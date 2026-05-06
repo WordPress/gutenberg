@@ -156,6 +156,22 @@ const BLOCK_SUPPORT_FEATURE_LEVEL_SELECTORS = {
 	typography: 'typography',
 };
 
+// The valid pseudo-selectors that can be used for blocks.
+// Keep in sync with WP_Theme_JSON_Gutenberg::VALID_BLOCK_PSEUDO_SELECTORS.
+const VALID_BLOCK_PSEUDO_SELECTORS: Record< string, string[] > = {
+	'core/button': [ ':hover', ':focus', ':focus-visible', ':active' ],
+	'core/navigation-link': [ ':hover', ':focus', ':focus-visible', ':active' ],
+};
+
+/**
+ * Responsive breakpoint state keys and their corresponding CSS media queries.
+ * Keep in sync with WP_Theme_JSON_Gutenberg::RESPONSIVE_BREAKPOINTS.
+ */
+const RESPONSIVE_BREAKPOINTS: Record< string, string > = {
+	mobile: '@media (width <= 480px)',
+	tablet: '@media (480px < width <= 782px)',
+};
+
 /**
  * Transform given preset tree into a set of preset class declarations.
  *
@@ -854,12 +870,26 @@ const STYLE_KEYS = [
 ];
 
 function pickStyleKeys( treeToPickFrom: any ): any {
+	return pickStyleAndPseudoKeys( treeToPickFrom );
+}
+
+function pickStyleAndPseudoKeys(
+	treeToPickFrom: any,
+	blockName?: string
+): any {
 	if ( ! treeToPickFrom ) {
 		return {};
 	}
 	const entries = Object.entries( treeToPickFrom );
-	const pickedEntries = entries.filter( ( [ key ] ) =>
-		STYLE_KEYS.includes( key )
+	const allowedPseudoSelectors = blockName
+		? VALID_BLOCK_PSEUDO_SELECTORS[ blockName ] ?? []
+		: [];
+
+	const pickedEntries = entries.filter(
+		( [ key ] ) =>
+			STYLE_KEYS.includes( key ) ||
+			allowedPseudoSelectors.includes( key ) ||
+			RESPONSIVE_BREAKPOINTS[ key ]
 	);
 	// clone the style objects so that `getFeatureDeclarations` can remove consumed keys from it
 	const clonedEntries = pickedEntries.map( ( [ key, style ] ) => [
@@ -867,6 +897,225 @@ function pickStyleKeys( treeToPickFrom: any ): any {
 		JSON.parse( JSON.stringify( style ) ),
 	] );
 	return Object.fromEntries( clonedEntries );
+}
+
+function appendPseudoSelectorStyles(
+	styles: Record< string, any >,
+	selector: string,
+	ruleset: string,
+	featureSelectors:
+		| string
+		| Record< string, string | Record< string, string > >
+		| undefined,
+	treeSettings: Record< string, any > | undefined,
+	blockName: string | undefined,
+	styleVariationSelector?: string
+): string {
+	const pseudoSelectorStyles = Object.entries( styles ).filter( ( [ key ] ) =>
+		key.startsWith( ':' )
+	);
+
+	if ( ! pseudoSelectorStyles.length ) {
+		return ruleset;
+	}
+
+	pseudoSelectorStyles.forEach( ( [ pseudoKey, pseudoStyle ] ) => {
+		if ( ! pseudoStyle || typeof pseudoStyle !== 'object' ) {
+			return;
+		}
+
+		const remainingPseudoStyles = JSON.parse(
+			JSON.stringify( pseudoStyle )
+		);
+
+		if ( featureSelectors && typeof featureSelectors !== 'string' ) {
+			let pseudoFeatureDeclarations = getFeatureDeclarations(
+				featureSelectors,
+				remainingPseudoStyles
+			);
+
+			pseudoFeatureDeclarations = updateParagraphTextIndentSelector(
+				pseudoFeatureDeclarations,
+				treeSettings,
+				blockName
+			);
+
+			pseudoFeatureDeclarations = updateButtonWidthDeclarations(
+				pseudoFeatureDeclarations,
+				treeSettings
+			);
+
+			Object.entries( pseudoFeatureDeclarations ).forEach(
+				( [ baseSelector, declarations ] ) => {
+					if ( ! declarations.length ) {
+						return;
+					}
+					const pseudoFeatureSelector = appendToSelector(
+						baseSelector,
+						pseudoKey
+					);
+					const cssSelector = styleVariationSelector
+						? concatFeatureVariationSelectorString(
+								pseudoFeatureSelector,
+								styleVariationSelector
+						  )
+						: pseudoFeatureSelector;
+					const rules = declarations.join( ';' );
+					ruleset += `:root :where(${ cssSelector }){${ rules };}`;
+				}
+			);
+		}
+
+		const pseudoDeclarations = getStylesDeclarations(
+			remainingPseudoStyles
+		);
+
+		if ( ! pseudoDeclarations.length ) {
+			return;
+		}
+
+		const pseudoSelector = appendToSelector( selector, pseudoKey );
+		const pseudoRule = `:root :where(${ pseudoSelector }){${ pseudoDeclarations.join(
+			';'
+		) };}`;
+
+		ruleset += pseudoRule;
+	} );
+
+	return ruleset;
+}
+
+/**
+ * Appends CSS rules for responsive breakpoint states to a ruleset string.
+ * Block styles stored under responsive keys (for example, 'mobile' and
+ * 'tablet') are wrapped in corresponding media queries instead of being
+ * appended directly to the selector.
+ *
+ * @param styles                 The styles object potentially containing responsive keys.
+ * @param selector               The base CSS selector for the block.
+ * @param ruleset                The accumulating CSS ruleset string.
+ * @param featureSelectors       Optional feature-level selectors for the block.
+ * @param treeSettings           Global styles settings tree.
+ * @param blockName              Optional block name used to resolve valid pseudo selectors.
+ * @param styleVariationSelector Optional style variation selector.
+ * @param blockRootSelector      Optional block root selector used to detect block-level feature selectors.
+ * @param styleVariationName     Optional variation name used when applying variation class to block-level feature selectors.
+ * @return Updated ruleset string with responsive base, feature-level, and pseudo-state CSS appended.
+ */
+function appendResponsiveStyles(
+	styles: Record< string, any >,
+	selector: string,
+	ruleset: string,
+	featureSelectors:
+		| string
+		| Record< string, string | Record< string, string > >
+		| undefined,
+	treeSettings: Record< string, any > | undefined,
+	blockName?: string,
+	styleVariationSelector?: string,
+	blockRootSelector?: string,
+	styleVariationName?: string
+): string {
+	const responsiveStyles = Object.entries( styles ).filter(
+		( [ key ] ) => RESPONSIVE_BREAKPOINTS[ key ]
+	);
+
+	if ( ! responsiveStyles.length ) {
+		return ruleset;
+	}
+
+	responsiveStyles.forEach( ( [ breakpointKey, breakpointStyle ] ) => {
+		if ( ! breakpointStyle || typeof breakpointStyle !== 'object' ) {
+			return;
+		}
+
+		const mediaQuery = RESPONSIVE_BREAKPOINTS[ breakpointKey ];
+		const remainingBreakpointStyles = JSON.parse(
+			JSON.stringify( breakpointStyle )
+		);
+
+		if ( featureSelectors && typeof featureSelectors !== 'string' ) {
+			let breakpointFeatureDeclarations = getFeatureDeclarations(
+				featureSelectors,
+				remainingBreakpointStyles
+			);
+
+			breakpointFeatureDeclarations = updateParagraphTextIndentSelector(
+				breakpointFeatureDeclarations,
+				treeSettings,
+				blockName
+			);
+
+			breakpointFeatureDeclarations = updateButtonWidthDeclarations(
+				breakpointFeatureDeclarations,
+				treeSettings
+			);
+
+			Object.entries( breakpointFeatureDeclarations ).forEach(
+				( [ baseSelector, declarations ] ) => {
+					if ( ! declarations.length ) {
+						return;
+					}
+					let cssSelector: string;
+					if ( ! styleVariationSelector ) {
+						cssSelector = baseSelector;
+					} else if (
+						blockRootSelector &&
+						styleVariationName &&
+						! baseSelector.includes( blockRootSelector )
+					) {
+						/*
+						 * Feature selector is block-level (e.g. `.wp-block-button` for
+						 * dimensions/width) — apply the variation class directly to it.
+						 */
+						cssSelector = getBlockStyleVariationSelector(
+							styleVariationName,
+							baseSelector
+						);
+					} else {
+						cssSelector = concatFeatureVariationSelectorString(
+							baseSelector,
+							styleVariationSelector
+						);
+					}
+					const rules = declarations.join( ';' );
+					ruleset += `${ mediaQuery }{:root :where(${ cssSelector }){${ rules };}}`;
+				}
+			);
+		}
+
+		const breakpointDeclarations = getStylesDeclarations(
+			remainingBreakpointStyles
+		);
+
+		if ( breakpointDeclarations.length ) {
+			const cssSelector = styleVariationSelector
+				? concatFeatureVariationSelectorString(
+						selector,
+						styleVariationSelector
+				  )
+				: selector;
+			ruleset += `${ mediaQuery }{:root :where(${ cssSelector }){${ breakpointDeclarations.join(
+				';'
+			) };}}`;
+		}
+
+		const breakpointPseudoRules = appendPseudoSelectorStyles(
+			remainingBreakpointStyles,
+			selector,
+			'',
+			featureSelectors,
+			treeSettings,
+			blockName,
+			styleVariationSelector
+		);
+
+		if ( breakpointPseudoRules ) {
+			ruleset += `${ mediaQuery }{${ breakpointPseudoRules }}`;
+		}
+	} );
+
+	return ruleset;
 }
 
 export const getNodesWithStyles = (
@@ -920,7 +1169,7 @@ export const getNodesWithStyles = (
 	// Iterate over blocks: they can have styles & elements.
 	Object.entries( tree.styles?.blocks ?? {} ).forEach(
 		( [ blockName, node ] ) => {
-			const blockStyles = pickStyleKeys( node );
+			const blockStyles = pickStyleAndPseudoKeys( node, blockName );
 			const typedNode = node as BlockNode;
 
 			// Store variation data for later processing, but don't add to nodes yet.
@@ -932,8 +1181,10 @@ export const getNodesWithStyles = (
 				Object.entries( typedNode.variations ).forEach(
 					( [ variationName, variation ] ) => {
 						const typedVariation = variation as BlockVariation;
-						variations[ variationName ] =
-							pickStyleKeys( typedVariation );
+						variations[ variationName ] = pickStyleAndPseudoKeys(
+							typedVariation,
+							blockName
+						);
 						if ( typedVariation?.css ) {
 							variations[ variationName ].css =
 								typedVariation.css;
@@ -1002,7 +1253,10 @@ export const getNodesWithStyles = (
 										: undefined;
 
 								const variationBlockStyleNodes =
-									pickStyleKeys( variationBlockStyles );
+									pickStyleAndPseudoKeys(
+										variationBlockStyles,
+										variationBlockName
+									);
 
 								if ( variationBlockStyles?.css ) {
 									variationBlockStyleNodes.css =
@@ -1562,6 +1816,29 @@ export const transformToStyles = (
 										`:root :where(${ styleVariationSelector })`
 									);
 								}
+
+								ruleset = appendPseudoSelectorStyles(
+									styleVariations,
+									styleVariationSelector as string,
+									ruleset,
+									featureSelectors,
+									tree.settings,
+									name,
+									styleVariationSelector as string
+								);
+
+								ruleset = appendResponsiveStyles(
+									styleVariations,
+									styleVariationSelector as string,
+									ruleset,
+									featureSelectors,
+									tree.settings,
+									name,
+									styleVariationSelector as string,
+									selector,
+									styleVariationName
+								);
+
 								// Generate layout styles for the variation if it supports layout and has blockGap defined.
 								if (
 									hasLayoutSupport &&
@@ -1583,45 +1860,23 @@ export const transformToStyles = (
 					);
 				}
 
-				// Check for pseudo selector in `styles` and handle separately.
-				const pseudoSelectorStyles = Object.entries( styles ).filter(
-					( [ key ] ) => key.startsWith( ':' )
+				ruleset = appendPseudoSelectorStyles(
+					styles,
+					selector,
+					ruleset,
+					featureSelectors,
+					tree.settings,
+					name
 				);
 
-				if ( pseudoSelectorStyles?.length ) {
-					pseudoSelectorStyles.forEach(
-						( [ pseudoKey, pseudoStyle ] ) => {
-							const pseudoDeclarations =
-								getStylesDeclarations( pseudoStyle );
-
-							if ( ! pseudoDeclarations?.length ) {
-								return;
-							}
-
-							// `selector` may be provided in a form
-							// where block level selectors have sub element
-							// selectors appended to them as a comma separated
-							// string.
-							// e.g. `h1 a,h2 a,h3 a,h4 a,h5 a,h6 a`;
-							// Split and append pseudo selector to create
-							// the proper rules to target the elements.
-							const _selector = selector
-								.split( ',' )
-								.map( ( sel: string ) => sel + pseudoKey )
-								.join( ',' );
-
-							// As pseudo classes such as :hover, :focus etc. have class-level
-							// specificity, they must use the `:root :where()` wrapper. This.
-							// caps the specificity at `0-1-0` to allow proper nesting of variations
-							// and block type element styles.
-							const pseudoRule = `:root :where(${ _selector }){${ pseudoDeclarations.join(
-								';'
-							) };}`;
-
-							ruleset += pseudoRule;
-						}
-					);
-				}
+				ruleset = appendResponsiveStyles(
+					styles,
+					selector,
+					ruleset,
+					featureSelectors,
+					tree.settings,
+					name
+				);
 			}
 		);
 	}

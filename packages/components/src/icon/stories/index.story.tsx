@@ -16,6 +16,7 @@ import Icon from '..';
 import { VStack } from '../../v-stack';
 
 const meta: Meta< typeof Icon > = {
+	tags: [ 'manifest' ],
 	title: 'Components/Icon',
 	component: Icon,
 	parameters: {

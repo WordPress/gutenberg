@@ -620,7 +620,7 @@ export const StyleBookBody = ( {
 			<style>
 				{ STYLE_BOOK_IFRAME_STYLES }
 				{ !! onClick &&
-					'body { cursor: pointer; } body * { pointer-events: none; }' }
+					'body { cursor: var(--wpds-cursor-control); } body * { pointer-events: none; }' }
 			</style>
 			<Examples
 				className="editor-style-book__examples"

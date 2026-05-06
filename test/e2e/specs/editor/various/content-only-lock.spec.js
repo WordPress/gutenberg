@@ -322,6 +322,7 @@ test.describe( 'Content-only lock', () => {
 
 		// Select the content-locked group block.
 		await editor.selectBlocks( groupBlock );
+
 		await test.step( 'Blocks cannot be inserted before/after or duplicated', async () => {
 			// Test paragraph.
 			await editor.selectBlocks( heading );
@@ -459,6 +460,7 @@ test.describe( 'Content-only lock', () => {
 
 		// Select the content-locked group block.
 		await editor.selectBlocks( groupBlock );
+
 		await test.step( 'Blocks can be inserted before/after or duplicated', async () => {
 			// Test first list item.
 			await editor.selectBlocks( firstListItem );
@@ -623,7 +625,7 @@ test.describe( 'Content-only lock', () => {
 		// Verify no new paragraph was inserted in the Column.
 		const afterBlocks = await editor.getBlocks();
 		const afterColumn = afterBlocks[ 0 ].innerBlocks[ 0 ].innerBlocks[ 1 ];
-		expect( afterColumn.innerBlocks.length ).toBe( initialColumnChildren );
+		expect( afterColumn.innerBlocks ).toHaveLength( initialColumnChildren );
 	} );
 
 	test( 'should insert blocks via Add before and Add after for paragraphs in contentOnly mode', async ( {

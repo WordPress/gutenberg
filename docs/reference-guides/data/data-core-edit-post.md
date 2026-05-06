@@ -124,18 +124,6 @@ _Returns_
 
 -   `Object`: Preferences Object.
 
-### getRtcCompatibleMetaBoxIds
-
-Returns the list of meta box IDs marked as compatible with real-time collaboration via the add_meta_box() \_\_rtc_compatible_meta_box compatibility flag.
-
-_Parameters_
-
--   _state_ `Object`: Global application state.
-
-_Returns_
-
--   `string[]`: List of RTC-compatible meta box IDs.
-
 ### hasMetaBoxes
 
 Returns true if the post is using Meta Boxes
@@ -483,14 +471,6 @@ Returns an action object used to open/close the list view.
 _Parameters_
 
 -   _isOpen_ `boolean`: A boolean representing whether the list view should be opened or closed.
-
-### setRtcCompatibleMetaBoxIds
-
-Stores the IDs of meta boxes marked as compatible with real-time collaboration via the \_\_rtc_compatible_meta_box flag on the server.
-
-_Parameters_
-
--   _ids_ `string[]`: Meta box IDs that are RTC-compatible.
 
 ### showBlockTypes
 

@@ -36,7 +36,7 @@
 
 	// When used in picker context, ensure row selection works as expected
 	.dataviews-view-table__row {
-		cursor: pointer;
+		cursor: var(--wpds-cursor-control);
 
 		&.is-selected {
 			// Ensure selected rows are visually distinct

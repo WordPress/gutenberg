@@ -626,8 +626,8 @@ registerBlockType( 'namespace/block-name', {
 
 _Parameters_
 
--   _blockNameOrMetadata_ `string | Record< string, unknown >`: Block type name or its metadata.
--   _settings_ `Partial< BlockType >`: Block settings.
+-   _blockNameOrMetadata_ `string | BlockConfiguration< Attributes >`: Block type name or its metadata.
+-   _settings_ `Partial< BlockConfiguration< Attributes > >`: Block settings.
 
 _Returns_
 
@@ -666,7 +666,7 @@ const ExampleComponent = () => {
 _Parameters_
 
 -   _blockName_ `string`: Name of the block (example: “core/columns”).
--   _variation_ `BlockVariation`: Object describing a block variation.
+-   _variation_ `BlockVariation | BlockVariation[]`: Object describing a block variation.
 
 ### serialize
 
@@ -943,7 +943,7 @@ const ExampleComponent = () => {
 _Parameters_
 
 -   _blockName_ `string`: Name of the block (example: “core/columns”).
--   _variationName_ `string`: Name of the variation defined for the block.
+-   _variationName_ `string | string[]`: Name of the variation defined for the block.
 
 ### updateCategory
 

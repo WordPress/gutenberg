@@ -44,7 +44,7 @@
 		min-height: 4px;
 		border: none;
 		padding: 0;
-		cursor: pointer;
+		cursor: var(--wpds-cursor-control);
 		transition: opacity 0.1s ease;
 
 		&.is-added {

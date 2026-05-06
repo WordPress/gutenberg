@@ -1,0 +1,10 @@
+.loading,
+.error {
+	height: 100%;
+	padding: var(--wpds-dimension-padding-md);
+	color: var(--wpds-color-fg-content-neutral-weak);
+}
+
+.error {
+	text-align: center;
+}
