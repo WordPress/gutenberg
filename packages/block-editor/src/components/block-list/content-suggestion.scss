@@ -1,0 +1,104 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+
+// Visual treatment for blocks tagged with a pending suggestion. The marker
+// itself lives in `metadata.suggestion` (set by the editor-package suggestion
+// system); this stylesheet only knows about the resulting class name. Lives in
+// `block-editor` because the canvas iframe loads `wp-block-editor-content`
+// (compiled from this package) but does NOT load the editor-package chrome
+// stylesheets — keeping these rules here is what makes them apply inside the
+// iframe.
+
+$suggestion-color: #007017;
+
+// Green "bracket" applied to any block with a pending attribute overlay
+// while the suggester is editing. Drawn with an outline so it layers above
+// block content without affecting layout.
+.block-editor-block-list__block.is-suggestion-pending {
+	position: relative;
+	outline: 2px solid $suggestion-color;
+	outline-offset: 2px;
+	border-radius: $radius-small;
+
+	&::before,
+	&::after {
+		content: "";
+		position: absolute;
+		width: $grid-unit-10;
+		height: $grid-unit-10;
+		border: 2px solid $suggestion-color;
+		pointer-events: none;
+	}
+
+	&::before {
+		top: -$grid-unit-05;
+		left: -$grid-unit-05;
+		border-right: 0;
+		border-bottom: 0;
+	}
+
+	&::after {
+		bottom: -$grid-unit-05;
+		right: -$grid-unit-05;
+		border-left: 0;
+		border-top: 0;
+	}
+}
+
+// Pending-remove: the block is still real (selection, focus, and toolbar
+// keep working) but the visual treatment communicates "proposed for
+// deletion". A horizontal rule sits over the block; reduced opacity
+// de-emphasizes the content without hiding it.
+.block-editor-block-list__block.is-suggestion-pending-remove {
+	position: relative;
+	opacity: 0.5;
+
+	&::after {
+		content: "";
+		position: absolute;
+		inset: 0;
+		top: 50%;
+		pointer-events: none;
+		border-top: 2px solid var(--wp-block-synced-color, #cc1818);
+	}
+}
+
+// Pending-insert: the block was inserted in Suggest mode but isn't yet
+// "real". A dashed green outline distinguishes it from the solid bracket
+// used by pending attribute edits.
+.block-editor-block-list__block.is-suggestion-pending-insert {
+	position: relative;
+	opacity: 0.7;
+	outline: 2px dashed $suggestion-color;
+	outline-offset: 2px;
+	border-radius: $radius-small;
+}
+
+// Pending-move: the block has been dragged to a new position but the move
+// isn't yet committed. A dotted green outline distinguishes it from the
+// dashed pending-insert (the block existed before — only its position is
+// suggested). The "Suggested move" tab pinned to the top corner makes the
+// preview state unambiguous.
+.block-editor-block-list__block.is-suggestion-pending-move {
+	position: relative;
+	opacity: 0.7;
+	outline: 2px dotted $suggestion-color;
+	outline-offset: 2px;
+	border-radius: $radius-small;
+
+	&::before {
+		content: "Suggested move";
+		position: absolute;
+		top: -$grid-unit-20;
+		left: -$grid-unit-05;
+		padding: 0 $grid-unit-10;
+		background: $suggestion-color;
+		color: $white;
+		font-size: 11px;
+		font-weight: 500;
+		line-height: $grid-unit-20;
+		border-radius: $radius-small $radius-small 0 0;
+		pointer-events: none;
+		z-index: 1;
+	}
+}
