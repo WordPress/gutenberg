@@ -10,17 +10,6 @@ import { notFound } from '@wordpress/route';
  */
 import { ensureView, viewToQuery } from './view-utils';
 
-function getEditLink( postType: string, postId: string ) {
-	if (
-		postType === 'attachment' &&
-		typeof window !== 'undefined' &&
-		( window as any ).__experimentalMediaEditor
-	) {
-		return `/media-editor/${ postId }`;
-	}
-	return `/types/${ postType }/edit/${ postId }`;
-}
-
 /**
  * Route configuration for post list.
  */
@@ -75,7 +64,7 @@ export const route = {
 				postType: params.type,
 				postId,
 				isPreview: true,
-				editLink: getEditLink( params.type, postId ),
+				editLink: `/types/${ params.type }/edit/${ postId }`,
 			};
 		}
 
@@ -94,7 +83,7 @@ export const route = {
 				postType: params.type,
 				postId,
 				isPreview: true,
-				editLink: getEditLink( params.type, postId ),
+				editLink: `/types/${ params.type }/edit/${ postId }`,
 			};
 		}
 

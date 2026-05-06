@@ -24,7 +24,7 @@ import { useSelect } from '@wordpress/data';
 import { useMemo, useCallback } from '@wordpress/element';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
-import { drawerRight, pencil } from '@wordpress/icons';
+import { drawerRight } from '@wordpress/icons';
 import type { Post } from '@wordpress/core-data';
 
 /**
@@ -235,27 +235,6 @@ function PostList() {
 		[ navigate, searchParams ]
 	);
 
-	const mediaEditorAction = useMemo< Action< Post > >(
-		() => ( {
-			id: 'edit-media',
-			label: __( 'Edit' ),
-			icon: pencil,
-			isPrimary: true,
-			isEligible( post: Post ) {
-				return post.type === 'attachment';
-			},
-			callback( items: Post[] ) {
-				const item = items[ 0 ];
-				if ( item ) {
-					navigate( {
-						to: `/media-editor/${ item.id }`,
-					} );
-				}
-			},
-		} ),
-		[ navigate ]
-	);
-
 	const actions = useMemo( () => {
 		const _actions = [
 			...postTypeActions?.flatMap< Action< Post > >( ( action ) => {
@@ -298,24 +277,11 @@ function PostList() {
 				return [ action ];
 			} ),
 		];
-		if (
-			postType === 'attachment' &&
-			typeof window !== 'undefined' &&
-			( window as any ).__experimentalMediaEditor
-		) {
-			_actions.unshift( mediaEditorAction );
-		}
 		if ( view.type !== LAYOUT_LIST ) {
 			_actions.unshift( quickEditAction );
 		}
 		return _actions;
-	}, [
-		mediaEditorAction,
-		postType,
-		quickEditAction,
-		postTypeActions,
-		view.type,
-	] );
+	}, [ quickEditAction, postTypeActions, view.type ] );
 
 	const handleTabChange = useCallback(
 		( status: string ) => {
