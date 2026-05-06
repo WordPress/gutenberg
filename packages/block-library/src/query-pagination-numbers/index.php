@@ -29,6 +29,8 @@ function render_block_core_query_pagination_numbers( $attributes, $content, $blo
 	global $wp_query;
 	$mid_size = isset( $block->attributes['midSize'] ) ? (int) $block->attributes['midSize'] : null;
 	if ( isset( $block->context['query']['inherit'] ) && $block->context['query']['inherit'] ) {
+		$prev_wp_query = $wp_query;
+		$wp_query      = block_core_query_get_inherited_query( $block );
 		// Take into account if we have set a bigger `max page`
 		// than what the query has.
 		$total         = ! $max_page || $max_page > $wp_query->max_num_pages ? $wp_query->max_num_pages : $max_page;
@@ -40,6 +42,7 @@ function render_block_core_query_pagination_numbers( $attributes, $content, $blo
 			$paginate_args['mid_size'] = $mid_size;
 		}
 		$content = paginate_links( $paginate_args );
+		$wp_query = $prev_wp_query;
 	} else {
 		$block_query = new WP_Query( build_query_vars_from_query_block( $block, $page ) );
 		// `paginate_links` works with the global $wp_query, so we have to

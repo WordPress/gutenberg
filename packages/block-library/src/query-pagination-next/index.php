@@ -48,10 +48,14 @@ function render_block_core_query_pagination_next( $attributes, $content, $block 
 		// Take into account if we have set a bigger `max page`
 		// than what the query has.
 		global $wp_query;
-		if ( $max_page > $wp_query->max_num_pages ) {
-			$max_page = $wp_query->max_num_pages;
+		$inherited_query = block_core_query_get_inherited_query( $block );
+		$prev_wp_query   = $wp_query;
+		$wp_query        = $inherited_query;
+		if ( $max_page > $inherited_query->max_num_pages ) {
+			$max_page = $inherited_query->max_num_pages;
 		}
 		$content = get_next_posts_link( $label, $max_page );
+		$wp_query = $prev_wp_query;
 		remove_filter( 'next_posts_link_attributes', $filter_link_attributes );
 	} elseif ( ! $max_page || $max_page > $page ) {
 		$custom_query           = new WP_Query( build_query_vars_from_query_block( $block, $page ) );

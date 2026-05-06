@@ -71,6 +71,37 @@ function register_block_core_query() {
 add_action( 'init', 'register_block_core_query' );
 
 /**
+ * Returns the inherited query for a Query block.
+ *
+ * If the Query block inherits the global query but defines its own posts per page
+ * value, run a matching query with that override so template-specific Query blocks
+ * can limit the number of displayed posts without changing the site reading setting.
+ *
+ * @since 7.1.0
+ *
+ * @global WP_Query $wp_query WordPress Query object.
+ *
+ * @param WP_Block $block Block instance.
+ * @return WP_Query Query object.
+ */
+function block_core_query_get_inherited_query( $block ) {
+	global $wp_query;
+
+	$per_page = isset( $block->context['query']['perPage'] )
+		? absint( $block->context['query']['perPage'] )
+		: 0;
+
+	if ( ! $per_page || $per_page === absint( $wp_query->get( 'posts_per_page' ) ) ) {
+		return $wp_query;
+	}
+
+	$query_vars                   = $wp_query->query_vars;
+	$query_vars['posts_per_page'] = $per_page;
+
+	return new WP_Query( $query_vars );
+}
+
+/**
  * Traverse the tree of blocks looking for any plugin block (i.e., a block from
  * an installed plugin) inside a Query block with the enhanced pagination
  * enabled. If at least one is found, the enhanced pagination is effectively
