@@ -10,6 +10,7 @@ import {
 /**
  * Internal dependencies
  */
+import { __ } from '@wordpress/i18n';
 import { store as blockEditorStore } from '../../store';
 
 /**
@@ -28,6 +29,13 @@ import { store as blockEditorStore } from '../../store';
  * @param {string|undefined} props.context       The context to pass to `getBlockLabel`.
  * @return {?string} Block title.
  */
+
+const CONTEXTUAL_BLOCK_LABELS = {
+	'core/query-no-results': {
+		'core/paragraph': __( 'Query: No results text' ),
+	},
+};
+
 export default function useBlockDisplayTitle( {
 	clientId,
 	maximumLength,
@@ -39,7 +47,7 @@ export default function useBlockDisplayTitle( {
 				return null;
 			}
 
-			const { getBlockName, getBlockAttributes } =
+			const { getBlockName, getBlockAttributes, getBlockParents } =
 				select( blockEditorStore );
 			const { getBlockType, getActiveBlockVariation } =
 				select( blocksStore );
@@ -59,7 +67,22 @@ export default function useBlockDisplayTitle( {
 
 			const match = getActiveBlockVariation( blockName, attributes );
 			// Label will fallback to the title if no label is defined for the current label context.
-			return match?.title || blockType.title;
+			let blockTitleToReturn = match?.title || blockType.title;
+
+			if ( context === 'list-view' ) {
+				const parents = getBlockParents( clientId );
+				if ( parents?.length > 0 ) {
+					const parentClientId = parents[ parents.length - 1 ];
+					const parentName = getBlockName( parentClientId );
+					if (
+						CONTEXTUAL_BLOCK_LABELS[ parentName ]?.[ blockName ]
+					) {
+						blockTitleToReturn =
+							CONTEXTUAL_BLOCK_LABELS[ parentName ][ blockName ];
+					}
+				}
+			}
+			return blockTitleToReturn;
 		},
 		[ clientId, context ]
 	);
