@@ -22,17 +22,6 @@ async function createUserPostType( requestUtils ) {
 	} );
 }
 
-async function visitPostTypesList( admin ) {
-	await admin.visitAdminPage( SETTINGS_PAGE_PATH, POST_TYPES_PAGE_QUERY );
-}
-
-async function visitPostTypeEdit( admin, id ) {
-	await admin.visitAdminPage(
-		SETTINGS_PAGE_PATH,
-		`${ POST_TYPES_PAGE_QUERY }&p=/edit/${ id }`
-	);
-}
-
 test.describe( 'User post types', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.setGutenbergExperiments( [
@@ -53,7 +42,7 @@ test.describe( 'User post types', () => {
 		page,
 		requestUtils,
 	} ) => {
-		await visitPostTypesList( admin );
+		await admin.visitAdminPage( SETTINGS_PAGE_PATH, POST_TYPES_PAGE_QUERY );
 
 		await page.getByRole( 'button', { name: 'Add post type' } ).click();
 
@@ -102,7 +91,7 @@ test.describe( 'User post types', () => {
 		requestUtils,
 	} ) => {
 		await createUserPostType( requestUtils );
-		await visitPostTypesList( admin );
+		await admin.visitAdminPage( SETTINGS_PAGE_PATH, POST_TYPES_PAGE_QUERY );
 
 		const row = page.getByRole( 'row', { name: /Books/ } );
 		await row.getByRole( 'button', { name: 'Actions' } ).click();
@@ -144,7 +133,10 @@ test.describe( 'User post types', () => {
 		requestUtils,
 	} ) => {
 		const created = await createUserPostType( requestUtils );
-		await visitPostTypeEdit( admin, created.id );
+		await admin.visitAdminPage(
+			SETTINGS_PAGE_PATH,
+			`${ POST_TYPES_PAGE_QUERY }&p=/edit/${ created.id }`
+		);
 
 		await page
 			.getByRole( 'checkbox', { name: 'Hierarchical', exact: true } )

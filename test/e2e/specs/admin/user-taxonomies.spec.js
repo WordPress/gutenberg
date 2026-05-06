@@ -33,17 +33,6 @@ async function createUserTaxonomy( requestUtils ) {
 	} );
 }
 
-async function visitTaxonomiesList( admin ) {
-	await admin.visitAdminPage( SETTINGS_PAGE_PATH, TAXONOMIES_PAGE_QUERY );
-}
-
-async function visitTaxonomyEdit( admin, id ) {
-	await admin.visitAdminPage(
-		SETTINGS_PAGE_PATH,
-		`${ TAXONOMIES_PAGE_QUERY }&p=/edit/${ id }`
-	);
-}
-
 test.describe( 'User taxonomies', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.setGutenbergExperiments( [
@@ -64,7 +53,7 @@ test.describe( 'User taxonomies', () => {
 		page,
 		requestUtils,
 	} ) => {
-		await visitTaxonomiesList( admin );
+		await admin.visitAdminPage( SETTINGS_PAGE_PATH, TAXONOMIES_PAGE_QUERY );
 
 		await page.getByRole( 'button', { name: 'Add taxonomy' } ).click();
 
@@ -123,7 +112,7 @@ test.describe( 'User taxonomies', () => {
 		requestUtils,
 	} ) => {
 		await createUserTaxonomy( requestUtils );
-		await visitTaxonomiesList( admin );
+		await admin.visitAdminPage( SETTINGS_PAGE_PATH, TAXONOMIES_PAGE_QUERY );
 
 		const row = page.getByRole( 'row', { name: /Genres/ } );
 		await row.getByRole( 'button', { name: 'Actions' } ).click();
@@ -162,7 +151,10 @@ test.describe( 'User taxonomies', () => {
 	test.describe( 'Edit taxonomy', () => {
 		test.beforeEach( async ( { requestUtils, admin } ) => {
 			const created = await createUserTaxonomy( requestUtils );
-			await visitTaxonomyEdit( admin, created.id );
+			await admin.visitAdminPage(
+				SETTINGS_PAGE_PATH,
+				`${ TAXONOMIES_PAGE_QUERY }&p=/edit/${ created.id }`
+			);
 		} );
 
 		test( 'editing a taxonomy persists changes to the registered taxonomy', async ( {
