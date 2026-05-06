@@ -63,10 +63,15 @@ $suggestion-color: #188038;
 
 // Pending-insert: the block was inserted in Suggest mode but isn't yet
 // "real". A dashed green outline distinguishes it from the solid bracket
-// used by pending attribute edits.
+// used by pending attribute edits, and the suggester's typed content
+// is rendered in suggestion green so the reviewer sees a green preview
+// of what's being added (matching Google Docs' suggesting-mode insert
+// treatment). Edits to a pending-insert block bypass the suggestion
+// overlay (see `with-suggestion-overlay.js`) so the content syncs and
+// shows up here.
 .block-editor-block-list__block.is-suggestion-pending-insert {
 	position: relative;
-	opacity: 0.7;
+	color: $suggestion-color;
 	outline: 2px dashed $suggestion-color;
 	outline-offset: 2px;
 	border-radius: $radius-small;
