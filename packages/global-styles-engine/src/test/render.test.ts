@@ -811,6 +811,9 @@ describe( 'global styles renderer', () => {
 								},
 							},
 							mobile: {
+								color: {
+									text: 'red',
+								},
 								':hover': {
 									color: {
 										text: 'orange',
@@ -839,7 +842,7 @@ describe( 'global styles renderer', () => {
 			);
 
 			expect( result ).toEqual(
-				':root :where(.wp-block-button:hover){color: blue;}@media (width <= 480px){:root :where(.wp-block-button:hover){color: orange;}}'
+				':root :where(.wp-block-button:hover){color: blue;}@media (width <= 480px){:root :where(.wp-block-button){color: red;}:root :where(.wp-block-button:hover){color: orange;}}'
 			);
 		} );
 

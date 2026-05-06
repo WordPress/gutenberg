@@ -169,11 +169,6 @@ interface StylesNode {
 	name?: string;
 }
 
-interface ResponsiveStyleNode {
-	breakpointKey: string;
-	node: StylesNode;
-}
-
 type ElementName = keyof typeof ELEMENTS;
 
 // Elements that rely on class names in their selectors.
@@ -1064,16 +1059,13 @@ function getBlockPseudoStyleNodes( node: StylesNode ): StylesNode[] {
 /**
  * Creates style nodes for configured responsive breakpoint states.
  *
- * Breakpoint nodes render feature-level and base declarations through the
- * normal node renderer. Responsive pseudo styles are intentionally handled by
- * a separate fallback so their output can stay in the existing order for now.
+ * Breakpoint nodes render feature-level, base, and pseudo declarations through
+ * the normal node renderer.
  *
  * @param node Style node that may contain configured responsive state styles.
  * @return Responsive style nodes in configured breakpoint order.
  */
-function getBlockResponsiveStyleNodes(
-	node: StylesNode
-): ResponsiveStyleNode[] {
+function getBlockResponsiveStyleNodes( node: StylesNode ): StylesNode[] {
 	const { styles, selector, featureSelectors, name } = node;
 
 	if ( ! name ) {
@@ -1089,54 +1081,18 @@ function getBlockResponsiveStyleNodes(
 
 			return [
 				{
-					breakpointKey,
-					node: {
-						styles: JSON.parse(
-							JSON.stringify( breakpointStyles )
-						),
-						selector,
-						mediaQuery,
-						featureSelectors:
-							featureSelectors &&
-							typeof featureSelectors !== 'string'
-								? featureSelectors
-								: undefined,
-						name,
-					},
+					styles: JSON.parse( JSON.stringify( breakpointStyles ) ),
+					selector,
+					mediaQuery,
+					featureSelectors:
+						featureSelectors && typeof featureSelectors !== 'string'
+							? featureSelectors
+							: undefined,
+					name,
 				},
 			];
 		}
 	);
-}
-
-function appendResponsivePseudoSelectorStyles(
-	styles: Record< string, any >,
-	selector: string,
-	ruleset: string,
-	featureSelectors: StylesNode[ 'featureSelectors' ],
-	treeSettings: Record< string, any > | undefined,
-	blockName: string | undefined,
-	breakpointKey: string
-): string {
-	const breakpointStyle = styles?.[ breakpointKey ];
-	if ( ! breakpointStyle || typeof breakpointStyle !== 'object' ) {
-		return ruleset;
-	}
-
-	const breakpointPseudoRules = appendPseudoSelectorStyles(
-		JSON.parse( JSON.stringify( breakpointStyle ) ),
-		selector,
-		'',
-		featureSelectors,
-		treeSettings,
-		blockName
-	);
-
-	if ( breakpointPseudoRules ) {
-		ruleset += `${ RESPONSIVE_BREAKPOINTS[ breakpointKey ] }{${ breakpointPseudoRules }}`;
-	}
-
-	return ruleset;
 }
 
 /**
@@ -2014,30 +1970,17 @@ function renderStylesNode(
 			name,
 		} );
 		if ( blockResponsiveNodes.length ) {
-			blockResponsiveNodes.forEach(
-				( { breakpointKey, node: responsiveNode } ) => {
-					ruleset += renderStylesNode( responsiveNode, {
-						tree,
-						options,
-						useRootPaddingAlign,
-						disableLayoutStyles: true,
-						hasBlockGapSupport,
-						hasFallbackGapSupport,
-						disableRootPadding,
-						includeStateStyles: false,
-					} );
-
-					ruleset = appendResponsivePseudoSelectorStyles(
-						styles,
-						selector,
-						ruleset,
-						featureSelectors,
-						tree.settings,
-						name,
-						breakpointKey
-					);
-				}
-			);
+			blockResponsiveNodes.forEach( ( responsiveNode ) => {
+				ruleset += renderStylesNode( responsiveNode, {
+					tree,
+					options,
+					useRootPaddingAlign,
+					disableLayoutStyles: true,
+					hasBlockGapSupport,
+					hasFallbackGapSupport,
+					disableRootPadding,
+				} );
+			} );
 		} else {
 			ruleset = appendResponsiveStyles(
 				styles,
