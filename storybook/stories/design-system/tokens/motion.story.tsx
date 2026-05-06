@@ -153,8 +153,7 @@ function MotionDemo() {
 
 	return (
 		<Stack direction="column" gap="xl">
-			{ /* eslint-disable-next-line react/no-danger */ }
-			<style dangerouslySetInnerHTML={ { __html: dotKeyframes } } />
+			<style>{ dotKeyframes }</style>
 			<div>
 				<Button variant="secondary" onClick={ replay }>
 					Replay animations
