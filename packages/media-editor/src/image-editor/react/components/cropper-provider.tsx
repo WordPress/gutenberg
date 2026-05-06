@@ -16,7 +16,9 @@ import {
 	type UseCropperStateReturn,
 } from '../hooks/use-cropper-state';
 import type { CropperState } from '../../core/types';
-import type { MeasuredCropperGeometry } from '../../core/crop-geometry';
+import type { NormalizedCropBounds } from '../../core/crop-geometry';
+
+type CropperImageBounds = NormalizedCropBounds | undefined;
 
 /**
  * The context value type for the CropperProvider.
@@ -26,18 +28,18 @@ type CropperContextValue = UseCropperStateReturn | null;
 
 const CropperContext = createContext< CropperContextValue >( null );
 
-type MeasuredCropperGeometryContextValue = {
-	geometry: MeasuredCropperGeometry | null;
-	setGeometry: React.Dispatch<
-		React.SetStateAction< MeasuredCropperGeometry | null >
+type CropperImageBoundsContextValue = {
+	imageBounds: CropperImageBounds;
+	setImageBounds: React.Dispatch<
+		React.SetStateAction< CropperImageBounds >
 	>;
 } | null;
 
-const MeasuredCropperGeometryContext =
-	createContext< MeasuredCropperGeometryContextValue >( null );
+const CropperImageBoundsContext =
+	createContext< CropperImageBoundsContextValue >( null );
 
-const noopSetGeometry: React.Dispatch<
-	React.SetStateAction< MeasuredCropperGeometry | null >
+const noopSetImageBounds: React.Dispatch<
+	React.SetStateAction< CropperImageBounds >
 > = () => {};
 
 /**
@@ -66,20 +68,19 @@ export function CropperProvider( {
 	children,
 }: CropperProviderProps ) {
 	const cropperReturn = useCropperState( initialState );
-	const [ geometry, setGeometry ] =
-		useState< MeasuredCropperGeometry | null >( null );
-	const geometryContextValue = useMemo(
-		() => ( { geometry, setGeometry } ),
-		[ geometry ]
+	const [ imageBounds, setImageBounds ] = useState< CropperImageBounds >();
+	const imageBoundsContextValue = useMemo(
+		() => ( { imageBounds, setImageBounds } ),
+		[ imageBounds ]
 	);
 
 	return (
 		<CropperContext.Provider value={ cropperReturn }>
-			<MeasuredCropperGeometryContext.Provider
-				value={ geometryContextValue }
+			<CropperImageBoundsContext.Provider
+				value={ imageBoundsContextValue }
 			>
 				{ children }
-			</MeasuredCropperGeometryContext.Provider>
+			</CropperImageBoundsContext.Provider>
 		</CropperContext.Provider>
 	);
 }
@@ -103,51 +104,51 @@ export function useCropper(): UseCropperStateReturn {
 }
 
 /**
- * Hook to consume the measured cropper geometry.
+ * Hook to consume the measured cropper image bounds.
  *
- * @return Measured cropper geometry, or null before the Cropper publishes it.
+ * @return Measured image bounds, or undefined before the Cropper publishes them.
  */
-export function useMeasuredCropperGeometry(): MeasuredCropperGeometry | null {
-	const context = useContext( MeasuredCropperGeometryContext );
+export function useCropperImageBounds(): CropperImageBounds {
+	const context = useContext( CropperImageBoundsContext );
 
 	if ( ! context ) {
 		throw new Error(
-			'useMeasuredCropperGeometry must be used within a CropperProvider.'
+			'useCropperImageBounds must be used within a CropperProvider.'
 		);
 	}
 
-	return context.geometry;
+	return context.imageBounds;
 }
 
 /**
- * Hook to publish measured cropper geometry.
+ * Hook to publish measured cropper image bounds.
  *
- * @return Setter for measured cropper geometry.
+ * @return Setter for measured image bounds.
  */
-export function useSetMeasuredCropperGeometry(): React.Dispatch<
-	React.SetStateAction< MeasuredCropperGeometry | null >
+export function useSetCropperImageBounds(): React.Dispatch<
+	React.SetStateAction< CropperImageBounds >
 > {
-	const context = useContext( MeasuredCropperGeometryContext );
+	const context = useContext( CropperImageBoundsContext );
 
 	if ( ! context ) {
 		throw new Error(
-			'useSetMeasuredCropperGeometry must be used within a CropperProvider.'
+			'useSetCropperImageBounds must be used within a CropperProvider.'
 		);
 	}
 
-	return context.setGeometry;
+	return context.setImageBounds;
 }
 
 /**
- * Hook to optionally publish measured geometry when a CropperProvider exists.
+ * Hook to optionally publish image bounds when a CropperProvider exists.
  * Standalone Cropper usage remains supported and simply skips publication.
  *
- * @return Geometry setter, or a no-op outside CropperProvider.
+ * @return Image-bounds setter, or a no-op outside CropperProvider.
  */
-export function useOptionalSetMeasuredCropperGeometry(): React.Dispatch<
-	React.SetStateAction< MeasuredCropperGeometry | null >
+export function useOptionalSetCropperImageBounds(): React.Dispatch<
+	React.SetStateAction< CropperImageBounds >
 > {
-	const context = useContext( MeasuredCropperGeometryContext );
+	const context = useContext( CropperImageBoundsContext );
 
-	return context?.setGeometry ?? noopSetGeometry;
+	return context?.setImageBounds ?? noopSetImageBounds;
 }

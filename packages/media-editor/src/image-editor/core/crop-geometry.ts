@@ -13,18 +13,6 @@ declare const cropPixelRectBrand: unique symbol;
 export type NormalizedCropBounds = CropBounds;
 
 /**
- * Measured cropper geometry. Published by the Cropper component so external
- * controls can use the same image bounds as manual stencil interaction.
- */
-export interface MeasuredCropperGeometry {
-	canvasSize: Size;
-	elementSize: Size;
-	visualSize: Size;
-	imageBounds: NormalizedCropBounds | undefined;
-	viewportBounds?: NormalizedCropBounds | undefined;
-}
-
-/**
  * Candidate crop rectangle expressed in snap-rotation crop pixels.
  *
  * This is the shape consumers provide for validation or conversion. Derived
@@ -67,27 +55,15 @@ export interface CropPixelRectBounds {
 	maxHeight: number;
 }
 
-/** Image crop limits for the current cropper state. */
-export type CropPixelImageBounds = CropPixelRectBounds;
-
-/** Optional viewport/layout crop limits for the current cropper state. */
-export type CropPixelViewportBounds = CropPixelRectBounds;
-
-/** Crop limits grouped by their source. */
-export interface CropGeometryBounds {
-	image: CropPixelImageBounds;
-	viewport: CropPixelViewportBounds | null;
-}
-
 export interface CropGeometryInput {
 	state: CropperState;
 	imageSize: Size;
-	geometry: MeasuredCropperGeometry;
+	imageBounds: NormalizedCropBounds | undefined;
 }
 
 export interface CropGeometrySnapshot {
 	rect: CropPixelRect;
-	bounds: CropGeometryBounds;
+	imageBounds: CropPixelRectBounds;
 	sourceRegion: SourceRegion;
 }
 
@@ -275,33 +251,31 @@ export function cropPixelRectToNormalizedRect(
 
 /**
  * Whether a crop geometry input has enough measured information for geometry
- * snapshots and image bounds.
+ * calculations.
  *
  * `imageBounds` is the normalized image constraint consumed by the pixel
- * helpers; the raw layout sizes document how that constraint was measured, but
- * they are not read directly here.
+ * helpers.
  *
  * @param input Crop geometry input.
  * @return True when crop geometry can be computed.
  */
-export function isCropGeometryReady( input: CropGeometryInput ): boolean {
+function isCropGeometryReady( input: CropGeometryInput ): boolean {
 	return (
 		input.imageSize.width > 0 &&
 		input.imageSize.height > 0 &&
-		!! input.geometry.imageBounds
+		!! input.imageBounds
 	);
 }
 
 /**
- * Convert normalized crop bounds to snap-rotation pixel bounds. This is shared
- * by image bounds and any future viewport/layout bounds.
+ * Convert normalized image crop bounds to snap-rotation pixel bounds.
  *
  * @param bounds    Normalized crop bounds.
  * @param state     Cropper state.
  * @param imageSize Natural source image size.
  * @return Crop pixel bounds.
  */
-export function cropBoundsToPixelRectBounds(
+function cropBoundsToPixelRectBounds(
 	bounds: NormalizedCropBounds,
 	state: CropperState,
 	imageSize: Size
@@ -354,39 +328,15 @@ export function cropBoundsToPixelRectBounds(
  * @param input Crop geometry input.
  * @return Crop pixel image bounds, or null when geometry is not ready.
  */
-export function getCropPixelImageBounds(
+function getCropPixelImageBounds(
 	input: CropGeometryInput
-): CropPixelImageBounds | null {
+): CropPixelRectBounds | null {
 	if ( ! isCropGeometryReady( input ) ) {
 		return null;
 	}
 
 	return cropBoundsToPixelRectBounds(
-		input.geometry.imageBounds as NormalizedCropBounds,
-		input.state,
-		input.imageSize
-	);
-}
-
-/**
- * Get optional viewport/layout crop limits in snap-rotation pixel space.
- *
- * @param input Crop geometry input.
- * @return Crop pixel viewport bounds, or null when not supplied.
- */
-export function getCropPixelViewportBounds(
-	input: CropGeometryInput
-): CropPixelViewportBounds | null {
-	if (
-		input.imageSize.width === 0 ||
-		input.imageSize.height === 0 ||
-		! input.geometry.viewportBounds
-	) {
-		return null;
-	}
-
-	return cropBoundsToPixelRectBounds(
-		input.geometry.viewportBounds,
+		input.imageBounds as NormalizedCropBounds,
 		input.state,
 		input.imageSize
 	);
@@ -530,10 +480,7 @@ export function getCropGeometrySnapshot(
 
 	return {
 		rect: getCropPixelRect( input.state, input.imageSize ),
-		bounds: {
-			image: imageBounds,
-			viewport: getCropPixelViewportBounds( input ),
-		},
+		imageBounds,
 		sourceRegion: getSourceRegion( input.state, input.imageSize ),
 	};
 }

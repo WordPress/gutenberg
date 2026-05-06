@@ -8,7 +8,7 @@ import { fireEvent, render, screen } from '@testing-library/react';
  */
 import CropAdvancedPanel from '../crop-advanced-panel';
 
-const mockSetCropRect = jest.fn();
+const mockApplyOperation = jest.fn();
 const mockSettleCrop = jest.fn();
 const mockNormalizedRect = { x: 0, y: 0, width: 1, height: 1 };
 const mockValidateCropPixelRectAgainstBounds = jest.fn( ( candidate ) => ( {
@@ -36,21 +36,17 @@ jest.mock( '../../../image-editor', () => ( {
 			right: 500,
 			bottom: 250,
 		},
-		bounds: {
-			image: {
-				minLeft: 0,
-				minTop: 0,
-				maxRight: 1000,
-				maxBottom: 500,
-				minWidth: 50,
-				minHeight: 25,
-				maxWidth: 1000,
-				maxHeight: 500,
-			},
-			viewport: null,
+		imageBounds: {
+			minLeft: 0,
+			minTop: 0,
+			maxRight: 1000,
+			maxBottom: 500,
+			minWidth: 50,
+			minHeight: 25,
+			maxWidth: 1000,
+			maxHeight: 500,
 		},
 		sourceRegion: null,
-		snapshot: null,
 	} ),
 	useCropper: () => ( {
 		state: {
@@ -60,7 +56,7 @@ jest.mock( '../../../image-editor', () => ( {
 				naturalHeight: 500,
 			},
 		},
-		setCropRect: mockSetCropRect,
+		applyOperation: mockApplyOperation,
 		settleCrop: mockSettleCrop,
 	} ),
 	validateCropPixelRectAgainstBounds: (
@@ -94,7 +90,10 @@ describe( 'CropAdvancedPanel', () => {
 				maxBottom: 500,
 			} )
 		);
-		expect( mockSetCropRect ).toHaveBeenCalledWith( mockNormalizedRect );
+		expect( mockApplyOperation ).toHaveBeenCalledWith( {
+			type: 'crop',
+			rect: mockNormalizedRect,
+		} );
 		expect( mockSettleCrop ).toHaveBeenCalledTimes( 1 );
 	} );
 } );

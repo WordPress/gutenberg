@@ -310,7 +310,7 @@ const aiRequest = {
 
 Use crop geometry when a consumer needs to read crop values or check them against explicit bounds without duplicating cropper math. It reports facts about the current cropper state; it is not an operation API. Consumers still decide intent, such as whether a width edit is left-anchored, center-anchored, or aspect-ratio locked.
 
-`CropPixelRectInput`, `CropPixelRect`, `CropPixelImageBounds`, and `CropPixelViewportBounds` are in snap-rotation pixels. `bounds.image` means the same image bounds used by manual crop resizing. A future viewport/layout constraint can be exposed as `bounds.viewport` without changing the validation helpers. `CropPixelRect` includes derived `right` and `bottom` edges; consumer suggestions should use `CropPixelRectInput`.
+`CropPixelRectInput`, `CropPixelRect`, and `CropPixelRectBounds` are in snap-rotation pixels. `imageBounds` means the same image bounds used by manual crop resizing. `CropPixelRect` includes derived `right` and `bottom` edges; consumer suggestions should use `CropPixelRectInput`.
 
 ```tsx
 import {
@@ -321,28 +321,29 @@ import {
 } from '../image-editor';
 
 function ApplySuggestedCrop( { suggestion } ) {
-  const { state, setCropRect } = useCropper();
-  const { rect, bounds } = useCropGeometry();
+  const { state, applyOperation } = useCropper();
+  const { rect, imageBounds } = useCropGeometry();
 
-  if ( ! state.image || ! rect || ! bounds ) {
+  if ( ! state.image || ! rect || ! imageBounds ) {
     return null;
   }
 
   const apply = () => {
     const result = validateCropPixelRectAgainstBounds(
       suggestion,
-      bounds.image
+      imageBounds
     );
     if ( ! result.isValid ) {
       console.warn( 'Adjusted crop suggestion:', result.violations );
     }
 
-    setCropRect(
-      cropPixelRectToNormalizedRect( result.rect, state, {
+    applyOperation( {
+      type: 'crop',
+      rect: cropPixelRectToNormalizedRect( result.rect, state, {
         width: state.image.naturalWidth,
         height: state.image.naturalHeight,
-      } )
-    );
+      } ),
+    } );
   };
 
   return <button onClick={ apply }>Apply suggestion</button>;

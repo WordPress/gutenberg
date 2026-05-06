@@ -6,20 +6,19 @@ import {
 	clampCropPixelRectToBounds,
 	cropPixelRectToNormalizedRect,
 	getCropGeometrySnapshot,
-	getCropPixelImageBounds,
 	getCropPixelRect,
 	validateCropPixelRectAgainstBounds,
 	type CropGeometryInput,
-	type MeasuredCropperGeometry,
+	type NormalizedCropBounds,
 } from '../crop-geometry';
 import type { CropperState, Size } from '../types';
 
 const IMAGE: Size = { width: 1000, height: 500 };
-const GEOMETRY: MeasuredCropperGeometry = {
-	canvasSize: { width: 1000, height: 500 },
-	elementSize: { width: 1000, height: 500 },
-	visualSize: { width: 1000, height: 500 },
-	imageBounds: { minX: 0, minY: 0, maxX: 1, maxY: 1 },
+const IMAGE_BOUNDS: NormalizedCropBounds = {
+	minX: 0,
+	minY: 0,
+	maxX: 1,
+	maxY: 1,
 };
 
 function makeState( overrides: Partial< CropperState > = {} ): CropperState {
@@ -42,7 +41,7 @@ function makeInput(
 			cropRect: { x: 0.2, y: 0.2, width: 0.4, height: 0.4 },
 		} ),
 		imageSize: IMAGE,
-		geometry: GEOMETRY,
+		imageBounds: IMAGE_BOUNDS,
 		...overrides,
 	};
 }
@@ -71,7 +70,7 @@ describe( 'crop pixel geometry', () => {
 	} );
 
 	it( 'computes image edge bounds in crop pixels', () => {
-		const imageBounds = getCropPixelImageBounds( makeInput() );
+		const imageBounds = getCropGeometrySnapshot( makeInput() )?.imageBounds;
 
 		expect( imageBounds?.minLeft ).toBeCloseTo( 0 );
 		expect( imageBounds?.minTop ).toBeCloseTo( 0 );
@@ -83,65 +82,26 @@ describe( 'crop pixel geometry', () => {
 		expect( imageBounds?.maxHeight ).toBeCloseTo( 500 );
 	} );
 
-	it( 'returns null image bounds before geometry is ready', () => {
-		const imageBounds = getCropPixelImageBounds( {
+	it( 'returns null before image bounds are ready', () => {
+		const snapshot = getCropGeometrySnapshot( {
 			...makeInput(),
-			geometry: {
-				...GEOMETRY,
-				imageBounds: undefined,
-			},
+			imageBounds: undefined,
 		} );
 
-		expect( imageBounds ).toBeNull();
-	} );
-
-	it( 'uses published image bounds without requiring raw layout sizes', () => {
-		const imageBounds = getCropPixelImageBounds( {
-			...makeInput(),
-			geometry: {
-				canvasSize: { width: 0, height: 0 },
-				elementSize: { width: 0, height: 0 },
-				visualSize: { width: 0, height: 0 },
-				imageBounds: GEOMETRY.imageBounds,
-			},
-		} );
-
-		expect( imageBounds?.maxRight ).toBeCloseTo( IMAGE.width );
-		expect( imageBounds?.maxBottom ).toBeCloseTo( IMAGE.height );
+		expect( snapshot ).toBeNull();
 	} );
 
 	it( 'returns a full geometry snapshot when geometry is ready', () => {
 		const snapshot = getCropGeometrySnapshot( makeInput() );
 
 		expect( snapshot?.rect.left ).toBeCloseTo( 200 );
-		expect( snapshot?.bounds.image.maxRight ).toBeCloseTo( 1000 );
-		expect( snapshot?.bounds.viewport ).toBeNull();
+		expect( snapshot?.imageBounds.maxRight ).toBeCloseTo( 1000 );
 		expect( snapshot?.sourceRegion.width ).toBeCloseTo( 400 );
-	} );
-
-	it( 'converts optional viewport bounds with the same bounds helper', () => {
-		const snapshot = getCropGeometrySnapshot( {
-			...makeInput(),
-			geometry: {
-				...GEOMETRY,
-				viewportBounds: {
-					minX: 0.1,
-					minY: 0.2,
-					maxX: 0.9,
-					maxY: 0.8,
-				},
-			},
-		} );
-
-		expect( snapshot?.bounds.viewport?.minLeft ).toBeCloseTo( 100 );
-		expect( snapshot?.bounds.viewport?.minTop ).toBeCloseTo( 100 );
-		expect( snapshot?.bounds.viewport?.maxRight ).toBeCloseTo( 900 );
-		expect( snapshot?.bounds.viewport?.maxBottom ).toBeCloseTo( 400 );
 	} );
 } );
 
 describe( 'validateCropPixelRectAgainstBounds', () => {
-	const imageBounds = getCropPixelImageBounds( makeInput() )!;
+	const imageBounds = getCropGeometrySnapshot( makeInput() )!.imageBounds;
 
 	it( 'accepts rectangles within the provided bounds', () => {
 		const result = validateCropPixelRectAgainstBounds(
@@ -232,7 +192,7 @@ describe( 'validateCropPixelRectAgainstBounds', () => {
 
 describe( 'clampCropPixelRectToBounds', () => {
 	it( 'fits a rectangle into the provided bounds', () => {
-		const imageBounds = getCropPixelImageBounds( makeInput() )!;
+		const imageBounds = getCropGeometrySnapshot( makeInput() )!.imageBounds;
 		const rect = clampCropPixelRectToBounds(
 			{ left: 900, top: 450, width: 200, height: 100 },
 			imageBounds

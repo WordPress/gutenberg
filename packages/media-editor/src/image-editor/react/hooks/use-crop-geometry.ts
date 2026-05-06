@@ -8,52 +8,43 @@ import { useMemo } from '@wordpress/element';
  */
 import {
 	getCropGeometrySnapshot,
-	type CropGeometryBounds,
-	type CropGeometrySnapshot,
-	type CropPixelImageBounds,
 	type CropPixelRect,
 	type CropPixelRectInput,
 	type CropPixelRectBounds,
 	type CropPixelRectValidationResult,
 	type CropPixelRectViolation,
-	type CropPixelViewportBounds,
 } from '../../core/crop-geometry';
 import type { SourceRegion } from '../../core/source-region';
 import {
-	useMeasuredCropperGeometry,
+	useCropperImageBounds,
 	useCropper,
 } from '../components/cropper-provider';
 
 export type {
-	CropGeometryBounds,
-	CropGeometrySnapshot,
-	CropPixelImageBounds,
 	CropPixelRect,
 	CropPixelRectBounds,
 	CropPixelRectInput,
 	CropPixelRectValidationResult,
 	CropPixelRectViolation,
-	CropPixelViewportBounds,
 };
 
 export interface UseCropGeometryReturn {
 	isReady: boolean;
 	rect: CropPixelRect | null;
-	bounds: CropGeometryBounds | null;
+	imageBounds: CropPixelRectBounds | null;
 	sourceRegion: SourceRegion | null;
-	snapshot: CropGeometrySnapshot | null;
 }
 
 /**
- * Expose the current crop geometry snapshot to controls, automation, and AI
+ * Expose the current crop geometry to controls, automation, and AI
  * workflows. This hook intentionally reports facts about the current cropper
  * state; consumers derive operation-specific field behavior themselves.
  *
- * @return Current crop geometry, bounds, and source region.
+ * @return Current crop rectangle, image bounds, and source region.
  */
 export function useCropGeometry(): UseCropGeometryReturn {
 	const cropper = useCropper();
-	const geometry = useMeasuredCropperGeometry();
+	const measuredImageBounds = useCropperImageBounds();
 	const imageSize = useMemo(
 		() =>
 			cropper.state.image
@@ -66,21 +57,20 @@ export function useCropGeometry(): UseCropGeometryReturn {
 	);
 
 	const snapshot = useMemo( () => {
-		if ( ! geometry ) {
+		if ( ! measuredImageBounds ) {
 			return null;
 		}
 		return getCropGeometrySnapshot( {
 			state: cropper.state,
 			imageSize,
-			geometry,
+			imageBounds: measuredImageBounds,
 		} );
-	}, [ cropper.state, geometry, imageSize ] );
+	}, [ cropper.state, measuredImageBounds, imageSize ] );
 
 	return {
 		isReady: !! snapshot,
 		rect: snapshot?.rect ?? null,
-		bounds: snapshot?.bounds ?? null,
+		imageBounds: snapshot?.imageBounds ?? null,
 		sourceRegion: snapshot?.sourceRegion ?? null,
-		snapshot,
 	};
 }

@@ -195,7 +195,9 @@ function CropInput( {
 			return false;
 		}
 
-		onCommit( commitValueCandidate );
+		if ( previewedValueRef.current !== commitValueCandidate ) {
+			onCommit( commitValueCandidate );
+		}
 		previewedValueRef.current = commitValueCandidate;
 		return true;
 	};
@@ -286,14 +288,13 @@ export default function CropAdvancedPanel( {
 	freeformCrop,
 	onPlacementControlInteraction,
 }: CropAdvancedPanelProps ) {
-	const { state, setCropRect, settleCrop } = useCropper();
-	const { isReady, rect, bounds } = useCropGeometry();
+	const { state, applyOperation, settleCrop } = useCropper();
+	const { isReady, rect, imageBounds } = useCropGeometry();
 
-	if ( ! isReady || ! rect || ! bounds || ! state.image ) {
+	if ( ! isReady || ! rect || ! imageBounds || ! state.image ) {
 		return null;
 	}
 
-	const imageBounds = bounds.image;
 	const imageSize = {
 		width: state.image.naturalWidth,
 		height: state.image.naturalHeight,
@@ -304,9 +305,14 @@ export default function CropAdvancedPanel( {
 			candidate,
 			imageBounds
 		);
-		setCropRect(
-			cropPixelRectToNormalizedRect( clampedRect, state, imageSize )
-		);
+		applyOperation( {
+			type: 'crop',
+			rect: cropPixelRectToNormalizedRect(
+				clampedRect,
+				state,
+				imageSize
+			),
+		} );
 		settleCrop();
 		onPlacementControlInteraction?.();
 	};

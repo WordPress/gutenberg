@@ -31,10 +31,7 @@ import type {
 import type { UseCropperStateReturn } from '../hooks/use-cropper-state';
 import { getImageFit } from '../../core/camera';
 import { getImageCropBounds } from '../../core/containment';
-import type {
-	MeasuredCropperGeometry,
-	NormalizedCropBounds,
-} from '../../core/crop-geometry';
+import type { NormalizedCropBounds } from '../../core/crop-geometry';
 import { useInteraction } from '../hooks/use-interaction';
 import { useTransformStyle } from '../hooks/use-transform-style';
 import { useAriaAnnouncer } from '../hooks/use-aria-announcer';
@@ -43,7 +40,7 @@ import { DimmingOverlay } from './overlays/dimming-overlay';
 import { GridOverlay } from './overlays/grid-overlay';
 import { ViewportProvider, useViewport } from './viewport-provider';
 import { VISUALLY_HIDDEN_STYLE } from '../visually-hidden-style';
-import { useOptionalSetMeasuredCropperGeometry } from './cropper-provider';
+import { useOptionalSetCropperImageBounds } from './cropper-provider';
 import './cropper.scss';
 
 /** Threshold for comparing normalized crop rect values. */
@@ -82,10 +79,6 @@ function computeInscribedRect(
 	};
 }
 
-function areSizesEqual( a: Size, b: Size ): boolean {
-	return a.width === b.width && a.height === b.height;
-}
-
 function areNormalizedCropBoundsEqual(
 	a: NormalizedCropBounds | undefined,
 	b: NormalizedCropBounds | undefined
@@ -101,29 +94,6 @@ function areNormalizedCropBoundsEqual(
 		a.minY === b.minY &&
 		a.maxX === b.maxX &&
 		a.maxY === b.maxY
-	);
-}
-
-/**
- * Check whether the measured cropper geometry has actually changed before
- * publishing it to context. This prevents equivalent geometry objects from
- * causing unnecessary `useCropGeometry` consumer updates.
- *
- * @param a Current published geometry, if any.
- * @param b Next measured geometry.
- * @return Whether both geometries represent the same values.
- */
-function areMeasuredGeometriesEqual(
-	a: MeasuredCropperGeometry | null,
-	b: MeasuredCropperGeometry
-): boolean {
-	return !! (
-		a &&
-		areSizesEqual( a.canvasSize, b.canvasSize ) &&
-		areSizesEqual( a.elementSize, b.elementSize ) &&
-		areSizesEqual( a.visualSize, b.visualSize ) &&
-		areNormalizedCropBoundsEqual( a.imageBounds, b.imageBounds ) &&
-		areNormalizedCropBoundsEqual( a.viewportBounds, b.viewportBounds )
 	);
 }
 
@@ -234,7 +204,7 @@ function CropperInner(
 		setViewportPan,
 		resetViewport,
 	} = useViewport();
-	const setMeasuredCropperGeometry = useOptionalSetMeasuredCropperGeometry();
+	const setCropperImageBounds = useOptionalSetCropperImageBounds();
 	// Canvas measurement via ResizeObserver. The canvas is the inner
 	// positioning context for image/stencil/handles — inset from the root
 	// by the handle gutter, so crop math operates on the reduced box.
@@ -389,30 +359,20 @@ function CropperInner(
 	const isSettlingRef = useRef( false );
 
 	useLayoutEffect( () => {
-		const nextGeometry: MeasuredCropperGeometry = {
-			canvasSize,
-			elementSize,
-			visualSize,
-			imageBounds: cropBounds,
-		};
-		setMeasuredCropperGeometry( ( current ) =>
-			areMeasuredGeometriesEqual( current, nextGeometry )
+		// Avoid replacing context with equivalent bounds objects; otherwise
+		// `useCropGeometry` consumers re-render even when the values are stable.
+		setCropperImageBounds( ( current ) =>
+			areNormalizedCropBoundsEqual( current, cropBounds )
 				? current
-				: nextGeometry
+				: cropBounds
 		);
-	}, [
-		canvasSize,
-		elementSize,
-		visualSize,
-		cropBounds,
-		setMeasuredCropperGeometry,
-	] );
+	}, [ cropBounds, setCropperImageBounds ] );
 
 	useLayoutEffect( () => {
 		return () => {
-			setMeasuredCropperGeometry( null );
+			setCropperImageBounds( undefined );
 		};
-	}, [ setMeasuredCropperGeometry ] );
+	}, [ setCropperImageBounds ] );
 
 	// Use the interaction hook for mouse, touch, and keyboard events.
 	const {
