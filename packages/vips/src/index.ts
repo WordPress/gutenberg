@@ -527,11 +527,11 @@ export async function batchResizeImage(
 			} );
 		}
 
-		// Only call after all images are no longer being used.
-		cleanup?.();
-
 		return results;
 	} finally {
+		// Run after all images are out of scope, regardless of whether
+		// the loop completed, was cancelled, or threw.
+		cleanup?.();
 		inProgressOperations.delete( id );
 	}
 }
