@@ -262,4 +262,107 @@ describe( 'ColorPalette', () => {
 			} )
 		).toBeInTheDocument();
 	} );
+
+	describe( 'duplicate colors in palette', () => {
+		const DUPLICATE_COLOR_PALETTE = [
+			{ name: 'Dark Background', slug: 'dark-background', color: '#000' },
+			{ name: 'Dark Text', slug: 'dark-text', color: '#000' },
+		];
+
+		it( 'should render all swatches even when two entries share the same color value', () => {
+			render(
+				<ColorPalette
+					colors={ DUPLICATE_COLOR_PALETTE }
+					value={ undefined }
+					onChange={ jest.fn() }
+				/>
+			);
+
+			expect( screen.getAllByRole( 'option' ) ).toHaveLength( 2 );
+		} );
+
+		it( 'should use slug as the React key so each option is individually identifiable', () => {
+			render(
+				<ColorPalette
+					colors={ DUPLICATE_COLOR_PALETTE }
+					value={ undefined }
+					onChange={ jest.fn() }
+				/>
+			);
+
+			// If duplicate keys were present React would silently drop one option;
+			// having two rendered options confirms each slug produced a unique key.
+			expect( screen.getAllByRole( 'option' ) ).toHaveLength( 2 );
+		} );
+
+		it( 'should select by slug when selectedSlug is provided, marking only the matching entry', () => {
+			render(
+				<ColorPalette
+					colors={ DUPLICATE_COLOR_PALETTE }
+					value="#000"
+					selectedSlug="dark-text"
+					onChange={ jest.fn() }
+				/>
+			);
+
+			const options = screen.getAllByRole( 'option' );
+			// "dark-background" is index 0, "dark-text" is index 1.
+			// With selectedSlug="dark-text", only the second swatch should be selected.
+			expect( options[ 0 ] ).not.toBeChecked();
+			expect( options[ 1 ] ).toBeChecked();
+		} );
+
+		it( 'should fall back to color-value selection and only mark the first duplicate when no selectedSlug is provided', () => {
+			render(
+				<ColorPalette
+					colors={ DUPLICATE_COLOR_PALETTE }
+					value="#000"
+					onChange={ jest.fn() }
+				/>
+			);
+
+			const options = screen.getAllByRole( 'option' );
+			// Only the first entry with this color value should appear selected.
+			expect( options[ 0 ] ).toBeChecked();
+			expect( options[ 1 ] ).not.toBeChecked();
+		} );
+
+		it( 'should pass slug as third argument to onChange when a swatch is clicked', async () => {
+			const user = userEvent.setup();
+			const onChange = jest.fn();
+
+			render(
+				<ColorPalette
+					colors={ DUPLICATE_COLOR_PALETTE }
+					value={ undefined }
+					onChange={ onChange }
+				/>
+			);
+
+			const options = screen.getAllByRole( 'option' );
+			await user.click( options[ 1 ] );
+			// Second entry: color=#000, index=1, slug='dark-text'
+			expect( onChange ).toHaveBeenCalledWith( '#000', 1, 'dark-text' );
+		} );
+
+		it( 'should clear the selection when the selected swatch is clicked', async () => {
+			const user = userEvent.setup();
+			const onChange = jest.fn();
+
+			render(
+				<ColorPalette
+					colors={ DUPLICATE_COLOR_PALETTE }
+					value="#000"
+					selectedSlug="dark-background"
+					onChange={ onChange }
+				/>
+			);
+
+			// Click the selected swatch — should call onChange with undefined.
+			await user.click(
+				screen.getByRole( 'option', { selected: true } )
+			);
+			expect( onChange ).toHaveBeenCalledWith( undefined );
+		} );
+	} );
 } );

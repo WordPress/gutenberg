@@ -12,6 +12,7 @@ import type { HeadingSize } from '../heading/types';
 export type ColorObject = {
 	name: string;
 	color: NonNullable< CSSProperties[ 'color' ] >;
+	slug?: string;
 };
 
 export type PaletteObject = {
@@ -24,9 +25,16 @@ type PaletteProps = {
 	clearColor: () => void;
 	/**
 	 * Callback called when a color is selected.
+	 * The third argument is the slug of the selected palette entry, when available.
 	 */
-	onChange: ( newColor?: string, index?: number ) => void;
+	onChange: ( newColor?: string, index?: number, slug?: string ) => void;
 	value?: string;
+	/**
+	 * The slug of the currently selected palette entry.
+	 * When provided, selection is determined by slug rather than color value,
+	 * which correctly handles palettes where two entries share the same color.
+	 */
+	selectedSlug?: string;
 	actions?: ReactNode;
 	headingLevel?: HeadingSize;
 };
@@ -43,7 +51,10 @@ export type CustomColorPickerDropdownProps = DropdownProps & {
 	isRenderedInSidebar: boolean;
 };
 
-export type ColorPaletteProps = Pick< PaletteProps, 'onChange' > & {
+export type ColorPaletteProps = Pick<
+	PaletteProps,
+	'onChange' | 'selectedSlug'
+> & {
 	/**
 	 * Whether the palette should have a clearing button.
 	 *

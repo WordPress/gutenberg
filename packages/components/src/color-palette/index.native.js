@@ -274,14 +274,14 @@ function ColorPalette( {
 				ref={ scrollViewRef }
 				testID={ `color-palette${ label ? '-' + label : '' }` }
 			>
-				{ colors.map( ( color ) => {
+				{ colors.map( ( color, index ) => {
 					const scaleValue = isSelected( color )
 						? scaleInterpolation
 						: 1;
 					const colorName = getColorGradientName( color );
 
 					return (
-						<View key={ `${ color }-${ isSelected( color ) }` }>
+						<View key={ `${ color }-${ index }` }>
 							<TouchableWithoutFeedback
 								onPress={ () => onColorPress( color ) }
 								accessibilityRole="button"
