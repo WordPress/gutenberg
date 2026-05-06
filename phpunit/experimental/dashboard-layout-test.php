@@ -16,6 +16,10 @@ class Gutenberg_Dashboard_Default_Layout_Test extends WP_UnitTestCase {
 	public function set_up() {
 		parent::set_up();
 		$this->user_id = self::factory()->user->create();
+
+		// Each test starts with no callbacks so the seed shipped with
+		// the experiment does not leak into the test scenarios.
+		remove_all_filters( 'gutenberg_dashboard_default_layout' );
 	}
 
 	public function tear_down() {
