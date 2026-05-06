@@ -93,7 +93,11 @@ describe( 'ColorPalette', () => {
 
 		// Expect the green color to have been selected
 		expect( onChange ).toHaveBeenCalledTimes( 1 );
-		expect( onChange ).toHaveBeenCalledWith( EXAMPLE_COLORS[ 1 ].color, 1 );
+		expect( onChange ).toHaveBeenCalledWith(
+			EXAMPLE_COLORS[ 1 ].color,
+			1,
+			undefined
+		);
 	} );
 
 	it( 'should call onClick with undefined, when the clearButton onClick is triggered', async () => {
