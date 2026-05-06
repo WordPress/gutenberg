@@ -144,6 +144,7 @@ export type BlockSelectors = Record<
  * - `styles`: theme.json style object for this node.
  * - `selector`: CSS selector used for the node's base declarations.
  * - `selectorSuffix`: optional suffix appended to base and feature selectors.
+ * - `mediaQuery`: optional media query wrapping this node's rules.
  * - `skipSelectorWrapper`: omits the `:root :where()` specificity wrapper.
  * - `duotoneSelector`: alternate selector for duotone filter declarations.
  * - `featureSelectors`: feature-level selectors for block supports.
@@ -156,6 +157,7 @@ interface StylesNode {
 	styles: any;
 	selector: string;
 	selectorSuffix?: string;
+	mediaQuery?: string;
 	skipSelectorWrapper?: boolean;
 	duotoneSelector?: string;
 	featureSelectors?:
@@ -165,6 +167,11 @@ interface StylesNode {
 	hasLayoutSupport?: boolean;
 	styleVariationSelectors?: Record< string, string >;
 	name?: string;
+}
+
+interface ResponsiveStyleNode {
+	breakpointKey: string;
+	node: StylesNode;
 }
 
 type ElementName = keyof typeof ELEMENTS;
@@ -1055,6 +1062,84 @@ function getBlockPseudoStyleNodes( node: StylesNode ): StylesNode[] {
 }
 
 /**
+ * Creates style nodes for configured responsive breakpoint states.
+ *
+ * Breakpoint nodes render feature-level and base declarations through the
+ * normal node renderer. Responsive pseudo styles are intentionally handled by
+ * a separate fallback so their output can stay in the existing order for now.
+ *
+ * @param node Style node that may contain configured responsive state styles.
+ * @return Responsive style nodes in configured breakpoint order.
+ */
+function getBlockResponsiveStyleNodes(
+	node: StylesNode
+): ResponsiveStyleNode[] {
+	const { styles, selector, featureSelectors, name } = node;
+
+	if ( ! name ) {
+		return [];
+	}
+
+	return Object.entries( RESPONSIVE_BREAKPOINTS ).flatMap(
+		( [ breakpointKey, mediaQuery ] ) => {
+			const breakpointStyles = styles?.[ breakpointKey ];
+			if ( ! breakpointStyles || typeof breakpointStyles !== 'object' ) {
+				return [];
+			}
+
+			return [
+				{
+					breakpointKey,
+					node: {
+						styles: JSON.parse(
+							JSON.stringify( breakpointStyles )
+						),
+						selector,
+						mediaQuery,
+						featureSelectors:
+							featureSelectors &&
+							typeof featureSelectors !== 'string'
+								? featureSelectors
+								: undefined,
+						name,
+					},
+				},
+			];
+		}
+	);
+}
+
+function appendResponsivePseudoSelectorStyles(
+	styles: Record< string, any >,
+	selector: string,
+	ruleset: string,
+	featureSelectors: StylesNode[ 'featureSelectors' ],
+	treeSettings: Record< string, any > | undefined,
+	blockName: string | undefined,
+	breakpointKey: string
+): string {
+	const breakpointStyle = styles?.[ breakpointKey ];
+	if ( ! breakpointStyle || typeof breakpointStyle !== 'object' ) {
+		return ruleset;
+	}
+
+	const breakpointPseudoRules = appendPseudoSelectorStyles(
+		JSON.parse( JSON.stringify( breakpointStyle ) ),
+		selector,
+		'',
+		featureSelectors,
+		treeSettings,
+		blockName
+	);
+
+	if ( breakpointPseudoRules ) {
+		ruleset += `${ RESPONSIVE_BREAKPOINTS[ breakpointKey ] }{${ breakpointPseudoRules }}`;
+	}
+
+	return ruleset;
+}
+
+/**
  * Appends CSS rules for responsive breakpoint states to a ruleset string.
  * Block styles stored under responsive keys (for example, 'mobile' and
  * 'tablet') are wrapped in corresponding media queries instead of being
@@ -1639,19 +1724,27 @@ export const generateCustomProperties = (
 	return ruleset;
 };
 
+/**
+ * Renders CSS rules for a single style node.
+ *
+ * The node renderer handles feature-level selectors, duotone declarations,
+ * layout styles, base declarations, custom CSS, and optionally nested state
+ * styles such as variations, pseudo selectors, and responsive breakpoints.
+ *
+ * @param node                          Style node metadata and styles.
+ * @param context                       Render context and feature flags.
+ * @param context.tree                  Global styles tree.
+ * @param context.options               Enabled renderer output groups.
+ * @param context.useRootPaddingAlign   Whether root padding alignment is enabled.
+ * @param context.disableLayoutStyles   Whether layout styles are disabled.
+ * @param context.hasBlockGapSupport    Whether block gap support is enabled.
+ * @param context.hasFallbackGapSupport Whether fallback gap support is enabled.
+ * @param context.disableRootPadding    Whether root padding declarations are disabled.
+ * @param context.includeStateStyles    Whether nested state styles should be rendered.
+ * @return Rendered CSS rules for the node.
+ */
 function renderStylesNode(
-	{
-		selector,
-		selectorSuffix,
-		duotoneSelector,
-		styles,
-		fallbackGapValue,
-		hasLayoutSupport,
-		featureSelectors,
-		styleVariationSelectors,
-		skipSelectorWrapper,
-		name,
-	}: StylesNode,
+	node: StylesNode,
 	{
 		tree,
 		options,
@@ -1660,6 +1753,7 @@ function renderStylesNode(
 		hasBlockGapSupport,
 		hasFallbackGapSupport,
 		disableRootPadding,
+		includeStateStyles = true,
 	}: {
 		tree: GlobalStylesConfig;
 		options: Record< string, boolean >;
@@ -1668,8 +1762,22 @@ function renderStylesNode(
 		hasBlockGapSupport?: boolean;
 		hasFallbackGapSupport?: boolean;
 		disableRootPadding: boolean;
+		includeStateStyles?: boolean;
 	}
 ): string {
+	const {
+		selector,
+		selectorSuffix,
+		mediaQuery,
+		duotoneSelector,
+		styles,
+		fallbackGapValue,
+		hasLayoutSupport,
+		featureSelectors,
+		styleVariationSelectors,
+		skipSelectorWrapper,
+		name,
+	} = node;
 	let ruleset = '';
 	const effectiveSelector = selectorSuffix
 		? appendToSelector( selector, selectorSuffix )
@@ -1759,7 +1867,11 @@ function renderStylesNode(
 		);
 	}
 
-	if ( options.variationStyles && styleVariationSelectors ) {
+	if (
+		includeStateStyles &&
+		options.variationStyles &&
+		styleVariationSelectors
+	) {
 		Object.entries( styleVariationSelectors ).forEach(
 			( [ styleVariationName, styleVariationSelector ] ) => {
 				const styleVariations =
@@ -1865,43 +1977,82 @@ function renderStylesNode(
 		);
 	}
 
-	const blockPseudoNodes = getBlockPseudoStyleNodes( {
-		styles,
-		selector,
-		featureSelectors,
-		name,
-	} );
-	if ( blockPseudoNodes.length ) {
-		blockPseudoNodes.forEach( ( pseudoNode ) => {
-			ruleset += renderStylesNode( pseudoNode, {
-				tree,
-				options,
-				useRootPaddingAlign,
-				disableLayoutStyles: true,
-				hasBlockGapSupport,
-				hasFallbackGapSupport,
-				disableRootPadding,
-			} );
-		} );
-	} else {
-		ruleset = appendPseudoSelectorStyles(
+	if ( includeStateStyles ) {
+		const blockPseudoNodes = getBlockPseudoStyleNodes( {
 			styles,
 			selector,
-			ruleset,
 			featureSelectors,
-			tree.settings,
-			name
-		);
+			name,
+		} );
+		if ( blockPseudoNodes.length ) {
+			blockPseudoNodes.forEach( ( pseudoNode ) => {
+				ruleset += renderStylesNode( pseudoNode, {
+					tree,
+					options,
+					useRootPaddingAlign,
+					disableLayoutStyles: true,
+					hasBlockGapSupport,
+					hasFallbackGapSupport,
+					disableRootPadding,
+				} );
+			} );
+		} else {
+			ruleset = appendPseudoSelectorStyles(
+				styles,
+				selector,
+				ruleset,
+				featureSelectors,
+				tree.settings,
+				name
+			);
+		}
+
+		const blockResponsiveNodes = getBlockResponsiveStyleNodes( {
+			styles,
+			selector,
+			featureSelectors,
+			name,
+		} );
+		if ( blockResponsiveNodes.length ) {
+			blockResponsiveNodes.forEach(
+				( { breakpointKey, node: responsiveNode } ) => {
+					ruleset += renderStylesNode( responsiveNode, {
+						tree,
+						options,
+						useRootPaddingAlign,
+						disableLayoutStyles: true,
+						hasBlockGapSupport,
+						hasFallbackGapSupport,
+						disableRootPadding,
+						includeStateStyles: false,
+					} );
+
+					ruleset = appendResponsivePseudoSelectorStyles(
+						styles,
+						selector,
+						ruleset,
+						featureSelectors,
+						tree.settings,
+						name,
+						breakpointKey
+					);
+				}
+			);
+		} else {
+			ruleset = appendResponsiveStyles(
+				styles,
+				selector,
+				ruleset,
+				featureSelectors,
+				tree.settings,
+				name
+			);
+		}
 	}
 
-	ruleset = appendResponsiveStyles(
-		styles,
-		selector,
-		ruleset,
-		featureSelectors,
-		tree.settings,
-		name
-	);
+	if ( mediaQuery && ruleset ) {
+		return `${ mediaQuery }{${ ruleset }}`;
+	}
 
 	return ruleset;
 }
