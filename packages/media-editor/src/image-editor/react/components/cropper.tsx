@@ -226,9 +226,21 @@ function CropperInner(
 		[ canvasSize, naturalWidth, naturalHeight, state.rotation ]
 	);
 
-	// In fixed-crop mode, auto-size the crop rect to fill the visual area
-	// while respecting the aspect ratio. The crop is always centered.
+	// In fixed-crop mode, re-apply the inscribed rect only when the aspect
+	// ratio or visual size changes (i.e. when the shape constraint changes).
+	// The Advanced panel and pan/zoom gestures can freely update the crop
+	// rect in non-freeform mode without triggering a reset.
+	//
+	// state.cropRect is intentionally not a dep: reading it via a ref for
+	// the epsilon check avoids making every Advanced-panel commit re-fire
+	// the effect and undo the user's change.
+	const cropRectRef = useRef( state.cropRect );
+	cropRectRef.current = state.cropRect;
+	const prevFreeformCropRef = useRef( freeformCrop );
 	useEffect( () => {
+		const prevFreeform = prevFreeformCropRef.current;
+		prevFreeformCropRef.current = freeformCrop;
+
 		if (
 			freeformCrop ||
 			visualSize.width === 0 ||
@@ -236,8 +248,12 @@ function CropperInner(
 		) {
 			return;
 		}
+		// Preserve the crop when the user toggles freeform off.
+		if ( prevFreeform ) {
+			return;
+		}
 		const rect = computeInscribedRect( aspectRatio, visualSize );
-		const current = state.cropRect;
+		const current = cropRectRef.current;
 		if (
 			Math.abs( current.x - rect.x ) < CROP_RECT_EPSILON &&
 			Math.abs( current.y - rect.y ) < CROP_RECT_EPSILON &&
@@ -247,7 +263,7 @@ function CropperInner(
 			return;
 		}
 		setCropRect( rect );
-	}, [ freeformCrop, aspectRatio, visualSize, setCropRect, state.cropRect ] );
+	}, [ freeformCrop, aspectRatio, visualSize, setCropRect ] );
 
 	// In freeform mode, when aspectRatio changes, reshape the crop to the
 	// largest inscribed rect of the new ratio.
@@ -303,6 +319,11 @@ function CropperInner(
 	// preventDefault works. React's onWheel registers as passive. Bound
 	// to the canvas (not the root) so pointer geometry inside the handler
 	// resolves against the canvas box.
+	//
+	// Skip zoom when an input or textarea has focus. The user may be
+	// editing a value in the Advanced panel while their cursor drifts
+	// over the canvas; zooming would change the coordinate context and
+	// make the in-flight draft value incorrect on commit.
 	useEffect( () => {
 		const el = canvasRef.current;
 		if ( ! el ) {
@@ -314,6 +335,11 @@ function CropperInner(
 			// so focal-point math would resolve against the wrong center.
 			if ( isResizingRef.current || isSettlingRef.current ) {
 				event.preventDefault();
+				return;
+			}
+			if (
+				el.ownerDocument.activeElement?.matches( 'input, textarea' )
+			) {
 				return;
 			}
 			onWheelNative( event );

@@ -3,6 +3,7 @@
  */
 import type { CropperState, Size } from '../../image-editor';
 import { getRotatedBBox } from '../../image-editor/core/camera';
+import { getCropPixels } from '../../utils/crop-pixels';
 
 /**
  * A single modifier in the Core REST `/edit` payload. Order is
@@ -88,7 +89,7 @@ export function buildModifiers(
 		return modifiers;
 	}
 
-	const { cropRect, pan, zoom, flip } = state;
+	const { flip } = state;
 	const hasFlipH = flip.horizontal;
 	const hasFlipV = flip.vertical;
 
@@ -108,27 +109,23 @@ export function buildModifiers(
 		modifiers.push( { type: 'rotate', args: { angle: signedAngle } } );
 	}
 
-	const snapRotation = Math.round( state.rotation / 90 ) * 90;
-	const { width: snapW, height: snapH } = getRotatedBBox(
-		imageSize.width,
-		imageSize.height,
-		snapRotation
-	);
+	// Stencil rect in snap-AABB pixels. Inverts `createExportCamera`'s
+	// pan/zoom composition to recover the pixel rectangle the stencil
+	// framed in that frame.
+	const {
+		x: snapX,
+		y: snapY,
+		width: widthPx,
+		height: heightPx,
+		snapBBoxWidth: snapW,
+		snapBBoxHeight: snapH,
+	} = getCropPixels( state, imageSize );
+
 	const { width: fullW, height: fullH } = getRotatedBBox(
 		imageSize.width,
 		imageSize.height,
 		state.rotation
 	);
-
-	// Stencil rect in snap-AABB pixels. Inverts `createExportCamera`'s
-	// pan/zoom composition to recover the pixel rectangle the stencil
-	// framed in that frame.
-	const imgLeft = 0.5 + pan.x - zoom / 2;
-	const imgTop = 0.5 + pan.y - zoom / 2;
-	const snapX = ( ( cropRect.x - imgLeft ) / zoom ) * snapW;
-	const snapY = ( ( cropRect.y - imgTop ) / zoom ) * snapH;
-	const widthPx = ( cropRect.width / zoom ) * snapW;
-	const heightPx = ( cropRect.height / zoom ) * snapH;
 
 	// Translate to the full AABB (both centered on source).
 	const offsetX = ( fullW - snapW ) / 2;

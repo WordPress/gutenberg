@@ -5,6 +5,7 @@ import type { CropperAction, CropperState, TransformOperation } from './types';
 import { DEFAULT_STATE, MAX_ZOOM } from './constants';
 import { normalizeRotation, degreesToRadians } from './math/rotation';
 import { restrictPanZoom, restrictCropRect } from './containment';
+import { getRotatedBBox } from './camera';
 
 /** Small tolerance for cropper floating-point comparisons. */
 const STATE_EPSILON = 1e-6;
@@ -369,14 +370,30 @@ export function cropperReducer(
 			// (0.5, 0.5), the pan must place that same content at
 			// the new center. Both pan and zoom scale by s because
 			// the CSS translate is independent of zoom.
+			const rawPanX = ( state.pan.x - oldCx + 0.5 ) * s;
+			const rawPanY = ( state.pan.y - oldCy + 0.5 ) * s;
+
+			// Snap sub-pixel pan drift to zero. A crop whose center lands
+			// within half a pixel of the visual midpoint produces a raw pan
+			// that is less than half a pixel from zero. Keeping that value
+			// would make the image edge appear to be 1 px inside the
+			// container, blocking the user from setting Left/Top to 0 in
+			// the Advanced panel. The snap is invisible (< 0.5 px) but
+			// prevents the bounds minimum from rising above zero.
+			const snapRotation = Math.round( state.rotation / 90 ) * 90;
+			const { width: snapBBoxW, height: snapBBoxH } = getRotatedBBox(
+				state.image.naturalWidth,
+				state.image.naturalHeight,
+				snapRotation
+			);
+			const panX = Math.abs( rawPanX ) < 0.5 / snapBBoxW ? 0 : rawPanX;
+			const panY = Math.abs( rawPanY ) < 0.5 / snapBBoxH ? 0 : rawPanY;
+
 			return commitBase(
 				enforceContainment( {
 					...state,
 					zoom: state.zoom * s,
-					pan: {
-						x: ( state.pan.x - oldCx + 0.5 ) * s,
-						y: ( state.pan.y - oldCy + 0.5 ) * s,
-					},
+					pan: { x: panX, y: panY },
 					cropRect: {
 						x: ( 1 - newW ) / 2,
 						y: ( 1 - newH ) / 2,
