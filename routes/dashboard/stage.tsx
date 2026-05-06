@@ -11,16 +11,7 @@ import { __ } from '@wordpress/i18n';
 import { WidgetDashboard, type DashboardWidget } from './widget-dashboard';
 import { useWidgetTypes } from './widget-types';
 
-const DEFAULT_LAYOUT: DashboardWidget[] = [
-	{
-		uuid: '1',
-		type: 'wordpress/hello-world',
-		placement: {
-			width: 'full',
-			height: 1,
-		},
-	},
-];
+const DEFAULT_LAYOUT: DashboardWidget[] = [];
 
 function Dashboard() {
 	const [ layout, setLayout ] =
@@ -42,6 +33,7 @@ function Dashboard() {
 				title={ __( 'Dashboard' ) }
 				actions={ <WidgetDashboard.Actions /> }
 			>
+				<WidgetDashboard.NoWidgetsState />
 				<WidgetDashboard.Widgets />
 			</Page>
 		</WidgetDashboard>
