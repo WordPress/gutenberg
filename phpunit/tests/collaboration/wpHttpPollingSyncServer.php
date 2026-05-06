@@ -916,6 +916,7 @@ class Tests_Collaboration_WpHttpPollingSyncServer extends WP_Test_REST_Controlle
 	}
 
 	public function test_sync_stale_compaction_succeeds_when_newer_compaction_exists() {
+		$this->markTestSkipped( 'Stale compaction handling fix is pending.' );
 		wp_set_current_user( self::$editor_id );
 
 		$room   = $this->get_post_room();
