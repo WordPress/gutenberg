@@ -1,0 +1,13 @@
+[
+	{
+		"name": "core/post-featured-media",
+		"isValid": true,
+		"attributes": {
+			"isLink": false,
+			"linkTarget": "_self",
+			"scale": "cover",
+			"controls": true
+		},
+		"innerBlocks": []
+	}
+]

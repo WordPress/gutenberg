@@ -65,6 +65,7 @@
 		"viewportWidth": 350
 	},
 	"supports": {
+		"inserter": false,
 		"anchor": true,
 		"align": [ "left", "right", "center", "wide", "full" ],
 		"color": {
