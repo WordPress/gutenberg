@@ -25,7 +25,7 @@ function gutenberg_seed_default_dashboard_layout( $dashboard_layout ) {
 			'type'      => 'core/welcome',
 			'placement' => array(
 				'width'  => 'full',
-				'height' => 1,
+				'height' => 2,
 			),
 		),
 		array(
