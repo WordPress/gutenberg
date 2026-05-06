@@ -20,3 +20,4 @@ There isn't an FSE specific theme type. In WordPress > 5.9 FSE is enabled for an
 
 - [Global Settings (theme.json)](/docs/how-to-guides/themes/global-settings-and-styles.md)
 - [Theme Support](/docs/how-to-guides/themes/theme-support.md)
+- [Root template](/docs/how-to-guides/themes/root-template.md)

@@ -312,6 +312,12 @@
 		"parent": "themes"
 	},
 	{
+		"title": "Root template",
+		"slug": "root-template",
+		"markdown_source": "../docs/how-to-guides/themes/root-template.md",
+		"parent": "themes"
+	},
+	{
 		"title": "Thunks in Core-Data",
 		"slug": "thunks",
 		"markdown_source": "../docs/how-to-guides/thunks.md",
