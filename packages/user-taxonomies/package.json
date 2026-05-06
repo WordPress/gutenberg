@@ -38,7 +38,9 @@
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/icons": "file:../icons",
 		"@wordpress/notices": "file:../notices",
-		"@wordpress/ui": "file:../ui"
+		"@wordpress/private-apis": "file:../private-apis",
+		"@wordpress/ui": "file:../ui",
+		"@wordpress/url": "file:../url"
 	},
 	"publishConfig": {
 		"access": "public"
