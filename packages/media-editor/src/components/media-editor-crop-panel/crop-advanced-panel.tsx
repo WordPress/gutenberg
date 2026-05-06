@@ -55,23 +55,51 @@ interface CropInputProps {
 	value: number;
 	range: CropInputRange;
 	disabled?: boolean;
+	step?: number;
+	commitStep?: number;
 	suffix?: React.ReactNode;
 	onCommit: ( value: number ) => void;
 }
 
 const INPUT_PREVIEW_DEBOUNCE_MS = 250;
 const INPUT_INTEGER_EPSILON = 1e-6;
-const FINE_ROTATION_EDGE_EPSILON = 0.01;
+const FINE_ROTATION_COMMIT_STEP = 0.5;
 const pxSuffix = <InputControlSuffixWrapper>px</InputControlSuffixWrapper>;
 const degreeSuffix = (
 	<InputControlSuffixWrapper>{ '\u00b0' }</InputControlSuffixWrapper>
 );
 
-function snapInputBoundToInteger( value: number ): number {
-	const rounded = Math.round( value );
-	return Math.abs( value - rounded ) < INPUT_INTEGER_EPSILON
-		? rounded
+function getStepPrecision( step: number ): number {
+	const stepString = step.toString();
+	const decimalIndex = stepString.indexOf( '.' );
+	return decimalIndex === -1 ? 0 : stepString.length - decimalIndex - 1;
+}
+
+function snapInputValueToStep( value: number, step: number ): number {
+	const precision = getStepPrecision( step );
+	const snapped = Math.round( value / step ) * step;
+	return Number( snapped.toFixed( precision ) );
+}
+
+function snapInputBoundToStep( value: number, step: number ): number {
+	const snapped = snapInputValueToStep( value, step );
+	return Math.abs( value - snapped ) < INPUT_INTEGER_EPSILON
+		? snapped
 		: value;
+}
+
+function ceilInputValueToStep( value: number, step: number ): number {
+	return snapInputValueToStep(
+		Math.ceil( snapInputBoundToStep( value, step ) / step ) * step,
+		step
+	);
+}
+
+function floorInputValueToStep( value: number, step: number ): number {
+	return snapInputValueToStep(
+		Math.floor( snapInputBoundToStep( value, step ) / step ) * step,
+		step
+	);
 }
 
 function makeRange(
@@ -89,30 +117,32 @@ function makeRange(
 
 function getInputBounds(
 	value: number,
-	range: CropInputRange
+	range: CropInputRange,
+	commitStep: number
 ): CropInputBounds {
-	const rounded = Math.round( value );
-	const min = Math.ceil( snapInputBoundToInteger( range.minValue ) );
-	const max = Math.floor( snapInputBoundToInteger( range.maxValue ) );
+	const snapped = snapInputValueToStep( value, commitStep );
+	const min = ceilInputValueToStep( range.minValue, commitStep );
+	const max = floorInputValueToStep( range.maxValue, commitStep );
 
 	if ( max < min ) {
 		return {
-			value: rounded,
-			min: rounded,
-			max: rounded,
+			value: snapped,
+			min: snapped,
+			max: snapped,
 		};
 	}
 
 	return {
-		value: rounded,
-		min: Math.min( rounded, min ),
-		max: Math.max( rounded, max ),
+		value: snapped,
+		min: Math.min( snapped, min ),
+		max: Math.max( snapped, max ),
 	};
 }
 
 function getInputCommitValue(
 	nextValue: string,
-	bounds: CropInputBounds
+	bounds: CropInputBounds,
+	commitStep: number
 ): number | null {
 	if ( nextValue.trim() === '' ) {
 		return null;
@@ -123,8 +153,12 @@ function getInputCommitValue(
 		return null;
 	}
 
-	const rounded = Math.round( parsed );
-	return Math.max( bounds.min, Math.min( rounded, bounds.max ) );
+	const snapped = snapInputValueToStep( parsed, commitStep );
+	if ( snapped < bounds.min || snapped > bounds.max ) {
+		return null;
+	}
+
+	return snapped;
 }
 
 function getWidthRange(
@@ -185,9 +219,13 @@ function getFineRotationOffset(
 }
 
 function clampFineRotationOffset( value: number ): number {
+	const max = MAX_ROTATION_OFFSET - FINE_ROTATION_COMMIT_STEP;
 	return Math.max(
-		-MAX_ROTATION_OFFSET + FINE_ROTATION_EDGE_EPSILON,
-		Math.min( MAX_ROTATION_OFFSET - FINE_ROTATION_EDGE_EPSILON, value )
+		-max,
+		Math.min(
+			max,
+			snapInputValueToStep( value, FINE_ROTATION_COMMIT_STEP )
+		)
 	);
 }
 
@@ -199,6 +237,8 @@ function CropInput( {
 	value,
 	range,
 	disabled = false,
+	step = 1,
+	commitStep = step,
 	suffix = pxSuffix,
 	onCommit,
 }: CropInputProps ) {
@@ -208,14 +248,16 @@ function CropInput( {
 	const previewDelayRef = useRef< ReturnType< typeof setTimeout > >();
 	const initialValueRef = useRef( value );
 	const previewedValueRef = useRef< number | null >( null );
-	const bounds = getInputBounds( value, range );
+	const bounds = getInputBounds( value, range, commitStep );
 	const boundsRef = useRef( bounds );
+	const commitStepRef = useRef( commitStep );
 	const onCommitRef = useRef( onCommit );
 
 	useLayoutEffect( () => {
 		boundsRef.current = bounds;
+		commitStepRef.current = commitStep;
 		onCommitRef.current = onCommit;
-	}, [ bounds, onCommit ] );
+	}, [ bounds, commitStep, onCommit ] );
 
 	useEffect( () => {
 		return () => {
@@ -235,7 +277,8 @@ function CropInput( {
 	const commitValue = ( nextValue: string ): boolean => {
 		const commitValueCandidate = getInputCommitValue(
 			nextValue,
-			boundsRef.current
+			boundsRef.current,
+			commitStepRef.current
 		);
 		if ( commitValueCandidate === null ) {
 			return false;
@@ -250,7 +293,11 @@ function CropInput( {
 
 	const schedulePreview = ( nextValue: string ) => {
 		cancelPreview();
-		const previewValue = getInputCommitValue( nextValue, bounds );
+		const previewValue = getInputCommitValue(
+			nextValue,
+			bounds,
+			commitStep
+		);
 		if ( previewValue === null ) {
 			return;
 		}
@@ -258,7 +305,8 @@ function CropInput( {
 		previewDelayRef.current = setTimeout( () => {
 			const latestPreviewValue = getInputCommitValue(
 				nextValue,
-				boundsRef.current
+				boundsRef.current,
+				commitStepRef.current
 			);
 			if ( latestPreviewValue === null ) {
 				previewDelayRef.current = undefined;
@@ -327,7 +375,7 @@ function CropInput( {
 			value={ focused ? draft : String( bounds.value ) }
 			min={ bounds.min }
 			max={ bounds.max }
-			step={ 1 }
+			step={ step }
 			disabled={ disabled }
 			onChange={ handleChange }
 			onFocus={ handleFocus }
@@ -423,8 +471,8 @@ export default function CropAdvancedPanel( {
 		state.flip
 	);
 	const fineRotationRange = makeRange(
-		-MAX_ROTATION_OFFSET,
-		MAX_ROTATION_OFFSET
+		-MAX_ROTATION_OFFSET + FINE_ROTATION_COMMIT_STEP,
+		MAX_ROTATION_OFFSET - FINE_ROTATION_COMMIT_STEP
 	);
 	const canMoveCropRect = freeformCrop;
 
@@ -456,6 +504,8 @@ export default function CropAdvancedPanel( {
 							aria-label={ __( 'Fine rotation angle' ) }
 							value={ fineRotationOffset }
 							range={ fineRotationRange }
+							step={ FINE_ROTATION_COMMIT_STEP }
+							commitStep={ FINE_ROTATION_COMMIT_STEP }
 							suffix={ degreeSuffix }
 							onCommit={ handleFineRotationApply }
 						/>

@@ -153,6 +153,25 @@ describe( 'CropAdvancedPanel', () => {
 		expect( mockSettleCrop ).toHaveBeenCalledTimes( 1 );
 	} );
 
+	it( 'does not apply out-of-range numeric crop drafts', () => {
+		jest.useFakeTimers();
+		render( <CropAdvancedPanel freeformCrop /> );
+
+		fireEvent.click( screen.getByRole( 'button', { name: 'Advanced' } ) );
+		const widthInput = screen.getByLabelText( 'Width' );
+		fireEvent.focus( widthInput );
+		fireEvent.change( widthInput, { target: { value: '1' } } );
+
+		act( () => {
+			jest.advanceTimersByTime( 250 );
+		} );
+		fireEvent.blur( widthInput );
+
+		expect( mockValidateCropPixelRectAgainstBounds ).not.toHaveBeenCalled();
+		expect( mockApplyOperation ).not.toHaveBeenCalled();
+		expect( mockSettleCrop ).not.toHaveBeenCalled();
+	} );
+
 	it( 'treats near-integer maximum bounds as the expected integer pixel value', () => {
 		setMockCropGeometry( {
 			rect: {
@@ -237,7 +256,7 @@ describe( 'CropAdvancedPanel', () => {
 		);
 	} );
 
-	it( 'uses the latest bounds when a delayed preview is applied', () => {
+	it( 'does not apply a delayed preview when latest bounds reject the draft', () => {
 		jest.useFakeTimers();
 		setMockCropGeometry( {
 			rect: {
@@ -272,14 +291,8 @@ describe( 'CropAdvancedPanel', () => {
 			jest.advanceTimersByTime( 250 );
 		} );
 
-		expect( mockValidateCropPixelRectAgainstBounds ).toHaveBeenCalledWith(
-			expect.objectContaining( {
-				width: 2560,
-			} ),
-			expect.objectContaining( {
-				maxRight: 2560,
-			} )
-		);
+		expect( mockValidateCropPixelRectAgainstBounds ).not.toHaveBeenCalled();
+		expect( mockApplyOperation ).not.toHaveBeenCalled();
 	} );
 
 	it( 'applies manual fine rotation changes from the advanced panel', () => {
@@ -297,7 +310,60 @@ describe( 'CropAdvancedPanel', () => {
 		} );
 	} );
 
-	it( 'clamps manual fine rotation changes to the rotation bounds', () => {
+	it( 'displays manual fine rotation half-degree values', () => {
+		setMockCropperState( {
+			rotation: 12.5,
+		} );
+		render( <CropAdvancedPanel freeformCrop /> );
+
+		fireEvent.click( screen.getByRole( 'button', { name: 'Advanced' } ) );
+
+		expect( screen.getByLabelText( 'Fine rotation angle' ) ).toHaveValue(
+			12.5
+		);
+	} );
+
+	it( 'uses half-degree steps for manual fine rotation', () => {
+		render( <CropAdvancedPanel freeformCrop /> );
+
+		fireEvent.click( screen.getByRole( 'button', { name: 'Advanced' } ) );
+
+		expect(
+			screen.getByLabelText( 'Fine rotation angle' )
+		).toHaveAttribute( 'step', '0.5' );
+	} );
+
+	it( 'allows manual fine rotation half-degree changes', () => {
+		render( <CropAdvancedPanel freeformCrop /> );
+
+		fireEvent.click( screen.getByRole( 'button', { name: 'Advanced' } ) );
+		const rotationInput = screen.getByLabelText( 'Fine rotation angle' );
+		fireEvent.focus( rotationInput );
+		fireEvent.change( rotationInput, { target: { value: '12.5' } } );
+		fireEvent.blur( rotationInput );
+
+		expect( mockApplyOperation ).toHaveBeenCalledWith( {
+			type: 'rotate',
+			degrees: 12.5,
+		} );
+	} );
+
+	it( 'snaps manual fine rotation changes to half-degree increments', () => {
+		render( <CropAdvancedPanel freeformCrop /> );
+
+		fireEvent.click( screen.getByRole( 'button', { name: 'Advanced' } ) );
+		const rotationInput = screen.getByLabelText( 'Fine rotation angle' );
+		fireEvent.focus( rotationInput );
+		fireEvent.change( rotationInput, { target: { value: '12.3' } } );
+		fireEvent.blur( rotationInput );
+
+		expect( mockApplyOperation ).toHaveBeenCalledWith( {
+			type: 'rotate',
+			degrees: 12.5,
+		} );
+	} );
+
+	it( 'does not apply manual fine rotation changes outside the rotation bounds', () => {
 		render( <CropAdvancedPanel freeformCrop /> );
 
 		fireEvent.click( screen.getByRole( 'button', { name: 'Advanced' } ) );
@@ -306,9 +372,6 @@ describe( 'CropAdvancedPanel', () => {
 		fireEvent.change( rotationInput, { target: { value: '47' } } );
 		fireEvent.blur( rotationInput );
 
-		expect( mockApplyOperation ).toHaveBeenCalledWith( {
-			type: 'rotate',
-			degrees: 44.99,
-		} );
+		expect( mockApplyOperation ).not.toHaveBeenCalled();
 	} );
 } );
