@@ -331,6 +331,22 @@ describe( 'applyDiffMarks', () => {
 		const baseline = { align: 'left' };
 		expect( applyDiffMarks( merged, baseline ) ).toBe( merged );
 	} );
+
+	it( 'propagates the suggester avatar color into each marked run', () => {
+		// HOC resolves the suggester via `getAvatarBorderColor` and passes
+		// the hex color through. The marks must carry it inline so two
+		// suggesters' edits read as different colors in the canvas.
+		const result = applyDiffMarks(
+			{ content: 'Hello world' },
+			{ content: 'Hello' },
+			'#b26200'
+		);
+		expect( result.content ).toBe(
+			'Hello' +
+				'<ins class="has-suggestion-addition" style="--suggestion-author-color: #b26200"> </ins>' +
+				'<ins class="has-suggestion-addition" style="--suggestion-author-color: #b26200">world</ins>'
+		);
+	} );
 } );
 
 describe( 'stripMarksFromIncoming', () => {

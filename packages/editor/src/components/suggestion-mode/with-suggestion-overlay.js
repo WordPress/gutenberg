@@ -34,6 +34,7 @@ import { createHigherOrderComponent } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import { useCallback, useMemo, useRef } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -41,6 +42,7 @@ import { addFilter } from '@wordpress/hooks';
 import { useSuggestionOverlay } from './overlay-context';
 import { EDITOR_STORE_NAME, SUGGEST_INTENT } from './constants';
 import { markContentDiff, stripSuggestionMarks } from './inline-formats';
+import { getAvatarBorderColor } from '../collab-sidebar/utils';
 
 const BLOCK_EDITOR_STORE_NAME = 'core/block-editor';
 
@@ -82,13 +84,19 @@ function isStringLike( value ) {
  * the baseline (no change to mark) or whose baseline is missing (the
  * suggestion has nothing to diff against).
  *
- * @param {Object} merged   Output of `mergeOverlayAttributes`.
- * @param {Object} baseline Baseline attributes captured when the suggestion
- *                          began.
+ * `authorColor` is forwarded to `markContentDiff` so each `<del>`/`<ins>`
+ * carries the suggester's avatar color as an inline custom property; the
+ * canvas CSS partial consumes the variable and falls back to the
+ * red/green default when this is null.
+ *
+ * @param {Object}      merged        Output of `mergeOverlayAttributes`.
+ * @param {Object}      baseline      Baseline attributes captured when the
+ *                                    suggestion began.
+ * @param {string|null} [authorColor] Optional suggester avatar color.
  * @return {Object} `merged` with rich-text attributes replaced by marked
  * HTML, or `merged` unchanged when nothing was eligible.
  */
-function applyDiffMarks( merged, baseline ) {
+function applyDiffMarks( merged, baseline, authorColor = null ) {
 	if ( ! merged || ! baseline ) {
 		return merged;
 	}
@@ -110,7 +118,11 @@ function applyDiffMarks( merged, baseline ) {
 		if ( ! result ) {
 			result = { ...merged };
 		}
-		result[ key ] = markContentDiff( originalStr, proposedStr );
+		result[ key ] = markContentDiff(
+			originalStr,
+			proposedStr,
+			authorColor
+		);
 	}
 	return result ?? merged;
 }
@@ -223,19 +235,28 @@ function SuggestingBlockEdit( { BlockEdit, props } ) {
 	const overlayAttributes = overlayEntry?.overlayAttributes ?? null;
 	const baselineAttributes = overlayEntry?.baselineAttributes ?? null;
 
-	// Whether this block is the currently selected one. While selected, we
-	// skip applying inline diff marks so RichText's value-prop reconciliation
-	// doesn't fight the user's caret on every keystroke. Marks reappear as
-	// soon as the user clicks/tabs away. Defaults to `true` so any
-	// environment without the block-editor store registered (unit tests of
-	// this HOC) skips marking too — production always has the store.
-	const isSelected = useSelect(
+	// Whether this block is the currently selected one (skip marking while
+	// the user is typing into it) and the suggester's avatar color (paints
+	// the inline marks so two suggesters' edits read as different colors).
+	// Folded into a single `useSelect` so the HOC stays at one extra
+	// store-subscription per block in suggest mode. `isSelected` defaults
+	// to `true` so any environment without the block-editor store
+	// registered (unit tests of this HOC) skips marking too — production
+	// always has both stores. `authorColor` defaults to `null` for
+	// anonymous / pre-collab edits, in which case the canvas CSS falls
+	// through to the red/green pair.
+	const { isSelected, authorColor } = useSelect(
 		( select ) => {
 			const blockEditor = select( BLOCK_EDITOR_STORE_NAME );
-			if ( ! blockEditor?.isBlockSelected ) {
-				return true;
-			}
-			return blockEditor.isBlockSelected( clientId );
+			const core = select( coreStore );
+			const userId = core?.getCurrentUser?.()?.id ?? null;
+			return {
+				isSelected: blockEditor?.isBlockSelected
+					? blockEditor.isBlockSelected( clientId )
+					: true,
+				authorColor:
+					userId !== null ? getAvatarBorderColor( userId ) : null,
+			};
 		},
 		[ clientId ]
 	);
@@ -277,8 +298,14 @@ function SuggestingBlockEdit( { BlockEdit, props } ) {
 		if ( isSelected ) {
 			return merged;
 		}
-		return applyDiffMarks( merged, baselineAttributes );
-	}, [ attributes, overlayAttributes, baselineAttributes, isSelected ] );
+		return applyDiffMarks( merged, baselineAttributes, authorColor );
+	}, [
+		attributes,
+		overlayAttributes,
+		baselineAttributes,
+		isSelected,
+		authorColor,
+	] );
 
 	return (
 		<BlockEdit
