@@ -9,6 +9,11 @@ import { test, type Page, type Browser } from '@playwright/test';
 // @ts-expect-error
 import type { Metric } from 'web-vitals';
 
+/**
+ * Internal dependencies
+ */
+import { resolveTraceSourceMaps } from './resolve-trace-source-maps';
+
 type EventType =
 	| 'click'
 	| 'focus'
@@ -269,7 +274,8 @@ export class Metrics {
 			);
 			await mkdir( tracesDir, { recursive: true } );
 			if ( ! ( await fileExists( filePath ) ) ) {
-				await writeFile( filePath, traceBuffer );
+				await resolveTraceSourceMaps( traceJSON, fetchMap );
+				await writeFile( filePath, JSON.stringify( traceJSON ) );
 			}
 		}
 	}
@@ -471,5 +477,29 @@ async function fileExists( filePath: string ): Promise< boolean > {
 		return true;
 	} catch {
 		return false;
+	}
+}
+
+/**
+ * Fetch a source map for a script URL by appending `.map`. Returns the body
+ * text, or `null` when the map is missing/unreachable. Used to deminify
+ * function names in saved traces; failures are intentionally silent so the
+ * trace is still saved when individual maps are unavailable (e.g. external
+ * scripts, runtime-injected code).
+ *
+ * @param scriptUrl URL of the script whose source map to fetch.
+ */
+async function fetchMap( scriptUrl: string ): Promise< string | null > {
+	if ( ! /^https?:\/\//.test( scriptUrl ) ) {
+		return null;
+	}
+	try {
+		const response = await fetch( `${ scriptUrl }.map` );
+		if ( ! response.ok ) {
+			return null;
+		}
+		return await response.text();
+	} catch {
+		return null;
 	}
 }

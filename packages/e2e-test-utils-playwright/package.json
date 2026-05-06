@@ -42,6 +42,7 @@
 		"get-port": "^5.1.1",
 		"lighthouse": "^12.2.2",
 		"mime": "^3.0.0",
+		"source-map": "^0.6.1",
 		"web-vitals": "^4.2.1"
 	},
 	"devDependencies": {
