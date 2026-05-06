@@ -17,7 +17,7 @@ import { compose } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import { dimRatioToClass } from '../post-featured-image/utils';
+import { dimRatioToClass } from './utils';
 
 const Overlay = ( { attributes, overlayColor } ) => {
 	const { dimRatio } = attributes;

@@ -134,7 +134,7 @@ export const STYLE_BOOK_CATEGORIES: StyleBookCategory[] = [
 	{
 		slug: 'media',
 		title: __( 'Media' ),
-		blocks: [ 'core/post-featured-image' ],
+		blocks: [ 'core/post-featured-media' ],
 	},
 	{
 		slug: 'widgets',
@@ -154,7 +154,7 @@ export const STYLE_BOOK_ALL_BLOCKS_SUBCATEGORIES: StyleBookCategory[] = [
 	{
 		slug: 'media',
 		title: __( 'Media' ),
-		blocks: [ 'core/post-featured-image' ],
+		blocks: [ 'core/post-featured-media' ],
 	},
 	{
 		slug: 'widgets',

@@ -16,7 +16,10 @@
  */
 function block_core_post_template_uses_featured_image( $inner_blocks ) {
 	foreach ( $inner_blocks as $block ) {
-		if ( 'core/post-featured-image' === $block->name ) {
+		if (
+			'core/post-featured-image' === $block->name ||
+			'core/post-featured-media' === $block->name
+		) {
 			return true;
 		}
 		if (

@@ -9,9 +9,12 @@ import {
 	Placeholder,
 	Spinner,
 	Button,
+	TextControl,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
+import { Link } from '@wordpress/ui';
+import { createInterpolateElement, useMemo } from '@wordpress/element';
 import {
 	InspectorControls,
 	BlockControls,
@@ -32,8 +35,8 @@ import { store as noticesStore } from '@wordpress/notices';
  * Internal dependencies
  */
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
-import DimensionControls from '../post-featured-image/dimension-controls';
-import OverlayControls from '../post-featured-image/overlay-controls';
+import DimensionControls from './dimension-controls';
+import OverlayControls from './overlay-controls';
 import Overlay from './overlay';
 import { unlock } from '../lock-unlock';
 
@@ -82,16 +85,18 @@ export default function PostFeaturedMediaEdit( {
 	const {
 		isLink,
 		linkTarget,
+		rel,
 		aspectRatio,
 		width,
 		height,
 		scale,
 		sizeSlug,
 		controls,
+		useFirstImageFromPost,
 	} = attributes;
 
 	// Featured image is a first-class post attribute.
-	const [ featuredImageId, setFeaturedImageId ] = useEntityProp(
+	const [ storedFeaturedImageId, setFeaturedImageId ] = useEntityProp(
 		'postType',
 		postTypeSlug,
 		'featured_media',
@@ -107,6 +112,31 @@ export default function PostFeaturedMediaEdit( {
 	);
 	const featuredVideoId = meta?._featured_video_id || 0;
 	const featuredAudioId = meta?._featured_audio_id || 0;
+
+	// Optional fallback to the first image found in post content. Only applies
+	// to images — preserved from the legacy `core/post-featured-image` block.
+	const [ postContent ] = useEntityProp(
+		'postType',
+		postTypeSlug,
+		'content',
+		postId
+	);
+	const featuredImageId = useMemo( () => {
+		if ( storedFeaturedImageId ) {
+			return storedFeaturedImageId;
+		}
+		if ( ! useFirstImageFromPost ) {
+			return 0;
+		}
+		const imageOpener =
+			/<!--\s+wp:(?:core\/)?image\s+(?<attrs>{(?:(?:[^}]+|}+(?=})|(?!}\s+\/?-->).)*)?}\s+)?-->/.exec(
+				postContent
+			);
+		const imageId =
+			imageOpener?.groups?.attrs &&
+			JSON.parse( imageOpener.groups.attrs )?.id;
+		return imageId || 0;
+	}, [ storedFeaturedImageId, useFirstImageFromPost, postContent ] );
 
 	// Priority: image > video > audio.
 	let activeType = null;
@@ -231,6 +261,7 @@ export default function PostFeaturedMediaEdit( {
 					setAttributes( {
 						isLink: false,
 						linkTarget: '_self',
+						rel: '',
 						controls: true,
 					} )
 				}
@@ -267,6 +298,36 @@ export default function PostFeaturedMediaEdit( {
 								} )
 							}
 							checked={ linkTarget === '_blank' }
+						/>
+					</ToolsPanelItem>
+				) }
+				{ isLink && (
+					<ToolsPanelItem
+						label={ __( 'Link relation' ) }
+						isShownByDefault
+						hasValue={ () => !! rel }
+						onDeselect={ () => setAttributes( { rel: '' } ) }
+					>
+						<TextControl
+							__next40pxDefaultSize
+							label={ __( 'Link relation' ) }
+							help={ createInterpolateElement(
+								__(
+									'The <a>Link Relation</a> attribute defines the relationship between a linked resource and the current document.'
+								),
+								{
+									a: (
+										<Link
+											href="https://developer.mozilla.org/docs/Web/HTML/Attributes/rel"
+											openInNewTab
+										/>
+									),
+								}
+							) }
+							value={ rel }
+							onChange={ ( newRel ) =>
+								setAttributes( { rel: newRel } )
+							}
 						/>
 					</ToolsPanelItem>
 				) }
@@ -418,7 +479,11 @@ export default function PostFeaturedMediaEdit( {
 	}
 
 	const wrappedMedia = isLink ? (
-		<a href={ postPermalink } target={ linkTarget }>
+		<a
+			href={ postPermalink }
+			target={ linkTarget }
+			rel={ rel || undefined }
+		>
 			{ mediaEl }
 		</a>
 	) : (

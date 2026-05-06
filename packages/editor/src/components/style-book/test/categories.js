@@ -74,8 +74,8 @@ const exampleThemeBlocks = [
 		category: 'theme',
 	},
 	{
-		name: 'core/post-featured-image',
-		title: 'Featured Image',
+		name: 'core/post-featured-media',
+		title: 'Featured Media',
 		category: 'theme',
 	},
 ];

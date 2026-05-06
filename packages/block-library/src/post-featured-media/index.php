@@ -28,6 +28,7 @@ function render_block_core_post_featured_media( $attributes, $content, $block ) 
 	$post_id   = $block->context['postId'];
 	$is_link   = ! empty( $attributes['isLink'] );
 	$target    = $is_link ? ( $attributes['linkTarget'] ?? '_self' ) : '';
+	$rel       = $is_link ? ( $attributes['rel'] ?? '' ) : '';
 	$size_slug = $attributes['sizeSlug'] ?? 'post-thumbnail';
 
 	$extra_styles = '';
@@ -42,6 +43,23 @@ function render_block_core_post_featured_media( $attributes, $content, $block ) 
 
 	// 1. Featured image.
 	$featured_image = get_the_post_thumbnail( $post_id, $size_slug );
+
+	// Legacy fallback: use the first image found in post content when no
+	// thumbnail is set. Carried over from `core/post-featured-image`.
+	if ( ! $featured_image && ! empty( $attributes['useFirstImageFromPost'] ) ) {
+		$content_post = get_post( $post_id );
+		$post_content = $content_post ? $content_post->post_content : '';
+		$processor    = new WP_HTML_Tag_Processor( $post_content );
+		if ( $processor->next_tag( 'img' ) ) {
+			$tag_html = new WP_HTML_Tag_Processor( '<img>' );
+			$tag_html->next_tag();
+			foreach ( $processor->get_attribute_names_with_prefix( '' ) as $name ) {
+				$tag_html->set_attribute( $name, $processor->get_attribute( $name ) );
+			}
+			$featured_image = $tag_html->get_updated_html();
+		}
+	}
+
 	if ( $featured_image ) {
 		if ( $extra_styles ) {
 			// Inject style onto the <img> tag.
@@ -57,11 +75,12 @@ function render_block_core_post_featured_media( $attributes, $content, $block ) 
 			$attributes,
 			$is_link,
 			$target,
+			$rel,
 			$post_id
 		);
 	}
 
-	$controls = $attributes['controls'];
+	$controls = $attributes['controls'] ?? true;
 
 	// 2. Featured video.
 	$video_id = (int) get_post_meta( $post_id, '_featured_video_id', true );
@@ -80,6 +99,7 @@ function render_block_core_post_featured_media( $attributes, $content, $block ) 
 				$attributes,
 				$is_link,
 				$target,
+				$rel,
 				$post_id
 			);
 		}
@@ -100,6 +120,7 @@ function render_block_core_post_featured_media( $attributes, $content, $block ) 
 				$attributes,
 				$is_link,
 				$target,
+				$rel,
 				$post_id
 			);
 		}
@@ -115,15 +136,18 @@ function render_block_core_post_featured_media( $attributes, $content, $block ) 
  * @param array  $attributes Block attributes.
  * @param bool   $is_link    Whether to wrap in a post permalink link.
  * @param string $target     Link target attribute value.
+ * @param string $rel        Link rel attribute value.
  * @param int    $post_id    The post ID.
  * @return string The complete block HTML.
  */
-function render_block_core_post_featured_media_wrap( $inner, $attributes, $is_link, $target, $post_id ) {
+function render_block_core_post_featured_media_wrap( $inner, $attributes, $is_link, $target, $rel, $post_id ) {
 	if ( $is_link ) {
-		$inner = sprintf(
-			'<a href="%s" target="%s">%s</a>',
+		$rel_attr = $rel ? sprintf( ' rel="%s"', esc_attr( $rel ) ) : '';
+		$inner    = sprintf(
+			'<a href="%s" target="%s"%s>%s</a>',
 			esc_url( get_the_permalink( $post_id ) ),
 			esc_attr( $target ),
+			$rel_attr,
 			$inner
 		);
 	}
@@ -158,3 +182,88 @@ function register_block_core_post_featured_media() {
 	);
 }
 add_action( 'init', 'register_block_core_post_featured_media' );
+
+/**
+ * Re-registers the legacy `core/post-featured-image` block, mapped to the
+ * `core/post-featured-media` render callback.
+ *
+ * The JS parser rewrites saved `core/post-featured-image` content to
+ * `core/post-featured-media` on load via `convertLegacyBlockNameAndAttributes`,
+ * so this PHP-side registration only matters for templates and patterns whose
+ * raw block markup is rendered server-side without a parser pass — typically
+ * theme template files (`single.html`, etc.) and pattern files. Hiding the
+ * legacy block from the inserter prevents new instances of it.
+ *
+ * Mirrors `register_legacy_post_comments_block()` in `core/comments`.
+ */
+function register_legacy_post_featured_image_block() {
+	$registry = WP_Block_Type_Registry::get_instance();
+
+	if ( $registry->is_registered( 'core/post-featured-image' ) ) {
+		unregister_block_type( 'core/post-featured-image' );
+	}
+
+	$metadata = array(
+		'name'            => 'core/post-featured-image',
+		'category'        => 'theme',
+		'attributes'      => array(
+			'isLink'                => array(
+				'type'    => 'boolean',
+				'default' => false,
+				'role'    => 'content',
+			),
+			'aspectRatio'           => array( 'type' => 'string' ),
+			'width'                 => array( 'type' => 'string' ),
+			'height'                => array( 'type' => 'string' ),
+			'scale'                 => array(
+				'type'    => 'string',
+				'default' => 'cover',
+			),
+			'sizeSlug'              => array( 'type' => 'string' ),
+			'rel'                   => array(
+				'type'      => 'string',
+				'attribute' => 'rel',
+				'default'   => '',
+				'role'      => 'content',
+			),
+			'linkTarget'            => array(
+				'type'    => 'string',
+				'default' => '_self',
+				'role'    => 'content',
+			),
+			'overlayColor'          => array( 'type' => 'string' ),
+			'customOverlayColor'    => array( 'type' => 'string' ),
+			'dimRatio'              => array(
+				'type'    => 'number',
+				'default' => 0,
+			),
+			'gradient'              => array( 'type' => 'string' ),
+			'customGradient'        => array( 'type' => 'string' ),
+			'useFirstImageFromPost' => array(
+				'type'    => 'boolean',
+				'default' => false,
+			),
+		),
+		'uses_context'    => array( 'postId', 'postType', 'queryId' ),
+		'supports'        => array(
+			'inserter'      => false,
+			'anchor'        => true,
+			'align'         => array( 'left', 'right', 'center', 'wide', 'full' ),
+			'html'          => false,
+			'spacing'       => array(
+				'margin'  => true,
+				'padding' => true,
+			),
+			'interactivity' => array(
+				'clientNavigation' => true,
+			),
+		),
+		'render_callback' => 'render_block_core_post_featured_media',
+	);
+
+	/** This filter is documented in wp-includes/blocks.php */
+	$metadata = apply_filters( 'block_type_metadata', $metadata );
+
+	register_block_type( 'core/post-featured-image', $metadata );
+}
+add_action( 'init', 'register_legacy_post_featured_image_block', 21 );

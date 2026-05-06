@@ -18,6 +18,16 @@
 			"default": "_self",
 			"role": "content"
 		},
+		"rel": {
+			"type": "string",
+			"attribute": "rel",
+			"default": "",
+			"role": "content"
+		},
+		"useFirstImageFromPost": {
+			"type": "boolean",
+			"default": false
+		},
 		"aspectRatio": {
 			"type": "string"
 		},

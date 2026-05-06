@@ -5,8 +5,11 @@
 		"attributes": {
 			"isLink": false,
 			"linkTarget": "_self",
+			"rel": "",
+			"useFirstImageFromPost": false,
 			"scale": "cover",
-			"controls": true
+			"controls": true,
+			"dimRatio": 0
 		},
 		"innerBlocks": []
 	}

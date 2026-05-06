@@ -18,6 +18,12 @@ export function convertLegacyBlockNameAndAttributes(
 		name = 'core/cover';
 	}
 
+	// Convert 'core/post-featured-image' to the broader 'core/post-featured-media'.
+	// All saved attributes are valid on the new block.
+	if ( 'core/post-featured-image' === name ) {
+		name = 'core/post-featured-media';
+	}
+
 	// Convert 'core/text' blocks in existing content to 'core/paragraph'.
 	if ( 'core/text' === name || 'core/cover-text' === name ) {
 		name = 'core/paragraph';

@@ -1,14 +1,15 @@
 [
 	{
-		"name": "core/post-featured-image",
+		"name": "core/post-featured-media",
 		"isValid": true,
 		"attributes": {
 			"isLink": false,
-			"scale": "cover",
-			"rel": "",
 			"linkTarget": "_self",
-			"dimRatio": 0,
-			"useFirstImageFromPost": false
+			"rel": "",
+			"useFirstImageFromPost": false,
+			"scale": "cover",
+			"controls": true,
+			"dimRatio": 0
 		},
 		"innerBlocks": []
 	}
