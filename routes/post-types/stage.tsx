@@ -58,7 +58,7 @@ function PostTypesEmptyState( {
 			/>
 			<EmptyState.Title>
 				{ hasSearchOrFilters
-					? __( 'No results found' )
+					? __( 'No post types found' )
 					: __( 'No post types yet' ) }
 			</EmptyState.Title>
 			<EmptyState.Description>
