@@ -59,13 +59,11 @@ function SinglePalette( {
 			// Prefer slug-based selection when both the palette entry and the
 			// caller provide a slug — this correctly distinguishes two entries
 			// that share the same color value. Fall back to comparing by color
-			// value, marking only the first duplicate as selected to avoid
-			// rendering multiple checkmarks simultaneously.
+			// value when no slug is provided.
 			const isSelected =
 				selectedSlug !== undefined && slug !== undefined
 					? slug === selectedSlug
-					: value === color &&
-					  colors.findIndex( ( c ) => c.color === color ) === index;
+					: value === color;
 
 			return (
 				<CircularOptionPicker.Option

@@ -308,11 +308,11 @@ describe( 'ColorPalette', () => {
 			const options = screen.getAllByRole( 'option' );
 			// "dark-background" is index 0, "dark-text" is index 1.
 			// With selectedSlug="dark-text", only the second swatch should be selected.
-			expect( options[ 0 ] ).not.toBeChecked();
-			expect( options[ 1 ] ).toBeChecked();
+			expect( options[ 0 ] ).toHaveAttribute( 'aria-selected', 'false' );
+			expect( options[ 1 ] ).toHaveAttribute( 'aria-selected', 'true' );
 		} );
 
-		it( 'should fall back to color-value selection and only mark the first duplicate when no selectedSlug is provided', () => {
+		it( 'should fall back to color-value selection and mark all matching duplicates when no selectedSlug is provided', () => {
 			render(
 				<ColorPalette
 					colors={ DUPLICATE_COLOR_PALETTE }
@@ -322,9 +322,10 @@ describe( 'ColorPalette', () => {
 			);
 
 			const options = screen.getAllByRole( 'option' );
-			// Only the first entry with this color value should appear selected.
-			expect( options[ 0 ] ).toBeChecked();
-			expect( options[ 1 ] ).not.toBeChecked();
+			// Both entries share the same color value, so both appear selected
+			// when no slug-specific selection is provided.
+			expect( options[ 0 ] ).toHaveAttribute( 'aria-selected', 'true' );
+			expect( options[ 1 ] ).toHaveAttribute( 'aria-selected', 'true' );
 		} );
 
 		it( 'should pass slug as third argument to onChange when a swatch is clicked', async () => {
