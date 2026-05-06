@@ -1013,6 +1013,96 @@ function appendPseudoSelectorStyles(
 }
 
 /**
+ * Creates feature-level selectors for a pseudo state.
+ *
+ * Feature selectors are keyed by block support feature, for example:
+ * `{ dimensions: { root: '.wp-block-button', width: '.wp-block-button' } }`.
+ * Pseudo nodes need those feature selectors to target the stateful selector,
+ * for example `.wp-block-button:hover`, so feature-level declarations are
+ * scoped to the same pseudo state as the node's base selector.
+ *
+ * String feature selectors are skipped to preserve the existing pseudo helper
+ * behavior, which only handled object-shaped feature selector maps.
+ *
+ * @param featureSelectors Feature-level selectors from a style node.
+ * @param pseudoSelector   Pseudo selector to append to each feature selector.
+ * @return Feature-level selectors scoped to the pseudo state.
+ */
+function appendPseudoSelectorToFeatureSelectors(
+	featureSelectors: StylesNode[ 'featureSelectors' ],
+	pseudoSelector: string
+): StylesNode[ 'featureSelectors' ] {
+	if ( ! featureSelectors || typeof featureSelectors === 'string' ) {
+		return undefined;
+	}
+
+	return Object.fromEntries(
+		Object.entries( featureSelectors ).map( ( [ feature, selector ] ) => {
+			if ( typeof selector === 'string' ) {
+				return [
+					feature,
+					appendToSelector( selector, pseudoSelector ),
+				];
+			}
+
+			return [
+				feature,
+				Object.fromEntries(
+					Object.entries( selector ).map(
+						( [ subfeature, subfeatureSelector ] ) => [
+							subfeature,
+							appendToSelector(
+								subfeatureSelector,
+								pseudoSelector
+							),
+						]
+					)
+				),
+			];
+		} )
+	);
+}
+
+/**
+ * Creates style nodes for configured block pseudo selectors.
+ *
+ * Only block pseudo selectors listed in `VALID_BLOCK_PSEUDO_SELECTORS` are
+ * considered. This mirrors the PHP renderer and avoids treating arbitrary
+ * colon-prefixed keys as pseudo selectors.
+ *
+ * @param node Style node that may contain configured block pseudo styles.
+ * @return Style nodes for the block's configured pseudo states.
+ */
+function getBlockPseudoStyleNodes( node: StylesNode ): StylesNode[] {
+	const { styles, selector, featureSelectors, name } = node;
+
+	if ( ! name ) {
+		return [];
+	}
+
+	return ( VALID_BLOCK_PSEUDO_SELECTORS[ name ] ?? [] ).flatMap(
+		( pseudoSelector ) => {
+			const pseudoStyles = styles?.[ pseudoSelector ];
+			if ( ! pseudoStyles || typeof pseudoStyles !== 'object' ) {
+				return [];
+			}
+
+			return [
+				{
+					styles: JSON.parse( JSON.stringify( pseudoStyles ) ),
+					selector: appendToSelector( selector, pseudoSelector ),
+					featureSelectors: appendPseudoSelectorToFeatureSelectors(
+						featureSelectors,
+						pseudoSelector
+					),
+					name,
+				},
+			];
+		}
+	);
+}
+
+/**
  * Appends CSS rules for responsive breakpoint states to a ruleset string.
  * Block styles stored under responsive keys (for example, 'mobile' and
  * 'tablet') are wrapped in corresponding media queries instead of being
@@ -1816,14 +1906,34 @@ function renderStylesNode(
 		);
 	}
 
-	ruleset = appendPseudoSelectorStyles(
+	const blockPseudoNodes = getBlockPseudoStyleNodes( {
 		styles,
 		selector,
-		ruleset,
 		featureSelectors,
-		tree.settings,
-		name
-	);
+		name,
+	} );
+	if ( blockPseudoNodes.length ) {
+		blockPseudoNodes.forEach( ( pseudoNode ) => {
+			ruleset += renderStylesNode( pseudoNode, {
+				tree,
+				options,
+				useRootPaddingAlign,
+				disableLayoutStyles: true,
+				hasBlockGapSupport,
+				hasFallbackGapSupport,
+				disableRootPadding,
+			} );
+		} );
+	} else {
+		ruleset = appendPseudoSelectorStyles(
+			styles,
+			selector,
+			ruleset,
+			featureSelectors,
+			tree.settings,
+			name
+		);
+	}
 
 	ruleset = appendResponsiveStyles(
 		styles,
