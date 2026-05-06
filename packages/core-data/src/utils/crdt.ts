@@ -6,7 +6,7 @@ import fastDeepEqual from 'fast-deep-equal/es6/index.js';
 /**
  * WordPress dependencies
  */
-import { __unstableSerializeAndClean } from '@wordpress/blocks';
+import { __unstableSerializeAndClean, getBlockType } from '@wordpress/blocks';
 import {
 	type CRDTDoc,
 	type ObjectData,
@@ -291,6 +291,32 @@ function defaultGetChangesFromCRDTDoc( crdtDoc: CRDTDoc ): ObjectData {
 }
 
 /**
+ * Returns true when a missing block can now be parsed as its original block
+ * type because that block type has become available again.
+ *
+ * This can happen when a plugin that registers a block is temporarily
+ * deactivated and then reactivated. The persisted CRDT document may still
+ * contain `core/missing`, even though parsing the raw post content would now
+ * produce the original block type.
+ *
+ * @param {Block[]} blocks Blocks from the CRDT document.
+ *
+ * @return {boolean} Whether the blocks contain a recoverable missing block.
+ */
+function hasRecoverableMissingBlock( blocks: Block[] = [] ): boolean {
+	return blocks.some( ( block ) => {
+		const originalName = block.attributes?.originalName;
+
+		return (
+			( block.name === 'core/missing' &&
+				typeof originalName === 'string' &&
+				!! getBlockType( originalName ) ) ||
+			hasRecoverableMissingBlock( block.innerBlocks ?? [] )
+		);
+	} );
+}
+
+/**
  * Given a local Y.Doc that *may* contain changes from remote peers, compare
  * against the local record and determine if there are changes (edits) we want
  * to dispatch.
@@ -341,10 +367,13 @@ export function getPostChangesFromCRDTDoc(
 						editedRecord.content
 					) {
 						const blocksJson = ymap.get( 'blocks' )?.toJSON() ?? [];
+						const serializedBlocks =
+							__unstableSerializeAndClean( blocksJson ).trim();
+						const rawContent = getRawValue( editedRecord.content );
 
 						return (
-							__unstableSerializeAndClean( blocksJson ).trim() !==
-							getRawValue( editedRecord.content )
+							serializedBlocks !== rawContent ||
+							hasRecoverableMissingBlock( blocksJson as Block[] )
 						);
 					}
 
