@@ -15,6 +15,7 @@
 
 ### Internal
 
+-   Upgrade `date-fns` dependency from `^3.6.0` to `^4.1.0`; replace `startOfMinute` with an inline `truncateToMinute` helper to avoid `timezone-mock` crashes in tests ([#78005](https://github.com/WordPress/gutenberg/issues/78005)).
 -   Update code to comply with `eslint-plugin-react-hooks` v7 ([#69962](https://github.com/WordPress/gutenberg/pull/69962)).
 -   `SlotFill`: Add dependencies to `updateFill` effect ([#77907](https://github.com/WordPress/gutenberg/pull/77907)).
 

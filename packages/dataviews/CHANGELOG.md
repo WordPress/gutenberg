@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   Upgrade `date-fns` dependency from `^3.6.0` to `^4.1.0`; replace `isValid` helper with native `!isNaN( date.valueOf() )` to avoid `timezone-mock` crashes under tests ([#78005](https://github.com/WordPress/gutenberg/issues/78005)).
+
 ## 14.2.0 (2026-04-29)
 
 ### Enhancements
