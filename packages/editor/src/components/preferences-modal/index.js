@@ -62,20 +62,20 @@ function PreferencesModalContents( { extraSections = {} } ) {
 		collaborationPreferencesDisabled,
 	} = useSelect(
 		( select ) => {
-			const editorSel = select( editorStore );
-			const coreSel = select( coreStore );
-			const { getEditorSettings, isCollaborationEnabledForCurrentPost } =
-				editorSel;
+			const {
+				getEditorSettings,
+				isCollaborationEnabledForCurrentPost,
+				getCurrentPostType,
+			} = select( editorStore );
+			const coreSelectors = select( coreStore );
+			const { getEntityConfig } = coreSelectors;
 			const { get } = select( preferencesStore );
 			const isRichEditingEnabled = getEditorSettings().richEditingEnabled;
 			const isDistractionFreeEnabled = get( 'core', 'distractionFree' );
-			const currentPostType = editorSel.getCurrentPostType();
-			const entityConfig = coreSel.getEntityConfig(
-				'postType',
-				currentPostType
-			);
+			const currentPostType = getCurrentPostType();
+			const entityConfig = getEntityConfig( 'postType', currentPostType );
 			const hasCollaborationInfrastructure = Boolean(
-				unlock( coreSel ).isCollaborationSupported() &&
+				unlock( coreSelectors ).isCollaborationSupported() &&
 					entityConfig?.syncConfig &&
 					window._wpCollaborationEnabled
 			);
