@@ -88,11 +88,14 @@ export default function useNavigateToEntityRecord() {
 				} );
 			}
 
-			// Navigate to the new entity record
-			const queryArgs = {
-				canvas: 'edit',
-				focusMode: true,
-			};
+			// Navigate to the new entity record. Callers can opt out of
+			// focus mode (e.g. `core/template-content` opens the chosen
+			// template in the regular template editor, where root.html
+			// wraps it, instead of an isolated focus view).
+			const queryArgs = { canvas: 'edit' };
+			if ( params.focusMode !== false ) {
+				queryArgs.focusMode = true;
+			}
 			if ( isValidRequestedViewport ) {
 				queryArgs.viewport = requestedViewport;
 			}

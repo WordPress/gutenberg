@@ -91,6 +91,19 @@ export default function DocumentBar( props ) {
 		} = select( coreStore );
 		const _postType = getCurrentPostType();
 		const _postId = getCurrentPostId();
+		// When the Site Editor wraps a non-root template inside `root.html`,
+		// the entity being edited is root.html but the user navigated to the
+		// inner template (e.g. "archive"). Surface the inner template's
+		// identity so the title bar reflects what the user is editing.
+		const _innerTemplateId =
+			getEditorSettings().__experimentalRootInnerTemplateId;
+		const _displayedDocument = _innerTemplateId
+			? getEditedEntityRecord(
+					'postType',
+					'wp_template',
+					_innerTemplateId
+			  )
+			: getEditedEntityRecord( 'postType', _postType, _postId );
 		const _document = getEditedEntityRecord(
 			'postType',
 			_postType,
@@ -102,7 +115,7 @@ export default function DocumentBar( props ) {
 
 		const _templateInfo = getTemplateInfo( {
 			templateTypes,
-			template: _document,
+			template: _displayedDocument,
 		} );
 		const _postTypeLabel = getPostType( _postType )?.labels?.singular_name;
 
@@ -121,7 +134,7 @@ export default function DocumentBar( props ) {
 			postId: _postId,
 			postType: _postType,
 			postTypeLabel: _postTypeLabel,
-			documentTitle: _document.title,
+			documentTitle: _displayedDocument.title,
 			isNotFound:
 				! _document &&
 				! isResolvingSelector(

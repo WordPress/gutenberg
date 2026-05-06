@@ -16,7 +16,7 @@ import { unlock } from '../../lock-unlock';
 
 const { getTemplateInfo } = unlock( editorPrivateApis );
 
-function useEditorTitle( postType, postId ) {
+function useEditorTitle( postType, postId, innerTemplateId ) {
 	const { title, isLoaded } = useSelect(
 		( select ) => {
 			const {
@@ -29,10 +29,18 @@ function useEditorTitle( postType, postId ) {
 				return { isLoaded: false };
 			}
 
+			// In wrap mode the entity being edited is `root.html`, but the
+			// user navigated to the inner template (e.g. `archive`). Use
+			// the inner template's record for the displayed title so the
+			// browser tab matches the on-screen DocumentBar.
+			const displayedPostType = innerTemplateId
+				? 'wp_template'
+				: postType;
+			const displayedPostId = innerTemplateId ?? postId;
 			const _record = getEditedEntityRecord(
 				'postType',
-				postType,
-				postId
+				displayedPostType,
+				displayedPostId
 			);
 
 			const { default_template_types: templateTypes = [] } =
@@ -45,8 +53,8 @@ function useEditorTitle( postType, postId ) {
 
 			const _isLoaded = hasFinishedResolution( 'getEditedEntityRecord', [
 				'postType',
-				postType,
-				postId,
+				displayedPostType,
+				displayedPostId,
 			] );
 
 			return {
@@ -54,7 +62,7 @@ function useEditorTitle( postType, postId ) {
 				isLoaded: _isLoaded,
 			};
 		},
-		[ postType, postId ]
+		[ postType, postId, innerTemplateId ]
 	);
 
 	let editorTitle;

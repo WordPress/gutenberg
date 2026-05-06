@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Support for an opt-in `root.html` template: themes that ship one get site-wide chrome (header, footer, sidebars) defined once. Opening a non-root template in the Site Editor renders that template inside `root.html` via `core/template-content`, with the surrounding chrome locked but selectable. A new "Edit root template" toolbar item appears on chrome blocks for switching to editing root.html itself, and the templates browse sidebar surfaces a quick "Root template" link.
+
 ## 6.45.0 (2026-04-29)
 
 ## 6.44.0 (2026-04-15)

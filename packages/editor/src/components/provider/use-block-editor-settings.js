@@ -50,6 +50,7 @@ const BLOCK_EDITOR_SETTINGS = [
 	'__experimentalDiscussionSettings',
 	'__experimentalFeatures',
 	'__experimentalGlobalStylesBaseStyles',
+	'__experimentalRootInnerTemplateId',
 	'allImageSizes',
 	'alignWide',
 	'blockInspectorTabs',

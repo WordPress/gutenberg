@@ -3,7 +3,7 @@
  */
 import { useEffect, useMemo, useRef } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { store as coreDataStore } from '@wordpress/core-data';
+import { store as coreDataStore, useEntityRecord } from '@wordpress/core-data';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
@@ -71,6 +71,25 @@ export function useResolveEditedEntity() {
 		const { getHomePage } = unlock( select( coreDataStore ) );
 		return getHomePage();
 	}, [] );
+
+	// Resolve the active theme's `root` template id (if any). This drives the
+	// "root template" wrapping behavior: clicking any other template renders
+	// it inside `root` with `core/template-content` as the editable slot,
+	// matching how the live frontend stacks them.
+	//
+	// `useEntityRecord` (vs. a bare `getEntityRecord` selector) auto-fetches
+	// and reports `hasResolved`, so we can keep the editor in a loading state
+	// until we know whether root exists rather than briefly rendering the
+	// wrap-less version and flickering into wrap mode once root loads.
+	const stylesheet = useSelect(
+		( select ) => select( coreDataStore ).getCurrentTheme()?.stylesheet,
+		[]
+	);
+	const rootTemplateId = stylesheet ? `${ stylesheet }//root` : null;
+	const { record: rootTemplate, hasResolved: hasResolvedRoot } =
+		useEntityRecord( 'postType', TEMPLATE_POST_TYPE, rootTemplateId ?? '', {
+			enabled: !! rootTemplateId,
+		} );
 
 	/**
 	 * This is a hook that recreates the logic to resolve a template for a given WordPress postID postTypeId
@@ -148,6 +167,38 @@ export function useResolveEditedEntity() {
 		};
 	} else {
 		entity = { isReady: false };
+	}
+
+	// Root-template wrap: when the active theme has `root.html` and the user
+	// is editing a different `wp_template`, render `root` as the canvas
+	// entity and expose the requested template id as `innerTemplateId`. The
+	// `core/template-content` block reads it via the editor settings and
+	// renders that template's blocks editably inside the root chrome.
+	//
+	// `?focusMode=true` (added by `onNavigateToEntityRecord`, e.g. from the
+	// "Edit original" toolbar on `core/template-content`) bypasses the wrap
+	// so users can drill in to an isolated single-template canvas.
+	//
+	// We hold off on declaring the entity ready until the root lookup has
+	// resolved — otherwise the canvas first paints with the inner template
+	// directly and then re-renders into wrap mode, which feels like a flash.
+	if (
+		rootTemplateId &&
+		entity.isReady &&
+		entity.postType === TEMPLATE_POST_TYPE &&
+		entity.postId &&
+		entity.postId !== rootTemplateId &&
+		! query?.focusMode
+	) {
+		if ( ! hasResolvedRoot ) {
+			entity = { ...entity, isReady: false };
+		} else if ( rootTemplate ) {
+			entity = {
+				...entity,
+				postId: rootTemplateId,
+				innerTemplateId: entity.postId,
+			};
+		}
 	}
 
 	// Restore selection from URL synchronously, before EditorProvider renders.
