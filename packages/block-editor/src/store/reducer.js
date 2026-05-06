@@ -292,7 +292,6 @@ const withBlockTree =
 					false
 				);
 				break;
-			case 'SYNC_DERIVED_BLOCK_ATTRIBUTES':
 			case 'UPDATE_BLOCK_ATTRIBUTES': {
 				newState.tree = new Map( newState.tree );
 				action.clientIds.forEach( ( clientId ) => {
@@ -421,63 +420,37 @@ const withBlockTree =
 function withPersistentBlockChange( reducer ) {
 	let lastAction;
 	let markNextChangeAsNotPersistent = false;
-	let explicitPersistent;
 
 	return ( state, action ) => {
-		let nextState = reducer( state, action );
+		const nextState = reducer( state, action );
 
-		let nextIsPersistentChange;
-		if ( action.type === 'SET_EXPLICIT_PERSISTENT' ) {
-			explicitPersistent = action.isPersistentChange;
-			nextIsPersistentChange = state.isPersistentChange ?? true;
-		}
-
-		if ( explicitPersistent !== undefined ) {
-			nextIsPersistentChange = explicitPersistent;
-			return nextIsPersistentChange === nextState.isPersistentChange
-				? nextState
-				: {
-						...nextState,
-						isPersistentChange: nextIsPersistentChange,
-				  };
-		}
+		const wasMarkedAsNotPersistent = markNextChangeAsNotPersistent;
+		markNextChangeAsNotPersistent =
+			action.type === 'MARK_NEXT_CHANGE_AS_NOT_PERSISTENT';
 
 		const isExplicitPersistentChange =
 			action.type === 'MARK_LAST_CHANGE_AS_PERSISTENT' ||
-			markNextChangeAsNotPersistent;
+			wasMarkedAsNotPersistent;
 
 		// Defer to previous state value (or default) unless changing or
 		// explicitly marking as persistent.
 		if ( state === nextState && ! isExplicitPersistentChange ) {
-			markNextChangeAsNotPersistent =
-				action.type === 'MARK_NEXT_CHANGE_AS_NOT_PERSISTENT';
-
-			nextIsPersistentChange = state?.isPersistentChange ?? true;
-			if ( state.isPersistentChange === nextIsPersistentChange ) {
+			if ( state.isPersistentChange !== undefined ) {
 				return state;
 			}
-
-			return {
-				...nextState,
-				isPersistentChange: nextIsPersistentChange,
-			};
+			return { ...nextState, isPersistentChange: true };
 		}
 
-		nextState = {
-			...nextState,
-			isPersistentChange: isExplicitPersistentChange
-				? ! markNextChangeAsNotPersistent
-				: ! isUpdatingSameBlockAttribute( action, lastAction ),
-		};
+		const isPersistentChange = isExplicitPersistentChange
+			? ! wasMarkedAsNotPersistent
+			: ! isUpdatingSameBlockAttribute( action, lastAction );
 
 		// In comparing against the previous action, consider only those which
 		// would have qualified as one which would have been ignored or not
 		// have resulted in a changed state.
 		lastAction = action;
-		markNextChangeAsNotPersistent =
-			action.type === 'MARK_NEXT_CHANGE_AS_NOT_PERSISTENT';
 
-		return nextState;
+		return { ...nextState, isPersistentChange };
 	};
 }
 
@@ -897,7 +870,6 @@ export const blocks = pipe(
 				return newState;
 			}
 
-			case 'SYNC_DERIVED_BLOCK_ATTRIBUTES':
 			case 'UPDATE_BLOCK_ATTRIBUTES': {
 				// Avoid a state change if none of the block IDs are known.
 				if ( action.clientIds.every( ( id ) => ! state.get( id ) ) ) {

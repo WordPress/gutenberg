@@ -703,4 +703,250 @@ class WP_REST_User_Post_Types_Controller_Gutenberg_Test extends WP_Test_REST_Con
 		$this->assertSame( 'array', $taxonomies_schema['type'] );
 		$this->assertSame( '^[a-z0-9_-]{1,32}$', $taxonomies_schema['items']['pattern'] );
 	}
+
+	/**
+	 * Seed a wp_user_taxonomy record via its REST endpoint, mirroring the
+	 * production write path. Used by the cross-CPT sync tests below.
+	 *
+	 * @param string $slug        Taxonomy slug.
+	 * @param string $title       Taxonomy plural label.
+	 * @param array  $object_type Post type slugs to attach.
+	 * @return int Post ID.
+	 */
+	protected static function insert_user_taxonomy_record_for_sync( $slug, $title, $object_type = array() ) {
+		wp_set_current_user( self::$admin_id );
+		$request = new WP_REST_Request( 'POST', '/wp/v2/user-taxonomies' );
+		$request->set_body_params(
+			array(
+				'title'       => $title,
+				'slug'        => $slug,
+				'status'      => 'publish',
+				'object_type' => $object_type,
+				'config'      => array(
+					'labels' => array( 'singular_name' => $title ),
+					'public' => true,
+				),
+			)
+		);
+		return rest_get_server()->dispatch( $request )->get_data()['id'];
+	}
+
+	/**
+	 * Reads the slugs stored in `_wp_user_taxonomy_object_type` meta on a
+	 * given wp_user_taxonomy record. Sorted for stable assertions.
+	 *
+	 * @param int $taxonomy_id wp_user_taxonomy record ID.
+	 * @return string[]
+	 */
+	protected static function get_object_type_meta( $taxonomy_id ) {
+		$values = get_post_meta( $taxonomy_id, GUTENBERG_USER_TAXONOMY_OBJECT_TYPE_META_KEY );
+		$values = array_values( array_filter( (array) $values, 'is_string' ) );
+		sort( $values );
+		return $values;
+	}
+
+	/**
+	 * Writes that include a user-defined taxonomy slug in `config.taxonomies`
+	 * persist only the non-user slugs in the post type's stored JSON; the
+	 * user-tax slugs are mirrored into the corresponding wp_user_taxonomy
+	 * record's `_wp_user_taxonomy_object_type` meta. Single source of truth
+	 * per side, with the controller doing the split.
+	 */
+	public function test_create_item_routes_user_tax_slugs_to_taxonomy_meta() {
+		wp_set_current_user( self::$admin_id );
+		$genre_id = self::insert_user_taxonomy_record_for_sync( 'sync_genre', 'Genres' );
+
+		$post_id = self::insert_user_post_type_record(
+			array(
+				'labels'     => array( 'singular_name' => 'Album' ),
+				'taxonomies' => array( 'category', 'sync_genre' ),
+			),
+			'sync_album',
+			'Albums'
+		);
+
+		// Stored JSON: only the core slug. The user-tax slug was lifted out.
+		$raw     = get_post( $post_id )->post_content;
+		$decoded = json_decode( $raw, true );
+		$this->assertSame( array( 'category' ), $decoded['taxonomies'] );
+
+		// User-taxonomy meta: now references the post type slug.
+		$this->assertSame( array( 'sync_album' ), self::get_object_type_meta( $genre_id ) );
+
+		// Response: the merged view, so the form sees what was sent.
+		$request = new WP_REST_Request( 'GET', self::REST_BASE . '/' . $post_id );
+		$request->set_param( 'context', 'edit' );
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+		$merged   = $data['config']['taxonomies'];
+		sort( $merged );
+		$this->assertSame( array( 'category', 'sync_genre' ), $merged );
+
+		wp_delete_post( $post_id, true );
+		wp_delete_post( $genre_id, true );
+	}
+
+	/**
+	 * Updating `config.taxonomies` to drop a previously-linked user-tax slug
+	 * removes the post type slug from that taxonomy's meta. Other user-tax
+	 * records are not touched.
+	 */
+	public function test_update_item_removes_dropped_user_tax_associations() {
+		wp_set_current_user( self::$admin_id );
+		$genre_id = self::insert_user_taxonomy_record_for_sync( 'sync_genre', 'Genres' );
+		$mood_id  = self::insert_user_taxonomy_record_for_sync( 'sync_mood', 'Moods' );
+
+		$post_id = self::insert_user_post_type_record(
+			array(
+				'labels'     => array( 'singular_name' => 'Album' ),
+				'taxonomies' => array( 'sync_genre', 'sync_mood' ),
+			),
+			'sync_album',
+			'Albums'
+		);
+
+		// Both attached after the create.
+		$this->assertSame( array( 'sync_album' ), self::get_object_type_meta( $genre_id ) );
+		$this->assertSame( array( 'sync_album' ), self::get_object_type_meta( $mood_id ) );
+
+		// Now drop sync_mood, keep sync_genre.
+		$request = new WP_REST_Request( 'PUT', self::REST_BASE . '/' . $post_id );
+		$request->set_body_params(
+			array(
+				'config' => array(
+					'labels'     => array( 'singular_name' => 'Album' ),
+					'taxonomies' => array( 'sync_genre' ),
+				),
+			)
+		);
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertSame( 200, $response->get_status() );
+
+		$this->assertSame( array( 'sync_album' ), self::get_object_type_meta( $genre_id ) );
+		$this->assertSame( array(), self::get_object_type_meta( $mood_id ) );
+
+		wp_delete_post( $post_id, true );
+		wp_delete_post( $genre_id, true );
+		wp_delete_post( $mood_id, true );
+	}
+
+	/**
+	 * Status-only updates (the activate/deactivate flow) leave user-tax
+	 * associations intact — there's no `config.taxonomies` in the request,
+	 * so the controller skips the sync entirely.
+	 */
+	public function test_update_item_without_config_does_not_touch_meta() {
+		wp_set_current_user( self::$admin_id );
+		$genre_id = self::insert_user_taxonomy_record_for_sync( 'sync_genre', 'Genres' );
+
+		$post_id = self::insert_user_post_type_record(
+			array(
+				'labels'     => array( 'singular_name' => 'Album' ),
+				'taxonomies' => array( 'sync_genre' ),
+			),
+			'sync_album',
+			'Albums'
+		);
+		$this->assertSame( array( 'sync_album' ), self::get_object_type_meta( $genre_id ) );
+
+		$request = new WP_REST_Request( 'PUT', self::REST_BASE . '/' . $post_id );
+		$request->set_body_params( array( 'status' => 'draft' ) );
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertSame( 200, $response->get_status() );
+
+		// Meta is unchanged — deactivating a post type doesn't disconnect
+		// linked user taxonomies, so reactivation restores everything.
+		$this->assertSame( array( 'sync_album' ), self::get_object_type_meta( $genre_id ) );
+
+		wp_delete_post( $post_id, true );
+		wp_delete_post( $genre_id, true );
+	}
+
+	/**
+	 * Force-deleting a post type strips its slug from every user-taxonomy
+	 * record's meta. Trash (force = false) leaves the meta intact so
+	 * untrashing restores the linkage.
+	 */
+	public function test_delete_item_force_cleans_user_tax_meta() {
+		wp_set_current_user( self::$admin_id );
+		$genre_id = self::insert_user_taxonomy_record_for_sync( 'sync_genre', 'Genres' );
+
+		$post_id = self::insert_user_post_type_record(
+			array(
+				'labels'     => array( 'singular_name' => 'Album' ),
+				'taxonomies' => array( 'sync_genre' ),
+			),
+			'sync_album',
+			'Albums'
+		);
+		$this->assertSame( array( 'sync_album' ), self::get_object_type_meta( $genre_id ) );
+
+		$request = new WP_REST_Request( 'DELETE', self::REST_BASE . '/' . $post_id );
+		$request->set_param( 'force', true );
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertSame( 200, $response->get_status() );
+
+		$this->assertSame( array(), self::get_object_type_meta( $genre_id ) );
+
+		wp_delete_post( $genre_id, true );
+	}
+
+	/**
+	 * Trash (force = false) preserves user-taxonomy meta so untrashing
+	 * restores the linkage. Companion to the force-delete test above.
+	 */
+	public function test_delete_item_trash_preserves_user_tax_meta() {
+		wp_set_current_user( self::$admin_id );
+		$genre_id = self::insert_user_taxonomy_record_for_sync( 'sync_genre', 'Genres' );
+
+		$post_id = self::insert_user_post_type_record(
+			array(
+				'labels'     => array( 'singular_name' => 'Album' ),
+				'taxonomies' => array( 'sync_genre' ),
+			),
+			'sync_album',
+			'Albums'
+		);
+		$this->assertSame( array( 'sync_album' ), self::get_object_type_meta( $genre_id ) );
+
+		// No `force` param — trash, not delete.
+		$request  = new WP_REST_Request( 'DELETE', self::REST_BASE . '/' . $post_id );
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertSame( 200, $response->get_status() );
+
+		$this->assertSame( array( 'sync_album' ), self::get_object_type_meta( $genre_id ) );
+
+		wp_delete_post( $post_id, true );
+		wp_delete_post( $genre_id, true );
+	}
+
+	/**
+	 * Renaming a post type's slug carries its user-taxonomy back-references
+	 * to the new slug — without this, every linked user taxonomy would
+	 * silently disconnect after a rename.
+	 */
+	public function test_update_item_slug_rename_migrates_user_tax_meta() {
+		wp_set_current_user( self::$admin_id );
+		$genre_id = self::insert_user_taxonomy_record_for_sync( 'sync_genre', 'Genres' );
+
+		$post_id = self::insert_user_post_type_record(
+			array(
+				'labels'     => array( 'singular_name' => 'Album' ),
+				'taxonomies' => array( 'sync_genre' ),
+			),
+			'sync_album',
+			'Albums'
+		);
+		$this->assertSame( array( 'sync_album' ), self::get_object_type_meta( $genre_id ) );
+
+		$request = new WP_REST_Request( 'PUT', self::REST_BASE . '/' . $post_id );
+		$request->set_body_params( array( 'slug' => 'sync_record' ) );
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertSame( 200, $response->get_status() );
+
+		$this->assertSame( array( 'sync_record' ), self::get_object_type_meta( $genre_id ) );
+
+		wp_delete_post( $post_id, true );
+		wp_delete_post( $genre_id, true );
+	}
 }

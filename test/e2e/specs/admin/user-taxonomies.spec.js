@@ -7,35 +7,28 @@ const SETTINGS_PAGE_PATH = 'options-general.php';
 const TAXONOMIES_PAGE_QUERY = 'page=taxonomies-wp-admin';
 const TAXONOMIES_REST_BASE = 'user-taxonomies';
 
-// TODO: once the user-taxonomies feature stabilizes, promote this seeding
-// helper into packages/e2e-test-utils-playwright/src/request-utils/ alongside
-// createPost / createPage so other specs can reuse it.
 // Seeds all visibility booleans so the form's `toFormData` reads each toggle
 // as a defined value — the form contract requires every flag present, to
 // avoid passing `undefined` for unchecked toggles and relying on defaults
 // in register_taxonomy.
 async function createUserTaxonomy( requestUtils ) {
-	return requestUtils.rest( {
-		path: `/wp/v2/${ TAXONOMIES_REST_BASE }`,
-		method: 'POST',
-		data: {
-			title: 'Genres',
-			slug: 'genre',
-			status: 'publish',
-			object_type: [ 'post' ],
-			config: {
-				labels: { singular_name: 'Genre' },
-				public: true,
-				hierarchical: false,
-				publicly_queryable: true,
-				show_ui: true,
-				show_in_menu: true,
-				show_in_nav_menus: true,
-				show_tagcloud: true,
-				show_in_quick_edit: true,
-				show_admin_column: false,
-				show_in_rest: true,
-			},
+	return requestUtils.createRecord( TAXONOMIES_REST_BASE, {
+		title: 'Genres',
+		slug: 'genre',
+		status: 'publish',
+		object_type: [ 'post' ],
+		config: {
+			labels: { singular_name: 'Genre' },
+			public: true,
+			hierarchical: false,
+			publicly_queryable: true,
+			show_ui: true,
+			show_in_menu: true,
+			show_in_nav_menus: true,
+			show_tagcloud: true,
+			show_in_quick_edit: true,
+			show_admin_column: false,
+			show_in_rest: true,
 		},
 	} );
 }
