@@ -13,6 +13,8 @@ import { useState } from '@wordpress/element';
  * Internal dependencies
  */
 import CustomSelectControl from '..';
+import { Popover } from '../../popover';
+import { Provider as SlotFillProvider } from '../../slot-fill';
 
 const meta: Meta< typeof CustomSelectControl > = {
 	tags: [ 'manifest' ],
@@ -38,14 +40,22 @@ const meta: Meta< typeof CustomSelectControl > = {
 		},
 	},
 	decorators: [
+		// Mirror the editor's setup: a `SlotFillProvider` at the root with a
+		// `Popover.Slot` registered above the trigger's wrapper. By default,
+		// `CustomSelectControl` portals its dropdown into this slot. Without
+		// this setup, the dropdown falls back to a fresh container in the
+		// document `body`.
 		( Story ) => (
-			<div
-				style={ {
-					minHeight: '150px',
-				} }
-			>
-				<Story />
-			</div>
+			<SlotFillProvider>
+				<div
+					style={ {
+						minHeight: '150px',
+					} }
+				>
+					<Story />
+				</div>
+				<Popover.Slot />
+			</SlotFillProvider>
 		),
 	],
 };
