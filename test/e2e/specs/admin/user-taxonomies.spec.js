@@ -81,22 +81,25 @@ test.describe( 'User taxonomies', () => {
 		await page
 			.getByRole( 'textbox', { name: 'Singular label' } )
 			.fill( 'Genre' );
-		// The slug field runs an async uniqueness check; the form's
-		// `isValid` stays false while it's in flight, so wait for the
+		// Focusing the slug field auto-fills it from the singular label,
+		// which also kicks off the async uniqueness check. The form's
+		// `isValid` stays false while that's in flight, so wait for the
 		// REST call to settle before submitting.
 		// The button doesn't reflect form validity, so a UI-only wait
 		// isn't possible.
 		// TODO: expolore disabling the button based on the form validity.
+		const slugField = page.getByRole( 'textbox', {
+			name: 'Taxonomy key',
+		} );
 		await Promise.all( [
 			page.waitForResponse(
 				( resp ) =>
 					resp.url().includes( `/${ TAXONOMIES_REST_BASE }` ) &&
 					resp.url().includes( 'slug=genre' )
 			),
-			page
-				.getByRole( 'textbox', { name: 'Taxonomy key' } )
-				.fill( 'genre' ),
+			slugField.focus(),
 		] );
+		await expect( slugField ).toHaveValue( 'genre' );
 		await page.getByRole( 'combobox', { name: 'Post types' } ).click();
 		await page.getByRole( 'option', { name: 'Posts' } ).click();
 		await expect(

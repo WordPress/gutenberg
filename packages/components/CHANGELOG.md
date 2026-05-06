@@ -9,6 +9,8 @@
 ### Bug Fixes
 
 -   `TabPanel`: Fix tab indicator animation while switching tabs ([#77812](https://github.com/WordPress/gutenberg/pull/77812)).
+-   `ColorPicker`: Fix issue where clearing the hex input entirely doesn't reset the selected color to black ([#77912](https://github.com/WordPress/gutenberg/pull/77912)).
+-   `ExternalLink`: Fix focus outline rendered in wp-admin ([#77935](https://github.com/WordPress/gutenberg/pull/77935)).
 
 ### Internal
 

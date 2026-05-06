@@ -90,6 +90,7 @@
 		&[data-highlighted]:not([aria-disabled="true"]) {
 			background-color: var(--wpds-color-bg-interactive-brand-weak-active);
 			color: var(--wpds-color-fg-interactive-neutral);
+			outline: none; /* Disable user agent focus ring */
 
 			@media ( forced-colors: active ) {
 				outline: 1px solid Highlight;

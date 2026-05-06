@@ -607,7 +607,31 @@ _Parameters_
 
 ### registerBlockType
 
-Undocumented declaration.
+Registers a new block provided a unique name and an object defining its behavior. Once registered, the block is made available as an option to any editor interface where blocks are implemented.
+
+For more in-depth information on registering a custom block see the [Create a block tutorial](https://developer.wordpress.org/block-editor/getting-started/create-block/).
+
+_Usage_
+
+```js
+import { __ } from '@wordpress/i18n';
+import { registerBlockType } from '@wordpress/blocks';
+
+registerBlockType( 'namespace/block-name', {
+	title: __( 'My First Block' ),
+	edit: () => <div>{ __( 'Hello from the editor!' ) }</div>,
+	save: () => <div>Hello from the saved content!</div>,
+} );
+```
+
+_Parameters_
+
+-   _blockNameOrMetadata_ `string | BlockConfiguration< Attributes >`: Block type name or its metadata.
+-   _settings_ `Partial< BlockConfiguration< Attributes > >`: Block settings.
+
+_Returns_
+
+-   `BlockType | undefined`: The block, if it has been successfully registered; otherwise `undefined`.
 
 ### registerBlockVariation
 
