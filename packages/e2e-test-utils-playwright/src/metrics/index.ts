@@ -56,7 +56,6 @@ export class Metrics {
 	browser: Browser;
 	page: Page;
 	trace: Trace;
-	#traceCount = 0;
 
 	webVitals: WebVitalsMeasurements = {};
 
@@ -248,10 +247,11 @@ export class Metrics {
 	 * "Load profile…") to inspect the flame graph.
 	 *
 	 * The default file name is derived from the surrounding Playwright test's
-	 * title path, with any `(N of M)` iteration suffix stripped so that
-	 * repeated runs of the same scenario share a name. Subsequent traces
-	 * with an existing file name are skipped — one trace per scenario is
-	 * enough to investigate a regression. Pass an explicit `name` to override.
+	 * title path, with any `(N of M)` iteration suffix stripped. Subsequent
+	 * `stopTracing` calls that resolve to an already-written file (repeated
+	 * test iterations or in-test loops) are skipped — one trace per scenario
+	 * is enough to investigate a regression. Pass an explicit `name` to
+	 * override.
 	 *
 	 * @param name Optional file name (without extension), overriding the
 	 *             default test-title-derived name.
@@ -266,12 +266,7 @@ export class Metrics {
 		if ( artifactsPath ) {
 			const tracesDir = join( artifactsPath, 'traces' );
 			const baseName = name ?? defaultTraceName();
-			const sequence = ++this.#traceCount;
-			const suffix = sequence > 1 ? `-${ sequence }` : '';
-			const filePath = join(
-				tracesDir,
-				`${ baseName }${ suffix }.trace.json`
-			);
+			const filePath = join( tracesDir, `${ baseName }.trace.json` );
 			await mkdir( tracesDir, { recursive: true } );
 			if ( ! ( await fileExists( filePath ) ) ) {
 				await resolveTraceSourceMaps( traceJSON, fetchMap );
@@ -481,11 +476,13 @@ async function fileExists( filePath: string ): Promise< boolean > {
 }
 
 /**
- * Fetch a source map for a script URL by appending `.map`. Returns the body
- * text, or `null` when the map is missing/unreachable. Used to deminify
- * function names in saved traces; failures are intentionally silent so the
- * trace is still saved when individual maps are unavailable (e.g. external
- * scripts, runtime-injected code).
+ * Fetch a source map for a script URL. Strips any query string (WordPress
+ * appends `?ver=…` cache-busters that, with Apache's default rules, would
+ * otherwise let the bogus `<url>.map?ver=…` request resolve to the script
+ * body itself). Returns the body text, or `null` when the map is missing or
+ * unreachable. Used to deminify function names in saved traces; failures
+ * are intentionally silent so the trace is still saved when individual
+ * maps are unavailable (e.g. external scripts, runtime-injected code).
  *
  * @param scriptUrl URL of the script whose source map to fetch.
  */
@@ -493,8 +490,18 @@ async function fetchMap( scriptUrl: string ): Promise< string | null > {
 	if ( ! /^https?:\/\//.test( scriptUrl ) ) {
 		return null;
 	}
+	let mapUrl: URL;
 	try {
-		const response = await fetch( `${ scriptUrl }.map` );
+		mapUrl = new URL( scriptUrl );
+	} catch {
+		return null;
+	}
+	mapUrl.search = '';
+	mapUrl.hash = '';
+	mapUrl.pathname = `${ mapUrl.pathname }.map`;
+
+	try {
+		const response = await fetch( mapUrl );
 		if ( ! response.ok ) {
 			return null;
 		}
