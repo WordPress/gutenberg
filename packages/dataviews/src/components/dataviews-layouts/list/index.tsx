@@ -108,13 +108,11 @@ function PrimaryActionGridCell< Item >( {
 					/>
 				}
 			>
-				{ isModalOpen && (
-					<ActionModal< Item >
-						action={ primaryAction }
-						items={ [ item ] }
-						closeModal={ () => setIsModalOpen( false ) }
-					/>
-				) }
+				<ActionModal< Item >
+					action={ isModalOpen ? primaryAction : null }
+					items={ [ item ] }
+					closeModal={ () => setIsModalOpen( false ) }
+				/>
 			</Composite.Item>
 		</div>
 	) : (
@@ -266,13 +264,11 @@ function ListItem< Item >( {
 							/>
 						</Menu.Popover>
 					</Menu>
-					{ !! activeModalAction && (
-						<ActionModal
-							action={ activeModalAction }
-							items={ [ item ] }
-							closeModal={ () => setActiveModalAction( null ) }
-						/>
-					) }
+					<ActionModal
+						action={ activeModalAction }
+						items={ [ item ] }
+						closeModal={ () => setActiveModalAction( null ) }
+					/>
 				</div>
 			) }
 		</Stack>

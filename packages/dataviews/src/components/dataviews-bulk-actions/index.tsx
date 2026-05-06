@@ -48,13 +48,11 @@ function ActionWithModal< Item >( {
 	return (
 		<>
 			<ActionTriggerComponent { ...actionTriggerProps } />
-			{ isModalOpen && (
-				<ActionModal
-					action={ action }
-					items={ items }
-					closeModal={ () => setIsModalOpen( false ) }
-				/>
-			) }
+			<ActionModal
+				action={ isModalOpen ? action : null }
+				items={ items }
+				closeModal={ () => setIsModalOpen( false ) }
+			/>
 		</>
 	);
 }
