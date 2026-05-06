@@ -9,6 +9,13 @@ if ( ! class_exists( 'WP_Sync_Post_Meta_Storage' ) ) {
 	require_once __DIR__ . '/interface-wp-sync-storage.php';
 	require_once __DIR__ . '/class-wp-sync-post-meta-storage.php';
 	require_once __DIR__ . '/class-wp-http-polling-sync-server.php';
+} elseif ( class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
+	/*
+	 * Core defines the sync server; Gutenberg may still need to adjust behavior before
+	 * the same change lands in WordPress. Register a plugin-specific server and replace
+	 * the REST route after core (see gutenberg_register_collaboration_rest_routes priority).
+	 */
+	require_once __DIR__ . '/class-gutenberg-wp-http-polling-sync-server.php';
 }
 
 if ( ! function_exists( 'gutenberg_register_sync_storage_post_type' ) ) {
@@ -57,10 +64,16 @@ if ( ! function_exists( 'gutenberg_register_collaboration_rest_routes' ) ) {
 	 */
 	function gutenberg_register_collaboration_rest_routes(): void {
 		$sync_storage = new WP_Sync_Post_Meta_Storage();
-		$sync_server  = new WP_HTTP_Polling_Sync_Server( $sync_storage );
+		$sync_server  = class_exists( 'Gutenberg_WP_HTTP_Polling_Sync_Server' )
+			? new Gutenberg_WP_HTTP_Polling_Sync_Server( $sync_storage )
+			: new WP_HTTP_Polling_Sync_Server( $sync_storage );
 		$sync_server->register_routes();
 	}
-	add_action( 'rest_api_init', 'gutenberg_register_collaboration_rest_routes' );
+	add_action(
+		'rest_api_init',
+		'gutenberg_register_collaboration_rest_routes',
+		class_exists( 'Gutenberg_WP_HTTP_Polling_Sync_Server' ) ? 20 : 10
+	);
 }
 
 if ( ! function_exists( 'wp_collaboration_register_meta' ) ) {
