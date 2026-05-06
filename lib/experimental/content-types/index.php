@@ -238,11 +238,18 @@ function gutenberg_user_taxonomy_read_object_type( $post_id ) {
  * @param string $object_type Post type slug to attach.
  */
 function gutenberg_user_taxonomy_attach_object_type( $tax_post_id, $object_type ) {
-	$existing = (array) get_post_meta( $tax_post_id, GUTENBERG_USER_TAXONOMY_OBJECT_TYPE_META_KEY );
-	if ( in_array( $object_type, $existing, true ) ) {
+	if ( 'wp_user_taxonomy' !== get_post_type( $tax_post_id ) ) {
 		return;
 	}
-	add_post_meta( $tax_post_id, GUTENBERG_USER_TAXONOMY_OBJECT_TYPE_META_KEY, $object_type );
+	$clean = is_string( $object_type ) ? sanitize_key( $object_type ) : '';
+	if ( '' === $clean ) {
+		return;
+	}
+	$existing = (array) get_post_meta( $tax_post_id, GUTENBERG_USER_TAXONOMY_OBJECT_TYPE_META_KEY );
+	if ( in_array( $clean, $existing, true ) ) {
+		return;
+	}
+	add_post_meta( $tax_post_id, GUTENBERG_USER_TAXONOMY_OBJECT_TYPE_META_KEY, $clean );
 }
 
 /**
@@ -253,7 +260,14 @@ function gutenberg_user_taxonomy_attach_object_type( $tax_post_id, $object_type 
  * @param string $object_type Post type slug to detach.
  */
 function gutenberg_user_taxonomy_detach_object_type( $tax_post_id, $object_type ) {
-	delete_post_meta( $tax_post_id, GUTENBERG_USER_TAXONOMY_OBJECT_TYPE_META_KEY, $object_type );
+	if ( 'wp_user_taxonomy' !== get_post_type( $tax_post_id ) ) {
+		return;
+	}
+	$clean = is_string( $object_type ) ? sanitize_key( $object_type ) : '';
+	if ( '' === $clean ) {
+		return;
+	}
+	delete_post_meta( $tax_post_id, GUTENBERG_USER_TAXONOMY_OBJECT_TYPE_META_KEY, $clean );
 }
 
 /**

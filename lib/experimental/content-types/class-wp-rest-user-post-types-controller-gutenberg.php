@@ -309,9 +309,12 @@ class WP_REST_User_Post_Types_Controller_Gutenberg extends WP_REST_Posts_Control
 		$data    = $response->get_data();
 		$post_id = (int) $data['id'];
 		$this->sync_taxonomy_associations( $post_id, $request );
-		$refreshed = $this->prepare_item_for_response( get_post( $post_id ), $request );
-		if ( ! is_wp_error( $refreshed ) ) {
-			$response->set_data( $refreshed->get_data() );
+		$post = get_post( $post_id );
+		if ( $post instanceof WP_Post ) {
+			$refreshed = $this->prepare_item_for_response( $post, $request );
+			if ( ! is_wp_error( $refreshed ) ) {
+				$response->set_data( $refreshed->get_data() );
+			}
 		}
 		return $response;
 	}
@@ -339,9 +342,12 @@ class WP_REST_User_Post_Types_Controller_Gutenberg extends WP_REST_Posts_Control
 		}
 		$this->sync_taxonomy_associations( $post_id, $request );
 
-		$refreshed = $this->prepare_item_for_response( get_post( $post_id ), $request );
-		if ( ! is_wp_error( $refreshed ) ) {
-			$response->set_data( $refreshed->get_data() );
+		$post = get_post( $post_id );
+		if ( $post instanceof WP_Post ) {
+			$refreshed = $this->prepare_item_for_response( $post, $request );
+			if ( ! is_wp_error( $refreshed ) ) {
+				$response->set_data( $refreshed->get_data() );
+			}
 		}
 		return $response;
 	}
@@ -355,13 +361,20 @@ class WP_REST_User_Post_Types_Controller_Gutenberg extends WP_REST_Posts_Control
 	 * @return WP_REST_Response|WP_Error
 	 */
 	public function delete_item( $request ) {
-		if ( ! empty( $request['force'] ) ) {
-			$slug = (string) get_post_field( 'post_name', (int) $request['id'] );
+		// Capture the slug before the parent runs — once force-delete fires
+		// the post is gone and `post_name` is no longer reachable.
+		$force    = ! empty( $request['force'] );
+		$slug     = $force ? (string) get_post_field( 'post_name', (int) $request['id'] ) : '';
+		$response = parent::delete_item( $request );
+		if ( is_wp_error( $response ) ) {
+			return $response;
+		}
+		if ( $force && '' !== $slug ) {
 			foreach ( self::get_user_taxonomy_ids_with_meta( $slug ) as $tax_id ) {
 				gutenberg_user_taxonomy_detach_object_type( $tax_id, $slug );
 			}
 		}
-		return parent::delete_item( $request );
+		return $response;
 	}
 
 	/**
@@ -496,9 +509,6 @@ class WP_REST_User_Post_Types_Controller_Gutenberg extends WP_REST_Posts_Control
 			return;
 		}
 		$current_slug = (string) $post->post_name;
-		if ( '' === $current_slug ) {
-			return;
-		}
 
 		$ids_by_slug = self::get_user_taxonomy_ids_by_slug();
 		$desired     = array();

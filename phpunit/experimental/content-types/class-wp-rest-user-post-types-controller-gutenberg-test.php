@@ -892,6 +892,35 @@ class WP_REST_User_Post_Types_Controller_Gutenberg_Test extends WP_Test_REST_Con
 	}
 
 	/**
+	 * Trash (force = false) preserves user-taxonomy meta so untrashing
+	 * restores the linkage. Companion to the force-delete test above.
+	 */
+	public function test_delete_item_trash_preserves_user_tax_meta() {
+		wp_set_current_user( self::$admin_id );
+		$genre_id = self::insert_user_taxonomy_record_for_sync( 'sync_genre', 'Genres' );
+
+		$post_id = self::insert_user_post_type_record(
+			array(
+				'labels'     => array( 'singular_name' => 'Album' ),
+				'taxonomies' => array( 'sync_genre' ),
+			),
+			'sync_album',
+			'Albums'
+		);
+		$this->assertSame( array( 'sync_album' ), self::get_object_type_meta( $genre_id ) );
+
+		// No `force` param — trash, not delete.
+		$request  = new WP_REST_Request( 'DELETE', self::REST_BASE . '/' . $post_id );
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertSame( 200, $response->get_status() );
+
+		$this->assertSame( array( 'sync_album' ), self::get_object_type_meta( $genre_id ) );
+
+		wp_delete_post( $post_id, true );
+		wp_delete_post( $genre_id, true );
+	}
+
+	/**
 	 * Renaming a post type's slug carries its user-taxonomy back-references
 	 * to the new slug — without this, every linked user taxonomy would
 	 * silently disconnect after a rename.
