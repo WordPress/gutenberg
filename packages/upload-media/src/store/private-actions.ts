@@ -26,6 +26,7 @@ import {
 	vipsConvertImageFormat,
 	vipsHasTransparency,
 	terminateVipsWorker,
+	maybeRecycleVipsWorker,
 } from './utils';
 import type {
 	AccumulateSubSizeAction,
@@ -60,19 +61,6 @@ import { ItemStatus, OperationType, Type } from './types';
 import type { cancelItem } from './actions';
 
 const DEFAULT_OUTPUT_QUALITY = 0.82;
-
-/**
- * Tracks the number of completed vips image processing operations.
- * Used to periodically recycle the WASM worker to reclaim memory,
- * since WASM linear memory can only grow and never shrink.
- */
-let completedVipsOperations = 0;
-
-/**
- * Maximum number of vips operations before recycling the worker.
- * Each operation can consume 50-100MB+ of WASM memory for large images.
- */
-const MAX_VIPS_OPS_BEFORE_RECYCLE = 50;
 
 type ActionCreators = {
 	cancelItem: typeof cancelItem;
@@ -577,26 +565,15 @@ export function finishOperation(
 			}
 		}
 
-		/*
-		 * Track vips image processing operations and periodically recycle
-		 * the WASM worker to reclaim memory. WASM linear memory can only
-		 * grow, never shrink, so the worker must be terminated and
-		 * recreated to free accumulated memory.
-		 */
+		// Track vips operations across success and failure paths so a
+		// burst of failures can't bypass the recycle budget; the cancel
+		// path calls the same helper.
 		if (
 			previousOperation === OperationType.ResizeCrop ||
 			previousOperation === OperationType.Rotate ||
 			previousOperation === OperationType.TranscodeImage
 		) {
-			completedVipsOperations++;
-
-			if (
-				completedVipsOperations >= MAX_VIPS_OPS_BEFORE_RECYCLE &&
-				select.getActiveImageProcessingCount() === 0
-			) {
-				terminateVipsWorker();
-				completedVipsOperations = 0;
-			}
+			maybeRecycleVipsWorker( select.getActiveImageProcessingCount() );
 		}
 	};
 }

@@ -32,7 +32,7 @@ import type {
 	removeItem,
 	revokeBlobUrls,
 } from './private-actions';
-import { vipsCancelOperations } from './utils';
+import { maybeRecycleVipsWorker, vipsCancelOperations } from './utils';
 import { UploadError } from '../upload-error';
 import { validateMimeType } from '../validate-mime-type';
 import { validateMimeTypeForUser } from '../validate-mime-type-for-user';
@@ -201,6 +201,17 @@ export function cancelItem( id: QueueItemId, error: Error, silent = false ) {
 			for ( const pending of select.getPendingUploads() ) {
 				dispatch.processItem( pending.id );
 			}
+		}
+
+		// Failed vips ops also leak WASM memory, so count them toward the
+		// recycle budget. Without this, a long burst of failures (e.g. a
+		// gallery of unsupported AVIFs) could grow memory unbounded.
+		if (
+			currentOperation === OperationType.ResizeCrop ||
+			currentOperation === OperationType.Rotate ||
+			currentOperation === OperationType.TranscodeImage
+		) {
+			maybeRecycleVipsWorker( select.getActiveImageProcessingCount() );
 		}
 
 		// If this was a child sideload item, handle the parent.
