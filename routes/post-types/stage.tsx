@@ -7,7 +7,9 @@ import { DataViews, type View } from '@wordpress/dataviews';
 import { useEntityRecords } from '@wordpress/core-data';
 import { useMemo, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { customPostType, search } from '@wordpress/icons';
 import { useNavigate } from '@wordpress/route';
+import { EmptyState } from '@wordpress/ui';
 import {
 	hasArchiveField,
 	hierarchicalField,
@@ -43,6 +45,24 @@ const DEFAULT_VIEW: View = {
 	titleField: 'title',
 	layout: {},
 };
+
+function PostTypesEmptyState( { hasSearch }: { hasSearch: boolean } ) {
+	return (
+		<EmptyState.Root>
+			<EmptyState.Icon icon={ hasSearch ? search : customPostType } />
+			<EmptyState.Title>
+				{ hasSearch
+					? __( 'No post types match your search' )
+					: __( 'No post types yet' ) }
+			</EmptyState.Title>
+			<EmptyState.Description>
+				{ hasSearch
+					? __( 'Try a different search term.' )
+					: __( 'Create your first post type to get started.' ) }
+			</EmptyState.Description>
+		</EmptyState.Root>
+	);
+}
 
 function PostTypesPage() {
 	const navigate = useNavigate();
@@ -105,6 +125,8 @@ function PostTypesPage() {
 		} ),
 		[ totalItems, totalPages ]
 	);
+	const hasSearch = !! view.search?.trim();
+
 	return (
 		<Page
 			title={ __( 'Post Types' ) }
@@ -135,6 +157,7 @@ function PostTypesPage() {
 				onClickItem={ ( item ) =>
 					navigate( { to: `/edit/${ item.id }` } )
 				}
+				empty={ <PostTypesEmptyState hasSearch={ hasSearch } /> }
 			/>
 		</Page>
 	);
