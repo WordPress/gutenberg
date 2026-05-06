@@ -358,6 +358,12 @@ function isAcceptedSuggestionChange( coreSelect, currentAttributes, delta ) {
  *                                                                          the marker represents.
  * @property {number}                                           [commentId] Filled in by auto-save once a note comment
  *                                                                          exists for this marker.
+ * @property {number|null}                                      [authorId]  ID of the user who proposed this
+ *                                                                          suggestion. Captured at marker-write
+ *                                                                          time so the rendering layer can tint
+ *                                                                          the preview with the author's avatar
+ *                                                                          color. `null` when the current user
+ *                                                                          can't be resolved (e.g., unit tests).
  */
 
 /**
@@ -671,6 +677,13 @@ export default function SuggestionStoreInterceptor() {
 		// reads suggestion comments handles a `null` selector defensively.
 		const coreSelect = registry.select( coreStore );
 
+		// Captured once at session start. Stored on every marker we write
+		// so the rendering layer can tint the canvas preview with the
+		// suggester's avatar color, the same way live cursors are tinted
+		// for collaborator presence. `null` for anonymous / unresolved
+		// users falls back to the suggestion-green default in CSS.
+		const currentUserId = coreSelect?.getCurrentUser?.()?.id ?? null;
+
 		// Snapshot of every block's attributes at the moment Suggest mode
 		// activated. New blocks added during the session are slotted in as
 		// they appear; mutations on existing blocks are reverted + overlaid.
@@ -760,6 +773,7 @@ export default function SuggestionStoreInterceptor() {
 						blockEditorDispatch.updateBlockAttributes( clientId, {
 							metadata: withSuggestionMarker( current?.metadata, {
 								type: 'pending-insert',
+								authorId: currentUserId,
 							} ),
 						} );
 					} finally {
@@ -875,6 +889,7 @@ export default function SuggestionStoreInterceptor() {
 					blockEditorDispatch.updateBlockAttributes( move.clientId, {
 						metadata: withSuggestionMarker( currentAttrs.metadata, {
 							type: 'pending-move',
+							authorId: currentUserId,
 							fromAnchorClientId: move.fromAnchorClientId,
 							fromParentClientId: move.fromParentClientId,
 							fromIndex: move.fromIndex,
@@ -988,7 +1003,10 @@ export default function SuggestionStoreInterceptor() {
 						blockEditorDispatch.updateBlockAttributes( clientId, {
 							metadata: withSuggestionMarker(
 								currentAttrs.metadata,
-								{ type: 'pending-remove' }
+								{
+									type: 'pending-remove',
+									authorId: currentUserId,
+								}
 							),
 						} );
 					} finally {

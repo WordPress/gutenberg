@@ -409,6 +409,7 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 		expect( liveBlocks[ 0 ].clientId ).toBe( clientId );
 		expect( liveBlocks[ 0 ].attributes?.metadata?.suggestion ).toEqual( {
 			type: 'pending-remove',
+			authorId: null,
 		} );
 
 		// The marker is system metadata — it must NOT leak into the user
@@ -580,6 +581,7 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 		expect( newBlock.clientId ).toBe( inserted.clientId );
 		expect( newBlock.attributes?.metadata?.suggestion ).toEqual( {
 			type: 'pending-insert',
+			authorId: null,
 		} );
 
 		expect(
