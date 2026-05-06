@@ -338,34 +338,45 @@ describe( 'diffRevisionContent', () => {
 			createBlock( 'core/paragraph', { content: 'First block content' } ),
 		] );
 		const blocks = diffRevisionContent( current, previous );
+		const normalized = normalizeBlockTree( blocks );
 
-		// LCS matches one block ("First block content" at prev[0] -> curr[1]).
-		// The other block appears as removed + added (showing the reorder).
-		// We intentionally don't pair identical blocks as "modified" since
-		// there's no actual content change - just a position change.
-		expect( normalizeBlockTree( blocks ) ).toMatchObject( [
-			{
-				name: 'core/paragraph',
-				attributes: {
-					content: 'Second block content',
-					__revisionDiffStatus: { status: 'added' },
-				},
-			},
-			{
-				name: 'core/paragraph',
-				attributes: {
-					content: 'First block content',
-					__revisionDiffStatus: undefined,
-				},
-			},
-			{
-				name: 'core/paragraph',
-				attributes: {
-					content: 'Second block content',
-					__revisionDiffStatus: { status: 'removed' },
-				},
-			},
-		] );
+		/*
+		 * For a pure swap, LCS has two equally-valid choices for the
+		 * "unchanged" anchor — either block could be the anchor while the
+		 * other reads as removed+added. The choice is implementation-
+		 * defined (it differs across `diff` library versions, for
+		 * instance), so we assert the user-facing invariant rather than
+		 * which side gets matched: exactly one block stays unmarked, the
+		 * other shows up as a removed/added pair with the same content
+		 * (a position change, not a modification).
+		 */
+		const statuses = normalized.map(
+			( b ) => b.attributes.__revisionDiffStatus?.status
+		);
+		const unchanged = normalized.filter(
+			( _, i ) => statuses[ i ] === undefined
+		);
+		const added = normalized.filter(
+			( _, i ) => statuses[ i ] === 'added'
+		);
+		const removed = normalized.filter(
+			( _, i ) => statuses[ i ] === 'removed'
+		);
+
+		expect( normalized ).toHaveLength( 3 );
+		expect( unchanged ).toHaveLength( 1 );
+		expect( added ).toHaveLength( 1 );
+		expect( removed ).toHaveLength( 1 );
+
+		expect( added[ 0 ].attributes.content ).toBe(
+			removed[ 0 ].attributes.content
+		);
+		expect( unchanged[ 0 ].attributes.content ).not.toBe(
+			added[ 0 ].attributes.content
+		);
+		expect( [ 'First block content', 'Second block content' ] ).toContain(
+			unchanged[ 0 ].attributes.content
+		);
 	} );
 
 	it( 'pairs blocks as modified when attrs differ but content is identical', () => {
