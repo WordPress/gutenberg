@@ -426,11 +426,11 @@ _Parameters_
 
 -   _shortcuts_ `string[] | string`: Keyboard Shortcuts.
 -   _callback_ `( e: ExtendedKeyboardEvent, combo: string ) => void`: Shortcut callback.
--   _options_ `Partial< WPKeyboardShortcutConfig >`: Shortcut options.
--   _options.bindGlobal_ `Partial< WPKeyboardShortcutConfig >[ 'bindGlobal' ]`:
--   _options.eventName_ `Partial< WPKeyboardShortcutConfig >[ 'eventName' ]`:
--   _options.isDisabled_ `Partial< WPKeyboardShortcutConfig >[ 'isDisabled' ]`:
--   _options.target_ `Partial< WPKeyboardShortcutConfig >[ 'target' ]`:
+-   _options_ `Partial< KeyboardShortcutConfig >`: Shortcut options.
+-   _options.bindGlobal_ `Partial< KeyboardShortcutConfig >[ 'bindGlobal' ]`:
+-   _options.eventName_ `Partial< KeyboardShortcutConfig >[ 'eventName' ]`:
+-   _options.isDisabled_ `Partial< KeyboardShortcutConfig >[ 'isDisabled' ]`:
+-   _options.target_ `Partial< KeyboardShortcutConfig >[ 'target' ]`:
 
 ### useMediaQuery
 

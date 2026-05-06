@@ -5,28 +5,44 @@ import useRefEffect from '../use-ref-effect';
 import useEvent from '../use-event';
 
 interface UseDropZoneProps {
+	/**
+	 * Optional element to be used as the drop zone.
+	 */
 	dropZoneElement?: HTMLElement | null;
+	/**
+	 * Whether or not to disable the drop zone.
+	 */
 	isDisabled?: boolean;
+	/**
+	 * Called when dragging has started.
+	 */
 	onDragStart?: ( e: DragEvent ) => void;
+	/**
+	 *  Called when the zone is entered.
+	 */
 	onDragEnter?: ( e: DragEvent ) => void;
+	/**
+	 * Called when the zone is moved within.
+	 */
 	onDragOver?: ( e: DragEvent ) => void;
+	/**
+	 * Called when the zone is left.
+	 */
 	onDragLeave?: ( e: DragEvent ) => void;
+	/**
+	 * Called when dragging has ended.
+	 */
 	onDragEnd?: ( e: MouseEvent ) => void;
+	/**
+	 * Called when dropping in the zone.
+	 */
 	onDrop?: ( e: DragEvent ) => void;
 }
 
 /**
  * A hook to facilitate drag and drop handling.
  *
- * @param props                 Hook options
- * @param props.dropZoneElement
- * @param props.isDisabled
- * @param props.onDrop
- * @param props.onDragStart
- * @param props.onDragEnter
- * @param props.onDragLeave
- * @param props.onDragEnd
- * @param props.onDragOver
+ * @param {UseDropZoneProps} props Hook options
  * @return Ref callback to be passed to the drop zone element.
  */
 export default function useDropZone( {

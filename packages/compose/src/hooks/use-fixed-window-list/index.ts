@@ -12,7 +12,7 @@ import { debounce } from '../../utils/debounce';
 
 const DEFAULT_INIT_WINDOW_SIZE = 30;
 
-interface WPFixedWindowList {
+interface FixedWindowList {
 	/** Items visible in the current viewport */
 	visibleItems: number;
 	/** Start index of the window */
@@ -23,7 +23,7 @@ interface WPFixedWindowList {
 	itemInView: ( index: number ) => boolean;
 }
 
-interface WPFixedWindowListOptions {
+interface FixedWindowListOptions {
 	/** Renders windowOverscan number of items before and after the calculated visible window. */
 	windowOverscan?: number;
 	/** When false avoids calculating the window size */
@@ -46,23 +46,24 @@ export default function useFixedWindowList(
 	elementRef: React.RefObject< HTMLElement >,
 	itemHeight: number,
 	totalItems: number,
-	options?: WPFixedWindowListOptions
+	options?: FixedWindowListOptions
 ): [
-	WPFixedWindowList,
-	React.Dispatch< React.SetStateAction< WPFixedWindowList > >,
+	FixedWindowList,
+	React.Dispatch< React.SetStateAction< FixedWindowList > >,
 ] {
 	const initWindowSize = options?.initWindowSize ?? DEFAULT_INIT_WINDOW_SIZE;
 	const useWindowing = options?.useWindowing ?? true;
 
-	const [ fixedListWindow, setFixedListWindow ] =
-		useState< WPFixedWindowList >( {
+	const [ fixedListWindow, setFixedListWindow ] = useState< FixedWindowList >(
+		{
 			visibleItems: initWindowSize,
 			start: 0,
 			end: initWindowSize,
 			itemInView: ( index: number ) => {
 				return index >= 0 && index <= initWindowSize;
 			},
-		} );
+		}
+	);
 
 	useLayoutEffect( () => {
 		if ( ! useWindowing ) {

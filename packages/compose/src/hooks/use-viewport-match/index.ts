@@ -8,7 +8,7 @@ import { createContext, useContext } from '@wordpress/element';
  */
 import useMediaQuery from '../use-media-query';
 
-type WPBreakpoint =
+type Breakpoint =
 	| 'xhuge'
 	| 'huge'
 	| 'wide'
@@ -17,14 +17,14 @@ type WPBreakpoint =
 	| 'medium'
 	| 'small'
 	| 'mobile';
-type WPViewportOperator = '>=' | '<';
+type ViewportOperator = '>=' | '<';
 
 /**
  * Hash of breakpoint names with pixel width at which it becomes effective.
  *
  * @see _breakpoints.scss
  */
-const BREAKPOINTS: Record< WPBreakpoint, number > = {
+const BREAKPOINTS: Record< Breakpoint, number > = {
 	xhuge: 1920,
 	huge: 1440,
 	wide: 1280,
@@ -38,7 +38,7 @@ const BREAKPOINTS: Record< WPBreakpoint, number > = {
 /**
  * Object mapping media query operators to the condition to be used.
  */
-const CONDITIONS: Record< WPViewportOperator, string > = {
+const CONDITIONS: Record< ViewportOperator, string > = {
 	'>=': 'min-width',
 	'<': 'max-width',
 };
@@ -47,7 +47,7 @@ const CONDITIONS: Record< WPViewportOperator, string > = {
  * Object mapping media query operators to a function that evaluates if the operator matches.
  */
 const OPERATOR_EVALUATORS: Record<
-	WPViewportOperator,
+	ViewportOperator,
 	( breakpointValue: number, width: number ) => boolean
 > = {
 	'>=': ( breakpointValue, width ) => width >= breakpointValue,
@@ -74,8 +74,8 @@ ViewportMatchWidthContext.displayName = 'ViewportMatchWidthContext';
  * @return Whether viewport matches query.
  */
 const useViewportMatch = (
-	breakpoint: WPBreakpoint,
-	operator: WPViewportOperator = '>=',
+	breakpoint: Breakpoint,
+	operator: ViewportOperator = '>=',
 	// Resolve the default lazily so SSR (where `window` is undeclared) does not
 	// throw a ReferenceError when this default expression is evaluated.
 	view: Window = typeof window !== 'undefined' ? window : undefined

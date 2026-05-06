@@ -12,7 +12,7 @@ import type { RefObject } from '@wordpress/element';
 import { useEffect, useRef } from '@wordpress/element';
 import { isAppleOS } from '@wordpress/keycodes';
 
-type WPKeyboardShortcutConfig = {
+type KeyboardShortcutConfig = {
 	/**
 	 * Handle keyboard events anywhere including inside textarea/input fields.
 	 */
@@ -52,7 +52,7 @@ function useKeyboardShortcut(
 		eventName = 'keydown',
 		isDisabled = false,
 		target,
-	}: Partial< WPKeyboardShortcutConfig > = {}
+	}: Partial< KeyboardShortcutConfig > = {}
 ) {
 	const currentCallbackRef = useRef( callback );
 
@@ -68,7 +68,10 @@ function useKeyboardShortcut(
 		const mousetrap = new Mousetrap(
 			target && target.current
 				? target.current
-				: ( document as unknown as Element )
+				: // We were passing `document` here previously, so to successfully cast it to Element we must cast it first to `unknown`.
+				  // Not sure if this is a mistake but it was the behavior previous to the addition of types so we're just doing what's
+				  // necessary to maintain the existing behavior.
+				  ( document as unknown as Element )
 		);
 
 		const shortcutsArray = Array.isArray( shortcuts )
@@ -94,6 +97,9 @@ function useKeyboardShortcut(
 			}
 
 			const bindFn = bindGlobal ? 'bindGlobal' : 'bind';
+			// `@ts-expect-error` Mousetrap typings don’t include `bindGlobal`
+			// It exists at runtime via the plugin
+			// `any` is used here to allow dynamic access via `bindFn`
 			( mousetrap as any )[ bindFn ](
 				shortcut,
 				( ...args: [ Mousetrap.ExtendedKeyboardEvent, string ] ) =>
