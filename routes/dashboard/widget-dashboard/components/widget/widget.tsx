@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { forwardRef, useMemo } from '@wordpress/element';
+import { Card } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -43,13 +44,22 @@ export const Widget = forwardRef< HTMLDivElement, WidgetProps >(
 
 		return (
 			<WidgetContextProvider value={ contextValue }>
-				<div
-					ref={ ref }
-					className={ styles.widget }
+				<Card.Root
+					className={ styles[ 'widget-chrome-container' ] }
 					{ ...( editMode ? { inert: '' } : {} ) }
+					ref={ ref }
 				>
-					<WidgetRender widget={ widget } widgetType={ widgetType } />
-				</div>
+					<Card.Header>
+						<Card.Title>{ widgetType.title }</Card.Title>
+					</Card.Header>
+
+					<Card.Content>
+						<WidgetRender
+							widget={ widget }
+							widgetType={ widgetType }
+						/>
+					</Card.Content>
+				</Card.Root>
 			</WidgetContextProvider>
 		);
 	}
