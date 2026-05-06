@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { createRef } from '@wordpress/element';
 import * as Card from '../../card';
@@ -8,7 +8,7 @@ describe( 'CollapsibleCard', () => {
 	describe( 'basic behaviour', () => {
 		it( 'forwards ref', () => {
 			const rootRef = createRef< HTMLDivElement >();
-			const headerRef = createRef< HTMLDivElement >();
+			const headerRef = createRef< HTMLHeadingElement >();
 			const contentRef = createRef< HTMLDivElement >();
 
 			render(
@@ -23,7 +23,7 @@ describe( 'CollapsibleCard', () => {
 			);
 
 			expect( rootRef.current ).toBeInstanceOf( HTMLDivElement );
-			expect( headerRef.current ).toBeInstanceOf( HTMLDivElement );
+			expect( headerRef.current ).toBeInstanceOf( HTMLHeadingElement );
 			expect( contentRef.current ).toBeInstanceOf( HTMLDivElement );
 		} );
 
@@ -179,6 +179,83 @@ describe( 'CollapsibleCard', () => {
 		} );
 	} );
 
+	describe( 'heading wrapper', () => {
+		it( 'renders an `<h3>` heading wrapping the trigger by default', () => {
+			render(
+				<CollapsibleCard.Root>
+					<CollapsibleCard.Header>
+						<Card.Title>Title</Card.Title>
+					</CollapsibleCard.Header>
+				</CollapsibleCard.Root>
+			);
+
+			const heading = screen.getByRole( 'heading', {
+				level: 3,
+				name: 'Title',
+			} );
+			expect( heading ).toBeVisible();
+			expect(
+				within( heading ).getByRole( 'button', { name: 'Title' } )
+			).toBeVisible();
+		} );
+
+		it( 'renders the heading at a different level via `render`', () => {
+			render(
+				<CollapsibleCard.Root>
+					<CollapsibleCard.Header render={ <h2 /> }>
+						<Card.Title>Title</Card.Title>
+					</CollapsibleCard.Header>
+				</CollapsibleCard.Root>
+			);
+
+			const heading = screen.getByRole( 'heading', {
+				level: 2,
+				name: 'Title',
+			} );
+			expect( heading ).toBeVisible();
+			expect(
+				within( heading ).getByRole( 'button', { name: 'Title' } )
+			).toBeVisible();
+		} );
+
+		it( 'opts out of heading semantics with `render={ <div /> }`', () => {
+			render(
+				<CollapsibleCard.Root>
+					<CollapsibleCard.Header render={ <div /> }>
+						<Card.Title>Title</Card.Title>
+					</CollapsibleCard.Header>
+				</CollapsibleCard.Root>
+			);
+
+			expect(
+				screen.queryByRole( 'heading', { name: 'Title' } )
+			).not.toBeInTheDocument();
+			expect(
+				screen.getByRole( 'button', { name: 'Title' } )
+			).toBeVisible();
+		} );
+
+		it( 'forwards `className` to the outer heading wrapper', () => {
+			render(
+				<CollapsibleCard.Root>
+					<CollapsibleCard.Header
+						className="custom-heading"
+						data-testid="header"
+					>
+						<Card.Title>Title</Card.Title>
+					</CollapsibleCard.Header>
+				</CollapsibleCard.Root>
+			);
+
+			const heading = screen.getByRole( 'heading', {
+				level: 3,
+				name: 'Title',
+			} );
+			expect( heading ).toHaveClass( 'custom-heading' );
+			expect( heading ).toHaveAttribute( 'data-testid', 'header' );
+		} );
+	} );
+
 	describe( 'HeaderDescription', () => {
 		it( 'sets aria-describedby on the trigger pointing to the description', () => {
 			render(
@@ -205,6 +282,11 @@ describe( 'CollapsibleCard', () => {
 				'aria-describedby',
 				descriptionElement.id
 			);
+
+			// aria-describedby must be on the inner button (which is what's
+			// being described), not on the outer heading wrapper.
+			const heading = screen.getByRole( 'heading', { name: 'Settings' } );
+			expect( heading ).not.toHaveAttribute( 'aria-describedby' );
 		} );
 
 		it( 'marks the description content as aria-hidden', () => {

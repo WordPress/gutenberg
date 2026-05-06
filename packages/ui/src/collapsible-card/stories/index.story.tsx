@@ -166,30 +166,56 @@ export const Stacked: Story = {
 };
 
 /**
- * Wraps the trigger in a heading element to contribute to the document outline.
+ * `CollapsibleCard.Header` renders an `<h3>` by default so the card
+ * contributes to the document outline. Use the `render` prop to change the
+ * heading level (e.g. `render={ <h2 /> }`) or to opt out of heading
+ * semantics entirely (`render={ <div /> }`).
  */
-export const WrappedInHeading: Story = {
-	args: {
-		children: (
-			<>
-				<CollapsibleCard.Header
-					render={ ( props ) => (
-						<h2 style={ { margin: 0 } }>
-							<div { ...props } />
-						</h2>
-					) }
-				>
-					<Card.Title>Section title</Card.Title>
+export const WithHeadingElement: Story = {
+	parameters: { controls: { disable: true } },
+	render: () => (
+		<div
+			style={ {
+				display: 'flex',
+				flexDirection: 'column',
+				gap: 'var(--wpds-dimension-gap-lg)',
+			} }
+		>
+			<CollapsibleCard.Root>
+				<CollapsibleCard.Header render={ <h2 /> }>
+					<Card.Title>Heading level 2</Card.Title>
 				</CollapsibleCard.Header>
 				<CollapsibleCard.Content>
 					<Text>
-						The trigger is rendered inside an h2 element so it
-						appears in the document outline.
+						The wrapper renders as an h2 element when the consumer
+						passes an h2 React element to the render prop.
 					</Text>
 				</CollapsibleCard.Content>
-			</>
-		),
-	},
+			</CollapsibleCard.Root>
+			<CollapsibleCard.Root>
+				<CollapsibleCard.Header>
+					<Card.Title>Heading level 3 (default)</Card.Title>
+				</CollapsibleCard.Header>
+				<CollapsibleCard.Content>
+					<Text>
+						Without a render prop, the header defaults to an h3
+						element.
+					</Text>
+				</CollapsibleCard.Content>
+			</CollapsibleCard.Root>
+			<CollapsibleCard.Root>
+				<CollapsibleCard.Header render={ <div /> }>
+					<Card.Title>No heading semantics</Card.Title>
+				</CollapsibleCard.Header>
+				<CollapsibleCard.Content>
+					<Text>
+						Passing a div React element to the render prop opts out
+						of heading semantics entirely.
+					</Text>
+				</CollapsibleCard.Content>
+			</CollapsibleCard.Root>
+		</div>
+	),
 };
 
 /**

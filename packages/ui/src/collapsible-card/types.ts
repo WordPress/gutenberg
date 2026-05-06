@@ -30,7 +30,7 @@ export interface RootProps extends ComponentProps< 'div' > {
 	disabled?: boolean;
 }
 
-export interface HeaderProps extends ComponentProps< 'div' > {
+export interface HeaderProps extends ComponentProps< 'h3' > {
 	/**
 	 * The content to be rendered inside the header.
 	 */
