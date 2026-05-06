@@ -80,8 +80,7 @@ if ( ! class_exists( 'WP_Sync_Post_Meta_Storage' ) ) {
 		public function add_update( string $room, $update ): bool {
 			global $wpdb;
 
-			$room_hash = md5( $room );
-			$post_id   = $this->get_storage_post_id( $room );
+			$post_id = $this->get_storage_post_id( $room );
 			if ( null === $post_id ) {
 				return false;
 			}
@@ -89,7 +88,7 @@ if ( ! class_exists( 'WP_Sync_Post_Meta_Storage' ) ) {
 			// Use direct database operation to avoid cache invalidation performed by
 			// post meta functions (`wp_cache_set_posts_last_changed()` and direct
 			// `wp_cache_delete()` calls).
-			$result = $wpdb->insert(
+			return (bool) $wpdb->insert(
 				$wpdb->postmeta,
 				array(
 					'post_id'    => $post_id,
@@ -98,12 +97,6 @@ if ( ! class_exists( 'WP_Sync_Post_Meta_Storage' ) ) {
 				),
 				array( '%d', '%s', '%s' )
 			);
-
-			if ( $result ) {
-				self::$storage_post_ids[ $room_hash ] = $this->merge_duplicate_storage_posts( $room_hash, $post_id );
-			}
-
-			return (bool) $result;
 		}
 
 		/**
@@ -162,8 +155,7 @@ if ( ! class_exists( 'WP_Sync_Post_Meta_Storage' ) ) {
 		public function set_awareness_state( string $room, array $awareness ): bool {
 			global $wpdb;
 
-			$room_hash = md5( $room );
-			$post_id   = $this->get_storage_post_id( $room );
+			$post_id = $this->get_storage_post_id( $room );
 			if ( null === $post_id ) {
 				return false;
 			}
@@ -184,22 +176,16 @@ if ( ! class_exists( 'WP_Sync_Post_Meta_Storage' ) ) {
 			);
 
 			if ( $meta_id ) {
-				$result = $wpdb->update(
+				return (bool) $wpdb->update(
 					$wpdb->postmeta,
 					array( 'meta_value' => wp_json_encode( $awareness ) ),
 					array( 'meta_id' => $meta_id ),
 					array( '%s' ),
 					array( '%d' )
 				);
-
-				if ( false !== $result ) {
-					self::$storage_post_ids[ $room_hash ] = $this->merge_duplicate_storage_posts( $room_hash, $post_id );
-				}
-
-				return false !== $result;
 			}
 
-			$result = $wpdb->insert(
+			return (bool) $wpdb->insert(
 				$wpdb->postmeta,
 				array(
 					'post_id'    => $post_id,
@@ -208,12 +194,6 @@ if ( ! class_exists( 'WP_Sync_Post_Meta_Storage' ) ) {
 				),
 				array( '%d', '%s', '%s' )
 			);
-
-			if ( $result ) {
-				self::$storage_post_ids[ $room_hash ] = $this->merge_duplicate_storage_posts( $room_hash, $post_id );
-			}
-
-			return (bool) $result;
 		}
 
 		/**
@@ -303,7 +283,8 @@ if ( ! class_exists( 'WP_Sync_Post_Meta_Storage' ) ) {
 		 * Two concurrent first writers can both miss the lookup above and create
 		 * storage posts for the same room hash. Depending on the exact interleaving,
 		 * WordPress may create either a duplicate exact slug or a suffixed slug.
-		 * When that happens, merge everything back into one canonical lineage.
+		 * When this request receives a non-canonical post, redirect it to the
+		 * canonical storage before any sync or awareness data is written.
 		 *
 		 * @since 7.0.0
 		 *
@@ -322,327 +303,24 @@ if ( ! class_exists( 'WP_Sync_Post_Meta_Storage' ) ) {
 				return null;
 			}
 
-			return $this->merge_duplicate_storage_posts( $room_hash, $canonical_post_id );
-		}
-
-		/**
-		 * Merges duplicate storage posts created by a first-access race.
-		 *
-		 * @since 7.0.0
-		 *
-		 * @param string $room_hash         MD5 hash of the room identifier.
-		 * @param int    $canonical_post_id Preferred post ID that should own the room.
-		 * @return int Canonical storage post ID.
-		 */
-		private function merge_duplicate_storage_posts( string $room_hash, int $canonical_post_id ): int {
-			$storage_post_ids = $this->get_storage_post_ids_for_room_hash( $room_hash );
-			if ( empty( $storage_post_ids ) ) {
-				return $canonical_post_id;
-			}
-
-			$exact_post_id = $this->find_canonical_storage_post_id( $room_hash );
-			if ( null === $exact_post_id ) {
-				$canonical_post_id = in_array( $canonical_post_id, $storage_post_ids, true ) ? $canonical_post_id : (int) $storage_post_ids[0];
-				$promoted_post_id  = $this->promote_storage_post_to_canonical_slug( $room_hash, $canonical_post_id );
-				if ( null === $promoted_post_id ) {
-					return $canonical_post_id;
-				}
-
-				$canonical_post_id = $promoted_post_id;
-				$storage_post_ids  = $this->get_storage_post_ids_for_room_hash( $room_hash );
-			} else {
-				$canonical_post_id = $exact_post_id;
-			}
-
-			foreach ( $storage_post_ids as $duplicate_id ) {
-				if ( $canonical_post_id === $duplicate_id ) {
-					continue;
-				}
-
-				if ( ! $this->merge_duplicate_storage_post_meta( $canonical_post_id, $duplicate_id ) ) {
-					continue;
-				}
-
-				wp_delete_post( $duplicate_id, true );
+			if ( $inserted_post_id !== $canonical_post_id ) {
+				/*
+				 * This request just created a duplicate empty storage post because
+				 * another first writer won the exact-slug race. Delete only that
+				 * just-created empty post and write this request's data to canonical
+				 * storage.
+				 *
+				 * Do not merge or delete older duplicate storage posts here. A stale
+				 * request may already hold a duplicate post ID, and MySQL advisory
+				 * locks/raw transactions are not a reliable cross-server fence under
+				 * HyperDB or database proxies. Future historical repair should be
+				 * bounded and idempotent, or run out of band with primary-pinned
+				 * verification and a grace period before deleting duplicates.
+				 */
+				wp_delete_post( $inserted_post_id, true );
 			}
 
 			return $canonical_post_id;
-		}
-
-		/**
-		 * Merges post meta from a duplicate storage post into the canonical post.
-		 *
-		 * Sync updates use postmeta.meta_id as a cursor. Moving old rows in place
-		 * would keep their old meta_id values and hide them from active readers
-		 * that already advanced past those IDs, so updates are appended as new rows.
-		 *
-		 * @since 7.0.0
-		 *
-		 * @param int $canonical_post_id Canonical storage post ID.
-		 * @param int $duplicate_id      Duplicate storage post ID.
-		 * @return bool True when the duplicate can be deleted, false otherwise.
-		 */
-		private function merge_duplicate_storage_post_meta( int $canonical_post_id, int $duplicate_id ): bool {
-			global $wpdb;
-
-			if ( ! $this->acquire_duplicate_storage_merge_lock( $duplicate_id ) ) {
-				return false;
-			}
-
-			$transaction_started = false;
-			$committed           = false;
-
-			try {
-				if ( false === $wpdb->query( 'START TRANSACTION' ) ) {
-					return false;
-				}
-
-				$transaction_started = true;
-				$max_meta_id         = $this->get_duplicate_sync_update_max_meta_id( $duplicate_id );
-				if ( null === $max_meta_id ) {
-					return false;
-				}
-
-				if (
-					! $this->append_duplicate_sync_updates( $canonical_post_id, $duplicate_id, $max_meta_id ) ||
-					! $this->delete_duplicate_sync_updates( $duplicate_id, $max_meta_id ) ||
-					! $this->move_duplicate_non_update_meta( $canonical_post_id, $duplicate_id )
-				) {
-					return false;
-				}
-
-				if ( false === $wpdb->query( 'COMMIT' ) ) {
-					return false;
-				}
-
-				$committed             = true;
-				$has_remaining_updates = $this->duplicate_has_sync_updates( $duplicate_id );
-				return false === $has_remaining_updates;
-			} finally {
-				if ( $transaction_started && ! $committed ) {
-					$wpdb->query( 'ROLLBACK' );
-				}
-
-				$this->release_duplicate_storage_merge_lock( $duplicate_id );
-			}
-		}
-
-		/**
-		 * Acquires a short-lived database lock for merging a duplicate storage post.
-		 *
-		 * @since 7.0.0
-		 *
-		 * @global wpdb $wpdb WordPress database abstraction object.
-		 *
-		 * @param int $duplicate_id Duplicate storage post ID.
-		 * @return bool True if the lock was acquired, false otherwise.
-		 */
-		private function acquire_duplicate_storage_merge_lock( int $duplicate_id ): bool {
-			global $wpdb;
-
-			$lock_result = $wpdb->get_var(
-				$wpdb->prepare(
-					'SELECT GET_LOCK( %s, 0 )',
-					$this->get_duplicate_storage_merge_lock_name( $duplicate_id )
-				)
-			);
-
-			return '1' === (string) $lock_result;
-		}
-
-		/**
-		 * Releases the database lock for merging a duplicate storage post.
-		 *
-		 * @since 7.0.0
-		 *
-		 * @global wpdb $wpdb WordPress database abstraction object.
-		 *
-		 * @param int $duplicate_id Duplicate storage post ID.
-		 */
-		private function release_duplicate_storage_merge_lock( int $duplicate_id ): void {
-			global $wpdb;
-
-			$wpdb->get_var(
-				$wpdb->prepare(
-					'SELECT RELEASE_LOCK( %s )',
-					$this->get_duplicate_storage_merge_lock_name( $duplicate_id )
-				)
-			);
-		}
-
-		/**
-		 * Gets the database lock name for merging a duplicate storage post.
-		 *
-		 * @since 7.0.0
-		 *
-		 * @param int $duplicate_id Duplicate storage post ID.
-		 * @return string Database lock name.
-		 */
-		private function get_duplicate_storage_merge_lock_name( int $duplicate_id ): string {
-			return 'wp_sync_storage_merge_' . $duplicate_id;
-		}
-
-		/**
-		 * Gets the highest sync update meta ID currently stored on a duplicate post.
-		 *
-		 * @since 7.0.0
-		 *
-		 * @global wpdb $wpdb WordPress database abstraction object.
-		 *
-		 * @param int $duplicate_id Duplicate storage post ID.
-		 * @return int|null Highest sync update meta ID, or null on failure.
-		 */
-		private function get_duplicate_sync_update_max_meta_id( int $duplicate_id ): ?int {
-			global $wpdb;
-
-			$max_meta_id = $wpdb->get_var(
-				$wpdb->prepare(
-					"SELECT COALESCE( MAX(meta_id), 0 )
-					FROM {$wpdb->postmeta}
-					WHERE post_id = %d
-						AND meta_key = %s",
-					$duplicate_id,
-					self::SYNC_UPDATE_META_KEY
-				)
-			);
-
-			return is_numeric( $max_meta_id ) ? (int) $max_meta_id : null;
-		}
-
-		/**
-		 * Moves duplicate non-update metadata to the canonical storage post.
-		 *
-		 * Non-update metadata, such as awareness snapshots, does not use meta_id
-		 * as a delivery cursor, so it can be moved without creating cursor gaps.
-		 *
-		 * @since 7.0.0
-		 *
-		 * @global wpdb $wpdb WordPress database abstraction object.
-		 *
-		 * @param int $canonical_post_id Canonical storage post ID.
-		 * @param int $duplicate_id      Duplicate storage post ID.
-		 * @return bool True on success, false on failure.
-		 */
-		private function move_duplicate_non_update_meta( int $canonical_post_id, int $duplicate_id ): bool {
-			global $wpdb;
-
-			$move_result = $wpdb->query(
-				$wpdb->prepare(
-					"UPDATE {$wpdb->postmeta}
-					SET post_id = %d
-					WHERE post_id = %d
-						AND ( meta_key IS NULL OR meta_key <> %s )",
-					$canonical_post_id,
-					$duplicate_id,
-					self::SYNC_UPDATE_META_KEY
-				)
-			);
-
-			return false !== $move_result;
-		}
-
-		/**
-		 * Appends duplicate sync updates to the canonical storage post.
-		 *
-		 * The source rows are read in meta_id order up to a bounded high-water
-		 * mark and inserted as new postmeta rows, giving every repaired update a
-		 * fresh cursor greater than any cursor an active reader could have
-		 * observed before the repair.
-		 *
-		 * @since 7.0.0
-		 *
-		 * @global wpdb $wpdb WordPress database abstraction object.
-		 *
-		 * @param int $canonical_post_id Canonical storage post ID.
-		 * @param int $duplicate_id      Duplicate storage post ID.
-		 * @param int $max_meta_id       Highest source meta ID to append.
-		 * @return bool True on success, false on failure.
-		 */
-		private function append_duplicate_sync_updates( int $canonical_post_id, int $duplicate_id, int $max_meta_id ): bool {
-			global $wpdb;
-
-			$append_result = $wpdb->query(
-				$wpdb->prepare(
-					"INSERT INTO {$wpdb->postmeta} ( post_id, meta_key, meta_value )
-					SELECT %d, meta_key, meta_value
-					FROM {$wpdb->postmeta}
-					WHERE post_id = %d
-						AND meta_key = %s
-						AND meta_id <= %d
-					ORDER BY meta_id ASC",
-					$canonical_post_id,
-					$duplicate_id,
-					self::SYNC_UPDATE_META_KEY,
-					$max_meta_id
-				)
-			);
-
-			return false !== $append_result;
-		}
-
-		/**
-		 * Deletes duplicate sync updates after they have been appended.
-		 *
-		 * Only rows up to the append high-water mark are deleted. If another
-		 * writer adds rows to the duplicate after the repair starts, those rows
-		 * remain on the duplicate post for a later repair attempt.
-		 *
-		 * @since 7.0.0
-		 *
-		 * @global wpdb $wpdb WordPress database abstraction object.
-		 *
-		 * @param int $duplicate_id Duplicate storage post ID.
-		 * @param int $max_meta_id  Highest source meta ID that was appended.
-		 * @return bool True on success, false on failure.
-		 */
-		private function delete_duplicate_sync_updates( int $duplicate_id, int $max_meta_id ): bool {
-			global $wpdb;
-
-			$delete_result = $wpdb->query(
-				$wpdb->prepare(
-					"DELETE FROM {$wpdb->postmeta}
-					WHERE post_id = %d
-						AND meta_key = %s
-						AND meta_id <= %d",
-					$duplicate_id,
-					self::SYNC_UPDATE_META_KEY,
-					$max_meta_id
-				)
-			);
-
-			return false !== $delete_result;
-		}
-
-		/**
-		 * Checks whether a duplicate storage post still has sync updates.
-		 *
-		 * @since 7.0.0
-		 *
-		 * @global wpdb $wpdb WordPress database abstraction object.
-		 *
-		 * @param int $duplicate_id Duplicate storage post ID.
-		 * @return bool|null True if sync updates remain, false if none remain, or null on failure.
-		 */
-		private function duplicate_has_sync_updates( int $duplicate_id ): ?bool {
-			global $wpdb;
-
-			$meta_id = $wpdb->get_var(
-				$wpdb->prepare(
-					"SELECT meta_id
-					FROM {$wpdb->postmeta}
-					WHERE post_id = %d
-						AND meta_key = %s
-					LIMIT 1",
-					$duplicate_id,
-					self::SYNC_UPDATE_META_KEY
-				)
-			);
-
-			if ( null === $meta_id && '' !== $wpdb->last_error ) {
-				return null;
-			}
-
-			return null !== $meta_id;
 		}
 
 		/**
@@ -700,33 +378,6 @@ if ( ! class_exists( 'WP_Sync_Post_Meta_Storage' ) ) {
 
 			clean_post_cache( $post_id );
 			return $post_id;
-		}
-
-		/**
-		 * Lists storage posts belonging to a room hash, including suffixed duplicates.
-		 *
-		 * @since 7.0.0
-		 *
-		 * @param string $room_hash MD5 hash of the room identifier.
-		 * @return array<int> Storage post IDs.
-		 */
-		private function get_storage_post_ids_for_room_hash( string $room_hash ): array {
-			global $wpdb;
-
-			$post_ids = $wpdb->get_col(
-				$wpdb->prepare(
-					"SELECT ID FROM {$wpdb->posts}
-					WHERE post_type = %s
-						AND post_status = 'publish'
-						AND ( post_name = %s OR post_name LIKE %s )
-					ORDER BY ID ASC",
-					self::POST_TYPE,
-					$room_hash,
-					$wpdb->esc_like( $room_hash . '-' ) . '%'
-				)
-			);
-
-			return array_map( 'intval', $post_ids );
 		}
 
 		/**
