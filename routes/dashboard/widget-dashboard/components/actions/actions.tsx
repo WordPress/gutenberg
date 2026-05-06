@@ -10,6 +10,7 @@ import { Button, Stack } from '@wordpress/ui';
  * Internal dependencies
  */
 import { useDashboardInternalContext } from '../../context/dashboard-context';
+import { useDashboardUIContext } from '../../context/ui-context';
 
 /**
  * Renders the dashboard's edit-mode toggle. Shows a "Customize" button while
@@ -24,23 +25,23 @@ import { useDashboardInternalContext } from '../../context/dashboard-context';
  */
 export function Actions(): React.ReactNode {
 	const { editMode, onEditChange } = useDashboardInternalContext();
+	const { setInserterOpen } = useDashboardUIContext();
 
 	const handleEditMode = useCallback( () => {
 		onEditChange?.( ! editMode );
 	}, [ editMode, onEditChange ] );
 
-	const handleInsertWidget = useCallback( () => {
-		// eslint-disable-next-line no-console
-		console.log( 'insert widget' ); // TODO: Implement widget insertion
-	}, [] );
+	const insert = useCallback( () => {
+		setInserterOpen( true );
+	}, [ setInserterOpen ] );
 
-	const handleCancel = useCallback( () => {
+	const cancel = useCallback( () => {
 		// eslint-disable-next-line no-console
 		console.log( 'cancel' ); // TODO: Implement cancel\
 		onEditChange?.( false );
 	}, [ onEditChange ] );
 
-	const handleDone = useCallback( () => {
+	const done = useCallback( () => {
 		// eslint-disable-next-line no-console
 		console.log( 'done' ); // TODO: Implement done
 		onEditChange?.( false );
@@ -58,23 +59,25 @@ export function Actions(): React.ReactNode {
 						variant="minimal"
 						tone="brand"
 						size="compact"
-						onClick={ handleInsertWidget }
+						onClick={ insert }
 					>
 						{ __( 'Add widgets' ) }
 					</Button>
+
 					<Button
 						variant="minimal"
 						tone="brand"
 						size="compact"
-						onClick={ handleCancel }
+						onClick={ cancel }
 					>
 						{ __( 'Cancel' ) }
 					</Button>
+
 					<Button
 						variant="solid"
 						tone="brand"
 						size="compact"
-						onClick={ handleDone }
+						onClick={ done }
 					>
 						{ __( 'Done' ) }
 					</Button>
