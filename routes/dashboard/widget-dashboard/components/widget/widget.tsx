@@ -15,7 +15,9 @@ import {
 	useMemo,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { Stack } from '@wordpress/ui';
+// Dashboard is still experimental.
+// eslint-disable-next-line @wordpress/use-recommended-components
+import { Card, Stack, Notice, Text } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -52,9 +54,12 @@ class WidgetErrorBoundary extends Component<
 					justify="center"
 					align="center"
 					className={ styles.error }
-					role="alert"
 				>
-					<p>{ __( 'This widget encountered an error.' ) }</p>
+					<Notice.Root intent="error">
+						<Notice.Description>
+							{ __( 'This widget encountered an error.' ) }
+						</Notice.Description>
+					</Notice.Root>
 				</Stack>
 			);
 		}
@@ -65,7 +70,7 @@ class WidgetErrorBoundary extends Component<
 function LoadingOverlay() {
 	return (
 		<Stack justify="center" align="center" className={ styles.loading }>
-			<span>{ __( 'Loading…' ) }</span>
+			<Text variant="body-md">{ __( 'Loading…' ) }</Text>
 		</Stack>
 	);
 }
@@ -80,21 +85,18 @@ function Header( { titleId, widgetType }: HeaderProps ) {
 		return null;
 	}
 	return (
-		<Stack
-			direction="row"
-			align="center"
-			gap="sm"
-			className={ styles.header }
-		>
-			{ widgetType.icon && (
-				<span className={ styles.headerIcon } aria-hidden="true">
-					<Icon icon={ widgetType.icon } />
-				</span>
-			) }
-			<h3 id={ titleId } className={ styles.headerTitle }>
-				{ widgetType.title }
-			</h3>
-		</Stack>
+		<Card.Header>
+			<Stack direction="row" align="center" gap="sm">
+				{ widgetType.icon && (
+					<span className={ styles.headerIcon } aria-hidden="true">
+						<Icon icon={ widgetType.icon } />
+					</span>
+				) }
+				<Card.Title id={ titleId } render={ <h3 /> }>
+					{ widgetType.title }
+				</Card.Title>
+			</Stack>
+		</Card.Header>
 	);
 }
 
@@ -130,22 +132,25 @@ export const Widget = forwardRef< HTMLDivElement, WidgetProps >(
 
 		return (
 			<WidgetContextProvider value={ contextValue }>
-				<section
+				<Card.Root
+					render={ <section /> }
 					ref={ ref }
 					className={ styles.widget }
 					aria-labelledby={ widgetType.title ? titleId : undefined }
 					{ ...( editMode ? { inert: '' } : {} ) }
 				>
 					<Header titleId={ titleId } widgetType={ widgetType } />
-					<WidgetErrorBoundary>
-						<Suspense fallback={ <LoadingOverlay /> }>
-							<WidgetRender
-								widget={ widget }
-								widgetType={ widgetType }
-							/>
-						</Suspense>
-					</WidgetErrorBoundary>
-				</section>
+					<Card.Content>
+						<WidgetErrorBoundary>
+							<Suspense fallback={ <LoadingOverlay /> }>
+								<WidgetRender
+									widget={ widget }
+									widgetType={ widgetType }
+								/>
+							</Suspense>
+						</WidgetErrorBoundary>
+					</Card.Content>
+				</Card.Root>
 			</WidgetContextProvider>
 		);
 	}
