@@ -12,6 +12,10 @@ export interface MediaEditorCanvasProps {
 	freeformCrop?: boolean;
 	/** Whether external placement activity should reveal the grid. */
 	isPlacementActive?: boolean;
+	/** Fires when a canvas cropper gesture begins. */
+	onGestureStart?: () => void;
+	/** Fires when a canvas cropper gesture ends. */
+	onGestureEnd?: () => void;
 }
 
 /**
@@ -25,11 +29,15 @@ export interface MediaEditorCanvasProps {
  * @param props.aspectRatio
  * @param props.freeformCrop
  * @param props.isPlacementActive
+ * @param props.onGestureStart
+ * @param props.onGestureEnd
  */
 export default function MediaEditorCanvas( {
 	aspectRatio,
 	freeformCrop,
 	isPlacementActive = false,
+	onGestureStart,
+	onGestureEnd,
 }: MediaEditorCanvasProps ) {
 	const { media } = useMediaEditorContext();
 	const controller = useCropper();
@@ -50,6 +58,17 @@ export default function MediaEditorCanvas( {
 				freeformCrop={ freeformCrop }
 				showGrid="interactive"
 				isPlacementActive={ isPlacementActive }
+				// Flush on gesture start so any pending sidebar interaction
+				// (e.g. zoom slider debounce) is committed as its own undo
+				// step before the canvas gesture begins.
+				onGestureStart={ () => {
+					onGestureStart?.();
+					controller.commitHistory();
+				} }
+				onGestureEnd={ () => {
+					controller.commitHistory();
+					onGestureEnd?.();
+				} }
 			/>
 		</div>
 	);

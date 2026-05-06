@@ -4,6 +4,29 @@
 
 ### Breaking Changes
 
+-   Remove the following entries from the `z-index()` helper ([#77753](https://github.com/WordPress/gutenberg/pull/77753), [#77759](https://github.com/WordPress/gutenberg/pull/77759), [#77772](https://github.com/WordPress/gutenberg/pull/77772), [#77806](https://github.com/WordPress/gutenberg/pull/77806), [#77807](https://github.com/WordPress/gutenberg/pull/77807), [#77808](https://github.com/WordPress/gutenberg/pull/77808)):
+    -   `.block-editor-block-manager__category-title`
+    -   `.block-editor-block-manager__disabled-blocks-count`
+    -   `.block-library-query-pattern__selection-search`
+    -   `.block-library-template-part__selection-search`
+    -   `.edit-site-layout__canvas-container.is-resizing::after`
+    -   `.edit-site-layout__canvas-container`
+    -   `.edit-site-layout__sidebar`
+    -   `.edit-site-sidebar-navigation-screen__title-icon`
+    -   `.edit-site-templates__dataviews-list-pagination`
+    -   `.editor-post-template__swap-template-search`
+    -   `.editor-start-page-options__modal__actions`
+    -   `.editor-start-template-options__modal__actions`
+    -   `.wp-block-cover__image-background`
+    -   `.wp-block-cover__inner-container`
+    -   `.wp-block-cover__video-background`
+    -   `.wp-block-cover.has-background-dim::before`
+    -   `.wp-block-cover.is-placeholder .components-placeholder.is-large`
+
+## 7.0.0 (2026-04-29)
+
+### Breaking Changes
+
 -   Remove the following entries from the `z-index()` helper ([#77619](https://github.com/WordPress/gutenberg/pull/77619), [#77620](https://github.com/WordPress/gutenberg/pull/77620), [#77621](https://github.com/WordPress/gutenberg/pull/77621), [#77714](https://github.com/WordPress/gutenberg/pull/77714), [#77715](https://github.com/WordPress/gutenberg/pull/77715), [#77717](https://github.com/WordPress/gutenberg/pull/77717), [#77774](https://github.com/WordPress/gutenberg/pull/77774)):
     -   `.block-editor-block-contextual-toolbar`
     -   `.block-editor-block-list__block {core/image aligned wide or fullwide}`
