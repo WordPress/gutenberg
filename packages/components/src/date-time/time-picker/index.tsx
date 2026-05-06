@@ -1,4 +1,3 @@
-import { startOfMinute } from 'date-fns';
 import { useState, useMemo, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { date as formatDate } from '@wordpress/date';
@@ -29,6 +28,23 @@ import { TimeInput } from './time-input';
 
 const VALID_DATE_ORDERS = [ 'dmy', 'mdy', 'ymd' ];
 
+/*
+ * Truncate to the start of the minute (see #15495). Avoids `date-fns`
+ * helpers that route through `toDate()` — in v4 that path constructs a
+ * new instance via `new input.constructor(value)`, which fails when
+ * combined with `@date-fns/utc`'s `UTCDateMini` and `timezone-mock`
+ * during tests. Setting seconds/ms directly on the UTCDateMini sticks
+ * to UTC because UTCDateMini's prototype shim reroutes setSeconds to
+ * setUTCSeconds.
+ */
+function truncateToMinute(
+	currentTime: Date | string | number | undefined
+): Date {
+	const date = inputToDate( currentTime ?? new Date() );
+	date.setSeconds( 0, 0 );
+	return date;
+}
+
 /**
  * TimePicker is a React component that renders form inputs for time and date selection. It can be used independently or as part of the `DateTimePicker` component.
  *
@@ -58,13 +74,13 @@ export function TimePicker( {
 }: TimePickerProps ) {
 	const [ date, setDate ] = useState( () =>
 		// Truncate the date at the minutes, see: #15495.
-		startOfMinute( inputToDate( currentTime ?? new Date() ) )
+		truncateToMinute( currentTime )
 	);
 
 	// Reset the state when currentTime changed.
 	// TODO: useEffect() shouldn't be used like this, causes an unnecessary render
 	useEffect( () => {
-		setDate( startOfMinute( inputToDate( currentTime ?? new Date() ) ) );
+		setDate( truncateToMinute( currentTime ) );
 	}, [ currentTime ] );
 
 	const monthOptions = [

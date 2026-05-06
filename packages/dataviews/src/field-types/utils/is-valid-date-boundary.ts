@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { isValid as isValidDate } from 'date-fns';
-
-/**
  * WordPress dependencies
  */
 import { getDate } from '@wordpress/date';
@@ -22,12 +17,12 @@ function parseDateLike( value?: string ) {
 
 	// Pre-check to avoid passing unparseable strings to getDate,
 	// which uses moment.js and emits deprecation warnings.
-	if ( ! isValidDate( new Date( value ) ) ) {
+	if ( isNaN( new Date( value ).valueOf() ) ) {
 		return null;
 	}
 
 	const parsed = getDate( value );
-	return parsed && isValidDate( parsed ) ? parsed : null;
+	return parsed && ! isNaN( parsed.valueOf() ) ? parsed : null;
 }
 
 function validateDateLikeBoundary< Item >(
