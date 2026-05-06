@@ -5,6 +5,7 @@
 ### Enhancements
 
 -   `Button`: Align `link` variant underline (offset and thickness) with `ExternalLink` and `Link` from `@wordpress/ui` ([#77842](https://github.com/WordPress/gutenberg/pull/77842)).
+-   `Text`: Use a theme-aware gray token for the muted variant ([#77999](https://github.com/WordPress/gutenberg/pull/77999)).
 
 ### Bug Fixes
 
