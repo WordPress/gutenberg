@@ -116,7 +116,7 @@ test.describe( 'User taxonomies', () => {
 		await admin.visitAdminPage( SETTINGS_PAGE_PATH, TAXONOMIES_PAGE_QUERY );
 
 		await page
-			.getByRole( 'row', { name: /Genres/ } )
+			.getByRole( 'row', { name: 'Genres' } )
 			.getByRole( 'button', { name: 'Actions' } )
 			.click();
 		await page.getByRole( 'menuitem', { name: 'Deactivate' } ).click();
@@ -125,7 +125,7 @@ test.describe( 'User taxonomies', () => {
 			'Taxonomy deactivated.'
 		);
 		await expect(
-			page.getByRole( 'row', { name: /Genres/ } ).getByText( 'Inactive' )
+			page.getByRole( 'row', { name: 'Genres' } ).getByText( 'Inactive' )
 		).toBeVisible();
 
 		// Unregistered taxonomies cause WP core to wp_die with "Invalid
@@ -138,7 +138,7 @@ test.describe( 'User taxonomies', () => {
 
 		await admin.visitAdminPage( SETTINGS_PAGE_PATH, TAXONOMIES_PAGE_QUERY );
 		await page
-			.getByRole( 'row', { name: /Genres/ } )
+			.getByRole( 'row', { name: 'Genres' } )
 			.getByRole( 'button', { name: 'Actions' } )
 			.click();
 		await page.getByRole( 'menuitem', { name: 'Activate' } ).click();
@@ -147,7 +147,7 @@ test.describe( 'User taxonomies', () => {
 			'Taxonomy activated.'
 		);
 		await expect(
-			page.getByRole( 'row', { name: /Genres/ } ).getByText( 'Active' )
+			page.getByRole( 'row', { name: 'Genres' } ).getByText( 'Active' )
 		).toBeVisible();
 
 		await admin.visitAdminPage(
@@ -191,9 +191,6 @@ test.describe( 'User taxonomies', () => {
 			await page
 				.getByRole( 'checkbox', { name: 'Show admin column' } )
 				.click();
-			await page
-				.getByRole( 'checkbox', { name: 'Publicly queryable' } )
-				.click();
 
 			await page.getByRole( 'button', { name: 'Save' } ).click();
 			await expect( page.getByTestId( 'snackbar' ).last() ).toContainText(
@@ -211,6 +208,15 @@ test.describe( 'User taxonomies', () => {
 					.filter( { hasText: 'Genres' } )
 					.first()
 			).toBeVisible();
+
+			// Confirm Posts is no longer attached. With `show_admin_column`
+			// enabled in this test, the column would still render on the
+			// posts list if the taxonomy were attached to `post` — its
+			// absence proves the detach.
+			await admin.visitAdminPage( 'edit.php', 'post_type=post' );
+			await expect(
+				page.getByRole( 'columnheader' ).filter( { hasText: 'Genres' } )
+			).toHaveCount( 0 );
 		} );
 
 		test( 'turning `Show in REST API` off blocks the taxonomy from the REST API', async ( {
@@ -235,9 +241,39 @@ test.describe( 'User taxonomies', () => {
 			expect( result.code ).toBe( 'rest_forbidden' );
 		} );
 
+		test( 'turning `Publicly queryable` off blocks the front-end term archive', async ( {
+			page,
+		} ) => {
+			// Sanity baseline: with publicly_queryable on (from the seed),
+			// WP::parse_request() routes the query vars through and 404s
+			// for an unknown term.
+			let response = await page.request.get(
+				'/?taxonomy=genre&term=missing'
+			);
+			expect( response.status() ).toBe( 404 );
+
+			await page.getByRole( 'button', { name: 'Visibility' } ).click();
+			await page
+				.getByRole( 'checkbox', { name: 'Publicly queryable' } )
+				.click();
+			await page.getByRole( 'button', { name: 'Save' } ).click();
+			await expect( page.getByTestId( 'snackbar' ).last() ).toContainText(
+				'"Genres" taxonomy updated.'
+			);
+
+			// With publicly_queryable off, WP::parse_request() unsets the
+			// taxonomy/term query vars, so the same URL falls through to
+			// the homepage (200) instead of resolving to a term archive.
+			response = await page.request.get(
+				'/?taxonomy=genre&term=missing'
+			);
+			expect( response.status() ).toBe( 200 );
+		} );
+
 		test( 'turning `Public` off does not cascade to `Show admin UI`', async ( {
 			admin,
 			page,
+			requestUtils,
 		} ) => {
 			await page.getByRole( 'button', { name: 'Visibility' } ).click();
 			await page
@@ -247,6 +283,13 @@ test.describe( 'User taxonomies', () => {
 			await expect( page.getByTestId( 'snackbar' ).last() ).toContainText(
 				'"Genres" taxonomy updated.'
 			);
+
+			// Confirm `public` actually flipped.
+			const registered = await requestUtils.rest( {
+				path: '/wp/v2/taxonomies/genre?context=edit',
+				method: 'GET',
+			} );
+			expect( registered.visibility.public ).toBe( false );
 
 			// `show_ui` should stay enabled even when `public` is off, so
 			// the term-management screen should still load.

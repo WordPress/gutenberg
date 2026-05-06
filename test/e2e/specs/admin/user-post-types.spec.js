@@ -8,17 +8,13 @@ const POST_TYPES_PAGE_QUERY = 'page=post-types-wp-admin';
 const POST_TYPES_REST_BASE = 'user-post-types';
 
 async function createUserPostType( requestUtils ) {
-	return requestUtils.rest( {
-		path: `/wp/v2/${ POST_TYPES_REST_BASE }`,
-		method: 'POST',
-		data: {
-			title: 'Books',
-			slug: 'book',
-			status: 'publish',
-			config: {
-				labels: { singular_name: 'Book' },
-				public: true, // mirrors the form's Create defaults
-			},
+	return requestUtils.createRecord( POST_TYPES_REST_BASE, {
+		title: 'Books',
+		slug: 'book',
+		status: 'publish',
+		config: {
+			labels: { singular_name: 'Book' },
+			public: true, // mirrors the form's Create defaults
 		},
 	} );
 }
@@ -88,7 +84,7 @@ test.describe( 'User post types', () => {
 		await admin.visitAdminPage( SETTINGS_PAGE_PATH, POST_TYPES_PAGE_QUERY );
 
 		await page
-			.getByRole( 'row', { name: /Books/ } )
+			.getByRole( 'row', { name: 'Books' } )
 			.getByRole( 'button', { name: 'Actions' } )
 			.click();
 		await page.getByRole( 'menuitem', { name: 'Deactivate' } ).click();
@@ -97,7 +93,7 @@ test.describe( 'User post types', () => {
 			'Post type deactivated.'
 		);
 		await expect(
-			page.getByRole( 'row', { name: /Books/ } ).getByText( 'Inactive' )
+			page.getByRole( 'row', { name: 'Books' } ).getByText( 'Inactive' )
 		).toBeVisible();
 
 		// Unregistered post types cause WP core to wp_die with "Invalid post
@@ -107,7 +103,7 @@ test.describe( 'User post types', () => {
 
 		await admin.visitAdminPage( SETTINGS_PAGE_PATH, POST_TYPES_PAGE_QUERY );
 		await page
-			.getByRole( 'row', { name: /Books/ } )
+			.getByRole( 'row', { name: 'Books' } )
 			.getByRole( 'button', { name: 'Actions' } )
 			.click();
 		await page.getByRole( 'menuitem', { name: 'Activate' } ).click();
@@ -116,7 +112,7 @@ test.describe( 'User post types', () => {
 			'Post type activated.'
 		);
 		await expect(
-			page.getByRole( 'row', { name: /Books/ } ).getByText( 'Active' )
+			page.getByRole( 'row', { name: 'Books' } ).getByText( 'Active' )
 		).toBeVisible();
 
 		await admin.visitAdminPage( 'edit.php', 'post_type=book' );
@@ -161,7 +157,7 @@ test.describe( 'User post types', () => {
 		await admin.createNewPost( { postType: 'book' } );
 		await editor.openDocumentSettingsSidebar();
 		await expect(
-			page.getByText( 'Parent', { exact: true } )
+			page.getByRole( 'button', { name: /Change parent:/ } )
 		).toBeVisible();
 		await expect(
 			page.getByRole( 'button', { name: 'Categories' } )
