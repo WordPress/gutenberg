@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ToolsPanel, ToolsPanelContext, ToolsPanelItem } from '../';
 import { createSlotFill, Provider as SlotFillProvider } from '../../slot-fill';
@@ -851,6 +851,51 @@ describe( 'ToolsPanel', () => {
 	describe( 'callbacks on menu item selection', () => {
 		beforeEach( () => {
 			jest.clearAllMocks();
+		} );
+
+		it( 'should call onVisibilityChange with shown and hidden item labels', async () => {
+			const onVisibilityChange = jest.fn();
+
+			render(
+				<ToolsPanel
+					{ ...defaultProps }
+					onVisibilityChange={ onVisibilityChange }
+				>
+					<ToolsPanelItem { ...controlProps }>
+						<div>Example control</div>
+					</ToolsPanelItem>
+					<ToolsPanelItem { ...altControlProps }>
+						<div>Alt control</div>
+					</ToolsPanelItem>
+				</ToolsPanel>
+			);
+
+			// Initially, the default item is visible but the optional Alt item is not.
+			expect( screen.getByText( 'Example control' ) ).toBeInTheDocument();
+			expect(
+				screen.queryByText( 'Alt control' )
+			).not.toBeInTheDocument();
+
+			await waitFor( () => {
+				expect( onVisibilityChange ).toHaveBeenCalledWith( {
+					shown: [ 'Example' ],
+					hidden: [ 'Alt' ],
+				} );
+			} );
+
+			// Toggle Alt on via the dropdown menu.
+			await openDropdownMenu();
+			await selectMenuItem( altControlProps.label );
+
+			// After toggling on, Alt control should now be visible in the DOM.
+			expect( screen.getByText( 'Alt control' ) ).toBeInTheDocument();
+
+			await waitFor( () => {
+				expect( onVisibilityChange ).toHaveBeenLastCalledWith( {
+					shown: [ 'Example', 'Alt' ],
+					hidden: [],
+				} );
+			} );
 		} );
 
 		it( 'should call onDeselect callback when menu item is toggled off', async () => {

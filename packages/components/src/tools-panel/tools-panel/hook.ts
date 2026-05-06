@@ -249,6 +249,7 @@ export function useToolsPanel(
 		className,
 		headingLevel = 2,
 		resetAll,
+		onVisibilityChange,
 		panelId,
 		hasInnerWrapper = false,
 		shouldRenderPlaceholderItems = false,
@@ -378,6 +379,30 @@ export function useToolsPanel(
 	);
 
 	const hasMenuItems = panelItems.length > 0;
+
+	useEffect( () => {
+		if ( ! onVisibilityChange ) {
+			return;
+		}
+
+		const shown: string[] = [];
+		const hidden: string[] = [];
+
+		panelItems.forEach( ( item ) => {
+			const isShown = item.isShownByDefault
+				? menuItems.default[ item.label ] !== undefined
+				: !! menuItems.optional[ item.label ];
+
+			if ( isShown ) {
+				shown.push( item.label );
+				return;
+			}
+
+			hidden.push( item.label );
+		} );
+
+		onVisibilityChange( { shown, hidden } );
+	}, [ menuItems, onVisibilityChange, panelItems ] );
 
 	const panelContext = useMemo(
 		() => ( {
