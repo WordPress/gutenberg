@@ -2196,7 +2196,7 @@ describe( 'state', () => {
 					expect( state.isPersistentChange ).toBe( true );
 				} );
 
-				it( 'should flag the next change as not persistent', () => {
+				it( 'should flag only the next change as not persistent', () => {
 					let original = deepFreeze(
 						blocks( undefined, {
 							type: 'RESET_BLOCKS',
@@ -2213,7 +2213,7 @@ describe( 'state', () => {
 						type: 'MARK_NEXT_CHANGE_AS_NOT_PERSISTENT',
 					} );
 
-					const state = blocks( original, {
+					const nextState = blocks( original, {
 						type: 'UPDATE_BLOCK_ATTRIBUTES',
 						clientIds: [ 'kumquat' ],
 						attributes: {
@@ -2221,7 +2221,18 @@ describe( 'state', () => {
 						},
 					} );
 
-					expect( state.isPersistentChange ).toBe( false );
+					expect( nextState.isPersistentChange ).toBe( false );
+
+					// A subsequent change should revert to persistent.
+					const subsequentState = blocks( nextState, {
+						type: 'UPDATE_BLOCK_ATTRIBUTES',
+						clientIds: [ 'kumquat' ],
+						attributes: {
+							other: true,
+						},
+					} );
+
+					expect( subsequentState.isPersistentChange ).toBe( true );
 				} );
 
 				it( 'should retain reference for same state, same persistence', () => {
