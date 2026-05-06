@@ -80,6 +80,7 @@ function gutenberg_inject_dashboard_default_layout( $value, $user_id, $meta_key 
 	if ( ! isset( $base[ GUTENBERG_DASHBOARD_LAYOUT_SCOPE ] ) || ! is_array( $base[ GUTENBERG_DASHBOARD_LAYOUT_SCOPE ] ) ) {
 		$base[ GUTENBERG_DASHBOARD_LAYOUT_SCOPE ] = array();
 	}
+
 	$base[ GUTENBERG_DASHBOARD_LAYOUT_SCOPE ][ GUTENBERG_DASHBOARD_LAYOUT_KEY ] = $default;
 
 	return array( $base );
