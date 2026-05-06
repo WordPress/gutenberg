@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Query Loop Block: Allow default queries to override items per page.
+
 ## 9.45.0 (2026-04-29)
 
 ## 9.44.0 (2026-04-15)

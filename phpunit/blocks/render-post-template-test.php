@@ -216,4 +216,48 @@ END;
 
 		$this->assertSame( $expected, $output, 'Unexpected parsed post content' );
 	}
+
+	/**
+	 * Tests that an inherited Query block can override the number of posts
+	 * rendered by the default query.
+	 *
+	 * @ticket 77886
+	 */
+	public function test_rendering_post_template_with_inherited_query_per_page() {
+		global $wp_query, $wp_the_query;
+
+		$content  = '<!-- wp:query {"query":{"inherit":true,"perPage":1}} -->';
+		$content .= '<!-- wp:post-template {"align":"wide"} -->';
+		$content .= '<!-- wp:post-title /-->';
+		$content .= '<!-- /wp:post-template -->';
+		$content .= '<!-- /wp:query -->';
+
+		$wp_query     = new WP_Query(
+			array(
+				'post_type'      => 'post',
+				'posts_per_page' => 10,
+				'orderby'        => 'ID',
+				'order'          => 'DESC',
+			)
+		);
+		$wp_the_query = $wp_query;
+
+		$output = do_blocks( $content );
+
+		$this->assertSame(
+			1,
+			substr_count( $output, '<li class="wp-block-post' ),
+			'Only one post should be rendered.'
+		);
+		$this->assertStringContainsString(
+			self::$other_post->post_title,
+			$output,
+			'The inherited query should preserve the global query parameters.'
+		);
+		$this->assertStringNotContainsString(
+			self::$post->post_title,
+			$output,
+			'The inherited query per-page override should limit rendered posts.'
+		);
+	}
 }

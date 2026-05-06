@@ -13,9 +13,10 @@ By registering your own block variation with some specific Query Loop block sett
 With the block variations API you can provide the default settings that make the most sense for your use-case.
 
 In order to have a Query Loop variation properly working, we'll need to:
-- Register the block variation for the `core/query` block with some default values
-- Define a layout for the block variation
-- Use the `namespace` attribute in the `isActive` block variation property
+
+-   Register the block variation for the `core/query` block with some default values
+-   Define a layout for the block variation
+-   Use the `namespace` attribute in the `isActive` block variation property
 
 Let's go on a journey, for example, of setting up a variation for a plugin which registers a `book` [custom post type](https://developer.wordpress.org/plugins/post-types/).
 
@@ -275,6 +276,8 @@ Currently, you'll likely have to implement slightly different paths to make the 
 ### Making your custom query work on the front-end side
 
 The Query Loop block functions mainly through the Post Template block which receives the attributes and builds the query from there. Other first-class children of the Query Loop block (such as the Pagination block) behave in the same way. They build their query and then expose the result via the filter [`query_loop_block_query_vars`](https://developer.wordpress.org/reference/hooks/query_loop_block_query_vars/).
+
+When a Query Loop uses the default query type, it still inherits the current template query context, but the `perPage` query value can override how many posts are displayed by that Query Loop. This is useful for archive templates that should keep the archive constraints, such as the current author or taxonomy term, while displaying fewer posts than the site's reading setting.
 
 You can hook into that filter and modify your query accordingly. Just make sure you don't cause side-effects to other Query Loop blocks by at least checking that you apply the filter only to your variation!
 
