@@ -1,0 +1,6 @@
+{
+	"name": "core/welcome",
+	"title": "Welcome",
+	"description": "Displays an introduction to WordPress with links to key admin areas.",
+	"category": "dashboard"
+}
