@@ -131,6 +131,19 @@ const embeddedContentSchema = {
 };
 
 /**
+ * <a> uses the transparent content model. The spec disallows interactive
+ * content descendants, which excludes most embedded elements (e.g. <embed>,
+ * <object>, <audio controls>, <video controls>). Of the embedded set, <img>
+ * is the common non-interactive case worth allowing here.
+ *
+ * @see https://html.spec.whatwg.org/multipage/text-level-semantics.html#the-a-element
+ */
+textContentSchema.a.children = {
+	.../** @type {ContentSchema} */ ( textContentSchema.a.children ),
+	img: embeddedContentSchema.img,
+};
+
+/**
  * Phrasing content elements.
  *
  * @see https://www.w3.org/TR/2011/WD-html5-20110525/content-models.html#phrasing-content-0
