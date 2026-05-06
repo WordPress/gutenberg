@@ -116,15 +116,6 @@ function CustomSelect(
 
 	const contextValue = useMemo( () => ( { store, size } ), [ store, size ] );
 
-	// The legacy adapter historically disabled flipping to mask a stacking
-	// context glitch with the block toolbar (see #63180/#63357). That
-	// workaround is only needed when the popover renders inline; once
-	// portaled, it escapes ancestor stacking contexts and Floating UI's
-	// default flipping is the right behavior (also fixes #76126). The
-	// non-inline branch sets `true` explicitly rather than relying on
-	// Ariakit's default, so the behavior can't drift in future updates.
-	const flip = isLegacy && ! portal ? false : true;
-
 	return (
 		// Where should `restProps` be forwarded to?
 		<div className={ className }>
@@ -160,7 +151,7 @@ function CustomSelect(
 					sameWidth
 					slide={ false }
 					onKeyDown={ onSelectPopoverKeyDown }
-					flip={ flip }
+					flip
 					portal={ portal }
 					portalElement={ portalElement }
 				>
