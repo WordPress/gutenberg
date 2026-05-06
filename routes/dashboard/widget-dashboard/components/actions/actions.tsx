@@ -60,7 +60,7 @@ export function Actions(): React.ReactNode {
 						size="compact"
 						onClick={ handleInsertWidget }
 					>
-						{ __( 'Add Widgets' ) }
+						{ __( 'Add widgets' ) }
 					</Button>
 					<Button
 						variant="minimal"
