@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import clsx from 'clsx';
 import type { CSSProperties, KeyboardEvent } from 'react';
 
 /**
@@ -14,16 +15,37 @@ import { useId, useMemo, useRef } from '@wordpress/element';
 import { useRulerDrag, clampValue } from './use-ruler-drag';
 
 export interface RotationRulerProps {
+	/** Current value. */
 	value: number;
+	/** Called with the next value on each change. */
 	onChange: ( value: number ) => void;
+	/** Lower bound of the range. Default: -45. */
 	min?: number;
+	/** Upper bound of the range. Default: 45. */
 	max?: number;
+	/**
+	 * Value step for drag and keyboard arrows. Default: 1. Drag values
+	 * are quantized to multiples of `step`. Holding Shift during drag
+	 * or with arrow keys halves the step for precision adjustment.
+	 */
 	step?: number;
+	/** Accessible label for the slider input. */
 	label: string;
+	/**
+	 * Unit suffix shown in the active label and `aria-valuetext`.
+	 * Default: `°`.
+	 */
 	unit?: string;
+	/** CSS pixels of pointer travel per `step`. Default: 6. */
 	pixelsPerStep?: number;
+	/** Optional extra class for the wrapper. */
 	className?: string;
+	/**
+	 * Optional id for the underlying input; auto-generated when
+	 * omitted.
+	 */
 	id?: string;
+	/** When true, ignores all input. */
 	disabled?: boolean;
 }
 
@@ -86,39 +108,22 @@ function formatValue( value: number ): string {
  * technologies and keyboard input alongside a decorative tick strip
  * that the user can drag with a pointer.
  *
- * @param props               Component props.
- * @param props.value         Current value.
- * @param props.onChange      Called with the next value on each change.
- * @param props.min           Lower bound of the range (default: -45).
- * @param props.max           Upper bound of the range (default: 45).
- * @param props.step          Value step for drag and keyboard arrows
- *                            (default: 1). Drag values are quantized to
- *                            multiples of `step`. Holding Shift during
- *                            drag or with arrow keys halves the step
- *                            for precision adjustment.
- * @param props.label         Accessible label for the slider input.
- * @param props.unit          Unit suffix shown in the active label and
- *                            `aria-valuetext` (default: `°`).
- * @param props.pixelsPerStep CSS pixels of pointer travel per `step`
- *                            (default: 6).
- * @param props.className     Optional extra class for the wrapper.
- * @param props.id            Optional id for the underlying input;
- *                            auto-generated when omitted.
- * @param props.disabled      When true, ignores all input.
+ * @param props Component props. See `RotationRulerProps`.
  */
-export default function RotationRuler( {
-	value,
-	onChange,
-	min = -45,
-	max = 45,
-	step = 1,
-	label,
-	unit = '°',
-	pixelsPerStep = 6,
-	className,
-	id,
-	disabled = false,
-}: RotationRulerProps ) {
+export default function RotationRuler( props: RotationRulerProps ) {
+	const {
+		value,
+		onChange,
+		min = -45,
+		max = 45,
+		step = 1,
+		label,
+		unit = '°',
+		pixelsPerStep = 6,
+		className,
+		id,
+		disabled = false,
+	} = props;
 	const inputRef = useRef< HTMLInputElement >( null );
 	const generatedId = useId();
 	const inputId = id ?? generatedId;
@@ -191,13 +196,9 @@ export default function RotationRuler( {
 	const activeText = onMajor ? `${ closestMajor }${ unit }` : display;
 	const majorTicks = ticks.filter( ( tick ) => tick.kind === 'major' );
 
-	const wrapperClassName = [ 'rotation-ruler', className ]
-		.filter( Boolean )
-		.join( ' ' );
-
 	return (
 		<div
-			className={ wrapperClassName }
+			className={ clsx( 'rotation-ruler', className ) }
 			role="presentation"
 			data-disabled={ disabled || undefined }
 			{ ...dragHandlers }

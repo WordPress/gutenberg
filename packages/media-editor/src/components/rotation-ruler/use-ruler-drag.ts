@@ -75,8 +75,11 @@ export interface RulerDragHandlers {
  *
  * The hook owns no state of its own — every value change is reported
  * through the supplied `onChange`. The "current value" is read from a
- * ref so closure staleness during a drag is impossible. The drag ends
- * automatically if the pointer leaves the wrapper's bounds.
+ * ref so closure staleness during a drag is impossible. Drag continues
+ * past the wrapper's bounds (standard slider behaviour); a window-level
+ * `pointerup` listener guarantees the drag ends and pointer capture
+ * releases even if the underlying captured event never fires on the
+ * wrapper.
  *
  * @param options Ruler-drag configuration. See `UseRulerDragOptions`.
  */
