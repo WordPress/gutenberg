@@ -955,92 +955,6 @@ function pickStyleAndPseudoKeys(
 	return Object.fromEntries( clonedEntries );
 }
 
-function appendPseudoSelectorStyles(
-	styles: Record< string, any >,
-	selector: string,
-	ruleset: string,
-	featureSelectors:
-		| string
-		| Record< string, string | Record< string, string > >
-		| undefined,
-	treeSettings: Record< string, any > | undefined,
-	blockName: string | undefined,
-	styleVariationSelector?: string
-): string {
-	const pseudoSelectorStyles = Object.entries( styles ).filter( ( [ key ] ) =>
-		key.startsWith( ':' )
-	);
-
-	if ( ! pseudoSelectorStyles.length ) {
-		return ruleset;
-	}
-
-	pseudoSelectorStyles.forEach( ( [ pseudoKey, pseudoStyle ] ) => {
-		if ( ! pseudoStyle || typeof pseudoStyle !== 'object' ) {
-			return;
-		}
-
-		const remainingPseudoStyles = JSON.parse(
-			JSON.stringify( pseudoStyle )
-		);
-
-		if ( featureSelectors && typeof featureSelectors !== 'string' ) {
-			let pseudoFeatureDeclarations = getFeatureDeclarations(
-				featureSelectors,
-				remainingPseudoStyles
-			);
-
-			pseudoFeatureDeclarations = updateParagraphTextIndentSelector(
-				pseudoFeatureDeclarations,
-				treeSettings,
-				blockName
-			);
-
-			pseudoFeatureDeclarations = updateButtonWidthDeclarations(
-				pseudoFeatureDeclarations,
-				treeSettings
-			);
-
-			Object.entries( pseudoFeatureDeclarations ).forEach(
-				( [ baseSelector, declarations ] ) => {
-					if ( ! declarations.length ) {
-						return;
-					}
-					const pseudoFeatureSelector = appendToSelector(
-						baseSelector,
-						pseudoKey
-					);
-					const cssSelector = styleVariationSelector
-						? concatFeatureVariationSelectorString(
-								pseudoFeatureSelector,
-								styleVariationSelector
-						  )
-						: pseudoFeatureSelector;
-					const rules = declarations.join( ';' );
-					ruleset += `:root :where(${ cssSelector }){${ rules };}`;
-				}
-			);
-		}
-
-		const pseudoDeclarations = getStylesDeclarations(
-			remainingPseudoStyles
-		);
-
-		if ( ! pseudoDeclarations.length ) {
-			return;
-		}
-
-		const pseudoSelector = appendToSelector( selector, pseudoKey );
-		const pseudoRule = `:root :where(${ pseudoSelector }){${ pseudoDeclarations.join(
-			';'
-		) };}`;
-
-		ruleset += pseudoRule;
-	} );
-
-	return ruleset;
-}
-
 /**
  * Creates style nodes for configured block and element pseudo selectors.
  *
@@ -1121,139 +1035,6 @@ function getResponsiveStyleNodes( node: StylesNode ): StylesNode[] {
 			];
 		}
 	);
-}
-
-/**
- * Appends CSS rules for responsive breakpoint states to a ruleset string.
- * Block styles stored under responsive keys (for example, 'mobile' and
- * 'tablet') are wrapped in corresponding media queries instead of being
- * appended directly to the selector.
- *
- * @param styles                 The styles object potentially containing responsive keys.
- * @param selector               The base CSS selector for the block.
- * @param ruleset                The accumulating CSS ruleset string.
- * @param featureSelectors       Optional feature-level selectors for the block.
- * @param treeSettings           Global styles settings tree.
- * @param blockName              Optional block name used to resolve valid pseudo selectors.
- * @param styleVariationSelector Optional style variation selector.
- * @param blockRootSelector      Optional block root selector used to detect block-level feature selectors.
- * @param styleVariationName     Optional variation name used when applying variation class to block-level feature selectors.
- * @return Updated ruleset string with responsive base, feature-level, and pseudo-state CSS appended.
- */
-function appendResponsiveStyles(
-	styles: Record< string, any >,
-	selector: string,
-	ruleset: string,
-	featureSelectors:
-		| string
-		| Record< string, string | Record< string, string > >
-		| undefined,
-	treeSettings: Record< string, any > | undefined,
-	blockName?: string,
-	styleVariationSelector?: string,
-	blockRootSelector?: string,
-	styleVariationName?: string
-): string {
-	const responsiveStyles = Object.entries( styles ).filter(
-		( [ key ] ) => RESPONSIVE_BREAKPOINTS[ key ]
-	);
-
-	if ( ! responsiveStyles.length ) {
-		return ruleset;
-	}
-
-	responsiveStyles.forEach( ( [ breakpointKey, breakpointStyle ] ) => {
-		if ( ! breakpointStyle || typeof breakpointStyle !== 'object' ) {
-			return;
-		}
-
-		const mediaQuery = RESPONSIVE_BREAKPOINTS[ breakpointKey ];
-		const remainingBreakpointStyles = JSON.parse(
-			JSON.stringify( breakpointStyle )
-		);
-
-		if ( featureSelectors && typeof featureSelectors !== 'string' ) {
-			let breakpointFeatureDeclarations = getFeatureDeclarations(
-				featureSelectors,
-				remainingBreakpointStyles
-			);
-
-			breakpointFeatureDeclarations = updateParagraphTextIndentSelector(
-				breakpointFeatureDeclarations,
-				treeSettings,
-				blockName
-			);
-
-			breakpointFeatureDeclarations = updateButtonWidthDeclarations(
-				breakpointFeatureDeclarations,
-				treeSettings
-			);
-
-			Object.entries( breakpointFeatureDeclarations ).forEach(
-				( [ baseSelector, declarations ] ) => {
-					if ( ! declarations.length ) {
-						return;
-					}
-					let cssSelector: string;
-					if ( ! styleVariationSelector ) {
-						cssSelector = baseSelector;
-					} else if (
-						blockRootSelector &&
-						styleVariationName &&
-						! baseSelector.includes( blockRootSelector )
-					) {
-						/*
-						 * Feature selector is block-level (e.g. `.wp-block-button` for
-						 * dimensions/width) — apply the variation class directly to it.
-						 */
-						cssSelector = getBlockStyleVariationSelector(
-							styleVariationName,
-							baseSelector
-						);
-					} else {
-						cssSelector = concatFeatureVariationSelectorString(
-							baseSelector,
-							styleVariationSelector
-						);
-					}
-					const rules = declarations.join( ';' );
-					ruleset += `${ mediaQuery }{:root :where(${ cssSelector }){${ rules };}}`;
-				}
-			);
-		}
-
-		const breakpointDeclarations = getStylesDeclarations(
-			remainingBreakpointStyles
-		);
-
-		if ( breakpointDeclarations.length ) {
-			const cssSelector = styleVariationSelector
-				? concatFeatureVariationSelectorString(
-						selector,
-						styleVariationSelector
-				  )
-				: selector;
-			ruleset += `${ mediaQuery }{:root :where(${ cssSelector }){${ breakpointDeclarations.join(
-				';'
-			) };}}`;
-		}
-
-		const breakpointPseudoRules = appendPseudoSelectorStyles(
-			remainingBreakpointStyles,
-			selector,
-			'',
-			featureSelectors,
-			treeSettings,
-			blockName,
-			styleVariationSelector
-		);
-
-		if ( breakpointPseudoRules ) {
-			ruleset += `${ mediaQuery }{${ breakpointPseudoRules }}`;
-		}
-	} );
-
-	return ruleset;
 }
 
 export const getNodesWithStyles = (
@@ -1987,6 +1768,7 @@ function renderStylesNode(
 			selector,
 			featureSelectors,
 			name,
+			elementName,
 		} );
 		if ( blockPseudoNodes.length ) {
 			blockPseudoNodes.forEach( ( pseudoNode ) => {
@@ -2000,15 +1782,6 @@ function renderStylesNode(
 					disableRootPadding,
 				} );
 			} );
-		} else {
-			ruleset = appendPseudoSelectorStyles(
-				styles,
-				selector,
-				ruleset,
-				featureSelectors,
-				tree.settings,
-				name
-			);
 		}
 
 		const blockResponsiveNodes = getResponsiveStyleNodes( {
@@ -2030,15 +1803,6 @@ function renderStylesNode(
 					disableRootPadding,
 				} );
 			} );
-		} else {
-			ruleset = appendResponsiveStyles(
-				styles,
-				selector,
-				ruleset,
-				featureSelectors,
-				tree.settings,
-				name
-			);
 		}
 	}
 

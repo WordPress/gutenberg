@@ -777,6 +777,43 @@ describe( 'global styles renderer', () => {
 			);
 		} );
 
+		it( 'ignores root-level state styles', () => {
+			const tree = {
+				styles: {
+					color: {
+						text: 'red',
+					},
+					':hover': {
+						color: {
+							text: 'blue',
+						},
+					},
+					mobile: {
+						color: {
+							text: 'green',
+						},
+						':hover': {
+							color: {
+								text: 'yellow',
+							},
+						},
+					},
+				},
+			} as unknown as GlobalStylesConfig;
+
+			const result = transformToStyles(
+				Object.freeze( tree ),
+				{},
+				false,
+				false,
+				true,
+				true,
+				minimalStyleOptions
+			);
+
+			expect( result ).toEqual( 'body{color: red;}' );
+		} );
+
 		it( 'should handle style variation pseudo selectors', () => {
 			const tree = {
 				styles: {
