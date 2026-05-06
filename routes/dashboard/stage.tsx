@@ -40,7 +40,6 @@ function Dashboard() {
 		>
 			<Page
 				title={ __( 'Dashboard' ) }
-				headingLevel={ 1 }
 				actions={ <WidgetDashboard.Actions /> }
 			>
 				<WidgetDashboard.Widgets />
