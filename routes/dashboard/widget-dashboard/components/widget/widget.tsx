@@ -6,7 +6,14 @@ import type { ReactNode } from 'react';
 /**
  * WordPress dependencies
  */
-import { Component, Suspense, forwardRef, useMemo } from '@wordpress/element';
+import { Icon } from '@wordpress/components';
+import {
+	Component,
+	Suspense,
+	forwardRef,
+	useId,
+	useMemo,
+} from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { Stack } from '@wordpress/ui';
 
@@ -17,7 +24,7 @@ import { useDashboardInternalContext } from '../../context/dashboard-context';
 import { WidgetContextProvider } from '../../context/widget-context';
 import { WidgetRender } from '../widget-render';
 import styles from './widget.module.css';
-import type { DashboardWidget } from '../../types';
+import type { DashboardWidget, WidgetType } from '../../types';
 
 interface ErrorBoundaryProps {
 	children: ReactNode;
@@ -63,6 +70,34 @@ function LoadingOverlay() {
 	);
 }
 
+interface HeaderProps {
+	titleId: string;
+	widgetType: WidgetType;
+}
+
+function Header( { titleId, widgetType }: HeaderProps ) {
+	if ( ! widgetType.title ) {
+		return null;
+	}
+	return (
+		<Stack
+			direction="row"
+			align="center"
+			gap="sm"
+			className={ styles.header }
+		>
+			{ widgetType.icon && (
+				<span className={ styles.headerIcon } aria-hidden="true">
+					<Icon icon={ widgetType.icon } />
+				</span>
+			) }
+			<h3 id={ titleId } className={ styles.headerTitle }>
+				{ widgetType.title }
+			</h3>
+		</Stack>
+	);
+}
+
 export interface WidgetProps {
 	widget: DashboardWidget< unknown >;
 	index: number;
@@ -70,13 +105,15 @@ export interface WidgetProps {
 
 /**
  * Per-instance wrapper. Owns the chrome around a widget instance: identity
- * context, edit-mode `inert` attribute, and the error/loading boundaries that
- * keep neighbours mounted when one widget fails or is still resolving.
+ * context, header (title + icon), edit-mode `inert` attribute, and the
+ * error/loading boundaries that keep neighbours mounted when one widget fails
+ * or is still resolving.
  */
 export const Widget = forwardRef< HTMLDivElement, WidgetProps >(
 	function Widget( { widget, index }, ref ) {
 		const { widgetTypes, editMode } = useDashboardInternalContext();
 		const widgetType = widgetTypes.find( ( t ) => t.name === widget.type );
+		const titleId = useId();
 
 		const contextValue = useMemo(
 			() => ( {
@@ -93,11 +130,13 @@ export const Widget = forwardRef< HTMLDivElement, WidgetProps >(
 
 		return (
 			<WidgetContextProvider value={ contextValue }>
-				<div
+				<section
 					ref={ ref }
 					className={ styles.widget }
+					aria-labelledby={ widgetType.title ? titleId : undefined }
 					{ ...( editMode ? { inert: '' } : {} ) }
 				>
+					<Header titleId={ titleId } widgetType={ widgetType } />
 					<WidgetErrorBoundary>
 						<Suspense fallback={ <LoadingOverlay /> }>
 							<WidgetRender
@@ -106,7 +145,7 @@ export const Widget = forwardRef< HTMLDivElement, WidgetProps >(
 							/>
 						</Suspense>
 					</WidgetErrorBoundary>
-				</div>
+				</section>
 			</WidgetContextProvider>
 		);
 	}
