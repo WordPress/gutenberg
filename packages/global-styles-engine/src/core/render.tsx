@@ -1511,7 +1511,6 @@ export const generateCustomProperties = (
  * @param context.hasBlockGapSupport    Whether block gap support is enabled.
  * @param context.hasFallbackGapSupport Whether fallback gap support is enabled.
  * @param context.disableRootPadding    Whether root padding declarations are disabled.
- * @param context.includeStateStyles    Whether nested state styles should be rendered.
  * @return Rendered CSS rules for the node.
  */
 function renderStylesNode(
@@ -1524,7 +1523,6 @@ function renderStylesNode(
 		hasBlockGapSupport,
 		hasFallbackGapSupport,
 		disableRootPadding,
-		includeStateStyles = true,
 	}: {
 		tree: GlobalStylesConfig;
 		options: Record< string, boolean >;
@@ -1533,7 +1531,6 @@ function renderStylesNode(
 		hasBlockGapSupport?: boolean;
 		hasFallbackGapSupport?: boolean;
 		disableRootPadding: boolean;
-		includeStateStyles?: boolean;
 	}
 ): string {
 	const {
@@ -1639,11 +1636,7 @@ function renderStylesNode(
 		);
 	}
 
-	if (
-		includeStateStyles &&
-		options.variationStyles &&
-		styleVariationSelectors
-	) {
+	if ( options.variationStyles && styleVariationSelectors ) {
 		Object.entries( styleVariationSelectors ).forEach(
 			( [ styleVariationName, styleVariationSelector ] ) => {
 				const styleVariations =
@@ -1720,7 +1713,6 @@ function renderStylesNode(
 							hasBlockGapSupport,
 							hasFallbackGapSupport,
 							disableRootPadding,
-							includeStateStyles: false,
 						} );
 					} );
 
@@ -1762,43 +1754,41 @@ function renderStylesNode(
 		);
 	}
 
-	if ( includeStateStyles ) {
-		getPseudoStyleNodes( {
-			styles,
-			selector,
-			featureSelectors,
-			name,
-			elementName,
-		} ).forEach( ( pseudoNode ) => {
-			ruleset += renderStylesNode( pseudoNode, {
-				tree,
-				options,
-				useRootPaddingAlign,
-				disableLayoutStyles: true,
-				hasBlockGapSupport,
-				hasFallbackGapSupport,
-				disableRootPadding,
-			} );
+	getPseudoStyleNodes( {
+		styles,
+		selector,
+		featureSelectors,
+		name,
+		elementName,
+	} ).forEach( ( pseudoNode ) => {
+		ruleset += renderStylesNode( pseudoNode, {
+			tree,
+			options,
+			useRootPaddingAlign,
+			disableLayoutStyles: true,
+			hasBlockGapSupport,
+			hasFallbackGapSupport,
+			disableRootPadding,
 		} );
+	} );
 
-		getResponsiveStyleNodes( {
-			styles,
-			selector,
-			featureSelectors,
-			name,
-			elementName,
-		} ).forEach( ( responsiveNode ) => {
-			ruleset += renderStylesNode( responsiveNode, {
-				tree,
-				options,
-				useRootPaddingAlign,
-				disableLayoutStyles: true,
-				hasBlockGapSupport,
-				hasFallbackGapSupport,
-				disableRootPadding,
-			} );
+	getResponsiveStyleNodes( {
+		styles,
+		selector,
+		featureSelectors,
+		name,
+		elementName,
+	} ).forEach( ( responsiveNode ) => {
+		ruleset += renderStylesNode( responsiveNode, {
+			tree,
+			options,
+			useRootPaddingAlign,
+			disableLayoutStyles: true,
+			hasBlockGapSupport,
+			hasFallbackGapSupport,
+			disableRootPadding,
 		} );
-	}
+	} );
 
 	if ( mediaQuery && ruleset ) {
 		return `${ mediaQuery }{${ ruleset }}`;
