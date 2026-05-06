@@ -221,6 +221,7 @@
 		}
 
 		.dataviews-filters__search-widget-listitem-multi-selection {
+			border-color: var(--wpds-color-stroke-interactive-brand-active);
 			background: var(--wpds-color-bg-surface-neutral-strong);
 
 			&.is-selected {
