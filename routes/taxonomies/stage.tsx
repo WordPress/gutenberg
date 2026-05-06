@@ -7,7 +7,9 @@ import { DataViews, type View } from '@wordpress/dataviews';
 import { useEntityRecords } from '@wordpress/core-data';
 import { useMemo, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { customPostType, search } from '@wordpress/icons';
 import { useNavigate } from '@wordpress/route';
+import { EmptyState } from '@wordpress/ui';
 import {
 	hierarchicalField,
 	publicField,
@@ -41,6 +43,24 @@ const DEFAULT_VIEW: View = {
 	titleField: 'title',
 	layout: {},
 };
+
+function TaxonomiesEmptyState( { hasSearch }: { hasSearch: boolean } ) {
+	return (
+		<EmptyState.Root>
+			<EmptyState.Icon icon={ hasSearch ? search : customPostType } />
+			<EmptyState.Title>
+				{ hasSearch
+					? __( 'No taxonomies match your search' )
+					: __( 'No taxonomies yet' ) }
+			</EmptyState.Title>
+			<EmptyState.Description>
+				{ hasSearch
+					? __( 'Try a different search term.' )
+					: __( 'Create your first taxonomy to get started.' ) }
+			</EmptyState.Description>
+		</EmptyState.Root>
+	);
+}
 
 function TaxonomiesPage() {
 	const navigate = useNavigate();
@@ -105,6 +125,8 @@ function TaxonomiesPage() {
 		} ),
 		[ totalItems, totalPages ]
 	);
+	const hasSearch = !! view.search?.trim();
+
 	return (
 		<Page
 			title={ __( 'Taxonomies' ) }
@@ -135,6 +157,7 @@ function TaxonomiesPage() {
 				onClickItem={ ( item ) =>
 					navigate( { to: `/edit/${ item.id }` } )
 				}
+				empty={ <TaxonomiesEmptyState hasSearch={ hasSearch } /> }
 			/>
 		</Page>
 	);
