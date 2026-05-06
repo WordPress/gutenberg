@@ -76,7 +76,7 @@
 		"remove-accents": "^0.5.0",
 		"showdown": "^1.9.1",
 		"simple-html-tokenizer": "^0.5.7",
-		"uuid": "^9.0.1"
+		"uuid": "^14.0.0"
 	},
 	"devDependencies": {
 		"deep-freeze": "0.0.1"

@@ -53,7 +53,7 @@ export type DashboardGridLayoutItem = {
 };
 
 /**
- * Props passed to a `renderResizeHandle` callback. Spread `listeners`
+ * Props received by a custom resize handle component. Spread `listeners`
  * and `attributes` onto the element that should respond to the gesture,
  * and assign `ref` to the same element so dnd-kit can track it.
  */
@@ -124,13 +124,13 @@ export interface ResizeHandleProps {
 	onResizeEnd?: () => void;
 
 	/**
-	 * Render prop to override the default corner triangle with a
+	 * Component that overrides the default corner triangle with a
 	 * custom element. Receives gesture wiring (`ref`, `listeners`,
 	 * `attributes`) plus context. The grid keeps ownership of the
 	 * `<DndContext>` and the throttled delta loop; consumers are only
 	 * responsible for the visual.
 	 */
-	renderResizeHandle?: ( props: ResizeHandleRenderProps ) => React.ReactNode;
+	renderResizeHandle?: React.ComponentType< ResizeHandleRenderProps >;
 }
 
 /**
@@ -199,10 +199,10 @@ export type GridItemProps = {
 	onResizeEnd: () => void;
 
 	/**
-	 * Render prop forwarded to `<ResizeHandle />` to override the
-	 * default corner triangle. See `DashboardGridProps.renderResizeHandle`.
+	 * Component forwarded to `<ResizeHandle />` to override the default
+	 * corner triangle. See `DashboardGridProps.renderResizeHandle`.
 	 */
-	renderResizeHandle?: ( props: ResizeHandleRenderProps ) => React.ReactNode;
+	renderResizeHandle?: React.ComponentType< ResizeHandleRenderProps >;
 };
 
 /**
@@ -279,13 +279,13 @@ interface BaseDashboardGridProps
 
 	/**
 	 * Override the default corner-triangle resize handle with a custom
-	 * element. The grid still owns the gesture (dnd-kit `<DndContext>`,
+	 * component. The grid still owns the gesture (dnd-kit `<DndContext>`,
 	 * throttled delta loop) and passes the wiring to the consumer:
 	 * spread `listeners` and `attributes` and assign `ref` on the
 	 * element that should receive the gesture. Use `disabled` and
 	 * `verticalResizable` to adapt the visual to context.
 	 */
-	renderResizeHandle?: ( props: ResizeHandleRenderProps ) => React.ReactNode;
+	renderResizeHandle?: React.ComponentType< ResizeHandleRenderProps >;
 }
 
 interface FixedDashboardGridProps extends BaseDashboardGridProps {
