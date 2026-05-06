@@ -136,7 +136,10 @@ const PanelBodyTitle = forwardRef(
 						/>
 					</span>
 					{ title }
-					<span className="block-editor-block-inspector__advanced-button__css-class-name">
+					<span
+						title={ blockClasses }
+						className="block-editor-block-inspector__advanced-button__css-class-name"
+					>
 						{ blockClasses }
 					</span>
 					{ icon && (

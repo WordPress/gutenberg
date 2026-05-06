@@ -180,4 +180,8 @@
 	line-height: $font-line-height-small;
 	position: absolute;
 	right: $grid-unit-60;
+	max-width: 50%;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
 }
