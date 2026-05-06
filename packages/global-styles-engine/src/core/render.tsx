@@ -1763,47 +1763,41 @@ function renderStylesNode(
 	}
 
 	if ( includeStateStyles ) {
-		const blockPseudoNodes = getPseudoStyleNodes( {
+		getPseudoStyleNodes( {
 			styles,
 			selector,
 			featureSelectors,
 			name,
 			elementName,
-		} );
-		if ( blockPseudoNodes.length ) {
-			blockPseudoNodes.forEach( ( pseudoNode ) => {
-				ruleset += renderStylesNode( pseudoNode, {
-					tree,
-					options,
-					useRootPaddingAlign,
-					disableLayoutStyles: true,
-					hasBlockGapSupport,
-					hasFallbackGapSupport,
-					disableRootPadding,
-				} );
+		} ).forEach( ( pseudoNode ) => {
+			ruleset += renderStylesNode( pseudoNode, {
+				tree,
+				options,
+				useRootPaddingAlign,
+				disableLayoutStyles: true,
+				hasBlockGapSupport,
+				hasFallbackGapSupport,
+				disableRootPadding,
 			} );
-		}
+		} );
 
-		const blockResponsiveNodes = getResponsiveStyleNodes( {
+		getResponsiveStyleNodes( {
 			styles,
 			selector,
 			featureSelectors,
 			name,
 			elementName,
-		} );
-		if ( blockResponsiveNodes.length ) {
-			blockResponsiveNodes.forEach( ( responsiveNode ) => {
-				ruleset += renderStylesNode( responsiveNode, {
-					tree,
-					options,
-					useRootPaddingAlign,
-					disableLayoutStyles: true,
-					hasBlockGapSupport,
-					hasFallbackGapSupport,
-					disableRootPadding,
-				} );
+		} ).forEach( ( responsiveNode ) => {
+			ruleset += renderStylesNode( responsiveNode, {
+				tree,
+				options,
+				useRootPaddingAlign,
+				disableLayoutStyles: true,
+				hasBlockGapSupport,
+				hasFallbackGapSupport,
+				disableRootPadding,
 			} );
-		}
+		} );
 	}
 
 	if ( mediaQuery && ruleset ) {
