@@ -8,7 +8,12 @@ import {
 	FlexItem,
 	PanelBody,
 } from '@wordpress/components';
-import { useEffect, useRef, useState } from '@wordpress/element';
+import {
+	useEffect,
+	useLayoutEffect,
+	useRef,
+	useState,
+} from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { Stack } from '@wordpress/ui';
 
@@ -53,7 +58,15 @@ interface CropInputProps {
 }
 
 const INPUT_PREVIEW_DEBOUNCE_MS = 250;
+const INPUT_INTEGER_EPSILON = 1e-6;
 const pxSuffix = <InputControlSuffixWrapper>px</InputControlSuffixWrapper>;
+
+function snapInputBoundToInteger( value: number ): number {
+	const rounded = Math.round( value );
+	return Math.abs( value - rounded ) < INPUT_INTEGER_EPSILON
+		? rounded
+		: value;
+}
 
 function makeRange(
 	minValue: number,
@@ -73,8 +86,8 @@ function getInputBounds(
 	range: CropInputRange
 ): CropInputBounds {
 	const rounded = Math.round( value );
-	const min = Math.ceil( range.minValue );
-	const max = Math.floor( range.maxValue );
+	const min = Math.ceil( snapInputBoundToInteger( range.minValue ) );
+	const max = Math.floor( snapInputBoundToInteger( range.maxValue ) );
 
 	if ( max < min ) {
 		return {
@@ -119,14 +132,11 @@ function getWidthRange(
 	}
 
 	let minWidth = imageBounds.minWidth;
-	let maxWidth = imageBounds.maxRight - rect.left;
+	let maxWidth = imageBounds.maxWidth;
 
 	if ( aspectRatio && aspectRatio > 0 ) {
 		minWidth = Math.max( minWidth, imageBounds.minHeight * aspectRatio );
-		maxWidth = Math.min(
-			maxWidth,
-			( imageBounds.maxBottom - rect.top ) * aspectRatio
-		);
+		maxWidth = Math.min( maxWidth, imageBounds.maxHeight * aspectRatio );
 	}
 
 	return makeRange( minWidth, maxWidth );
@@ -143,14 +153,11 @@ function getHeightRange(
 	}
 
 	let minHeight = imageBounds.minHeight;
-	let maxHeight = imageBounds.maxBottom - rect.top;
+	let maxHeight = imageBounds.maxHeight;
 
 	if ( aspectRatio && aspectRatio > 0 ) {
 		minHeight = Math.max( minHeight, imageBounds.minWidth / aspectRatio );
-		maxHeight = Math.min(
-			maxHeight,
-			( imageBounds.maxRight - rect.left ) / aspectRatio
-		);
+		maxHeight = Math.min( maxHeight, imageBounds.maxWidth / aspectRatio );
 	}
 
 	return makeRange( minHeight, maxHeight );
@@ -173,6 +180,13 @@ function CropInput( {
 	const initialValueRef = useRef( value );
 	const previewedValueRef = useRef< number | null >( null );
 	const bounds = getInputBounds( value, range );
+	const boundsRef = useRef( bounds );
+	const onCommitRef = useRef( onCommit );
+
+	useLayoutEffect( () => {
+		boundsRef.current = bounds;
+		onCommitRef.current = onCommit;
+	}, [ bounds, onCommit ] );
 
 	useEffect( () => {
 		return () => {
@@ -190,13 +204,16 @@ function CropInput( {
 	};
 
 	const commitValue = ( nextValue: string ): boolean => {
-		const commitValueCandidate = getInputCommitValue( nextValue, bounds );
+		const commitValueCandidate = getInputCommitValue(
+			nextValue,
+			boundsRef.current
+		);
 		if ( commitValueCandidate === null ) {
 			return false;
 		}
 
 		if ( previewedValueRef.current !== commitValueCandidate ) {
-			onCommit( commitValueCandidate );
+			onCommitRef.current( commitValueCandidate );
 		}
 		previewedValueRef.current = commitValueCandidate;
 		return true;
@@ -210,9 +227,18 @@ function CropInput( {
 		}
 
 		previewDelayRef.current = setTimeout( () => {
-			if ( previewedValueRef.current !== previewValue ) {
-				onCommit( previewValue );
-				previewedValueRef.current = previewValue;
+			const latestPreviewValue = getInputCommitValue(
+				nextValue,
+				boundsRef.current
+			);
+			if ( latestPreviewValue === null ) {
+				previewDelayRef.current = undefined;
+				return;
+			}
+
+			if ( previewedValueRef.current !== latestPreviewValue ) {
+				onCommitRef.current( latestPreviewValue );
+				previewedValueRef.current = latestPreviewValue;
 			}
 			previewDelayRef.current = undefined;
 		}, INPUT_PREVIEW_DEBOUNCE_MS );
@@ -257,7 +283,7 @@ function CropInput( {
 			setFocused( false );
 			cancelPreview();
 			if ( previewedValueRef.current !== null ) {
-				onCommit( initialValueRef.current );
+				onCommitRef.current( initialValueRef.current );
 				previewedValueRef.current = null;
 			}
 			event.currentTarget.blur();
