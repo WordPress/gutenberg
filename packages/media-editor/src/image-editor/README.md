@@ -112,7 +112,7 @@ Validity is always relative to an explicit bounds object. `useCropGeometry()` ex
 
 #### `useCropGeometry(): UseCropGeometryReturn`
 
-Returns the current crop pixel rectangle, image bounds, and source region once the cropper has loaded an image and measured bounds. The hook intentionally exposes facts about the current cropper state, not operation-specific commands.
+Returns a discriminated result. When `isReady` is true, `rect`, `imageBounds`, and `sourceRegion` are available. The hook intentionally exposes facts about the current cropper state, not operation-specific commands.
 
 #### `getCropPixelRect( state, imageSize ): CropPixelRect`
 

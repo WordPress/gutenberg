@@ -322,16 +322,16 @@ import {
 
 function ApplySuggestedCrop( { suggestion } ) {
   const { state, applyOperation } = useCropper();
-  const { rect, imageBounds } = useCropGeometry();
+  const geometry = useCropGeometry();
 
-  if ( ! state.image || ! rect || ! imageBounds ) {
+  if ( ! state.image || ! geometry.isReady ) {
     return null;
   }
 
   const apply = () => {
     const result = validateCropPixelRectAgainstBounds(
       suggestion,
-      imageBounds
+      geometry.imageBounds
     );
     if ( ! result.isValid ) {
       console.warn( 'Adjusted crop suggestion:', result.violations );

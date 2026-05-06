@@ -241,7 +241,7 @@ describe( 'CropAdvancedPanel', () => {
 		render( <CropAdvancedPanel freeformCrop /> );
 
 		fireEvent.click( screen.getByRole( 'button', { name: 'Advanced' } ) );
-		const leftInput = screen.getByLabelText( 'Crop left position' );
+		const leftInput = screen.getByLabelText( 'Crop horizontal position' );
 		fireEvent.focus( leftInput );
 		fireEvent.change( leftInput, { target: { value: '0' } } );
 		fireEvent.blur( leftInput );

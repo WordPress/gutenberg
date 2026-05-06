@@ -28,12 +28,19 @@ export type {
 	CropPixelRectViolation,
 };
 
-export interface UseCropGeometryReturn {
-	isReady: boolean;
-	rect: CropPixelRect | null;
-	imageBounds: CropPixelRectBounds | null;
-	sourceRegion: SourceRegion | null;
-}
+export type UseCropGeometryReturn =
+	| {
+			isReady: false;
+			rect: null;
+			imageBounds: null;
+			sourceRegion: null;
+	  }
+	| {
+			isReady: true;
+			rect: CropPixelRect;
+			imageBounds: CropPixelRectBounds;
+			sourceRegion: SourceRegion;
+	  };
 
 /**
  * Expose the current crop geometry to controls, automation, and AI
@@ -67,10 +74,19 @@ export function useCropGeometry(): UseCropGeometryReturn {
 		} );
 	}, [ cropper.state, measuredImageBounds, imageSize ] );
 
+	if ( ! snapshot ) {
+		return {
+			isReady: false,
+			rect: null,
+			imageBounds: null,
+			sourceRegion: null,
+		};
+	}
+
 	return {
-		isReady: !! snapshot,
-		rect: snapshot?.rect ?? null,
-		imageBounds: snapshot?.imageBounds ?? null,
-		sourceRegion: snapshot?.sourceRegion ?? null,
+		isReady: true,
+		rect: snapshot.rect,
+		imageBounds: snapshot.imageBounds,
+		sourceRegion: snapshot.sourceRegion,
 	};
 }

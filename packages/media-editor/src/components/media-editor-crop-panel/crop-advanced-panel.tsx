@@ -61,7 +61,7 @@ interface CropInputProps {
 	onCommit: ( value: number ) => void;
 }
 
-const INPUT_PREVIEW_DEBOUNCE_MS = 250;
+const INPUT_COMMIT_DEBOUNCE_MS = 250;
 const INPUT_INTEGER_EPSILON = 1e-6;
 const FINE_ROTATION_COMMIT_STEP = 0.5;
 const pxSuffix = <InputControlSuffixWrapper>px</InputControlSuffixWrapper>;
@@ -229,7 +229,7 @@ function clampFineRotationOffset( value: number ): number {
 	);
 }
 
-// Shows the user's in-flight text while typing. Valid numeric drafts preview
+// Shows the user's in-flight text while typing. Valid numeric drafts commit
 // after a short pause, flush on blur/Enter, and Escape discards the draft.
 function CropInput( {
 	label,
@@ -245,9 +245,9 @@ function CropInput( {
 	const [ focused, setFocused ] = useState( false );
 	const [ draft, setDraft ] = useState( '' );
 	const skipBlurCommitRef = useRef( false );
-	const previewDelayRef = useRef< ReturnType< typeof setTimeout > >();
+	const commitDelayRef = useRef< ReturnType< typeof setTimeout > >();
 	const initialValueRef = useRef( value );
-	const previewedValueRef = useRef< number | null >( null );
+	const lastCommittedDraftValueRef = useRef< number | null >( null );
 	const bounds = getInputBounds( value, range, commitStep );
 	const boundsRef = useRef( bounds );
 	const commitStepRef = useRef( commitStep );
@@ -261,16 +261,16 @@ function CropInput( {
 
 	useEffect( () => {
 		return () => {
-			if ( previewDelayRef.current ) {
-				clearTimeout( previewDelayRef.current );
+			if ( commitDelayRef.current ) {
+				clearTimeout( commitDelayRef.current );
 			}
 		};
 	}, [] );
 
-	const cancelPreview = () => {
-		if ( previewDelayRef.current ) {
-			clearTimeout( previewDelayRef.current );
-			previewDelayRef.current = undefined;
+	const cancelDelayedCommit = () => {
+		if ( commitDelayRef.current ) {
+			clearTimeout( commitDelayRef.current );
+			commitDelayRef.current = undefined;
 		}
 	};
 
@@ -284,46 +284,46 @@ function CropInput( {
 			return false;
 		}
 
-		if ( previewedValueRef.current !== commitValueCandidate ) {
+		if ( lastCommittedDraftValueRef.current !== commitValueCandidate ) {
 			onCommitRef.current( commitValueCandidate );
 		}
-		previewedValueRef.current = commitValueCandidate;
+		lastCommittedDraftValueRef.current = commitValueCandidate;
 		return true;
 	};
 
-	const schedulePreview = ( nextValue: string ) => {
-		cancelPreview();
-		const previewValue = getInputCommitValue(
+	const scheduleDelayedCommit = ( nextValue: string ) => {
+		cancelDelayedCommit();
+		const delayedCommitValue = getInputCommitValue(
 			nextValue,
 			bounds,
 			commitStep
 		);
-		if ( previewValue === null ) {
+		if ( delayedCommitValue === null ) {
 			return;
 		}
 
-		previewDelayRef.current = setTimeout( () => {
-			const latestPreviewValue = getInputCommitValue(
+		commitDelayRef.current = setTimeout( () => {
+			const latestCommitValue = getInputCommitValue(
 				nextValue,
 				boundsRef.current,
 				commitStepRef.current
 			);
-			if ( latestPreviewValue === null ) {
-				previewDelayRef.current = undefined;
+			if ( latestCommitValue === null ) {
+				commitDelayRef.current = undefined;
 				return;
 			}
 
-			if ( previewedValueRef.current !== latestPreviewValue ) {
-				onCommitRef.current( latestPreviewValue );
-				previewedValueRef.current = latestPreviewValue;
+			if ( lastCommittedDraftValueRef.current !== latestCommitValue ) {
+				onCommitRef.current( latestCommitValue );
+				lastCommittedDraftValueRef.current = latestCommitValue;
 			}
-			previewDelayRef.current = undefined;
-		}, INPUT_PREVIEW_DEBOUNCE_MS );
+			commitDelayRef.current = undefined;
+		}, INPUT_COMMIT_DEBOUNCE_MS );
 	};
 
 	const handleFocus = () => {
 		initialValueRef.current = bounds.value;
-		previewedValueRef.current = null;
+		lastCommittedDraftValueRef.current = null;
 		setFocused( true );
 		setDraft( String( bounds.value ) );
 	};
@@ -331,7 +331,7 @@ function CropInput( {
 	const handleChange = ( nextValue: string | undefined ) => {
 		const nextDraft = nextValue ?? '';
 		setDraft( nextDraft );
-		schedulePreview( nextDraft );
+		scheduleDelayedCommit( nextDraft );
 	};
 
 	const handleBlur = () => {
@@ -340,7 +340,7 @@ function CropInput( {
 			skipBlurCommitRef.current = false;
 			return;
 		}
-		cancelPreview();
+		cancelDelayedCommit();
 		commitValue( draft );
 	};
 
@@ -351,17 +351,17 @@ function CropInput( {
 			event.preventDefault();
 			skipBlurCommitRef.current = true;
 			setFocused( false );
-			cancelPreview();
+			cancelDelayedCommit();
 			commitValue( draft );
 			event.currentTarget.blur();
 		} else if ( event.key === 'Escape' ) {
 			event.preventDefault();
 			skipBlurCommitRef.current = true;
 			setFocused( false );
-			cancelPreview();
-			if ( previewedValueRef.current !== null ) {
+			cancelDelayedCommit();
+			if ( lastCommittedDraftValueRef.current !== null ) {
 				onCommitRef.current( initialValueRef.current );
-				previewedValueRef.current = null;
+				lastCommittedDraftValueRef.current = null;
 			}
 			event.currentTarget.blur();
 		}
@@ -392,12 +392,13 @@ export default function CropAdvancedPanel( {
 	onPlacementControlInteraction,
 }: CropAdvancedPanelProps ) {
 	const { state, applyOperation, settleCrop } = useCropper();
-	const { isReady, rect, imageBounds } = useCropGeometry();
+	const geometry = useCropGeometry();
 
-	if ( ! isReady || ! rect || ! imageBounds || ! state.image ) {
+	if ( ! geometry.isReady || ! state.image ) {
 		return null;
 	}
 
+	const { rect, imageBounds } = geometry;
 	const imageSize = {
 		width: state.image.naturalWidth,
 		height: state.image.naturalHeight,
@@ -514,8 +515,8 @@ export default function CropAdvancedPanel( {
 				<Flex gap={ 2 } align="flex-start">
 					<FlexItem isBlock>
 						<CropInput
-							label={ __( 'Left' ) }
-							aria-label={ __( 'Crop left position' ) }
+							label={ __( 'X' ) }
+							aria-label={ __( 'Crop horizontal position' ) }
 							value={ rect.left }
 							range={ leftRange }
 							disabled={
@@ -526,8 +527,8 @@ export default function CropAdvancedPanel( {
 					</FlexItem>
 					<FlexItem isBlock>
 						<CropInput
-							label={ __( 'Top' ) }
-							aria-label={ __( 'Crop top position' ) }
+							label={ __( 'Y' ) }
+							aria-label={ __( 'Crop vertical position' ) }
 							value={ rect.top }
 							range={ topRange }
 							disabled={
