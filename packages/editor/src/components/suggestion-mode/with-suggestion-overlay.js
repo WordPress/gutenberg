@@ -17,6 +17,7 @@ import { addFilter } from '@wordpress/hooks';
  */
 import { useSuggestionOverlay } from './overlay-context';
 import { EDITOR_STORE_NAME, SUGGEST_INTENT } from './constants';
+import { getAvatarBorderColor } from '../collab-sidebar/utils';
 
 /**
  * Attribute keys whose values are known to be object-valued and therefore
@@ -191,17 +192,18 @@ const withSuggestionBlockClassName = createHigherOrderComponent(
 		function BlockListBlockWithSuggestionClass( props ) {
 			const { clientId } = props;
 			const { entries } = useSuggestionOverlay();
-			const { isSuggestMode, structuralClass } = useSelect(
+			const { isSuggestMode, structuralClass, authorId } = useSelect(
 				( select ) => {
 					const editor = select( EDITOR_STORE_NAME );
 					const blockEditor = select( blockEditorStore );
+					const marker =
+						blockEditor?.getBlockAttributes?.( clientId )?.metadata
+							?.suggestion;
 					return {
 						isSuggestMode:
 							editor.getEditorIntent() === SUGGEST_INTENT,
-						structuralClass: structuralMarkerClass(
-							blockEditor?.getBlockAttributes?.( clientId )
-								?.metadata?.suggestion?.type
-						),
+						structuralClass: structuralMarkerClass( marker?.type ),
+						authorId: marker?.authorId ?? null,
 					};
 				},
 				[ clientId ]
@@ -216,6 +218,19 @@ const withSuggestionBlockClassName = createHigherOrderComponent(
 				return <BlockListBlock { ...props } />;
 			}
 
+			// Apply the suggester's avatar color via a CSS custom property
+			// so the canvas treatment (outline / strikethrough / label tab)
+			// reads as that suggester's. Falls through to the green default
+			// in CSS when `authorId` is missing.
+			const wrapperStyle =
+				authorId !== null
+					? {
+							...props.wrapperProps?.style,
+							'--suggestion-author-color':
+								getAvatarBorderColor( authorId ),
+					  }
+					: props.wrapperProps?.style;
+
 			return (
 				<BlockListBlock
 					{ ...props }
@@ -224,6 +239,10 @@ const withSuggestionBlockClassName = createHigherOrderComponent(
 						showOverlayBracket && 'is-suggestion-pending',
 						structuralClass
 					) }
+					wrapperProps={ {
+						...props.wrapperProps,
+						style: wrapperStyle,
+					} }
 				/>
 			);
 		},

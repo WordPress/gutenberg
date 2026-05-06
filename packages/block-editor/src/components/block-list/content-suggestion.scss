@@ -9,17 +9,22 @@
 // stylesheets — keeping these rules here is what makes them apply inside the
 // iframe.
 
-// Google Docs-style suggestion green. Used uniformly across all
-// canvas-pending visual treatments so the reviewer reads "this is a
-// suggestion" at a glance regardless of which structural op produced it.
+// Default suggestion color, used when the suggester's avatar color
+// can't be resolved (e.g., anonymous edits or pre-collab sessions).
+// `withSuggestionBlockClassName` writes the suggester's avatar color
+// into `--suggestion-author-color` on each pending-suggestion block,
+// so individual suggestions tint to their author's color the same way
+// live cursors do — Google Docs-style. Rules below consume the
+// variable with this green as the fallback.
 $suggestion-color: #188038;
+$suggestion-author-color: var(--suggestion-author-color, #{$suggestion-color});
 
 // Green "bracket" applied to any block with a pending attribute overlay
 // while the suggester is editing. Drawn with an outline so it layers above
 // block content without affecting layout.
 .block-editor-block-list__block.is-suggestion-pending {
 	position: relative;
-	outline: 2px solid $suggestion-color;
+	outline: 2px solid $suggestion-author-color;
 	outline-offset: 2px;
 	border-radius: $radius-small;
 
@@ -29,7 +34,7 @@ $suggestion-color: #188038;
 		position: absolute;
 		width: $grid-unit-10;
 		height: $grid-unit-10;
-		border: 2px solid $suggestion-color;
+		border: 2px solid $suggestion-author-color;
 		pointer-events: none;
 	}
 
@@ -55,9 +60,9 @@ $suggestion-color: #188038;
 // Docs' suggesting-mode strike-through. The decoration is applied to
 // the wrapper and propagates to inline rich-text descendants.
 .block-editor-block-list__block.is-suggestion-pending-remove {
-	color: $suggestion-color;
+	color: $suggestion-author-color;
 	text-decoration: line-through;
-	text-decoration-color: $suggestion-color;
+	text-decoration-color: $suggestion-author-color;
 	text-decoration-thickness: 2px;
 }
 
@@ -71,8 +76,8 @@ $suggestion-color: #188038;
 // shows up here.
 .block-editor-block-list__block.is-suggestion-pending-insert {
 	position: relative;
-	color: $suggestion-color;
-	outline: 2px dashed $suggestion-color;
+	color: $suggestion-author-color;
+	outline: 2px dashed $suggestion-author-color;
 	outline-offset: 2px;
 	border-radius: $radius-small;
 }
@@ -85,7 +90,7 @@ $suggestion-color: #188038;
 .block-editor-block-list__block.is-suggestion-pending-move {
 	position: relative;
 	opacity: 0.7;
-	outline: 2px dotted $suggestion-color;
+	outline: 2px dotted $suggestion-author-color;
 	outline-offset: 2px;
 	border-radius: $radius-small;
 
@@ -95,7 +100,7 @@ $suggestion-color: #188038;
 		top: -$grid-unit-20;
 		left: -$grid-unit-05;
 		padding: 0 $grid-unit-10;
-		background: $suggestion-color;
+		background: $suggestion-author-color;
 		color: $white;
 		font-size: 11px;
 		font-weight: 500;
