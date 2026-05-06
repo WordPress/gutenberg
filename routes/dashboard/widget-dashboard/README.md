@@ -90,7 +90,11 @@ Renders its children only when `layout` is empty. Pair it with `<WidgetDashboard
 
 Edit-mode toggle: a "Customize" button while `editMode` is off and a "Done" button while it is on. Clicking either fires `onEditChange` with the toggled value. Returns `null` when the dashboard is mounted without `onEditChange`, so surfaces that don't expose edit mode can keep `Actions` in their tree unconditionally.
 
+`<Page>` from `@wordpress/admin-ui` exposes an `actions` slot used across admin surfaces (DataViews, WidgetDashboard, …). Plug `Actions` straight into it:
+
 ```tsx
+import { Page } from '@wordpress/admin-ui';
+
 <WidgetDashboard
 	layout={ layout }
 	onLayoutChange={ setLayout }
@@ -98,13 +102,16 @@ Edit-mode toggle: a "Customize" button while `editMode` is off and a "Done" butt
 	editMode={ editMode }
 	onEditChange={ setEditMode }
 >
-	<header>
-		<h1>{ __( 'My Dashboard' ) }</h1>
-		<WidgetDashboard.Actions />
-	</header>
-	<WidgetDashboard.Widgets />
+	<Page
+		title={ __( 'My Dashboard' ) }
+		actions={ <WidgetDashboard.Actions /> }
+	>
+		<WidgetDashboard.Widgets />
+	</Page>
 </WidgetDashboard>
 ```
+
+`<Page>` is optional. The compound renders inside any container, so a bare `<header>` or custom chrome works just as well.
 
 ## Authoring widgets
 
