@@ -41,7 +41,7 @@ function render_block_core_query_pagination_numbers( $attributes, $content, $blo
 		if ( null !== $mid_size ) {
 			$paginate_args['mid_size'] = $mid_size;
 		}
-		$content = paginate_links( $paginate_args );
+		$content  = paginate_links( $paginate_args );
 		$wp_query = $prev_wp_query;
 	} else {
 		$block_query = new WP_Query( build_query_vars_from_query_block( $block, $page ) );

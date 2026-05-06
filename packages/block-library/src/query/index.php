@@ -91,7 +91,7 @@ function block_core_query_get_inherited_query( $block ) {
 		? absint( $block->context['query']['perPage'] )
 		: 0;
 
-	if ( ! $per_page || $per_page === absint( $wp_query->get( 'posts_per_page' ) ) ) {
+	if ( ! $per_page || absint( $wp_query->get( 'posts_per_page' ) ) === $per_page ) {
 		return $wp_query;
 	}
 

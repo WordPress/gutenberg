@@ -54,7 +54,7 @@ function render_block_core_query_pagination_next( $attributes, $content, $block 
 		if ( $max_page > $inherited_query->max_num_pages ) {
 			$max_page = $inherited_query->max_num_pages;
 		}
-		$content = get_next_posts_link( $label, $max_page );
+		$content  = get_next_posts_link( $label, $max_page );
 		$wp_query = $prev_wp_query;
 		remove_filter( 'next_posts_link_attributes', $filter_link_attributes );
 	} elseif ( ! $max_page || $max_page > $page ) {

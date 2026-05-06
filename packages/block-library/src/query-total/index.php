@@ -19,7 +19,6 @@
  * @return string The rendered block content.
  */
 function render_block_core_query_total( $attributes, $content, $block ) {
-	global $wp_query;
 	$wrapper_attributes = get_block_wrapper_attributes();
 	if ( $block->context['query']['inherit'] ?? false ) {
 		$query_to_use = block_core_query_get_inherited_query( $block );

@@ -43,10 +43,10 @@ function render_block_core_query_pagination_previous( $attributes, $content, $bl
 
 		add_filter( 'previous_posts_link_attributes', $filter_link_attributes );
 		global $wp_query;
-		$prev_wp_query = $wp_query;
-		$wp_query      = block_core_query_get_inherited_query( $block );
-		$content = get_previous_posts_link( $label );
-		$wp_query = $prev_wp_query;
+		$prev_wp_query  = $wp_query;
+		$wp_query       = block_core_query_get_inherited_query( $block );
+		$content        = get_previous_posts_link( $label );
+		$wp_query       = $prev_wp_query;
 		remove_filter( 'previous_posts_link_attributes', $filter_link_attributes );
 	} else {
 		$block_query     = new WP_Query( build_query_vars_from_query_block( $block, $page ) );
