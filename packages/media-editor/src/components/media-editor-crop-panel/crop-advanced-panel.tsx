@@ -29,6 +29,7 @@ import {
 	type CropPixelRect,
 	type CropPixelRectInput,
 } from '../../image-editor';
+import { MAX_ROTATION_OFFSET } from '../../image-editor/core/constants';
 
 interface CropAdvancedPanelProps {
 	aspectRatio?: number;
@@ -54,12 +55,17 @@ interface CropInputProps {
 	value: number;
 	range: CropInputRange;
 	disabled?: boolean;
+	suffix?: React.ReactNode;
 	onCommit: ( value: number ) => void;
 }
 
 const INPUT_PREVIEW_DEBOUNCE_MS = 250;
 const INPUT_INTEGER_EPSILON = 1e-6;
+const FINE_ROTATION_EDGE_EPSILON = 0.01;
 const pxSuffix = <InputControlSuffixWrapper>px</InputControlSuffixWrapper>;
+const degreeSuffix = (
+	<InputControlSuffixWrapper>{ '\u00b0' }</InputControlSuffixWrapper>
+);
 
 function snapInputBoundToInteger( value: number ): number {
 	const rounded = Math.round( value );
@@ -163,6 +169,28 @@ function getHeightRange(
 	return makeRange( minHeight, maxHeight );
 }
 
+function getVisualRotationDirection( flip: {
+	horizontal: boolean;
+	vertical: boolean;
+} ): 1 | -1 {
+	return flip.horizontal !== flip.vertical ? -1 : 1;
+}
+
+function getFineRotationOffset(
+	rotation: number,
+	flip: { horizontal: boolean; vertical: boolean }
+): number {
+	const baseAngle = Math.round( rotation / 90 ) * 90;
+	return ( rotation - baseAngle ) * getVisualRotationDirection( flip );
+}
+
+function clampFineRotationOffset( value: number ): number {
+	return Math.max(
+		-MAX_ROTATION_OFFSET + FINE_ROTATION_EDGE_EPSILON,
+		Math.min( MAX_ROTATION_OFFSET - FINE_ROTATION_EDGE_EPSILON, value )
+	);
+}
+
 // Shows the user's in-flight text while typing. Valid numeric drafts preview
 // after a short pause, flush on blur/Enter, and Escape discards the draft.
 function CropInput( {
@@ -171,6 +199,7 @@ function CropInput( {
 	value,
 	range,
 	disabled = false,
+	suffix = pxSuffix,
 	onCommit,
 }: CropInputProps ) {
 	const [ focused, setFocused ] = useState( false );
@@ -304,7 +333,7 @@ function CropInput( {
 			onFocus={ handleFocus }
 			onBlur={ handleBlur }
 			onKeyDown={ handleKeyDown }
-			suffix={ pxSuffix }
+			suffix={ suffix }
 		/>
 	);
 }
@@ -389,7 +418,29 @@ export default function CropAdvancedPanel( {
 		aspectRatio,
 		freeformCrop
 	);
+	const fineRotationOffset = getFineRotationOffset(
+		state.rotation,
+		state.flip
+	);
+	const fineRotationRange = makeRange(
+		-MAX_ROTATION_OFFSET,
+		MAX_ROTATION_OFFSET
+	);
 	const canMoveCropRect = freeformCrop;
+
+	const handleFineRotationApply = ( value: number ) => {
+		const clampedOffset = clampFineRotationOffset( value );
+		const delta = clampedOffset - fineRotationOffset;
+		if ( Math.abs( delta ) < INPUT_INTEGER_EPSILON ) {
+			return;
+		}
+
+		applyOperation( {
+			type: 'rotate',
+			degrees: delta,
+		} );
+		onPlacementControlInteraction?.();
+	};
 
 	return (
 		<PanelBody
@@ -398,6 +449,18 @@ export default function CropAdvancedPanel( {
 			className="media-editor-crop-advanced-panel"
 		>
 			<Stack direction="column" gap="sm">
+				<Flex gap={ 2 } align="flex-start">
+					<FlexItem isBlock>
+						<CropInput
+							label={ __( 'Fine rotation' ) }
+							aria-label={ __( 'Fine rotation angle' ) }
+							value={ fineRotationOffset }
+							range={ fineRotationRange }
+							suffix={ degreeSuffix }
+							onCommit={ handleFineRotationApply }
+						/>
+					</FlexItem>
+				</Flex>
 				<Flex gap={ 2 } align="flex-start">
 					<FlexItem isBlock>
 						<CropInput

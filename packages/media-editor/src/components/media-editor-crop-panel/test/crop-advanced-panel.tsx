@@ -11,6 +11,18 @@ import CropAdvancedPanel from '../crop-advanced-panel';
 const mockApplyOperation = jest.fn();
 const mockSettleCrop = jest.fn();
 const mockNormalizedRect = { x: 0, y: 0, width: 1, height: 1 };
+const mockDefaultCropperState = {
+	image: {
+		src: 'test.jpg',
+		naturalWidth: 1000,
+		naturalHeight: 500,
+	},
+	rotation: 0,
+	flip: {
+		horizontal: false,
+		vertical: false,
+	},
+};
 const mockDefaultCropGeometry = {
 	isReady: true,
 	rect: {
@@ -34,13 +46,21 @@ const mockDefaultCropGeometry = {
 	sourceRegion: null,
 };
 type MockCropGeometry = typeof mockDefaultCropGeometry;
+type MockCropperState = typeof mockDefaultCropperState;
 type MockCropGeometryOverrides = Partial<
 	Omit< MockCropGeometry, 'rect' | 'imageBounds' >
 > & {
 	rect?: Partial< MockCropGeometry[ 'rect' ] >;
 	imageBounds?: Partial< MockCropGeometry[ 'imageBounds' ] >;
 };
+type MockCropperStateOverrides = Partial<
+	Omit< MockCropperState, 'image' | 'flip' >
+> & {
+	image?: Partial< MockCropperState[ 'image' ] >;
+	flip?: Partial< MockCropperState[ 'flip' ] >;
+};
 let mockCropGeometry = mockDefaultCropGeometry;
+let mockCropperState = mockDefaultCropperState;
 const mockValidateCropPixelRectAgainstBounds = jest.fn( ( candidate ) => ( {
 	isValid: true,
 	rect: {
@@ -67,19 +87,28 @@ function setMockCropGeometry( overrides: MockCropGeometryOverrides = {} ) {
 	};
 }
 
+function setMockCropperState( overrides: MockCropperStateOverrides = {} ) {
+	mockCropperState = {
+		...mockDefaultCropperState,
+		...overrides,
+		image: {
+			...mockDefaultCropperState.image,
+			...overrides.image,
+		},
+		flip: {
+			...mockDefaultCropperState.flip,
+			...overrides.flip,
+		},
+	};
+}
+
 jest.mock( '../../../image-editor', () => ( {
 	cropPixelRectToNormalizedRect: (
 		...args: Parameters< typeof mockCropPixelRectToNormalizedRect >
 	) => mockCropPixelRectToNormalizedRect( ...args ),
 	useCropGeometry: () => mockCropGeometry,
 	useCropper: () => ( {
-		state: {
-			image: {
-				src: 'test.jpg',
-				naturalWidth: 1000,
-				naturalHeight: 500,
-			},
-		},
+		state: mockCropperState,
 		applyOperation: mockApplyOperation,
 		settleCrop: mockSettleCrop,
 	} ),
@@ -93,6 +122,7 @@ describe( 'CropAdvancedPanel', () => {
 		jest.clearAllMocks();
 		jest.useRealTimers();
 		setMockCropGeometry();
+		setMockCropperState();
 	} );
 
 	it( 'settles after applying a numeric crop edit', () => {
@@ -250,5 +280,35 @@ describe( 'CropAdvancedPanel', () => {
 				maxRight: 2560,
 			} )
 		);
+	} );
+
+	it( 'applies manual fine rotation changes from the advanced panel', () => {
+		render( <CropAdvancedPanel freeformCrop /> );
+
+		fireEvent.click( screen.getByRole( 'button', { name: 'Advanced' } ) );
+		const rotationInput = screen.getByLabelText( 'Fine rotation angle' );
+		fireEvent.focus( rotationInput );
+		fireEvent.change( rotationInput, { target: { value: '30' } } );
+		fireEvent.blur( rotationInput );
+
+		expect( mockApplyOperation ).toHaveBeenCalledWith( {
+			type: 'rotate',
+			degrees: 30,
+		} );
+	} );
+
+	it( 'clamps manual fine rotation changes to the rotation bounds', () => {
+		render( <CropAdvancedPanel freeformCrop /> );
+
+		fireEvent.click( screen.getByRole( 'button', { name: 'Advanced' } ) );
+		const rotationInput = screen.getByLabelText( 'Fine rotation angle' );
+		fireEvent.focus( rotationInput );
+		fireEvent.change( rotationInput, { target: { value: '47' } } );
+		fireEvent.blur( rotationInput );
+
+		expect( mockApplyOperation ).toHaveBeenCalledWith( {
+			type: 'rotate',
+			degrees: 44.99,
+		} );
 	} );
 } );
