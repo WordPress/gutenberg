@@ -362,6 +362,10 @@ if ( ! class_exists( 'WP_Sync_Post_Meta_Storage' ) ) {
 		private function promote_storage_post_to_canonical_slug( string $room_hash, int $post_id ): ?int {
 			global $wpdb;
 
+			/*
+			 * @todo Could this be replaced by {@see wp_update_post()}? Could we experience
+			 *       a race with other posts having a different post type or post status?
+			 */
 			$result = $wpdb->update(
 				$wpdb->posts,
 				array( 'post_name' => $room_hash ),
