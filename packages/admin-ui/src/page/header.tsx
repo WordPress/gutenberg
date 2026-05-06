@@ -27,11 +27,7 @@ export default function Header( {
 } ) {
 	const HeadingTag = `h${ headingLevel }` as const;
 	return (
-		<Stack
-			direction="column"
-			className="admin-ui-page__header"
-			render={ <header /> }
-		>
+		<Stack direction="column" className="admin-ui-page__header">
 			<Stack direction="row" justify="space-between" gap="sm">
 				<Stack direction="row" gap="sm" align="center" justify="start">
 					{ showSidebarToggle && (
