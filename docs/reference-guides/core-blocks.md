@@ -743,8 +743,8 @@ Display a post's featured media — image, video, or audio. Shows whichever is s
 
 -	**Name:** core/post-featured-media
 -	**Category:** theme
--	**Supports:** align (center, full, left, right, wide), anchor, interactivity (clientNavigation), spacing (margin, padding), ~~html~~
--	**Attributes:** aspectRatio, controls, height, isLink, linkTarget, scale, sizeSlug, width
+-	**Supports:** align (center, full, left, right, wide), anchor, color (~~background~~, ~~text~~), filter (duotone), interactivity (clientNavigation), shadow, spacing (margin, padding), ~~html~~
+-	**Attributes:** aspectRatio, controls, customGradient, customOverlayColor, dimRatio, gradient, height, isLink, linkTarget, overlayColor, scale, sizeSlug, width
 
 ## Post Navigation Link
 

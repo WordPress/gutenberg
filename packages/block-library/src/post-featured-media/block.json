@@ -37,6 +37,22 @@
 		"controls": {
 			"type": "boolean",
 			"default": true
+		},
+		"overlayColor": {
+			"type": "string"
+		},
+		"customOverlayColor": {
+			"type": "string"
+		},
+		"dimRatio": {
+			"type": "number",
+			"default": 0
+		},
+		"gradient": {
+			"type": "string"
+		},
+		"customGradient": {
+			"type": "string"
 		}
 	},
 	"usesContext": [ "postId", "postType", "queryId" ],
@@ -46,6 +62,10 @@
 	"supports": {
 		"anchor": true,
 		"align": [ "left", "right", "center", "wide", "full" ],
+		"color": {
+			"text": false,
+			"background": false
+		},
 		"__experimentalBorder": {
 			"color": true,
 			"radius": true,
@@ -57,6 +77,12 @@
 				"width": true
 			}
 		},
+		"filter": {
+			"duotone": true
+		},
+		"shadow": {
+			"__experimentalSkipSerialization": true
+		},
 		"html": false,
 		"spacing": {
 			"margin": true,
@@ -64,6 +90,13 @@
 		},
 		"interactivity": {
 			"clientNavigation": true
+		}
+	},
+	"selectors": {
+		"border": ".wp-block-post-featured-media img, .wp-block-post-featured-media .block-editor-media-placeholder, .wp-block-post-featured-media .wp-block-post-featured-media__overlay",
+		"shadow": ".wp-block-post-featured-media img, .wp-block-post-featured-media .components-placeholder",
+		"filter": {
+			"duotone": ".wp-block-post-featured-media img, .wp-block-post-featured-media .wp-block-post-featured-media__placeholder, .wp-block-post-featured-media .components-placeholder__illustration, .wp-block-post-featured-media .components-placeholder::before"
 		}
 	},
 	"editorStyle": "wp-block-post-featured-media-editor",

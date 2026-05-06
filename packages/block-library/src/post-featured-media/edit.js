@@ -19,7 +19,10 @@ import {
 	MediaReplaceFlow,
 	useBlockProps,
 	__experimentalUseBorderProps as useBorderProps,
+	__experimentalGetShadowClassesAndStyles as getShadowClassesAndStyles,
 	useBlockEditingMode,
+	privateApis as blockEditorPrivateApis,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { __, sprintf } from '@wordpress/i18n';
 import { upload } from '@wordpress/icons';
@@ -29,6 +32,12 @@ import { store as noticesStore } from '@wordpress/notices';
  * Internal dependencies
  */
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+import DimensionControls from '../post-featured-image/dimension-controls';
+import OverlayControls from '../post-featured-image/overlay-controls';
+import Overlay from './overlay';
+import { unlock } from '../lock-unlock';
+
+const { ResolutionTool } = unlock( blockEditorPrivateApis );
 
 const ALLOWED_MEDIA_TYPES = [ 'image', 'video', 'audio' ];
 
@@ -64,6 +73,7 @@ export function getMediaType( media ) {
 }
 
 export default function PostFeaturedMediaEdit( {
+	clientId,
 	attributes,
 	setAttributes,
 	context: { postId, postType: postTypeSlug, queryId },
@@ -117,10 +127,11 @@ export default function PostFeaturedMediaEdit( {
 		activeId = featuredAudioId;
 	}
 
-	const { media, postPermalink } = useSelect(
+	const { media, postPermalink, imageSizes } = useSelect(
 		( select ) => {
 			const { getEntityRecord, getEditedEntityRecord } =
 				select( coreStore );
+			const { getSettings } = select( blockEditorStore );
 			return {
 				media:
 					activeId &&
@@ -131,6 +142,7 @@ export default function PostFeaturedMediaEdit( {
 					? getEditedEntityRecord( 'postType', postTypeSlug, postId )
 							?.link
 					: null,
+				imageSizes: getSettings().imageSizes,
 			};
 		},
 		[ activeId, postTypeSlug, postId ]
@@ -146,8 +158,15 @@ export default function PostFeaturedMediaEdit( {
 		style: { width, height, aspectRatio },
 	} );
 	const borderProps = useBorderProps( attributes );
+	const shadowProps = getShadowClassesAndStyles( attributes );
 	const blockEditingMode = useBlockEditingMode();
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+
+	const imageSizeOptions = ( imageSizes || [] )
+		.filter(
+			( { slug } ) => media?.media_details?.sizes?.[ slug ]?.source_url
+		)
+		.map( ( { name, slug } ) => ( { value: slug, label: name } ) );
 
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const onUploadError = ( message ) =>
@@ -173,6 +192,36 @@ export default function PostFeaturedMediaEdit( {
 			setMeta( { ...meta, _featured_audio_id: 0 } );
 		}
 	}
+
+	const colorControls = blockEditingMode === 'default' && (
+		<InspectorControls group="color">
+			<OverlayControls
+				attributes={ attributes }
+				setAttributes={ setAttributes }
+				clientId={ clientId }
+			/>
+		</InspectorControls>
+	);
+
+	const dimensionControls = blockEditingMode === 'default' && (
+		<InspectorControls group="dimensions">
+			<DimensionControls
+				clientId={ clientId }
+				attributes={ attributes }
+				setAttributes={ setAttributes }
+				media={ activeType === 'image' ? media : null }
+			/>
+			{ activeType === 'image' && imageSizeOptions.length > 0 && (
+				<ResolutionTool
+					value={ sizeSlug }
+					onChange={ ( nextSizeSlug ) =>
+						setAttributes( { sizeSlug: nextSizeSlug } )
+					}
+					options={ imageSizeOptions }
+				/>
+			) }
+		</InspectorControls>
+	);
 
 	const inspector = blockEditingMode === 'default' && (
 		<InspectorControls>
@@ -253,6 +302,7 @@ export default function PostFeaturedMediaEdit( {
 				height: !! aspectRatio && '100%',
 				width: !! aspectRatio && '100%',
 				...borderProps.style,
+				...shadowProps.style,
 			} }
 		>
 			{ content }
@@ -263,8 +313,17 @@ export default function PostFeaturedMediaEdit( {
 	if ( ! activeType && ( isDescendentOfQueryLoop || ! postId ) ) {
 		return (
 			<>
+				{ colorControls }
+				{ dimensionControls }
 				{ inspector }
-				<figure { ...blockProps }>{ placeholder() }</figure>
+				<figure { ...blockProps }>
+					{ placeholder() }
+					<Overlay
+						attributes={ attributes }
+						setAttributes={ setAttributes }
+						clientId={ clientId }
+					/>
+				</figure>
 			</>
 		);
 	}
@@ -273,6 +332,8 @@ export default function PostFeaturedMediaEdit( {
 	if ( ! activeType ) {
 		return (
 			<>
+				{ colorControls }
+				{ dimensionControls }
 				{ inspector }
 				<figure { ...blockProps }>
 					<MediaPlaceholder
@@ -300,6 +361,7 @@ export default function PostFeaturedMediaEdit( {
 	// Media is set — render the appropriate element.
 	const mediaStyles = {
 		...borderProps.style,
+		...shadowProps.style,
 		height: aspectRatio ? '100%' : height,
 		width: !! aspectRatio && '100%',
 		objectFit: !! ( height || aspectRatio ) && scale,
@@ -365,6 +427,8 @@ export default function PostFeaturedMediaEdit( {
 
 	return (
 		<>
+			{ colorControls }
+			{ dimensionControls }
 			{ inspector }
 			{ !! activeId && ! isDescendentOfQueryLoop && (
 				<BlockControls group="other">
@@ -378,7 +442,14 @@ export default function PostFeaturedMediaEdit( {
 					/>
 				</BlockControls>
 			) }
-			<figure { ...blockProps }>{ wrappedMedia }</figure>
+			<figure { ...blockProps }>
+				{ wrappedMedia }
+				<Overlay
+					attributes={ attributes }
+					setAttributes={ setAttributes }
+					clientId={ clientId }
+				/>
+			</figure>
 		</>
 	);
 }
