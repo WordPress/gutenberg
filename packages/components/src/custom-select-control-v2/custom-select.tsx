@@ -117,11 +117,13 @@ function CustomSelect(
 	const contextValue = useMemo( () => ( { store, size } ), [ store, size ] );
 
 	// The legacy adapter historically disabled flipping to mask a stacking
-	// context glitch with the block toolbar (see #63180/#63357). When the
-	// popover is portaled, that workaround is no longer needed because the
-	// popover escapes ancestor stacking contexts; let Floating UI flip
-	// near viewport edges, which is also the right thing for #76126.
-	const flip = isLegacy && ! portal ? false : undefined;
+	// context glitch with the block toolbar (see #63180/#63357). That
+	// workaround is only needed when the popover renders inline; once
+	// portaled, it escapes ancestor stacking contexts and Floating UI's
+	// default flipping is the right behavior (also fixes #76126). The
+	// non-inline branch sets `true` explicitly rather than relying on
+	// Ariakit's default, so the behavior can't drift in future updates.
+	const flip = isLegacy && ! portal ? false : true;
 
 	return (
 		// Where should `restProps` be forwarded to?
