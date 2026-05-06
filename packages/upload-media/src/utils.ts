@@ -106,3 +106,24 @@ export function getFileBasename( name: string ): string {
 export function getFileNameFromUrl( url: string ) {
 	return getFilename( url ) || _x( 'unnamed', 'file name' );
 }
+
+/**
+ * Strips a trailing `-scaled` suffix from a file's basename.
+ *
+ * Used when deriving sub-size filenames from an attachment whose main
+ * file has been scaled down by `wp_create_image_subsizes()`. Sub-sizes
+ * inherit the un-suffixed basename so they end up named like
+ * `IMG_2300-150x150.jpg` rather than `IMG_2300-scaled-150x150.jpg`.
+ *
+ * @param name File name including extension.
+ * @return File name with `-scaled` removed from the basename, or the
+ *         input unchanged if no `-scaled` suffix is present.
+ */
+export function stripScaledSuffix( name: string ): string {
+	const basename = getFileBasename( name );
+	if ( ! basename.endsWith( '-scaled' ) ) {
+		return name;
+	}
+	const stripped = basename.slice( 0, -'-scaled'.length );
+	return name.replace( basename, stripped );
+}

@@ -13,7 +13,12 @@ type WPDataRegistry = ReturnType< typeof createRegistry >;
 /**
  * Internal dependencies
  */
-import { cloneFile, convertBlobToFile, renameFile } from '../utils';
+import {
+	cloneFile,
+	convertBlobToFile,
+	renameFile,
+	stripScaledSuffix,
+} from '../utils';
 import { canvasConvertToJpeg } from '../canvas-utils';
 import { isClientSideMediaSupported } from '../feature-detection';
 import { CLIENT_SIDE_SUPPORTED_MIME_TYPES, HEIC_MIME_TYPES } from './constants';
@@ -665,30 +670,21 @@ export function prepareItem( id: QueueItemId ) {
 		);
 		const isHeic = HEIC_MIME_TYPES.includes( file.type );
 
-		// For images that can be processed by vips, check if we need to scale down based on threshold.
+		// For images that can be processed by vips, upload the original and
+		// let generateThumbnails() handle threshold scaling as a sideload.
+		//
+		// Uploading the original (rather than a pre-scaled copy) preserves
+		// the un-suffixed basename in attachment.filename, so sub-size
+		// names are derived from the original — matching WordPress core's
+		// wp_create_image_subsizes() naming convention where only the
+		// scaled-down full-size copy carries the `-scaled` suffix and the
+		// original is kept alongside it as `original_image`.
+		//
+		// Main-file format conversion is handled server-side via the
+		// image_editor_output_format filter during create_item.
+		// The response carries image_output_format so generateThumbnails
+		// can transcode sub-sizes to the same target format.
 		if ( isImage && isVipsSupported ) {
-			const { bigImageSizeThreshold } = settings;
-
-			// If a threshold is set, add a resize operation to scale down large images.
-			// This matches WordPress core's behavior in wp_create_image_subsizes().
-			if ( bigImageSizeThreshold ) {
-				operations.push( [
-					OperationType.ResizeCrop,
-					{
-						resize: {
-							width: bigImageSizeThreshold,
-							height: bigImageSizeThreshold,
-						},
-						isThresholdResize: true,
-					},
-				] );
-			}
-
-			// Main-file format conversion is handled server-side via the
-			// image_editor_output_format filter during create_item.
-			// The response carries image_output_format so generateThumbnails
-			// can transcode sub-sizes to the same target format.
-
 			operations.push(
 				OperationType.Upload,
 				OperationType.ThumbnailGeneration,
@@ -1148,8 +1144,15 @@ export function generateThumbnails( id: QueueItemId ) {
 				attachment.missing_image_sizes as string[];
 
 			const thumbnailSource = item.sourceFile;
-			const file = attachment.filename
-				? renameFile( thumbnailSource, attachment.filename )
+			// Strip any `-scaled` suffix from the attachment filename so
+			// sub-size names are derived from the original basename. This
+			// matches WordPress core's wp_create_image_subsizes() naming,
+			// where only the scaled-down full-size copy carries `-scaled`.
+			const subSizeFilename = attachment.filename
+				? stripScaledSuffix( attachment.filename )
+				: null;
+			const file = subSizeFilename
+				? renameFile( thumbnailSource, subSizeFilename )
 				: thumbnailSource;
 			const batchId = uuidv4();
 
@@ -1247,9 +1250,11 @@ export function generateThumbnails( id: QueueItemId ) {
 					bitmap.close();
 
 					if ( needsScaling ) {
-						// Rename sourceFile to match the server attachment filename.
-						const sourceForScaled = attachment.filename
-							? renameFile( thumbnailSource, attachment.filename )
+						// Use the un-suffixed filename so vipsResizeImage adds
+						// a single `-scaled` suffix to produce e.g.
+						// `IMG_2300-scaled.jpg` (rather than `-scaled-scaled`).
+						const sourceForScaled = subSizeFilename
+							? renameFile( thumbnailSource, subSizeFilename )
 							: thumbnailSource;
 
 						// Add scaling to queue.

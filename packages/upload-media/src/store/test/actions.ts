@@ -1085,5 +1085,147 @@ describe( 'actions', () => {
 			// Exactly at threshold means no scaling (condition is > not >=).
 			expect( scaledItems ).toHaveLength( 0 );
 		} );
+
+		// Regression coverage for the `-scaled` filename bug:
+		// when the server returned an attachment whose filename already
+		// carried `-scaled` (because a prior step had scaled the main file),
+		// every sub-size inherited the suffix — producing names like
+		// `IMG_2300-scaled-150x150.jpg`. Sub-sizes must be derived from
+		// the un-suffixed basename instead.
+		it( 'should strip -scaled from attachment.filename when naming thumbnail sideloads', async () => {
+			mockCreateImageBitmap( 4000, 3000 );
+
+			unlock( registry.dispatch( uploadStore ) ).updateSettings( {
+				bigImageSizeThreshold: 2560,
+				allImageSizes: {
+					thumbnail: { width: 150, height: 150 },
+					medium: { width: 300, height: 300 },
+				},
+			} );
+
+			const item = await setupItemForThumbnailGeneration( {
+				attachment: { filename: 'IMG_2300-scaled.jpg' },
+			} );
+			await unlock( registry.dispatch( uploadStore ) ).generateThumbnails(
+				item.id
+			);
+
+			const allItems = unlock(
+				registry.select( uploadStore )
+			).getAllItems();
+
+			const thumbnailItems = allItems.filter(
+				( i ) =>
+					i.additionalData?.image_size === 'thumbnail' ||
+					i.additionalData?.image_size === 'medium'
+			);
+			expect( thumbnailItems ).toHaveLength( 2 );
+			for ( const sideload of thumbnailItems ) {
+				expect( sideload.file.name ).toBe( 'IMG_2300.jpg' );
+			}
+		} );
+
+		it( 'should strip -scaled from attachment.filename when naming the scaled sideload', async () => {
+			mockCreateImageBitmap( 4000, 3000 );
+
+			unlock( registry.dispatch( uploadStore ) ).updateSettings( {
+				bigImageSizeThreshold: 2560,
+				allImageSizes: {
+					thumbnail: { width: 150, height: 150 },
+				},
+			} );
+
+			const item = await setupItemForThumbnailGeneration( {
+				attachment: {
+					filename: 'IMG_2300-scaled.jpg',
+					missing_image_sizes: [ 'thumbnail' ],
+				},
+			} );
+			await unlock( registry.dispatch( uploadStore ) ).generateThumbnails(
+				item.id
+			);
+
+			const allItems = unlock(
+				registry.select( uploadStore )
+			).getAllItems();
+
+			const scaledItems = allItems.filter(
+				( i ) => i.additionalData?.image_size === 'scaled'
+			);
+			expect( scaledItems ).toHaveLength( 1 );
+			// vipsResizeImage adds the single `-scaled` suffix when running
+			// the ResizeCrop operation; the file enters the queue under the
+			// un-suffixed basename so we don't end up with `-scaled-scaled`.
+			expect( scaledItems[ 0 ].file.name ).toBe( 'IMG_2300.jpg' );
+		} );
+
+		it( 'should preserve un-suffixed attachment.filename for thumbnails', async () => {
+			mockCreateImageBitmap( 800, 600 );
+
+			unlock( registry.dispatch( uploadStore ) ).updateSettings( {
+				bigImageSizeThreshold: 2560,
+				allImageSizes: {
+					thumbnail: { width: 150, height: 150 },
+					medium: { width: 300, height: 300 },
+				},
+			} );
+
+			const item = await setupItemForThumbnailGeneration( {
+				attachment: { filename: 'photo.jpg' },
+			} );
+			await unlock( registry.dispatch( uploadStore ) ).generateThumbnails(
+				item.id
+			);
+
+			const allItems = unlock(
+				registry.select( uploadStore )
+			).getAllItems();
+
+			const sideloads = allItems.filter(
+				( i ) => i.parentId === item.id
+			);
+			expect( sideloads.length ).toBeGreaterThan( 0 );
+			for ( const sideload of sideloads ) {
+				expect( sideload.file.name ).toBe( 'photo.jpg' );
+			}
+		} );
+	} );
+
+	describe( 'prepareItem big image threshold', () => {
+		it( 'should not pre-scale the main upload when bigImageSizeThreshold is set', async () => {
+			// Pre-scaling the main upload would cause the server-returned
+			// attachment.filename to carry `-scaled`, which would then leak
+			// into every sub-size name. Threshold scaling must happen as a
+			// sideload so the original is uploaded with its un-suffixed
+			// basename.
+			unlock( registry.dispatch( uploadStore ) ).updateSettings( {
+				bigImageSizeThreshold: 2560,
+			} );
+			unlock( registry.dispatch( uploadStore ) ).addItem( {
+				file: jpegFile,
+			} );
+
+			const item = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			await unlock( registry.dispatch( uploadStore ) ).prepareItem(
+				item.id
+			);
+
+			const updatedItem = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			expect( updatedItem.operations ).not.toEqual(
+				expect.arrayContaining( [ OperationType.ResizeCrop ] )
+			);
+			expect( updatedItem.operations ).toEqual(
+				expect.arrayContaining( [
+					OperationType.Upload,
+					OperationType.ThumbnailGeneration,
+				] )
+			);
+		} );
 	} );
 } );
