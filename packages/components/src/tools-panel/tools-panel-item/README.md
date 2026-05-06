@@ -32,6 +32,13 @@ panel's menu.
 -   Required: No
 -   Default: `false`
 
+### `isShownOnFirstRender`: `boolean`
+
+For optional controls only, this determines whether the item should be visible
+when it first renders, even if `hasValue()` is `false`.
+
+-   Required: No
+
 ### `label`: `string`
 
 The supplied label is dual purpose.

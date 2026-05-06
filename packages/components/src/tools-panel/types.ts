@@ -117,6 +117,11 @@ export type ToolsPanelItem = {
 	 */
 	isShownByDefault?: boolean;
 	/**
+	 * For optional items only, determines whether the item should be visible on
+	 * first render even when `hasValue()` is false.
+	 */
+	isShownOnFirstRender?: boolean;
+	/**
 	 * The supplied label is dual purpose. It is used as:
 	 * 1. the human-readable label for the panel's dropdown menu
 	 * 2. a key to locate the corresponding item in the panel's menu context to

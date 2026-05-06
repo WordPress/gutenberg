@@ -53,17 +53,23 @@ const generateMenuItems = ( {
 	const newMenuItems: ToolsPanelMenuItems = emptyMenuItems();
 	const menuItems: ToolsPanelMenuItems = emptyMenuItems();
 
-	panelItems.forEach( ( { hasValue, isShownByDefault, label } ) => {
-		const group = isShownByDefault ? 'default' : 'optional';
+	panelItems.forEach(
+		( { hasValue, isShownByDefault, isShownOnFirstRender, label } ) => {
+			const group = isShownByDefault ? 'default' : 'optional';
 
-		// If a menu item for this label has already been flagged as customized
-		// (for default controls), or toggled on (for optional controls), do not
-		// overwrite its value as those controls would lose that state.
-		const existingItemValue = currentMenuItems?.[ group ]?.[ label ];
-		const value = existingItemValue ? existingItemValue : hasValue();
+			// If a menu item for this label has already been flagged as customized
+			// (for default controls), or toggled on (for optional controls), do not
+			// overwrite its value as those controls would lose that state.
+			const existingItemValue = currentMenuItems?.[ group ]?.[ label ];
+			const initialValue =
+				! isShownByDefault && isShownOnFirstRender !== undefined
+					? isShownOnFirstRender
+					: hasValue();
+			const value = existingItemValue ?? initialValue;
 
-		newMenuItems[ group ][ label ] = shouldReset ? false : value;
-	} );
+			newMenuItems[ group ][ label ] = shouldReset ? false : value;
+		}
+	);
 
 	// Loop the known, previously registered items first to maintain menu order.
 	menuItemOrder.forEach( ( key ) => {

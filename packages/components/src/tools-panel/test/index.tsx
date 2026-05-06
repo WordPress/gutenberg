@@ -488,6 +488,32 @@ describe( 'ToolsPanel', () => {
 			expect( controlRerendered ).toBeInTheDocument();
 		} );
 
+		it( 'should render optional item on first render when isShownOnFirstRender is true', () => {
+			const { rerender } = render(
+				<ToolsPanel { ...defaultProps }>
+					<ToolsPanelItem { ...altControlProps }>
+						<div>Optional control</div>
+					</ToolsPanelItem>
+				</ToolsPanel>
+			);
+
+			expect(
+				screen.queryByText( 'Optional control' )
+			).not.toBeInTheDocument();
+
+			rerender(
+				<ToolsPanel { ...defaultProps }>
+					<ToolsPanelItem { ...altControlProps } isShownOnFirstRender>
+						<div>Optional control</div>
+					</ToolsPanelItem>
+				</ToolsPanel>
+			);
+
+			expect(
+				screen.getByText( 'Optional control' )
+			).toBeInTheDocument();
+		} );
+
 		it( 'should continue to render shown by default item after it is toggled off via menu item', async () => {
 			render(
 				<ToolsPanel { ...defaultProps }>

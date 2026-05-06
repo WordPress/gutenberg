@@ -16,6 +16,7 @@ export function useToolsPanelItem(
 		className,
 		hasValue,
 		isShownByDefault = false,
+		isShownOnFirstRender,
 		label,
 		panelId,
 		resetAllFilter = noop,
@@ -62,6 +63,7 @@ export function useToolsPanelItem(
 			registerPanelItem( {
 				hasValue: hasValueCallback,
 				isShownByDefault,
+				isShownOnFirstRender,
 				label,
 				panelId,
 			} );
@@ -79,6 +81,7 @@ export function useToolsPanelItem(
 		currentPanelId,
 		hasMatchingPanel,
 		isShownByDefault,
+		isShownOnFirstRender,
 		label,
 		hasValueCallback,
 		panelId,
