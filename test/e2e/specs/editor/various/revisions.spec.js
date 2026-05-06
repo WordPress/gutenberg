@@ -263,6 +263,153 @@ test.describe( 'Post revisions', () => {
 	} );
 } );
 
+test.describe( 'Post revisions slider pagination', () => {
+	test.afterEach( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllPosts();
+	} );
+
+	test( 'should paginate when there are more than 100 revisions', async ( {
+		admin,
+		page,
+		requestUtils,
+	} ) => {
+		// Create a post and update it enough times to require pagination.
+		// Page 1 holds the newest 100 revisions, so > 100 total → 2 pages.
+		const post = await requestUtils.rest( {
+			method: 'POST',
+			path: '/wp/v2/posts',
+			data: {
+				title: 'Pagination Test',
+				content: '<!-- wp:paragraph --><p>0</p><!-- /wp:paragraph -->',
+				status: 'draft',
+			},
+		} );
+
+		for ( let i = 1; i <= 105; i++ ) {
+			await requestUtils.rest( {
+				method: 'POST',
+				path: `/wp/v2/posts/${ post.id }`,
+				data: {
+					content: `<!-- wp:paragraph --><p>${ i }</p><!-- /wp:paragraph -->`,
+				},
+			} );
+		}
+
+		await admin.editPost( post.id );
+
+		const settingsSidebar = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+		await settingsSidebar.getByRole( 'tab', { name: 'Post' } ).click();
+
+		// The revisions button is labeled with the count. The editor count
+		// may differ from the REST version-history count by an autosave,
+		// so read it from the rendered button.
+		const revisionsButton = settingsSidebar
+			.getByRole( 'button' )
+			.filter( { hasText: /^\d+$/ } );
+		await expect( revisionsButton ).toBeVisible();
+		const totalRevisions = parseInt(
+			await revisionsButton.textContent(),
+			10
+		);
+		const olderPageSize = totalRevisions - 100;
+
+		await revisionsButton.click();
+		await expect(
+			page.getByRole( 'button', { name: 'Restore' } )
+		).toBeVisible();
+
+		// Page 1 holds the newest 100 revisions. The prev chevron points
+		// at page 2, which holds the remaining older revisions.
+		const prevPageButton = page.getByRole( 'button', {
+			name: `Revisions 1–${ olderPageSize }`,
+		} );
+		const nextPageButton = page.getByRole( 'button', {
+			name: 'No newer revisions',
+		} );
+		await expect( prevPageButton ).toBeEnabled();
+		await expect( nextPageButton ).toBeDisabled();
+
+		// Page 1 holds 100 revisions, so the slider's max is 99.
+		const slider = page.getByRole( 'slider', { name: 'Revision' } );
+		await expect( slider ).toHaveAttribute( 'max', '99' );
+
+		await prevPageButton.click();
+
+		// After loading page 2: prev chevron disabled, next chevron enabled.
+		await expect(
+			page.getByRole( 'button', { name: 'No older revisions' } )
+		).toBeDisabled();
+		await expect(
+			page.getByRole( 'button', {
+				name: `Revisions ${ olderPageSize + 1 }–${ totalRevisions }`,
+			} )
+		).toBeEnabled();
+
+		// Slider now reflects page 2's smaller revision count.
+		await expect( slider ).toHaveAttribute(
+			'max',
+			String( olderPageSize - 1 )
+		);
+	} );
+
+	test( 'should not show pagination when there are 100 or fewer revisions', async ( {
+		admin,
+		page,
+		requestUtils,
+	} ) => {
+		const post = await requestUtils.rest( {
+			method: 'POST',
+			path: '/wp/v2/posts',
+			data: {
+				title: 'No Pagination Test',
+				content: '<!-- wp:paragraph --><p>0</p><!-- /wp:paragraph -->',
+				status: 'draft',
+			},
+		} );
+
+		for ( let i = 1; i <= 5; i++ ) {
+			await requestUtils.rest( {
+				method: 'POST',
+				path: `/wp/v2/posts/${ post.id }`,
+				data: {
+					content: `<!-- wp:paragraph --><p>${ i }</p><!-- /wp:paragraph -->`,
+				},
+			} );
+		}
+
+		await admin.editPost( post.id );
+
+		const settingsSidebar = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+		await settingsSidebar.getByRole( 'tab', { name: 'Post' } ).click();
+
+		const revisionsButton = settingsSidebar
+			.getByRole( 'button' )
+			.filter( { hasText: /^\d+$/ } );
+		await expect( revisionsButton ).toBeVisible();
+		await revisionsButton.click();
+		await expect(
+			page.getByRole( 'button', { name: 'Restore' } )
+		).toBeVisible();
+
+		await expect(
+			page.getByRole( 'slider', { name: 'Revision' } )
+		).toBeVisible();
+		await expect(
+			page.getByRole( 'button', { name: /^Revisions \d/ } )
+		).toHaveCount( 0 );
+		await expect(
+			page.getByRole( 'button', { name: 'No older revisions' } )
+		).toHaveCount( 0 );
+		await expect(
+			page.getByRole( 'button', { name: 'No newer revisions' } )
+		).toHaveCount( 0 );
+	} );
+} );
+
 test.describe( 'Template and template part revisions', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'emptytheme' );
