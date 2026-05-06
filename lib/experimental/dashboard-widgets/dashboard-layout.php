@@ -10,6 +10,18 @@
  */
 
 /**
+ * Preferences scope under which the dashboard layout is stored.
+ * Mirrors the scope read by the JS surface.
+ */
+const GUTENBERG_DASHBOARD_LAYOUT_SCOPE = 'core/dashboard';
+
+/**
+ * Preferences key under `GUTENBERG_DASHBOARD_LAYOUT_SCOPE` that holds
+ * the layout array.
+ */
+const GUTENBERG_DASHBOARD_LAYOUT_KEY = 'dashboardLayout';
+
+/**
  * Injects a registered default dashboard layout into the user's
  * `persisted_preferences` read when the stored layout is empty.
  *
@@ -42,8 +54,8 @@ function gutenberg_inject_dashboard_default_layout( $value, $user_id, $meta_key 
 		$base = array();
 	}
 
-	$committed = isset( $base['core/dashboard']['dashboardLayout'] )
-		? $base['core/dashboard']['dashboardLayout']
+	$committed = isset( $base[ GUTENBERG_DASHBOARD_LAYOUT_SCOPE ][ GUTENBERG_DASHBOARD_LAYOUT_KEY ] )
+		? $base[ GUTENBERG_DASHBOARD_LAYOUT_SCOPE ][ GUTENBERG_DASHBOARD_LAYOUT_KEY ]
 		: array();
 
 	if ( ! empty( $committed ) ) {
@@ -65,10 +77,10 @@ function gutenberg_inject_dashboard_default_layout( $value, $user_id, $meta_key 
 		return $value;
 	}
 
-	if ( ! isset( $base['core/dashboard'] ) || ! is_array( $base['core/dashboard'] ) ) {
-		$base['core/dashboard'] = array();
+	if ( ! isset( $base[ GUTENBERG_DASHBOARD_LAYOUT_SCOPE ] ) || ! is_array( $base[ GUTENBERG_DASHBOARD_LAYOUT_SCOPE ] ) ) {
+		$base[ GUTENBERG_DASHBOARD_LAYOUT_SCOPE ] = array();
 	}
-	$base['core/dashboard']['dashboardLayout'] = $default;
+	$base[ GUTENBERG_DASHBOARD_LAYOUT_SCOPE ][ GUTENBERG_DASHBOARD_LAYOUT_KEY ] = $default;
 
 	return array( $base );
 }
