@@ -135,49 +135,72 @@ export default function UnifiedFeaturedMedia() {
 						allowedTypes={ ALLOWED_MEDIA_TYPES }
 						render={ ( { open } ) => (
 							<div className="editor-post-featured-image__container">
-								<Button
-									__next40pxDefaultSize
-									className={
-										! activeId
-											? 'editor-post-featured-image__toggle'
-											: 'editor-post-featured-image__preview'
-									}
-									onClick={ open }
-									aria-label={
-										activeId
-											? __(
-													'Edit or replace the featured media'
-											  )
-											: null
-									}
-									aria-haspopup="dialog"
-									disabled={ isLoading }
-									accessibleWhenDisabled
-								>
-									{ isLoading && <Spinner /> }
-									{ ! isLoading &&
-										! activeId &&
-										__( 'Add featured media' ) }
-									{ ! isLoading &&
-										activeType === 'image' &&
-										thumbnailUrl && (
+								{ /* Loading state */ }
+								{ isLoading && (
+									<Button
+										__next40pxDefaultSize
+										className="editor-post-featured-image__toggle"
+										disabled
+										accessibleWhenDisabled
+									>
+										<Spinner />
+									</Button>
+								) }
+								{ /* No media: upload/select button */ }
+								{ ! isLoading && ! activeId && (
+									<Button
+										__next40pxDefaultSize
+										className="editor-post-featured-image__toggle"
+										onClick={ open }
+										aria-haspopup="dialog"
+									>
+										{ __( 'Add featured media' ) }
+									</Button>
+								) }
+								{ /* Image: thumbnail inside a clickable button */ }
+								{ ! isLoading && activeType === 'image' && (
+									<Button
+										__next40pxDefaultSize
+										className="editor-post-featured-image__preview"
+										onClick={ open }
+										aria-label={ __(
+											'Edit or replace the featured media'
+										) }
+										aria-haspopup="dialog"
+									>
+										{ thumbnailUrl ? (
 											<img
 												className="editor-post-featured-image__preview-image"
 												src={ thumbnailUrl }
 												alt={ mediaName }
 											/>
+										) : (
+											mediaName
 										) }
-									{ ! isLoading &&
-										activeType === 'image' &&
-										! thumbnailUrl &&
-										activeMedia &&
-										mediaName }
-									{ ! isLoading &&
-										( activeType === 'video' ||
-											activeType === 'audio' ) &&
-										mediaName }
-								</Button>
-								{ !! activeId && (
+									</Button>
+								) }
+								{ /* Video: native player — Replace/Remove handle the library */ }
+								{ ! isLoading &&
+									activeType === 'video' &&
+									activeMedia && (
+										<video
+											className="editor-post-featured-image__preview-video"
+											src={ activeMedia.source_url }
+											controls
+											preload="metadata"
+										/>
+									) }
+								{ /* Audio: native player */ }
+								{ ! isLoading &&
+									activeType === 'audio' &&
+									activeMedia && (
+										<audio
+											className="editor-post-featured-image__preview-audio"
+											src={ activeMedia.source_url }
+											controls
+										/>
+									) }
+								{ !! activeId && ! isLoading && (
 									<Stack className="editor-post-featured-image__actions">
 										<Button
 											__next40pxDefaultSize
