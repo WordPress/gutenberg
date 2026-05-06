@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { Page } from '@wordpress/admin-ui';
-import { Button } from '@wordpress/components';
+import { Button, Link } from '@wordpress/components';
 import { DataViews, type View } from '@wordpress/dataviews';
 import { useEntityRecords } from '@wordpress/core-data';
 import { useMemo, useState } from '@wordpress/element';
@@ -58,6 +58,16 @@ function TaxonomiesEmptyState( { hasSearch }: { hasSearch: boolean } ) {
 					? __( 'Try a different search term.' )
 					: __( 'Create your first taxonomy to get started.' ) }
 			</EmptyState.Description>
+			{ ! hasSearch && (
+				<EmptyState.Actions>
+					<Link
+						href="https://wordpress.org/documentation/article/taxonomies/"
+						openInNewTab
+					>
+						{ __( 'Learn more about taxonomies' ) }
+					</Link>
+				</EmptyState.Actions>
+			) }
 		</EmptyState.Root>
 	);
 }

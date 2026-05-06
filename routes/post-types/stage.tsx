@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { Page } from '@wordpress/admin-ui';
-import { Button } from '@wordpress/components';
+import { Button, Link } from '@wordpress/components';
 import { DataViews, type View } from '@wordpress/dataviews';
 import { useEntityRecords } from '@wordpress/core-data';
 import { useMemo, useState } from '@wordpress/element';
@@ -60,6 +60,16 @@ function PostTypesEmptyState( { hasSearch }: { hasSearch: boolean } ) {
 					? __( 'Try a different search term.' )
 					: __( 'Create your first post type to get started.' ) }
 			</EmptyState.Description>
+			{ ! hasSearch && (
+				<EmptyState.Actions>
+					<Link
+						href="https://wordpress.org/documentation/article/what-is-post-type/"
+						openInNewTab
+					>
+						{ __( 'Learn more about post types' ) }
+					</Link>
+				</EmptyState.Actions>
+			) }
 		</EmptyState.Root>
 	);
 }
