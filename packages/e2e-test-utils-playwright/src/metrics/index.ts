@@ -431,10 +431,9 @@ export class Metrics {
 
 /**
  * Build a filesystem-safe default trace name from the current Playwright test's
- * title path. Drops the project- and file-name segments that Playwright
- * prepends, and strips any `(N of M)` iteration suffix so that repeated runs
- * of the same scenario produce the same name. Falls back to "trace" when
- * called outside a test context.
+ * title path. Drops the leading file-path segment and strips any `(N of M)`
+ * iteration suffix so that repeated runs of the same scenario produce the
+ * same name. Falls back to "trace" when called outside a test context.
  */
 function defaultTraceName(): string {
 	const info = ( () => {
@@ -450,10 +449,11 @@ function defaultTraceName(): string {
 		return 'trace';
 	}
 
-	// `titlePath` is `[projectName, fileName, ...describes, testTitle]`. Keep
-	// only the describe blocks and the test title — the rest is noise once
-	// the artifact directory is already scoped to a single CI run.
-	const segments = info.titlePath.slice( 2 );
+	// `titlePath` is `[fileRelativePath, ...describes, testTitle]`. Drop the
+	// file path so the name reflects the describe blocks and test title;
+	// keep the outer describe (e.g. "Post Editor Performance") to disambiguate
+	// scenarios that share an inner describe across spec files.
+	const segments = info.titlePath.slice( 1 );
 
 	const slug = segments
 		.map( ( segment ) =>
