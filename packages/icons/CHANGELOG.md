@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Add new `microphone` icon.
+
 ## 13.0.0 (2026-04-29)
 
 ### Breaking Changes

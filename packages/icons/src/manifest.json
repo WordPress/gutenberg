@@ -998,6 +998,11 @@
 		"public": true
 	},
 	{
+		"slug": "microphone",
+		"label": "Microphone",
+		"filePath": "library/microphone.svg"
+	},
+	{
 		"slug": "mobile",
 		"label": "Mobile",
 		"filePath": "library/mobile.svg",
