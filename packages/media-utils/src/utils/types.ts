@@ -208,6 +208,8 @@ export type AdditionalData = BetterOmit< CreateRestAttachment, 'meta' >;
 export interface CreateSideloadFile {
 	image_size?: string;
 	upload_request?: string;
+	generate_sub_sizes?: boolean;
+	convert_format?: boolean;
 }
 
 export interface SideloadAdditionalData {

@@ -149,3 +149,32 @@ export function intValueOrDefault(
 
 	return isNaN( intValue ) ? defaultValue : intValue;
 }
+
+/**
+ * Take `size` items from `items` starting at `offset`, wrapping around the
+ * end of the list. Returns the selected window and the offset to use on the
+ * next call (advanced by `size`).
+ *
+ * @param items  The list to rotate through.
+ * @param offset The starting index. Values larger than `items.length` are
+ *               wrapped (modulo).
+ * @param size   The maximum number of items to include in the window. The
+ *               window may be shorter if `size` exceeds `items.length`.
+ */
+export function rotateWindow< T >(
+	items: T[],
+	offset: number,
+	size: number
+): { window: T[]; nextOffset: number } {
+	if ( items.length === 0 ) {
+		return { window: [], nextOffset: 0 };
+	}
+
+	const start = ( ( offset % items.length ) + items.length ) % items.length;
+	const wrapped = [ ...items.slice( start ), ...items.slice( 0, start ) ];
+
+	return {
+		window: wrapped.slice( 0, Math.max( 0, size ) ),
+		nextOffset: ( start + Math.max( 0, size ) ) % items.length,
+	};
+}

@@ -353,7 +353,11 @@ export function ImageEdit( {
 
 	const isSideloading = useSelect(
 		( select ) => {
-			if ( ! window.__clientSideMediaProcessing || ! id ) {
+			if (
+				( ! window.__clientSideMediaProcessing &&
+					! window.__heicUploadSupport ) ||
+				! id
+			) {
 				return false;
 			}
 			return select( uploadStore ).isUploadingById( id );

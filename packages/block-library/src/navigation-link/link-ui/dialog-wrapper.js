@@ -1,10 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { Button, VisuallyHidden } from '@wordpress/components';
+import { Button } from '@wordpress/components';
 import { __, isRTL } from '@wordpress/i18n';
 import { chevronLeftSmall, chevronRightSmall } from '@wordpress/icons';
 import { useInstanceId, useFocusOnMount } from '@wordpress/compose';
+import { VisuallyHidden } from '@wordpress/ui';
 
 /**
  * Shared BackButton component for consistent navigation across LinkUI sub-components.

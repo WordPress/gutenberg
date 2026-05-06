@@ -20,14 +20,8 @@ import { store as noticesStore } from '@wordpress/notices';
  */
 import { store as coreGuidelinesStore } from '../store';
 import { saveGuidelines } from '../api';
-import type { GuidelineAccordionFormProps } from '../types';
 
-export default function GuidelineAccordionForm( {
-	slug,
-	contentId,
-	headingId,
-	descriptionId,
-}: GuidelineAccordionFormProps ) {
+export default function GuidelineAccordionForm( { slug }: { slug: string } ) {
 	const { setGuideline } = useDispatch( coreGuidelinesStore );
 	const { createSuccessNotice } = useDispatch( noticesStore );
 	const [ loading, setLoading ] = useState( false );
@@ -127,13 +121,7 @@ export default function GuidelineAccordionForm( {
 	};
 
 	return (
-		<form
-			id={ contentId }
-			aria-labelledby={ headingId }
-			aria-describedby={ descriptionId }
-			onSubmit={ handleSave }
-			className="guidelines__accordion-form"
-		>
+		<form onSubmit={ handleSave }>
 			<VStack spacing={ 4 }>
 				<DataForm
 					data={ data }

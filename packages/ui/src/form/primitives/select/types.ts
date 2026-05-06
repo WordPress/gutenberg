@@ -1,6 +1,10 @@
 import type { Select as _Select } from '@base-ui/react/select';
+import type { ComponentPropsWithoutRef, ReactElement } from 'react';
+
 import type { ComponentProps } from '../../../utils/types';
 import type { InputLayoutProps } from '../input-layout/types';
+
+export type PortalProps = ComponentPropsWithoutRef< typeof _Select.Portal >;
 
 // The second type parameter is the `multiple` flag (currently disabled).
 export type SelectRootProps = Omit<
@@ -34,9 +38,12 @@ export type SelectPopupProps = ComponentProps< typeof _Select.Popup > & {
 	 */
 	children?: React.ReactNode;
 	/**
-	 * A parent element to render the portal into.
+	 * Optional portal element, typically `<Select.Portal />` with custom
+	 * `container`. When omitted, `Select.Popup` uses `Select.Portal` with
+	 * default props. Do not pass `children` on the portal element; they would
+	 * be ignored.
 	 */
-	container?: _Select.Portal.Props[ 'container' ];
+	portal?: ReactElement< Omit< PortalProps, 'children' > >;
 };
 
 export type SelectItemProps = Omit<
