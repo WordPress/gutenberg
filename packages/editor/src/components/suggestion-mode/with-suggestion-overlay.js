@@ -119,14 +119,27 @@ function SuggestingBlockEdit( { BlockEdit, props } ) {
 const withSuggestionOverlay = createHigherOrderComponent(
 	( BlockEdit ) =>
 		function BlockEditWithSuggestionOverlay( props ) {
+			const { clientId } = props;
 			const isSuggestMode = useSelect(
 				( select ) =>
 					select( EDITOR_STORE_NAME ).getEditorIntent() ===
 					SUGGEST_INTENT,
 				[]
 			);
+			const isPendingInsert = useSelect(
+				( select ) =>
+					select( blockEditorStore )?.getBlockAttributes?.( clientId )
+						?.metadata?.suggestion?.type === 'pending-insert',
+				[ clientId ]
+			);
 
-			if ( ! isSuggestMode ) {
+			// A pending-insert block has no "before" state to preserve — the
+			// block itself is the suggestion. Edits to it write through to
+			// the real attributes (skipping the overlay) so the content
+			// syncs via CRDT and renders on the reviewer's canvas as part
+			// of the preview, instead of being trapped in the suggester's
+			// local overlay.
+			if ( ! isSuggestMode || isPendingInsert ) {
 				return <BlockEdit { ...props } />;
 			}
 
