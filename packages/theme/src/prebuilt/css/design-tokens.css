@@ -254,15 +254,15 @@
 	--wpds-elevation-lg: 0 5px 15px 0 #00000014, 0 15px 27px 0 #00000012,
 		0 30px 36px 0 #0000000a, 0 50px 43px 0 #00000005;
 	/* Micro-delays and transition offsets */
-	--wpds-motion-duration-xs: undefinedundefined;
+	--wpds-motion-duration-xs: 50ms;
 	/* Micro-interactions like focus rings and state changes */
-	--wpds-motion-duration-sm: undefinedundefined;
+	--wpds-motion-duration-sm: 100ms;
 	/* Standard transitions like menus and popovers */
-	--wpds-motion-duration-md: undefinedundefined;
+	--wpds-motion-duration-md: 200ms;
 	/* Deliberate animations like slides and reveals */
-	--wpds-motion-duration-lg: undefinedundefined;
+	--wpds-motion-duration-lg: 300ms;
 	/* Extended animations like complex or multi-step transitions */
-	--wpds-motion-duration-xl: undefinedundefined;
+	--wpds-motion-duration-xl: 400ms;
 	/* Nearly imperceptible easing for hover, color, and background transitions */
 	--wpds-motion-easing-subtle: cubic-bezier( 0.15, 0, 0.15, 1 );
 	/* General-purpose easing for on-screen movement like resizing, morphing, and layout shifts */
