@@ -11,11 +11,16 @@
 	"dependencies": {
 		"@wordpress/admin-ui": "file:../../packages/admin-ui",
 		"@wordpress/base-styles": "file:../../packages/base-styles",
+		"@wordpress/compose": "file:../../packages/compose",
 		"@wordpress/data": "file:../../packages/data",
 		"@wordpress/dataviews": "file:../../packages/dataviews",
 		"@wordpress/element": "file:../../packages/element",
+		"@wordpress/grid": "file:../../packages/grid",
 		"@wordpress/hooks": "file:../../packages/hooks",
 		"@wordpress/i18n": "file:../../packages/i18n",
-		"@wordpress/warning": "file:../../packages/warning"
+		"@wordpress/icons": "file:../../packages/icons",
+		"@wordpress/ui": "file:../../packages/ui",
+		"@wordpress/warning": "file:../../packages/warning",
+		"clsx": "^2.1.1"
 	}
 }
