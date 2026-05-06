@@ -7,7 +7,7 @@ import { DataViews, type View } from '@wordpress/dataviews';
 import { useEntityRecords } from '@wordpress/core-data';
 import { useMemo, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { customPostType, search } from '@wordpress/icons';
+import { tag, search } from '@wordpress/icons';
 import { useNavigate } from '@wordpress/route';
 import { EmptyState } from '@wordpress/ui';
 import {
@@ -47,7 +47,7 @@ const DEFAULT_VIEW: View = {
 function TaxonomiesEmptyState( { hasSearch }: { hasSearch: boolean } ) {
 	return (
 		<EmptyState.Root>
-			<EmptyState.Icon icon={ hasSearch ? search : customPostType } />
+			<EmptyState.Icon icon={ hasSearch ? search : tag } />
 			<EmptyState.Title>
 				{ hasSearch
 					? __( 'No taxonomies match your search' )
