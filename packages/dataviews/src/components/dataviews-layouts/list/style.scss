@@ -74,12 +74,6 @@ div.dataviews-view-list {
 			&:focus-within {
 				color: var(--wpds-color-fg-interactive-brand);
 				background-color: var(--wpds-color-bg-interactive-brand-weak);
-				border-top: 1px solid var(--wpds-color-stroke-surface-neutral);
-
-				& + div[role="row"],
-				& + div[role="article"] {
-					border-top: 1px solid var(--wpds-color-stroke-surface-neutral);
-				}
 
 				.dataviews-title-field,
 				.dataviews-view-list__field {
