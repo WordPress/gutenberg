@@ -162,6 +162,34 @@ describe( 'markContentDiff', () => {
 			'<del class="has-suggestion-deletion">Old</del>'
 		);
 	} );
+
+	it( 'paints the suggester avatar color onto each del/ins run', () => {
+		// `authorColor` rides along as an inline custom property on every
+		// mark so two suggesters' marks read as different colors. The CSS
+		// partial in block-editor consumes the variable; the helper just
+		// has to write it onto the tag.
+		expect(
+			markContentDiff( 'Hello world', 'Hello there', '#b26200' )
+		).toBe(
+			'Hello ' +
+				'<del class="has-suggestion-deletion" style="--suggestion-author-color: #b26200">world</del>' +
+				'<ins class="has-suggestion-addition" style="--suggestion-author-color: #b26200">there</ins>'
+		);
+	} );
+
+	it( 'omits the inline style when authorColor is null or undefined', () => {
+		// Anonymous / pre-collab edits keep the existing red/green CSS
+		// fallback, so the marks on the wire stay byte-identical to the
+		// pre-author-color shape.
+		expect( markContentDiff( 'Hello', 'Hi', null ) ).toBe(
+			'<del class="has-suggestion-deletion">Hello</del>' +
+				'<ins class="has-suggestion-addition">Hi</ins>'
+		);
+		expect( markContentDiff( 'Hello', 'Hi', undefined ) ).toBe(
+			'<del class="has-suggestion-deletion">Hello</del>' +
+				'<ins class="has-suggestion-addition">Hi</ins>'
+		);
+	} );
 } );
 
 describe( 'stripSuggestionMarks', () => {
@@ -209,5 +237,17 @@ describe( 'stripSuggestionMarks', () => {
 	it( 'passes null and undefined through untouched', () => {
 		expect( stripSuggestionMarks( null ) ).toBeNull();
 		expect( stripSuggestionMarks( undefined ) ).toBeUndefined();
+	} );
+
+	it( 'discards the per-author inline style attribute on round-trip', () => {
+		// The author color rides on the wrapper element, so removing
+		// (deletion) or unwrapping (addition) the wrapper drops the inline
+		// `style` attribute with it — proposed value never carries leftover
+		// `--suggestion-author-color` on persistence.
+		const marked =
+			'Hello ' +
+			'<del class="has-suggestion-deletion" style="--suggestion-author-color: #b26200">world</del>' +
+			'<ins class="has-suggestion-addition" style="--suggestion-author-color: #b26200">there</ins>';
+		expect( stripSuggestionMarks( marked ) ).toBe( 'Hello there' );
 	} );
 } );

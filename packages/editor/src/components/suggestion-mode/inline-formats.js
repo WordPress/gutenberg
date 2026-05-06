@@ -72,15 +72,36 @@ const DELETION_CLASS = 'has-suggestion-deletion';
 const ADDITION_CLASS = 'has-suggestion-addition';
 
 /**
+ * Build the optional `style` attribute that paints the suggester's avatar
+ * color into the inline mark. Returns an empty string when no color is
+ * passed so anonymous / pre-collab edits keep the existing red/green CSS
+ * fallbacks. Inline rather than a class because each suggester needs a
+ * distinct value, and there's no block-level wrapper to hang a custom
+ * property on — marks live inside RichText.
+ *
+ * @param {string|null|undefined} color Hex color from `getAvatarBorderColor`.
+ * @return {string} Style attribute fragment, leading-space included, or ''.
+ */
+function authorStyleAttr( color ) {
+	if ( ! color ) {
+		return '';
+	}
+	return ` style="--suggestion-author-color: ${ color }"`;
+}
+
+/**
  * Wrap a chunk of HTML in the suggested-deletion `<del>`. Used when an
  * incoming run was present in the baseline but absent from the proposed
  * value, so reviewers see what the suggester wants to remove.
  *
- * @param {string} value Run content (already-serialized HTML or plain text).
+ * @param {string}                value Run content (already-serialized HTML or plain text).
+ * @param {string|null|undefined} color Optional suggester avatar color.
  * @return {string} Wrapped run.
  */
-function wrapDeletion( value ) {
-	return `<del class="${ DELETION_CLASS }">${ value }</del>`;
+function wrapDeletion( value, color ) {
+	return `<del class="${ DELETION_CLASS }"${ authorStyleAttr(
+		color
+	) }>${ value }</del>`;
 }
 
 /**
@@ -88,11 +109,14 @@ function wrapDeletion( value ) {
  * incoming run is present in the proposed value but absent from the
  * baseline, so reviewers see what the suggester wants to add.
  *
- * @param {string} value Run content (already-serialized HTML or plain text).
+ * @param {string}                value Run content (already-serialized HTML or plain text).
+ * @param {string|null|undefined} color Optional suggester avatar color.
  * @return {string} Wrapped run.
  */
-function wrapAddition( value ) {
-	return `<ins class="${ ADDITION_CLASS }">${ value }</ins>`;
+function wrapAddition( value, color ) {
+	return `<ins class="${ ADDITION_CLASS }"${ authorStyleAttr(
+		color
+	) }>${ value }</ins>`;
 }
 
 /**
@@ -117,11 +141,22 @@ function wrapAddition( value ) {
  * (e.g. baseline === proposed during an attribute-only suggestion) costs
  * nothing.
  *
- * @param {string|null|undefined} baseline Original attribute value.
- * @param {string|null|undefined} proposed Suggested attribute value.
+ * `authorColor` is an optional hex string (`#188038`, etc.) that the HOC
+ * resolves from the suggester's user id via `getAvatarBorderColor`. When
+ * provided it rides along on each `<del>`/`<ins>` as an inline
+ * `style="--suggestion-author-color: …"` so reviewers can tell two
+ * suggesters' marks apart at a glance — Google Docs-style. The CSS
+ * partial in `block-editor` consumes the variable with the existing
+ * red/green pair as the fallback, so omitting `authorColor` leaves
+ * single-suggester sessions visually unchanged.
+ *
+ * @param {string|null|undefined} baseline      Original attribute value.
+ * @param {string|null|undefined} proposed      Suggested attribute value.
+ * @param {string|null}           [authorColor] Optional suggester avatar color
+ *                                              applied per `<del>`/`<ins>` run.
  * @return {string} Marked HTML representing the diff.
  */
-export function markContentDiff( baseline, proposed ) {
+export function markContentDiff( baseline, proposed, authorColor = null ) {
 	const beforeHtml =
 		baseline === null || baseline === undefined ? '' : String( baseline );
 	const afterHtml =
@@ -137,9 +172,9 @@ export function markContentDiff( baseline, proposed ) {
 		if ( seg.type === 'equal' ) {
 			result += seg.value;
 		} else if ( seg.type === 'insert' ) {
-			result += wrapAddition( seg.value );
+			result += wrapAddition( seg.value, authorColor );
 		} else {
-			result += wrapDeletion( seg.value );
+			result += wrapDeletion( seg.value, authorColor );
 		}
 	}
 	return result;
