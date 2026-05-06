@@ -40,6 +40,7 @@ function Stage() {
 
 	return (
 		<Page
+			headingLevel={ 2 }
 			actions={
 				! isMobileViewport ? (
 					<HStack>
