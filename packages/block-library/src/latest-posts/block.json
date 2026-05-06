@@ -86,6 +86,7 @@
 		"anchor": true,
 		"align": true,
 		"html": false,
+		"layout": true,
 		"color": {
 			"gradients": true,
 			"link": true,
@@ -97,7 +98,13 @@
 		},
 		"spacing": {
 			"margin": true,
-			"padding": true
+			"padding": true,
+			"blockGap": {
+				"__experimentalDefault": "1.25em"
+			},
+			"__experimentalDefaultControls": {
+				"blockGap": true
+			}
 		},
 		"typography": {
 			"fontSize": true,
