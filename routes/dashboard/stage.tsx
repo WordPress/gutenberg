@@ -17,7 +17,7 @@ function Dashboard() {
 
 	const widgetTypes = useWidgetTypes();
 
-	const [ editMode, setEditMode ] = useState( true );
+	const [ editMode, setEditMode ] = useState( false );
 
 	return (
 		<WidgetDashboard
