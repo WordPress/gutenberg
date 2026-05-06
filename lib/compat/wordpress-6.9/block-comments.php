@@ -1,4 +1,34 @@
 <?php
+/**
+ * Block comment infrastructure (notes + suggestions).
+ *
+ * Notes are stored as `note`-type comments. A note can be a pure discussion
+ * thread or carry a proposed edit ("suggestion") attached as comment meta.
+ * Three meta fields drive the lifecycle:
+ *
+ *   - `_wp_note_status`        — discussion lifecycle (`resolved` / `reopen`).
+ *   - `_wp_suggestion`         — proposed edit, JSON payload. Presence of this
+ *                                meta is what makes a note a suggestion.
+ *   - `_wp_suggestion_status`  — suggestion lifecycle (`pending` / `applied`
+ *                                / `rejected`). Set on apply or reject so the
+ *                                comment thread persists as evidence even
+ *                                after the suggestion is resolved.
+ *
+ * A note can have a status without a suggestion (pure discussion) or a
+ * suggestion without a status (edit not yet reviewed); the two axes are
+ * intentionally independent.
+ *
+ * Why store the suggestion as comment meta rather than the comment_content?
+ *   - `comment_content` is intended for human-readable text; suggestions are
+ *     JSON, and surfacing JSON to comment-feed renderers would break them.
+ *   - Separation of concerns: a note can carry both a discussion (content)
+ *     and a proposed edit (meta) so users can reply to a suggestion.
+ *   - Per-meta `auth_callback` and `sanitize_callback` give us strict
+ *     per-field control independent of comment-text moderation.
+ *   - Size validation can be strict (reject oversized) at the meta layer.
+ *
+ * @package gutenberg
+ */
 
 /**
  * Maximum byte length of a `_wp_suggestion` payload. Mirrored on the client

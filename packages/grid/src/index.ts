@@ -1,2 +1,7 @@
 export { DashboardGrid } from './grid';
-export type { DashboardGridLayoutItem, DashboardGridProps } from './types';
+export type {
+	DashboardGridLayoutItem,
+	DashboardGridProps,
+	ResizeDelta,
+	ResizeHandleRenderProps,
+} from './types';

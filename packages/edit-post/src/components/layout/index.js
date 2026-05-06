@@ -472,7 +472,6 @@ function Layout( {
 			styles,
 			onNavigateToEntityRecord,
 			onNavigateToPreviousEntityRecord,
-			defaultRenderingMode: 'post-only',
 		} ),
 		[
 			settings,

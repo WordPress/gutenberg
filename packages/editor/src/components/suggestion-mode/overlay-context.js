@@ -1,4 +1,34 @@
 /**
+ * In-memory overlay system for Suggest mode.
+ *
+ * The overlay holds user edits made while the editor is in `suggest` intent
+ * without ever writing them through to the block-editor store. Each entry is
+ * keyed by `clientId` and carries:
+ *   - `baselineAttributes` — captured on first edit, used by
+ *     `operationsFromOverlay` (provider.js) to build the persisted suggestion.
+ *   - `overlayAttributes`  — pending user changes; merged into the rendered
+ *     attributes by `withSuggestionOverlay` so the user sees their edit, but
+ *     never stored.
+ *
+ * Why an overlay rather than a draft post / branch?
+ *   - The post stays at its real baseline so autosave, undo/redo, and
+ *     real-time collaboration sync see only persisted state.
+ *   - Multiple editors can suggest concurrently without conflicting writes.
+ *   - Suggestions stay immutable until explicitly committed (`createSuggestion`),
+ *     so a half-typed edit never leaks into the post.
+ *
+ * Overlay entry lifecycle:
+ *   1. `captureBaseline` — fired on first `setAttributes` (HOC) or on the first
+ *      detected store-level mutation (store-interceptor).
+ *   2. `setOverlayAttributes` — accumulated by the wrapped `setAttributes` or
+ *      by interceptor diffs.
+ *   3. `clearOverlay` / `PRUNE_ORPHANS` — entries are dropped when the
+ *      suggestion is committed, rejected, or the underlying block is deleted.
+ *
+ * The orphan prune runs whenever the live block tree shrinks; it skips when
+ * the block-editor store isn't registered (tests, standalone consumers).
+ */
+/**
  * WordPress dependencies
  */
 import {

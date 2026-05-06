@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useEffect, useMemo } from '@wordpress/element';
+import { useEffect, useMemo, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { Stack } from '@wordpress/ui';
@@ -115,12 +115,15 @@ export function Notes( { notes, sidebarRef, isFloating = false, styles } ) {
 			return;
 		}
 
-		if ( nextThread ) {
-			selectNote( nextThread.id );
-			focusNoteThread( nextThread.id, sidebarRef.current );
-		} else if ( prevThread ) {
-			selectNote( prevThread.id );
-			focusNoteThread( prevThread.id, sidebarRef.current );
+		const adjacentThread = nextThread ?? prevThread;
+		if ( adjacentThread ) {
+			selectNote( adjacentThread.id );
+			focusNoteThread( adjacentThread.id, sidebarRef.current );
+			if ( adjacentThread.blockClientId ) {
+				toggleBlockSpotlight( adjacentThread.blockClientId, true );
+				// Pass `null` as the second parameter to prevent focusing the block.
+				selectBlock( adjacentThread.blockClientId, null );
+			}
 		} else {
 			selectNote( undefined );
 			toggleBlockSpotlight( note.blockClientId, false );
@@ -146,22 +149,26 @@ export function Notes( { notes, sidebarRef, isFloating = false, styles } ) {
 		return unresolved?.id ?? first?.id;
 	}, [ blockNoteIds, notes ] );
 
-	// Auto-select the related note thread when a block is selected. Bails
-	// out when the user has explicitly opened the new note form, or when
-	// the user has already picked a thread on this block — so an explicit
-	// thread choice within a block isn't clobbered.
+	// Auto-select the related note thread when the block context changes
+	// (block selection or note metadata). Read selectedNote via a ref so
+	// that an explicit user collapse — selectNote( undefined ) — doesn't
+	// retrigger the effect and immediately re-select the same thread.
+	const selectedNoteRef = useRef( selectedNote );
 	useEffect( () => {
-		if ( selectedNote === 'new' ) {
+		selectedNoteRef.current = selectedNote;
+	}, [ selectedNote ] );
+	useEffect( () => {
+		const current = selectedNoteRef.current;
+		// Don't clobber an in-progress new note form.
+		if ( current === 'new' ) {
 			return;
 		}
-		if (
-			typeof selectedNote === 'number' &&
-			blockNoteIds.includes( selectedNote )
-		) {
+		// Preserve an explicit thread pick on the same block.
+		if ( typeof current === 'number' && blockNoteIds.includes( current ) ) {
 			return;
 		}
 		selectNote( targetNoteId );
-	}, [ targetNoteId, selectedNote, blockNoteIds, selectNote ] );
+	}, [ targetNoteId, blockNoteIds, selectNote ] );
 
 	// Focus the selected note when requested.
 	useEffect( () => {

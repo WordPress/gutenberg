@@ -1,6 +1,27 @@
 <?php
 /**
- * Unit tests covering WP_Test_REST_Comments_Controller_Gutenberg functionality.
+ * Tests for the Gutenberg REST comment controller subclass that backs block
+ * notes and suggestions.
+ *
+ * Coverage areas:
+ *   - **Permissions**: that post editors can create/read/update note comments
+ *     under the `edit_post` shortcut; that suggestion-lifecycle updates
+ *     (`status`, `meta._wp_suggestion_status`) are accepted while attempts
+ *     to rewrite content/author/date fall back to the core `edit_comment`
+ *     check; that contributors and subscribers are gated as expected.
+ *   - **Suggestion meta round-trip**: that `_wp_suggestion` and
+ *     `_wp_suggestion_status` survive create + read + update, and that the
+ *     payload-size cap (`GUTENBERG_SUGGESTION_PAYLOAD_MAX_BYTES`) is
+ *     enforced with a 413 before the meta sanitize_callback can silently
+ *     truncate the JSON.
+ *   - **Note vs. regular comment divergence**: that `note`-typed comments
+ *     follow the new permission model while plain `comment`-type traffic
+ *     stays on core's defaults.
+ *   - **Meta registration setup**: every test re-registers
+ *     `gutenberg_register_block_comment_metadata()` because
+ *     `WP_UnitTestCase_Base` wipes `$wp_meta_keys` between tests; without
+ *     this hook REST sees `_wp_suggestion` as unregistered and silently
+ *     no-ops on writes, masking real failures.
  *
  * @package Gutenberg
  */

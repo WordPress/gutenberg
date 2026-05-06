@@ -1,4 +1,28 @@
 /**
+ * Sidebar summary of a suggestion's operations.
+ *
+ * Companion to `suggestion-diff.js` — where SuggestionDiff is a full inline
+ * diff (used in the comment thread body), SuggestionSummary is a one-or-two
+ * line precis suitable for the collapsed sidebar list. It produces three
+ * line categories from the operations array:
+ *
+ *   - **Add: …**       — new text inserted by the suggestion. For text-valued
+ *                        attributes the inserted words are extracted from the
+ *                        word-level diff; long insertions are truncated to
+ *                        `SUMMARY_MAX_CHARS` with an ellipsis.
+ *   - **Delete: …**    — text removed by the suggestion, again derived from
+ *                        the word diff.
+ *   - **Format: …**    — non-text attribute changes. Uses
+ *                        `FORMAT_ATTRIBUTE_LABELS` to surface friendly names
+ *                        (e.g. `level` → "heading level") with a fallback to
+ *                        the raw attribute name so a brand-new attribute
+ *                        isn't silently swallowed.
+ *   - **Formatting:**  — pure inline-format changes (bold, italic, links).
+ *                        Detected by tag-level diff of the serialized HTML
+ *                        and de-duplicated by `joinLabels` so multiple span
+ *                        edits don't list the same format twice.
+ */
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';

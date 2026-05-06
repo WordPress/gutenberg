@@ -362,6 +362,20 @@ export function useSuggestionsProvider() {
 		]
 	);
 
+	/**
+	 * Update an existing suggestion's payload (auto-save path). Replaces
+	 * the `_wp_suggestion` meta on the comment without changing its author,
+	 * status, or thread identity, so the user sees a single note
+	 * accumulating edits rather than a new note per save burst.
+	 *
+	 * @param {Object}                args            Update arguments.
+	 * @param {number|string}         args.commentId  Comment id of the
+	 *                                                existing suggestion.
+	 * @param {string}                args.blockName  Block name (recorded
+	 *                                                on the payload).
+	 * @param {SuggestionOperation[]} args.operations Latest operations.
+	 * @return {Promise<Object>} The saved comment record.
+	 */
 	const updateSuggestion = useCallback(
 		async ( { commentId, blockName, operations } ) => {
 			if ( ! commentId ) {
@@ -410,6 +424,15 @@ export function useSuggestionsProvider() {
 		[ postModified, saveEntityRecord, createNotice ]
 	);
 
+	/**
+	 * Delete a suggestion. The auto-saver calls this when the overlay is
+	 * fully reverted to baseline — the user retracted their edit, so the
+	 * note no longer carries a meaningful suggestion.
+	 *
+	 * @param {Object}        args           Delete arguments.
+	 * @param {number|string} args.commentId Comment id to trash.
+	 * @return {Promise<void>}
+	 */
 	const deleteSuggestion = useCallback(
 		async ( { commentId } ) => {
 			if ( ! commentId ) {
@@ -434,6 +457,26 @@ export function useSuggestionsProvider() {
 		[ saveEntityRecord, createNotice ]
 	);
 
+	/**
+	 * Apply a suggestion to the live block, then persist the lifecycle
+	 * status to the comment meta. On a server failure the block is rolled
+	 * back so the UI is never left in a half-applied state.
+	 *
+	 * @param {Object}            args           Apply arguments.
+	 * @param {number|string}     args.commentId Comment id holding the
+	 *                                           suggestion (`_wp_suggestion`
+	 *                                           meta).
+	 * @param {string}            args.clientId  Block client id of the apply
+	 *                                           target. May be undefined if
+	 *                                           the acting user opened the
+	 *                                           post fresh and the metadata
+	 *                                           linkage was never persisted —
+	 *                                           the apply path then scans the
+	 *                                           live tree by `metadata.noteId`.
+	 * @param {SuggestionPayload} args.payload   Parsed payload (from
+	 *                                           `parseSuggestionPayload`).
+	 * @return {Promise<void>}
+	 */
 	const applySuggestion = useCallback(
 		async ( { commentId, clientId, payload } ) => {
 			if ( ! payload || ! Array.isArray( payload.operations ) ) {
@@ -557,6 +600,16 @@ export function useSuggestionsProvider() {
 		]
 	);
 
+	/**
+	 * Reject a suggestion by setting the comment's lifecycle status. The
+	 * comment itself stays as a thread (status `approved`) so the
+	 * conversation persists as evidence that the suggestion was reviewed.
+	 *
+	 * @param {Object}        args           Reject arguments.
+	 * @param {number|string} args.commentId Comment id of the rejected
+	 *                                       suggestion.
+	 * @return {Promise<void>}
+	 */
 	const rejectSuggestion = useCallback(
 		async ( { commentId } ) => {
 			try {
