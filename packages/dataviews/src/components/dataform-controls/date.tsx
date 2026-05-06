@@ -4,7 +4,6 @@
 import clsx from 'clsx';
 import {
 	format,
-	isValid as isValidDate,
 	subMonths,
 	subDays,
 	subYears,
@@ -141,7 +140,7 @@ const parseDate = ( dateString?: string ): Date | null => {
 		return null;
 	}
 	const parsed = getDate( dateString );
-	return parsed && isValidDate( parsed ) ? parsed : null;
+	return parsed && ! isNaN( parsed.valueOf() ) ? parsed : null;
 };
 
 const formatDate = ( date?: Date | string ): string => {

@@ -38,7 +38,7 @@ const VALID_DATE_ORDERS = [ 'dmy', 'mdy', 'ymd' ];
  * setUTCSeconds.
  */
 function truncateToMinute(
-	currentTime: Date | string | number | undefined
+	currentTime: Date | string | number | null | undefined
 ): Date {
 	const date = inputToDate( currentTime ?? new Date() );
 	date.setSeconds( 0, 0 );
