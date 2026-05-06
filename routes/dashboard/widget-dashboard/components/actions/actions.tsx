@@ -25,9 +25,26 @@ import { useDashboardInternalContext } from '../../context/dashboard-context';
 export function Actions(): React.ReactNode {
 	const { editMode, onEditChange } = useDashboardInternalContext();
 
-	const handleClick = useCallback( () => {
+	const handleEditMode = useCallback( () => {
 		onEditChange?.( ! editMode );
 	}, [ editMode, onEditChange ] );
+
+	const handleInsertWidget = useCallback( () => {
+		// eslint-disable-next-line no-console
+		console.log( 'insert widget' ); // TODO: Implement widget insertion
+	}, [] );
+
+	const handleCancel = useCallback( () => {
+		// eslint-disable-next-line no-console
+		console.log( 'cancel' ); // TODO: Implement cancel\
+		onEditChange?.( false );
+	}, [ onEditChange ] );
+
+	const handleDone = useCallback( () => {
+		// eslint-disable-next-line no-console
+		console.log( 'done' ); // TODO: Implement done
+		onEditChange?.( false );
+	}, [ onEditChange ] );
 
 	if ( ! onEditChange ) {
 		return null;
@@ -41,7 +58,7 @@ export function Actions(): React.ReactNode {
 						variant="minimal"
 						tone="brand"
 						size="compact"
-						onClick={ handleClick }
+						onClick={ handleInsertWidget }
 					>
 						{ __( 'Add Widgets' ) }
 					</Button>
@@ -49,7 +66,7 @@ export function Actions(): React.ReactNode {
 						variant="minimal"
 						tone="brand"
 						size="compact"
-						onClick={ handleClick }
+						onClick={ handleCancel }
 					>
 						{ __( 'Cancel' ) }
 					</Button>
@@ -57,7 +74,7 @@ export function Actions(): React.ReactNode {
 						variant="solid"
 						tone="brand"
 						size="compact"
-						onClick={ handleClick }
+						onClick={ handleDone }
 					>
 						{ __( 'Done' ) }
 					</Button>
@@ -67,7 +84,7 @@ export function Actions(): React.ReactNode {
 					variant="outline"
 					tone="brand"
 					size="compact"
-					onClick={ handleClick }
+					onClick={ handleEditMode }
 				>
 					{ __( 'Customize' ) }
 				</Button>

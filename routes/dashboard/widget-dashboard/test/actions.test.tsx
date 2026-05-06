@@ -78,6 +78,10 @@ describe( 'WidgetDashboard.Actions', () => {
 		await userEvent.click( screen.getByRole( 'button', { name: 'Done' } ) );
 		expect( onEditChange ).toHaveBeenLastCalledWith( false );
 		expect( onEditChange ).toHaveBeenCalledTimes( 2 );
+
+		// TODO: drop once Done has its own committed behavior; today it logs.
+		// eslint-disable-next-line jest/no-standalone-expect
+		expect( console ).toHaveLogged( 'done' );
 	} );
 
 	it( 'renders nothing when onEditChange is not provided', () => {
