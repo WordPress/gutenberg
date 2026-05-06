@@ -28,17 +28,23 @@ export default function DeprecatedPostFeaturedImageEdit( props ) {
 	const { clientId, attributes } = props;
 	const { replaceBlocks } = useDispatch( blockEditorStore );
 
-	// Only migrate if the target block type is registered. Without this guard
-	// the effect would silently swallow the block if the block library hasn't
-	// been built yet (e.g. during development before `npm run build`).
-	const targetBlockRegistered = useSelect(
-		( select ) =>
-			!! select( blocksStore ).getBlockType( 'core/post-featured-media' ),
-		[]
+	// Only migrate when both conditions are true: the target block type is
+	// registered, and the block is in an editable context (not locked by a
+	// template or synced-pattern). `canRemoveBlock` covers both cases — if
+	// false, `replaceBlocks` would silently no-op anyway (e.g. site editor
+	// "browse" mode before the user actively edits the template).
+	const { targetBlockRegistered, canReplace } = useSelect(
+		( select ) => ( {
+			targetBlockRegistered: !! select( blocksStore ).getBlockType(
+				'core/post-featured-media'
+			),
+			canReplace: select( blockEditorStore ).canRemoveBlock( clientId ),
+		} ),
+		[ clientId ]
 	);
 
 	useEffect( () => {
-		if ( ! targetBlockRegistered ) {
+		if ( ! targetBlockRegistered || ! canReplace ) {
 			return;
 		}
 		replaceBlocks(
@@ -54,7 +60,7 @@ export default function DeprecatedPostFeaturedImageEdit( props ) {
 				controls: true,
 			} )
 		);
-	}, [ targetBlockRegistered ] ); // eslint-disable-line react-hooks/exhaustive-deps
+	}, [ targetBlockRegistered, canReplace ] ); // eslint-disable-line react-hooks/exhaustive-deps
 
 	// Render the original block as a stable fallback while the replacement is pending.
 	return <OriginalEdit { ...props } />;
