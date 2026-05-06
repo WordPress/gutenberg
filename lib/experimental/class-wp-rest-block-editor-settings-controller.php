@@ -457,9 +457,16 @@ if ( ! class_exists( 'WP_REST_Block_Editor_Settings_Controller' ) ) {
 				'after'  => array(),
 			);
 
-			// Get boot module asset file for dependencies.
-			$boot_asset_file   = include __DIR__ . '/../../build/modules/boot/index.min.asset.php';
-			$boot_dependencies = $boot_asset_file['dependencies'] ?? array();
+			// Get boot module dependencies from the modules registry.
+			$modules_registry = require __DIR__ . '/../../build/modules/registry.php';
+			$boot_entry        = array();
+			foreach ( $modules_registry as $module ) {
+				if ( '@wordpress/boot' === $module['id'] ) {
+					$boot_entry = $module;
+					break;
+				}
+			}
+			$boot_dependencies = $boot_entry['dependencies'] ?? array();
 
 			// Get all dependencies that should be excluded (boot dependencies + their deep dependencies).
 			$excluded_scripts = $this->get_all_dependencies( $boot_dependencies, $wp_scripts );
