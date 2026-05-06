@@ -38,6 +38,31 @@ function getSerializedBlockValue( block ) {
 	return __unstableSerializeAndClean( [ block ] ).trim();
 }
 
+function getSerializedCRDTBlockContent( crdtRecord ) {
+	return Array.isArray( crdtRecord?.blocks )
+		? __unstableSerializeAndClean( crdtRecord.blocks ).trim()
+		: undefined;
+}
+
+function getCRDTRawPostValue( crdtRecord, key ) {
+	if ( key === 'content' ) {
+		return (
+			getSerializedCRDTBlockContent( crdtRecord ) ??
+			getRawPostValue( crdtRecord?.content )
+		);
+	}
+
+	return getRawPostValue( crdtRecord?.[ key ] );
+}
+
+function areSerializedBlocksEqualAt( blocksA, blocksB, index ) {
+	return (
+		blocksA[ index ]?.name === blocksB[ index ]?.name &&
+		getSerializedBlockValue( blocksA[ index ] ) ===
+			getSerializedBlockValue( blocksB[ index ] )
+	);
+}
+
 function mergeStaleSerializedBlockContent(
 	baseContent,
 	latestContent,
@@ -76,6 +101,29 @@ function mergeStaleSerializedBlockContent(
 		return __unstableSerializeAndClean( [
 			...localBlocks,
 			...latestBlocks.slice( localBlocks.length ),
+		] );
+	}
+
+	if (
+		baseBlocks.length < latestBlocks.length &&
+		baseBlocks.length < localBlocks.length
+	) {
+		for ( let index = 0; index < baseBlocks.length; index++ ) {
+			if (
+				! areSerializedBlocksEqualAt(
+					baseBlocks,
+					latestBlocks,
+					index
+				) ||
+				! areSerializedBlocksEqualAt( baseBlocks, localBlocks, index )
+			) {
+				return;
+			}
+		}
+
+		return __unstableSerializeAndClean( [
+			...localBlocks,
+			...latestBlocks.slice( baseBlocks.length ),
 		] );
 	}
 
@@ -461,7 +509,7 @@ export const prePersistPostType = async (
 				latestRecord?.meta?.[ POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE ]
 			);
 			const shouldApplyLatestCRDTDoc =
-				hasLatestPersistedCRDTDoc || locallyChangedSavedFields.length;
+				serverChangedSavedFields.length > 0;
 			const didApplyLatestCRDTDoc = shouldApplyLatestCRDTDoc
 				? ( await syncManager?.applyPersistedCRDTDoc?.(
 						objectType,
@@ -490,9 +538,16 @@ export const prePersistPostType = async (
 					);
 
 					for ( const key of locallyChangedSavedFields ) {
-						if ( key in ( crdtRecord ?? {} ) ) {
-							const crdtValue = getRawPostValue(
-								crdtRecord[ key ]
+						const hasCRDTValue =
+							key === 'content'
+								? key in ( crdtRecord ?? {} ) ||
+								  Array.isArray( crdtRecord?.blocks )
+								: key in ( crdtRecord ?? {} );
+
+						if ( hasCRDTValue ) {
+							const crdtValue = getCRDTRawPostValue(
+								crdtRecord,
+								key
 							);
 
 							if (

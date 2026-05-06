@@ -2,7 +2,11 @@
  * WordPress dependencies
  */
 import apiFetch from '@wordpress/api-fetch';
-import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
+import {
+	parse,
+	registerBlockType,
+	unregisterBlockType,
+} from '@wordpress/blocks';
 
 jest.mock( '@wordpress/api-fetch' );
 jest.mock( '../sync', () => ( {
@@ -188,7 +192,7 @@ describe( 'prePersistPostType', () => {
 		};
 		const syncManager = {
 			applyPersistedCRDTDoc: jest.fn().mockResolvedValue( false ),
-			createPersistedCRDTDoc: jest.fn().mockResolvedValue( 'local-doc' ),
+			createPersistedCRDTDoc: jest.fn().mockReturnValue( 'local-doc' ),
 			getCRDTRecordData: jest.fn( () => ( {
 				content: 'older local crdt content',
 			} ) ),
@@ -245,7 +249,7 @@ describe( 'prePersistPostType', () => {
 		};
 		const syncManager = {
 			applyPersistedCRDTDoc: jest.fn(),
-			createPersistedCRDTDoc: jest.fn().mockResolvedValue( 'merged-doc' ),
+			createPersistedCRDTDoc: jest.fn().mockReturnValue( 'merged-doc' ),
 			getCRDTRecordData: jest.fn( () => ( {
 				content: 'merged content',
 			} ) ),
@@ -296,7 +300,7 @@ describe( 'prePersistPostType', () => {
 		};
 		const syncManager = {
 			applyPersistedCRDTDoc: jest.fn().mockResolvedValue( true ),
-			createPersistedCRDTDoc: jest.fn().mockResolvedValue( 'merged-doc' ),
+			createPersistedCRDTDoc: jest.fn().mockReturnValue( 'merged-doc' ),
 			getCRDTRecordData: jest.fn( () => ( {
 				content: 'merged content',
 			} ) ),
@@ -309,7 +313,7 @@ describe( 'prePersistPostType', () => {
 			{
 				id: 123,
 				status: 'publish',
-				content: { raw: 'current content' },
+				content: { raw: 'base content' },
 			},
 			{ content: 'stale local content' },
 			'page',
@@ -334,6 +338,50 @@ describe( 'prePersistPostType', () => {
 		} );
 	} );
 
+	it( 'derives stale saved content from CRDT blocks instead of serialized CRDT content', async () => {
+		const mergedContent = pageContent( [
+			'Alpha',
+			'stale local content',
+			'current content',
+		] );
+		const latestRecord = {
+			id: 123,
+			content: { raw: pageContent( [ 'Alpha', 'current content' ] ) },
+			meta: {
+				[ POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE ]: 'latest-doc',
+			},
+		};
+		const syncManager = {
+			applyPersistedCRDTDoc: jest.fn().mockResolvedValue( true ),
+			createPersistedCRDTDoc: jest.fn().mockReturnValue( 'merged-doc' ),
+			getCRDTRecordData: jest.fn( () => ( {
+				blocks: parse( mergedContent ),
+				content: 'mangled serialized CRDT content',
+			} ) ),
+		};
+		apiFetch.mockResolvedValue( latestRecord );
+		getSyncManager.mockReturnValue( syncManager );
+		window._wpCollaborationEnabled = true;
+
+		const result = await prePersistPostType(
+			{
+				id: 123,
+				status: 'publish',
+				content: { raw: pageContent( [ 'Alpha' ] ) },
+			},
+			{ content: pageContent( [ 'Alpha', 'stale local content' ] ) },
+			'page',
+			false,
+			'/wp/v2/pages'
+		);
+
+		expect( result.content ).toBe( mergedContent );
+		expect( result.content ).not.toContain( 'mangled' );
+		expect( result.meta ).toEqual( {
+			[ POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE ]: 'merged-doc',
+		} );
+	} );
+
 	it( 'merges non-conflicting stale serialized content edits with the latest saved content', async () => {
 		const latestRecord = {
 			id: 123,
@@ -344,7 +392,7 @@ describe( 'prePersistPostType', () => {
 		};
 		const syncManager = {
 			applyPersistedCRDTDoc: jest.fn().mockResolvedValue( false ),
-			createPersistedCRDTDoc: jest.fn().mockResolvedValue( 'merged-doc' ),
+			createPersistedCRDTDoc: jest.fn().mockReturnValue( 'merged-doc' ),
 			getCRDTRecordData: jest.fn( () => ( {
 				content: latestRecord.content.raw,
 			} ) ),
@@ -387,7 +435,7 @@ describe( 'prePersistPostType', () => {
 		};
 		const syncManager = {
 			applyPersistedCRDTDoc: jest.fn().mockResolvedValue( false ),
-			createPersistedCRDTDoc: jest.fn().mockResolvedValue( 'merged-doc' ),
+			createPersistedCRDTDoc: jest.fn().mockReturnValue( 'merged-doc' ),
 			getCRDTRecordData: jest.fn( () => ( {
 				content: latestContent,
 			} ) ),
@@ -415,6 +463,44 @@ describe( 'prePersistPostType', () => {
 		} );
 	} );
 
+	it( 'merges sibling serialized blocks appended from a shared stale base', async () => {
+		const latestRecord = {
+			id: 123,
+			content: { raw: pageContent( [ 'Alpha', 'current content' ] ) },
+			meta: {
+				[ POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE ]: 'latest-doc',
+			},
+		};
+		const syncManager = {
+			applyPersistedCRDTDoc: jest.fn().mockResolvedValue( false ),
+			createPersistedCRDTDoc: jest.fn().mockReturnValue( 'merged-doc' ),
+			getCRDTRecordData: jest.fn( () => ( {
+				content: latestRecord.content.raw,
+			} ) ),
+		};
+		apiFetch.mockResolvedValue( latestRecord );
+		getSyncManager.mockReturnValue( syncManager );
+		window._wpCollaborationEnabled = true;
+
+		const result = await prePersistPostType(
+			{
+				id: 123,
+				status: 'publish',
+				content: { raw: pageContent( [ 'Alpha' ] ) },
+			},
+			{ content: pageContent( [ 'Alpha', 'stale local content' ] ) },
+			'page',
+			false,
+			'/wp/v2/pages'
+		);
+
+		expect( result.content ).toContain( 'stale local content' );
+		expect( result.content ).toContain( 'current content' );
+		expect( result.meta ).toEqual( {
+			[ POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE ]: 'merged-doc',
+		} );
+	} );
+
 	it( 'does not merge stale serialized content edits when the same block changed locally and remotely', async () => {
 		const latestRecord = {
 			id: 123,
@@ -425,7 +511,7 @@ describe( 'prePersistPostType', () => {
 		};
 		const syncManager = {
 			applyPersistedCRDTDoc: jest.fn().mockResolvedValue( false ),
-			createPersistedCRDTDoc: jest.fn().mockResolvedValue( 'merged-doc' ),
+			createPersistedCRDTDoc: jest.fn().mockReturnValue( 'merged-doc' ),
 			getCRDTRecordData: jest.fn( () => ( {
 				content: latestRecord.content.raw,
 			} ) ),
@@ -463,8 +549,8 @@ describe( 'prePersistPostType', () => {
 			applyPersistedCRDTDoc: jest.fn().mockResolvedValue( true ),
 			createPersistedCRDTDoc: jest
 				.fn()
-				.mockResolvedValueOnce( 'before-apply-doc' )
-				.mockResolvedValueOnce( 'after-apply-doc' ),
+				.mockReturnValueOnce( 'before-apply-doc' )
+				.mockReturnValueOnce( 'after-apply-doc' ),
 			getCRDTRecordData: jest.fn( () => ( {
 				content: 'partially flushed local crdt content',
 			} ) ),
@@ -485,15 +571,11 @@ describe( 'prePersistPostType', () => {
 			'/wp/v2/pages'
 		);
 
-		expect( syncManager.applyPersistedCRDTDoc ).toHaveBeenCalledWith(
-			'postType/page',
-			123,
-			latestRecord
-		);
+		expect( syncManager.applyPersistedCRDTDoc ).not.toHaveBeenCalled();
 		expect( syncManager.getCRDTRecordData ).not.toHaveBeenCalled();
 		expect( result ).toEqual( {
 			meta: {
-				[ POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE ]: 'after-apply-doc',
+				[ POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE ]: 'before-apply-doc',
 			},
 		} );
 	} );
@@ -505,7 +587,7 @@ describe( 'prePersistPostType', () => {
 		};
 		const syncManager = {
 			applyPersistedCRDTDoc: jest.fn().mockResolvedValue( false ),
-			createPersistedCRDTDoc: jest.fn().mockResolvedValue( 'local-doc' ),
+			createPersistedCRDTDoc: jest.fn().mockReturnValue( 'local-doc' ),
 			getCRDTRecordData: jest.fn( () => ( {
 				content: 'older local crdt content',
 			} ) ),
@@ -526,11 +608,7 @@ describe( 'prePersistPostType', () => {
 			'/wp/v2/pages'
 		);
 
-		expect( syncManager.applyPersistedCRDTDoc ).toHaveBeenCalledWith(
-			'postType/page',
-			123,
-			latestRecord
-		);
+		expect( syncManager.applyPersistedCRDTDoc ).not.toHaveBeenCalled();
 		expect( syncManager.getCRDTRecordData ).not.toHaveBeenCalled();
 		expect( result ).toEqual( {
 			meta: {
