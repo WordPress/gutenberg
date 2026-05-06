@@ -9,7 +9,10 @@
 // stylesheets — keeping these rules here is what makes them apply inside the
 // iframe.
 
-$suggestion-color: #007017;
+// Google Docs-style suggestion green. Used uniformly across all
+// canvas-pending visual treatments so the reviewer reads "this is a
+// suggestion" at a glance regardless of which structural op produced it.
+$suggestion-color: #188038;
 
 // Green "bracket" applied to any block with a pending attribute overlay
 // while the suggester is editing. Drawn with an outline so it layers above
@@ -47,20 +50,15 @@ $suggestion-color: #007017;
 
 // Pending-remove: the block is still real (selection, focus, and toolbar
 // keep working) but the visual treatment communicates "proposed for
-// deletion". A horizontal rule sits over the block; reduced opacity
-// de-emphasizes the content without hiding it.
+// deletion". Strikethrough + suggestion-green text on every line so
+// multi-line paragraphs read clearly as "delete me", matching Google
+// Docs' suggesting-mode strike-through. The decoration is applied to
+// the wrapper and propagates to inline rich-text descendants.
 .block-editor-block-list__block.is-suggestion-pending-remove {
-	position: relative;
-	opacity: 0.5;
-
-	&::after {
-		content: "";
-		position: absolute;
-		inset: 0;
-		top: 50%;
-		pointer-events: none;
-		border-top: 2px solid var(--wp-block-synced-color, #cc1818);
-	}
+	color: $suggestion-color;
+	text-decoration: line-through;
+	text-decoration-color: $suggestion-color;
+	text-decoration-thickness: 2px;
 }
 
 // Pending-insert: the block was inserted in Suggest mode but isn't yet
