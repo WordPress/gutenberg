@@ -168,6 +168,7 @@ describe( 'global styles renderer', () => {
 						},
 					},
 					selector: ELEMENTS.link,
+					elementName: 'link',
 					skipSelectorWrapper: true,
 				},
 				{
@@ -187,6 +188,7 @@ describe( 'global styles renderer', () => {
 						},
 					},
 					selector: '.my-heading1 h1, .my-heading2 h1',
+					elementName: 'h1',
 				},
 				{
 					styles: {
@@ -195,6 +197,7 @@ describe( 'global styles renderer', () => {
 						},
 					},
 					selector: '.my-heading1 h2, .my-heading2 h2',
+					elementName: 'h2',
 				},
 				{
 					styles: {
@@ -213,6 +216,7 @@ describe( 'global styles renderer', () => {
 					},
 					selector:
 						'.my-heading1 a:where(:not(.wp-element-button)), .my-heading2 a:where(:not(.wp-element-button))',
+					elementName: 'link',
 				},
 				{
 					styles: {

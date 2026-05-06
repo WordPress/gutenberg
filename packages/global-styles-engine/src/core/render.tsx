@@ -152,6 +152,7 @@ export type BlockSelectors = Record<
  * - `hasLayoutSupport`: whether layout styles can be generated for the node.
  * - `styleVariationSelectors`: block style variation selectors keyed by variation name.
  * - `name`: block name used by block-specific declaration adjustments.
+ * - `elementName`: element name used to resolve valid pseudo selectors.
  */
 interface StylesNode {
 	styles: any;
@@ -167,6 +168,7 @@ interface StylesNode {
 	hasLayoutSupport?: boolean;
 	styleVariationSelectors?: Record< string, string >;
 	name?: string;
+	elementName?: string;
 }
 
 type ElementName = keyof typeof ELEMENTS;
@@ -192,6 +194,29 @@ const BLOCK_SUPPORT_FEATURE_LEVEL_SELECTORS = {
 const VALID_BLOCK_PSEUDO_SELECTORS: Record< string, string[] > = {
 	'core/button': [ ':hover', ':focus', ':focus-visible', ':active' ],
 	'core/navigation-link': [ ':hover', ':focus', ':focus-visible', ':active' ],
+};
+
+// The valid pseudo-selectors that can be used for elements.
+// Keep in sync with WP_Theme_JSON_Gutenberg::VALID_ELEMENT_PSEUDO_SELECTORS.
+const VALID_ELEMENT_PSEUDO_SELECTORS: Record< string, string[] > = {
+	link: [
+		':link',
+		':any-link',
+		':visited',
+		':hover',
+		':focus',
+		':focus-visible',
+		':active',
+	],
+	button: [
+		':link',
+		':any-link',
+		':visited',
+		':hover',
+		':focus',
+		':focus-visible',
+		':active',
+	],
 };
 
 /**
@@ -1017,43 +1042,45 @@ function appendPseudoSelectorStyles(
 }
 
 /**
- * Creates style nodes for configured block pseudo selectors.
+ * Creates style nodes for configured block and element pseudo selectors.
  *
- * Only block pseudo selectors listed in `VALID_BLOCK_PSEUDO_SELECTORS` are
+ * Only pseudo selectors listed in the matching block or element allow-list are
  * considered. This mirrors the PHP renderer and avoids treating arbitrary
  * colon-prefixed keys as pseudo selectors.
  *
- * @param node Style node that may contain configured block pseudo styles.
- * @return Style nodes for the block's configured pseudo states.
+ * @param node Style node that may contain configured pseudo styles.
+ * @return Style nodes for the configured pseudo states.
  */
-function getBlockPseudoStyleNodes( node: StylesNode ): StylesNode[] {
-	const { styles, selector, featureSelectors, name } = node;
+function getPseudoStyleNodes( node: StylesNode ): StylesNode[] {
+	const { styles, selector, featureSelectors, name, elementName } = node;
+	const pseudoSelectors = name
+		? VALID_BLOCK_PSEUDO_SELECTORS[ name ] ?? []
+		: VALID_ELEMENT_PSEUDO_SELECTORS[ elementName ?? '' ] ?? [];
 
-	if ( ! name ) {
+	if ( ! pseudoSelectors.length ) {
 		return [];
 	}
 
-	return ( VALID_BLOCK_PSEUDO_SELECTORS[ name ] ?? [] ).flatMap(
-		( pseudoSelector ) => {
-			const pseudoStyles = styles?.[ pseudoSelector ];
-			if ( ! pseudoStyles || typeof pseudoStyles !== 'object' ) {
-				return [];
-			}
-
-			return [
-				{
-					styles: JSON.parse( JSON.stringify( pseudoStyles ) ),
-					selector,
-					selectorSuffix: pseudoSelector,
-					featureSelectors:
-						featureSelectors && typeof featureSelectors !== 'string'
-							? featureSelectors
-							: undefined,
-					name,
-				},
-			];
+	return pseudoSelectors.flatMap( ( pseudoSelector ) => {
+		const pseudoStyles = styles?.[ pseudoSelector ];
+		if ( ! pseudoStyles || typeof pseudoStyles !== 'object' ) {
+			return [];
 		}
-	);
+
+		return [
+			{
+				styles: JSON.parse( JSON.stringify( pseudoStyles ) ),
+				selector,
+				selectorSuffix: pseudoSelector,
+				featureSelectors:
+					featureSelectors && typeof featureSelectors !== 'string'
+						? featureSelectors
+						: undefined,
+				name,
+				elementName,
+			},
+		];
+	} );
 }
 
 /**
@@ -1255,6 +1282,7 @@ export const getNodesWithStyles = (
 			nodes.push( {
 				styles: tree.styles?.elements?.[ name ] ?? {},
 				selector: selector as string,
+				elementName: name,
 				// Top level elements that don't use a class name should not receive the
 				// `:root :where()` wrapper to maintain backwards compatibility.
 				skipSelectorWrapper: ! (
@@ -1312,6 +1340,7 @@ export const getNodesWithStyles = (
 										variationSelector,
 										ELEMENTS[ element as ElementName ]
 									),
+									elementName: element,
 								} );
 							}
 						} );
@@ -1404,6 +1433,8 @@ export const getNodesWithStyles = (
 														variationBlockElement as ElementName
 													]
 												),
+												elementName:
+													variationBlockElement,
 											} );
 										}
 									}
@@ -1459,6 +1490,7 @@ export const getNodesWithStyles = (
 									);
 								} )
 								.join( ',' ),
+							elementName,
 						} );
 					}
 				}
@@ -1890,7 +1922,7 @@ function renderStylesNode(
 						);
 					}
 
-					getBlockPseudoStyleNodes( {
+					getPseudoStyleNodes( {
 						styles: styleVariations,
 						selector: styleVariationSelector as string,
 						featureSelectors,
@@ -1947,7 +1979,7 @@ function renderStylesNode(
 	}
 
 	if ( includeStateStyles ) {
-		const blockPseudoNodes = getBlockPseudoStyleNodes( {
+		const blockPseudoNodes = getPseudoStyleNodes( {
 			styles,
 			selector,
 			featureSelectors,
