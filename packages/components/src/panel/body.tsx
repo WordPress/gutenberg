@@ -26,6 +26,7 @@ export function UnforwardedPanelBody(
 	ref: React.ForwardedRef< HTMLDivElement >
 ) {
 	const {
+		blockClasses,
 		buttonProps = {},
 		children,
 		className,
@@ -90,6 +91,7 @@ export function UnforwardedPanelBody(
 				isOpened={ Boolean( isOpened ) }
 				onClick={ handleOnToggle }
 				title={ title }
+				blockClasses={ blockClasses }
 				{ ...buttonProps }
 			/>
 			{ typeof children === 'function'
@@ -102,6 +104,7 @@ export function UnforwardedPanelBody(
 const PanelBodyTitle = forwardRef(
 	(
 		{
+			blockClasses = '',
 			isOpened,
 			icon,
 			title,
@@ -133,6 +136,9 @@ const PanelBodyTitle = forwardRef(
 						/>
 					</span>
 					{ title }
+					<span className="block-editor-block-inspector__advanced-button__css-class-name">
+						{ blockClasses }
+					</span>
 					{ icon && (
 						<Icon
 							icon={ icon }

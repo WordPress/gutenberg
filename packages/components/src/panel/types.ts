@@ -45,6 +45,10 @@ export type PanelRowProps = {
 
 export type PanelBodyProps = {
 	/**
+	 * The block classes.
+	 */
+	blockClasses?: string;
+	/**
 	 * Props that are passed to the `Button` component in title within the
 	 * `PanelBody`.
 	 *
@@ -101,6 +105,10 @@ export type PanelBodyProps = {
 };
 
 export type PanelBodyTitleProps = Omit< ButtonAsButtonProps, 'icon' > & {
+	/**
+	 * The block classes.
+	 */
+	blockClasses?: string;
 	/**
 	 * An icon to be shown next to the title.
 	 */

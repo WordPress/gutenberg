@@ -169,3 +169,15 @@
 .components-panel .circle-picker {
 	padding-bottom: 20px;
 }
+
+.block-editor-block-inspector__advanced-button__css-class-name {
+	background-color: $gray-100;
+	color: $gray-800;
+	padding: 2px $grid-unit-10;
+	border-radius: $radius-small;
+	font-size: $font-size-small;
+	font-weight: 400;
+	line-height: $font-line-height-small;
+	position: absolute;
+	right: $grid-unit-60;
+}
