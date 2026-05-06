@@ -28,14 +28,23 @@ function Dashboard() {
 
 	const widgetTypes = useWidgetTypes();
 
+	const [ editMode, setEditMode ] = useState( false );
+
 	return (
-		<Page title={ __( 'Dashboard' ) } headingLevel={ 1 }>
-			<WidgetDashboard
-				layout={ layout }
-				onLayoutChange={ setLayout }
-				widgetTypes={ widgetTypes }
-			/>
-		</Page>
+		<WidgetDashboard
+			layout={ layout }
+			onLayoutChange={ setLayout }
+			widgetTypes={ widgetTypes }
+			editMode={ editMode }
+			onEditChange={ setEditMode }
+		>
+			<Page
+				title={ __( 'Dashboard' ) }
+				actions={ <WidgetDashboard.Actions /> }
+			>
+				<WidgetDashboard.Widgets />
+			</Page>
+		</WidgetDashboard>
 	);
 }
 
