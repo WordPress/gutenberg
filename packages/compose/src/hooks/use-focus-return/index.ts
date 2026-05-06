@@ -31,7 +31,7 @@ function useFocusReturn(
 	onFocusReturn?: () => void
 ): React.RefCallback< HTMLElement > {
 	const ref = useRef< HTMLElement | null >( null );
-	const focusedBeforeMount = useRef< Element | null >( null );
+	const focusedBeforeMountRef = useRef< Element | null >( null );
 	const onFocusReturnRef = useRef< ( () => void ) | undefined >(
 		onFocusReturn
 	);
@@ -46,7 +46,7 @@ function useFocusReturn(
 			ref.current = node;
 
 			// Only set when the node mounts.
-			if ( focusedBeforeMount.current ) {
+			if ( focusedBeforeMountRef.current ) {
 				return;
 			}
 
@@ -56,14 +56,15 @@ function useFocusReturn(
 					? node.ownerDocument.activeElement.contentDocument
 					: node.ownerDocument;
 
-			focusedBeforeMount.current = activeDocument?.activeElement ?? null;
-		} else if ( focusedBeforeMount.current ) {
+			focusedBeforeMountRef.current =
+				activeDocument?.activeElement ?? null;
+		} else if ( focusedBeforeMountRef.current ) {
 			const isFocused = ref.current?.contains(
 				ref.current?.ownerDocument.activeElement ?? null
 			);
 
 			if ( ref.current?.isConnected && ! isFocused ) {
-				origin ??= focusedBeforeMount.current;
+				origin ??= focusedBeforeMountRef.current;
 				return;
 			}
 
@@ -74,9 +75,10 @@ function useFocusReturn(
 			if ( onFocusReturnRef.current ) {
 				onFocusReturnRef.current();
 			} else {
-				const elementToFocus = ! focusedBeforeMount.current.isConnected
+				const elementToFocus = ! focusedBeforeMountRef.current
+					.isConnected
 					? origin
-					: focusedBeforeMount.current;
+					: focusedBeforeMountRef.current;
 
 				if ( elementToFocus instanceof HTMLElement ) {
 					elementToFocus.focus();
