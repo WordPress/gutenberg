@@ -58,12 +58,81 @@ function useAllDefaultTemplateTypes() {
 	];
 }
 
+/**
+ * Walks a parsed block tree and substitutes any `core/template-content` it
+ * finds with the supplied inner-template blocks. Used to make preview
+ * thumbnails match the frontend, where root.html wraps every other template.
+ *
+ * @param {Object[]} blocks      Parsed block tree to walk.
+ * @param {Object[]} replacement Blocks to drop in where template-content lives.
+ * @return {[Object[], boolean]} The transformed tree and a flag indicating
+ *                               whether template-content was actually found.
+ */
+function substituteTemplateContent( blocks, replacement ) {
+	let found = false;
+	const walk = ( current ) => {
+		const out = [];
+		for ( const block of current ) {
+			if ( block.name === 'core/template-content' ) {
+				found = true;
+				out.push( ...replacement );
+				continue;
+			}
+			if ( block.innerBlocks?.length ) {
+				out.push( {
+					...block,
+					innerBlocks: walk( block.innerBlocks ),
+				} );
+			} else {
+				out.push( block );
+			}
+		}
+		return out;
+	};
+	return [ walk( blocks ), found ];
+}
+
 function PreviewField( { item } ) {
 	const settings = usePatternSettings();
 	const backgroundColor = useStyle( 'color.background' ) ?? 'white';
+
+	const ownBlocks = useMemo(
+		() => parse( item.content.raw ),
+		[ item.content.raw ]
+	);
+
+	// When the active theme has a root.html template and this item is a
+	// non-root template (not a template part, not root itself), pull in
+	// root's content so the thumbnail matches the wrapped frontend output.
+	const rootContent = useSelect(
+		( select ) => {
+			if (
+				item.type !== 'wp_template' ||
+				item.slug === 'root' ||
+				! item.theme
+			) {
+				return null;
+			}
+			const record = select( coreStore ).getEntityRecord(
+				'postType',
+				'wp_template',
+				`${ item.theme }//root`
+			);
+			return record?.content?.raw ?? null;
+		},
+		[ item.type, item.slug, item.theme ]
+	);
+
 	const blocks = useMemo( () => {
-		return parse( item.content.raw );
-	}, [ item.content.raw ] );
+		if ( ! rootContent ) {
+			return ownBlocks;
+		}
+		const [ wrapped, found ] = substituteTemplateContent(
+			parse( rootContent ),
+			ownBlocks
+		);
+		return found ? wrapped : ownBlocks;
+	}, [ rootContent, ownBlocks ] );
 
 	const isEmpty = ! blocks?.length;
 	// Wrap everything in a block editor provider to ensure 'styles' that are needed

@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { Fragment } from '@wordpress/element';
 import { __experimentalItemGroup as ItemGroup } from '@wordpress/components';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import {
@@ -39,6 +40,7 @@ const defaultResolveIcon = ( view ) => {
 export default function DataViewsSidebarContent( {
 	postType,
 	resolveIcon = defaultResolveIcon,
+	appendItems,
 } ) {
 	const {
 		path,
@@ -55,21 +57,29 @@ export default function DataViewsSidebarContent( {
 	return (
 		<>
 			<ItemGroup className="edit-site-sidebar-dataviews">
-				{ viewList?.map( ( view ) => {
+				{ viewList?.map( ( view, index ) => {
 					const isActive = view.slug === activeView;
 					const slug = view.slug === 'all' ? undefined : view.slug;
 					const icon = resolveIcon( view );
 					return (
-						<SidebarNavigationItem
-							key={ view.slug }
-							icon={ icon }
-							to={ addQueryArgs( path, {
-								activeView: slug,
-							} ) }
-							aria-current={ isActive ? 'true' : undefined }
-						>
-							{ view.title }
-						</SidebarNavigationItem>
+						<Fragment key={ view.slug }>
+							<SidebarNavigationItem
+								icon={ icon }
+								to={ addQueryArgs( path, {
+									activeView: slug,
+								} ) }
+								aria-current={ isActive ? 'true' : undefined }
+							>
+								{ view.title }
+							</SidebarNavigationItem>
+							{ /*
+							 * Render `appendItems` immediately after the first
+							 * view (typically the catch-all "All templates" /
+							 * "All pages" entry). This promotes the extra item
+							 * above the per-source rows that follow.
+							 */ }
+							{ index === 0 && appendItems }
+						</Fragment>
 					);
 				} ) }
 			</ItemGroup>

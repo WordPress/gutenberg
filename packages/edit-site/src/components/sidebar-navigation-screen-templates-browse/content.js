@@ -1,7 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { useEntityRecords } from '@wordpress/core-data';
+import {
+	store as coreStore,
+	useEntityRecord,
+	useEntityRecords,
+} from '@wordpress/core-data';
+import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import { __experimentalItemGroup as ItemGroup } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -15,6 +20,7 @@ import SidebarNavigationItem from '../sidebar-navigation-item';
 import { useAddedBy } from '../page-templates/hooks';
 import { commentAuthorAvatar, published } from '@wordpress/icons';
 import { unlock } from '../../lock-unlock';
+import rootTemplateIcon from './root-template-icon';
 
 const { useLocation } = unlock( routerPrivateApis );
 
@@ -36,6 +42,7 @@ function TemplateDataviewItem( { template, isActive } ) {
 
 export default function DataviewsTemplatesSidebarContent() {
 	const {
+		params,
 		query: { activeView = 'active' },
 	} = useLocation();
 	const { records } = useEntityRecords( 'root', 'registeredTemplate', {
@@ -58,6 +65,25 @@ export default function DataviewsTemplatesSidebarContent() {
 		);
 	}, [ records ] );
 
+	// If the active theme provides a `root.html`, surface a quick "Root
+	// template" link inside the same ItemGroup as the per-source views so
+	// it reads as a peer entry with consistent left-alignment. Promoted
+	// out of the per-source views because it's the most common thing an
+	// author of a root-template-based theme will want to edit.
+	const stylesheet = useSelect(
+		( select ) => select( coreStore ).getCurrentTheme()?.stylesheet,
+		[]
+	);
+	const rootTemplateId = stylesheet ? `${ stylesheet }//root` : null;
+	const { record: rootTemplate, hasResolved: hasResolvedRoot } =
+		useEntityRecord( 'postType', 'wp_template', rootTemplateId ?? '', {
+			enabled: !! rootTemplateId,
+		} );
+	const showRootEntry = hasResolvedRoot && !! rootTemplate;
+	const isEditingRoot =
+		params?.postId &&
+		decodeURIComponent( params.postId ) === rootTemplateId;
+
 	return (
 		<ItemGroup className="edit-site-sidebar-navigation-screen-templates-browse">
 			<SidebarNavigationItem
@@ -67,6 +93,15 @@ export default function DataviewsTemplatesSidebarContent() {
 			>
 				{ __( 'Active templates' ) }
 			</SidebarNavigationItem>
+			{ showRootEntry && (
+				<SidebarNavigationItem
+					to={ `/wp_template/${ rootTemplateId }?canvas=edit` }
+					icon={ rootTemplateIcon }
+					aria-current={ isEditingRoot }
+				>
+					{ __( 'Root template' ) }
+				</SidebarNavigationItem>
+			) }
 			<SidebarNavigationItem
 				to={ addQueryArgs( '/template', { activeView: 'user' } ) }
 				icon={ commentAuthorAvatar }
