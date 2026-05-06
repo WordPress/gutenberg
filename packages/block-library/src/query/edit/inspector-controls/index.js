@@ -334,12 +334,13 @@ export default function QueryInspectorControls( props ) {
 					) }
 				</ToolsPanel>
 			) }
-			{ ! inherit && showDisplayPanel && (
+			{ showDisplayPanel && (
 				<ToolsPanel
 					className="block-library-query-toolspanel__display"
 					label={ __( 'Display' ) }
 					resetAll={ () => {
 						setQuery( {
+							perPage: 0,
 							offset: 0,
 							pages: 0,
 						} );
@@ -349,6 +350,7 @@ export default function QueryInspectorControls( props ) {
 					<ToolsPanelItem
 						label={ __( 'Items per page' ) }
 						hasValue={ () => perPage > 0 }
+						onDeselect={ () => setQuery( { perPage: 0 } ) }
 					>
 						<PerPageControl
 							perPage={ perPage }
@@ -356,16 +358,18 @@ export default function QueryInspectorControls( props ) {
 							onChange={ setQuery }
 						/>
 					</ToolsPanelItem>
-					<ToolsPanelItem
-						label={ __( 'Offset' ) }
-						hasValue={ () => offset > 0 }
-						onDeselect={ () => setQuery( { offset: 0 } ) }
-					>
-						<OffsetControl
-							offset={ offset }
-							onChange={ setQuery }
-						/>
-					</ToolsPanelItem>
+					{ ! inherit && (
+						<ToolsPanelItem
+							label={ __( 'Offset' ) }
+							hasValue={ () => offset > 0 }
+							onDeselect={ () => setQuery( { offset: 0 } ) }
+						>
+							<OffsetControl
+								offset={ offset }
+								onChange={ setQuery }
+							/>
+						</ToolsPanelItem>
+					) }
 					<ToolsPanelItem
 						label={ __( 'Max pages to show' ) }
 						hasValue={ () => pages > 0 }

@@ -95,11 +95,7 @@ export default function QueryContent( {
 	);
 	useEffect( () => {
 		const newQuery = {};
-		// When we inherit from global query always need to set the `perPage`
-		// based on the reading settings.
-		if ( inherit && query.perPage !== postsPerPage ) {
-			newQuery.perPage = postsPerPage;
-		} else if ( ! query.perPage && postsPerPage ) {
+		if ( ! query.perPage && postsPerPage ) {
 			newQuery.perPage = postsPerPage;
 		}
 
