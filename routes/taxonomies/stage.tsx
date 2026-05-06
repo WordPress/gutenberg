@@ -54,7 +54,7 @@ function TaxonomiesEmptyState( {
 			<EmptyState.Icon icon={ hasSearchOrFilters ? search : tag } />
 			<EmptyState.Title>
 				{ hasSearchOrFilters
-					? __( 'No taxonimies found' )
+					? __( 'No taxonomies found' )
 					: __( 'No taxonomies yet' ) }
 			</EmptyState.Title>
 			<EmptyState.Description>
