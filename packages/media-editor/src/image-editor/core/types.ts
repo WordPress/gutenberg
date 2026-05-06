@@ -105,7 +105,11 @@ export interface CropperState {
 }
 
 /**
- * Actions for the cropper reducer.
+ * Internal reducer action union.
+ *
+ * This type is intentionally not exported from the image-editor public barrel.
+ * Consumers should drive state through the controller returned by
+ * `useCropperState()` or through serializable `TransformOperation` values.
  */
 export type CropperAction =
 	/** Sets the loaded image metadata (natural size, src). */
@@ -121,22 +125,38 @@ export type CropperAction =
 	 */
 	| {
 			type: 'SET_ZOOM_AT_POINT';
-			payload: { zoom: number; pan: { x: number; y: number } };
+			payload: { zoom: number; pan: NormalizedPoint };
 	  }
 	/** Sets the absolute rotation angle in degrees. */
 	| { type: 'SET_ROTATION'; payload: number }
-	/** Rotates by ±90° (snap). */
+	/** Rotates by +/-90 degrees (snap). */
 	| { type: 'SNAP_ROTATE_90'; payload: { direction: 1 | -1 } }
 	/** Sets the flip state. */
 	| { type: 'SET_FLIP'; payload: Flip }
 	/** Sets the crop rectangle. */
 	| { type: 'SET_CROP_RECT'; payload: NormalizedRect }
-	/** Settle animation after resize drag — recenters the crop rect. */
+	/** Settle animation after resize drag, recentering the crop rect. */
 	| { type: 'SETTLE_CROP' }
 	/** Applies a single pipeline transform via the reducer. */
 	| { type: 'APPLY_OPERATION'; payload: TransformOperation }
 	/** Resets to DEFAULT_STATE, optionally merging a partial override. */
 	| { type: 'RESET'; payload?: Partial< CropperState > };
+
+/**
+ * Viewport camera state — display-only, does not affect export or undo.
+ *
+ * Applied as a CSS transform on the inner stage div so the user can scroll
+ * the view independently of the crop. zoom > 1 magnifies; pan shifts in CSS px.
+ */
+export interface ViewportState {
+	zoom: number;
+	pan: { x: number; y: number };
+}
+
+export type ViewportAction =
+	| { type: 'SET_VIEWPORT_ZOOM'; payload: number }
+	| { type: 'SET_VIEWPORT_PAN'; payload: { x: number; y: number } }
+	| { type: 'RESET_VIEWPORT' };
 
 /**
  * The contract for a pluggable stencil component.

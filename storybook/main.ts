@@ -32,6 +32,8 @@ const stories = [
 	'../packages/media-fields/src/**/stories/*.story.@(js|tsx|mdx)',
 	'../packages/theme/src/**/stories/*.mdx',
 	'../packages/theme/src/**/stories/*.story.@(tsx|mdx)',
+	'../packages/grid/src/**/stories/*.story.@(ts|tsx)',
+	'../routes/dashboard/**/stories/*.story.@(ts|tsx)',
 	'../packages/ui/src/**/stories/*.mdx',
 	'../packages/ui/src/**/stories/*.story.@(ts|tsx)',
 	'../packages/admin-ui/src/**/stories/*.story.@(ts|tsx)',

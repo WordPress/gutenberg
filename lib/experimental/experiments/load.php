@@ -34,11 +34,6 @@ function gutenberg_initialize_experiments_settings() {
 					'label'       => __( 'Grid interactivity', 'gutenberg' ),
 					'description' => __( 'Enables enhancements to the Grid block that let you move and resize items in the editor canvas.', 'gutenberg' ),
 				),
-				array(
-					'id'          => 'gutenberg-no-tinymce',
-					'label'       => __( 'Disable TinyMCE and Classic block', 'gutenberg' ),
-					'description' => __( 'Disables the TinyMCE and Classic block.', 'gutenberg' ),
-				),
 			),
 		),
 		array(
@@ -128,7 +123,7 @@ function gutenberg_initialize_experiments_settings() {
 				array(
 					'id'          => 'gutenberg-content-types',
 					'label'       => __( 'Content types', 'gutenberg' ),
-					'description' => __( 'Enables a UI for creating and managing custom taxonomies under Settings. Custom post types will be explored soon.', 'gutenberg' ),
+					'description' => __( 'Enables a UI for creating and managing custom taxonomies and custom post types under Settings.', 'gutenberg' ),
 				),
 				array(
 					'id'          => 'gutenberg-dashboard-widgets',
