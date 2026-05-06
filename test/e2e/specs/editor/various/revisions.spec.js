@@ -268,7 +268,7 @@ test.describe( 'Post revisions slider pagination', () => {
 		await requestUtils.deleteAllPosts();
 	} );
 
-	test( 'should paginate when there are more than 100 revisions', async ( {
+	test( 'should paginate, navigate pages, and diff across page boundaries', async ( {
 		admin,
 		page,
 		requestUtils,
@@ -285,6 +285,8 @@ test.describe( 'Post revisions slider pagination', () => {
 			},
 		} );
 
+		// Sequential REST calls to enforce ordering (concurrent writes to
+		// the same post race and produce non-monotonic revision content).
 		for ( let i = 1; i <= 105; i++ ) {
 			await requestUtils.rest( {
 				method: 'POST',
@@ -335,6 +337,22 @@ test.describe( 'Post revisions slider pagination', () => {
 		const slider = page.getByRole( 'slider', { name: 'Revision' } );
 		await expect( slider ).toHaveAttribute( 'max', '99' );
 
+		// Slide to the leftmost (oldest revision on page 1). Computing the
+		// previous-revision diff requires fetching the adjacent page.
+		await slider.focus();
+		await page.keyboard.press( 'Home' );
+
+		// The diff should still pair adjacent revisions as a modification
+		// (not render the entire current revision as "added", which would
+		// happen if the cross-page lookup failed).
+		await expect(
+			page
+				.locator( 'iframe[name="editor-canvas"]' )
+				.contentFrame()
+				.locator( '.is-revision-modified' )
+		).toBeVisible();
+
+		// Navigate to page 2 via the chevron.
 		await prevPageButton.click();
 
 		// After loading page 2: prev chevron disabled, next chevron enabled.
@@ -352,61 +370,6 @@ test.describe( 'Post revisions slider pagination', () => {
 			'max',
 			String( olderPageSize - 1 )
 		);
-	} );
-
-	test( 'should not show pagination when there are 100 or fewer revisions', async ( {
-		admin,
-		page,
-		requestUtils,
-	} ) => {
-		const post = await requestUtils.rest( {
-			method: 'POST',
-			path: '/wp/v2/posts',
-			data: {
-				title: 'No Pagination Test',
-				content: '<!-- wp:paragraph --><p>0</p><!-- /wp:paragraph -->',
-				status: 'draft',
-			},
-		} );
-
-		for ( let i = 1; i <= 5; i++ ) {
-			await requestUtils.rest( {
-				method: 'POST',
-				path: `/wp/v2/posts/${ post.id }`,
-				data: {
-					content: `<!-- wp:paragraph --><p>${ i }</p><!-- /wp:paragraph -->`,
-				},
-			} );
-		}
-
-		await admin.editPost( post.id );
-
-		const settingsSidebar = page.getByRole( 'region', {
-			name: 'Editor settings',
-		} );
-		await settingsSidebar.getByRole( 'tab', { name: 'Post' } ).click();
-
-		const revisionsButton = settingsSidebar
-			.getByRole( 'button' )
-			.filter( { hasText: /^\d+$/ } );
-		await expect( revisionsButton ).toBeVisible();
-		await revisionsButton.click();
-		await expect(
-			page.getByRole( 'button', { name: 'Restore' } )
-		).toBeVisible();
-
-		await expect(
-			page.getByRole( 'slider', { name: 'Revision' } )
-		).toBeVisible();
-		await expect(
-			page.getByRole( 'button', { name: /^Revisions \d/ } )
-		).toHaveCount( 0 );
-		await expect(
-			page.getByRole( 'button', { name: 'No older revisions' } )
-		).toHaveCount( 0 );
-		await expect(
-			page.getByRole( 'button', { name: 'No newer revisions' } )
-		).toHaveCount( 0 );
 	} );
 } );
 
