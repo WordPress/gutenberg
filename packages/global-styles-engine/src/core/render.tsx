@@ -1908,17 +1908,22 @@ function renderStylesNode(
 						} );
 					} );
 
-					ruleset = appendResponsiveStyles(
-						styleVariations,
-						styleVariationSelector as string,
-						ruleset,
+					getBlockResponsiveStyleNodes( {
+						styles: styleVariations,
+						selector: styleVariationSelector as string,
 						featureSelectors,
-						tree.settings,
 						name,
-						styleVariationSelector as string,
-						selector,
-						styleVariationName
-					);
+					} ).forEach( ( responsiveNode ) => {
+						ruleset += renderStylesNode( responsiveNode, {
+							tree,
+							options,
+							useRootPaddingAlign,
+							disableLayoutStyles: true,
+							hasBlockGapSupport,
+							hasFallbackGapSupport,
+							disableRootPadding,
+						} );
+					} );
 
 					// Generate layout styles for the variation if it supports layout and has blockGap defined.
 					if (

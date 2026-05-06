@@ -937,7 +937,7 @@ describe( 'global styles renderer', () => {
 			);
 
 			expect( result ).toEqual(
-				':root :where(.is-style-foo.wp-block-button){color: green;}@media (width <= 480px){:root :where(.is-style-foo.wp-block-button.is-style-foo.wp-block-button){color: yellow;}}'
+				':root :where(.is-style-foo.wp-block-button){color: green;}@media (width <= 480px){:root :where(.is-style-foo.wp-block-button){color: yellow;}}'
 			);
 		} );
 
