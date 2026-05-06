@@ -23,6 +23,7 @@ import {
 import { store as editSiteStore } from './store';
 import { unlock } from './lock-unlock';
 import App from './components/app';
+import './hooks/wrap-mode-root-edit-toolbar';
 
 const { registerCoreBlockBindingsSources } = unlock( editorPrivateApis );
 
