@@ -345,7 +345,7 @@ class WP_REST_User_Taxonomies_Controller_Gutenberg extends WP_REST_Posts_Control
 		$data    = $response->get_data();
 		$post_id = (int) $data['id'];
 
-		$this->save_object_type_meta( $post_id, $request );
+		gutenberg_user_taxonomy_replace_object_types( $post_id, (array) $request['object_type'] );
 
 		$refreshed = $this->prepare_item_for_response( get_post( $post_id ), $request );
 		if ( ! is_wp_error( $refreshed ) ) {
@@ -374,7 +374,7 @@ class WP_REST_User_Taxonomies_Controller_Gutenberg extends WP_REST_Posts_Control
 
 		$post_id = (int) $request['id'];
 
-		$this->save_object_type_meta( $post_id, $request );
+		gutenberg_user_taxonomy_replace_object_types( $post_id, (array) $request['object_type'] );
 
 		$refreshed = $this->prepare_item_for_response( get_post( $post_id ), $request );
 		if ( ! is_wp_error( $refreshed ) ) {
@@ -382,35 +382,6 @@ class WP_REST_User_Taxonomies_Controller_Gutenberg extends WP_REST_Posts_Control
 		}
 
 		return $response;
-	}
-
-	/**
-	 * Persists the `object_type` array from the request as repeated rows of
-	 * `_wp_user_taxonomy_object_type` post meta. Stored separately from the
-	 * JSON config so listings can filter via `meta_query` IN. Callers must
-	 * have already verified that the request includes the `object_type`
-	 * param.
-	 *
-	 * @param int             $post_id Saved post ID.
-	 * @param WP_REST_Request $request REST request.
-	 */
-	private function save_object_type_meta( $post_id, $request ) {
-		$values = array();
-		foreach ( (array) $request['object_type'] as $slug ) {
-			if ( ! is_string( $slug ) ) {
-				continue;
-			}
-			$clean = sanitize_key( $slug );
-			if ( '' !== $clean && post_type_exists( $clean ) ) {
-				$values[] = $clean;
-			}
-		}
-		$values = array_values( array_unique( $values ) );
-
-		delete_post_meta( $post_id, GUTENBERG_USER_TAXONOMY_OBJECT_TYPE_META_KEY );
-		foreach ( $values as $slug ) {
-			add_post_meta( $post_id, GUTENBERG_USER_TAXONOMY_OBJECT_TYPE_META_KEY, $slug );
-		}
 	}
 
 	/**
