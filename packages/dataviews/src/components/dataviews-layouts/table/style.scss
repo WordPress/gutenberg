@@ -198,6 +198,17 @@
 			}
 		}
 
+		.dataviews-view-table__hierarchy-cell {
+			min-width: auto;
+			max-width: none;
+		}
+
+		.dataviews-view-table__hierarchy-cell,
+		.dataviews-view-table__checkbox-column > .dataviews-view-table__cell-content-wrapper,
+		.dataviews-view-table__primary-column {
+			transform: translateX(calc(var(--wp-dataviews-table-hierarchy-level, 0) * #{$grid-unit-30}));
+		}
+
 		.components-v-stack > .dataviews-view-table__cell-content-wrapper:not(:first-child) {
 			min-height: 0;
 		}
@@ -228,6 +239,21 @@
 	.dataviews-view-table__actions-column {
 		width: auto;
 		white-space: nowrap;
+	}
+
+	.dataviews-view-table__hierarchy-toggle.components-button.has-icon {
+		min-width: $grid-unit-30;
+	}
+
+	.dataviews-view-table__hierarchy-toggle-placeholder {
+		display: block;
+		width: $grid-unit-30;
+		height: $grid-unit-30;
+		flex-shrink: 0;
+	}
+
+	.dataviews-view-table__hierarchy-badge {
+		margin-left: 8px;
 	}
 
 
