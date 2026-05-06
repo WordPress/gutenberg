@@ -335,13 +335,15 @@ if ( ! class_exists( 'WP_Sync_Post_Meta_Storage' ) ) {
 		 * @return int|null Canonical storage post ID.
 		 */
 		private function find_canonical_storage_post_id( string $room_hash ): ?int {
-			global $wpdb;
-
-			$post_id = $wpdb->get_var(
-				$wpdb->prepare(
-					"SELECT ID FROM {$wpdb->posts} WHERE post_type = %s AND post_status = 'publish' AND post_name = %s ORDER BY ID ASC LIMIT 1",
-					self::POST_TYPE,
-					$room_hash
+			$post_id = get_posts(
+				array(
+					'post_type'      => self::POST_TYPE,
+					'posts_per_page' => 1,
+					'post_status'    => 'publish',
+					'name'           => $room_hash,
+					'fields'         => 'ids',
+					'orderby'        => 'ID',
+					'order'          => 'ASC',
 				)
 			);
 
