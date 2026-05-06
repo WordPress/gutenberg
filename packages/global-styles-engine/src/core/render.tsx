@@ -1890,15 +1890,23 @@ function renderStylesNode(
 						);
 					}
 
-					ruleset = appendPseudoSelectorStyles(
-						styleVariations,
-						styleVariationSelector as string,
-						ruleset,
+					getBlockPseudoStyleNodes( {
+						styles: styleVariations,
+						selector: styleVariationSelector as string,
 						featureSelectors,
-						tree.settings,
 						name,
-						styleVariationSelector as string
-					);
+					} ).forEach( ( pseudoNode ) => {
+						ruleset += renderStylesNode( pseudoNode, {
+							tree,
+							options,
+							useRootPaddingAlign,
+							disableLayoutStyles: true,
+							hasBlockGapSupport,
+							hasFallbackGapSupport,
+							disableRootPadding,
+							includeStateStyles: false,
+						} );
+					} );
 
 					ruleset = appendResponsiveStyles(
 						styleVariations,
