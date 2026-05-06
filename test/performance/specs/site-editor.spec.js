@@ -95,8 +95,11 @@ test.describe( 'Site Editor Performance', () => {
 				const canvas = await perfUtils.getCanvas();
 				await canvas.locator( '.wp-block' ).first().waitFor();
 
-				// Stop tracing.
-				await metrics.stopTracing( 'site-editor-first-block' );
+				// Stop tracing. Save just one representative sample.
+				await metrics.stopTracing(
+					i === Math.floor( iterations / 2 ) &&
+						'site-editor-first-block'
+				);
 
 				// Get the durations.
 				const loadingDurations = await metrics.getLoadingDurations();
@@ -243,7 +246,10 @@ test.describe( 'Site Editor Performance', () => {
 				await page
 					.getByRole( 'button', { name: 'Single Posts' } )
 					.click();
-				await metrics.stopTracing( 'site-editor-navigate' );
+				// Stop tracing. Save just one representative sample.
+				await metrics.stopTracing(
+					i === Math.floor( iterations / 2 ) && 'site-editor-navigate'
+				);
 
 				// Get the durations.
 				const [ mouseClickEvents ] = metrics.getClickEventDurations();

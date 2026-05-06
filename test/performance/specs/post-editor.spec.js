@@ -80,8 +80,11 @@ test.describe( 'Post Editor Performance', () => {
 				// Wait for the first block.
 				await canvas.locator( '.wp-block' ).first().waitFor();
 
-				// Stop tracing.
-				await metrics.stopTracing( 'post-editor-first-block' );
+				// Stop tracing. Save just one representative sample.
+				await metrics.stopTracing(
+					i === Math.floor( iterations / 2 ) &&
+						'post-editor-first-block'
+				);
 
 				// Get the durations.
 				const loadingDurations = await metrics.getLoadingDurations();
@@ -295,8 +298,10 @@ test.describe( 'Post Editor Performance', () => {
 				// Click the next paragraph.
 				await paragraphs.nth( i ).click();
 
-				// Stop tracing.
-				await metrics.stopTracing( 'post-editor-focus' );
+				// Stop tracing. Save just one representative sample.
+				await metrics.stopTracing(
+					i === Math.floor( iterations / 2 ) && 'post-editor-focus'
+				);
 
 				// Get the durations.
 				const allDurations = metrics.getSelectionEventDurations();
@@ -345,8 +350,11 @@ test.describe( 'Post Editor Performance', () => {
 				await listViewToggle.click();
 				await perfUtils.expectExpandedState( listViewToggle, 'true' );
 
-				// Stop tracing.
-				await metrics.stopTracing( 'post-editor-list-view-open' );
+				// Stop tracing. Save just one representative sample.
+				await metrics.stopTracing(
+					i === Math.floor( iterations / 2 ) &&
+						'post-editor-list-view-open'
+				);
 
 				// Get the durations.
 				const [ mouseClickEvents ] = metrics.getClickEventDurations();
@@ -400,8 +408,11 @@ test.describe( 'Post Editor Performance', () => {
 					'true'
 				);
 
-				// Stop tracing.
-				await metrics.stopTracing( 'post-editor-inserter-open' );
+				// Stop tracing. Save just one representative sample.
+				await metrics.stopTracing(
+					i === Math.floor( iterations / 2 ) &&
+						'post-editor-inserter-open'
+				);
 
 				// Get the durations.
 				const [ mouseClickEvents ] = metrics.getClickEventDurations();
@@ -460,8 +471,11 @@ test.describe( 'Post Editor Performance', () => {
 				// Type to trigger search.
 				await page.keyboard.type( 'p' );
 
-				// Stop tracing.
-				await metrics.stopTracing( 'post-editor-inserter-search' );
+				// Stop tracing. Save just one representative sample.
+				await metrics.stopTracing(
+					i === Math.floor( iterations / 2 ) &&
+						'post-editor-inserter-search'
+				);
 
 				// Get the durations.
 				const [ keyDownEvents, keyPressEvents, keyUpEvents ] =
@@ -528,8 +542,11 @@ test.describe( 'Post Editor Performance', () => {
 				await paragraphBlockItem.hover();
 				await headingBlockItem.hover();
 
-				// Stop tracing.
-				await metrics.stopTracing( 'post-editor-inserter-hover' );
+				// Stop tracing. Save just one representative sample.
+				await metrics.stopTracing(
+					i === Math.floor( iterations / 2 ) &&
+						'post-editor-inserter-hover'
+				);
 
 				// Get the durations.
 				const [ mouseOverEvents, mouseOutEvents ] =

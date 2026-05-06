@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { access, mkdir, writeFile } from 'fs/promises';
+import { mkdir, writeFile } from 'fs/promises';
 import { join } from 'path';
 import type { Page, Browser } from '@playwright/test';
 // resolution-mode support in TypeScript 5.3 will resolve this.
@@ -239,37 +239,41 @@ export class Metrics {
 	}
 
 	/**
-	 * Stops Chromium tracing and saves the trace.
+	 * Stops Chromium tracing.
 	 *
-	 * When the `WP_ARTIFACTS_PATH` environment variable is set, the raw trace
-	 * is also written to `${WP_ARTIFACTS_PATH}/traces/<name>.trace.json`. The
-	 * resulting file can be opened in Chrome DevTools (Performance panel →
-	 * "Load profile…") to inspect the flame graph.
+	 * When `name` is a non-empty string and the `WP_ARTIFACTS_PATH` environment
+	 * variable is set, the raw trace is written to
+	 * `${WP_ARTIFACTS_PATH}/traces/<name>.trace.json`. The resulting file can
+	 * be opened in Chrome DevTools (Performance panel → "Load profile…") to
+	 * inspect the flame graph. Pass a falsy value (or omit the argument) to
+	 * just parse the trace into `this.trace` without writing — this is the
+	 * default for iteration loops, where you typically want to save only one
+	 * representative sample. Callers pick which iteration that is, e.g.
+	 * `i === Math.floor( iterations / 2 ) && 'post-editor-first-block'`.
 	 *
-	 * `name` is a stable identifier for the scenario (e.g. `post-editor-loading`).
-	 * Subsequent `stopTracing` calls with the same name within a CI run are
-	 * skipped — repeated test iterations and in-test loops produce one trace
-	 * per scenario. Stable, hand-picked names also let downstream tooling
-	 * match traces across runs by ID rather than by test-title heuristics.
-	 *
-	 * @param name File name (without extension) identifying the scenario.
+	 * @param name File name (without extension) identifying the scenario, or
+	 *             `false`/`undefined` to skip writing.
 	 */
-	async stopTracing( name: string ) {
+	async stopTracing( name?: string | false ) {
 		const traceBuffer = await this.browser.stopTracing();
 		const traceJSON = JSON.parse( traceBuffer.toString() );
 
 		this.trace = traceJSON;
 
-		const artifactsPath = process.env.WP_ARTIFACTS_PATH;
-		if ( artifactsPath ) {
-			const tracesDir = join( artifactsPath, 'traces' );
-			const filePath = join( tracesDir, `${ name }.trace.json` );
-			await mkdir( tracesDir, { recursive: true } );
-			if ( ! ( await fileExists( filePath ) ) ) {
-				await resolveTraceSourceMaps( traceJSON, fetchMap );
-				await writeFile( filePath, JSON.stringify( traceJSON ) );
-			}
+		if ( ! name ) {
+			return;
 		}
+
+		const artifactsPath = process.env.WP_ARTIFACTS_PATH;
+		if ( ! artifactsPath ) {
+			return;
+		}
+
+		const tracesDir = join( artifactsPath, 'traces' );
+		const filePath = join( tracesDir, `${ name }.trace.json` );
+		await mkdir( tracesDir, { recursive: true } );
+		await resolveTraceSourceMaps( traceJSON, fetchMap );
+		await writeFile( filePath, JSON.stringify( traceJSON ) );
 	}
 
 	/**
@@ -423,15 +427,6 @@ export class Metrics {
 		await this.page.reload();
 
 		return this.webVitals;
-	}
-}
-
-async function fileExists( filePath: string ): Promise< boolean > {
-	try {
-		await access( filePath );
-		return true;
-	} catch {
-		return false;
 	}
 }
 
