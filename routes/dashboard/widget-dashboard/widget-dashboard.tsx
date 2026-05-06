@@ -2,7 +2,9 @@
  * Internal dependencies
  */
 import { WidgetDashboardProvider } from './context/dashboard-context';
+import { WidgetDashboardUIProvider } from './context/ui-context';
 import { Actions } from './components/actions';
+import { Inserter } from './components/inserter';
 import { Widget } from './components/widget';
 import { Widgets } from './components/widgets';
 import type { WidgetDashboardProps } from './types';
@@ -56,13 +58,17 @@ export const WidgetDashboard = Object.assign(
 				resolveWidgetModule={ resolveWidgetModule }
 				gridSettings={ gridSettings }
 			>
-				{ children ?? (
-					<>
-						<NoWidgetsState />
-						<Actions />
-						<Widgets />
-					</>
-				) }
+				<WidgetDashboardUIProvider>
+					{ children ?? (
+						<>
+							<NoWidgetsState />
+							<Actions />
+							<Widgets />
+						</>
+					) }
+
+					<Inserter />
+				</WidgetDashboardUIProvider>
 			</WidgetDashboardProvider>
 		);
 	},
