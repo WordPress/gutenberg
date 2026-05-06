@@ -143,6 +143,7 @@ export type BlockSelectors = Record<
  *
  * - `styles`: theme.json style object for this node.
  * - `selector`: CSS selector used for the node's base declarations.
+ * - `selectorSuffix`: optional suffix appended to base and feature selectors.
  * - `skipSelectorWrapper`: omits the `:root :where()` specificity wrapper.
  * - `duotoneSelector`: alternate selector for duotone filter declarations.
  * - `featureSelectors`: feature-level selectors for block supports.
@@ -154,6 +155,7 @@ export type BlockSelectors = Record<
 interface StylesNode {
 	styles: any;
 	selector: string;
+	selectorSuffix?: string;
 	skipSelectorWrapper?: boolean;
 	duotoneSelector?: string;
 	featureSelectors?:
@@ -1013,57 +1015,6 @@ function appendPseudoSelectorStyles(
 }
 
 /**
- * Creates feature-level selectors for a pseudo state.
- *
- * Feature selectors are keyed by block support feature, for example:
- * `{ dimensions: { root: '.wp-block-button', width: '.wp-block-button' } }`.
- * Pseudo nodes need those feature selectors to target the stateful selector,
- * for example `.wp-block-button:hover`, so feature-level declarations are
- * scoped to the same pseudo state as the node's base selector.
- *
- * String feature selectors are skipped to preserve the existing pseudo helper
- * behavior, which only handled object-shaped feature selector maps.
- *
- * @param featureSelectors Feature-level selectors from a style node.
- * @param pseudoSelector   Pseudo selector to append to each feature selector.
- * @return Feature-level selectors scoped to the pseudo state.
- */
-function appendPseudoSelectorToFeatureSelectors(
-	featureSelectors: StylesNode[ 'featureSelectors' ],
-	pseudoSelector: string
-): StylesNode[ 'featureSelectors' ] {
-	if ( ! featureSelectors || typeof featureSelectors === 'string' ) {
-		return undefined;
-	}
-
-	return Object.fromEntries(
-		Object.entries( featureSelectors ).map( ( [ feature, selector ] ) => {
-			if ( typeof selector === 'string' ) {
-				return [
-					feature,
-					appendToSelector( selector, pseudoSelector ),
-				];
-			}
-
-			return [
-				feature,
-				Object.fromEntries(
-					Object.entries( selector ).map(
-						( [ subfeature, subfeatureSelector ] ) => [
-							subfeature,
-							appendToSelector(
-								subfeatureSelector,
-								pseudoSelector
-							),
-						]
-					)
-				),
-			];
-		} )
-	);
-}
-
-/**
  * Creates style nodes for configured block pseudo selectors.
  *
  * Only block pseudo selectors listed in `VALID_BLOCK_PSEUDO_SELECTORS` are
@@ -1090,11 +1041,12 @@ function getBlockPseudoStyleNodes( node: StylesNode ): StylesNode[] {
 			return [
 				{
 					styles: JSON.parse( JSON.stringify( pseudoStyles ) ),
-					selector: appendToSelector( selector, pseudoSelector ),
-					featureSelectors: appendPseudoSelectorToFeatureSelectors(
-						featureSelectors,
-						pseudoSelector
-					),
+					selector,
+					selectorSuffix: pseudoSelector,
+					featureSelectors:
+						featureSelectors && typeof featureSelectors !== 'string'
+							? featureSelectors
+							: undefined,
 					name,
 				},
 			];
@@ -1690,6 +1642,7 @@ export const generateCustomProperties = (
 function renderStylesNode(
 	{
 		selector,
+		selectorSuffix,
 		duotoneSelector,
 		styles,
 		fallbackGapValue,
@@ -1718,6 +1671,9 @@ function renderStylesNode(
 	}
 ): string {
 	let ruleset = '';
+	const effectiveSelector = selectorSuffix
+		? appendToSelector( selector, selectorSuffix )
+		: selector;
 
 	// Process styles for block support features with custom feature level
 	// CSS selectors set.
@@ -1741,10 +1697,13 @@ function renderStylesNode(
 		);
 
 		Object.entries( featureDeclarations ).forEach(
-			( [ cssSelector, declarations ] ) => {
+			( [ featureSelector, declarations ] ) => {
 				if ( declarations.length ) {
+					const selectorForRule = selectorSuffix
+						? appendToSelector( featureSelector, selectorSuffix )
+						: featureSelector;
 					const rules = declarations.join( ';' );
-					ruleset += `:root :where(${ cssSelector }){${ rules };}`;
+					ruleset += `:root :where(${ selectorForRule }){${ rules };}`;
 				}
 			}
 		);
@@ -1768,11 +1727,11 @@ function renderStylesNode(
 	// Process blockGap and layout styles.
 	if (
 		! disableLayoutStyles &&
-		( ROOT_BLOCK_SELECTOR === selector || hasLayoutSupport )
+		( ROOT_BLOCK_SELECTOR === effectiveSelector || hasLayoutSupport )
 	) {
 		ruleset += getLayoutStyles( {
 			style: styles,
-			selector,
+			selector: effectiveSelector,
 			hasBlockGapSupport,
 			hasFallbackGapSupport,
 			fallbackGapValue,
@@ -1782,21 +1741,21 @@ function renderStylesNode(
 	// Process the remaining block styles (they use either normal block class or __experimentalSelector).
 	const styleDeclarations = getStylesDeclarations(
 		styles,
-		selector,
+		effectiveSelector,
 		useRootPaddingAlign,
 		tree,
 		disableRootPadding
 	);
 	if ( styleDeclarations?.length ) {
 		const generalSelector = skipSelectorWrapper
-			? selector
-			: `:root :where(${ selector })`;
+			? effectiveSelector
+			: `:root :where(${ effectiveSelector })`;
 		ruleset += `${ generalSelector }{${ styleDeclarations.join( ';' ) };}`;
 	}
 	if ( styles?.css ) {
 		ruleset += processCSSNesting(
 			styles.css,
-			`:root :where(${ selector })`
+			`:root :where(${ effectiveSelector })`
 		);
 	}
 
