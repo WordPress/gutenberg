@@ -17,7 +17,7 @@ function Dashboard() {
 
 	const widgetTypes = useWidgetTypes();
 
-	const [ editMode, setEditMode ] = useState( false );
+	const [ editMode, setEditMode ] = useState( true );
 
 	return (
 		<WidgetDashboard
@@ -30,6 +30,7 @@ function Dashboard() {
 			<Page
 				title={ __( 'Dashboard' ) }
 				actions={ <WidgetDashboard.Actions /> }
+				hasPadding
 			>
 				<WidgetDashboard.NoWidgetsState />
 				<WidgetDashboard.Widgets />
