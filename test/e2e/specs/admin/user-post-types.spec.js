@@ -17,6 +17,7 @@ async function createUserPostType( requestUtils ) {
 			status: 'publish',
 			config: {
 				labels: { singular_name: 'Book' },
+				public: true, // mirrors the form's Create defaults
 			},
 		},
 	} );
@@ -37,11 +38,7 @@ test.describe( 'User post types', () => {
 		await requestUtils.setGutenbergExperiments( [] );
 	} );
 
-	test( 'creates a post type and registers it', async ( {
-		admin,
-		page,
-		requestUtils,
-	} ) => {
+	test( 'creates a post type and registers it', async ( { admin, page } ) => {
 		await admin.visitAdminPage( SETTINGS_PAGE_PATH, POST_TYPES_PAGE_QUERY );
 
 		await page.getByRole( 'button', { name: 'Add post type' } ).click();
@@ -76,13 +73,10 @@ test.describe( 'User post types', () => {
 			'"Books" post type created.'
 		);
 
-		// `show_in_rest: true` is the default for user-defined post types,
-		// so the type endpoint should resolve immediately after activation.
-		const registered = await requestUtils.rest( {
-			path: '/wp/v2/types/book',
-			method: 'GET',
-		} );
-		expect( registered.slug ).toBe( 'book' );
+		await admin.visitAdminPage( 'edit.php', 'post_type=book' );
+		await expect(
+			page.getByRole( 'heading', { level: 1, name: 'Books' } )
+		).toBeVisible();
 	} );
 
 	test( 'deactivating unregisters the post type and activating re-registers it', async ( {
@@ -93,42 +87,47 @@ test.describe( 'User post types', () => {
 		await createUserPostType( requestUtils );
 		await admin.visitAdminPage( SETTINGS_PAGE_PATH, POST_TYPES_PAGE_QUERY );
 
-		const row = page.getByRole( 'row', { name: /Books/ } );
-		await row.getByRole( 'button', { name: 'Actions' } ).click();
+		await page
+			.getByRole( 'row', { name: /Books/ } )
+			.getByRole( 'button', { name: 'Actions' } )
+			.click();
 		await page.getByRole( 'menuitem', { name: 'Deactivate' } ).click();
 
 		await expect( page.getByTestId( 'snackbar' ).last() ).toContainText(
 			'Post type deactivated.'
 		);
-		await expect( row.getByText( 'Inactive' ) ).toBeVisible();
+		await expect(
+			page.getByRole( 'row', { name: /Books/ } ).getByText( 'Inactive' )
+		).toBeVisible();
 
-		// requestUtils.rest() throws on non-2xx — catch and inspect the
-		// error code instead of relying on a status assertion.
-		const deactivated = await requestUtils
-			.rest( {
-				path: '/wp/v2/types/book',
-				method: 'GET',
-			} )
-			.catch( ( error ) => error );
-		expect( deactivated.code ).toBe( 'rest_type_invalid' );
+		// Unregistered post types cause WP core to wp_die with "Invalid post
+		// type." when visiting their admin list URL.
+		await admin.visitAdminPage( 'edit.php', 'post_type=book' );
+		await expect( page.getByText( 'Invalid post type.' ) ).toBeVisible();
 
-		await row.getByRole( 'button', { name: 'Actions' } ).click();
+		await admin.visitAdminPage( SETTINGS_PAGE_PATH, POST_TYPES_PAGE_QUERY );
+		await page
+			.getByRole( 'row', { name: /Books/ } )
+			.getByRole( 'button', { name: 'Actions' } )
+			.click();
 		await page.getByRole( 'menuitem', { name: 'Activate' } ).click();
 
 		await expect( page.getByTestId( 'snackbar' ).last() ).toContainText(
 			'Post type activated.'
 		);
-		await expect( row.getByText( 'Active' ) ).toBeVisible();
+		await expect(
+			page.getByRole( 'row', { name: /Books/ } ).getByText( 'Active' )
+		).toBeVisible();
 
-		const reactivated = await requestUtils.rest( {
-			path: '/wp/v2/types/book',
-			method: 'GET',
-		} );
-		expect( reactivated.slug ).toBe( 'book' );
+		await admin.visitAdminPage( 'edit.php', 'post_type=book' );
+		await expect(
+			page.getByRole( 'heading', { level: 1, name: 'Books' } )
+		).toBeVisible();
 	} );
 
 	test( 'editing a post type persists changes to the registered post type', async ( {
 		admin,
+		editor,
 		page,
 		requestUtils,
 	} ) => {
@@ -154,11 +153,18 @@ test.describe( 'User post types', () => {
 			'"Books" post type updated.'
 		);
 
-		const registered = await requestUtils.rest( {
-			path: '/wp/v2/types/book',
-			method: 'GET',
-		} );
-		expect( registered.hierarchical ).toBe( true );
-		expect( registered.taxonomies ).toContain( 'category' );
+		// Open the post editor for the registered type and confirm the saved
+		// config reached register_post_type():
+		// - Hierarchical post types render a "Parent" row in the document
+		//   sidebar.
+		// - Associating the `category` taxonomy adds a "Categories" panel.
+		await admin.createNewPost( { postType: 'book' } );
+		await editor.openDocumentSettingsSidebar();
+		await expect(
+			page.getByText( 'Parent', { exact: true } )
+		).toBeVisible();
+		await expect(
+			page.getByRole( 'button', { name: 'Categories' } )
+		).toBeVisible();
 	} );
 } );
