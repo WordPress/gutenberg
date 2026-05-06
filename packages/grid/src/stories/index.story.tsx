@@ -23,6 +23,7 @@ import type {
 const meta: Meta< typeof DashboardGrid > = {
 	title: 'Grid/DashboardGrid',
 	component: DashboardGrid,
+	tags: [ 'status-experimental' ],
 	args: {
 		columns: 6,
 		spacing: 2,
