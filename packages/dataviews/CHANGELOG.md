@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Code Quality
+
+- DataViews: `ButtonTrigger` and `MenuItemTrigger` (item-actions internals) now `forwardRef` and spread unknown props onto their underlying `Button` / `Menu.Item`, so they compose under `Dialog.Trigger` via the render-prop pattern. `ModalActionInlineButton` and `ModalActionMenuItem` reuse them instead of inlining the same trigger markup. ([#76837](https://github.com/WordPress/gutenberg/pull/76837))
+
 ### Breaking Changes
 
 - DataViews: Migrate action modals and DataForm panel modals from `@wordpress/components` `Modal` to `@wordpress/ui` `Dialog` and `AlertDialog`. The `modalSize` value `'fill'` is deprecated in favour of `'stretch'`. New values `'stretch'` and `'full'` are available. Custom CSS targeting `.components-modal__*` classes inside action modals will no longer work. The `dataforms-layouts-panel__modal` CSS class on the panel modal and the `dataforms-layouts-panel__modal-footer` CSS class have been removed. The `modalFocusOnMount` value `'firstElement'` now behaves like `'firstContentElement'` (the new Dialog primitive's smart default already skips the close icon and focuses the first content tabbable, so the legacy distinction between the two is no longer meaningful). ([#76837](https://github.com/WordPress/gutenberg/pull/76837))

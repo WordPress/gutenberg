@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { MouseEventHandler } from 'react';
+import type { MouseEventHandler, ReactElement } from 'react';
 
 /**
  * WordPress dependencies
@@ -11,7 +11,13 @@ import {
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useCallback, useMemo, useRef, useState } from '@wordpress/element';
+import {
+	forwardRef,
+	useCallback,
+	useMemo,
+	useRef,
+	useState,
+} from '@wordpress/element';
 import { moreVertical } from '@wordpress/icons';
 import { useRegistry } from '@wordpress/data';
 import { useViewportMatch } from '@wordpress/compose';
@@ -30,7 +36,13 @@ const { Menu, kebabCase } = unlock( componentsPrivateApis );
 
 export interface ActionTriggerProps< Item > {
 	action: Action< Item >;
-	onClick: MouseEventHandler;
+	/**
+	 * Click handler for direct usage. When the trigger is wrapped in a
+	 * primitive that injects its own `onClick` via the render-prop pattern
+	 * (e.g. `Dialog.Trigger render={ <ButtonTrigger … /> }`), the wrapper
+	 * supplies the click handler and this prop should be omitted.
+	 */
+	onClick?: MouseEventHandler;
 	isBusy?: boolean;
 	items: Item[];
 	variant?: 'primary' | 'secondary' | 'tertiary' | 'link';
@@ -84,40 +96,68 @@ interface PrimaryActionsProps< Item > {
 	buttonVariant?: 'primary' | 'secondary' | 'tertiary' | 'link';
 }
 
-function ButtonTrigger< Item >( {
-	action,
-	onClick,
-	items,
-	variant,
-}: ActionTriggerProps< Item > ) {
+// `ButtonTrigger` and `MenuItemTrigger` forward both refs and unknown
+// props onto their underlying primitive (Button / Menu.Item), so the same
+// component can be used directly (parent supplies `onClick`) or composed
+// via render props (e.g. `<Dialog.Trigger render={ <ButtonTrigger … /> } />`,
+// `<MenuItemTrigger render={ <Dialog.Trigger /> } />`). This eliminates the
+// duplicated trigger markup that the modal-action wrappers used to inline.
+const ButtonTrigger = forwardRef( function ButtonTrigger< Item >(
+	{ action, items, variant, ...rest }: ActionTriggerProps< Item >,
+	ref: React.Ref< HTMLButtonElement >
+) {
 	const label =
 		typeof action.label === 'string' ? action.label : action.label( items );
 	return (
 		<Button
+			ref={ ref }
 			disabled={ !! action.disabled }
 			accessibleWhenDisabled
 			size="compact"
 			variant={ variant }
-			onClick={ onClick }
+			{ ...rest }
 		>
 			{ label }
 		</Button>
 	);
-}
+} ) as < Item >(
+	props: ActionTriggerProps< Item > & {
+		ref?: React.Ref< HTMLButtonElement >;
+	}
+) => ReactElement;
 
-function MenuItemTrigger< Item >( {
-	action,
-	onClick,
-	items,
-}: ActionTriggerProps< Item > ) {
+const MenuItemTrigger = forwardRef( function MenuItemTrigger< Item >(
+	{
+		action,
+		items,
+		render,
+		...rest
+	}: Pick< ActionTriggerProps< Item >, 'action' | 'items' | 'onClick' > & {
+		render?: ReactElement;
+	},
+	ref: React.Ref< HTMLDivElement >
+) {
 	const label =
 		typeof action.label === 'string' ? action.label : action.label( items );
 	return (
-		<Menu.Item disabled={ action.disabled } onClick={ onClick }>
+		<Menu.Item
+			ref={ ref }
+			disabled={ action.disabled }
+			render={ render }
+			{ ...rest }
+		>
 			<Menu.ItemLabel>{ label }</Menu.ItemLabel>
 		</Menu.Item>
 	);
-}
+} ) as < Item >(
+	props: Pick<
+		ActionTriggerProps< Item >,
+		'action' | 'items' | 'onClick'
+	> & {
+		render?: ReactElement;
+		ref?: React.Ref< HTMLDivElement >;
+	}
+) => ReactElement;
 
 function mapModalSize(
 	size: ActionModalType< unknown >[ 'modalSize' ]
@@ -202,20 +242,17 @@ function ModalActionMenuItem< Item >( {
 	// `closeModal` to event handlers / effects without remounting on every
 	// keystroke.
 	const closeModal = useCallback( () => setOpen( false ), [] );
-	const label =
-		typeof action.label === 'string' ? action.label : action.label( items );
 	return (
 		<Dialog.Root
 			open={ open }
 			onOpenChange={ setOpen }
 			disablePointerDismissal={ action.hideModalHeader }
 		>
-			<Menu.Item
-				disabled={ action.disabled }
+			<MenuItemTrigger
+				action={ action }
+				items={ items }
 				render={ <Dialog.Trigger /> }
-			>
-				<Menu.ItemLabel>{ label }</Menu.ItemLabel>
-			</Menu.Item>
+			/>
 			<ActionModal
 				action={ action }
 				items={ items }
@@ -239,8 +276,6 @@ function ModalActionInlineButton< Item >( {
 } ) {
 	const [ open, setOpen ] = useState( false );
 	const closeModal = useCallback( () => setOpen( false ), [] );
-	const label =
-		typeof action.label === 'string' ? action.label : action.label( items );
 	return (
 		<Dialog.Root
 			open={ open }
@@ -249,16 +284,13 @@ function ModalActionInlineButton< Item >( {
 		>
 			<Dialog.Trigger
 				render={
-					<Button
-						disabled={ !! action.disabled }
-						accessibleWhenDisabled
-						size="compact"
+					<ButtonTrigger
+						action={ action }
+						items={ items }
 						variant={ variant }
 					/>
 				}
-			>
-				{ label }
-			</Dialog.Trigger>
+			/>
 			<ActionModal
 				action={ action }
 				items={ items }
