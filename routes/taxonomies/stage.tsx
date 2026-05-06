@@ -2,14 +2,14 @@
  * WordPress dependencies
  */
 import { Page } from '@wordpress/admin-ui';
-import { Button, Link } from '@wordpress/components';
+import { Button } from '@wordpress/components';
 import { DataViews, type View } from '@wordpress/dataviews';
 import { useEntityRecords } from '@wordpress/core-data';
 import { useMemo, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { tag, search } from '@wordpress/icons';
 import { useNavigate } from '@wordpress/route';
-import { EmptyState } from '@wordpress/ui';
+import { EmptyState, Link } from '@wordpress/ui';
 import {
 	hierarchicalField,
 	publicField,
@@ -44,21 +44,27 @@ const DEFAULT_VIEW: View = {
 	layout: {},
 };
 
-function TaxonomiesEmptyState( { hasSearch }: { hasSearch: boolean } ) {
+function TaxonomiesEmptyState( {
+	hasSearchOrFilters,
+}: {
+	hasSearchOrFilters: boolean;
+} ) {
 	return (
 		<EmptyState.Root>
-			<EmptyState.Icon icon={ hasSearch ? search : tag } />
+			<EmptyState.Icon icon={ hasSearchOrFilters ? search : tag } />
 			<EmptyState.Title>
-				{ hasSearch
-					? __( 'No taxonomies match your search' )
+				{ hasSearchOrFilters
+					? __( 'No results found' )
 					: __( 'No taxonomies yet' ) }
 			</EmptyState.Title>
 			<EmptyState.Description>
-				{ hasSearch
-					? __( 'Try a different search term.' )
+				{ hasSearchOrFilters
+					? __(
+							"Try adjusting your search or filter to find what you're looking for."
+					  )
 					: __( 'Create your first taxonomy to get started.' ) }
 			</EmptyState.Description>
-			{ ! hasSearch && (
+			{ ! hasSearchOrFilters && (
 				<EmptyState.Actions>
 					<Link
 						href="https://wordpress.org/documentation/article/taxonomies/"
@@ -136,6 +142,8 @@ function TaxonomiesPage() {
 		[ totalItems, totalPages ]
 	);
 	const hasSearch = !! view.search?.trim();
+	const hasFilters = !! view.filters?.length;
+	const hasSearchOrFilters = hasSearch || hasFilters;
 
 	return (
 		<Page
@@ -167,7 +175,11 @@ function TaxonomiesPage() {
 				onClickItem={ ( item ) =>
 					navigate( { to: `/edit/${ item.id }` } )
 				}
-				empty={ <TaxonomiesEmptyState hasSearch={ hasSearch } /> }
+				empty={
+					<TaxonomiesEmptyState
+						hasSearchOrFilters={ hasSearchOrFilters }
+					/>
+				}
 			/>
 		</Page>
 	);

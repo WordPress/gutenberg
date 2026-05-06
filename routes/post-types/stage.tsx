@@ -2,14 +2,14 @@
  * WordPress dependencies
  */
 import { Page } from '@wordpress/admin-ui';
-import { Button, Link } from '@wordpress/components';
+import { Button } from '@wordpress/components';
 import { DataViews, type View } from '@wordpress/dataviews';
 import { useEntityRecords } from '@wordpress/core-data';
 import { useMemo, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { customPostType, search } from '@wordpress/icons';
 import { useNavigate } from '@wordpress/route';
-import { EmptyState } from '@wordpress/ui';
+import { EmptyState, Link } from '@wordpress/ui';
 import {
 	hasArchiveField,
 	hierarchicalField,
@@ -46,21 +46,29 @@ const DEFAULT_VIEW: View = {
 	layout: {},
 };
 
-function PostTypesEmptyState( { hasSearch }: { hasSearch: boolean } ) {
+function PostTypesEmptyState( {
+	hasSearchOrFilters,
+}: {
+	hasSearchOrFilters: boolean;
+} ) {
 	return (
 		<EmptyState.Root>
-			<EmptyState.Icon icon={ hasSearch ? search : customPostType } />
+			<EmptyState.Icon
+				icon={ hasSearchOrFilters ? search : customPostType }
+			/>
 			<EmptyState.Title>
-				{ hasSearch
-					? __( 'No post types match your search' )
+				{ hasSearchOrFilters
+					? __( 'No results found' )
 					: __( 'No post types yet' ) }
 			</EmptyState.Title>
 			<EmptyState.Description>
-				{ hasSearch
-					? __( 'Try a different search term.' )
+				{ hasSearchOrFilters
+					? __(
+							"Try adjusting your search or filter to find what you're looking for."
+					  )
 					: __( 'Create your first post type to get started.' ) }
 			</EmptyState.Description>
-			{ ! hasSearch && (
+			{ ! hasSearchOrFilters && (
 				<EmptyState.Actions>
 					<Link
 						href="https://wordpress.org/documentation/article/what-is-post-type/"
@@ -136,6 +144,8 @@ function PostTypesPage() {
 		[ totalItems, totalPages ]
 	);
 	const hasSearch = !! view.search?.trim();
+	const hasFilters = !! view.filters?.length;
+	const hasSearchOrFilters = hasSearch || hasFilters;
 
 	return (
 		<Page
@@ -167,7 +177,11 @@ function PostTypesPage() {
 				onClickItem={ ( item ) =>
 					navigate( { to: `/edit/${ item.id }` } )
 				}
-				empty={ <PostTypesEmptyState hasSearch={ hasSearch } /> }
+				empty={
+					<PostTypesEmptyState
+						hasSearchOrFilters={ hasSearchOrFilters }
+					/>
+				}
 			/>
 		</Page>
 	);
