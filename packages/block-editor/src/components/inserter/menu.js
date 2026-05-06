@@ -10,6 +10,7 @@ import {
 	forwardRef,
 	useState,
 	useCallback,
+	useEffect,
 	useMemo,
 	useRef,
 	useLayoutEffect,
@@ -169,16 +170,27 @@ function InserterMenu(
 	const showMediaPanel = selectedTab === 'media' && !! selectedMediaCategory;
 
 	const [ isScrolled, setIsScrolled ] = useState( false );
+	const blocksPanelRef = useRef( null );
+	const patternsPanelRef = useRef( null );
+	const mediaPanelRef = useRef( null );
+	useEffect( () => {
+		const handleScroll = ( event ) => {
+			setIsScrolled( event.currentTarget.scrollTop > 0 );
+		};
+		const panels = [
+			blocksPanelRef.current,
+			patternsPanelRef.current,
+			mediaPanelRef.current,
+		].filter( Boolean );
+		panels.forEach( ( panel ) =>
+			panel.addEventListener( 'scroll', handleScroll )
+		);
 
-	const handleScroll = useCallback( ( event ) => {
-		if (
-			! event.target.classList.contains(
-				'block-editor-tabbed-sidebar__tabpanel'
-			)
-		) {
-			return;
-		}
-		setIsScrolled( event.target.scrollTop > 0 );
+		return () => {
+			panels.forEach( ( panel ) =>
+				panel.removeEventListener( 'scroll', handleScroll )
+			);
+		};
 	}, [] );
 
 	const inserterSearch = useMemo( () => {
@@ -348,10 +360,7 @@ function InserterMenu(
 			} ) }
 			ref={ ref }
 		>
-			<div
-				className="block-editor-inserter__main-area"
-				onScrollCapture={ handleScroll }
-			>
+			<div className="block-editor-inserter__main-area">
 				<TabbedSidebar
 					ref={ tabsRef }
 					onSelect={ handleSetSelectedTab }
@@ -362,6 +371,7 @@ function InserterMenu(
 						{
 							name: 'blocks',
 							title: __( 'Blocks' ),
+							panelRef: blocksPanelRef,
 							panel: (
 								<>
 									{ inserterSearch }
@@ -374,6 +384,7 @@ function InserterMenu(
 						{
 							name: 'patterns',
 							title: __( 'Patterns' ),
+							panelRef: patternsPanelRef,
 							panel: (
 								<>
 									{ inserterSearch }
@@ -386,6 +397,7 @@ function InserterMenu(
 						{
 							name: 'media',
 							title: __( 'Media' ),
+							panelRef: mediaPanelRef,
 							panel: (
 								<>
 									{ inserterSearch }
