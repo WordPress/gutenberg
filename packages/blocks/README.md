@@ -372,6 +372,8 @@ _Returns_
 
 Determines whether or not the given block is a template part. This is a special block type that allows composing a page template out of reusable design elements.
 
+Also returns true for `core/template-content`, the root-template wrapper block, so it inherits the same "synced" visual treatment in the editor (List View row colour, icon colour, outline) as a template part.
+
 _Parameters_
 
 -   _blockOrType_ `Block | BlockType | null | undefined`: Block or Block Type to test.

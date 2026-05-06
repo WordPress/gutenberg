@@ -1,0 +1,17 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "core/template-content",
+	"title": "Template Content",
+	"category": "theme",
+	"description": "Renders the template selected by the WordPress template hierarchy. Use inside a root.html template to control the shared scaffolding around every page.",
+	"textdomain": "default",
+	"supports": {
+		"html": false,
+		"multiple": false,
+		"reusable": false,
+		"renaming": false,
+		"inserter": true
+	},
+	"editorStyle": "wp-block-template-content-editor"
+}

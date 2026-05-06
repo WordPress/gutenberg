@@ -1,0 +1,31 @@
+// Mirrors `core/template-part`'s outline treatment: highlight the block in
+// the canvas with the synced-pattern purple so authors can see the boundary
+// of the area whose contents come from another template.
+.block-editor-block-list__block:not(.remove-outline).wp-block-template-content {
+
+	&.is-highlighted::after,
+	&.is-selected::after {
+		outline-color: var(--wp-block-synced-color);
+	}
+
+	&.block-editor-block-list__block:not([contenteditable]):focus {
+		&::after {
+			outline-color: var(--wp-block-synced-color);
+		}
+	}
+}
+
+.is-outline-mode .block-editor-block-list__block:not(.remove-outline).wp-block-template-content {
+
+	&.is-hovered::after,
+	&.is-selected::after,
+	&.is-highlighted::after {
+		outline-color: var(--wp-block-synced-color);
+	}
+
+	&.block-editor-block-list__block:not([contenteditable]):focus {
+		&::after {
+			outline-color: var(--wp-block-synced-color);
+		}
+	}
+}

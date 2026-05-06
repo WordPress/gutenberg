@@ -143,6 +143,7 @@ import * as tableOfContents from './table-of-contents';
 import * as tabList from './tab-list';
 import * as tabs from './tabs';
 import * as tagCloud from './tag-cloud';
+import * as templateContent from './template-content';
 import * as templatePart from './template-part';
 import * as termCount from './term-count';
 import * as termDescription from './term-description';
@@ -228,6 +229,7 @@ const getAllBlocks = () => {
 		siteTitle,
 		siteTagline,
 		query,
+		templateContent,
 		templatePart,
 		avatar,
 		postTitle,

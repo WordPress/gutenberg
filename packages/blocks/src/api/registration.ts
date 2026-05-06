@@ -508,6 +508,10 @@ export function isReusableBlock(
  * special block type that allows composing a page template out of reusable
  * design elements.
  *
+ * Also returns true for `core/template-content`, the root-template wrapper
+ * block, so it inherits the same "synced" visual treatment in the editor
+ * (List View row colour, icon colour, outline) as a template part.
+ *
  * @param blockOrType Block or Block Type to test.
  *
  * @return Whether the given block is a template part.
@@ -515,7 +519,10 @@ export function isReusableBlock(
 export function isTemplatePart(
 	blockOrType: Block | BlockType | null | undefined
 ): boolean {
-	return blockOrType?.name === 'core/template-part';
+	return (
+		blockOrType?.name === 'core/template-part' ||
+		blockOrType?.name === 'core/template-content'
+	);
 }
 
 /**

@@ -1070,6 +1070,14 @@ A cloud of popular keywords, each sized by how often it appears. ([Source](https
 -	**Supports:** align, anchor, interactivity (clientNavigation), spacing (margin, padding), typography (lineHeight), ~~html~~
 -	**Attributes:** largestFontSize, numberOfTags, showTagCounts, smallestFontSize, taxonomy
 
+## Template Content
+
+Renders the template selected by the WordPress template hierarchy. Use inside a root.html template to control the shared scaffolding around every page. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/template-content))
+
+-	**Name:** core/template-content
+-	**Category:** theme
+-	**Supports:** inserter, ~~html~~, ~~multiple~~, ~~renaming~~, ~~reusable~~
+
 ## Template Part
 
 Edit the different global regions of your site, like the header, footer, sidebar, or create your own. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/template-part))

@@ -6,6 +6,7 @@
 
 - Update `registerBlockType` to accept the attributes type as a generic.
 - Update `registerBlockVariation`, `unregisterBlockVariation` type signature to match the dispatch call.
+- `isTemplatePart()` now also returns `true` for `core/template-content`, so the editor surfaces both blocks with the same "synced" visual treatment (List View row colour, icon colour, outline).
 
 ## 15.17.0 (2026-04-15)
 

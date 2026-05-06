@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   New `core/template-content` block — renders, on the frontend, whichever template the WordPress hierarchy selects. Intended for use inside an opt-in `root.html` template that wraps every page. The block has two editor modes: when the user is wrapping a non-root template (e.g. `archive`) inside `root.html`, the inner template's blocks render here and edits round-trip to that entity; when the user edits `root.html` directly, the slot shows a non-interactive preview of the home-hierarchy fallback (front-page → home → index) with a dropdown to pick a different template to preview, plus an "Edit template" toolbar button to open it in the regular editor.
+
 ## 9.45.0 (2026-04-29)
 
 ## 9.44.0 (2026-04-15)
