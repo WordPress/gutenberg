@@ -6,7 +6,7 @@ import type { ReactNode } from 'react';
 /**
  * WordPress dependencies
  */
-import { Icon } from '@wordpress/components';
+import { Icon, Spinner } from '@wordpress/components';
 import {
 	Component,
 	Suspense,
@@ -17,7 +17,7 @@ import {
 import { __ } from '@wordpress/i18n';
 // Dashboard is still experimental.
 // eslint-disable-next-line @wordpress/use-recommended-components
-import { Card, Stack, Notice, Text } from '@wordpress/ui';
+import { Card, Stack, Notice } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -63,7 +63,7 @@ class WidgetErrorBoundary extends Component<
 function LoadingOverlay() {
 	return (
 		<Stack justify="center" align="center" className={ styles.loading }>
-			<Text variant="body-md">{ __( 'Loading…' ) }</Text>
+			<Spinner />
 		</Stack>
 	);
 }
@@ -81,7 +81,10 @@ function Header( { titleId, widgetType }: HeaderProps ) {
 		<Card.Header>
 			<Stack direction="row" align="center" gap="sm">
 				{ widgetType.icon && (
-					<span className={ styles.headerIcon } aria-hidden="true">
+					<span
+						className={ styles.widgetHeaderIcon }
+						aria-hidden="true"
+					>
 						<Icon icon={ widgetType.icon } />
 					</span>
 				) }
@@ -133,7 +136,7 @@ export const Widget = forwardRef< HTMLDivElement, WidgetProps >(
 					{ ...( editMode ? { inert: '' } : {} ) }
 				>
 					<Header titleId={ titleId } widgetType={ widgetType } />
-					<Card.Content>
+					<Card.Content className={ styles.widgetContent }>
 						<WidgetErrorBoundary>
 							<Suspense fallback={ <LoadingOverlay /> }>
 								<WidgetRender

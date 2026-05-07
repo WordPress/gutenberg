@@ -2,13 +2,15 @@
 	height: 100%;
 }
 
-.headerIcon {
+.widgetHeaderIcon {
 	display: inline-flex;
 	color: var(--wpds-color-fg-content-neutral-weak);
 }
 
-.loading {
+.widgetContent {
 	flex: 1;
-	padding: var(--wpds-dimension-padding-md);
-	color: var(--wpds-color-fg-content-neutral-weak);
+}
+
+.loading {
+	height: 100%;
 }
