@@ -16,6 +16,7 @@ import { Stack } from '@wordpress/ui';
 import type { DataFormControlProps, FormatDatetime } from '../../types';
 import { OPERATOR_IN_THE_PAST, OPERATOR_OVER } from '../../constants';
 import RelativeDateControl from './utils/relative-date-control';
+import useDisabledDateMatchers from './utils/use-disabled-date-matchers';
 import getCustomValidity from './utils/get-custom-validity';
 import parseDateTime from '../../field-types/utils/parse-date-time';
 import { unlock } from '../../lock-unlock';
@@ -54,6 +55,9 @@ function CalendarDateTimeControl< Item >( {
 	const validationTimeoutRef =
 		useRef< ReturnType< typeof setTimeout > >( undefined );
 	const previousFocusRef = useRef< Element | null >( null );
+
+	const { minConstraint, maxConstraint, disabledMatchers } =
+		useDisabledDateMatchers( isValid, parseDateTime );
 
 	const onChangeCallback = useCallback(
 		( newValue: string | undefined ) =>
@@ -181,6 +185,16 @@ function CalendarDateTimeControl< Item >( {
 					value={ formatDateTime( value ) }
 					onChange={ handleManualDateTimeChange }
 					disabled={ disabled }
+					min={
+						minConstraint
+							? formatDateTime( minConstraint )
+							: undefined
+					}
+					max={
+						maxConstraint
+							? formatDateTime( maxConstraint )
+							: undefined
+					}
 				/>
 				{ /* Calendar widget */ }
 				{ ! compact && (
@@ -196,7 +210,7 @@ function CalendarDateTimeControl< Item >( {
 						onMonthChange={ setCalendarMonth }
 						timeZone={ timezoneString || undefined }
 						weekStartsOn={ weekStartsOn }
-						disabled={ disabled }
+						disabled={ disabled || disabledMatchers }
 					/>
 				) }
 			</Stack>

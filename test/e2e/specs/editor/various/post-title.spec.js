@@ -52,6 +52,7 @@ test.describe( 'Post title', () => {
 			await expect( pageTitleField ).toBeFocused();
 		} );
 	} );
+
 	test.describe( 'HTML handling', () => {
 		test( `should (visually) render any HTML in Post Editor's post title field when in Visual editing mode`, async ( {
 			page,

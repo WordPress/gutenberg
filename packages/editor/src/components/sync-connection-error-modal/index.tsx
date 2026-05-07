@@ -45,6 +45,8 @@ const INITIAL_DISCONNECTED_DEBOUNCE_MS = 20000;
 export function SyncConnectionErrorModal() {
 	const [ hasInitialized, setHasInitialized ] = useState( false );
 	const [ showModal, setShowModal ] = useState( false );
+	const [ isManualRetryAvailable, setIsManualRetryAvailable ] =
+		useState( false );
 
 	const { connectionStatus, isCollaborationEnabled, postType } = useSelect(
 		( selectFn ) => {
@@ -81,6 +83,22 @@ export function SyncConnectionErrorModal() {
 
 		return () => clearTimeout( timeout );
 	}, [] );
+
+	// Track retry availability separately from the raw connection status.
+	// The polling manager briefly emits `{ status: 'connecting' }` without
+	// `canManuallyRetry` when a retry is kicked off, which would otherwise
+	//  unmount the Retry button briefly.
+	useEffect( () => {
+		if ( 'connecting' === connectionStatus?.status ) {
+			return;
+		}
+
+		setIsManualRetryAvailable(
+			connectionStatus !== null &&
+				'canManuallyRetry' in connectionStatus &&
+				connectionStatus.canManuallyRetry === true
+		);
+	}, [ connectionStatus ] );
 
 	// Show the modal when disconnected and either retries are exhausted or
 	// no retry is available (unrecoverable error). Hide on reconnect.
@@ -145,15 +163,12 @@ export function SyncConnectionErrorModal() {
 		return null;
 	}
 
-	const manualRetry =
-		connectionStatus &&
-		'canManuallyRetry' in connectionStatus &&
-		connectionStatus.canManuallyRetry
-			? () => {
-					onManualRetry();
-					retrySyncConnection();
-			  }
-			: undefined;
+	const manualRetry = isManualRetryAvailable
+		? () => {
+				onManualRetry();
+				retrySyncConnection();
+		  }
+		: undefined;
 
 	const messages = getSyncErrorMessages( error );
 

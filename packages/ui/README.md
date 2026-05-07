@@ -28,13 +28,13 @@ npm install @wordpress/ui
 
 As an implementation of the design system and companion to the `@wordpress/theme` package, these components depend on CSS custom properties defined by the theme package. What you need to set up depends on whether you're building for a WordPress context, and how much of the theming features you want to use.
 
-### Within WordPress
+### Within standard WordPress editor screens
 
-Stylesheets are managed on your behalf in a WordPress context, so you don't need to worry about loading them yourself.
+In standard WordPress editor screens (such as the post editor or the site editor), stylesheets, isolation styles, and layout styles are managed centrally by Gutenberg. You don't need to add any setup yourself — and you should avoid doing so in this shared context to prevent conflicts.
 
-### Outside WordPress
+### Elsewhere
 
-While the components ship with basic fallbacks for every CSS custom property, it's recommended that you install and load the design tokens stylesheet to support the full range of theming capabilities:
+The components ship with built-in fallback values for all CSS custom properties, so they work out of the box without any theme setup. For full theming capabilities, it's recommended that you install and load the design tokens stylesheet:
 
 ```
 npm install @wordpress/theme
@@ -50,7 +50,15 @@ Also, to ensure that portaled popovers appear correctly, add these isolation sty
 
 ```css
 .root {
-  isolation: isolate;
+	isolation: isolate;
+}
+```
+
+Finally, in order to support overlay elements such as backdrops to correctly cover the whole browser viewport even when scrolled, add the following style to your global styles:
+
+```css
+body {
+	position: relative;
 }
 ```
 
@@ -124,10 +132,10 @@ Interactive components that manage internal state (such as open/closed, selected
 
 For a given state `x`, the convention is:
 
-| Prop | Purpose |
-| --- | --- |
-| `defaultX` | Sets the initial value in **uncontrolled** mode. The component manages subsequent state changes internally. |
-| `x` | Sets the current value in **controlled** mode. The consumer is responsible for updating the value in response to changes. |
+| Prop        | Purpose                                                                                                                                 |
+| ----------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| `defaultX`  | Sets the initial value in **uncontrolled** mode. The component manages subsequent state changes internally.                             |
+| `x`         | Sets the current value in **controlled** mode. The consumer is responsible for updating the value in response to changes.               |
 | `onXChange` | Callback invoked when the state changes. Receives the new value as its first argument. Works in both controlled and uncontrolled modes. |
 
 For example, a component with an open/closed state would expose:

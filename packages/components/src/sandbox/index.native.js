@@ -172,7 +172,7 @@ const style = `
 
 const EMPTY_ARRAY = [];
 
-const Sandbox = forwardRef( function Sandbox(
+const Sandbox = forwardRef( function UnforwardedSandbox(
 	{
 		containerStyle,
 		customJS,

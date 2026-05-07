@@ -715,7 +715,7 @@ const FieldTypeStory = ( {
 						},
 					] }
 					defaultLayouts={ {
-						table: {},
+						table: true,
 					} }
 					selection={ selectedIds.map( ( id ) => id.toString() ) }
 					onChangeSelection={ ( newSelection ) =>

@@ -112,7 +112,6 @@ function VisualEditor( {
 		postType,
 		isPreview,
 		styles,
-		canvasMinHeight,
 	} = useSelect( ( select ) => {
 		const {
 			getCurrentPostId,
@@ -121,7 +120,6 @@ function VisualEditor( {
 			getEditorSettings,
 			getRenderingMode,
 			getDeviceType,
-			getCanvasMinHeight,
 		} = unlock( select( editorStore ) );
 		const { getPostType, getEditedEntityRecord } = select( coreStore );
 		const postTypeSlug = getCurrentPostType();
@@ -163,7 +161,6 @@ function VisualEditor( {
 			postType: postTypeSlug,
 			isPreview: editorSettings.isPreviewMode,
 			styles: editorSettings.styles,
-			canvasMinHeight: getCanvasMinHeight(),
 		};
 	}, [] );
 	const { isCleanNewPost } = useSelect( editorStore );
@@ -336,20 +333,6 @@ function VisualEditor( {
 
 	const isNavigationPreview = postType === NAVIGATION_POST_TYPE && isPreview;
 
-	// Calculate the minimum height including scroll offset to fit all notes.
-	const calculatedMinHeight = useMemo( () => {
-		if ( ! localRef.current ) {
-			return canvasMinHeight;
-		}
-
-		const { ownerDocument } = localRef.current;
-		const scrollTop =
-			ownerDocument.documentElement.scrollTop ||
-			ownerDocument.body.scrollTop;
-
-		return canvasMinHeight + scrollTop;
-	}, [ canvasMinHeight ] );
-
 	const [ paddingAppenderRef, paddingStyle ] = usePaddingAppender(
 		! isPreview && renderingMode === 'post-only' && ! isDesignPostType
 	);
@@ -363,11 +346,7 @@ function VisualEditor( {
 				// Ensures margins of children are contained so that the body background paints behind them.
 				// Otherwise, the background of html (when zoomed out) would show there and appear broken. It's
 				// important mostly for post-only views yet conceivably an issue in templated views too.
-				css: `:where(.block-editor-iframe__body){display:flow-root;${
-					calculatedMinHeight
-						? `min-height:${ calculatedMinHeight }px;`
-						: ''
-				}}.is-root-container{display:flow-root;${
+				css: `:where(.block-editor-iframe__body){display:flow-root;}.is-root-container{display:flow-root;${
 					// Some themes will have `min-height: 100vh` for the root container,
 					// which isn't a requirement in auto resize mode.
 					enableResizing || isNavigationPreview
@@ -389,13 +368,7 @@ function VisualEditor( {
 				// The CSS for isNavigationPreview centers the body content vertically and horizontally when the navigation is in preview mode.
 			},
 		];
-	}, [
-		styles,
-		enableResizing,
-		isNavigationPreview,
-		calculatedMinHeight,
-		paddingStyle,
-	] );
+	}, [ styles, enableResizing, isNavigationPreview, paddingStyle ] );
 
 	const typewriterRef = useTypewriter();
 	contentRef = useMergeRefs( [

@@ -9,7 +9,7 @@ import {
 	Navigator,
 	useNavigator,
 	__experimentalSpacer as Spacer,
-	__experimentalText as Text,
+	__experimentalText as WCText,
 	__experimentalVStack as VStack,
 	Flex,
 	Notice,
@@ -238,7 +238,6 @@ function InstalledFonts() {
 					<ProgressBar />
 				</div>
 			) }
-
 			{ ! isResolvingLibrary && (
 				<>
 					<Navigator
@@ -257,9 +256,9 @@ function InstalledFonts() {
 									</Notice>
 								) }
 								{ ! hasFonts && (
-									<Text as="p">
+									<WCText as="p">
 										{ __( 'No fonts installed.' ) }
-									</Text>
+									</WCText>
 								) }
 								{ baseThemeFonts.length > 0 && (
 									<VStack>
@@ -395,11 +394,11 @@ function InstalledFonts() {
 								</>
 							) }
 							<Spacer margin={ 4 } />
-							<Text>
+							<WCText>
 								{ __(
 									'Choose font variants. Keep in mind that too many variants could make your site slower.'
 								) }
-							</Text>
+							</WCText>
 							<Spacer margin={ 4 } />
 							<VStack spacing={ 0 }>
 								<CheckboxControl

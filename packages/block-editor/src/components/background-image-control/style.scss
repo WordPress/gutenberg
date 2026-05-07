@@ -78,7 +78,7 @@
 }
 
 .block-editor-global-styles-background-panel__dropdown-toggle {
-	cursor: pointer;
+	cursor: var(--wpds-cursor-control);
 	background: transparent;
 	border: none;
 	height: 100%;

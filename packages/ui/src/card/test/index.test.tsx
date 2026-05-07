@@ -91,5 +91,22 @@ describe( 'Card', () => {
 				screen.getByRole( 'heading', { level: 2, name: 'Heading' } )
 			).toBeVisible();
 		} );
+
+		it( 'forwards ref to custom Title render element', () => {
+			const titleRef = createRef< HTMLHeadingElement >();
+
+			render(
+				<Card.Root>
+					<Card.Header>
+						<Card.Title ref={ titleRef } render={ <h3 /> }>
+							Heading
+						</Card.Title>
+					</Card.Header>
+				</Card.Root>
+			);
+
+			expect( titleRef.current ).toBeInstanceOf( HTMLHeadingElement );
+			expect( titleRef.current?.tagName ).toBe( 'H3' );
+		} );
 	} );
 } );

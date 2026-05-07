@@ -4,7 +4,7 @@
 const path = require( 'path' );
 const fs = require( 'fs/promises' );
 const os = require( 'os' );
-const { v4: uuid } = require( 'uuid' );
+const { randomUUID } = require( 'crypto' );
 
 /** @typedef {import('@playwright/test').Page} Page */
 
@@ -240,10 +240,9 @@ test.describe( 'Cover', () => {
 			.click();
 
 		// Ensure there the default value for the minimum height of cover is undefined.
-		const defaultHeightValue = await coverBlockEditorSettings
-			.getByLabel( 'Minimum height' )
-			.inputValue();
-		expect( defaultHeightValue ).toBeFalsy();
+		await expect(
+			coverBlockEditorSettings.getByLabel( 'Minimum height' )
+		).toHaveValue( '' );
 
 		// There is no accessible locator for the draggable block resize edge,
 		// which is he bottom edge of the Cover block.
@@ -577,7 +576,7 @@ class CoverBlockUtils {
 		const tmpDirectory = await fs.mkdtemp(
 			path.join( os.tmpdir(), 'gutenberg-test-image-' )
 		);
-		const fileName = uuid();
+		const fileName = randomUUID();
 		const tmpFileName = path.join( tmpDirectory, fileName + '.png' );
 		await fs.copyFile( srcPath, tmpFileName );
 

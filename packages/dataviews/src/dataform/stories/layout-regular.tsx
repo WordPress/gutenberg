@@ -55,11 +55,16 @@ const fields: Field< SamplePost >[] = [
 	{
 		id: 'date',
 		label: 'Date',
+		type: 'date',
+	},
+	{
+		id: 'datetime',
+		label: 'DateTime',
 		type: 'datetime',
 	},
 	{
 		id: 'birthdate',
-		label: 'Date as options',
+		label: 'DateTime as options',
 		type: 'datetime',
 		elements: [
 			{ value: '', label: 'Select a date' },
@@ -126,11 +131,11 @@ const fields: Field< SamplePost >[] = [
 		id: 'can_comment',
 		label: 'Allow people to leave a comment',
 		type: 'boolean',
-		Edit: 'checkbox',
+		Edit: 'toggle',
 	},
 	{
 		id: 'filesize',
-		label: 'File Size',
+		label: 'File size',
 		type: 'integer',
 		readOnly: true,
 	},
@@ -177,7 +182,7 @@ const fields: Field< SamplePost >[] = [
 	},
 	{
 		id: 'longDescription',
-		label: 'Long Description',
+		label: 'Long description',
 		type: 'text',
 		Edit: {
 			control: 'textarea',
@@ -186,7 +191,7 @@ const fields: Field< SamplePost >[] = [
 	},
 	{
 		id: 'comment_status',
-		label: 'Comment Status',
+		label: 'Comment status',
 		type: 'text',
 		Edit: 'radio',
 		elements: [
@@ -196,7 +201,7 @@ const fields: Field< SamplePost >[] = [
 	},
 	{
 		id: 'ping_status',
-		label: 'Allow Pings/Trackbacks',
+		label: 'Allow pings/trackbacks',
 		type: 'boolean',
 	},
 	{
@@ -230,7 +235,7 @@ const fields: Field< SamplePost >[] = [
 	},
 	{
 		id: 'flight_status',
-		label: 'Flight Status',
+		label: 'Flight status',
 		type: 'text',
 		Edit: 'radio',
 		elements: [
@@ -324,7 +329,8 @@ const LayoutRegularComponent = ( {
 		status: 'draft',
 		reviewer: 'fulano',
 		email: 'hello@wordpress.org',
-		date: '2021-01-01T12:00:00',
+		date: '2021-01-01',
+		datetime: '2021-01-01T12:00:00',
 		birthdate: '1950-02-23T12:00:00',
 		sticky: false,
 		can_comment: false,
@@ -356,14 +362,15 @@ const LayoutRegularComponent = ( {
 				'title',
 				'order',
 				'sticky',
+				'can_comment',
 				'author',
 				'status',
 				'reviewer',
 				'email',
 				'password',
 				'date',
+				'datetime',
 				'birthdate',
-				'can_comment',
 				'filesize',
 				'dimensions',
 				'tags',
