@@ -1,0 +1,35 @@
+.lanes {
+	display: grid-lanes;
+}
+
+/*
+ * Polyfill fallback. The hook computes per-item `grid-column-start`
+ * and `grid-row-start`/`grid-row-end: span N` against this row unit.
+ * `grid-auto-flow: dense` keeps the natural gap-fill behavior; the
+ * skyline already drives placement, so this is just a safety net.
+ */
+@supports not (display: grid-lanes) {
+	.lanes {
+		display: grid;
+		grid-auto-rows: var(--wpds-lane-row-unit, 4px);
+		grid-auto-flow: dense;
+	}
+}
+
+/*
+ * The drag preview clones the active tile inside `<DragOverlay>` and
+ * follows the cursor. The scale and shadow make it visually stand
+ * out from the placeholder left behind in its lane.
+ */
+.drag-preview {
+	height: 100%;
+	transform: scale(1.05);
+	box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15);
+	cursor: grabbing;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.drag-preview {
+		transform: none;
+	}
+}
