@@ -50,10 +50,12 @@ interface SummaryButtonProps< Item > {
 	onClick?: MouseEventHandler;
 	/*
 	 * The three `aria-*` props below are routed onto the inner pencil
-	 * `<Button>` (the only focusable element). Their defaults preserve the
-	 * shape that legacy callers like `PanelDropdown` rely on; when
+	 * `<Button>` (the only focusable element). Consumers must pass an
+	 * explicit `aria-haspopup` value matching what their popup actually
+	 * opens (e.g. `"dialog"`, `"menu"`, or `"true"`). When
 	 * `Dialog.Trigger` composes this component via render props it
-	 * overrides them with its own values for the open/closed state.
+	 * supplies `"dialog"` automatically along with `aria-expanded` /
+	 * `aria-controls` for the open/closed state.
 	 */
 	'aria-expanded'?: boolean;
 	'aria-controls'?: string;
@@ -89,7 +91,7 @@ function SummaryButtonImpl< Item >(
 		onClick,
 		'aria-expanded': ariaExpanded,
 		'aria-controls': ariaControls,
-		'aria-haspopup': ariaHasPopup = 'dialog',
+		'aria-haspopup': ariaHasPopup,
 	}: SummaryButtonProps< Item >,
 	ref: Ref< HTMLButtonElement >
 ) {
