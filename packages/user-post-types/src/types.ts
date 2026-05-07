@@ -54,6 +54,13 @@ export type SupportFeature =
 
 export interface StoredConfig {
 	labels?: StoredLabels;
+	/**
+	 * The merged set of taxonomy slugs attached to this post type. The REST
+	 * controller composes this on read from two storage sites — non-user
+	 * slugs persisted on the post type record's JSON, and user-defined
+	 * taxonomies whose `_wp_user_taxonomy_object_type` meta points back —
+	 * and splits writes back into those sites.
+	 */
 	taxonomies?: string[];
 	supports?: SupportFeature[];
 	description?: string;

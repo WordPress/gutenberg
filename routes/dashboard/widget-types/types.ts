@@ -117,7 +117,3 @@ export interface WidgetType extends WidgetTypeMetadata {
 	 */
 	renderModule: string;
 }
-
-export interface WidgetTypesState {
-	widgetTypes: Record< string, WidgetType >;
-}

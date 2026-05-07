@@ -36,7 +36,6 @@ import { RectangleStencil } from './stencils/rectangle-stencil';
 import { DimmingOverlay } from './overlays/dimming-overlay';
 import { GridOverlay } from './overlays/grid-overlay';
 import { ViewportProvider, useViewport } from './viewport-provider';
-import './cropper.scss';
 
 /** Threshold for comparing normalized crop rect values. */
 const CROP_RECT_EPSILON = 1e-6;
@@ -227,13 +226,16 @@ function CropperInner(
 		[ canvasSize, naturalWidth, naturalHeight, state.rotation ]
 	);
 
-	// In fixed-crop mode, auto-size the crop rect to fill the visual area
-	// while respecting the aspect ratio. The crop is always centered.
+	// In fixed-crop mode, auto-size the crop rect only when a fixed aspect
+	// ratio is selected. With "Free" selected, turning freeform handles off
+	// should preserve the user's current unconstrained crop.
 	useEffect( () => {
 		if (
 			freeformCrop ||
 			visualSize.width === 0 ||
-			visualSize.height === 0
+			visualSize.height === 0 ||
+			! aspectRatio ||
+			aspectRatio <= 0
 		) {
 			return;
 		}
