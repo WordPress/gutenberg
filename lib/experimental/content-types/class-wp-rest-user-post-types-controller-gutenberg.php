@@ -588,13 +588,14 @@ class WP_REST_User_Post_Types_Controller_Gutenberg extends WP_REST_Posts_Control
 	 *   - status crossing the `publish` boundary in either direction (a
 	 *     record going from active → inactive or back, which toggles
 	 *     `register_post_type()` on next `init`),
-	 *   - while remaining published, a change in slug, `has_archive`, or
-	 *     `public` — the three fields the issue calls out as rewrite-rules
-	 *     impacting.
+	 *   - while remaining published, a change in slug, `has_archive`,
+	 *     `public`, or `hierarchical`. `hierarchical` flips the rewrite
+	 *     tag regex between `(.+?)` (nested) and `([^/]+)` (flat) and
+	 *     swaps the query-var fallback between `pagename=` and `name=`.
 	 *
-	 * Other config edits (labels, supports, hierarchical, taxonomies,
-	 * description, show_in_rest) don't affect rewrite rules and are skipped
-	 * so we don't flush on every label tweak.
+	 * Other config edits (labels, supports, taxonomies, description,
+	 * show_in_rest) don't affect rewrite rules and are skipped so we
+	 * don't flush on every label tweak.
 	 *
 	 * @param string  $previous_status Status the record had before update.
 	 * @param string  $previous_slug   Slug before update.
@@ -625,6 +626,9 @@ class WP_REST_User_Post_Types_Controller_Gutenberg extends WP_REST_Posts_Control
 			return true;
 		}
 		if ( ! empty( $previous_config['public'] ) !== ! empty( $current_config['public'] ) ) {
+			return true;
+		}
+		if ( ! empty( $previous_config['hierarchical'] ) !== ! empty( $current_config['hierarchical'] ) ) {
 			return true;
 		}
 

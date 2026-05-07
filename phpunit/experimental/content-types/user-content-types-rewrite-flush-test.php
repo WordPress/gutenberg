@@ -349,6 +349,40 @@ class User_Content_Types_Rewrite_Flush_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Toggling hierarchical while published schedules a flush — for post
+	 * types `register_post_type()` flips the rewrite-tag regex between
+	 * `(.+?)` and `([^/]+)` and the query-var fallback between `pagename=`
+	 * and `name=`, so the cached rules need regenerating.
+	 */
+	public function test_post_type_update_hierarchical_schedules_flush() {
+		$data = $this->create_post_type(
+			'rwflush_pt_hier',
+			'Hier',
+			array(
+				'public'       => true,
+				'hierarchical' => false,
+			)
+		);
+		delete_option( GUTENBERG_USER_CONTENT_TYPES_FLUSH_OPTION );
+
+		$request = new WP_REST_Request( 'PUT', self::POST_TYPES_BASE . '/' . $data['id'] );
+		$request->set_body_params(
+			array(
+				'config' => array(
+					'public'       => true,
+					'hierarchical' => true,
+				),
+			)
+		);
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertSame( 200, $response->get_status() );
+
+		$this->assert_flush_scheduled( 'Toggling hierarchical on a published post type must schedule a flush.' );
+
+		wp_delete_post( $data['id'], true );
+	}
+
+	/**
 	 * Transitioning from publish → draft schedules a flush — the post type
 	 * stops being registered next request.
 	 */
