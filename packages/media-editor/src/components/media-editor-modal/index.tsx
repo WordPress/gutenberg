@@ -84,6 +84,7 @@ export function MediaEditorModal( {
 			fields={ fields }
 			aspectRatioPresets={ aspectRatioPresets }
 			showCloseButton
+			shouldCloseOnEsc
 			noticesClassName="media-editor-modal__snackbar"
 			noticesPortalElement={ portalElement }
 			onClose={ closeMediaEditorModal }

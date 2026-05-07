@@ -106,6 +106,7 @@ export interface MediaEditorProps {
 	noticesClassName?: string;
 	noticesPortalElement?: Element | null;
 	showCloseButton?: boolean;
+	shouldCloseOnEsc?: boolean;
 }
 
 function MediaEditorSidebar( { tabs }: { tabs: EditorTab[] } ) {
@@ -232,6 +233,7 @@ function MediaEditorContent( {
 	noticesClassName = 'media-editor__snackbar',
 	noticesPortalElement,
 	showCloseButton = false,
+	shouldCloseOnEsc = false,
 }: MediaEditorProps ) {
 	const cropper = useCropper();
 	const hasChanges = cropper.isDirty || hasEdits;
@@ -493,20 +495,21 @@ function MediaEditorContent( {
 				} else {
 					cropper.undo();
 				}
-				return;
 			}
 		}
 
-		if ( event.code !== 'Escape' && event.key !== 'Escape' ) {
-			return;
-		}
-		if ( isSaving ) {
-			event.preventDefault();
-			return;
-		}
-		if ( hasChanges ) {
-			event.preventDefault();
-			setIsDiscardDialogOpen( true );
+		if ( shouldCloseOnEsc ) {
+			if ( event.code !== 'Escape' && event.key !== 'Escape' ) {
+				return;
+			}
+			if ( isSaving ) {
+				event.preventDefault();
+				return;
+			}
+			if ( hasChanges ) {
+				event.preventDefault();
+				setIsDiscardDialogOpen( true );
+			}
 		}
 	};
 
