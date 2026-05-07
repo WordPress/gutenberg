@@ -13,7 +13,7 @@ import { Dialog } from '@wordpress/ui';
 /**
  * Internal dependencies
  */
-import { ActionModal } from '../index';
+import ItemActions, { ActionModal } from '../index';
 import type { ActionModal as ActionModalType } from '../../../types';
 
 type TestItem = { id: number; title: string };
@@ -263,5 +263,85 @@ describe( 'ActionModal', () => {
 		await user.click( screen.getByRole( 'button', { name: /done/i } ) );
 
 		expect( onOpenChange ).toHaveBeenCalledWith( false );
+	} );
+} );
+
+describe( 'ItemActions — kebab menu → modal action', () => {
+	// Regression coverage for the composition between `Menu.Popover`
+	// (`unmountOnHide` + `Menu.Item.hideOnClick`) and the per-action
+	// `Dialog.Root` that owns each modal action's open state. The bug:
+	// hosting `Dialog.Root` inside the compact menu's popover means the
+	// dialog mounts and immediately unmounts when the menu hides on
+	// `Menu.Item` click, so consumers can't reach the modal body. These
+	// tests assert that selecting a modal action from the kebab menu
+	// opens its dialog and that the dialog body remains interactive long
+	// enough to dispatch its own actions.
+	const item = { id: 1, title: 'Item' };
+
+	function createMenuModalAction(
+		overrides: Partial< ActionModalType< TestItem > > = {}
+	): ActionModalType< TestItem > {
+		return {
+			id: 'menu-modal-action',
+			label: 'Menu modal action',
+			RenderModal: ( { closeModal } ) => (
+				<div>
+					<p data-testid="menu-modal-content">Menu modal content</p>
+					<button onClick={ closeModal }>Done</button>
+				</div>
+			),
+			...overrides,
+		};
+	}
+
+	it( 'opens the dialog when a modal action is selected from the kebab menu', async () => {
+		const user = userEvent.setup();
+		const action = createMenuModalAction();
+
+		render(
+			<ItemActions item={ item } actions={ [ action ] } isCompact />
+		);
+
+		await user.click( screen.getByRole( 'button', { name: /actions/i } ) );
+		await user.click(
+			screen.getByRole( 'menuitem', { name: /menu modal action/i } )
+		);
+
+		// The dialog body must be mounted and reachable after the menu
+		// closes; on the buggy host it unmounts together with the menu
+		// popover and the assertion times out.
+		await waitFor( () => {
+			expect(
+				screen.getByTestId( 'menu-modal-content' )
+			).toBeInTheDocument();
+		} );
+		expect(
+			screen.getByRole( 'button', { name: /done/i } )
+		).toBeInTheDocument();
+	} );
+
+	it( 'keeps the dialog interactive — closeModal from the body still dismisses it', async () => {
+		const user = userEvent.setup();
+		const action = createMenuModalAction();
+
+		render(
+			<ItemActions item={ item } actions={ [ action ] } isCompact />
+		);
+
+		await user.click( screen.getByRole( 'button', { name: /actions/i } ) );
+		await user.click(
+			screen.getByRole( 'menuitem', { name: /menu modal action/i } )
+		);
+
+		const doneButton = await screen.findByRole( 'button', {
+			name: /done/i,
+		} );
+		await user.click( doneButton );
+
+		await waitFor( () => {
+			expect(
+				screen.queryByTestId( 'menu-modal-content' )
+			).not.toBeInTheDocument();
+		} );
 	} );
 } );

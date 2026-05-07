@@ -7,12 +7,7 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { useInstanceId, usePrevious } from '@wordpress/compose';
-import {
-	Button,
-	privateApis as componentsPrivateApis,
-	Spinner,
-	Composite,
-} from '@wordpress/components';
+import { Button, Spinner, Composite } from '@wordpress/components';
 import {
 	useCallback,
 	useEffect,
@@ -30,8 +25,7 @@ import { Dialog, Stack, VisuallyHidden } from '@wordpress/ui';
 /**
  * Internal dependencies
  */
-import { unlock } from '../../../lock-unlock';
-import { ActionsMenuGroup, ActionModal } from '../../dataviews-item-actions';
+import { ActionModal, ItemActionsMenu } from '../../dataviews-item-actions';
 import DataViewsContext from '../../dataviews-context';
 import { useDelayedLoading } from '../../../hooks/use-delayed-loading';
 import type {
@@ -56,8 +50,6 @@ interface ListViewItemProps< Item > {
 	onDropdownTriggerKeyDown: React.KeyboardEventHandler< HTMLButtonElement >;
 	posinset?: number;
 }
-
-const { Menu } = unlock( componentsPrivateApis );
 
 function generateItemWrapperCompositeId( idPrefix: string ) {
 	return `${ idPrefix }-item-wrapper`;
@@ -246,36 +238,28 @@ function ListItem< Item >( {
 			) }
 			{ ! hasOnlyOnePrimaryAction && (
 				<div role="gridcell">
-					<Menu placement="bottom-end">
-						<Menu.TriggerButton
-							render={
-								<Composite.Item
-									id={ generateDropdownTriggerCompositeId(
-										idPrefix
-									) }
-									render={
-										<Button
-											size="small"
-											icon={ moreVertical }
-											label={ __( 'Actions' ) }
-											accessibleWhenDisabled
-											disabled={ ! actions.length }
-											onKeyDown={
-												onDropdownTriggerKeyDown
-											}
-										/>
-									}
-								/>
-							}
-						/>
-						<Menu.Popover>
-							<ActionsMenuGroup
-								actions={ eligibleActions }
-								item={ item }
-								registry={ registry }
+					<ItemActionsMenu
+						item={ item }
+						actions={ eligibleActions }
+						registry={ registry }
+						triggerRender={
+							<Composite.Item
+								id={ generateDropdownTriggerCompositeId(
+									idPrefix
+								) }
+								render={
+									<Button
+										size="small"
+										icon={ moreVertical }
+										label={ __( 'Actions' ) }
+										accessibleWhenDisabled
+										disabled={ ! actions.length }
+										onKeyDown={ onDropdownTriggerKeyDown }
+									/>
+								}
 							/>
-						</Menu.Popover>
-					</Menu>
+						}
+					/>
 				</div>
 			) }
 		</Stack>

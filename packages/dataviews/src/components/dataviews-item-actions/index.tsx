@@ -11,13 +11,7 @@ import {
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import {
-	forwardRef,
-	useCallback,
-	useMemo,
-	useRef,
-	useState,
-} from '@wordpress/element';
+import { useCallback, useMemo, useRef, useState } from '@wordpress/element';
 import { moreVertical } from '@wordpress/icons';
 import { useRegistry } from '@wordpress/data';
 import { useViewportMatch } from '@wordpress/compose';
@@ -31,6 +25,7 @@ import { Dialog, Stack, VisuallyHidden } from '@wordpress/ui';
 import { unlock } from '../../lock-unlock';
 import type { Action, ActionModal as ActionModalType } from '../../types';
 import useMapFocusOnMount from '../../hooks/use-map-focus-on-mount';
+import genericForwardRef from '../../utils/generic-forward-ref';
 
 const { Menu, kebabCase } = unlock( componentsPrivateApis );
 
@@ -74,6 +69,14 @@ interface ActionsMenuGroupProps< Item > {
 	actions: Action< Item >[];
 	item: Item;
 	registry: ReturnType< typeof useRegistry >;
+	/**
+	 * Invoked when the user selects a modal action from the menu. The
+	 * caller is expected to render a sibling `<Dialog.Root>` outside this
+	 * menu that hosts the action's popup body — keeping the dialog out of
+	 * the `Menu.Popover`'s `unmountOnHide` subtree so it survives the
+	 * menu's exit transition.
+	 */
+	onModalAction: ( action: ActionModalType< Item > ) => void;
 }
 
 interface ItemActionsProps< Item > {
@@ -96,13 +99,11 @@ interface PrimaryActionsProps< Item > {
 	buttonVariant?: 'primary' | 'secondary' | 'tertiary' | 'link';
 }
 
-// `ButtonTrigger` and `MenuItemTrigger` forward both refs and unknown
-// props onto their underlying primitive (Button / Menu.Item), so the same
-// component can be used directly (parent supplies `onClick`) or composed
-// via render props (e.g. `<Dialog.Trigger render={ <ButtonTrigger … /> } />`,
-// `<MenuItemTrigger render={ <Dialog.Trigger /> } />`). This eliminates the
-// duplicated trigger markup that the modal-action wrappers used to inline.
-const ButtonTrigger = forwardRef( function ButtonTrigger< Item >(
+// `ButtonTrigger` forwards refs and unknown props onto its underlying
+// `Button`, so it can be used directly (parent supplies `onClick`) or
+// composed via render props
+// (e.g. `<Dialog.Trigger render={ <ButtonTrigger … /> } />`).
+const ButtonTrigger = genericForwardRef( function ButtonTrigger< Item >(
 	{ action, items, variant, ...rest }: ActionTriggerProps< Item >,
 	ref: React.Ref< HTMLButtonElement >
 ) {
@@ -120,44 +121,30 @@ const ButtonTrigger = forwardRef( function ButtonTrigger< Item >(
 			{ label }
 		</Button>
 	);
-} ) as < Item >(
-	props: ActionTriggerProps< Item > & {
-		ref?: React.Ref< HTMLButtonElement >;
-	}
-) => ReactElement;
+} );
 
-const MenuItemTrigger = forwardRef( function MenuItemTrigger< Item >(
-	{
-		action,
-		items,
-		render,
-		...rest
-	}: Pick< ActionTriggerProps< Item >, 'action' | 'items' | 'onClick' > & {
-		render?: ReactElement;
-	},
-	ref: React.Ref< HTMLDivElement >
-) {
+// `MenuItemTrigger` is always rendered as a child of `<Menu.Popover>`
+// and never composed under `<Dialog.Trigger>` — modal actions hoist
+// their `Dialog.Root` outside the menu (see `ItemActionsMenu` below) so
+// the `Menu.Item` only needs to fire its own `onClick`. No `forwardRef`,
+// no `render` prop forwarding, no generic cast.
+function MenuItemTrigger< Item >( {
+	action,
+	items,
+	onClick,
+}: {
+	action: Action< Item >;
+	items: Item[];
+	onClick: () => void;
+} ) {
 	const label =
 		typeof action.label === 'string' ? action.label : action.label( items );
 	return (
-		<Menu.Item
-			ref={ ref }
-			disabled={ action.disabled }
-			render={ render }
-			{ ...rest }
-		>
+		<Menu.Item disabled={ action.disabled } onClick={ onClick }>
 			<Menu.ItemLabel>{ label }</Menu.ItemLabel>
 		</Menu.Item>
 	);
-} ) as < Item >(
-	props: Pick<
-		ActionTriggerProps< Item >,
-		'action' | 'items' | 'onClick'
-	> & {
-		render?: ReactElement;
-		ref?: React.Ref< HTMLDivElement >;
-	}
-) => ReactElement;
+}
 
 function mapModalSize(
 	size: ActionModalType< unknown >[ 'modalSize' ]
@@ -226,45 +213,11 @@ export function ActionModal< Item >( {
 	);
 }
 
-// Wraps a single modal action as a menu item that opens the action's
-// dialog. Owns the dialog's open state locally so each modal action is
-// self-contained: the surrounding parent doesn't need a "which action is
-// active" piece of state.
-function ModalActionMenuItem< Item >( {
-	action,
-	items,
-}: {
-	action: ActionModalType< Item >;
-	items: Item[];
-} ) {
-	const [ open, setOpen ] = useState( false );
-	// Stable reference so consumer `RenderModal` implementations can pass
-	// `closeModal` to event handlers / effects without remounting on every
-	// keystroke.
-	const closeModal = useCallback( () => setOpen( false ), [] );
-	return (
-		<Dialog.Root
-			open={ open }
-			onOpenChange={ setOpen }
-			disablePointerDismissal={ action.hideModalHeader }
-		>
-			<MenuItemTrigger
-				action={ action }
-				items={ items }
-				render={ <Dialog.Trigger /> }
-			/>
-			<ActionModal
-				action={ action }
-				items={ items }
-				closeModal={ closeModal }
-			/>
-		</Dialog.Root>
-	);
-}
-
 // Wraps a single modal action as an inline button that opens the
-// action's dialog. Same self-contained-state contract as
-// `ModalActionMenuItem`.
+// action's dialog. The `Dialog.Root` lives at this call site (outside
+// any host that unmounts on click — `Menu.Popover` is the relevant one
+// in the menu path, see `ItemActionsMenu`) so its lifecycle is not
+// affected by surrounding popover transitions.
 function ModalActionInlineButton< Item >( {
 	action,
 	items,
@@ -304,6 +257,7 @@ export function ActionsMenuGroup< Item >( {
 	actions,
 	item,
 	registry,
+	onModalAction,
 }: ActionsMenuGroupProps< Item > ) {
 	const { primaryActions, regularActions } = useMemo( () => {
 		return actions.reduce(
@@ -322,28 +276,102 @@ export function ActionsMenuGroup< Item >( {
 	}, [ actions ] );
 
 	const renderActionGroup = ( actionList: Action< Item >[] ) =>
-		actionList.map( ( action ) =>
-			'RenderModal' in action ? (
-				<ModalActionMenuItem
-					key={ action.id }
-					action={ action }
-					items={ [ item ] }
-				/>
-			) : (
-				<MenuItemTrigger
-					key={ action.id }
-					action={ action }
-					onClick={ () => action.callback( [ item ], { registry } ) }
-					items={ [ item ] }
-				/>
-			)
-		);
+		actionList.map( ( action ) => (
+			<MenuItemTrigger
+				key={ action.id }
+				action={ action }
+				onClick={
+					'RenderModal' in action
+						? () => onModalAction( action )
+						: () => action.callback( [ item ], { registry } )
+				}
+				items={ [ item ] }
+			/>
+		) );
 
 	return (
 		<Menu.Group>
 			{ renderActionGroup( primaryActions ) }
 			{ renderActionGroup( regularActions ) }
 		</Menu.Group>
+	);
+}
+
+// Hosts a kebab-style menu of item actions plus the `Dialog.Root` that
+// owns the active modal action's popup body. The dialog is rendered as
+// a sibling of `<Menu>` (not as a descendant of `Menu.Popover`) so it
+// survives the menu's `unmountOnHide` exit transition. Both
+// `CompactItemActions` and the list-layout's per-row menu use this
+// component; they only differ in the trigger button passed in via
+// `triggerRender`.
+export function ItemActionsMenu< Item >( {
+	item,
+	actions,
+	registry,
+	triggerRender,
+}: {
+	item: Item;
+	actions: Action< Item >[];
+	registry: ReturnType< typeof useRegistry >;
+	triggerRender: ReactElement;
+} ) {
+	const [ activeModalAction, setActiveModalAction ] =
+		useState< ActionModalType< Item > | null >( null );
+	// Snapshot of the most recently active action — kept around so the
+	// popup body stays mounted through the exit animation and is then
+	// cleared from `onOpenChangeComplete` once the close transition
+	// finishes (mirrors the `sessionKey` / defensive-setter patterns in
+	// `PanelModal` and the page-templates duplicate dialog).
+	const [ lastActiveModalAction, setLastActiveModalAction ] =
+		useState< ActionModalType< Item > | null >( null );
+	const renderedAction = activeModalAction ?? lastActiveModalAction;
+	const closeModal = useCallback( () => setActiveModalAction( null ), [] );
+	const onModalAction = useCallback( ( action: ActionModalType< Item > ) => {
+		setActiveModalAction( action );
+		setLastActiveModalAction( action );
+	}, [] );
+
+	return (
+		<>
+			<Menu placement="bottom-end">
+				<Menu.TriggerButton render={ triggerRender } />
+				<Menu.Popover>
+					<ActionsMenuGroup
+						actions={ actions }
+						item={ item }
+						registry={ registry }
+						onModalAction={ onModalAction }
+					/>
+				</Menu.Popover>
+			</Menu>
+			<Dialog.Root
+				open={ activeModalAction !== null }
+				onOpenChange={ ( open ) => {
+					if ( ! open ) {
+						setActiveModalAction( null );
+					}
+				} }
+				onOpenChangeComplete={ ( open ) => {
+					if ( ! open ) {
+						setLastActiveModalAction( null );
+					}
+				} }
+				disablePointerDismissal={ renderedAction?.hideModalHeader }
+			>
+				{ renderedAction && (
+					// `key` per action.id force-remounts the popup body when
+					// the user closes one action and opens a different one,
+					// preventing the new action's `RenderModal` from
+					// inheriting the previous session's state.
+					<ActionModal
+						key={ renderedAction.id }
+						action={ renderedAction }
+						items={ [ item ] }
+						closeModal={ closeModal }
+					/>
+				) }
+			</Dialog.Root>
+		</>
 	);
 }
 
@@ -417,27 +445,21 @@ function CompactItemActions< Item >( {
 	registry,
 }: CompactItemActionsProps< Item > ) {
 	return (
-		<Menu placement="bottom-end">
-			<Menu.TriggerButton
-				render={
-					<Button
-						size={ isSmall ? 'small' : 'compact' }
-						icon={ moreVertical }
-						label={ __( 'Actions' ) }
-						accessibleWhenDisabled
-						disabled={ ! actions.length }
-						className="dataviews-all-actions-button"
-					/>
-				}
-			/>
-			<Menu.Popover>
-				<ActionsMenuGroup
-					actions={ actions }
-					item={ item }
-					registry={ registry }
+		<ItemActionsMenu
+			item={ item }
+			actions={ actions }
+			registry={ registry }
+			triggerRender={
+				<Button
+					size={ isSmall ? 'small' : 'compact' }
+					icon={ moreVertical }
+					label={ __( 'Actions' ) }
+					accessibleWhenDisabled
+					disabled={ ! actions.length }
+					className="dataviews-all-actions-button"
 				/>
-			</Menu.Popover>
-		</Menu>
+			}
+		/>
 	);
 }
 
