@@ -5,10 +5,10 @@
  * @package gutenberg
  */
 
-if ( ! class_exists( 'WP_Sync_Post_Meta_Storage' ) ) {
-	require_once __DIR__ . '/interface-wp-sync-storage.php';
-	require_once __DIR__ . '/class-wp-sync-post-meta-storage.php';
-	require_once __DIR__ . '/class-wp-http-polling-sync-server.php';
+if ( ! class_exists( 'WP_Collaboration_Table_Storage' ) ) {
+	require_once __DIR__ . '/interface-wp-collaboration-storage.php';
+	require_once __DIR__ . '/class-wp-collaboration-table-storage.php';
+	require_once __DIR__ . '/class-wp-http-polling-collaboration-server.php';
 }
 
 if ( ! function_exists( 'gutenberg_register_sync_storage_post_type' ) ) {
