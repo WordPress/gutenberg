@@ -2,7 +2,7 @@
 
 ## Introduction
 
-Client-side media processing is a capability shipping in WordPress 7.1 that handles image compression, resizing, format conversion, rotation, and thumbnail generation directly in the user's browser using WebAssembly, rather than on the server. Most of the underlying infrastructure landed during the 7.0 development cycle when the feature graduated from a Gutenberg experiment; the 7.1 cycle adds HEIC support, AVIF end-to-end uploads, performance improvements, and finishes hardening before the public release.
+Client-side media processing is a capability shipping in WordPress 7.1 that handles image compression, resizing, format conversion, rotation, and thumbnail generation directly in the user's browser using WebAssembly, rather than on the server.
 
 Key benefits include:
 
@@ -24,7 +24,7 @@ flowchart TD
     C --> D[Upload files via<br/>sideload endpoint]
     B -- No --> E[POST file to /wp/v2/media]
     E --> F[PHP GD/Imagick<br/>generates thumbnails]
-    D --> G[Finalize: re-runs<br/>wp_generate_attachment_metadata]
+    D --> G[Finalize: applies<br/>wp_generate_attachment_metadata]
     F --> G
     G --> H[Attachment ready in post]
 ```
@@ -33,31 +33,16 @@ flowchart TD
 
 The client-side media processing pipeline flows through several layers:
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│  Block Editor (Image block, Gallery block, etc.)                │
-│  Calls mediaUpload() from @wordpress/block-editor               │
-└──────────────────────────┬──────────────────────────────────────┘
-                           │
-                           ▼
-┌─────────────────────────────────────────────────────────────────┐
-│  @wordpress/media-utils                                         │
-│  uploadMedia() / sideloadMedia() — HTTP transport to REST API   │
-└──────────────────────────┬──────────────────────────────────────┘
-                           │
-                           ▼
-┌─────────────────────────────────────────────────────────────────┐
-│  @wordpress/upload-media  (core/upload-media store)             │
-│  Upload queue, concurrency management, operation orchestration  │
-└──────────────┬───────────────────────────┬──────────────────────┘
-               │                           │
-               ▼                           ▼
-┌──────────────────────────┐  ┌───────────────────────────────────┐
-│  @wordpress/vips         │  │  REST API                         │
-│  WASM image processing   │  │  POST /wp/v2/media                │
-│  (Web Worker)            │  │  POST /wp/v2/media/{id}/sideload  │
-└──────────────────────────┘  │  POST /wp/v2/media/{id}/finalize  │
-                              └───────────────────────────────────┘
+```mermaid
+flowchart TD
+    A["<b>Block Editor</b><br/>(Image block, Gallery block, etc.)<br/>Calls <code>mediaUpload()</code> from <code>@wordpress/block-editor</code>"]
+    B["<b>@wordpress/media-utils</b><br/><code>uploadMedia()</code> / <code>sideloadMedia()</code><br/>HTTP transport to REST API"]
+    C["<b>@wordpress/upload-media</b> (<code>core/upload-media</code> store)<br/>Upload queue, concurrency management,<br/>operation orchestration"]
+    D["<b>@wordpress/vips</b><br/>WASM image processing<br/>(Web Worker)"]
+    E["<b>REST API</b><br/>POST /wp/v2/media<br/>POST /wp/v2/media/{id}/sideload<br/>POST /wp/v2/media/{id}/finalize"]
+    A --> B --> C
+    C --> D
+    C --> E
 ```
 
 ## Three-package split
@@ -87,11 +72,12 @@ A JavaScript wrapper around [wasm-vips](https://github.com/kleisauke/wasm-vips) 
 -   Resizing and cropping with smart crop support.
 -   EXIF orientation-based rotation.
 -   Transparency detection (to avoid converting transparent PNGs to JPEG).
--   Compression with configurable quality (default: 82%).
+-   Compression with configurable quality (0–1, default `0.82`).
 
 **Key source files:**
 
 -   `packages/vips/src/index.ts` — Core processing functions.
+-   `packages/vips/src/worker.ts` — Web Worker entry point dynamically imported by the loader.
 -   `packages/vips/src/vips-worker.ts` — Worker wrapper with lazy initialization.
 -   `packages/vips/src/loader.ts` — Minimal loader for WordPress script module discovery.
 
@@ -133,7 +119,9 @@ To prevent race conditions, sideload uploads to the same post are serialized —
 
 ### 6. Finalize
 
-After all sideloads for an item complete, the `finalizeItem()` operation calls `POST /wp/v2/media/{id}/finalize`. This endpoint re-applies the `wp_generate_attachment_metadata` filter on the server, ensuring that server-side plugins (e.g., for watermarking, CDN sync, or custom metadata processing) can post-process the attachment after all client-side operations are done.
+After all sideloads for an item complete, the `finalizeItem()` operation calls `POST /wp/v2/media/{id}/finalize`. This endpoint applies the `wp_generate_attachment_metadata` filter with context `'update'` so server-side plugins (watermarking, CDN sync, custom metadata processing, etc.) can post-process the attachment after all sub-sizes are written.
+
+The filter was already fired once with context `'create'` during the initial upload, so plugins see two passes per client-side upload. This double-fire pattern matches how WordPress handles big-image uploads on the server, where sub-size generation is deferred and triggers a second `'update'` pass — plugins that already work with big-image uploads accommodate it without modification, but they should be written idempotently.
 
 The finalize step uses a gate: if any child sideloads are still pending, the operation waits. Once the last sideload completes, it triggers the parent item's pending Finalize operation.
 
@@ -214,7 +202,7 @@ Client-side media processing is limited to Chromium-based browsers that support 
 | Chrome | 137+ | Full support via Document-Isolation-Policy. |
 | Edge | 137+ | Full support via Document-Isolation-Policy. |
 | Firefox | — | Not supported. |
-| Safari | — | Not supported. |
+| Safari | — | Not supported for the WASM pipeline; the HEIC canvas fallback still works. |
 
 Browsers that do not support DIP fall back automatically to server-side processing.
 
@@ -319,9 +307,9 @@ Uploads a processed image variant (thumbnail, scaled version, or rotated origina
 POST /wp/v2/media/{id}/finalize
 ```
 
-Triggers the `wp_generate_attachment_metadata` filter after all client-side operations (upload, thumbnail generation, sideloads) are complete. This ensures server-side plugins that hook into `wp_generate_attachment_metadata` — such as those for watermarking, CDN sync, or custom image sizes — can post-process the attachment.
+Applies the `wp_generate_attachment_metadata` filter with context `'update'` after all client-side operations (upload, thumbnail generation, sideloads) are complete. The filter was already fired once with `'create'` during the initial upload — this second pass is what lets server-side plugins (watermarking, CDN sync, custom image sizes) see the full sub-size metadata.
 
-The endpoint requires `edit_post` and `upload_files` capabilities. It reads the existing attachment metadata, re-applies the `wp_generate_attachment_metadata` filter with context `'update'`, and saves the result.
+The endpoint requires `edit_post` and `upload_files` capabilities. It reads the existing attachment metadata, applies the filter, and saves the result.
 
 ### REST index media settings
 

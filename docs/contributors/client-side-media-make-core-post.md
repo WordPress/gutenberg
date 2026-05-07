@@ -2,15 +2,13 @@
 
 WordPress 7.1 ships client-side media processing — a capability that handles image compression, resizing, format conversion, rotation, and thumbnail generation directly in the user's browser using WebAssembly, rather than on the server.
 
-The feature graduated from a Gutenberg experiment to a core Gutenberg feature during the 7.0 cycle and ships in 7.1 with HEIC support and end-to-end AVIF uploads. See the [7.1 iteration tracking issue](https://github.com/WordPress/gutenberg/issues/76756) for the full scope.
-
 This post outlines what's changing, how it works, and what plugin and theme developers need to know.
 
 ## What is client-side media processing?
 
 Traditionally, when a user uploads an image in the block editor, the file is sent to the server where PHP (using GD or Imagick) generates thumbnails, applies format conversions, handles EXIF rotation, and scales large images. This approach is limited by PHP memory constraints, server CPU availability, and the capabilities of the installed image library.
 
-Client-side media processing moves this work to the browser. Images are processed using [wasm-vips](https://github.com/kleisauke/wasm-vips), a WebAssembly compilation of the high-performance libvips image processing library. The processed images — including all thumbnails — are then uploaded to the server, which simply stores them. After all client-side operations complete, a finalize step re-runs the `wp_generate_attachment_metadata` filter on the server so plugins continue to see the same hook surface as before.
+Client-side media processing moves this work to the browser. Images are processed using [wasm-vips](https://github.com/kleisauke/wasm-vips), a WebAssembly compilation of the high-performance libvips image processing library. The processed images — including all thumbnails — are then uploaded to the server, which simply stores them. After all client-side operations complete, a finalize step applies the `wp_generate_attachment_metadata` filter with context `'update'` so plugins see the full sub-size metadata, mirroring how the server already handles big-image uploads where sub-sizes are deferred.
 
 ## Key benefits
 
@@ -30,7 +28,7 @@ Client-side media processing moves this work to the browser. Images are processe
 - **AVIF end-to-end uploads** — `vips-heif.wasm` is bundled in the worker so AVIF can be decoded client-side, and the REST API accepts the upload on hosts without server-side AVIF support.
 - **Automatic format conversion** — The existing `image_editor_output_format` filter is respected client-side, enabling automatic conversion (e.g., JPEG to WebP) before upload.
 - **Cross-origin isolation via Document-Isolation-Policy** — WordPress sends `Document-Isolation-Policy: isolate-and-credentialless` on block editor screens for Chromium 137+. DIP provides per-document isolation without breaking other iframes on the page.
-- **Server-side hook compatibility** — After all client-side operations complete, `POST /wp/v2/media/{id}/finalize` re-runs `wp_generate_attachment_metadata` so plugins that hook into it (watermarking, CDN sync, etc.) continue to work.
+- **Server-side hook compatibility** — `wp_generate_attachment_metadata` fires the same way as for a server-side upload: once with context `'create'` during the initial upload and again with `'update'` after `POST /wp/v2/media/{id}/finalize` runs. Plugins that hook into it (watermarking, CDN sync, etc.) continue to work, the same way they already handle the deferred-subsize pass on big-image uploads.
 - **Smart fallback** — Browsers that don't support the required features automatically fall back to server-side processing with no user-facing change.
 - **Image quality filter** — `editor.media.imageQuality` JavaScript filter to control client-side resize/crop quality (0–1, default 0.82).
 
@@ -62,7 +60,7 @@ add_filter( 'wp_client_side_media_processing_enabled', '__return_false' );
 
 ### Server-side hooks still fire
 
-A common concern: if client-side processing bypasses server-side image generation, do plugins that hook into `wp_generate_attachment_metadata` stop working? No — after all client-side operations complete (including thumbnail sideloads), WordPress calls a finalize endpoint that re-applies this filter, ensuring plugins for watermarking, CDN sync, custom metadata processing, and similar use cases continue to work without modification.
+A common concern: if client-side processing bypasses server-side image generation, do plugins that hook into `wp_generate_attachment_metadata` stop working? No — the filter fires the same way it does during a server-side upload, just with the work shifted around. WordPress fires it once with context `'create'` during the initial upload, and again with `'update'` after the finalize endpoint runs (once all client-side sub-size sideloads are complete). Plugins for watermarking, CDN sync, custom metadata processing, and similar use cases continue to work without modification — write them idempotently so they handle both passes correctly. This double-fire pattern matches how WordPress already handles big-image uploads on the server, where sub-size generation is deferred and triggers a second `'update'` pass.
 
 If finalize fails, the error is logged but the upload still succeeds — the call is best-effort so a plugin failure can't block the user's upload.
 
@@ -165,7 +163,9 @@ No — and it isn't a bandwidth win at all. The client uploads the original plus
 
 ### Doesn't the "never trust the client" rule apply here?
 
-Client-side processing is a **performance optimization, not a trust boundary**. The server still validates every uploaded file — MIME type, dimensions, capability checks, sanitization — exactly as before. Client-side code generates the bytes; the server still decides whether to accept them and runs the same `wp_generate_attachment_metadata` filter chain via the finalize step. If the browser can't or won't process the file, WordPress falls back to server-side processing transparently. The security model is unchanged.
+Client-side processing is a **performance optimization, not a trust boundary**. The server still validates every uploaded file — MIME type, dimensions, capability checks, sanitization — and runs the same `wp_generate_attachment_metadata` filter chain. If the browser can't or won't process the file, WordPress falls back to server-side processing transparently.
+
+The validation surface is preserved with one intentional exception: AVIF uploads from the client-side path bypass the server's `wp_prevent_unsupported_mime_type_uploads` check when `generate_sub_sizes=false`, so hosts whose PHP image editor doesn't support AVIF can still accept client-decoded AVIF files.
 
 ### What happens if the browser can't process the image?
 
@@ -173,7 +173,7 @@ Server-side processing runs as before. The fallback is automatic and transparent
 
 ### Will my plugin's `wp_generate_attachment_metadata` hooks still run?
 
-Yes. After all client-side operations complete (including thumbnail sideloads), WordPress calls a finalize endpoint that re-runs `wp_generate_attachment_metadata` on the server, so watermarking, CDN sync, custom metadata processing, and similar plugins keep working without modification. See "Server-side hooks still fire" above.
+Yes. The filter fires the same way as during a server-side upload: once with context `'create'` during the initial upload, and again with `'update'` after the finalize endpoint runs (once all client-side sub-size sideloads complete). Watermarking, CDN sync, custom metadata processing, and similar plugins keep working without modification — write them idempotently so they handle both passes. See "Server-side hooks still fire" above.
 
 ### Does this change the format my users upload?
 
@@ -196,7 +196,6 @@ We encourage plugin and theme developers to test client-side media processing wi
 Please report any issues on the [Gutenberg GitHub repository](https://github.com/WordPress/gutenberg/issues). Related tracking issues:
 
 - [Client-side media processing iteration for WordPress 7.1 (#76756)](https://github.com/WordPress/gutenberg/issues/76756)
-- [WordPress 7.0 iteration (historical) (#74333)](https://github.com/WordPress/gutenberg/issues/74333)
 - [Documentation tracking issue (#75111)](https://github.com/WordPress/gutenberg/issues/75111)
 
 For detailed developer documentation, see:

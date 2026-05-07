@@ -2,7 +2,7 @@
 
 ## Overview
 
-Client-side media processing handles image compression, resizing, format conversion, rotation, and thumbnail generation in the browser using WebAssembly, rather than on the server. It is enabled by default in WordPress 7.1 for supported browsers and transparently falls back to server-side processing when unavailable. The infrastructure landed during the 7.0 cycle; the 7.1 release adds HEIC support, AVIF end-to-end uploads, batch thumbnail generation, sub-size deduplication, and tightened upload locking.
+Client-side media processing handles image compression, resizing, format conversion, rotation, and thumbnail generation in the browser using WebAssembly, rather than on the server. It is enabled by default in WordPress 7.1 for supported browsers and transparently falls back to server-side processing when unavailable.
 
 This guide covers how plugin and theme developers can interact with, customize, and troubleshoot client-side media processing.
 
@@ -62,7 +62,7 @@ add_filter( 'image_editor_output_format', function ( $formats ) {
 } );
 ```
 
-Client-side processing will apply this conversion before uploading. If a PNG has transparency and the target format is JPEG, the conversion is skipped to preserve the alpha channel.
+Client-side processing will apply this conversion before uploading sub-sized images. If a PNG has transparency and the target format is JPEG, the conversion is skipped to preserve the alpha channel.
 
 ### Progressive/interlaced image output
 
@@ -82,7 +82,7 @@ add_filter( 'image_save_progressive', function ( $interlaced, $mime_type ) {
 
 Client-side processing handles the following MIME types in the WASM/vips pipeline: `image/jpeg`, `image/png`, `image/gif`, `image/webp`, `image/avif`. Files outside this set fall through to one of two paths depending on type:
 
--   **HEIC/HEIF** (`image/heic`, `image/heif`): the client decodes the file with `createImageBitmap`, an `HTMLImageElement`/`OffscreenCanvas` strategy, or a HEIC-container + WebCodecs `VideoDecoder` path (Chrome 107+ on macOS), exports a JPEG (`.jpg`, MIME `image/jpeg`), and lets the server generate sub-sizes from the JPEG. The original HEIC is kept as a companion file in `$metadata['original']` and deleted with the attachment.
+-   **HEIC/HEIF** (`image/heic`, `image/heif`): the client decodes the file with `createImageBitmap`, an `HTMLImageElement`/`OffscreenCanvas` strategy, or a HEIC-container + WebCodecs `VideoDecoder` path (Chromium 107+ via the platform codec — VideoToolbox on macOS, the Microsoft HEVC Video Extension on Windows), exports a JPEG (`.jpg`, MIME `image/jpeg`), and lets the server generate sub-sizes from the JPEG. The original HEIC is kept as a companion file in `$metadata['original']` and deleted with the attachment.
 -   **Other** (video, audio, documents): the file is uploaded directly to the server with default parameters and standard server-side processing. No client-side step runs.
 
 The set of MIME types eligible for the WASM pipeline is fixed at `CLIENT_SIDE_SUPPORTED_MIME_TYPES` in `packages/upload-media/src/store/constants.ts` — there is no public filter for adding or removing types.
@@ -147,7 +147,9 @@ dispatch( uploadStore ).addItems( {
 
 ## Server-side plugin compatibility
 
-When client-side processing is active, server-side image generation hooks like `wp_generate_attachment_metadata` are bypassed during the initial upload. However, after all client-side operations complete (including thumbnail sideloads), WordPress calls a finalize endpoint (`POST /wp/v2/media/{id}/finalize`) that re-applies the `wp_generate_attachment_metadata` filter. This means plugins that rely on this hook for watermarking, CDN sync, custom image sizes, or other post-processing continue to work without modification.
+When client-side processing is active, the `wp_generate_attachment_metadata` filter fires the same way it does for a server-side upload: once with context `'create'` during the initial upload, and again with `'update'` after WordPress calls the finalize endpoint (`POST /wp/v2/media/{id}/finalize`) once all client-side sub-size sideloads complete. Plugins that rely on this hook for watermarking, CDN sync, custom image sizes, or other post-processing continue to work without modification — write them idempotently so they handle both passes correctly.
+
+This double-fire pattern is the same one WordPress uses for big-image uploads on the server, where sub-size generation is deferred and triggers a second `'update'` pass. Plugins that already work with big-image uploads accommodate it without changes.
 
 If the finalize request fails, the error is logged but the upload still succeeds — finalization is best-effort so that a plugin failure does not block the user's upload.
 
@@ -179,7 +181,7 @@ After all client-side thumbnail sideloads complete, the finalize endpoint trigge
 POST /wp/v2/media/{id}/finalize
 ```
 
-This endpoint re-applies the `wp_generate_attachment_metadata` filter with context `'update'`, then saves the updated metadata. It requires `edit_post` and `upload_files` capabilities.
+This endpoint applies the `wp_generate_attachment_metadata` filter with context `'update'` (the second of two passes during a client-side upload — see [Server-side plugin compatibility](#server-side-plugin-compatibility)), then saves the updated metadata. It requires `edit_post` and `upload_files` capabilities.
 
 WordPress calls this endpoint automatically as part of the client-side upload pipeline. Plugin developers do not need to call it manually — it is documented here for context on how server-side hooks are preserved.
 
@@ -256,7 +258,7 @@ This endpoint requires both `edit_post` and `upload_files` capabilities.
 | Feature disabled on slow network | `2g`/`slow-2g` connection or Save-Data is on | The ~13 MB worker download is gated behind `effectiveType` and `saveData`. `3g` and faster connections are allowed. |
 | HEIC upload error on a server without HEIC support | Server-side HEIC decoder missing | The client converts HEIC to JPEG before upload — this should not occur in browsers that match `isHeicCanvasSupported()`. Verify the browser provides `createImageBitmap` and `OffscreenCanvas`. |
 | Upload fails with "image transcoding error" | Unsupported format or corrupt file | Verify the file is a supported format (JPEG, PNG, WebP, AVIF, GIF, HEIC). |
-| Save Draft button stays disabled | Lock not released | Ensure all upload items have completed or been cancelled. The lock releases when the upload queue is empty (see [#76973](https://github.com/WordPress/gutenberg/pull/76973)). |
+| Save Draft button stays disabled | Lock not released | Ensure all upload items have completed or been cancelled. The lock releases when the upload queue is empty. |
 
 ## Browser compatibility
 
@@ -267,6 +269,6 @@ Client-side media processing requires `Document-Isolation-Policy` support, which
 | Chrome | 137+ | Full support via Document-Isolation-Policy. |
 | Edge | 137+ | Full support via Document-Isolation-Policy. |
 | Firefox | — | Not supported (no Document-Isolation-Policy support). |
-| Safari | — | Not supported (no Document-Isolation-Policy support). |
+| Safari | — | Not supported for the WASM pipeline; the HEIC canvas fallback still works. |
 
 On unsupported browsers, WordPress automatically falls back to server-side processing with no user-facing changes.
