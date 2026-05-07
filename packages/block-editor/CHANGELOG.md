@@ -6,6 +6,10 @@
 
 -   `BlockManager`: Add stacking context isolation to category list ([#77759](https://github.com/WordPress/gutenberg/pull/77759)).
 
+### Bug Fixes
+
+-   `ColorPanel`: Fix incorrect color selection and persistence with duplicate palette entries by integrating slug-based selection ([#78048](https://github.com/WordPress/gutenberg/pull/78048)).
+
 ## 15.18.0 (2026-04-29)
 
 ### Enhancements
