@@ -7,6 +7,12 @@ import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
 import { notFound } from '@wordpress/route';
 
+declare global {
+	interface Window {
+		__experimentalMediaEditor?: boolean;
+	}
+}
+
 function getAttachmentId( id: string ) {
 	const attachmentId = parseInt( id, 10 );
 	if ( Number.isNaN( attachmentId ) || attachmentId <= 0 ) {
@@ -31,6 +37,10 @@ function getAttachmentTitle( attachment: {
  */
 export const route = {
 	beforeLoad: async ( { params }: { params: { id: string } } ) => {
+		if ( ! window?.__experimentalMediaEditor ) {
+			throw notFound();
+		}
+
 		const attachmentId = getAttachmentId( params.id );
 
 		try {
