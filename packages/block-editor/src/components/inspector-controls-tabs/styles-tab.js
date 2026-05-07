@@ -95,7 +95,10 @@ const StylesTab = ( {
 						group="typography"
 						label={ __( 'Typography' ) }
 					/>
-					<InspectorControls.Slot group="layout" />
+					<InspectorControls.Slot
+						group="layout"
+						label={ __( 'Layout' ) }
+					/>
 					<InspectorControls.Slot
 						group="dimensions"
 						label={ __( 'Dimensions' ) }

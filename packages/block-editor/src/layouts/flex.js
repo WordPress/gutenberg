@@ -12,11 +12,11 @@ import {
 	arrowDown,
 } from '@wordpress/icons';
 import {
-	ToggleControl,
 	Flex,
-	FlexItem,
+	ToggleControl,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
+	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 
 /**
@@ -30,7 +30,7 @@ import {
 	JustifyContentControl,
 	BlockVerticalAlignmentControl,
 } from '../components';
-import { shouldSkipSerialization } from '../hooks/utils';
+import { cleanEmptyObject, shouldSkipSerialization } from '../hooks/utils';
 import { LAYOUT_DEFINITIONS } from './definitions';
 
 // Used with the default, horizontal flex orientation.
@@ -69,36 +69,105 @@ export default {
 	label: __( 'Flex' ),
 	inspectorControls: function FlexLayoutInspectorControls( {
 		layout = {},
+		value: savedLayout = {},
 		onChange,
 		layoutBlockSupport = {},
+		clientId,
 	} ) {
 		const {
 			allowOrientation = true,
 			allowJustification = true,
 			allowWrap = true,
 		} = layoutBlockSupport;
+		const hasJustificationValue = () =>
+			!! savedLayout.justifyContent &&
+			savedLayout.justifyContent !== 'left';
+		const hasOrientationValue = () =>
+			!! savedLayout.orientation &&
+			savedLayout.orientation !== 'horizontal';
+		const hasWrapValue = () => savedLayout.flexWrap === 'nowrap';
+		const resetJustification = () =>
+			onChange(
+				cleanEmptyObject( {
+					...layout,
+					justifyContent: undefined,
+				} )
+			);
+		const resetOrientation = () => {
+			const { verticalAlignment, justifyContent } = layout;
+			onChange(
+				cleanEmptyObject( {
+					...layout,
+					orientation: undefined,
+					verticalAlignment:
+						verticalAlignment === 'space-between'
+							? 'center'
+							: verticalAlignment,
+					justifyContent:
+						justifyContent === 'stretch' ? 'left' : justifyContent,
+				} )
+			);
+		};
+		const resetWrap = () =>
+			onChange(
+				cleanEmptyObject( {
+					...layout,
+					flexWrap: undefined,
+				} )
+			);
+
 		return (
 			<>
-				<Flex>
-					{ allowJustification && (
-						<FlexItem>
-							<FlexLayoutJustifyContentControl
-								layout={ layout }
-								onChange={ onChange }
-							/>
-						</FlexItem>
-					) }
-					{ allowOrientation && (
-						<FlexItem>
-							<OrientationControl
-								layout={ layout }
-								onChange={ onChange }
-							/>
-						</FlexItem>
-					) }
-				</Flex>
+				{ ( allowJustification || allowOrientation ) && (
+					<Flex
+						align="flex-start"
+						className="block-editor-hooks__flex-layout-controls"
+						gap={ 4 }
+						justify="flex-start"
+					>
+						{ allowJustification && (
+							<ToolsPanelItem
+								label={ __( 'Justification' ) }
+								hasValue={ hasJustificationValue }
+								onDeselect={ resetJustification }
+								isShownByDefault
+								panelId={ clientId }
+							>
+								<FlexLayoutJustifyContentControl
+									layout={ layout }
+									onChange={ onChange }
+								/>
+							</ToolsPanelItem>
+						) }
+						{ allowOrientation && (
+							<ToolsPanelItem
+								label={ __( 'Orientation' ) }
+								hasValue={ hasOrientationValue }
+								onDeselect={ resetOrientation }
+								isShownByDefault
+								panelId={ clientId }
+							>
+								<OrientationControl
+									layout={ layout }
+									onChange={ onChange }
+								/>
+							</ToolsPanelItem>
+						) }
+					</Flex>
+				) }
 				{ allowWrap && (
-					<FlexWrapControl layout={ layout } onChange={ onChange } />
+					<ToolsPanelItem
+						label={ __( 'Wrapping' ) }
+						hasValue={ hasWrapValue }
+						onDeselect={ resetWrap }
+						isShownByDefault
+						panelId={ clientId }
+					>
+						<FlexWrapControl
+							layout={ layout }
+							onChange={ onChange }
+						/>
+					</ToolsPanelItem>
 				) }
 			</>
 		);
