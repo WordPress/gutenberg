@@ -125,6 +125,10 @@ export function createWordpressExternalsPlugin(
 				const vendorExternals = {
 					react: { global: 'React', handle: 'react' },
 					'react-dom': { global: 'ReactDOM', handle: 'react-dom' },
+					'react-dom/client': {
+						global: 'ReactDOM',
+						handle: 'react-dom',
+					},
 					'react/jsx-runtime': {
 						global: 'ReactJSXRuntime',
 						handle: 'react-jsx-runtime',

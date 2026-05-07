@@ -1,5 +1,10 @@
 import type { Select as _Select } from '@base-ui/react/select';
+import type { ComponentPropsWithoutRef, ReactElement } from 'react';
+
+import type { ComponentProps } from '../../../utils/types';
 import type { InputLayoutProps } from '../input-layout/types';
+
+export type PortalProps = ComponentPropsWithoutRef< typeof _Select.Portal >;
 
 // The second type parameter is the `multiple` flag (currently disabled).
 export type SelectRootProps = Omit<
@@ -7,7 +12,7 @@ export type SelectRootProps = Omit<
 	'multiple'
 >;
 
-export type SelectTriggerProps = Omit< _Select.Trigger.Props, 'children' > & {
+export type SelectTriggerProps = ComponentProps< typeof _Select.Trigger > & {
 	/**
 	 * The size of the trigger.
 	 *
@@ -27,16 +32,23 @@ export type SelectTriggerProps = Omit< _Select.Trigger.Props, 'children' > & {
 	children?: _Select.Value.Props[ 'children' ];
 };
 
-export type SelectPopupProps = _Select.Popup.Props & {
+export type SelectPopupProps = ComponentProps< typeof _Select.Popup > & {
 	/**
-	 * A parent element to render the portal into.
+	 * The content to be rendered inside the popup.
 	 */
-	container?: _Select.Portal.Props[ 'container' ];
+	children?: React.ReactNode;
+	/**
+	 * Optional portal element, typically `<Select.Portal />` with custom
+	 * `container`. When omitted, `Select.Popup` uses `Select.Portal` with
+	 * default props. Do not pass `children` on the portal element; they would
+	 * be ignored.
+	 */
+	portal?: ReactElement< Omit< PortalProps, 'children' > >;
 };
 
 export type SelectItemProps = Omit<
-	_Select.Item.Props,
-	'children' | 'value'
+	ComponentProps< typeof _Select.Item >,
+	'value'
 > & {
 	/**
 	 * A unique value that identifies this select item.

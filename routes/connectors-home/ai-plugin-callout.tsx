@@ -23,6 +23,7 @@ import { WpLogoDecoration } from './wp-logo-decoration';
 import type { PluginStatus } from './use-connector-plugin';
 
 const AI_PLUGIN_SLUG = 'ai';
+const AI_PLUGIN_PAGE_SLUG = 'ai-wp-admin';
 const AI_PLUGIN_ID = 'ai/ai';
 const AI_PLUGIN_URL = 'https://wordpress.org/plugins/ai/';
 
@@ -223,11 +224,11 @@ export function AiPluginCallout() {
 		}
 		if ( isActiveNoProvider ) {
 			return __(
-				'The <strong>AI plugin</strong> is installed. Connect a provider below to generate featured images, alt text, titles, excerpts, and more. <a>Learn more</a>'
+				'The <strong>AI plugin</strong> is installed. Connect an AI provider below to generate featured images, alt text, titles, excerpts, and more. <a>Learn more</a>'
 			);
 		}
 		return __(
-			'The <strong>AI plugin</strong> can use your connectors to generate featured images, alt text, titles, excerpts and more. <a>Learn more</a>'
+			'The <strong>AI plugin</strong> can use your AI connectors to generate featured images, alt text, titles, excerpts and more. <a>Learn more</a>'
 		);
 	};
 
@@ -278,7 +279,7 @@ export function AiPluginCallout() {
 						variant="secondary"
 						size="compact"
 						href={ addQueryArgs( 'options-general.php', {
-							page: AI_PLUGIN_SLUG,
+							page: AI_PLUGIN_PAGE_SLUG,
 						} ) }
 					>
 						{ __( 'Control features in the AI plugin' ) }

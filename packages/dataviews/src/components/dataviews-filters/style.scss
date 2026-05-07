@@ -76,7 +76,7 @@
 	.dataviews-filters__summary-chip {
 		border-radius: $grid-unit-20;
 		border: $border-width solid transparent;
-		cursor: pointer;
+		cursor: var(--wpds-cursor-control);
 		padding: $grid-unit-05 $grid-unit-15;
 		min-height: $grid-unit-40;
 		background: $gray-100;
@@ -137,7 +137,7 @@
 		align-items: center;
 		justify-content: center;
 		background: transparent;
-		cursor: pointer;
+		cursor: var(--wpds-cursor-control);
 
 		svg {
 			fill: $gray-700;

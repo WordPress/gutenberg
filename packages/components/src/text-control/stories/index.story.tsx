@@ -14,6 +14,7 @@ import { useState } from '@wordpress/element';
 import TextControl from '..';
 
 const meta: Meta< typeof TextControl > = {
+	tags: [ 'manifest' ],
 	component: TextControl,
 	title: 'Components/Selection & Input/Common/TextControl',
 	id: 'components-textcontrol',

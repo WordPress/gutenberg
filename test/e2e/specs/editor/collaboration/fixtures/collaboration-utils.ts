@@ -260,6 +260,7 @@ export default class CollaborationUtils {
 					.select( 'core/editor' )
 					.isSavingPost();
 			},
+			undefined,
 			{ timeout }
 		);
 	}
@@ -300,6 +301,7 @@ export default class CollaborationUtils {
 				( window as any )._wpCollaborationEnabled === true &&
 				window?.wp?.data &&
 				window?.wp?.blocks,
+			undefined,
 			{ timeout }
 		);
 	}
