@@ -237,6 +237,7 @@ if ( ! function_exists( 'wp_delete_old_collaboration_data' ) ) {
 			)
 		);
 	}
+	add_action( 'wp_delete_old_collaboration_data', 'wp_delete_old_collaboration_data' );
 }
 
 /**
