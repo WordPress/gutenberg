@@ -8,14 +8,12 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { WidgetDashboard, type DashboardWidget } from './widget-dashboard';
+import { useDashboardLayout } from './hooks';
+import { WidgetDashboard } from './widget-dashboard';
 import { useWidgetTypes } from './widget-types';
 
-const DEFAULT_LAYOUT: DashboardWidget[] = [];
-
 function Dashboard() {
-	const [ layout, setLayout ] =
-		useState< DashboardWidget[] >( DEFAULT_LAYOUT );
+	const [ layout, setLayout ] = useDashboardLayout();
 
 	const widgetTypes = useWidgetTypes();
 

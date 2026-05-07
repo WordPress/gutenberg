@@ -1,7 +1,13 @@
 /**
  * External dependencies
  */
-import { act, fireEvent, render, screen } from '@testing-library/react';
+import {
+	act,
+	fireEvent,
+	render,
+	screen,
+	waitFor,
+} from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -37,6 +43,11 @@ function createController(): UseCropperStateReturn {
 		applyOperation: jest.fn(),
 		reset: jest.fn(),
 		isDirty: false,
+		hasUndo: false,
+		hasRedo: false,
+		undo: jest.fn(),
+		redo: jest.fn(),
+		commitHistory: jest.fn(),
 		getCroppedImage: jest.fn(),
 	};
 }
@@ -116,9 +127,77 @@ describe( 'Cropper', () => {
 
 		await screen.findByTestId( GRID_TEST_ID );
 
-		const canvas = screen.getByRole( 'group', { name: 'Image editor' } );
+		const canvas = screen.getByRole( 'group', { name: 'Crop area' } );
 		expect( canvas ).not.toHaveClass( GRID_INTERACTIVE_CLASS );
 		expect( canvas ).not.toHaveClass( SHOW_GRID_CLASS );
+	} );
+
+	it( 'describes and focuses the crop area when requested', () => {
+		render(
+			<Cropper
+				src="test.jpg"
+				controller={ createController() }
+				showDimming={ false }
+				focusOnMount
+			/>
+		);
+
+		const canvas = screen.getByRole( 'group', { name: 'Crop area' } );
+		expect( canvas ).toHaveAccessibleDescription(
+			'When this area is focused, use arrow keys to move the image and plus or minus to zoom. Tab to resize handles and controls.'
+		);
+		expect( canvas ).toHaveFocus();
+	} );
+
+	it( 'does not expose crop area keyboard hints while resize handles are focused', async () => {
+		render(
+			<Cropper
+				src="test.jpg"
+				controller={ createController() }
+				showDimming={ false }
+				freeformCrop
+				focusOnMount
+			/>
+		);
+
+		const canvas = screen.getByRole( 'group', { name: 'Crop area' } );
+		const handle = await screen.findByRole( 'button', {
+			name: 'Resize top-left corner',
+		} );
+
+		fireEvent.blur( canvas, { relatedTarget: handle } );
+		fireEvent.focus( handle );
+
+		expect( canvas ).not.toHaveAccessibleDescription(
+			'When this area is focused, use arrow keys to move the image and plus or minus to zoom. Tab to resize handles and controls.'
+		);
+		expect( handle ).toHaveAccessibleDescription(
+			'Use arrow keys to resize the crop area. Hold Shift for larger steps.'
+		);
+	} );
+
+	it( 'returns focus to the crop area on Escape from a resize handle', async () => {
+		render(
+			<Cropper
+				src="test.jpg"
+				controller={ createController() }
+				showDimming={ false }
+				freeformCrop
+				focusOnMount
+			/>
+		);
+
+		const canvas = screen.getByRole( 'group', { name: 'Crop area' } );
+		const handle = await screen.findByRole( 'button', {
+			name: 'Resize top-left corner',
+		} );
+
+		act( () => {
+			handle.focus();
+		} );
+		fireEvent.keyDown( handle, { key: 'Escape' } );
+
+		expect( canvas ).toHaveFocus();
 	} );
 
 	it( 'renders the grid hidden by default in interactive mode', async () => {
@@ -133,7 +212,7 @@ describe( 'Cropper', () => {
 
 		await screen.findByTestId( GRID_TEST_ID );
 
-		const canvas = screen.getByRole( 'group', { name: 'Image editor' } );
+		const canvas = screen.getByRole( 'group', { name: 'Crop area' } );
 		expect( canvas ).toHaveClass( GRID_INTERACTIVE_CLASS );
 		expect( canvas ).not.toHaveClass( SHOW_GRID_CLASS );
 	} );
@@ -151,9 +230,72 @@ describe( 'Cropper', () => {
 
 		await screen.findByTestId( GRID_TEST_ID );
 
-		const canvas = screen.getByRole( 'group', { name: 'Image editor' } );
+		const canvas = screen.getByRole( 'group', { name: 'Crop area' } );
 		expect( canvas ).toHaveClass( GRID_INTERACTIVE_CLASS );
 		expect( canvas ).toHaveClass( SHOW_GRID_CLASS );
+	} );
+
+	it( 'preserves a free crop when freeform handles are toggled off', async () => {
+		const controller = createController();
+		controller.state = {
+			...controller.state,
+			cropRect: { x: 0.1, y: 0.2, width: 0.5, height: 0.4 },
+		};
+		const { rerender } = render(
+			<Cropper
+				src="test.jpg"
+				controller={ controller }
+				showDimming={ false }
+				freeformCrop
+			/>
+		);
+
+		await screen.findByRole( 'button', {
+			name: 'Resize top-left corner',
+		} );
+		( controller.setCropRect as jest.Mock ).mockClear();
+
+		rerender(
+			<Cropper
+				src="test.jpg"
+				controller={ controller }
+				showDimming={ false }
+				freeformCrop={ false }
+			/>
+		);
+
+		expect(
+			screen.queryByRole( 'button', {
+				name: 'Resize top-left corner',
+			} )
+		).not.toBeInTheDocument();
+		expect( controller.setCropRect ).not.toHaveBeenCalled();
+	} );
+
+	it( 'centers a fixed-ratio crop when freeform handles are off', async () => {
+		const controller = createController();
+		controller.state = {
+			...controller.state,
+			cropRect: { x: 0.1, y: 0.2, width: 0.5, height: 0.4 },
+		};
+		render(
+			<Cropper
+				src="test.jpg"
+				controller={ controller }
+				showDimming={ false }
+				freeformCrop={ false }
+				aspectRatio={ 1 }
+			/>
+		);
+
+		await waitFor( () =>
+			expect( controller.setCropRect ).toHaveBeenCalledWith( {
+				x: expect.closeTo( 1 / 6, 5 ),
+				y: 0,
+				width: expect.closeTo( 2 / 3, 5 ),
+				height: 1,
+			} )
+		);
 	} );
 
 	it( 'clears settling state when a new resize starts before the settle timer fires', async () => {
@@ -260,7 +402,7 @@ describe( 'Cropper', () => {
 		const resizeHandle = await screen.findByRole( 'button', {
 			name: 'Resize top-left corner',
 		} );
-		const canvas = screen.getByRole( 'group', { name: 'Image editor' } );
+		const canvas = screen.getByRole( 'group', { name: 'Crop area' } );
 
 		fireEvent.pointerDown( resizeHandle, {
 			button: 0,
