@@ -1,7 +1,13 @@
 /**
  * WordPress dependencies
  */
-import { useCallback, useEffect, useMemo, useRef } from '@wordpress/element';
+import {
+	useCallback,
+	useEffect,
+	useId,
+	useMemo,
+	useRef,
+} from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -41,6 +47,18 @@ const ALL_POSITIONS: HandlePosition[] = [
 	'sw',
 	'w',
 ];
+
+const VISUALLY_HIDDEN_STYLE: React.CSSProperties = {
+	position: 'absolute',
+	width: 1,
+	height: 1,
+	padding: 0,
+	margin: -1,
+	overflow: 'hidden',
+	clip: 'rect(0, 0, 0, 0)',
+	whiteSpace: 'nowrap',
+	border: 0,
+};
 
 /**
  * Get the translated aria-label for a resize handle position.
@@ -95,7 +113,6 @@ type RectangleStencilProps = StencilProps;
  * @param props.freeformCrop      Whether resize handles are shown.
  * @param props.stencilTransition CSS transition string for settle animation.
  * @param props.cropBounds        Maximum crop rect bounds from camera (zoom/rotation-aware).
- * @param props.onEscape          Called when Escape is pressed on a resize handle.
  * @return The rectangle stencil element.
  */
 export function RectangleStencil( {
@@ -109,7 +126,6 @@ export function RectangleStencil( {
 	freeformCrop = false,
 	stencilTransition,
 	cropBounds,
-	onEscape,
 }: RectangleStencilProps ) {
 	// Use cropBounds from the camera if available, otherwise default to [0,1].
 	const boundsMinX = cropBounds?.minX ?? 0;
@@ -127,6 +143,7 @@ export function RectangleStencil( {
 	);
 	const keyboardSettleTimerRef = useRef< ReturnType< typeof setTimeout > >();
 	const keyboardResizeActiveRef = useRef( false );
+	const resizeHandleDescriptionId = useId();
 	const hasLockedRatio = !! ( aspectRatio && aspectRatio > 0 );
 
 	// Clear the pending keyboard settle timer on unmount so it can't
@@ -356,19 +373,11 @@ export function RectangleStencil( {
 
 	/**
 	 * Handle keyboard events on a resize handle.
-	 * Arrow keys resize; Escape returns focus to the canvas.
 	 * Shift multiplies the step size by 10 for coarser movement.
 	 */
 	const handleKeyDown = useCallback(
 		( handle: HandlePosition, event: React.KeyboardEvent ) => {
 			const key = event.key;
-
-			if ( key === 'Escape' ) {
-				event.preventDefault();
-				event.stopPropagation();
-				onEscape?.();
-				return;
-			}
 
 			if (
 				key !== 'ArrowUp' &&
@@ -456,7 +465,6 @@ export function RectangleStencil( {
 			onCropChange,
 			onResizeStart,
 			onResizeEnd,
-			onEscape,
 		]
 	);
 
@@ -477,6 +485,16 @@ export function RectangleStencil( {
 				transition: stencilTransition,
 			} }
 		>
+			{ freeformCrop && (
+				<div
+					id={ resizeHandleDescriptionId }
+					style={ VISUALLY_HIDDEN_STYLE }
+				>
+					{ __(
+						'Use arrow keys to resize the crop area. Hold Shift for larger steps. Tab to move between handles and controls.'
+					) }
+				</div>
+			) }
 			{ /* The crop rectangle border. pointer-events: none is set in
 				   CSS so clicks pass through to the container for panning. */ }
 			<div
@@ -506,6 +524,7 @@ export function RectangleStencil( {
 						onTouchStart={ ( event ) => event.stopPropagation() }
 						onKeyDown={ ( event ) => handleKeyDown( pos, event ) }
 						aria-label={ getHandleLabel( pos ) }
+						aria-describedby={ resizeHandleDescriptionId }
 					/>
 				) ) }
 		</div>

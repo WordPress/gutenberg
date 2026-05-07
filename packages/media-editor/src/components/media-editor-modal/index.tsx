@@ -580,6 +580,7 @@ function MediaEditorModalContent( {
 												imageAspectRatio
 											) }
 											freeformCrop={ freeformCrop }
+											focusOnMount
 											isPlacementActive={
 												isPlacementActive
 											}
@@ -622,8 +623,13 @@ function MediaEditorModalContent( {
 					 on mount, request the parent Modal close. */ }
 				<ConfirmDialog
 					isOpen={ isDiscardDialogOpen }
+					title={ __( 'Discard changes?' ) }
 					confirmButtonText={ __( 'Discard' ) }
 					cancelButtonText={ __( 'Keep editing' ) }
+					size="medium"
+					focusOnMount="firstContentElement"
+					isDismissible={ false }
+					__experimentalHideHeader={ false }
 					onCancel={ () => setIsDiscardDialogOpen( false ) }
 					onConfirm={ () => {
 						setIsDiscardDialogOpen( false );

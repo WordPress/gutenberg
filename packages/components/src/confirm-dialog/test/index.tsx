@@ -1,13 +1,14 @@
 /**
  * External dependencies
  */
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
  * Internal dependencies
  */
 import { ConfirmDialog } from '..';
+import Modal from '../../modal';
 
 const noop = () => {};
 
@@ -414,6 +415,58 @@ describe( 'Confirm', () => {
 			expect( confirmButton ).not.toHaveClass( 'is-busy' );
 			expect( cancelButton ).toBeEnabled();
 			expect( confirmButton ).toBeEnabled();
+		} );
+
+		it( 'should keep tab focus inside a titled nested dialog focused on the safe action', async () => {
+			const user = userEvent.setup();
+
+			const originalGetClientRects =
+				window.HTMLElement.prototype.getClientRects;
+			// @ts-expect-error We're mocking layout enough for tabbable checks.
+			window.HTMLElement.prototype.getClientRects = function () {
+				return [ 'trick-jsdom-into-having-size-for-element-rect' ];
+			};
+
+			try {
+				render(
+					<Modal onRequestClose={ noop } title="Parent dialog">
+						<button>Parent action</button>
+						<ConfirmDialog
+							isOpen
+							onConfirm={ noop }
+							onCancel={ noop }
+							title="Discard changes?"
+							confirmButtonText="Discard"
+							cancelButtonText="Keep editing"
+							size="medium"
+							focusOnMount="firstContentElement"
+							isDismissible={ false }
+							__experimentalHideHeader={ false }
+						>
+							Are you sure?
+						</ConfirmDialog>
+					</Modal>
+				);
+
+				await screen.findByRole( 'dialog', {
+					name: 'Discard changes?',
+				} );
+
+				await waitFor( () =>
+					expect(
+						screen.getByRole( 'button', { name: 'Keep editing' } )
+					).toHaveFocus()
+				);
+
+				await user.tab();
+
+				expect(
+					screen.getByRole( 'button', { name: 'Discard' } )
+				).toHaveFocus();
+			} finally {
+				window.HTMLElement.prototype.getClientRects =
+					originalGetClientRects;
+			}
 		} );
 	} );
 } );

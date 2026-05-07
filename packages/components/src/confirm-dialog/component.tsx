@@ -30,6 +30,7 @@ const UnconnectedConfirmDialog = (
 		confirmButtonText,
 		cancelButtonText,
 		isBusy,
+		onKeyDown,
 		...otherProps
 	} = useContextSystem( props, 'ConfirmDialog' );
 
@@ -77,6 +78,50 @@ const UnconnectedConfirmDialog = (
 		[ handleEvent, onConfirm ]
 	);
 
+	const handleTab = useCallback(
+		( event: React.KeyboardEvent< HTMLDivElement > ) => {
+			if ( event.key !== 'Tab' ) {
+				return false;
+			}
+
+			const actionButtons = [
+				cancelButtonRef.current,
+				confirmButtonRef.current,
+			].filter( Boolean ) as HTMLButtonElement[];
+			const currentIndex = actionButtons.findIndex(
+				( button ) => button === event.target
+			);
+
+			if ( currentIndex === -1 ) {
+				return false;
+			}
+
+			event.preventDefault();
+			const nextIndex = event.shiftKey
+				? ( currentIndex - 1 + actionButtons.length ) %
+				  actionButtons.length
+				: ( currentIndex + 1 ) % actionButtons.length;
+			actionButtons[ nextIndex ]?.focus();
+
+			return true;
+		},
+		[]
+	);
+
+	const handleKeyDown = useCallback(
+		( event: React.KeyboardEvent< HTMLDivElement > ) => {
+			onKeyDown?.( event );
+			if ( event.defaultPrevented ) {
+				return;
+			}
+			if ( handleTab( event ) ) {
+				return;
+			}
+			handleEnter( event );
+		},
+		[ handleEnter, handleTab, onKeyDown ]
+	);
+
 	const cancelLabel = cancelButtonText ?? __( 'Cancel' );
 	const confirmLabel = confirmButtonText ?? __( 'OK' );
 
@@ -85,7 +130,7 @@ const UnconnectedConfirmDialog = (
 			{ isOpen && (
 				<Modal
 					onRequestClose={ handleEvent( onCancel ) }
-					onKeyDown={ handleEnter }
+					onKeyDown={ handleKeyDown }
 					closeButtonLabel={ cancelLabel }
 					isDismissible
 					ref={ forwardedRef }

@@ -116,9 +116,53 @@ describe( 'Cropper', () => {
 
 		await screen.findByTestId( GRID_TEST_ID );
 
-		const canvas = screen.getByRole( 'group', { name: 'Image editor' } );
+		const canvas = screen.getByRole( 'group', { name: 'Crop area' } );
 		expect( canvas ).not.toHaveClass( GRID_INTERACTIVE_CLASS );
 		expect( canvas ).not.toHaveClass( SHOW_GRID_CLASS );
+	} );
+
+	it( 'describes and focuses the crop area when requested', () => {
+		render(
+			<Cropper
+				src="test.jpg"
+				controller={ createController() }
+				showDimming={ false }
+				focusOnMount
+			/>
+		);
+
+		const canvas = screen.getByRole( 'group', { name: 'Crop area' } );
+		expect( canvas ).toHaveAccessibleDescription(
+			'When this area is focused, use arrow keys to move the image and plus or minus to zoom. Tab to resize handles and controls.'
+		);
+		expect( canvas ).toHaveFocus();
+	} );
+
+	it( 'does not expose crop area keyboard hints while resize handles are focused', async () => {
+		render(
+			<Cropper
+				src="test.jpg"
+				controller={ createController() }
+				showDimming={ false }
+				freeformCrop
+				focusOnMount
+			/>
+		);
+
+		const canvas = screen.getByRole( 'group', { name: 'Crop area' } );
+		const handle = await screen.findByRole( 'button', {
+			name: 'Resize top-left corner',
+		} );
+
+		fireEvent.blur( canvas, { relatedTarget: handle } );
+		fireEvent.focus( handle );
+
+		expect( canvas ).not.toHaveAccessibleDescription(
+			'When this area is focused, use arrow keys to move the image and plus or minus to zoom. Tab to resize handles and controls.'
+		);
+		expect( handle ).toHaveAccessibleDescription(
+			'Use arrow keys to resize the crop area. Hold Shift for larger steps. Tab to move between handles and controls.'
+		);
 	} );
 
 	it( 'renders the grid hidden by default in interactive mode', async () => {
@@ -133,7 +177,7 @@ describe( 'Cropper', () => {
 
 		await screen.findByTestId( GRID_TEST_ID );
 
-		const canvas = screen.getByRole( 'group', { name: 'Image editor' } );
+		const canvas = screen.getByRole( 'group', { name: 'Crop area' } );
 		expect( canvas ).toHaveClass( GRID_INTERACTIVE_CLASS );
 		expect( canvas ).not.toHaveClass( SHOW_GRID_CLASS );
 	} );
@@ -151,7 +195,7 @@ describe( 'Cropper', () => {
 
 		await screen.findByTestId( GRID_TEST_ID );
 
-		const canvas = screen.getByRole( 'group', { name: 'Image editor' } );
+		const canvas = screen.getByRole( 'group', { name: 'Crop area' } );
 		expect( canvas ).toHaveClass( GRID_INTERACTIVE_CLASS );
 		expect( canvas ).toHaveClass( SHOW_GRID_CLASS );
 	} );
@@ -260,7 +304,7 @@ describe( 'Cropper', () => {
 		const resizeHandle = await screen.findByRole( 'button', {
 			name: 'Resize top-left corner',
 		} );
-		const canvas = screen.getByRole( 'group', { name: 'Image editor' } );
+		const canvas = screen.getByRole( 'group', { name: 'Crop area' } );
 
 		fireEvent.pointerDown( resizeHandle, {
 			button: 0,
