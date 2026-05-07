@@ -26,9 +26,13 @@ import InserterDraggableBlocks from '../inserter-draggable-blocks';
 import BlockPatternsPaging from '../block-patterns-paging';
 import { INSERTER_PATTERN_TYPES } from '../inserter/block-patterns-tab/utils';
 
-const WithToolTip = ( { showTooltip, title, children } ) => {
+const WithToolTip = ( { showTooltip, placement, title, children } ) => {
 	if ( showTooltip ) {
-		return <Tooltip text={ title }>{ children }</Tooltip>;
+		return (
+			<Tooltip placement={ placement } text={ title }>
+				{ children }
+			</Tooltip>
+		);
 	}
 	return <>{ children }</>;
 };
@@ -42,6 +46,7 @@ function BlockPattern( {
 	showTitlesAsTooltip,
 	category,
 	isSelected,
+	placement,
 } ) {
 	const [ isDragging, setIsDragging ] = useState( false );
 	const { blocks, viewportWidth } = pattern;
@@ -97,6 +102,7 @@ function BlockPattern( {
 					<WithToolTip
 						showTooltip={ showTitlesAsTooltip && ! isUserPattern }
 						title={ pattern.title }
+						placement={ placement }
 					>
 						<Composite.Item
 							render={
@@ -190,6 +196,7 @@ function BlockPatternsList(
 		category,
 		showTitlesAsTooltip,
 		pagingProps,
+		placement,
 	},
 	ref
 ) {
@@ -232,6 +239,7 @@ function BlockPatternsList(
 					isSelected={
 						!! activePattern && activePattern === pattern.name
 					}
+					placement={ placement }
 				/>
 			) ) }
 			{ pagingProps && <BlockPatternsPaging { ...pagingProps } /> }

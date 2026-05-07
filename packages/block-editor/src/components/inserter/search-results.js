@@ -191,6 +191,8 @@ function InserterSearchResults( {
 					onClickPattern={ onClickPattern }
 					onHover={ onHoverPattern }
 					isDraggable={ isDraggable }
+					showTitlesAsTooltip
+					placement="top"
 				/>
 			</div>
 		</InserterPanel>
