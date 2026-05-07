@@ -53,7 +53,7 @@ test.describe( 'Connectors', () => {
 		);
 	} );
 
-	test( 'should display default providers with setup buttons', async ( {
+	test( 'should display default providers with install buttons', async ( {
 		page,
 		admin,
 	} ) => {
@@ -66,7 +66,7 @@ test.describe( 'Connectors', () => {
 		} );
 		await expect( pageTitle ).toBeVisible();
 
-		// Verify each connector card shows name as heading, description, and Set up button.
+		// Verify each connector card shows name as heading, description, and Install button.
 		for ( const { slug, name, description } of CONNECTORS ) {
 			const card = page.locator( `.connector-item--${ slug }` );
 			await expect( card ).toBeVisible();
@@ -86,9 +86,9 @@ test.describe( 'Connectors', () => {
 				headingId
 			);
 
-			const button = card.getByRole( 'button', { name: 'Set up' } );
+			const button = card.getByRole( 'button', { name: 'Install' } );
 			await expect( button ).toBeVisible();
-			// Set up button should not have aria-expanded until expanded.
+			// Install button should not have aria-expanded until expanded.
 			await expect( button ).not.toHaveAttribute( 'aria-expanded' );
 		}
 

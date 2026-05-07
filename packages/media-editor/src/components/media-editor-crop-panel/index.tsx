@@ -96,12 +96,36 @@ export default function MediaEditorCropPanel( {
 		...( aspectRatioPresets ??
 			DEFAULT_ASPECT_RATIOS.filter( ( preset ) => preset.value > 0 ) ),
 	];
+	const handleAspectRatioChange = ( value: string ) => {
+		onAspectRatioChange( value );
+		if ( value === '0' && ! freeformCrop ) {
+			onFreeformChange( true );
+		}
+	};
 
 	return (
 		<Stack direction="column" gap="md">
 			<VisuallyHidden render={ <h2 /> }>
 				{ __( 'Crop options' ) }
 			</VisuallyHidden>
+			<SelectControl
+				__next40pxDefaultSize
+				__nextHasNoMarginBottom
+				label={ __( 'Aspect ratio' ) }
+				value={ aspectRatioValue }
+				onChange={ handleAspectRatioChange }
+				options={ aspectRatioOptions.map( ( preset ) => ( {
+					label: preset.label,
+					value: preset.value.toString(),
+				} ) ) }
+			/>
+			<ToggleControl
+				__nextHasNoMarginBottom
+				label={ __( 'Resize crop area' ) }
+				help={ __( 'Show handles to adjust the crop box.' ) }
+				checked={ freeformCrop }
+				onChange={ onFreeformChange }
+			/>
 			<div role="presentation" { ...zoomGestureHandlers }>
 				<RangeControl
 					__next40pxDefaultSize
@@ -126,26 +150,6 @@ export default function MediaEditorCropPanel( {
 					} }
 				/>
 			</div>
-			<SelectControl
-				__next40pxDefaultSize
-				__nextHasNoMarginBottom
-				label={ __( 'Aspect ratio' ) }
-				value={ aspectRatioValue }
-				onChange={ onAspectRatioChange }
-				options={ aspectRatioOptions.map( ( preset ) => ( {
-					label: preset.label,
-					value: preset.value.toString(),
-				} ) ) }
-			/>
-			<ToggleControl
-				__nextHasNoMarginBottom
-				label={ __( 'Freeform crop' ) }
-				help={ __(
-					'Drag the crop edges to resize freely. When off, the crop is fixed to the selected ratio.'
-				) }
-				checked={ freeformCrop }
-				onChange={ onFreeformChange }
-			/>
 		</Stack>
 	);
 }
