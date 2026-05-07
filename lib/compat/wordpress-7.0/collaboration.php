@@ -58,6 +58,10 @@ gutenberg_register_collaboration_table();
 function gutenberg_create_collaboration_table() {
 	global $wpdb;
 
+	if ( get_transient( 'gutenberg_collaboration_table_created' ) ) {
+		return;
+	}
+
 	gutenberg_register_collaboration_table();
 
 	$charset_collate  = $wpdb->get_charset_collate();
@@ -79,6 +83,7 @@ function gutenberg_create_collaboration_table() {
 
 	require_once ABSPATH . 'wp-admin/includes/upgrade.php';
 	dbDelta( $sql );
+	set_transient( 'gutenberg_collaboration_table_created', '1', WEEK_IN_SECONDS );
 }
 add_action( 'gutenberg_create_collaboration_table', 'gutenberg_create_collaboration_table' );
 
