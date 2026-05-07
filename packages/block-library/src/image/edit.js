@@ -321,6 +321,7 @@ export function ImageEdit( {
 			...mediaAttributes,
 			...additionalAttributes,
 			linkDestination,
+			isDecorative: undefined,
 		} );
 		setTemporaryURL();
 	}
