@@ -93,6 +93,12 @@ export function NoteThread( {
 		);
 		const isDialogFocused =
 			event.relatedTarget?.closest( '[role="dialog"]' );
+		// Popovers anchored from inside the note (e.g. the emoji
+		// reaction pickers) portal their content to <body>, so focus
+		// moving into them looks like focus leaving the thread.
+		const isPopoverFocused = event.relatedTarget?.closest(
+			'.components-popover'
+		);
 		const isTabbing = isKeyboardTabbingRef.current;
 
 		// When another note is clicked, do nothing because the current note is automatically closed.
@@ -101,6 +107,12 @@ export function NoteThread( {
 		}
 		// When deleting a note, a dialog appears, but the note should not be collapsed.
 		if ( isDialogFocused ) {
+			return;
+		}
+		// When opening a popover from inside the note, the popover
+		// content is portaled outside the thread DOM but the note
+		// should remain selected for the trigger to stay rendered.
+		if ( isPopoverFocused ) {
 			return;
 		}
 		// When tabbing, do nothing if the focus is within the current note.
