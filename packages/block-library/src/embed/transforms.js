@@ -35,9 +35,11 @@ const transforms = {
 				) {
 					return false;
 				}
-				// Reject URLs whose pathname ends in a file extension.
-				// Embed providers don't use such URLs
-				return ! /\.[a-z0-9]+$/i.test( getFilename( trimmed ) );
+				// Reject URLs whose filename ends in a file extension,
+				// except common page extensions used by permalinks.
+				return ! /\.(?!(html?|php)$)[a-z0-9]+$/i.test(
+					getFilename( trimmed ) || ''
+				);
 			},
 			transform: ( node ) => {
 				const url = rewriteXToTwitter( node.textContent.trim() );
