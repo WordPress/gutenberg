@@ -24,7 +24,7 @@ flowchart TD
     C --> D[Upload files via<br/>sideload endpoint]
     B -- No --> E[POST file to /wp/v2/media]
     E --> F[PHP GD/Imagick<br/>generates thumbnails]
-    D --> G[Finalize: applies<br/>wp_generate_attachment_metadata]
+    D --> G[Finalize: wp_generate_attachment_metadata<br/>context: 'update']
     F --> G
     G --> H[Attachment ready in post]
 ```

@@ -181,7 +181,7 @@ After all client-side thumbnail sideloads complete, the finalize endpoint trigge
 POST /wp/v2/media/{id}/finalize
 ```
 
-This endpoint applies the `wp_generate_attachment_metadata` filter with context `'update'` (the second of two passes during a client-side upload — see [Server-side plugin compatibility](#server-side-plugin-compatibility)), then saves the updated metadata. It requires `edit_post` and `upload_files` capabilities.
+This endpoint applies the `wp_generate_attachment_metadata` filter with context `'update'`, then saves the updated metadata. It requires `edit_post` and `upload_files` capabilities. This is the second of two passes during a client-side upload — see [Server-side plugin compatibility](#server-side-plugin-compatibility) for the full picture.
 
 WordPress calls this endpoint automatically as part of the client-side upload pipeline. Plugin developers do not need to call it manually — it is documented here for context on how server-side hooks are preserved.
 

@@ -8,7 +8,7 @@ This post outlines what's changing, how it works, and what plugin and theme deve
 
 Traditionally, when a user uploads an image in the block editor, the file is sent to the server where PHP (using GD or Imagick) generates thumbnails, applies format conversions, handles EXIF rotation, and scales large images. This approach is limited by PHP memory constraints, server CPU availability, and the capabilities of the installed image library.
 
-Client-side media processing moves this work to the browser. Images are processed using [wasm-vips](https://github.com/kleisauke/wasm-vips), a WebAssembly compilation of the high-performance libvips image processing library. The processed images — including all thumbnails — are then uploaded to the server, which simply stores them. After all client-side operations complete, a finalize step applies the `wp_generate_attachment_metadata` filter with context `'update'` so plugins see the full sub-size metadata, mirroring how the server already handles big-image uploads where sub-sizes are deferred.
+Client-side media processing moves this work to the browser. Images are processed using [wasm-vips](https://github.com/kleisauke/wasm-vips), a WebAssembly compilation of the high-performance libvips image processing library. The processed images — including all thumbnails — are then uploaded to the server, which simply stores them. After all client-side operations complete, a finalize step applies the `wp_generate_attachment_metadata` filter with context `'update'` so plugins see the full sub-size metadata. This mirrors how the server already handles big-image uploads, where sub-sizes are deferred and trigger the same `'update'` pass.
 
 ## Key benefits
 
@@ -17,7 +17,7 @@ Client-side media processing moves this work to the browser. Images are processe
 - **Consistent, high-quality output with modern image support.** All users get the same libvips-powered processing regardless of whether the server has GD or Imagick, and regardless of which version is installed.
 - **Faster downloads for visitors.** libvips produces better-compressed output than GD or Imagick, so the generated images served to site visitors are smaller and load faster.
 - **iPhone photos just work.** HEIC images can be decoded in the browser and converted to JPEG before upload, even on hosts without server-side HEIC support. **Note**: HEIC decode relies on platform codecs and is supported in Chromium browsers (Chrome, Edge, Brave) on macOS and on Windows with HEVC support, and in Safari on macOS. Firefox is not supported.
-- **AVIF without server-side AVIF support.** Hosts whose PHP image editor doesn't support AVIF can still accept AVIF uploads when client-side processing is active.
+- **AVIF without server-side AVIF support.** Hosts whose PHP image editor doesn't support AVIF can still accept AVIF uploads when client-side processing is active. The MIME-type check is bypassed for client-decoded uploads — see the security FAQ below for details.
 - **More resilient uploads.** Sub-size uploads are independent requests, so a network hiccup mid-upload doesn't lose the entire batch.
 
 ## What's included
