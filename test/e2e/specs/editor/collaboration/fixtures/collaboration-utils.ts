@@ -310,7 +310,7 @@ export default class CollaborationUtils {
 	 * Wait for sync polling cycles to complete on the given page.
 	 *
 	 * Note: The sync endpoint URL is URL-encoded in wp-env
-	 * (rest_route=%2Fwp-sync%2Fv1%2Fupdates), so we match the
+	 * (rest_route=%2Fwp-collaboration%2Fv1%2Fupdates), so we match the
 	 * encoded form.
 	 *
 	 * @param page              The Playwright page to wait on.
@@ -326,7 +326,7 @@ export default class CollaborationUtils {
 		for ( let i = 0; i < cycles; i++ ) {
 			await page.waitForResponse(
 				( response ) =>
-					response.url().includes( 'wp-sync' ) &&
+					response.url().includes( 'wp-collaboration' ) &&
 					response.status() === 200,
 				{ timeout }
 			);

@@ -201,20 +201,6 @@ if ( ! class_exists( 'WP_HTTP_Polling_Collaboration_Server' ) ) {
 				'/updates',
 				$route_args
 			);
-
-			/*
-			* Backward-compatible alias so that the Gutenberg plugin's
-			* bundled sync package (which still uses wp-sync/v1) continues
-			* to work against WordPress 7.0+.
-			*
-			* @todo Remove once the Gutenberg plugin has transitioned to
-			*       the wp-collaboration/v1 namespace.
-			*/
-			register_rest_route(
-				'wp-sync/v1',
-				'/updates',
-				$route_args
-			);
 		}
 
 		/**

@@ -18,7 +18,7 @@ A Yjs provider for Gutenberg that enables real-time synchronization via HTTP pol
 │  └─────┬─────┘  │                              │  └─────┬─────┘  │
 └────────┼────────┘                              └────────┼────────┘
          │                                                │
-         │         POST /wp-sync/v1/updates               │
+         │     POST /wp-collaboration/v1/updates          │
          └────────────────────┬───────────────────────────┘
                               │
                     ┌─────────┴─────────┐
@@ -123,7 +123,7 @@ Awareness state (presence, cursors) is synchronized alongside document updates:
 
 ## REST API
 
-### POST `/wp-sync/v1/updates`
+### POST `/wp-collaboration/v1/updates`
 
 Single endpoint for bidirectional sync including awareness. Clients send their updates and receive updates from others in one request.
 
