@@ -1144,7 +1144,17 @@ export default function Image( {
 	const filename = getFilename( url );
 	let defaultedAlt;
 
-	if ( alt ) {
+	if ( isDecorative ) {
+		defaultedAlt = filename
+			? sprintf(
+					/* translators: %s: file name */
+					__(
+						'This image has been marked as decorative; its file name is %s'
+					),
+					filename
+			  )
+			: __( 'This image has been marked as decorative.' );
+	} else if ( alt ) {
 		defaultedAlt = alt;
 	} else if ( filename ) {
 		defaultedAlt = sprintf(
