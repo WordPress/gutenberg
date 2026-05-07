@@ -41,16 +41,18 @@ const DEFAULT_RESOLVE_WIDGET_MODULE: ResolveWidgetModule = ( moduleId ) =>
 	import( /* webpackIgnore: true */ moduleId );
 
 /**
- * Returns a comparison-friendly copy of `layout`.
+ * Returns the canonical form of `layout`.
  *
  * Sorts widgets by their declared `placement.order` (falling back to
  * the array index when omitted) and then strips `order` from each
- * placement, since order is now implicit in the array position. This
- * canonical form lets `hasUncommittedChanges` ignore round-trips that
- * end at the same visible arrangement but differ in how the grid model
- * records ordering (e.g., a swap and its undo: the committed layout
- * has no explicit `order`, while the staged one carries the `0, 1, …`
- * values the grid wrote during the drag).
+ * placement, since the order is now implicit in the array position.
+ *
+ * Used in two places: as the comparison form for
+ * `hasUncommittedChanges` (so a swap and its undo are reported as
+ * equal even though the staged copy carries explicit `0, 1, …` orders
+ * the grid wrote during the drag) and as the publish form for
+ * `commitLayout`, so the persisted payload stays free of redundant
+ * `order` fields and matches what the comparison treats as canonical.
  *
  * @param layout Layout to canonicalize.
  * @return Layout sorted by display order with `order` stripped from
@@ -151,7 +153,7 @@ export function WidgetDashboardProvider( {
 
 	const commitLayout = useCallback( () => {
 		if ( hasUncommittedChanges ) {
-			onLayoutChange( stagingLayout );
+			onLayoutChange( canonicalize( stagingLayout ) );
 		}
 		onEditChange?.( false );
 	}, [ hasUncommittedChanges, onLayoutChange, stagingLayout, onEditChange ] );

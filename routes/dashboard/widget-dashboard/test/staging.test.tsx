@@ -195,6 +195,65 @@ describe( 'WidgetDashboard staging layer', () => {
 		expect( readProbe().hasUncommittedChanges ).toBe( false );
 	} );
 
+	it( 'commits a canonicalized layout, sorted by order with order stripped', () => {
+		const onLayoutChange = jest.fn();
+		render(
+			<Harness
+				layout={ initialLayout }
+				onLayoutChange={ onLayoutChange }
+			/>
+		);
+
+		// Stage a layout where the array is in reverse visual order but
+		// the placements carry explicit `order` values that restore the
+		// visible "a then b" arrangement.
+		act( () => {
+			readProbe().mutate( [
+				{
+					...initialLayout[ 1 ],
+					placement: { width: 1, height: 1, order: 1 },
+				},
+				{
+					...initialLayout[ 0 ],
+					placement: { width: 1, height: 1, order: 0 },
+				},
+			] );
+		} );
+
+		// hasUncommittedChanges should be false (visual order is unchanged).
+		expect( readProbe().hasUncommittedChanges ).toBe( false );
+
+		// Now stage a true visual change that also carries `order`, and
+		// commit. The publish payload should be sorted by order with the
+		// `order` field stripped.
+		act( () => {
+			readProbe().mutate( [
+				{
+					...initialLayout[ 0 ],
+					placement: { width: 1, height: 1, order: 1 },
+				},
+				{
+					...initialLayout[ 1 ],
+					placement: { width: 1, height: 1, order: 0 },
+				},
+			] );
+		} );
+
+		act( () => {
+			readProbe().commit();
+		} );
+
+		expect( onLayoutChange ).toHaveBeenCalledTimes( 1 );
+		const committed = onLayoutChange.mock.calls[ 0 ][ 0 ];
+		expect( committed.map( ( w: DashboardWidget ) => w.uuid ) ).toEqual( [
+			'b',
+			'a',
+		] );
+		for ( const widget of committed ) {
+			expect( widget.placement ).not.toHaveProperty( 'order' );
+		}
+	} );
+
 	it( 'forces edit mode when the layout becomes empty', () => {
 		const onLayoutChange = jest.fn();
 		const { rerender } = render(
