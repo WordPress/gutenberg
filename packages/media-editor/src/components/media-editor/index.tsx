@@ -453,13 +453,17 @@ function MediaEditorContent( {
 					: ( error as { message?: string } )?.message ??
 					  __( 'An unknown error occurred.' );
 			createErrorNotice(
-				sprintf(
-					/* translators: %s: Error message. */
-					isImage
-						? __( 'Could not save image. %s' )
-						: __( 'Could not save media. %s' ),
-					message
-				),
+				isImage
+					? sprintf(
+							/* translators: %s: Error message. */
+							__( 'Could not save image. %s' ),
+							message
+					  )
+					: sprintf(
+							/* translators: %s: Error message. */
+							__( 'Could not save media. %s' ),
+							message
+					  ),
 				{ type: 'snackbar', context: NOTICES_CONTEXT }
 			);
 		} finally {
