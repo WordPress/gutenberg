@@ -463,6 +463,10 @@ function CropperInner(
 		isInteractiveGrid &&
 		( isInteractionPlacementActive || isResizing || isPlacementActive );
 
+	const handleStencilEscape = useCallback( () => {
+		canvasRef.current?.focus( { preventScroll: true } );
+	}, [] );
+
 	const handleResizeStart = useCallback( () => {
 		isResizingRef.current = true;
 		setIsResizing( true );
@@ -648,6 +652,7 @@ function CropperInner(
 						onCropChange={ handleCropChange }
 						onResizeStart={ handleResizeStart }
 						onResizeEnd={ handleResizeEnd }
+						onEscape={ handleStencilEscape }
 						aspectRatio={ aspectRatio }
 						freeformCrop={ freeformCrop }
 						stencilTransition={ settleStencilTransition }

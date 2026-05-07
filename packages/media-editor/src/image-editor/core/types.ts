@@ -188,4 +188,6 @@ export interface StencilProps {
 		maxX: number;
 		maxY: number;
 	};
+	/** Called when Escape is pressed by a stencil implementation. */
+	onEscape?: () => void;
 }
