@@ -10,8 +10,10 @@
 .drag-preview {
 	height: 100%;
 	transform: scale(1.05);
-	box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15);
+	box-shadow: var(--wpds-elevation-md);
 	cursor: grabbing;
+	border-radius: var(--wpds-border-radius-lg);
+	overflow: hidden;
 }
 
 @media (prefers-reduced-motion: reduce) {

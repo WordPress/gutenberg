@@ -18,6 +18,7 @@
 	opacity: 0.4;
 	pointer-events: none;
 	outline: var(--wpds-border-width-sm) dashed var(--wpds-color-stroke-interactive-brand);
+	border-radius: var(--wpds-border-radius-lg);
 }
 
 @media (forced-colors: active) {

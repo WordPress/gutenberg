@@ -1,3 +1,28 @@
 .grid {
 	width: 100%;
 }
+
+.tile {
+	height: 100%;
+	border-radius: var(--wpds-border-radius-lg);
+}
+
+.tileEditMode {
+	box-shadow: var(--wpds-elevation-xs);
+}
+
+.tileEditMode:hover,
+.tileEditMode:focus-visible {
+	box-shadow: var(--wpds-elevation-md);
+}
+
+.tileEditMode:focus-visible {
+	outline: var(--wpds-border-width-focus) solid var(--wpds-color-stroke-focus-brand);
+	outline-offset: 2px;
+}
+
+@media not ( prefers-reduced-motion ) {
+	.tile {
+		transition: box-shadow 180ms ease;
+	}
+}

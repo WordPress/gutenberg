@@ -68,11 +68,15 @@ export const Widgets = forwardRef< HTMLDivElement, WidgetsProps >(
 		);
 
 		const children = layout.map( ( widget, index ) => (
-			<WidgetChrome
+			<div
 				key={ widget.uuid }
-				widget={ widget }
-				index={ index }
-			/>
+				className={ clsx( styles.tile, {
+					[ styles.tileEditMode ]: editMode,
+				} ) }
+				tabIndex={ editMode ? 0 : undefined }
+			>
+				<WidgetChrome widget={ widget } index={ index } />
+			</div>
 		) );
 
 		const sharedProps = {
