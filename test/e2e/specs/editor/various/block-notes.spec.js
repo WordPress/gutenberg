@@ -1895,6 +1895,37 @@ test.describe( 'Block Notes', () => {
 			// stays selected and the trigger stays mounted.
 			await expect( thread ).toHaveAttribute( 'aria-expanded', 'true' );
 		} );
+
+		test( 'Frimousse popover wraps tightly to the picker width', async ( {
+			page,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Testing tight popover layout' },
+				comment: 'Tight layout',
+			} );
+
+			await page.getByRole( 'button', { name: 'More emojis' } ).click();
+			await blockNoteUtils.waitForFrimoussePicker();
+
+			const popover = page.locator(
+				'.editor-collab-sidebar-panel__frimousse-popover'
+			);
+			const picker = page.locator(
+				'.editor-collab-sidebar-panel__frimousse'
+			);
+
+			const popoverBox = await popover.boundingBox();
+			const pickerBox = await picker.boundingBox();
+
+			// Popover wrapper must wrap tightly to the picker. If the
+			// popover is wider, the surface background renders as a
+			// visible band beside the picker.
+			expect(
+				Math.abs( popoverBox.width - pickerBox.width )
+			).toBeLessThanOrEqual( 1 );
+		} );
 	} );
 } );
 

@@ -328,13 +328,9 @@ mark.wp-note {
 	}
 }
 
-// Class is applied via `Dropdown`'s `contentClassName`, which lands
-// on `.components-popover__content` itself — so style the class
-// directly rather than nesting through `.components-popover__content`.
-.editor-collab-sidebar-panel__add-reaction-popover {
-	padding: $grid-unit-10;
-	min-width: 40px;
-}
+// Curated picker uses Dropdown's default `.components-popover__content`
+// padding (8px) for breathing room around the listbox; no extra rule
+// needed.
 
 .editor-collab-sidebar-panel__emoji-picker {
 	display: flex;
@@ -348,19 +344,31 @@ mark.wp-note {
 	justify-content: center;
 }
 
-// Frimousse popover: anchor a fixed-size picker surface with WPDS surface
-// tokens so it visually matches the WPDS toolbar/menu surfaces nearby.
+// Frimousse popover: width is driven by the picker itself (below) so the
+// popover wrapper fits its content via Popover's default
+// `width: min-content`. Setting width on the wrapper instead leaves
+// horizontal slack between the picker and the popover edge.
+//
+// `contentClassName` from `Dropdown` lands on the outer
+// `.components-popover` wrapper. The inner `.components-popover__content`
+// is where the visible surface and Dropdown's default 8px padding live —
+// override that here with a higher-specificity selector so the Frimousse
+// picker can manage its own internal padding (search margin, viewport
+// padding-inline, list padding-bottom) without an extra ring of empty
+// surface around it.
 .editor-collab-sidebar-panel__frimousse-popover {
-	width: var(--wpds-dimension-surface-width-md);
-	padding: 0;
-	border-radius: var(--wpds-border-radius-md);
-	box-shadow: var(--wpds-elevation-md);
-	background-color: var(--wpds-color-bg-surface-neutral-weak);
+	.components-popover__content {
+		padding: 0;
+		border-radius: var(--wpds-border-radius-md);
+		box-shadow: var(--wpds-elevation-md);
+		background-color: var(--wpds-color-bg-surface-neutral-weak);
+	}
 }
 
 .editor-collab-sidebar-panel__frimousse {
 	display: flex;
 	flex-direction: column;
+	width: var(--wpds-dimension-surface-width-md);
 	height: 320px;
 	font-family: var(--wpds-typography-font-family-body);
 	font-size: var(--wpds-typography-font-size-sm);
