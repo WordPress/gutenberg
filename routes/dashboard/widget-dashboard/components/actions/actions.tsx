@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useCallback } from '@wordpress/element';
+import { useCallback, useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 // eslint-disable-next-line @wordpress/use-recommended-components
 import { Button, Stack } from '@wordpress/ui';
@@ -9,6 +9,7 @@ import { Button, Stack } from '@wordpress/ui';
 /**
  * Internal dependencies
  */
+import styles from './actions.module.css';
 import { useDashboardInternalContext } from '../../context/dashboard-context';
 
 /**
@@ -24,6 +25,29 @@ import { useDashboardInternalContext } from '../../context/dashboard-context';
  */
 export function Actions(): React.ReactNode {
 	const { editMode, onEditChange } = useDashboardInternalContext();
+	const [ isEditActionsMounted, setIsEditActionsMounted ] =
+		useState( editMode );
+	const [ isExitingEditActions, setIsExitingEditActions ] = useState( false );
+
+	useEffect( () => {
+		if ( editMode ) {
+			setIsEditActionsMounted( true );
+			setIsExitingEditActions( false );
+			return;
+		}
+
+		if ( ! isEditActionsMounted ) {
+			return;
+		}
+
+		setIsExitingEditActions( true );
+		const exitTimeout = setTimeout( () => {
+			setIsEditActionsMounted( false );
+			setIsExitingEditActions( false );
+		}, 220 );
+
+		return () => clearTimeout( exitTimeout );
+	}, [ editMode, isEditActionsMounted ] );
 
 	const handleEditMode = useCallback( () => {
 		onEditChange?.( ! editMode );
@@ -52,8 +76,16 @@ export function Actions(): React.ReactNode {
 
 	return (
 		<Stack direction="row" gap="sm">
-			{ editMode ? (
-				<>
+			{ isEditActionsMounted ? (
+				<Stack
+					direction="row"
+					gap="sm"
+					className={
+						isExitingEditActions
+							? styles.editActionsExit
+							: styles.editActionsEnter
+					}
+				>
 					<Button
 						variant="minimal"
 						tone="brand"
@@ -78,7 +110,7 @@ export function Actions(): React.ReactNode {
 					>
 						{ __( 'Done' ) }
 					</Button>
-				</>
+				</Stack>
 			) : (
 				<Button
 					variant="outline"
