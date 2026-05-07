@@ -1086,13 +1086,7 @@ describe( 'actions', () => {
 			expect( scaledItems ).toHaveLength( 0 );
 		} );
 
-		// Regression coverage for the `-scaled` filename bug:
-		// when the server returned an attachment whose filename already
-		// carried `-scaled` (because a prior step had scaled the main file),
-		// every sub-size inherited the suffix — producing names like
-		// `IMG_2300-scaled-150x150.jpg`. Sub-sizes must be derived from
-		// the un-suffixed basename instead.
-		it( 'should strip -scaled from attachment.filename when naming thumbnail sideloads', async () => {
+		it( 'should derive sub-size names from attachment.filename', async () => {
 			mockCreateImageBitmap( 4000, 3000 );
 
 			unlock( registry.dispatch( uploadStore ) ).updateSettings( {
@@ -1104,7 +1098,7 @@ describe( 'actions', () => {
 			} );
 
 			const item = await setupItemForThumbnailGeneration( {
-				attachment: { filename: 'IMG_2300-scaled.jpg' },
+				attachment: { filename: 'IMG_2300.jpg' },
 			} );
 			await unlock( registry.dispatch( uploadStore ) ).generateThumbnails(
 				item.id
@@ -1125,8 +1119,11 @@ describe( 'actions', () => {
 			}
 		} );
 
-		it( 'should strip -scaled from attachment.filename when naming the scaled sideload', async () => {
-			mockCreateImageBitmap( 4000, 3000 );
+		// Regression coverage: a user-supplied filename that legitimately
+		// ends in `-scaled` (e.g., `foo-scaled.jpg`) must be passed through
+		// unchanged. Sub-sizes use the server-returned filename verbatim.
+		it( 'should preserve a `-scaled` suffix that is part of the original filename', async () => {
+			mockCreateImageBitmap( 800, 600 );
 
 			unlock( registry.dispatch( uploadStore ) ).updateSettings( {
 				bigImageSizeThreshold: 2560,
@@ -1137,41 +1134,9 @@ describe( 'actions', () => {
 
 			const item = await setupItemForThumbnailGeneration( {
 				attachment: {
-					filename: 'IMG_2300-scaled.jpg',
+					filename: 'foo-scaled.jpg',
 					missing_image_sizes: [ 'thumbnail' ],
 				},
-			} );
-			await unlock( registry.dispatch( uploadStore ) ).generateThumbnails(
-				item.id
-			);
-
-			const allItems = unlock(
-				registry.select( uploadStore )
-			).getAllItems();
-
-			const scaledItems = allItems.filter(
-				( i ) => i.additionalData?.image_size === 'scaled'
-			);
-			expect( scaledItems ).toHaveLength( 1 );
-			// vipsResizeImage adds the single `-scaled` suffix when running
-			// the ResizeCrop operation; the file enters the queue under the
-			// un-suffixed basename so we don't end up with `-scaled-scaled`.
-			expect( scaledItems[ 0 ].file.name ).toBe( 'IMG_2300.jpg' );
-		} );
-
-		it( 'should preserve un-suffixed attachment.filename for thumbnails', async () => {
-			mockCreateImageBitmap( 800, 600 );
-
-			unlock( registry.dispatch( uploadStore ) ).updateSettings( {
-				bigImageSizeThreshold: 2560,
-				allImageSizes: {
-					thumbnail: { width: 150, height: 150 },
-					medium: { width: 300, height: 300 },
-				},
-			} );
-
-			const item = await setupItemForThumbnailGeneration( {
-				attachment: { filename: 'photo.jpg' },
 			} );
 			await unlock( registry.dispatch( uploadStore ) ).generateThumbnails(
 				item.id
@@ -1186,7 +1151,7 @@ describe( 'actions', () => {
 			);
 			expect( sideloads.length ).toBeGreaterThan( 0 );
 			for ( const sideload of sideloads ) {
-				expect( sideload.file.name ).toBe( 'photo.jpg' );
+				expect( sideload.file.name ).toBe( 'foo-scaled.jpg' );
 			}
 		} );
 	} );

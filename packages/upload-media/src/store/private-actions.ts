@@ -13,12 +13,7 @@ type WPDataRegistry = ReturnType< typeof createRegistry >;
 /**
  * Internal dependencies
  */
-import {
-	cloneFile,
-	convertBlobToFile,
-	renameFile,
-	stripScaledSuffix,
-} from '../utils';
+import { cloneFile, convertBlobToFile, renameFile } from '../utils';
 import { canvasConvertToJpeg } from '../canvas-utils';
 import { isClientSideMediaSupported } from '../feature-detection';
 import { CLIENT_SIDE_SUPPORTED_MIME_TYPES, HEIC_MIME_TYPES } from './constants';
@@ -1144,15 +1139,8 @@ export function generateThumbnails( id: QueueItemId ) {
 				attachment.missing_image_sizes as string[];
 
 			const thumbnailSource = item.sourceFile;
-			// Strip any `-scaled` suffix from the attachment filename so
-			// sub-size names are derived from the original basename. This
-			// matches WordPress core's wp_create_image_subsizes() naming,
-			// where only the scaled-down full-size copy carries `-scaled`.
-			const subSizeFilename = attachment.filename
-				? stripScaledSuffix( attachment.filename )
-				: null;
-			const file = subSizeFilename
-				? renameFile( thumbnailSource, subSizeFilename )
+			const file = attachment.filename
+				? renameFile( thumbnailSource, attachment.filename )
 				: thumbnailSource;
 			const batchId = uuidv4();
 
@@ -1250,11 +1238,9 @@ export function generateThumbnails( id: QueueItemId ) {
 					bitmap.close();
 
 					if ( needsScaling ) {
-						// Use the un-suffixed filename so vipsResizeImage adds
-						// a single `-scaled` suffix to produce e.g.
-						// `IMG_2300-scaled.jpg` (rather than `-scaled-scaled`).
-						const sourceForScaled = subSizeFilename
-							? renameFile( thumbnailSource, subSizeFilename )
+						// Rename sourceFile to match the server attachment filename.
+						const sourceForScaled = attachment.filename
+							? renameFile( thumbnailSource, attachment.filename )
 							: thumbnailSource;
 
 						// Add scaling to queue.
