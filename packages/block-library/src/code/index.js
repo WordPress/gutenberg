@@ -47,7 +47,7 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
 	settings[ fieldsKey ] = [
 		{
 			id: 'content',
-			label: __( 'Code' ),
+			label: __( 'Preformatted Code' ),
 			type: 'text',
 			Edit: 'rich-text', // TODO: replace with custom component
 		},

@@ -3,9 +3,9 @@
 	"apiVersion": 3,
 	"name": "core/html",
 	"title": "Custom HTML",
-	"category": "widgets",
+	"category": "text",
 	"description": "Add custom HTML code and preview it as you edit.",
-	"keywords": [ "embed" ],
+	"keywords": [ "embed", "code" ],
 	"textdomain": "default",
 	"attributes": {
 		"content": {
