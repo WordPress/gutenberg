@@ -5,11 +5,6 @@ import type { DropdownMenu } from '../dropdown-menu';
 export type ResetAllFilter = ( attributes?: any ) => any;
 type ResetAll = ( filters?: ResetAllFilter[] ) => void;
 
-export type ToolsPanelVisibility = {
-	shown: string[];
-	hidden: string[];
-};
-
 export type ToolsPanelProps = {
 	/**
 	 * The child elements.
@@ -40,10 +35,6 @@ export type ToolsPanelProps = {
 	 * for the panel's dropdown menu.
 	 */
 	label: string;
-	/**
-	 * Called when `ToolsPanelItem` visibility changes.
-	 */
-	onVisibilityChange?: ( visibility: ToolsPanelVisibility ) => void;
 	/**
 	 * If a `panelId` is set, it is passed through the `ToolsPanelContext` and
 	 * used to restrict panel items. When a `panelId` is set, items can only
