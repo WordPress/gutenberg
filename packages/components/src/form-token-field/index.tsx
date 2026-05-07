@@ -413,7 +413,11 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 	}
 
 	function handleCommaKey() {
-		if ( inputHasValidValue() ) {
+		if (
+			inputHasValidValue() &&
+			( ! __experimentalValidateInput ||
+				__experimentalValidateInput( incompleteTokenValue ) )
+		) {
 			addNewToken( incompleteTokenValue );
 		}
 
@@ -461,7 +465,11 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 		if ( selectedSuggestion ) {
 			addNewToken( selectedSuggestion );
 			preventDefault = true;
-		} else if ( inputHasValidValue() ) {
+		} else if (
+			inputHasValidValue() &&
+			( ! __experimentalValidateInput ||
+				__experimentalValidateInput( incompleteTokenValue ) )
+		) {
 			addNewToken( incompleteTokenValue );
 			preventDefault = true;
 		}
