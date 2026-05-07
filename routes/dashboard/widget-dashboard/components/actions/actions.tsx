@@ -113,8 +113,8 @@ export function Actions(): React.ReactNode {
 					<AlertDialog.Root
 						open={ isResetDialogOpen }
 						onOpenChange={ setIsResetDialogOpen }
-						onConfirm={ () => {
-							onLayoutReset?.();
+						onConfirm={ async () => {
+							await onLayoutReset?.();
 							onEditChange?.( false );
 							setIsResetDialogOpen( false );
 						} }
@@ -123,7 +123,7 @@ export function Actions(): React.ReactNode {
 							intent="irreversible"
 							title={ __( 'Reset dashboard to default?' ) }
 							description={ __(
-								'Your customized layout will be replaced with the default. This cannot be undone.'
+								'All customizations will be permanently lost.'
 							) }
 							confirmButtonText={ __( 'Reset' ) }
 						/>
