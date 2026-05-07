@@ -185,6 +185,10 @@ function CropperInner(
 	// positioning context for image/stencil/handles — inset from the root
 	// by the handle gutter, so crop math operates on the reduced box.
 	const canvasRef = useRef< HTMLDivElement >( null );
+	// Keep the accessible crop-area focus target separate from the visual
+	// canvas so VoiceOver can move between it and the resize handles as
+	// sibling focus stops, rather than a parent/child focus transition.
+	const cropAreaRef = useRef< HTMLDivElement >( null );
 	const cropAreaDescriptionId = useId();
 	const [ isCropAreaFocused, setIsCropAreaFocused ] =
 		useState( focusOnMount );
@@ -195,7 +199,7 @@ function CropperInner(
 
 	useLayoutEffect( () => {
 		if ( focusOnMount ) {
-			canvasRef.current?.focus( { preventScroll: true } );
+			cropAreaRef.current?.focus( { preventScroll: true } );
 		}
 	}, [ focusOnMount ] );
 
@@ -213,26 +217,6 @@ function CropperInner(
 			if ( event.target === event.currentTarget ) {
 				setIsCropAreaFocused( false );
 			}
-		},
-		[]
-	);
-
-	// Ensure focus returns to the crop area when Shift+Tab is pressed on the first resize handle.
-	const handleCropAreaKeyDownCapture = useCallback(
-		( event: React.KeyboardEvent< HTMLDivElement > ) => {
-			if ( event.key !== 'Tab' || ! event.shiftKey ) {
-				return;
-			}
-
-			const firstHandle = event.currentTarget.querySelector(
-				'.wp-media-editor-image-editor__handle'
-			);
-			if ( event.target !== firstHandle ) {
-				return;
-			}
-
-			event.preventDefault();
-			canvasRef.current?.focus( { preventScroll: true } );
 		},
 		[]
 	);
@@ -463,9 +447,10 @@ function CropperInner(
 		isInteractiveGrid &&
 		( isInteractionPlacementActive || isResizing || isPlacementActive );
 
-	const handleStencilEscape = useCallback( () => {
-		canvasRef.current?.focus( { preventScroll: true } );
-	}, [] );
+	const handleStencilEscape = useCallback(
+		() => cropAreaRef.current?.focus( { preventScroll: true } ),
+		[]
+	);
 
 	const handleResizeStart = useCallback( () => {
 		isResizingRef.current = true;
@@ -572,11 +557,10 @@ function CropperInner(
 			) }
 		>
 			{ /*
-			 * The canvas is the interactive, inset surface. Handles and
-			 * the ARIA role/tabIndex live here so pointer geometry
+			 * The canvas is the interactive, inset surface. Pointer geometry
 			 * (getBoundingClientRect on e.currentTarget) resolves against
-			 * the same box that crop math uses. The root stays as the
-			 * clipping shell for the dimming overlay's box-shadow.
+			 * this box for crop math. The root stays as the clipping shell
+			 * for the dimming overlay's box-shadow.
 			 *
 			 * Not role="application" — that disables the screen reader's
 			 * normal keyboard interception, too heavy-handed for a single
@@ -593,24 +577,29 @@ function CropperInner(
 						'wp-media-editor-image-editor__canvas--show-grid',
 					settling && 'wp-media-editor-image-editor__canvas--settling'
 				) }
-				tabIndex={ 0 }
-				role="group"
-				aria-label={ __( 'Crop area' ) }
-				aria-describedby={
-					isCropAreaFocused ? cropAreaDescriptionId : undefined
-				}
-				onFocus={ handleCropAreaFocus }
-				onBlur={ handleCropAreaBlur }
-				onKeyDownCapture={ handleCropAreaKeyDownCapture }
+				data-testid="cropper-canvas"
 				{ ...handlers }
 			>
 				<div
-					id={ cropAreaDescriptionId }
-					style={ VISUALLY_HIDDEN_STYLE }
+					ref={ cropAreaRef }
+					className="wp-media-editor-image-editor__crop-area"
+					tabIndex={ 0 }
+					role="group"
+					aria-label={ __( 'Crop area' ) }
+					aria-describedby={
+						isCropAreaFocused ? cropAreaDescriptionId : undefined
+					}
+					onFocus={ handleCropAreaFocus }
+					onBlur={ handleCropAreaBlur }
 				>
-					{ __(
-						'When this area is focused, use arrow keys to move the image and plus or minus to zoom. Tab to resize handles and controls.'
-					) }
+					<div
+						id={ cropAreaDescriptionId }
+						style={ VISUALLY_HIDDEN_STYLE }
+					>
+						{ __(
+							'When this area is focused, use arrow keys to move the image and plus or minus to zoom. Tab to resize handles and controls.'
+						) }
+					</div>
 				</div>
 				{ /*
 				 * The stage is an inner full-size div that receives the

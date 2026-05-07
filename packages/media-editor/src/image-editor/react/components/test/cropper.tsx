@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { act, fireEvent, render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 /**
  * Internal dependencies
@@ -116,7 +117,7 @@ describe( 'Cropper', () => {
 
 		await screen.findByTestId( GRID_TEST_ID );
 
-		const canvas = screen.getByRole( 'group', { name: 'Crop area' } );
+		const canvas = screen.getByTestId( 'cropper-canvas' );
 		expect( canvas ).not.toHaveClass( GRID_INTERACTIVE_CLASS );
 		expect( canvas ).not.toHaveClass( SHOW_GRID_CLASS );
 	} );
@@ -166,6 +167,7 @@ describe( 'Cropper', () => {
 	} );
 
 	it( 'returns focus to the crop area on Shift+Tab from the first resize handle', async () => {
+		const user = userEvent.setup();
 		render(
 			<Cropper
 				src="test.jpg"
@@ -186,7 +188,7 @@ describe( 'Cropper', () => {
 		} );
 		expect( handle ).toHaveFocus();
 
-		fireEvent.keyDown( handle, { key: 'Tab', shiftKey: true } );
+		await user.tab( { shift: true } );
 
 		expect( canvas ).toHaveFocus();
 	} );
@@ -203,7 +205,7 @@ describe( 'Cropper', () => {
 
 		await screen.findByTestId( GRID_TEST_ID );
 
-		const canvas = screen.getByRole( 'group', { name: 'Crop area' } );
+		const canvas = screen.getByTestId( 'cropper-canvas' );
 		expect( canvas ).toHaveClass( GRID_INTERACTIVE_CLASS );
 		expect( canvas ).not.toHaveClass( SHOW_GRID_CLASS );
 	} );
@@ -221,7 +223,7 @@ describe( 'Cropper', () => {
 
 		await screen.findByTestId( GRID_TEST_ID );
 
-		const canvas = screen.getByRole( 'group', { name: 'Crop area' } );
+		const canvas = screen.getByTestId( 'cropper-canvas' );
 		expect( canvas ).toHaveClass( GRID_INTERACTIVE_CLASS );
 		expect( canvas ).toHaveClass( SHOW_GRID_CLASS );
 	} );
