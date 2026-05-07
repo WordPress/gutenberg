@@ -157,6 +157,7 @@ function BlockPattern( {
 									<Text
 										render={ <div /> }
 										className="block-editor-block-patterns-list__item-title"
+										variant="body-sm"
 									>
 										{ pattern.title }
 									</Text>
