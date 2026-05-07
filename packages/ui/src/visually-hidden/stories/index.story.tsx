@@ -8,7 +8,7 @@ const meta: Meta< typeof VisuallyHidden > = {
 	component: VisuallyHidden,
 	parameters: {
 		componentStatus: {
-			status: 'stable',
+			status: 'recommended',
 			whereUsed: 'global',
 		},
 	},

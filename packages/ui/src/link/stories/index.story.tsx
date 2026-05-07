@@ -9,7 +9,7 @@ const meta: Meta< typeof Link > = {
 	tags: [ 'manifest' ],
 	parameters: {
 		componentStatus: {
-			status: 'stable',
+			status: 'recommended',
 			whereUsed: 'global',
 		},
 	},

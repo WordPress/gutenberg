@@ -35,7 +35,7 @@ const meta: Meta< typeof Card.Root > = {
 	},
 	parameters: {
 		componentStatus: {
-			status: 'stable',
+			status: 'recommended',
 			whereUsed: 'global',
 		},
 	},

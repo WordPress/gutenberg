@@ -36,7 +36,7 @@ const meta: Meta< typeof CollapsibleCard.Root > = {
 	},
 	parameters: {
 		componentStatus: {
-			status: 'stable',
+			status: 'recommended',
 			whereUsed: 'global',
 		},
 	},

@@ -7,7 +7,7 @@ const meta: Meta< typeof Stack > = {
 	component: Stack,
 	parameters: {
 		componentStatus: {
-			status: 'stable',
+			status: 'recommended',
 			whereUsed: 'global',
 		},
 	},

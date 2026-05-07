@@ -8,7 +8,7 @@ const meta: Meta< typeof Badge > = {
 	component: Badge,
 	parameters: {
 		componentStatus: {
-			status: 'stable',
+			status: 'recommended',
 			whereUsed: 'global',
 		},
 	},

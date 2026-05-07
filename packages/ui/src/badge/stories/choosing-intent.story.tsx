@@ -15,7 +15,7 @@ const meta: Meta< typeof Badge > = {
 	parameters: {
 		controls: { disable: true },
 		componentStatus: {
-			status: 'stable',
+			status: 'recommended',
 			whereUsed: 'global',
 		},
 	},

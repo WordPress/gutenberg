@@ -16,7 +16,7 @@ const meta: Meta< typeof EmptyState.Root > = {
 	},
 	parameters: {
 		componentStatus: {
-			status: 'stable',
+			status: 'recommended',
 			whereUsed: 'global',
 		},
 	},

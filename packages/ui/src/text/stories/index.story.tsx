@@ -8,7 +8,7 @@ const meta: Meta< typeof Text > = {
 	component: Text,
 	parameters: {
 		componentStatus: {
-			status: 'stable',
+			status: 'recommended',
 			whereUsed: 'global',
 		},
 	},

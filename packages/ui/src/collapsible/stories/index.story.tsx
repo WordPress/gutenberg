@@ -12,7 +12,7 @@ const meta: Meta< typeof Collapsible.Root > = {
 	},
 	parameters: {
 		componentStatus: {
-			status: 'stable',
+			status: 'recommended',
 			whereUsed: 'global',
 		},
 	},
