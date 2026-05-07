@@ -43,7 +43,18 @@ export function Inserter() {
 
 	return (
 		<Dialog.Root open={ inserterOpen } onOpenChange={ setInserterOpen }>
-			<Dialog.Popup size="large">
+			<Dialog.Popup
+				size="large"
+				portal={
+					<Dialog.Portal
+						style={
+							{
+								'--wp-ui-dialog-z-index': 99999,
+							} as React.CSSProperties
+						}
+					/>
+				}
+			>
 				<Dialog.Header>
 					<Dialog.Title>{ __( 'Add widget' ) }</Dialog.Title>
 					<Dialog.CloseIcon />
