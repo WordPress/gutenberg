@@ -98,38 +98,35 @@ export function Actions(): React.ReactNode {
 					</Button>
 				</>
 			) : (
-				<>
-					<Button
-						variant="outline"
-						tone="brand"
-						size="compact"
-						onClick={ handleEditMode }
-					>
-						{ __( 'Customize' ) }
-					</Button>
-
-					<MoreActionsDropdown items={ moreActionsItems } />
-
-					<AlertDialog.Root
-						open={ isResetDialogOpen }
-						onOpenChange={ setIsResetDialogOpen }
-						onConfirm={ async () => {
-							await onLayoutReset?.();
-							onEditChange?.( false );
-							setIsResetDialogOpen( false );
-						} }
-					>
-						<AlertDialog.Popup
-							intent="irreversible"
-							title={ __( 'Reset dashboard to default?' ) }
-							description={ __(
-								'All customizations will be permanently lost.'
-							) }
-							confirmButtonText={ __( 'Reset' ) }
-						/>
-					</AlertDialog.Root>
-				</>
+				<Button
+					variant="outline"
+					tone="brand"
+					size="compact"
+					onClick={ handleEditMode }
+				>
+					{ __( 'Customize' ) }
+				</Button>
 			) }
+			<MoreActionsDropdown items={ moreActionsItems } />
+
+			<AlertDialog.Root
+				open={ isResetDialogOpen }
+				onOpenChange={ setIsResetDialogOpen }
+				onConfirm={ async () => {
+					await onLayoutReset?.();
+					onEditChange?.( false );
+					setIsResetDialogOpen( false );
+				} }
+			>
+				<AlertDialog.Popup
+					intent="irreversible"
+					title={ __( 'Reset dashboard to default?' ) }
+					description={ __(
+						'All customizations will be permanently lost.'
+					) }
+					confirmButtonText={ __( 'Reset' ) }
+				/>
+			</AlertDialog.Root>
 		</Stack>
 	);
 }
