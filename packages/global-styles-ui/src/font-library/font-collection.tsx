@@ -46,7 +46,7 @@ import type {
  */
 import { FontLibraryContext } from './context';
 import FontCard from './font-card';
-import filterFonts from './utils/filter-fonts';
+import filterFonts, { type VariantCountRange } from './utils/filter-fonts';
 import { toggleFont } from './utils/toggleFont';
 import {
 	getFontsOutline,
@@ -87,6 +87,7 @@ function FontCollection( { slug }: { slug: string } ) {
 	const [ filters, setFilters ] = useState< {
 		category?: string;
 		search?: string;
+		variantCount?: VariantCountRange;
 	} >( {} );
 	const [ renderConfirmDialog, setRenderConfirmDialog ] = useState(
 		requiresPermission && ! getGoogleFontsPermissionFromStorage()
@@ -147,6 +148,14 @@ function FontCollection( { slug }: { slug: string } ) {
 
 	const handleCategoryFilter = ( category: string ) => {
 		setFilters( { ...filters, category } );
+		setPage( 1 );
+	};
+
+	const handleVariantCountFilter = ( variantCount: string ) => {
+		setFilters( {
+			...filters,
+			variantCount: variantCount as VariantCountRange,
+		} );
 		setPage( 1 );
 	};
 
@@ -326,6 +335,42 @@ function FontCollection( { slug }: { slug: string } ) {
 											</option>
 										) ) }
 								</SelectControl>
+								<SelectControl
+									__next40pxDefaultSize
+									label={ __( 'Variants' ) }
+									value={ filters.variantCount ?? '' }
+									onChange={ handleVariantCountFilter }
+									options={ [
+										{
+											label: _x(
+												'Any',
+												'font styles count filter'
+											),
+											value: '',
+										},
+										{
+											label: _x(
+												'1–3',
+												'font styles count range'
+											),
+											value: '1-3',
+										},
+										{
+											label: _x(
+												'4–9',
+												'font styles count range'
+											),
+											value: '4-9',
+										},
+										{
+											label: _x(
+												'10+',
+												'font styles count range'
+											),
+											value: '10+',
+										},
+									] }
+								/>
 							</HStack>
 
 							<Spacer margin={ 4 } />
