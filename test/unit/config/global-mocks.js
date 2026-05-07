@@ -13,11 +13,17 @@ import timezoneMock from 'timezone-mock';
  *
  * @see https://github.com/WordPress/gutenberg/issues/78005
  */
+const OriginalDate = globalThis.Date;
 timezoneMock.options( {
-	fallbackFn: ( p ) =>
-		new timezoneMock._Date(
-			typeof p?.valueOf === 'function' ? p.valueOf() : p
-		),
+	fallbackFn: ( p ) => {
+		if ( p instanceof OriginalDate ) {
+			return new timezoneMock._Date( p.valueOf() );
+		}
+		// Re-raise the original assertion behavior for unsupported shapes.
+		throw new Error(
+			`Unhandled type passed to MockDate constructor: ${ typeof p }`
+		);
+	},
 } );
 
 // ESLint v10's RuleTester uses structuredClone, which is not available in
