@@ -317,19 +317,28 @@ export function AddReactionButton( { disabled = false, onToggleReaction } ) {
  * Sibling of AddReactionButton; not nested inside it so the curated and
  * full picker popovers never conflict.
  *
+ * Renders nothing when `window.gutenbergEmojibaseUrl` is unset — the
+ * Gutenberg plugin sets it via PHP, but npm consumers of @wordpress/editor
+ * must opt in by providing a URL pointing at a self-hosted emojibase
+ * dataset. We hide the trigger rather than fall through to Frimousse's
+ * default jsdelivr CDN.
+ *
  * @param {Object}   props                  Component props.
  * @param {Function} props.onToggleReaction Callback to toggle a reaction.
  */
 export function MoreEmojiButton( { onToggleReaction } ) {
 	const [ isOpen, setIsOpen ] = useState( false );
 	const emojis = useReactionEmojis();
+	if ( typeof window === 'undefined' || ! window.gutenbergEmojibaseUrl ) {
+		return null;
+	}
 	return (
 		<Menu placement="bottom-end" open={ isOpen } onOpenChange={ setIsOpen }>
 			<Menu.TriggerButton
 				render={
 					<Button
 						size="compact"
-						className="editor-collab-sidebar-panel__add-reaction-button"
+						className="editor-collab-sidebar-panel__more-reaction-button"
 						icon={ plusIcon }
 						label={ __( 'More emojis' ) }
 					/>
