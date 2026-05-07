@@ -10,6 +10,7 @@ import type { ComponentType, ReactNode } from 'react';
 /**
  * WordPress dependencies
  */
+import type { IconType } from '@wordpress/components';
 import type { Field } from '@wordpress/dataviews';
 import type { DashboardGridLayoutItem } from '@wordpress/grid';
 
@@ -71,11 +72,9 @@ export interface WidgetTypeMetadata {
 	description?: string;
 
 	/**
-	 * Visual identifier. In `widget.json` this is a Dashicon slug string;
-	 * widgets registered in JS may also pass a React node (an
-	 * `@wordpress/icons` SVG component, or any element).
+	 * Visual identifier shown in the widget header; dashicon string, React node, or SVG component.
 	 */
-	icon?: string | ReactNode;
+	icon?: IconType;
 
 	/**
 	 * Grouping category. Core provides `dashboard`; plugins and themes may
