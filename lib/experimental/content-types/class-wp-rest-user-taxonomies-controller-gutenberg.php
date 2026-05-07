@@ -436,11 +436,18 @@ class WP_REST_User_Taxonomies_Controller_Gutenberg extends WP_REST_Posts_Control
 	 * regenerated. Triggers on:
 	 *   - status crossing the `publish` boundary in either direction
 	 *     (registration toggles on next `init`),
-	 *   - while remaining published, a change in slug or `public` — the
-	 *     two fields that affect the taxonomy's rewrite rules.
+	 *   - while remaining published, a change in slug, `public`, or
+	 *     `publicly_queryable` — the fields that change the rewrite rules
+	 *     `register_taxonomy()` emits. `publicly_queryable` flips
+	 *     `query_var`, which in turn swaps the `add_rewrite_tag` query
+	 *     string between `{slug}=` and `taxonomy={name}&term=`.
 	 *
 	 * Other config edits (labels, hierarchical, show_ui, show_in_rest, etc.)
-	 * don't affect rewrite rules.
+	 * don't affect rewrite rules. `hierarchical` only changes the rewrite
+	 * tag regex when paired with `rewrite['hierarchical'] = true`, which
+	 * `gutenberg_build_user_taxonomy_args()` never sets — `rewrite` is
+	 * left at its `true` default, so `rewrite['hierarchical']` parses to
+	 * false.
 	 *
 	 * @param string  $previous_status Status the record had before update.
 	 * @param string  $previous_slug   Slug before update.
@@ -466,6 +473,19 @@ class WP_REST_User_Taxonomies_Controller_Gutenberg extends WP_REST_Posts_Control
 
 		$current_config = self::decode_stored_config( $current_post->post_content );
 		if ( ! empty( $previous_config['public'] ) !== ! empty( $current_config['public'] ) ) {
+			return true;
+		}
+		// `publicly_queryable` defaults to `public` when omitted from the
+		// stored config, so compare effective values rather than raw flags
+		// — otherwise toggling `publicly_queryable` between "absent (=public)"
+		// and "explicitly equal to public" would trip a no-op flush.
+		$prev_pq = array_key_exists( 'publicly_queryable', $previous_config )
+			? ! empty( $previous_config['publicly_queryable'] )
+			: ! empty( $previous_config['public'] );
+		$curr_pq = array_key_exists( 'publicly_queryable', $current_config )
+			? ! empty( $current_config['publicly_queryable'] )
+			: ! empty( $current_config['public'] );
+		if ( $prev_pq !== $curr_pq ) {
 			return true;
 		}
 

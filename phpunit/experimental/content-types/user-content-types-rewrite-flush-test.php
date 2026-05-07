@@ -573,6 +573,71 @@ class User_Content_Types_Rewrite_Flush_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Toggling publicly_queryable on a published taxonomy schedules a flush.
+	 * `publicly_queryable` flips `register_taxonomy()`'s `query_var`, which
+	 * swaps the `add_rewrite_tag` query string between `{slug}=` and
+	 * `taxonomy={name}&term=` — so the rewrite rules must be regenerated.
+	 */
+	public function test_taxonomy_update_publicly_queryable_schedules_flush() {
+		$data = $this->create_taxonomy(
+			'rwflush_tx_pq',
+			'Tax PQ',
+			array(
+				'public'             => true,
+				'publicly_queryable' => true,
+			)
+		);
+		delete_option( GUTENBERG_USER_CONTENT_TYPES_FLUSH_OPTION );
+
+		$request = new WP_REST_Request( 'PUT', self::TAXONOMIES_BASE . '/' . $data['id'] );
+		$request->set_body_params(
+			array(
+				'config' => array(
+					'public'             => true,
+					'publicly_queryable' => false,
+				),
+			)
+		);
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertSame( 200, $response->get_status() );
+
+		$this->assert_flush_scheduled( 'Toggling publicly_queryable on a published taxonomy must schedule a flush.' );
+
+		wp_delete_post( $data['id'], true );
+	}
+
+	/**
+	 * `publicly_queryable` defaults to `public` when omitted from the
+	 * stored config. Going from "absent" to "explicitly equal to public"
+	 * (or vice-versa) leaves the effective value unchanged and must not
+	 * trip a no-op flush.
+	 */
+	public function test_taxonomy_update_publicly_queryable_redundant_does_not_schedule() {
+		$data = $this->create_taxonomy(
+			'rwflush_tx_pqr',
+			'Tax PQ Redundant',
+			array( 'public' => true )
+		);
+		delete_option( GUTENBERG_USER_CONTENT_TYPES_FLUSH_OPTION );
+
+		$request = new WP_REST_Request( 'PUT', self::TAXONOMIES_BASE . '/' . $data['id'] );
+		$request->set_body_params(
+			array(
+				'config' => array(
+					'public'             => true,
+					'publicly_queryable' => true,
+				),
+			)
+		);
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertSame( 200, $response->get_status() );
+
+		$this->assert_flush_not_scheduled( 'Setting publicly_queryable to its implicit default must not schedule a flush.' );
+
+		wp_delete_post( $data['id'], true );
+	}
+
+	/**
 	 * Editing labels-only on a published taxonomy does not schedule.
 	 */
 	public function test_taxonomy_update_irrelevant_field_does_not_schedule() {
