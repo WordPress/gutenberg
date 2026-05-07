@@ -394,20 +394,26 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 						{ ...divProps }
 						ref={ mergedRootRef }
 						className={ clsx( styles.lanes, className ) }
-						style={ {
-							...style,
-							gridTemplateColumns: `repeat(${ effectiveColumns }, minmax(0, 1fr))`,
-							columnGap: gapPx,
-							// Polyfill mode: the algorithm already builds
-							// inter-item vertical spacing into each tile's
-							// `top` (skyline + gap), and the row math maps
-							// 1px → 1/rowUnit grid lines. A non-zero
-							// `row-gap` would compound on top of that and
-							// push tiles off their computed positions.
-							// Native lanes does its own packing, so the
-							// user's gap applies to both axes.
-							rowGap: isPolyfilled ? 0 : gapPx,
-						} }
+						style={
+							{
+								...style,
+								gridTemplateColumns: `repeat(${ effectiveColumns }, minmax(0, 1fr))`,
+								columnGap: gapPx,
+								'--wp-grid-lane-row-unit': `${ Math.max(
+									1,
+									rowUnit
+								) }px`,
+								// Polyfill mode: the algorithm already builds
+								// inter-item vertical spacing into each tile's
+								// `top` (skyline + gap), and the row math maps
+								// 1px → 1/rowUnit grid lines. A non-zero
+								// `row-gap` would compound on top of that and
+								// push tiles off their computed positions.
+								// Native lanes does its own packing, so the
+								// user's gap applies to both axes.
+								rowGap: isPolyfilled ? 0 : gapPx,
+							} as React.CSSProperties
+						}
 					>
 						{ items.map( ( id ) => {
 							const child = childrenMap.get( id );

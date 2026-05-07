@@ -11,7 +11,7 @@
 @supports not (display: grid-lanes) {
 	.lanes {
 		display: grid;
-		grid-auto-rows: var(--wpds-lane-row-unit, 4px);
+		grid-auto-rows: var(--wp-grid-lane-row-unit, 4px);
 		grid-auto-flow: dense;
 	}
 }
