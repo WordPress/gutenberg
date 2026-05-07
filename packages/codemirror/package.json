@@ -1,0 +1,50 @@
+{
+	"name": "@wordpress/codemirror",
+	"version": "0.1.0",
+	"private": true,
+	"description": "CodeMirror 6 bundle and re-exports for WordPress.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"codemirror",
+		"editor"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/codemirror/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/codemirror"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"engines": {
+		"node": ">=18.12.0",
+		"npm": ">=8.19.2"
+	},
+	"module": "build-module/index.mjs",
+	"exports": {
+		".": {
+			"types": "./build-types/index.d.ts",
+			"import": "./build-module/index.mjs"
+		},
+		"./package.json": "./package.json"
+	},
+	"wpScriptModuleExports": "./build-module/index.mjs",
+	"types": "build-types",
+	"dependencies": {
+		"@codemirror/autocomplete": "6.20.1",
+		"@codemirror/commands": "6.10.3",
+		"@codemirror/lang-css": "6.3.1",
+		"@codemirror/lang-html": "6.4.11",
+		"@codemirror/language": "6.12.3",
+		"@codemirror/lint": "6.9.5",
+		"@codemirror/search": "6.7.0",
+		"@codemirror/state": "6.6.0",
+		"@codemirror/view": "6.41.1"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

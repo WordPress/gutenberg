@@ -14,6 +14,7 @@
 		{ "path": "packages/block-serialization-default-parser" },
 		{ "path": "packages/blocks" },
 		{ "path": "packages/boot" },
+		{ "path": "packages/codemirror" },
 		{ "path": "packages/components" },
 		{ "path": "packages/connectors" },
 		{ "path": "packages/content-types" },
