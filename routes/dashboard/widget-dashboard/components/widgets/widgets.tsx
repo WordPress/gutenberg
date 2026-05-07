@@ -19,7 +19,7 @@ import type {
  * Internal dependencies
  */
 import { useDashboardInternalContext } from '../../context/dashboard-context';
-import { WidgetChrome } from '../widget-chrome';
+import { WidgetChrome, WidgetChromeActionableArea } from '../widget-chrome';
 import { WidgetResizeHandle } from './widget-resize-handle';
 import styles from './widgets.module.css';
 import type {
@@ -131,15 +131,20 @@ export const Widgets = forwardRef< HTMLDivElement, WidgetsProps >(
 		);
 
 		const children = layout.map( ( widget, index ) => (
-			<div
+			<WidgetChrome
 				key={ widget.uuid }
+				widget={ widget }
+				index={ index }
 				className={ clsx( styles.tile, {
 					[ styles.tileEditMode ]: editMode,
 				} ) }
 				tabIndex={ editMode ? 0 : undefined }
-			>
-				<WidgetChrome widget={ widget } index={ index } />
-			</div>
+				actionableArea={
+					editMode ? (
+						<WidgetChromeActionableArea widget={ widget } />
+					) : undefined
+				}
+			/>
 		) );
 
 		const renderDragPreview = useCallback(

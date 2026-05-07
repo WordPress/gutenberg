@@ -29,6 +29,13 @@
 	height: 100%;
 }
 
+.widgetChromeActionableArea {
+	position: absolute;
+	top: var(--wpds-dimension-padding-xs);
+	right: var(--wpds-dimension-padding-xs);
+	z-index: 1;
+}
+
 .loading {
 	height: 100%;
 }

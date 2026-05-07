@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import clsx from 'clsx';
 import type { ReactNode } from 'react';
 
 /**
@@ -16,7 +17,6 @@ import {
 	Component,
 	Suspense,
 	forwardRef,
-	useCallback,
 	useId,
 	useMemo,
 } from '@wordpress/element';
@@ -90,8 +90,6 @@ function LoadingOverlay() {
 interface HeaderProps {
 	titleId: string;
 	widgetType: WidgetType;
-	width?: number | 'fill' | 'full';
-	onWidthChange: ( width: WidthMode ) => void;
 }
 
 type WidthMode = 'custom' | 'fill' | 'full';
@@ -108,12 +106,10 @@ const WIDTH_MODE_LABEL = {
 	full: __( 'Full width' ),
 } as const;
 
-function Header( { titleId, widgetType, width, onWidthChange }: HeaderProps ) {
+function Header( { titleId, widgetType }: HeaderProps ) {
 	if ( ! widgetType.title ) {
 		return null;
 	}
-	const selectedWidthMode: WidthMode =
-		typeof width === 'number' ? 'custom' : width ?? 'full';
 	return (
 		<Card.Header>
 			<Stack direction="row" align="center" justify="space-between">
@@ -130,48 +126,6 @@ function Header( { titleId, widgetType, width, onWidthChange }: HeaderProps ) {
 						{ widgetType.title }
 					</Card.Title>
 				</Stack>
-				<Stack direction="row" align="center" gap="xs">
-					<Dropdown
-						popoverProps={ { placement: 'bottom-end' } }
-						renderToggle={ ( { isOpen, onToggle } ) => (
-							<IconButton
-								icon={ WIDTH_MODE_ICON[ selectedWidthMode ] }
-								label={ __( 'Widget width' ) }
-								size="small"
-								variant="minimal"
-								tone="neutral"
-								aria-expanded={ isOpen }
-								onClick={ onToggle }
-							/>
-						) }
-						renderContent={ ( { onClose } ) => (
-							<MenuGroup>
-								{ WIDTH_MODES.map( ( mode ) => (
-									<MenuItem
-										key={ mode }
-										icon={ WIDTH_MODE_ICON[ mode ] }
-										isSelected={
-											selectedWidthMode === mode
-										}
-										onClick={ () => {
-											onWidthChange( mode );
-											onClose();
-										} }
-									>
-										{ WIDTH_MODE_LABEL[ mode ] }
-									</MenuItem>
-								) ) }
-							</MenuGroup>
-						) }
-					/>
-					<IconButton
-						icon={ trash }
-						label={ __( 'Remove' ) }
-						size="small"
-						variant="minimal"
-						tone="neutral"
-					/>
-				</Stack>
 			</Stack>
 		</Card.Header>
 	);
@@ -180,6 +134,100 @@ function Header( { titleId, widgetType, width, onWidthChange }: HeaderProps ) {
 export interface WidgetChromeProps {
 	widget: DashboardWidget< unknown >;
 	index: number;
+	actionableArea?: ReactNode;
+	className?: string;
+	tabIndex?: number;
+}
+
+interface WidgetChromeActionableAreaProps {
+	widget: DashboardWidget< unknown >;
+}
+
+interface HeaderActionsProps {
+	selectedWidthMode: WidthMode;
+	onWidthChange: ( width: WidthMode ) => void;
+}
+
+function HeaderActions( {
+	selectedWidthMode,
+	onWidthChange,
+}: HeaderActionsProps ) {
+	return (
+		<Stack direction="row" align="center" gap="xs">
+			<Dropdown
+				popoverProps={ { placement: 'bottom-end' } }
+				renderToggle={ ( { isOpen, onToggle } ) => (
+					<IconButton
+						icon={ WIDTH_MODE_ICON[ selectedWidthMode ] }
+						label={ __( 'Widget width' ) }
+						size="small"
+						variant="minimal"
+						tone="neutral"
+						aria-expanded={ isOpen }
+						onClick={ onToggle }
+					/>
+				) }
+				renderContent={ ( { onClose } ) => (
+					<MenuGroup>
+						{ WIDTH_MODES.map( ( mode ) => (
+							<MenuItem
+								key={ mode }
+								icon={ WIDTH_MODE_ICON[ mode ] }
+								isSelected={ selectedWidthMode === mode }
+								onClick={ () => {
+									onWidthChange( mode );
+									onClose();
+								} }
+							>
+								{ WIDTH_MODE_LABEL[ mode ] }
+							</MenuItem>
+						) ) }
+					</MenuGroup>
+				) }
+			/>
+			<IconButton
+				icon={ trash }
+				label={ __( 'Remove' ) }
+				size="small"
+				variant="minimal"
+				tone="neutral"
+			/>
+		</Stack>
+	);
+}
+
+export function WidgetChromeActionableArea( {
+	widget,
+}: WidgetChromeActionableAreaProps ) {
+	const { layout, onLayoutChange } = useDashboardInternalContext();
+	const selectedWidthMode: WidthMode =
+		typeof widget.placement?.width === 'number'
+			? 'custom'
+			: widget.placement?.width ?? 'full';
+
+	const onWidthChange = ( nextWidth: WidthMode ) => {
+		const nextLayout = layout.map( ( currentWidget ) =>
+			currentWidget.uuid === widget.uuid
+				? {
+						...currentWidget,
+						placement: {
+							...currentWidget.placement,
+							width: nextWidth === 'custom' ? 1 : nextWidth,
+						},
+				  }
+				: currentWidget
+		);
+		onLayoutChange( nextLayout );
+	};
+
+	return (
+		<div className={ styles.widgetChromeActionableArea }>
+			<HeaderActions
+				selectedWidthMode={ selectedWidthMode }
+				onWidthChange={ onWidthChange }
+			/>
+		</div>
+	);
 }
 
 /**
@@ -189,31 +237,13 @@ export interface WidgetChromeProps {
  * or is still resolving.
  */
 export const WidgetChrome = forwardRef< HTMLDivElement, WidgetChromeProps >(
-	function WidgetChrome( { widget, index }, ref ) {
-		const { widgetTypes, layout, onLayoutChange, editMode } =
-			useDashboardInternalContext();
+	function WidgetChrome(
+		{ widget, index, className, tabIndex },
+		ref
+	) {
+		const { widgetTypes, editMode } = useDashboardInternalContext();
 		const widgetType = widgetTypes.find( ( t ) => t.name === widget.type );
 		const titleId = useId();
-		const width = widget.placement?.width;
-
-		const handleWidthChange = useCallback(
-			( nextWidth: WidthMode ) => {
-				const nextLayout = layout.map( ( currentWidget ) =>
-					currentWidget.uuid === widget.uuid
-						? {
-								...currentWidget,
-								placement: {
-									...currentWidget.placement,
-									width:
-										nextWidth === 'custom' ? 1 : nextWidth,
-								},
-						  }
-						: currentWidget
-				);
-				onLayoutChange( nextLayout );
-			},
-			[ layout, onLayoutChange, widget.uuid ]
-		);
 
 		const contextValue = useMemo(
 			() => ( {
@@ -230,12 +260,7 @@ export const WidgetChrome = forwardRef< HTMLDivElement, WidgetChromeProps >(
 
 		const isFullBleed = widgetType.presentation === 'full-bleed';
 		const header = (
-			<Header
-				titleId={ titleId }
-				widgetType={ widgetType }
-				width={ width }
-				onWidthChange={ handleWidthChange }
-			/>
+			<Header titleId={ titleId } widgetType={ widgetType } />
 		);
 		const body = (
 			<WidgetErrorBoundary>
@@ -250,7 +275,8 @@ export const WidgetChrome = forwardRef< HTMLDivElement, WidgetChromeProps >(
 				<Card.Root
 					render={ <section /> }
 					ref={ ref }
-					className={ styles.widgetChrome }
+					className={ clsx( styles.widgetChrome, className ) }
+					tabIndex={ tabIndex }
 					aria-labelledby={ widgetType.title ? titleId : undefined }
 					{ ...( editMode ? { inert: '' } : {} ) }
 				>
