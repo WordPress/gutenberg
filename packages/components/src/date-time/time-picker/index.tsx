@@ -1,5 +1,5 @@
 import { startOfMinute } from 'date-fns';
-import { useState, useMemo, useEffect } from '@wordpress/element';
+import { useState, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { date as formatDate } from '@wordpress/date';
 import BaseControl from '../../base-control';
@@ -61,11 +61,14 @@ export function TimePicker( {
 		startOfMinute( inputToDate( currentTime ?? new Date() ) )
 	);
 
-	// Reset the state when currentTime changed.
-	// TODO: useEffect() shouldn't be used like this, causes an unnecessary render
-	useEffect( () => {
+	// Reset the state when currentTime changed by storing the previous value
+	// and adjusting state during render. See:
+	// https://react.dev/learn/you-might-not-need-an-effect#adjusting-some-state-when-a-prop-changes
+	const [ prevCurrentTime, setPrevCurrentTime ] = useState( currentTime );
+	if ( currentTime !== prevCurrentTime ) {
+		setPrevCurrentTime( currentTime );
 		setDate( startOfMinute( inputToDate( currentTime ?? new Date() ) ) );
-	}, [ currentTime ] );
+	}
 
 	const monthOptions = [
 		{ value: '01', label: __( 'January' ) },

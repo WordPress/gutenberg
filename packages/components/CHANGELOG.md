@@ -18,6 +18,7 @@
 
 -   Update code to comply with `eslint-plugin-react-hooks` v7 ([#69962](https://github.com/WordPress/gutenberg/pull/69962)).
 -   `SlotFill`: Add dependencies to `updateFill` effect ([#77907](https://github.com/WordPress/gutenberg/pull/77907)).
+-   `TimePicker`: Adjust derived state during render instead of via `useEffect` to avoid an unnecessary render when `currentTime` changes.
 
 ## 33.0.0 (2026-04-29)
 
