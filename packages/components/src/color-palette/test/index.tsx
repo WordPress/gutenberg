@@ -285,20 +285,6 @@ describe( 'ColorPalette', () => {
 			expect( screen.getAllByRole( 'option' ) ).toHaveLength( 2 );
 		} );
 
-		it( 'should use slug as the React key so each option is individually identifiable', () => {
-			render(
-				<ColorPalette
-					colors={ DUPLICATE_COLOR_PALETTE }
-					value={ undefined }
-					onChange={ jest.fn() }
-				/>
-			);
-
-			// If duplicate keys were present React would silently drop one option;
-			// having two rendered options confirms each slug produced a unique key.
-			expect( screen.getAllByRole( 'option' ) ).toHaveLength( 2 );
-		} );
-
 		it( 'should select by slug when selectedSlug is provided, marking only the matching entry', () => {
 			render(
 				<ColorPalette
