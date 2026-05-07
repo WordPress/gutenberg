@@ -304,9 +304,15 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 			}
 
 			const updatedItems = arrayMove( items, currentIndex, newIndex );
+			// Build a key→index lookup so the .map below is O(n)
+			// instead of O(n²) from per-item `indexOf` calls.
+			const orderByKey = new Map< string, number >();
+			updatedItems.forEach( ( key, index ) => {
+				orderByKey.set( key, index );
+			} );
 			const updatedLayout = activeLayout.map( ( item ) => ( {
 				...item,
-				order: updatedItems.indexOf( item.key ),
+				order: orderByKey.get( item.key ) ?? 0,
 			} ) );
 
 			lastReorderCursorRef.current = {
