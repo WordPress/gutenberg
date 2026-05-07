@@ -2,6 +2,16 @@
 	height: 100%;
 }
 
+.widgetChromeEditMode {
+	box-shadow: var(--wpds-elevation-xs);
+}
+
+@media not ( prefers-reduced-motion ) {
+	.widgetChrome {
+		transition: box-shadow 180ms ease;
+	}
+}
+
 .widgetChromeHeaderIcon {
 	display: inline-flex;
 	color: var(--wpds-color-fg-content-neutral-weak);

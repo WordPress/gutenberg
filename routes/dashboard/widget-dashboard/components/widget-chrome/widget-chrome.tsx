@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import clsx from 'clsx';
 import type { ReactNode } from 'react';
 
 /**
@@ -131,7 +132,9 @@ export const WidgetChrome = forwardRef< HTMLDivElement, WidgetChromeProps >(
 				<Card.Root
 					render={ <section /> }
 					ref={ ref }
-					className={ styles.widgetChrome }
+					className={ clsx( styles.widgetChrome, {
+						[ styles.widgetChromeEditMode ]: editMode,
+					} ) }
 					aria-labelledby={ widgetType.title ? titleId : undefined }
 					{ ...( editMode ? { inert: '' } : {} ) }
 				>
