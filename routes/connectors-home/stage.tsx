@@ -4,7 +4,6 @@
 import { Page } from '@wordpress/admin-ui';
 import {
 	Button,
-	Notice,
 	__experimentalHeading as Heading,
 	__experimentalText as WCText,
 	__experimentalVStack as VStack,
@@ -17,6 +16,8 @@ import { useSelect } from '@wordpress/data';
 import { createInterpolateElement } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
+// eslint-disable-next-line @wordpress/use-recommended-components
+import { Notice } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -46,11 +47,11 @@ function ConnectorsPage() {
 				'ai/ai'
 			) as { status: string } | undefined;
 			return {
-			connectors: unlock( select( store ) ).getConnectors(),
+				connectors: unlock( select( store ) ).getConnectors(),
 				canInstallPlugins: coreSelect.canUser( 'create', {
-				kind: 'root',
-				name: 'plugin',
-			} ),
+					kind: 'root',
+					name: 'plugin',
+				} ),
 				isAiPluginActive: aiPlugin?.status === 'active',
 			};
 		},
@@ -112,52 +113,53 @@ function ConnectorsPage() {
 			>
 				{ manualInstallPluginSlugs.length > 0 &&
 					( isFileModsDisabled || ! canInstallPlugins ) && (
-					<Notice
-						status="notice"
-						isDismissible={ false }
-						className="connectors-page__file-mods-notice"
-					>
-							{ isFileModsDisabled ? (
-								<>
-						<p>
-							{ __(
-								'Plugins cannot be installed here due to your site configuration. Install them manually using your normal deployment workflow.'
-							) }
-						</p>
-						<details>
-										<summary>
-											{ __( 'WP-CLI examples' ) }
-										</summary>
-						<ul>
-											{ manualInstallPluginSlugs.map(
-												( slug ) => {
-								const command = `wp plugin install ${ slug } --activate`;
-								return (
-									<li key={ slug }>
-										{ sprintf(
-											/* translators: %s: Plugin slug. */
-											__( '%s:' ),
-											slug
-										) }{ ' ' }
-															<code>
-																{ command }
-															</code>
-									</li>
-								);
-												}
+						<Notice.Root
+							intent="info"
+							className="connectors-page__file-mods-notice"
+						>
+							<Notice.Description>
+								{ isFileModsDisabled ? (
+									<>
+										<p>
+											{ __(
+												'Plugins cannot be installed here due to your site configuration. Install them manually using your normal deployment workflow.'
 											) }
-						</ul>
-						</details>
-								</>
-							) : (
-								<p>
-									{ __(
-										'You do not have permission to install plugins. Please ask a site administrator to install them for you.'
-									) }
-								</p>
-							) }
-					</Notice>
-				) }
+										</p>
+										<details>
+											<summary>
+												{ __( 'WP-CLI examples' ) }
+											</summary>
+											<ul>
+												{ manualInstallPluginSlugs.map(
+													( slug ) => {
+														const command = `wp plugin install ${ slug } --activate`;
+														return (
+															<li key={ slug }>
+																{ sprintf(
+																	/* translators: %s: Plugin slug. */
+																	__( '%s:' ),
+																	slug
+																) }{ ' ' }
+																<code>
+																	{ command }
+																</code>
+															</li>
+														);
+													}
+												) }
+											</ul>
+										</details>
+									</>
+								) : (
+									<p>
+										{ __(
+											'You do not have permission to install plugins. Please ask a site administrator to install them for you.'
+										) }
+									</p>
+								) }
+							</Notice.Description>
+						</Notice.Root>
+					) }
 				{ isEmpty ? (
 					<VStack
 						alignment="center"
@@ -208,19 +210,19 @@ function ConnectorsPage() {
 						</VStack>
 					</VStack>
 				) }
-					<p>
-						{ createInterpolateElement(
-							__(
-								'If the connector you need is not listed, <a>search the plugin directory</a> to see if a connector is available.'
-							),
-							{
-								a: (
-									// eslint-disable-next-line jsx-a11y/anchor-has-content
+				<p>
+					{ createInterpolateElement(
+						__(
+							'If the connector you need is not listed, <a>search the plugin directory</a> to see if a connector is available.'
+						),
+						{
+							a: (
+								// eslint-disable-next-line jsx-a11y/anchor-has-content
 								<a href={ searchUrl } />
-								),
-							}
-						) }
-					</p>
+							),
+						}
+					) }
+				</p>
 			</div>
 		</Page>
 	);
