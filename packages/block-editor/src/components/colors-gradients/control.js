@@ -42,7 +42,6 @@ function ColorGradientControlInner( {
 	onColorChange,
 	onGradientChange,
 	colorValue,
-	colorSlug,
 	gradientValue,
 	clearable,
 	showTitle = true,
@@ -60,19 +59,18 @@ function ColorGradientControlInner( {
 		return null;
 	}
 
-	const colorPaletteOnChange = canChooseAGradient
-		? ( newColor, _index, newSlug ) => {
-				onColorChange( newColor, newSlug );
-				onGradientChange();
-		  }
-		: ( newColor, _index, newSlug ) => onColorChange( newColor, newSlug );
-
 	const tabPanels = {
 		[ TAB_IDS.color ]: (
 			<ColorPalette
 				value={ colorValue }
-				selectedSlug={ colorSlug }
-				onChange={ colorPaletteOnChange }
+				onChange={
+					canChooseAGradient
+						? ( newColor ) => {
+								onColorChange( newColor );
+								onGradientChange();
+						  }
+						: onColorChange
+				}
 				{ ...{ colors, disableCustomColors } }
 				__experimentalIsRenderedInSidebar={
 					__experimentalIsRenderedInSidebar
