@@ -2,11 +2,19 @@
  * External dependencies
  */
 import type { ReactNode } from 'react';
+import fastDeepEqual from 'fast-deep-equal/es6';
 
 /**
  * WordPress dependencies
  */
-import { createContext, useContext, useMemo } from '@wordpress/element';
+import {
+	createContext,
+	useCallback,
+	useContext,
+	useEffect,
+	useMemo,
+	useState,
+} from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -35,12 +43,19 @@ const DEFAULT_RESOLVE_WIDGET_MODULE: ResolveWidgetModule = ( moduleId ) =>
 /**
  * Rich state distributed to every compound component inside `WidgetDashboard`.
  * Internal — compounds reach the full state via `useDashboardInternalContext()`.
+ *
+ * `layout` and `onLayoutChange` here operate on the staging layer, not the
+ * committed prop. Mutations from compound children stay in staging until
+ * `commitLayout` fires `onLayoutChange` on the consumer.
  */
 interface InternalDashboardContextValue {
 	widgetTypes: WidgetType[];
 	layout: DashboardWidget[];
 	onLayoutChange: ( layout: DashboardWidget[] ) => void;
-	onLayoutReset: () => void;
+	onLayoutReset?: () => void;
+	commitLayout: () => void;
+	cancelLayout: () => void;
+	hasUncommittedChanges: boolean;
 	editMode: boolean;
 	onEditChange?: ( next: boolean ) => void;
 	resolveWidgetModule: ResolveWidgetModule;
@@ -68,7 +83,7 @@ interface ProviderProps {
 	widgetTypes: WidgetType[];
 	layout: DashboardWidget[];
 	onLayoutChange: ( layout: DashboardWidget[] ) => void;
-	onLayoutReset: () => void;
+	onLayoutReset?: () => void;
 	editMode?: boolean;
 	onEditChange?: ( next: boolean ) => void;
 	resolveWidgetModule?: ResolveWidgetModule;
@@ -78,7 +93,7 @@ interface ProviderProps {
 
 export function WidgetDashboardProvider( {
 	widgetTypes,
-	layout,
+	layout: committedLayout,
 	onLayoutChange,
 	onLayoutReset,
 	editMode = false,
@@ -87,12 +102,49 @@ export function WidgetDashboardProvider( {
 	gridSettings = DEFAULT_GRID,
 	children,
 }: ProviderProps ) {
+	const [ stagingLayout, setStagingLayout ] =
+		useState< DashboardWidget[] >( committedLayout );
+
+	useEffect( () => {
+		setStagingLayout( committedLayout );
+	}, [ committedLayout ] );
+
+	const hasUncommittedChanges = useMemo(
+		() => ! fastDeepEqual( committedLayout, stagingLayout ),
+		[ committedLayout, stagingLayout ]
+	);
+
+	const commitLayout = useCallback( () => {
+		if ( hasUncommittedChanges ) {
+			onLayoutChange( stagingLayout );
+		}
+		onEditChange?.( false );
+	}, [ hasUncommittedChanges, onLayoutChange, stagingLayout, onEditChange ] );
+
+	const cancelLayout = useCallback( () => {
+		setStagingLayout( committedLayout );
+		onEditChange?.( false );
+	}, [ committedLayout, onEditChange ] );
+
+	useEffect( () => {
+		if ( stagingLayout.length === 0 ) {
+			onEditChange?.( true );
+		}
+		// Only react to the layout count flipping to zero; firing on every
+		// onEditChange identity change would also reopen edit mode after the
+		// user explicitly closed it on a non-empty layout.
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [ stagingLayout.length === 0 ] );
+
 	const value = useMemo< InternalDashboardContextValue >(
 		() => ( {
 			widgetTypes,
-			layout,
-			onLayoutChange,
+			layout: stagingLayout,
+			onLayoutChange: setStagingLayout,
 			onLayoutReset,
+			commitLayout,
+			cancelLayout,
+			hasUncommittedChanges,
 			editMode,
 			onEditChange,
 			resolveWidgetModule,
@@ -100,9 +152,11 @@ export function WidgetDashboardProvider( {
 		} ),
 		[
 			widgetTypes,
-			layout,
-			onLayoutChange,
+			stagingLayout,
 			onLayoutReset,
+			commitLayout,
+			cancelLayout,
+			hasUncommittedChanges,
 			editMode,
 			onEditChange,
 			resolveWidgetModule,

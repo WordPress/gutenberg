@@ -26,6 +26,7 @@
 		"@wordpress/private-apis": "file:../../packages/private-apis",
 		"@wordpress/ui": "file:../../packages/ui",
 		"@wordpress/warning": "file:../../packages/warning",
-		"clsx": "^2.1.1"
+		"clsx": "^2.1.1",
+		"fast-deep-equal": "^3.1.3"
 	}
 }

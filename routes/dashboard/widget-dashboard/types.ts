@@ -272,8 +272,10 @@ export interface WidgetGridSettings {
 /**
  * Props for `WidgetDashboard`.
  *
- * The consumer owns layout state; every mutation fires `onLayoutChange`
- * with the fully updated array.
+ * The consumer owns the committed layout state; the dashboard maintains
+ * a staging copy internally for in-progress edits, and `onLayoutChange`
+ * fires only when the user commits via the Done action (or when an
+ * action like reset replaces the committed layout from outside).
  */
 export interface WidgetDashboardProps {
 	/**

@@ -17,20 +17,30 @@ import { WidgetDashboard } from '../widget-dashboard';
 import type { DashboardWidget, WidgetType } from '../types';
 
 const widgetTypes: WidgetType[] = [];
-const layout: DashboardWidget[] = [];
+
+// Use a non-empty layout so the provider's auto-edit-when-empty effect
+// does not flip editMode on as a side effect of mounting.
+const layout: DashboardWidget[] = [
+	{ uuid: 'a', type: 'core/test', placement: { width: 1, height: 1 } },
+];
 
 interface HarnessProps {
 	initialEditMode?: boolean;
 	onEditChange?: ( next: boolean ) => void;
+	onLayoutChange?: ( next: DashboardWidget[] ) => void;
 }
 
-function Harness( { initialEditMode = false, onEditChange }: HarnessProps ) {
+function Harness( {
+	initialEditMode = false,
+	onEditChange,
+	onLayoutChange = () => {},
+}: HarnessProps ) {
 	const [ editMode, setEditMode ] = useState( initialEditMode );
 
 	return (
 		<WidgetDashboard
 			layout={ layout }
-			onLayoutChange={ () => {} }
+			onLayoutChange={ onLayoutChange }
 			widgetTypes={ widgetTypes }
 			editMode={ editMode }
 			onEditChange={ ( next ) => {
@@ -78,10 +88,34 @@ describe( 'WidgetDashboard.Actions', () => {
 		await userEvent.click( screen.getByRole( 'button', { name: 'Done' } ) );
 		expect( onEditChange ).toHaveBeenLastCalledWith( false );
 		expect( onEditChange ).toHaveBeenCalledTimes( 2 );
+	} );
 
-		// TODO: drop once Done has its own committed behavior; today it logs.
+	it( 'does not fire onLayoutChange when Done is clicked without staging changes', async () => {
+		const onLayoutChange = jest.fn();
+		render( <Harness initialEditMode onLayoutChange={ onLayoutChange } /> );
 
-		expect( console ).toHaveLogged( 'done' );
+		await userEvent.click( screen.getByRole( 'button', { name: 'Done' } ) );
+
+		expect( onLayoutChange ).not.toHaveBeenCalled();
+	} );
+
+	it( 'fires onEditChange with false when Cancel is clicked', async () => {
+		const onEditChange = jest.fn();
+		const onLayoutChange = jest.fn();
+		render(
+			<Harness
+				initialEditMode
+				onEditChange={ onEditChange }
+				onLayoutChange={ onLayoutChange }
+			/>
+		);
+
+		await userEvent.click(
+			screen.getByRole( 'button', { name: 'Cancel' } )
+		);
+
+		expect( onEditChange ).toHaveBeenLastCalledWith( false );
+		expect( onLayoutChange ).not.toHaveBeenCalled();
 	} );
 
 	it( 'renders nothing when onEditChange is not provided', () => {
