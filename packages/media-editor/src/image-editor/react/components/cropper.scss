@@ -23,6 +23,13 @@ $handle-touch-target-size: 44px;
 		inset: calc($handle-touch-target-size / 2);
 	}
 
+	// Inner stage — receives the viewport pan transform so the canvas div
+	// itself stays fixed, preventing the root background from showing through.
+	&__stage {
+		position: absolute;
+		inset: 0;
+	}
+
 	&--dragging {
 		cursor: grabbing;
 	}
@@ -69,6 +76,11 @@ $handle-touch-target-size: 44px;
 	&__canvas--show-grid &__grid {
 		opacity: 1;
 		transition-delay: 0s;
+	}
+
+	&__canvas--settling &__grid {
+		opacity: 0;
+		transition: none;
 	}
 
 	&__grid-line {

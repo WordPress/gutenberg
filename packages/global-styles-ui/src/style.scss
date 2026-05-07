@@ -73,6 +73,8 @@
 .global-styles-ui-header {
 	// Need to override the too specific bottom margin for complementary areas.
 	margin-bottom: 0 !important;
+	// Ensure header text is centred with the back button.
+	line-height: 1.9 !important;
 }
 
 .global-styles-ui-subtitle {

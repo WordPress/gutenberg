@@ -249,6 +249,8 @@ function MediaEditorModalContent( {
 	const [ isSaving, setIsSaving ] = useState( false );
 	const [ isDiscardDialogOpen, setIsDiscardDialogOpen ] = useState( false );
 	const [ isPlacementActive, setIsPlacementActive ] = useState( false );
+	const [ isCanvasGestureActive, setIsCanvasGestureActive ] =
+		useState( false );
 	const placementControlTimerRef =
 		useRef< ReturnType< typeof setTimeout > >();
 
@@ -262,6 +264,13 @@ function MediaEditorModalContent( {
 			setIsPlacementActive( false );
 		}, PLACEMENT_CONTROL_IDLE_MS );
 	}, [] );
+	const handleCanvasGestureStart = useCallback( () => {
+		setIsCanvasGestureActive( true );
+	}, [] );
+	const handleCanvasGestureEnd = useCallback( () => {
+		setIsCanvasGestureActive( false );
+	}, [] );
+	const isCropInteractionActive = isPlacementActive || isCanvasGestureActive;
 
 	useEffect( () => {
 		return () => {
@@ -274,6 +283,8 @@ function MediaEditorModalContent( {
 	useEffect( () => {
 		setAspectRatioValue( '0' );
 		setFreeformCrop( true );
+		setIsPlacementActive( false );
+		setIsCanvasGestureActive( false );
 	}, [ id ] );
 
 	const mediaType = getMediaTypeFromMimeType( media?.mime_type ).type;
@@ -495,6 +506,9 @@ function MediaEditorModalContent( {
 						! target.closest( `[${ CROP_CONTROL_ATTR }]` );
 					if ( ! isMetadataField ) {
 						event.preventDefault();
+						if ( isCropInteractionActive ) {
+							return;
+						}
 						if ( isRedoShortcut ) {
 							cropper.redo();
 						} else {
@@ -569,6 +583,12 @@ function MediaEditorModalContent( {
 											isPlacementActive={
 												isPlacementActive
 											}
+											onGestureStart={
+												handleCanvasGestureStart
+											}
+											onGestureEnd={
+												handleCanvasGestureEnd
+											}
 										/>
 									) : (
 										<MediaPreview />
@@ -584,6 +604,9 @@ function MediaEditorModalContent( {
 										} }
 										onPlacementControlInteraction={
 											signalPlacementControlInteraction
+										}
+										isUndoRedoDisabled={
+											isCropInteractionActive
 										}
 									/>
 								) : undefined

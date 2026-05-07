@@ -4,7 +4,7 @@ export interface PostTypeRecord {
 	slug: string;
 	status: 'publish' | 'draft';
 	title: { raw: string; rendered: string };
-	content: { raw: string; rendered: string };
+	config: StoredConfig;
 }
 
 export interface StoredLabels {
@@ -54,6 +54,13 @@ export type SupportFeature =
 
 export interface StoredConfig {
 	labels?: StoredLabels;
+	/**
+	 * The merged set of taxonomy slugs attached to this post type. The REST
+	 * controller composes this on read from two storage sites — non-user
+	 * slugs persisted on the post type record's JSON, and user-defined
+	 * taxonomies whose `_wp_user_taxonomy_object_type` meta points back —
+	 * and splits writes back into those sites.
+	 */
 	taxonomies?: string[];
 	supports?: SupportFeature[];
 	description?: string;
@@ -66,8 +73,7 @@ export interface StoredConfig {
 /**
  * Normalized in-memory shape used by the Add/Edit forms and the DataViews
  * table. REST rows are converted to this shape via `toFormData`, and back to
- * the save payload via `serializeForSave`, so fields never have to JSON
- * round-trip `content.raw` on every keystroke.
+ * the save payload via `serializeForSave`.
  */
 export interface PostTypeFormData {
 	id?: number;

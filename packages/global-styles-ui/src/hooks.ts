@@ -36,8 +36,9 @@ extend( [ a11yPlugin ] );
  * @param blockName          The name of the block, if applicable.
  * @param readFrom           Which source to read from: "base" (theme), "user" (customizations), or "merged" (final result).
  * @param shouldDecodeEncode Whether to decode and encode the style value.
- * @param state              Optional pseudo-selector state (e.g. `:hover`, `:focus`). When provided,
- *                           reads from and writes to the state sub-object automatically.
+ * @param state              Optional style state path. Supports viewport states (e.g. `mobile`),
+ *                           pseudo-selector states (e.g. `:hover`) or both (e.g. `mobile.:hover`).
+ *                           Pseudo selectors are always read/written as nested keys.
  * @return An array containing the style value and a function to set the style
  * value.
  *
@@ -53,6 +54,16 @@ export function useStyle< T = any >(
 	state?: string
 ) {
 	const { user, base, merged, onChange } = useContext( GlobalStylesContext );
+	const statePathParts = state?.split( '.' ).filter( Boolean ) ?? [];
+	const pseudoSelectorState = statePathParts.find( ( value ) =>
+		value.startsWith( ':' )
+	);
+	const statePathWithoutPseudo = statePathParts
+		.filter( ( value ) => ! value.startsWith( ':' ) )
+		.join( '.' );
+	const stylePath = [ path, statePathWithoutPseudo ]
+		.filter( Boolean )
+		.join( '.' );
 
 	let sourceValue = merged;
 	if ( readFrom === 'base' ) {
@@ -61,43 +72,53 @@ export function useStyle< T = any >(
 		sourceValue = user;
 	}
 
-	const styleValue = useMemo( () => {
+	const styleValue = useMemo< T | undefined >( () => {
 		const rawValue = getStyle< T >(
 			sourceValue,
-			path,
+			stylePath,
 			blockName,
 			shouldDecodeEncode
 		);
-		if ( state ) {
-			return ( rawValue as any )?.[ state ] ?? {};
+		if ( pseudoSelectorState ) {
+			return (
+				( rawValue as Record< string, T | undefined > )?.[
+					pseudoSelectorState
+				] ?? ( {} as T )
+			);
 		}
 		return rawValue;
-	}, [ sourceValue, path, blockName, shouldDecodeEncode, state ] );
+	}, [
+		sourceValue,
+		stylePath,
+		blockName,
+		shouldDecodeEncode,
+		pseudoSelectorState,
+	] );
 
 	const setStyleValue = useCallback(
 		( newValue: T | undefined ) => {
 			let valueToSet: any = newValue;
-			if ( state ) {
+			if ( pseudoSelectorState ) {
 				const fullCurrentValue = getStyle(
 					user,
-					path,
+					stylePath,
 					blockName,
 					false
 				);
 				valueToSet = {
 					...( fullCurrentValue as object ),
-					[ state ]: newValue,
+					[ pseudoSelectorState ]: newValue,
 				};
 			}
 			const newGlobalStyles = setStyle< any >(
 				user,
-				path,
+				stylePath,
 				valueToSet,
 				blockName
 			);
 			onChange( newGlobalStyles );
 		},
-		[ user, onChange, path, blockName, state ]
+		[ user, onChange, stylePath, blockName, pseudoSelectorState ]
 	);
 
 	return [ styleValue, setStyleValue ] as const;
