@@ -1,10 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	Notice,
-	__experimentalVStack as VStack,
-} from '@wordpress/components';
+import { Notice, __experimentalVStack as VStack } from '@wordpress/components';
 import { lazy, Suspense, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
@@ -13,7 +10,16 @@ import { __ } from '@wordpress/i18n';
  */
 import { default as transformStyles } from '../../utils/transform-styles';
 
-const CodeMirrorEditor = lazy( () => import( './codemirror-editor' ) );
+const CodeMirrorEditor = lazy( async () => {
+	const [ codemirrorModule, editorModule ] = await Promise.all( [
+		import( '@wordpress/codemirror' ),
+		import( './codemirror-editor' ),
+	] );
+	editorModule.setCodemirror(
+		codemirrorModule.__WORDPRESS_PRIVATE_DO_NOT_USE
+	);
+	return editorModule;
+} );
 
 /**
  * Validates that a CSS string doesn't contain HTML markup.

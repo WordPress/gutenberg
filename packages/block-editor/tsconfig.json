@@ -6,6 +6,7 @@
 		{ "path": "../block-serialization-default-parser" },
 		{ "path": "../blob" },
 		{ "path": "../blocks" },
+		{ "path": "../codemirror" },
 		{ "path": "../components" },
 		{ "path": "../compose" },
 		{ "path": "../data" },

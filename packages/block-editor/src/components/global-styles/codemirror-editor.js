@@ -1,31 +1,21 @@
 /**
- * External dependencies
- */
-import { autocompletion } from '@codemirror/autocomplete';
-import {
-	defaultKeymap,
-	history,
-	historyKeymap,
-} from '@codemirror/commands';
-import { css as cssLanguage } from '@codemirror/lang-css';
-import {
-	bracketMatching,
-	defaultHighlightStyle,
-	indentOnInput,
-	syntaxHighlighting,
-} from '@codemirror/language';
-import { searchKeymap } from '@codemirror/search';
-import {
-	EditorView,
-	highlightActiveLine,
-	keymap,
-	lineNumbers,
-} from '@codemirror/view';
-
-/**
  * WordPress dependencies
  */
 import { useEffect, useRef } from '@wordpress/element';
+
+/**
+ * The CodeMirror namespace bag from `@wordpress/codemirror`. Set by the
+ * dynamic-import wrapper in `advanced-panel.js` before this component is
+ * first rendered, so that the file itself never imports `@wordpress/codemirror`
+ * statically (which would not resolve from `block-editor`'s IIFE bundle).
+ *
+ * @type {?import('@wordpress/codemirror').__WORDPRESS_PRIVATE_DO_NOT_USE}
+ */
+let codemirror;
+
+export function setCodemirror( cm ) {
+	codemirror = cm;
+}
 
 export default function CodeMirrorEditor( {
 	value,
@@ -35,13 +25,30 @@ export default function CodeMirrorEditor( {
 	help,
 	className,
 } ) {
+	const {
+		autocomplete: { autocompletion },
+		commands: { defaultKeymap, history, historyKeymap },
+		langCss: { css: cssLanguage },
+		language: {
+			bracketMatching,
+			defaultHighlightStyle,
+			indentOnInput,
+			syntaxHighlighting,
+		},
+		search: { searchKeymap },
+		view: { EditorView, highlightActiveLine, keymap, lineNumbers },
+	} = codemirror;
+
 	const containerRef = useRef( null );
 
 	const onChangeRef = useRef( onChange );
 	const onBlurRef = useRef( onBlur );
-	onChangeRef.current = onChange;
-	onBlurRef.current = onBlur;
 	const initialDocRef = useRef( value ?? '' );
+
+	useEffect( () => {
+		onChangeRef.current = onChange;
+		onBlurRef.current = onBlur;
+	} );
 
 	useEffect( () => {
 		const view = new EditorView( {
@@ -77,6 +84,7 @@ export default function CodeMirrorEditor( {
 		return () => {
 			view.destroy();
 		};
+		// eslint-disable-next-line react-hooks/exhaustive-deps -- One-shot init.
 	}, [] );
 
 	return (
