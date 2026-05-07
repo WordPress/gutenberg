@@ -33,6 +33,7 @@ export function Actions(): React.ReactNode {
 		onLayoutReset,
 		commitLayout,
 		cancelLayout,
+		hasUncommittedChanges,
 	} = useDashboardInternalContext();
 
 	const { setInserterOpen } = useDashboardUIContext();
@@ -94,6 +95,7 @@ export function Actions(): React.ReactNode {
 						tone="brand"
 						size="compact"
 						onClick={ done }
+						disabled={ ! hasUncommittedChanges }
 					>
 						{ __( 'Done' ) }
 					</Button>
@@ -108,6 +110,7 @@ export function Actions(): React.ReactNode {
 					{ __( 'Customize' ) }
 				</Button>
 			) }
+
 			<MoreActionsDropdown items={ moreActionsItems } />
 
 			<AlertDialog.Root

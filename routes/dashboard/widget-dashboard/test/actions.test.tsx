@@ -76,27 +76,23 @@ describe( 'WidgetDashboard.Actions', () => {
 		).not.toBeInTheDocument();
 	} );
 
-	it( 'fires onEditChange with the toggled value on click', async () => {
+	it( 'fires onEditChange with true when Customize is clicked', async () => {
 		const onEditChange = jest.fn();
 		render( <Harness onEditChange={ onEditChange } /> );
 
 		await userEvent.click(
 			screen.getByRole( 'button', { name: 'Customize' } )
 		);
-		expect( onEditChange ).toHaveBeenLastCalledWith( true );
 
-		await userEvent.click( screen.getByRole( 'button', { name: 'Done' } ) );
-		expect( onEditChange ).toHaveBeenLastCalledWith( false );
-		expect( onEditChange ).toHaveBeenCalledTimes( 2 );
+		expect( onEditChange ).toHaveBeenLastCalledWith( true );
 	} );
 
-	it( 'does not fire onLayoutChange when Done is clicked without staging changes', async () => {
-		const onLayoutChange = jest.fn();
-		render( <Harness initialEditMode onLayoutChange={ onLayoutChange } /> );
+	it( 'disables Done when there are no staging changes', () => {
+		render( <Harness initialEditMode /> );
 
-		await userEvent.click( screen.getByRole( 'button', { name: 'Done' } ) );
-
-		expect( onLayoutChange ).not.toHaveBeenCalled();
+		expect(
+			screen.getByRole( 'button', { name: 'Done' } )
+		).toHaveAttribute( 'aria-disabled', 'true' );
 	} );
 
 	it( 'fires onEditChange with false when Cancel is clicked', async () => {
