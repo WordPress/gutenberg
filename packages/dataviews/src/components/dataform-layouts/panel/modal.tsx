@@ -24,7 +24,7 @@ import type {
 import { DataFormLayout } from '../data-form-layout';
 import { DEFAULT_LAYOUT } from '../normalize-form';
 import SummaryButton from './summary-button';
-import useFormValidity, { isFormValid } from '../../../hooks/use-form-validity';
+import useFormValidity from '../../../hooks/use-form-validity';
 import useMapFocusOnMount from '../../../hooks/use-map-focus-on-mount';
 import useReportValidity from '../../../hooks/use-report-validity';
 import DataFormContext from '../../dataform-context';
@@ -78,8 +78,11 @@ function PanelDialogContent< Item >( {
 			maxLength: f.isValid.maxLength?.constraint,
 		},
 	} ) );
-	const { validity } = useFormValidity( modalData, fieldsAsFieldType, form );
-	const isValid = useMemo( () => isFormValid( validity ), [ validity ] );
+	const { validity, isValid } = useFormValidity(
+		modalData,
+		fieldsAsFieldType,
+		form
+	);
 
 	const handleOnChange = ( newValue: Partial< Item > ) => {
 		setChanges( ( prev ) =>
