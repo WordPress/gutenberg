@@ -25,7 +25,7 @@ import { Card, Stack, Notice } from '@wordpress/ui';
 import { useDashboardInternalContext } from '../../context/dashboard-context';
 import { WidgetContextProvider } from '../../context/widget-context';
 import { WidgetRender } from '../widget-render';
-import styles from './widget.module.css';
+import styles from './widget-chrome.module.css';
 import type { DashboardWidget, WidgetType } from '../../types';
 
 interface ErrorBoundaryProps {
@@ -82,7 +82,7 @@ function Header( { titleId, widgetType }: HeaderProps ) {
 			<Stack direction="row" align="center" gap="sm">
 				{ widgetType.icon && (
 					<span
-						className={ styles.widgetHeaderIcon }
+						className={ styles.widgetChromeHeaderIcon }
 						aria-hidden="true"
 					>
 						<Icon icon={ widgetType.icon } />
@@ -96,7 +96,7 @@ function Header( { titleId, widgetType }: HeaderProps ) {
 	);
 }
 
-export interface WidgetProps {
+export interface WidgetChromeProps {
 	widget: DashboardWidget< unknown >;
 	index: number;
 }
@@ -107,8 +107,8 @@ export interface WidgetProps {
  * error/loading boundaries that keep neighbours mounted when one widget fails
  * or is still resolving.
  */
-export const Widget = forwardRef< HTMLDivElement, WidgetProps >(
-	function Widget( { widget, index }, ref ) {
+export const WidgetChrome = forwardRef< HTMLDivElement, WidgetChromeProps >(
+	function WidgetChrome( { widget, index }, ref ) {
 		const { widgetTypes, editMode } = useDashboardInternalContext();
 		const widgetType = widgetTypes.find( ( t ) => t.name === widget.type );
 		const titleId = useId();
@@ -131,12 +131,12 @@ export const Widget = forwardRef< HTMLDivElement, WidgetProps >(
 				<Card.Root
 					render={ <section /> }
 					ref={ ref }
-					className={ styles.widget }
+					className={ styles.widgetChrome }
 					aria-labelledby={ widgetType.title ? titleId : undefined }
 					{ ...( editMode ? { inert: '' } : {} ) }
 				>
 					<Header titleId={ titleId } widgetType={ widgetType } />
-					<Card.Content className={ styles.widgetContent }>
+					<Card.Content className={ styles.widgetChromeContent }>
 						<WidgetErrorBoundary>
 							<Suspense fallback={ <LoadingOverlay /> }>
 								<WidgetRender

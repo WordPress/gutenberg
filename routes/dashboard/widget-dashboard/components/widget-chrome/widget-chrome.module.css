@@ -1,13 +1,13 @@
-.widget {
+.widgetChrome {
 	height: 100%;
 }
 
-.widgetHeaderIcon {
+.widgetChromeHeaderIcon {
 	display: inline-flex;
 	color: var(--wpds-color-fg-content-neutral-weak);
 }
 
-.widgetContent {
+.widgetChromeContent {
 	flex: 1;
 }
 
