@@ -102,6 +102,7 @@ type RectangleStencilProps = StencilProps;
  * @param props.freeformCrop      Whether resize handles are shown.
  * @param props.stencilTransition CSS transition string for settle animation.
  * @param props.cropBounds        Maximum crop rect bounds from camera (zoom/rotation-aware).
+ * @param props.onEscape          Called when Escape is pressed on a resize handle.
  * @return The rectangle stencil element.
  */
 export function RectangleStencil( {
@@ -115,6 +116,7 @@ export function RectangleStencil( {
 	freeformCrop = false,
 	stencilTransition,
 	cropBounds,
+	onEscape,
 }: RectangleStencilProps ) {
 	// Use cropBounds from the camera if available, otherwise default to [0,1].
 	const boundsMinX = cropBounds?.minX ?? 0;
@@ -362,11 +364,20 @@ export function RectangleStencil( {
 
 	/**
 	 * Handle keyboard events on a resize handle.
+	 * Escape returns focus to the crop area so keyboard users can switch from
+	 * resizing the crop boundary to moving the image inside it.
 	 * Shift multiplies the step size by 10 for coarser movement.
 	 */
 	const handleKeyDown = useCallback(
 		( handle: HandlePosition, event: React.KeyboardEvent ) => {
 			const key = event.key;
+
+			if ( key === 'Escape' ) {
+				event.preventDefault();
+				event.stopPropagation();
+				onEscape?.();
+				return;
+			}
 
 			if (
 				key !== 'ArrowUp' &&
@@ -454,6 +465,7 @@ export function RectangleStencil( {
 			onCropChange,
 			onResizeStart,
 			onResizeEnd,
+			onEscape,
 		]
 	);
 
@@ -480,7 +492,7 @@ export function RectangleStencil( {
 					style={ VISUALLY_HIDDEN_STYLE }
 				>
 					{ __(
-						'Use arrow keys to resize the crop area. Hold Shift for larger steps. Tab to move between handles and controls.'
+						'Use arrow keys to resize the crop area. Hold Shift for larger steps.'
 					) }
 				</div>
 			) }

@@ -18,7 +18,6 @@ import {
 	useCallback,
 	useContext,
 	useEffect,
-	useId,
 	useMemo,
 	useRef,
 	useState,
@@ -252,7 +251,6 @@ function MediaEditorModalContent( {
 	const [ isPlacementActive, setIsPlacementActive ] = useState( false );
 	const [ isCanvasGestureActive, setIsCanvasGestureActive ] =
 		useState( false );
-	const discardDialogDescriptionId = useId();
 	const placementControlTimerRef =
 		useRef< ReturnType< typeof setTimeout > >();
 
@@ -625,8 +623,6 @@ function MediaEditorModalContent( {
 					 on mount, request the parent Modal close. */ }
 				<ConfirmDialog
 					isOpen={ isDiscardDialogOpen }
-					contentLabel={ __( 'Discard changes?' ) }
-					aria={ { describedby: discardDialogDescriptionId } }
 					confirmButtonText={ __( 'Discard' ) }
 					cancelButtonText={ __( 'Keep editing' ) }
 					onCancel={ () => setIsDiscardDialogOpen( false ) }
@@ -635,11 +631,9 @@ function MediaEditorModalContent( {
 						discardAndClose();
 					} }
 				>
-					<span id={ discardDialogDescriptionId }>
-						{ __(
-							'Are you sure you want to discard your unsaved changes?'
-						) }
-					</span>
+					{ __(
+						'Are you sure you want to discard your unsaved changes?'
+					) }
 				</ConfirmDialog>
 			</MediaEditorProvider>
 			{ createPortal(

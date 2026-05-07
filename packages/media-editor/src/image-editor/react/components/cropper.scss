@@ -23,12 +23,6 @@ $handle-touch-target-size: 44px;
 		inset: calc($handle-touch-target-size / 2);
 	}
 
-	&__crop-area {
-		position: absolute;
-		inset: 0;
-		pointer-events: none;
-	}
-
 	// Inner stage — receives the viewport pan transform so the canvas div
 	// itself stays fixed, preventing the root background from showing through.
 	&__stage {

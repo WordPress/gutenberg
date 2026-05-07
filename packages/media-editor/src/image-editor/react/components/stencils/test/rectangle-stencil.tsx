@@ -31,6 +31,7 @@ function renderStencil(
 	const onCropChange = jest.fn();
 	const onResizeStart = jest.fn();
 	const onResizeEnd = jest.fn();
+	const onEscape = jest.fn();
 
 	render(
 		<RectangleStencil
@@ -40,13 +41,14 @@ function renderStencil(
 			onCropChange={ onCropChange }
 			onResizeStart={ onResizeStart }
 			onResizeEnd={ onResizeEnd }
+			onEscape={ onEscape }
 			freeformCrop
 			cropBounds={ CROP_BOUNDS }
 			{ ...overrides }
 		/>
 	);
 
-	return { onCropChange, onResizeStart, onResizeEnd };
+	return { onCropChange, onResizeStart, onResizeEnd, onEscape };
 }
 
 describe( 'RectangleStencil', () => {
@@ -101,7 +103,7 @@ describe( 'RectangleStencil', () => {
 			expect(
 				screen.getByRole( 'button', { name: 'Resize top-left corner' } )
 			).toHaveAccessibleDescription(
-				'Use arrow keys to resize the crop area. Hold Shift for larger steps. Tab to move between handles and controls.'
+				'Use arrow keys to resize the crop area. Hold Shift for larger steps.'
 			);
 		} );
 
@@ -121,8 +123,9 @@ describe( 'RectangleStencil', () => {
 	} );
 
 	describe( 'keyboard — Escape', () => {
-		it( 'does not intercept Escape on a handle', () => {
+		it( 'handles Escape on a handle without bubbling', () => {
 			const onKeyDown = jest.fn();
+			const onEscape = jest.fn();
 			render(
 				// eslint-disable-next-line jsx-a11y/no-static-element-interactions
 				<div onKeyDown={ onKeyDown }>
@@ -131,6 +134,7 @@ describe( 'RectangleStencil', () => {
 						containerSize={ CONTAINER_SIZE }
 						imageSize={ IMAGE_SIZE }
 						onCropChange={ jest.fn() }
+						onEscape={ onEscape }
 						freeformCrop
 						cropBounds={ CROP_BOUNDS }
 					/>
@@ -140,18 +144,17 @@ describe( 'RectangleStencil', () => {
 
 			fireEvent.keyDown( firstHandle, { key: 'Escape' } );
 
-			expect( onKeyDown ).toHaveBeenCalledTimes( 1 );
-			expect( onKeyDown.mock.calls[ 0 ][ 0 ].defaultPrevented ).toBe(
-				false
-			);
+			expect( onEscape ).toHaveBeenCalledTimes( 1 );
+			expect( onKeyDown ).not.toHaveBeenCalled();
 		} );
 
 		it( 'does not call onCropChange when Escape is pressed', () => {
-			const { onCropChange } = renderStencil();
+			const { onCropChange, onEscape } = renderStencil();
 			const [ firstHandle ] = screen.getAllByRole( 'button' );
 
 			fireEvent.keyDown( firstHandle, { key: 'Escape' } );
 
+			expect( onEscape ).toHaveBeenCalledTimes( 1 );
 			expect( onCropChange ).not.toHaveBeenCalled();
 		} );
 	} );

@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { act, fireEvent, render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 
 /**
  * Internal dependencies
@@ -117,7 +116,7 @@ describe( 'Cropper', () => {
 
 		await screen.findByTestId( GRID_TEST_ID );
 
-		const canvas = screen.getByTestId( 'cropper-canvas' );
+		const canvas = screen.getByRole( 'group', { name: 'Crop area' } );
 		expect( canvas ).not.toHaveClass( GRID_INTERACTIVE_CLASS );
 		expect( canvas ).not.toHaveClass( SHOW_GRID_CLASS );
 	} );
@@ -162,12 +161,11 @@ describe( 'Cropper', () => {
 			'When this area is focused, use arrow keys to move the image and plus or minus to zoom. Tab to resize handles and controls.'
 		);
 		expect( handle ).toHaveAccessibleDescription(
-			'Use arrow keys to resize the crop area. Hold Shift for larger steps. Tab to move between handles and controls.'
+			'Use arrow keys to resize the crop area. Hold Shift for larger steps.'
 		);
 	} );
 
-	it( 'returns focus to the crop area on Shift+Tab from the first resize handle', async () => {
-		const user = userEvent.setup();
+	it( 'returns focus to the crop area on Escape from a resize handle', async () => {
 		render(
 			<Cropper
 				src="test.jpg"
@@ -186,9 +184,7 @@ describe( 'Cropper', () => {
 		act( () => {
 			handle.focus();
 		} );
-		expect( handle ).toHaveFocus();
-
-		await user.tab( { shift: true } );
+		fireEvent.keyDown( handle, { key: 'Escape' } );
 
 		expect( canvas ).toHaveFocus();
 	} );
@@ -205,7 +201,7 @@ describe( 'Cropper', () => {
 
 		await screen.findByTestId( GRID_TEST_ID );
 
-		const canvas = screen.getByTestId( 'cropper-canvas' );
+		const canvas = screen.getByRole( 'group', { name: 'Crop area' } );
 		expect( canvas ).toHaveClass( GRID_INTERACTIVE_CLASS );
 		expect( canvas ).not.toHaveClass( SHOW_GRID_CLASS );
 	} );
@@ -223,7 +219,7 @@ describe( 'Cropper', () => {
 
 		await screen.findByTestId( GRID_TEST_ID );
 
-		const canvas = screen.getByTestId( 'cropper-canvas' );
+		const canvas = screen.getByRole( 'group', { name: 'Crop area' } );
 		expect( canvas ).toHaveClass( GRID_INTERACTIVE_CLASS );
 		expect( canvas ).toHaveClass( SHOW_GRID_CLASS );
 	} );

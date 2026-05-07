@@ -185,10 +185,6 @@ function CropperInner(
 	// positioning context for image/stencil/handles — inset from the root
 	// by the handle gutter, so crop math operates on the reduced box.
 	const canvasRef = useRef< HTMLDivElement >( null );
-	// Keep the accessible crop-area focus target separate from the visual
-	// canvas so VoiceOver can move between it and the resize handles as
-	// sibling focus stops, rather than a parent/child focus transition.
-	const cropAreaRef = useRef< HTMLDivElement >( null );
 	const cropAreaDescriptionId = useId();
 	const [ isCropAreaFocused, setIsCropAreaFocused ] =
 		useState( focusOnMount );
@@ -199,7 +195,7 @@ function CropperInner(
 
 	useLayoutEffect( () => {
 		if ( focusOnMount ) {
-			cropAreaRef.current?.focus( { preventScroll: true } );
+			canvasRef.current?.focus( { preventScroll: true } );
 		}
 	}, [ focusOnMount ] );
 
@@ -448,7 +444,7 @@ function CropperInner(
 		( isInteractionPlacementActive || isResizing || isPlacementActive );
 
 	const handleStencilEscape = useCallback(
-		() => cropAreaRef.current?.focus( { preventScroll: true } ),
+		() => canvasRef.current?.focus( { preventScroll: true } ),
 		[]
 	);
 
@@ -577,29 +573,23 @@ function CropperInner(
 						'wp-media-editor-image-editor__canvas--show-grid',
 					settling && 'wp-media-editor-image-editor__canvas--settling'
 				) }
-				data-testid="cropper-canvas"
+				tabIndex={ 0 }
+				role="group"
+				aria-label={ __( 'Crop area' ) }
+				aria-describedby={
+					isCropAreaFocused ? cropAreaDescriptionId : undefined
+				}
+				onFocus={ handleCropAreaFocus }
+				onBlur={ handleCropAreaBlur }
 				{ ...handlers }
 			>
 				<div
-					ref={ cropAreaRef }
-					className="wp-media-editor-image-editor__crop-area"
-					tabIndex={ 0 }
-					role="group"
-					aria-label={ __( 'Crop area' ) }
-					aria-describedby={
-						isCropAreaFocused ? cropAreaDescriptionId : undefined
-					}
-					onFocus={ handleCropAreaFocus }
-					onBlur={ handleCropAreaBlur }
+					id={ cropAreaDescriptionId }
+					style={ VISUALLY_HIDDEN_STYLE }
 				>
-					<div
-						id={ cropAreaDescriptionId }
-						style={ VISUALLY_HIDDEN_STYLE }
-					>
-						{ __(
-							'When this area is focused, use arrow keys to move the image and plus or minus to zoom. Tab to resize handles and controls.'
-						) }
-					</div>
+					{ __(
+						'When this area is focused, use arrow keys to move the image and plus or minus to zoom. Tab to resize handles and controls.'
+					) }
 				</div>
 				{ /*
 				 * The stage is an inner full-size div that receives the
