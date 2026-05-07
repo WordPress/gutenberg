@@ -289,7 +289,7 @@ export interface WidgetDashboardProps {
 	/**
 	 * Called when the layout is reset to the default.
 	 */
-	onLayoutReset: () => void;
+	onLayoutReset?: () => void;
 
 	/**
 	 * Widget types available for rendering. The dashboard never queries a
