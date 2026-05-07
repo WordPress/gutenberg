@@ -328,12 +328,11 @@ mark.wp-note {
 	}
 }
 
+// Class is applied via `Dropdown`'s `contentClassName`, which lands
+// on `.components-popover__content` itself — so style the class
+// directly rather than nesting through `.components-popover__content`.
 .editor-collab-sidebar-panel__add-reaction-popover {
 	padding: $grid-unit-10;
-}
-
-.editor-collab-sidebar-panel
-.editor-collab-sidebar-panel__add-reaction-popover {
 	min-width: 40px;
 }
 
@@ -352,13 +351,11 @@ mark.wp-note {
 // Frimousse popover: anchor a fixed-size picker surface with WPDS surface
 // tokens so it visually matches the WPDS toolbar/menu surfaces nearby.
 .editor-collab-sidebar-panel__frimousse-popover {
-	.components-popover__content {
-		width: var(--wpds-dimension-surface-width-md);
-		padding: 0;
-		border-radius: var(--wpds-border-radius-md);
-		box-shadow: var(--wpds-elevation-md);
-		background-color: var(--wpds-color-bg-surface-neutral-weak);
-	}
+	width: var(--wpds-dimension-surface-width-md);
+	padding: 0;
+	border-radius: var(--wpds-border-radius-md);
+	box-shadow: var(--wpds-elevation-md);
+	background-color: var(--wpds-color-bg-surface-neutral-weak);
 }
 
 .editor-collab-sidebar-panel__frimousse {

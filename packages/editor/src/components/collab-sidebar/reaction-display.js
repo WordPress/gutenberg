@@ -2,10 +2,7 @@
  * WordPress dependencies
  */
 import { __, sprintf, _n } from '@wordpress/i18n';
-import {
-	Button,
-	privateApis as componentsPrivateApis,
-} from '@wordpress/components';
+import { Button, Dropdown } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
 import { smiley as smileyIcon, plus as plusIcon } from '@wordpress/icons';
 import { useState, useCallback, lazy, Suspense } from '@wordpress/element';
@@ -21,7 +18,6 @@ import ReactionEmojiPicker, {
 	getLabelBySlug,
 	useReactionEmojis,
 } from './reaction-emoji-picker';
-import { unlock } from '../../lock-unlock';
 
 /**
  * Lazy-load the Frimousse-based full picker. Its bundle (Frimousse +
@@ -30,7 +26,11 @@ import { unlock } from '../../lock-unlock';
  */
 const FrimoussePicker = lazy( () => import( './frimousse-picker' ) );
 
-const { Menu } = unlock( componentsPrivateApis );
+// `Dropdown`'s popover is rendered in a portal anchored to <body>,
+// so it escapes the `overflow: hidden` chain on the collab sidebar
+// (`.interface-interface-skeleton__sidebar`,
+// `.editor-collab-sidebar`, `.editor-collab-sidebar-panel`).
+const POPOVER_PROPS = { placement: 'bottom-end' };
 
 /**
  * Get the count of reactions for a specific slug.
@@ -282,33 +282,31 @@ export default function ReactionDisplay( {
  * @param {Function} props.onToggleReaction Callback to toggle a reaction.
  */
 export function AddReactionButton( { disabled = false, onToggleReaction } ) {
-	const [ isOpen, setIsOpen ] = useState( false );
 	return (
-		<Menu placement="bottom-end" open={ isOpen } onOpenChange={ setIsOpen }>
-			<Menu.TriggerButton
-				render={
-					<Button
-						size="compact"
-						className="editor-collab-sidebar-panel__add-reaction-button"
-						icon={ smileyIcon }
-						label={ __( 'Add reaction' ) }
-						disabled={ disabled }
-						accessibleWhenDisabled
-					/>
-				}
-			/>
-			<Menu.Popover
-				modal={ false }
-				className="editor-collab-sidebar-panel__add-reaction-popover"
-			>
+		<Dropdown
+			popoverProps={ POPOVER_PROPS }
+			contentClassName="editor-collab-sidebar-panel__add-reaction-popover"
+			renderToggle={ ( { isOpen, onToggle } ) => (
+				<Button
+					size="compact"
+					className="editor-collab-sidebar-panel__add-reaction-button"
+					icon={ smileyIcon }
+					label={ __( 'Add reaction' ) }
+					aria-expanded={ isOpen }
+					disabled={ disabled }
+					accessibleWhenDisabled
+					onClick={ onToggle }
+				/>
+			) }
+			renderContent={ ( { onClose } ) => (
 				<ReactionEmojiPicker
 					onSelect={ ( slug ) => {
-						setIsOpen( false );
+						onClose();
 						onToggleReaction( slug );
 					} }
 				/>
-			</Menu.Popover>
-		</Menu>
+			) }
+		/>
 	);
 }
 
@@ -327,38 +325,36 @@ export function AddReactionButton( { disabled = false, onToggleReaction } ) {
  * @param {Function} props.onToggleReaction Callback to toggle a reaction.
  */
 export function MoreEmojiButton( { onToggleReaction } ) {
-	const [ isOpen, setIsOpen ] = useState( false );
 	const emojis = useReactionEmojis();
 	if ( typeof window === 'undefined' || ! window.gutenbergEmojibaseUrl ) {
 		return null;
 	}
 	return (
-		<Menu placement="bottom-end" open={ isOpen } onOpenChange={ setIsOpen }>
-			<Menu.TriggerButton
-				render={
-					<Button
-						size="compact"
-						className="editor-collab-sidebar-panel__more-reaction-button"
-						icon={ plusIcon }
-						label={ __( 'More emojis' ) }
-					/>
-				}
-			/>
-			<Menu.Popover
-				modal={ false }
-				className="editor-collab-sidebar-panel__frimousse-popover"
-			>
+		<Dropdown
+			popoverProps={ POPOVER_PROPS }
+			contentClassName="editor-collab-sidebar-panel__frimousse-popover"
+			renderToggle={ ( { isOpen, onToggle } ) => (
+				<Button
+					size="compact"
+					className="editor-collab-sidebar-panel__more-reaction-button"
+					icon={ plusIcon }
+					label={ __( 'More emojis' ) }
+					aria-expanded={ isOpen }
+					onClick={ onToggle }
+				/>
+			) }
+			renderContent={ ( { onClose } ) => (
 				<Suspense fallback={ null }>
 					<FrimoussePicker
 						onSelect={ ( emoji ) => {
-							setIsOpen( false );
+							onClose();
 							onToggleReaction(
 								emojiToStorageKey( emoji, emojis )
 							);
 						} }
 					/>
 				</Suspense>
-			</Menu.Popover>
-		</Menu>
+			) }
+		/>
 	);
 }

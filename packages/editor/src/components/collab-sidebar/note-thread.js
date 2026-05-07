@@ -106,9 +106,9 @@ export function NoteThread( {
 		);
 		const isDialogFocused =
 			event.relatedTarget?.closest( '[role="dialog"]' );
-		// Popovers anchored from inside the note (e.g. emoji reaction
-		// pickers) portal their content to <body>, so focus moving into them
-		// looks like focus leaving the thread.
+		// Popovers anchored from inside the note (e.g. the emoji
+		// reaction pickers) portal their content to <body>, so focus
+		// moving into them looks like focus leaving the thread.
 		const isPopoverFocused = event.relatedTarget?.closest(
 			'.components-popover'
 		);
@@ -122,6 +122,9 @@ export function NoteThread( {
 		if ( isDialogFocused ) {
 			return;
 		}
+		// When opening a popover from inside the note, the popover
+		// content is portaled outside the thread DOM but the note
+		// should remain selected for the trigger to stay rendered.
 		if ( isPopoverFocused ) {
 			return;
 		}
