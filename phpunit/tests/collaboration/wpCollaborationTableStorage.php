@@ -348,8 +348,6 @@ class Tests_Collaboration_WpCollaborationTableStorage extends WP_UnitTestCase {
 			$this->markTestSkipped( 'This test requires that an external object cache is in use.' );
 		}
 
-		global $wpdb;
-
 		$storage = new WP_Collaboration_Table_Storage();
 		$room    = __FUNCTION__;
 
