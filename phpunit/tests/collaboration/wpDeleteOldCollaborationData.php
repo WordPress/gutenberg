@@ -17,6 +17,8 @@ class Tests_Collaboration_wpDeleteOldCollaborationData extends WP_UnitTestCase {
 		self::$post_id   = $factory->post->create( array( 'post_author' => self::$editor_id ) );
 
 		add_filter( 'pre_option_wp_collaboration_enabled', '__return_true' );
+		gutenberg_register_collaboration_table();
+		gutenberg_create_collaboration_table();
 	}
 
 	public static function wpTearDownAfterClass() {

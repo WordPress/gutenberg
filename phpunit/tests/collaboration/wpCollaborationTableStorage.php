@@ -13,6 +13,16 @@
  */
 class Tests_Collaboration_WpCollaborationTableStorage extends WP_UnitTestCase {
 
+	public static function wpSetUpBeforeClass() {
+		add_filter( 'pre_option_wp_collaboration_enabled', '__return_true' );
+		gutenberg_register_collaboration_table();
+		gutenberg_create_collaboration_table();
+	}
+
+	public static function wpTearDownAfterClass() {
+		remove_filter( 'pre_option_wp_collaboration_enabled', '__return_true' );
+	}
+
 	public function set_up() {
 		parent::set_up();
 		add_filter( 'pre_option_wp_collaboration_enabled', '__return_true' );
