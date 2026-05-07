@@ -6,6 +6,7 @@ import {
 	addNoteIdToMetadata,
 	removeNoteIdFromMetadata,
 	calculateNotePositions,
+	pickPrimaryNote,
 } from '../utils';
 
 function makeRect( top ) {
@@ -270,6 +271,29 @@ describe( 'note id order preservation', () => {
 		const result = addNoteIdToMetadata( { noteId: 42 }, 99 );
 		expect( result.noteId ).toEqual( [ 42, 99 ] );
 		expect( result.noteId[ 0 ] ).toBe( 42 );
+	} );
+} );
+
+describe( 'pickPrimaryNote', () => {
+	it( 'returns null for an empty list', () => {
+		expect( pickPrimaryNote( [] ) ).toBeNull();
+	} );
+
+	it( 'returns the first unresolved thread when one exists', () => {
+		const threads = [
+			{ id: 1, status: 'approved' },
+			{ id: 2, status: 'hold' },
+			{ id: 3, status: 'hold' },
+		];
+		expect( pickPrimaryNote( threads ) ).toBe( threads[ 1 ] );
+	} );
+
+	it( 'falls back to the first thread when none are unresolved', () => {
+		const threads = [
+			{ id: 1, status: 'approved' },
+			{ id: 2, status: 'approved' },
+		];
+		expect( pickPrimaryNote( threads ) ).toBe( threads[ 0 ] );
 	} );
 } );
 

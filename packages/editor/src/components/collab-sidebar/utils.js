@@ -132,6 +132,20 @@ export function addNoteIdToMetadata( metadata, noteId ) {
 }
 
 /**
+ * Picks the most relevant thread from a list: first unresolved, else first.
+ *
+ * @param {Array} threads Ordered list of thread objects.
+ * @return {Object|null} Selected thread or null when the list is empty.
+ */
+export function pickPrimaryNote( threads ) {
+	return (
+		threads.find( ( thread ) => thread.status === 'hold' ) ??
+		threads[ 0 ] ??
+		null
+	);
+}
+
+/**
  * Removes a note ID from the metadata.
  *
  * @param {Object} metadata Existing block metadata

@@ -26,7 +26,7 @@ import { AddNoteMenuItem } from './add-note-menu-item';
 import { NoteAvatarIndicator } from './note-indicator-toolbar';
 import { useGlobalStylesContext } from '../global-styles-provider';
 import { useNoteThreads, useEnableFloatingSidebar } from './hooks';
-import { getNoteIdsFromMetadata } from './utils';
+import { getNoteIdsFromMetadata, pickPrimaryNote } from './utils';
 import PostTypeSupportCheck from '../post-type-support-check';
 import { unlock } from '../../lock-unlock';
 
@@ -111,15 +111,11 @@ function NotesSidebar( { postId } ) {
 	}
 
 	function openNoteForBlock( targetClientId ) {
-		// A block can carry multiple threads, so surface the most relevant
-		// one — first unresolved, else first.
+		// A block can carry multiple threads; surface the most relevant.
 		const blockThreads = notes.filter(
 			( thread ) => thread.blockClientId === targetClientId
 		);
-		const target =
-			blockThreads.find( ( thread ) => thread.status === 'hold' ) ??
-			blockThreads[ 0 ] ??
-			null;
+		const target = pickPrimaryNote( blockThreads );
 		return focusNote( {
 			targetClientId,
 			noteId: target?.id ?? 'new',
@@ -150,17 +146,12 @@ function NotesSidebar( { postId } ) {
 	const { merged: GlobalStyles } = useGlobalStylesContext();
 	const backgroundColor = GlobalStyles?.styles?.color?.background;
 
-	// Find threads for the selected block. Blocks can carry multiple note IDs,
-	// so gather all matching threads and surface the most relevant one
-	// (first unresolved, else first) for UI interactions like avatars.
+	// Surface one thread for the avatar indicator.
 	const currentThreads =
 		blockNoteIds.length > 0
 			? notes.filter( ( thread ) => blockNoteIds.includes( thread.id ) )
 			: [];
-	const currentThread =
-		currentThreads.find( ( thread ) => thread.status === 'hold' ) ??
-		currentThreads[ 0 ] ??
-		null;
+	const currentThread = pickPrimaryNote( currentThreads );
 
 	if ( isDistractionFree ) {
 		return <AddNoteMenuItem isDistractionFree />;
