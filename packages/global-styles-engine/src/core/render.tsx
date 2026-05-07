@@ -1554,7 +1554,7 @@ function renderStylesNode(
 
 	// Process styles for block support features with custom feature level
 	// CSS selectors set.
-	if ( featureSelectors ) {
+	if ( featureSelectors && typeof featureSelectors !== 'string' ) {
 		let featureDeclarations = getFeatureDeclarations(
 			featureSelectors,
 			styles
@@ -1643,7 +1643,10 @@ function renderStylesNode(
 					styles?.variations?.[ styleVariationName ];
 				if ( styleVariations ) {
 					// If the block uses any custom selectors for block support, add those first.
-					if ( featureSelectors ) {
+					if (
+						featureSelectors &&
+						typeof featureSelectors !== 'string'
+					) {
 						let featureDeclarations = getFeatureDeclarations(
 							featureSelectors,
 							styleVariations
