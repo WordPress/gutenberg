@@ -688,6 +688,22 @@ export const saveEntityRecord =
 					// is intentionally excluded to avoid stale values
 					// overriding reverted fields.
 					const merged = { ...persistedRecord, ...record };
+
+					// The persisted CRDT document is managed through explicit
+					// saves (which call __unstablePrePersist to serialize a
+					// fresh copy). Autosaves carry a stale copy from the last
+					// server response and will either be rejected by the
+					// server's version check or, worse, overwrite a newer
+					// document. Strip it so autosaves don't touch sync data.
+					if ( merged.meta ) {
+						const {
+							/* eslint-disable-next-line camelcase */
+							_crdt_document,
+							...metaWithoutCRDT
+						} = merged.meta;
+						merged.meta = metaWithoutCRDT;
+					}
+
 					const data = [
 						'title',
 						'excerpt',

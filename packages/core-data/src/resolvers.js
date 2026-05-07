@@ -236,26 +236,77 @@ export const getEntityRecord =
 						// This effectively means that only post entities support CRDT
 						// persistence. As we add support for syncing additional entity,
 						// we'll need to revisit where persisted CRDT documents are stored.
-						persistCRDTDoc: () => {
-							resolveSelect
-								.getEditedEntityRecord( kind, name, key )
-								.then( ( editedRecord ) => {
-									// Don't persist the CRDT document if the record is still an
-									// auto-draft or if the entity does not support meta.
-									const { meta, status } = editedRecord;
-									if ( 'auto-draft' === status || ! meta ) {
-										return;
-									}
+						persistCRDTDoc: async () => {
+							const editedRecord =
+								await resolveSelect.getEditedEntityRecord(
+									kind,
+									name,
+									key
+								);
 
-									// Trigger a save to persist the CRDT document. The entity's
-									// pre-persist hooks will create the persisted CRDT document
-									// and apply it to the record's meta.
-									dispatch.saveEntityRecord(
+							const { meta, status } = editedRecord;
+							if ( 'auto-draft' === status || ! meta ) {
+								return;
+							}
+
+							let baseVersionSent = 0;
+							try {
+								const persistedDoc = meta._crdt_document;
+								if ( persistedDoc ) {
+									const parsed = JSON.parse( persistedDoc );
+									baseVersionSent = parsed.baseVersion ?? 0;
+								}
+							} catch {}
+
+							const savedRecord = await dispatch.saveEntityRecord(
+								kind,
+								name,
+								editedRecord
+							);
+							if ( ! savedRecord?.meta?._crdt_document ) {
+								return;
+							}
+
+							let serverVersion = 0;
+							try {
+								const savedDoc =
+									savedRecord.meta._crdt_document;
+								const parsed = JSON.parse( savedDoc );
+								serverVersion = parsed.baseVersion ?? 0;
+							} catch {}
+
+							if ( serverVersion === baseVersionSent ) {
+								return;
+							}
+
+							// Another client's CRDT doc was persisted between
+							// our read and write. Merge the server's CRDT doc
+							// into our local Y.Doc so we don't overwrite their
+							// changes on retry.
+							try {
+								const syncManager = getSyncManager();
+								if ( syncManager ) {
+									await resolveSelect.getEntityRecord(
 										kind,
 										name,
-										editedRecord
+										key
 									);
-								} );
+									// getEntityRecord re-applies the persisted CRDT
+									// doc to the local Y.Doc via load(). The
+									// edited record now reflects merged state.
+									const mergedRecord =
+										await resolveSelect.getEditedEntityRecord(
+											kind,
+											name,
+											key
+										);
+									await dispatch.saveEntityRecord(
+										kind,
+										name,
+										mergedRecord
+									);
+								}
+							} catch {}
 						},
 						addUndoMeta: ( ydoc, meta ) => {
 							const selectionHistory =
