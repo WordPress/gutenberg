@@ -3,7 +3,7 @@
  */
 import { DataViewsPicker, filterSortAndPaginate } from '@wordpress/dataviews';
 import type { Field, View } from '@wordpress/dataviews';
-import { useMemo, useState } from '@wordpress/element';
+import { Suspense, useMemo, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -33,7 +33,9 @@ function WidgetPreview( { item }: { item: WidgetType } ) {
 
 	return (
 		<div className={ styles.preview } { ...{ inert: '' } }>
-			<WidgetRender widget={ exampleWidget } widgetType={ item } />
+			<Suspense fallback={ null }>
+				<WidgetRender widget={ exampleWidget } widgetType={ item } />
+			</Suspense>
 		</div>
 	);
 }
