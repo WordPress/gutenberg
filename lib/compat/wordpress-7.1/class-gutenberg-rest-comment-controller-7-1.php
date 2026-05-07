@@ -378,18 +378,24 @@ class Gutenberg_REST_Comment_Controller_7_1 extends Gutenberg_REST_Comment_Contr
 				);
 			}
 
-			// Validate the reaction content. We accept either a curated emoji
-			// slug (e.g. "heart") or a short raw emoji character chosen from
-			// the full picker (e.g. "👍"). Length is capped so this column
-			// can never store anything resembling text content.
+			// Validate the reaction content. We accept either:
+			// - a curated slug (e.g. "heart"), or
+			// - a lowercase hex-codepoint sequence joined by `-` (e.g.
+			//   "1f44d" for 👍 or "1f468-200d-1f4bb" for 👨‍💻).
+			// Raw emoji bytes are rejected because the comments table is
+			// not guaranteed to be utf8mb4 across all WordPress installs;
+			// clients normalize before submitting.
 			$emojis      = gutenberg_get_note_reaction_emojis();
 			$valid_slugs = wp_list_pluck( $emojis, 'value' );
 			$emoji_slug  = isset( $request['content'] ) ? wp_strip_all_tags( $request['content'] ) : '';
 
 			$is_curated_slug = in_array( $emoji_slug, $valid_slugs, true );
-			$is_short_emoji  = '' !== $emoji_slug && mb_strlen( $emoji_slug ) <= 16;
+			$is_hex_key      = (bool) preg_match(
+				'/^[0-9a-f]{2,6}(-[0-9a-f]{2,6}){0,15}$/',
+				$emoji_slug
+			);
 
-			if ( ! $is_curated_slug && ! $is_short_emoji ) {
+			if ( ! $is_curated_slug && ! $is_hex_key ) {
 				return new WP_Error(
 					'rest_comment_invalid_reaction',
 					__( 'Invalid reaction emoji.', 'gutenberg' ),
