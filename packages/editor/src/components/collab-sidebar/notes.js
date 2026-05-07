@@ -111,12 +111,15 @@ export function Notes( { notes, sidebarRef, isFloating = false, styles } ) {
 			return;
 		}
 
-		if ( nextThread ) {
-			selectNote( nextThread.id );
-			focusNoteThread( nextThread.id, sidebarRef.current );
-		} else if ( prevThread ) {
-			selectNote( prevThread.id );
-			focusNoteThread( prevThread.id, sidebarRef.current );
+		const adjacentThread = nextThread ?? prevThread;
+		if ( adjacentThread ) {
+			selectNote( adjacentThread.id );
+			focusNoteThread( adjacentThread.id, sidebarRef.current );
+			if ( adjacentThread.blockClientId ) {
+				toggleBlockSpotlight( adjacentThread.blockClientId, true );
+				// Pass `null` as the second parameter to prevent focusing the block.
+				selectBlock( adjacentThread.blockClientId, null );
+			}
 		} else {
 			selectNote( undefined );
 			toggleBlockSpotlight( note.blockClientId, false );

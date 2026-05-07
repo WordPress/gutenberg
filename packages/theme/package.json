@@ -96,7 +96,7 @@
 		"@terrazzo/token-tools": "^2.0.3",
 		"@testing-library/jest-dom": "^6.9.1",
 		"@types/jest": "^29.5.14",
-		"@types/node": "^20.17.10",
+		"@types/node": "^20.19.39",
 		"esbuild": "^0.27.2",
 		"esbuild-esm-loader": "^0.3.3",
 		"storybook": "^10.2.8"

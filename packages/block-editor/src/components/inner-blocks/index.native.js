@@ -35,7 +35,7 @@ import { MAX_NESTING_DEPTH } from './constants';
  * returns. Optionally, you can also pass any other props through this hook, and
  * they will be merged and returned.
  *
- * @see https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/inner-blocks/README.md
+ * @see https://github.com/WordPress/gutenberg/blob/trunk/packages/block-editor/src/components/inner-blocks/README.md
  *
  * @param {Object} props   Optional. Props to pass to the element. Must contain
  *                         the ref if one is defined.

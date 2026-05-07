@@ -21,6 +21,7 @@ import {
 	activateAction,
 	deactivateAction,
 	deletePostTypeAction,
+	duplicatePostTypeAction,
 	type PostTypeRecord,
 } from '@wordpress/user-post-types';
 
@@ -51,6 +52,7 @@ function PostTypesPage() {
 		() => [
 			editAction,
 			quickEditPostTypeAction,
+			duplicatePostTypeAction,
 			activateAction,
 			deactivateAction,
 			deletePostTypeAction,
@@ -129,6 +131,10 @@ function PostTypesPage() {
 				paginationInfo={ paginationInfo }
 				defaultLayouts={ defaultLayouts }
 				getItemId={ ( item ) => String( item.id ) }
+				isItemClickable={ () => true }
+				onClickItem={ ( item ) =>
+					navigate( { to: `/edit/${ item.id }` } )
+				}
 			/>
 		</Page>
 	);

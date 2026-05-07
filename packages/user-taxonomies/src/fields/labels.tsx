@@ -242,14 +242,11 @@ export const labelsActionsField: Field< TaxonomyFormData > = {
 	filterBy: false,
 };
 
-export const labelsForm: Form = {
-	layout: { type: 'regular' },
+export const labelsFormFields: Form[ 'fields' ] = [
+	{
+		id: '__labels_actions',
+		layout: { type: 'regular', labelPosition: 'none' },
+	},
 	// singular_name lives in the General card, so exclude it here.
-	fields: [
-		{
-			id: '__labels_actions',
-			layout: { type: 'regular', labelPosition: 'none' },
-		},
-		...STRING_LABEL_KEYS.filter( ( key ) => key !== 'singular_name' ),
-	],
-};
+	...STRING_LABEL_KEYS.filter( ( key ) => key !== 'singular_name' ),
+];
