@@ -8,7 +8,7 @@
 
 ### Code Quality
 
-- DataViews: `ButtonTrigger` and `MenuItemTrigger` (item-actions internals) now `forwardRef` and spread unknown props onto their underlying `Button` / `Menu.Item`, so they compose under `Dialog.Trigger` via the render-prop pattern. `ModalActionInlineButton` and `ModalActionMenuItem` reuse them instead of inlining the same trigger markup. ([#78028](https://github.com/WordPress/gutenberg/pull/78028))
+- DataViews: Item actions now share a single `ItemActionsMenu` host that renders the kebab `<Menu>` and the per-action `Dialog.Root` as siblings. The dialog is hoisted out of `Menu.Popover`'s `unmountOnHide` subtree so a modal action stays mounted while the menu closes. `ButtonTrigger` (used in the inline-button path) gained `forwardRef` and spreads unknown props so it composes under `Dialog.Trigger`. A new `genericForwardRef` helper centralises the `forwardRef`-with-generics TypeScript workaround. ([#78028](https://github.com/WordPress/gutenberg/pull/78028))
 
 ### Breaking Changes
 
