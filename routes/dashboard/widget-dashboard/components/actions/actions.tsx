@@ -102,8 +102,8 @@ export function Actions(): React.ReactNode {
 					<AlertDialog.Root
 						open={ isResetDialogOpen }
 						onOpenChange={ setIsResetDialogOpen }
-						onConfirm={ () => {
-							onLayoutReset?.();
+						onConfirm={ async () => {
+							await onLayoutReset?.();
 							onEditChange?.( false );
 							setIsResetDialogOpen( false );
 						} }
