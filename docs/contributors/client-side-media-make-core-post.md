@@ -2,7 +2,7 @@
 
 WordPress 7.1 ships client-side media processing — a capability that handles image compression, resizing, format conversion, rotation, and thumbnail generation directly in the user's browser using WebAssembly, rather than on the server.
 
-The infrastructure landed during the 7.0 development cycle, when the feature graduated from a Gutenberg experiment to a core Gutenberg feature. Shipping was deferred to 7.1 to give the feature additional time to bake and to land HEIC support, end-to-end AVIF uploads, and several performance and stability improvements. See the [7.1 iteration tracking issue](https://github.com/WordPress/gutenberg/issues/76756) for the full scope.
+The feature graduated from a Gutenberg experiment to a core Gutenberg feature during the 7.0 cycle and ships in 7.1 with HEIC support and end-to-end AVIF uploads. See the [7.1 iteration tracking issue](https://github.com/WordPress/gutenberg/issues/76756) for the full scope.
 
 This post outlines what's changing, how it works, and what plugin and theme developers need to know.
 
@@ -17,36 +17,22 @@ Client-side media processing moves this work to the browser. Images are processe
 - **No more PHP memory limit failures.** Large image processing that would exceed PHP's memory limit now succeeds because it runs in the browser's memory space.
 - **Reduced server load.** Image processing is offloaded to the user's device, freeing server CPU and memory for other tasks.
 - **Consistent, high-quality output with modern image support.** All users get the same libvips-powered processing regardless of whether the server has GD or Imagick, and regardless of which version is installed.
-- **iPhone photos just work.** HEIC images can be decoded in the browser and converted to JPEG before upload, even on hosts without server-side HEIC support.
+- **Faster downloads for visitors.** libvips produces better-compressed output than GD or Imagick, so the generated images served to site visitors are smaller and load faster.
+- **iPhone photos just work.** HEIC images can be decoded in the browser and converted to JPEG before upload, even on hosts without server-side HEIC support. **Note**: HEIC decode relies on platform codecs and is supported in Chromium browsers (Chrome, Edge, Brave) on macOS and on Windows with HEVC support, and in Safari on macOS. Firefox is not supported.
 - **AVIF without server-side AVIF support.** Hosts whose PHP image editor doesn't support AVIF can still accept AVIF uploads when client-side processing is active.
 - **More resilient uploads.** Sub-size uploads are independent requests, so a network hiccup mid-upload doesn't lose the entire batch.
 
-## What's new in 7.1
+## What's included
 
-The 7.0 cycle delivered the foundation; 7.1 adds:
-
-- **HEIC/HEIF support** — iPhone photos (`image/heic`, `image/heif`) are decoded in the browser via three fallback strategies (`createImageBitmap`, `HTMLImageElement` + `OffscreenCanvas`, and HEIC container parsing + WebCodecs `VideoDecoder`) and uploaded as JPEG (`.jpg`). The original HEIC is kept as a companion file in `$metadata['original']` and removed when the attachment is deleted.
-- **AVIF end-to-end uploads** — `vips-heif.wasm` is now bundled in the worker, so AVIF can be decoded client-side. The REST API skips its `wp_prevent_unsupported_mime_type_uploads` check when `generate_sub_sizes=false`, so hosts without server-side AVIF support still accept the upload ([#76371](https://github.com/WordPress/gutenberg/pull/76371)).
-- **Batch thumbnail generation** — Sub-sizes are now generated from a single in-memory copy of the source image via `image.copyMemory()` and `thumbnailImage()`, replacing the previous decode-per-thumbnail approach ([#76979](https://github.com/WordPress/gutenberg/pull/76979)). The libvips discussion this is based on showed roughly a 60× per-thumbnail speedup.
-- **Sub-size deduplication** — When themes register image sizes with the same dimensions as built-in sizes (e.g. Twenty Eleven's `large` matches `medium_large`), the client now generates one physical file and registers it under all matching size names via the sideload route's `image_size` parameter (now accepts `string | string[]`) ([#77036](https://github.com/WordPress/gutenberg/pull/77036)).
-- **Single VIPS instance guarantee** — `getVips()` caches a promise rather than an instance, eliminating a race that could create multiple vips instances under concurrent first-time calls ([#76780](https://github.com/WordPress/gutenberg/pull/76780)).
-- **Fixed save lock during uploads** — The Save Draft button now respects `isPostSavingLocked` (it didn't before), and the legacy upload path no longer toggles the lock per file in a way that left it stuck on multi-file uploads ([#76973](https://github.com/WordPress/gutenberg/pull/76973)).
-- **Loosened device requirements** — The minimum CPU core count was lowered from 4 to 2, and `3g` connections are now allowed (previously blocked) ([#76616](https://github.com/WordPress/gutenberg/pull/76616)). Device memory and Save-Data thresholds are unchanged.
-- **`<img>` removed from cross-origin attribute injection** — `<img>` no longer gets `crossorigin="anonymous"` injected on cross-origin URLs, which was breaking external image previews. Document-Isolation-Policy doesn't require it for client-side processing to function ([#76618](https://github.com/WordPress/gutenberg/pull/76618)).
-- **Smaller build output** — Removed unused `vips-jxl.wasm` (~3.1 MB), skipped non-minified worker output and source maps for inlined-WASM modules. The vips worker bundle dropped from ~16 MB to ~13 MB and `build/modules/vips/` from 26 MB to 10 MB ([#76639](https://github.com/WordPress/gutenberg/pull/76639), [#76615](https://github.com/WordPress/gutenberg/pull/76615), [#75993](https://github.com/WordPress/gutenberg/pull/75993)).
-- **`convert_format` declared as boolean on the sideload route** — Lets REST coerce string values from `multipart/form-data`, fixing a HEIC filename-suffix drift bug ([#77565](https://github.com/WordPress/gutenberg/pull/77565)).
-
-## What changed during 7.0
-
-The 7.0 cycle delivered the foundation — published here for historical context since the feature was originally targeted for that release:
-
-- **Browser-based image processing**: Compression, resizing, cropping, format conversion (JPEG, PNG, WebP, AVIF, GIF), EXIF rotation, and progressive/interlaced encoding — all via WebAssembly in a Web Worker.
-- **Thumbnail generation in the browser**: All registered image sub-sizes are generated client-side and uploaded individually via the new sideload REST API endpoint.
-- **Automatic format conversion**: The existing `image_editor_output_format` filter is respected client-side, enabling automatic conversion (e.g., JPEG to WebP) before upload.
-- **Smart fallback**: Browsers that don't support the required features automatically fall back to server-side processing with no user-facing change.
-- **Cross-origin isolation via Document-Isolation-Policy**: WordPress sends `Document-Isolation-Policy: isolate-and-credentialless` on block editor screens for Chromium 137+, replacing the COEP/COOP approach in core. DIP provides per-document isolation without breaking other iframes on the page.
-- **Server-side hook compatibility**: After all client-side operations complete, `POST /wp/v2/media/{id}/finalize` re-runs `wp_generate_attachment_metadata` so plugins that hook into it (watermarking, CDN sync, etc.) continue to work.
-- **Image quality filter**: `editor.media.imageQuality` JavaScript filter to control client-side resize/crop quality (0–1, default 0.82).
+- **Browser-based image processing** — Compression, resizing, cropping, format conversion (JPEG, PNG, WebP, AVIF, GIF), EXIF rotation, and progressive/interlaced encoding via WebAssembly in a Web Worker.
+- **Thumbnail generation in the browser** — All registered image sub-sizes are generated client-side and uploaded individually via a new sideload REST API endpoint. Sizes that share dimensions with built-in sizes (e.g. Twenty Eleven's `large` matches `medium_large`) are deduplicated to a single physical file registered under all matching size names.
+- **HEIC/HEIF support** — iPhone photos (`image/heic`, `image/heif`) are decoded in the browser via three fallback strategies (`createImageBitmap`, `HTMLImageElement` + `OffscreenCanvas`, and HEIC container parsing + WebCodecs `VideoDecoder`) and uploaded as JPEG. The original HEIC is kept as a companion file in `$metadata['original']` and removed when the attachment is deleted.
+- **AVIF end-to-end uploads** — `vips-heif.wasm` is bundled in the worker so AVIF can be decoded client-side, and the REST API accepts the upload on hosts without server-side AVIF support.
+- **Automatic format conversion** — The existing `image_editor_output_format` filter is respected client-side, enabling automatic conversion (e.g., JPEG to WebP) before upload.
+- **Cross-origin isolation via Document-Isolation-Policy** — WordPress sends `Document-Isolation-Policy: isolate-and-credentialless` on block editor screens for Chromium 137+. DIP provides per-document isolation without breaking other iframes on the page.
+- **Server-side hook compatibility** — After all client-side operations complete, `POST /wp/v2/media/{id}/finalize` re-runs `wp_generate_attachment_metadata` so plugins that hook into it (watermarking, CDN sync, etc.) continue to work.
+- **Smart fallback** — Browsers that don't support the required features automatically fall back to server-side processing with no user-facing change.
+- **Image quality filter** — `editor.media.imageQuality` JavaScript filter to control client-side resize/crop quality (0–1, default 0.82).
 
 ## Technical overview
 
@@ -115,7 +101,7 @@ The quality value is passed through to the vips worker during resize and crop op
 
 WordPress sends `Document-Isolation-Policy: isolate-and-credentialless` on block editor screens for Chromium 137+. Since DIP is per-document, it doesn't impose the page-wide constraints of COEP/COOP. Notable behavior:
 
-- **External scripts loaded across origins** automatically get a `crossorigin="anonymous"` attribute via the server-side `wp_add_crossorigin_attributes()` output buffer and a client-side MutationObserver. Note: `<img>` was excluded from this list in 7.1 ([#76618](https://github.com/WordPress/gutenberg/pull/76618)) so external image previews don't break.
+- **External scripts loaded across origins** automatically get a `crossorigin="anonymous"` attribute via the server-side `wp_add_crossorigin_attributes()` output buffer and a client-side MutationObserver. `<img>` is excluded so external image previews aren't affected.
 - **DIP is skipped on admin pages with an `action` other than `edit`**, which keeps third-party page builders that rely on same-origin iframe access functional.
 
 You can override the gating with `gutenberg_use_document_isolation_policy` if you need to force DIP on or off:
@@ -136,7 +122,7 @@ Without this, the WASM processing worker cannot be created and processing falls 
 
 ## What theme developers need to know
 
-Client-side media processing is transparent to themes. Existing filters (`big_image_size_threshold`, `image_editor_output_format`, etc.) continue to work without modification. Image sizes registered via `add_image_size()` are automatically generated client-side, and sizes that share dimensions with built-in sizes are now deduplicated to a single physical file ([#77036](https://github.com/WordPress/gutenberg/pull/77036)).
+Client-side media processing is transparent to themes. Existing filters (`big_image_size_threshold`, `image_editor_output_format`, etc.) continue to work without modification. Image sizes registered via `add_image_size()` are automatically generated client-side, and sizes that share dimensions with built-in sizes are deduplicated to a single physical file.
 
 ## Browser compatibility and fallback
 
@@ -158,7 +144,7 @@ In addition to API support, the client checks several runtime conditions before 
 | Check | Threshold | Why |
 | --- | --- | --- |
 | Device memory | > 2 GB | WASM image processing can OOM on very low-memory devices. |
-| CPU cores | ≥ 2 | Lowered from 4 in [#76616](https://github.com/WordPress/gutenberg/pull/76616). |
+| CPU cores | ≥ 2 | WASM image processing benefits from at least one core for the worker plus one for the UI thread. |
 | Network | not `2g`/`slow-2g`, no Save-Data | The ~13 MB worker download is gated to faster connections; `3g` is allowed. |
 | CSP `blob:` workers | must succeed | The worker is created from a blob URL; strict `worker-src` policies block it. |
 
@@ -175,7 +161,7 @@ Failing any check causes a transparent fallback to server-side processing.
 
 ### Isn't this just a bandwidth optimization?
 
-The bigger win is **server CPU and memory relief**. Hosts no longer pay the GD/Imagick cost of generating sub-sizes on upload, which is one of the most common causes of PHP timeouts and memory-limit failures on shared hosting. Reduced upload bandwidth (when sub-sizes are smaller than the source the server would otherwise receive once) is a side effect, not the goal. See "Key benefits" above.
+No — and it isn't a bandwidth win at all. The client uploads the original plus every sub-size, so total bytes over the wire actually go *up* compared to the server-side path (which receives only the original). The point is **server CPU and memory relief**: hosts no longer pay the GD/Imagick cost of generating sub-sizes on upload, which is one of the most common causes of PHP timeouts and memory-limit failures on shared hosting. See "Key benefits" above.
 
 ### Doesn't the "never trust the client" rule apply here?
 
