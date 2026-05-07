@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { Button, RangeControl } from '@wordpress/components';
+import { Button } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
 import { displayShortcut, isAppleOS } from '@wordpress/keycodes';
@@ -20,6 +20,7 @@ import {
 import { useCropper } from '../../image-editor';
 import { useCropGestureHandlers } from '../../hooks/use-crop-gesture-handlers';
 import { MAX_ROTATION_OFFSET } from '../../image-editor/core/constants';
+import RotationRuler from '../rotation-ruler';
 
 export interface MediaEditorToolbarProps {
 	/**
@@ -61,7 +62,12 @@ export default function MediaEditorToolbar( {
 		undo: undoCrop,
 		redo: redoCrop,
 	} = useCropper();
-	const rotationGestureHandlers = useCropGestureHandlers();
+	// `commitOnKeyUp: false` keeps rapid arrow-key adjustments coalesced
+	// into a single undo entry by the state-change debounce. Pointer-up
+	// still commits immediately so each drag is its own undo step.
+	const rotationGestureHandlers = useCropGestureHandlers( {
+		commitOnKeyUp: false,
+	} );
 
 	const handleReset = () => {
 		reset();
@@ -88,10 +94,7 @@ export default function MediaEditorToolbar( {
 	const visualDir = singleFlip ? -1 : 1;
 	const fineOffset = ( state.rotation - baseAngle ) * visualDir;
 
-	const handleRotationSlider = ( value: number | undefined ) => {
-		if ( value === undefined ) {
-			return;
-		}
+	const handleRotationSlider = ( value: number ) => {
 		// Clamp strictly inside [-MAX, MAX). Exactly ±MAX lands state on a
 		// 90° midpoint and flips the derived baseAngle on the next render,
 		// causing subsequent events to spiral.
@@ -113,97 +116,94 @@ export default function MediaEditorToolbar( {
 			gap="sm"
 			wrap="wrap"
 		>
-			<Button
-				size="compact"
-				icon={ undo }
-				label={ __( 'Undo' ) }
-				showTooltip
-				shortcut={ displayShortcut.primary( 'z' ) }
-				disabled={ isUndoRedoDisabled || ! hasUndo }
-				accessibleWhenDisabled
-				onClick={ handleUndo }
-			/>
-			<Button
-				size="compact"
-				icon={ redo }
-				label={ __( 'Redo' ) }
-				showTooltip
-				shortcut={
-					isAppleOS()
-						? displayShortcut.primaryShift( 'z' )
-						: displayShortcut.primary( 'y' )
-				}
-				disabled={ isUndoRedoDisabled || ! hasRedo }
-				accessibleWhenDisabled
-				onClick={ handleRedo }
-			/>
-			<Button
-				size="compact"
-				icon={ rotateLeft }
-				label={ __( 'Rotate 90° counter-clockwise' ) }
-				showTooltip
-				onClick={ () => snapRotate90( -1 ) }
-			/>
-			<Button
-				size="compact"
-				icon={ rotateRight }
-				label={ __( 'Rotate 90° clockwise' ) }
-				showTooltip
-				onClick={ () => snapRotate90( 1 ) }
-			/>
-			<Button
-				size="compact"
-				icon={ flipHorizontal }
-				label={ __( 'Flip horizontal' ) }
-				showTooltip
-				isPressed={ state.flip.horizontal }
-				onClick={ () =>
-					setFlip( {
-						horizontal: ! state.flip.horizontal,
-						vertical: state.flip.vertical,
-					} )
-				}
-			/>
-			<Button
-				size="compact"
-				icon={ flipVertical }
-				label={ __( 'Flip vertical' ) }
-				showTooltip
-				isPressed={ state.flip.vertical }
-				onClick={ () =>
-					setFlip( {
-						horizontal: state.flip.horizontal,
-						vertical: ! state.flip.vertical,
-					} )
-				}
-			/>
 			<div
 				role="presentation"
 				className="media-editor-toolbar__rotation-slider"
 				{ ...rotationGestureHandlers }
 			>
-				<RangeControl
-					__next40pxDefaultSize
-					__nextHasNoMarginBottom
+				<RotationRuler
 					label={ __( 'Fine rotation' ) }
-					hideLabelFromVision
 					min={ -MAX_ROTATION_OFFSET }
 					max={ MAX_ROTATION_OFFSET }
-					step={ 0.5 }
 					value={ fineOffset }
 					onChange={ handleRotationSlider }
-					showTooltip={ false }
 				/>
 			</div>
-			<Button
-				size="compact"
-				variant="tertiary"
-				disabled={ ! isDirty }
-				accessibleWhenDisabled
-				onClick={ handleReset }
-			>
-				{ __( 'Reset' ) }
-			</Button>
+			<div className="media-editor-toolbar__action-cluster">
+				<Button
+					size="compact"
+					icon={ rotateLeft }
+					label={ __( 'Rotate 90° counter-clockwise' ) }
+					showTooltip
+					onClick={ () => snapRotate90( -1 ) }
+				/>
+				<Button
+					size="compact"
+					icon={ rotateRight }
+					label={ __( 'Rotate 90° clockwise' ) }
+					showTooltip
+					onClick={ () => snapRotate90( 1 ) }
+				/>
+				<Button
+					size="compact"
+					icon={ flipHorizontal }
+					label={ __( 'Flip horizontal' ) }
+					showTooltip
+					isPressed={ state.flip.horizontal }
+					onClick={ () =>
+						setFlip( {
+							horizontal: ! state.flip.horizontal,
+							vertical: state.flip.vertical,
+						} )
+					}
+				/>
+				<Button
+					size="compact"
+					icon={ flipVertical }
+					label={ __( 'Flip vertical' ) }
+					showTooltip
+					isPressed={ state.flip.vertical }
+					onClick={ () =>
+						setFlip( {
+							horizontal: state.flip.horizontal,
+							vertical: ! state.flip.vertical,
+						} )
+					}
+				/>
+				<Button
+					size="compact"
+					icon={ undo }
+					label={ __( 'Undo' ) }
+					showTooltip
+					shortcut={ displayShortcut.primary( 'z' ) }
+					disabled={ isUndoRedoDisabled || ! hasUndo }
+					accessibleWhenDisabled
+					onClick={ handleUndo }
+				/>
+				<Button
+					size="compact"
+					icon={ redo }
+					label={ __( 'Redo' ) }
+					showTooltip
+					shortcut={
+						isAppleOS()
+							? displayShortcut.primaryShift( 'z' )
+							: displayShortcut.primary( 'y' )
+					}
+					disabled={ isUndoRedoDisabled || ! hasRedo }
+					accessibleWhenDisabled
+					onClick={ handleRedo }
+				/>
+				<Button
+					size="compact"
+					variant="tertiary"
+					disabled={ ! isDirty }
+					accessibleWhenDisabled
+					onClick={ handleReset }
+				>
+					{ __( 'Reset' ) }
+				</Button>
+			</div>
 		</Stack>
 	);
 }

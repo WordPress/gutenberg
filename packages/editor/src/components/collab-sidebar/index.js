@@ -75,11 +75,54 @@ function NotesSidebar( { postId } ) {
 			( unresolvedNotes.length > 0 || selectedNote !== undefined )
 	);
 
+	async function focusNote( {
+		targetClientId,
+		noteId: targetNoteId,
+		isApproved,
+	} ) {
+		if ( ! targetClientId ) {
+			return;
+		}
+
+		const prevArea = await getActiveComplementaryArea( 'core' );
+		if ( isApproved ) {
+			enableComplementaryArea( 'core', ALL_NOTES_SIDEBAR );
+		} else if ( ! SIDEBARS.includes( prevArea ) || ! showAllNotesSidebar ) {
+			enableComplementaryArea(
+				'core',
+				showFloatingSidebar ? FLOATING_NOTES_SIDEBAR : ALL_NOTES_SIDEBAR
+			);
+		}
+
+		const currentArea = await getActiveComplementaryArea( 'core' );
+		// Bail out if the current active area is not one of note sidebars.
+		if ( ! SIDEBARS.includes( currentArea ) ) {
+			return;
+		}
+
+		// A special case for the List View, where block selection isn't required to trigger an action.
+		// The action won't do anything if the block is already selected.
+		selectBlock( targetClientId, null );
+		toggleBlockSpotlight( targetClientId, true );
+		selectNote( targetNoteId, { focus: true } );
+	}
+
+	function openNoteForBlock( targetClientId ) {
+		const target = notes.find(
+			( note ) => note.blockClientId === targetClientId
+		);
+		return focusNote( {
+			targetClientId,
+			noteId: target?.id ?? 'new',
+			isApproved: target?.status === 'approved',
+		} );
+	}
+
 	useShortcut(
 		'core/editor/new-note',
 		( event ) => {
 			event.preventDefault();
-			openTheSidebar();
+			openNoteForBlock( clientId );
 		},
 		{
 			// When multiple notes per block are supported. Remove note ID check.
@@ -98,39 +141,6 @@ function NotesSidebar( { postId } ) {
 		? notes.find( ( thread ) => thread.id === noteId )
 		: null;
 
-	async function openTheSidebar( selectedClientId ) {
-		const prevArea = await getActiveComplementaryArea( 'core' );
-		const activeNotesArea = SIDEBARS.find( ( name ) => name === prevArea );
-		const targetClientId =
-			selectedClientId && selectedClientId !== clientId
-				? selectedClientId
-				: clientId;
-		const targetNote = notes.find(
-			( note ) => note.blockClientId === targetClientId
-		);
-
-		if ( targetNote?.status === 'approved' ) {
-			enableComplementaryArea( 'core', ALL_NOTES_SIDEBAR );
-		} else if ( ! activeNotesArea || ! showAllNotesSidebar ) {
-			enableComplementaryArea(
-				'core',
-				showFloatingSidebar ? FLOATING_NOTES_SIDEBAR : ALL_NOTES_SIDEBAR
-			);
-		}
-
-		const currentArea = await getActiveComplementaryArea( 'core' );
-		// Bail out if the current active area is not one of note sidebars.
-		if ( ! SIDEBARS.includes( currentArea ) ) {
-			return;
-		}
-
-		// A special case for the List View, where block selection isn't required to trigger an action.
-		// The action won't do anything if the block is already selected.
-		selectBlock( targetClientId, null );
-		toggleBlockSpotlight( targetClientId, true );
-		selectNote( targetNote ? targetNote.id : 'new', { focus: true } );
-	}
-
 	if ( isDistractionFree ) {
 		return <AddNoteMenuItem isDistractionFree />;
 	}
@@ -140,10 +150,12 @@ function NotesSidebar( { postId } ) {
 			{ !! currentThread && (
 				<NoteAvatarIndicator
 					note={ currentThread }
-					onClick={ openTheSidebar }
+					onClick={ () => openNoteForBlock( clientId ) }
 				/>
 			) }
-			<AddNoteMenuItem onClick={ openTheSidebar } />
+			<AddNoteMenuItem
+				onClick={ ( menuClientId ) => openNoteForBlock( menuClientId ) }
+			/>
 			{ showAllNotesSidebar && (
 				<PluginSidebar
 					identifier={ ALL_NOTES_SIDEBAR }

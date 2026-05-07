@@ -2,23 +2,42 @@
  * WordPress dependencies
  */
 import { Page } from '@wordpress/admin-ui';
+import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import { useWidgetTypes } from './widget-types/hooks/use-widget-types';
+import { useDashboardLayout } from './hooks';
+import { WidgetDashboard } from './widget-dashboard';
+import { useWidgetTypes } from './widget-types';
+import styles from './stage.module.css';
 
 function Dashboard() {
+	const [ layout, setLayout ] = useDashboardLayout();
+
 	const widgetTypes = useWidgetTypes();
 
-	// eslint-disable-next-line no-console
-	console.log( 'widgetTypes', widgetTypes ); // ToDo: clean after testing
+	const [ editMode, setEditMode ] = useState( false );
 
 	return (
-		<Page title={ __( 'Dashboard' ) }>
-			<div className="dashboard-widgets" />
-		</Page>
+		<WidgetDashboard
+			layout={ layout }
+			onLayoutChange={ setLayout }
+			widgetTypes={ widgetTypes }
+			editMode={ editMode }
+			onEditChange={ setEditMode }
+		>
+			<Page
+				title={ __( 'Dashboard' ) }
+				actions={ <WidgetDashboard.Actions /> }
+			>
+				<div className={ styles[ 'dashboard-widgets-container' ] }>
+					<WidgetDashboard.NoWidgetsState />
+					<WidgetDashboard.Widgets />
+				</div>
+			</Page>
+		</WidgetDashboard>
 	);
 }
 

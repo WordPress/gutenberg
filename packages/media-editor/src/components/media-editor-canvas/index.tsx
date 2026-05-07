@@ -10,6 +10,8 @@ export interface MediaEditorCanvasProps {
 	aspectRatio?: number;
 	/** Enable freeform crop mode (resize handles). */
 	freeformCrop?: boolean;
+	/** Focus the crop area when the canvas mounts. */
+	focusOnMount?: boolean;
 	/** Whether external placement activity should reveal the grid. */
 	isPlacementActive?: boolean;
 	/** Fires when a canvas cropper gesture begins. */
@@ -28,6 +30,7 @@ export interface MediaEditorCanvasProps {
  * @param props
  * @param props.aspectRatio
  * @param props.freeformCrop
+ * @param props.focusOnMount
  * @param props.isPlacementActive
  * @param props.onGestureStart
  * @param props.onGestureEnd
@@ -35,6 +38,7 @@ export interface MediaEditorCanvasProps {
 export default function MediaEditorCanvas( {
 	aspectRatio,
 	freeformCrop,
+	focusOnMount,
 	isPlacementActive = false,
 	onGestureStart,
 	onGestureEnd,
@@ -56,6 +60,7 @@ export default function MediaEditorCanvas( {
 				controller={ controller }
 				aspectRatio={ aspectRatio }
 				freeformCrop={ freeformCrop }
+				focusOnMount={ focusOnMount }
 				showGrid="interactive"
 				isPlacementActive={ isPlacementActive }
 				// Flush on gesture start so any pending sidebar interaction
