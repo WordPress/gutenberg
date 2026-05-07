@@ -7,6 +7,7 @@ import type {
 	MouseEventHandler,
 	ReactElement,
 	Ref,
+	SyntheticEvent,
 } from 'react';
 
 /**
@@ -41,13 +42,15 @@ interface SummaryButtonProps< Item > {
 	disabled?: boolean;
 	/*
 	 * Click handler invoked from both the row's pointer interaction
-	 * (`handleRowClick`) and the keyboard handler (`handleKeyDown`). When
+	 * (`handleRowClick`) and the keyboard handler (`handleKeyDown`).
+	 * Typed as `SyntheticEvent` because keyboard activation forwards the
+	 * `KeyboardEvent` here without synthesising a `MouseEvent`. When
 	 * `SummaryButton` is composed with `Dialog.Trigger` via the render-prop
 	 * pattern, the trigger primitive injects its open-toggle handler here
 	 * at runtime; otherwise the parent supplies the click handler
 	 * directly (e.g. the `Dropdown` `renderToggle` callback).
 	 */
-	onClick?: MouseEventHandler;
+	onClick?: ( event: SyntheticEvent ) => void;
 	/*
 	 * The three `aria-*` props below are routed onto the inner pencil
 	 * `<Button>` (the only focusable element). Consumers must pass an
@@ -145,7 +148,7 @@ function SummaryButtonImpl< Item >(
 			( event.key === 'Enter' || event.key === ' ' )
 		) {
 			event.preventDefault();
-			onClick?.( event as unknown as React.MouseEvent< HTMLDivElement > );
+			onClick?.( event );
 		}
 	};
 
