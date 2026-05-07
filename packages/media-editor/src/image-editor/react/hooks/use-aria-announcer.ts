@@ -95,7 +95,7 @@ export function useAriaAnnouncer( state: CropperState ): string {
 	const latestStateRef = useRef( state );
 	useLayoutEffect( () => {
 		latestStateRef.current = state;
-	} );
+	}, [ state ] );
 
 	useEffect( () => {
 		clearTimeout( timerRef.current );
