@@ -1,6 +1,11 @@
 import clsx from 'clsx';
 import { usePrevious } from '@wordpress/compose';
-import { useCallback, useEffect, useLayoutEffect } from '@wordpress/element';
+import {
+	useCallback,
+	useEffect,
+	useLayoutEffect,
+	useRef,
+} from '@wordpress/element';
 import styles from '../style.module.scss';
 import { useToolsPanelContext } from '../context';
 import type { WordPressComponentProps } from '../../context';
@@ -130,6 +135,11 @@ export function useToolsPanelItem(
 		isShownByDefault,
 	] );
 
+	// Tracks whether the item was explicitly shown by a user menu action.
+	// This allows onDeselect to fire even when hasValue() is false, but only
+	// for items the user intentionally toggled on.
+	const wasShownByUserRef = useRef( false );
+
 	// Determine if the panel item's corresponding menu is being toggled and
 	// trigger appropriate callback if it is.
 	useEffect( () => {
@@ -141,11 +151,15 @@ export function useToolsPanelItem(
 		}
 
 		if ( isMenuItemChecked && ! isValueSet && ! wasMenuItemChecked ) {
+			wasShownByUserRef.current = true;
 			onSelect?.();
 		}
 
 		if ( ! isMenuItemChecked && wasMenuItemChecked ) {
-			onDeselect?.();
+			if ( isValueSet || wasShownByUserRef.current ) {
+				onDeselect?.();
+			}
+			wasShownByUserRef.current = false;
 		}
 	}, [
 		hasMatchingPanel,
