@@ -246,6 +246,8 @@ function compileInlineStyle( { cssModules = false, minify = true } = {} ) {
 			.digest( 'hex' )
 			.slice( 0, 10 );
 
+		// Skip automatic style injection in Node-based test environments, where DOM
+		// implementations do not reliably support modern CSS features like @layer.
 		let cssModule = cssModules
 			? `import { registerStyle } from '@wordpress/style-runtime';
 if (typeof process === 'undefined' || process.env.NODE_ENV !== 'test') {
