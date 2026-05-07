@@ -2,11 +2,14 @@
 
 ## Dev environment tips
 
+Node version is pinned in `.nvmrc` (currently 20). Use `nvm use` before installing.
+
 ```bash
 # Setup
 npm install && composer install
 npm run wp-env status   # Always check status first
 npm run wp-env start    # Only start if not already running
+npm run wp-env stop     # Stop the local WordPress environment
 
 # Development
 npm start               # Development with watch
@@ -73,6 +76,7 @@ For full architecture details, see `docs/explanations/architecture/`.
 -   Avoid using private APIs in bundled packages (packages without `wpScript` or `wpModuleExports`). Private APIs are intended for Core usage; bundled packages may also be imported via npm into plugin scripts, causing incompatibilities.
 -   `block-editor` is a WordPress-agnostic package. NEVER add `core-data` dependencies or direct REST API calls to it.
 -   `@wordpress/build` (`packages/wp-build`) is a generic build tool used both in Gutenberg and by plugins targeting WordPress Core directly. Avoid Gutenberg-specific changes in it.
+-   React Native mobile editor: when renaming exported functions, classes, or variables, mirror the change in the corresponding `.native.js` file (if one exists) to avoid breaking the mobile build.
 
 ## PR instructions
 
