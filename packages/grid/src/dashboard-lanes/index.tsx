@@ -352,9 +352,7 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 			);
 
 			if ( resizeBaselineRef.current === null ) {
-				const baseItem = activeLayout.find(
-					( item ) => item.key === id
-				);
+				const baseItem = layoutMap.get( id );
 				const baseWidth =
 					typeof baseItem?.width === 'number' ? baseItem.width : 1;
 				resizeBaselineRef.current = baseWidth;
@@ -365,9 +363,7 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 				Math.min( baseline + relativeDelta, effectiveColumns )
 			);
 
-			const currentItem = activeLayout.find(
-				( item ) => item.key === id
-			);
+			const currentItem = layoutMap.get( id );
 			if ( currentItem && currentItem.width === newWidth ) {
 				return;
 			}
