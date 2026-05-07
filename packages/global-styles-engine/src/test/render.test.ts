@@ -727,7 +727,7 @@ describe( 'global styles renderer', () => {
 			);
 
 			expect( result ).toEqual(
-				':root :where(.is-style-foo.wp-block-group .wp-block-button){color: red;}:root :where(.is-style-foo.wp-block-group .wp-block-button:hover){color: blue;}@media (width <= 480px){:root :where(.is-style-foo.wp-block-group .wp-block-button){color: green;}:root :where(.is-style-foo.wp-block-group .wp-block-button:hover){color: yellow;}}'
+				':root :where(.is-style-foo.wp-block-group .wp-block-button){color: red;}@media (width <= 480px){:root :where(.is-style-foo.wp-block-group .wp-block-button){color: green;}}:root :where(.is-style-foo.wp-block-group .wp-block-button:hover){color: blue;}@media (width <= 480px){:root :where(.is-style-foo.wp-block-group .wp-block-button:hover){color: yellow;}}'
 			);
 		} );
 
@@ -993,7 +993,7 @@ describe( 'global styles renderer', () => {
 			);
 
 			expect( result ).toEqual(
-				':root :where(.wp-block-button:hover){color: blue;}@media (width <= 480px){:root :where(.wp-block-button){color: red;}:root :where(.wp-block-button:hover){color: orange;}}'
+				'@media (width <= 480px){:root :where(.wp-block-button){color: red;}}:root :where(.wp-block-button:hover){color: blue;}@media (width <= 480px){:root :where(.wp-block-button:hover){color: orange;}}'
 			);
 		} );
 
@@ -1077,7 +1077,7 @@ describe( 'global styles renderer', () => {
 			);
 
 			expect( result ).toEqual(
-				'a:where(:not(.wp-element-button)){color: blue;}@media (width <= 480px){:root :where(a:where(:not(.wp-element-button))){color: red;}:root :where(a:where(:not(.wp-element-button)):hover){color: orange;}}'
+				'a:where(:not(.wp-element-button)){color: blue;}@media (width <= 480px){:root :where(a:where(:not(.wp-element-button))){color: red;}}@media (width <= 480px){:root :where(a:where(:not(.wp-element-button)):hover){color: orange;}}'
 			);
 		} );
 
