@@ -14,7 +14,7 @@ import type { DashboardGridLayoutItem } from '@wordpress/grid';
  * Internal dependencies
  */
 import { useDashboardInternalContext } from '../../context/dashboard-context';
-import { Widget } from '../widget';
+import { WidgetChrome } from '../widget-chrome';
 import styles from './widgets.module.css';
 import type { DashboardWidget, WidgetName } from '../../types';
 
@@ -50,7 +50,7 @@ export interface WidgetsProps {
 }
 
 /**
- * Iterates `layout`, delegates each entry to `WidgetDashboard.Widget`, and
+ * Iterates `layout`, delegates each entry to `WidgetDashboard.WidgetChrome`, and
  * feeds the resulting tree into `@wordpress/grid`.
  */
 export const Widgets = forwardRef< HTMLDivElement, WidgetsProps >(
@@ -68,7 +68,11 @@ export const Widgets = forwardRef< HTMLDivElement, WidgetsProps >(
 		);
 
 		const children = layout.map( ( widget, index ) => (
-			<Widget key={ widget.uuid } widget={ widget } index={ index } />
+			<WidgetChrome
+				key={ widget.uuid }
+				widget={ widget }
+				index={ index }
+			/>
 		) );
 
 		const sharedProps = {

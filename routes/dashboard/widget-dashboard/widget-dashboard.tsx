@@ -5,7 +5,7 @@ import { WidgetDashboardProvider } from './context/dashboard-context';
 import { WidgetDashboardUIProvider } from './context/ui-context';
 import { Actions } from './components/actions';
 import { Inserter } from './components/inserter';
-import { Widget } from './components/widget';
+import { WidgetChrome } from './components/widget-chrome';
 import { Widgets } from './components/widgets';
 import type { WidgetDashboardProps } from './types';
 import { NoWidgetsState } from './components/no-widgets-state';
@@ -72,5 +72,5 @@ export const WidgetDashboard = Object.assign(
 			</WidgetDashboardProvider>
 		);
 	},
-	{ Actions, Widgets, Widget, NoWidgetsState }
+	{ Actions, Widgets, WidgetChrome, NoWidgetsState }
 );

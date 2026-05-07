@@ -4,4 +4,5 @@
 export default {
 	name: 'core/hello-world',
 	title: 'Hello World',
+	icon: 'wordpress',
 };
