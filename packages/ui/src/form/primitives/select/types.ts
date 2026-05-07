@@ -26,6 +26,13 @@ export type SelectTriggerProps = ComponentProps< typeof _Select.Trigger > & {
 	 */
 	variant?: 'default' | 'minimal';
 	/**
+	 * Text to show when no value is selected.
+	 * This is overridden by `children` if specified, or by a null item's label in `items`.
+	 *
+	 * @default __( 'Select' )
+	 */
+	placeholder?: _Select.Value.Props[ 'placeholder' ];
+	/**
 	 * A function that gets called with the current value as an argument.
 	 * Use this to customize the trigger content.
 	 */

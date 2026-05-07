@@ -80,46 +80,26 @@ export const Minimal: Story = {
 	},
 };
 
-const withEmptyOptionItems = [
-	{
-		value: '',
-		label: 'Select',
-		disabled: true,
-	},
-	{
-		value: 'Item 2',
-		label: 'Item 2',
-	},
-];
+const placeholderItems = [ 'Item 1', 'Item 2' ];
 
 /**
- * By passing an `items` array to `Select.Root`, the `Select.Trigger` will be able to
- * render a `label` string for each item rather than the raw `value` string. In this
- * case, the option with an empty string value has a `"Select"` label string.
- *
- * This may be easier than writing a custom render function for the `Select.Trigger`.
+ * Use the `placeholder` prop on `Select.Trigger` to show text when no
+ * value is selected. The default placeholder is `"Select"`.
  */
-export const WithEmptyValueOption: Story = {
+export const WithCustomPlaceholder: Story = {
 	args: {
-		items: withEmptyOptionItems,
 		children: (
 			<>
-				<Select.Trigger />
+				<Select.Trigger placeholder="Choose an item" />
 				<Select.Popup>
-					{ withEmptyOptionItems.map( ( item ) => (
-						<Select.Item
-							key={ item.value }
-							value={ item.value }
-							label={ item.label }
-							disabled={ item.disabled }
-						>
-							{ item.label }
+					{ placeholderItems.map( ( item ) => (
+						<Select.Item key={ item } value={ item }>
+							{ item }
 						</Select.Item>
 					) ) }
 				</Select.Popup>
 			</>
 		),
-		defaultValue: '',
 	},
 };
 
