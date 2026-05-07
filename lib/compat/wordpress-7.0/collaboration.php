@@ -68,16 +68,16 @@ function gutenberg_create_collaboration_table() {
 	$max_index_length = 191;
 
 	$sql = "CREATE TABLE {$wpdb->collaboration} (
-		id bigint(20) unsigned NOT NULL auto_increment,
+		collaboration_id bigint(20) unsigned NOT NULL auto_increment,
 		room varchar({$max_index_length}) NOT NULL default '',
 		type varchar(32) NOT NULL default '',
 		client_id varchar(32) NOT NULL default '',
 		user_id bigint(20) unsigned NOT NULL default '0',
 		data longtext NOT NULL,
 		date_gmt datetime NOT NULL default '0000-00-00 00:00:00',
-		PRIMARY KEY  (id),
+		PRIMARY KEY  (collaboration_id),
 		KEY type_client_id (type,client_id),
-		KEY room (room,id),
+		KEY room (room,collaboration_id),
 		KEY date_gmt (date_gmt)
 	) $charset_collate;";
 
