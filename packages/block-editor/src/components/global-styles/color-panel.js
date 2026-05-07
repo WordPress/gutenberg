@@ -179,6 +179,7 @@ const LabeledColorIndicators = ( { indicators, label } ) => (
 function ColorPanelTab( {
 	isGradient,
 	inheritedValue,
+	inheritedSlug,
 	userValue,
 	setValue,
 	colorGradientControlSettings,
@@ -190,8 +191,13 @@ function ColorPanelTab( {
 			enableAlpha
 			__experimentalIsRenderedInSidebar
 			colorValue={ isGradient ? undefined : inheritedValue }
+			colorSlug={ isGradient ? undefined : inheritedSlug }
 			gradientValue={ isGradient ? inheritedValue : undefined }
-			onColorChange={ isGradient ? undefined : setValue }
+			onColorChange={
+				isGradient
+					? undefined
+					: ( newColor, newSlug ) => setValue( newColor, newSlug )
+			}
 			onGradientChange={ isGradient ? setValue : undefined }
 			clearable={ inheritedValue === userValue }
 			headingLevel={ 3 }
@@ -343,7 +349,14 @@ export default function ColorPanel( {
 		hasGradientColors && ! hasBackgroundGradientSupport;
 	const decodeValue = ( rawValue ) =>
 		getValueFromVariable( { settings }, '', rawValue );
-	const encodeColorValue = ( colorValue ) => {
+	const extractColorSlug = ( rawValue ) =>
+		rawValue?.startsWith( 'var:preset|color|' )
+			? rawValue.slice( 'var:preset|color|'.length )
+			: undefined;
+	const encodeColorValue = ( colorValue, slug ) => {
+		if ( slug ) {
+			return 'var:preset|color|' + slug;
+		}
 		const allColors = colors.flatMap(
 			( { colors: originColors } ) => originColors
 		);
@@ -375,11 +388,11 @@ export default function ColorPanel( {
 	const hasBackground = () =>
 		!! userBackgroundColor ||
 		( ! hasBackgroundGradientSupport && !! userGradient );
-	const setBackgroundColor = ( newColor ) => {
+	const setBackgroundColor = ( newColor, newSlug ) => {
 		const newValue = setImmutably(
 			value,
 			[ 'color', 'background' ],
-			encodeColorValue( newColor )
+			encodeColorValue( newColor, newSlug )
 		);
 		if ( ! hasBackgroundGradientSupport ) {
 			newValue.color.gradient = undefined;
@@ -413,12 +426,12 @@ export default function ColorPanel( {
 		inheritedValue?.elements?.link?.color?.text
 	);
 	const userLinkColor = decodeValue( value?.elements?.link?.color?.text );
-	const setLinkColor = ( newColor ) => {
+	const setLinkColor = ( newColor, newSlug ) => {
 		onChange(
 			setImmutably(
 				value,
 				[ 'elements', 'link', 'color', 'text' ],
-				encodeColorValue( newColor )
+				encodeColorValue( newColor, newSlug )
 			)
 		);
 	};
@@ -428,12 +441,12 @@ export default function ColorPanel( {
 	const userHoverLinkColor = decodeValue(
 		value?.elements?.link?.[ ':hover' ]?.color?.text
 	);
-	const setHoverLinkColor = ( newColor ) => {
+	const setHoverLinkColor = ( newColor, newSlug ) => {
 		onChange(
 			setImmutably(
 				value,
 				[ 'elements', 'link', ':hover', 'color', 'text' ],
-				encodeColorValue( newColor )
+				encodeColorValue( newColor, newSlug )
 			)
 		);
 	};
@@ -457,17 +470,17 @@ export default function ColorPanel( {
 	const textColor = decodeValue( inheritedValue?.color?.text );
 	const userTextColor = decodeValue( value?.color?.text );
 	const hasTextColor = () => !! userTextColor;
-	const setTextColor = ( newColor ) => {
+	const setTextColor = ( newColor, newSlug ) => {
 		let changedObject = setImmutably(
 			value,
 			[ 'color', 'text' ],
-			encodeColorValue( newColor )
+			encodeColorValue( newColor, newSlug )
 		);
 		if ( textColor === linkColor ) {
 			changedObject = setImmutably(
 				changedObject,
 				[ 'elements', 'link', 'color', 'text' ],
-				encodeColorValue( newColor )
+				encodeColorValue( newColor, newSlug )
 			);
 		}
 
@@ -566,6 +579,9 @@ export default function ColorPanel( {
 					key: 'text',
 					label: __( 'Text' ),
 					inheritedValue: textColor,
+					inheritedSlug: extractColorSlug(
+						inheritedValue?.color?.text
+					),
 					setValue: setTextColor,
 					userValue: userTextColor,
 				},
@@ -586,6 +602,9 @@ export default function ColorPanel( {
 					key: 'background',
 					label: __( 'Color' ),
 					inheritedValue: backgroundColor,
+					inheritedSlug: extractColorSlug(
+						inheritedValue?.color?.background
+					),
 					setValue: setBackgroundColor,
 					userValue: userBackgroundColor,
 				},
@@ -611,6 +630,9 @@ export default function ColorPanel( {
 					key: 'link',
 					label: __( 'Default' ),
 					inheritedValue: linkColor,
+					inheritedSlug: extractColorSlug(
+						inheritedValue?.elements?.link?.color?.text
+					),
 					setValue: setLinkColor,
 					userValue: userLinkColor,
 				},
@@ -618,6 +640,10 @@ export default function ColorPanel( {
 					key: 'hover',
 					label: __( 'Hover' ),
 					inheritedValue: hoverLinkColor,
+					inheritedSlug: extractColorSlug(
+						inheritedValue?.elements?.link?.[ ':hover' ]?.color
+							?.text
+					),
 					setValue: setHoverLinkColor,
 					userValue: userHoverLinkColor,
 				},
@@ -665,20 +691,20 @@ export default function ColorPanel( {
 			onChange( newValue );
 		};
 
-		const setElementTextColor = ( newTextColor ) => {
+		const setElementTextColor = ( newTextColor, newSlug ) => {
 			onChange(
 				setImmutably(
 					value,
 					[ 'elements', name, 'color', 'text' ],
-					encodeColorValue( newTextColor )
+					encodeColorValue( newTextColor, newSlug )
 				)
 			);
 		};
-		const setElementBackgroundColor = ( newBackgroundColor ) => {
+		const setElementBackgroundColor = ( newBackgroundColor, newSlug ) => {
 			const newValue = setImmutably(
 				value,
 				[ 'elements', name, 'color', 'background' ],
-				encodeColorValue( newBackgroundColor )
+				encodeColorValue( newBackgroundColor, newSlug )
 			);
 			newValue.elements[ name ].color.gradient = undefined;
 			onChange( newValue );
@@ -720,6 +746,9 @@ export default function ColorPanel( {
 						key: 'text',
 						label: __( 'Text' ),
 						inheritedValue: elementTextColor,
+						inheritedSlug: extractColorSlug(
+							inheritedValue?.elements?.[ name ]?.color?.text
+						),
 						setValue: setElementTextColor,
 						userValue: elementTextUserColor,
 					},
@@ -728,6 +757,10 @@ export default function ColorPanel( {
 						key: 'background',
 						label: __( 'Background' ),
 						inheritedValue: elementBackgroundColor,
+						inheritedSlug: extractColorSlug(
+							inheritedValue?.elements?.[ name ]?.color
+								?.background
+						),
 						setValue: setElementBackgroundColor,
 						userValue: elementBackgroundUserColor,
 					},
