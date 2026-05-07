@@ -27,8 +27,13 @@ import type { MoreActionsDropdownItem } from '../more-actions-dropdown';
  * @return {React.ReactNode} - The Actions component.
  */
 export function Actions(): React.ReactNode {
-	const { editMode, onEditChange, onLayoutReset } =
-		useDashboardInternalContext();
+	const {
+		editMode,
+		onEditChange,
+		onLayoutReset,
+		commitLayout,
+		cancelLayout,
+	} = useDashboardInternalContext();
 
 	const { setInserterOpen } = useDashboardUIContext();
 
@@ -43,16 +48,12 @@ export function Actions(): React.ReactNode {
 	}, [ setInserterOpen ] );
 
 	const cancel = useCallback( () => {
-		// eslint-disable-next-line no-console
-		console.log( 'cancel' ); // TODO: Implement cancel\
-		onEditChange?.( false );
-	}, [ onEditChange ] );
+		cancelLayout();
+	}, [ cancelLayout ] );
 
 	const done = useCallback( () => {
-		// eslint-disable-next-line no-console
-		console.log( 'done' ); // TODO: Implement done
-		onEditChange?.( false );
-	}, [ onEditChange ] );
+		commitLayout();
+	}, [ commitLayout ] );
 
 	const moreActionsItems: MoreActionsDropdownItem[] = [
 		{
