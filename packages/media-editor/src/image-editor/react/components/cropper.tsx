@@ -217,6 +217,26 @@ function CropperInner(
 		[]
 	);
 
+	// Ensure focus returns to the crop area when Shift+Tab is pressed on the first resize handle.
+	const handleCropAreaKeyDownCapture = useCallback(
+		( event: React.KeyboardEvent< HTMLDivElement > ) => {
+			if ( event.key !== 'Tab' || ! event.shiftKey ) {
+				return;
+			}
+
+			const firstHandle = event.currentTarget.querySelector(
+				'.wp-media-editor-image-editor__handle'
+			);
+			if ( event.target !== firstHandle ) {
+				return;
+			}
+
+			event.preventDefault();
+			canvasRef.current?.focus( { preventScroll: true } );
+		},
+		[]
+	);
+
 	useEffect( () => {
 		const element = canvasRef.current;
 		if ( ! element ) {
@@ -577,6 +597,7 @@ function CropperInner(
 				}
 				onFocus={ handleCropAreaFocus }
 				onBlur={ handleCropAreaBlur }
+				onKeyDownCapture={ handleCropAreaKeyDownCapture }
 				{ ...handlers }
 			>
 				<div

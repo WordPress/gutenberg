@@ -165,6 +165,32 @@ describe( 'Cropper', () => {
 		);
 	} );
 
+	it( 'returns focus to the crop area on Shift+Tab from the first resize handle', async () => {
+		render(
+			<Cropper
+				src="test.jpg"
+				controller={ createController() }
+				showDimming={ false }
+				freeformCrop
+				focusOnMount
+			/>
+		);
+
+		const canvas = screen.getByRole( 'group', { name: 'Crop area' } );
+		const handle = await screen.findByRole( 'button', {
+			name: 'Resize top-left corner',
+		} );
+
+		act( () => {
+			handle.focus();
+		} );
+		expect( handle ).toHaveFocus();
+
+		fireEvent.keyDown( handle, { key: 'Tab', shiftKey: true } );
+
+		expect( canvas ).toHaveFocus();
+	} );
+
 	it( 'renders the grid hidden by default in interactive mode', async () => {
 		render(
 			<Cropper
