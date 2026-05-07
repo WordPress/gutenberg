@@ -12,6 +12,7 @@ import {
 	ToggleControl,
 	ToolbarButton,
 	ToolbarGroup,
+	__experimentalConfirmDialog as ConfirmDialog,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalUseCustomUnits as useCustomUnits,
@@ -30,6 +31,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	BlockControls,
 	InspectorControls,
+	RichText,
 	__experimentalImageURLInputUI as ImageURLInputUI,
 	MediaReplaceFlow,
 	store as blockEditorStore,
@@ -328,6 +330,7 @@ export default function Image( {
 		lightbox,
 		metadata,
 		isDecorative,
+		caption,
 	} = attributes;
 	const [ imageElement, setImageElement ] = useState();
 	const [ resizeDelta, setResizeDelta ] = useState( null );
@@ -607,11 +610,32 @@ export default function Image( {
 		setAttributes( { alt: newAlt } );
 	}
 
-	function updateIsDecorative( value ) {
+	const [ isDecorativeConfirmVisible, setIsDecorativeConfirmVisible ] =
+		useState( false );
+
+	function applyDecorative() {
 		setAttributes( {
-			isDecorative: value || undefined,
-			...( value && { alt: '' } ),
+			isDecorative: true,
+			alt: '',
+			caption: undefined,
+			href: undefined,
+			linkDestination: undefined,
+			linkTarget: undefined,
+			rel: undefined,
 		} );
+	}
+
+	function updateIsDecorative( value ) {
+		if ( ! value ) {
+			setAttributes( { isDecorative: undefined } );
+			return;
+		}
+		const hasDataToLose = alt || ! RichText.isEmpty( caption ) || href;
+		if ( hasDataToLose ) {
+			setIsDecorativeConfirmVisible( true );
+		} else {
+			applyDecorative();
+		}
 	}
 
 	const imperativeFocalPointPreview = ( value ) => {
@@ -857,7 +881,8 @@ export default function Image( {
 		isSingleSelected &&
 		! isEditingImage &&
 		! lockHrefControls &&
-		! lockUrlControls;
+		! lockUrlControls &&
+		! isDecorative;
 
 	const showCoverControls =
 		isSingleSelected && canInsertCover && ! isContentOnlyMode;
@@ -1419,9 +1444,28 @@ export default function Image( {
 				showToolbarButton={
 					isSingleSelected &&
 					( hasNonContentControls || isContentOnlyMode ) &&
-					! hideCaptionControls
+					! hideCaptionControls &&
+					! isDecorative
 				}
+				readOnly={ isDecorative }
 			/>
+
+			{ isDecorativeConfirmVisible && (
+				<ConfirmDialog
+					isOpen
+					onConfirm={ () => {
+						setIsDecorativeConfirmVisible( false );
+						applyDecorative();
+					} }
+					onCancel={ () => setIsDecorativeConfirmVisible( false ) }
+					confirmButtonText={ __( 'Mark as decorative' ) }
+					size="medium"
+				>
+					{ __(
+						'Marking this image as decorative will remove its alt text, caption, and any link. Continue?'
+					) }
+				</ConfirmDialog>
+			) }
 		</>
 	);
 }
