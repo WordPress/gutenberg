@@ -25,6 +25,7 @@ import type { Action, ActionModal as ActionModalType } from '../../types';
 import type { SetSelection } from '../../types/private';
 import type { ActionTriggerProps } from '../dataviews-item-actions';
 import getFooterMessage from '../../utils/get-footer-message';
+import genericForwardRef from '../../utils/generic-forward-ref';
 
 interface ActionWithModalProps< Item > {
 	action: ActionModalType< Item >;
@@ -37,15 +38,7 @@ function ActionWithModal< Item >( {
 }: ActionWithModalProps< Item > ) {
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
 	const closeModal = useCallback( () => setIsModalOpen( false ), [] );
-	const label =
-		typeof action.label === 'string' ? action.label : action.label( items );
-	const isMobile = useViewportMatch( 'medium', '<' );
 
-	// `Dialog.Trigger` renders into a real `Button` element here (rather
-	// than delegating to a custom component), so Base UI's merged props
-	// — `onClick`, `aria-haspopup="dialog"`, `aria-expanded`,
-	// `aria-controls` — flow straight through and the dialog opens
-	// without any imperative state plumbing in this component.
 	return (
 		<Dialog.Root
 			open={ isModalOpen }
@@ -53,20 +46,7 @@ function ActionWithModal< Item >( {
 			disablePointerDismissal={ action.hideModalHeader }
 		>
 			<Dialog.Trigger
-				render={
-					isMobile ? (
-						<Button
-							accessibleWhenDisabled
-							label={ label }
-							icon={ action.icon }
-							size="compact"
-						/>
-					) : (
-						<Button accessibleWhenDisabled size="compact">
-							{ label }
-						</Button>
-					)
-				}
+				render={ <ActionTrigger action={ action } items={ items } /> }
 			/>
 			<ActionModal
 				action={ action }
@@ -196,12 +176,16 @@ interface ToolbarContentProps< Item > {
 	};
 }
 
-function ActionTrigger< Item >( {
-	action,
-	onClick,
-	isBusy,
-	items,
-}: ActionTriggerProps< Item > ) {
+// `forwardRef` + `{ ...rest }` so this component composes under
+// `<Dialog.Trigger render={ <ActionTrigger … /> } />`: Base UI's merged
+// `onClick` and ARIA state (`aria-haspopup="dialog"`, `aria-expanded`,
+// `aria-controls`) flow straight onto the underlying `Button`. Direct
+// callers (the inline `ActionButton` path) keep passing `onClick` /
+// `isBusy` explicitly.
+const ActionTrigger = genericForwardRef( function ActionTrigger< Item >(
+	{ action, onClick, isBusy, items, ...rest }: ActionTriggerProps< Item >,
+	ref: React.Ref< HTMLButtonElement >
+) {
 	const label =
 		typeof action.label === 'string' ? action.label : action.label( items );
 	const isMobile = useViewportMatch( 'medium', '<' );
@@ -209,6 +193,7 @@ function ActionTrigger< Item >( {
 	if ( isMobile ) {
 		return (
 			<Button
+				ref={ ref }
 				disabled={ isBusy }
 				accessibleWhenDisabled
 				label={ label }
@@ -216,22 +201,25 @@ function ActionTrigger< Item >( {
 				size="compact"
 				onClick={ onClick }
 				isBusy={ isBusy }
+				{ ...rest }
 			/>
 		);
 	}
 
 	return (
 		<Button
+			ref={ ref }
 			disabled={ isBusy }
 			accessibleWhenDisabled
 			size="compact"
 			onClick={ onClick }
 			isBusy={ isBusy }
+			{ ...rest }
 		>
 			{ label }
 		</Button>
 	);
-}
+} );
 
 const EMPTY_ARRAY: [] = [];
 
