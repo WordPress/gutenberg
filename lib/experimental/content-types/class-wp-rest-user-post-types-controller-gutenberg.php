@@ -130,6 +130,12 @@ class WP_REST_User_Post_Types_Controller_Gutenberg extends WP_REST_Posts_Control
 					'uniqueItems' => true,
 					'maxItems'    => 50,
 				),
+				// Storage split: the JSON blob in `post_content` holds only
+				// non-user-defined slugs (core/theme/plugin). Slugs that
+				// match a `wp_user_taxonomy` record live on the taxonomy
+				// side via `_wp_user_taxonomy_object_type` meta. Requests
+				// and responses carry the union; `prepare_item_for_database`
+				// and `prepare_item_for_response` reconcile the two sides.
 				'taxonomies'   => array(
 					'type'        => 'array',
 					'items'       => array(
@@ -195,6 +201,30 @@ class WP_REST_User_Post_Types_Controller_Gutenberg extends WP_REST_Posts_Control
 				: array();
 			// Storage marker is server-only; never expose it to clients.
 			unset( $config[ GUTENBERG_USER_POST_TYPE_CONFIG_MARKER ] );
+
+			// `config.taxonomies` in the response is the merged view: the
+			// non-user slugs persisted in this record's JSON, plus any
+			// user-defined taxonomies whose `_wp_user_taxonomy_object_type`
+			// meta points back at this post type. Single field for the
+			// client to read and write — the controller splits writes back
+			// into the two storage sites.
+			$stored = isset( $config['taxonomies'] ) && is_array( $config['taxonomies'] )
+				? array_values( array_filter( $config['taxonomies'], 'is_string' ) )
+				: array();
+			$linked = array();
+			foreach ( self::get_user_taxonomy_ids_with_meta( $item->post_name ) as $tax_id ) {
+				$tax_slug = (string) get_post_field( 'post_name', $tax_id );
+				if ( '' !== $tax_slug ) {
+					$linked[] = $tax_slug;
+				}
+			}
+			$merged = array_values( array_unique( array_merge( $stored, $linked ) ) );
+			if ( ! empty( $merged ) ) {
+				$config['taxonomies'] = $merged;
+			} else {
+				unset( $config['taxonomies'] );
+			}
+
 			// Empty config must serialize as `{}` to match the schema's
 			// `type: 'object'`. PHP encodes empty associative arrays as `[]`
 			// in JSON, so cast empties to stdClass.
@@ -231,6 +261,22 @@ class WP_REST_User_Post_Types_Controller_Gutenberg extends WP_REST_Posts_Control
 		if ( $request->has_param( 'config' ) || empty( $request['id'] ) ) {
 			$config = is_array( $request['config'] ) ? $request['config'] : array();
 
+			// User-defined taxonomy slugs ride on the taxonomy record's
+			// `_wp_user_taxonomy_object_type` meta as the single source of
+			// truth, so they're stripped from `config.taxonomies` here and
+			// reapplied via `sync_taxonomy_associations()` after save. The
+			// JSON keeps only core/theme/plugin slugs.
+			if ( isset( $config['taxonomies'] ) && is_array( $config['taxonomies'] ) ) {
+				$ids_by_slug = self::get_user_taxonomy_ids_by_slug();
+				$stored      = array();
+				foreach ( $config['taxonomies'] as $slug ) {
+					if ( is_string( $slug ) && ! isset( $ids_by_slug[ $slug ] ) ) {
+						$stored[] = $slug;
+					}
+				}
+				$config['taxonomies'] = array_values( array_unique( $stored ) );
+			}
+
 			// `JSON_HEX_TAG | JSON_HEX_AMP` escape `<`, `>`, and `&` to their
 			// `\u00XX` forms before `wp_insert_post()` is called, so when
 			// kses runs first via `content_save_pre` it sees an inert string
@@ -246,6 +292,89 @@ class WP_REST_User_Post_Types_Controller_Gutenberg extends WP_REST_Posts_Control
 		}
 
 		return $prepared;
+	}
+
+	/**
+	 * Creates a record, then mirrors any `config.taxonomies` user-tax slugs
+	 * into the corresponding wp_user_taxonomy records' `object_type` meta.
+	 *
+	 * @param WP_REST_Request $request REST request.
+	 * @return WP_REST_Response|WP_Error
+	 */
+	public function create_item( $request ) {
+		$response = parent::create_item( $request );
+		if ( is_wp_error( $response ) ) {
+			return $response;
+		}
+		$data    = $response->get_data();
+		$post_id = (int) $data['id'];
+		$this->sync_taxonomy_associations( $post_id, $request );
+		$post = get_post( $post_id );
+		if ( $post instanceof WP_Post ) {
+			$refreshed = $this->prepare_item_for_response( $post, $request );
+			if ( ! is_wp_error( $refreshed ) ) {
+				$response->set_data( $refreshed->get_data() );
+			}
+		}
+		return $response;
+	}
+
+	/**
+	 * Updates a record, migrates user-taxonomy back-references when the slug
+	 * changes, and re-syncs taxonomy associations from `config.taxonomies`.
+	 *
+	 * @param WP_REST_Request $request REST request.
+	 * @return WP_REST_Response|WP_Error
+	 */
+	public function update_item( $request ) {
+		$post_id       = (int) $request['id'];
+		$existing      = get_post( $post_id );
+		$previous_slug = $existing instanceof WP_Post ? (string) $existing->post_name : '';
+
+		$response = parent::update_item( $request );
+		if ( is_wp_error( $response ) ) {
+			return $response;
+		}
+
+		$current_slug = (string) get_post_field( 'post_name', $post_id );
+		if ( '' !== $previous_slug && '' !== $current_slug && $previous_slug !== $current_slug ) {
+			self::migrate_user_tax_back_references( $previous_slug, $current_slug );
+		}
+		$this->sync_taxonomy_associations( $post_id, $request );
+
+		$post = get_post( $post_id );
+		if ( $post instanceof WP_Post ) {
+			$refreshed = $this->prepare_item_for_response( $post, $request );
+			if ( ! is_wp_error( $refreshed ) ) {
+				$response->set_data( $refreshed->get_data() );
+			}
+		}
+		return $response;
+	}
+
+	/**
+	 * Force-deletes a record after stripping its slug from any user-taxonomy
+	 * `_wp_user_taxonomy_object_type` meta that referenced it. Trash (force
+	 * = false) leaves the meta intact so untrashing restores the linkage.
+	 *
+	 * @param WP_REST_Request $request REST request.
+	 * @return WP_REST_Response|WP_Error
+	 */
+	public function delete_item( $request ) {
+		// Capture the slug before the parent runs — once force-delete fires
+		// the post is gone and `post_name` is no longer reachable.
+		$force    = ! empty( $request['force'] );
+		$slug     = $force ? (string) get_post_field( 'post_name', (int) $request['id'] ) : '';
+		$response = parent::delete_item( $request );
+		if ( is_wp_error( $response ) ) {
+			return $response;
+		}
+		if ( $force && '' !== $slug ) {
+			foreach ( self::get_user_taxonomy_ids_with_meta( $slug ) as $tax_id ) {
+				gutenberg_user_taxonomy_detach_object_type( $tax_id, $slug );
+			}
+		}
+		return $response;
 	}
 
 	/**
@@ -351,5 +480,140 @@ class WP_REST_User_Post_Types_Controller_Gutenberg extends WP_REST_Posts_Control
 		}
 
 		return true;
+	}
+
+	/**
+	 * Reapplies the user-taxonomy half of a `config.taxonomies` write. Walks
+	 * the requested slugs once, finds the user-defined ones, and reconciles
+	 * each affected wp_user_taxonomy record's `_wp_user_taxonomy_object_type`
+	 * meta to match. Slugs in the request that already exist in meta are
+	 * left alone; previously-attached user taxonomies that are no longer in
+	 * the request have the post type slug removed from their meta.
+	 *
+	 * Skipped when the request omits `config.taxonomies`.
+	 *
+	 * @param int             $post_id Saved post ID.
+	 * @param WP_REST_Request $request REST request.
+	 */
+	private function sync_taxonomy_associations( $post_id, $request ) {
+		if ( ! $request->has_param( 'config' ) ) {
+			return;
+		}
+		$config = $request['config'];
+		if ( ! is_array( $config ) || ! isset( $config['taxonomies'] ) || ! is_array( $config['taxonomies'] ) ) {
+			return;
+		}
+
+		$post = get_post( $post_id );
+		if ( ! $post instanceof WP_Post ) {
+			return;
+		}
+		$current_slug = (string) $post->post_name;
+
+		$ids_by_slug = self::get_user_taxonomy_ids_by_slug();
+		$desired     = array();
+		foreach ( $config['taxonomies'] as $slug ) {
+			if ( is_string( $slug ) && isset( $ids_by_slug[ $slug ] ) ) {
+				$desired[ $slug ] = true;
+			}
+		}
+
+		// Walk previously-attached user taxonomies; detach the post-type
+		// slug from any whose taxonomy isn't in the new request, mark the
+		// rest as already-applied so we don't re-attach them below.
+		foreach ( self::get_user_taxonomy_ids_with_meta( $current_slug ) as $tax_id ) {
+			$tax_slug = get_post_field( 'post_name', $tax_id );
+			if ( ! is_string( $tax_slug ) || '' === $tax_slug ) {
+				continue;
+			}
+			if ( isset( $desired[ $tax_slug ] ) ) {
+				unset( $desired[ $tax_slug ] );
+			} else {
+				gutenberg_user_taxonomy_detach_object_type( $tax_id, $current_slug );
+			}
+		}
+
+		// Anything left in $desired is a newly-requested attachment.
+		foreach ( array_keys( $desired ) as $tax_slug ) {
+			gutenberg_user_taxonomy_attach_object_type( $ids_by_slug[ $tax_slug ], $current_slug );
+		}
+	}
+
+	/**
+	 * Rewrites every `_wp_user_taxonomy_object_type` meta row pointing at
+	 * `$previous_slug` to `$current_slug`. Called from {@see update_item}
+	 * whenever the slug changes, independently of `config.taxonomies` —
+	 * a PUT that only renames the slug still needs the back-references
+	 * to follow, otherwise every linked user taxonomy silently disconnects.
+	 *
+	 * @param string $previous_slug Slug the record had before this save.
+	 * @param string $current_slug  Slug after the save.
+	 */
+	private static function migrate_user_tax_back_references( $previous_slug, $current_slug ) {
+		foreach ( self::get_user_taxonomy_ids_with_meta( $previous_slug ) as $tax_id ) {
+			gutenberg_user_taxonomy_detach_object_type( $tax_id, $previous_slug );
+			gutenberg_user_taxonomy_attach_object_type( $tax_id, $current_slug );
+		}
+	}
+
+	/**
+	 * Returns a `slug => ID` map of every wp_user_taxonomy record. Used both
+	 * as the user-tax membership check (`isset( $map[ $slug ] )`) and as the
+	 * slug-to-ID lookup when reattaching `_wp_user_taxonomy_object_type`
+	 * meta. Single bounded query; user taxonomies are a small set.
+	 *
+	 * @return array<string, int>
+	 */
+	private static function get_user_taxonomy_ids_by_slug() {
+		$records = get_posts(
+			array(
+				'post_type'              => 'wp_user_taxonomy',
+				'post_status'            => 'any',
+				'posts_per_page'         => -1,
+				'no_found_rows'          => true,
+				'suppress_filters'       => true,
+				'update_post_meta_cache' => false,
+				'update_post_term_cache' => false,
+			)
+		);
+		$map     = array();
+		foreach ( $records as $record ) {
+			$slug = (string) $record->post_name;
+			if ( '' !== $slug ) {
+				$map[ $slug ] = (int) $record->ID;
+			}
+		}
+		return $map;
+	}
+
+	/**
+	 * Returns wp_user_taxonomy record IDs whose
+	 * `_wp_user_taxonomy_object_type` meta contains the given post type
+	 * slug, fetched directly from the DB.
+	 *
+	 * @param string $post_type_slug Post type slug to match.
+	 * @return int[]
+	 */
+	private static function get_user_taxonomy_ids_with_meta( $post_type_slug ) {
+		if ( '' === (string) $post_type_slug ) {
+			return array();
+		}
+		return get_posts(
+			array(
+				'post_type'        => 'wp_user_taxonomy',
+				'post_status'      => 'any',
+				'posts_per_page'   => -1,
+				'fields'           => 'ids',
+				'no_found_rows'    => true,
+				'suppress_filters' => true,
+				'meta_query'       => array(
+					array(
+						'key'     => GUTENBERG_USER_TAXONOMY_OBJECT_TYPE_META_KEY,
+						'value'   => $post_type_slug,
+						'compare' => '=',
+					),
+				),
+			)
+		);
 	}
 }

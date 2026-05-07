@@ -150,7 +150,7 @@ export function usePublicTaxonomies() {
 	);
 	return useMemo( () => {
 		return taxonomies
-			?.filter( ( t: any ) => t.visibility?.public ?? false )
+			?.filter( ( t: any ) => !! t.visibility?.public )
 			.sort( ( a: any, b: any ) => {
 				// Core taxonomies first (alphabetically), then the rest
 				// (alphabetically). The REST API doesn't expose `_builtin`,

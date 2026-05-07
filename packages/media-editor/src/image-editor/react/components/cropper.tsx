@@ -226,13 +226,16 @@ function CropperInner(
 		[ canvasSize, naturalWidth, naturalHeight, state.rotation ]
 	);
 
-	// In fixed-crop mode, auto-size the crop rect to fill the visual area
-	// while respecting the aspect ratio. The crop is always centered.
+	// In fixed-crop mode, auto-size the crop rect only when a fixed aspect
+	// ratio is selected. With "Free" selected, turning freeform handles off
+	// should preserve the user's current unconstrained crop.
 	useEffect( () => {
 		if (
 			freeformCrop ||
 			visualSize.width === 0 ||
-			visualSize.height === 0
+			visualSize.height === 0 ||
+			! aspectRatio ||
+			aspectRatio <= 0
 		) {
 			return;
 		}
