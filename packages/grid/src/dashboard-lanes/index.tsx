@@ -72,6 +72,9 @@ const NO_SORT_STRATEGY = () => null;
  *     <Tile key="c">C</Tile>
  * </DashboardLanes>
  * ```
+ *
+ * @param props Component props.
+ * @param ref   Forwarded to the surface's root `<div>`.
  */
 export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 	function DashboardLanes( props, ref ) {
