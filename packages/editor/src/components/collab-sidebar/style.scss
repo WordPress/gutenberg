@@ -302,20 +302,14 @@ mark.wp-note {
 
 .editor-collab-sidebar-panel__emoji-picker {
 	display: flex;
-	flex-direction: row;
-	align-items: center;
-	gap: var(--wpds-dimension-gap-xs);
-	padding: var(--wpds-dimension-padding-xs);
+	flex-direction: column;
+	gap: 0;
 }
 
 .editor-collab-sidebar-panel__emoji-option {
 	width: 32px;
 	font-size: 18px;
 	justify-content: center;
-}
-
-.editor-collab-sidebar-panel__emoji-more {
-	cursor: var(--wpds-cursor-control);
 }
 
 // Frimousse popover: anchor a fixed-size picker surface with WPDS surface

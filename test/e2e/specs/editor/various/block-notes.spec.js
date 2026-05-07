@@ -1048,11 +1048,12 @@ test.describe( 'Block Notes', () => {
 			);
 			await expect( emojiPicker ).toBeVisible();
 
-			// Navigate with arrow keys and select. The picker is a horizontal
-			// listbox, so ArrowRight moves to the next option.
+			// Navigate with arrow keys and select. The picker is a vertical
+			// listbox, so ArrowDown moves to the next option. ArrowRight
+			// would now escape to the adjacent "More emojis" menu trigger.
 			const firstEmoji = emojiPicker.getByRole( 'option' ).first();
 			await firstEmoji.focus();
-			await page.keyboard.press( 'ArrowRight' );
+			await page.keyboard.press( 'ArrowDown' );
 			await page.keyboard.press( 'Enter' );
 
 			await expect(
@@ -1093,6 +1094,96 @@ test.describe( 'Block Notes', () => {
 				'.editor-collab-sidebar-panel__reaction-button'
 			);
 			await expect( reactionButtons ).toHaveCount( 2 );
+		} );
+
+		test( 'can open the full emoji picker via the + button', async ( {
+			page,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Testing full emoji picker' },
+				comment: 'Open the full picker',
+			} );
+
+			await page.getByRole( 'button', { name: 'More emojis' } ).click();
+
+			await blockNoteUtils.waitForFrimoussePicker();
+
+			// The search field is present.
+			await expect( page.getByPlaceholder( 'Search emoji' ) ).toBeVisible();
+		} );
+
+		test( 'a Frimousse pick that matches a curated emoji stores as the curated slug', async ( {
+			page,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Curated normalization' },
+				comment: 'Pick heart from full picker',
+			} );
+
+			await blockNoteUtils.pickFrimousseEmojiBySearch( 'red heart' );
+
+			await expect(
+				page
+					.getByRole( 'button', { name: 'Dismiss this notice' } )
+					.filter( { hasText: 'Reaction added.' } )
+			).toBeVisible();
+
+			// The same reaction button shape that the curated row produces
+			// — contains the heart emoji and a count of 1. If storage
+			// normalization were broken we'd get a stray hex-key button.
+			const reactionButton = page.locator(
+				'.editor-collab-sidebar-panel__reaction-button'
+			);
+			await expect( reactionButton ).toHaveCount( 1 );
+			await expect( reactionButton ).toContainText( '❤' );
+			await expect( reactionButton ).toContainText( '1' );
+		} );
+
+		test( 'a Frimousse pick that is not curated renders the chosen emoji', async ( {
+			page,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Non-curated emoji' },
+				comment: 'Pick thumbs up from full picker',
+			} );
+
+			await blockNoteUtils.pickFrimousseEmojiBySearch( 'thumbs up' );
+
+			await expect(
+				page
+					.getByRole( 'button', { name: 'Dismiss this notice' } )
+					.filter( { hasText: 'Reaction added.' } )
+			).toBeVisible();
+
+			const reactionButton = page.locator(
+				'.editor-collab-sidebar-panel__reaction-button'
+			);
+			await expect( reactionButton ).toHaveCount( 1 );
+			await expect( reactionButton ).toContainText( '👍' );
+		} );
+
+		test( 'pressing Escape closes the Frimousse popover', async ( {
+			page,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Escape closes picker' },
+				comment: 'Close picker with Escape',
+			} );
+
+			await page.getByRole( 'button', { name: 'More emojis' } ).click();
+			await blockNoteUtils.waitForFrimoussePicker();
+
+			await page.keyboard.press( 'Escape' );
+
+			await expect( page.getByPlaceholder( 'Search emoji' ) ).toBeHidden();
 		} );
 
 		test( 'reaction picker portals outside the collab sidebar', async ( {
@@ -1820,5 +1911,59 @@ class BlockNoteUtils {
 			.nth( index )
 			.click();
 		await this.#page.getByRole( 'menuitem', { name: actionName } ).click();
+	}
+
+	async addReactionToComment( emoji ) {
+		await this.#page
+			.getByRole( 'button', { name: 'Add reaction' } )
+			.click();
+
+		// Wait for the emoji picker popover to appear.
+		const emojiPicker = this.#page.locator(
+			'.editor-collab-sidebar-panel__emoji-picker'
+		);
+		await expect( emojiPicker ).toBeVisible();
+
+		// Click the specific emoji within the picker.
+		await emojiPicker
+			.getByRole( 'option', { name: new RegExp( emoji, 'i' ) } )
+			.click();
+	}
+
+	/**
+	 * Wait for the Frimousse picker to finish loading its bundled
+	 * Emojibase data and render at least one emoji button. The grid /
+	 * gridcell roles come from Frimousse itself and are stable across
+	 * className changes.
+	 */
+	async waitForFrimoussePicker() {
+		await expect( this.#page.getByPlaceholder( 'Search emoji' ) ).toBeVisible();
+		await expect(
+			this.#page.getByRole( 'grid' ).getByRole( 'gridcell' ).first()
+		).toBeVisible();
+	}
+
+	/**
+	 * Click the + button to open Frimousse, search by name, and click
+	 * the first matching emoji.
+	 *
+	 * @param {string} search Search term (matched against Emojibase
+	 *                        labels, e.g. "red heart" or "thumbs up").
+	 */
+	async pickFrimousseEmojiBySearch( search ) {
+		await this.#page.getByRole( 'button', { name: 'More emojis' } ).click();
+		await this.waitForFrimoussePicker();
+
+		await this.#page.getByPlaceholder( 'Search emoji' ).fill( search );
+
+		// Wait for the search to actually filter. Frimousse's gridcells
+		// expose the emoji label as their accessible name, so once the
+		// first cell carries a name matching `search` we know the grid
+		// has finished re-laying-out.
+		const match = this.#page
+			.getByRole( 'gridcell', { name: new RegExp( search, 'i' ) } )
+			.first();
+		await expect( match ).toBeVisible();
+		await match.click();
 	}
 }

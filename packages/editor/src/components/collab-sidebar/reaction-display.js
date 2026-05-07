@@ -4,11 +4,11 @@
 import { __, sprintf, _n } from '@wordpress/i18n';
 import {
 	Button,
-	__experimentalHStack as HStack,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
-import { smiley as smileyIcon } from '@wordpress/icons';
-import { useState, useCallback } from '@wordpress/element';
+import { Stack } from '@wordpress/ui';
+import { smiley as smileyIcon, plus as plusIcon } from '@wordpress/icons';
+import { useState, useCallback, lazy, Suspense } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 
@@ -16,11 +16,19 @@ import { addQueryArgs } from '@wordpress/url';
  * Internal dependencies
  */
 import ReactionEmojiPicker, {
+	emojiToStorageKey,
 	getEmojiBySlug,
 	getLabelBySlug,
 	useReactionEmojis,
 } from './reaction-emoji-picker';
 import { unlock } from '../../lock-unlock';
+
+/**
+ * Lazy-load the Frimousse-based full picker. Its bundle (Frimousse +
+ * the bundled Emojibase JSON) is only fetched when a user opens the
+ * "More emojis" popover for the first time in a session.
+ */
+const FrimoussePicker = lazy( () => import( './frimousse-picker' ) );
 
 const { Menu } = unlock( componentsPrivateApis );
 
@@ -243,7 +251,7 @@ export default function ReactionDisplay( {
 	}
 
 	return (
-		<HStack spacing="1" justify="flex-start" expanded={ false } wrap>
+		<Stack direction="row" gap="xs" justify="flex-start" wrap="wrap">
 			{ reactedSlugs.map( ( slug ) => {
 				const count = getReactionCount( reactions, slug );
 				const isActive = hasUserReacted( reactions, slug );
@@ -261,12 +269,13 @@ export default function ReactionDisplay( {
 					/>
 				);
 			} ) }
-		</HStack>
+		</Stack>
 	);
 }
 
 /**
- * Standalone add-reaction button with emoji picker dropdown.
+ * Standalone add-reaction button with the curated emoji picker
+ * dropdown (the 5-emoji quick row).
  *
  * @param {Object}   props                  Component props.
  * @param {boolean}  props.disabled         Whether the button is disabled.
@@ -298,6 +307,48 @@ export function AddReactionButton( { disabled = false, onToggleReaction } ) {
 						onToggleReaction( slug );
 					} }
 				/>
+			</Menu.Popover>
+		</Menu>
+	);
+}
+
+/**
+ * Standalone "+" button that opens a full Frimousse-based emoji picker.
+ * Sibling of AddReactionButton; not nested inside it so the curated and
+ * full picker popovers never conflict.
+ *
+ * @param {Object}   props                  Component props.
+ * @param {Function} props.onToggleReaction Callback to toggle a reaction.
+ */
+export function MoreEmojiButton( { onToggleReaction } ) {
+	const [ isOpen, setIsOpen ] = useState( false );
+	const emojis = useReactionEmojis();
+	return (
+		<Menu placement="bottom-end" open={ isOpen } onOpenChange={ setIsOpen }>
+			<Menu.TriggerButton
+				render={
+					<Button
+						size="compact"
+						className="editor-collab-sidebar-panel__add-reaction-button"
+						icon={ plusIcon }
+						label={ __( 'More emojis' ) }
+					/>
+				}
+			/>
+			<Menu.Popover
+				modal={ false }
+				className="editor-collab-sidebar-panel__frimousse-popover"
+			>
+				<Suspense fallback={ null }>
+					<FrimoussePicker
+						onSelect={ ( emoji ) => {
+							setIsOpen( false );
+							onToggleReaction(
+								emojiToStorageKey( emoji, emojis )
+							);
+						} }
+					/>
+				</Suspense>
 			</Menu.Popover>
 		</Menu>
 	);

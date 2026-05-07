@@ -2,22 +2,9 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Button, Composite, Popover } from '@wordpress/components';
-import {
-	useState,
-	useEffect,
-	useRef,
-	lazy,
-	Suspense,
-} from '@wordpress/element';
+import { Button, Composite } from '@wordpress/components';
+import { useState, useEffect } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
-import { plus as plusIcon } from '@wordpress/icons';
-
-/**
- * Lazy-load the Frimousse picker so its emoji data fetch and ~30KB of
- * picker code are only paid for when a user actually opens it.
- */
-const FrimoussePicker = lazy( () => import( './frimousse-picker' ) );
 
 /**
  * Curated emoji set for reactions (fallback).
@@ -192,78 +179,39 @@ export function getLabelBySlug( slug, emojis = REACTION_EMOJIS ) {
 }
 
 /**
- * A row of curated emoji buttons plus a `+` button that opens a full
- * Frimousse-based picker in a Popover.
+ * A row of curated emoji buttons. The `+` "More emojis" trigger lives
+ * outside this picker (as a sibling of the smiley trigger) so the
+ * full-picker popover never has to nest inside the curated popover.
  *
  * @param {Object}   props          Component props.
- * @param {Function} props.onSelect Callback invoked with the chosen emoji.
- *                                  For curated picks this is the slug
- *                                  (e.g. `heart`); for picks from the full
- *                                  picker it is the emoji character itself.
+ * @param {Function} props.onSelect Called with the chosen slug when the
+ *                                  user picks a curated emoji.
  */
 export default function ReactionEmojiPicker( { onSelect } ) {
 	const emojis = useReactionEmojis();
-	const [ isFullPickerOpen, setIsFullPickerOpen ] = useState( false );
-	const moreButtonRef = useRef( null );
 
 	return (
-		<>
-			<Composite
-				role="listbox"
-				aria-label={ __( 'Select an emoji reaction' ) }
-				className="editor-collab-sidebar-panel__emoji-picker"
-			>
-				{ emojis.map( ( { emoji, label, value } ) => (
-					<Composite.Item
-						key={ value }
-						render={
-							<Button
-								role="option"
-								size="compact"
-								onClick={ () => onSelect( value ) }
-								aria-label={ label }
-								className="editor-collab-sidebar-panel__emoji-option"
-							/>
-						}
-					>
-						{ emoji }
-					</Composite.Item>
-				) ) }
+		<Composite
+			role="listbox"
+			aria-label={ __( 'Select an emoji reaction' ) }
+			className="editor-collab-sidebar-panel__emoji-picker"
+		>
+			{ emojis.map( ( { emoji, label, value } ) => (
 				<Composite.Item
+					key={ value }
 					render={
 						<Button
-							ref={ moreButtonRef }
+							role="option"
 							size="compact"
-							icon={ plusIcon }
-							onClick={ () =>
-								setIsFullPickerOpen( ( open ) => ! open )
-							}
-							aria-expanded={ isFullPickerOpen }
-							aria-haspopup="dialog"
-							label={ __( 'More emojis' ) }
-							className="editor-collab-sidebar-panel__emoji-more"
+							onClick={ () => onSelect( value ) }
+							aria-label={ label }
+							className="editor-collab-sidebar-panel__emoji-option"
 						/>
 					}
-				/>
-			</Composite>
-			{ isFullPickerOpen && (
-				<Popover
-					anchor={ moreButtonRef.current }
-					placement="bottom-end"
-					onClose={ () => setIsFullPickerOpen( false ) }
-					onFocusOutside={ () => setIsFullPickerOpen( false ) }
-					className="editor-collab-sidebar-panel__frimousse-popover"
 				>
-					<Suspense fallback={ null }>
-						<FrimoussePicker
-							onSelect={ ( emoji ) => {
-								setIsFullPickerOpen( false );
-								onSelect( emojiToStorageKey( emoji, emojis ) );
-							} }
-						/>
-					</Suspense>
-				</Popover>
-			) }
-		</>
+					{ emoji }
+				</Composite.Item>
+			) ) }
+		</Composite>
 	);
 }
