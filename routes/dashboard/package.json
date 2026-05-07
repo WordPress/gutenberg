@@ -12,6 +12,7 @@
 		"@wordpress/admin-ui": "file:../../packages/admin-ui",
 		"@wordpress/base-styles": "file:../../packages/base-styles",
 		"@wordpress/core-data": "file:../../packages/core-data",
+		"@wordpress/components": "file:../../packages/components",
 		"@wordpress/compose": "file:../../packages/compose",
 		"@wordpress/data": "file:../../packages/data",
 		"@wordpress/dataviews": "file:../../packages/dataviews",
