@@ -1704,13 +1704,13 @@ async function buildRoute( routeName ) {
 				minify: true,
 				define: getDefine( false ),
 				plugins: [
+					...createStyleBundlingPlugins( routeDir ),
 					wordpressExternalsPlugin(
 						'content.min',
 						'esm',
 						[],
 						true // Generate asset file for minified build
 					),
-					...createStyleBundlingPlugins( routeDir ),
 				],
 			} ),
 			esbuild.build( {
@@ -1722,13 +1722,13 @@ async function buildRoute( routeName ) {
 				minify: false,
 				define: getDefine( true ),
 				plugins: [
+					...createStyleBundlingPlugins( routeDir ),
 					wordpressExternalsPlugin(
 						'content.min',
 						'esm',
 						[],
 						false // Skip asset file for non-minified build
 					),
-					...createStyleBundlingPlugins( routeDir ),
 				],
 			} ),
 		] );
@@ -1799,13 +1799,13 @@ async function buildWidget( widgetName ) {
 					minify: true,
 					define: getDefine( false ),
 					plugins: [
+						...createStyleBundlingPlugins( widgetDir ),
 						wordpressExternalsPlugin(
 							'render.min',
 							'esm',
 							[],
 							true // Generate asset file for minified build
 						),
-						...createStyleBundlingPlugins( widgetDir ),
 					],
 				} ),
 				esbuild.build( {
@@ -1817,13 +1817,13 @@ async function buildWidget( widgetName ) {
 					minify: false,
 					define: getDefine( true ),
 					plugins: [
+						...createStyleBundlingPlugins( widgetDir ),
 						wordpressExternalsPlugin(
 							'render.min',
 							'esm',
 							[],
 							false // Skip asset file for non-minified build
 						),
-						...createStyleBundlingPlugins( widgetDir ),
 					],
 				} ),
 			] );
