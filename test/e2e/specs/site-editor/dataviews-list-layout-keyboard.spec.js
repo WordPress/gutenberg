@@ -26,8 +26,10 @@ test.describe( 'Dataviews List Layout', () => {
 		// - the "Add filter" button, enabled only after post type fields are loaded
 		// - the actual pages in the list, appearing after a REST fetch finishes
 		// Only then we can start testing keyboard navigation around the full UI.
-		await page.getByRole( 'button', { name: 'Add filter' } ).waitFor();
-		await page.getByRole( 'grid' ).waitFor();
+		await expect(
+			page.getByRole( 'button', { name: 'Add filter' } )
+		).toBeVisible();
+		await expect( page.getByRole( 'grid' ) ).toBeVisible();
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
@@ -58,8 +60,6 @@ test.describe( 'Dataviews List Layout', () => {
 			page.getByRole( 'button', { name: 'View options' } )
 		).toBeFocused();
 
-		// Make sure the items have loaded before reaching for the 1st item in the list.
-		await expect( page.getByRole( 'grid' ) ).toBeVisible();
 		await page.keyboard.press( 'Tab' );
 		await expect(
 			page.getByRole( 'grid' ).getByRole( 'button' ).first()
@@ -82,8 +82,6 @@ test.describe( 'Dataviews List Layout', () => {
 			.getByRole( 'button' )
 			.first();
 
-		// Make sure the items have loaded before reaching for the 1st item in the list.
-		await expect( page.getByRole( 'grid' ) ).toBeVisible();
 		await page.keyboard.press( 'Tab' );
 		await expect( firstItem ).toBeFocused();
 
@@ -110,9 +108,6 @@ test.describe( 'Dataviews List Layout', () => {
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Tab' );
-
-		// Make sure the items have loaded before reaching for the 1st item in the list.
-		await expect( page.getByRole( 'grid' ) ).toBeVisible();
 		await page.keyboard.press( 'Tab' );
 
 		// Use arrow up/down to move through the list.
@@ -133,9 +128,6 @@ test.describe( 'Dataviews List Layout', () => {
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Tab' );
-
-		// Make sure the items have loaded before reaching for the 1st item in the list.
-		await expect( page.getByRole( 'grid' ) ).toBeVisible();
 		await page.keyboard.press( 'Tab' );
 
 		// Use right/left arrow keys to move horizontally.
@@ -202,9 +194,6 @@ test.describe( 'Dataviews List Layout', () => {
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Tab' );
-
-		// Make sure the items have loaded before reaching for the 1st item in the list.
-		await expect( page.getByRole( 'grid' ) ).toBeVisible();
 		await page.keyboard.press( 'Tab' );
 
 		// Use arrow up/down to move through the list from the edit primary action button.
