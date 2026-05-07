@@ -54,9 +54,10 @@ function renderActionModal( {
 	return render(
 		<Dialog.Root
 			open={ open }
-			// Wrap to drop Base UI's `eventDetails` second argument so
-			// tests can assert `toHaveBeenCalledWith( false )` against the
-			// caller-provided mock without coupling to Base UI internals.
+			// Wrap to drop the `eventDetails` second argument that
+			// `Dialog.Root.onOpenChange` forwards, so tests can assert
+			// `toHaveBeenCalledWith( false )` against the caller-provided
+			// mock without coupling to the dialog primitive's signature.
 			onOpenChange={ ( isOpen ) => onOpenChange( isOpen ) }
 			disablePointerDismissal={ action.hideModalHeader }
 		>
@@ -138,9 +139,8 @@ describe( 'ActionModal', () => {
 	} );
 
 	it( 'falls back to the popup smart default when modalFocusOnMount is unset', async () => {
-		// With Base UI's smart default (and the close-icon de-prioritisation
-		// installed by `Dialog.Popup`), focus should land on the first content
-		// tabbable rather than the close button.
+		// `Dialog.Popup`'s default focus-on-mount lands on the first
+		// content tabbable rather than the close icon.
 		const action = createAction( {
 			RenderModal: () => (
 				<div>

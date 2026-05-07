@@ -177,11 +177,11 @@ interface ToolbarContentProps< Item > {
 }
 
 // `forwardRef` + `{ ...rest }` so this component composes under
-// `<Dialog.Trigger render={ <ActionTrigger … /> } />`: Base UI's merged
-// `onClick` and ARIA state (`aria-haspopup="dialog"`, `aria-expanded`,
-// `aria-controls`) flow straight onto the underlying `Button`. Direct
-// callers (the inline `ActionButton` path) keep passing `onClick` /
-// `isBusy` explicitly.
+// `<Dialog.Trigger render={ <ActionTrigger … /> } />`: the trigger's
+// merged `onClick` and ARIA state (`aria-haspopup="dialog"`,
+// `aria-expanded`, `aria-controls`) flow straight onto the underlying
+// `Button`. Direct callers (the inline `ActionButton` path) keep
+// passing `onClick` / `isBusy` explicitly.
 const ActionTrigger = genericForwardRef( function ActionTrigger< Item >(
 	{ action, onClick, isBusy, items, ...rest }: ActionTriggerProps< Item >,
 	ref: React.Ref< HTMLButtonElement >

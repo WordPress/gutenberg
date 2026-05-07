@@ -88,10 +88,10 @@ function PrimaryActionGridCell< Item >( {
 			: primaryAction.label( [ item ] );
 
 	if ( 'RenderModal' in primaryAction ) {
-		// Compose `Composite.Item` (Ariakit) → `Dialog.Trigger` (Base UI)
-		// → `Button` so all three layers' props merge onto the same DOM
-		// button: composite-item navigation, dialog-trigger ARIA, and
-		// the visual `Button` styling.
+		// Compose `Composite.Item` → `Dialog.Trigger` → `Button` so all
+		// three layers' props merge onto the same DOM button:
+		// composite-item navigation, dialog-trigger ARIA, and the
+		// visual `Button` styling.
 		return (
 			<div role="gridcell" key={ primaryAction.id }>
 				<Dialog.Root

@@ -356,8 +356,7 @@ describe( 'DataForm component', () => {
 
 			// Modal should be closed once the exit transition completes.
 			// `Dialog.Root` stays mounted in the React tree and the popup
-			// unmounts asynchronously after Base UI's animation tracking
-			// resolves.
+			// unmounts asynchronously after the close animation resolves.
 			await waitFor( () => {
 				expect(
 					screen.queryByRole( 'dialog' )
@@ -407,8 +406,7 @@ describe( 'DataForm component', () => {
 
 			// Modal should be closed once the exit transition completes.
 			// `Dialog.Root` stays mounted in the React tree and the popup
-			// unmounts asynchronously after Base UI's animation tracking
-			// resolves.
+			// unmounts asynchronously after the close animation resolves.
 			await waitFor( () => {
 				expect(
 					screen.queryByRole( 'dialog' )

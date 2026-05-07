@@ -43,9 +43,9 @@ interface SummaryButtonProps< Item > {
 	 * Click handler invoked from both the row's pointer interaction
 	 * (`handleRowClick`) and the keyboard handler (`handleKeyDown`). When
 	 * `SummaryButton` is composed with `Dialog.Trigger` via the render-prop
-	 * pattern, Base UI injects its open-toggle handler here at runtime;
-	 * otherwise the parent supplies the click handler directly (e.g. the
-	 * `Dropdown` `renderToggle` callback).
+	 * pattern, the trigger primitive injects its open-toggle handler here
+	 * at runtime; otherwise the parent supplies the click handler
+	 * directly (e.g. the `Dropdown` `renderToggle` callback).
 	 */
 	onClick?: MouseEventHandler;
 	/*
@@ -63,8 +63,8 @@ interface SummaryButtonProps< Item > {
 /*
  * SummaryButton renders a clickable row `<div>` with a focusable pencil
  * `<Button>` nested inside. When used as `<Dialog.Trigger render={ ... } />`,
- * Base UI clones merged props onto this component; we route them to the
- * matching DOM element:
+ * the trigger primitive clones merged props onto this component; we
+ * route them to the matching DOM element:
  *   - `onClick`           → outer `<div>` (fires `handleRowClick` → `onClick()`)
  *   - `aria-expanded` /
  *     `aria-controls` /
