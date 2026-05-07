@@ -1,0 +1,9 @@
+@use "@wordpress/base-styles/colors" as *;
+
+.content-types-page {
+	padding: var(--wpds-dimension-padding-lg);
+}
+
+.content-types-tabs-wrapper {
+	border-bottom: 1px solid $gray-100;
+}
