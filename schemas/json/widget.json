@@ -71,55 +71,107 @@
 			"type": "string"
 		},
 		"attributes": {
-			"description": "A declarative list of fields used by the widget. The dashboard renders controls for each field automatically, without each widget needing to wire its own form.\n\nThis is distinct from block attributes: widget attributes are an ordered array of Field descriptors, not a keyed object of block-attribute sources.",
+			"description": "A declarative list of fields used by the widget. Each entry follows the @wordpress/dataviews Field shape so the dashboard can pipe attributes through DataForm directly, with no per-widget form code required.\n\nSee packages/dataviews/src/types/field-api.ts for the full TypeScript definition.",
 			"type": "array",
 			"items": {
-				"description": "A declarative field used by the widget. The dashboard renders a control for each field automatically.",
+				"description": "A declarative field descriptor. Follows the @wordpress/dataviews Field type.",
 				"type": "object",
 				"properties": {
-					"name": {
-						"description": "The unique machine-readable identifier for the field. Used as the key when reading and writing the widget's saved data.",
-						"type": "string",
-						"pattern": "^[a-zA-Z][a-zA-Z0-9_]*$"
+					"id": {
+						"description": "The unique identifier of the field. Used as the key when reading and writing the widget's saved data.",
+						"type": "string"
 					},
 					"type": {
-						"description": "The field type, which determines what control is rendered in the widget form.",
+						"description": "The type of the field, which determines how the value is handled and what default control is rendered.",
 						"type": "string",
 						"enum": [
 							"text",
-							"textarea",
+							"integer",
 							"number",
+							"datetime",
+							"date",
+							"media",
 							"boolean",
-							"url",
 							"email",
+							"password",
+							"telephone",
 							"color",
-							"range",
-							"select",
-							"radio",
-							"media"
+							"url",
+							"array"
 						]
 					},
 					"label": {
-						"description": "A human-readable label shown above the control.",
+						"description": "A human-readable label shown above the control. Defaults to the id.",
+						"type": "string"
+					},
+					"header": {
+						"description": "The header of the field. Defaults to the label.",
 						"type": "string"
 					},
 					"description": {
 						"description": "Optional help text shown below the control.",
 						"type": "string"
 					},
-					"default": {
-						"description": "The default value for the field used when no saved value is present."
+					"placeholder": {
+						"description": "Placeholder text for the control.",
+						"type": "string"
 					},
-					"options": {
-						"description": "An array of choices for `select` and `radio` field types.",
+					"Edit": {
+						"description": "Override the default control rendered for this field. Pass a control name string (e.g. `\"textarea\"`) or a configuration object with a `control` key.",
+						"oneOf": [
+							{
+								"type": "string"
+							},
+							{
+								"type": "object",
+								"properties": {
+									"control": {
+										"description": "The control type to render.",
+										"type": "string"
+									}
+								},
+								"required": [ "control" ],
+								"additionalProperties": true
+							}
+						]
+					},
+					"isValid": {
+						"description": "Validation rules for the field value.",
+						"type": "object",
+						"properties": {
+							"required": {
+								"description": "Whether a value is required.",
+								"type": "boolean"
+							},
+							"pattern": {
+								"description": "A regex pattern the value must match.",
+								"type": "string"
+							},
+							"minLength": {
+								"description": "The minimum string length.",
+								"type": "number"
+							},
+							"maxLength": {
+								"description": "The maximum string length.",
+								"type": "number"
+							},
+							"min": {
+								"description": "The minimum allowed numeric value.",
+								"type": "number"
+							},
+							"max": {
+								"description": "The maximum allowed numeric value.",
+								"type": "number"
+							}
+						},
+						"additionalProperties": false
+					},
+					"elements": {
+						"description": "The list of choices for the field. A field with `elements` and a non-`array` type renders an adaptive select control automatically via DataForm.",
 						"type": "array",
 						"items": {
 							"type": "object",
 							"properties": {
-								"label": {
-									"description": "The human-readable text shown for this option.",
-									"type": "string"
-								},
 								"value": {
 									"description": "The value stored when this option is selected.",
 									"oneOf": [
@@ -127,32 +179,35 @@
 										{ "type": "number" },
 										{ "type": "boolean" }
 									]
+								},
+								"label": {
+									"description": "The human-readable text shown for this option.",
+									"type": "string"
+								},
+								"description": {
+									"description": "An optional longer description for the option.",
+									"type": "string"
 								}
 							},
-							"required": [ "label", "value" ],
+							"required": [ "value", "label" ],
 							"additionalProperties": false
 						}
 					},
-					"multiple": {
-						"description": "Whether more than one option may be chosen at once. Applicable to the `select` type only.",
-						"type": "boolean",
-						"default": false
+					"enableSorting": {
+						"description": "Whether the field is sortable.",
+						"type": "boolean"
 					},
-					"min": {
-						"description": "The minimum allowed value. Applicable to `number` and `range` types.",
-						"type": "number"
+					"enableGlobalSearch": {
+						"description": "Whether the field is searchable.",
+						"type": "boolean"
 					},
-					"max": {
-						"description": "The maximum allowed value. Applicable to `number` and `range` types.",
-						"type": "number"
-					},
-					"step": {
-						"description": "The increment step between valid values. Applicable to `number` and `range` types.",
-						"type": "number"
+					"enableHiding": {
+						"description": "Whether the field can be hidden in the UI.",
+						"type": "boolean"
 					}
 				},
-				"required": [ "name", "type", "label" ],
-				"additionalProperties": false
+				"required": [ "id" ],
+				"additionalProperties": true
 			}
 		},
 		"styles": {
