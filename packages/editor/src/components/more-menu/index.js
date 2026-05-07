@@ -5,17 +5,13 @@ import { __, _x } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { displayShortcut } from '@wordpress/keycodes';
 import { external, moreVertical } from '@wordpress/icons';
-import {
-	MenuGroup,
-	MenuItem,
-	VisuallyHidden,
-	DropdownMenu,
-} from '@wordpress/components';
+import { MenuGroup, MenuItem, DropdownMenu } from '@wordpress/components';
 import {
 	PreferenceToggleMenuItem,
 	store as preferencesStore,
 } from '@wordpress/preferences';
 import { store as interfaceStore, ActionItem } from '@wordpress/interface';
+import { VisuallyHidden } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -135,7 +131,7 @@ export default function MoreMenu( { disabled = false } ) {
 								rel="noopener"
 							>
 								{ __( 'Help' ) }
-								<VisuallyHidden as="span">
+								<VisuallyHidden render={ <span /> }>
 									{
 										/* translators: accessibility text */
 										__( '(opens in a new tab)' )

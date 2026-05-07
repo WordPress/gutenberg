@@ -7,7 +7,7 @@ import {
 	FlexItem,
 	SearchControl,
 	__experimentalHStack as HStack,
-	__experimentalText as Text,
+	__experimentalText as WCText,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import {
@@ -151,9 +151,9 @@ function BlockList( { filterValue }: BlockListProps ) {
 			role="list"
 		>
 			{ filteredBlockTypes.length === 0 ? (
-				<Text align="center" as="p">
+				<WCText align="center" as="p">
 					{ __( 'No blocks found.' ) }
-				</Text>
+				</WCText>
 			) : (
 				filteredBlockTypes.map( ( block ) => (
 					<BlockMenuItem

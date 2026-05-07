@@ -641,14 +641,18 @@ const useEntitiesInfo = (
 		( select ) => {
 			return Object.keys( templatePrefixes || {} ).reduce(
 				( accumulator: any, slug ) => {
-					accumulator[ slug ] = !! select(
-						coreStore
-					).getEntityRecords( entityName, slug, {
-						per_page: 1,
-						_fields: 'id',
-						context: 'view',
-						...additionalQueryParameters[ slug ],
-					} )?.length;
+					const records = select( coreStore ).getEntityRecords(
+						entityName,
+						slug,
+						{
+							per_page: 1,
+							_fields: 'id',
+							context: 'view',
+							...additionalQueryParameters[ slug ],
+						}
+					);
+					accumulator[ slug ] =
+						records === null || records.length > 0;
 					return accumulator;
 				},
 				{}
