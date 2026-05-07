@@ -143,7 +143,8 @@ export type BlockSelectors = Record<
  *
  * - `styles`: theme.json style object for this node.
  * - `selector`: CSS selector used for the node's base declarations.
- * - `selectorSuffix`: optional suffix appended to base and feature selectors.
+ * - `selectorSuffix`: optional suffix used to append additional selectors,
+ *   such as pseudo selectors, to base and feature selectors.
  * - `mediaQuery`: optional media query wrapping this node's rules.
  * - `skipSelectorWrapper`: omits the `:root :where()` specificity wrapper.
  * - `duotoneSelector`: alternate selector for duotone filter declarations.
