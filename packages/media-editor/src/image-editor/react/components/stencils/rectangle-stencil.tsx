@@ -364,8 +364,7 @@ export function RectangleStencil( {
 
 	/**
 	 * Handle keyboard events on a resize handle.
-	 * Escape returns focus to the crop area so keyboard users can switch from
-	 * resizing the crop boundary to moving the image inside it.
+	 * Arrow keys resize; Escape returns focus to the canvas.
 	 * Shift multiplies the step size by 10 for coarser movement.
 	 */
 	const handleKeyDown = useCallback(

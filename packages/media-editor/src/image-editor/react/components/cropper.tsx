@@ -443,10 +443,13 @@ function CropperInner(
 		isInteractiveGrid &&
 		( isInteractionPlacementActive || isResizing || isPlacementActive );
 
-	const handleStencilEscape = useCallback(
-		() => canvasRef.current?.focus( { preventScroll: true } ),
-		[]
-	);
+	/**
+	 * Handle Escape on a resize handle — return focus to the canvas so
+	 * arrow keys pan the image rather than resize.
+	 */
+	const handleEscape = useCallback( () => {
+		canvasRef.current?.focus( { preventScroll: true } );
+	}, [] );
 
 	const handleResizeStart = useCallback( () => {
 		isResizingRef.current = true;
@@ -553,10 +556,11 @@ function CropperInner(
 			) }
 		>
 			{ /*
-			 * The canvas is the interactive, inset surface. Pointer geometry
+			 * The canvas is the interactive, inset surface. Handles and
+			 * the ARIA role/tabIndex live here so pointer geometry
 			 * (getBoundingClientRect on e.currentTarget) resolves against
-			 * this box for crop math. The root stays as the clipping shell
-			 * for the dimming overlay's box-shadow.
+			 * the same box that crop math uses. The root stays as the
+			 * clipping shell for the dimming overlay's box-shadow.
 			 *
 			 * Not role="application" — that disables the screen reader's
 			 * normal keyboard interception, too heavy-handed for a single
@@ -631,7 +635,7 @@ function CropperInner(
 						onCropChange={ handleCropChange }
 						onResizeStart={ handleResizeStart }
 						onResizeEnd={ handleResizeEnd }
-						onEscape={ handleStencilEscape }
+						onEscape={ handleEscape }
 						aspectRatio={ aspectRatio }
 						freeformCrop={ freeformCrop }
 						stencilTransition={ settleStencilTransition }
