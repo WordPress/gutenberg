@@ -6,18 +6,37 @@ import type { ReactNode } from 'react';
 /**
  * WordPress dependencies
  */
-import { Spinner } from '@wordpress/components';
+import {
+	Dropdown,
+	MenuGroup,
+	MenuItem,
+	Spinner,
+} from '@wordpress/components';
 import {
 	Component,
 	Suspense,
 	forwardRef,
+	useCallback,
 	useId,
 	useMemo,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import {
+	contents,
+	stretchFullWidth,
+	stretchWide,
+	trash,
+} from '@wordpress/icons';
 // Dashboard is still experimental.
 // eslint-disable-next-line @wordpress/use-recommended-components
-import { Card, Icon, Stack, Notice, VisuallyHidden } from '@wordpress/ui';
+import {
+	Card,
+	Icon,
+	IconButton,
+	Stack,
+	Notice,
+	VisuallyHidden,
+} from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -71,26 +90,88 @@ function LoadingOverlay() {
 interface HeaderProps {
 	titleId: string;
 	widgetType: WidgetType;
+	width?: number | 'fill' | 'full';
+	onWidthChange: ( width: WidthMode ) => void;
 }
 
-function Header( { titleId, widgetType }: HeaderProps ) {
+type WidthMode = 'custom' | 'fill' | 'full';
+
+const WIDTH_MODES: WidthMode[] = [ 'custom', 'fill', 'full' ];
+const WIDTH_MODE_ICON = {
+	custom: contents,
+	fill: stretchWide,
+	full: stretchFullWidth,
+} as const;
+const WIDTH_MODE_LABEL = {
+	custom: __( 'Custom width' ),
+	fill: __( 'Fill width' ),
+	full: __( 'Full width' ),
+} as const;
+
+function Header( { titleId, widgetType, width, onWidthChange }: HeaderProps ) {
 	if ( ! widgetType.title ) {
 		return null;
 	}
+	const selectedWidthMode: WidthMode =
+		typeof width === 'number' ? 'custom' : width ?? 'full';
 	return (
 		<Card.Header>
-			<Stack direction="row" align="center" gap="sm">
-				{ widgetType.icon && (
-					<span
-						className={ styles.widgetChromeHeaderIcon }
-						aria-hidden="true"
-					>
-						<Icon icon={ widgetType.icon } />
-					</span>
-				) }
-				<Card.Title id={ titleId } render={ <h3 /> }>
-					{ widgetType.title }
-				</Card.Title>
+			<Stack direction="row" align="center" justify="space-between">
+				<Stack direction="row" align="center" gap="sm">
+					{ widgetType.icon && (
+						<span
+							className={ styles.widgetChromeHeaderIcon }
+							aria-hidden="true"
+						>
+							<Icon icon={ widgetType.icon } />
+						</span>
+					) }
+					<Card.Title id={ titleId } render={ <h3 /> }>
+						{ widgetType.title }
+					</Card.Title>
+				</Stack>
+				<Stack direction="row" align="center" gap="xs">
+					<Dropdown
+						popoverProps={ { placement: 'bottom-end' } }
+						renderToggle={ ( { isOpen, onToggle } ) => (
+							<IconButton
+								icon={ WIDTH_MODE_ICON[ selectedWidthMode ] }
+								label={ __( 'Widget width' ) }
+								size="small"
+								variant="minimal"
+								tone="neutral"
+								aria-expanded={ isOpen }
+								onClick={ onToggle }
+							/>
+						) }
+						renderContent={ ( { onClose } ) => (
+							<MenuGroup>
+								{ WIDTH_MODES.map( ( mode ) => (
+									<MenuItem
+										key={ mode }
+										icon={ WIDTH_MODE_ICON[ mode ] }
+										isSelected={
+											selectedWidthMode === mode
+										}
+										onClick={ () => {
+											onWidthChange( mode );
+											onClose();
+										} }
+									>
+										{ WIDTH_MODE_LABEL[ mode ] }
+									</MenuItem>
+								) ) }
+							</MenuGroup>
+						) }
+					/>
+					<IconButton
+						icon={ trash }
+						label={ __( 'Remove' ) }
+						size="small"
+						variant="minimal"
+						tone="neutral"
+					/>
+				</Stack>
 			</Stack>
 		</Card.Header>
 	);
@@ -109,9 +190,30 @@ export interface WidgetChromeProps {
  */
 export const WidgetChrome = forwardRef< HTMLDivElement, WidgetChromeProps >(
 	function WidgetChrome( { widget, index }, ref ) {
-		const { widgetTypes, editMode } = useDashboardInternalContext();
+		const { widgetTypes, layout, onLayoutChange, editMode } =
+			useDashboardInternalContext();
 		const widgetType = widgetTypes.find( ( t ) => t.name === widget.type );
 		const titleId = useId();
+		const width = widget.placement?.width;
+
+		const handleWidthChange = useCallback(
+			( nextWidth: WidthMode ) => {
+				const nextLayout = layout.map( ( currentWidget ) =>
+					currentWidget.uuid === widget.uuid
+						? {
+								...currentWidget,
+								placement: {
+									...currentWidget.placement,
+									width:
+										nextWidth === 'custom' ? 1 : nextWidth,
+								},
+						  }
+						: currentWidget
+				);
+				onLayoutChange( nextLayout );
+			},
+			[ layout, onLayoutChange, widget.uuid ]
+		);
 
 		const contextValue = useMemo(
 			() => ( {
@@ -127,7 +229,14 @@ export const WidgetChrome = forwardRef< HTMLDivElement, WidgetChromeProps >(
 		}
 
 		const isFullBleed = widgetType.presentation === 'full-bleed';
-		const header = <Header titleId={ titleId } widgetType={ widgetType } />;
+		const header = (
+			<Header
+				titleId={ titleId }
+				widgetType={ widgetType }
+				width={ width }
+				onWidthChange={ handleWidthChange }
+			/>
+		);
 		const body = (
 			<WidgetErrorBoundary>
 				<Suspense fallback={ <LoadingOverlay /> }>
@@ -150,7 +259,6 @@ export const WidgetChrome = forwardRef< HTMLDivElement, WidgetChromeProps >(
 					) : (
 						header
 					) }
-
 					<Card.Content className={ styles.widgetChromeContent }>
 						{ isFullBleed ? (
 							<Card.FullBleed
