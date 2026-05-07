@@ -1,20 +1,23 @@
 /**
  * WordPress dependencies
  */
-import { useCallback } from '@wordpress/element';
+import { useCallback, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 // eslint-disable-next-line @wordpress/use-recommended-components
-import { Button, Stack } from '@wordpress/ui';
+import { AlertDialog, Button, Stack } from '@wordpress/ui';
 
 /**
  * Internal dependencies
  */
 import { useDashboardInternalContext } from '../../context/dashboard-context';
 import { useDashboardUIContext } from '../../context/ui-context';
+import { MoreActionsDropdown } from '../more-actions-dropdown';
+import type { MoreActionsDropdownItem } from '../more-actions-dropdown';
 
 /**
  * Renders the dashboard's edit-mode toggle. Shows a "Customize" button while
- * `editMode` is off and a "Done" button while it is on; clicking either fires
+ * `editMode` is off and the edit-mode toolbar (Add widgets, Cancel, Done,
+ * plus a more-actions dropdown) while it is on. Clicking either fires
  * `onEditChange` with the toggled value.
  *
  * Returns `null` when the dashboard is mounted without `onEditChange` so
@@ -24,8 +27,12 @@ import { useDashboardUIContext } from '../../context/ui-context';
  * @return {React.ReactNode} - The Actions component.
  */
 export function Actions(): React.ReactNode {
-	const { editMode, onEditChange } = useDashboardInternalContext();
+	const { editMode, onEditChange, onLayoutReset } =
+		useDashboardInternalContext();
+
 	const { setInserterOpen } = useDashboardUIContext();
+
+	const [ isResetDialogOpen, setIsResetDialogOpen ] = useState( false );
 
 	const handleEditMode = useCallback( () => {
 		onEditChange?.( ! editMode );
@@ -46,6 +53,14 @@ export function Actions(): React.ReactNode {
 		console.log( 'done' ); // TODO: Implement done
 		onEditChange?.( false );
 	}, [ onEditChange ] );
+
+	const moreActionsItems: MoreActionsDropdownItem[] = [
+		{
+			label: __( 'Reset to default' ),
+			onClick: () => setIsResetDialogOpen( true ),
+			disabled: ! onLayoutReset,
+		},
+	];
 
 	if ( ! onEditChange ) {
 		return null;
@@ -81,6 +96,27 @@ export function Actions(): React.ReactNode {
 					>
 						{ __( 'Done' ) }
 					</Button>
+
+					<MoreActionsDropdown items={ moreActionsItems } />
+
+					<AlertDialog.Root
+						open={ isResetDialogOpen }
+						onOpenChange={ setIsResetDialogOpen }
+						onConfirm={ () => {
+							onLayoutReset?.();
+							onEditChange?.( false );
+							setIsResetDialogOpen( false );
+						} }
+					>
+						<AlertDialog.Popup
+							intent="irreversible"
+							title={ __( 'Reset dashboard to default?' ) }
+							description={ __(
+								'Your customized layout will be replaced with the default. This cannot be undone.'
+							) }
+							confirmButtonText={ __( 'Reset' ) }
+						/>
+					</AlertDialog.Root>
 				</>
 			) : (
 				<Button
