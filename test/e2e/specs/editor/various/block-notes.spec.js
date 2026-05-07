@@ -1926,6 +1926,43 @@ test.describe( 'Block Notes', () => {
 				Math.abs( popoverBox.width - pickerBox.width )
 			).toBeLessThanOrEqual( 1 );
 		} );
+
+		test( 'emoji grid fills the picker width', async ( {
+			page,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Testing grid fills picker' },
+				comment: 'Grid fill',
+			} );
+
+			await page.getByRole( 'button', { name: 'More emojis' } ).click();
+			await blockNoteUtils.waitForFrimoussePicker();
+
+			const picker = page.locator(
+				'.editor-collab-sidebar-panel__frimousse'
+			);
+			const lastEmojiInFirstRow = page
+				.locator( '.editor-collab-sidebar-panel__frimousse-row' )
+				.first()
+				.locator( '.editor-collab-sidebar-panel__frimousse-emoji' )
+				.last();
+
+			const pickerBox = await picker.boundingBox();
+			const emojiBox = await lastEmojiInFirstRow.boundingBox();
+			const horizontalSlack =
+				pickerBox.x + pickerBox.width - ( emojiBox.x + emojiBox.width );
+
+			// Last emoji in a full row should sit close to the picker's
+			// right edge. Tolerance allows for viewport padding (4px)
+			// plus a reserved scrollbar gutter (~17px on most
+			// platforms). Catches regressions where the picker is sized
+			// wider than the emoji grid (buttons fill only the left
+			// fraction, with a large empty band to the right — the
+			// original bug had ~145px of slack).
+			expect( horizontalSlack ).toBeLessThanOrEqual( 24 );
+		} );
 	} );
 } );
 
