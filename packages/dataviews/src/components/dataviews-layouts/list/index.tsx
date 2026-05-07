@@ -242,7 +242,7 @@ function ListItem< Item >( {
 						item={ item }
 						actions={ eligibleActions }
 						registry={ registry }
-						triggerRender={
+						renderTrigger={
 							<Composite.Item
 								id={ generateDropdownTriggerCompositeId(
 									idPrefix

@@ -303,17 +303,17 @@ export function ActionsMenuGroup< Item >( {
 // survives the menu's `unmountOnHide` exit transition. Both
 // `CompactItemActions` and the list-layout's per-row menu use this
 // component; they only differ in the trigger button passed in via
-// `triggerRender`.
+// `renderTrigger`.
 export function ItemActionsMenu< Item >( {
 	item,
 	actions,
 	registry,
-	triggerRender,
+	renderTrigger,
 }: {
 	item: Item;
 	actions: Action< Item >[];
 	registry: ReturnType< typeof useRegistry >;
-	triggerRender: ReactElement;
+	renderTrigger: ReactElement;
 } ) {
 	const [ activeModalAction, setActiveModalAction ] =
 		useState< ActionModalType< Item > | null >( null );
@@ -334,7 +334,7 @@ export function ItemActionsMenu< Item >( {
 	return (
 		<>
 			<Menu placement="bottom-end">
-				<Menu.TriggerButton render={ triggerRender } />
+				<Menu.TriggerButton render={ renderTrigger } />
 				<Menu.Popover>
 					<ActionsMenuGroup
 						actions={ actions }
@@ -449,7 +449,7 @@ function CompactItemActions< Item >( {
 			item={ item }
 			actions={ actions }
 			registry={ registry }
-			triggerRender={
+			renderTrigger={
 				<Button
 					size={ isSmall ? 'small' : 'compact' }
 					icon={ moreVertical }
