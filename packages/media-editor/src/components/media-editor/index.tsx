@@ -455,7 +455,9 @@ function MediaEditorContent( {
 			createErrorNotice(
 				sprintf(
 					/* translators: %s: Error message. */
-					__( 'Could not save image. %s' ),
+					isImage
+						? __( 'Could not save image. %s' )
+						: __( 'Could not save media. %s' ),
 					message
 				),
 				{ type: 'snackbar', context: NOTICES_CONTEXT }
