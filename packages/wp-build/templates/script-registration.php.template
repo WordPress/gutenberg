@@ -79,6 +79,19 @@ function {{PREFIX}}_register_package_scripts( $scripts ) {
 			$version,
 			true
 		);
+
+		// Attach script-module dependencies so they land in the import map.
+		// `WP_Script_Modules::get_import_map()` reads this metadata from each
+		// enqueued classic script's data (since WP 7.0.0) and adds the listed
+		// module specifiers to the printed import map, making dynamic
+		// `import('@…')` calls resolvable at runtime.
+		if ( ! empty( $asset['module_dependencies'] ) ) {
+			$scripts->add_data(
+				$script_data['handle'],
+				'module_dependencies',
+				$asset['module_dependencies']
+			);
+		}
 	}
 }
 
