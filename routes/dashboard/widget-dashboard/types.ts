@@ -273,8 +273,7 @@ export interface WidgetGridSettings {
  *
  * The consumer owns the committed layout state; the dashboard maintains
  * a staging copy internally for in-progress edits, and `onLayoutChange`
- * fires only when the user commits via the Done action (or when an
- * action like reset replaces the committed layout from outside).
+ * fires only when the user commits via the Done action.
  */
 export interface WidgetDashboardProps {
 	/**
@@ -283,7 +282,11 @@ export interface WidgetDashboardProps {
 	layout: DashboardWidget[];
 
 	/**
-	 * Called on every layout mutation (reorder, resize, add, remove).
+	 * Called when the user commits in-progress edits via the Done action.
+	 * Receives the full layout array as it should be persisted. In-progress
+	 * mutations (reorder, resize, add, remove, attribute edits) accumulate
+	 * in the dashboard's internal staging layer and do not fire this
+	 * callback until commit.
 	 */
 	onLayoutChange: ( layout: DashboardWidget[] ) => void;
 
