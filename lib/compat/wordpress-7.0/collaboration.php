@@ -29,19 +29,19 @@ if ( ! function_exists( 'gutenberg_register_collaboration_rest_routes' ) ) {
  * Since the Gutenberg plugin cannot modify class-wpdb.php, this function
  * registers the table at runtime so $wpdb->collaboration is available.
  *
+ * This function runs on both the 'plugins_loaded' and 'switch_blog' hooks to ensure
+ * the table is registered for the current site.
+ *
  * @global wpdb $wpdb WordPress database abstraction object.
  */
 function gutenberg_register_collaboration_table() {
 	global $wpdb;
 
-	if ( isset( $wpdb->collaboration ) && ! empty( $wpdb->collaboration ) ) {
-		return;
-	}
-
 	$wpdb->collaboration = $wpdb->prefix . 'collaboration';
 	$wpdb->tables[]      = 'collaboration';
 }
 add_action( 'plugins_loaded', 'gutenberg_register_collaboration_table', 0 );
+add_action( 'switch_blog', 'gutenberg_register_collaboration_table', 0 );
 // Also call it immediately so it's available during the current request.
 gutenberg_register_collaboration_table();
 
@@ -85,7 +85,8 @@ function gutenberg_create_collaboration_table() {
 	dbDelta( $sql );
 	set_transient( 'gutenberg_collaboration_table_created', '1', WEEK_IN_SECONDS );
 }
-add_action( 'gutenberg_create_collaboration_table', 'gutenberg_create_collaboration_table' );
+add_action( 'plugins_loaded', 'gutenberg_create_collaboration_table' );
+add_action( 'switch_blog', 'gutenberg_create_collaboration_table' );
 
 if ( ! function_exists( 'wp_collaboration_inject_setting' ) ) {
 	/**
