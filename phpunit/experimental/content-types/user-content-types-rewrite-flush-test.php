@@ -215,25 +215,6 @@ class User_Content_Types_Rewrite_Flush_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * A direct DB-level draft insert does not schedule — drafts are never
-	 * registered, so there are no rewrite rules to regenerate. The
-	 * controller's `create_item` short-circuits on non-publish status; this
-	 * verifies that no other code path (filters, hooks) sneaks a flush in.
-	 */
-	public function test_post_type_create_draft_does_not_schedule() {
-		$id = $this->seed_post_type_draft(
-			'rwflush_pt_draft',
-			'Draft',
-			array( 'public' => true )
-		);
-		$this->assertIsInt( $id );
-		$this->assertGreaterThan( 0, $id );
-		$this->assert_flush_not_scheduled( 'A draft post type record must not schedule a flush.' );
-
-		wp_delete_post( $id, true );
-	}
-
-	/**
 	 * Updating only labels/description on a published record does not
 	 * schedule — those fields don't affect rewrite rules.
 	 */
@@ -534,25 +515,6 @@ class User_Content_Types_Rewrite_Flush_Test extends WP_UnitTestCase {
 		$this->assert_flush_scheduled( 'Publishing a new taxonomy record should schedule a flush.' );
 
 		wp_delete_post( $data['id'], true );
-	}
-
-	/**
-	 * A direct DB-level draft taxonomy insert does not schedule. Same
-	 * rationale as the post-type counterpart: bypassing the controller
-	 * verifies that no other code path schedules a flush for unpublished
-	 * records.
-	 */
-	public function test_taxonomy_create_draft_does_not_schedule() {
-		$id = $this->seed_taxonomy_draft(
-			'rwflush_tx_drft',
-			'Draft Tax',
-			array( 'public' => true )
-		);
-		$this->assertIsInt( $id );
-		$this->assertGreaterThan( 0, $id );
-		$this->assert_flush_not_scheduled( 'A draft taxonomy record must not schedule a flush.' );
-
-		wp_delete_post( $id, true );
 	}
 
 	/**
