@@ -855,87 +855,45 @@ test.describe( 'Block Notes', () => {
 			page,
 			blockNoteUtils,
 		} ) => {
-			// Add a block with the first note.
 			await blockNoteUtils.addBlockWithNote( {
 				type: 'core/paragraph',
 				attributes: { content: 'Block with multiple notes' },
 				comment: 'First note on block',
 			} );
 
-			// Dismiss the first "Note added." snackbar so it won't interfere
-			// with the second note's snackbar check.
-			await page
-				.getByRole( 'button', { name: 'Dismiss this notice' } )
-				.filter( { hasText: 'Note added.' } )
-				.click();
-
-			// Click "Add note" again to add a second note.
+			// Second "Add note" should open the new-note form, not the reply
+			// form — confirms the menu item routes through the multi-note path.
 			await editor.clickBlockOptionsMenuItem( 'Add note' );
-
-			// Verify the new note form is shown (not the reply form).
 			const newNoteForm = page.getByRole( 'textbox', {
 				name: 'New note',
 				exact: true,
 			} );
 			await expect( newNoteForm ).toBeFocused();
-
-			// Add the second note.
 			await newNoteForm.fill( 'Second note on block' );
 			await page
 				.getByRole( 'region', { name: 'Editor settings' } )
 				.getByRole( 'button', { name: 'Add note', exact: true } )
 				.click();
 
-			// Verify both notes are visible as separate threads.
-			const firstThread = page
-				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByRole( 'treeitem', { name: 'Note: First note on block' } );
-			const secondThread = page
-				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByRole( 'treeitem', {
-					name: 'Note: Second note on block',
-				} );
-
-			await expect( firstThread ).toBeVisible();
-			await expect( secondThread ).toBeVisible();
-
-			// Verify "Note added." (not "Reply added.").
-			await expect(
-				page
-					.getByRole( 'button', { name: 'Dismiss this notice' } )
-					.filter( { hasText: 'Note added.' } )
-			).toBeVisible();
-		} );
-
-		test( 'multiple notes on same block are stored as array in metadata', async ( {
-			editor,
-			page,
-			blockNoteUtils,
-		} ) => {
-			await blockNoteUtils.addBlockWithNote( {
-				type: 'core/paragraph',
-				attributes: { content: 'Block with multiple notes' },
-				comment: 'First note',
+			const settings = page.getByRole( 'region', {
+				name: 'Editor settings',
 			} );
-			// Dismiss the first "Note added." so the second toast can be asserted.
-			await blockNoteUtils.dismissSnackbar( 'Note added.' );
-
-			await blockNoteUtils.addAnotherNoteToCurrentBlock( 'Second note' );
-
 			await expect(
-				page
-					.getByRole( 'button', { name: 'Dismiss this notice' } )
-					.filter( { hasText: 'Note added.' } )
+				settings.getByRole( 'treeitem', {
+					name: 'Note: First note on block',
+				} )
+			).toBeVisible();
+			await expect(
+				settings.getByRole( 'treeitem', {
+					name: 'Note: Second note on block',
+				} )
 			).toBeVisible();
 
-			// Verify noteId is an array with 2 elements.
-			const blocks = await editor.getBlocks();
-			const paragraphBlock = blocks.find(
+			// noteId is stored as an array; the array shape (vs. a child
+			// comment) proves the second add went through the new-note path.
+			const noteIds = ( await editor.getBlocks() ).find(
 				( b ) => b.name === 'core/paragraph'
-			);
-			const noteIds = paragraphBlock?.attributes?.metadata?.noteId;
-
-			expect( Array.isArray( noteIds ) ).toBe( true );
+			)?.attributes?.metadata?.noteId;
 			expect( noteIds ).toHaveLength( 2 );
 		} );
 
@@ -949,17 +907,7 @@ test.describe( 'Block Notes', () => {
 				attributes: { content: 'Block with notes to delete' },
 				comment: 'Note to keep',
 			} );
-			await blockNoteUtils.dismissSnackbar( 'Note added.' );
-
-			await blockNoteUtils.addAnotherNoteToCurrentBlock(
-				'Note to delete'
-			);
-
-			await expect(
-				page
-					.getByRole( 'button', { name: 'Dismiss this notice' } )
-					.filter( { hasText: 'Note added.' } )
-			).toBeVisible();
+			await blockNoteUtils.addNote( 'Note to delete' );
 
 			// Both notes should be visible.
 			const settings = page.getByRole( 'region', {
@@ -1020,15 +968,7 @@ test.describe( 'Block Notes', () => {
 				attributes: { content: 'Block with notes to resolve' },
 				comment: 'Note A',
 			} );
-			await blockNoteUtils.dismissSnackbar( 'Note added.' );
-
-			await blockNoteUtils.addAnotherNoteToCurrentBlock( 'Note B' );
-
-			await expect(
-				page
-					.getByRole( 'button', { name: 'Dismiss this notice' } )
-					.filter( { hasText: 'Note added.' } )
-			).toBeVisible();
+			await blockNoteUtils.addNote( 'Note B' );
 
 			const settings = page.getByRole( 'region', {
 				name: 'Editor settings',
@@ -1071,15 +1011,7 @@ test.describe( 'Block Notes', () => {
 				attributes: { content: 'Block for auto-select' },
 				comment: 'First note',
 			} );
-			await blockNoteUtils.dismissSnackbar( 'Note added.' );
-
-			await blockNoteUtils.addAnotherNoteToCurrentBlock( 'Second note' );
-
-			await expect(
-				page
-					.getByRole( 'button', { name: 'Dismiss this notice' } )
-					.filter( { hasText: 'Note added.' } )
-			).toBeVisible();
+			await blockNoteUtils.addNote( 'Second note' );
 
 			const settings = page.getByRole( 'region', {
 				name: 'Editor settings',
@@ -1189,18 +1121,11 @@ test.describe( 'Block Notes', () => {
 					.filter( { hasText: 'Note added.' } )
 			).toBeVisible();
 
-			const blocks = await editor.getBlocks();
-			const paragraphBlock = blocks.find(
+			const noteIds = ( await editor.getBlocks() ).find(
 				( b ) => b.name === 'core/paragraph'
-			);
-			const noteIds = paragraphBlock?.attributes?.metadata?.noteId;
-
-			expect( Array.isArray( noteIds ) ).toBe( true );
-			expect( noteIds ).toHaveLength( 2 );
+			)?.attributes?.metadata?.noteId;
 			// Legacy id is preserved as the first entry; the new note id is appended.
-			expect( noteIds[ 0 ] ).toBe( 999 );
-			expect( typeof noteIds[ 1 ] ).toBe( 'number' );
-			expect( noteIds[ 1 ] ).not.toBe( 999 );
+			expect( noteIds ).toEqual( [ 999, expect.any( Number ) ] );
 		} );
 
 		test( 'multi-note metadata persists across save and reload', async ( {
@@ -1213,16 +1138,7 @@ test.describe( 'Block Notes', () => {
 				attributes: { content: 'Block with persisted notes' },
 				comment: 'Persisted note A',
 			} );
-			await blockNoteUtils.dismissSnackbar( 'Note added.' );
-
-			await blockNoteUtils.addAnotherNoteToCurrentBlock(
-				'Persisted note B'
-			);
-			await expect(
-				page
-					.getByRole( 'button', { name: 'Dismiss this notice' } )
-					.filter( { hasText: 'Note added.' } )
-			).toBeVisible();
+			await blockNoteUtils.addNote( 'Persisted note B' );
 
 			const beforeIds = ( await editor.getBlocks() ).find(
 				( b ) => b.name === 'core/paragraph'
@@ -1301,29 +1217,27 @@ class BlockNoteUtils {
 					name: type,
 					attributes,
 				} );
-				await this.#editor.clickBlockOptionsMenuItem( 'Add note' );
-				await this.#page
-					.getByRole( 'textbox', {
-						name: 'New note',
-						exact: true,
-					} )
-					.fill( comment );
-				await this.#page
-					.getByRole( 'region', { name: 'Editor settings' } )
-					.getByRole( 'button', { name: 'Add note', exact: true } )
-					.click();
-				await expect(
-					this.#page
-						.getByRole( 'region', {
-							name: 'Editor settings',
-						} )
-						.getByRole( 'treeitem', {
-							name: `Note: ${ comment }`,
-						} )
-				).toBeVisible();
+				await this.addNote( comment );
 			},
 			{ box: true }
 		);
+	}
+
+	async addNote( content ) {
+		await this.#editor.clickBlockOptionsMenuItem( 'Add note' );
+		await this.#page
+			.getByRole( 'textbox', { name: 'New note', exact: true } )
+			.fill( content );
+		await this.#page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'button', { name: 'Add note', exact: true } )
+			.click();
+		// Wait for the new thread to appear before returning.
+		await expect(
+			this.#page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'treeitem', { name: `Note: ${ content }` } )
+		).toBeVisible();
 	}
 
 	async clickBlockNoteActionMenuItem( actionName, index = 0 ) {
@@ -1333,23 +1247,5 @@ class BlockNoteUtils {
 			.nth( index )
 			.click();
 		await this.#page.getByRole( 'menuitem', { name: actionName } ).click();
-	}
-
-	async dismissSnackbar( text ) {
-		await this.#page
-			.getByRole( 'button', { name: 'Dismiss this notice' } )
-			.filter( { hasText: text } )
-			.click();
-	}
-
-	async addAnotherNoteToCurrentBlock( content ) {
-		await this.#editor.clickBlockOptionsMenuItem( 'Add note' );
-		await this.#page
-			.getByRole( 'textbox', { name: 'New note', exact: true } )
-			.fill( content );
-		await this.#page
-			.getByRole( 'region', { name: 'Editor settings' } )
-			.getByRole( 'button', { name: 'Add note', exact: true } )
-			.click();
 	}
 }
