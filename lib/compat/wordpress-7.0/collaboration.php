@@ -23,6 +23,65 @@ if ( ! function_exists( 'gutenberg_register_collaboration_rest_routes' ) ) {
 	add_action( 'rest_api_init', 'gutenberg_register_collaboration_rest_routes' );
 }
 
+/**
+ * Registers the collaboration table on the global $wpdb instance.
+ *
+ * Since the Gutenberg plugin cannot modify class-wpdb.php, this function
+ * registers the table at runtime so $wpdb->collaboration is available.
+ *
+ * @global wpdb $wpdb WordPress database abstraction object.
+ */
+function gutenberg_register_collaboration_table() {
+	global $wpdb;
+
+	if ( isset( $wpdb->collaboration ) && ! empty( $wpdb->collaboration ) ) {
+		return;
+	}
+
+	$wpdb->collaboration = $wpdb->prefix . 'collaboration';
+	$wpdb->tables[]      = 'collaboration';
+}
+add_action( 'plugins_loaded', 'gutenberg_register_collaboration_table', 0 );
+// Also call it immediately so it's available during the current request.
+gutenberg_register_collaboration_table();
+
+/**
+ * Creates the collaboration database table if it doesn't exist.
+ *
+ * Uses dbDelta() for safe schema management. This function is also registered
+ * as an action hook so it can be triggered via WP-CLI:
+ *
+ *   wp eval 'do_action( "gutenberg_create_collaboration_table" );'
+ *
+ * @global wpdb $wpdb WordPress database abstraction object.
+ */
+function gutenberg_create_collaboration_table() {
+	global $wpdb;
+
+	gutenberg_register_collaboration_table();
+
+	$charset_collate  = $wpdb->get_charset_collate();
+	$max_index_length = 191;
+
+	$sql = "CREATE TABLE {$wpdb->collaboration} (
+		id bigint(20) unsigned NOT NULL auto_increment,
+		room varchar({$max_index_length}) NOT NULL default '',
+		type varchar(32) NOT NULL default '',
+		client_id varchar(32) NOT NULL default '',
+		user_id bigint(20) unsigned NOT NULL default '0',
+		data longtext NOT NULL,
+		date_gmt datetime NOT NULL default '0000-00-00 00:00:00',
+		PRIMARY KEY  (id),
+		KEY type_client_id (type,client_id),
+		KEY room (room,id),
+		KEY date_gmt (date_gmt)
+	) $charset_collate;";
+
+	require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+	dbDelta( $sql );
+}
+add_action( 'gutenberg_create_collaboration_table', 'gutenberg_create_collaboration_table' );
+
 if ( ! function_exists( 'wp_collaboration_inject_setting' ) ) {
 	/**
 	 * Registers the real-time collaboration setting.
