@@ -37,6 +37,10 @@ unregisterDocument();
 When a document is registered, all previously registered styles are injected
 into it. Future styles are injected into every registered document.
 
+The runtime coordinates separately bundled copies of this package through a
+reserved `globalThis.__wpStyleRuntime` object. Consumers should use the public
+APIs below instead of reading or writing that global directly.
+
 ## API
 
 ### `registerStyle`

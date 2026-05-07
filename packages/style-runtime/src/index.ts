@@ -1,4 +1,6 @@
 type GlobalScopeWithStyleRuntime = typeof globalThis & {
+	// This global is shared by separately bundled copies of this package.
+	// Keep its shape backward compatible after release.
 	__wpStyleRuntime?: {
 		documents: Map< Document, number >;
 		styles: Map< string, string >;
