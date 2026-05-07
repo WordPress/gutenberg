@@ -18,7 +18,7 @@ const meta: Meta = {
 		componentStatus: {
 			status: 'use-with-caution',
 			whereUsed: 'global',
-			notes: 'Not yet recommended for use in Gutenberg core, pending review of popover compatibility. See [WordPress/gutenberg#76135](https://github.com/WordPress/gutenberg/issues/76135).',
+			notes: 'Not yet recommended for use alongside components from `@wordpress/components`, pending review of popover compatibility. See [WordPress/gutenberg#76135](https://github.com/WordPress/gutenberg/issues/76135).',
 		},
 	},
 	tags: [ '!dev' ],
