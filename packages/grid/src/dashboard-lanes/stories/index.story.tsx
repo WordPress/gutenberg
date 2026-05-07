@@ -92,12 +92,14 @@ const fgTokens: Record< Tone, string > = {
 function Tile( {
 	tone,
 	height,
+	index,
 	children,
 	...props
 }: {
 	tone: Tone;
 	height: number;
-	children: React.ReactNode;
+	index?: number;
+	children?: React.ReactNode;
 } & React.HTMLAttributes< HTMLDivElement > ) {
 	return (
 		<div
@@ -109,6 +111,8 @@ function Tile( {
 				display: 'flex',
 				alignItems: 'center',
 				justifyContent: 'center',
+				position: 'relative',
+				overflow: 'hidden',
 				height,
 				boxSizing: 'border-box',
 				fontFamily: 'var(--wpds-typography-font-family-body)',
@@ -117,7 +121,28 @@ function Tile( {
 				...props?.style,
 			} }
 		>
-			{ children }
+			{ index !== undefined && (
+				<span
+					aria-hidden
+					style={ {
+						position: 'absolute',
+						inset: 0,
+						display: 'flex',
+						alignItems: 'center',
+						justifyContent: 'center',
+						fontSize: '3rem',
+						fontWeight: 700,
+						opacity: 0.3,
+						pointerEvents: 'none',
+						userSelect: 'none',
+					} }
+				>
+					{ index }
+				</span>
+			) }
+			{ children && (
+				<span style={ { position: 'relative' } }>{ children }</span>
+			) }
 		</div>
 	);
 }
@@ -141,29 +166,29 @@ export const Default: Story = {
 			{ key: 'h' },
 		],
 		children: [
-			<Tile key="a" tone="brand" height={ 120 }>
-				A · 120px
+			<Tile key="a" tone="brand" height={ 120 } index={ 1 }>
+				120px
 			</Tile>,
-			<Tile key="b" tone="info" height={ 200 }>
-				B · 200px
+			<Tile key="b" tone="info" height={ 200 } index={ 2 }>
+				200px
 			</Tile>,
-			<Tile key="c" tone="success" height={ 80 }>
-				C · 80px
+			<Tile key="c" tone="success" height={ 80 } index={ 3 }>
+				80px
 			</Tile>,
-			<Tile key="d" tone="warning" height={ 160 }>
-				D · 160px
+			<Tile key="d" tone="warning" height={ 160 } index={ 4 }>
+				160px
 			</Tile>,
-			<Tile key="e" tone="error" height={ 100 }>
-				E · 100px
+			<Tile key="e" tone="error" height={ 100 } index={ 5 }>
+				100px
 			</Tile>,
-			<Tile key="f" tone="neutral" height={ 240 }>
-				F · 240px
+			<Tile key="f" tone="neutral" height={ 240 } index={ 6 }>
+				240px
 			</Tile>,
-			<Tile key="g" tone="brand" height={ 140 }>
-				G · 140px
+			<Tile key="g" tone="brand" height={ 140 } index={ 7 }>
+				140px
 			</Tile>,
-			<Tile key="h" tone="info" height={ 90 }>
-				H · 90px
+			<Tile key="h" tone="info" height={ 90 } index={ 8 }>
+				90px
 			</Tile>,
 		],
 	},
@@ -186,24 +211,12 @@ export const Responsive: Story = {
 			{ key: 'f' },
 		],
 		children: [
-			<Tile key="a" tone="brand" height={ 120 }>
-				A
-			</Tile>,
-			<Tile key="b" tone="info" height={ 200 }>
-				B
-			</Tile>,
-			<Tile key="c" tone="success" height={ 80 }>
-				C
-			</Tile>,
-			<Tile key="d" tone="warning" height={ 160 }>
-				D
-			</Tile>,
-			<Tile key="e" tone="error" height={ 100 }>
-				E
-			</Tile>,
-			<Tile key="f" tone="neutral" height={ 240 }>
-				F
-			</Tile>,
+			<Tile key="a" tone="brand" height={ 120 } index={ 1 } />,
+			<Tile key="b" tone="info" height={ 200 } index={ 2 } />,
+			<Tile key="c" tone="success" height={ 80 } index={ 3 } />,
+			<Tile key="d" tone="warning" height={ 160 } index={ 4 } />,
+			<Tile key="e" tone="error" height={ 100 } index={ 5 } />,
+			<Tile key="f" tone="neutral" height={ 240 } index={ 6 } />,
 		],
 	},
 };
@@ -226,27 +239,17 @@ export const Spanning: Story = {
 			{ key: 'e' },
 		],
 		children: [
-			<Tile key="a" tone="brand" height={ 120 }>
-				A
+			<Tile key="a" tone="brand" height={ 120 } index={ 1 } />,
+			<Tile key="wide" tone="info" height={ 100 } index={ 2 }>
+				span 2
 			</Tile>,
-			<Tile key="wide" tone="info" height={ 100 }>
-				wide · span 2
+			<Tile key="b" tone="success" height={ 80 } index={ 3 } />,
+			<Tile key="c" tone="warning" height={ 200 } index={ 4 } />,
+			<Tile key="d" tone="error" height={ 90 } index={ 5 } />,
+			<Tile key="taller-wide" tone="neutral" height={ 160 } index={ 6 }>
+				span 2
 			</Tile>,
-			<Tile key="b" tone="success" height={ 80 }>
-				B
-			</Tile>,
-			<Tile key="c" tone="warning" height={ 200 }>
-				C
-			</Tile>,
-			<Tile key="d" tone="error" height={ 90 }>
-				D
-			</Tile>,
-			<Tile key="taller-wide" tone="neutral" height={ 160 }>
-				taller-wide · span 2
-			</Tile>,
-			<Tile key="e" tone="brand" height={ 110 }>
-				E
-			</Tile>,
+			<Tile key="e" tone="brand" height={ 110 } index={ 7 } />,
 		],
 	},
 };
@@ -268,19 +271,19 @@ export const EditMode: Story = {
 			height: number;
 			label: string;
 		} )[] = [
-			{ key: 'a', tone: 'brand', height: 120, label: 'A · 120px' },
-			{ key: 'b', tone: 'info', height: 200, label: 'B · 200px' },
+			{ key: 'a', tone: 'brand', height: 120, label: '120px' },
+			{ key: 'b', tone: 'info', height: 200, label: '200px' },
 			{
 				key: 'wide',
 				width: 2,
 				tone: 'success',
 				height: 100,
-				label: 'wide · span 2',
+				label: 'span 2',
 			},
-			{ key: 'c', tone: 'warning', height: 160, label: 'C · 160px' },
-			{ key: 'd', tone: 'error', height: 90, label: 'D · 90px' },
-			{ key: 'e', tone: 'neutral', height: 240, label: 'E · 240px' },
-			{ key: 'f', tone: 'brand', height: 140, label: 'F · 140px' },
+			{ key: 'c', tone: 'warning', height: 160, label: '160px' },
+			{ key: 'd', tone: 'error', height: 90, label: '90px' },
+			{ key: 'e', tone: 'neutral', height: 240, label: '240px' },
+			{ key: 'f', tone: 'brand', height: 140, label: '140px' },
 		];
 
 		const [ tiles, setTiles ] = useState( initial );
@@ -305,11 +308,12 @@ export const EditMode: Story = {
 
 		const tileElements = useMemo(
 			() =>
-				tiles.map( ( tile ) => (
+				tiles.map( ( tile, i ) => (
 					<Tile
 						key={ tile.key }
 						tone={ tile.tone }
 						height={ tile.height }
+						index={ i + 1 }
 					>
 						{ tile.label }
 					</Tile>
