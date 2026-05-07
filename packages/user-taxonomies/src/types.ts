@@ -31,8 +31,16 @@ export interface StoredLabels {
 export interface StoredConfig {
 	labels?: StoredLabels;
 	description?: string;
-	public?: boolean;
-	hierarchical?: boolean;
+	public: boolean;
+	hierarchical: boolean;
+	publicly_queryable: boolean;
+	show_ui: boolean;
+	show_in_menu: boolean;
+	show_in_nav_menus: boolean;
+	show_tagcloud: boolean;
+	show_in_quick_edit: boolean;
+	show_admin_column: boolean;
+	show_in_rest: boolean;
 }
 
 /**
@@ -54,6 +62,14 @@ export interface TaxonomyFormData {
 		description: string;
 		public: boolean;
 		hierarchical: boolean;
+		publicly_queryable: boolean;
+		show_ui: boolean;
+		show_in_menu: boolean;
+		show_in_nav_menus: boolean;
+		show_tagcloud: boolean;
+		show_in_quick_edit: boolean;
+		show_admin_column: boolean;
+		show_in_rest: boolean;
 	};
 }
 
