@@ -378,11 +378,18 @@ class Gutenberg_REST_Comment_Controller_7_1 extends Gutenberg_REST_Comment_Contr
 				);
 			}
 
-			// Validate content is a valid emoji slug.
+			// Validate the reaction content. We accept either a curated emoji
+			// slug (e.g. "heart") or a short raw emoji character chosen from
+			// the full picker (e.g. "👍"). Length is capped so this column
+			// can never store anything resembling text content.
 			$emojis      = gutenberg_get_note_reaction_emojis();
 			$valid_slugs = wp_list_pluck( $emojis, 'value' );
 			$emoji_slug  = isset( $request['content'] ) ? wp_strip_all_tags( $request['content'] ) : '';
-			if ( ! in_array( $emoji_slug, $valid_slugs, true ) ) {
+
+			$is_curated_slug = in_array( $emoji_slug, $valid_slugs, true );
+			$is_short_emoji  = '' !== $emoji_slug && mb_strlen( $emoji_slug ) <= 16;
+
+			if ( ! $is_curated_slug && ! $is_short_emoji ) {
 				return new WP_Error(
 					'rest_comment_invalid_reaction',
 					__( 'Invalid reaction emoji.', 'gutenberg' ),
