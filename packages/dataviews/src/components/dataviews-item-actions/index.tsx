@@ -147,7 +147,7 @@ function MenuItemTrigger< Item >( {
 
 function mapModalSize(
 	size: ActionModalType< unknown >[ 'modalSize' ]
-): 'small' | 'medium' | 'large' | 'stretch' | 'full' {
+): 'small' | 'medium' | 'large' | 'stretch' {
 	if ( size === 'fill' ) {
 		deprecated( "modalSize: 'fill'", {
 			since: '15.0.0',

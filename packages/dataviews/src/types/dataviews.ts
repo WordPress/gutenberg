@@ -430,12 +430,11 @@ export interface ActionModal< Item > extends ActionBase< Item > {
 	 * - `'medium'` — moderate max-width.
 	 * - `'large'` — wide max-width.
 	 * - `'stretch'` — no max-width, stretches to fill available space.
-	 * - `'full'` — stretches to fill available width and height.
 	 * - `'fill'` — deprecated, use `'stretch'` instead.
 	 *
 	 * @default 'medium'
 	 */
-	modalSize?: 'small' | 'medium' | 'large' | 'stretch' | 'full' | 'fill';
+	modalSize?: 'small' | 'medium' | 'large' | 'stretch' | 'fill';
 
 	/**
 	 * The focus on mount property of the modal.

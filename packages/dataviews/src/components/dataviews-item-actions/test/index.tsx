@@ -160,7 +160,7 @@ describe( 'ActionModal', () => {
 		} );
 	} );
 
-	it.each( [ 'small', 'medium', 'large', 'stretch', 'full' ] as const )(
+	it.each( [ 'small', 'medium', 'large', 'stretch' ] as const )(
 		'forwards modalSize %p to Dialog.Popup without emitting a deprecation warning',
 		async ( modalSize ) => {
 			const action = createAction( { modalSize } );
