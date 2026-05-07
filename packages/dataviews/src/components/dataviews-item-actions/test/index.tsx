@@ -4,6 +4,30 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
+// `Dialog.Popup` only reflects `size` through CSS-module class names, which
+// are stripped in unit tests. Wrap the real `Dialog.Popup` so we can assert
+// what `ActionModal` forwards across the boundary while still rendering the
+// real popup behaviour (focus, role, backdrop, portal). Must be defined
+// before the module is imported below — `jest.mock` is hoisted, so the
+// captured spy needs a `mock`-prefixed name to satisfy the babel hoist
+// guard.
+const mockDialogPopupSpy = jest.fn();
+jest.mock( '@wordpress/ui', () => {
+	const actual = jest.requireActual( '@wordpress/ui' );
+	const { forwardRef, createElement } =
+		jest.requireActual( '@wordpress/element' );
+	const PopupSpy = forwardRef(
+		( props: Record< string, unknown >, ref: unknown ) => {
+			mockDialogPopupSpy( props );
+			return createElement( actual.Dialog.Popup, { ...props, ref } );
+		}
+	);
+	return {
+		...actual,
+		Dialog: { ...actual.Dialog, Popup: PopupSpy },
+	};
+} );
+
 /**
  * WordPress dependencies
  */
@@ -97,25 +121,6 @@ describe( 'ActionModal', () => {
 		} );
 	} );
 
-	it( "maps modalSize 'fill' to 'stretch' and emits a deprecation warning", async () => {
-		const action = createAction( {
-			modalSize: 'fill',
-		} );
-
-		renderActionModal( {
-			action,
-			items: [ { id: 1, title: 'Item' } ],
-		} );
-
-		await waitFor( () => {
-			expect( screen.getByRole( 'dialog' ) ).toBeVisible();
-		} );
-
-		expect( console ).toHaveWarnedWith(
-			"modalSize: 'fill' is deprecated since version 15.0.0. Please use 'stretch' instead."
-		);
-	} );
-
 	it( 'focuses the first input when modalFocusOnMount is "firstInputElement"', async () => {
 		const action = createAction( {
 			modalFocusOnMount: 'firstInputElement',
@@ -160,7 +165,7 @@ describe( 'ActionModal', () => {
 		} );
 	} );
 
-	it.each( [ 'small', 'medium', 'large', 'stretch' ] as const )(
+	it.each( [ 'small', 'medium', 'large' ] as const )(
 		'forwards modalSize %p to Dialog.Popup without emitting a deprecation warning',
 		async ( modalSize ) => {
 			const action = createAction( { modalSize } );
@@ -174,6 +179,22 @@ describe( 'ActionModal', () => {
 			expect( console ).not.toHaveWarned();
 		}
 	);
+
+	it( "translates modalSize 'fill' to Dialog.Popup size 'full' silently", async () => {
+		mockDialogPopupSpy.mockClear();
+		const action = createAction( { modalSize: 'fill' } );
+
+		renderActionModal( {
+			action,
+			items: [ { id: 1, title: 'Item' } ],
+		} );
+
+		await screen.findByRole( 'dialog' );
+		expect( mockDialogPopupSpy ).toHaveBeenCalledWith(
+			expect.objectContaining( { size: 'full' } )
+		);
+		expect( console ).not.toHaveWarned();
+	} );
 
 	it( 'renders the popup inside the dataviews-action-modal__portal element', async () => {
 		const action = createAction();

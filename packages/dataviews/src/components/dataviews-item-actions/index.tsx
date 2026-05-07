@@ -15,7 +15,6 @@ import { useCallback, useMemo, useRef, useState } from '@wordpress/element';
 import { moreVertical } from '@wordpress/icons';
 import { useRegistry } from '@wordpress/data';
 import { useViewportMatch } from '@wordpress/compose';
-import deprecated from '@wordpress/deprecated';
 // eslint-disable-next-line @wordpress/use-recommended-components
 import { Dialog, Stack, VisuallyHidden } from '@wordpress/ui';
 
@@ -147,13 +146,9 @@ function MenuItemTrigger< Item >( {
 
 function mapModalSize(
 	size: ActionModalType< unknown >[ 'modalSize' ]
-): 'small' | 'medium' | 'large' | 'stretch' {
+): 'small' | 'medium' | 'large' | 'full' {
 	if ( size === 'fill' ) {
-		deprecated( "modalSize: 'fill'", {
-			since: '15.0.0',
-			alternative: "'stretch'",
-		} );
-		return 'stretch';
+		return 'full';
 	}
 	return size ?? 'medium';
 }
