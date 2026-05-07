@@ -45,7 +45,7 @@ describe( 'MediaEditorCropPanel', () => {
 		const zoom = screen.getByRole( 'slider', { name: 'Zoom' } );
 
 		expect(
-			screen.getByText( 'Show handles for adjusting the crop box.' )
+			screen.getByText( 'Show handles to adjust the crop box.' )
 		).toBeInTheDocument();
 		expectElementBefore( aspectRatio, resizeCropArea );
 		expectElementBefore( resizeCropArea, zoom );
