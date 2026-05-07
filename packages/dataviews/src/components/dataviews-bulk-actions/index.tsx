@@ -26,6 +26,7 @@ import type { SetSelection } from '../../types/private';
 import type { ActionTriggerProps } from '../dataviews-item-actions';
 import getFooterMessage from '../../utils/get-footer-message';
 import genericForwardRef from '../../utils/generic-forward-ref';
+import getActionLabel from '../../utils/get-action-label';
 
 interface ActionWithModalProps< Item > {
 	action: ActionModalType< Item >;
@@ -186,8 +187,7 @@ const ActionTrigger = genericForwardRef( function ActionTrigger< Item >(
 	{ action, onClick, isBusy, items, ...rest }: ActionTriggerProps< Item >,
 	ref: React.Ref< HTMLButtonElement >
 ) {
-	const label =
-		typeof action.label === 'string' ? action.label : action.label( items );
+	const label = getActionLabel( action, items );
 	const isMobile = useViewportMatch( 'medium', '<' );
 
 	if ( isMobile ) {

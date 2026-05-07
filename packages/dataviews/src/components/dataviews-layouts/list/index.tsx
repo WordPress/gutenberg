@@ -35,6 +35,7 @@ import type {
 	ViewListProps,
 } from '../../../types';
 import getDataByGroup from '../utils/get-data-by-group';
+import getActionLabel from '../../../utils/get-action-label';
 
 interface ListViewItemProps< Item > {
 	view: ViewListType;
@@ -82,10 +83,7 @@ function PrimaryActionGridCell< Item >( {
 		primaryAction.id
 	);
 
-	const label =
-		typeof primaryAction.label === 'string'
-			? primaryAction.label
-			: primaryAction.label( [ item ] );
+	const label = getActionLabel( primaryAction, [ item ] );
 
 	if ( 'RenderModal' in primaryAction ) {
 		// Compose `Composite.Item` → `Dialog.Trigger` → `Button` so all

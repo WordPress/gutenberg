@@ -26,6 +26,7 @@ import { unlock } from '../../lock-unlock';
 import type { Action, ActionModal as ActionModalType } from '../../types';
 import useMapFocusOnMount from '../../hooks/use-map-focus-on-mount';
 import genericForwardRef from '../../utils/generic-forward-ref';
+import getActionLabel from '../../utils/get-action-label';
 
 const { Menu, kebabCase } = unlock( componentsPrivateApis );
 
@@ -107,8 +108,7 @@ const ButtonTrigger = genericForwardRef( function ButtonTrigger< Item >(
 	{ action, items, variant, ...rest }: ActionTriggerProps< Item >,
 	ref: React.Ref< HTMLButtonElement >
 ) {
-	const label =
-		typeof action.label === 'string' ? action.label : action.label( items );
+	const label = getActionLabel( action, items );
 	return (
 		<Button
 			ref={ ref }
@@ -137,8 +137,7 @@ function MenuItemTrigger< Item >( {
 	items: Item[];
 	onClick: () => void;
 } ) {
-	const label =
-		typeof action.label === 'string' ? action.label : action.label( items );
+	const label = getActionLabel( action, items );
 	return (
 		<Menu.Item disabled={ action.disabled } onClick={ onClick }>
 			<Menu.ItemLabel>{ label }</Menu.ItemLabel>
@@ -174,8 +173,7 @@ export function ActionModal< Item >( {
 		contentRef
 	);
 
-	const label =
-		typeof action.label === 'string' ? action.label : action.label( items );
+	const label = getActionLabel( action, items );
 	const modalHeader =
 		typeof action.modalHeader === 'function'
 			? action.modalHeader( items )
