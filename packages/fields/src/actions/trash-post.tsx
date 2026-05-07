@@ -13,6 +13,8 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
+// eslint-disable-next-line @wordpress/use-recommended-components
+import { Dialog } from '@wordpress/ui';
 import type { Action } from '@wordpress/dataviews';
 
 /**
@@ -45,6 +47,10 @@ const trashPost: Action< PostWithPermissions > = {
 	supportsBulk: true,
 	hideModalHeader: true,
 	modalFocusOnMount: 'firstContentElement',
+	// `Dialog.Action` (used inside this body) requires a `@wordpress/ui`
+	// `Dialog.Root` ancestor at render time. Every in-tree consumer of
+	// `Action.RenderModal` provides one; external hosts rendering it
+	// outside `Dialog.Root` will crash. See `RenderModalProps` JSDoc.
 	RenderModal: ( { items, closeModal, onActionPerformed } ) => {
 		const [ isBusy, setIsBusy ] = useState( false );
 		const { createSuccessNotice, createErrorNotice } =
@@ -72,15 +78,9 @@ const trashPost: Action< PostWithPermissions > = {
 						  ) }
 				</WCText>
 				<HStack justify="right">
-					<Button
-						__next40pxDefaultSize
-						variant="tertiary"
-						onClick={ closeModal }
-						disabled={ isBusy }
-						accessibleWhenDisabled
-					>
+					<Dialog.Action variant="outline" disabled={ isBusy }>
 						{ __( 'Cancel' ) }
-					</Button>
+					</Dialog.Action>
 					<Button
 						__next40pxDefaultSize
 						variant="primary"

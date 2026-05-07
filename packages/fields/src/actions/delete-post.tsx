@@ -10,6 +10,8 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
+// eslint-disable-next-line @wordpress/use-recommended-components
+import { Dialog } from '@wordpress/ui';
 // @ts-ignore
 import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
 import type { Action } from '@wordpress/dataviews';
@@ -48,6 +50,10 @@ const deletePostAction: Action< Template | TemplatePart | Pattern > = {
 	supportsBulk: true,
 	hideModalHeader: true,
 	modalFocusOnMount: 'firstContentElement',
+	// `Dialog.Action` (used inside this body) requires a `@wordpress/ui`
+	// `Dialog.Root` ancestor at render time. Every in-tree consumer of
+	// `Action.RenderModal` provides one; external hosts rendering it
+	// outside `Dialog.Root` will crash. See `RenderModalProps` JSDoc.
 	RenderModal: ( { items, closeModal, onActionPerformed } ) => {
 		const [ isBusy, setIsBusy ] = useState( false );
 		const isResetting = items.every(
@@ -73,15 +79,9 @@ const deletePostAction: Action< Template | TemplatePart | Pattern > = {
 						  ) }
 				</WCText>
 				<HStack justify="right">
-					<Button
-						variant="tertiary"
-						onClick={ closeModal }
-						disabled={ isBusy }
-						accessibleWhenDisabled
-						__next40pxDefaultSize
-					>
+					<Dialog.Action variant="outline" disabled={ isBusy }>
 						{ __( 'Cancel' ) }
-					</Button>
+					</Dialog.Action>
 					<Button
 						variant="primary"
 						onClick={ async () => {

@@ -9,7 +9,8 @@ import { useState } from '@wordpress/element';
 import { __, _n, _x, sprintf } from '@wordpress/i18n';
 import { trash } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
-import { Stack, Text } from '@wordpress/ui';
+// eslint-disable-next-line @wordpress/use-recommended-components
+import { Dialog, Stack, Text } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -143,15 +144,9 @@ function DeletePostTypeModal( {
 					  ) }
 			</Text>
 			<Stack direction="row" justify="flex-end" gap="sm">
-				<Button
-					__next40pxDefaultSize
-					variant="tertiary"
-					onClick={ closeModal }
-					disabled={ isDeleting }
-					accessibleWhenDisabled
-				>
+				<Dialog.Action variant="outline" disabled={ isDeleting }>
 					{ __( 'Cancel' ) }
-				</Button>
+				</Dialog.Action>
 				<Button
 					__next40pxDefaultSize
 					variant="primary"
@@ -176,6 +171,11 @@ const deletePostTypeAction: Action< PostTypeFormData > = {
 	hideModalHeader: true,
 	modalFocusOnMount: 'firstContentElement',
 	modalSize: 'small',
+	// `DeletePostTypeModal` uses `Dialog.Action`, so it requires a
+	// `@wordpress/ui` `Dialog.Root` ancestor at render time. Every
+	// in-tree consumer of `Action.RenderModal` provides one; external
+	// hosts rendering it outside `Dialog.Root` will crash. See
+	// `RenderModalProps` JSDoc.
 	RenderModal: DeletePostTypeModal,
 };
 

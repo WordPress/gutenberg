@@ -12,6 +12,8 @@ import {
 	__experimentalVStack as VStack,
 	__experimentalInputControl as InputControl,
 } from '@wordpress/components';
+// eslint-disable-next-line @wordpress/use-recommended-components
+import { Dialog } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -40,6 +42,10 @@ const duplicatePost: Action< BasePost > = {
 		return status !== 'trash';
 	},
 	modalFocusOnMount: 'firstContentElement',
+	// `Dialog.Action` (used inside this body) requires a `@wordpress/ui`
+	// `Dialog.Root` ancestor at render time. Every in-tree consumer of
+	// `Action.RenderModal` provides one; external hosts rendering it
+	// outside `Dialog.Root` will crash. See `RenderModalProps` JSDoc.
 	RenderModal: ( { items, closeModal, onActionPerformed } ) => {
 		const [ item, setItem ] = useState< BasePost >( {
 			...items[ 0 ],
@@ -165,13 +171,9 @@ const duplicatePost: Action< BasePost > = {
 						}
 					/>
 					<HStack spacing={ 2 } justify="end">
-						<Button
-							variant="tertiary"
-							onClick={ closeModal }
-							__next40pxDefaultSize
-						>
+						<Dialog.Action variant="outline">
 							{ __( 'Cancel' ) }
-						</Button>
+						</Dialog.Action>
 						<Button
 							variant="primary"
 							type="submit"

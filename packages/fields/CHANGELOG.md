@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   The `RenderModal` implementations exported from this package (`deletePostAction`, `permanentlyDeletePostAction`, `trashPostAction`, `resetPostAction`, `renamePostAction`, `reorderPageAction`, `duplicatePostAction`) now use `@wordpress/ui` `Dialog.Action` for their Cancel buttons and therefore require a `Dialog.Root` ancestor at render time. All in-tree consumers (`@wordpress/dataviews` item-action menus, `@wordpress/editor` `PostActions`, `@wordpress/edit-site` page-templates) provide one, but plugins or custom UIs that register these actions and render `Action.RenderModal` outside a `Dialog.Root` will crash with "Dialog parts must be placed within `<Dialog.Root>`". Wrap the rendered output in `<Dialog.Root>` or migrate to one of the in-tree consumers. ([#76837](https://github.com/WordPress/gutenberg/pull/76837))
+
+### Code Quality
+
+-   Migrate the Cancel button in `RenderModal` implementations (delete, permanently delete, trash, reset, rename, reorder, duplicate-post) from a tertiary `Button` to `@wordpress/ui` `Dialog.Action`. ([#76837](https://github.com/WordPress/gutenberg/pull/76837))
+
 ## 0.37.0 (2026-04-29)
 
 ## 0.36.0 (2026-04-15)

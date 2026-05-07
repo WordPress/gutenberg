@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   The `RenderModal` implementations registered by this package (`useSetAsHomepageAction`, `useSetAsPostsPageAction`) now use `@wordpress/ui` `Dialog.Action` for their Cancel buttons and therefore require a `Dialog.Root` ancestor at render time. The editor's own `PostActions` component (which is the only in-tree consumer) supplies one. Plugins or custom UIs that consume these action objects and render `Action.RenderModal` outside a `Dialog.Root` will crash with "Dialog parts must be placed within `<Dialog.Root>`". Wrap the rendered output in `<Dialog.Root>` or render through the editor's `PostActions` component. ([#76837](https://github.com/WordPress/gutenberg/pull/76837))
+
+### Code Quality
+
+-   Migrate the Cancel button in the "Set as homepage" / "Set as posts page" modals from a tertiary `Button` to `Dialog.Action`. ([#76837](https://github.com/WordPress/gutenberg/pull/76837))
+
 ## 14.45.0 (2026-04-29)
 
 ## 14.44.0 (2026-04-15)

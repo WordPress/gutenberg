@@ -13,6 +13,8 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
+// eslint-disable-next-line @wordpress/use-recommended-components
+import { Dialog } from '@wordpress/ui';
 import type { Action } from '@wordpress/dataviews';
 import { store as noticesStore } from '@wordpress/notices';
 
@@ -80,6 +82,10 @@ const renamePost: Action< PostWithPermissions > = {
 
 		return post.type === PATTERN_TYPES.user && post.permissions?.update;
 	},
+	// `Dialog.Action` (used inside this body) requires a `@wordpress/ui`
+	// `Dialog.Root` ancestor at render time. Every in-tree consumer of
+	// `Action.RenderModal` provides one; external hosts rendering it
+	// outside `Dialog.Root` will crash. See `RenderModalProps` JSDoc.
 	RenderModal: ( { items, closeModal, onActionPerformed } ) => {
 		const [ item ] = items;
 		const [ title, setTitle ] = useState( () => getItemTitle( item, '' ) );
@@ -126,15 +132,9 @@ const renamePost: Action< PostWithPermissions > = {
 						required
 					/>
 					<HStack justify="right">
-						<Button
-							__next40pxDefaultSize
-							variant="tertiary"
-							onClick={ () => {
-								closeModal?.();
-							} }
-						>
+						<Dialog.Action variant="outline">
 							{ __( 'Cancel' ) }
-						</Button>
+						</Dialog.Action>
 						<Button
 							__next40pxDefaultSize
 							variant="primary"

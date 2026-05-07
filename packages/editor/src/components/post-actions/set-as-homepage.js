@@ -9,6 +9,8 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
+// eslint-disable-next-line @wordpress/use-recommended-components
+import { Dialog } from '@wordpress/ui';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
@@ -94,17 +96,9 @@ const SetAsHomepageModal = ( { items, closeModal } ) => {
 			<VStack spacing="5">
 				<WCText>{ modalText }</WCText>
 				<HStack justify="right">
-					<Button
-						__next40pxDefaultSize
-						variant="tertiary"
-						onClick={ () => {
-							closeModal?.();
-						} }
-						disabled={ isSaving }
-						accessibleWhenDisabled
-					>
+					<Dialog.Action variant="outline" disabled={ isSaving }>
 						{ __( 'Cancel' ) }
-					</Button>
+					</Dialog.Action>
 					<Button
 						__next40pxDefaultSize
 						variant="primary"
@@ -161,6 +155,11 @@ export const useSetAsHomepageAction = () => {
 				return true;
 			},
 			modalFocusOnMount: 'firstContentElement',
+			// `SetAsHomepageModal` uses `Dialog.Action`, so it requires a
+			// `@wordpress/ui` `Dialog.Root` ancestor at render time. Every
+			// in-tree consumer of `Action.RenderModal` provides one; external
+			// hosts rendering it outside `Dialog.Root` will crash. See
+			// `RenderModalProps` JSDoc in `@wordpress/dataviews`.
 			RenderModal: SetAsHomepageModal,
 		} ),
 		[ pageForPosts, pageOnFront ]

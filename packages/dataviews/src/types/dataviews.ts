@@ -399,6 +399,14 @@ interface ActionBase< Item > {
 
 export interface RenderModalProps< Item > {
 	items: Item[];
+	/**
+	 * Imperative close handler. Calling it dismisses the host dialog. The
+	 * exact mechanism is host-defined: the host typically wires it to its
+	 * own `setOpen(false)` (which in turn drives its `Dialog.Root.open`).
+	 * Async consumer code (e.g. after a network round-trip) should call
+	 * `closeModal()` on success rather than relying on the user clicking
+	 * a Cancel button.
+	 */
 	closeModal?: () => void;
 	onActionPerformed?: ( items: Item[] ) => void;
 }
@@ -406,6 +414,17 @@ export interface RenderModalProps< Item > {
 export interface ActionModal< Item > extends ActionBase< Item > {
 	/**
 	 * Modal to render when the action is triggered.
+	 *
+	 * **Host requirement (since the migration from `@wordpress/components`
+	 * `Modal` to `@wordpress/ui` `Dialog`):** the rendered output is
+	 * expected to be mounted inside an `@wordpress/ui` `Dialog.Root`
+	 * ancestor. All in-tree hosts (`@wordpress/dataviews` action menus,
+	 * `@wordpress/editor` `PostActions`, `@wordpress/edit-site` page
+	 * templates) satisfy this. Custom hosts that render `RenderModal`
+	 * outside a `Dialog.Root` will crash if the body uses Dialog parts
+	 * such as `Dialog.Action` (Base UI throws "Dialog parts must be
+	 * placed within `<Dialog.Root>`"). When in doubt, render through one
+	 * of the in-tree hosts or wrap your custom host in `Dialog.Root`.
 	 */
 	RenderModal: ( {
 		items,

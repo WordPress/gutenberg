@@ -12,6 +12,8 @@ import {
 	__experimentalVStack as VStack,
 	__experimentalInputControl as InputControl,
 } from '@wordpress/components';
+// eslint-disable-next-line @wordpress/use-recommended-components
+import { Dialog } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -111,15 +113,9 @@ function ReorderModal( {
 					} }
 				/>
 				<HStack justify="right">
-					<Button
-						__next40pxDefaultSize
-						variant="tertiary"
-						onClick={ () => {
-							closeModal?.();
-						} }
-					>
+					<Dialog.Action variant="outline">
 						{ __( 'Cancel' ) }
-					</Button>
+					</Dialog.Action>
 					<Button
 						__next40pxDefaultSize
 						variant="primary"
@@ -142,6 +138,10 @@ const reorderPage: Action< BasePost > = {
 		return status !== 'trash';
 	},
 	modalFocusOnMount: 'firstContentElement',
+	// `ReorderModal` uses `Dialog.Action`, so it requires a `@wordpress/ui`
+	// `Dialog.Root` ancestor at render time. Every in-tree consumer of
+	// `Action.RenderModal` provides one; external hosts rendering it
+	// outside `Dialog.Root` will crash. See `RenderModalProps` JSDoc.
 	RenderModal: ReorderModal,
 };
 
