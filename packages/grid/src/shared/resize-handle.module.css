@@ -10,6 +10,36 @@
 	border-inline-start: 12px solid transparent;
 }
 
+/*
+ * When the host surface only resizes horizontally (e.g. lanes,
+ * where height is content-driven), the corner triangle advertises a
+ * vertical drag the user cannot perform. Override with a vertical
+ * grip centered on the trailing edge.
+ */
 .is-horizontal-only {
 	cursor: ew-resize;
+	border-style: none;
+	bottom: auto;
+	top: 50%;
+	transform: translateY(-50%);
+	width: 16px;
+	height: 40px;
+	background: transparent;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.is-horizontal-only::before {
+	content: '';
+	width: 4px;
+	height: 24px;
+	border-radius: 2px;
+	background-color: var(--wpds-color-fg-interactive-brand);
+}
+
+@media (forced-colors: active) {
+	.is-horizontal-only::before {
+		background-color: Highlight;
+	}
 }
