@@ -16,8 +16,8 @@ if ( ! function_exists( 'gutenberg_register_collaboration_rest_routes' ) ) {
 	 * Registers REST API routes for collaborative editing.
 	 */
 	function gutenberg_register_collaboration_rest_routes(): void {
-		$sync_storage = new WP_Sync_Post_Meta_Storage();
-		$sync_server  = new WP_HTTP_Polling_Sync_Server( $sync_storage );
+		$sync_storage = new WP_Collaboration_Table_Storage();
+		$sync_server  = new WP_HTTP_Polling_Collaboration_Server( $sync_storage );
 		$sync_server->register_routes();
 	}
 	add_action( 'rest_api_init', 'gutenberg_register_collaboration_rest_routes' );
