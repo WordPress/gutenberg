@@ -3,23 +3,18 @@
 	"version": "1.0.0",
 	"private": true,
 	"route": {
-		"path": "/edit/$id",
+		"path": "/post-types/$id",
 		"page": [
-			"post-types"
+			"content-types"
 		]
 	},
 	"dependencies": {
-		"@wordpress/admin-ui": "file:../../packages/admin-ui",
-		"@wordpress/components": "file:../../packages/components",
-		"@wordpress/compose": "file:../../packages/compose",
+		"@wordpress/base-styles": "file:../../packages/base-styles",
+		"@wordpress/content-types": "file:../../packages/content-types",
 		"@wordpress/core-data": "file:../../packages/core-data",
 		"@wordpress/data": "file:../../packages/data",
-		"@wordpress/dataviews": "file:../../packages/dataviews",
-		"@wordpress/element": "file:../../packages/element",
 		"@wordpress/i18n": "file:../../packages/i18n",
 		"@wordpress/notices": "file:../../packages/notices",
-		"@wordpress/route": "file:../../packages/route",
-		"@wordpress/ui": "file:../../packages/ui",
-		"@wordpress/user-post-types": "file:../../packages/user-post-types"
+		"@wordpress/route": "file:../../packages/route"
 	}
 }
