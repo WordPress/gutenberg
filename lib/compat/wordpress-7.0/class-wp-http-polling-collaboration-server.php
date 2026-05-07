@@ -442,20 +442,31 @@ if ( ! class_exists( 'WP_HTTP_Polling_Collaboration_Server' ) ) {
 				}
 			}
 
-			if ( null !== $awareness_update ) {
+			if ( null === $awareness_update ) {
+				/*
+				 * Client signalled disconnect, remove the awareness entry.
+				 */
+				$this->storage->remove_awareness_state( $room, $client_id );
+			} else {
 				$this->storage->set_awareness_state( $room, $client_id, $awareness_update, $wp_user_id );
 			}
 
 			$response = array();
 			foreach ( $entries as $entry ) {
+				if ( $client_id === $entry['client_id'] ) {
+					// Skip the current client, it is added below from the
+					// request payload or removed on disconnect.
+					continue;
+				}
+
 				$response[ $entry['client_id'] ] = $entry['state'];
 			}
 
 			/*
-			* Other clients' states were decoded from the DB. Run the current
-			* client's state through the same encode/decode path so the response
-			* is consistent — wp_json_encode may normalize values (e.g. strip
-			* invalid UTF-8) that would otherwise differ on the next poll.
+			 * Other clients' states were decoded from the DB. Run the current
+			 * client's state through the same encode/decode path so the response
+			 * is consistent — wp_json_encode may normalize values (e.g. strip
+			 * invalid UTF-8) that would otherwise differ on the next poll.
 			*/
 			if ( null !== $awareness_update ) {
 				$response[ $client_id ] = json_decode( wp_json_encode( $awareness_update ), true );

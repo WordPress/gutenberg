@@ -445,5 +445,61 @@ if ( ! class_exists( 'WP_Collaboration_Table_Storage' ) ) {
 			wp_cache_delete( $cache_key, 'collaboration' );
 			return true;
 		}
+
+		/**
+		 * Removes awareness state for a given client in a room.
+		 *
+		 * @since 7.0.0
+		 *
+		 * @global wpdb $wpdb WordPress database abstraction object.
+		 *
+		 * @param string $room      Room identifier.
+		 * @param string $client_id Client identifier.
+		 */
+		public function remove_awareness_state( string $room, string $client_id ): void {
+			global $wpdb;
+
+			if ( '' === $room || '' === $client_id ) {
+				return;
+			}
+
+			$cache_key = $this->get_awareness_cache_key( $room );
+
+			if ( wp_using_ext_object_cache() ) {
+				$cached = wp_cache_get( $cache_key, 'collaboration' );
+
+				if ( false === $cached || ! is_array( $cached ) ) {
+					// Nothing cached for this room; treat as a no-op.
+					return;
+				}
+
+				$filtered = array();
+				foreach ( $cached as $entry ) {
+					if ( isset( $entry['client_id'] ) && $entry['client_id'] === $client_id ) {
+						continue;
+					}
+
+					$filtered[] = $entry;
+				}
+
+				if ( count( $filtered ) === count( $cached ) ) {
+					// Client wasn't present; nothing to do.
+					return;
+				}
+
+				wp_cache_set( $cache_key, $filtered, 'collaboration', HOUR_IN_SECONDS );
+				return;
+			}
+
+			$wpdb->query(
+				$wpdb->prepare(
+					"DELETE FROM {$wpdb->collaboration} WHERE room = %s AND type = 'awareness' AND client_id = %s",
+					$room,
+					$client_id
+				)
+			);
+
+			wp_cache_delete( $cache_key, 'collaboration' );
+		}
 	}
 }

@@ -94,5 +94,18 @@ if ( ! interface_exists( 'WP_Collaboration_Storage' ) ) {
 		 * @return bool True on success, false on failure.
 		 */
 		public function set_awareness_state( string $room, string $client_id, array $state, int $user_id ): bool;
+
+		/**
+		 * Removes awareness state for a given client in a room.
+		 *
+		 * Used when a client signals disconnect (e.g. on `pagehide`) so that
+		 * other clients remove the departing user.
+		 *
+		 * @since 7.0.0
+		 *
+		 * @param string $room      Room identifier.
+		 * @param string $client_id Client identifier.
+		 */
+		public function remove_awareness_state( string $room, string $client_id ): void;
 	}
 }
