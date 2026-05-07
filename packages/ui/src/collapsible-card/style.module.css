@@ -2,11 +2,13 @@
 
 @layer wp-ui-components {
 	/*
-	 * Style overrides for the outer heading wrapper rendered by
-	 * `CollapsibleCard.Header` (defaults to `<h3>`). Combined with
-	 * `defenseStyles.heading` so the unlayered defense class beats wp-admin's
-	 * bare `h2`/`h3`/etc. selectors. Keeps the wrapper visually transparent so
-	 * UA and host stylesheets don't bleed into the inner trigger.
+	 * Style overrides for the outer wrapper rendered by `CollapsibleCard.Header`
+	 * (defaults to `<div>`, but consumers can opt into a heading level via
+	 * `render={ <h2 /> }` etc.). Combined with `defenseStyles.heading` so that,
+	 * when the wrapper renders as an h1–h6, the unlayered defense class beats
+	 * wp-admin's bare `h2`/`h3`/etc. selectors. Keeps the wrapper visually
+	 * transparent so UA and host stylesheets don't bleed into the inner
+	 * trigger.
 	 */
 	.heading-wrapper {
 		--_gcd-heading-color: inherit;

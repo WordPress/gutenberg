@@ -16,18 +16,19 @@ import type { HeaderProps } from './types';
  * toggle trigger — clicking anywhere on it expands or collapses the
  * card's content.
  *
- * Renders an `<h3>` element by default so each card contributes to the
- * document outline. Pass `render` to change the heading level (e.g.
- * `render={ <h2 /> }`) or to opt out of heading semantics entirely
- * (`render={ <div /> }`) when no outline contribution is desired.
+ * Defaults to a `<div>` wrapper around the trigger. Since the right heading
+ * level depends on the surrounding document outline, the consumer is
+ * expected to opt in to heading semantics. Pass `render` to wrap the
+ * trigger in a heading (e.g. `render={ <h2 /> }`), following the W3C APG
+ * accordion pattern (heading wraps button).
  *
  * Avoid placing interactive elements (buttons, links, inputs) inside the
  * header, since the entire area is clickable and their events will bubble
  * to trigger the collapse toggle.
  */
-export const Header = forwardRef< HTMLHeadingElement, HeaderProps >(
+export const Header = forwardRef< HTMLDivElement, HeaderProps >(
 	function CollapsibleCardHeader(
-		{ children, className, style, render, ...restProps },
+		{ children, className, render, ...restProps },
 		ref
 	) {
 		const [ descriptionId, setDescriptionId ] = useState< string >();
@@ -38,16 +39,15 @@ export const Header = forwardRef< HTMLHeadingElement, HeaderProps >(
 		);
 
 		return useRender( {
-			defaultTagName: 'h3',
+			defaultTagName: 'div',
 			render,
 			ref,
-			props: mergeProps< 'h3' >( restProps, {
+			props: mergeProps< 'div' >( restProps, {
 				className: clsx(
 					defenseStyles.heading,
 					styles[ 'heading-wrapper' ],
 					className
 				),
-				style,
 				children: (
 					<HeaderDescriptionIdContext.Provider value={ contextValue }>
 						<Collapsible.Trigger

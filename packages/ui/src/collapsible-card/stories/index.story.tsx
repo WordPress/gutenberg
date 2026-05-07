@@ -166,10 +166,11 @@ export const Stacked: Story = {
 };
 
 /**
- * `CollapsibleCard.Header` renders an `<h3>` by default so the card
- * contributes to the document outline. Use the `render` prop to change the
- * heading level (e.g. `render={ <h2 /> }`) or to opt out of heading
- * semantics entirely (`render={ <div /> }`).
+ * `CollapsibleCard.Header` renders a `<div>` wrapper by default. Pass an
+ * `<h1>`–`<h6>` React element to the `render` prop to wrap the trigger in
+ * a heading and contribute to the document outline. The right level
+ * depends on the surrounding outline, so the consumer is expected to opt
+ * in.
  */
 export const WithHeadingElement: Story = {
 	parameters: { controls: { disable: true } },
@@ -193,24 +194,25 @@ export const WithHeadingElement: Story = {
 				</CollapsibleCard.Content>
 			</CollapsibleCard.Root>
 			<CollapsibleCard.Root>
-				<CollapsibleCard.Header>
-					<Card.Title>Heading level 3 (default)</Card.Title>
+				<CollapsibleCard.Header render={ <h3 /> }>
+					<Card.Title>Heading level 3</Card.Title>
 				</CollapsibleCard.Header>
 				<CollapsibleCard.Content>
 					<Text>
-						Without a render prop, the header defaults to an h3
-						element.
+						Pass any of h1–h6 to choose the level that fits the
+						surrounding document outline.
 					</Text>
 				</CollapsibleCard.Content>
 			</CollapsibleCard.Root>
 			<CollapsibleCard.Root>
-				<CollapsibleCard.Header render={ <div /> }>
-					<Card.Title>No heading semantics</Card.Title>
+				<CollapsibleCard.Header>
+					<Card.Title>No heading (default)</Card.Title>
 				</CollapsibleCard.Header>
 				<CollapsibleCard.Content>
 					<Text>
-						Passing a div React element to the render prop opts out
-						of heading semantics entirely.
+						Without a render prop, the header wraps the trigger in a
+						plain div and does not contribute to the document
+						outline.
 					</Text>
 				</CollapsibleCard.Content>
 			</CollapsibleCard.Root>
