@@ -153,7 +153,10 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 		}, [ activeLayout ] );
 
 		// Stable-identity key set for the children walk (see grid.tsx).
-		const layoutKeysSig = layout.map( ( item ) => item.key ).join( '\0' );
+		const layoutKeysSig = useMemo(
+			() => layout.map( ( item ) => item.key ).join( '\0' ),
+			[ layout ]
+		);
 		const layoutKeysRef = useRef< {
 			sig: string;
 			set: Set< string >;
@@ -168,14 +171,22 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 
 		// Sorted item keys, identity-stable when the resulting sequence
 		// is unchanged (avoids invalidating SortableContext).
-		const sortedItems = activeLayout
-			.map( ( item, index ) => ( { item, index } ) )
-			.sort(
-				( a, b ) =>
-					( a.item.order ?? a.index ) - ( b.item.order ?? b.index )
-			)
-			.map( ( { item } ) => item.key );
-		const itemsSig = sortedItems.join( '\0' );
+		const sortedItems = useMemo(
+			() =>
+				activeLayout
+					.map( ( item, index ) => ( { item, index } ) )
+					.sort(
+						( a, b ) =>
+							( a.item.order ?? a.index ) -
+							( b.item.order ?? b.index )
+					)
+					.map( ( { item } ) => item.key ),
+			[ activeLayout ]
+		);
+		const itemsSig = useMemo(
+			() => sortedItems.join( '\0' ),
+			[ sortedItems ]
+		);
 		const itemsRef = useRef< {
 			sig: string;
 			arr: string[];
