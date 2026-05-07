@@ -777,6 +777,50 @@ describe( 'global styles renderer', () => {
 			);
 		} );
 
+		it( 'outputs default pseudo styles after responsive base styles', () => {
+			const tree = {
+				styles: {
+					blocks: {
+						'core/button': {
+							color: {
+								text: 'black',
+							},
+							':hover': {
+								color: {
+									text: 'blue',
+								},
+							},
+							mobile: {
+								color: {
+									text: 'red',
+								},
+							},
+						},
+					},
+				},
+			} as unknown as GlobalStylesConfig;
+
+			const blockSelectors = {
+				'core/button': {
+					selector: '.wp-block-button',
+				},
+			};
+
+			const result = transformToStyles(
+				Object.freeze( tree ),
+				blockSelectors,
+				false,
+				false,
+				true,
+				true,
+				minimalStyleOptions
+			);
+
+			expect( result ).toEqual(
+				':root :where(.wp-block-button){color: black;}@media (width <= 480px){:root :where(.wp-block-button){color: red;}}:root :where(.wp-block-button:hover){color: blue;}'
+			);
+		} );
+
 		it( 'ignores root-level state styles', () => {
 			const tree = {
 				styles: {
