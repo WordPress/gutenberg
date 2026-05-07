@@ -96,6 +96,17 @@ export function Actions(): React.ReactNode {
 					>
 						{ __( 'Done' ) }
 					</Button>
+				</>
+			) : (
+				<>
+					<Button
+						variant="outline"
+						tone="brand"
+						size="compact"
+						onClick={ handleEditMode }
+					>
+						{ __( 'Customize' ) }
+					</Button>
 
 					<MoreActionsDropdown items={ moreActionsItems } />
 
@@ -118,15 +129,6 @@ export function Actions(): React.ReactNode {
 						/>
 					</AlertDialog.Root>
 				</>
-			) : (
-				<Button
-					variant="outline"
-					tone="brand"
-					size="compact"
-					onClick={ handleEditMode }
-				>
-					{ __( 'Customize' ) }
-				</Button>
 			) }
 		</Stack>
 	);
