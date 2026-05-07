@@ -49,6 +49,9 @@ Registers CSS text under a stable hash and injects it into all registered
 documents. The hash is used to deduplicate style tags, so the same style is not
 inserted more than once per document.
 
+Registered styles are retained for the lifetime of the page so they can be
+replayed into documents that are registered later.
+
 ```js
 import { registerStyle } from '@wordpress/style-runtime';
 

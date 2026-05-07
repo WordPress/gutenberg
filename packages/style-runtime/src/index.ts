@@ -146,6 +146,8 @@ export function registerDocument( targetDocument: Document ) {
  *
  * The hash is used as the deduplication key, so calling this repeatedly with
  * the same hash will not add duplicate style tags to a document.
+ * Registered styles are retained for the lifetime of the page so they can be
+ * replayed into documents that are registered later.
  *
  * @param hash Stable hash for the transformed CSS.
  * @param css  CSS text to inject.
