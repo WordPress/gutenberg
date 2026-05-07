@@ -14,7 +14,9 @@ import { useWidgetTypes } from './widget-types';
 import styles from './stage.module.css';
 
 function Dashboard() {
-	const [ layout, setLayout ] = useDashboardLayout( 'gutenberg_dashboard' );
+	const [ layout, setLayout, resetLayout ] = useDashboardLayout(
+		'gutenberg_dashboard'
+	);
 
 	const widgetTypes = useWidgetTypes();
 
@@ -25,6 +27,7 @@ function Dashboard() {
 			widgetTypes={ widgetTypes }
 			layout={ layout }
 			onLayoutChange={ setLayout }
+			onLayoutReset={ resetLayout }
 			editMode={ editMode }
 			onEditChange={ setEditMode }
 		>

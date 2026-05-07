@@ -41,6 +41,7 @@ export const WidgetDashboard = Object.assign(
 	function WidgetDashboard( {
 		layout,
 		onLayoutChange,
+		onLayoutReset,
 		widgetTypes,
 		editMode,
 		onEditChange,
@@ -52,6 +53,7 @@ export const WidgetDashboard = Object.assign(
 			<WidgetDashboardProvider
 				layout={ layout }
 				onLayoutChange={ onLayoutChange }
+				onLayoutReset={ onLayoutReset }
 				widgetTypes={ widgetTypes }
 				editMode={ editMode }
 				onEditChange={ onEditChange }
