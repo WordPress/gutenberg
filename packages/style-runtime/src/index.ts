@@ -2,6 +2,7 @@ type GlobalScopeWithStyleRuntime = typeof globalThis & {
 	__wpStyleRuntime?: {
 		documents: Map< Document, number >;
 		styles: Map< string, string >;
+		injectedStyles: WeakMap< Document, Set< string > >;
 	};
 };
 
@@ -25,6 +26,7 @@ function getRuntime() {
 	globalScope.__wpStyleRuntime = {
 		documents: new Map(),
 		styles: new Map(),
+		injectedStyles: new WeakMap(),
 	};
 
 	if ( typeof document !== 'undefined' ) {
@@ -32,6 +34,33 @@ function getRuntime() {
 	}
 
 	return globalScope.__wpStyleRuntime;
+}
+
+/**
+ * Checks whether a document already contains a style tag for a hash.
+ *
+ * @param targetDocument Document to inspect.
+ * @param hash           Stable hash for the transformed CSS.
+ *
+ * @return Whether the style hash already exists in the document.
+ */
+function documentContainsStyleHash(
+	targetDocument: Document,
+	hash: string
+): boolean {
+	if ( ! targetDocument.head ) {
+		return false;
+	}
+
+	for ( const style of targetDocument.head.querySelectorAll(
+		`style[${ STYLE_HASH_ATTRIBUTE }]`
+	) ) {
+		if ( style.getAttribute( STYLE_HASH_ATTRIBUTE ) === hash ) {
+			return true;
+		}
+	}
+
+	return false;
 }
 
 /**
@@ -43,12 +72,24 @@ function getRuntime() {
  * @param css            CSS text to inject.
  */
 function injectStyle( targetDocument: Document, hash: string, css: string ) {
-	if (
-		! targetDocument.head ||
-		targetDocument.head.querySelector(
-			`style[${ STYLE_HASH_ATTRIBUTE }="${ hash }"]`
-		)
-	) {
+	if ( ! targetDocument.head ) {
+		return;
+	}
+
+	const runtime = getRuntime();
+	let injectedStyles = runtime.injectedStyles.get( targetDocument );
+
+	if ( ! injectedStyles ) {
+		injectedStyles = new Set();
+		runtime.injectedStyles.set( targetDocument, injectedStyles );
+	}
+
+	if ( injectedStyles.has( hash ) ) {
+		return;
+	}
+
+	if ( documentContainsStyleHash( targetDocument, hash ) ) {
+		injectedStyles.add( hash );
 		return;
 	}
 
@@ -56,6 +97,7 @@ function injectStyle( targetDocument: Document, hash: string, css: string ) {
 	style.setAttribute( STYLE_HASH_ATTRIBUTE, hash );
 	style.appendChild( targetDocument.createTextNode( css ) );
 	targetDocument.head.appendChild( style );
+	injectedStyles.add( hash );
 }
 
 /**
