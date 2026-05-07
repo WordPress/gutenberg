@@ -26,6 +26,7 @@ import {
 	type CropBounds,
 	type ResizeDragState,
 } from '../../../core/stencil-math';
+import { VISUALLY_HIDDEN_STYLE } from '../../visually-hidden-style';
 
 /**
  * Corner handle positions only — used when aspect ratio is locked.
@@ -47,18 +48,6 @@ const ALL_POSITIONS: HandlePosition[] = [
 	'sw',
 	'w',
 ];
-
-const VISUALLY_HIDDEN_STYLE: React.CSSProperties = {
-	position: 'absolute',
-	width: 1,
-	height: 1,
-	padding: 0,
-	margin: -1,
-	overflow: 'hidden',
-	clip: 'rect(0, 0, 0, 0)',
-	whiteSpace: 'nowrap',
-	border: 0,
-};
 
 /**
  * Get the translated aria-label for a resize handle position.

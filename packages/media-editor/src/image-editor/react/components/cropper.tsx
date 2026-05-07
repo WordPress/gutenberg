@@ -38,21 +38,10 @@ import { RectangleStencil } from './stencils/rectangle-stencil';
 import { DimmingOverlay } from './overlays/dimming-overlay';
 import { GridOverlay } from './overlays/grid-overlay';
 import { ViewportProvider, useViewport } from './viewport-provider';
+import { VISUALLY_HIDDEN_STYLE } from '../visually-hidden-style';
 
 /** Threshold for comparing normalized crop rect values. */
 const CROP_RECT_EPSILON = 1e-6;
-
-const VISUALLY_HIDDEN_STYLE: React.CSSProperties = {
-	position: 'absolute',
-	width: 1,
-	height: 1,
-	padding: 0,
-	margin: -1,
-	overflow: 'hidden',
-	clip: 'rect(0, 0, 0, 0)',
-	whiteSpace: 'nowrap',
-	border: 0,
-};
 
 // Largest rect of the given pixel aspect ratio that fits inside the visual
 // bounds, centered in [0,1] × [0,1] normalized space. Returns a full-frame

@@ -1,7 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { useState, useEffect, useRef } from '@wordpress/element';
+import {
+	useState,
+	useEffect,
+	useLayoutEffect,
+	useRef,
+} from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 
 /**
@@ -87,12 +92,17 @@ export function useAriaAnnouncer( state: CropperState ): string {
 	const timerRef = useRef< ReturnType< typeof setTimeout > >();
 	const prevMessageRef = useRef( '' );
 	const prevStateRef = useRef< CropperState | null >( null );
+	const latestStateRef = useRef( state );
+	useLayoutEffect( () => {
+		latestStateRef.current = state;
+	} );
 
 	useEffect( () => {
 		clearTimeout( timerRef.current );
 		timerRef.current = setTimeout( () => {
-			const msg = buildAnnouncement( state, prevStateRef.current );
-			prevStateRef.current = state;
+			const current = latestStateRef.current;
+			const msg = buildAnnouncement( current, prevStateRef.current );
+			prevStateRef.current = current;
 			if ( msg !== prevMessageRef.current ) {
 				prevMessageRef.current = msg;
 				setAriaMessage( msg );
@@ -109,7 +119,6 @@ export function useAriaAnnouncer( state: CropperState ): string {
 		state.cropRect.height,
 		state.flip.horizontal,
 		state.flip.vertical,
-		state,
 	] );
 
 	return ariaMessage;
