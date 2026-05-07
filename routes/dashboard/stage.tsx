@@ -11,6 +11,7 @@ import { __ } from '@wordpress/i18n';
 import { useDashboardLayout } from './hooks';
 import { WidgetDashboard } from './widget-dashboard';
 import { useWidgetTypes } from './widget-types';
+import styles from './stage.module.css';
 
 function Dashboard() {
 	const [ layout, setLayout ] = useDashboardLayout();
@@ -31,7 +32,9 @@ function Dashboard() {
 				title={ __( 'Dashboard' ) }
 				actions={ <WidgetDashboard.Actions /> }
 			>
-				<WidgetDashboard.Widgets />
+				<div className={ styles[ 'dashboard-widgets-container' ] }>
+					<WidgetDashboard.Widgets />
+				</div>
 			</Page>
 		</WidgetDashboard>
 	);
