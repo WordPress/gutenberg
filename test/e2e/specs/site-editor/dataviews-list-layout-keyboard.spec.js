@@ -21,6 +21,13 @@ test.describe( 'Dataviews List Layout', () => {
 		// Go to the pages page, as it has the list layout enabled by default.
 		await admin.visitSiteEditor();
 		await page.getByRole( 'button', { name: 'Pages' } ).click();
+
+		// Wait for the pages dataviews UI to fully load including:
+		// - the "Add filter" button, enabled only after post type fields are loaded
+		// - the actual pages in the list, appearing after a REST fetch finishes
+		// Only then we can start testing keyboard navigation around the full UI.
+		await page.getByRole( 'button', { name: 'Add filter' } ).waitFor();
+		await page.getByRole( 'grid' ).waitFor();
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
