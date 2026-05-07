@@ -14,11 +14,20 @@
  * Appends the bundled `core/hello-world` instance to the default layout
  * unless something earlier in the filter chain already added it.
  *
- * @param array $dashboard_layout Default layout produced by previous
- *                                callbacks on `gutenberg_dashboard_default_layout`.
+ * Only contributes to the bundled `gutenberg_dashboard` surface; other
+ * dashboards are left untouched.
+ *
+ * @param array  $dashboard_layout Default layout produced by previous
+ *                                 callbacks on `gutenberg_dashboard_default_layout`.
+ * @param string $dashboard_name   Identifier of the dashboard surface
+ *                                 receiving the default.
  * @return array The layout extended with the bundled widget instance.
  */
-function gutenberg_seed_default_dashboard_layout( $dashboard_layout ) {
+function gutenberg_seed_default_dashboard_layout( $dashboard_layout, $dashboard_name = '' ) {
+	if ( 'gutenberg_dashboard' !== $dashboard_name ) {
+		return $dashboard_layout;
+	}
+
 	$uuids = array_column( $dashboard_layout, 'uuid' );
 
 	if ( in_array( 'default-hello-world-widget-instance', $uuids, true ) ) {
@@ -37,4 +46,4 @@ function gutenberg_seed_default_dashboard_layout( $dashboard_layout ) {
 	return $dashboard_layout;
 }
 
-add_filter( 'gutenberg_dashboard_default_layout', 'gutenberg_seed_default_dashboard_layout' );
+add_filter( 'gutenberg_dashboard_default_layout', 'gutenberg_seed_default_dashboard_layout', 10, 2 );
