@@ -204,6 +204,43 @@
 					"enableHiding": {
 						"description": "Whether the field can be hidden in the UI.",
 						"type": "boolean"
+					},
+					"readOnly": {
+						"description": "Whether the field is read-only. When true, the value is rendered using the render callback and no edit control is shown.",
+						"type": "boolean"
+					},
+					"format": {
+						"description": "Display format configuration for the field value. The shape depends on the field type: datetime/date fields accept `datetime` or `date` format strings; number/integer fields accept `separatorThousand`, `separatorDecimal`, and `decimals`.",
+						"type": "object",
+						"properties": {
+							"datetime": {
+								"description": "A datetime format string for `datetime` fields.",
+								"type": "string"
+							},
+							"date": {
+								"description": "A date format string for `date` fields.",
+								"type": "string"
+							},
+							"weekStartsOn": {
+								"description": "The day the week starts on (0 = Sunday, 6 = Saturday). Applicable to `datetime` and `date` fields.",
+								"type": "integer",
+								"minimum": 0,
+								"maximum": 6
+							},
+							"separatorThousand": {
+								"description": "Thousands separator character for `number` and `integer` fields.",
+								"type": "string"
+							},
+							"separatorDecimal": {
+								"description": "Decimal separator character for `number` fields.",
+								"type": "string"
+							},
+							"decimals": {
+								"description": "Number of decimal places to display for `number` fields.",
+								"type": "integer"
+							}
+						},
+						"additionalProperties": false
 					}
 				},
 				"required": [ "id" ],
