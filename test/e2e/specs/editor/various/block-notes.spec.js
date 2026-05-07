@@ -1840,6 +1840,61 @@ test.describe( 'Block Notes', () => {
 
 			await expect.poll( alphaOf ).toBeGreaterThan( 0.4 );
 		} );
+
+		test( 'reaction picker portals outside the collab sidebar', async ( {
+			page,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Testing popover portal' },
+				comment: 'Popover portal',
+			} );
+
+			await page.getByRole( 'button', { name: 'Add reaction' } ).click();
+
+			const popover = page.locator(
+				'.editor-collab-sidebar-panel__add-reaction-popover'
+			);
+			await expect( popover ).toBeVisible();
+
+			// The popover must portal out of the sidebar; otherwise the
+			// `overflow: hidden` chain on `.editor-collab-sidebar-panel`
+			// (and the framework `.interface-interface-skeleton__sidebar`)
+			// would clip the picker. Pin the contract by asserting the
+			// popover has no sidebar-panel ancestor.
+			await expect( popover ).toHaveCount( 1 );
+			const isPortaled = await popover.evaluate(
+				( el ) => ! el.closest( '.editor-collab-sidebar-panel' )
+			);
+			expect( isPortaled ).toBe( true );
+		} );
+
+		test( 'note remains selected while reaction picker is open', async ( {
+			page,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Testing selection persistence' },
+				comment: 'Selection persistence',
+			} );
+
+			const thread = page.getByRole( 'treeitem', {
+				name: /Note: Selection persistence/,
+			} );
+			await expect( thread ).toHaveAttribute( 'aria-expanded', 'true' );
+
+			await page.getByRole( 'button', { name: 'Add reaction' } ).click();
+			await expect(
+				page.locator( '.editor-collab-sidebar-panel__emoji-picker' )
+			).toBeVisible();
+
+			// Focus has moved into the portaled popover, but the note's
+			// onBlur handler exempts `.components-popover` so the thread
+			// stays selected and the trigger stays mounted.
+			await expect( thread ).toHaveAttribute( 'aria-expanded', 'true' );
+		} );
 	} );
 } );
 
