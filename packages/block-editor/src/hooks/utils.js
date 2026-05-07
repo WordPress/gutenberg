@@ -9,7 +9,10 @@ import clsx from 'clsx';
 import { getBlockSupport } from '@wordpress/blocks';
 import { memo, useMemo, useEffect, useId, useState } from '@wordpress/element';
 import { useDispatch, useRegistry } from '@wordpress/data';
-import { createHigherOrderComponent } from '@wordpress/compose';
+import {
+	createHigherOrderComponent,
+	useViewportMatch,
+} from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
 
 /**
@@ -753,4 +756,17 @@ export function createBlockSaveFilter( features ) {
 			return props;
 		}
 	);
+}
+
+export function useToolsPanelDropdownMenuProps() {
+	const isMobile = useViewportMatch( 'medium', '<' );
+	return ! isMobile
+		? {
+				popoverProps: {
+					placement: 'left-start',
+					// For non-mobile, inner sidebar width (248px) - button width (24px) - border (1px) + padding (16px) + spacing (20px)
+					offset: 259,
+				},
+		  }
+		: {};
 }

@@ -17,8 +17,9 @@ import { useSelect } from '@wordpress/data';
 import {
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
 	ToggleControl,
-	PanelBody,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -32,7 +33,11 @@ import { useSettings } from '../components/use-settings';
 import { getLayoutType, getLayoutTypes } from '../layouts';
 import { useBlockEditingMode } from '../components/block-editing-mode';
 import { LAYOUT_DEFINITIONS } from '../layouts/definitions';
-import { useBlockSettings, useStyleOverride } from './utils';
+import {
+	useBlockSettings,
+	useStyleOverride,
+	useToolsPanelDropdownMenuProps,
+} from './utils';
 import { unlock } from '../lock-unlock';
 import { globalStylesDataKey } from '../store/private-keys';
 import { getVariationNameFromClass } from './block-style-variation';
@@ -164,6 +169,7 @@ function LayoutPanelPure( {
 		};
 	}, [] );
 	const blockEditingMode = useBlockEditingMode();
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	if ( blockEditingMode !== 'default' ) {
 		return null;
@@ -237,12 +243,48 @@ function LayoutPanelPure( {
 	const onChangeLayout = ( newLayout ) =>
 		setAttributes( { layout: newLayout } );
 
+	// Generate default values for ToolsPanel settings reset
+	const defaultBlockLayoutValue = {
+		...defaultBlockLayout,
+		contentSize: false,
+		wideSize: false,
+		justifyContent: undefined,
+		orientation: undefined,
+		allowSizingOnChildren: true,
+		type:
+			defaultBlockLayout?.type ||
+			( allowInheriting ? 'constrained' : 'default' ),
+	};
+
 	return (
 		<>
 			<InspectorControls>
-				<PanelBody title={ __( 'Layout' ) }>
+				<ToolsPanel
+					label={ __( 'Layout' ) }
+					resetAll={ () => {
+						setAttributes( {
+							layout: {
+								...defaultBlockLayoutValue,
+							},
+						} );
+					} }
+					dropdownMenuProps={ dropdownMenuProps }
+				>
 					{ showInheritToggle && (
-						<>
+						<ToolsPanelItem
+							label={ __( 'Inner blocks use content width' ) }
+							__nextHasNoMarginBottom
+							isShownByDefault
+							hasValue={ () =>
+								!! (
+									layout?.type !==
+									defaultBlockLayoutValue?.type
+								)
+							}
+							onDeselect={ () =>
+								onChangeType( defaultBlockLayoutValue?.type )
+							}
+						>
 							<ToggleControl
 								label={ __( 'Inner blocks use content width' ) }
 								checked={
@@ -272,35 +314,95 @@ function LayoutPanelPure( {
 										  )
 								}
 							/>
-						</>
+						</ToolsPanelItem>
 					) }
 
 					{ ! inherit && allowSwitching && (
-						<LayoutTypeSwitcher
-							type={ blockLayoutType }
-							onChange={ onChangeType }
-						/>
+						<ToolsPanelItem
+							label={ __( 'Layout Switcher' ) }
+							__nextHasNoMarginBottom
+							isShownByDefault
+							hasValue={ () =>
+								!! (
+									layout?.type !==
+									defaultBlockLayoutValue?.type
+								)
+							}
+							onDeselect={ () =>
+								onChangeType( defaultBlockLayoutValue?.type )
+							}
+						>
+							<LayoutTypeSwitcher
+								type={ blockLayoutType }
+								onChange={ onChangeType }
+							/>
+						</ToolsPanelItem>
 					) }
 
 					{ layoutType && layoutType.name !== 'default' && (
-						<layoutType.inspectorControls
-							layout={ usedLayout }
-							onChange={ onChangeLayout }
-							layoutBlockSupport={ blockSupportAndThemeSettings }
-							name={ blockName }
-							clientId={ clientId }
-						/>
+						<ToolsPanelItem
+							label={ __( 'Layout' ) }
+							__nextHasNoMarginBottom
+							isShownByDefault
+							hasValue={ () =>
+								!! (
+									usedLayout?.contentSize ||
+									usedLayout?.wideSize ||
+									usedLayout?.justifyContent ||
+									usedLayout?.orientation
+								)
+							}
+							onDeselect={ () =>
+								onChangeLayout( {
+									type: layout.type,
+									...defaultBlockLayoutValue,
+								} )
+							}
+						>
+							<layoutType.inspectorControls
+								layout={ usedLayout }
+								onChange={ onChangeLayout }
+								layoutBlockSupport={
+									blockSupportAndThemeSettings
+								}
+								name={ blockName }
+								clientId={ clientId }
+							/>
+						</ToolsPanelItem>
 					) }
+
 					{ constrainedType && displayControlsForLegacyLayouts && (
-						<constrainedType.inspectorControls
-							layout={ usedLayout }
-							onChange={ onChangeLayout }
-							layoutBlockSupport={ blockSupportAndThemeSettings }
-							name={ blockName }
-							clientId={ clientId }
-						/>
+						<ToolsPanelItem
+							label={ __( 'Layout' ) }
+							__nextHasNoMarginBottom
+							isShownByDefault
+							hasValue={ () =>
+								!! (
+									usedLayout?.contentSize ||
+									usedLayout?.wideSize ||
+									usedLayout?.justifyContent ||
+									usedLayout?.orientation
+								)
+							}
+							onDeselect={ () =>
+								onChangeLayout( {
+									type: layout.type,
+									...defaultBlockLayoutValue,
+								} )
+							}
+						>
+							<constrainedType.inspectorControls
+								layout={ usedLayout }
+								onChange={ onChangeLayout }
+								layoutBlockSupport={
+									blockSupportAndThemeSettings
+								}
+								name={ blockName }
+								clientId={ clientId }
+							/>
+						</ToolsPanelItem>
 					) }
-				</PanelBody>
+				</ToolsPanel>
 			</InspectorControls>
 			{ ! inherit && layoutType && (
 				<layoutType.toolBarControls
