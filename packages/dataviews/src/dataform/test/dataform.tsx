@@ -417,6 +417,79 @@ describe( 'DataForm component', () => {
 			expect( onChange ).toHaveBeenCalledWith( { title: 'New Title' } );
 		} );
 
+		it( 'should disable Apply when the form is invalid (Cancel stays enabled)', async () => {
+			const onChange = jest.fn();
+			const requiredTitleFields = fields.map( ( field ) =>
+				field.id === 'title'
+					? { ...field, isValid: { required: true } }
+					: field
+			);
+			const formWithRequiredTitle = {
+				fields: [ 'title' ],
+				layout: {
+					type: 'panel',
+					labelPosition: 'side',
+					openAs: 'modal',
+				} as const,
+			};
+
+			render(
+				<Dataform
+					onChange={ onChange }
+					fields={ requiredTitleFields }
+					form={ formWithRequiredTitle }
+					data={ data }
+				/>
+			);
+
+			const user = await userEvent.setup();
+			await user.click( fieldsSelector.title.view() );
+
+			expect( screen.getByRole( 'dialog' ) ).toBeInTheDocument();
+
+			// Apply is enabled while the title is non-empty.
+			const applyButton = screen.getByRole( 'button', {
+				name: /apply/i,
+			} );
+			const cancelButton = screen.getByRole( 'button', {
+				name: /cancel/i,
+			} );
+			expect( applyButton ).not.toHaveAttribute(
+				'aria-disabled',
+				'true'
+			);
+			expect( cancelButton ).not.toHaveAttribute(
+				'aria-disabled',
+				'true'
+			);
+
+			// Clear the title to violate the `required` constraint.
+			await user.clear( fieldsSelector.title.edit() );
+
+			// Apply is disabled, Cancel stays enabled — users must always
+			// be able to discard the draft. `Dialog.Action` uses the
+			// focusable-when-disabled pattern (`aria-disabled="true"`)
+			// rather than the native `disabled` attribute, so assert on
+			// the ARIA state and on the functional consequence (click does
+			// not dispatch the change).
+			expect( applyButton ).toHaveAttribute( 'aria-disabled', 'true' );
+			expect( cancelButton ).not.toHaveAttribute(
+				'aria-disabled',
+				'true'
+			);
+			await user.click( applyButton );
+			expect( onChange ).not.toHaveBeenCalled();
+
+			// Cancel still closes the modal.
+			await user.click( cancelButton );
+			await waitFor( () => {
+				expect(
+					screen.queryByRole( 'dialog' )
+				).not.toBeInTheDocument();
+			} );
+			expect( onChange ).not.toHaveBeenCalled();
+		} );
+
 		it( 'should call onChange with the correct value for each typed character', async () => {
 			const onChange = jest.fn();
 			render(

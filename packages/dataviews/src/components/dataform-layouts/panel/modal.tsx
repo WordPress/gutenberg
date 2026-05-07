@@ -24,13 +24,13 @@ import type {
 import { DataFormLayout } from '../data-form-layout';
 import { DEFAULT_LAYOUT } from '../normalize-form';
 import SummaryButton from './summary-button';
-import useFormValidity from '../../../hooks/use-form-validity';
+import useFormValidity, { isFormValid } from '../../../hooks/use-form-validity';
 import useMapFocusOnMount from '../../../hooks/use-map-focus-on-mount';
 import useReportValidity from '../../../hooks/use-report-validity';
 import DataFormContext from '../../dataform-context';
 import useFieldFromFormField from './utils/use-field-from-form-field';
 
-function PanelModalSession< Item >( {
+function PanelDialogContent< Item >( {
 	data,
 	field,
 	onChange,
@@ -79,6 +79,7 @@ function PanelModalSession< Item >( {
 		},
 	} ) );
 	const { validity } = useFormValidity( modalData, fieldsAsFieldType, form );
+	const isValid = useMemo( () => isFormValid( validity ), [ validity ] );
 
 	const handleOnChange = ( newValue: Partial< Item > ) => {
 		setChanges( ( prev ) =>
@@ -94,9 +95,6 @@ function PanelModalSession< Item >( {
 	// trigger reportValidity to show field-level errors.
 	useReportValidity( contentRef, touched );
 
-	// Preserve the legacy `Modal.focusOnMount: 'firstInputElement'` behaviour
-	// by mapping it onto Base UI's `initialFocus`. PanelModal opens to edit a
-	// single field, so focusing the first input is a sensible default.
 	const initialFocus = useMapFocusOnMount( 'firstInputElement', contentRef );
 
 	return (
@@ -131,20 +129,11 @@ function PanelModalSession< Item >( {
 				</DataFormLayout>
 			</Dialog.Content>
 			<Dialog.Footer>
-				{ /*
-				 * Cancel: a propless `Dialog.Action` is enough — it closes
-				 * via the dialog primitive, and `setTouched` runs through
-				 * the parent's `onOpenChange` callback as a side effect of
-				 * the close.
-				 */ }
 				<Dialog.Action variant="outline">{ cancelLabel }</Dialog.Action>
-				{ /*
-				 * Apply: the `onClick` runs synchronously before Base UI
-				 * fires the close, so `onChange( changes )` lands first;
-				 * then the dialog closes and `onOpenChange` flips
-				 * `setTouched` in the parent.
-				 */ }
-				<Dialog.Action onClick={ () => onChange( changes ) }>
+				<Dialog.Action
+					onClick={ () => onChange( changes ) }
+					disabled={ ! isValid }
+				>
 					{ applyLabel }
 				</Dialog.Action>
 			</Dialog.Footer>
@@ -159,11 +148,10 @@ function PanelModal< Item >( {
 	validity,
 }: FieldLayoutProps< Item > ) {
 	const [ touched, setTouched ] = useState( false );
-	const [ isOpen, setIsOpen ] = useState( false );
 	// `Dialog.Root` stays mounted across opens, so the session component
 	// holding the in-progress `changes` state would also persist by default.
 	// Bump `sessionKey` on `onOpenChangeComplete` (when the exit animation
-	// finishes) to force-remount `<PanelModalSession>` between sessions —
+	// finishes) to force-remount `<PanelDialogContent>` between sessions —
 	// this preserves the existing "Cancel/close always wipes the draft"
 	// semantic without disturbing the form contents during the exit
 	// animation itself.
@@ -176,46 +164,44 @@ function PanelModal< Item >( {
 	}
 
 	return (
-		<>
-			<SummaryButton
+		<Dialog.Root
+			onOpenChange={ ( open ) => {
+				if ( ! open ) {
+					// Mark the field as "touched" once the dialog has been
+					// opened and dismissed at least once, so validation
+					// messages on the summary trigger the next time the
+					// user opens it.
+					setTouched( true );
+				}
+			} }
+			onOpenChangeComplete={ ( open ) => {
+				if ( ! open ) {
+					setSessionKey( ( k ) => k + 1 );
+				}
+			} }
+		>
+			<Dialog.Trigger
+				render={
+					<SummaryButton
+						data={ data }
+						field={ field }
+						fieldLabel={ fieldLabel }
+						summaryFields={ summaryFields }
+						validity={ validity }
+						touched={ touched }
+						disabled={ fieldDefinition.readOnly === true }
+					/>
+				}
+			/>
+			<PanelDialogContent
+				key={ sessionKey }
 				data={ data }
 				field={ field }
-				fieldLabel={ fieldLabel }
-				summaryFields={ summaryFields }
-				validity={ validity }
+				onChange={ onChange }
+				fieldLabel={ fieldLabel ?? '' }
 				touched={ touched }
-				disabled={ fieldDefinition.readOnly === true }
-				onClick={ () => setIsOpen( true ) }
-				aria-expanded={ isOpen }
 			/>
-			<Dialog.Root
-				open={ isOpen }
-				onOpenChange={ ( open ) => {
-					setIsOpen( open );
-					if ( ! open ) {
-						// Mark the field as "touched" once the dialog has
-						// been opened and dismissed at least once, so
-						// validation messages on the summary trigger the
-						// next time the user opens it.
-						setTouched( true );
-					}
-				} }
-				onOpenChangeComplete={ ( open ) => {
-					if ( ! open ) {
-						setSessionKey( ( k ) => k + 1 );
-					}
-				} }
-			>
-				<PanelModalSession
-					key={ sessionKey }
-					data={ data }
-					field={ field }
-					onChange={ onChange }
-					fieldLabel={ fieldLabel ?? '' }
-					touched={ touched }
-				/>
-			</Dialog.Root>
-		</>
+		</Dialog.Root>
 	);
 }
 

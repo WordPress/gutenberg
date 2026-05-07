@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+- DataForm: `PanelModal`'s Apply button is now disabled while the in-progress form has validation errors, preventing invalid edits from being committed silently. Cancel remains enabled so users can always discard the draft. ([#78028](https://github.com/WordPress/gutenberg/pull/78028))
+
 ### Code Quality
 
 - DataViews: `ButtonTrigger` and `MenuItemTrigger` (item-actions internals) now `forwardRef` and spread unknown props onto their underlying `Button` / `Menu.Item`, so they compose under `Dialog.Trigger` via the render-prop pattern. `ModalActionInlineButton` and `ModalActionMenuItem` reuse them instead of inlining the same trigger markup. ([#78028](https://github.com/WordPress/gutenberg/pull/78028))

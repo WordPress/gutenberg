@@ -24,7 +24,7 @@ import type {
 	NormalizedFormField,
 } from '../types';
 
-function isFormValid( formValidity: FormValidity | undefined ): boolean {
+export function isFormValid( formValidity: FormValidity | undefined ): boolean {
 	if ( ! formValidity ) {
 		return true;
 	}

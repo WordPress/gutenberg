@@ -2,6 +2,12 @@
  * External dependencies
  */
 import clsx from 'clsx';
+import type {
+	AriaAttributes,
+	MouseEventHandler,
+	ReactElement,
+	Ref,
+} from 'react';
 
 /**
  * WordPress dependencies
@@ -10,7 +16,7 @@ import { Button, Icon, Tooltip } from '@wordpress/components';
 import { sprintf, _x } from '@wordpress/i18n';
 import { error as errorIcon, pencil } from '@wordpress/icons';
 import { useInstanceId } from '@wordpress/compose';
-import { useRef } from '@wordpress/element';
+import { forwardRef, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -25,17 +31,7 @@ import getLabelClassName from './utils/get-label-classname';
 import getLabelContent from './utils/get-label-content';
 import getFirstValidationError from './utils/get-first-validation-error';
 
-export default function SummaryButton< Item >( {
-	data,
-	field,
-	fieldLabel,
-	summaryFields,
-	validity,
-	touched,
-	disabled,
-	onClick,
-	'aria-expanded': ariaExpanded,
-}: {
+interface SummaryButtonProps< Item > {
 	data: Item;
 	field: NormalizedFormField;
 	fieldLabel?: string;
@@ -43,9 +39,60 @@ export default function SummaryButton< Item >( {
 	validity?: FieldValidity;
 	touched: boolean;
 	disabled?: boolean;
-	onClick: () => void;
+	/*
+	 * Click handler invoked from both the row's pointer interaction
+	 * (`handleRowClick`) and the keyboard handler (`handleKeyDown`). When
+	 * `SummaryButton` is composed with `Dialog.Trigger` via the render-prop
+	 * pattern, Base UI injects its open-toggle handler here at runtime;
+	 * otherwise the parent supplies the click handler directly (e.g. the
+	 * `Dropdown` `renderToggle` callback).
+	 */
+	onClick?: MouseEventHandler;
+	/*
+	 * The three `aria-*` props below are routed onto the inner pencil
+	 * `<Button>` (the only focusable element). Their defaults preserve the
+	 * shape that legacy callers like `PanelDropdown` rely on; when
+	 * `Dialog.Trigger` composes this component via render props it
+	 * overrides them with its own values for the open/closed state.
+	 */
 	'aria-expanded'?: boolean;
-} ) {
+	'aria-controls'?: string;
+	'aria-haspopup'?: AriaAttributes[ 'aria-haspopup' ];
+}
+
+/*
+ * SummaryButton renders a clickable row `<div>` with a focusable pencil
+ * `<Button>` nested inside. When used as `<Dialog.Trigger render={ ... } />`,
+ * Base UI clones merged props onto this component; we route them to the
+ * matching DOM element:
+ *   - `onClick`           → outer `<div>` (fires `handleRowClick` → `onClick()`)
+ *   - `aria-expanded` /
+ *     `aria-controls` /
+ *     `aria-haspopup`     → inner `<Button>` (the only focusable element)
+ *   - `ref`               → inner `<Button>` (focus-return target on close)
+ *
+ * TODO: Restructure SummaryButton so a single element carries the
+ * click/keyboard/ARIA contract (the row becomes a real button, or the
+ * pencil becomes purely decorative). That removes the need for this
+ * manual prop split and makes the trigger surface unambiguous to
+ * assistive tech. Tracked as a follow-up to PR #78028.
+ */
+function SummaryButtonImpl< Item >(
+	{
+		data,
+		field,
+		fieldLabel,
+		summaryFields,
+		validity,
+		touched,
+		disabled,
+		onClick,
+		'aria-expanded': ariaExpanded,
+		'aria-controls': ariaControls,
+		'aria-haspopup': ariaHasPopup = 'dialog',
+	}: SummaryButtonProps< Item >,
+	ref: Ref< HTMLButtonElement >
+) {
 	const { labelPosition, editVisibility } =
 		field.layout as NormalizedPanelLayout;
 	const errorMessage = getFirstValidationError( validity );
@@ -63,7 +110,7 @@ export default function SummaryButton< Item >( {
 	);
 
 	const controlId = useInstanceId(
-		SummaryButton,
+		SummaryButtonImpl,
 		'dataforms-layouts-panel__field-control'
 	);
 
@@ -81,13 +128,13 @@ export default function SummaryButton< Item >( {
 
 	const rowRef = useRef< HTMLDivElement >( null );
 
-	const handleRowClick = () => {
+	const handleRowClick: MouseEventHandler = ( event ) => {
 		const selection =
 			rowRef.current?.ownerDocument.defaultView?.getSelection();
 		if ( selection && selection.toString().length > 0 ) {
 			return;
 		}
-		onClick();
+		onClick?.( event );
 	};
 
 	const handleKeyDown = ( event: React.KeyboardEvent ) => {
@@ -96,7 +143,7 @@ export default function SummaryButton< Item >( {
 			( event.key === 'Enter' || event.key === ' ' )
 		) {
 			event.preventDefault();
-			onClick();
+			onClick?.( event as unknown as React.MouseEvent< HTMLDivElement > );
 		}
 	};
 
@@ -155,15 +202,23 @@ export default function SummaryButton< Item >( {
 			</span>
 			{ ! disabled && (
 				<Button
+					ref={ ref }
 					className="dataforms-layouts-panel__field-trigger-icon"
 					label={ ariaLabel }
 					icon={ pencil }
 					size="small"
 					aria-expanded={ ariaExpanded }
-					aria-haspopup="dialog"
+					aria-haspopup={ ariaHasPopup }
+					aria-controls={ ariaControls }
 					aria-describedby={ `${ controlId }` }
 				/>
 			) }
 		</div>
 	);
 }
+
+const SummaryButton = forwardRef( SummaryButtonImpl ) as < Item >(
+	props: SummaryButtonProps< Item > & { ref?: Ref< HTMLButtonElement > }
+) => ReactElement;
+
+export default SummaryButton;
