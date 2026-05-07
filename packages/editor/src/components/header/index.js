@@ -137,7 +137,7 @@ function Header( {
 			}
 			settings={
 				<>
-					{ ! hasCenter && (
+					{ ! hasCenter && ! isTooNarrowForDocumentBar && (
 						<CollaboratorsPresence
 							postType={ postType }
 							postId={ postId }
