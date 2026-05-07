@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Set `modalSize: 'small'` on `duplicateTemplatePart` and `duplicatePattern` actions to replace CSS-based width overrides. ([#76837](https://github.com/WordPress/gutenberg/pull/76837))
+-   Set `modalSize: 'small'` on `duplicateTemplatePart` and `duplicatePattern` actions to replace CSS-based width overrides. ([#78028](https://github.com/WordPress/gutenberg/pull/78028))
 
 ## 0.37.0 (2026-04-29)
 

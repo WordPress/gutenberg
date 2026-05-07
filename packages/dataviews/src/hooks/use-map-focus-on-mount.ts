@@ -16,13 +16,24 @@ const FIRST_INPUT_SELECTOR =
  * Maps the legacy `Modal.focusOnMount` semantics onto the
  * `Dialog.Popup.initialFocus` prop accepted by `@wordpress/ui`.
  *
- * - `false` is forwarded as-is to skip focus-on-mount entirely.
- * - `'firstInputElement'` returns a callback that resolves to the first
- *   focusable input/select/textarea inside `contentRef`, falling back to
- *   the popup's smart default if no match is found.
- * - All other values (`'firstContentElement'`, `'firstElement'`, `true`)
- *   defer to the popup's smart default, which already skips the close icon
- *   and focuses the first content tabbable.
+ * Mapping for each of the five legacy values that `ActionModal.modalFocusOnMount`
+ * accepts (`Parameters< typeof useFocusOnMount >[ 0 ] | 'firstContentElement'`):
+ *
+ * - `false` — forwarded as-is to skip focus-on-mount entirely.
+ * - `'firstInputElement'` — returns a callback that resolves to the first
+ *   focusable `<input>` / `<select>` / `<textarea>` inside `contentRef`,
+ *   falling back to the popup's smart default if no match is found.
+ * - `'firstContentElement'` — defers to the popup's smart default (which
+ *   already skips the close icon and focuses the first content tabbable).
+ * - `'firstElement'` — same as `'firstContentElement'` under the new Dialog
+ *   primitive. The legacy distinction (focus first focusable, including the
+ *   close icon) is no longer meaningful because the popup's smart default
+ *   already skips the close icon.
+ * - `true` (the default) — defers to the popup's smart default.
+ *
+ * Three of the five values converge on the popup's smart default; they're
+ * still listed explicitly so that grepping the source for any of the legacy
+ * string literals lands on this hook.
  *
  * @param focusOnMount Legacy `Modal.focusOnMount` value to translate.
  * @param contentRef   Ref to the popup body, used by the
