@@ -443,9 +443,7 @@ if ( ! class_exists( 'WP_HTTP_Polling_Collaboration_Server' ) ) {
 			}
 
 			if ( null === $awareness_update ) {
-				/*
-				 * Client signalled disconnect, remove the awareness entry.
-				 */
+				// Client signalled disconnect, remove the awareness entry.
 				$this->storage->remove_awareness_state( $room, $client_id );
 			} else {
 				$this->storage->set_awareness_state( $room, $client_id, $awareness_update, $wp_user_id );
