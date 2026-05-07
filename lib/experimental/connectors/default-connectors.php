@@ -31,7 +31,10 @@ function _gutenberg_connectors_init(): void {
 			'description'    => __( 'Protect your site from spam.', 'gutenberg' ),
 			'type'           => 'spam_filtering',
 			'plugin'         => array(
-				'file' => 'akismet/akismet.php',
+				'file'      => 'akismet/akismet.php',
+				'is_active' => static function (): bool {
+					return defined( 'AKISMET_VERSION' );
+				},
 			),
 			'authentication' => array(
 				'method'          => 'api_key',
@@ -201,6 +204,17 @@ function _gutenberg_register_default_ai_providers( WP_Connector_Registry $regist
 				}
 			}
 		}
+
+		if ( ! isset( $args['plugin']['is_active'] ) ) {
+			$args['plugin']['is_active'] = static function () use ( $ai_registry, $id ): bool {
+				try {
+					return $ai_registry->hasProvider( $id );
+				} catch ( Exception $e ) {
+					return false;
+				}
+			};
+		}
+
 		$registry->register( $id, $args );
 	}
 }
@@ -373,10 +387,9 @@ add_filter( 'rest_post_dispatch', '_gutenberg_connectors_rest_settings_dispatch'
  * @access private
  */
 function _gutenberg_register_default_connector_settings(): void {
-	$ai_registry       = \WordPress\AiClient\AiClient::defaultRegistry();
 	$existing_settings = get_registered_settings();
 
-	foreach ( wp_get_connectors() as $connector_id => $connector_data ) {
+	foreach ( wp_get_connectors() as $connector_data ) {
 		$auth = $connector_data['authentication'];
 		if ( 'api_key' !== $auth['method'] || empty( $auth['setting_name'] ) ) {
 			continue;
@@ -387,8 +400,11 @@ function _gutenberg_register_default_connector_settings(): void {
 			continue;
 		}
 
-		// For AI providers, skip if the provider is not in the AI Client registry.
-		if ( 'ai_provider' === $connector_data['type'] && ! $ai_registry->hasProvider( $connector_id ) ) {
+		if ( ! isset( $connector_data['plugin']['is_active'] ) || ! is_callable( $connector_data['plugin']['is_active'] ) ) {
+			continue;
+		}
+
+		if ( ! call_user_func( $connector_data['plugin']['is_active'] ) ) {
 			continue;
 		}
 
@@ -485,7 +501,7 @@ function _gutenberg_get_connector_script_module_data( array $data ): array {
 
 	$registry = \WordPress\AiClient\AiClient::defaultRegistry();
 
-	if ( ! function_exists( 'is_plugin_active' ) ) {
+	if ( ! function_exists( 'validate_plugin' ) ) {
 		require_once ABSPATH . 'wp-admin/includes/plugin.php';
 	}
 
@@ -525,22 +541,8 @@ function _gutenberg_get_connector_script_module_data( array $data ): array {
 
 		if ( ! empty( $connector_data['plugin']['file'] ) ) {
 			$file         = $connector_data['plugin']['file'];
-			$is_installed = false;
-			$is_activated = false;
-
-			if ( ! empty( $connector_data['plugin']['is_active'] ) && is_callable( $connector_data['plugin']['is_active'] ) ) {
-				$is_activated = (bool) call_user_func( $connector_data['plugin']['is_active'] );
-			}
-
-			if ( ! $is_activated ) {
-				$is_activated = is_plugin_active( $file );
-			}
-
-			if ( $is_activated ) {
-				$is_installed = true;
-			} else {
-				$is_installed = file_exists( WP_PLUGIN_DIR . '/' . $file );
-			}
+			$is_activated = (bool) call_user_func( $connector_data['plugin']['is_active'] );
+			$is_installed = $is_activated || 0 === validate_plugin( $file );
 
 			$connector_out['plugin'] = array(
 				'file'        => $file,

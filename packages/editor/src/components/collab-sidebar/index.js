@@ -78,11 +78,68 @@ function NotesSidebar( { postId } ) {
 			( unresolvedNotes.length > 0 || selectedNote !== undefined )
 	);
 
+	async function focusNote( {
+		targetClientId,
+		noteId: targetNoteId,
+		isApproved,
+	} ) {
+		if ( ! targetClientId ) {
+			return;
+		}
+
+		const prevArea = await getActiveComplementaryArea( 'core' );
+		if ( isApproved ) {
+			enableComplementaryArea( 'core', ALL_NOTES_SIDEBAR );
+		} else if ( ! SIDEBARS.includes( prevArea ) || ! showAllNotesSidebar ) {
+			enableComplementaryArea(
+				'core',
+				showFloatingSidebar ? FLOATING_NOTES_SIDEBAR : ALL_NOTES_SIDEBAR
+			);
+		}
+
+		const currentArea = await getActiveComplementaryArea( 'core' );
+		// Bail out if the current active area is not one of note sidebars.
+		if ( ! SIDEBARS.includes( currentArea ) ) {
+			return;
+		}
+
+		// A special case for the List View, where block selection isn't required to trigger an action.
+		// The action won't do anything if the block is already selected.
+		selectBlock( targetClientId, null );
+		toggleBlockSpotlight( targetClientId, true );
+		selectNote( targetNoteId, { focus: true } );
+	}
+
+	function openNoteForBlock( targetClientId ) {
+		// A block can carry multiple threads, so surface the most relevant
+		// one — first unresolved, else first.
+		const blockThreads = notes.filter(
+			( thread ) => thread.blockClientId === targetClientId
+		);
+		const target =
+			blockThreads.find( ( thread ) => thread.status === 'hold' ) ??
+			blockThreads[ 0 ] ??
+			null;
+		return focusNote( {
+			targetClientId,
+			noteId: target?.id ?? 'new',
+			isApproved: target?.status === 'approved',
+		} );
+	}
+
+	function addNewNoteForBlock( targetClientId ) {
+		return focusNote( {
+			targetClientId,
+			noteId: 'new',
+			isApproved: false,
+		} );
+	}
+
 	useShortcut(
 		'core/editor/new-note',
 		( event ) => {
 			event.preventDefault();
-			openTheSidebar();
+			addNewNoteForBlock( clientId );
 		},
 		{
 			isDisabled: isDistractionFree || isClassicBlock || ! clientId,
@@ -105,61 +162,6 @@ function NotesSidebar( { postId } ) {
 		currentThreads[ 0 ] ??
 		null;
 
-	async function openTheSidebar( {
-		addNewNote = false,
-		clientId: explicitClientId,
-	} = {} ) {
-		// `AddNoteMenuItem` (a slot fill rendered per block in the List
-		// View row menus) passes the row's clientId, which may differ
-		// from the canvas selection. Fall back to the canvas selection
-		// for the keyboard shortcut and avatar indicator paths.
-		const targetClientId = explicitClientId ?? clientId;
-		if ( ! targetClientId ) {
-			return;
-		}
-
-		// Look up threads for the target block directly so the List View
-		// path resolves the right notes even when the canvas selection
-		// is somewhere else.
-		const targetThreads = notes.filter(
-			( thread ) => thread.blockClientId === targetClientId
-		);
-		const targetThread =
-			targetThreads.find( ( thread ) => thread.status === 'hold' ) ??
-			targetThreads[ 0 ] ??
-			null;
-
-		const prevArea = await getActiveComplementaryArea( 'core' );
-		const activeNotesArea = SIDEBARS.find( ( name ) => name === prevArea );
-
-		if ( targetThread?.status === 'approved' && ! addNewNote ) {
-			enableComplementaryArea( 'core', ALL_NOTES_SIDEBAR );
-		} else if ( ! activeNotesArea || ! showAllNotesSidebar ) {
-			enableComplementaryArea(
-				'core',
-				showFloatingSidebar ? FLOATING_NOTES_SIDEBAR : ALL_NOTES_SIDEBAR
-			);
-		}
-
-		const currentArea = await getActiveComplementaryArea( 'core' );
-		// Bail out if the current active area is not one of note sidebars.
-		if ( ! SIDEBARS.includes( currentArea ) ) {
-			return;
-		}
-
-		// When addNewNote is true, always open the new note form.
-		// Otherwise, select the existing thread or open new.
-		const shouldAddNew = addNewNote || ! targetThread;
-		// A special case for the List View, where block selection isn't
-		// required to trigger the action. The action is a no-op when the
-		// block is already selected.
-		selectBlock( targetClientId, null );
-		toggleBlockSpotlight( targetClientId, true );
-		selectNote( shouldAddNew ? 'new' : targetThread.id, {
-			focus: true,
-		} );
-	}
-
 	if ( isDistractionFree ) {
 		return <AddNoteMenuItem isDistractionFree />;
 	}
@@ -169,15 +171,12 @@ function NotesSidebar( { postId } ) {
 			{ !! currentThread && (
 				<NoteAvatarIndicator
 					note={ currentThread }
-					onClick={ () => openTheSidebar() }
+					onClick={ () => openNoteForBlock( clientId ) }
 				/>
 			) }
 			<AddNoteMenuItem
 				onClick={ ( menuClientId ) =>
-					openTheSidebar( {
-						addNewNote: true,
-						clientId: menuClientId,
-					} )
+					addNewNoteForBlock( menuClientId )
 				}
 			/>
 			{ showAllNotesSidebar && (

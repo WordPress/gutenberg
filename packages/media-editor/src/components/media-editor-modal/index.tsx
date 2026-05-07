@@ -580,6 +580,7 @@ function MediaEditorModalContent( {
 												imageAspectRatio
 											) }
 											freeformCrop={ freeformCrop }
+											focusOnMount
 											isPlacementActive={
 												isPlacementActive
 											}
