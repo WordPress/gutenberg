@@ -36,7 +36,7 @@ function render_block_core_site_title( $attributes ) {
 
 		$site_title = sprintf(
 			'<a href="%1$s" target="%2$s" rel="home"%3$s>%4$s</a>',
-			esc_url( home_url() ),
+			esc_url( home_url( '/' ) ),
 			esc_attr( $link_target ),
 			$aria_current,
 			esc_html( $site_title )
