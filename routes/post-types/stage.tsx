@@ -21,6 +21,7 @@ import {
 	activateAction,
 	deactivateAction,
 	deletePostTypeAction,
+	duplicatePostTypeAction,
 	type PostTypeRecord,
 } from '@wordpress/user-post-types';
 
@@ -51,6 +52,7 @@ function PostTypesPage() {
 		() => [
 			editAction,
 			quickEditPostTypeAction,
+			duplicatePostTypeAction,
 			activateAction,
 			deactivateAction,
 			deletePostTypeAction,
