@@ -49,18 +49,11 @@ class WidgetErrorBoundary extends Component<
 	render() {
 		if ( this.state.hasError ) {
 			return (
-				<Stack
-					direction="column"
-					justify="center"
-					align="center"
-					className={ styles.error }
-				>
-					<Notice.Root intent="error">
-						<Notice.Description>
-							{ __( 'This widget encountered an error.' ) }
-						</Notice.Description>
-					</Notice.Root>
-				</Stack>
+				<Notice.Root intent="error">
+					<Notice.Description>
+						{ __( 'This widget encountered an error.' ) }
+					</Notice.Description>
+				</Notice.Root>
 			);
 		}
 		return this.props.children;
