@@ -912,6 +912,65 @@ describe( 'global styles renderer', () => {
 			);
 		} );
 
+		it( 'outputs variation pseudo styles after variation responsive base styles', () => {
+			const tree = {
+				styles: {
+					blocks: {
+						'core/button': {
+							variations: {
+								foo: {
+									color: {
+										text: 'green',
+									},
+									':hover': {
+										color: {
+											text: 'blue',
+										},
+									},
+									mobile: {
+										color: {
+											text: 'red',
+										},
+										':hover': {
+											color: {
+												text: 'orange',
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			} as unknown as GlobalStylesConfig;
+
+			const blockSelectors = {
+				'core/button': {
+					selector: '.wp-block-button',
+					styleVariationSelectors: {
+						foo: '.is-style-foo.wp-block-button',
+					},
+				},
+			};
+
+			const result = transformToStyles(
+				Object.freeze( tree ),
+				blockSelectors,
+				false,
+				false,
+				true,
+				true,
+				{
+					...minimalStyleOptions,
+					variationStyles: true,
+				}
+			);
+
+			expect( result ).toEqual(
+				':root :where(.is-style-foo.wp-block-button){color: green;}@media (width <= 480px){:root :where(.is-style-foo.wp-block-button){color: red;}}:root :where(.is-style-foo.wp-block-button:hover){color: blue;}@media (width <= 480px){:root :where(.is-style-foo.wp-block-button:hover){color: orange;}}'
+			);
+		} );
+
 		it( 'handles responsive block styles', () => {
 			const tree = {
 				styles: {
