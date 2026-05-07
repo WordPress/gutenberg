@@ -167,6 +167,34 @@ describe( 'WidgetDashboard staging layer', () => {
 		expect( onLayoutChange ).not.toHaveBeenCalled();
 	} );
 
+	it( 'reports no uncommitted changes after a swap-and-revert when the visible order is restored', () => {
+		const onLayoutChange = jest.fn();
+		render(
+			<Harness
+				layout={ initialLayout }
+				onLayoutChange={ onLayoutChange }
+			/>
+		);
+
+		// Initial: committed has no `order`. After a swap, the grid assigns
+		// explicit order values. After re-swapping, the visible order
+		// matches initial but the array shape carries explicit orders.
+		act( () => {
+			readProbe().mutate( [
+				{
+					...initialLayout[ 0 ],
+					placement: { width: 1, height: 1, order: 0 },
+				},
+				{
+					...initialLayout[ 1 ],
+					placement: { width: 1, height: 1, order: 1 },
+				},
+			] );
+		} );
+
+		expect( readProbe().hasUncommittedChanges ).toBe( false );
+	} );
+
 	it( 'forces edit mode when the layout becomes empty', () => {
 		const onLayoutChange = jest.fn();
 		const { rerender } = render(
