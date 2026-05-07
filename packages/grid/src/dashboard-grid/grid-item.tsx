@@ -13,8 +13,9 @@ import { useMergeRefs } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import ResizeHandle from './resize-handle';
-import type { GridItemProps, ResizeDelta } from './types';
+import ResizeHandle from '../shared/resize-handle';
+import type { ResizeDelta } from '../shared/types';
+import type { GridItemProps } from './types';
 import styles from './grid-item.module.css';
 
 function getItemCursor(

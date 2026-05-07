@@ -37,11 +37,8 @@ import {
  */
 import { GridItem } from './grid-item';
 import { resolveFillWidths } from './resolve-fill-widths';
-import type {
-	DashboardGridLayoutItem,
-	DashboardGridProps,
-	ResizeDelta,
-} from './types';
+import type { DashboardGridLayoutItem, DashboardGridProps } from './types';
+import type { ResizeDelta } from '../shared/types';
 import styles from './grid.module.css';
 
 // Reorder is driven by `temporaryLayout` + CSS Grid, not by dnd-kit

@@ -14,11 +14,9 @@ import { Icon, IconButton, Stack } from '@wordpress/ui';
 /**
  * Internal dependencies
  */
-import { DashboardGrid } from '../grid';
-import type {
-	DashboardGridLayoutItem,
-	ResizeHandleRenderProps,
-} from '../types';
+import { DashboardGrid } from '..';
+import type { DashboardGridLayoutItem } from '../types';
+import type { ResizeHandleRenderProps } from '../../shared/types';
 
 const meta: Meta< typeof DashboardGrid > = {
 	title: 'Grid/DashboardGrid',
