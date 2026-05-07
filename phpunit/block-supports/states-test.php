@@ -25,21 +25,23 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Registers a block with `states` support.
+	 * Registers a block for tests when the block is not already registered.
 	 *
 	 * @param string $block_name Block name.
 	 * @param array  $selectors  Optional block selectors (e.g. `['root' => '.foo .bar']`).
 	 * @return WP_Block_Type
 	 */
-	private function register_block_with_states( $block_name, $selectors = array() ) {
+	private function ensure_block_registered( $block_name, $selectors = array() ) {
+		$registered_block = WP_Block_Type_Registry::get_instance()->get_registered( $block_name );
+		if ( $registered_block ) {
+			return $registered_block;
+		}
+
 		$this->test_block_name = $block_name;
 		$args                  = array(
 			'api_version' => 3,
 			'attributes'  => array(
 				'style' => array( 'type' => 'object' ),
-			),
-			'supports'    => array(
-				'states' => array( ':hover', ':focus', ':active' ),
 			),
 		);
 		if ( ! empty( $selectors ) ) {
@@ -98,10 +100,10 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 	 * @covers ::gutenberg_render_block_states_support
 	 */
 	public function test_returns_unchanged_when_block_content_empty() {
-		$this->register_block_with_states( 'test/states-empty-content' );
+		$this->ensure_block_registered( 'core/navigation-link' );
 
 		$block = array(
-			'blockName' => 'test/states-empty-content',
+			'blockName' => 'core/navigation-link',
 			'attrs'     => array(
 				'style' => array(
 					':hover' => array( 'color' => array( 'text' => '#ff0000' ) ),
@@ -115,12 +117,12 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Tests that block content is returned unchanged when `states` support is not declared.
+	 * Tests that block content is returned unchanged when the block has no configured pseudo-states.
 	 *
 	 * @covers ::gutenberg_render_block_states_support
 	 */
-	public function test_returns_unchanged_when_states_support_not_declared() {
-		$this->test_block_name = 'test/no-states-support';
+	public function test_returns_unchanged_when_block_has_no_configured_pseudo_states() {
+		$this->test_block_name = 'test/no-pseudo-state-config';
 		register_block_type(
 			$this->test_block_name,
 			array(
@@ -134,7 +136,7 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 
 		$block_content = '<div class="wp-block-test">Hello</div>';
 		$block         = array(
-			'blockName' => 'test/no-states-support',
+			'blockName' => 'test/no-pseudo-state-config',
 			'attrs'     => array(
 				'style' => array(
 					':hover' => array( 'color' => array( 'text' => '#ff0000' ) ),
@@ -148,16 +150,16 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Tests that block content is returned unchanged when no state styles are set.
+	 * Tests that block content is returned unchanged when no pseudo-state styles are set.
 	 *
 	 * @covers ::gutenberg_render_block_states_support
 	 */
 	public function test_returns_unchanged_when_no_state_styles_set() {
-		$this->register_block_with_states( 'test/states-no-state-style' );
+		$this->ensure_block_registered( 'core/navigation-link' );
 
 		$block_content = '<div class="wp-block-test">Hello</div>';
 		$block         = array(
-			'blockName' => 'test/states-no-state-style',
+			'blockName' => 'core/navigation-link',
 			'attrs'     => array(
 				'style' => array(
 					'color' => array( 'text' => '#000000' ),
@@ -171,16 +173,16 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Tests that block content is returned unchanged when the state key is an empty array.
+	 * Tests that block content is returned unchanged when the pseudo-state key is an empty array.
 	 *
 	 * @covers ::gutenberg_render_block_states_support
 	 */
 	public function test_returns_unchanged_when_state_style_is_empty_array() {
-		$this->register_block_with_states( 'test/states-empty-hover' );
+		$this->ensure_block_registered( 'core/navigation-link' );
 
 		$block_content = '<div class="wp-block-test">Hello</div>';
 		$block         = array(
-			'blockName' => 'test/states-empty-hover',
+			'blockName' => 'core/navigation-link',
 			'attrs'     => array(
 				'style' => array(
 					':hover' => array(),
@@ -199,12 +201,12 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 	 * @covers ::gutenberg_render_block_states_support
 	 */
 	public function test_hover_text_color_generates_scoped_css() {
-		$this->register_block_with_states( 'test/states-hover-text-color' );
+		$this->ensure_block_registered( 'core/navigation-link' );
 
 		$block_content = '<div class="wp-block-test">Hello</div>';
 		$state_styles  = array( ':hover' => array( 'color' => array( 'text' => '#e6ffe8' ) ) );
 		$block         = array(
-			'blockName' => 'test/states-hover-text-color',
+			'blockName' => 'core/navigation-link',
 			'attrs'     => array( 'style' => $state_styles ),
 		);
 
@@ -221,12 +223,12 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 	 * @covers ::gutenberg_render_block_states_support
 	 */
 	public function test_hover_background_color_generates_scoped_css() {
-		$this->register_block_with_states( 'test/states-hover-bg-color' );
+		$this->ensure_block_registered( 'core/navigation-link' );
 
 		$block_content = '<div class="wp-block-test">Hello</div>';
 		$state_styles  = array( ':hover' => array( 'color' => array( 'background' => '#ff00d0' ) ) );
 		$block         = array(
-			'blockName' => 'test/states-hover-bg-color',
+			'blockName' => 'core/navigation-link',
 			'attrs'     => array( 'style' => $state_styles ),
 		);
 
@@ -243,7 +245,7 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 	 * @covers ::gutenberg_render_block_states_support
 	 */
 	public function test_hover_text_and_background_color_in_same_rule() {
-		$this->register_block_with_states( 'test/states-hover-both-colors' );
+		$this->ensure_block_registered( 'core/navigation-link' );
 
 		$block_content = '<div class="wp-block-test">Hello</div>';
 		$state_styles  = array(
@@ -255,7 +257,7 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 			),
 		);
 		$block         = array(
-			'blockName' => 'test/states-hover-both-colors',
+			'blockName' => 'core/navigation-link',
 			'attrs'     => array( 'style' => $state_styles ),
 		);
 
@@ -273,7 +275,7 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 	 * @covers ::gutenberg_render_block_states_support
 	 */
 	public function test_hover_font_family_preset_reference_generates_css_custom_property() {
-		$this->register_block_with_states( 'test/states-hover-font-family' );
+		$this->ensure_block_registered( 'core/navigation-link' );
 
 		$block_content = '<div class="wp-block-test">Hello</div>';
 		$state_styles  = array(
@@ -282,7 +284,7 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 			),
 		);
 		$block         = array(
-			'blockName' => 'test/states-hover-font-family',
+			'blockName' => 'core/navigation-link',
 			'attrs'     => array( 'style' => $state_styles ),
 		);
 
@@ -299,7 +301,7 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 	 * @covers ::gutenberg_render_block_states_support
 	 */
 	public function test_hover_font_size_generates_scoped_css() {
-		$this->register_block_with_states( 'test/states-hover-font-size' );
+		$this->ensure_block_registered( 'core/navigation-link' );
 
 		$block_content = '<div class="wp-block-test">Hello</div>';
 		$state_styles  = array(
@@ -308,7 +310,7 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 			),
 		);
 		$block         = array(
-			'blockName' => 'test/states-hover-font-size',
+			'blockName' => 'core/navigation-link',
 			'attrs'     => array( 'style' => $state_styles ),
 		);
 
@@ -325,7 +327,7 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 	 * @covers ::gutenberg_render_block_states_support
 	 */
 	public function test_hover_border_width_and_color_generate_scoped_css() {
-		$this->register_block_with_states( 'test/states-hover-border' );
+		$this->ensure_block_registered( 'core/navigation-link' );
 
 		$block_content = '<div class="wp-block-test">Hello</div>';
 		$state_styles  = array(
@@ -337,7 +339,7 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 			),
 		);
 		$block         = array(
-			'blockName' => 'test/states-hover-border',
+			'blockName' => 'core/navigation-link',
 			'attrs'     => array( 'style' => $state_styles ),
 		);
 
@@ -354,7 +356,7 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 	 * @covers ::gutenberg_render_block_states_support
 	 */
 	public function test_hover_border_radius_generates_scoped_css() {
-		$this->register_block_with_states( 'test/states-hover-border-radius' );
+		$this->ensure_block_registered( 'core/navigation-link' );
 
 		$block_content = '<div class="wp-block-test">Hello</div>';
 		$state_styles  = array(
@@ -363,7 +365,7 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 			),
 		);
 		$block         = array(
-			'blockName' => 'test/states-hover-border-radius',
+			'blockName' => 'core/navigation-link',
 			'attrs'     => array( 'style' => $state_styles ),
 		);
 
@@ -380,15 +382,16 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 	 * @covers ::gutenberg_render_block_states_support
 	 */
 	public function test_multiple_states_generate_separate_css_rules() {
-		$this->register_block_with_states( 'test/states-multiple' );
+		$this->ensure_block_registered( 'core/navigation-link' );
 
 		$block_content = '<div class="wp-block-test">Hello</div>';
 		$state_styles  = array(
-			':hover' => array( 'color' => array( 'text' => '#ff0000' ) ),
-			':focus' => array( 'color' => array( 'text' => '#00ff00' ) ),
+			':hover'         => array( 'color' => array( 'text' => '#ff0000' ) ),
+			':focus'         => array( 'color' => array( 'text' => '#00ff00' ) ),
+			':focus-visible' => array( 'color' => array( 'text' => '#0000ff' ) ),
 		);
 		$block         = array(
-			'blockName' => 'test/states-multiple',
+			'blockName' => 'core/navigation-link',
 			'attrs'     => array( 'style' => $state_styles ),
 		);
 
@@ -400,18 +403,41 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Tests that unconfigured pseudo-state keys are ignored.
+	 *
+	 * @covers ::gutenberg_render_block_states_support
+	 */
+	public function test_unconfigured_pseudo_state_is_ignored() {
+		$this->ensure_block_registered( 'core/navigation-link' );
+
+		$block_content = '<div class="wp-block-test">Hello</div>';
+		$block         = array(
+			'blockName' => 'core/navigation-link',
+			'attrs'     => array(
+				'style' => array(
+					':visited' => array( 'color' => array( 'text' => '#ff0000' ) ),
+				),
+			),
+		);
+
+		$actual = gutenberg_render_block_states_support( $block_content, $block );
+
+		$this->assertSame( $block_content, $actual );
+	}
+
+	/**
 	 * Tests that the unique scoped class is added to the wrapper element for a
 	 * block with no descendant root selector.
 	 *
 	 * @covers ::gutenberg_render_block_states_support
 	 */
 	public function test_unique_class_is_added_to_wrapper_when_no_root_selector() {
-		$this->register_block_with_states( 'test/states-wrapper' );
+		$this->ensure_block_registered( 'core/navigation-link' );
 
 		$block_content = '<div class="wp-block-test">Hello</div>';
 		$state_styles  = array( ':hover' => array( 'color' => array( 'text' => '#ff0000' ) ) );
 		$block         = array(
-			'blockName' => 'test/states-wrapper',
+			'blockName' => 'core/navigation-link',
 			'attrs'     => array( 'style' => $state_styles ),
 		);
 
@@ -430,15 +456,15 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 	 * @covers ::gutenberg_render_block_states_support
 	 */
 	public function test_unique_class_is_added_to_descendant_not_wrapper_when_root_selector_has_descendant() {
-		$this->register_block_with_states(
-			'test/states-descendant',
+		$this->ensure_block_registered(
+			'core/button',
 			array( 'root' => '.wp-block-button .wp-block-button__link' )
 		);
 
 		$block_content = '<div class="wp-block-button"><a class="wp-block-button__link">Click me</a></div>';
 		$state_styles  = array( ':hover' => array( 'color' => array( 'background' => '#ff00d0' ) ) );
 		$block         = array(
-			'blockName' => 'test/states-descendant',
+			'blockName' => 'core/button',
 			'attrs'     => array( 'style' => $state_styles ),
 		);
 
@@ -458,8 +484,8 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 	 * @covers ::gutenberg_render_block_states_support
 	 */
 	public function test_button_like_block_with_hover_color_and_font_family_preset() {
-		$this->register_block_with_states(
-			'test/states-button-full',
+		$this->ensure_block_registered(
+			'core/button',
 			array( 'root' => '.wp-block-button .wp-block-button__link' )
 		);
 
@@ -477,7 +503,7 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 			),
 		);
 		$block = array(
-			'blockName' => 'test/states-button-full',
+			'blockName' => 'core/button',
 			'attrs'     => array( 'style' => $state_styles ),
 		);
 
@@ -495,8 +521,8 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 	 * @covers ::gutenberg_render_block_states_support
 	 */
 	public function test_button_like_block_with_hover_border() {
-		$this->register_block_with_states(
-			'test/states-button-border',
+		$this->ensure_block_registered(
+			'core/button',
 			array( 'root' => '.wp-block-button .wp-block-button__link' )
 		);
 
@@ -511,7 +537,7 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 			),
 		);
 		$block         = array(
-			'blockName' => 'test/states-button-border',
+			'blockName' => 'core/button',
 			'attrs'     => array( 'style' => $state_styles ),
 		);
 
