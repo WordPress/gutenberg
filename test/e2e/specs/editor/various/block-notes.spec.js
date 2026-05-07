@@ -446,6 +446,34 @@ test.describe( 'Block Notes', () => {
 			await expect( thread ).toHaveAttribute( 'aria-expanded', 'false' );
 		} );
 
+		test( 'should keep a note collapsed while editing the same block', async ( {
+			editor,
+			page,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Sticky collapse' },
+				comment: 'Sticky collapse note',
+			} );
+
+			const thread = page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'treeitem', {
+					name: 'Note: Sticky collapse note',
+				} );
+
+			await thread.click();
+			await page.keyboard.press( 'Escape' );
+			await expect( thread ).toHaveAttribute( 'aria-expanded', 'false' );
+
+			await editor.canvas
+				.getByRole( 'document', { name: 'Block: Paragraph' } )
+				.click();
+			await page.keyboard.type( ' edited' );
+			await expect( thread ).toHaveAttribute( 'aria-expanded', 'false' );
+		} );
+
 		test( 'should collapse a note after canceling note form', async ( {
 			page,
 			blockNoteUtils,
