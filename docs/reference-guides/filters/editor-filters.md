@@ -263,6 +263,8 @@ Client-side processing reads the following existing WordPress filters from the s
 -   **`image_save_progressive`** — Controls progressive (JPEG) or interlaced (PNG, GIF) encoding. Applied during client-side compression and format conversion.
 -   **`wp_image_maybe_exif_rotate`** — Controls EXIF-based image rotation. When client-side processing is active, server-side rotation is disabled and the client handles it instead.
 
+> **Note:** There is no filter for the set of MIME types eligible for client-side processing. The supported set is fixed at `CLIENT_SIDE_SUPPORTED_MIME_TYPES` (`image/jpeg`, `image/png`, `image/gif`, `image/webp`, `image/avif`) in `packages/upload-media/src/store/constants.ts`. Files outside this set fall through to server-side processing or, for HEIC/HEIF, to a separate canvas-based decode path.
+
 ### REST API parameters
 
 Client-side processing uses two additional REST API parameters when uploading media:

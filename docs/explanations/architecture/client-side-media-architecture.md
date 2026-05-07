@@ -341,3 +341,8 @@ While uploads are in flight, the editor takes a post-saving lock so the user can
 -   The legacy (`uploadMedia`-only) path also locks via `UploadSaveLockWrapper`, which counts active uploads instead of tracking a queue.
 
 The Save Draft button, Publish button, and `Ctrl/Cmd+S` shortcut all check `isPostSavingLocked()`. The lock releases when all items are uploaded or any in-flight item is cancelled.
+
+## See also
+
+-   [Client-side media processing how-to guide](/docs/how-to-guides/client-side-media.md) — practical guidance for plugin and theme developers (disabling, customizing, and debugging the feature).
+-   [Editor filters reference: Client-side media processing](/docs/reference-guides/filters/editor-filters.md#client-side-media-processing) — full filter and REST API parameter reference.
