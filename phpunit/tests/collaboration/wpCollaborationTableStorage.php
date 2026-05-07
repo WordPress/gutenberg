@@ -339,6 +339,91 @@ class Tests_Collaboration_WpCollaborationTableStorage extends WP_UnitTestCase {
 
 
 	/**
+	 * Ensure remove_awareness_state removes only the targeted client.
+	 *
+	 * @ticket 64696
+	 */
+	public function test_remove_awareness_state_removes_only_targeted_client(): void {
+		$storage = new WP_Collaboration_Table_Storage();
+		$room    = __FUNCTION__;
+
+		$storage->set_awareness_state( $room, 'client-1', array( 'name' => 'Client 1' ), 1 );
+		$storage->set_awareness_state( $room, 'client-2', array( 'name' => 'Client 2' ), 2 );
+
+		$storage->remove_awareness_state( $room, 'client-1' );
+
+		$awareness = $storage->get_awareness_state( $room );
+		$clients   = wp_list_pluck( $awareness, 'client_id' );
+
+		$this->assertNotContains( 'client-1', $clients, 'Removed client should be absent from awareness state.' );
+		$this->assertContains( 'client-2', $clients, 'Other clients should remain in awareness state.' );
+		$this->assertCount( 1, $awareness );
+	}
+
+	/**
+	 * Ensure removing a client that is not present is a no-op.
+	 *
+	 * @ticket 64696
+	 */
+	public function test_remove_awareness_state_is_idempotent(): void {
+		$storage = new WP_Collaboration_Table_Storage();
+		$room    = __FUNCTION__;
+
+		$storage->set_awareness_state( $room, 'client-1', array( 'name' => 'Client 1' ), 1 );
+
+		$storage->remove_awareness_state( $room, 'client-missing' );
+		$storage->remove_awareness_state( $room, 'client-1' );
+		$storage->remove_awareness_state( $room, 'client-1' );
+
+		$this->assertSame( array(), $storage->get_awareness_state( $room ) );
+	}
+
+	/**
+	 * Ensure remove_awareness_state does not write to the database when a persistent object cache is in use.
+	 *
+	 * @ticket 64696
+	 */
+	public function test_remove_awareness_state_uses_persistent_object_cache(): void {
+		if ( ! wp_using_ext_object_cache() ) {
+			$this->markTestSkipped( 'This test requires that an external object cache is in use.' );
+		}
+
+		$storage = new WP_Collaboration_Table_Storage();
+		$room    = __FUNCTION__;
+
+		$storage->set_awareness_state( $room, 'client-1', array( 'name' => 'Client 1' ), 1 );
+
+		$db_calls_initial = get_num_queries();
+		$storage->remove_awareness_state( $room, 'client-1' );
+		$db_calls_after = get_num_queries();
+
+		$this->assertSame( 0, $db_calls_after - $db_calls_initial, 'remove_awareness_state should not query the database when a persistent object cache is in use.' );
+		$this->assertSame( 0, $this->get_awareness_row_count() );
+	}
+
+	/**
+	 * Ensure remove_awareness_state deletes the database row and invalidates the cache when no persistent object cache is in use.
+	 *
+	 * @ticket 64696
+	 */
+	public function test_remove_awareness_state_deletes_database_row(): void {
+		if ( wp_using_ext_object_cache() ) {
+			$this->markTestSkipped( 'This test requires that an external object cache is not in use.' );
+		}
+
+		$storage = new WP_Collaboration_Table_Storage();
+		$room    = __FUNCTION__;
+
+		$storage->set_awareness_state( $room, 'client-1', array( 'name' => 'Client 1' ), 1 );
+		$this->assertSame( 1, $this->get_awareness_row_count() );
+
+		$storage->remove_awareness_state( $room, 'client-1' );
+
+		$this->assertSame( 0, $this->get_awareness_row_count(), 'Awareness row should be deleted from the database.' );
+		$this->assertSame( array(), $storage->get_awareness_state( $room ), 'Awareness state should be empty after removal.' );
+	}
+
+	/**
 	 * Ensure awareness getter returns the last client entry when duplicates exist.
 	 *
 	 * @ticket 64696
