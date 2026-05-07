@@ -14,10 +14,6 @@ const meta: Meta< typeof Badge > = {
 	],
 	parameters: {
 		controls: { disable: true },
-		componentStatus: {
-			status: 'recommended',
-			whereUsed: 'global',
-		},
 	},
 	tags: [ '!dev' /* Hide individual story pages from sidebar */, 'manifest' ],
 };
