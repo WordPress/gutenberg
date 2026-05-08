@@ -16,6 +16,7 @@ import {
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { store as noticesStore } from '@wordpress/notices';
+import apiFetch from '@wordpress/api-fetch';
 import { getScrollContainer } from '@wordpress/dom';
 import { decodeEntities } from '@wordpress/html-entities';
 import { store as interfaceStore } from '@wordpress/interface';
@@ -289,7 +290,7 @@ function clearInlineNoteMarker(
 
 export function useNoteActions( reactionsMap = {} ) {
 	const { createNotice } = useDispatch( noticesStore );
-	const { saveEntityRecord, deleteEntityRecord, invalidateResolution } =
+	const { saveEntityRecord, deleteEntityRecord, receiveEntityRecords } =
 		useDispatch( coreStore );
 	const { getCurrentPostId } = useSelect( editorStore );
 	const {
@@ -518,12 +519,16 @@ export function useNoteActions( reactionsMap = {} ) {
 				const emojiData = noteReactions[ emoji ];
 
 				if ( emojiData?.reacted && emojiData?.my_reaction_id ) {
-					// Remove the reaction by deleting the comment record.
+					// Force-delete the reaction comment rather than
+					// trashing it (the WP REST default). Reactions
+					// don't have a trash workflow, and a trashed
+					// reaction would otherwise linger in `wp_comments`
+					// indefinitely each time the user toggles it off.
 					await deleteEntityRecord(
 						'root',
 						'comment',
 						emojiData.my_reaction_id,
-						undefined,
+						{ force: true },
 						{ throwOnError: true }
 					);
 
@@ -552,25 +557,23 @@ export function useNoteActions( reactionsMap = {} ) {
 					} );
 				}
 
-				// `reaction_summary` is computed server-side and cached
-				// on each parent note's entity record. Mutating a
-				// reaction comment doesn't invalidate that field, so a
-				// subsequent toggle for the same emoji on the same note
-				// reads stale `reacted` / `my_reaction_id` data — a
-				// removed reaction can't be re-added because the toggle
-				// still tries to delete a now-missing comment record.
-				// Refetch the notes list so each parent's
-				// `reaction_summary` is fresh.
-				invalidateResolution( 'getEntityRecords', [
-					'root',
-					'comment',
-					{
-						post: getCurrentPostId(),
-						type: 'note',
-						status: 'all',
-						per_page: -1,
-					},
-				] );
+				// `reaction_summary` is computed server-side and
+				// cached on the parent note's entity record. Mutating
+				// a reaction comment doesn't invalidate that field, so
+				// a subsequent toggle would read stale `reacted` /
+				// `my_reaction_id` data and route into the wrong
+				// branch (deleting an already-removed comment).
+				//
+				// Refetch only the parent note (1 record) and merge it
+				// into the entity store. `receiveEntityRecords` with
+				// no `query` arg updates the per-record cache, which
+				// the list selector reads through by ID — so the LIST
+				// view picks up the fresh `reaction_summary` without
+				// re-fetching every other note on the post.
+				const refreshed = await apiFetch( {
+					path: `/wp/v2/comments/${ commentId }`,
+				} );
+				receiveEntityRecords( 'root', 'comment', [ refreshed ] );
 			} catch ( error ) {
 				onError( error );
 			}
@@ -581,7 +584,7 @@ export function useNoteActions( reactionsMap = {} ) {
 			saveEntityRecord,
 			getCurrentPostId,
 			createNotice,
-			invalidateResolution,
+			receiveEntityRecords,
 		]
 	);
 
