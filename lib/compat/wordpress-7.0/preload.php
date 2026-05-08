@@ -12,9 +12,7 @@ function gutenberg_block_editor_preload_paths_6_9( $paths, $context ) {
 	if ( 'core/edit-site' === $context->name ) {
 		$template_parts = get_block_templates( array(), 'wp_template_part' );
 		foreach ( $template_parts as $template_part ) {
-			if ( ! empty( $template_part->id ) ) {
-				$paths[] = '/wp/v2/template-parts/' . $template_part->id . '?context=edit';
-			}
+			$paths[] = '/wp/v2/template-parts/' . $template_part->id . '?context=edit';
 		}
 
 		$post_rest_route = rest_get_route_for_post_type_items( 'post' );
