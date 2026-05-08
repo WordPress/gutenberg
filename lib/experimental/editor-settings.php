@@ -56,10 +56,10 @@ function gutenberg_add_admin_bar_in_editor_body_class( $classes ) {
 		return $classes;
 	}
 
-	return (
-		( 'post' === $screen->base && $screen->is_block_editor() ) ||
-		'site-editor' === $screen->id
-	)
+	$is_post_editor = 'post' === $screen->base && $screen->is_block_editor();
+	$is_site_editor = 'site-editor' === $screen->id;
+
+	return ( $is_post_editor || $is_site_editor )
 		? $classes . ' is-admin-bar-in-editor-enabled'
 		: $classes;
 }
