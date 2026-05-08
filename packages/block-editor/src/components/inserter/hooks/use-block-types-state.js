@@ -6,7 +6,7 @@ import {
 	createBlock,
 	createBlocksFromInnerBlocksTemplate,
 	store as blocksStore,
-	parse,
+	cloneBlock,
 } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useCallback, useMemo } from '@wordpress/element';
@@ -54,7 +54,7 @@ const useBlockTypesState = ( rootClientId, onInsert, isQuick ) => {
 
 	const onSelectItem = useCallback(
 		(
-			{ name, initialAttributes, innerBlocks, syncStatus, content },
+			{ name, initialAttributes, innerBlocks, syncStatus, blocks },
 			shouldFocusBlock
 		) => {
 			const destinationClientId = getClosestAllowedInsertionPoint(
@@ -79,9 +79,7 @@ const useBlockTypesState = ( rootClientId, onInsert, isQuick ) => {
 
 			const insertedBlock =
 				syncStatus === 'unsynced'
-					? parse( content, {
-							__unstableSkipMigrationLogs: true,
-					  } )
+					? ( blocks ?? [] ).map( ( block ) => cloneBlock( block ) )
 					: createBlock(
 							name,
 							initialAttributes,

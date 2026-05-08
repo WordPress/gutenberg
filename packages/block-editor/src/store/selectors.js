@@ -2342,7 +2342,10 @@ export const getInserterItems = createRegistrySelector( ( select ) =>
 							foreground: 'var(--wp-block-synced-color)',
 					  }
 					: symbol;
-				const userPattern = mapUserPattern( reusableBlock );
+				const userPattern = mapUserPattern(
+					reusableBlock,
+					state.settings.__experimentalUserPatternCategories
+				);
 				const { time, count = 0 } =
 					getInsertUsage( state, userPattern.name ) || {};
 				const frecency = calculateFrecency( time, count );
@@ -2467,6 +2470,7 @@ export const getInserterItems = createRegistrySelector( ( select ) =>
 			unlock( select( STORE_NAME ) ).getReusableBlocks(),
 			state.blocks.order,
 			state.preferences.insertUsage,
+			state.settings.__experimentalUserPatternCategories,
 			...getInsertBlockTypeDependants( select )( state, rootClientId ),
 		]
 	)
