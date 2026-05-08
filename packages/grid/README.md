@@ -191,7 +191,18 @@ When `editMode` is true:
 
 A masonry-style surface aligned with `display: grid-lanes`. Items
 declare a column span; heights are driven by content; placement
-follows a source-ordered, shortest-lane skyline.
+follows a source-ordered, shortest-lane skyline with a
+`flow-tolerance` tiebreaker.
+
+The layout model and the placement algorithm are described in
+[Introducing CSS Grid Lanes](https://webkit.org/blog/17660/introducing-css-grid-lanes/)
+on the WebKit blog. This package implements the same model in
+JavaScript so it works today on browsers that do not yet support
+`display: grid-lanes` natively; the skyline + tolerance core is
+adapted from Simon Willison's
+[CSS Grid Lanes Polyfill](https://tools.simonwillison.net/grid-lanes-polyfill.js)
+(MIT). Once native support lands across browsers, the polyfill can
+be removed without any public API change.
 
 ### Usage
 
