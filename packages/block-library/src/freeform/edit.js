@@ -35,10 +35,8 @@ export default function FreeformEdit( {
 	const [ isOpen, setOpen ] = useState( false );
 	const editButtonRef = useRef( null );
 
-	const { canRemove } = useSelect(
-		( select ) => ( {
-			canRemove: select( blockEditorStore ).canRemoveBlock( clientId ),
-		} ),
+	const canRemove = useSelect(
+		( select ) => select( blockEditorStore ).canRemoveBlock( clientId ),
 		[ clientId ]
 	);
 
