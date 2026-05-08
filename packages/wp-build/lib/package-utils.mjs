@@ -7,10 +7,11 @@ import path from 'path';
 
 /**
  * Shared cache for package.json files to avoid redundant reads.
- * Cache is keyed by the full package name from package.json's name field.
+ * Cache is keyed by package name and the package root used for resolution.
  */
 const packageJsonCache = new Map();
 const packagePathCache = new Map();
+const packageJsonPathCache = new Map();
 
 /**
  * @typedef  {Object} PackageJson
@@ -23,6 +24,8 @@ const packagePathCache = new Map();
  * @property {string}                 [main]                  Main entry point.
  * @property {string}                 [module]                ES module entry point.
  * @property {string}                 [react-native]          React Native entry point.
+ * @property {boolean}                [wpCore]                Whether to include the package in WordPress Core builds.
+ * @property {string}                 [wpCoreStub]            Stub entry point for WordPress Core builds.
  * @property {Record<string, string>} [dependencies]          Runtime dependencies.
  * @property {Record<string, string>} [devDependencies]       Development dependencies.
  * @property {Record<string, string>} [peerDependencies]      Peer dependencies.
@@ -74,7 +77,6 @@ function findPackageRoot( startDir ) {
  * @return {PackageJson|null} Package.json object or null if not found.
  */
 export function getPackageInfo( fullPackageName, resolveDir = null ) {
-	// Determine the package root for cache keying
 	const packageRoot = resolveDir
 		? findPackageRoot( resolveDir )
 		: process.cwd();
@@ -84,14 +86,37 @@ export function getPackageInfo( fullPackageName, resolveDir = null ) {
 		return packageJsonCache.get( cacheKey );
 	}
 
-	// Resolve from the package root context to get correct versions
-	const contextPath = path.join( packageRoot, 'package.json' );
-	const require = createRequire( contextPath );
-	const resolved = require.resolve( `${ fullPackageName }/package.json` );
-	const result = getPackageInfoFromFile( resolved );
+	const packageJsonPath = getPackageJsonPath( fullPackageName, resolveDir );
+	const result = getPackageInfoFromFile( packageJsonPath );
 	packageJsonCache.set( cacheKey, result );
 
 	return result;
+}
+
+/**
+ * Get package.json path using Node's module resolution.
+ *
+ * @param {string}      fullPackageName The full package name (e.g., '@wordpress/blocks').
+ * @param {string|null} resolveDir      Optional directory context for resolution (from esbuild).
+ * @return {string} Absolute path to the resolved package.json file.
+ */
+export function getPackageJsonPath( fullPackageName, resolveDir = null ) {
+	const packageRoot = resolveDir
+		? findPackageRoot( resolveDir )
+		: process.cwd();
+	const cacheKey = `${ fullPackageName }@${ packageRoot }`;
+
+	if ( packageJsonPathCache.has( cacheKey ) ) {
+		return packageJsonPathCache.get( cacheKey );
+	}
+
+	const contextPath = path.join( packageRoot, 'package.json' );
+	const require = createRequire( contextPath );
+	const packageJsonPath = require.resolve(
+		`${ fullPackageName }/package.json`
+	);
+	packageJsonPathCache.set( cacheKey, packageJsonPath );
+	return packageJsonPath;
 }
 
 /**

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+- Exclude the package from WordPress Core build artifacts.
+
 ## 1.40.0 (2026-02-18)
 
 ## 1.39.0 (2026-01-29)

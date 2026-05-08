@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+- Add package property ordering for WordPress Core build metadata.
+
 ## 5.40.0 (2026-02-18)
 
 ## 5.39.0 (2026-01-29)

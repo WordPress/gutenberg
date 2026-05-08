@@ -58,6 +58,8 @@ const defaultConfig = {
 				'module',
 				'exports',
 				'react-native',
+				'wpCore',
+				'wpCoreStub',
 				'wpScript',
 				'wpScriptModuleExports',
 				'types',

@@ -56,6 +56,31 @@ or via npm script:
 
 Configure your `package.json` with the following optional fields:
 
+### `wpCore`
+
+Controls whether the package is included in WordPress Core-targeted bundled artifacts when `IS_WORDPRESS_CORE` is true.
+
+- **Omitted or `true` (default)**: The package is included in WordPress Core builds when it otherwise qualifies as a WordPress script or module.
+
+- **`false`**: The package is omitted from WordPress Core script/module output. The package can still be transpiled and consumed as an npm dependency.
+
+```json
+{
+	"wpCore": false
+}
+```
+
+### `wpCoreStub`
+
+Defines a package-local stub entry point to use when another package imports a package excluded from WordPress Core builds with `wpCore: false`.
+
+```json
+{
+	"wpCore": false,
+	"wpCoreStub": "src/core-stub.ts"
+}
+```
+
 ### `wpScript`
 
 Controls whether the package is exposed as a bundled WordPress script/module and accessible via the configured global variable.

@@ -40,6 +40,8 @@
 		"./package.json": "./package.json"
 	},
 	"react-native": "src/index",
+	"wpCore": false,
+	"wpCoreStub": "src/core-stub.ts",
 	"wpScript": true,
 	"types": "build-types",
 	"sideEffects": false,

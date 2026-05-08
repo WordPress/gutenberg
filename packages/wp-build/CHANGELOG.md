@@ -4,6 +4,7 @@
 
 ### Enhancements
 
+- Add package-level support for excluding scripts and modules from WordPress Core builds.
 - Avoid unexpected results when typecasting `IS_GUTENBERG_PLUGIN` and `IS_WORDPRESS_CORE` values to Booleans ([#75844](https://github.com/WordPress/gutenberg/pull/75844)).
 - Skip PHP transforms during builds when building for WordPress Core ([#75844](https://github.com/WordPress/gutenberg/pull/75844)).
 

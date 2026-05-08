@@ -127,6 +127,20 @@ const boolConfigVal = ( value ) => {
 	return [ 'true', '1' ].includes( value.toLowerCase() );
 };
 
+const isWordPressCoreBuild = () =>
+	boolConfigVal( process.env.IS_WORDPRESS_CORE ) ??
+	boolConfigVal( process.env.npm_package_config_IS_WORDPRESS_CORE ) ??
+	false;
+
+/**
+ * Check whether a package should be included in WordPress Core builds.
+ *
+ * @param {import('./package-utils.mjs').PackageJson} packageJson Package.json object.
+ * @return {boolean} Whether the package should be included in WordPress Core builds.
+ */
+const shouldIncludePackageInWordPressCoreBuild = ( packageJson ) =>
+	! ( isWordPressCoreBuild() && packageJson.wpCore === false );
+
 const baseDefine = {
 	'globalThis.IS_GUTENBERG_PLUGIN': JSON.stringify(
 		boolConfigVal( process.env.IS_GUTENBERG_PLUGIN ) ??
@@ -135,11 +149,7 @@ const baseDefine = {
 			) ??
 			false
 	),
-	'globalThis.IS_WORDPRESS_CORE': JSON.stringify(
-		boolConfigVal( process.env.IS_WORDPRESS_CORE ) ??
-			boolConfigVal( process.env.npm_package_config_IS_WORDPRESS_CORE ) ??
-			false
-	),
+	'globalThis.IS_WORDPRESS_CORE': JSON.stringify( isWordPressCoreBuild() ),
 };
 const getDefine = ( scriptDebug ) => ( {
 	...baseDefine,
@@ -347,8 +357,7 @@ function transformPhpContent( content, transforms ) {
 	 * necessary to perform these steps.
 	 */
 	if (
-		boolConfigVal( process.env.IS_WORDPRESS_CORE ) ??
-		boolConfigVal( process.env.npm_package_config_IS_WORDPRESS_CORE )
+		isWordPressCoreBuild()
 	) {
 		return content;
 	}
@@ -492,6 +501,10 @@ async function bundlePackage( packageName, options = {} ) {
 	const packageJson = getPackageInfoFromFile(
 		path.join( sourceDir, packageName, 'package.json' )
 	);
+
+	if ( ! shouldIncludePackageInWordPressCoreBuild( packageJson ) ) {
+		return false;
+	}
 
 	const builds = [];
 
@@ -1830,9 +1843,7 @@ async function buildAll( baseUrlExpression ) {
 	} );
 
 	// When building for WordPress Core, exclude experimental pages.
-	const isCoreBuild =
-		boolConfigVal( process.env.IS_WORDPRESS_CORE ) ??
-		boolConfigVal( process.env.npm_package_config_IS_WORDPRESS_CORE );
+	const isCoreBuild = isWordPressCoreBuild();
 	const activePages = isCoreBuild
 		? normalizedPages.filter( ( page ) => ! page.experimental )
 		: normalizedPages;
@@ -2197,10 +2208,7 @@ async function main() {
 			'base-url': {
 				type: 'string',
 				default:
-					boolConfigVal( process.env.IS_WORDPRESS_CORE ) ??
-					boolConfigVal(
-						process.env.npm_package_config_IS_WORDPRESS_CORE
-					)
+					isWordPressCoreBuild()
 						? "includes_url( 'build/' )"
 						: 'plugin_dir_url( __FILE__ )',
 			},

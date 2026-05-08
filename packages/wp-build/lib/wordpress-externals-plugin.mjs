@@ -9,7 +9,35 @@ import { createHash } from 'crypto';
 /**
  * Internal dependencies
  */
-import { getPackageInfo } from './package-utils.mjs';
+import { getPackageInfo, getPackageJsonPath } from './package-utils.mjs';
+
+/**
+ * Interprets a configuration value as a boolean, where `"true"` and `"1"`
+ * are considered true while all other values are false.
+ *
+ * @param {string|undefined} value The configuration value to interpret.
+ * @return {boolean|undefined} Boolean interpretation of the given configuration value, or undefined if not set.
+ */
+const boolConfigVal = ( value ) => {
+	if ( value === undefined ) {
+		return undefined;
+	}
+	return [ 'true', '1' ].includes( value.toLowerCase() );
+};
+
+const isWordPressCoreBuild = () =>
+	boolConfigVal( process.env.IS_WORDPRESS_CORE ) ??
+	boolConfigVal( process.env.npm_package_config_IS_WORDPRESS_CORE ) ??
+	false;
+
+/**
+ * Check whether a package should be excluded from WordPress Core builds.
+ *
+ * @param {import('./package-utils.mjs').PackageJson} packageJson Package.json object.
+ * @return {boolean} Whether the package is excluded from WordPress Core builds.
+ */
+const isExcludedFromWordPressCoreBuild = ( packageJson ) =>
+	isWordPressCoreBuild() && packageJson.wpCore === false;
 
 /**
  * Generate a content hash from file contents.
@@ -220,6 +248,28 @@ export function createWordpressExternalsPlugin(
 
 							if ( ! packageJson ) {
 								return undefined;
+							}
+
+							if (
+								isExcludedFromWordPressCoreBuild( packageJson )
+							) {
+								if ( ! packageJson.wpCoreStub ) {
+									throw new Error(
+										`${ packageName } is excluded from WordPress Core builds, but does not define a wpCoreStub.`
+									);
+								}
+
+								return {
+									path: path.resolve(
+										path.dirname(
+											getPackageJsonPath(
+												packageName,
+												args.resolveDir
+											)
+										),
+										packageJson.wpCoreStub
+									),
+								};
 							}
 
 							let isScriptModule = isScriptModuleImport(
