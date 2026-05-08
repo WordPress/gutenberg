@@ -729,60 +729,6 @@ function CustomResizeHandle( {
 	);
 }
 
-export const CustomResizeHandleStory: Story = {
-	name: 'Custom Resize Handle',
-	args: {
-		columns: 6,
-		spacing: 2,
-		rowHeight: 80,
-		editMode: true,
-		layout: [
-			{ key: 'a', width: 2, height: 1 },
-			{ key: 'b', width: 4, height: 1 },
-			{ key: 'c', width: 3, height: 2 },
-			{ key: 'd', width: 3, height: 1 },
-			{ key: 'e', width: 3, height: 1 },
-		],
-	},
-	render: function CustomResizeHandleRender( args ) {
-		const [ layout, setLayout ] = useState< DashboardGridLayoutItem[] >(
-			args.layout
-		);
-
-		const tiles = useMemo(
-			() => [
-				<Tile key="a" tone="brand">
-					A
-				</Tile>,
-				<Tile key="b" tone="info">
-					B
-				</Tile>,
-				<Tile key="c" tone="success">
-					C
-				</Tile>,
-				<Tile key="d" tone="warning">
-					D
-				</Tile>,
-				<Tile key="e" tone="error">
-					E
-				</Tile>,
-			],
-			[]
-		);
-
-		return (
-			<DashboardGrid
-				{ ...args }
-				layout={ layout }
-				onChangeLayout={ setLayout }
-				renderResizeHandle={ CustomResizeHandle }
-			>
-				{ tiles }
-			</DashboardGrid>
-		);
-	},
-};
-
 /**
  * Drop-in wrapper that bumps the dragged-clone shadow and clips its
  * corners. The grid keeps the lift scale and the grabbing cursor on
@@ -804,16 +750,18 @@ function CustomDragPreview( { children }: DragPreviewRenderProps ) {
 }
 
 /**
- * Demonstrates the two ways to customize the drag and placeholder
- * visuals:
+ * Exercises the three customization vectors on a single grid:
  *
- * 1. `renderDragPreview` wraps the cloned tile in `<DragOverlay>`
- *    with consumer-owned chrome (shadow, radius, overflow).
- * 2. CSS custom properties on any ancestor retheme the lift scale,
- *    the placeholder opacity, the placeholder outline color, and the
- *    placeholder border-radius without touching the package.
+ * 1. `renderResizeHandle` swaps the default corner triangle for a
+ *    custom diagonal-arrow icon.
+ * 2. `renderDragPreview` wraps the dragged clone with extra chrome
+ *    (stronger shadow, rounded corners, overflow clipping).
+ * 3. CSS custom properties on an ancestor retheme the lift scale,
+ *    placeholder opacity, placeholder outline color, and placeholder
+ *    border-radius without touching the package.
  *
- * Toggle `editMode`, then drag a tile to see both surfaces respond.
+ * Toggle `editMode`, then drag and resize a tile to see all three
+ * respond.
  */
 export const Customization: Story = {
 	args: {
@@ -869,6 +817,7 @@ export const Customization: Story = {
 					{ ...args }
 					layout={ layout }
 					onChangeLayout={ setLayout }
+					renderResizeHandle={ CustomResizeHandle }
 					renderDragPreview={ CustomDragPreview }
 				>
 					{ tiles }
