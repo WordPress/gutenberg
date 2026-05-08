@@ -3,7 +3,7 @@
 /**
  * External dependencies
  */
-import { readFile, writeFile, copyFile, mkdir, unlink } from 'fs/promises';
+import { readFile, writeFile, copyFile, mkdir, unlink, rm } from 'fs/promises';
 import path from 'path';
 import { createHash } from 'node:crypto';
 import { parseArgs } from 'node:util';
@@ -480,6 +480,22 @@ function resolveEntryPoint( packageDir, packageJson ) {
 }
 
 /**
+ * Remove generated build output for a package.
+ *
+ * @param {string} packageName Package name.
+ */
+async function removePackageBuildOutput( packageName ) {
+	await Promise.all(
+		[ 'scripts', 'modules', 'styles' ].map( ( buildType ) =>
+			rm( path.join( BUILD_DIR, buildType, packageName ), {
+				force: true,
+				recursive: true,
+			} )
+		)
+	);
+}
+
+/**
  * Bundle a package for WordPress using esbuild.
  *
  * @param {string} packageName Package name.
@@ -503,6 +519,7 @@ async function bundlePackage( packageName, options = {} ) {
 	);
 
 	if ( ! shouldIncludePackageInWordPressCoreBuild( packageJson ) ) {
+		await removePackageBuildOutput( packageName );
 		return false;
 	}
 
