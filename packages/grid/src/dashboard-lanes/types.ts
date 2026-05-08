@@ -6,11 +6,11 @@ import type { ResizeHandleRenderProps } from '../shared/types';
 /**
  * Lanes layout item definition.
  *
- * Mirrors the public surface of `display: grid-lanes`: only the
- * column span and an optional source order. Heights are content-
- * driven; there is no `height` field. There is no `'fill'` (lanes
- * pack their items by skyline; nothing is "left over"). `'full'`
- * is expressed by setting `width` to the lane count.
+ * Mirrors the public surface of `display: grid-lanes`: column span,
+ * an optional pinned lane, and an optional source order. Heights are
+ * content-driven; there is no `height` field. There is no `'fill'`
+ * (lanes pack their items by skyline; nothing is "left over").
+ * `'full'` is expressed by setting `width` to the lane count.
  */
 export type DashboardLanesLayoutItem = {
 	/**
@@ -25,6 +25,14 @@ export type DashboardLanesLayoutItem = {
 	 * @default 1
 	 */
 	width?: number;
+
+	/**
+	 * Pin the item to a specific 0-indexed lane. Pinned items are
+	 * placed before auto items, so the auto flow runs around them.
+	 * Out-of-range values (negative, or beyond `columns - width`) are
+	 * clamped to the available range.
+	 */
+	lane?: number;
 
 	/**
 	 * Display order. Lower values render first. When omitted, the

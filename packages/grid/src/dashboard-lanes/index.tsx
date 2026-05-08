@@ -200,7 +200,9 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 		const items = itemsRef.current.arr;
 
 		// Placement input for the hook: each item with its clamped span
-		// in source (sorted) order.
+		// in source (sorted) order. `lane` forwards the optional explicit
+		// pin from the layout item; the algorithm clamps out-of-range
+		// values, so no surface-level guard is needed.
 		const placementItems = useMemo( () => {
 			return items.map( ( key ) => {
 				const item = layoutMap.get( key );
@@ -209,7 +211,7 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 					typeof width === 'number'
 						? Math.max( 1, Math.min( width, effectiveColumns ) )
 						: 1;
-				return { key, span };
+				return { key, span, lane: item?.lane };
 			} );
 		}, [ items, layoutMap, effectiveColumns ] );
 

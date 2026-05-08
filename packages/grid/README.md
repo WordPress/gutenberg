@@ -233,6 +233,7 @@ Each child **must** have a `key` prop that matches an entry in the
 interface DashboardLanesLayoutItem {
 	key: string;     // matches child key
 	width?: number;  // lanes to span (default 1)
+	lane?: number;   // 0-indexed: pin to a specific lane
 	order?: number;  // lower values render first
 }
 ```
@@ -245,6 +246,11 @@ in a row; the algorithm always finds a lane.
 
 `'full'` (span the entire surface width) is expressed by setting
 `width` to the lane count.
+
+To anchor a tile to a specific column, set `lane` to its 0-indexed
+position. Pinned tiles are placed before auto-placed ones, so auto
+items flow around them; out-of-range values (negative, or beyond
+`columns - width`) are clamped.
 
 ### Props
 
