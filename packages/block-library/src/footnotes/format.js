@@ -36,6 +36,7 @@ export const format = {
 	className: 'fn',
 	attributes: {
 		'data-fn': 'data-fn',
+		'data-fn-content': 'data-fn-content',
 	},
 	interactive: true,
 	contentEditable: false,
@@ -132,6 +133,7 @@ export const format = {
 							type: formatName,
 							attributes: {
 								'data-fn': id,
+								'data-fn-content': '',
 							},
 							innerHTML: `<a href="#${ id }" id="${ id }-link">*</a>`,
 						},
