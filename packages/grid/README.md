@@ -278,8 +278,9 @@ once at mount.
 
 - When supported (Safari 26+, others as the spec ships), the
   component emits `display: grid-lanes` and the spec's CSS, and lets
-  the engine handle layout. No JS observers are mounted; layout cost
-  is zero on the JS side.
+  the engine handle layout. The placement layer mounts no per-tile
+  observers; the only `ResizeObserver` left is the container-width
+  one used for responsive mode and resize-step math.
 - When unsupported, an internal hook (`useLanePlacement`) measures
   each tile's height with a `ResizeObserver`, runs the source-ordered
   shortest-lane algorithm, and emits explicit `grid-column-start`
@@ -342,10 +343,13 @@ Resize handles are currently pointer-only.
 ### Custom resize handle
 
 Both components accept a `renderResizeHandle` prop to override the
-default visual. The grid still owns the gesture (`<DndContext>`,
-throttled delta loop, step-to-grid logic) and passes the wiring as
-props. Spread `listeners` and `attributes` and assign `ref` on the
-element that should receive pointer events.
+default visual. The surface owns the resize math (column/row
+stepping, throttled delta loop, layout commit) and passes the
+gesture wiring (`ref`, `listeners`, `attributes`) as props for the
+consumer to spread on the element that should receive pointer
+events. The dnd-kit `<DndContext>` for the resize gesture is
+internal to the handle wrapper; consumers do not need to mount
+their own.
 
 ```jsx
 import { Icon } from '@wordpress/ui';
