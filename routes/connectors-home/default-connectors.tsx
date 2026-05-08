@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { Button } from '@wordpress/components';
+import { __experimentalHStack as HStack, Button } from '@wordpress/components';
 import { useRef } from '@wordpress/element';
 import {
 	__experimentalRegisterConnector as registerConnector,
@@ -13,7 +13,7 @@ import {
 } from '@wordpress/connectors';
 import { select } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
-import { Badge, Link, Stack } from '@wordpress/ui';
+import { Badge, Link } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -189,7 +189,7 @@ function ApiKeyConnector( {
 			name={ name }
 			description={ description }
 			actionArea={
-				<Stack direction="row" gap="md" align="center">
+				<HStack spacing={ 3 } expanded={ false }>
 					{ isConnected && <ConnectedBadge /> }
 					{ showUnavailableBadge &&
 						( pluginSlug ? (
@@ -214,7 +214,7 @@ function ApiKeyConnector( {
 							{ getButtonLabel() }
 						</Button>
 					) }
-				</Stack>
+				</HStack>
 			}
 		>
 			{ isExpanded && pluginStatus === 'active' && (
