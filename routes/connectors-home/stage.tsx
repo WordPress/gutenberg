@@ -93,10 +93,6 @@ function ConnectorsPage() {
 		( slug ) => ! installedPluginSlugs.has( slug )
 	);
 	const isEmpty = renderableConnectors.length === 0;
-	const searchUrl =
-		canInstallPlugins && ! isFileModsDisabled
-			? 'plugin-install.php?s=connector&tab=search&type=tag'
-			: __( 'https://wordpress.org/plugins/search/ai-connectors/' );
 
 	return (
 		<Page
@@ -177,19 +173,21 @@ function ConnectorsPage() {
 						</VStack>
 					</VStack>
 				) }
-				<p>
-					{ createInterpolateElement(
-						__(
-							'If the connector you need is not listed, <a>search the plugin directory</a> to see if a connector is available.'
-						),
-						{
-							a: (
-								// eslint-disable-next-line jsx-a11y/anchor-has-content
-								<a href={ searchUrl } />
+				{ canInstallPlugins && ! isFileModsDisabled && (
+					<p>
+						{ createInterpolateElement(
+							__(
+								'If the connector you need is not listed, <a>search the plugin directory</a> to see if a connector is available.'
 							),
-						}
-					) }
-				</p>
+							{
+								a: (
+									// eslint-disable-next-line jsx-a11y/anchor-has-content
+									<a href="plugin-install.php?s=connector&tab=search&type=tag" />
+								),
+							}
+						) }
+					</p>
+				) }
 			</div>
 		</Page>
 	);

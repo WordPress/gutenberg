@@ -547,7 +547,7 @@ test.describe( 'Connectors', () => {
 					page.getByRole( 'link', {
 						name: 'search the plugin directory',
 					} )
-				).toBeVisible();
+				).toBeHidden();
 			} );
 		} );
 	} );
