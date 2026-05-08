@@ -17,6 +17,7 @@ import { addQueryArgs } from '@wordpress/url';
 import {
 	wordpress,
 	arrowUpLeft,
+	arrowUpRight,
 	chevronLeft,
 	chevronRight,
 } from '@wordpress/icons';
@@ -167,7 +168,7 @@ function FullscreenModeClose( { showTooltip, icon, href, initialPost } ) {
 					) }
 					variants={ ! disableMotion && toggleHomeIconVariants }
 				>
-					<Icon icon={ arrowUpLeft } />
+					<Icon icon={ isRTL() ? arrowUpRight : arrowUpLeft } />
 				</motion.div>
 			) }
 		</motion.div>

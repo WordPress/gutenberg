@@ -8,11 +8,11 @@ import clsx from 'clsx';
  */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { Button, __experimentalHStack as HStack } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, isRTL } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { memo, forwardRef, useContext } from '@wordpress/element';
-import { Icon, arrowUpLeft, search } from '@wordpress/icons';
+import { Icon, arrowUpLeft, arrowUpRight, search } from '@wordpress/icons';
 import { store as commandsStore } from '@wordpress/commands';
 import { displayShortcut } from '@wordpress/keycodes';
 import { VisuallyHidden } from '@wordpress/ui';
@@ -201,7 +201,12 @@ export const SiteHubMobile = memo(
 							{ ...backButtonProps }
 						>
 							{ isAdminBarInEditorEnabled ? (
-								<Icon icon={ arrowUpLeft } size={ 48 } />
+								<Icon
+									icon={
+										isRTL() ? arrowUpRight : arrowUpLeft
+									}
+									size={ 48 }
+								/>
 							) : (
 								<SiteIcon className="edit-site-layout__view-mode-toggle-icon" />
 							) }

@@ -14,14 +14,14 @@ import {
 	privateApis as editorPrivateApis,
 	store as editorStore,
 } from '@wordpress/editor';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, isRTL, sprintf } from '@wordpress/i18n';
 import { store as coreDataStore } from '@wordpress/core-data';
 import { privateApis as blockLibraryPrivateApis } from '@wordpress/block-library';
 import { useCallback } from '@wordpress/element';
 import { store as noticesStore } from '@wordpress/notices';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { decodeEntities } from '@wordpress/html-entities';
-import { Icon, arrowUpLeft } from '@wordpress/icons';
+import { Icon, arrowUpLeft, arrowUpRight } from '@wordpress/icons';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { addQueryArgs } from '@wordpress/url';
 
@@ -289,7 +289,13 @@ export default function EditSiteEditor( { isHomeRoute = false } ) {
 										</Button>
 										{ isAdminBarInEditorEnabled ? (
 											<div className="edit-site-editor__back-icon">
-												<Icon icon={ arrowUpLeft } />
+												<Icon
+													icon={
+														isRTL()
+															? arrowUpRight
+															: arrowUpLeft
+													}
+												/>
 											</div>
 										) : (
 											<motion.div
@@ -305,7 +311,13 @@ export default function EditSiteEditor( { isHomeRoute = false } ) {
 													toggleHomeIconVariants
 												}
 											>
-												<Icon icon={ arrowUpLeft } />
+												<Icon
+													icon={
+														isRTL()
+															? arrowUpRight
+															: arrowUpLeft
+													}
+												/>
 											</motion.div>
 										) }
 									</motion.div>
