@@ -80,7 +80,7 @@ describe( 'WidgetDashboard.Actions', () => {
 		expect( onEditChange ).toHaveBeenCalledTimes( 2 );
 
 		// TODO: drop once Done has its own committed behavior; today it logs.
-		// eslint-disable-next-line jest/no-standalone-expect
+
 		expect( console ).toHaveLogged( 'done' );
 	} );
 

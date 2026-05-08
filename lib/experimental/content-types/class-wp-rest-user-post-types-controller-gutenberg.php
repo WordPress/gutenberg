@@ -309,6 +309,13 @@ class WP_REST_User_Post_Types_Controller_Gutenberg extends WP_REST_Posts_Control
 		$data    = $response->get_data();
 		$post_id = (int) $data['id'];
 		$this->sync_taxonomy_associations( $post_id, $request );
+
+		// A new record published in this request will register on the next
+		// `init`, so the rewrite rules need to follow.
+		if ( 'publish' === get_post_status( $post_id ) ) {
+			gutenberg_user_content_types_schedule_flush_rewrite_rules();
+		}
+
 		$post = get_post( $post_id );
 		if ( $post instanceof WP_Post ) {
 			$refreshed = $this->prepare_item_for_response( $post, $request );
@@ -327,9 +334,13 @@ class WP_REST_User_Post_Types_Controller_Gutenberg extends WP_REST_Posts_Control
 	 * @return WP_REST_Response|WP_Error
 	 */
 	public function update_item( $request ) {
-		$post_id       = (int) $request['id'];
-		$existing      = get_post( $post_id );
-		$previous_slug = $existing instanceof WP_Post ? (string) $existing->post_name : '';
+		$post_id         = (int) $request['id'];
+		$existing        = get_post( $post_id );
+		$previous_slug   = $existing instanceof WP_Post ? (string) $existing->post_name : '';
+		$previous_status = $existing instanceof WP_Post ? (string) $existing->post_status : '';
+		$previous_config = $existing instanceof WP_Post
+			? self::decode_stored_config( $existing->post_content )
+			: array();
 
 		$response = parent::update_item( $request );
 		if ( is_wp_error( $response ) ) {
@@ -343,6 +354,10 @@ class WP_REST_User_Post_Types_Controller_Gutenberg extends WP_REST_Posts_Control
 		$this->sync_taxonomy_associations( $post_id, $request );
 
 		$post = get_post( $post_id );
+		if ( $post instanceof WP_Post && self::update_needs_rewrite_flush( $previous_status, $previous_slug, $previous_config, $post ) ) {
+			gutenberg_user_content_types_schedule_flush_rewrite_rules();
+		}
+
 		if ( $post instanceof WP_Post ) {
 			$refreshed = $this->prepare_item_for_response( $post, $request );
 			if ( ! is_wp_error( $refreshed ) ) {
@@ -361,11 +376,15 @@ class WP_REST_User_Post_Types_Controller_Gutenberg extends WP_REST_Posts_Control
 	 * @return WP_REST_Response|WP_Error
 	 */
 	public function delete_item( $request ) {
-		// Capture the slug before the parent runs — once force-delete fires
-		// the post is gone and `post_name` is no longer reachable.
-		$force    = ! empty( $request['force'] );
-		$slug     = $force ? (string) get_post_field( 'post_name', (int) $request['id'] ) : '';
-		$response = parent::delete_item( $request );
+		// Capture the slug and pre-delete status before the parent runs —
+		// once force-delete fires the post is gone and `post_name` /
+		// `post_status` are no longer reachable, and trash will have already
+		// transitioned the row's status by the time we read it back.
+		$force          = ! empty( $request['force'] );
+		$existing       = get_post( (int) $request['id'] );
+		$slug           = ( $force && $existing instanceof WP_Post ) ? (string) $existing->post_name : '';
+		$was_registered = $existing instanceof WP_Post && 'publish' === $existing->post_status;
+		$response       = parent::delete_item( $request );
 		if ( is_wp_error( $response ) ) {
 			return $response;
 		}
@@ -373,6 +392,13 @@ class WP_REST_User_Post_Types_Controller_Gutenberg extends WP_REST_Posts_Control
 			foreach ( self::get_user_taxonomy_ids_with_meta( $slug ) as $tax_id ) {
 				gutenberg_user_taxonomy_detach_object_type( $tax_id, $slug );
 			}
+		}
+		// Either trash (publish → trash) or force-delete on a previously
+		// published record removes it from the next `init`'s registration,
+		// so the rewrite rules need to follow. Drafts were never registered;
+		// nothing to flush.
+		if ( $was_registered ) {
+			gutenberg_user_content_types_schedule_flush_rewrite_rules();
 		}
 		return $response;
 	}
@@ -554,6 +580,76 @@ class WP_REST_User_Post_Types_Controller_Gutenberg extends WP_REST_Posts_Control
 			gutenberg_user_taxonomy_detach_object_type( $tax_id, $previous_slug );
 			gutenberg_user_taxonomy_attach_object_type( $tax_id, $current_slug );
 		}
+	}
+
+	/**
+	 * Decides whether an `update_item` mutation needs the rewrite rules
+	 * regenerated. Triggers on:
+	 *   - status crossing the `publish` boundary in either direction (a
+	 *     record going from active → inactive or back, which toggles
+	 *     `register_post_type()` on next `init`),
+	 *   - while remaining published, a change in slug, `has_archive`,
+	 *     `public`, or `hierarchical`. `hierarchical` flips the rewrite
+	 *     tag regex between `(.+?)` (nested) and `([^/]+)` (flat) and
+	 *     swaps the query-var fallback between `pagename=` and `name=`.
+	 *
+	 * Other config edits (labels, supports, taxonomies, description,
+	 * show_in_rest) don't affect rewrite rules and are skipped so we
+	 * don't flush on every label tweak.
+	 *
+	 * @param string  $previous_status Status the record had before update.
+	 * @param string  $previous_slug   Slug before update.
+	 * @param array   $previous_config Decoded config before update.
+	 * @param WP_Post $current_post    Record after update.
+	 * @return bool
+	 */
+	private static function update_needs_rewrite_flush( $previous_status, $previous_slug, $previous_config, WP_Post $current_post ) {
+		$current_status = (string) $current_post->post_status;
+		$was_active     = 'publish' === $previous_status;
+		$is_active      = 'publish' === $current_status;
+
+		if ( $was_active !== $is_active ) {
+			return true;
+		}
+		if ( ! $is_active ) {
+			// Drafts aren't registered, so config edits between drafts are
+			// irrelevant to rewrite rules.
+			return false;
+		}
+
+		if ( $previous_slug !== (string) $current_post->post_name ) {
+			return true;
+		}
+
+		$current_config = self::decode_stored_config( $current_post->post_content );
+		if ( ! empty( $previous_config['has_archive'] ) !== ! empty( $current_config['has_archive'] ) ) {
+			return true;
+		}
+		if ( ! empty( $previous_config['public'] ) !== ! empty( $current_config['public'] ) ) {
+			return true;
+		}
+		if ( ! empty( $previous_config['hierarchical'] ) !== ! empty( $current_config['hierarchical'] ) ) {
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Decodes the stored `post_content` JSON for a wp_user_post_type record
+	 * down to its sanitized config array. Returns an empty array on invalid
+	 * JSON so callers can use `! empty()` semantics for boolean fields.
+	 *
+	 * @param string $post_content Raw stored JSON.
+	 * @return array
+	 */
+	private static function decode_stored_config( $post_content ) {
+		$decoded = json_decode( (string) $post_content, true );
+		if ( JSON_ERROR_NONE !== json_last_error() || ! is_array( $decoded ) ) {
+			return array();
+		}
+		unset( $decoded[ GUTENBERG_USER_POST_TYPE_CONFIG_MARKER ] );
+		return $decoded;
 	}
 
 	/**

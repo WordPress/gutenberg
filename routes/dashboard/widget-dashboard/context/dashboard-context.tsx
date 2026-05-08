@@ -40,6 +40,7 @@ interface InternalDashboardContextValue {
 	widgetTypes: WidgetType[];
 	layout: DashboardWidget[];
 	onLayoutChange: ( layout: DashboardWidget[] ) => void;
+	onLayoutReset: () => void;
 	editMode: boolean;
 	onEditChange?: ( next: boolean ) => void;
 	resolveWidgetModule: ResolveWidgetModule;
@@ -67,6 +68,7 @@ interface ProviderProps {
 	widgetTypes: WidgetType[];
 	layout: DashboardWidget[];
 	onLayoutChange: ( layout: DashboardWidget[] ) => void;
+	onLayoutReset: () => void;
 	editMode?: boolean;
 	onEditChange?: ( next: boolean ) => void;
 	resolveWidgetModule?: ResolveWidgetModule;
@@ -78,6 +80,7 @@ export function WidgetDashboardProvider( {
 	widgetTypes,
 	layout,
 	onLayoutChange,
+	onLayoutReset,
 	editMode = false,
 	onEditChange,
 	resolveWidgetModule = DEFAULT_RESOLVE_WIDGET_MODULE,
@@ -89,6 +92,7 @@ export function WidgetDashboardProvider( {
 			widgetTypes,
 			layout,
 			onLayoutChange,
+			onLayoutReset,
 			editMode,
 			onEditChange,
 			resolveWidgetModule,
@@ -98,6 +102,7 @@ export function WidgetDashboardProvider( {
 			widgetTypes,
 			layout,
 			onLayoutChange,
+			onLayoutReset,
 			editMode,
 			onEditChange,
 			resolveWidgetModule,

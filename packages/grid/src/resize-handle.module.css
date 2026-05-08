@@ -6,16 +6,6 @@
 	height: 0;
 	z-index: 1;
 	cursor: nwse-resize;
-	/*
-	 * Triangle drawn via borders. Use the per-side logical shorthands
-	 * instead of `border-width: 0` + `border-block-end-width: 12px`:
-	 * the build's CSS optimizer merges the global shorthands into a
-	 * single `border: 0 solid transparent` and emits it AFTER the
-	 * logical longhands, which then loses the cascade and zeroes the
-	 * triangle widths.
-	 */
-	border-block-start: 0 solid transparent;
-	border-inline-end: 0 solid transparent;
 	border-block-end: 12px solid var(--wpds-color-fg-interactive-brand);
 	border-inline-start: 12px solid transparent;
 }

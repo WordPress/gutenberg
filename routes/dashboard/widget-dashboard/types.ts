@@ -287,6 +287,11 @@ export interface WidgetDashboardProps {
 	onLayoutChange: ( layout: DashboardWidget[] ) => void;
 
 	/**
+	 * Called when the layout is reset to the default.
+	 */
+	onLayoutReset?: () => void;
+
+	/**
 	 * Widget types available for rendering. The dashboard never queries a
 	 * store directly — consumers scope and filter via this prop.
 	 */

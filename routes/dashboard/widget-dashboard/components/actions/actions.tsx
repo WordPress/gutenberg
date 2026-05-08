@@ -4,17 +4,21 @@
 import { useCallback, useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 // eslint-disable-next-line @wordpress/use-recommended-components
-import { Button, Stack } from '@wordpress/ui';
+import { AlertDialog, Button, Stack } from '@wordpress/ui';
 
 /**
  * Internal dependencies
  */
 import styles from './actions.module.css';
 import { useDashboardInternalContext } from '../../context/dashboard-context';
+import { useDashboardUIContext } from '../../context/ui-context';
+import { MoreActionsDropdown } from '../more-actions-dropdown';
+import type { MoreActionsDropdownItem } from '../more-actions-dropdown';
 
 /**
  * Renders the dashboard's edit-mode toggle. Shows a "Customize" button while
- * `editMode` is off and a "Done" button while it is on; clicking either fires
+ * `editMode` is off and the edit-mode toolbar (Add widgets, Cancel, Done,
+ * plus a more-actions dropdown) while it is on. Clicking either fires
  * `onEditChange` with the toggled value.
  *
  * Returns `null` when the dashboard is mounted without `onEditChange` so
@@ -24,7 +28,9 @@ import { useDashboardInternalContext } from '../../context/dashboard-context';
  * @return {React.ReactNode} - The Actions component.
  */
 export function Actions(): React.ReactNode {
-	const { editMode, onEditChange } = useDashboardInternalContext();
+	const { editMode, onEditChange, onLayoutReset } =
+		useDashboardInternalContext();
+
 	const [ isEditActionsMounted, setIsEditActionsMounted ] =
 		useState( editMode );
 	const [ isExitingEditActions, setIsExitingEditActions ] = useState( false );
@@ -49,26 +55,37 @@ export function Actions(): React.ReactNode {
 		return () => clearTimeout( exitTimeout );
 	}, [ editMode, isEditActionsMounted ] );
 
+	const { setInserterOpen } = useDashboardUIContext();
+
+	const [ isResetDialogOpen, setIsResetDialogOpen ] = useState( false );
+
 	const handleEditMode = useCallback( () => {
 		onEditChange?.( ! editMode );
 	}, [ editMode, onEditChange ] );
 
-	const handleInsertWidget = useCallback( () => {
-		// eslint-disable-next-line no-console
-		console.log( 'insert widget' ); // TODO: Implement widget insertion
-	}, [] );
+	const insert = useCallback( () => {
+		setInserterOpen( true );
+	}, [ setInserterOpen ] );
 
-	const handleCancel = useCallback( () => {
+	const cancel = useCallback( () => {
 		// eslint-disable-next-line no-console
 		console.log( 'cancel' ); // TODO: Implement cancel\
 		onEditChange?.( false );
 	}, [ onEditChange ] );
 
-	const handleDone = useCallback( () => {
+	const done = useCallback( () => {
 		// eslint-disable-next-line no-console
 		console.log( 'done' ); // TODO: Implement done
 		onEditChange?.( false );
 	}, [ onEditChange ] );
+
+	const moreActionsItems: MoreActionsDropdownItem[] = [
+		{
+			label: __( 'Reset to default' ),
+			onClick: () => setIsResetDialogOpen( true ),
+			disabled: ! onLayoutReset,
+		},
+	];
 
 	if ( ! onEditChange ) {
 		return null;
@@ -90,23 +107,25 @@ export function Actions(): React.ReactNode {
 						variant="minimal"
 						tone="brand"
 						size="compact"
-						onClick={ handleInsertWidget }
+						onClick={ insert }
 					>
 						{ __( 'Add widgets' ) }
 					</Button>
+
 					<Button
 						variant="minimal"
 						tone="brand"
 						size="compact"
-						onClick={ handleCancel }
+						onClick={ cancel }
 					>
 						{ __( 'Cancel' ) }
 					</Button>
+
 					<Button
 						variant="solid"
 						tone="brand"
 						size="compact"
-						onClick={ handleDone }
+						onClick={ done }
 					>
 						{ __( 'Done' ) }
 					</Button>
@@ -121,6 +140,26 @@ export function Actions(): React.ReactNode {
 					{ __( 'Customize' ) }
 				</Button>
 			) }
+			<MoreActionsDropdown items={ moreActionsItems } />
+
+			<AlertDialog.Root
+				open={ isResetDialogOpen }
+				onOpenChange={ setIsResetDialogOpen }
+				onConfirm={ async () => {
+					await onLayoutReset?.();
+					onEditChange?.( false );
+					setIsResetDialogOpen( false );
+				} }
+			>
+				<AlertDialog.Popup
+					intent="irreversible"
+					title={ __( 'Reset dashboard to default?' ) }
+					description={ __(
+						'All customizations will be permanently lost.'
+					) }
+					confirmButtonText={ __( 'Reset' ) }
+				/>
+			</AlertDialog.Root>
 		</Stack>
 	);
 }
