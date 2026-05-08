@@ -7,7 +7,7 @@
 -   `InputControl`: Narrow the TypeScript type of the `label` prop to plain strings ([#77860](https://github.com/WordPress/gutenberg/pull/77860)).
 -   `Select`: `Select.Item` values that are empty strings no longer render with placeholder styling on the trigger. Use the new `placeholder` prop on `Select.Trigger`, or a `null` item value, instead ([#78076](https://github.com/WordPress/gutenberg/pull/78076)).
 -   `Select`: `Select.Trigger` now renders a default `"Select"` placeholder when no value is selected, where it previously rendered empty ([#78076](https://github.com/WordPress/gutenberg/pull/78076)).
--   `Select`: `Select.Item` no longer renders its `value` as fallback item content. Pass item content explicitly as `children` ([#77861](https://github.com/WordPress/gutenberg/pull/77861)).
+-   `Select`: `Select.Item` no longer renders its `value` as fallback item content. Pass item content explicitly as `children`. Migrate `<Select.Item value="Foo" />` to `<Select.Item value="Foo">Foo</Select.Item>` ([#77861](https://github.com/WordPress/gutenberg/pull/77861)).
 
 ### Bug Fixes
 
