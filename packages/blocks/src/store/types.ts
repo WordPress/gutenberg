@@ -136,6 +136,8 @@ export type Action =
 			setValues?: Function;
 			canUserEditValue?: Function;
 			getFieldsList?: Function;
+			getInnerBlocks?: Function;
+			setInnerBlocks?: Function;
 	  }
 	| { type: 'REMOVE_BLOCK_BINDINGS_SOURCE'; name: string };
 

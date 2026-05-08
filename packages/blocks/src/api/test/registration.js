@@ -1780,6 +1780,8 @@ describe( 'blocks', () => {
 				getValues: () => 'value',
 				setValues: () => 'new values',
 				canUserEditValue: () => true,
+				getInnerBlocks: () => [],
+				setInnerBlocks: () => undefined,
 			};
 			registerBlockBindingsSource( {
 				name: 'core/valid-source',

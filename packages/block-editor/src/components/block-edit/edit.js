@@ -19,7 +19,6 @@ import {
 	useContext,
 	useEffect,
 	useMemo,
-	useRef,
 } from '@wordpress/element';
 
 /**
@@ -193,43 +192,39 @@ const EditWithGeneratedProps = ( props ) => {
 	);
 
 	// Handle innerBlocks binding: get inner blocks from the source and sync
-	// them into the block editor store whenever they change.
+	// them into the block editor store when the binding or context changes.
+	// We use useEffect (not useSelect) to avoid an infinite loop: calling
+	// replaceInnerBlocks changes the store, which would re-trigger a useSelect,
+	// which would call replaceInnerBlocks again, and so on.
 	const innerBlocksBinding = blockBindings?.innerBlocks;
 	const innerBlocksBindingSource = innerBlocksBinding
 		? registeredSources[ innerBlocksBinding.source ]
 		: null;
 
-	const boundInnerBlocks = useSelect(
-		( select ) => {
-			if (
-				! innerBlocksBinding ||
-				! innerBlocksBindingSource?.getInnerBlocks
-			) {
-				return undefined;
-			}
-			return innerBlocksBindingSource.getInnerBlocks( {
-				select,
-				context,
-				clientId,
-				binding: innerBlocksBinding,
-			} );
-		},
-		[ innerBlocksBinding, innerBlocksBindingSource, context, clientId ]
-	);
-
-	// Track whether we have already synced the current boundInnerBlocks
-	// value so we can skip redundant dispatches.
-	const prevBoundInnerBlocksRef = useRef( undefined );
 	useEffect( () => {
-		if ( boundInnerBlocks === undefined ) {
+		if (
+			! innerBlocksBinding ||
+			! innerBlocksBindingSource?.getInnerBlocks
+		) {
 			return;
 		}
-		if ( prevBoundInnerBlocksRef.current === boundInnerBlocks ) {
-			return;
+		const blocks = innerBlocksBindingSource.getInnerBlocks( {
+			select: registry.select,
+			context,
+			clientId,
+			binding: innerBlocksBinding,
+		} );
+		if ( blocks !== undefined ) {
+			replaceInnerBlocks( clientId, blocks );
 		}
-		prevBoundInnerBlocksRef.current = boundInnerBlocks;
-		replaceInnerBlocks( clientId, boundInnerBlocks );
-	}, [ clientId, boundInnerBlocks, replaceInnerBlocks ] );
+	}, [
+		clientId,
+		innerBlocksBinding,
+		innerBlocksBindingSource,
+		context,
+		registry.select,
+		replaceInnerBlocks,
+	] );
 
 	const setBoundAttributes = useCallback(
 		( nextAttributes ) => {

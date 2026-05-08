@@ -402,6 +402,10 @@ export function blockBindingsSources(
 						action.setValues && action.canUserEditValue,
 					getFieldsList:
 						action.getFieldsList as BlockBindingsSource[ 'getFieldsList' ],
+					getInnerBlocks:
+						action.getInnerBlocks as BlockBindingsSource[ 'getInnerBlocks' ],
+					setInnerBlocks:
+						action.setInnerBlocks as BlockBindingsSource[ 'setInnerBlocks' ],
 				},
 			};
 		case 'REMOVE_BLOCK_BINDINGS_SOURCE':
