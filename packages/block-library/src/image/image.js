@@ -881,6 +881,9 @@ export default function Image( {
 							linkDestination={ linkDestination }
 							mediaUrl={ ( image && image.source_url ) || url }
 							mediaLink={ image && image.link }
+							attachmentPagesEnabled={
+								settings?.attachmentPagesEnabled !== false
+							}
 							linkTarget={ linkTarget }
 							linkClass={ linkClass }
 							rel={ rel }

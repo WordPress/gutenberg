@@ -259,6 +259,14 @@ function MediaTextEdit( {
 		[ isSelected, mediaId ]
 	);
 
+	const { attachmentPagesEnabled } = useSelect( ( select ) => {
+		return {
+			attachmentPagesEnabled:
+				select( blockEditorStore ).getSettings()
+					?.attachmentPagesEnabled !== false,
+		};
+	}, [] );
+
 	const featuredImageURL = useFeaturedImage
 		? featuredImageMedia?.source_url
 		: '';
@@ -528,6 +536,7 @@ function MediaTextEdit( {
 						mediaType={ mediaType }
 						mediaUrl={ image && image.source_url }
 						mediaLink={ image && image.link }
+						attachmentPagesEnabled={ attachmentPagesEnabled }
 						linkTarget={ linkTarget }
 						linkClass={ linkClass }
 						rel={ rel }

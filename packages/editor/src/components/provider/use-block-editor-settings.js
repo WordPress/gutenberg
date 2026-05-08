@@ -52,6 +52,7 @@ const BLOCK_EDITOR_SETTINGS = [
 	'__experimentalGlobalStylesBaseStyles',
 	'allImageSizes',
 	'alignWide',
+	'attachmentPagesEnabled',
 	'blockInspectorTabs',
 	'maxUploadFileSize',
 	'allowedMimeTypes',

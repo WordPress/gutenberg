@@ -47,6 +47,7 @@ const ImageURLInputUI = ( {
 	mediaType = 'image',
 	mediaUrl,
 	mediaLink,
+	attachmentPagesEnabled = true,
 	linkTarget,
 	linkClass,
 	rel,
@@ -183,7 +184,7 @@ const ImageURLInputUI = ( {
 				icon: image,
 			},
 		];
-		if ( mediaType === 'image' && mediaLink ) {
+		if ( mediaType === 'image' && mediaLink && attachmentPagesEnabled ) {
 			linkDestinations.push( {
 				linkDestination: LINK_DESTINATION_ATTACHMENT,
 				title: __( 'Link to attachment page' ),
