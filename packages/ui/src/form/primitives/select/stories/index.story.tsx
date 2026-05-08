@@ -133,7 +133,6 @@ export const WithNullValueOption: Story = {
 				</Select.Popup>
 			</>
 		),
-		// defaultValue: 'system',
 	},
 };
 
