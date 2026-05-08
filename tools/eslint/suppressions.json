@@ -1621,6 +1621,11 @@
 			"count": 1
 		}
 	},
+	"routes/connectors-home/default-connectors.tsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 1
+		}
+	},
 	"routes/connectors-home/stage.tsx": {
 		"@wordpress/no-non-module-stylesheet-imports": {
 			"count": 1
