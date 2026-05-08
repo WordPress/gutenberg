@@ -8,7 +8,7 @@ import { useState } from '@wordpress/element';
  */
 import { Modal, Popover, Button } from '@wordpress/components';
 import * as Tooltip from '../../../packages/ui/src/tooltip';
-import { WithWpCompatOverlaySlot } from '../../decorators/with-wp-compat-overlay-slot';
+import { WithWpCompatOverlaySlot } from '../../../packages/ui/src/utils/with-wp-compat-overlay-slot';
 
 /**
  * Demonstrates the cross-library stacking promise of the `@wordpress/ui`

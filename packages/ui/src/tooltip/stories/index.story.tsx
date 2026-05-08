@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { formatBold, formatItalic } from '@wordpress/icons';
 import { Icon } from '../../icon';
 import * as Tooltip from '../';
-import { WithWpCompatOverlaySlot } from '../../../../../storybook/decorators/with-wp-compat-overlay-slot';
+import { WithWpCompatOverlaySlot } from '../../utils/with-wp-compat-overlay-slot';
 
 const meta: Meta< typeof Tooltip.Root > = {
 	title: 'Design System/Components/Tooltip',
