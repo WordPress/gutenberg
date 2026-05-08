@@ -14,6 +14,7 @@
 
 ### Enhancements
 
+-   `Select`: Add a `placeholder` prop to `Select.Trigger`, and support `null` item values for clearable placeholder options. A default placeholder is now applied when no initial value is specified ([#78076](https://github.com/WordPress/gutenberg/pull/78076)).
 -   `Drawer`: Fade the popup elevation shadow alongside the slide ([#77800](https://github.com/WordPress/gutenberg/pull/77800)).
 -   `Drawer`: Allow mouse-drag swipe-dismiss in the popup-edge padding gutter ([#77800](https://github.com/WordPress/gutenberg/pull/77800)).
 
