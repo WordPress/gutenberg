@@ -7,7 +7,7 @@ import {
 	useBlockProps,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { useSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	Button,
 	Placeholder,
@@ -38,15 +38,15 @@ export default function FreeformEdit( {
 		( select ) => select( blockEditorStore ).canRemoveBlock( clientId ),
 		[ clientId ]
 	);
+	const { removeBlock } = useDispatch( blockEditorStore );
 
 	// Gated by an experiment so authors can opt into a stronger nudge to
 	// migrate Classic block content ahead of its planned deprecation.
-	const showMigrationNotice =
-		!! window?.__experimentalClassicBlockMigrationNotice;
+	const isDeprecationMode = window.__experimentalClassicBlockMigrationNotice;
 
 	return (
 		<>
-			{ canRemove && ! showMigrationNotice && (
+			{ canRemove && ! isDeprecationMode && (
 				<BlockControls>
 					<ToolbarGroup>
 						<ConvertToBlocksButton clientId={ clientId } />
@@ -64,8 +64,11 @@ export default function FreeformEdit( {
 				</ToolbarGroup>
 			</BlockControls>
 			<div { ...useBlockProps() }>
-				{ showMigrationNotice && (
-					<MigrationNotice clientId={ clientId } />
+				{ isDeprecationMode && canRemove && content && (
+					<MigrationNotice
+						clientId={ clientId }
+						content={ content }
+					/>
 				) }
 				{ content ? (
 					<RawHTML>{ content }</RawHTML>
@@ -73,13 +76,30 @@ export default function FreeformEdit( {
 					<Placeholder
 						icon={ <BlockIcon icon={ classic } /> }
 						label={ __( 'Classic' ) }
-						instructions={ __(
-							'Use the classic editor to add content.'
-						) }
+						instructions={
+							isDeprecationMode
+								? __(
+										'The Classic block is being phased out. It’s recommended to use other blocks for the best editing experience.'
+								  )
+								: __( 'Use the classic editor to add content.' )
+						}
 					>
+						{ isDeprecationMode && canRemove && (
+							<Button
+								__next40pxDefaultSize
+								variant="primary"
+								onClick={ () => removeBlock( clientId ) }
+							>
+								{ __( 'Remove block' ) }
+							</Button>
+						) }
 						<Button
 							__next40pxDefaultSize
-							variant="primary"
+							variant={
+								isDeprecationMode && canRemove
+									? 'secondary'
+									: 'primary'
+							}
 							onClick={ () => setOpen( true ) }
 						>
 							{ __( 'Edit contents' ) }

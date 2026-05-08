@@ -3,7 +3,7 @@
  */
 import { store as blockEditorStore, Warning } from '@wordpress/block-editor';
 import { Button } from '@wordpress/components';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch } from '@wordpress/data';
 import { createBlock, rawHandler, serialize } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 
@@ -11,46 +11,32 @@ import { __ } from '@wordpress/i18n';
  * Block-level deprecation warning rendered when the
  * `gutenberg-classic-block-migration-notice` experiment is enabled.
  *
- * Mirrors the existing `core/missing` deprecation treatment for orphaned
- * Classic blocks: a `Warning` with a primary "Convert to blocks" action and a
- * secondary "Convert to Custom HTML" escape hatch.
+ * Uses the same `Warning` primitive as `core/missing` so the experience is
+ * visually consistent with how the editor already surfaces deprecated blocks,
+ * and offers two migration actions - a primary "Convert to blocks", and a
+ * secondary "Convert to Custom HTML".
+ *
+ * Assumes the parent only mounts this component when the block can be removed
+ * and has non-empty content; both conditions are gated in `freeform/edit.js`.
  *
  * @param {Object} props
  * @param {string} props.clientId Client ID of the Classic block.
+ * @param {string} props.content  Raw HTML content of the Classic block.
  */
-export default function MigrationNotice( { clientId } ) {
+export default function MigrationNotice( { clientId, content } ) {
 	const { replaceBlocks } = useDispatch( blockEditorStore );
-
-	const { block, canRemove } = useSelect(
-		( select ) => {
-			const store = select( blockEditorStore );
-			return {
-				block: store.getBlock( clientId ),
-				canRemove: store.canRemoveBlock( clientId ),
-			};
-		},
-		[ clientId ]
-	);
-
-	if ( ! block || ! canRemove ) {
-		return null;
-	}
-
-	const content = block.attributes?.content ?? '';
-	const hasContent = !! content.trim();
 
 	const convertToBlocks = () => {
 		replaceBlocks(
-			block.clientId,
-			rawHandler( { HTML: serialize( block ) } )
+			clientId,
+			rawHandler( {
+				HTML: serialize( createBlock( 'core/freeform', { content } ) ),
+			} )
 		);
 	};
 
 	const convertToHtmlBlock = () => {
-		replaceBlocks(
-			block.clientId,
-			createBlock( 'core/html', { content } )
-		);
+		replaceBlocks( clientId, createBlock( 'core/html', { content } ) );
 	};
 
 	const actions = [
@@ -59,8 +45,6 @@ export default function MigrationNotice( { clientId } ) {
 			key="convert-to-blocks"
 			variant="primary"
 			onClick={ convertToBlocks }
-			disabled={ ! hasContent }
-			accessibleWhenDisabled
 		>
 			{ __( 'Convert to blocks' ) }
 		</Button>,
@@ -69,8 +53,6 @@ export default function MigrationNotice( { clientId } ) {
 			key="convert-to-html"
 			variant="secondary"
 			onClick={ convertToHtmlBlock }
-			disabled={ ! hasContent }
-			accessibleWhenDisabled
 		>
 			{ __( 'Convert to Custom HTML' ) }
 		</Button>,
