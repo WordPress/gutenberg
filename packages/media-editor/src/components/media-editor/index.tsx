@@ -10,7 +10,7 @@ import {
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
-import { useDispatch, useRegistry } from '@wordpress/data';
+import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import {
 	createPortal,
@@ -97,8 +97,6 @@ export interface MediaEditorFrameProps {
 export interface MediaEditorProps {
 	fields?: Field< Media >[];
 	id: number;
-	media: Media | null;
-	hasEdits: boolean;
 	aspectRatioPresets?: AspectRatioPreset[];
 	onClose?: () => void;
 	onSaved?: ( result: MediaEditorSaveResult ) => void;
@@ -152,6 +150,7 @@ interface HeaderActionsProps {
 	isSaving: boolean;
 	hasMedia: boolean;
 	hasChanges: boolean;
+	isImage: boolean;
 	showCloseButton?: boolean;
 	onCancel: () => void;
 	onSave: () => void;
@@ -161,6 +160,7 @@ function HeaderActions( {
 	isSaving,
 	hasMedia,
 	hasChanges,
+	isImage,
 	showCloseButton = false,
 	onCancel,
 	onSave,
@@ -174,12 +174,14 @@ function HeaderActions( {
 			expanded={ false }
 			gap={ 2 }
 		>
-			<Button
-				size="compact"
-				icon={ keyboard }
-				label={ __( 'Keyboard shortcuts' ) }
-				onClick={ () => setIsShortcutsModalOpen( true ) }
-			/>
+			{ isImage && (
+				<Button
+					size="compact"
+					icon={ keyboard }
+					label={ __( 'Keyboard shortcuts' ) }
+					onClick={ () => setIsShortcutsModalOpen( true ) }
+				/>
+			) }
 			<PinnedItems.Slot scope="media-editor" />
 			<Button
 				size="compact"
@@ -224,8 +226,6 @@ type PendingMetadataEdits = Record< string, unknown > | undefined;
 function MediaEditorContent( {
 	fields = [],
 	id,
-	media,
-	hasEdits,
 	aspectRatioPresets,
 	onClose,
 	onSaved,
@@ -236,6 +236,27 @@ function MediaEditorContent( {
 	shouldCloseOnEsc = false,
 }: MediaEditorProps ) {
 	const cropper = useCropper();
+
+	const { media, hasEdits } = useSelect(
+		( select ) => {
+			const { getEditedEntityRecord, hasEditsForEntityRecord } =
+				select( coreStore );
+			return {
+				media: getEditedEntityRecord(
+					'postType',
+					'attachment',
+					id
+				) as Media,
+				hasEdits: hasEditsForEntityRecord(
+					'postType',
+					'attachment',
+					id
+				),
+			};
+		},
+		[ id ]
+	);
+
 	const hasChanges = cropper.isDirty || hasEdits;
 
 	const registry = useRegistry();
@@ -620,6 +641,7 @@ function MediaEditorContent( {
 				isSaving={ isSaving }
 				hasMedia={ !! media }
 				hasChanges={ hasChanges }
+				isImage={ isImage }
 				showCloseButton={ showCloseButton }
 				onCancel={ handleRequestClose }
 				onSave={ handleSave }

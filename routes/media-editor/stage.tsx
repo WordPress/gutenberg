@@ -50,23 +50,13 @@ function MediaEditorRoute() {
 	const fields = usePostFields( { postType: 'attachment' } );
 	const isStandaloneAdminPage = isMediaEditorAdminPage();
 
-	const { media, hasEdits } = useSelect(
-		( select ) => {
-			const { getEditedEntityRecord, hasEditsForEntityRecord } =
-				select( coreStore );
-			return {
-				media: getEditedEntityRecord(
-					'postType',
-					'attachment',
-					attachmentId
-				) as Media,
-				hasEdits: hasEditsForEntityRecord(
-					'postType',
-					'attachment',
-					attachmentId
-				),
-			};
-		},
+	const media = useSelect(
+		( select ) =>
+			select( coreStore ).getEditedEntityRecord(
+				'postType',
+				'attachment',
+				attachmentId
+			),
 		[ attachmentId ]
 	);
 
@@ -86,8 +76,6 @@ function MediaEditorRoute() {
 	return (
 		<MediaEditor
 			id={ attachmentId }
-			media={ media ?? null }
-			hasEdits={ hasEdits }
 			fields={ fields }
 			onClose={ navigateBack }
 			onSaved={ ( { id: savedId } ) => {

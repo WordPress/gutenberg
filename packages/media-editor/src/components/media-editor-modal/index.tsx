@@ -3,7 +3,6 @@
  */
 import { Modal } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { store as coreStore } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
 import type { Field } from '@wordpress/dataviews';
 
@@ -44,29 +43,6 @@ export function MediaEditorModal( {
 		};
 	}, [] );
 
-	const { media, hasEdits } = useSelect(
-		( select ) => {
-			if ( ! id ) {
-				return { media: null, hasEdits: false };
-			}
-			const { getEditedEntityRecord, hasEditsForEntityRecord } =
-				select( coreStore );
-			return {
-				media: getEditedEntityRecord(
-					'postType',
-					'attachment',
-					id
-				) as Media,
-				hasEdits: hasEditsForEntityRecord(
-					'postType',
-					'attachment',
-					id
-				),
-			};
-		},
-		[ id ]
-	);
-
 	const { closeMediaEditorModal } = useDispatch( mediaEditorStore );
 
 	if ( ! isModalOpen || ! id ) {
@@ -79,8 +55,6 @@ export function MediaEditorModal( {
 	return (
 		<MediaEditor
 			id={ id }
-			media={ media }
-			hasEdits={ hasEdits }
 			fields={ fields }
 			aspectRatioPresets={ aspectRatioPresets }
 			showCloseButton
