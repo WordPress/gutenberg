@@ -22,6 +22,7 @@ import { classic } from '@wordpress/icons';
  * Internal dependencies
  */
 import ConvertToBlocksButton from './convert-to-blocks-button';
+import MigrationNotice from './migration-notice';
 import ModalEdit from './modal';
 
 export default function FreeformEdit( {
@@ -38,9 +39,14 @@ export default function FreeformEdit( {
 		[ clientId ]
 	);
 
+	// Gated by an experiment so authors can opt into a stronger nudge to
+	// migrate Classic block content ahead of its planned deprecation.
+	const showMigrationNotice =
+		!! window?.__experimentalClassicBlockMigrationNotice;
+
 	return (
 		<>
-			{ canRemove && (
+			{ canRemove && ! showMigrationNotice && (
 				<BlockControls>
 					<ToolbarGroup>
 						<ConvertToBlocksButton clientId={ clientId } />
@@ -58,6 +64,9 @@ export default function FreeformEdit( {
 				</ToolbarGroup>
 			</BlockControls>
 			<div { ...useBlockProps() }>
+				{ showMigrationNotice && (
+					<MigrationNotice clientId={ clientId } />
+				) }
 				{ content ? (
 					<RawHTML>{ content }</RawHTML>
 				) : (
