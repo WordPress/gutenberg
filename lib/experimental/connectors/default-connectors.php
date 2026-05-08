@@ -132,7 +132,7 @@ function _gutenberg_register_default_ai_providers( WP_Connector_Registry $regist
 	// Registry values (from provider plugins) take precedence over hardcoded fallbacks.
 	$ai_registry = \WordPress\AiClient\AiClient::defaultRegistry();
 
-	foreach ( $ai_registry->getRegisteredProviderIds() as $connector_id ) {
+	foreach ( array_filter( $ai_registry->getRegisteredProviderIds() ) as $connector_id ) {
 		$provider_class_name = $ai_registry->getProviderClassName( $connector_id );
 		$provider_metadata   = $provider_class_name::metadata();
 
@@ -142,9 +142,11 @@ function _gutenberg_register_default_ai_providers( WP_Connector_Registry $regist
 		if ( $is_api_key ) {
 			$credentials_url = $provider_metadata->getCredentialsUrl();
 			$authentication  = array(
-				'method'          => 'api_key',
-				'credentials_url' => $credentials_url ? $credentials_url : null,
+				'method' => 'api_key',
 			);
+			if ( $credentials_url ) {
+				$authentication['credentials_url'] = $credentials_url;
+			}
 		} else {
 			$authentication = array( 'method' => 'none' );
 		}
@@ -177,8 +179,10 @@ function _gutenberg_register_default_ai_providers( WP_Connector_Registry $regist
 				'description'    => $description ? $description : '',
 				'type'           => 'ai_provider',
 				'authentication' => $authentication,
-				'logo_url'       => $logo_url,
 			);
+			if ( $logo_url ) {
+				$defaults[ $connector_id ]['logo_url'] = $logo_url;
+			}
 		}
 	}
 
@@ -187,33 +191,22 @@ function _gutenberg_register_default_ai_providers( WP_Connector_Registry $regist
 		if ( 'api_key' === $args['authentication']['method'] ) {
 			$sanitized_id = str_replace( '-', '_', $id );
 
-			if ( ! isset( $args['authentication']['setting_name'] ) ) {
-				$args['authentication']['setting_name'] = "connectors_ai_{$sanitized_id}_api_key";
-			}
+			$args['authentication']['setting_name'] = "connectors_ai_{$sanitized_id}_api_key";
 
 			// All AI providers use the {CONSTANT_CASE_ID}_API_KEY naming convention.
-			if ( ! isset( $args['authentication']['constant_name'] ) || ! isset( $args['authentication']['env_var_name'] ) ) {
-				$constant_case_key = strtoupper( preg_replace( '/([a-z])([A-Z])/', '$1_$2', $sanitized_id ) ) . '_API_KEY';
+			$constant_case_key = strtoupper( (string) preg_replace( '/([a-z])([A-Z])/', '$1_$2', $sanitized_id ) ) . '_API_KEY';
 
-				if ( ! isset( $args['authentication']['constant_name'] ) ) {
-					$args['authentication']['constant_name'] = $constant_case_key;
-				}
+			$args['authentication']['constant_name'] = $constant_case_key;
+			$args['authentication']['env_var_name']  = $constant_case_key;
+		}
 
-				if ( ! isset( $args['authentication']['env_var_name'] ) ) {
-					$args['authentication']['env_var_name'] = $constant_case_key;
-				}
+		$args['plugin']['is_active'] = static function () use ( $ai_registry, $id ): bool {
+			try {
+				return $ai_registry->hasProvider( $id );
+			} catch ( Exception $e ) {
+				return false;
 			}
-		}
-
-		if ( ! isset( $args['plugin']['is_active'] ) ) {
-			$args['plugin']['is_active'] = static function () use ( $ai_registry, $id ): bool {
-				try {
-					return $ai_registry->hasProvider( $id );
-				} catch ( Exception $e ) {
-					return false;
-				}
-			};
-		}
+		};
 
 		$registry->register( $id, $args );
 	}
@@ -470,7 +463,7 @@ function _gutenberg_pass_default_connector_keys_to_ai_client(): void {
 			}
 
 			$api_key = get_option( $auth['setting_name'], '' );
-			if ( '' === $api_key ) {
+			if ( ! is_string( $api_key ) || '' === $api_key ) {
 				continue;
 			}
 
