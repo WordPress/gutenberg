@@ -4,13 +4,17 @@
 
 ### New Features
 
--   Add `DashboardLanes`, a masonry-style surface aligned with the
-    WebKit `display: grid-lanes` spec. Tiles declare a column span
-    only; heights are driven by content; placement follows a
-    source-ordered, shortest-lane skyline with a `flow-tolerance`
-    tiebreaker. Falls back to a JS-driven polyfill on browsers
-    without native support.
--   Export `DashboardLanesLayoutItem` and `DashboardLanesProps` types.
+-   Initial release. Ships two layout components:
+    -   `DashboardGrid`, a 2D packed grid with explicit `(width,
+        height)` spans, drag-to-reorder and resize handles.
+    -   `DashboardLanes`, a masonry-style surface aligned with the
+        WebKit `display: grid-lanes` spec. Tiles declare a column
+        span only; heights are driven by content; placement follows
+        a source-ordered, shortest-lane skyline with a
+        `flow-tolerance` tiebreaker. Falls back to a JS-driven
+        polyfill on browsers without native support.
+-   Export `DashboardGridLayoutItem`, `DashboardGridProps`,
+    `DashboardLanesLayoutItem`, and `DashboardLanesProps` types.
 -   Add `renderDragPreview` prop and `DragPreviewRenderProps` type on
     both surfaces for consumers that need to wrap the dragged-clone
     visual with their own chrome. The surface keeps a thin functional
@@ -25,7 +29,7 @@
 
 ### Internal
 
--   Reorganize the package source under `dashboard-grid/`,
+-   Organize the package source under `dashboard-grid/`,
     `dashboard-lanes/`, and `shared/` so each layout model owns its
     component, types, stories, and tests.
 -   Drop the default visual layer on the drag-preview wrapper
@@ -33,5 +37,3 @@
     directly inside the functional frame; visual chrome is owned by
     the consumer either through the tile children themselves or via
     `renderDragPreview`.
--   Initial release of `DashboardGrid` (2D packed grid, kept under
-    its own folder).
