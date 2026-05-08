@@ -213,7 +213,7 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 			} );
 		}, [ items, layoutMap, effectiveColumns ] );
 
-		const { itemStyles, isPolyfilled } = useLanePlacement( container, {
+		const { itemStyles } = useLanePlacement( container, {
 			items: placementItems,
 			lanes: effectiveColumns,
 			gap: gapPx,
@@ -414,20 +414,19 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 							{
 								...style,
 								gridTemplateColumns: `repeat(${ effectiveColumns }, minmax(0, 1fr))`,
-								columnGap: gapPx,
+								// `column-gap` and `row-gap` resolve through
+								// the `--wp-grid-lane-gap` custom property in
+								// `lanes.module.css`, which uses `@supports`
+								// to zero `row-gap` in polyfill mode (the
+								// skyline already encodes vertical spacing
+								// in each tile's `top`). Driving the toggle
+								// from CSS keeps SSR and client output
+								// identical regardless of native support.
+								'--wp-grid-lane-gap': `${ gapPx }px`,
 								'--wp-grid-lane-row-unit': `${ Math.max(
 									1,
 									rowUnit
 								) }px`,
-								// Polyfill mode: the algorithm already builds
-								// inter-item vertical spacing into each tile's
-								// `top` (skyline + gap), and the row math maps
-								// 1px → 1/rowUnit grid lines. A non-zero
-								// `row-gap` would compound on top of that and
-								// push tiles off their computed positions.
-								// Native lanes does its own packing, so the
-								// user's gap applies to both axes.
-								rowGap: isPolyfilled ? 0 : gapPx,
 							} as React.CSSProperties
 						}
 					>

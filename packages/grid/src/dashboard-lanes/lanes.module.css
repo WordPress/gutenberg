@@ -1,18 +1,23 @@
 .lanes {
 	display: grid-lanes;
+	column-gap: var(--wp-grid-lane-gap, 0);
+	row-gap: var(--wp-grid-lane-gap, 0);
 }
 
 /*
  * Polyfill fallback. The hook computes per-item `grid-column-start`
  * and `grid-row-start`/`grid-row-end: span N` against this row unit.
- * `grid-auto-flow: dense` keeps the natural gap-fill behavior; the
- * skyline already drives placement, so this is just a safety net.
+ * The skyline already builds inter-item vertical spacing into each
+ * tile's `top`, so `row-gap` must be zero here to avoid compounding
+ * on top of the algorithm's spacing. `grid-auto-flow: dense` is a
+ * safety net; the algorithm drives placement.
  */
 @supports not (display: grid-lanes) {
 	.lanes {
 		display: grid;
 		grid-auto-rows: var(--wp-grid-lane-row-unit, 4px);
 		grid-auto-flow: dense;
+		row-gap: 0;
 	}
 }
 
