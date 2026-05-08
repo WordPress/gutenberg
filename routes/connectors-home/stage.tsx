@@ -38,21 +38,21 @@ registerDefaultConnectors();
 function ConnectorsPage() {
 	const isFileModsDisabled = getIsFileModsDisabled();
 
-	const { connectors, canInstallPlugins, isAiPluginActive } = useSelect(
+	const { connectors, canInstallPlugins, isAiPluginInstalled } = useSelect(
 		( select ) => {
 			const coreSelect = select( coreStore );
 			const aiPlugin = coreSelect.getEntityRecord(
 				'root',
 				'plugin',
 				'ai/ai'
-			) as { status: string } | undefined;
+			);
 			return {
 				connectors: unlock( select( store ) ).getConnectors(),
 				canInstallPlugins: coreSelect.canUser( 'create', {
 					kind: 'root',
 					name: 'plugin',
 				} ),
-				isAiPluginActive: aiPlugin?.status === 'active',
+				isAiPluginInstalled: !! aiPlugin,
 			};
 		},
 		[]
@@ -75,10 +75,10 @@ function ConnectorsPage() {
 				.filter( ( slug ): slug is string => !! slug )
 		)
 	).sort();
-	const activatedPluginSlugs = new Set(
+	const installedPluginSlugs = new Set(
 		connectors
 			.filter(
-				( connector: ConnectorConfig ) => connector.plugin?.isActivated
+				( connector: ConnectorConfig ) => connector.plugin?.isInstalled
 			)
 			.map(
 				( connector: ConnectorConfig ) =>
@@ -86,12 +86,11 @@ function ConnectorsPage() {
 			)
 			.filter( ( slug: string | undefined ): slug is string => !! slug )
 	);
-	// AI provider connectors are only registered when the 'ai' plugin is active.
-	if ( isAiPluginActive ) {
-		activatedPluginSlugs.add( 'ai' );
+	if ( isAiPluginInstalled ) {
+		installedPluginSlugs.add( 'ai' );
 	}
 	const manualInstallPluginSlugs = [ 'ai', ...aiProviderPluginSlugs ].filter(
-		( slug ) => ! activatedPluginSlugs.has( slug )
+		( slug ) => ! installedPluginSlugs.has( slug )
 	);
 	const isEmpty = renderableConnectors.length === 0;
 	const searchUrl =
