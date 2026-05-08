@@ -182,6 +182,10 @@
 		box-shadow: none;
 	}
 
+	// Kept for backward compatibility with content saved while the embed-video
+	// background type was supported. The feature has been removed, but old
+	// posts may still contain this markup until they are re-saved through
+	// the deprecation migration.
 	.wp-block-cover__embed-background {
 		position: absolute;
 		top: 0;
@@ -351,8 +355,10 @@ body:not(.editor-styles-wrapper) .wp-block-cover:not(
 		z-index: 0;
 	}
 
+	// Kept for backward compatibility with content saved while the embed-video
+	// background type was supported. Shares the same base layer as the video
+	// background.
 	.wp-block-cover__embed-background {
-		// Shares the same base layer as the video background.
 		z-index: 0;
 	}
 

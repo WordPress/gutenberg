@@ -13,7 +13,7 @@ import {
 	useMemo,
 	useRef,
 } from '@wordpress/element';
-import { Placeholder, SandBox, Spinner } from '@wordpress/components';
+import { Placeholder, Spinner } from '@wordpress/components';
 import { compose, useResizeObserver } from '@wordpress/compose';
 import {
 	withColors,
@@ -37,7 +37,6 @@ import {
 	attributesFromMedia,
 	IMAGE_BACKGROUND_TYPE,
 	VIDEO_BACKGROUND_TYPE,
-	EMBED_VIDEO_BACKGROUND_TYPE,
 	dimRatioToClass,
 	isContentPositionCenter,
 	getPositionClassName,
@@ -54,7 +53,6 @@ import {
 	DEFAULT_OVERLAY_COLOR,
 } from './color-utils';
 import { DEFAULT_MEDIA_SIZE_SLUG } from '../constants';
-import { getBackgroundEmbedHtml } from '../embed-video-utils';
 
 function getInnerBlocksTemplate( attributes ) {
 	return [
@@ -363,63 +361,10 @@ function CoverEdit( {
 		createErrorNotice( message, { type: 'snackbar' } );
 	};
 
-	const onSelectEmbedUrl = ( embedUrl ) => {
-		// Only set a new dimRatio if there was no previous media selected
-		// to avoid resetting to 50 if it has been explicitly set to 100.
-		const newDimRatio =
-			originalUrl === undefined && dimRatio === 100 ? 50 : dimRatio;
-
-		// Set initial attributes with URL
-		setAttributes( {
-			url: embedUrl,
-			backgroundType: EMBED_VIDEO_BACKGROUND_TYPE,
-			dimRatio: newDimRatio,
-			id: undefined,
-			focalPoint: undefined,
-			hasParallax: undefined,
-			isRepeated: undefined,
-			useFeaturedImage: undefined,
-		} );
-	};
-
-	// Fetch embed preview for embed videos
-	const { embedPreview, isFetchingEmbed } = useSelect(
-		( select ) => {
-			if ( backgroundType !== EMBED_VIDEO_BACKGROUND_TYPE || ! url ) {
-				return {
-					embedPreview: undefined,
-					isFetchingEmbed: false,
-				};
-			}
-
-			const { getEmbedPreview, isRequestingEmbedPreview } =
-				select( coreStore );
-
-			return {
-				embedPreview: getEmbedPreview( url ),
-				isFetchingEmbed: isRequestingEmbedPreview( url ),
-			};
-		},
-		[ url, backgroundType ]
-	);
-
-	// Compute embed HTML for editor display via SandBox
-	const embedHtml = useMemo( () => {
-		if (
-			backgroundType !== EMBED_VIDEO_BACKGROUND_TYPE ||
-			! embedPreview?.html
-		) {
-			return null;
-		}
-		return getBackgroundEmbedHtml( embedPreview.html );
-	}, [ embedPreview, backgroundType ] );
-
 	const isUploadingMedia = isTemporaryMedia( id, url );
 
 	const isImageBackground = IMAGE_BACKGROUND_TYPE === backgroundType;
 	const isVideoBackground = VIDEO_BACKGROUND_TYPE === backgroundType;
-	const isEmbedVideoBackground =
-		EMBED_VIDEO_BACKGROUND_TYPE === backgroundType;
 
 	const blockEditingMode = useBlockEditingMode();
 	const hasNonContentControls = blockEditingMode === 'default';
@@ -551,7 +496,6 @@ function CoverEdit( {
 			attributes={ attributes }
 			setAttributes={ setAttributes }
 			onSelectMedia={ onSelectMedia }
-			onSelectEmbedUrl={ onSelectEmbedUrl }
 			currentSettings={ currentSettings }
 			toggleUseFeaturedImage={ toggleUseFeaturedImage }
 			onClearMedia={ onClearMedia }
@@ -702,25 +646,6 @@ function CoverEdit( {
 						poster={ poster }
 						style={ mediaStyle }
 					/>
-				) }
-				{ isEmbedVideoBackground && embedHtml && (
-					<div
-						ref={ mediaElement }
-						className="wp-block-cover__video-background wp-block-cover__embed-background"
-						style={ mediaStyle }
-					>
-						<SandBox
-							allowSameOrigin
-							html={ embedHtml }
-							title="Background video"
-							styles={ [
-								'iframe{position:fixed;top:0;left:0;width:100%;height:100%;}',
-							] }
-						/>
-					</div>
-				) }
-				{ isEmbedVideoBackground && ! embedHtml && isFetchingEmbed && (
-					<Spinner />
 				) }
 
 				{ showOverlay && (

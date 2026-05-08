@@ -1,0 +1,35 @@
+[
+	{
+		"blockName": "core/cover",
+		"attrs": {
+			"url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+			"dimRatio": 50,
+			"backgroundType": "embed-video",
+			"isDark": false,
+			"layout": {
+				"type": "constrained"
+			}
+		},
+		"innerBlocks": [
+			{
+				"blockName": "core/paragraph",
+				"attrs": {
+					"align": "center",
+					"placeholder": "Write title…",
+					"fontSize": "large"
+				},
+				"innerBlocks": [],
+				"innerHTML": "\n\t<p class=\"has-text-align-center has-large-font-size\"></p>\n\t",
+				"innerContent": [
+					"\n\t<p class=\"has-text-align-center has-large-font-size\"></p>\n\t"
+				]
+			}
+		],
+		"innerHTML": "\n<div class=\"wp-block-cover is-light\"><figure class=\"wp-block-cover__video-background wp-block-cover__embed-background wp-block-embed\"><div class=\"wp-block-embed__wrapper\">https://www.youtube.com/watch?v=dQw4w9WgXcQ</div></figure><span aria-hidden=\"true\" class=\"wp-block-cover__background has-background-dim\"></span><div class=\"wp-block-cover__inner-container\"></div></div>\n",
+		"innerContent": [
+			"\n<div class=\"wp-block-cover is-light\"><figure class=\"wp-block-cover__video-background wp-block-cover__embed-background wp-block-embed\"><div class=\"wp-block-embed__wrapper\">https://www.youtube.com/watch?v=dQw4w9WgXcQ</div></figure><span aria-hidden=\"true\" class=\"wp-block-cover__background has-background-dim\"></span><div class=\"wp-block-cover__inner-container\">",
+			null,
+			"</div></div>\n"
+		]
+	}
+]
