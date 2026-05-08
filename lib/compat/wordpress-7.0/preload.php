@@ -10,24 +10,102 @@
  */
 function gutenberg_block_editor_preload_paths_6_9( $paths, $context ) {
 	if ( 'core/edit-site' === $context->name ) {
-		$template_parts = get_block_templates( array(), 'wp_template_part' );
-		foreach ( $template_parts as $template_part ) {
-			$paths[] = '/wp/v2/template-parts/' . $template_part->id . '?context=edit';
+		$template_slugs = array();
+		$front_page    = null;
+		if ( ! empty( $context->post ) && 'page' === $context->post->post_type ) {
+			$template_slugs[] = empty( $context->post->post_name ) ? 'page' : 'page-' . $context->post->post_name;
+			$template_slugs[] = 'page';
+		} else {
+			$template_slugs[] = 'front-page';
+
+			if ( 'page' === get_option( 'show_on_front' ) ) {
+				$front_page = get_post( (int) get_option( 'page_on_front' ) );
+				if ( $front_page instanceof WP_Post ) {
+					$template_slugs[] = empty( $front_page->post_name ) ? 'page' : 'page-' . $front_page->post_name;
+					$template_slugs[] = 'page';
+				}
+			} else {
+				$template_slugs[] = 'home';
+			}
+
+			$template_slugs[] = 'index';
 		}
 
-		$post_rest_route = rest_get_route_for_post_type_items( 'post' );
-		foreach ( array( 10, 3 ) as $per_page ) {
+		$template_slugs = array_values( array_unique( $template_slugs ) );
+		$templates      = get_block_templates(
+			array(
+				'slug__in' => $template_slugs,
+			),
+			'wp_template'
+		);
+		$priorities     = array_flip( $template_slugs );
+
+		usort(
+			$templates,
+			static function ( $template_a, $template_b ) use ( $priorities ) {
+				return ( $priorities[ $template_a->slug ] ?? 999 ) - ( $priorities[ $template_b->slug ] ?? 999 );
+			}
+		);
+
+		$template_part_ids = array();
+		$has_query         = false;
+		$walk_blocks       = static function ( $blocks ) use ( &$walk_blocks, &$template_part_ids, &$has_query ) {
+			foreach ( $blocks as $block ) {
+				if ( 'core/template-part' === ( $block['blockName'] ?? '' ) && ! empty( $block['attrs']['slug'] ) ) {
+					$theme               = ! empty( $block['attrs']['theme'] ) ? $block['attrs']['theme'] : get_stylesheet();
+					$template_part_ids[] = $theme . '//' . $block['attrs']['slug'];
+				}
+
+				if ( 'core/query' === ( $block['blockName'] ?? '' ) ) {
+					$has_query = true;
+				}
+
+				if ( ! empty( $block['innerBlocks'] ) ) {
+					$walk_blocks( $block['innerBlocks'] );
+				}
+			}
+		};
+
+		if ( ! empty( $templates ) && ! empty( $templates[0]->content ) ) {
+			$blocks = parse_blocks( $templates[0]->content );
+			if ( function_exists( 'resolve_pattern_blocks' ) ) {
+				$blocks = resolve_pattern_blocks( $blocks );
+			}
+			$walk_blocks( $blocks );
+		}
+
+		foreach ( array_unique( $template_part_ids ) as $template_part_id ) {
+			$paths[] = '/wp/v2/template-parts/' . $template_part_id . '?context=edit';
+		}
+
+		if ( $front_page instanceof WP_Post ) {
+			$route_for_front_page = rest_get_route_for_post( $front_page );
+			if ( $route_for_front_page ) {
+				$paths[] = add_query_arg( 'context', 'edit', $route_for_front_page );
+			}
 			$paths[] = add_query_arg(
-				array(
-					'context'       => 'edit',
-					'offset'        => 0,
-					'order'         => 'desc',
-					'orderby'       => 'date',
-					'per_page'      => $per_page,
-					'ignore_sticky' => 'false',
-				),
-				$post_rest_route
+				'slug',
+				empty( $front_page->post_name ) ? 'page' : 'page-' . $front_page->post_name,
+				'/wp/v2/templates/lookup'
 			);
+			$paths[] = '/wp/v2/types/page?context=edit';
+		}
+
+		if ( $has_query ) {
+			$post_rest_route = rest_get_route_for_post_type_items( 'post' );
+			foreach ( array( 10, 3 ) as $per_page ) {
+				$paths[] = add_query_arg(
+					array(
+						'context'       => 'edit',
+						'offset'        => 0,
+						'order'         => 'desc',
+						'orderby'       => 'date',
+						'per_page'      => $per_page,
+						'ignore_sticky' => 'false',
+					),
+					$post_rest_route
+				);
+			}
 		}
 
 		$paths[] = '/wp/v2/taxonomies?context=view';
