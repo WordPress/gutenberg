@@ -79,10 +79,7 @@ function FullscreenModeClose( { showTooltip, icon, href, initialPost } ) {
 		return null;
 	}
 
-	const isAdminBarInEditorEnabled =
-		globalThis.document?.body.classList.contains(
-			'is-admin-bar-in-editor-enabled'
-		);
+	const isAdminBarInEditorEnabled = window.__experimentalAdminBarInEditor;
 
 	let backIcon = arrowUpLeft;
 	if ( isAdminBarInEditorEnabled ) {
