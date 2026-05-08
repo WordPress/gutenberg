@@ -126,6 +126,18 @@ export async function vipsHasTransparency( url: string ) {
 }
 
 /**
+ * Probes a JPEG buffer for UltraHDR (ISO 21496-1 gain map) support using vips
+ * in a web worker.
+ *
+ * @param buffer Image buffer to probe.
+ * @return UltraHDR info if the buffer is a valid UltraHDR JPEG, otherwise null.
+ */
+export async function vipsGetUltraHdrInfo( buffer: ArrayBuffer ) {
+	const { vipsGetUltraHdrInfo: getUltraHdrInfo } = await loadVipsModule();
+	return getUltraHdrInfo( buffer );
+}
+
+/**
  * Resizes an image using vips in a web worker.
  *
  * @param id           Queue item ID.
@@ -136,6 +148,8 @@ export async function vipsHasTransparency( url: string ) {
  * @param signal       Optional abort signal to cancel the operation.
  * @param scaledSuffix Whether to add '-scaled' suffix instead of dimensions (for big image threshold).
  * @param quality      Desired quality (0-1). Defaults to 0.82.
+ * @param isUltraHdr   Whether the source is an UltraHDR JPEG; routes through
+ *                     uhdrload/uhdrsave so the gain map is preserved.
  * @return Resized ImageFile with dimension metadata.
  */
 export async function vipsResizeImage(
@@ -146,7 +160,8 @@ export async function vipsResizeImage(
 	addSuffix: boolean,
 	signal?: AbortSignal,
 	scaledSuffix?: boolean,
-	quality?: number
+	quality?: number,
+	isUltraHdr?: boolean
 ) {
 	if ( signal?.aborted ) {
 		throw new Error( 'Operation aborted' );
@@ -160,7 +175,8 @@ export async function vipsResizeImage(
 			file.type,
 			resize,
 			smartCrop,
-			quality
+			quality,
+			isUltraHdr
 		);
 
 	let fileName = file.name;

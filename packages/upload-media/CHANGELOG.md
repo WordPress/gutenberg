@@ -5,6 +5,7 @@
 ### Enhancement
 
 - Remove sideload upload serialization: thumbnail uploads now run concurrently, governed by `maxConcurrentUploads` instead of being queued one-at-a-time per attachment ([#75257](https://github.com/WordPress/gutenberg/pull/75257)).
+- UltraHDR (ISO 21496-1 gain map) JPEGs are now detected and resized via libvips's native `uhdrload`/`uhdrsave` pipeline. The standalone `open-ultrahdr` and `open-ultrahdr-wasm` dependencies have been removed; gain maps are preserved automatically through the existing resize step ([#74873](https://github.com/WordPress/gutenberg/pull/74873)).
 
 ## 0.29.0 (2026-04-15)
 

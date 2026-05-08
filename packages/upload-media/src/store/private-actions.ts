@@ -3,9 +3,6 @@
  */
 import { v4 as uuidv4 } from 'uuid';
 
-// @ts-expect-error - WASM files are inlined as base64 data URLs at build time
-import ultraHdrWasm from 'open-ultrahdr-wasm/pkg/open_ultrahdr.wasm';
-
 /**
  * WordPress dependencies
  */
@@ -27,6 +24,7 @@ import {
 	vipsRotateImage,
 	vipsConvertImageFormat,
 	vipsHasTransparency,
+	vipsGetUltraHdrInfo,
 	terminateVipsWorker,
 } from './utils';
 import type {
@@ -64,23 +62,11 @@ import type { cancelItem } from './actions';
 const DEFAULT_OUTPUT_QUALITY = 0.82;
 
 /**
- * Cached UltraHDR decoded data, keyed by parent item ID.
- * Holds gain map and metadata needed for re-encoding sub-sizes.
- * Entries are cleaned up when the parent item is finalized.
+ * Tracks parent item IDs whose source file is an UltraHDR JPEG so that
+ * sub-size resize operations can route through libvips's uhdrload/uhdrsave
+ * to preserve the gain map. Entries are cleared when the parent finalizes.
  */
-interface UltraHdrCacheEntry {
-	gainMap: Uint8Array;
-	metadata: {
-		gainMapMin: number[];
-		gainMapMax: number[];
-		gamma: number[];
-		offsetSdr: number[];
-		offsetHdr: number[];
-		hdrCapacityMin: number;
-		hdrCapacityMax: number;
-	};
-}
-const ultraHdrCache = new Map< QueueItemId, UltraHdrCacheEntry >();
+const ultraHdrItems = new Set< QueueItemId >();
 
 type ActionCreators = {
 	cancelItem: typeof cancelItem;
@@ -101,7 +87,6 @@ type ActionCreators = {
 	updateItemProgress: typeof updateItemProgress;
 	revokeBlobUrls: typeof revokeBlobUrls;
 	detectUltraHdr: typeof detectUltraHdr;
-	encodeUltraHdrItem: typeof encodeUltraHdrItem;
 	< T = Record< string, unknown > >( args: T ): void;
 };
 
@@ -467,10 +452,6 @@ export function processItem( id: QueueItemId ) {
 			case OperationType.DetectUltraHdr:
 				dispatch.detectUltraHdr( id );
 				break;
-
-			case OperationType.EncodeUltraHdr:
-				dispatch.encodeUltraHdrItem( id );
-				break;
 		}
 	};
 }
@@ -810,8 +791,9 @@ export function prepareItem( id: QueueItemId ) {
 }
 
 /**
- * Detects if a JPEG is an UltraHDR image, decodes it, and caches
- * the gain map data for re-encoding into sub-sizes.
+ * Detects whether a JPEG is an UltraHDR image and records the parent item
+ * ID so that downstream resize operations route through libvips's
+ * uhdrload/uhdrsave pipeline (which preserves the gain map).
  *
  * @param id Item ID.
  */
@@ -822,58 +804,30 @@ export function detectUltraHdr( id: QueueItemId ) {
 			return;
 		}
 
-		let probeResult;
+		let info;
 		try {
-			// Dynamically import to avoid loading WASM unless needed.
-			const { setWasmUrl, probeUltraHdr } = await import(
-				'open-ultrahdr'
-			);
-			// Pass the build-time inlined WASM data URL to the library.
-			setWasmUrl( ultraHdrWasm );
 			const buffer = await item.file.arrayBuffer();
-			probeResult = await probeUltraHdr( buffer );
+			info = await vipsGetUltraHdrInfo( buffer );
 		} catch {
 			// If UltraHDR detection fails, continue with regular upload.
 		}
 
-		if ( probeResult?.isValid ) {
-			// Decode to extract gain map and metadata for sub-size re-encoding.
-			try {
-				const { decodeUltraHdr } = await import( 'open-ultrahdr' );
-				const buffer = await item.file.arrayBuffer();
-				const decoded = await decodeUltraHdr( id, buffer );
+		if ( info ) {
+			ultraHdrItems.add( id );
 
-				ultraHdrCache.set( id, {
-					gainMap: decoded.gainMap,
-					metadata: decoded.metadata,
-				} );
-			} catch {
-				// If decode fails, still upload the original but skip
-				// gain map preservation in sub-sizes.
-			}
-
-			// Mark attachment metadata with UltraHDR info.
-			// The original file is uploaded unmodified — UltraHDR JPEGs are
-			// already backwards compatible (SDR displays use the embedded base image).
-			//
-			// Replace the remaining operations to skip any transcoding that
-			// prepareItem may have queued (e.g. format conversion). Transcoding
-			// would strip the HDR gain map data from the file.
+			// Mark attachment metadata with UltraHDR info. The original file
+			// is uploaded unmodified — UltraHDR JPEGs are already backwards
+			// compatible (SDR displays use the embedded base image).
 			const existingMeta = Array.isArray( item.attachment?.meta )
 				? {}
 				: item.attachment?.meta || {};
 			dispatch.finishOperation( id, {
-				operations: [
-					OperationType.Upload,
-					OperationType.ThumbnailGeneration,
-					OperationType.Finalize,
-				],
 				attachment: {
 					...item.attachment,
 					meta: {
 						...existingMeta,
 						ultrahdr: true,
-						hdr_capacity: probeResult.hdrCapacity,
+						hdr_capacity: info.hdrCapacity,
 					},
 				},
 			} );
@@ -881,162 +835,6 @@ export function detectUltraHdr( id: QueueItemId ) {
 		}
 
 		dispatch.finishOperation( id, {} );
-	};
-}
-
-/**
- * Converts sRGB component (0-255) to linear light (0-1).
- *
- * @param c sRGB component value (0-255).
- * @return Linear light value (0-1).
- */
-function srgbToLinear( c: number ): number {
-	const s = c / 255;
-	return s <= 0.04045 ? s / 12.92 : Math.pow( ( s + 0.055 ) / 1.055, 2.4 );
-}
-
-/**
- * Re-encodes a resized SDR JPEG as an UltraHDR image by reconstructing
- * HDR data from the cached gain map and metadata.
- *
- * Uses the ISO 21496-1 gain map application formula to derive HDR linear
- * pixel data from the SDR image and gain map, then passes both to the
- * UltraHDR encoder which produces a JPEG with an embedded gain map.
- *
- * @param id Item ID.
- */
-export function encodeUltraHdrItem( id: QueueItemId ) {
-	return async ( { select, dispatch }: ThunkArgs ) => {
-		const item = select.getItem( id );
-		if ( ! item ) {
-			return;
-		}
-
-		const parentId = item.parentId;
-		if ( ! parentId ) {
-			dispatch.finishOperation( id, {} );
-			return;
-		}
-
-		const cached = ultraHdrCache.get( parentId );
-		if ( ! cached ) {
-			// No gain map data available, skip re-encoding.
-			dispatch.finishOperation( id, {} );
-			return;
-		}
-
-		try {
-			const { setWasmUrl, encodeUltraHdr } = await import(
-				'open-ultrahdr'
-			);
-			setWasmUrl( ultraHdrWasm );
-
-			// Decode resized SDR JPEG to pixel data via OffscreenCanvas.
-			const sdrBlob = new Blob( [ await item.file.arrayBuffer() ], {
-				type: 'image/jpeg',
-			} );
-			const sdrBitmap = await createImageBitmap( sdrBlob );
-			const sdrWidth = sdrBitmap.width;
-			const sdrHeight = sdrBitmap.height;
-
-			const sdrCanvas = new OffscreenCanvas( sdrWidth, sdrHeight );
-			const sdrCtx = sdrCanvas.getContext( '2d' )!;
-			sdrCtx.drawImage( sdrBitmap, 0, 0 );
-			sdrBitmap.close();
-			const sdrImageData = sdrCtx.getImageData(
-				0,
-				0,
-				sdrWidth,
-				sdrHeight
-			);
-
-			// Decode gain map JPEG to pixel data, resized to match sub-size.
-			const gainBlob = new Blob(
-				[ cached.gainMap.buffer as ArrayBuffer ],
-				{
-					type: 'image/jpeg',
-				}
-			);
-			const gainBitmap = await createImageBitmap( gainBlob, {
-				resizeWidth: sdrWidth,
-				resizeHeight: sdrHeight,
-				resizeQuality: 'high',
-			} );
-			const gainCanvas = new OffscreenCanvas( sdrWidth, sdrHeight );
-			const gainCtx = gainCanvas.getContext( '2d' )!;
-			gainCtx.drawImage( gainBitmap, 0, 0 );
-			gainBitmap.close();
-			const gainImageData = gainCtx.getImageData(
-				0,
-				0,
-				sdrWidth,
-				sdrHeight
-			);
-
-			// Apply ISO 21496-1 gain map formula to reconstruct HDR.
-			const pixelCount = sdrWidth * sdrHeight;
-			const hdrFloat = new Float32Array( pixelCount * 3 );
-			const meta = cached.metadata;
-
-			for ( let i = 0; i < pixelCount; i++ ) {
-				const sdrIdx = i * 4; // RGBA
-				const hdrIdx = i * 3; // RGB
-
-				for ( let c = 0; c < 3; c++ ) {
-					const sdrLinear = srgbToLinear(
-						sdrImageData.data[ sdrIdx + c ]
-					);
-					// Gain map is stored gamma-encoded; decode to linear.
-					const gainNorm = gainImageData.data[ sdrIdx + c ] / 255;
-					const gainLinear = Math.pow( gainNorm, meta.gamma[ c ] );
-					// Compute log2 recovery from gain map range.
-					const logRecovery =
-						meta.gainMapMin[ c ] +
-						gainLinear *
-							( meta.gainMapMax[ c ] - meta.gainMapMin[ c ] );
-					// Apply full HDR weight (weight = 1.0).
-					const recovery = Math.pow( 2, logRecovery );
-					// Reconstruct HDR linear value.
-					hdrFloat[ hdrIdx + c ] =
-						( sdrLinear + meta.offsetSdr[ c ] ) * recovery -
-						meta.offsetHdr[ c ];
-				}
-			}
-
-			// Re-encode as UltraHDR JPEG.
-			const sdrBuffer = await item.file.arrayBuffer();
-			const encoded = await encodeUltraHdr(
-				id,
-				sdrBuffer,
-				hdrFloat.buffer as ArrayBuffer
-			);
-
-			const file = new File(
-				[ new Blob( [ encoded ], { type: 'image/jpeg' } ) ],
-				item.file.name,
-				{ type: 'image/jpeg' }
-			);
-
-			const blobUrl = createBlobURL( file );
-			dispatch< CacheBlobUrlAction >( {
-				type: Type.CacheBlobUrl,
-				id,
-				blobUrl,
-			} );
-
-			dispatch.finishOperation( id, {
-				file,
-				attachment: {
-					url: blobUrl,
-				},
-			} );
-		} catch ( error ) {
-			// If re-encoding fails, continue with the SDR-only sub-size.
-			// This is non-fatal — the sub-size simply won't have HDR data.
-			// eslint-disable-next-line no-console
-			console.warn( 'UltraHDR sub-size encoding failed:', error );
-			dispatch.finishOperation( id, {} );
-		}
 	};
 }
 
@@ -1146,6 +944,10 @@ export function resizeCropItem( id: QueueItemId, args?: ResizeCropItemArgs ) {
 		const addSuffix = Boolean( item.parentId );
 		// Add '-scaled' suffix for big image threshold resizing.
 		const scaledSuffix = Boolean( args.isThresholdResize );
+		// UltraHDR status is tracked on the parent item ID. For sub-sizes,
+		// look up the parentId; for threshold-resize on the parent itself,
+		// look up its own id.
+		const isUltraHdr = ultraHdrItems.has( item.parentId ?? item.id );
 
 		try {
 			const file = await vipsResizeImage(
@@ -1155,7 +957,9 @@ export function resizeCropItem( id: QueueItemId, args?: ResizeCropItemArgs ) {
 				false, // smartCrop
 				addSuffix,
 				item.abortController?.signal,
-				scaledSuffix
+				scaledSuffix,
+				undefined, // quality (defaults inside vipsResizeImage)
+				isUltraHdr
 			);
 
 			const blobUrl = createBlobURL( file );
@@ -1424,9 +1228,12 @@ export function generateThumbnails( id: QueueItemId ) {
 				: thumbnailSource;
 			const batchId = uuidv4();
 
-			// Check if this is an UltraHDR image with cached gain map data.
-			// If so, sub-sizes need gain map re-encoding instead of format transcoding.
-			const hasUltraHdrData = ultraHdrCache.has( item.id );
+			// Sub-sizes inherit the parent's UltraHDR status so that the
+			// resize step routes through libvips's uhdrload/uhdrsave pipeline
+			// (which preserves the gain map). Format transcoding is skipped
+			// for UltraHDR sources because converting to a different codec
+			// would strip the ISO 21496-1 gain map data.
+			const isUltraHdr = ultraHdrItems.has( item.id );
 
 			// Read per-file format conversion data from the attachment response.
 			const outputMimeType = attachment.image_output_format;
@@ -1435,7 +1242,6 @@ export function generateThumbnails( id: QueueItemId ) {
 			// Check if thumbnails should be transcoded to a different format.
 			// Uses the same transparency-aware logic as the main image
 			// to avoid converting transparent PNGs to JPEG.
-			// Skip transcoding for UltraHDR — format conversion strips gain maps.
 			let thumbnailTranscodeOperation:
 				| [
 						OperationType.TranscodeImage,
@@ -1443,7 +1249,7 @@ export function generateThumbnails( id: QueueItemId ) {
 				  ]
 				| null = null;
 
-			if ( ! hasUltraHdrData && outputMimeType ) {
+			if ( ! isUltraHdr && outputMimeType ) {
 				thumbnailTranscodeOperation = await getTranscodeImageOperation(
 					thumbnailSource,
 					outputMimeType,
@@ -1477,15 +1283,13 @@ export function generateThumbnails( id: QueueItemId ) {
 			for ( const [ , names ] of dimensionGroups ) {
 				const imageSize = allImageSizes[ names[ 0 ] ];
 
-				// Build operations list for this thumbnail.
+				// Build operations list for this thumbnail. The resize step
+				// is UltraHDR-aware and will preserve the gain map automatically.
 				const thumbnailOperations: Operation[] = [
 					[ OperationType.ResizeCrop, { resize: imageSize } ],
 				];
 
-				if ( hasUltraHdrData ) {
-					// Re-encode as UltraHDR after resize to preserve gain map.
-					thumbnailOperations.push( OperationType.EncodeUltraHdr );
-				} else if ( thumbnailTranscodeOperation ) {
+				if ( ! isUltraHdr && thumbnailTranscodeOperation ) {
 					// Add transcoding if format conversion is configured and
 					// the transparency check passed.
 					thumbnailOperations.push( thumbnailTranscodeOperation );
@@ -1531,7 +1335,8 @@ export function generateThumbnails( id: QueueItemId ) {
 							? renameFile( thumbnailSource, attachment.filename )
 							: thumbnailSource;
 
-						// Add scaling to queue.
+						// Add scaling to queue. The resize step is UltraHDR-aware
+						// and will preserve the gain map automatically.
 						const scaledOperations: Operation[] = [
 							[
 								OperationType.ResizeCrop,
@@ -1545,12 +1350,7 @@ export function generateThumbnails( id: QueueItemId ) {
 							],
 						];
 
-						if ( hasUltraHdrData ) {
-							// Re-encode as UltraHDR after resize to preserve gain map.
-							scaledOperations.push(
-								OperationType.EncodeUltraHdr
-							);
-						} else if ( thumbnailTranscodeOperation ) {
+						if ( ! isUltraHdr && thumbnailTranscodeOperation ) {
 							// Add transcoding if format conversion is configured.
 							scaledOperations.push(
 								thumbnailTranscodeOperation
@@ -1609,8 +1409,8 @@ export function finalizeItem( id: QueueItemId ) {
 			}
 		}
 
-		// Clean up cached UltraHDR data — all sub-sizes are done by now.
-		ultraHdrCache.delete( id );
+		// Clean up UltraHDR tracking — all sub-sizes are done by now.
+		ultraHdrItems.delete( id );
 
 		dispatch.finishOperation( id, {} );
 	};
