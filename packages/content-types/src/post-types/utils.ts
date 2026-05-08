@@ -8,6 +8,7 @@ import { useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
+import { pickStoredLabels, serializeLabels } from '../utils/form-data';
 import type {
 	PostTypeFormData,
 	PostTypeRecord,
@@ -76,13 +77,10 @@ export const SUPPORT_FEATURES: SupportFeature[] = [
 
 export function toFormData( row: PostTypeRecord ): PostTypeFormData {
 	const config = row.config ?? {};
-	const labels: StoredLabels = {};
-	for ( const key of STRING_LABEL_KEYS ) {
-		const value = config.labels?.[ key ];
-		if ( typeof value === 'string' ) {
-			labels[ key ] = value;
-		}
-	}
+	const labels = pickStoredLabels< StoredLabels >(
+		config.labels,
+		STRING_LABEL_KEYS
+	);
 	const supports: SupportFeature[] = Array.isArray( config.supports )
 		? config.supports.filter( ( s ): s is SupportFeature =>
 				SUPPORT_FEATURES.includes( s as SupportFeature )
@@ -111,16 +109,12 @@ export function toFormData( row: PostTypeRecord ): PostTypeFormData {
 export function serializeForSave( data: PostTypeFormData ) {
 	const { config } = data;
 
-	const labels: StoredLabels = {};
-	for ( const key of STRING_LABEL_KEYS ) {
-		const value = config.labels[ key ];
-		if ( typeof value === 'string' && value.trim() !== '' ) {
-			labels[ key ] = value.trim();
-		}
-	}
-	// singular_name is required; keep the raw (possibly-empty) value so save
-	// errors point at the right field rather than silently dropping it.
-	labels.singular_name = config.labels.singular_name;
+	const labels = serializeLabels< PostTypeFormData[ 'config' ][ 'labels' ] >(
+		config.labels,
+		STRING_LABEL_KEYS as ReadonlyArray<
+			keyof PostTypeFormData[ 'config' ][ 'labels' ]
+		>
+	);
 
 	const description = config.description.trim();
 	return {

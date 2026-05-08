@@ -43,14 +43,11 @@ import {
 	notFoundField,
 	notFoundInTrashField,
 	parentItemColonField,
-	pluralLabelField,
 	publicField,
 	removeFeaturedImageField,
 	searchItemsField,
 	setFeaturedImageField,
 	showInRestField,
-	singularLabelField,
-	statusField,
 	supportsField,
 	uploadedToThisItemField,
 	useFeaturedImageField,
@@ -59,6 +56,11 @@ import {
 	viewItemField,
 	viewItemsField,
 } from './fields';
+import {
+	pluralLabelField,
+	singularLabelField,
+	statusField,
+} from '../utils/fields';
 import type { PostTypeFormData, PostTypeRecord } from './types';
 import { BLANK_RECORD, serializeForSave, toFormData } from './utils';
 import { NEW_ID, POST_TYPE_ENTITY, POST_TYPES_PATH } from '../constants';
@@ -135,45 +137,46 @@ function PostTypePage( {
 	const originalSlug = ! isAddMode ? initialData.slug : undefined;
 	const slugField = useSlugField( originalSlug, data.slug );
 	const taxonomiesField = useTaxonomiesField();
-	const fields = useMemo< Field< PostTypeFormData >[] >(
-		() => [
-			// General
-			pluralLabelField,
-			singularLabelField,
-			slugField,
-			descriptionField,
-			taxonomiesField,
-			supportsField,
-			publicField,
-			hierarchicalField,
-			hasArchiveField,
-			showInRestField,
-			statusField,
-			// Labels
-			menuNameField,
-			allItemsField,
-			addNewField,
-			addNewItemLabelField,
-			editItemField,
-			newItemField,
-			viewItemField,
-			viewItemsField,
-			searchItemsField,
-			notFoundField,
-			notFoundInTrashField,
-			parentItemColonField,
-			archivesField,
-			attributesField,
-			insertIntoItemField,
-			uploadedToThisItemField,
-			featuredImageField,
-			setFeaturedImageField,
-			removeFeaturedImageField,
-			useFeaturedImageField,
-			filterItemsListField,
-			itemsListNavigationField,
-			itemsListField,
-		],
+	const fields = useMemo(
+		() =>
+			[
+				// General
+				pluralLabelField,
+				singularLabelField,
+				slugField,
+				descriptionField,
+				taxonomiesField,
+				supportsField,
+				publicField,
+				hierarchicalField,
+				hasArchiveField,
+				showInRestField,
+				statusField,
+				// Labels
+				menuNameField,
+				allItemsField,
+				addNewField,
+				addNewItemLabelField,
+				editItemField,
+				newItemField,
+				viewItemField,
+				viewItemsField,
+				searchItemsField,
+				notFoundField,
+				notFoundInTrashField,
+				parentItemColonField,
+				archivesField,
+				attributesField,
+				insertIntoItemField,
+				uploadedToThisItemField,
+				featuredImageField,
+				setFeaturedImageField,
+				removeFeaturedImageField,
+				useFeaturedImageField,
+				filterItemsListField,
+				itemsListNavigationField,
+				itemsListField,
+			] as Field< PostTypeFormData >[],
 		[ slugField, taxonomiesField ]
 	);
 

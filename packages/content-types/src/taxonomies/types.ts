@@ -43,6 +43,8 @@ export interface StoredConfig {
 	show_in_rest: boolean;
 }
 
+import type { ContentType } from '../types';
+
 /**
  * Normalized in-memory shape used by the Add/Edit forms and the DataViews
  * table. REST rows are converted to this shape via `toFormData`, and back to
@@ -50,18 +52,11 @@ export interface StoredConfig {
  * `config` here even though the wire format keeps it at the top level —
  * keeps the form components free of split state.
  */
-export interface TaxonomyFormData {
-	id?: number;
-	slug: string;
-	status: 'publish' | 'draft';
-	title: { raw: string };
-	config: {
+export interface TaxonomyFormData extends ContentType {
+	config: ContentType[ 'config' ] & {
 		labels: Required< Pick< StoredLabels, 'singular_name' > > &
 			StoredLabels;
 		object_type: string[];
-		description: string;
-		public: boolean;
-		hierarchical: boolean;
 		publicly_queryable: boolean;
 		show_ui: boolean;
 		show_in_menu: boolean;
@@ -69,7 +64,6 @@ export interface TaxonomyFormData {
 		show_tagcloud: boolean;
 		show_in_quick_edit: boolean;
 		show_admin_column: boolean;
-		show_in_rest: boolean;
 	};
 }
 

@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { Button } from '@wordpress/components';
-import { DataViews, type View } from '@wordpress/dataviews';
+import { DataViews, type Field, type View } from '@wordpress/dataviews';
 import { useEntityRecords } from '@wordpress/core-data';
 import { useMemo, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -19,12 +19,11 @@ import {
 	hasArchiveField,
 	hierarchicalField,
 	publicField,
-	statusField,
 	supportsField,
-	titleField,
 	useSlugField,
 	useTaxonomiesField,
 } from './fields';
+import { statusField, titleField } from '../utils/fields';
 import type { PostTypeFormData, PostTypeRecord } from './types';
 import { toFormData } from './utils';
 import { useEditPostTypeAction } from './actions/edit';
@@ -62,16 +61,17 @@ export function PostTypesList() {
 	const slugField = useSlugField();
 	const taxonomiesField = useTaxonomiesField();
 	const fields = useMemo(
-		() => [
-			titleField,
-			taxonomiesField,
-			statusField,
-			publicField,
-			slugField,
-			hierarchicalField,
-			hasArchiveField,
-			supportsField,
-		],
+		() =>
+			[
+				titleField,
+				taxonomiesField,
+				statusField,
+				publicField,
+				slugField,
+				hierarchicalField,
+				hasArchiveField,
+				supportsField,
+			] as Field< PostTypeFormData >[],
 		[ slugField, taxonomiesField ]
 	);
 	const queryArgs = useMemo( () => {

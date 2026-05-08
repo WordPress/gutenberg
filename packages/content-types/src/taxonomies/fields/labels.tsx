@@ -11,89 +11,50 @@ import { Stack, Text } from '@wordpress/ui';
 /**
  * Internal dependencies
  */
+import { createLabelField } from '../../utils/fields';
 import type { StoredLabels, TaxonomyFormData } from '../types';
 import { deriveLabels, STRING_LABEL_KEYS } from '../utils';
 
-type LabelFieldOptions = {
-	placeholder?: string;
-	description?: string;
-	isVisible?: ( item: TaxonomyFormData ) => boolean;
-};
-
-function labelField(
-	id: keyof StoredLabels,
-	label: string,
-	options: LabelFieldOptions = {}
-): Field< TaxonomyFormData > {
-	const field: Field< TaxonomyFormData > = {
-		id,
-		label,
-		type: 'text',
-		placeholder: options.placeholder,
-		description: options.description,
-		getValue: ( { item } ) => item.config.labels[ id ] ?? '',
-		setValue: ( { item, value } ) => ( {
-			config: {
-				...item.config,
-				labels: {
-					...item.config.labels,
-					[ id ]: String( value ?? '' ),
-				},
-			},
-		} ),
-		isValid: { maxLength: 200 },
-		enableSorting: false,
-	};
-	if ( options.isVisible ) {
-		field.isVisible = options.isVisible;
-	}
-	return field;
-}
-
-export const menuNameField = labelField( 'menu_name', __( 'Menu name' ), {
+export const menuNameField = createLabelField( 'menu_name', __( 'Menu name' ), {
 	placeholder: __( 'Categories' ),
 	description: __( 'Defaults to the plural label.' ),
 } );
-export const allItemsField = labelField( 'all_items', __( 'All items' ), {
+export const allItemsField = createLabelField( 'all_items', __( 'All items' ), {
 	placeholder: __( 'All Categories' ),
 } );
-export const editItemField = labelField( 'edit_item', __( 'Edit item' ), {
+export const editItemField = createLabelField( 'edit_item', __( 'Edit item' ), {
 	placeholder: __( 'Edit Category' ),
 } );
-export const viewItemField = labelField( 'view_item', __( 'View item' ), {
+export const viewItemField = createLabelField( 'view_item', __( 'View item' ), {
 	placeholder: __( 'View Category' ),
 } );
-export const updateItemField = labelField( 'update_item', __( 'Update item' ), {
-	placeholder: __( 'Update Category' ),
-} );
-export const addNewItemLabelField = labelField(
+export const updateItemField = createLabelField(
+	'update_item',
+	__( 'Update item' ),
+	{ placeholder: __( 'Update Category' ) }
+);
+export const addNewItemLabelField = createLabelField(
 	'add_new_item',
 	__( 'Add new item' ),
-	{
-		placeholder: __( 'Add New Category' ),
-	}
+	{ placeholder: __( 'Add New Category' ) }
 );
-export const newItemNameField = labelField(
+export const newItemNameField = createLabelField(
 	'new_item_name',
 	__( 'New item name' ),
-	{
-		placeholder: __( 'New Category Name' ),
-	}
+	{ placeholder: __( 'New Category Name' ) }
 );
-export const searchItemsField = labelField(
+export const searchItemsField = createLabelField(
 	'search_items',
 	__( 'Search items' ),
-	{
-		placeholder: __( 'Search Categories' ),
-	}
+	{ placeholder: __( 'Search Categories' ) }
 );
-export const notFoundField = labelField( 'not_found', __( 'Not found' ), {
+export const notFoundField = createLabelField( 'not_found', __( 'Not found' ), {
 	placeholder: __( 'No categories found.' ),
 	description: __(
 		'The text displayed when no terms are available in the term meta box and tag cloud.'
 	),
 } );
-export const backToItemsField = labelField(
+export const backToItemsField = createLabelField(
 	'back_to_items',
 	__( 'Back to items' ),
 	{
@@ -101,12 +62,16 @@ export const backToItemsField = labelField(
 		description: __( 'Label displayed after a term has been updated.' ),
 	}
 );
-export const parentItemField = labelField( 'parent_item', __( 'Parent item' ), {
-	placeholder: __( 'Parent Category' ),
-	description: __( 'Not used on non-hierarchical taxonomies.' ),
-	isVisible: ( item ) => item.config.hierarchical,
-} );
-export const popularItemsField = labelField(
+export const parentItemField = createLabelField(
+	'parent_item',
+	__( 'Parent item' ),
+	{
+		placeholder: __( 'Parent Category' ),
+		description: __( 'Not used on non-hierarchical taxonomies.' ),
+		isVisible: ( item ) => item.config.hierarchical,
+	}
+);
+export const popularItemsField = createLabelField(
 	'popular_items',
 	__( 'Popular items' ),
 	{
@@ -117,7 +82,7 @@ export const popularItemsField = labelField(
 		isVisible: ( item ) => ! item.config.hierarchical,
 	}
 );
-export const separateItemsField = labelField(
+export const separateItemsField = createLabelField(
 	'separate_items_with_commas',
 	__( 'Separate items with commas' ),
 	{
@@ -129,7 +94,7 @@ export const separateItemsField = labelField(
 	}
 );
 // Rare label overrides — appear last in the form.
-export const parentItemColonField = labelField(
+export const parentItemColonField = createLabelField(
 	'parent_item_colon',
 	__( 'Parent item with colon' ),
 	{
@@ -138,7 +103,7 @@ export const parentItemColonField = labelField(
 		isVisible: ( item ) => item.config.hierarchical,
 	}
 );
-export const addOrRemoveItemsField = labelField(
+export const addOrRemoveItemsField = createLabelField(
 	'add_or_remove_items',
 	__( 'Add or remove items' ),
 	{
@@ -149,7 +114,7 @@ export const addOrRemoveItemsField = labelField(
 		isVisible: ( item ) => ! item.config.hierarchical,
 	}
 );
-export const chooseFromMostUsedField = labelField(
+export const chooseFromMostUsedField = createLabelField(
 	'choose_from_most_used',
 	__( 'Choose from the most used' ),
 	{
