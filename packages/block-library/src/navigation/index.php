@@ -709,7 +709,6 @@ class WP_Navigation_Block_Renderer {
 			$overlay_blocks = static::get_overlay_blocks_from_template_part( $attributes['overlay'], $attributes );
 			// Render template part blocks directly without navigation container wrapper.
 			$overlay_blocks_html = static::get_template_part_blocks_html( $overlay_blocks );
-
 			// Check if overlay contains a navigation-overlay-close block (detect in rendered HTML so it works with patterns).
 			$has_custom_overlay_close_block = block_core_navigation_overlay_html_has_close_block( $overlay_blocks_html );
 			// Add Interactivity API directives to the overlay close block if present.
