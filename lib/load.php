@@ -24,7 +24,7 @@ if ( file_exists( $build_registration ) ) {
 // The constants.php file returns an array but doesn't define constants to avoid conflicts.
 $constants_file = plugin_dir_path( __DIR__ ) . 'build/constants.php';
 if ( file_exists( $constants_file ) && ! defined( 'GUTENBERG_VERSION' ) ) {
-	$build_constants = require_once $constants_file;
+	$build_constants = require $constants_file;
 	define( 'GUTENBERG_VERSION', $build_constants['version'] );
 }
 
@@ -122,6 +122,9 @@ require __DIR__ . '/compat/wordpress-7.0/command-palette.php';
 require __DIR__ . '/compat/wordpress-7.0/meta-box-rtc-compat.php';
 require __DIR__ . '/compat/wordpress-7.0/script-modules.php';
 
+// WordPress 7.1 compat.
+require __DIR__ . '/compat/wordpress-7.1/classic-block.php';
+
 // Experimental features.
 require __DIR__ . '/experimental/block-editor-settings-mobile.php';
 require __DIR__ . '/experimental/blocks.php';
@@ -137,10 +140,6 @@ if ( class_exists( '\WordPress\AiClient\AiClient' ) ) {
 
 if ( gutenberg_is_experiment_enabled( 'gutenberg-workflow-palette' ) ) {
 	require __DIR__ . '/experimental/workflow-palette.php';
-}
-
-if ( gutenberg_is_experiment_enabled( 'gutenberg-no-tinymce' ) ) {
-	require __DIR__ . '/experimental/disable-tinymce.php';
 }
 
 // Load the BC Layer to avoid fatal errors of extenders using the Fonts API.
@@ -226,9 +225,13 @@ if ( gutenberg_is_experiment_enabled( 'gutenberg-guidelines' ) ) {
 if ( gutenberg_is_experiment_enabled( 'gutenberg-content-types' ) ) {
 	require __DIR__ . '/experimental/content-types/load.php';
 	require __DIR__ . '/experimental/content-types/index.php';
+	require __DIR__ . '/experimental/content-types/post-types.php';
 }
 
 // Dashboard Widgets (only load when experiment is enabled).
 if ( gutenberg_is_experiment_enabled( 'gutenberg-dashboard-widgets' ) ) {
 	require __DIR__ . '/experimental/dashboard-widgets/load.php';
+	require __DIR__ . '/experimental/dashboard-widgets/widget-types.php';
+	require __DIR__ . '/experimental/dashboard-widgets/dashboard-layout.php';
+	require __DIR__ . '/experimental/dashboard-widgets/default-layout-seed.php';
 }

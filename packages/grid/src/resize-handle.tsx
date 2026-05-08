@@ -8,67 +8,69 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { useThrottle } from '@wordpress/compose';
+import { useEffect, useRef } from '@wordpress/element';
+import { useMergeRefs, useThrottle } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
+import type { ResizeDelta, ResizeHandleProps } from './types';
 import styles from './resize-handle.module.css';
 
-interface ResizeHandleProps {
-	/**
-	 * Whether the handle is inert. When true, it renders muted and
-	 * does not respond to pointer events.
-	 *
-	 * @default false
-	 */
-	disabled?: boolean;
-
-	/**
-	 * Owning grid item's `key`. Forwarded as `data.itemId` on the
-	 * draggable so the parent can correlate the gesture with a tile
-	 * if needed.
-	 */
-	itemId?: string;
-
-	/**
-	 * Whether the handle should track vertical movement. When false,
-	 * the handle still appears but only emits horizontal deltas, and
-	 * the cursor is constrained to the column resize axis.
-	 *
-	 * @default true
-	 */
-	verticalResizable?: boolean;
-
-	/**
-	 * Callback fired while the handle is being dragged. Receives the
-	 * cursor offset from the gesture start in pixels.
-	 */
-	onResize?: ( delta: { width: number; height: number } ) => void;
-
-	/**
-	 * Callback fired when the gesture ends.
-	 */
-	onResizeEnd?: () => void;
-}
-
 function ResizeHandle( {
-	disabled = false,
 	itemId,
 	verticalResizable = true,
+	renderResizeHandle,
 }: ResizeHandleProps ) {
-	const { attributes, listeners, setNodeRef } = useDraggable( {
+	const { attributes, listeners, setNodeRef, isDragging } = useDraggable( {
 		id: 'draggable',
 		data: { itemId },
 	} );
 
+	// Track the rendered node so we can resolve `ownerDocument` for the
+	// cursor lock — needed when the grid lives inside an iframe (e.g.
+	// the block-editor canvas).
+	const nodeRef = useRef< HTMLElement | null >( null );
+	const mergedRef = useMergeRefs( [ nodeRef, setNodeRef ] );
+
+	// Lock the document cursor while the gesture is active. Without
+	// this, the OS pointer reverts to the default arrow as soon as it
+	// leaves the handle's hit area, even though the resize is still
+	// in progress.
+	useEffect( () => {
+		if ( ! isDragging ) {
+			return;
+		}
+		const cursor = verticalResizable ? 'nwse-resize' : 'ew-resize';
+		const root = ( nodeRef.current?.ownerDocument ?? document )
+			.documentElement;
+		const previous = root.style.cursor;
+		root.style.cursor = cursor;
+		return () => {
+			root.style.cursor = previous;
+		};
+	}, [ isDragging, verticalResizable ] );
+
+	if ( renderResizeHandle ) {
+		const RenderResizeHandle = renderResizeHandle;
+		return (
+			<RenderResizeHandle
+				ref={ mergedRef }
+				listeners={ listeners }
+				attributes={ attributes }
+				verticalResizable={ verticalResizable }
+				isResizing={ isDragging }
+				itemId={ itemId }
+			/>
+		);
+	}
+
 	return (
 		<div
-			ref={ setNodeRef }
+			ref={ mergedRef }
 			className={ clsx(
 				styles[ 'resize-handle' ],
-				! verticalResizable && styles[ 'is-horizontal-only' ],
-				disabled && styles[ 'is-disabled' ]
+				! verticalResizable && styles[ 'is-horizontal-only' ]
 			) }
 			{ ...listeners }
 			{ ...attributes }
@@ -82,18 +84,24 @@ function ResizeHandle( {
  * via `onResize`, throttled to one animation frame so the grid
  * commit loop runs at most once per paint.
  *
+ * Auto-scroll is enabled with a tight trigger zone and a low
+ * acceleration so a resize gesture near the viewport edge scrolls
+ * the page only when the user deliberately pushes against the very
+ * edge, and even then at a pace the user can interrupt by releasing.
+ * Default tuning would otherwise produce a runaway loop where the
+ * page scrolls fast, dnd-kit's document-coordinate `delta` inflates
+ * with the scroll, and the tile keeps growing without further user
+ * input.
+ *
  * @param props Component props.
  */
 export default function ResizeHandleWrapper( props: ResizeHandleProps ) {
 	const throttleDelay = 16;
-	const throttledResize = useThrottle(
-		( delta: { width: number; height: number } ) => {
-			if ( props.onResize ) {
-				props.onResize( delta );
-			}
-		},
-		throttleDelay
-	);
+	const throttledResize = useThrottle( ( delta: ResizeDelta ) => {
+		if ( props.onResize ) {
+			props.onResize( delta );
+		}
+	}, throttleDelay );
 
 	// `event.delta` is the cursor offset from the gesture start —
 	// not from the handle's current position — so it stays stable
@@ -117,7 +125,14 @@ export default function ResizeHandleWrapper( props: ResizeHandleProps ) {
 	};
 
 	return (
-		<DndContext onDragMove={ handleDragMove } onDragEnd={ handleDragEnd }>
+		<DndContext
+			autoScroll={ {
+				threshold: { x: 0.005, y: 0.005 },
+				acceleration: 1,
+			} }
+			onDragMove={ handleDragMove }
+			onDragEnd={ handleDragEnd }
+		>
 			<ResizeHandle { ...props } />
 		</DndContext>
 	);

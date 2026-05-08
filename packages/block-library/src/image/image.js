@@ -901,6 +901,11 @@ export default function Image( {
 											} )
 									: () => setIsEditingImage( true )
 							}
+							aria-haspopup={
+								openMediaEditorModal && id
+									? 'dialog'
+									: undefined
+							}
 							icon={ crop }
 							label={ __( 'Crop' ) }
 						/>
