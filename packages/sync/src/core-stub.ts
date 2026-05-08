@@ -5,117 +5,15 @@ import { __dangerousOptInToUnstableAPIsOnlyForCoreModules } from '@wordpress/pri
 
 /**
  * A minimal no-op replacement used when the real-time collaboration package is
- * excluded from WordPress Core builds.
+ * excluded from WordPress Core builds. The Yjs constructors are present only
+ * to preserve the import and instanceof shape; createSyncManager() below
+ * returns undefined, so these should not be reached.
  */
-
-class StubDoc {
-	getMap() {
-		return new StubMap();
-	}
-}
-
-class StubMap {
-	private values = new globalThis.Map< PropertyKey, unknown >();
-	public parent = null;
-
-	constructor( entries: Iterable< [ PropertyKey, unknown ] > = [] ) {
-		this.values = new globalThis.Map( entries );
-	}
-
-	get( key: PropertyKey ) {
-		return this.values.get( key );
-	}
-
-	set( key: PropertyKey, value: unknown ) {
-		this.values.set( key, value );
-	}
-
-	has( key: PropertyKey ) {
-		return this.values.has( key );
-	}
-
-	delete( key: PropertyKey ) {
-		return this.values.delete( key );
-	}
-
-	toJSON() {
-		return Object.fromEntries( this.values );
-	}
-}
-
-class StubArray {
-	private values: unknown[] = [];
-	public parent = null;
-
-	get length() {
-		return this.values.length;
-	}
-
-	get( index: number ) {
-		return this.values[ index ];
-	}
-
-	insert( index: number, values: unknown[] ) {
-		this.values.splice( index, 0, ...values );
-	}
-
-	delete( index: number, length = 1 ) {
-		this.values.splice( index, length );
-	}
-
-	map< T >( callback: ( value: unknown, index: number ) => T ) {
-		return this.values.map( callback );
-	}
-
-	forEach( callback: ( value: unknown, index: number ) => void ) {
-		this.values.forEach( callback );
-	}
-
-	toArray() {
-		return [ ...this.values ];
-	}
-}
-
-class StubText {
-	private value: string;
-	public parent = null;
-
-	constructor( value = '' ) {
-		this.value = value;
-	}
-
-	insert( index: number, text: string ) {
-		this.value =
-			this.value.slice( 0, index ) + text + this.value.slice( index );
-	}
-
-	delete( index: number, length: number ) {
-		this.value =
-			this.value.slice( 0, index ) + this.value.slice( index + length );
-	}
-
-	toDelta() {
-		return [];
-	}
-
-	applyDelta() {
-		return undefined;
-	}
-
-	toJSON() {
-		return this.value;
-	}
-
-	toString() {
-		return this.value;
-	}
-}
-
 export const Y = {
-	Doc: StubDoc,
-	Map: StubMap,
-	Array: StubArray,
-	Text: StubText,
+	Doc: class {},
+	Map: class {},
+	Array: class {},
+	Text: class {},
 	createAbsolutePositionFromRelativePosition: () => null,
 	createRelativePositionFromTypeIndex: () => null,
 	compareRelativePositions: ( a: unknown, b: unknown ) => a === b,
