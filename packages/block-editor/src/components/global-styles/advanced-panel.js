@@ -91,7 +91,6 @@ export default function AdvancedPanel( {
 					{ cssError }
 				</Notice>
 			) }
-			<h1>ok</h1>
 			<Suspense fallback={ null }>
 				<CodeMirrorEditor
 					label={ __( 'Additional CSS' ) }
