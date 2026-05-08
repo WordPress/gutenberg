@@ -4,7 +4,7 @@
 import { v4 as uuidv4 } from 'uuid';
 
 // @ts-expect-error - WASM files are inlined as base64 data URLs at build time
-import ultraHdrWasm from 'open-ultrahdr-wasm/pkg/open_ultrahdr_bg.wasm';
+import ultraHdrWasm from 'open-ultrahdr-wasm/pkg/open_ultrahdr.wasm';
 
 /**
  * WordPress dependencies

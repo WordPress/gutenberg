@@ -58,8 +58,8 @@
 		"@wordpress/private-apis": "file:../private-apis",
 		"@wordpress/url": "file:../url",
 		"@wordpress/vips": "file:../vips",
-		"open-ultrahdr": "0.1.2",
-		"open-ultrahdr-wasm": "0.1.2",
+		"open-ultrahdr": "0.2.0",
+		"open-ultrahdr-wasm": "0.2.0",
 		"uuid": "^9.0.1"
 	},
 	"peerDependencies": {
