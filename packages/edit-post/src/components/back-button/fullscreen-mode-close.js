@@ -79,13 +79,6 @@ function FullscreenModeClose( { showTooltip, icon, href, initialPost } ) {
 		return null;
 	}
 
-	const isAdminBarInEditorEnabled = window.__experimentalAdminBarInEditor;
-
-	let backIcon = arrowUpLeft;
-	if ( isAdminBarInEditorEnabled ) {
-		backIcon = isRTL() ? chevronRight : chevronLeft;
-	}
-
 	// Create SiteIcon equivalent structure exactly like edit-site
 	let siteIconContent;
 	if ( isRequestingSiteIcon && ! siteIconUrl ) {
@@ -131,6 +124,8 @@ function FullscreenModeClose( { showTooltip, icon, href, initialPost } ) {
 
 	const buttonLabel = postType?.labels?.view_items ?? __( 'Back' );
 
+	const isAdminBarInEditorEnabled = window.__experimentalAdminBarInEditor;
+
 	return (
 		<motion.div
 			className="edit-post-fullscreen-mode-close__view-mode-toggle"
@@ -148,23 +143,33 @@ function FullscreenModeClose( { showTooltip, icon, href, initialPost } ) {
 				showTooltip={ showTooltip }
 				tooltipPosition="bottom"
 			>
-				<motion.div variants={ ! disableMotion && siteIconVariants }>
-					<div className="edit-post-fullscreen-mode-close__view-mode-toggle-icon">
-						{ buttonIcon }
-					</div>
-				</motion.div>
-			</Button>
-			<motion.div
-				className={ clsx(
-					'edit-post-fullscreen-mode-close__back-icon',
-					{
-						'has-site-icon': siteIconUrl,
-					}
+				{ ! isAdminBarInEditorEnabled && (
+					<motion.div
+						variants={ ! disableMotion && siteIconVariants }
+					>
+						<div className="edit-post-fullscreen-mode-close__view-mode-toggle-icon">
+							{ buttonIcon }
+						</div>
+					</motion.div>
 				) }
-				variants={ ! disableMotion && toggleHomeIconVariants }
-			>
-				<Icon icon={ backIcon } />
-			</motion.div>
+			</Button>
+			{ isAdminBarInEditorEnabled ? (
+				<div className="edit-post-fullscreen-mode-close__back-icon">
+					<Icon icon={ isRTL() ? chevronRight : chevronLeft } />
+				</div>
+			) : (
+				<motion.div
+					className={ clsx(
+						'edit-post-fullscreen-mode-close__back-icon',
+						{
+							'has-site-icon': siteIconUrl,
+						}
+					) }
+					variants={ ! disableMotion && toggleHomeIconVariants }
+				>
+					<Icon icon={ arrowUpLeft } />
+				</motion.div>
+			) }
 		</motion.div>
 	);
 }

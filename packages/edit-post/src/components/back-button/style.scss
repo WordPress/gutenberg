@@ -51,18 +51,16 @@
 			color: $gray-900;
 		}
 
-		.edit-post-fullscreen-mode-close__view-mode-toggle-icon {
-			display: none;
-		}
-
 		.edit-post-fullscreen-mode-close__back-icon {
 			top: auto;
 			left: auto;
 			width: $button-size-compact;
 			height: $button-size-compact;
 			background: transparent;
-			opacity: 1 !important;
-			transform: none !important;
+		}
+
+		&:hover .edit-post-fullscreen-mode-close__back-icon {
+			color: var(--wp-admin-theme-color);
 		}
 	}
 }

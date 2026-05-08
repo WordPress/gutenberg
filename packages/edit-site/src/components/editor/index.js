@@ -208,6 +208,8 @@ export default function EditSiteEditor( { isHomeRoute = false } ) {
 		duration: disableMotion ? 0 : 0.2,
 	};
 
+	const isAdminBarInEditorEnabled = window.__experimentalAdminBarInEditor;
+
 	return ! isBlockBasedTheme && isHomeRoute ? (
 		<SitePreview />
 	) : (
@@ -274,24 +276,38 @@ export default function EditSiteEditor( { isHomeRoute = false } ) {
 												);
 											} }
 										>
-											<motion.div
-												variants={ siteIconVariants }
-											>
-												<SiteIcon className="edit-site-editor__view-mode-toggle-icon" />
-											</motion.div>
-										</Button>
-										<motion.div
-											className={ clsx(
-												'edit-site-editor__back-icon',
-												{
-													'has-site-icon':
-														hasSiteIcon,
-												}
+											{ ! isAdminBarInEditorEnabled && (
+												<motion.div
+													variants={
+														! disableMotion &&
+														siteIconVariants
+													}
+												>
+													<SiteIcon className="edit-site-editor__view-mode-toggle-icon" />
+												</motion.div>
 											) }
-											variants={ toggleHomeIconVariants }
-										>
-											<Icon icon={ arrowUpLeft } />
-										</motion.div>
+										</Button>
+										{ isAdminBarInEditorEnabled ? (
+											<div className="edit-site-editor__back-icon">
+												<Icon icon={ arrowUpLeft } />
+											</div>
+										) : (
+											<motion.div
+												className={ clsx(
+													'edit-site-editor__back-icon',
+													{
+														'has-site-icon':
+															hasSiteIcon,
+													}
+												) }
+												variants={
+													! disableMotion &&
+													toggleHomeIconVariants
+												}
+											>
+												<Icon icon={ arrowUpLeft } />
+											</motion.div>
+										) }
 									</motion.div>
 								)
 							}
