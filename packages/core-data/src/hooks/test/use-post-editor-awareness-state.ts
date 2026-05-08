@@ -19,17 +19,22 @@ import { SelectionType } from '../../types';
 
 describe( 'use-post-editor-awareness-state hooks', () => {
 	it( 'returns no active collaborators', () => {
-		const { result } = renderHook( () =>
+		const { result, rerender } = renderHook( () =>
 			useActiveCollaborators( 123, 'post' )
 		);
+		const firstResult = result.current;
+		rerender();
 
 		expect( result.current ).toEqual( [] );
+		expect( result.current ).toBe( firstResult );
 	} );
 
 	it( 'returns the default resolved selection', () => {
-		const { result } = renderHook( () =>
+		const { result, rerender } = renderHook( () =>
 			useResolvedSelection( 123, 'post' )
 		);
+		const firstResult = result.current;
+		rerender();
 
 		expect(
 			result.current( {
@@ -39,6 +44,7 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 			richTextOffset: null,
 			localClientId: null,
 		} );
+		expect( result.current ).toBe( firstResult );
 	} );
 
 	it( 'returns empty debug data', () => {

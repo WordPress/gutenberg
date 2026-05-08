@@ -13,6 +13,15 @@ const defaultResolvedSelection: ResolvedSelection = {
 	localClientId: null,
 };
 
+const emptyCollaborators: ActiveCollaborator[] = [];
+
+const resolveDefaultSelection = (
+	selection: SelectionState
+): ResolvedSelection => {
+	void selection;
+	return defaultResolvedSelection;
+};
+
 const defaultDebugData: YDocDebugData = {
 	doc: {},
 	clients: {},
@@ -32,7 +41,7 @@ export function useActiveCollaborators(
 ): ActiveCollaborator[] {
 	void postId;
 	void postType;
-	return [];
+	return emptyCollaborators;
 }
 
 /**
@@ -48,10 +57,7 @@ export function useResolvedSelection(
 ): ( selection: SelectionState ) => ResolvedSelection {
 	void postId;
 	void postType;
-	return ( selection: SelectionState ) => {
-		void selection;
-		return defaultResolvedSelection;
-	};
+	return resolveDefaultSelection;
 }
 
 /**

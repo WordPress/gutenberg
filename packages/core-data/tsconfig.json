@@ -18,7 +18,6 @@
 		{ "path": "../is-shallow-equal" },
 		{ "path": "../private-apis" },
 		{ "path": "../rich-text" },
-		{ "path": "../sync" },
 		{ "path": "../undo-manager" },
 		{ "path": "../url" },
 		{ "path": "../warning" }
