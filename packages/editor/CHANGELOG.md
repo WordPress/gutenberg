@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   Update `date-fns` dependency to `v4.1.0` ([#78057](https://github.com/WordPress/gutenberg/pull/78057)).
+
 ## 14.45.0 (2026-04-29)
 
 ## 14.44.0 (2026-04-15)

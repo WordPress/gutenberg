@@ -20,6 +20,7 @@ const CORE_MODULES_USING_PRIVATE_APIS = [
 	'@wordpress/connectors',
 	'@wordpress/workflows',
 	'@wordpress/components',
+	'@wordpress/content-types',
 	'@wordpress/core-commands',
 	'@wordpress/core-data',
 	'@wordpress/customize-widgets',
