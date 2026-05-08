@@ -16,10 +16,15 @@ async function enableFullscreenMode( page ) {
 		.click();
 }
 
+async function enableDistractionFreeMode( pageUtils ) {
+	await pageUtils.pressKeys( 'primaryShift+\\' );
+}
+
 test.describe( 'Fullscreen Mode', () => {
 	test.afterEach( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllPosts();
 		await requestUtils.setGutenbergExperiments( [] );
+		await requestUtils.resetPreferences();
 	} );
 
 	test( 'should open the fullscreen mode from the more menu', async ( {
@@ -70,6 +75,28 @@ test.describe( 'Fullscreen Mode', () => {
 				'role=region[name="Editor top bar"i] >> role=link[name="View Posts"i]'
 			)
 		).toBeVisible();
+	} );
+
+	test( 'should hide the admin bar in distraction free mode when the experiment is enabled', async ( {
+		page,
+		admin,
+		requestUtils,
+		pageUtils,
+	} ) => {
+		await requestUtils.setGutenbergExperiments( [
+			'gutenberg-admin-bar-in-editor',
+		] );
+		await admin.createNewPost();
+		await enableFullscreenMode( page );
+		await enableDistractionFreeMode( pageUtils );
+
+		await expect( page.locator( 'body' ) ).toHaveClass(
+			/is-admin-bar-in-editor-enabled/
+		);
+		await expect( page.locator( '.editor-editor-interface' ) ).toHaveClass(
+			/is-distraction-free/
+		);
+		await expect( page.locator( '#wpadminbar' ) ).toBeHidden();
 	} );
 
 	test( 'should show the admin bar in the site editor when the experiment is enabled', async ( {
