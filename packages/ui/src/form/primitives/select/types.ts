@@ -60,7 +60,7 @@ export type SelectItemProps = Omit<
 	/**
 	 * A unique value that identifies this select item.
 	 */
-	value?: string;
+	value?: string | null;
 	/**
 	 * The size of the item.
 	 *

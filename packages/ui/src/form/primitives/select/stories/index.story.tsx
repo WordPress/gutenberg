@@ -103,6 +103,40 @@ export const WithCustomPlaceholder: Story = {
 	},
 };
 
+const nullValueOptionItems = [
+	{ value: null, label: 'Select theme' },
+	{ value: 'system', label: 'System default' },
+	{ value: 'light', label: 'Light' },
+	{ value: 'dark', label: 'Dark' },
+];
+
+/**
+ * Use a `null` item when users should be able to clear the selected value from
+ * the popup. When `items` includes a `null` item, its label is used as the
+ * placeholder text.
+ */
+export const WithNullValueOption: Story = {
+	args: {
+		items: nullValueOptionItems,
+		children: (
+			<>
+				<Select.Trigger />
+				<Select.Popup>
+					{ nullValueOptionItems.map( ( item ) => (
+						<Select.Item
+							key={ item.value ?? 'null' }
+							value={ item.value }
+						>
+							{ item.label }
+						</Select.Item>
+					) ) }
+				</Select.Popup>
+			</>
+		),
+		// defaultValue: 'system',
+	},
+};
+
 /**
  * When accessibly labeling a `Select`, note that the label must be associated with the `Select.Trigger`,
  * not the `Select.Root`.
