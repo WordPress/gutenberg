@@ -76,6 +76,20 @@ _Parameters_
 -   _quality_ Desired quality.
 -   _interlaced_ Whether to use interlaced/progressive mode. Only used if the outputType supports it.
 
+### getUltraHdrInfo
+
+Probes a JPEG to determine whether it is an UltraHDR image with an embedded gain map.
+
+Returns dimensions and HDR headroom on success, or `null` if the buffer is not a valid UltraHDR JPEG (no gain map, decode failure, or unsupported format).
+
+_Parameters_
+
+-   _buffer_ `ArrayBuffer`: Image buffer.
+
+_Returns_
+
+-   `Promise< UltraHdrInfo | null >`: UltraHDR info, or null when the buffer is not UltraHDR.
+
 ### hasTransparency
 
 Determines whether an image has an alpha channel.
@@ -100,6 +114,7 @@ _Parameters_
 -   _resize_ `ImageSizeCrop`: Resize options.
 -   _smartCrop_ Whether to use smart cropping (i.e. saliency-aware).
 -   _quality_ Desired quality (0-1).
+-   _isUltraHdr_ Whether the input is an UltraHDR JPEG with a gain map. When true, the image is loaded via uhdrload so libvips resizes the gain map alongside the base image, and the output is saved via uhdrsave so the gain map is re-embedded in the resulting JPEG.
 
 _Returns_
 
@@ -184,6 +199,20 @@ _Parameters_
 -   _quality_ Desired quality.
 -   _interlaced_ Whether to use interlaced/progressive mode. Only used if the outputType supports it.
 
+### vipsGetUltraHdrInfo
+
+Probes a JPEG to determine whether it is an UltraHDR image with an embedded gain map.
+
+Returns dimensions and HDR headroom on success, or `null` if the buffer is not a valid UltraHDR JPEG (no gain map, decode failure, or unsupported format).
+
+_Parameters_
+
+-   _buffer_ `ArrayBuffer`: Image buffer.
+
+_Returns_
+
+-   `Promise< UltraHdrInfo | null >`: UltraHDR info, or null when the buffer is not UltraHDR.
+
 ### vipsHasTransparency
 
 Determines whether an image has an alpha channel.
@@ -208,6 +237,7 @@ _Parameters_
 -   _resize_ `ImageSizeCrop`: Resize options.
 -   _smartCrop_ Whether to use smart cropping (i.e. saliency-aware).
 -   _quality_ Desired quality (0-1).
+-   _isUltraHdr_ Whether the input is an UltraHDR JPEG with a gain map. When true, the image is loaded via uhdrload so libvips resizes the gain map alongside the base image, and the output is saved via uhdrsave so the gain map is re-embedded in the resulting JPEG.
 
 _Returns_
 

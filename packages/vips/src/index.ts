@@ -316,12 +316,17 @@ function buildSaveOptions(
 /**
  * Resizes an image using vips.
  *
- * @param id        Item ID.
- * @param buffer    Original file buffer.
- * @param type      Mime type.
- * @param resize    Resize options.
- * @param smartCrop Whether to use smart cropping (i.e. saliency-aware).
- * @param quality   Desired quality (0-1).
+ * @param id         Item ID.
+ * @param buffer     Original file buffer.
+ * @param type       Mime type.
+ * @param resize     Resize options.
+ * @param smartCrop  Whether to use smart cropping (i.e. saliency-aware).
+ * @param quality    Desired quality (0-1).
+ * @param isUltraHdr Whether the input is an UltraHDR JPEG with a gain map.
+ *                   When true, the image is loaded via uhdrload so libvips
+ *                   resizes the gain map alongside the base image, and the
+ *                   output is saved via uhdrsave so the gain map is
+ *                   re-embedded in the resulting JPEG.
  * @return Processed file data plus the old and new dimensions.
  */
 export async function resizeImage(
@@ -330,7 +335,8 @@ export async function resizeImage(
 	type: string,
 	resize: ImageSizeCrop,
 	smartCrop = false,
-	quality = 0.82
+	quality = 0.82,
+	isUltraHdr = false
 ): Promise< {
 	buffer: ArrayBuffer | ArrayBufferLike;
 	width: number;
@@ -362,7 +368,11 @@ export async function resizeImage(
 			}
 		};
 
-		let image = vips.Image.newFromBuffer( buffer, strOptions, loadOptions );
+		// For UltraHDR JPEGs, load via uhdrload so the gain map is decoded
+		// alongside the base image and tracked through the thumbnail pipeline.
+		let image = isUltraHdr
+			? vips.Image.uhdrloadBuffer( buffer )
+			: vips.Image.newFromBuffer( buffer, strOptions, loadOptions );
 
 		image.onProgress = onProgress;
 
@@ -374,6 +384,18 @@ export async function resizeImage(
 			pageHeight,
 			smartCrop,
 			( resizeWidth, thumbnailOptions ) => {
+				// thumbnailImage downsizes the already-loaded image (including
+				// the attached gain map for UltraHDR inputs), avoiding a
+				// reload via thumbnailBuffer which would not preserve the
+				// gain map link for UltraHDR sources.
+				if ( isUltraHdr ) {
+					const thumb = image.thumbnailImage(
+						resizeWidth,
+						thumbnailOptions
+					);
+					thumb.onProgress = onProgress;
+					return thumb;
+				}
 				if ( strOptions ) {
 					thumbnailOptions.option_string = strOptions;
 				}
@@ -387,8 +409,17 @@ export async function resizeImage(
 			}
 		);
 
-		const saveOptions = buildSaveOptions( type, quality );
-		const outBuffer = image.writeToBuffer( `.${ ext }`, saveOptions );
+		let outBuffer: Uint8Array;
+		if ( isUltraHdr ) {
+			// Default metadata retention — UltraHDR's gain map structure is
+			// stored in XMP, so stripping metadata would invalidate the file.
+			outBuffer = image.uhdrsaveBuffer( {
+				Q: quality * 100,
+			} );
+		} else {
+			const saveOptions = buildSaveOptions( type, quality );
+			outBuffer = image.writeToBuffer( `.${ ext }`, saveOptions );
+		}
 
 		const result = {
 			buffer: outBuffer.buffer,
@@ -404,6 +435,66 @@ export async function resizeImage(
 		return result;
 	} finally {
 		inProgressOperations.delete( id );
+	}
+}
+
+/**
+ * Information returned by getUltraHdrInfo() for a successfully probed
+ * UltraHDR JPEG.
+ */
+interface UltraHdrInfo {
+	width: number;
+	height: number;
+	/** HDR headroom in stops (log2 of the linear capacity). */
+	hdrCapacity: number;
+}
+
+/**
+ * Probes a JPEG to determine whether it is an UltraHDR image with an embedded
+ * gain map.
+ *
+ * Returns dimensions and HDR headroom on success, or `null` if the buffer is
+ * not a valid UltraHDR JPEG (no gain map, decode failure, or unsupported
+ * format).
+ *
+ * @param buffer Image buffer.
+ * @return UltraHDR info, or null when the buffer is not UltraHDR.
+ */
+export async function getUltraHdrInfo(
+	buffer: ArrayBuffer
+): Promise< UltraHdrInfo | null > {
+	try {
+		const vips = await getVips();
+		const image = vips.Image.uhdrloadBuffer( buffer );
+		if ( ! image.gainmap ) {
+			cleanup?.();
+			return null;
+		}
+
+		// `gainmap-hdr-capacity-max` is libultrahdr's linear-scale max capacity.
+		// Convert to log2 stops so the value stored in attachment metadata
+		// represents HDR headroom in stops.
+		let hdrCapacityLinear = 1;
+		try {
+			hdrCapacityLinear = image.getDouble( 'gainmap-hdr-capacity-max' );
+		} catch {
+			// Field may be missing; fall back to no headroom.
+		}
+		const hdrCapacity =
+			hdrCapacityLinear > 0 ? Math.log2( hdrCapacityLinear ) : 0;
+
+		const info: UltraHdrInfo = {
+			width: image.width,
+			height: image.pageHeight,
+			hdrCapacity,
+		};
+
+		cleanup?.();
+		return info;
+	} catch {
+		// Not an UltraHDR image (or libultrahdr decoder unavailable).
+		cleanup?.();
+		return null;
 	}
 }
 
@@ -646,5 +737,6 @@ export {
 	batchResizeImage as vipsBatchResizeImage,
 	rotateImage as vipsRotateImage,
 	hasTransparency as vipsHasTransparency,
+	getUltraHdrInfo as vipsGetUltraHdrInfo,
 	cancelOperations as vipsCancelOperations,
 };
