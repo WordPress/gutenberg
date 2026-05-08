@@ -6,6 +6,7 @@ import type {
 	DataFormControlProps,
 	Field,
 	FieldValidity,
+	NormalizedRules,
 } from '@wordpress/dataviews';
 import { __ } from '@wordpress/i18n';
 
@@ -95,6 +96,7 @@ export function createLabelField(
 			} ) as Partial< ContentType >,
 		isValid: {
 			...( options.required ? { required: true } : {} ),
+			// Mirrors the server REST schema: 200 chars for labels.
 			maxLength: 200,
 		},
 		enableSorting: false,
@@ -116,6 +118,7 @@ export const titleField: Field< ContentType > = {
 	} ),
 	isValid: {
 		required: true,
+		// Title is stored as the plural label — mirrors the server REST schema (200 chars).
 		maxLength: 200,
 	},
 	filterBy: false,
@@ -170,6 +173,7 @@ export function createDescriptionField(
 		setValue: ( { item, value } ) => ( {
 			config: { ...item.config, description: String( value ?? '' ) },
 		} ),
+		// Mirrors the server REST schema (1000 chars for description).
 		isValid: { maxLength: 1000 },
 		enableSorting: false,
 	};
@@ -194,15 +198,24 @@ export const statusField: Field< ContentType > = {
 	enableSorting: false,
 };
 
-export function SlugEdit( {
+// `SlugEdit` is internal to this package and only used by the slug field
+// produced by the two `useSlugField` hooks, which always declare
+// `isValid.maxLength`. The internal `SlugFieldRules` cast narrows it so the
+// constraint can be read without optional chaining or fallbacks.
+type SlugFieldRules< T > = NormalizedRules< T > & {
+	maxLength: NonNullable< NormalizedRules< T >[ 'maxLength' ] >;
+};
+
+export function SlugEdit< T extends ContentType >( {
 	data,
 	field,
 	onChange,
 	hideLabelFromVision,
 	markWhenOptional,
 	validity,
-}: DataFormControlProps< any > ) {
-	const { label, description, getValue, setValue, isValid } = field;
+}: DataFormControlProps< T > ) {
+	const { label, description, getValue, setValue } = field;
+	const isValid = field.isValid as SlugFieldRules< T >;
 	const value = ( getValue( { item: data } ) as string | undefined ) ?? '';
 	const handleChange = ( newValue: string ) =>
 		onChange( setValue( { item: data, value: newValue } ) );
@@ -221,13 +234,8 @@ export function SlugEdit( {
 		if ( /[^a-z0-9_-]/.test( cleaned ) ) {
 			return;
 		}
-		const maxLength =
-			typeof isValid?.maxLength === 'number'
-				? isValid.maxLength
-				: ( isValid?.maxLength as { constraint?: number } | undefined )
-						?.constraint ?? Infinity;
 		const trimmed = cleaned
-			.slice( 0, maxLength )
+			.slice( 0, isValid.maxLength.constraint )
 			// Slicing can introduce a trailing hyphen — strip it.
 			.replace( /-+$/, '' );
 		if ( trimmed ) {
@@ -247,7 +255,7 @@ export function SlugEdit( {
 			onFocus={ onFocus }
 			hideLabelFromVision={ hideLabelFromVision }
 			pattern={ isValid.pattern?.constraint }
-			maxLength={ isValid.maxLength?.constraint }
+			maxLength={ isValid.maxLength.constraint }
 		/>
 	);
 }
