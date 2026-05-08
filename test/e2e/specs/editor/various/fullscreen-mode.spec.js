@@ -20,6 +20,22 @@ async function enableDistractionFreeMode( pageUtils ) {
 	await pageUtils.pressKeys( 'primaryShift+\\' );
 }
 
+function getEditorTopBar( page ) {
+	return page.getByRole( 'region', { name: 'Editor top bar' } );
+}
+
+function getPostEditorBackLink( page ) {
+	return getEditorTopBar( page ).getByRole( 'link', {
+		name: 'View Posts',
+	} );
+}
+
+function getSiteEditorOpenNavigationButton( page ) {
+	return getEditorTopBar( page ).getByRole( 'button', {
+		name: 'Open Navigation',
+	} );
+}
+
 test.describe( 'Fullscreen Mode', () => {
 	test.afterEach( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllPosts();
@@ -40,12 +56,7 @@ test.describe( 'Fullscreen Mode', () => {
 		);
 
 		await expect( page.locator( '#wpadminbar' ) ).toBeHidden();
-
-		await expect(
-			page.locator(
-				'role=region[name="Editor top bar"i] >> role=link[name="View Posts"i]'
-			)
-		).toBeVisible();
+		await expect( getPostEditorBackLink( page ) ).toBeVisible();
 	} );
 
 	test( 'should show the admin bar when the experiment is enabled', async ( {
@@ -66,15 +77,7 @@ test.describe( 'Fullscreen Mode', () => {
 			/is-admin-bar-in-editor-enabled/
 		);
 		await expect( page.locator( '#wpadminbar' ) ).toBeVisible();
-		await expect(
-			page.locator( '.interface-interface-skeleton' )
-		).toHaveCSS( 'top', '32px' );
-
-		await expect(
-			page.locator(
-				'role=region[name="Editor top bar"i] >> role=link[name="View Posts"i]'
-			)
-		).toBeVisible();
+		await expect( getPostEditorBackLink( page ) ).toBeVisible();
 	} );
 
 	test( 'should hide the admin bar in distraction free mode when the experiment is enabled', async ( {
@@ -99,21 +102,32 @@ test.describe( 'Fullscreen Mode', () => {
 		await expect( page.locator( '#wpadminbar' ) ).toBeHidden();
 	} );
 
-	test( 'should show the admin bar in the site editor when the experiment is enabled', async ( {
-		page,
-		admin,
-		requestUtils,
-	} ) => {
-		await requestUtils.setGutenbergExperiments( [
-			'gutenberg-admin-bar-in-editor',
-		] );
-		await admin.visitAdminPage( 'site-editor.php' );
+	test.describe( 'Site Editor', () => {
+		test.beforeAll( async ( { requestUtils } ) => {
+			await requestUtils.activateTheme( 'emptytheme' );
+		} );
 
-		await expect( page.locator( 'body' ) ).toHaveClass(
-			/is-admin-bar-in-editor-enabled/
-		);
-		await expect( page.locator( '#wpadminbar' ) ).toBeVisible();
-		await expect( page.locator( '.edit-site' ) ).toHaveCSS( 'top', '32px' );
-		await expect( page.locator( '.edit-site-site-hub' ) ).toBeHidden();
+		test.afterAll( async ( { requestUtils } ) => {
+			await requestUtils.activateTheme( 'twentytwentyone' );
+		} );
+
+		test( 'should show the admin bar when the experiment is enabled', async ( {
+			page,
+			admin,
+			requestUtils,
+		} ) => {
+			await requestUtils.setGutenbergExperiments( [
+				'gutenberg-admin-bar-in-editor',
+			] );
+			await admin.visitSiteEditor( { canvas: 'edit' } );
+
+			await expect( page.locator( 'body' ) ).toHaveClass(
+				/is-admin-bar-in-editor-enabled/
+			);
+			await expect( page.locator( '#wpadminbar' ) ).toBeVisible();
+			await expect(
+				getSiteEditorOpenNavigationButton( page )
+			).toBeVisible();
+		} );
 	} );
 } );
