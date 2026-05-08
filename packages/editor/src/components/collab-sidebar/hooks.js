@@ -289,7 +289,8 @@ function clearInlineNoteMarker(
 
 export function useNoteActions( reactionsMap = {} ) {
 	const { createNotice } = useDispatch( noticesStore );
-	const { saveEntityRecord, deleteEntityRecord } = useDispatch( coreStore );
+	const { saveEntityRecord, deleteEntityRecord, invalidateResolution } =
+		useDispatch( coreStore );
 	const { getCurrentPostId } = useSelect( editorStore );
 	const {
 		getBlockAttributes,
@@ -550,6 +551,26 @@ export function useNoteActions( reactionsMap = {} ) {
 						isDismissible: true,
 					} );
 				}
+
+				// `reaction_summary` is computed server-side and cached
+				// on each parent note's entity record. Mutating a
+				// reaction comment doesn't invalidate that field, so a
+				// subsequent toggle for the same emoji on the same note
+				// reads stale `reacted` / `my_reaction_id` data — a
+				// removed reaction can't be re-added because the toggle
+				// still tries to delete a now-missing comment record.
+				// Refetch the notes list so each parent's
+				// `reaction_summary` is fresh.
+				invalidateResolution( 'getEntityRecords', [
+					'root',
+					'comment',
+					{
+						post: getCurrentPostId(),
+						type: 'note',
+						status: 'all',
+						per_page: -1,
+					},
+				] );
 			} catch ( error ) {
 				onError( error );
 			}
@@ -560,6 +581,7 @@ export function useNoteActions( reactionsMap = {} ) {
 			saveEntityRecord,
 			getCurrentPostId,
 			createNotice,
+			invalidateResolution,
 		]
 	);
 

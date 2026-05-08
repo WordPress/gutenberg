@@ -404,12 +404,14 @@ class Gutenberg_REST_Comment_Controller_7_1 extends Gutenberg_REST_Comment_Contr
 			}
 
 			// Enforce uniqueness: prevent duplicate emoji per user per note.
+			// Limit to active reactions — trashed reactions are invisible and
+			// must not block the user from re-adding the same emoji.
 			$existing = get_comments(
 				array(
 					'parent'  => $request['parent'],
 					'user_id' => get_current_user_id(),
 					'type'    => 'reaction',
-					'status'  => 'any',
+					'status'  => 'approve',
 				)
 			);
 
