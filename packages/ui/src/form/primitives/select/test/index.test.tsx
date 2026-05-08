@@ -6,13 +6,18 @@ import * as Select from '../index';
 describe( 'Select', () => {
 	it( 'supports object item values', async () => {
 		const user = userEvent.setup();
+		const onValueChange = jest.fn();
 		const users = [
 			{ value: '1', label: 'User 1' },
 			{ value: '2', label: 'User 2' },
 		];
 
 		render(
-			<Select.Root defaultValue={ users[ 0 ] } items={ users }>
+			<Select.Root
+				defaultValue={ users[ 0 ] }
+				items={ users }
+				onValueChange={ onValueChange }
+			>
 				<Select.Trigger>{ ( value ) => value?.label }</Select.Trigger>
 				<Select.Popup>
 					{ users.map( ( option ) => (
@@ -34,6 +39,11 @@ describe( 'Select', () => {
 		);
 
 		expect( trigger ).toHaveTextContent( 'User 2' );
+		expect( onValueChange ).toHaveBeenCalledTimes( 1 );
+		expect( onValueChange ).toHaveBeenLastCalledWith(
+			users[ 1 ],
+			expect.anything()
+		);
 	} );
 
 	it( 'renders a default placeholder when no value is selected', () => {
