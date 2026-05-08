@@ -76,7 +76,6 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require __DIR__ . '/compat/wordpress-7.0/template-activate.php';
 	require __DIR__ . '/compat/wordpress-7.0/rest-api.php';
 	require __DIR__ . '/compat/wordpress-7.0/global-styles.php';
-	require __DIR__ . '/compat/wordpress-7.0/block-comments.php';
 	require __DIR__ . '/compat/wordpress-7.0/class-wp-connector-registry.php';
 	require __DIR__ . '/compat/wordpress-7.0/connectors.php';
 
