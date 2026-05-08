@@ -93,6 +93,29 @@ export interface ResizeHandleRenderProps {
 }
 
 /**
+ * Props received by a custom drag-preview component. The grid mounts
+ * the component inside `<DragOverlay>` and supplies the active tile's
+ * cloned children plus its `key`. The component is responsible for
+ * the visual chrome of the dragged clone (shadow, radius, padding);
+ * the grid keeps a thin functional wrapper around it that owns the
+ * lift cue, the cursor, and pointer pass-through during the gesture.
+ */
+export interface DragPreviewRenderProps {
+	/**
+	 * The cloned tile content the surface mounts inside the
+	 * `<DragOverlay>` portal. Render it wherever the visual wrapper
+	 * expects the tile body.
+	 */
+	children: React.ReactNode;
+
+	/**
+	 * Owning tile's `key`. Useful when the visual chrome needs to
+	 * vary by which tile is being dragged.
+	 */
+	itemId: string;
+}
+
+/**
  * Props for the internal `<ResizeHandle />` wrapper.
  */
 export interface ResizeHandleProps {
@@ -286,6 +309,27 @@ interface BaseDashboardGridProps
 	 * `verticalResizable` to adapt the visual to context.
 	 */
 	renderResizeHandle?: React.ComponentType< ResizeHandleRenderProps >;
+
+	/**
+	 * Custom wrapper for the dragged-clone visual mounted inside
+	 * `<DragOverlay>`. The grid always wraps the clone with a thin
+	 * functional frame (lift scale, grabbing cursor, pointer pass-
+	 * through) and mounts this component inside it, so consumers only
+	 * own the visual chrome (shadow, radius, padding).
+	 *
+	 * When omitted, the grid renders the cloned children directly
+	 * inside the functional frame, letting any chrome the consumer
+	 * applied to the persistent tile carry through to the dragged
+	 * clone unchanged.
+	 *
+	 * Token-only adjustments (lift scale, placeholder opacity, outline
+	 * color, placeholder radius) flow through CSS custom properties
+	 * documented in the README; reach for this prop when the dragged
+	 * state needs structurally different chrome from the persistent
+	 * tile (e.g., a stronger shadow, a different border, an extra
+	 * badge).
+	 */
+	renderDragPreview?: React.ComponentType< DragPreviewRenderProps >;
 }
 
 interface FixedDashboardGridProps extends BaseDashboardGridProps {
