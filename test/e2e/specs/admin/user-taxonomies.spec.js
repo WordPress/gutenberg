@@ -4,7 +4,7 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 const SETTINGS_PAGE_PATH = 'options-general.php';
-const TAXONOMIES_PAGE_QUERY = 'page=taxonomies-wp-admin';
+const CONTENT_TYPES_PAGE_QUERY = 'page=content-types-wp-admin&p=/taxonomies';
 const TAXONOMIES_REST_BASE = 'user-taxonomies';
 
 // Seeds all visibility booleans so the form's `toFormData` reads each toggle
@@ -52,7 +52,10 @@ test.describe( 'User taxonomies', () => {
 		admin,
 		page,
 	} ) => {
-		await admin.visitAdminPage( SETTINGS_PAGE_PATH, TAXONOMIES_PAGE_QUERY );
+		await admin.visitAdminPage(
+			SETTINGS_PAGE_PATH,
+			CONTENT_TYPES_PAGE_QUERY
+		);
 
 		await page.getByRole( 'button', { name: 'Add taxonomy' } ).click();
 
@@ -113,7 +116,10 @@ test.describe( 'User taxonomies', () => {
 		requestUtils,
 	} ) => {
 		await createUserTaxonomy( requestUtils );
-		await admin.visitAdminPage( SETTINGS_PAGE_PATH, TAXONOMIES_PAGE_QUERY );
+		await admin.visitAdminPage(
+			SETTINGS_PAGE_PATH,
+			CONTENT_TYPES_PAGE_QUERY
+		);
 
 		await page
 			.getByRole( 'row', { name: 'Genres' } )
@@ -136,7 +142,10 @@ test.describe( 'User taxonomies', () => {
 		);
 		await expect( page.getByText( 'Invalid taxonomy.' ) ).toBeVisible();
 
-		await admin.visitAdminPage( SETTINGS_PAGE_PATH, TAXONOMIES_PAGE_QUERY );
+		await admin.visitAdminPage(
+			SETTINGS_PAGE_PATH,
+			CONTENT_TYPES_PAGE_QUERY
+		);
 		await page
 			.getByRole( 'row', { name: 'Genres' } )
 			.getByRole( 'button', { name: 'Actions' } )
@@ -164,7 +173,7 @@ test.describe( 'User taxonomies', () => {
 			const created = await createUserTaxonomy( requestUtils );
 			await admin.visitAdminPage(
 				SETTINGS_PAGE_PATH,
-				`${ TAXONOMIES_PAGE_QUERY }&p=/edit/${ created.id }`
+				`page=content-types-wp-admin&p=/taxonomies/${ created.id }`
 			);
 		} );
 
