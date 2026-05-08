@@ -135,14 +135,21 @@ function ConnectorsPage() {
 														const command = `wp plugin install ${ slug } --activate`;
 														return (
 															<li key={ slug }>
-																{ sprintf(
-																	/* translators: %s: Plugin slug. */
-																	__( '%s:' ),
-																	slug
-																) }{ ' ' }
-																<code>
-																	{ command }
-																</code>
+																{ createInterpolateElement(
+																	sprintf(
+																		/* translators: 1: Plugin slug. 2: WP-CLI command. */
+																		__(
+																			'%1$s: <code>%2$s</code>'
+																		),
+																		slug,
+																		command
+																	),
+																	{
+																		code: (
+																			<code />
+																		),
+																	}
+																) }
 															</li>
 														);
 													}
