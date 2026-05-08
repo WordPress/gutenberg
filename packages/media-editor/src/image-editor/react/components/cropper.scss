@@ -115,10 +115,10 @@ $handle-touch-target-size: 44px;
 	}
 
 	// Blue border on the crop rectangle when the canvas has keyboard focus.
-	// :focus-visible is suppressed after pointer interactions, so this only
-	// appears for keyboard navigation (Tab, Escape from a handle, or pressing
-	// a key while the canvas is mouse-focused).
-	&__canvas:focus-visible &__stencil-rect {
+	// Uses a JS-controlled class rather than :focus-visible — browsers can
+	// restore :focus-visible across programmatic focus calls, making pure
+	// CSS unreliable for pointer-to-keyboard transitions.
+	&__canvas--focus-visible &__stencil-rect {
 		border-color: var(--wp-image-editor-focus-color, var(--wp-admin-theme-color, #007cba));
 		box-shadow: 0 0 0 1px var(--wp-image-editor-focus-color, var(--wp-admin-theme-color, #007cba));
 	}
