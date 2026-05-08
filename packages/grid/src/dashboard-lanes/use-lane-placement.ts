@@ -301,7 +301,11 @@ export function useLanePlacement(
 		gap,
 		flowTolerance,
 		rowUnit,
-		items,
+		// `items` is intentionally not a dep: the rAF closure reads
+		// from it, but the only fields that affect placement (keys,
+		// spans, explicit lanes) are captured by `itemsSignature`.
+		// Including the array identity would tear the effect down on
+		// every fresh reference from the parent and defeat the signature.
 		itemsSignature,
 	] );
 
