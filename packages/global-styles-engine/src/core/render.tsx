@@ -1599,7 +1599,6 @@ export const generateCustomProperties = (
  * @param node                          Style node metadata and styles.
  * @param context                       Render context and feature flags.
  * @param context.tree                  Global styles tree.
- * @param context.options               Enabled renderer output groups.
  * @param context.useRootPaddingAlign   Whether root padding alignment is enabled.
  * @param context.disableLayoutStyles   Whether layout styles are disabled.
  * @param context.hasBlockGapSupport    Whether block gap support is enabled.
@@ -1618,7 +1617,6 @@ function renderStylesNode(
 		disableRootPadding,
 	}: {
 		tree: GlobalStylesConfig;
-		options: Record< string, boolean >;
 		useRootPaddingAlign?: boolean;
 		disableLayoutStyles: boolean;
 		hasBlockGapSupport?: boolean;
@@ -1823,7 +1821,6 @@ export const transformToStyles = (
 			].forEach( ( expandedNode ) => {
 				ruleset += renderStylesNode( expandedNode, {
 					tree,
-					options,
 					useRootPaddingAlign,
 					disableLayoutStyles,
 					hasBlockGapSupport,
