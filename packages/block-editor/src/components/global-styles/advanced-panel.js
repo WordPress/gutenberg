@@ -1,8 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { Notice, __experimentalVStack as VStack } from '@wordpress/components';
-import { lazy, Suspense, useState } from '@wordpress/element';
+import {
+	BaseControl,
+	Notice,
+	__experimentalVStack as VStack,
+} from '@wordpress/components';
+import { lazy, Suspense, useId, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -91,16 +95,22 @@ export default function AdvancedPanel( {
 					{ cssError }
 				</Notice>
 			) }
-			<Suspense fallback={ null }>
-				<CodeMirrorEditor
-					label={ __( 'Additional CSS' ) }
-					value={ customCSS }
-					onChange={ handleOnChange }
-					onBlur={ handleOnBlur }
-					className="block-editor-global-styles-advanced-panel__custom-css-input"
-					help={ help }
-				/>
-			</Suspense>
+			<BaseControl
+				className="block-editor-global-styles-advanced-panel__base-control"
+				label={ __( 'Additional CSS' ) }
+				help={ help }
+				id={ useId() }
+			>
+				<Suspense fallback={ null }>
+					<CodeMirrorEditor
+						label={ __( 'Additional CSS' ) }
+						value={ customCSS }
+						onChange={ handleOnChange }
+						onBlur={ handleOnBlur }
+						className="block-editor-global-styles-advanced-panel__custom-css-input"
+					/>
+				</Suspense>
+			</BaseControl>
 		</VStack>
 	);
 }
