@@ -10,6 +10,7 @@ import { act, renderHook } from '@testing-library/react';
 /**
  * WordPress dependencies
  */
+import apiFetch from '@wordpress/api-fetch';
 import { dispatch } from '@wordpress/data';
 import { store as preferencesStore } from '@wordpress/preferences';
 
@@ -19,27 +20,41 @@ import { store as preferencesStore } from '@wordpress/preferences';
 import useDashboardLayout from '../use-dashboard-layout/use-dashboard-layout';
 import type { DashboardWidget } from '../../widget-dashboard';
 
+jest.mock( '@wordpress/api-fetch' );
+
+const mockedApiFetch = apiFetch as unknown as jest.Mock;
+
 const SCOPE = 'core/dashboard';
 const KEY = 'dashboardLayout';
+const DASHBOARD_NAME = 'gutenberg_dashboard';
 
 const SAMPLE_LAYOUT: DashboardWidget[] = [
 	{ uuid: 'a', type: 'core/quick-draft' },
 	{ uuid: 'b', type: 'core/at-a-glance' },
 ];
 
+const DEFAULT_LAYOUT: DashboardWidget[] = [
+	{ uuid: 'default-hello-world-widget-instance', type: 'core/hello-world' },
+];
+
 describe( 'useDashboardLayout', () => {
 	beforeEach( () => {
 		dispatch( preferencesStore ).set( SCOPE, KEY, undefined );
+		mockedApiFetch.mockReset();
 	} );
 
 	it( 'returns an empty array when nothing is persisted', () => {
-		const { result } = renderHook( () => useDashboardLayout() );
+		const { result } = renderHook( () =>
+			useDashboardLayout( DASHBOARD_NAME )
+		);
 		const [ layout ] = result.current;
 		expect( layout ).toEqual( [] );
 	} );
 
 	it( 'persists updates written through setLayout', () => {
-		const { result } = renderHook( () => useDashboardLayout() );
+		const { result } = renderHook( () =>
+			useDashboardLayout( DASHBOARD_NAME )
+		);
 
 		act( () => {
 			const [ , setLayout ] = result.current;
@@ -53,25 +68,35 @@ describe( 'useDashboardLayout', () => {
 	it( 'reads the layout written from outside the hook', () => {
 		dispatch( preferencesStore ).set( SCOPE, KEY, SAMPLE_LAYOUT );
 
-		const { result } = renderHook( () => useDashboardLayout() );
+		const { result } = renderHook( () =>
+			useDashboardLayout( DASHBOARD_NAME )
+		);
 		const [ layout ] = result.current;
 		expect( layout ).toEqual( SAMPLE_LAYOUT );
 	} );
 
-	it( 'clears the layout via resetLayout', () => {
-		const { result } = renderHook( () => useDashboardLayout() );
+	it( 'restores the registered default via resetLayout', async () => {
+		mockedApiFetch.mockResolvedValueOnce( DEFAULT_LAYOUT );
+
+		const { result } = renderHook( () =>
+			useDashboardLayout( DASHBOARD_NAME )
+		);
 
 		act( () => {
 			const [ , setLayout ] = result.current;
 			setLayout( SAMPLE_LAYOUT );
 		} );
 
-		act( () => {
+		await act( async () => {
 			const [ , , resetLayout ] = result.current;
-			resetLayout();
+			await resetLayout();
+		} );
+
+		expect( mockedApiFetch ).toHaveBeenCalledWith( {
+			path: `/wp/v2/dashboards/${ DASHBOARD_NAME }/default-layout`,
 		} );
 
 		const [ layout ] = result.current;
-		expect( layout ).toEqual( [] );
+		expect( layout ).toEqual( DEFAULT_LAYOUT );
 	} );
 } );

@@ -14,7 +14,9 @@ import { useWidgetTypes } from './widget-types';
 import styles from './stage.module.css';
 
 function Dashboard() {
-	const [ layout, setLayout ] = useDashboardLayout();
+	const [ layout, setLayout, resetLayout ] = useDashboardLayout(
+		'gutenberg_dashboard'
+	);
 
 	const widgetTypes = useWidgetTypes();
 
@@ -22,9 +24,10 @@ function Dashboard() {
 
 	return (
 		<WidgetDashboard
+			widgetTypes={ widgetTypes }
 			layout={ layout }
 			onLayoutChange={ setLayout }
-			widgetTypes={ widgetTypes }
+			onLayoutReset={ resetLayout }
 			editMode={ editMode }
 			onEditChange={ setEditMode }
 		>
@@ -33,6 +36,7 @@ function Dashboard() {
 				actions={ <WidgetDashboard.Actions /> }
 			>
 				<div className={ styles[ 'dashboard-widgets-container' ] }>
+					<WidgetDashboard.NoWidgetsState />
 					<WidgetDashboard.Widgets />
 				</div>
 			</Page>

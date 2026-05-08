@@ -22,6 +22,17 @@ const GUTENBERG_DASHBOARD_LAYOUT_SCOPE = 'core/dashboard';
 const GUTENBERG_DASHBOARD_LAYOUT_KEY = 'dashboardLayout';
 
 /**
+ * Identifier of the bundled dashboard surface, formatted as
+ * `<plugin>_<page>` to match the underscore form produced by the
+ * wp-build pipeline (mirrors the `{{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}`
+ * pair used in generated page templates).
+ *
+ * Passed as context to `gutenberg_dashboard_default_layout` and used
+ * as the `{name}` segment of the REST default-layout route.
+ */
+const GUTENBERG_DASHBOARD_NAME = 'gutenberg_dashboard';
+
+/**
  * Injects a registered default dashboard layout into the user's
  * `persisted_preferences` read when the stored layout is empty.
  *
@@ -69,9 +80,13 @@ function gutenberg_inject_dashboard_default_layout( $value, $user_id, $meta_key 
 	 * Each entry should match the dashboard's widget instance shape:
 	 * `uuid`, `type`, optional `attributes`, optional `placement`.
 	 *
-	 * @param array $default_layout Default array of widget instances.
+	 * @param array  $default_layout Default array of widget instances.
+	 * @param string $dashboard_name Identifier of the dashboard surface
+	 *                               receiving the default. Callbacks
+	 *                               targeting a specific dashboard
+	 *                               should switch on this value.
 	 */
-	$default = apply_filters( 'gutenberg_dashboard_default_layout', array() );
+	$default = apply_filters( 'gutenberg_dashboard_default_layout', array(), GUTENBERG_DASHBOARD_NAME );
 
 	if ( empty( $default ) || ! is_array( $default ) ) {
 		return $value;
@@ -87,3 +102,51 @@ function gutenberg_inject_dashboard_default_layout( $value, $user_id, $meta_key 
 }
 
 add_filter( 'get_user_metadata', 'gutenberg_inject_dashboard_default_layout', 99, 3 );
+
+/**
+ * Returns the default layout registered for a dashboard surface.
+ *
+ * Resolves `gutenberg_dashboard_default_layout` for the supplied
+ * dashboard name, returning a fresh evaluation of the filter chain
+ * each call. Used by the JS surface to back a "reset to default"
+ * action without depending on the user-meta hydration path.
+ *
+ * @param WP_REST_Request $request REST request carrying the
+ *                                 dashboard name segment.
+ * @return WP_REST_Response Response wrapping the default layout
+ *                          array.
+ */
+function gutenberg_get_dashboard_default_layout( $request ) {
+	$name    = $request['name'];
+	$default = apply_filters( 'gutenberg_dashboard_default_layout', array(), $name );
+
+	if ( ! is_array( $default ) ) {
+		$default = array();
+	}
+
+	return rest_ensure_response( array_values( $default ) );
+}
+
+/**
+ * Registers the REST route that exposes per-dashboard default layouts.
+ */
+function gutenberg_register_dashboard_default_layout_route() {
+	register_rest_route(
+		'wp/v2',
+		'/dashboards/(?P<name>[a-z][a-z0-9]*(?:_[a-z0-9]+)+)/default-layout',
+		array(
+			'methods'             => WP_REST_Server::READABLE,
+			'callback'            => 'gutenberg_get_dashboard_default_layout',
+			'permission_callback' => function () {
+				return current_user_can( 'read' );
+			},
+			'args'                => array(
+				'name' => array(
+					'description' => __( 'Dashboard identifier as produced by the build pipeline.', 'gutenberg' ),
+					'type'        => 'string',
+				),
+			),
+		)
+	);
+}
+add_action( 'rest_api_init', 'gutenberg_register_dashboard_default_layout_route' );
