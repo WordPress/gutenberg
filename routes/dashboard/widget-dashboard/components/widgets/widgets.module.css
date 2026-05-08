@@ -23,10 +23,16 @@
 
 /*
  * Wrapper applied through `renderDragPreview` on @wordpress/grid.
- * Using an ancestor class instead of touching `.tile` directly lets
- * the dragged-state shadow win over the persistent one without
+ * `height: 100%` keeps the inner `.tile` height: 100% chain alive
+ * (without it, the wrapper auto-sizes and the cloned tile collapses
+ * to content height). Using an ancestor class to bump the shadow
+ * lets the dragged-state shadow win over the persistent one without
  * stacking two box-shadows on the same element.
  */
+.dragPreview {
+	height: 100%;
+}
+
 .dragPreview .tile {
 	box-shadow: var(--wpds-elevation-md);
 }
