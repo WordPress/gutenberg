@@ -554,14 +554,8 @@ function _gutenberg_get_connector_script_module_data( array $data ): array {
 		$connectors[ $connector_id ] = $connector_out;
 	}
 	ksort( $connectors );
-
-	$is_file_mods_disabled = defined( 'DISALLOW_FILE_MODS' ) && DISALLOW_FILE_MODS;
-	if ( function_exists( 'wp_is_file_mod_allowed' ) ) {
-		$is_file_mods_disabled = ! wp_is_file_mod_allowed( 'install_plugins' );
-	}
-
 	$data['connectors']         = $connectors;
-	$data['isFileModsDisabled'] = $is_file_mods_disabled;
+	$data['isFileModsDisabled'] = ! wp_is_file_mod_allowed( 'install_plugins' );
 	return $data;
 }
 remove_filter( 'script_module_data_options-connectors-wp-admin', '_wp_connectors_get_connector_script_module_data' );
