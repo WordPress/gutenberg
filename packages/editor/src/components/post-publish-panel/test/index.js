@@ -13,7 +13,7 @@ import { store as editorStore } from '@wordpress/editor';
 /**
  * Internal dependencies
  */
-import { PostPublishPanel } from '../index';
+import PostPublishPanel from '../index';
 
 describe( 'PostPublishPanel', () => {
 	beforeEach( () => {

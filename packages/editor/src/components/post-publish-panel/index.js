@@ -3,15 +3,14 @@
  */
 import { __ } from '@wordpress/i18n';
 import { useEffect, useRef } from '@wordpress/element';
-import {
-	Button,
-	Spinner,
-	CheckboxControl,
-	withFocusReturn,
-	withConstrainedTabbing,
-} from '@wordpress/components';
+import { Button, Spinner, CheckboxControl } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { compose, useEvent } from '@wordpress/compose';
+import {
+	useConstrainedTabbing,
+	useEvent,
+	useFocusReturn,
+	useMergeRefs,
+} from '@wordpress/compose';
 import { closeSmall } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
 
@@ -23,7 +22,18 @@ import PostPublishPanelPrepublish from './prepublish';
 import PostPublishPanelPostpublish from './postpublish';
 import { store as editorStore } from '../../store';
 
-export function PostPublishPanel( {
+/**
+ * Renders a panel for publishing a post.
+ *
+ * @param {Object}      props                        Component props.
+ * @param {boolean}     [props.forceIsDirty]         Whether to force the dirty state.
+ * @param {()=>void}    props.onClose                Called when the panel requests to close.
+ * @param {WPComponent} [props.PostPublishExtension] Component rendered after publishing.
+ * @param {WPComponent} [props.PrePublishExtension]  Component rendered before publishing.
+ *
+ * @return {Element} The post publish panel.
+ */
+export default function PostPublishPanel( {
 	forceIsDirty,
 	onClose,
 	PostPublishExtension,
@@ -77,6 +87,10 @@ export function PostPublishPanel( {
 		useDispatch( editorStore );
 
 	const cancelButtonRef = useRef( null );
+	const wrapperRef = useMergeRefs( [
+		useFocusReturn(),
+		useConstrainedTabbing(),
+	] );
 
 	useEffect( () => {
 		// This timeout is necessary to make sure the `useEffect` hook of
@@ -121,7 +135,12 @@ export function PostPublishPanel( {
 	const isPostPublish = isPublishedOrScheduled && ! isSaving;
 
 	return (
-		<div className="editor-post-publish-panel" { ...propsForPanel }>
+		<div
+			ref={ wrapperRef }
+			tabIndex={ -1 }
+			className="editor-post-publish-panel"
+			{ ...propsForPanel }
+		>
 			<div className="editor-post-publish-panel__header">
 				{ isPostPublish ? (
 					<Button
@@ -176,10 +195,3 @@ export function PostPublishPanel( {
 		</div>
 	);
 }
-
-/**
- * Renders a panel for publishing a post.
- */
-export default compose( [ withFocusReturn, withConstrainedTabbing ] )(
-	PostPublishPanel
-);

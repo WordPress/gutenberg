@@ -54,6 +54,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is pu
 <div>
   <div
     class="editor-post-publish-panel"
+    tabindex="-1"
   >
     <div
       class="editor-post-publish-panel__header"
@@ -278,6 +279,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is sc
 <div>
   <div
     class="editor-post-publish-panel"
+    tabindex="-1"
   >
     <div
       class="editor-post-publish-panel__header"
@@ -472,6 +474,7 @@ exports[`PostPublishPanel should render the pre-publish panel if post status is 
 <div>
   <div
     class="editor-post-publish-panel"
+    tabindex="-1"
   >
     <div
       class="editor-post-publish-panel__header"
@@ -625,6 +628,7 @@ exports[`PostPublishPanel should render the pre-publish panel if the post is not
 <div>
   <div
     class="editor-post-publish-panel"
+    tabindex="-1"
   >
     <div
       class="editor-post-publish-panel__header"
@@ -822,6 +826,7 @@ exports[`PostPublishPanel should render the spinner if the post is being saved 1
 <div>
   <div
     class="editor-post-publish-panel"
+    tabindex="-1"
   >
     <div
       class="editor-post-publish-panel__header"

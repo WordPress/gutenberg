@@ -1250,6 +1250,18 @@ _Returns_
 
 Renders a panel for publishing a post.
 
+_Parameters_
+
+-   _props_ `Object`: Component props.
+-   _props.forceIsDirty_ `[boolean]`: Whether to force the dirty state.
+-   _props.onClose_ `()=>void`: Called when the panel requests to close.
+-   _props.PostPublishExtension_ `[WPComponent]`: Component rendered after publishing.
+-   _props.PrePublishExtension_ `[WPComponent]`: Component rendered before publishing.
+
+_Returns_
+
+-   `Element`: The post publish panel.
+
 ### PostSavedState
 
 Component showing whether the post is saved or not and providing save buttons.
