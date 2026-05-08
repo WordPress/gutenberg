@@ -3,6 +3,28 @@
  */
 import { TextDecoder, TextEncoder } from 'node:util';
 import { Blob as BlobPolyfill, File as FilePolyfill } from 'node:buffer';
+import timezoneMock from 'timezone-mock';
+
+/**
+ * Configure timezone-mock to handle Date subclasses (like UTCDateMini) correctly.
+ * MockDate constructor normally rejects object arguments, but date-fns v4
+ * often reconstructs dates using `new date.constructor(date)`.
+ * The fallbackFn allows us to intercept these and use the underlying timestamp.
+ *
+ * @see https://github.com/WordPress/gutenberg/issues/78005
+ */
+const OriginalDate = globalThis.Date;
+timezoneMock.options( {
+	fallbackFn: ( p ) => {
+		if ( p instanceof OriginalDate ) {
+			return new timezoneMock._Date( p.valueOf() );
+		}
+		// Re-raise the original assertion behavior for unsupported shapes.
+		throw new Error(
+			`Unhandled type passed to MockDate constructor: ${ typeof p }`
+		);
+	},
+} );
 
 // ESLint v10's RuleTester uses structuredClone, which is not available in
 // the jsdom test environment. Polyfill it using JSON serialization.

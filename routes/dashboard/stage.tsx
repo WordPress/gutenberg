@@ -8,23 +8,15 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { WidgetDashboard, type DashboardWidget } from './widget-dashboard';
+import { useDashboardLayout } from './hooks';
+import { WidgetDashboard } from './widget-dashboard';
 import { useWidgetTypes } from './widget-types';
-
-const DEFAULT_LAYOUT: DashboardWidget[] = [
-	{
-		uuid: '1',
-		type: 'wordpress/hello-world',
-		placement: {
-			width: 'full',
-			height: 1,
-		},
-	},
-];
+import styles from './stage.module.css';
 
 function Dashboard() {
-	const [ layout, setLayout ] =
-		useState< DashboardWidget[] >( DEFAULT_LAYOUT );
+	const [ layout, setLayout, resetLayout ] = useDashboardLayout(
+		'gutenberg_dashboard'
+	);
 
 	const widgetTypes = useWidgetTypes();
 
@@ -32,9 +24,10 @@ function Dashboard() {
 
 	return (
 		<WidgetDashboard
+			widgetTypes={ widgetTypes }
 			layout={ layout }
 			onLayoutChange={ setLayout }
-			widgetTypes={ widgetTypes }
+			onLayoutReset={ resetLayout }
 			editMode={ editMode }
 			onEditChange={ setEditMode }
 		>
@@ -42,7 +35,10 @@ function Dashboard() {
 				title={ __( 'Dashboard' ) }
 				actions={ <WidgetDashboard.Actions /> }
 			>
-				<WidgetDashboard.Widgets />
+				<div className={ styles[ 'dashboard-widgets-container' ] }>
+					<WidgetDashboard.NoWidgetsState />
+					<WidgetDashboard.Widgets />
+				</div>
 			</Page>
 		</WidgetDashboard>
 	);
