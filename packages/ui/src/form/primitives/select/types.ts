@@ -7,8 +7,8 @@ import type { InputLayoutProps } from '../input-layout/types';
 export type PortalProps = ComponentPropsWithoutRef< typeof _Select.Portal >;
 
 // The second type parameter is the `multiple` flag (currently disabled).
-export type SelectRootProps = Omit<
-	_Select.Root.Props< any, false >,
+export type SelectRootProps< Value = unknown > = Omit<
+	_Select.Root.Props< Value, false >,
 	'multiple'
 >;
 
