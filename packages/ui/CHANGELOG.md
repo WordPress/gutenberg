@@ -26,7 +26,7 @@
 -   `Select`: Add a `placeholder` prop to `Select.Trigger`, and support `null` item values for clearable placeholder options ([#78076](https://github.com/WordPress/gutenberg/pull/78076)).
 -   `Drawer`: Fade the popup elevation shadow alongside the slide ([#77800](https://github.com/WordPress/gutenberg/pull/77800)).
 -   `Drawer`: Allow mouse-drag swipe-dismiss in the popup-edge padding gutter ([#77800](https://github.com/WordPress/gutenberg/pull/77800)).
--   `IconButton`: Add a `tooltipPlacement` prop to customize the tooltip's `side`, `align`, and `sideOffset`.
+-   `IconButton`: Add a `tooltipPlacement` prop to customize the tooltip's `side`, `align`, and `sideOffset` ([#78089](https://github.com/WordPress/gutenberg/pull/78089)).
 
 ## 0.12.0 (2026-04-29)
 
