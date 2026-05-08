@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createRef } from '@wordpress/element';
 import * as Select from '../index';
@@ -48,10 +48,12 @@ describe( 'Select', () => {
 			</Select.Root>
 		);
 
-		const value = screen.getByText( 'Item 1' );
+		const trigger = screen.getByRole( 'combobox' );
 
-		expect( screen.getByRole( 'combobox' ) ).toHaveTextContent( 'Item 1' );
-		expect( value ).not.toHaveAttribute( 'data-placeholder' );
+		expect( trigger ).toHaveTextContent( 'Item 1' );
+		expect( within( trigger ).getByText( 'Item 1' ) ).not.toHaveAttribute(
+			'data-placeholder'
+		);
 	} );
 
 	it( 'forwards ref', async () => {
