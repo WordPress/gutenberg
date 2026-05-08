@@ -52,6 +52,13 @@ or via npm script:
 }
 ```
 
+### Testing Generated Styles
+
+Generated CSS module output skips automatic style injection when `NODE_ENV` is
+`test`. Node-based DOM implementations such as jsdom do not reliably support
+modern CSS features, so tests that need actual styles in the DOM should
+run in a browser environment.
+
 ## Package Configuration
 
 Configure your `package.json` with the following optional fields:

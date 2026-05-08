@@ -36,6 +36,7 @@
 	},
 	"dependencies": {
 		"@emotion/babel-plugin": "11.13.5",
+		"@wordpress/style-runtime": "file:../style-runtime",
 		"autoprefixer": "10.4.21",
 		"browserslist-to-esbuild": "2.1.1",
 		"change-case": "4.1.2",
