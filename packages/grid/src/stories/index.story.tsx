@@ -17,6 +17,7 @@ import { Icon, IconButton, Stack } from '@wordpress/ui';
 import { DashboardGrid } from '../grid';
 import type {
 	DashboardGridLayoutItem,
+	DragPreviewRenderProps,
 	ResizeHandleRenderProps,
 } from '../types';
 
@@ -778,6 +779,101 @@ export const CustomResizeHandleStory: Story = {
 			>
 				{ tiles }
 			</DashboardGrid>
+		);
+	},
+};
+
+/**
+ * Drop-in wrapper that bumps the dragged-clone shadow and clips its
+ * corners. The grid keeps the lift scale and the grabbing cursor on
+ * the functional frame; the consumer's wrapper sits inside it.
+ */
+function CustomDragPreview( { children }: DragPreviewRenderProps ) {
+	return (
+		<div
+			style={ {
+				height: '100%',
+				boxShadow: 'var(--wpds-elevation-lg)',
+				borderRadius: 'var(--wpds-border-radius-lg)',
+				overflow: 'hidden',
+			} }
+		>
+			{ children }
+		</div>
+	);
+}
+
+/**
+ * Demonstrates the two ways to customize the drag and placeholder
+ * visuals:
+ *
+ * 1. `renderDragPreview` wraps the cloned tile in `<DragOverlay>`
+ *    with consumer-owned chrome (shadow, radius, overflow).
+ * 2. CSS custom properties on any ancestor retheme the lift scale,
+ *    the placeholder opacity, the placeholder outline color, and the
+ *    placeholder border-radius without touching the package.
+ *
+ * Toggle `editMode`, then drag a tile to see both surfaces respond.
+ */
+export const Customization: Story = {
+	args: {
+		columns: 6,
+		spacing: 2,
+		rowHeight: 80,
+		editMode: true,
+		layout: [
+			{ key: 'a', width: 2, height: 1 },
+			{ key: 'b', width: 4, height: 1 },
+			{ key: 'c', width: 3, height: 2 },
+			{ key: 'd', width: 3, height: 1 },
+			{ key: 'e', width: 3, height: 1 },
+		],
+	},
+	render: function CustomizationRender( args ) {
+		const [ layout, setLayout ] = useState< DashboardGridLayoutItem[] >(
+			args.layout
+		);
+
+		const tiles = useMemo(
+			() => [
+				<Tile key="a" tone="brand">
+					A
+				</Tile>,
+				<Tile key="b" tone="info">
+					B
+				</Tile>,
+				<Tile key="c" tone="success">
+					C
+				</Tile>,
+				<Tile key="d" tone="warning">
+					D
+				</Tile>,
+				<Tile key="e" tone="error">
+					E
+				</Tile>,
+			],
+			[]
+		);
+
+		const customTokens = {
+			'--wp-grid-drag-preview-scale': '1.08',
+			'--wp-grid-placeholder-opacity': '0.2',
+			'--wp-grid-placeholder-outline-color':
+				'var(--wpds-color-fg-content-warning)',
+			'--wp-grid-placeholder-radius': '12px',
+		} as React.CSSProperties;
+
+		return (
+			<div style={ customTokens }>
+				<DashboardGrid
+					{ ...args }
+					layout={ layout }
+					onChangeLayout={ setLayout }
+					renderDragPreview={ CustomDragPreview }
+				>
+					{ tiles }
+				</DashboardGrid>
+			</div>
 		);
 	},
 };
