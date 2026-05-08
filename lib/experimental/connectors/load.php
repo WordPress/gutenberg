@@ -60,16 +60,14 @@ function _gutenberg_connectors_preload_paths( array $preload_paths ): array {
 	$preload_paths[] = '/wp/v2/plugins/ai/ai?context=edit';
 
 	// getEntityRecord( 'root', 'plugin', <basename> ) per connector in use-connector-plugin.ts.
-	if ( function_exists( 'wp_get_connectors' ) ) {
-		foreach ( wp_get_connectors() as $connector_data ) {
-			if ( empty( $connector_data['plugin']['file'] ) ) {
-				continue;
-			}
-			// core-data's plugin entity uses the basename with `.php` stripped
-			// as the record key (see routes/connectors-home/use-connector-plugin.ts).
-			$basename        = preg_replace( '/\.php$/', '', plugin_basename( $connector_data['plugin']['file'] ) );
-			$preload_paths[] = '/wp/v2/plugins/' . $basename . '?context=edit';
+	foreach ( wp_get_connectors() as $connector_data ) {
+		if ( empty( $connector_data['plugin']['file'] ) ) {
+			continue;
 		}
+		// core-data's plugin entity uses the basename with `.php` stripped
+		// as the record key (see routes/connectors-home/use-connector-plugin.ts).
+		$basename        = preg_replace( '/\.php$/', '', plugin_basename( $connector_data['plugin']['file'] ) );
+		$preload_paths[] = '/wp/v2/plugins/' . $basename . '?context=edit';
 	}
 
 	return $preload_paths;
