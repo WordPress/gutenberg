@@ -109,7 +109,14 @@ const ConnectedBadge = () => (
 );
 
 const PluginDirectoryLink = ( { slug }: { slug: string } ) => (
-	<Link href={ `https://wordpress.org/plugins/${ slug }/` } openInNewTab>
+	<Link
+		href={ sprintf(
+			/* translators: %s: plugin slug. */
+			__( 'https://wordpress.org/plugins/%s/' ),
+			slug
+		) }
+		openInNewTab
+	>
 		{ __( 'Learn more' ) }
 	</Link>
 );
