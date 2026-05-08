@@ -139,26 +139,11 @@ export const pluralLabelField: Field< ContentType > = {
 	},
 };
 
-export const singularLabelField: Field< ContentType > = {
-	id: 'singular_name',
-	label: __( 'Singular label' ),
-	type: 'text',
-	getValue: ( { item } ) => item.config.labels.singular_name,
-	setValue: ( { item, value } ) => ( {
-		config: {
-			...item.config,
-			labels: {
-				...item.config.labels,
-				singular_name: String( value ?? '' ),
-			},
-		},
-	} ),
-	isValid: {
-		required: true,
-		maxLength: 200,
-	},
-	enableSorting: false,
-};
+export const singularLabelField = createLabelField(
+	'singular_name',
+	__( 'Singular label' ),
+	{ required: true }
+);
 
 export function createDescriptionField(
 	description: string

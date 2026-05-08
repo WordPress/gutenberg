@@ -23,7 +23,8 @@ import { Stack } from '@wordpress/ui';
 import { useSlugField } from '../fields/general';
 import { pluralLabelField, singularLabelField } from '../../utils/fields';
 import { serializeForSave } from '../utils';
-import type { CoreDataError, PostTypeFormData } from '../types';
+import type { PostTypeFormData } from '../types';
+import type { CoreDataError } from '../../types';
 import { POST_TYPE_ENTITY } from '../../constants';
 
 const SLUG_MAX_LENGTH = 20;

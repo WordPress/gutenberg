@@ -80,38 +80,52 @@ export const Minimal: Story = {
 	},
 };
 
-const withEmptyOptionItems = [
-	{
-		value: '',
-		label: 'Select',
-		disabled: true,
+const placeholderItems = [ 'Item 1', 'Item 2' ];
+
+/**
+ * Use the `placeholder` prop on `Select.Trigger` to show text when no
+ * value is selected. The default placeholder is `"Select"`.
+ */
+export const WithCustomPlaceholder: Story = {
+	args: {
+		children: (
+			<>
+				<Select.Trigger placeholder="Choose an item" />
+				<Select.Popup>
+					{ placeholderItems.map( ( item ) => (
+						<Select.Item key={ item } value={ item }>
+							{ item }
+						</Select.Item>
+					) ) }
+				</Select.Popup>
+			</>
+		),
 	},
-	{
-		value: 'Item 2',
-		label: 'Item 2',
-	},
+};
+
+const nullValueOptionItems = [
+	{ value: null, label: 'Select theme' },
+	{ value: 'system', label: 'System default' },
+	{ value: 'light', label: 'Light' },
+	{ value: 'dark', label: 'Dark' },
 ];
 
 /**
- * By passing an `items` array to `Select.Root`, the `Select.Trigger` will be able to
- * render a `label` string for each item rather than the raw `value` string. In this
- * case, the option with an empty string value has a `"Select"` label string.
- *
- * This may be easier than writing a custom render function for the `Select.Trigger`.
+ * Use a `null` item when users should be able to clear the selected value from
+ * the popup. When `items` includes a `null` item, its label is used as the
+ * placeholder text.
  */
-export const WithEmptyValueOption: Story = {
+export const WithNullValueOption: Story = {
 	args: {
-		items: withEmptyOptionItems,
+		items: nullValueOptionItems,
 		children: (
 			<>
 				<Select.Trigger />
 				<Select.Popup>
-					{ withEmptyOptionItems.map( ( item ) => (
+					{ nullValueOptionItems.map( ( item ) => (
 						<Select.Item
-							key={ item.value }
+							key={ item.value ?? 'null' }
 							value={ item.value }
-							label={ item.label }
-							disabled={ item.disabled }
 						>
 							{ item.label }
 						</Select.Item>
@@ -119,7 +133,6 @@ export const WithEmptyValueOption: Story = {
 				</Select.Popup>
 			</>
 		),
-		defaultValue: '',
 	},
 };
 

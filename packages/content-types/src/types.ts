@@ -17,3 +17,5 @@ export interface ContentType {
 		show_in_rest: boolean;
 	};
 }
+
+export type CoreDataError = { message?: string; code?: string };

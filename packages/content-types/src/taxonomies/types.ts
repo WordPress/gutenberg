@@ -66,5 +66,3 @@ export interface TaxonomyFormData extends ContentType {
 		show_admin_column: boolean;
 	};
 }
-
-export type CoreDataError = { message?: string; code?: string };

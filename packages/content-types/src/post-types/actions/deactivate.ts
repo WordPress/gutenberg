@@ -6,11 +6,14 @@ import { __, _n, sprintf } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { createStatusAction } from './utils';
+import { createStatusAction } from '../../utils/actions';
+import { POST_TYPE_ENTITY } from '../../constants';
+import type { PostTypeFormData } from '../types';
 
-const deactivateAction = createStatusAction( {
+const deactivateAction = createStatusAction< PostTypeFormData >( {
 	id: 'deactivate',
 	label: __( 'Deactivate' ),
+	entity: POST_TYPE_ENTITY,
 	targetStatus: 'draft',
 	messages: {
 		successSingle: __( 'Post type deactivated.' ),

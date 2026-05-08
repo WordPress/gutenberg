@@ -23,7 +23,8 @@ import { Stack } from '@wordpress/ui';
 import { useSlugField } from '../fields/general';
 import { pluralLabelField, singularLabelField } from '../../utils/fields';
 import { serializeForSave } from '../utils';
-import type { CoreDataError, TaxonomyFormData } from '../types';
+import type { TaxonomyFormData } from '../types';
+import type { CoreDataError } from '../../types';
 import { TAXONOMY_ENTITY } from '../../constants';
 
 const SLUG_MAX_LENGTH = 32;

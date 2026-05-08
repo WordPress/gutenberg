@@ -86,5 +86,3 @@ export interface PostTypeFormData extends ContentType {
 		has_archive: boolean;
 	};
 }
-
-export type CoreDataError = { message?: string; code?: string };
