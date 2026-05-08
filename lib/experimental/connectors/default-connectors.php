@@ -555,7 +555,7 @@ function _gutenberg_get_connector_script_module_data( array $data ): array {
 	}
 	ksort( $connectors );
 	$data['connectors']         = $connectors;
-	$data['isFileModsDisabled'] = ! wp_is_file_mod_allowed( 'install_plugins' );
+	$data['isFileModDisabled'] = ! wp_is_file_mod_allowed( 'install_plugins' );
 	return $data;
 }
 remove_filter( 'script_module_data_options-connectors-wp-admin', '_wp_connectors_get_connector_script_module_data' );

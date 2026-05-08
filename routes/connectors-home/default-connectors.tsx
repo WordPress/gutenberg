@@ -45,7 +45,7 @@ interface ConnectorData {
 
 interface ConnectorScriptModuleData {
 	connectors?: Record< string, ConnectorData >;
-	isFileModsDisabled?: boolean;
+	isFileModDisabled?: boolean;
 }
 
 function getConnectorScriptModuleData(): ConnectorScriptModuleData {
@@ -67,8 +67,8 @@ export function getConnectorData(): Record< string, ConnectorData > {
 	return getConnectorScriptModuleData().connectors ?? {};
 }
 
-export function getIsFileModsDisabled(): boolean {
-	return !! getConnectorScriptModuleData().isFileModsDisabled;
+export function getIsFileModDisabled(): boolean {
+	return !! getConnectorScriptModuleData().isFileModDisabled;
 }
 
 const CONNECTOR_LOGOS: Record< string, React.ComponentType > = {

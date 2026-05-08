@@ -25,7 +25,7 @@ import { Notice } from '@wordpress/ui';
 import './style.scss';
 import { AiPluginCallout } from './ai-plugin-callout';
 import {
-	getIsFileModsDisabled,
+	getIsFileModDisabled,
 	registerDefaultConnectors,
 } from './default-connectors';
 import { unlock } from '../lock-unlock';
@@ -36,7 +36,7 @@ const { store } = unlock( connectorsPrivateApis );
 registerDefaultConnectors();
 
 function ConnectorsPage() {
-	const isFileModsDisabled = getIsFileModsDisabled();
+	const isFileModDisabled = getIsFileModDisabled();
 
 	const { connectors, canInstallPlugins, isAiPluginInstalled } = useSelect(
 		( select ) => {
@@ -107,13 +107,13 @@ function ConnectorsPage() {
 				}` }
 			>
 				{ manualInstallPluginSlugs.length > 0 &&
-					( isFileModsDisabled || ! canInstallPlugins ) && (
+					( isFileModDisabled || ! canInstallPlugins ) && (
 						<Notice.Root
 							intent="info"
 							className="connectors-page__file-mods-notice"
 						>
 							<Notice.Description>
-								{ isFileModsDisabled
+								{ isFileModDisabled
 									? __(
 											'Plugins cannot be installed here due to your site configuration. Install them manually using your normal deployment workflow.'
 									  )
@@ -173,7 +173,7 @@ function ConnectorsPage() {
 						</VStack>
 					</VStack>
 				) }
-				{ canInstallPlugins && ! isFileModsDisabled && (
+				{ canInstallPlugins && ! isFileModDisabled && (
 					<p>
 						{ createInterpolateElement(
 							__(
