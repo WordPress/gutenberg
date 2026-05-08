@@ -1,18 +1,12 @@
 /**
- * WordPress dependencies
- */
-import type { ConnectionStatusDisconnected, Y } from '@wordpress/sync';
-
-/**
  * Internal dependencies
  */
-import type { SelectionType } from './utils/crdt-user-selections';
+import type { SelectionType } from './selection-type';
 
-export type { ConnectionStatus } from '@wordpress/sync';
-
-export type ConnectionError = NonNullable<
-	ConnectionStatusDisconnected[ 'error' ]
->;
+export type {
+	ConnectionStatus,
+	ConnectionError,
+} from './sync-connection-types';
 
 export interface AnyFunction {
 	( ...args: any[] ): any;
@@ -114,7 +108,7 @@ export interface WPSelection {
  * The position of the cursor.
  */
 export type CursorPosition = {
-	relativePosition: Y.RelativePosition;
+	relativePosition: unknown;
 
 	// Also store the absolute offset index of the cursor from the perspective
 	// of the user who is updating the selection.
@@ -176,10 +170,8 @@ export type SelectionInMultipleBlocks = {
 
 export type SelectionWholeBlock = {
 	// The user has a non-text block selected, like an image block.
-	// Uses a Y.RelativePosition pointing to the block in its parent Y.Array,
-	// since there is no text cursor to navigate up from.
 	type: SelectionType.WholeBlock;
-	blockPosition: Y.RelativePosition;
+	blockPosition: unknown;
 };
 
 export type SelectionState =

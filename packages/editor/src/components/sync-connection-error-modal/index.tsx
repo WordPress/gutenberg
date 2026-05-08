@@ -5,10 +5,7 @@ import { useSelect, select } from '@wordpress/data';
 import { useCopyToClipboard } from '@wordpress/compose';
 // @ts-ignore No exported types.
 import { serialize } from '@wordpress/blocks';
-import {
-	store as coreDataStore,
-	privateApis as coreDataPrivateApis,
-} from '@wordpress/core-data';
+import { store as coreDataStore } from '@wordpress/core-data';
 // @ts-expect-error - No type declarations available for @wordpress/block-editor
 // prettier-ignore
 import { privateApis, store as blockEditorStore } from '@wordpress/block-editor';
@@ -31,7 +28,6 @@ import { unlock } from '../../lock-unlock';
 import { useRetryCountdown } from './use-retry-countdown';
 
 const { BlockCanvasCover } = unlock( privateApis );
-const { retrySyncConnection } = unlock( coreDataPrivateApis );
 
 // Debounce time for initial disconnected status to allow connection to establish.
 const INITIAL_DISCONNECTED_DEBOUNCE_MS = 20000;
@@ -166,7 +162,6 @@ export function SyncConnectionErrorModal() {
 	const manualRetry = isManualRetryAvailable
 		? () => {
 				onManualRetry();
-				retrySyncConnection();
 		  }
 		: undefined;
 

@@ -1,9 +1,4 @@
 /**
- * WordPress dependencies
- */
-import type { Y } from '@wordpress/sync';
-
-/**
  * Internal dependencies
  */
 import type { SelectionState } from '../types';
@@ -67,27 +62,11 @@ export interface YDocDebugData {
 	collaboratorMap: Record< string, DebugCollaboratorData >;
 }
 
-// Type for serializable left/right item references to avoid deep nesting
-export type SerializableYItemRef = Pick<
-	Y.Item,
-	'id' | 'length' | 'origin' | 'content'
->;
+export type SerializableYItemRef = Record< string, unknown > | null;
 
-// Serializable Y.Item - only includes data properties with shallow left/right references
-export type SerializableYItem = Pick<
-	Y.Item,
-	| 'id'
-	| 'length'
-	| 'origin'
-	| 'rightOrigin'
-	| 'parent'
-	| 'parentSub'
-	| 'redone'
-	| 'content'
-	| 'info'
-> & {
-	left: SerializableYItemRef | null;
-	right: SerializableYItemRef | null;
+export type SerializableYItem = Record< string, unknown > & {
+	left?: SerializableYItemRef;
+	right?: SerializableYItemRef;
 };
 
 export type EqualityFieldCheck< State, FieldName extends keyof State > = (

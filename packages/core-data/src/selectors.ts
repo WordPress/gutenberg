@@ -5,7 +5,7 @@ import { createSelector, createRegistrySelector } from '@wordpress/data';
 import { addQueryArgs } from '@wordpress/url';
 import type { UndoManager } from '@wordpress/undo-manager';
 import deprecated from '@wordpress/deprecated';
-import type { ConnectionStatus } from '@wordpress/sync';
+import type { ConnectionStatus } from './sync-connection-types';
 
 /**
  * Internal dependencies
