@@ -35,9 +35,9 @@ function gutenberg_initialize_experiments_settings() {
 					'description' => __( 'Enables enhancements to the Grid block that let you move and resize items in the editor canvas.', 'gutenberg' ),
 				),
 				array(
-					'id'          => 'gutenberg-no-tinymce',
-					'label'       => __( 'Disable Classic block', 'gutenberg' ),
-					'description' => __( 'Hides the Classic block from any inserters in the block editor.', 'gutenberg' ),
+					'id'          => 'gutenberg-classic-block-deprecation',
+					'label'       => __( 'Classic block deprecation', 'gutenberg' ),
+					'description' => __( 'Enables UI changes aimed at deprecating the Classic block, including prompts on existing Classic blocks to migrate their content to blocks or to a Custom HTML block.', 'gutenberg' ),
 				),
 			),
 		),

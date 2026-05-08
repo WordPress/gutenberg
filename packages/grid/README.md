@@ -10,6 +10,9 @@ columns **and** multiple rows. It does not implement other grid
 models such as masonry (column-flow) or justified rows (equal-height
 rows).
 
+> [!NOTE]
+> This package is under heavy development and likely to change.
+
 ## Relation to `@wordpress/components`'s `__experimentalGrid`
 
 `@wordpress/components` already exports a `__experimentalGrid` (often

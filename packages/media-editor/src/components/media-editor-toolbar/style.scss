@@ -1,21 +1,49 @@
-@use "@wordpress/base-styles/variables" as *;
 @use "@wordpress/base-styles/breakpoints" as *;
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
 
 .media-editor-toolbar {
 	width: 100%;
 	padding: $grid-unit-10 $grid-unit-20;
+}
 
-	// Let the rotation slider absorb extra horizontal space (so it grows
-	// between the icon buttons and Reset) while capping its width so it
-	// doesn't dominate on wide viewports.
+// Two flex items: the fine-rotation slider (left, grows) and the
+// action cluster (right, fixed). At narrow widths each takes a full
+// row with the slider on top.
+.media-editor-toolbar__rotation-slider {
+	flex: 1 1 280px;
+	min-width: 0;
+	max-width: 360px;
+}
+
+.media-editor-toolbar__action-cluster {
+	display: flex;
+	flex-wrap: nowrap;
+	align-items: center;
+	gap: $grid-unit-10;
+}
+
+// Above break-medium, when the slider and action cluster share a row,
+// divide them with a thin rule. Below the breakpoint they stack — no
+// divider.
+@media (min-width: $break-medium) {
+	.media-editor-toolbar__action-cluster {
+		border-left: 1px solid $gray-300;
+		padding-left: $grid-unit-15;
+	}
+}
+
+// Below the modal-sidebar full-page breakpoint, force a deterministic
+// two-row layout: slider on top, action cluster beneath. Mirrors the
+// InterfaceSkeleton's own side-by-side → stacked flip at break-medium.
+@media (max-width: #{ $break-medium - 1 }) {
 	.media-editor-toolbar__rotation-slider {
-		flex: 1 1 auto;
-		max-width: 240px;
+		flex-basis: 100%;
+		max-width: none;
+	}
 
-		// At narrow widths the slider is too cramped to aim precisely;
-		// the 90° rotate buttons cover the essential need.
-		@media (max-width: #{ $break-mobile }) {
-			display: none;
-		}
+	.media-editor-toolbar__action-cluster {
+		flex-basis: 100%;
+		justify-content: center;
 	}
 }
