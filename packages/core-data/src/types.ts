@@ -1,18 +1,28 @@
-/**
- * WordPress dependencies
- */
-import type { ConnectionStatusDisconnected, Y } from '@wordpress/sync';
-
-/**
- * Internal dependencies
- */
-import type { SelectionType } from './utils/crdt-user-selections';
-
-export type { ConnectionStatus } from '@wordpress/sync';
+export type ConnectionStatus =
+	| { status: 'connected' }
+	| { status: 'connecting' }
+	| {
+			status: 'disconnected';
+			error?: {
+				code?: string;
+				message?: string;
+			};
+			canManuallyRetry?: boolean;
+			willAutoRetryInMs?: number;
+			backgroundRetriesFailed?: boolean;
+	  };
 
 export type ConnectionError = NonNullable<
-	ConnectionStatusDisconnected[ 'error' ]
+	Extract< ConnectionStatus, { status: 'disconnected' } >[ 'error' ]
 >;
+
+export enum SelectionType {
+	None = 'none',
+	Cursor = 'cursor',
+	SelectionInOneBlock = 'selection-in-one-block',
+	SelectionInMultipleBlocks = 'selection-in-multiple-blocks',
+	WholeBlock = 'whole-block',
+}
 
 export interface AnyFunction {
 	( ...args: any[] ): any;
@@ -54,10 +64,29 @@ export interface WPSelection {
 }
 
 /**
+ * Structural shape of a Yjs relative position.
+ *
+ * Keeping this local avoids a public type dependency on @wordpress/sync for
+ * the Core build branch while still allowing the dormant RTC internals to pass
+ * these values to Yjs helpers.
+ */
+interface RelativePositionID {
+	client: number;
+	clock: number;
+}
+
+export interface RelativePosition {
+	type: RelativePositionID | null;
+	tname: string | null;
+	item: RelativePositionID | null;
+	assoc: number;
+}
+
+/**
  * The position of the cursor.
  */
 export type CursorPosition = {
-	relativePosition: Y.RelativePosition;
+	relativePosition: RelativePosition;
 
 	// Also store the absolute offset index of the cursor from the perspective
 	// of the user who is updating the selection.
@@ -122,7 +151,7 @@ export type SelectionWholeBlock = {
 	// Uses a Y.RelativePosition pointing to the block in its parent Y.Array,
 	// since there is no text cursor to navigate up from.
 	type: SelectionType.WholeBlock;
-	blockPosition: Y.RelativePosition;
+	blockPosition: RelativePosition;
 };
 
 export type SelectionState =
