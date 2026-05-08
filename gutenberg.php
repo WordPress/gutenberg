@@ -72,7 +72,3 @@ function gutenberg_pre_init() {
 
 	require_once __DIR__ . '/lib/load.php';
 }
-
-add_shortcode( 'test', function() {
-	return '<span class="test">Shortcode Test</span>';
-} );
