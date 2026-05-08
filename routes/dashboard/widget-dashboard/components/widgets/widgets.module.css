@@ -21,6 +21,16 @@
 	outline-offset: 2px;
 }
 
+/*
+ * Wrapper applied through `renderDragPreview` on @wordpress/grid.
+ * Using an ancestor class instead of touching `.tile` directly lets
+ * the dragged-state shadow win over the persistent one without
+ * stacking two box-shadows on the same element.
+ */
+.dragPreview .tile {
+	box-shadow: var(--wpds-elevation-md);
+}
+
 @media not ( prefers-reduced-motion ) {
 	.tile {
 		transition: box-shadow 180ms ease;

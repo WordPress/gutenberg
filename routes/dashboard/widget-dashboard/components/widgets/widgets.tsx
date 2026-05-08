@@ -8,7 +8,10 @@ import clsx from 'clsx';
  */
 import { forwardRef, useCallback, useMemo } from '@wordpress/element';
 import { DashboardGrid } from '@wordpress/grid';
-import type { DashboardGridLayoutItem } from '@wordpress/grid';
+import type {
+	DashboardGridLayoutItem,
+	DragPreviewRenderProps,
+} from '@wordpress/grid';
 
 /**
  * Internal dependencies
@@ -79,12 +82,20 @@ export const Widgets = forwardRef< HTMLDivElement, WidgetsProps >(
 			</div>
 		) );
 
+		const renderDragPreview = useCallback(
+			( { children: clone }: DragPreviewRenderProps ) => (
+				<div className={ styles.dragPreview }>{ clone }</div>
+			),
+			[]
+		);
+
 		const sharedProps = {
 			layout: gridLayout,
 			spacing: gridSettings.spacing,
 			rowHeight: gridSettings.rowHeight,
 			editMode,
 			onChangeLayout: handleLayoutChange,
+			renderDragPreview,
 		};
 
 		return (
