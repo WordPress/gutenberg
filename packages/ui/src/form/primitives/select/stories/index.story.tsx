@@ -80,38 +80,52 @@ export const Minimal: Story = {
 	},
 };
 
-const withEmptyOptionItems = [
-	{
-		value: '',
-		label: 'Select',
-		disabled: true,
+const placeholderItems = [ 'Item 1', 'Item 2' ];
+
+/**
+ * Use the `placeholder` prop on `Select.Trigger` to show text when no
+ * value is selected. The default placeholder is `"Select"`.
+ */
+export const WithCustomPlaceholder: Story = {
+	args: {
+		children: (
+			<>
+				<Select.Trigger placeholder="Choose an item" />
+				<Select.Popup>
+					{ placeholderItems.map( ( item ) => (
+						<Select.Item key={ item } value={ item }>
+							{ item }
+						</Select.Item>
+					) ) }
+				</Select.Popup>
+			</>
+		),
 	},
-	{
-		value: 'Item 2',
-		label: 'Item 2',
-	},
+};
+
+const nullValueOptionItems = [
+	{ value: null, label: 'Select theme' },
+	{ value: 'system', label: 'System default' },
+	{ value: 'light', label: 'Light' },
+	{ value: 'dark', label: 'Dark' },
 ];
 
 /**
- * By passing an `items` array to `Select.Root`, the `Select.Trigger` will be able to
- * render a `label` string for each item rather than the raw `value` string. In this
- * case, the option with an empty string value has a `"Select"` label string.
- *
- * This may be easier than writing a custom render function for the `Select.Trigger`.
+ * Use a `null` item when users should be able to clear the selected value from
+ * the popup. When `items` includes a `null` item, its label is used as the
+ * placeholder text.
  */
-export const WithEmptyValueOption: Story = {
+export const WithNullValueOption: Story = {
 	args: {
-		items: withEmptyOptionItems,
+		items: nullValueOptionItems,
 		children: (
 			<>
 				<Select.Trigger />
 				<Select.Popup>
-					{ withEmptyOptionItems.map( ( item ) => (
+					{ nullValueOptionItems.map( ( item ) => (
 						<Select.Item
-							key={ item.value }
+							key={ item.value ?? 'null' }
 							value={ item.value }
-							label={ item.label }
-							disabled={ item.disabled }
 						>
 							{ item.label }
 						</Select.Item>
@@ -119,7 +133,6 @@ export const WithEmptyValueOption: Story = {
 				</Select.Popup>
 			</>
 		),
-		defaultValue: '',
 	},
 };
 
@@ -252,20 +265,19 @@ export const WithCustomTriggerAndItem: Story = {
 
 /**
  * Popovers in Gutenberg are managed with explicit z-index values, which can
- * create situations where a popover renders below another popover, when you
- * want it to be rendered above.
+ * create situations where a select popup renders below another popover when
+ * you want it above.
  *
- * The `--wp-ui-select-z-index` CSS variable is an escape hatch for that
- * case. Override it either:
+ * The `--wp-ui-select-z-index` CSS variable controls the z-index of the
+ * `Select` positioner. Override it either:
  *
  * - **Globally**, by setting the variable on `:root` or `body` (raises every
- *   `Select` popover in the page),
- * - **Per instance on the popup**, by setting the variable via `style` on
- *   `Select.Popup` (as this story does), or
- * - **Per instance on the portal**, by passing a `Select.Portal` with a
- *   `style` (or `className`) to `Select.Popup`'s `portal` prop. The
- *   variable then cascades from the portal wrapper to everything rendered
- *   inside it.
+ *   `Select` popover in the page), or
+ * - **Per instance**, by passing a `Select.Portal` with a `style` (or
+ *   `className`) to `Select.Popup`'s `portal` prop. The variable cascades
+ *   from the portal wrapper to everything rendered inside it.
+ *
+ * This story demonstrates the per-instance approach.
  */
 export const WithCustomZIndex: Story = {
 	name: 'With Custom z-index',
@@ -273,7 +285,13 @@ export const WithCustomZIndex: Story = {
 		children: (
 			<>
 				<Select.Trigger />
-				<Select.Popup style={ { '--wp-ui-select-z-index': '1000001' } }>
+				<Select.Popup
+					portal={
+						<Select.Portal
+							style={ { '--wp-ui-select-z-index': '9999' } }
+						/>
+					}
+				>
 					<Select.Item value="Item 1" />
 					<Select.Item value="Item 2" />
 				</Select.Popup>

@@ -126,4 +126,21 @@ export interface PopupProps
 	 * @default 'Cancel'
 	 */
 	cancelButtonText?: string;
+
+	/**
+	 * When `true`, the dialog's title stays pinned to the top of the popup
+	 * as the body scrolls. When `false`, the title scrolls with the body.
+	 *
+	 * @default true
+	 */
+	stickyHeader?: boolean;
+
+	/**
+	 * When `true`, the dialog's action buttons (and error message, if any)
+	 * stay pinned to the bottom of the popup as the body scrolls. When
+	 * `false`, they scroll with the body.
+	 *
+	 * @default true
+	 */
+	stickyFooter?: boolean;
 }

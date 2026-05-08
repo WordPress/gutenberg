@@ -127,52 +127,25 @@ function GuidelinesPage() {
 								 */
 								/* eslint-disable jsx-a11y/no-redundant-roles */ }
 								<ul role="list" className="guidelines__list">
-									{ GUIDELINE_ITEMS.map( ( item ) => {
-										const contentId = `guidelines-${ item.slug }`;
-										const headingId = `guidelines-${ item.slug }-heading`;
-										const descriptionId = `guidelines-${ item.slug }-description`;
-
-										return (
-											<li
-												key={ item.slug }
-												className="guidelines__list-item"
+									{ GUIDELINE_ITEMS.map( ( item ) => (
+										<li
+											key={ item.slug }
+											className="guidelines__list-item"
+										>
+											<GuidelineAccordion
+												title={ item.title }
+												description={ item.description }
 											>
-												<div className="guidelines__accordion-item">
-													<GuidelineAccordion
-														title={ item.title }
-														description={
-															item.description
-														}
-														contentId={ contentId }
-														headingId={ headingId }
-														descriptionId={
-															descriptionId
-														}
-													>
-														{ item.slug ===
-														'blocks' ? (
-															<BlockGuidelines />
-														) : (
-															<GuidelineAccordionForm
-																slug={
-																	item.slug
-																}
-																contentId={
-																	contentId
-																}
-																headingId={
-																	headingId
-																}
-																descriptionId={
-																	descriptionId
-																}
-															/>
-														) }
-													</GuidelineAccordion>
-												</div>
-											</li>
-										);
-									} ) }
+												{ item.slug === 'blocks' ? (
+													<BlockGuidelines />
+												) : (
+													<GuidelineAccordionForm
+														slug={ item.slug }
+													/>
+												) }
+											</GuidelineAccordion>
+										</li>
+									) ) }
 								</ul>
 								{ /* eslint-enable jsx-a11y/no-redundant-roles */ }
 								<GuidelineActionsSection />

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, act } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -29,6 +29,7 @@ function renderStencil(
 	overrides: Partial< React.ComponentProps< typeof RectangleStencil > > = {}
 ) {
 	const onCropChange = jest.fn();
+	const onResizeStart = jest.fn();
 	const onResizeEnd = jest.fn();
 	const onEscape = jest.fn();
 
@@ -38,6 +39,7 @@ function renderStencil(
 			containerSize={ CONTAINER_SIZE }
 			imageSize={ IMAGE_SIZE }
 			onCropChange={ onCropChange }
+			onResizeStart={ onResizeStart }
 			onResizeEnd={ onResizeEnd }
 			onEscape={ onEscape }
 			freeformCrop
@@ -46,7 +48,7 @@ function renderStencil(
 		/>
 	);
 
-	return { onCropChange, onResizeEnd, onEscape };
+	return { onCropChange, onResizeStart, onResizeEnd, onEscape };
 }
 
 describe( 'RectangleStencil', () => {
@@ -96,6 +98,15 @@ describe( 'RectangleStencil', () => {
 			] );
 		} );
 
+		it( 'describes keyboard resizing on resize handles', () => {
+			renderStencil();
+			expect(
+				screen.getByRole( 'button', { name: 'Resize top-left corner' } )
+			).toHaveAccessibleDescription(
+				'Use arrow keys to resize the crop area. Hold Shift for larger steps.'
+			);
+		} );
+
 		it( 'renders corner handles clockwise from top-left when aspect ratio is locked', () => {
 			renderStencil( { aspectRatio: 16 / 9 } );
 			const labels = screen
@@ -112,26 +123,62 @@ describe( 'RectangleStencil', () => {
 	} );
 
 	describe( 'keyboard — Escape', () => {
-		it( 'calls onEscape when Escape is pressed on a handle', () => {
-			const { onEscape } = renderStencil();
+		it( 'handles Escape on a handle without bubbling', () => {
+			const onKeyDown = jest.fn();
+			const onEscape = jest.fn();
+			render(
+				// eslint-disable-next-line jsx-a11y/no-static-element-interactions
+				<div onKeyDown={ onKeyDown }>
+					<RectangleStencil
+						cropRect={ DEFAULT_CROP_RECT }
+						containerSize={ CONTAINER_SIZE }
+						imageSize={ IMAGE_SIZE }
+						onCropChange={ jest.fn() }
+						onEscape={ onEscape }
+						freeformCrop
+						cropBounds={ CROP_BOUNDS }
+					/>
+				</div>
+			);
 			const [ firstHandle ] = screen.getAllByRole( 'button' );
 
 			fireEvent.keyDown( firstHandle, { key: 'Escape' } );
 
 			expect( onEscape ).toHaveBeenCalledTimes( 1 );
+			expect( onKeyDown ).not.toHaveBeenCalled();
 		} );
 
 		it( 'does not call onCropChange when Escape is pressed', () => {
-			const { onCropChange } = renderStencil();
+			const { onCropChange, onEscape } = renderStencil();
 			const [ firstHandle ] = screen.getAllByRole( 'button' );
 
 			fireEvent.keyDown( firstHandle, { key: 'Escape' } );
 
+			expect( onEscape ).toHaveBeenCalledTimes( 1 );
 			expect( onCropChange ).not.toHaveBeenCalled();
 		} );
 	} );
 
 	describe( 'keyboard — arrow keys (fine step)', () => {
+		it( 'calls onResizeStart once and onResizeEnd after keyboard resize settles', () => {
+			jest.useFakeTimers();
+			const { onResizeStart, onResizeEnd } = renderStencil();
+			const eHandle = screen.getAllByRole( 'button' )[ 3 ];
+
+			fireEvent.keyDown( eHandle, { key: 'ArrowRight' } );
+			fireEvent.keyDown( eHandle, { key: 'ArrowRight' } );
+
+			expect( onResizeStart ).toHaveBeenCalledTimes( 1 );
+			expect( onResizeEnd ).not.toHaveBeenCalled();
+
+			act( () => {
+				jest.advanceTimersByTime( 500 );
+			} );
+
+			expect( onResizeEnd ).toHaveBeenCalledTimes( 1 );
+			jest.useRealTimers();
+		} );
+
 		it( 'moves the right edge right by KEYBOARD_STEP on ArrowRight (no Shift)', () => {
 			const { onCropChange } = renderStencil();
 			// 'e' handle is the 4th button in clockwise order (nw, n, ne, e).
@@ -203,6 +250,25 @@ describe( 'RectangleStencil', () => {
 	} );
 
 	describe( 'pointer drag — focus after release', () => {
+		it( 'calls onResizeStart on pointerdown and onResizeEnd on pointerup', () => {
+			const { onResizeStart, onResizeEnd } = renderStencil();
+			const [ firstHandle ] = screen.getAllByRole( 'button' );
+
+			fireEvent.pointerDown( firstHandle, {
+				button: 0,
+				clientX: 100,
+				clientY: 100,
+				pointerId: 1,
+			} );
+
+			expect( onResizeStart ).toHaveBeenCalledTimes( 1 );
+			expect( onResizeEnd ).not.toHaveBeenCalled();
+
+			fireEvent.pointerUp( firstHandle, { pointerId: 1 } );
+
+			expect( onResizeEnd ).toHaveBeenCalledTimes( 1 );
+		} );
+
 		it( 'focuses the handle button after a pointer drag ends', () => {
 			renderStencil();
 			const [ firstHandle ] = screen.getAllByRole( 'button' );

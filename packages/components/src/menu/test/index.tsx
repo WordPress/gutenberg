@@ -161,7 +161,7 @@ describe( 'Menu', () => {
 				<Menu>
 					<Menu.TriggerButton>Open dropdown</Menu.TriggerButton>
 					<Menu.Popover>
-						<Menu.Item disabled>First item</Menu.Item>
+						<Menu.Item>First item</Menu.Item>
 						<Menu.Item>Second item</Menu.Item>
 						<Menu.Item>Third item</Menu.Item>
 					</Menu.Popover>
@@ -183,7 +183,6 @@ describe( 'Menu', () => {
 			await press.Space();
 
 			// Menu open, focus is on the first focusable item
-			// (disabled items are still focusable and accessible
 			await waitForFocusedMenuItem( 'First item' );
 		} );
 

@@ -6,19 +6,21 @@ import {
 	SelectControl,
 	ToggleControl,
 } from '@wordpress/components';
-import { Stack } from '@wordpress/ui';
+import { Stack, VisuallyHidden } from '@wordpress/ui';
 import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import { useCropper } from '../../image-editor';
+import { useCropGestureHandlers } from '../../hooks/use-crop-gesture-handlers';
 import {
 	DEFAULT_ASPECT_RATIOS,
 	MAX_ZOOM,
 	MIN_ZOOM,
 	ORIGINAL_ASPECT_RATIO,
 } from '../../image-editor/core/constants';
+import type { AspectRatioPreset } from '../../image-editor/core/constants';
 
 export interface MediaEditorCropPanelProps {
 	/**
@@ -33,6 +35,13 @@ export interface MediaEditorCropPanelProps {
 	freeformCrop: boolean;
 	/** Setter for freeform mode. */
 	onFreeformChange: ( value: boolean ) => void;
+	/** Signal that a placement-oriented control is being adjusted. */
+	onPlacementControlInteraction?: () => void;
+	/**
+	 * Fixed aspect-ratio presets to display after Free and Original. When
+	 * omitted, the media editor's default fixed-ratio presets are used.
+	 */
+	aspectRatioPresets?: AspectRatioPreset[];
 }
 
 /**
@@ -69,57 +78,78 @@ export function resolveAspectRatio(
  * @param props.onAspectRatioChange
  * @param props.freeformCrop
  * @param props.onFreeformChange
+ * @param props.onPlacementControlInteraction
+ * @param props.aspectRatioPresets
  */
 export default function MediaEditorCropPanel( {
 	aspectRatioValue,
 	onAspectRatioChange,
 	freeformCrop,
 	onFreeformChange,
+	onPlacementControlInteraction,
+	aspectRatioPresets,
 }: MediaEditorCropPanelProps ) {
 	const { state, setZoom } = useCropper();
+	const zoomGestureHandlers = useCropGestureHandlers();
+	const aspectRatioOptions = [
+		...DEFAULT_ASPECT_RATIOS.filter( ( preset ) => preset.value <= 0 ),
+		...( aspectRatioPresets ??
+			DEFAULT_ASPECT_RATIOS.filter( ( preset ) => preset.value > 0 ) ),
+	];
+	const handleAspectRatioChange = ( value: string ) => {
+		onAspectRatioChange( value );
+		if ( value === '0' && ! freeformCrop ) {
+			onFreeformChange( true );
+		}
+	};
 
 	return (
 		<Stack direction="column" gap="md">
-			<RangeControl
-				__next40pxDefaultSize
-				__nextHasNoMarginBottom
-				label={ __( 'Zoom' ) }
-				min={ MIN_ZOOM }
-				max={ MAX_ZOOM }
-				step={ 0.1 }
-				value={ state.zoom }
-				onChange={ ( value ) =>
-					setZoom( typeof value === 'number' ? value : MIN_ZOOM )
-				}
-				renderTooltipContent={ ( value ) => {
-					const zoom = typeof value === 'number' ? value : MIN_ZOOM;
-					return sprintf(
-						/* translators: %d: zoom level as a percentage. */
-						__( '%d%%' ),
-						Math.round( zoom * 100 )
-					);
-				} }
-			/>
+			<VisuallyHidden render={ <h2 /> }>
+				{ __( 'Crop options' ) }
+			</VisuallyHidden>
 			<SelectControl
 				__next40pxDefaultSize
 				__nextHasNoMarginBottom
 				label={ __( 'Aspect ratio' ) }
 				value={ aspectRatioValue }
-				onChange={ onAspectRatioChange }
-				options={ DEFAULT_ASPECT_RATIOS.map( ( preset ) => ( {
+				onChange={ handleAspectRatioChange }
+				options={ aspectRatioOptions.map( ( preset ) => ( {
 					label: preset.label,
 					value: preset.value.toString(),
 				} ) ) }
 			/>
 			<ToggleControl
 				__nextHasNoMarginBottom
-				label={ __( 'Freeform crop' ) }
-				help={ __(
-					'Drag the crop edges to resize freely. When off, the crop is fixed to the selected ratio.'
-				) }
+				label={ __( 'Resize crop area' ) }
+				help={ __( 'Show handles to adjust the crop box.' ) }
 				checked={ freeformCrop }
 				onChange={ onFreeformChange }
 			/>
+			<div role="presentation" { ...zoomGestureHandlers }>
+				<RangeControl
+					__next40pxDefaultSize
+					__nextHasNoMarginBottom
+					label={ __( 'Zoom' ) }
+					min={ MIN_ZOOM }
+					max={ MAX_ZOOM }
+					step={ 0.1 }
+					value={ state.zoom }
+					onChange={ ( value ) => {
+						onPlacementControlInteraction?.();
+						setZoom( typeof value === 'number' ? value : MIN_ZOOM );
+					} }
+					renderTooltipContent={ ( value ) => {
+						const zoom =
+							typeof value === 'number' ? value : MIN_ZOOM;
+						return sprintf(
+							/* translators: %d: zoom level as a percentage. */
+							__( '%d%%' ),
+							Math.round( zoom * 100 )
+						);
+					} }
+				/>
+			</div>
 		</Stack>
 	);
 }

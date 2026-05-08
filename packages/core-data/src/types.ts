@@ -32,18 +32,75 @@ export interface AnyFunction {
 export type AbsoluteBlockIndexPath = number[];
 
 /**
- * Avoid a circular dependency with @wordpress/editor
+ * Describes part of a visible selection in the editor. Namely, either a cursor
+ * position within a block or a block entirely contained within a selection.
  *
- * Additionaly, this type marks `attributeKey` and `offset` as possibly
- * `undefined`, which can happen in two known scenarios:
+ * This description covers multiple selection scenarios, each of which impacts
+ * how the `attributeKey` and `offset` are set. These two parameters indicate
+ * where in a RichText component the cursor sits and with which block attribute
+ * that RichText component is associated.
  *
- * 1. If a user has an entire block highlighted (e.g., a `core/image` block).
- * 2. If there's an intermediate selection state while inserting a block, those
- *    properties will be temporarily`undefined`.
+ *  - When a selection covers an entire block or covers multiple blocks, there
+ *    is no associated RichText, so both of the parameters are unset.
+ *
+ *  - When a selection starts, ends, or is a simple position within a block,
+ *    both parameters will be set accordingly.
+ *
+ *  - When a block is being inserted into a document, however, there are multiple
+ *    stages determining which parameters are set.
+ *
+ *      1. A block is created in the data store, but has no appearance in the
+ *         editor otherwise. Both parameters are unset.
+ *
+ *      2. The block has loaded into the editor and there is a RichText field,
+ *         but editor focus hasn’t yet placed a browser selection inside it.
+ *         Only the `attributeKey` is set.
+ *
+ *      3. The browser has focused into a RichText field and both parameters are set.
+ *
+ * Selections are thus dynamic because block creation itself loads through multiple
+ * intermediate stages before someone is able to highlight, type, or modify text.
+ *
+ * This type is duplicated to avoid creating circular dependencies.
+ * @see {import("@wordpress/block-editor/src/store/actions").WPBlockSelection}
+ * @see {import("@wordpress/block-editor/src/store/selectors").WPBlockSelection}
+ * @see {import("@wordpress/editor/src/store/selectors").WPBlockSelection}
+ *
+ * @todo Move this into a canonical types file which can be imported in separate
+ *       packages without causing circular dependencies.
  */
 export interface WPBlockSelection {
+	/**
+	 * The selection cursor (start or end) is found within this block.
+	 * or this entire block is contained within a multi-block selection.
+	 */
 	clientId: string;
+
+	/**
+	 * When a selection cursor appears within a RichText component which
+	 * maps back to a block’s attribute, e.g. a paragraph block’s `content`
+	 * attribute, this will hold the attribute key for that associated
+	 * block attribute.
+	 *
+	 * An attribute key is mostly the same as an attribute name, but in some
+	 * circumstances, such as in a multiline attribute, there can be multiple
+	 * RichText instances associated with a given attribute. The key will
+	 * usually be the attribute name verbatim, but in these cases, an index
+	 * will be appended to differentiate the multiple RichText instances
+	 * associated with the array-like attribute.
+	 *
+	 * Technically, the `attributeKey` is the value stored in the DOM node
+	 * for a RichText instance in the `data-wp-block-attribute-key` attribute.
+	 * This “key” links the actual instance with the block attribute, provided
+	 * by the `identifier` React prop when creating a `<RichText>` element.
+	 */
 	attributeKey?: string;
+
+	/**
+	 * When a selection cursor appears within a block, it can be found this
+	 * many Unicode code points into the RichText component’s decoded text
+	 * which is associated with the given attribute key.
+	 */
 	offset?: number;
 }
 

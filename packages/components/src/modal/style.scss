@@ -29,9 +29,14 @@
 // The modal window element.
 .components-modal__frame {
 	@include reset;
-	// Use the entire viewport on smaller screens.
-	margin: $grid-unit-50 0 0 0;
+	// On smaller screens, render as a bottom sheet: edge-to-edge, anchored
+	// to the bottom of the viewport. `align-self: flex-end` both anchors
+	// the modal to the bottom of the flex overlay and breaks the default
+	// `align-items: stretch`, so the modal hugs its content height.
+	align-self: flex-end;
+	margin: 0;
 	width: 100%;
+	max-height: calc(100% - #{$grid-unit-50});
 	background: $white;
 	box-shadow: $elevation-large;
 	border-radius: $radius-large $radius-large 0 0;
@@ -62,25 +67,13 @@
 
 	// Show a centered modal on bigger screens.
 	@include break-small() {
+		align-self: auto;
 		border-radius: $radius-large;
 		margin: auto;
 		width: auto;
 		min-width: var(--wpds-dimension-surface-width-sm);
 		max-width: calc(100% - #{$grid-unit-20 * 2});
 		max-height: calc(100% - #{$header-height * 2});
-
-		&.is-full-screen {
-			@include break-small() {
-				width: calc(100% - #{ $grid-unit-20 * 2 });
-				height: calc(100% - #{ $grid-unit-20 * 2 });
-				max-height: none;
-			}
-			@include break-medium() {
-				width: calc(100% - #{ $grid-unit-50 * 2 });
-				height: calc(100% - #{ $grid-unit-50 * 2 });
-				max-width: none;
-			}
-		}
 
 		&.has-size-small,
 		&.has-size-medium,
@@ -105,6 +98,14 @@
 	}
 
 	&.is-full-screen {
+		// Full-screen modals cover the entire viewport on mobile,
+		// overriding the bottom-sheet defaults.
+		margin: 0;
+		width: 100%;
+		height: 100%;
+		max-height: none;
+		border-radius: 0;
+
 		// When full screen, make sure the children container is full height.
 		:where(.components-modal__content) {
 			display: flex;
@@ -116,17 +117,33 @@
 				flex: 1;
 			}
 		}
+
+		@include break-small() {
+			// Reset the mobile bottom-sheet overrides so the desktop
+			// full-screen modal is centered with rounded corners.
+			margin: auto;
+			border-radius: $radius-large;
+			width: calc(100% - #{ $grid-unit-20 * 2 });
+			height: calc(100% - #{ $grid-unit-20 * 2 });
+		}
+
+		@include break-medium() {
+			width: calc(100% - #{ $grid-unit-50 * 2 });
+			height: calc(100% - #{ $grid-unit-50 * 2 });
+			max-width: none;
+		}
 	}
 }
 
+// On mobile, the modal slides up from the bottom of the viewport.
 @keyframes components-modal__appear-animation {
 	from {
 		opacity: 0;
-		transform: scale(0.9);
+		transform: translateY(100%);
 	}
 	to {
 		opacity: 1;
-		transform: scale(1);
+		transform: translateY(0);
 	}
 }
 
@@ -135,11 +152,38 @@
 @keyframes components-modal__disappear-animation {
 	from {
 		opacity: 1;
-		transform: scale(1);
+		transform: translateY(0);
 	}
 	to {
 		opacity: 0;
-		transform: scale(0.9);
+		transform: translateY(100%);
+	}
+}
+
+// On bigger screens, the modal scales in/out instead of sliding. The keyframe
+// names are intentionally reused so the JS animationend listener
+// (use-modal-exit-animation.ts) keeps working unchanged.
+@include break-small() {
+	@keyframes components-modal__appear-animation {
+		from {
+			opacity: 0;
+			transform: scale(0.9);
+		}
+		to {
+			opacity: 1;
+			transform: scale(1);
+		}
+	}
+
+	@keyframes components-modal__disappear-animation {
+		from {
+			opacity: 1;
+			transform: scale(1);
+		}
+		to {
+			opacity: 0;
+			transform: scale(0.9);
+		}
 	}
 }
 
