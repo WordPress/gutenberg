@@ -1,0 +1,16 @@
+.widgetChrome {
+	height: 100%;
+}
+
+.widgetChromeHeaderIcon {
+	display: inline-flex;
+	color: var(--wpds-color-fg-content-neutral-weak);
+}
+
+.widgetChromeContent {
+	flex: 1;
+}
+
+.loading {
+	height: 100%;
+}
