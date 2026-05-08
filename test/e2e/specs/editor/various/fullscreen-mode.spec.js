@@ -73,9 +73,7 @@ test.describe( 'Fullscreen Mode', () => {
 		await expect( page.locator( 'body' ) ).toHaveClass(
 			/is-fullscreen-mode/
 		);
-		await expect( page.locator( 'body' ) ).toHaveClass(
-			/is-admin-bar-in-editor-enabled/
-		);
+
 		await expect( page.locator( '#wpadminbar' ) ).toBeVisible();
 		await expect( getPostEditorBackLink( page ) ).toBeVisible();
 	} );
@@ -93,9 +91,6 @@ test.describe( 'Fullscreen Mode', () => {
 		await enableFullscreenMode( page );
 		await enableDistractionFreeMode( pageUtils );
 
-		await expect( page.locator( 'body' ) ).toHaveClass(
-			/is-admin-bar-in-editor-enabled/
-		);
 		await expect( page.locator( '.editor-editor-interface' ) ).toHaveClass(
 			/is-distraction-free/
 		);
@@ -121,9 +116,6 @@ test.describe( 'Fullscreen Mode', () => {
 			] );
 			await admin.visitSiteEditor( { canvas: 'edit' } );
 
-			await expect( page.locator( 'body' ) ).toHaveClass(
-				/is-admin-bar-in-editor-enabled/
-			);
 			await expect( page.locator( '#wpadminbar' ) ).toBeVisible();
 			await expect(
 				getSiteEditorOpenNavigationButton( page )

@@ -129,6 +129,7 @@ require __DIR__ . '/compat/wordpress-7.1/classic-block.php';
 require __DIR__ . '/experimental/block-editor-settings-mobile.php';
 require __DIR__ . '/experimental/blocks.php';
 require __DIR__ . '/experimental/navigation-theme-opt-in.php';
+require __DIR__ . '/experimental/admin-bar-in-editor/load.php';
 require __DIR__ . '/experimental/kses.php';
 require __DIR__ . '/experimental/script-modules.php';
 require __DIR__ . '/experimental/pages/site-editor.php';

@@ -38,25 +38,6 @@
 			display: block;
 		}
 	}
-
-	body.is-admin-bar-in-editor-enabled & {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		width: $button-size-compact;
-
-		.edit-post-fullscreen-mode-close__back-icon {
-			top: auto;
-			left: auto;
-			width: $button-size-compact;
-			height: $button-size-compact;
-			background: transparent;
-		}
-
-		&:hover .edit-post-fullscreen-mode-close__back-icon {
-			color: var(--wp-admin-theme-color);
-		}
-	}
 }
 
 .edit-post-fullscreen-mode-close-site-icon__icon {

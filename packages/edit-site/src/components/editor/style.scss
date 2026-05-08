@@ -60,16 +60,6 @@
 			display: block;
 		}
 	}
-
-	body.is-admin-bar-in-editor-enabled & {
-		.edit-site-editor__back-icon {
-			background: transparent;
-		}
-
-		&:hover .edit-site-editor__back-icon {
-			color: var(--wp-admin-theme-color);
-		}
-	}
 }
 
 .edit-site-editor__back-icon {

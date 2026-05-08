@@ -62,69 +62,6 @@ body.js.site-editor-php {
 
 body.js.site-editor-php {
 	background: $gray-900;
-
-	&.is-admin-bar-in-editor-enabled {
-		--wp-admin-bar-in-editor-height: #{$admin-bar-height-big};
-
-		margin-top: 0;
-		height: 100%;
-
-		#wpadminbar {
-			display: block;
-		}
-
-		.edit-site-sidebar-navigation-screen__title-icon {
-			padding-top: $grid-unit-20;
-		}
-
-		.edit-site-layout__content,
-		.edit-site-layout__sidebar {
-			min-height: 0;
-		}
-
-		.edit-site-sidebar__content {
-			flex-basis: 0;
-			min-height: 0;
-		}
-
-		.edit-site {
-			box-sizing: border-box;
-			padding-top: var(--wp-admin-bar-in-editor-height);
-			height: 100vh;
-			min-height: 100vh;
-
-			@include break-small {
-				padding-top: 0;
-				top: var(--wp-admin-bar-in-editor-height);
-				height: calc(100vh - var(--wp-admin-bar-in-editor-height));
-				min-height: calc(100vh - var(--wp-admin-bar-in-editor-height));
-			}
-		}
-
-		.edit-site-layout.is-full-canvas .edit-site-layout__sidebar-region {
-			top: var(--wp-admin-bar-in-editor-height);
-			height: calc(100vh - var(--wp-admin-bar-in-editor-height));
-		}
-
-		.is-entity-save-view-open .interface-interface-skeleton__actions {
-			&:focus,
-			&:focus-within {
-				top: var(--wp-admin-bar-in-editor-height);
-			}
-		}
-
-		@include break-medium {
-			--wp-admin-bar-in-editor-height: #{$admin-bar-height};
-		}
-
-		&:has(.editor-editor-interface.is-distraction-free) {
-			--wp-admin-bar-in-editor-height: 0;
-
-			#wpadminbar {
-				display: none;
-			}
-		}
-	}
 }
 
 .edit-site {
