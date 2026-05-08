@@ -11,7 +11,7 @@ import {
 	withConstrainedTabbing,
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { compose } from '@wordpress/compose';
+import { compose, useEvent } from '@wordpress/compose';
 import { closeSmall } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
 
@@ -75,13 +75,6 @@ export function PostPublishPanel( {
 
 	const { disablePublishSidebar, enablePublishSidebar } =
 		useDispatch( editorStore );
-	const onTogglePublishSidebar = () => {
-		if ( isPublishSidebarEnabled ) {
-			disablePublishSidebar();
-		} else {
-			enablePublishSidebar();
-		}
-	};
 
 	const cancelButtonRef = useRef( null );
 
@@ -97,29 +90,30 @@ export function PostPublishPanel( {
 
 	// Auto-collapse the publish sidebar when a post is published and the user
 	// makes an edit, or when the edited post changes.
-	const prevIsPublishedRef = useRef( isPublished );
-	const prevCurrentPostIdRef = useRef( currentPostId );
-	const didMountRef = useRef( false );
+	const prevPostIdRef = useRef( currentPostId );
+	const stableOnClose = useEvent( onClose );
 	useEffect( () => {
-		if ( ! didMountRef.current ) {
-			didMountRef.current = true;
-			return;
-		}
-		if (
-			( prevIsPublishedRef.current && ! isSaving && isDirty ) ||
-			currentPostId !== prevCurrentPostIdRef.current
-		) {
-			onClose?.();
-		}
-		prevIsPublishedRef.current = isPublished;
-		prevCurrentPostIdRef.current = currentPostId;
-	}, [ isPublished, isSaving, isDirty, currentPostId, onClose ] );
+		const postChanged = currentPostId !== prevPostIdRef.current;
+		prevPostIdRef.current = currentPostId;
 
-	const onSubmit = () => {
+		if ( postChanged || ( isPublished && ! isSaving && isDirty ) ) {
+			stableOnClose();
+		}
+	}, [ isPublished, isSaving, isDirty, currentPostId, stableOnClose ] );
+
+	function onTogglePublishSidebar() {
+		if ( isPublishSidebarEnabled ) {
+			disablePublishSidebar();
+		} else {
+			enablePublishSidebar();
+		}
+	}
+
+	function onSubmit() {
 		if ( ! hasPublishAction || ! isPostTypeViewable ) {
 			onClose();
 		}
-	};
+	}
 
 	const isPublishedOrScheduled =
 		isPublished || ( isScheduled && isBeingScheduled );
