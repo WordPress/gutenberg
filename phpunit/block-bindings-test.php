@@ -391,4 +391,75 @@ HTML;
 			'The block content should show the filtered value.'
 		);
 	}
+
+	/**
+	 * Tests that innerBlocks binding replaces the block's inner blocks with
+	 * those returned by the source callback.
+	 */
+	public function test_inner_blocks_binding_replaces_inner_blocks() {
+		register_block_bindings_source(
+			self::SOURCE_NAME,
+			array(
+				'label'              => self::SOURCE_LABEL,
+				'get_value_callback' => function ( $source_args, $block_instance, $attribute_name ) {
+					if ( 'innerBlocks' !== $attribute_name ) {
+						return null;
+					}
+					return '<!-- wp:paragraph --><p>Bound paragraph</p><!-- /wp:paragraph -->';
+				},
+			)
+		);
+
+		$block_content = <<<HTML
+<!-- wp:group {"metadata":{"bindings":{"innerBlocks":{"source":"test/source"}}}} -->
+<div class="wp-block-group"><!-- wp:paragraph --><p>Original paragraph</p><!-- /wp:paragraph --></div>
+<!-- /wp:group -->
+HTML;
+
+		$parsed_blocks = parse_blocks( $block_content );
+		$block         = new WP_Block( $parsed_blocks[0] );
+		$result        = $block->render();
+
+		$this->assertStringContainsString(
+			'Bound paragraph',
+			$result,
+			'The rendered block should contain the inner block content returned by the source.'
+		);
+		$this->assertStringNotContainsString(
+			'Original paragraph',
+			$result,
+			'The original inner block content should be replaced by the bound content.'
+		);
+	}
+
+	/**
+	 * Tests that an innerBlocks binding with a non-string source value is ignored.
+	 */
+	public function test_inner_blocks_binding_ignores_non_string_value() {
+		register_block_bindings_source(
+			self::SOURCE_NAME,
+			array(
+				'label'              => self::SOURCE_LABEL,
+				'get_value_callback' => function () {
+					return null; // Source returns null — binding should be ignored.
+				},
+			)
+		);
+
+		$block_content = <<<HTML
+<!-- wp:group {"metadata":{"bindings":{"innerBlocks":{"source":"test/source"}}}} -->
+<div class="wp-block-group"><!-- wp:paragraph --><p>Original paragraph</p><!-- /wp:paragraph --></div>
+<!-- /wp:group -->
+HTML;
+
+		$parsed_blocks = parse_blocks( $block_content );
+		$block         = new WP_Block( $parsed_blocks[0] );
+		$result        = $block->render();
+
+		$this->assertStringContainsString(
+			'Original paragraph',
+			$result,
+			'Original inner blocks should remain when source returns null.'
+		);
+	}
 }

@@ -13,8 +13,14 @@ import {
 	store as blocksStore,
 } from '@wordpress/blocks';
 import { withFilters } from '@wordpress/components';
-import { useRegistry, useSelect } from '@wordpress/data';
-import { useCallback, useContext, useMemo } from '@wordpress/element';
+import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
+import {
+	useCallback,
+	useContext,
+	useEffect,
+	useMemo,
+	useRef,
+} from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -26,6 +32,7 @@ import {
 	replacePatternOverridesDefaultBinding,
 } from '../../utils/block-bindings';
 import { unlock } from '../../lock-unlock';
+import { store as blockEditorStore } from '../../store';
 import { PrivateBlockContext } from '../block-list/private-block-context';
 
 /**
@@ -59,6 +66,7 @@ const EditWithFilters = withFilters( 'editor.BlockEdit' )( Edit );
 const EditWithGeneratedProps = ( props ) => {
 	const { name, clientId, attributes, setAttributes } = props;
 	const registry = useRegistry();
+	const { replaceInnerBlocks } = useDispatch( blockEditorStore );
 	const blockType = getBlockType( name );
 	const blockContext = useContext( BlockContext );
 	const registeredSources = useSelect(
@@ -183,6 +191,45 @@ const EditWithGeneratedProps = ( props ) => {
 			registeredSources,
 		]
 	);
+
+	// Handle innerBlocks binding: get inner blocks from the source and sync
+	// them into the block editor store whenever they change.
+	const innerBlocksBinding = blockBindings?.innerBlocks;
+	const innerBlocksBindingSource = innerBlocksBinding
+		? registeredSources[ innerBlocksBinding.source ]
+		: null;
+
+	const boundInnerBlocks = useSelect(
+		( select ) => {
+			if (
+				! innerBlocksBinding ||
+				! innerBlocksBindingSource?.getInnerBlocks
+			) {
+				return undefined;
+			}
+			return innerBlocksBindingSource.getInnerBlocks( {
+				select,
+				context,
+				clientId,
+				binding: innerBlocksBinding,
+			} );
+		},
+		[ innerBlocksBinding, innerBlocksBindingSource, context, clientId ]
+	);
+
+	// Track whether we have already synced the current boundInnerBlocks
+	// value so we can skip redundant dispatches.
+	const prevBoundInnerBlocksRef = useRef( undefined );
+	useEffect( () => {
+		if ( boundInnerBlocks === undefined ) {
+			return;
+		}
+		if ( prevBoundInnerBlocksRef.current === boundInnerBlocks ) {
+			return;
+		}
+		prevBoundInnerBlocksRef.current = boundInnerBlocks;
+		replaceInnerBlocks( clientId, boundInnerBlocks );
+	}, [ clientId, boundInnerBlocks, replaceInnerBlocks ] );
 
 	const setBoundAttributes = useCallback(
 		( nextAttributes ) => {
