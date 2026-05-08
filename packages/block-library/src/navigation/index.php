@@ -425,7 +425,11 @@ class WP_Navigation_Block_Renderer {
 			$full_template_part_id = $theme . '//' . $slug;
 			$block_template        = get_block_file_template( $full_template_part_id, 'wp_template_part' );
 			if ( isset( $block_template->content ) ) {
-				$parsed_blocks = parse_blocks( $block_template->content );
+				// Expand shortcodes before parsing blocks, matching the order in
+				// `render_block_core_template_part()`.
+				$content       = shortcode_unautop( $block_template->content );
+				$content       = do_shortcode( $content );
+				$parsed_blocks = parse_blocks( $content );
 				$blocks        = block_core_navigation_filter_out_empty_blocks( $parsed_blocks );
 				// Disable overlay menu for any navigation blocks within the overlay to prevent nested overlays.
 				$blocks = static::disable_overlay_menu_for_nested_navigation_blocks( $blocks );
@@ -449,6 +453,12 @@ class WP_Navigation_Block_Renderer {
 		// Re-serialize, and run Block Hooks algorithm to inject hooked blocks.
 		$markup = serialize_blocks( $blocks );
 		$markup = apply_block_hooks_to_content_from_post_object( $markup, $template_part_post );
+
+		// Expand shortcodes before parsing blocks, matching the order in
+		// `render_block_core_template_part()`.
+		$markup = shortcode_unautop( $markup );
+		$markup = do_shortcode( $markup );
+
 		$blocks = parse_blocks( $markup );
 
 		// Disable overlay menu for any navigation blocks within the overlay to prevent nested overlays.
@@ -699,11 +709,6 @@ class WP_Navigation_Block_Renderer {
 			$overlay_blocks = static::get_overlay_blocks_from_template_part( $attributes['overlay'], $attributes );
 			// Render template part blocks directly without navigation container wrapper.
 			$overlay_blocks_html = static::get_template_part_blocks_html( $overlay_blocks );
-
-			// Expand shortcodes in the overlay, matching what `render_block_core_template_part()`
-			// does for regular template parts. See https://github.com/WordPress/gutenberg/issues/77510.
-			$overlay_blocks_html = shortcode_unautop( $overlay_blocks_html );
-			$overlay_blocks_html = do_shortcode( $overlay_blocks_html );
 
 			// Check if overlay contains a navigation-overlay-close block (detect in rendered HTML so it works with patterns).
 			$has_custom_overlay_close_block = block_core_navigation_overlay_html_has_close_block( $overlay_blocks_html );
