@@ -151,7 +151,6 @@ export type BlockSelectors = Record<
  * - `featureSelectors`: feature-level selectors for block supports.
  * - `fallbackGapValue`: fallback block gap value used by layout rules.
  * - `hasLayoutSupport`: whether layout styles can be generated for the node.
- * - `styleVariationSelectors`: block style variation selectors keyed by variation name.
  * - `isStyleVariation`: whether this node is a block style variation.
  * - `layoutSelector`: optional selector override for layout styles.
  * - `layoutHasBlockGapSupport`: optional block gap support override for layout styles.
@@ -170,7 +169,6 @@ interface StylesNode {
 		| Record< string, string | Record< string, string > >;
 	fallbackGapValue?: string;
 	hasLayoutSupport?: boolean;
-	styleVariationSelectors?: Record< string, string >;
 	isStyleVariation?: boolean;
 	layoutSelector?: string;
 	layoutHasBlockGapSupport?: boolean;
