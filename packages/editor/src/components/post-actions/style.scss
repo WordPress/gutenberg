@@ -1,5 +1,10 @@
 @use "@wordpress/base-styles/z-index" as *;
 
-.editor-action-modal {
-	z-index: z-index(".editor-action-modal");
+// Scope the legacy z-index override to the dialog's portal so the
+// post-actions modal still stacks above older `@wordpress/components`
+// overlays during the transition. The `:root` defaults shared by
+// other migrated overlays come from `@wordpress/dataviews`'
+// `wp-ui-legacy-compat.scss`.
+.editor-action-modal__portal {
+	--wp-ui-dialog-z-index: #{z-index(".editor-action-modal")};
 }
