@@ -58,6 +58,7 @@ function CustomCSSControl( { blockName, setAttributes, style } ) {
 				onChange={ onChange }
 				inheritedValue={ style }
 				help={ cssHelpText }
+				cssDeclarationsList
 			/>
 		</InspectorControls>
 	);

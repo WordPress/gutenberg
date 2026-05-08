@@ -24,11 +24,12 @@ export default function CodeMirrorEditor( {
 	label,
 	help,
 	className,
+	cssDeclarationsList = false,
 } ) {
 	const {
 		autocomplete: { autocompletion },
 		commands: { defaultKeymap, history, historyKeymap },
-		langCss: { css: cssLanguage },
+		langCss: { cssLanguage, cssCompletionSource },
 		language: {
 			bracketMatching,
 			defaultHighlightStyle,
@@ -61,7 +62,10 @@ export default function CodeMirrorEditor( {
 				indentOnInput(),
 				syntaxHighlighting( defaultHighlightStyle ),
 				autocompletion(),
-				cssLanguage(),
+				cssLanguage.configure( {
+					top: cssDeclarationsList ? 'Styles' : 'StyleSheet',
+				} ),
+				cssLanguage.data.of( { autocomplete: cssCompletionSource } ),
 				EditorView.theme( {
 					'&': {
 						height: '100%',

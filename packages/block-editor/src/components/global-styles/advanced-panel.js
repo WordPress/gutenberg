@@ -45,6 +45,7 @@ export default function AdvancedPanel( {
 	onChange,
 	inheritedValue = value,
 	help,
+	cssDeclarationsList = false,
 } ) {
 	// Custom CSS
 	const [ cssError, setCSSError ] = useState( null );
@@ -108,6 +109,7 @@ export default function AdvancedPanel( {
 						onChange={ handleOnChange }
 						onBlur={ handleOnBlur }
 						className="block-editor-global-styles-advanced-panel__custom-css-input"
+						cssDeclarationsList={ cssDeclarationsList }
 					/>
 				</Suspense>
 			</BaseControl>

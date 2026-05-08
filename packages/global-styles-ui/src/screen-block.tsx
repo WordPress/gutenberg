@@ -433,6 +433,7 @@ function ScreenBlock( { name, variation }: ScreenBlockProps ) {
 						value={ style }
 						onChange={ setStyle }
 						inheritedValue={ inheritedStyle }
+						cssDeclarationsList
 						help={ sprintf(
 							// translators: %s: is the name of a block e.g., 'Image' or 'Table'.
 							__(
