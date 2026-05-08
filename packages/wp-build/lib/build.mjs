@@ -164,6 +164,8 @@ const wordpressExternalsPlugin = createWordpressExternalsPlugin(
 
 const styleRuntimeRequire = createNodeRequire( import.meta.url );
 const STYLE_RUNTIME_PACKAGE_NAME = '@wordpress/style-runtime';
+// Use the source entry instead of the package export so wp-build can bootstrap
+// from a clean checkout before style-runtime has generated build output.
 const STYLE_RUNTIME_ENTRY = path.join(
 	path.dirname(
 		styleRuntimeRequire.resolve(
