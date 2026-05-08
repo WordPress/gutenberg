@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -160,18 +160,121 @@ describe( 'CropAdvancedPanel', () => {
 		expect( mockSettleCrop ).toHaveBeenCalledTimes( 1 );
 	} );
 
-	it( 'does not apply out-of-range numeric crop drafts', () => {
+	it( 'does not apply out-of-range numeric crop drafts before completion', () => {
 		render( <CropAdvancedPanel freeformCrop /> );
 
 		fireEvent.click( screen.getByRole( 'button', { name: 'Advanced' } ) );
 		const widthInput = screen.getByLabelText( 'Width' );
 		fireEvent.focus( widthInput );
 		fireEvent.change( widthInput, { target: { value: '1' } } );
-		fireEvent.blur( widthInput );
 
 		expect( mockValidateCropPixelRectAgainstBounds ).not.toHaveBeenCalled();
 		expect( mockSetCropRect ).not.toHaveBeenCalled();
 		expect( mockSettleCrop ).not.toHaveBeenCalled();
+	} );
+
+	it( 'clamps completed crop edits to the nearest input bound', () => {
+		render( <CropAdvancedPanel freeformCrop /> );
+
+		fireEvent.click( screen.getByRole( 'button', { name: 'Advanced' } ) );
+		const widthInput = screen.getByLabelText( 'Width' );
+		fireEvent.focus( widthInput );
+		fireEvent.change( widthInput, { target: { value: '9999' } } );
+		fireEvent.blur( widthInput );
+
+		expect( mockValidateCropPixelRectAgainstBounds ).toHaveBeenCalledWith(
+			expect.objectContaining( {
+				width: 1000,
+			} ),
+			expect.objectContaining( {
+				maxWidth: 1000,
+			} )
+		);
+		expect( mockSetCropRect ).toHaveBeenCalledWith( mockNormalizedRect );
+		expect( mockSettleCrop ).toHaveBeenCalledTimes( 1 );
+	} );
+
+	it( 'settles crop edits after the input is idle while focused', () => {
+		jest.useFakeTimers();
+		render( <CropAdvancedPanel freeformCrop /> );
+
+		fireEvent.click( screen.getByRole( 'button', { name: 'Advanced' } ) );
+		const widthInput = screen.getByLabelText( 'Width' );
+		fireEvent.focus( widthInput );
+		fireEvent.change( widthInput, { target: { value: '600' } } );
+
+		expect( mockSetCropRect ).toHaveBeenCalledWith( mockNormalizedRect );
+		expect( mockSettleCrop ).not.toHaveBeenCalled();
+
+		act( () => {
+			jest.advanceTimersByTime( 300 );
+		} );
+
+		expect( mockSettleCrop ).toHaveBeenCalledTimes( 1 );
+	} );
+
+	it( 'clamps out-of-range crop edits after the input is idle while focused', () => {
+		jest.useFakeTimers();
+		render( <CropAdvancedPanel freeformCrop /> );
+
+		fireEvent.click( screen.getByRole( 'button', { name: 'Advanced' } ) );
+		const widthInput = screen.getByLabelText( 'Width' );
+		fireEvent.focus( widthInput );
+		fireEvent.change( widthInput, { target: { value: '9999' } } );
+
+		expect( mockValidateCropPixelRectAgainstBounds ).not.toHaveBeenCalled();
+
+		act( () => {
+			jest.advanceTimersByTime( 300 );
+		} );
+
+		expect( widthInput ).toHaveValue( 1000 );
+		expect( mockValidateCropPixelRectAgainstBounds ).toHaveBeenCalledWith(
+			expect.objectContaining( {
+				width: 1000,
+			} ),
+			expect.objectContaining( {
+				maxWidth: 1000,
+			} )
+		);
+		expect( mockSettleCrop ).toHaveBeenCalledTimes( 1 );
+	} );
+
+	it( 'updates a focused crop input when external crop state changes', () => {
+		const { rerender } = render( <CropAdvancedPanel freeformCrop /> );
+
+		fireEvent.click( screen.getByRole( 'button', { name: 'Advanced' } ) );
+		const widthInput = screen.getByLabelText( 'Width' );
+		fireEvent.focus( widthInput );
+
+		setMockCropGeometry( {
+			rect: {
+				width: 250,
+				right: 350,
+			},
+		} );
+		rerender( <CropAdvancedPanel freeformCrop /> );
+
+		expect( screen.getByLabelText( 'Width' ) ).toHaveValue( 250 );
+	} );
+
+	it( 'updates a focused crop input with a draft when external crop state changes', () => {
+		const { rerender } = render( <CropAdvancedPanel freeformCrop /> );
+
+		fireEvent.click( screen.getByRole( 'button', { name: 'Advanced' } ) );
+		const widthInput = screen.getByLabelText( 'Width' );
+		fireEvent.focus( widthInput );
+		fireEvent.change( widthInput, { target: { value: '600' } } );
+
+		setMockCropGeometry( {
+			rect: {
+				width: 250,
+				right: 350,
+			},
+		} );
+		rerender( <CropAdvancedPanel freeformCrop /> );
+
+		expect( screen.getByLabelText( 'Width' ) ).toHaveValue( 250 );
 	} );
 
 	it( 'treats near-integer maximum bounds as the expected integer pixel value', () => {
@@ -318,7 +421,7 @@ describe( 'CropAdvancedPanel', () => {
 		expect( mockSetRotation ).toHaveBeenCalledWith( 12.5 );
 	} );
 
-	it( 'does not apply manual fine rotation changes outside the rotation bounds', () => {
+	it( 'clamps manual fine rotation changes to the rotation bounds', () => {
 		render( <CropAdvancedPanel freeformCrop /> );
 
 		fireEvent.click( screen.getByRole( 'button', { name: 'Advanced' } ) );
@@ -327,6 +430,6 @@ describe( 'CropAdvancedPanel', () => {
 		fireEvent.change( rotationInput, { target: { value: '47' } } );
 		fireEvent.blur( rotationInput );
 
-		expect( mockSetRotation ).not.toHaveBeenCalled();
+		expect( mockSetRotation ).toHaveBeenCalledWith( 44.5 );
 	} );
 } );
