@@ -208,16 +208,11 @@ export function computeLanePlacements(
 		for ( let candidate = 0; candidate <= lanes - span; candidate++ ) {
 			const baseline = maxBaselineAcross( laneBottoms, candidate, span );
 
+			// Only take a lane that is strictly shorter beyond
+			// tolerance. Within-tolerance ties keep the earlier lane
+			// because candidates iterate in lane order, so the first
+			// acceptable baseline wins.
 			if ( bestBaseline - baseline > tolerance ) {
-				// Strictly shorter beyond tolerance; take it.
-				bestBaseline = baseline;
-				bestLane = candidate;
-			} else if (
-				Math.abs( baseline - bestBaseline ) <= tolerance &&
-				candidate < bestLane
-			) {
-				// Within tolerance: keep the earliest lane to preserve
-				// source order in the visual sequence.
 				bestBaseline = baseline;
 				bestLane = candidate;
 			}
