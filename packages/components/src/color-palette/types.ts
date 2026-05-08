@@ -33,6 +33,8 @@ type PaletteProps = {
 	 * The slug of the currently selected palette entry.
 	 * When provided, selection is determined by slug rather than color value,
 	 * which correctly handles palettes where two entries share the same color.
+	 * Note: Palette entries without a slug will not appear selected when this prop is provided,
+	 * even if their color value matches the `value` prop.
 	 */
 	selectedSlug?: string;
 	actions?: ReactNode;

@@ -355,5 +355,30 @@ describe( 'ColorPalette', () => {
 			);
 			expect( onChange ).toHaveBeenCalledWith( undefined );
 		} );
+
+		it( 'should handle mixed palettes with some entries having slugs and others not', () => {
+			const MIXED_PALETTE = [
+				{ name: 'Brand White', slug: 'brand-white', color: '#fff' },
+				{ name: 'Plain White', color: '#fff' },
+				{ name: 'Brand Black', slug: 'brand-black', color: '#000' },
+			];
+
+			render(
+				<ColorPalette
+					colors={ MIXED_PALETTE }
+					value="#fff"
+					selectedSlug="brand-white"
+					onChange={ jest.fn() }
+				/>
+			);
+
+			const options = screen.getAllByRole( 'option' );
+			// Only the entry with slug="brand-white" should be selected.
+			// The unslugged "Plain White" entry should NOT be selected, even though
+			// its color matches the value prop.
+			expect( options[ 0 ] ).toHaveAttribute( 'aria-selected', 'true' );
+			expect( options[ 1 ] ).toHaveAttribute( 'aria-selected', 'false' );
+			expect( options[ 2 ] ).toHaveAttribute( 'aria-selected', 'false' );
+		} );
 	} );
 } );

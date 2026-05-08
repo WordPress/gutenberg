@@ -56,12 +56,12 @@ function SinglePalette( {
 	const colorOptions = useMemo( () => {
 		return colors.map( ( { color, name, slug }, index ) => {
 			const colordColor = colord( color );
-			// Prefer slug-based selection when both the palette entry and the
-			// caller provide a slug — this correctly distinguishes two entries
-			// that share the same color value. Fall back to comparing by color
-			// value when no slug is provided.
+			// When selectedSlug is provided, only match entries with that slug.
+			// This correctly handles mixed palettes where some entries have slugs
+			// and others don't. Fall back to color value matching when no slug
+			// is provided by the caller.
 			const isSelected =
-				selectedSlug !== undefined && slug !== undefined
+				selectedSlug !== undefined
 					? slug === selectedSlug
 					: value === color;
 
