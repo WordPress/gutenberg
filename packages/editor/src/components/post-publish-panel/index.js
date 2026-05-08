@@ -93,13 +93,7 @@ export default function PostPublishPanel( {
 	] );
 
 	useEffect( () => {
-		// This timeout is necessary to make sure the `useEffect` hook of
-		// `useFocusReturn` gets the correct element (the button that opens the
-		// PostPublishPanel) otherwise it will get this button.
-		const timeoutID = setTimeout( () => {
-			cancelButtonRef.current?.focus();
-		}, 0 );
-		return () => clearTimeout( timeoutID );
+		cancelButtonRef.current?.focus();
 	}, [] );
 
 	// Auto-collapse the publish sidebar when a post is published and the user
