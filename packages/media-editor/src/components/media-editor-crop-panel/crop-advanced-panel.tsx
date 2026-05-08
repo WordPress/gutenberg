@@ -8,28 +8,24 @@ import {
 	FlexItem,
 	PanelBody,
 } from '@wordpress/components';
-import {
-	useEffect,
-	useLayoutEffect,
-	useRef,
-	useState,
-} from '@wordpress/element';
+import { useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { Stack } from '@wordpress/ui';
 
 /**
  * Internal dependencies
  */
+import { useCropper } from '../../image-editor';
+import { MAX_ROTATION_OFFSET } from '../../image-editor/core/constants';
 import {
 	cropPixelRectToNormalizedRect,
-	useCropGeometry,
-	useCropper,
 	validateCropPixelRectAgainstBounds,
 	type CropPixelRectBounds,
 	type CropPixelRect,
 	type CropPixelRectInput,
-} from '../../image-editor';
-import { MAX_ROTATION_OFFSET } from '../../image-editor/core/constants';
+} from '../../image-editor/core/crop-geometry';
+import { useCropGeometry } from '../../image-editor/react/hooks/use-crop-geometry';
+import { useCropGestureHandlers } from '../../hooks/use-crop-gesture-handlers';
 
 interface CropAdvancedPanelProps {
 	aspectRatio?: number;
@@ -59,9 +55,9 @@ interface CropInputProps {
 	commitStep?: number;
 	suffix?: React.ReactNode;
 	onCommit: ( value: number ) => void;
+	onCommitEnd?: () => void;
 }
 
-const INPUT_COMMIT_DEBOUNCE_MS = 250;
 const INPUT_INTEGER_EPSILON = 1e-6;
 const FINE_ROTATION_COMMIT_STEP = 0.5;
 const pxSuffix = <InputControlSuffixWrapper>px</InputControlSuffixWrapper>;
@@ -229,8 +225,9 @@ function clampFineRotationOffset( value: number ): number {
 	);
 }
 
-// Shows the user's in-flight text while typing. Valid numeric drafts commit
-// after a short pause, flush on blur/Enter, and Escape discards the draft.
+// Shows the user's in-flight text while typing. Valid numeric drafts update
+// the cropper immediately; blur/Enter ends the interaction, and Escape
+// discards any applied draft.
 function CropInput( {
 	label,
 	'aria-label': ariaLabel,
@@ -241,84 +238,30 @@ function CropInput( {
 	commitStep = step,
 	suffix = pxSuffix,
 	onCommit,
+	onCommitEnd,
 }: CropInputProps ) {
 	const [ focused, setFocused ] = useState( false );
 	const [ draft, setDraft ] = useState( '' );
 	const skipBlurCommitRef = useRef( false );
-	const commitDelayRef = useRef< ReturnType< typeof setTimeout > >();
 	const initialValueRef = useRef( value );
 	const lastCommittedDraftValueRef = useRef< number | null >( null );
 	const bounds = getInputBounds( value, range, commitStep );
-	const boundsRef = useRef( bounds );
-	const commitStepRef = useRef( commitStep );
-	const onCommitRef = useRef( onCommit );
-
-	useLayoutEffect( () => {
-		boundsRef.current = bounds;
-		commitStepRef.current = commitStep;
-		onCommitRef.current = onCommit;
-	}, [ bounds, commitStep, onCommit ] );
-
-	useEffect( () => {
-		return () => {
-			if ( commitDelayRef.current ) {
-				clearTimeout( commitDelayRef.current );
-			}
-		};
-	}, [] );
-
-	const cancelDelayedCommit = () => {
-		if ( commitDelayRef.current ) {
-			clearTimeout( commitDelayRef.current );
-			commitDelayRef.current = undefined;
-		}
-	};
 
 	const commitValue = ( nextValue: string ): boolean => {
 		const commitValueCandidate = getInputCommitValue(
 			nextValue,
-			boundsRef.current,
-			commitStepRef.current
+			bounds,
+			commitStep
 		);
 		if ( commitValueCandidate === null ) {
 			return false;
 		}
 
 		if ( lastCommittedDraftValueRef.current !== commitValueCandidate ) {
-			onCommitRef.current( commitValueCandidate );
+			onCommit( commitValueCandidate );
 		}
 		lastCommittedDraftValueRef.current = commitValueCandidate;
 		return true;
-	};
-
-	const scheduleDelayedCommit = ( nextValue: string ) => {
-		cancelDelayedCommit();
-		const delayedCommitValue = getInputCommitValue(
-			nextValue,
-			bounds,
-			commitStep
-		);
-		if ( delayedCommitValue === null ) {
-			return;
-		}
-
-		commitDelayRef.current = setTimeout( () => {
-			const latestCommitValue = getInputCommitValue(
-				nextValue,
-				boundsRef.current,
-				commitStepRef.current
-			);
-			if ( latestCommitValue === null ) {
-				commitDelayRef.current = undefined;
-				return;
-			}
-
-			if ( lastCommittedDraftValueRef.current !== latestCommitValue ) {
-				onCommitRef.current( latestCommitValue );
-				lastCommittedDraftValueRef.current = latestCommitValue;
-			}
-			commitDelayRef.current = undefined;
-		}, INPUT_COMMIT_DEBOUNCE_MS );
 	};
 
 	const handleFocus = () => {
@@ -331,7 +274,7 @@ function CropInput( {
 	const handleChange = ( nextValue: string | undefined ) => {
 		const nextDraft = nextValue ?? '';
 		setDraft( nextDraft );
-		scheduleDelayedCommit( nextDraft );
+		commitValue( nextDraft );
 	};
 
 	const handleBlur = () => {
@@ -340,8 +283,11 @@ function CropInput( {
 			skipBlurCommitRef.current = false;
 			return;
 		}
-		cancelDelayedCommit();
-		commitValue( draft );
+		const hadCommittedDraft = lastCommittedDraftValueRef.current !== null;
+		const didCommit = commitValue( draft );
+		if ( hadCommittedDraft || didCommit ) {
+			onCommitEnd?.();
+		}
 	};
 
 	const handleKeyDown = (
@@ -351,16 +297,20 @@ function CropInput( {
 			event.preventDefault();
 			skipBlurCommitRef.current = true;
 			setFocused( false );
-			cancelDelayedCommit();
-			commitValue( draft );
+			const hadCommittedDraft =
+				lastCommittedDraftValueRef.current !== null;
+			const didCommit = commitValue( draft );
+			if ( hadCommittedDraft || didCommit ) {
+				onCommitEnd?.();
+			}
 			event.currentTarget.blur();
 		} else if ( event.key === 'Escape' ) {
 			event.preventDefault();
 			skipBlurCommitRef.current = true;
 			setFocused( false );
-			cancelDelayedCommit();
 			if ( lastCommittedDraftValueRef.current !== null ) {
-				onCommitRef.current( initialValueRef.current );
+				onCommit( initialValueRef.current );
+				onCommitEnd?.();
 				lastCommittedDraftValueRef.current = null;
 			}
 			event.currentTarget.blur();
@@ -373,8 +323,8 @@ function CropInput( {
 			label={ label }
 			aria-label={ ariaLabel }
 			value={ focused ? draft : String( bounds.value ) }
-			min={ bounds.min }
-			max={ bounds.max }
+			min={ focused ? undefined : bounds.min }
+			max={ focused ? undefined : bounds.max }
 			step={ step }
 			disabled={ disabled }
 			onChange={ handleChange }
@@ -391,8 +341,10 @@ export default function CropAdvancedPanel( {
 	freeformCrop,
 	onPlacementControlInteraction,
 }: CropAdvancedPanelProps ) {
-	const { state, applyOperation, settleCrop } = useCropper();
+	const { state, setCropRect, setRotation, settleCrop, commitHistory } =
+		useCropper();
 	const geometry = useCropGeometry();
+	const gestureHandlers = useCropGestureHandlers( { commitOnKeyUp: false } );
 
 	if ( ! geometry.isReady || ! state.image ) {
 		return null;
@@ -409,15 +361,9 @@ export default function CropAdvancedPanel( {
 			candidate,
 			imageBounds
 		);
-		applyOperation( {
-			type: 'crop',
-			rect: cropPixelRectToNormalizedRect(
-				clampedRect,
-				state,
-				imageSize
-			),
-		} );
-		settleCrop();
+		setCropRect(
+			cropPixelRectToNormalizedRect( clampedRect, state, imageSize )
+		);
 		onPlacementControlInteraction?.();
 	};
 
@@ -476,6 +422,10 @@ export default function CropAdvancedPanel( {
 		MAX_ROTATION_OFFSET - FINE_ROTATION_COMMIT_STEP
 	);
 	const canMoveCropRect = freeformCrop;
+	const handleCropCommitEnd = () => {
+		settleCrop();
+		onPlacementControlInteraction?.();
+	};
 
 	const handleFineRotationApply = ( value: number ) => {
 		const clampedOffset = clampFineRotationOffset( value );
@@ -484,10 +434,10 @@ export default function CropAdvancedPanel( {
 			return;
 		}
 
-		applyOperation( {
-			type: 'rotate',
-			degrees: delta,
-		} );
+		const baseAngle = Math.round( state.rotation / 90 ) * 90;
+		setRotation(
+			baseAngle + clampedOffset * getVisualRotationDirection( state.flip )
+		);
 		onPlacementControlInteraction?.();
 	};
 
@@ -497,7 +447,12 @@ export default function CropAdvancedPanel( {
 			initialOpen={ false }
 			className="media-editor-crop-advanced-panel"
 		>
-			<Stack direction="column" gap="sm">
+			<Stack
+				direction="column"
+				gap="sm"
+				role="presentation"
+				{ ...gestureHandlers }
+			>
 				<Flex gap={ 2 } align="flex-start">
 					<FlexItem isBlock>
 						<CropInput
@@ -509,6 +464,7 @@ export default function CropAdvancedPanel( {
 							commitStep={ FINE_ROTATION_COMMIT_STEP }
 							suffix={ degreeSuffix }
 							onCommit={ handleFineRotationApply }
+							onCommitEnd={ commitHistory }
 						/>
 					</FlexItem>
 				</Flex>
@@ -523,6 +479,7 @@ export default function CropAdvancedPanel( {
 								! canMoveCropRect || ! leftRange.canApply
 							}
 							onCommit={ handleApply( 'left' ) }
+							onCommitEnd={ handleCropCommitEnd }
 						/>
 					</FlexItem>
 					<FlexItem isBlock>
@@ -535,6 +492,7 @@ export default function CropAdvancedPanel( {
 								! canMoveCropRect || ! topRange.canApply
 							}
 							onCommit={ handleApply( 'top' ) }
+							onCommitEnd={ handleCropCommitEnd }
 						/>
 					</FlexItem>
 				</Flex>
@@ -546,6 +504,7 @@ export default function CropAdvancedPanel( {
 							range={ widthRange }
 							disabled={ ! widthRange.canApply }
 							onCommit={ handleApply( 'width' ) }
+							onCommitEnd={ handleCropCommitEnd }
 						/>
 					</FlexItem>
 					<FlexItem isBlock>
@@ -555,6 +514,7 @@ export default function CropAdvancedPanel( {
 							range={ heightRange }
 							disabled={ ! heightRange.canApply }
 							onCommit={ handleApply( 'height' ) }
+							onCommitEnd={ handleCropCommitEnd }
 						/>
 					</FlexItem>
 				</Flex>

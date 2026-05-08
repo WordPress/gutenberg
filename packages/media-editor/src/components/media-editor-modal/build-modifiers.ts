@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import type { CropperState, Size } from '../../image-editor';
-import { getCropPixelRect } from '../../image-editor';
+import { getCropPixelRect } from '../../image-editor/core/crop-geometry';
 import { getRotatedBBox } from '../../image-editor/core/camera';
 
 /**

@@ -306,51 +306,7 @@ const aiRequest = {
 };
 ```
 
-### 6. Crop geometry for controls and automation
-
-Use crop geometry when a consumer needs to read crop values or check them against explicit bounds without duplicating cropper math. It reports facts about the current cropper state; it is not an operation API. Consumers still decide intent, such as whether a width edit is left-anchored, center-anchored, or aspect-ratio locked.
-
-`CropPixelRectInput`, `CropPixelRect`, and `CropPixelRectBounds` are in snap-rotation pixels. `imageBounds` means the same image bounds used by manual crop resizing. `CropPixelRect` includes derived `right` and `bottom` edges; consumer suggestions should use `CropPixelRectInput`.
-
-```tsx
-import {
-  cropPixelRectToNormalizedRect,
-  useCropGeometry,
-  useCropper,
-  validateCropPixelRectAgainstBounds,
-} from '../image-editor';
-
-function ApplySuggestedCrop( { suggestion } ) {
-  const { state, applyOperation } = useCropper();
-  const geometry = useCropGeometry();
-
-  if ( ! state.image || ! geometry.isReady ) {
-    return null;
-  }
-
-  const apply = () => {
-    const result = validateCropPixelRectAgainstBounds(
-      suggestion,
-      geometry.imageBounds
-    );
-    if ( ! result.isValid ) {
-      console.warn( 'Adjusted crop suggestion:', result.violations );
-    }
-
-    applyOperation( {
-      type: 'crop',
-      rect: cropPixelRectToNormalizedRect( result.rect, state, {
-        width: state.image.naturalWidth,
-        height: state.image.naturalHeight,
-      } ),
-    } );
-  };
-
-  return <button onClick={ apply }>Apply suggestion</button>;
-}
-```
-
-### 7. Multi-step editing pipelines
+### 6. Multi-step editing pipelines
 
 `applyToCanvas()` applies the cropper's transform to an existing canvas or image source. This enables multi-step editing where an upstream tool (brightness, color, filters) has already processed the image.
 

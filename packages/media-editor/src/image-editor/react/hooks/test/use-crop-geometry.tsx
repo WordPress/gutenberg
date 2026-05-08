@@ -16,7 +16,7 @@ import type { CropperState } from '../../../core/types';
 import type { NormalizedCropBounds } from '../../../core/crop-geometry';
 import {
 	CropperProvider,
-	useSetCropperImageBounds,
+	useCropperImageBoundsContext,
 } from '../../components/cropper-provider';
 import { useCropGeometry } from '../use-crop-geometry';
 
@@ -43,7 +43,7 @@ function ImageBoundsPublisher( {
 }: {
 	imageBounds: NormalizedCropBounds;
 } ) {
-	const setImageBounds = useSetCropperImageBounds();
+	const { setImageBounds } = useCropperImageBoundsContext();
 
 	useEffect( () => {
 		setImageBounds( imageBounds );

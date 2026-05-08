@@ -28,15 +28,15 @@ type CropperContextValue = UseCropperStateReturn | null;
 
 const CropperContext = createContext< CropperContextValue >( null );
 
-type CropperImageBoundsContextValue = {
+interface CropperImageBoundsContextValue {
 	imageBounds: CropperImageBounds;
 	setImageBounds: React.Dispatch<
 		React.SetStateAction< CropperImageBounds >
 	>;
-} | null;
+}
 
 const CropperImageBoundsContext =
-	createContext< CropperImageBoundsContextValue >( null );
+	createContext< CropperImageBoundsContextValue | null >( null );
 
 const noopSetImageBounds: React.Dispatch<
 	React.SetStateAction< CropperImageBounds >
@@ -104,39 +104,20 @@ export function useCropper(): UseCropperStateReturn {
 }
 
 /**
- * Hook to consume the measured cropper image bounds.
+ * Hook to consume the measured cropper image-bounds context.
  *
- * @return Measured image bounds, or undefined before the Cropper publishes them.
+ * @return Measured image bounds and setter.
  */
-export function useCropperImageBounds(): CropperImageBounds {
+export function useCropperImageBoundsContext(): CropperImageBoundsContextValue {
 	const context = useContext( CropperImageBoundsContext );
 
 	if ( ! context ) {
 		throw new Error(
-			'useCropperImageBounds must be used within a CropperProvider.'
+			'useCropperImageBoundsContext must be used within a CropperProvider.'
 		);
 	}
 
-	return context.imageBounds;
-}
-
-/**
- * Hook to publish measured cropper image bounds.
- *
- * @return Setter for measured image bounds.
- */
-export function useSetCropperImageBounds(): React.Dispatch<
-	React.SetStateAction< CropperImageBounds >
-> {
-	const context = useContext( CropperImageBoundsContext );
-
-	if ( ! context ) {
-		throw new Error(
-			'useSetCropperImageBounds must be used within a CropperProvider.'
-		);
-	}
-
-	return context.setImageBounds;
+	return context;
 }
 
 /**

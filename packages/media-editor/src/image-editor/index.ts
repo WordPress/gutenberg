@@ -8,17 +8,9 @@
  */
 
 // React surface.
-export { useCropperState, useCropGeometry } from './react/hooks';
+export { useCropperState } from './react/hooks';
 export { Cropper, CropperProvider, useCropper } from './react/components';
-export type {
-	UseCropperStateReturn,
-	UseCropGeometryReturn,
-	CropPixelRect,
-	CropPixelRectBounds,
-	CropPixelRectInput,
-	CropPixelRectValidationResult,
-	CropPixelRectViolation,
-} from './react/hooks';
+export type { UseCropperStateReturn } from './react/hooks';
 export type { CropperProps } from './react/components';
 
 // State and extension types.
@@ -39,10 +31,6 @@ export {
 	ORIGINAL_ASPECT_RATIO,
 	getSourceRegion,
 	getSourceRegionPercent,
-	clampCropPixelRectToBounds,
-	cropPixelRectToNormalizedRect,
-	getCropPixelRect,
-	validateCropPixelRectAgainstBounds,
 	applyOperationToState,
 	stateFromPipeline,
 	exportCroppedImage,
