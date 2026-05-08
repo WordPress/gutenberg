@@ -62,6 +62,19 @@ export default function CodeMirrorEditor( {
 				syntaxHighlighting( defaultHighlightStyle ),
 				autocompletion(),
 				cssLanguage(),
+				EditorView.theme( {
+					'&': {
+						height: '100%',
+						border: '1px solid #949494',
+						borderRadius: '2px',
+					},
+					'&.cm-focused': {
+						outline: 'none',
+						borderColor: 'var(--wp-admin-theme-color)',
+						boxShadow: '0 0 0 1px var(--wp-admin-theme-color)',
+					},
+					'.cm-scroller': { overflow: 'auto' },
+				} ),
 				keymap.of( [
 					...defaultKeymap,
 					...historyKeymap,
@@ -89,7 +102,11 @@ export default function CodeMirrorEditor( {
 
 	return (
 		<div className={ className }>
-			<div ref={ containerRef } aria-label={ label } />
+			<div
+				ref={ containerRef }
+				aria-label={ label }
+				style={ { height: '100%' } }
+			/>
 			{ help && <p>{ help }</p> }
 		</div>
 	);

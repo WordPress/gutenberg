@@ -125,20 +125,8 @@
 }
 
 .block-editor-global-styles-advanced-panel__custom-css-input {
-	textarea {
-		font-family: $editor_html_font;
-		// CSS input is always LTR regardless of language.
-		/*rtl:ignore*/
-		direction: ltr;
-	}
-
-	// Stretch the inner CodeMirror element to fill available height.
-	> div {
-		flex: 1 1 auto;
-		min-height: 0;
-		display: flex;
-		flex-direction: column;
-	}
+	flex: 1 1 auto;
+	min-height: 0;
 }
 
 .block-editor-panel-duotone-settings__reset {
