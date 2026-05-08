@@ -1375,6 +1375,8 @@ async function transpilePackage( packageName ) {
 		dsTokenFallbacksJs,
 		needsEmotionPlugin && emotionPlugin,
 		wasmInlinePlugin,
+		// CSS modules import @wordpress/style-runtime in generated JS. Resolve
+		// that alias before externalizing imports so the runtime is bundled.
 		...createStyleBundlingPlugins( packageDir ),
 		externalizeAllExceptCssPlugin,
 	].filter( Boolean );
