@@ -1128,6 +1128,10 @@ export const receiveRevisions =
  * @return {Object} Action object.
  */
 export function setSyncConnectionStatus( kind, name, key, status ) {
+	if ( ! globalThis.IS_GUTENBERG_PLUGIN ) {
+		return { type: 'NOOP' };
+	}
+
 	if ( ! status ) {
 		return {
 			type: 'CLEAR_SYNC_CONNECTION_STATUS',

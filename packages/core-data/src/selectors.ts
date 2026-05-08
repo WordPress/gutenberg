@@ -1673,6 +1673,10 @@ export const getRevision = createSelector(
 export function getSyncConnectionStatus(
 	state: State
 ): ConnectionStatus | undefined {
+	if ( ! globalThis.IS_GUTENBERG_PLUGIN ) {
+		return undefined;
+	}
+
 	if ( ! state.syncConnectionStatuses ) {
 		return undefined;
 	}

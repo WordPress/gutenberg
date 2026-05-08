@@ -1893,6 +1893,10 @@ export function isPublishSidebarOpened( state ) {
  */
 export const isCollaborationEnabledForCurrentPost = createRegistrySelector(
 	( select ) => ( state ) => {
+		if ( ! globalThis.IS_GUTENBERG_PLUGIN ) {
+			return false;
+		}
+
 		// Return early, if collaboration is not supported.
 		if ( ! unlock( select( coreStore ) ).isCollaborationSupported() ) {
 			return false;

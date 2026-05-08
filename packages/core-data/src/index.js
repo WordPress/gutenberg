@@ -22,6 +22,8 @@ import { STORE_NAME } from './name';
 import { unlock } from './lock-unlock';
 import { dynamicActions, dynamicSelectors } from './dynamic-entities';
 import logEntityDeprecation from './utils/log-entity-deprecation';
+import { SelectionType as _SelectionType } from './utils/crdt-user-selections';
+import { SelectionDirection as _SelectionDirection } from './types';
 
 // The entity selectors/resolvers and actions are shortcuts to their generic equivalents
 // (getEntityRecord, getEntityRecords, updateEntityRecord, updateEntityRecords)
@@ -137,8 +139,14 @@ register( store ); // Register store after unlocking private selectors to allow 
  * Enums cannot be exported private without losing the ability to narrow types
  * based on their values (they blur to string type).
  */
-export { SelectionType } from './utils/crdt-user-selections';
-export { SelectionDirection } from './types';
+/** @type {typeof _SelectionType} */
+export const SelectionType = globalThis.IS_GUTENBERG_PLUGIN
+	? _SelectionType
+	: undefined;
+/** @type {typeof _SelectionDirection} */
+export const SelectionDirection = globalThis.IS_GUTENBERG_PLUGIN
+	? _SelectionDirection
+	: undefined;
 
 export { default as EntityProvider } from './entity-provider';
 export * from './entity-provider';
