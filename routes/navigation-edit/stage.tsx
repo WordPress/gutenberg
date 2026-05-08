@@ -43,6 +43,7 @@ function NavigationEditStage() {
 
 	return (
 		<Page
+			headingLevel={ 2 }
 			breadcrumbs={
 				<Breadcrumbs
 					items={ [
