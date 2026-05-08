@@ -36,12 +36,12 @@ describe( 'useEnableWpCompatOverlaySlot', () => {
 	} );
 
 	it( 'enables the slot once mounted, so getWpCompatOverlaySlot() returns the slot', () => {
-		expect( getWpCompatOverlaySlot() ).toBeNull();
+		expect( getWpCompatOverlaySlot() ).toBeUndefined();
 
 		render( <HookHost /> );
 
 		const slot = getWpCompatOverlaySlot();
-		expect( slot ).not.toBeNull();
+		expect( slot ).toBeDefined();
 		expect( slot?.parentElement ).toBe( document.body );
 		expect( findSlots() ).toHaveLength( 1 );
 	} );
@@ -55,7 +55,7 @@ describe( 'useEnableWpCompatOverlaySlot', () => {
 			</>
 		);
 
-		expect( getWpCompatOverlaySlot() ).not.toBeNull();
+		expect( getWpCompatOverlaySlot() ).toBeDefined();
 		expect( findSlots() ).toHaveLength( 1 );
 	} );
 
@@ -67,12 +67,12 @@ describe( 'useEnableWpCompatOverlaySlot', () => {
 		// not flip the gate back off.
 		const { unmount } = render( <HookHost /> );
 
-		expect( getWpCompatOverlaySlot() ).not.toBeNull();
+		expect( getWpCompatOverlaySlot() ).toBeDefined();
 
 		unmount();
 
 		expect( internalWindow.__wpUiCompatOverlaySlotEnabled ).toBe( true );
-		expect( getWpCompatOverlaySlot() ).not.toBeNull();
+		expect( getWpCompatOverlaySlot() ).toBeDefined();
 	} );
 } );
 
