@@ -35,6 +35,9 @@ export type SelectTriggerProps = ComponentProps< typeof _Select.Trigger > & {
 	/**
 	 * A function that gets called with the current value as an argument.
 	 * Use this to customize the trigger content.
+	 *
+	 * When no value is selected, the rendered content inherits the
+	 * placeholder text color.
 	 */
 	children?: _Select.Value.Props[ 'children' ];
 };
