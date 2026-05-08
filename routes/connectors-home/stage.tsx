@@ -14,7 +14,7 @@ import {
 } from '@wordpress/connectors';
 import { useSelect } from '@wordpress/data';
 import { createInterpolateElement } from '@wordpress/element';
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
 // eslint-disable-next-line @wordpress/use-recommended-components
 import { Notice } from '@wordpress/ui';
@@ -118,52 +118,13 @@ function ConnectorsPage() {
 							className="connectors-page__file-mods-notice"
 						>
 							<Notice.Description>
-								{ isFileModsDisabled ? (
-									<>
-										<p>
-											{ __(
-												'Plugins cannot be installed here due to your site configuration. Install them manually using your normal deployment workflow.'
-											) }
-										</p>
-										<details>
-											<summary>
-												{ __( 'WP-CLI examples' ) }
-											</summary>
-											<ul>
-												{ manualInstallPluginSlugs.map(
-													( slug ) => {
-														const command = `wp plugin install ${ slug } --activate`;
-														return (
-															<li key={ slug }>
-																{ createInterpolateElement(
-																	sprintf(
-																		/* translators: 1: Plugin slug. 2: WP-CLI command. */
-																		__(
-																			'%1$s: <code>%2$s</code>'
-																		),
-																		slug,
-																		command
-																	),
-																	{
-																		code: (
-																			<code />
-																		),
-																	}
-																) }
-															</li>
-														);
-													}
-												) }
-											</ul>
-										</details>
-									</>
-								) : (
-									<p>
-										{ __(
+								{ isFileModsDisabled
+									? __(
+											'Plugins cannot be installed here due to your site configuration. Install them manually using your normal deployment workflow.'
+									  )
+									: __(
 											'You do not have permission to install plugins. Please ask a site administrator to install them for you.'
-										) }
-									</p>
-								) }
+									  ) }
 							</Notice.Description>
 						</Notice.Root>
 					) }

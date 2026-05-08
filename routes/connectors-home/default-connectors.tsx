@@ -13,7 +13,7 @@ import {
 } from '@wordpress/connectors';
 import { select } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-import { Badge } from '@wordpress/ui';
+import { Badge, Link } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -108,6 +108,12 @@ const ConnectedBadge = () => (
 	</span>
 );
 
+const PluginDirectoryLink = ( { slug }: { slug: string } ) => (
+	<Link href={ `https://wordpress.org/plugins/${ slug }/` } openInNewTab>
+		{ __( 'Learn more' ) }
+	</Link>
+);
+
 const UnavailableActionBadge = () => <Badge>{ __( 'Not available' ) }</Badge>;
 
 function ApiKeyConnector( {
@@ -178,7 +184,12 @@ function ApiKeyConnector( {
 			actionArea={
 				<HStack spacing={ 3 } expanded={ false }>
 					{ isConnected && <ConnectedBadge /> }
-					{ showUnavailableBadge && <UnavailableActionBadge /> }
+					{ showUnavailableBadge &&
+						( pluginSlug ? (
+							<PluginDirectoryLink slug={ pluginSlug } />
+						) : (
+							<UnavailableActionBadge />
+						) ) }
 					{ showActionButton && (
 						<Button
 							ref={ actionButtonRef }
