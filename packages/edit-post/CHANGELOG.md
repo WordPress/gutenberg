@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 8.45.0 (2026-04-29)
+
 ### Enhancements
 
 - Use `--wpds-cursor-control` for interactive cursor styling. [#77360](https://github.com/WordPress/gutenberg/pull/77360)

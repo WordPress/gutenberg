@@ -29,6 +29,10 @@ $sticky-header-clearance: 120px;
 		scroll-margin-top: $sticky-header-clearance;
 	}
 
+	&__file-mods-notice {
+		margin-bottom: 16px;
+	}
+
 	&--empty {
 		flex-grow: 1;
 		display: flex;

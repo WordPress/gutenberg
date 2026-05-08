@@ -7,6 +7,8 @@
 - Add `getUltraHdrInfo` for probing UltraHDR (ISO 21496-1 gain map) JPEGs and an `isUltraHdr` flag on `resizeImage` that routes through `uhdrloadBuffer`/`uhdrsaveBuffer` so the gain map is preserved through resize ([#74873](https://github.com/WordPress/gutenberg/pull/74873)).
 - Bump `wasm-vips` to `^0.0.17` for native UltraHDR support ([#74873](https://github.com/WordPress/gutenberg/pull/74873)).
 
+## 1.5.0 (2026-04-29)
+
 ## 1.4.0 (2026-04-15)
 
 ## 1.3.0 (2026-04-01)

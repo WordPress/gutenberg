@@ -70,14 +70,19 @@ const NOTICES_CONTEXT = 'media-modal';
 // Notice ID - reused for all upload-related notices to prevent flooding
 const NOTICE_ID_UPLOAD_PROGRESS = 'media-modal-upload-progress';
 
+type ViewQueryParams = Pick< View, 'page' | 'search' >;
+
+const defaultQueryParams: ViewQueryParams = {
+	page: 1,
+	search: '',
+};
+
 const defaultView: View = {
 	type: LAYOUT_PICKER_GRID,
 	fields: [],
 	showTitle: false,
 	titleField: 'title',
 	mediaField: 'media_thumbnail',
-	search: '',
-	page: 1,
 	perPage: 50,
 	filters: [],
 	layout: {
@@ -230,6 +235,9 @@ export function MediaUploadModal( {
 		useDispatch( noticesStore );
 	const invalidateAttachmentResolutions =
 		useInvalidateAttachmentResolutions();
+	const [ queryParams, setQueryParams ] = useState< ViewQueryParams >(
+		() => defaultQueryParams
+	);
 
 	// Persist view configuration across sessions via the preferences store.
 	const { view, updateView, isModified, resetToDefault } = useView( {
@@ -237,7 +245,21 @@ export function MediaUploadModal( {
 		name: 'attachment',
 		slug: 'media-modal',
 		defaultView,
+		queryParams,
+		onChangeQueryParams: setQueryParams,
 	} );
+
+	// Normalize undefined transient DataViews values so they do not persist as modified modal preferences.
+	const handleChangeView = useCallback(
+		( nextView: View ) => {
+			const normalizedView = { ...nextView };
+			if ( normalizedView.startPosition === undefined ) {
+				delete normalizedView.startPosition;
+			}
+			updateView( normalizedView );
+		},
+		[ updateView ]
+	);
 
 	// Build query args based on view properties, similar to PostList
 	const queryArgs = useMemo( () => {
@@ -444,6 +466,12 @@ export function MediaUploadModal( {
 		onClose?.();
 	}, [ removeAllNotices, onClose ] );
 
+	useEffect( () => {
+		if ( ! isOpen ) {
+			setQueryParams( defaultQueryParams );
+		}
+	}, [ isOpen ] );
+
 	// Use onUpload if provided, otherwise fall back to uploadMedia
 	const handleUpload = onUpload || uploadMedia;
 
@@ -581,7 +609,7 @@ export function MediaUploadModal( {
 				data={ mediaRecords || [] }
 				fields={ fields }
 				view={ view }
-				onChangeView={ updateView }
+				onChangeView={ handleChangeView }
 				actions={ actions }
 				selection={ selection }
 				onChangeSelection={ setSelection }

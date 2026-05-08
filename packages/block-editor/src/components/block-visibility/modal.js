@@ -38,7 +38,6 @@ import {
 	getViewportCheckboxState,
 	getHideEverywhereCheckboxState,
 } from './utils';
-import './style.scss';
 
 const DEFAULT_VIEWPORT_CHECKBOX_VALUES = {
 	[ BLOCK_VISIBILITY_VIEWPORTS.mobile.key ]: false,

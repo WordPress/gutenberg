@@ -7,9 +7,9 @@ import {
 	Button,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
-	VisuallyHidden,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
+import { VisuallyHidden } from '@wordpress/ui';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 
@@ -30,7 +30,7 @@ function VariationsButtons( {
 } ) {
 	return (
 		<fieldset className={ className }>
-			<VisuallyHidden as="legend">
+			<VisuallyHidden render={ <legend /> }>
 				{ __( 'Transform to variation' ) }
 			</VisuallyHidden>
 			{ variations.map( ( variation ) => (
@@ -144,7 +144,7 @@ function VariationsToggleGroupControl( {
 	);
 }
 
-function __experimentalBlockVariationTransforms( { blockClientId } ) {
+function BlockVariationTransforms( { blockClientId } ) {
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 	const {
 		activeBlockVariation,
@@ -235,4 +235,4 @@ function __experimentalBlockVariationTransforms( { blockClientId } ) {
 	);
 }
 
-export default __experimentalBlockVariationTransforms;
+export default BlockVariationTransforms;
