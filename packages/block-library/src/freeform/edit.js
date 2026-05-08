@@ -4,10 +4,11 @@
 import {
 	BlockControls,
 	BlockIcon,
+	Warning,
 	useBlockProps,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { useSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	Button,
 	Placeholder,
@@ -17,6 +18,7 @@ import {
 import { useState, useRef, RawHTML } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { classic } from '@wordpress/icons';
+import { rawHandler, serialize } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -33,10 +35,37 @@ export default function FreeformEdit( {
 	const [ isOpen, setOpen ] = useState( false );
 	const editButtonRef = useRef( null );
 
-	const canRemove = useSelect(
-		( select ) => select( blockEditorStore ).canRemoveBlock( clientId ),
+	const { canRemove } = useSelect(
+		( select ) => ( {
+			canRemove: select( blockEditorStore ).canRemoveBlock( clientId ),
+		} ),
 		[ clientId ]
 	);
+
+	const { replaceBlocks } = useDispatch( blockEditorStore );
+
+	const block = useSelect(
+		( select ) => select( blockEditorStore ).getBlock( clientId ),
+		[ clientId ]
+	);
+
+	const convertToBlocks = () => {
+		replaceBlocks(
+			block.clientId,
+			rawHandler( { HTML: serialize( block ) } )
+		);
+	};
+
+	const actions = [
+		<Button
+			__next40pxDefaultSize
+			key="convert"
+			onClick={ convertToBlocks }
+			variant="primary"
+		>
+			{ __( 'Convert to blocks' ) }
+		</Button>,
+	];
 
 	return (
 		<>
@@ -57,7 +86,12 @@ export default function FreeformEdit( {
 					</ToolbarButton>
 				</ToolbarGroup>
 			</BlockControls>
-			<div { ...useBlockProps() }>
+			<div { ...useBlockProps( { className: 'has-warning' } ) }>
+				<Warning actions={ actions }>
+					{ __(
+						'It appears you are using the deprecated Classic block. You can keep editing it for now, but it is recommended to convert it to blocks.'
+					) }
+				</Warning>
 				{ content ? (
 					<RawHTML>{ content }</RawHTML>
 				) : (
