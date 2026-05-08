@@ -6,6 +6,7 @@ const meta: Meta< typeof Select.Root > = {
 	component: Select.Root,
 	subcomponents: {
 		Trigger: Select.Trigger,
+		Portal: Select.Portal,
 		Popup: Select.Popup,
 		Item: Select.Item,
 	},
