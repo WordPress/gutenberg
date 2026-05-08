@@ -53,12 +53,6 @@ export type UseLanePlacementInput = {
 	 * implicit rows. Defaults to 4 (px).
 	 */
 	rowUnit?: number;
-	/**
-	 * When true, the hook holds the last computed styles and stops
-	 * reacting to size or DOM changes. Use during drag/resize gestures
-	 * so the surface does not reflow under the user.
-	 */
-	paused?: boolean;
 };
 
 export type UseLanePlacementResult = {
@@ -152,10 +146,10 @@ export function useLanePlacement(
 			.join( '\0' );
 	}, [ input.items ] );
 
-	const { items, lanes, gap, flowTolerance, rowUnit, paused } = input;
+	const { items, lanes, gap, flowTolerance, rowUnit } = input;
 
 	useLayoutEffect( () => {
-		if ( ! isPolyfilled || paused || ! container ) {
+		if ( ! isPolyfilled || ! container ) {
 			return;
 		}
 		if ( typeof ResizeObserver === 'undefined' ) {
@@ -296,7 +290,6 @@ export function useLanePlacement(
 	}, [
 		container,
 		isPolyfilled,
-		paused,
 		lanes,
 		gap,
 		flowTolerance,

@@ -331,29 +331,6 @@ describe( 'useLanePlacement', () => {
 		} );
 	} );
 
-	describe( 'paused mode', () => {
-		it( 'does not mount observers when paused', () => {
-			setNativeSupport( false );
-
-			render(
-				<Harness
-					input={ {
-						items: [ { key: 'a', span: 1 } ],
-						lanes: 3,
-						gap: 16,
-						flowTolerance: 0,
-						paused: true,
-					} }
-				/>
-			);
-			act( () => {
-				flushRaf();
-			} );
-
-			expect( MockResizeObserver.instances.length ).toBe( 0 );
-		} );
-	} );
-
 	describe( 'cleanup', () => {
 		it( 'disconnects observers on unmount', () => {
 			setNativeSupport( false );
