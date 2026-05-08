@@ -10,6 +10,30 @@
  */
 function gutenberg_block_editor_preload_paths_6_9( $paths, $context ) {
 	if ( 'core/edit-site' === $context->name ) {
+		$template_parts = get_block_templates( array(), 'wp_template_part' );
+		foreach ( $template_parts as $template_part ) {
+			if ( ! empty( $template_part->id ) ) {
+				$paths[] = '/wp/v2/template-parts/' . $template_part->id . '?context=edit';
+			}
+		}
+
+		$post_rest_route = rest_get_route_for_post_type_items( 'post' );
+		foreach ( array( 10, 3 ) as $per_page ) {
+			$paths[] = add_query_arg(
+				array(
+					'context'       => 'edit',
+					'offset'        => 0,
+					'order'         => 'desc',
+					'orderby'       => 'date',
+					'per_page'      => $per_page,
+					'ignore_sticky' => 'false',
+				),
+				$post_rest_route
+			);
+		}
+
+		$paths[] = '/wp/v2/taxonomies?context=view';
+
 		// Only prefetch for the root. If we preload it for all pages and it's not used
 		// it won't be possible to invalidate.
 		// To do: perhaps purge all preloaded paths when client side navigating.
