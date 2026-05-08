@@ -124,6 +124,7 @@ interface DashboardGridLayoutItem {
 | `onChangeLayout` | `( layout ) => void` | — | Fired when the user commits a drag or resize. |
 | `onPreviewLayout` | `( layout ) => void` | — | Fired continuously during a drag or resize with the in-progress layout. Use for live feedback; `onChangeLayout` still emits the committed result. |
 | `renderResizeHandle` | `ComponentType< ResizeHandleRenderProps >` | — | Override the default corner-triangle resize handle. See [Custom resize handle](#custom-resize-handle). |
+| `renderDragPreview` | `ComponentType< DragPreviewRenderProps >` | — | Wrap the dragged-clone visual mounted inside `<DragOverlay>`. See [Custom drag preview](#custom-drag-preview). |
 | `className` | `string` | — | Extra class on the grid root. |
 
 `DashboardGrid` forwards refs to its root `<div>`, and standard
@@ -267,6 +268,7 @@ items flow around them; out-of-range values (negative, or beyond
 | `onChangeLayout` | `( layout ) => void` | — | Fired when the user commits a drag or resize. |
 | `onPreviewLayout` | `( layout ) => void` | — | Fired continuously during a drag or resize. |
 | `renderResizeHandle` | `ComponentType< ResizeHandleRenderProps >` | — | Override the default side-grip resize handle. See [Custom resize handle](#custom-resize-handle). |
+| `renderDragPreview` | `ComponentType< DragPreviewRenderProps >` | — | Wrap the dragged-clone visual mounted inside `<DragOverlay>`. See [Custom drag preview](#custom-drag-preview). |
 | `className` | `string` | — | Extra class on the surface root. |
 
 ### Native vs polyfill
@@ -395,6 +397,68 @@ The component receives:
 The handle is only mounted while the surface is in edit mode
 (`editMode={ true }`), so the custom component never has to
 short-circuit on a disabled state.
+
+### Custom drag preview
+
+While a tile is being dragged, dnd-kit clones it into a `<DragOverlay>`
+that follows the cursor. Both surfaces wrap that clone with a thin
+**functional frame** (`scale`, `cursor: grabbing`, `pointer-events:
+none`) that advertises the lift, but they do not impose visual
+chrome on top: any styles the consumer applied to the tile children
+carry through to the dragged clone unchanged.
+
+When the dragged state should look structurally different from the
+persistent tile (a stronger shadow, a different border, an extra
+badge…), pass a `renderDragPreview` component. The surface mounts
+it inside the functional frame and supplies the cloned children
+plus the active tile's `key`:
+
+```jsx
+import { DashboardGrid } from '@wordpress/grid';
+import type { DragPreviewRenderProps } from '@wordpress/grid';
+
+function DragPreview( { children }: DragPreviewRenderProps ) {
+	return (
+		<div className="my-tile-while-dragging">
+			{ children }
+		</div>
+	);
+}
+
+<DashboardGrid
+	layout={ layout }
+	editMode
+	renderDragPreview={ DragPreview }
+>
+	{ tiles }
+</DashboardGrid>;
+```
+
+The component receives:
+
+| Prop | Type | Description |
+|------|------|-------------|
+| `children` | `ReactNode` | The cloned tile content the surface mounts inside `<DragOverlay>`. Place it where the visual wrapper expects the tile body. |
+| `itemId` | `string` | Owning tile's `key`. Useful when chrome varies by tile. |
+
+For token-only tweaks (lift scale, placeholder opacity, outline
+color, placeholder radius), prefer the [CSS variables](#theming-with-css-variables)
+below; reach for `renderDragPreview` only when the dragged state
+needs markup the persistent tile does not have.
+
+### Theming with CSS variables
+
+Both surfaces expose a small set of CSS custom properties for
+visuals that need to flex between consumers without writing a render
+prop. Override them on any ancestor of the surface root (or on the
+root itself via `style`). All values fall back to sensible defaults.
+
+| Variable | Default | Applies to |
+|----------|---------|------------|
+| `--wp-grid-drag-preview-scale` | `1.05` | Lift scale of the drag-preview functional frame. Set to `1` to disable the lift. |
+| `--wp-grid-placeholder-opacity` | `0.4` | Opacity of the placeholder tile (the original item while a drag is in flight). |
+| `--wp-grid-placeholder-outline-color` | `var(--wpds-color-stroke-interactive-brand)` | Dashed outline color of the placeholder and of the resize-preview overlay. |
+| `--wp-grid-placeholder-radius` | `0` | Border radius of the placeholder, used to match the consumer's tile shape so the dashed outline traces the right silhouette. |
 
 ---
 

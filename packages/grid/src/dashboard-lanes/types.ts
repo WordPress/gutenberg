@@ -1,7 +1,10 @@
 /**
  * Internal dependencies
  */
-import type { ResizeHandleRenderProps } from '../shared/types';
+import type {
+	DragPreviewRenderProps,
+	ResizeHandleRenderProps,
+} from '../shared/types';
 
 /**
  * Lanes layout item definition.
@@ -123,6 +126,23 @@ interface BaseDashboardLanesProps
 	 * because heights are content-driven.
 	 */
 	renderResizeHandle?: React.ComponentType< ResizeHandleRenderProps >;
+
+	/**
+	 * Custom wrapper for the dragged-clone visual mounted inside
+	 * `<DragOverlay>`. The surface always wraps the clone with a thin
+	 * functional frame (lift scale, grabbing cursor, pointer pass-
+	 * through) and mounts this component inside it; the consumer
+	 * owns the visual chrome (shadow, radius, padding).
+	 *
+	 * When omitted, the cloned children render directly inside the
+	 * functional frame so any chrome the consumer applied to the
+	 * persistent tile carries through unchanged.
+	 *
+	 * Token-only adjustments (lift scale, placeholder opacity,
+	 * outline color, placeholder radius) flow through CSS custom
+	 * properties documented in the README.
+	 */
+	renderDragPreview?: React.ComponentType< DragPreviewRenderProps >;
 }
 
 interface FixedDashboardLanesProps extends BaseDashboardLanesProps {

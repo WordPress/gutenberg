@@ -3,19 +3,23 @@
 }
 
 /*
- * The drag preview clones the active tile inside `<DragOverlay>` and
- * follows the cursor. The scale and shadow make it visually stand
- * out from the placeholder left behind in the grid.
+ * Functional frame for the drag-preview clone inside `<DragOverlay>`.
+ * Always applied, including when the consumer passes a
+ * `renderDragPreview` wrapper. Owns the lift cue (`scale`), the
+ * pointer feedback (`cursor`), and the pointer pass-through during
+ * the gesture. Visual chrome (shadow, radius, padding) belongs to
+ * the consumer, either on the children passed to <DashboardGrid />
+ * or via `renderDragPreview`.
  */
-.drag-preview {
+.drag-preview-frame {
 	height: 100%;
-	transform: scale(1.05);
-	box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15);
+	transform: scale(var(--wp-grid-drag-preview-scale, 1.05));
 	cursor: grabbing;
+	pointer-events: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
-	.drag-preview {
+	.drag-preview-frame {
 		transform: none;
 	}
 }

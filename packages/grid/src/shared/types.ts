@@ -59,6 +59,29 @@ export interface ResizeHandleRenderProps {
 }
 
 /**
+ * Props received by a custom drag-preview component. The surface mounts
+ * the component inside `<DragOverlay>` and supplies the active tile's
+ * cloned children plus its `key`. The component is responsible for the
+ * visual chrome of the dragged clone (shadow, radius, padding); the
+ * surface keeps a thin functional wrapper around it that owns the lift
+ * cue, the cursor, and pointer pass-through during the gesture.
+ */
+export interface DragPreviewRenderProps {
+	/**
+	 * The cloned tile content the surface mounts inside the
+	 * `<DragOverlay>` portal. Render it where the visual wrapper
+	 * expects the tile body.
+	 */
+	children: React.ReactNode;
+
+	/**
+	 * Owning tile's `key`. Useful when the visual chrome needs to
+	 * vary by which tile is being dragged.
+	 */
+	itemId: string;
+}
+
+/**
  * Props for the internal `<ResizeHandle />` wrapper.
  */
 export interface ResizeHandleProps {

@@ -9,4 +9,8 @@ export type {
 	DashboardLanesLayoutItem,
 	DashboardLanesProps,
 } from './dashboard-lanes/types';
-export type { ResizeDelta, ResizeHandleRenderProps } from './shared/types';
+export type {
+	DragPreviewRenderProps,
+	ResizeDelta,
+	ResizeHandleRenderProps,
+} from './shared/types';

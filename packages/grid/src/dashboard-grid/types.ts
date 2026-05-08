@@ -1,7 +1,11 @@
 /**
  * Internal dependencies
  */
-import type { ResizeDelta, ResizeHandleRenderProps } from '../shared/types';
+import type {
+	DragPreviewRenderProps,
+	ResizeDelta,
+	ResizeHandleRenderProps,
+} from '../shared/types';
 
 /**
  * Dashboard grid layout item definition.
@@ -190,6 +194,23 @@ interface BaseDashboardGridProps
 	 * `verticalResizable` to adapt the visual to context.
 	 */
 	renderResizeHandle?: React.ComponentType< ResizeHandleRenderProps >;
+
+	/**
+	 * Custom wrapper for the dragged-clone visual mounted inside
+	 * `<DragOverlay>`. The grid always wraps the clone with a thin
+	 * functional frame (lift scale, grabbing cursor, pointer pass-
+	 * through) and mounts this component inside it; the consumer
+	 * owns the visual chrome (shadow, radius, padding).
+	 *
+	 * When omitted, the cloned children render directly inside the
+	 * functional frame so any chrome the consumer applied to the
+	 * persistent tile carries through unchanged.
+	 *
+	 * Token-only adjustments (lift scale, placeholder opacity,
+	 * outline color, placeholder radius) flow through CSS custom
+	 * properties documented in the README.
+	 */
+	renderDragPreview?: React.ComponentType< DragPreviewRenderProps >;
 }
 
 interface FixedDashboardGridProps extends BaseDashboardGridProps {
