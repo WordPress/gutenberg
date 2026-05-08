@@ -1243,7 +1243,10 @@ async function generatePagesPhp( pageData, replacements ) {
 	// Generate pages.php loader
 	const pageIncludes = pageData
 		.map( ( page ) => {
-			return `require_once __DIR__ . '/pages/${ page.slug }/page.php';\nrequire_once __DIR__ . '/pages/${ page.slug }/page-wp-admin.php';`;
+			return [
+				`if ( file_exists( __DIR__ . '/pages/${ page.slug }/page.php' ) ) {\n\trequire_once __DIR__ . '/pages/${ page.slug }/page.php';\n}`,
+				`if ( file_exists( __DIR__ . '/pages/${ page.slug }/page-wp-admin.php' ) ) {\n\trequire_once __DIR__ . '/pages/${ page.slug }/page-wp-admin.php';\n}`,
+			].join( '\n' );
 		} )
 		.join( '\n' );
 
