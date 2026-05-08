@@ -49,8 +49,7 @@ add_action( 'site-editor-v2_init', 'gutenberg_enable_experiments' );
  */
 function gutenberg_enable_admin_bar_in_editor_experiment() {
 	if ( gutenberg_is_admin_bar_in_editor_experiment_enabled() ) {
-		wp_add_inline_script( 'wp-edit-post', 'window.__experimentalAdminBarInEditor = true', 'before' );
-		wp_add_inline_script( 'wp-edit-site', 'window.__experimentalAdminBarInEditor = true', 'before' );
+		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalAdminBarInEditor = true', 'before' );
 	}
 }
 
