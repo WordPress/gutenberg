@@ -876,6 +876,37 @@ test.describe( 'Block Notes', () => {
 			await expect( reactionButton ).toContainText( '1' );
 		} );
 
+		test( 'can re-add the same reaction after removing it', async ( {
+			page,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Testing re-add reaction' },
+				comment: 'Re-add reaction',
+			} );
+
+			await blockNoteUtils.addReactionToComment( 'Heart' );
+			const reactionButton = page.locator(
+				'.editor-collab-sidebar-panel__reaction-button'
+			);
+			await expect( reactionButton ).toBeVisible();
+			await expect( reactionButton ).toContainText( '1' );
+
+			// Remove the reaction.
+			await reactionButton.click();
+			await expect( reactionButton ).toBeHidden();
+
+			// Add the same reaction again. This used to fail because the
+			// parent note's cached `reaction_summary` still reported the
+			// removed heart as `reacted`, so the toggle attempted to
+			// delete a now-missing comment record instead of adding.
+			await blockNoteUtils.addReactionToComment( 'Heart' );
+			await expect( reactionButton ).toBeVisible();
+			await expect( reactionButton ).toContainText( '❤' );
+			await expect( reactionButton ).toContainText( '1' );
+		} );
+
 		test( 'can remove own emoji reaction by clicking it', async ( {
 			page,
 			blockNoteUtils,
