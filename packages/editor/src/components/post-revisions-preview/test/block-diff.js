@@ -452,6 +452,100 @@ describe( 'diffRevisionContent', () => {
 		] );
 	} );
 
+	it( 'filters whitespace-only freeform pseudo-blocks before LCS', () => {
+		/*
+		 * Direct canary for the whitespace-pseudo-block filter in
+		 * `diffRawBlocks`. The grammar parser emits
+		 * `{ blockName: null, innerHTML: '\n\n' }` for the whitespace
+		 * between block markers; under `diff` v6+'s LCS tie-breaker,
+		 * those pseudo-blocks would otherwise be selected as the match
+		 * anchor in [paragraph, whitespace, paragraph] swaps, leaving
+		 * `pairSimilarBlocks` with two removed and two added paragraphs
+		 * to mis-match by similarity. With the filter, the LCS picks a
+		 * content block and the surrounding paragraphs pair cleanly.
+		 */
+		const previous = serialize( [
+			createBlock( 'core/paragraph', { content: 'Alpha content' } ),
+			createBlock( 'core/paragraph', { content: 'Beta content' } ),
+		] );
+		const current = serialize( [
+			createBlock( 'core/paragraph', {
+				content: 'Beta content modified',
+			} ),
+			createBlock( 'core/paragraph', { content: 'Alpha content' } ),
+		] );
+		const blocks = diffRevisionContent( current, previous );
+		const normalized = normalizeBlockTree( blocks );
+
+		const statuses = normalized.map(
+			( b ) => b.attributes.__revisionDiffStatus?.status
+		);
+		// Exactly one modified pair and one unchanged anchor — not the
+		// double-modified mis-pair that the unfiltered LCS would yield.
+		expect( statuses.filter( ( s ) => s === 'modified' ) ).toHaveLength(
+			1
+		);
+		expect( statuses.filter( ( s ) => s === undefined ) ).toHaveLength( 1 );
+
+		const unchanged = normalized.find(
+			( b ) => b.attributes.__revisionDiffStatus === undefined
+		);
+		expect( unchanged.attributes.content ).toBe( 'Alpha content' );
+	} );
+
+	it( 'places paired modification at current-revision position when only unchanged blocks sit between', () => {
+		/*
+		 * Direct canary for the `crossesCurrentContent` "unchanged
+		 * between removed and added" branch. The modified block crosses
+		 * two unchanged paragraphs; the placement heuristic should
+		 * anchor it at its current-revision position (index 0), not at
+		 * the removed position (index 3) — otherwise the modified block
+		 * would render after content that already comes before it in
+		 * the current revision.
+		 */
+		const previous = serialize( [
+			createBlock( 'core/paragraph', {
+				content: 'Stays one anchor sentence',
+			} ),
+			createBlock( 'core/paragraph', {
+				content: 'Stays two anchor sentence',
+			} ),
+			createBlock( 'core/paragraph', {
+				content: 'Original tail content sentence',
+			} ),
+		] );
+		const current = serialize( [
+			createBlock( 'core/paragraph', {
+				content: 'Original tail content sentence rewritten',
+			} ),
+			createBlock( 'core/paragraph', {
+				content: 'Stays one anchor sentence',
+			} ),
+			createBlock( 'core/paragraph', {
+				content: 'Stays two anchor sentence',
+			} ),
+		] );
+		const blocks = diffRevisionContent( current, previous );
+		const normalized = normalizeBlockTree( blocks );
+
+		expect( normalized ).toHaveLength( 3 );
+		expect( normalized[ 0 ].attributes.__revisionDiffStatus?.status ).toBe(
+			'modified'
+		);
+		expect( normalized[ 1 ].attributes.content ).toBe(
+			'Stays one anchor sentence'
+		);
+		expect(
+			normalized[ 1 ].attributes.__revisionDiffStatus
+		).toBeUndefined();
+		expect( normalized[ 2 ].attributes.content ).toBe(
+			'Stays two anchor sentence'
+		);
+		expect(
+			normalized[ 2 ].attributes.__revisionDiffStatus
+		).toBeUndefined();
+	} );
+
 	describe( 'inner blocks', () => {
 		it( 'handles deeply nested inner blocks', () => {
 			const previous = serialize( [

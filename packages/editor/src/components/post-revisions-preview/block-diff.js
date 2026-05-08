@@ -2,10 +2,9 @@
  * External dependencies
  */
 /*
- * `diffWordsWithSpace` keeps whitespace as its own token, matching the
- * behaviour `diffWords` had in `diff` v4. v6+ stopped treating whitespace
- * as a token, which would otherwise coalesce adjacent word changes into a
- * single removed/added pair instead of reporting them per-word.
+ * `diffWordsWithSpace` preserves the v4-style per-word output. v6+
+ * stopped treating whitespace as a token in `diffWords`, which coalesces
+ * adjacent word changes into a single removed/added pair.
  */
 import { diffArrays, diffWordsWithSpace } from 'diff';
 
@@ -258,14 +257,18 @@ function pairSimilarBlocks( blocks ) {
 			};
 
 			// Decide where to place the modified block by checking
-			// what's between the removed and added positions.
-			// If anything between them is part of the current revision
-			// (an unpaired added block, or an unchanged block),
-			// placing at the removed position would put the modified
-			// block before content that comes before it in the
-			// current revision — so use the added position.
-			// Otherwise, use the removed position to keep the
-			// previous revision's order intact.
+			// what's between the removed and added positions. If any
+			// block between them is in the current revision (an
+			// unchanged block, or an unpaired added block), placing
+			// the modification at the removed position would put it
+			// before content that already comes before it in the
+			// current revision — so use the added position instead.
+			// Otherwise, use the removed position to keep the previous
+			// revision's reading order intact.
+			//
+			// 'removed' blocks (and added blocks already absorbed via
+			// `pairedAdded`) aren't checked because they aren't in the
+			// current revision and so don't count as crossing it.
 			const lo = Math.min( rem.index, bestMatch.index );
 			const hi = Math.max( rem.index, bestMatch.index );
 			let crossesCurrentContent = false;
@@ -314,6 +317,11 @@ function pairSimilarBlocks( blocks ) {
  * Diff raw block arrays using LCS, recursively handling innerBlocks.
  * Detects modifications when exactly 1 block is removed and 1 is added
  * with the same blockName (1:1 replacement = modification).
+ *
+ * Whitespace-only freeform pseudo-blocks are filtered at every recursive
+ * level so this function is safe to call directly with raw output from
+ * `@wordpress/block-serialization-default-parser`. The duplicate work for
+ * inner-block recursion is negligible and keeps the contract self-contained.
  *
  * @param {Array} currentRaw  Current revision's raw blocks.
  * @param {Array} previousRaw Previous revision's raw blocks.
