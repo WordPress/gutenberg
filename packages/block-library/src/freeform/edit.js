@@ -42,7 +42,7 @@ export default function FreeformEdit( {
 
 	// Gated by an experiment so authors can opt into a stronger nudge to
 	// migrate Classic block content ahead of its planned deprecation.
-	const isDeprecationMode = window.__experimentalClassicBlockMigrationNotice;
+	const isDeprecationMode = window.__experimentalClassicBlockDeprecation;
 
 	return (
 		<>

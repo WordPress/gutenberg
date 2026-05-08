@@ -9,15 +9,12 @@ import { __ } from '@wordpress/i18n';
 
 /**
  * Block-level deprecation warning rendered when the
- * `gutenberg-classic-block-migration-notice` experiment is enabled.
+ * `gutenberg-classic-block-deprecation` experiment is enabled.
  *
  * Uses the same `Warning` primitive as `core/missing` so the experience is
  * visually consistent with how the editor already surfaces deprecated blocks,
  * and offers two migration actions - a primary "Convert to blocks", and a
  * secondary "Convert to Custom HTML".
- *
- * Assumes the parent only mounts this component when the block can be removed
- * and has non-empty content; both conditions are gated in `freeform/edit.js`.
  *
  * @param {Object} props
  * @param {string} props.clientId Client ID of the Classic block.
