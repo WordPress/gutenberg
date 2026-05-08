@@ -47,13 +47,32 @@ function render_block_core_post_date( $attributes, $content, $block ) {
 	}
 
 	if ( empty( $attributes['datetime'] ) ) {
-		// If the `datetime` attribute is set but empty, it could be because Block Bindings
-		// set it that way. This can happen e.g. if the block is bound to the
-		// post's last modified date, and the latter lies before the publish date.
+		// If the `datetime` attribute is empty, it could be because Block Bindings
+		// set it that way when the modified date is before the publish date.
 		// (See https://github.com/WordPress/gutenberg/pull/46839 where this logic was originally
 		// implemented.)
-		// In this case, we have to respect and return the empty value.
-		return '';
+		//
+		// However, when a post is first published, WordPress sets post_modified equal to
+		// post_date. In that case we still want to render the modified date.
+		// Detect this scenario and fall back to the actual modified date.
+		// See https://github.com/WordPress/gutenberg/issues/57915.
+		$post_id = $block->context['postId'] ?? null;
+
+		// Determine whether this block is displaying the modified date — either via
+		// the legacy displayType attribute or via a Block Bindings binding.
+		$binding_args  = $attributes['metadata']['bindings']['datetime']['args'] ?? array();
+		$binding_field = $binding_args['field'] ?? $binding_args['key'] ?? null;
+		$is_modified   = ( isset( $source_args['field'] ) && 'modified' === $source_args['field'] )
+			|| 'modified' === $binding_field;
+
+		if ( $post_id && $is_modified
+			&& get_the_modified_date( 'U', $post_id ) >= get_the_date( 'U', $post_id ) ) {
+			// Modified date is equal to or later than publish date — render it.
+			$attributes['datetime'] = esc_attr( get_the_modified_date( 'c', $post_id ) );
+		} else {
+			// Modified date is strictly before the publish date; respect the empty value.
+			return '';
+		}
 	}
 
 	$unformatted_date = $attributes['datetime'];
