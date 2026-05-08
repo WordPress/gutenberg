@@ -11,7 +11,6 @@ import {
 	Button,
 	privateApis as componentsPrivateApis,
 	Spinner,
-	VisuallyHidden,
 	Composite,
 } from '@wordpress/components';
 import {
@@ -25,7 +24,7 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { moreVertical } from '@wordpress/icons';
 import { useRegistry } from '@wordpress/data';
-import { Stack } from '@wordpress/ui';
+import { Stack, VisuallyHidden } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -355,8 +354,8 @@ function ListItem< Item >( {
 									className="dataviews-view-list__field"
 								>
 									<VisuallyHidden
-										as="span"
 										className="dataviews-view-list__field-label"
+										render={ <span /> }
 									>
 										{ field.label }
 									</VisuallyHidden>

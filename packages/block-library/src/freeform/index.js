@@ -21,4 +21,12 @@ export const settings = {
 	save,
 };
 
-export const init = () => initBlock( { name, metadata, settings } );
+export const init = () => {
+	// Only expose the block in the inserter if the current post actually needs
+	// a classic block.
+	const supports = {
+		...metadata.supports,
+		inserter: !! window?.__needsClassicBlock,
+	};
+	return initBlock( { name, metadata, settings: { ...settings, supports } } );
+};

@@ -20,10 +20,10 @@ function block_core_tabs_generate_tabs_list( array $innerblocks = array(), strin
 
 	// Find tab-panel block
 	foreach ( $innerblocks as $inner_block ) {
-		if ( 'core/tab-panel' === ( $inner_block['blockName'] ?? '' ) ) {
+		if ( 'core/tab-panels' === ( $inner_block['blockName'] ?? '' ) ) {
 			$tab_index = 0;
 			foreach ( $inner_block['innerBlocks'] ?? array() as $tab_block ) {
-				if ( 'core/tab' === ( $tab_block['blockName'] ?? '' ) ) {
+				if ( 'core/tab-panel' === ( $tab_block['blockName'] ?? '' ) ) {
 					$attrs     = $tab_block['attrs'] ?? array();
 					$tab_label = $attrs['label'] ?? '';
 
@@ -49,7 +49,7 @@ function block_core_tabs_generate_tabs_list( array $innerblocks = array(), strin
 }
 
 /**
- * Filter to provide tabs list context to core/tabs and core/tabs-menu blocks.
+ * Filter to provide tabs list context to core/tabs and core/tab-list blocks.
  * It is more performant to do this here, once, rather than in the tabs render and tabs context filters.
  * In this way core/tabs is both a provider and a consumer of the core/tabs-list context.
  *
@@ -103,9 +103,9 @@ function block_core_tabs_render_block_callback( array $attributes, string $conte
 	$tag_processor->next_tag( array( 'class_name' => 'wp-block-tabs' ) );
 	$tag_processor->set_attribute( 'data-wp-interactive', 'core/tabs/private' );
 
-	// Inspect inside the tabs-menu to see if its vertical or not.
+	// Inspect inside the tab-list to see if its vertical or not.
 	$tag_processor->set_bookmark( 'core/tabs_wrapper' );
-	while ( $tag_processor->next_tag( array( 'class_name' => 'wp-block-tabs-menu' ) ) ) {
+	while ( $tag_processor->next_tag( array( 'class_name' => 'wp-block-tabs-list' ) ) ) {
 		if ( $tag_processor->has_class( 'is-vertical' ) ) {
 			$is_vertical = true;
 			break;
