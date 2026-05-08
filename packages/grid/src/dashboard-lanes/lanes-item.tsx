@@ -106,7 +106,6 @@ export function LanesItem( {
 
 	const style: React.CSSProperties = {
 		...placementStyle,
-		cursor: getItemCursor( disabled, interacting ),
 		// Without this, the item is stretched to its grid track
 		// (4px when no row span has been computed yet) and
 		// `getBoundingClientRect` reports the track size, not the
@@ -218,7 +217,21 @@ export function LanesItem( {
 				</div>
 			) : null }
 
-			<div { ...listeners } style={ { height: '100%' } }>
+			<div
+				{ ...listeners }
+				style={ {
+					height: '100%',
+					// Cursor lives on the listener wrapper rather
+					// than the outer item so `actionableArea`
+					// children render their own cursor (e.g.
+					// `pointer` on buttons) instead of inheriting
+					// the surface's `grab`. Setting `undefined`
+					// during an active gesture leaves the property
+					// off the DOM so the document-level cursor
+					// lock from the resize handle takes over.
+					cursor: getItemCursor( disabled, interacting ),
+				} }
+			>
 				<div className={ styles[ 'item-content' ] }>
 					{ children }
 					{ ! disabled && (
