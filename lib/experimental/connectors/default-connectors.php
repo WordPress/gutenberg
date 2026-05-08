@@ -554,7 +554,7 @@ function _gutenberg_get_connector_script_module_data( array $data ): array {
 		$connectors[ $connector_id ] = $connector_out;
 	}
 	ksort( $connectors );
-	$data['connectors']         = $connectors;
+	$data['connectors']        = $connectors;
 	$data['isFileModDisabled'] = ! wp_is_file_mod_allowed( 'install_plugins' );
 	return $data;
 }
