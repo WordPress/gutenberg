@@ -90,6 +90,9 @@ function injectStyle( targetDocument: Document, hash: string, css: string ) {
 		return;
 	}
 
+	// Older generated CSS module output can still inject matching style tags
+	// after this document's cache is created, so keep the DOM as the fallback
+	// source of truth on cache misses.
 	if ( documentContainsStyleHash( targetDocument, hash ) ) {
 		injectedStyles.add( hash );
 		return;
