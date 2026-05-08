@@ -37,6 +37,7 @@ import {
 	insertIntoItemField,
 	itemsListField,
 	itemsListNavigationField,
+	labelsActionsField,
 	labelsForm,
 	menuNameField,
 	newItemField,
@@ -153,6 +154,7 @@ function PostTypePage( {
 				showInRestField,
 				statusField,
 				// Labels
+				labelsActionsField,
 				menuNameField,
 				allItemsField,
 				addNewField,
@@ -200,9 +202,6 @@ function PostTypePage( {
 				{
 					id: 'labels',
 					label: __( 'Labels' ),
-					description: __(
-						'Override the text WordPress shows in admin lists, menus, and forms. Leave blank to use defaults derived from the plural and singular names.'
-					),
 					layout: {
 						type: 'card',
 						isCollapsible: true,

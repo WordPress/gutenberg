@@ -8,7 +8,12 @@ import type { Form } from '@wordpress/dataviews';
  * Internal dependencies
  */
 import { createLabelField } from '../../utils/fields';
-import { STRING_LABEL_KEYS } from '../utils';
+import {
+	createLabelsActionsField,
+	LABELS_ACTIONS_FIELD_ID,
+} from '../../utils/labels';
+import type { PostTypeFormData } from '../types';
+import { deriveLabels, STRING_LABEL_KEYS } from '../utils';
 
 export const menuNameField = createLabelField( 'menu_name', __( 'Menu name' ), {
 	placeholder: __( 'Posts' ),
@@ -155,8 +160,24 @@ export const itemsListField = createLabelField(
 	}
 );
 
+export const labelsActionsField = createLabelsActionsField< PostTypeFormData >(
+	{
+		labelKeys: STRING_LABEL_KEYS,
+		deriveLabels,
+		helpText: __(
+			'Override the text WordPress shows in admin lists, menus, and forms. Auto-fill replaces every label below with values derived from the current plural and singular names — including any you have already customized. Clearing removes all overrides so WordPress falls back to its defaults. If you rename the post type after auto-filling, click Auto-fill again to keep them in sync.'
+		),
+	}
+);
+
 export const labelsForm: Form = {
 	layout: { type: 'regular' },
-	// singular_name lives in the General card, so exclude it here.
-	fields: STRING_LABEL_KEYS.filter( ( key ) => key !== 'singular_name' ),
+	fields: [
+		{
+			id: LABELS_ACTIONS_FIELD_ID,
+			layout: { type: 'regular', labelPosition: 'none' },
+		},
+		// singular_name lives in the General card, so exclude it here.
+		...STRING_LABEL_KEYS.filter( ( key ) => key !== 'singular_name' ),
+	],
 };
