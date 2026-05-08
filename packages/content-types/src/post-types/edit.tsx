@@ -12,7 +12,7 @@ import {
 	type Field,
 	type Form,
 } from '@wordpress/dataviews';
-import { useMemo, useState } from '@wordpress/element';
+import { useEffect, useMemo, useRef, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { useNavigate, useParams } from '@wordpress/route';
@@ -73,6 +73,7 @@ type PostTypePageProps = {
 	breadcrumbLabel: string;
 	subTitle: string;
 	onSaved?: ( saved: PostTypeFormData & { id: number } ) => void;
+	focusSaveButton?: boolean;
 };
 
 export function PostTypeEdit() {
@@ -80,6 +81,7 @@ export function PostTypeEdit() {
 	const navigate = useNavigate();
 	const isAddMode = id === NEW_ID;
 	const postTypeId = parseInt( id, 10 );
+	const [ justCreated, setJustCreated ] = useState( false );
 	const record = useSelect(
 		( select ) => {
 			return (
@@ -106,10 +108,10 @@ export function PostTypeEdit() {
 				subTitle: __(
 					'Define a new post type. Fill in the essentials under General; expand Labels to customize.'
 				),
-				onSaved: ( saved ) =>
-					navigate( {
-						to: `${ POST_TYPES_PATH }/${ saved.id }`,
-					} ),
+				onSaved: ( saved ) => {
+					setJustCreated( true );
+					navigate( { to: `${ POST_TYPES_PATH }/${ saved.id }` } );
+				},
 		  }
 		: {
 				...commonProps,
@@ -118,6 +120,7 @@ export function PostTypeEdit() {
 				subTitle: __(
 					'Edit this post type. Expand the Labels section to adjust labels.'
 				),
+				focusSaveButton: justCreated,
 		  };
 
 	// key remounts PostTypePage when navigating between records so in-flight
@@ -132,8 +135,18 @@ function PostTypePage( {
 	breadcrumbLabel,
 	subTitle,
 	onSaved,
+	focusSaveButton,
 }: PostTypePageProps ) {
 	const [ data, setData ] = useState< PostTypeFormData >( initialData );
+	const saveButtonRef = useRef< HTMLButtonElement >( null );
+
+	// Restore focus to the Save button after navigating from add mode.
+	useEffect( () => {
+		if ( focusSaveButton ) {
+			saveButtonRef.current?.focus();
+		}
+	}, [ focusSaveButton ] );
+
 	const [ isSaving, setIsSaving ] = useState( false );
 	const originalSlug = ! isAddMode ? initialData.slug : undefined;
 	const slugField = useSlugField( originalSlug, data.slug );
@@ -278,6 +291,7 @@ function PostTypePage( {
 			subTitle={ subTitle }
 			actions={
 				<Button
+					ref={ saveButtonRef }
 					__next40pxDefaultSize
 					variant="primary"
 					size="compact"
