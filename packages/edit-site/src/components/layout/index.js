@@ -54,6 +54,10 @@ function Layout() {
 	const { query, name: routeKey, areas, widths } = useLocation();
 	// Force canvas to 'view' on notfound route to show the error message and allow navigation.
 	const canvas = routeKey === 'notfound' ? 'view' : query?.canvas ?? 'view';
+	const isAdminBarInEditorEnabled = window.__experimentalAdminBarInEditor;
+	const showDesktopSiteHub = ! isAdminBarInEditorEnabled;
+	const showMobileSiteHub =
+		! isAdminBarInEditorEnabled || routeKey !== 'home';
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const toggleRef = useRef();
 	const navigateRegionsProps = useNavigateRegions();
@@ -129,12 +133,14 @@ function Layout() {
 										} }
 										className="edit-site-layout__sidebar"
 									>
-										<SiteHub
-											ref={ toggleRef }
-											isTransparent={
-												isResizableFrameOversized
-											}
-										/>
+										{ showDesktopSiteHub && (
+											<SiteHub
+												ref={ toggleRef }
+												isTransparent={
+													isResizableFrameOversized
+												}
+											/>
+										) }
 										<SidebarNavigationProvider>
 											<SidebarContent
 												shouldAnimate={
@@ -163,12 +169,14 @@ function Layout() {
 							<SidebarNavigationProvider>
 								{ canvas !== 'edit' ? (
 									<>
-										<SiteHubMobile
-											ref={ toggleRef }
-											isTransparent={
-												isResizableFrameOversized
-											}
-										/>
+										{ showMobileSiteHub && (
+											<SiteHubMobile
+												ref={ toggleRef }
+												isTransparent={
+													isResizableFrameOversized
+												}
+											/>
+										) }
 										<SidebarContent routeKey={ routeKey }>
 											<ErrorBoundary>
 												{ areas.mobile }
