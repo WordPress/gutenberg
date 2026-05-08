@@ -52,7 +52,7 @@ add_action( 'site-editor-v2_init', 'gutenberg_enable_experiments' );
  */
 function gutenberg_add_admin_bar_in_editor_body_class( $classes ) {
 	$screen = get_current_screen();
-	if ( ! $screen || ! gutenberg_is_experiment_enabled( 'gutenberg-admin-bar-in-editor' ) ) {
+	if ( ! $screen || ! is_admin_bar_showing() || ! gutenberg_is_experiment_enabled( 'gutenberg-admin-bar-in-editor' ) ) {
 		return $classes;
 	}
 
