@@ -34,7 +34,6 @@ export const Default: Story = {
 				</Select.Popup>
 			</>
 		),
-		defaultValue: defaultItems[ 0 ],
 	},
 };
 
@@ -75,18 +74,19 @@ export const Minimal: Story = {
 			<>
 				<Select.Trigger size="small" variant="minimal" />
 				<Select.Popup>
-					{ defaultItems.map( ( item ) => (
+					{ Array.from( { length: 6 }, ( _, index ) => (
 						<Select.Item
-							key={ item.value }
-							value={ item }
+							key={ index }
+							value={ `${ index + 1 }` }
 							size="small"
 						>
-							{ item.label }
+							{ `${ index + 1 }` }
 						</Select.Item>
 					) ) }
 				</Select.Popup>
 			</>
 		),
+		defaultValue: '1',
 	},
 };
 
@@ -217,6 +217,7 @@ export const Disabled: Story = {
 				</Select.Popup>
 			</>
 		),
+		defaultValue: defaultItems[ 0 ],
 		disabled: true,
 	},
 };
