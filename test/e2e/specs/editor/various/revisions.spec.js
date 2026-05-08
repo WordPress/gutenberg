@@ -268,6 +268,7 @@ test.describe( 'Post revisions slider pagination', () => {
 
 	test( 'should paginate, navigate pages, and diff across page boundaries', async ( {
 		admin,
+		editor,
 		page,
 		requestUtils,
 	} ) => {
@@ -297,6 +298,7 @@ test.describe( 'Post revisions slider pagination', () => {
 
 		await admin.editPost( post.id );
 
+		await editor.openDocumentSettingsSidebar();
 		const settingsSidebar = page.getByRole( 'region', {
 			name: 'Editor settings',
 		} );
