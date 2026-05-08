@@ -51,7 +51,7 @@ export default function MigrationNotice( { clientId, content } ) {
 			variant="secondary"
 			onClick={ convertToHtmlBlock }
 		>
-			{ __( 'Convert to Custom HTML' ) }
+			{ __( 'Convert to HTML' ) }
 		</Button>,
 	];
 
