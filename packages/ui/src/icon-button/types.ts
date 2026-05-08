@@ -1,5 +1,6 @@
 import { type ButtonProps } from '../button/types';
 import { type IconProps } from '../icon/types';
+import { type PopupProps } from '../tooltip/types';
 
 export type IconButtonProps = Omit< ButtonProps, 'children' > & {
 	/**
@@ -35,4 +36,11 @@ export type IconButtonProps = Omit< ButtonProps, 'children' > & {
 		 */
 		ariaKeyShortcut: string;
 	};
+
+	/**
+	 * Customize where the tooltip is placed relative to the button. Accepts
+	 * `side`, `align`, and `sideOffset`, mirroring the corresponding props on
+	 * `Tooltip.Popup`. When omitted, the tooltip uses the default placement.
+	 */
+	tooltipPlacement?: Pick< PopupProps, 'side' | 'align' | 'sideOffset' >;
 };

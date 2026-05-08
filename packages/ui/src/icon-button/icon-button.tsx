@@ -22,6 +22,7 @@ export const IconButton = forwardRef< HTMLButtonElement, IconButtonProps >(
 			icon,
 			size,
 			shortcut,
+			tooltipPlacement,
 			...restProps
 		}: IconButtonProps & { children?: unknown },
 		ref
@@ -52,7 +53,7 @@ export const IconButton = forwardRef< HTMLButtonElement, IconButtonProps >(
 							className={ styles.icon }
 						/>
 					</Tooltip.Trigger>
-					<Tooltip.Popup>
+					<Tooltip.Popup { ...tooltipPlacement }>
 						{ label }
 						{ shortcut && (
 							<>

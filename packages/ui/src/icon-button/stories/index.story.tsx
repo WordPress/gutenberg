@@ -133,3 +133,15 @@ export const WithShortcut: Story = {
 		shortcut: EXAMPLE_SHORTCUT_OBJECT,
 	},
 };
+
+/**
+ * Customize where the tooltip is placed relative to the button via the
+ * `tooltipPlacement` prop.
+ */
+export const WithCustomTooltipPlacement: Story = {
+	...Default,
+	args: {
+		...Default.args,
+		tooltipPlacement: { side: 'right', align: 'center', sideOffset: 8 },
+	},
+};
