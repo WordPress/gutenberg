@@ -298,7 +298,9 @@ function buildSaveOptions(
 	const saveOptions: SaveOptions< typeof type > = {
 		// Strip metadata except ICC color profiles,
 		// matching WordPress core's behavior.
-		keep: 'icc',
+// Strip metadata except ICC color profiles or gainmaps,
+// matching WordPress core's behavior.
+keep: 'icc|gainmap',
 	};
 
 	if ( supportsQuality( type ) ) {
