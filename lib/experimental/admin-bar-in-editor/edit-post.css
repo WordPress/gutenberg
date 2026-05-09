@@ -1,11 +1,11 @@
-body.js.block-editor-page .edit-post-fullscreen-mode-close__view-mode-toggle {
+.edit-post-fullscreen-mode-close__view-mode-toggle {
 	display: flex;
 	align-items: center;
 	justify-content: center;
 	width: 32px;
 }
 
-body.js.block-editor-page .edit-post-fullscreen-mode-close__view-mode-toggle .edit-post-fullscreen-mode-close__back-icon {
+.edit-post-fullscreen-mode-close__view-mode-toggle .edit-post-fullscreen-mode-close__back-icon {
 	top: auto;
 	left: auto;
 	width: 32px;
@@ -13,52 +13,52 @@ body.js.block-editor-page .edit-post-fullscreen-mode-close__view-mode-toggle .ed
 	background: transparent;
 }
 
-body.js.block-editor-page .edit-post-fullscreen-mode-close__view-mode-toggle:hover .edit-post-fullscreen-mode-close__back-icon {
+.edit-post-fullscreen-mode-close__view-mode-toggle:hover .edit-post-fullscreen-mode-close__back-icon {
 	color: var(--wp-admin-theme-color);
 }
 
-body.js.block-editor-page.is-fullscreen-mode {
+.is-fullscreen-mode {
 	--wp-admin-bar-in-editor-height: 32px;
 }
 
-body.js.block-editor-page.is-fullscreen-mode .editor-header:has(> .editor-header__back-button) {
+.is-fullscreen-mode .editor-header:has(> .editor-header__back-button) {
 	grid-template-columns: 32px minmax(0, max-content) minmax(min-content, 1fr) 64px;
 }
 
-body.js.block-editor-page.is-fullscreen-mode .editor-header:has(> .editor-header__back-button):has(> .editor-header__center) {
+.is-fullscreen-mode .editor-header:has(> .editor-header__back-button):has(> .editor-header__center) {
 	grid-template-columns: 32px min-content 1fr min-content 64px;
 }
 
-body.js.block-editor-page.is-fullscreen-mode .editor-header__back-button {
+.is-fullscreen-mode .editor-header__back-button {
 	padding-left: 8px;
 }
 
 @media (min-width: 782px) {
-	body.js.block-editor-page.is-fullscreen-mode {
+	.is-fullscreen-mode {
 		margin-top: 0;
 		height: 100%;
 	}
 
-	body.js.block-editor-page.is-fullscreen-mode #wpadminbar {
+	body.block-editor-page.is-fullscreen-mode #wpadminbar {
 		display: block;
 	}
 
-	body.js.block-editor-page.is-fullscreen-mode .interface-interface-skeleton,
-	body.js.block-editor-page.is-fullscreen-mode .editor-post-publish-panel,
-	body.js.block-editor-page.is-fullscreen-mode .is-entity-save-view-open .interface-interface-skeleton__actions:focus,
-	body.js.block-editor-page.is-fullscreen-mode .is-entity-save-view-open .interface-interface-skeleton__actions:focus-within {
+	.is-fullscreen-mode .interface-interface-skeleton,
+	.is-fullscreen-mode .editor-post-publish-panel,
+	.is-fullscreen-mode .is-entity-save-view-open .interface-interface-skeleton__actions:focus,
+	.is-fullscreen-mode .is-entity-save-view-open .interface-interface-skeleton__actions:focus-within {
 		top: var(--wp-admin-bar-in-editor-height);
 	}
 
-	body.js.block-editor-page.is-fullscreen-mode .block-editor__container {
+	.is-fullscreen-mode .block-editor__container {
 		min-height: calc(100vh - var(--wp-admin-bar-in-editor-height));
 	}
 }
 
-body.js.block-editor-page.is-fullscreen-mode:has(.editor-editor-interface.is-distraction-free) {
+.is-fullscreen-mode:has(.editor-editor-interface.is-distraction-free) {
 	--wp-admin-bar-in-editor-height: 0;
 }
 
-body.js.block-editor-page.is-fullscreen-mode:has(.editor-editor-interface.is-distraction-free) #wpadminbar {
+body.is-fullscreen-mode:has(.editor-editor-interface.is-distraction-free) #wpadminbar {
 	display: none;
 }
