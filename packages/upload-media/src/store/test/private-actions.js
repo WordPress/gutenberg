@@ -6,9 +6,13 @@ import { createBlobURL, revokeBlobURL } from '@wordpress/blob';
 /**
  * Internal dependencies
  */
-import { getTranscodeImageOperation, finalizeItem } from '../private-actions';
+import {
+	getTranscodeImageOperation,
+	finalizeItem,
+	detectUltraHdr,
+} from '../private-actions';
 import { OperationType } from '../types';
-import { vipsHasTransparency } from '../utils';
+import { vipsHasTransparency, vipsGetUltraHdrInfo } from '../utils';
 
 // Mock @wordpress/blob
 jest.mock( '@wordpress/blob', () => ( {
@@ -19,6 +23,7 @@ jest.mock( '@wordpress/blob', () => ( {
 // Mock vips utilities
 jest.mock( '../utils', () => ( {
 	vipsHasTransparency: jest.fn(),
+	vipsGetUltraHdrInfo: jest.fn(),
 } ) );
 
 describe( 'private actions', () => {
@@ -376,6 +381,111 @@ describe( 'private actions', () => {
 			const thunk = finalizeItem( 'test-id' );
 			await thunk( { select, dispatch } );
 
+			expect( finishOperation ).not.toHaveBeenCalled();
+		} );
+	} );
+
+	describe( 'detectUltraHdr', () => {
+		const makeItem = () => ( {
+			file: new File( [ 'fake' ], 'photo.jpg', {
+				type: 'image/jpeg',
+			} ),
+			attachment: { meta: {} },
+		} );
+
+		beforeEach( () => {
+			jest.clearAllMocks();
+		} );
+
+		it( 'tags the attachment when the buffer is UltraHDR', async () => {
+			vipsGetUltraHdrInfo.mockResolvedValue( {
+				width: 1024,
+				height: 768,
+				hdrCapacity: 3,
+			} );
+			const finishOperation = jest.fn();
+			const item = makeItem();
+			const select = { getItem: () => item };
+			const dispatch = { finishOperation };
+
+			const thunk = detectUltraHdr( 'test-id' );
+			await thunk( { select, dispatch } );
+
+			expect( vipsGetUltraHdrInfo ).toHaveBeenCalledTimes( 1 );
+			expect( finishOperation ).toHaveBeenCalledWith( 'test-id', {
+				attachment: {
+					meta: {
+						ultrahdr: true,
+						hdr_capacity: 3,
+					},
+				},
+			} );
+		} );
+
+		it( 'finishes with no metadata when buffer is not UltraHDR', async () => {
+			vipsGetUltraHdrInfo.mockResolvedValue( null );
+			const finishOperation = jest.fn();
+			const select = { getItem: () => makeItem() };
+			const dispatch = { finishOperation };
+
+			const thunk = detectUltraHdr( 'test-id' );
+			await thunk( { select, dispatch } );
+
+			expect( finishOperation ).toHaveBeenCalledWith( 'test-id', {} );
+		} );
+
+		it( 'falls through gracefully when probe throws', async () => {
+			vipsGetUltraHdrInfo.mockRejectedValue(
+				new Error( 'wasm module unavailable' )
+			);
+			const finishOperation = jest.fn();
+			const select = { getItem: () => makeItem() };
+			const dispatch = { finishOperation };
+
+			const thunk = detectUltraHdr( 'test-id' );
+			await thunk( { select, dispatch } );
+
+			// Probe failure must not cancel the upload — pass-through finish.
+			expect( finishOperation ).toHaveBeenCalledWith( 'test-id', {} );
+		} );
+
+		it( 'normalizes meta when attachment.meta is an array', async () => {
+			vipsGetUltraHdrInfo.mockResolvedValue( {
+				width: 800,
+				height: 600,
+				hdrCapacity: 2,
+			} );
+			const finishOperation = jest.fn();
+			// WP REST sometimes returns `meta: []` for empty meta;
+			// the thunk must spread an object, not the array.
+			const item = {
+				file: new File( [ 'fake' ], 'photo.jpg', {
+					type: 'image/jpeg',
+				} ),
+				attachment: { meta: [] },
+			};
+			const select = { getItem: () => item };
+			const dispatch = { finishOperation };
+
+			const thunk = detectUltraHdr( 'test-id' );
+			await thunk( { select, dispatch } );
+
+			const call = finishOperation.mock.calls[ 0 ];
+			expect( call[ 1 ].attachment.meta ).toEqual( {
+				ultrahdr: true,
+				hdr_capacity: 2,
+			} );
+		} );
+
+		it( 'returns early when item is not found', async () => {
+			const finishOperation = jest.fn();
+			const select = { getItem: () => undefined };
+			const dispatch = { finishOperation };
+
+			const thunk = detectUltraHdr( 'missing' );
+			await thunk( { select, dispatch } );
+
+			expect( vipsGetUltraHdrInfo ).not.toHaveBeenCalled();
 			expect( finishOperation ).not.toHaveBeenCalled();
 		} );
 	} );
