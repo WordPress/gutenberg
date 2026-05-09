@@ -97,6 +97,25 @@ test.describe( 'Fullscreen Mode', () => {
 		await expect( page.locator( '#wpadminbar' ) ).toBeHidden();
 	} );
 
+	test( 'should show the admin bar in distraction free mode on mobile when the experiment is enabled', async ( {
+		page,
+		admin,
+		requestUtils,
+		pageUtils,
+	} ) => {
+		await requestUtils.setGutenbergExperiments( [
+			'gutenberg-admin-bar-in-editor',
+		] );
+		await pageUtils.setBrowserViewport( 'small' );
+		await admin.createNewPost();
+		await enableDistractionFreeMode( pageUtils );
+
+		await expect( page.locator( '.editor-editor-interface' ) ).toHaveClass(
+			/is-distraction-free/
+		);
+		await expect( page.locator( '#wpadminbar' ) ).toBeVisible();
+	} );
+
 	test.describe( 'Site Editor', () => {
 		test.beforeAll( async ( { requestUtils } ) => {
 			await requestUtils.activateTheme( 'emptytheme' );
