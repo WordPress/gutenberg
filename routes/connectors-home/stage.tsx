@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { speak } from '@wordpress/a11y';
 import { Page } from '@wordpress/admin-ui';
 import {
 	Button,
@@ -13,11 +14,10 @@ import {
 	type ConnectorConfig,
 } from '@wordpress/connectors';
 import { useSelect } from '@wordpress/data';
-import { createInterpolateElement } from '@wordpress/element';
+import { createInterpolateElement, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
-// eslint-disable-next-line @wordpress/use-recommended-components
-import { Notice } from '@wordpress/ui';
+import { Icon, info } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -94,6 +94,25 @@ function ConnectorsPage() {
 	);
 	const isEmpty = renderableConnectors.length === 0;
 
+	const showFileModsNotice =
+		manualInstallPluginSlugs.length > 0 &&
+		( isFileModDisabled || ! canInstallPlugins );
+	const fileModsNoticeMessage = isFileModDisabled
+		? __(
+				'Plugins cannot be installed here due to your site configuration. Install them manually using your normal deployment workflow.'
+		  )
+		: __(
+				'You do not have permission to install plugins. Please ask a site administrator to install them for you.'
+		  );
+
+	// Mirrors `useSpokenMessage` in `@wordpress/ui` Notice so the inlined
+	// markup announces the message to assistive tech the same way.
+	useEffect( () => {
+		if ( showFileModsNotice ) {
+			speak( fileModsNoticeMessage, 'polite' );
+		}
+	}, [ showFileModsNotice, fileModsNoticeMessage ] );
+
 	return (
 		<Page
 			title={ __( 'Connectors' ) }
@@ -106,23 +125,17 @@ function ConnectorsPage() {
 					isEmpty ? ' connectors-page--empty' : ''
 				}` }
 			>
-				{ manualInstallPluginSlugs.length > 0 &&
-					( isFileModDisabled || ! canInstallPlugins ) && (
-						<Notice.Root
-							intent="info"
-							className="connectors-page__file-mods-notice"
-						>
-							<Notice.Description>
-								{ isFileModDisabled
-									? __(
-											'Plugins cannot be installed here due to your site configuration. Install them manually using your normal deployment workflow.'
-									  )
-									: __(
-											'You do not have permission to install plugins. Please ask a site administrator to install them for you.'
-									  ) }
-							</Notice.Description>
-						</Notice.Root>
-					) }
+				{ showFileModsNotice && (
+					<div className="connectors-page__file-mods-notice">
+						<Icon
+							className="connectors-page__file-mods-notice-icon"
+							icon={ info }
+						/>
+						<span className="connectors-page__file-mods-notice-text">
+							{ fileModsNoticeMessage }
+						</span>
+					</div>
+				) }
 				{ isEmpty ? (
 					<VStack
 						alignment="center"
