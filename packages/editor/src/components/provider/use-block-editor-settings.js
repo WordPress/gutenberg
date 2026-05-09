@@ -47,6 +47,7 @@ const BLOCK_EDITOR_SETTINGS = [
 	'__experimentalDiscussionSettings',
 	'__experimentalFeatures',
 	'__experimentalGlobalStylesBaseStyles',
+	'attachmentPagesEnabled',
 	'allImageSizes',
 	'alignWide',
 	'blockInspectorTabs',

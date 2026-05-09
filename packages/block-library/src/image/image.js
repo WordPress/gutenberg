@@ -368,19 +368,21 @@ export default function Image( {
 		imageSizes,
 		maxWidth,
 		editMediaEntity,
+		settings,
 	} = useSelect(
 		( select ) => {
 			const { getBlockRootClientId, canInsertBlockType, getSettings } =
 				select( blockEditorStore );
 
 			const rootClientId = getBlockRootClientId( clientId );
-			const settings = getSettings();
+			const _settings = getSettings();
 
 			return {
-				imageEditing: settings.imageEditing,
-				imageSizes: settings.imageSizes,
-				maxWidth: settings.maxWidth,
-				editMediaEntity: settings?.[ mediaEditKey ],
+				imageEditing: _settings.imageEditing,
+				imageSizes: _settings.imageSizes,
+				maxWidth: _settings.maxWidth,
+				editMediaEntity: _settings?.[ mediaEditKey ],
+				settings: _settings,
 				canInsertCover: canInsertBlockType(
 					'core/cover',
 					rootClientId
@@ -864,6 +866,9 @@ export default function Image( {
 							linkDestination={ linkDestination }
 							mediaUrl={ ( image && image.source_url ) || url }
 							mediaLink={ image && image.link }
+							attachmentPagesEnabled={
+								settings?.attachmentPagesEnabled !== false
+							}
 							linkTarget={ linkTarget }
 							linkClass={ linkClass }
 							rel={ rel }

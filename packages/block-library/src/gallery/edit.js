@@ -143,12 +143,6 @@ export default function GalleryEdit( props ) {
 			'dimensions.defaultAspectRatios'
 		);
 
-	const linkOptions = ! lightboxSetting?.allowEditing
-		? LINK_OPTIONS.filter(
-				( option ) => option.value !== LINK_DESTINATION_LIGHTBOX
-		  )
-		: LINK_OPTIONS;
-
 	const {
 		navigationButtonType,
 		columns,
@@ -172,6 +166,7 @@ export default function GalleryEdit( props ) {
 	const {
 		getBlock,
 		getSettings,
+		attachmentPagesEnabled,
 		innerBlockImages,
 		blockWasJustInserted,
 		multiGallerySelection,
@@ -189,6 +184,8 @@ export default function GalleryEdit( props ) {
 			return {
 				getBlock: _getBlock,
 				getSettings: _getSettings,
+				attachmentPagesEnabled:
+					_getSettings()?.attachmentPagesEnabled !== false,
 				innerBlockImages:
 					_getBlock( clientId )?.innerBlocks ?? EMPTY_ARRAY,
 				blockWasJustInserted: wasBlockJustInserted(
@@ -204,6 +201,18 @@ export default function GalleryEdit( props ) {
 			};
 		},
 		[ clientId ]
+	);
+
+	const linkOptions = (
+		! lightboxSetting?.allowEditing
+			? LINK_OPTIONS.filter(
+					( option ) => option.value !== LINK_DESTINATION_LIGHTBOX
+			  )
+			: LINK_OPTIONS
+	).filter(
+		( option ) =>
+			attachmentPagesEnabled ||
+			option.value !== LINK_DESTINATION_ATTACHMENT
 	);
 
 	const images = useMemo(
@@ -439,6 +448,14 @@ export default function GalleryEdit( props ) {
 	}
 
 	function setLinkTo( value ) {
+		// Attachment page links are not supported when attachment pages are disabled, so we prevent the user from selecting that option.
+		if (
+			value === LINK_DESTINATION_ATTACHMENT &&
+			! attachmentPagesEnabled
+		) {
+			return;
+		}
+
 		setAttributes( { linkTo: value } );
 		const changedAttributes = {};
 		const blocks = [];
@@ -467,7 +484,7 @@ export default function GalleryEdit( props ) {
 			sprintf(
 				/* translators: %s: image size settings */
 				__( 'All gallery image links updated to: %s' ),
-				linkToText.noticeText
+				linkToText?.noticeText || value
 			),
 			{
 				id: 'gallery-attributes-linkTo',

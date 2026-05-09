@@ -119,6 +119,8 @@ function gutenberg_get_block_editor_settings( $settings ) {
 		$settings['spacingSizes'] = $spacing_sizes_by_origin['custom'] ?? $spacing_sizes_by_origin['theme'] ?? $spacing_sizes_by_origin['default'];
 	}
 
+	$settings['attachmentPagesEnabled'] = (bool) get_option( 'wp_attachment_pages_enabled' );
+
 	$settings['canEditCSS'] = current_user_can( 'edit_css' );
 
 	return $settings;
