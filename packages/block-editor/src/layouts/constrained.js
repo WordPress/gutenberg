@@ -19,6 +19,7 @@ import {
 	justifyRight,
 } from '@wordpress/icons';
 import { getCSSRules } from '@wordpress/style-engine';
+import { Text } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -127,11 +128,15 @@ export default {
 								</InputControlPrefixWrapper>
 							}
 						/>
-						<p className="block-editor-hooks__layout-constrained-helptext">
+						<Text
+							variant="body-sm"
+							render={ <p /> }
+							className="block-editor-hooks__layout-constrained-helptext"
+						>
 							{ __(
 								'Customize the width for all elements that are assigned to the center or wide columns.'
 							) }
-						</p>
+						</Text>
 					</>
 				) }
 				{ allowJustification && (
