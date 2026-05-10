@@ -48,6 +48,12 @@ async function getVips() {
 			} );
 		},
 	} );
+	// Disable libvips's operation cache. The cache pins decoded image
+	// references, which in turn prevents libheif from releasing its
+	// internal AVIF decoder state. Across the 8 perf-test iterations on
+	// a 3000x2000 AVIF, this manifests as a `heif: Memory allocation
+	// error` once the WASM heap is exhausted.
+	vips.Cache.max( 0 );
 	return vips;
 }
 
