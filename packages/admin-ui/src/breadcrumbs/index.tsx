@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { Link as RouterLink } from '@wordpress/route';
-import { __, _x } from '@wordpress/i18n';
+import { _x } from '@wordpress/i18n';
 import { Link, Stack, Text } from '@wordpress/ui';
 
 /**
