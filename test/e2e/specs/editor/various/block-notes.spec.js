@@ -1147,6 +1147,34 @@ test.describe( 'Block Notes', () => {
 			).toBeHidden();
 		} );
 
+		test( 'full picker shows the empty state when search has no matches', async ( {
+			page,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Search empty state' },
+				comment: 'Empty search state',
+			} );
+
+			await page.getByRole( 'button', { name: 'More emojis' } ).click();
+			await blockNoteUtils.waitForFullPicker();
+
+			// A query no Emojibase label/tag matches.
+			await page
+				.getByPlaceholder( 'Search emoji' )
+				.fill( 'zzzzzznoresults' );
+
+			// The grid is replaced by an empty-state status message…
+			await expect(
+				page.locator( '.editor-collab-sidebar-panel__picker-status' )
+			).toContainText( 'No emoji found.' );
+			// …and no gridcells remain in the DOM.
+			await expect(
+				page.locator( '.editor-collab-sidebar-panel__picker-emoji' )
+			).toHaveCount( 0 );
+		} );
+
 		test( 'reaction picker portals outside the collab sidebar', async ( {
 			page,
 			blockNoteUtils,

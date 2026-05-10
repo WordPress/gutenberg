@@ -58,16 +58,15 @@ export function resolveEmojibaseLocale( raw ) {
 	if ( EMOJIBASE_LOCALES.has( normalized ) ) {
 		return normalized;
 	}
+	// Special-case Traditional Chinese variants. Must run before the
+	// language-portion fallback, since `zh` is itself a supported locale
+	// and would otherwise swallow `zh-tw`/`zh-hk`/`zh-mo`.
+	if ( [ 'zh-tw', 'zh-hk', 'zh-mo' ].includes( normalized ) ) {
+		return 'zh-hant';
+	}
 	const lang = normalized.split( '-' )[ 0 ];
 	if ( EMOJIBASE_LOCALES.has( lang ) ) {
 		return lang;
-	}
-	// Special-case Traditional Chinese variants Emojibase keys as `zh-hant`.
-	if (
-		[ 'zh-tw', 'zh-hk', 'zh-mo', 'zh-hant' ].includes( normalized ) &&
-		EMOJIBASE_LOCALES.has( 'zh-hant' )
-	) {
-		return 'zh-hant';
 	}
 	return 'en';
 }
@@ -212,7 +211,7 @@ const COLUMNS = 8;
  * @param {Array} data Emoji records from `data.json`.
  * @return {Array<{ key: number, emojis: Array }>} Ordered category buckets.
  */
-function groupEmojis( data ) {
+export function groupEmojis( data ) {
 	const buckets = new Map();
 	for ( const entry of data ) {
 		if ( typeof entry.group !== 'number' ) {
@@ -236,7 +235,7 @@ function groupEmojis( data ) {
  * @param {Array} emojis Emoji records.
  * @return {Array<Array>} Rows of up to `COLUMNS` emoji each.
  */
-function chunkRows( emojis ) {
+export function chunkRows( emojis ) {
 	const rows = [];
 	for ( let i = 0; i < emojis.length; i += COLUMNS ) {
 		rows.push( emojis.slice( i, i + COLUMNS ) );
@@ -255,7 +254,7 @@ function chunkRows( emojis ) {
  * @param {Object|null} overrides Map of `hexcode => translated label`.
  * @return {Array} Matching emoji records.
  */
-function searchEmojis( emojis, query, overrides ) {
+export function searchEmojis( emojis, query, overrides ) {
 	const trimmed = query.trim().toLowerCase();
 	if ( ! trimmed ) {
 		return emojis;
