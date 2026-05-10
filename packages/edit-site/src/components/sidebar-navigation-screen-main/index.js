@@ -47,7 +47,7 @@ export function MainSidebarNavigationContent( { isBlockBasedTheme = true } ) {
 						uid="identity-navigation-item"
 						icon={ siteLogo }
 					>
-						{ _x( 'Identity', 'site identity ) }
+						{ _x( 'Identity', 'site identity' ) }
 					</SidebarNavigationItemIdentity>
 					<SidebarNavigationItem
 						uid="page-navigation-item"
