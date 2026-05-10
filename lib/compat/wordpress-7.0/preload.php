@@ -18,8 +18,9 @@ function gutenberg_block_editor_preload_paths_6_9( $paths, $context ) {
 		} else {
 			$template_slugs[] = 'front-page';
 
-			if ( 'page' === get_option( 'show_on_front' ) ) {
-				$front_page = get_post( (int) get_option( 'page_on_front' ) );
+			$page_on_front = (int) get_option( 'page_on_front' );
+			if ( 'page' === get_option( 'show_on_front' ) && $page_on_front > 0 ) {
+				$front_page = get_post( $page_on_front );
 				if ( $front_page instanceof WP_Post ) {
 					$template_slugs[] = empty( $front_page->post_name ) ? 'page' : 'page-' . $front_page->post_name;
 					$template_slugs[] = 'page';
@@ -49,7 +50,7 @@ function gutenberg_block_editor_preload_paths_6_9( $paths, $context ) {
 
 		$template_part_ids = array();
 		$has_query         = false;
-		$walk_blocks       = static function ( $blocks ) use ( &$walk_blocks, &$template_part_ids, &$has_query ) {
+		$walk_blocks       = static function ( array $blocks ) use ( &$walk_blocks, &$template_part_ids, &$has_query ) {
 			foreach ( $blocks as $block ) {
 				if ( 'core/template-part' === ( $block['blockName'] ?? '' ) && ! empty( $block['attrs']['slug'] ) ) {
 					$theme               = ! empty( $block['attrs']['theme'] ) ? $block['attrs']['theme'] : get_stylesheet();
