@@ -1,9 +1,9 @@
 <?php
 /**
- * Exposes a same-origin URL for the bundled emojibase data so the
- * Frimousse picker (used by the Notes feature) can fetch its emoji
+ * Exposes a same-origin URL for the bundled Emojibase data so the
+ * editor's emoji picker (used by the Notes feature) can fetch its
  * dataset without contacting an external CDN and without inflating the
- * editor JS bundle by ~100KB gzipped.
+ * editor JS bundle.
  *
  * The data files are copied into `build/emojibase-data/{locale}/` at
  * plugin build time by `bin/copy-emojibase-data.mjs`.
@@ -13,8 +13,8 @@
  */
 
 /**
- * Adds a global JS variable pointing at the bundled emojibase data
- * directory, before any editor script runs. The Frimousse wrapper in
+ * Adds a global JS variable pointing at the bundled Emojibase data
+ * directory, before any editor script runs. The picker in
  * @wordpress/editor consumes this URL.
  */
 function gutenberg_emojibase_data_register_inline_script() {
