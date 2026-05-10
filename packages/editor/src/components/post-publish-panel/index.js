@@ -25,13 +25,13 @@ import { store as editorStore } from '../../store';
 /**
  * Renders a panel for publishing a post.
  *
- * @param {Object}      props                        Component props.
- * @param {boolean}     [props.forceIsDirty]         Whether to force the dirty state.
- * @param {()=>void}    props.onClose                Called when the panel requests to close.
- * @param {WPComponent} [props.PostPublishExtension] Component rendered after publishing.
- * @param {WPComponent} [props.PrePublishExtension]  Component rendered before publishing.
+ * @param {Object}              props                        Component props.
+ * @param {boolean}             [props.forceIsDirty]         Whether to force the dirty state.
+ * @param {()=>void}            props.onClose                Called when the panel requests to close.
+ * @param {React.ComponentType} [props.PostPublishExtension] Component rendered after publishing.
+ * @param {React.ComponentType} [props.PrePublishExtension]  Component rendered before publishing.
  *
- * @return {Element} The post publish panel.
+ * @return {React.JSX.Element} The post publish panel.
  */
 export default function PostPublishPanel( {
 	forceIsDirty,
@@ -97,7 +97,9 @@ export default function PostPublishPanel( {
 	}, [] );
 
 	// Auto-collapse the publish sidebar when a post is published and the user
-	// makes an edit, or when the edited post changes.
+	// makes an edit, or when the edited post changes. The panel only mounts
+	// for unpublished posts, so `isPublished && isDirty` cannot be true on
+	// mount — it implies a publish-then-edit transition.
 	const prevPostIdRef = useRef( currentPostId );
 	const stableOnClose = useEvent( onClose );
 	useEffect( () => {

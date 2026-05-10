@@ -1255,12 +1255,12 @@ _Parameters_
 -   _props_ `Object`: Component props.
 -   _props.forceIsDirty_ `[boolean]`: Whether to force the dirty state.
 -   _props.onClose_ `()=>void`: Called when the panel requests to close.
--   _props.PostPublishExtension_ `[WPComponent]`: Component rendered after publishing.
--   _props.PrePublishExtension_ `[WPComponent]`: Component rendered before publishing.
+-   _props.PostPublishExtension_ `[React.ComponentType]`: Component rendered after publishing.
+-   _props.PrePublishExtension_ `[React.ComponentType]`: Component rendered before publishing.
 
 _Returns_
 
--   `Element`: The post publish panel.
+-   `React.JSX.Element`: The post publish panel.
 
 ### PostSavedState
 
