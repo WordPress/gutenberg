@@ -896,15 +896,40 @@ test.describe( 'Block Notes', () => {
 			// Remove the reaction.
 			await reactionButton.click();
 			await expect( reactionButton ).toBeHidden();
+			await expect(
+				page
+					.getByRole( 'button', { name: 'Dismiss this notice' } )
+					.filter( { hasText: 'Reaction removed.' } )
+			).toBeVisible();
 
-			// Add the same reaction again. This used to fail because the
-			// parent note's cached `reaction_summary` still reported the
-			// removed heart as `reacted`, so the toggle attempted to
-			// delete a now-missing comment record instead of adding.
+			// Add the same reaction again. This used to fail two ways:
+			// 1) the parent note's cached `reaction_summary` still
+			//    reported the removed heart as `reacted`, so the toggle
+			//    attempted to delete a now-missing comment record
+			//    instead of routing to add; and 2) the server's
+			//    duplicate-reaction guard included trashed comments,
+			//    so the just-removed reaction blocked the re-add with
+			//    `rest_comment_duplicate_reaction` ("You have already
+			//    reacted with this emoji").
 			await blockNoteUtils.addReactionToComment( 'Heart' );
 			await expect( reactionButton ).toBeVisible();
 			await expect( reactionButton ).toContainText( '❤' );
 			await expect( reactionButton ).toContainText( '1' );
+
+			// Both adds must have surfaced a success snackbar (initial
+			// add + re-add), and the duplicate-reaction error must
+			// never appear — pins both fixes (client refetch + server
+			// status='approve' query) against regression.
+			await expect(
+				page
+					.getByRole( 'button', { name: 'Dismiss this notice' } )
+					.filter( { hasText: 'Reaction added.' } )
+			).toHaveCount( 2 );
+			await expect(
+				page.locator( '.components-snackbar__content', {
+					hasText: /already reacted/i,
+				} )
+			).toHaveCount( 0 );
 		} );
 
 		test( 'can remove own emoji reaction by clicking it', async ( {
