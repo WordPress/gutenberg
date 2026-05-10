@@ -33,9 +33,21 @@ type Interesting =
  * iptc: Keep IPTC metadata.
  * icc: Keep ICC metadata.
  * other: Keep other metadata (e.g. PNG comments and some TIFF tags).
+ * gainmap: Keep gainmap metadata (UltraHDR JPEG).
  * all: Keep all metadata.
+ *
+ * Multiple values can be combined with `|`, e.g. `'icc|gainmap'`.
  */
-type ForeignKeep = 'none' | 'exif' | 'xmp' | 'iptc' | 'icc' | 'other' | 'all';
+type ForeignKeepValue =
+	| 'none'
+	| 'exif'
+	| 'xmp'
+	| 'iptc'
+	| 'icc'
+	| 'other'
+	| 'gainmap'
+	| 'all';
+type ForeignKeep = ForeignKeepValue | `${ ForeignKeepValue }|${ string }`;
 
 /**
  * The rendering intent.'absolute' is best for

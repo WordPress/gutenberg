@@ -204,6 +204,11 @@ function applyResizeAndCrop<
 		width: number;
 		height: number;
 		crop: ( ...args: number[] ) => T;
+		// Optional UltraHDR support: present on Vips.Image instances when the
+		// source has an embedded gain map.
+		gainmap?: T;
+		copy?: () => T;
+		setImage?: ( name: string, value: T ) => void;
 	},
 >(
 	resize: ImageSizeCrop,
@@ -281,7 +286,32 @@ function applyResizeAndCrop<
 	const cropWidth = Math.min( image.width, target.width );
 	const cropHeight = Math.min( image.height, target.height );
 
-	return image.crop( left, top, cropWidth, cropHeight );
+	const cropped = image.crop( left, top, cropWidth, cropHeight );
+
+	// For UltraHDR sources, also crop the attached gain map. The gain map
+	// can be smaller than the main image, so we scale the crop coordinates
+	// to its resolution. See:
+	// https://www.libvips.org/API/current/uhdr.html#a-la-carte-processing
+	const gainmap = image.gainmap;
+	const copy = cropped.copy;
+	const setImage = cropped.setImage;
+	if ( ! gainmap || ! copy || ! setImage ) {
+		return cropped;
+	}
+
+	const hscale = gainmap.width / image.width;
+	const vscale = gainmap.height / image.height;
+	const newGainmap = gainmap.crop(
+		left * hscale,
+		top * vscale,
+		cropWidth * hscale,
+		cropHeight * vscale
+	);
+
+	// setImage mutates, so produce a unique copy first.
+	const result = copy.call( cropped );
+	setImage.call( result, 'gainmap', newGainmap );
+	return result;
 }
 
 /**
@@ -296,11 +326,9 @@ function buildSaveOptions(
 	quality: number
 ): SaveOptions< typeof type > {
 	const saveOptions: SaveOptions< typeof type > = {
-		// Strip metadata except ICC color profiles,
+		// Strip metadata except ICC color profiles or gainmaps,
 		// matching WordPress core's behavior.
-// Strip metadata except ICC color profiles or gainmaps,
-// matching WordPress core's behavior.
-keep: 'icc|gainmap',
+		keep: 'icc|gainmap',
 	};
 
 	if ( supportsQuality( type ) ) {
@@ -318,17 +346,17 @@ keep: 'icc|gainmap',
 /**
  * Resizes an image using vips.
  *
- * @param id         Item ID.
- * @param buffer     Original file buffer.
- * @param type       Mime type.
- * @param resize     Resize options.
- * @param smartCrop  Whether to use smart cropping (i.e. saliency-aware).
- * @param quality    Desired quality (0-1).
- * @param isUltraHdr Whether the input is an UltraHDR JPEG with a gain map.
- *                   When true, the image is loaded via uhdrload so libvips
- *                   resizes the gain map alongside the base image, and the
- *                   output is saved via uhdrsave so the gain map is
- *                   re-embedded in the resulting JPEG.
+ * UltraHDR JPEGs are auto-detected and preserved: libvips's `uhdrload*`
+ * has higher priority than `jpegload*`, so `newFromBuffer`/`thumbnailBuffer`
+ * decode the gain map alongside the base image, and `jpegsave*` delegates
+ * to `uhdrsave*` on output when a gain map is attached.
+ *
+ * @param id        Item ID.
+ * @param buffer    Original file buffer.
+ * @param type      Mime type.
+ * @param resize    Resize options.
+ * @param smartCrop Whether to use smart cropping (i.e. saliency-aware).
+ * @param quality   Desired quality (0-1).
  * @return Processed file data plus the old and new dimensions.
  */
 export async function resizeImage(
@@ -337,8 +365,7 @@ export async function resizeImage(
 	type: string,
 	resize: ImageSizeCrop,
 	smartCrop = false,
-	quality = 0.82,
-	isUltraHdr = false
+	quality = 0.82
 ): Promise< {
 	buffer: ArrayBuffer | ArrayBufferLike;
 	width: number;
@@ -370,11 +397,7 @@ export async function resizeImage(
 			}
 		};
 
-		// For UltraHDR JPEGs, load via uhdrload so the gain map is decoded
-		// alongside the base image and tracked through the thumbnail pipeline.
-		let image = isUltraHdr
-			? vips.Image.uhdrloadBuffer( buffer )
-			: vips.Image.newFromBuffer( buffer, strOptions, loadOptions );
+		let image = vips.Image.newFromBuffer( buffer, strOptions, loadOptions );
 
 		image.onProgress = onProgress;
 
@@ -386,18 +409,6 @@ export async function resizeImage(
 			pageHeight,
 			smartCrop,
 			( resizeWidth, thumbnailOptions ) => {
-				// thumbnailImage downsizes the already-loaded image (including
-				// the attached gain map for UltraHDR inputs), avoiding a
-				// reload via thumbnailBuffer which would not preserve the
-				// gain map link for UltraHDR sources.
-				if ( isUltraHdr ) {
-					const thumb = image.thumbnailImage(
-						resizeWidth,
-						thumbnailOptions
-					);
-					thumb.onProgress = onProgress;
-					return thumb;
-				}
 				if ( strOptions ) {
 					thumbnailOptions.option_string = strOptions;
 				}
@@ -411,17 +422,8 @@ export async function resizeImage(
 			}
 		);
 
-		let outBuffer: Uint8Array;
-		if ( isUltraHdr ) {
-			// Default metadata retention — UltraHDR's gain map structure is
-			// stored in XMP, so stripping metadata would invalidate the file.
-			outBuffer = image.uhdrsaveBuffer( {
-				Q: quality * 100,
-			} );
-		} else {
-			const saveOptions = buildSaveOptions( type, quality );
-			outBuffer = image.writeToBuffer( `.${ ext }`, saveOptions );
-		}
+		const saveOptions = buildSaveOptions( type, quality );
+		const outBuffer = image.writeToBuffer( `.${ ext }`, saveOptions );
 
 		const result = {
 			buffer: outBuffer.buffer,

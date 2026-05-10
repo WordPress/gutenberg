@@ -944,10 +944,6 @@ export function resizeCropItem( id: QueueItemId, args?: ResizeCropItemArgs ) {
 		const addSuffix = Boolean( item.parentId );
 		// Add '-scaled' suffix for big image threshold resizing.
 		const scaledSuffix = Boolean( args.isThresholdResize );
-		// UltraHDR status is tracked on the parent item ID. For sub-sizes,
-		// look up the parentId; for threshold-resize on the parent itself,
-		// look up its own id.
-		const isUltraHdr = ultraHdrItems.has( item.parentId ?? item.id );
 
 		try {
 			const file = await vipsResizeImage(
@@ -957,9 +953,7 @@ export function resizeCropItem( id: QueueItemId, args?: ResizeCropItemArgs ) {
 				false, // smartCrop
 				addSuffix,
 				item.abortController?.signal,
-				scaledSuffix,
-				undefined, // quality (defaults inside vipsResizeImage)
-				isUltraHdr
+				scaledSuffix
 			);
 
 			const blobUrl = createBlobURL( file );

@@ -106,6 +106,8 @@ _Returns_
 
 Resizes an image using vips.
 
+UltraHDR JPEGs are auto-detected and preserved: libvips's `uhdrload*` has higher priority than `jpegload*`, so `newFromBuffer`/`thumbnailBuffer` decode the gain map alongside the base image, and `jpegsave*` delegates to `uhdrsave*` on output when a gain map is attached.
+
 _Parameters_
 
 -   _id_ `ItemId`: Item ID.
@@ -114,7 +116,6 @@ _Parameters_
 -   _resize_ `ImageSizeCrop`: Resize options.
 -   _smartCrop_ Whether to use smart cropping (i.e. saliency-aware).
 -   _quality_ Desired quality (0-1).
--   _isUltraHdr_ Whether the input is an UltraHDR JPEG with a gain map. When true, the image is loaded via uhdrload so libvips resizes the gain map alongside the base image, and the output is saved via uhdrsave so the gain map is re-embedded in the resulting JPEG.
 
 _Returns_
 
@@ -229,6 +230,8 @@ _Returns_
 
 Resizes an image using vips.
 
+UltraHDR JPEGs are auto-detected and preserved: libvips's `uhdrload*` has higher priority than `jpegload*`, so `newFromBuffer`/`thumbnailBuffer` decode the gain map alongside the base image, and `jpegsave*` delegates to `uhdrsave*` on output when a gain map is attached.
+
 _Parameters_
 
 -   _id_ `ItemId`: Item ID.
@@ -237,7 +240,6 @@ _Parameters_
 -   _resize_ `ImageSizeCrop`: Resize options.
 -   _smartCrop_ Whether to use smart cropping (i.e. saliency-aware).
 -   _quality_ Desired quality (0-1).
--   _isUltraHdr_ Whether the input is an UltraHDR JPEG with a gain map. When true, the image is loaded via uhdrload so libvips resizes the gain map alongside the base image, and the output is saved via uhdrsave so the gain map is re-embedded in the resulting JPEG.
 
 _Returns_
 

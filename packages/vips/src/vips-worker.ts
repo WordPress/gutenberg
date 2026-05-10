@@ -103,15 +103,15 @@ export async function vipsCompressImage(
 /**
  * Resizes an image using vips in a worker.
  *
- * @param id         Item ID.
- * @param buffer     Original file buffer.
- * @param type       Mime type.
- * @param resize     Resize options.
- * @param smartCrop  Whether to use smart cropping (i.e. saliency-aware).
- * @param quality    Desired quality (0-1). Defaults to 0.82.
- * @param isUltraHdr Whether the input is an UltraHDR JPEG with a gain map.
- *                   When true, libvips loads via uhdrload and saves via
- *                   uhdrsave so the gain map is preserved through resize.
+ * UltraHDR JPEGs are auto-detected by libvips and their gain map is
+ * preserved through the resize.
+ *
+ * @param id        Item ID.
+ * @param buffer    Original file buffer.
+ * @param type      Mime type.
+ * @param resize    Resize options.
+ * @param smartCrop Whether to use smart cropping (i.e. saliency-aware).
+ * @param quality   Desired quality (0-1). Defaults to 0.82.
  * @return Processed file data plus the old and new dimensions.
  */
 export async function vipsResizeImage(
@@ -120,8 +120,7 @@ export async function vipsResizeImage(
 	type: string,
 	resize: ImageSizeCrop,
 	smartCrop = false,
-	quality = 0.82,
-	isUltraHdr = false
+	quality = 0.82
 ): Promise< {
 	buffer: ArrayBuffer | ArrayBufferLike;
 	width: number;
@@ -130,15 +129,7 @@ export async function vipsResizeImage(
 	originalHeight: number;
 } > {
 	const api = getWorkerAPI();
-	return api.resizeImage(
-		id,
-		buffer,
-		type,
-		resize,
-		smartCrop,
-		quality,
-		isUltraHdr
-	);
+	return api.resizeImage( id, buffer, type, resize, smartCrop, quality );
 }
 
 /**

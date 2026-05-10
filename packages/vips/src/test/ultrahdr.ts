@@ -7,11 +7,10 @@ const mockThumbnailImage = jest.fn();
 const mockThumbnailBuffer = jest.fn();
 const mockNewFromBuffer = jest.fn();
 const mockUhdrLoadBuffer = jest.fn();
-const mockUhdrSaveBuffer = jest.fn(
-	() => new Uint8Array( [ 0xff, 0xd8, 0xff ] )
-);
 const mockWriteToBuffer = jest.fn( () => ( { buffer: new ArrayBuffer( 0 ) } ) );
 const mockGetDouble = jest.fn();
+const mockSetImage = jest.fn();
+const mockCrop = jest.fn();
 
 class MockImage {
 	width = 100;
@@ -19,10 +18,11 @@ class MockImage {
 	pageHeight = 100;
 	gainmap: MockImage | undefined;
 	thumbnailImage = mockThumbnailImage.mockImplementation( () => this );
-	uhdrsaveBuffer = mockUhdrSaveBuffer;
 	writeToBuffer = mockWriteToBuffer;
 	getDouble = mockGetDouble;
-	crop = jest.fn( () => this );
+	crop = mockCrop.mockImplementation( () => this );
+	copy = jest.fn( () => this );
+	setImage = mockSetImage;
 }
 
 class MockVipsImage {
@@ -111,57 +111,79 @@ describe( 'UltraHDR helpers', () => {
 		} );
 	} );
 
-	describe( 'resizeImage with isUltraHdr', () => {
-		it( 'loads via uhdrloadBuffer and saves via uhdrsaveBuffer when isUltraHdr=true', async () => {
-			const image = new MockImage();
-			image.width = 1024;
-			image.pageHeight = 768;
-			image.gainmap = new MockImage();
-			mockUhdrLoadBuffer.mockReturnValueOnce( image );
-
-			const buffer = new ArrayBuffer( 16 );
-			await resizeImage(
-				'itemId',
-				buffer,
-				'image/jpeg',
-				{ width: 200, height: 0 },
-				false,
-				0.7,
-				true
-			);
-
-			// Should NOT use the regular load path.
-			expect( mockNewFromBuffer ).not.toHaveBeenCalled();
-			expect( mockThumbnailBuffer ).not.toHaveBeenCalled();
-
-			// UltraHDR path: uhdrload, then thumbnailImage on the loaded image.
-			expect( mockUhdrLoadBuffer ).toHaveBeenCalledWith( buffer );
-			expect( mockThumbnailImage ).toHaveBeenCalledWith( 200, {
-				size: 'down',
-				height: 150,
+	describe( 'resizeImage uses libvips auto-detection for UltraHDR', () => {
+		it( 'uses newFromBuffer/thumbnailBuffer/writeToBuffer regardless of UltraHDR status', async () => {
+			// libvips auto-detects UltraHDR via uhdrload's higher priority,
+			// and writeToBuffer auto-delegates to uhdrsave when a gain map
+			// is attached. No separate uhdr code path is needed here.
+			await resizeImage( 'itemId', new ArrayBuffer( 16 ), 'image/jpeg', {
+				width: 200,
+				height: 200,
 			} );
-			// Saves with quality scaled to 0..100; no `keep` so XMP gain map metadata is preserved.
-			expect( mockUhdrSaveBuffer ).toHaveBeenCalledWith( {
-				Q: 70,
-			} );
-		} );
-
-		it( 'uses the regular path when isUltraHdr=false', async () => {
-			await resizeImage(
-				'itemId',
-				new ArrayBuffer( 16 ),
-				'image/jpeg',
-				{ width: 200, height: 200 },
-				false,
-				0.82,
-				false
-			);
 
 			expect( mockUhdrLoadBuffer ).not.toHaveBeenCalled();
-			expect( mockUhdrSaveBuffer ).not.toHaveBeenCalled();
 			expect( mockNewFromBuffer ).toHaveBeenCalled();
 			expect( mockThumbnailBuffer ).toHaveBeenCalled();
 			expect( mockWriteToBuffer ).toHaveBeenCalled();
+		} );
+
+		it( 'passes keep:icc|gainmap to writeToBuffer to preserve gain maps', async () => {
+			await resizeImage( 'itemId', new ArrayBuffer( 16 ), 'image/jpeg', {
+				width: 200,
+				height: 200,
+			} );
+
+			expect( mockWriteToBuffer ).toHaveBeenCalledWith(
+				'.jpeg',
+				expect.objectContaining( { keep: 'icc|gainmap' } )
+			);
+		} );
+
+		it( 'crops the gain map alongside the main image on positional crop', async () => {
+			// Build a thumbnail with a gain map at half resolution.
+			const thumb = new MockImage();
+			thumb.width = 200;
+			thumb.height = 200;
+			thumb.pageHeight = 200;
+			const thumbGainmap = new MockImage();
+			thumbGainmap.width = 100;
+			thumbGainmap.height = 100;
+			thumb.gainmap = thumbGainmap;
+			mockThumbnailBuffer.mockImplementationOnce( () => thumb );
+
+			await resizeImage( 'itemId', new ArrayBuffer( 16 ), 'image/jpeg', {
+				width: 100,
+				height: 100,
+				crop: [ 'center', 'top' ],
+			} );
+
+			// Main image is cropped at full resolution.
+			expect( thumb.crop ).toHaveBeenCalledWith( 50, 0, 100, 100 );
+			// Gain map is cropped at its (halved) scale.
+			expect( thumbGainmap.crop ).toHaveBeenCalledWith( 25, 0, 50, 50 );
+			// Result is set as the gain map on a copy of the cropped image.
+			expect( mockSetImage ).toHaveBeenCalledWith(
+				'gainmap',
+				expect.anything()
+			);
+		} );
+
+		it( 'skips gain-map crop when no gain map is present', async () => {
+			const thumb = new MockImage();
+			thumb.width = 200;
+			thumb.height = 200;
+			thumb.pageHeight = 200;
+			// gainmap stays undefined.
+			mockThumbnailBuffer.mockImplementationOnce( () => thumb );
+
+			await resizeImage( 'itemId', new ArrayBuffer( 16 ), 'image/jpeg', {
+				width: 100,
+				height: 100,
+				crop: [ 'center', 'top' ],
+			} );
+
+			expect( thumb.crop ).toHaveBeenCalledWith( 50, 0, 100, 100 );
+			expect( mockSetImage ).not.toHaveBeenCalled();
 		} );
 	} );
 } );

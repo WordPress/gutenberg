@@ -140,6 +140,9 @@ export async function vipsGetUltraHdrInfo( buffer: ArrayBuffer ) {
 /**
  * Resizes an image using vips in a web worker.
  *
+ * UltraHDR JPEGs are auto-detected by libvips and their gain map is
+ * preserved through the resize.
+ *
  * @param id           Queue item ID.
  * @param file         File object.
  * @param resize       Resize options (width, height, crop).
@@ -148,8 +151,6 @@ export async function vipsGetUltraHdrInfo( buffer: ArrayBuffer ) {
  * @param signal       Optional abort signal to cancel the operation.
  * @param scaledSuffix Whether to add '-scaled' suffix instead of dimensions (for big image threshold).
  * @param quality      Desired quality (0-1). Defaults to 0.82.
- * @param isUltraHdr   Whether the source is an UltraHDR JPEG; routes through
- *                     uhdrload/uhdrsave so the gain map is preserved.
  * @return Resized ImageFile with dimension metadata.
  */
 export async function vipsResizeImage(
@@ -160,8 +161,7 @@ export async function vipsResizeImage(
 	addSuffix: boolean,
 	signal?: AbortSignal,
 	scaledSuffix?: boolean,
-	quality?: number,
-	isUltraHdr?: boolean
+	quality?: number
 ) {
 	if ( signal?.aborted ) {
 		throw new Error( 'Operation aborted' );
@@ -175,8 +175,7 @@ export async function vipsResizeImage(
 			file.type,
 			resize,
 			smartCrop,
-			quality,
-			isUltraHdr
+			quality
 		);
 
 	let fileName = file.name;

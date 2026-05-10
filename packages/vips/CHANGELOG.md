@@ -4,7 +4,8 @@
 
 ### New Features
 
-- Add `getUltraHdrInfo` for probing UltraHDR (ISO 21496-1 gain map) JPEGs and an `isUltraHdr` flag on `resizeImage` that routes through `uhdrloadBuffer`/`uhdrsaveBuffer` so the gain map is preserved through resize ([#74873](https://github.com/WordPress/gutenberg/pull/74873)).
+- Add `getUltraHdrInfo` for probing UltraHDR (ISO 21496-1 gain map) JPEGs ([#74873](https://github.com/WordPress/gutenberg/pull/74873)).
+- Preserve UltraHDR gain maps through `resizeImage`: libvips's `uhdrload`/`uhdrsave` priority is leveraged automatically, the save path keeps `icc|gainmap` metadata, and positional crop now also crops the attached gain map ([#74873](https://github.com/WordPress/gutenberg/pull/74873)).
 - Bump `wasm-vips` to `^0.0.17` for native UltraHDR support ([#74873](https://github.com/WordPress/gutenberg/pull/74873)).
 
 ## 1.5.0 (2026-04-29)
