@@ -70,9 +70,12 @@ import {
 } from './constants';
 import { evalAspectRatio, mediaPosition } from './utils';
 
-const { DimensionsTool, ResolutionTool, mediaEditKey } = unlock(
-	blockEditorPrivateApis
-);
+const {
+	DimensionsTool,
+	ResolutionTool,
+	mediaEditKey,
+	openMediaEditorModalKey,
+} = unlock( blockEditorPrivateApis );
 
 const scaleOptions = [
 	{
@@ -392,7 +395,21 @@ export default function Image( {
 		[ clientId ]
 	);
 	const { getBlock, getSettings } = useSelect( blockEditorStore );
-	const onNavigateToEntityRecord = getSettings().onNavigateToEntityRecord;
+	const settings = getSettings();
+	const { onNavigateToEntityRecord } = settings;
+	const openMediaEditorModal = settings[ openMediaEditorModalKey ];
+
+	const handleMediaUpdate = useCallback(
+		( { id: newId, url: newUrl } ) => {
+			if ( typeof newId === 'number' && newId !== id ) {
+				setAttributes( {
+					id: newId,
+					url: newUrl ?? url,
+				} );
+			}
+		},
+		[ id, url, setAttributes ]
+	);
 
 	const {
 		replaceBlocks,
@@ -880,7 +897,20 @@ export default function Image( {
 					) }
 					{ allowCrop && (
 						<ToolbarButton
-							onClick={ () => setIsEditingImage( true ) }
+							onClick={
+								openMediaEditorModal && id
+									? () =>
+											openMediaEditorModal( {
+												id,
+												onUpdate: handleMediaUpdate,
+											} )
+									: () => setIsEditingImage( true )
+							}
+							aria-haspopup={
+								openMediaEditorModal && id
+									? 'dialog'
+									: undefined
+							}
 							icon={ crop }
 							label={ __( 'Crop' ) }
 						/>

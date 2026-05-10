@@ -1,0 +1,492 @@
+/**
+ * External dependencies
+ */
+const path = require( 'path' );
+const fs = require( 'fs/promises' );
+const os = require( 'os' );
+const { v4: uuid } = require( 'uuid' );
+
+/**
+ * WordPress dependencies
+ */
+const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
+
+/**
+ * @typedef {import('@playwright/test').Page} Page
+ */
+
+const ASSETS_DIR = path.join( __dirname, '..', '..', '..', 'assets' );
+
+test.use( {
+	mediaProcessingUtils: async ( { page }, use ) => {
+		await use( new MediaProcessingUtils( { page } ) );
+	},
+} );
+
+/**
+ * Shared fixture for client-side media processing tests.
+ */
+class MediaProcessingUtils {
+	constructor( { page } ) {
+		/** @type {Page} */
+		this.page = page;
+	}
+
+	/**
+	 * Upload a file to the given input element.
+	 * Copies the file to a temp directory with a unique name to avoid collisions.
+	 *
+	 * @param {import('@playwright/test').Locator} inputElement File input locator.
+	 * @param {string}                             fileName     File name in the assets directory.
+	 * @return {Promise<string>} The unique file name (without extension).
+	 */
+	async upload( inputElement, fileName ) {
+		const tmpDirectory = await fs.mkdtemp(
+			path.join( os.tmpdir(), 'gutenberg-test-media-' )
+		);
+		const uniqueName = uuid();
+		const extension = path.extname( fileName );
+		const tmpFileName = path.join( tmpDirectory, uniqueName + extension );
+		await fs.copyFile( path.join( ASSETS_DIR, fileName ), tmpFileName );
+		await inputElement.setInputFiles( tmpFileName );
+		return uniqueName;
+	}
+
+	/**
+	 * Wait for the upload queue to be empty.
+	 *
+	 * @param {number} timeout Timeout in milliseconds.
+	 */
+	async waitForUploadQueueEmpty( timeout = 120000 ) {
+		await this.page.waitForFunction(
+			() => {
+				const items = window.wp.data
+					.select( 'core/upload-media' )
+					.getItems();
+				return items.length === 0;
+			},
+			{ timeout }
+		);
+	}
+
+	/**
+	 * Skip the test unless the client-side media processing pipeline is the
+	 * active upload path. This mirrors the gate used in the editor's
+	 * media-upload util: the global flag must be set AND the browser must
+	 * meet the feature detection requirements (cross-origin isolation,
+	 * SharedArrayBuffer, Web Workers, WebAssembly).
+	 *
+	 * @param {import('@playwright/test').TestInfo} testInstance The test object for skipping.
+	 */
+	async skipIfClientSideMediaInactive( testInstance ) {
+		const isActive = await this.page.evaluate( () => {
+			if ( ! window.__clientSideMediaProcessing ) {
+				return false;
+			}
+			// Prefer the package's own detection when available so the
+			// gate stays in sync with the editor's runtime decision.
+			if (
+				window.wp?.uploadMedia &&
+				typeof window.wp.uploadMedia.isClientSideMediaSupported ===
+					'function'
+			) {
+				return window.wp.uploadMedia.isClientSideMediaSupported();
+			}
+			// Fall back to the core preconditions for CSM. These are the
+			// signals the package's feature detection inspects first.
+			return (
+				window.crossOriginIsolated === true &&
+				typeof SharedArrayBuffer !== 'undefined' &&
+				typeof WebAssembly !== 'undefined' &&
+				typeof Worker !== 'undefined'
+			);
+		} );
+		testInstance.skip(
+			! isActive,
+			'Client-side media processing is not active in this environment'
+		);
+	}
+
+	/**
+	 * Get the image ID from the currently selected block's attributes.
+	 *
+	 * @return {Promise<number|undefined>} The image attachment ID.
+	 */
+	async getSelectedBlockImageId() {
+		return await this.page.evaluate(
+			() =>
+				window.wp.data.select( 'core/block-editor' ).getSelectedBlock()
+					?.attributes?.id
+		);
+	}
+
+	/**
+	 * Fetch media details from the REST API.
+	 *
+	 * @param {Object} requestUtils The requestUtils fixture.
+	 * @param {number} imageId      The attachment ID.
+	 * @return {Promise<Object>} Media details from the REST API.
+	 */
+	async getMediaDetails( requestUtils, imageId ) {
+		return await requestUtils.rest( {
+			method: 'GET',
+			path: `/wp/v2/media/${ imageId }`,
+		} );
+	}
+
+	/**
+	 * Insert a core/image block, upload an asset, and return its REST media object.
+	 *
+	 * @param {Object} editor       The editor fixture.
+	 * @param {Object} requestUtils The requestUtils fixture.
+	 * @param {string} fileName     File name in the assets directory.
+	 * @return {Promise<Object>} REST media object for the uploaded attachment.
+	 */
+	async uploadImageAndGetMedia( editor, requestUtils, fileName ) {
+		await editor.insertBlock( { name: 'core/image' } );
+
+		const imageBlock = editor.canvas.locator(
+			'role=document[name="Block: Image"i]'
+		);
+		await expect( imageBlock ).toBeVisible();
+
+		await this.upload(
+			imageBlock.locator( 'data-testid=form-file-upload-input' ),
+			fileName
+		);
+
+		const image = imageBlock.getByRole( 'img', {
+			name: 'This image has an empty alt attribute',
+		} );
+		await expect( image ).toBeVisible();
+		await expect( image ).toHaveAttribute( 'src', /^https?:\/\//, {
+			timeout: 30_000,
+		} );
+
+		await this.waitForUploadQueueEmpty();
+
+		const imageId = await this.getSelectedBlockImageId();
+		expect( imageId ).toBeDefined();
+
+		return await this.getMediaDetails( requestUtils, imageId );
+	}
+}
+
+test.describe( 'Client-side media processing', () => {
+	test.beforeAll( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllMedia();
+	} );
+
+	test.beforeEach( async ( { admin, mediaProcessingUtils } ) => {
+		await admin.createNewPost();
+		// Every test in this describe exercises the CSM upload pipeline.
+		// Skip up-front if it isn't the active path so we never assert on
+		// server-side fallback behavior (covered by the image/gallery e2es).
+		await mediaProcessingUtils.skipIfClientSideMediaInactive( test );
+	} );
+
+	test.afterEach( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllMedia();
+	} );
+
+	test( 'preserves a JPEG below the size threshold', async ( {
+		editor,
+		mediaProcessingUtils,
+		requestUtils,
+	} ) => {
+		const media = await mediaProcessingUtils.uploadImageAndGetMedia(
+			editor,
+			requestUtils,
+			'1024x768_e2e_test_image_size.jpeg'
+		);
+
+		expect( media.mime_type ).toBe( 'image/jpeg' );
+		expect( media.media_details.width ).toBe( 1024 );
+		expect( media.media_details.height ).toBe( 768 );
+		expect( media.source_url ).not.toContain( '-scaled' );
+	} );
+
+	test( 'preserves an opaque PNG without format conversion', async ( {
+		editor,
+		mediaProcessingUtils,
+		requestUtils,
+	} ) => {
+		const media = await mediaProcessingUtils.uploadImageAndGetMedia(
+			editor,
+			requestUtils,
+			'200x150_e2e_test_image_opaque.png'
+		);
+
+		expect( media.mime_type ).toBe( 'image/png' );
+		expect( media.media_details.width ).toBe( 200 );
+		expect( media.media_details.height ).toBe( 150 );
+	} );
+
+	test( 'preserves an animated GIF', async ( {
+		editor,
+		mediaProcessingUtils,
+		requestUtils,
+	} ) => {
+		const media = await mediaProcessingUtils.uploadImageAndGetMedia(
+			editor,
+			requestUtils,
+			'100x80_e2e_test_image_animated.gif'
+		);
+
+		expect( media.mime_type ).toBe( 'image/gif' );
+		expect( media.media_details.width ).toBe( 100 );
+		expect( media.media_details.height ).toBe( 80 );
+	} );
+
+	test( 'decodes and uploads a WebP image as WebP', async ( {
+		editor,
+		mediaProcessingUtils,
+		requestUtils,
+	} ) => {
+		const media = await mediaProcessingUtils.uploadImageAndGetMedia(
+			editor,
+			requestUtils,
+			'200x150_e2e_test_image_decode.webp'
+		);
+
+		expect( media.mime_type ).toBe( 'image/webp' );
+		expect( media.media_details.width ).toBe( 200 );
+		expect( media.media_details.height ).toBe( 150 );
+	} );
+
+	test( 'decodes and uploads an AVIF image as AVIF', async ( {
+		editor,
+		mediaProcessingUtils,
+		requestUtils,
+	} ) => {
+		const media = await mediaProcessingUtils.uploadImageAndGetMedia(
+			editor,
+			requestUtils,
+			'200x150_e2e_test_image_decode.avif'
+		);
+
+		expect( media.mime_type ).toBe( 'image/avif' );
+		expect( media.media_details.width ).toBe( 200 );
+		expect( media.media_details.height ).toBe( 150 );
+	} );
+
+	test( 'scales oversized images and generates the standard sub-sizes', async ( {
+		editor,
+		mediaProcessingUtils,
+		requestUtils,
+	} ) => {
+		const media = await mediaProcessingUtils.uploadImageAndGetMedia(
+			editor,
+			requestUtils,
+			'5000x4000_e2e_test_image_oversized.jpeg'
+		);
+
+		// 5000x4000 must be scaled to fit within the 2560 default threshold.
+		// CSM scales the longest edge to 2560 and writes a -scaled file.
+		expect( media.source_url ).toContain( '-scaled' );
+		expect( media.media_details.width ).toBe( 2560 );
+		expect( media.media_details.height ).toBe( 2048 );
+
+		// The unscaled original is preserved alongside the scaled main file.
+		expect( media.media_details.original_image ).toBeDefined();
+
+		// CSM must produce the WordPress default sub-sizes.
+		const sizes = media.media_details.sizes;
+		expect( sizes.thumbnail ).toBeDefined();
+		expect( sizes.medium ).toBeDefined();
+		expect( sizes.large ).toBeDefined();
+
+		// Default thumbnail is 150x150 (cropped).
+		expect( sizes.thumbnail.width ).toBe( 150 );
+		expect( sizes.thumbnail.height ).toBe( 150 );
+
+		// Default medium fits within 300x300 (preserves aspect ratio).
+		expect( sizes.medium.width ).toBeLessThanOrEqual( 300 );
+		expect( sizes.medium.height ).toBeLessThanOrEqual( 300 );
+
+		// Default large fits within 1024x1024 (preserves aspect ratio).
+		expect( sizes.large.width ).toBeLessThanOrEqual( 1024 );
+		expect( sizes.large.height ).toBeLessThanOrEqual( 1024 );
+	} );
+
+	test( 'uploads multiple images via gallery', async ( {
+		page,
+		editor,
+		mediaProcessingUtils,
+	} ) => {
+		await editor.insertBlock( { name: 'core/gallery' } );
+
+		const galleryBlock = editor.canvas.locator(
+			'role=document[name="Block: Gallery"i]'
+		);
+		await expect( galleryBlock ).toBeVisible();
+
+		const uploadInput = galleryBlock.locator(
+			'data-testid=form-file-upload-input'
+		);
+
+		const tmpDirectory = await fs.mkdtemp(
+			path.join( os.tmpdir(), 'gutenberg-test-gallery-' )
+		);
+		const files = [
+			'1024x768_e2e_test_image_size.jpeg',
+			'200x150_e2e_test_image_opaque.png',
+			'10x10_e2e_test_image_z9T8jK.png',
+		];
+		const tmpFiles = [];
+
+		for ( const file of files ) {
+			const uniqueName = uuid();
+			const ext = path.extname( file );
+			const tmpFile = path.join( tmpDirectory, uniqueName + ext );
+			await fs.copyFile( path.join( ASSETS_DIR, file ), tmpFile );
+			tmpFiles.push( tmpFile );
+		}
+
+		await uploadInput.setInputFiles( tmpFiles );
+
+		await mediaProcessingUtils.waitForUploadQueueEmpty();
+
+		const images = galleryBlock.locator(
+			'role=document[name="Block: Image"i]'
+		);
+		await expect( images ).toHaveCount( files.length, { timeout: 60_000 } );
+
+		// CSM holds the post-save lock until every queued upload finishes.
+		// The Publish button should be enabled after the queue drains.
+		const publishButton = page.locator(
+			'role=region[name="Editor top bar"i] >> role=button[name="Publish"i]'
+		);
+		await expect( publishButton ).toBeEnabled( { timeout: 60_000 } );
+	} );
+
+	test( 'rejects an unsupported file type', async ( { page, editor } ) => {
+		await editor.insertBlock( { name: 'core/image' } );
+
+		const imageBlock = editor.canvas.locator(
+			'role=document[name="Block: Image"i]'
+		);
+		await expect( imageBlock ).toBeVisible();
+
+		const tmpDirectory = await fs.mkdtemp(
+			path.join( os.tmpdir(), 'gutenberg-test-invalid-' )
+		);
+		const tmpFile = path.join( tmpDirectory, 'test.txt' );
+		await fs.writeFile( tmpFile, 'This is not an image.' );
+
+		await imageBlock
+			.locator( 'data-testid=form-file-upload-input' )
+			.setInputFiles( tmpFile );
+
+		const snackbar = page.locator( '.components-snackbar-list' );
+		await expect( snackbar ).toBeVisible( { timeout: 10_000 } );
+	} );
+
+	test( 'converts an opaque PNG to JPEG when image_editor_output_format is filtered', async ( {
+		page,
+		editor,
+		mediaProcessingUtils,
+		requestUtils,
+	} ) => {
+		await requestUtils.activatePlugin(
+			'gutenberg-test-plugin-image-format-conversion-png-to-jpeg'
+		);
+
+		try {
+			await page.reload();
+			// Re-check after the reload — the plugin doesn't change CSM
+			// availability, but the page state is fresh.
+			await mediaProcessingUtils.skipIfClientSideMediaInactive( test );
+
+			const media = await mediaProcessingUtils.uploadImageAndGetMedia(
+				editor,
+				requestUtils,
+				'200x150_e2e_test_image_opaque.png'
+			);
+
+			// With the filter active and no transparency, CSM transcodes
+			// sub-sizes to JPEG and the server transcodes the main file.
+			expect( media.mime_type ).toBe( 'image/jpeg' );
+		} finally {
+			await requestUtils.deactivatePlugin(
+				'gutenberg-test-plugin-image-format-conversion-png-to-jpeg'
+			);
+		}
+	} );
+
+	test( 'preserves a transparent PNG even when PNG-to-JPEG is filtered', async ( {
+		page,
+		editor,
+		mediaProcessingUtils,
+		requestUtils,
+	} ) => {
+		await requestUtils.activatePlugin(
+			'gutenberg-test-plugin-image-format-conversion-png-to-jpeg'
+		);
+
+		try {
+			await page.reload();
+			await mediaProcessingUtils.skipIfClientSideMediaInactive( test );
+
+			const media = await mediaProcessingUtils.uploadImageAndGetMedia(
+				editor,
+				requestUtils,
+				'200x150_e2e_test_image_transparent.png'
+			);
+
+			// CSM detects the alpha channel and skips the JPEG transcode to
+			// preserve transparency.
+			expect( media.mime_type ).toBe( 'image/png' );
+		} finally {
+			await requestUtils.deactivatePlugin(
+				'gutenberg-test-plugin-image-format-conversion-png-to-jpeg'
+			);
+		}
+	} );
+
+	test( 'converts a JPEG to WebP when image_editor_output_format is filtered', async ( {
+		page,
+		editor,
+		mediaProcessingUtils,
+		requestUtils,
+	} ) => {
+		await requestUtils.activatePlugin(
+			'gutenberg-test-plugin-image-format-conversion-jpeg-to-webp'
+		);
+
+		try {
+			await page.reload();
+			await mediaProcessingUtils.skipIfClientSideMediaInactive( test );
+
+			const media = await mediaProcessingUtils.uploadImageAndGetMedia(
+				editor,
+				requestUtils,
+				'1024x768_e2e_test_image_size.jpeg'
+			);
+
+			expect( media.mime_type ).toBe( 'image/webp' );
+		} finally {
+			await requestUtils.deactivatePlugin(
+				'gutenberg-test-plugin-image-format-conversion-jpeg-to-webp'
+			);
+		}
+	} );
+
+	test( 'auto-rotates images based on EXIF orientation', async ( {
+		editor,
+		mediaProcessingUtils,
+		requestUtils,
+	} ) => {
+		// EXIF orientation=6 means a 90° clockwise rotation. The asset is
+		// stored 1024x768 in pixels but should land 768x1024 after CSM
+		// applies the EXIF-driven rotation.
+		const media = await mediaProcessingUtils.uploadImageAndGetMedia(
+			editor,
+			requestUtils,
+			'1024x768_e2e_test_image_rotated.jpeg'
+		);
+
+		expect( media.media_details.width ).toBe( 768 );
+		expect( media.media_details.height ).toBe( 1024 );
+	} );
+} );

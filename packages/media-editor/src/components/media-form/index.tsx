@@ -4,6 +4,8 @@
 import { DataForm } from '@wordpress/dataviews';
 import type { Form, Field } from '@wordpress/dataviews';
 import { Spinner, __experimentalVStack as VStack } from '@wordpress/components';
+import { VisuallyHidden } from '@wordpress/ui';
+import { __ } from '@wordpress/i18n';
 import type { ReactNode } from 'react';
 
 /**
@@ -74,6 +76,9 @@ export default function MediaForm( {
 	return (
 		<div className="media-editor-form">
 			<VStack spacing={ 4 }>
+				<VisuallyHidden render={ <h2 /> }>
+					{ __( 'Media details' ) }
+				</VisuallyHidden>
 				{ header }
 				<DataForm
 					data={ media }

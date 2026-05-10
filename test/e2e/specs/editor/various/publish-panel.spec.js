@@ -19,15 +19,17 @@ test.describe( 'Post publish panel', () => {
 		} );
 
 		// Find and click the Publish panel toggle button.
-		const publishPanelToggleButton = page.locator(
-			'role=region[name="Editor top bar"i] >> role=button[name="Publish"i]'
-		);
+		const publishPanelToggleButton = page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'Publish', exact: true } );
 		await publishPanelToggleButton.click();
 
 		// Click the Cancel button.
-		await page.click(
-			'role=region[name="Editor publish"i] >> role=button[name="Cancel"i]'
-		);
+		const cancelButton = page
+			.getByRole( 'region', { name: 'Editor publish' } )
+			.getByRole( 'button', { name: 'Cancel' } );
+		await expect( cancelButton ).toBeEnabled();
+		await cancelButton.click();
 
 		// Test focus is moved back to the Publish panel toggle button.
 		await expect( publishPanelToggleButton ).toBeFocused();
@@ -46,15 +48,16 @@ test.describe( 'Post publish panel', () => {
 		await editor.publishPost();
 
 		// Close the publish panel.
-		await page.click(
-			'role=region[name="Editor publish"i] >> role=button[name="Close panel"i]'
-		);
+		await page
+			.getByRole( 'region', { name: 'Editor publish' } )
+			.getByRole( 'button', { name: 'Close panel' } )
+			.click();
 
 		// Test focus is moved back to the Publish panel toggle button.
 		await expect(
-			page.locator(
-				'role=region[name="Editor top bar"i] >> role=button[name="Save"i]'
-			)
+			page
+				.getByRole( 'region', { name: 'Editor top bar' } )
+				.getByRole( 'button', { name: 'Save' } )
 		).toBeFocused();
 	} );
 

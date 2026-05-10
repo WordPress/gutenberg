@@ -220,7 +220,7 @@ test.describe( 'Collaboration - Notes Sync', () => {
 
 		// User B should see both the main note content and the reply.
 		await expect(
-			page2.locator( '.editor-collab-sidebar-panel__user-comment' ).last()
+			page2.locator( '.editor-collab-sidebar-panel__note-content' ).last()
 		).toHaveText( 'A reply to the note', { timeout: 5000 } );
 	} );
 } );

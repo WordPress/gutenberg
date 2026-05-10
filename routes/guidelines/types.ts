@@ -42,9 +42,6 @@ export interface GuidelineAccordionProps {
 	title: string;
 	description: string;
 	children: ReactNode;
-	contentId?: string;
-	headingId?: string;
-	descriptionId?: string;
 }
 
 export interface GuidelinesRevision {
@@ -54,11 +51,4 @@ export interface GuidelinesRevision {
 	_embedded?: {
 		author: Array< { name: string } >;
 	};
-}
-
-export interface GuidelineAccordionFormProps {
-	slug: string;
-	contentId?: string; // Used for a11y.
-	headingId?: string; // Used for a11y.
-	descriptionId?: string;
 }
