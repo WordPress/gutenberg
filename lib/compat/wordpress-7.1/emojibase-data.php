@@ -104,6 +104,12 @@ function gutenberg_emoji_picker_label_overrides_register_inline_script() {
 		$defaults
 	);
 
+	// Coerce defensively: a misbehaving filter callback that returns
+	// non-string values would otherwise crash the picker's JS-side
+	// label handling (`label.toLowerCase()` in searchEmojis()).
+	$overrides = is_array( $overrides ) ? $overrides : array();
+	$overrides = array_filter( $overrides, 'is_string' );
+
 	wp_add_inline_script(
 		'wp-editor',
 		'window.gutenbergEmojiLabelOverrides = ' . wp_json_encode( (object) $overrides ) . ';',

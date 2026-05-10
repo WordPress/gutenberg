@@ -11,7 +11,7 @@ import { speak } from '@wordpress/a11y';
  * from the directory listing of the `emojibase-data` npm package, kept
  * in sync with the `LOCALES` set copied by `bin/copy-emojibase-data.mjs`.
  */
-const EMOJIBASE_LOCALES = new Set( [
+export const EMOJIBASE_LOCALES = new Set( [
 	'bn',
 	'da',
 	'de',

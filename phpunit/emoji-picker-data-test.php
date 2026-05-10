@@ -123,6 +123,55 @@ class Emoji_Picker_Data_Test extends WP_UnitTestCase {
 		remove_filter( 'gutenberg_emoji_picker_label_overrides', $callback );
 	}
 
+	/**
+	 * @covers ::gutenberg_emoji_picker_label_overrides_register_inline_script
+	 */
+	public function test_filter_drops_non_string_values() {
+		$callback = static function () {
+			return array(
+				'1F600' => 'Grin',                 // Kept.
+				'1F44D' => array( 'array value' ), // Dropped.
+				'1F389' => 42,                     // Dropped.
+				'1F680' => 'Rocket',               // Kept.
+			);
+		};
+		add_filter( 'gutenberg_emoji_picker_label_overrides', $callback );
+
+		gutenberg_emoji_picker_label_overrides_register_inline_script();
+
+		$inline  = wp_scripts()->get_data( 'wp-editor', 'before' );
+		$payload = is_array( $inline ) ? implode( "\n", $inline ) : (string) $inline;
+
+		$this->assertStringContainsString( '"1F600":"Grin"', $payload );
+		$this->assertStringContainsString( '"1F680":"Rocket"', $payload );
+		$this->assertStringNotContainsString( '"1F44D"', $payload );
+		$this->assertStringNotContainsString( '"1F389":42', $payload );
+
+		remove_filter( 'gutenberg_emoji_picker_label_overrides', $callback );
+	}
+
+	/**
+	 * @covers ::gutenberg_emoji_picker_label_overrides_register_inline_script
+	 */
+	public function test_filter_returning_non_array_is_treated_as_empty() {
+		$callback = static function () {
+			return 'not an array';
+		};
+		add_filter( 'gutenberg_emoji_picker_label_overrides', $callback );
+
+		gutenberg_emoji_picker_label_overrides_register_inline_script();
+
+		$inline  = wp_scripts()->get_data( 'wp-editor', 'before' );
+		$payload = is_array( $inline ) ? implode( "\n", $inline ) : (string) $inline;
+
+		$this->assertStringContainsString(
+			'window.gutenbergEmojiLabelOverrides = {};',
+			$payload
+		);
+
+		remove_filter( 'gutenberg_emoji_picker_label_overrides', $callback );
+	}
+
 	public function tear_down() {
 		// Reset inline script state between tests so the order in which
 		// the suite runs doesn't pollute the assertions.
