@@ -7,7 +7,11 @@
  *
  * Synthesizes a small UltraHDR JPEG (ISO 21496-1 gain map) using wasm-vips's
  * encoder so we don't need to vendor a binary asset from a third-party source.
+ *
+ * Run manually (not part of CI). `wasm-vips` resolves through the workspace
+ * via `@wordpress/vips`; console output is the script's user interface.
  */
+/* eslint-disable import/no-extraneous-dependencies, no-console */
 import Vips from 'wasm-vips';
 import fs from 'node:fs';
 
@@ -55,12 +59,8 @@ base.setArrayDouble( 'gainmap-max-content-boost', [ 8.0, 8.0, 8.0 ] );
 base.setDouble( 'gainmap-hdr-capacity-min', 1.0 );
 base.setDouble( 'gainmap-hdr-capacity-max', 8.0 );
 base.setArrayDouble( 'gainmap-gamma', [ 1.0, 1.0, 1.0 ] );
-base.setArrayDouble( 'gainmap-offset-sdr', [
-	0.015625, 0.015625, 0.015625,
-] );
-base.setArrayDouble( 'gainmap-offset-hdr', [
-	0.015625, 0.015625, 0.015625,
-] );
+base.setArrayDouble( 'gainmap-offset-sdr', [ 0.015625, 0.015625, 0.015625 ] );
+base.setArrayDouble( 'gainmap-offset-hdr', [ 0.015625, 0.015625, 0.015625 ] );
 base.setInt( 'gainmap-base-rendition-is-hdr', 0 );
 base.setInt( 'gainmap-use-base-cg', 1 );
 
@@ -73,3 +73,4 @@ try {
 	console.error( vips.error || vips.Error?.message || '(no extra detail)' );
 	process.exit( 1 );
 }
+/* eslint-enable import/no-extraneous-dependencies, no-console */
