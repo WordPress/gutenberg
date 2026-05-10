@@ -1073,7 +1073,17 @@ test.describe( 'Block Notes', () => {
 				comment: 'Pick heart from full picker',
 			} );
 
-			await blockNoteUtils.pickFullPickerEmojiBySearch( 'red heart' );
+			// Open the full picker and click the plain heart specifically.
+			// "Heart" is a label-overridden curated reaction; the helper's
+			// regex-based gridcell lookup would otherwise pick up the
+			// first "heart"-containing label (e.g. "smiling face with
+			// hearts") instead of the curated red heart.
+			await page.getByRole( 'button', { name: 'More emojis' } ).click();
+			await blockNoteUtils.waitForFullPicker();
+			await page.getByPlaceholder( 'Search emoji' ).fill( 'Heart' );
+			await page
+				.getByRole( 'gridcell', { name: 'Heart', exact: true } )
+				.click();
 
 			await expect(
 				page

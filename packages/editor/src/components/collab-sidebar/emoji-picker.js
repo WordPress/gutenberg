@@ -246,18 +246,30 @@ function chunkRows( emojis ) {
 
 /**
  * Run a case-insensitive search over the emoji label and Emojibase
- * tags. Returns the unfiltered list when the query is empty.
+ * tags, applying any per-emoji label override before matching so users
+ * searching for an overridden label still get the expected hit.
+ * Returns the unfiltered list when the query is empty.
  *
- * @param {Array}  emojis Emoji records.
- * @param {string} query  Search query.
+ * @param {Array}       emojis    Emoji records.
+ * @param {string}      query     Search query.
+ * @param {Object|null} overrides Map of `hexcode => translated label`.
  * @return {Array} Matching emoji records.
  */
-function searchEmojis( emojis, query ) {
+function searchEmojis( emojis, query, overrides ) {
 	const trimmed = query.trim().toLowerCase();
 	if ( ! trimmed ) {
 		return emojis;
 	}
 	return emojis.filter( ( entry ) => {
+		// Match against both the overridden label (if any) and the
+		// original Emojibase label so a user searching in either name
+		// still finds the emoji — useful when an English-language user
+		// types "red heart" against a "Heart" override, or a translator
+		// types the local-language label against the English fallback.
+		const override = overrides?.[ entry.hexcode ];
+		if ( override && override.toLowerCase().includes( trimmed ) ) {
+			return true;
+		}
 		if ( entry.label && entry.label.toLowerCase().includes( trimmed ) ) {
 			return true;
 		}
@@ -285,6 +297,10 @@ function searchEmojis( emojis, query ) {
 export default function EmojiPicker( { onSelect } ) {
 	const baseUrl =
 		typeof window !== 'undefined' ? window.gutenbergEmojibaseUrl : null;
+	const labelOverrides =
+		typeof window !== 'undefined' && window.gutenbergEmojiLabelOverrides
+			? window.gutenbergEmojiLabelOverrides
+			: null;
 	const [ locale ] = useState( detectLocale );
 	const { data, messages, isLoading, error } = useEmojibaseData(
 		baseUrl,
@@ -292,6 +308,17 @@ export default function EmojiPicker( { onSelect } ) {
 	);
 	const [ query, setQuery ] = useState( '' );
 	const viewportRef = useRef( null );
+
+	/**
+	 * Resolve the user-facing label for an emoji record. Prefers the
+	 * server-supplied override (typically a `__()`-translated string for
+	 * locales Emojibase doesn't cover) over the Emojibase data label.
+	 *
+	 * @param {Object} entry Emojibase emoji record.
+	 * @return {string} The label to render and use as the accessible name.
+	 */
+	const labelFor = ( entry ) =>
+		labelOverrides?.[ entry.hexcode ] || entry.label || '';
 
 	const groups = useMemo(
 		() => ( data ? groupEmojis( data ) : [] ),
@@ -320,7 +347,11 @@ export default function EmojiPicker( { onSelect } ) {
 		}
 		return groups
 			.map( ( g ) => {
-				const filtered = searchEmojis( g.emojis, query );
+				const filtered = searchEmojis(
+					g.emojis,
+					query,
+					labelOverrides
+				);
 				return {
 					...g,
 					emojis: filtered,
@@ -328,7 +359,7 @@ export default function EmojiPicker( { onSelect } ) {
 				};
 			} )
 			.filter( ( g ) => g.emojis.length > 0 );
-	}, [ groups, query ] );
+	}, [ groups, query, labelOverrides ] );
 
 	const matchCount = useMemo(
 		() => visibleGroups.reduce( ( n, g ) => n + g.emojis.length, 0 ),
@@ -422,7 +453,7 @@ export default function EmojiPicker( { onSelect } ) {
 												key={ emoji.hexcode }
 												role="gridcell"
 												className="editor-collab-sidebar-panel__picker-emoji"
-												aria-label={ emoji.label }
+												aria-label={ labelFor( emoji ) }
 												onClick={ () =>
 													onSelect( emoji.emoji )
 												}
