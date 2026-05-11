@@ -21,6 +21,7 @@ import { TEXT_ALIGN_SUPPORT_KEY } from './text-align';
 import { FIT_TEXT_SUPPORT_KEY } from './fit-text';
 import { cleanEmptyObject } from './utils';
 import { store as blockEditorStore } from '../store';
+import { useBlockStyle } from './use-block-style';
 
 function omit( object, keys ) {
 	return Object.fromEntries(
@@ -119,20 +120,18 @@ function TypographyInspectorControl( { children, resetAllFilter } ) {
 export function TypographyPanel( { clientId, name, setAttributes, settings } ) {
 	const isEnabled = useHasTypographyPanel( settings );
 
-	const { style, fontFamily, fontSize, fitText } = useSelect(
+	const { fontFamily, fontSize, fitText } = useSelect(
 		( select ) => {
 			// Early return to avoid subscription when disabled.
 			if ( ! isEnabled ) {
 				return {};
 			}
 			const {
-				style: _style,
 				fontFamily: _fontFamily,
 				fontSize: _fontSize,
 				fitText: _fitText,
 			} = select( blockEditorStore ).getBlockAttributes( clientId ) || {};
 			return {
-				style: _style,
 				fontFamily: _fontFamily,
 				fontSize: _fontSize,
 				fitText: _fitText,
@@ -140,6 +139,7 @@ export function TypographyPanel( { clientId, name, setAttributes, settings } ) {
 		},
 		[ clientId, isEnabled ]
 	);
+	const [ style ] = useBlockStyle( null );
 	const value = useMemo(
 		() => attributesToStyle( { style, fontFamily, fontSize } ),
 		[ style, fontSize, fontFamily ]

@@ -7,7 +7,7 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { Platform, useState, useEffect, useCallback } from '@wordpress/element';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch } from '@wordpress/data';
 import { getBlockSupport } from '@wordpress/blocks';
 import deprecated from '@wordpress/deprecated';
 
@@ -22,7 +22,8 @@ import {
 import { MarginVisualizer, PaddingVisualizer } from './spacing-visualizer';
 import { store as blockEditorStore } from '../store';
 import { unlock } from '../lock-unlock';
-import { cleanEmptyObject, shouldSkipSerialization } from './utils';
+import { shouldSkipSerialization } from './utils';
+import { useBlockStyle } from './use-block-style';
 
 export const DIMENSIONS_SUPPORT_KEY = 'dimensions';
 export const SPACING_SUPPORT_KEY = 'spacing';
@@ -68,26 +69,10 @@ function DimensionsInspectorControl( { children, resetAllFilter } ) {
 	);
 }
 
-export function DimensionsPanel( { clientId, name, setAttributes, settings } ) {
+export function DimensionsPanel( { clientId, name, settings } ) {
 	const isEnabled = useHasDimensionsPanel( settings );
-	const value = useSelect(
-		( select ) => {
-			// Early return to avoid subscription when disabled
-			if ( ! isEnabled ) {
-				return undefined;
-			}
-			return select( blockEditorStore ).getBlockAttributes( clientId )
-				?.style;
-		},
-		[ clientId, isEnabled ]
-	);
-
 	const [ visualizedProperty, setVisualizedProperty ] = useVisualizer();
-	const onChange = ( newStyle ) => {
-		setAttributes( {
-			style: cleanEmptyObject( newStyle ),
-		} );
-	};
+	const [ value, onChange ] = useBlockStyle( null );
 
 	if ( ! isEnabled ) {
 		return null;

@@ -30,6 +30,7 @@ import {
 } from '../components/global-styles';
 import { store as blockEditorStore } from '../store';
 import { __ } from '@wordpress/i18n';
+import { useBlockStyle } from './use-block-style';
 
 export const BORDER_SUPPORT_KEY = '__experimentalBorder';
 export const SHADOW_SUPPORT_KEY = 'shadow';
@@ -142,18 +143,19 @@ function BordersInspectorControl( { label, children, resetAllFilter } ) {
 
 export function BorderPanel( { clientId, name, setAttributes, settings } ) {
 	const isEnabled = useHasBorderPanel( settings );
-	const { style, borderColor } = useSelect(
+	const { borderColor } = useSelect(
 		( select ) => {
 			// Early return to avoid subscription when disabled
 			if ( ! isEnabled ) {
 				return {};
 			}
-			const { style: _style, borderColor: _borderColor } =
+			const { borderColor: _borderColor } =
 				select( blockEditorStore ).getBlockAttributes( clientId ) || {};
-			return { style: _style, borderColor: _borderColor };
+			return { borderColor: _borderColor };
 		},
 		[ clientId, isEnabled ]
 	);
+	const [ style ] = useBlockStyle( null );
 	const value = useMemo( () => {
 		return attributesToStyle( { style, borderColor } );
 	}, [ style, borderColor ] );

@@ -16,6 +16,7 @@ import { useCallback } from '@wordpress/element';
 import InspectorControls from '../components/inspector-controls';
 import { cleanEmptyObject } from './utils';
 import { store as blockEditorStore } from '../store';
+import { useBlockStyle } from './use-block-style';
 import {
 	default as StylesBackgroundPanel,
 	useHasBackgroundPanel,
@@ -164,14 +165,13 @@ export function BackgroundImagePanel( {
 	setAttributes,
 	settings,
 } ) {
-	const { style, className, inheritedValue } = useSelect(
+	const { className, inheritedValue } = useSelect(
 		( select ) => {
 			const { getBlockAttributes, getSettings } =
 				select( blockEditorStore );
 			const _settings = getSettings();
 			const blockAttributes = getBlockAttributes( clientId );
 			return {
-				style: blockAttributes?.style,
 				className: blockAttributes?.className,
 				/*
 				 * To ensure we pass down the right inherited values:
@@ -186,6 +186,7 @@ export function BackgroundImagePanel( {
 		},
 		[ clientId, name ]
 	);
+	const [ style ] = useBlockStyle( null );
 
 	const backgroundGradientSupported = hasBackgroundSupport(
 		name,
