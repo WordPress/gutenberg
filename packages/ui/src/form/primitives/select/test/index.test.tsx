@@ -46,6 +46,28 @@ describe( 'Select', () => {
 		);
 	} );
 
+	it( 'auto-resolves trigger label from items when value is an object', () => {
+		const users = [
+			{ value: '1', label: 'User 1' },
+			{ value: '2', label: 'User 2' },
+		];
+
+		render(
+			<Select.Root defaultValue={ users[ 0 ] } items={ users }>
+				<Select.Trigger />
+				<Select.Popup>
+					{ users.map( ( option ) => (
+						<Select.Item key={ option.value } value={ option }>
+							{ option.label }
+						</Select.Item>
+					) ) }
+				</Select.Popup>
+			</Select.Root>
+		);
+
+		expect( screen.getByRole( 'combobox' ) ).toHaveTextContent( 'User 1' );
+	} );
+
 	it( 'renders a default placeholder when no value is selected', () => {
 		render(
 			<Select.Root>
