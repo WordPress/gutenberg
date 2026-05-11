@@ -181,7 +181,7 @@ class WP_REST_User_Taxonomies_Controller_Gutenberg extends WP_REST_Posts_Control
 		if ( rest_is_field_included( 'term_count', $fields ) && 'publish' === $item->post_status ) {
 			// Drafts aren't registered, so the count is undefined — omit the
 			// field rather than report a value the server can't vouch for.
-			$count = wp_count_terms(
+			$count              = wp_count_terms(
 				array(
 					'taxonomy'   => $item->post_name,
 					'hide_empty' => false,
