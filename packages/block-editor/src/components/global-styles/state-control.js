@@ -7,11 +7,6 @@ import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
 
 /**
- * Internal dependencies
- */
-import StateControlBadges from './state-control-badges';
-
-/**
  * State control for managing viewport and pseudo-state styles.
  * Displays a dropdown menu with separate groups for each selector.
  *
@@ -167,7 +162,6 @@ export default function StateControl( {
 					</>
 				) }
 			</DropdownMenu>
-			{ showText && <StateControlBadges states={ activeStates } /> }
 		</Stack>
 	);
 }

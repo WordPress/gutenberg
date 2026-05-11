@@ -21,7 +21,12 @@ import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import type { StateDefinition } from './utils';
 import { unlock } from './lock-unlock';
 
-const { StateControl } = unlock( blockEditorPrivateApis );
+const { StateControl, StateControlBadges } = unlock( blockEditorPrivateApis );
+
+interface ActiveState {
+	key: string;
+	label: string;
+}
 
 interface ScreenHeaderProps {
 	title: string;
@@ -46,6 +51,28 @@ export function ScreenHeader( {
 	onChangeViewport,
 	onChangePseudoState,
 }: ScreenHeaderProps ) {
+	const activeStates: ActiveState[] = [];
+	const activeViewport = viewportStates?.find(
+		( state ) => state.value === selectedViewport
+	);
+	const activePseudoState = pseudoStates?.find(
+		( state ) => state.value === selectedPseudoState
+	);
+
+	if ( activeViewport ) {
+		activeStates.push( {
+			key: `viewport-${ activeViewport.value }`,
+			label: activeViewport.label,
+		} );
+	}
+
+	if ( activePseudoState ) {
+		activeStates.push( {
+			key: `pseudo-${ activePseudoState.value }`,
+			label: activePseudoState.label,
+		} );
+	}
+
 	return (
 		<VStack spacing={ 0 }>
 			<View>
@@ -67,16 +94,25 @@ export function ScreenHeader( {
 									>
 										{ title }
 									</Heading>
-									<StateControl
-										viewportStates={ viewportStates }
-										pseudoStates={ pseudoStates }
-										viewportValue={ selectedViewport }
-										pseudoStateValue={ selectedPseudoState }
-										onChangeViewport={ onChangeViewport }
-										onChangePseudoState={
-											onChangePseudoState
-										}
-									/>
+									<VStack spacing={ 2 } alignment="right">
+										<StateControl
+											viewportStates={ viewportStates }
+											pseudoStates={ pseudoStates }
+											viewportValue={ selectedViewport }
+											pseudoStateValue={
+												selectedPseudoState
+											}
+											onChangeViewport={
+												onChangeViewport
+											}
+											onChangePseudoState={
+												onChangePseudoState
+											}
+										/>
+										<StateControlBadges
+											states={ activeStates }
+										/>
+									</VStack>
 								</HStack>
 							</Spacer>
 						</HStack>
