@@ -137,8 +137,7 @@
 		},
 		"interactivity": {
 			"clientNavigation": true
-		},
-		"states": [ ":hover", ":focus", ":active" ]
+		}
 	},
 	"styles": [
 		{ "name": "fill", "label": "Fill", "isDefault": true },
