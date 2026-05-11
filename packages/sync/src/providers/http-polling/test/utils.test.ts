@@ -604,7 +604,7 @@ describe( 'http-polling utils', () => {
 			expect( mockApiFetch ).toHaveBeenCalledWith( {
 				data: payload,
 				method: 'POST',
-				path: '/wp-sync/v1/updates',
+				path: '/wp-collaboration/v1/updates',
 			} );
 		} );
 

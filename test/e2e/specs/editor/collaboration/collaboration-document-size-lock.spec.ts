@@ -82,7 +82,8 @@ test.describe( 'Collaboration with large documents', () => {
 		// entirely. Either outcome confirms the room was unregistered.
 		const POLL_TIMEOUT = 3000;
 		const nextSyncResponse = page.waitForResponse(
-			( res ) => res.url().includes( 'wp-sync' ) && res.status() === 200
+			( res ) =>
+				res.url().includes( 'wp-collaboration' ) && res.status() === 200
 		);
 		const timeout = new Promise< 'timeout' >( ( resolve ) =>
 			setTimeout( () => resolve( 'timeout' ), POLL_TIMEOUT )
