@@ -207,7 +207,7 @@ function MotionDemo() {
 
 			<Stack direction="column" gap="lg">
 				<h3>Durations</h3>
-				<p>All using easing-standard</p>
+				<p>All using easing-balanced</p>
 				<Stack direction="column" gap="md">
 					{ DURATION_TOKENS.map( ( token ) => (
 						<AnimationRow
