@@ -27,6 +27,7 @@ import type {
 	ObjectData,
 	ObjectType,
 	ProviderCreator,
+	ProviderCreatorResult,
 	RecordHandlers,
 	SyncConfig,
 	SyncManager,
@@ -195,7 +196,7 @@ export function createSyncManager( debug = false ): SyncManager {
 		// Clean up providers and in-memory state when the entity is unloaded.
 		const unload = (): void => {
 			log( 'loadEntity', 'unloading', entityId );
-			providerResults.forEach( ( result ) => result.destroy() );
+			providerResults?.forEach( ( result ) => result.destroy() );
 			handlers.onStatusChange( null );
 			recordMap.unobserveDeep( onRecordUpdate );
 			stateMap.unobserve( onStateMapUpdate );
@@ -256,6 +257,10 @@ export function createSyncManager( debug = false ): SyncManager {
 			restoreUndoMeta,
 		} );
 
+		// Declare with let before using it in unload closure.
+		// eslint-disable-next-line prefer-const
+		let providerResults: ProviderCreatorResult[];
+
 		const entityState: EntityState = {
 			awareness,
 			handlers,
@@ -270,7 +275,7 @@ export function createSyncManager( debug = false ): SyncManager {
 
 		// Create providers for the given entity and its Yjs document.
 		log( 'loadEntity', 'connecting', entityId );
-		const providerResults = await Promise.all(
+		providerResults = await Promise.all(
 			providerCreators.map( async ( create ) => {
 				const provider = await create( {
 					objectType,
@@ -340,7 +345,7 @@ export function createSyncManager( debug = false ): SyncManager {
 		// Clean up providers and in-memory state when the entity is unloaded.
 		const unload = (): void => {
 			log( 'loadCollection', 'unloading', entityId );
-			providerResults.forEach( ( result ) => result.destroy() );
+			providerResults?.forEach( ( result ) => result.destroy() );
 			handlers.onStatusChange( null );
 			stateMap.unobserve( onStateMapUpdate );
 			ydoc.destroy();
@@ -372,6 +377,10 @@ export function createSyncManager( debug = false ): SyncManager {
 		// If the sync config supports awareness, create it.
 		const awareness = syncConfig.createAwareness?.( ydoc );
 
+		// Declare with let before using it in unload closure.
+		// eslint-disable-next-line prefer-const
+		let providerResults: ProviderCreatorResult[];
+
 		const collectionState: CollectionState = {
 			awareness,
 			handlers,
@@ -384,7 +393,7 @@ export function createSyncManager( debug = false ): SyncManager {
 
 		// Create providers for the given entity and its Yjs document.
 		log( 'loadCollection', 'connecting', entityId );
-		const providerResults = await Promise.all(
+		providerResults = await Promise.all(
 			providerCreators.map( async ( create ) => {
 				const provider = await create( {
 					awareness,
@@ -419,6 +428,23 @@ export function createSyncManager( debug = false ): SyncManager {
 		log( 'unloadEntity', 'unloading', entityId );
 		entityStates.get( entityId )?.unload();
 		updateCRDTDoc( objectType, null, {}, origin, { isSave: true } );
+	}
+
+	/**
+	 * Unload all loaded entities, stopping all syncing.
+	 */
+	function unloadAll(): void {
+		log( 'unloadAll', 'unloading all entities', '' );
+		for ( const [ entityId, entityState ] of entityStates ) {
+			log( 'unloadAll', 'unloading', entityId );
+			entityState.unload();
+		}
+		entityStates.clear();
+		for ( const [ objectType, collectionState ] of collectionStates ) {
+			log( 'unloadAll', 'unloading collection', objectType as string );
+			collectionState.unload();
+		}
+		collectionStates.clear();
 	}
 
 	/**
@@ -683,6 +709,7 @@ export function createSyncManager( debug = false ): SyncManager {
 			return undoManager;
 		},
 		unload: debugWrap( unloadEntity ),
+		unloadAll: debugWrap( unloadAll ),
 		update: debugWrap( yieldToEventLoop( updateCRDTDoc ) ),
 	};
 }
