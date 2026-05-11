@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { Button } from '@wordpress/components';
-import { DataViews, type View } from '@wordpress/dataviews';
+import { DataViews, type Field, type View } from '@wordpress/dataviews';
 import { useEntityRecords } from '@wordpress/core-data';
 import { useMemo, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -15,14 +15,14 @@ import activateAction from './actions/activate';
 import deactivateAction from './actions/deactivate';
 import deleteTaxonomyAction from './actions/delete';
 import duplicateTaxonomyAction from './actions/duplicate';
+import viewTermsAction from './actions/view-terms';
 import {
 	hierarchicalField,
 	publicField,
-	statusField,
-	titleField,
 	useObjectTypeField,
 	useSlugField,
 } from './fields';
+import { statusField, titleField } from '../utils/fields';
 import type { TaxonomyFormData, TaxonomyRecord } from './types';
 import { toFormData } from './utils';
 import { useEditTaxonomyAction } from './actions/edit';
@@ -51,6 +51,7 @@ export function TaxonomiesList() {
 			editAction,
 			quickEditTaxonomyAction,
 			duplicateTaxonomyAction,
+			viewTermsAction,
 			activateAction,
 			deactivateAction,
 			deleteTaxonomyAction,
@@ -60,14 +61,15 @@ export function TaxonomiesList() {
 	const slugField = useSlugField();
 	const objectTypeField = useObjectTypeField();
 	const fields = useMemo(
-		() => [
-			titleField,
-			objectTypeField,
-			statusField,
-			publicField,
-			slugField,
-			hierarchicalField,
-		],
+		() =>
+			[
+				titleField,
+				objectTypeField,
+				statusField,
+				publicField,
+				slugField,
+				hierarchicalField,
+			] as Field< TaxonomyFormData >[],
 		[ slugField, objectTypeField ]
 	);
 	const queryArgs = useMemo( () => {

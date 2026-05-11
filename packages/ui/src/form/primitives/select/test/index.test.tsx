@@ -1,9 +1,61 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createRef } from '@wordpress/element';
 import * as Select from '../index';
 
 describe( 'Select', () => {
+	it( 'renders a default placeholder when no value is selected', () => {
+		render(
+			<Select.Root>
+				<Select.Trigger />
+				<Select.Popup>
+					<Select.Item value="Item 1" />
+				</Select.Popup>
+			</Select.Root>
+		);
+
+		const placeholder = screen.getByText( 'Select' );
+
+		expect( screen.getByRole( 'combobox' ) ).toHaveTextContent( 'Select' );
+		expect( placeholder ).toHaveAttribute( 'data-placeholder' );
+	} );
+
+	it( 'supports custom placeholder text', () => {
+		render(
+			<Select.Root>
+				<Select.Trigger placeholder="Choose an item" />
+				<Select.Popup>
+					<Select.Item value="Item 1" />
+				</Select.Popup>
+			</Select.Root>
+		);
+
+		const placeholder = screen.getByText( 'Choose an item' );
+
+		expect( screen.getByRole( 'combobox' ) ).toHaveTextContent(
+			'Choose an item'
+		);
+		expect( placeholder ).toHaveAttribute( 'data-placeholder' );
+	} );
+
+	it( 'does not use placeholder styling when a value is selected', () => {
+		render(
+			<Select.Root defaultValue="Item 1">
+				<Select.Trigger />
+				<Select.Popup>
+					<Select.Item value="Item 1" />
+				</Select.Popup>
+			</Select.Root>
+		);
+
+		const trigger = screen.getByRole( 'combobox' );
+
+		expect( trigger ).toHaveTextContent( 'Item 1' );
+		expect( within( trigger ).getByText( 'Item 1' ) ).not.toHaveAttribute(
+			'data-placeholder'
+		);
+	} );
+
 	it( 'forwards ref', async () => {
 		const user = userEvent.setup();
 		const triggerRef = createRef< HTMLButtonElement >();

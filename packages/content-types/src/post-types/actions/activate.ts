@@ -6,11 +6,14 @@ import { __, _n, sprintf } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { createStatusAction } from './utils';
+import { createStatusAction } from '../../utils/actions';
+import { POST_TYPE_ENTITY } from '../../constants';
+import type { PostTypeFormData } from '../types';
 
-const activateAction = createStatusAction( {
+const activateAction = createStatusAction< PostTypeFormData >( {
 	id: 'activate',
 	label: __( 'Activate' ),
+	entity: POST_TYPE_ENTITY,
 	targetStatus: 'publish',
 	messages: {
 		successSingle: __( 'Post type activated.' ),

@@ -3,126 +3,27 @@
 @use "@wordpress/base-styles/variables" as *;
 @use "@wordpress/base-styles/z-index" as *;
 
-// `className` on `<Modal>` is applied to `.components-modal__frame`, so the
-// compound selector below bumps specificity over the shipped rule at
-// `.components-modal__frame.is-full-screen :where(.components-modal__content)`
-// and lets the InterfaceSkeleton run edge-to-edge inside the modal.
+// `className` on `<Modal>` is applied to `.components-modal__frame`, so this
+// bumps specificity over the shipped full-screen modal content rule and lets
+// the media editor run edge-to-edge inside the modal.
 .media-editor-modal.components-modal__frame .components-modal__content {
 	padding: 0;
 	margin-bottom: 0;
+	display: flex;
+	flex-direction: column;
+	min-height: 0;
+}
+
+.media-editor-modal.components-modal__frame .components-modal__children-container {
+	display: flex;
+	flex: 1;
+	flex-direction: column;
+	min-height: 0;
 }
 
 .media-editor-modal {
 	display: flex;
 	flex-direction: column;
-
-	// Center the loading spinner in the modal body while media data is
-	// resolving, before the InterfaceSkeleton mounts. The wrapper sits
-	// inside `.components-modal__children-container`, which isn't a flex
-	// container — `height: 100%` (rather than `flex: 1`) makes it fill
-	// the body so the inner flex can center the spinner.
-	.media-editor-modal__loading {
-		height: 100%;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-	}
-
-	// InterfaceSkeleton defaults to position: fixed for full-viewport usage.
-	// Reset it so the skeleton flows inside the modal's content area. Stack
-	// children vertically (header/body/footer) since the default row layout
-	// assumes an absolutely positioned footer that overlays the bottom.
-	.interface-interface-skeleton {
-		position: relative;
-		top: auto;
-		right: auto;
-		bottom: auto;
-		left: auto;
-		height: 100%;
-		max-height: none;
-		flex: 1;
-		flex-direction: column;
-	}
-
-	.interface-interface-skeleton__editor {
-		min-width: 0;
-		flex: 1;
-	}
-
-	// The skeleton's default footer is `position: absolute; bottom: 0` with
-	// a small fixed padding-bottom on the body to compensate. Our bottom
-	// bar is taller than that default, so it would overlap the cropper's
-	// resize handles. Put the footer in flow so it claims its own row and
-	// the canvas (and sidebar) resize to fit above it. The skeleton also
-	// hides the footer below the medium breakpoint by default; force it
-	// visible so the bottom-bar controls remain accessible on narrow
-	// viewports.
-	.interface-interface-skeleton__footer {
-		position: relative;
-		display: flex;
-	}
-
-	.interface-interface-skeleton.has-footer .interface-interface-skeleton__body {
-		padding-bottom: 0;
-	}
-
-	.media-editor-modal__canvas {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		background: $gray-100;
-		overflow: auto;
-		height: 100%;
-
-		// MediaPreview uses `min-height: 100%` so it can grow when needed in
-		// other contexts. Inside the modal canvas we need a definite height
-		// so the image/video's `max-height: 100%` resolves and the preview
-		// is contained vertically.
-		.media-editor-preview {
-			height: 100%;
-		}
-
-		img,
-		video {
-			max-width: 100%;
-			max-height: 100%;
-			object-fit: contain;
-		}
-	}
-
-	// Matches the post editor's `.editor-sidebar` container (see
-	// `packages/editor/src/components/sidebar/style.scss`): `@include reset`
-	// sets `box-sizing: border-box` and makes all descendants inherit it.
-	// Without this, descendants (notably the active-tab underline inside
-	// `<Tabs>`) fall back to `content-box` sizing that shortens the
-	// indicator under the selected tab label.
-	.media-editor-modal__sidebar {
-		@include reset;
-	}
-
-	// Mirror the editor's `PostPanelSection` padding for tab body content,
-	// so the form inside the Details tab has breathing room.
-	.media-editor-modal__panel {
-		padding: $grid-unit-20;
-	}
-
-	// Match the post editor's sidebar header treatment
-	// (see `packages/editor/src/components/sidebar/style.scss`): when the tab
-	// list is rendered as `ComplementaryArea`'s header, zero the default
-	// panel-header padding so tabs sit flush to the edge and the active-tab
-	// underline can span the full tab label width.
-	.components-panel__header.media-editor-modal__sidebar-header {
-		padding-left: 0;
-		padding-right: $grid-unit-10;
-
-		.components-button.has-icon {
-			padding: 0;
-
-			@include break-medium() {
-				display: flex;
-			}
-		}
-	}
 }
 
 // `<SnackbarNotices>` renders `.components-snackbar-list` with
