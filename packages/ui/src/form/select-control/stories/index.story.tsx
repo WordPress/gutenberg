@@ -22,11 +22,6 @@ type Story = StoryObj< typeof SelectControl >;
 
 const defaultItems = [
 	{
-		value: '',
-		label: 'Select',
-		disabled: true,
-	},
-	{
 		value: '1',
 		label: 'Item 1',
 	},
@@ -36,19 +31,56 @@ const defaultItems = [
 	},
 ];
 
-/**
- * When showing a "placeholder" item, prefer a concise label such as "Select"
- * without a trailing ellipsis. By default, items with an empty string value
- * will be rendered with a lighter color in the trigger.
- *
- * It is recommended to also add `disabled` to the placeholder item so it cannot be reselected.
- */
 export const Default: Story = {
 	args: {
 		items: defaultItems,
 		label: 'Label',
 		description: 'This is the description.',
-		defaultValue: defaultItems[ 0 ],
+	},
+};
+
+/**
+ * When no value is selected, the trigger shows the default placeholder text.
+ *
+ * Use the `placeholder` prop to customize text shown.
+ * Prefer a concise label without a trailing ellipsis.
+ */
+export const WithCustomPlaceholder: Story = {
+	args: {
+		...Default.args,
+		placeholder: 'Choose an item',
+	},
+};
+
+const nullValueOptionItems = [
+	{
+		value: null,
+		label: 'Select theme',
+	},
+	{
+		value: 'system',
+		label: 'System default',
+	},
+	{
+		value: 'light',
+		label: 'Light',
+	},
+	{
+		value: 'dark',
+		label: 'Dark',
+	},
+];
+
+/**
+ * Use a `null` item value when users should be able to clear the selected value
+ * from the popup.
+ */
+export const WithNullValueOption: Story = {
+	args: {
+		items: nullValueOptionItems,
+		label: 'Theme',
+		description: 'Choose a theme preference.',
+		defaultValue: nullValueOptionItems[ 0 ],
 	},
 };
 
@@ -174,7 +206,7 @@ export const WithItemsArrayAndPartialCustomization: Story = {
 			<>
 				{ Default.args?.items?.map( ( item ) => (
 					<SelectControl.Item
-						key={ item.value }
+						key={ item.value ?? 'null' }
 						value={ item }
 						label={ item.label }
 						disabled={ item.disabled }

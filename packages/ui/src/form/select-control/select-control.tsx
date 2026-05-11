@@ -19,6 +19,7 @@ export const SelectControl = forwardRef<
 		description,
 		details,
 		hideLabelFromVision,
+		placeholder,
 		size = 'default',
 		triggerContent,
 		...restProps
@@ -31,7 +32,11 @@ export const SelectControl = forwardRef<
 				{ label }
 			</Field.Label>
 			<Select.Root items={ items } { ...restProps }>
-				<Select.Trigger ref={ ref } size={ size }>
+				<Select.Trigger
+					ref={ ref }
+					placeholder={ placeholder }
+					size={ size }
+				>
 					{ triggerContent }
 				</Select.Trigger>
 				<Select.Popup>
@@ -40,7 +45,7 @@ export const SelectControl = forwardRef<
 							? children
 							: items?.map( ( item ) => (
 									<Item
-										key={ item.value }
+										key={ item.value ?? 'null' }
 										value={ item }
 										label={ item.label }
 										disabled={ item.disabled }

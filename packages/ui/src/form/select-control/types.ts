@@ -7,7 +7,7 @@ import type {
 
 export type SelectItem = {
 	label: string;
-	value: string;
+	value: string | null;
 	disabled?: boolean;
 };
 
@@ -24,6 +24,13 @@ export type SelectControlProps = Omit<
 		 * The array of option items to render in the select.
 		 */
 		items?: SelectItem[];
+		/**
+		 * Text to show when no value is selected. This is overridden by `triggerContent`
+		 * if specified, or by a null item's label in `items`.
+		 *
+		 * @default __( 'Select' )
+		 */
+		placeholder?: SelectTriggerProps[ 'placeholder' ];
 		/**
 		 * The custom trigger content to use instead of the default.
 		 *

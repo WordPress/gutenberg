@@ -44,6 +44,22 @@ describe( 'SelectControl', () => {
 		).toBeVisible();
 	} );
 
+	it( 'renders custom placeholder text when no value is selected', () => {
+		render(
+			<SelectControl
+				label="Country"
+				items={ mockItems }
+				placeholder="Choose a country"
+			/>
+		);
+
+		expect(
+			screen.getByRole( 'combobox', {
+				name: 'Country',
+			} )
+		).toHaveTextContent( 'Choose a country' );
+	} );
+
 	it( 'renders with a visually hidden label', () => {
 		render(
 			<SelectControl
