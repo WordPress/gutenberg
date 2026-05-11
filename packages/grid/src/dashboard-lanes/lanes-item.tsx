@@ -98,13 +98,7 @@ export function LanesItem( {
 	} | null >( null );
 	const lastResizeDeltaRef = useRef< ResizeDelta | null >( null );
 
-	const {
-		attributes,
-		listeners,
-		setNodeRef,
-		setActivatorNodeRef,
-		isDragging,
-	} = useSortable( {
+	const { attributes, listeners, setNodeRef, isDragging } = useSortable( {
 		id: itemKey,
 		disabled,
 	} );
@@ -212,6 +206,7 @@ export function LanesItem( {
 			className={ itemClassName }
 			style={ style }
 			{ ...{ [ LANES_DATA_KEY ]: itemKey } }
+			{ ...attributes }
 		>
 			{ actionableArea ? (
 				<div
@@ -223,24 +218,9 @@ export function LanesItem( {
 			) : null }
 
 			<div
-				ref={ setActivatorNodeRef }
-				{ ...attributes }
 				{ ...listeners }
 				style={ {
 					height: '100%',
-					// `attributes` (tabIndex, role, aria-*) and
-					// `listeners` (onKeyDown, onPointerDown) live on
-					// the same element so keyboard activation works:
-					// Tab focuses this wrapper, Space dispatches the
-					// keydown that the listener catches. Splitting
-					// them across the outer item and this wrapper
-					// would land focus on the outer but route the
-					// keydown only to children, never firing the
-					// activation. `setActivatorNodeRef` tells dnd-kit
-					// to treat this element as the keyboard sensor
-					// target while the outer keeps its role as the
-					// measured sortable node.
-					//
 					// Cursor lives on the listener wrapper rather
 					// than the outer item so `actionableArea`
 					// children render their own cursor (e.g.
