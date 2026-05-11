@@ -12,7 +12,7 @@ import { RequestUtils } from '@wordpress/e2e-test-utils-playwright';
 /**
  * Internal dependencies
  */
-import { prepareRtcWebSocketProvider } from './rtc-websocket-setup';
+import { setupRtcWebSocketProvider } from './rtc-websocket-setup';
 
 async function globalSetup( config: FullConfig ) {
 	const { storageState, baseURL } = config.projects[ 0 ].use;
@@ -31,7 +31,7 @@ async function globalSetup( config: FullConfig ) {
 	await requestUtils.setupRest();
 
 	// Reset the test environment before running the tests.
-	const resetTasks = [
+	await Promise.all( [
 		requestUtils.activateTheme( 'twentytwentyone' ),
 		// Disable this test plugin as it's conflicting with some of the tests.
 		// We already have reduced motion enabled and Playwright will wait for most of the animations anyway.
@@ -41,10 +41,8 @@ async function globalSetup( config: FullConfig ) {
 		requestUtils.deleteAllPosts(),
 		requestUtils.deleteAllBlocks(),
 		requestUtils.resetPreferences(),
-		...( await prepareRtcWebSocketProvider( requestUtils ) ),
-	];
-
-	await Promise.all( resetTasks );
+		setupRtcWebSocketProvider( requestUtils ),
+	] );
 
 	await requestContext.dispose();
 }

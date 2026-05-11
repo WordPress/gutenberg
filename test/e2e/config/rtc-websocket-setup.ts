@@ -92,25 +92,28 @@ async function resetSyncServer() {
 }
 
 /**
- * Prepare the WS provider for a globalSetup run and return any additional
- * reset tasks the caller should await in parallel with its own.
+ * Set up the WebSocket provider for a globalSetup run.
  *
- * When the WS suite is active, builds the browser-side bundle and writes
- * the runtime config before returning the server-reset and plugin-activate
- * tasks. When inactive, just returns a plugin-deactivate task so a stale
- * WS plugin from a previous run doesn't bleed into the default suite.
+ * Resolves once any work the WS suite needs is complete: bundle built,
+ * runtime config written, plugin activated, and sync server reset. When
+ * the WS suite is inactive, just deactivates the plugin so a stale
+ * activation from a previous run doesn't bleed into the default suite.
  *
  * @param requestUtils RequestUtils instance for plugin activation calls.
  */
-export async function prepareRtcWebSocketProvider(
+export async function setupRtcWebSocketProvider(
 	requestUtils: RequestUtils
-): Promise< Array< Promise< unknown > > > {
+): Promise< void > {
 	const enabled = process.env.GUTENBERG_RTC_TEST_WS_PROVIDER === '1';
 
 	if ( ! enabled ) {
-		return [ requestUtils.deactivatePlugin( PROVIDER_PLUGIN ) ];
+		await requestUtils.deactivatePlugin( PROVIDER_PLUGIN );
+		return;
 	}
 
+	// Bundle and runtime config must exist before WP enqueues the plugin
+	// script, so build them first. The sync-server reset is independent
+	// and can race the plugin activation.
 	await buildProviderBundle();
 	await writeRuntimeConfig();
 
@@ -120,5 +123,5 @@ export async function prepareRtcWebSocketProvider(
 	if ( process.env.GUTENBERG_RTC_TEST_WS_SKIP_RESET !== '1' ) {
 		tasks.push( resetSyncServer() );
 	}
-	return tasks;
+	await Promise.all( tasks );
 }
