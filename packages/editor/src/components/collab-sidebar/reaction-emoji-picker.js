@@ -82,7 +82,7 @@ export function useReactionEmojis() {
  * Reactions storage format:
  *
  * - Curated picks (5 default emojis) are stored as their slug, e.g. `heart`.
- * - Picks from the full Frimousse picker are stored as a lowercase
+ * - Picks from the full searchable picker are stored as a lowercase
  *   hex-codepoint sequence joined by `-`, e.g. `1f44d` for 👍 or
  *   `1f468-200d-1f4bb` for 👨‍💻. Variation selector U+FE0F is stripped
  *   so `2764-fe0f` (❤️) collapses into the curated `heart` slug.
