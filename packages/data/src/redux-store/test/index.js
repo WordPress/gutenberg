@@ -350,6 +350,35 @@ describe( 'resolveSelect', () => {
 		expect( fulfilledResolver ).not.toHaveBeenCalled();
 	} );
 
+	it( 'does not change Redux state when isFulfilled returns true', async () => {
+		const fulfill = jest.fn();
+		const isFulfilled = () => true;
+
+		registry.registerStore( 'demo', {
+			reducer: ( state = { items: [ 'item' ] } ) => state,
+			selectors: {
+				getItems: ( state ) => state.items,
+			},
+			resolvers: {
+				getItems: { fulfill, isFulfilled },
+			},
+		} );
+
+		const listener = jest.fn();
+		const unsubscribe = registry.subscribe( listener );
+
+		// Call the selector — isFulfilled is true, so no resolution should happen.
+		registry.select( 'demo' ).getItems();
+
+		// Wait long enough for any setTimeout(0) resolver to have fired.
+		await new Promise( ( resolve ) => setTimeout( resolve, 10 ) );
+
+		expect( fulfill ).not.toHaveBeenCalled();
+		expect( listener ).not.toHaveBeenCalled();
+
+		unsubscribe();
+	} );
+
 	it( 'calls resolver when isFulfilled returns false', async () => {
 		const fulfill = jest.fn().mockImplementation( () => ( {
 			type: 'SET_DATA',
