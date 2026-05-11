@@ -50,6 +50,17 @@ if ( ! class_exists( 'WP_Widget_Type' ) ) {
 		public $widget_module = null;
 
 		/**
+		 * Authoring intent about how the widget wants to render. Static
+		 * and declarative; not a user-editable attribute.
+		 *
+		 * One of `'framed'` (default) or `'full-bleed'`. Null when the
+		 * widget did not declare the field.
+		 *
+		 * @var string|null
+		 */
+		public $presentation = null;
+
+		/**
 		 * Constructor.
 		 *
 		 * @param string $name Widget type name including namespace.
