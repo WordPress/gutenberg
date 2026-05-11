@@ -19,11 +19,6 @@
 			"count": 2
 		}
 	},
-	"packages/block-editor/src/components/block-card/index.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 3
-		}
-	},
 	"packages/block-editor/src/components/block-inspector/edit-contents.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
