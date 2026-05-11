@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
-import { __, _x } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { isReusableBlock, isTemplatePart } from '@wordpress/blocks';
 
@@ -55,15 +55,19 @@ export default function EditSectionButton( { clientId } ) {
 		}
 	};
 
+	let buttonLabel;
+	if ( isEditing ) {
+		/* translators: Button label to leave pattern editing mode. */
+		buttonLabel = __( 'Exit pattern' );
+	} else {
+		/* translators: Button label to enter pattern editing mode. */
+		buttonLabel = __( 'Edit pattern' );
+	}
+
 	return (
 		<ToolbarGroup>
 			<ToolbarButton onClick={ handleClick }>
-				{ isEditing
-					? _x(
-							'Exit pattern',
-							'Button label to leave pattern editing mode'
-					  )
-					: __( 'Edit pattern' ) }
+				{ buttonLabel }
 			</ToolbarButton>
 		</ToolbarGroup>
 	);

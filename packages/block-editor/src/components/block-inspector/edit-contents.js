@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { Button, __experimentalVStack as VStack } from '@wordpress/components';
-import { __, _x } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { isReusableBlock, isTemplatePart } from '@wordpress/blocks';
 
@@ -67,6 +67,15 @@ function InlineEditButton( {
 		}
 	};
 
+	let buttonLabel;
+	if ( editedContentOnlySection ) {
+		/* translators: Button label to leave pattern editing mode. */
+		buttonLabel = __( 'Exit pattern' );
+	} else {
+		/* translators: Button label to enter pattern editing mode. */
+		buttonLabel = __( 'Edit pattern' );
+	}
+
 	return (
 		<VStack className="block-editor-block-inspector-edit-contents" expanded>
 			<Button
@@ -75,12 +84,7 @@ function InlineEditButton( {
 				variant="secondary"
 				onClick={ handleClick }
 			>
-				{ editedContentOnlySection
-					? _x(
-							'Exit pattern',
-							'Button label to leave pattern editing mode'
-					  )
-					: __( 'Edit pattern' ) }
+				{ buttonLabel }
 			</Button>
 		</VStack>
 	);
