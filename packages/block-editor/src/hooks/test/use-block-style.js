@@ -48,6 +48,10 @@ describe( 'useBlockStyle', () => {
 			style: {
 				color: { text: '#000000' },
 				':hover': { color: { text: '#ff0000' } },
+				mobile: {
+					color: { text: '#00ff00' },
+					':hover': { color: { text: '#ffff00' } },
+				},
 			},
 		} );
 		await act( async () => {
@@ -125,6 +129,24 @@ describe( 'useBlockStyle', () => {
 				color: { text: '#ff0000' },
 			} );
 		} );
+
+		it( 'reads a value scoped to a viewport state path', () => {
+			const { result } = renderHook(
+				() => useBlockStyle( 'color.text', 'mobile' ),
+				{ wrapper: makeWrapper( clientId ) }
+			);
+
+			expect( result.current[ 0 ] ).toBe( '#00ff00' );
+		} );
+
+		it( 'reads a value scoped to a combined viewport and pseudo-state path', () => {
+			const { result } = renderHook(
+				() => useBlockStyle( 'color.text', 'mobile.:hover' ),
+				{ wrapper: makeWrapper( clientId ) }
+			);
+
+			expect( result.current[ 0 ] ).toBe( '#ffff00' );
+		} );
 	} );
 
 	describe( 'writing values', () => {
@@ -193,6 +215,54 @@ describe( 'useBlockStyle', () => {
 			expect( style[ ':hover' ] ).toBeUndefined();
 			// Default-state styles must be left intact.
 			expect( style.color.text ).toBe( '#000000' );
+		} );
+
+		it( 'writes a value to a viewport state path without affecting the default state', () => {
+			const { result } = renderHook(
+				() => useBlockStyle( 'color.text', 'mobile' ),
+				{ wrapper: makeWrapper( clientId ) }
+			);
+
+			act( () => {
+				result.current[ 1 ]( '#0000ff' );
+			} );
+
+			const { style } =
+				select( blockEditorStore ).getBlockAttributes( clientId );
+			expect( style.mobile.color.text ).toBe( '#0000ff' );
+			expect( style.color.text ).toBe( '#000000' );
+		} );
+
+		it( 'writes a value to a combined viewport and pseudo-state path', () => {
+			const { result } = renderHook(
+				() => useBlockStyle( 'color.text', 'mobile.:hover' ),
+				{ wrapper: makeWrapper( clientId ) }
+			);
+
+			act( () => {
+				result.current[ 1 ]( '#ffffff' );
+			} );
+
+			const { style } =
+				select( blockEditorStore ).getBlockAttributes( clientId );
+			expect( style.mobile[ ':hover' ].color.text ).toBe( '#ffffff' );
+			expect( style.mobile.color.text ).toBe( '#00ff00' );
+		} );
+
+		it( 'removes empty nested state path objects when a combined value is cleared', () => {
+			const { result } = renderHook(
+				() => useBlockStyle( 'color.text', 'mobile.:hover' ),
+				{ wrapper: makeWrapper( clientId ) }
+			);
+
+			act( () => {
+				result.current[ 1 ]( undefined );
+			} );
+
+			const { style } =
+				select( blockEditorStore ).getBlockAttributes( clientId );
+			expect( style.mobile[ ':hover' ] ).toBeUndefined();
+			expect( style.mobile.color.text ).toBe( '#00ff00' );
 		} );
 	} );
 } );

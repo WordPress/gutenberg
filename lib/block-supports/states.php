@@ -1,6 +1,6 @@
 <?php
 /**
- * Block states support for frontend CSS generation.
+ * Block pseudo-state support for frontend CSS generation.
  *
  * Generates scoped CSS for per-instance pseudo-state styles (e.g., :hover, :focus)
  * declared in block attributes under `style[':hover']`, `style[':focus']`, etc.
@@ -9,24 +9,25 @@
  */
 
 /**
- * Renders per-instance state styles on the frontend for blocks that declare
- * `states` support.
+ * Renders per-instance pseudo-state styles on the frontend for blocks with
+ * configured pseudo-state support.
  *
  * @param string $block_content The block's rendered HTML.
  * @param array  $block         The block data including blockName and attrs.
- * @return string Modified block content with injected state styles.
+ * @return string Modified block content with injected pseudo-state styles.
  */
 function gutenberg_render_block_states_support( $block_content, $block ) {
 	if ( empty( $block['blockName'] ) || empty( $block_content ) ) {
 		return $block_content;
 	}
 
-	$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
+	$block_name = $block['blockName'];
+	$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block_name );
 	if ( ! $block_type ) {
 		return $block_content;
 	}
 
-	$supported_states = $block_type->supports['states'] ?? null;
+	$supported_states = WP_Theme_JSON_Gutenberg::VALID_BLOCK_PSEUDO_SELECTORS[ $block_name ] ?? null;
 	if ( empty( $supported_states ) || ! is_array( $supported_states ) ) {
 		return $block_content;
 	}
@@ -55,15 +56,15 @@ function gutenberg_render_block_states_support( $block_content, $block ) {
 	$unique_class = 'wp-states-' . substr( md5( wp_json_encode( $css_rules ) ), 0, 8 );
 
 	/*
-	 * Register each state's CSS rules with the block-supports style engine store.
+	 * Register each pseudo-state's CSS rules with the block-supports style engine store.
 	 * The store deduplicates rules by selector — two block instances with identical
-	 * state styles share the same hash class and therefore the same selector, so
-	 * only one CSS rule is emitted. The store is flushed to the page by
+	 * pseudo-state styles share the same hash class and therefore the same selector,
+	 * so only one CSS rule is emitted. The store is flushed to the page by
 	 * gutenberg_enqueue_stored_styles() rather than injected inline here.
 	 *
 	 * Preset utility classes (e.g. .has-accent-3-background-color) are generated
-	 * with !important, so state styles targeting the same properties must also use
-	 * !important to win. Properties without preset utility classes don't need it.
+	 * with !important, so pseudo-state styles targeting the same properties must also
+	 * use !important to win. Properties without preset utility classes don't need it.
 	 */
 	$preset_class_properties = array( 'color', 'background-color', 'border-color', 'background', 'font-size', 'font-family' );
 
@@ -89,8 +90,8 @@ function gutenberg_render_block_states_support( $block_content, $block ) {
 		)
 	);
 
-	// Add the unique class to the interactive element so that state selectors
-	// like `.$unique_class:hover` match directly without needing a descendant.
+	// Add the unique class to the interactive element so that pseudo-state
+	// selectors like `.$unique_class:hover` match directly without needing a descendant.
 	// If the block declares selectors.root with a descendant (e.g. the button
 	// block's ".wp-block-button .wp-block-button__link"), we extract the last
 	// class and walk to that element. Otherwise we fall back to the wrapper.

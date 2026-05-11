@@ -37,7 +37,7 @@ import {
 	useStyleOverride,
 	useBlockSettings,
 } from './utils';
-import { BlockStatesControl, STATES_SUPPORT_KEY } from './states';
+import { BlockStatesControl, VALID_BLOCK_PSEUDO_STATES } from './states';
 import { buildStateSelector, buildCanvasStateSelector } from './state-utils';
 import { BlockInspectorPreTabsFill } from '../components/block-inspector/inspector-pre-tabs-slot-fill';
 import { scopeSelector } from '../components/global-styles/utils';
@@ -534,8 +534,8 @@ function useBlockProps( { name, style } ) {
 			cssRules.push( elementCSS );
 		}
 
-		// Generate per-instance state CSS (e.g., :hover, :focus).
-		const validStates = getBlockSupport( name, STATES_SUPPORT_KEY );
+		// Generate per-instance pseudo-state CSS (e.g., :hover, :focus).
+		const validStates = VALID_BLOCK_PSEUDO_STATES[ name ];
 		if ( validStates ) {
 			validStates.forEach( ( state ) => {
 				const stateStyles = style?.[ state ];
