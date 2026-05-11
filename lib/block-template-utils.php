@@ -6,6 +6,33 @@
  */
 
 /**
+ * Finds an available path in a ZIP archive by appending a numeric suffix if needed.
+ *
+ * @since 6.8.0
+ * @access private
+ *
+ * @param ZipArchive $zip  ZIP archive.
+ * @param string     $path Desired path in the ZIP archive.
+ * @return string Available path in the ZIP archive.
+ */
+function gutenberg_get_available_zip_path( $zip, $path ) {
+	$path       = ltrim( wp_normalize_path( $path ), '/' );
+	$path_info  = pathinfo( $path );
+	$directory  = ( ! empty( $path_info['dirname'] ) && '.' !== $path_info['dirname'] ) ? trailingslashit( $path_info['dirname'] ) : '';
+	$filename   = $path_info['filename'] ?? '';
+	$extension  = empty( $path_info['extension'] ) ? '' : '.' . $path_info['extension'];
+	$candidate  = $directory . $filename . $extension;
+	$file_index = 1;
+
+	while ( false !== $zip->locateName( $candidate ) || false !== $zip->locateName( trailingslashit( $candidate ) ) ) {
+		$candidate = $directory . $filename . '-' . $file_index . $extension;
+		++$file_index;
+	}
+
+	return $candidate;
+}
+
+/**
  * Creates an export of the current templates and
  * template parts from the site editor at the
  * specified path in a ZIP file.
@@ -104,9 +131,34 @@ function gutenberg_generate_block_templates_export_file() {
 		)
 	);
 	if ( ! empty( $uris_to_migrate ) ) {
-		$uploads = wp_upload_dir();
+		$uploads              = wp_upload_dir();
+		$uploaded_asset_paths = array();
 		foreach ( $uris_to_migrate as $uri ) {
-			$href   = $uri['href'];
+			$relative_file_path = $uri['relative_path'] ?? '';
+			if ( ! is_string( $relative_file_path ) || '' === $relative_file_path || validate_file( $relative_file_path ) > 0 ) {
+				continue;
+			}
+
+			$file = wp_normalize_path( trailingslashit( $uploads['basedir'] ) . $relative_file_path );
+			if ( ! is_file( $file ) || ! is_readable( $file ) ) {
+				continue;
+			}
+
+			if ( ! isset( $uploaded_asset_paths[ $file ] ) ) {
+				$file_content = file_get_contents( $file );
+				if ( false === $file_content ) {
+					continue;
+				}
+
+				$asset_path = gutenberg_get_available_zip_path( $zip, 'assets/' . $relative_file_path );
+				if ( false === $zip->addFromString( $asset_path, $file_content ) ) {
+					continue;
+				}
+
+				$uploaded_asset_paths[ $file ] = $asset_path;
+			}
+
+			$href   = 'file:./' . $uploaded_asset_paths[ $file ];
 			$target = $uri['target'];
 			if ( str_ends_with( $target, 'background.backgroundImage.url' ) ) {
 				/*
@@ -115,28 +167,13 @@ function gutenberg_generate_block_templates_export_file() {
 				 * Done by removing .url from the path to get the target, and setting
 				 * href to replace the `background.backgroundImage` object.
 				 */
-				$target = rtrim( $target, '.url' );
+				$target = substr( $target, 0, -strlen( '.url' ) );
 				$href   = array(
 					'url' => $href,
 				);
 			}
-			$path         = explode( '.', $target );
-			$file         = str_replace( $uploads['baseurl'], $uploads['basedir'], $uri['name'] );
-			$file_content = file_get_contents( $file );
-			if ( ! $file_content ) {
-				continue;
-			}
-
+			$path = explode( '.', $target );
 			_wp_array_set( $theme_json_raw, $path, $href );
-
-			if ( $zip->locateName( 'assets' ) === false ) {
-				// Directory doesn't exist, so add it
-				$zip->addEmptyDir( 'assets' );
-			}
-			$zip->addFromString(
-				'assets/' . basename( parse_url( $file, PHP_URL_PATH ) ),
-				$file_content
-			);
 		}
 	}
 

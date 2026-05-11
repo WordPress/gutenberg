@@ -864,24 +864,39 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		);
 
 		$should_process       = $options['should_process'] ?? array();
-		$theme_json_data      = $theme_json->get_raw_data();
+		$theme_json_data      = $options['theme_json_data'] ?? $theme_json->get_raw_data();
 		$theme_value_prefix   = $options['theme_value_prefix'];
 		$relative_path_prefix = $options['relative_path_prefix'];
+		$value_func           = $options['value_func'];
+
+		if ( ! is_array( $theme_json_data ) || ! is_callable( $value_func ) ) {
+			return $processed_theme_uris;
+		}
+
+		$process_theme_uri = static function ( $theme_path, $theme_value ) use ( &$processed_theme_uris, $theme_value_prefix, $relative_path_prefix, $value_func ) {
+			if ( ! is_string( $theme_value ) || ! str_starts_with( $theme_value, $theme_value_prefix ) ) {
+				return;
+			}
+
+			$processed_theme_uri = call_user_func(
+				$value_func,
+				array(
+					'theme_path'           => $theme_path,
+					'theme_value_prefix'   => $theme_value_prefix,
+					'theme_value'          => $theme_value,
+					'relative_path_prefix' => $relative_path_prefix,
+				)
+			);
+
+			if ( is_array( $processed_theme_uri ) && ! empty( $processed_theme_uri ) ) {
+				$processed_theme_uris[] = $processed_theme_uri;
+			}
+		};
 
 		if ( ! empty( $should_process['images'] ) ) {
 			// Top level styles.
 			$background_image_url = $theme_json_data['styles']['background']['backgroundImage']['url'] ?? null;
-			if ( is_string( $background_image_url ) && str_starts_with( $background_image_url, $theme_value_prefix ) ) {
-				$processed_theme_uris[] = call_user_func(
-					$options['value_func'],
-					array(
-						'theme_path'           => 'styles.background.backgroundImage.url',
-						'theme_value_prefix'   => $theme_value_prefix,
-						'theme_value'          => $background_image_url,
-						'relative_path_prefix' => $relative_path_prefix,
-					)
-				);
-			}
+			$process_theme_uri( 'styles.background.backgroundImage.url', $background_image_url );
 
 			// Block styles.
 			if ( ! empty( $theme_json_data['styles']['blocks'] ) ) {
@@ -890,57 +905,52 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 						continue;
 					}
 					$background_image_url = $block_styles['background']['backgroundImage']['url'] ?? null;
-					if ( is_string( $background_image_url ) && str_starts_with( $background_image_url, $theme_value_prefix ) ) {
-						if ( isset( $options['value_func'] ) && is_callable( $options['value_func'] ) ) {
-							$processed_theme_uris[] = call_user_func(
-								$options['value_func'],
-								array(
-									'theme_path'           => "styles.blocks.{$block_name}.background.backgroundImage.url",
-									'theme_value_prefix'   => $theme_value_prefix,
-									'theme_value'          => $background_image_url,
-									'relative_path_prefix' => $relative_path_prefix,
-								)
-							);
-						}
-					}
+					$process_theme_uri( "styles.blocks.{$block_name}.background.backgroundImage.url", $background_image_url );
 				}
 			}
 		}
 
 		// Font URIs.
 		if ( ! empty( $should_process['fonts'] ) && ! empty( $theme_json_data['settings']['typography']['fontFamilies'] ) ) {
-			$font_families = array_merge(
-				$theme_json_data['settings']['typography']['fontFamilies']['theme'] ?? array(),
-				$theme_json_data['settings']['typography']['fontFamilies']['custom'] ?? array(),
-				$theme_json_data['settings']['typography']['fontFamilies']['default'] ?? array()
-			);
+			$font_families         = $theme_json_data['settings']['typography']['fontFamilies'];
+			$font_family_origins   = array( 'default', 'blocks', 'theme', 'custom' );
+			$font_families_by_path = array();
+			$root_font_families    = array();
+
 			foreach ( $font_families as $font_family_key => $font_family ) {
-				if ( ! empty( $font_family['fontFace'] ) ) {
-					foreach ( $font_family['fontFace'] as  $font_face_key => $font_face ) {
-						if ( ! empty( $font_face['src'] ) ) {
-							if ( is_string( $font_face['src'] ) && str_starts_with( $font_face['src'], $theme_value_prefix ) ) {
-								$processed_theme_uris[] = call_user_func(
-									$options['value_func'],
-									array(
-										'theme_path'  => "settings.typography.fontFamilies.{$font_family_key}.fontFace.{$font_face_key}.src",
-										'theme_value_prefix' => $theme_value_prefix,
-										'theme_value' => $font_face['src'],
-										'relative_path_prefix' => $relative_path_prefix,
-									)
-								);
-							} elseif ( is_array( $font_face['src'] ) ) {
-								foreach ( $font_face['src'] as $source_key => $source ) {
-									if ( str_starts_with( $source, $theme_value_prefix ) ) {
-										$processed_theme_uris[] = call_user_func(
-											$options['value_func'],
-											array(
-												'theme_path'           => "settings.typography.fontFamilies.{$font_family_key}.fontFace.{$font_face_key}.src.{$source_key}",
-												'theme_value_prefix'   => $theme_value_prefix,
-												'theme_value'          => $source,
-												'relative_path_prefix' => $relative_path_prefix,
-											)
-										);
-									}
+				if ( in_array( $font_family_key, $font_family_origins, true ) ) {
+					$font_families_by_path[ "settings.typography.fontFamilies.{$font_family_key}" ] = $font_family;
+					continue;
+				}
+
+				$root_font_families[ $font_family_key ] = $font_family;
+			}
+
+			if ( ! empty( $root_font_families ) ) {
+				$font_families_by_path['settings.typography.fontFamilies'] = $root_font_families;
+			}
+
+			foreach ( $font_families_by_path as $font_family_path => $font_families ) {
+				if ( ! is_array( $font_families ) ) {
+					continue;
+				}
+
+				foreach ( $font_families as $font_family_key => $font_family ) {
+					if ( empty( $font_family['fontFace'] ) || ! is_array( $font_family['fontFace'] ) ) {
+						continue;
+					}
+
+					foreach ( $font_family['fontFace'] as $font_face_key => $font_face ) {
+						if ( empty( $font_face['src'] ) ) {
+							continue;
+						}
+
+						if ( is_string( $font_face['src'] ) ) {
+							$process_theme_uri( "{$font_family_path}.{$font_family_key}.fontFace.{$font_face_key}.src", $font_face['src'] );
+						} elseif ( is_array( $font_face['src'] ) ) {
+							foreach ( $font_face['src'] as $source_key => $source ) {
+								if ( is_string( $source ) ) {
+									$process_theme_uri( "{$font_family_path}.{$font_family_key}.fontFace.{$font_face_key}.src.{$source_key}", $source );
 								}
 							}
 						}
@@ -1035,10 +1045,30 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		 * @return array
 		 */
 		$migrate_absolute_uri_to_relative_path = function ( $args ) {
+			$theme_value_path  = wp_parse_url( $args['theme_value'], PHP_URL_PATH );
+			$theme_prefix_path = wp_parse_url( $args['theme_value_prefix'], PHP_URL_PATH );
+
+			if ( ! is_string( $theme_value_path ) || ! is_string( $theme_prefix_path ) ) {
+				return null;
+			}
+
+			$theme_value_path  = wp_normalize_path( rawurldecode( $theme_value_path ) );
+			$theme_prefix_path = trailingslashit( wp_normalize_path( rawurldecode( $theme_prefix_path ) ) );
+
+			if ( ! str_starts_with( $theme_value_path, $theme_prefix_path ) ) {
+				return null;
+			}
+
+			$relative_file_path = ltrim( substr( $theme_value_path, strlen( $theme_prefix_path ) ), '/' );
+			if ( '' === $relative_file_path || validate_file( $relative_file_path ) > 0 ) {
+				return null;
+			}
+
 			return array(
-				'name'   => $args['theme_value'],
-				'href'   => $args['relative_path_prefix'] . basename( parse_url( $args['theme_value'], PHP_URL_PATH ) ),
-				'target' => $args['theme_path'],
+				'name'          => $args['theme_value'],
+				'href'          => $args['relative_path_prefix'] . $relative_file_path,
+				'target'        => $args['theme_path'],
+				'relative_path' => $relative_file_path,
 			);
 		};
 
@@ -1049,9 +1079,10 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 					'images' => true,
 					'fonts'  => true,
 				),
-				'theme_value_prefix'   => $options['theme_value_prefix'] ?? wp_upload_dir()['baseurl'],
+				'theme_json_data'      => $theme_json->get_data(),
+				'theme_value_prefix'   => trailingslashit( $options['theme_value_prefix'] ?? wp_upload_dir()['baseurl'] ),
 				'value_func'           => $migrate_absolute_uri_to_relative_path,
-				'relative_path_prefix' => $options['relative_path_prefix'] ?? 'file:./',
+				'relative_path_prefix' => trailingslashit( $options['relative_path_prefix'] ?? 'file:./' ),
 			)
 		);
 	}
