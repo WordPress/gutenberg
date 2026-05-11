@@ -66,6 +66,12 @@ export const WithRenderProp: Story = {
 				A paragraph of body text rendered as a semantic paragraph
 				element.
 			</Text>
+			<Text variant="body-sm" render={ <h3 /> }>
+				Body typography rendered as a semantic heading.
+			</Text>
+			<Text variant="heading-md" render={ <p /> }>
+				Heading typography rendered as a semantic paragraph.
+			</Text>
 		</Stack>
 	),
 };
