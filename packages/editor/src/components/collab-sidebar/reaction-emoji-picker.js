@@ -121,6 +121,7 @@ export default function ReactionEmojiPicker( { onSelect } ) {
 	return (
 		<Composite
 			role="listbox"
+			orientation="horizontal"
 			aria-label={ __( 'Select an emoji reaction' ) }
 			className="editor-collab-sidebar-panel__emoji-picker"
 		>
