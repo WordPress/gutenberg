@@ -6,12 +6,8 @@
 	height: 0;
 	z-index: 1;
 	cursor: nwse-resize;
-	border-style: solid;
-	border-width: 0;
-	border-block-end-width: 12px;
-	border-inline-start-width: 12px;
-	border-color: transparent;
-	border-block-end-color: var(--wpds-color-fg-interactive-brand);
+	border-block-end: 12px solid var(--wpds-color-fg-interactive-brand);
+	border-inline-start: 12px solid transparent;
 }
 
 .is-horizontal-only {

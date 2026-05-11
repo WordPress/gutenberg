@@ -1699,6 +1699,11 @@
 			"count": 1
 		}
 	},
+	"routes/media-editor/stage.tsx": {
+		"@wordpress/no-non-module-stylesheet-imports": {
+			"count": 1
+		}
+	},
 	"routes/navigation-edit/editor/index.tsx": {
 		"@wordpress/no-non-module-stylesheet-imports": {
 			"count": 1
@@ -1734,12 +1739,7 @@
 			"count": 1
 		}
 	},
-	"routes/post-types/actions/quick-edit.tsx": {
-		"@wordpress/no-non-module-stylesheet-imports": {
-			"count": 1
-		}
-	},
-	"routes/post-types/stage.tsx": {
+	"routes/post-types-list/stage.tsx": {
 		"@wordpress/no-non-module-stylesheet-imports": {
 			"count": 1
 		}
@@ -1752,12 +1752,7 @@
 			"count": 1
 		}
 	},
-	"routes/taxonomies/actions/quick-edit.tsx": {
-		"@wordpress/no-non-module-stylesheet-imports": {
-			"count": 1
-		}
-	},
-	"routes/taxonomies/stage.tsx": {
+	"routes/taxonomies-list/stage.tsx": {
 		"@wordpress/no-non-module-stylesheet-imports": {
 			"count": 1
 		}

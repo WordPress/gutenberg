@@ -2,6 +2,7 @@
  * Widget type definition
  */
 export default {
-	name: 'wordpress/hello-world',
+	name: 'core/hello-world',
 	title: 'Hello World',
+	icon: 'wordpress',
 };

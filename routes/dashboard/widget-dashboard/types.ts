@@ -71,9 +71,11 @@ export interface WidgetTypeMetadata {
 	description?: string;
 
 	/**
-	 * Dashicon slug used as the visual identifier.
+	 * Visual identifier. In `widget.json` this is a Dashicon slug string;
+	 * widgets registered in JS may also pass a React node (an
+	 * `@wordpress/icons` SVG component, or any element).
 	 */
-	icon?: string;
+	icon?: string | ReactNode;
 
 	/**
 	 * Grouping category. Core provides `dashboard`; plugins and themes may
@@ -283,6 +285,11 @@ export interface WidgetDashboardProps {
 	 * Called on every layout mutation (reorder, resize, add, remove).
 	 */
 	onLayoutChange: ( layout: DashboardWidget[] ) => void;
+
+	/**
+	 * Called when the layout is reset to the default.
+	 */
+	onLayoutReset?: () => void;
 
 	/**
 	 * Widget types available for rendering. The dashboard never queries a

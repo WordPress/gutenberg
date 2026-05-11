@@ -31,7 +31,10 @@ function _gutenberg_connectors_init(): void {
 			'description'    => __( 'Protect your site from spam.', 'gutenberg' ),
 			'type'           => 'spam_filtering',
 			'plugin'         => array(
-				'file' => 'akismet/akismet.php',
+				'file'      => 'akismet/akismet.php',
+				'is_active' => static function (): bool {
+					return defined( 'AKISMET_VERSION' );
+				},
 			),
 			'authentication' => array(
 				'method'          => 'api_key',
@@ -129,7 +132,7 @@ function _gutenberg_register_default_ai_providers( WP_Connector_Registry $regist
 	// Registry values (from provider plugins) take precedence over hardcoded fallbacks.
 	$ai_registry = \WordPress\AiClient\AiClient::defaultRegistry();
 
-	foreach ( $ai_registry->getRegisteredProviderIds() as $connector_id ) {
+	foreach ( array_filter( $ai_registry->getRegisteredProviderIds() ) as $connector_id ) {
 		$provider_class_name = $ai_registry->getProviderClassName( $connector_id );
 		$provider_metadata   = $provider_class_name::metadata();
 
@@ -139,9 +142,11 @@ function _gutenberg_register_default_ai_providers( WP_Connector_Registry $regist
 		if ( $is_api_key ) {
 			$credentials_url = $provider_metadata->getCredentialsUrl();
 			$authentication  = array(
-				'method'          => 'api_key',
-				'credentials_url' => $credentials_url ? $credentials_url : null,
+				'method' => 'api_key',
 			);
+			if ( $credentials_url ) {
+				$authentication['credentials_url'] = $credentials_url;
+			}
 		} else {
 			$authentication = array( 'method' => 'none' );
 		}
@@ -174,8 +179,10 @@ function _gutenberg_register_default_ai_providers( WP_Connector_Registry $regist
 				'description'    => $description ? $description : '',
 				'type'           => 'ai_provider',
 				'authentication' => $authentication,
-				'logo_url'       => $logo_url,
 			);
+			if ( $logo_url ) {
+				$defaults[ $connector_id ]['logo_url'] = $logo_url;
+			}
 		}
 	}
 
@@ -184,23 +191,23 @@ function _gutenberg_register_default_ai_providers( WP_Connector_Registry $regist
 		if ( 'api_key' === $args['authentication']['method'] ) {
 			$sanitized_id = str_replace( '-', '_', $id );
 
-			if ( ! isset( $args['authentication']['setting_name'] ) ) {
-				$args['authentication']['setting_name'] = "connectors_ai_{$sanitized_id}_api_key";
-			}
+			$args['authentication']['setting_name'] = "connectors_ai_{$sanitized_id}_api_key";
 
 			// All AI providers use the {CONSTANT_CASE_ID}_API_KEY naming convention.
-			if ( ! isset( $args['authentication']['constant_name'] ) || ! isset( $args['authentication']['env_var_name'] ) ) {
-				$constant_case_key = strtoupper( preg_replace( '/([a-z])([A-Z])/', '$1_$2', $sanitized_id ) ) . '_API_KEY';
+			$constant_case_key = strtoupper( (string) preg_replace( '/([a-z])([A-Z])/', '$1_$2', $sanitized_id ) ) . '_API_KEY';
 
-				if ( ! isset( $args['authentication']['constant_name'] ) ) {
-					$args['authentication']['constant_name'] = $constant_case_key;
-				}
-
-				if ( ! isset( $args['authentication']['env_var_name'] ) ) {
-					$args['authentication']['env_var_name'] = $constant_case_key;
-				}
-			}
+			$args['authentication']['constant_name'] = $constant_case_key;
+			$args['authentication']['env_var_name']  = $constant_case_key;
 		}
+
+		$args['plugin']['is_active'] = static function () use ( $ai_registry, $id ): bool {
+			try {
+				return $ai_registry->hasProvider( $id );
+			} catch ( Exception $e ) {
+				return false;
+			}
+		};
+
 		$registry->register( $id, $args );
 	}
 }
@@ -373,10 +380,9 @@ add_filter( 'rest_post_dispatch', '_gutenberg_connectors_rest_settings_dispatch'
  * @access private
  */
 function _gutenberg_register_default_connector_settings(): void {
-	$ai_registry       = \WordPress\AiClient\AiClient::defaultRegistry();
 	$existing_settings = get_registered_settings();
 
-	foreach ( wp_get_connectors() as $connector_id => $connector_data ) {
+	foreach ( wp_get_connectors() as $connector_data ) {
 		$auth = $connector_data['authentication'];
 		if ( 'api_key' !== $auth['method'] || empty( $auth['setting_name'] ) ) {
 			continue;
@@ -387,8 +393,11 @@ function _gutenberg_register_default_connector_settings(): void {
 			continue;
 		}
 
-		// For AI providers, skip if the provider is not in the AI Client registry.
-		if ( 'ai_provider' === $connector_data['type'] && ! $ai_registry->hasProvider( $connector_id ) ) {
+		if ( ! isset( $connector_data['plugin']['is_active'] ) || ! is_callable( $connector_data['plugin']['is_active'] ) ) {
+			continue;
+		}
+
+		if ( ! call_user_func( $connector_data['plugin']['is_active'] ) ) {
 			continue;
 		}
 
@@ -454,7 +463,7 @@ function _gutenberg_pass_default_connector_keys_to_ai_client(): void {
 			}
 
 			$api_key = get_option( $auth['setting_name'], '' );
-			if ( '' === $api_key ) {
+			if ( ! is_string( $api_key ) || '' === $api_key ) {
 				continue;
 			}
 
@@ -485,7 +494,7 @@ function _gutenberg_get_connector_script_module_data( array $data ): array {
 
 	$registry = \WordPress\AiClient\AiClient::defaultRegistry();
 
-	if ( ! function_exists( 'is_plugin_active' ) ) {
+	if ( ! function_exists( 'validate_plugin' ) ) {
 		require_once ABSPATH . 'wp-admin/includes/plugin.php';
 	}
 
@@ -525,22 +534,8 @@ function _gutenberg_get_connector_script_module_data( array $data ): array {
 
 		if ( ! empty( $connector_data['plugin']['file'] ) ) {
 			$file         = $connector_data['plugin']['file'];
-			$is_installed = false;
-			$is_activated = false;
-
-			if ( ! empty( $connector_data['plugin']['is_active'] ) && is_callable( $connector_data['plugin']['is_active'] ) ) {
-				$is_activated = (bool) call_user_func( $connector_data['plugin']['is_active'] );
-			}
-
-			if ( ! $is_activated ) {
-				$is_activated = is_plugin_active( $file );
-			}
-
-			if ( $is_activated ) {
-				$is_installed = true;
-			} else {
-				$is_installed = file_exists( WP_PLUGIN_DIR . '/' . $file );
-			}
+			$is_activated = (bool) call_user_func( $connector_data['plugin']['is_active'] );
+			$is_installed = $is_activated || 0 === validate_plugin( $file );
 
 			$connector_out['plugin'] = array(
 				'file'        => $file,
@@ -552,7 +547,8 @@ function _gutenberg_get_connector_script_module_data( array $data ): array {
 		$connectors[ $connector_id ] = $connector_out;
 	}
 	ksort( $connectors );
-	$data['connectors'] = $connectors;
+	$data['connectors']        = $connectors;
+	$data['isFileModDisabled'] = ! wp_is_file_mod_allowed( 'install_plugins' );
 	return $data;
 }
 remove_filter( 'script_module_data_options-connectors-wp-admin', '_wp_connectors_get_connector_script_module_data' );

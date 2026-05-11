@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "23.1.0-rc.1",
+	"version": "23.1.1",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -31,12 +31,12 @@
 				],
 				"experimental": true
 			},
+			"media-editor",
 			"font-library",
 			"options-connectors",
 			"guidelines",
 			"experiments",
-			"taxonomies",
-			"post-types",
+			"content-types",
 			"dashboard"
 		]
 	},

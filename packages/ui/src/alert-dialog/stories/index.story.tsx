@@ -12,6 +12,7 @@ const meta: Meta< typeof AlertDialog.Root > = {
 	component: AlertDialog.Root,
 	subcomponents: {
 		'AlertDialog.Trigger': AlertDialog.Trigger,
+		'AlertDialog.Portal': AlertDialog.Portal,
 		'AlertDialog.Popup': AlertDialog.Popup,
 	},
 	argTypes: {
