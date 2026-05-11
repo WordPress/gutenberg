@@ -19,12 +19,14 @@ import { cleanEmptyObject } from './utils';
  *
  * Path uses dot notation into the style object, e.g. `'color'` or
  * `'typography.fontSize'`. Pass a separate `state` argument to scope to a
- * pseudo-state or custom state — the state key becomes the first segment of
- * the storage path:
+ * pseudo-state, custom state, viewport state, or combined state path — the
+ * state path becomes the first segments of the storage path:
  *
  *   `useBlockStyle( 'color', ':hover' )`       — `style[':hover'].color`
  *   `useBlockStyle( 'color', '@current' )`     — `style['@current'].color`
  *   `useBlockStyle( 'color', ':hover:focus' )` — compound state
+ *   `useBlockStyle( 'color', 'mobile' )`       — `style.mobile.color`
+ *   `useBlockStyle( 'color', 'mobile.:hover' )` — `style.mobile[':hover'].color`
  *
  * Omit `path` (or pass `null`) to read and write the full style object for
  * that state context, e.g. `useBlockStyle( null, ':hover' )` returns the
@@ -57,9 +59,9 @@ export function useBlockStyle( path, state ) {
 		} else {
 			stylePath = path.split( '.' );
 		}
-		return state && state !== 'default'
-			? [ state, ...stylePath ]
-			: stylePath;
+		const statePath =
+			state && state !== 'default' ? state.split( '.' ) : [];
+		return [ ...statePath, ...stylePath ];
 	}, [ path, state ] );
 
 	const value = useMemo(
