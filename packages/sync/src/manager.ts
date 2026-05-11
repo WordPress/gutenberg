@@ -447,13 +447,12 @@ export function createSyncManager( debug = false ): SyncManager {
 	 */
 	function unloadAll(): void {
 		log( 'unloadAll', 'unloading all entities', '' );
-		for ( const [ entityId, entityState ] of entityStates ) {
+		for ( const [ entityId, entityState ] of [ ...entityStates ] ) {
 			log( 'unloadAll', 'unloading', entityId );
 			entityState.unload();
 		}
 		entityStates.clear();
-		for ( const [ objectType, collectionState ] of collectionStates ) {
-			log( 'unloadAll', 'unloading collection', objectType as string );
+		for ( const [ , collectionState ] of [ ...collectionStates ] ) {
 			collectionState.unload();
 		}
 		collectionStates.clear();
