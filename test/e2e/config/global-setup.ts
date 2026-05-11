@@ -1,82 +1,18 @@
 /**
  * External dependencies
  */
-import fs from 'node:fs/promises';
-import path from 'node:path';
 import { request } from '@playwright/test';
 import type { FullConfig } from '@playwright/test';
-import { build as esbuildBuild } from 'esbuild';
 
 /**
  * WordPress dependencies
  */
 import { RequestUtils } from '@wordpress/e2e-test-utils-playwright';
 
-function getProviderPluginDir() {
-	return path.resolve(
-		__dirname,
-		'../../../packages/e2e-tests/plugins/rtc-websocket-provider'
-	);
-}
-
-async function buildTestWebSocketProvider() {
-	const pluginDir = getProviderPluginDir();
-	await esbuildBuild( {
-		entryPoints: [ path.join( pluginDir, 'src/index.js' ) ],
-		outfile: path.join( pluginDir, 'build/index.js' ),
-		bundle: true,
-		format: 'iife',
-		target: 'es2020',
-		alias: { yjs: path.join( pluginDir, 'src/yjs-external.js' ) },
-		logLevel: 'warning',
-	} );
-}
-
-// Write the resolved WS URL where the PHP test plugin can read it. wp-env
-// does not forward host env vars into the WordPress container, so
-// getenv( 'GUTENBERG_RTC_TEST_WS_URL' ) inside PHP would always return false
-// and the browser would fall back to ws://127.0.0.1:18991, ignoring any port
-// override. The plugin directory is bind-mounted into the container, so a
-// file written here on the host is visible to PHP at the same relative path.
-async function writeTestWebSocketProviderRuntimeConfig() {
-	const pluginDir = getProviderPluginDir();
-	const wsUrl =
-		process.env.GUTENBERG_RTC_TEST_WS_URL ||
-		`ws://127.0.0.1:${ process.env.GUTENBERG_RTC_TEST_WS_PORT || '18991' }`;
-	const configPath = path.join( pluginDir, 'build/runtime-config.json' );
-	await fs.mkdir( path.dirname( configPath ), { recursive: true } );
-	await fs.writeFile( configPath, JSON.stringify( { url: wsUrl } ) + '\n' );
-}
-
-async function resetTestWebSocketSyncServer() {
-	const wsUrl =
-		process.env.GUTENBERG_RTC_TEST_WS_URL ||
-		`ws://127.0.0.1:${ process.env.GUTENBERG_RTC_TEST_WS_PORT || '18991' }`;
-	const resetUrl = new URL( wsUrl );
-	resetUrl.protocol = resetUrl.protocol === 'wss:' ? 'https:' : 'http:';
-	resetUrl.pathname = '/reset';
-	resetUrl.search = '';
-	resetUrl.hash = '';
-
-	let lastError: unknown;
-	for ( let attempts = 0; attempts < 20; attempts++ ) {
-		try {
-			const response = await fetch( resetUrl, { method: 'POST' } );
-			if ( response.ok || response.status === 204 ) {
-				return;
-			}
-			lastError = new Error(
-				`WebSocket sync server reset failed with HTTP ${ response.status }`
-			);
-		} catch ( error ) {
-			lastError = error;
-		}
-
-		await new Promise( ( resolve ) => setTimeout( resolve, 250 ) );
-	}
-
-	throw lastError;
-}
+/**
+ * Internal dependencies
+ */
+import { prepareRtcWebSocketProvider } from './rtc-websocket-setup';
 
 async function globalSetup( config: FullConfig ) {
 	const { storageState, baseURL } = config.projects[ 0 ].use;
@@ -105,31 +41,8 @@ async function globalSetup( config: FullConfig ) {
 		requestUtils.deleteAllPosts(),
 		requestUtils.deleteAllBlocks(),
 		requestUtils.resetPreferences(),
+		...( await prepareRtcWebSocketProvider( requestUtils ) ),
 	];
-
-	const useTestWebSocketProvider =
-		process.env.GUTENBERG_RTC_TEST_WS_PROVIDER === '1';
-
-	if ( useTestWebSocketProvider ) {
-		await buildTestWebSocketProvider();
-		await writeTestWebSocketProviderRuntimeConfig();
-
-		if ( process.env.GUTENBERG_RTC_TEST_WS_SKIP_RESET !== '1' ) {
-			resetTasks.push( resetTestWebSocketSyncServer() );
-		}
-
-		resetTasks.push(
-			requestUtils.activatePlugin(
-				'gutenberg-test-plugin-rtc-websocket-provider'
-			)
-		);
-	} else {
-		resetTasks.push(
-			requestUtils.deactivatePlugin(
-				'gutenberg-test-plugin-rtc-websocket-provider'
-			)
-		);
-	}
 
 	await Promise.all( resetTasks );
 
