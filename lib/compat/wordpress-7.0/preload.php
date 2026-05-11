@@ -91,6 +91,7 @@ function gutenberg_block_editor_preload_paths_6_9( $paths, $context ) {
 
 		if ( $has_query ) {
 			$post_rest_route = rest_get_route_for_post_type_items( 'post' );
+			$paths[]         = '/wp/v2/types/post?context=edit';
 			foreach ( array( 10, 3 ) as $per_page ) {
 				$paths[] = add_query_arg(
 					array(
@@ -105,6 +106,17 @@ function gutenberg_block_editor_preload_paths_6_9( $paths, $context ) {
 				);
 			}
 		}
+
+		$paths[] = add_query_arg(
+			array(
+				'context'  => 'edit',
+				'per_page' => 100,
+				'_fields'  => 'id,link,menu_order,parent,title,type',
+				'orderby'  => 'menu_order',
+				'order'    => 'asc',
+			),
+			rest_get_route_for_post_type_items( 'page' )
+		);
 
 		$paths[] = '/wp/v2/taxonomies?context=view';
 
