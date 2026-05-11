@@ -22,6 +22,8 @@ add_action( 'dashboard_init', 'gutenberg_dashboard_widgets_register_news_widget'
 add_action( 'dashboard-wp-admin_init', 'gutenberg_dashboard_widgets_register_news_widget' );
 add_action( 'dashboard_init', 'gutenberg_dashboard_widgets_register_hello_dolly_widget' );
 add_action( 'dashboard-wp-admin_init', 'gutenberg_dashboard_widgets_register_hello_dolly_widget' );
+add_action( 'dashboard_init', 'gutenberg_dashboard_widgets_register_on_this_day_widget' );
+add_action( 'dashboard-wp-admin_init', 'gutenberg_dashboard_widgets_register_on_this_day_widget' );
 add_action( 'admin_print_scripts', 'gutenberg_dashboard_widgets_print_config' );
 
 /**
@@ -196,5 +198,24 @@ function gutenberg_dashboard_widgets_register_hello_dolly_widget() {
 
 	if ( function_exists( 'gutenberg_register_dashboard_wp_admin_route' ) ) {
 		gutenberg_register_dashboard_wp_admin_route( '/__widget_hello_dolly', $widget_module );
+	}
+}
+
+/**
+ * Wires the `on-this-day` widget as a dynamic dep of the dashboard module so it
+ * lands in the import map and React.lazy in the dashboard stage can resolve it.
+ */
+function gutenberg_dashboard_widgets_register_on_this_day_widget() {
+	$widget_module = 'wp/widgets/on-this-day/render';
+
+	if ( function_exists( 'gutenberg_register_dashboard_route' ) ) {
+		gutenberg_register_dashboard_route( '/__widget_on_this_day', $widget_module );
+	}
+
+	if ( function_exists( 'gutenberg_register_dashboard_wp_admin_route' ) ) {
+		gutenberg_register_dashboard_wp_admin_route(
+			'/__widget_on_this_day',
+			$widget_module
+		);
 	}
 }

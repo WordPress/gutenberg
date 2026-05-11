@@ -1,0 +1,12 @@
+{
+	"name": "core/on-this-day",
+	"title": "On This Day",
+	"description": "Shows posts you published on today’s month and day in previous years.",
+	"category": "dashboard",
+	"keywords": [ "history", "memories", "posts", "archive" ],
+	"example": {
+		"attributes": {
+			"windowDays": 1
+		}
+	}
+}

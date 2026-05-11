@@ -11,7 +11,7 @@
  */
 
 /**
- * Appends the bundled `core/hello-world` instance to the default layout
+ * Appends the bundled `core/on-this-day` instance to the default layout
  * unless something earlier in the filter chain already added it.
  *
  * Only contributes to the bundled `gutenberg_dashboard` surface; other
@@ -30,16 +30,19 @@ function gutenberg_seed_default_dashboard_layout( $dashboard_layout, $dashboard_
 
 	$uuids = array_column( $dashboard_layout, 'uuid' );
 
-	if ( in_array( 'default-hello-world-widget-instance', $uuids, true ) ) {
+	if ( in_array( 'default-on-this-day-widget-instance', $uuids, true ) ) {
 		return $dashboard_layout;
 	}
 
 	$dashboard_layout[] = array(
-		'uuid'      => 'default-hello-world-widget-instance',
-		'type'      => 'core/hello-world',
-		'placement' => array(
+		'uuid'        => 'default-on-this-day-widget-instance',
+		'type'        => 'core/on-this-day',
+		'attributes'  => array(
+			'windowDays' => 1,
+		),
+		'placement'   => array(
 			'width'  => 2,
-			'height' => 1,
+			'height' => 2,
 		),
 	);
 
