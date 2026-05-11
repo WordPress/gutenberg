@@ -203,10 +203,7 @@ function BlockCard( {
 					</OptionalParentSelectButton>
 				</Stack>
 				{ ! parentClientId && ! isChild && description && (
-					<Text
-						variant="body-md"
-						className="block-editor-block-card__description"
-					>
+					<Text className="block-editor-block-card__description">
 						{ description }
 					</Text>
 				) }
