@@ -89,19 +89,7 @@ export default class CollaborationUtils {
 	 * @param postId The post ID to open.
 	 */
 	async openPost( postId: number ) {
-		await this.admin.visitAdminPage(
-			'post.php',
-			`post=${ postId }&action=edit`
-		);
-		await this.primaryPage.waitForFunction(
-			() => window?.wp?.data && window?.wp?.blocks,
-			undefined,
-			{ timeout: 30000 }
-		);
-		await this.editor.setPreferences( 'core/edit-post', {
-			welcomeGuide: false,
-			fullscreenMode: false,
-		} );
+		await this.admin.editPost( postId );
 		await this.waitForCollaborationReady( this.primaryPage );
 	}
 
