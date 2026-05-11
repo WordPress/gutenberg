@@ -12,7 +12,22 @@
  */
 function gutenberg_test_rtc_websocket_provider_enqueue() {
 	$script_path = plugin_dir_path( __FILE__ ) . 'rtc-websocket-provider/build/index.js';
-	$ws_url      = getenv( 'GUTENBERG_RTC_TEST_WS_URL' );
+	$ws_url      = '';
+
+	// The Playwright globalSetup writes the resolved WS URL here so the PHP
+	// plugin can find it. wp-env does not forward host env vars into the
+	// container, so getenv() alone would always miss any port override.
+	$config_path = plugin_dir_path( __FILE__ ) . 'rtc-websocket-provider/build/runtime-config.json';
+	if ( file_exists( $config_path ) ) {
+		$config = json_decode( file_get_contents( $config_path ), true );
+		if ( is_array( $config ) && ! empty( $config['url'] ) ) {
+			$ws_url = $config['url'];
+		}
+	}
+
+	if ( ! $ws_url ) {
+		$ws_url = getenv( 'GUTENBERG_RTC_TEST_WS_URL' );
+	}
 
 	if ( ! $ws_url ) {
 		$ws_port = getenv( 'GUTENBERG_RTC_TEST_WS_PORT' );

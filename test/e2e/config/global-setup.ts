@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import fs from 'node:fs/promises';
 import path from 'node:path';
 import { request } from '@playwright/test';
 import type { FullConfig } from '@playwright/test';
@@ -11,11 +12,15 @@ import { build as esbuildBuild } from 'esbuild';
  */
 import { RequestUtils } from '@wordpress/e2e-test-utils-playwright';
 
-async function buildTestWebSocketProvider() {
-	const pluginDir = path.resolve(
+function getProviderPluginDir() {
+	return path.resolve(
 		__dirname,
 		'../../../packages/e2e-tests/plugins/rtc-websocket-provider'
 	);
+}
+
+async function buildTestWebSocketProvider() {
+	const pluginDir = getProviderPluginDir();
 	await esbuildBuild( {
 		entryPoints: [ path.join( pluginDir, 'src/index.js' ) ],
 		outfile: path.join( pluginDir, 'build/index.js' ),
@@ -25,6 +30,22 @@ async function buildTestWebSocketProvider() {
 		alias: { yjs: path.join( pluginDir, 'src/yjs-external.js' ) },
 		logLevel: 'warning',
 	} );
+}
+
+// Write the resolved WS URL where the PHP test plugin can read it. wp-env
+// does not forward host env vars into the WordPress container, so
+// getenv( 'GUTENBERG_RTC_TEST_WS_URL' ) inside PHP would always return false
+// and the browser would fall back to ws://127.0.0.1:18991, ignoring any port
+// override. The plugin directory is bind-mounted into the container, so a
+// file written here on the host is visible to PHP at the same relative path.
+async function writeTestWebSocketProviderRuntimeConfig() {
+	const pluginDir = getProviderPluginDir();
+	const wsUrl =
+		process.env.GUTENBERG_RTC_TEST_WS_URL ||
+		`ws://127.0.0.1:${ process.env.GUTENBERG_RTC_TEST_WS_PORT || '18991' }`;
+	const configPath = path.join( pluginDir, 'build/runtime-config.json' );
+	await fs.mkdir( path.dirname( configPath ), { recursive: true } );
+	await fs.writeFile( configPath, JSON.stringify( { url: wsUrl } ) + '\n' );
 }
 
 async function resetTestWebSocketSyncServer() {
@@ -91,6 +112,7 @@ async function globalSetup( config: FullConfig ) {
 
 	if ( useTestWebSocketProvider ) {
 		await buildTestWebSocketProvider();
+		await writeTestWebSocketProviderRuntimeConfig();
 
 		if ( process.env.GUTENBERG_RTC_TEST_WS_SKIP_RESET !== '1' ) {
 			resetTasks.push( resetTestWebSocketSyncServer() );
