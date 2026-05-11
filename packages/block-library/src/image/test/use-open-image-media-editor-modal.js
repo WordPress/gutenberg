@@ -10,12 +10,14 @@ import { act, renderHook } from '@testing-library/react';
 /**
  * WordPress dependencies
  */
-import { useRegistry } from '@wordpress/data';
+import { useRegistry, useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import { useMediaEditorMetadataSync } from '../use-media-editor-metadata-sync';
+import { useOpenImageMediaEditorModal } from '../use-open-image-media-editor-modal';
+
+const mockOpenMediaEditorModalKey = 'openMediaEditorModal';
 
 jest.mock( '@wordpress/core-data', () => ( {
 	store: {},
@@ -23,6 +25,18 @@ jest.mock( '@wordpress/core-data', () => ( {
 
 jest.mock( '@wordpress/data', () => ( {
 	useRegistry: jest.fn(),
+	useSelect: jest.fn(),
+} ) );
+
+jest.mock( '@wordpress/block-editor', () => ( {
+	privateApis: {},
+	store: {},
+} ) );
+
+jest.mock( '../../lock-unlock', () => ( {
+	unlock: jest.fn( () => ( {
+		openMediaEditorModalKey: 'openMediaEditorModal',
+	} ) ),
 } ) );
 
 function createRegistry( {
@@ -54,7 +68,17 @@ function createDeferred() {
 	return { promise, resolve };
 }
 
-describe( 'useMediaEditorMetadataSync', () => {
+function useMediaEditorModalSetting( openMediaEditorModal ) {
+	useSelect.mockImplementation( ( mapSelect ) =>
+		mapSelect( () => ( {
+			getSettings: () => ( {
+				[ mockOpenMediaEditorModalKey ]: openMediaEditorModal,
+			} ),
+		} ) )
+	);
+}
+
+describe( 'useOpenImageMediaEditorModal', () => {
 	beforeEach( () => {
 		jest.clearAllMocks();
 	} );
@@ -77,22 +101,21 @@ describe( 'useMediaEditorMetadataSync', () => {
 		useRegistry.mockReturnValue( registry );
 		const setAttributes = jest.fn();
 		const openMediaEditorModal = jest.fn();
+		useMediaEditorModalSetting( openMediaEditorModal );
 		const { result } = renderHook( () =>
-			useMediaEditorMetadataSync( {
+			useOpenImageMediaEditorModal( {
 				attributes: {
 					id: 1,
 					url: 'original.jpg',
 					alt: 'Original alt',
 					caption: 'Original caption',
 				},
-				image: originalAttachment,
 				setAttributes,
-				openMediaEditorModal,
 			} )
 		);
 
-		act( () => {
-			result.current();
+		await act( async () => {
+			await result.current();
 		} );
 		await act( async () => {
 			await openMediaEditorModal.mock.calls[ 0 ][ 0 ].onUpdate( {
@@ -115,6 +138,66 @@ describe( 'useMediaEditorMetadataSync', () => {
 		);
 	} );
 
+	it( 'resolves original raw attachment metadata before opening the modal when it is not cached', async () => {
+		const originalAttachment = {
+			id: 1,
+			alt_text: 'Original alt',
+			caption: { raw: 'Original caption' },
+		};
+		const updatedAttachment = {
+			id: 1,
+			alt_text: 'Updated alt',
+			caption: { raw: 'Updated caption' },
+		};
+		const resolveGetEntityRecord = jest
+			.fn()
+			.mockResolvedValueOnce( originalAttachment )
+			.mockResolvedValueOnce( updatedAttachment );
+		const registry = createRegistry( {
+			resolveGetEntityRecord,
+		} );
+		useRegistry.mockReturnValue( registry );
+		const setAttributes = jest.fn();
+		const openMediaEditorModal = jest.fn();
+		useMediaEditorModalSetting( openMediaEditorModal );
+		const { result } = renderHook( () =>
+			useOpenImageMediaEditorModal( {
+				attributes: {
+					id: 1,
+					url: 'original.jpg',
+					alt: 'Original alt',
+					caption: 'Original caption',
+				},
+				setAttributes,
+			} )
+		);
+
+		await act( async () => {
+			await result.current();
+		} );
+		await act( async () => {
+			await openMediaEditorModal.mock.calls[ 0 ][ 0 ].onUpdate( {
+				id: 1,
+				url: 'updated.jpg',
+			} );
+		} );
+
+		expect( resolveGetEntityRecord ).toHaveBeenNthCalledWith(
+			1,
+			'postType',
+			'attachment',
+			1
+		);
+		expect( openMediaEditorModal ).toHaveBeenCalledWith( {
+			id: 1,
+			onUpdate: expect.any( Function ),
+		} );
+		expect( setAttributes ).toHaveBeenCalledWith( {
+			alt: 'Updated alt',
+			caption: 'Updated caption',
+		} );
+	} );
+
 	it( 'resolves attachment metadata when a new attachment id is not cached', async () => {
 		const originalAttachment = {
 			id: 1,
@@ -135,22 +218,21 @@ describe( 'useMediaEditorMetadataSync', () => {
 		useRegistry.mockReturnValue( registry );
 		const setAttributes = jest.fn();
 		const openMediaEditorModal = jest.fn();
+		useMediaEditorModalSetting( openMediaEditorModal );
 		const { result } = renderHook( () =>
-			useMediaEditorMetadataSync( {
+			useOpenImageMediaEditorModal( {
 				attributes: {
 					id: 1,
 					url: 'original.jpg',
 					alt: '',
 					caption: '',
 				},
-				image: originalAttachment,
 				setAttributes,
-				openMediaEditorModal,
 			} )
 		);
 
-		act( () => {
-			result.current();
+		await act( async () => {
+			await result.current();
 		} );
 		await act( async () => {
 			await openMediaEditorModal.mock.calls[ 0 ][ 0 ].onUpdate( {
@@ -194,22 +276,21 @@ describe( 'useMediaEditorMetadataSync', () => {
 		useRegistry.mockReturnValue( registry );
 		const setAttributes = jest.fn();
 		const openMediaEditorModal = jest.fn();
+		useMediaEditorModalSetting( openMediaEditorModal );
 		const { result } = renderHook( () =>
-			useMediaEditorMetadataSync( {
+			useOpenImageMediaEditorModal( {
 				attributes: {
 					id: 1,
 					url: 'original.jpg',
 					alt: '',
 					caption: '',
 				},
-				image: originalAttachment,
 				setAttributes,
-				openMediaEditorModal,
 			} )
 		);
 
-		act( () => {
-			result.current();
+		await act( async () => {
+			await result.current();
 		} );
 		await act( async () => {
 			await openMediaEditorModal.mock.calls[ 0 ][ 0 ].onUpdate( {
@@ -228,15 +309,11 @@ describe( 'useMediaEditorMetadataSync', () => {
 		} );
 	} );
 
-	it( 'syncs new caption to a block with no caption when the view-context attachment has an existing caption', async () => {
-		// This tests the core failing scenario: the attachment already has a caption
-		// (e.g. set at upload time), the image block has no caption (was added via a
-		// path that didn't include the caption), and the user opens the media editor
-		// to update the caption. The block should receive the new caption.
-		const viewContextAttachment = {
+	it( 'syncs new raw caption to a block with no caption when the original attachment has one', async () => {
+		const originalAttachment = {
 			id: 1,
 			alt_text: '',
-			caption: { rendered: '<p>Existing caption</p>' },
+			caption: { raw: 'Existing caption' },
 		};
 		const updatedAttachment = {
 			id: 1,
@@ -244,29 +321,27 @@ describe( 'useMediaEditorMetadataSync', () => {
 			caption: { raw: 'New caption' },
 		};
 		const registry = createRegistry( {
-			getEntityRecord: ( kind, name, id, query ) =>
-				query?.context === 'view' ? viewContextAttachment : undefined,
+			getEntityRecord: () => originalAttachment,
 			resolveGetEntityRecord: () => updatedAttachment,
 		} );
 		useRegistry.mockReturnValue( registry );
 		const setAttributes = jest.fn();
 		const openMediaEditorModal = jest.fn();
+		useMediaEditorModalSetting( openMediaEditorModal );
 		const { result } = renderHook( () =>
-			useMediaEditorMetadataSync( {
+			useOpenImageMediaEditorModal( {
 				attributes: {
 					id: 1,
 					url: 'original.jpg',
 					alt: '',
 					caption: undefined,
 				},
-				image: undefined,
 				setAttributes,
-				openMediaEditorModal,
 			} )
 		);
 
-		act( () => {
-			result.current();
+		await act( async () => {
+			await result.current();
 		} );
 		await act( async () => {
 			await openMediaEditorModal.mock.calls[ 0 ][ 0 ].onUpdate( {
@@ -292,22 +367,21 @@ describe( 'useMediaEditorMetadataSync', () => {
 		useRegistry.mockReturnValue( registry );
 		const setAttributes = jest.fn();
 		const openMediaEditorModal = jest.fn();
+		useMediaEditorModalSetting( openMediaEditorModal );
 		const { result } = renderHook( () =>
-			useMediaEditorMetadataSync( {
+			useOpenImageMediaEditorModal( {
 				attributes: {
 					id: 1,
 					url: 'original.jpg',
 					alt: '',
 					caption: '',
 				},
-				image: undefined,
 				setAttributes,
-				openMediaEditorModal,
 			} )
 		);
 
-		act( () => {
-			result.current();
+		await act( async () => {
+			await result.current();
 		} );
 		await act( async () => {
 			await openMediaEditorModal.mock.calls[ 0 ][ 0 ].onUpdate( {
@@ -334,22 +408,21 @@ describe( 'useMediaEditorMetadataSync', () => {
 		useRegistry.mockReturnValue( registry );
 		const setAttributes = jest.fn();
 		const openMediaEditorModal = jest.fn();
+		useMediaEditorModalSetting( openMediaEditorModal );
 		const { result } = renderHook( () =>
-			useMediaEditorMetadataSync( {
+			useOpenImageMediaEditorModal( {
 				attributes: {
 					id: 1,
 					url: 'original.jpg',
 					alt: '',
 					caption: 'Custom caption',
 				},
-				image: undefined,
 				setAttributes,
-				openMediaEditorModal,
 			} )
 		);
 
-		act( () => {
-			result.current();
+		await act( async () => {
+			await result.current();
 		} );
 		await act( async () => {
 			await openMediaEditorModal.mock.calls[ 0 ][ 0 ].onUpdate( {
@@ -380,12 +453,11 @@ describe( 'useMediaEditorMetadataSync', () => {
 		useRegistry.mockReturnValue( registry );
 		const setAttributes = jest.fn();
 		const openMediaEditorModal = jest.fn();
+		useMediaEditorModalSetting( openMediaEditorModal );
 		const useHookWithAttributes = ( attributes ) =>
-			useMediaEditorMetadataSync( {
+			useOpenImageMediaEditorModal( {
 				attributes,
-				image: originalAttachment,
 				setAttributes,
-				openMediaEditorModal,
 			} );
 		const { result, rerender } = renderHook(
 			( { attributes } ) => useHookWithAttributes( attributes ),
@@ -401,8 +473,8 @@ describe( 'useMediaEditorMetadataSync', () => {
 			}
 		);
 
-		act( () => {
-			result.current();
+		await act( async () => {
+			await result.current();
 		} );
 		let updatePromise;
 		await act( async () => {

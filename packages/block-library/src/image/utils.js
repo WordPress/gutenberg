@@ -103,23 +103,9 @@ export function mediaPosition( { x, y } = { x: 0.5, y: 0.5 } ) {
 	return `${ Math.round( x * 100 ) }% ${ Math.round( y * 100 ) }%`;
 }
 
-function normalizeImageBlockCaption(
-	caption,
-	{ stripParagraphWrapper = false } = {}
-) {
+function normalizeImageBlockCaption( caption ) {
 	if ( typeof caption !== 'string' ) {
 		return '';
-	}
-
-	if ( stripParagraphWrapper ) {
-		const trimmedCaption = caption.trim();
-		const paragraphMatch = trimmedCaption.match(
-			/^<p(?:\s[^>]*)?>([\s\S]*)<\/p>$/i
-		);
-
-		if ( paragraphMatch ) {
-			caption = paragraphMatch[ 1 ];
-		}
 	}
 
 	const textContent = stripHTML( caption ).trim();
@@ -138,15 +124,15 @@ function getAttachmentCaption( attachment ) {
 		return normalizeImageBlockCaption( caption );
 	}
 
-	const rawCaption = normalizeImageBlockCaption( caption?.raw );
-
-	if ( rawCaption ) {
-		return rawCaption;
+	if (
+		caption &&
+		typeof caption === 'object' &&
+		Object.hasOwn( caption, 'raw' )
+	) {
+		return normalizeImageBlockCaption( caption.raw );
 	}
 
-	return normalizeImageBlockCaption( caption?.rendered, {
-		stripParagraphWrapper: true,
-	} );
+	return undefined;
 }
 
 export function getImageBlockMetadataFromAttachment( attachment ) {
@@ -193,6 +179,8 @@ export function getSyncedImageBlockAttributes(
 		currentAttributes.caption
 	);
 	if (
+		originalMetadata.caption !== undefined &&
+		updatedMetadata.caption !== undefined &&
 		( normalizedCurrentCaption === originalMetadata.caption ||
 			! normalizedCurrentCaption ) &&
 		normalizedCurrentCaption !== updatedMetadata.caption

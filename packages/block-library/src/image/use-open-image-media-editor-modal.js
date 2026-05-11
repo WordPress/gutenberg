@@ -2,13 +2,20 @@
  * WordPress dependencies
  */
 import { store as coreStore } from '@wordpress/core-data';
-import { useRegistry } from '@wordpress/data';
+import {
+	privateApis as blockEditorPrivateApis,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
+import { useRegistry, useSelect } from '@wordpress/data';
 import { useCallback, useEffect, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { getSyncedImageBlockAttributes } from './utils';
+import { unlock } from '../lock-unlock';
+
+const { openMediaEditorModalKey } = unlock( blockEditorPrivateApis );
 
 function getAttachmentFallbackForEmptyBlockMetadata( { alt, caption } ) {
 	const attachment = {};
@@ -24,17 +31,17 @@ function getAttachmentFallbackForEmptyBlockMetadata( { alt, caption } ) {
 	return Object.keys( attachment ).length ? attachment : undefined;
 }
 
-export function useMediaEditorMetadataSync( {
-	attributes,
-	image,
-	setAttributes,
-	openMediaEditorModal,
-} ) {
+export function useOpenImageMediaEditorModal( { attributes, setAttributes } ) {
 	// Keep this hook private to the Image block and pass the block attributes
 	// object so the callsite stays compact. Destructure only the attributes
 	// currently used for metadata sync; add more here if the sync policy grows.
 	const { id, url, alt, caption } = attributes;
 	const registry = useRegistry();
+	const openMediaEditorModal = useSelect(
+		( select ) =>
+			select( blockEditorStore ).getSettings()[ openMediaEditorModalKey ],
+		[]
+	);
 	const blockMetadataRef = useRef( { alt, caption } );
 	const mediaEditorMetadataBaselineRef = useRef();
 	const mediaEditorMetadataSyncRequestRef = useRef( 0 );
@@ -44,36 +51,31 @@ export function useMediaEditorMetadataSync( {
 	}, [ alt, caption ] );
 
 	const getCachedAttachmentRecord = useCallback(
-		( attachmentId, includeViewRecord = true ) => {
+		( attachmentId ) => {
 			const { getEditedEntityRecord, getEntityRecord } =
 				registry.select( coreStore );
-			const editedRecord = getEditedEntityRecord(
-				'postType',
-				'attachment',
-				attachmentId
-			);
-
-			if ( editedRecord ) {
-				return editedRecord;
-			}
-
-			const defaultRecord = getEntityRecord(
-				'postType',
-				'attachment',
-				attachmentId
-			);
-
-			if ( defaultRecord || ! includeViewRecord ) {
-				return defaultRecord;
-			}
-
 			return (
-				getEntityRecord( 'postType', 'attachment', attachmentId, {
-					context: 'view',
-				} ) || ( attachmentId === id ? image : undefined )
+				getEditedEntityRecord(
+					'postType',
+					'attachment',
+					attachmentId
+				) || getEntityRecord( 'postType', 'attachment', attachmentId )
 			);
 		},
-		[ id, image, registry ]
+		[ registry ]
+	);
+
+	const resolveAttachmentRecord = useCallback(
+		async ( attachmentId ) => {
+			try {
+				return await registry
+					.resolveSelect( coreStore )
+					.getEntityRecord( 'postType', 'attachment', attachmentId );
+			} catch {
+				return undefined;
+			}
+		},
+		[ registry ]
 	);
 
 	const resolveFreshAttachmentRecord = useCallback(
@@ -97,20 +99,7 @@ export function useMediaEditorMetadataSync( {
 					.resolveSelect( coreStore )
 					.getEntityRecord( 'postType', 'attachment', attachmentId );
 			} catch {
-				try {
-					return await registry
-						.resolveSelect( coreStore )
-						.getEntityRecord(
-							'postType',
-							'attachment',
-							attachmentId,
-							{
-								context: 'view',
-							}
-						);
-				} catch {
-					return undefined;
-				}
+				return undefined;
 			}
 		},
 		[ registry ]
@@ -166,16 +155,25 @@ export function useMediaEditorMetadataSync( {
 		[ id, resolveFreshAttachmentRecord, setAttributes, url ]
 	);
 
-	return useCallback( () => {
+	const openImageMediaEditorModal = useCallback( async () => {
 		if ( ! id || ! openMediaEditorModal ) {
 			return;
 		}
 
-		mediaEditorMetadataBaselineRef.current =
-			getCachedAttachmentRecord( id ) ||
+		const cachedAttachmentRecord = getCachedAttachmentRecord( id );
+		const fallbackAttachmentRecord =
 			getAttachmentFallbackForEmptyBlockMetadata(
 				blockMetadataRef.current
 			);
+		const needsOriginalAttachmentRecord =
+			! cachedAttachmentRecord &&
+			( blockMetadataRef.current.alt ||
+				blockMetadataRef.current.caption );
+
+		mediaEditorMetadataBaselineRef.current = needsOriginalAttachmentRecord
+			? ( await resolveAttachmentRecord( id ) ) ||
+			  fallbackAttachmentRecord
+			: cachedAttachmentRecord || fallbackAttachmentRecord;
 		openMediaEditorModal( {
 			id,
 			onUpdate: handleMediaUpdate,
@@ -185,5 +183,8 @@ export function useMediaEditorMetadataSync( {
 		handleMediaUpdate,
 		id,
 		openMediaEditorModal,
+		resolveAttachmentRecord,
 	] );
+
+	return id && openMediaEditorModal ? openImageMediaEditorModal : undefined;
 }

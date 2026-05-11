@@ -20,7 +20,7 @@ describe( 'core/image utils', () => {
 			} );
 		} );
 
-		it( 'uses rendered captions when raw captions are unavailable', () => {
+		it( 'does not use rendered captions when raw captions are unavailable', () => {
 			expect(
 				getImageBlockMetadataFromAttachment( {
 					alt_text: 'Alt text',
@@ -28,7 +28,7 @@ describe( 'core/image utils', () => {
 				} )
 			).toEqual( {
 				alt: 'Alt text',
-				caption: 'Rendered caption',
+				caption: undefined,
 			} );
 		} );
 
@@ -40,7 +40,7 @@ describe( 'core/image utils', () => {
 			).toBe( '<p>Raw caption</p>' );
 		} );
 
-		it( 'uses rendered captions when raw captions are empty', () => {
+		it( 'does not fall back to rendered captions when raw captions are empty', () => {
 			expect(
 				getImageBlockMetadataFromAttachment( {
 					caption: {
@@ -48,18 +48,17 @@ describe( 'core/image utils', () => {
 						rendered: '<p>Rendered caption</p>\n',
 					},
 				} ).caption
-			).toBe( 'Rendered caption' );
+			).toBe( '' );
 		} );
 
-		it( 'normalizes empty rendered caption markup to an empty string', () => {
+		it( 'returns an unknown caption when only rendered empty caption markup is available', () => {
 			expect(
 				getImageBlockMetadataFromAttachment( {
 					caption: {
-						raw: '',
 						rendered: '<p class="attachment"><br></p>\n',
 					},
 				} ).caption
-			).toBe( '' );
+			).toBe( undefined );
 		} );
 	} );
 
@@ -147,23 +146,20 @@ describe( 'core/image utils', () => {
 			} );
 		} );
 
-		it( 'syncs newly added captions when the original attachment caption is empty rendered markup', () => {
+		it( 'does not sync captions when the original raw attachment caption is unavailable', () => {
 			expect(
 				getSyncedImageBlockAttributes(
 					{},
 					{
 						caption: {
-							raw: '',
-							rendered: '<p class="attachment"><br></p>\n',
+							rendered: '<p>Original caption</p>\n',
 						},
 					},
 					{
 						caption: { raw: 'Updated caption' },
 					}
 				)
-			).toEqual( {
-				caption: 'Updated caption',
-			} );
+			).toEqual( {} );
 		} );
 
 		it( 'syncs caption to a block with no caption when the original attachment has one', () => {

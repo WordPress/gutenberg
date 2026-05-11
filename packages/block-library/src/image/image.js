@@ -62,7 +62,7 @@ import { isExternalImage } from './edit';
 import { Caption } from '../utils/caption';
 import { MediaControl } from '../utils/media-control';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
-import { useMediaEditorMetadataSync } from './use-media-editor-metadata-sync';
+import { useOpenImageMediaEditorModal } from './use-open-image-media-editor-modal';
 import {
 	MIN_SIZE,
 	ALLOWED_MEDIA_TYPES,
@@ -71,12 +71,9 @@ import {
 } from './constants';
 import { evalAspectRatio, mediaPosition } from './utils';
 
-const {
-	DimensionsTool,
-	ResolutionTool,
-	mediaEditKey,
-	openMediaEditorModalKey,
-} = unlock( blockEditorPrivateApis );
+const { DimensionsTool, ResolutionTool, mediaEditKey } = unlock(
+	blockEditorPrivateApis
+);
 
 const scaleOptions = [
 	{
@@ -382,13 +379,9 @@ export default function Image( {
 		[ clientId ]
 	);
 	const { getBlock, getSettings } = useSelect( blockEditorStore );
-	const settings = getSettings();
-	const openMediaEditorModal = settings[ openMediaEditorModalKey ];
-	const openImageMediaEditorModal = useMediaEditorMetadataSync( {
+	const openImageMediaEditorModal = useOpenImageMediaEditorModal( {
 		attributes,
-		image,
 		setAttributes,
-		openMediaEditorModal,
 	} );
 
 	const {
@@ -853,14 +846,12 @@ export default function Image( {
 					{ allowCrop && (
 						<ToolbarButton
 							onClick={
-								openMediaEditorModal && id
+								openImageMediaEditorModal
 									? openImageMediaEditorModal
 									: () => setIsEditingImage( true )
 							}
 							aria-haspopup={
-								openMediaEditorModal && id
-									? 'dialog'
-									: undefined
+								openImageMediaEditorModal ? 'dialog' : undefined
 							}
 							icon={ crop }
 							label={ __( 'Crop' ) }
