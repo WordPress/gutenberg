@@ -1,88 +1,33 @@
 /**
  * WordPress dependencies
  */
-import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { resolveSelect, useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import type {
-	DataFormControlProps,
-	Field,
-	FieldValidity,
-	Form,
-} from '@wordpress/dataviews';
+import type { Field, Form } from '@wordpress/dataviews';
 // eslint-disable-next-line @wordpress/use-recommended-components -- Used here because it supports rendering as a `span` via the `render` prop to avoid invalid HTML.
-import { Badge, Notice, Stack } from '@wordpress/ui';
-import { cleanForSlug } from '@wordpress/url';
+import { Notice, Stack } from '@wordpress/ui';
 
 /**
  * Internal dependencies
  */
-import { unlock } from '../../lock-unlock';
 import { TAXONOMY_ENTITY } from '../../constants';
+import {
+	createBooleanField,
+	createDescriptionField,
+	SlugEdit,
+} from '../../utils/fields';
 import { usePublicPostTypes } from '../utils';
 import type { TaxonomyFormData } from '../types';
-import { booleanField } from './utils';
 
-const { ValidatedInputControl } = unlock( componentsPrivateApis );
-
-export const titleField: Field< TaxonomyFormData > = {
-	id: 'title',
-	label: __( 'Title' ),
-	type: 'text',
-	enableGlobalSearch: true,
-	getValue: ( { item } ) => item.title.raw,
-	setValue: ( { value } ) => ( { title: { raw: String( value ?? '' ) } } ),
-	isValid: { required: true, maxLength: 200 },
-	filterBy: false,
-	enableHiding: false,
-};
-
-export const pluralLabelField: Field< TaxonomyFormData > = {
-	id: 'plural_name',
-	label: __( 'Plural label' ),
-	type: 'text',
-	getValue: ( { item } ) => item.title.raw,
-	setValue: ( { value } ) => ( { title: { raw: String( value ?? '' ) } } ),
-	isValid: { required: true, maxLength: 200 },
-};
-
-export const singularLabelField: Field< TaxonomyFormData > = {
-	id: 'singular_name',
-	label: __( 'Singular label' ),
-	type: 'text',
-	getValue: ( { item } ) => item.config.labels.singular_name,
-	setValue: ( { item, value } ) => ( {
-		config: {
-			...item.config,
-			labels: {
-				...item.config.labels,
-				singular_name: String( value ?? '' ),
-			},
-		},
-	} ),
-	isValid: { required: true, maxLength: 200 },
-	enableSorting: false,
-};
-
-export const descriptionField: Field< TaxonomyFormData > = {
-	id: 'description',
-	label: __( 'Description' ),
-	type: 'text',
-	Edit: { control: 'textarea', rows: 3 },
-	description: __(
+export const descriptionField = createDescriptionField(
+	__(
 		'Optional summary of the taxonomy. Shown in admin UIs that surface taxonomy details.'
-	),
-	getValue: ( { item } ) => item.config.description,
-	setValue: ( { item, value } ) => ( {
-		config: { ...item.config, description: String( value ?? '' ) },
-	} ),
-	isValid: { maxLength: 1000 },
-	enableSorting: false,
-};
+	)
+);
 
-export const hierarchicalField = booleanField(
+export const hierarchicalField = createBooleanField(
 	'hierarchical',
 	__( 'Hierarchical' ),
 	{
@@ -92,44 +37,8 @@ export const hierarchicalField = booleanField(
 	}
 );
 
-export const statusField: Field< TaxonomyFormData > = {
-	id: 'status',
-	label: __( 'Status' ),
-	description: __(
-		'Active taxonomies are enabled and registered with WordPress.'
-	),
-	elements: [
-		{ value: 'publish', label: __( 'Active' ) },
-		{ value: 'draft', label: __( 'Inactive' ) },
-	],
-	render: ( { item } ) => {
-		const isActive = item.status === 'publish';
-		return (
-			<Badge intent={ isActive ? 'stable' : 'draft' }>
-				{ isActive ? __( 'Active' ) : __( 'Inactive' ) }
-			</Badge>
-		);
-	},
-	enableSorting: false,
-};
-
 const SLUG_MAX_LENGTH = 32;
-// Slug field has required + pattern + maxLength + a custom (slug-taken) check.
-// Surface them in priority order: structural rules first, async slug-taken last.
-// `required` only overrides the native browser message when our rule supplies
-// one of its own.
-function getSlugCustomValidity( validity?: FieldValidity ) {
-	if ( validity?.required?.message ) {
-		return validity.required;
-	}
-	if ( validity?.pattern ) {
-		return validity.pattern;
-	}
-	if ( validity?.maxLength ) {
-		return validity.maxLength;
-	}
-	return validity?.custom;
-}
+
 export function useSlugField(
 	originalSlug?: string,
 	currentValue?: string
@@ -179,7 +88,8 @@ export function useSlugField(
 					if ( slugTaken ) {
 						return __( 'This taxonomy key is already in use.' );
 					}
-					// We only need to query for `drafts` because published taxonomies are checked through `registeredTaxonomies` above.
+					// We only need to query for `drafts` because published
+					// taxonomies are checked through `registeredTaxonomies` above.
 					const drafts = await resolveSelect(
 						coreStore
 					).getEntityRecords( 'postType', TAXONOMY_ENTITY, {
@@ -188,65 +98,12 @@ export function useSlugField(
 						_fields: 'id,name',
 						per_page: 1,
 					} );
-					return !! drafts?.length
+					return drafts?.length
 						? __( 'This taxonomy key is already in use.' )
 						: null;
 				},
 			},
-			Edit: function SlugEdit( {
-				data,
-				field,
-				onChange,
-				hideLabelFromVision,
-				markWhenOptional,
-				validity,
-			}: DataFormControlProps< TaxonomyFormData > ) {
-				const { label, description, getValue, setValue, isValid } =
-					field;
-				const value =
-					( getValue( { item: data } ) as string | undefined ) ?? '';
-				const handleChange = ( newValue: string ) =>
-					onChange( setValue( { item: data, value: newValue } ) );
-				const onFocus = () => {
-					if ( data.id !== undefined || data.slug ) {
-						return;
-					}
-					const singular = data.config.labels.singular_name?.trim();
-					if ( ! singular ) {
-						return;
-					}
-					const cleaned = cleanForSlug( singular );
-					// On a fresh record fill the input from the singular label.
-					// Skip auto-fill if cleanForSlug retained non-ASCII to match
-					// the server's sanitize_key charset.
-					if ( /[^a-z0-9_-]/.test( cleaned ) ) {
-						return;
-					}
-					const trimmed = cleaned
-						.slice( 0, SLUG_MAX_LENGTH )
-						// Slicing can introduce a trailing hyphen — strip it.
-						.replace( /-+$/, '' );
-					if ( trimmed ) {
-						handleChange( trimmed );
-					}
-				};
-				return (
-					<ValidatedInputControl
-						__next40pxDefaultSize
-						required={ !! isValid.required }
-						markWhenOptional={ markWhenOptional }
-						customValidity={ getSlugCustomValidity( validity ) }
-						label={ label }
-						value={ value }
-						help={ description }
-						onChange={ handleChange }
-						onFocus={ onFocus }
-						hideLabelFromVision={ hideLabelFromVision }
-						pattern={ isValid.pattern?.constraint }
-						maxLength={ isValid.maxLength?.constraint }
-					/>
-				);
-			},
+			Edit: SlugEdit,
 			filterBy: false,
 			enableSorting: false,
 		} ),

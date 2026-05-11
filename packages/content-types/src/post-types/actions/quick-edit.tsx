@@ -23,13 +23,15 @@ import {
 	defaultForm,
 	hasArchiveField,
 	hierarchicalField,
-	pluralLabelField,
 	publicField,
-	singularLabelField,
-	statusField,
 	useSlugField,
 	useTaxonomiesField,
 } from '../fields';
+import {
+	pluralLabelField,
+	singularLabelField,
+	statusField,
+} from '../../utils/fields';
 import type { PostTypeFormData } from '../types';
 import { serializeForSave } from '../utils';
 import { POST_TYPE_ENTITY } from '../../constants';
@@ -47,17 +49,18 @@ function QuickEditPostTypeModal( {
 	const slugField = useSlugField( item.slug, data.slug );
 	const taxonomiesField = useTaxonomiesField();
 
-	const fields = useMemo< Field< PostTypeFormData >[] >(
-		() => [
-			pluralLabelField,
-			singularLabelField,
-			slugField,
-			taxonomiesField,
-			publicField,
-			hierarchicalField,
-			hasArchiveField,
-			statusField,
-		],
+	const fields = useMemo(
+		() =>
+			[
+				pluralLabelField,
+				singularLabelField,
+				slugField,
+				taxonomiesField,
+				publicField,
+				hierarchicalField,
+				hasArchiveField,
+				statusField,
+			] as Field< PostTypeFormData >[],
 		[ slugField, taxonomiesField ]
 	);
 

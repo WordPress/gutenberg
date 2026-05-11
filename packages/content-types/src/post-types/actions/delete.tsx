@@ -14,7 +14,8 @@ import { Stack, Text } from '@wordpress/ui';
 /**
  * Internal dependencies
  */
-import type { CoreDataError, PostTypeFormData } from '../types';
+import type { PostTypeFormData } from '../types';
+import type { CoreDataError } from '../../types';
 import { POST_TYPE_ENTITY } from '../../constants';
 
 function DeletePostTypeModal( {
