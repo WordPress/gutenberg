@@ -1661,4 +1661,3 @@ export const getRevision = createSelector(
 		];
 	}
 );
-
