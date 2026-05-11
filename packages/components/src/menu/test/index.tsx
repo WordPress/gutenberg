@@ -180,7 +180,9 @@ describe( 'Menu', () => {
 			// Menu closed
 			expect( screen.queryByRole( 'menuitem' ) ).not.toBeInTheDocument();
 
-			await press.Space();
+			// Keyboard-triggered clicks have `detail: 0`, which Ariakit uses to
+			// choose the initial item focus path instead of the pointer path.
+			await press.Space( toggleButton, { detail: 0 } );
 
 			// Menu open, focus is on the first focusable item
 			await waitForFocusedMenuItem( 'First item' );
