@@ -53,7 +53,7 @@ test.describe( 'Connectors', () => {
 		);
 	} );
 
-	test( 'should display default providers with setup buttons', async ( {
+	test( 'should display default providers with install buttons', async ( {
 		page,
 		admin,
 	} ) => {
@@ -66,7 +66,7 @@ test.describe( 'Connectors', () => {
 		} );
 		await expect( pageTitle ).toBeVisible();
 
-		// Verify each connector card shows name as heading, description, and Set up button.
+		// Verify each connector card shows name as heading, description, and Install button.
 		for ( const { slug, name, description } of CONNECTORS ) {
 			const card = page.locator( `.connector-item--${ slug }` );
 			await expect( card ).toBeVisible();
@@ -86,9 +86,9 @@ test.describe( 'Connectors', () => {
 				headingId
 			);
 
-			const button = card.getByRole( 'button', { name: 'Set up' } );
+			const button = card.getByRole( 'button', { name: 'Install' } );
 			await expect( button ).toBeVisible();
-			// Set up button should not have aria-expanded until expanded.
+			// Install button should not have aria-expanded until expanded.
 			await expect( button ).not.toHaveAttribute( 'aria-expanded' );
 		}
 
@@ -461,11 +461,13 @@ test.describe( 'Connectors', () => {
 			slug: 'gutenberg-test-connectors-never-installed',
 			name: 'Test Install Required Connector',
 			action: 'Install',
+			pluginSlug: 'gutenberg-test-connectors-never-installed',
 		};
 		const activateRequiredConnector = {
 			slug: 'hello',
 			name: 'Test Activate Required Connector',
 			action: 'Activate',
+			pluginSlug: 'hello',
 		};
 		const clearCapabilityRestriction = async ( requestUtils ) => {
 			await requestUtils.rest( {
@@ -519,7 +521,7 @@ test.describe( 'Connectors', () => {
 					CONNECTORS_PAGE_QUERY
 				);
 
-				for ( const { slug, name, action } of [
+				for ( const { slug, name, action, pluginSlug } of [
 					installRequiredConnector,
 					activateRequiredConnector,
 				] ) {
@@ -528,9 +530,14 @@ test.describe( 'Connectors', () => {
 					await expect(
 						card.getByRole( 'heading', { name, level: 2 } )
 					).toBeVisible();
-					await expect(
-						card.getByText( 'Not available' )
-					).toBeVisible();
+					const learnMoreLink = card.getByRole( 'link', {
+						name: 'Learn more',
+					} );
+					await expect( learnMoreLink ).toBeVisible();
+					await expect( learnMoreLink ).toHaveAttribute(
+						'href',
+						`https://wordpress.org/plugins/${ pluginSlug }/`
+					);
 					await expect(
 						card.getByRole( 'button', { name: action } )
 					).toBeHidden();
