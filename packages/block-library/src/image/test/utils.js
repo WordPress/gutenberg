@@ -166,6 +166,46 @@ describe( 'core/image utils', () => {
 			} );
 		} );
 
+		it( 'syncs caption to a block with no caption when the original attachment has one', () => {
+			expect(
+				getSyncedImageBlockAttributes(
+					{
+						alt: '',
+						caption: '',
+					},
+					{
+						alt_text: '',
+						caption: { raw: 'Existing caption' },
+					},
+					{
+						alt_text: '',
+						caption: { raw: 'Updated caption' },
+					}
+				)
+			).toEqual( {
+				caption: 'Updated caption',
+			} );
+		} );
+
+		it( 'does not sync caption when block has a custom value differing from the original', () => {
+			expect(
+				getSyncedImageBlockAttributes(
+					{
+						alt: '',
+						caption: 'Custom caption',
+					},
+					{
+						alt_text: '',
+						caption: { raw: 'Original caption' },
+					},
+					{
+						alt_text: '',
+						caption: { raw: 'Updated caption' },
+					}
+				)
+			).toEqual( {} );
+		} );
+
 		it( 'clears captions when the updated attachment caption is empty', () => {
 			expect(
 				getSyncedImageBlockAttributes(

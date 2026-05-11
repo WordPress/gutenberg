@@ -228,6 +228,58 @@ describe( 'useMediaEditorMetadataSync', () => {
 		} );
 	} );
 
+	it( 'syncs new caption to a block with no caption when the view-context attachment has an existing caption', async () => {
+		// This tests the core failing scenario: the attachment already has a caption
+		// (e.g. set at upload time), the image block has no caption (was added via a
+		// path that didn't include the caption), and the user opens the media editor
+		// to update the caption. The block should receive the new caption.
+		const viewContextAttachment = {
+			id: 1,
+			alt_text: '',
+			caption: { rendered: '<p>Existing caption</p>' },
+		};
+		const updatedAttachment = {
+			id: 1,
+			alt_text: '',
+			caption: { raw: 'New caption' },
+		};
+		const registry = createRegistry( {
+			getEntityRecord: ( kind, name, id, query ) =>
+				query?.context === 'view' ? viewContextAttachment : undefined,
+			resolveGetEntityRecord: () => updatedAttachment,
+		} );
+		useRegistry.mockReturnValue( registry );
+		const setAttributes = jest.fn();
+		const openMediaEditorModal = jest.fn();
+		const { result } = renderHook( () =>
+			useMediaEditorMetadataSync( {
+				attributes: {
+					id: 1,
+					url: 'original.jpg',
+					alt: '',
+					caption: undefined,
+				},
+				image: undefined,
+				setAttributes,
+				openMediaEditorModal,
+			} )
+		);
+
+		act( () => {
+			result.current();
+		} );
+		await act( async () => {
+			await openMediaEditorModal.mock.calls[ 0 ][ 0 ].onUpdate( {
+				id: 1,
+				url: 'original.jpg',
+			} );
+		} );
+
+		expect( setAttributes ).toHaveBeenCalledWith( {
+			caption: 'New caption',
+		} );
+	} );
+
 	it( 'syncs metadata from an empty block when the original attachment is not cached', async () => {
 		const updatedAttachment = {
 			id: 1,

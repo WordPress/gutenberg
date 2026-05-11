@@ -178,20 +178,24 @@ export function getSyncedImageBlockAttributes(
 		getImageBlockMetadataFromAttachment( updatedAttachment );
 	const syncedAttributes = {};
 
+	const normalizedCurrentAlt = normalizeMetadataAttribute(
+		currentAttributes.alt
+	);
 	if (
-		normalizeMetadataAttribute( currentAttributes.alt ) ===
-			originalMetadata.alt &&
-		normalizeMetadataAttribute( currentAttributes.alt ) !==
-			updatedMetadata.alt
+		( normalizedCurrentAlt === originalMetadata.alt ||
+			! normalizedCurrentAlt ) &&
+		normalizedCurrentAlt !== updatedMetadata.alt
 	) {
 		syncedAttributes.alt = updatedMetadata.alt;
 	}
 
+	const normalizedCurrentCaption = normalizeMetadataAttribute(
+		currentAttributes.caption
+	);
 	if (
-		normalizeMetadataAttribute( currentAttributes.caption ) ===
-			originalMetadata.caption &&
-		normalizeMetadataAttribute( currentAttributes.caption ) !==
-			updatedMetadata.caption
+		( normalizedCurrentCaption === originalMetadata.caption ||
+			! normalizedCurrentCaption ) &&
+		normalizedCurrentCaption !== updatedMetadata.caption
 	) {
 		syncedAttributes.caption = updatedMetadata.caption || undefined;
 	}
