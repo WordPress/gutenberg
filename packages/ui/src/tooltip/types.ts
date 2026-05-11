@@ -23,9 +23,7 @@ export interface TriggerProps extends ComponentProps< 'button' > {
 	children?: ReactNode;
 }
 
-export interface PopupProps
-	extends ComponentProps< 'div' >,
-		Pick< _Tooltip.Positioner.Props, 'align' | 'side' | 'sideOffset' > {
+export interface PopupProps extends ComponentProps< 'div' > {
 	/**
 	 * The content to be rendered inside the component.
 	 */
@@ -38,4 +36,13 @@ export interface PopupProps
 	 * be ignored.
 	 */
 	portal?: ReactElement< Omit< PortalProps, 'children' > >;
+
+	/**
+	 * Optional positioner element, typically `<Tooltip.Positioner />` with
+	 * custom positioning props (`side`, `align`, `sideOffset`, collision
+	 * settings, etc.). When omitted, `Tooltip.Popup` uses `Tooltip.Positioner`
+	 * with default props. Do not pass `children` on the positioner element;
+	 * they would be ignored.
+	 */
+	positioner?: ReactElement< Omit< PositionerProps, 'children' > >;
 }

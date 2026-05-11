@@ -10,6 +10,7 @@ const meta: Meta< typeof Tooltip.Root > = {
 		Provider: Tooltip.Provider,
 		Trigger: Tooltip.Trigger,
 		Popup: Tooltip.Popup,
+		Positioner: Tooltip.Positioner,
 		Portal: Tooltip.Portal,
 	},
 	parameters: {
@@ -47,8 +48,11 @@ export const Disabled: StoryObj< typeof Tooltip.Root > = {
 };
 
 /**
- * Use the `side` prop to control where the tooltip appears relative to the
- * trigger element.
+ * Customize where the tooltip appears relative to the trigger by passing a
+ * `<Tooltip.Positioner />` element to `Tooltip.Popup`'s `positioner` prop.
+ * `Tooltip.Positioner` accepts `side`, `align`, `sideOffset`, and collision
+ * settings; when `positioner` is omitted, the tooltip uses the defaults
+ * (`side="top"`, `align="center"`, `sideOffset={ 4 }`).
  */
 export const Positioning: StoryObj< typeof Tooltip.Root > = {
 	render: () => (
@@ -62,25 +66,65 @@ export const Positioning: StoryObj< typeof Tooltip.Root > = {
 		>
 			<Tooltip.Root>
 				<Tooltip.Trigger aria-label="Up">⬆️</Tooltip.Trigger>
-				<Tooltip.Popup side="top">Up</Tooltip.Popup>
+				<Tooltip.Popup positioner={ <Tooltip.Positioner side="top" /> }>
+					Up
+				</Tooltip.Popup>
 			</Tooltip.Root>
 
 			<Tooltip.Root>
 				<Tooltip.Trigger aria-label="Forward">➡️</Tooltip.Trigger>
-				<Tooltip.Popup side="right">Forward</Tooltip.Popup>
+				<Tooltip.Popup
+					positioner={ <Tooltip.Positioner side="right" /> }
+				>
+					Forward
+				</Tooltip.Popup>
 			</Tooltip.Root>
 
 			<Tooltip.Root>
 				<Tooltip.Trigger aria-label="Down">⬇️</Tooltip.Trigger>
-				<Tooltip.Popup side="bottom">Down</Tooltip.Popup>
+				<Tooltip.Popup
+					positioner={ <Tooltip.Positioner side="bottom" /> }
+				>
+					Down
+				</Tooltip.Popup>
 			</Tooltip.Root>
 
 			<Tooltip.Root>
 				<Tooltip.Trigger aria-label="Back">⬅️</Tooltip.Trigger>
-				<Tooltip.Popup side="left">Back</Tooltip.Popup>
+				<Tooltip.Popup
+					positioner={ <Tooltip.Positioner side="left" /> }
+				>
+					Back
+				</Tooltip.Popup>
 			</Tooltip.Root>
 		</div>
 	),
+};
+
+/**
+ * Beyond `side`, `Tooltip.Positioner` accepts the rest of Base UI's
+ * positioner surface — `align`, `alignOffset`, `sideOffset`, collision
+ * settings, and more — for fine-grained placement.
+ */
+export const WithCustomPositioner: StoryObj< typeof Tooltip.Root > = {
+	args: {
+		children: (
+			<>
+				<Tooltip.Trigger aria-label="Save">💾</Tooltip.Trigger>
+				<Tooltip.Popup
+					positioner={
+						<Tooltip.Positioner
+							side="right"
+							align="start"
+							sideOffset={ 16 }
+						/>
+					}
+				>
+					Save
+				</Tooltip.Popup>
+			</>
+		),
+	},
 };
 
 /**

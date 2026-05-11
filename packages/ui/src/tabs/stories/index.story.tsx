@@ -288,7 +288,14 @@ export const WithTabIconsAndTooltips: StoryObj< typeof Tabs.Root > = {
 										} }
 									/>
 								</Tooltip.Trigger>
-								<Tooltip.Popup align="center" side="top">
+								<Tooltip.Popup
+									positioner={
+										<Tooltip.Positioner
+											align="center"
+											side="top"
+										/>
+									}
+								>
 									{ label }
 								</Tooltip.Popup>
 							</Tooltip.Root>

@@ -11,6 +11,7 @@ import {
 } from '@wordpress/icons';
 import { displayShortcut, ariaKeyShortcut } from '@wordpress/keycodes';
 import { IconButton } from '../index';
+import * as Tooltip from '../../tooltip';
 
 const meta: Meta< typeof IconButton > = {
 	title: 'Design System/Components/IconButton',
@@ -135,13 +136,16 @@ export const WithShortcut: Story = {
 };
 
 /**
- * Customize where the tooltip is placed relative to the button via the
- * `tooltipPlacement` prop.
+ * Customize how the tooltip is positioned by passing a `<Tooltip.Positioner />`
+ * element to the `positioner` prop. `Tooltip.Positioner` accepts `side`,
+ * `align`, `sideOffset`, and collision settings.
  */
-export const WithCustomTooltipPlacement: Story = {
+export const WithCustomPositioner: Story = {
 	...Default,
 	args: {
 		...Default.args,
-		tooltipPlacement: { side: 'right', align: 'center', sideOffset: 8 },
+		positioner: (
+			<Tooltip.Positioner side="right" align="center" sideOffset={ 8 } />
+		),
 	},
 };

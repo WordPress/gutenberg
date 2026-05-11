@@ -1,6 +1,6 @@
 import { type ButtonProps } from '../button/types';
 import { type IconProps } from '../icon/types';
-import { type PopupProps } from '../tooltip/types';
+import { type PopupProps as TooltipPopupProps } from '../tooltip/types';
 
 export type IconButtonProps = Omit< ButtonProps, 'children' > & {
 	/**
@@ -38,9 +38,10 @@ export type IconButtonProps = Omit< ButtonProps, 'children' > & {
 	};
 
 	/**
-	 * Customize where the tooltip is placed relative to the button. Accepts
-	 * `side`, `align`, and `sideOffset`, mirroring the corresponding props on
-	 * `Tooltip.Popup`. When omitted, the tooltip uses the default placement.
+	 * Customize how the tooltip is positioned relative to the button. Accepts
+	 * a `<Tooltip.Positioner />` element with custom positioning props
+	 * (`side`, `align`, `sideOffset`, collision settings, etc.). When omitted,
+	 * the tooltip uses the default placement.
 	 */
-	tooltipPlacement?: Pick< PopupProps, 'side' | 'align' | 'sideOffset' >;
+	positioner?: TooltipPopupProps[ 'positioner' ];
 };
