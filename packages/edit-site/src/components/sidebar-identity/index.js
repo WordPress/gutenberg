@@ -74,7 +74,11 @@ export default function SidebarIdentity() {
 	};
 
 	return (
-		<Page title={ _x( 'Identity', 'site identity' ) } headingLevel={ 2 } hasPadding>
+		<Page
+			title={ _x( 'Identity', 'site identity' ) }
+			headingLevel={ 2 }
+			hasPadding
+		>
 			<DataForm
 				data={ data }
 				fields={ fields }
