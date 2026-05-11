@@ -39,6 +39,11 @@ import {
 } from './utils';
 import { BlockStatesControl, VALID_BLOCK_PSEUDO_STATES } from './states';
 import { BlockStyleStateProvider } from './block-style-state';
+import {
+	BlockStateBadges,
+	BlockStatesControl,
+	VALID_BLOCK_PSEUDO_STATES,
+} from './states';
 import { buildStateSelector, buildCanvasStateSelector } from './state-utils';
 import { BlockInspectorPreTabsFill } from '../components/block-inspector/inspector-pre-tabs-slot-fill';
 import { scopeSelector } from '../components/global-styles/utils';
@@ -399,6 +404,10 @@ function BlockStyleControls( {
 							label={ __( 'Show state on canvas' ) }
 							checked={ showStateOnCanvas }
 							onChange={ setShowStateOnCanvas }
+						/>
+						<BlockStateBadges
+							name={ name }
+							value={ selectedState }
 						/>
 					</Spacer>
 				</BlockInspectorPreTabsFill>

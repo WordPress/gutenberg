@@ -18,6 +18,27 @@ import { unlock } from '../../lock-unlock';
 
 const { Badge: WCBadge } = unlock( componentsPrivateApis );
 
+export function StateControlBadges( {
+	states,
+	className = 'block-editor-global-styles-state-control__badges',
+} ) {
+	return (
+		<Stack
+			className={ className }
+			direction="row"
+			justify="flex-start"
+			gap="xs"
+			wrap="wrap"
+		>
+			{ states.map( ( state ) => (
+				<WCBadge key={ state.key } intent="info">
+					{ state.label }
+				</WCBadge>
+			) ) }
+		</Stack>
+	);
+}
+
 /**
  * State control for managing viewport and pseudo-state styles.
  * Displays a dropdown menu with separate groups for each selector.
@@ -174,21 +195,7 @@ export default function StateControl( {
 					</>
 				) }
 			</DropdownMenu>
-			{ showText && (
-				<Stack
-					className="block-editor-global-styles-state-control__badges"
-					direction="row"
-					justify="flex-start"
-					gap="xs"
-					wrap="wrap"
-				>
-					{ activeStates.map( ( activeState ) => (
-						<WCBadge key={ activeState.key } intent="info">
-							{ activeState.label }
-						</WCBadge>
-					) ) }
-				</Stack>
-			) }
+			{ showText && <StateControlBadges states={ activeStates } /> }
 		</Stack>
 	);
 }
