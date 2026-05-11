@@ -6,6 +6,10 @@ import type { InputLayoutProps } from '../input-layout/types';
 
 export type PortalProps = ComponentPropsWithoutRef< typeof _Select.Portal >;
 
+export type SelectPositionerProps = ComponentPropsWithoutRef<
+	typeof _Select.Positioner
+>;
+
 // The second type parameter is the `multiple` flag (currently disabled).
 export type SelectRootProps< Value = unknown > = Omit<
 	_Select.Root.Props< Value, false >,
@@ -54,6 +58,14 @@ export type SelectPopupProps = ComponentProps< typeof _Select.Popup > & {
 	 * be ignored.
 	 */
 	portal?: ReactElement< Omit< PortalProps, 'children' > >;
+	/**
+	 * Optional positioner element, typically `<Select.Positioner />` with
+	 * custom positioning props (`side`, `align`, `sideOffset`, collision
+	 * settings, etc.). When omitted, `Select.Popup` uses `Select.Positioner`
+	 * with default props. Do not pass `children` on the positioner element;
+	 * they would be ignored.
+	 */
+	positioner?: ReactElement< Omit< SelectPositionerProps, 'children' > >;
 };
 
 export type SelectItemProps = Omit<
