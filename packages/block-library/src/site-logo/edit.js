@@ -409,6 +409,11 @@ const SiteLogo = ( {
 											} )
 									: () => setIsEditingImage( true )
 							}
+							aria-haspopup={
+								openMediaEditorModal && logoId
+									? 'dialog'
+									: undefined
+							}
 							icon={ crop }
 							label={ __( 'Crop' ) }
 						/>

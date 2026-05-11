@@ -12,6 +12,7 @@ const meta: Meta< typeof Autocomplete.Root > = {
 	title: 'Design System/Components/Form/Primitives/Autocomplete',
 	component: Autocomplete.Root,
 	subcomponents: {
+		Portal: Autocomplete.Portal,
 		Popup: Autocomplete.Popup,
 		Input: Autocomplete.Input,
 		InputGroup: Autocomplete.InputGroup,

@@ -23,6 +23,7 @@ import type {
 const meta: Meta< typeof DashboardGrid > = {
 	title: 'Grid/DashboardGrid',
 	component: DashboardGrid,
+	tags: [ 'status-experimental' ],
 	args: {
 		columns: 6,
 		spacing: 2,
@@ -55,6 +56,13 @@ const meta: Meta< typeof DashboardGrid > = {
 		className: { control: { type: 'text' } },
 		onChangeLayout: { action: 'onChangeLayout' },
 		onPreviewLayout: { action: 'onPreviewLayout' },
+	},
+	parameters: {
+		componentStatus: {
+			status: 'use-with-caution',
+			whereUsed: 'global',
+			notes: 'This package is under heavy development and likely to change.',
+		},
 	},
 };
 export default meta;

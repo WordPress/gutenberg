@@ -12,7 +12,7 @@ import { degreesToRadians } from './math/rotation';
  *
  * Flip is composed outside rotation so it is viewport-relative — horizontal
  * flip mirrors across the viewport's vertical axis regardless of rotation.
- * Must match the matrix order in `createCamera` / `getCropBounds`.
+ * Must match the matrix order in `createCamera` / `getImageCropBounds`.
  *
  * This is a pure function with no framework dependencies. The React hook
  * `useTransformStyle` wraps this in `useMemo` for memoization.

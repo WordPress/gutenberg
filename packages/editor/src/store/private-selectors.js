@@ -25,6 +25,7 @@ import {
 	getRenderingMode,
 	getCurrentPost,
 	getEditorSettings,
+	getCurrentPostRevisionsCount,
 } from './selectors';
 import {
 	getEntityActions as _getEntityActions,
@@ -350,6 +351,85 @@ export function getShowStylebook( state ) {
 }
 
 /**
+ * Returns the current revisions page number.
+ *
+ * @param {Object} state Global application state.
+ * @return {number} The page number.
+ */
+export function getRevisionPage( state ) {
+	return state.revisionPage;
+}
+
+/**
+ * Builds the query object for fetching a page of revisions.
+ *
+ * @param {string} revisionKey The entity's revision key.
+ * @param {number} page        The 1-based page number (page 1 = newest).
+ * @return {Object} Query object for getRevisions.
+ */
+export function buildRevisionsPageQuery( revisionKey, page ) {
+	return {
+		per_page: REVISIONS_PER_PAGE,
+		page,
+		context: 'edit',
+		orderby: 'date',
+		order: 'desc',
+		_fields: [
+			...new Set( [
+				'id',
+				'date',
+				'modified',
+				'author',
+				'meta',
+				'title.raw',
+				'excerpt.raw',
+				'content.raw',
+				revisionKey,
+			] ),
+		].join(),
+	};
+}
+
+const REVISIONS_PER_PAGE = 100;
+
+export function getRevisionsPerPage() {
+	return REVISIONS_PER_PAGE;
+}
+
+/**
+ * Returns revisions for the given page number.
+ *
+ * @param {Object} state Global application state.
+ * @param {number} page  The 1-based page number (page 1 = newest).
+ * @return {Array|null} The revisions array, or null if not yet loaded.
+ */
+export const getPageRevisions = createRegistrySelector(
+	( select ) => ( state, page ) => {
+		if ( ! page ) {
+			return null;
+		}
+
+		const { type: postType, id: postId } = getCurrentPost( state );
+		if ( ! postType || ! postId ) {
+			return null;
+		}
+
+		const entityConfig = select( coreStore ).getEntityConfig(
+			'postType',
+			postType
+		);
+		const revisionKey = entityConfig?.revisionKey || 'id';
+
+		return select( coreStore ).getRevisions(
+			'postType',
+			postType,
+			postId,
+			buildRevisionsPageQuery( revisionKey, page )
+		);
+	}
+);
+
+/**
  * Returns whether the editor is in revisions preview mode.
  *
  * @param {Object} state Global application state.
@@ -392,40 +472,22 @@ export const getCurrentRevision = createRegistrySelector(
 			return undefined;
 		}
 
+		const page = getRevisionPage( state );
+		if ( ! page ) {
+			return null;
+		}
+
 		const { type: postType, id: postId } = getCurrentPost( state );
 		const entityConfig = select( coreStore ).getEntityConfig(
 			'postType',
 			postType
 		);
 		const revisionKey = entityConfig?.revisionKey || 'id';
-		// - Use getRevisions (plural) instead of getRevision (singular) to
-		//   avoid a race condition where both API calls complete around the
-		//   same time and the single revision fetch overwrites the list in the
-		//   store.
-		// - getRevision also needs to be updated to check if there's any
-		//   received revisions from the collection API call to avoid unnecessary
-		//   API calls.
 		const revisions = select( coreStore ).getRevisions(
 			'postType',
 			postType,
 			postId,
-			{
-				per_page: -1,
-				context: 'edit',
-				_fields: [
-					...new Set( [
-						'id',
-						'date',
-						'modified',
-						'author',
-						'meta',
-						'title.raw',
-						'excerpt.raw',
-						'content.raw',
-						revisionKey,
-					] ),
-				].join(),
-			}
+			buildRevisionsPageQuery( revisionKey, page )
 		);
 		if ( ! revisions ) {
 			return null;
@@ -472,35 +534,23 @@ export const getPreviousRevision = createRegistrySelector(
 			return undefined;
 		}
 
+		const page = getRevisionPage( state );
+		if ( ! page ) {
+			return null;
+		}
+
 		const { type: postType, id: postId } = getCurrentPost( state );
 		const entityConfig = select( coreStore ).getEntityConfig(
 			'postType',
 			postType
 		);
 		const revisionKey = entityConfig?.revisionKey || 'id';
+		const query = buildRevisionsPageQuery( revisionKey, page );
 		const revisions = select( coreStore ).getRevisions(
 			'postType',
 			postType,
 			postId,
-			{
-				per_page: -1,
-				context: 'edit',
-				orderby: 'date',
-				order: 'asc',
-				_fields: [
-					...new Set( [
-						'id',
-						'date',
-						'modified',
-						'author',
-						'meta',
-						'title.raw',
-						'excerpt.raw',
-						'content.raw',
-						revisionKey,
-					] ),
-				].join(),
-			}
+			query
 		);
 		if ( ! revisions ) {
 			return null;
@@ -512,8 +562,21 @@ export const getPreviousRevision = createRegistrySelector(
 		);
 
 		// Return the previous revision (older one) if it exists.
-		if ( currentIndex > 0 ) {
-			return revisions[ currentIndex - 1 ];
+		if ( currentIndex >= 0 && currentIndex < revisions.length - 1 ) {
+			return revisions[ currentIndex + 1 ];
+		}
+
+		// At page boundary: fetch the first revision from the next page.
+		const totalRevisions = getCurrentPostRevisionsCount( state );
+		const totalPages = Math.ceil( totalRevisions / query.per_page ) || 1;
+		if ( currentIndex === revisions.length - 1 && page < totalPages ) {
+			const nextPageRevisions = select( coreStore ).getRevisions(
+				'postType',
+				postType,
+				postId,
+				buildRevisionsPageQuery( revisionKey, page + 1 )
+			);
+			return nextPageRevisions?.[ 0 ] ?? null;
 		}
 
 		return null;
