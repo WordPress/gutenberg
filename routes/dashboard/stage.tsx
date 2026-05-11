@@ -29,7 +29,7 @@ function Dashboard() {
 
 	const handleLayoutChange = ( next: DashboardWidget[] ) => {
 		setLayout( next );
-		void createSuccessNotice( __( 'Layout saved.' ), {
+		void createSuccessNotice( __( 'Dashboard saved.' ), {
 			type: 'snackbar',
 		} );
 	};
