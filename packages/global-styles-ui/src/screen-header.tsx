@@ -23,11 +23,6 @@ import { unlock } from './lock-unlock';
 
 const { StateControl, StateControlBadges } = unlock( blockEditorPrivateApis );
 
-interface ActiveState {
-	key: string;
-	label: string;
-}
-
 interface ScreenHeaderProps {
 	title: string;
 	description?: string | React.ReactElement;
@@ -51,28 +46,6 @@ export function ScreenHeader( {
 	onChangeViewport,
 	onChangePseudoState,
 }: ScreenHeaderProps ) {
-	const activeStates: ActiveState[] = [];
-	const activeViewport = viewportStates?.find(
-		( state ) => state.value === selectedViewport
-	);
-	const activePseudoState = pseudoStates?.find(
-		( state ) => state.value === selectedPseudoState
-	);
-
-	if ( activeViewport ) {
-		activeStates.push( {
-			key: `viewport-${ activeViewport.value }`,
-			label: activeViewport.label,
-		} );
-	}
-
-	if ( activePseudoState ) {
-		activeStates.push( {
-			key: `pseudo-${ activePseudoState.value }`,
-			label: activePseudoState.label,
-		} );
-	}
-
 	return (
 		<VStack spacing={ 0 }>
 			<View>
@@ -110,7 +83,12 @@ export function ScreenHeader( {
 											}
 										/>
 										<StateControlBadges
-											states={ activeStates }
+											viewportStates={ viewportStates }
+											pseudoStates={ pseudoStates }
+											viewportValue={ selectedViewport }
+											pseudoStateValue={
+												selectedPseudoState
+											}
 										/>
 									</VStack>
 								</HStack>

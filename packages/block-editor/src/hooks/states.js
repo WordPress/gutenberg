@@ -65,22 +65,16 @@ export function BlockStatesControl( { name, value, onChange } ) {
 }
 
 export function BlockStateBadges( { name, value } ) {
-	const selectedState = getStateOptions( name ).find(
-		( option ) => option.value === value
-	);
+	const stateOptions = getStateOptions( name );
 
-	if ( ! selectedState ) {
+	if ( ! stateOptions.length ) {
 		return null;
 	}
 
 	return (
 		<StateControlBadges
-			states={ [
-				{
-					key: `pseudo-${ selectedState.value }`,
-					label: selectedState.label,
-				},
-			] }
+			pseudoStates={ stateOptions }
+			pseudoStateValue={ value }
 		/>
 	);
 }
