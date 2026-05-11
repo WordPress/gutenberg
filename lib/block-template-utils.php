@@ -8,7 +8,7 @@
 /**
  * Finds an available path in a ZIP archive by appending a numeric suffix if needed.
  *
- * @since 6.8.0
+ * @since 7.1.0
  * @access private
  *
  * @param ZipArchive $zip  ZIP archive.
@@ -39,7 +39,7 @@ function gutenberg_get_available_zip_path( $zip, $path ) {
  *
  * @since 5.9.0
  * @since 6.0.0 Adds the whole theme to the export archive.
- * @since 6.8.0 Adds uploaded files to the export archive.
+ * @since 7.1.0 Adds uploaded files to the export archive.
  *
  * @global string $wp_version The WordPress version string.
  *

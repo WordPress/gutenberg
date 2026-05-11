@@ -43,6 +43,7 @@ class Tests_Block_Template extends WP_UnitTestCase {
 		$zip_path = wp_tempnam( 'theme-export.zip' );
 		$zip      = new ZipArchive();
 
+		$this->assertIsString( $zip_path );
 		$this->assertTrue( $zip->open( $zip_path, ZipArchive::CREATE | ZipArchive::OVERWRITE ) );
 		$this->assertTrue( $zip->addFromString( 'assets/img/image.png', 'first image' ) );
 		$this->assertTrue( $zip->addFromString( 'assets/img/image-1.png', 'second image' ) );

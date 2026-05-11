@@ -1488,6 +1488,7 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 		remove_filter( 'upload_dir', $filter_upload_dir_callback );
 
 		$this->assertSame( $expected_data, $actual );
+		$this->assertSame( array(), WP_Theme_JSON_Resolver_Gutenberg::get_migrated_relative_theme_uris( array() ) );
 
 		$exported_theme_json = $theme_json->get_data();
 		foreach ( $actual as $uri ) {

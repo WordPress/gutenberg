@@ -826,21 +826,24 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	/**
 	 * Processes theme URIs according to provided options.
 	 *
-	 * @since 6.8.0
+	 * @since 7.1.0
 	 *
-	 * @param WP_Theme_JSON_Gutenberg $theme_json A theme json instance.
+	 * @param WP_Theme_JSON_Gutenberg $theme_json A theme JSON instance.
 	 * @param array                   $options    {
-	 *   Optional. An array of options to process theme URIs.
-	 *   @type array $should_process {
-	 *      Optional. An array of booleans to determine which URIs to process.
-	 *      @type bool $images Whether to process image URIs. Default true.
-	 *      @type bool $fonts  Whether to process font URIs. Default false.
-	 *  }
-	 *  @type string $theme_value_prefix    The base URL to resolve URIs.
-	 *  @type string $relative_path_prefix The relative path to resolve URIs.
-	 *  @type callable $value_func  The function to resolve URIs.
+	 *     Optional. An array of options to process theme URIs.
+	 *
+	 *     @type array    $should_process {
+	 *         Optional. An array of booleans to determine which URIs to process.
+	 *
+	 *         @type bool $images Whether to process image URIs. Default true.
+	 *         @type bool $fonts  Whether to process font URIs. Default false.
+	 *     }
+	 *     @type array    $theme_json_data      Theme JSON data to process. Default raw data from `$theme_json`.
+	 *     @type string   $theme_value_prefix   The URI prefix to find in theme.json.
+	 *     @type string   $relative_path_prefix The relative path prefix to append to the file.
+	 *     @type callable $value_func           The function to process URIs.
 	 * }
-	 * @return array An array of resolved paths.
+	 * @return array An array of processed paths.
 	 */
 	private static function process_theme_uris( $theme_json, $options = array() ) {
 		$processed_theme_uris = array();
@@ -859,7 +862,15 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 				// Using the same file convention 'file:./' when registering web fonts. See: WP_Font_Face_Resolver:: to_theme_file_uri.
 				'theme_value_prefix'   => 'file:./',
 				'relative_path_prefix' => '',
-				'value_func'           => array( static::class, 'resolve_relative_path_to_absolute_uri' ),
+				'value_func'           => null,
+			)
+		);
+
+		$options['should_process'] = wp_parse_args(
+			is_array( $options['should_process'] ) ? $options['should_process'] : array(),
+			array(
+				'images' => true,
+				'fonts'  => false,
 			)
 		);
 
@@ -869,7 +880,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		$relative_path_prefix = $options['relative_path_prefix'];
 		$value_func           = $options['value_func'];
 
-		if ( ! is_array( $theme_json_data ) || ! is_callable( $value_func ) ) {
+		if ( ! is_array( $theme_json_data ) || ! is_string( $theme_value_prefix ) || ! is_string( $relative_path_prefix ) || ! is_callable( $value_func ) ) {
 			return $processed_theme_uris;
 		}
 
@@ -969,9 +980,9 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 *
 	 * @since 6.6.0
 	 * @since 6.7.0 Added support for resolving block styles.
-	 * @since 6.8.0 Abstracting the process of resolving theme URIs.
+	 * @since 7.1.0 Abstracted the process of resolving theme URIs.
 	 *
-	 * @param WP_Theme_JSON_Gutenberg $theme_json A theme json instance.
+	 * @param WP_Theme_JSON_Gutenberg $theme_json A theme JSON instance.
 	 * @return array An array of resolved paths.
 	 */
 	public static function get_resolved_theme_uris( $theme_json ) {
@@ -979,12 +990,12 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		 * A helper function to resolve a relative path in theme.json to a theme absolute path.
 		 * Returns an array with keys based on link attributes for compatibility with REST API _link responses.
 		 *
-		 * @param {array} $args {
+		 * @param array $args {
 		 *  An array of arguments to resolve URIs.
-		 * @type array  $theme_path         The path to the theme value.
-		 * @type string $theme_value_prefix The prefix of the theme value.
-		 * @type string $theme_value        The theme value.
-		 * @type string $relative_prefix    The relative prefix to append to the file.
+		 *  @type string $theme_path           The path to the theme value.
+		 *  @type string $theme_value_prefix   The prefix of the theme value.
+		 *  @type string $theme_value          The theme value.
+		 *  @type string $relative_path_prefix The relative prefix to append to the file.
 		 * }
 		 * @return array
 		 */
@@ -1019,30 +1030,41 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	}
 
 	/**
-	 * Migrates absolute paths that begin with a baseurl in theme.json styles to theme relative paths
+	 * Migrates absolute paths that begin with a base URL in theme.json styles to theme relative paths
 	 * and returns them in an array. In conjunction with copying the corresponding files to
-	 * a theme directory, migrating to relative paths is useful for migrating theme json to a new location.
+	 * a theme directory, migrating to relative paths is useful for migrating theme JSON to a new location.
 	 * The default is to migrate URIs from the site's uploads directory.
 	 *
-	 * @since 6.8.0
+	 * @since 7.1.0
 	 *
-	 * @param WP_Theme_JSON_Gutenberg $theme_json A theme json instance.
-	 * @param {array}                 $options    Optional. A 'theme_value_prefix' to find the target URI in theme.json, and a 'relative_path_prefix' to append to the file.
+	 * @param WP_Theme_JSON_Gutenberg $theme_json A theme JSON instance.
+	 * @param array                   $options    {
+	 *     Optional. Options to migrate theme URIs.
+	 *
+	 *     @type string $theme_value_prefix   The URI prefix to find in theme.json.
+	 *                                        Default site's uploads base URL.
+	 *     @type string $relative_path_prefix The relative path prefix to append to the file.
+	 *                                        Default `file:./`.
+	 * }
 	 * @return array An array of migrated paths.
 	 */
 	public static function get_migrated_relative_theme_uris( $theme_json, $options = array() ) {
+		if ( ! $theme_json instanceof WP_Theme_JSON_Gutenberg ) {
+			return array();
+		}
+
 		/**
-		 * A helper function to migrate an absolute paths in theme.json to a theme relative path.
+		 * A helper function to migrate an absolute path in theme.json to a theme relative path.
 		 * Returns an array with keys based on link attributes for compatibility with REST API _link responses.
 		 *
-		 * @param {array} $args {
+		 * @param array $args {
 		 *  An array of arguments to resolve URIs.
-		 * @type array  $theme_path         The path to the theme value.
-		 * @type string $theme_value_prefix The prefix of the theme value.
-		 * @type string $theme_value        The theme value.
-		 * @type string $relative_prefix    The relative prefix to append to the file.
+		 *  @type string $theme_path           The path to the theme value.
+		 *  @type string $theme_value_prefix   The prefix of the theme value.
+		 *  @type string $theme_value          The theme value.
+		 *  @type string $relative_path_prefix The relative prefix to append to the file.
 		 * }
-		 * @return array
+		 * @return array|null Migrated URI data, or null when the URI is invalid for migration.
 		 */
 		$migrate_absolute_uri_to_relative_path = function ( $args ) {
 			$theme_value_path  = wp_parse_url( $args['theme_value'], PHP_URL_PATH );
