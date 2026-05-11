@@ -85,9 +85,8 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 	}
 	$style_attribute = $font_sizes['inline_styles'];
 
-	$inner_blocks_html    = '';
-
 	// Assume all viewports are fully hidden until we find a child that is visible on them.
+	$inner_blocks_html    = '';
 	$has_visible_children = false;
 	$hidden_viewports     = array(
 		'desktop' => true,
