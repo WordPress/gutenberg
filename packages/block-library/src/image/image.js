@@ -316,7 +316,7 @@ export default function Image( {
 	const setRefs = useMergeRefs( [ setImageElement, setResizeObserved ] );
 	const { allowResize = true } = context;
 
-	const { image, canUserEdit, attachmentResolutionError } = useSelect(
+	const { image, attachmentResolutionError } = useSelect(
 		( select ) => {
 			const imageRecord =
 				id && isSingleSelected
@@ -345,20 +345,8 @@ export default function Image( {
 					  )
 					: null;
 
-			// Check edit permissions when the media editor experiment is enabled.
-			// Only check when imageRecord is available to avoid unnecessary API requests.
-			let canEdit = false;
-			if ( imageRecord && window?.__experimentalMediaEditor ) {
-				canEdit = !! select( coreStore ).canUser( 'update', {
-					kind: 'postType',
-					name: 'attachment',
-					id,
-				} );
-			}
-
 			return {
 				image: imageRecord,
-				canUserEdit: canEdit,
 				attachmentResolutionError: resolutionError,
 			};
 		},
@@ -394,7 +382,6 @@ export default function Image( {
 	);
 	const { getBlock, getSettings } = useSelect( blockEditorStore );
 	const settings = getSettings();
-	const { onNavigateToEntityRecord } = settings;
 	const openMediaEditorModal = settings[ openMediaEditorModalKey ];
 
 	const handleMediaUpdate = useCallback(
@@ -847,28 +834,6 @@ export default function Image( {
 
 	const hasDataFormBlockFields =
 		window?.__experimentalContentOnlyInspectorFields;
-
-	const editMediaButton = window?.__experimentalMediaEditor &&
-		id &&
-		isSingleSelected &&
-		canUserEdit &&
-		!! editMediaEntity &&
-		! isExternalImage( id, url ) &&
-		! isEditingImage &&
-		onNavigateToEntityRecord && (
-			<BlockControls group="other">
-				<ToolbarButton
-					onClick={ () => {
-						onNavigateToEntityRecord( {
-							postId: id,
-							postType: 'attachment',
-						} );
-					} }
-				>
-					{ __( 'Edit media' ) }
-				</ToolbarButton>
-			</BlockControls>
-		);
 
 	const controls = (
 		<>
@@ -1356,7 +1321,6 @@ export default function Image( {
 
 	return (
 		<>
-			{ editMediaButton }
 			{ mediaReplaceFlow }
 			{ controls }
 			{ featuredImageControl }

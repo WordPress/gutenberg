@@ -14,7 +14,8 @@ import { Stack, Text } from '@wordpress/ui';
 /**
  * Internal dependencies
  */
-import type { CoreDataError, TaxonomyFormData } from '../types';
+import type { TaxonomyFormData } from '../types';
+import type { CoreDataError } from '../../types';
 import { TAXONOMY_ENTITY } from '../../constants';
 
 function DeleteTaxonomyModal( {
