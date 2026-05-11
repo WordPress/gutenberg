@@ -7,15 +7,15 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { booleanField } from './utils';
+import { createBooleanField } from '../../utils/fields';
 
-export const publicField = booleanField( 'public', __( 'Public' ), {
+export const publicField = createBooleanField( 'public', __( 'Public' ), {
 	description: __(
 		'Whether a taxonomy is intended for use publicly either via the admin interface or by front-end users.'
 	),
 } );
 
-export const showInRestField = booleanField(
+export const showInRestField = createBooleanField(
 	'show_in_rest',
 	__( 'Show in REST API' ),
 	{
@@ -25,7 +25,7 @@ export const showInRestField = booleanField(
 	}
 );
 
-export const publiclyQueryableField = booleanField(
+export const publiclyQueryableField = createBooleanField(
 	'publicly_queryable',
 	__( 'Publicly queryable' ),
 	{
@@ -35,13 +35,17 @@ export const publiclyQueryableField = booleanField(
 	}
 );
 
-export const showUiField = booleanField( 'show_ui', __( 'Show admin UI' ), {
-	description: __(
-		'Whether to generate a default admin interface for managing terms.'
-	),
-} );
+export const showUiField = createBooleanField(
+	'show_ui',
+	__( 'Show admin UI' ),
+	{
+		description: __(
+			'Whether to generate a default admin interface for managing terms.'
+		),
+	}
+);
 
-export const showInMenuField = booleanField(
+export const showInMenuField = createBooleanField(
 	'show_in_menu',
 	__( 'Show in admin menu' ),
 	{
@@ -55,7 +59,7 @@ export const showInMenuField = booleanField(
 	}
 );
 
-export const showInQuickEditField = booleanField(
+export const showInQuickEditField = createBooleanField(
 	'show_in_quick_edit',
 	__( 'Show in Quick Edit' ),
 	{
@@ -65,7 +69,7 @@ export const showInQuickEditField = booleanField(
 	}
 );
 
-export const showAdminColumnField = booleanField(
+export const showAdminColumnField = createBooleanField(
 	'show_admin_column',
 	__( 'Show admin column' ),
 	{
@@ -75,7 +79,7 @@ export const showAdminColumnField = booleanField(
 	}
 );
 
-export const showInNavMenusField = booleanField(
+export const showInNavMenusField = createBooleanField(
 	'show_in_nav_menus',
 	__( 'Available in nav menus' ),
 	{
@@ -85,7 +89,7 @@ export const showInNavMenusField = booleanField(
 	}
 );
 
-export const showTagcloudField = booleanField(
+export const showTagcloudField = createBooleanField(
 	'show_tagcloud',
 	__( 'Available in Tag Cloud widget' ),
 	{

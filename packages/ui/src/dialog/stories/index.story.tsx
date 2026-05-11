@@ -10,6 +10,7 @@ const meta: Meta< typeof Dialog.Root > = {
 	component: Dialog.Root,
 	subcomponents: {
 		'Dialog.Trigger': Dialog.Trigger,
+		'Dialog.Portal': Dialog.Portal,
 		'Dialog.Popup': Dialog.Popup,
 		'Dialog.Header': Dialog.Header,
 		'Dialog.Title': Dialog.Title,

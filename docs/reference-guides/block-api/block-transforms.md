@@ -337,6 +337,33 @@ transforms: {
 },
 ```
 
+**Example: shortcode with wrapped content to block with InnerBlocks**
+
+Shortcodes that wrap inner content (e.g. `[example]<p>Inner.</p>[/example]`) can be transformed into a block with InnerBlocks by passing `match.shortcode.content` through [`rawHandler`](/packages/blocks/README.md#rawHandler) inside `transform`.
+
+```js
+transforms: {
+    from: [
+        {
+            type: 'shortcode',
+            tag: 'example',
+            transform( attrs, match ) {
+                const innerBlocks = rawHandler( {
+                    HTML: match.shortcode.content || '',
+                } );
+                return createBlock(
+                    'myplugin/example',
+                    { att1: attrs.named.att1 || '' },
+                    innerBlocks
+                );
+            },
+        },
+    ],
+},
+```
+
+`rawHandler` recurses into the content, so nested shortcodes and HTML are converted to blocks the same way pasted content is.
+
 ## `ungroup` blocks
 
 Via the optional `transforms` key of the block configuration, blocks can use the `ungroup` subkey to define the blocks that will replace the block being processed. These new blocks will usually be a subset of the existing inner blocks, but could also include new blocks.
