@@ -17,7 +17,7 @@ import {
 import { __ } from '@wordpress/i18n';
 // Dashboard is still experimental.
 // eslint-disable-next-line @wordpress/use-recommended-components
-import { Card, Stack, Notice } from '@wordpress/ui';
+import { Card, Stack, Notice, VisuallyHidden } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -126,6 +126,16 @@ export const WidgetChrome = forwardRef< HTMLDivElement, WidgetChromeProps >(
 			return null;
 		}
 
+		const isFullBleed = widgetType.presentation === 'full-bleed';
+		const header = <Header titleId={ titleId } widgetType={ widgetType } />;
+		const body = (
+			<WidgetErrorBoundary>
+				<Suspense fallback={ <LoadingOverlay /> }>
+					<WidgetRender widget={ widget } widgetType={ widgetType } />
+				</Suspense>
+			</WidgetErrorBoundary>
+		);
+
 		return (
 			<WidgetContextProvider value={ contextValue }>
 				<Card.Root
@@ -135,16 +145,24 @@ export const WidgetChrome = forwardRef< HTMLDivElement, WidgetChromeProps >(
 					aria-labelledby={ widgetType.title ? titleId : undefined }
 					{ ...( editMode ? { inert: '' } : {} ) }
 				>
-					<Header titleId={ titleId } widgetType={ widgetType } />
+					{ isFullBleed ? (
+						<VisuallyHidden>{ header }</VisuallyHidden>
+					) : (
+						header
+					) }
+
 					<Card.Content className={ styles.widgetChromeContent }>
-						<WidgetErrorBoundary>
-							<Suspense fallback={ <LoadingOverlay /> }>
-								<WidgetRender
-									widget={ widget }
-									widgetType={ widgetType }
-								/>
-							</Suspense>
-						</WidgetErrorBoundary>
+						{ isFullBleed ? (
+							<Card.FullBleed
+								className={
+									styles.widgetChromeContentFullBleed
+								}
+							>
+								{ body }
+							</Card.FullBleed>
+						) : (
+							body
+						) }
 					</Card.Content>
 				</Card.Root>
 			</WidgetContextProvider>
