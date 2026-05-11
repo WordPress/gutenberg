@@ -22,13 +22,15 @@ import { Stack, Text } from '@wordpress/ui';
 import {
 	defaultForm,
 	hierarchicalField,
-	pluralLabelField,
 	publicField,
-	singularLabelField,
-	statusField,
 	useObjectTypeField,
 	useSlugField,
 } from '../fields';
+import {
+	pluralLabelField,
+	singularLabelField,
+	statusField,
+} from '../../utils/fields';
 import type { TaxonomyFormData } from '../types';
 import { serializeForSave } from '../utils';
 import { TAXONOMY_ENTITY } from '../../constants';
@@ -46,16 +48,17 @@ function QuickEditTaxonomyModal( {
 	const slugField = useSlugField( item.slug, data.slug );
 	const objectTypeField = useObjectTypeField();
 
-	const fields = useMemo< Field< TaxonomyFormData >[] >(
-		() => [
-			pluralLabelField,
-			singularLabelField,
-			slugField,
-			objectTypeField,
-			publicField,
-			hierarchicalField,
-			statusField,
-		],
+	const fields = useMemo(
+		() =>
+			[
+				pluralLabelField,
+				singularLabelField,
+				slugField,
+				objectTypeField,
+				publicField,
+				hierarchicalField,
+				statusField,
+			] as Field< TaxonomyFormData >[],
 		[ slugField, objectTypeField ]
 	);
 
