@@ -1241,11 +1241,19 @@ async function generatePagesPhp( pageData, replacements ) {
 	await Promise.all( pageGenerationPromises );
 
 	// Generate pages.php loader
-	const pageIncludes = pageData
-		.map( ( page ) => {
-			return `require_once __DIR__ . '/pages/${ page.slug }/page.php';\nrequire_once __DIR__ . '/pages/${ page.slug }/page-wp-admin.php';`;
-		} )
-		.join( '\n' );
+	const pageFiles = pageData.flatMap( ( page ) => [
+		`\t__DIR__ . '/pages/${ page.slug }/page.php'`,
+		`\t__DIR__ . '/pages/${ page.slug }/page-wp-admin.php'`,
+	] );
+	const pageIncludes = [
+		'foreach ( [',
+		pageFiles.join( ',\n' ) + ',',
+		'] as $file ) {',
+		'\tif ( file_exists( $file ) ) {',
+		'\t\trequire_once $file;',
+		'\t}',
+		'}',
+	].join( '\n' );
 
 	await generatePhpFromTemplate(
 		'pages.php.template',
