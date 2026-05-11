@@ -479,14 +479,54 @@ export const initializeMetaBoxes =
 
 		metaBoxesInitialized = true;
 
-		// Save metaboxes on save completion, except for autosaves.
 		addAction(
 			'editor.savePost',
 			'core/edit-post/save-metaboxes',
 			async ( post, options ) => {
-				if ( ! options.isAutosave && select.hasMetaBoxes() ) {
-					await dispatch.requestMetaBoxUpdates();
+				if ( options.isAutosave || ! select.hasMetaBoxes() ) {
+					return;
 				}
+
+				if ( options.isRevisionsRestore ) {
+					// The revision meta has been persisted via the REST API.
+					// Sync the restored values back into the classic meta box
+					// DOM fields so the UI reflects the correct state and any
+					// subsequent save submits the restored values instead of
+					// the stale pre-restore ones.
+					const savedMeta = registry
+						.select( editorStore )
+						.getCurrentPost()?.meta;
+
+					if ( savedMeta ) {
+						const containers = [
+							document.querySelector( '.metabox-base-form' ),
+							...select
+								.getActiveMetaBoxLocations()
+								.map( getMetaBoxContainer ),
+						].filter( Boolean );
+
+						for ( const [ key, value ] of Object.entries(
+							savedMeta
+						) ) {
+							const stringValue =
+								'string' === typeof value
+									? value
+									: JSON.stringify( value );
+							for ( const container of containers ) {
+								/* global CSS */
+								const field = container.querySelector(
+									`[name="${ CSS.escape( key ) }"]`
+								);
+								if ( field ) {
+									field.value = stringValue;
+								}
+							}
+						}
+					}
+					return;
+				}
+
+				await dispatch.requestMetaBoxUpdates();
 			}
 		);
 
