@@ -17,6 +17,7 @@ import { Icon, IconButton, Stack } from '@wordpress/ui';
 import { DashboardGrid } from '../grid';
 import type {
 	DashboardGridLayoutItem,
+	DragPreviewRenderProps,
 	ResizeHandleRenderProps,
 } from '../types';
 
@@ -728,8 +729,41 @@ function CustomResizeHandle( {
 	);
 }
 
-export const CustomResizeHandleStory: Story = {
-	name: 'Custom Resize Handle',
+/**
+ * Drop-in wrapper that bumps the dragged-clone shadow and clips its
+ * corners. The grid keeps the lift scale and the grabbing cursor on
+ * the functional frame; the consumer's wrapper sits inside it.
+ */
+function CustomDragPreview( { children }: DragPreviewRenderProps ) {
+	return (
+		<div
+			style={ {
+				height: '100%',
+				boxShadow: 'var(--wpds-elevation-lg)',
+				borderRadius: 'var(--wpds-border-radius-lg)',
+				overflow: 'hidden',
+			} }
+		>
+			{ children }
+		</div>
+	);
+}
+
+/**
+ * Exercises the three customization vectors on a single grid:
+ *
+ * 1. `renderResizeHandle` swaps the default corner triangle for a
+ *    custom diagonal-arrow icon.
+ * 2. `renderDragPreview` wraps the dragged clone with extra chrome
+ *    (stronger shadow, rounded corners, overflow clipping).
+ * 3. CSS custom properties on an ancestor retheme the lift scale,
+ *    placeholder opacity, placeholder outline color, and placeholder
+ *    border-radius without touching the package.
+ *
+ * Toggle `editMode`, then drag and resize a tile to see all three
+ * respond.
+ */
+export const Customization: Story = {
 	args: {
 		columns: 6,
 		spacing: 2,
@@ -743,7 +777,7 @@ export const CustomResizeHandleStory: Story = {
 			{ key: 'e', width: 3, height: 1 },
 		],
 	},
-	render: function CustomResizeHandleRender( args ) {
+	render: function CustomizationRender( args ) {
 		const [ layout, setLayout ] = useState< DashboardGridLayoutItem[] >(
 			args.layout
 		);
@@ -769,15 +803,26 @@ export const CustomResizeHandleStory: Story = {
 			[]
 		);
 
+		const customTokens = {
+			'--wp-grid-drag-preview-scale': '1.08',
+			'--wp-grid-placeholder-opacity': '0.2',
+			'--wp-grid-placeholder-outline-color':
+				'var(--wpds-color-fg-content-warning)',
+			'--wp-grid-placeholder-radius': '12px',
+		} as React.CSSProperties;
+
 		return (
-			<DashboardGrid
-				{ ...args }
-				layout={ layout }
-				onChangeLayout={ setLayout }
-				renderResizeHandle={ CustomResizeHandle }
-			>
-				{ tiles }
-			</DashboardGrid>
+			<div style={ customTokens }>
+				<DashboardGrid
+					{ ...args }
+					layout={ layout }
+					onChangeLayout={ setLayout }
+					renderResizeHandle={ CustomResizeHandle }
+					renderDragPreview={ CustomDragPreview }
+				>
+					{ tiles }
+				</DashboardGrid>
+			</div>
 		);
 	},
 };

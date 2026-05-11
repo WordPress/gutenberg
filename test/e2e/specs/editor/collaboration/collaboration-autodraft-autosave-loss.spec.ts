@@ -72,11 +72,7 @@ test.describe( 'Collaboration - auto-draft autosave retention', () => {
 		const title = 'RTC automatic auto-draft autosave title';
 		const marker = 'rtc-automatic-auto-draft-autosave-content';
 
-		await admin.visitAdminPage( 'post-new.php' );
-		await editor.setPreferences( 'core/edit-post', {
-			welcomeGuide: false,
-			fullscreenMode: false,
-		} );
+		await admin.createNewPost();
 		await collaborationUtils.waitForEntityReady( page, {
 			requireCollaboration: false,
 			timeout: 30_000,

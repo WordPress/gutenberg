@@ -43,14 +43,7 @@ test.describe( 'Collaboration - Refresh', () => {
 		} );
 
 		// Step 1: User A opens the post, adds content, and saves.
-		await admin.visitAdminPage(
-			'post.php',
-			`post=${ post.id }&action=edit`
-		);
-		await editor.setPreferences( 'core/edit-post', {
-			welcomeGuide: false,
-			fullscreenMode: false,
-		} );
+		await admin.editPost( post.id );
 		await page.waitForFunction(
 			() =>
 				( window as any )._wpCollaborationEnabled === true &&

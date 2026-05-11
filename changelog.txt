@@ -1,5 +1,25 @@
 == Changelog ==
 
+= 23.1.1 =
+
+
+## Changelog
+
+### Bug Fixes
+
+#### Components
+- Style Runtime: Support CSS module style injection across documents. ([77965](https://github.com/WordPress/gutenberg/pull/77965))
+
+
+
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@mirka
+
+
 = 23.1.0 =
 
 ## Changelog

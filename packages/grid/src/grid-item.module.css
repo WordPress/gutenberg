@@ -15,9 +15,12 @@
  * original element.
  */
 .is-dragging {
-	opacity: 0.4;
+	opacity: var(--wp-grid-placeholder-opacity, 0.4);
 	pointer-events: none;
-	outline: var(--wpds-border-width-sm) dashed var(--wpds-color-stroke-interactive-brand);
+	outline:
+		var(--wpds-border-width-sm) dashed
+		var(--wp-grid-placeholder-outline-color, var(--wpds-color-stroke-interactive-brand));
+	border-radius: var(--wp-grid-placeholder-radius, var(--wpds-border-radius-lg));
 }
 
 @media (forced-colors: active) {
@@ -32,7 +35,9 @@
 	inset-inline-start: 0;
 	pointer-events: none;
 	z-index: 1;
-	border: var(--wpds-border-width-sm) dashed var(--wpds-color-stroke-interactive-brand);
+	border:
+		var(--wpds-border-width-sm) dashed
+		var(--wp-grid-placeholder-outline-color, var(--wpds-color-stroke-interactive-brand));
 	background: transparent;
 }
 

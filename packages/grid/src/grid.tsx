@@ -97,6 +97,7 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 			onChangeLayout,
 			onPreviewLayout,
 			renderResizeHandle,
+			renderDragPreview,
 			...divProps
 		} = props;
 		// Preview layout applied during drag/resize before committing.
@@ -453,6 +454,27 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 			onPreviewLayout?.( updatedLayout );
 		} );
 
+		// Drag-overlay clone composition: the surface always wraps with a
+		// thin functional frame (lift, cursor, pointer pass-through). When
+		// `renderDragPreview` is supplied, the consumer's wrapper sits
+		// inside the frame around the cloned children; otherwise the
+		// cloned children render directly so any persistent chrome on
+		// them carries through unchanged.
+		const activeClone = activeId ? childrenMap.get( activeId ) : null;
+		const DragPreview = renderDragPreview;
+		const dragOverlayContent =
+			activeId && activeClone ? (
+				<div className={ styles[ 'drag-preview-frame' ] }>
+					{ DragPreview ? (
+						<DragPreview itemId={ activeId }>
+							{ activeClone }
+						</DragPreview>
+					) : (
+						activeClone
+					) }
+				</div>
+			) : null;
+
 		return (
 			<DndContext
 				sensors={ sensors }
@@ -502,13 +524,7 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 						{ remaining }
 					</div>
 				</SortableContext>
-				<DragOverlay>
-					{ activeId && childrenMap.get( activeId ) ? (
-						<div className={ styles[ 'drag-preview' ] }>
-							{ childrenMap.get( activeId ) }
-						</div>
-					) : null }
-				</DragOverlay>
+				<DragOverlay>{ dragOverlayContent }</DragOverlay>
 			</DndContext>
 		);
 	}

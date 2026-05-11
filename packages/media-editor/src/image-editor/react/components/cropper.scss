@@ -21,6 +21,12 @@ $handle-touch-target-size: 44px;
 	&__canvas {
 		position: absolute;
 		inset: calc($handle-touch-target-size / 2);
+
+		// Suppress the browser's default focus ring — the crop rectangle
+		// border provides the custom keyboard-focus indicator instead.
+		&:focus {
+			outline: none;
+		}
 	}
 
 	// Inner stage — receives the viewport pan transform so the canvas div
@@ -105,6 +111,16 @@ $handle-touch-target-size: 44px;
 		border: 1px solid rgba(255, 255, 255, 0.7);
 		box-sizing: border-box;
 		pointer-events: none;
+		transition: border-color 0.15s ease, box-shadow 0.15s ease;
+	}
+
+	// Blue border on the crop rectangle when the canvas has keyboard focus.
+	// Uses a JS-controlled class rather than :focus-visible — browsers can
+	// restore :focus-visible across programmatic focus calls, making pure
+	// CSS unreliable for pointer-to-keyboard transitions.
+	&__canvas--focus-visible &__stencil-rect {
+		border-color: var(--wp-image-editor-focus-color, var(--wp-admin-theme-color, #007cba));
+		box-shadow: 0 0 0 1px var(--wp-image-editor-focus-color, var(--wp-admin-theme-color, #007cba));
 	}
 
 	&__handle {

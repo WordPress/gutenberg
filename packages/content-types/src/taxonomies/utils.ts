@@ -9,6 +9,7 @@ import { __, sprintf } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
+import { pickStoredLabels, serializeLabels } from '../utils/form-data';
 import type { StoredLabels, TaxonomyFormData, TaxonomyRecord } from './types';
 
 export const BLANK_RECORD: TaxonomyFormData = {
@@ -139,13 +140,10 @@ export function deriveLabels(
 
 export function toFormData( row: TaxonomyRecord ): TaxonomyFormData {
 	const config = row.config ?? {};
-	const labels: StoredLabels = {};
-	for ( const key of STRING_LABEL_KEYS ) {
-		const value = config.labels?.[ key ];
-		if ( typeof value === 'string' ) {
-			labels[ key ] = value;
-		}
-	}
+	const labels = pickStoredLabels< StoredLabels >(
+		config.labels,
+		STRING_LABEL_KEYS
+	);
 	const formConfig: TaxonomyFormData[ 'config' ] = {
 		labels: { singular_name: '', ...labels },
 		object_type: Array.isArray( row.object_type ) ? row.object_type : [],
@@ -173,16 +171,12 @@ export function toFormData( row: TaxonomyRecord ): TaxonomyFormData {
 export function serializeForSave( data: TaxonomyFormData ) {
 	const { config } = data;
 
-	const labels: StoredLabels = {};
-	for ( const key of STRING_LABEL_KEYS ) {
-		const value = config.labels[ key ];
-		if ( typeof value === 'string' && value.trim() !== '' ) {
-			labels[ key ] = value.trim();
-		}
-	}
-	// singular_name is required; keep the raw (possibly-empty) value so save
-	// errors point at the right field rather than silently dropping it.
-	labels.singular_name = config.labels.singular_name;
+	const labels = serializeLabels< TaxonomyFormData[ 'config' ][ 'labels' ] >(
+		config.labels,
+		STRING_LABEL_KEYS as ReadonlyArray<
+			keyof TaxonomyFormData[ 'config' ][ 'labels' ]
+		>
+	);
 
 	const description = config.description.trim();
 	return {
