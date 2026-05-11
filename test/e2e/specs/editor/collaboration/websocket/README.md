@@ -4,7 +4,7 @@ This directory contains local-only WebSocket transport variants of the editor
 collaboration e2e tests in the parent directory. Each spec imports the matching
 HTTP-polling RTC spec; the dedicated Playwright config enables
 `GUTENBERG_RTC_TEST_WS_PROVIDER`, activates the test provider plugin, and starts
-`bin/rtc-test-ws-sync-server.mjs`.
+`test/e2e/bin/rtc-test-ws-sync-server.mjs`.
 
 Run them locally with:
 

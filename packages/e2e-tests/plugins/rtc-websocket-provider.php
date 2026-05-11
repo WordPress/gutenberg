@@ -11,7 +11,7 @@
  * Enqueues a test-only WebSocket sync provider for RTC e2e tests.
  */
 function gutenberg_test_rtc_websocket_provider_enqueue() {
-	$script_path = plugin_dir_path( __FILE__ ) . 'rtc-websocket-provider/index.js';
+	$script_path = plugin_dir_path( __FILE__ ) . 'rtc-websocket-provider/build/index.js';
 	$ws_url      = getenv( 'GUTENBERG_RTC_TEST_WS_URL' );
 
 	if ( ! $ws_url ) {
@@ -24,7 +24,7 @@ function gutenberg_test_rtc_websocket_provider_enqueue() {
 
 	wp_enqueue_script(
 		'gutenberg-test-rtc-websocket-provider',
-		plugins_url( 'rtc-websocket-provider/index.js', __FILE__ ),
+		plugins_url( 'rtc-websocket-provider/build/index.js', __FILE__ ),
 		array( 'wp-hooks', 'wp-sync' ),
 		filemtime( $script_path ),
 		true

@@ -1,13 +1,31 @@
 /**
  * External dependencies
  */
+import path from 'node:path';
 import { request } from '@playwright/test';
 import type { FullConfig } from '@playwright/test';
+import { build as esbuildBuild } from 'esbuild';
 
 /**
  * WordPress dependencies
  */
 import { RequestUtils } from '@wordpress/e2e-test-utils-playwright';
+
+async function buildTestWebSocketProvider() {
+	const pluginDir = path.resolve(
+		__dirname,
+		'../../../packages/e2e-tests/plugins/rtc-websocket-provider'
+	);
+	await esbuildBuild( {
+		entryPoints: [ path.join( pluginDir, 'src/index.js' ) ],
+		outfile: path.join( pluginDir, 'build/index.js' ),
+		bundle: true,
+		format: 'iife',
+		target: 'es2020',
+		alias: { yjs: path.join( pluginDir, 'src/yjs-external.js' ) },
+		logLevel: 'warning',
+	} );
+}
 
 async function resetTestWebSocketSyncServer() {
 	const wsUrl =
@@ -72,6 +90,8 @@ async function globalSetup( config: FullConfig ) {
 		process.env.GUTENBERG_RTC_TEST_WS_PROVIDER === '1';
 
 	if ( useTestWebSocketProvider ) {
+		await buildTestWebSocketProvider();
+
 		if ( process.env.GUTENBERG_RTC_TEST_WS_SKIP_RESET !== '1' ) {
 			resetTasks.push( resetTestWebSocketSyncServer() );
 		}

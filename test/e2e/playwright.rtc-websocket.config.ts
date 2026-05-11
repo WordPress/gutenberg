@@ -40,7 +40,7 @@ const config = defineConfig( {
 	webServer: [
 		...baseWebServer,
 		{
-			command: `exec node ../../bin/rtc-test-ws-sync-server.mjs --port ${ wsPort }`,
+			command: `exec node ./bin/rtc-test-ws-sync-server.mjs --port ${ wsPort }`,
 			reuseExistingServer:
 				process.env.GUTENBERG_RTC_TEST_WS_REUSE_SERVER === '1',
 			stderr: 'pipe',
