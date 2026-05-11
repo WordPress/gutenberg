@@ -32,6 +32,10 @@ export type KeyedOption = {
 	keywords: Array< string >;
 	isDisabled: boolean;
 };
+type UseItemsResult = readonly [
+	items: Array< KeyedOption >,
+	noResultsMessage?: React.ReactNode,
+];
 
 export type WPCompleter< TCompleterOption = any > = {
 	/**
@@ -95,7 +99,7 @@ export type WPCompleter< TCompleterOption = any > = {
 	 * Autocomplete UI. These items have uniform shape and have been filtered by
 	 * `AutocompleterUIProps.filterValue`.
 	 */
-	useItems?: ( filterValue: string ) => readonly [ Array< KeyedOption > ];
+	useItems?: ( filterValue: string ) => UseItemsResult;
 	/**
 	 * Whether or not changes to the `filterValue` should be debounced.
 	 */

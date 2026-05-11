@@ -25,6 +25,7 @@ import getDefaultUseItems from './get-default-use-items';
 import Button from '../button';
 import Popover from '../popover';
 import { VisuallyHidden } from '../visually-hidden';
+import getNodeText from '../utils/get-node-text';
 import type { AutocompleterUIProps, KeyedOption } from './types';
 
 type ListBoxProps = {
@@ -96,7 +97,7 @@ export function AutocompleterUI( {
 	// ensuring a fresh mount (and stable hook identity) when the completer changes.
 	const useItems =
 		autocompleter.useItems ?? getDefaultUseItems( autocompleter );
-	const [ items ] = useItems( filterValue );
+	const [ items, noResultsMessage ] = useItems( filterValue );
 	const popoverAnchor = useAnchor( {
 		editableContentElement: contentRef.current,
 	} );
@@ -127,7 +128,10 @@ export function AutocompleterUI( {
 
 	const debouncedSpeak = useDebounce( speak, 500 );
 
-	function announce( options: Array< KeyedOption > ) {
+	function announce(
+		options: Array< KeyedOption >,
+		message?: React.ReactNode
+	) {
 		if ( ! debouncedSpeak ) {
 			return;
 		}
@@ -160,18 +164,21 @@ export function AutocompleterUI( {
 				);
 			}
 		} else {
-			debouncedSpeak( __( 'No results.' ), 'assertive' );
+			debouncedSpeak(
+				( message && getNodeText( message ) ) || __( 'No results.' ),
+				'assertive'
+			);
 		}
 	}
 
 	useLayoutEffect( () => {
 		onChangeOptions( items );
-		announce( items );
+		announce( items, noResultsMessage );
 		// We want to avoid introducing unexpected side effects.
 		// See https://github.com/WordPress/gutenberg/pull/41820
-	}, [ items ] );
+	}, [ items, noResultsMessage ] );
 
-	if ( items.length === 0 ) {
+	if ( items.length === 0 && ! noResultsMessage ) {
 		return null;
 	}
 
@@ -185,14 +192,25 @@ export function AutocompleterUI( {
 				anchor={ popoverAnchor }
 				ref={ popoverRefs }
 			>
-				<ListBox
-					items={ items }
-					onSelect={ onSelect }
-					selectedIndex={ selectedIndex }
-					instanceId={ instanceId }
-					listBoxId={ listBoxId }
-					className={ className }
-				/>
+				{ items.length ? (
+					<ListBox
+						items={ items }
+						onSelect={ onSelect }
+						selectedIndex={ selectedIndex }
+						instanceId={ instanceId }
+						listBoxId={ listBoxId }
+						className={ className }
+					/>
+				) : (
+					<div
+						className={ clsx(
+							'components-autocomplete__no-results',
+							className
+						) }
+					>
+						{ noResultsMessage }
+					</div>
+				) }
 			</Popover>
 			{ contentRef.current &&
 				needsA11yCompat &&

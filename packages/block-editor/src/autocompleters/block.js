@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
+import { __ } from '@wordpress/i18n';
 import {
 	cloneBlock,
 	createBlock,
@@ -70,6 +71,23 @@ function createBlockCompleter() {
 				noop,
 				true
 			);
+			const hasBlockReplacements = useMemo(
+				() => items.some( ( item ) => item.id !== selectedBlockId ),
+				[ items, selectedBlockId ]
+			);
+			const noBlockReplacementsMessage = useMemo(
+				() =>
+					hasBlockReplacements ? undefined : (
+						<>
+							<BlockIcon
+								key="icon"
+								icon={ { src: 'block-default' } }
+							/>
+							{ __( 'No other blocks are available here' ) }
+						</>
+					),
+				[ hasBlockReplacements ]
+			);
 
 			const filteredItems = useMemo( () => {
 				const initialFilteredItems = !! filterValue.trim()
@@ -119,7 +137,7 @@ function createBlockCompleter() {
 				[ filteredItems ]
 			);
 
-			return [ options ];
+			return [ options, noBlockReplacementsMessage ];
 		},
 		allowContext( before, after ) {
 			return ! ( /\S/.test( before ) || /\S/.test( after ) );

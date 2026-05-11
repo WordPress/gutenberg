@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, screen, renderHook } from '@testing-library/react';
+import { render, screen, renderHook, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -126,6 +126,51 @@ describe( 'useLastDifferentValue', () => {
 } );
 
 describe( 'AutocompleterUI', () => {
+	it( 'should render the no results message returned by useItems', async () => {
+		const onChangeOptions = jest.fn();
+		const autocompleter = {
+			name: 'fruit',
+			options: [],
+			triggerPrefix: '~',
+			getOptionLabel: () => '',
+			useItems: () => [
+				[],
+				<>
+					<span data-testid="no-results-icon" />
+					No other blocks are available here
+				</>,
+			],
+		};
+
+		const Container = () => {
+			const contentRef = useRef< HTMLElement >( null );
+
+			return (
+				<AutocompleterUI
+					autocompleter={ autocompleter }
+					filterValue=""
+					instanceId={ 1 }
+					listBoxId={ undefined }
+					selectedIndex={ 0 }
+					onChangeOptions={ onChangeOptions }
+					onSelect={ () => {} }
+					contentRef={ contentRef }
+					reset={ () => {} }
+				/>
+			);
+		};
+
+		render( <Container /> );
+
+		await waitFor( () => {
+			expect(
+				screen.getByText( 'No other blocks are available here' )
+			).toBeVisible();
+			expect( screen.getByTestId( 'no-results-icon' ) ).toBeVisible();
+			expect( onChangeOptions ).toHaveBeenCalledWith( [] );
+		} );
+	} );
+
 	describe( 'click outside behavior', () => {
 		it( 'should call reset function when a click on another element occurs', async () => {
 			const user = userEvent.setup();

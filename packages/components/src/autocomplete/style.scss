@@ -17,3 +17,9 @@
 		@include block-toolbar-button-style__focus();
 	}
 }
+
+.components-autocomplete__no-results {
+	align-items: center;
+	display: flex;
+	min-height: $button-size;
+}
