@@ -219,6 +219,32 @@ class WP_Style_Engine_CSS_Declarations_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Tests that non-string values are rejected without causing fatal errors.
+	 *
+	 * @covers ::add_declaration
+	 */
+	public function test_should_reject_non_string_values() {
+		$css_declarations = new WP_Style_Engine_CSS_Declarations_Gutenberg();
+
+		// Add valid string value first.
+		$css_declarations->add_declaration( 'color', 'red' );
+
+		// Try to add array value - should be silently rejected.
+		$css_declarations->add_declaration( 'padding-margin', array( 'top' => '10px' ) );
+
+		// Try to add other non-string values.
+		$css_declarations->add_declaration( 'font-size', 123 );
+		$css_declarations->add_declaration( 'margin', null );
+
+		// Only the valid string value should be stored.
+		$this->assertSame(
+			array( 'color' => 'red' ),
+			$css_declarations->get_declarations(),
+			'Non-string values should be rejected without causing errors.'
+		);
+	}
+
+	/**
 	 * Tests removing a single declaration.
 	 *
 	 * @covers ::remove_declaration

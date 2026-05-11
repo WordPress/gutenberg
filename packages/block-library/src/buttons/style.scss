@@ -82,6 +82,11 @@ $blocks-block__margin: 0.5em;
 			font-size: inherit;
 		}
 	}
+
+	// Needed to make the buttons stretch correctly in a vertical layout.
+	.wp-block-button__link {
+		width: 100%;
+	}
 }
 
 // Legacy buttons that did not come in a wrapping container.

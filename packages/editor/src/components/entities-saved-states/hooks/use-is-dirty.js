@@ -39,15 +39,24 @@ export const useIsDirty = () => {
 		);
 
 		const siteEntityLabels = siteEntityConfig?.meta?.labels ?? {};
-		const editedSiteEntities = [];
-		for ( const property in siteEdits ) {
-			editedSiteEntities.push( {
+		const {
+			site_logo: siteLogoEdit,
+			site_icon: siteIconEdit,
+			...otherSiteEdits
+		} = siteEdits ?? {};
+		const orderedSiteProperties = [
+			siteLogoEdit !== undefined && 'site_logo',
+			siteIconEdit !== undefined && 'site_icon',
+			...Object.keys( otherSiteEdits ),
+		].filter( Boolean );
+		const editedSiteEntities = orderedSiteProperties.map(
+			( property ) => ( {
 				kind: 'root',
 				name: 'site',
 				title: siteEntityLabels[ property ] || property,
 				property,
-			} );
-		}
+			} )
+		);
 
 		return [ ...editedEntitiesWithoutSite, ...editedSiteEntities ];
 	}, [ editedEntities, siteEdits, siteEntityConfig ] );

@@ -65,9 +65,7 @@ function CategoryTabs( {
 						key={ category.name }
 						tabId={ category.name }
 						aria-current={
-							category.name === selectedCategory?.name
-								? 'true'
-								: undefined
+							category === selectedCategory ? 'true' : undefined
 						}
 					>
 						{ category.label }

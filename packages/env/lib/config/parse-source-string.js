@@ -68,12 +68,10 @@ function parseSourceString( sourceString, { cacheDirectoryPath } ) {
 	);
 
 	if ( zipFields ) {
-		const wpOrgFields = sourceString.match(
-			/^https?:\/\/downloads\.wordpress\.org\/(?:plugin|theme)\/([^\s\.]*)([^\s]*)?\.zip$/
+		const rawBasename = path.basename( zipFields[ 1 ] );
+		const basename = encodeURIComponent(
+			rawBasename.replace( /\.(\d+\.)*\d+$/, '' )
 		);
-		const basename = wpOrgFields
-			? encodeURIComponent( wpOrgFields[ 1 ] )
-			: encodeURIComponent( path.basename( zipFields[ 1 ] ) );
 
 		return {
 			type: 'zip',
@@ -108,7 +106,7 @@ function parseSourceString( sourceString, { cacheDirectoryPath } ) {
 				basename,
 			};
 		}
-	} catch ( err ) {}
+	} catch {}
 
 	const gitHubFields = sourceString.match(
 		/^([^\/]+)\/([^#\/]+)(\/([^#]+))?(?:#(.+))?$/

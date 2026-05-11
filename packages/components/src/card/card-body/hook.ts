@@ -11,6 +11,7 @@ import { useContextSystem } from '../../context';
 import * as styles from '../styles';
 import { useCx } from '../../utils/hooks/use-cx';
 import type { BodyProps } from '../types';
+import { getPaddingBySize } from '../get-padding-by-size';
 
 export function useCardBody(
 	props: WordPressComponentProps< BodyProps, 'div' >
@@ -30,7 +31,7 @@ export function useCardBody(
 			cx(
 				styles.Body,
 				styles.borderRadius,
-				styles.cardPaddings[ size ],
+				getPaddingBySize( size ),
 				isShady && styles.shady,
 				// This classname is added for legacy compatibility reasons.
 				'components-card__body',

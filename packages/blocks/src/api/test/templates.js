@@ -28,6 +28,7 @@ describe( 'templates', () => {
 
 	beforeEach( () => {
 		registerBlockType( 'core/test-block', {
+			apiVersion: 3,
 			attributes: {},
 			save: noop,
 			category: 'text',
@@ -35,6 +36,7 @@ describe( 'templates', () => {
 		} );
 
 		registerBlockType( 'core/test-block-2', {
+			apiVersion: 3,
 			attributes: {},
 			save: noop,
 			category: 'text',
@@ -42,6 +44,7 @@ describe( 'templates', () => {
 		} );
 
 		registerBlockType( 'core/missing', {
+			apiVersion: 3,
 			attributes: {},
 			save: noop,
 			category: 'text',

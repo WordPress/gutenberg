@@ -3,7 +3,7 @@
 /**
  * Test WP_Theme_JSON_Resolver_Gutenberg class.
  *
- * @package Gutenberg
+ * @package gutenberg
  *
  * @since 5.8.0
  */
@@ -693,22 +693,22 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 	/**
 	 * @covers WP_Theme_JSON_Resolver_Gutenberg::get_user_data_from_wp_global_styles
 	 */
-	public function test_get_user_data_from_wp_global_styles_does_not_run_for_theme_without_support() {
-		// The 'default' theme does not support theme.json.
+	public function test_get_user_data_from_wp_global_styles_runs_for_classic_themes() {
+		// The 'default' theme does not support theme.json (classic theme).
 		switch_theme( 'default' );
 		wp_set_current_user( self::$administrator_id );
 		$theme = wp_get_theme();
 
-		$start_queries = get_num_queries();
-
-		// When theme.json is not supported, the method should not run a query and always return an empty result.
-		$user_cpt = WP_Theme_JSON_Resolver_Gutenberg::get_user_data_from_wp_global_styles( $theme );
-		$this->assertEmpty( $user_cpt, 'User CPT is expected to be empty.' );
-		$this->assertSame( 0, get_num_queries() - $start_queries, 'Unexpected SQL query detected for theme without theme.json support.' );
-
+		// Classic themes should now be able to access user global styles data.
+		// When should_create_post is true, it should create a post.
 		$user_cpt = WP_Theme_JSON_Resolver_Gutenberg::get_user_data_from_wp_global_styles( $theme, true );
-		$this->assertEmpty( $user_cpt, 'User CPT is expected to be empty.' );
-		$this->assertSame( 0, get_num_queries() - $start_queries, 'Unexpected SQL query detected for theme without theme.json support.' );
+		$this->assertIsArray( $user_cpt, 'User CPT should be an array for classic themes.' );
+		$this->assertArrayHasKey( 'ID', $user_cpt, 'User CPT should have an ID for classic themes.' );
+
+		// Clean up the created post.
+		if ( isset( $user_cpt['ID'] ) ) {
+			wp_delete_post( $user_cpt['ID'], true );
+		}
 	}
 
 	/**
@@ -1161,12 +1161,12 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 				),
 				array(
 					'name'   => 'Outlined',
-					'shadow' => '6px 6px 0px -3px rgba(255, 255, 255, 1), 6px 6px rgba(0, 0, 0, 1)',
+					'shadow' => '6px 6px 0px -3px rgb(255, 255, 255), 6px 6px rgb(0, 0, 0)',
 					'slug'   => 'outlined',
 				),
 				array(
 					'name'   => 'Crisp',
-					'shadow' => '6px 6px 0px rgba(0, 0, 0, 1)',
+					'shadow' => '6px 6px 0px rgb(0, 0, 0)',
 					'slug'   => 'crisp',
 				),
 			),

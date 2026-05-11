@@ -10,6 +10,7 @@ import { useEffect } from '@wordpress/element';
 import { unlock } from '../../lock-unlock';
 import { store as siteEditorStore } from '../../store';
 import { homeRoute } from './home';
+import { identityRoute } from './identity';
 import { stylesRoute } from './styles';
 import { navigationRoute } from './navigation';
 import { navigationItemRoute } from './navigation-item';
@@ -20,9 +21,12 @@ import { templatesRoute } from './templates';
 import { templateItemRoute } from './template-item';
 import { pagesRoute } from './pages';
 import { pageItemRoute } from './page-item';
+import { attachmentItemRoute } from './attachment-item';
 import { stylebookRoute } from './stylebook';
+import { notFoundRoute } from './notfound';
 
 const routes = [
+	...( window?.__experimentalMediaEditor ? [ attachmentItemRoute ] : [] ),
 	pageItemRoute,
 	pagesRoute,
 	templateItemRoute,
@@ -32,9 +36,11 @@ const routes = [
 	patternsRoute,
 	navigationItemRoute,
 	navigationRoute,
+	identityRoute,
 	stylesRoute,
 	homeRoute,
 	stylebookRoute,
+	notFoundRoute,
 ];
 
 export function useRegisterSiteEditorRoutes() {

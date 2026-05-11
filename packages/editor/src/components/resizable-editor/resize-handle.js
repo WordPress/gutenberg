@@ -3,11 +3,8 @@
  */
 import { __ } from '@wordpress/i18n';
 import { LEFT, RIGHT } from '@wordpress/keycodes';
-import {
-	VisuallyHidden,
-	Tooltip,
-	__unstableMotion as motion,
-} from '@wordpress/components';
+import { Tooltip, __unstableMotion as motion } from '@wordpress/components';
+import { VisuallyHidden } from '@wordpress/ui';
 
 const DELTA_DISTANCE = 20; // The distance to resize per keydown in pixels.
 
