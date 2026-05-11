@@ -62,6 +62,7 @@ import { isExternalImage } from './edit';
 import { Caption } from '../utils/caption';
 import { MediaControl } from '../utils/media-control';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+import { useMediaEditorMetadataSync } from './use-media-editor-metadata-sync';
 import {
 	MIN_SIZE,
 	ALLOWED_MEDIA_TYPES,
@@ -383,18 +384,12 @@ export default function Image( {
 	const { getBlock, getSettings } = useSelect( blockEditorStore );
 	const settings = getSettings();
 	const openMediaEditorModal = settings[ openMediaEditorModalKey ];
-
-	const handleMediaUpdate = useCallback(
-		( { id: newId, url: newUrl } ) => {
-			if ( typeof newId === 'number' && newId !== id ) {
-				setAttributes( {
-					id: newId,
-					url: newUrl ?? url,
-				} );
-			}
-		},
-		[ id, url, setAttributes ]
-	);
+	const openImageMediaEditorModal = useMediaEditorMetadataSync( {
+		attributes,
+		image,
+		setAttributes,
+		openMediaEditorModal,
+	} );
 
 	const {
 		replaceBlocks,
@@ -859,11 +854,7 @@ export default function Image( {
 						<ToolbarButton
 							onClick={
 								openMediaEditorModal && id
-									? () =>
-											openMediaEditorModal( {
-												id,
-												onUpdate: handleMediaUpdate,
-											} )
+									? openImageMediaEditorModal
 									: () => setIsEditingImage( true )
 							}
 							aria-haspopup={

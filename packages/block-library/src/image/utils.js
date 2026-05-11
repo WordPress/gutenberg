@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
+
+/**
  * Internal dependencies
  */
 import { NEW_TAB_REL, ALLOWED_MEDIA_TYPES } from './constants';
@@ -96,4 +101,100 @@ export function isValidFileType( file ) {
 
 export function mediaPosition( { x, y } = { x: 0.5, y: 0.5 } ) {
 	return `${ Math.round( x * 100 ) }% ${ Math.round( y * 100 ) }%`;
+}
+
+function normalizeImageBlockCaption(
+	caption,
+	{ stripParagraphWrapper = false } = {}
+) {
+	if ( typeof caption !== 'string' ) {
+		return '';
+	}
+
+	if ( stripParagraphWrapper ) {
+		const trimmedCaption = caption.trim();
+		const paragraphMatch = trimmedCaption.match(
+			/^<p(?:\s[^>]*)?>([\s\S]*)<\/p>$/i
+		);
+
+		if ( paragraphMatch ) {
+			caption = paragraphMatch[ 1 ];
+		}
+	}
+
+	const textContent = stripHTML( caption ).trim();
+
+	if ( ! textContent ) {
+		return '';
+	}
+
+	return caption.replace( /\n/g, '<br>' );
+}
+
+function getAttachmentCaption( attachment ) {
+	const caption = attachment?.caption;
+
+	if ( typeof caption === 'string' ) {
+		return normalizeImageBlockCaption( caption );
+	}
+
+	const rawCaption = normalizeImageBlockCaption( caption?.raw );
+
+	if ( rawCaption ) {
+		return rawCaption;
+	}
+
+	return normalizeImageBlockCaption( caption?.rendered, {
+		stripParagraphWrapper: true,
+	} );
+}
+
+export function getImageBlockMetadataFromAttachment( attachment ) {
+	return {
+		alt:
+			typeof attachment?.alt_text === 'string'
+				? attachment.alt_text
+				: attachment?.alt || '',
+		caption: getAttachmentCaption( attachment ),
+	};
+}
+
+function normalizeMetadataAttribute( value ) {
+	return value || '';
+}
+
+export function getSyncedImageBlockAttributes(
+	currentAttributes,
+	originalAttachment,
+	updatedAttachment
+) {
+	if ( ! originalAttachment || ! updatedAttachment ) {
+		return {};
+	}
+
+	const originalMetadata =
+		getImageBlockMetadataFromAttachment( originalAttachment );
+	const updatedMetadata =
+		getImageBlockMetadataFromAttachment( updatedAttachment );
+	const syncedAttributes = {};
+
+	if (
+		normalizeMetadataAttribute( currentAttributes.alt ) ===
+			originalMetadata.alt &&
+		normalizeMetadataAttribute( currentAttributes.alt ) !==
+			updatedMetadata.alt
+	) {
+		syncedAttributes.alt = updatedMetadata.alt;
+	}
+
+	if (
+		normalizeMetadataAttribute( currentAttributes.caption ) ===
+			originalMetadata.caption &&
+		normalizeMetadataAttribute( currentAttributes.caption ) !==
+			updatedMetadata.caption
+	) {
+		syncedAttributes.caption = updatedMetadata.caption || undefined;
+	}
+
+	return syncedAttributes;
 }
