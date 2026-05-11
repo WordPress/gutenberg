@@ -6,6 +6,10 @@
 
 -   Added `UploadProgressSnackbar` component that shows a persistent snackbar with upload progress while media uploads are in progress. The snackbar shows a spinner during uploads and a green checkmark briefly when all uploads complete.
 
+### Internal
+
+-   Update `date-fns` dependency to `v4.1.0` ([#78057](https://github.com/WordPress/gutenberg/pull/78057)).
+
 ## 14.45.0 (2026-04-29)
 
 ## 14.44.0 (2026-04-15)
