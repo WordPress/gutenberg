@@ -32,12 +32,26 @@ if ( Array.isArray( baseConfig.webServer ) ) {
 	baseWebServer.push( baseConfig.webServer );
 }
 
+const baseTestIgnore: Array< string | RegExp > = [];
+if ( Array.isArray( baseConfig.testIgnore ) ) {
+	baseTestIgnore.push( ...baseConfig.testIgnore );
+} else if ( baseConfig.testIgnore ) {
+	baseTestIgnore.push( baseConfig.testIgnore );
+}
+
 const config = defineConfig( {
 	...baseConfig,
-	// Run the same RTC specs the default suite runs, but with the test
-	// WebSocket provider activated by globalSetup. Any new spec added to
-	// the collaboration directory is picked up automatically.
-	testMatch: '**/specs/editor/collaboration/collaboration-*.spec.ts',
+	// Run the shared RTC specs plus anything WebSocket-specific under
+	// `websocket-only/`, with the test WebSocket provider activated by
+	// globalSetup. Specs that exercise HTTP-polling-specific semantics
+	// (connection limits, wp-sync polling responses, document-size
+	// errors that surface via the polling pipeline) live under
+	// `http-only/` and are excluded here.
+	testMatch: '**/specs/editor/collaboration/**/collaboration-*.spec.ts',
+	testIgnore: [
+		...baseTestIgnore,
+		'**/specs/editor/collaboration/http-only/**',
+	],
 	webServer: [
 		...baseWebServer,
 		{
