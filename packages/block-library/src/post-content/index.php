@@ -39,13 +39,13 @@ function render_block_core_post_content( $attributes, $content, $block ) {
 
 	if ( post_password_required( $post_id ) ) {
 		unset( $seen_ids[ $post_id ] );
-		$block_data = [
+		$block_data     = array(
 			'blockName' => 'core/post-password-form',
-			'attrs'     => [],
-		];
-		$context = [
-			'postId' => $post_id
-		];
+			'attrs'     => array(),
+		);
+		$context        = array(
+			'postId' => $post_id,
+		);
 		$block_instance = new WP_Block( $block_data, $context );
 
 		return $block_instance->render();
