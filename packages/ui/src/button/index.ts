@@ -1,6 +1,8 @@
 import { Button as ButtonButton } from './button';
 import { ButtonIcon } from './icon';
 
+ButtonIcon.displayName = 'Button.Icon';
+
 /**
  * A versatile button component with multiple variants, tones, and sizes.
  * Built on design tokens for consistent theming and accessibility.
