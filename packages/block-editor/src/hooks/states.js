@@ -6,9 +6,8 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import StateControl, {
-	StateControlBadges,
-} from '../components/global-styles/state-control';
+import StateControl from '../components/global-styles/state-control';
+import StateControlBadges from '../components/global-styles/state-control-badges';
 import { BlockCardControlsFill } from '../components/block-card';
 
 export const PSEUDO_STATE_LABELS = {

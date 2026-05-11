@@ -3,41 +3,13 @@
  */
 import { __, sprintf } from '@wordpress/i18n';
 import { check, chevronDown, moreVertical } from '@wordpress/icons';
-import {
-	DropdownMenu,
-	MenuGroup,
-	MenuItem,
-	privateApis as componentsPrivateApis,
-} from '@wordpress/components';
+import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
 
 /**
  * Internal dependencies
  */
-import { unlock } from '../../lock-unlock';
-
-const { Badge: WCBadge } = unlock( componentsPrivateApis );
-
-export function StateControlBadges( {
-	states,
-	className = 'block-editor-global-styles-state-control__badges',
-} ) {
-	return (
-		<Stack
-			className={ className }
-			direction="row"
-			justify="flex-start"
-			gap="xs"
-			wrap="wrap"
-		>
-			{ states.map( ( state ) => (
-				<WCBadge key={ state.key } intent="info">
-					{ state.label }
-				</WCBadge>
-			) ) }
-		</Stack>
-	);
-}
+import StateControlBadges from './state-control-badges';
 
 /**
  * State control for managing viewport and pseudo-state styles.
