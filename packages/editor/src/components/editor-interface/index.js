@@ -242,12 +242,10 @@ export default function EditorInterface( {
 								/>
 							) }
 							{ children }
-							{ globalThis.IS_GUTENBERG_PLUGIN ? (
-								<CollaboratorsOverlay
-									postId={ postId }
-									postType={ postType }
-								/>
-							) : null }
+							<CollaboratorsOverlay
+								postId={ postId }
+								postType={ postType }
+							/>
 						</>
 					) }
 				</>
