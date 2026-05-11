@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Accordion Block: Enable layout switching and child sizing controls.
+
 ## 9.45.0 (2026-04-29)
 
 ## 9.44.0 (2026-04-15)
