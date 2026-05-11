@@ -164,18 +164,18 @@ function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_enqueue_scripts( $hook_suf
 		 * "Cannot unlock an undefined object". See #65103.
 		 */
 		$init_js_function = <<<'JS'
-( mountId, routes ) => {
-	const run = async () => {
-		const mod = await import( "@wordpress/boot" );
-		mod.initSinglePage( { mountId, routes } );
-	};
-	if ( document.readyState === "loading" ) {
-		document.addEventListener( "DOMContentLoaded", run );
-	} else {
-		run();
-	}
-}
-JS;
+		( mountId, routes ) => {
+			const run = async () => {
+				const mod = await import( "@wordpress/boot" );
+				mod.initSinglePage( { mountId, routes } );
+			};
+			if ( document.readyState === "loading" ) {
+				document.addEventListener( "DOMContentLoaded", run );
+			} else {
+				run();
+			}
+		}
+		JS;
 		wp_add_inline_script(
 			'{{PAGE_SLUG}}-wp-admin-prerequisites',
 			sprintf(
