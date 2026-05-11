@@ -11,7 +11,7 @@ import { useShortcut } from '@wordpress/keyboard-shortcuts';
 /**
  * Internal dependencies
  */
-import BlockPopover from '../block-popover';
+import { PrivateBlockPopover } from '../block-popover';
 import useBlockToolbarPopoverProps from './use-block-toolbar-popover-props';
 import useSelectedBlockToolProps from './use-selected-block-tool-props';
 import { store as blockEditorStore } from '../../store';
@@ -58,7 +58,7 @@ export default function BlockToolbarPopover( {
 
 	return (
 		! isTyping && (
-			<BlockPopover
+			<PrivateBlockPopover
 				clientId={ clientIdToPositionOver }
 				bottomClientId={ lastClientId }
 				className={ clsx( 'block-editor-block-list__block-popover', {
@@ -66,6 +66,7 @@ export default function BlockToolbarPopover( {
 				} ) }
 				resize={ false }
 				{ ...popoverProps }
+				__unstableContentRef={ __unstableContentRef }
 			>
 				<PrivateBlockToolbar
 					// If the toolbar is being shown because of being forced
@@ -79,7 +80,7 @@ export default function BlockToolbarPopover( {
 					} }
 					variant="toolbar"
 				/>
-			</BlockPopover>
+			</PrivateBlockPopover>
 		)
 	);
 }

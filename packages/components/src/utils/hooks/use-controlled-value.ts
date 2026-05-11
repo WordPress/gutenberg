@@ -1,12 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
+import { useCallback, useState } from '@wordpress/element';
 
 type Props< T > = {
 	defaultValue?: T;
 	value?: T;
-	onChange?: ( value: T ) => void;
+	onChange?: ( value: T, ...args: any[] ) => void;
 };
 
 /**
@@ -28,17 +28,25 @@ export function useControlledValue< T >( {
 	const [ state, setState ] = useState( initialValue );
 	const value = hasValue ? valueProp : state;
 
-	let setValue: ( nextValue: T ) => void;
+	const uncontrolledSetValue = useCallback(
+		( nextValue: T, ...args: any[] ) => {
+			setState( nextValue );
+			onChange?.( nextValue, ...args );
+		},
+		[ onChange ]
+	);
+
+	let setValue: typeof onChange;
 	if ( hasValue && typeof onChange === 'function' ) {
+		// Controlled mode.
 		setValue = onChange;
 	} else if ( ! hasValue && typeof onChange === 'function' ) {
-		setValue = ( nextValue ) => {
-			onChange( nextValue );
-			setState( nextValue );
-		};
+		// Uncontrolled mode, plus forwarding to the onChange prop.
+		setValue = uncontrolledSetValue;
 	} else {
+		// Uncontrolled mode, only update internal state.
 		setValue = setState;
 	}
 
-	return [ value, setValue as typeof setState ] as const;
+	return [ value, setValue ] as const;
 }

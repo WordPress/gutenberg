@@ -13,7 +13,11 @@ directive(
 	'show-mock',
 	( { directives: { 'show-mock': showMock }, element, evaluate } ) => {
 		const entry = showMock.find( ( { suffix } ) => suffix === null );
-		if ( ! evaluate( entry ) ) {
+		const result = evaluate( entry );
+		if ( ! result ) {
+			return null;
+		}
+		if ( typeof result === 'function' && ! result() ) {
 			return null;
 		}
 		return element;

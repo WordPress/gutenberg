@@ -3,8 +3,12 @@ name: Compressed Size
 on:
     pull_request:
         paths:
-            # Any change to a CSS, Sass, or JavaScript file should run checks.
+            # Any change to a CSS, Sass, or JavaScript/TypeScript file should run checks.
             - '**.js'
+            - '**.ts'
+            - '**.tsx'
+            - '**.cjs'
+            - '**.mjs'
             - '**.css'
             - '**.scss'
             # Changes to any NPM related files could affect the outcome.
@@ -23,6 +27,7 @@ on:
             - 'webpack.config.js'
             # Changes to this workflow file should always verify the changes are successful.
             - '.github/workflows/bundle-size.yml'
+            - bin/packages
 
 # Cancels all previous workflow runs for pull requests that have not completed.
 concurrency:
@@ -31,26 +36,34 @@ concurrency:
     group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.sha }}
     cancel-in-progress: true
 
+# Disable permissions for all available scopes by default.
+# Any needed permissions should be configured at the job level.
+permissions: {}
+
 jobs:
     build:
         name: Check
-        runs-on: ubuntu-latest
+        runs-on: 'ubuntu-24.04'
+        permissions:
+            contents: read
+            pull-requests: write
 
         steps:
-            - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+            - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
               with:
                   fetch-depth: 1
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: false
 
             - name: Use desired version of Node.js
-              uses: actions/setup-node@39370e3970a6d050c480ffad4ff0ed4d3fdee5af # v4.1.0
+              uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
               with:
                   node-version-file: '.nvmrc'
                   check-latest: true
                   cache: npm
 
-            - uses: preactjs/compressed-size-action@6fa0e7ca017120c754863b31123c5ee2860fd434 # v2.7.0
+            - uses: preactjs/compressed-size-action@66325aad6443cb7cf89c4bfcd414aea2367cda94 # v2.9.1
               with:
                   repo-token: '${{ secrets.GITHUB_TOKEN }}'
-                  pattern: '{build/**/*.min.js,build/**/*.css,build-module/**/*.min.js}'
+                  pattern: '{build/scripts/**/*.min.js,build/styles/**/*.css,build/modules/**/*.min.js}'
                   clean-script: 'distclean'

@@ -34,7 +34,7 @@
 	width: fit-content;
 }
 
-.wp-block-form-input__input {
+:where(.wp-block-form-input__input) {
 	padding: 0 0.5em;
 	font-size: 1em;
 	margin-bottom: 0.5em;
@@ -54,7 +54,8 @@
 	&[type="week"] {
 		min-height: 2em;
 		line-height: 2;
-		border: 1px solid;
+		border-width: 1px;
+		border-style: solid;
 	}
 }
 

@@ -6,6 +6,7 @@ import { useMemo } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { decodeEntities } from '@wordpress/html-entities';
+import { __ } from '@wordpress/i18n';
 import {
 	cloneBlock,
 	getBlockSupport,
@@ -13,6 +14,7 @@ import {
 } from '@wordpress/blocks';
 
 /** @typedef {import('@wordpress/blocks').WPBlockVariation} WPBlockVariation */
+/** @typedef {import('@wordpress/components/build-types/query-controls/types').OrderByOption} OrderByOption */
 
 /**
  * @typedef IHasNameAndId
@@ -184,6 +186,62 @@ export function useIsPostTypeHierarchical( postType ) {
 		},
 		[ postType ]
 	);
+}
+
+/**
+ * List of avaiable options to order by.
+ *
+ * @param {string} postType The post type to check.
+ * @return {OrderByOption[]} List of order options.
+ */
+export function useOrderByOptions( postType ) {
+	const supportsCustomOrder = useSelect(
+		( select ) => {
+			const type = select( coreStore ).getPostType( postType );
+			return !! type?.supports?.[ 'page-attributes' ];
+		},
+		[ postType ]
+	);
+
+	return useMemo( () => {
+		const orderByOptions = [
+			{
+				label: __( 'Newest to oldest' ),
+				value: 'date/desc',
+			},
+			{
+				label: __( 'Oldest to newest' ),
+				value: 'date/asc',
+			},
+			{
+				/* translators: Label for ordering posts by title in ascending order. */
+				label: __( 'A → Z' ),
+				value: 'title/asc',
+			},
+			{
+				/* translators: Label for ordering posts by title in descending order. */
+				label: __( 'Z → A' ),
+				value: 'title/desc',
+			},
+		];
+
+		if ( supportsCustomOrder ) {
+			orderByOptions.push(
+				{
+					/* translators: Label for ordering posts by ascending menu order. */
+					label: __( 'Ascending by order' ),
+					value: 'menu_order/asc',
+				},
+				{
+					/* translators: Label for ordering posts by descending menu order. */
+					label: __( 'Descending by order' ),
+					value: 'menu_order/desc',
+				}
+			);
+		}
+
+		return orderByOptions;
+	}, [ supportsCustomOrder ] );
 }
 
 /**
@@ -376,31 +434,17 @@ export const usePatterns = ( clientId, name ) => {
 };
 
 /**
- * The object returned by useUnsupportedBlocks with info about the type of
- * unsupported blocks present inside the Query block.
- *
- * @typedef  {Object}  UnsupportedBlocksInfo
- * @property {boolean} hasBlocksFromPlugins True if blocks from plugins are present.
- * @property {boolean} hasPostContentBlock  True if a 'core/post-content' block is present.
- * @property {boolean} hasUnsupportedBlocks True if there are any unsupported blocks.
- */
-
-/**
- * Hook that returns an object with information about the unsupported blocks
- * present inside a Query Loop with the given `clientId`. The returned object
- * contains props that are true when a certain type of unsupported block is
- * present.
+ * Hook that, given a block clientId, determines if it has unsupported blocks or not.
  *
  * @param {string} clientId The block's client ID.
- * @return {UnsupportedBlocksInfo} The object containing the information.
+ * @return {boolean} True if there are any unsupported blocks.
  */
 export const useUnsupportedBlocks = ( clientId ) => {
 	return useSelect(
 		( select ) => {
 			const { getClientIdsOfDescendants, getBlockName } =
 				select( blockEditorStore );
-			const blocks = {};
-			getClientIdsOfDescendants( clientId ).forEach(
+			return getClientIdsOfDescendants( clientId ).some(
 				( descendantClientId ) => {
 					const blockName = getBlockName( descendantClientId );
 					/*
@@ -417,19 +461,13 @@ export const useUnsupportedBlocks = ( clientId ) => {
 							blockName,
 							'interactivity.clientNavigation'
 						);
-					const blockInteractivity =
-						blockSupportsInteractivity ||
-						blockSupportsInteractivityClientNavigation;
-					if ( ! blockInteractivity ) {
-						blocks.hasBlocksFromPlugins = true;
-					} else if ( blockName === 'core/post-content' ) {
-						blocks.hasPostContentBlock = true;
-					}
+
+					return (
+						! blockSupportsInteractivity &&
+						! blockSupportsInteractivityClientNavigation
+					);
 				}
 			);
-			blocks.hasUnsupportedBlocks =
-				blocks.hasBlocksFromPlugins || blocks.hasPostContentBlock;
-			return blocks;
 		},
 		[ clientId ]
 	);

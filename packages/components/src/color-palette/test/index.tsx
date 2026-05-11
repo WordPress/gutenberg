@@ -258,7 +258,7 @@ describe( 'ColorPalette', () => {
 		expect( screen.queryByText( colorCode ) ).not.toBeInTheDocument();
 		expect(
 			screen.getByRole( 'button', {
-				name: /^Custom color picker.$/,
+				name: /^Custom color picker$/,
 			} )
 		).toBeInTheDocument();
 	} );

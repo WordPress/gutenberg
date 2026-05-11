@@ -71,11 +71,5 @@ export async function createPage(
 	payload: CreatePagePayload
 ) {
 	// https://developer.wordpress.org/rest-api/reference/pages/#create-a-page
-	const page = await this.rest< Page >( {
-		method: 'POST',
-		path: `/wp/v2/pages`,
-		params: payload,
-	} );
-
-	return page;
+	return this.createRecord< Page >( 'pages', { ...payload } );
 }

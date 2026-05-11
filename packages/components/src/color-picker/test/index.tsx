@@ -3,6 +3,7 @@
  */
 import { fireEvent, screen, render, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { click } from '@ariakit/test';
 
 /**
  * WordPress dependencies
@@ -13,7 +14,6 @@ import { useState } from '@wordpress/element';
  * Internal dependencies
  */
 import { ColorPicker } from '..';
-import { click } from '@ariakit/test';
 
 const hslaMatcher = expect.objectContaining( {
 	h: expect.any( Number ),
@@ -39,6 +39,34 @@ const legacyColorMatcher = {
 	} ),
 	oldHue: expect.any( Number ),
 	source: 'hex',
+};
+
+// Without the controlled component, slider values don't update after changes.
+// Controlled component with state helps synchronize input box and slider during testing.
+const ControlledColorPicker = ( {
+	onChange: onChangeProp,
+	initialColor = '#000000',
+	...restProps
+}: React.ComponentProps< typeof ColorPicker > & { initialColor?: string } ) => {
+	const [ colorState, setColorState ] = useState( initialColor );
+
+	const internalOnChange: typeof onChangeProp = ( newColor ) => {
+		onChangeProp?.( newColor );
+		setColorState( newColor );
+	};
+
+	return (
+		<>
+			<ColorPicker
+				{ ...restProps }
+				onChange={ internalOnChange }
+				color={ colorState }
+			/>
+			<button onClick={ () => setColorState( '#4d87ba' ) }>
+				Set color to #4d87ba
+			</button>
+		</>
+	);
 };
 
 describe( 'ColorPicker', () => {
@@ -67,7 +95,7 @@ describe( 'ColorPicker', () => {
 			await user.clear( hexInput );
 			await user.type( hexInput, '1ab' );
 
-			expect( onChangeComplete ).toHaveBeenCalledTimes( 3 );
+			expect( onChangeComplete ).toHaveBeenCalledTimes( 4 );
 			expect( onChangeComplete ).toHaveBeenLastCalledWith(
 				legacyColorMatcher
 			);
@@ -98,8 +126,30 @@ describe( 'ColorPicker', () => {
 			await user.clear( hexInput );
 			await user.type( hexInput, '1ab' );
 
-			expect( onChange ).toHaveBeenCalledTimes( 3 );
+			expect( onChange ).toHaveBeenCalledTimes( 4 );
 			expect( onChange ).toHaveBeenLastCalledWith( '#11aabb' );
+		} );
+
+		it( 'should reset color to black when the hex input is completely cleared', async () => {
+			const user = userEvent.setup();
+			const onChange = jest.fn();
+			const color = '#11aabb';
+
+			render(
+				<ColorPicker
+					onChange={ onChange }
+					color={ color }
+					enableAlpha={ false }
+				/>
+			);
+
+			const formatSelector = screen.getByRole( 'combobox' );
+			await user.selectOptions( formatSelector, 'hex' );
+
+			const hexInput = screen.getByRole( 'textbox' );
+			await user.clear( hexInput );
+
+			expect( onChange ).toHaveBeenLastCalledWith( '#000000' );
 		} );
 	} );
 
@@ -143,31 +193,6 @@ describe( 'ColorPicker', () => {
 		it( 'sliders should use accurate H and S values based on user interaction when possible', async () => {
 			const user = userEvent.setup();
 			const onChange = jest.fn();
-
-			const ControlledColorPicker = ( {
-				onChange: onChangeProp,
-				...restProps
-			}: React.ComponentProps< typeof ColorPicker > ) => {
-				const [ colorState, setColorState ] = useState( '#000000' );
-
-				const internalOnChange: typeof onChangeProp = ( newColor ) => {
-					onChangeProp?.( newColor );
-					setColorState( newColor );
-				};
-
-				return (
-					<>
-						<ColorPicker
-							{ ...restProps }
-							onChange={ internalOnChange }
-							color={ colorState }
-						/>
-						<button onClick={ () => setColorState( '#4d87ba' ) }>
-							Set color to #4d87ba
-						</button>
-					</>
-				);
-			};
 
 			render(
 				<ControlledColorPicker
@@ -245,18 +270,19 @@ describe( 'ColorPicker', () => {
 			expect( onChange ).toHaveBeenLastCalledWith( '#597326' );
 
 			// Interact with the Lightness slider, setting to 100 (ie. white).
-			// It should also cause the `onChange` callback to fire, and reset the
-			// hue and saturation inputs to `0`.
+			// It should also cause the `onChange` callback to fire. The hue and
+			// saturation should be preserved (not reset to 0) since the user
+			// explicitly set them earlier.
 			fireEvent.change( lightnessSlider, { target: { value: 100 } } );
 
 			await waitFor( () =>
 				expect( lightnessSlider ).toHaveValue( '100' )
 			);
 			expect( lightnessNumberInput ).toHaveValue( 100 );
-			expect( hueSlider ).toHaveValue( '0' );
-			expect( saturationSlider ).toHaveValue( '0' );
-			expect( hueNumberInput ).toHaveValue( 0 );
-			expect( saturationNumberInput ).toHaveValue( 0 );
+			expect( hueSlider ).toHaveValue( '80' );
+			expect( saturationSlider ).toHaveValue( '50' );
+			expect( hueNumberInput ).toHaveValue( 80 );
+			expect( saturationNumberInput ).toHaveValue( 50 );
 			expect( onChange ).toHaveBeenCalledTimes( 2 );
 			expect( onChange ).toHaveBeenLastCalledWith( '#ffffff' );
 
@@ -306,6 +332,138 @@ describe( 'ColorPicker', () => {
 			expect( lightnessNumberInput ).toHaveValue( 52 );
 		} );
 
+		it( 'should preserve hue and saturation when lightness is set to 0 (black)', async () => {
+			const onChange = jest.fn();
+
+			render(
+				<ControlledColorPicker
+					onChange={ onChange }
+					enableAlpha={ false }
+					initialColor="#2ad5d5" // hsl(180, 67%, 50%)
+				/>
+			);
+
+			const formatSelector = screen.getByRole( 'combobox' );
+			await userEvent.setup().selectOptions( formatSelector, 'hsl' );
+
+			const hueSliders = screen.getAllByRole( 'slider', { name: 'Hue' } );
+			const hueSlider = hueSliders.at( -1 )!;
+			const saturationSlider = screen.getByRole( 'slider', {
+				name: 'Saturation',
+			} );
+			const lightnessSlider = screen.getByRole( 'slider', {
+				name: 'Lightness',
+			} );
+			const hueNumberInput = screen.getByRole( 'spinbutton', {
+				name: 'Hue',
+			} );
+			const saturationNumberInput = screen.getByRole( 'spinbutton', {
+				name: 'Saturation',
+			} );
+
+			// Verify initial values
+			expect( hueSlider ).toHaveValue( '180' );
+			expect( saturationSlider ).toHaveValue( '67' );
+
+			// Set lightness to 0 (black)
+			fireEvent.change( lightnessSlider, { target: { value: 0 } } );
+
+			await waitFor( () => expect( lightnessSlider ).toHaveValue( '0' ) );
+
+			// Hue and saturation should be preserved
+			expect( hueSlider ).toHaveValue( '180' );
+			expect( saturationSlider ).toHaveValue( '67' );
+			expect( hueNumberInput ).toHaveValue( 180 );
+			expect( saturationNumberInput ).toHaveValue( 67 );
+			expect( onChange ).toHaveBeenLastCalledWith( '#000000' );
+		} );
+
+		it( 'should reset saturation to 0 when a mid-gray is entered via hex input', async () => {
+			const user = userEvent.setup();
+
+			render(
+				<ControlledColorPicker
+					enableAlpha={ false }
+					initialColor="#2ad5d5" // hsl(180, 67%, 50%)
+				/>
+			);
+
+			const formatSelector = screen.getByRole( 'combobox' );
+
+			// Start in hex mode and enter a mid-gray.
+			await user.selectOptions( formatSelector, 'hex' );
+			const hexInput = screen.getByRole( 'textbox' );
+			await user.clear( hexInput );
+			await user.type( hexInput, '808080' );
+
+			// Switch to HSL to inspect the values.
+			await user.selectOptions( formatSelector, 'hsl' );
+
+			const saturationSlider = screen.getByRole( 'slider', {
+				name: 'Saturation',
+			} );
+			const saturationNumberInput = screen.getByRole( 'spinbutton', {
+				name: 'Saturation',
+			} );
+
+			// #808080 is hsl(0, 0%, 50%) — a pure mid-gray.
+			// Saturation must be 0, not the stale value from the
+			// previous chromatic color.
+			await waitFor( () =>
+				expect( saturationSlider ).toHaveValue( '0' )
+			);
+			expect( saturationNumberInput ).toHaveValue( 0 );
+		} );
+
+		it( 'should preserve hue when saturation is set to 0', async () => {
+			const onChange = jest.fn();
+
+			render(
+				<ControlledColorPicker
+					onChange={ onChange }
+					enableAlpha={ false }
+					initialColor="#ff0000" // hsl(0, 100%, 50%) - pure red
+				/>
+			);
+
+			const formatSelector = screen.getByRole( 'combobox' );
+			await userEvent.setup().selectOptions( formatSelector, 'hsl' );
+
+			const hueSliders = screen.getAllByRole( 'slider', { name: 'Hue' } );
+			const hueSlider = hueSliders.at( -1 )!;
+			const saturationSlider = screen.getByRole( 'slider', {
+				name: 'Saturation',
+			} );
+			const hueNumberInput = screen.getByRole( 'spinbutton', {
+				name: 'Hue',
+			} );
+
+			// Set a specific hue first
+			fireEvent.change( hueSlider, { target: { value: 200 } } );
+
+			await waitFor( () => expect( hueSlider ).toHaveValue( '200' ) );
+
+			// Set saturation to 0 (grayscale)
+			fireEvent.change( saturationSlider, { target: { value: 0 } } );
+
+			await waitFor( () =>
+				expect( saturationSlider ).toHaveValue( '0' )
+			);
+
+			// Hue should be preserved even though color is now gray
+			expect( hueSlider ).toHaveValue( '200' );
+			expect( hueNumberInput ).toHaveValue( 200 );
+
+			// Increase saturation again - hue should still be 200
+			fireEvent.change( saturationSlider, { target: { value: 50 } } );
+
+			await waitFor( () =>
+				expect( saturationSlider ).toHaveValue( '50' )
+			);
+
+			expect( hueSlider ).toHaveValue( '200' );
+			expect( hueNumberInput ).toHaveValue( 200 );
+		} );
 		describe.each( [
 			[ 'hue', 'Hue', '#aad52a' ],
 			[ 'saturation', 'Saturation', '#20dfdf' ],
@@ -340,6 +498,80 @@ describe( 'ColorPicker', () => {
 				expect( onChange ).toHaveBeenCalledTimes( 3 );
 				expect( onChange ).toHaveBeenLastCalledWith( expected );
 			} );
+		} );
+	} );
+
+	describe.each( [
+		[ 'hsl', 'HSL' ],
+		[ 'rgb', 'RGB' ],
+	] )( 'Alpha-enabled %s format', ( format, formatLabel ) => {
+		it( `should update alpha correctly when ${ formatLabel } format is selected`, async () => {
+			const user = userEvent.setup();
+			const onChange = jest.fn();
+
+			render(
+				<ControlledColorPicker
+					onChange={ onChange }
+					enableAlpha
+					initialColor="#ffffff80"
+				/>
+			);
+
+			const formatSelector = screen.getByRole( 'combobox' );
+			expect( formatSelector ).toBeVisible();
+			await user.selectOptions( formatSelector, format );
+
+			const alphaInput = screen.getByRole( 'spinbutton', {
+				name: 'Alpha',
+			} );
+			expect( alphaInput ).toBeVisible();
+
+			const alphaSliders = screen.getAllByRole( 'slider', {
+				name: 'Alpha',
+			} );
+
+			expect( alphaSliders ).toHaveLength( 2 );
+
+			// Choose the second slider which is the actual slider of type: input[type="range"]
+			const alphaSlider = alphaSliders.at( -1 )!;
+
+			expect( alphaSlider ).toHaveValue( '50' );
+			expect( alphaInput ).toHaveValue( 50 );
+
+			expect( onChange ).not.toHaveBeenCalled();
+
+			// Test pattern 1: Update the slider
+			fireEvent.change( alphaSlider, {
+				target: { value: 75 },
+			} );
+
+			await waitFor( () => {
+				expect( onChange ).toHaveBeenCalledTimes( 1 );
+			} );
+
+			expect( onChange ).toHaveBeenLastCalledWith( '#ffffffbf' );
+			expect( alphaInput ).toHaveValue( 75 );
+			expect( alphaSlider ).toHaveValue( '75' );
+
+			onChange.mockClear();
+
+			// Test pattern 2: Update the alphaInput
+			await user.clear( alphaInput );
+			expect( onChange ).toHaveBeenCalledTimes( 1 );
+
+			// Initially type 7 in the alpha input, we expect it to be called with #ffffff12
+			await user.keyboard( '7' );
+
+			// Now with 75% opacity we expect it to be called with #ffffffbf
+			await user.keyboard( '5' );
+
+			// Called twice, once per key stroke (`7` and `5`)
+			expect( onChange ).toHaveBeenCalledTimes( 3 );
+			expect( onChange ).toHaveBeenNthCalledWith( 2, '#ffffff12' );
+			expect( onChange ).toHaveBeenNthCalledWith( 3, '#ffffffbf' );
+
+			expect( alphaSlider ).toHaveValue( '75' );
+			expect( alphaInput ).toHaveValue( 75 );
 		} );
 	} );
 } );

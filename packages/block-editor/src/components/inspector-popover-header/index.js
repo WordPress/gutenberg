@@ -7,7 +7,7 @@ import {
 	__experimentalHeading as Heading,
 	__experimentalSpacer as Spacer,
 	Button,
-	__experimentalText as Text,
+	__experimentalText as WCText,
 } from '@wordpress/components';
 import { closeSmall } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
@@ -52,7 +52,7 @@ export default function InspectorPopoverHeader( {
 					/>
 				) }
 			</HStack>
-			{ help && <Text>{ help }</Text> }
+			{ help && <WCText>{ help }</WCText> }
 		</VStack>
 	);
 }

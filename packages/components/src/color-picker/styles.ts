@@ -91,6 +91,16 @@ export const ColorfulWrapper = styled.div`
 
 		// Shown instead of box-shadow to Windows high contrast mode.
 		outline: 2px solid transparent;
+
+		@media not ( prefers-reduced-motion ) {
+			transition: transform ${ CONFIG.transitionDurationFast } ease-in-out;
+		}
+	}
+
+	.react-colorful__interactive:focus .react-colorful__pointer {
+		box-shadow: 0 0 0 ${ CONFIG.borderWidthFocus } ${ CONFIG.surfaceColor };
+		border: ${ CONFIG.borderWidthFocus } solid black;
+		transform: translate( -50%, -50% ) scale( 1.5 );
 	}
 
 	.react-colorful__pointer-fill {

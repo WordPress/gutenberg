@@ -12,7 +12,7 @@ BlockControls.Slot = BlockControlsSlot;
 export const BlockFormatControls = ( props ) => {
 	return <BlockControlsFill group="inline" { ...props } />;
 };
-BlockFormatControls.Slot = ( props ) => {
+BlockFormatControls.Slot = function Slot( props ) {
 	return <BlockControlsSlot group="inline" { ...props } />;
 };
 

@@ -1,0 +1,21 @@
+{
+	"$schema": "https://json.schemastore.org/tsconfig.json",
+	"extends": "../../tsconfig.base.json",
+	"compilerOptions": {
+		"types": [ "style-imports" ],
+		"checkJs": false
+	},
+	"references": [
+		{ "path": "../asset-loader" },
+		{ "path": "../block-editor" },
+		{ "path": "../blocks" },
+		{ "path": "../components" },
+		{ "path": "../core-data" },
+		{ "path": "../data" },
+		{ "path": "../element" },
+		{ "path": "../editor" },
+		{ "path": "../global-styles-engine" },
+		{ "path": "../i18n" },
+		{ "path": "../private-apis" }
+	]
+}

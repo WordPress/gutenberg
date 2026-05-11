@@ -17,7 +17,7 @@ const { Fill, Slot } = createSlotFill( 'PluginPrePublishPanel' );
  *                                                                      When no title is provided it is always opened.
  * @param {WPBlockTypeIconRender} [props.icon=inherits from the plugin] The [Dashicon](https://developer.wordpress.org/resource/dashicons/)
  *                                                                      icon slug string, or an SVG WP element, to be rendered when
- *                                                                      the sidebar is pinned to toolbar.
+ *                                                                      the sidebar is pinned to toolbar. If `false` is passed, no icon will be rendered.
  * @param {React.ReactNode}       props.children                        Children to be rendered
  *
  * @example

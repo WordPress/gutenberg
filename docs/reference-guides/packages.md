@@ -2,6 +2,14 @@
 
 WordPress exposes a list of JavaScript packages and tools for WordPress development.
 
+For information on creating and managing packages in Gutenberg, see the [packages README](../../packages/README.md). For details on the build system and package configuration, see the [@wordpress/build README](../../packages/wp-build/README.md).
+
+## Package Guidelines
+
+Packages are the first layer of architecture in Gutenberg. Each package should have a single, clear purpose, include a README, document prerequisites and public APIs, and avoid utility/kitchen-sink patterns. Default to bundled packages unless globals or modules are necessary.
+
+For complete guidelines, see the [package guidelines](../../packages/README.md#package-guidelines) in the packages README.
+
 ## Using the packages via WordPress global
 
 JavaScript packages are available as a registered script in WordPress and can be accessed using the `wp` global variable.

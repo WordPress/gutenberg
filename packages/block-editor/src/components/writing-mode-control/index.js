@@ -40,7 +40,6 @@ export default function WritingModeControl( { className, value, onChange } ) {
 	return (
 		<ToggleGroupControl
 			isDeselectable
-			__nextHasNoMarginBottom
 			__next40pxDefaultSize
 			label={ __( 'Orientation' ) }
 			className={ clsx( 'block-editor-writing-mode-control', className ) }

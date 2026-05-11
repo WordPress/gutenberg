@@ -530,8 +530,8 @@ export const toggleFullscreenMode =
 			.dispatch( noticesStore )
 			.createInfoNotice(
 				isFullscreen
-					? __( 'Fullscreen mode activated.' )
-					: __( 'Fullscreen mode deactivated.' ),
+					? __( 'Fullscreen mode deactivated.' )
+					: __( 'Fullscreen mode activated.' ),
 				{
 					id: 'core/edit-post/toggle-fullscreen-mode/notice',
 					type: 'snackbar',
