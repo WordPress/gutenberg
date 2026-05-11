@@ -52,7 +52,7 @@ export const NameContainer = styled.div`
 export const PaletteHeading = styled( Heading )`
 	text-transform: uppercase;
 	line-height: ${ space( 6 ) };
-	font-weight: 500;
+	font-weight: ${ CONFIG.fontWeightMedium };
 	&&& {
 		font-size: 11px;
 		margin-bottom: 0;

@@ -16,6 +16,7 @@ const noop = () => {};
 
 describe( 'textAlign', () => {
 	const blockSettings = {
+		apiVersion: 3,
 		save: noop,
 		category: 'text',
 		title: 'block title',

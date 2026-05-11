@@ -10,7 +10,6 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useContext } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -18,7 +17,6 @@ import { useContext } from '@wordpress/element';
 import useStylesForBlocks from '../block-styles/use-styles-for-block';
 import { replaceActiveStyle } from '../block-styles/utils';
 import { store as blockEditorStore } from '../../store';
-import { GlobalStylesContext } from '../global-styles';
 import { globalStylesDataKey } from '../../store/private-keys';
 import { getVariationStylesWithRefValues } from '../../hooks/block-style-variation';
 
@@ -47,7 +45,6 @@ function SwitchSectionStyle( { clientId } ) {
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
 	// Get global styles data
-	const { merged: mergedConfig } = useContext( GlobalStylesContext );
 	const { globalSettings, globalStyles, blockName } = useSelect(
 		( select ) => {
 			const settings = select( blockEditorStore ).getSettings();
@@ -64,8 +61,8 @@ function SwitchSectionStyle( { clientId } ) {
 	const activeStyleBackground = activeStyle?.name
 		? getVariationStylesWithRefValues(
 				{
-					settings: mergedConfig?.settings ?? globalSettings,
-					styles: mergedConfig?.styles ?? globalStyles,
+					settings: globalSettings,
+					styles: globalStyles,
 				},
 				blockName,
 				activeStyle.name

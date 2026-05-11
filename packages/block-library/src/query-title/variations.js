@@ -30,6 +30,19 @@ const variations = [
 		},
 		scope: [ 'inserter' ],
 	},
+	{
+		isDefault: false,
+		name: 'post-type-label',
+		title: __( 'Post Type Label' ),
+		description: __(
+			'Display the post type label based on the queried object.'
+		),
+		icon: title,
+		attributes: {
+			type: 'post-type',
+		},
+		scope: [ 'inserter' ],
+	},
 ];
 
 /**

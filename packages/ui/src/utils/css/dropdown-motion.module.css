@@ -1,0 +1,47 @@
+/*
+ * Motion configuration for dropdown-like popovers.
+ * Keep constants in sync with: packages/components/src/utils/dropdown-motion.ts
+ */
+
+@layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
+
+@layer wp-ui-utilities {
+	.dropdown-motion {
+		--wp-ui-dropdown-slide-distance: 4px;
+		--wp-ui-dropdown-slide-duration: 200ms;
+		--wp-ui-dropdown-slide-easing: cubic-bezier(0, 0, 0, 1);
+		--wp-ui-dropdown-fade-duration: 80ms;
+		--wp-ui-dropdown-fade-easing: linear;
+
+		@media not ( prefers-reduced-motion ) {
+			transition-property: transform, opacity;
+			transition-duration:
+				var(--wp-ui-dropdown-slide-duration),
+				var(--wp-ui-dropdown-fade-duration);
+			transition-timing-function:
+				var(--wp-ui-dropdown-slide-easing),
+				var(--wp-ui-dropdown-fade-easing);
+			will-change: transform, opacity;
+		}
+
+		opacity: 0;
+
+		&[data-side="bottom"] {
+			transform: translateY(calc(-1 * var(--wp-ui-dropdown-slide-distance)));
+		}
+		&[data-side="top"] {
+			transform: translateY(var(--wp-ui-dropdown-slide-distance));
+		}
+		&[data-side="left"] {
+			transform: translateX(var(--wp-ui-dropdown-slide-distance));
+		}
+		&[data-side="right"] {
+			transform: translateX(calc(-1 * var(--wp-ui-dropdown-slide-distance)));
+		}
+
+		&[data-open]:not([data-starting-style]) {
+			opacity: 1;
+			transform: translate(0);
+		}
+	}
+}

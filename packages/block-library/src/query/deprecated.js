@@ -18,15 +18,22 @@ const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
 
 const migrateToTaxQuery = ( attributes ) => {
 	const { query } = attributes;
-	const { categoryIds, tagIds, ...newQuery } = query;
-
-	if ( query.categoryIds?.length || query.tagIds?.length ) {
+	const { categoryIds, tagIds, taxQuery, ...newQuery } = query;
+	// First `taxQuery` migration that moves `categoryIds` and `tagIds`
+	// into `taxQuery` (v2 deprecation).
+	if ( !! categoryIds?.length || !! tagIds?.length ) {
 		newQuery.taxQuery = {
-			category: !! query.categoryIds?.length
-				? query.categoryIds
-				: undefined,
-			post_tag: !! query.tagIds?.length ? query.tagIds : undefined,
+			include: {
+				category: !! categoryIds?.length ? categoryIds : undefined,
+				post_tag: !! tagIds?.length ? tagIds : undefined,
+			},
 		};
+	}
+	// Second `taxQuery` migration that changes the structure from
+	// taxQuery: { taxonomy: [ids] } to
+	// taxQuery: { include: { taxonomy: [ids] } } (v6 deprecation).
+	if ( !! Object.keys( taxQuery || {} ).length ) {
+		newQuery.taxQuery = { include: taxQuery };
 	}
 	return {
 		...attributes,
@@ -522,6 +529,65 @@ const v5 = {
 	migrate: migrateDisplayLayout,
 };
 
-const deprecated = [ v5, v4, v3, v2, v1 ];
+const v6 = {
+	attributes: {
+		queryId: {
+			type: 'number',
+		},
+		query: {
+			type: 'object',
+			default: {
+				perPage: null,
+				pages: 0,
+				offset: 0,
+				postType: 'post',
+				order: 'desc',
+				orderBy: 'date',
+				author: '',
+				search: '',
+				exclude: [],
+				sticky: '',
+				inherit: true,
+				taxQuery: null,
+				parents: [],
+				format: [],
+			},
+		},
+		tagName: {
+			type: 'string',
+			default: 'div',
+		},
+		namespace: {
+			type: 'string',
+		},
+		enhancedPagination: {
+			type: 'boolean',
+			default: false,
+		},
+	},
+	supports: {
+		align: [ 'wide', 'full' ],
+		html: false,
+		layout: true,
+		interactivity: true,
+		contentRole: true,
+	},
+	save( { attributes: { tagName: Tag = 'div' } } ) {
+		const blockProps = useBlockProps.save();
+		const innerBlocksProps = useInnerBlocksProps.save( blockProps );
+		return <Tag { ...innerBlocksProps } />;
+	},
+	isEligible: ( { query: { taxQuery } = {} } ) =>
+		!! taxQuery &&
+		Object.keys( taxQuery ).some(
+			( key ) => ! [ 'include', 'exclude' ].includes( key )
+		),
+	migrate( attributes, innerBlocks ) {
+		const withTaxQuery = migrateToTaxQuery( attributes );
+		return migrateDisplayLayout( withTaxQuery, innerBlocks );
+	},
+};
+
+const deprecated = [ v6, v5, v4, v3, v2, v1 ];
 
 export default deprecated;

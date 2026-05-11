@@ -22,6 +22,12 @@
 		"npm": ">=8.19.2"
 	},
 	"main": "index.js",
+	"exports": {
+		".": {
+			"default": "./index.js"
+		},
+		"./package.json": "./package.json"
+	},
 	"react-native": "index",
 	"dependencies": {
 		"@wordpress/react-native-aztec": "file:../react-native-aztec"

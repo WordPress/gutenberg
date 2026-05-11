@@ -254,7 +254,7 @@ function ResizableFrame( {
 				}
 			} }
 			whileHover={
-				canvas === 'view'
+				canvas === 'view' && isBlockTheme
 					? {
 							scale: 1.005,
 							transition: {

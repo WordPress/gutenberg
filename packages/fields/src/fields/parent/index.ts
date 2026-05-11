@@ -18,6 +18,7 @@ const parentField: Field< BasePost > = {
 	Edit: ParentEdit,
 	render: ParentView,
 	enableSorting: true,
+	filterBy: false,
 };
 
 /**

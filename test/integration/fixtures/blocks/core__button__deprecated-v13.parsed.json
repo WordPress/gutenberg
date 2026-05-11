@@ -1,0 +1,49 @@
+[
+	{
+		"blockName": "core/button",
+		"attrs": {
+			"textAlign": "left"
+		},
+		"innerBlocks": [],
+		"innerHTML": "\n<div class=\"wp-block-button\"><a class=\"wp-block-button__link has-text-align-left wp-element-button\">My button 1</a></div>\n",
+		"innerContent": [
+			"\n<div class=\"wp-block-button\"><a class=\"wp-block-button__link has-text-align-left wp-element-button\">My button 1</a></div>\n"
+		]
+	},
+	{
+		"blockName": null,
+		"attrs": {},
+		"innerBlocks": [],
+		"innerHTML": "\n\n",
+		"innerContent": [ "\n\n" ]
+	},
+	{
+		"blockName": "core/button",
+		"attrs": {
+			"textAlign": "center"
+		},
+		"innerBlocks": [],
+		"innerHTML": "\n<div class=\"wp-block-button\"><a class=\"wp-block-button__link has-text-align-center wp-element-button\">My button 2</a></div>\n",
+		"innerContent": [
+			"\n<div class=\"wp-block-button\"><a class=\"wp-block-button__link has-text-align-center wp-element-button\">My button 2</a></div>\n"
+		]
+	},
+	{
+		"blockName": null,
+		"attrs": {},
+		"innerBlocks": [],
+		"innerHTML": "\n\n",
+		"innerContent": [ "\n\n" ]
+	},
+	{
+		"blockName": "core/button",
+		"attrs": {
+			"textAlign": "right"
+		},
+		"innerBlocks": [],
+		"innerHTML": "\n<div class=\"wp-block-button\"><a class=\"wp-block-button__link has-text-align-right wp-element-button\">My button 3</a></div>\n",
+		"innerContent": [
+			"\n<div class=\"wp-block-button\"><a class=\"wp-block-button__link has-text-align-right wp-element-button\">My button 3</a></div>\n"
+		]
+	}
+]

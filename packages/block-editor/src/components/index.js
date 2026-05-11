@@ -11,6 +11,11 @@ export {
 	BlockAlignmentControl,
 	BlockAlignmentToolbar,
 } from './block-alignment-control';
+export {
+	BlockBindingsAttributeControl,
+	BlockBindingsSourceFieldsList,
+	useBlockBindingsUtils,
+} from './block-bindings';
 export { default as __experimentalBlockFullHeightAligmentControl } from './block-full-height-alignment-control';
 export { default as __experimentalBlockAlignmentMatrixControl } from './block-alignment-matrix-control';
 export { default as BlockBreadcrumb } from './block-breadcrumb';
@@ -55,6 +60,7 @@ export { default as __experimentalColorGradientControl } from './colors-gradient
 export { default as __experimentalColorGradientSettingsDropdown } from './colors-gradients/dropdown';
 export { default as __experimentalPanelColorGradientSettings } from './colors-gradients/panel-color-gradient-settings';
 export { default as __experimentalUseMultipleOriginColorsAndGradients } from './colors-gradients/use-multiple-origin-colors-and-gradients';
+export { default as DimensionControl } from './dimension-control';
 export { default as HeightControl } from './height-control';
 export { default as __experimentalImageEditor } from './image-editor';
 export { default as __experimentalImageSizeControl } from './image-size-control';
@@ -89,7 +95,6 @@ export {
 	RichTextToolbarButton,
 	__unstableRichTextInputEvent,
 } from './rich-text';
-export { default as ToolSelector } from './tool-selector';
 export { default as __experimentalUnitControl } from './unit-control';
 export { default as URLInput } from './url-input';
 export { default as URLInputButton } from './url-input/button';
@@ -108,7 +113,6 @@ export {
 
 export { default as __unstableBlockSettingsMenuFirstItem } from './block-settings-menu/block-settings-menu-first-item';
 export { default as __unstableBlockToolbarLastItem } from './block-toolbar/block-toolbar-last-item';
-export { default as __unstableBlockNameContext } from './block-toolbar/block-name-context';
 export { default as __unstableInserterMenuExtension } from './inserter-menu-extension';
 export { default as __experimentalPreviewOptions } from './preview-options';
 export { default as __experimentalUseResizeCanvas } from './use-resize-canvas';
@@ -173,3 +177,7 @@ export { useBlockEditingMode } from './block-editing-mode';
 export { default as BlockEditorProvider } from './provider';
 export { useSettings, useSetting } from './use-settings';
 export { useBlockCommands } from './use-block-commands';
+
+// This component is no longer used in Gutenberg,
+// but kept for backwards compatibility.
+export { default as ToolSelector } from './tool-selector';

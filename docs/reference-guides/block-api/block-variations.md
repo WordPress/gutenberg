@@ -60,6 +60,44 @@ wp.blocks.registerBlockVariation( 'core/embed', {
 } );
 ```
 
+## Registering block variations in PHP
+
+Block variations can also be registered from PHP using the `get_block_type_variations` filter hook. This approach is particularly useful when you need to dynamically generate variations based on registered post types, taxonomies, or other WordPress data.
+
+Here's an example of how to register a custom variation for the `core/image` block:
+
+```php
+function my_custom_image_variation( $variations, $block_type ) {
+    // Only modify variations for the image block
+    if ( 'core/image' !== $block_type->name ) {
+        return $variations;
+    }
+
+    // Add a custom variation
+    $variations[] = array(
+		'name'        => 'wide-image',
+		'title'       => __( 'Wide image', 'textdomain' ),
+		'description' => __( 'A wide image', 'textdomain' ),
+		'scope'       => array( 'inserter' ),
+		'isDefault'   => false,
+		'attributes'  => array(
+			'align' => 'wide', // Identifies the link type as custom
+		),
+    );
+
+    return $variations;
+}
+add_filter( 'get_block_type_variations', 'my_custom_image_variation', 10, 2 );
+```
+
+The `get_block_type_variations` filter is called when variations are requested for a block type. It receives two parameters:
+- `$variations`: An array of currently registered variations for the block type
+- `$block_type`: The full block type object
+
+Note that variations registered through PHP will be merged with any variations registered through JavaScript using `registerBlockVariation()`.
+
+<div class="callout callout-info">Check the <a href="https://developer.wordpress.org/news/2024/03/how-to-register-block-variations-with-php/">How to register block variations with PHP</a> blog post for more info about this</div>
+
 ## Removing a block variation
 
 Block variations can also be easily removed. To do so, use `wp.blocks.unregisterBlockVariation()`. This function accepts the name of the block and the `name` of the variation that should be unregistered.

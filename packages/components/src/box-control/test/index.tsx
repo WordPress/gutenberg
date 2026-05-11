@@ -15,8 +15,15 @@ import { useState } from '@wordpress/element';
 import BoxControl from '..';
 import type { BoxControlProps, BoxControlValue } from '../types';
 
+// Since `BoxControlProps` is a the result of type unions, we need to use
+// a distributive version of the standard `Omit` utility.
+// See https://stackoverflow.com/a/57103940
+type DistributiveOmit< T, K extends keyof any > = T extends any
+	? Omit< T, K >
+	: never;
+
 const ControlledBoxControl = (
-	extraProps: Omit< BoxControlProps, 'onChange' >
+	extraProps: DistributiveOmit< BoxControlProps, 'onChange' >
 ) => {
 	const [ state, setState ] = useState< BoxControlValue >();
 
@@ -33,7 +40,7 @@ const ControlledBoxControl = (
 const UncontrolledBoxControl = ( {
 	onChange = () => {},
 	...props
-}: Omit< BoxControlProps, 'onChange' > & {
+}: DistributiveOmit< BoxControlProps, 'onChange' > & {
 	onChange?: BoxControlProps[ 'onChange' ];
 } ) => <BoxControl __next40pxDefaultSize onChange={ onChange } { ...props } />;
 

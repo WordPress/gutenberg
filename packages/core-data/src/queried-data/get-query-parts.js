@@ -15,13 +15,11 @@ import { withWeakMapCache, getNormalizedCommaSeparable } from '../utils';
  *
  * @property {number}      page      The query page (1-based index, default 1).
  * @property {number}      perPage   Items per page for query (default 10).
- * @property {string}      stableKey An encoded stable string of all non-
- *                                   pagination, non-fields query parameters.
- * @property {?(string[])} fields    Target subset of fields to derive from
- *                                   item objects.
- * @property {?(number[])} include   Specific item IDs to include.
- * @property {string}      context   Scope under which the request is made;
- *                                   determines returned fields in response.
+ * @property {?number}     offset    Absolute item offset (default null).
+ * @property {string}      stableKey An encoded stable string of all non-pagination, non-fields query parameters.
+ * @property {?(string[])} fields    Target subset of fields to derive from item objects (default null).
+ * @property {?(number[])} include   Specific item IDs to include (default null).
+ * @property {string}      context   Scope under which the request is made; determines returned fields in response.
  */
 
 /**
@@ -41,6 +39,7 @@ export function getQueryParts( query ) {
 		stableKey: '',
 		page: 1,
 		perPage: 10,
+		offset: null,
 		fields: null,
 		include: null,
 		context: 'default',
@@ -61,6 +60,14 @@ export function getQueryParts( query ) {
 			case 'per_page':
 				parts.perPage = Number( value );
 				break;
+
+			case 'offset': {
+				const numericOffset = Number( value );
+				if ( Number.isFinite( numericOffset ) ) {
+					parts.offset = numericOffset;
+				}
+				break;
+			}
 
 			case 'context':
 				parts.context = value;

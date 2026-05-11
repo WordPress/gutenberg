@@ -1,0 +1,56 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"__experimental": true,
+	"apiVersion": 3,
+	"name": "core/tab-panel",
+	"title": "Tab Panel",
+	"description": "Content for a tab in a tabbed interface.",
+	"category": "design",
+	"textdomain": "default",
+	"attributes": {
+		"label": {
+			"type": "string",
+			"default": ""
+		}
+	},
+	"parent": [ "core/tab-panels" ],
+	"usesContext": [
+		"core/tabs-activeTabIndex",
+		"core/tabs-editorActiveTabIndex",
+		"core/tabs-id"
+	],
+	"supports": {
+		"anchor": true,
+		"html": false,
+		"reusable": false,
+		"color": {
+			"background": true,
+			"text": true,
+			"__experimentalDefaultControls": {
+				"background": true,
+				"text": true
+			}
+		},
+		"layout": true,
+		"spacing": {
+			"blockGap": true,
+			"padding": true,
+			"margin": false
+		},
+		"typography": {
+			"fontSize": true,
+			"__experimentalFontFamily": true,
+			"__experimentalDefaultControls": {
+				"fontSize": true,
+				"__experimentalFontFamily": true
+			}
+		},
+		"renaming": true,
+		"visibility": false
+	},
+	"providesContext": {
+		"core/tab-label": "label"
+	},
+	"editorScript": "file:./index.js",
+	"style": "file:./style-index.css"
+}

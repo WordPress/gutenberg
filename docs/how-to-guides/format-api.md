@@ -84,7 +84,7 @@ Let's check that everything is working as expected. Build and reload and then se
 
 Click the button and check the console.log for the "toggle format" message.
 
-If you do not see the button or message, double check you are building and loading the JavScript properly; and check the console.log for any errors.
+If you do not see the button or message, double check you are building and loading the JavaScript properly; and check the console.log for any errors.
 
 ### Step 3: Apply a format when clicked
 
@@ -225,7 +225,7 @@ If you run into errors:
 Reference documentation used in this guide:
 
 -   RichText: [`registerFormatType`](/packages/rich-text/README.md#registerformattype)
--   Components: [`RichTextToolbarButton`](/packages/block-editor/src/components/rich-text#richtexttoolbarbutton)
+-   Components: [`RichTextToolbarButton`](/packages/block-editor/README.md#richtexttoolbarbutton)
 -   RichText: [`applyFormat`](/packages/rich-text/README.md#applyformat)
 -   RichText: [`removeFormat`](/packages/rich-text/README.md#removeformat)
 -   RichText: [`toggleFormat`](/packages/rich-text/README.md#toggleformat)

@@ -120,6 +120,8 @@ function gutenberg_register_block_style( $block_name, $style_properties ) {
 
 /**
  * Additional data to expose to the view script module in the Form block.
+ *
+ * @return array The script module data.
  */
 function gutenberg_block_core_form_view_script_module( $data ) {
 	if ( ! gutenberg_is_experiment_enabled( 'gutenberg-form-blocks' ) ) {

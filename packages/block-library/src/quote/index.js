@@ -22,7 +22,7 @@ export const settings = {
 	icon,
 	example: {
 		attributes: {
-			citation: 'Julio Cortázar',
+			citation: __( 'Julio Cortázar' ),
 		},
 		innerBlocks: [
 			{

@@ -169,4 +169,15 @@ describe( 'normalizeTextString', () => {
 			'-'.repeat( dashCharacters.length )
 		);
 	} );
+
+	it( 'should normalize unicode to standard characters', () => {
+		expect( normalizeTextString( '①' ) ).toBe( '1' );
+		expect( normalizeTextString( 'Ⅸ' ) ).toBe( 'ix' );
+		expect( normalizeTextString( 'MC²' ) ).toBe( 'mc2' );
+		expect( normalizeTextString( 'ＰｌａｙＳｔａｔｉｏｎ　２' ) ).toBe(
+			'playstation 2'
+		);
+		expect( normalizeTextString( 'ＡＢＣ' ) ).toBe( 'abc' );
+		expect( normalizeTextString( 'Amélie' ) ).toBe( 'amelie' );
+	} );
 } );

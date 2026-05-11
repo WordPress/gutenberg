@@ -5,7 +5,7 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 	Button,
-	__experimentalText as Text,
+	__experimentalText as WCText,
 	TextControl,
 	Modal,
 } from '@wordpress/components';
@@ -61,13 +61,12 @@ export function AllowOverridesModal( {
 				} }
 			>
 				<VStack spacing="6">
-					<Text id={ descriptionId }>
+					<WCText id={ descriptionId }>
 						{ __(
 							'Overrides are changes you make to a block within a synced pattern instance. Use overrides to customize a synced pattern instance to suit its new context. Name this block to specify an override.'
 						) }
-					</Text>
+					</WCText>
 					<TextControl
-						__nextHasNoMarginBottom
 						__next40pxDefaultSize
 						value={ editedBlockName }
 						label={ __( 'Name' ) }
@@ -119,11 +118,11 @@ export function DisallowOverridesModal( { onClose, onSave } ) {
 				} }
 			>
 				<VStack spacing="6">
-					<Text id={ descriptionId }>
+					<WCText id={ descriptionId }>
 						{ __(
 							'Are you sure you want to disable overrides? Disabling overrides will revert all applied overrides for this block throughout instances of this pattern.'
 						) }
-					</Text>
+					</WCText>
 
 					<HStack justify="right">
 						<Button

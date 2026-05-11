@@ -65,7 +65,8 @@ test.describe( 'Change detection', () => {
 			).toBeDisabled(),
 		] );
 
-		// Autosave draft as same user should do full save, i.e. not dirty.
+		// New auto-drafts are promoted to drafts on first autosave, including
+		// when RTC is enabled, so the editor should no longer be dirty.
 		expect( await changeDetectionUtils.getIsDirty() ).toBe( false );
 	} );
 
@@ -243,16 +244,19 @@ test.describe( 'Change detection', () => {
 		await expect(
 			page
 				.getByRole( 'region', { name: 'Editor content' } )
-				.getByText( 'Updating failed. You are probably offline.' )
+				.getByText(
+					'Updating failed because you were offline. Please verify your connection and try again.'
+				)
 		).toBeVisible();
+
+		// Need to disable offline to allow reload and allow reconnect to sync provider.
+		await context.setOffline( false );
+
 		await expect(
 			page
 				.getByRole( 'region', { name: 'Editor top bar' } )
 				.getByRole( 'button', { name: 'Save draft' } )
 		).toBeEnabled();
-
-		// Need to disable offline to allow reload.
-		await context.setOffline( false );
 
 		expect( await changeDetectionUtils.getIsDirty() ).toBe( true );
 	} );
@@ -414,7 +418,7 @@ test.describe( 'Change detection', () => {
 			.click();
 		await page
 			.getByRole( 'menu' )
-			.getByRole( 'menuitem', { name: 'Move to trash' } )
+			.getByRole( 'menuitem', { name: 'Trash' } )
 			.click();
 		await page
 			.getByRole( 'dialog' )
@@ -492,6 +496,37 @@ test.describe( 'Change detection', () => {
 				.getByRole( 'region', { name: 'Editor top bar' } )
 				.getByRole( 'button', { name: 'Save draft' } )
 		).toBeEnabled();
+	} );
+
+	// See: https://github.com/WordPress/gutenberg/issues/76143.
+	test( 'should not be dirty after autosaving content changes for draft post', async ( {
+		page,
+		editor,
+		changeDetectionUtils,
+	} ) => {
+		await editor.canvas
+			.getByRole( 'textbox', { name: 'Add title' } )
+			.fill( 'Hello World' );
+		await editor.canvas
+			.getByRole( 'button', { name: 'Add default block' } )
+			.click();
+		await page.keyboard.type( 'Paragraph' );
+
+		// Force autosave to occur immediately.
+		await Promise.all( [
+			page.evaluate( () =>
+				window.wp.data.dispatch( 'core/editor' ).autosave()
+			),
+			expect(
+				page
+					.getByRole( 'region', { name: 'Editor top bar' } )
+					.getByRole( 'button', { name: 'saved' } )
+			).toBeDisabled(),
+		] );
+
+		// New auto-drafts are promoted to drafts on first autosave, including
+		// when RTC is enabled, so content edits should be clean afterward.
+		expect( await changeDetectionUtils.getIsDirty() ).toBe( false );
 	} );
 } );
 

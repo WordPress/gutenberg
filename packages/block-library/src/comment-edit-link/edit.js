@@ -1,60 +1,63 @@
 /**
- * External dependencies
- */
-import clsx from 'clsx';
-
-/**
  * WordPress dependencies
  */
+import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
 import {
-	AlignmentControl,
-	BlockControls,
-	InspectorControls,
-	useBlockProps,
-} from '@wordpress/block-editor';
-import { PanelBody, ToggleControl } from '@wordpress/components';
+	ToggleControl,
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
-export default function Edit( {
-	attributes: { linkTarget, textAlign },
-	setAttributes,
-} ) {
-	const blockProps = useBlockProps( {
-		className: clsx( {
-			[ `has-text-align-${ textAlign }` ]: textAlign,
-		} ),
-	} );
+/**
+ * Internal dependencies
+ */
+import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+import useDeprecatedTextAlign from '../utils/deprecated-text-align-attributes';
 
-	const blockControls = (
-		<BlockControls group="block">
-			<AlignmentControl
-				value={ textAlign }
-				onChange={ ( newAlign ) =>
-					setAttributes( { textAlign: newAlign } )
-				}
-			/>
-		</BlockControls>
-	);
+export default function Edit( props ) {
+	const { attributes, setAttributes } = props;
+	const { linkTarget } = attributes;
+	useDeprecatedTextAlign( props );
+	const blockProps = useBlockProps();
+
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+
 	const inspectorControls = (
 		<InspectorControls>
-			<PanelBody title={ __( 'Settings' ) }>
-				<ToggleControl
-					__nextHasNoMarginBottom
+			<ToolsPanel
+				label={ __( 'Settings' ) }
+				resetAll={ () => {
+					setAttributes( {
+						linkTarget: '_self',
+					} );
+				} }
+				dropdownMenuProps={ dropdownMenuProps }
+			>
+				<ToolsPanelItem
 					label={ __( 'Open in new tab' ) }
-					onChange={ ( value ) =>
-						setAttributes( {
-							linkTarget: value ? '_blank' : '_self',
-						} )
+					isShownByDefault
+					hasValue={ () => linkTarget === '_blank' }
+					onDeselect={ () =>
+						setAttributes( { linkTarget: '_self' } )
 					}
-					checked={ linkTarget === '_blank' }
-				/>
-			</PanelBody>
+				>
+					<ToggleControl
+						label={ __( 'Open in new tab' ) }
+						onChange={ ( value ) =>
+							setAttributes( {
+								linkTarget: value ? '_blank' : '_self',
+							} )
+						}
+						checked={ linkTarget === '_blank' }
+					/>
+				</ToolsPanelItem>
+			</ToolsPanel>
 		</InspectorControls>
 	);
 
 	return (
 		<>
-			{ blockControls }
 			{ inspectorControls }
 			<div { ...blockProps }>
 				<a

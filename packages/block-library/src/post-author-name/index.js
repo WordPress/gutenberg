@@ -9,6 +9,7 @@ import { postAuthor as icon } from '@wordpress/icons';
 import initBlock from '../utils/init-block';
 import metadata from './block.json';
 import edit from './edit';
+import deprecated from './deprecated';
 import transforms from './transforms';
 
 const { name } = metadata;
@@ -18,6 +19,7 @@ export const settings = {
 	icon,
 	transforms,
 	edit,
+	deprecated,
 };
 
 export const init = () => initBlock( { name, metadata, settings } );

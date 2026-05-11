@@ -238,7 +238,6 @@ export function useCompositeState(
 		loop: focusLoop = false,
 		wrap: focusWrap = false,
 		shift: focusShift = false,
-		// eslint-disable-next-line camelcase
 		unstable_virtual: virtualFocus,
 	} = legacyStateOptions;
 

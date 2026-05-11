@@ -1,0 +1,46 @@
+[
+	{
+		"blockName": "core/post-terms",
+		"attrs": {
+			"term": "category",
+			"textAlign": "left"
+		},
+		"innerBlocks": [],
+		"innerHTML": "",
+		"innerContent": []
+	},
+	{
+		"blockName": null,
+		"attrs": {},
+		"innerBlocks": [],
+		"innerHTML": "\n\n",
+		"innerContent": [ "\n\n" ]
+	},
+	{
+		"blockName": "core/post-terms",
+		"attrs": {
+			"term": "category",
+			"textAlign": "center"
+		},
+		"innerBlocks": [],
+		"innerHTML": "",
+		"innerContent": []
+	},
+	{
+		"blockName": null,
+		"attrs": {},
+		"innerBlocks": [],
+		"innerHTML": "\n\n",
+		"innerContent": [ "\n\n" ]
+	},
+	{
+		"blockName": "core/post-terms",
+		"attrs": {
+			"term": "category",
+			"textAlign": "right"
+		},
+		"innerBlocks": [],
+		"innerHTML": "",
+		"innerContent": []
+	}
+]

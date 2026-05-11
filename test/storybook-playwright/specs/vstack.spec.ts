@@ -39,7 +39,7 @@ const PROP_VALUES_TO_TEST = [
 test.describe( 'VStack', () => {
 	test.beforeEach( async ( { page } ) => {
 		await gotoStoryId( page, 'components-experimental-vstack--default', {
-			decorators: { marginChecker: 'show', customE2EControls: 'show' },
+			decorators: { customE2EControls: 'show' },
 		} );
 	} );
 

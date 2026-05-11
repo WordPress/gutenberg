@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 
-import * as basePreviewConfig from '../../../storybook/preview';
+import * as basePreviewConfig from '@wordpress/storybook/preview';
 import { WithCustomControls } from './decorators/with-custom-controls';
 
 export const globalTypes = {

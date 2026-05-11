@@ -70,7 +70,7 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 		await pageUtils.pressKeys( 'ArrowUp', { times: 4 } );
 		await page.keyboard.press( 'ArrowRight' );
 		// Select mid line one to mid line four.
-		await pageUtils.pressKeys( 'Shift+ArrowDown', { times: 3 } );
+		await pageUtils.pressKeys( 'Shift+ArrowDown', { times: 3, delay: 50 } );
 		// Delete the text to see if the selection was correct.
 		await page.keyboard.press( 'Backspace' );
 
@@ -291,9 +291,6 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 		editor,
 		pageUtils,
 	} ) => {
-		// To do: run with iframe.
-		await editor.switchToLegacyCanvas();
-
 		await editor.insertBlock( {
 			name: 'core/paragraph',
 			attributes: { content: 'test' },
@@ -301,10 +298,8 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 
 		await editor.saveDraft();
 		await page.reload();
-		// To do: run with iframe.
-		await editor.switchToLegacyCanvas();
 
-		await page
+		await editor.canvas
 			.getByRole( 'document', { name: 'Block: Paragraph' } )
 			.click( { modifiers: [ 'Shift' ] } );
 		await pageUtils.pressKeys( 'primary+a' );
@@ -803,12 +798,20 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 			.getByRole( 'menuitemradio', { name: 'Align text center' } )
 			.click();
 
-		await expect
-			.poll( editor.getBlocks )
-			.toMatchObject( [
-				{ attributes: { align: 'center', content: '1' } },
-				{ attributes: { align: 'center', content: '2' } },
-			] );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				attributes: {
+					style: { typography: { textAlign: 'center' } },
+					content: '1',
+				},
+			},
+			{
+				attributes: {
+					style: { typography: { textAlign: 'center' } },
+					content: '2',
+				},
+			},
+		] );
 	} );
 
 	// Previously we would unexpectedly duplicate the block on Enter.
@@ -1094,7 +1097,11 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 
 		await page.keyboard.press( 'ArrowLeft' );
 		// Select everything between [].
-		await pageUtils.pressKeys( 'Shift+ArrowLeft', { times: 5 } );
+		// Delay ensures selection can catch up.
+		await pageUtils.pressKeys( 'Shift+ArrowLeft', {
+			times: 5,
+			delay: 50,
+		} );
 
 		await page.keyboard.press( 'Delete' );
 
@@ -1121,7 +1128,11 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 		await page.keyboard.type( ']2' );
 		await page.keyboard.press( 'ArrowLeft' );
 		// Select everything between [].
-		await pageUtils.pressKeys( 'Shift+ArrowLeft', { times: 3 } );
+		// Delay ensures selection can catch up.
+		await pageUtils.pressKeys( 'Shift+ArrowLeft', {
+			times: 3,
+			delay: 50,
+		} );
 
 		// Ensure selection is in the correct place.
 		await page.keyboard.type( '|' );
@@ -1146,7 +1157,7 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 		await page.keyboard.type( ']2' );
 		await page.keyboard.press( 'ArrowLeft' );
 		// Select everything between [].
-		await pageUtils.pressKeys( 'Shift+ArrowLeft', { times: 3 } );
+		await pageUtils.pressKeys( 'Shift+ArrowLeft', { times: 3, delay: 50 } );
 
 		// Ensure selection is in the correct place.
 		await page.keyboard.type( '|' );
@@ -1184,7 +1195,8 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 			.click();
 		await page.keyboard.press( 'ArrowLeft' );
 		// Select everything between [].
-		await pageUtils.pressKeys( 'Shift+ArrowLeft', { times: 5 } );
+		// Delay ensures selection can catch up.
+		await pageUtils.pressKeys( 'Shift+ArrowLeft', { times: 5, delay: 50 } );
 
 		await page.keyboard.press( 'Enter' );
 
@@ -1223,7 +1235,7 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 			.filter( { hasText: 'a' } )
 			.click();
 
-		await pageUtils.pressKeys( 'Shift+ArrowDown', { times: 2 } );
+		await pageUtils.pressKeys( 'Shift+ArrowDown', { times: 2, delay: 50 } );
 		await page.keyboard.press( 'Backspace' );
 
 		// Ensure selection is in the correct place.
@@ -1240,9 +1252,6 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 		page,
 		editor,
 	} ) => {
-		// To do: run with iframe.
-		await editor.switchToLegacyCanvas();
-
 		await editor.insertBlock( {
 			name: 'core/paragraph',
 			attributes: { content: '<strong>1</strong>[' },
@@ -1252,7 +1261,7 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 			attributes: { content: ']2' },
 		} );
 		// Focus and move the caret to the end.
-		const secondParagraphBlock = page
+		const secondParagraphBlock = editor.canvas
 			.getByRole( 'document', { name: 'Block: Paragraph' } )
 			.filter( { hasText: ']2' } );
 		const secondParagraphBlockBox =
@@ -1265,9 +1274,7 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 		} );
 
 		await page.keyboard.press( 'ArrowLeft' );
-		const strongText = page
-			.getByRole( 'region', { name: 'Editor content' } )
-			.getByText( '1', { exact: true } );
+		const strongText = editor.canvas.getByText( '1', { exact: true } );
 		const strongBox = await strongText.boundingBox();
 		// Focus and move the caret to the end.
 		await strongText.click( {
@@ -1365,6 +1372,31 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 			.poll( multiBlockSelectionUtils.getSelectedFlatIndices )
 			.toEqual( [ 1, 2 ] );
 	} );
+
+	test( 'should select all with formatting', async ( {
+		pageUtils,
+		editor,
+		multiBlockSelectionUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: '<strong>a</strong>' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: '<strong>b</strong>' },
+		} );
+
+		await pageUtils.pressKeys( 'primary+a' );
+		await pageUtils.pressKeys( 'primary+a' );
+
+		await expect
+			.poll( multiBlockSelectionUtils.getSelectedBlocks )
+			.toMatchObject( [
+				{ name: 'core/paragraph' },
+				{ name: 'core/paragraph' },
+			] );
+	} );
 } );
 
 class MultiBlockSelectionUtils {
@@ -1434,6 +1466,7 @@ class MultiBlockSelectionUtils {
 		const endBlock = this.#editor.canvas.locator(
 			`[data-block="${ selectionEnd }"]`
 		);
+		/* eslint-disable playwright/no-standalone-expect */
 
 		expect(
 			await selection.evaluate( ( _selection ) => _selection.rangeCount ),
@@ -1483,5 +1516,6 @@ class MultiBlockSelectionUtils {
 				'Expected selection to start and end in the selected block'
 			).toBe( true );
 		}
+		/* eslint-enable playwright/no-standalone-expect */
 	};
 }

@@ -4,7 +4,7 @@
 This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
 </div>
 
-NumberControl is an enhanced HTML [`input[type="number]`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/number) element.
+NumberControl is an enhanced HTML [`input[type="number"]`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/number) element.
 
 ## Usage
 
