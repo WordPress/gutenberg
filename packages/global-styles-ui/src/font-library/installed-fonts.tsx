@@ -18,7 +18,7 @@ import {
 } from '@wordpress/components';
 import { useEntityRecord, store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
-import { useContext, useEffect, useState } from '@wordpress/element';
+import { useContext, useEffect, useState, useMemo } from '@wordpress/element';
 import { __, _x, sprintf, isRTL } from '@wordpress/i18n';
 import { chevronLeft, chevronRight } from '@wordpress/icons';
 import type {
@@ -41,6 +41,51 @@ import {
 	getDisplaySrcFromFontFace,
 } from './utils';
 import { useSetting } from '../hooks';
+
+/**
+ * Recursively searches a nested styles object for any string value that
+ * references the given font slug, in either of the two formats WordPress
+ * uses depending on context:
+ *
+ *   Computed/rendered: `var(--wp--preset--font-family--<slug>)`
+ *   Raw stored:        `var:preset|font-family|<slug>`
+ *
+ * @param obj  The styles object to search.
+ * @param slug The font family slug to look for.
+ * @return Whether the slug is referenced anywhere in the object.
+ */
+function isFontSlugUsedInStyles(
+	obj: Record< string, any > | undefined | null,
+	slug: string
+): boolean {
+	if ( ! obj || typeof obj !== 'object' ) {
+		return false;
+	}
+
+	// WordPress slugs use hyphens; convert to the CSS custom property segment.
+	const cssSlug = slug.replace( /\//g, '-' );
+
+	// The format seen in the computed styles object passed to the component.
+	const cssVarFormat = `var(--wp--preset--font-family--${ cssSlug })`;
+	// The raw colon format used in the database / REST API response.
+	const colonFormat = `var:preset|font-family|${ slug }`;
+
+	for ( const value of Object.values( obj ) ) {
+		if (
+			typeof value === 'string' &&
+			( value === cssVarFormat || value === colonFormat )
+		) {
+			return true;
+		}
+		if (
+			typeof value === 'object' &&
+			isFontSlugUsedInStyles( value, slug )
+		) {
+			return true;
+		}
+	}
+	return false;
+}
 
 function InstalledFonts() {
 	const {
@@ -66,10 +111,12 @@ function InstalledFonts() {
 	const [ baseFontFamilies ] = useSetting<
 		Record< string, FontFamilyPreset[] > | undefined
 	>( 'typography.fontFamilies', undefined, 'base' );
+
 	const globalStylesId = useSelect( ( select ) => {
 		const { __experimentalGetCurrentGlobalStylesId } = select( coreStore );
 		return __experimentalGetCurrentGlobalStylesId();
 	}, [] );
+
 	const globalStyles = useEntityRecord< GlobalStylesConfig >(
 		'root',
 		'globalStyles',
@@ -77,6 +124,36 @@ function InstalledFonts() {
 	);
 	const fontFamiliesHasChanges =
 		!! globalStyles?.edits?.settings?.typography?.fontFamilies;
+
+	// Read the live global styles styles object from the store.
+	// getEditedEntityRecord returns the merged saved+unsaved state,
+	// which is the authoritative source for current font assignments.
+	const globalStylesStyles = useSelect(
+		( select ) => {
+			if ( ! globalStylesId ) {
+				return undefined;
+			}
+			const record = select( coreStore ).getEditedEntityRecord(
+				'root',
+				'globalStyles',
+				globalStylesId
+			) as GlobalStylesConfig | undefined;
+			return record?.styles;
+		},
+		[ globalStylesId ]
+	);
+
+	// True only when the selected font is actually assigned to a style target
+	// (body text, headings, elements, blocks, etc.) in the live global styles.
+	const isFontInUse = useMemo( () => {
+		if ( ! libraryFontSelected?.slug || ! globalStylesStyles ) {
+			return false;
+		}
+		return isFontSlugUsedInStyles(
+			globalStylesStyles as Record< string, any >,
+			libraryFontSelected.slug
+		);
+	}, [ globalStylesStyles, libraryFontSelected?.slug ] );
 
 	const themeFonts = fontFamilies?.theme
 		? fontFamilies.theme
@@ -356,6 +433,7 @@ function InstalledFonts() {
 									handleSetLibraryFontSelected={
 										handleSetLibraryFontSelected
 									}
+									isInUse={ isFontInUse }
 								/>
 							) }
 
@@ -474,6 +552,7 @@ function ConfirmDeleteDialog( {
 	setNotice,
 	uninstallFontFamily,
 	handleSetLibraryFontSelected,
+	isInUse,
 }: {
 	font: FontFamily;
 	isOpen: boolean;
@@ -488,6 +567,7 @@ function ConfirmDeleteDialog( {
 		fontFamily: FontFamily
 	) => Promise< { deleted: boolean } >;
 	handleSetLibraryFontSelected: ( font?: FontFamily ) => void;
+	isInUse: boolean;
 } ) {
 	const navigator = useNavigator();
 
@@ -516,6 +596,22 @@ function ConfirmDeleteDialog( {
 		setIsOpen( false );
 	};
 
+	const dialogMessage = isInUse
+		? sprintf(
+				/* translators: %s: Name of the font. */
+				__(
+					'"%s" is currently used in your site styles. Deleting it will remove the font and all its variants and assets, and your site will fall back to the default font. Do you want to continue?'
+				),
+				font.name
+		  )
+		: sprintf(
+				/* translators: %s: Name of the font. */
+				__(
+					'Are you sure you want to delete "%s" font and all its variants and assets?'
+				),
+				font.name
+		  );
+
 	return (
 		<ConfirmDialog
 			isOpen={ isOpen }
@@ -525,14 +621,7 @@ function ConfirmDeleteDialog( {
 			onConfirm={ handleConfirmUninstall }
 			size="medium"
 		>
-			{ font &&
-				sprintf(
-					/* translators: %s: Name of the font. */
-					__(
-						'Are you sure you want to delete "%s" font and all its variants and assets?'
-					),
-					font.name
-				) }
+			{ font && dialogMessage }
 		</ConfirmDialog>
 	);
 }
