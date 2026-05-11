@@ -21,6 +21,10 @@
 -   `Drawer`: Fade the popup elevation shadow alongside the slide ([#77800](https://github.com/WordPress/gutenberg/pull/77800)).
 -   `Drawer`: Allow mouse-drag swipe-dismiss in the popup-edge padding gutter ([#77800](https://github.com/WordPress/gutenberg/pull/77800)).
 
+### Internal
+
+-   `Dialog`: Use `--wpds-motion-*` design tokens for animation duration and easing ([#76097](https://github.com/WordPress/gutenberg/pull/76097)).
+
 ## 0.12.0 (2026-04-29)
 
 ### Breaking Changes
@@ -97,7 +101,6 @@
 
 ### Internal
 
--   `Dialog`: Use `--wpds-motion-*` design tokens for animation duration and easing ([#76097](https://github.com/WordPress/gutenberg/pull/76097)).
 -   `Card`: Remove redundant `margin: 0` from `Card.Title` now that `Text` applies it by default ([#77187](https://github.com/WordPress/gutenberg/pull/77187)).
 -   Normalize `render` prop handling across components and document conventions in `CONTRIBUTING.md` ([#77160](https://github.com/WordPress/gutenberg/pull/77160)).
 -   `AlertDialog`: Rewrite internals to use Base UI's `AlertDialog` primitives directly instead of `Dialog` wrappers. Introduces an internal state machine for async confirm flows ([#76937](https://github.com/WordPress/gutenberg/pull/76937)).
