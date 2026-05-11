@@ -103,6 +103,7 @@ export default function SidebarGlobalStyles() {
 			}
 			className="edit-site-styles"
 			title={ __( 'Styles' ) }
+			headingLevel={ 2 }
 		>
 			<GlobalStylesUIWrapper
 				path={ section }
