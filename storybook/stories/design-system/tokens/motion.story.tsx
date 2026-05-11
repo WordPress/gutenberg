@@ -1,7 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { Button, SelectControl, TextControl } from '@wordpress/components';
-import { useState, useCallback } from '@wordpress/element';
-import { Stack } from '@wordpress/ui';
+import { useState, useCallback, useId } from '@wordpress/element';
+import { Button, Field, InputControl, Select, Stack } from '@wordpress/ui';
 
 const EASING_TOKENS = [
 	{
@@ -139,6 +138,7 @@ function AnimationRow( {
 }
 
 function MotionDemo() {
+	const durationSelectId = useId();
 	const [ animKey, setAnimKey ] = useState( 0 );
 	const replay = useCallback( () => setAnimKey( ( k ) => k + 1 ), [] );
 	const [ selectedDuration, setSelectedDuration ] = useState(
@@ -155,7 +155,7 @@ function MotionDemo() {
 		<Stack direction="column" gap="xl">
 			<style>{ dotKeyframes }</style>
 			<div>
-				<Button variant="secondary" onClick={ replay }>
+				<Button tone="brand" onClick={ replay }>
 					Replay animations
 				</Button>
 			</div>
@@ -163,27 +163,42 @@ function MotionDemo() {
 			<Stack direction="column" gap="lg">
 				<h3>Easing curves</h3>
 				<Stack align="end" gap="md" wrap="wrap">
-					<SelectControl
-						__next40pxDefaultSize
-						label="Duration"
-						value={ selectedDuration }
-						options={ DURATION_OPTIONS }
-						onChange={ ( value ) => {
-							setSelectedDuration( value );
-							setAnimKey( ( k ) => k + 1 );
-						} }
-						style={ { minWidth: '180px' } }
-					/>
+					<Field.Root style={ { minWidth: '180px' } }>
+						<Field.Label htmlFor={ durationSelectId }>
+							Duration
+						</Field.Label>
+						<Select.Root
+							value={ selectedDuration }
+							onValueChange={ ( value ) => {
+								if ( typeof value !== 'string' ) {
+									return;
+								}
+								setSelectedDuration( value );
+								setAnimKey( ( k ) => k + 1 );
+							} }
+						>
+							<Select.Trigger id={ durationSelectId } />
+							<Select.Popup>
+								{ DURATION_OPTIONS.map( ( opt ) => (
+									<Select.Item
+										key={ opt.value }
+										value={ opt.value }
+									>
+										{ opt.label }
+									</Select.Item>
+								) ) }
+							</Select.Popup>
+						</Select.Root>
+					</Field.Root>
 					{ selectedDuration === 'custom' && (
-						<TextControl
-							__next40pxDefaultSize
+						<InputControl
 							label="Value (ms)"
 							type="number"
 							min={ 0 }
 							max={ 5000 }
 							step={ 50 }
 							value={ customDuration }
-							onChange={ ( value ) => {
+							onValueChange={ ( value ) => {
 								setCustomDuration( value );
 								setAnimKey( ( k ) => k + 1 );
 							} }
