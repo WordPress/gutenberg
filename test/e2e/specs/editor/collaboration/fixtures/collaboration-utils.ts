@@ -154,10 +154,11 @@ export default class CollaborationUtils {
 		const pages = this.allPages;
 		const resolvedTimeout = timeout ?? 10000 + pages.length * 2500;
 
+		const roomName = USE_TEST_WS_PROVIDER
+			? await this.getCurrentPostRoomName( this.primaryPage )
+			: undefined;
+
 		if ( USE_TEST_WS_PROVIDER ) {
-			const roomName = await this.getCurrentPostRoomName(
-				this.primaryPage
-			);
 			await Promise.all(
 				pages.map( ( pg ) =>
 					this.waitForTestWebSocketAwarenessPeerCount(
@@ -182,7 +183,10 @@ export default class CollaborationUtils {
 
 		await Promise.all(
 			pages.map( ( pg ) =>
-				this.waitForSyncCycle( pg, 3, { timeout: resolvedTimeout } )
+				this.waitForSyncCycle( pg, 3, {
+					timeout: resolvedTimeout,
+					room: roomName,
+				} )
 			)
 		);
 	}
@@ -385,23 +389,29 @@ export default class CollaborationUtils {
 	 * @param cycles            Number of sync responses to wait for (default 3).
 	 * @param [options]         Optional settings.
 	 * @param [options.timeout] Maximum wait time per cycle in ms (default 10000).
+	 * @param options.room
 	 */
 	async waitForSyncCycle(
 		page: Page,
 		cycles = 3,
-		{ timeout = 10000 }: { timeout?: number } = {}
+		{ timeout = 10000, room }: { timeout?: number; room?: string } = {}
 	) {
 		if ( USE_TEST_WS_PROVIDER ) {
 			await page.waitForFunction(
-				() => {
+				( targetRoom: string | undefined ) => {
 					const state = ( window as any )
 						.__gutenbergTestWebSocketSync;
-					const rooms = Object.values( state?.rooms ?? {} );
-					return rooms.some(
-						( room: any ) => room?.status === 'connected'
+					const rooms = state?.rooms ?? {};
+
+					if ( targetRoom ) {
+						return rooms[ targetRoom ]?.status === 'connected';
+					}
+
+					return Object.values( rooms ).some(
+						( candidate: any ) => candidate?.status === 'connected'
 					);
 				},
-				undefined,
+				room,
 				{ timeout }
 			);
 			return;
