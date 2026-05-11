@@ -33,7 +33,7 @@
 		"access": "public"
 	},
 	"scripts": {
-		"check-licenses": "node ./check-licenses.mjs",
+		"check-licenses": "node ./check-licenses.js",
 		"validate-package-lock": "node ./validate-package-lock.js",
 		"validate-tsconfig": "node ./validate-tsconfig.mjs",
 		"check-local-changes": "node ./check-local-changes.js"
