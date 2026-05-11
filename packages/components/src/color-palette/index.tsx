@@ -60,10 +60,9 @@ function SinglePalette( {
 			// This correctly handles mixed palettes where some entries have slugs
 			// and others don't. Fall back to color value matching when no slug
 			// is provided by the caller.
-			const isSelected =
-				selectedSlug !== undefined
-					? slug === selectedSlug
-					: value === color;
+			const isSelected = selectedSlug
+				? slug === selectedSlug
+				: value === color;
 
 			return (
 				<CircularOptionPicker.Option
@@ -221,9 +220,10 @@ function UnforwardedColorPalette(
 			extractColorNameFromCurrentValue(
 				value,
 				colors,
-				hasMultipleColorOrigins
+				hasMultipleColorOrigins,
+				selectedSlug
 			),
-		[ value, colors, hasMultipleColorOrigins ]
+		[ value, colors, hasMultipleColorOrigins, selectedSlug ]
 	);
 
 	const renderCustomColorPicker = () => (

@@ -318,6 +318,38 @@ describe( 'ColorPalette', () => {
 			expect( options[ 1 ] ).toHaveAttribute( 'aria-selected', 'true' );
 		} );
 
+		it( 'should treat an empty-string selectedSlug as no slug and fall back to color-value selection', () => {
+			render(
+				<ColorPalette
+					colors={ DUPLICATE_COLOR_PALETTE }
+					value="#000"
+					selectedSlug=""
+					onChange={ jest.fn() }
+				/>
+			);
+
+			const options = screen.getAllByRole( 'option' );
+			expect( options[ 0 ] ).toHaveAttribute( 'aria-selected', 'true' );
+			expect( options[ 1 ] ).toHaveAttribute( 'aria-selected', 'true' );
+		} );
+
+		it( 'should display the slug-matched entry name in the custom color button label', () => {
+			render(
+				<ColorPalette
+					colors={ DUPLICATE_COLOR_PALETTE }
+					value="#000"
+					selectedSlug="dark-text"
+					onChange={ jest.fn() }
+				/>
+			);
+
+			expect(
+				screen.getByRole( 'button', {
+					name: 'Custom color picker. The currently selected color is called "Dark Text" and has a value of "#000".',
+				} )
+			).toBeInTheDocument();
+		} );
+
 		it( 'should pass slug as third argument to onChange when a swatch is clicked', async () => {
 			const user = userEvent.setup();
 			const onChange = jest.fn();
