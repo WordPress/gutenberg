@@ -5,6 +5,7 @@
 ### Enhancements
 
 -   `get_component_details` now optionally accepts an array of component names so multiple components can be fetched in a single call. ([#78185](https://github.com/WordPress/gutenberg/pull/78185))
+-   The server now provides instructions on how AI agents should be expected to use it, improving discoverability and tool call efficiency. ([#78186](https://github.com/WordPress/gutenberg/pull/78186))
 
 ## 0.3.0 (2026-05-14)
 
