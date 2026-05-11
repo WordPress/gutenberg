@@ -188,6 +188,7 @@ function CropperInner(
 	const cropAreaDescriptionId = useId();
 	const [ isCropAreaFocused, setIsCropAreaFocused ] =
 		useState( focusOnMount );
+	const [ isFocusVisible, setIsFocusVisible ] = useState( false );
 	const [ canvasSize, setCanvasSize ] = useState< Size >( {
 		width: 0,
 		height: 0,
@@ -203,6 +204,16 @@ function CropperInner(
 		( event: React.FocusEvent< HTMLDivElement > ) => {
 			if ( event.target === event.currentTarget ) {
 				setIsCropAreaFocused( true );
+				// Show the outline only when focus arrived via keyboard
+				// navigation. relatedTarget is null for pointer-initiated and
+				// cross-window focus, so it reliably excludes those cases
+				// without needing a separate ref or flag.
+				if (
+					event.relatedTarget !== null &&
+					event.currentTarget.matches( ':focus-visible' )
+				) {
+					setIsFocusVisible( true );
+				}
 			}
 		},
 		[]
@@ -212,6 +223,7 @@ function CropperInner(
 		( event: React.FocusEvent< HTMLDivElement > ) => {
 			if ( event.target === event.currentTarget ) {
 				setIsCropAreaFocused( false );
+				setIsFocusVisible( false );
 			}
 		},
 		[]
@@ -336,6 +348,33 @@ function CropperInner(
 		onGestureEnd,
 	} );
 
+	// Compose focus-visibility tracking into the canvas event handlers.
+	// Kept as a spread rather than explicit props to avoid triggering
+	// jsx-a11y/no-noninteractive-element-interactions on role="group".
+	const canvasHandlers = {
+		...handlers,
+		onPointerDown: ( event: React.PointerEvent< HTMLDivElement > ) => {
+			handlers.onPointerDown?.( event );
+			// Called after handlers so it lands last in the React batch —
+			// el.focus() inside the handler fires onFocus, which may
+			// otherwise set isFocusVisible back to true.
+			setIsFocusVisible( false );
+		},
+		onKeyDown: ( event: React.KeyboardEvent< HTMLDivElement > ) => {
+			// Guard against keydowns bubbling up from child handles
+			// (e.g. Tab between handles, unhandled keys). Modifier-only
+			// keypresses are excluded — they precede another key rather
+			// than indicating deliberate keyboard interaction on their own.
+			if (
+				event.target === event.currentTarget &&
+				! [ 'Shift', 'Control', 'Alt', 'Meta' ].includes( event.key )
+			) {
+				setIsFocusVisible( true );
+			}
+			handlers.onKeyDown?.( event );
+		},
+	};
+
 	// Register wheel handler natively with { passive: false } so
 	// preventDefault works. React's onWheel registers as passive. Bound
 	// to the canvas (not the root) so pointer geometry inside the handler
@@ -451,6 +490,9 @@ function CropperInner(
 	 * arrow keys pan the image rather than resize.
 	 */
 	const handleEscape = useCallback( () => {
+		// Escape is always a keyboard action, so show the outline immediately
+		// rather than relying on the focus handler's :focus-visible check.
+		setIsFocusVisible( true );
 		canvasRef.current?.focus( { preventScroll: true } );
 	}, [] );
 
@@ -578,7 +620,13 @@ function CropperInner(
 						'wp-media-editor-image-editor__canvas--grid-interactive',
 					showInteractiveGrid &&
 						'wp-media-editor-image-editor__canvas--show-grid',
-					settling && 'wp-media-editor-image-editor__canvas--settling'
+					settling &&
+						'wp-media-editor-image-editor__canvas--settling',
+					// Show the keyboard focus outline only when the canvas
+					// itself (not a child handle) has keyboard focus.
+					isFocusVisible &&
+						isCropAreaFocused &&
+						'wp-media-editor-image-editor__canvas--focus-visible'
 				) }
 				tabIndex={ 0 }
 				role="group"
@@ -588,7 +636,7 @@ function CropperInner(
 				}
 				onFocus={ handleCropAreaFocus }
 				onBlur={ handleCropAreaBlur }
-				{ ...handlers }
+				{ ...canvasHandlers }
 			>
 				<div
 					id={ cropAreaDescriptionId }

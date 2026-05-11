@@ -8,15 +8,13 @@ import { store as noticesStore } from '@wordpress/notices';
 /**
  * Internal dependencies
  */
-import type { CoreDataError, TaxonomyFormData } from '../types';
-import { TAXONOMY_ENTITY } from '../../constants';
-
-type Status = TaxonomyFormData[ 'status' ];
+import type { ContentType, CoreDataError } from '../types';
 
 export interface StatusActionConfig {
 	id: string;
 	label: string;
-	targetStatus: Status;
+	entity: string;
+	targetStatus: ContentType[ 'status' ];
 	messages: {
 		successSingle: string;
 		successMany: ( count: number ) => string;
@@ -27,11 +25,10 @@ export interface StatusActionConfig {
 	};
 }
 
-export function createStatusAction(
+export function createStatusAction< T extends ContentType >(
 	config: StatusActionConfig
-): Action< TaxonomyFormData > {
-	const isEligible = ( item: TaxonomyFormData ) =>
-		item.status !== config.targetStatus;
+): Action< T > {
+	const isEligible = ( item: T ) => item.status !== config.targetStatus;
 	return {
 		id: config.id,
 		label: config.label,
@@ -49,7 +46,7 @@ export function createStatusAction(
 				itemsToUpdate.map( ( item ) =>
 					saveEntityRecord(
 						'postType',
-						TAXONOMY_ENTITY,
+						config.entity,
 						{ id: item.id, status: config.targetStatus },
 						{ throwOnError: true }
 					)

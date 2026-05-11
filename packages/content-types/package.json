@@ -34,6 +34,7 @@
 	"types": "build-types",
 	"dependencies": {
 		"@wordpress/admin-ui": "file:../admin-ui",
+		"@wordpress/base-styles": "file:../base-styles",
 		"@wordpress/components": "file:../components",
 		"@wordpress/compose": "file:../compose",
 		"@wordpress/core-data": "file:../core-data",
