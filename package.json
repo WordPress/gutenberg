@@ -75,6 +75,7 @@
 		"cross-env": "7.0.3",
 		"cross-spawn": "^7.0.6",
 		"css-loader": "^6.2.0",
+		"emojibase-data": "^17.0.0",
 		"esbuild": "^0.27.2",
 		"eslint": "^10.0.0",
 		"eslint-formatter-compact": "9.0.1",
