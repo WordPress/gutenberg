@@ -1,0 +1,63 @@
+/**
+ * External dependencies
+ */
+import clsx from 'clsx';
+
+/**
+ * Internal dependencies
+ */
+import type { GridOverlayRenderProps } from './types';
+import styles from './grid-overlay.module.css';
+
+/**
+ * Default edit-mode overlay. Paints diagonal stripes behind the tiles
+ * to mark the dashboard surface, plus dashed outlines on each column
+ * track and (when `rowHeight` is supplied) repeating dividers for the
+ * row tracks.
+ *
+ * Used by both `DashboardGrid` and `DashboardLanes`. Replaced wholesale
+ * by passing a `renderGridOverlay` to either surface; themed in place
+ * via the CSS custom properties documented in the package README.
+ *
+ * @param props           Render props supplied by the surface.
+ * @param props.columns   Number of column tracks to mirror.
+ * @param props.gapPx     Gap between tracks in pixels.
+ * @param props.rowHeight Row height in pixels for surfaces with uniform
+ *                        rows. Omitted on lane surfaces or auto-sized
+ *                        grids; in that case row dividers are skipped.
+ */
+export function GridOverlay( {
+	columns,
+	gapPx,
+	rowHeight,
+}: GridOverlayRenderProps ) {
+	const showRows = typeof rowHeight === 'number';
+	// Custom properties drive the row-divider gradient so the CSS file
+	// stays static while the values come from the live grid.
+	const style: React.CSSProperties = {
+		gridTemplateColumns: `repeat(${ columns }, minmax(0, 1fr))`,
+		gap: `${ gapPx }px`,
+		...( showRows
+			? ( {
+					'--wp-grid-overlay-row-tile': `${ rowHeight + gapPx }px`,
+					'--wp-grid-overlay-row-line': `calc(${ rowHeight }px - 1px)`,
+					'--wp-grid-overlay-row-line-end': `${ rowHeight }px`,
+			  } as React.CSSProperties )
+			: {} ),
+	};
+
+	return (
+		<div
+			aria-hidden
+			className={ clsx(
+				styles.overlay,
+				showRows && styles[ 'has-rows' ]
+			) }
+			style={ style }
+		>
+			{ Array.from( { length: columns } ).map( ( _, i ) => (
+				<div key={ i } className={ styles.column } />
+			) ) }
+		</div>
+	);
+}

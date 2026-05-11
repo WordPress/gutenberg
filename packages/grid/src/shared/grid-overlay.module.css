@@ -1,0 +1,31 @@
+.overlay {
+	position: absolute;
+	inset: 0;
+	display: grid;
+	pointer-events: none;
+	background-image:
+		repeating-linear-gradient(135deg, var(--wp-grid-overlay-stripe-color, color-mix(in srgb, var(--wpds-color-bg-surface-warning) 28%, transparent))
+		0 6px, transparent 6px 12px);
+}
+
+.column {
+	outline:
+		1px dashed
+		var(--wp-grid-overlay-track-color, var(--wpds-color-stroke-surface-warning));
+	background-color: var(--wp-grid-overlay-column-fill, color-mix(in srgb, var(--wpds-color-bg-surface-warning) 10%, transparent));
+}
+
+/*
+ * Tile a 1px solid stroke at the bottom edge of each row track. The
+ * gradient paints transparent for most of the row, a 1px band of the
+ * track color where the row ends, then transparent through the gap.
+ * `background-size` makes that single stop repeat for every row.
+ */
+.has-rows .column {
+	background-image:
+		linear-gradient(to bottom, transparent var(--wp-grid-overlay-row-line), var(--wp-grid-overlay-track-color, var(--wpds-color-stroke-surface-warning))
+		var(--wp-grid-overlay-row-line), var(--wp-grid-overlay-track-color, var(--wpds-color-stroke-surface-warning))
+		var(--wp-grid-overlay-row-line-end), transparent var(--wp-grid-overlay-row-line-end));
+	background-size: 100% var(--wp-grid-overlay-row-tile);
+	background-repeat: repeat;
+}
