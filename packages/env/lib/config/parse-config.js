@@ -35,7 +35,7 @@ const mergeConfigs = require( './merge-configs' );
  * @typedef WPRootConfigOptions
  * @property {number}                               port                          The port to use in the development environment.
  * @property {number}                               testsPort                     The port to use in the tests environment.
- * @property {boolean}                              autoPort                      Whether to automatically select a nearby available HTTP port.
+ * @property {boolean|null}                         autoPort                      Tri-state: `null` (unset, default behavior — auto-fallback only on default ports), `true` (auto-fallback for all ports), `false` (strict for all ports).
  * @property {Object.<string, string|null>}         lifecycleScripts              The scripts to run at certain points in the command lifecycle.
  * @property {Object.<string, string|null>}         lifecycleScripts.afterStart   The script to run after the "start" command has completed.
  * @property {Object.<string, string|null>}         lifecycleScripts.afterClean   The script to run after the "clean" command has completed.
@@ -90,7 +90,7 @@ const DEFAULT_ENVIRONMENT_CONFIG = {
 	themes: [],
 	port: 8888,
 	testsPort: 8889,
-	autoPort: false,
+	autoPort: null,
 	mysqlPort: null,
 	phpmyadmin: false,
 	phpmyadminPort: null,
@@ -159,12 +159,115 @@ async function parseConfig(
 
 	// Merge all of our configs so that we have a complete object
 	// containing the desired options in order of precedence.
-	return mergeConfigs(
+	const merged = mergeConfigs(
 		defaultConfig,
 		localConfig ?? {},
 		overrideConfig ?? {},
 		environmentVarOverrides
 	);
+
+	// Track which HTTP ports came from `DEFAULT_ENVIRONMENT_CONFIG` versus
+	// any user-supplied source. This is consumed by the port resolver to
+	// decide whether to silently fall back to the next available port (for
+	// default-origin ports) or to surface a strict port-busy error (for
+	// user-set ports). Stored as a non-enumerable property so it does not
+	// participate in `mergeConfig` iteration, JSON serialization, or
+	// `toEqual` equality checks performed elsewhere.
+	const defaultOriginPorts = computeDefaultOriginPorts(
+		localConfig,
+		overrideConfig,
+		environmentVarOverrides
+	);
+	Object.defineProperty( merged, '__defaultOriginPorts', {
+		value: defaultOriginPorts,
+		enumerable: false,
+		writable: false,
+		configurable: false,
+	} );
+
+	return merged;
+}
+
+/**
+ * Computes the set of HTTP port keys whose effective value comes from
+ * `DEFAULT_ENVIRONMENT_CONFIG` (i.e. no user-supplied source provided them).
+ *
+ * The returned Set contains zero or more of the strings `'development.port'`
+ * and `'tests.port'`. Each key is included when none of the user-supplied
+ * sources (root `.wp-env.json`, `.wp-env.override.json`, or environment
+ * variables) provide a value for that port.
+ *
+ * @param {Object|null} localConfig             The parsed local config, or null when absent.
+ * @param {Object|null} overrideConfig          The parsed override config, or null when absent.
+ * @param {Object}      environmentVarOverrides The config-shaped object derived from env vars.
+ *
+ * @return {Set<string>} The set of default-origin port keys.
+ */
+function computeDefaultOriginPorts(
+	localConfig,
+	overrideConfig,
+	environmentVarOverrides
+) {
+	const result = new Set();
+
+	const isDevelopmentPortUserSet =
+		layerSetsDevelopmentPort( localConfig ) ||
+		layerSetsDevelopmentPort( overrideConfig ) ||
+		layerSetsDevelopmentPort( environmentVarOverrides );
+
+	const isTestsPortUserSet =
+		layerSetsTestsPort( localConfig ) ||
+		layerSetsTestsPort( overrideConfig ) ||
+		layerSetsTestsPort( environmentVarOverrides );
+
+	if ( ! isDevelopmentPortUserSet ) {
+		result.add( 'development.port' );
+	}
+	if ( ! isTestsPortUserSet ) {
+		result.add( 'tests.port' );
+	}
+
+	return result;
+}
+
+/**
+ * Whether the given config layer provides a value for the development HTTP port.
+ *
+ * @param {Object|null|undefined} layer The config layer to inspect.
+ *
+ * @return {boolean} True when the layer sets the development port.
+ */
+function layerSetsDevelopmentPort( layer ) {
+	if ( ! layer ) {
+		return false;
+	}
+	if ( layer.port !== undefined ) {
+		return true;
+	}
+	if ( layer.env?.development?.port !== undefined ) {
+		return true;
+	}
+	return false;
+}
+
+/**
+ * Whether the given config layer provides a value for the tests HTTP port.
+ *
+ * @param {Object|null|undefined} layer The config layer to inspect.
+ *
+ * @return {boolean} True when the layer sets the tests port.
+ */
+function layerSetsTestsPort( layer ) {
+	if ( ! layer ) {
+		return false;
+	}
+	if ( layer.testsPort !== undefined ) {
+		return true;
+	}
+	if ( layer.env?.tests?.port !== undefined ) {
+		return true;
+	}
+	return false;
 }
 
 /**
@@ -388,7 +491,12 @@ async function parseRootConfig( configFile, rawConfig, options ) {
 		parsedConfig.testsPort = rawConfig.testsPort;
 	}
 	if ( rawConfig.autoPort !== undefined ) {
-		if ( typeof rawConfig.autoPort !== 'boolean' ) {
+		// `null` is a valid tri-state value meaning "unset" (the default).
+		// Only user-provided autoPort values must be booleans.
+		if (
+			rawConfig.autoPort !== null &&
+			typeof rawConfig.autoPort !== 'boolean'
+		) {
 			throw new ValidationError(
 				`Invalid ${ configFile }: "autoPort" must be a boolean.`
 			);

@@ -37,12 +37,12 @@ const { createPortResolver } = require( '../resolve-available-ports' );
 /**
  * Loads any configuration from a given directory.
  *
- * @param {string}      configDirectoryPath  The directory we want to load the config from.
- * @param {string|null} customConfigPath     Optional custom config file path.
- * @param {Object}      options              Options for loading the config.
- * @param {boolean}     options.resolvePorts Whether HTTP ports should be resolved for this command.
- * @param {boolean}     options.autoPort     CLI override for automatic port selection.
- * @param {Object}      options.spinner      A CLI spinner used by the port resolver.
+ * @param {string}            configDirectoryPath  The directory we want to load the config from.
+ * @param {string|null}       customConfigPath     Optional custom config file path.
+ * @param {Object}            options              Options for loading the config.
+ * @param {boolean}           options.resolvePorts Whether HTTP ports should be resolved for this command.
+ * @param {boolean|undefined} options.autoPort     Tri-state CLI override for automatic port selection: `true` enables fallback for all ports, `false` disables fallback even on default ports, `undefined` defers to `config.autoPort` (which itself is tri-state — `null`/`undefined` means "fallback only on default ports").
+ * @param {Object}            options.spinner      A CLI spinner used by the port resolver.
  *
  * @return {Promise<WPConfig>} The config object we've loaded.
  */
@@ -93,25 +93,44 @@ module.exports = async function loadConfig(
 		customConfigPath
 	);
 
-	let portResolver;
-	if ( resolvePorts ) {
-		let shouldAutoPort =
-			autoPort !== undefined ? autoPort : config.autoPort;
-
-		// Automatic port selection is undesirable in CI where determinism matters.
-		if ( process.env.CI ) {
-			shouldAutoPort = false;
-		}
-
-		if ( shouldAutoPort ) {
-			portResolver = createPortResolver( spinner );
-		}
+	// Compute the tri-state auto-port mode. Precedence: CLI option beats
+	// config.autoPort. CLI `true`/`false` are explicit; `undefined` defers
+	// to the parsed config value (which itself is tri-state — `null` /
+	// `undefined` means "unset, use the new defaults-only behavior").
+	let autoPortMode;
+	const effectiveAutoPort =
+		autoPort !== undefined ? autoPort : config.autoPort;
+	if ( effectiveAutoPort === true ) {
+		autoPortMode = 'all';
+	} else if ( effectiveAutoPort === false ) {
+		autoPortMode = 'off';
+	} else {
+		autoPortMode = 'defaults-only';
 	}
+
+	// Automatic port selection is undesirable in CI where determinism matters.
+	if ( process.env.CI ) {
+		autoPortMode = 'off';
+	}
+
+	let portResolver;
+	if ( resolvePorts && autoPortMode !== 'off' ) {
+		portResolver = createPortResolver( spinner );
+	}
+
+	// Read the per-port provenance attached by `parseConfig`. Falls back to
+	// an empty set so callers that bypass `parseConfig` (e.g. some tests)
+	// keep working.
+	const defaultOriginPorts = config.__defaultOriginPorts ?? new Set();
 
 	// Make sure to perform any additional post-processing that
 	// may be needed before the config object is ready for
 	// consumption elsewhere in the tool.
-	config = await postProcessConfig( config, { portResolver } );
+	config = await postProcessConfig( config, {
+		portResolver,
+		autoPortMode,
+		defaultOriginPorts,
+	} );
 
 	return {
 		name: path.basename( configDirectoryPath ),

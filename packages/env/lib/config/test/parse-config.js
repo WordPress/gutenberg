@@ -21,7 +21,7 @@ jest.mock( '../../wordpress', () => ( {
 const DEFAULT_CONFIG = {
 	port: 8888,
 	testsPort: 8889,
-	autoPort: false,
+	autoPort: null,
 	mysqlPort: null,
 	phpmyadmin: false,
 	phpmyadminPort: null,
@@ -193,7 +193,13 @@ describe( 'parseConfig', () => {
 		expect( parsed ).toEqual( expected );
 	} );
 
-	it( 'should accept autoPort as a boolean', async () => {
+	it( 'should accept autoPort as a tri-state (null default, true, false)', async () => {
+		// 1. With no user config, the default is `null` (the new tri-state
+		//    "unset" sentinel — distinguishable from explicit `false`).
+		const defaultParsed = await parseConfig( '/test/gutenberg', '/cache' );
+		expect( defaultParsed.autoPort ).toBeNull();
+
+		// 2. Explicit `true` survives merge.
 		readRawConfigFile.mockImplementation( async ( configFile ) => {
 			if ( configFile === '/test/gutenberg/.wp-env.json' ) {
 				return {
@@ -201,9 +207,21 @@ describe( 'parseConfig', () => {
 				};
 			}
 		} );
+		const parsedTrue = await parseConfig( '/test/gutenberg', '/cache' );
+		expect( parsedTrue.autoPort ).toEqual( true );
 
-		const parsed = await parseConfig( '/test/gutenberg', '/cache' );
-		expect( parsed.autoPort ).toEqual( true );
+		// 3. Explicit `false` survives merge and is observably distinct
+		//    from the default `null` (this is the AC11 boundary check).
+		readRawConfigFile.mockImplementation( async ( configFile ) => {
+			if ( configFile === '/test/gutenberg/.wp-env.json' ) {
+				return {
+					autoPort: false,
+				};
+			}
+		} );
+		const parsedFalse = await parseConfig( '/test/gutenberg', '/cache' );
+		expect( parsedFalse.autoPort ).toEqual( false );
+		expect( parsedFalse.autoPort ).not.toBeNull();
 	} );
 
 	it( 'should parse core, plugin, theme, and mapping sources', async () => {
@@ -589,5 +607,121 @@ describe( 'parseConfig', () => {
 				`Invalid /test/gutenberg/.wp-env.json: "testsEnvironment" must be a boolean.`
 			)
 		);
+	} );
+
+	describe( '__defaultOriginPorts provenance', () => {
+		it( 'attaches __defaultOriginPorts as a non-enumerable Set with both http ports when no user config sets them', async () => {
+			const parsed = await parseConfig( '/test/gutenberg', '/cache' );
+
+			expect( parsed.__defaultOriginPorts ).toBeInstanceOf( Set );
+			expect(
+				parsed.__defaultOriginPorts.has( 'development.port' )
+			).toBe( true );
+			expect( parsed.__defaultOriginPorts.has( 'tests.port' ) ).toBe(
+				true
+			);
+			expect( parsed.__defaultOriginPorts.size ).toBe( 2 );
+
+			expect(
+				Object.prototype.propertyIsEnumerable.call(
+					parsed,
+					'__defaultOriginPorts'
+				)
+			).toBe( false );
+		} );
+
+		it( 'omits development.port from __defaultOriginPorts when local config sets root port', async () => {
+			readRawConfigFile.mockImplementation( async ( configFile ) => {
+				if ( configFile === '/test/gutenberg/.wp-env.json' ) {
+					return { port: 9000 };
+				}
+			} );
+
+			const parsed = await parseConfig( '/test/gutenberg', '/cache' );
+			expect(
+				parsed.__defaultOriginPorts.has( 'development.port' )
+			).toBe( false );
+			expect( parsed.__defaultOriginPorts.has( 'tests.port' ) ).toBe(
+				true
+			);
+		} );
+
+		it( 'omits tests.port from __defaultOriginPorts when local config sets env.tests.port', async () => {
+			readRawConfigFile.mockImplementation( async ( configFile ) => {
+				if ( configFile === '/test/gutenberg/.wp-env.json' ) {
+					return {
+						env: {
+							tests: { port: 9001 },
+						},
+					};
+				}
+			} );
+
+			const parsed = await parseConfig( '/test/gutenberg', '/cache' );
+			expect(
+				parsed.__defaultOriginPorts.has( 'development.port' )
+			).toBe( true );
+			expect( parsed.__defaultOriginPorts.has( 'tests.port' ) ).toBe(
+				false
+			);
+		} );
+
+		it( 'omits development.port from __defaultOriginPorts when override config sets port', async () => {
+			readRawConfigFile.mockImplementation( async ( configFile ) => {
+				if ( configFile === '/test/gutenberg/.wp-env.override.json' ) {
+					return { port: 9000 };
+				}
+			} );
+
+			const parsed = await parseConfig( '/test/gutenberg', '/cache' );
+			expect(
+				parsed.__defaultOriginPorts.has( 'development.port' )
+			).toBe( false );
+			expect( parsed.__defaultOriginPorts.has( 'tests.port' ) ).toBe(
+				true
+			);
+		} );
+
+		it( 'omits development.port from __defaultOriginPorts when WP_ENV_PORT is set', async () => {
+			process.env.WP_ENV_PORT = '4321';
+
+			const parsed = await parseConfig( '/test/gutenberg', '/cache' );
+			expect(
+				parsed.__defaultOriginPorts.has( 'development.port' )
+			).toBe( false );
+			expect( parsed.__defaultOriginPorts.has( 'tests.port' ) ).toBe(
+				true
+			);
+		} );
+
+		it( 'omits tests.port from __defaultOriginPorts when WP_ENV_TESTS_PORT is set', async () => {
+			process.env.WP_ENV_TESTS_PORT = '5432';
+
+			const parsed = await parseConfig( '/test/gutenberg', '/cache' );
+			expect(
+				parsed.__defaultOriginPorts.has( 'development.port' )
+			).toBe( true );
+			expect( parsed.__defaultOriginPorts.has( 'tests.port' ) ).toBe(
+				false
+			);
+		} );
+
+		it( '__defaultOriginPorts is invisible to mergeConfigs and toEqual (regression guard for non-enumerable contract)', async () => {
+			const parsed = await parseConfig( '/test/gutenberg', '/cache' );
+
+			// JSON round-trip must drop the non-enumerable property.
+			const roundTripped = JSON.parse( JSON.stringify( parsed ) );
+			expect( roundTripped.__defaultOriginPorts ).toBeUndefined();
+
+			// `toEqual` against the publicly-known DEFAULT_CONFIG must still
+			// pass (i.e. Jest's deep-equal does not consider the
+			// non-enumerable property).
+			expect( parsed ).toEqual( DEFAULT_CONFIG );
+
+			// `Object.keys` / `for…in` / `Object.entries` must all skip it.
+			expect( Object.keys( parsed ) ).not.toContain(
+				'__defaultOriginPorts'
+			);
+		} );
 	} );
 } );

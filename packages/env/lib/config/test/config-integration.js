@@ -12,6 +12,7 @@ const { existsSync } = require( 'fs' );
 const loadConfig = require( '../load-config' );
 const detectDirectoryType = require( '../detect-directory-type' );
 const md5 = require( '../../md5' );
+const { findAvailablePort, isPortAvailable } = require( '../../port-utils' );
 
 jest.mock( 'fs', () => ( {
 	promises: {
@@ -22,6 +23,8 @@ jest.mock( 'fs', () => ( {
 	},
 	existsSync: jest.fn().mockReturnValue( false ),
 } ) );
+
+jest.mock( '../../port-utils' );
 
 // This mocks a small response with a format matching the stable-check API.
 // It makes getLatestWordPressVersion resolve to "100.0.0".
@@ -43,9 +46,17 @@ jest.mock( 'got', () =>
 jest.mock( '../detect-directory-type', () => jest.fn() );
 
 describe( 'Config Integration', () => {
+	// Save the inherited CI value so we can restore it after each test
+	// (the new tests below stomp on `process.env.CI` to assert the guard).
+	let originalCI;
+
 	beforeEach( () => {
 		process.env.WP_ENV_HOME = '/cache';
 		detectDirectoryType.mockResolvedValue( null );
+		originalCI = process.env.CI;
+		// Force-disable CI for tests that exercise the auto-fallback paths.
+		// Tests that need CI on opt back in explicitly.
+		delete process.env.CI;
 	} );
 
 	afterEach( () => {
@@ -55,6 +66,13 @@ describe( 'Config Integration', () => {
 		delete process.env.WP_ENV_TESTS_PORT;
 		delete process.env.WP_ENV_TESTS_MYSQL_PORT;
 		delete process.env.WP_ENV_LIFECYCLE_SCRIPT_AFTER_START;
+		// Restore the inherited CI value, if any.
+		if ( originalCI === undefined ) {
+			delete process.env.CI;
+		} else {
+			process.env.CI = originalCI;
+		}
+		jest.clearAllMocks();
 	} );
 
 	it( 'should use default configuration', async () => {
@@ -202,6 +220,169 @@ describe( 'Config Integration', () => {
 			'test'
 		);
 		expect( config ).toMatchSnapshot();
+	} );
+
+	describe( 'auto-port fallback (tri-state autoPort)', () => {
+		const stubSpinner = () => ( {
+			text: '',
+			info: jest.fn(),
+			start: jest.fn(),
+			fail: jest.fn(),
+			warn: jest.fn(),
+			stop: jest.fn(),
+		} );
+
+		it( 'with no user autoPort and busy default port falls back via defaults-only mode (AC1)', async () => {
+			readFile.mockImplementation( async () => {
+				throw { code: 'ENOENT' };
+			} );
+
+			// Default port 8888 is busy; the resolver should hand back 8890.
+			findAvailablePort.mockImplementation( ( { preferredPort } ) => {
+				if ( preferredPort === 8888 ) {
+					return Promise.resolve( 8890 );
+				}
+				return Promise.resolve( preferredPort );
+			} );
+
+			const config = await loadConfig( '/test/gutenberg', null, {
+				resolvePorts: true,
+				spinner: stubSpinner(),
+			} );
+
+			expect( config.env.development.port ).toEqual( 8890 );
+			expect( config.env.development.config.WP_HOME ).toEqual(
+				'http://localhost:8890'
+			);
+			expect( config.env.development.config.WP_SITEURL ).toEqual(
+				'http://localhost:8890'
+			);
+		} );
+
+		it( 'with autoPort:false in user config skips fallback even on default ports (AC5)', async () => {
+			readFile.mockImplementation( async ( fileName ) => {
+				if ( fileName === '/test/gutenberg/.wp-env.json' ) {
+					return JSON.stringify( { autoPort: false } );
+				}
+				throw { code: 'ENOENT' };
+			} );
+
+			findAvailablePort.mockResolvedValue( 8890 );
+
+			const config = await loadConfig( '/test/gutenberg', null, {
+				resolvePorts: true,
+				spinner: stubSpinner(),
+			} );
+
+			// autoPort:false forces 'off' mode, so the auto-fallback path
+			// (`findAvailablePort`) is never called. The default port stays
+			// as configured; any port-busy error surfaces later at the
+			// Docker bind layer with the existing message.
+			expect( findAvailablePort ).not.toHaveBeenCalled();
+			expect( config.env.development.port ).toEqual( 8888 );
+		} );
+
+		it( 'with CI=1 disables fallback regardless of autoPort:true in user config (AC6 + AC8 regression detector)', async () => {
+			process.env.CI = '1';
+
+			readFile.mockImplementation( async ( fileName ) => {
+				if ( fileName === '/test/gutenberg/.wp-env.json' ) {
+					return JSON.stringify( { autoPort: true } );
+				}
+				throw { code: 'ENOENT' };
+			} );
+
+			// Mock both port-utils functions so we can detect which path
+			// (if any) was taken. Strict path uses isPortAvailable;
+			// auto-fallback path uses findAvailablePort.
+			findAvailablePort.mockResolvedValue( 8890 );
+			isPortAvailable.mockResolvedValue( true );
+
+			const config = await loadConfig( '/test/gutenberg', null, {
+				resolvePorts: true,
+				spinner: stubSpinner(),
+			} );
+
+			// AC8 regression detector: even with autoPort:true the CI guard
+			// forces 'off' mode, so the resolver is not created at all and
+			// the auto-fallback path (`findAvailablePort`) is never called.
+			// Removing the `if ( process.env.CI )` guard in load-config.js
+			// would call findAvailablePort and fail this expectation.
+			expect( findAvailablePort ).not.toHaveBeenCalled();
+			// Default port stays as configured because no resolver fired.
+			expect( config.env.development.port ).toEqual( 8888 );
+		} );
+
+		it( 'with CI=1 disables fallback even when autoPort is unset (AC6)', async () => {
+			process.env.CI = '1';
+
+			readFile.mockImplementation( async () => {
+				throw { code: 'ENOENT' };
+			} );
+
+			findAvailablePort.mockResolvedValue( 8890 );
+
+			const config = await loadConfig( '/test/gutenberg', null, {
+				resolvePorts: true,
+				spinner: stubSpinner(),
+			} );
+
+			// CI guard short-circuits the new defaults-only mode.
+			expect( findAvailablePort ).not.toHaveBeenCalled();
+			expect( config.env.development.port ).toEqual( 8888 );
+		} );
+
+		it( 'with CLI autoPort=true and user config autoPort=false has CLI win (AC4 precedence)', async () => {
+			readFile.mockImplementation( async ( fileName ) => {
+				if ( fileName === '/test/gutenberg/.wp-env.json' ) {
+					return JSON.stringify( { autoPort: false } );
+				}
+				throw { code: 'ENOENT' };
+			} );
+
+			findAvailablePort.mockImplementation( ( { preferredPort } ) => {
+				if ( preferredPort === 8888 ) {
+					return Promise.resolve( 8890 );
+				}
+				return Promise.resolve( preferredPort );
+			} );
+
+			const config = await loadConfig( '/test/gutenberg', null, {
+				resolvePorts: true,
+				autoPort: true,
+				spinner: stubSpinner(),
+			} );
+
+			// CLI true wins over config false → fallback fired.
+			expect( config.env.development.port ).toEqual( 8890 );
+		} );
+
+		it( 'with CLI autoPort=true and explicit user port falls back when port is busy (AC4 behavior-level)', async () => {
+			readFile.mockImplementation( async ( fileName ) => {
+				if ( fileName === '/test/gutenberg/.wp-env.json' ) {
+					return JSON.stringify( { port: 9000 } );
+				}
+				throw { code: 'ENOENT' };
+			} );
+
+			findAvailablePort.mockImplementation( ( { preferredPort } ) => {
+				if ( preferredPort === 9000 ) {
+					return Promise.resolve( 9001 );
+				}
+				return Promise.resolve( preferredPort );
+			} );
+
+			const config = await loadConfig( '/test/gutenberg', null, {
+				resolvePorts: true,
+				autoPort: true,
+				spinner: stubSpinner(),
+			} );
+
+			expect( config.env.development.port ).toEqual( 9001 );
+			expect( config.env.development.config.WP_HOME ).toEqual(
+				'http://localhost:9001'
+			);
+		} );
 	} );
 
 	describe( 'cache directory naming', () => {
