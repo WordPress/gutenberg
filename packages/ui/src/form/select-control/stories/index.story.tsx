@@ -20,6 +20,22 @@ export default meta;
 
 type Story = StoryObj< typeof SelectControl >;
 
+const defaultItems = [
+	{
+		value: '',
+		label: 'Select',
+		disabled: true,
+	},
+	{
+		value: '1',
+		label: 'Item 1',
+	},
+	{
+		value: '2',
+		label: 'Item 2',
+	},
+];
+
 /**
  * When showing a "placeholder" item, prefer a concise label such as "Select"
  * without a trailing ellipsis. By default, items with an empty string value
@@ -29,24 +45,10 @@ type Story = StoryObj< typeof SelectControl >;
  */
 export const Default: Story = {
 	args: {
-		items: [
-			{
-				value: '',
-				label: 'Select',
-				disabled: true,
-			},
-			{
-				value: '1',
-				label: 'Item 1',
-			},
-			{
-				value: '2',
-				label: 'Item 2',
-			},
-		],
+		items: defaultItems,
 		label: 'Label',
 		description: 'This is the description.',
-		defaultValue: '',
+		defaultValue: defaultItems[ 0 ],
 	},
 };
 
@@ -68,26 +70,45 @@ export const WithDetails: Story = {
 	},
 };
 
+const disabledOptionItems = [
+	{
+		value: '1',
+		label: 'Item 1',
+	},
+	{
+		value: '2',
+		label: 'Item 2',
+		disabled: true,
+	},
+];
+
 export const WithDisabledOption: Story = {
 	args: {
-		items: [
-			{
-				value: '1',
-				label: 'Item 1',
-			},
-			{
-				value: '2',
-				label: 'Item 2',
-				disabled: true,
-			},
-		],
+		items: disabledOptionItems,
 		label: 'Label',
 		description: 'This is the description.',
-		defaultValue: '1',
+		defaultValue: disabledOptionItems[ 0 ],
 	},
 };
 
-const User = ( { uuid }: { uuid: string } ) => (
+const userOptions = [
+	{
+		value: '1',
+		label: 'User 1 (Admin)',
+	},
+	{
+		value: '2',
+		label: 'User 2 (Editor)',
+	},
+	{
+		value: '3',
+		label: 'User 3 (Author)',
+	},
+];
+
+type UserOption = ( typeof userOptions )[ number ];
+
+const User = ( { user }: { user: UserOption } ) => (
 	<span
 		style={ {
 			display: 'flex',
@@ -96,14 +117,14 @@ const User = ( { uuid }: { uuid: string } ) => (
 		} }
 	>
 		<img
-			src={ `https://gravatar.com/avatar/?d=initials&initials=U${ uuid }` }
+			src={ `https://gravatar.com/avatar/?d=initials&name=${ user.value }` }
 			alt=""
 			width="20"
 			style={ {
 				borderRadius: '50%',
 			} }
 		/>
-		{ `User ${ uuid }` }
+		{ user.label }
 	</span>
 );
 
@@ -118,23 +139,24 @@ const User = ( { uuid }: { uuid: string } ) => (
  */
 export const WithCustomTriggerAndItems: Story = {
 	args: {
+		items: userOptions,
 		label: 'Label',
 		description: 'This is the description.',
-		triggerContent: ( value: string ) => <User uuid={ value } />,
+		triggerContent: ( item ) => <User user={ item } />,
 		children: (
 			<>
-				{ [ '1', '2', '3' ].map( ( item ) => (
+				{ userOptions.map( ( item ) => (
 					<SelectControl.Item
-						key={ item }
+						key={ item.value }
 						value={ item }
-						label={ `User ${ item }` }
+						label={ item.label }
 					>
-						<User uuid={ item } />
+						<User user={ item } />
 					</SelectControl.Item>
 				) ) }
 			</>
 		),
-		defaultValue: '1',
+		defaultValue: userOptions[ 0 ],
 	},
 };
 
@@ -153,7 +175,7 @@ export const WithItemsArrayAndPartialCustomization: Story = {
 				{ Default.args?.items?.map( ( item ) => (
 					<SelectControl.Item
 						key={ item.value }
-						value={ item.value }
+						value={ item }
 						label={ item.label }
 						disabled={ item.disabled }
 					>

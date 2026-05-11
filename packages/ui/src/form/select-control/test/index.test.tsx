@@ -83,8 +83,8 @@ describe( 'SelectControl', () => {
 			<SelectControl
 				label="Country"
 				items={ mockItems }
-				defaultValue="option1"
-				triggerContent={ ( value ) => `Selected ${ value }` }
+				defaultValue={ mockItems[ 1 ] }
+				triggerContent={ ( item ) => `Selected ${ item.label }` }
 			/>
 		);
 
@@ -92,7 +92,7 @@ describe( 'SelectControl', () => {
 			name: 'Country',
 		} );
 
-		expect( trigger ).toHaveTextContent( 'Selected option1' );
+		expect( trigger ).toHaveTextContent( 'Selected Option 1' );
 
 		await user.click( trigger );
 		await user.click(
@@ -101,7 +101,7 @@ describe( 'SelectControl', () => {
 			} )
 		);
 
-		expect( trigger ).toHaveTextContent( 'Selected option2' );
+		expect( trigger ).toHaveTextContent( 'Selected Option 2' );
 	} );
 
 	describe( 'Form data behavior', () => {
@@ -161,7 +161,7 @@ describe( 'SelectControl', () => {
 						label="Country"
 						name="country"
 						items={ mockItems }
-						defaultValue=""
+						defaultValue={ mockItems[ 0 ] }
 					/>
 					<button type="submit">Submit</button>
 				</form>

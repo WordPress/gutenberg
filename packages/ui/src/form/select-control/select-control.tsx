@@ -41,7 +41,7 @@ export const SelectControl = forwardRef<
 							: items?.map( ( item ) => (
 									<Item
 										key={ item.value }
-										value={ item.value }
+										value={ item }
 										label={ item.label }
 										disabled={ item.disabled }
 									>

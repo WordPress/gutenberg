@@ -1,3 +1,4 @@
+import type React from 'react';
 import type { ControlProps } from '../types';
 import type {
 	SelectRootProps,
@@ -10,7 +11,10 @@ export type SelectItem = {
 	disabled?: boolean;
 };
 
-export type SelectControlProps = Omit< SelectRootProps, 'items' | 'inputRef' > &
+export type SelectControlProps = Omit<
+	SelectRootProps< SelectItem >,
+	'items' | 'inputRef'
+> &
 	ControlProps & {
 		/**
 		 * CSS class to apply.
@@ -24,15 +28,12 @@ export type SelectControlProps = Omit< SelectRootProps, 'items' | 'inputRef' > &
 		 * The custom trigger content to use instead of the default.
 		 *
 		 * ```jsx
-		 * triggerContent={ ( value ) => (
-		 *   <span>
-		 *     <Icon icon={ wordpress } />
-		 *     { value }
-		 *   </span>
-		 * ) }
+		 * triggerContent={ ( item ) => item.label }
 		 * ```
 		 */
-		triggerContent?: SelectTriggerProps[ 'children' ];
+		triggerContent?:
+			| ( ( item: SelectItem ) => React.ReactNode )
+			| React.ReactNode;
 		/**
 		 * The size of the control.
 		 *
