@@ -508,44 +508,65 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 		$this->assertSame( '1', $new_comment->comment_approved );
 	}
 
-	public function test_cannot_create_reaction_without_parent() {
-		wp_set_current_user( self::$editor_id );
+	/**
+	 * @dataProvider data_invalid_reaction_inputs
+	 *
+	 * @param string $parent_kind  One of 'none', 'note', or 'comment' — what the
+	 *                             reaction's `parent` field references.
+	 * @param string $content      The reaction storage key (slug) to submit.
+	 * @param bool   $authenticate Whether to set the current user before posting.
+	 * @param string $error_code   Expected WP_Error code on the REST response.
+	 * @param int    $status       Expected HTTP status code.
+	 */
+	public function test_cannot_create_reaction_with_invalid_input( $parent_kind, $content, $authenticate, $error_code, $status ) {
+		if ( $authenticate ) {
+			wp_set_current_user( self::$editor_id );
+		} else {
+			wp_set_current_user( 0 );
+		}
+
 		$post_id = self::factory()->post->create();
 
 		$params = array(
 			'post'    => $post_id,
 			'type'    => 'reaction',
-			'content' => 'heart',
-			'author'  => self::$editor_id,
+			'content' => $content,
 		);
+		if ( $authenticate ) {
+			$params['author'] = self::$editor_id;
+		}
+
+		if ( 'note' === $parent_kind ) {
+			$params['parent'] = $this->create_note( $post_id, self::$editor_id );
+		} elseif ( 'comment' === $parent_kind ) {
+			$params['parent'] = self::factory()->comment->create(
+				array(
+					'comment_post_ID' => $post_id,
+					'comment_type'    => 'comment',
+				)
+			);
+		}
+
+		// `create_note()` flips the current user; reset for the actual reaction request.
+		if ( $authenticate ) {
+			wp_set_current_user( self::$editor_id );
+		}
 
 		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
 		$request->add_header( 'Content-Type', 'application/json' );
 		$request->set_body( wp_json_encode( $params ) );
 		$response = rest_get_server()->dispatch( $request );
 
-		$this->assertErrorResponse( 'rest_comment_invalid_parent', $response, 400 );
+		$this->assertErrorResponse( $error_code, $response, $status );
 	}
 
-	public function test_cannot_create_reaction_with_invalid_emoji() {
-		wp_set_current_user( self::$editor_id );
-		$post_id = self::factory()->post->create();
-		$note_id = $this->create_note( $post_id, self::$editor_id );
-
-		$params = array(
-			'post'    => $post_id,
-			'type'    => 'reaction',
-			'parent'  => $note_id,
-			'content' => 'invalid_emoji',
-			'author'  => self::$editor_id,
+	public function data_invalid_reaction_inputs() {
+		return array(
+			'no parent'                    => array( 'none', 'heart', true, 'rest_comment_invalid_parent', 400 ),
+			'parent is a regular comment'  => array( 'comment', 'heart', true, 'rest_comment_invalid_parent', 400 ),
+			'content is not in emoji list' => array( 'note', 'invalid_emoji', true, 'rest_comment_invalid_reaction', 400 ),
+			'anonymous user'               => array( 'none', 'heart', false, 'rest_comment_login_required', 401 ),
 		);
-
-		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
-		$request->add_header( 'Content-Type', 'application/json' );
-		$request->set_body( wp_json_encode( $params ) );
-		$response = rest_get_server()->dispatch( $request );
-
-		$this->assertErrorResponse( 'rest_comment_invalid_reaction', $response, 400 );
 	}
 
 	public function test_cannot_create_duplicate_reaction() {
@@ -596,50 +617,6 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 			$response = rest_get_server()->dispatch( $request );
 			$this->assertSame( 201, $response->get_status() );
 		}
-	}
-
-	public function test_cannot_create_reaction_on_regular_comment() {
-		wp_set_current_user( self::$editor_id );
-		$post_id    = self::factory()->post->create();
-		$comment_id = self::factory()->comment->create(
-			array(
-				'comment_post_ID' => $post_id,
-				'comment_type'    => 'comment',
-			)
-		);
-
-		$params = array(
-			'post'    => $post_id,
-			'type'    => 'reaction',
-			'parent'  => $comment_id,
-			'content' => 'heart',
-			'author'  => self::$editor_id,
-		);
-
-		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
-		$request->add_header( 'Content-Type', 'application/json' );
-		$request->set_body( wp_json_encode( $params ) );
-		$response = rest_get_server()->dispatch( $request );
-
-		$this->assertErrorResponse( 'rest_comment_invalid_parent', $response, 400 );
-	}
-
-	public function test_create_reaction_requires_login() {
-		wp_set_current_user( 0 );
-		$post_id = self::factory()->post->create();
-
-		$params = array(
-			'post'    => $post_id,
-			'type'    => 'reaction',
-			'content' => 'heart',
-		);
-
-		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
-		$request->add_header( 'Content-Type', 'application/json' );
-		$request->set_body( wp_json_encode( $params ) );
-		$response = rest_get_server()->dispatch( $request );
-
-		$this->assertErrorResponse( 'rest_comment_login_required', $response, 401 );
 	}
 
 	/**
