@@ -9,6 +9,7 @@ import { __ } from '@wordpress/i18n';
 import StateControl from '../components/global-styles/state-control';
 import StateControlBadges from '../components/global-styles/state-control-badges';
 import { BlockCardControlsFill } from '../components/block-card';
+import { useToolsPanelDropdownMenuProps } from '../components/global-styles/utils';
 
 export const PSEUDO_STATE_LABELS = {
 	':hover': __( 'Hover' ),
@@ -47,6 +48,7 @@ function getStateOptions( name ) {
  */
 export function BlockStatesControl( { name, value, onChange } ) {
 	const stateOptions = getStateOptions( name );
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	if ( ! stateOptions.length ) {
 		return null;
@@ -58,6 +60,7 @@ export function BlockStatesControl( { name, value, onChange } ) {
 				pseudoStates={ stateOptions }
 				pseudoStateValue={ value }
 				onChangePseudoState={ onChange }
+				popoverProps={ dropdownMenuProps.popoverProps }
 				showText={ false }
 			/>
 		</BlockCardControlsFill>
