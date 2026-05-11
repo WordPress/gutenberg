@@ -1,14 +1,36 @@
 == Changelog ==
 
-= 23.1.0-rc.1 =
+= 23.1.1 =
+
+
+## Changelog
+
+### Bug Fixes
+
+#### Components
+- Style Runtime: Support CSS module style injection across documents. ([77965](https://github.com/WordPress/gutenberg/pull/77965))
+
+
+
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@mirka
+
+
+= 23.1.0 =
 
 ## Changelog
 
 ### Features
 
-#### Post Editor
-
 - Upload Media: Enable concurrent sideload uploads. ([75888](https://github.com/WordPress/gutenberg/pull/75888))
+- Experimental Image Cropper: Tweak the keyboard interactions with drag handles and canvas. ([77639](https://github.com/WordPress/gutenberg/pull/77639))
+- Admin UI: Change default heading level from h2 to h1. ([77617](https://github.com/WordPress/gutenberg/pull/77617))
+- Core Data: Remove redundant memoization wrapper from 'getQueriedItems'. ([77483](https://github.com/WordPress/gutenberg/pull/77483))
+- I18N: Polyfill script module translations for WordPress < 7.0. ([77214](https://github.com/WordPress/gutenberg/pull/77214))
 
 ### Enhancements
 
@@ -53,22 +75,6 @@
 - Embed: Restore paragraph with URL when undoing paste-to-embed transform. ([77551](https://github.com/WordPress/gutenberg/pull/77551))
 - UI: Add `Autocomplete` primitive. ([77642](https://github.com/WordPress/gutenberg/pull/77642))
 
-#### Media
-
-- Experimental Image Cropper: Tweak the keyboard interactions with drag handles and canvas. ([77639](https://github.com/WordPress/gutenberg/pull/77639))
-
-#### Site Editor
-
-- Admin UI: Change default heading level from h2 to h1. ([77617](https://github.com/WordPress/gutenberg/pull/77617))
-
-#### Data Layer
-
-- Core Data: Remove redundant memoization wrapper from 'getQueriedItems'. ([77483](https://github.com/WordPress/gutenberg/pull/77483))
-
-#### Script Modules API
-
-- I18N: Polyfill script module translations for WordPress < 7.0. ([77214](https://github.com/WordPress/gutenberg/pull/77214))
-
 ### New APIs
 
 - Add `@wordpress/grid` package. ([77562](https://github.com/WordPress/gutenberg/pull/77562))
@@ -91,6 +97,7 @@
 - Layout: Ensure layout classnames are applied to the inner blocks wrapper and not to its siblings. ([77408](https://github.com/WordPress/gutenberg/pull/77408))
 - Global Styles: Fix pseudo selector block style rendering in the editor. ([76879](https://github.com/WordPress/gutenberg/pull/76879))
 - Data Layer: Media — move image output format filtering to upload response. ([75793](https://github.com/WordPress/gutenberg/pull/75793))
+- Media Upload Modal: Fix pagination and search. ([77872](https://github.com/WordPress/gutenberg/pull/77872))
 
 #### Block Library
 
@@ -140,8 +147,12 @@
 
 - RTC: Fix "Connection Lost" dialog when too many entities are loaded. ([77631](https://github.com/WordPress/gutenberg/pull/77631))
 - RTC: Fix connection-lost error on large updates caused by mismatch between update size bounds check and expanded base64 update size. ([77669](https://github.com/WordPress/gutenberg/pull/77669))
+- RTC: Fix divergence when two offline users reconnect. ([77980](https://github.com/WordPress/gutenberg/pull/77980))
 
 ### Accessibility
+
+- Revisions: Improve screen reader accessibility for diff markers region and slider. ([77660](https://github.com/WordPress/gutenberg/pull/77660))
+- Fix accessibility issues in admin Font Library. ([77482](https://github.com/WordPress/gutenberg/pull/77482))
 
 #### Connectors
 
@@ -153,20 +164,13 @@
 - CollapsibleCard: Fix missing keyboard focus ring on the header chevron icon when rendered inside wp-admin. ([77468](https://github.com/WordPress/gutenberg/pull/77468))
 - Tabs: Fix missing keyboard focus ring on the panel in Windows High Contrast mode when rendered inside wp-admin. ([77469](https://github.com/WordPress/gutenberg/pull/77469))
 
-#### Post Editor
-
-- Revisions: Improve screen reader accessibility for diff markers region and slider. ([77660](https://github.com/WordPress/gutenberg/pull/77660))
-
-#### Font Library
-
-- Fix accessibility issues in admin Font Library. ([77482](https://github.com/WordPress/gutenberg/pull/77482))
-
 ### Performance
 
 #### Post Editor
 
 - Notes: Extract floating notes state into a dedicated store. ([77424](https://github.com/WordPress/gutenberg/pull/77424))
 - Notes: Reduce passes in useBlockComments memo and rename outputs. ([77440](https://github.com/WordPress/gutenberg/pull/77440))
+- RTC: Attach sync observers after hydrating persisted CRDT doc. ([77966](https://github.com/WordPress/gutenberg/pull/77966))
 
 ### Experiments
 
@@ -186,6 +190,8 @@
 - Taxonomies: Warn when editing an existing taxonomy's slug. ([77527](https://github.com/WordPress/gutenberg/pull/77527))
 - User Taxonomies: REST controller. ([77697](https://github.com/WordPress/gutenberg/pull/77697))
 - User Taxonomies: Show Public field in create/edit form. ([77802](https://github.com/WordPress/gutenberg/pull/77802))
+- Disable Classic block: Control inserter support via filter. ([77845](https://github.com/WordPress/gutenberg/pull/77845))
+- Register `gutenberg-dashboard-widgets` flag. ([77569](https://github.com/WordPress/gutenberg/pull/77569))
 
 #### Media
 
@@ -210,15 +216,14 @@
 
 - Disable TinyMCE: Warn instead of redirecting directly. ([77747](https://github.com/WordPress/gutenberg/pull/77747))
 - Site Logo Block: Enable the media editor modal experiment for the crop button. ([77548](https://github.com/WordPress/gutenberg/pull/77548))
+- Classic Block: Unwrap experiment to hide it from inserter. ([77911](https://github.com/WordPress/gutenberg/pull/77911))
+- Disable Classic block: Always register, hide from inserter conditionally. ([77840](https://github.com/WordPress/gutenberg/pull/77840))
+- Disable TinyMCE: Repurpose experiment as Classic block removal. ([77838](https://github.com/WordPress/gutenberg/pull/77838))
 
 #### Post Editor
 
 - Image Editor experiment: Pass theme aspect ratios to media editor. ([77665](https://github.com/WordPress/gutenberg/pull/77665))
 - Media Editor Modal: Add a media editor modal experiment. ([77480](https://github.com/WordPress/gutenberg/pull/77480))
-
-#### Plugin
-
-- Register `gutenberg-dashboard-widgets` flag. ([77569](https://github.com/WordPress/gutenberg/pull/77569))
 
 ### Documentation
 
@@ -240,6 +245,11 @@
 - Media editor: Remove unused dependency. ([77438](https://github.com/WordPress/gutenberg/pull/77438))
 - Blocks: Port over type information for `@wordpress/blocks` from DefinitelyTyped. ([77393](https://github.com/WordPress/gutenberg/pull/77393), [77437](https://github.com/WordPress/gutenberg/pull/77437))
 - Refactor: Migrate `tests/unit` to npm workspace `@wordpress/unit-tests`. ([77063](https://github.com/WordPress/gutenberg/pull/77063))
+- Experiments: Declare `@wordpress/base-styles` dependency. ([77684](https://github.com/WordPress/gutenberg/pull/77684))
+- Data: Export and consolidate `onSubKey` helper. ([77364](https://github.com/WordPress/gutenberg/pull/77364))
+- Remove `ZebulanStanphill` from `CODEOWNERS`. ([77586](https://github.com/WordPress/gutenberg/pull/77586))
+- ESLint Plugin: Recommend `EmptyState` from `@wordpress/ui`. ([77765](https://github.com/WordPress/gutenberg/pull/77765))
+- Experiments: Rebuild the wp-admin Experiments screen on the `wp-build` routes pattern. ([77443](https://github.com/WordPress/gutenberg/pull/77443))
 
 #### Components
 
@@ -284,18 +294,6 @@
 - Edit Site: Move show-icon-labels handling to specific edit-site call sites. ([77287](https://github.com/WordPress/gutenberg/pull/77287))
 - EditSite: Remove unused CSS rule. ([77494](https://github.com/WordPress/gutenberg/pull/77494))
 
-#### Plugin
-
-- Experiments: Declare `@wordpress/base-styles` dependency. ([77684](https://github.com/WordPress/gutenberg/pull/77684))
-
-#### Data Layer
-
-- Data: Export and consolidate `onSubKey` helper. ([77364](https://github.com/WordPress/gutenberg/pull/77364))
-
-### Tools
-
-- Remove `ZebulanStanphill` from `CODEOWNERS`. ([77586](https://github.com/WordPress/gutenberg/pull/77586))
-
 #### Build Tooling
 
 - Build: Skip sourcemaps for WASM-inlined script module workers. ([75993](https://github.com/WordPress/gutenberg/pull/75993))
@@ -314,13 +312,13 @@
 - Tests: Remove duplicate mentions spec. ([77593](https://github.com/WordPress/gutenberg/pull/77593))
 - e2e: Shorten visit-site-editor canvas-loader visible wait. ([77725](https://github.com/WordPress/gutenberg/pull/77725))
 
-#### Components
+### Tools
 
-- ESLint Plugin: Recommend `EmptyState` from `@wordpress/ui`. ([77765](https://github.com/WordPress/gutenberg/pull/77765))
+#### Testing
 
-#### Plugin
-
-- Experiments: Rebuild the wp-admin Experiments screen on the `wp-build` routes pattern. ([77443](https://github.com/WordPress/gutenberg/pull/77443))
+- Connectors: Stop end-to-end capability restriction from leaking across specs. ([77857](https://github.com/WordPress/gutenberg/pull/77857))
+- Fix PHP multisite tests. ([77825](https://github.com/WordPress/gutenberg/pull/77825))
+- RTC: Fix compaction unit test. ([77986](https://github.com/WordPress/gutenberg/pull/77986))
 
 ## First-time contributors
 
@@ -337,7 +335,7 @@ The following PRs were merged by first-time contributors:
 
 The following contributors merged PRs in this release:
 
-@adamsilverstein @Adi-ty @adithya-naik @aduth @alecgeatches @amitraj2203 @andrewserong @CGastrell @ciampo @danluu @DarkMatter-999 @dpmehta @glendaviesnz @gziolo @hbhalodia @hi0001234d @himanshupathak95 @jameskoster @jorgefilipecosta @joshualip-plaudit @jsnajdr @juanmaguitar @kraftbj @Mamaduka @manzoorwanijk @mcsf @mikachan @mirka @Mustafabharmal @ntsekouras @peterwilsoncc @R1shabh-Gupta @rajanarahul93 @ramonjd @retrofox @SainathPoojary @shrivastavanolo @simison @Soean @t-hamano @Takshil-Kunadia @tellthemachines @tyxla @USERSATOSHI @vishnupprajapat @westonruter @wwahammy @yogeshbhutkar @ZebulanStanphill
+@adamsilverstein @Adi-ty @adithya-naik @aduth @alecgeatches @amitraj2203 @andrewserong @CGastrell @ciampo @danluu @DarkMatter-999 @dpmehta @ellatrix @glendaviesnz @gziolo @hbhalodia @hi0001234d @himanshupathak95 @jameskoster @jorgefilipecosta @joshualip-plaudit @jsnajdr @juanmaguitar @kraftbj @Mamaduka @manzoorwanijk @mcsf @mikachan @mirka @Mustafabharmal @ntsekouras @peterwilsoncc @R1shabh-Gupta @rajanarahul93 @ramonjd @retrofox @SainathPoojary @shrivastavanolo @simison @Soean @t-hamano @Takshil-Kunadia @tellthemachines @tyxla @USERSATOSHI @vishnupprajapat @westonruter @wwahammy @yogeshbhutkar @yuliyan @ZebulanStanphill
 
 
 = 23.0.1 =

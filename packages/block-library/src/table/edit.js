@@ -24,7 +24,7 @@ import {
 	__experimentalUseBorderProps as useBorderProps,
 	useBlockEditingMode,
 } from '@wordpress/block-editor';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import {
 	Button,
 	Placeholder,
@@ -91,8 +91,8 @@ const cellAriaLabel = {
 };
 
 const placeholder = {
-	head: __( 'Header label' ),
-	foot: __( 'Footer label' ),
+	head: _x( 'Header label', 'table header' ),
+	foot: _x( 'Footer label', 'table footer' ),
 };
 
 function TSection( { name, ...props } ) {

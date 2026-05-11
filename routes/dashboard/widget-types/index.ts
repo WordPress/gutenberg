@@ -1,9 +1,4 @@
 /**
- * Store
- */
-export { store } from './store';
-
-/**
  * Hooks
  */
 export { useWidgetTypes } from './hooks';
