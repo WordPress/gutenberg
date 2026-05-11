@@ -70,10 +70,12 @@ test.describe( 'data-wp-on-window', () => {
 	} ) => {
 		const resizeHandler = page.getByTestId( 'resizeHandler' );
 		const resizeSecondHandler = page.getByTestId( 'resizeSecondHandler' );
+		const resizeThirdHandler = page.getByTestId( 'resizeThirdHandler' );
 
 		// Initial value.
 		await expect( resizeHandler ).toHaveText( 'no' );
 		await expect( resizeSecondHandler ).toHaveText( 'no' );
+		await expect( resizeThirdHandler ).toHaveText( 'no' );
 
 		// Make sure the event listener is attached.
 		await page
@@ -85,5 +87,6 @@ test.describe( 'data-wp-on-window', () => {
 		await page.setViewportSize( { width: 600, height: 600 } );
 		await expect( resizeHandler ).toHaveText( 'yes' );
 		await expect( resizeSecondHandler ).toHaveText( 'yes' );
+		await expect( resizeThirdHandler ).toHaveText( 'yes' );
 	} );
 } );

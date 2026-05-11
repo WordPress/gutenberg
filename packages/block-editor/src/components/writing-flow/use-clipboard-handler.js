@@ -137,6 +137,7 @@ export default function useClipboardHandler() {
 				const {
 					__experimentalCanUserUseUnfilteredHTML:
 						canUserUseUnfilteredHTML,
+					mediaUpload,
 				} = getSettings();
 				const isInternal =
 					event.clipboardData.getData( 'rich-text' ) === 'true';
@@ -148,6 +149,11 @@ export default function useClipboardHandler() {
 				let blocks = [];
 
 				if ( files.length ) {
+					if ( ! mediaUpload ) {
+						event.preventDefault();
+						return;
+					}
+
 					const fromTransforms = getBlockTransforms( 'from' );
 					blocks = files
 						.reduce( ( accumulator, file ) => {

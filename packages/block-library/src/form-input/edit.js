@@ -14,14 +14,24 @@ import {
 	__experimentalUseBorderProps as useBorderProps,
 	__experimentalUseColorProps as useColorProps,
 } from '@wordpress/block-editor';
-import { PanelBody, TextControl, CheckboxControl } from '@wordpress/components';
-
+import {
+	TextControl,
+	CheckboxControl,
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
+} from '@wordpress/components';
 import { useRef } from '@wordpress/element';
+
+/**
+ * Internal dependencies
+ */
+import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 function InputFieldBlock( { attributes, setAttributes, className } ) {
 	const { type, name, label, inlineLabel, required, placeholder, value } =
 		attributes;
 	const blockProps = useBlockProps();
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 	const ref = useRef();
 	const TagName = type === 'textarea' ? 'textarea' : 'input';
 
@@ -38,36 +48,61 @@ function InputFieldBlock( { attributes, setAttributes, className } ) {
 		<>
 			{ 'hidden' !== type && (
 				<InspectorControls>
-					<PanelBody title={ __( 'Settings' ) }>
+					<ToolsPanel
+						label={ __( 'Settings' ) }
+						resetAll={ () => {
+							setAttributes( {
+								inlineLabel: false,
+								required: false,
+							} );
+						} }
+						dropdownMenuProps={ dropdownMenuProps }
+					>
 						{ 'checkbox' !== type && (
-							<CheckboxControl
-								__nextHasNoMarginBottom
+							<ToolsPanelItem
 								label={ __( 'Inline label' ) }
-								checked={ inlineLabel }
+								hasValue={ () => !! inlineLabel }
+								onDeselect={ () =>
+									setAttributes( { inlineLabel: false } )
+								}
+								isShownByDefault
+							>
+								<CheckboxControl
+									label={ __( 'Inline label' ) }
+									checked={ inlineLabel }
+									onChange={ ( newVal ) => {
+										setAttributes( {
+											inlineLabel: newVal,
+										} );
+									} }
+								/>
+							</ToolsPanelItem>
+						) }
+
+						<ToolsPanelItem
+							label={ __( 'Required' ) }
+							hasValue={ () => !! required }
+							onDeselect={ () =>
+								setAttributes( { required: false } )
+							}
+							isShownByDefault
+						>
+							<CheckboxControl
+								label={ __( 'Required' ) }
+								checked={ required }
 								onChange={ ( newVal ) => {
 									setAttributes( {
-										inlineLabel: newVal,
+										required: newVal,
 									} );
 								} }
 							/>
-						) }
-						<CheckboxControl
-							__nextHasNoMarginBottom
-							label={ __( 'Required' ) }
-							checked={ required }
-							onChange={ ( newVal ) => {
-								setAttributes( {
-									required: newVal,
-								} );
-							} }
-						/>
-					</PanelBody>
+						</ToolsPanelItem>
+					</ToolsPanel>
 				</InspectorControls>
 			) }
 			<InspectorControls group="advanced">
 				<TextControl
 					__next40pxDefaultSize
-					__nextHasNoMarginBottom
 					autoComplete="off"
 					label={ __( 'Name' ) }
 					value={ name }
@@ -80,6 +115,20 @@ function InputFieldBlock( { attributes, setAttributes, className } ) {
 						'Affects the "name" attribute of the input element, and is used as a name for the form submission results.'
 					) }
 				/>
+				{ 'hidden' === type && (
+					<TextControl
+						__next40pxDefaultSize
+						autoComplete="off"
+						label={ __( 'Value' ) }
+						value={ value }
+						onChange={ ( newVal ) =>
+							setAttributes( { value: newVal } )
+						}
+						help={ __(
+							'Sets the stored value for this hidden field.'
+						) }
+					/>
+				) }
 			</InspectorControls>
 		</>
 	);
@@ -98,23 +147,13 @@ function InputFieldBlock( { attributes, setAttributes, className } ) {
 
 	if ( 'hidden' === type ) {
 		return (
-			<>
+			<div { ...blockProps }>
 				{ controls }
-				<input
-					type="hidden"
-					className={ clsx(
-						className,
-						'wp-block-form-input__input',
-						colorProps.className,
-						borderProps.className
-					) }
-					aria-label={ __( 'Value' ) }
-					value={ value }
-					onChange={ ( event ) =>
-						setAttributes( { value: event.target.value } )
-					}
+				<span
+					className="wp-block-form-input__label is-input-hidden"
+					data-message={ __( 'Hidden field' ) }
 				/>
-			</>
+			</div>
 		);
 	}
 

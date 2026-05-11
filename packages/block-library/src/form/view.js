@@ -7,8 +7,6 @@ try {
 	);
 } catch {}
 
-// eslint-disable-next-line eslint-comments/disable-enable-pair
-/* eslint-disable no-undef */
 document.querySelectorAll( 'form.wp-block-form' ).forEach( function ( form ) {
 	// Bail If the form settings not provided or the form is not using the mailto: action.
 	if (
@@ -49,7 +47,7 @@ document.querySelectorAll( 'form.wp-block-form' ).forEach( function ( form ) {
 			} else {
 				redirectNotification( 'error' );
 			}
-		} catch ( error ) {
+		} catch {
 			redirectNotification( 'error' );
 		}
 	} );

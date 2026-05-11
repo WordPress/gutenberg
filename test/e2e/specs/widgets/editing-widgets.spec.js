@@ -17,6 +17,14 @@ const test = base.extend( {
 } );
 
 test.describe( 'Widgets screen', () => {
+	test.beforeAll( async ( { requestUtils } ) => {
+		await Promise.all( [
+			// TODO: Ideally we can bundle our test theme directly in the repo.
+			requestUtils.activateTheme( 'twentytwenty' ),
+			requestUtils.deleteAllWidgets(),
+		] );
+	} );
+
 	test.beforeEach( async ( { admin, editor } ) => {
 		await admin.visitAdminPage( 'widgets.php' );
 
@@ -27,14 +35,6 @@ test.describe( 'Widgets screen', () => {
 
 	test.afterEach( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllWidgets();
-	} );
-
-	test.beforeAll( async ( { requestUtils } ) => {
-		await Promise.all( [
-			// TODO: Ideally we can bundle our test theme directly in the repo.
-			requestUtils.activateTheme( 'twentytwenty' ),
-			requestUtils.deleteAllWidgets(),
-		] );
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
@@ -162,6 +162,7 @@ test.describe( 'Widgets screen', () => {
 
 		const paragraphBlock = inlineQuickInserter.getByRole( 'option', {
 			name: 'Paragraph',
+			exact: true,
 		} );
 		await paragraphBlock.click();
 
@@ -214,7 +215,7 @@ test.describe( 'Widgets screen', () => {
 		await page.keyboard.type( 'Heading' );
 
 		await inlineQuickInserter
-			.getByRole( 'option', { name: 'Heading' } )
+			.getByRole( 'option', { name: 'Heading', exact: true } )
 			.click();
 
 		await expect(
@@ -573,7 +574,7 @@ test.describe( 'Widgets screen', () => {
 			.getByRole( 'document', { name: 'Block: Paragraph' } )
 			.filter( { hasText: 'Second Paragraph' } )
 			.focus();
-		await pageUtils.pressKeys( 'shift+Backspace' );
+		await pageUtils.pressKeys( 'access+z' );
 		await widgetsScreen.saveWidgets();
 
 		await expect.poll( widgetsScreen.getWidgetAreaBlocks ).toMatchObject( {
@@ -708,7 +709,10 @@ class WidgetsScreen {
 			} )
 			.fill( blockName );
 
-		return blockLibrary.getByRole( 'option', { name: blockName } );
+		return blockLibrary.getByRole( 'option', {
+			name: blockName,
+			exact: true,
+		} );
 	};
 
 	saveWidgets = async () => {

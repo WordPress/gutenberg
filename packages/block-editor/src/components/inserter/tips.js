@@ -29,9 +29,7 @@ const globalTips = [
 ];
 
 function Tips() {
-	const [ randomIndex ] = useState(
-		// Disable Reason: I'm not generating an HTML id.
-		// eslint-disable-next-line no-restricted-syntax
+	const [ randomIndex ] = useState( () =>
 		Math.floor( Math.random() * globalTips.length )
 	);
 

@@ -20,6 +20,8 @@ $block_core_latest_posts_excerpt_length = 0;
  *
  * @since 5.4.0
  *
+ * @global int $block_core_latest_posts_excerpt_length Excerpt length set by the Latest Posts core block.
+ *
  * @return int Returns the global $block_core_latest_posts_excerpt_length variable
  *             to allow the excerpt_length filter respect the Latest Block setting.
  */
@@ -32,6 +34,9 @@ function block_core_latest_posts_get_excerpt_length() {
  * Renders the `core/latest-posts` block on server.
  *
  * @since 5.0.0
+ *
+ * @global WP_Post $post                                   Global post object.
+ * @global int     $block_core_latest_posts_excerpt_length Excerpt length set by the Latest Posts core block.
  *
  * @param array $attributes The block attributes.
  *
@@ -158,7 +163,7 @@ function render_block_core_latest_posts( $attributes ) {
 					$trimmed_excerpt  = substr( $trimmed_excerpt, 0, -11 );
 					$trimmed_excerpt .= sprintf(
 						/* translators: 1: A URL to a post, 2: Hidden accessibility text: Post title */
-						__( '… <a class="wp-block-latest-posts__read-more" href="%1$s" rel="noopener noreferrer">Read more<span class="screen-reader-text">: %2$s</span></a>' ),
+						__( '… <a class="wp-block-latest-posts__read-more" href="%1$s" rel="noopener">Read more<span class="screen-reader-text">: %2$s</span></a>' ),
 						esc_url( $post_link ),
 						esc_html( $title )
 					);

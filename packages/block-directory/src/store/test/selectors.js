@@ -2,7 +2,8 @@
  * Internal dependencies
  */
 import {
-	blockList,
+	blockListIds,
+	blockListNameMap,
 	blockTypeInstalled,
 	blockTypeUnused,
 	downloadableBlock,
@@ -90,7 +91,10 @@ describe( 'selectors', () => {
 	describe( 'getNewBlockTypes', () => {
 		it( 'should retrieve the block types that are installed and in the post content', () => {
 			getNewBlockTypes.registry = {
-				select: jest.fn( () => ( { getBlocks: () => blockList } ) ),
+				select: jest.fn( () => ( {
+					getBlockName: ( clientId ) => blockListNameMap[ clientId ],
+					getClientIdsWithDescendants: () => blockListIds,
+				} ) ),
 			};
 			const state = {
 				blockManagement: {
@@ -107,7 +111,10 @@ describe( 'selectors', () => {
 
 		it( 'should return an empty array if no blocks are used', () => {
 			getNewBlockTypes.registry = {
-				select: jest.fn( () => ( { getBlocks: () => [] } ) ),
+				select: jest.fn( () => ( {
+					getBlockName: ( clientId ) => blockListNameMap[ clientId ],
+					getClientIdsWithDescendants: () => [],
+				} ) ),
 			};
 			const state = {
 				blockManagement: {
@@ -125,7 +132,10 @@ describe( 'selectors', () => {
 	describe( 'getUnusedBlockTypes', () => {
 		it( 'should retrieve the block types that are installed but not used', () => {
 			getUnusedBlockTypes.registry = {
-				select: jest.fn( () => ( { getBlocks: () => blockList } ) ),
+				select: jest.fn( () => ( {
+					getBlockName: ( clientId ) => blockListNameMap[ clientId ],
+					getClientIdsWithDescendants: () => blockListIds,
+				} ) ),
 			};
 			const state = {
 				blockManagement: {
@@ -142,7 +152,10 @@ describe( 'selectors', () => {
 
 		it( 'should return all block types if no blocks are used', () => {
 			getUnusedBlockTypes.registry = {
-				select: jest.fn( () => ( { getBlocks: () => [] } ) ),
+				select: jest.fn( () => ( {
+					getBlockName: ( clientId ) => blockListNameMap[ clientId ],
+					getClientIdsWithDescendants: () => [],
+				} ) ),
 			};
 			const state = {
 				blockManagement: {

@@ -1,3 +1,7 @@
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/breakpoints" as *;
+
 // Must equal $color-palette-circle-size from:
 // @wordpress/components/src/circular-option-picker/style.scss
 $swatch-size: 28px;
@@ -10,6 +14,11 @@ $swatch-gap: 12px;
 }
 
 .block-editor-color-gradient-control__fieldset {
+	// Reset `fieldset` browser defaults.
+	border: 0;
+	padding: 0;
+	margin: 0;
+
 	// Prevents the `fieldset` from growing beyond its parent's size
 	// in order to fit its content.
 	min-width: 0;
@@ -40,6 +49,11 @@ $swatch-gap: 12px;
 }
 
 .block-editor-panel-color-gradient-settings__dropdown-content {
+	// Set minimum height to prevent content from being squashed when
+	// the popover is triggered near the bottom of the page, and flip
+	// the position accordingly.
+	min-height: 160px;
+
 	.block-editor-color-gradient-control__panel {
 		$panelPadding: $grid-unit-20;
 
@@ -129,8 +143,9 @@ $swatch-gap: 12px;
 	top: $grid-unit;
 	margin: auto $grid-unit auto;
 	opacity: 0;
-	transition: opacity 0.1s ease-in-out;
-	@include reduce-motion("transition");
+	@media not ( prefers-reduced-motion ) {
+		transition: opacity 0.1s ease-in-out;
+	}
 
 	&.block-editor-panel-color-gradient-settings__reset {
 		border-radius: $radius-small;

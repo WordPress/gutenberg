@@ -46,7 +46,7 @@ function ResizeTooltip(
 		...props
 	}: ResizeTooltipProps,
 	ref: ForwardedRef< HTMLDivElement >
-): JSX.Element | null {
+) {
 	const { label, resizeListener } = useResizeLabel( {
 		axis,
 		fadeTimeout,

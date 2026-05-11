@@ -7,14 +7,16 @@ test.describe( 'Templates', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'emptytheme' );
 	} );
+
 	test.afterEach( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllTemplates( 'wp_template' );
 	} );
+
 	test( 'Create a custom template', async ( { admin, page } ) => {
 		const templateName = 'demo';
 		await admin.visitSiteEditor();
 		await page.getByRole( 'button', { name: 'Templates' } ).click();
-		await page.getByRole( 'button', { name: 'Add New Template' } ).click();
+		await page.getByRole( 'button', { name: 'Add template' } ).click();
 		await page
 			.getByRole( 'button', {
 				name: 'A custom template can be manually applied to any post or page.',

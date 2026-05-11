@@ -1,13 +1,13 @@
 /**
  * External dependencies
  */
-import fastDeepEqual from 'fast-deep-equal/es6';
+import fastDeepEqual from 'fast-deep-equal/es6/index.js';
 
 /**
  * WordPress dependencies
  */
 import { useState, useEffect, useCallback } from '@wordpress/element';
-import isShallowEqual from '@wordpress/is-shallow-equal';
+import { isShallowEqual } from '@wordpress/is-shallow-equal';
 import { getWidgetIdFromBlock, addWidgetIdToBlock } from '@wordpress/widgets';
 
 /**

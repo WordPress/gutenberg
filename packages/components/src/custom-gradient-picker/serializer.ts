@@ -13,6 +13,17 @@ export function serializeGradientColor( {
 	if ( type === 'hex' ) {
 		return `#${ value }`;
 	}
+	if ( type === 'var' ) {
+		return `var(${ value })`;
+	}
+	if ( type === 'hsl' ) {
+		const [ hue, saturation, lightness ] = value;
+		return `hsl(${ hue },${ saturation }%,${ lightness }%)`;
+	}
+	if ( type === 'hsla' ) {
+		const [ hue, saturation, lightness, alpha ] = value;
+		return `hsla(${ hue },${ saturation }%,${ lightness }%,${ alpha })`;
+	}
 	return `${ type }(${ value.join( ',' ) })`;
 }
 
@@ -23,6 +34,9 @@ export function serializeGradientPosition(
 		return '';
 	}
 	const { value, type } = position;
+	if ( type === 'calc' ) {
+		return `calc(${ value })`;
+	}
 	return `${ value }${ type }`;
 }
 

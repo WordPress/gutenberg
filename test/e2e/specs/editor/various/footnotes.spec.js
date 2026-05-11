@@ -370,9 +370,9 @@ test.describe( 'Footnotes', () => {
 		await page
 			.locator( '.editor-private-post-last-revision__button' )
 			.click();
-		await page.locator( '.revisions-controls .ui-slider-handle' ).focus();
+		await page.locator( '.components-range-control__slider' ).focus();
 		await page.keyboard.press( 'ArrowLeft' );
-		await page.locator( 'input:text("Restore This Revision")' ).click();
+		await page.getByRole( 'button', { name: 'Restore' } ).click();
 
 		expect( await getFootnotes( page, true ) ).toMatchObject( [
 			{

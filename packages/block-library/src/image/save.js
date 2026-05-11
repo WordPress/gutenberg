@@ -14,6 +14,11 @@ import {
 	__experimentalGetShadowClassesAndStyles as getShadowClassesAndStyles,
 } from '@wordpress/block-editor';
 
+/**
+ * Internal dependencies
+ */
+import { mediaPosition } from './utils';
+
 export default function save( { attributes } ) {
 	const {
 		url,
@@ -27,10 +32,12 @@ export default function save( { attributes } ) {
 		height,
 		aspectRatio,
 		scale,
+		focalPoint,
 		id,
 		linkTarget,
 		sizeSlug,
 		title,
+		metadata: { bindings = {} } = {},
 	} = attributes;
 
 	const newRel = ! rel ? undefined : rel;
@@ -63,12 +70,21 @@ export default function save( { attributes } ) {
 				...shadowProps.style,
 				aspectRatio,
 				objectFit: scale,
+				objectPosition:
+					focalPoint && scale
+						? mediaPosition( focalPoint )
+						: undefined,
 				width,
 				height,
 			} }
 			title={ title }
 		/>
 	);
+
+	const displayCaption =
+		! RichText.isEmpty( caption ) ||
+		bindings.caption ||
+		bindings?.__default?.source === 'core/pattern-overrides';
 
 	const figure = (
 		<>
@@ -84,7 +100,7 @@ export default function save( { attributes } ) {
 			) : (
 				image
 			) }
-			{ ! RichText.isEmpty( caption ) && (
+			{ displayCaption && (
 				<RichText.Content
 					className={ __experimentalGetElementClassName( 'caption' ) }
 					tagName="figcaption"

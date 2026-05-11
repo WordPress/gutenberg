@@ -11,6 +11,10 @@ import defaultRegistry from './default-registry';
  * Note: Action creators returned by the dispatch will return a promise when
  * they are called.
  *
+ * Warning: This global `dispatch` function only works with the default registry.
+ * It will not work with custom `RegistryProvider` or `BlockEditorProvider` contexts.
+ * In React components, prefer the `useDispatch` hook instead, which is registry-aware.
+ *
  * @param storeNameOrDescriptor The store descriptor. The legacy calling convention of passing
  *                              the store name is also supported.
  *
@@ -28,5 +32,7 @@ export function dispatch<
 >(
 	storeNameOrDescriptor: StoreNameOrDescriptor
 ): DispatchReturn< StoreNameOrDescriptor > {
-	return defaultRegistry.dispatch( storeNameOrDescriptor );
+	return defaultRegistry.dispatch(
+		storeNameOrDescriptor
+	) as DispatchReturn< StoreNameOrDescriptor >;
 }
