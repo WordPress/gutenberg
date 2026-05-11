@@ -85,12 +85,51 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 	}
 	$style_attribute = $font_sizes['inline_styles'];
 
-	// Render inner blocks first to check if any menu items will actually display.
-	$inner_blocks_html = '';
+	$inner_blocks_html    = '';
+
+	// Assume all viewports are fully hidden until we find a child that is visible on them.
+	$has_visible_children = false;
+	$hidden_viewports     = array(
+		'desktop' => true,
+		'tablet'  => true,
+		'mobile'  => true,
+	);
+
 	foreach ( $block->inner_blocks as $inner_block ) {
-		$inner_blocks_html .= $inner_block->render();
+		$rendered           = $inner_block->render();
+		$inner_blocks_html .= $rendered;
+
+		// Skip for blocks that doesn't have any output
+		// (e.g 'Omit from published content')
+		if ( '' === trim( $rendered ) ) {
+			continue;
+		}
+
+		$metadata         = $inner_block->attributes['metadata'] ?? array();
+		$block_visibility = $metadata['blockVisibility'] ?? null;
+		$viewport         = is_array( $block_visibility ) ? ( $block_visibility['viewport'] ?? array() ) : array();
+
+		foreach ( array( 'desktop', 'tablet', 'mobile' ) as $device ) {
+			// If device key is absent or truthy, the child is visible.
+			if ( ! array_key_exists( $device, $viewport ) || $viewport[ $device ] ) {
+				$hidden_viewports[ $device ] = false;
+				$has_visible_children        = true;
+			}
+		}
 	}
-	$has_submenu = ! empty( trim( $inner_blocks_html ) );
+
+	$has_submenu = $has_visible_children;
+
+	// Build submenu toggle hide classes where every child is hidden on a given viewport
+	$submenu_hidden_classes = array();
+	foreach ( $hidden_viewports as $device => $is_hidden ) {
+		if ( $is_hidden ) {
+			$submenu_hidden_classes[] = 'wp-block-hidden-' . $device;
+		}
+	}
+	$submenu_hidden_class_string = ! empty( $submenu_hidden_classes )
+		? ' ' . implode( ' ', $submenu_hidden_classes )
+		: '';
 
 	$kind      = empty( $attributes['kind'] ) ? 'post_type' : str_replace( '-', '_', $attributes['kind'] );
 	$is_active = ! empty( $attributes['id'] ) && get_queried_object_id() === (int) $attributes['id'] && ! empty( get_queried_object()->$kind );
@@ -206,7 +245,9 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 		if ( $show_submenu_indicators && $has_submenu ) {
 			// The submenu icon is rendered in a button here
 			// so that there's a clickable element to open the submenu.
-			$html .= '<button aria-label="' . esc_attr( $aria_label ) . '" class="wp-block-navigation__submenu-icon wp-block-navigation-submenu__toggle" aria-expanded="false">';
+			// wp-block-hidden-* classes are added when all children are hidden on
+			// a given viewport, so the arrow is suppressed there via CSS too.
+			$html .= '<button aria-label="' . esc_attr( $aria_label ) . '" class="wp-block-navigation__submenu-icon wp-block-navigation-submenu__toggle' . $submenu_hidden_class_string . '" aria-expanded="false">';
 			if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
 				$html .= gutenberg_block_core_shared_navigation_render_submenu_icon();
 			} else {
@@ -234,7 +275,7 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 		$html .= '</button>';
 
 		if ( $has_submenu ) {
-			$html .= '<span class="wp-block-navigation__submenu-icon">';
+			$html .= '<span class="wp-block-navigation__submenu-icon' . $submenu_hidden_class_string . '">';
 			if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
 				$html .= gutenberg_block_core_shared_navigation_render_submenu_icon();
 			} else {
@@ -263,7 +304,9 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 		// This allows us to be able to get a response from wp_apply_colors_support.
 		$block->block_type->supports['color'] = true;
 		$colors_supports                      = wp_apply_colors_support( $block->block_type, $attributes );
-		$css_classes                          = 'wp-block-navigation__submenu-container';
+
+		// Using wp-block-hidden-* classes to hide submenu on viewports where all children are hidden.
+		$css_classes = 'wp-block-navigation__submenu-container' . $submenu_hidden_class_string;
 		if ( array_key_exists( 'class', $colors_supports ) ) {
 			$css_classes .= ' ' . $colors_supports['class'];
 		}
