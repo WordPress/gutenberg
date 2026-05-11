@@ -166,11 +166,10 @@ export default class CollaborationUtils {
 		const pages = this.allPages;
 		const resolvedTimeout = timeout ?? 10000 + pages.length * 2500;
 
-		const roomName = USE_TEST_WS_PROVIDER
-			? await this.getCurrentPostRoomName( this.primaryPage )
-			: undefined;
-
 		if ( USE_TEST_WS_PROVIDER ) {
+			const roomName = await this.getCurrentPostRoomName(
+				this.primaryPage
+			);
 			await Promise.all(
 				pages.map( ( pg ) =>
 					this.waitForTestWebSocketAwarenessPeerCount(
@@ -181,24 +180,29 @@ export default class CollaborationUtils {
 					)
 				)
 			);
-		} else {
 			await Promise.all(
 				pages.map( ( pg ) =>
-					pg
-						.getByRole( 'button', {
-							name: /Collaborators list/,
-						} )
-						.waitFor( { timeout: resolvedTimeout } )
+					this.waitForSyncCycle( pg, 3, {
+						timeout: resolvedTimeout,
+						room: roomName,
+					} )
 				)
 			);
+			return;
 		}
 
 		await Promise.all(
 			pages.map( ( pg ) =>
-				this.waitForSyncCycle( pg, 3, {
-					timeout: resolvedTimeout,
-					room: roomName,
-				} )
+				pg
+					.getByRole( 'button', {
+						name: /Collaborators list/,
+					} )
+					.waitFor( { timeout: resolvedTimeout } )
+			)
+		);
+		await Promise.all(
+			pages.map( ( pg ) =>
+				this.waitForSyncCycle( pg, 3, { timeout: resolvedTimeout } )
 			)
 		);
 	}
@@ -207,18 +211,12 @@ export default class CollaborationUtils {
 		page: Page,
 		expectedPeerCount: number,
 		timeout: number,
-		roomName?: string
+		roomName: string
 	) {
 		await page.waitForFunction(
-			( { expected, room }: { expected: number; room?: string } ) => {
+			( { expected, room }: { expected: number; room: string } ) => {
 				const state = ( window as any ).__gutenbergTestWebSocketSync;
-				const rooms = state?.rooms ?? {};
-				const matchingRoom = room
-					? rooms[ room ]
-					: Object.values( rooms ).find(
-							( candidate: any ) =>
-								candidate?.awarenessCount >= expected
-					  );
+				const matchingRoom = state?.rooms?.[ room ];
 
 				return (
 					matchingRoom?.status === 'connected' &&
@@ -409,21 +407,23 @@ export default class CollaborationUtils {
 		{ timeout = 10000, room }: { timeout?: number; room?: string } = {}
 	) {
 		if ( USE_TEST_WS_PROVIDER ) {
+			// y-websocket distinguishes 'connected' (socket up) from 'synced'
+			// (sync step 2 applied). Waiting only on connected lets tests race
+			// past initial document load. Require both, on the exact target
+			// room, to rule out stale rooms from earlier navigations.
+			const targetRoom =
+				room ?? ( await this.getCurrentPostRoomName( page ) );
 			await page.waitForFunction(
-				( targetRoom: string | undefined ) => {
+				( roomName: string ) => {
 					const state = ( window as any )
 						.__gutenbergTestWebSocketSync;
-					const rooms = state?.rooms ?? {};
-
-					if ( targetRoom ) {
-						return rooms[ targetRoom ]?.status === 'connected';
-					}
-
-					return Object.values( rooms ).some(
-						( candidate: any ) => candidate?.status === 'connected'
+					const matchingRoom = state?.rooms?.[ roomName ];
+					return (
+						matchingRoom?.status === 'connected' &&
+						matchingRoom?.synced === true
 					);
 				},
-				room,
+				targetRoom,
 				{ timeout }
 			);
 			return;

@@ -26,6 +26,7 @@ function ensureRoomDebugState( room ) {
 			awarenessCount: 0,
 			clientId: null,
 			status: 'disconnected',
+			synced: false,
 		};
 	}
 	return globalState.rooms[ room ];
@@ -43,6 +44,7 @@ function createWebSocketProvider() {
 		updateDebugState( room, {
 			clientId: ydoc.clientID,
 			status: 'connecting',
+			synced: false,
 		} );
 
 		const provider = new WebsocketProvider( globalState.url, room, ydoc, {
@@ -55,12 +57,28 @@ function createWebSocketProvider() {
 		const statusListeners = new Set();
 
 		const onStatus = ( event ) => {
-			updateDebugState( room, { status: event.status } );
+			// A fresh socket means the previous sync handshake (if any) is
+			// no longer current. y-websocket re-fires 'sync' once sync step 2
+			// completes on the new connection.
+			const patch = { status: event.status };
+			if ( event.status !== 'connected' ) {
+				patch.synced = false;
+			}
+			updateDebugState( room, patch );
 			for ( const callback of statusListeners ) {
 				callback( { status: event.status } );
 			}
 		};
 		provider.on( 'status', onStatus );
+
+		// y-websocket distinguishes socket connection from sync completion.
+		// 'connected' means the WS is open; 'sync' fires once sync step 2 has
+		// landed and the doc reflects the server state. Tests that need real
+		// convergence should wait on `synced`, not just `status`.
+		const onSync = ( isSynced ) => {
+			updateDebugState( room, { synced: !! isSynced } );
+		};
+		provider.on( 'sync', onSync );
 
 		const onAwarenessChange = () => {
 			updateDebugState( room, {
@@ -76,8 +94,12 @@ function createWebSocketProvider() {
 			destroy: () => {
 				awarenessInstance.off( 'change', onAwarenessChange );
 				provider.off( 'status', onStatus );
+				provider.off( 'sync', onSync );
 				provider.destroy();
-				updateDebugState( room, { status: 'disconnected' } );
+				updateDebugState( room, {
+					status: 'disconnected',
+					synced: false,
+				} );
 			},
 			on: ( event, callback ) => {
 				if ( event === 'status' ) {
