@@ -262,6 +262,9 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, registry ) => {
 		removeBlock,
 		selectBlock,
 	} = dispatch( blockEditorStore );
+	const { replaceBlocksWithFallback } = unlock(
+		dispatch( blockEditorStore )
+	);
 
 	// Do not add new properties here, use `useDispatch` instead to avoid
 	// leaking new props to the public API (editor.BlockListBlock filter).
@@ -528,11 +531,10 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, registry ) => {
 				blocks?.length === 1 && Array.isArray( blocks[ 0 ] )
 					? blocks[ 0 ]
 					: blocks;
-			replaceBlocks(
+			replaceBlocksWithFallback(
 				[ ownProps.clientId ],
 				replacementBlocks,
-				indexToSelect,
-				initialPosition
+				{ indexToSelect, initialPosition }
 			);
 		},
 		onRemove() {

@@ -5,6 +5,13 @@ import { Platform } from '@wordpress/element';
 import deprecated from '@wordpress/deprecated';
 import { speak } from '@wordpress/a11y';
 import { __ } from '@wordpress/i18n';
+import {
+	createBlock,
+	getBlockType,
+	getPossibleBlockTransformations,
+	getSaveContent,
+	switchToBlockType,
+} from '@wordpress/blocks';
 
 const castArray = ( maybeArray ) =>
 	Array.isArray( maybeArray ) ? maybeArray : [ maybeArray ];
@@ -529,3 +536,60 @@ export function clearRequestedInspectorTab() {
 		type: 'CLEAR_REQUESTED_INSPECTOR_TAB',
 	};
 }
+
+/**
+ * Like `replaceBlocks`, but maps any block that cannot be inserted at the
+ * target location to a fallback. The fallback is the first available `to`
+ * transform target that is insertable, or a paragraph block created from the
+ * serialized HTML if none qualifies.
+ *
+ * @param {string|string[]} clientIds                 Client ID(s) of the block(s) to replace.
+ * @param {Object|Object[]} blocks                    Replacement block(s).
+ * @param {Object}          [options]                 Options.
+ * @param {number}          [options.indexToSelect]   Index of replacement block to select.
+ * @param {0|-1|null}       [options.initialPosition] Caret position after replacement.
+ * @param {Object}          [options.meta]            Meta values passed to the action.
+ */
+export const replaceBlocksWithFallback =
+	( clientIds, blocks, options = {} ) =>
+	( { select, dispatch, registry } ) => {
+		const { indexToSelect, initialPosition = 0, meta } = options;
+		clientIds = castArray( clientIds );
+		blocks = castArray( blocks );
+		const rootClientId = select.getBlockRootClientId( clientIds[ 0 ] );
+
+		const mappedBlocks = blocks.flatMap( ( block ) => {
+			if ( select.canInsertBlockType( block.name, rootClientId ) ) {
+				return block;
+			}
+			// Pick the first `to` transform whose target is insertable
+			// (e.g. heading → paragraph, embed → paragraph).
+			const target = getPossibleBlockTransformations( [ block ] ).find(
+				( { name } ) => select.canInsertBlockType( name, rootClientId )
+			);
+			const switched = target && switchToBlockType( block, target.name );
+			if ( switched ) {
+				return switched;
+			}
+			// No transform path — preserve markup verbatim as raw HTML.
+			return createBlock( 'core/html', {
+				content: getSaveContent(
+					getBlockType( block.name ),
+					block.attributes
+				),
+			} );
+		} );
+
+		registry.batch( () => {
+			dispatch( {
+				type: 'REPLACE_BLOCKS',
+				clientIds,
+				blocks: mappedBlocks,
+				time: Date.now(),
+				indexToSelect,
+				initialPosition,
+				meta,
+			} );
+			dispatch( ensureDefaultBlock() );
+		} );
+	};

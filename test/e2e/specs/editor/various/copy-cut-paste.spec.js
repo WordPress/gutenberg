@@ -709,6 +709,52 @@ test.describe( 'Copy/cut/paste', () => {
 		] );
 	} );
 
+	test( 'should fall back to paragraph when target block is not allowed', async ( {
+		pageUtils,
+		editor,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/group',
+			attributes: { allowedBlocks: [ 'core/paragraph' ] },
+			innerBlocks: [ { name: 'core/paragraph' } ],
+		} );
+		await editor.canvas
+			.getByRole( 'document', { name: 'Empty block' } )
+			.click();
+		pageUtils.setClipboardData( {
+			plainText:
+				'Lorem ipsum.\n\nhttps://www.youtube.com/watch?v=FcTLMTyD2DU\n\nDolor sit amet.',
+			html: '<p>Lorem ipsum.</p><h2>Heading text.</h2><p>https://www.youtube.com/watch?v=FcTLMTyD2DU</p><p>Dolor sit amet.</p>',
+		} );
+		await pageUtils.pressKeys( 'primary+v' );
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/group',
+				innerBlocks: [
+					{
+						name: 'core/paragraph',
+						attributes: { content: 'Lorem ipsum.' },
+					},
+					{
+						name: 'core/paragraph',
+						attributes: { content: 'Heading text.' },
+					},
+					{
+						name: 'core/paragraph',
+						attributes: {
+							content:
+								'<a href="https://www.youtube.com/watch?v=FcTLMTyD2DU">https://www.youtube.com/watch?v=FcTLMTyD2DU</a>',
+						},
+					},
+					{
+						name: 'core/paragraph',
+						attributes: { content: 'Dolor sit amet.' },
+					},
+				],
+			},
+		] );
+	} );
+
 	test( 'should not link selection for non http(s) protocol', async ( {
 		pageUtils,
 		editor,
