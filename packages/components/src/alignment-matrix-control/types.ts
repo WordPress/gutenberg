@@ -44,11 +44,24 @@ export type AlignmentMatrixControlIconProps = Pick<
 	AlignmentMatrixControlProps,
 	'value'
 > & {
+	/**
+	 * If `true`, disables pointer events on the icon.
+	 * @default true
+	 */
 	disablePointerEvents?: boolean;
+	/**
+	 * _Note: this prop is deprecated. Use the `size` prop on the parent `Icon`
+	 * component instead_
+	 *
+	 * The size of the icon.
+	 *
+	 * @deprecated
+	 * @ignore
+	 * @default 24
+	 */
 	size?: number;
 };
 
 export type AlignmentMatrixControlCellProps = {
-	isActive?: boolean;
 	value: NonNullable< AlignmentMatrixControlProps[ 'value' ] >;
 };

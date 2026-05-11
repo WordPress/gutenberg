@@ -1,3 +1,5 @@
+@use "@wordpress/base-styles/colors" as *;
+
 /* Styles for backwards compatibility with the legacy `post-comments` block */
 .wp-block-post-comments {
 	// This block has customizable padding, border-box makes that more predictable.
@@ -13,7 +15,6 @@
 	}
 
 	/* end utility classes */
-
 	.navigation {
 		&::after {
 			content: "";
@@ -145,4 +146,8 @@
 // Styles copied from button block styles.
 :where(.wp-block-post-comments input[type="submit"]) {
 	border: none;
+}
+
+.wp-block-comments {
+	box-sizing: border-box;
 }

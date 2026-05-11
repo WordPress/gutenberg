@@ -17,13 +17,29 @@ import {
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { safeDecodeURI, filterURLForDisplay, getPath } from '@wordpress/url';
 import { pipe } from '@wordpress/compose';
+import deprecated from '@wordpress/deprecated';
 
-const ICONS_MAP = {
-	post: postList,
-	page,
-	post_tag: tag,
-	category,
-	attachment: file,
+const TYPES = {
+	post: {
+		icon: postList,
+		label: __( 'Post' ),
+	},
+	page: {
+		icon: page,
+		label: __( 'Page' ),
+	},
+	post_tag: {
+		icon: tag,
+		label: __( 'Tag' ),
+	},
+	category: {
+		icon: category,
+		label: __( 'Category' ),
+	},
+	attachment: {
+		icon: file,
+		label: __( 'Attachment' ),
+	},
 };
 
 function SearchItemIcon( { isURL, suggestion } ) {
@@ -31,8 +47,8 @@ function SearchItemIcon( { isURL, suggestion } ) {
 
 	if ( isURL ) {
 		icon = globe;
-	} else if ( suggestion.type in ICONS_MAP ) {
-		icon = ICONS_MAP[ suggestion.type ];
+	} else if ( suggestion.type in TYPES ) {
+		icon = TYPES[ suggestion.type ].icon;
 		if ( suggestion.type === 'page' ) {
 			if ( suggestion.isFrontPage ) {
 				icon = home;
@@ -148,15 +164,27 @@ export const LinkControlSearchItem = ( {
 
 function getVisualTypeName( suggestion ) {
 	if ( suggestion.isFrontPage ) {
-		return 'front page';
+		return __( 'Front page' );
 	}
 
 	if ( suggestion.isBlogHome ) {
-		return 'blog home';
+		return __( 'Blog home' );
 	}
 
-	// Rename 'post_tag' to 'tag'. Ideally, the API would return the localised CPT or taxonomy label.
-	return suggestion.type === 'post_tag' ? 'tag' : suggestion.type;
+	// Provide translated labels for built-in post types. Ideally, the API would return the localised CPT or taxonomy label.
+	if ( suggestion.type in TYPES ) {
+		return TYPES[ suggestion.type ].label;
+	}
+
+	return suggestion.type;
 }
 
 export default LinkControlSearchItem;
+
+export const __experimentalLinkControlSearchItem = ( props ) => {
+	deprecated( 'wp.blockEditor.__experimentalLinkControlSearchItem', {
+		since: '6.8',
+	} );
+
+	return <LinkControlSearchItem { ...props } />;
+};

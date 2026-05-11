@@ -1,0 +1,14 @@
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/z-index" as *;
+
+.dataviews-action-modal {
+	z-index: z-index(".dataviews-action-modal");
+}
+
+// TODO: the way forward here would be to use the new unstyle button coming
+// from wordpress/ui package, but we're not ready to use it yet.
+// See https://github.com/WordPress/gutenberg/pull/75721/
+.dataviews-item-actions .components-button:not(.dataviews-all-actions-button) {
+	padding: 0 $grid-unit-05;
+}

@@ -12,8 +12,12 @@ const { directive } = privateApis(
 directive(
 	'show-mock',
 	( { directives: { 'show-mock': showMock }, element, evaluate } ) => {
-		const entry = showMock.find( ( { suffix } ) => suffix === 'default' );
-		if ( ! evaluate( entry ) ) {
+		const entry = showMock.find( ( { suffix } ) => suffix === null );
+		const result = evaluate( entry );
+		if ( ! result ) {
+			return null;
+		}
+		if ( typeof result === 'function' && ! result() ) {
 			return null;
 		}
 		return element;
@@ -27,6 +31,7 @@ const { state } = store( 'directive-on-document', {
 		isEventAttached: 'no',
 		keydownHandler: 'no',
 		keydownSecondHandler: 'no',
+		keydownThirdHandler: 'no',
 	},
 	callbacks: {
 		keydownHandler() {
@@ -46,6 +51,9 @@ const { state } = store( 'directive-on-document', {
 		},
 		keydownSecondHandler: () => {
 			state.keydownSecondHandler = 'yes';
+		},
+		keydownThirdHandler: () => {
+			state.keydownThirdHandler = 'yes';
 		},
 	},
 } );

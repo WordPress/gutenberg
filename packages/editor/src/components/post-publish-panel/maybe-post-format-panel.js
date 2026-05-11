@@ -25,6 +25,7 @@ const PostFormatSuggestion = ( {
 	onUpdatePostFormat,
 } ) => (
 	<Button
+		__next40pxDefaultSize
 		variant="link"
 		onClick={ () => onUpdatePostFormat( suggestedPostFormat ) }
 	>
@@ -74,7 +75,7 @@ export default function PostFormatPanel() {
 					onUpdatePostFormat={ onUpdatePostFormat }
 					suggestedPostFormat={ suggestion.id }
 					suggestionText={ sprintf(
-						/* translators: %s: post format */
+						/* translators: %1s: post format */
 						__( 'Apply the "%1$s" format.' ),
 						suggestion.caption
 					) }

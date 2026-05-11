@@ -176,6 +176,10 @@ describe( 'Navigation', () => {
 
 		const menuItems = screen.getAllByRole( 'listitem' );
 
+		expect( console ).toHaveWarnedWith(
+			'wp.components.Navigation (and all subcomponents) is deprecated since version 6.8 and will be removed in version 7.1. Please use wp.components.Navigator instead.'
+		);
+
 		expect( menuItems ).toHaveLength( 4 );
 		expect( menuItems[ 0 ] ).toHaveTextContent( 'Item 1' );
 		expect( menuItems[ 1 ] ).toHaveTextContent( 'Item 2' );

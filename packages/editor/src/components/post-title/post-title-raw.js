@@ -26,7 +26,7 @@ import usePostTitle from './use-post-title';
  * @param {Object}  _            Unused parameter.
  * @param {Element} forwardedRef Reference to the component's DOM node.
  *
- * @return {Component} The rendered component.
+ * @return {React.ReactNode} The rendered component.
  */
 function PostTitleRaw( _, forwardedRef ) {
 	const { placeholder } = useSelect( ( select ) => {
@@ -79,7 +79,6 @@ function PostTitleRaw( _, forwardedRef ) {
 			autoComplete="off"
 			dir="auto"
 			rows={ 1 }
-			__nextHasNoMarginBottom
 		/>
 	);
 }

@@ -48,7 +48,12 @@ function UnforwardedToggleGroupControlOption(
  *
  * function Example() {
  *   return (
- *     <ToggleGroupControl label="my label" value="vertical" isBlock>
+ *     <ToggleGroupControl
+ *       label="my label"
+ *       value="vertical"
+ *       isBlock
+ *       __next40pxDefaultSize
+ *     >
  *       <ToggleGroupControlOption value="horizontal" label="Horizontal" />
  *       <ToggleGroupControlOption value="vertical" label="Vertical" />
  *     </ToggleGroupControl>
@@ -59,5 +64,6 @@ function UnforwardedToggleGroupControlOption(
 export const ToggleGroupControlOption = forwardRef(
 	UnforwardedToggleGroupControlOption
 );
+ToggleGroupControlOption.displayName = 'ToggleGroupControlOption';
 
 export default ToggleGroupControlOption;

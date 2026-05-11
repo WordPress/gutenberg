@@ -56,13 +56,24 @@ Renders with rounded corners.
 - Required: No
 - Default: `true`
 
-### `size`: `string`
+### `size`: `string | object`
 
-Determines the amount of padding within the component.
+Determines the amount of padding within the component. Can be specified either as a single size token or as an object.
 
 - Required: No
 - Default: `medium`
-- Allowed values: `xSmall`, `small`, `medium`, `large`
+- Allowed values:
+   	- Single size token: `none`, `xSmall`, `small`, `medium`, `large`
+   	- Object:
+
+    ```ts
+    {
+      blockStart: 'none' | 'xSmall' | 'small' | 'medium' | 'large';
+      blockEnd: 'none' | 'xSmall' | 'small' | 'medium' | 'large';
+      inlineStart: 'none' | 'xSmall' | 'small' | 'medium' | 'large';
+      inlineEnd: 'none' | 'xSmall' | 'small' | 'medium' | 'large';
+    }
+    ```
 
 ### Inherited props
 
@@ -104,9 +115,43 @@ const Example = () => (
 );
 ```
 
+### Logical Padding Properties
+
+The `size` prop supports logical properties that adapt to different writing directions:
+
+- `blockStart` - Maps to `top` in horizontal writing modes
+- `blockEnd` - Maps to `bottom` in horizontal writing modes
+- `inlineStart` - Maps to `left` in horizontal left-to-right writing modes
+- `inlineEnd` - Maps to `right` in horizontal left-to-right writing modes
+
+```jsx
+import { Card, CardBody } from '@wordpress/components';
+
+const Example = () => (
+	<Card
+		size={ {
+			blockStart: 'large',
+			blockEnd: 'small',
+			inlineStart: 'medium',
+			inlineEnd: 'medium',
+		} }
+	>
+		<CardBody
+			size={ {
+				blockStart: 'small',
+				inlineStart: 'large',
+				inlineEnd: 'large',
+			} }
+		>
+			Content with logical padding properties
+		</CardBody>
+	</Card>
+);
+```
+
 ### Context
 
-`<Card />`'s sub-components are connected to `<Card />` using [Context](https://reactjs.org/docs/context.html). Certain props like `size` and `isBorderless` are passed through to some of the sub-components.
+`<Card />`'s sub-components are connected to `<Card />` using [Context](https://react.dev/learn/passing-data-deeply-with-context). Certain props like `size` and `isBorderless` are passed through to some of the sub-components.
 
 In the following example, the `<CardBody />` will render with a size of `small`:
 

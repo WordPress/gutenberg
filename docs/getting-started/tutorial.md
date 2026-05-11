@@ -25,7 +25,7 @@ To complete this tutorial, you will need:
 If you don't have one or more of these items, the [Block Development Environment](https://developer.wordpress.org/block-editor/getting-started/devenv/) documentation will help you get started. Come back here once you are all set up.
 
 <div class="callout callout-info">
-	This tutorial uses <a href="https://developer.wordpress.org/block-editor/getting-started/devenv/get-started-with-wp-env/"><code>wp-env</code></a> to create a local WordPress development environment. However, feel free to use alternate local development tools if you already have one that you prefer.
+	This tutorial uses <a href="https://developer.wordpress.org/block-editor/getting-started/devenv/get-started-with-wp-env/"><code>wp-env</code></a> to create a local WordPress development environment. However, feel free to use any development environment that meets the abovementioned prerequisites.
 </div>
 
 ## Scaffolding the block
@@ -150,7 +150,7 @@ Update the [`supports`](https://developer.wordpress.org/block-editor/getting-sta
 
 Note that when you enable text color support with `"text": true`, the background color is also enabled by default. You are welcome to keep it enabled, but it's not required for this tutorial, so you can manually set `"background": false`.
 
-Save the file and select the block in the Editor. You will now see both Color and Typography panels in the Settings Sidebar. Try modifying the settings and see what happens.
+Save the file and select the block in the Editor. You will now see both Color and Typography panels in the Settings Panel. Try modifying the settings and see what happens.
 
 ![The block in the Editor with block supports](https://developer.wordpress.org/files/2023/12/block-tutorial-5.png)
 
@@ -250,7 +250,7 @@ At this point, the block's icon and description are correct, and block supports 
 
 ### Updating edit.js
 
-The [`edit.js`](https://developer.wordpress.org/block-editor/getting-started/fundamentals/file-structure-of-a-block/#edit-js) file controls how the block functions and appears in the Editor. Right now, the user sees the message " Copyright Date Block – hello from the editor!". Let's change that.
+The [`edit.js`](https://developer.wordpress.org/block-editor/getting-started/fundamentals/file-structure-of-a-block/#edit-js) file controls how the block functions and appears in the Editor. Right now, the user sees the message "Copyright Date Block – hello from the editor!". Let's change that.
 
 Open the file and see that the `Edit()` function returns a paragraph tag with the default message.
 
@@ -480,6 +480,7 @@ export default function Edit( { attributes, setAttributes } ) {
 			<InspectorControls>
 				<PanelBody title={ __( 'Settings', 'copyright-date-block' ) }>
 					<TextControl
+						__next40pxDefaultSize
 						label={ __(
 							'Starting year',
 							'copyright-date-block'
@@ -540,6 +541,7 @@ export default function Edit( { attributes, setAttributes } ) {
 					/>
 					{ showStartingYear && (
 						<TextControl
+							__next40pxDefaultSize
 							label={ __(
 								'Starting year',
 								'copyright-date-block'
@@ -647,10 +649,10 @@ While the Editor looks great, the starting year functionality has yet to be adde
 
 Start by adding a variable called `$display_date` and replicate what you did in the `Edit()` function above.
 
-This variable should display the value of the `startingYear` attribute and the `$current_year` variable separated by an em dash, or just the `$current_year` is the `showStartingYear` attribute is `false`.
+This variable should display the value of the `startingYear` attribute and the `$current_year` variable separated by an em dash, or just the `$current_year` if the `showStartingYear` attribute is `false`.
 
 <div class="callout callout-tip">
-	<p>Three variables are exposed in the <code>render.php</code>, which you can use to customize the block's output:</p>
+	<p>Three variables are exposed in <code>render.php</code>, which you can use to customize the block's output:</p>
 	<ul>
 		<li><code>$attributes</code> (array): The block attributes.</li>
 		<li><code>$content</code> (string): The block default content.</li>
@@ -917,7 +919,7 @@ Save both the `block.json` and `save.js` files; you won't need to make any more 
 
 The `save()` function now uses the new `fallbackCurrentYear`, so it needs to be set somewhere. Let's use the `Edit()` function.
 
-Open the `edit.js` file and start by defining the `fallbackCurrentYear` variable at the top of the `Edit()` functional alongside the other attributes. Next, review what's happening in the function.
+Open the `edit.js` file and start by defining the `fallbackCurrentYear` variable at the top of the `Edit()` function alongside the other attributes. Next, review what's happening in the function.
 
 When the block loads in the Editor, the `currentYear` variable is defined. The function then uses this variable to set the content of the block.
 

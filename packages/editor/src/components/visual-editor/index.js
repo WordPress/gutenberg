@@ -20,11 +20,7 @@ import { useEffect, useRef, useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { parse } from '@wordpress/blocks';
 import { store as coreStore } from '@wordpress/core-data';
-import {
-	useMergeRefs,
-	useViewportMatch,
-	useResizeObserver,
-} from '@wordpress/compose';
+import { useMergeRefs, useViewportMatch } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -34,13 +30,18 @@ import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import EditTemplateBlocksNotification from './edit-template-blocks-notification';
 import ResizableEditor from '../resizable-editor';
-import useSelectNearestEditableBlock from '../../hooks/use-select-nearest-editable-block';
+import useSelectNearestEditableBlock from './use-select-nearest-editable-block';
 import {
 	NAVIGATION_POST_TYPE,
 	PATTERN_POST_TYPE,
 	TEMPLATE_PART_POST_TYPE,
 	TEMPLATE_POST_TYPE,
+	DESIGN_POST_TYPES,
 } from '../../store/constants';
+import { useZoomOutModeExit } from './use-zoom-out-mode-exit';
+import { usePaddingAppender } from './use-padding-appender';
+import { useEditContentOnlySectionExit } from './use-edit-content-only-section-exit';
+import { SyncConnectionErrorModal } from '../sync-connection-error-modal';
 
 const {
 	LayoutStyle,
@@ -54,12 +55,6 @@ const {
  * These post types have a special editor where they don't allow you to fill the title
  * and they don't apply the layout styles.
  */
-const DESIGN_POST_TYPES = [
-	PATTERN_POST_TYPE,
-	TEMPLATE_POST_TYPE,
-	NAVIGATION_POST_TYPE,
-	TEMPLATE_PART_POST_TYPE,
-];
 
 /**
  * Given an array of nested blocks, find the first Post Content
@@ -99,13 +94,11 @@ function checkForPostContentAtRootLevel( blocks ) {
 function VisualEditor( {
 	// Ideally as we unify post and site editors, we won't need these props.
 	autoFocus,
-	styles,
 	disableIframe = false,
 	iframeProps,
 	contentRef,
 	className,
 } ) {
-	const [ resizeObserver, sizes ] = useResizeObserver();
 	const isMobileViewport = useViewportMatch( 'small', '<' );
 	const {
 		renderingMode,
@@ -118,6 +111,7 @@ function VisualEditor( {
 		isDesignPostType,
 		postType,
 		isPreview,
+		styles,
 	} = useSelect( ( select ) => {
 		const {
 			getCurrentPostId,
@@ -126,9 +120,8 @@ function VisualEditor( {
 			getEditorSettings,
 			getRenderingMode,
 			getDeviceType,
-		} = select( editorStore );
-		const { getPostType, canUser, getEditedEntityRecord } =
-			select( coreStore );
+		} = unlock( select( editorStore ) );
+		const { getPostType, getEditedEntityRecord } = select( coreStore );
 		const postTypeSlug = getCurrentPostType();
 		const _renderingMode = getRenderingMode();
 		let _wrapperBlockName;
@@ -142,7 +135,6 @@ function VisualEditor( {
 		const editorSettings = getEditorSettings();
 		const supportsTemplateMode = editorSettings.supportsTemplateMode;
 		const postTypeObject = getPostType( postTypeSlug );
-		const canEditTemplate = canUser( 'create', 'templates' );
 		const currentTemplateId = getCurrentTemplateId();
 		const template = currentTemplateId
 			? getEditedEntityRecord(
@@ -159,9 +151,7 @@ function VisualEditor( {
 			// Post template fetch returns a 404 on classic themes, which
 			// messes with e2e tests, so check it's a block theme first.
 			editedPostTemplate:
-				postTypeObject?.viewable &&
-				supportsTemplateMode &&
-				canEditTemplate
+				postTypeObject?.viewable && supportsTemplateMode
 					? template
 					: undefined,
 			wrapperBlockName: _wrapperBlockName,
@@ -169,7 +159,8 @@ function VisualEditor( {
 			deviceType: getDeviceType(),
 			isFocusedEntity: !! editorSettings.onNavigateToPreviousEntityRecord,
 			postType: postTypeSlug,
-			isPreview: editorSettings.__unstableIsPreviewMode,
+			isPreview: editorSettings.isPreviewMode,
+			styles: editorSettings.styles,
 		};
 	}, [] );
 	const { isCleanNewPost } = useSelect( editorStore );
@@ -177,20 +168,23 @@ function VisualEditor( {
 		hasRootPaddingAwareAlignments,
 		themeHasDisabledLayoutStyles,
 		themeSupportsLayout,
-		isZoomOutMode,
+		isZoomedOut,
 	} = useSelect( ( select ) => {
-		const { getSettings, __unstableGetEditorMode } =
-			select( blockEditorStore );
+		const { getSettings, isZoomOut: _isZoomOut } = unlock(
+			select( blockEditorStore )
+		);
+
 		const _settings = getSettings();
 		return {
 			themeHasDisabledLayoutStyles: _settings.disableLayoutStyles,
 			themeSupportsLayout: _settings.supportsLayout,
 			hasRootPaddingAwareAlignments:
 				_settings.__experimentalFeatures?.useRootPaddingAwareAlignments,
-			isZoomOutMode: __unstableGetEditorMode() === 'zoom-out',
+			isZoomedOut: _isZoomOut(),
 		};
 	}, [] );
 
+	const localRef = useRef();
 	const deviceStyles = useResizeCanvas( deviceType );
 	const [ globalLayoutSettings ] = useSettings( 'layout' );
 
@@ -324,7 +318,58 @@ function VisualEditor( {
 		.is-root-container.alignfull { max-width: none; margin-left: auto; margin-right: auto;}
 		.is-root-container.alignfull:where(.is-layout-flow) > :not(.alignleft):not(.alignright) { max-width: none;}`;
 
-	const localRef = useRef();
+	const enableResizing =
+		[
+			NAVIGATION_POST_TYPE,
+			TEMPLATE_PART_POST_TYPE,
+			PATTERN_POST_TYPE,
+		].includes( postType ) &&
+		// Disable in previews / view mode.
+		! isPreview &&
+		// Disable resizing in mobile viewport.
+		! isMobileViewport &&
+		// Disable resizing in zoomed-out mode.
+		! isZoomedOut;
+
+	const isNavigationPreview = postType === NAVIGATION_POST_TYPE && isPreview;
+
+	const [ paddingAppenderRef, paddingStyle ] = usePaddingAppender(
+		! isPreview && renderingMode === 'post-only' && ! isDesignPostType
+	);
+
+	const centerContentCSS = `display:flex;align-items:center;justify-content:center;`;
+
+	const iframeStyles = useMemo( () => {
+		return [
+			...( styles ?? [] ),
+			{
+				// Ensures margins of children are contained so that the body background paints behind them.
+				// Otherwise, the background of html (when zoomed out) would show there and appear broken. It's
+				// important mostly for post-only views yet conceivably an issue in templated views too.
+				css: `:where(.block-editor-iframe__body){display:flow-root;}.is-root-container{display:flow-root;${
+					// Some themes will have `min-height: 100vh` for the root container,
+					// which isn't a requirement in auto resize mode.
+					enableResizing || isNavigationPreview
+						? 'min-height:0!important;'
+						: ''
+				}}
+				${ paddingStyle ? paddingStyle : '' }
+				${
+					enableResizing
+						? `.block-editor-iframe__html{background:var(--wp-editor-canvas-background);min-height:100vh;${ centerContentCSS }}.block-editor-iframe__body{width:100%;}`
+						: ''
+				}${
+					isNavigationPreview
+						? `.block-editor-iframe__body{${ centerContentCSS }padding:var(--wp--style--block-gap,2em);}`
+						: ''
+				}`,
+				// The CSS for enableResizing centers the body content vertically when resizing is enabled and applies a background
+				// color to the iframe HTML element to match the background color of the editor canvas.
+				// The CSS for isNavigationPreview centers the body content vertically and horizontally when the navigation is in preview mode.
+			},
+		];
+	}, [ styles, enableResizing, isNavigationPreview, paddingStyle ] );
+
 	const typewriterRef = useTypewriter();
 	contentRef = useMergeRefs( [
 		localRef,
@@ -336,43 +381,10 @@ function VisualEditor( {
 		useSelectNearestEditableBlock( {
 			isEnabled: renderingMode === 'template-locked',
 		} ),
+		useZoomOutModeExit(),
+		paddingAppenderRef,
+		useEditContentOnlySectionExit(),
 	] );
-
-	const zoomOutProps = isZoomOutMode
-		? {
-				scale: 'default',
-				frameSize: '20px',
-		  }
-		: {};
-
-	const forceFullHeight = postType === NAVIGATION_POST_TYPE;
-	const enableResizing =
-		[
-			NAVIGATION_POST_TYPE,
-			TEMPLATE_PART_POST_TYPE,
-			PATTERN_POST_TYPE,
-		].includes( postType ) &&
-		// Disable in previews / view mode.
-		! isPreview &&
-		// Disable resizing in mobile viewport.
-		! isMobileViewport &&
-		// Dsiable resizing in zoomed-out mode.
-		! isZoomOutMode;
-	const shouldIframe =
-		! disableIframe || [ 'Tablet', 'Mobile' ].includes( deviceType );
-
-	const iframeStyles = useMemo( () => {
-		return [
-			...( styles ?? [] ),
-			{
-				css: `.is-root-container{display:flow-root;${
-					// Some themes will have `min-height: 100vh` for the root container,
-					// which isn't a requirement in auto resize mode.
-					enableResizing ? 'min-height:0!important;' : ''
-				}}`,
-			},
-		];
-	}, [ styles, enableResizing ] );
 
 	return (
 		<div
@@ -384,24 +396,19 @@ function VisualEditor( {
 				{
 					'has-padding': isFocusedEntity || enableResizing,
 					'is-resizable': enableResizing,
-					'is-iframed': shouldIframe,
+					'is-iframed': ! disableIframe,
 				}
 			) }
 		>
-			<ResizableEditor
-				enableResizing={ enableResizing }
-				height={
-					sizes.height && ! forceFullHeight ? sizes.height : '100%'
-				}
-			>
+			<SyncConnectionErrorModal />
+			<ResizableEditor enableResizing={ enableResizing } height="100%">
 				<BlockCanvas
-					shouldIframe={ shouldIframe }
+					shouldIframe={ ! disableIframe }
 					contentRef={ contentRef }
 					styles={ iframeStyles }
 					height="100%"
 					iframeProps={ {
 						...iframeProps,
-						...zoomOutProps,
 						style: {
 							...iframeProps?.style,
 							...deviceStyles,
@@ -434,7 +441,7 @@ function VisualEditor( {
 						<div
 							className={ clsx(
 								'editor-visual-editor__post-title-wrapper',
-								// The following class is only here for backward comapatibility
+								// The following class is only here for backward compatibility
 								// some themes might be using it to style the post title.
 								'edit-post-visual-editor__post-title-wrapper',
 								{
@@ -463,7 +470,13 @@ function VisualEditor( {
 								renderingMode !== 'post-only' ||
 									isDesignPostType
 									? 'wp-site-blocks'
-									: `${ blockListLayoutClass } wp-block-post-content` // Ensure root level blocks receive default/flow blockGap styling rules.
+									: `${ blockListLayoutClass } wp-block-post-content`, // Ensure root level blocks receive default/flow blockGap styling rules.
+								{
+									'has-global-padding':
+										renderingMode === 'post-only' &&
+										! isDesignPostType &&
+										hasRootPaddingAwareAlignments,
+								}
 							) }
 							layout={ blockListLayout }
 							dropZoneElement={
@@ -486,12 +499,6 @@ function VisualEditor( {
 							/>
 						) }
 					</RecursionProvider>
-					{
-						// Avoid resize listeners when not needed,
-						// these will trigger unnecessary re-renders
-						// when animating the iframe width.
-						enableResizing && resizeObserver
-					}
 				</BlockCanvas>
 			</ResizableEditor>
 		</div>

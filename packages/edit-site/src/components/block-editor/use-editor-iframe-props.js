@@ -6,37 +6,38 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { ENTER, SPACE } from '@wordpress/keycodes';
 import { useState, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { store as editorStore } from '@wordpress/editor';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
+import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
-import { store as editSiteStore } from '../../store';
+
+const { useLocation, useHistory } = unlock( routerPrivateApis );
 
 export default function useEditorIframeProps() {
-	const { canvasMode, currentPostIsTrashed } = useSelect( ( select ) => {
-		const { getCanvasMode } = unlock( select( editSiteStore ) );
-
-		return {
-			canvasMode: getCanvasMode(),
-			currentPostIsTrashed:
-				select( editorStore ).getCurrentPostAttribute( 'status' ) ===
-				'trash',
-		};
+	const { query, path } = useLocation();
+	const history = useHistory();
+	const { canvas = 'view' } = query;
+	const currentPostIsTrashed = useSelect( ( select ) => {
+		return (
+			select( editorStore ).getCurrentPostAttribute( 'status' ) ===
+			'trash'
+		);
 	}, [] );
-	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
 	const [ isFocused, setIsFocused ] = useState( false );
 
 	useEffect( () => {
-		if ( canvasMode === 'edit' ) {
+		if ( canvas === 'edit' ) {
 			setIsFocused( false );
 		}
-	}, [ canvasMode ] );
+	}, [ canvas ] );
 
 	// In view mode, make the canvas iframe be perceived and behave as a button
 	// to switch to edit mode, with a meaningful label and no title attribute.
@@ -55,12 +56,15 @@ export default function useEditorIframeProps() {
 				! currentPostIsTrashed
 			) {
 				event.preventDefault();
-				setCanvasMode( 'edit' );
+				history.navigate( addQueryArgs( path, { canvas: 'edit' } ), {
+					transition: 'canvas-mode-edit-transition',
+				} );
 			}
 		},
-		onClick: () => {
-			setCanvasMode( 'edit' );
-		},
+		onClick: () =>
+			history.navigate( addQueryArgs( path, { canvas: 'edit' } ), {
+				transition: 'canvas-mode-edit-transition',
+			} ),
 		onClickCapture: ( event ) => {
 			if ( currentPostIsTrashed ) {
 				event.preventDefault();
@@ -72,8 +76,8 @@ export default function useEditorIframeProps() {
 
 	return {
 		className: clsx( 'edit-site-visual-editor__editor-canvas', {
-			'is-focused': isFocused && canvasMode === 'view',
+			'is-focused': isFocused && canvas === 'view',
 		} ),
-		...( canvasMode === 'view' ? viewModeIframeProps : {} ),
+		...( canvas === 'view' ? viewModeIframeProps : {} ),
 	};
 }

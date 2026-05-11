@@ -1,0 +1,59 @@
+[
+	{
+		"name": "core/button",
+		"isValid": true,
+		"attributes": {
+			"tagName": "a",
+			"type": "button",
+			"text": "My button 1",
+			"fontSize": "xx-large"
+		},
+		"innerBlocks": []
+	},
+	{
+		"name": "core/button",
+		"isValid": true,
+		"attributes": {
+			"tagName": "a",
+			"type": "button",
+			"text": "My button 2",
+			"style": {
+				"typography": {
+					"fontStyle": "normal",
+					"fontWeight": "800"
+				}
+			}
+		},
+		"innerBlocks": []
+	},
+	{
+		"name": "core/button",
+		"isValid": true,
+		"attributes": {
+			"tagName": "a",
+			"type": "button",
+			"text": "My button 3",
+			"style": {
+				"typography": {
+					"letterSpacing": "39px"
+				}
+			}
+		},
+		"innerBlocks": []
+	},
+	{
+		"name": "core/button",
+		"isValid": true,
+		"attributes": {
+			"tagName": "button",
+			"type": "button",
+			"text": "My button 4",
+			"style": {
+				"typography": {
+					"letterSpacing": "39px"
+				}
+			}
+		},
+		"innerBlocks": []
+	}
+]

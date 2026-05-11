@@ -25,6 +25,11 @@ export const myPatternsCategory = {
 	label: __( 'My patterns' ),
 };
 
+export const starterPatternsCategory = {
+	name: 'core/starter-content',
+	label: __( 'Starter content' ),
+};
+
 export function isPatternFiltered( pattern, sourceFilter, syncFilter ) {
 	const isUserPattern = pattern.name.startsWith( 'core/block' );
 	const isDirectoryPattern =

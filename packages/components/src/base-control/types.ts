@@ -7,7 +7,8 @@ export type BaseControlProps = {
 	/**
 	 * Start opting into the new margin-free styles that will become the default in a future version.
 	 *
-	 * @default false
+	 * @deprecated Default behavior since WordPress 7.0. Prop can be safely removed.
+	 * @ignore
 	 */
 	__nextHasNoMarginBottom?: boolean;
 	/**
@@ -21,7 +22,7 @@ export type BaseControlProps = {
 	/**
 	 * Additional description for the control.
 	 *
-	 * The element containing the description will be programmatically associated to the BaseControl by the means of an `aria-describedby` attribute.
+	 * Only use for meaningful description or instructions for the control. An element containing the description will be programmatically associated to the BaseControl by the means of an `aria-describedby` attribute.
 	 */
 	help?: ReactNode;
 	/**
@@ -42,5 +43,8 @@ export type BaseControlProps = {
 };
 
 export type BaseControlVisualLabelProps = {
+	/**
+	 * The content to be displayed within the `BaseControl.VisualLabel`.
+	 */
 	children: ReactNode;
 };

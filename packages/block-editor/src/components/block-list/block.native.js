@@ -195,6 +195,7 @@ function BlockListBlock( {
 		isParentSelected,
 		order,
 		mayDisplayControls,
+		mayDisplayPatternEditingControls,
 		blockEditingMode,
 	} = useSelect(
 		( select ) => {
@@ -263,6 +264,7 @@ function BlockListBlock( {
 						getMultiSelectedBlockClientIds().every(
 							( id ) => getBlockName( id ) === name
 						) ),
+				mayDisplayPatternEditingControls: false, // Section/pattern editing not yet supported on native
 				blockEditingMode: getBlockEditingMode( clientId ),
 			};
 		},
@@ -320,7 +322,6 @@ function BlockListBlock( {
 			name,
 			fontSizes || EMPTY_ARRAY
 		);
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [
 		// It is crucial to keep the dependencies array minimal to prevent unnecessary calls that could negatively impact performance.
 		// JSON.stringify is used for the following purposes:
@@ -329,11 +330,8 @@ function BlockListBlock( {
 		// 2. To filter the attributes object, ensuring that only the relevant attributes (included in
 		//    GlobalStylesContext.BLOCK_STYLE_ATTRIBUTES) are considered as dependencies. This reduces the likelihood of
 		//    unnecessary useMemo calls when other, unrelated attributes change.
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 		JSON.stringify( globalStyle ),
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 		JSON.stringify( wrapperProps?.style ),
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 		JSON.stringify(
 			Object.fromEntries(
 				Object.entries( attributes ?? {} ).filter( ( [ key ] ) =>
@@ -407,6 +405,9 @@ function BlockListBlock( {
 							}
 							wrapperProps={ wrapperProps }
 							mayDisplayControls={ mayDisplayControls }
+							mayDisplayPatternEditingControls={
+								mayDisplayPatternEditingControls
+							}
 							blockEditingMode={ blockEditingMode }
 						/>
 						<View onLayout={ onLayout } />

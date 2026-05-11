@@ -1,29 +1,35 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
-
-/**
- * Internal dependencies
- */
-import ResizableBox from '..';
+import type { Meta, StoryFn } from '@storybook/react-vite';
 
 /**
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
 
+/**
+ * Internal dependencies
+ */
+import ResizableBox from '..';
+
 const meta: Meta< typeof ResizableBox > = {
-	title: 'Components/ResizableBox',
+	tags: [ 'manifest' ],
+	title: 'Components/Utilities/ResizableBox',
+	id: 'components-resizablebox',
 	component: ResizableBox,
 	argTypes: {
-		children: { control: { type: null } },
+		children: { control: false },
 		enable: { control: 'object' },
 		onResizeStop: { action: 'onResizeStop' },
 	},
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'stable',
+			whereUsed: 'global',
+		},
 	},
 };
 export default meta;

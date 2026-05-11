@@ -183,7 +183,7 @@ For features included in the Gutenberg plugin, the deprecation policy is intende
 
 ## 3.8.0
 
--   `wp.components.withContext` has been removed. Please use `wp.element.createContext` instead. See: https://reactjs.org/docs/context.html.
+-   `wp.components.withContext` has been removed. Please use `wp.element.createContext` instead. See: https://react.dev/reference/react/createContext.
 -   `wp.coreBlocks.registerCoreBlocks` has been removed. Please use `wp.blockLibrary.registerCoreBlocks` instead.
 -   `wp.editor.DocumentTitle` component has been removed.
 -   `getDocumentTitle` selector (`core/editor`) has been removed.

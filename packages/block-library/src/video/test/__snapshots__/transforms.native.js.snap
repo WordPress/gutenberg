@@ -12,7 +12,7 @@ exports[`Video block transforms to Columns block 1`] = `
 
 exports[`Video block transforms to Cover block 1`] = `
 "<!-- wp:cover {"url":"https://i.cloudup.com/YtZFJbuQCE.mov","dimRatio":50,"backgroundType":"video"} -->
-<div class="wp-block-cover"><span aria-hidden="true" class="wp-block-cover__background has-background-dim"></span><video class="wp-block-cover__video-background intrinsic-ignore" autoplay muted loop playsinline src="https://i.cloudup.com/YtZFJbuQCE.mov" data-object-fit="cover"></video><div class="wp-block-cover__inner-container"><!-- wp:paragraph {"align":"center","fontSize":"large"} -->
+<div class="wp-block-cover"><video class="wp-block-cover__video-background intrinsic-ignore" autoplay muted loop playsinline src="https://i.cloudup.com/YtZFJbuQCE.mov" data-object-fit="cover"></video><span aria-hidden="true" class="wp-block-cover__background has-background-dim"></span><div class="wp-block-cover__inner-container"><!-- wp:paragraph {"align":"center","fontSize":"large"} -->
 <p class="has-text-align-center has-large-font-size">Cloudup video</p>
 <!-- /wp:paragraph --></div></div>
 <!-- /wp:cover -->"

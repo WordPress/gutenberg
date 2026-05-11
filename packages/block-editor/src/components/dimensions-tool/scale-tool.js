@@ -76,7 +76,7 @@ const DEFAULT_SCALE_OPTIONS = [
  *
  * @param {ScaleToolProps} props
  *
- * @return {import('react').ReactElement} The scale tool.
+ * @return {React.ReactElement} The scale tool.
  */
 export default function ScaleTool( {
 	panelId,
@@ -98,14 +98,14 @@ export default function ScaleTool( {
 
 	return (
 		<ToolsPanelItem
-			label={ __( 'Scale' ) }
+			label={ _x( 'Scale', 'Image scaling options' ) }
 			isShownByDefault={ isShownByDefault }
 			hasValue={ () => displayValue !== defaultValue }
 			onDeselect={ () => onChange( defaultValue ) }
 			panelId={ panelId }
 		>
 			<ToggleGroupControl
-				label={ __( 'Scale' ) }
+				label={ _x( 'Scale', 'Image scaling options' ) }
 				isBlock
 				help={ scaleHelp[ displayValue ] }
 				value={ displayValue }

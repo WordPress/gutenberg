@@ -70,13 +70,12 @@ test.describe( 'Post publish button', () => {
 		admin,
 		page,
 		requestUtils,
+		editor,
 	} ) => {
 		await requestUtils.activatePlugin( 'gutenberg-test-plugin-meta-box' );
 		await admin.createNewPost();
-		await page
-			.getByRole( 'textbox', {
-				name: 'Add title',
-			} )
+		await editor.canvas
+			.getByRole( 'textbox', { name: 'Add title' } )
 			.fill( 'Test post' );
 
 		const topBar = page.getByRole( 'region', { name: 'Editor top bar' } );

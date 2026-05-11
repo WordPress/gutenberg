@@ -30,7 +30,6 @@ describe( 'compose', () => {
 		const c = ( value ) => ( value += 'c' );
 		const d = ( value ) => ( value += 'd' );
 		const e = ( value ) => ( value += 'e' );
-		const f = ( value ) => ( value += 'f' );
 
 		expect( compose( [ a, b ], c, [ d ], e )( 'test' ) ).toBe(
 			'testedcba'

@@ -1,3 +1,8 @@
+/**
+ * Internal dependencies
+ */
+import type { ButtonProps } from '../button/types';
+
 export type RadioGroupProps = {
 	/**
 	 * Accessible label for the radio group
@@ -27,7 +32,7 @@ export type RadioGroupProps = {
 	children: React.ReactNode;
 };
 
-export type RadioProps = {
+export type RadioProps = Pick< ButtonProps, '__next40pxDefaultSize' > & {
 	/**
 	 * The actual value of the radio element.
 	 */

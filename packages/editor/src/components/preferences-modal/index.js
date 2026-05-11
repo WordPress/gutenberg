@@ -18,7 +18,7 @@ import { store as interfaceStore } from '@wordpress/interface';
 import EnablePanelOption from './enable-panel';
 import EnablePluginDocumentSettingPanelOption from './enable-plugin-document-setting-panel';
 import EnablePublishSidebarOption from './enable-publish-sidebar';
-import BlockManager from '../block-manager';
+import BlockVisibility from '../block-visibility';
 import PostTaxonomies from '../post-taxonomies';
 import PostFeaturedImageCheck from '../post-featured-image/check';
 import PostExcerptCheck from '../post-excerpt/check';
@@ -35,12 +35,31 @@ const {
 } = unlock( preferencesPrivateApis );
 
 export default function EditorPreferencesModal( { extraSections = {} } ) {
+	const isActive = useSelect( ( select ) => {
+		return select( interfaceStore ).isModalActive( 'editor/preferences' );
+	}, [] );
+	const { closeModal } = useDispatch( interfaceStore );
+
+	if ( ! isActive ) {
+		return null;
+	}
+
+	// Please wrap all contents inside PreferencesModalContents to prevent all
+	// hooks from executing when the modal is not open.
+	return (
+		<PreferencesModal closeModal={ closeModal }>
+			<PreferencesModalContents extraSections={ extraSections } />
+		</PreferencesModal>
+	);
+}
+
+function PreferencesModalContents( { extraSections = {} } ) {
 	const isLargeViewport = useViewportMatch( 'medium' );
-	const { isActive, showBlockBreadcrumbsOption } = useSelect(
+	const { showBlockBreadcrumbsOption, showCollaborationOptions } = useSelect(
 		( select ) => {
-			const { getEditorSettings } = select( editorStore );
+			const { getEditorSettings, isCollaborationEnabledForCurrentPost } =
+				select( editorStore );
 			const { get } = select( preferencesStore );
-			const { isModalActive } = select( interfaceStore );
 			const isRichEditingEnabled = getEditorSettings().richEditingEnabled;
 			const isDistractionFreeEnabled = get( 'core', 'distractionFree' );
 			return {
@@ -48,225 +67,301 @@ export default function EditorPreferencesModal( { extraSections = {} } ) {
 					! isDistractionFreeEnabled &&
 					isLargeViewport &&
 					isRichEditingEnabled,
-				isActive: isModalActive( 'editor/preferences' ),
+				showCollaborationOptions:
+					isCollaborationEnabledForCurrentPost(),
 			};
 		},
 		[ isLargeViewport ]
 	);
-	const { closeModal } = useDispatch( interfaceStore );
+
 	const { setIsListViewOpened, setIsInserterOpened } =
 		useDispatch( editorStore );
 	const { set: setPreference } = useDispatch( preferencesStore );
 
 	const sections = useMemo(
-		() => [
-			{
-				name: 'general',
-				tabLabel: __( 'General' ),
-				content: (
-					<>
-						<PreferencesModalSection title={ __( 'Interface' ) }>
-							<PreferenceToggleControl
-								scope="core"
-								featureName="showListViewByDefault"
-								help={ __(
-									'Opens the List View sidebar by default.'
-								) }
-								label={ __( 'Always open List View' ) }
-							/>
-							{ showBlockBreadcrumbsOption && (
+		() =>
+			[
+				{
+					name: 'general',
+					tabLabel: __( 'General' ),
+					content: (
+						<>
+							<PreferencesModalSection
+								title={ __( 'Interface' ) }
+							>
 								<PreferenceToggleControl
 									scope="core"
-									featureName="showBlockBreadcrumbs"
+									featureName="showListViewByDefault"
 									help={ __(
-										'Display the block hierarchy trail at the bottom of the editor.'
+										'Opens the List View panel by default.'
 									) }
-									label={ __( 'Show block breadcrumbs' ) }
+									label={ __( 'Always open List View' ) }
 								/>
-							) }
-							<PreferenceToggleControl
-								scope="core"
-								featureName="allowRightClickOverrides"
-								help={ __(
-									'Allows contextual List View menus via right-click, overriding browser defaults.'
-								) }
-								label={ __(
-									'Allow right-click contextual menus'
-								) }
-							/>
-						</PreferencesModalSection>
-						<PreferencesModalSection
-							title={ __( 'Document settings' ) }
-							description={ __(
-								'Select what settings are shown in the document panel.'
-							) }
-						>
-							<EnablePluginDocumentSettingPanelOption.Slot />
-							<PostTaxonomies
-								taxonomyWrapper={ ( content, taxonomy ) => (
-									<EnablePanelOption
-										label={ taxonomy.labels.menu_name }
-										panelName={ `taxonomy-panel-${ taxonomy.slug }` }
+								{ showBlockBreadcrumbsOption && (
+									<PreferenceToggleControl
+										scope="core"
+										featureName="showBlockBreadcrumbs"
+										help={ __(
+											'Display the block hierarchy trail at the bottom of the editor.'
+										) }
+										label={ __( 'Show block breadcrumbs' ) }
 									/>
 								) }
-							/>
-							<PostFeaturedImageCheck>
-								<EnablePanelOption
-									label={ __( 'Featured image' ) }
-									panelName="featured-image"
-								/>
-							</PostFeaturedImageCheck>
-							<PostExcerptCheck>
-								<EnablePanelOption
-									label={ __( 'Excerpt' ) }
-									panelName="post-excerpt"
-								/>
-							</PostExcerptCheck>
-							<PostTypeSupportCheck
-								supportKeys={ [ 'comments', 'trackbacks' ] }
-							>
-								<EnablePanelOption
-									label={ __( 'Discussion' ) }
-									panelName="discussion-panel"
-								/>
-							</PostTypeSupportCheck>
-							<PageAttributesCheck>
-								<EnablePanelOption
-									label={ __( 'Page attributes' ) }
-									panelName="page-attributes"
-								/>
-							</PageAttributesCheck>
-						</PreferencesModalSection>
-						{ isLargeViewport && (
-							<PreferencesModalSection
-								title={ __( 'Publishing' ) }
-							>
-								<EnablePublishSidebarOption
+								<PreferenceToggleControl
+									scope="core"
+									featureName="allowRightClickOverrides"
 									help={ __(
-										'Review settings, such as visibility and tags.'
+										'Allows contextual List View menus via right-click, overriding browser defaults.'
 									) }
-									label={ __( 'Enable pre-publish checks' ) }
+									label={ __(
+										'Allow right-click contextual menus'
+									) }
+								/>
+								<PreferenceToggleControl
+									scope="core"
+									featureName="enableChoosePatternModal"
+									help={ __(
+										'Pick from starter content when creating a new page.'
+									) }
+									label={ __( 'Show starter patterns' ) }
+								/>
+								{ showCollaborationOptions && (
+									<>
+										<PreferenceToggleControl
+											scope="core"
+											featureName="showCollaborationCursor"
+											help={ __(
+												'Show your own avatar inside blocks during collaborative editing sessions.'
+											) }
+											label={ __(
+												'Show avatar in blocks'
+											) }
+										/>
+										<PreferenceToggleControl
+											scope="core"
+											featureName="showCollaborationNotifications"
+											help={ __(
+												'Show notifications when collaborators join, leave, or save the post.'
+											) }
+											label={ __(
+												'Show collaboration notifications'
+											) }
+										/>
+									</>
+								) }
+							</PreferencesModalSection>
+							<PreferencesModalSection
+								title={ __( 'Document settings' ) }
+								description={ __(
+									'Select what settings are shown in the document panel.'
+								) }
+							>
+								<EnablePluginDocumentSettingPanelOption.Slot />
+								<PostTaxonomies
+									taxonomyWrapper={ ( content, taxonomy ) => (
+										<EnablePanelOption
+											label={ taxonomy.labels.menu_name }
+											panelName={ `taxonomy-panel-${ taxonomy.slug }` }
+										/>
+									) }
+								/>
+								<PostFeaturedImageCheck>
+									<EnablePanelOption
+										label={ __( 'Featured image' ) }
+										panelName="featured-image"
+									/>
+								</PostFeaturedImageCheck>
+								<PostExcerptCheck>
+									<EnablePanelOption
+										label={ __( 'Excerpt' ) }
+										panelName="post-excerpt"
+									/>
+								</PostExcerptCheck>
+								<PostTypeSupportCheck
+									supportKeys={ [ 'comments', 'trackbacks' ] }
+								>
+									<EnablePanelOption
+										label={ __( 'Discussion' ) }
+										panelName="discussion-panel"
+									/>
+								</PostTypeSupportCheck>
+								<PageAttributesCheck>
+									<EnablePanelOption
+										label={ __( 'Page attributes' ) }
+										panelName="page-attributes"
+									/>
+								</PageAttributesCheck>
+							</PreferencesModalSection>
+							{ isLargeViewport && (
+								<PreferencesModalSection
+									title={ __( 'Publishing' ) }
+								>
+									<EnablePublishSidebarOption
+										help={ __(
+											'Review settings, such as visibility and tags.'
+										) }
+										label={ __(
+											'Enable pre-publish checks'
+										) }
+									/>
+								</PreferencesModalSection>
+							) }
+							{ extraSections?.general }
+						</>
+					),
+				},
+				{
+					name: 'appearance',
+					tabLabel: __( 'Appearance' ),
+					content: (
+						<PreferencesModalSection
+							title={ __( 'Appearance' ) }
+							description={ __(
+								'Customize the editor interface to suit your needs.'
+							) }
+						>
+							<PreferenceToggleControl
+								scope="core"
+								featureName="fixedToolbar"
+								onToggle={ () =>
+									setPreference(
+										'core',
+										'distractionFree',
+										false
+									)
+								}
+								help={ __(
+									'Access all block and document tools in a single place.'
+								) }
+								label={ __( 'Top toolbar' ) }
+							/>
+							<PreferenceToggleControl
+								scope="core"
+								featureName="distractionFree"
+								onToggle={ () => {
+									setPreference(
+										'core',
+										'fixedToolbar',
+										true
+									);
+									setIsInserterOpened( false );
+									setIsListViewOpened( false );
+								} }
+								help={ __(
+									'Reduce visual distractions by hiding the toolbar and other elements to focus on writing.'
+								) }
+								label={ __( 'Distraction free' ) }
+							/>
+							<PreferenceToggleControl
+								scope="core"
+								featureName="focusMode"
+								help={ __(
+									'Highlights the current block and fades other content.'
+								) }
+								label={ __( 'Spotlight mode' ) }
+							/>
+							{ extraSections?.appearance }
+						</PreferencesModalSection>
+					),
+				},
+				{
+					name: 'accessibility',
+					tabLabel: __( 'Accessibility' ),
+					content: (
+						<>
+							<PreferencesModalSection
+								title={ __( 'Navigation' ) }
+								description={ __(
+									'Optimize the editing experience for enhanced control.'
+								) }
+							>
+								<PreferenceToggleControl
+									scope="core"
+									featureName="keepCaretInsideBlock"
+									help={ __(
+										'Keeps the text cursor within blocks while navigating with arrow keys, preventing it from moving to other blocks and enhancing accessibility for keyboard users.'
+									) }
+									label={ __(
+										'Contain text cursor inside block'
+									) }
 								/>
 							</PreferencesModalSection>
-						) }
-						{ extraSections?.general }
-					</>
-				),
-			},
-			{
-				name: 'appearance',
-				tabLabel: __( 'Appearance' ),
-				content: (
-					<PreferencesModalSection
-						title={ __( 'Appearance' ) }
-						description={ __(
-							'Customize the editor interface to suit your needs.'
-						) }
-					>
-						<PreferenceToggleControl
-							scope="core"
-							featureName="fixedToolbar"
-							onToggle={ () =>
-								setPreference(
-									'core',
-									'distractionFree',
-									false
-								)
-							}
-							help={ __(
-								'Access all block and document tools in a single place.'
-							) }
-							label={ __( 'Top toolbar' ) }
-						/>
-						<PreferenceToggleControl
-							scope="core"
-							featureName="distractionFree"
-							onToggle={ () => {
-								setPreference( 'core', 'fixedToolbar', true );
-								setIsInserterOpened( false );
-								setIsListViewOpened( false );
-							} }
-							help={ __(
-								'Reduce visual distractions by hiding the toolbar and other elements to focus on writing.'
-							) }
-							label={ __( 'Distraction free' ) }
-						/>
-						<PreferenceToggleControl
-							scope="core"
-							featureName="focusMode"
-							help={ __(
-								'Highlights the current block and fades other content.'
-							) }
-							label={ __( 'Spotlight mode' ) }
-						/>
-						{ extraSections?.appearance }
-					</PreferencesModalSection>
-				),
-			},
-			{
-				name: 'accessibility',
-				tabLabel: __( 'Accessibility' ),
-				content: (
-					<>
-						<PreferencesModalSection
-							title={ __( 'Navigation' ) }
-							description={ __(
-								'Optimize the editing experience for enhanced control.'
-							) }
-						>
-							<PreferenceToggleControl
-								scope="core"
-								featureName="keepCaretInsideBlock"
-								help={ __(
-									'Keeps the text cursor within the block boundaries, aiding users with screen readers by preventing unintentional cursor movement outside the block.'
+							<PreferencesModalSection
+								title={ __( 'Interface' ) }
+							>
+								<PreferenceToggleControl
+									scope="core"
+									featureName="showIconLabels"
+									label={ __( 'Show button text labels' ) }
+									help={ __(
+										'Show text instead of icons on buttons across the interface.'
+									) }
+								/>
+							</PreferencesModalSection>
+						</>
+					),
+				},
+				{
+					name: 'blocks',
+					tabLabel: __( 'Blocks' ),
+					content: (
+						<>
+							<PreferencesModalSection title={ __( 'Inserter' ) }>
+								<PreferenceToggleControl
+									scope="core"
+									featureName="mostUsedBlocks"
+									help={ __(
+										'Adds a category with the most frequently used blocks in the inserter.'
+									) }
+									label={ __( 'Show most used blocks' ) }
+								/>
+							</PreferencesModalSection>
+							<PreferencesModalSection
+								title={ __( 'Manage block visibility' ) }
+								description={ __(
+									"Disable blocks that you don't want to appear in the inserter. They can always be toggled back on later."
 								) }
-								label={ __(
-									'Contain text cursor inside block'
+							>
+								<BlockVisibility />
+							</PreferencesModalSection>
+						</>
+					),
+				},
+				window.__clientSideMediaProcessing && {
+					name: 'media',
+					tabLabel: __( 'Media' ),
+					content: (
+						<>
+							<PreferencesModalSection
+								title={ __( 'General' ) }
+								description={ __(
+									'Customize options related to the media upload flow.'
 								) }
-							/>
-						</PreferencesModalSection>
-						<PreferencesModalSection title={ __( 'Interface' ) }>
-							<PreferenceToggleControl
-								scope="core"
-								featureName="showIconLabels"
-								label={ __( 'Show button text labels' ) }
-								help={ __(
-									'Show text instead of icons on buttons across the interface.'
-								) }
-							/>
-						</PreferencesModalSection>
-					</>
-				),
-			},
-			{
-				name: 'blocks',
-				tabLabel: __( 'Blocks' ),
-				content: (
-					<>
-						<PreferencesModalSection title={ __( 'Inserter' ) }>
-							<PreferenceToggleControl
-								scope="core"
-								featureName="mostUsedBlocks"
-								help={ __(
-									'Adds a category with the most frequently used blocks in the inserter.'
-								) }
-								label={ __( 'Show most used blocks' ) }
-							/>
-						</PreferencesModalSection>
-						<PreferencesModalSection
-							title={ __( 'Manage block visibility' ) }
-							description={ __(
-								"Disable blocks that you don't want to appear in the inserter. They can always be toggled back on later."
-							) }
-						>
-							<BlockManager />
-						</PreferencesModalSection>
-					</>
-				),
-			},
-		],
+							>
+								<PreferenceToggleControl
+									scope="core/media"
+									featureName="optimizeOnUpload"
+									help={ __(
+										'Compress media items before uploading to the server.'
+									) }
+									label={ __( 'Pre-upload compression' ) }
+								/>
+								<PreferenceToggleControl
+									scope="core/media"
+									featureName="requireApproval"
+									help={ __(
+										'Require approval step when optimizing existing media.'
+									) }
+									label={ __( 'Approval step' ) }
+								/>
+							</PreferencesModalSection>
+						</>
+					),
+				},
+			].filter( Boolean ),
 		[
 			showBlockBreadcrumbsOption,
+			showCollaborationOptions,
 			extraSections,
 			setIsInserterOpened,
 			setIsListViewOpened,
@@ -275,13 +370,5 @@ export default function EditorPreferencesModal( { extraSections = {} } ) {
 		]
 	);
 
-	if ( ! isActive ) {
-		return null;
-	}
-
-	return (
-		<PreferencesModal closeModal={ closeModal }>
-			<PreferencesModalTabs sections={ sections } />
-		</PreferencesModal>
-	);
+	return <PreferencesModalTabs sections={ sections } />;
 }

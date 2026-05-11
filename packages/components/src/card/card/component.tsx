@@ -34,7 +34,7 @@ function UnconnectedCard(
 		size,
 		...otherProps
 	} = useCard( props );
-	const elevationBorderRadius = isRounded ? CONFIG.cardBorderRadius : 0;
+	const elevationBorderRadius = isRounded ? CONFIG.radiusLarge : 0;
 
 	const cx = useCx();
 

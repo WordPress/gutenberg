@@ -22,7 +22,7 @@ import { useContext } from '@wordpress/element';
 import { unlock } from '../../lock-unlock';
 import { SidebarNavigationContext } from '../sidebar';
 
-const { useHistory } = unlock( routerPrivateApis );
+const { useHistory, useLink } = unlock( routerPrivateApis );
 
 export default function SidebarNavigationItem( {
 	className,
@@ -30,7 +30,7 @@ export default function SidebarNavigationItem( {
 	withChevron = false,
 	suffix,
 	uid,
-	params,
+	to,
 	onClick,
 	children,
 	...props
@@ -42,12 +42,13 @@ export default function SidebarNavigationItem( {
 		if ( onClick ) {
 			onClick( e );
 			navigate( 'forward' );
-		} else if ( params ) {
+		} else if ( to ) {
 			e.preventDefault();
-			history.push( params );
+			history.navigate( to );
 			navigate( 'forward', `[id="${ uid }"]` );
 		}
 	}
+	const linkProps = useLink( to );
 
 	return (
 		<Item
@@ -56,8 +57,9 @@ export default function SidebarNavigationItem( {
 				{ 'with-suffix': ! withChevron && suffix },
 				className
 			) }
-			onClick={ handleClick }
 			id={ uid }
+			onClick={ handleClick }
+			href={ to ? linkProps.href : undefined }
 			{ ...props }
 		>
 			<HStack justify="flex-start">

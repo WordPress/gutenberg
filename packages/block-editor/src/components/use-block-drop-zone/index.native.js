@@ -132,7 +132,6 @@ export default function useBlockDropZone( {
 	const getSortedBlocksLayouts = useCallback( () => {
 		return getBlockLayoutsOrderedByYCoord( blocksLayouts.current );
 		// We use the value of `blocksLayouts` as the dependency.
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ blocksLayouts.current ] );
 
 	const isRTL = getSettings().isRTL;

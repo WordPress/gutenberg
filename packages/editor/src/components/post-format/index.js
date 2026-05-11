@@ -46,7 +46,7 @@ export const POST_FORMATS = [
  * <PostFormat />
  * ```
  *
- * @return {JSX.Element} The rendered PostFormat component.
+ * @return {React.ReactNode} The rendered PostFormat component.
  */
 export default function PostFormat() {
 	const instanceId = useInstanceId( PostFormat );
@@ -100,6 +100,7 @@ export default function PostFormat() {
 				{ suggestion && suggestion.id !== postFormat && (
 					<p className="editor-post-format__suggestion">
 						<Button
+							__next40pxDefaultSize
 							variant="link"
 							onClick={ () =>
 								onUpdatePostFormat( suggestion.id )

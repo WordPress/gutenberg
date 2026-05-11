@@ -58,7 +58,7 @@ async function setupRest( this: RequestUtils ): Promise< StorageState > {
 					return error;
 				}
 
-				return nonce && rootURL ? true : false;
+				return !! ( nonce && rootURL );
 			},
 			{
 				message: 'Failed to setup REST API.',

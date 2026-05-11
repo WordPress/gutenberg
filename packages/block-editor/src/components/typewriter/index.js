@@ -193,7 +193,7 @@ export function useTypewriter() {
 			}
 
 			/**
-			 * Checks if the current situation is elegible for scroll:
+			 * Checks if the current situation is eligible for scroll:
 			 * - There should be one and only one block selected.
 			 * - The component must contain the selection.
 			 * - The active element must be contenteditable.

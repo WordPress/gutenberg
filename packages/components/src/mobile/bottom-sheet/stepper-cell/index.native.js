@@ -159,7 +159,7 @@ class BottomSheetStepperCell extends Component {
 		};
 
 		const accessibilityLabel = sprintf(
-			/* translators: accessibility text. Inform about current value. %1$s: Control label %2$s: setting label (example: width), %3$s: Current value. %4$s: value measurement unit (example: pixels) */
+			/* translators: accessibility text. Inform about current value. 1: Control label. 2: setting label (example: width). 3: Current value. 4: value measurement unit (example: pixels) */
 			__( '%1$s. %2$s is %3$s %4$s.' ),
 			label,
 			settingLabel,

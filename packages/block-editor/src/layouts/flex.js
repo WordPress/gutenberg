@@ -12,7 +12,6 @@ import {
 	arrowDown,
 } from '@wordpress/icons';
 import {
-	Button,
 	ToggleControl,
 	Flex,
 	FlexItem,
@@ -24,7 +23,8 @@ import {
  * Internal dependencies
  */
 import { appendSelectors, getBlockGapCSS } from './utils';
-import { getGapCSSValue } from '../hooks/gap';
+import { getGapCSSValue, getGapBoxControlValueFromStyle } from '../hooks/gap';
+import { getSpacingPresetCssVar } from '../components/spacing-sizes-control/utils';
 import {
 	BlockControls,
 	JustifyContentControl,
@@ -57,6 +57,11 @@ const verticalAlignmentMap = {
 	'space-between': 'space-between',
 };
 
+const defaultAlignments = {
+	horizontal: 'center',
+	vertical: 'top',
+};
+
 const flexWrapOptions = [ 'wrap', 'nowrap' ];
 
 export default {
@@ -67,26 +72,34 @@ export default {
 		onChange,
 		layoutBlockSupport = {},
 	} ) {
-		const { allowOrientation = true } = layoutBlockSupport;
+		const {
+			allowOrientation = true,
+			allowJustification = true,
+			allowWrap = true,
+		} = layoutBlockSupport;
 		return (
 			<>
 				<Flex>
-					<FlexItem>
-						<FlexLayoutJustifyContentControl
-							layout={ layout }
-							onChange={ onChange }
-						/>
-					</FlexItem>
-					<FlexItem>
-						{ allowOrientation && (
+					{ allowJustification && (
+						<FlexItem>
+							<FlexLayoutJustifyContentControl
+								layout={ layout }
+								onChange={ onChange }
+							/>
+						</FlexItem>
+					) }
+					{ allowOrientation && (
+						<FlexItem>
 							<OrientationControl
 								layout={ layout }
 								onChange={ onChange }
 							/>
-						) }
-					</FlexItem>
+						</FlexItem>
+					) }
 				</Flex>
-				<FlexWrapControl layout={ layout } onChange={ onChange } />
+				{ allowWrap && (
+					<FlexWrapControl layout={ layout } onChange={ onChange } />
+				) }
 			</>
 		);
 	},
@@ -95,22 +108,26 @@ export default {
 		onChange,
 		layoutBlockSupport,
 	} ) {
-		if ( layoutBlockSupport?.allowSwitching ) {
+		const { allowVerticalAlignment = true, allowJustification = true } =
+			layoutBlockSupport;
+
+		if ( ! allowJustification && ! allowVerticalAlignment ) {
 			return null;
 		}
-		const { allowVerticalAlignment = true } = layoutBlockSupport;
+
 		return (
 			<BlockControls group="block" __experimentalShareWithChildBlocks>
-				<FlexLayoutJustifyContentControl
-					layout={ layout }
-					onChange={ onChange }
-					isToolbar
-				/>
+				{ allowJustification && (
+					<FlexLayoutJustifyContentControl
+						layout={ layout }
+						onChange={ onChange }
+						isToolbar
+					/>
+				) }
 				{ allowVerticalAlignment && (
 					<FlexLayoutVerticalAlignmentControl
 						layout={ layout }
 						onChange={ onChange }
-						isToolbar
 					/>
 				) }
 			</BlockControls>
@@ -122,16 +139,29 @@ export default {
 		style,
 		blockName,
 		hasBlockGapSupport,
+		globalBlockGapValue,
 		layoutDefinitions = LAYOUT_DEFINITIONS,
 	} ) {
 		const { orientation = 'horizontal' } = layout;
+
+		// Determine the fallback gap value using global styles (theme.json),
+		// falling back to '0.5em' for backwards compatibility.
+		let fallbackGapValue = '0.5em';
+		if ( globalBlockGapValue ) {
+			const gapBox =
+				getGapBoxControlValueFromStyle( globalBlockGapValue );
+			fallbackGapValue =
+				getSpacingPresetCssVar( gapBox?.left ) ||
+				getSpacingPresetCssVar( gapBox?.top ) ||
+				'0.5em';
+		}
 
 		// If a block's block.json skips serialization for spacing or spacing.blockGap,
 		// don't apply the user-defined value to the styles.
 		const blockGapValue =
 			style?.spacing?.blockGap &&
 			! shouldSkipSerialization( blockName, 'spacing', 'blockGap' )
-				? getGapCSSValue( style?.spacing?.blockGap, '0.5em' )
+				? getGapCSSValue( style?.spacing?.blockGap, fallbackGapValue )
 				: undefined;
 		const justifyContent = justifyContentMap[ layout.justifyContent ];
 		const flexWrap = flexWrapOptions.includes( layout.flexWrap )
@@ -190,17 +220,13 @@ export default {
 	},
 };
 
-function FlexLayoutVerticalAlignmentControl( {
-	layout,
-	onChange,
-	isToolbar = false,
-} ) {
+function FlexLayoutVerticalAlignmentControl( { layout, onChange } ) {
 	const { orientation = 'horizontal' } = layout;
 
 	const defaultVerticalAlignment =
 		orientation === 'horizontal'
-			? verticalAlignmentMap.center
-			: verticalAlignmentMap.top;
+			? defaultAlignments.horizontal
+			: defaultAlignments.vertical;
 
 	const { verticalAlignment = defaultVerticalAlignment } = layout;
 
@@ -210,52 +236,17 @@ function FlexLayoutVerticalAlignmentControl( {
 			verticalAlignment: value,
 		} );
 	};
-	if ( isToolbar ) {
-		return (
-			<BlockVerticalAlignmentControl
-				onChange={ onVerticalAlignmentChange }
-				value={ verticalAlignment }
-				controls={
-					orientation === 'horizontal'
-						? [ 'top', 'center', 'bottom', 'stretch' ]
-						: [ 'top', 'center', 'bottom', 'space-between' ]
-				}
-			/>
-		);
-	}
-
-	const verticalAlignmentOptions = [
-		{
-			value: 'flex-start',
-			label: __( 'Align items top' ),
-		},
-		{
-			value: 'center',
-			label: __( 'Align items center' ),
-		},
-		{
-			value: 'flex-end',
-			label: __( 'Align items bottom' ),
-		},
-	];
 
 	return (
-		<fieldset className="block-editor-hooks__flex-layout-vertical-alignment-control">
-			<legend>{ __( 'Vertical alignment' ) }</legend>
-			<div>
-				{ verticalAlignmentOptions.map( ( value, icon, label ) => {
-					return (
-						<Button
-							key={ value }
-							label={ label }
-							icon={ icon }
-							isPressed={ verticalAlignment === value }
-							onClick={ () => onVerticalAlignmentChange( value ) }
-						/>
-					);
-				} ) }
-			</div>
-		</fieldset>
+		<BlockVerticalAlignmentControl
+			onChange={ onVerticalAlignmentChange }
+			value={ verticalAlignment }
+			controls={
+				orientation === 'horizontal'
+					? [ 'top', 'center', 'bottom', 'stretch' ]
+					: [ 'top', 'center', 'bottom', 'space-between' ]
+			}
+		/>
 	);
 }
 
@@ -325,7 +316,7 @@ function FlexLayoutJustifyContentControl( {
 
 	return (
 		<ToggleGroupControl
-			__nextHasNoMarginBottom
+			__next40pxDefaultSize
 			label={ __( 'Justification' ) }
 			value={ justifyContent }
 			onChange={ onJustificationChange }
@@ -349,7 +340,6 @@ function FlexWrapControl( { layout, onChange } ) {
 	const { flexWrap = 'wrap' } = layout;
 	return (
 		<ToggleControl
-			__nextHasNoMarginBottom
 			label={ __( 'Allow to wrap to multiple lines' ) }
 			onChange={ ( value ) => {
 				onChange( {
@@ -370,7 +360,7 @@ function OrientationControl( { layout, onChange } ) {
 	} = layout;
 	return (
 		<ToggleGroupControl
-			__nextHasNoMarginBottom
+			__next40pxDefaultSize
 			className="block-editor-hooks__flex-layout-orientation-controls"
 			label={ __( 'Orientation' ) }
 			value={ orientation }

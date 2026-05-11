@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { getProtocol, prependHTTP } from '@wordpress/url';
 import { useCallback } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 
@@ -9,39 +8,20 @@ import { useSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import isURLLike from './is-url-like';
-import {
-	CREATE_TYPE,
-	TEL_TYPE,
-	MAILTO_TYPE,
-	INTERNAL_TYPE,
-	URL_TYPE,
-} from './constants';
+import normalizeUrl from './normalize-url';
+import { CREATE_TYPE } from './constants';
 import { store as blockEditorStore } from '../../store';
 
 export const handleNoop = () => Promise.resolve( [] );
 
 export const handleDirectEntry = ( val ) => {
-	let type = URL_TYPE;
-
-	const protocol = getProtocol( val ) || '';
-
-	if ( protocol.includes( 'mailto' ) ) {
-		type = MAILTO_TYPE;
-	}
-
-	if ( protocol.includes( 'tel' ) ) {
-		type = TEL_TYPE;
-	}
-
-	if ( val?.startsWith( '#' ) ) {
-		type = INTERNAL_TYPE;
-	}
+	const { url, type } = normalizeUrl( val );
 
 	return Promise.resolve( [
 		{
 			id: val,
 			title: val,
-			url: type === 'URL' ? prependHTTP( val ) : val,
+			url,
 			type,
 		},
 	] );
@@ -94,7 +74,7 @@ const handleEntitySearch = async (
 	return isURLLike( val ) || ! withCreateSuggestion
 		? results
 		: results.concat( {
-				// the `id` prop is intentionally ommitted here because it
+				// the `id` prop is intentionally omitted here because it
 				// is never exposed as part of the component's public API.
 				// see: https://github.com/WordPress/gutenberg/pull/19775#discussion_r378931316.
 				title: val, // Must match the existing `<input>`s text value.

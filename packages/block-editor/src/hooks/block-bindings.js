@@ -4,87 +4,113 @@
 import { __ } from '@wordpress/i18n';
 import { store as blocksStore } from '@wordpress/blocks';
 import {
-	BaseControl,
-	PanelBody,
-	__experimentalHStack as HStack,
 	__experimentalItemGroup as ItemGroup,
-	__experimentalItem as Item,
+	__experimentalText as WCText,
+	__experimentalToolsPanel as ToolsPanel,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
+import { useContext } from '@wordpress/element';
+import { useViewportMatch } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
-import { canBindAttribute } from '../hooks/use-bindings-attributes';
+import {
+	BlockBindingsAttributeControl,
+	useBlockBindingsUtils,
+} from '../components/block-bindings';
 import { unlock } from '../lock-unlock';
 import InspectorControls from '../components/inspector-controls';
+import BlockContext from '../components/block-context';
+import { store as blockEditorStore } from '../store';
 
-export const BlockBindingsPanel = ( { name, metadata } ) => {
-	const { bindings } = metadata || {};
-	const { sources } = useSelect( ( select ) => {
-		const _sources = unlock(
-			select( blocksStore )
-		).getAllBlockBindingsSources();
+const useToolsPanelDropdownMenuProps = () => {
+	const isMobile = useViewportMatch( 'medium', '<' );
+	return ! isMobile
+		? {
+				popoverProps: {
+					placement: 'left-start',
+					// For non-mobile, inner sidebar width (248px) - button width (24px) - border (1px) + padding (16px) + spacing (20px)
+					offset: 259,
+				},
+		  }
+		: {};
+};
 
-		return {
-			sources: _sources,
-		};
-	}, [] );
+export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
+	const blockContext = useContext( BlockContext );
+	const { removeAllBlockBindings } = useBlockBindingsUtils();
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
-	if ( ! bindings ) {
+	const { bindableAttributes, hasCompatibleFields } = useSelect(
+		( select ) => {
+			const { __experimentalBlockBindingsSupportedAttributes } =
+				select( blockEditorStore ).getSettings();
+			const {
+				getAllBlockBindingsSources,
+				getBlockBindingsSourceFieldsList,
+			} = unlock( select( blocksStore ) );
+
+			return {
+				bindableAttributes:
+					__experimentalBlockBindingsSupportedAttributes?.[
+						blockName
+					],
+				hasCompatibleFields: Object.values(
+					getAllBlockBindingsSources()
+				).some(
+					( source ) =>
+						getBlockBindingsSourceFieldsList( source, blockContext )
+							?.length > 0
+				),
+			};
+		},
+		[ blockName, blockContext ]
+	);
+
+	// Return early if there are no bindable attributes.
+	if ( ! bindableAttributes || bindableAttributes.length === 0 ) {
 		return null;
 	}
 
-	// Don't show not allowed attributes.
-	// Don't show the bindings connected to pattern overrides in the inspectors panel.
-	// TODO: Explore if this should be abstracted to let other sources decide.
-	const filteredBindings = { ...bindings };
-	Object.keys( filteredBindings ).forEach( ( key ) => {
-		if (
-			! canBindAttribute( name, key ) ||
-			filteredBindings[ key ].source === 'core/pattern-overrides'
-		) {
-			delete filteredBindings[ key ];
-		}
-	} );
+	const { bindings } = metadata || {};
 
-	if ( Object.keys( filteredBindings ).length === 0 ) {
+	if ( bindings === undefined && ! hasCompatibleFields ) {
 		return null;
 	}
 
 	return (
-		<InspectorControls>
-			<PanelBody
-				title={ __( 'Attributes' ) }
-				className="components-panel__block-bindings-panel"
+		<InspectorControls group="bindings">
+			<ToolsPanel
+				label={ __( 'Attributes' ) }
+				resetAll={ () => {
+					removeAllBlockBindings();
+				} }
+				dropdownMenuProps={ dropdownMenuProps }
+				className="block-editor-bindings__panel"
 			>
-				<BaseControl
-					help={ __( 'Attributes connected to various sources.' ) }
-				>
-					<ItemGroup isBordered isSeparated size="large">
-						{ Object.keys( filteredBindings ).map( ( key ) => {
-							return (
-								<Item key={ key }>
-									<HStack>
-										<span>{ key }</span>
-										<span className="components-item__block-bindings-source">
-											{ sources[
-												filteredBindings[ key ].source
-											]
-												? sources[
-														filteredBindings[ key ]
-															.source
-												  ].label
-												: filteredBindings[ key ]
-														.source }
-										</span>
-									</HStack>
-								</Item>
-							);
-						} ) }
-					</ItemGroup>
-				</BaseControl>
-			</PanelBody>
+				<ItemGroup isBordered isSeparated>
+					{ bindableAttributes.map( ( attribute ) => (
+						<BlockBindingsAttributeControl
+							key={ attribute }
+							attribute={ attribute }
+							blockName={ blockName }
+							binding={ bindings?.[ attribute ] }
+						/>
+					) ) }
+				</ItemGroup>
+				{ /*
+					Use a div element to make the ToolsPanelHiddenInnerWrapper
+					toggle the visibility of this help text automatically.
+				*/ }
+				<WCText as="div" variant="muted">
+					<p>
+						{ __(
+							'Attributes connected to custom fields or other dynamic data.'
+						) }
+					</p>
+				</WCText>
+			</ToolsPanel>
 		</InspectorControls>
 	);
 };
@@ -92,7 +118,11 @@ export const BlockBindingsPanel = ( { name, metadata } ) => {
 export default {
 	edit: BlockBindingsPanel,
 	attributeKeys: [ 'metadata' ],
-	hasSupport() {
-		return true;
+	hasSupport( name ) {
+		return ! [
+			'core/post-date',
+			'core/navigation-link',
+			'core/navigation-submenu',
+		].includes( name );
 	},
 };

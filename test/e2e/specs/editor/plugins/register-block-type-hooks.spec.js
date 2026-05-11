@@ -18,7 +18,7 @@ test.describe( 'Register block type hooks', () => {
 	} );
 
 	test( 'has a custom category for Paragraph block', async ( { page } ) => {
-		await page.click( 'role=button[name="Toggle block inserter"i]' );
+		await page.click( 'role=button[name="Block Inserter"i]' );
 
 		expect(
 			page.locator(

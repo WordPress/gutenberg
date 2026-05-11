@@ -12,21 +12,22 @@ describe( 'BlockSwitcher - utils', () => {
 	describe( 'getRetainedBlockAttributes', () => {
 		beforeAll( () => {
 			registerBlockType( 'core/test-block-1', {
+				apiVersion: 3,
 				attributes: {
 					align: {
 						type: 'string',
 					},
 					content: {
 						type: 'boolean',
-						__experimentalRole: 'content',
+						role: 'content',
 					},
 					level: {
 						type: 'number',
-						__experimentalRole: 'content',
+						role: 'content',
 					},
 					color: {
 						type: 'string',
-						__experimentalRole: 'other',
+						role: 'other',
 					},
 				},
 				save() {},
@@ -34,6 +35,7 @@ describe( 'BlockSwitcher - utils', () => {
 				title: 'test block 1',
 			} );
 			registerBlockType( 'core/test-block-2', {
+				apiVersion: 3,
 				attributes: {
 					align: { type: 'string' },
 					content: { type: 'boolean' },

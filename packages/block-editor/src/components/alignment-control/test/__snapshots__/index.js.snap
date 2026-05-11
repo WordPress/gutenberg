@@ -12,7 +12,7 @@ exports[`AlignmentUI should allow custom alignment controls to be specified 1`] 
         align="custom-left"
         aria-label="My custom left"
         aria-pressed="false"
-        class="components-button components-toolbar__control has-icon"
+        class="components-button components-toolbar__control is-compact has-icon"
         data-toolbar-item="true"
         type="button"
       >
@@ -35,7 +35,7 @@ exports[`AlignmentUI should allow custom alignment controls to be specified 1`] 
         align="custom-right"
         aria-label="My custom right"
         aria-pressed="true"
-        class="components-button components-toolbar__control is-pressed has-icon"
+        class="components-button components-toolbar__control is-compact is-pressed has-icon"
         data-toolbar-item="true"
         type="button"
       >
@@ -100,7 +100,7 @@ exports[`AlignmentUI should match snapshot when controls are visible 1`] = `
         align="left"
         aria-label="Align text left"
         aria-pressed="true"
-        class="components-button components-toolbar__control is-pressed has-icon"
+        class="components-button components-toolbar__control is-compact is-pressed has-icon"
         data-toolbar-item="true"
         type="button"
       >
@@ -123,7 +123,7 @@ exports[`AlignmentUI should match snapshot when controls are visible 1`] = `
         align="center"
         aria-label="Align text center"
         aria-pressed="false"
-        class="components-button components-toolbar__control has-icon"
+        class="components-button components-toolbar__control is-compact has-icon"
         data-toolbar-item="true"
         type="button"
       >
@@ -146,7 +146,7 @@ exports[`AlignmentUI should match snapshot when controls are visible 1`] = `
         align="right"
         aria-label="Align text right"
         aria-pressed="false"
-        class="components-button components-toolbar__control has-icon"
+        class="components-button components-toolbar__control is-compact has-icon"
         data-toolbar-item="true"
         type="button"
       >

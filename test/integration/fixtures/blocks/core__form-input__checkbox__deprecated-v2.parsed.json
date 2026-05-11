@@ -1,0 +1,13 @@
+[
+	{
+		"blockName": "core/form-input",
+		"attrs": {
+			"type": "checkbox"
+		},
+		"innerBlocks": [],
+		"innerHTML": "\n<div class=\"wp-block-form-input\">\n\t<label class=\"wp-block-form-input__label\">\n\t\t<span class=\"wp-block-form-input__label-content\">Label</span>\n\t\t<input class=\"wp-block-form-input__input\" type=\"checkbox\" name=\"label\" aria-required=\"false\"/>\n\t</label>\n</div>\n",
+		"innerContent": [
+			"\n<div class=\"wp-block-form-input\">\n\t<label class=\"wp-block-form-input__label\">\n\t\t<span class=\"wp-block-form-input__label-content\">Label</span>\n\t\t<input class=\"wp-block-form-input__input\" type=\"checkbox\" name=\"label\" aria-required=\"false\"/>\n\t</label>\n</div>\n"
+		]
+	}
+]

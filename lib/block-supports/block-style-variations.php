@@ -11,12 +11,15 @@
  *
  * @since 6.6.0
  *
+ * @deprecated 6.7.0
+ *
  * @param array  $block     Block object.
  * @param string $variation Slug for the block style variation.
  *
  * @return string The unique variation name.
  */
 function gutenberg_create_block_style_variation_instance_name( $block, $variation ) {
+	_deprecated_function( __FUNCTION__, '6.7.0' );
 	return $variation . '--' . md5( serialize( $block ) );
 }
 
@@ -36,6 +39,42 @@ function gutenberg_get_block_style_variation_name_from_class( $class_string ) {
 
 	preg_match_all( '/\bis-style-(?!default)(\S+)\b/', $class_string, $matches );
 	return $matches[1] ?? null;
+}
+
+/**
+ * Recursively resolves any `ref` values within a block style variation's data.
+ *
+ * @since 6.6.0
+ *
+ * @param array $variation_data Reference to the variation data being processed.
+ * @param array $theme_json     Theme.json data to retrieve referenced values from.
+ */
+function gutenberg_resolve_block_style_variation_ref_values( &$variation_data, $theme_json ) {
+	foreach ( $variation_data as $key => &$value ) {
+		// Only need to potentially process arrays.
+		if ( is_array( $value ) ) {
+			// If ref value is set, attempt to find its matching value and update it.
+			if ( array_key_exists( 'ref', $value ) ) {
+				// Clean up any invalid ref value.
+				if ( empty( $value['ref'] ) || ! is_string( $value['ref'] ) ) {
+					unset( $variation_data[ $key ] );
+				}
+
+				$value_path = explode( '.', $value['ref'] ?? '' );
+				$ref_value  = _wp_array_get( $theme_json, $value_path );
+
+				// Only update the current value if the referenced path matched a value.
+				if ( null === $ref_value ) {
+					unset( $variation_data[ $key ] );
+				} else {
+					$value = $ref_value;
+				}
+			} else {
+				// Recursively look for ref instances.
+				gutenberg_resolve_block_style_variation_ref_values( $value, $theme_json );
+			}
+		}
+	}
 }
 
 /**
@@ -79,7 +118,11 @@ function gutenberg_render_block_style_variation_support_styles( $parsed_block ) 
 		return $parsed_block;
 	}
 
-	$variation_instance = gutenberg_create_block_style_variation_instance_name( $parsed_block, $variation );
+	// Recursively resolve any ref values with the appropriate value within the
+	// theme_json data.
+	gutenberg_resolve_block_style_variation_ref_values( $variation_data, $theme_json );
+
+	$variation_instance = wp_unique_id( $variation . '--' );
 	$class_name         = "is-style-$variation_instance";
 	$updated_class_name = $parsed_block['attrs']['className'] . " $class_name";
 
@@ -112,8 +155,13 @@ function gutenberg_render_block_style_variation_support_styles( $parsed_block ) 
 	);
 
 	$config = array(
-		'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
-		'styles'  => array(
+		'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+		'settings' => array(
+			'spacing' => array(
+				'blockGap' => true,
+			),
+		),
+		'styles'   => array(
 			'elements' => $elements_data,
 			'blocks'   => $blocks_data,
 		),
@@ -151,7 +199,7 @@ function gutenberg_render_block_style_variation_support_styles( $parsed_block ) 
 		return $parsed_block;
 	}
 
-	wp_register_style( 'block-style-variation-styles', false, array( 'global-styles', 'wp-block-library' ) );
+	wp_register_style( 'block-style-variation-styles', false, array( 'wp-block-library', 'global-styles' ) );
 	wp_add_inline_style( 'block-style-variation-styles', $variation_styles );
 
 	/*
@@ -168,9 +216,9 @@ function gutenberg_render_block_style_variation_support_styles( $parsed_block ) 
  * block attributes in the `render_block_data` filter gets applied to the
  * block's markup.
  *
- * @see gutenberg_render_block_style_variation_support_styles
- *
  * @since 6.6.0
+ *
+ * @see gutenberg_render_block_style_variation_support_styles
  *
  * @param  string $block_content Rendered block content.
  * @param  array  $block         Block object.
@@ -184,11 +232,9 @@ function gutenberg_render_block_style_variation_class_name( $block_content, $blo
 
 	/*
 	 * Matches a class prefixed by `is-style`, followed by the
-	 * variation slug, then `--`, and finally a hash.
-	 *
-	 * See `gutenberg_create_block_style_variation_instance_name` for class generation.
+	 * variation slug, then `--`, and finally an instance number.
 	 */
-	preg_match( '/\bis-style-(\S+?--\w+)\b/', $block['attrs']['className'], $matches );
+	preg_match( '/\bis-style-(\S+?--\d+)\b/', $block['attrs']['className'], $matches );
 
 	if ( empty( $matches ) ) {
 		return $block_content;
@@ -232,7 +278,7 @@ if ( function_exists( 'wp_enqueue_block_style_variation_styles' ) ) {
 }
 
 // Add Gutenberg filters and action.
-add_filter( 'render_block_data', 'gutenberg_render_block_style_variation_support_styles', 10, 2 );
+add_filter( 'render_block_data', 'gutenberg_render_block_style_variation_support_styles' );
 add_filter( 'render_block', 'gutenberg_render_block_style_variation_class_name', 10, 2 );
 add_action( 'wp_enqueue_scripts', 'gutenberg_enqueue_block_style_variation_styles', 1 );
 
@@ -274,19 +320,3 @@ function gutenberg_register_block_style_variations_from_theme_json_partials( $va
 		}
 	}
 }
-
-// DO NOT BACKPORT TO CORE.
-// To be removed when core has backported this PR.
-if ( function_exists( 'wp_resolve_block_style_variations_from_styles_registry' ) ) {
-	remove_filter( 'wp_theme_json_data_theme', 'wp_resolve_block_style_variations_from_styles_registry' );
-}
-if ( function_exists( 'wp_resolve_block_style_variations_from_primary_theme_json' ) ) {
-	remove_filter( 'wp_theme_json_data_theme', 'wp_resolve_block_style_variations_from_primary_theme_json' );
-}
-if ( function_exists( 'wp_resolve_block_style_variations_from_theme_json_partials' ) ) {
-	remove_filter( 'wp_theme_json_data_theme', 'wp_resolve_block_style_variations_from_theme_json_partials' );
-}
-if ( function_exists( 'wp_resolve_block_style_variations_from_theme_style_variation' ) ) {
-	remove_filter( 'wp_theme_json_data_user', 'wp_resolve_block_style_variations_from_theme_style_variation' );
-}
-// END OF DO NOT BACKPORT TO CORE.

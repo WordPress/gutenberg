@@ -11,13 +11,13 @@
 			"type": "rich-text",
 			"source": "rich-text",
 			"selector": "p",
-			"__experimentalRole": "content"
+			"role": "content"
 		},
 		"citation": {
 			"type": "rich-text",
 			"source": "rich-text",
 			"selector": "cite",
-			"__experimentalRole": "content"
+			"role": "content"
 		},
 		"textAlign": {
 			"type": "string"
@@ -43,10 +43,7 @@
 			}
 		},
 		"dimensions": {
-			"minHeight": true,
-			"__experimentalDefaultControls": {
-				"minHeight": false
-			}
+			"minHeight": true
 		},
 		"spacing": {
 			"margin": true,

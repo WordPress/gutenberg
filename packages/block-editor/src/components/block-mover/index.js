@@ -19,12 +19,7 @@ import BlockDraggable from '../block-draggable';
 import { BlockMoverUpButton, BlockMoverDownButton } from './button';
 import { store as blockEditorStore } from '../../store';
 
-function BlockMover( {
-	clientIds,
-	hideDragHandle,
-	isBlockMoverUpButtonDisabled,
-	isBlockMoverDownButtonDisabled,
-} ) {
+function BlockMover( { clientIds, hideDragHandle } ) {
 	const {
 		canMove,
 		rootClientId,
@@ -62,14 +57,18 @@ function BlockMover( {
 				orientation: getBlockListSettings( _rootClientId )?.orientation,
 				isManualGrid:
 					layout.type === 'grid' &&
-					!! layout.columnCount &&
+					layout.isManualPlacement &&
 					window.__experimentalEnableGridInteractivity,
 			};
 		},
 		[ clientIds ]
 	);
 
-	if ( ! canMove || ( isFirst && isLast && ! rootClientId ) ) {
+	if (
+		! canMove ||
+		( isFirst && isLast && ! rootClientId ) ||
+		( hideDragHandle && isManualGrid )
+	) {
 		return null;
 	}
 
@@ -83,9 +82,9 @@ function BlockMover( {
 				<BlockDraggable clientIds={ clientIds } fadeWhenDisabled>
 					{ ( draggableProps ) => (
 						<Button
+							__next40pxDefaultSize
 							icon={ dragHandle }
 							className="block-editor-block-mover__drag-handle"
-							aria-hidden="true"
 							label={ __( 'Drag' ) }
 							// Should not be able to tab to drag handle as this
 							// button can only be used with a pointer device.
@@ -100,7 +99,6 @@ function BlockMover( {
 					<ToolbarItem>
 						{ ( itemProps ) => (
 							<BlockMoverUpButton
-								disabled={ isBlockMoverUpButtonDisabled }
 								clientIds={ clientIds }
 								{ ...itemProps }
 							/>
@@ -109,7 +107,6 @@ function BlockMover( {
 					<ToolbarItem>
 						{ ( itemProps ) => (
 							<BlockMoverDownButton
-								disabled={ isBlockMoverDownButtonDisabled }
 								clientIds={ clientIds }
 								{ ...itemProps }
 							/>

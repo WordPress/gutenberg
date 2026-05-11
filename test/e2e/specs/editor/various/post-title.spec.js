@@ -22,7 +22,7 @@ test.describe( 'Post title', () => {
 				editor.canvas.getByRole( 'document', {
 					name: 'Empty block',
 				} ),
-				'sould move focus to an empty paragraph block when the Enter key is pressed'
+				'should move focus to an empty paragraph block when the Enter key is pressed'
 			).toBeFocused();
 		} );
 
@@ -52,6 +52,7 @@ test.describe( 'Post title', () => {
 			await expect( pageTitleField ).toBeFocused();
 		} );
 	} );
+
 	test.describe( 'HTML handling', () => {
 		test( `should (visually) render any HTML in Post Editor's post title field when in Visual editing mode`, async ( {
 			page,
@@ -103,7 +104,7 @@ test.describe( 'Post title', () => {
 			);
 		} );
 
-		test( `should show raw HTML in the post title field when in Code view mode `, async ( {
+		test( `should show raw HTML in the post title field when in Code view mode`, async ( {
 			page,
 			admin,
 			requestUtils,

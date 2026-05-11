@@ -2,10 +2,10 @@
  * External dependencies
  */
 // @ts-ignore
-const inquirer = require( 'inquirer' );
+const { confirm } = require( '@inquirer/prompts' );
 const fs = require( 'fs' );
 const childProcess = require( 'child_process' );
-const { v4: uuid } = require( 'uuid' );
+const { randomUUID } = require( 'crypto' );
 const path = require( 'path' );
 const os = require( 'os' );
 
@@ -97,14 +97,19 @@ async function askForConfirmation(
 	isDefault = true,
 	abortMessage = 'Aborting.'
 ) {
-	const { isReady } = await inquirer.prompt( [
-		{
-			type: 'confirm',
-			name: 'isReady',
+	let isReady = false;
+	try {
+		isReady = await confirm( {
 			default: isDefault,
 			message,
-		},
-	] );
+		} );
+	} catch ( error ) {
+		if ( error instanceof Error && error.name === 'ExitPromptError' ) {
+			console.log( 'Cancelled.' );
+			process.exit( 1 );
+		}
+		throw error;
+	}
 
 	if ( ! isReady ) {
 		log( formats.error( '\n' + abortMessage ) );
@@ -118,7 +123,7 @@ async function askForConfirmation(
  * @return {string} Temporary Path.
  */
 function getRandomTemporaryPath() {
-	return path.join( os.tmpdir(), uuid() );
+	return path.join( os.tmpdir(), randomUUID() );
 }
 
 /**

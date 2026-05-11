@@ -10,13 +10,15 @@ import {
 	forwardRef,
 	useState,
 	useCallback,
+	useEffect,
 	useMemo,
 	useRef,
 	useLayoutEffect,
 } from '@wordpress/element';
-import { VisuallyHidden, SearchControl, Popover } from '@wordpress/components';
+import { SearchControl, Popover } from '@wordpress/components';
+import { VisuallyHidden } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
-import { useDebouncedInput } from '@wordpress/compose';
+import { useDebouncedInput, useViewportMatch } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 
 /**
@@ -26,12 +28,14 @@ import Tips from './tips';
 import InserterPreviewPanel from './preview-panel';
 import BlockTypesTab from './block-types-tab';
 import BlockPatternsTab from './block-patterns-tab';
-import { PatternCategoryPreviewPanel } from './block-patterns-tab/pattern-category-preview-panel';
+import { PatternCategoryPreviews } from './block-patterns-tab/pattern-category-previews';
 import { MediaTab, MediaCategoryPanel } from './media-tab';
 import InserterSearchResults from './search-results';
 import useInsertionPoint from './hooks/use-insertion-point';
-import InserterTabs from './tabs';
 import { store as blockEditorStore } from '../../store';
+import TabbedSidebar from '../tabbed-sidebar';
+import { useZoomOut } from '../../hooks/use-zoom-out';
+import { unlock } from '../../lock-unlock';
 
 const NOOP = () => {};
 function InserterMenu(
@@ -52,11 +56,17 @@ function InserterMenu(
 	},
 	ref
 ) {
-	const isZoomOutMode = useSelect(
-		( select ) =>
-			select( blockEditorStore ).__unstableGetEditorMode() === 'zoom-out',
-		[]
-	);
+	const { isZoomOutMode, hasSectionRootClientId } = useSelect( ( select ) => {
+		const { isZoomOut, getSectionRootClientId } = unlock(
+			select( blockEditorStore )
+		);
+
+		return {
+			isZoomOutMode: isZoomOut(),
+			hasSectionRootClientId: !! getSectionRootClientId(),
+		};
+	}, [] );
+
 	const [ filterValue, setFilterValue, delayedFilterValue ] =
 		useDebouncedInput( __experimentalFilterValue );
 	const [ hoveredItem, setHoveredItem ] = useState( null );
@@ -66,9 +76,28 @@ function InserterMenu(
 	const [ patternFilter, setPatternFilter ] = useState( 'all' );
 	const [ selectedMediaCategory, setSelectedMediaCategory ] =
 		useState( null );
-	const [ selectedTab, setSelectedTab ] = useState(
-		__experimentalInitialTab
-	);
+	const isLargeViewport = useViewportMatch( 'large' );
+	const isMobileViewport = useViewportMatch( 'medium', '<' );
+	const maybeCloseInserter = isMobileViewport ? onClose : NOOP;
+
+	function getInitialTab() {
+		if ( __experimentalInitialTab ) {
+			return __experimentalInitialTab;
+		}
+
+		if ( isZoomOutMode ) {
+			return 'patterns';
+		}
+
+		return 'blocks';
+	}
+	const [ selectedTab, setSelectedTab ] = useState( getInitialTab() );
+
+	const shouldUseZoomOut =
+		hasSectionRootClientId &&
+		( selectedTab === 'patterns' || selectedTab === 'media' );
+
+	useZoomOut( shouldUseZoomOut && isLargeViewport );
 
 	const [ destinationRootClientId, onInsertBlocks, onToggleInsertionPoint ] =
 		useInsertionPoint( {
@@ -88,30 +117,33 @@ function InserterMenu(
 				shouldForceFocusBlock,
 				_rootClientId
 			);
-			onSelect();
+			onSelect( blocks );
+			maybeCloseInserter();
 
 			// Check for focus loss due to filtering blocks by selected block type
 			window.requestAnimationFrame( () => {
 				if (
 					! shouldFocusBlock &&
-					! blockTypesTabRef?.current.contains(
+					! blockTypesTabRef.current?.contains(
 						ref.current.ownerDocument.activeElement
 					)
 				) {
 					// There has been a focus loss, so focus the first button in the block types tab
-					blockTypesTabRef?.current.querySelector( 'button' ).focus();
+					blockTypesTabRef.current?.querySelector( 'button' ).focus();
 				}
 			} );
 		},
-		[ onInsertBlocks, onSelect, shouldFocusBlock ]
+		[ onInsertBlocks, maybeCloseInserter, onSelect, ref, shouldFocusBlock ]
 	);
 
 	const onInsertPattern = useCallback(
-		( blocks, patternName ) => {
-			onInsertBlocks( blocks, { patternName } );
+		( blocks, patternName, ...args ) => {
+			onToggleInsertionPoint( false );
+			onInsertBlocks( blocks, { patternName }, ...args );
 			onSelect();
+			maybeCloseInserter();
 		},
-		[ onInsertBlocks, onSelect ]
+		[ onInsertBlocks, maybeCloseInserter, onSelect, onToggleInsertionPoint ]
 	);
 
 	const onHover = useCallback(
@@ -120,13 +152,6 @@ function InserterMenu(
 			setHoveredItem( item );
 		},
 		[ onToggleInsertionPoint, setHoveredItem ]
-	);
-
-	const onHoverPattern = useCallback(
-		( item ) => {
-			onToggleInsertionPoint( !! item );
-		},
-		[ onToggleInsertionPoint ]
 	);
 
 	const onClickPatternCategory = useCallback(
@@ -145,6 +170,30 @@ function InserterMenu(
 
 	const showMediaPanel = selectedTab === 'media' && !! selectedMediaCategory;
 
+	const [ isScrolled, setIsScrolled ] = useState( false );
+	const blocksPanelRef = useRef( null );
+	const patternsPanelRef = useRef( null );
+	const mediaPanelRef = useRef( null );
+	useEffect( () => {
+		const handleScroll = ( event ) => {
+			setIsScrolled( event.currentTarget.scrollTop > 0 );
+		};
+		const panels = [
+			blocksPanelRef.current,
+			patternsPanelRef.current,
+			mediaPanelRef.current,
+		].filter( Boolean );
+		panels.forEach( ( panel ) =>
+			panel.addEventListener( 'scroll', handleScroll )
+		);
+
+		return () => {
+			panels.forEach( ( panel ) =>
+				panel.removeEventListener( 'scroll', handleScroll )
+			);
+		};
+	}, [] );
+
 	const inserterSearch = useMemo( () => {
 		if ( selectedTab === 'media' ) {
 			return null;
@@ -153,8 +202,9 @@ function InserterMenu(
 		return (
 			<>
 				<SearchControl
-					__nextHasNoMarginBottom
-					className="block-editor-inserter__search"
+					className={ clsx( 'block-editor-inserter__search', {
+						'is-scrolled': isScrolled,
+					} ) }
 					onChange={ ( value ) => {
 						if ( hoveredItem ) {
 							setHoveredItem( null );
@@ -162,7 +212,7 @@ function InserterMenu(
 						setFilterValue( value );
 					} }
 					value={ filterValue }
-					label={ __( 'Search for blocks and patterns' ) }
+					label={ __( 'Search' ) }
 					placeholder={ __( 'Search' ) }
 				/>
 				{ !! delayedFilterValue && (
@@ -170,7 +220,6 @@ function InserterMenu(
 						filterValue={ delayedFilterValue }
 						onSelect={ onSelect }
 						onHover={ onHover }
-						onHoverPattern={ onHoverPattern }
 						rootClientId={ rootClientId }
 						clientId={ clientId }
 						isAppender={ isAppender }
@@ -193,12 +242,12 @@ function InserterMenu(
 		delayedFilterValue,
 		onSelect,
 		onHover,
-		onHoverPattern,
 		shouldFocusBlock,
 		clientId,
 		rootClientId,
 		__experimentalInsertionIndex,
 		isAppender,
+		isScrolled,
 	] );
 
 	const blocksTab = useMemo( () => {
@@ -215,7 +264,7 @@ function InserterMenu(
 				</div>
 				{ showInserterHelpPanel && (
 					<div className="block-editor-inserter__tips">
-						<VisuallyHidden as="h2">
+						<VisuallyHidden render={ <h2 /> }>
 							{ __( 'A tip for using the block editor' ) }
 						</VisuallyHidden>
 						<Tips />
@@ -240,10 +289,9 @@ function InserterMenu(
 				selectedCategory={ selectedPatternCategory }
 			>
 				{ showPatternPanel && (
-					<PatternCategoryPreviewPanel
+					<PatternCategoryPreviews
 						rootClientId={ destinationRootClientId }
 						onInsert={ onInsertPattern }
-						onHover={ onHoverPattern }
 						category={ selectedPatternCategory }
 						patternFilter={ patternFilter }
 						showTitlesAsTooltip
@@ -253,7 +301,6 @@ function InserterMenu(
 		);
 	}, [
 		destinationRootClientId,
-		onHoverPattern,
 		onInsertPattern,
 		onClickPatternCategory,
 		patternFilter,
@@ -315,21 +362,52 @@ function InserterMenu(
 			ref={ ref }
 		>
 			<div className="block-editor-inserter__main-area">
-				<InserterTabs
+				<TabbedSidebar
 					ref={ tabsRef }
 					onSelect={ handleSetSelectedTab }
 					onClose={ onClose }
 					selectedTab={ selectedTab }
-				>
-					{ inserterSearch }
-					{ selectedTab === 'blocks' &&
-						! delayedFilterValue &&
-						blocksTab }
-					{ selectedTab === 'patterns' &&
-						! delayedFilterValue &&
-						patternsTab }
-					{ selectedTab === 'media' && mediaTab }
-				</InserterTabs>
+					closeButtonLabel={ __( 'Close Block Inserter' ) }
+					tabs={ [
+						{
+							name: 'blocks',
+							title: __( 'Blocks' ),
+							panelRef: blocksPanelRef,
+							panel: (
+								<>
+									{ inserterSearch }
+									{ selectedTab === 'blocks' &&
+										! delayedFilterValue &&
+										blocksTab }
+								</>
+							),
+						},
+						{
+							name: 'patterns',
+							title: __( 'Patterns' ),
+							panelRef: patternsPanelRef,
+							panel: (
+								<>
+									{ inserterSearch }
+									{ selectedTab === 'patterns' &&
+										! delayedFilterValue &&
+										patternsTab }
+								</>
+							),
+						},
+						{
+							name: 'media',
+							title: __( 'Media' ),
+							panelRef: mediaPanelRef,
+							panel: (
+								<>
+									{ inserterSearch }
+									{ mediaTab }
+								</>
+							),
+						},
+					] }
+				/>
 			</div>
 			{ showInserterHelpPanel && hoveredItem && (
 				<Popover

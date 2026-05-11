@@ -29,6 +29,7 @@ import { positionToPlacement } from '../popover/utils';
 const disabledEventsOnDisabledButton = [ 'onMouseDown', 'onClick' ] as const;
 
 function useDeprecatedProps( {
+	__experimentalIsFocusable,
 	isDefault,
 	isPrimary,
 	isSecondary,
@@ -38,14 +39,17 @@ function useDeprecatedProps( {
 	isSmall,
 	size,
 	variant,
+	describedBy,
 	...otherProps
 }: ButtonProps & DeprecatedButtonProps ): ButtonProps {
 	let computedSize = size;
 	let computedVariant = variant;
 
-	const newProps: { 'aria-pressed'?: boolean } = {
+	const newProps = {
+		accessibleWhenDisabled: __experimentalIsFocusable,
 		// @todo Mark `isPressed` as deprecated
 		'aria-pressed': isPressed,
+		description: describedBy,
 	};
 
 	if ( isSmall ) {
@@ -85,12 +89,28 @@ function useDeprecatedProps( {
 	};
 }
 
+/**
+ * Lets users take actions and make choices with a single click or tap.
+ *
+ * ```jsx
+ * import { Button } from '@wordpress/components';
+ * const Mybutton = () => (
+ *   <Button
+ *     variant="primary"
+ *     onClick={ handleClick }
+ *   >
+ *     Click here
+ *   </Button>
+ * );
+ * ```
+ */
 export function UnforwardedButton(
 	props: ButtonProps & DeprecatedButtonProps,
 	ref: ForwardedRef< any >
 ) {
 	const {
 		__next40pxDefaultSize,
+		accessibleWhenDisabled,
 		isBusy,
 		isDestructive,
 		className,
@@ -106,8 +126,7 @@ export function UnforwardedButton(
 		size = 'default',
 		text,
 		variant,
-		__experimentalIsFocusable: isFocusable,
-		describedBy,
+		description,
 		...buttonOrAnchorProps
 	} = useDeprecatedProps( props );
 
@@ -157,10 +176,11 @@ export function UnforwardedButton(
 		'is-destructive': isDestructive,
 		'has-text': !! icon && ( hasChildren || text ),
 		'has-icon': !! icon,
+		'has-icon-right': iconPosition === 'right',
 	} );
 
-	const trulyDisabled = disabled && ! isFocusable;
-	const Tag = href !== undefined && ! trulyDisabled ? 'a' : 'button';
+	const trulyDisabled = disabled && ! accessibleWhenDisabled;
+	const Tag = href !== undefined && ! disabled ? 'a' : 'button';
 	const buttonProps: ComponentPropsWithoutRef< 'button' > =
 		Tag === 'button'
 			? {
@@ -177,7 +197,7 @@ export function UnforwardedButton(
 	const disableEventProps: {
 		[ key: string ]: ( event: MouseEvent ) => void;
 	} = {};
-	if ( disabled && isFocusable ) {
+	if ( disabled && accessibleWhenDisabled ) {
 		// In this case, the button will be disabled, but still focusable and
 		// perceivable by screen reader users.
 		buttonProps[ 'aria-disabled' ] = true;
@@ -206,7 +226,7 @@ export function UnforwardedButton(
 				// The tooltip is not explicitly disabled.
 				false !== showTooltip ) );
 
-	const descriptionId = describedBy ? instanceId : undefined;
+	const descriptionId = description ? instanceId : undefined;
 
 	const describedById =
 		additionalProps[ 'aria-describedby' ] || descriptionId;
@@ -260,8 +280,8 @@ export function UnforwardedButton(
 		? {
 				text:
 					( children as string | ReactElement[] )?.length &&
-					describedBy
-						? describedBy
+					description
+						? description
 						: label,
 				shortcut,
 				placement:
@@ -274,29 +294,15 @@ export function UnforwardedButton(
 	return (
 		<>
 			<Tooltip { ...tooltipProps }>{ element }</Tooltip>
-			{ describedBy && (
+			{ description && (
 				<VisuallyHidden>
-					<span id={ descriptionId }>{ describedBy }</span>
+					<span id={ descriptionId }>{ description }</span>
 				</VisuallyHidden>
 			) }
 		</>
 	);
 }
 
-/**
- * Lets users take actions and make choices with a single click or tap.
- *
- * ```jsx
- * import { Button } from '@wordpress/components';
- * const Mybutton = () => (
- *   <Button
- *     variant="primary"
- *     onClick={ handleClick }
- *   >
- *     Click here
- *   </Button>
- * );
- * ```
- */
 export const Button = forwardRef( UnforwardedButton );
+Button.displayName = 'Button';
 export default Button;

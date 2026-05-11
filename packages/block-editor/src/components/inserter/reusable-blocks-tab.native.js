@@ -29,7 +29,7 @@ function ReusableBlocksTab( { onSelect, rootClientId, listProps } ) {
 		return filterInserterItems( inserterItems, { onlyReusable: true } );
 	}, [ inserterItems ] );
 
-	const sections = [ createInserterSection( { key: 'reuseable', items } ) ];
+	const sections = [ createInserterSection( { key: 'reusable', items } ) ];
 
 	return (
 		<BlockTypesList

@@ -51,7 +51,10 @@ export default function SidebarBlockEditor( {
 		const { get } = select( preferencesStore );
 		return {
 			hasUploadPermissions:
-				select( coreStore ).canUser( 'create', 'media' ) ?? true,
+				select( coreStore ).canUser( 'create', {
+					kind: 'postType',
+					name: 'attachment',
+				} ) ?? true,
 			isFixedToolbarActive: !! get(
 				'core/customize-widgets',
 				'fixedToolbar'
@@ -84,6 +87,7 @@ export default function SidebarBlockEditor( {
 			mediaUpload: mediaUploadBlockEditor,
 			hasFixedToolbar: isFixedToolbarActive || ! isMediumViewport,
 			keepCaretInsideBlock,
+			editorTool: 'edit',
 			__unstableHasCustomAppender: true,
 		};
 	}, [

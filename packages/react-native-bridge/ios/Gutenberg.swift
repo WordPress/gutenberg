@@ -85,7 +85,7 @@ public class Gutenberg: UIResponder {
 
         let editorSettings = dataSource.gutenbergEditorSettings()
         let settingsUpdates = properties(from: editorSettings)
-        initialProps.merge(settingsUpdates) { (intialProp, settingsUpdates) -> Any in
+        initialProps.merge(settingsUpdates) { (initialProp, settingsUpdates) -> Any in
             settingsUpdates
         }
 
@@ -136,8 +136,8 @@ public class Gutenberg: UIResponder {
     }
 
     public func updateCapabilities() {
-        let capabilites = dataSource.gutenbergCapabilities()
-        sendEvent(.updateCapabilities, body: capabilites.toJSPayload())
+        let capabilities = dataSource.gutenbergCapabilities()
+        sendEvent(.updateCapabilities, body: capabilities.toJSPayload())
     }
 
     private func sendEvent(_ event: RNReactNativeGutenbergBridge.EventName, body: [String: Any]? = nil) {
@@ -230,18 +230,6 @@ public class Gutenberg: UIResponder {
     private func properties(from editorSettings: GutenbergEditorSettings?) -> [String : Any] {
         var settingsUpdates = [String : Any]()
         settingsUpdates["isFSETheme"] = editorSettings?.isFSETheme ?? false
-        
-        if let galleryWithImageBlocks = editorSettings?.galleryWithImageBlocks {
-            settingsUpdates["galleryWithImageBlocks"] = galleryWithImageBlocks
-        }
-
-        if let quoteBlockV2 = editorSettings?.quoteBlockV2 {
-            settingsUpdates["quoteBlockV2"] = quoteBlockV2
-        }
-
-        if let listBlockV2 = editorSettings?.listBlockV2 {
-            settingsUpdates["listBlockV2"] = listBlockV2
-        }
 
         if let rawStyles = editorSettings?.rawStyles {
             settingsUpdates["rawStyles"] = rawStyles

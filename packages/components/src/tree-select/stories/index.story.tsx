@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react-vite';
 import type { ComponentProps } from 'react';
 /**
  * WordPress dependencies
@@ -14,20 +14,26 @@ import { useState } from '@wordpress/element';
 import TreeSelect from '../';
 
 const meta: Meta< typeof TreeSelect > = {
-	title: 'Components/TreeSelect',
+	tags: [ 'manifest' ],
+	title: 'Components/Selection & Input/Common/TreeSelect',
+	id: 'components-treeselect',
 	component: TreeSelect,
 	argTypes: {
 		help: { control: { type: 'text' } },
 		label: { control: { type: 'text' } },
 		prefix: { control: { type: 'text' } },
 		suffix: { control: { type: 'text' } },
-		selectedId: { control: { type: null } },
+		selectedId: { control: false },
 	},
 	parameters: {
 		controls: {
 			expanded: true,
 		},
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'stable',
+			whereUsed: 'global',
+		},
 	},
 };
 
@@ -39,6 +45,7 @@ const TreeSelectWithState: StoryFn< typeof TreeSelect > = ( props ) => {
 
 	return (
 		<TreeSelect
+			__next40pxDefaultSize
 			{ ...props }
 			onChange={ setSelection }
 			selectedId={ selection }
@@ -48,6 +55,7 @@ const TreeSelectWithState: StoryFn< typeof TreeSelect > = ( props ) => {
 
 export const Default = TreeSelectWithState.bind( {} );
 Default.args = {
+	__next40pxDefaultSize: true,
 	label: 'Label Text',
 	noOptionLabel: 'No parent page',
 	help: 'Help text to explain the select control.',

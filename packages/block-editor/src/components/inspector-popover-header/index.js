@@ -7,7 +7,7 @@ import {
 	__experimentalHeading as Heading,
 	__experimentalSpacer as Spacer,
 	Button,
-	__experimentalText as Text,
+	__experimentalText as WCText,
 } from '@wordpress/components';
 import { closeSmall } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
@@ -31,6 +31,7 @@ export default function InspectorPopoverHeader( {
 				<Spacer />
 				{ actions.map( ( { label, icon, onClick } ) => (
 					<Button
+						size="small"
 						key={ label }
 						className="block-editor-inspector-popover-header__action"
 						label={ label }
@@ -43,6 +44,7 @@ export default function InspectorPopoverHeader( {
 				) ) }
 				{ onClose && (
 					<Button
+						size="small"
 						className="block-editor-inspector-popover-header__action"
 						label={ __( 'Close' ) }
 						icon={ closeSmall }
@@ -50,7 +52,7 @@ export default function InspectorPopoverHeader( {
 					/>
 				) }
 			</HStack>
-			{ help && <Text>{ help }</Text> }
+			{ help && <WCText>{ help }</WCText> }
 		</VStack>
 	);
 }

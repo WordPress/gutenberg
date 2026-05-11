@@ -32,6 +32,7 @@ export { default as PluginMoreMenuItem } from './plugin-more-menu-item';
 export { default as PluginPostPublishPanel } from './plugin-post-publish-panel';
 export { default as PluginPostStatusInfo } from './plugin-post-status-info';
 export { default as PluginPrePublishPanel } from './plugin-pre-publish-panel';
+export { default as PluginPreviewMenuItem } from './plugin-preview-menu-item';
 export { default as PluginSidebar } from './plugin-sidebar';
 export { default as PluginSidebarMoreMenuItem } from './plugin-sidebar-more-menu-item';
 export { default as PostTemplatePanel } from './post-template/panel';
@@ -67,8 +68,6 @@ export {
 	usePostScheduleLabel,
 } from './post-schedule/label';
 export { default as PostSchedulePanel } from './post-schedule/panel';
-export { default as PostSlug } from './post-slug';
-export { default as PostSlugCheck } from './post-slug/check';
 export { default as PostSticky } from './post-sticky';
 export { default as PostStickyCheck } from './post-sticky/check';
 export { default as PostSwitchToDraftButton } from './post-switch-to-draft-button';

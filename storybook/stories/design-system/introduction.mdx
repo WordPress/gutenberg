@@ -1,0 +1,45 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Design System/Introduction" />
+
+# WordPress Design System
+
+## What is a Design System?
+
+A design system is a collection of reusable components, design tokens, and guidelines that work together to create consistent, accessible user interfaces. It serves as a single source of truth that bridges design and development, ensuring cohesion across different parts of an application.
+
+Rather than building UI elements from scratch each time, a design system provides pre-built, themeable components built on a foundation of design tokens. Design tokens encode design decisions like colors, spacing, and typography and can be customized to match different contexts while maintaining consistency.
+
+## How is this different from existing components?
+
+While similar in scope to the existing [`@wordpress/components`](https://github.com/WordPress/gutenberg/tree/trunk/packages/components) package, there are key differences:
+
+-   **Cohesive by design**: Unlike `@wordpress/components`, which grew organically as a collection of unrelated UI elements, this design system guarantees user- and developer-facing cohesion through a unified token system and consistent component patterns.
+-   **Flexible theming**: Built from the ground up to support customizable color schemes, adjustable density, and user personalization—capabilities needed to support the [Phase 3 admin redesign initiative](https://github.com/WordPress/gutenberg/issues/71196).
+-   **Modern distribution**: Distributed as a versioned npm package following [semantic versioning](https://semver.org/), rather than being bundled as a WordPress script on the `window.wp` global.
+-   **Composable architecture**: Components follow consistent patterns with proper composability, ref forwarding, and flexible rendering—avoiding the bloated abstractions that emerged from historical scope creep.
+
+For more context on the motivations and goals behind this work, see the [Design System: Support for admin redesign](https://github.com/WordPress/gutenberg/issues/71196) overview issue.
+
+## What are the parts of the design system?
+
+The WordPress Design System consists of two complementary packages:
+
+### Theming (`@wordpress/theme`)
+
+The foundational layer that provides:
+
+-   **Design Tokens**: A comprehensive system of design tokens for colors, spacing, typography, shadows, and more.
+-   **Theme Provider**: A component that accepts seed values and automatically generates consistent, accessible color ramps and spacing scales.
+
+Explore the [Theme documentation](/story/design-system-theme-introduction--docs) to learn more about design tokens, the token architecture, and how to use `ThemeProvider`.
+
+### Components (`@wordpress/ui`)
+
+A library of React UI components built on the theme foundation:
+
+-   **Consistent patterns**: All components follow a consistent set of technical design principles to ensure that their usage is easy to understand and predictable.
+-   **Token-driven styling**: Components use design tokens for all visual properties, ensuring they automatically adapt to theme changes.
+-   **Accessible by default**: Built with WordPress accessibility coding standards in mind, including semantic markup, keyboard navigation, and proper color contrast.
+
+Explore the [Components documentation](/story/design-system-components-introduction--docs) to learn more about the component library and usage patterns.

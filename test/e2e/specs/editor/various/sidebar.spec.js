@@ -111,7 +111,7 @@ test.describe( 'Sidebar', () => {
 			.getByRole( 'heading', { level: 2 } );
 
 		await expect( documentSettingsPanels ).toHaveText( [
-			'No Title',
+			'No title',
 			'Categories',
 			'Tags',
 		] );

@@ -6,20 +6,27 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { useState, useEffect, forwardRef } from '@wordpress/element';
+import { useState, useEffect, forwardRef, useMemo } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __experimentalUseDropZone as useDropZone } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
-import { __unstableUseBlockElement as useBlockElement } from '../block-list/use-block-props/use-block-refs';
+import { useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import BlockPopoverCover from '../block-popover/cover';
-import { range, GridRect, getGridInfo } from './utils';
+import { range, GridRect, getGridInfo, getGridItemRect } from './utils';
 import { store as blockEditorStore } from '../../store';
 import { useGetNumberOfBlocksBeforeCell } from './use-get-number-of-blocks-before-cell';
+import ButtonBlockAppender from '../button-block-appender';
+import { unlock } from '../../lock-unlock';
 
-export function GridVisualizer( { clientId, contentRef, parentLayout } ) {
+export function GridVisualizer( {
+	clientId,
+	contentRef,
+	parentLayout,
+	childGridClientId,
+} ) {
 	const isDistractionFree = useSelect(
 		( select ) =>
 			select( blockEditorStore ).getSettings().isDistractionFree,
@@ -32,39 +39,55 @@ export function GridVisualizer( { clientId, contentRef, parentLayout } ) {
 	}
 
 	const isManualGrid =
-		parentLayout?.columnCount &&
+		parentLayout?.isManualPlacement &&
 		window.__experimentalEnableGridInteractivity;
 	return (
 		<GridVisualizerGrid
-			clientId={ clientId }
+			gridClientId={ clientId }
 			gridElement={ gridElement }
 			isManualGrid={ isManualGrid }
 			ref={ contentRef }
+			childGridClientId={ childGridClientId }
 		/>
 	);
 }
 
 const GridVisualizerGrid = forwardRef(
-	( { clientId, gridElement, isManualGrid }, ref ) => {
+	( { gridClientId, gridElement, isManualGrid, childGridClientId }, ref ) => {
 		const [ gridInfo, setGridInfo ] = useState( () =>
 			getGridInfo( gridElement )
 		);
 		const [ isDroppingAllowed, setIsDroppingAllowed ] = useState( false );
-		const [ highlightedRect, setHighlightedRect ] = useState( null );
+
+		// Get the element for the child grid block so we can
+		// compute its position and hide overlapping visualizer cells.
+		const childGridElement = useBlockElement( childGridClientId );
+
+		// Compute the child grid block's rect from its position in the grid.
+		// This works for both manual and non-manual grids.
+		const childGridRect = useMemo( () => {
+			if ( ! childGridElement ) {
+				return null;
+			}
+			return getGridItemRect( childGridElement );
+		}, [ childGridElement ] );
 
 		useEffect( () => {
-			const observers = [];
-			for ( const element of [ gridElement, ...gridElement.children ] ) {
-				const observer = new window.ResizeObserver( () => {
-					setGridInfo( getGridInfo( gridElement ) );
-				} );
-				observer.observe( element );
-				observers.push( observer );
+			const resizeCallback = () =>
+				setGridInfo( getGridInfo( gridElement ) );
+			// Both border-box and content-box are observed as they may change
+			// independently. This requires two observers because a single one
+			// can’t be made to monitor both on the same element.
+			const borderBoxSpy = new window.ResizeObserver( resizeCallback );
+			borderBoxSpy.observe( gridElement, { box: 'border-box' } );
+			const contentBoxSpy = new window.ResizeObserver( resizeCallback );
+			contentBoxSpy.observe( gridElement );
+			for ( const element of gridElement.children ) {
+				contentBoxSpy.observe( element );
 			}
 			return () => {
-				for ( const observer of observers ) {
-					observer.disconnect();
-				}
+				borderBoxSpy.disconnect();
+				contentBoxSpy.disconnect();
 			};
 		}, [ gridElement ] );
 
@@ -88,59 +111,143 @@ const GridVisualizerGrid = forwardRef(
 				className={ clsx( 'block-editor-grid-visualizer', {
 					'is-dropping-allowed': isDroppingAllowed,
 				} ) }
-				clientId={ clientId }
-				__unstablePopoverSlot="block-toolbar"
+				clientId={ gridClientId }
+				__unstablePopoverSlot="__unstable-block-tools-after"
 			>
 				<div
 					ref={ ref }
 					className="block-editor-grid-visualizer__grid"
 					style={ gridInfo.style }
 				>
-					{ isManualGrid
-						? range( 1, gridInfo.numRows ).map( ( row ) =>
-								range( 1, gridInfo.numColumns ).map(
-									( column ) => (
-										<GridVisualizerCell
-											key={ `${ row }-${ column }` }
-											color={ gridInfo.currentColor }
-										>
-											<GridVisualizerDropZone
-												column={ column }
-												row={ row }
-												gridClientId={ clientId }
-												gridInfo={ gridInfo }
-												highlightedRect={
-													highlightedRect
-												}
-												setHighlightedRect={
-													setHighlightedRect
-												}
-											/>
-										</GridVisualizerCell>
-									)
-								)
-						  )
-						: Array.from(
-								{ length: gridInfo.numItems },
-								( _, i ) => (
-									<GridVisualizerCell
-										key={ i }
-										color={ gridInfo.currentColor }
-									/>
-								)
-						  ) }
+					{ isManualGrid ? (
+						<ManualGridVisualizer
+							gridClientId={ gridClientId }
+							gridInfo={ gridInfo }
+							childGridRect={ childGridRect }
+						/>
+					) : (
+						<AutoGridVisualizer
+							gridInfo={ gridInfo }
+							childGridRect={ childGridRect }
+						/>
+					) }
 				</div>
 			</BlockPopoverCover>
 		);
 	}
 );
 
-function GridVisualizerCell( { color, children } ) {
+function AutoGridVisualizer( { gridInfo, childGridRect } ) {
+	return range( 1, gridInfo.numRows ).map( ( row ) =>
+		range( 1, gridInfo.numColumns ).map( ( column ) => {
+			// Don't render visualizer cells for a selected child block
+			// that is itself a grid, so that only the child's grid
+			// visualizer is visible.
+			let color = gridInfo.currentColor;
+			if ( childGridRect?.contains( column, row ) ) {
+				color = 'transparent';
+			}
+			return (
+				<GridVisualizerCell
+					key={ `${ row }-${ column }` }
+					color={ color }
+				/>
+			);
+		} )
+	);
+}
+
+function ManualGridVisualizer( { gridClientId, gridInfo, childGridRect } ) {
+	const [ highlightedRect, setHighlightedRect ] = useState( null );
+
+	const gridItemStyles = useSelect(
+		( select ) => {
+			const { getBlockOrder, getBlockStyles } = unlock(
+				select( blockEditorStore )
+			);
+			const blockOrder = getBlockOrder( gridClientId );
+			return getBlockStyles( blockOrder );
+		},
+		[ gridClientId ]
+	);
+	const occupiedRects = useMemo( () => {
+		const rects = [];
+		for ( const style of Object.values( gridItemStyles ) ) {
+			const {
+				columnStart,
+				rowStart,
+				columnSpan = 1,
+				rowSpan = 1,
+			} = style?.layout ?? {};
+			if ( ! columnStart || ! rowStart ) {
+				continue;
+			}
+			rects.push(
+				new GridRect( {
+					columnStart,
+					rowStart,
+					columnSpan,
+					rowSpan,
+				} )
+			);
+		}
+		return rects;
+	}, [ gridItemStyles ] );
+
+	return range( 1, gridInfo.numRows ).map( ( row ) =>
+		range( 1, gridInfo.numColumns ).map( ( column ) => {
+			// Don't render visualizer cells for a selected child block
+			// that is itself a grid, so that only the child's grid
+			// visualizer is visible.
+			const isChildGridCell = childGridRect?.contains( column, row );
+			let color = gridInfo.currentColor;
+			if ( isChildGridCell ) {
+				color = 'transparent';
+			}
+			const isCellOccupied = occupiedRects.some( ( rect ) =>
+				rect.contains( column, row )
+			);
+			const isHighlighted =
+				highlightedRect?.contains( column, row ) ?? false;
+			return (
+				<GridVisualizerCell
+					key={ `${ row }-${ column }` }
+					color={ color }
+					className={ isHighlighted && 'is-highlighted' }
+				>
+					{ isCellOccupied && ! isChildGridCell ? (
+						<GridVisualizerDropZone
+							column={ column }
+							row={ row }
+							gridClientId={ gridClientId }
+							gridInfo={ gridInfo }
+							setHighlightedRect={ setHighlightedRect }
+						/>
+					) : (
+						<GridVisualizerAppender
+							column={ column }
+							row={ row }
+							gridClientId={ gridClientId }
+							gridInfo={ gridInfo }
+							setHighlightedRect={ setHighlightedRect }
+						/>
+					) }
+				</GridVisualizerCell>
+			);
+		} )
+	);
+}
+
+function GridVisualizerCell( { color, children, className } ) {
 	return (
 		<div
-			className="block-editor-grid-visualizer__cell"
+			className={ clsx(
+				'block-editor-grid-visualizer__cell',
+				className
+			) }
 			style={ {
 				boxShadow: `inset 0 0 0 1px color-mix(in srgb, ${ color } 20%, #0000)`,
+				color,
 			} }
 		>
 			{ children }
@@ -148,15 +255,19 @@ function GridVisualizerCell( { color, children } ) {
 	);
 }
 
-function GridVisualizerDropZone( {
+function useGridVisualizerDropZone(
 	column,
 	row,
 	gridClientId,
 	gridInfo,
-	highlightedRect,
-	setHighlightedRect,
-} ) {
-	const { getBlockAttributes } = useSelect( blockEditorStore );
+	setHighlightedRect
+) {
+	const {
+		getBlockAttributes,
+		getBlockRootClientId,
+		canInsertBlockType,
+		getBlockName,
+	} = useSelect( blockEditorStore );
 	const {
 		updateBlockAttributes,
 		moveBlocksToPosition,
@@ -168,8 +279,12 @@ function GridVisualizerDropZone( {
 		gridInfo.numColumns
 	);
 
-	const ref = useDropZoneWithValidation( {
+	return useDropZoneWithValidation( {
 		validateDrag( srcClientId ) {
+			const blockName = getBlockName( srcClientId );
+			if ( ! canInsertBlockType( blockName, gridClientId ) ) {
+				return false;
+			}
 			const attributes = getBlockAttributes( srcClientId );
 			const rect = new GridRect( {
 				columnStart: column,
@@ -221,21 +336,87 @@ function GridVisualizerDropZone( {
 			__unstableMarkNextChangeAsNotPersistent();
 			moveBlocksToPosition(
 				[ srcClientId ],
-				gridClientId,
+				getBlockRootClientId( srcClientId ),
 				gridClientId,
 				getNumberOfBlocksBeforeCell( column, row )
 			);
 		},
 	} );
+}
 
-	const isHighlighted = highlightedRect?.contains( column, row ) ?? false;
-
+function GridVisualizerDropZone( {
+	column,
+	row,
+	gridClientId,
+	gridInfo,
+	setHighlightedRect,
+} ) {
 	return (
 		<div
-			ref={ ref }
-			className={ clsx( 'block-editor-grid-visualizer__drop-zone', {
-				'is-highlighted': isHighlighted,
-			} ) }
+			className="block-editor-grid-visualizer__drop-zone"
+			ref={ useGridVisualizerDropZone(
+				column,
+				row,
+				gridClientId,
+				gridInfo,
+				setHighlightedRect
+			) }
+		/>
+	);
+}
+
+function GridVisualizerAppender( {
+	column,
+	row,
+	gridClientId,
+	gridInfo,
+	setHighlightedRect,
+} ) {
+	const {
+		updateBlockAttributes,
+		moveBlocksToPosition,
+		__unstableMarkNextChangeAsNotPersistent,
+	} = useDispatch( blockEditorStore );
+
+	const getNumberOfBlocksBeforeCell = useGetNumberOfBlocksBeforeCell(
+		gridClientId,
+		gridInfo.numColumns
+	);
+
+	return (
+		<ButtonBlockAppender
+			rootClientId={ gridClientId }
+			className="block-editor-grid-visualizer__appender"
+			ref={ useGridVisualizerDropZone(
+				column,
+				row,
+				gridClientId,
+				gridInfo,
+				setHighlightedRect
+			) }
+			style={ {
+				color: gridInfo.currentColor,
+			} }
+			onSelect={ ( block ) => {
+				if ( ! block ) {
+					return;
+				}
+				updateBlockAttributes( block.clientId, {
+					style: {
+						layout: {
+							columnStart: column,
+							rowStart: row,
+						},
+					},
+				} );
+				__unstableMarkNextChangeAsNotPersistent();
+				moveBlocksToPosition(
+					[ block.clientId ],
+					gridClientId,
+					gridClientId,
+					getNumberOfBlocksBeforeCell( column, row )
+				);
+			} }
 		/>
 	);
 }

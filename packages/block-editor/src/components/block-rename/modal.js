@@ -9,27 +9,47 @@ import {
 	Modal,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import { useState, useId } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import { speak } from '@wordpress/a11y';
+import { useSelect, useDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
+import { store as blockEditorStore } from '../../store';
+import { useBlockDisplayInformation } from '..';
 import isEmptyString from './is-empty-string';
+import { cleanEmptyObject } from '../../hooks/utils';
 
-export default function BlockRenameModal( {
-	blockName,
-	originalBlockName,
-	onClose,
-	onSave,
+export default function BlockRenameModal( { clientId, onClose } ) {
+	const [ editedBlockName, setEditedBlockName ] = useState();
+
+	const blockInformation = useBlockDisplayInformation( clientId );
+	const { metadata } = useSelect(
+		( select ) => {
+			const { getBlockAttributes } = select( blockEditorStore );
+
+			return {
+				metadata: getBlockAttributes( clientId )?.metadata,
+			};
+		},
+		[ clientId ]
+	);
+	const { updateBlockAttributes } = useDispatch( blockEditorStore );
+
+	const blockName = metadata?.name || '';
+	const originalBlockName = blockInformation?.title;
 	// Pattern Overrides is a WordPress-only feature but it also uses the Block Binding API.
 	// Ideally this should not be inside the block editor package, but we keep it here for simplicity.
-	hasOverridesWarning,
-} ) {
-	const [ editedBlockName, setEditedBlockName ] = useState( blockName );
-	const descriptionId = useId();
+	const hasOverridesWarning =
+		!! blockName &&
+		!! metadata?.bindings &&
+		Object.values( metadata.bindings ).some(
+			( binding ) => binding.source === 'core/pattern-overrides'
+		);
 
-	const nameHasChanged = editedBlockName !== blockName;
+	const nameHasChanged =
+		editedBlockName !== undefined && editedBlockName !== blockName;
 	const nameIsOriginal = editedBlockName === originalBlockName;
 	const nameIsEmpty = isEmptyString( editedBlockName );
 
@@ -38,6 +58,8 @@ export default function BlockRenameModal( {
 	const autoSelectInputText = ( event ) => event.target.select();
 
 	const handleSubmit = () => {
+		const newName =
+			nameIsOriginal || nameIsEmpty ? undefined : editedBlockName;
 		const message =
 			nameIsOriginal || nameIsEmpty
 				? sprintf(
@@ -53,7 +75,12 @@ export default function BlockRenameModal( {
 
 		// Must be assertive to immediately announce change.
 		speak( message, 'assertive' );
-		onSave( editedBlockName );
+		updateBlockAttributes( [ clientId ], {
+			metadata: cleanEmptyObject( {
+				...metadata,
+				name: newName,
+			} ),
+		} );
 
 		// Immediate close avoids ability to hit save multiple times.
 		onClose();
@@ -65,7 +92,6 @@ export default function BlockRenameModal( {
 			onRequestClose={ onClose }
 			overlayClassName="block-editor-block-rename-modal"
 			focusOnMount="firstContentElement"
-			aria={ { describedby: descriptionId } }
 			size="small"
 		>
 			<form
@@ -79,16 +105,11 @@ export default function BlockRenameModal( {
 					handleSubmit();
 				} }
 			>
-				<p id={ descriptionId }>
-					{ __( 'Enter a custom name for this block.' ) }
-				</p>
 				<VStack spacing="3">
 					<TextControl
-						__nextHasNoMarginBottom
 						__next40pxDefaultSize
-						value={ editedBlockName }
-						label={ __( 'Block name' ) }
-						hideLabelFromVision
+						value={ editedBlockName ?? blockName }
+						label={ __( 'Name' ) }
 						help={
 							hasOverridesWarning
 								? __(
@@ -111,7 +132,8 @@ export default function BlockRenameModal( {
 
 						<Button
 							__next40pxDefaultSize
-							aria-disabled={ ! isNameValid }
+							accessibleWhenDisabled
+							disabled={ ! isNameValid }
 							variant="primary"
 							type="submit"
 						>

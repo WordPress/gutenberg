@@ -11,19 +11,19 @@ test.describe( 'Site Editor - Multi-entity save flow', () => {
 		] );
 	} );
 
-	test.afterAll( async ( { requestUtils } ) => {
-		await Promise.all( [
-			requestUtils.activateTheme( 'twentytwentyone' ),
-			requestUtils.deleteAllTemplates( 'wp_template' ),
-		] );
-	} );
-
 	test.beforeEach( async ( { admin } ) => {
 		await admin.visitSiteEditor( {
 			postId: 'emptytheme//index',
 			postType: 'wp_template',
 			canvas: 'edit',
 		} );
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await Promise.all( [
+			requestUtils.activateTheme( 'twentytwentyone' ),
+			requestUtils.deleteAllTemplates( 'wp_template' ),
+		] );
 	} );
 
 	test( 'save flow should work as expected', async ( { editor, page } ) => {
@@ -41,7 +41,7 @@ test.describe( 'Site Editor - Multi-entity save flow', () => {
 		).toBeEnabled();
 		await expect(
 			page
-				.getByRole( 'region', { name: 'Save panel' } )
+				.getByRole( 'region', { name: 'Editor publish' } )
 				.getByRole( 'button', { name: 'Open save panel' } )
 		).toBeVisible();
 

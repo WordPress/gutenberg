@@ -46,6 +46,7 @@ function makeContextValue( i18n: I18n ): I18nContextProps {
 }
 
 const I18nContext = createContext( makeContextValue( defaultI18n ) );
+I18nContext.displayName = 'I18nContext';
 
 type I18nProviderProps = PropsWithChildren< { i18n: I18n } >;
 
@@ -72,7 +73,7 @@ type I18nProviderProps = PropsWithChildren< { i18n: I18n } >;
  * @param props i18n provider props.
  * @return Children wrapped in the I18nProvider.
  */
-export function I18nProvider( props: I18nProviderProps ): JSX.Element {
+export function I18nProvider( props: I18nProviderProps ) {
 	const { children, i18n = defaultI18n } = props;
 	const [ update, forceUpdate ] = useReducer( () => [], [] );
 

@@ -10,6 +10,7 @@ jest.mock( '@wordpress/api-fetch' );
  */
 import {
 	editEntityRecord,
+	clearEntityRecordEdits,
 	saveEntityRecord,
 	saveEditedEntityRecord,
 	deleteEntityRecord,
@@ -18,6 +19,7 @@ import {
 	receiveCurrentUser,
 	__experimentalBatch,
 } from '../actions';
+import { getSyncManager } from '../sync';
 
 jest.mock( '../batch', () => {
 	const { createBatch } = jest.requireActual( '../batch' );
@@ -27,6 +29,12 @@ jest.mock( '../batch', () => {
 		},
 	};
 } );
+
+jest.mock( '../sync', () => ( {
+	getSyncManager: jest.fn(),
+	LOCAL_EDITOR_ORIGIN: 'local-editor',
+	LOCAL_UNDO_IGNORED_ORIGIN: 'local-undo-ignored',
+} ) );
 
 describe( 'editEntityRecord', () => {
 	it( 'throws when the edited entity does not have a loaded config.', async () => {
@@ -38,17 +46,491 @@ describe( 'editEntityRecord', () => {
 		const select = {
 			getEntityConfig: jest.fn(),
 		};
-		const fulfillment = () =>
+		const fulfillment = async () =>
 			editEntityRecord(
 				entityConfig.kind,
 				entityConfig.name,
 				entityConfig.id,
 				{}
 			)( { select } );
-		expect( fulfillment ).toThrow(
+		await expect( fulfillment ).rejects.toThrow(
 			`The entity being edited (${ entityConfig.kind }, ${ entityConfig.name }) does not have a loaded config.`
 		);
 		expect( select.getEntityConfig ).toHaveBeenCalledTimes( 1 );
+	} );
+
+	it( 'dispatches the correct action for non-merged edits', () => {
+		const dispatch = jest.fn();
+		const select = {
+			getEntityConfig: () => ( {
+				kind: 'postType',
+				name: 'post',
+				mergedEdits: {},
+			} ),
+			getRawEntityRecord: () => ( {
+				id: 1,
+				title: 'Original Title',
+				content: 'Original Content',
+			} ),
+			getEditedEntityRecord: () => ( {
+				id: 1,
+				title: 'Original Title',
+				content: 'Original Content',
+			} ),
+			getUndoManager: () => ( {
+				addRecord: jest.fn(),
+			} ),
+		};
+
+		editEntityRecord( 'postType', 'post', 1, { title: 'New Title' } )( {
+			select,
+			dispatch,
+		} );
+
+		expect( dispatch ).toHaveBeenCalledWith( {
+			type: 'EDIT_ENTITY_RECORD',
+			kind: 'postType',
+			name: 'post',
+			recordId: 1,
+			edits: { title: 'New Title' },
+		} );
+	} );
+
+	it( 'merges edits for fields defined in mergedEdits config', () => {
+		const dispatch = jest.fn();
+		const select = {
+			getEntityConfig: () => ( {
+				kind: 'postType',
+				name: 'post',
+				mergedEdits: { meta: true },
+			} ),
+			getRawEntityRecord: () => ( {
+				id: 1,
+				meta: { existingKey: 'existingValue' },
+			} ),
+			getEditedEntityRecord: () => ( {
+				id: 1,
+				meta: {
+					existingKey: 'existingValue',
+					editedKey: 'editedValue',
+				},
+			} ),
+			getUndoManager: () => ( {
+				addRecord: jest.fn(),
+			} ),
+		};
+
+		editEntityRecord( 'postType', 'post', 1, {
+			meta: { newKey: 'newValue' },
+		} )( {
+			select,
+			dispatch,
+		} );
+
+		expect( dispatch ).toHaveBeenCalledWith( {
+			type: 'EDIT_ENTITY_RECORD',
+			kind: 'postType',
+			name: 'post',
+			recordId: 1,
+			edits: {
+				meta: {
+					existingKey: 'existingValue',
+					editedKey: 'editedValue',
+					newKey: 'newValue',
+				},
+			},
+		} );
+	} );
+
+	it( 'handles both merged and non-merged edits together', () => {
+		const dispatch = jest.fn();
+		const select = {
+			getEntityConfig: () => ( {
+				kind: 'postType',
+				name: 'post',
+				mergedEdits: { meta: true },
+			} ),
+			getRawEntityRecord: () => ( {
+				id: 1,
+				title: 'Original Title',
+				meta: { existingKey: 'existingValue' },
+			} ),
+			getEditedEntityRecord: () => ( {
+				id: 1,
+				title: 'Original Title',
+				meta: { existingKey: 'existingValue' },
+			} ),
+			getUndoManager: () => ( {
+				addRecord: jest.fn(),
+			} ),
+		};
+
+		editEntityRecord( 'postType', 'post', 1, {
+			title: 'New Title',
+			meta: { newKey: 'newValue' },
+		} )( { select, dispatch } );
+
+		expect( dispatch ).toHaveBeenCalledWith( {
+			type: 'EDIT_ENTITY_RECORD',
+			kind: 'postType',
+			name: 'post',
+			recordId: 1,
+			edits: {
+				title: 'New Title',
+				meta: {
+					existingKey: 'existingValue',
+					newKey: 'newValue',
+				},
+			},
+		} );
+	} );
+
+	it( 'clears edit when merged value equals persisted record', () => {
+		const dispatch = jest.fn();
+		const select = {
+			getEntityConfig: () => ( {
+				kind: 'postType',
+				name: 'post',
+				mergedEdits: { meta: true },
+			} ),
+			getRawEntityRecord: () => ( {
+				id: 1,
+				meta: { key1: 'value1', key2: 'value2' },
+			} ),
+			getEditedEntityRecord: () => ( {
+				id: 1,
+				meta: { key1: 'value1' },
+			} ),
+			getUndoManager: () => ( {
+				addRecord: jest.fn(),
+			} ),
+		};
+
+		// Editing meta to add key2 back should result in a value equal to the persisted record
+		editEntityRecord( 'postType', 'post', 1, {
+			meta: { key2: 'value2' },
+		} )( { select, dispatch } );
+
+		expect( dispatch ).toHaveBeenCalledWith( {
+			type: 'EDIT_ENTITY_RECORD',
+			kind: 'postType',
+			name: 'post',
+			recordId: 1,
+			edits: {
+				// meta should be undefined because merged value equals persisted record
+				meta: undefined,
+			},
+		} );
+	} );
+
+	it( 'clears non-merged edit when value equals persisted record', () => {
+		const dispatch = jest.fn();
+		const select = {
+			getEntityConfig: () => ( {
+				kind: 'postType',
+				name: 'post',
+				mergedEdits: {},
+			} ),
+			getRawEntityRecord: () => ( {
+				id: 1,
+				title: 'Original Title',
+			} ),
+			getEditedEntityRecord: () => ( {
+				id: 1,
+				title: 'Edited Title',
+			} ),
+			getUndoManager: () => ( {
+				addRecord: jest.fn(),
+			} ),
+		};
+
+		// Editing title back to original should clear the edit
+		editEntityRecord( 'postType', 'post', 1, {
+			title: 'Original Title',
+		} )( { select, dispatch } );
+
+		expect( dispatch ).toHaveBeenCalledWith( {
+			type: 'EDIT_ENTITY_RECORD',
+			kind: 'postType',
+			name: 'post',
+			recordId: 1,
+			edits: {
+				title: undefined,
+			},
+		} );
+	} );
+
+	describe( 'with SyncManager', () => {
+		let syncManager;
+
+		beforeEach( () => {
+			// Create a mock sync manager
+			syncManager = {
+				update: jest.fn(),
+			};
+			getSyncManager.mockReturnValue( syncManager );
+		} );
+
+		afterEach( () => {
+			getSyncManager.mockReset();
+		} );
+
+		it( 'passes merged edits to SyncManager#update for merged fields', () => {
+			const dispatch = jest.fn();
+			const select = {
+				getEntityConfig: () => ( {
+					kind: 'postType',
+					name: 'post',
+					mergedEdits: { meta: true },
+					syncConfig: {},
+				} ),
+				getRawEntityRecord: () => ( {
+					id: 1,
+					meta: { existingKey: 'existingValue' },
+				} ),
+				getEditedEntityRecord: () => ( {
+					id: 1,
+					meta: {
+						existingKey: 'existingValue',
+						editedKey: 'editedValue',
+					},
+				} ),
+				getUndoManager: () => ( {
+					addRecord: jest.fn(),
+				} ),
+			};
+
+			editEntityRecord( 'postType', 'post', 1, {
+				meta: { newKey: 'newValue' },
+			} )( {
+				select,
+				dispatch,
+			} );
+
+			// Verify SyncManager#update was called with merged edits
+			expect( syncManager.update ).toHaveBeenCalledWith(
+				'postType/post',
+				1,
+				{
+					meta: {
+						existingKey: 'existingValue',
+						editedKey: 'editedValue',
+						newKey: 'newValue',
+					},
+				},
+				'local-editor',
+				{ isNewUndoLevel: true }
+			);
+		} );
+
+		it( 'passes merged edits to SyncManager#update even when value equals persisted record', () => {
+			const dispatch = jest.fn();
+			const select = {
+				getEntityConfig: () => ( {
+					kind: 'postType',
+					name: 'post',
+					mergedEdits: { meta: true },
+					syncConfig: {},
+				} ),
+				getRawEntityRecord: () => ( {
+					id: 1,
+					meta: { key1: 'value1', key2: 'value2' },
+				} ),
+				getEditedEntityRecord: () => ( {
+					id: 1,
+					meta: { key1: 'value1' },
+				} ),
+				getUndoManager: () => ( {
+					addRecord: jest.fn(),
+				} ),
+			};
+
+			// Editing meta to add key2 back results in a value equal to the persisted record
+			editEntityRecord( 'postType', 'post', 1, {
+				meta: { key2: 'value2' },
+			} )( { select, dispatch } );
+
+			// Verify SyncManager#update was called with merged edits (not cleaned/undefined)
+			expect( syncManager.update ).toHaveBeenCalledWith(
+				'postType/post',
+				1,
+				{
+					meta: {
+						key1: 'value1',
+						key2: 'value2',
+					},
+				},
+				'local-editor',
+				{ isNewUndoLevel: true }
+			);
+
+			// But the local store dispatch should still receive undefined for the cleaned edit
+			expect( dispatch ).toHaveBeenCalledWith( {
+				type: 'EDIT_ENTITY_RECORD',
+				kind: 'postType',
+				name: 'post',
+				recordId: 1,
+				edits: {
+					meta: undefined,
+				},
+			} );
+		} );
+
+		it( 'passes merged and non-merged edits correctly to SyncManager#update', () => {
+			const dispatch = jest.fn();
+			const select = {
+				getEntityConfig: () => ( {
+					kind: 'postType',
+					name: 'post',
+					mergedEdits: { meta: true },
+					syncConfig: {},
+				} ),
+				getRawEntityRecord: () => ( {
+					id: 1,
+					title: 'Original Title',
+					meta: { existingKey: 'existingValue' },
+				} ),
+				getEditedEntityRecord: () => ( {
+					id: 1,
+					title: 'Original Title',
+					meta: { existingKey: 'existingValue' },
+				} ),
+				getUndoManager: () => ( {
+					addRecord: jest.fn(),
+				} ),
+			};
+
+			editEntityRecord( 'postType', 'post', 1, {
+				title: 'New Title',
+				meta: { newKey: 'newValue' },
+			} )( { select, dispatch } );
+
+			// Verify SyncManager#update was called with merged meta but non-merged title
+			expect( syncManager.update ).toHaveBeenCalledWith(
+				'postType/post',
+				1,
+				{
+					title: 'New Title',
+					meta: {
+						existingKey: 'existingValue',
+						newKey: 'newValue',
+					},
+				},
+				'local-editor',
+				{ isNewUndoLevel: true }
+			);
+		} );
+
+		it( 'does not call SyncManager#update when syncConfig is not defined', () => {
+			const dispatch = jest.fn();
+			const select = {
+				getEntityConfig: () => ( {
+					kind: 'postType',
+					name: 'post',
+					mergedEdits: { meta: true },
+					// No syncConfig
+				} ),
+				getRawEntityRecord: () => ( {
+					id: 1,
+					meta: { existingKey: 'existingValue' },
+				} ),
+				getEditedEntityRecord: () => ( {
+					id: 1,
+					meta: { existingKey: 'existingValue' },
+				} ),
+				getUndoManager: () => ( {
+					addRecord: jest.fn(),
+				} ),
+			};
+
+			editEntityRecord( 'postType', 'post', 1, {
+				meta: { newKey: 'newValue' },
+			} )( {
+				select,
+				dispatch,
+			} );
+
+			// Verify SyncManager#update was NOT called
+			expect( syncManager.update ).not.toHaveBeenCalled();
+		} );
+	} );
+} );
+
+describe( 'clearEntityRecordEdits', () => {
+	it( 'throws when the entity does not have a loaded config.', async () => {
+		const select = {
+			getEntityConfig: jest.fn(),
+		};
+		const fulfillment = async () =>
+			clearEntityRecordEdits(
+				'someKind',
+				'someName',
+				'someId'
+			)( { select } );
+		await expect( fulfillment ).rejects.toThrow(
+			`The entity being edited (someKind, someName) does not have a loaded config.`
+		);
+	} );
+
+	it( 'does nothing when there are no edits', () => {
+		const dispatch = jest.fn();
+		const select = {
+			getEntityConfig: () => ( {
+				kind: 'postType',
+				name: 'post',
+			} ),
+			getEntityRecordEdits: () => undefined,
+		};
+
+		clearEntityRecordEdits(
+			'postType',
+			'post',
+			1
+		)( {
+			select,
+			dispatch,
+		} );
+
+		expect( dispatch ).not.toHaveBeenCalled();
+	} );
+
+	it( 'clears all edits for an entity record', () => {
+		const dispatch = jest.fn();
+		const select = {
+			getEntityConfig: () => ( {
+				kind: 'postType',
+				name: 'post',
+			} ),
+			getEntityRecordEdits: () => ( {
+				title: 'New Title',
+				content: 'New Content',
+			} ),
+			getEditedEntityRecord: () => ( {
+				id: 1,
+				title: 'New Title',
+				content: 'New Content',
+			} ),
+		};
+
+		clearEntityRecordEdits(
+			'postType',
+			'post',
+			1
+		)( {
+			select,
+			dispatch,
+		} );
+
+		expect( dispatch ).toHaveBeenCalledWith( {
+			type: 'EDIT_ENTITY_RECORD',
+			kind: 'postType',
+			name: 'post',
+			recordId: 1,
+			edits: {
+				title: undefined,
+				content: undefined,
+			},
+		} );
 	} );
 } );
 
@@ -68,8 +550,7 @@ describe( 'deleteEntityRecord', () => {
 			__unstableAcquireStoreLock: jest.fn(),
 			__unstableReleaseStoreLock: jest.fn(),
 		} );
-		// Provide entities
-		dispatch.mockReturnValueOnce( configs );
+		const resolveSelect = { getEntitiesConfig: jest.fn( () => configs ) };
 
 		// Provide response
 		apiFetch.mockImplementation( () => deletedRecord );
@@ -78,7 +559,7 @@ describe( 'deleteEntityRecord', () => {
 			'postType',
 			'post',
 			deletedRecord.id
-		)( { dispatch } );
+		)( { dispatch, resolveSelect } );
 
 		expect( apiFetch ).toHaveBeenCalledTimes( 1 );
 		expect( apiFetch ).toHaveBeenCalledWith( {
@@ -86,7 +567,7 @@ describe( 'deleteEntityRecord', () => {
 			method: 'DELETE',
 		} );
 
-		expect( dispatch ).toHaveBeenCalledTimes( 4 );
+		expect( dispatch ).toHaveBeenCalledTimes( 3 );
 		expect( dispatch ).toHaveBeenCalledWith( {
 			type: 'DELETE_ENTITY_RECORD_START',
 			kind: 'postType',
@@ -120,8 +601,7 @@ describe( 'deleteEntityRecord', () => {
 			__unstableAcquireStoreLock: jest.fn(),
 			__unstableReleaseStoreLock: jest.fn(),
 		} );
-		// Provide entities
-		dispatch.mockReturnValueOnce( entities );
+		const resolveSelect = { getEntitiesConfig: jest.fn( () => entities ) };
 
 		// Provide response
 		apiFetch.mockImplementation( () => {
@@ -137,7 +617,7 @@ describe( 'deleteEntityRecord', () => {
 				{
 					throwOnError: true,
 				}
-			)( { dispatch } )
+			)( { dispatch, resolveSelect } )
 		).rejects.toEqual( new Error( 'API error' ) );
 	} );
 
@@ -151,8 +631,7 @@ describe( 'deleteEntityRecord', () => {
 			__unstableAcquireStoreLock: jest.fn(),
 			__unstableReleaseStoreLock: jest.fn(),
 		} );
-		// Provide entities
-		dispatch.mockReturnValueOnce( entities );
+		const resolveSelect = { getEntitiesConfig: jest.fn( () => entities ) };
 
 		// Provide response
 		apiFetch.mockImplementation( () => {
@@ -168,7 +647,7 @@ describe( 'deleteEntityRecord', () => {
 				{
 					throwOnError: false,
 				}
-			)( { dispatch } )
+			)( { dispatch, resolveSelect } )
 		).resolves.toBe( false );
 	} );
 } );
@@ -195,8 +674,7 @@ describe( 'saveEditedEntityRecord', () => {
 		const dispatch = Object.assign( jest.fn(), {
 			saveEntityRecord: jest.fn(),
 		} );
-		// Provide entities
-		dispatch.mockReturnValueOnce( configs );
+		const resolveSelect = { getEntitiesConfig: jest.fn( () => configs ) };
 
 		// Provide response
 		const updatedRecord = { ...item, menu: 10 };
@@ -208,7 +686,7 @@ describe( 'saveEditedEntityRecord', () => {
 			'root',
 			'menuItem',
 			1
-		)( { dispatch, select } );
+		)( { dispatch, select, resolveSelect } );
 
 		expect( dispatch.saveEntityRecord ).toHaveBeenCalledWith(
 			'root',
@@ -236,8 +714,7 @@ describe( 'saveEditedEntityRecord', () => {
 		const dispatch = Object.assign( jest.fn(), {
 			saveEntityRecord: jest.fn(),
 		} );
-		// Provide entities
-		dispatch.mockReturnValueOnce( configs );
+		const resolveSelect = { getEntitiesConfig: jest.fn( () => configs ) };
 
 		// Provide response
 		const updatedRecord = { ...item, menu: 10 };
@@ -249,7 +726,7 @@ describe( 'saveEditedEntityRecord', () => {
 			'root',
 			'menuLocation',
 			'primary'
-		)( { dispatch, select } );
+		)( { dispatch, select, resolveSelect } );
 
 		expect( dispatch.saveEntityRecord ).toHaveBeenCalledWith(
 			'root',
@@ -280,9 +757,7 @@ describe( 'saveEntityRecord', () => {
 		const select = {
 			getRawEntityRecord: () => post,
 		};
-
-		// Provide entities
-		dispatch.mockReturnValueOnce( configs );
+		const resolveSelect = { getEntitiesConfig: jest.fn( () => configs ) };
 
 		// Provide response
 		const updatedRecord = { ...post, id: 10 };
@@ -294,7 +769,7 @@ describe( 'saveEntityRecord', () => {
 			'postType',
 			'post',
 			post
-		)( { select, dispatch } );
+		)( { select, dispatch, resolveSelect } );
 
 		expect( apiFetch ).toHaveBeenCalledTimes( 1 );
 		expect( apiFetch ).toHaveBeenCalledWith( {
@@ -303,7 +778,7 @@ describe( 'saveEntityRecord', () => {
 			data: post,
 		} );
 
-		expect( dispatch ).toHaveBeenCalledTimes( 3 );
+		expect( dispatch ).toHaveBeenCalledTimes( 2 );
 		expect( dispatch ).toHaveBeenCalledWith( {
 			type: 'SAVE_ENTITY_RECORD_START',
 			kind: 'postType',
@@ -347,9 +822,7 @@ describe( 'saveEntityRecord', () => {
 		const select = {
 			getRawEntityRecord: () => post,
 		};
-
-		// Provide entities
-		dispatch.mockReturnValueOnce( entities );
+		const resolveSelect = { getEntitiesConfig: jest.fn( () => entities ) };
 
 		// Provide response
 		apiFetch.mockImplementation( () => {
@@ -359,7 +832,7 @@ describe( 'saveEntityRecord', () => {
 		await expect(
 			saveEntityRecord( 'postType', 'post', post, {
 				throwOnError: true,
-			} )( { select, dispatch } )
+			} )( { select, dispatch, resolveSelect } )
 		).rejects.toEqual( new Error( 'API error' ) );
 	} );
 
@@ -371,9 +844,7 @@ describe( 'saveEntityRecord', () => {
 		const select = {
 			getRawEntityRecord: () => post,
 		};
-
-		// Provide entities
-		dispatch.mockReturnValueOnce( entities );
+		const resolveSelect = { getEntitiesConfig: jest.fn( () => entities ) };
 
 		// Provide response
 		apiFetch.mockImplementation( () => {
@@ -383,7 +854,7 @@ describe( 'saveEntityRecord', () => {
 		await expect(
 			saveEntityRecord( 'postType', 'post', post, {
 				throwOnError: false,
-			} )( { select, dispatch } )
+			} )( { select, dispatch, resolveSelect } )
 		).resolves.toEqual( undefined );
 	} );
 
@@ -395,9 +866,7 @@ describe( 'saveEntityRecord', () => {
 		const select = {
 			getRawEntityRecord: () => post,
 		};
-
-		// Provide entities
-		dispatch.mockReturnValueOnce( configs );
+		const resolveSelect = { getEntitiesConfig: jest.fn( () => configs ) };
 
 		// Provide response
 		const updatedRecord = { ...post, id: 10 };
@@ -409,7 +878,7 @@ describe( 'saveEntityRecord', () => {
 			'postType',
 			'post',
 			post
-		)( { select, dispatch } );
+		)( { select, dispatch, resolveSelect } );
 
 		expect( apiFetch ).toHaveBeenCalledTimes( 1 );
 		expect( apiFetch ).toHaveBeenCalledWith( {
@@ -418,7 +887,7 @@ describe( 'saveEntityRecord', () => {
 			data: post,
 		} );
 
-		expect( dispatch ).toHaveBeenCalledTimes( 3 );
+		expect( dispatch ).toHaveBeenCalledTimes( 2 );
 		expect( dispatch ).toHaveBeenCalledWith( {
 			type: 'SAVE_ENTITY_RECORD_START',
 			kind: 'postType',
@@ -454,6 +923,63 @@ describe( 'saveEntityRecord', () => {
 		expect( result ).toBe( updatedRecord );
 	} );
 
+	it( 'preserves the live sync title when a CRDT persistence save returns stale post fields', async () => {
+		const liveSyncState = {
+			isSaved: false,
+			title: 'synced title',
+		};
+		const post = { id: 10, title: 'synced title' };
+		const configs = [
+			{
+				name: 'post',
+				kind: 'postType',
+				baseURL: '/wp/v2/posts',
+				syncConfig: {},
+			},
+		];
+		const syncManager = {
+			update: jest.fn(
+				( _objectType, _objectId, changes, _origin, options ) => {
+					if (
+						Object.prototype.hasOwnProperty.call( changes, 'title' )
+					) {
+						liveSyncState.title = changes.title;
+					}
+					if ( options?.isSave ) {
+						liveSyncState.isSaved = true;
+					}
+				}
+			),
+		};
+		const select = {
+			getRawEntityRecord: () => post,
+		};
+		const resolveSelect = { getEntitiesConfig: jest.fn( () => configs ) };
+
+		const staleSaveResponse = { ...post, title: 'initial title' };
+		apiFetch.mockImplementation( () => {
+			return staleSaveResponse;
+		} );
+		getSyncManager.mockReturnValue( syncManager );
+
+		const result = await saveEntityRecord( 'postType', 'post', post, {
+			__unstableSkipSyncUpdate: true,
+		} )( { select, dispatch, resolveSelect } );
+
+		expect( syncManager.update ).toHaveBeenCalledWith(
+			'postType/post',
+			10,
+			{},
+			'local-undo-ignored',
+			{ isSave: true }
+		);
+		expect( liveSyncState ).toEqual( {
+			isSaved: true,
+			title: 'synced title',
+		} );
+		expect( result ).toBe( staleSaveResponse );
+	} );
+
 	it( 'triggers a PUT request for an existing record with a custom key', async () => {
 		const postType = { slug: 'page', title: 'Pages' };
 		const configs = [
@@ -467,9 +993,7 @@ describe( 'saveEntityRecord', () => {
 		const select = {
 			getRawEntityRecord: () => ( {} ),
 		};
-
-		// Provide entities
-		dispatch.mockReturnValueOnce( configs );
+		const resolveSelect = { getEntitiesConfig: jest.fn( () => configs ) };
 
 		// Provide response
 		apiFetch.mockImplementation( () => postType );
@@ -478,7 +1002,7 @@ describe( 'saveEntityRecord', () => {
 			'root',
 			'postType',
 			postType
-		)( { select, dispatch } );
+		)( { select, dispatch, resolveSelect } );
 
 		expect( apiFetch ).toHaveBeenCalledTimes( 1 );
 		expect( apiFetch ).toHaveBeenCalledWith( {
@@ -487,7 +1011,7 @@ describe( 'saveEntityRecord', () => {
 			data: postType,
 		} );
 
-		expect( dispatch ).toHaveBeenCalledTimes( 3 );
+		expect( dispatch ).toHaveBeenCalledTimes( 2 );
 		expect( dispatch ).toHaveBeenCalledWith( {
 			type: 'SAVE_ENTITY_RECORD_START',
 			kind: 'root',

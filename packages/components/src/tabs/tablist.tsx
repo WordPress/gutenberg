@@ -1,146 +1,114 @@
 /**
  * External dependencies
  */
-// eslint-disable-next-line no-restricted-imports
 import * as Ariakit from '@ariakit/react';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
  */
 import warning from '@wordpress/warning';
-import {
-	forwardRef,
-	useEffect,
-	useLayoutEffect,
-	useRef,
-	useState,
-} from '@wordpress/element';
+import { forwardRef, useLayoutEffect, useState } from '@wordpress/element';
+import { useMergeRefs } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import type { TabListProps } from './types';
-import { useTabsContext } from './context';
-import { TabListWrapper } from './styles';
 import type { WordPressComponentProps } from '../context';
-import clsx from 'clsx';
+import type { ElementOffsetRect } from '../utils/element-rect';
+import { useTabsContext } from './context';
+import { StyledTabList } from './styles';
+import { useTrackElementOffsetRect } from '../utils/element-rect';
+import { useTrackOverflow } from './use-track-overflow';
+import { useAnimatedOffsetRect } from '../utils/hooks/use-animated-offset-rect';
 
-function useTrackElementOffset(
-	targetElement?: HTMLElement | null,
-	onUpdate?: () => void
+const DEFAULT_SCROLL_MARGIN = 24;
+
+/**
+ * Scrolls a given parent element so that a given rect is visible.
+ *
+ * The scroll is updated initially and whenever the rect changes.
+ */
+function useScrollRectIntoView(
+	parent: HTMLElement | undefined,
+	rect: ElementOffsetRect,
+	{ margin = DEFAULT_SCROLL_MARGIN } = {}
 ) {
-	const [ indicatorPosition, setIndicatorPosition ] = useState( {
-		left: 0,
-		top: 0,
-		width: 0,
-		height: 0,
-	} );
-
-	// TODO: replace with useEventCallback or similar when officially available.
-	const updateCallbackRef = useRef( onUpdate );
 	useLayoutEffect( () => {
-		updateCallbackRef.current = onUpdate;
-	} );
-
-	const observedElementRef = useRef< HTMLElement >();
-	const resizeObserverRef = useRef< ResizeObserver >();
-	useEffect( () => {
-		if ( targetElement === observedElementRef.current ) {
+		if ( ! parent || ! rect ) {
 			return;
 		}
 
-		observedElementRef.current = targetElement ?? undefined;
+		const { scrollLeft: parentScroll } = parent;
+		const parentWidth = parent.getBoundingClientRect().width;
+		const { left: childLeft, width: childWidth } = rect;
 
-		function updateIndicator( element: HTMLElement ) {
-			setIndicatorPosition( {
-				// Workaround to prevent unwanted scrollbars, see:
-				// https://github.com/WordPress/gutenberg/pull/61979
-				left: Math.max( element.offsetLeft - 1, 0 ),
-				top: Math.max( element.offsetTop - 1, 0 ),
-				width: parseFloat( getComputedStyle( element ).width ),
-				height: parseFloat( getComputedStyle( element ).height ),
-			} );
-			updateCallbackRef.current?.();
+		const parentRightEdge = parentScroll + parentWidth;
+		const childRightEdge = childLeft + childWidth;
+		const rightOverflow = childRightEdge + margin - parentRightEdge;
+		const leftOverflow = parentScroll - ( childLeft - margin );
+
+		let scrollLeft = null;
+		if ( leftOverflow > 0 ) {
+			scrollLeft = parentScroll - leftOverflow;
+		} else if ( rightOverflow > 0 ) {
+			scrollLeft = parentScroll + rightOverflow;
 		}
 
-		// Set up a ResizeObserver.
-		if ( ! resizeObserverRef.current ) {
-			resizeObserverRef.current = new ResizeObserver( () => {
-				if ( observedElementRef.current ) {
-					updateIndicator( observedElementRef.current );
-				}
-			} );
+		if ( scrollLeft !== null ) {
+			/**
+			 * The optional chaining is used here to avoid unit test failures.
+			 * It can be removed when JSDOM supports `Element` scroll methods.
+			 * See: https://github.com/WordPress/gutenberg/pull/66498#issuecomment-2441146096
+			 */
+			parent.scroll?.( { left: scrollLeft } );
 		}
-		const { current: resizeObserver } = resizeObserverRef;
-
-		// Observe new element.
-		if ( targetElement ) {
-			updateIndicator( targetElement );
-			resizeObserver.observe( targetElement );
-		}
-
-		return () => {
-			// Unobserve previous element.
-			if ( observedElementRef.current ) {
-				resizeObserver.unobserve( observedElementRef.current );
-			}
-		};
-	}, [ targetElement ] );
-
-	return indicatorPosition;
-}
-
-type ValueUpdateContext< T > = {
-	previousValue: T;
-};
-
-function useOnValueUpdate< T >(
-	value: T,
-	onUpdate: ( context: ValueUpdateContext< T > ) => void
-) {
-	const previousValueRef = useRef( value );
-
-	// TODO: replace with useEventCallback or similar when officially available.
-	const updateCallbackRef = useRef( onUpdate );
-	useLayoutEffect( () => {
-		updateCallbackRef.current = onUpdate;
-	} );
-
-	useEffect( () => {
-		if ( previousValueRef.current !== value ) {
-			updateCallbackRef.current( {
-				previousValue: previousValueRef.current,
-			} );
-			previousValueRef.current = value;
-		}
-	}, [ value ] );
+	}, [ margin, parent, rect ] );
 }
 
 export const TabList = forwardRef<
 	HTMLDivElement,
 	WordPressComponentProps< TabListProps, 'div', false >
 >( function TabList( { children, ...otherProps }, ref ) {
-	const context = useTabsContext();
+	const { store } = useTabsContext() ?? {};
 
-	const selectedId = context?.store.useState( 'selectedId' );
-	const indicatorPosition = useTrackElementOffset(
-		context?.store.item( selectedId )?.element
-	);
+	const selectedId = Ariakit.useStoreState( store, 'selectedId' );
+	const activeId = Ariakit.useStoreState( store, 'activeId' );
+	const selectOnMove = Ariakit.useStoreState( store, 'selectOnMove' );
+	const items = Ariakit.useStoreState( store, 'items' );
+	const [ parent, setParent ] = useState< HTMLElement >();
+	const refs = useMergeRefs( [ ref, setParent ] );
 
-	const [ animationEnabled, setAnimationEnabled ] = useState( false );
-	useOnValueUpdate(
-		selectedId,
-		( { previousValue } ) => previousValue && setAnimationEnabled( true )
-	);
+	const selectedItem = store?.item( selectedId );
+	const renderedItems = Ariakit.useStoreState( store, 'renderedItems' );
 
-	if ( ! context ) {
-		warning( '`Tabs.TabList` must be wrapped in a `Tabs` component.' );
-		return null;
-	}
-	const { store } = context;
+	const selectedItemIndex =
+		renderedItems && selectedItem
+			? renderedItems.indexOf( selectedItem )
+			: -1;
+	// Use selectedItemIndex as a dependency to force recalculation when the
+	// selected item index changes (elements are swapped / added / removed).
+	const selectedRect = useTrackElementOffsetRect( selectedItem?.element, [
+		selectedItemIndex,
+	] );
 
-	const { activeId, selectOnMove } = store.useState();
-	const { setActiveId } = store;
+	// Track overflow to show scroll hints.
+	const overflow = useTrackOverflow( parent, {
+		first: items?.at( 0 )?.element,
+		last: items?.at( -1 )?.element,
+	} );
+
+	// Size, position, and animate the indicator.
+	useAnimatedOffsetRect( parent, selectedRect, {
+		prefix: 'selected',
+		dataAttribute: 'indicator-animated',
+		transitionEndFilter: ( event ) => event.pseudoElement === '::before',
+		roundRect: true,
+	} );
+
+	// Make sure selected tab is scrolled into view.
+	useScrollRectIntoView( parent, selectedRect );
 
 	const onBlur = () => {
 		if ( ! selectOnMove ) {
@@ -152,38 +120,37 @@ export const TabList = forwardRef<
 		// that the selected tab will receive keyboard focus when tabbing back into
 		// the tablist.
 		if ( selectedId !== activeId ) {
-			setActiveId( selectedId );
+			store?.setActiveId( selectedId );
 		}
 	};
 
+	if ( ! store ) {
+		warning( '`Tabs.TabList` must be wrapped in a `Tabs` component.' );
+		return null;
+	}
+
 	return (
-		<Ariakit.TabList
-			ref={ ref }
+		<StyledTabList
+			ref={ refs }
 			store={ store }
-			render={
-				<TabListWrapper
-					onTransitionEnd={ ( event ) => {
-						if ( event.pseudoElement === '::after' ) {
-							setAnimationEnabled( false );
-						}
-					} }
+			render={ ( props ) => (
+				<div
+					{ ...props }
+					// Fallback to -1 to prevent browsers from making the tablist
+					// tabbable when it is a scrolling container.
+					tabIndex={ props.tabIndex ?? -1 }
 				/>
-			}
+			) }
 			onBlur={ onBlur }
+			data-select-on-move={ selectOnMove ? 'true' : 'false' }
 			{ ...otherProps }
-			style={ {
-				'--indicator-left': `${ indicatorPosition.left }px`,
-				'--indicator-top': `${ indicatorPosition.top }px`,
-				'--indicator-width': `${ indicatorPosition.width }px`,
-				'--indicator-height': `${ indicatorPosition.height }px`,
-				...otherProps.style,
-			} }
 			className={ clsx(
-				animationEnabled ? 'is-animation-enabled' : '',
+				overflow.first && 'is-overflowing-first',
+				overflow.last && 'is-overflowing-last',
 				otherProps.className
 			) }
 		>
 			{ children }
-		</Ariakit.TabList>
+		</StyledTabList>
 	);
 } );

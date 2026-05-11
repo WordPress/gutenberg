@@ -24,11 +24,11 @@ Property used to change the event bubbling behavior, passed to the `Slot` compon
 
 ### as
 
-The component used as the container of the fills. Defaults to the `ButtonGroup` component.
+The component used as the container of the fills. Defaults to the `MenuGroup` component.
 
 -   Type: `Component`
 -   Required: no
--   Default: `ButtonGroup`
+-   Default: `MenuGroup`
 
 ## ActionItem
 

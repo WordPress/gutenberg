@@ -50,9 +50,7 @@ describe( 'ColorPalette', () => {
 			/>
 		);
 
-		expect(
-			screen.getAllByRole( 'option', { name: /^Color:/ } )
-		).toHaveLength( 3 );
+		expect( screen.getAllByRole( 'option' ) ).toHaveLength( 3 );
 	} );
 
 	it( 'should call onClick on an active button with undefined', async () => {
@@ -67,9 +65,7 @@ describe( 'ColorPalette', () => {
 			/>
 		);
 
-		await user.click(
-			screen.getByRole( 'option', { name: /^Color:/, selected: true } )
-		);
+		await user.click( screen.getByRole( 'option', { selected: true } ) );
 
 		expect( onChange ).toHaveBeenCalledTimes( 1 );
 		expect( onChange ).toHaveBeenCalledWith( undefined );
@@ -91,7 +87,6 @@ describe( 'ColorPalette', () => {
 		// (i.e. a button representing a color that is not the current color)
 		await user.click(
 			screen.getAllByRole( 'option', {
-				name: /^Color:/,
 				selected: false,
 			} )[ 0 ]
 		);
@@ -230,7 +225,6 @@ describe( 'ColorPalette', () => {
 		// Click the first unpressed button
 		await user.click(
 			screen.getAllByRole( 'option', {
-				name: /^Color:/,
 				selected: false,
 			} )[ 0 ]
 		);
@@ -264,7 +258,7 @@ describe( 'ColorPalette', () => {
 		expect( screen.queryByText( colorCode ) ).not.toBeInTheDocument();
 		expect(
 			screen.getByRole( 'button', {
-				name: /^Custom color picker.$/,
+				name: /^Custom color picker$/,
 			} )
 		).toBeInTheDocument();
 	} );

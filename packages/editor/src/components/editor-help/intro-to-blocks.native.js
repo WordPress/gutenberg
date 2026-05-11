@@ -71,7 +71,7 @@ const IntroToBlocks = () => {
 				<HelpDetailSectionHeadingText text={ __( 'Build layouts' ) } />
 				<HelpDetailBodyText
 					text={ __(
-						'Arrange your content into columns, add Call to Action buttons, and overlay images with text.'
+						'Arrange your content into columns, add Call to action buttons, and overlay images with text.'
 					) }
 				/>
 				<HelpDetailImage

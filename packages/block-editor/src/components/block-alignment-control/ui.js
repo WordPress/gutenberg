@@ -64,7 +64,7 @@ function BlockAlignmentUI( {
 				} ),
 		  }
 		: {
-				toggleProps: { describedBy: __( 'Change alignment' ) },
+				toggleProps: { description: __( 'Change alignment' ) },
 				children: ( { onClose } ) => {
 					return (
 						<>

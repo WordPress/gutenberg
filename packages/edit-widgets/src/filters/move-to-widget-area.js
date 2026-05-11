@@ -48,7 +48,7 @@ const withMoveToWidgetAreaToolbarItem = createHigherOrderComponent(
 
 		return (
 			<>
-				<BlockEdit { ...props } />
+				<BlockEdit key="edit" { ...props } />
 				{ isMoveToWidgetAreaVisible && (
 					<BlockControls>
 						<MoveToWidgetArea

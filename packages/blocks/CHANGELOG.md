@@ -2,6 +2,101 @@
 
 ## Unreleased
 
+## 15.18.0 (2026-04-29)
+
+- Update `registerBlockType` to accept the attributes type as a generic.
+- Update `registerBlockVariation`, `unregisterBlockVariation` type signature to match the dispatch call.
+
+## 15.17.0 (2026-04-15)
+
+## 15.16.0 (2026-04-01)
+
+## 15.15.0 (2026-03-18)
+
+## 15.14.0 (2026-03-04)
+
+## 15.13.0 (2026-02-18)
+
+## 15.12.0 (2026-01-29)
+
+## 15.11.0 (2026-01-16)
+
+## 15.9.0 (2025-11-26)
+
+## 15.8.0 (2025-11-12)
+
+## 15.7.0 (2025-10-29)
+
+## 15.6.0 (2025-10-17)
+
+## 15.5.0 (2025-10-01)
+
+## 15.4.0 (2025-09-17)
+
+## 15.3.0 (2025-09-03)
+
+## 15.2.0 (2025-08-20)
+
+## 15.1.0 (2025-08-07)
+
+## 15.0.0 (2025-07-23)
+
+### Breaking changes
+
+-   `registerBlockType`: Set default `apiVersion` when none is provided during client-side block registration ([#70750](https://github.com/WordPress/gutenberg/pull/70750)).
+
+## 14.15.0 (2025-06-25)
+
+## 14.14.0 (2025-06-04)
+
+## 14.13.0 (2025-05-22)
+
+## 14.12.0 (2025-05-07)
+
+## 14.11.0 (2025-04-11)
+
+## 14.10.0 (2025-03-27)
+
+## 14.9.0 (2025-03-13)
+
+## 14.8.0 (2025-02-28)
+
+## 14.7.0 (2025-02-12)
+
+## 14.6.0 (2025-01-29)
+
+## 14.5.0 (2025-01-15)
+
+## 14.4.0 (2025-01-02)
+
+## 14.3.0 (2024-12-11)
+
+## 14.2.0 (2024-11-27)
+
+## 14.1.0 (2024-11-16)
+
+## 14.0.0 (2024-10-30)
+
+### Breaking changes
+
+- Normalize `blockType.parent` to be an array. While string values were never supported, they appeared to work with some unintended side-effects that have been fixed by [#66250](https://github.com/WordPress/gutenberg/pull/66250). For that reason, we've added some code that automatically migrates strings to arrays — though it still raises a warning.
+
+## 13.10.0 (2024-10-16)
+
+## 13.9.0 (2024-10-03)
+
+## 13.8.0 (2024-09-19)
+
+## 13.7.0 (2024-09-05)
+
+## 13.6.0 (2024-08-21)
+
+## 13.5.0 (2024-08-07)
+
+## 13.4.0 (2024-07-24)
+
+## 13.3.0 (2024-07-10)
+
 ## 13.2.0 (2024-06-26)
 
 ## 13.1.0 (2024-06-15)

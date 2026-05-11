@@ -1,5 +1,5 @@
 /**
- * This function was accidentially exposed for mobile/native usage.
+ * This function was accidentally exposed for mobile/native usage.
  *
  * @deprecated
  *

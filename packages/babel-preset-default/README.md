@@ -35,7 +35,7 @@ For example, if you'd like to use a new language feature proposal which has not 
 ```json
 {
 	"presets": [ "@wordpress/babel-preset-default" ],
-	"plugins": [ "@babel/plugin-proposal-class-properties" ]
+	"plugins": [ "@babel/plugin-transform-class-properties" ]
 }
 ```
 
@@ -43,7 +43,7 @@ For example, if you'd like to use a new language feature proposal which has not 
 
 There is a complementary `build/polyfill.js` (minified version – `build/polyfill.min.js`) file available that polyfills ECMAScript features missing in the [browsers supported](https://make.wordpress.org/core/handbook/best-practices/browser-support/) by the WordPress project ([#31279](https://github.com/WordPress/gutenberg/pull/31279)). It's a drop-in replacement for the deprecated `@babel/polyfill` package, and it's also based on [`core-js`](https://github.com/zloirock/core-js) project.
 
-This needs to be included before all your compiled Babel code. You can either prepend it to your compiled code or include it in a `<script>` before it.
+This needs to be included in some cases, if the features being used require polyfills. You can either prepend it to your compiled code or include it in a `<script>` before it.
 
 #### TC39 Proposals
 

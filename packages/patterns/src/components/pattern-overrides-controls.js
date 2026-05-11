@@ -2,7 +2,10 @@
  * WordPress dependencies
  */
 import { useState, useId } from '@wordpress/element';
-import { InspectorControls } from '@wordpress/block-editor';
+import {
+	InspectorControls,
+	useBlockBindingsUtils,
+} from '@wordpress/block-editor';
 import { BaseControl, Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
@@ -14,22 +17,6 @@ import {
 	AllowOverridesModal,
 	DisallowOverridesModal,
 } from './allow-overrides-modal';
-
-function removeBindings( bindings ) {
-	let updatedBindings = { ...bindings };
-	delete updatedBindings.__default;
-	if ( ! Object.keys( updatedBindings ).length ) {
-		updatedBindings = undefined;
-	}
-	return updatedBindings;
-}
-
-function addBindings( bindings ) {
-	return {
-		...bindings,
-		__default: { source: PATTERN_OVERRIDES_BINDING_SOURCE },
-	};
-}
 
 function PatternOverridesControls( {
 	attributes,
@@ -44,29 +31,27 @@ function PatternOverridesControls( {
 
 	const hasName = !! attributes.metadata?.name;
 	const defaultBindings = attributes.metadata?.bindings?.__default;
-	const allowOverrides =
+	const hasOverrides =
 		hasName && defaultBindings?.source === PATTERN_OVERRIDES_BINDING_SOURCE;
 	const isConnectedToOtherSources =
 		defaultBindings?.source &&
 		defaultBindings.source !== PATTERN_OVERRIDES_BINDING_SOURCE;
+	const { updateBlockBindings } = useBlockBindingsUtils();
 
 	function updateBindings( isChecked, customName ) {
-		const prevBindings = attributes?.metadata?.bindings;
-		const updatedBindings = isChecked
-			? addBindings( prevBindings )
-			: removeBindings( prevBindings );
-
-		const updatedMetadata = {
-			...attributes.metadata,
-			bindings: updatedBindings,
-		};
-
 		if ( customName ) {
-			updatedMetadata.name = customName;
+			setAttributes( {
+				metadata: {
+					...attributes.metadata,
+					name: customName,
+				},
+			} );
 		}
 
-		setAttributes( {
-			metadata: updatedMetadata,
+		updateBlockBindings( {
+			__default: isChecked
+				? { source: PATTERN_OVERRIDES_BINDING_SOURCE }
+				: undefined,
 		} );
 	}
 
@@ -76,16 +61,16 @@ function PatternOverridesControls( {
 	}
 
 	const hasUnsupportedImageAttributes =
-		blockName === 'core/image' &&
-		( !! attributes.caption?.length || !! attributes.href?.length );
+		blockName === 'core/image' && !! attributes.href?.length;
 
-	const helpText = hasUnsupportedImageAttributes
-		? __(
-				`Overrides currently don't support image captions or links. Remove the caption or link first before enabling overrides.`
-		  )
-		: __(
-				'Allow changes to this block throughout instances of this pattern.'
-		  );
+	const helpText =
+		! hasOverrides && hasUnsupportedImageAttributes
+			? __(
+					`Overrides currently don't support image links. Remove the link first before enabling overrides.`
+			  )
+			: __(
+					'Allow changes to this block throughout instances of this pattern.'
+			  );
 
 	return (
 		<>
@@ -101,16 +86,18 @@ function PatternOverridesControls( {
 						variant="secondary"
 						aria-haspopup="dialog"
 						onClick={ () => {
-							if ( allowOverrides ) {
+							if ( hasOverrides ) {
 								setShowDisallowOverridesModal( true );
 							} else {
 								setShowAllowOverridesModal( true );
 							}
 						} }
-						disabled={ hasUnsupportedImageAttributes }
-						__experimentalIsFocusable
+						disabled={
+							! hasOverrides && hasUnsupportedImageAttributes
+						}
+						accessibleWhenDisabled
 					>
-						{ allowOverrides
+						{ hasOverrides
 							? __( 'Disable overrides' )
 							: __( 'Enable overrides' ) }
 					</Button>

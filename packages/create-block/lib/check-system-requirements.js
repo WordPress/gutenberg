@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-const inquirer = require( 'inquirer' );
+const { confirm } = require( '@inquirer/prompts' );
 const checkSync = require( 'check-node-version' );
 const tools = require( 'check-node-version/tools' );
 const { promisify } = require( 'util' );
@@ -34,14 +34,10 @@ async function checkSystemRequirements( engines ) {
 		log.error( 'The program may not complete correctly if you continue.' );
 		log.info( '' );
 
-		const { yesContinue } = await inquirer.prompt( [
-			{
-				type: 'confirm',
-				name: 'yesContinue',
-				message: 'Are you sure you want to continue anyway?',
-				default: false,
-			},
-		] );
+		const yesContinue = await confirm( {
+			message: 'Are you sure you want to continue anyway?',
+			default: false,
+		} );
 
 		if ( ! yesContinue ) {
 			log.error( 'Cancelled.' );

@@ -14,7 +14,7 @@ const v0 = {
 		ordered: {
 			type: 'boolean',
 			default: false,
-			__experimentalRole: 'content',
+			role: 'content',
 		},
 		values: {
 			type: 'string',
@@ -23,7 +23,7 @@ const v0 = {
 			multiline: 'li',
 			__unstableMultilineWrapperTags: [ 'ol', 'ul' ],
 			default: '',
-			__experimentalRole: 'content',
+			role: 'content',
 		},
 		type: {
 			type: 'string',
@@ -74,7 +74,7 @@ const v1 = {
 		ordered: {
 			type: 'boolean',
 			default: false,
-			__experimentalRole: 'content',
+			role: 'content',
 		},
 		values: {
 			type: 'string',
@@ -83,7 +83,7 @@ const v1 = {
 			multiline: 'li',
 			__unstableMultilineWrapperTags: [ 'ol', 'ul' ],
 			default: '',
-			__experimentalRole: 'content',
+			role: 'content',
 		},
 		type: {
 			type: 'string',
@@ -144,7 +144,7 @@ const v2 = {
 		ordered: {
 			type: 'boolean',
 			default: false,
-			__experimentalRole: 'content',
+			role: 'content',
 		},
 		values: {
 			type: 'string',
@@ -153,7 +153,7 @@ const v2 = {
 			multiline: 'li',
 			__unstableMultilineWrapperTags: [ 'ol', 'ul' ],
 			default: '',
-			__experimentalRole: 'content',
+			role: 'content',
 		},
 		type: {
 			type: 'string',
@@ -225,7 +225,7 @@ const v3 = {
 		ordered: {
 			type: 'boolean',
 			default: false,
-			__experimentalRole: 'content',
+			role: 'content',
 		},
 		values: {
 			type: 'string',
@@ -234,7 +234,7 @@ const v3 = {
 			multiline: 'li',
 			__unstableMultilineWrapperTags: [ 'ol', 'ul' ],
 			default: '',
-			__experimentalRole: 'content',
+			role: 'content',
 		},
 		type: {
 			type: 'string',

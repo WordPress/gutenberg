@@ -1,5 +1,10 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+
 .edit-site-sidebar-navigation-screen-patterns__group {
 	margin-bottom: $grid-unit-30;
+	margin-left: -$grid-unit-20;
+	margin-right: -$grid-unit-20;
 
 	&:last-of-type {
 		border-bottom: 0;
@@ -17,7 +22,7 @@
 
 	h2 {
 		font-size: 11px;
-		font-weight: 500;
+		font-weight: $font-weight-medium;
 		text-transform: uppercase;
 	}
 }

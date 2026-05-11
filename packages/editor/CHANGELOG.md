@@ -2,6 +2,110 @@
 
 ## Unreleased
 
+### Internal
+
+-   Update `date-fns` dependency to `v4.1.0` ([#78057](https://github.com/WordPress/gutenberg/pull/78057)).
+
+## 14.45.0 (2026-04-29)
+
+## 14.44.0 (2026-04-15)
+
+## 14.43.0 (2026-04-01)
+
+## 14.42.0 (2026-03-18)
+
+### Bug Fixes
+
+-   Fixed avatar contrast ring not displaying over loaded images by using a `::after` pseudo-element instead of an inset `box-shadow`.
+
+## 14.41.0 (2026-03-04)
+
+## 14.40.0 (2026-02-18)
+
+## 14.39.0 (2026-01-29)
+
+## 14.38.0 (2026-01-16)
+
+## 14.36.0 (2025-11-26)
+
+### Internal
+
+-   Applied the `welcome-guide` close-button hover color locally to maintain consistent styling after changes to the shared `Guide` component.
+
+## 14.35.0 (2025-11-12)
+
+## 14.34.0 (2025-10-29)
+
+## 14.33.0 (2025-10-17)
+
+## 14.32.0 (2025-10-01)
+
+## 14.31.0 (2025-09-17)
+
+## 14.30.0 (2025-09-03)
+
+## 14.29.0 (2025-08-20)
+
+## 14.28.0 (2025-08-07)
+
+## 14.27.0 (2025-07-23)
+
+## 14.26.0 (2025-06-25)
+
+## 14.25.0 (2025-06-04)
+
+## 14.24.0 (2025-05-22)
+
+## 14.23.0 (2025-05-07)
+
+## 14.22.0 (2025-04-11)
+
+## 14.21.0 (2025-03-27)
+
+## 14.20.0 (2025-03-13)
+
+## 14.19.0 (2025-02-28)
+
+## 14.18.0 (2025-02-12)
+
+## 14.17.0 (2025-01-29)
+
+## 14.16.0 (2025-01-15)
+
+## 14.15.0 (2025-01-02)
+
+## 14.14.0 (2024-12-11)
+
+## 14.13.0 (2024-11-27)
+
+## 14.12.0 (2024-11-16)
+
+## 14.11.0 (2024-10-30)
+
+### Bug Fixes
+
+-   `Post Featured Image`: Fix `Set featured image` button's `box-shadow` transition to prevent border from flashing when focused.
+
+## 14.10.0 (2024-10-16)
+
+## 14.9.0 (2024-10-03)
+
+## 14.8.0 (2024-09-19)
+
+## 14.7.0 (2024-09-05)
+
+## 14.6.0 (2024-08-21)
+
+## 14.5.0 (2024-08-07)
+
+## 14.4.0 (2024-07-24)
+
+### Deprecations
+
+-   `PostTaxonomiesFlatTermSelector`: Deprecate bottom margin. Add a `__nextHasNoMarginBottom` prop to start opting into the margin-free styles that will become the default in a future version, currently scheduled to be WordPress 7.0 ([#63491](https://github.com/WordPress/gutenberg/pull/63491)).
+
+## 14.3.0 (2024-07-10)
+
 ## 14.2.0 (2024-06-26)
 
 ## 14.1.0 (2024-06-15)

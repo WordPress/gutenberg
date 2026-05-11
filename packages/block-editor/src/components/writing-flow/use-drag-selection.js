@@ -30,6 +30,7 @@ export default function useDragSelection() {
 	const { startMultiSelect, stopMultiSelect } =
 		useDispatch( blockEditorStore );
 	const {
+		getSettings,
 		isSelectionEnabled,
 		hasSelectedBlock,
 		isDraggingBlocks,
@@ -80,7 +81,17 @@ export default function useDragSelection() {
 				} );
 			}
 
+			let lastMouseDownTarget;
+
+			function onMouseDown( { target } ) {
+				lastMouseDownTarget = target;
+			}
+
 			function onMouseLeave( { buttons, target, relatedTarget } ) {
+				if ( ! target.contains( lastMouseDownTarget ) ) {
+					return;
+				}
+
 				// If we're moving into a child element, ignore. We're tracking
 				// the mouse leaving the element to a parent, no a child.
 				if ( target.contains( relatedTarget ) ) {
@@ -113,7 +124,12 @@ export default function useDragSelection() {
 				// child elements of the content editable wrapper are editable
 				// and return true for this property. We only want to start
 				// multi selecting when the mouse leaves the wrapper.
-				if ( target.getAttribute( 'contenteditable' ) !== 'true' ) {
+				// In preview mode, allow drag selection from blocks since they
+				// are not contenteditable.
+				if (
+					target.getAttribute( 'contenteditable' ) !== 'true' &&
+					! getSettings().isPreviewMode
+				) {
 					return;
 				}
 
@@ -141,6 +157,7 @@ export default function useDragSelection() {
 			}
 
 			node.addEventListener( 'mouseout', onMouseLeave );
+			node.addEventListener( 'mousedown', onMouseDown );
 
 			return () => {
 				node.removeEventListener( 'mouseout', onMouseLeave );

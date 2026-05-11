@@ -1,8 +1,8 @@
 export type ObservableMap< K, V > = {
-	get( name: K ): V | undefined;
-	set( name: K, value: V ): void;
-	delete( name: K ): void;
-	subscribe( name: K, listener: () => void ): () => void;
+	get: ( name: K ) => V | undefined;
+	set: ( name: K, value: V ) => void;
+	delete: ( name: K ) => void;
+	subscribe: ( name: K, listener: () => void ) => () => void;
 };
 
 /**

@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react-vite';
+import { fn } from 'storybook/test';
 
 /**
  * WordPress dependencies
@@ -14,21 +15,28 @@ import { useState } from '@wordpress/element';
 import BoxControl from '../';
 
 const meta: Meta< typeof BoxControl > = {
-	title: 'Components (Experimental)/BoxControl',
+	title: 'Components/BoxControl',
 	component: BoxControl,
 	argTypes: {
-		values: { control: { type: null } },
+		values: { control: false },
+	},
+	args: {
+		onChange: fn(),
 	},
 	parameters: {
-		actions: { argTypesRegex: '^on.*' },
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'use-with-caution',
+			whereUsed: 'editor',
+			notes: 'This component is a fallback for themes that do not supply spacing presets. Most of the time `SpacingSizesControl` from `@wordpress/block-editor` is used instead.',
+		},
 	},
 };
 export default meta;
 
 const TemplateUncontrolled: StoryFn< typeof BoxControl > = ( props ) => {
-	return <BoxControl { ...props } />;
+	return <BoxControl __next40pxDefaultSize { ...props } />;
 };
 
 const TemplateControlled: StoryFn< typeof BoxControl > = ( props ) => {
@@ -36,6 +44,7 @@ const TemplateControlled: StoryFn< typeof BoxControl > = ( props ) => {
 
 	return (
 		<BoxControl
+			__next40pxDefaultSize
 			values={ values }
 			{ ...props }
 			onChange={ ( nextValue ) => {
@@ -49,6 +58,7 @@ const TemplateControlled: StoryFn< typeof BoxControl > = ( props ) => {
 export const Default = TemplateUncontrolled.bind( {} );
 Default.args = {
 	label: 'Label',
+	__next40pxDefaultSize: true,
 };
 
 export const Controlled = TemplateControlled.bind( {} );
@@ -79,4 +89,16 @@ AxialControlsWithSingleSide.args = {
 	...Default.args,
 	sides: [ 'horizontal' ],
 	splitOnAxis: true,
+};
+
+export const ControlWithPresets = TemplateControlled.bind( {} );
+ControlWithPresets.args = {
+	...Default.args,
+	presets: [
+		{ name: 'Small', slug: 'small', value: '4px' },
+		{ name: 'Medium', slug: 'medium', value: '8px' },
+		{ name: 'Large', slug: 'large', value: '12px' },
+		{ name: 'Extra Large', slug: 'extra-large', value: '16px' },
+	],
+	presetKey: 'padding',
 };

@@ -16,7 +16,7 @@ We recommend using the [Node Version Manager](https://github.com/nvm-sh/nvm) (nv
     We recommend using the [wp-env package](/packages/env/README.md) for setting WordPress environment locally. You'll need to install Docker to use `wp-env`. See the [Development Environment tutorial for additional details](/docs/getting-started/devenv/README.md).
     > Note: To install Docker on Windows 10 Home Edition, follow the [install instructions from Docker for Windows with WSL2](https://docs.docker.com/docker-for-windows/wsl/).
 
-As an alternative to Docker setup, you can use [Local](https://localwp.com/), [WampServer](http://www.wampserver.com/en/), or [MAMP](https://www.mamp.info/), or even use a remote server.
+As an alternative to Docker setup, you can use [Local](https://localwp.com/), [WampServer](https://wampserver.aviatechno.net/), or [MAMP](https://www.mamp.info/), or even use a remote server.
 
 -   GitHub CLI
     Although not a requirement, the [GitHub CLI](https://cli.github.com/) can be very useful in helping you checkout pull requests locally. Both from the Gutenberg repo and forked repos. This can be a major time saver while code reviewing and testing pull requests.
@@ -78,7 +78,6 @@ If everything went well, you should see the following message in your terminal:
 
 ```bash
 WordPress development site started at http://localhost:8888/
-WordPress test site started at http://localhost:8889/
 MySQL is listening on port 51220
 
  ✔ Done! (in 261s 898ms)
@@ -104,7 +103,9 @@ You can access the Dashboard at: `http://localhost:8888/wp-admin/` using **Usern
 
 #### Accessing the MySQL Database
 
-To access the MySQL database on the `wp-env` instance you will first need the connection details. To do this:
+phpMyAdmin is available by default for the Gutenberg project. You can access the MySQL Database at: `http://localhost:9000/`.
+
+If you want to access the database through another tool, you will first need the connection details. To do this:
 
 1. In a terminal, navigate to your local Gutenberg repo.
 2. Run `npm run wp-env start` - various information about the `wp-env` environment should be logged into the terminal.
@@ -134,7 +135,7 @@ If you run into an issue, check the [troubleshooting section in `wp-env` documen
 
 ### Using Local or MAMP
 
-As an alternative to Docker and `wp-env`, you can also use [Local](https://localwp.com/), [WampServer](http://www.wampserver.com/en/), or [MAMP](https://www.mamp.info/) to run a local WordPress environment. To do so clone and install Gutenberg as a regular plugin in your installation by creating a symlink or copying the directory to the proper `wp-content/plugins` directory.
+As an alternative to Docker and `wp-env`, you can also use [Local](https://localwp.com/), [WampServer](https://wampserver.aviatechno.net/), or [MAMP](https://www.mamp.info/) to run a local WordPress environment. To do so clone and install Gutenberg as a regular plugin in your installation by creating a symlink or copying the directory to the proper `wp-content/plugins` directory.
 
 You will also need some extra configuration to be able to run the e2e tests.
 
@@ -215,11 +216,11 @@ We recommend configuring your editor to automatically check for syntax and lint 
 
 [ESLint](https://eslint.org/) statically analyzes the code to find problems. The lint rules are integrated in the continuous integration process and must pass to be able to commit. You should install the [ESLint Extension](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) for Visual Studio Code, see eslint docs for [more editor integrations](https://eslint.org/docs/user-guide/integrations).
 
-With the extension installed, ESLint will use the [.eslintrc.js](https://github.com/WordPress/gutenberg/blob/HEAD/.eslintrc.js) file in the root of the Gutenberg repository for formatting rules. It will highlight issues as you develop, you can also set the following preference to fix lint rules on save.
+With the extension installed, ESLint will use the [eslint.config.cjs](https://github.com/WordPress/gutenberg/blob/HEAD/eslint.config.cjs) file in the root of the Gutenberg repository for formatting rules. It will highlight issues as you develop, you can also set the following preference to fix lint rules on save.
 
 ```json
     "editor.codeActionsOnSave": {
-        "source.fixAll.eslint": true
+        "source.fixAll.eslint": "explicit"
     },
 ```
 

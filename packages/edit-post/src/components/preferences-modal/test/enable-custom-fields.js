@@ -5,26 +5,37 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
+ * WordPress dependencies
+ */
+import { useSelect } from '@wordpress/data';
+
+/**
  * Internal dependencies
  */
 import {
-	EnableCustomFieldsOption,
+	default as EnableCustomFieldsOption,
 	CustomFieldsConfirmation,
 } from '../enable-custom-fields';
 
+jest.mock( '@wordpress/data/src/components/use-select', () => jest.fn() );
+
+function setupUseSelectMock( areCustomFieldsEnabled ) {
+	useSelect.mockImplementation( () => {
+		return areCustomFieldsEnabled;
+	} );
+}
+
 describe( 'EnableCustomFieldsOption', () => {
 	it( 'renders a checked checkbox when custom fields are enabled', () => {
-		const { container } = render(
-			<EnableCustomFieldsOption areCustomFieldsEnabled />
-		);
+		setupUseSelectMock( true );
+		const { container } = render( <EnableCustomFieldsOption /> );
 
 		expect( container ).toMatchSnapshot();
 	} );
 
 	it( 'renders an unchecked checkbox when custom fields are disabled', () => {
-		const { container } = render(
-			<EnableCustomFieldsOption areCustomFieldsEnabled={ false } />
-		);
+		setupUseSelectMock( false );
+		const { container } = render( <EnableCustomFieldsOption /> );
 
 		expect( container ).toMatchSnapshot();
 	} );
@@ -32,9 +43,8 @@ describe( 'EnableCustomFieldsOption', () => {
 	it( 'renders an unchecked checkbox and a confirmation message when toggled off', async () => {
 		const user = userEvent.setup();
 
-		const { container } = render(
-			<EnableCustomFieldsOption areCustomFieldsEnabled />
-		);
+		setupUseSelectMock( true );
+		const { container } = render( <EnableCustomFieldsOption /> );
 
 		await user.click( screen.getByRole( 'checkbox' ) );
 
@@ -44,9 +54,8 @@ describe( 'EnableCustomFieldsOption', () => {
 	it( 'renders a checked checkbox and a confirmation message when toggled on', async () => {
 		const user = userEvent.setup();
 
-		const { container } = render(
-			<EnableCustomFieldsOption areCustomFieldsEnabled={ false } />
-		);
+		setupUseSelectMock( false );
+		const { container } = render( <EnableCustomFieldsOption /> );
 
 		await user.click( screen.getByRole( 'checkbox' ) );
 

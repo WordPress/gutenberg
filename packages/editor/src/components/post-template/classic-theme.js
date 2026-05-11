@@ -16,11 +16,7 @@ import { store as noticesStore } from '@wordpress/notices';
 import { store as editorStore } from '../../store';
 import CreateNewTemplateModal from './create-new-template-modal';
 import { useAllowSwitchingTemplates } from './hooks';
-
-const POPOVER_PROPS = {
-	className: 'editor-post-template__dropdown',
-	placement: 'bottom-start',
-};
+import PostPanelRow from '../post-panel-row';
 
 function PostTemplateToggle( { isOpen, onClick } ) {
 	const templateTitle = useSelect( ( select ) => {
@@ -33,8 +29,10 @@ function PostTemplateToggle( { isOpen, onClick } ) {
 			return availableTemplates[ templateSlug ];
 		}
 		const template =
-			select( coreStore ).canUser( 'create', 'templates' ) &&
-			select( editorStore ).getCurrentTemplateId();
+			select( coreStore ).canUser( 'create', {
+				kind: 'postType',
+				name: 'wp_template',
+			} ) && select( editorStore ).getCurrentTemplateId();
 		return (
 			template?.title ||
 			template?.slug ||
@@ -61,7 +59,7 @@ function PostTemplateToggle( { isOpen, onClick } ) {
  * @param {Object}   props         The component props.
  * @param {Function} props.onClose The function to close the dropdown.
  *
- * @return {JSX.Element} The rendered dropdown content.
+ * @return {React.ReactNode} The rendered dropdown content.
  */
 function PostTemplateDropdownContent( { onClose } ) {
 	const allowSwitchingTemplate = useAllowSwitchingTemplates();
@@ -78,7 +76,10 @@ function PostTemplateDropdownContent( { onClose } ) {
 		( select ) => {
 			const { canUser, getEntityRecords } = select( coreStore );
 			const editorSettings = select( editorStore ).getEditorSettings();
-			const canCreateTemplates = canUser( 'create', 'templates' );
+			const canCreateTemplates = canUser( 'create', {
+				kind: 'postType',
+				name: 'wp_template',
+			} );
 			const _currentTemplateId =
 				select( editorStore ).getCurrentTemplateId();
 			return {
@@ -159,7 +160,6 @@ function PostTemplateDropdownContent( { onClose } ) {
 			) : (
 				<SelectControl
 					__next40pxDefaultSize
-					__nextHasNoMarginBottom
 					hideLabelFromVision
 					label={ __( 'Template' ) }
 					value={ selectedOption?.value ?? '' }
@@ -172,6 +172,7 @@ function PostTemplateDropdownContent( { onClose } ) {
 			{ canEdit && onNavigateToEntityRecord && (
 				<p>
 					<Button
+						__next40pxDefaultSize
 						variant="link"
 						onClick={ () => {
 							onNavigateToEntityRecord( {
@@ -210,17 +211,37 @@ function PostTemplateDropdownContent( { onClose } ) {
 }
 
 function ClassicThemeControl() {
+	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
+	// Memoize popoverProps to avoid returning a new object every time.
+	const popoverProps = useMemo(
+		() => ( {
+			// Anchor the popover to the middle of the entire row so that it doesn't
+			// move around when the label changes.
+			anchor: popoverAnchor,
+			className: 'editor-post-template__dropdown',
+			placement: 'left-start',
+			offset: 36,
+			shift: true,
+		} ),
+		[ popoverAnchor ]
+	);
+
 	return (
-		<Dropdown
-			popoverProps={ POPOVER_PROPS }
-			focusOnMount
-			renderToggle={ ( { isOpen, onToggle } ) => (
-				<PostTemplateToggle isOpen={ isOpen } onClick={ onToggle } />
-			) }
-			renderContent={ ( { onClose } ) => (
-				<PostTemplateDropdownContent onClose={ onClose } />
-			) }
-		/>
+		<PostPanelRow label={ __( 'Template' ) } ref={ setPopoverAnchor }>
+			<Dropdown
+				popoverProps={ popoverProps }
+				focusOnMount
+				renderToggle={ ( { isOpen, onToggle } ) => (
+					<PostTemplateToggle
+						isOpen={ isOpen }
+						onClick={ onToggle }
+					/>
+				) }
+				renderContent={ ( { onClose } ) => (
+					<PostTemplateDropdownContent onClose={ onClose } />
+				) }
+			/>
+		</PostPanelRow>
 	);
 }
 
@@ -229,6 +250,6 @@ function ClassicThemeControl() {
  *
  * The dropdown menu includes a button for toggling the menu, a list of available templates, and options for creating and editing templates.
  *
- * @return {JSX.Element} The rendered ClassicThemeControl component.
+ * @return {React.ReactNode} The rendered ClassicThemeControl component.
  */
 export default ClassicThemeControl;

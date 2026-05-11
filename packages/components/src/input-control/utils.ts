@@ -73,7 +73,7 @@ export function useDraft( props: {
 	onBlur?: FocusEventHandler;
 	onChange: InputChangeCallback;
 } ) {
-	const refPreviousValue = useRef( props.value );
+	const previousValueRef = useRef( props.value );
 	const [ draft, setDraft ] = useState< {
 		value?: string;
 		isStale?: boolean;
@@ -84,8 +84,8 @@ export function useDraft( props: {
 	// To do so, it tracks the previous value and marks the draft value as stale
 	// after each render.
 	useLayoutEffect( () => {
-		const { current: previousValue } = refPreviousValue;
-		refPreviousValue.current = props.value;
+		const { current: previousValue } = previousValueRef;
+		previousValueRef.current = props.value;
 		if ( draft.value !== undefined && ! draft.isStale ) {
 			setDraft( { ...draft, isStale: true } );
 		} else if ( draft.isStale && props.value !== previousValue ) {

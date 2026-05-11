@@ -57,10 +57,10 @@ const MyControlledRadioRadioGroup = () => {
 	const [ checked, setChecked ] = useState( '25' );
 	return (
 		<RadioGroup label="Width" onChange={ setChecked } checked={ checked }>
-			<Radio value="25">25%</Radio>
-			<Radio value="50">50%</Radio>
-			<Radio value="75">75%</Radio>
-			<Radio value="100">100%</Radio>
+			<Radio __next40pxDefaultSize value="25">25%</Radio>
+			<Radio __next40pxDefaultSize value="50">50%</Radio>
+			<Radio __next40pxDefaultSize value="75">75%</Radio>
+			<Radio __next40pxDefaultSize value="100">100%</Radio>
 		</RadioGroup>
 	);
 };
@@ -80,10 +80,10 @@ import {
 const MyUncontrolledRadioRadioGroup = () => {
 	return (
 		<RadioGroup label="Width" defaultChecked="25">
-			<Radio value="25">25%</Radio>
-			<Radio value="50">50%</Radio>
-			<Radio value="75">75%</Radio>
-			<Radio value="100">100%</Radio>
+			<Radio __next40pxDefaultSize value="25">25%</Radio>
+			<Radio __next40pxDefaultSize value="50">50%</Radio>
+			<Radio __next40pxDefaultSize value="75">75%</Radio>
+			<Radio __next40pxDefaultSize value="100">100%</Radio>
 		</RadioGroup>
 	);
 };

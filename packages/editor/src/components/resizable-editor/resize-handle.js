@@ -3,17 +3,19 @@
  */
 import { __ } from '@wordpress/i18n';
 import { LEFT, RIGHT } from '@wordpress/keycodes';
-import {
-	VisuallyHidden,
-	Tooltip,
-	__unstableMotion as motion,
-} from '@wordpress/components';
+import { Tooltip, __unstableMotion as motion } from '@wordpress/components';
+import { VisuallyHidden } from '@wordpress/ui';
 
 const DELTA_DISTANCE = 20; // The distance to resize per keydown in pixels.
 
 export default function ResizeHandle( { direction, resizeWidthBy } ) {
 	function handleKeyDown( event ) {
 		const { keyCode } = event;
+
+		if ( keyCode !== LEFT && keyCode !== RIGHT ) {
+			return;
+		}
+		event.preventDefault();
 
 		if (
 			( direction === 'left' && keyCode === LEFT ) ||

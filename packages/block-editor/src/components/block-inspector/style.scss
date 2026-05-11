@@ -1,3 +1,6 @@
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/colors" as *;
+
 .block-editor-block-inspector {
 	p:not(.components-base-control__help) {
 		margin-top: 0;
@@ -10,18 +13,21 @@
 		margin-bottom: 1.5em;
 	}
 
-	.components-base-control {
-		margin-bottom: #{ $grid-unit-30 };
-
-		&:last-child {
-			margin-bottom: $grid-unit-10;
+	.components-base-control,
+	.components-radio-control,
+	.block-editor-html-element-control,
+	.block-editor-image-size-control {
+		&:where(:not(:last-child)) {
+			margin-bottom: $grid-unit-20;
 		}
 	}
 
 	// Reset unwanted margin-bottom from being applied to BaseControls within certain components.
 	.components-focal-point-picker-control,
 	.components-query-controls,
-	.components-range-control {
+	.components-range-control,
+	.block-editor-html-element-control,
+	.block-editor-image-size-control {
 		.components-base-control {
 			margin-bottom: 0;
 		}
@@ -49,6 +55,10 @@
 	border-top: $border-width solid $gray-300;
 }
 
-.block-editor-block-inspector__tab-item {
-	flex: 1 1 0px;
+.block-editor-block-inspector-edit-contents {
+	margin: 0 $grid-unit-20 $grid-unit-20 $grid-unit-20;
+
+	.block-editor-block-inspector-edit-contents__button {
+		justify-content: center;
+	}
 }

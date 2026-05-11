@@ -2,11 +2,17 @@
  * WordPress dependencies
  */
 import { createBlock } from '@wordpress/blocks';
+import { isURL, getFilename } from '@wordpress/url';
 
 /**
  * Internal dependencies
  */
 import metadata from './block.json';
+import {
+	findMoreSuitableBlock,
+	rewriteXToTwitter,
+	removeAspectRatioClasses,
+} from './util';
 
 const { name: EMBED_BLOCK } = metadata;
 
@@ -17,13 +23,40 @@ const transforms = {
 	from: [
 		{
 			type: 'raw',
-			isMatch: ( node ) =>
-				node.nodeName === 'P' &&
-				/^\s*(https?:\/\/\S+)\s*$/i.test( node.textContent ) &&
-				node.textContent?.match( /https/gi )?.length === 1,
+			isMatch: ( node ) => {
+				if ( node.nodeName !== 'P' ) {
+					return false;
+				}
+				const trimmed = node.textContent.trim();
+				if (
+					! isURL( trimmed ) ||
+					! /^https:\/\//i.test( trimmed ) ||
+					trimmed.match( /https:\/\//gi )?.length !== 1
+				) {
+					return false;
+				}
+				// Reject URLs whose filename ends in a file extension,
+				// except common page extensions used by permalinks.
+				return ! /\.(?!(html?|php)$)[a-z0-9]+$/i.test(
+					getFilename( trimmed ) || ''
+				);
+			},
 			transform: ( node ) => {
+				const url = rewriteXToTwitter( node.textContent.trim() );
 				return createBlock( EMBED_BLOCK, {
-					url: node.textContent.trim(),
+					url,
+					...findMoreSuitableBlock( url )?.attributes,
+				} );
+			},
+		},
+		{
+			type: 'shortcode',
+			tag: 'embed',
+			transform: ( _attrs, { shortcode } ) => {
+				const url = rewriteXToTwitter( shortcode.content?.trim() );
+				return createBlock( EMBED_BLOCK, {
+					url,
+					...findMoreSuitableBlock( url )?.attributes,
 				} );
 			},
 		},
@@ -33,13 +66,14 @@ const transforms = {
 			type: 'block',
 			blocks: [ 'core/paragraph' ],
 			isMatch: ( { url } ) => !! url,
-			transform: ( { url, caption } ) => {
+			transform: ( { url, caption, className } ) => {
 				let value = `<a href="${ url }">${ url }</a>`;
 				if ( caption?.trim() ) {
 					value += `<br />${ caption }`;
 				}
 				return createBlock( 'core/paragraph', {
 					content: value,
+					className: removeAspectRatioClasses( className ),
 				} );
 			},
 		},

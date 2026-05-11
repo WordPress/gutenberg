@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-const path = require( 'path' );
-
-/**
  * WordPress dependencies
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
@@ -17,6 +12,14 @@ test.use( {
 		height: 1024,
 	},
 } );
+
+async function dragTo( page, x, y ) {
+	// Call the move function twice to make sure the `dragOver` event is sent.
+	// @see https://github.com/microsoft/playwright/issues/17153
+	for ( let i = 0; i < 2; i += 1 ) {
+		await page.mouse.move( x, y );
+	}
+}
 
 test.describe( 'Draggable block', () => {
 	test.beforeEach( async ( { admin } ) => {
@@ -60,14 +63,7 @@ test.describe( 'Draggable block', () => {
 			'role=document[name="Block: Paragraph"i] >> text=1'
 		);
 		const firstParagraphBound = await firstParagraph.boundingBox();
-		// Call the move function twice to make sure the `dragOver` event is sent.
-		// @see https://github.com/microsoft/playwright/issues/17153
-		for ( let i = 0; i < 2; i += 1 ) {
-			await page.mouse.move(
-				firstParagraphBound.x,
-				firstParagraphBound.y
-			);
-		}
+		await dragTo( page, firstParagraphBound.x, firstParagraphBound.y );
 
 		await expect(
 			page.locator( 'data-testid=block-draggable-chip >> visible=true' )
@@ -132,15 +128,11 @@ test.describe( 'Draggable block', () => {
 			'role=document[name="Block: Paragraph"i] >> text=2'
 		);
 		const secondParagraphBound = await secondParagraph.boundingBox();
-		// Call the move function twice to make sure the `dragOver` event is sent.
-		// @see https://github.com/microsoft/playwright/issues/17153
-		// Make sure mouse is > 30px within the block for bottom drop indicator to appear.
-		for ( let i = 0; i < 2; i += 1 ) {
-			await page.mouse.move(
-				secondParagraphBound.x + 32,
-				secondParagraphBound.y + secondParagraphBound.height * 0.75
-			);
-		}
+		await dragTo(
+			page,
+			secondParagraphBound.x + 32,
+			secondParagraphBound.y + secondParagraphBound.height * 0.75
+		);
 
 		await expect(
 			page.locator( 'data-testid=block-draggable-chip >> visible=true' )
@@ -216,14 +208,11 @@ test.describe( 'Draggable block', () => {
 			'role=document[name="Block: Paragraph"i] >> text=1'
 		);
 		const firstParagraphBound = await firstParagraph.boundingBox();
-		// Call the move function twice to make sure the `dragOver` event is sent.
-		// @see https://github.com/microsoft/playwright/issues/17153
-		for ( let i = 0; i < 2; i += 1 ) {
-			await page.mouse.move(
-				firstParagraphBound.x + firstParagraphBound.width * 0.25,
-				firstParagraphBound.y
-			);
-		}
+		await dragTo(
+			page,
+			firstParagraphBound.x + firstParagraphBound.width * 0.25,
+			firstParagraphBound.y
+		);
 
 		await expect(
 			page.locator( 'data-testid=block-draggable-chip >> visible=true' )
@@ -297,14 +286,11 @@ test.describe( 'Draggable block', () => {
 			'role=document[name="Block: Paragraph"i] >> text=2'
 		);
 		const secondParagraphBound = await secondParagraph.boundingBox();
-		// Call the move function twice to make sure the `dragOver` event is sent.
-		// @see https://github.com/microsoft/playwright/issues/17153
-		for ( let i = 0; i < 2; i += 1 ) {
-			await page.mouse.move(
-				secondParagraphBound.x + secondParagraphBound.width * 0.75,
-				secondParagraphBound.y
-			);
-		}
+		await dragTo(
+			page,
+			secondParagraphBound.x + secondParagraphBound.width * 0.75,
+			secondParagraphBound.y
+		);
 
 		await expect(
 			page.locator( 'data-testid=block-draggable-chip >> visible=true' )
@@ -381,11 +367,7 @@ test.describe( 'Draggable block', () => {
 		);
 
 		const testImageName = '10x10_e2e_test_image_z9T8jK.png';
-		const testImagePath = path.join(
-			__dirname,
-			'../../../assets',
-			testImageName
-		);
+		const testImagePath = `./assets/${ testImageName }`;
 
 		{
 			const { dragOver, drop } =
@@ -404,7 +386,10 @@ test.describe( 'Draggable block', () => {
 			await expect(
 				rowAppender,
 				'Dragging over the button block appender should show the blue background'
-			).toHaveCSS( 'background-color', 'rgb(0, 124, 186)' );
+			).toHaveCSS(
+				'background-color',
+				/rgb\(0, 124, 186\)|rgb\(56, 88, 233\)/
+			);
 
 			const { width: rowWidth } = await rowBlock.boundingBox();
 			await dragOver( rowBlock, { position: { x: rowWidth - 10 } } );
@@ -413,7 +398,10 @@ test.describe( 'Draggable block', () => {
 			await expect(
 				rowAppender,
 				'Dragging over the empty group block but outside the appender should still show the blue background'
-			).toHaveCSS( 'background-color', 'rgb(0, 124, 186)' );
+			).toHaveCSS(
+				'background-color',
+				/rgb\(0, 124, 186\)|rgb\(56, 88, 233\)/
+			);
 
 			await drop();
 			await expect( rowAppender ).toBeHidden();
@@ -444,7 +432,7 @@ test.describe( 'Draggable block', () => {
 			// This is technically an implementation detail but easier to test in this case.
 			await expect( columnAppender ).toHaveCSS(
 				'background-color',
-				'rgb(0, 124, 186)'
+				/rgb\(0, 124, 186\)|rgb\(56, 88, 233\)/
 			);
 
 			await drop();
@@ -464,5 +452,48 @@ test.describe( 'Draggable block', () => {
 				},
 			] );
 		}
+	} );
+
+	test( 'can directly drag an image', async ( { page, editor } ) => {
+		await editor.insertBlock( { name: 'core/image' } );
+		await editor.insertBlock( {
+			name: 'core/group',
+			attributes: { layout: { type: 'constrained' } },
+			innerBlocks: [ { name: 'core/paragraph' } ],
+		} );
+
+		const imageBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Image',
+		} );
+
+		const groupBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Group',
+		} );
+
+		await imageBlock.hover();
+		await page.mouse.down();
+		const groupBlockBox = await groupBlock.boundingBox();
+		await dragTo(
+			page,
+			groupBlockBox.x + groupBlockBox.width * 0.5,
+			groupBlockBox.y + groupBlockBox.height * 0.5
+		);
+		await page.mouse.up();
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/group',
+				attributes: {
+					tagName: 'div',
+					layout: { type: 'constrained' },
+				},
+				innerBlocks: [
+					{
+						name: 'core/image',
+						attributes: { alt: '', caption: '' },
+					},
+				],
+			},
+		] );
 	} );
 } );

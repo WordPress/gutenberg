@@ -19,7 +19,7 @@ import { toTree } from './to-tree';
 /**
  * Create an HTML string from a Rich Text value.
  *
- * @param {Object}        $1                      Named argements.
+ * @param {Object}        $1                      Named arguments.
  * @param {RichTextValue} $1.value                Rich text value.
  * @param {boolean}       [$1.preserveWhiteSpace] Preserves newlines if true.
  *
@@ -88,6 +88,15 @@ function remove( object ) {
 }
 
 function createElementHTML( { type, attributes, object, children } ) {
+	if ( type === '#comment' ) {
+		// We can't restore the original comment delimiters, because once parsed
+		// into DOM nodes, we don't have the information. But in the future we
+		// could allow comment handlers to specify custom delimiters, for
+		// example `</{comment-content}>` for Bits, where `comment-content`
+		// would be `/{bit-name}` or `__{translatable-string}` (TBD).
+		return `<!--${ attributes[ 'data-rich-text-comment' ] }-->`;
+	}
+
 	let attributeString = '';
 
 	for ( const key in attributes ) {

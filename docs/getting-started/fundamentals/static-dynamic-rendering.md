@@ -61,7 +61,7 @@ Dynamic blocks, which we'll explore in the following section, can specify an ini
 For a practical demonstration of how this works, refer to the [Building your first block](/docs/getting-started/tutorial.md) tutorial. Specifically, the [Adding static rendering](/docs/getting-started/tutorial.md#adding-static-rendering) section illustrates how a block can have both a saved HTML structure and dynamic rendering capabilities.
 
 <div class="callout callout-info">
-WordPress provides mechanisms like the <a href="https://developer.wordpress.org/reference/functions/render_block/"><code>render_block</code></a> are the <code>$render_callback</code> function to alter the saved HTML of a block before it appears on the front end. These tools offer developers the capability to customize block output dynamically, catering to complex and interactive user experiences.
+WordPress provides mechanisms like the <a href="https://developer.wordpress.org/reference/functions/render_block/"><code>render_block</code></a> and the <a href="https://developer.wordpress.org/block-editor/how-to-guides/block-tutorial/creating-dynamic-blocks/"><code>render_callback</code></a> function to alter the saved HTML of a block before it appears on the front end. These tools offer developers the capability to customize block output dynamically, catering to complex and interactive user experiences.
 </div>
 
 Additional examples of WordPress blocks that use static rendering, meaning their output is fixed at the time of saving and doesn't rely on server-side processing, include:
@@ -88,7 +88,7 @@ There are some common use cases for dynamic blocks:
 
 A block can define dynamic rendering in two main ways:
 
-1. Using the `render_callback` argument that can be passed to the [`register_block_type()`](https://developer.wordpress.org/block-editor/getting-started/fundamentals/registration-of-a-block/#registration-of-the-block-with-php-server-side) function.
+1. Using the `render_callback` argument that can be passed to the [`register_block_type()`](https://developer.wordpress.org/block-editor/getting-started/fundamentals/registration-of-a-block/#registration-of-the-block-with-php-server-side) function. This is needed for [PHP-only blocks](/docs/getting-started/fundamentals/registration-of-a-block.md#php-only-blocks-with-auto-registration).
 2. Using a separate PHP file usually named `render.php`. This file's path should be defined using the [`render`](https://developer.wordpress.org/block-editor/getting-started/fundamentals/block-json/#files-for-the-blocks-behavior-output-or-style) property in the `block.json` file.
 
 Both of these methods receive the following data:

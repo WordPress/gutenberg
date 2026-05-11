@@ -4,7 +4,7 @@
 import {
 	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
-	__experimentalText as Text,
+	__experimentalText as WCText,
 	Button,
 } from '@wordpress/components';
 import { __, _x, _n, sprintf } from '@wordpress/i18n';
@@ -17,14 +17,13 @@ export default function Pagination( {
 } ) {
 	return (
 		<VStack className="block-editor-patterns__grid-pagination-wrapper">
-			<Text variant="muted">
+			<WCText variant="muted">
 				{ sprintf(
 					// translators: %s: Total number of patterns.
 					_n( '%s item', '%s items', totalItems ),
 					totalItems
 				) }
-			</Text>
-
+			</WCText>
 			{ numPages > 1 && (
 				<HStack
 					expanded={ false }
@@ -42,7 +41,9 @@ export default function Pagination( {
 							onClick={ () => changePage( 1 ) }
 							disabled={ currentPage === 1 }
 							aria-label={ __( 'First page' ) }
-							__experimentalIsFocusable
+							size="compact"
+							accessibleWhenDisabled
+							className="block-editor-patterns__grid-pagination-button"
 						>
 							<span>«</span>
 						</Button>
@@ -51,19 +52,21 @@ export default function Pagination( {
 							onClick={ () => changePage( currentPage - 1 ) }
 							disabled={ currentPage === 1 }
 							aria-label={ __( 'Previous page' ) }
-							__experimentalIsFocusable
+							size="compact"
+							accessibleWhenDisabled
+							className="block-editor-patterns__grid-pagination-button"
 						>
 							<span>‹</span>
 						</Button>
 					</HStack>
-					<Text variant="muted">
+					<WCText variant="muted">
 						{ sprintf(
-							// translators: %1$s: Current page number, %2$s: Total number of pages.
+							// translators: 1: Current page number. 2: Total number of pages.
 							_x( '%1$s of %2$s', 'paging' ),
 							currentPage,
 							numPages
 						) }
-					</Text>
+					</WCText>
 					<HStack
 						expanded={ false }
 						spacing={ 1 }
@@ -74,7 +77,9 @@ export default function Pagination( {
 							onClick={ () => changePage( currentPage + 1 ) }
 							disabled={ currentPage === numPages }
 							aria-label={ __( 'Next page' ) }
-							__experimentalIsFocusable
+							size="compact"
+							accessibleWhenDisabled
+							className="block-editor-patterns__grid-pagination-button"
 						>
 							<span>›</span>
 						</Button>
@@ -83,8 +88,9 @@ export default function Pagination( {
 							onClick={ () => changePage( numPages ) }
 							disabled={ currentPage === numPages }
 							aria-label={ __( 'Last page' ) }
-							size="default"
-							__experimentalIsFocusable
+							size="compact"
+							accessibleWhenDisabled
+							className="block-editor-patterns__grid-pagination-button"
 						>
 							<span>»</span>
 						</Button>

@@ -3,10 +3,9 @@
 /**
  * External dependencies
  */
-// @ts-ignore
 import glob from 'glob';
 import { dirname, basename } from 'path';
-import stripJsonComments from 'strip-json-comments';
+import JSONC from 'jsonc-parser';
 import { readFileSync } from 'fs';
 
 let hasErrors = false;
@@ -29,14 +28,23 @@ for ( const packageName of packagesWithTypes ) {
 		hasErrors = true;
 	}
 
-	const packageJson = JSON.parse(
-		readFileSync( `packages/${ packageName }/package.json`, 'utf8' )
+	let packageJson;
+	try {
+		packageJson = JSON.parse(
+			readFileSync( `packages/${ packageName }/package.json`, 'utf8' )
+		);
+	} catch ( e ) {
+		console.error(
+			`Error parsing package.json for package ${ packageName }`
+		);
+		throw e;
+	}
+
+	const tsconfigs = glob.sync( `packages/${ packageName }/tsconfig*.json` );
+	const references = tsconfigs.flatMap(
+		( path ) => JSONC.parse( readFileSync( path, 'utf8' ) ).references ?? []
 	);
-	const tsconfigJson = JSON.parse(
-		stripJsonComments(
-			readFileSync( `packages/${ packageName }/tsconfig.json`, 'utf8' )
-		)
-	);
+
 	if ( packageJson.dependencies ) {
 		for ( const dependency of Object.keys( packageJson.dependencies ) ) {
 			if ( dependency.startsWith( '@wordpress/' ) ) {
@@ -45,7 +53,7 @@ for ( const packageName of packagesWithTypes ) {
 				);
 				if (
 					packagesWithTypes.includes( dependencyPackageName ) &&
-					! tsconfigJson.references?.some(
+					! references.some(
 						( reference ) =>
 							reference.path === `../${ dependencyPackageName }`
 					)

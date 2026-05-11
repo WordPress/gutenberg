@@ -17,10 +17,13 @@ test.describe( 'Keep styles on block transforms', () => {
 			.locator( 'role=button[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '## Heading' );
-		await page.click( 'role=button[name="Color Text styles"i]' );
-		await page.click( 'role=option[name="Color: Luminous vivid orange"i]' );
+		await page.click( 'role=button[name="Text"i]' );
+		await page.click( 'role=option[name="Luminous vivid orange"i]' );
 
-		await page.click( 'role=button[name="Heading"i]' );
+		await page
+			.getByRole( 'toolbar', { name: 'Block tools' } )
+			.getByRole( 'button', { name: 'Heading 2' } )
+			.click();
 		await page.click( 'role=menuitem[name="Paragraph"i]' );
 
 		await expect.poll( editor.getBlocks ).toMatchObject( [

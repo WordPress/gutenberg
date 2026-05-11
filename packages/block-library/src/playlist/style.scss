@@ -1,0 +1,69 @@
+@use "@arraypress/waveform-player/dist/waveform-player";
+
+// Waveform player dimensions.
+$waveform-player-height: 100px;
+
+.wp-block-playlist {
+	// Clip content to respect border-radius.
+	// `overflow: hidden` is a fallback for browsers that don't support `overflow: clip`.
+	overflow: hidden;
+	overflow: clip;
+
+	// Main waveform player container.
+	.wp-block-playlist__waveform-player {
+		width: 100%;
+		margin: var(--wp--preset--spacing--20, 0.625em) 0;
+		position: relative;
+	}
+
+	// Set the waveform track height and remove gap between button and waveform.
+	.waveform-track {
+		height: $waveform-player-height;
+		gap: 0;
+	}
+
+	// WaveformPlayer button styling.
+	.waveform-btn {
+		border-radius: 0;
+		border-end-start-radius: 0.125rem;
+		border-start-start-radius: 0.125rem;
+		width: $waveform-player-height;
+		height: $waveform-player-height;
+		min-width: $waveform-player-height;
+		background: currentColor;
+		margin: 0;
+
+		&:hover:not(:disabled) {
+			transform: none;
+		}
+	}
+
+	.waveform-track.waveform-align-bottom .waveform-btn {
+		margin-bottom: 0;
+	}
+
+	.waveform-subtitle {
+		opacity: 0.7;
+	}
+
+	.wp-block-playlist__tracklist {
+		margin: 0;
+		padding-left: 0;
+		list-style: none;
+
+		&.wp-block-playlist__tracklist-is-hidden {
+			display: none;
+		}
+
+		&.wp-block-playlist__tracklist-artist-is-hidden {
+			// Hide the artist name, which is in the playlist-track block.
+			.wp-block-playlist-track__artist {
+				display: none;
+			}
+		}
+
+		&.wp-block-playlist__tracklist-show-numbers {
+			counter-reset: playlist-track;
+		}
+	}
+}

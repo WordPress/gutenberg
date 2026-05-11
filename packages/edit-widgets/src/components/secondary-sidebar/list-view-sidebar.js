@@ -54,6 +54,7 @@ export default function ListViewSidebar() {
 					icon={ closeSmall }
 					label={ __( 'Close' ) }
 					onClick={ closeListView }
+					size="compact"
 				/>
 			</div>
 			<div

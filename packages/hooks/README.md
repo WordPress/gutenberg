@@ -41,7 +41,9 @@ One notable difference between the JS and PHP hooks API is that in the JS versio
 -   `removeAllActions( 'hookName' )`
 -   `removeAllFilters( 'hookName' )`
 -   `doAction( 'hookName', arg1, arg2, moreArgs, finalArg )`
+-   `doActionAsync( 'hookName', arg1, arg2, moreArgs, finalArg )`
 -   `applyFilters( 'hookName', content, arg1, arg2, moreArgs, finalArg )`
+-   `applyFiltersAsync( 'hookName', content, arg1, arg2, moreArgs, finalArg )`
 -   `doingAction( 'hookName' )`
 -   `doingFilter( 'hookName' )`
 -   `didAction( 'hookName' )`
@@ -51,6 +53,22 @@ One notable difference between the JS and PHP hooks API is that in the JS versio
 -   `actions`
 -   `filters`
 -   `defaultHooks`
+
+## Parameters
+
+### hookName
+
+Should be a non empty string containing only numbers, letters, dashes, periods and underscores. Also, the hook name cannot begin with `__`.
+
+-   Type: `String`
+-   Required: Yes
+
+### namespace
+
+Should be a non empty string containing only numbers, letters, dashes, periods, underscores and slashes. It should take the form `vendor/plugin/function`.
+
+-   Type: `String`
+-   Required: Yes
 
 ### Events on action/filter add or remove
 

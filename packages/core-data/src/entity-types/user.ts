@@ -81,7 +81,7 @@ declare module './base-entity-records' {
 			 * All capabilities assigned to the user.
 			 */
 			capabilities: ContextualField<
-				Record< string, string >,
+				Record< string, boolean >,
 				'edit',
 				C
 			>;
@@ -89,7 +89,7 @@ declare module './base-entity-records' {
 			 * Any extra capabilities assigned to the user.
 			 */
 			extra_capabilities: ContextualField<
-				Record< string, string >,
+				Record< string, boolean >,
 				'edit',
 				C
 			>;
@@ -101,7 +101,7 @@ declare module './base-entity-records' {
 			 * Meta fields.
 			 */
 			meta: ContextualField<
-				Record< string, string >,
+				Record< string, unknown >,
 				'view' | 'edit',
 				C
 			>;

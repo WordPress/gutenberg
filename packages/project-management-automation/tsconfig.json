@@ -3,8 +3,7 @@
 	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
 		"rootDir": "lib",
-		"declarationDir": "build-types",
 		"types": [ "node" ]
 	},
-	"include": [ "lib/**/*" ]
+	"include": [ "lib" ]
 }

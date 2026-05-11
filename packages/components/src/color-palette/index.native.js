@@ -115,9 +115,8 @@ function ColorPalette( {
 				scrollViewRef.current.scrollTo( { x: 0, y: 0 } );
 			}
 		}
-		// Temporarily disabling exhuastive-deps until the component can be refactored and updated safely.
+		// Not adding additional dependencies until the component can be refactored and updated safely.
 		// Please see https://github.com/WordPress/gutenberg/pull/41253 for discussion and details.
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ currentSegment ] );
 
 	function isSelectedCustom() {

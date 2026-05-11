@@ -10,7 +10,7 @@ import { _x } from '@wordpress/i18n';
  * @param {Array}  styles    Block styles.
  * @param {string} className Class name
  *
- * @return {Object?} The active style.
+ * @return {?Object} The active style.
  */
 export function getActiveStyle( styles, className ) {
 	for ( const style of new TokenList( className ).values() ) {
@@ -34,7 +34,7 @@ export function getActiveStyle( styles, className ) {
  * Replaces the active style in the block's className.
  *
  * @param {string}  className   Class name.
- * @param {Object?} activeStyle The replaced style.
+ * @param {?Object} activeStyle The replaced style.
  * @param {Object}  newStyle    The replacing style.
  *
  * @return {string} The updated className.
@@ -83,7 +83,7 @@ export function getRenderedStyles( styles ) {
  *
  * @param {Array} styles Block styles.
  *
- * @return {Object?}        The default style object, if found.
+ * @return {?Object}        The default style object, if found.
  */
 export function getDefaultStyle( styles ) {
 	return styles?.find( ( style ) => style.isDefault );

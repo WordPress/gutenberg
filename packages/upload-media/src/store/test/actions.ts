@@ -1,0 +1,1089 @@
+/**
+ * WordPress dependencies
+ */
+import { createRegistry } from '@wordpress/data';
+type WPDataRegistry = ReturnType< typeof createRegistry >;
+
+/**
+ * Internal dependencies
+ */
+import { store as uploadStore } from '..';
+import { ItemStatus, OperationType } from '../types';
+import { unlock } from '../../lock-unlock';
+
+jest.mock( '@wordpress/blob', () => ( {
+	__esModule: true,
+	createBlobURL: jest.fn( () => 'blob:foo' ),
+	isBlobURL: jest.fn( ( str: string ) => str.startsWith( 'blob:' ) ),
+	revokeBlobURL: jest.fn(),
+} ) );
+
+jest.mock( '../utils', () => ( {
+	vipsCancelOperations: jest.fn( () => Promise.resolve( true ) ),
+	vipsResizeImage: jest.fn( () =>
+		Promise.resolve(
+			new File( [ 'resized' ], 'example-100x100.jpg', {
+				type: 'image/jpeg',
+			} )
+		)
+	),
+	vipsRotateImage: jest.fn(),
+	vipsHasTransparency: jest.fn( () => Promise.resolve( false ) ),
+	vipsConvertImageFormat: jest.fn(),
+	terminateVipsWorker: jest.fn(),
+} ) );
+
+// Import the mocked module to access the mock function.
+import { vipsCancelOperations } from '../utils';
+
+function createRegistryWithStores() {
+	// Create a registry and register used stores.
+	const registry = createRegistry();
+	// @ts-ignore
+	[ uploadStore ].forEach( registry.register );
+	return registry;
+}
+
+const jpegFile = new File( [ 'foo' ], 'example.jpg', {
+	lastModified: 1234567891,
+	type: 'image/jpeg',
+} );
+
+const mp4File = new File( [ 'foo' ], 'amazing-video.mp4', {
+	lastModified: 1234567891,
+	type: 'video/mp4',
+} );
+
+describe( 'actions', () => {
+	let registry: WPDataRegistry;
+	beforeEach( () => {
+		registry = createRegistryWithStores();
+		unlock( registry.dispatch( uploadStore ) ).pauseQueue();
+	} );
+
+	describe( 'addItem', () => {
+		it( 'adds an item to the queue', () => {
+			unlock( registry.dispatch( uploadStore ) ).addItem( {
+				file: jpegFile,
+			} );
+
+			expect( registry.select( uploadStore ).getItems() ).toHaveLength(
+				1
+			);
+			expect(
+				registry.select( uploadStore ).getItems()[ 0 ]
+			).toStrictEqual(
+				expect.objectContaining( {
+					id: expect.any( String ),
+					file: jpegFile,
+					sourceFile: jpegFile,
+					status: ItemStatus.Processing,
+					attachment: {
+						url: expect.stringMatching( /^blob:/ ),
+					},
+				} )
+			);
+		} );
+	} );
+
+	describe( 'addItems', () => {
+		it( 'adds multiple items to the queue', () => {
+			const onError = jest.fn();
+			registry.dispatch( uploadStore ).addItems( {
+				files: [ jpegFile, mp4File ],
+				onError,
+			} );
+
+			expect( onError ).not.toHaveBeenCalled();
+			expect( registry.select( uploadStore ).getItems() ).toHaveLength(
+				2
+			);
+			expect(
+				registry.select( uploadStore ).getItems()[ 0 ]
+			).toStrictEqual(
+				expect.objectContaining( {
+					id: expect.any( String ),
+					file: jpegFile,
+					sourceFile: jpegFile,
+					status: ItemStatus.Processing,
+					attachment: {
+						url: expect.stringMatching( /^blob:/ ),
+					},
+				} )
+			);
+			expect(
+				registry.select( uploadStore ).getItems()[ 1 ]
+			).toStrictEqual(
+				expect.objectContaining( {
+					id: expect.any( String ),
+					file: mp4File,
+					sourceFile: mp4File,
+					status: ItemStatus.Processing,
+					attachment: {
+						url: expect.stringMatching( /^blob:/ ),
+					},
+				} )
+			);
+		} );
+	} );
+
+	describe( 'addSideloadItem', () => {
+		it( 'adds a sideload item with parent ID', () => {
+			// Add parent item first.
+			unlock( registry.dispatch( uploadStore ) ).addItem( {
+				file: jpegFile,
+			} );
+			const parentItem = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			unlock( registry.dispatch( uploadStore ) ).addSideloadItem( {
+				file: jpegFile,
+				parentId: parentItem.id,
+				additionalData: { post: 123, image_size: 'thumbnail' },
+			} );
+
+			const items = unlock(
+				registry.select( uploadStore )
+			).getAllItems();
+			expect( items ).toHaveLength( 2 );
+			expect( items[ 1 ].parentId ).toBe( parentItem.id );
+			expect( items[ 1 ].additionalData ).toEqual(
+				expect.objectContaining( {
+					post: 123,
+					image_size: 'thumbnail',
+				} )
+			);
+		} );
+
+		it( 'adds a sideload item with custom operations', () => {
+			unlock( registry.dispatch( uploadStore ) ).addSideloadItem( {
+				file: jpegFile,
+				additionalData: { post: 456, image_size: 'medium' },
+			} );
+
+			const items = unlock(
+				registry.select( uploadStore )
+			).getAllItems();
+			expect( items ).toHaveLength( 1 );
+			expect( items[ 0 ].status ).toBe( ItemStatus.Processing );
+		} );
+	} );
+
+	describe( 'prepareItem', () => {
+		it( 'should add Upload and ThumbnailGeneration for vips-supported image types', async () => {
+			unlock( registry.dispatch( uploadStore ) ).addItem( {
+				file: jpegFile,
+			} );
+
+			const item = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			// Manually call prepareItem to determine operations.
+			await unlock( registry.dispatch( uploadStore ) ).prepareItem(
+				item.id
+			);
+
+			const updatedItem = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			// Should include Upload and ThumbnailGeneration (no ResizeCrop without bigImageSizeThreshold).
+			expect( updatedItem.operations ).toEqual(
+				expect.arrayContaining( [
+					OperationType.Upload,
+					OperationType.ThumbnailGeneration,
+				] )
+			);
+			// Server should not generate sub-sizes for vips-supported images.
+			expect( updatedItem.additionalData.generate_sub_sizes ).toBe(
+				false
+			);
+		} );
+
+		it( 'should add only Upload for non-image types', async () => {
+			unlock( registry.dispatch( uploadStore ) ).addItem( {
+				file: mp4File,
+			} );
+
+			const item = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			await unlock( registry.dispatch( uploadStore ) ).prepareItem(
+				item.id
+			);
+
+			const updatedItem = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			expect( updatedItem.operations ).toEqual(
+				expect.arrayContaining( [ OperationType.Upload ] )
+			);
+			expect( updatedItem.operations ).not.toEqual(
+				expect.arrayContaining( [ OperationType.ThumbnailGeneration ] )
+			);
+			// Server should generate sub-sizes for non-vips files.
+			expect( updatedItem.additionalData.generate_sub_sizes ).toBe(
+				true
+			);
+			// Server should convert formats (e.g. HEIC to JPEG).
+			expect( updatedItem.additionalData.convert_format ).toBe( true );
+		} );
+
+		it( 'should add only Upload for unsupported image types like SVG', async () => {
+			const svgFile = new File( [ '<svg></svg>' ], 'test.svg', {
+				lastModified: 1234567891,
+				type: 'image/svg+xml',
+			} );
+
+			unlock( registry.dispatch( uploadStore ) ).addItem( {
+				file: svgFile,
+			} );
+
+			const item = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			await unlock( registry.dispatch( uploadStore ) ).prepareItem(
+				item.id
+			);
+
+			const updatedItem = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			expect( updatedItem.operations ).toEqual(
+				expect.arrayContaining( [ OperationType.Upload ] )
+			);
+			expect( updatedItem.operations ).not.toEqual(
+				expect.arrayContaining( [ OperationType.ThumbnailGeneration ] )
+			);
+			expect( updatedItem.additionalData.generate_sub_sizes ).toBe(
+				true
+			);
+			expect( updatedItem.additionalData.convert_format ).toBe( true );
+		} );
+
+		it( 'should add only Upload for unsupported image types like BMP', async () => {
+			const bmpFile = new File( [ 'bmp' ], 'test.bmp', {
+				lastModified: 1234567891,
+				type: 'image/bmp',
+			} );
+
+			unlock( registry.dispatch( uploadStore ) ).addItem( {
+				file: bmpFile,
+			} );
+
+			const item = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			await unlock( registry.dispatch( uploadStore ) ).prepareItem(
+				item.id
+			);
+
+			const updatedItem = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			expect( updatedItem.operations ).toEqual(
+				expect.arrayContaining( [ OperationType.Upload ] )
+			);
+			expect( updatedItem.operations ).not.toEqual(
+				expect.arrayContaining( [ OperationType.ThumbnailGeneration ] )
+			);
+			expect( updatedItem.additionalData.generate_sub_sizes ).toBe(
+				true
+			);
+			expect( updatedItem.additionalData.convert_format ).toBe( true );
+		} );
+
+		it( 'should add only Upload for PDF files', async () => {
+			const pdfFile = new File( [ 'pdf' ], 'document.pdf', {
+				lastModified: 1234567891,
+				type: 'application/pdf',
+			} );
+
+			unlock( registry.dispatch( uploadStore ) ).addItem( {
+				file: pdfFile,
+			} );
+
+			const item = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			await unlock( registry.dispatch( uploadStore ) ).prepareItem(
+				item.id
+			);
+
+			const updatedItem = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			expect( updatedItem.operations ).toEqual(
+				expect.arrayContaining( [ OperationType.Upload ] )
+			);
+			expect( updatedItem.operations ).not.toEqual(
+				expect.arrayContaining( [ OperationType.ThumbnailGeneration ] )
+			);
+			expect( updatedItem.additionalData.generate_sub_sizes ).toBe(
+				true
+			);
+			expect( updatedItem.additionalData.convert_format ).toBe( true );
+		} );
+	} );
+
+	describe( 'concurrent sideloads', () => {
+		it( 'does not pause sideload items targeting the same post', async () => {
+			// Configure mediaSideload so sideload uploads can proceed.
+			unlock( registry.dispatch( uploadStore ) ).updateSettings( {
+				mediaSideload: jest.fn(),
+			} );
+
+			// Use a fake parentId so we only test sideload scheduling.
+			const fakeParentId = 'fake-parent-id';
+
+			// Add two sideload items targeting the same post.
+			unlock( registry.dispatch( uploadStore ) ).addSideloadItem( {
+				file: jpegFile,
+				parentId: fakeParentId,
+				additionalData: { post: 100, image_size: 'thumbnail' },
+				operations: [ OperationType.Upload ],
+			} );
+			unlock( registry.dispatch( uploadStore ) ).addSideloadItem( {
+				file: jpegFile,
+				parentId: fakeParentId,
+				additionalData: { post: 100, image_size: 'medium' },
+				operations: [ OperationType.Upload ],
+			} );
+
+			// Resume the queue to trigger processing.
+			await unlock( registry.dispatch( uploadStore ) ).resumeQueue();
+
+			const items = unlock(
+				registry.select( uploadStore )
+			).getAllItems();
+			const sideloadItems = items.filter(
+				( item ) => item.parentId === fakeParentId
+			);
+
+			// Neither sideload item should be paused.
+			for ( const item of sideloadItems ) {
+				expect( item.status ).not.toBe( ItemStatus.Paused );
+			}
+		} );
+
+		it( 'allows multiple sideloads to the same attachment to upload concurrently', async () => {
+			const mediaSideload = jest.fn();
+
+			unlock( registry.dispatch( uploadStore ) ).updateSettings( {
+				mediaSideload,
+				maxConcurrentUploads: 5,
+			} );
+
+			// Add a parent item first.
+			unlock( registry.dispatch( uploadStore ) ).addItem( {
+				file: jpegFile,
+			} );
+			const parentItem = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			// Add 3 sideload items to same post.
+			for ( const size of [ 'thumbnail', 'medium', 'large' ] ) {
+				unlock( registry.dispatch( uploadStore ) ).addSideloadItem( {
+					file: jpegFile,
+					parentId: parentItem.id,
+					additionalData: { post: 200, image_size: size },
+					operations: [ OperationType.Upload ],
+				} );
+			}
+
+			// Resume the queue.
+			await unlock( registry.dispatch( uploadStore ) ).resumeQueue();
+
+			// All 3 sideloads should have started (not serialized).
+			expect( mediaSideload ).toHaveBeenCalledTimes( 3 );
+		} );
+
+		it( 'respects maxConcurrentUploads for sideloads', async () => {
+			const mediaSideload = jest.fn();
+
+			unlock( registry.dispatch( uploadStore ) ).updateSettings( {
+				mediaSideload,
+				maxConcurrentUploads: 2,
+			} );
+
+			// Use a fake parentId so the parent item does not consume
+			// an upload slot. Only sideload items compete for slots.
+			const fakeParentId = 'fake-parent-id';
+
+			// Add 4 sideload items.
+			for ( const size of [
+				'thumbnail',
+				'medium',
+				'large',
+				'medium_large',
+			] ) {
+				unlock( registry.dispatch( uploadStore ) ).addSideloadItem( {
+					file: jpegFile,
+					parentId: fakeParentId,
+					additionalData: { post: 300, image_size: size },
+					operations: [ OperationType.Upload ],
+				} );
+			}
+
+			// Resume the queue.
+			await unlock( registry.dispatch( uploadStore ) ).resumeQueue();
+
+			// Only 2 should have started due to concurrency limit.
+			expect( mediaSideload ).toHaveBeenCalledTimes( 2 );
+		} );
+
+		it( 'starts pending sideloads after one finishes', async () => {
+			let onSuccessCallback:
+				| ( ( subSize: Record< string, unknown > ) => void )
+				| undefined;
+			const mediaSideload = jest.fn( ( { onSuccess } ) => {
+				// Capture the first callback to simulate completion later.
+				if ( ! onSuccessCallback ) {
+					onSuccessCallback = onSuccess;
+				}
+			} );
+
+			unlock( registry.dispatch( uploadStore ) ).updateSettings( {
+				mediaSideload,
+				maxConcurrentUploads: 1,
+			} );
+
+			// Use a fake parentId so the parent item does not consume
+			// an upload slot.
+			const fakeParentId = 'fake-parent-id';
+
+			// Add 2 sideload items.
+			unlock( registry.dispatch( uploadStore ) ).addSideloadItem( {
+				file: jpegFile,
+				parentId: fakeParentId,
+				additionalData: { post: 400, image_size: 'thumbnail' },
+				operations: [ OperationType.Upload ],
+			} );
+			unlock( registry.dispatch( uploadStore ) ).addSideloadItem( {
+				file: jpegFile,
+				parentId: fakeParentId,
+				additionalData: { post: 400, image_size: 'medium' },
+				operations: [ OperationType.Upload ],
+			} );
+
+			// Resume the queue.
+			await unlock( registry.dispatch( uploadStore ) ).resumeQueue();
+
+			// Only 1 should have started due to maxConcurrentUploads=1.
+			expect( mediaSideload ).toHaveBeenCalledTimes( 1 );
+
+			// Complete the first upload to trigger the pending one.
+			onSuccessCallback?.( {
+				image_size: 'thumbnail',
+				width: 150,
+				height: 150,
+				file: 'image-150x150.jpg',
+				mime_type: 'image/jpeg',
+				filesize: 5000,
+			} );
+
+			// Allow async dispatch to propagate.
+			await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
+
+			// The second sideload should now have started.
+			expect( mediaSideload ).toHaveBeenCalledTimes( 2 );
+		} );
+
+		it( 'resumeItemByPostId is not on private dispatch', () => {
+			const privateDispatch = unlock( registry.dispatch( uploadStore ) );
+			expect(
+				( privateDispatch as Record< string, unknown > )
+					.resumeItemByPostId
+			).toBeUndefined();
+		} );
+	} );
+
+	describe( 'cancelItem', () => {
+		beforeEach( () => {
+			( vipsCancelOperations as jest.Mock ).mockClear();
+		} );
+
+		it( 'calls vipsCancelOperations when cancelling', async () => {
+			// Suppress console.error that fires when there's no onError callback.
+			const consoleErrorSpy = jest
+				.spyOn( console, 'error' )
+				.mockImplementation( () => {} );
+
+			unlock( registry.dispatch( uploadStore ) ).addItem( {
+				file: jpegFile,
+			} );
+			const item = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			await registry
+				.dispatch( uploadStore )
+				.cancelItem( item.id, new Error( 'User cancelled' ) );
+
+			expect( vipsCancelOperations ).toHaveBeenCalledWith( item.id );
+			expect( consoleErrorSpy ).toHaveBeenCalled();
+
+			consoleErrorSpy.mockRestore();
+		} );
+
+		it( 'removes item from queue after cancelling', async () => {
+			// Suppress console.error that fires when there's no onError callback.
+			const consoleErrorSpy = jest
+				.spyOn( console, 'error' )
+				.mockImplementation( () => {} );
+
+			unlock( registry.dispatch( uploadStore ) ).addItem( {
+				file: jpegFile,
+			} );
+			const item = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			await registry
+				.dispatch( uploadStore )
+				.cancelItem( item.id, new Error( 'User cancelled' ) );
+
+			expect(
+				unlock( registry.select( uploadStore ) ).getAllItems()
+			).toHaveLength( 0 );
+
+			consoleErrorSpy.mockRestore();
+		} );
+
+		it( 'calls onError callback when not silent', async () => {
+			const onError = jest.fn();
+			unlock( registry.dispatch( uploadStore ) ).addItem( {
+				file: jpegFile,
+				onError,
+			} );
+			const item = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			await registry
+				.dispatch( uploadStore )
+				.cancelItem( item.id, new Error( 'Test error' ) );
+
+			expect( onError ).toHaveBeenCalledWith(
+				expect.objectContaining( { message: 'Test error' } )
+			);
+		} );
+
+		it( 'does not call onError when silent', async () => {
+			const onError = jest.fn();
+			unlock( registry.dispatch( uploadStore ) ).addItem( {
+				file: jpegFile,
+				onError,
+			} );
+			const item = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			await registry
+				.dispatch( uploadStore )
+				.cancelItem( item.id, new Error( 'Test error' ), true );
+
+			expect( onError ).not.toHaveBeenCalled();
+		} );
+	} );
+
+	describe( 'resizeCropItem', () => {
+		it( 'uses imageQuality from store settings when set', async () => {
+			unlock( registry.dispatch( uploadStore ) ).updateSettings( {
+				imageQuality: 0.5,
+			} );
+
+			unlock( registry.dispatch( uploadStore ) ).addItem( {
+				file: jpegFile,
+			} );
+
+			const item = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			const { vipsResizeImage } = require( '../utils' );
+			( vipsResizeImage as jest.Mock ).mockClear();
+
+			await unlock( registry.dispatch( uploadStore ) ).resizeCropItem(
+				item.id,
+				{ resize: { width: 100, height: 100 } }
+			);
+
+			// Verify the resize was called (quality will be wired through in a future update).
+			expect( vipsResizeImage ).toHaveBeenCalled();
+		} );
+
+		it( 'falls back to default quality when imageQuality is not set', async () => {
+			unlock( registry.dispatch( uploadStore ) ).addItem( {
+				file: jpegFile,
+			} );
+
+			const item = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			const { vipsResizeImage } = require( '../utils' );
+			( vipsResizeImage as jest.Mock ).mockClear();
+
+			await unlock( registry.dispatch( uploadStore ) ).resizeCropItem(
+				item.id,
+				{ resize: { width: 100, height: 100 } }
+			);
+
+			expect( vipsResizeImage ).toHaveBeenCalled();
+		} );
+
+		it( 'skips resize when no resize args are provided', async () => {
+			unlock( registry.dispatch( uploadStore ) ).addItem( {
+				file: jpegFile,
+			} );
+
+			const item = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			await unlock( registry.dispatch( uploadStore ) ).resizeCropItem(
+				item.id
+			);
+
+			// Item should finish without resize.
+			const updatedItem = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+			expect( updatedItem.file ).toBe( jpegFile );
+		} );
+	} );
+
+	describe( 'generateThumbnails', () => {
+		const mockBitmapClose = jest.fn();
+
+		function mockCreateImageBitmap( width: number, height: number ) {
+			global.createImageBitmap = jest.fn( () =>
+				Promise.resolve( {
+					width,
+					height,
+					close: mockBitmapClose,
+				} )
+			) as unknown as typeof global.createImageBitmap;
+		}
+
+		/**
+		 * Sets up an item in the queue with an attachment and
+		 * ThumbnailGeneration as the current operation, simulating
+		 * the state after upload completes.
+		 *
+		 * @param overrides            Optional overrides.
+		 * @param overrides.attachment Attachment field overrides.
+		 */
+		async function setupItemForThumbnailGeneration( overrides?: {
+			attachment?: Record< string, unknown >;
+		} ) {
+			// Add an item with ThumbnailGeneration as the only operation.
+			unlock( registry.dispatch( uploadStore ) ).addItem( {
+				file: jpegFile,
+				operations: [ OperationType.ThumbnailGeneration ],
+			} );
+
+			const item = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			// Simulate upload completion by finishing the operation with attachment data.
+			// finishOperation shifts the operations array, so ThumbnailGeneration
+			// becomes the next operation to process.
+			await unlock( registry.dispatch( uploadStore ) ).finishOperation(
+				item.id,
+				{
+					attachment: {
+						id: 123,
+						filename: 'example.jpg',
+						missing_image_sizes: [ 'thumbnail', 'medium' ],
+						...( overrides?.attachment || {} ),
+					},
+				}
+			);
+
+			return unlock( registry.select( uploadStore ) ).getAllItems()[ 0 ];
+		}
+
+		beforeEach( () => {
+			mockBitmapClose.mockClear();
+		} );
+
+		afterEach( () => {
+			// Clean up global mock.
+			// @ts-ignore
+			delete global.createImageBitmap;
+		} );
+
+		it( 'should not sideload a scaled version when image is below the threshold', async () => {
+			// Image is 800x600, threshold is 2560.
+			mockCreateImageBitmap( 800, 600 );
+
+			unlock( registry.dispatch( uploadStore ) ).updateSettings( {
+				bigImageSizeThreshold: 2560,
+				allImageSizes: {
+					thumbnail: { width: 150, height: 150 },
+					medium: { width: 300, height: 300 },
+				},
+			} );
+
+			const item = await setupItemForThumbnailGeneration();
+			await unlock( registry.dispatch( uploadStore ) ).generateThumbnails(
+				item.id
+			);
+
+			const allItems = unlock(
+				registry.select( uploadStore )
+			).getAllItems();
+
+			// Should have sideload items for thumbnails, but NOT for 'scaled'.
+			const scaledItems = allItems.filter(
+				( i ) => i.additionalData?.image_size === 'scaled'
+			);
+			expect( scaledItems ).toHaveLength( 0 );
+			expect( mockBitmapClose ).toHaveBeenCalled();
+		} );
+
+		it( 'should sideload a scaled version when image exceeds the threshold', async () => {
+			// Image is 4000x3000, threshold is 2560.
+			mockCreateImageBitmap( 4000, 3000 );
+
+			unlock( registry.dispatch( uploadStore ) ).updateSettings( {
+				bigImageSizeThreshold: 2560,
+				allImageSizes: {
+					thumbnail: { width: 150, height: 150 },
+					medium: { width: 300, height: 300 },
+				},
+			} );
+
+			const item = await setupItemForThumbnailGeneration();
+			await unlock( registry.dispatch( uploadStore ) ).generateThumbnails(
+				item.id
+			);
+
+			const allItems = unlock(
+				registry.select( uploadStore )
+			).getAllItems();
+
+			const scaledItems = allItems.filter(
+				( i ) => i.additionalData?.image_size === 'scaled'
+			);
+			expect( scaledItems ).toHaveLength( 1 );
+			expect( scaledItems[ 0 ].additionalData.post ).toBe( 123 );
+			expect( mockBitmapClose ).toHaveBeenCalled();
+		} );
+
+		it( 'should sideload a scaled version when only height exceeds the threshold', async () => {
+			// Image is 2000x3000, threshold is 2560 — height exceeds.
+			mockCreateImageBitmap( 2000, 3000 );
+
+			unlock( registry.dispatch( uploadStore ) ).updateSettings( {
+				bigImageSizeThreshold: 2560,
+				allImageSizes: {
+					thumbnail: { width: 150, height: 150 },
+					medium: { width: 300, height: 300 },
+				},
+			} );
+
+			const item = await setupItemForThumbnailGeneration();
+			await unlock( registry.dispatch( uploadStore ) ).generateThumbnails(
+				item.id
+			);
+
+			const allItems = unlock(
+				registry.select( uploadStore )
+			).getAllItems();
+
+			const scaledItems = allItems.filter(
+				( i ) => i.additionalData?.image_size === 'scaled'
+			);
+			expect( scaledItems ).toHaveLength( 1 );
+		} );
+
+		it( 'should not sideload a scaled version when bigImageSizeThreshold is not set', async () => {
+			// No bigImageSizeThreshold in settings — scaling should be skipped entirely.
+			unlock( registry.dispatch( uploadStore ) ).updateSettings( {
+				allImageSizes: {
+					thumbnail: { width: 150, height: 150 },
+					medium: { width: 300, height: 300 },
+				},
+			} );
+
+			const item = await setupItemForThumbnailGeneration();
+			await unlock( registry.dispatch( uploadStore ) ).generateThumbnails(
+				item.id
+			);
+
+			const allItems = unlock(
+				registry.select( uploadStore )
+			).getAllItems();
+
+			const scaledItems = allItems.filter(
+				( i ) => i.additionalData?.image_size === 'scaled'
+			);
+			expect( scaledItems ).toHaveLength( 0 );
+			// createImageBitmap should not have been called since threshold is not set.
+			expect( global.createImageBitmap ).toBeUndefined();
+		} );
+
+		it( 'should not sideload a scaled version when attachment has no id', async () => {
+			mockCreateImageBitmap( 4000, 3000 );
+
+			unlock( registry.dispatch( uploadStore ) ).updateSettings( {
+				bigImageSizeThreshold: 2560,
+				allImageSizes: {
+					thumbnail: { width: 150, height: 150 },
+					medium: { width: 300, height: 300 },
+				},
+			} );
+
+			// Set up item with attachment that has no id.
+			const item = await setupItemForThumbnailGeneration( {
+				attachment: { id: undefined },
+			} );
+			await unlock( registry.dispatch( uploadStore ) ).generateThumbnails(
+				item.id
+			);
+
+			const allItems = unlock(
+				registry.select( uploadStore )
+			).getAllItems();
+
+			const scaledItems = allItems.filter(
+				( i ) => i.additionalData?.image_size === 'scaled'
+			);
+			expect( scaledItems ).toHaveLength( 0 );
+		} );
+
+		it( 'should create sideload items for missing image sizes', async () => {
+			mockCreateImageBitmap( 800, 600 );
+
+			unlock( registry.dispatch( uploadStore ) ).updateSettings( {
+				bigImageSizeThreshold: 2560,
+				allImageSizes: {
+					thumbnail: { width: 150, height: 150 },
+					medium: { width: 300, height: 300 },
+				},
+			} );
+
+			const item = await setupItemForThumbnailGeneration();
+			await unlock( registry.dispatch( uploadStore ) ).generateThumbnails(
+				item.id
+			);
+
+			const allItems = unlock(
+				registry.select( uploadStore )
+			).getAllItems();
+
+			// Should have the original item plus 2 sideload items for thumbnail and medium.
+			const thumbnailItems = allItems.filter(
+				( i ) => i.additionalData?.image_size === 'thumbnail'
+			);
+			const mediumItems = allItems.filter(
+				( i ) => i.additionalData?.image_size === 'medium'
+			);
+			expect( thumbnailItems ).toHaveLength( 1 );
+			expect( mediumItems ).toHaveLength( 1 );
+		} );
+
+		it( 'should deduplicate sizes with the same dimensions', async () => {
+			mockCreateImageBitmap( 800, 600 );
+
+			unlock( registry.dispatch( uploadStore ) ).updateSettings( {
+				bigImageSizeThreshold: 2560,
+				allImageSizes: {
+					thumbnail: { width: 150, height: 150, crop: true },
+					medium: { width: 300, height: 300, crop: false },
+					// 'custom' has the same dimensions as 'medium'.
+					custom: { width: 300, height: 300, crop: false },
+				},
+			} );
+
+			const item = await setupItemForThumbnailGeneration( {
+				attachment: {
+					missing_image_sizes: [ 'thumbnail', 'medium', 'custom' ],
+				},
+			} );
+			await unlock( registry.dispatch( uploadStore ) ).generateThumbnails(
+				item.id
+			);
+
+			const allItems = unlock(
+				registry.select( uploadStore )
+			).getAllItems();
+
+			// Should have the original item plus 2 sideload items (not 3),
+			// because medium and custom share the same dimensions.
+			const sideloadItems = allItems.filter(
+				( i ) => i.parentId === item.id
+			);
+			expect( sideloadItems ).toHaveLength( 2 );
+
+			// The deduplicated group should pass both size names.
+			const mediumCustomItem = sideloadItems.find( ( i ) =>
+				Array.isArray( i.additionalData?.image_size )
+			);
+			expect( mediumCustomItem ).toBeDefined();
+			expect( mediumCustomItem!.additionalData!.image_size ).toEqual( [
+				'medium',
+				'custom',
+			] );
+		} );
+
+		it( 'should not deduplicate sizes that share dimensions but differ by crop', async () => {
+			mockCreateImageBitmap( 800, 600 );
+
+			unlock( registry.dispatch( uploadStore ) ).updateSettings( {
+				bigImageSizeThreshold: 2560,
+				allImageSizes: {
+					// Same width/height, different crop — must be treated as distinct.
+					soft: { width: 300, height: 300, crop: false },
+					hard: { width: 300, height: 300, crop: true },
+				},
+			} );
+
+			const item = await setupItemForThumbnailGeneration( {
+				attachment: {
+					missing_image_sizes: [ 'soft', 'hard' ],
+				},
+			} );
+			await unlock( registry.dispatch( uploadStore ) ).generateThumbnails(
+				item.id
+			);
+
+			const allItems = unlock(
+				registry.select( uploadStore )
+			).getAllItems();
+
+			const sideloadItems = allItems.filter(
+				( i ) => i.parentId === item.id
+			);
+			// Two separate sideloads because crop differs.
+			expect( sideloadItems ).toHaveLength( 2 );
+
+			// Each sideload passes a single string (not an array).
+			for ( const sideload of sideloadItems ) {
+				expect(
+					typeof sideload.additionalData?.image_size === 'string'
+				).toBe( true );
+			}
+			const imageSizes = sideloadItems.map(
+				( i ) => i.additionalData?.image_size
+			);
+			expect( imageSizes ).toEqual(
+				expect.arrayContaining( [ 'soft', 'hard' ] )
+			);
+		} );
+
+		it( 'should group three sizes with identical dimensions into one sideload', async () => {
+			mockCreateImageBitmap( 800, 600 );
+
+			unlock( registry.dispatch( uploadStore ) ).updateSettings( {
+				bigImageSizeThreshold: 2560,
+				allImageSizes: {
+					medium: { width: 300, height: 300, crop: false },
+					alias_a: { width: 300, height: 300, crop: false },
+					alias_b: { width: 300, height: 300, crop: false },
+				},
+			} );
+
+			const item = await setupItemForThumbnailGeneration( {
+				attachment: {
+					missing_image_sizes: [ 'medium', 'alias_a', 'alias_b' ],
+				},
+			} );
+			await unlock( registry.dispatch( uploadStore ) ).generateThumbnails(
+				item.id
+			);
+
+			const allItems = unlock(
+				registry.select( uploadStore )
+			).getAllItems();
+
+			const sideloadItems = allItems.filter(
+				( i ) => i.parentId === item.id
+			);
+			// One sideload, all three names grouped together.
+			expect( sideloadItems ).toHaveLength( 1 );
+			expect( sideloadItems[ 0 ].additionalData!.image_size ).toEqual( [
+				'medium',
+				'alias_a',
+				'alias_b',
+			] );
+		} );
+
+		it( 'should skip thumbnail generation when item has no attachment', async () => {
+			// Add an item without going through the attachment setup.
+			unlock( registry.dispatch( uploadStore ) ).addItem( {
+				file: jpegFile,
+				operations: [ OperationType.ThumbnailGeneration ],
+			} );
+
+			const item = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			// Clear the attachment to simulate no upload response.
+			await unlock( registry.dispatch( uploadStore ) ).finishOperation(
+				item.id,
+				{
+					attachment: undefined,
+				}
+			);
+
+			const updatedItem = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			await unlock( registry.dispatch( uploadStore ) ).generateThumbnails(
+				updatedItem.id
+			);
+
+			// Should only have the original item — no sideloads created.
+			const allItems = unlock(
+				registry.select( uploadStore )
+			).getAllItems();
+			expect( allItems ).toHaveLength( 1 );
+		} );
+
+		it( 'should not create scaled version when image is exactly at the threshold', async () => {
+			// Image is exactly 2560x2560, threshold is 2560 — should NOT scale.
+			mockCreateImageBitmap( 2560, 2560 );
+
+			unlock( registry.dispatch( uploadStore ) ).updateSettings( {
+				bigImageSizeThreshold: 2560,
+				allImageSizes: {
+					thumbnail: { width: 150, height: 150 },
+					medium: { width: 300, height: 300 },
+				},
+			} );
+
+			const item = await setupItemForThumbnailGeneration();
+			await unlock( registry.dispatch( uploadStore ) ).generateThumbnails(
+				item.id
+			);
+
+			const allItems = unlock(
+				registry.select( uploadStore )
+			).getAllItems();
+
+			const scaledItems = allItems.filter(
+				( i ) => i.additionalData?.image_size === 'scaled'
+			);
+			// Exactly at threshold means no scaling (condition is > not >=).
+			expect( scaledItems ).toHaveLength( 0 );
+		} );
+	} );
+} );

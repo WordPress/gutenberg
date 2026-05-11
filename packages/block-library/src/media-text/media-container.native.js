@@ -44,8 +44,6 @@ const ICON_TYPE = {
 	RETRY: 'retry',
 };
 
-export { imageFillStyles } from './media-container.js';
-
 class MediaContainer extends Component {
 	constructor() {
 		super( ...arguments );
@@ -173,7 +171,7 @@ class MediaContainer extends Component {
 	renderImage( params, openMediaOptions ) {
 		const { isUploadInProgress } = this.state;
 		const {
-			aligmentStyles,
+			alignmentStyles,
 			focalPoint,
 			imageFill,
 			isMediaSelected,
@@ -207,7 +205,7 @@ class MediaContainer extends Component {
 						style={ [
 							imageFill && styles.imageCropped,
 							styles.mediaImageContainer,
-							! isUploadInProgress && aligmentStyles,
+							! isUploadInProgress && alignmentStyles,
 						] }
 					>
 						<Image
@@ -234,7 +232,7 @@ class MediaContainer extends Component {
 
 	renderVideo( params ) {
 		const {
-			aligmentStyles,
+			alignmentStyles,
 			mediaUrl,
 			isSelected,
 			getStylesFromColorScheme,
@@ -263,7 +261,7 @@ class MediaContainer extends Component {
 					onPress={ this.onMediaPressed }
 					disabled={ ! isSelected }
 				>
-					<View style={ [ styles.videoContainer, aligmentStyles ] }>
+					<View style={ [ styles.videoContainer, alignmentStyles ] }>
 						<View
 							style={ [
 								styles.videoContent,

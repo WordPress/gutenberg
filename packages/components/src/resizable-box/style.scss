@@ -1,3 +1,8 @@
+@use "sass:math";
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "../utils/theme-variables" as *;
+
 $resize-handler-size: 15px;
 $resize-handler-container-size: $resize-handler-size + ($grid-unit-05 * 2); // Make the resize handle container larger so there's a larger grabbable area.
 
@@ -9,11 +14,19 @@ $resize-handler-container-size: $resize-handler-size + ($grid-unit-05 * 2); // M
 	height: $resize-handler-container-size;
 
 	// Elevate the resize handle above the focus style.
-	z-index: z-index(".components-resizable-box__handle");
+	z-index: 2;
 
 	// Show the resize handle if set in props
 	.components-resizable-box__container.has-show-handle & {
 		display: block;
+	}
+
+	> div {
+		position: relative;
+		width: 100%;
+		height: 100%;
+		z-index: 2;
+		outline: none;
 	}
 }
 
@@ -28,14 +41,14 @@ $resize-handler-container-size: $resize-handler-size + ($grid-unit-05 * 2); // M
 	content: "";
 	width: $resize-handler-size;
 	height: $resize-handler-size;
-	border-radius: 50%;
+	border-radius: $radius-round;
 	background: $white;
 	cursor: inherit;
 	position: absolute;
-	top: calc(50% - #{ceil($resize-handler-size * 0.5)});
-	right: calc(50% - #{ceil($resize-handler-size * 0.5)});
+	top: calc(50% - #{math.ceil($resize-handler-size * 0.5)});
+	right: calc(50% - #{math.ceil($resize-handler-size * 0.5)});
 
-	box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent;
+	box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent, $elevation-x-small;
 	// Only visible in Windows High Contrast mode.
 	outline: 2px solid transparent;
 }
@@ -43,7 +56,7 @@ $resize-handler-container-size: $resize-handler-size + ($grid-unit-05 * 2); // M
 // This is the "visible" resize handle for side handles - the line
 .components-resizable-box__side-handle::before {
 	display: block;
-	border-radius: 2px;
+	border-radius: $radius-full;
 	content: "";
 	width: 3px;
 	height: 3px;
@@ -52,19 +65,22 @@ $resize-handler-container-size: $resize-handler-size + ($grid-unit-05 * 2); // M
 	position: absolute;
 	top: calc(50% - 1px);
 	right: calc(50% - 1px);
-	transition: transform 0.1s ease-in;
-	@include reduce-motion("transition");
-	will-change: transform;
+
+	@media not (prefers-reduced-motion) {
+		transition: transform 0.1s ease-in;
+		will-change: transform;
+	}
+
 	opacity: 0;
 }
 
 // Show corner handles on top of side handles so they can be used
 .components-resizable-box__side-handle {
-	z-index: z-index(".components-resizable-box__side-handle");
+	z-index: 2;
 }
 
 .components-resizable-box__corner-handle {
-	z-index: z-index(".components-resizable-box__corner-handle");
+	z-index: 2;
 }
 
 // Make horizontal side-handles full width
@@ -94,18 +110,20 @@ $resize-handler-container-size: $resize-handler-size + ($grid-unit-05 * 2); // M
 .components-resizable-box__side-handle.components-resizable-box__handle-bottom:hover::before,
 .components-resizable-box__side-handle.components-resizable-box__handle-top:active::before,
 .components-resizable-box__side-handle.components-resizable-box__handle-bottom:active::before {
-	animation: components-resizable-box__top-bottom-animation 0.1s ease-out 0s;
-	animation-fill-mode: forwards;
-	@include reduce-motion("animation");
+	@media not (prefers-reduced-motion) {
+		animation: components-resizable-box__top-bottom-animation 0.1s ease-out 0s;
+		animation-fill-mode: forwards;
+	}
 }
 
 .components-resizable-box__side-handle.components-resizable-box__handle-left:hover::before,
 .components-resizable-box__side-handle.components-resizable-box__handle-right:hover::before,
 .components-resizable-box__side-handle.components-resizable-box__handle-left:active::before,
 .components-resizable-box__side-handle.components-resizable-box__handle-right:active::before {
-	animation: components-resizable-box__left-right-animation 0.1s ease-out 0s;
-	animation-fill-mode: forwards;
-	@include reduce-motion("animation");
+	@media not (prefers-reduced-motion) {
+		animation: components-resizable-box__left-right-animation 0.1s ease-out 0s;
+		animation-fill-mode: forwards;
+	}
 }
 
 /* This CSS is shown only to Safari, which has a bug with table-caption making it jumpy.

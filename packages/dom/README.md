@@ -114,7 +114,7 @@ _Returns_
 
 ### getRectangleFromRange
 
-Get the rectangle of a given Range. Returns `null` if no suitable rectangle can be found.
+Get the rectangle of a given Range. Returns `null` if no suitable rectangle can be found. Use instead of `Range.getBoundingClientRect()`, which is often broken, especially for collapsed ranges.
 
 _Parameters_
 
@@ -238,6 +238,22 @@ _Parameters_
 _Returns_
 
 -   `boolean`: True if rtl, false if ltr.
+
+### isSelectionForward
+
+Returns true if the given selection object is in the forward direction, or false otherwise.
+
+_Related_
+
+-   <https://developer.mozilla.org/en-US/docs/Web/API/Node/compareDocumentPosition>
+
+_Parameters_
+
+-   _selection_ `Selection`: Selection object to check.
+
+_Returns_
+
+-   `boolean`: Whether the selection is forward.
 
 ### isTextContent
 

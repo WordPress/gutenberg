@@ -31,7 +31,7 @@ There are however certain exceptions to that rule. PRs with the following criter
 
 -   Does not contain changes to PHP code.
 -   Has label `Backport from WordPress Core` - this code is already in WP Core and is being synchronized back to Gutenberg.
--   Has label `Backport to WordPress Core` - this code has already been synchronized to WP Core.
+-   Has label `Backported to WordPress Core` - this code has already been synchronized to WP Core.
 
 ## Further Reading
 

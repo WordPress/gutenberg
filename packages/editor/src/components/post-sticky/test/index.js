@@ -35,23 +35,23 @@ function setupUseSelectMock( { hasStickyAction, postType } ) {
 describe( 'PostSticky', () => {
 	it( 'should not render anything if the post type is not "post"', () => {
 		setupUseSelectMock( { hasStickyAction: true, postType: 'page' } );
-		render( <PostStickyCheck>Can Toggle Sticky</PostStickyCheck> );
+		render( <PostStickyCheck>Can Show Sticky</PostStickyCheck> );
 		expect(
-			screen.queryByText( 'Can Toggle Sticky' )
+			screen.queryByText( 'Can Show Sticky' )
 		).not.toBeInTheDocument();
 	} );
 
 	it( "should not render anything if post doesn't support stickying", () => {
 		setupUseSelectMock( { hasStickyAction: false, postType: 'post' } );
-		render( <PostStickyCheck>Can Toggle Sticky</PostStickyCheck> );
+		render( <PostStickyCheck>Can Show Sticky</PostStickyCheck> );
 		expect(
-			screen.queryByText( 'Can Toggle Sticky' )
+			screen.queryByText( 'Can Show Sticky' )
 		).not.toBeInTheDocument();
 	} );
 
 	it( 'should render if the post supports stickying', () => {
 		setupUseSelectMock( { hasStickyAction: true, postType: 'post' } );
-		render( <PostStickyCheck>Can Toggle Sticky</PostStickyCheck> );
-		expect( screen.getByText( 'Can Toggle Sticky' ) ).toBeVisible();
+		render( <PostStickyCheck>Can Show Sticky</PostStickyCheck> );
+		expect( screen.getByText( 'Can Show Sticky' ) ).toBeVisible();
 	} );
 } );

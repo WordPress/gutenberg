@@ -8,27 +8,40 @@ function listener( event ) {
 		return;
 	}
 
-	const action = event.type === 'mouseover' ? 'add' : 'remove';
-
 	event.preventDefault();
-	event.currentTarget.classList[ action ]( 'is-hovered' );
+	event.currentTarget.classList.toggle(
+		'is-hovered',
+		event.type === 'mouseover'
+	);
 }
 
-/*
+/**
  * Adds `is-hovered` class when the block is hovered and in navigation or
  * outline mode.
+ *
+ * @param {Object}  options                  Options object.
+ * @param {boolean} [options.isEnabled=true] Whether to enable hover detection.
+ *
+ * @return {Function} Ref callback.
  */
-export function useIsHovered() {
-	return useRefEffect( ( node ) => {
-		node.addEventListener( 'mouseout', listener );
-		node.addEventListener( 'mouseover', listener );
+export function useIsHovered( { isEnabled = true } = {} ) {
+	return useRefEffect(
+		( node ) => {
+			if ( ! isEnabled ) {
+				return;
+			}
 
-		return () => {
-			node.removeEventListener( 'mouseout', listener );
-			node.removeEventListener( 'mouseover', listener );
+			node.addEventListener( 'mouseout', listener );
+			node.addEventListener( 'mouseover', listener );
 
-			// Remove class in case it lingers.
-			node.classList.remove( 'is-hovered' );
-		};
-	}, [] );
+			return () => {
+				node.removeEventListener( 'mouseout', listener );
+				node.removeEventListener( 'mouseover', listener );
+
+				// Remove class in case it lingers.
+				node.classList.remove( 'is-hovered' );
+			};
+		},
+		[ isEnabled ]
+	);
 }

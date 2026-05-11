@@ -8,8 +8,11 @@ import {
 	useInnerBlocksProps,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { useSelect } from '@wordpress/data';
-import { PanelBody } from '@wordpress/components';
+import { useDispatch, useSelect } from '@wordpress/data';
+import {
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
+} from '@wordpress/components';
 import { useEffect } from '@wordpress/element';
 
 /**
@@ -17,6 +20,7 @@ import { useEffect } from '@wordpress/element';
  */
 import { QueryPaginationArrowControls } from './query-pagination-arrow-controls';
 import { QueryPaginationLabelControl } from './query-pagination-label-control';
+import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 const TEMPLATE = [
 	[ 'core/query-pagination-previous' ],
@@ -46,36 +50,74 @@ export default function QueryPaginationEdit( {
 		},
 		[ clientId ]
 	);
+	const { __unstableMarkNextChangeAsNotPersistent } =
+		useDispatch( blockEditorStore );
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 	const blockProps = useBlockProps();
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		template: TEMPLATE,
 	} );
+
 	// Always show label text if paginationArrow is set to 'none'.
 	useEffect( () => {
 		if ( paginationArrow === 'none' && ! showLabel ) {
+			__unstableMarkNextChangeAsNotPersistent();
 			setAttributes( { showLabel: true } );
 		}
-	}, [ paginationArrow, setAttributes, showLabel ] );
+	}, [
+		paginationArrow,
+		setAttributes,
+		showLabel,
+		__unstableMarkNextChangeAsNotPersistent,
+	] );
+
 	return (
 		<>
 			{ hasNextPreviousBlocks && (
 				<InspectorControls>
-					<PanelBody title={ __( 'Settings' ) }>
-						<QueryPaginationArrowControls
-							value={ paginationArrow }
-							onChange={ ( value ) => {
-								setAttributes( { paginationArrow: value } );
-							} }
-						/>
-						{ paginationArrow !== 'none' && (
-							<QueryPaginationLabelControl
-								value={ showLabel }
+					<ToolsPanel
+						label={ __( 'Settings' ) }
+						resetAll={ () => {
+							setAttributes( {
+								paginationArrow: 'none',
+								showLabel: true,
+							} );
+						} }
+						dropdownMenuProps={ dropdownMenuProps }
+					>
+						<ToolsPanelItem
+							hasValue={ () => paginationArrow !== 'none' }
+							label={ __( 'Pagination arrow' ) }
+							onDeselect={ () =>
+								setAttributes( { paginationArrow: 'none' } )
+							}
+							isShownByDefault
+						>
+							<QueryPaginationArrowControls
+								value={ paginationArrow }
 								onChange={ ( value ) => {
-									setAttributes( { showLabel: value } );
+									setAttributes( { paginationArrow: value } );
 								} }
 							/>
+						</ToolsPanelItem>
+						{ paginationArrow !== 'none' && (
+							<ToolsPanelItem
+								hasValue={ () => ! showLabel }
+								label={ __( 'Show text' ) }
+								onDeselect={ () =>
+									setAttributes( { showLabel: true } )
+								}
+								isShownByDefault
+							>
+								<QueryPaginationLabelControl
+									value={ showLabel }
+									onChange={ ( value ) => {
+										setAttributes( { showLabel: value } );
+									} }
+								/>
+							</ToolsPanelItem>
 						) }
-					</PanelBody>
+					</ToolsPanel>
 				</InspectorControls>
 			) }
 			<nav { ...innerBlocksProps } />

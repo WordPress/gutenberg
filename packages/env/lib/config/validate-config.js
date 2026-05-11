@@ -5,7 +5,7 @@
  */
 
 /**
- * Error subtype which indicates that an expected validation erorr occurred
+ * Error subtype which indicates that an expected validation error occurred
  * while reading wp-env configuration.
  */
 class ValidationError extends Error {}

@@ -9,11 +9,9 @@ import clsx from 'clsx';
 import {
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
-	__experimentalItemGroup as ItemGroup,
 	__experimentalHStack as HStack,
 	__experimentalZStack as ZStack,
 	__experimentalDropdownContentWrapper as DropdownContentWrapper,
-	Button,
 	MenuGroup,
 	ColorIndicator,
 	DuotonePicker,
@@ -21,14 +19,17 @@ import {
 	Dropdown,
 	Flex,
 	FlexItem,
+	Button,
 } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
-import { useCallback, useMemo } from '@wordpress/element';
+import { useCallback, useMemo, useRef } from '@wordpress/element';
+import { reset as resetIcon } from '@wordpress/icons';
+import { getValueFromVariable } from '@wordpress/global-styles-engine';
 
 /**
  * Internal dependencies
  */
-import { getValueFromVariable, TOOLSPANEL_DROPDOWNMENU_PROPS } from './utils';
+import { useToolsPanelDropdownMenuProps } from './utils';
 import { setImmutably } from '../../utils/object';
 
 const EMPTY_ARRAY = [];
@@ -72,6 +73,7 @@ function FiltersToolsPanel( {
 	panelId,
 	children,
 } ) {
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 	const resetAll = () => {
 		const updatedValue = resetAllFilter( value );
 		onChange( updatedValue );
@@ -82,7 +84,7 @@ function FiltersToolsPanel( {
 			label={ _x( 'Filters', 'Name for applying graphical effects' ) }
 			resetAll={ resetAll }
 			panelId={ panelId }
-			dropdownMenuProps={ TOOLSPANEL_DROPDOWNMENU_PROPS }
+			dropdownMenuProps={ dropdownMenuProps }
 		>
 			{ children }
 		</ToolsPanel>
@@ -116,6 +118,52 @@ const LabeledColorIndicator = ( { indicator, label } ) => (
 	</HStack>
 );
 
+const renderToggle = ( duotone, resetDuotone ) =>
+	function Toggle( { onToggle, isOpen } ) {
+		const duotoneButtonRef = useRef( undefined );
+
+		const toggleProps = {
+			onClick: onToggle,
+			className: clsx(
+				'block-editor-global-styles-filters-panel__dropdown-toggle',
+				{ 'is-open': isOpen }
+			),
+			'aria-expanded': isOpen,
+			ref: duotoneButtonRef,
+		};
+
+		const removeButtonProps = {
+			onClick: () => {
+				if ( isOpen ) {
+					onToggle();
+				}
+				resetDuotone();
+				// Return focus to parent button.
+				duotoneButtonRef.current?.focus();
+			},
+			className: 'block-editor-panel-duotone-settings__reset',
+			label: __( 'Reset' ),
+		};
+
+		return (
+			<>
+				<Button __next40pxDefaultSize { ...toggleProps }>
+					<LabeledColorIndicator
+						indicator={ duotone }
+						label={ __( 'Duotone' ) }
+					/>
+				</Button>
+				{ duotone && (
+					<Button
+						size="small"
+						icon={ resetIcon }
+						{ ...removeButtonProps }
+					/>
+				) }
+			</>
+		);
+	};
+
 export default function FiltersPanel( {
 	as: Wrapper = FiltersToolsPanel,
 	value,
@@ -143,10 +191,12 @@ export default function FiltersPanel( {
 		const duotonePreset = duotonePalette.find( ( { colors } ) => {
 			return colors === newValue;
 		} );
-		const settedValue = duotonePreset
+		const duotoneValue = duotonePreset
 			? `var:preset|duotone|${ duotonePreset.slug }`
 			: newValue;
-		onChange( setImmutably( value, [ 'filter', 'duotone' ], settedValue ) );
+		onChange(
+			setImmutably( value, [ 'filter', 'duotone' ], duotoneValue )
+		);
 	};
 	const hasDuotone = () => !! value?.filter?.duotone;
 	const resetDuotone = () => setDuotone( undefined );
@@ -179,24 +229,7 @@ export default function FiltersPanel( {
 					<Dropdown
 						popoverProps={ popoverProps }
 						className="block-editor-global-styles-filters-panel__dropdown"
-						renderToggle={ ( { onToggle, isOpen } ) => {
-							const toggleProps = {
-								onClick: onToggle,
-								className: clsx( { 'is-open': isOpen } ),
-								'aria-expanded': isOpen,
-							};
-
-							return (
-								<ItemGroup isBordered isSeparated>
-									<Button { ...toggleProps }>
-										<LabeledColorIndicator
-											indicator={ duotone }
-											label={ __( 'Duotone' ) }
-										/>
-									</Button>
-								</ItemGroup>
-							);
-						} }
+						renderToggle={ renderToggle( duotone, resetDuotone ) }
 						renderContent={ () => (
 							<DropdownContentWrapper paddingSize="small">
 								<MenuGroup label={ __( 'Duotone' ) }>

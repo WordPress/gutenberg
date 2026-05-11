@@ -1,12 +1,12 @@
 /**
+ * WordPress dependencies
+ */
+import { prependHTTPS } from '@wordpress/url';
+
+/**
  * Internal dependencies
  */
 import { NEW_TAB_REL, NEW_TAB_TARGET, NOFOLLOW_REL } from './constants';
-
-/**
- * WordPress dependencies
- */
-import { prependHTTP } from '@wordpress/url';
 
 /**
  * Updates the link attributes.
@@ -40,14 +40,14 @@ export function getUpdatedLinkAttributes( {
 	if ( nofollow ) {
 		updatedRel = updatedRel?.includes( NOFOLLOW_REL )
 			? updatedRel
-			: updatedRel + ` ${ NOFOLLOW_REL }`;
+			: ( updatedRel + ` ${ NOFOLLOW_REL }` ).trim();
 	} else {
 		const relRegex = new RegExp( `\\b${ NOFOLLOW_REL }\\s*`, 'g' );
 		updatedRel = updatedRel?.replace( relRegex, '' ).trim();
 	}
 
 	return {
-		url: prependHTTP( url ),
+		url: prependHTTPS( url ),
 		linkTarget: newLinkTarget,
 		rel: updatedRel || undefined,
 	};

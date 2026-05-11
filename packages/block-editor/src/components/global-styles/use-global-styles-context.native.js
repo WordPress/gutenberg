@@ -410,6 +410,9 @@ export function getColorsAndGradients(
 	return {
 		__experimentalGlobalStylesBaseStyles: null,
 		__experimentalFeatures: {
+			// Set an empty object to avoid errors from shared web components relying
+			// upon block settings. E.g., the Gallery block.
+			blocks: {},
 			color: {
 				...( ! features?.color
 					? {
@@ -455,6 +458,9 @@ export function getGlobalStyles( rawStyles, rawFeatures ) {
 
 	return {
 		__experimentalFeatures: {
+			// Set an empty object to avoid errors from shared web components relying
+			// upon block settings. E.g., the Gallery block.
+			blocks: {},
 			color: {
 				palette: colors?.palette,
 				gradients,

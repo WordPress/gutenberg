@@ -23,7 +23,7 @@ export const useNavigationTreeMenu = ( props: NavigationMenuProps ) => {
 		return () => {
 			removeMenu( key );
 		};
-		// Ignore exhaustive-deps rule for now. See https://github.com/WordPress/gutenberg/pull/44090
-		// eslint-disable-next-line react-hooks/exhaustive-deps
+		// Not adding deps for now, as it would require either a larger refactor
+		// See https://github.com/WordPress/gutenberg/pull/44090
 	}, [] );
 };

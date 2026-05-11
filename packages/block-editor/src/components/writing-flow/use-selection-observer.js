@@ -4,6 +4,7 @@
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
 import { create } from '@wordpress/rich-text';
+import { isSelectionForward } from '@wordpress/dom';
 
 /**
  * Internal dependencies
@@ -51,6 +52,14 @@ function extractSelectionEndNode( selection ) {
 
 	if ( focusOffset === focusNode.childNodes.length ) {
 		return focusNode;
+	}
+
+	// When the selection is forward (the selection ends with the focus node),
+	// the selection may extend into the next element with an offset of 0. This
+	// may trigger multi selection even though the selection does not visually
+	// end in the next block.
+	if ( focusOffset === 0 && isSelectionForward( selection ) ) {
+		return focusNode.previousSibling ?? focusNode.parentElement;
 	}
 
 	return focusNode.childNodes[ focusOffset ];
@@ -182,10 +191,68 @@ export default function useSelectionObserver() {
 					return;
 				}
 
+				// On mouseup, if the native selection is within one block
+				// but the click target is a different block, bail out
+				// and let the clicked block's focus handler manage
+				// selection.
+				if (
+					event.type === 'mouseup' &&
+					! event.shiftKey &&
+					! isMultiSelecting() &&
+					startClientId === endClientId
+				) {
+					const clickedClientId = getBlockClientId( event.target );
+					if (
+						clickedClientId &&
+						clickedClientId !== startClientId
+					) {
+						selection.removeAllRanges();
+						return;
+					}
+				}
+
 				const isSingularSelection = startClientId === endClientId;
 				if ( isSingularSelection ) {
 					if ( ! isMultiSelecting() ) {
-						selectBlock( startClientId );
+						// If the selection is not collapsed and falls
+						// within a RichText that doesn't have focus
+						// (e.g. the user started dragging from the block
+						// wrapper padding), dispatch a full
+						// selectionChange so the format toolbar appears.
+						const richTextElement =
+							! selection.isCollapsed &&
+							( getRichTextElement( startNode ) ||
+								getRichTextElement( endNode ) );
+
+						if (
+							richTextElement &&
+							ownerDocument.activeElement !== richTextElement
+						) {
+							const range = selection.getRangeAt( 0 );
+							const richTextData = create( {
+								element: richTextElement,
+								range,
+								__unstableIsEditableTree: true,
+							} );
+							selectionChange( {
+								start: {
+									clientId: startClientId,
+									attributeKey:
+										richTextElement.dataset
+											.wpBlockAttributeKey,
+									offset: richTextData.start ?? 0,
+								},
+								end: {
+									clientId: startClientId,
+									attributeKey:
+										richTextElement.dataset
+											.wpBlockAttributeKey,
+									offset: richTextData.end,
+								},
+							} );
+						} else {
+							selectBlock( startClientId );
+						}
 					} else {
 						multiSelect( startClientId, startClientId );
 					}

@@ -66,7 +66,7 @@ describe( 'Parse exception', () => {
 		expect( exception.message ).toBe( 'No error message' );
 	} );
 
-	it( 'sets unkown error type', () => {
+	it( 'sets unknown error type', () => {
 		const exception = parseException( {
 			message: { error: { message: '' } },
 		} );

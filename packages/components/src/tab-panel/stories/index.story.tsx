@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react-vite';
+import { fn } from 'storybook/test';
 
 /**
  * WordPress dependencies
@@ -14,12 +15,20 @@ import { link, more, wordpress } from '@wordpress/icons';
 import TabPanel from '..';
 
 const meta: Meta< typeof TabPanel > = {
-	title: 'Components/TabPanel',
+	title: 'Components/Containers/TabPanel',
+	id: 'components-tabpanel',
 	component: TabPanel,
 	parameters: {
-		actions: { argTypesRegex: '^on.*' },
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'use-with-caution',
+			whereUsed: 'global',
+			notes: 'When building for the Gutenberg repo, use `Tabs` instead. Otherwise, continue using for now.',
+		},
+	},
+	args: {
+		onSelect: fn(),
 	},
 };
 export default meta;

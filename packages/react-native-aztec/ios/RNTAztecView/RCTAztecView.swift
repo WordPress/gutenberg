@@ -72,18 +72,18 @@ class RCTAztecView: Aztec.TextView {
         return label
     }()
 
-    // RCTScrollViews are flipped horizontally on RTL. This messes up competelly horizontal layout contraints
+    // RCTScrollViews are flipped horizontally on RTL. This messes up competelly horizontal layout constraints
     // on views inserted after the transformation.
-    var placeholderPreferedHorizontalAnchor: NSLayoutXAxisAnchor {
+    var placeholderPreferredHorizontalAnchor: NSLayoutXAxisAnchor {
         return hasRTLLayout ? placeholderLabel.rightAnchor : placeholderLabel.leftAnchor
     }
 
-    // This constraint is created from the prefered horizontal anchor (analog to "leading")
+    // This constraint is created from the preferred horizontal anchor (analog to "leading")
     // but appending it always to left of its super view (Aztec).
     // This partially fixes the position issue originated from fliping the scroll view.
     // fixLabelPositionForRTLLayout() fixes the rest.
     private lazy var placeholderHorizontalConstraint: NSLayoutConstraint = {
-        return placeholderPreferedHorizontalAnchor.constraint(
+        return placeholderPreferredHorizontalAnchor.constraint(
             equalTo: leftAnchor,
             constant: leftTextInset
         )
@@ -169,7 +169,7 @@ class RCTAztecView: Aztec.TextView {
     /**
      This handles a bug introduced by iOS 13.0 (tested up to 13.2) where link interactions don't respect what the documentation says.
 
-     The documenatation for textView(_:shouldInteractWith:in:interaction:) says:
+     The documentation for textView(_:shouldInteractWith:in:interaction:) says:
 
      > Links in text views are interactive only if the text view is selectable but noneditable.
 
@@ -413,7 +413,7 @@ class RCTAztecView: Aztec.TextView {
         return text.isStartOfParagraph(at: currentLocation) && !(text.endIndex == currentLocation)
     }
     override var keyCommands: [UIKeyCommand]? {
-        // Remove defautls Tab and Shift+Tab commands, leaving just Shift+Enter command.
+        // Remove defaults Tab and Shift+Tab commands, leaving just Shift+Enter command.
         return [carriageReturnKeyCommand]
     }
 
@@ -673,7 +673,7 @@ class RCTAztecView: Aztec.TextView {
         }
     }
 
-    /// This method refreshes the font for the palceholder field and typing attributes.
+    /// This method refreshes the font for the placeholder field and typing attributes.
     /// This method should not be called directly.  Call `refreshFont()` instead.
     ///
     private func refreshTypingAttributesAndPlaceholderFont() {

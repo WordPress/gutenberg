@@ -8,6 +8,7 @@ import {
 	ExternalLink,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
+	__experimentalInputControl as InputControl,
 } from '@wordpress/components';
 import { BlockIcon } from '@wordpress/block-editor';
 
@@ -31,15 +32,17 @@ const EmbedPlaceholder = ( {
 			) }
 		>
 			<form onSubmit={ onSubmit }>
-				<input
+				<InputControl
+					__next40pxDefaultSize
 					type="url"
 					value={ value || '' }
-					className="components-placeholder__input"
-					aria-label={ label }
+					className="wp-block-embed__placeholder-input"
+					label={ label }
+					hideLabelFromVision
 					placeholder={ __( 'Enter URL to embed here…' ) }
 					onChange={ onChange }
 				/>
-				<Button variant="primary" type="submit">
+				<Button __next40pxDefaultSize variant="primary" type="submit">
 					{ _x( 'Embed', 'button label' ) }
 				</Button>
 			</form>
@@ -62,10 +65,18 @@ const EmbedPlaceholder = ( {
 						spacing={ 3 }
 						justify="flex-start"
 					>
-						<Button variant="secondary" onClick={ tryAgain }>
+						<Button
+							__next40pxDefaultSize
+							variant="secondary"
+							onClick={ tryAgain }
+						>
 							{ _x( 'Try again', 'button label' ) }
 						</Button>{ ' ' }
-						<Button variant="secondary" onClick={ fallback }>
+						<Button
+							__next40pxDefaultSize
+							variant="secondary"
+							onClick={ fallback }
+						>
 							{ _x( 'Convert to link', 'button label' ) }
 						</Button>
 					</HStack>

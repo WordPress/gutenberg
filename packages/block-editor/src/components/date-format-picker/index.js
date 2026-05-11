@@ -7,14 +7,14 @@ import { useState, createInterpolateElement } from '@wordpress/element';
 import {
 	TextControl,
 	ExternalLink,
-	VisuallyHidden,
-	CustomSelectControl,
 	ToggleControl,
 	__experimentalVStack as VStack,
+	CustomSelectControl,
 } from '@wordpress/components';
+import { VisuallyHidden } from '@wordpress/ui';
 
 // So that we illustrate the different formats in the dropdown properly, show a date that is
-// somwhat recent, has a day greater than 12, and a month with more than three letters.
+// somewhat recent, has a day greater than 12, and a month with more than three letters.
 const exampleDate = new Date();
 exampleDate.setDate( 20 );
 exampleDate.setMonth( exampleDate.getMonth() - 3 );
@@ -29,21 +29,10 @@ if ( exampleDate.getMonth() === 4 ) {
  *
  * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/date-format-picker/README.md
  *
- * @param {Object}                          props
- * @param {string|null}                     props.format        The selected date
- *                                                              format. If
- *                                                              `null`,
- *                                                              _Default_ is
- *                                                              selected.
- * @param {string}                          props.defaultFormat The date format that
- *                                                              will be used if the
- *                                                              user selects
- *                                                              'Default'.
- * @param {( format: string|null ) => void} props.onChange      Called when a
- *                                                              selection is
- *                                                              made. If `null`,
- *                                                              _Default_ is
- *                                                              selected.
+ * @param {Object}      props
+ * @param {string|null} props.format        The selected date format. If `null`, _Default_ is selected.
+ * @param {string}      props.defaultFormat The date format that will be used if the user selects 'Default'.
+ * @param {Function}    props.onChange      Called when a selection is made. If `null`, _Default_ is selected.
  */
 export default function DateFormatPicker( {
 	format,
@@ -51,10 +40,15 @@ export default function DateFormatPicker( {
 	onChange,
 } ) {
 	return (
-		<fieldset className="block-editor-date-format-picker">
-			<VisuallyHidden as="legend">{ __( 'Date format' ) }</VisuallyHidden>
+		<VStack
+			as="fieldset"
+			spacing={ 4 }
+			className="block-editor-date-format-picker"
+		>
+			<VisuallyHidden render={ <legend /> }>
+				{ __( 'Date format' ) }
+			</VisuallyHidden>
 			<ToggleControl
-				__nextHasNoMarginBottom
 				label={ __( 'Default format' ) }
 				help={ `${ __( 'Example:' ) }  ${ dateI18n(
 					defaultFormat,
@@ -68,7 +62,7 @@ export default function DateFormatPicker( {
 			{ format && (
 				<NonDefaultControls format={ format } onChange={ onChange } />
 			) }
-		</fieldset>
+		</VStack>
 	);
 }
 
@@ -117,7 +111,7 @@ function NonDefaultControls( { format, onChange } ) {
 		name: __( 'Custom' ),
 		className:
 			'block-editor-date-format-picker__custom-format-select-control__custom-option',
-		__experimentalHint: __( 'Enter your own date format' ),
+		hint: __( 'Enter your own date format' ),
 	};
 
 	const [ isCustom, setIsCustom ] = useState(
@@ -129,6 +123,7 @@ function NonDefaultControls( { format, onChange } ) {
 	return (
 		<VStack>
 			<CustomSelectControl
+				__next40pxDefaultSize
 				label={ __( 'Choose a format' ) }
 				options={ [ ...suggestedOptions, customOption ] }
 				value={
@@ -149,7 +144,7 @@ function NonDefaultControls( { format, onChange } ) {
 			/>
 			{ isCustom && (
 				<TextControl
-					__nextHasNoMarginBottom
+					__next40pxDefaultSize
 					label={ __( 'Custom format' ) }
 					hideLabelFromVision
 					help={ createInterpolateElement(

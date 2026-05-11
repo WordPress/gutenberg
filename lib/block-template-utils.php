@@ -60,7 +60,7 @@ function gutenberg_generate_block_templates_export_file() {
 	}
 
 	// Load templates into the zip file.
-	$templates = gutenberg_get_block_templates();
+	$templates = get_block_templates();
 	foreach ( $templates as $template ) {
 		$template->content = traverse_and_serialize_blocks(
 			parse_blocks( $template->content ),
@@ -74,7 +74,7 @@ function gutenberg_generate_block_templates_export_file() {
 	}
 
 	// Load template parts into the zip file.
-	$template_parts = gutenberg_get_block_templates( array(), 'wp_template_part' );
+	$template_parts = get_block_templates( array(), 'wp_template_part' );
 	foreach ( $template_parts as $template_part ) {
 		$zip->addFromString(
 			'parts/' . $template_part->slug . '.html',

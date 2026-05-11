@@ -31,7 +31,7 @@ test.describe( 'Font Size Picker', () => {
 			await page.click(
 				'role=region[name="Editor settings"i] >> role=button[name="Set custom size"i]'
 			);
-			await page.click( 'role=spinbutton[name="Custom"i]' );
+			await page.click( 'role=spinbutton[name="Font size"i]' );
 
 			await page.keyboard.type( '23' );
 
@@ -54,7 +54,7 @@ test.describe( 'Font Size Picker', () => {
 			await page.click(
 				'role=region[name="Editor settings"i] >> role=button[name="Set custom size"i]'
 			);
-			await page.click( 'role=spinbutton[name="Custom"i]' );
+			await page.click( 'role=spinbutton[name="Font size"i]' );
 			await page.keyboard.type( '23' );
 
 			await expect.poll( editor.getEditedPostContent )
@@ -144,7 +144,7 @@ test.describe( 'Font Size Picker', () => {
 				.click();
 			await page.keyboard.type( 'Paragraph to be made "large"' );
 			await page.click(
-				'role=group[name="Font size"i] >> role=button[name="Font size"i]'
+				'role=group[name="Font size"i] >> role=combobox[name="Font size"i]'
 			);
 			await pageUtils.pressKeys( 'ArrowDown', { times: 4 } );
 			await page.keyboard.press( 'Enter' );
@@ -168,7 +168,7 @@ test.describe( 'Font Size Picker', () => {
 				'Paragraph with font size reset using tools panel menu'
 			);
 			await page.click(
-				'role=group[name="Font size"i] >> role=button[name="Font size"i]'
+				'role=group[name="Font size"i] >> role=combobox[name="Font size"i]'
 			);
 			await pageUtils.pressKeys( 'ArrowDown', { times: 3 } );
 			await page.keyboard.press( 'Enter' );
@@ -201,7 +201,7 @@ test.describe( 'Font Size Picker', () => {
 				'Paragraph with font size reset using input field'
 			);
 			await page.click(
-				'role=group[name="Font size"i] >> role=button[name="Font size"i]'
+				'role=group[name="Font size"i] >> role=combobox[name="Font size"i]'
 			);
 			await pageUtils.pressKeys( 'ArrowDown', { times: 2 } );
 			await page.keyboard.press( 'Enter' );
@@ -214,7 +214,7 @@ test.describe( 'Font Size Picker', () => {
 			await page.click(
 				'role=region[name="Editor settings"i] >> role=button[name="Set custom size"i]'
 			);
-			await page.click( 'role=spinbutton[name="Custom"i]' );
+			await page.click( 'role=spinbutton[name="Font size"i]' );
 			await pageUtils.pressKeys( 'primary+A' );
 			await page.keyboard.press( 'Backspace' );
 
@@ -299,7 +299,7 @@ test.describe( 'Font Size Picker', () => {
 			await page.click(
 				'role=region[name="Editor settings"i] >> role=button[name="Set custom size"i]'
 			);
-			await page.click( 'role=spinbutton[name="Custom"i]' );
+			await page.click( 'role=spinbutton[name="Font size"i]' );
 			await pageUtils.pressKeys( 'primary+A' );
 			await page.keyboard.press( 'Backspace' );
 

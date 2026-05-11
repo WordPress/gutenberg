@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import { VisuallyHidden, MenuGroup } from '@wordpress/components';
+import { MenuGroup } from '@wordpress/components';
 
 /**
  * External dependencies
@@ -15,9 +15,9 @@ import clsx from 'clsx';
 import LinkControlSearchCreate from './search-create-button';
 import LinkControlSearchItem from './search-item';
 import { CREATE_TYPE, LINK_ENTRY_TYPES } from './constants';
+import deprecated from '@wordpress/deprecated';
 
-export default function LinkControlSearchResults( {
-	instanceId,
+function LinkControlSearchResults( {
 	withCreateSuggestion,
 	currentInputValue,
 	handleSuggestionClick,
@@ -47,10 +47,6 @@ export default function LinkControlSearchResults( {
 	// If the query has a specified type, then we can skip showing them in the result. See #24839.
 	const shouldShowSuggestionsTypes = ! suggestionsQuery?.type;
 
-	// According to guidelines aria-label should be added if the label
-	// itself is not visible.
-	// See: https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Roles/listbox_role
-	const searchResultsLabelId = `block-editor-link-control-search-results-label-${ instanceId }`;
 	const labelText = isInitialSuggestions
 		? __( 'Suggestions' )
 		: sprintf(
@@ -58,19 +54,13 @@ export default function LinkControlSearchResults( {
 				__( 'Search results for "%s"' ),
 				currentInputValue
 		  );
-	const searchResultsLabel = (
-		<VisuallyHidden id={ searchResultsLabelId }>
-			{ labelText }
-		</VisuallyHidden>
-	);
 
 	return (
 		<div className="block-editor-link-control__search-results-wrapper">
-			{ searchResultsLabel }
 			<div
 				{ ...suggestionsListProps }
 				className={ resultsListClasses }
-				aria-labelledby={ searchResultsLabelId }
+				aria-label={ labelText }
 			>
 				<MenuGroup>
 					{ suggestions.map( ( suggestion, index ) => {
@@ -132,3 +122,13 @@ export default function LinkControlSearchResults( {
 		</div>
 	);
 }
+
+export default LinkControlSearchResults;
+
+export const __experimentalLinkControlSearchResults = ( props ) => {
+	deprecated( 'wp.blockEditor.__experimentalLinkControlSearchResults', {
+		since: '6.8',
+	} );
+
+	return <LinkControlSearchResults { ...props } />;
+};

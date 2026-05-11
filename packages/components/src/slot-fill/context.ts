@@ -1,21 +1,35 @@
 /**
  * WordPress dependencies
  */
+import { observableMap } from '@wordpress/compose';
 import { createContext } from '@wordpress/element';
+import warning from '@wordpress/warning';
+
 /**
  * Internal dependencies
  */
-import type { BaseSlotFillContext } from './types';
+import type { SlotFillRegistry } from './types';
 
-const initialValue: BaseSlotFillContext = {
-	registerSlot: () => {},
+const initialValue: SlotFillRegistry = {
+	slots: observableMap(),
+	fills: observableMap(),
+	registerSlot: () => {
+		warning(
+			'Components must be wrapped within `SlotFillProvider`. ' +
+				'See https://developer.wordpress.org/block-editor/components/slot-fill/'
+		);
+	},
 	unregisterSlot: () => {},
+	updateSlot: () => {},
 	registerFill: () => {},
 	unregisterFill: () => {},
-	getSlot: () => undefined,
-	getFills: () => [],
-	subscribe: () => () => {},
+	updateFill: () => {},
+
+	// This helps the provider know if it's using the default context value or not.
+	isDefault: true,
 };
-export const SlotFillContext = createContext( initialValue );
+
+const SlotFillContext = createContext( initialValue );
+SlotFillContext.displayName = 'SlotFillContext';
 
 export default SlotFillContext;

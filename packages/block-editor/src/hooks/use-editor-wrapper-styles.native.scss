@@ -5,6 +5,7 @@
 }
 
 .use-editor-wrapper-styles--reversed {
+	/* stylelint-disable-next-line declaration-property-value-allowed-list -- This should be refactored to not use the column-reverse value. */
 	flex-direction: column-reverse;
 	width: 100%;
 	max-width: 580;

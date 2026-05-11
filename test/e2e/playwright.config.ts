@@ -8,12 +8,16 @@ import { defineConfig, devices } from '@playwright/test';
 /**
  * WordPress dependencies
  */
-const baseConfig = require( '@wordpress/scripts/config/playwright.config' );
+import baseConfig from '@wordpress/scripts/config/playwright.config.js';
 
 const config = defineConfig( {
 	...baseConfig,
+	webServer: {
+		...baseConfig.webServer,
+		command: 'npm run --prefix ../.. wp-env-test -- start',
+	},
 	reporter: process.env.CI
-		? [ [ 'github' ], [ './config/flaky-tests-reporter.ts' ] ]
+		? [ [ 'github' ], [ './config/flaky-tests-reporter.ts' ], [ 'blob' ] ]
 		: 'list',
 	workers: 1,
 	globalSetup: fileURLToPath(

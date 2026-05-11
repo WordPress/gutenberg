@@ -2,7 +2,7 @@
  * External dependencies
  */
 import type { ChangeEvent, ForwardedRef } from 'react';
-import { css } from '@emotion/react';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -19,38 +19,18 @@ import BaseControl from '../base-control';
 import type { WordPressComponentProps } from '../context/wordpress-component';
 import type { ToggleControlProps } from './types';
 import { HStack } from '../h-stack';
-import { useCx } from '../utils';
-import { space } from '../utils/space';
 
-/**
- * ToggleControl is used to generate a toggle user interface.
- *
- * ```jsx
- * import { ToggleControl } from '@wordpress/components';
- * import { useState } from '@wordpress/element';
- *
- * const MyToggleControl = () => {
- *   const [ value, setValue ] = useState( false );
- *
- *   return (
- *     <ToggleControl
- *       label="Fixed Background"
- *       checked={ value }
- *       onChange={ () => setValue( ( state ) => ! state ) }
- *     />
- *   );
- * };
- * ```
- */
-export function ToggleControl(
+function UnforwardedToggleControl(
 	{
-		__nextHasNoMarginBottom,
 		label,
 		checked,
 		help,
 		className,
 		onChange,
 		disabled,
+		// Prevent passing to internal component.
+		__nextHasNoMarginBottom: _,
+		...additionalProps
 	}: WordPressComponentProps< ToggleControlProps, 'input', false >,
 	ref: ForwardedRef< HTMLInputElement >
 ) {
@@ -59,13 +39,6 @@ export function ToggleControl(
 	}
 	const instanceId = useInstanceId( ToggleControl );
 	const id = `inspector-toggle-control-${ instanceId }`;
-
-	const cx = useCx();
-	const classes = cx(
-		'components-toggle-control',
-		className,
-		! __nextHasNoMarginBottom && css( { marginBottom: space( 3 ) } )
-	);
 
 	let describedBy, helpLabel;
 	if ( help ) {
@@ -87,11 +60,16 @@ export function ToggleControl(
 	return (
 		<BaseControl
 			id={ id }
-			help={ helpLabel }
-			className={ classes }
-			__nextHasNoMarginBottom
+			help={
+				helpLabel && (
+					<span className="components-toggle-control__help">
+						{ helpLabel }
+					</span>
+				)
+			}
+			className={ clsx( 'components-toggle-control', className ) }
 		>
-			<HStack justify="flex-start" spacing={ 3 }>
+			<HStack justify="flex-start" spacing={ 2 }>
 				<FormToggle
 					id={ id }
 					checked={ checked }
@@ -99,11 +77,14 @@ export function ToggleControl(
 					aria-describedby={ describedBy }
 					disabled={ disabled }
 					ref={ ref }
+					{ ...additionalProps }
 				/>
 				<FlexBlock
 					as="label"
 					htmlFor={ id }
-					className="components-toggle-control__label"
+					className={ clsx( 'components-toggle-control__label', {
+						'is-disabled': disabled,
+					} ) }
 				>
 					{ label }
 				</FlexBlock>
@@ -112,4 +93,27 @@ export function ToggleControl(
 	);
 }
 
-export default forwardRef( ToggleControl );
+/**
+ * ToggleControl is used to generate a toggle user interface.
+ *
+ * ```jsx
+ * import { ToggleControl } from '@wordpress/components';
+ * import { useState } from '@wordpress/element';
+ *
+ * const MyToggleControl = () => {
+ *   const [ value, setValue ] = useState( false );
+ *
+ *   return (
+ *     <ToggleControl
+ *       label="Fixed Background"
+ *       checked={ value }
+ *       onChange={ () => setValue( ( state ) => ! state ) }
+ *     />
+ *   );
+ * };
+ * ```
+ */
+export const ToggleControl = forwardRef( UnforwardedToggleControl );
+ToggleControl.displayName = 'ToggleControl';
+
+export default ToggleControl;

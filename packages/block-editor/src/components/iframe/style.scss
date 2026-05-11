@@ -1,0 +1,24 @@
+@use "sass:math";
+@use "@wordpress/base-styles/animations" as *;
+@use "@wordpress/base-styles/breakpoints" as *;
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/colors" as *;
+
+.block-editor-iframe__container {
+	width: 100%;
+	height: 100%;
+}
+
+.block-editor-iframe__scale-container {
+	height: 100%;
+}
+
+.block-editor-iframe__scale-container.is-zoomed-out {
+	$scale-container-width: var(--wp-block-editor-iframe-zoom-out-scale-container-width, 100vw);
+	width: $scale-container-width;
+	// Position the iframe so that it is always aligned with the right side so that
+	// the scrollbar is always visible on the right side
+	position: absolute;
+	right: 0;
+}

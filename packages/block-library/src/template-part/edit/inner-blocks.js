@@ -100,6 +100,12 @@ function EditableTemplatePartInnerBlocks( {
 	tagName: TagName,
 	blockProps,
 } ) {
+	const onNavigateToEntityRecord = useSelect(
+		( select ) =>
+			select( blockEditorStore ).getSettings().onNavigateToEntityRecord,
+		[]
+	);
+
 	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
 		'postType',
 		'wp_template_part',
@@ -114,7 +120,20 @@ function EditableTemplatePartInnerBlocks( {
 		layout: useLayout( layout ),
 	} );
 
-	return <TagName { ...innerBlocksProps } />;
+	const blockEditingMode = useBlockEditingMode();
+
+	const customProps =
+		blockEditingMode === 'contentOnly' && onNavigateToEntityRecord
+			? {
+					onDoubleClick: () =>
+						onNavigateToEntityRecord( {
+							postId: id,
+							postType: 'wp_template_part',
+						} ),
+			  }
+			: {};
+
+	return <TagName { ...innerBlocksProps } { ...customProps } />;
 }
 
 export default function TemplatePartInnerBlocks( {
@@ -127,14 +146,19 @@ export default function TemplatePartInnerBlocks( {
 	const { canViewTemplatePart, canEditTemplatePart } = useSelect(
 		( select ) => {
 			return {
-				canViewTemplatePart:
-					select( coreStore ).canUser( 'read', 'templates' ) ?? false,
-				canEditTemplatePart:
-					select( coreStore ).canUser( 'create', 'templates' ) ??
-					false,
+				canViewTemplatePart: !! select( coreStore ).canUser( 'read', {
+					kind: 'postType',
+					name: 'wp_template_part',
+					id,
+				} ),
+				canEditTemplatePart: !! select( coreStore ).canUser( 'update', {
+					kind: 'postType',
+					name: 'wp_template_part',
+					id,
+				} ),
 			};
 		},
-		[]
+		[ id ]
 	);
 
 	if ( ! canViewTemplatePart ) {

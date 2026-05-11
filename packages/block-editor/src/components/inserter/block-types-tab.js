@@ -186,7 +186,12 @@ export function BlockTypesTab(
 			continue;
 		}
 
-		if ( rootClientId && item.rootClientId === rootClientId ) {
+		// Skip search-only items from browse view (they're still searchable).
+		if ( item.isSearchOnly ) {
+			continue;
+		}
+
+		if ( item.isAllowedInCurrentRoot ) {
 			itemsForCurrentRoot.push( item );
 		} else {
 			itemsRemaining.push( item );

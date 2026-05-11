@@ -9,10 +9,9 @@ import { css } from '@emotion/react';
 import { COLORS, CONFIG } from '../utils';
 
 export const Text = css`
-	color: ${ COLORS.gray[ 900 ] };
+	color: ${ COLORS.theme.foreground };
 	line-height: ${ CONFIG.fontLineHeightBase };
 	margin: 0;
-	text-wrap: balance; /* Fallback for Safari. */
 	text-wrap: pretty;
 `;
 
@@ -29,13 +28,13 @@ export const destructive = css`
 `;
 
 export const muted = css`
-	color: ${ COLORS.gray[ 700 ] };
+	color: ${ COLORS.theme.gray[ 700 ] };
 `;
 
 export const highlighterText = css`
 	mark {
 		background: ${ COLORS.alert.yellow };
-		border-radius: 2px;
+		border-radius: ${ CONFIG.radiusSmall };
 		box-shadow:
 			0 0 0 1px rgba( 0, 0, 0, 0.05 ) inset,
 			0 -1px 0 rgba( 0, 0, 0, 0.1 ) inset;

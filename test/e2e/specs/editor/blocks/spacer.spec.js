@@ -14,6 +14,9 @@ test.describe( 'Spacer', () => {
 			.locator( 'role=button[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '/spacer' );
+		await expect(
+			page.getByRole( 'option', { name: 'Spacer' } )
+		).toBeVisible();
 		await page.keyboard.press( 'Enter' );
 
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
@@ -28,6 +31,9 @@ test.describe( 'Spacer', () => {
 			.locator( 'role=button[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '/spacer' );
+		await expect(
+			page.getByRole( 'option', { name: 'Spacer' } )
+		).toBeVisible();
 		await page.keyboard.press( 'Enter' );
 
 		const resizableHandle = editor.canvas.locator(
@@ -43,7 +49,34 @@ test.describe( 'Spacer', () => {
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 
 		await expect(
-			editor.canvas.locator( 'role=document[name="Block: Spacer"i]' )
+			editor.canvas.locator(
+				'role=document[name="Block: Spacer"i] >> css=.components-resizable-box__handle >> [tabindex]'
+			)
 		).toBeFocused();
+	} );
+
+	test( 'should work in theme without spacing units support', async ( {
+		editor,
+		page,
+	} ) => {
+		await page.waitForFunction( () => window?.wp?.data );
+
+		// Mock the theme.json data to simulate a theme without spacing units
+		await page.evaluate( () => {
+			const settings = window.wp.data
+				.select( 'core/block-editor' )
+				.getSettings();
+			window.__originalSettings = settings;
+			window.wp.data.dispatch( 'core/block-editor' ).updateSettings( {
+				...settings,
+				spacing: { units: false },
+			} );
+		} );
+
+		await editor.insertBlock( { name: 'core/spacer' } );
+
+		await expect(
+			editor.canvas.locator( '.block-editor-warning' )
+		).toBeHidden();
 	} );
 } );
