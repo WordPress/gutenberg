@@ -122,6 +122,18 @@ export function getFormatTypeForBareElement( state, bareElementTagName ) {
 }
 
 /**
+ * Returns the list of format type names disabled for a specific block type.
+ *
+ * @param {Object} state     Data state.
+ * @param {string} blockName Block name (e.g. 'core/heading').
+ *
+ * @return {string[]} Disabled format type names for the block.
+ */
+export function getDisabledFormatTypesForBlock( state, blockName ) {
+	return state.disabledFormatTypesByBlock[ blockName ] || [];
+}
+
+/**
  * Gets the format type, if any, that can handle an element, given its classes.
  *
  * @param {Object} state            Data state.

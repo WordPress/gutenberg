@@ -36,4 +36,42 @@ export function formatTypes( state = {}, action ) {
 	return state;
 }
 
-export default combineReducers( { formatTypes } );
+/**
+ * Reducer managing per-block disabled format types.
+ * State shape: { [blockName]: string[] }
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function disabledFormatTypesByBlock( state = {}, action ) {
+	switch ( action.type ) {
+		case 'DISABLE_FORMAT_TYPE_IN_BLOCK': {
+			const { blockName, formatName } = action;
+			const existing = state[ blockName ] || [];
+			if ( existing.includes( formatName ) ) {
+				return state;
+			}
+			return { ...state, [ blockName ]: [ ...existing, formatName ] };
+		}
+		case 'ENABLE_FORMAT_TYPE_IN_BLOCK': {
+			const { blockName, formatName } = action;
+			if ( ! state[ blockName ] ) {
+				return state;
+			}
+			const filtered = state[ blockName ].filter(
+				( name ) => name !== formatName
+			);
+			if ( filtered.length === 0 ) {
+				const { [ blockName ]: _removed, ...rest } = state;
+				return rest;
+			}
+			return { ...state, [ blockName ]: filtered };
+		}
+	}
+
+	return state;
+}
+
+export default combineReducers( { formatTypes, disabledFormatTypesByBlock } );

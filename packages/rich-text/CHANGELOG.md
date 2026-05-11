@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Feature
+
+-   Add `unregisterFormatTypeInBlock( blockName, formatName )` to disable a format type for a specific block type without affecting other blocks ([#77687](https://github.com/WordPress/gutenberg/pull/77687)).
+
 ## 7.45.0 (2026-04-29)
 
 ## 7.44.0 (2026-04-15)

@@ -358,6 +358,7 @@ export function RichTextWrapper(
 		__unstableDependencies: [ tagName ],
 		allowedFormats: adjustedAllowedFormats,
 		withoutInteractiveFormatting,
+		blockName,
 		__unstableFormatTypeHandlerContext: useMemo(
 			() => ( {
 				richTextIdentifier: identifier,
