@@ -539,7 +539,13 @@ describe( 'Popover', () => {
 							Anchor element
 						</div>
 						<Popover.Root defaultOpen>
-							<Popover.Popup anchor={ anchorEl ?? undefined }>
+							<Popover.Popup
+								positioner={
+									<Popover.Positioner
+										anchor={ anchorEl ?? undefined }
+									/>
+								}
+							>
 								<Popover.Title>Title</Popover.Title>
 								Anchored content
 							</Popover.Popup>

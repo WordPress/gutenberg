@@ -31,19 +31,6 @@ export interface TriggerProps
 
 export interface PopupProps
 	extends ComponentProps< 'div' >,
-		Pick<
-			_Popover.Positioner.Props,
-			| 'align'
-			| 'alignOffset'
-			| 'anchor'
-			| 'arrowPadding'
-			| 'collisionAvoidance'
-			| 'collisionBoundary'
-			| 'collisionPadding'
-			| 'side'
-			| 'sideOffset'
-			| 'sticky'
-		>,
 		Pick< _Popover.Popup.Props, 'initialFocus' | 'finalFocus' > {
 	/**
 	 * Whether to render a backdrop overlay behind the popover.
@@ -69,6 +56,15 @@ export interface PopupProps
 	 * When omitted, `Popover.Popup` uses `Popover.Portal` with default props.
 	 */
 	portal?: ReactElement< Omit< PortalProps, 'children' > >;
+
+	/**
+	 * Optional positioner element, typically `<Popover.Positioner />` with
+	 * custom positioning props (`side`, `align`, `sideOffset`, collision
+	 * settings, anchor, etc.). When omitted, `Popover.Popup` uses
+	 * `Popover.Positioner` with default props. Do not pass `children` on
+	 * the positioner element; they would be ignored.
+	 */
+	positioner?: ReactElement< Omit< PositionerProps, 'children' > >;
 
 	/**
 	 * The visual style variant of the popup.
