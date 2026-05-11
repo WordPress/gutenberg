@@ -37,6 +37,20 @@ function render_block_core_post_content( $attributes, $content, $block ) {
 
 	$seen_ids[ $post_id ] = true;
 
+	if ( post_password_required( $post_id ) ) {
+		unset( $seen_ids[ $post_id ] );
+		$block_data = [
+			'blockName' => 'core/post-password-form',
+			'attrs'     => [],
+		];
+		$context = [
+			'postId' => $post_id
+		];
+		$block_instance = new WP_Block( $block_data, $context );
+
+		return $block_instance->render();
+	}
+
 	// When inside the main loop, we want to use queried object
 	// so that `the_preview` for the current post can apply.
 	// We force this behavior by omitting the third argument (post ID) from the `get_the_content`.

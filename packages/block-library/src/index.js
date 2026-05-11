@@ -108,6 +108,7 @@ import * as postDate from './post-date';
 import * as postExcerpt from './post-excerpt';
 import * as postFeaturedImage from './post-featured-image';
 import * as postNavigationLink from './post-navigation-link';
+import * as postPasswordForm from './post-password-form';
 import * as postTemplate from './post-template';
 import * as postTerms from './post-terms';
 import * as postTimeToRead from './post-time-to-read';
@@ -242,6 +243,7 @@ const getAllBlocks = () => {
 		postDate,
 		postTerms,
 		postNavigationLink,
+		postPasswordForm,
 		postTemplate,
 		postTimeToRead,
 		queryPagination,
