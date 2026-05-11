@@ -40,7 +40,7 @@
 }
 
 .is-horizontal-only::before {
-	content: '';
+	content: "";
 	width: 4px;
 	height: 24px;
 	border-radius: 2px;
