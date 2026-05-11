@@ -133,13 +133,14 @@ describe( 'AutocompleterUI', () => {
 			options: [],
 			triggerPrefix: '~',
 			getOptionLabel: () => '',
-			useItems: () => [
-				[],
-				<>
-					<span data-testid="no-results-icon" />
-					No other blocks are available here
-				</>,
-			],
+			useItems: () =>
+				[
+					[] as [],
+					<>
+						<span data-testid="no-results-icon" />
+						No other blocks are available here
+					</>,
+				] as const,
 		};
 
 		const Container = () => {
