@@ -559,6 +559,7 @@ export default function Image( {
 		if ( enable && ! lightboxSetting?.enabled ) {
 			setAttributes( {
 				lightbox: { enabled: true },
+				isDecorative: false,
 			} );
 		} else if ( ! enable && lightboxSetting?.enabled ) {
 			setAttributes( {
@@ -1030,7 +1031,7 @@ export default function Image( {
 								} ) }
 							/>
 						</ToolsPanelItem>
-						{ ! lockAltControls && (
+						{ ! lockAltControls && ! lightboxChecked && (
 							<ToolsPanelItem
 								label={ __( 'Mark as decorative' ) }
 								isShownByDefault
