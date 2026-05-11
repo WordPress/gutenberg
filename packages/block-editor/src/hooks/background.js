@@ -14,7 +14,7 @@ import { useCallback } from '@wordpress/element';
  * Internal dependencies
  */
 import InspectorControls from '../components/inspector-controls';
-import { cleanEmptyObject, buildStateResetAllFilter } from './utils';
+import { cleanEmptyObject } from './utils';
 import { store as blockEditorStore } from '../store';
 import {
 	default as StylesBackgroundPanel,
@@ -23,7 +23,11 @@ import {
 	hasBackgroundGradientValue,
 } from '../components/global-styles/background-panel';
 import { globalStylesDataKey } from '../store/private-keys';
-import { useBlockStyle } from './use-block-style';
+import {
+	getStyleForState,
+	setStyleForState,
+	useBlockStyleState,
+} from './block-style-state';
 
 export const BACKGROUND_SUPPORT_KEY = 'background';
 
@@ -124,17 +128,9 @@ export function getBackgroundImageClasses( style ) {
 function BackgroundInspectorControl( {
 	children,
 	backgroundGradientSupported = false,
-	selectedState = 'default',
 } ) {
-	const isStateSelected = selectedState !== 'default';
 	const resetAllFilter = useCallback(
 		( attributes ) => {
-			if ( isStateSelected ) {
-				return buildStateResetAllFilter( selectedState, ( style ) => ( {
-					...style,
-					background: undefined,
-				} ) )( attributes );
-			}
 			const updatedClassName = attributes.className?.includes(
 				'has-background'
 			)
@@ -158,7 +154,7 @@ function BackgroundInspectorControl( {
 				} ),
 			};
 		},
-		[ backgroundGradientSupported, isStateSelected, selectedState ]
+		[ backgroundGradientSupported ]
 	);
 	return (
 		<InspectorControls group="background" resetAllFilter={ resetAllFilter }>
@@ -172,15 +168,16 @@ export function BackgroundImagePanel( {
 	name,
 	setAttributes,
 	settings,
-	selectedState = 'default',
 } ) {
-	const { className, inheritedValue } = useSelect(
+	const selectedState = useBlockStyleState();
+	const { style, className, inheritedValue } = useSelect(
 		( select ) => {
 			const { getBlockAttributes, getSettings } =
 				select( blockEditorStore );
 			const _settings = getSettings();
 			const blockAttributes = getBlockAttributes( clientId );
 			return {
+				style: blockAttributes?.style,
 				className: blockAttributes?.className,
 				/*
 				 * To ensure we pass down the right inherited values:
@@ -196,7 +193,6 @@ export function BackgroundImagePanel( {
 		[ clientId, name ]
 	);
 
-	const [ style, setStyle ] = useBlockStyle( null, selectedState );
 	const isStateSelected = selectedState !== 'default';
 
 	const backgroundGradientSupported = hasBackgroundSupport(
@@ -211,12 +207,11 @@ export function BackgroundImagePanel( {
 		( { children } ) => (
 			<BackgroundInspectorControl
 				backgroundGradientSupported={ backgroundGradientSupported }
-				selectedState={ selectedState }
 			>
 				{ children }
 			</BackgroundInspectorControl>
 		),
-		[ backgroundGradientSupported, selectedState ]
+		[ backgroundGradientSupported ]
 	);
 
 	if (
@@ -227,7 +222,11 @@ export function BackgroundImagePanel( {
 	}
 
 	const onChange = isStateSelected
-		? setStyle
+		? ( newStyle ) => {
+				setAttributes( {
+					style: setStyleForState( style, selectedState, newStyle ),
+				} );
+		  }
 		: ( newStyle ) => {
 				const isMigrating =
 					backgroundGradientSupported && !! style?.color?.gradient;
@@ -310,7 +309,11 @@ export function BackgroundImagePanel( {
 			settings={ updatedSettings }
 			onChange={ onChange }
 			defaultControls={ defaultControls }
-			value={ isStateSelected ? style : styleValue }
+			value={
+				isStateSelected
+					? getStyleForState( style, selectedState )
+					: styleValue
+			}
 		/>
 	);
 }

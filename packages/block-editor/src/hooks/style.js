@@ -38,6 +38,7 @@ import {
 	useBlockSettings,
 } from './utils';
 import { BlockStatesControl, VALID_BLOCK_PSEUDO_STATES } from './states';
+import { BlockStyleStateProvider } from './block-style-state';
 import { buildStateSelector, buildCanvasStateSelector } from './state-utils';
 import { BlockInspectorPreTabsFill } from '../components/block-inspector/inspector-pre-tabs-slot-fill';
 import { scopeSelector } from '../components/global-styles/utils';
@@ -382,7 +383,6 @@ function BlockStyleControls( {
 		name,
 		setAttributes,
 		settings: panelSettings,
-		selectedState,
 	};
 
 	return (
@@ -403,11 +403,13 @@ function BlockStyleControls( {
 					</Spacer>
 				</BlockInspectorPreTabsFill>
 			) }
-			<ColorEdit { ...passedProps } />
-			<BackgroundImagePanel { ...passedProps } />
-			<TypographyPanel { ...passedProps } />
-			<BorderPanel { ...passedProps } />
-			<DimensionsPanel { ...passedProps } />
+			<BlockStyleStateProvider value={ selectedState }>
+				<ColorEdit { ...passedProps } />
+				<BackgroundImagePanel { ...passedProps } />
+				<TypographyPanel { ...passedProps } />
+				<BorderPanel { ...passedProps } />
+				<DimensionsPanel { ...passedProps } />
+			</BlockStyleStateProvider>
 		</>
 	);
 }

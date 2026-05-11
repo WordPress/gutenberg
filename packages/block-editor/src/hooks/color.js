@@ -23,7 +23,6 @@ import {
 	cleanEmptyObject,
 	transformStyles,
 	shouldSkipSerialization,
-	buildStateResetAllFilter,
 } from './utils';
 import { getBackgroundImageClasses } from './background';
 import { useSettings } from '../components/use-settings';
@@ -34,7 +33,11 @@ import {
 } from '../components/global-styles/color-panel';
 import BlockColorContrastChecker from './contrast-checker';
 import { store as blockEditorStore } from '../store';
-import { useBlockStyle } from './use-block-style';
+import {
+	getStyleForState,
+	setStyleForState,
+	useBlockStyleState,
+} from './block-style-state';
 
 export const COLOR_SUPPORT_KEY = 'color';
 
@@ -239,20 +242,9 @@ function attributesToStyle( attributes ) {
 	};
 }
 
-function ColorInspectorControl( {
-	children,
-	resetAllFilter,
-	selectedState = 'default',
-} ) {
-	const isStateSelected = selectedState !== 'default';
+function ColorInspectorControl( { children, resetAllFilter } ) {
 	const attributesResetAllFilter = useCallback(
 		( attributes ) => {
-			if ( isStateSelected ) {
-				return buildStateResetAllFilter(
-					selectedState,
-					resetAllFilter
-				)( attributes );
-			}
 			const existingStyle = attributesToStyle( attributes );
 			const updatedStyle = resetAllFilter( existingStyle );
 			return {
@@ -260,7 +252,7 @@ function ColorInspectorControl( {
 				...styleToAttributes( updatedStyle ),
 			};
 		},
-		[ isStateSelected, selectedState, resetAllFilter ]
+		[ resetAllFilter ]
 	);
 
 	return (
@@ -281,22 +273,24 @@ export function ColorEdit( {
 	asWrapper,
 	label,
 	defaultControls,
-	selectedState = 'default',
 } ) {
+	const selectedState = useBlockStyleState();
 	const isEnabled = useHasColorPanel( settings );
 
-	const { textColor, backgroundColor, gradient } = useSelect(
+	const { style, textColor, backgroundColor, gradient } = useSelect(
 		( select ) => {
 			// Early return to avoid subscription when disabled
 			if ( ! isEnabled ) {
 				return {};
 			}
 			const {
+				style: _style,
 				textColor: _textColor,
 				backgroundColor: _backgroundColor,
 				gradient: _gradient,
 			} = select( blockEditorStore ).getBlockAttributes( clientId ) || {};
 			return {
+				style: _style,
 				textColor: _textColor,
 				backgroundColor: _backgroundColor,
 				gradient: _gradient,
@@ -305,12 +299,11 @@ export function ColorEdit( {
 		[ clientId, isEnabled ]
 	);
 
-	const [ style, setStyle ] = useBlockStyle( null, selectedState );
 	const isStateSelected = selectedState !== 'default';
 
 	const value = useMemo( () => {
 		if ( isStateSelected ) {
-			return style;
+			return getStyleForState( style, selectedState );
 		}
 		return attributesToStyle( {
 			style,
@@ -318,21 +311,26 @@ export function ColorEdit( {
 			backgroundColor,
 			gradient,
 		} );
-	}, [ isStateSelected, style, textColor, backgroundColor, gradient ] );
+	}, [
+		isStateSelected,
+		selectedState,
+		style,
+		textColor,
+		backgroundColor,
+		gradient,
+	] );
 
 	const onChange = isStateSelected
-		? setStyle
+		? ( newStyle ) => {
+				setAttributes( {
+					style: setStyleForState( style, selectedState, newStyle ),
+				} );
+		  }
 		: ( newStyle ) => {
 				setAttributes( styleToAttributes( newStyle ) );
 		  };
 
-	const Wrapper = useMemo( () => {
-		const Base = asWrapper || ColorInspectorControl;
-		function ColorWrapper( props ) {
-			return <Base { ...props } selectedState={ selectedState } />;
-		}
-		return ColorWrapper;
-	}, [ asWrapper, selectedState ] );
+	const Wrapper = asWrapper || ColorInspectorControl;
 
 	if ( ! isEnabled ) {
 		return null;
