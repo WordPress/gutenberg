@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { Button, __experimentalVStack as VStack } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { isReusableBlock, isTemplatePart } from '@wordpress/blocks';
 
@@ -76,7 +76,10 @@ function InlineEditButton( {
 				onClick={ handleClick }
 			>
 				{ editedContentOnlySection
-					? __( 'Exit pattern' )
+					? _x(
+							'Exit pattern',
+							'Button label to leave pattern editing mode'
+					  )
 					: __( 'Edit pattern' ) }
 			</Button>
 		</VStack>
