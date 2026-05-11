@@ -22,10 +22,7 @@ import { moreVertical, published } from '@wordpress/icons';
  */
 import { NoteCard } from './note-card';
 import { NoteForm } from './note-form';
-import ReactionDisplay, {
-	AddReactionButton,
-	MoreEmojiButton,
-} from './reaction-display';
+import ReactionDisplay, { AddReactionButton } from './reaction-display';
 import { unlock } from '../../lock-unlock';
 
 const { Menu } = unlock( componentsPrivateApis );
@@ -226,14 +223,6 @@ export function Note( {
 				<Stack direction="row" gap="xs" justify="flex-start">
 					<AddReactionButton
 						disabled={ note.status === 'approved' }
-						onToggleReaction={ ( emoji ) =>
-							onToggleReaction?.( {
-								commentId: note.id,
-								emoji,
-							} )
-						}
-					/>
-					<MoreEmojiButton
 						onToggleReaction={ ( emoji ) =>
 							onToggleReaction?.( {
 								commentId: note.id,

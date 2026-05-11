@@ -179,9 +179,7 @@ export function getLabelBySlug( slug, emojis = REACTION_EMOJIS ) {
 }
 
 /**
- * A row of curated emoji buttons. The `+` "More emojis" trigger lives
- * outside this picker (as a sibling of the smiley trigger) so the
- * full-picker popover never has to nest inside the curated popover.
+ * A row of curated emoji buttons.
  *
  * @param {Object}   props          Component props.
  * @param {Function} props.onSelect Called with the chosen slug when the

@@ -4,8 +4,8 @@
 import { __, sprintf, _n } from '@wordpress/i18n';
 import { Button, Dropdown } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
-import { smiley as smileyIcon, plus as plusIcon } from '@wordpress/icons';
-import { useState, useCallback, lazy, Suspense } from '@wordpress/element';
+import { smiley as smileyIcon } from '@wordpress/icons';
+import { useState, useCallback } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 
@@ -13,18 +13,10 @@ import { addQueryArgs } from '@wordpress/url';
  * Internal dependencies
  */
 import ReactionEmojiPicker, {
-	emojiToStorageKey,
 	getEmojiBySlug,
 	getLabelBySlug,
 	useReactionEmojis,
 } from './reaction-emoji-picker';
-
-/**
- * Lazy-load the full emoji picker. Its bundle is only fetched when a
- * user opens the "More emojis" popover for the first time in a session;
- * the Emojibase JSON dataset is fetched separately on first open.
- */
-const FullEmojiPicker = lazy( () => import( './emoji-picker' ) );
 
 // `Dropdown`'s popover is rendered in a portal anchored to <body>,
 // so it escapes the `overflow: hidden` chain on the collab sidebar
@@ -305,54 +297,6 @@ export function AddReactionButton( { disabled = false, onToggleReaction } ) {
 						onToggleReaction( slug );
 					} }
 				/>
-			) }
-		/>
-	);
-}
-
-/**
- * Standalone "+" button that opens the full emoji picker. Sibling of
- * AddReactionButton; not nested inside it so the curated and full picker
- * popovers never conflict.
- *
- * Renders nothing when `window.gutenbergEmojibaseUrl` is unset — the
- * Gutenberg plugin sets it via PHP, but npm consumers of @wordpress/editor
- * must opt in by providing a URL pointing at a self-hosted emojibase
- * dataset.
- *
- * @param {Object}   props                  Component props.
- * @param {Function} props.onToggleReaction Callback to toggle a reaction.
- */
-export function MoreEmojiButton( { onToggleReaction } ) {
-	const emojis = useReactionEmojis();
-	if ( typeof window === 'undefined' || ! window.gutenbergEmojibaseUrl ) {
-		return null;
-	}
-	return (
-		<Dropdown
-			popoverProps={ POPOVER_PROPS }
-			contentClassName="editor-collab-sidebar-panel__picker-popover"
-			renderToggle={ ( { isOpen, onToggle } ) => (
-				<Button
-					size="compact"
-					className="editor-collab-sidebar-panel__more-reaction-button"
-					icon={ plusIcon }
-					label={ __( 'More emojis' ) }
-					aria-expanded={ isOpen }
-					onClick={ onToggle }
-				/>
-			) }
-			renderContent={ ( { onClose } ) => (
-				<Suspense fallback={ null }>
-					<FullEmojiPicker
-						onSelect={ ( emoji ) => {
-							onClose();
-							onToggleReaction(
-								emojiToStorageKey( emoji, emojis )
-							);
-						} }
-					/>
-				</Suspense>
 			) }
 		/>
 	);
