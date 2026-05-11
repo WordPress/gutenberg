@@ -228,27 +228,16 @@ export function LanesItem( {
 				{ ...listeners }
 				style={ {
 					height: '100%',
-					// `attributes` (tabIndex, role, aria-*) and
-					// `listeners` (onKeyDown, onPointerDown) live on
-					// the same element so keyboard activation works:
-					// Tab focuses this wrapper, Space dispatches the
-					// keydown that the listener catches. Splitting
-					// them across the outer item and this wrapper
-					// would land focus on the outer but route the
-					// keydown only to children, never firing the
-					// activation. `setActivatorNodeRef` tells dnd-kit
-					// to treat this element as the keyboard sensor
-					// target while the outer keeps its role as the
-					// measured sortable node.
+					// Keyboard activation needs `attributes` (tabIndex)
+					// and `listeners` (onKeyDown) on the same focused
+					// node; `setActivatorNodeRef` points dnd-kit's
+					// keyboard sensor here, the outer keeps `setNodeRef`
+					// for measurement.
 					//
-					// Cursor lives on the listener wrapper rather
-					// than the outer item so `actionableArea`
-					// children render their own cursor (e.g.
-					// `pointer` on buttons) instead of inheriting
-					// the surface's `grab`. Setting `undefined`
-					// during an active gesture leaves the property
-					// off the DOM so the document-level cursor
-					// lock from the resize handle takes over.
+					// Cursor lives on this wrapper so `actionableArea`
+					// children (mounted outside it) keep their own;
+					// `undefined` during a gesture defers to the resize
+					// handle's document cursor lock.
 					cursor: getItemCursor( disabled, interacting ),
 				} }
 			>
