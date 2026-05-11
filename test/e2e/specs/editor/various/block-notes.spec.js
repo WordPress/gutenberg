@@ -1048,11 +1048,11 @@ test.describe( 'Block Notes', () => {
 			);
 			await expect( emojiPicker ).toBeVisible();
 
-			// Navigate with arrow keys and select. The picker is a vertical
-			// listbox, so ArrowDown moves to the next option.
+			// Navigate with arrow keys and select. The picker is a horizontal
+			// listbox, so ArrowRight moves to the next option.
 			const firstEmoji = emojiPicker.getByRole( 'option' ).first();
 			await firstEmoji.focus();
-			await page.keyboard.press( 'ArrowDown' );
+			await page.keyboard.press( 'ArrowRight' );
 			await page.keyboard.press( 'Enter' );
 
 			await expect(
