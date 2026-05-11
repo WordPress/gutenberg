@@ -30,10 +30,7 @@ const config = defineConfig( {
 	globalSetup: fileURLToPath(
 		new URL( './config/global-setup.ts', 'file:' + __filename ).href
 	),
-	testIgnore: [
-		...baseTestIgnore,
-		'**/specs/editor/collaboration/websocket/**',
-	],
+	testIgnore: [ ...baseTestIgnore ],
 	projects: [
 		{
 			name: 'chromium',

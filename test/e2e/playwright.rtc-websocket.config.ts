@@ -34,9 +34,10 @@ if ( Array.isArray( baseConfig.webServer ) ) {
 
 const config = defineConfig( {
 	...baseConfig,
-	testIgnore: [],
-	testMatch:
-		'**/specs/editor/collaboration/websocket/collaboration-*.spec.ts',
+	// Run the same RTC specs the default suite runs, but with the test
+	// WebSocket provider activated by globalSetup. Any new spec added to
+	// the collaboration directory is picked up automatically.
+	testMatch: '**/specs/editor/collaboration/collaboration-*.spec.ts',
 	webServer: [
 		...baseWebServer,
 		{

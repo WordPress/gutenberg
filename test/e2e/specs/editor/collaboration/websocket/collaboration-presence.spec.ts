@@ -1,1 +1,0 @@
-import '../collaboration-presence.spec';
