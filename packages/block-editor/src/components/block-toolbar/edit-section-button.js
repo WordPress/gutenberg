@@ -55,19 +55,14 @@ export default function EditSectionButton( { clientId } ) {
 		}
 	};
 
-	let buttonLabel;
-	if ( isEditing ) {
-		/* translators: Button label to leave pattern editing mode. */
-		buttonLabel = __( 'Exit pattern' );
-	} else {
-		/* translators: Button label to enter pattern editing mode. */
-		buttonLabel = __( 'Edit pattern' );
-	}
-
 	return (
 		<ToolbarGroup>
 			<ToolbarButton onClick={ handleClick }>
-				{ buttonLabel }
+				{ isEditing
+					? /* translators: Button label to leave pattern editing mode. */
+					  __( 'Exit pattern' )
+					: /* translators: Button label to enter pattern editing mode. */
+					  __( 'Edit pattern' ) }
 			</ToolbarButton>
 		</ToolbarGroup>
 	);

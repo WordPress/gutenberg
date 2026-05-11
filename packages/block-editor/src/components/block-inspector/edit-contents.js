@@ -67,15 +67,6 @@ function InlineEditButton( {
 		}
 	};
 
-	let buttonLabel;
-	if ( editedContentOnlySection ) {
-		/* translators: Button label to leave pattern editing mode. */
-		buttonLabel = __( 'Exit pattern' );
-	} else {
-		/* translators: Button label to enter pattern editing mode. */
-		buttonLabel = __( 'Edit pattern' );
-	}
-
 	return (
 		<VStack className="block-editor-block-inspector-edit-contents" expanded>
 			<Button
@@ -84,7 +75,11 @@ function InlineEditButton( {
 				variant="secondary"
 				onClick={ handleClick }
 			>
-				{ buttonLabel }
+				{ editedContentOnlySection
+					? /* translators: Button label to leave pattern editing mode. */
+					  __( 'Exit pattern' )
+					: /* translators: Button label to enter pattern editing mode. */
+					  __( 'Edit pattern' ) }
 			</Button>
 		</VStack>
 	);
