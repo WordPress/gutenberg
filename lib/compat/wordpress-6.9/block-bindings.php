@@ -45,6 +45,21 @@ add_filter(
 	}
 );
 
+if ( ! class_exists( 'WP_Block_Context_Extractor' ) ) {
+	// phpcs:ignore Gutenberg.Commenting.SinceTag.MissingClassSinceTag
+	class WP_Block_Context_Extractor extends WP_Block {
+		/**
+		 * Static methods of subclasses have access to protected properties
+		 * of instances of the parent class.
+		 * In this case, this gives us access to `available_context`.
+		 */
+		// phpcs:ignore Gutenberg.Commenting.SinceTag.MissingMethodSinceTag
+		public static function get_available_context( $instance ) {
+			return $instance->available_context;
+		}
+	}
+}
+
 /**
  * Callback function for the render_block filter.
  *
@@ -311,20 +326,6 @@ function gutenberg_process_block_bindings( $instance ) {
 			continue;
 		}
 
-		if ( ! class_exists( 'WP_Block_Context_Extractor' ) ) {
-			// phpcs:ignore Gutenberg.Commenting.SinceTag.MissingClassSinceTag
-			class WP_Block_Context_Extractor extends WP_Block {
-				/**
-				 * Static methods of subclasses have access to protected properties
-				 * of instances of the parent class.
-				 * In this case, this gives us access to `available_context`.
-				 */
-				// phpcs:ignore Gutenberg.Commenting.SinceTag.MissingMethodSinceTag
-				public static function get_available_context( $instance ) {
-					return $instance->available_context;
-				}
-			}
-		}
 		$available_context = WP_Block_Context_Extractor::get_available_context( $instance );
 
 		// Adds the necessary context defined by the source.
@@ -399,20 +400,6 @@ function gutenberg_process_inner_blocks_binding( $instance ) {
 		return null;
 	}
 
-	if ( ! class_exists( 'WP_Block_Context_Extractor' ) ) {
-		// phpcs:ignore Gutenberg.Commenting.SinceTag.MissingClassSinceTag
-		class WP_Block_Context_Extractor extends WP_Block {
-			/**
-			 * Static methods of subclasses have access to protected properties
-			 * of instances of the parent class.
-			 * In this case, this gives us access to `available_context`.
-			 */
-			// phpcs:ignore Gutenberg.Commenting.SinceTag.MissingMethodSinceTag
-			public static function get_available_context( $instance ) {
-				return $instance->available_context;
-			}
-		}
-	}
 	$available_context = WP_Block_Context_Extractor::get_available_context( $instance );
 
 	// Adds the necessary context defined by the source.
