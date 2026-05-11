@@ -10,6 +10,14 @@ import warning from '@wordpress/warning';
  */
 import { CONFIG } from '../utils';
 
+/**
+ * Milliseconds used as a fallback when racing `animationend` against a timeout.
+ *
+ * Sourced from `CONFIG.transitionDuration`. This value is implicitly coupled to
+ * the modal frame’s CSS `animation-duration` in `style.scss`, which uses
+ * `var(--wpds-motion-duration-md)`. If either the token, the SCSS, or
+ * `CONFIG.transitionDuration` changes, keep them aligned so exit timing stays correct.
+ */
 const FRAME_ANIMATION_DURATION_MS = Number.parseInt(
 	CONFIG.transitionDuration
 );
