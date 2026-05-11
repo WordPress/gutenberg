@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useCallback, useState } from '@wordpress/element';
+import { useCallback, useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 // eslint-disable-next-line @wordpress/use-recommended-components
 import { AlertDialog, Button, Stack } from '@wordpress/ui';
@@ -9,6 +9,7 @@ import { AlertDialog, Button, Stack } from '@wordpress/ui';
 /**
  * Internal dependencies
  */
+import styles from './actions.module.css';
 import { useDashboardInternalContext } from '../../context/dashboard-context';
 import { useDashboardUIContext } from '../../context/ui-context';
 import { MoreActionsDropdown } from '../more-actions-dropdown';
@@ -29,6 +30,30 @@ import type { MoreActionsDropdownItem } from '../more-actions-dropdown';
 export function Actions(): React.ReactNode {
 	const { editMode, onEditChange, onLayoutReset } =
 		useDashboardInternalContext();
+
+	const [ isEditActionsMounted, setIsEditActionsMounted ] =
+		useState( editMode );
+	const [ isExitingEditActions, setIsExitingEditActions ] = useState( false );
+
+	useEffect( () => {
+		if ( editMode ) {
+			setIsEditActionsMounted( true );
+			setIsExitingEditActions( false );
+			return;
+		}
+
+		if ( ! isEditActionsMounted ) {
+			return;
+		}
+
+		setIsExitingEditActions( true );
+		const exitTimeout = setTimeout( () => {
+			setIsEditActionsMounted( false );
+			setIsExitingEditActions( false );
+		}, 220 );
+
+		return () => clearTimeout( exitTimeout );
+	}, [ editMode, isEditActionsMounted ] );
 
 	const { setInserterOpen } = useDashboardUIContext();
 
@@ -68,8 +93,16 @@ export function Actions(): React.ReactNode {
 
 	return (
 		<Stack direction="row" gap="sm">
-			{ editMode ? (
-				<>
+			{ isEditActionsMounted ? (
+				<Stack
+					direction="row"
+					gap="sm"
+					className={
+						isExitingEditActions
+							? styles.editActionsExit
+							: styles.editActionsEnter
+					}
+				>
 					<Button
 						variant="minimal"
 						tone="brand"
@@ -96,7 +129,7 @@ export function Actions(): React.ReactNode {
 					>
 						{ __( 'Done' ) }
 					</Button>
-				</>
+				</Stack>
 			) : (
 				<Button
 					variant="outline"

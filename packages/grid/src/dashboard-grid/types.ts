@@ -197,9 +197,6 @@ interface BaseDashboardGridProps
 	renderResizeHandle?: React.ComponentType< ResizeHandleRenderProps >;
 
 	/**
-	 * Custom wrapper for the dragged-clone visual mounted inside
-	 * `<DragOverlay>`. The grid always wraps the clone with a thin
-	 * functional frame (lift scale, grabbing cursor, pointer pass-
 	 * through) and mounts this component inside it; the consumer
 	 * owns the visual chrome (shadow, radius, padding).
 	 *
