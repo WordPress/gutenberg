@@ -22,6 +22,7 @@ import './settings';
 import color from './color';
 import dimensions from './dimensions';
 import duotone from './duotone';
+import tritone from './tritone';
 import fontFamily from './font-family';
 import fontSize from './font-size';
 import textAlign from './text-align';
@@ -49,6 +50,7 @@ createBlockEditFilter(
 		style,
 		customCSS,
 		duotone,
+		tritone,
 		fitText,
 		position,
 		layout,
@@ -69,6 +71,7 @@ createBlockListBlockFilter( [
 	color,
 	dimensions,
 	duotone,
+	tritone,
 	fontFamily,
 	fontSize,
 	fitText,
