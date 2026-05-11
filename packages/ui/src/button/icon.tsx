@@ -22,3 +22,5 @@ export const ButtonIcon = forwardRef< SVGSVGElement, ButtonIconProps >(
 		);
 	}
 );
+
+ButtonIcon.displayName = 'Button.Icon';
