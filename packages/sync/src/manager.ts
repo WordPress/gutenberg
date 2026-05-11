@@ -193,13 +193,18 @@ export function createSyncManager( debug = false ): SyncManager {
 		const stateMap = ydoc.getMap( CRDT_STATE_MAP_KEY );
 		const now = Date.now();
 
+		// Track whether observers have been attached to the maps.
+		let hasObserversAttached = false;
+
 		// Clean up providers and in-memory state when the entity is unloaded.
 		const unload = (): void => {
 			log( 'loadEntity', 'unloading', entityId );
 			providerResults?.forEach( ( result ) => result.destroy() );
 			handlers.onStatusChange( null );
-			recordMap.unobserveDeep( onRecordUpdate );
-			stateMap.unobserve( onStateMapUpdate );
+			if ( hasObserversAttached ) {
+				recordMap.unobserveDeep( onRecordUpdate );
+				stateMap.unobserve( onStateMapUpdate );
+			}
 			ydoc.destroy();
 			entityStates.delete( entityId );
 		};
@@ -304,6 +309,7 @@ export function createSyncManager( debug = false ): SyncManager {
 		// Attach observers.
 		recordMap.observeDeep( onRecordUpdate );
 		stateMap.observe( onStateMapUpdate );
+		hasObserversAttached = true;
 	}
 
 	/**
@@ -342,12 +348,17 @@ export function createSyncManager( debug = false ): SyncManager {
 		const stateMap = ydoc.getMap( CRDT_STATE_MAP_KEY );
 		const now = Date.now();
 
+		// Track whether observers have been attached to the maps
+		let hasObserversAttached = false;
+
 		// Clean up providers and in-memory state when the entity is unloaded.
 		const unload = (): void => {
 			log( 'loadCollection', 'unloading', entityId );
 			providerResults?.forEach( ( result ) => result.destroy() );
 			handlers.onStatusChange( null );
-			stateMap.unobserve( onStateMapUpdate );
+			if ( hasObserversAttached ) {
+				stateMap.unobserve( onStateMapUpdate );
+			}
 			ydoc.destroy();
 			collectionStates.delete( objectType );
 		};
@@ -411,6 +422,7 @@ export function createSyncManager( debug = false ): SyncManager {
 
 		// Attach observers.
 		stateMap.observe( onStateMapUpdate );
+		hasObserversAttached = true;
 
 		// Initialize the Yjs document with the necessary CRDT state.
 		initializeYjsDoc( ydoc );
