@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/validation-tools",
-	"version": "1.0.0",
+	"version": "0.0.0",
 	"description": "Validation scripts used across the Gutenberg monorepo (license checks, tsconfig validation, package-lock validation).",
 	"private": true,
 	"author": "The WordPress Contributors",
@@ -8,9 +8,9 @@
 	"keywords": [
 		"wordpress",
 		"gutenberg",
-		"api-docs"
+		"validation"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/tools/validation/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/tools/validation",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",
@@ -23,12 +23,11 @@
 		"node": ">=20.10.0"
 	},
 	"devDependencies": {
-		"ajv": "8.17.1",
-		"chalk": "4.1.1",
-		"cross-spawn": "^7.0.6",
-		"glob": "7.1.2",
-		"jsonc-parser": "3.3.1",
-		"simple-git": "3.24.0"
+		"@wordpress/scripts": "file:../../packages/scripts",
+		"chalk": "^4.1.1",
+		"glob": "^7.1.2",
+		"jsonc-parser": "^3.3.1",
+		"simple-git": "^3.24.0"
 	},
 	"publishConfig": {
 		"access": "public"

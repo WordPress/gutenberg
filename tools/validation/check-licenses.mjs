@@ -10,11 +10,9 @@ import { fileURLToPath } from 'url';
 /**
  * Internal dependencies
  */
-import {
-	checkDeps,
-	collectDeps,
-	readPackageJson,
-} from '../../packages/scripts/utils/license.js';
+const { checkDeps, collectDeps, readPackageJson } = await import(
+	'@wordpress/scripts/utils/license.js'
+);
 
 const __dirname = path.dirname( fileURLToPath( import.meta.url ) );
 const ROOT_DIR = path.resolve( __dirname, '../..' );

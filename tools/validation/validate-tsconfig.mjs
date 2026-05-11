@@ -14,7 +14,7 @@ let hasErrors = false;
 const __dirname = dirname( fileURLToPath( import.meta.url ) );
 const repoRoot = resolve( __dirname, '../..' );
 
-const rootTsconfigJson = JSON.parse(
+const rootTsconfigJson = JSONC.parse(
 	readFileSync( resolve( repoRoot, 'tsconfig.json' ), 'utf8' )
 );
 
