@@ -5,6 +5,10 @@ import type { ComponentProps } from '../utils/types';
 
 export type PortalProps = ComponentPropsWithoutRef< typeof _Popover.Portal >;
 
+export type PositionerProps = ComponentPropsWithoutRef<
+	typeof _Popover.Positioner
+>;
+
 export interface RootProps
 	extends Pick<
 		_Popover.Root.Props,
