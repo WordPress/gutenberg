@@ -31,10 +31,14 @@ type PaletteProps = {
 	value?: string;
 	/**
 	 * The slug of the currently selected palette entry.
-	 * When provided, selection is determined by slug rather than color value,
-	 * which correctly handles palettes where two entries share the same color.
-	 * Note: Palette entries without a slug will not appear selected when this prop is provided,
-	 * even if their color value matches the `value` prop.
+	 *
+	 * When set to a non-empty string, selection is determined by slug rather
+	 * than by color value — this correctly handles palettes where two entries
+	 * share the same color. Palette entries without a slug will not appear
+	 * selected in this mode, even if their color value matches `value`.
+	 *
+	 * An empty string is treated the same as `undefined`: selection falls
+	 * back to matching by color value.
 	 */
 	selectedSlug?: string;
 	actions?: ReactNode;

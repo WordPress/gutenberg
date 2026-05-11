@@ -56,20 +56,18 @@ export const extractColorNameFromCurrentValue = (
 			color: colorValue,
 			slug,
 		} of paletteColors ) {
+			if ( selectedSlug ) {
+				if ( slug === selectedSlug ) {
+					return colorName;
+				}
+				continue;
+			}
+
 			const normalizedColorValue = currentValueIsSimpleColor
 				? colord( colorValue ).toHex()
 				: colorValue;
-			const matchesSelectedSlug =
-				selectedSlug && slug ? slug === selectedSlug : false;
 
-			if ( matchesSelectedSlug ) {
-				return colorName;
-			}
-
-			if (
-				! selectedSlug &&
-				normalizedCurrentValue === normalizedColorValue
-			) {
+			if ( normalizedCurrentValue === normalizedColorValue ) {
 				return colorName;
 			}
 		}
