@@ -116,4 +116,27 @@ test.describe( 'Post publish panel', () => {
 			} )
 		).toBeFocused();
 	} );
+
+	test( 'should auto-collapse the publish panel after publishing when the user makes an edit', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.canvas
+			.getByRole( 'textbox', { name: 'Add title' } )
+			.fill( 'Test Post' );
+		await editor.publishPost();
+
+		const prePublishChecksToggle = page.getByRole( 'checkbox', {
+			name: 'Always show pre-publish checks.',
+		} );
+		await expect( prePublishChecksToggle ).toBeVisible();
+
+		// Make an edit after publishing.
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Edit after publish' },
+		} );
+
+		await expect( prePublishChecksToggle ).toBeHidden();
+	} );
 } );

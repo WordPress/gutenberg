@@ -10,6 +10,7 @@
 
 ### Bug Fixes
 
+-   `Autocomplete`, `Select`: Do not show the interactive cursor for disabled select triggers or disabled popup items ([#78112](https://github.com/WordPress/gutenberg/pull/78112)).
 -   `Select`: Hide the browser focus ring on highlighted popup items ([#77919](https://github.com/WordPress/gutenberg/pull/77919)).
 -   `Drawer`: Restore the slide-out animation when the popup closes ([#77800](https://github.com/WordPress/gutenberg/pull/77800)).
 -   `Drawer`: Forward the `render` prop on `Drawer.Content` to the scroll container instead of leaking it as a DOM attribute, matching `Dialog.Content` ([#77941](https://github.com/WordPress/gutenberg/pull/77941)).
