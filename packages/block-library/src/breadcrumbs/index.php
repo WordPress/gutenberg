@@ -103,36 +103,59 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 			}
 		}
 
-		// Determine breadcrumb type.
+		// Determine breadcrumb style.
+		// Handle backward compatibility: prefersTaxonomy was a boolean, now breadcrumbStyle is an enum.
+		// The 'taxonomy' value is deprecated - 'default' now automatically uses taxonomy for non-hierarchical posts.
+		$breadcrumb_style = 'default';
+		if ( isset( $attributes['breadcrumbStyle'] ) && 'date' === $attributes['breadcrumbStyle'] ) {
+			$breadcrumb_style = 'date';
+		}
+		// Note: prefersTaxonomy is no longer needed - 'default' already uses taxonomy for non-hierarchical posts.
+
+		// Determine which breadcrumb type to show for 'default' style.
 		// Some non-hierarchical post types (e.g., attachments) can have parents.
-		// Use hierarchical breadcrumbs if a parent exists, otherwise use taxonomy breadcrumbs.
-		$show_terms = false;
-		if ( ! is_post_type_hierarchical( $post_type ) && ! $post_parent ) {
-			$show_terms = true;
-		} elseif ( empty( get_object_taxonomies( $post_type, 'objects' ) ) ) {
-			$show_terms = false;
+		$show_date        = false;
+		$show_terms       = false;
+		$show_hierarchy   = false;
+
+		if ( 'date' === $breadcrumb_style ) {
+			$show_date = true;
 		} else {
-			$show_terms = $attributes['prefersTaxonomy'];
+			// Default: Use hierarchical breadcrumbs if hierarchical post type and has parent,
+			// or use taxonomy breadcrumbs for non-hierarchical post types.
+			if ( ! is_post_type_hierarchical( $post_type ) && ! $post_parent ) {
+				$show_terms = true;
+			} elseif ( empty( get_object_taxonomies( $post_type, 'objects' ) ) ) {
+				$show_hierarchy = true;
+			} else {
+				$show_hierarchy = true;
+			}
 		}
 
 		// Add post type archive link if applicable.
-		$post_type_object = get_post_type_object( $post_type );
-		$archive_link     = get_post_type_archive_link( $post_type );
-		if ( $archive_link && untrailingslashit( home_url() ) !== untrailingslashit( $archive_link ) ) {
-			$label = $post_type_object->labels->archives;
-			if ( 'post' === $post_type && $page_for_posts ) {
-				$label = block_core_breadcrumbs_get_post_title( $page_for_posts );
+		// Skip archive link for date-based breadcrumbs (already have date structure).
+		if ( $show_hierarchy || $show_terms ) {
+			$post_type_object = get_post_type_object( $post_type );
+			$archive_link     = get_post_type_archive_link( $post_type );
+			if ( $archive_link && untrailingslashit( home_url() ) !== untrailingslashit( $archive_link ) ) {
+				$label = $post_type_object->labels->archives;
+				if ( 'post' === $post_type && $page_for_posts ) {
+					$label = block_core_breadcrumbs_get_post_title( $page_for_posts );
+				}
+				$breadcrumb_items[] = array(
+					'label' => $label,
+					'url'   => $archive_link,
+				);
 			}
-			$breadcrumb_items[] = array(
-				'label' => $label,
-				'url'   => $archive_link,
-			);
 		}
-		// Build breadcrumb trail based on hierarchical structure or taxonomy terms.
-		if ( ! $show_terms ) {
-			$breadcrumb_items = array_merge( $breadcrumb_items, block_core_breadcrumbs_get_hierarchical_post_type_breadcrumbs( $post_id ) );
-		} else {
+
+		// Build breadcrumb trail based on selected style.
+		if ( $show_date ) {
+			$breadcrumb_items = array_merge( $breadcrumb_items, block_core_breadcrumbs_get_date_breadcrumbs( $post_id ) );
+		} elseif ( $show_terms ) {
 			$breadcrumb_items = array_merge( $breadcrumb_items, block_core_breadcrumbs_get_terms_breadcrumbs( $post_id, $post_type ) );
+		} else {
+			$breadcrumb_items = array_merge( $breadcrumb_items, block_core_breadcrumbs_get_hierarchical_post_type_breadcrumbs( $post_id ) );
 		}
 
 		// Add post title: linked when viewing a paginated page, plain text otherwise.
@@ -312,6 +335,54 @@ function block_core_breadcrumbs_get_hierarchical_post_type_breadcrumbs( $post_id
 			'allow_html' => true,
 		);
 	}
+	return $breadcrumb_items;
+}
+
+/**
+ * Generates breadcrumb items for date-based permalinks.
+ *
+ * Creates year/month/day breadcrumb trail based on the post's publish date.
+ *
+ * @since 7.0.0
+ *
+ * @param int $post_id The post ID.
+ *
+ * @return array Array of breadcrumb item data.
+ */
+function block_core_breadcrumbs_get_date_breadcrumbs( $post_id ) {
+	$post             = get_post( $post_id );
+	$breadcrumb_items = array();
+
+	if ( ! $post ) {
+		return $breadcrumb_items;
+	}
+
+	// Get the post's publish date components.
+	$year       = get_the_date( 'Y', $post );
+	$month      = get_the_date( 'm', $post );
+	$month_name = get_the_date( 'F', $post );
+	$day        = get_the_date( 'd', $post );
+	$monthnum   = (int) $month;
+	$daynum     = (int) $day;
+
+	// Add year archive link.
+	$breadcrumb_items[] = array(
+		'label' => $year,
+		'url'   => get_year_link( (int) $year ),
+	);
+
+	// Add month archive link with localized month name.
+	$breadcrumb_items[] = array(
+		'label' => $month_name,
+		'url'   => get_month_link( (int) $year, $monthnum ),
+	);
+
+	// Add day archive link.
+	$breadcrumb_items[] = array(
+		'label' => $day,
+		'url'   => get_day_link( (int) $year, $monthnum, $daynum ),
+	);
+
 	return $breadcrumb_items;
 }
 

@@ -6,7 +6,7 @@ import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
 import {
 	ToggleControl,
 	TextControl,
-	CheckboxControl,
+	SelectControl,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	Spinner,
@@ -25,6 +25,11 @@ import HtmlRenderer from '../utils/html-renderer';
 
 const separatorDefaultValue = '/';
 
+const BREADCRUMB_STYLE_OPTIONS = [
+	{ label: __( 'Default' ), value: 'default' },
+	{ label: __( 'Date' ), value: 'date' },
+];
+
 export default function BreadcrumbEdit( {
 	attributes,
 	setAttributes,
@@ -35,62 +40,62 @@ export default function BreadcrumbEdit( {
 		separator,
 		showHomeItem,
 		showCurrentItem,
-		prefersTaxonomy,
+		breadcrumbStyle,
 		showOnHomePage,
 	} = attributes;
-	const {
-		post,
-		isPostTypeHierarchical,
-		postTypeHasTaxonomies,
-		hasTermsAssigned,
-		isLoading,
-	} = useSelect(
-		( select ) => {
-			if ( ! postType ) {
-				return {};
-			}
-			const _post = select( coreStore ).getEntityRecord(
-				'postType',
-				postType,
-				postId
-			);
-			const postTypeObject = select( coreStore ).getPostType( postType );
-			const _postTypeHasTaxonomies =
-				postTypeObject && postTypeObject.taxonomies.length;
-			let taxonomies;
-			if ( _postTypeHasTaxonomies ) {
-				taxonomies = select( coreStore ).getTaxonomies( {
-					type: postType,
-					per_page: -1,
-				} );
-			}
-			return {
-				post: _post,
-				isPostTypeHierarchical: postTypeObject?.hierarchical,
-				postTypeHasTaxonomies: _postTypeHasTaxonomies,
-				hasTermsAssigned:
-					_post &&
-					( taxonomies || [] )
-						.filter(
-							( { visibility } ) => visibility?.publicly_queryable
-						)
-						.some( ( taxonomy ) => {
-							return !! _post[ taxonomy.rest_base ]?.length;
-						} ),
-				isLoading:
-					( postId && ! _post ) ||
-					! postTypeObject ||
-					( _postTypeHasTaxonomies && ! taxonomies ),
-			};
-		},
-		[ postType, postId ]
-	);
+	// Handle backward compatibility for the old prefersTaxonomy attribute.
+	const effectiveBreadcrumbStyle =
+		breadcrumbStyle ||
+		( attributes.prefersTaxonomy ? 'default' : 'default' );
+	const { post, isPostTypeHierarchical, hasTermsAssigned, isLoading } =
+		useSelect(
+			( select ) => {
+				if ( ! postType ) {
+					return {};
+				}
+				const _post = select( coreStore ).getEntityRecord(
+					'postType',
+					postType,
+					postId
+				);
+				const postTypeObject =
+					select( coreStore ).getPostType( postType );
+				const _postTypeHasTaxonomies =
+					postTypeObject && postTypeObject.taxonomies.length;
+				let taxonomies;
+				if ( _postTypeHasTaxonomies ) {
+					taxonomies = select( coreStore ).getTaxonomies( {
+						type: postType,
+						per_page: -1,
+					} );
+				}
+				return {
+					post: _post,
+					isPostTypeHierarchical: postTypeObject?.hierarchical,
+					hasTermsAssigned:
+						_post &&
+						( taxonomies || [] )
+							.filter(
+								( { visibility } ) =>
+									visibility?.publicly_queryable
+							)
+							.some( ( taxonomy ) => {
+								return !! _post[ taxonomy.rest_base ]?.length;
+							} ),
+					isLoading:
+						( postId && ! _post ) ||
+						! postTypeObject ||
+						( _postTypeHasTaxonomies && ! taxonomies ),
+				};
+			},
+			[ postType, postId ]
+		);
 
 	/**
 	 * Counter used to cache-bust `useServerSideRender`.
 	 *
 	 * This is a catch-all signal to re-render the block when a post's title,
-	 * parent ID, or terms change.
+	 * parent ID, terms, or breadcrumb style change.
 	 *
 	 * This is fundamentally imperfect, because there are other entities which
 	 * could change in the meantime (the titles of ancestor posts, or the
@@ -100,7 +105,7 @@ export default function BreadcrumbEdit( {
 	const [ invalidationKey, setInvalidationKey ] = useState( 0 );
 	useEffect( () => {
 		setInvalidationKey( ( c ) => c + 1 );
-	}, [ post ] );
+	}, [ post, effectiveBreadcrumbStyle ] );
 
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 	const { content, status, error } = useServerSideRender( {
@@ -110,11 +115,18 @@ export default function BreadcrumbEdit( {
 		urlQueryArgs: { post_id: postId, invalidationKey },
 	} );
 	const prevContentRef = useRef( '' );
+	const prevBreadcrumbStyleRef = useRef( effectiveBreadcrumbStyle );
 	useEffect( () => {
+		// Clear cached content when breadcrumb style changes to prevent
+		// showing stale content from a different style during the transition.
+		if ( prevBreadcrumbStyleRef.current !== effectiveBreadcrumbStyle ) {
+			prevBreadcrumbStyleRef.current = effectiveBreadcrumbStyle;
+			prevContentRef.current = '';
+		}
 		if ( status === 'success' ) {
 			prevContentRef.current = content;
 		}
-	}, [ content, status ] );
+	}, [ content, status, effectiveBreadcrumbStyle ] );
 	const [ showLoader, setShowLoader ] = useState( false );
 	useEffect( () => {
 		if ( status !== 'loading' ) {
@@ -140,18 +152,15 @@ export default function BreadcrumbEdit( {
 	}
 
 	// Try to determine breadcrumb type for more accurate previews.
-	let _showTerms;
+	let _breadcrumbStyle = effectiveBreadcrumbStyle;
 	// Some non-hierarchical post types (e.g., attachments) can have parents.
-	// Use hierarchical breadcrumbs if a parent exists, otherwise use taxonomy breadcrumbs.
-	if ( ! isPostTypeHierarchical && ! post?.parent ) {
-		_showTerms = true;
-	} else if ( ! postTypeHasTaxonomies ) {
-		// Hierarchical post type without taxonomies can only use ancestors.
-		_showTerms = false;
-	} else {
-		// For hierarchical post types with taxonomies, use the attribute.
-		_showTerms = prefersTaxonomy;
+	// For 'default' style, determine if we should show taxonomy or hierarchy.
+	if ( effectiveBreadcrumbStyle === 'default' ) {
+		if ( ! isPostTypeHierarchical && ! post?.parent ) {
+			_breadcrumbStyle = 'taxonomy';
+		}
 	}
+
 	let placeholder = null;
 	// This is fragile because this block is server side rendered and we'll have to
 	// update the placeholder html if the server side rendering output changes.
@@ -162,8 +171,11 @@ export default function BreadcrumbEdit( {
 		// This is needed because when we are showing the template in post editor we
 		// want to show the real breadcrumbs if we have the post type.
 		( templateSlug && ! postType ) ||
-		( ! _showTerms && ! isPostTypeHierarchical ) ||
-		( _showTerms && ! hasTermsAssigned );
+		( _breadcrumbStyle === 'default' &&
+			! isPostTypeHierarchical &&
+			! post?.parent &&
+			! hasTermsAssigned ) ||
+		( _breadcrumbStyle === 'taxonomy' && ! hasTermsAssigned );
 	if ( showPlaceholder ) {
 		const placeholderItems = [];
 		if ( showHomeItem ) {
@@ -171,7 +183,7 @@ export default function BreadcrumbEdit( {
 		}
 		if ( templateSlug && ! postId ) {
 			placeholderItems.push( __( 'Page' ) );
-		} else if ( _showTerms ) {
+		} else if ( _breadcrumbStyle === 'taxonomy' ) {
 			placeholderItems.push( __( 'Category' ) );
 		} else {
 			placeholderItems.push( __( 'Ancestor' ), __( 'Parent' ) );
@@ -280,27 +292,40 @@ export default function BreadcrumbEdit( {
 							} }
 						/>
 					</ToolsPanelItem>
+					<ToolsPanelItem
+						label={ __( 'Breadcrumb style' ) }
+						isShownByDefault
+						hasValue={ () =>
+							breadcrumbStyle && breadcrumbStyle !== 'default'
+						}
+						onDeselect={ () =>
+							setAttributes( { breadcrumbStyle: 'default' } )
+						}
+					>
+						<SelectControl
+							__next40pxDefaultSize
+							label={ __( 'Breadcrumb style' ) }
+							options={ BREADCRUMB_STYLE_OPTIONS }
+							value={ effectiveBreadcrumbStyle }
+							onChange={ ( value ) =>
+								setAttributes( { breadcrumbStyle: value } )
+							}
+							help={ __(
+								'Choose how to display the breadcrumb trail for single posts. "Default" shows post hierarchy for hierarchical post types, taxonomy terms for non-hierarchical post types. "Date" shows the publish date path (Year > Month > Day).'
+							) }
+						/>
+					</ToolsPanelItem>
 				</ToolsPanel>
 			</InspectorControls>
 			<InspectorControls group="advanced">
-				<CheckboxControl
+				<ToggleControl
 					label={ __( 'Show on homepage' ) }
 					checked={ showOnHomePage }
 					onChange={ ( value ) =>
 						setAttributes( { showOnHomePage: value } )
 					}
 					help={ __(
-						'If this breadcrumbs block appears in a template or template part that’s shown on the homepage, enable this option to display the breadcrumb trail. Otherwise, this setting has no effect.'
-					) }
-				/>
-				<CheckboxControl
-					label={ __( 'Prefer taxonomy terms' ) }
-					checked={ prefersTaxonomy }
-					onChange={ ( value ) =>
-						setAttributes( { prefersTaxonomy: value } )
-					}
-					help={ __(
-						'The exact type of breadcrumbs shown will vary automatically depending on the page in which this block is displayed. In the specific case of a hierarchical post type with taxonomies, the breadcrumbs can either reflect its post hierarchy (default) or the hierarchy of its assigned taxonomy terms.'
+						"If this breadcrumbs block appears in a template or template part that's shown on the homepage, enable this option to display the breadcrumb trail. Otherwise, this setting has no effect."
 					) }
 				/>
 			</InspectorControls>
