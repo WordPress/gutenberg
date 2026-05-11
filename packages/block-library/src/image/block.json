@@ -107,7 +107,8 @@
 			"attribute": "target"
 		},
 		"isDecorative": {
-			"type": "boolean"
+			"type": "boolean",
+			"default": false
 		}
 	},
 	"supports": {

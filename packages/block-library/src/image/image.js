@@ -614,7 +614,7 @@ export default function Image( {
 
 	function updateIsDecorative( value ) {
 		if ( ! value ) {
-			setAttributes( { isDecorative: undefined } );
+			setAttributes( { isDecorative: false } );
 			return;
 		}
 		const hasDataToLose = alt || ! RichText.isEmpty( caption ) || href;
@@ -979,7 +979,7 @@ export default function Image( {
 						label={ __( 'Media' ) }
 						resetAll={ () => {
 							onSelectImage( undefined );
-							setAttributes( { isDecorative: undefined } );
+							setAttributes( { isDecorative: false } );
 						} }
 						dropdownMenuProps={ dropdownMenuProps }
 					>
@@ -1036,7 +1036,7 @@ export default function Image( {
 								isShownByDefault
 								hasValue={ () => !! isDecorative }
 								onDeselect={ () =>
-									setAttributes( { isDecorative: undefined } )
+									setAttributes( { isDecorative: false } )
 								}
 							>
 								<ToggleControl
