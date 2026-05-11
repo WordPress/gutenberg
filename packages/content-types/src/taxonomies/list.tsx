@@ -15,6 +15,7 @@ import activateAction from './actions/activate';
 import deactivateAction from './actions/deactivate';
 import deleteTaxonomyAction from './actions/delete';
 import duplicateTaxonomyAction from './actions/duplicate';
+import viewTermsAction from './actions/view-terms';
 import {
 	hierarchicalField,
 	publicField,
@@ -50,6 +51,7 @@ export function TaxonomiesList() {
 			editAction,
 			quickEditTaxonomyAction,
 			duplicateTaxonomyAction,
+			viewTermsAction,
 			activateAction,
 			deactivateAction,
 			deleteTaxonomyAction,

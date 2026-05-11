@@ -1704,6 +1704,11 @@
 			"count": 1
 		}
 	},
+	"routes/media-editor/stage.tsx": {
+		"@wordpress/no-non-module-stylesheet-imports": {
+			"count": 1
+		}
+	},
 	"routes/navigation-edit/editor/index.tsx": {
 		"@wordpress/no-non-module-stylesheet-imports": {
 			"count": 1

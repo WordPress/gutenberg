@@ -31,6 +31,7 @@
 				],
 				"experimental": true
 			},
+			"media-editor",
 			"font-library",
 			"options-connectors",
 			"guidelines",
