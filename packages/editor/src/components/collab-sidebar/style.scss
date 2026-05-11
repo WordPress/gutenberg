@@ -291,43 +291,6 @@ mark.wp-note {
 	}
 }
 
-// Mirror the smiley trigger but render the plus icon with a filled
-// path. The shared add-reaction-button rule sets `fill: none` on its
-// SVG (the smiley uses path-level `fill="currentColor"` which beats
-// it); the plus icon's single path has no attribute and was hidden.
-.editor-collab-sidebar-panel__more-reaction-button {
-	display: inline-flex;
-	margin: 0;
-	align-items: center;
-	justify-content: center;
-	width: 28px;
-	height: 28px !important;
-	min-width: 28px !important;
-	padding: 0;
-	border-radius: $radius-round;
-	border: $border-width solid $gray-300;
-	background-color: $white;
-	cursor: var(--wpds-cursor-control);
-
-	&:hover {
-		background-color: $gray-100;
-	}
-
-	&:focus {
-		outline:
-			var(--wp-admin-border-width-focus) solid
-			var(--wp-admin-theme-color);
-		outline-offset: calc(-1 * var(--wp-admin-border-width-focus));
-	}
-
-	svg {
-		fill: currentColor;
-		color: $gray-700;
-		width: 20px;
-		height: 20px;
-	}
-}
-
 // Curated picker uses Dropdown's default `.components-popover__content`
 // padding (8px) for breathing room around the listbox; no extra rule
 // needed.
