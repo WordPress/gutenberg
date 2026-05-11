@@ -69,7 +69,7 @@ describe( 'handler', () => {
 		const button = fakeDetail( 'Button' );
 		mockGetComponentDetail
 			.mockResolvedValueOnce( button )
-			.mockResolvedValueOnce( undefined );
+			.mockResolvedValueOnce( null );
 
 		const result = await handler( { name: [ 'Button', 'Nope' ] } );
 
@@ -89,8 +89,8 @@ describe( 'handler', () => {
 		const button = fakeDetail( 'Button' );
 		mockGetComponentDetail
 			.mockResolvedValueOnce( button )
-			.mockResolvedValueOnce( undefined )
-			.mockResolvedValueOnce( undefined );
+			.mockResolvedValueOnce( null )
+			.mockResolvedValueOnce( null );
 
 		const result = await handler( {
 			name: [ 'Button', 'Nope', 'AlsoNope' ],
@@ -109,7 +109,7 @@ describe( 'handler', () => {
 	} );
 
 	it( 'returns isError when no components are found', async () => {
-		mockGetComponentDetail.mockResolvedValue( undefined );
+		mockGetComponentDetail.mockResolvedValue( null );
 
 		const result = await handler( { name: [ 'Foo', 'Bar' ] } );
 
