@@ -39,6 +39,7 @@ interface WidgetModuleRecord {
 	name: string;
 	render_module?: string | null;
 	widget_module?: string | null;
+	presentation?: 'framed' | 'full-bleed' | null;
 }
 
 /**
@@ -92,6 +93,9 @@ export function useWidgetTypes(): WidgetType[] {
 						...( module.default as Partial< WidgetType > ),
 						name: record.name as WidgetName,
 						renderModule: record.render_module ?? '',
+						...( record.presentation
+							? { presentation: record.presentation }
+							: {} ),
 					} as WidgetType;
 				} catch {
 					return null;
