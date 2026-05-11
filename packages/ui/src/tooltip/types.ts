@@ -5,6 +5,10 @@ import type { ComponentProps } from '../utils/types';
 
 export type PortalProps = ComponentPropsWithoutRef< typeof _Tooltip.Portal >;
 
+export type PositionerProps = ComponentPropsWithoutRef<
+	typeof _Tooltip.Positioner
+>;
+
 export type RootProps = Pick< _Tooltip.Root.Props, 'disabled' | 'children' >;
 
 export type ProviderProps = Pick<
