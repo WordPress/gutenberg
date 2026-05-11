@@ -19,6 +19,7 @@ import viewTermsAction from './actions/view-terms';
 import {
 	hierarchicalField,
 	publicField,
+	termCountField,
 	useObjectTypeField,
 	useSlugField,
 } from './fields';
@@ -37,7 +38,7 @@ const DEFAULT_VIEW: View = {
 	type: 'table',
 	perPage: 20,
 	page: 1,
-	fields: [ 'object_type', 'status', 'public' ],
+	fields: [ 'object_type', 'term_count', 'status' ],
 	titleField: 'title',
 	layout: {},
 };
@@ -65,6 +66,7 @@ export function TaxonomiesList() {
 			[
 				titleField,
 				objectTypeField,
+				termCountField,
 				statusField,
 				publicField,
 				slugField,

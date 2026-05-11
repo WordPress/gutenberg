@@ -19,6 +19,7 @@ import viewPostsAction from './actions/view-posts';
 import {
 	hasArchiveField,
 	hierarchicalField,
+	postCountField,
 	publicField,
 	supportsField,
 	useSlugField,
@@ -39,7 +40,7 @@ const DEFAULT_VIEW: View = {
 	type: 'table',
 	perPage: 20,
 	page: 1,
-	fields: [ 'taxonomies', 'status', 'public', 'hierarchical' ],
+	fields: [ 'taxonomies', 'post_count', 'status' ],
 	titleField: 'title',
 	layout: {},
 };
@@ -67,6 +68,7 @@ export function PostTypesList() {
 			[
 				titleField,
 				taxonomiesField,
+				postCountField,
 				statusField,
 				publicField,
 				slugField,

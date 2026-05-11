@@ -177,6 +177,13 @@ class WP_REST_User_Post_Types_Controller_Gutenberg extends WP_REST_Posts_Control
 			)
 		);
 
+		$schema['properties']['post_count'] = array(
+			'description' => __( 'Number of posts in this post type.', 'gutenberg' ),
+			'type'        => 'integer',
+			'context'     => array( 'view', 'edit' ),
+			'readonly'    => true,
+		);
+
 		$this->schema = $schema;
 		return $this->add_additional_fields_schema( $this->schema );
 	}
@@ -229,6 +236,17 @@ class WP_REST_User_Post_Types_Controller_Gutenberg extends WP_REST_Posts_Control
 			// `type: 'object'`. PHP encodes empty associative arrays as `[]`
 			// in JSON, so cast empties to stdClass.
 			$data['config'] = empty( $config ) ? new stdClass() : $config;
+		}
+
+		if ( rest_is_field_included( 'post_count', $fields ) && 'publish' === $item->post_status ) {
+			// Drafts aren't registered, so the count is undefined — omit the
+			// field rather than report a value the server can't vouch for.
+			$counts = wp_count_posts( $item->post_name );
+			$total  = 0;
+			foreach ( array( 'publish', 'future', 'draft', 'pending', 'private' ) as $status ) {
+				$total += isset( $counts->$status ) ? (int) $counts->$status : 0;
+			}
+			$data['post_count'] = $total;
 		}
 
 		$response->set_data( $data );

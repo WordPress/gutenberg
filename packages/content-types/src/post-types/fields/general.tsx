@@ -6,8 +6,9 @@ import { resolveSelect, useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import type { Field, Form } from '@wordpress/dataviews';
+import { addQueryArgs } from '@wordpress/url';
 // eslint-disable-next-line @wordpress/use-recommended-components -- Used here because it supports rendering as a `span` via the `render` prop to avoid invalid HTML.
-import { Notice, Stack } from '@wordpress/ui';
+import { Link, Notice, Stack } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -76,6 +77,30 @@ export const showInRestField = createBooleanField(
 		),
 	}
 );
+
+export const postCountField: Field< PostTypeFormData > = {
+	id: 'post_count',
+	label: __( 'Posts' ),
+	type: 'integer',
+	readOnly: true,
+	render: ( { item } ) => {
+		const count = item.post_count;
+		if ( item.status !== 'publish' || ! count ) {
+			return <span aria-hidden="true">—</span>;
+		}
+		return (
+			<Link
+				href={ addQueryArgs( 'edit.php', {
+					post_type: item.slug,
+				} ) }
+			>
+				{ count }
+			</Link>
+		);
+	},
+	enableSorting: false,
+	filterBy: false,
+};
 
 export const supportsField: Field< PostTypeFormData > = {
 	id: 'supports',
