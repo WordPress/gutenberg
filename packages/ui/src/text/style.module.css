@@ -9,9 +9,7 @@
 	   provides values for both element-specific CSS defenses. */
 	.heading-2xl {
 		--_gcd-heading-font-size: var(--wpds-typography-font-size-2xl);
-		--_gcd-heading-font-weight: var(
-			--wpds-typography-font-weight-medium
-		);
+		--_gcd-heading-font-weight: var(--wpds-typography-font-weight-medium);
 		--_gcd-p-font-size: var(--wpds-typography-font-size-2xl);
 		--_gcd-p-line-height: var(--wpds-typography-line-height-2xl);
 
@@ -23,9 +21,7 @@
 
 	.heading-xl {
 		--_gcd-heading-font-size: var(--wpds-typography-font-size-xl);
-		--_gcd-heading-font-weight: var(
-			--wpds-typography-font-weight-medium
-		);
+		--_gcd-heading-font-weight: var(--wpds-typography-font-weight-medium);
 		--_gcd-p-font-size: var(--wpds-typography-font-size-xl);
 		--_gcd-p-line-height: var(--wpds-typography-line-height-md);
 
@@ -37,9 +33,7 @@
 
 	.heading-lg {
 		--_gcd-heading-font-size: var(--wpds-typography-font-size-lg);
-		--_gcd-heading-font-weight: var(
-			--wpds-typography-font-weight-medium
-		);
+		--_gcd-heading-font-weight: var(--wpds-typography-font-weight-medium);
 		--_gcd-p-font-size: var(--wpds-typography-font-size-lg);
 		--_gcd-p-line-height: var(--wpds-typography-line-height-sm);
 
@@ -51,9 +45,7 @@
 
 	.heading-md {
 		--_gcd-heading-font-size: var(--wpds-typography-font-size-md);
-		--_gcd-heading-font-weight: var(
-			--wpds-typography-font-weight-medium
-		);
+		--_gcd-heading-font-weight: var(--wpds-typography-font-weight-medium);
 		--_gcd-p-font-size: var(--wpds-typography-font-size-md);
 		--_gcd-p-line-height: var(--wpds-typography-line-height-sm);
 
@@ -65,9 +57,7 @@
 
 	.heading-sm {
 		--_gcd-heading-font-size: var(--wpds-typography-font-size-xs);
-		--_gcd-heading-font-weight: var(
-			--wpds-typography-font-weight-medium
-		);
+		--_gcd-heading-font-weight: var(--wpds-typography-font-weight-medium);
 		--_gcd-p-font-size: var(--wpds-typography-font-size-xs);
 		--_gcd-p-line-height: var(--wpds-typography-line-height-xs);
 
@@ -80,9 +70,7 @@
 
 	.body-xl {
 		--_gcd-heading-font-size: var(--wpds-typography-font-size-xl);
-		--_gcd-heading-font-weight: var(
-			--wpds-typography-font-weight-regular
-		);
+		--_gcd-heading-font-weight: var(--wpds-typography-font-weight-regular);
 		--_gcd-p-font-size: var(--wpds-typography-font-size-xl);
 		--_gcd-p-line-height: var(--wpds-typography-line-height-xl);
 
@@ -94,9 +82,7 @@
 
 	.body-lg {
 		--_gcd-heading-font-size: var(--wpds-typography-font-size-lg);
-		--_gcd-heading-font-weight: var(
-			--wpds-typography-font-weight-regular
-		);
+		--_gcd-heading-font-weight: var(--wpds-typography-font-weight-regular);
 		--_gcd-p-font-size: var(--wpds-typography-font-size-lg);
 		--_gcd-p-line-height: var(--wpds-typography-line-height-md);
 
@@ -108,9 +94,7 @@
 
 	.body-md {
 		--_gcd-heading-font-size: var(--wpds-typography-font-size-md);
-		--_gcd-heading-font-weight: var(
-			--wpds-typography-font-weight-regular
-		);
+		--_gcd-heading-font-weight: var(--wpds-typography-font-weight-regular);
 		--_gcd-p-font-size: var(--wpds-typography-font-size-md);
 		--_gcd-p-line-height: var(--wpds-typography-line-height-sm);
 
@@ -122,9 +106,7 @@
 
 	.body-sm {
 		--_gcd-heading-font-size: var(--wpds-typography-font-size-sm);
-		--_gcd-heading-font-weight: var(
-			--wpds-typography-font-weight-regular
-		);
+		--_gcd-heading-font-weight: var(--wpds-typography-font-weight-regular);
 		--_gcd-p-font-size: var(--wpds-typography-font-size-sm);
 		--_gcd-p-line-height: var(--wpds-typography-line-height-xs);
 
