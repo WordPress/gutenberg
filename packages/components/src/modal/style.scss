@@ -22,7 +22,7 @@
 		// Note: it's important that the fade-out animation doesn't end after the
 		// modal frame's disappear animation, because the component will be removed
 		// from the DOM when that animation ends.
-		@include animation__fade-out($speed: var(--wpds-motion-duration-sm), $delay: var(--wpds-motion-duration-sm), $easing: var(--wpds-motion-easing-subtle));
+		@include animation__fade-out($speed: var(--wpds-motion-duration-sm), $delay: var(--wpds-motion-duration-xs), $easing: var(--wpds-motion-easing-subtle));
 	}
 }
 
