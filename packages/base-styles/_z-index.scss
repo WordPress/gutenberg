@@ -23,8 +23,9 @@ $z-layers: (
 	".has-child .wp-block-navigation__submenu-container": 28,
 	".has-child:hover .wp-block-navigation__submenu-container": 29,
 
-	// The draggable element should show up above the entire UI
-	".components-draggable__clone": 1000000000,
+	// The draggable element should show up above the entire UI, including
+	// the `@wordpress/ui` compat overlay slot at `1000000003`.
+	".components-draggable__clone": 1000000004,
 
 	// Show drop zone above most standard content, but below any overlays
 	".components-drop-zone": 40,

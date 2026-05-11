@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Bump `.components-draggable__clone` z-index from `1000000000` to `1000000004` so an active drag stays above the `@wordpress/ui` compat overlay slot (`1000000003`) introduced in [#77851](https://github.com/WordPress/gutenberg/pull/77851).
+
 ### Breaking Changes
 
 -   Remove the following entries from the `z-index()` helper ([#77753](https://github.com/WordPress/gutenberg/pull/77753), [#77759](https://github.com/WordPress/gutenberg/pull/77759), [#77772](https://github.com/WordPress/gutenberg/pull/77772), [#77806](https://github.com/WordPress/gutenberg/pull/77806), [#77807](https://github.com/WordPress/gutenberg/pull/77807), [#77808](https://github.com/WordPress/gutenberg/pull/77808)):
