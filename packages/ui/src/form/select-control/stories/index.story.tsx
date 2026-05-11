@@ -123,7 +123,7 @@ export const WithDisabledOption: Story = {
 	},
 };
 
-const userOptions = [
+const userOptions: React.ComponentProps< typeof SelectControl >[ 'items' ] = [
 	{
 		value: '1',
 		label: 'User 1 (Admin)',
@@ -138,9 +138,7 @@ const userOptions = [
 	},
 ];
 
-type UserOption = ( typeof userOptions )[ number ];
-
-const User = ( { user }: { user: UserOption } ) => (
+const User = ( { user }: { user: ( typeof userOptions )[ number ] } ) => (
 	<span
 		style={ {
 			display: 'flex',
@@ -149,7 +147,9 @@ const User = ( { user }: { user: UserOption } ) => (
 		} }
 	>
 		<img
-			src={ `https://gravatar.com/avatar/?d=initials&name=${ user.value }` }
+			src={ `https://gravatar.com/avatar/?d=initials&name=${
+				user.value ?? 'null'
+			}` }
 			alt=""
 			width="20"
 			style={ {
