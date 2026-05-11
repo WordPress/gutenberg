@@ -1,10 +1,20 @@
-/**
- * External dependencies
- */
-// eslint-disable-next-line @typescript-eslint/no-restricted-imports
-import React from 'react';
+interface Token {
+	name: string;
+	valueShow: string;
+	valueCode: string;
+}
 
-export const TokensTable = ( { tokenCategory, tokens, applyTokenStyle } ) => {
+interface TokensTableProps {
+	tokenCategory: string;
+	tokens: Token[];
+	applyTokenStyle: ( valueCode: string ) => React.CSSProperties;
+}
+
+export const TokensTable = ( {
+	tokenCategory,
+	tokens,
+	applyTokenStyle,
+}: TokensTableProps ) => {
 	return (
 		<table style={ { width: '100%' } }>
 			<thead>

@@ -11,7 +11,7 @@ import CommentsLegacy from './comments-legacy';
 import TEMPLATE from './template';
 
 export default function CommentsEdit( props ) {
-	const { attributes, setAttributes } = props;
+	const { attributes, setAttributes, clientId } = props;
 	const { tagName: TagName, legacy } = attributes;
 
 	const blockProps = useBlockProps();
@@ -28,6 +28,7 @@ export default function CommentsEdit( props ) {
 			<CommentsInspectorControls
 				attributes={ attributes }
 				setAttributes={ setAttributes }
+				clientId={ clientId }
 			/>
 			<TagName { ...innerBlocksProps } />
 		</>

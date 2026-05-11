@@ -1,13 +1,7 @@
 /**
- * External dependencies
- */
-import clsx from 'clsx';
-
-/**
  * WordPress dependencies
  */
 import {
-	AlignmentControl,
 	BlockControls,
 	useBlockProps,
 	InspectorControls,
@@ -16,32 +10,37 @@ import {
 } from '@wordpress/block-editor';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { useEntityProp } from '@wordpress/core-data';
-import { PanelBody, ToggleControl } from '@wordpress/components';
+import {
+	ToggleControl,
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
+} from '@wordpress/components';
 import { useState, useEffect } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 
-export default function Edit( {
-	attributes: {
-		textAlign,
+/**
+ * Internal dependencies
+ */
+import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+import useDeprecatedTextAlign from '../utils/deprecated-text-align-attributes';
+
+export default function Edit( props ) {
+	useDeprecatedTextAlign( props );
+	const { attributes, setAttributes, context } = props;
+	const {
 		showPostTitle,
 		showCommentsCount,
-		level,
+		level = 2,
 		levelOptions,
-	},
-	setAttributes,
-	context: { postType, postId },
-} ) {
+	} = attributes;
+	const { postId, postType } = context;
 	const TagName = 'h' + level;
 	const [ commentsCount, setCommentsCount ] = useState();
 	const [ rawTitle ] = useEntityProp( 'postType', postType, 'title', postId );
 	const isSiteEditor = typeof postId === 'undefined';
-	const blockProps = useBlockProps( {
-		className: clsx( {
-			[ `has-text-align-${ textAlign }` ]: textAlign,
-		} ),
-	} );
+	const blockProps = useBlockProps();
 
 	const {
 		threadCommentsDepth,
@@ -50,8 +49,10 @@ export default function Edit( {
 		pageComments,
 	} = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
-		return getSettings().__experimentalDiscussionSettings;
-	} );
+		return getSettings().__experimentalDiscussionSettings ?? {};
+	}, [] );
+
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	useEffect( () => {
 		if ( isSiteEditor ) {
@@ -93,12 +94,6 @@ export default function Edit( {
 
 	const blockControls = (
 		<BlockControls group="block">
-			<AlignmentControl
-				value={ textAlign }
-				onChange={ ( newAlign ) =>
-					setAttributes( { textAlign: newAlign } )
-				}
-			/>
 			<HeadingLevelDropdown
 				value={ level }
 				options={ levelOptions }
@@ -111,41 +106,69 @@ export default function Edit( {
 
 	const inspectorControls = (
 		<InspectorControls>
-			<PanelBody title={ __( 'Settings' ) }>
-				<ToggleControl
-					__nextHasNoMarginBottom
+			<ToolsPanel
+				label={ __( 'Settings' ) }
+				resetAll={ () => {
+					setAttributes( {
+						showPostTitle: true,
+						showCommentsCount: true,
+					} );
+				} }
+				dropdownMenuProps={ dropdownMenuProps }
+			>
+				<ToolsPanelItem
 					label={ __( 'Show post title' ) }
-					checked={ showPostTitle }
-					onChange={ ( value ) =>
-						setAttributes( { showPostTitle: value } )
+					isShownByDefault
+					hasValue={ () => ! showPostTitle }
+					onDeselect={ () =>
+						setAttributes( { showPostTitle: true } )
 					}
-				/>
-				<ToggleControl
-					__nextHasNoMarginBottom
+				>
+					<ToggleControl
+						label={ __( 'Show post title' ) }
+						checked={ showPostTitle }
+						onChange={ ( value ) =>
+							setAttributes( { showPostTitle: value } )
+						}
+					/>
+				</ToolsPanelItem>
+				<ToolsPanelItem
 					label={ __( 'Show comments count' ) }
-					checked={ showCommentsCount }
-					onChange={ ( value ) =>
-						setAttributes( { showCommentsCount: value } )
+					isShownByDefault
+					hasValue={ () => ! showCommentsCount }
+					onDeselect={ () =>
+						setAttributes( { showCommentsCount: true } )
 					}
-				/>
-			</PanelBody>
+				>
+					<ToggleControl
+						label={ __( 'Show comments count' ) }
+						checked={ showCommentsCount }
+						onChange={ ( value ) =>
+							setAttributes( { showCommentsCount: value } )
+						}
+					/>
+				</ToolsPanelItem>
+			</ToolsPanel>
 		</InspectorControls>
 	);
 
-	const postTitle = isSiteEditor ? __( '“Post Title”' ) : `"${ rawTitle }"`;
+	const postTitle = isSiteEditor ? __( 'Post Title' ) : rawTitle;
 
 	let placeholder;
 	if ( showCommentsCount && commentsCount !== undefined ) {
 		if ( showPostTitle ) {
 			if ( commentsCount === 1 ) {
-				/* translators: %s: Post title. */
-				placeholder = sprintf( __( 'One response to %s' ), postTitle );
+				placeholder = sprintf(
+					/* translators: %s: Post title. */
+					__( 'One response to "%s"' ),
+					postTitle
+				);
 			} else {
 				placeholder = sprintf(
 					/* translators: 1: Number of comments, 2: Post title. */
 					_n(
-						'%1$s response to %2$s',
-						'%1$s responses to %2$s',
+						'%1$s response to "%2$s"',
+						'%1$s responses to "%2$s"',
 						commentsCount
 					),
 					commentsCount,
@@ -164,10 +187,10 @@ export default function Edit( {
 	} else if ( showPostTitle ) {
 		if ( commentsCount === 1 ) {
 			/* translators: %s: Post title. */
-			placeholder = sprintf( __( 'Response to %s' ), postTitle );
+			placeholder = sprintf( __( 'Response to "%s"' ), postTitle );
 		} else {
 			/* translators: %s: Post title. */
-			placeholder = sprintf( __( 'Responses to %s' ), postTitle );
+			placeholder = sprintf( __( 'Responses to "%s"' ), postTitle );
 		}
 	} else if ( commentsCount === 1 ) {
 		placeholder = __( 'Response' );

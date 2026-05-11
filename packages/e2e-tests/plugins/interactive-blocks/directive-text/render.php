@@ -45,5 +45,14 @@
 			data-wp-text="state.boolean"
 			data-testid="show state boolean"
 		></span>
+
+		<span
+			data-wp-text--suffix="state.text"
+			data-testid="ignores suffixes"
+		></span>
+		<span
+			data-wp-text---unique-id="state.text"
+			data-testid="ignores unique-ids"
+		></span>
 	</div>
 </div>

@@ -1,28 +1,25 @@
 /**
  * WordPress dependencies
  */
-import {
-	Button,
-	__experimentalHStack as HStack,
-	SelectControl,
-} from '@wordpress/components';
+import { Button, SelectControl } from '@wordpress/components';
 import { createInterpolateElement, memo, useContext } from '@wordpress/element';
 import { sprintf, __, _x, isRTL } from '@wordpress/i18n';
 import { next, previous } from '@wordpress/icons';
+import { Stack } from '@wordpress/ui';
 
 /**
  * Internal dependencies
  */
 import DataViewsContext from '../dataviews-context';
 
-function DataViewsPagination() {
+export function DataViewsPagination() {
 	const {
 		view,
 		onChangeView,
 		paginationInfo: { totalItems = 0, totalPages },
 	} = useContext( DataViewsContext );
 
-	if ( ! totalItems || ! totalPages ) {
+	if ( ! totalItems || ! totalPages || view.infiniteScrollEnabled ) {
 		return null;
 	}
 
@@ -36,8 +33,8 @@ function DataViewsPagination() {
 				'aria-label':
 					currentPage === page
 						? sprintf(
-								// translators: Current page number in total number of pages
-								__( 'Page %1$s of %2$s' ),
+								// translators: 1: current page number. 2: total number of pages.
+								__( 'Page %1$d of %2$d' ),
 								currentPage,
 								totalPages
 						  )
@@ -49,23 +46,25 @@ function DataViewsPagination() {
 	return (
 		!! totalItems &&
 		totalPages !== 1 && (
-			<HStack
-				expanded={ false }
+			<Stack
+				direction="row"
 				className="dataviews-pagination"
 				justify="end"
-				spacing={ 6 }
+				align="center"
+				gap="xl"
 			>
-				<HStack
+				<Stack
+					direction="row"
 					justify="flex-start"
-					expanded={ false }
-					spacing={ 1 }
+					align="center"
+					gap="xs"
 					className="dataviews-pagination__page-select"
 				>
 					{ createInterpolateElement(
 						sprintf(
 							// translators: 1: Current page number, 2: Total number of pages.
 							_x(
-								'<div>Page</div>%1$s<div>of %2$s</div>',
+								'<div>Page</div>%1$s<div>of %2$d</div>',
 								'paging'
 							),
 							'<CurrentPage />',
@@ -73,6 +72,7 @@ function DataViewsPagination() {
 						),
 						{
 							div: <div aria-hidden />,
+							// @ts-expect-error — Tag injected via sprintf argument, not visible in format string.
 							CurrentPage: (
 								<SelectControl
 									aria-label={ __( 'Current page' ) }
@@ -85,14 +85,13 @@ function DataViewsPagination() {
 										} );
 									} }
 									size="small"
-									__nextHasNoMarginBottom
 									variant="minimal"
 								/>
 							),
 						}
 					) }
-				</HStack>
-				<HStack expanded={ false } spacing={ 1 }>
+				</Stack>
+				<Stack direction="row" gap="xs" align="center">
 					<Button
 						onClick={ () =>
 							onChangeView( {
@@ -120,8 +119,8 @@ function DataViewsPagination() {
 						size="compact"
 						tooltipPosition="top"
 					/>
-				</HStack>
-			</HStack>
+				</Stack>
+			</Stack>
 		)
 	);
 }

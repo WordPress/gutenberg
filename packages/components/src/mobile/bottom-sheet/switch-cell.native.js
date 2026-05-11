@@ -57,7 +57,7 @@ export default function BottomSheetSwitchCell( props ) {
 			accessibilityRole="none"
 			accessibilityHint={
 				/* translators: accessibility text (hint for switches) */
-				__( 'Double tap to toggle setting' )
+				__( 'Double tap to change setting' )
 			}
 			onPress={ onPress }
 			editable={ false }

@@ -1,5 +1,6 @@
+@use "@wordpress/base-styles/variables" as *;
+
 .editor-site-discussion-dropdown__content .components-popover__content {
 	min-width: 320px;
 	padding: $grid-unit-20;
 }
-

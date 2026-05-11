@@ -1,4 +1,4 @@
-/* eslint-disable playwright/no-conditional-in-test, playwright/expect-expect */
+/* eslint-disable playwright/expect-expect */
 
 /**
  * WordPress dependencies
@@ -62,12 +62,14 @@ test.describe( 'Site Editor Performance', () => {
 	test.describe( 'Loading', () => {
 		let draftId = null;
 
-		test( 'Setup the test page', async ( { admin, perfUtils } ) => {
-			await admin.createNewPost( { postType: 'page' } );
-			await perfUtils.setRenderingMode( 'post-only' );
-			await perfUtils.loadBlocksForLargePost();
+		test( 'Setup the test page', async ( { requestUtils, perfUtils } ) => {
+			const content = await perfUtils.loadContentForLargePost();
+			const page = await requestUtils.createPage( {
+				content,
+				status: 'draft',
+			} );
 
-			draftId = await perfUtils.saveDraft();
+			draftId = page.id;
 		} );
 
 		const samples = 10;
@@ -121,13 +123,15 @@ test.describe( 'Site Editor Performance', () => {
 	test.describe( 'Typing', () => {
 		let draftId = null;
 
-		test( 'Setup the test post', async ( { admin, editor, perfUtils } ) => {
-			await admin.createNewPost( { postType: 'page' } );
-			await perfUtils.setRenderingMode( 'post-only' );
-			await perfUtils.loadBlocksForLargePost();
-			await editor.insertBlock( { name: 'core/paragraph' } );
+		test( 'Setup the test post', async ( { requestUtils, perfUtils } ) => {
+			const content = await perfUtils.loadContentForLargePost();
+			const page = await requestUtils.createPage( {
+				content:
+					content + `<!-- wp:paragraph --><!-- /wp:paragraph -->`,
+				status: 'draft',
+			} );
 
-			draftId = await perfUtils.saveDraft();
+			draftId = page.id;
 		} );
 
 		test( 'Run the test', async ( { admin, perfUtils, metrics, page } ) => {
@@ -155,10 +159,6 @@ test.describe( 'Site Editor Performance', () => {
 			if ( ! isClosed ) {
 				await toggleSidebarButton.click();
 			}
-
-			await canvas
-				.getByRole( 'document', { name: /Block:( Post)? Content/ } )
-				.click();
 
 			const paragraph = canvas.getByRole( 'document', {
 				name: /Empty block/i,
@@ -238,7 +238,10 @@ test.describe( 'Site Editor Performance', () => {
 
 				await metrics.startTracing();
 				await page
-					.getByText( 'Single Posts', { exact: true } )
+					.getByRole( 'button', {
+						name: 'Single Posts',
+						exact: true,
+					} )
 					.click( { force: true } );
 				await metrics.stopTracing();
 
@@ -289,11 +292,7 @@ test.describe( 'Site Editor Performance', () => {
 			for ( let i = 1; i <= samples; i++ ) {
 				// We want to start from a fresh state each time, without
 				// queries or patterns already cached.
-				await admin.visitSiteEditor( {
-					postId: 'twentytwentyfour//home',
-					postType: 'wp_template',
-					canvas: 'edit',
-				} );
+				await admin.visitSiteEditor( { canvas: 'edit' } );
 				await editor.openDocumentSettingsSidebar();
 
 				/*
@@ -307,7 +306,6 @@ test.describe( 'Site Editor Performance', () => {
 				 * If there is a Replace template button (old UI), click it, otherwise, click the "transform into" button.
 				 * Once the performance tests are updated to compare compatible versions this code can be removed.
 				 */
-				// eslint-disable-next-line no-restricted-syntax
 				const isActionsButtonVisible = await page
 					.locator(
 						'.edit-site-template-card__actions button[aria-label="Actions"]'
@@ -455,4 +453,4 @@ test.describe( 'Site Editor Performance', () => {
 	} );
 } );
 
-/* eslint-enable playwright/no-conditional-in-test, playwright/expect-expect */
+/* eslint-enable playwright/expect-expect */

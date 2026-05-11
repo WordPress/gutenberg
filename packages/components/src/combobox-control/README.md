@@ -35,10 +35,10 @@ function MyComboboxControl() {
 	return (
 		<ComboboxControl
 			__next40pxDefaultSize
-			__nextHasNoMarginBottom
 			label="Font Size"
 			value={ fontSize }
 			onChange={ setFontSize }
+			isLoading={ isLoading }
 			options={ filteredOptions }
 			onFilterValueChange={ ( inputValue ) =>
 				setFilteredOptions(
@@ -112,11 +112,18 @@ If the control is clicked, the dropdown will expand regardless of this prop.
 -   Required: No
 -   Default: `true`
 
-### placeholder
+#### placeholder
 
 If passed, the combobox input will show a placeholder string if no values are present.
 
 -   Type: `string`
+-   Required: No
+
+#### isLoading
+
+Show a spinner (and hide the suggestions dropdown) while data about the matching suggestions (ie the `options` prop) is loading
+
+-   Type: `Boolean`
 -   Required: No
 
 #### __experimentalRenderItem
@@ -133,14 +140,6 @@ Start opting into the larger default height that will become the default size in
 - Type: `Boolean`
 - Required: No
 - Default: `false`
-
-#### __nextHasNoMarginBottom
-
-Start opting into the new margin-free styles that will become the default in a future version.
-
--   Type: `Boolean`
--   Required: No
--   Default: `false`
 
 ## Related components
 

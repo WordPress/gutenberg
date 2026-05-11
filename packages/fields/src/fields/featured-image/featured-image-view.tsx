@@ -1,27 +1,18 @@
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
-import { store as coreStore } from '@wordpress/core-data';
 import type { DataViewRenderFieldProps } from '@wordpress/dataviews';
 
 /**
  * Internal dependencies
  */
-import type { BasePost } from '../../types';
+import type { BasePostWithEmbeddedFeaturedMedia } from '../../types';
 
 export const FeaturedImageView = ( {
 	item,
-}: DataViewRenderFieldProps< BasePost > ) => {
-	const mediaId = item.featured_media;
-
-	const media = useSelect(
-		( select ) => {
-			const { getEntityRecord } = select( coreStore );
-			return mediaId ? getEntityRecord( 'root', 'media', mediaId ) : null;
-		},
-		[ mediaId ]
-	);
+	config,
+}: DataViewRenderFieldProps< BasePostWithEmbeddedFeaturedMedia > ) => {
+	const media = item?._embedded?.[ 'wp:featuredmedia' ]?.[ 0 ];
 	const url = media?.source_url;
 
 	if ( url ) {
@@ -30,6 +21,17 @@ export const FeaturedImageView = ( {
 				className="fields-controls__featured-image-image"
 				src={ url }
 				alt=""
+				srcSet={
+					media?.media_details?.sizes
+						? Object.values( media.media_details.sizes )
+								.map(
+									( size: any ) =>
+										`${ size.source_url } ${ size.width }w`
+								)
+								.join( ', ' )
+						: undefined
+				}
+				sizes={ config?.sizes || '100vw' }
 			/>
 		);
 	}

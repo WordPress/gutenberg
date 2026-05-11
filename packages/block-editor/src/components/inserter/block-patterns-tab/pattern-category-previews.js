@@ -14,7 +14,7 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 	__experimentalHeading as Heading,
-	__experimentalText as Text,
+	__experimentalText as WCText,
 	FlexBlock,
 } from '@wordpress/components';
 
@@ -69,19 +69,19 @@ export function PatternCategoryPreviews( {
 					return false;
 				}
 
-				if ( category.name === allPatternsCategory?.name ) {
+				if ( category.name === allPatternsCategory.name ) {
 					return true;
 				}
 
 				if (
-					category.name === myPatternsCategory?.name &&
+					category.name === myPatternsCategory.name &&
 					pattern.type === INSERTER_PATTERN_TYPES.user
 				) {
 					return true;
 				}
 
 				if (
-					category.name === starterPatternsCategory?.name &&
+					category.name === starterPatternsCategory.name &&
 					pattern.blockTypes?.includes( 'core/post-content' )
 				) {
 					return true;
@@ -149,7 +149,7 @@ export function PatternCategoryPreviews( {
 							level={ 4 }
 							as="div"
 						>
-							{ category?.label }
+							{ category.label }
 						</Heading>
 					</FlexBlock>
 					<PatternsFilter
@@ -162,23 +162,23 @@ export function PatternCategoryPreviews( {
 					/>
 				</HStack>
 				{ ! currentCategoryPatterns.length && (
-					<Text
+					<WCText
 						variant="muted"
 						className="block-editor-inserter__patterns-category-no-results"
 					>
 						{ __( 'No results found' ) }
-					</Text>
+					</WCText>
 				) }
 			</VStack>
 			{ currentCategoryPatterns.length > 0 && (
 				<>
-					<Text
+					<WCText
 						size="12"
 						as="p"
 						className="block-editor-inserter__help-text"
 					>
 						{ __( 'Drag and drop patterns into the canvas.' ) }
-					</Text>
+					</WCText>
 					<BlockPatternsList
 						ref={ scrollContainerRef }
 						blockPatterns={ pagingProps.categoryPatterns }

@@ -25,7 +25,6 @@ function PostPingbacks() {
 
 	return (
 		<CheckboxControl
-			__nextHasNoMarginBottom
 			label={ __( 'Enable pingbacks & trackbacks' ) }
 			checked={ pingStatus === 'open' }
 			onChange={ onTogglePingback }

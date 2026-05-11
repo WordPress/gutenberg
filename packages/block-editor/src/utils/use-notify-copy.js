@@ -29,13 +29,13 @@ export function useNotifyCopy() {
 
 				if ( eventType === 'copy' ) {
 					notice = sprintf(
-						// Translators: Name of the block being copied, e.g. "Paragraph".
+						// Translators: %s: Name of the block being copied, e.g. "Paragraph".
 						__( 'Copied "%s" to clipboard.' ),
 						title
 					);
 				} else {
 					notice = sprintf(
-						// Translators: Name of the block being cut, e.g. "Paragraph".
+						// Translators: %s: Name of the block being cut, e.g. "Paragraph".
 						__( 'Moved "%s" to clipboard.' ),
 						title
 					);

@@ -51,19 +51,19 @@ const restorePost: Action< PostWithPermissions > = {
 			let successMessage;
 			if ( posts.length === 1 ) {
 				successMessage = sprintf(
-					/* translators: The number of posts. */
+					/* translators: %s: The number of posts. */
 					__( '"%s" has been restored.' ),
 					getItemTitle( posts[ 0 ] )
 				);
 			} else if ( posts[ 0 ].type === 'page' ) {
 				successMessage = sprintf(
-					/* translators: The number of posts. */
+					/* translators: %d: The number of posts. */
 					__( '%d pages have been restored.' ),
 					posts.length
 				);
 			} else {
 				successMessage = sprintf(
-					/* translators: The number of posts. */
+					/* translators: %d: The number of posts. */
 					__( '%d posts have been restored.' ),
 					posts.length
 				);
@@ -92,7 +92,7 @@ const restorePost: Action< PostWithPermissions > = {
 				}
 				// If we were trying to move multiple posts to the trash
 			} else {
-				const errorMessages = new Set();
+				const errorMessages = new Set< string >();
 				const failedPromises = promiseResult.filter(
 					( { status } ) => status === 'rejected'
 				);

@@ -2,7 +2,7 @@
 /**
  * Tests the typography block supports.
  *
- * @package Gutenberg
+ * @package gutenberg
  */
 class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 	/**
