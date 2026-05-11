@@ -139,7 +139,7 @@ In this table, by default, you should see two entries: `wordpress` with port 888
 
 ### 2. Check the port number
 
-By default `wp-env` uses port 8888, meaning that the local environment will be available at http://localhost:8888.
+By default `wp-env` tries port 8888, meaning that the local environment will be available at http://localhost:8888. If 8888 is busy on your host and you have not configured a port explicitly, `wp-env` automatically falls back to the next available port and prints the resolved port at start time — see [Automatic Port Selection](#automatic-port-selection) for the full contract and how to opt out.
 
 You can configure the port that `wp-env` uses so that it doesn't clash with another server by specifying the `WP_ENV_PORT` environment variable when starting `wp-env`:
 
@@ -149,7 +149,7 @@ $ WP_ENV_PORT=3333 wp-env start
 
 Running `docker ps` and inspecting the `PORTS` column allows you to determine which port `wp-env` is currently using.
 
-You may also specify the port numbers in your `.wp-env.json` file, but the environment variables will take precedence.
+You may also specify the port numbers in your `.wp-env.json` file, but the environment variables will take precedence. Ports you set explicitly (in `.wp-env.json`, in `.wp-env.override.json`, or via `WP_ENV_PORT` / `WP_ENV_TESTS_PORT`) are never silently moved; if you need them to also auto-fall-back when busy, see the `--auto-port` flag in [Automatic Port Selection](#automatic-port-selection).
 
 ### 3. Restart `wp-env` with updates
 
@@ -365,8 +365,10 @@ Options:
                                                                         [string]
   --scripts    Execute any configured lifecycle scripts.
                                                       [boolean] [default: true]
-  --auto-port  Automatically find available ports when configured ports are
-               busy.                                  [boolean]
+  --auto-port  Also fall back to the next available port when explicitly
+               configured ports are busy. By default, only the standard ports
+               8888/8889 auto-fall-back. Overrides the .wp-env.json "autoPort"
+               setting.                                                [boolean]
 ```
 
 ### `wp-env stop`
@@ -606,7 +608,7 @@ To enable editor autocomplete and validation, add a `$schema` key:
 | `"port"`             | `integer`      | `8888`                                 | The port number to use for the installation. |
 | `"testsEnvironment"` | `boolean`      | `false`                                | _Deprecated._ Whether to create a separate test environment with its own database and containers. Use `--config` with a separate config file instead. |
 | `"testsPort"`        | `integer`      | `8889`                                 | The port number for the test site. |
-| `"autoPort"`         | `boolean`      | `false`                                | Whether to automatically find available HTTP ports when configured ports are busy. |
+| `"autoPort"`         | `boolean\|null`| `null` (defaults only)                 | Tri-state automatic HTTP port selection. When `null` (the default), the default ports `8888`/`8889` automatically fall back to the next available port if busy, but explicitly configured ports stay strict. Set to `true` to also fall back on user-set ports. Set to `false` to opt out entirely, including on the default ports. |
 | `"config"`           | `Object`       | See below.                             | Mapping of wp-config.php constants to their desired values.                                                                      |
 | `"mappings"`         | `Object`       | `"{}"`                                 | Mapping of WordPress directories to local directories to be mounted in the WordPress instance.                                   |
 | `"mysqlPort"`        | `integer`      | `null` (randomly assigned)             | The MySQL port number to expose.                                                                                                 |
@@ -619,15 +621,25 @@ _Note: the port number environment variable (`WP_ENV_PORT`) takes precedence ove
 
 ### Automatic Port Selection
 
-By default, `wp-env` uses fixed ports (`8888` for development, `8889` for tests). If a port is busy, Docker will report an error at start time.
+By default, `wp-env` tries the standard ports (`8888` for development, `8889` for tests). If you have not configured a port explicitly and one of those defaults is busy on the host, `wp-env` scans upward to the next available port (for example: `8888` → `8890` → `8891`, ...) and starts the environment there. The CLI prints a one-line notice through the same spinner used for other start-time messages so you can see which port was actually bound.
 
-To opt in to automatic port selection, pass the `--auto-port` flag:
+Ports that you configured yourself — through `port` / `testsPort` in `.wp-env.json`, in `.wp-env.override.json`, via `WP_ENV_PORT` / `WP_ENV_TESTS_PORT`, or any combination — are never silently moved. If your configured port is busy, the start fails with the existing port-conflict error so your explicit choice is honored.
+
+If you want auto-fallback to apply to your configured ports too, pass the `--auto-port` flag (or set `"autoPort": true` in `.wp-env.json`):
 
 ```sh
 wp-env start --auto-port
 ```
 
-When `--auto-port` (or `"autoPort": true`) is enabled and a configured port is busy, `wp-env` scans upward from the configured port to find the next available one (for example: `8888`, `8889`, `8890`, ...). Automatic port selection is disabled when `CI` is set.
+To opt out of the default-port fallback as well — for example, when you want a hard guarantee that `wp-env` only ever binds `8888`/`8889` — set `"autoPort": false` in `.wp-env.json`:
+
+```json
+{
+	"autoPort": false
+}
+```
+
+Automatic port selection is also disabled whenever the `CI` environment variable is set, regardless of the `autoPort` value, so test runs stay deterministic.
 
 Several types of strings can be passed into the `core`, `plugins`, `themes`, and `mappings` fields.
 

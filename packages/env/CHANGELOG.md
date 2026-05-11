@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   The default ports `8888` (development) and `8889` (tests) now automatically fall back to the next available port when busy, so `wp-env start` works out of the box on hosts where those ports are taken; explicitly configured ports keep today's strict behavior unless `--auto-port` / `"autoPort": true` is passed, and the new `"autoPort": false` opt-out disables fallback even on the defaults. ([#49843](https://github.com/WordPress/gutenberg/issues/49843), [#74472](https://github.com/WordPress/gutenberg/pull/74472))
+
 ## 11.5.0 (2026-04-29)
 
 ## 11.4.0 (2026-04-15)
