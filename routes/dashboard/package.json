@@ -22,6 +22,7 @@
 		"@wordpress/hooks": "file:../../packages/hooks",
 		"@wordpress/i18n": "file:../../packages/i18n",
 		"@wordpress/icons": "file:../../packages/icons",
+		"@wordpress/notices": "file:../../packages/notices",
 		"@wordpress/preferences": "file:../../packages/preferences",
 		"@wordpress/private-apis": "file:../../packages/private-apis",
 		"@wordpress/ui": "file:../../packages/ui",
