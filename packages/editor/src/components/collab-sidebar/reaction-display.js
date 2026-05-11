@@ -20,11 +20,11 @@ import ReactionEmojiPicker, {
 } from './reaction-emoji-picker';
 
 /**
- * Lazy-load the Frimousse-based full picker. Its bundle (Frimousse +
- * the bundled Emojibase JSON) is only fetched when a user opens the
- * "More emojis" popover for the first time in a session.
+ * Lazy-load the full emoji picker. Its bundle is only fetched when a
+ * user opens the "More emojis" popover for the first time in a session;
+ * the Emojibase JSON dataset is fetched separately on first open.
  */
-const FrimoussePicker = lazy( () => import( './frimousse-picker' ) );
+const FullEmojiPicker = lazy( () => import( './emoji-picker' ) );
 
 // `Dropdown`'s popover is rendered in a portal anchored to <body>,
 // so it escapes the `overflow: hidden` chain on the collab sidebar
@@ -311,15 +311,14 @@ export function AddReactionButton( { disabled = false, onToggleReaction } ) {
 }
 
 /**
- * Standalone "+" button that opens a full Frimousse-based emoji picker.
- * Sibling of AddReactionButton; not nested inside it so the curated and
- * full picker popovers never conflict.
+ * Standalone "+" button that opens the full emoji picker. Sibling of
+ * AddReactionButton; not nested inside it so the curated and full picker
+ * popovers never conflict.
  *
  * Renders nothing when `window.gutenbergEmojibaseUrl` is unset — the
  * Gutenberg plugin sets it via PHP, but npm consumers of @wordpress/editor
  * must opt in by providing a URL pointing at a self-hosted emojibase
- * dataset. We hide the trigger rather than fall through to Frimousse's
- * default jsdelivr CDN.
+ * dataset.
  *
  * @param {Object}   props                  Component props.
  * @param {Function} props.onToggleReaction Callback to toggle a reaction.
@@ -332,7 +331,7 @@ export function MoreEmojiButton( { onToggleReaction } ) {
 	return (
 		<Dropdown
 			popoverProps={ POPOVER_PROPS }
-			contentClassName="editor-collab-sidebar-panel__frimousse-popover"
+			contentClassName="editor-collab-sidebar-panel__picker-popover"
 			renderToggle={ ( { isOpen, onToggle } ) => (
 				<Button
 					size="compact"
@@ -345,7 +344,7 @@ export function MoreEmojiButton( { onToggleReaction } ) {
 			) }
 			renderContent={ ( { onClose } ) => (
 				<Suspense fallback={ null }>
-					<FrimoussePicker
+					<FullEmojiPicker
 						onSelect={ ( emoji ) => {
 							onClose();
 							onToggleReaction(

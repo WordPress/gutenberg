@@ -344,19 +344,19 @@ mark.wp-note {
 	justify-content: center;
 }
 
-// Frimousse popover: width is driven by the picker itself (below) so the
-// popover wrapper fits its content via Popover's default
+// Full picker popover: width is driven by the picker itself (below) so
+// the popover wrapper fits its content via Popover's default
 // `width: min-content`. Setting width on the wrapper instead leaves
 // horizontal slack between the picker and the popover edge.
 //
 // `contentClassName` from `Dropdown` lands on the outer
 // `.components-popover` wrapper. The inner `.components-popover__content`
 // is where the visible surface and Dropdown's default 8px padding live —
-// override that here with a higher-specificity selector so the Frimousse
-// picker can manage its own internal padding (search margin, viewport
+// override that here with a higher-specificity selector so the picker
+// can manage its own internal padding (search margin, viewport
 // padding-inline, list padding-bottom) without an extra ring of empty
 // surface around it.
-.editor-collab-sidebar-panel__frimousse-popover {
+.editor-collab-sidebar-panel__picker-popover {
 	.components-popover__content {
 		padding: 0;
 		border-radius: var(--wpds-border-radius-md);
@@ -365,7 +365,7 @@ mark.wp-note {
 	}
 }
 
-.editor-collab-sidebar-panel__frimousse {
+.editor-collab-sidebar-panel__picker {
 	display: flex;
 	flex-direction: column;
 	// Width sized to the 8-column emoji grid plus the viewport's
@@ -383,28 +383,15 @@ mark.wp-note {
 	isolation: isolate;
 }
 
-.editor-collab-sidebar-panel__frimousse-search {
-	margin: var(--wpds-dimension-padding-sm);
-	padding:
-		var(--wpds-dimension-padding-sm)
-		var(--wpds-dimension-padding-md);
-	border:
-		var(--wpds-border-width-xs) solid
-		var(--wpds-color-stroke-interactive-neutral);
-	border-radius: var(--wpds-border-radius-sm);
-	background-color: var(--wpds-color-bg-surface-neutral-weak);
-	color: inherit;
-	font: inherit;
+.editor-collab-sidebar-panel__picker-search {
+	padding: var(--wpds-dimension-padding-sm);
 
-	&:focus {
-		outline:
-			var(--wpds-border-width-focus) solid
-			var(--wpds-color-stroke-focus-brand);
-		outline-offset: -1px;
+	.components-search-control {
+		margin: 0;
 	}
 }
 
-.editor-collab-sidebar-panel__frimousse-viewport {
+.editor-collab-sidebar-panel__picker-viewport {
 	flex: 1;
 	overflow: auto;
 	// Always reserve scrollbar space so the emoji grid doesn't shift
@@ -414,19 +401,18 @@ mark.wp-note {
 	padding-inline: var(--wpds-dimension-padding-xs);
 }
 
-.editor-collab-sidebar-panel__frimousse-loading,
-.editor-collab-sidebar-panel__frimousse-empty {
+.editor-collab-sidebar-panel__picker-status {
 	display: grid;
 	place-items: center;
 	height: 100%;
 	color: var(--wpds-color-fg-content-neutral-weak);
 }
 
-.editor-collab-sidebar-panel__frimousse-list {
+.editor-collab-sidebar-panel__picker-list {
 	padding-bottom: var(--wpds-dimension-padding-sm);
 }
 
-.editor-collab-sidebar-panel__frimousse-category {
+.editor-collab-sidebar-panel__picker-category {
 	position: sticky;
 	top: 0;
 	padding: var(--wpds-dimension-padding-sm);
@@ -437,12 +423,17 @@ mark.wp-note {
 	z-index: 1;
 }
 
-.editor-collab-sidebar-panel__frimousse-row {
+.editor-collab-sidebar-panel__picker-row {
 	display: flex;
 	gap: var(--wpds-dimension-gap-xs);
+	// Skip rendering offscreen rows so the full ~250-row list mounts
+	// quickly. The intrinsic-size hint matches the actual button row
+	// height so scroll geometry stays accurate.
+	content-visibility: auto;
+	contain-intrinsic-size: auto 32px;
 }
 
-.editor-collab-sidebar-panel__frimousse-emoji {
+.editor-collab-sidebar-panel__picker-emoji {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
@@ -456,7 +447,7 @@ mark.wp-note {
 	font-size: 18px;
 	line-height: 1;
 
-	&[data-active="true"] {
+	&[data-active-item] {
 		background-color: var(--wpds-color-bg-interactive-neutral-weak-active);
 	}
 

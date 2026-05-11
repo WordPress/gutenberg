@@ -1108,13 +1108,13 @@ test.describe( 'Block Notes', () => {
 
 			await page.getByRole( 'button', { name: 'More emojis' } ).click();
 
-			await blockNoteUtils.waitForFrimoussePicker();
+			await blockNoteUtils.waitForFullPicker();
 
 			// The search field is present.
 			await expect( page.getByPlaceholder( 'Search emoji' ) ).toBeVisible();
 		} );
 
-		test( 'a Frimousse pick that matches a curated emoji stores as the curated slug', async ( {
+		test( 'a full-picker pick that matches a curated emoji stores as the curated slug', async ( {
 			page,
 			blockNoteUtils,
 		} ) => {
@@ -1124,7 +1124,17 @@ test.describe( 'Block Notes', () => {
 				comment: 'Pick heart from full picker',
 			} );
 
-			await blockNoteUtils.pickFrimousseEmojiBySearch( 'red heart' );
+			// Open the full picker and click the plain heart specifically.
+			// "Heart" is a label-overridden curated reaction; the helper's
+			// regex-based gridcell lookup would otherwise pick up the
+			// first "heart"-containing label (e.g. "smiling face with
+			// hearts") instead of the curated red heart.
+			await page.getByRole( 'button', { name: 'More emojis' } ).click();
+			await blockNoteUtils.waitForFullPicker();
+			await page.getByPlaceholder( 'Search emoji' ).fill( 'Heart' );
+			await page
+				.getByRole( 'gridcell', { name: 'Heart', exact: true } )
+				.click();
 
 			await expect(
 				page
@@ -1143,7 +1153,7 @@ test.describe( 'Block Notes', () => {
 			await expect( reactionButton ).toContainText( '1' );
 		} );
 
-		test( 'a Frimousse pick that is not curated renders the chosen emoji', async ( {
+		test( 'a full-picker pick that is not curated renders the chosen emoji', async ( {
 			page,
 			blockNoteUtils,
 		} ) => {
@@ -1153,7 +1163,7 @@ test.describe( 'Block Notes', () => {
 				comment: 'Pick thumbs up from full picker',
 			} );
 
-			await blockNoteUtils.pickFrimousseEmojiBySearch( 'thumbs up' );
+			await blockNoteUtils.pickFullPickerEmojiBySearch( 'thumbs up' );
 
 			await expect(
 				page
@@ -1168,7 +1178,7 @@ test.describe( 'Block Notes', () => {
 			await expect( reactionButton ).toContainText( '👍' );
 		} );
 
-		test( 'pressing Escape closes the Frimousse popover', async ( {
+		test( 'pressing Escape closes the full-picker popover', async ( {
 			page,
 			blockNoteUtils,
 		} ) => {
@@ -1179,11 +1189,107 @@ test.describe( 'Block Notes', () => {
 			} );
 
 			await page.getByRole( 'button', { name: 'More emojis' } ).click();
-			await blockNoteUtils.waitForFrimoussePicker();
+			await blockNoteUtils.waitForFullPicker();
 
 			await page.keyboard.press( 'Escape' );
 
 			await expect( page.getByPlaceholder( 'Search emoji' ) ).toBeHidden();
+		} );
+
+		test( 'full picker shows the empty state when search has no matches', async ( {
+			page,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Search empty state' },
+				comment: 'Empty search state',
+			} );
+
+			await page.getByRole( 'button', { name: 'More emojis' } ).click();
+			await blockNoteUtils.waitForFullPicker();
+
+			// A query no Emojibase label/tag matches.
+			await page
+				.getByPlaceholder( 'Search emoji' )
+				.fill( 'zzzzzznoresults' );
+
+			// The grid is replaced by an empty-state status message…
+			await expect(
+				page.locator( '.editor-collab-sidebar-panel__picker-status' )
+			).toContainText( 'No emoji found.' );
+			// …and no gridcells remain in the DOM.
+			await expect(
+				page.locator( '.editor-collab-sidebar-panel__picker-emoji' )
+			).toHaveCount( 0 );
+		} );
+
+		test( 'full-picker popover wraps tightly to the picker width', async ( {
+			page,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Testing tight popover layout' },
+				comment: 'Tight layout',
+			} );
+
+			await page.getByRole( 'button', { name: 'More emojis' } ).click();
+			await blockNoteUtils.waitForFullPicker();
+
+			const popover = page.locator(
+				'.editor-collab-sidebar-panel__picker-popover'
+			);
+			const picker = page.locator(
+				'.editor-collab-sidebar-panel__picker'
+			);
+
+			const popoverBox = await popover.boundingBox();
+			const pickerBox = await picker.boundingBox();
+
+			// Popover wrapper must wrap tightly to the picker. If the
+			// popover is wider, the surface background renders as a
+			// visible band beside the picker.
+			expect(
+				Math.abs( popoverBox.width - pickerBox.width )
+			).toBeLessThanOrEqual( 1 );
+		} );
+
+		test( 'emoji grid fills the picker width', async ( {
+			page,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Testing grid fills picker' },
+				comment: 'Grid fill',
+			} );
+
+			await page.getByRole( 'button', { name: 'More emojis' } ).click();
+			await blockNoteUtils.waitForFullPicker();
+
+			const picker = page.locator(
+				'.editor-collab-sidebar-panel__picker'
+			);
+			const lastEmojiInFirstRow = page
+				.locator( '.editor-collab-sidebar-panel__picker-row' )
+				.first()
+				.locator( '.editor-collab-sidebar-panel__picker-emoji' )
+				.last();
+
+			const pickerBox = await picker.boundingBox();
+			const emojiBox = await lastEmojiInFirstRow.boundingBox();
+			const horizontalSlack =
+				pickerBox.x + pickerBox.width - ( emojiBox.x + emojiBox.width );
+
+			// Last emoji in a full row should sit close to the picker's
+			// right edge. Tolerance allows for viewport padding (4px)
+			// plus a reserved scrollbar gutter (~17px on most
+			// platforms). Catches regressions where the picker is sized
+			// wider than the emoji grid (buttons fill only the left
+			// fraction, with a large empty band to the right — the
+			// original bug had ~145px of slack).
+			expect( horizontalSlack ).toBeLessThanOrEqual( 24 );
 		} );
 
 		test( 'reaction picker portals outside the collab sidebar', async ( {
@@ -1840,129 +1946,6 @@ test.describe( 'Block Notes', () => {
 
 			await expect.poll( alphaOf ).toBeGreaterThan( 0.4 );
 		} );
-
-		test( 'reaction picker portals outside the collab sidebar', async ( {
-			page,
-			blockNoteUtils,
-		} ) => {
-			await blockNoteUtils.addBlockWithNote( {
-				type: 'core/paragraph',
-				attributes: { content: 'Testing popover portal' },
-				comment: 'Popover portal',
-			} );
-
-			await page.getByRole( 'button', { name: 'Add reaction' } ).click();
-
-			const popover = page.locator(
-				'.editor-collab-sidebar-panel__add-reaction-popover'
-			);
-			await expect( popover ).toBeVisible();
-
-			// The popover must portal out of the sidebar; otherwise the
-			// `overflow: hidden` chain on `.editor-collab-sidebar-panel`
-			// (and the framework `.interface-interface-skeleton__sidebar`)
-			// would clip the picker. Pin the contract by asserting the
-			// popover has no sidebar-panel ancestor.
-			await expect( popover ).toHaveCount( 1 );
-			const isPortaled = await popover.evaluate(
-				( el ) => ! el.closest( '.editor-collab-sidebar-panel' )
-			);
-			expect( isPortaled ).toBe( true );
-		} );
-
-		test( 'note remains selected while reaction picker is open', async ( {
-			page,
-			blockNoteUtils,
-		} ) => {
-			await blockNoteUtils.addBlockWithNote( {
-				type: 'core/paragraph',
-				attributes: { content: 'Testing selection persistence' },
-				comment: 'Selection persistence',
-			} );
-
-			const thread = page.getByRole( 'treeitem', {
-				name: /Note: Selection persistence/,
-			} );
-			await expect( thread ).toHaveAttribute( 'aria-expanded', 'true' );
-
-			await page.getByRole( 'button', { name: 'Add reaction' } ).click();
-			await expect(
-				page.locator( '.editor-collab-sidebar-panel__emoji-picker' )
-			).toBeVisible();
-
-			// Focus has moved into the portaled popover, but the note's
-			// onBlur handler exempts `.components-popover` so the thread
-			// stays selected and the trigger stays mounted.
-			await expect( thread ).toHaveAttribute( 'aria-expanded', 'true' );
-		} );
-
-		test( 'Frimousse popover wraps tightly to the picker width', async ( {
-			page,
-			blockNoteUtils,
-		} ) => {
-			await blockNoteUtils.addBlockWithNote( {
-				type: 'core/paragraph',
-				attributes: { content: 'Testing tight popover layout' },
-				comment: 'Tight layout',
-			} );
-
-			await page.getByRole( 'button', { name: 'More emojis' } ).click();
-			await blockNoteUtils.waitForFrimoussePicker();
-
-			const popover = page.locator(
-				'.editor-collab-sidebar-panel__frimousse-popover'
-			);
-			const picker = page.locator(
-				'.editor-collab-sidebar-panel__frimousse'
-			);
-
-			const popoverBox = await popover.boundingBox();
-			const pickerBox = await picker.boundingBox();
-
-			// Popover wrapper must wrap tightly to the picker. If the
-			// popover is wider, the surface background renders as a
-			// visible band beside the picker.
-			expect(
-				Math.abs( popoverBox.width - pickerBox.width )
-			).toBeLessThanOrEqual( 1 );
-		} );
-
-		test( 'emoji grid fills the picker width', async ( {
-			page,
-			blockNoteUtils,
-		} ) => {
-			await blockNoteUtils.addBlockWithNote( {
-				type: 'core/paragraph',
-				attributes: { content: 'Testing grid fills picker' },
-				comment: 'Grid fill',
-			} );
-
-			await page.getByRole( 'button', { name: 'More emojis' } ).click();
-			await blockNoteUtils.waitForFrimoussePicker();
-
-			const picker = page.locator(
-				'.editor-collab-sidebar-panel__frimousse'
-			);
-			const lastEmojiInFirstRow = page
-				.locator( '.editor-collab-sidebar-panel__frimousse-row' )
-				.first()
-				.locator( '.editor-collab-sidebar-panel__frimousse-emoji' )
-				.last();
-
-			const pickerBox = await picker.boundingBox();
-			const emojiBox = await lastEmojiInFirstRow.boundingBox();
-			const horizontalSlack =
-				pickerBox.x + pickerBox.width - ( emojiBox.x + emojiBox.width );
-
-			// Last emoji in a full row should sit close to the picker's
-			// right edge. Tolerance allows for viewport padding (4px)
-			// plus a reserved scrollbar gutter (~17px on most
-			// platforms). Catches regressions where the picker is sized
-			// wider than the emoji grid (buttons fill only the left
-			// fraction, with a large empty band to the right — the
-			// original bug had ~145px of slack).
-			expect( horizontalSlack ).toBeLessThanOrEqual( 24 );
-		} );
 	} );
 } );
 
@@ -2054,35 +2037,36 @@ class BlockNoteUtils {
 	}
 
 	/**
-	 * Wait for the Frimousse picker to finish loading its bundled
-	 * Emojibase data and render at least one emoji button. The grid /
-	 * gridcell roles come from Frimousse itself and are stable across
-	 * className changes.
+	 * Wait for the full emoji picker to finish loading its Emojibase
+	 * data and render at least one emoji button. The grid / gridcell
+	 * roles are stable across className changes.
 	 */
-	async waitForFrimoussePicker() {
-		await expect( this.#page.getByPlaceholder( 'Search emoji' ) ).toBeVisible();
+	async waitForFullPicker() {
+		await expect(
+			this.#page.getByPlaceholder( 'Search emoji' )
+		).toBeVisible();
 		await expect(
 			this.#page.getByRole( 'grid' ).getByRole( 'gridcell' ).first()
 		).toBeVisible();
 	}
 
 	/**
-	 * Click the + button to open Frimousse, search by name, and click
-	 * the first matching emoji.
+	 * Click the + button to open the full emoji picker, search by name,
+	 * and click the first matching emoji.
 	 *
 	 * @param {string} search Search term (matched against Emojibase
 	 *                        labels, e.g. "red heart" or "thumbs up").
 	 */
-	async pickFrimousseEmojiBySearch( search ) {
+	async pickFullPickerEmojiBySearch( search ) {
 		await this.#page.getByRole( 'button', { name: 'More emojis' } ).click();
-		await this.waitForFrimoussePicker();
+		await this.waitForFullPicker();
 
 		await this.#page.getByPlaceholder( 'Search emoji' ).fill( search );
 
-		// Wait for the search to actually filter. Frimousse's gridcells
-		// expose the emoji label as their accessible name, so once the
-		// first cell carries a name matching `search` we know the grid
-		// has finished re-laying-out.
+		// Wait for the search to actually filter. Each gridcell exposes
+		// the emoji label as its accessible name, so once the first cell
+		// carries a name matching `search` we know the grid has finished
+		// re-laying-out.
 		const match = this.#page
 			.getByRole( 'gridcell', { name: new RegExp( search, 'i' ) } )
 			.first();
