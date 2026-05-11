@@ -69,7 +69,6 @@ export const Compact: Story = {
  */
 export const Minimal: Story = {
 	args: {
-		...Default.args,
 		children: (
 			<>
 				<Select.Trigger size="small" variant="minimal" />
