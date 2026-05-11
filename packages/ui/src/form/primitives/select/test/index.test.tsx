@@ -42,7 +42,7 @@ describe( 'Select', () => {
 		expect( onValueChange ).toHaveBeenCalledTimes( 1 );
 		expect( onValueChange ).toHaveBeenLastCalledWith(
 			users[ 1 ],
-			expect.anything()
+			expect.objectContaining( { reason: expect.any( String ) } )
 		);
 	} );
 
