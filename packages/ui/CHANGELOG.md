@@ -9,6 +9,10 @@
 -   `Select`: `Select.Trigger` now renders a default `"Select"` placeholder when no value is selected, where it previously rendered empty ([#78076](https://github.com/WordPress/gutenberg/pull/78076)).
 -   `Select`: `Select.Item` no longer renders its `value` as fallback item content. Pass item content explicitly as `children`. Migrate `<Select.Item value="Foo" />` to `<Select.Item value="Foo">Foo</Select.Item>` ([#77861](https://github.com/WordPress/gutenberg/pull/77861)).
 
+### New Features
+
+-   Add `SelectControl` component ([#77809](https://github.com/WordPress/gutenberg/pull/77809)).
+
 ### Bug Fixes
 
 -   `Text`: Provide CSS defense values for every variant when rendered as either a paragraph or heading element ([#78172](https://github.com/WordPress/gutenberg/pull/78172)).
@@ -35,7 +39,6 @@
 
 -   Add `Drawer` primitive ([#76690](https://github.com/WordPress/gutenberg/pull/76690)).
 -   Add `Autocomplete` primitive ([#77642](https://github.com/WordPress/gutenberg/pull/77642)).
--   Add `SelectControl` component ([#77809](https://github.com/WordPress/gutenberg/pull/77809)).
 
 ### Documentation
 
