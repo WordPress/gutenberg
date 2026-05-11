@@ -55,6 +55,10 @@ const NO_SORT_STRATEGY = () => null;
  * explicit `grid-column-start` / `grid-row-start` values that
  * approximate the same result inside CSS Grid.
  *
+ * Each child's `key` must match an entry in the `layout` array;
+ * children without a match render at the end of the surface without
+ * explicit placement and fall through the lanes auto-flow.
+ *
  * @example
  * ```jsx
  * <DashboardLanes

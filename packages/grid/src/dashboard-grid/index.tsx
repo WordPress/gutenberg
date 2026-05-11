@@ -54,7 +54,8 @@ const NO_SORT_STRATEGY = () => null;
  * widths, and multi-row tiles.
  *
  * Each child's `key` must match an entry in the `layout` array;
- * children without a match are rendered outside the grid.
+ * children without a match render at the end of the grid without
+ * explicit placement and fall through CSS Grid's auto-flow.
  *
  * @example
  * ```jsx

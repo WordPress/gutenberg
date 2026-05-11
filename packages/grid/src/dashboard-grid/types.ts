@@ -130,8 +130,9 @@ interface BaseDashboardGridProps
 
 	/**
 	 * Grid children. Each child must carry a `key` that matches an
-	 * entry in `layout`; children without a match are rendered outside
-	 * the grid.
+	 * entry in `layout`; children without a match render at the end
+	 * of the grid without explicit placement and fall through CSS
+	 * Grid's auto-flow.
 	 */
 	children: React.ReactNode;
 

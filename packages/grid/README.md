@@ -88,8 +88,9 @@ function Dashboard() {
 ```
 
 Each child **must** have a `key` prop that matches an entry in the
-`layout` array. Children without a matching layout entry are
-ignored.
+`layout` array. Children without a matching layout entry render at
+the end of the grid without explicit placement and fall through
+CSS Grid's auto-flow.
 
 ### Layout model
 
@@ -237,7 +238,9 @@ function Pinboard() {
 ```
 
 Each child **must** have a `key` prop that matches an entry in the
-`layout` array.
+`layout` array. Children without a matching layout entry render at
+the end of the surface without explicit placement and fall through
+the lanes auto-flow.
 
 ### Layout model
 

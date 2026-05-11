@@ -59,7 +59,9 @@ interface BaseDashboardLanesProps
 
 	/**
 	 * Surface children. Each child must carry a `key` matching an
-	 * entry in `layout`; children without a match render outside.
+	 * entry in `layout`; children without a match render at the end
+	 * of the surface without explicit placement and fall through the
+	 * lanes auto-flow.
 	 */
 	children: React.ReactNode;
 
