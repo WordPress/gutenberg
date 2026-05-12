@@ -8,12 +8,17 @@ import { render, screen, act, fireEvent } from '@testing-library/react';
  */
 import { createRegistry, RegistryProvider } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
+import { store as blockEditorStore } from '@wordpress/block-editor';
+import { createBlock, registerBlockType } from '@wordpress/blocks';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
  */
 import withSuggestionOverlay, {
 	mergeOverlayAttributes,
+	structuralMarkerClass,
+	withSuggestionBlockClassName,
 } from '../with-suggestion-overlay';
 import {
 	SuggestionOverlayProvider,
@@ -21,13 +26,26 @@ import {
 } from '../overlay-context';
 import { store as editorStore } from '../../../store';
 
-function renderWithProviders( ui, { intent = 'edit' } = {} ) {
+function renderWithProviders( ui, { intent = 'edit', blocks = null } = {} ) {
 	const registry = createRegistry();
 	// `setEditorIntent` dispatches a snackbar via the notices store when
 	// the intent actually changes, so the store needs to be registered even
 	// in tests that only care about the overlay HOC.
 	registry.register( noticesStore );
 	registry.register( editorStore );
+	// `blockEditorStore` is only registered when the test passes `blocks`.
+	// Registering it unconditionally activates the overlay provider's
+	// orphan-prune effect — it short-circuits when
+	// `getClientIdsWithDescendants` is unavailable — which would then
+	// prune any overlay entry whose `clientId` doesn't correspond to a
+	// real block. Most tests use a synthetic `clientId="a"` and never
+	// register a matching block, so the entry would be pruned the
+	// moment `captureBaseline` creates it.
+	if ( blocks ) {
+		registry.register( preferencesStore );
+		registry.register( blockEditorStore );
+		registry.dispatch( blockEditorStore ).resetBlocks( blocks );
+	}
 	registry.dispatch( editorStore ).setEditorIntent( intent );
 
 	const wrapper = ( { children } ) => (
@@ -100,6 +118,48 @@ describe( 'withSuggestionOverlay', () => {
 		expect( screen.getByTestId( 'content' ) ).toHaveTextContent(
 			'proposed'
 		);
+	} );
+
+	it( 'writes setAttributes through (no overlay) for a pending-insert block in Suggest intent', () => {
+		// A pending-insert block has no "before" worth preserving — the
+		// block itself is the suggestion. Routing edits through the
+		// overlay would trap the suggester's typed content on the
+		// suggester's peer; the reviewer needs to see it as part of the
+		// preview, so the edit must hit the real attributes and sync via
+		// CRDT like any other block change.
+		registerBlockType( 'core/test-pending-insert', {
+			apiVersion: 3,
+			title: 'Test',
+			category: 'text',
+			attributes: {
+				content: { type: 'string', default: '' },
+				metadata: { type: 'object' },
+			},
+			save() {
+				return null;
+			},
+		} );
+		const block = createBlock( 'core/test-pending-insert', {
+			content: 'Hello',
+			metadata: { suggestion: { type: 'pending-insert' } },
+		} );
+
+		const setAttributes = jest.fn();
+		renderWithProviders(
+			<Wrapped
+				clientId={ block.clientId }
+				name="core/test-pending-insert"
+				attributes={ block.attributes }
+				setAttributes={ setAttributes }
+			/>,
+			{ intent: 'suggest', blocks: [ block ] }
+		);
+
+		fireEvent.click( screen.getByRole( 'button', { name: 'edit' } ) );
+
+		expect( setAttributes ).toHaveBeenCalledWith( {
+			content: 'proposed',
+		} );
 	} );
 
 	it( 'merges overlay on top of real attributes for rendering', () => {
@@ -271,5 +331,115 @@ describe( 'mergeOverlayAttributes', () => {
 				{ custom: { other: 'new' } }
 			)
 		).toEqual( { custom: { other: 'new' } } );
+	} );
+} );
+
+describe( 'structuralMarkerClass', () => {
+	it( 'maps each known marker type to its class', () => {
+		expect( structuralMarkerClass( 'pending-remove' ) ).toBe(
+			'is-suggestion-pending-remove'
+		);
+		expect( structuralMarkerClass( 'pending-insert' ) ).toBe(
+			'is-suggestion-pending-insert'
+		);
+		expect( structuralMarkerClass( 'pending-move' ) ).toBe(
+			'is-suggestion-pending-move'
+		);
+	} );
+
+	it( 'returns null for unknown or missing types', () => {
+		expect( structuralMarkerClass( undefined ) ).toBeNull();
+		expect( structuralMarkerClass( 'something-else' ) ).toBeNull();
+	} );
+} );
+
+describe( 'withSuggestionBlockClassName', () => {
+	const TEST_BLOCK_NAME = 'core/test-suggestion-classname';
+
+	beforeAll( () => {
+		registerBlockType( TEST_BLOCK_NAME, {
+			apiVersion: 3,
+			title: 'Test Block',
+			category: 'text',
+			attributes: {
+				content: { type: 'string', default: '' },
+				metadata: { type: 'object' },
+			},
+			save() {
+				return null;
+			},
+		} );
+	} );
+
+	function FakeBlockListBlock( { className } ) {
+		return <div data-testid="block-list-block" className={ className } />;
+	}
+
+	const WrappedBlockListBlock =
+		withSuggestionBlockClassName( FakeBlockListBlock );
+
+	function setup( { intent = 'edit', metadata } = {} ) {
+		const registry = createRegistry();
+		registry.register( noticesStore );
+		registry.register( preferencesStore );
+		registry.register( blockEditorStore );
+		registry.register( editorStore );
+		registry.dispatch( editorStore ).setEditorIntent( intent );
+
+		const block = createBlock( TEST_BLOCK_NAME, {
+			content: 'Hello',
+			...( metadata !== undefined && { metadata } ),
+		} );
+		registry.dispatch( blockEditorStore ).resetBlocks( [ block ] );
+
+		const wrapper = ( { children } ) => (
+			<RegistryProvider value={ registry }>
+				<SuggestionOverlayProvider>
+					{ children }
+				</SuggestionOverlayProvider>
+			</RegistryProvider>
+		);
+
+		render( <WrappedBlockListBlock clientId={ block.clientId } />, {
+			wrapper,
+		} );
+		return screen.getByTestId( 'block-list-block' );
+	}
+
+	it( 'applies is-suggestion-pending-remove for an admin (Edit intent) — the marker is the only signal a reviewer has that a structural change is pending', () => {
+		const node = setup( {
+			intent: 'edit',
+			metadata: { suggestion: { type: 'pending-remove' } },
+		} );
+		expect( node.className ).toContain( 'is-suggestion-pending-remove' );
+	} );
+
+	it( 'applies is-suggestion-pending-insert for an admin (Edit intent)', () => {
+		const node = setup( {
+			intent: 'edit',
+			metadata: { suggestion: { type: 'pending-insert' } },
+		} );
+		expect( node.className ).toContain( 'is-suggestion-pending-insert' );
+	} );
+
+	it( 'applies is-suggestion-pending-move for an admin (Edit intent)', () => {
+		const node = setup( {
+			intent: 'edit',
+			metadata: { suggestion: { type: 'pending-move' } },
+		} );
+		expect( node.className ).toContain( 'is-suggestion-pending-move' );
+	} );
+
+	it( 'applies the structural class for the suggester (Suggest intent) too', () => {
+		const node = setup( {
+			intent: 'suggest',
+			metadata: { suggestion: { type: 'pending-move' } },
+		} );
+		expect( node.className ).toContain( 'is-suggestion-pending-move' );
+	} );
+
+	it( 'applies no suggestion class when the block has no marker', () => {
+		const node = setup( { intent: 'edit' } );
+		expect( node.className ).not.toMatch( /is-suggestion-pending/ );
 	} );
 } );

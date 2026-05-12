@@ -26,6 +26,9 @@ import SuggestionStoreInterceptor, {
 	adoptSystemMetadata,
 	stripSystemMetadata,
 	isAcceptedSuggestionChange,
+	topLevelRemoved,
+	withSuggestionMarker,
+	lcsClientIds,
 } from '../store-interceptor';
 import {
 	SuggestionOverlayProvider,
@@ -171,7 +174,7 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 		);
 	} );
 
-	function setup() {
+	function setup( { initialBlocks } = {} ) {
 		const registry = createRegistry();
 		registry.register( noticesStore );
 		// `preferencesStore` is required by `setEditorIntent` on branches
@@ -183,8 +186,11 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 		registry.register( editorStore );
 		registry.dispatch( editorStore ).setEditorIntent( 'suggest' );
 
-		const block = createBlock( TEST_BLOCK_NAME, { content: 'Hello' } );
-		registry.dispatch( blockEditorStore ).resetBlocks( [ block ] );
+		const block =
+			initialBlocks?.[ 0 ] ??
+			createBlock( TEST_BLOCK_NAME, { content: 'Hello' } );
+		const blocks = initialBlocks ?? [ block ];
+		registry.dispatch( blockEditorStore ).resetBlocks( blocks );
 
 		let overlayHandle;
 		function CaptureOverlay() {
@@ -383,6 +389,377 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 			getOverlay().entries[ clientId ]?.overlayAttributes?.content
 		).toBe( 'After apply' );
 	} );
+
+	it( 'tags a removed block with metadata.suggestion = pending-remove and writes a block-remove op into the overlay', async () => {
+		// In Suggest mode a `removeBlock` dispatch must not actually remove
+		// the block — the apply-and-tag flow re-inserts the subtree at its
+		// previous position and marks it pending-remove. Auto-save reads
+		// the structural op from the overlay and persists it as a comment;
+		// Apply later runs the real removeBlock, Reject just clears the
+		// marker.
+		const { registry, clientId, getOverlay } = setup();
+
+		await act( async () => {
+			registry.dispatch( blockEditorStore ).removeBlock( clientId );
+		} );
+		await flushSubscribers();
+
+		const liveBlocks = registry.select( blockEditorStore ).getBlocks();
+		expect( liveBlocks ).toHaveLength( 1 );
+		expect( liveBlocks[ 0 ].clientId ).toBe( clientId );
+		expect( liveBlocks[ 0 ].attributes?.metadata?.suggestion ).toEqual( {
+			type: 'pending-remove',
+			authorId: null,
+		} );
+
+		// The marker is system metadata — it must NOT leak into the user
+		// overlay (the overlay represents user-pending edits, not provider-
+		// internal linkage).
+		expect(
+			getOverlay().entries[ clientId ]?.overlayAttributes?.metadata
+		).toBeUndefined();
+
+		// The structural op slot drives auto-save persistence.
+		expect( getOverlay().entries[ clientId ]?.structuralOp ).toMatchObject(
+			{
+				type: 'block-remove',
+				clientId,
+				blockName: TEST_BLOCK_NAME,
+			}
+		);
+	} );
+
+	it( 'keeps the pending-remove marker after a follow-up dispatch fires the subscribe loop again', async () => {
+		// Regression: a follow-up store update (a sync echo, an unrelated
+		// dispatch, or React batching draining a second tick) used to find
+		// the re-inserted block missing from the snapshot and route it
+		// through the new-block branch — overwriting the pending-remove
+		// marker with pending-insert and the structural op from
+		// `block-remove` to `block-insert-after`.
+		const a = createBlock( TEST_BLOCK_NAME, { content: 'A' } );
+		const b = createBlock( TEST_BLOCK_NAME, { content: 'B' } );
+		const c = createBlock( TEST_BLOCK_NAME, { content: 'C' } );
+		const { registry, getOverlay } = setup( {
+			initialBlocks: [ a, b, c ],
+		} );
+
+		await act( async () => {
+			registry.dispatch( blockEditorStore ).removeBlock( b.clientId );
+		} );
+		await flushSubscribers();
+
+		// Sanity: the first fire tagged the re-inserted block as
+		// pending-remove and recorded the matching structural op.
+		expect(
+			registry.select( blockEditorStore ).getBlockAttributes( b.clientId )
+				?.metadata?.suggestion?.type
+		).toBe( 'pending-remove' );
+		expect( getOverlay().entries[ b.clientId ]?.structuralOp?.type ).toBe(
+			'block-remove'
+		);
+
+		// Trigger a second subscribe fire by dispatching an unrelated
+		// store update. This is the same code path a YJS sync echo or a
+		// follow-up editor action exercises in the wild.
+		await act( async () => {
+			registry
+				.dispatch( blockEditorStore )
+				.updateBlockAttributes( a.clientId, { content: 'A!' } );
+		} );
+		await flushSubscribers();
+
+		// The re-inserted block must still carry the pending-remove
+		// marker and its structural op must still describe a removal.
+		expect(
+			registry.select( blockEditorStore ).getBlockAttributes( b.clientId )
+				?.metadata?.suggestion?.type
+		).toBe( 'pending-remove' );
+		expect( getOverlay().entries[ b.clientId ]?.structuralOp?.type ).toBe(
+			'block-remove'
+		);
+	} );
+
+	it( 'adopts a removal that arrives bundled with its marker-clear (apply of pending-remove via sync)', async () => {
+		// Regression: when another client clicks "Apply" on a
+		// pending-remove suggestion, the resulting marker-clear and
+		// removeBlock land here through sync as a single batched
+		// block-editor update. Without the apply-landing check the
+		// removal-detection branch would re-insert the block and tag
+		// it as a fresh pending-remove — which then bounces back
+		// through sync, undoing the apply on the accepting client a
+		// moment after they clicked.
+		const a = createBlock( TEST_BLOCK_NAME, { content: 'A' } );
+		const b = createBlock( TEST_BLOCK_NAME, { content: 'B' } );
+		const { registry, getOverlay } = setup( {
+			initialBlocks: [ a, b ],
+		} );
+
+		// First, this client creates the pending-remove suggestion
+		// (just like the suggester would).
+		await act( async () => {
+			registry.dispatch( blockEditorStore ).removeBlock( b.clientId );
+		} );
+		await flushSubscribers();
+
+		expect(
+			registry.select( blockEditorStore ).getBlockAttributes( b.clientId )
+				?.metadata?.suggestion?.type
+		).toBe( 'pending-remove' );
+
+		// Simulate the apply landing: marker-clear + removeBlock
+		// batched into a single store update (matching how YJS
+		// applies multi-op transactions on a peer client).
+		await act( async () => {
+			registry.batch( () => {
+				registry
+					.dispatch( blockEditorStore )
+					.updateBlockAttributes( b.clientId, { metadata: {} } );
+				registry.dispatch( blockEditorStore ).removeBlock( b.clientId );
+			} );
+		} );
+		await flushSubscribers();
+
+		// The block must stay removed — the interceptor adopts the
+		// apply landing rather than re-inserting and re-tagging.
+		const liveBlocks = registry.select( blockEditorStore ).getBlocks();
+		expect( liveBlocks ).toHaveLength( 1 );
+		expect( liveBlocks[ 0 ].clientId ).toBe( a.clientId );
+
+		// The orphan overlay entry is cleaned up by the PRUNE_ORPHANS
+		// effect once the block leaves the live tree.
+		expect( getOverlay().entries[ b.clientId ] ).toBeUndefined();
+	} );
+
+	it( 're-inserts only the top-level removed block when a parent and its child are removed together', async () => {
+		// `removeBlock` on a parent removes the whole subtree atomically.
+		// We must re-insert just the parent — its child rides along.
+		// Re-inserting both would duplicate the child.
+		const parent = createBlock( TEST_BLOCK_NAME, { content: 'Parent' }, [
+			createBlock( TEST_BLOCK_NAME, { content: 'Child' } ),
+		] );
+		const { registry } = setup( { initialBlocks: [ parent ] } );
+
+		await act( async () => {
+			registry
+				.dispatch( blockEditorStore )
+				.removeBlock( parent.clientId );
+		} );
+		await flushSubscribers();
+
+		const liveBlocks = registry.select( blockEditorStore ).getBlocks();
+		expect( liveBlocks ).toHaveLength( 1 );
+		expect( liveBlocks[ 0 ].clientId ).toBe( parent.clientId );
+		expect( liveBlocks[ 0 ].innerBlocks ).toHaveLength( 1 );
+		expect( liveBlocks[ 0 ].innerBlocks[ 0 ].attributes?.content ).toBe(
+			'Child'
+		);
+		expect( liveBlocks[ 0 ].attributes?.metadata?.suggestion?.type ).toBe(
+			'pending-remove'
+		);
+	} );
+
+	it( 'tags a newly-inserted block with metadata.suggestion = pending-insert and writes a block-insert-after op', async () => {
+		// Inserting a block in Suggest mode now flows through the apply-
+		// and-tag pipeline: the block stays at its inserted position; the
+		// marker drives the dimmed visual treatment; auto-save persists
+		// the structural op as a `block-insert-after` comment. Apply
+		// later just clears the marker, Reject runs `removeBlock` to
+		// undo.
+		const { registry, clientId, getOverlay } = setup();
+
+		const inserted = createBlock( TEST_BLOCK_NAME, { content: 'New' } );
+		await act( async () => {
+			registry
+				.dispatch( blockEditorStore )
+				.insertBlock( inserted, 1, undefined, false );
+		} );
+		await flushSubscribers();
+
+		const liveBlocks = registry.select( blockEditorStore ).getBlocks();
+		expect( liveBlocks ).toHaveLength( 2 );
+		const newBlock = liveBlocks[ 1 ];
+		expect( newBlock.clientId ).toBe( inserted.clientId );
+		expect( newBlock.attributes?.metadata?.suggestion ).toEqual( {
+			type: 'pending-insert',
+			authorId: null,
+		} );
+
+		expect(
+			getOverlay().entries[ inserted.clientId ]?.structuralOp
+		).toMatchObject( {
+			type: 'block-insert-after',
+			clientId: inserted.clientId,
+			blockName: TEST_BLOCK_NAME,
+			anchorClientId: clientId,
+			parentClientId: null,
+		} );
+	} );
+
+	it( 'adopts a removal that arrives bundled with its marker-clear (reject of pending-insert via sync)', async () => {
+		// Regression: rejecting a pending-insert suggestion on
+		// another client dispatches `removeBlock` (the rejection
+		// undoes the insert). When that arrives here via sync,
+		// batched with the corresponding marker-clear, the
+		// disappearing block carries `metadata.suggestion.type ===
+		// 'pending-insert'` in the previous-tick tree. The
+		// interceptor must adopt that as the reject landing instead
+		// of re-inserting the block and re-tagging it as a fresh
+		// pending-remove — otherwise the rejected paragraph reappears
+		// on the suggester's screen a moment later via the bounced
+		// re-insert.
+		const a = createBlock( TEST_BLOCK_NAME, { content: 'A' } );
+		const inserted = createBlock( TEST_BLOCK_NAME, { content: 'New' } );
+		const { registry, getOverlay } = setup( { initialBlocks: [ a ] } );
+
+		// First, this client creates the pending-insert suggestion.
+		await act( async () => {
+			registry
+				.dispatch( blockEditorStore )
+				.insertBlock( inserted, 1, undefined, false );
+		} );
+		await flushSubscribers();
+
+		expect(
+			registry
+				.select( blockEditorStore )
+				.getBlockAttributes( inserted.clientId )?.metadata?.suggestion
+				?.type
+		).toBe( 'pending-insert' );
+
+		// Simulate the reject landing: marker-clear + removeBlock
+		// batched into a single store update.
+		await act( async () => {
+			registry.batch( () => {
+				registry
+					.dispatch( blockEditorStore )
+					.updateBlockAttributes( inserted.clientId, {
+						metadata: {},
+					} );
+				registry
+					.dispatch( blockEditorStore )
+					.removeBlock( inserted.clientId );
+			} );
+		} );
+		await flushSubscribers();
+
+		// The block must stay removed — the interceptor adopts the
+		// reject landing rather than re-inserting and re-tagging.
+		const liveBlocks = registry.select( blockEditorStore ).getBlocks();
+		expect( liveBlocks ).toHaveLength( 1 );
+		expect( liveBlocks[ 0 ].clientId ).toBe( a.clientId );
+		expect( getOverlay().entries[ inserted.clientId ] ).toBeUndefined();
+	} );
+
+	it( 'records a null anchor when the inserted block lands at index 0 (no previous sibling)', async () => {
+		const { registry, getOverlay } = setup();
+
+		const inserted = createBlock( TEST_BLOCK_NAME, { content: 'First' } );
+		await act( async () => {
+			registry
+				.dispatch( blockEditorStore )
+				.insertBlock( inserted, 0, undefined, false );
+		} );
+		await flushSubscribers();
+
+		const liveBlocks = registry.select( blockEditorStore ).getBlocks();
+		expect( liveBlocks[ 0 ].clientId ).toBe( inserted.clientId );
+		expect( liveBlocks[ 0 ].attributes?.metadata?.suggestion?.type ).toBe(
+			'pending-insert'
+		);
+		expect(
+			getOverlay().entries[ inserted.clientId ]?.structuralOp
+		).toMatchObject( {
+			type: 'block-insert-after',
+			anchorClientId: null,
+			parentClientId: null,
+		} );
+	} );
+
+	it( 'tags a moved block with metadata.suggestion = pending-move and writes a block-move op', async () => {
+		// Move a block from index 1 to index 3 in a 4-block tree. The
+		// moved block carries a pending-move marker with from-position
+		// context; the side-effect siblings (whose indices shifted to
+		// fill the gap) are NOT tagged thanks to the LCS heuristic.
+		const a = createBlock( TEST_BLOCK_NAME, { content: 'A' } );
+		const b = createBlock( TEST_BLOCK_NAME, { content: 'B' } );
+		const c = createBlock( TEST_BLOCK_NAME, { content: 'C' } );
+		const d = createBlock( TEST_BLOCK_NAME, { content: 'D' } );
+		const { registry, getOverlay } = setup( {
+			initialBlocks: [ a, b, c, d ],
+		} );
+
+		await act( async () => {
+			registry
+				.dispatch( blockEditorStore )
+				.moveBlockToPosition( b.clientId, '', '', 3 );
+		} );
+		await flushSubscribers();
+
+		const liveBlocks = registry.select( blockEditorStore ).getBlocks();
+		expect( liveBlocks.map( ( bl ) => bl.attributes?.content ) ).toEqual( [
+			'A',
+			'C',
+			'D',
+			'B',
+		] );
+		expect(
+			liveBlocks.find( ( bl ) => bl.clientId === b.clientId )?.attributes
+				?.metadata?.suggestion?.type
+		).toBe( 'pending-move' );
+
+		// Side-effect siblings: NOT tagged.
+		const sideEffectBlocks = liveBlocks.filter(
+			( bl ) => bl.clientId !== b.clientId
+		);
+		for ( const bl of sideEffectBlocks ) {
+			expect( bl.attributes?.metadata?.suggestion ).toBeUndefined();
+		}
+
+		expect(
+			getOverlay().entries[ b.clientId ]?.structuralOp
+		).toMatchObject( {
+			type: 'block-move',
+			clientId: b.clientId,
+			fromAnchorClientId: a.clientId,
+			fromParentClientId: null,
+			toAnchorClientId: d.clientId,
+			toParentClientId: null,
+		} );
+	} );
+
+	it( 'tags only the top-level new block when an inserted subtree contains nested children', async () => {
+		// A Group block with a child paragraph dispatches both as new in
+		// the same tick. The interceptor must tag only the top-level
+		// Group as pending-insert; the child rides along inside the
+		// captured snapshot.
+		const { registry } = setup();
+
+		const child = createBlock( TEST_BLOCK_NAME, { content: 'Child' } );
+		const parent = createBlock( TEST_BLOCK_NAME, { content: 'Parent' }, [
+			child,
+		] );
+		await act( async () => {
+			registry
+				.dispatch( blockEditorStore )
+				.insertBlock( parent, 1, undefined, false );
+		} );
+		await flushSubscribers();
+
+		const insertedRoot = registry
+			.select( blockEditorStore )
+			.getBlock( parent.clientId );
+		expect( insertedRoot?.attributes?.metadata?.suggestion?.type ).toBe(
+			'pending-insert'
+		);
+		const insertedChild = registry
+			.select( blockEditorStore )
+			.getBlock( child.clientId );
+		// Child must NOT be tagged — its parent's marker covers the whole
+		// subtree.
+		expect(
+			insertedChild?.attributes?.metadata?.suggestion
+		).toBeUndefined();
+	} );
 } );
 
 describe( 'isAcceptedSuggestionChange', () => {
@@ -578,5 +955,96 @@ describe( 'stripSystemMetadata', () => {
 			level: 3,
 			metadata: { name: 'Heading' },
 		} );
+	} );
+} );
+
+describe( 'topLevelRemoved', () => {
+	it( 'returns the input when every removed block has a live parent', () => {
+		const parentByClientId = new Map( [
+			[ 'a', null ],
+			[ 'b', null ],
+		] );
+		expect( topLevelRemoved( [ 'a', 'b' ], parentByClientId ) ).toEqual( [
+			'a',
+			'b',
+		] );
+	} );
+
+	it( 'filters out descendants of other removed blocks', () => {
+		const parentByClientId = new Map( [
+			[ 'parent', null ],
+			[ 'child', 'parent' ],
+			[ 'grandchild', 'child' ],
+		] );
+		expect(
+			topLevelRemoved(
+				[ 'parent', 'child', 'grandchild' ],
+				parentByClientId
+			)
+		).toEqual( [ 'parent' ] );
+	} );
+
+	it( 'keeps siblings whose parent is still live', () => {
+		const parentByClientId = new Map( [
+			[ 'liveParent', null ],
+			[ 'sibling-a', 'liveParent' ],
+			[ 'sibling-b', 'liveParent' ],
+		] );
+		expect(
+			topLevelRemoved( [ 'sibling-a', 'sibling-b' ], parentByClientId )
+		).toEqual( [ 'sibling-a', 'sibling-b' ] );
+	} );
+} );
+
+describe( 'withSuggestionMarker', () => {
+	it( 'attaches the marker to a fresh metadata object', () => {
+		expect(
+			withSuggestionMarker( undefined, { type: 'pending-remove' } )
+		).toEqual( { suggestion: { type: 'pending-remove' } } );
+	} );
+
+	it( 'preserves existing metadata fields when adding the marker', () => {
+		expect(
+			withSuggestionMarker(
+				{ noteId: 7, name: 'Hero' },
+				{ type: 'pending-remove' }
+			)
+		).toEqual( {
+			noteId: 7,
+			name: 'Hero',
+			suggestion: { type: 'pending-remove' },
+		} );
+	} );
+
+	it( 'replaces an existing marker rather than merging', () => {
+		expect(
+			withSuggestionMarker(
+				{ suggestion: { type: 'pending-insert', commentId: 1 } },
+				{ type: 'pending-remove' }
+			).suggestion
+		).toEqual( { type: 'pending-remove' } );
+	} );
+} );
+
+describe( 'lcsClientIds', () => {
+	it( 'returns the full sequence when both sides match', () => {
+		const lcs = lcsClientIds( [ 'a', 'b', 'c' ], [ 'a', 'b', 'c' ] );
+		expect( Array.from( lcs ).sort() ).toEqual( [ 'a', 'b', 'c' ] );
+	} );
+
+	it( 'identifies the moved-block as the one absent from the LCS', () => {
+		// [A, B, C, D] → [A, C, D, B]: B is the moved block; A, C, D form
+		// the longest stable subsequence.
+		const lcs = lcsClientIds(
+			[ 'a', 'b', 'c', 'd' ],
+			[ 'a', 'c', 'd', 'b' ]
+		);
+		expect( Array.from( lcs ).sort() ).toEqual( [ 'a', 'c', 'd' ] );
+		expect( lcs.has( 'b' ) ).toBe( false );
+	} );
+
+	it( 'returns an empty set when either side is empty', () => {
+		expect( lcsClientIds( [], [ 'a' ] ).size ).toBe( 0 );
+		expect( lcsClientIds( [ 'a' ], [] ).size ).toBe( 0 );
 	} );
 } );

@@ -8,6 +8,7 @@ import clsx from 'clsx';
  */
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useCallback, useMemo, useRef } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 
@@ -16,6 +17,7 @@ import { addFilter } from '@wordpress/hooks';
  */
 import { useSuggestionOverlay } from './overlay-context';
 import { EDITOR_STORE_NAME, SUGGEST_INTENT } from './constants';
+import { getAvatarBorderColor } from '../collab-sidebar/utils';
 
 /**
  * Attribute keys whose values are known to be object-valued and therefore
@@ -118,14 +120,27 @@ function SuggestingBlockEdit( { BlockEdit, props } ) {
 const withSuggestionOverlay = createHigherOrderComponent(
 	( BlockEdit ) =>
 		function BlockEditWithSuggestionOverlay( props ) {
+			const { clientId } = props;
 			const isSuggestMode = useSelect(
 				( select ) =>
 					select( EDITOR_STORE_NAME ).getEditorIntent() ===
 					SUGGEST_INTENT,
 				[]
 			);
+			const isPendingInsert = useSelect(
+				( select ) =>
+					select( blockEditorStore )?.getBlockAttributes?.( clientId )
+						?.metadata?.suggestion?.type === 'pending-insert',
+				[ clientId ]
+			);
 
-			if ( ! isSuggestMode ) {
+			// A pending-insert block has no "before" state to preserve — the
+			// block itself is the suggestion. Edits to it write through to
+			// the real attributes (skipping the overlay) so the content
+			// syncs via CRDT and renders on the reviewer's canvas as part
+			// of the preview, instead of being trapped in the suggester's
+			// local overlay.
+			if ( ! isSuggestMode || isPendingInsert ) {
 				return <BlockEdit { ...props } />;
 			}
 
@@ -137,43 +152,104 @@ const withSuggestionOverlay = createHigherOrderComponent(
 );
 
 /**
+ * Map a `metadata.suggestion.type` marker to the class that drives the
+ * structural-suggestion visual treatment. Keeps the marker → class lookup
+ * in one place so the rendering layer stays a thin shell over the data
+ * model.
+ *
+ * @param {string|undefined} type Marker type.
+ * @return {string|null} Class name for the marker, or null when the type
+ * is not a recognized structural marker.
+ */
+function structuralMarkerClass( type ) {
+	switch ( type ) {
+		case 'pending-remove':
+			return 'is-suggestion-pending-remove';
+		case 'pending-insert':
+			return 'is-suggestion-pending-insert';
+		case 'pending-move':
+			return 'is-suggestion-pending-move';
+		default:
+			return null;
+	}
+}
+
+/**
  * HOC that tags the rendered block list item with a class whenever it has a
- * pending suggestion overlay. The class is the hook for the "bracket"
- * styling that makes edited blocks discoverable without relying on the
- * block toolbar being visible.
+ * pending suggestion — either an attribute overlay (renders the green
+ * "bracket" treatment) or a structural marker stored in
+ * `metadata.suggestion` (renders strikethrough/dim/move overlays).
+ *
+ * The attribute "bracket" is suggest-mode-only — it represents the suggester's
+ * uncommitted edits living in the local overlay, which other intents have no
+ * way to interact with. Structural markers, by contrast, are persisted on the
+ * live block (synced through the same path as block content), so reviewers in
+ * Edit or View intent see and can act on them too — that's the visual cue a
+ * post author needs to spot a pending removal/insertion/move at a glance.
  */
 const withSuggestionBlockClassName = createHigherOrderComponent(
 	( BlockListBlock ) =>
 		function BlockListBlockWithSuggestionClass( props ) {
 			const { clientId } = props;
 			const { entries } = useSuggestionOverlay();
-			const isSuggestMode = useSelect(
-				( select ) =>
-					select( EDITOR_STORE_NAME ).getEditorIntent() ===
-					SUGGEST_INTENT,
-				[]
+			const { isSuggestMode, structuralClass, authorId } = useSelect(
+				( select ) => {
+					const editor = select( EDITOR_STORE_NAME );
+					const blockEditor = select( blockEditorStore );
+					const marker =
+						blockEditor?.getBlockAttributes?.( clientId )?.metadata
+							?.suggestion;
+					return {
+						isSuggestMode:
+							editor.getEditorIntent() === SUGGEST_INTENT,
+						structuralClass: structuralMarkerClass( marker?.type ),
+						authorId: marker?.authorId ?? null,
+					};
+				},
+				[ clientId ]
 			);
 			const entry = entries[ clientId ];
 			const hasPendingOverlay =
 				!! entry &&
 				Object.keys( entry.overlayAttributes ?? {} ).length > 0;
+			const showOverlayBracket = isSuggestMode && hasPendingOverlay;
 
-			if ( ! isSuggestMode || ! hasPendingOverlay ) {
+			if ( ! showOverlayBracket && ! structuralClass ) {
 				return <BlockListBlock { ...props } />;
 			}
+
+			// Apply the suggester's avatar color via a CSS custom property
+			// so the canvas treatment (outline / strikethrough / label tab)
+			// reads as that suggester's. Falls through to the green default
+			// in CSS when `authorId` is missing.
+			const wrapperStyle =
+				authorId !== null
+					? {
+							...props.wrapperProps?.style,
+							'--suggestion-author-color':
+								getAvatarBorderColor( authorId ),
+					  }
+					: props.wrapperProps?.style;
 
 			return (
 				<BlockListBlock
 					{ ...props }
 					className={ clsx(
 						props.className,
-						'is-suggestion-pending'
+						showOverlayBracket && 'is-suggestion-pending',
+						structuralClass
 					) }
+					wrapperProps={ {
+						...props.wrapperProps,
+						style: wrapperStyle,
+					} }
 				/>
 			);
 		},
 	'withSuggestionBlockClassName'
 );
+
+export { structuralMarkerClass, withSuggestionBlockClassName };
 
 let filterRegistered = false;
 

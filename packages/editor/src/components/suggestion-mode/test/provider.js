@@ -8,6 +8,8 @@ import {
 	parseSuggestionPayload,
 	payloadByteLength,
 	PAYLOAD_MAX_BYTES,
+	findStructuralOp,
+	clearSuggestionMarkerAttributes,
 } from '../provider';
 
 describe( 'operationsFromOverlay', () => {
@@ -130,6 +132,53 @@ describe( 'applyOperations', () => {
 		expect( result ).toEqual( attrs );
 		expect( result ).not.toBe( attrs );
 	} );
+
+	it( 'composes with clearSuggestionMarkerAttributes to produce the inserted-block apply payload', () => {
+		// When applying a block-insert-after suggestion the live block on
+		// the accepter's side is in its captured-at-insertion shape — the
+		// suggester's interceptor diverted any subsequent typing into the
+		// overlay rather than committing it. Apply must (1) materialize
+		// those overlay edits as attribute-set ops, AND (2) clear the
+		// pending-insert marker. Combining `applyOperations` with
+		// `clearSuggestionMarkerAttributes` yields the merged payload the
+		// provider hands to `updateBlockAttributes`.
+		const liveAttributes = {
+			content: '',
+			metadata: {
+				noteId: [ 42 ],
+				suggestion: { type: 'pending-insert' },
+			},
+		};
+		const operations = [
+			{
+				type: 'block-insert-after',
+				clientId: 'abc',
+				blockName: 'core/paragraph',
+				anchorClientId: null,
+				parentClientId: null,
+				block: { name: 'core/paragraph', attributes: { content: '' } },
+			},
+			{
+				type: 'attribute-set',
+				attribute: 'content',
+				before: '',
+				after: 'Hello world',
+			},
+		];
+
+		const withOpsApplied = applyOperations( liveAttributes, operations );
+		const markerCleared = clearSuggestionMarkerAttributes( withOpsApplied );
+		const finalAttributes = markerCleared
+			? { ...withOpsApplied, ...markerCleared }
+			: withOpsApplied;
+
+		// The typed content is committed to the live block...
+		expect( finalAttributes.content ).toBe( 'Hello world' );
+		// ...and the pending-insert marker is gone, while noteId
+		// (system metadata) is preserved.
+		expect( finalAttributes.metadata ).toEqual( { noteId: [ 42 ] } );
+		expect( finalAttributes.metadata.suggestion ).toBeUndefined();
+	} );
 } );
 
 describe( 'payloadByteLength', () => {
@@ -246,12 +295,43 @@ describe( 'hasAttributeConflict', () => {
 			hasAttributeConflict( { content: wrapperOther }, [ CONTENT_OP ] )
 		).toBe( true );
 	} );
+
+	it( 'returns false for a block-insert-after payload even when attribute-set ops appear divergent', () => {
+		// The overlay baseline for an inserted block is `{}` — every
+		// attribute-set op the auto-save loop persists carries
+		// `before: null` regardless of what the user typed. Comparing
+		// that against the live (already-typed-into) block on the
+		// accepting client must not fire the staleness prompt.
+		const operations = [
+			{
+				type: 'block-insert-after',
+				clientId: 'inserted',
+				blockName: 'core/paragraph',
+				anchorClientId: 'anchor',
+				parentClientId: null,
+				block: {
+					name: 'core/paragraph',
+					attributes: { content: 'Hi' },
+					innerBlocks: [],
+				},
+			},
+			{
+				type: 'attribute-set',
+				attribute: 'content',
+				before: null,
+				after: 'Hi',
+			},
+		];
+		expect( hasAttributeConflict( { content: 'Hi' }, operations ) ).toBe(
+			false
+		);
+	} );
 } );
 
 describe( 'parseSuggestionPayload', () => {
-	it( 'parses a valid JSON payload', () => {
+	it( 'parses a valid current-version JSON payload', () => {
 		const raw = JSON.stringify( {
-			schemaVersion: 1,
+			schemaVersion: 2,
 			blockName: 'core/paragraph',
 			baseRevision: '2026-04-15T00:00:00',
 			operations: [
@@ -265,8 +345,62 @@ describe( 'parseSuggestionPayload', () => {
 		} );
 		const result = parseSuggestionPayload( raw );
 		expect( result ).not.toBeNull();
+		expect( result.schemaVersion ).toBe( 2 );
 		expect( result.operations ).toHaveLength( 1 );
 		expect( result.blockName ).toBe( 'core/paragraph' );
+	} );
+
+	it( 'migrates a v1 payload forward to the current version', () => {
+		const raw = JSON.stringify( {
+			schemaVersion: 1,
+			blockName: 'core/paragraph',
+			baseRevision: null,
+			operations: [
+				{
+					type: 'attribute-set',
+					attribute: 'content',
+					before: 'a',
+					after: 'b',
+				},
+			],
+		} );
+		const result = parseSuggestionPayload( raw );
+		expect( result ).not.toBeNull();
+		expect( result.schemaVersion ).toBe( 2 );
+		expect( result.operations ).toHaveLength( 1 );
+	} );
+
+	it( 'treats a missing schemaVersion as v1 and migrates it', () => {
+		const raw = JSON.stringify( {
+			blockName: 'core/paragraph',
+			baseRevision: null,
+			operations: [
+				{
+					type: 'attribute-set',
+					attribute: 'content',
+					before: 'a',
+					after: 'b',
+				},
+			],
+		} );
+		const result = parseSuggestionPayload( raw );
+		expect( result ).not.toBeNull();
+		expect( result.schemaVersion ).toBe( 2 );
+	} );
+
+	it( 'refuses a payload from a newer editor', () => {
+		const raw = JSON.stringify( {
+			schemaVersion: 99,
+			blockName: 'core/paragraph',
+			baseRevision: null,
+			operations: [
+				{
+					type: 'block-rotate',
+					clientId: 'x',
+				},
+			],
+		} );
+		expect( parseSuggestionPayload( raw ) ).toBeNull();
 	} );
 
 	it( 'returns null for missing, empty, or invalid input', () => {
@@ -277,5 +411,61 @@ describe( 'parseSuggestionPayload', () => {
 		expect(
 			parseSuggestionPayload( JSON.stringify( { noOps: true } ) )
 		).toBeNull();
+	} );
+} );
+
+describe( 'findStructuralOp', () => {
+	it( 'returns null for a payload of attribute-set ops only', () => {
+		expect(
+			findStructuralOp( [
+				{ type: 'attribute-set', attribute: 'content', after: 'x' },
+			] )
+		).toBeNull();
+	} );
+
+	it( 'returns the block-remove op when present', () => {
+		const op = {
+			type: 'block-remove',
+			clientId: 'abc',
+			blockName: 'core/paragraph',
+		};
+		expect(
+			findStructuralOp( [
+				{ type: 'attribute-set', attribute: 'x', after: 1 },
+				op,
+			] )
+		).toBe( op );
+	} );
+
+	it( 'recognizes block-insert-after and block-move op types', () => {
+		expect(
+			findStructuralOp( [ { type: 'block-insert-after' } ] )?.type
+		).toBe( 'block-insert-after' );
+		expect( findStructuralOp( [ { type: 'block-move' } ] )?.type ).toBe(
+			'block-move'
+		);
+	} );
+
+	it( 'returns null for non-array input', () => {
+		expect( findStructuralOp( null ) ).toBeNull();
+		expect( findStructuralOp( undefined ) ).toBeNull();
+	} );
+} );
+
+describe( 'clearSuggestionMarkerAttributes', () => {
+	it( 'returns null when there is no marker to clear', () => {
+		expect( clearSuggestionMarkerAttributes( {} ) ).toBeNull();
+		expect(
+			clearSuggestionMarkerAttributes( { metadata: { noteId: 1 } } )
+		).toBeNull();
+	} );
+
+	it( 'strips the suggestion field while preserving other metadata', () => {
+		expect(
+			clearSuggestionMarkerAttributes( {
+				content: 'hi',
+				metadata: { noteId: 7, suggestion: { type: 'pending-remove' } },
+			} )
+		).toEqual( { metadata: { noteId: 7 } } );
 	} );
 } );

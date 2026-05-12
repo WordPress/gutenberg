@@ -138,23 +138,12 @@ export default function SuggestionDiff( { operations } ) {
 				{ __( 'Suggested change' ) }
 			</WCText>
 			{ operations.map( ( op, index ) => {
-				const canWordDiff =
-					op.type === 'attribute-set' &&
-					isTextValue( op.before ) &&
-					isTextValue( op.after ) &&
-					( op.before?.length ?? 0 ) <= MAX_DIFF_LENGTH &&
-					( op.after?.length ?? 0 ) <= MAX_DIFF_LENGTH;
-				const key = `${ op.type }:${ op.attribute }:${ index }`;
+				const key = `${ op.type }:${
+					op.attribute ?? op.clientId
+				}:${ index }`;
 				return (
 					<div key={ key }>
-						{ canWordDiff ? (
-							<TextDiff
-								before={ op.before ?? '' }
-								after={ op.after }
-							/>
-						) : (
-							<AttributeDiff operation={ op } />
-						) }
+						<DiffForOperation operation={ op } />
 					</div>
 				);
 			} ) }
@@ -164,6 +153,40 @@ export default function SuggestionDiff( { operations } ) {
 
 function isTextValue( value ) {
 	return value === null || value === undefined || typeof value === 'string';
+}
+
+/**
+ * Pick the diff renderer for an operation. Hoisted out of the parent map
+ * loop so the per-op decision tree is a flat if/else rather than a nested
+ * ternary.
+ *
+ * @param {{ operation: import('./provider').SuggestionOperation }} props
+ */
+function DiffForOperation( { operation } ) {
+	if ( operation.type === 'block-remove' ) {
+		return <BlockRemoveDiff operation={ operation } />;
+	}
+	if ( operation.type === 'block-insert-after' ) {
+		return <BlockInsertDiff operation={ operation } />;
+	}
+	if ( operation.type === 'block-move' ) {
+		return <BlockMoveDiff operation={ operation } />;
+	}
+	if (
+		operation.type === 'attribute-set' &&
+		isTextValue( operation.before ) &&
+		isTextValue( operation.after ) &&
+		( operation.before?.length ?? 0 ) <= MAX_DIFF_LENGTH &&
+		( operation.after?.length ?? 0 ) <= MAX_DIFF_LENGTH
+	) {
+		return (
+			<TextDiff
+				before={ operation.before ?? '' }
+				after={ operation.after }
+			/>
+		);
+	}
+	return <AttributeDiff operation={ operation } />;
 }
 
 function TextDiff( { before, after } ) {
@@ -216,3 +239,139 @@ function AttributeDiff( { operation } ) {
 		</WCText>
 	);
 }
+
+/**
+ * Render a `block-remove` op as a strikethrough preview. The op carries a
+ * snapshot of the removed block (`op.block`) so the sidebar can show what
+ * is proposed to disappear without depending on the live tree.
+ *
+ * Falls back to a label-only "Remove block: X" line when the block snapshot
+ * is missing (older payloads, or block-editor reading edge cases).
+ *
+ * @param {{ operation: { blockName?: string, block?: Object } }} props
+ */
+function BlockRemoveDiff( { operation } ) {
+	const blockName = operation.blockName ?? operation.block?.name ?? '';
+	const innerText = collectBlockText( operation.block );
+	return (
+		<WCText
+			size="13px"
+			className="editor-collab-sidebar-panel__suggestion-text-diff"
+		>
+			<del>
+				<VisuallyHidden>{ __( 'Deleted:' ) }</VisuallyHidden>
+				{ innerText
+					? innerText
+					: blockName || __( 'Block proposed for removal.' ) }
+			</del>
+		</WCText>
+	);
+}
+
+/**
+ * Render a `block-insert-after` op as an underlined inserted-block preview.
+ * The captured snapshot (`op.block`) carries the proposed block as it was
+ * at insertion time; `collectBlockText` walks its content and innerBlocks
+ * to produce a textual preview.
+ *
+ * Falls back to "Insert block: <name>" when the op carries no usable text
+ * (an inserted block with no content yet, e.g. an empty paragraph).
+ *
+ * @param {{ operation: { blockName?: string, block?: Object } }} props
+ */
+function BlockInsertDiff( { operation } ) {
+	const blockName = operation.blockName ?? operation.block?.name ?? '';
+	const innerText = collectBlockText( operation.block );
+	const fallbackLabel = blockName
+		? // translators: %s: block name (e.g. "core/paragraph").
+		  __( 'New block: %s' ).replace( '%s', blockName )
+		: __( 'New block proposed.' );
+	return (
+		<WCText
+			size="13px"
+			className="editor-collab-sidebar-panel__suggestion-text-diff"
+		>
+			<ins>
+				<VisuallyHidden>{ __( 'Inserted:' ) }</VisuallyHidden>
+				{ innerText || fallbackLabel }
+			</ins>
+		</WCText>
+	);
+}
+
+/**
+ * Render a `block-move` op as a from→to descriptor. The op carries
+ * the from + to anchors (clientId of the previous sibling at each
+ * position, or null for "first child"); the diff renders them in a
+ * compact "Moved from … to …" sentence so reviewers can verify the
+ * proposed motion without the canvas open. Block content stays where
+ * it was — just its position is suggested.
+ *
+ * @param {{ operation: {
+ *   blockName?: string,
+ *   fromAnchorClientId?: string|null,
+ *   toAnchorClientId?: string|null,
+ * } }} props
+ */
+function BlockMoveDiff( { operation } ) {
+	const blockName = operation.blockName ?? '';
+	const friendly = blockName || __( 'block' );
+	const fromLabel = operation.fromAnchorClientId
+		? __( 'after a previous block' )
+		: __( 'the start' );
+	const toLabel = operation.toAnchorClientId
+		? __( 'after a different block' )
+		: __( 'the start' );
+	return (
+		<WCText size="13px" variant="muted">
+			{
+				/* translators: %1$s: block name; %2$s: from-position; %3$s: to-position. */
+				__( 'Moved %1$s from %2$s to %3$s.' )
+					.replace( '%1$s', friendly )
+					.replace( '%2$s', fromLabel )
+					.replace( '%3$s', toLabel )
+			}
+		</WCText>
+	);
+}
+
+/**
+ * Concatenate the text content of a serialized block snapshot for use in
+ * the sidebar diff preview. Walks `attributes.content` (RichText-backed
+ * blocks) plus innerBlocks recursively. Caps the total length at
+ * `MAX_DIFF_LENGTH` so a giant subtree doesn't bloat the sidebar.
+ *
+ * @param {Object|undefined} block Serialized block snapshot.
+ * @return {string} Concatenated text, possibly empty.
+ */
+function collectBlockText( block ) {
+	if ( ! block ) {
+		return '';
+	}
+	const parts = [];
+	const walk = ( node ) => {
+		if ( ! node ) {
+			return;
+		}
+		const text = node.attributes?.content;
+		if ( typeof text === 'string' && text.length > 0 ) {
+			parts.push( text );
+		} else if ( text && typeof text.toString === 'function' ) {
+			// RichTextData wrappers serialize their content via String().
+			const str = String( text );
+			if ( str.length > 0 ) {
+				parts.push( str );
+			}
+		}
+		for ( const child of node.innerBlocks ?? [] ) {
+			walk( child );
+		}
+	};
+	walk( block );
+	const joined = parts.join( ' ' );
+	return joined.length > MAX_DIFF_LENGTH
+		? `${ joined.slice( 0, MAX_DIFF_LENGTH ) }…`
+		: joined;
+}
+
+export { collectBlockText };
