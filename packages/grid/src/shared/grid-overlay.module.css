@@ -9,7 +9,7 @@
 		opacity 200ms ease,
 		visibility 0s linear 200ms;
 	background-image:
-		repeating-linear-gradient(135deg, var(--wp-grid-overlay-stripe-color, color-mix(in srgb, var(--wpds-color-bg-surface-warning) 28%, transparent))
+		repeating-linear-gradient(135deg, var(--wp-grid-overlay-stripe-color, color-mix(in srgb, var(--wpds-color-bg-surface-warning) 15%, transparent))
 		0 6px, transparent 6px 12px);
 }
 
@@ -32,19 +32,27 @@
 		1px dashed
 		var(--wp-grid-overlay-track-color, var(--wpds-color-stroke-surface-warning));
 	background-color: var(--wp-grid-overlay-column-fill, color-mix(in srgb, var(--wpds-color-bg-surface-warning) 10%, transparent));
+	position: relative;
 }
 
 /*
- * Tile a 1px solid stroke at the bottom edge of each row track. The
- * gradient paints transparent for most of the row, a 1px band of the
- * track color where the row ends, then transparent through the gap.
- * `background-size` makes that single stop repeat for every row.
+ * Dashed row dividers between rows. A `::after` pseudo-element tiles a
+ * 1px stroke at the top of each row track and is masked with a
+ * horizontal dash pattern so the stroke renders dashed instead of
+ * solid. The pattern is shifted up by 1px so the first stroke lands
+ * just above the grid (clipped) and the last visible stroke sits at
+ * the top of the final row, leaving no divider at the bottom of the
+ * grid.
  */
-.has-rows .column {
-	background-image:
-		linear-gradient(to bottom, transparent var(--wp-grid-overlay-row-line), var(--wp-grid-overlay-track-color, var(--wpds-color-stroke-surface-warning))
-		var(--wp-grid-overlay-row-line), var(--wp-grid-overlay-track-color, var(--wpds-color-stroke-surface-warning))
-		var(--wp-grid-overlay-row-line-end), transparent var(--wp-grid-overlay-row-line-end));
+.has-rows .column::after {
+	content: "";
+	position: absolute;
+	inset: 0;
+	pointer-events: none;
+	background-image: linear-gradient(to bottom, var(--wp-grid-overlay-track-color, var(--wpds-color-stroke-surface-warning)) 0, var(--wp-grid-overlay-track-color, var(--wpds-color-stroke-surface-warning)) 1px, transparent 1px, transparent var(--wp-grid-overlay-row-tile));
 	background-size: 100% var(--wp-grid-overlay-row-tile);
+	background-position: 0 -1px;
 	background-repeat: repeat;
+	mask-image: repeating-linear-gradient(to right, #000 0 4px, transparent 4px 8px);
+	-webkit-mask-image: repeating-linear-gradient(to right, #000 0 4px, transparent 4px 8px);
 }

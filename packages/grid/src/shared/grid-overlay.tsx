@@ -38,16 +38,15 @@ export function GridOverlay( {
 	isActive,
 }: GridOverlayRenderProps ) {
 	const showRows = typeof rowHeight === 'number';
-	// Custom properties drive the row-divider gradient so the CSS file
-	// stays static while the values come from the live grid.
+	// `--wp-grid-overlay-row-tile` drives the row-divider tile size so
+	// the CSS file stays static while the value comes from the live
+	// grid.
 	const style: React.CSSProperties = {
 		gridTemplateColumns: `repeat(${ columns }, minmax(0, 1fr))`,
 		gap: `${ gapPx }px`,
 		...( showRows
 			? ( {
 					'--wp-grid-overlay-row-tile': `${ rowHeight + gapPx }px`,
-					'--wp-grid-overlay-row-line': `calc(${ rowHeight }px - 1px)`,
-					'--wp-grid-overlay-row-line-end': `${ rowHeight }px`,
 			  } as React.CSSProperties )
 			: {} ),
 	};
