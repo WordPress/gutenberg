@@ -148,7 +148,7 @@ function BlockCard( {
 				className
 			) }
 		>
-			<Stack direction="column" gap="xs">
+			<Stack direction="column" gap="sm">
 				<Stack direction="row" justify="flex-start">
 					{ parentBlockClientId && (
 						<Button
