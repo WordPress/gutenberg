@@ -148,7 +148,7 @@ function render_block_core_post_featured_media( $attributes, $content, $block ) 
 	if ( 'video' === $featured['type'] ) {
 		$style = 'width:100%;' . $extra_styles;
 		$inner = sprintf(
-			'<video src="%s" style="%s"%s></video>',
+			'<video src="%s" style="%s" preload="metadata" playsinline%s></video>',
 			esc_url( $src ),
 			esc_attr( $style ),
 			$controls ? ' controls' : ''
@@ -156,7 +156,7 @@ function render_block_core_post_featured_media( $attributes, $content, $block ) 
 	} elseif ( 'audio' === $featured['type'] ) {
 		$style = 'width:100%;' . $extra_styles;
 		$inner = sprintf(
-			'<audio src="%s" style="%s"%s></audio>',
+			'<audio src="%s" style="%s" preload="metadata"%s></audio>',
 			esc_url( $src ),
 			esc_attr( $style ),
 			$controls ? ' controls' : ''

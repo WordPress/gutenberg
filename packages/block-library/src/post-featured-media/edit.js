@@ -449,7 +449,6 @@ export default function PostFeaturedMediaEdit( {
 			/>
 		);
 	} else if ( activeType === 'video' ) {
-		// Reuses the same <video> element pattern as core/video.
 		if ( media === undefined ) {
 			mediaEl = placeholder( <Spinner /> );
 		} else if ( ! media ) {
@@ -459,12 +458,13 @@ export default function PostFeaturedMediaEdit( {
 				<video
 					src={ mediaUrl }
 					controls={ controls || undefined }
+					preload="metadata"
+					playsInline
 					style={ { ...mediaStyles, width: '100%' } }
 				/>
 			);
 		}
 	} else if ( media === undefined ) {
-		// Reuses the same <audio> element pattern as core/audio.
 		mediaEl = placeholder( <Spinner /> );
 	} else if ( ! media ) {
 		mediaEl = placeholder();
@@ -473,6 +473,7 @@ export default function PostFeaturedMediaEdit( {
 			<audio
 				src={ mediaUrl }
 				controls={ controls || undefined }
+				preload="metadata"
 				style={ { width: '100%' } }
 			/>
 		);

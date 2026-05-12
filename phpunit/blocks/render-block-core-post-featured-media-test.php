@@ -395,6 +395,23 @@ class Tests_Blocks_Render_Post_Featured_Media extends WP_UnitTestCase {
 		wp_delete_post( $image_id, true );
 	}
 
+	public function test_video_has_preload_metadata_and_playsinline() {
+		$this->set_featured_media( self::$video_id, 'video' );
+
+		$output = $this->render_block();
+
+		$this->assertStringContainsString( 'preload="metadata"', $output );
+		$this->assertStringContainsString( 'playsinline', $output );
+	}
+
+	public function test_audio_has_preload_metadata() {
+		$this->set_featured_media( self::$audio_id, 'audio' );
+
+		$output = $this->render_block();
+
+		$this->assertStringContainsString( 'preload="metadata"', $output );
+	}
+
 	public function test_image_attributes_filter_is_applied() {
 		$image_id = $this->make_test_image_thumbnail();
 
