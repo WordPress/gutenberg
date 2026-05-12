@@ -103,7 +103,12 @@ function QuickEditPostTypeModal( {
 	}
 
 	return (
-		<>
+		<form
+			onSubmit={ ( event ) => {
+				event.preventDefault();
+				onSave();
+			} }
+		>
 			<Stack
 				className="dataviews-action-modal__quick-edit-post-type-header"
 				direction="row"
@@ -149,15 +154,15 @@ function QuickEditPostTypeModal( {
 				<Button
 					__next40pxDefaultSize
 					variant="primary"
+					type="submit"
 					isBusy={ isSaving }
-					disabled={ isSaving }
+					disabled={ isSaving || ! isValid }
 					accessibleWhenDisabled
-					onClick={ onSave }
 				>
 					{ __( 'Done' ) }
 				</Button>
 			</Stack>
-		</>
+		</form>
 	);
 }
 

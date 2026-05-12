@@ -1,8 +1,8 @@
 /**
  * Internal dependencies
  */
-import { test, expect } from './fixtures';
-import { SECOND_USER } from './fixtures/collaboration-utils';
+import { test, expect } from '../fixtures';
+import { SECOND_USER } from '../fixtures/collaboration-utils';
 
 const BASE_URL = process.env.WP_BASE_URL || 'http://localhost:8889';
 
@@ -29,14 +29,7 @@ test.describe( 'Collaboration with large documents', () => {
 		const postRoom = `postType/post:${ post.id }`;
 
 		// User 1 (admin) opens the post.
-		await admin.visitAdminPage(
-			'post.php',
-			`post=${ post.id }&action=edit`
-		);
-		await editor.setPreferences( 'core/edit-post', {
-			welcomeGuide: false,
-			fullscreenMode: false,
-		} );
+		await admin.editPost( post.id );
 
 		// Wait for collaboration runtime and entity record to be ready.
 		await collaborationUtils.waitForEntityReady( page );

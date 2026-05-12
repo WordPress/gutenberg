@@ -37,11 +37,8 @@ import {
  */
 import { GridItem } from './grid-item';
 import { resolveFillWidths } from './resolve-fill-widths';
-import type {
-	DashboardGridLayoutItem,
-	DashboardGridProps,
-	ResizeDelta,
-} from './types';
+import type { DashboardGridLayoutItem, DashboardGridProps } from './types';
+import type { ResizeDelta } from '../shared/types';
 import styles from './grid.module.css';
 
 // Reorder is driven by `temporaryLayout` + CSS Grid, not by dnd-kit
@@ -57,7 +54,8 @@ const NO_SORT_STRATEGY = () => null;
  * widths, and multi-row tiles.
  *
  * Each child's `key` must match an entry in the `layout` array;
- * children without a match are rendered outside the grid.
+ * children without a match render at the end of the grid without
+ * explicit placement and fall through CSS Grid's auto-flow.
  *
  * @example
  * ```jsx
@@ -97,6 +95,7 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 			onChangeLayout,
 			onPreviewLayout,
 			renderResizeHandle,
+			renderDragPreview,
 			...divProps
 		} = props;
 		// Preview layout applied during drag/resize before committing.
@@ -453,6 +452,27 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 			onPreviewLayout?.( updatedLayout );
 		} );
 
+		// Drag-overlay clone composition: the surface always wraps with a
+		// thin functional frame (lift, cursor, pointer pass-through). When
+		// `renderDragPreview` is supplied, the consumer's wrapper sits
+		// inside the frame around the cloned children; otherwise the
+		// cloned children render directly so any persistent chrome on
+		// them carries through unchanged.
+		const activeClone = activeId ? childrenMap.get( activeId ) : null;
+		const DragPreview = renderDragPreview;
+		const dragOverlayContent =
+			activeId && activeClone ? (
+				<div className={ styles[ 'drag-preview-frame' ] }>
+					{ DragPreview ? (
+						<DragPreview itemId={ activeId }>
+							{ activeClone }
+						</DragPreview>
+					) : (
+						activeClone
+					) }
+				</div>
+			) : null;
+
 		return (
 			<DndContext
 				sensors={ sensors }
@@ -502,13 +522,7 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 						{ remaining }
 					</div>
 				</SortableContext>
-				<DragOverlay>
-					{ activeId && childrenMap.get( activeId ) ? (
-						<div className={ styles[ 'drag-preview' ] }>
-							{ childrenMap.get( activeId ) }
-						</div>
-					) : null }
-				</DragOverlay>
+				<DragOverlay>{ dragOverlayContent }</DragOverlay>
 			</DndContext>
 		);
 	}
