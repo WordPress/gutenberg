@@ -3,20 +3,8 @@
  */
 import { __, sprintf } from '@wordpress/i18n';
 import { check, chevronDown, moreVertical } from '@wordpress/icons';
-import {
-	DropdownMenu,
-	MenuGroup,
-	MenuItem,
-	privateApis as componentsPrivateApis,
-} from '@wordpress/components';
+import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
-import { unlock } from '../../lock-unlock';
-
-const { Badge: WCBadge } = unlock( componentsPrivateApis );
 
 /**
  * State control for managing viewport and pseudo-state styles.
@@ -30,6 +18,7 @@ const { Badge: WCBadge } = unlock( componentsPrivateApis );
  * @param {Function} props.onChangeViewport    Callback when viewport selection changes.
  * @param {Function} props.onChangePseudoState Callback when pseudo state selection changes.
  * @param {boolean}  props.showText            Whether to show text label on the toggle. Default true.
+ * @param {Object}   props.popoverProps        Popover props for the dropdown menu.
  * @return {Element|null} State control component.
  */
 export default function StateControl( {
@@ -40,6 +29,7 @@ export default function StateControl( {
 	onChangeViewport,
 	onChangePseudoState,
 	showText = true,
+	popoverProps = {},
 } ) {
 	if ( ! viewportStates.length && ! pseudoStates.length ) {
 		return null;
@@ -119,6 +109,7 @@ export default function StateControl( {
 				}
 				popoverProps={ {
 					placement: 'right-start',
+					...popoverProps,
 				} }
 				text={ showText ? triggerLabel : undefined }
 				toggleProps={ toggleProps }
@@ -174,21 +165,6 @@ export default function StateControl( {
 					</>
 				) }
 			</DropdownMenu>
-			{ showText && (
-				<Stack
-					className="block-editor-global-styles-state-control__badges"
-					direction="row"
-					justify="flex-start"
-					gap="xs"
-					wrap="wrap"
-				>
-					{ activeStates.map( ( activeState ) => (
-						<WCBadge key={ activeState.key } intent="info">
-							{ activeState.label }
-						</WCBadge>
-					) ) }
-				</Stack>
-			) }
 		</Stack>
 	);
 }
