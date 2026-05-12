@@ -64,7 +64,7 @@ import {
 } from '../utils/fields';
 import type { PostTypeFormData, PostTypeRecord } from './types';
 import { BLANK_RECORD, serializeForSave, toFormData } from './utils';
-import { useMaybeInvalidateCache } from '../utils/use-maybe-invalidate-cache';
+import { useMaybeInvalidateContentTypeCache } from '../utils/use-maybe-invalidate-content-type-cache';
 import {
 	NEW_ID,
 	POST_TYPE_ENTITY,
@@ -227,7 +227,7 @@ function PostTypePage( {
 	const { saveEntityRecord } = useDispatch( coreStore );
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
-	const maybeInvalidateCache = useMaybeInvalidateCache();
+	const maybeInvalidateCache = useMaybeInvalidateContentTypeCache();
 
 	async function onSave() {
 		if ( isSaving || ! isValid ) {

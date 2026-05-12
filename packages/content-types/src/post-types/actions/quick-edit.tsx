@@ -34,7 +34,7 @@ import {
 } from '../../utils/fields';
 import type { PostTypeFormData } from '../types';
 import { serializeForSave } from '../utils';
-import { useMaybeInvalidateCache } from '../../utils/use-maybe-invalidate-cache';
+import { useMaybeInvalidateContentTypeCache } from '../../utils/use-maybe-invalidate-content-type-cache';
 import { POST_TYPE_ENTITY, TAXONOMY_ENTITY } from '../../constants';
 
 function QuickEditPostTypeModal( {
@@ -69,7 +69,7 @@ function QuickEditPostTypeModal( {
 	const { saveEntityRecord } = useDispatch( coreStore );
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
-	const maybeInvalidateCache = useMaybeInvalidateCache();
+	const maybeInvalidateCache = useMaybeInvalidateContentTypeCache();
 
 	async function onSave() {
 		if ( isSaving || ! isValid ) {

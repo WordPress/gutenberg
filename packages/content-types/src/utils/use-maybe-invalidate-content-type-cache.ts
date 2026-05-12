@@ -16,7 +16,7 @@ import { isShallowEqual } from '@wordpress/is-shallow-equal';
  * meta), so saving or deleting on one side leaves the opposite list cache
  * stale.
  */
-export function useMaybeInvalidateCache() {
+export function useMaybeInvalidateContentTypeCache() {
 	const registry = useRegistry();
 	return useCallback(
 		( prev: string[], next: string[], entityName: string ) => {
