@@ -114,6 +114,15 @@ function isInWordPressEnvironment(): boolean {
  */
 let cachedSlot: HTMLDivElement | null = null;
 
+/**
+ * Creates the slot element, tags it with the cross-instance singleton
+ * attribute, applies the co-located CSS-module class, and appends it to
+ * the given document's body. Callers are expected to have already
+ * verified that the opt-in gate is open and that `ownerDocument.body`
+ * exists; this helper performs no validation of its own.
+ *
+ * @param ownerDocument The document that should own and host the slot.
+ */
 function createSlot( ownerDocument: Document ): HTMLDivElement {
 	const element = ownerDocument.createElement( 'div' );
 	element.setAttribute( WP_COMPAT_OVERLAY_SLOT_ATTRIBUTE, '' );
