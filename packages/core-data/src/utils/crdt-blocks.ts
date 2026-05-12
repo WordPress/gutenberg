@@ -783,7 +783,8 @@ function mergeYArrayByElementIds(
 	yArray: Y.Array< unknown >,
 	newValue: unknown[],
 	query: Record< string, BlockAttributeSchema >,
-	cursorPosition: number | null
+	cursorPosition: MergeCursorPosition,
+	cursorScope: RichTextCursorScope
 ): boolean {
 	if ( ! newValue.some( getArrayElementId ) ) {
 		return false;
@@ -815,7 +816,8 @@ function mergeYArrayByElementIds(
 					currentElement,
 					newElement,
 					query,
-					cursorPosition
+					cursorPosition,
+					cursorScope
 				);
 			}
 		} else {
@@ -862,7 +864,15 @@ function mergeYArray(
 
 	const query = schema.query;
 
-	if ( mergeYArrayByElementIds( yArray, newValue, query, cursorPosition ) ) {
+	if (
+		mergeYArrayByElementIds(
+			yArray,
+			newValue,
+			query,
+			cursorPosition,
+			cursorScope
+		)
+	) {
 		return;
 	}
 
