@@ -264,6 +264,9 @@ jobs:
             needs.build.outputs.job_status == 'success' &&
             github.repository == 'WordPress/gutenberg' &&
             github.event_name == 'push'
+        env:
+            IMAGE_REF: ghcr.io/wordpress/gutenberg/gutenberg-wp-develop-build:${{ github.sha }}
+            PACKAGE_NAME: gutenberg/gutenberg-wp-develop-build
 
         steps:
             - name: Download build artifact
@@ -297,12 +300,49 @@ jobs:
             # Container Registry. The organization name is WordPress, so ${{ github.repository }} causes an error.
             # See https://github.com/orgs/community/discussions/27086 for more info.
             - name: Push built plugin .tar.gz file to GitHub Container Registry
+              env:
+                  COMMIT_SHA: ${{ github.sha }}
+                  REPOSITORY: ${{ github.repository }}
               run: |
-                  oras push "ghcr.io/wordpress/gutenberg/gutenberg-wp-develop-build:${{ github.sha }}" \
-                  "gutenberg.tar.gz:application/gzip" \
-                  --annotation "org.opencontainers.image.description=Gutenberg plugin build for commit ${{ github.sha }}" \
-                  --annotation "org.opencontainers.image.source=https://github.com/${{ github.repository }}" \
-                  --annotation "org.opencontainers.image.revision=${{ github.sha }}"
+                  oras push "$IMAGE_REF" \
+                    "gutenberg.tar.gz:application/gzip" \
+                    --annotation "org.opencontainers.image.description=Gutenberg plugin build for commit ${COMMIT_SHA}" \
+                    --annotation "org.opencontainers.image.source=https://github.com/${REPOSITORY}" \
+                    --annotation "org.opencontainers.image.revision=${COMMIT_SHA}"
+
+            - name: Look up published package version URL
+              id: lookup_version
+              uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+              with:
+                  result-encoding: string
+                  script: |
+                      const { data: versions } = await github.rest.packages.getAllPackageVersionsForPackageOwnedByOrg( {
+                          org: 'WordPress',
+                          package_type: 'container',
+                          package_name: process.env.PACKAGE_NAME,
+                          per_page: 20,
+                      } );
+                      const match = versions.find( ( v ) =>
+                          v.metadata?.container?.tags?.includes( context.sha )
+                      );
+                      if ( ! match ) {
+                          core.setFailed( `No package version found with tag ${ context.sha }` );
+                          return '';
+                      }
+                      return match.html_url;
+
+            - name: Write published image details to job summary
+              env:
+                  PACKAGE_URL: ${{ steps.lookup_version.outputs.result }}
+              run: |
+                  {
+                    echo "## Published to GitHub Container Registry"
+                    echo ""
+                    echo "| | |"
+                    echo "| --- | --- |"
+                    echo "| **Image** | \`${IMAGE_REF}\` |"
+                    echo "| **Package** | [View on GitHub Container Registry](${PACKAGE_URL}) |"
+                  } >> "$GITHUB_STEP_SUMMARY"
 
     revert-version-bump:
         name: Revert version bump if build failed
