@@ -253,7 +253,7 @@ function LayoutPanelPure( {
 			>
 				{ showInheritToggle && (
 					<ToolsPanelItem
-						label={ __( 'Inner blocks use content width' ) }
+						label={ __( 'Use content width' ) }
 						hasValue={ hasInheritToggleValue }
 						onDeselect={ resetInheritToggle }
 						isShownByDefault
