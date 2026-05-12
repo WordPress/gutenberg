@@ -19,6 +19,7 @@
 		{ "path": "../private-apis" },
 		{ "path": "../route" },
 		{ "path": "../ui" },
-		{ "path": "../url" }
+		{ "path": "../url" },
+		{ "path": "../views" }
 	]
 }
