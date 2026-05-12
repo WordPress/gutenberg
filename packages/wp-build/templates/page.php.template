@@ -295,8 +295,19 @@ function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_render_page() {
 	 */
 	do_action( 'admin_footer', '' );
 
-	// Print import map first so it's available for inline scripts
-	wp_script_modules()->print_import_map();
+	// Print import map first so it's available for inline scripts.
+	if ( function_exists( 'gutenberg_print_import_map_early' ) ) {
+		// gutenberg_print_import_map_early() is idempotent: if the import map
+		// was already printed via wp_print_scripts in <head> (the hook fired
+		// above by print_head_scripts()), this is a no-op. When the helper is
+		// absent (wp-build used outside the Gutenberg plugin, or Gutenberg
+		// disabled), the fallback below preserves the pre-fix behavior and
+		// the Firefox 150 single-importmap bug recurs; third-party consumers
+		// of wp-build should ship their own equivalent hoist.
+		gutenberg_print_import_map_early();
+	} else {
+		wp_script_modules()->print_import_map();
+	}
 	print_footer_scripts();
 	wp_script_modules()->print_enqueued_script_modules();
 	wp_script_modules()->print_script_module_preloads();
