@@ -122,9 +122,9 @@ The `resolvers` option should be passed as an object where each key is the name 
 
 Resolvers, in combination with [thunks](https://github.com/WordPress/gutenberg/blob/trunk/docs/how-to-guides/thunks.md#thunks-can-be-async), can be used to implement asynchronous data flows for your store.
 
-##### Object-form resolvers and `isFulfilled`
+##### Object-form resolvers
 
-A resolver can be defined as an object with a `fulfill` method and an optional `isFulfilled` method:
+A resolver can be defined as an object with a `fulfill` method and optional `isFulfilled` and `shouldInvalidate` methods:
 
 ```js
 resolvers: {
@@ -134,11 +134,16 @@ resolvers: {
 			dispatch( { type: 'RECEIVE_PAGE', id, data } );
 		},
 		isFulfilled: ( state, id ) => !! state.pages[ id ],
+		shouldInvalidate: ( action, id ) => action.type === 'INVALIDATE_PAGE' && action.id === id,
 	},
 },
 ```
 
-The `isFulfilled( state, ...args )` method lets you override the `hasFinishedResolution` meta selector for a given set of args. Normally, a resolver is skipped only when the resolution metadata records that it has already run for those args. With `isFulfilled`, you can look at the actual store state and decide that the data is already there — for example because it was loaded by a different resolver or preloaded server-side. When `isFulfilled` returns `true`, the `fulfill` method is not called and no resolution metadata is written.
+A resolver can also be a plain function with `isFulfilled` or `shouldInvalidate` assigned as properties. It will be normalized into the `{ fulfill, isFulfilled, shouldInvalidate }` object form internally.
+
+**`isFulfilled( state, ...args )`** lets you override the `hasFinishedResolution` meta selector for a given set of args. Normally, a resolver is skipped only when the resolution metadata records that it has already run for those args. With `isFulfilled`, you can look at the actual store state and decide that the data is already there: for example because it was loaded by a different resolver or preloaded server-side. When `isFulfilled` returns `true`, the `fulfill` method is not called and no resolution metadata is written.
+
+**`shouldInvalidate( action, ...args )`** is called on every dispatched action for each set of args that has already been resolved. If it returns `true`, the resolution for those args is invalidated, causing the resolver to run again on the next selector call. This is useful for automatically re-fetching data when a related action signals that the cached result may be stale.
 
 #### `controls` (deprecated)
 
