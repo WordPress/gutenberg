@@ -16,7 +16,7 @@
 	}
 
 	.editActionsExit {
-		animation: actions-fold-out var(--wpds-motion-duration-xs) var(--wpds-motion-easing-subtle) forwards;
+		animation: actions-fold-out var(--wpds-motion-duration-sm) var(--wpds-motion-easing-balanced) forwards;
 	}
 
 	@keyframes actions-slide-in {
