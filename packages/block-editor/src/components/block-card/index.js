@@ -148,8 +148,8 @@ function BlockCard( {
 				className
 			) }
 		>
-			<Stack direction="column">
-				<Stack direction="row" justify="flex-start" spacing={ 0 }>
+			<Stack direction="column" gap="xs">
+				<Stack direction="row" justify="flex-start">
 					{ parentBlockClientId && (
 						<Button
 							onClick={ () => selectBlock( parentBlockClientId ) }
@@ -187,7 +187,7 @@ function BlockCard( {
 						}
 					>
 						<BlockIcon icon={ icon } showColors />
-						<Stack direction="column" spacing={ 1 }>
+						<Stack direction="column">
 							<TitleElement className="block-editor-block-card__title">
 								<span className="block-editor-block-card__name">
 									{ !! name?.length ? name : title }
