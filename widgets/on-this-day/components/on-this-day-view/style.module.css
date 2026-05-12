@@ -3,6 +3,7 @@
 	overflow: hidden;
 	isolation: isolate;
 	min-height: 240px;
+	height: 100%;
 }
 
 .content {

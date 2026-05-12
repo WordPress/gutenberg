@@ -2,5 +2,6 @@
 	"name": "core/on-this-day",
 	"title": "On This Day",
 	"description": "The oldest post published on this day in history.",
-	"category": "dashboard"
+	"category": "dashboard",
+	"presentation": "full-bleed"
 }
