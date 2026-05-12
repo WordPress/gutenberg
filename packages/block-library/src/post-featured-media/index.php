@@ -106,18 +106,29 @@ function render_block_core_post_featured_media( $attributes, $content, $block ) 
 	}
 
 	if ( 'image' === $featured['type'] ) {
-		$featured_image = get_the_post_thumbnail( $post_id, $size_slug );
+		$attr   = array();
+		$border = render_block_core_post_featured_media_border_attributes( $attributes );
+		if ( ! empty( $border['class'] ) ) {
+			$attr['class'] = $border['class'];
+		}
+		if ( ! empty( $border['style'] ) || $extra_styles ) {
+			$attr['style'] = ( $border['style'] ?? '' ) . $extra_styles;
+		}
+		// When the image is the entire content of a post permalink, provide
+		// the post title as alt text so the link has an accessible name.
+		if ( $is_link ) {
+			$title        = trim( wp_strip_all_tags( get_the_title( $post_id ) ) );
+			$attr['alt']  = $title
+				? $title
+				/* translators: %d: post ID. */
+				: sprintf( __( 'Untitled post %d' ), $post_id );
+		}
+
+		$featured_image = get_the_post_thumbnail( $post_id, $size_slug, $attr );
 		if ( ! $featured_image ) {
 			return '';
 		}
-		if ( $extra_styles ) {
-			$processor = new WP_HTML_Tag_Processor( $featured_image );
-			if ( $processor->next_tag( 'img' ) ) {
-				$existing = $processor->get_attribute( 'style' ) ?? '';
-				$processor->set_attribute( 'style', $existing . $extra_styles );
-				$featured_image = $processor->get_updated_html();
-			}
-		}
+
 		return render_block_core_post_featured_media_wrap(
 			$featured_image,
 			$attributes,

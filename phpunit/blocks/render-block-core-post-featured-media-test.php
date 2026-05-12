@@ -359,4 +359,63 @@ class Tests_Blocks_Render_Post_Featured_Media extends WP_UnitTestCase {
 
 		$this->assertStringContainsString( 'box-shadow:', $output );
 	}
+
+	/**
+	 * Helper used by the get_the_post_thumbnail tests below. Inserts an image
+	 * attachment, sets it as the post thumbnail, and returns the attachment ID.
+	 */
+	private function make_test_image_thumbnail(): int {
+		$image_id = wp_insert_post(
+			array(
+				'post_type'      => 'attachment',
+				'post_title'     => 'Test Image',
+				'post_status'    => 'inherit',
+				'post_mime_type' => 'image/jpeg',
+				'post_parent'    => self::$post_id,
+				'guid'           => 'http://example.org/wp-content/uploads/test-image.jpg',
+			)
+		);
+		update_post_meta( $image_id, '_wp_attached_file', 'test-image.jpg' );
+		update_post_meta(
+			$image_id,
+			'_wp_attachment_metadata',
+			array( 'width' => 800, 'height' => 600, 'sizes' => array() )
+		);
+		set_post_thumbnail( self::$post_id, $image_id );
+		return $image_id;
+	}
+
+	public function test_linked_image_uses_post_title_as_alt() {
+		$image_id = $this->make_test_image_thumbnail();
+
+		$output = $this->render_block( array( 'isLink' => true ) );
+
+		$this->assertStringContainsString( 'alt="Featured Media Test Post"', $output );
+
+		wp_delete_post( $image_id, true );
+	}
+
+	public function test_image_attributes_filter_is_applied() {
+		$image_id = $this->make_test_image_thumbnail();
+
+		// Themes/plugins commonly hook this filter to add classes, loading
+		// attributes, etc. Refactoring away from get_the_post_thumbnail()
+		// would skip the filter — assert it runs.
+		$ran = false;
+		$cb  = static function ( $attr ) use ( &$ran ) {
+			$ran           = true;
+			$attr['class'] = ( $attr['class'] ?? '' ) . ' from-filter';
+			return $attr;
+		};
+		add_filter( 'wp_get_attachment_image_attributes', $cb );
+
+		$output = $this->render_block();
+
+		remove_filter( 'wp_get_attachment_image_attributes', $cb );
+
+		$this->assertTrue( $ran, 'wp_get_attachment_image_attributes was not called' );
+		$this->assertStringContainsString( 'from-filter', $output );
+
+		wp_delete_post( $image_id, true );
+	}
 }
