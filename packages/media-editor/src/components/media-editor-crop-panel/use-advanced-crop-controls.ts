@@ -6,7 +6,7 @@ import { useCallback, useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { useCropper } from '../../image-editor';
+import { useMediaEditor } from '../../state';
 import {
 	applyCropEdit,
 	cropPixelRectToNormalizedRect,
@@ -44,6 +44,19 @@ export type AdvancedCropControlsState =
 			fineRotation: AdvancedFineRotationConfig;
 			onEdit: ( field: CropEditField, value: number ) => void;
 			onEditEnd: () => void;
+			/**
+			 * Pass to each numeric control's `onSessionStart`. Pauses the
+			 * cropper's auto-history debounce so a focused edit session
+			 * accumulates state changes without producing intermediate
+			 * undo entries.
+			 */
+			onSessionStart: () => void;
+			/**
+			 * Pass to each numeric control's `onSessionEnd`. Resumes the
+			 * debounce. The session's single undo entry is recorded by
+			 * `onEditEnd` (which calls `settleCrop` → `commitHistory`).
+			 */
+			onSessionEnd: () => void;
 	  };
 
 export interface UseAdvancedCropControlsArgs {
@@ -78,8 +91,14 @@ export function useAdvancedCropControls( {
 	freeformCrop,
 	onPlacementControlInteraction,
 }: UseAdvancedCropControlsArgs ): AdvancedCropControlsState {
-	const { state, setCropRect, setRotation, settleCrop, commitHistory } =
-		useCropper();
+	const {
+		state,
+		setCropRect,
+		setRotation,
+		settleCrop,
+		beginGesture,
+		endGesture,
+	} = useMediaEditor();
 	const geometry = useCropGeometry();
 
 	const imageSize = useMemo(
@@ -150,6 +169,14 @@ export function useAdvancedCropControls( {
 		]
 	);
 
+	const onSessionStart = useCallback( () => {
+		beginGesture();
+	}, [ beginGesture ] );
+
+	const onSessionEnd = useCallback( () => {
+		endGesture();
+	}, [ endGesture ] );
+
 	if ( ! geometry.isReady ) {
 		return { isReady: false };
 	}
@@ -167,12 +194,14 @@ export function useAdvancedCropControls( {
 		imageBounds,
 		canMoveCropRect: freeformCrop,
 		ranges,
+		onSessionStart,
+		onSessionEnd,
 		fineRotation: {
 			offset: fineRotationOffset,
 			range: makeRange( fineRotation.min, fineRotation.max ),
 			step: fineRotation.step,
 			onEdit: onFineRotationEdit,
-			onEditEnd: commitHistory,
+			onEditEnd: () => {},
 		},
 		onEdit,
 		onEditEnd,

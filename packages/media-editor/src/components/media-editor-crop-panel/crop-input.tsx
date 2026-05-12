@@ -25,6 +25,8 @@ export interface CropInputProps {
 	suffix?: React.ReactNode;
 	onCommit: ( value: number ) => void;
 	onCommitEnd?: () => void;
+	onSessionStart?: () => void;
+	onSessionEnd?: () => void;
 }
 
 const PX_SUFFIX = <InputControlSuffixWrapper>px</InputControlSuffixWrapper>;
@@ -50,6 +52,8 @@ export default function CropInput( props: CropInputProps ) {
 		suffix = PX_SUFFIX,
 		onCommit,
 		onCommitEnd,
+		onSessionStart,
+		onSessionEnd,
 	} = props;
 	const handlers = useDeferredCommit( {
 		value,
@@ -57,6 +61,8 @@ export default function CropInput( props: CropInputProps ) {
 		commitStep,
 		onCommit,
 		onCommitEnd,
+		onSessionStart,
+		onSessionEnd,
 	} );
 
 	return (

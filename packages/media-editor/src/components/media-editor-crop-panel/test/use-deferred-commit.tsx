@@ -310,4 +310,113 @@ describe( 'useDeferredCommit', () => {
 		expect( onCommit ).not.toHaveBeenCalled();
 		expect( onCommitEnd ).not.toHaveBeenCalled();
 	} );
+
+	it( 'fires onSessionStart on focus and onSessionEnd on blur', () => {
+		const onSessionStart = jest.fn();
+		const onSessionEnd = jest.fn();
+		const { result } = renderHook( () =>
+			useDeferredCommit( {
+				value: 100,
+				range: RANGE,
+				commitStep: 1,
+				onCommit: jest.fn(),
+				onSessionStart,
+				onSessionEnd,
+			} )
+		);
+
+		act( () => result.current.onFocus() );
+		expect( onSessionStart ).toHaveBeenCalledTimes( 1 );
+		expect( onSessionEnd ).not.toHaveBeenCalled();
+
+		act( () => result.current.onChange( '250' ) );
+		expect( onSessionStart ).toHaveBeenCalledTimes( 1 );
+		expect( onSessionEnd ).not.toHaveBeenCalled();
+
+		act( () => result.current.onBlur() );
+		expect( onSessionEnd ).toHaveBeenCalledTimes( 1 );
+	} );
+
+	it( 'fires onSessionEnd exactly once on Enter (not again from the resulting blur)', () => {
+		const onSessionEnd = jest.fn();
+		const { result } = renderHook( () =>
+			useDeferredCommit( {
+				value: 100,
+				range: RANGE,
+				commitStep: 1,
+				onCommit: jest.fn(),
+				onSessionEnd,
+			} )
+		);
+
+		act( () => result.current.onFocus() );
+		act( () => result.current.onChange( '250' ) );
+		act( () => result.current.onKeyDown( fakeKeyboardEvent( 'Enter' ) ) );
+		act( () => result.current.onBlur() );
+
+		expect( onSessionEnd ).toHaveBeenCalledTimes( 1 );
+	} );
+
+	it( 'fires onSessionEnd exactly once on Escape', () => {
+		const onSessionEnd = jest.fn();
+		const { result } = renderHook( () =>
+			useDeferredCommit( {
+				value: 100,
+				range: RANGE,
+				commitStep: 1,
+				onCommit: jest.fn(),
+				onSessionEnd,
+			} )
+		);
+
+		act( () => result.current.onFocus() );
+		act( () => result.current.onChange( '250' ) );
+		act( () => result.current.onKeyDown( fakeKeyboardEvent( 'Escape' ) ) );
+		act( () => result.current.onBlur() );
+
+		expect( onSessionEnd ).toHaveBeenCalledTimes( 1 );
+	} );
+
+	it( 'ends an active session on unmount', () => {
+		const onSessionEnd = jest.fn();
+		const { result, unmount } = renderHook( () =>
+			useDeferredCommit( {
+				value: 100,
+				range: RANGE,
+				commitStep: 1,
+				onCommit: jest.fn(),
+				onSessionEnd,
+			} )
+		);
+
+		act( () => result.current.onFocus() );
+		unmount();
+
+		expect( onSessionEnd ).toHaveBeenCalledTimes( 1 );
+	} );
+
+	it( 'flushes a pending live commit before ending an active session on unmount', () => {
+		const onCommitEnd = jest.fn();
+		const onSessionEnd = jest.fn();
+		const { result, unmount } = renderHook( () =>
+			useDeferredCommit( {
+				value: 100,
+				range: RANGE,
+				commitStep: 1,
+				onCommit: jest.fn(),
+				onCommitEnd,
+				onSessionEnd,
+			} )
+		);
+
+		act( () => result.current.onFocus() );
+		act( () => result.current.onChange( '250' ) );
+		unmount();
+
+		expect( onCommitEnd ).toHaveBeenCalledTimes( 1 );
+		expect( onSessionEnd ).toHaveBeenCalledTimes( 1 );
+		expect( onCommitEnd.mock.invocationCallOrder[ 0 ] ).toBeLessThan(
+			onSessionEnd.mock.invocationCallOrder[ 0 ]
+		);
+	} );
 } );

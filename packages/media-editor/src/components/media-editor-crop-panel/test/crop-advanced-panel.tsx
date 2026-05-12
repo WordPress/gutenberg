@@ -12,6 +12,8 @@ const mockSetCropRect = jest.fn();
 const mockSetRotation = jest.fn();
 const mockSettleCrop = jest.fn();
 const mockCommitHistory = jest.fn();
+const mockPauseHistory = jest.fn();
+const mockResumeHistory = jest.fn();
 const mockNormalizedRect = { x: 0, y: 0, width: 1, height: 1 };
 const mockDefaultCropperState = {
 	image: {
@@ -110,6 +112,8 @@ jest.mock( '../../../image-editor', () => ( {
 		setRotation: mockSetRotation,
 		settleCrop: mockSettleCrop,
 		commitHistory: mockCommitHistory,
+		pauseHistory: mockPauseHistory,
+		resumeHistory: mockResumeHistory,
 	} ),
 } ) );
 
@@ -438,5 +442,55 @@ describe( 'CropAdvancedPanel', () => {
 		fireEvent.blur( rotationInput );
 
 		expect( mockSetRotation ).toHaveBeenCalledWith( 44.99 );
+	} );
+
+	it( 'pauses history on focus and resumes on blur so a focus session is one undo step', () => {
+		render( <CropAdvancedPanel freeformCrop /> );
+
+		fireEvent.click( screen.getByRole( 'button', { name: 'Advanced' } ) );
+		const widthInput = screen.getByLabelText( 'Width' );
+
+		fireEvent.focus( widthInput );
+		expect( mockPauseHistory ).toHaveBeenCalledTimes( 1 );
+		expect( mockResumeHistory ).not.toHaveBeenCalled();
+
+		fireEvent.change( widthInput, { target: { value: '600' } } );
+		fireEvent.change( widthInput, { target: { value: '700' } } );
+
+		// Still paused — intermediate state changes do not record entries.
+		expect( mockPauseHistory ).toHaveBeenCalledTimes( 1 );
+		expect( mockResumeHistory ).not.toHaveBeenCalled();
+
+		fireEvent.blur( widthInput );
+
+		expect( mockResumeHistory ).toHaveBeenCalledTimes( 1 );
+	} );
+
+	it( 'still pauses + resumes when the user types an out-of-range value', () => {
+		render( <CropAdvancedPanel freeformCrop /> );
+
+		fireEvent.click( screen.getByRole( 'button', { name: 'Advanced' } ) );
+		const widthInput = screen.getByLabelText( 'Width' );
+
+		fireEvent.focus( widthInput );
+		fireEvent.change( widthInput, { target: { value: '9999' } } );
+		fireEvent.blur( widthInput );
+
+		expect( mockPauseHistory ).toHaveBeenCalledTimes( 1 );
+		expect( mockResumeHistory ).toHaveBeenCalledTimes( 1 );
+	} );
+
+	it( 'pauses fine rotation edits too', () => {
+		render( <CropAdvancedPanel freeformCrop /> );
+
+		fireEvent.click( screen.getByRole( 'button', { name: 'Advanced' } ) );
+		const rotationInput = screen.getByLabelText( 'Fine rotation angle' );
+
+		fireEvent.focus( rotationInput );
+		fireEvent.change( rotationInput, { target: { value: '12.5' } } );
+		fireEvent.blur( rotationInput );
+
+		expect( mockPauseHistory ).toHaveBeenCalledTimes( 1 );
+		expect( mockResumeHistory ).toHaveBeenCalledTimes( 1 );
 	} );
 } );
