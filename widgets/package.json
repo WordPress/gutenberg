@@ -5,6 +5,20 @@
 	"private": true,
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"gutenberg",
+		"widgets"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/widgets",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/WordPress/gutenberg.git",
+		"directory": "widgets"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
 	"dependencies": {
 		"@wordpress/core-data": "file:../packages/core-data",
 		"@wordpress/data": "file:../packages/data",
@@ -16,5 +30,8 @@
 		"@wordpress/icons": "file:../packages/icons",
 		"@wordpress/ui": "file:../packages/ui",
 		"clsx": "^2.1.1"
+	},
+	"publishConfig": {
+		"access": "public"
 	}
 }
