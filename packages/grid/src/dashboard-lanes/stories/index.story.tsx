@@ -21,7 +21,7 @@ const meta: Meta< typeof DashboardLanes > = {
 	tags: [ 'status-experimental' ],
 	args: {
 		columns: 4,
-		spacing: 2,
+		spacing: 'sm',
 		flowTolerance: 16,
 		rowUnit: 4,
 		editMode: false,
@@ -38,8 +38,10 @@ const meta: Meta< typeof DashboardLanes > = {
 				'Enables responsive mode. Per-lane lower bound in pixels.',
 		},
 		spacing: {
-			control: { type: 'number', min: 0, max: 16, step: 1 },
-			description: 'Gap multiplier (effective gap = spacing × 4px).',
+			control: { type: 'select' },
+			options: [ 'xs', 'sm', 'md', 'lg', 'xl', '2xl', '3xl' ],
+			description:
+				'Gap size from the design-system scale; follows the active density.',
 		},
 		flowTolerance: {
 			control: { type: 'number', min: 0, max: 64, step: 1 },
@@ -277,7 +279,7 @@ export const Spanning: Story = {
 export const EditMode: Story = {
 	args: {
 		columns: 4,
-		spacing: 2,
+		spacing: 'sm',
 		editMode: true,
 	},
 	render: function EditModeStory( args ) {
@@ -430,7 +432,7 @@ export const CustomGridOverlayStory: Story = {
 	name: 'Custom Grid Overlay',
 	args: {
 		columns: 4,
-		spacing: 2,
+		spacing: 'sm',
 		editMode: true,
 	},
 	render: function CustomGridOverlayRender( args ) {

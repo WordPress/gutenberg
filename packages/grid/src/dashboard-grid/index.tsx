@@ -40,6 +40,7 @@ import { GridOverlay } from '../shared/grid-overlay';
 import { resolveFillWidths } from './resolve-fill-widths';
 import type { DashboardGridLayoutItem, DashboardGridProps } from './types';
 import type { ResizeDelta } from '../shared/types';
+import { SPACING_PX, getSpacingTokenVar } from '../shared/spacing';
 import styles from './grid.module.css';
 
 // Reorder is driven by `temporaryLayout` + CSS Grid, not by dnd-kit
@@ -89,7 +90,7 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 			children,
 			className,
 			style,
-			spacing = 2,
+			spacing = 'sm',
 			rowHeight = 'auto',
 			minColumnWidth,
 			editMode = false,
@@ -155,7 +156,7 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 				}
 			}
 		}, [] );
-		const gapPx = spacing * 4;
+		const gapPx = SPACING_PX[ spacing ];
 		const effectiveColumns = useMemo( () => {
 			if ( ! minColumnWidth ) {
 				return columns;
@@ -492,12 +493,20 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 			() => (
 				<Overlay
 					columns={ effectiveColumns }
+					spacing={ spacing }
 					gapPx={ gapPx }
 					rowHeight={ overlayRowHeight }
 					isActive={ editMode }
 				/>
 			),
-			[ Overlay, editMode, effectiveColumns, gapPx, overlayRowHeight ]
+			[
+				Overlay,
+				editMode,
+				effectiveColumns,
+				spacing,
+				gapPx,
+				overlayRowHeight,
+			]
 		);
 
 		return (
@@ -523,7 +532,7 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 							...style,
 							gridTemplateColumns: `repeat(${ effectiveColumns }, minmax(0, 1fr))`,
 							gridAutoRows: rowHeight,
-							gap: gapPx,
+							gap: getSpacingTokenVar( spacing ),
 						} }
 					>
 						{ gridOverlay }

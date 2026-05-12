@@ -74,7 +74,7 @@ function Dashboard() {
 		<DashboardGrid
 			layout={ current }
 			columns={ 6 }
-			spacing={ 2 }
+			spacing="sm"
 			editMode
 			onChangeLayout={ setCurrent }
 		>
@@ -119,7 +119,7 @@ interface DashboardGridLayoutItem {
 | `children` | `ReactNode` | — | Required. Each child needs a `key` matching a layout entry. |
 | `columns` | `number` | `6` | Total columns (fixed mode). |
 | `minColumnWidth` | `number` | — | If set, enables responsive mode: columns derived from container width. Mutually exclusive with `columns`. |
-| `spacing` | `number` | `2` | Gap multiplier. Effective gap = `spacing * 4px`. |
+| `spacing` | `'xs' \| 'sm' \| 'md' \| 'lg' \| 'xl' \| '2xl' \| '3xl'` | `'sm'` | Gap size from the design-system scale (`--wpds-dimension-gap-*`). Follows the active `density` of the ancestor `ThemeProvider`. |
 | `rowHeight` | `number \| 'auto'` | `'auto'` | Row height in pixels, or `'auto'` to let content size rows. |
 | `editMode` | `boolean` | `false` | Enables drag-to-reorder and resize handles. |
 | `onChangeLayout` | `( layout ) => void` | — | Fired when the user commits a drag or resize. |
@@ -224,7 +224,7 @@ function Pinboard() {
 		<DashboardLanes
 			layout={ current }
 			columns={ 4 }
-			spacing={ 2 }
+			spacing="sm"
 			editMode
 			onChangeLayout={ setCurrent }
 		>
@@ -275,7 +275,7 @@ items flow around them; out-of-range values (negative, or beyond
 | `children` | `ReactNode` | — | Required. Each child needs a `key` matching a layout entry. |
 | `columns` | `number` | `6` | Total lanes (fixed mode). |
 | `minColumnWidth` | `number` | — | If set, enables responsive mode: lane count derived from container width. Mutually exclusive with `columns`. |
-| `spacing` | `number` | `2` | Gap multiplier. Effective gap = `spacing * 4px`. |
+| `spacing` | `'xs' \| 'sm' \| 'md' \| 'lg' \| 'xl' \| '2xl' \| '3xl'` | `'sm'` | Gap size from the design-system scale (`--wpds-dimension-gap-*`). Follows the active `density` of the ancestor `ThemeProvider`. |
 | `flowTolerance` | `number` | `16` | Pixel tolerance for source-order tiebreaking when two candidate lanes have similar baselines. Larger values keep tiles closer to reading order at the cost of bigger empty regions. |
 | `rowUnit` | `number` | `4` | Snap unit for the polyfill's `grid-row-start` math. Smaller values produce sharper placement at the cost of a larger implicit row count. Ignored on browsers with native `display: grid-lanes` support. |
 | `editMode` | `boolean` | `false` | Enables drag-to-reorder and horizontal resize. |

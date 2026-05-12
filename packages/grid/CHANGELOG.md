@@ -27,6 +27,17 @@
     `--wp-grid-placeholder-outline-color`,
     `--wp-grid-placeholder-radius`).
 
+### Breaking changes
+
+-   `spacing` is now a size key from the design-system gap scale
+    (`'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl'`) instead of a
+    numeric multiplier. The rendered gap resolves through
+    `--wpds-dimension-gap-{size}`, so it follows the `density` chosen by
+    an ancestor `ThemeProvider`. The default is `'sm'`, which maps to
+    the previous default at `density: 'default'`. Custom overlays
+    receive an additional `spacing` field on `GridOverlayRenderProps`;
+    `gapPx` is retained as a numeric fallback at `default` density.
+
 ### Internal
 
 -   Organize the package source under `dashboard-grid/`,

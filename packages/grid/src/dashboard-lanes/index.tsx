@@ -40,6 +40,7 @@ import { useLanePlacement } from './use-lane-placement';
 import { GridOverlay } from '../shared/grid-overlay';
 import type { DashboardLanesLayoutItem, DashboardLanesProps } from './types';
 import type { ResizeDelta } from '../shared/types';
+import { SPACING_PX, getSpacingTokenVar } from '../shared/spacing';
 import styles from './lanes.module.css';
 
 const NO_SORT_STRATEGY = () => null;
@@ -89,7 +90,7 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 			children,
 			className,
 			style,
-			spacing = 2,
+			spacing = 'sm',
 			flowTolerance = 16,
 			rowUnit = 4,
 			minColumnWidth,
@@ -141,7 +142,7 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 			}
 		}, [ container ] );
 
-		const gapPx = spacing * 4;
+		const gapPx = SPACING_PX[ spacing ];
 		const effectiveColumns = useMemo( () => {
 			if ( ! minColumnWidth ) {
 				return columns;
@@ -435,11 +436,12 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 			() => (
 				<Overlay
 					columns={ effectiveColumns }
+					spacing={ spacing }
 					gapPx={ gapPx }
 					isActive={ editMode }
 				/>
 			),
-			[ Overlay, editMode, effectiveColumns, gapPx ]
+			[ Overlay, editMode, effectiveColumns, spacing, gapPx ]
 		);
 
 		return (
@@ -471,7 +473,8 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 								// in each tile's `top`). Driving the toggle
 								// from CSS keeps SSR and client output
 								// identical regardless of native support.
-								'--wp-grid-lane-gap': `${ gapPx }px`,
+								'--wp-grid-lane-gap':
+									getSpacingTokenVar( spacing ),
 								'--wp-grid-lane-row-unit': `${ Math.max(
 									1,
 									rowUnit

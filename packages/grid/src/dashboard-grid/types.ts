@@ -7,6 +7,7 @@ import type {
 	ResizeDelta,
 	ResizeHandleRenderProps,
 } from '../shared/types';
+import type { DashboardGridSpacing } from '../shared/spacing';
 
 /**
  * Dashboard grid layout item definition.
@@ -150,12 +151,13 @@ interface BaseDashboardGridProps
 	style?: React.CSSProperties;
 
 	/**
-	 * Grid gap multiplier size (e.g., a spacing of 2 results in a gap
-	 * of 8px, it's multiplied by 4).
+	 * Gap size between tiles. Maps to the design-system gap scale
+	 * (`--wpds-dimension-gap-*`), so the rendered gap follows the
+	 * `density` chosen by an ancestor `ThemeProvider`.
 	 *
-	 * @default 2
+	 * @default 'sm'
 	 */
-	spacing?: number;
+	spacing?: DashboardGridSpacing;
 
 	/**
 	 * Height of each row in pixels, or `'auto'` to let the tallest

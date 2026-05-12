@@ -6,6 +6,7 @@ import type {
 	GridOverlayRenderProps,
 	ResizeHandleRenderProps,
 } from '../shared/types';
+import type { DashboardGridSpacing } from '../shared/spacing';
 
 /**
  * Lanes layout item definition.
@@ -79,11 +80,13 @@ interface BaseDashboardLanesProps
 	style?: React.CSSProperties;
 
 	/**
-	 * Gap multiplier (effective gap = `spacing * 4px`).
+	 * Gap size between tiles. Maps to the design-system gap scale
+	 * (`--wpds-dimension-gap-*`), so the rendered gap follows the
+	 * `density` chosen by an ancestor `ThemeProvider`.
 	 *
-	 * @default 2
+	 * @default 'sm'
 	 */
-	spacing?: number;
+	spacing?: DashboardGridSpacing;
 
 	/**
 	 * `flow-tolerance` value in pixels. When two candidate lanes

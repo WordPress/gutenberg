@@ -7,6 +7,7 @@ import clsx from 'clsx';
  * Internal dependencies
  */
 import type { GridOverlayRenderProps } from './types';
+import { getSpacingTokenVar } from './spacing';
 import styles from './grid-overlay.module.css';
 
 /**
@@ -24,7 +25,9 @@ import styles from './grid-overlay.module.css';
  *
  * @param props           Render props supplied by the surface.
  * @param props.columns   Number of column tracks to mirror.
- * @param props.gapPx     Gap between tracks in pixels.
+ * @param props.spacing   Gap size key from the design-system scale.
+ *                        Emitted as `--wpds-dimension-gap-{size}` so the
+ *                        overlay follows the active density.
  * @param props.rowHeight Row height in pixels for surfaces with uniform
  *                        rows. Omitted on lane surfaces or auto-sized
  *                        grids; in that case row dividers are skipped.
@@ -33,21 +36,22 @@ import styles from './grid-overlay.module.css';
  */
 export function GridOverlay( {
 	columns,
-	gapPx,
+	spacing,
 	rowHeight,
 	isActive,
 }: GridOverlayRenderProps ) {
 	const showRows = typeof rowHeight === 'number';
+	const gapVar = getSpacingTokenVar( spacing );
 	// `--wp-grid-overlay-row-height` and `--wp-grid-overlay-row-tile`
 	// drive the row-divider stops so the CSS file stays static while
 	// the values come from the live grid.
 	const style: React.CSSProperties = {
 		gridTemplateColumns: `repeat(${ columns }, minmax(0, 1fr))`,
-		gap: `${ gapPx }px`,
+		gap: gapVar,
 		...( showRows
 			? ( {
 					'--wp-grid-overlay-row-height': `${ rowHeight }px`,
-					'--wp-grid-overlay-row-tile': `${ rowHeight + gapPx }px`,
+					'--wp-grid-overlay-row-tile': `calc(${ rowHeight }px + ${ gapVar })`,
 			  } as React.CSSProperties )
 			: {} ),
 	};

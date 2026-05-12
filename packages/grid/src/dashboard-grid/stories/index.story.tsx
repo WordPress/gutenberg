@@ -28,7 +28,7 @@ const meta: Meta< typeof DashboardGrid > = {
 	tags: [ 'status-experimental' ],
 	args: {
 		columns: 6,
-		spacing: 2,
+		spacing: 'sm',
 		rowHeight: 80,
 		editMode: false,
 	},
@@ -44,8 +44,10 @@ const meta: Meta< typeof DashboardGrid > = {
 				'Enables responsive mode. Per-column lower bound in pixels.',
 		},
 		spacing: {
-			control: { type: 'number', min: 0, max: 16, step: 1 },
-			description: 'Gap multiplier (effective gap = spacing × 4px).',
+			control: { type: 'select' },
+			options: [ 'xs', 'sm', 'md', 'lg', 'xl', '2xl', '3xl' ],
+			description:
+				'Gap size from the design-system scale; follows the active density.',
 		},
 		rowHeight: {
 			control: { type: 'number', min: 24, max: 400, step: 4 },
@@ -461,7 +463,7 @@ export const RowHeight: Story = {
 export const EditMode: Story = {
 	args: {
 		columns: 12,
-		spacing: 4,
+		spacing: 'lg',
 		rowHeight: 80,
 		editMode: true,
 	},
@@ -711,7 +713,7 @@ function CustomDragPreview( { children }: DragPreviewRenderProps ) {
 export const Customization: Story = {
 	args: {
 		columns: 6,
-		spacing: 2,
+		spacing: 'sm',
 		rowHeight: 80,
 		editMode: true,
 		layout: [
@@ -860,7 +862,7 @@ export const CustomGridOverlayStory: Story = {
 	name: 'Custom Grid Overlay',
 	args: {
 		columns: 12,
-		spacing: 4,
+		spacing: 'lg',
 		rowHeight: 80,
 		editMode: true,
 		layout: [
