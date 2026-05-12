@@ -82,7 +82,9 @@ const bgTokens: Record< Tone, string > = {
 };
 
 const fgTokens: Record< Tone, string > = {
-	brand: 'var(--wpds-color-fg-content-info)',
+	// `brand` has no dedicated fg-content token in the design system,
+	// so neutral content reads safely against the brand surface tint.
+	brand: 'var(--wpds-color-fg-content-neutral)',
 	info: 'var(--wpds-color-fg-content-info)',
 	success: 'var(--wpds-color-fg-content-success)',
 	warning: 'var(--wpds-color-fg-content-warning)',
