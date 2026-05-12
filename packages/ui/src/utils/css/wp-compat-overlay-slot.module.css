@@ -25,8 +25,8 @@
  *   1. `z-index` is ignored on `position: static` elements. The slot needs
  *      to be positioned for the `1000000003` value to apply at all.
  *   2. Any non-static position makes the slot a containing block for its
- *      absolute-positioned descendants. Base UI overlay positioners use
- *      `positionMethod: 'absolute'` by default, and floating-ui writes
+ *      absolute-positioned descendants. Overlay positioners in this
+ *      package position popups absolutely, and floating-ui writes
  *      physical viewport-relative `top` / `left` coordinates onto the
  *      floating element. For those coordinates to land correctly, the
  *      containing block must sit at viewport `(0, 0)`. `position: fixed`

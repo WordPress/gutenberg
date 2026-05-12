@@ -46,7 +46,7 @@ export function useEnableWpCompatOverlaySlot(): void {
 	// time descendants that resolve the gate during render (Tooltip's
 	// `Portal` reads `getWpCompatOverlaySlot()` on every render to pick
 	// its container) have already seen the slot disabled and rendered
-	// against Base UI's default container. Render-phase visibility
+	// against the default portal container. Render-phase visibility
 	// extends only to components rendered *after* this hook in the same
 	// pass — i.e. descendants of the caller. The "call from a top-level
 	// component" guidance in the JSDoc keeps that invariant trivially

@@ -136,7 +136,7 @@ function createSlot( ownerDocument: Document ): HTMLDivElement {
 /**
  * Returns the body-level compat overlay slot element when the runtime opts
  * in, lazily creating it on first call. Returns `null` otherwise, leaving
- * Base UI's default portal container in effect.
+ * the underlying overlay primitives' default portal container in effect.
  *
  * Two opt-in paths:
  * - Auto-enabled by detecting `window.wp.components` on the global. This
@@ -199,8 +199,8 @@ export function getWpCompatOverlaySlot(): HTMLDivElement | null {
 	// `document.body` can be null if the helper is called before `<body>` has
 	// been parsed (e.g. from a `<script>` placed in `<head>` ahead of body).
 	// Bail in that case rather than throwing in `createSlot`'s `appendChild`;
-	// callers fall through to Base UI's default container, which is the same
-	// no-op behavior as when neither gate fires.
+	// callers fall through to the default portal container, which is the
+	// same no-op behavior as when neither gate fires.
 	if ( ! ownerDocument || ! ownerDocument.body ) {
 		return null;
 	}
