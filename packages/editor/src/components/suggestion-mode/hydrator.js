@@ -39,6 +39,40 @@ import { useNoteThreads } from '../collab-sidebar/hooks';
 import { store as editorStore } from '../../store';
 
 /**
+ * Shallow equality over two flat objects of primitive-ish values. The
+ * hydrator uses this to avoid re-dispatching `SEED_FROM_COMMENT` on every
+ * render when the persisted payload hasn't actually moved — the reducer
+ * would otherwise mint a new state reference each time and the effect would
+ * loop. Strings, numbers, booleans, null, and undefined compare by value;
+ * non-primitive values (object attribute payloads like `style`) fall back to
+ * reference equality. That matches the suggestion payload shape today —
+ * `attribute-set` ops carry primitive or string-serialized values.
+ *
+ * @param {Object} a First object.
+ * @param {Object} b Second object.
+ * @return {boolean} True when both objects have the same keys and matching values.
+ */
+function shallowEqual( a, b ) {
+	if ( a === b ) {
+		return true;
+	}
+	if ( ! a || ! b ) {
+		return false;
+	}
+	const ak = Object.keys( a );
+	const bk = Object.keys( b );
+	if ( ak.length !== bk.length ) {
+		return false;
+	}
+	for ( const k of ak ) {
+		if ( a[ k ] !== b[ k ] ) {
+			return false;
+		}
+	}
+	return true;
+}
+
+/**
  * Derive baseline + overlay attribute pairs from a parsed payload's
  * `attribute-set` operations. Structural ops (`block-remove`,
  * `block-insert-after`, `block-move`) are already rendered via the block's
@@ -117,6 +151,24 @@ export default function SuggestionOverlayHydrator() {
 				existing &&
 				existing.hydratedFromCommentId !== thread.id &&
 				Object.keys( existing.overlayAttributes ?? {} ).length > 0
+			) {
+				continue;
+			}
+			// Already hydrated from this comment and the persisted values
+			// haven't changed — no-op rather than re-dispatching. The reducer
+			// would otherwise produce a new state reference on every render,
+			// looping the effect indefinitely.
+			if (
+				existing &&
+				existing.hydratedFromCommentId === thread.id &&
+				shallowEqual(
+					existing.baselineAttributes,
+					pairs.baselineAttributes
+				) &&
+				shallowEqual(
+					existing.overlayAttributes,
+					pairs.overlayAttributes
+				)
 			) {
 				continue;
 			}
