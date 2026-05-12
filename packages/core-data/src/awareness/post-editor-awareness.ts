@@ -31,7 +31,11 @@ import {
 } from '../utils/crdt-user-selections';
 
 import { SelectionDirection } from '../types';
-import type { SelectionState, WPBlockSelection } from '../types';
+import type {
+	ResolvedSelection,
+	SelectionState,
+	WPBlockSelection,
+} from '../types';
 import type { YBlocks } from '../utils/crdt-blocks';
 import type {
 	DebugCollaboratorData,
@@ -243,12 +247,15 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 	 * @param selection - The selection state.
 	 * @return The rich-text offset and block client ID, or nulls if not resolvable.
 	 */
-	public convertSelectionStateToAbsolute( selection: SelectionState ): {
-		richTextOffset: number | null;
-		localClientId: string | null;
-	} {
+	public convertSelectionStateToAbsolute(
+		selection: SelectionState
+	): ResolvedSelection {
 		if ( selection.type === SelectionType.None ) {
-			return { richTextOffset: null, localClientId: null };
+			return {
+				richTextOffset: null,
+				localClientId: null,
+				attributeKey: null,
+			};
 		}
 
 		if ( selection.type === SelectionType.WholeBlock ) {
@@ -271,7 +278,11 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 				}
 			}
 
-			return { richTextOffset: null, localClientId };
+			return {
+				richTextOffset: null,
+				localClientId,
+				attributeKey: null,
+			};
 		}
 
 		// Text-based selections: resolve cursor position and navigate up.
@@ -286,7 +297,11 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 		);
 
 		if ( ! absolutePosition ) {
-			return { richTextOffset: null, localClientId: null };
+			return {
+				richTextOffset: null,
+				localClientId: null,
+				attributeKey: null,
+			};
 		}
 
 		const yType = getContainingBlockYMap( absolutePosition.type );
@@ -299,6 +314,7 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 				asHtmlStringIndex( absolutePosition.index )
 			),
 			localClientId,
+			attributeKey: cursorPos.attributeKey ?? null,
 		};
 	}
 

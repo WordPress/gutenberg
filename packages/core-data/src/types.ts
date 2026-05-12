@@ -127,6 +127,14 @@ export type CursorPosition = {
 	// character. With both of these values as editor state, a change in perceived
 	// position will always result in a redraw.
 	absoluteOffset: number;
+
+	// The sender's `WPBlockSelection.attributeKey` (e.g. `content` or
+	// `body.0.cells.0.content`). Used by the receiver to scope the cursor
+	// DOM lookup to a specific RichText element, identified by the
+	// `data-wp-block-attribute-key` attribute that RichText writes to its
+	// contenteditable. Optional so older awareness payloads (without the
+	// field) still resolve to the containing block element as a fallback.
+	attributeKey?: string;
 };
 
 /**
@@ -192,4 +200,12 @@ export type SelectionState =
 export interface ResolvedSelection {
 	richTextOffset: number | null;
 	localClientId: string | null;
+
+	// Identifier of the RichText attribute within the block, e.g.:
+	// - `content` on a core/paragraph block
+	// - `citation` on a quote block
+	// - a dot path into a nested attribute like `body.0.cells.0.content` for a
+	//   core/table cell.
+	// Set to `null` for WholeBlock selections.
+	attributeKey: string | null;
 }

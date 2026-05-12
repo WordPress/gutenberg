@@ -538,6 +538,9 @@ describe( 'getSelectionState', () => {
 			expect(
 				( result as SelectionCursor ).cursorPosition.absoluteOffset
 			).toBe( 5 );
+			expect(
+				( result as SelectionCursor ).cursorPosition.attributeKey
+			).toBe( 'content' );
 		} );
 
 		test( 'returns Cursor at start of block (offset 0)', () => {
@@ -586,6 +589,9 @@ describe( 'getSelectionState', () => {
 			expect(
 				( result as SelectionCursor ).cursorPosition.absoluteOffset
 			).toBe( 4 );
+			expect(
+				( result as SelectionCursor ).cursorPosition.attributeKey
+			).toBe( 'body.0.cells.0.content' );
 		} );
 
 		test( 'returns None when block does not exist', () => {

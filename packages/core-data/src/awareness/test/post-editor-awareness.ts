@@ -647,6 +647,7 @@ describe( 'PostEditorAwareness', () => {
 				cursorPosition: {
 					relativePosition,
 					absoluteOffset: 5,
+					attributeKey: 'content',
 				},
 			};
 
@@ -655,6 +656,7 @@ describe( 'PostEditorAwareness', () => {
 
 			expect( result.richTextOffset ).toBe( 5 );
 			expect( result.localClientId ).toBe( 'block-1' );
+			expect( result.attributeKey ).toBe( 'content' );
 		} );
 
 		test( 'should resolve WholeBlock selection to block client ID', () => {
@@ -687,6 +689,58 @@ describe( 'PostEditorAwareness', () => {
 
 			expect( result.richTextOffset ).toBeNull();
 			expect( result.localClientId ).toBe( 'block-1' );
+			expect( result.attributeKey ).toBeNull();
+		} );
+
+		test( 'should return null attributeKey for SelectionType.None', () => {
+			const awareness = new PostEditorAwareness(
+				doc,
+				'postType',
+				'post',
+				123
+			);
+
+			const result = awareness.convertSelectionStateToAbsolute( {
+				type: SelectionType.None,
+			} );
+
+			expect( result.attributeKey ).toBeNull();
+		} );
+
+		test( 'should pass through nested attributeKey for a cursor selection', () => {
+			const awareness = new PostEditorAwareness(
+				doc,
+				'postType',
+				'post',
+				123
+			);
+
+			const documentMap = doc.getMap( CRDT_RECORD_MAP_KEY );
+			const blocks = documentMap.get( 'blocks' ) as Y.Array<
+				Y.Map< any >
+			>;
+			const block = blocks.get( 0 );
+			const attrs = block.get( 'attributes' ) as Y.Map< Y.Text >;
+			const yText = attrs.get( 'content' );
+
+			const relativePosition = Y.createRelativePositionFromTypeIndex(
+				yText as Y.Text,
+				3
+			);
+
+			const selection: SelectionCursor = {
+				type: SelectionType.Cursor,
+				cursorPosition: {
+					relativePosition,
+					absoluteOffset: 3,
+					attributeKey: 'body.0.cells.0.content',
+				},
+			};
+
+			const result =
+				awareness.convertSelectionStateToAbsolute( selection );
+
+			expect( result.attributeKey ).toBe( 'body.0.cells.0.content' );
 		} );
 	} );
 

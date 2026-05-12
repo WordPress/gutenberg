@@ -194,6 +194,7 @@ function getCursorPosition(
 	return {
 		relativePosition,
 		absoluteOffset: selection.offset,
+		attributeKey: selection.attributeKey,
 	};
 }
 
