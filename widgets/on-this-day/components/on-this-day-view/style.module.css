@@ -23,7 +23,7 @@
 	background-position: center;
 	background-size: cover;
 	filter: var(--on-this-day-bg-filter, none);
-	transition: filter 300ms ease;
+	transition: filter var(--wpds-motion-duration-lg) var(--wpds-motion-easing-expressive);
 }
 
 .with-image:hover::before,
