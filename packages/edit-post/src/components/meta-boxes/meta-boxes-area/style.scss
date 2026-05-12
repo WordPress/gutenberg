@@ -63,6 +63,7 @@
 		width: 44px;
 	}
 
+	// Block interaction with meta boxes while they are being saved.
 	&.is-loading::before {
 		position: absolute;
 		top: 0;
@@ -78,7 +79,7 @@
 		position: absolute;
 		top: 10px;
 		right: 20px;
-		z-index: 2;
+		z-index: 2; // Stack above the .is-loading::before overlay.
 	}
 
 	// Hide disabled meta boxes using CSS so that we don't interfere with plugins
