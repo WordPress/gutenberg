@@ -58,3 +58,33 @@ function gutenberg_admin_bar_in_editor_body_class( $classes ) {
 }
 
 add_filter( 'admin_body_class', 'gutenberg_admin_bar_in_editor_body_class' );
+
+/**
+ * Enables the admin bar on the site-editor-v2 page.
+ */
+function gutenberg_enable_admin_bar_in_site_editor_v2() {
+	if (
+		! is_admin_bar_showing() ||
+		! gutenberg_is_experiment_enabled( 'gutenberg-admin-bar-in-editor' )
+	) {
+		return;
+	}
+
+	add_action( 'admin_head', 'wp_admin_bar_header' );
+	remove_action( 'admin_bar_menu', 'wp_admin_bar_sidebar_toggle', 0 );
+	add_action( 'admin_footer-site-editor-v2', 'wp_admin_bar_render' );
+
+	add_action(
+		'admin_head-site-editor-v2',
+		static function () {
+			echo '<script>'
+				. 'window.__experimentalAdminBarInEditor = true;'
+				. 'document.addEventListener("DOMContentLoaded", function () { document.body.classList.add("has-admin-bar-in-editor"); });'
+				. '</script>';
+		}
+	);
+
+	wp_enqueue_style( 'admin-bar' );
+}
+
+add_action( 'site-editor-v2_init', 'gutenberg_enable_admin_bar_in_site_editor_v2' );
