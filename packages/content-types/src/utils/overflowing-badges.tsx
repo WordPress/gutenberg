@@ -1,0 +1,79 @@
+/**
+ * WordPress dependencies
+ */
+import { __, sprintf } from '@wordpress/i18n';
+// eslint-disable-next-line @wordpress/use-recommended-components -- Used here because it supports rendering as a `span` via the `render` prop to avoid invalid HTML.
+import { Badge, Button, Popover, Stack, Tooltip } from '@wordpress/ui';
+
+const DEFAULT_MAX = 3;
+
+type OverflowingBadgesProps = {
+	items: Array< { key: string; label: string } >;
+	max?: number;
+};
+
+export function OverflowingBadges( {
+	items,
+	max = DEFAULT_MAX,
+}: OverflowingBadgesProps ) {
+	const visible = items.slice( 0, max );
+	const hidden = items.slice( max );
+	const moreLabel = sprintf(
+		/* translators: %d: number of additional items */
+		__( 'Show %d more' ),
+		hidden.length
+	);
+	return (
+		<Stack
+			direction="row"
+			wrap="wrap"
+			gap="xs"
+			align="center"
+			render={ <span /> }
+		>
+			{ visible.map( ( item ) => (
+				<Badge key={ item.key }>{ item.label }</Badge>
+			) ) }
+			{ hidden.length > 0 && (
+				<Tooltip.Provider delay={ 0 }>
+					<Tooltip.Root>
+						<Popover.Root>
+							<Tooltip.Trigger
+								render={
+									<Popover.Trigger
+										render={
+											<Button
+												variant="outline"
+												tone="neutral"
+												size="small"
+												aria-label={ moreLabel }
+												style={ {
+													minWidth: 'auto',
+													borderRadius:
+														'var(--wpds-border-radius-lg)',
+													fontWeight: 'normal',
+												} }
+											>
+												{ `+${ hidden.length }` }
+											</Button>
+										}
+									/>
+								}
+							/>
+							<Popover.Popup style={ { maxWidth: 320 } }>
+								<Stack direction="row" wrap="wrap" gap="xs">
+									{ hidden.map( ( item ) => (
+										<Badge key={ item.key }>
+											{ item.label }
+										</Badge>
+									) ) }
+								</Stack>
+							</Popover.Popup>
+							<Tooltip.Popup>{ moreLabel }</Tooltip.Popup>
+						</Popover.Root>
+					</Tooltip.Root>
+				</Tooltip.Provider>
+			) }
+		</Stack>
+	);
+}
