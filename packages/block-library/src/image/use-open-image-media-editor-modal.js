@@ -147,8 +147,16 @@ export function useOpenImageMediaEditorModal( { attributes, setAttributes } ) {
 			select( blockEditorStore ).getSettings()[ openMediaEditorModalKey ],
 		[]
 	);
+	// Track the block's current alt and caption in a ref so handleMediaUpdate
+	// can read the latest values without being listed as a dependency (which
+	// would recreate the callback and re-register the onUpdate handler on every
+	// keystroke while the modal is open).
 	const blockMetadataRef = useRef( { alt, caption: caption?.toString() } );
+	// Snapshot of the attachment's metadata taken just before the modal opens,
+	// used as the baseline for detecting what changed during the editing session.
 	const mediaEditorMetadataBaselineRef = useRef();
+	// Incremented on every handleMediaUpdate call; stale async continuations
+	// check against this to bail out if a newer update has since started.
 	const mediaEditorMetadataSyncRequestRef = useRef( 0 );
 
 	useEffect( () => {
@@ -204,6 +212,8 @@ export function useOpenImageMediaEditorModal( { attributes, setAttributes } ) {
 
 	const resolveFreshAttachmentRecord = useCallback(
 		async ( attachmentId ) => {
+			// Bust cached records so resolveAttachmentRecord fetches the
+			// server state that reflects the media editor's saved changes.
 			const { invalidateResolution } = registry.dispatch( coreStore );
 
 			invalidateResolution( 'getEntityRecord', [
@@ -217,13 +227,6 @@ export function useOpenImageMediaEditorModal( { attributes, setAttributes } ) {
 				attachmentId,
 				ATTACHMENT_EDIT_QUERY,
 			] );
-			invalidateResolution( 'getEntityRecord', [
-				'postType',
-				'attachment',
-				attachmentId,
-				{ context: 'view' },
-			] );
-
 			return resolveAttachmentRecord( attachmentId );
 		},
 		[ registry, resolveAttachmentRecord ]
@@ -235,6 +238,8 @@ export function useOpenImageMediaEditorModal( { attributes, setAttributes } ) {
 				return;
 			}
 
+			// Capture and clear the baseline so a rapid second save doesn't
+			// reuse a stale snapshot.
 			const originalAttachment = mediaEditorMetadataBaselineRef.current;
 			mediaEditorMetadataBaselineRef.current = undefined;
 			const syncRequest = ++mediaEditorMetadataSyncRequestRef.current;
@@ -251,17 +256,25 @@ export function useOpenImageMediaEditorModal( { attributes, setAttributes } ) {
 				setAttributes( nextAttributes );
 			}
 
+			// Without a baseline we cannot tell what changed, so skip the sync.
 			if ( ! originalAttachment ) {
 				return;
 			}
 
+			// Fetch fresh server state so the comparison reflects what the
+			// media editor actually saved, not a potentially stale cache.
 			const resolvedAttachment =
 				await resolveFreshAttachmentRecord( newId );
 
+			// A newer update started while we were awaiting; discard this one.
 			if ( syncRequest !== mediaEditorMetadataSyncRequestRef.current ) {
 				return;
 			}
 
+			// Sync alt text and caption back to the block only when they were
+			// changed in the media editor. Fields the user has independently
+			// customised on the block (i.e. values that don't match the
+			// pre-session attachment metadata) are left untouched.
 			const resolvedMetadataAttributes = getSyncedImageBlockAttributes(
 				blockMetadataRef.current,
 				originalAttachment,
@@ -284,6 +297,11 @@ export function useOpenImageMediaEditorModal( { attributes, setAttributes } ) {
 			return;
 		}
 
+		// Snapshot the attachment's current metadata before the user makes
+		// any changes so handleMediaUpdate can compare against it later.
+		// Prefer a freshly resolved edit-context record for accuracy; fall
+		// back to whatever is in the cache, or a minimal object derived from
+		// the block's own attributes when nothing is cached yet.
 		const cachedAttachmentRecord = getCachedAttachmentRecord( id );
 		const fallbackAttachmentRecord =
 			getAttachmentFallbackForEmptyBlockMetadata(

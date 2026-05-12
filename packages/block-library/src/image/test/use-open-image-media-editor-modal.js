@@ -143,10 +143,6 @@ describe( 'useOpenImageMediaEditorModal', () => {
 			'getEntityRecord',
 			[ 'postType', 'attachment', 1, { context: 'edit' } ]
 		);
-		expect( registry.actions.invalidateResolution ).toHaveBeenCalledWith(
-			'getEntityRecord',
-			[ 'postType', 'attachment', 1, { context: 'view' } ]
-		);
 	} );
 
 	it( 'resolves original raw attachment metadata before opening the modal when it is not cached', async () => {
