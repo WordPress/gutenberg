@@ -1483,12 +1483,17 @@
 			"count": 1
 		}
 	},
-	"packages/grid/src/grid.tsx": {
+	"packages/grid/src/dashboard-grid/index.tsx": {
 		"react-hooks/refs": {
 			"count": 13
 		}
 	},
-	"packages/grid/src/resize-handle.tsx": {
+	"packages/grid/src/dashboard-lanes/index.tsx": {
+		"react-hooks/refs": {
+			"count": 13
+		}
+	},
+	"packages/grid/src/shared/resize-handle.tsx": {
 		"react-hooks/immutability": {
 			"count": 1
 		}
@@ -1699,6 +1704,11 @@
 			"count": 1
 		}
 	},
+	"routes/media-editor/stage.tsx": {
+		"@wordpress/no-non-module-stylesheet-imports": {
+			"count": 1
+		}
+	},
 	"routes/navigation-edit/editor/index.tsx": {
 		"@wordpress/no-non-module-stylesheet-imports": {
 			"count": 1
@@ -1734,12 +1744,7 @@
 			"count": 1
 		}
 	},
-	"routes/post-types/actions/quick-edit.tsx": {
-		"@wordpress/no-non-module-stylesheet-imports": {
-			"count": 1
-		}
-	},
-	"routes/post-types/stage.tsx": {
+	"routes/post-types-list/stage.tsx": {
 		"@wordpress/no-non-module-stylesheet-imports": {
 			"count": 1
 		}
@@ -1752,12 +1757,7 @@
 			"count": 1
 		}
 	},
-	"routes/taxonomies/actions/quick-edit.tsx": {
-		"@wordpress/no-non-module-stylesheet-imports": {
-			"count": 1
-		}
-	},
-	"routes/taxonomies/stage.tsx": {
+	"routes/taxonomies-list/stage.tsx": {
 		"@wordpress/no-non-module-stylesheet-imports": {
 			"count": 1
 		}

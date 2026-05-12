@@ -9,6 +9,7 @@
 /**
  * External dependencies
  */
+import type { IconType } from '@wordpress/components';
 import type { Field } from '@wordpress/dataviews';
 
 /**
@@ -53,9 +54,9 @@ export interface WidgetTypeMetadata {
 	description?: string;
 
 	/**
-	 * Dashicon slug used as the visual identifier.
+	 * Visual identifier shown in the widget header; dashicon string, React node, or SVG component.
 	 */
-	icon?: string;
+	icon?: IconType;
 
 	/**
 	 * Grouping category. Core provides `dashboard`; plugins and themes may

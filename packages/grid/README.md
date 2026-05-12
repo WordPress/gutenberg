@@ -3,38 +3,40 @@
 A collection of grid layout components for arranging tiles in
 dashboard-style surfaces.
 
-This package currently exposes a single component, `DashboardGrid`,
-which implements a **2D packed grid**: items have explicit
-`(width, height)` spans in column/row units and can span multiple
-columns **and** multiple rows. It does not implement other grid
-models such as masonry (column-flow) or justified rows (equal-height
-rows).
+This package exposes two components, each implementing a different
+layout model:
+
+- **`DashboardGrid`** is a 2D packed grid: tiles declare explicit
+  `(width, height)` spans in column/row units and can span multiple
+  columns and rows.
+- **`DashboardLanes`** is a masonry-style surface aligned with the
+  emerging WebKit spec [`display: grid-lanes`](https://webkit.org/blog/17660/introducing-css-grid-lanes/).
+  Tiles declare a column span only; heights are driven by content;
+  placement follows a source-ordered, shortest-lane skyline with a
+  `flow-tolerance` tiebreaker.
 
 > [!NOTE]
 > This package is under heavy development and likely to change.
 
-## Relation to `@wordpress/components`'s `__experimentalGrid`
+## Choosing a component
 
-`@wordpress/components` already exports a `__experimentalGrid` (often
-imported as `Grid`). The two solve different problems:
+| Need | Use |
+|------|-----|
+| Fixed-cell tile dashboard, content fills its cell. | `DashboardGrid` |
+| Masonry / waterfall surface, content drives height. | `DashboardLanes` |
+| Static layout primitive (no per-item state, no drag). | `__experimentalGrid` from `@wordpress/components` |
 
-- **`__experimentalGrid`** is a low-level CSS Grid layout primitive:
-  it accepts `columns`, `gap`, `templateColumns`, `alignment`, etc.,
-  and renders children in a static grid. There is no concept of an
-  item having a span, no drag, no resize, no per-item state.
-- **`DashboardGrid`** is a higher-level component for user-arrangeable
-  tile surfaces. Items declare `(width, height)` spans, can be
-  reordered via drag-and-drop and resized via handles in edit mode,
-  and the resulting layout is emitted to the consumer through
-  `onChangeLayout`.
+`__experimentalGrid` is a low-level CSS Grid layout primitive: it
+accepts `columns`, `gap`, `templateColumns`, `alignment`, etc., and
+renders children in a static grid. There is no concept of an item
+having a span, no drag, no resize, no per-item state. Reach for it
+when you only need static CSS Grid ergonomics.
 
-Reach for `__experimentalGrid` when you only need static CSS Grid
-ergonomics. Reach for `DashboardGrid` when the user — not the
-developer — places and resizes the tiles.
+Both components in this package are higher-level: the user, not the
+developer, places and resizes the tiles, and the resulting layout
+is emitted to the consumer through `onChangeLayout`.
 
 ## Installation
-
-Install the module:
 
 ```bash
 npm install @wordpress/grid --save
@@ -46,7 +48,14 @@ language features and APIs, you should include [the polyfill shipped in
 `@wordpress/babel-preset-default`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/babel-preset-default#polyfill)
 in your code._
 
-## Usage
+---
+
+## `DashboardGrid`
+
+A 2D packed grid where each child has an explicit column and row
+span.
+
+### Usage
 
 ```jsx
 import { DashboardGrid } from '@wordpress/grid';
@@ -78,10 +87,12 @@ function Dashboard() {
 }
 ```
 
-Each child **must** have a `key` prop that matches an entry in the `layout`
-array. Children without a matching layout entry are ignored.
+Each child **must** have a `key` prop that matches an entry in the
+`layout` array. Children without a matching layout entry render at
+the end of the grid without explicit placement and fall through
+CSS Grid's auto-flow.
 
-## Layout model
+### Layout model
 
 ```ts
 interface DashboardGridLayoutItem {
@@ -94,13 +105,13 @@ interface DashboardGridLayoutItem {
 
 `width` is a discriminated value:
 
-- `number` — span that many columns (clamped to the grid's column count).
-- `'fill'` — fill the remaining columns in the current row.
-- `'full'` — span every column (`grid-column: 1 / -1`), forcing a row break.
+- `number`: span that many columns (clamped to the grid's column count).
+- `'fill'`: fill the remaining columns in the current row.
+- `'full'`: span every column (`grid-column: 1 / -1`), forcing a row break.
 
 `'fill'` is resolved per-row against the remaining free space.
 
-## Props
+### Props
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
@@ -113,28 +124,29 @@ interface DashboardGridLayoutItem {
 | `editMode` | `boolean` | `false` | Enables drag-to-reorder and resize handles. |
 | `onChangeLayout` | `( layout ) => void` | — | Fired when the user commits a drag or resize. |
 | `onPreviewLayout` | `( layout ) => void` | — | Fired continuously during a drag or resize with the in-progress layout. Use for live feedback; `onChangeLayout` still emits the committed result. |
-| `renderResizeHandle` | `ComponentType< ResizeHandleRenderProps >` | — | Override the default corner-triangle resize handle with a custom component. Receives gesture wiring (`ref`, `listeners`, `attributes`) plus `verticalResizable`, `isResizing`, and `itemId`. The grid keeps ownership of the `<DndContext>` and the throttled delta loop. |
+| `renderResizeHandle` | `ComponentType< ResizeHandleRenderProps >` | — | Override the default corner-triangle resize handle. See [Custom resize handle](#custom-resize-handle). |
+| `renderDragPreview` | `ComponentType< DragPreviewRenderProps >` | — | Wrap the dragged-clone visual mounted inside `<DragOverlay>`. See [Custom drag preview](#custom-drag-preview). |
 | `className` | `string` | — | Extra class on the grid root. |
 
-`DashboardGrid` forwards refs to its root `<div>`, and standard `<div>`
-attributes (`id`, `aria-*`, `data-*`, event handlers, `style`, etc.)
-flow through. The grid's own layout styles
-(`gridTemplateColumns`, `gridAutoRows`, `gap`) override any user-supplied
-`style` for those properties.
+`DashboardGrid` forwards refs to its root `<div>`, and standard
+`<div>` attributes (`id`, `aria-*`, `data-*`, event handlers,
+`style`, etc.) flow through. The grid's own layout styles
+(`gridTemplateColumns`, `gridAutoRows`, `gap`) override any
+user-supplied `style` for those properties.
 
-### Child-level props
+#### Child-level props
 
-Children render with the layout entry that matches their `key`. An optional
-prop read off the child lets you keep controls interactive while edit mode
-is on:
+Children render with the layout entry that matches their `key`. An
+optional prop read off the child lets you keep controls interactive
+while edit mode is on:
 
 | Child prop | Type | Description |
 |------------|------|-------------|
 | `actionableArea` | `ReactNode` | Content rendered above the draggable surface of the grid item. Useful for close buttons, menus, or links that must stay clickable in edit mode. |
 
-## Modes
+### Modes
 
-### Fixed columns
+#### Fixed columns
 
 ```jsx
 <DashboardGrid layout={ layout } columns={ 12 }>
@@ -142,11 +154,11 @@ is on:
 </DashboardGrid>
 ```
 
-### Responsive
+#### Responsive
 
-Columns are computed from container width using `minColumnWidth` as the
-lower bound per column. A `ResizeObserver` recomputes on container
-resize.
+Columns are computed from container width using `minColumnWidth` as
+the lower bound per column. A `ResizeObserver` recomputes on
+container resize.
 
 ```jsx
 <DashboardGrid layout={ layout } minColumnWidth={ 240 }>
@@ -157,29 +169,157 @@ resize.
 In responsive mode, layout items can provide an `order` to control
 display order independently of array position.
 
-### Edit mode
+#### Edit mode
 
 When `editMode` is true:
 
 - Items become draggable (powered by `@dnd-kit`). The original tile
   stays in place as a dashed placeholder while a clone follows the
   cursor through `<DragOverlay>`.
-- A resize handle appears on the bottom-right of each item. A dashed
-  outline previews the target size as the cursor moves.
-- While any tile is dragging or resizing, `actionableArea` content on
-  every tile is set `inert` so hovers on other tiles can't steal the
-  gesture.
+- A resize handle appears on the bottom-right of each item. A
+  dashed outline previews the target size as the cursor moves.
+- While any tile is dragging or resizing, `actionableArea` content
+  on every tile is set `inert` so hovers on other tiles can't steal
+  the gesture.
 - `onChangeLayout` fires after drop or resize with the new layout.
 - `onPreviewLayout` fires continuously during the interaction for
   live feedback; the committed layout is still emitted via
   `onChangeLayout`.
 
-## Performance
+---
+
+## `DashboardLanes`
+
+A masonry-style surface aligned with `display: grid-lanes`. Items
+declare a column span; heights are driven by content; placement
+follows a source-ordered, shortest-lane skyline with a
+`flow-tolerance` tiebreaker.
+
+The layout model and the placement algorithm are described in
+[Introducing CSS Grid Lanes](https://webkit.org/blog/17660/introducing-css-grid-lanes/)
+on the WebKit blog. This package implements the same model in
+JavaScript so it works today on browsers that do not yet support
+`display: grid-lanes` natively; the skyline + tolerance core is
+adapted from Simon Willison's
+[CSS Grid Lanes Polyfill](https://tools.simonwillison.net/grid-lanes-polyfill.js)
+(MIT). Once native support lands across browsers, the polyfill can
+be removed without any public API change.
+
+### Usage
+
+```jsx
+import { DashboardLanes } from '@wordpress/grid';
+
+const layout = [
+	{ key: 'a' },
+	{ key: 'hero', width: 2 },
+	{ key: 'b' },
+	{ key: 'c' },
+];
+
+function Pinboard() {
+	const [ current, setCurrent ] = useState( layout );
+
+	return (
+		<DashboardLanes
+			layout={ current }
+			columns={ 4 }
+			spacing={ 2 }
+			editMode
+			onChangeLayout={ setCurrent }
+		>
+			<Tile key="a">A</Tile>
+			<Tile key="hero">Hero (spans 2 lanes)</Tile>
+			<Tile key="b">B</Tile>
+			<Tile key="c">C</Tile>
+		</DashboardLanes>
+	);
+}
+```
+
+Each child **must** have a `key` prop that matches an entry in the
+`layout` array. Children without a matching layout entry render at
+the end of the surface without explicit placement and fall through
+the lanes auto-flow.
+
+### Layout model
+
+```ts
+interface DashboardLanesLayoutItem {
+	key: string;     // matches child key
+	width?: number;  // lanes to span (default 1)
+	lane?: number;   // 0-indexed: pin to a specific lane
+	order?: number;  // lower values render first
+}
+```
+
+There is no `height` field: lanes pack tiles vertically using each
+tile's intrinsic content height.
+
+There is no `'fill'`: with auto-placement, no item is "left over"
+in a row; the algorithm always finds a lane.
+
+`'full'` (span the entire surface width) is expressed by setting
+`width` to the lane count.
+
+To anchor a tile to a specific column, set `lane` to its 0-indexed
+position. Pinned tiles are placed before auto-placed ones, so auto
+items flow around them; out-of-range values (negative, or beyond
+`columns - width`) are clamped.
+
+### Props
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `layout` | `DashboardLanesLayoutItem[]` | — | Required. Span and order keyed by child `key`. |
+| `children` | `ReactNode` | — | Required. Each child needs a `key` matching a layout entry. |
+| `columns` | `number` | `6` | Total lanes (fixed mode). |
+| `minColumnWidth` | `number` | — | If set, enables responsive mode: lane count derived from container width. Mutually exclusive with `columns`. |
+| `spacing` | `number` | `2` | Gap multiplier. Effective gap = `spacing * 4px`. |
+| `flowTolerance` | `number` | `16` | Pixel tolerance for source-order tiebreaking when two candidate lanes have similar baselines. Larger values keep tiles closer to reading order at the cost of bigger empty regions. |
+| `rowUnit` | `number` | `4` | Snap unit for the polyfill's `grid-row-start` math. Smaller values produce sharper placement at the cost of a larger implicit row count. Ignored on browsers with native `display: grid-lanes` support. |
+| `editMode` | `boolean` | `false` | Enables drag-to-reorder and horizontal resize. |
+| `onChangeLayout` | `( layout ) => void` | — | Fired when the user commits a drag or resize. |
+| `onPreviewLayout` | `( layout ) => void` | — | Fired continuously during a drag or resize. |
+| `renderResizeHandle` | `ComponentType< ResizeHandleRenderProps >` | — | Override the default side-grip resize handle. See [Custom resize handle](#custom-resize-handle). |
+| `renderDragPreview` | `ComponentType< DragPreviewRenderProps >` | — | Wrap the dragged-clone visual mounted inside `<DragOverlay>`. See [Custom drag preview](#custom-drag-preview). |
+| `className` | `string` | — | Extra class on the surface root. |
+
+### Native vs polyfill
+
+`DashboardLanes` checks `CSS.supports( 'display', 'grid-lanes' )`
+once at mount.
+
+- When supported (Safari 26+, others as the spec ships), the
+  component emits `display: grid-lanes` and the spec's CSS, and lets
+  the engine handle layout. The placement layer mounts no per-tile
+  observers; the only `ResizeObserver` left is the container-width
+  one used for responsive mode and resize-step math.
+- When unsupported, an internal hook (`useLanePlacement`) measures
+  each tile's height with a `ResizeObserver`, runs the source-ordered
+  shortest-lane algorithm, and emits explicit `grid-column-start`
+  and `grid-row-start` / `grid-row-end: span N` values on each tile.
+
+The same DOM contract is preserved in both paths; the visual is the
+same.
+
+### Edit mode
+
+Drag-to-reorder works the same as in `DashboardGrid`. Resize is
+**horizontal-only**: tile heights are content-driven, so there is
+no vertical resize gesture. The default handle is a vertical bar
+centered on the trailing edge; the cursor is `ew-resize`.
+
+---
+
+## Shared topics
+
+### Performance
 
 `onPreviewLayout` typically causes the parent to re-render on every
-gesture frame. To prevent the grid's internal children walk from
-re-running on each of those frames, **memoize the children array**
-when its content is stable across re-renders:
+gesture frame. To prevent the components' internal children walk
+from re-running on each of those frames, **memoize the children
+array** when its content is stable across re-renders:
 
 ```jsx
 const tiles = useMemo(
@@ -188,37 +328,42 @@ const tiles = useMemo(
 );
 
 return (
-	<DashboardGrid layout={ layout } editMode onPreviewLayout={ ... }>
+	<DashboardLanes layout={ layout } editMode onPreviewLayout={ ... }>
 		{ tiles }
-	</DashboardGrid>
+	</DashboardLanes>
 );
 ```
 
-Without memoization the grid still works, but it walks the children
-on every preview update. For typical N (10–50 tiles) the overhead is
-minor; for larger grids it adds up.
+Without memoization the surface still works, but it walks the
+children on every preview update. For typical N (10 to 50 tiles)
+the overhead is minor; for larger grids it adds up.
 
-## Accessibility
+For `DashboardLanes` specifically, the placement algorithm runs in
+a `useLayoutEffect` and is throttled to one animation frame per
+measurement burst.
+
+### Accessibility
 
 Drag-to-reorder is operable from the keyboard via `@dnd-kit`'s
 keyboard sensor:
 
-- `Tab` to focus a grid item.
+- `Tab` to focus a tile.
 - `Space` to pick it up.
 - Arrow keys to move it between positions.
 - `Space` to drop, or `Escape` to cancel.
 
 Resize handles are currently pointer-only.
 
-## Custom resize handle
+### Custom resize handle
 
-The default handle is a small corner triangle on the bottom-right of
-each tile. To swap it for a custom element (icon, button, branded
-shape…), pass a component to `renderResizeHandle`. The grid still
-owns the gesture — `<DndContext>`, throttled delta loop, step-to-grid
-logic — and passes the wiring as props. Spread `listeners` and
-`attributes` and assign `ref` on the element that should receive
-pointer events.
+Both components accept a `renderResizeHandle` prop to override the
+default visual. The surface owns the resize math (column/row
+stepping, throttled delta loop, layout commit) and passes the
+gesture wiring (`ref`, `listeners`, `attributes`) as props for the
+consumer to spread on the element that should receive pointer
+events. The dnd-kit `<DndContext>` for the resize gesture is
+internal to the handle wrapper; consumers do not need to mount
+their own.
 
 ```jsx
 import { Icon } from '@wordpress/ui';
@@ -263,12 +408,77 @@ The component receives:
 | `ref` | `( node ) => void` | dnd-kit ref; assign on the gesture-bearing element. |
 | `listeners` | `SyntheticListenerMap \| undefined` | Pointer/keyboard listeners; spread on the same element. |
 | `attributes` | `DraggableAttributes` | Accessibility/dnd-kit attributes; spread alongside `listeners`. |
-| `verticalResizable` | `boolean` | False when `rowHeight: 'auto'` — useful for adapting cursor or visual cue. |
+| `verticalResizable` | `boolean` | False on `DashboardLanes` and on `DashboardGrid` with `rowHeight: 'auto'`. Useful for adapting cursor or visual cue. |
 | `isResizing` | `boolean` | True while the user is actively dragging this handle. Use it to swap colors, icons, or transforms during the gesture. |
 | `itemId` | `string` | Owning tile's `key`. |
 
-The handle is only mounted while the grid is in edit mode (`editMode={ true }`),
-so the custom component never has to short-circuit on a disabled state.
+The handle is only mounted while the surface is in edit mode
+(`editMode={ true }`), so the custom component never has to
+short-circuit on a disabled state.
+
+### Custom drag preview
+
+While a tile is being dragged, dnd-kit clones it into a `<DragOverlay>`
+that follows the cursor. Both surfaces wrap that clone with a thin
+**functional frame** (`scale`, `cursor: grabbing`, `pointer-events:
+none`) that advertises the lift, but they do not impose visual
+chrome on top: any styles the consumer applied to the tile children
+carry through to the dragged clone unchanged.
+
+When the dragged state should look structurally different from the
+persistent tile (a stronger shadow, a different border, an extra
+badge…), pass a `renderDragPreview` component. The surface mounts
+it inside the functional frame and supplies the cloned children
+plus the active tile's `key`:
+
+```jsx
+import { DashboardGrid } from '@wordpress/grid';
+import type { DragPreviewRenderProps } from '@wordpress/grid';
+
+function DragPreview( { children }: DragPreviewRenderProps ) {
+	return (
+		<div className="my-tile-while-dragging">
+			{ children }
+		</div>
+	);
+}
+
+<DashboardGrid
+	layout={ layout }
+	editMode
+	renderDragPreview={ DragPreview }
+>
+	{ tiles }
+</DashboardGrid>;
+```
+
+The component receives:
+
+| Prop | Type | Description |
+|------|------|-------------|
+| `children` | `ReactNode` | The cloned tile content the surface mounts inside `<DragOverlay>`. Place it where the visual wrapper expects the tile body. |
+| `itemId` | `string` | Owning tile's `key`. Useful when chrome varies by tile. |
+
+For token-only tweaks (lift scale, placeholder opacity, outline
+color, placeholder radius), prefer the [CSS variables](#theming-with-css-variables)
+below; reach for `renderDragPreview` only when the dragged state
+needs markup the persistent tile does not have.
+
+### Theming with CSS variables
+
+Both surfaces expose a small set of CSS custom properties for
+visuals that need to flex between consumers without writing a render
+prop. Override them on any ancestor of the surface root (or on the
+root itself via `style`). All values fall back to sensible defaults.
+
+| Variable | Default | Applies to |
+|----------|---------|------------|
+| `--wp-grid-drag-preview-scale` | `1.05` | Lift scale of the drag-preview functional frame. Set to `1` to disable the lift. |
+| `--wp-grid-placeholder-opacity` | `0.4` | Opacity of the placeholder tile (the original item while a drag is in flight). |
+| `--wp-grid-placeholder-outline-color` | `var(--wpds-color-stroke-interactive-brand)` | Dashed outline color of the placeholder and of the resize-preview overlay. |
+| `--wp-grid-placeholder-radius` | `0` | Border radius of the placeholder, used to match the consumer's tile shape so the dashed outline traces the right silhouette. |
+
+---
 
 ## Contributing to this package
 
