@@ -215,4 +215,57 @@ describe( 'overlayReducer', () => {
 		expect( afterClear[ 'block-a' ] ).toBeUndefined();
 		expect( afterClear[ 'block-b' ] ).toEqual( state[ 'block-b' ] );
 	} );
+
+	it( 'seeds a full entry from a persisted suggestion comment', () => {
+		// The hydrator path bypasses CAPTURE_BASELINE / SET_OVERLAY_ATTRIBUTES
+		// in favor of one atomic write so a hydrated entry is identifiable
+		// (via `hydratedFromCommentId`) and never collides with the existing
+		// "CAPTURE_BASELINE is a no-op when an entry exists" rule.
+		const seeded = overlayReducer( INITIAL, {
+			type: 'SEED_FROM_COMMENT',
+			clientId: 'block-a',
+			blockName: 'core/paragraph',
+			commentId: 42,
+			baselineAttributes: { content: 'before' },
+			overlayAttributes: { content: 'after' },
+		} );
+
+		expect( seeded[ 'block-a' ] ).toEqual( {
+			blockName: 'core/paragraph',
+			baselineAttributes: { content: 'before' },
+			overlayAttributes: { content: 'after' },
+			commentId: 42,
+			syncedOpsKey: null,
+			hydratedFromCommentId: 42,
+		} );
+	} );
+
+	it( 'preserves an existing syncedOpsKey when re-seeding the same entry', () => {
+		// After auto-save sets the sync fingerprint, a re-hydration on the
+		// next mount must not zero it out — otherwise auto-save would re-fire
+		// for an already-persisted payload on every reload.
+		const withSynced = {
+			'block-a': {
+				blockName: 'core/paragraph',
+				baselineAttributes: { content: 'before' },
+				overlayAttributes: { content: 'after' },
+				commentId: 42,
+				syncedOpsKey: 'op-hash',
+				hydratedFromCommentId: 42,
+			},
+		};
+		const reseeded = overlayReducer( withSynced, {
+			type: 'SEED_FROM_COMMENT',
+			clientId: 'block-a',
+			blockName: 'core/paragraph',
+			commentId: 42,
+			baselineAttributes: { content: 'before' },
+			overlayAttributes: { content: 'after-2' },
+		} );
+
+		expect( reseeded[ 'block-a' ].syncedOpsKey ).toBe( 'op-hash' );
+		expect( reseeded[ 'block-a' ].overlayAttributes ).toEqual( {
+			content: 'after-2',
+		} );
+	} );
 } );

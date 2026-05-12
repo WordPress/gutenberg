@@ -214,20 +214,30 @@ function mergeOverlayAttributes( base, overlay ) {
 }
 
 /**
- * Inner renderer that owns the suggestion overlay hooks. Only mounted when
- * the editor is in `suggest` intent, so the overlay's context lookup,
- * refs, and memoized merge don't run on every `BlockEdit` render for every
- * block across the entire editor when suggestions are inactive. This split
- * matters for large documents — in Edit/View intent the outer wrapper
- * executes a single `useSelect` and renders the original `BlockEdit`
- * untouched.
+ * Inner renderer that owns the suggestion overlay hooks. Mounted when the
+ * editor is in `suggest` intent or when the hydrator has seeded a read-only
+ * overlay entry for this block (reviewer / post-reload). Splitting the
+ * outer pass-through HOC from this inner component keeps the overlay's
+ * context lookup, refs, and memoized merge out of the render path on
+ * blocks the suggestion system has nothing to say about — a noticeable win
+ * on large documents.
  *
- * @param {Object}                        args           Arguments.
- * @param {import('react').ComponentType} args.BlockEdit Wrapped edit component.
- * @param {Object}                        args.props     Props to forward to `BlockEdit`.
+ * @param {Object}                        args               Arguments.
+ * @param {import('react').ComponentType} args.BlockEdit     Wrapped edit component.
+ * @param {Object}                        args.props         Props to forward to `BlockEdit`.
+ * @param {boolean}                       args.isSuggestMode True when the editor is in Suggest
+ *                                                           intent; routes writes into the
+ *                                                           overlay. Otherwise the wrap is
+ *                                                           render-only and writes go straight
+ *                                                           to the real block.
  */
-function SuggestingBlockEdit( { BlockEdit, props } ) {
-	const { clientId, name, attributes } = props;
+function SuggestingBlockEdit( { BlockEdit, props, isSuggestMode } ) {
+	const {
+		clientId,
+		name,
+		attributes,
+		setAttributes: realSetAttributes,
+	} = props;
 	const { entries, captureBaseline, setOverlayAttributes } =
 		useSuggestionOverlay();
 
@@ -276,6 +286,15 @@ function SuggestingBlockEdit( { BlockEdit, props } ) {
 
 	const wrappedSetAttributes = useCallback(
 		( nextAttributes ) => {
+			// Reviewer / non-suggest intent (the block is only being wrapped
+			// because the hydrator seeded an entry from a persisted
+			// suggestion comment): writes go straight to the real block.
+			// The reviewer's edit is not part of the original suggester's
+			// proposal, so it shouldn't be captured into the overlay.
+			if ( ! isSuggestMode ) {
+				realSetAttributes( nextAttributes );
+				return;
+			}
 			// First overlay write for this block snapshots the current
 			// attributes as the baseline; subsequent writes only record
 			// overlay deltas. This lets the diff renderer below compare
@@ -292,7 +311,15 @@ function SuggestingBlockEdit( { BlockEdit, props } ) {
 				stripMarksFromIncoming( nextAttributes )
 			);
 		},
-		[ clientId, name, captureBaseline, setOverlayAttributes, entryExists ]
+		[
+			clientId,
+			name,
+			captureBaseline,
+			setOverlayAttributes,
+			entryExists,
+			isSuggestMode,
+			realSetAttributes,
+		]
 	);
 
 	// Idle-debounce mark rendering: when `overlayAttributes` is unchanged
@@ -365,19 +392,33 @@ function SuggestingBlockEdit( { BlockEdit, props } ) {
 const withSuggestionOverlay = createHigherOrderComponent(
 	( BlockEdit ) =>
 		function BlockEditWithSuggestionOverlay( props ) {
+			const { clientId } = props;
 			const isSuggestMode = useSelect(
 				( select ) =>
 					select( EDITOR_STORE_NAME ).getEditorIntent() ===
 					SUGGEST_INTENT,
 				[]
 			);
+			// Wrap blocks that have an overlay entry too, not just those
+			// being edited in Suggest intent. The hydrator seeds entries
+			// from persisted suggestion comments so a reviewer (or the
+			// suggester after a reload) can see inline diff marks for any
+			// pending suggestion without having to re-enter Suggest intent.
+			// `wrappedSetAttributes` routes the reviewer's writes through
+			// to the real block, so this wrap is render-only for them.
+			const { entries } = useSuggestionOverlay();
+			const hasOverlayEntry = !! entries[ clientId ];
 
-			if ( ! isSuggestMode ) {
+			if ( ! isSuggestMode && ! hasOverlayEntry ) {
 				return <BlockEdit { ...props } />;
 			}
 
 			return (
-				<SuggestingBlockEdit BlockEdit={ BlockEdit } props={ props } />
+				<SuggestingBlockEdit
+					BlockEdit={ BlockEdit }
+					props={ props }
+					isSuggestMode={ isSuggestMode }
+				/>
 			);
 		},
 	'withSuggestionOverlay'

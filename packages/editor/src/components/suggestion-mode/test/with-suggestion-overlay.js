@@ -267,6 +267,83 @@ describe( 'withSuggestionOverlay', () => {
 		}
 	} );
 
+	it( 'wraps for marks but writes through to the real block when a hydrated entry exists outside Suggest intent', () => {
+		// Reviewer scenario: the hydrator seeded an overlay entry from a
+		// persisted suggestion. The block must render the marked diff
+		// (via the wrapping HOC) but any keystrokes the reviewer types into
+		// the canvas must land on the real block, not get captured into
+		// the suggester's overlay.
+		jest.useFakeTimers();
+		try {
+			// Trigger the hydration via a button the test can click, so the
+			// `seedFromComment` callback is only consumed inside React's
+			// event handler rather than reassigned from inside a render.
+			function SeedButton() {
+				const { seedFromComment } = useSuggestionOverlay();
+				return (
+					<button
+						type="button"
+						onClick={ () =>
+							seedFromComment(
+								'a',
+								'core/paragraph',
+								42,
+								{ content: 'before' },
+								{ content: 'after' }
+							)
+						}
+					>
+						seed
+					</button>
+				);
+			}
+
+			const setAttributes = jest.fn();
+			renderWithProviders(
+				<>
+					<SeedButton />
+					<Wrapped
+						clientId="a"
+						name="core/paragraph"
+						attributes={ { content: 'after' } }
+						setAttributes={ setAttributes }
+					/>
+				</>,
+				{ intent: 'edit' }
+			);
+
+			// Initially there's no entry, so the HOC is a pass-through in
+			// Edit intent — no marks, real setAttributes wired up.
+			expect( screen.getByTestId( 'content' ) ).not.toHaveTextContent(
+				/<(del|ins)/
+			);
+
+			// Hydrate from a persisted comment.
+			fireEvent.click( screen.getByRole( 'button', { name: 'seed' } ) );
+			act( () => {
+				jest.advanceTimersByTime( 100 );
+			} );
+
+			// Now the wrap is active and the marks render even outside
+			// Suggest intent.
+			expect( screen.getByTestId( 'content' ) ).toHaveTextContent(
+				/<del class="has-suggestion-deletion">before<\/del>/
+			);
+			expect( screen.getByTestId( 'content' ) ).toHaveTextContent(
+				/<ins class="has-suggestion-addition">after<\/ins>/
+			);
+
+			// Reviewer types — write goes through to the real block, not
+			// the overlay.
+			fireEvent.click( screen.getByRole( 'button', { name: 'edit' } ) );
+			expect( setAttributes ).toHaveBeenCalledWith( {
+				content: 'proposed',
+			} );
+		} finally {
+			jest.useRealTimers();
+		}
+	} );
+
 	it( 're-captures baseline when overlay is cleared then re-edited', () => {
 		// Regression: after Submit/Discard clears the overlay entry, a
 		// later edit must create a new baseline + overlay rather than

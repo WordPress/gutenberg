@@ -1,0 +1,134 @@
+/**
+ * Seeds the suggestion overlay from persisted `_wp_suggestion` comment
+ * payloads on editor mount and whenever the comment list updates. Two
+ * scenarios depend on this:
+ *
+ *   - A suggester reloads the page after auto-save fired. The in-memory
+ *     overlay (see `overlay-context.js`) starts empty, but the persisted
+ *     note carries the proposed values — without re-seeding, the inline
+ *     diff marks disappear until the suggestion is accepted or rejected.
+ *   - A reviewer (post author, admin) opens the same post in any intent.
+ *     They never wrote the suggestion themselves, so their local overlay is
+ *     empty too; without seeding, they only see the sidebar summary, never
+ *     the inline strike-through/insertion on the canvas.
+ *
+ * The hydrator reuses the existing `useNoteThreads` hook from the collab
+ * sidebar so the entity-records query (and its cache) is shared — no extra
+ * REST traffic, no risk of the two consumers diverging on what counts as a
+ * note thread.
+ *
+ * Live editing wins over hydration: if an entry already exists for a block
+ * and was *not* sourced from the hydrator, the seed is skipped. That way a
+ * suggester typing into a block whose previous suggestion was persisted
+ * doesn't have their unsaved overlay clobbered by a refresh of the comment
+ * list.
+ */
+
+/**
+ * WordPress dependencies
+ */
+import { useEffect } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
+
+/**
+ * Internal dependencies
+ */
+import { useSuggestionOverlay } from './overlay-context';
+import { parseSuggestionPayload } from './provider';
+import { useNoteThreads } from '../collab-sidebar/hooks';
+import { store as editorStore } from '../../store';
+
+/**
+ * Derive baseline + overlay attribute pairs from a parsed payload's
+ * `attribute-set` operations. Structural ops (`block-remove`,
+ * `block-insert-after`, `block-move`) are already rendered via the block's
+ * own `metadata.suggestion` marker on the live canvas, so the hydrator
+ * skips them — including them here would re-do work that the structural
+ * BlockListBlock filter already handles.
+ *
+ * @param {{ operations: Array<{type: string, attribute?: string, before?: *, after?: *}> }|null} payload
+ * @return {{ baselineAttributes: Object, overlayAttributes: Object }|null} Pair
+ * suitable for `SEED_FROM_COMMENT`, or null when the payload carries no
+ * attribute-set ops.
+ */
+function attributePairsFromPayload( payload ) {
+	if ( ! payload || ! Array.isArray( payload.operations ) ) {
+		return null;
+	}
+	const baselineAttributes = {};
+	const overlayAttributes = {};
+	let count = 0;
+	for ( const op of payload.operations ) {
+		if (
+			op?.type !== 'attribute-set' ||
+			typeof op.attribute !== 'string'
+		) {
+			continue;
+		}
+		baselineAttributes[ op.attribute ] = op.before;
+		overlayAttributes[ op.attribute ] = op.after;
+		count++;
+	}
+	if ( count === 0 ) {
+		return null;
+	}
+	return { baselineAttributes, overlayAttributes };
+}
+
+/**
+ * Mounted once inside `SuggestionOverlayProvider`. Watches the post's note
+ * threads and seeds an overlay entry for any unresolved (`status: 'hold'`)
+ * suggestion whose payload carries an `attribute-set` operation. Re-runs
+ * whenever the thread list or block tree changes so a newly-loaded
+ * suggestion (or a hot-reloaded block tree) ends up reflected.
+ */
+export default function SuggestionOverlayHydrator() {
+	const postId = useSelect(
+		( select ) => select( editorStore ).getCurrentPostId(),
+		[]
+	);
+	const { unresolvedNotes } = useNoteThreads( postId );
+	const { entries, seedFromComment } = useSuggestionOverlay();
+
+	useEffect( () => {
+		if ( ! unresolvedNotes || unresolvedNotes.length === 0 ) {
+			return;
+		}
+		for ( const thread of unresolvedNotes ) {
+			const clientId = thread.blockClientId;
+			if ( ! clientId ) {
+				continue;
+			}
+			const payload = parseSuggestionPayload(
+				thread.meta?._wp_suggestion
+			);
+			if ( ! payload ) {
+				continue;
+			}
+			const pairs = attributePairsFromPayload( payload );
+			if ( ! pairs ) {
+				continue;
+			}
+			const existing = entries[ clientId ];
+			// Don't clobber a live overlay that wasn't itself sourced from
+			// the hydrator — the suggester may be mid-edit and the in-memory
+			// state is more current than the persisted comment.
+			if (
+				existing &&
+				existing.hydratedFromCommentId !== thread.id &&
+				Object.keys( existing.overlayAttributes ?? {} ).length > 0
+			) {
+				continue;
+			}
+			seedFromComment(
+				clientId,
+				payload.blockName ?? null,
+				thread.id,
+				pairs.baselineAttributes,
+				pairs.overlayAttributes
+			);
+		}
+	}, [ unresolvedNotes, entries, seedFromComment ] );
+
+	return null;
+}

@@ -50,6 +50,7 @@ import {
 	SuggestionOverlayProvider,
 	SuggestionAutoSave,
 	SuggestionStoreInterceptor,
+	SuggestionOverlayHydrator,
 	registerSuggestionOverlayFilter,
 } from '../suggestion-mode';
 
@@ -480,6 +481,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 										<PatternDuplicateModal />
 										<SuggestionStoreInterceptor />
 										<SuggestionAutoSave />
+										<SuggestionOverlayHydrator />
 										{ window?.__experimentalMediaEditorModal && (
 											<MediaEditorModalMount />
 										) }

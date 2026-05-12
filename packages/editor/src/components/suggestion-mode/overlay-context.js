@@ -83,6 +83,7 @@ const OverlayContext = createContext( {
 	clearOverlay: () => {},
 	setCommentId: () => {},
 	setSyncedOpsKey: () => {},
+	seedFromComment: () => {},
 	hasOverlay: () => false,
 	requestInterceptorBypass: () => {},
 	consumeInterceptorBypass: () => false,
@@ -161,6 +162,27 @@ export function overlayReducer( state, action ) {
 				},
 			};
 		}
+		case 'SEED_FROM_COMMENT': {
+			// Replace an entry verbatim with the values derived from a
+			// persisted suggestion comment. `hydratedFromCommentId` flags the
+			// entry so consumers can tell hydrator-sourced state from live
+			// editing (the HOC routes writes through to the real block when
+			// the only reason an entry exists is hydration). `syncedOpsKey`
+			// is preserved from any prior entry so a fresh seed doesn't
+			// re-trigger auto-save on top of an already-persisted payload.
+			const existing = state[ action.clientId ];
+			return {
+				...state,
+				[ action.clientId ]: {
+					blockName: action.blockName,
+					baselineAttributes: action.baselineAttributes,
+					overlayAttributes: action.overlayAttributes,
+					commentId: action.commentId,
+					syncedOpsKey: existing?.syncedOpsKey ?? null,
+					hydratedFromCommentId: action.commentId,
+				},
+			};
+		}
 		case 'PRUNE_ORPHANS': {
 			// Action carries a serializable array; the reducer materializes a
 			// Set internally for the lookup. Keeps actions Redux-DevTools-
@@ -233,6 +255,25 @@ export function SuggestionOverlayProvider( { children } ) {
 	const setSyncedOpsKey = useCallback(
 		( clientId, syncedOpsKey ) =>
 			dispatch( { type: 'SET_SYNCED_OPS_KEY', clientId, syncedOpsKey } ),
+		[]
+	);
+
+	const seedFromComment = useCallback(
+		(
+			clientId,
+			blockName,
+			commentId,
+			baselineAttributes,
+			overlayAttributes
+		) =>
+			dispatch( {
+				type: 'SEED_FROM_COMMENT',
+				clientId,
+				blockName,
+				commentId,
+				baselineAttributes,
+				overlayAttributes,
+			} ),
 		[]
 	);
 
@@ -315,6 +356,7 @@ export function SuggestionOverlayProvider( { children } ) {
 			clearOverlay,
 			setCommentId,
 			setSyncedOpsKey,
+			seedFromComment,
 			hasOverlay,
 			requestInterceptorBypass,
 			consumeInterceptorBypass,
@@ -326,6 +368,7 @@ export function SuggestionOverlayProvider( { children } ) {
 			clearOverlay,
 			setCommentId,
 			setSyncedOpsKey,
+			seedFromComment,
 			hasOverlay,
 			requestInterceptorBypass,
 			consumeInterceptorBypass,
