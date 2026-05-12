@@ -481,16 +481,23 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 		// gap, and row height. `'auto'` collapses to `undefined` for
 		// the overlay so it falls back to columns-only (row dividers
 		// have no anchor when the row height is content-driven).
+		// Memoized so drag/resize re-renders don't reconstruct the
+		// element while its inputs are stable; React then shortcuts
+		// the reconciliation of the overlay subtree by identity.
 		const Overlay = renderGridOverlay ?? GridOverlay;
-		const gridOverlay = editMode ? (
-			<Overlay
-				columns={ effectiveColumns }
-				gapPx={ gapPx }
-				rowHeight={
-					typeof rowHeight === 'number' ? rowHeight : undefined
-				}
-			/>
-		) : null;
+		const overlayRowHeight =
+			typeof rowHeight === 'number' ? rowHeight : undefined;
+		const gridOverlay = useMemo(
+			() =>
+				editMode ? (
+					<Overlay
+						columns={ effectiveColumns }
+						gapPx={ gapPx }
+						rowHeight={ overlayRowHeight }
+					/>
+				) : null,
+			[ Overlay, editMode, effectiveColumns, gapPx, overlayRowHeight ]
+		);
 
 		return (
 			<DndContext
