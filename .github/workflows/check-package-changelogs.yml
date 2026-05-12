@@ -51,28 +51,35 @@ jobs:
                   persist-credentials: false
             - name: 'Fetch relevant history from origin'
               run: git fetch origin "$GITHUB_BASE_REF"
+            - name: Determine if package has relevant changes
+              id: filter
+              env:
+                  BASE_SHA: ${{ github.event.pull_request.base.sha }}
+                  PACKAGE_PATH: packages/${{ matrix.package }}
+              run: |
+                  # The workflow's `paths:` filter triggers on the union of all
+                  # tracked packages, so this matrix entry may run on a PR that
+                  # doesn't touch its package. Short-circuit if that's the case.
+                  relevant_changes=$(git diff --name-only "$BASE_SHA" HEAD -- "${PACKAGE_PATH}/" \
+                      | grep -Ev "^${PACKAGE_PATH}/src/(.+/)?(stories|test)/" \
+                      | grep -Ev "^${PACKAGE_PATH}/src/.*(\.android\.js|\.ios\.js|\.native\.js|\.native\.scss)$" \
+                      | grep -Ev "^${PACKAGE_PATH}/src/(.+/)?react-native-" || true)
+
+                  if [ -z "$relevant_changes" ]; then
+                      echo "No relevant changes under ${PACKAGE_PATH}; skipping CHANGELOG check."
+                      echo "has_changes=false" >> "$GITHUB_OUTPUT"
+                  else
+                      echo "has_changes=true" >> "$GITHUB_OUTPUT"
+                  fi
             - name: Check CHANGELOG status
+              if: steps.filter.outputs.has_changes == 'true'
               env:
                   PR_NUMBER: ${{ github.event.number }}
                   BASE_SHA: ${{ github.event.pull_request.base.sha }}
-                  PACKAGE: ${{ matrix.package }}
+                  PACKAGE_PATH: packages/${{ matrix.package }}
               run: |
-                  package_path="packages/${PACKAGE}"
-                  changelog_path="${package_path}/CHANGELOG.md"
+                  changelog_path="${PACKAGE_PATH}/CHANGELOG.md"
                   optional_check_notice="This isn't a required check, so if you think your changes are small enough that they don't warrant a CHANGELOG entry, please go ahead and merge without one."
-
-                  # The workflow-level `paths:` filter triggers on the union of all
-                  # tracked packages, so this matrix entry may run on a PR that
-                  # doesn't touch its package. Short-circuit when that's the case.
-                  relevant_changes=$(git diff --name-only "$BASE_SHA" HEAD -- "${package_path}/" \
-                      | grep -Ev "^${package_path}/src/(.+/)?(stories|test)/" \
-                      | grep -Ev "^${package_path}/src/.*(\.android\.js|\.ios\.js|\.native\.js|\.native\.scss)$" \
-                      | grep -Ev "^${package_path}/src/(.+/)?react-native-" || true)
-
-                  if [ -z "$relevant_changes" ]; then
-                      echo "No relevant changes under ${package_path}; skipping CHANGELOG check."
-                      exit 0
-                  fi
 
                   # Fail if the PR doesn't touch the changelog
                   if git diff --quiet "$BASE_SHA" HEAD -- "$changelog_path"; then
