@@ -315,9 +315,7 @@ describe( 'applyDiffMarks', () => {
 			{ content: 'Hello', level: 2 }
 		);
 		expect( result.content ).toBe(
-			'Hello' +
-				'<ins class="has-suggestion-addition"> </ins>' +
-				'<ins class="has-suggestion-addition">world</ins>'
+			'Hello' + '<ins class="has-suggestion-addition"> world</ins>'
 		);
 		// Other attributes pass through untouched.
 		expect( result.level ).toBe( 2 );
@@ -343,8 +341,7 @@ describe( 'applyDiffMarks', () => {
 		);
 		expect( result.content ).toBe(
 			'Hello' +
-				'<ins class="has-suggestion-addition" style="--suggestion-author-color: #b26200"> </ins>' +
-				'<ins class="has-suggestion-addition" style="--suggestion-author-color: #b26200">world</ins>'
+				'<ins class="has-suggestion-addition" style="--suggestion-author-color: #b26200"> world</ins>'
 		);
 	} );
 } );

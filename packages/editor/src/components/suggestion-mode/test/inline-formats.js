@@ -107,23 +107,22 @@ describe( 'markContentDiff', () => {
 	} );
 
 	it( 'wraps appended text in <ins class="has-suggestion-addition">', () => {
-		// Pure end-of-string addition: "Hello" → "Hello world". The added
-		// space and word each surface as their own insert segments because
-		// `wordDiff` tokenizes on whitespace runs.
+		// Pure end-of-string addition: "Hello" → "Hello world". `wordDiff`
+		// emits separate insert segments per word/whitespace run, and
+		// `markContentDiff` coalesces consecutive same-type segments so the
+		// whole appended run lands inside one `<ins>` — otherwise the
+		// per-element boundary CSS draws a pipe around every word.
 		expect( markContentDiff( 'Hello', 'Hello world' ) ).toBe(
-			'Hello' +
-				'<ins class="has-suggestion-addition"> </ins>' +
-				'<ins class="has-suggestion-addition">world</ins>'
+			'Hello' + '<ins class="has-suggestion-addition"> world</ins>'
 		);
 	} );
 
 	it( 'wraps removed text in <del class="has-suggestion-deletion">', () => {
 		// Pure end-of-string deletion: "Hello world" → "Hello". Mirrors the
-		// addition case but in the delete direction.
+		// addition case but in the delete direction; the run is coalesced
+		// into a single `<del>`.
 		expect( markContentDiff( 'Hello world', 'Hello' ) ).toBe(
-			'Hello' +
-				'<del class="has-suggestion-deletion"> </del>' +
-				'<del class="has-suggestion-deletion">world</del>'
+			'Hello' + '<del class="has-suggestion-deletion"> world</del>'
 		);
 	} );
 

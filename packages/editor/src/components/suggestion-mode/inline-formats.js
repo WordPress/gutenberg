@@ -166,17 +166,38 @@ export function markContentDiff( baseline, proposed, authorColor = null ) {
 		return afterHtml;
 	}
 
+	// `wordDiff` tokenizes into alternating word/whitespace runs, so a
+	// contiguous addition like "foo bar baz" arrives as five separate
+	// `insert` segments. Wrapping each one in its own `<ins>` paints the
+	// per-segment `box-shadow` boundary CSS as a pipe around every word.
+	// Coalesce consecutive same-type segments so a single addition (or
+	// deletion) renders as one `<ins>` (or `<del>`) with brackets only at
+	// the real boundaries of the change.
 	const segments = wordDiff( beforeHtml, afterHtml );
 	let result = '';
+	let runType = null;
+	let runValue = '';
+	const flush = () => {
+		if ( runType === 'insert' ) {
+			result += wrapAddition( runValue, authorColor );
+		} else if ( runType === 'delete' ) {
+			result += wrapDeletion( runValue, authorColor );
+		} else if ( runType === 'equal' ) {
+			result += runValue;
+		}
+		runType = null;
+		runValue = '';
+	};
 	for ( const seg of segments ) {
-		if ( seg.type === 'equal' ) {
-			result += seg.value;
-		} else if ( seg.type === 'insert' ) {
-			result += wrapAddition( seg.value, authorColor );
+		if ( seg.type === runType ) {
+			runValue += seg.value;
 		} else {
-			result += wrapDeletion( seg.value, authorColor );
+			flush();
+			runType = seg.type;
+			runValue = seg.value;
 		}
 	}
+	flush();
 	return result;
 }
 
