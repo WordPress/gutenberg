@@ -136,16 +136,13 @@ export const WithShortcut: Story = {
 };
 
 /**
- * Customize how the tooltip is positioned by passing a `<Tooltip.Positioner />`
- * element to the `positioner` prop. `Tooltip.Positioner` accepts `side`,
- * `align`, `sideOffset`, and collision settings.
+ * Customize where the tooltip appears relative to the button by passing a
+ * `<Tooltip.Positioner />` element with a `side` to the `positioner` prop.
  */
 export const WithCustomPositioner: Story = {
 	...Default,
 	args: {
 		...Default.args,
-		positioner: (
-			<Tooltip.Positioner side="right" align="center" sideOffset={ 8 } />
-		),
+		positioner: <Tooltip.Positioner side="right" />,
 	},
 };
