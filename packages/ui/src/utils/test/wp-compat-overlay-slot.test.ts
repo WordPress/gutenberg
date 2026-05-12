@@ -191,6 +191,42 @@ describe( 'getWpCompatOverlaySlot', () => {
 
 			expect( getWpCompatOverlaySlot() ).toBeNull();
 		} );
+
+		it( 'invalidates the cache and detaches the stale slot when the cached element belongs to a different document', () => {
+			// Drives the `cachedSlot.ownerDocument !== ownerDocument` branch
+			// and the subsequent `if ( cachedSlot?.isConnected )
+			// cachedSlot.remove();` cleanup. Triggered in real environments
+			// by a runtime-detected switch in the owning document (e.g. a
+			// jsdom test teardown that tears down the realm, or a host
+			// swapping the active document). Simulated here by moving the
+			// cached slot into a foreign parsed document so its
+			// `ownerDocument` differs from the helper's local `document`
+			// while staying `isConnected` to that foreign document — the
+			// exact shape the cleanup branch was written to handle.
+			const first = getWpCompatOverlaySlot();
+			expect( first ).not.toBeNull();
+
+			const foreignDocument = new DOMParser().parseFromString(
+				'<!DOCTYPE html><html><body></body></html>',
+				'text/html'
+			);
+			foreignDocument.body.appendChild(
+				foreignDocument.adoptNode( first! )
+			);
+			expect( first?.ownerDocument ).toBe( foreignDocument );
+			expect( first?.isConnected ).toBe( true );
+			expect( findSlots() ).toHaveLength( 0 );
+
+			const second = getWpCompatOverlaySlot();
+
+			expect( second ).not.toBeNull();
+			expect( second ).not.toBe( first );
+			expect( second?.ownerDocument ).toBe( document );
+			expect( second?.parentElement ).toBe( document.body );
+			expect( first?.isConnected ).toBe( false );
+			expect( foreignDocument.body.children ).toHaveLength( 0 );
+			expect( findSlots() ).toHaveLength( 1 );
+		} );
 	} );
 
 	describe( 'DOM-level singleton (cross-instance coordination)', () => {
