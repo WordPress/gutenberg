@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add `--wpds-motion-duration-*` and `--wpds-motion-easing-*` design tokens for standardizing animation timing across components. Easing tokens use intent-based names: `subtle`, `balanced`, and `expressive` ([#76097](https://github.com/WordPress/gutenberg/pull/76097)).
+
 ## 0.12.0 (2026-04-29)
 
 ## 0.11.0 (2026-04-15)

@@ -1,0 +1,44 @@
+.lanes {
+	display: grid-lanes;
+	column-gap: var(--wp-grid-lane-gap, 0);
+	row-gap: var(--wp-grid-lane-gap, 0);
+}
+
+/*
+ * Polyfill fallback. The hook computes per-item `grid-column-start`
+ * and `grid-row-start`/`grid-row-end: span N` against this row unit.
+ * The skyline already builds inter-item vertical spacing into each
+ * tile's `top`, so `row-gap` must be zero here to avoid compounding
+ * on top of the algorithm's spacing. `grid-auto-flow: dense` is a
+ * safety net; the algorithm drives placement.
+ */
+@supports not (display: grid-lanes) {
+	.lanes {
+		display: grid;
+		grid-auto-rows: var(--wp-grid-lane-row-unit, 4px);
+		grid-auto-flow: dense;
+		row-gap: 0;
+	}
+}
+
+/*
+ * Functional frame for the drag-preview clone inside `<DragOverlay>`.
+ * Always applied, including when the consumer passes a
+ * `renderDragPreview` wrapper. Owns the lift cue (`scale`), the
+ * pointer feedback (`cursor`), and the pointer pass-through during
+ * the gesture. Visual chrome (shadow, radius, padding) belongs to
+ * the consumer, either on the children passed to <DashboardLanes />
+ * or via `renderDragPreview`.
+ */
+.drag-preview-frame {
+	height: 100%;
+	transform: scale(var(--wp-grid-drag-preview-scale, 1.05));
+	cursor: grabbing;
+	pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.drag-preview-frame {
+		transform: none;
+	}
+}

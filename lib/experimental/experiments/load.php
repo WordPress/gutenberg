@@ -34,6 +34,11 @@ function gutenberg_initialize_experiments_settings() {
 					'label'       => __( 'Grid interactivity', 'gutenberg' ),
 					'description' => __( 'Enables enhancements to the Grid block that let you move and resize items in the editor canvas.', 'gutenberg' ),
 				),
+				array(
+					'id'          => 'gutenberg-classic-block-deprecation',
+					'label'       => __( 'Classic block deprecation', 'gutenberg' ),
+					'description' => __( 'Enables UI changes aimed at deprecating the Classic block, including prompts on existing Classic blocks to migrate their content to blocks or to a Custom HTML block.', 'gutenberg' ),
+				),
 			),
 		),
 		array(
@@ -42,8 +47,8 @@ function gutenberg_initialize_experiments_settings() {
 			'items' => array(
 				array(
 					'id'          => 'gutenberg-media-editor',
-					'label'       => __( 'Media Editor', 'gutenberg' ),
-					'description' => __( 'Adds an "Edit media" action on image blocks for editing the attached media item (metadata and content) in the editor.', 'gutenberg' ),
+					'label'       => __( 'Media Editor (Route)', 'gutenberg' ),
+					'description' => __( 'Enables a dedicated route-based media editor screen for editing media items (metadata and content).', 'gutenberg' ),
 				),
 				array(
 					'id'          => 'gutenberg-media-editor-modal',

@@ -2,7 +2,10 @@
  * Internal dependencies
  */
 import { WidgetDashboardProvider } from './context/dashboard-context';
-import { Widget } from './components/widget';
+import { WidgetDashboardUIProvider } from './context/ui-context';
+import { Actions } from './components/actions';
+import { Inserter } from './components/inserter';
+import { WidgetChrome } from './components/widget-chrome';
 import { Widgets } from './components/widgets';
 import type { WidgetDashboardProps } from './types';
 import { NoWidgetsState } from './components/no-widgets-state';
@@ -38,6 +41,7 @@ export const WidgetDashboard = Object.assign(
 	function WidgetDashboard( {
 		layout,
 		onLayoutChange,
+		onLayoutReset,
 		widgetTypes,
 		editMode,
 		onEditChange,
@@ -49,20 +53,26 @@ export const WidgetDashboard = Object.assign(
 			<WidgetDashboardProvider
 				layout={ layout }
 				onLayoutChange={ onLayoutChange }
+				onLayoutReset={ onLayoutReset }
 				widgetTypes={ widgetTypes }
 				editMode={ editMode }
 				onEditChange={ onEditChange }
 				resolveWidgetModule={ resolveWidgetModule }
 				gridSettings={ gridSettings }
 			>
-				{ children ?? (
-					<>
-						<NoWidgetsState />
-						<Widgets />
-					</>
-				) }
+				<WidgetDashboardUIProvider>
+					{ children ?? (
+						<>
+							<NoWidgetsState />
+							<Actions />
+							<Widgets />
+						</>
+					) }
+
+					<Inserter />
+				</WidgetDashboardUIProvider>
 			</WidgetDashboardProvider>
 		);
 	},
-	{ Widgets, Widget, NoWidgetsState }
+	{ Actions, Widgets, WidgetChrome, NoWidgetsState }
 );

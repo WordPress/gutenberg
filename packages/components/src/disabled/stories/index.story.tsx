@@ -32,7 +32,7 @@ const meta: Meta< typeof Disabled > = {
 		},
 		docs: { canvas: { sourceState: 'shown' } },
 		componentStatus: {
-			status: 'stable',
+			status: 'recommended',
 			whereUsed: 'global',
 		},
 	},

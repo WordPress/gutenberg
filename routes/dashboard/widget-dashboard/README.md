@@ -58,7 +58,7 @@ When `true`, the grid enables drag and resize. Defaults to `false`.
 
 #### `onEditChange`: `( next: boolean ) => void`
 
-Optional. Called when edit mode toggles via a future `WidgetDashboard.Actions` compound.
+Optional. Called when edit mode toggles via `WidgetDashboard.Actions` (or any consumer-built toggle). When omitted, `WidgetDashboard.Actions` renders nothing.
 
 #### `resolveWidgetModule`: `( moduleId: string ) => Promise< { default: ComponentType } >`
 
@@ -85,6 +85,41 @@ Per-instance wrapper. Provides widget identity to the render tree via context an
 #### `<WidgetDashboard.NoWidgetsState>`
 
 Renders its children only when `layout` is empty. Pair it with `<WidgetDashboard.Widgets />` so the empty state shows up in place of the grid until widgets are added.
+
+#### `<WidgetDashboard.Actions />`
+
+Edit-mode toggle: a "Customize" button while `editMode` is off, and "Add widgets", "Cancel", "Done" while it is on. Clicking "Customize" or "Done" fires `onEditChange` with the toggled value. Clicking "Add widgets" opens the inserter (see below). Returns `null` when the dashboard is mounted without `onEditChange`, so surfaces that don't expose edit mode can keep `Actions` in their tree unconditionally.
+
+`<Page>` from `@wordpress/admin-ui` exposes an `actions` slot used across admin surfaces (DataViews, WidgetDashboard, …). Plug `Actions` straight into it:
+
+```tsx
+import { Page } from '@wordpress/admin-ui';
+
+<WidgetDashboard
+	layout={ layout }
+	onLayoutChange={ setLayout }
+	widgetTypes={ widgetTypes }
+	editMode={ editMode }
+	onEditChange={ setEditMode }
+>
+	<Page
+		title={ __( 'My Dashboard' ) }
+		actions={ <WidgetDashboard.Actions /> }
+	>
+		<WidgetDashboard.Widgets />
+	</Page>
+</WidgetDashboard>
+```
+
+`<Page>` is optional. The compound renders inside any container, so a bare `<header>` or custom chrome works just as well.
+
+## Inserting widgets
+
+A modal-based inserter is mounted automatically inside `WidgetDashboard`. It stays hidden until the "Add widgets" button in `<WidgetDashboard.Actions />` is clicked. The inserter lists every entry in the `widgetTypes` prop as a grid of live previews (each preview renders the type's `example` attributes through its own render module), supports search, and exposes a single "Select" action with bulk support so users can insert one or several widgets in a single layout change.
+
+On confirmation, the inserter creates instances via `createDashboardWidget( widgetType )` (using each type's `example.attributes` as the initial values) and appends them to `layout` through `onLayoutChange`. The dialog closes after a successful insertion or when the user dismisses it.
+
+The inserter has no opt-out today; surfaces that want a custom widget-picking experience should compose their own UI alongside `<WidgetDashboard.Widgets />` and avoid rendering `<WidgetDashboard.Actions />` (which exposes the trigger).
 
 ## Authoring widgets
 

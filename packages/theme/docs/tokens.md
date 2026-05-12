@@ -155,6 +155,19 @@ Do not edit directly.
 | `--wpds-elevation-md` | For components that offer additional actions. Example: Menus, Command Palette                                                     |
 | `--wpds-elevation-lg` | For components that confirm decisions or handle necessary interruptions. Example: Modals.                                         |
 
+### Motion
+
+| Variable name                     | Description                                                                                         |
+| --------------------------------- | --------------------------------------------------------------------------------------------------- |
+| `--wpds-motion-duration-xs`       | Micro-delays and transition offsets                                                                 |
+| `--wpds-motion-duration-sm`       | Micro-interactions like focus rings and state changes                                               |
+| `--wpds-motion-duration-md`       | Standard transitions like menus and popovers                                                        |
+| `--wpds-motion-duration-lg`       | Deliberate animations like slides and reveals                                                       |
+| `--wpds-motion-duration-xl`       | Extended animations like complex or multi-step transitions                                          |
+| `--wpds-motion-easing-subtle`     | Nearly imperceptible easing for hover, color, and background transitions                            |
+| `--wpds-motion-easing-balanced`   | General-purpose easing for on-screen movement like resizing, morphing, and layout shifts            |
+| `--wpds-motion-easing-expressive` | Noticeable easing for enter/exit and spatial transitions like menus, popovers, dialogs, and drawers |
+
 ### Typography
 
 | Variable name                           | Description                                  |

@@ -7,7 +7,7 @@ import {
 } from '@wordpress/theme';
 import { unlock } from '../../../lock-unlock';
 import { Portal } from './portal';
-import { renderPortalWithChildren } from '../../../utils/render-portal-with-children';
+import { renderSlotWithChildren } from '../../../utils/render-slot-with-children';
 import itemPopupStyles from '../../../utils/css/item-popup.module.css';
 import resetStyles from '../../../utils/css/resets.module.css';
 import styles from './style.module.css';
@@ -50,6 +50,6 @@ export const Popup = forwardRef< HTMLDivElement, SelectPopupProps >(
 			</_Select.Positioner>
 		);
 
-		return renderPortalWithChildren( portal, <Portal />, portalChildren );
+		return renderSlotWithChildren( portal, <Portal />, portalChildren );
 	}
 );
