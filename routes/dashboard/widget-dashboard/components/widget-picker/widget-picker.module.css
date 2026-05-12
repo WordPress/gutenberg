@@ -1,0 +1,5 @@
+.preview {
+	height: 100%;
+	overflow: hidden;
+	padding: var(--wpds-dimension-padding-md);
+}

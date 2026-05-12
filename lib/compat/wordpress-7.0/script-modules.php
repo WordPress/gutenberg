@@ -31,7 +31,9 @@ function gutenberg_get_script_module_src( string $id ): ?string {
 	// Fallback for WP versions without get_registered().
 	$reflection = new ReflectionClass( $script_modules );
 	$prop       = $reflection->getProperty( 'registered' );
-	$prop->setAccessible( true );
+	if ( PHP_VERSION_ID < 80100 ) {
+		$prop->setAccessible( true );
+	}
 	$registered = $prop->getValue( $script_modules );
 
 	return $registered[ $id ]['src'] ?? null;
@@ -56,7 +58,9 @@ function gutenberg_print_script_module_translations() {
 	$reflection = new ReflectionClass( $script_modules );
 	if ( $reflection->hasMethod( 'get_sorted_dependencies' ) ) {
 		$method = $reflection->getMethod( 'get_sorted_dependencies' );
-		$method->setAccessible( true );
+		if ( PHP_VERSION_ID < 80100 ) {
+			$method->setAccessible( true );
+		}
 		$module_ids = $method->invoke( $script_modules, $queue );
 	} else {
 		$module_ids = $queue;

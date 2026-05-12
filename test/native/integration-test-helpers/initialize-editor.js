@@ -1,8 +1,8 @@
 /**
  * External dependencies
  */
+import { randomUUID } from 'crypto';
 import { render, fireEvent } from '@testing-library/react-native';
-import { v4 as uuid } from 'uuid';
 
 /**
  * WordPress dependencies
@@ -45,7 +45,7 @@ export async function initializeEditor( props, { component } = {} ) {
 		return actualResolution( selectorName, args );
 	} );
 
-	const uniqueId = uuid();
+	const uniqueId = randomUUID();
 	const postId = `post-id-${ uniqueId }`;
 	const postType = 'post';
 

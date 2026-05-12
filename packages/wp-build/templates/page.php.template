@@ -209,6 +209,21 @@ function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_render_page() {
 			}
 		}
 
+		/**
+		 * Filters the boot script-module dependencies for the
+		 * {{PAGE_SLUG}} page.
+		 *
+		 * Surfaces extending this page can append entries to the boot
+		 * dependency list. Each entry is an array with 'import' (string
+		 * 'static' or 'dynamic') and 'id' (script-module handle) keys.
+		 *
+		 * @param array $boot_dependencies Boot dependencies for the page.
+		 */
+		$boot_dependencies = apply_filters(
+			'{{PAGE_SLUG}}_boot_dependencies',
+			$boot_dependencies
+		);
+
 		// Dummy script module to ensure dependencies are loaded
 		wp_register_script_module(
 			'{{PAGE_SLUG}}',

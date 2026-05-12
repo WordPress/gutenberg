@@ -161,7 +161,7 @@ describe( 'Menu', () => {
 				<Menu>
 					<Menu.TriggerButton>Open dropdown</Menu.TriggerButton>
 					<Menu.Popover>
-						<Menu.Item disabled>First item</Menu.Item>
+						<Menu.Item>First item</Menu.Item>
 						<Menu.Item>Second item</Menu.Item>
 						<Menu.Item>Third item</Menu.Item>
 					</Menu.Popover>
@@ -180,10 +180,11 @@ describe( 'Menu', () => {
 			// Menu closed
 			expect( screen.queryByRole( 'menuitem' ) ).not.toBeInTheDocument();
 
-			await press.Space();
+			// Keyboard-triggered clicks have `detail: 0`, which Ariakit uses to
+			// choose the initial item focus path instead of the pointer path.
+			await press.Space( toggleButton, { detail: 0 } );
 
 			// Menu open, focus is on the first focusable item
-			// (disabled items are still focusable and accessible
 			await waitForFocusedMenuItem( 'First item' );
 		} );
 
