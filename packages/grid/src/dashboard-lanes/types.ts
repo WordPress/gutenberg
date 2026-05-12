@@ -3,6 +3,7 @@
  */
 import type {
 	DragPreviewRenderProps,
+	GridOverlayRenderProps,
 	ResizeHandleRenderProps,
 } from '../shared/types';
 
@@ -145,6 +146,17 @@ interface BaseDashboardLanesProps
 	 * properties documented in the README.
 	 */
 	renderDragPreview?: React.ComponentType< DragPreviewRenderProps >;
+
+	/**
+	 * Override the default edit-mode overlay (diagonal stripes plus
+	 * dashed column track guides) with a custom component. Lanes are
+	 * content-driven vertically, so no `rowHeight` is supplied and the
+	 * default visual paints columns only.
+	 *
+	 * The overlay only renders when `editMode` is true. When omitted,
+	 * the package's default visual is used.
+	 */
+	renderGridOverlay?: React.ComponentType< GridOverlayRenderProps >;
 }
 
 interface FixedDashboardLanesProps extends BaseDashboardLanesProps {

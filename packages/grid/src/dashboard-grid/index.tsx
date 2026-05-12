@@ -36,6 +36,7 @@ import {
  * Internal dependencies
  */
 import { GridItem } from './grid-item';
+import { GridOverlay } from '../shared/grid-overlay';
 import { resolveFillWidths } from './resolve-fill-widths';
 import type { DashboardGridLayoutItem, DashboardGridProps } from './types';
 import type { ResizeDelta } from '../shared/types';
@@ -96,6 +97,7 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 			onPreviewLayout,
 			renderResizeHandle,
 			renderDragPreview,
+			renderGridOverlay,
 			...divProps
 		} = props;
 		// Preview layout applied during drag/resize before committing.
@@ -473,6 +475,31 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 				</div>
 			) : null;
 
+		// Edit-mode background visual. Default paints diagonal stripes
+		// and dashed track guides; a consumer can replace it via
+		// `renderGridOverlay` while reusing the resolved column count,
+		// gap, and row height. `'auto'` collapses to `undefined` for
+		// the overlay so it falls back to columns-only (row dividers
+		// have no anchor when the row height is content-driven).
+		// Rendered unconditionally so the overlay can cross-fade on
+		// edit-mode toggles; `isActive` drives the opacity transition
+		// inside the overlay. Memoized so drag/resize re-renders skip
+		// reconciliation while inputs are stable.
+		const Overlay = renderGridOverlay ?? GridOverlay;
+		const overlayRowHeight =
+			typeof rowHeight === 'number' ? rowHeight : undefined;
+		const gridOverlay = useMemo(
+			() => (
+				<Overlay
+					columns={ effectiveColumns }
+					gapPx={ gapPx }
+					rowHeight={ overlayRowHeight }
+					isActive={ editMode }
+				/>
+			),
+			[ Overlay, editMode, effectiveColumns, gapPx, overlayRowHeight ]
+		);
+
 		return (
 			<DndContext
 				sensors={ sensors }
@@ -499,6 +526,7 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 							gap: gapPx,
 						} }
 					>
+						{ gridOverlay }
 						{ items.map( ( id ) => (
 							<GridItem
 								key={ id }

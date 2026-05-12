@@ -166,6 +166,61 @@ export const Stacked: Story = {
 };
 
 /**
+ * `CollapsibleCard.Header` renders a `<div>` wrapper by default. Pass an
+ * `<h1>`–`<h6>` React element to the `render` prop to wrap the trigger in
+ * a heading and contribute to the document outline. The right level
+ * depends on the surrounding outline, so the consumer is expected to opt
+ * in.
+ */
+export const WithHeadingElement: Story = {
+	parameters: { controls: { disable: true } },
+	render: () => (
+		<div
+			style={ {
+				display: 'flex',
+				flexDirection: 'column',
+				gap: 'var(--wpds-dimension-gap-lg)',
+			} }
+		>
+			<CollapsibleCard.Root>
+				<CollapsibleCard.Header render={ <h2 /> }>
+					<Card.Title>Heading level 2</Card.Title>
+				</CollapsibleCard.Header>
+				<CollapsibleCard.Content>
+					<Text>
+						The wrapper renders as an h2 element when the consumer
+						passes an h2 React element to the render prop.
+					</Text>
+				</CollapsibleCard.Content>
+			</CollapsibleCard.Root>
+			<CollapsibleCard.Root>
+				<CollapsibleCard.Header render={ <h3 /> }>
+					<Card.Title>Heading level 3</Card.Title>
+				</CollapsibleCard.Header>
+				<CollapsibleCard.Content>
+					<Text>
+						Pass any of h1–h6 to choose the level that fits the
+						surrounding document outline.
+					</Text>
+				</CollapsibleCard.Content>
+			</CollapsibleCard.Root>
+			<CollapsibleCard.Root>
+				<CollapsibleCard.Header>
+					<Card.Title>No heading (default)</Card.Title>
+				</CollapsibleCard.Header>
+				<CollapsibleCard.Content>
+					<Text>
+						Without a render prop, the header wraps the trigger in a
+						plain div and does not contribute to the document
+						outline.
+					</Text>
+				</CollapsibleCard.Content>
+			</CollapsibleCard.Root>
+		</div>
+	),
+};
+
+/**
  * A collapsible card with a `HeaderDescription` that provides supplementary
  * information (e.g. status, summary) as an `aria-describedby` relationship.
  */

@@ -6,6 +6,9 @@ import { Button } from '../index';
 const meta: Meta< typeof Button > = {
 	title: 'Design System/Components/Button',
 	component: Button,
+	subcomponents: {
+		'Button.Icon': Button.Icon,
+	},
 	argTypes: {
 		'aria-pressed': {
 			control: { type: 'boolean' },

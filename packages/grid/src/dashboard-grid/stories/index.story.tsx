@@ -18,6 +18,7 @@ import { DashboardGrid } from '..';
 import type { DashboardGridLayoutItem } from '../types';
 import type {
 	DragPreviewRenderProps,
+	GridOverlayRenderProps,
 	ResizeHandleRenderProps,
 } from '../../shared/types';
 
@@ -85,7 +86,9 @@ const bgTokens: Record< Tone, string > = {
 };
 
 const fgTokens: Record< Tone, string > = {
-	brand: 'var(--wpds-color-fg-content-info)',
+	// `brand` has no dedicated fg-content token in the design system,
+	// so neutral content reads safely against the brand surface tint.
+	brand: 'var(--wpds-color-fg-content-neutral)',
 	info: 'var(--wpds-color-fg-content-info)',
 	success: 'var(--wpds-color-fg-content-success)',
 	warning: 'var(--wpds-color-fg-content-warning)',
@@ -436,72 +439,24 @@ export const RowHeight: Story = {
 };
 
 /**
- * Visualizes the grid's column tracks and gaps as a Chrome
- * DevTools-style overlay. Renders a sibling grid behind
- * `DashboardGrid` with the same template, so the column tracks
- * line up exactly with the live layout.
- */
-function GridVisualizer( {
-	columns,
-	spacing,
-}: {
-	columns: number;
-	spacing: number;
-} ) {
-	const gapPx = spacing * 4;
-	return (
-		<div
-			aria-hidden
-			style={ {
-				position: 'absolute',
-				top: 24,
-				right: 0,
-				bottom: 0,
-				left: 0,
-				background: `repeating-linear-gradient(135deg, color-mix(in srgb, var(--wpds-color-bg-surface-warning) 28%, transparent) 0 6px, transparent 6px 12px)`,
-				display: 'grid',
-				gridTemplateColumns: `repeat(${ columns }, minmax(0, 1fr))`,
-				gap: gapPx,
-				pointerEvents: 'none',
-				zIndex: 0,
-			} }
-		>
-			{ Array.from( { length: columns } ).map( ( _, i ) => (
-				<div
-					key={ i }
-					style={ {
-						outline:
-							'1px dashed var(--wpds-color-stroke-surface-warning)',
-						position: 'relative',
-					} }
-				>
-					<span
-						style={ {
-							position: 'absolute',
-							top: -18,
-							left: 0,
-							fontSize: 10,
-							padding: '1px 4px',
-							borderRadius: 2,
-							background: 'var(--wpds-color-bg-surface-warning)',
-							color: 'var(--wpds-color-fg-content-warning)',
-							fontFamily:
-								'var(--wpds-typography-font-family-mono)',
-						} }
-					>
-						{ i + 1 }
-					</span>
-				</div>
-			) ) }
-		</div>
-	);
-}
-
-/**
- * Edit mode with drag, resize, and all width modes. A state panel
- * shows the raw layout JSON. Drag items to reorder; resize from the
- * bottom-right handle. Keyboard sensor is enabled: use Tab to focus
- * an item, Space to grab, arrow keys to move, Space to drop.
+ * Edit mode with drag, resize, and all width modes. While `editMode`
+ * is on, `<DashboardGrid />` paints its default overlay behind the
+ * tiles to visualize the underlying template: diagonal stripes, a
+ * dashed outline on each column track, a subtle column fill that
+ * marks the drop zones against the gaps, and a 1px row divider when
+ * `rowHeight` is numeric. The overlay disappears when `editMode`
+ * flips back to `false`.
+ *
+ * Theme the default look in place via CSS custom properties exposed
+ * by the package (`--wp-grid-overlay-stripe-color`,
+ * `--wp-grid-overlay-track-color`, `--wp-grid-overlay-column-fill`),
+ * or replace the visual wholesale by passing `renderGridOverlay`.
+ * See the `Custom Grid Overlay` story for a full override example.
+ *
+ * A state panel shows the raw layout JSON. Drag items to reorder;
+ * resize from the bottom-right handle. Keyboard sensor is enabled:
+ * use Tab to focus an item, Space to grab, arrow keys to move, Space
+ * to drop.
  */
 export const EditMode: Story = {
 	args: {
@@ -643,17 +598,7 @@ export const EditMode: Story = {
 
 		return (
 			<Stack direction="row" gap="lg" align="flex-start">
-				<div
-					style={ {
-						width: '800px',
-						position: 'relative',
-						paddingTop: 24,
-					} }
-				>
-					<GridVisualizer
-						columns={ args.columns ?? 12 }
-						spacing={ args.spacing ?? 4 }
-					/>
+				<div style={ { width: '800px' } }>
 					<DashboardGrid
 						{ ...args }
 						layout={ layout }
@@ -823,6 +768,144 @@ export const Customization: Story = {
 					{ tiles }
 				</DashboardGrid>
 			</div>
+		);
+	},
+};
+
+/**
+ * Example custom overlay supplied to `<DashboardGrid />` through the
+ * `renderGridOverlay` prop. Receives the grid's resolved column
+ * count, gap, row height, and `isActive` flag; this implementation
+ * drops the row dividers, swaps to an info tone, labels each column
+ * track with its index, and fades in/out on `isActive` toggles. The
+ * grid always mounts the overlay; the consumer owns the visual and
+ * its transition.
+ *
+ * @param props          Render props supplied by the grid.
+ * @param props.columns  Number of column tracks to mirror.
+ * @param props.gapPx    Gap between tracks in pixels.
+ * @param props.isActive Whether the overlay should be visible.
+ */
+function NumberedOverlay( {
+	columns,
+	gapPx,
+	isActive,
+}: GridOverlayRenderProps ) {
+	return (
+		<div
+			aria-hidden
+			style={ {
+				position: 'absolute',
+				inset: 0,
+				display: 'grid',
+				gridTemplateColumns: `repeat(${ columns }, minmax(0, 1fr))`,
+				gap: gapPx,
+				pointerEvents: 'none',
+				opacity: isActive ? 1 : 0,
+				visibility: isActive ? 'visible' : 'hidden',
+				transition: isActive
+					? 'opacity 200ms ease, visibility 0s linear 0s'
+					: 'opacity 200ms ease, visibility 0s linear 200ms',
+				backgroundImage: `repeating-linear-gradient(135deg, color-mix(in srgb, var(--wpds-color-bg-surface-info) 24%, transparent) 0 6px, transparent 6px 12px)`,
+			} }
+		>
+			{ Array.from( { length: columns } ).map( ( _, i ) => (
+				<div
+					key={ i }
+					style={ {
+						outline:
+							'1px dashed var(--wpds-color-stroke-surface-info)',
+						backgroundColor:
+							'color-mix(in srgb, var(--wpds-color-bg-surface-info) 10%, transparent)',
+						position: 'relative',
+					} }
+				>
+					<span
+						style={ {
+							position: 'absolute',
+							top: 4,
+							insetInlineStart: 4,
+							fontSize: 10,
+							padding: '1px 6px',
+							borderRadius: 2,
+							background: 'var(--wpds-color-bg-surface-info)',
+							color: 'var(--wpds-color-fg-content-info)',
+							fontFamily:
+								'var(--wpds-typography-font-family-mono)',
+						} }
+					>
+						{ i + 1 }
+					</span>
+				</div>
+			) ) }
+		</div>
+	);
+}
+
+/**
+ * Replaces the package's default edit-mode overlay with a custom
+ * visual through the `renderGridOverlay` prop. The grid mounts the
+ * supplied component as a sibling behind the tiles whenever
+ * `editMode` is on, passing the resolved `{ columns, gapPx,
+ * rowHeight }` so the override can reproduce the column and row
+ * tracks pixel-accurately without re-deriving them.
+ *
+ * Here the override (see `NumberedOverlay` above) swaps the warning
+ * tone for info, drops the row dividers, and labels each column
+ * track with its index. Pass `renderGridOverlay={ () => null }` to
+ * suppress the overlay entirely while keeping `editMode` interactions
+ * on.
+ */
+export const CustomGridOverlayStory: Story = {
+	name: 'Custom Grid Overlay',
+	args: {
+		columns: 12,
+		spacing: 4,
+		rowHeight: 80,
+		editMode: true,
+		layout: [
+			{ key: 'a', width: 3, height: 1 },
+			{ key: 'b', width: 5, height: 1 },
+			{ key: 'c', width: 4, height: 1 },
+			{ key: 'd', width: 2, height: 2 },
+			{ key: 'e', width: 6, height: 1 },
+		],
+	},
+	render: function CustomGridOverlayRender( args ) {
+		const [ layout, setLayout ] = useState< DashboardGridLayoutItem[] >(
+			args.layout
+		);
+
+		const tiles = useMemo(
+			() => [
+				<Tile key="a" tone="brand">
+					A
+				</Tile>,
+				<Tile key="b" tone="info">
+					B
+				</Tile>,
+				<Tile key="c" tone="success">
+					C
+				</Tile>,
+				<Tile key="d" tone="warning">
+					D
+				</Tile>,
+				<Tile key="e" tone="error">
+					E
+				</Tile>,
+			],
+			[]
+		);
+
+		return (
+			<DashboardGrid
+				{ ...args }
+				layout={ layout }
+				onChangeLayout={ setLayout }
+				renderGridOverlay={ NumberedOverlay }
+			>
+				{ tiles }
+			</DashboardGrid>
 		);
 	},
 };
