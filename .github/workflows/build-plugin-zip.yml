@@ -310,12 +310,11 @@ jobs:
             - name: Push built plugin .tar.gz file to GitHub Container Registry
               env:
                   SOURCE_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
-                  REPOSITORY: ${{ github.repository }}
               run: |
                   oras push "ghcr.io/wordpress/gutenberg/gutenberg-wp-develop-build:${SOURCE_SHA}" \
                   "gutenberg.tar.gz:application/gzip" \
                   --annotation "org.opencontainers.image.description=Gutenberg plugin build for commit ${SOURCE_SHA}" \
-                  --annotation "org.opencontainers.image.source=https://github.com/${REPOSITORY}" \
+                  --annotation "org.opencontainers.image.source=https://github.com/${{ github.repository }}" \
                   --annotation "org.opencontainers.image.revision=${SOURCE_SHA}"
 
             # Compute the mutable tag from the event. GitHub Actions expressions can't do string replacement,
