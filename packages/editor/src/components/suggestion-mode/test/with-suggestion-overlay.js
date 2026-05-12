@@ -176,6 +176,97 @@ describe( 'withSuggestionOverlay', () => {
 		} );
 	} );
 
+	it( 'surfaces diff marks once the overlay change settles', () => {
+		// A discrete edit (e.g. range Delete) generates one overlay write
+		// then silence — after the ~100 ms idle window, the HOC swaps the
+		// clean proposed value for the marked HTML so reviewers see the
+		// strikethrough/insertion without leaving the block.
+		jest.useFakeTimers();
+		try {
+			const setAttributes = jest.fn();
+			renderWithProviders(
+				<Wrapped
+					clientId="a"
+					name="core/paragraph"
+					attributes={ { content: 'Hello' } }
+					setAttributes={ setAttributes }
+				/>,
+				{ intent: 'suggest' }
+			);
+
+			fireEvent.click( screen.getByRole( 'button', { name: 'edit' } ) );
+
+			// Immediately after the click, the gate still suppresses marks.
+			expect( screen.getByTestId( 'content' ) ).toHaveTextContent(
+				'proposed'
+			);
+			expect( screen.getByTestId( 'content' ) ).not.toHaveTextContent(
+				/<del/
+			);
+
+			act( () => {
+				jest.advanceTimersByTime( 100 );
+			} );
+
+			// After the idle window, the rendered content carries both the
+			// deletion (`Hello`) and the addition (`proposed`) wrappers.
+			expect( screen.getByTestId( 'content' ) ).toHaveTextContent(
+				/<del class="has-suggestion-deletion">Hello<\/del>/
+			);
+			expect( screen.getByTestId( 'content' ) ).toHaveTextContent(
+				/<ins class="has-suggestion-addition">proposed<\/ins>/
+			);
+		} finally {
+			jest.useRealTimers();
+		}
+	} );
+
+	it( 'keeps marks suppressed while overlay writes churn within the idle window', () => {
+		// Continuous typing flushes one setAttributes per keystroke. Each
+		// write resets the debounce timer, so marks stay hidden until the
+		// user pauses — RichText doesn't see a marked value mid-burst.
+		// Each click triggers a fresh setAttributes call, which the
+		// reducer turns into a new `overlayAttributes` reference even when
+		// the proposed value is unchanged, so two clicks model a typing
+		// burst that re-arms the debounce.
+		jest.useFakeTimers();
+		try {
+			const setAttributes = jest.fn();
+			renderWithProviders(
+				<Wrapped
+					clientId="a"
+					name="core/paragraph"
+					attributes={ { content: 'Hello' } }
+					setAttributes={ setAttributes }
+				/>,
+				{ intent: 'suggest' }
+			);
+
+			fireEvent.click( screen.getByRole( 'button', { name: 'edit' } ) );
+			act( () => {
+				jest.advanceTimersByTime( 80 );
+			} );
+			fireEvent.click( screen.getByRole( 'button', { name: 'edit' } ) );
+			act( () => {
+				jest.advanceTimersByTime( 80 );
+			} );
+
+			expect( screen.getByTestId( 'content' ) ).not.toHaveTextContent(
+				/<del/
+			);
+
+			// Once the user actually pauses for 100 ms, marks render.
+			act( () => {
+				jest.advanceTimersByTime( 100 );
+			} );
+			expect( screen.getByTestId( 'content' ) ).toHaveTextContent(
+				/<del class="has-suggestion-deletion">Hello<\/del>/
+			);
+		} finally {
+			jest.useRealTimers();
+		}
+	} );
+
 	it( 're-captures baseline when overlay is cleared then re-edited', () => {
 		// Regression: after Submit/Discard clears the overlay entry, a
 		// later edit must create a new baseline + overlay rather than
