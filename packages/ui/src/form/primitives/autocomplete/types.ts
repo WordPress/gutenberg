@@ -8,7 +8,7 @@ export type PortalProps = ComponentPropsWithoutRef<
 	typeof _Autocomplete.Portal
 >;
 
-export type AutocompletePositionerProps = ComponentPropsWithoutRef<
+export type PositionerProps = ComponentPropsWithoutRef<
 	typeof _Autocomplete.Positioner
 >;
 
@@ -69,9 +69,7 @@ export type AutocompletePopupProps = ComponentProps<
 	 * `Autocomplete.Positioner` with default props. Do not pass `children` on
 	 * the positioner element; they would be ignored.
 	 */
-	positioner?: ReactElement<
-		Omit< AutocompletePositionerProps, 'children' >
-	>;
+	positioner?: ReactElement< Omit< PositionerProps, 'children' > >;
 };
 
 export type AutocompleteRootProps = ComponentProps<

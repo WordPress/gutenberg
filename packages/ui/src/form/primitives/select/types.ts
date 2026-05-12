@@ -6,7 +6,7 @@ import type { InputLayoutProps } from '../input-layout/types';
 
 export type PortalProps = ComponentPropsWithoutRef< typeof _Select.Portal >;
 
-export type SelectPositionerProps = ComponentPropsWithoutRef<
+export type PositionerProps = ComponentPropsWithoutRef<
 	typeof _Select.Positioner
 >;
 
@@ -65,7 +65,7 @@ export type SelectPopupProps = ComponentProps< typeof _Select.Popup > & {
 	 * with default props. Do not pass `children` on the positioner element;
 	 * they would be ignored.
 	 */
-	positioner?: ReactElement< Omit< SelectPositionerProps, 'children' > >;
+	positioner?: ReactElement< Omit< PositionerProps, 'children' > >;
 };
 
 export type SelectItemProps = Omit<
