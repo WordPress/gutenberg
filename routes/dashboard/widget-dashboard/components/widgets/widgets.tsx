@@ -7,9 +7,10 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { forwardRef, useCallback, useMemo } from '@wordpress/element';
-import { DashboardGrid } from '@wordpress/grid';
+import { DashboardGrid, DashboardLanes } from '@wordpress/grid';
 import type {
 	DashboardGridLayoutItem,
+	DashboardLanesLayoutItem,
 	DragPreviewRenderProps,
 } from '@wordpress/grid';
 
@@ -19,12 +20,26 @@ import type {
 import { useDashboardInternalContext } from '../../context/dashboard-context';
 import { WidgetChrome } from '../widget-chrome';
 import styles from './widgets.module.css';
-import type { DashboardWidget, WidgetName } from '../../types';
+import type {
+	DashboardWidget,
+	GridTilePlacement,
+	MasonryTilePlacement,
+	WidgetName,
+} from '../../types';
 
 function toGridLayout( widgets: DashboardWidget[] ): DashboardGridLayoutItem[] {
 	return widgets.map( ( w ) => ( {
 		key: w.uuid,
-		...w.placement,
+		...( w.placement as GridTilePlacement | undefined ),
+	} ) );
+}
+
+function toMasonryLayout(
+	widgets: DashboardWidget[]
+): DashboardLanesLayoutItem[] {
+	return widgets.map( ( w ) => ( {
+		key: w.uuid,
+		...( w.placement as MasonryTilePlacement | undefined ),
 	} ) );
 }
 
@@ -48,24 +63,60 @@ function applyGridChange(
 	} );
 }
 
+function applyMasonryChange(
+	widgets: DashboardWidget[],
+	masonryLayout: DashboardLanesLayoutItem[]
+): DashboardWidget[] {
+	return masonryLayout.map( ( { key, ...placement } ) => {
+		const existing = widgets.find( ( w ) => w.uuid === key );
+		if ( ! existing ) {
+			return {
+				uuid: key,
+				type: '' as WidgetName,
+				placement,
+			};
+		}
+		return {
+			...existing,
+			placement,
+		};
+	} );
+}
+
 export interface WidgetsProps {
 	className?: string;
 }
 
 /**
  * Iterates `layout`, delegates each entry to `WidgetDashboard.WidgetChrome`, and
- * feeds the resulting tree into `@wordpress/grid`.
+ * feeds the resulting tree into the active `@wordpress/grid` surface (2D grid
+ * or masonry, picked from `gridSettings.model`).
  */
 export const Widgets = forwardRef< HTMLDivElement, WidgetsProps >(
 	function Widgets( { className }, ref ) {
 		const { layout, onLayoutChange, editMode, gridSettings } =
 			useDashboardInternalContext();
 
-		const gridLayout = useMemo( () => toGridLayout( layout ), [ layout ] );
+		const isMasonry = gridSettings.model === 'masonry';
 
-		const handleLayoutChange = useCallback(
+		const gridLayout = useMemo(
+			() =>
+				isMasonry ? toMasonryLayout( layout ) : toGridLayout( layout ),
+			[ layout, isMasonry ]
+		);
+
+		const handleGridChange = useCallback(
 			( newGridLayout: DashboardGridLayoutItem[] ) => {
 				onLayoutChange( applyGridChange( layout, newGridLayout ) );
+			},
+			[ layout, onLayoutChange ]
+		);
+
+		const handleMasonryChange = useCallback(
+			( newMasonryLayout: DashboardLanesLayoutItem[] ) => {
+				onLayoutChange(
+					applyMasonryChange( layout, newMasonryLayout )
+				);
 			},
 			[ layout, onLayoutChange ]
 		);
@@ -89,32 +140,70 @@ export const Widgets = forwardRef< HTMLDivElement, WidgetsProps >(
 			[]
 		);
 
-		const sharedProps = {
-			layout: gridLayout,
-			spacing: gridSettings.spacing,
-			rowHeight: gridSettings.rowHeight,
-			editMode,
-			onChangeLayout: handleLayoutChange,
-			renderDragPreview,
-		};
+		const isFixedColumns = gridSettings.columns !== undefined;
+
+		let surface;
+		if ( isMasonry && isFixedColumns ) {
+			surface = (
+				<DashboardLanes
+					layout={ gridLayout as DashboardLanesLayoutItem[] }
+					columns={ gridSettings.columns }
+					spacing={ gridSettings.spacing }
+					flowTolerance={ gridSettings.flowTolerance }
+					editMode={ editMode }
+					onChangeLayout={ handleMasonryChange }
+					renderDragPreview={ renderDragPreview }
+				>
+					{ children }
+				</DashboardLanes>
+			);
+		} else if ( isMasonry ) {
+			surface = (
+				<DashboardLanes
+					layout={ gridLayout as DashboardLanesLayoutItem[] }
+					minColumnWidth={ gridSettings.minColumnWidth }
+					spacing={ gridSettings.spacing }
+					flowTolerance={ gridSettings.flowTolerance }
+					editMode={ editMode }
+					onChangeLayout={ handleMasonryChange }
+					renderDragPreview={ renderDragPreview }
+				>
+					{ children }
+				</DashboardLanes>
+			);
+		} else if ( isFixedColumns ) {
+			surface = (
+				<DashboardGrid
+					layout={ gridLayout as DashboardGridLayoutItem[] }
+					columns={ gridSettings.columns }
+					spacing={ gridSettings.spacing }
+					rowHeight={ gridSettings.rowHeight }
+					editMode={ editMode }
+					onChangeLayout={ handleGridChange }
+					renderDragPreview={ renderDragPreview }
+				>
+					{ children }
+				</DashboardGrid>
+			);
+		} else {
+			surface = (
+				<DashboardGrid
+					layout={ gridLayout as DashboardGridLayoutItem[] }
+					minColumnWidth={ gridSettings.minColumnWidth }
+					spacing={ gridSettings.spacing }
+					rowHeight={ gridSettings.rowHeight }
+					editMode={ editMode }
+					onChangeLayout={ handleGridChange }
+					renderDragPreview={ renderDragPreview }
+				>
+					{ children }
+				</DashboardGrid>
+			);
+		}
 
 		return (
 			<div ref={ ref } className={ clsx( styles.grid, className ) }>
-				{ gridSettings.columns !== undefined ? (
-					<DashboardGrid
-						{ ...sharedProps }
-						columns={ gridSettings.columns }
-					>
-						{ children }
-					</DashboardGrid>
-				) : (
-					<DashboardGrid
-						{ ...sharedProps }
-						minColumnWidth={ gridSettings.minColumnWidth }
-					>
-						{ children }
-					</DashboardGrid>
-				) }
+				{ surface }
 			</div>
 		);
 	}
