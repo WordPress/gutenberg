@@ -17,9 +17,9 @@ import { WithWpCompatOverlaySlot } from '../../../packages/ui/src/utils/with-wp-
  * components-side overlay.
  *
  * The dormant baseline (no decorator) would show the Tooltip rendered
- * via Base UI's default portal — which sits at body level but at a
- * z-index that may or may not beat `@wordpress/components` overlays
- * depending on insertion order. Wrapping the story with
+ * via the default portal — which sits at body level but at a z-index
+ * that may or may not beat `@wordpress/components` overlays depending
+ * on insertion order. Wrapping the story with
  * `WithWpCompatOverlaySlot` opts it into the slot, where the Tooltip
  * gets a guaranteed-on-top stacking position.
  *

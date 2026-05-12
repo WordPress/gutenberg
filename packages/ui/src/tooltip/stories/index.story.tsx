@@ -168,7 +168,7 @@ export const WithCustomZIndex: StoryObj< typeof Tooltip.Root > = {
  * Demonstrates the `@wordpress/ui` compat overlay slot. With the slot
  * enabled (via the `WithWpCompatOverlaySlot` decorator), the tooltip
  * popup portals into the body-level `[data-wp-compat-overlay-slot]`
- * container instead of Base UI's default portal. Inspect the DOM via
+ * container instead of the default portal. Inspect the DOM via
  * DevTools to verify.
  *
  * The default `Tooltip` story above (without the decorator) reflects
