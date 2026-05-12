@@ -12,7 +12,7 @@ import { Notice, Stack } from '@wordpress/ui';
 /**
  * Internal dependencies
  */
-import { TAXONOMY_ENTITY } from '../../constants';
+import { RESERVED_KEYS, TAXONOMY_ENTITY } from '../../constants';
 import {
 	createBooleanField,
 	createDescriptionField,
@@ -81,6 +81,11 @@ export function useSlugField(
 					const slug = value.slug;
 					if ( originalSlug !== undefined && slug === originalSlug ) {
 						return null;
+					}
+					if ( RESERVED_KEYS.has( slug ) ) {
+						return __(
+							'This key is reserved by WordPress and would conflict with built-in URLs.'
+						);
 					}
 					const slugTaken = ( registeredTaxonomies ?? [] ).some(
 						( t: any ) => t.slug === slug

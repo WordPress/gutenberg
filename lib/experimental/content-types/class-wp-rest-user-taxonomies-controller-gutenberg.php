@@ -252,6 +252,7 @@ class WP_REST_User_Taxonomies_Controller_Gutenberg extends WP_REST_Posts_Control
 	/**
 	 * Validates the prepared post's `post_name` slug. Rejects:
 	 *   - shapes outside `^[a-z0-9_-]{1,32}$`,
+	 *   - slugs that collide with a WP query var (`cat`, `author`, …),
 	 *   - slugs already taken by another `wp_user_taxonomy` post,
 	 *   - slugs reserved by an existing registered taxonomy (core/plugin).
 	 *
@@ -285,6 +286,22 @@ class WP_REST_User_Taxonomies_Controller_Gutenberg extends WP_REST_Posts_Control
 			if ( $existing && $existing->post_name === $slug ) {
 				return true;
 			}
+		}
+
+		// Reject WP query-var collisions (`cat`, `author`, `name`, …). These
+		// names aren't registered as taxonomies, so `taxonomy_exists()` below
+		// won't catch them, but registering a taxonomy with one breaks
+		// built-in archive URLs via rewrite collisions.
+		if ( $this->is_reserved_query_var( $slug ) ) {
+			return new WP_Error(
+				'gutenberg_user_taxonomy_slug_query_var_reserved',
+				sprintf(
+					/* translators: %s: taxonomy slug */
+					__( 'The taxonomy key "%s" is reserved by WordPress and would conflict with built-in URLs.', 'gutenberg' ),
+					$slug
+				),
+				array( 'status' => 400 )
+			);
 		}
 
 		$other_posts = get_posts(
@@ -322,6 +339,22 @@ class WP_REST_User_Taxonomies_Controller_Gutenberg extends WP_REST_Posts_Control
 		}
 
 		return true;
+	}
+
+	/**
+	 * Whether the given slug collides with a WP public or private query var.
+	 * Registering a taxonomy or post type with one of these names creates
+	 * rewrite rules that hijack built-in archive URLs (e.g. `?cat=`,
+	 * `?author=`). Uses `$wp->public_query_vars` as the canonical source so
+	 * the list stays in sync with whatever core declares at runtime.
+	 *
+	 * @param string $slug Candidate slug.
+	 * @return bool
+	 */
+	private function is_reserved_query_var( $slug ) {
+		global $wp;
+		return in_array( $slug, $wp->public_query_vars, true )
+			|| in_array( $slug, $wp->private_query_vars, true );
 	}
 
 	/**

@@ -387,6 +387,33 @@ class WP_REST_User_Post_Types_Controller_Gutenberg_Test extends WP_Test_REST_Con
 	}
 
 	/**
+	 * Slugs that collide with a WP query var (e.g. `cat`, `author`, `name`)
+	 * are rejected with the dedicated query-var-collision error code. These
+	 * names aren't themselves registered post types, so the existing
+	 * `post_type_exists()` branch wouldn't catch them — registering a
+	 * post type with one would silently hijack built-in archive URLs.
+	 */
+	public function test_create_item_rejects_query_var_slug() {
+		wp_set_current_user( self::$admin_id );
+
+		$request = new WP_REST_Request( 'POST', self::REST_BASE );
+		$request->set_body_params(
+			array(
+				'slug'   => 'author',
+				'title'  => 'Author',
+				'config' => array( 'labels' => array( 'singular_name' => 'Author' ) ),
+			)
+		);
+
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertSame( 400, $response->get_status() );
+		$this->assertSame(
+			'gutenberg_user_post_type_slug_query_var_reserved',
+			$response->get_data()['code']
+		);
+	}
+
+	/**
 	 * Slug must match `^[a-z0-9_-]{1,20}$`. The 20-char cap is post-types-
 	 * specific (vs 32 for taxonomies) because `wp_posts.post_type` is a
 	 * 20-char column. Other shape violations (spaces, uppercase) get

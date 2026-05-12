@@ -433,6 +433,33 @@ class WP_REST_User_Taxonomies_Controller_Gutenberg_Test extends WP_Test_REST_Con
 	}
 
 	/**
+	 * Slugs that collide with a WP query var (e.g. `cat`, `author`, `name`)
+	 * are rejected with the dedicated query-var-collision error code. These
+	 * names aren't themselves registered taxonomies, so the existing
+	 * `taxonomy_exists()` branch wouldn't catch them — registering a
+	 * taxonomy with one would silently hijack built-in archive URLs.
+	 */
+	public function test_create_item_rejects_query_var_slug() {
+		wp_set_current_user( self::$admin_id );
+
+		$request = new WP_REST_Request( 'POST', self::REST_BASE );
+		$request->set_body_params(
+			array(
+				'slug'   => 'cat',
+				'title'  => 'Cat',
+				'config' => array( 'labels' => array( 'singular_name' => 'Cat' ) ),
+			)
+		);
+
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertSame( 400, $response->get_status() );
+		$this->assertSame(
+			'gutenberg_user_taxonomy_slug_query_var_reserved',
+			$response->get_data()['code']
+		);
+	}
+
+	/**
 	 * Update modifies the typed `config` and reflects it back.
 	 */
 	public function test_update_item() {
