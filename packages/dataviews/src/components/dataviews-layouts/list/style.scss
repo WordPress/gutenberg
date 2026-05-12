@@ -115,7 +115,7 @@ div.dataviews-view-list {
 		border: none;
 		background: none;
 		padding: 0;
-		cursor: pointer;
+		cursor: var(--wpds-cursor-control);
 
 		&:focus-visible {
 			outline: none;

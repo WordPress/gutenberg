@@ -7,9 +7,25 @@ import { describe, expect, it } from '@jest/globals';
  * Internal dependencies
  */
 import {
-	htmlIndexToRichTextOffset,
-	richTextOffsetToHtmlIndex,
+	asHtmlStringIndex,
+	asRichTextOffset,
+	htmlIndexToRichTextOffset as typedHtmlIndexToRichTextOffset,
+	richTextOffsetToHtmlIndex as typedRichTextOffsetToHtmlIndex,
 } from '../crdt-utils';
+
+function htmlIndexToRichTextOffset( html: string, htmlIndex: number ) {
+	return typedHtmlIndexToRichTextOffset(
+		html,
+		asHtmlStringIndex( htmlIndex )
+	);
+}
+
+function richTextOffsetToHtmlIndex( html: string, richTextOffset: number ) {
+	return typedRichTextOffsetToHtmlIndex(
+		html,
+		asRichTextOffset( richTextOffset )
+	);
+}
 
 describe( 'htmlIndexToRichTextOffset', () => {
 	it( 'returns the index unchanged when there are no tags', () => {

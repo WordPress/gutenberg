@@ -42,7 +42,7 @@
 	padding: $grid-unit-10;
 	align-items: stretch;
 	justify-content: center;
-	cursor: pointer;
+	cursor: var(--wpds-cursor-control);
 	background: transparent;
 	word-break: break-word;
 	@media not ( prefers-reduced-motion ) {

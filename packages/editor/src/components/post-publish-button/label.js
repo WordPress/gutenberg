@@ -29,6 +29,7 @@ export default function PublishButtonLabel() {
 		postStatusHasChanged,
 		postStatus,
 		postType,
+		isPostSavingLocked,
 	} = useSelect( ( select ) => {
 		const {
 			isCurrentPostPublished,
@@ -52,6 +53,7 @@ export default function PublishButtonLabel() {
 			isAutosaving: isAutosavingPost(),
 			hasNonPostEntityChanges:
 				select( editorStore ).hasNonPostEntityChanges(),
+			isPostSavingLocked: select( editorStore ).isPostSavingLocked(),
 			postStatusHasChanged: !! getPostEdits()?.status,
 			postStatus: getEditedPostAttribute( 'status' ),
 		};
@@ -82,7 +84,7 @@ export default function PublishButtonLabel() {
 			: __( 'Submit for Review' );
 	}
 	if (
-		hasNonPostEntityChanges ||
+		( hasNonPostEntityChanges && ! isPostSavingLocked ) ||
 		isPublished ||
 		( postStatusHasChanged &&
 			! [ 'future', 'publish' ].includes( postStatus ) ) ||
