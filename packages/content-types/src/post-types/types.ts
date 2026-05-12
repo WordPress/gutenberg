@@ -5,7 +5,7 @@ export interface PostTypeRecord {
 	status: 'publish' | 'draft';
 	title: { raw: string; rendered: string };
 	config: StoredConfig;
-	post_count: number;
+	count: number;
 }
 
 export interface StoredLabels {
@@ -86,5 +86,5 @@ export interface PostTypeFormData extends ContentType {
 		supports: SupportFeature[];
 		has_archive: boolean;
 	};
-	post_count?: number;
+	count?: number;
 }

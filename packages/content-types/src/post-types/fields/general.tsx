@@ -78,13 +78,13 @@ export const showInRestField = createBooleanField(
 	}
 );
 
-export const postCountField: Field< PostTypeFormData > = {
-	id: 'post_count',
+export const countField: Field< PostTypeFormData > = {
+	id: 'count',
 	label: __( 'Posts' ),
 	type: 'integer',
 	readOnly: true,
 	render: ( { item } ) => {
-		const count = item.post_count;
+		const count = item.count;
 		if ( item.status !== 'publish' || ! count ) {
 			return <span aria-hidden="true">—</span>;
 		}

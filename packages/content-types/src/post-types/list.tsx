@@ -17,9 +17,9 @@ import deletePostTypeAction from './actions/delete';
 import duplicatePostTypeAction from './actions/duplicate';
 import viewPostsAction from './actions/view-posts';
 import {
+	countField,
 	hasArchiveField,
 	hierarchicalField,
-	postCountField,
 	publicField,
 	supportsField,
 	useSlugField,
@@ -40,7 +40,7 @@ const DEFAULT_VIEW: View = {
 	type: 'table',
 	perPage: 20,
 	page: 1,
-	fields: [ 'taxonomies', 'post_count', 'status' ],
+	fields: [ 'taxonomies', 'count', 'status' ],
 	titleField: 'title',
 	layout: {},
 };
@@ -68,7 +68,7 @@ export function PostTypesList() {
 			[
 				titleField,
 				taxonomiesField,
-				postCountField,
+				countField,
 				statusField,
 				publicField,
 				slugField,

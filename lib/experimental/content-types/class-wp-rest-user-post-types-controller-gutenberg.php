@@ -177,8 +177,8 @@ class WP_REST_User_Post_Types_Controller_Gutenberg extends WP_REST_Posts_Control
 			)
 		);
 
-		$schema['properties']['post_count'] = array(
-			'description' => __( 'Number of posts in this post type.', 'gutenberg' ),
+		$schema['properties']['count'] = array(
+			'description' => __( 'Number of posts in this post type with publish, future, draft, pending, or private status.', 'gutenberg' ),
 			'type'        => 'integer',
 			'context'     => array( 'view', 'edit' ),
 			'readonly'    => true,
@@ -238,7 +238,7 @@ class WP_REST_User_Post_Types_Controller_Gutenberg extends WP_REST_Posts_Control
 			$data['config'] = empty( $config ) ? new stdClass() : $config;
 		}
 
-		if ( rest_is_field_included( 'post_count', $fields ) && 'publish' === $item->post_status ) {
+		if ( rest_is_field_included( 'count', $fields ) && 'publish' === $item->post_status ) {
 			// Drafts aren't registered, so the count is undefined — omit the
 			// field rather than report a value the server can't vouch for.
 			$counts = wp_count_posts( $item->post_name );
@@ -246,7 +246,7 @@ class WP_REST_User_Post_Types_Controller_Gutenberg extends WP_REST_Posts_Control
 			foreach ( array( 'publish', 'future', 'draft', 'pending', 'private' ) as $status ) {
 				$total += isset( $counts->$status ) ? (int) $counts->$status : 0;
 			}
-			$data['post_count'] = $total;
+			$data['count'] = $total;
 		}
 
 		$response->set_data( $data );

@@ -157,13 +157,13 @@ export function useObjectTypeField(): Field< TaxonomyFormData > {
 	}, [ publicPostTypes ] );
 }
 
-export const termCountField: Field< TaxonomyFormData > = {
-	id: 'term_count',
+export const countField: Field< TaxonomyFormData > = {
+	id: 'count',
 	label: __( 'Terms' ),
 	type: 'integer',
 	readOnly: true,
 	render: ( { item } ) => {
-		const count = item.term_count;
+		const count = item.count;
 		if ( item.status !== 'publish' || ! count ) {
 			return <span aria-hidden="true">—</span>;
 		}

@@ -6,7 +6,7 @@ export interface TaxonomyRecord {
 	title: { raw: string; rendered: string };
 	config: StoredConfig;
 	object_type: string[];
-	term_count: number;
+	count: number;
 }
 
 export interface StoredLabels {
@@ -66,5 +66,5 @@ export interface TaxonomyFormData extends ContentType {
 		show_in_quick_edit: boolean;
 		show_admin_column: boolean;
 	};
-	term_count?: number;
+	count?: number;
 }
