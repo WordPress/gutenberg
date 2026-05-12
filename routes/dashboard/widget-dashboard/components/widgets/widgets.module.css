@@ -39,6 +39,6 @@
 
 @media not ( prefers-reduced-motion ) {
 	.tile {
-		transition: box-shadow 180ms ease;
+		transition: box-shadow var(--wpds-motion-duration-md) var(--wpds-motion-easing-subtle);
 	}
 }
