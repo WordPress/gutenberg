@@ -17,8 +17,8 @@ import { store as preferencesStore } from '@wordpress/preferences';
 /**
  * Internal dependencies
  */
-import useDashboardLayout from '../use-dashboard-layout/use-dashboard-layout';
-import type { DashboardWidget } from '../../widget-dashboard';
+import { useDashboardLayout } from '../';
+import type { DashboardWidget } from '../../../widget-dashboard';
 
 jest.mock( '@wordpress/api-fetch' );
 

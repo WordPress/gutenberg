@@ -7,9 +7,16 @@
 -   `InputControl`: Narrow the TypeScript type of the `label` prop to plain strings ([#77860](https://github.com/WordPress/gutenberg/pull/77860)).
 -   `Select`: `Select.Item` values that are empty strings no longer render with placeholder styling on the trigger. Use the new `placeholder` prop on `Select.Trigger`, or a `null` item value, instead ([#78076](https://github.com/WordPress/gutenberg/pull/78076)).
 -   `Select`: `Select.Trigger` now renders a default `"Select"` placeholder when no value is selected, where it previously rendered empty ([#78076](https://github.com/WordPress/gutenberg/pull/78076)).
+-   `Select`: `Select.Item` no longer renders its `value` as fallback item content. Pass item content explicitly as `children`. Migrate `<Select.Item value="Foo" />` to `<Select.Item value="Foo">Foo</Select.Item>` ([#77861](https://github.com/WordPress/gutenberg/pull/77861)).
+
+### New Features
+
+-   Add `SelectControl` component ([#77809](https://github.com/WordPress/gutenberg/pull/77809)).
 
 ### Bug Fixes
 
+-   `Text`: Provide CSS defense values for every variant when rendered as either a paragraph or heading element ([#78172](https://github.com/WordPress/gutenberg/pull/78172)).
+-   `Autocomplete`, `Select`: Do not show the interactive cursor for disabled select triggers or disabled popup items ([#78112](https://github.com/WordPress/gutenberg/pull/78112)).
 -   `Select`: Hide the browser focus ring on highlighted popup items ([#77919](https://github.com/WordPress/gutenberg/pull/77919)).
 -   `Drawer`: Restore the slide-out animation when the popup closes ([#77800](https://github.com/WordPress/gutenberg/pull/77800)).
 -   `Drawer`: Forward the `render` prop on `Drawer.Content` to the scroll container instead of leaking it as a DOM attribute, matching `Dialog.Content` ([#77941](https://github.com/WordPress/gutenberg/pull/77941)).

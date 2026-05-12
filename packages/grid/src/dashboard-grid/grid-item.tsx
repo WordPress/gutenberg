@@ -13,8 +13,9 @@ import { useMergeRefs } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import ResizeHandle from './resize-handle';
-import type { GridItemProps, ResizeDelta } from './types';
+import ResizeHandle from '../shared/resize-handle';
+import type { ResizeDelta } from '../shared/types';
+import type { GridItemProps } from './types';
 import styles from './grid-item.module.css';
 
 function getItemCursor(
@@ -92,12 +93,6 @@ export function GridItem( {
 				  )
 		}`,
 		gridRowEnd: `span ${ item.height || 1 }`,
-
-		// Suppress the grab hint while any gesture is active so the
-		// inline `cursor` on the tile doesn't override the gesture's
-		// document-level cursor (e.g. the resize lock). Setting
-		// `undefined` leaves the property off the DOM.
-		cursor: getItemCursor( disabled, interacting ),
 	};
 
 	const itemClassName = clsx(
@@ -217,7 +212,21 @@ export function GridItem( {
 				</div>
 			) : null }
 
-			<div { ...listeners } style={ { height: '100%' } }>
+			<div
+				{ ...listeners }
+				style={ {
+					height: '100%',
+					// Cursor lives on the listener wrapper rather
+					// than the outer tile so `actionableArea`
+					// children render their own cursor (e.g.
+					// `pointer` on buttons) instead of inheriting
+					// the grid's `grab`. Setting `undefined`
+					// during an active gesture leaves the property
+					// off the DOM so the document-level cursor
+					// lock from the resize handle takes over.
+					cursor: getItemCursor( disabled, interacting ),
+				} }
+			>
 				<div className={ styles[ 'item-content' ] }>
 					{ children }
 					{ ! disabled && (
