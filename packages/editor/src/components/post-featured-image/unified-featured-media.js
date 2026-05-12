@@ -8,6 +8,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { Stack } from '@wordpress/ui';
 import { MediaUpload, MediaUploadCheck } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
+import { getMediaType } from '@wordpress/media-utils';
 
 /**
  * Internal dependencies
@@ -15,39 +16,6 @@ import { store as coreStore } from '@wordpress/core-data';
 import { store as editorStore } from '../../store';
 
 const ALLOWED_MEDIA_TYPES = [ 'image', 'video', 'audio' ];
-
-/**
- * Derives a simple media type ('image' | 'video' | 'audio') from a media object.
- *
- * Keep this implementation in sync with the copy in
- * `packages/block-library/src/post-featured-media/edit.js` —
- * cross-package extraction is a separate refactor.
- *
- * @param {Object} media Attachment object from REST or the media library.
- * @return {'image'|'video'|'audio'|null} Resolved media type, or null for nullish input.
- */
-function getMediaType( media ) {
-	if ( ! media ) {
-		return null;
-	}
-	if ( media.media_type === 'image' || media.type === 'image' ) {
-		return 'image';
-	}
-	const mime = media.mime_type || media.mime || '';
-	if ( mime.startsWith( 'audio/' ) ) {
-		return 'audio';
-	}
-	if ( mime.startsWith( 'video/' ) || media.media_type === 'file' ) {
-		return 'video';
-	}
-	if ( media.type === 'audio' ) {
-		return 'audio';
-	}
-	if ( media.type === 'video' ) {
-		return 'video';
-	}
-	return 'image';
-}
 
 export default function UnifiedFeaturedMedia() {
 	const instanceId = useId();

@@ -1,7 +1,7 @@
 /**
- * Internal dependencies
+ * WordPress dependencies
  */
-import { getMediaType } from '../edit';
+import { getMediaType } from '@wordpress/media-utils';
 
 describe( 'getMediaType', () => {
 	describe( 'REST API format (media_type / mime_type)', () => {

@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import clsx from 'clsx';
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
@@ -21,65 +20,24 @@ import {
 	MediaPlaceholder,
 	MediaReplaceFlow,
 	useBlockProps,
-	__experimentalUseBorderProps as useBorderProps,
-	__experimentalGetShadowClassesAndStyles as getShadowClassesAndStyles,
 	useBlockEditingMode,
 	privateApis as blockEditorPrivateApis,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { __, sprintf } from '@wordpress/i18n';
 import { upload } from '@wordpress/icons';
+import { getMediaType } from '@wordpress/media-utils';
 import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
  */
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
-import DimensionControls from './dimension-controls';
-import OverlayControls from './overlay-controls';
-import Overlay from './overlay';
 import { unlock } from '../lock-unlock';
 
-const { ResolutionTool } = unlock( blockEditorPrivateApis );
+const { DimensionsTool, ResolutionTool } = unlock( blockEditorPrivateApis );
 
 const ALLOWED_MEDIA_TYPES = [ 'image', 'video', 'audio' ];
-
-/**
- * Derives a simple media type ('image' | 'video' | 'audio') from a media object.
- *
- * The REST API returns `media_type: 'image'` for images and `media_type: 'file'`
- * for both video and audio, so we also check `mime_type` to tell those apart.
- * The media library picker uses `media.type` and `media.mime` instead.
- *
- * Keep this implementation in sync with the copy in
- * `packages/editor/src/components/post-featured-image/unified-featured-media.js` —
- * cross-package extraction is a separate refactor.
- *
- * @param {Object} media Attachment object from REST or the media library.
- * @return {'image'|'video'|'audio'|null} Resolved media type, or null for nullish input.
- */
-export function getMediaType( media ) {
-	if ( ! media ) {
-		return null;
-	}
-	if ( media.media_type === 'image' || media.type === 'image' ) {
-		return 'image';
-	}
-	const mime = media.mime_type || media.mime || '';
-	if ( mime.startsWith( 'audio/' ) ) {
-		return 'audio';
-	}
-	if ( mime.startsWith( 'video/' ) || media.media_type === 'file' ) {
-		return 'video';
-	}
-	if ( media.type === 'audio' ) {
-		return 'audio';
-	}
-	if ( media.type === 'video' ) {
-		return 'video';
-	}
-	return 'image';
-}
 
 export default function PostFeaturedMediaEdit( {
 	clientId,
@@ -180,8 +138,6 @@ export default function PostFeaturedMediaEdit( {
 	const blockProps = useBlockProps( {
 		style: { width, height, aspectRatio },
 	} );
-	const borderProps = useBorderProps( attributes );
-	const shadowProps = getShadowClassesAndStyles( attributes );
 	const blockEditingMode = useBlockEditingMode();
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
@@ -223,23 +179,15 @@ export default function PostFeaturedMediaEdit( {
 		} );
 	}
 
-	const colorControls = blockEditingMode === 'default' && (
-		<InspectorControls group="color">
-			<OverlayControls
-				attributes={ attributes }
-				setAttributes={ setAttributes }
-				clientId={ clientId }
-			/>
-		</InspectorControls>
-	);
-
 	const dimensionControls = blockEditingMode === 'default' && (
 		<InspectorControls group="dimensions">
-			<DimensionControls
-				clientId={ clientId }
-				attributes={ attributes }
-				setAttributes={ setAttributes }
-				media={ activeType === 'image' ? media : null }
+			<DimensionsTool
+				panelId={ clientId }
+				value={ { aspectRatio, width, height, scale } }
+				onChange={ ( newValue ) => setAttributes( newValue ) }
+				defaultScale="cover"
+				defaultAspectRatio="auto"
+				unitsOptions={ [ 'px', '%', 'vw', 'em', 'rem' ] }
 			/>
 			{ activeType === 'image' && imageSizeOptions.length > 0 && (
 				<ResolutionTool
@@ -354,16 +302,11 @@ export default function PostFeaturedMediaEdit( {
 
 	const placeholder = ( content ) => (
 		<Placeholder
-			className={ clsx(
-				'block-editor-media-placeholder',
-				borderProps.className
-			) }
+			className="block-editor-media-placeholder"
 			withIllustration
 			style={ {
 				height: !! aspectRatio && '100%',
 				width: !! aspectRatio && '100%',
-				...borderProps.style,
-				...shadowProps.style,
 			} }
 		>
 			{ content }
@@ -374,17 +317,9 @@ export default function PostFeaturedMediaEdit( {
 	if ( ! activeType && ( isDescendentOfQueryLoop || ! postId ) ) {
 		return (
 			<>
-				{ colorControls }
 				{ dimensionControls }
 				{ inspector }
-				<figure { ...blockProps }>
-					{ placeholder() }
-					<Overlay
-						attributes={ attributes }
-						setAttributes={ setAttributes }
-						clientId={ clientId }
-					/>
-				</figure>
+				<figure { ...blockProps }>{ placeholder() }</figure>
 			</>
 		);
 	}
@@ -393,7 +328,6 @@ export default function PostFeaturedMediaEdit( {
 	if ( ! activeType ) {
 		return (
 			<>
-				{ colorControls }
 				{ dimensionControls }
 				{ inspector }
 				<figure { ...blockProps }>
@@ -419,10 +353,9 @@ export default function PostFeaturedMediaEdit( {
 		);
 	}
 
-	// Media is set — render the appropriate element.
+	// Block-supports auto-applies border/shadow/etc. to the figure via
+	// useBlockProps. Inner elements only need dimension-related styles.
 	const mediaStyles = {
-		...borderProps.style,
-		...shadowProps.style,
 		height: aspectRatio ? '100%' : height,
 		width: !! aspectRatio && '100%',
 		objectFit: !! ( height || aspectRatio ) && scale,
@@ -434,7 +367,6 @@ export default function PostFeaturedMediaEdit( {
 			placeholder()
 		) : (
 			<img
-				className={ borderProps.className }
 				src={ mediaUrl }
 				alt={
 					media.alt_text
@@ -493,7 +425,6 @@ export default function PostFeaturedMediaEdit( {
 
 	return (
 		<>
-			{ colorControls }
 			{ dimensionControls }
 			{ inspector }
 			{ !! activeId && ! isDescendentOfQueryLoop && (
@@ -508,14 +439,7 @@ export default function PostFeaturedMediaEdit( {
 					/>
 				</BlockControls>
 			) }
-			<figure { ...blockProps }>
-				{ wrappedMedia }
-				<Overlay
-					attributes={ attributes }
-					setAttributes={ setAttributes }
-					clientId={ clientId }
-				/>
-			</figure>
+			<figure { ...blockProps }>{ wrappedMedia }</figure>
 		</>
 	);
 }

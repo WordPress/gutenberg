@@ -120,6 +120,7 @@
 		"@wordpress/keyboard-shortcuts": "file:../keyboard-shortcuts",
 		"@wordpress/keycodes": "file:../keycodes",
 		"@wordpress/latex-to-mathml": "file:../latex-to-mathml",
+		"@wordpress/media-utils": "file:../media-utils",
 		"@wordpress/notices": "file:../notices",
 		"@wordpress/patterns": "file:../patterns",
 		"@wordpress/primitives": "file:../primitives",

@@ -730,12 +730,12 @@ Display the excerpt. ([Source](https://github.com/WordPress/gutenberg/tree/trunk
 
 ## Featured Media
 
-Display a post's featured media — image, video, or audio. Shows whichever is set, preferring image over video over audio. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-featured-media))
+Display a post's featured image, video, or audio. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-featured-media))
 
 -	**Name:** core/post-featured-media
 -	**Category:** theme
 -	**Supports:** align (center, full, left, right, wide), anchor, color (~~background~~, ~~text~~), filter (duotone), interactivity (clientNavigation), shadow, spacing (margin, padding), ~~html~~
--	**Attributes:** aspectRatio, controls, customGradient, customOverlayColor, dimRatio, gradient, height, isLink, linkTarget, overlayColor, rel, scale, sizeSlug, useFirstImageFromPost, width
+-	**Attributes:** aspectRatio, controls, height, isLink, linkTarget, rel, scale, sizeSlug, useFirstImageFromPost, width
 
 ## Post Navigation Link
 

@@ -307,59 +307,6 @@ class Tests_Blocks_Render_Post_Featured_Media extends WP_UnitTestCase {
 		$this->assertStringNotContainsString( 'object-fit', $output );
 	}
 
-	public function test_overlay_is_omitted_when_dim_ratio_is_zero() {
-		$this->set_featured_media( self::$video_id, 'video' );
-
-		$output = $this->render_block( array( 'dimRatio' => 0 ) );
-
-		$this->assertStringNotContainsString( '__overlay', $output );
-	}
-
-	public function test_overlay_is_rendered_with_dim_ratio() {
-		$this->set_featured_media( self::$video_id, 'video' );
-
-		$output = $this->render_block(
-			array(
-				'dimRatio'           => 50,
-				'customOverlayColor' => '#123456',
-			)
-		);
-
-		$this->assertStringContainsString( 'wp-block-post-featured-media__overlay', $output );
-		$this->assertStringContainsString( 'has-background-dim-50', $output );
-		$this->assertStringContainsString( 'background-color:#123456', $output );
-		$this->assertStringContainsString( 'aria-hidden="true"', $output );
-	}
-
-	public function test_overlay_sits_outside_the_link() {
-		$this->set_featured_media( self::$video_id, 'video' );
-
-		$output = $this->render_block(
-			array(
-				'isLink'   => true,
-				'dimRatio' => 50,
-			)
-		);
-
-		// Overlay span appears after the closing </a> rather than inside the link.
-		$this->assertMatchesRegularExpression(
-			'#</a>\s*<span[^>]*wp-block-post-featured-media__overlay#',
-			$output
-		);
-	}
-
-	public function test_shadow_is_applied_to_video_inline_style() {
-		$this->set_featured_media( self::$video_id, 'video' );
-
-		$output = $this->render_block(
-			array(
-				'style' => array( 'shadow' => 'var:preset|shadow|natural' ),
-			)
-		);
-
-		$this->assertStringContainsString( 'box-shadow:', $output );
-	}
-
 	/**
 	 * Helper used by the get_the_post_thumbnail tests below. Inserts an image
 	 * attachment, sets it as the post thumbnail, and returns the attachment ID.

@@ -4,7 +4,7 @@
 	"name": "core/post-featured-media",
 	"title": "Featured Media",
 	"category": "theme",
-	"description": "Display a post's featured media — image, video, or audio. Shows whichever is set, preferring image over video over audio.",
+	"description": "Display a post's featured image, video, or audio.",
 	"keywords": [ "featured", "image", "video", "audio", "media" ],
 	"textdomain": "default",
 	"attributes": {
@@ -47,22 +47,6 @@
 		"controls": {
 			"type": "boolean",
 			"default": true
-		},
-		"overlayColor": {
-			"type": "string"
-		},
-		"customOverlayColor": {
-			"type": "string"
-		},
-		"dimRatio": {
-			"type": "number",
-			"default": 0
-		},
-		"gradient": {
-			"type": "string"
-		},
-		"customGradient": {
-			"type": "string"
 		}
 	},
 	"usesContext": [ "postId", "postType", "queryId" ],
@@ -80,7 +64,6 @@
 			"color": true,
 			"radius": true,
 			"width": true,
-			"__experimentalSkipSerialization": true,
 			"__experimentalDefaultControls": {
 				"color": true,
 				"radius": true,
@@ -90,9 +73,7 @@
 		"filter": {
 			"duotone": true
 		},
-		"shadow": {
-			"__experimentalSkipSerialization": true
-		},
+		"shadow": true,
 		"html": false,
 		"spacing": {
 			"margin": true,
@@ -103,10 +84,8 @@
 		}
 	},
 	"selectors": {
-		"border": ".wp-block-post-featured-media img, .wp-block-post-featured-media .block-editor-media-placeholder, .wp-block-post-featured-media .wp-block-post-featured-media__overlay",
-		"shadow": ".wp-block-post-featured-media img, .wp-block-post-featured-media .components-placeholder",
 		"filter": {
-			"duotone": ".wp-block-post-featured-media img, .wp-block-post-featured-media .wp-block-post-featured-media__placeholder, .wp-block-post-featured-media .components-placeholder__illustration, .wp-block-post-featured-media .components-placeholder::before"
+			"duotone": ".wp-block-post-featured-media img"
 		}
 	},
 	"editorStyle": "wp-block-post-featured-media-editor",
