@@ -11,7 +11,7 @@ import { getSyncManager } from '../sync';
 jest.mock( '@wordpress/api-fetch' );
 jest.mock( '../sync', () => ( {
 	getSyncManager: jest.fn(),
-	LOCAL_UNDO_IGNORED_ORIGIN: 'local-undo-ignored',
+	LOCAL_UNDO_IGNORED_ORIGIN: 'gutenberg-undo-ignored',
 } ) );
 
 /**
@@ -234,7 +234,7 @@ describe( 'getEntityRecord', () => {
 		expect( dispatch.saveEntityRecord ).not.toHaveBeenCalled();
 	} );
 
-	it( 'persistCRDTDoc fetches edited record and saves full entity record', async () => {
+	it( 'persistCRDTDoc fetches edited record and saves only entity meta', async () => {
 		const POST_RECORD = { id: 1, title: 'Test Post', meta: {} };
 		const EDITED_RECORD = { id: 1, title: 'Edited Post', meta: {} };
 		const POST_RESPONSE = {
@@ -283,11 +283,11 @@ describe( 'getEntityRecord', () => {
 			resolveSelectWithSync.getEditedEntityRecord
 		).toHaveBeenCalledWith( 'postType', 'post', 1 );
 
-		// Should have called saveEntityRecord (not saveEditedEntityRecord).
+		// Should have called saveEntityRecord with only the ID and meta.
 		expect( dispatch.saveEntityRecord ).toHaveBeenCalledWith(
 			'postType',
 			'post',
-			EDITED_RECORD,
+			{ id: 1, meta: {} },
 			{ __unstableSkipSyncUpdate: true }
 		);
 	} );
@@ -335,11 +335,11 @@ describe( 'getEntityRecord', () => {
 		handlers.persistCRDTDoc();
 		await resolveSelectWithSync.getEditedEntityRecord();
 
-		// Should save the record even with no edits (the whole point of the fix).
+		// Should save the CRDT meta even with no edits.
 		expect( dispatch.saveEntityRecord ).toHaveBeenCalledWith(
 			'postType',
 			'post',
-			POST_RECORD,
+			{ id: 1, meta: {} },
 			{ __unstableSkipSyncUpdate: true }
 		);
 	} );
@@ -437,14 +437,14 @@ describe( 'getEntityRecord', () => {
 		expect( dispatch.saveEntityRecord ).toHaveBeenCalledWith(
 			'postType',
 			'post',
-			EDITED_RECORD,
+			{ id: 1, meta: {} },
 			{ __unstableSkipSyncUpdate: true }
 		);
 		expect( syncManager.update ).toHaveBeenCalledWith(
 			'postType/post',
 			1,
 			{},
-			'local-undo-ignored',
+			'gutenberg-undo-ignored',
 			{ isSave: true }
 		);
 		expect( liveSyncState ).toEqual( {
