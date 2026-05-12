@@ -101,7 +101,12 @@ function QuickEditTaxonomyModal( {
 	}
 
 	return (
-		<>
+		<form
+			onSubmit={ ( event ) => {
+				event.preventDefault();
+				onSave();
+			} }
+		>
 			<Stack
 				className="dataviews-action-modal__quick-edit-taxonomy-header"
 				direction="row"
@@ -147,15 +152,15 @@ function QuickEditTaxonomyModal( {
 				<Button
 					__next40pxDefaultSize
 					variant="primary"
+					type="submit"
 					isBusy={ isSaving }
-					disabled={ isSaving }
+					disabled={ isSaving || ! isValid }
 					accessibleWhenDisabled
-					onClick={ onSave }
 				>
 					{ __( 'Done' ) }
 				</Button>
 			</Stack>
-		</>
+		</form>
 	);
 }
 

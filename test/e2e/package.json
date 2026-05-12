@@ -25,13 +25,18 @@
 		"@types/node": "^20.19.39",
 		"@wordpress/e2e-test-utils-playwright": "file:../../packages/e2e-test-utils-playwright",
 		"@wordpress/scripts": "file:../../packages/scripts",
-		"filenamify": "^4.2.0"
+		"@y/websocket-server": "0.1.1",
+		"filenamify": "^4.2.0",
+		"ws": "^8.18.3",
+		"y-websocket": "^3.0.0"
 	},
 	"publishConfig": {
 		"access": "public"
 	},
 	"scripts": {
 		"test:e2e": "wp-scripts test-playwright --config playwright.config.ts",
-		"test:e2e:debug": "wp-scripts test-playwright --config playwright.config.ts --ui"
+		"test:e2e:debug": "wp-scripts test-playwright --config playwright.config.ts --ui",
+		"test:e2e:rtc-websocket": "wp-scripts test-playwright --config playwright.rtc-websocket.config.ts",
+		"test:e2e:rtc-websocket:debug": "wp-scripts test-playwright --config playwright.rtc-websocket.config.ts --ui"
 	}
 }
