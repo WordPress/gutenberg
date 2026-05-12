@@ -101,7 +101,11 @@ class Tests_Blocks_Render_Post_Featured_Media extends WP_UnitTestCase {
 		$block = new WP_Block(
 			array(
 				'blockName' => 'core/post-featured-media',
-				'attrs'     => array( 'isLink' => false, 'linkTarget' => '_self', 'controls' => true ),
+				'attrs'     => array(
+					'isLink'     => false,
+					'linkTarget' => '_self',
+					'controls'   => true,
+				),
 			)
 			// No context — postId is absent.
 		);
@@ -142,7 +146,15 @@ class Tests_Blocks_Render_Post_Featured_Media extends WP_UnitTestCase {
 			)
 		);
 		update_post_meta( $image_id, '_wp_attached_file', 'test-image.jpg' );
-		update_post_meta( $image_id, '_wp_attachment_metadata', array( 'width' => 800, 'height' => 600, 'sizes' => array() ) );
+		update_post_meta(
+			$image_id,
+			'_wp_attachment_metadata',
+			array(
+				'width'  => 800,
+				'height' => 600,
+				'sizes'  => array(),
+			)
+		);
 		set_post_thumbnail( self::$post_id, $image_id );
 		$this->set_featured_media( self::$video_id, 'video' );
 
@@ -247,7 +259,10 @@ class Tests_Blocks_Render_Post_Featured_Media extends WP_UnitTestCase {
 		set_post_thumbnail( self::$post_id, $image_id );
 
 		$this->assertSame(
-			array( 'id' => $image_id, 'type' => 'image' ),
+			array(
+				'id'   => $image_id,
+				'type' => 'image',
+			),
 			get_post_featured_media( self::$post_id )
 		);
 
@@ -258,7 +273,10 @@ class Tests_Blocks_Render_Post_Featured_Media extends WP_UnitTestCase {
 		$this->set_featured_media( self::$video_id, 'video' );
 
 		$this->assertSame(
-			array( 'id' => self::$video_id, 'type' => 'video' ),
+			array(
+				'id'   => self::$video_id,
+				'type' => 'video',
+			),
 			get_post_featured_media( self::$post_id )
 		);
 	}
@@ -326,7 +344,11 @@ class Tests_Blocks_Render_Post_Featured_Media extends WP_UnitTestCase {
 		update_post_meta(
 			$image_id,
 			'_wp_attachment_metadata',
-			array( 'width' => 800, 'height' => 600, 'sizes' => array() )
+			array(
+				'width'  => 800,
+				'height' => 600,
+				'sizes'  => array(),
+			)
 		);
 		set_post_thumbnail( self::$post_id, $image_id );
 		return $image_id;

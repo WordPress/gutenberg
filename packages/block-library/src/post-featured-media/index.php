@@ -189,13 +189,13 @@ function render_block_core_post_featured_media_wrap( $inner, $attributes, $is_li
 		);
 	}
 
-	$aspect_ratio = ! empty( $attributes['aspectRatio'] )
+	$aspect_ratio  = ! empty( $attributes['aspectRatio'] )
 		? esc_attr( safecss_filter_attr( 'aspect-ratio:' . $attributes['aspectRatio'] ) ) . ';'
 		: '';
-	$width        = ! empty( $attributes['width'] )
+	$width         = ! empty( $attributes['width'] )
 		? esc_attr( safecss_filter_attr( 'width:' . $attributes['width'] ) ) . ';'
 		: '';
-	$height       = ! empty( $attributes['height'] )
+	$height        = ! empty( $attributes['height'] )
 		? esc_attr( safecss_filter_attr( 'height:' . $attributes['height'] ) ) . ';'
 		: '';
 	$wrapper_style = $aspect_ratio . $width . $height;
@@ -234,7 +234,7 @@ add_action( 'init', 'register_block_core_post_featured_media' );
  *
  * @see register_legacy_post_comments_block()
  */
-function register_legacy_post_featured_image_block() {
+function register_block_core_post_featured_media_legacy() {
 	$registry = WP_Block_Type_Registry::get_instance();
 	if ( $registry->is_registered( 'core/post-featured-image' ) ) {
 		unregister_block_type( 'core/post-featured-image' );
@@ -250,4 +250,4 @@ function register_legacy_post_featured_image_block() {
 		)
 	);
 }
-add_action( 'init', 'register_legacy_post_featured_image_block', 21 );
+add_action( 'init', 'register_block_core_post_featured_media_legacy', 21 );
