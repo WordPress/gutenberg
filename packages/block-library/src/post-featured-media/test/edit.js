@@ -67,6 +67,11 @@ describe( 'getMediaType', () => {
 	} );
 
 	describe( 'fallback behaviour', () => {
+		test( 'returns null for nullish input', () => {
+			expect( getMediaType( null ) ).toBeNull();
+			expect( getMediaType( undefined ) ).toBeNull();
+		} );
+
 		test( 'defaults to "image" when no recognisable fields are present', () => {
 			expect( getMediaType( {} ) ).toBe( 'image' );
 		} );

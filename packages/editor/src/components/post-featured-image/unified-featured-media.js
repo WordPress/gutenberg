@@ -16,8 +16,16 @@ import { store as editorStore } from '../../store';
 
 const ALLOWED_MEDIA_TYPES = [ 'image', 'video', 'audio' ];
 
-// REST API returns media_type: 'file' for both video and audio.
-// The media library picker uses media.type and media.mime instead.
+/**
+ * Derives a simple media type ('image' | 'video' | 'audio') from a media object.
+ *
+ * Keep this implementation in sync with the copy in
+ * `packages/block-library/src/post-featured-media/edit.js` —
+ * cross-package extraction is a separate refactor.
+ *
+ * @param {Object} media Attachment object from REST or the media library.
+ * @return {'image'|'video'|'audio'|null} Resolved media type, or null for nullish input.
+ */
 function getMediaType( media ) {
 	if ( ! media ) {
 		return null;

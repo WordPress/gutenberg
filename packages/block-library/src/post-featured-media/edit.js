@@ -45,17 +45,24 @@ const { ResolutionTool } = unlock( blockEditorPrivateApis );
 const ALLOWED_MEDIA_TYPES = [ 'image', 'video', 'audio' ];
 
 /**
- * Derives a simple media type ('image' | 'video' | 'audio') from a media
- * object returned by the media library or the REST API.
+ * Derives a simple media type ('image' | 'video' | 'audio') from a media object.
  *
  * The REST API returns `media_type: 'image'` for images and `media_type: 'file'`
  * for both video and audio, so we also check `mime_type` to tell those apart.
+ * The media library picker uses `media.type` and `media.mime` instead.
  *
- * @param {Object} media
- * @return {'image'|'video'|'audio'} Resolved media type.
+ * Keep this implementation in sync with the copy in
+ * `packages/editor/src/components/post-featured-image/unified-featured-media.js` —
+ * cross-package extraction is a separate refactor.
+ *
+ * @param {Object} media Attachment object from REST or the media library.
+ * @return {'image'|'video'|'audio'|null} Resolved media type, or null for nullish input.
  */
 export function getMediaType( media ) {
-	if ( media.media_type === 'image' ) {
+	if ( ! media ) {
+		return null;
+	}
+	if ( media.media_type === 'image' || media.type === 'image' ) {
 		return 'image';
 	}
 	const mime = media.mime_type || media.mime || '';
@@ -65,7 +72,6 @@ export function getMediaType( media ) {
 	if ( mime.startsWith( 'video/' ) || media.media_type === 'file' ) {
 		return 'video';
 	}
-	// Library picker sets type directly.
 	if ( media.type === 'audio' ) {
 		return 'audio';
 	}
