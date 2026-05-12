@@ -2,14 +2,17 @@
  * WordPress dependencies
  */
 import { Page } from '@wordpress/admin-ui';
+import { useDispatch } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
  */
 import { useDashboardLayout } from './hooks';
 import { WidgetDashboard } from './widget-dashboard';
+import type { DashboardWidget } from './widget-dashboard';
 import { useWidgetTypes } from './widget-types';
 import styles from './stage.module.css';
 
@@ -22,11 +25,20 @@ function Dashboard() {
 
 	const [ editMode, setEditMode ] = useState( false );
 
+	const { createSuccessNotice } = useDispatch( noticesStore );
+
+	const handleLayoutChange = ( next: DashboardWidget[] ) => {
+		setLayout( next );
+		void createSuccessNotice( __( 'Dashboard saved.' ), {
+			type: 'snackbar',
+		} );
+	};
+
 	return (
 		<WidgetDashboard
 			widgetTypes={ widgetTypes }
 			layout={ layout }
-			onLayoutChange={ setLayout }
+			onLayoutChange={ handleLayoutChange }
 			onLayoutReset={ resetLayout }
 			editMode={ editMode }
 			onEditChange={ setEditMode }

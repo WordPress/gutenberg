@@ -1,8 +1,8 @@
 /**
  * Internal dependencies
  */
-import { test, expect } from './fixtures';
-import { SECOND_USER } from './fixtures/collaboration-utils';
+import { test, expect } from '../fixtures';
+import { SECOND_USER } from '../fixtures/collaboration-utils';
 
 const BASE_URL = process.env.WP_BASE_URL || 'http://localhost:8889';
 

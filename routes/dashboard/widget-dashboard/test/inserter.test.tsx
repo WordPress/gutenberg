@@ -94,7 +94,7 @@ describe( 'WidgetDashboard.Inserter', () => {
 		expect( await screen.findByRole( 'dialog' ) ).toBeInTheDocument();
 	} );
 
-	it( 'inserts the selected widget type into the layout and closes', async () => {
+	it( 'inserts the selected widget type into the layout on Done', async () => {
 		const user = userEvent.setup();
 		const onLayoutChange = jest.fn();
 		render( <Harness onLayoutChange={ onLayoutChange } /> );
@@ -112,6 +112,15 @@ describe( 'WidgetDashboard.Inserter', () => {
 			within( dialog ).getByRole( 'button', { name: 'Select' } )
 		);
 
+		// Inserts stay in staging until Done.
+		expect( onLayoutChange ).not.toHaveBeenCalled();
+
+		await waitFor( () =>
+			expect( screen.queryByRole( 'dialog' ) ).not.toBeInTheDocument()
+		);
+
+		await user.click( screen.getByRole( 'button', { name: 'Done' } ) );
+
 		expect( onLayoutChange ).toHaveBeenCalledTimes( 1 );
 		const [ updated ] = onLayoutChange.mock.calls[ 0 ];
 		expect( updated ).toHaveLength( 1 );
@@ -120,10 +129,6 @@ describe( 'WidgetDashboard.Inserter', () => {
 			attributes: { label: 'welcome-example' },
 		} );
 		expect( updated[ 0 ].uuid ).toEqual( expect.any( String ) );
-
-		await waitFor( () =>
-			expect( screen.queryByRole( 'dialog' ) ).not.toBeInTheDocument()
-		);
 	} );
 
 	it( 'inserts multiple widgets via multi-select in a single layout change', async () => {
@@ -144,6 +149,8 @@ describe( 'WidgetDashboard.Inserter', () => {
 		await user.click(
 			within( dialog ).getByRole( 'button', { name: 'Select' } )
 		);
+
+		await user.click( screen.getByRole( 'button', { name: 'Done' } ) );
 
 		expect( onLayoutChange ).toHaveBeenCalledTimes( 1 );
 		const [ updated ] = onLayoutChange.mock.calls[ 0 ];
@@ -180,6 +187,8 @@ describe( 'WidgetDashboard.Inserter', () => {
 		await user.click(
 			within( dialog ).getByRole( 'button', { name: 'Select' } )
 		);
+
+		await user.click( screen.getByRole( 'button', { name: 'Done' } ) );
 
 		const [ updated ] = onLayoutChange.mock.calls[ 0 ];
 		expect( updated ).toHaveLength( 2 );
