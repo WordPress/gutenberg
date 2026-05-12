@@ -88,6 +88,15 @@ describe( 'shortcode', () => {
 			expect( result?.index ).toBe( 31 );
 		} );
 
+		it( 'should find the shortcode when attribute values contain brackets', () => {
+			const result = next(
+				'foo',
+				'this has the [foo param="[value]" bar="baz"] shortcode'
+			);
+			expect( result?.shortcode.attrs.named.param ).toBe( '[value]' );
+			expect( result?.shortcode.attrs.named.bar ).toBe( 'baz' );
+		} );
+
 		it( 'should not find shortcodes that are not full matches', () => {
 			const result1 = next( 'foo', 'this has the [foobar] shortcode' );
 			expect( result1 ).toBe( undefined );
