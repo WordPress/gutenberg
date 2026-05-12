@@ -53,38 +53,48 @@ export async function visitSiteEditor(
 	}
 
 	/**
-	 * @todo This is a workaround for the fact that the editor canvas is seen as
-	 * ready and visible before the loading spinner is hidden. Ideally, the
-	 * content underneath the loading overlay should be marked inert until the
-	 * loading is done.
+	 * Wait until the editor is loaded. The logic is a copy of the
+	 * `waitWhileSiteEditorLoading` function in the `edit-site` package.
 	 */
 	if ( ! query.size || postId || canvas === 'edit' ) {
-		const canvasLoader = this.page.locator(
-			// Spinner was used instead of the progress bar in an earlier
-			// version of the site editor.
-			'.edit-site-canvas-loader, .edit-site-canvas-spinner'
-		);
+		await this.page.evaluate( () => {
+			const MAX_LOADING_TIME = 10000;
+			const MAX_PAUSE_TIME = 100;
 
-		try {
-			// Wait for the canvas loader to appear first, so that the locator that
-			// waits for the hidden state doesn't resolve prematurely. The loader
-			// either renders within a tick or it is skipped entirely (when the
-			// editor finishes resolving inside the artificial-delay window in
-			// `useIsSiteEditorLoading`), so a long visible-state timeout is just
-			// wasted wall clock when the loader never shows up.
-			await canvasLoader.waitFor( { state: 'visible', timeout: 3_000 } );
-			await canvasLoader.waitFor( {
-				state: 'hidden',
-				// Bigger timeout is needed for larger entities, like the Large Post
-				// HTML fixture that we load for performance tests, which often
-				// doesn't make it under the default timeout value.
-				timeout: 60_000,
+			return new Promise< void >( ( resolve ) => {
+				let pauseTimeout: ReturnType< typeof setTimeout > | undefined;
+
+				function finish() {
+					unsubscribe();
+					clearTimeout( pauseTimeout );
+					clearTimeout( maxTimeout );
+					resolve();
+				}
+
+				const maxTimeout = setTimeout( finish, MAX_LOADING_TIME );
+
+				function checkResolving() {
+					const isResolving = window.wp.data
+						.select( 'core' )
+						.hasResolvingSelectors();
+
+					if ( isResolving ) {
+						clearTimeout( pauseTimeout );
+						pauseTimeout = undefined;
+						return;
+					}
+
+					if ( ! pauseTimeout ) {
+						pauseTimeout = setTimeout( finish, MAX_PAUSE_TIME );
+					}
+				}
+
+				const unsubscribe = window.wp.data.subscribe(
+					checkResolving,
+					'core'
+				);
+				checkResolving();
 			} );
-		} catch {
-			// If the canvas loader is already disappeared, skip the waiting.
-			await this.page
-				.getByRole( 'region', { name: 'Editor content' } )
-				.waitFor();
-		}
+		} );
 	}
 }

@@ -7,8 +7,8 @@ import type { InputLayoutProps } from '../input-layout/types';
 export type PortalProps = ComponentPropsWithoutRef< typeof _Select.Portal >;
 
 // The second type parameter is the `multiple` flag (currently disabled).
-export type SelectRootProps = Omit<
-	_Select.Root.Props< string, false >,
+export type SelectRootProps< Value = unknown > = Omit<
+	_Select.Root.Props< Value, false >,
 	'multiple'
 >;
 
@@ -26,8 +26,18 @@ export type SelectTriggerProps = ComponentProps< typeof _Select.Trigger > & {
 	 */
 	variant?: 'default' | 'minimal';
 	/**
+	 * Text to show when no value is selected.
+	 * This is overridden by `children` if specified, or by a null item's label in `items`.
+	 *
+	 * @default __( 'Select' )
+	 */
+	placeholder?: _Select.Value.Props[ 'placeholder' ];
+	/**
 	 * A function that gets called with the current value as an argument.
 	 * Use this to customize the trigger content.
+	 *
+	 * When no value is selected, the rendered content inherits the
+	 * placeholder text color.
 	 */
 	children?: _Select.Value.Props[ 'children' ];
 };
@@ -53,7 +63,7 @@ export type SelectItemProps = Omit<
 	/**
 	 * A unique value that identifies this select item.
 	 */
-	value?: string;
+	value?: unknown;
 	/**
 	 * The size of the item.
 	 *
@@ -62,8 +72,6 @@ export type SelectItemProps = Omit<
 	size?: InputLayoutProps[ 'size' ];
 	/**
 	 * The content of the item.
-	 *
-	 * @default `value`
 	 */
 	children?: _Select.Item.Props[ 'children' ];
 };
