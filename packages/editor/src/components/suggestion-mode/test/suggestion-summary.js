@@ -165,12 +165,16 @@ describe( 'summarizeOperations', () => {
 			},
 		] );
 		// Visible text differs ("brave" inserted), so this takes the text-diff
-		// path rather than the Formatting: path.
+		// path rather than the Formatting: path. The Add quote should hold the
+		// stripped visible text, not the raw HTML tags.
 		expect( lines ).toEqual(
 			expect.arrayContaining( [
 				{ label: 'Add:', value: expect.stringContaining( 'brave' ) },
 			] )
 		);
+		for ( const line of lines ) {
+			expect( line.value ).not.toMatch( /<[a-z]/i );
+		}
 	} );
 
 	it( 'treats non-text content attributes as a format change', () => {

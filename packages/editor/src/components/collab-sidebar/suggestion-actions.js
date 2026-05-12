@@ -169,7 +169,6 @@ export function SuggestionActionButtons( { thread } ) {
 			<Button
 				size="compact"
 				icon={ check }
-				iconSize={ 24 }
 				label={ __( 'Accept suggestion' ) }
 				showTooltip
 				disabled={ decision.applyDisabled }
@@ -179,7 +178,6 @@ export function SuggestionActionButtons( { thread } ) {
 			<Button
 				size="compact"
 				icon={ close }
-				iconSize={ 24 }
 				label={ __( 'Reject suggestion' ) }
 				showTooltip
 				disabled={ decision.busy }

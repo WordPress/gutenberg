@@ -162,7 +162,9 @@ function ellipsize( text ) {
  * deletions, already trimmed and ellipsized.
  */
 function textDelta( before, after ) {
-	const segments = wordDiff( before, after );
+	// Diff on stripped text so the quoted Add/Delete spans never leak raw
+	// HTML tags (e.g. `<strong>`) into the sidebar.
+	const segments = wordDiff( stripTags( before ), stripTags( after ) );
 	let inserted = '';
 	let deleted = '';
 	for ( const seg of segments ) {

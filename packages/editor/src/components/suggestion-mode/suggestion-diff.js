@@ -8,6 +8,7 @@ import {
 	VisuallyHidden,
 } from '@wordpress/components';
 import { useMemo } from '@wordpress/element';
+import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 
 /**
  * Upper bound for word-level LCS input length (characters). Beyond this,
@@ -152,10 +153,12 @@ function isTextValue( value ) {
 }
 
 function TextDiff( { before, after } ) {
+	// Strip HTML before diffing so the inline preview renders plain text
+	// instead of leaking literal `<strong>`/`<em>` tags into the sidebar.
 	// The LCS below is O(m·n) in time and space. Memoize so repeated
 	// sidebar renders don't repay the cost.
 	const segments = useMemo(
-		() => wordDiff( before, after ),
+		() => wordDiff( stripHTML( before ?? '' ), stripHTML( after ?? '' ) ),
 		[ before, after ]
 	);
 	return (
