@@ -246,47 +246,48 @@ export function useOpenImageMediaEditorModal( { attributes, setAttributes } ) {
 			const nextAttributes = {};
 
 			if ( newId !== id ) {
-				Object.assign( nextAttributes, {
-					id: newId,
-					url: newUrl ?? url,
-				} );
+				nextAttributes.id = newId;
+				nextAttributes.url = newUrl ?? url;
+			}
+
+			if ( originalAttachment ) {
+				// Fetch fresh server state so the comparison reflects what
+				// the media editor actually saved, not a potentially stale
+				// cache.
+				const resolvedAttachment =
+					await resolveFreshAttachmentRecord( newId );
+
+				// A newer update started while we were awaiting; discard
+				// this one.
+				if (
+					syncRequest !== mediaEditorMetadataSyncRequestRef.current
+				) {
+					return;
+				}
+
+				// Sync alt text and caption back to the block only when
+				// they were changed in the media editor. Fields the user
+				// has independently customised on the block (i.e. values
+				// that don't match the pre-session attachment metadata)
+				// are left untouched.
+				const resolvedMetadataAttributes =
+					getSyncedImageBlockAttributes(
+						blockMetadataRef.current,
+						originalAttachment,
+						resolvedAttachment
+					);
+
+				if ( Object.keys( resolvedMetadataAttributes ).length ) {
+					Object.assign( nextAttributes, resolvedMetadataAttributes );
+					blockMetadataRef.current = {
+						...blockMetadataRef.current,
+						...resolvedMetadataAttributes,
+					};
+				}
 			}
 
 			if ( Object.keys( nextAttributes ).length ) {
 				setAttributes( nextAttributes );
-			}
-
-			// Without a baseline we cannot tell what changed, so skip the sync.
-			if ( ! originalAttachment ) {
-				return;
-			}
-
-			// Fetch fresh server state so the comparison reflects what the
-			// media editor actually saved, not a potentially stale cache.
-			const resolvedAttachment =
-				await resolveFreshAttachmentRecord( newId );
-
-			// A newer update started while we were awaiting; discard this one.
-			if ( syncRequest !== mediaEditorMetadataSyncRequestRef.current ) {
-				return;
-			}
-
-			// Sync alt text and caption back to the block only when they were
-			// changed in the media editor. Fields the user has independently
-			// customised on the block (i.e. values that don't match the
-			// pre-session attachment metadata) are left untouched.
-			const resolvedMetadataAttributes = getSyncedImageBlockAttributes(
-				blockMetadataRef.current,
-				originalAttachment,
-				resolvedAttachment
-			);
-
-			if ( Object.keys( resolvedMetadataAttributes ).length ) {
-				setAttributes( resolvedMetadataAttributes );
-				blockMetadataRef.current = {
-					...blockMetadataRef.current,
-					...resolvedMetadataAttributes,
-				};
 			}
 		},
 		[ id, resolveFreshAttachmentRecord, setAttributes, url ]

@@ -308,11 +308,10 @@ describe( 'useOpenImageMediaEditorModal', () => {
 			updatePayload: { id: 2, url: 'cropped.jpg' },
 		} );
 
-		expect( setAttributes ).toHaveBeenNthCalledWith( 1, {
+		expect( setAttributes ).toHaveBeenCalledTimes( 1 );
+		expect( setAttributes ).toHaveBeenCalledWith( {
 			id: 2,
 			url: 'cropped.jpg',
-		} );
-		expect( setAttributes ).toHaveBeenNthCalledWith( 2, {
 			alt: 'Updated alt',
 			caption: 'Updated caption',
 		} );
@@ -351,11 +350,10 @@ describe( 'useOpenImageMediaEditorModal', () => {
 			updatePayload: { id: 2, url: 'cropped.jpg' },
 		} );
 
-		expect( setAttributes ).toHaveBeenNthCalledWith( 1, {
+		expect( setAttributes ).toHaveBeenCalledTimes( 1 );
+		expect( setAttributes ).toHaveBeenCalledWith( {
 			id: 2,
 			url: 'cropped.jpg',
-		} );
-		expect( setAttributes ).toHaveBeenNthCalledWith( 2, {
 			alt: 'Updated alt',
 			caption: 'Updated caption',
 		} );
