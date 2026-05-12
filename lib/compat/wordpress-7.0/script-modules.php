@@ -171,6 +171,12 @@ function gutenberg_print_import_map_early() {
  * re-instantiates the singleton or moves the print site, the paired PHPUnit
  * test fails loudly.
  *
+ * Limitation: third-party callers that invoke `wp_script_modules()->print_import_map()`
+ * directly (rather than through gutenberg_print_import_map_early()) bypass
+ * this suppress because the global flag is not set on their behalf. The
+ * idempotency contract documented on gutenberg_print_import_map_early()
+ * keeps the supported path (wp-admin head + wp-build page template) clean.
+ *
  * Internal Gutenberg compat helper, not public API. Removable when Trac #65165
  * lands a Core fix.
  *

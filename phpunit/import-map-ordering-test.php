@@ -32,7 +32,12 @@ class Gutenberg_Import_Map_Ordering_Test extends WP_UnitTestCase {
 		// guard.
 		set_current_screen( 'edit-post' );
 
-		wp_register_script_module( self::TEST_MODULE_ID, '/test-78041.js' );
+		// Use a fully-qualified URL so WP_Script_Modules::get_src() always
+		// returns a non-empty string and print_import_map() emits a
+		// non-empty <script type="importmap"> tag (Major #3 in code-review-1:
+		// don't let print_import_map's empty-map short-circuit silently pass
+		// the substr_count assertions in tests below).
+		wp_register_script_module( self::TEST_MODULE_ID, 'https://example.com/test-78041.js' );
 		wp_enqueue_script_module( self::TEST_MODULE_ID );
 	}
 
@@ -112,15 +117,58 @@ class Gutenberg_Import_Map_Ordering_Test extends WP_UnitTestCase {
 
 	/**
 	 * The map must be emitted exactly once across head + footer.
+	 *
+	 * Major #3 (code-review-1): additionally proves the suppress callback
+	 * fires in the full action chain by asserting that, after the chain
+	 * runs, Core's `print_import_map` is no longer registered on
+	 * `admin_print_footer_scripts`. If `gutenberg_suppress_duplicate_import_map`
+	 * had silently bailed (e.g. flag-check inverted, callback identity
+	 * mismatch, hook not registered), Core's print_import_map would still
+	 * be there and the assertion would fail.
+	 *
+	 * This is the load-bearing end-to-end test for the suppress mechanism:
+	 * it exercises the real `do_action` chain, not a direct callback call.
 	 */
 	public function test_import_map_is_not_printed_twice() {
+		$script_modules = wp_script_modules();
+
+		// Pre-condition: Core registers print_import_map on the footer.
+		$this->assertNotFalse(
+			has_action( 'admin_print_footer_scripts', array( $script_modules, 'print_import_map' ) ),
+			'Pre-condition: Core must register print_import_map on admin_print_footer_scripts before the action chain runs.'
+		);
+
 		ob_start();
 		do_action( 'admin_print_scripts' );
+		$head_only = ob_get_contents();
 		do_action( 'admin_print_footer_scripts' );
 		$combined = ob_get_clean();
 
+		// The full-page render simulation must yield exactly one importmap.
 		$count = substr_count( $combined, '<script type="importmap"' );
 		$this->assertSame( 1, $count, sprintf( 'Expected exactly one importmap tag across head + footer, found %d.', $count ) );
+
+		// The single emission must be in the head portion (i.e. the hoist
+		// fired and the suppress kept the footer from re-emitting).
+		$this->assertStringContainsString(
+			'<script type="importmap"',
+			$head_only,
+			'The single importmap emission must come from the head hoist.'
+		);
+		$this->assertStringNotContainsString(
+			'<script type="importmap"',
+			substr( $combined, strlen( $head_only ) ),
+			'After the head hoist, the footer must NOT also emit an importmap tag.'
+		);
+
+		// Suppress callback identity check: by the time
+		// admin_print_footer_scripts has run, Core's print_import_map must
+		// have been removed from the hook by gutenberg_suppress_duplicate_import_map.
+		// If the suppress had not fired, Core's callback would still be registered.
+		$this->assertFalse(
+			has_action( 'admin_print_footer_scripts', array( $script_modules, 'print_import_map' ) ),
+			'Suppress callback must have removed Core print_import_map from admin_print_footer_scripts during the chain.'
+		);
 	}
 
 	/**
@@ -264,6 +312,12 @@ class Gutenberg_Import_Map_Ordering_Test extends WP_UnitTestCase {
 	 * This test asserts no new file under `build/` has been added to git
 	 * tracking by the patch. Skipped gracefully if `git` or `exec()` are
 	 * unavailable (e.g. restricted CI environments).
+	 *
+	 * Uses `git rev-parse --show-toplevel` (Major #2 in code-review-1) to
+	 * resolve the repository root deterministically rather than walking
+	 * relative `dirname()` from this file's location. That way the test is
+	 * correct regardless of where `phpunit/` lives in the checkout and
+	 * regardless of the working directory PHPUnit is invoked from.
 	 */
 	public function test_no_new_built_js_assets_added() {
 		if ( ! function_exists( 'exec' ) ) {
@@ -276,13 +330,33 @@ class Gutenberg_Import_Map_Ordering_Test extends WP_UnitTestCase {
 			$this->markTestSkipped( 'exec() is disabled via disable_functions.' );
 		}
 
-		$repo_root = dirname( __DIR__ );
-		$cmd       = sprintf(
-			'cd %s && git ls-files --others --exclude-standard build/ 2>&1',
+		// Anchor git to the directory this test file lives in, then ask git
+		// itself for the repo root. This is robust against checkouts where
+		// the plugin is bind-mounted under a different parent path.
+		$test_dir     = __DIR__;
+		$toplevel_cmd = sprintf(
+			'git -C %s rev-parse --show-toplevel 2>&1',
+			escapeshellarg( $test_dir )
+		);
+		$toplevel_out = array();
+		$toplevel_rc  = 0;
+		exec( $toplevel_cmd, $toplevel_out, $toplevel_rc );
+
+		if ( 0 !== $toplevel_rc || empty( $toplevel_out ) ) {
+			$this->markTestSkipped( 'git rev-parse --show-toplevel unavailable in this environment.' );
+		}
+
+		$repo_root = trim( (string) end( $toplevel_out ) );
+		if ( '' === $repo_root || ! is_dir( $repo_root ) ) {
+			$this->markTestSkipped( 'Could not resolve a usable git toplevel directory.' );
+		}
+
+		$cmd    = sprintf(
+			'git -C %s ls-files --others --exclude-standard build/ 2>&1',
 			escapeshellarg( $repo_root )
 		);
-		$output    = array();
-		$rc        = 0;
+		$output = array();
+		$rc     = 0;
 		exec( $cmd, $output, $rc );
 
 		if ( 0 !== $rc ) {
