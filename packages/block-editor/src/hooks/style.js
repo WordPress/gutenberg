@@ -357,6 +357,8 @@ function BlockStyleControls( {
 				?.blocks?.[ name ],
 		[ name ]
 	);
+	const globalStateValue = globalBlockStyles?.[ selectedState ];
+	const instanceStateValue = style?.[ selectedState ];
 
 	// Inject state styles onto the editor canvas so the selected state is
 	// visible while editing. Scoped to this block instance via data-block so
@@ -366,8 +368,6 @@ function BlockStyleControls( {
 		if ( ! showStateOnCanvas || selectedState === 'default' ) {
 			return undefined;
 		}
-		const globalStateValue = globalBlockStyles?.[ selectedState ];
-		const instanceStateValue = style?.[ selectedState ];
 		let stateValue;
 
 		if ( globalStateValue && instanceStateValue ) {
@@ -391,8 +391,8 @@ function BlockStyleControls( {
 	}, [
 		showStateOnCanvas,
 		selectedState,
-		globalBlockStyles,
-		style,
+		globalStateValue,
+		instanceStateValue,
 		clientId,
 		name,
 	] );
