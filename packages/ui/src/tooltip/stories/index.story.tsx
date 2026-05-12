@@ -102,9 +102,9 @@ export const Positioning: StoryObj< typeof Tooltip.Root > = {
 };
 
 /**
- * Beyond `side`, `Tooltip.Positioner` accepts the rest of Base UI's
- * positioner surface — `align`, `alignOffset`, `sideOffset`, collision
- * settings, and more — for fine-grained placement.
+ * Beyond `side`, `Tooltip.Positioner` accepts the rest of the positioner
+ * surface — `align`, `alignOffset`, `sideOffset`, collision settings, and
+ * more — for fine-grained placement.
  */
 export const WithCustomPositioner: StoryObj< typeof Tooltip.Root > = {
 	args: {
