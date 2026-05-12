@@ -242,8 +242,7 @@ function LayoutPanelPure( {
 		setAttributes( { layout: { type: 'default' } } );
 	const isUsingContentWidth = () =>
 		layoutType?.name === 'constrained' || hasContentSizeOrLegacySettings;
-	const hasInheritToggleValue = () =>
-		!! ( layout?.type || layout?.inherit || layout?.contentSize );
+	const hasInheritToggleValue = () => layout?.type === 'constrained';
 	const hasLayoutTypeValue = () => !! layout?.type;
 
 	return (
