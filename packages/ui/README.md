@@ -236,6 +236,4 @@ This is an individual package that's part of the Gutenberg project. The project 
 
 To find out more about contributing to this package or Gutenberg as a whole, please read the project's main [contributor guide](https://github.com/WordPress/gutenberg/tree/HEAD/CONTRIBUTING.md).
 
-<!-- temp: validating CHANGELOG CI workflow — revert before merge -->
-
 <br /><br /><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
