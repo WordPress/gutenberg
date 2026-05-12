@@ -1,0 +1,32 @@
+.container {
+	position: relative;
+	overflow: hidden;
+	isolation: isolate;
+	min-height: 240px;
+}
+
+.content {
+	padding: var(--wpds-dimension-padding-lg);
+}
+
+.with-image .content {
+	background-color: color-mix(in srgb, var(--wpds-color-bg-surface-neutral-strong) 60%, transparent);
+	backdrop-filter: blur(2px);
+}
+
+.with-image::before {
+	content: "";
+	position: absolute;
+	inset: 0;
+	z-index: -1;
+	background-image: var(--on-this-day-bg-image);
+	background-position: center;
+	background-size: cover;
+	filter: var(--on-this-day-bg-filter, none);
+	transition: filter 300ms ease;
+}
+
+.with-image:hover::before,
+.with-image:focus-within::before {
+	filter: none;
+}
