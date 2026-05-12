@@ -58,7 +58,10 @@
 		},
 		"shadow": true,
 		"visibility": false,
-		"lock": false
+		"lock": false,
+		"__experimentalSyncedStyles": {
+			"scope": "core/accordion"
+		}
 	},
 	"selectors": {
 		"typography": {

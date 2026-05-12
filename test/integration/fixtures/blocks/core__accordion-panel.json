@@ -3,7 +3,8 @@
 		"name": "core/accordion-panel",
 		"isValid": true,
 		"attributes": {
-			"templateLock": false
+			"templateLock": false,
+			"styleSyncUnlinked": false
 		},
 		"innerBlocks": [
 			{

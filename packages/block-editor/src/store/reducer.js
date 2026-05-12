@@ -2229,6 +2229,86 @@ function listViewExpandRevision( state = 0, action ) {
 }
 
 /**
+ * Reducer tracking sibling style sync state.
+ *
+ * Stores which block instances have been explicitly unlinked from their
+ * sibling sync group. State is keyed by `${scopeClientId}:${blockName}`.
+ *
+ * This is editor-only state: it is not serialized to block attributes and
+ * is cleared when the relevant blocks are removed.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function syncedStyles( state = {}, action ) {
+	switch ( action.type ) {
+		case 'UNLINK_SIBLING_STYLE_SYNC': {
+			const key = `${ action.scopeClientId }:${ action.blockName }`;
+			const existing = state[ key ] ?? { unlinkedIds: {} };
+			return {
+				...state,
+				[ key ]: {
+					unlinkedIds: {
+						...existing.unlinkedIds,
+						[ action.clientId ]: true,
+					},
+				},
+			};
+		}
+		case 'RELINK_SIBLING_STYLE_SYNC': {
+			const key = `${ action.scopeClientId }:${ action.blockName }`;
+			const existing = state[ key ];
+			if ( ! existing ) {
+				return state;
+			}
+			const { [ action.clientId ]: _, ...nextUnlinkedIds } =
+				existing.unlinkedIds;
+			return { ...state, [ key ]: { unlinkedIds: nextUnlinkedIds } };
+		}
+		case 'REMOVE_BLOCKS':
+		case 'REPLACE_BLOCKS': {
+			if ( ! action.clientIds?.length ) {
+				return state;
+			}
+			const removedSet = new Set( action.clientIds );
+			let changed = false;
+			const nextState = {};
+
+			for ( const [ key, value ] of Object.entries( state ) ) {
+				// If the scope block itself was removed, drop the entire entry.
+				const scopeClientId = key.split( ':' )[ 0 ];
+				if ( removedSet.has( scopeClientId ) ) {
+					changed = true;
+					continue;
+				}
+				// Remove any unlinked IDs that were removed.
+				const nextUnlinkedIds = Object.fromEntries(
+					Object.entries( value.unlinkedIds ).filter(
+						( [ id ] ) => ! removedSet.has( id )
+					)
+				);
+				if (
+					Object.keys( nextUnlinkedIds ).length !==
+					Object.keys( value.unlinkedIds ).length
+				) {
+					changed = true;
+					nextState[ key ] = { unlinkedIds: nextUnlinkedIds };
+				} else {
+					nextState[ key ] = value;
+				}
+			}
+
+			return changed ? nextState : state;
+		}
+		case 'RESET_BLOCKS':
+			return {};
+	}
+	return state;
+}
+
+/**
  * Reducer tracking whether the list view content panel popover is open.
  *
  * @param {boolean} state  Current state.
@@ -2310,6 +2390,7 @@ const combinedReducers = combineReducers( {
 	listViewExpandRevision,
 	listViewContentPanelOpen,
 	requestedInspectorTab,
+	syncedStyles,
 } );
 
 /**

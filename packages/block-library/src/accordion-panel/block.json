@@ -54,7 +54,10 @@
 		"visibility": false,
 		"contentRole": true,
 		"allowedBlocks": true,
-		"lock": false
+		"lock": false,
+		"__experimentalSyncedStyles": {
+			"scope": "core/accordion"
+		}
 	},
 	"attributes": {
 		"templateLock": {

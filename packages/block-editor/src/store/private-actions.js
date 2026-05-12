@@ -5,6 +5,17 @@ import { Platform } from '@wordpress/element';
 import deprecated from '@wordpress/deprecated';
 import { speak } from '@wordpress/a11y';
 import { __ } from '@wordpress/i18n';
+import { getBlockType } from '@wordpress/blocks';
+
+/**
+ * Internal dependencies
+ */
+import { unlock } from '../lock-unlock';
+import { STORE_NAME } from './constants';
+import {
+	partitionAttributesByGroups,
+	mergeStyleByGroups,
+} from './synced-styles-utils';
 
 const castArray = ( maybeArray ) =>
 	Array.isArray( maybeArray ) ? maybeArray : [ maybeArray ];
@@ -529,3 +540,203 @@ export function clearRequestedInspectorTab() {
 		type: 'CLEAR_REQUESTED_INSPECTOR_TAB',
 	};
 }
+
+/**
+ * Updates block attributes with sibling style sync propagation.
+ *
+ * If the block type declares `__experimentalSyncedStyles` support, the
+ * attributes that belong to the declared sync groups are propagated to all
+ * linked siblings within the sync scope. Attributes outside the sync groups
+ * are only applied to the current block.
+ *
+ * Uses `registry.batch()` so that the whole propagation is a single undo step.
+ *
+ * @param {string} clientId   Client ID of the block being edited.
+ * @param {Object} attributes New attribute values (as passed to setAttributes).
+ */
+export const __experimentalUpdateSyncedBlockAttributes =
+	( clientId, attributes ) =>
+	( { select, dispatch, registry } ) => {
+		const blockName = select.getBlockName( clientId );
+		const syncSupport =
+			getBlockType( blockName )?.supports?.__experimentalSyncedStyles;
+
+		if ( ! syncSupport ) {
+			dispatch.updateBlockAttributes( clientId, attributes );
+			return;
+		}
+
+		const { syncedAttributes, unsyncedAttributes } =
+			partitionAttributesByGroups( attributes );
+
+		const hasSyncedAttrs = Object.keys( syncedAttributes ).length > 0;
+		const hasUnsyncedAttrs = Object.keys( unsyncedAttributes ).length > 0;
+
+		const privateSelect = unlock( registry.select( STORE_NAME ) );
+
+		// Check if this block instance is individually unlinked.
+		if (
+			privateSelect.__experimentalIsBlockStyleSyncUnlinked(
+				clientId,
+				blockName
+			)
+		) {
+			dispatch.updateBlockAttributes( clientId, attributes );
+			return;
+		}
+
+		// Check if the parent scope has sync disabled for this block type.
+		const scopeClientId =
+			privateSelect.__experimentalGetSyncedStylesScopeClientId(
+				clientId,
+				blockName
+			);
+		const syncDescendantStyles =
+			select.getBlockAttributes( scopeClientId )?.syncDescendantStyles ??
+			{};
+		if ( syncDescendantStyles[ blockName ] === false ) {
+			dispatch.updateBlockAttributes( clientId, attributes );
+			return;
+		}
+
+		const siblings = privateSelect.__experimentalGetSyncedStylesBlocks(
+			clientId,
+			blockName
+		);
+		const linkedSiblingIds = siblings
+			.filter(
+				( s ) =>
+					! privateSelect.__experimentalIsBlockStyleSyncUnlinked(
+						s.clientId,
+						blockName
+					)
+			)
+			.map( ( s ) => s.clientId );
+
+		registry.batch( () => {
+			if ( hasUnsyncedAttrs ) {
+				dispatch.updateBlockAttributes( clientId, unsyncedAttributes );
+			}
+
+			if ( hasSyncedAttrs ) {
+				if ( syncedAttributes.style ) {
+					// Per-sibling deep merge: preserve each sibling's unsynced
+					// style sub-keys, so a spacing change on one block doesn't
+					// wipe the color on another.
+					[ clientId, ...linkedSiblingIds ].forEach( ( sibId ) => {
+						const currentStyle =
+							select.getBlockAttributes( sibId )?.style ?? {};
+						const merged = mergeStyleByGroups(
+							currentStyle,
+							syncedAttributes.style
+						);
+						dispatch.updateBlockAttributes( sibId, {
+							...syncedAttributes,
+							style: merged,
+						} );
+					} );
+				} else {
+					// All blocks get the same value — one batched call.
+					dispatch.updateBlockAttributes(
+						[ clientId, ...linkedSiblingIds ],
+						syncedAttributes
+					);
+				}
+			}
+		} );
+	};
+
+/**
+ * Unlinks a block from its sibling style sync group so that future style
+ * changes are not propagated to or from this block.
+ *
+ * Persists the unlinked state to the block's `styleSyncUnlinked` attribute so
+ * it survives page reload.
+ *
+ * @param {string} clientId      Client ID of the block to unlink.
+ * @param {string} blockName     Name of the block type.
+ * @param {string} scopeClientId Client ID of the scope ancestor.
+ */
+export const __experimentalUnlinkBlockStyleSync =
+	( clientId, blockName, scopeClientId ) =>
+	( { dispatch } ) => {
+		dispatch( {
+			type: 'UNLINK_SIBLING_STYLE_SYNC',
+			clientId,
+			blockName,
+			scopeClientId,
+		} );
+		dispatch.updateBlockAttributes( clientId, {
+			styleSyncUnlinked: true,
+		} );
+	};
+
+/**
+ * Re-links a block to its sibling style sync group and immediately copies the
+ * canonical styles from the first linked sibling so the block matches its
+ * peers right away.
+ *
+ * Clears the `styleSyncUnlinked` attribute so the re-linked state persists
+ * across page reloads.
+ *
+ * @param {string} clientId      Client ID of the block to relink.
+ * @param {string} blockName     Name of the block type.
+ * @param {string} scopeClientId Client ID of the scope ancestor.
+ */
+export const __experimentalRelinkBlockStyleSync =
+	( clientId, blockName, scopeClientId ) =>
+	( { select, dispatch, registry } ) => {
+		const syncSupport =
+			getBlockType( blockName )?.supports?.__experimentalSyncedStyles;
+
+		let canonicalStyleUpdate = null;
+		if ( syncSupport ) {
+			const privateSelect = unlock( registry.select( STORE_NAME ) );
+			const siblings = privateSelect.__experimentalGetSyncedStylesBlocks(
+				clientId,
+				blockName
+			);
+			const canonicalSibling = siblings.find(
+				( s ) =>
+					! privateSelect.__experimentalIsBlockStyleSyncUnlinked(
+						s.clientId,
+						blockName
+					)
+			);
+			if ( canonicalSibling ) {
+				const canonicalAttrs = select.getBlockAttributes(
+					canonicalSibling.clientId
+				);
+				const { syncedAttributes } =
+					partitionAttributesByGroups( canonicalAttrs );
+				if ( Object.keys( syncedAttributes ).length > 0 ) {
+					if ( syncedAttributes.style ) {
+						const currentStyle =
+							select.getBlockAttributes( clientId )?.style ?? {};
+						canonicalStyleUpdate = {
+							...syncedAttributes,
+							style: mergeStyleByGroups(
+								currentStyle,
+								syncedAttributes.style
+							),
+						};
+					} else {
+						canonicalStyleUpdate = syncedAttributes;
+					}
+				}
+			}
+		}
+
+		registry.batch( () => {
+			dispatch( {
+				type: 'RELINK_SIBLING_STYLE_SYNC',
+				clientId,
+				blockName,
+				scopeClientId,
+			} );
+			dispatch.updateBlockAttributes( clientId, {
+				styleSyncUnlinked: false,
+				...canonicalStyleUpdate,
+			} );
+		} );
+	};
