@@ -37,7 +37,6 @@ import {
 	useStyleOverride,
 	useBlockSettings,
 } from './utils';
-import { BlockStatesControl, VALID_BLOCK_PSEUDO_STATES } from './states';
 import { BlockStyleStateProvider } from './block-style-state';
 import {
 	BlockStateBadges,
