@@ -1,20 +1,20 @@
 /**
  * WordPress dependencies
  */
-import type { Field } from '@wordpress/dataviews';
 import { __ } from '@wordpress/i18n';
 import { calendar } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
+import type { WidgetTypeMetadata } from '../../routes/dashboard/widget-types';
 import type { BackgroundEffect } from './components/on-this-day-view';
 import type { TimeRange } from './hooks/use-on-this-day-post';
 
 /**
- * Shape of the widget's persisted attributes. Used to type the
- * `attributes` schema and the `example` defaults so a typo in either
- * surfaces as a TS error.
+ * Shape of the widget's persisted attributes. Bound to
+ * `WidgetTypeMetadata` below so the attribute schema and the example
+ * defaults are validated against this type.
  */
 type OnThisDayWidgetType = {
 	timeRange?: TimeRange;
@@ -22,7 +22,7 @@ type OnThisDayWidgetType = {
 	effect?: BackgroundEffect;
 };
 
-const widget = {
+const widget: WidgetTypeMetadata< OnThisDayWidgetType > = {
 	apiVersion: 1,
 	name: 'core/on-this-day',
 	title: __( 'On This Day' ),
@@ -40,26 +40,14 @@ const widget = {
 			label: __( 'Time range' ),
 			type: 'text',
 			elements: [
-				{
-					value: 'one-year-ago',
-					label: __( 'One year ago' ),
-				},
-				{
-					value: 'five-years-ago',
-					label: __( 'Five years ago' ),
-				},
-				{
-					value: 'ten-years-ago',
-					label: __( 'Ten years ago' ),
-				},
+				{ value: 'one-year-ago', label: __( 'One year ago' ) },
+				{ value: 'five-years-ago', label: __( 'Five years ago' ) },
+				{ value: 'ten-years-ago', label: __( 'Ten years ago' ) },
 				{
 					value: 'oldest-on-this-day',
 					label: __( 'Oldest on this day (any year)' ),
 				},
-				{
-					value: 'custom',
-					label: __( 'Custom date' ),
-				},
+				{ value: 'custom', label: __( 'Custom date' ) },
 			],
 		},
 		{
@@ -72,34 +60,19 @@ const widget = {
 			label: __( 'Background effect' ),
 			type: 'text',
 			elements: [
-				{
-					value: 'vintage',
-					label: __( 'Vintage memory' ),
-				},
-				{
-					value: 'dim-saturate',
-					label: __( 'Dim + saturate' ),
-				},
-				{
-					value: 'dim-blur',
-					label: __( 'Dim + blur' ),
-				},
-				{
-					value: 'grayscale',
-					label: __( 'Grayscale' ),
-				},
-				{
-					value: 'none',
-					label: __( 'No filter' ),
-				},
+				{ value: 'vintage', label: __( 'Vintage memory' ) },
+				{ value: 'dim-saturate', label: __( 'Dim + saturate' ) },
+				{ value: 'dim-blur', label: __( 'Dim + blur' ) },
+				{ value: 'grayscale', label: __( 'Grayscale' ) },
+				{ value: 'none', label: __( 'No filter' ) },
 			],
 		},
-	] satisfies Field< OnThisDayWidgetType >[],
+	],
 	example: {
 		attributes: {
 			timeRange: 'oldest-on-this-day',
 			effect: 'vintage',
-		} satisfies Partial< OnThisDayWidgetType >,
+		},
 	},
 };
 
