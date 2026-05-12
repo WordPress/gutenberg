@@ -239,8 +239,18 @@ function MediaEditorContent( {
 
 	const { media, hasEdits } = useSelect(
 		( select ) => {
-			const { getEditedEntityRecord, hasEditsForEntityRecord } =
-				select( coreStore );
+			const {
+				getEditedEntityRecord,
+				getEntityRecord,
+				hasEditsForEntityRecord,
+			} = select( coreStore );
+			// Trigger an _embed fetch so `_embedded.author` and
+			// `_embedded['wp:attached-to']` land on the record for the Details
+			// fields to read. `getEditedEntityRecord` doesn't formally accept a
+			// query, so we can't embed via that selector directly.
+			getEntityRecord( 'postType', 'attachment', id, {
+				_embed: 'author,wp:attached-to',
+			} );
 			return {
 				media: getEditedEntityRecord(
 					'postType',
