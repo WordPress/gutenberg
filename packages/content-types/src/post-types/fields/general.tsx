@@ -12,7 +12,7 @@ import { Notice, Stack } from '@wordpress/ui';
 /**
  * Internal dependencies
  */
-import { POST_TYPE_ENTITY, RESERVED_KEYS } from '../../constants';
+import { POST_TYPE_ENTITY, RESERVED_POST_TYPE_KEYS } from '../../constants';
 import {
 	createBooleanField,
 	createDescriptionField,
@@ -161,7 +161,7 @@ export function useSlugField(
 					if ( originalSlug !== undefined && slug === originalSlug ) {
 						return null;
 					}
-					if ( RESERVED_KEYS.has( slug ) ) {
+					if ( RESERVED_POST_TYPE_KEYS.has( slug ) ) {
 						return __(
 							'This key is reserved by WordPress and would conflict with built-in URLs.'
 						);
