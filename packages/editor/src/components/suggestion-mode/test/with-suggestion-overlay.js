@@ -299,13 +299,18 @@ describe( 'withSuggestionOverlay', () => {
 			}
 
 			const setAttributes = jest.fn();
+			// Real block content stays at the suggester's recorded baseline
+			// (`before`) — that's the production state: until the suggestion
+			// is accepted, the live block-editor store still holds the
+			// baseline value, and only the overlay carries the proposed
+			// `after`.
 			renderWithProviders(
 				<>
 					<SeedButton />
 					<Wrapped
 						clientId="a"
 						name="core/paragraph"
-						attributes={ { content: 'after' } }
+						attributes={ { content: 'before' } }
 						setAttributes={ setAttributes }
 					/>
 				</>,
@@ -339,6 +344,107 @@ describe( 'withSuggestionOverlay', () => {
 			expect( setAttributes ).toHaveBeenCalledWith( {
 				content: 'proposed',
 			} );
+		} finally {
+			jest.useRealTimers();
+		}
+	} );
+
+	it( 'drops marks for a hydrated entry when real content has diverged from the suggester baseline', () => {
+		// RTC regression: once a reviewer's real block content moves away
+		// from the suggester's recorded `before` (their own keystrokes, or
+		// a concurrent editor's CRDT-synced change), the overlay merge would
+		// otherwise overwrite the reviewer's text with the suggester's stale
+		// `after` and the diff marks would visually attribute the reviewer's
+		// edits to the suggester. The guard skips the merge in that case.
+		jest.useFakeTimers();
+		try {
+			function SeedButton() {
+				const { seedFromComment } = useSuggestionOverlay();
+				return (
+					<button
+						type="button"
+						onClick={ () =>
+							seedFromComment(
+								'a',
+								'core/paragraph',
+								42,
+								{ content: 'before' },
+								{ content: 'after' }
+							)
+						}
+					>
+						seed
+					</button>
+				);
+			}
+
+			const setAttributes = jest.fn();
+			// Real block content has already diverged from the suggester's
+			// recorded baseline (`before`) — e.g. the reviewer just typed.
+			renderWithProviders(
+				<>
+					<SeedButton />
+					<Wrapped
+						clientId="a"
+						name="core/paragraph"
+						attributes={ { content: 'reviewer typed' } }
+						setAttributes={ setAttributes }
+					/>
+				</>,
+				{ intent: 'edit' }
+			);
+
+			fireEvent.click( screen.getByRole( 'button', { name: 'seed' } ) );
+			act( () => {
+				jest.advanceTimersByTime( 100 );
+			} );
+
+			// Real content wins. No del/ins wrappers — the divergence
+			// guard skipped the overlay merge and the diff rendering.
+			expect( screen.getByTestId( 'content' ) ).toHaveTextContent(
+				'reviewer typed'
+			);
+			expect( screen.getByTestId( 'content' ) ).not.toHaveTextContent(
+				/<del/
+			);
+			expect( screen.getByTestId( 'content' ) ).not.toHaveTextContent(
+				/<ins/
+			);
+		} finally {
+			jest.useRealTimers();
+		}
+	} );
+
+	it( 'keeps marks for the suggester themselves even when overlay attributes diverge from baseline (no reviewer guard)', () => {
+		// The divergence guard is reviewer-only — the suggester's overlay
+		// is the source of truth and must keep rendering with diff marks
+		// regardless of whether the real block content (kept at baseline by
+		// the overlay) matches the recorded baseline. This pins the guard
+		// to `! isSuggestMode` so a future refactor can't widen it.
+		jest.useFakeTimers();
+		try {
+			const setAttributes = jest.fn();
+			renderWithProviders(
+				<Wrapped
+					clientId="a"
+					name="core/paragraph"
+					attributes={ { content: 'Hello' } }
+					setAttributes={ setAttributes }
+				/>,
+				{ intent: 'suggest' }
+			);
+
+			fireEvent.click( screen.getByRole( 'button', { name: 'edit' } ) );
+			act( () => {
+				jest.advanceTimersByTime( 100 );
+			} );
+
+			expect( screen.getByTestId( 'content' ) ).toHaveTextContent(
+				/<del class="has-suggestion-deletion">Hello<\/del>/
+			);
+			expect( screen.getByTestId( 'content' ) ).toHaveTextContent(
+				/<ins class="has-suggestion-addition">proposed<\/ins>/
+			);
 		} finally {
 			jest.useRealTimers();
 		}

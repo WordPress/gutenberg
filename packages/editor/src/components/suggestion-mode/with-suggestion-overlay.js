@@ -85,6 +85,48 @@ function isStringLike( value ) {
 }
 
 /**
+ * Compare the rich-text attributes of two attribute objects for stringwise
+ * equality. Used to detect divergence between the suggester's recorded
+ * baseline and the reviewer's current real-block content: when they no
+ * longer match, the hydrated overlay is no longer applicable and the merge
+ * step must be skipped. Missing values on both sides count as equal so a
+ * block with no `content` attribute doesn't trigger divergence on every
+ * render.
+ *
+ * @param {Object|null} a First attribute set.
+ * @param {Object|null} b Second attribute set.
+ * @return {boolean} True when every key in `RICH_TEXT_ATTRIBUTE_KEYS`
+ * stringifies to the same value in both, including the both-missing case.
+ */
+function richTextAttributesMatch( a, b ) {
+	if ( ! a || ! b ) {
+		return false;
+	}
+	for ( const key of RICH_TEXT_ATTRIBUTE_KEYS ) {
+		const aHas = Object.prototype.hasOwnProperty.call( a, key );
+		const bHas = Object.prototype.hasOwnProperty.call( b, key );
+		if ( ! aHas && ! bHas ) {
+			continue;
+		}
+		if ( aHas !== bHas ) {
+			return false;
+		}
+		const av = a[ key ];
+		const bv = b[ key ];
+		if ( av === bv ) {
+			continue;
+		}
+		if ( ! isStringLike( av ) || ! isStringLike( bv ) ) {
+			return false;
+		}
+		if ( String( av ) !== String( bv ) ) {
+			return false;
+		}
+	}
+	return true;
+}
+
+/**
  * Walk the merged attribute set and replace each rich-text value with its
  * baseline-vs-proposed marked diff. Skips attributes whose value matches
  * the baseline (no change to mark) or whose baseline is missing (the
@@ -250,6 +292,19 @@ function SuggestingBlockEdit( { BlockEdit, props, isSuggestMode } ) {
 	const overlayEntry = entries[ clientId ];
 	const overlayAttributes = overlayEntry?.overlayAttributes ?? null;
 	const baselineAttributes = overlayEntry?.baselineAttributes ?? null;
+	// Hydrator-seeded entries on reviewers (not the suggester) need a
+	// divergence guard. The overlay's recorded baseline is the suggester's
+	// `before` value. Once the real block content moves away from that
+	// baseline — either because the reviewer is typing locally or because
+	// CRDT synced inbound changes from a concurrent editor — the merge
+	// step would overwrite the reviewer's text with the suggester's stale
+	// `after` and the diff renderer would visually attribute the divergence
+	// to the suggester. The reviewer would see their own writes vanish and
+	// the suggester's name attached to text they never wrote. Skip the
+	// merge in that case; the existing `hasAttributeConflict` flow in
+	// `provider.js` will prompt on accept.
+	const isHydratedReviewerView =
+		! isSuggestMode && !! overlayEntry?.hydratedFromCommentId;
 
 	// Whether this block is the currently selected one (skip marking while
 	// the user is typing into it) and the suggester's avatar color (paints
@@ -351,6 +406,17 @@ function SuggestingBlockEdit( { BlockEdit, props, isSuggestMode } ) {
 	}, [ overlayAttributes ] );
 
 	const mergedAttributes = useMemo( () => {
+		// Reviewer view of a hydrated entry: only merge + mark while the
+		// real block's rich-text content still matches the suggester's
+		// recorded baseline. Once they diverge, render the real content
+		// unchanged so the reviewer's writes (or RTC-synced changes) stay
+		// visible and aren't visually attributed to the suggester.
+		if (
+			isHydratedReviewerView &&
+			! richTextAttributesMatch( attributes, baselineAttributes )
+		) {
+			return attributes;
+		}
 		const merged = mergeOverlayAttributes( attributes, overlayAttributes );
 		// Skip marking only while the block is selected AND the user is
 		// actively writing into the overlay (`! isOverlayIdle`). The block
@@ -368,6 +434,7 @@ function SuggestingBlockEdit( { BlockEdit, props, isSuggestMode } ) {
 		isSelected,
 		isOverlayIdle,
 		authorColor,
+		isHydratedReviewerView,
 	] );
 
 	return (
