@@ -59,6 +59,14 @@
 	flex-direction: column;
 }
 
+// The Advanced panel is nested inside the already-padded
+// `.media-editor-modal__panel`. Pull its root flush to the panel edges
+// while relying on PanelBody's own content padding.
+.media-editor-crop-advanced-panel {
+	margin-left: -$grid-unit-20;
+	margin-right: -$grid-unit-20;
+}
+
 // `<SnackbarNotices>` renders `.components-snackbar-list` with
 // `position: absolute; width: 100%`. Portaled to `<body>` it has no
 // positioned ancestor, so it collapses to a 0-size box at the document

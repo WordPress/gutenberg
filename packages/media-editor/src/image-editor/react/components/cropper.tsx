@@ -18,8 +18,8 @@ import type {
 	NormalizedRect,
 } from '../../core/types';
 import type { CropperController } from '../hooks/use-cropper-reducer';
-import { getImageFit, getRotatedBBox, getViewScale } from '../../core/camera';
-import { getImageCropBounds, getMinZoom } from '../../core/containment';
+import { getRotatedBBox, getViewScale } from '../../core/camera';
+import { getMinZoom } from '../../core/containment';
 import {
 	MAX_VIEW_SCALE,
 	PIXEL_SNAP_DISPLAY_SCALE,
@@ -30,6 +30,7 @@ import { getMinCropPixels } from '../../core/stencil-math';
 import { useInteraction } from '../hooks/use-interaction';
 import { useTransformStyle } from '../hooks/use-transform-style';
 import { useAriaAnnouncer } from '../hooks/use-aria-announcer';
+import { useDerivedCropperMeasurements } from '../hooks/use-derived-cropper-measurements';
 import { RectangleStencil } from './stencils/rectangle-stencil';
 import { DimmingOverlay } from './overlays/dimming-overlay';
 import { GridOverlay } from './overlays/grid-overlay';
@@ -41,6 +42,7 @@ import {
 } from '../../core/source-region';
 import { ViewportProvider, useViewport } from './viewport-provider';
 import { VISUALLY_HIDDEN_STYLE } from '../visually-hidden-style';
+import { useOptionalSetCropperCanvasSize } from './cropper-provider';
 
 /** Threshold for comparing normalized crop rect values. */
 const CROP_RECT_EPSILON = 1e-6;
@@ -178,6 +180,7 @@ function CropperInner(
 		setViewportPan,
 		resetViewport,
 	} = useViewport();
+	const setCropperCanvasSize = useOptionalSetCropperCanvasSize();
 	// Canvas measurement via ResizeObserver. The canvas is the inner
 	// positioning context for image/stencil/handles — inset from the root
 	// by the handle gutter, so crop math operates on the reduced box.
@@ -268,18 +271,27 @@ function CropperInner(
 	// via the centralized @wordpress/a11y speak() API called inside the hook.
 	useAriaAnnouncer( state );
 
-	// Compute fitted image dimensions and visual bounds from camera math.
 	const naturalWidth = state.image?.naturalWidth ?? 0;
 	const naturalHeight = state.image?.naturalHeight ?? 0;
-	const { elementSize, visualSize } = useMemo(
-		() =>
-			getImageFit(
-				canvasSize,
-				{ width: naturalWidth, height: naturalHeight },
-				state.rotation
-			),
-		[ canvasSize, naturalWidth, naturalHeight, state.rotation ]
-	);
+
+	// Local derivation of fitted dimensions, visual bounds, and normalized
+	// crop bounds. The same hook runs inside `<CropperProvider>` when present,
+	// so sibling consumers (advanced panel, automation) see the same numbers
+	// without a separate derived-state write-back.
+	const { elementSize, visualSize, cropBounds } =
+		useDerivedCropperMeasurements( state, canvasSize );
+
+	// Publish raw `canvasSize` so the Provider's central derivation stays in
+	// sync. Silently noops outside a Provider.
+	useEffect( () => {
+		setCropperCanvasSize( canvasSize );
+	}, [ canvasSize, setCropperCanvasSize ] );
+
+	useEffect( () => {
+		return () => {
+			setCropperCanvasSize( { width: 0, height: 0 } );
+		};
+	}, [ setCropperCanvasSize ] );
 
 	// Report the rendered image size to the controller. Composite
 	// controllers need it to compute aspect-ratio reshapes from the
@@ -365,17 +377,6 @@ function CropperInner(
 		state.cropRect,
 	] );
 
-	// Compute the crop handle bounds from the actual image footprint.
-	// Depends on the full state object because getImageCropBounds reads
-	// crop, zoom, rotation, flip, and image. React Compiler requires
-	// the complete dependency; the computation is lightweight (a few
-	// trig ops + 4 corner transforms).
-	const cropBounds = useMemo( () => {
-		if ( ! state.image || elementSize.width === 0 ) {
-			return undefined;
-		}
-		return getImageCropBounds( state, elementSize, visualSize );
-	}, [ state, elementSize, visualSize ] );
 	const effectiveMinZoom =
 		minZoom !== undefined ? minZoom : getMinZoom( state );
 	const [ isResizing, setIsResizing ] = useState( false );
