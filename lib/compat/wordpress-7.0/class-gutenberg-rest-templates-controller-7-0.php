@@ -171,6 +171,27 @@ class Gutenberg_REST_Templates_Controller_7_0 extends WP_REST_Templates_Controll
 		// Restores the more descriptive, specific name for use within this method.
 		$template = $item;
 
+		//////////////////////////////
+		// START CORE MODIFICATIONS //
+		//////////////////////////////
+		/*
+		 * For default template types, always use the i18n title and description
+		 * from get_default_block_template_types() rather than what may be stored
+		 * in the database. This ensures correct translations when the site language
+		 * or user language changes after a template has been edited and saved.
+		 * See: https://github.com/WordPress/gutenberg/issues/69261
+		 */
+		if ( 'wp_template' === $template->type ) {
+			$default_template_types = get_default_block_template_types();
+			if ( isset( $default_template_types[ $template->slug ] ) ) {
+				$template->title       = $default_template_types[ $template->slug ]['title'];
+				$template->description = $default_template_types[ $template->slug ]['description'];
+			}
+		}
+		//////////////////////////////
+		// END CORE MODIFICATIONS   //
+		//////////////////////////////
+
 		$fields = $this->get_fields_for_response( $request );
 
 		// Base fields for every template.
