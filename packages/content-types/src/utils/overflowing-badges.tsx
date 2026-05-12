@@ -20,7 +20,7 @@ export function OverflowingBadges( {
 	const hidden = items.slice( max );
 	const moreLabel = sprintf(
 		/* translators: %d: number of additional items */
-		__( 'Show %d more' ),
+		_n( 'Show %d more', 'Show %d more', hidden.length ),
 		hidden.length
 	);
 	return (
@@ -54,7 +54,11 @@ export function OverflowingBadges( {
 													fontWeight: 'normal',
 												} }
 											>
-												{ `+${ hidden.length }` }
+												{ sprintf(
+													/* translators: %d: number of additional items */
+													__( '+%d' ),
+													hidden.length
+												) }
 											</Button>
 										}
 									/>
