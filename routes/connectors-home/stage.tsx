@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { speak } from '@wordpress/a11y';
 import { Page } from '@wordpress/admin-ui';
 import {
 	Button,
@@ -14,10 +13,10 @@ import {
 	type ConnectorConfig,
 } from '@wordpress/connectors';
 import { useSelect } from '@wordpress/data';
-import { createInterpolateElement, useEffect } from '@wordpress/element';
+import { createInterpolateElement } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
-import { Icon, info } from '@wordpress/icons';
+import { Notice } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -105,14 +104,6 @@ function ConnectorsPage() {
 				'You do not have permission to install plugins. Please ask a site administrator to install them for you.'
 		  );
 
-	// Mirrors `useSpokenMessage` in `@wordpress/ui` Notice so the inlined
-	// markup announces the message to assistive tech the same way.
-	useEffect( () => {
-		if ( showFileModsNotice ) {
-			speak( fileModsNoticeMessage, 'polite' );
-		}
-	}, [ showFileModsNotice, fileModsNoticeMessage ] );
-
 	return (
 		<Page
 			title={ __( 'Connectors' ) }
@@ -126,15 +117,14 @@ function ConnectorsPage() {
 				}` }
 			>
 				{ showFileModsNotice && (
-					<div className="connectors-page__file-mods-notice">
-						<Icon
-							className="connectors-page__file-mods-notice-icon"
-							icon={ info }
-						/>
-						<span className="connectors-page__file-mods-notice-text">
+					<Notice.Root
+						intent="info"
+						className="connectors-page__file-mods-notice"
+					>
+						<Notice.Description>
 							{ fileModsNoticeMessage }
-						</span>
-					</div>
+						</Notice.Description>
+					</Notice.Root>
 				) }
 				{ isEmpty ? (
 					<VStack
