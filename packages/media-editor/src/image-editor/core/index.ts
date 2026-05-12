@@ -37,6 +37,26 @@ export type { SourceRegion, SourceRegionPercent } from './source-region';
 // Crop-rect helpers
 export { computeInscribedRect } from './crop-rect';
 
+// Crop geometry
+export {
+	applyCropEdit,
+	clampCropPixelRectToBounds,
+	cropPixelRectToNormalizedRect,
+	getCropPixelRect,
+	validateCropPixelRectAgainstBounds,
+} from './crop-geometry';
+export type {
+	CropEditField,
+	CropPixelRect,
+	CropPixelRectBounds,
+	CropPixelRectCheck,
+	CropPixelRectInput,
+	CropPixelRectViolation,
+} from './crop-geometry';
+
+// Fine rotation policy
+export { fineRotation } from './fine-rotation';
+
 // Pipeline
 export {
 	applyOperationToState,
