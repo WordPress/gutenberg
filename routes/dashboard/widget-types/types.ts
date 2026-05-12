@@ -86,6 +86,11 @@ export interface WidgetTypeMetadata {
 	version?: string;
 
 	/**
+	 * Gettext text domain for translations.
+	 */
+	textdomain?: string;
+
+	/**
 	 * Experiment gate — boolean `true`, or a specific experiment name.
 	 */
 	__experimental?: string | boolean;
