@@ -10,6 +10,7 @@ import type { ComponentType, ReactNode } from 'react';
 /**
  * WordPress dependencies
  */
+import type { IconType } from '@wordpress/components';
 import type { Field } from '@wordpress/dataviews';
 import type { DashboardGridLayoutItem } from '@wordpress/grid';
 
@@ -71,9 +72,9 @@ export interface WidgetTypeMetadata {
 	description?: string;
 
 	/**
-	 * Dashicon slug used as the visual identifier.
+	 * Visual identifier shown in the widget header; dashicon string, React node, or SVG component.
 	 */
-	icon?: string;
+	icon?: IconType;
 
 	/**
 	 * Grouping category. Core provides `dashboard`; plugins and themes may
@@ -270,8 +271,9 @@ export interface WidgetGridSettings {
 /**
  * Props for `WidgetDashboard`.
  *
- * The consumer owns layout state; every mutation fires `onLayoutChange`
- * with the fully updated array.
+ * The consumer owns the committed layout state; the dashboard maintains
+ * a staging copy internally for in-progress edits, and `onLayoutChange`
+ * fires only when the user commits via the Done action.
  */
 export interface WidgetDashboardProps {
 	/**
@@ -280,9 +282,18 @@ export interface WidgetDashboardProps {
 	layout: DashboardWidget[];
 
 	/**
-	 * Called on every layout mutation (reorder, resize, add, remove).
+	 * Called when the user commits in-progress edits via the Done action.
+	 * Receives the full layout array as it should be persisted. In-progress
+	 * mutations (reorder, resize, add, remove, attribute edits) accumulate
+	 * in the dashboard's internal staging layer and do not fire this
+	 * callback until commit.
 	 */
 	onLayoutChange: ( layout: DashboardWidget[] ) => void;
+
+	/**
+	 * Called when the layout is reset to the default.
+	 */
+	onLayoutReset?: () => void;
 
 	/**
 	 * Widget types available for rendering. The dashboard never queries a

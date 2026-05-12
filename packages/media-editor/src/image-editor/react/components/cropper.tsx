@@ -13,6 +13,8 @@ import {
 	useMemo,
 	useRef,
 	useEffect,
+	useLayoutEffect,
+	useId,
 	forwardRef,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -36,7 +38,7 @@ import { RectangleStencil } from './stencils/rectangle-stencil';
 import { DimmingOverlay } from './overlays/dimming-overlay';
 import { GridOverlay } from './overlays/grid-overlay';
 import { ViewportProvider, useViewport } from './viewport-provider';
-import './cropper.scss';
+import { VISUALLY_HIDDEN_STYLE } from '../visually-hidden-style';
 
 /** Threshold for comparing normalized crop rect values. */
 const CROP_RECT_EPSILON = 1e-6;
@@ -100,6 +102,8 @@ export interface CropperProps {
 	 * When true, the crop area has resize handles and can be freely repositioned.
 	 */
 	freeformCrop?: boolean;
+	/** Focus the crop area when the cropper mounts. */
+	focusOnMount?: boolean;
 	/** Callback fired when the image is loaded. */
 	onImageLoaded?: ( size: Size ) => void;
 	/**
@@ -142,6 +146,7 @@ export interface CropperProps {
  * @param root0.maxZoom           Maximum zoom level.
  * @param root0.aspectRatio       Fixed aspect ratio (width/height).
  * @param root0.freeformCrop      Enable resize handles.
+ * @param root0.focusOnMount      Focus the crop area on mount.
  * @param root0.onImageLoaded     Image load callback.
  * @param root0.onStateChange     Every-frame state callback.
  * @param root0.onGestureStart    Gesture boundary start.
@@ -161,6 +166,7 @@ function CropperInner(
 		maxZoom,
 		aspectRatio,
 		freeformCrop = false,
+		focusOnMount = false,
 		onImageLoaded,
 		onStateChange,
 		onGestureStart,
@@ -179,10 +185,49 @@ function CropperInner(
 	// positioning context for image/stencil/handles — inset from the root
 	// by the handle gutter, so crop math operates on the reduced box.
 	const canvasRef = useRef< HTMLDivElement >( null );
+	const cropAreaDescriptionId = useId();
+	const [ isCropAreaFocused, setIsCropAreaFocused ] =
+		useState( focusOnMount );
+	const [ isFocusVisible, setIsFocusVisible ] = useState( false );
 	const [ canvasSize, setCanvasSize ] = useState< Size >( {
 		width: 0,
 		height: 0,
 	} );
+
+	useLayoutEffect( () => {
+		if ( focusOnMount ) {
+			canvasRef.current?.focus( { preventScroll: true } );
+		}
+	}, [ focusOnMount ] );
+
+	const handleCropAreaFocus = useCallback(
+		( event: React.FocusEvent< HTMLDivElement > ) => {
+			if ( event.target === event.currentTarget ) {
+				setIsCropAreaFocused( true );
+				// Show the outline only when focus arrived via keyboard
+				// navigation. relatedTarget is null for pointer-initiated and
+				// cross-window focus, so it reliably excludes those cases
+				// without needing a separate ref or flag.
+				if (
+					event.relatedTarget !== null &&
+					event.currentTarget.matches( ':focus-visible' )
+				) {
+					setIsFocusVisible( true );
+				}
+			}
+		},
+		[]
+	);
+
+	const handleCropAreaBlur = useCallback(
+		( event: React.FocusEvent< HTMLDivElement > ) => {
+			if ( event.target === event.currentTarget ) {
+				setIsCropAreaFocused( false );
+				setIsFocusVisible( false );
+			}
+		},
+		[]
+	);
 
 	useEffect( () => {
 		const element = canvasRef.current;
@@ -227,13 +272,16 @@ function CropperInner(
 		[ canvasSize, naturalWidth, naturalHeight, state.rotation ]
 	);
 
-	// In fixed-crop mode, auto-size the crop rect to fill the visual area
-	// while respecting the aspect ratio. The crop is always centered.
+	// In fixed-crop mode, auto-size the crop rect only when a fixed aspect
+	// ratio is selected. With "Free" selected, turning freeform handles off
+	// should preserve the user's current unconstrained crop.
 	useEffect( () => {
 		if (
 			freeformCrop ||
 			visualSize.width === 0 ||
-			visualSize.height === 0
+			visualSize.height === 0 ||
+			! aspectRatio ||
+			aspectRatio <= 0
 		) {
 			return;
 		}
@@ -299,6 +347,33 @@ function CropperInner(
 		onGestureStart,
 		onGestureEnd,
 	} );
+
+	// Compose focus-visibility tracking into the canvas event handlers.
+	// Kept as a spread rather than explicit props to avoid triggering
+	// jsx-a11y/no-noninteractive-element-interactions on role="group".
+	const canvasHandlers = {
+		...handlers,
+		onPointerDown: ( event: React.PointerEvent< HTMLDivElement > ) => {
+			handlers.onPointerDown?.( event );
+			// Called after handlers so it lands last in the React batch —
+			// el.focus() inside the handler fires onFocus, which may
+			// otherwise set isFocusVisible back to true.
+			setIsFocusVisible( false );
+		},
+		onKeyDown: ( event: React.KeyboardEvent< HTMLDivElement > ) => {
+			// Guard against keydowns bubbling up from child handles
+			// (e.g. Tab between handles, unhandled keys). Modifier-only
+			// keypresses are excluded — they precede another key rather
+			// than indicating deliberate keyboard interaction on their own.
+			if (
+				event.target === event.currentTarget &&
+				! [ 'Shift', 'Control', 'Alt', 'Meta' ].includes( event.key )
+			) {
+				setIsFocusVisible( true );
+			}
+			handlers.onKeyDown?.( event );
+		},
+	};
 
 	// Register wheel handler natively with { passive: false } so
 	// preventDefault works. React's onWheel registers as passive. Bound
@@ -415,6 +490,9 @@ function CropperInner(
 	 * arrow keys pan the image rather than resize.
 	 */
 	const handleEscape = useCallback( () => {
+		// Escape is always a keyboard action, so show the outline immediately
+		// rather than relying on the focus handler's :focus-visible check.
+		setIsFocusVisible( true );
 		canvasRef.current?.focus( { preventScroll: true } );
 	}, [] );
 
@@ -542,13 +620,32 @@ function CropperInner(
 						'wp-media-editor-image-editor__canvas--grid-interactive',
 					showInteractiveGrid &&
 						'wp-media-editor-image-editor__canvas--show-grid',
-					settling && 'wp-media-editor-image-editor__canvas--settling'
+					settling &&
+						'wp-media-editor-image-editor__canvas--settling',
+					// Show the keyboard focus outline only when the canvas
+					// itself (not a child handle) has keyboard focus.
+					isFocusVisible &&
+						isCropAreaFocused &&
+						'wp-media-editor-image-editor__canvas--focus-visible'
 				) }
 				tabIndex={ 0 }
 				role="group"
-				aria-label={ __( 'Image editor' ) }
-				{ ...handlers }
+				aria-label={ __( 'Crop area' ) }
+				aria-describedby={
+					isCropAreaFocused ? cropAreaDescriptionId : undefined
+				}
+				onFocus={ handleCropAreaFocus }
+				onBlur={ handleCropAreaBlur }
+				{ ...canvasHandlers }
 			>
+				<div
+					id={ cropAreaDescriptionId }
+					style={ VISUALLY_HIDDEN_STYLE }
+				>
+					{ __(
+						'When this area is focused, use arrow keys to move the image and plus or minus to zoom. Tab to resize handles and controls.'
+					) }
+				</div>
 				{ /*
 				 * The stage is an inner full-size div that receives the
 				 * viewport pan CSS transform. Keeping the transform here
@@ -611,17 +708,7 @@ function CropperInner(
 					aria-live="polite"
 					aria-atomic="true"
 					className="wp-media-editor-image-editor__aria-live"
-					style={ {
-						position: 'absolute',
-						width: 1,
-						height: 1,
-						padding: 0,
-						margin: -1,
-						overflow: 'hidden',
-						clip: 'rect(0, 0, 0, 0)',
-						whiteSpace: 'nowrap',
-						border: 0,
-					} }
+					style={ VISUALLY_HIDDEN_STYLE }
 				>
 					{ ariaMessage }
 				</div>

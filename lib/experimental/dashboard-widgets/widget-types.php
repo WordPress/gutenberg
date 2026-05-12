@@ -1,17 +1,19 @@
 <?php
 /**
- * Widget Types: server-side registry and client bootstrap.
+ * Widget Types: server-side registry and REST exposure.
  *
- * Hydrates `WP_Widget_Type_Registry` from the build manifest at `init`, and
- * exposes the registered widget types to the dashboard client through a
- * temporary inline global (`window.__registeredWidgetTypes`). The inline
- * transport is a stopgap until a REST endpoint replaces it.
+ * Hydrates `WP_Widget_Type_Registry` from the build manifest at `init`,
+ * and exposes the registry to the client through the
+ * `/wp/v2/widget-modules` REST endpoint. The JS layer reads the endpoint
+ * via core-data and dynamically imports each widget's render module on
+ * the consumer side.
  *
  * @package gutenberg
  */
 
 require_once __DIR__ . '/class-wp-widget-type.php';
 require_once __DIR__ . '/class-wp-widget-type-registry.php';
+require_once __DIR__ . '/class-wp-rest-widget-modules-controller.php';
 
 /**
  * Hydrates the widget type registry from the build manifest.
@@ -64,43 +66,46 @@ function gutenberg_get_registered_widget_types() {
 }
 
 /**
- * Prints the inline script that exposes the widget types as a global.
- *
- * Temporary bridge: emits `window.__registeredWidgetTypes` so the
- * `core/widget-types` data store has data on first paint. Globals on
- * `window` are not the desired surface; this is a stopgap until a REST
- * endpoint backed by the widget type registry takes over and the resolver
- * fetches via `apiFetch`. Consumers should read widget types through the
- * `core/widget-types` data store, not by reaching into the global directly.
+ * Registers the REST controller that exposes the widget type registry.
  */
-function gutenberg_print_widget_types_bootstrap() {
-	$widget_types = gutenberg_get_registered_widget_types();
-	if ( empty( $widget_types ) ) {
-		return;
-	}
-
-	$entries = array_values(
-		array_map(
-			static function ( $widget_type ) {
-				return array_filter(
-					array(
-						'name'          => $widget_type->name,
-						'render_module' => $widget_type->render_module,
-						'widget_module' => $widget_type->widget_module,
-					)
-				);
-			},
-			$widget_types
-		)
-	);
-
-	if ( empty( $entries ) ) {
-		return;
-	}
-
-	wp_print_inline_script_tag(
-		'window.__registeredWidgetTypes = ' . wp_json_encode( $entries ) . ';'
-	);
+function gutenberg_register_widget_modules_rest_controller() {
+	$controller = new WP_REST_Widget_Modules_Controller();
+	$controller->register_routes();
 }
+add_action( 'rest_api_init', 'gutenberg_register_widget_modules_rest_controller' );
 
-add_action( 'admin_print_scripts', 'gutenberg_print_widget_types_bootstrap' );
+/**
+ * Adds the registered widget modules to the dashboard page's boot
+ * dependencies.
+ *
+ * The wp-build page templates expose a generic
+ * `{page-id}-wp-admin_boot_dependencies` filter. The dashboard surface
+ * hooks it to make every registered widget render and metadata module
+ * available in the page's import map for dynamic `import()` calls.
+ *
+ * Both the render module and the metadata module are added as
+ * 'dynamic' dependencies so they are reachable from the import map but
+ * not eagerly executed.
+ *
+ * @param array $boot_dependencies Boot dependencies for the page.
+ * @return array Updated boot dependencies.
+ */
+function gutenberg_add_widget_modules_to_dashboard_boot_deps( $boot_dependencies ) {
+	foreach ( gutenberg_get_registered_widget_types() as $widget_type ) {
+		if ( $widget_type->render_module ) {
+			$boot_dependencies[] = array(
+				'import' => 'dynamic',
+				'id'     => $widget_type->render_module,
+			);
+		}
+		if ( $widget_type->widget_module ) {
+			$boot_dependencies[] = array(
+				'import' => 'dynamic',
+				'id'     => $widget_type->widget_module,
+			);
+		}
+	}
+
+	return $boot_dependencies;
+}
+add_filter( 'dashboard-wp-admin_boot_dependencies', 'gutenberg_add_widget_modules_to_dashboard_boot_deps' );

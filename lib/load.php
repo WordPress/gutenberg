@@ -134,6 +134,9 @@ require __DIR__ . '/experimental/script-modules.php';
 require __DIR__ . '/experimental/pages/site-editor.php';
 require __DIR__ . '/experimental/extensible-site-editor.php';
 require __DIR__ . '/experimental/fonts/load.php';
+if ( gutenberg_is_experiment_enabled( 'gutenberg-media-editor' ) ) {
+	require __DIR__ . '/experimental/media-editor/load.php';
+}
 if ( class_exists( '\WordPress\AiClient\AiClient' ) ) {
 	require __DIR__ . '/experimental/connectors/load.php';
 }
@@ -232,4 +235,6 @@ if ( gutenberg_is_experiment_enabled( 'gutenberg-content-types' ) ) {
 if ( gutenberg_is_experiment_enabled( 'gutenberg-dashboard-widgets' ) ) {
 	require __DIR__ . '/experimental/dashboard-widgets/load.php';
 	require __DIR__ . '/experimental/dashboard-widgets/widget-types.php';
+	require __DIR__ . '/experimental/dashboard-widgets/dashboard-layout.php';
+	require __DIR__ . '/experimental/dashboard-widgets/default-layout-seed.php';
 }
