@@ -8,17 +8,15 @@
 /**
  * Renders the `core/post-featured-media` block on the server.
  *
- * Shows the first featured media found for the post, in priority order:
- * featured image > featured video > featured audio.
+ * Returns an empty string when no featured media is set so query-loop
+ * layouts can omit the figure cleanly.
  *
- * Returning an empty string when no media is set is intentional — the block
- * is designed to be used inside a Query Loop where not every post will have
- * featured media, and the layout is expected to handle absent elements.
+ * @since 7.1.0
  *
  * @param array    $attributes Block attributes.
  * @param string   $content    Block default content.
  * @param WP_Block $block      Block instance.
- * @return string HTML output or empty string.
+ * @return string HTML output, or an empty string when no featured media is set.
  */
 function render_block_core_post_featured_media( $attributes, $content, $block ) {
 	if ( ! isset( $block->context['postId'] ) ) {
@@ -30,6 +28,7 @@ function render_block_core_post_featured_media( $attributes, $content, $block ) 
 	$target    = $is_link ? ( $attributes['linkTarget'] ?? '_self' ) : '';
 	$rel       = $is_link ? ( $attributes['rel'] ?? '' ) : '';
 	$size_slug = $attributes['sizeSlug'] ?? 'post-thumbnail';
+	$controls  = $attributes['controls'] ?? true;
 
 	$extra_styles = '';
 	if ( ! empty( $attributes['aspectRatio'] ) ) {
@@ -41,12 +40,17 @@ function render_block_core_post_featured_media( $attributes, $content, $block ) 
 		$extra_styles .= 'object-fit:' . esc_attr( $attributes['scale'] ) . ';';
 	}
 
-	// 1. Featured image.
-	$featured_image = get_the_post_thumbnail( $post_id, $size_slug );
+	$featured = function_exists( 'get_post_featured_media' )
+		? get_post_featured_media( $post_id )
+		: ( get_post_thumbnail_id( $post_id )
+			? array(
+				'id'   => (int) get_post_thumbnail_id( $post_id ),
+				'type' => 'image',
+			)
+			: null );
 
-	// Legacy fallback: use the first image found in post content when no
-	// thumbnail is set. Carried over from `core/post-featured-image`.
-	if ( ! $featured_image && ! empty( $attributes['useFirstImageFromPost'] ) ) {
+	// Inherited legacy fallback: pull the first image from post content.
+	if ( ! $featured && ! empty( $attributes['useFirstImageFromPost'] ) ) {
 		$content_post = get_post( $post_id );
 		$post_content = $content_post ? $content_post->post_content : '';
 		$processor    = new WP_HTML_Tag_Processor( $post_content );
@@ -57,12 +61,35 @@ function render_block_core_post_featured_media( $attributes, $content, $block ) 
 				$tag_html->set_attribute( $name, $processor->get_attribute( $name ) );
 			}
 			$featured_image = $tag_html->get_updated_html();
+			if ( $extra_styles ) {
+				$processor = new WP_HTML_Tag_Processor( $featured_image );
+				if ( $processor->next_tag( 'img' ) ) {
+					$existing = $processor->get_attribute( 'style' ) ?? '';
+					$processor->set_attribute( 'style', $existing . $extra_styles );
+					$featured_image = $processor->get_updated_html();
+				}
+			}
+			return render_block_core_post_featured_media_wrap(
+				$featured_image,
+				$attributes,
+				$is_link,
+				$target,
+				$rel,
+				$post_id
+			);
 		}
 	}
 
-	if ( $featured_image ) {
+	if ( ! $featured ) {
+		return '';
+	}
+
+	if ( 'image' === $featured['type'] ) {
+		$featured_image = get_the_post_thumbnail( $post_id, $size_slug );
+		if ( ! $featured_image ) {
+			return '';
+		}
 		if ( $extra_styles ) {
-			// Inject style onto the <img> tag.
 			$processor = new WP_HTML_Tag_Processor( $featured_image );
 			if ( $processor->next_tag( 'img' ) ) {
 				$existing = $processor->get_attribute( 'style' ) ?? '';
@@ -80,61 +107,47 @@ function render_block_core_post_featured_media( $attributes, $content, $block ) 
 		);
 	}
 
-	$controls = $attributes['controls'] ?? true;
-
-	// 2. Featured video.
-	$video_id = (int) get_post_meta( $post_id, '_featured_video_id', true );
-	if ( $video_id ) {
-		$video_src = wp_get_attachment_url( $video_id );
-		if ( $video_src ) {
-			$video_style = 'width:100%;' . $extra_styles;
-			$inner       = sprintf(
-				'<video src="%s" style="%s"%s></video>',
-				esc_url( $video_src ),
-				esc_attr( $video_style ),
-				$controls ? ' controls' : ''
-			);
-			return render_block_core_post_featured_media_wrap(
-				$inner,
-				$attributes,
-				$is_link,
-				$target,
-				$rel,
-				$post_id
-			);
-		}
+	$src = wp_get_attachment_url( $featured['id'] );
+	if ( ! $src ) {
+		return '';
 	}
 
-	// 3. Featured audio.
-	$audio_id = (int) get_post_meta( $post_id, '_featured_audio_id', true );
-	if ( $audio_id ) {
-		$audio_src = wp_get_attachment_url( $audio_id );
-		if ( $audio_src ) {
-			$inner = sprintf(
-				'<audio src="%s" style="width:100%%"%s></audio>',
-				esc_url( $audio_src ),
-				$controls ? ' controls' : ''
-			);
-			return render_block_core_post_featured_media_wrap(
-				$inner,
-				$attributes,
-				$is_link,
-				$target,
-				$rel,
-				$post_id
-			);
-		}
+	if ( 'video' === $featured['type'] ) {
+		$style = 'width:100%;' . $extra_styles;
+		$inner = sprintf(
+			'<video src="%s" style="%s"%s></video>',
+			esc_url( $src ),
+			esc_attr( $style ),
+			$controls ? ' controls' : ''
+		);
+	} elseif ( 'audio' === $featured['type'] ) {
+		$inner = sprintf(
+			'<audio src="%s" style="width:100%%"%s></audio>',
+			esc_url( $src ),
+			$controls ? ' controls' : ''
+		);
+	} else {
+		return '';
 	}
 
-	return '';
+	return render_block_core_post_featured_media_wrap(
+		$inner,
+		$attributes,
+		$is_link,
+		$target,
+		$rel,
+		$post_id
+	);
 }
 
 /**
- * Wraps rendered media HTML in an optional link and a <figure> element.
+ * Wraps rendered featured-media HTML in an optional link and a `<figure>` element.
+ *
+ * @since 7.1.0
  *
  * @param string $inner      The media HTML (img, video, or audio element).
  * @param array  $attributes Block attributes.
- * @param bool   $is_link    Whether to wrap in a post permalink link.
+ * @param bool   $is_link    Whether to wrap the media in a post permalink link.
  * @param string $target     Link target attribute value.
  * @param string $rel        Link rel attribute value.
  * @param int    $post_id    The post ID.
@@ -172,6 +185,8 @@ function render_block_core_post_featured_media_wrap( $inner, $attributes, $is_li
 
 /**
  * Registers the `core/post-featured-media` block on the server.
+ *
+ * @since 7.1.0
  */
 function register_block_core_post_featured_media() {
 	register_block_type_from_metadata(
@@ -184,17 +199,16 @@ function register_block_core_post_featured_media() {
 add_action( 'init', 'register_block_core_post_featured_media' );
 
 /**
- * Re-registers the legacy `core/post-featured-image` block, mapped to the
- * `core/post-featured-media` render callback.
+ * Re-registers the legacy `core/post-featured-image` block server-side.
  *
- * The JS parser rewrites saved `core/post-featured-image` content to
- * `core/post-featured-media` on load via `convertLegacyBlockNameAndAttributes`,
- * so this PHP-side registration only matters for templates and patterns whose
- * raw block markup is rendered server-side without a parser pass — typically
- * theme template files (`single.html`, etc.) and pattern files. Hiding the
- * legacy block from the inserter prevents new instances of it.
+ * The JS block parser rewrites saved `core/post-featured-image` markup to
+ * `core/post-featured-media` on load, so this registration only matters for
+ * raw block markup rendered server-side without a parser pass — typically
+ * theme template files and patterns. Mirrors `register_legacy_post_comments_block()`.
  *
- * Mirrors `register_legacy_post_comments_block()` in `core/comments`.
+ * @since 7.1.0
+ *
+ * @see register_legacy_post_comments_block()
  */
 function register_legacy_post_featured_image_block() {
 	$registry = WP_Block_Type_Registry::get_instance();

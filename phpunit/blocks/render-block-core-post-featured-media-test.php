@@ -64,10 +64,15 @@ class Tests_Blocks_Render_Post_Featured_Media extends WP_UnitTestCase {
 	}
 
 	public function tear_down() {
-		delete_post_meta( self::$post_id, '_featured_video_id' );
-		delete_post_meta( self::$post_id, '_featured_audio_id' );
+		delete_post_meta( self::$post_id, '_featured_media_id' );
+		delete_post_meta( self::$post_id, '_featured_media_type' );
 		delete_post_thumbnail( self::$post_id );
 		parent::tear_down();
+	}
+
+	private function set_featured_media( int $attachment_id, string $type ): void {
+		update_post_meta( self::$post_id, '_featured_media_id', $attachment_id );
+		update_post_meta( self::$post_id, '_featured_media_type', $type );
 	}
 
 	/**
@@ -108,7 +113,7 @@ class Tests_Blocks_Render_Post_Featured_Media extends WP_UnitTestCase {
 	}
 
 	public function test_renders_featured_video() {
-		update_post_meta( self::$post_id, '_featured_video_id', self::$video_id );
+		$this->set_featured_media( self::$video_id, 'video' );
 
 		$output = $this->render_block();
 
@@ -117,7 +122,7 @@ class Tests_Blocks_Render_Post_Featured_Media extends WP_UnitTestCase {
 	}
 
 	public function test_renders_featured_audio() {
-		update_post_meta( self::$post_id, '_featured_audio_id', self::$audio_id );
+		$this->set_featured_media( self::$audio_id, 'audio' );
 
 		$output = $this->render_block();
 
@@ -125,7 +130,7 @@ class Tests_Blocks_Render_Post_Featured_Media extends WP_UnitTestCase {
 		$this->assertStringContainsString( 'test-audio.mp3', $output );
 	}
 
-	public function test_featured_image_takes_priority_over_video() {
+	public function test_featured_image_wins_when_both_slots_populated() {
 		$image_id = wp_insert_post(
 			array(
 				'post_type'      => 'attachment',
@@ -139,7 +144,7 @@ class Tests_Blocks_Render_Post_Featured_Media extends WP_UnitTestCase {
 		update_post_meta( $image_id, '_wp_attached_file', 'test-image.jpg' );
 		update_post_meta( $image_id, '_wp_attachment_metadata', array( 'width' => 800, 'height' => 600, 'sizes' => array() ) );
 		set_post_thumbnail( self::$post_id, $image_id );
-		update_post_meta( self::$post_id, '_featured_video_id', self::$video_id );
+		$this->set_featured_media( self::$video_id, 'video' );
 
 		$output = $this->render_block();
 
@@ -150,7 +155,7 @@ class Tests_Blocks_Render_Post_Featured_Media extends WP_UnitTestCase {
 	}
 
 	public function test_video_shows_controls_by_default() {
-		update_post_meta( self::$post_id, '_featured_video_id', self::$video_id );
+		$this->set_featured_media( self::$video_id, 'video' );
 
 		$output = $this->render_block( array( 'controls' => true ) );
 
@@ -158,7 +163,7 @@ class Tests_Blocks_Render_Post_Featured_Media extends WP_UnitTestCase {
 	}
 
 	public function test_video_hides_controls_when_disabled() {
-		update_post_meta( self::$post_id, '_featured_video_id', self::$video_id );
+		$this->set_featured_media( self::$video_id, 'video' );
 
 		$output = $this->render_block( array( 'controls' => false ) );
 
@@ -166,7 +171,7 @@ class Tests_Blocks_Render_Post_Featured_Media extends WP_UnitTestCase {
 	}
 
 	public function test_audio_shows_controls_by_default() {
-		update_post_meta( self::$post_id, '_featured_audio_id', self::$audio_id );
+		$this->set_featured_media( self::$audio_id, 'audio' );
 
 		$output = $this->render_block( array( 'controls' => true ) );
 
@@ -174,7 +179,7 @@ class Tests_Blocks_Render_Post_Featured_Media extends WP_UnitTestCase {
 	}
 
 	public function test_audio_hides_controls_when_disabled() {
-		update_post_meta( self::$post_id, '_featured_audio_id', self::$audio_id );
+		$this->set_featured_media( self::$audio_id, 'audio' );
 
 		$output = $this->render_block( array( 'controls' => false ) );
 
@@ -182,7 +187,7 @@ class Tests_Blocks_Render_Post_Featured_Media extends WP_UnitTestCase {
 	}
 
 	public function test_wraps_video_in_link_when_is_link_true() {
-		update_post_meta( self::$post_id, '_featured_video_id', self::$video_id );
+		$this->set_featured_media( self::$video_id, 'video' );
 
 		$output = $this->render_block(
 			array(
@@ -197,7 +202,7 @@ class Tests_Blocks_Render_Post_Featured_Media extends WP_UnitTestCase {
 	}
 
 	public function test_wraps_audio_in_link_when_is_link_true() {
-		update_post_meta( self::$post_id, '_featured_audio_id', self::$audio_id );
+		$this->set_featured_media( self::$audio_id, 'audio' );
 
 		$output = $this->render_block(
 			array(
@@ -212,7 +217,7 @@ class Tests_Blocks_Render_Post_Featured_Media extends WP_UnitTestCase {
 	}
 
 	public function test_output_is_wrapped_in_figure() {
-		update_post_meta( self::$post_id, '_featured_video_id', self::$video_id );
+		$this->set_featured_media( self::$video_id, 'video' );
 
 		$output = $this->render_block();
 
@@ -221,10 +226,44 @@ class Tests_Blocks_Render_Post_Featured_Media extends WP_UnitTestCase {
 	}
 
 	public function test_video_has_full_width_style() {
-		update_post_meta( self::$post_id, '_featured_video_id', self::$video_id );
+		$this->set_featured_media( self::$video_id, 'video' );
 
 		$output = $this->render_block();
 
 		$this->assertStringContainsString( 'width:100%', $output );
+	}
+
+	public function test_get_post_featured_media_returns_image() {
+		$image_id = wp_insert_post(
+			array(
+				'post_type'      => 'attachment',
+				'post_title'     => 'Test Image',
+				'post_status'    => 'inherit',
+				'post_mime_type' => 'image/jpeg',
+				'post_parent'    => self::$post_id,
+				'guid'           => 'http://example.org/wp-content/uploads/test-image-2.jpg',
+			)
+		);
+		set_post_thumbnail( self::$post_id, $image_id );
+
+		$this->assertSame(
+			array( 'id' => $image_id, 'type' => 'image' ),
+			get_post_featured_media( self::$post_id )
+		);
+
+		wp_delete_post( $image_id, true );
+	}
+
+	public function test_get_post_featured_media_returns_video() {
+		$this->set_featured_media( self::$video_id, 'video' );
+
+		$this->assertSame(
+			array( 'id' => self::$video_id, 'type' => 'video' ),
+			get_post_featured_media( self::$post_id )
+		);
+	}
+
+	public function test_get_post_featured_media_returns_null_when_unset() {
+		$this->assertNull( get_post_featured_media( self::$post_id ) );
 	}
 }

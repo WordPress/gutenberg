@@ -51,19 +51,18 @@ export default function UnifiedFeaturedMedia() {
 		};
 	}, [] );
 
-	const featuredVideoId = meta._featured_video_id || 0;
-	const featuredAudioId = meta._featured_audio_id || 0;
+	const featuredMediaId = meta._featured_media_id || 0;
+	const featuredMediaType = meta._featured_media_type || '';
 
-	// Priority: image > video > audio — only one is ever shown.
 	let activeType = null;
+	let activeId = 0;
 	if ( featuredImageId ) {
 		activeType = 'image';
-	} else if ( featuredVideoId ) {
-		activeType = 'video';
-	} else if ( featuredAudioId ) {
-		activeType = 'audio';
+		activeId = featuredImageId;
+	} else if ( featuredMediaId && featuredMediaType ) {
+		activeType = featuredMediaType;
+		activeId = featuredMediaId;
 	}
-	const activeId = featuredImageId || featuredVideoId || featuredAudioId || 0;
 
 	// undefined = still loading, null = not found, object = loaded.
 	const activeMedia = useSelect(
@@ -98,16 +97,25 @@ export default function UnifiedFeaturedMedia() {
 
 	function onSelect( selected ) {
 		const type = getMediaType( selected );
-		// Single editPost call clears all three slots and sets only the chosen
-		// one, avoiding meta-spread race conditions from sequential calls.
-		editPost( {
-			featured_media: type === 'image' ? selected.id : 0,
-			meta: {
-				...meta,
-				_featured_video_id: type === 'video' ? selected.id : 0,
-				_featured_audio_id: type === 'audio' ? selected.id : 0,
-			},
-		} );
+		if ( type === 'image' ) {
+			editPost( {
+				featured_media: selected.id,
+				meta: {
+					...meta,
+					_featured_media_id: 0,
+					_featured_media_type: '',
+				},
+			} );
+		} else {
+			editPost( {
+				featured_media: 0,
+				meta: {
+					...meta,
+					_featured_media_id: selected.id,
+					_featured_media_type: type,
+				},
+			} );
+		}
 	}
 
 	function onRemove() {
@@ -115,8 +123,8 @@ export default function UnifiedFeaturedMedia() {
 			featured_media: 0,
 			meta: {
 				...meta,
-				_featured_video_id: 0,
-				_featured_audio_id: 0,
+				_featured_media_id: 0,
+				_featured_media_type: '',
 			},
 		} );
 	}

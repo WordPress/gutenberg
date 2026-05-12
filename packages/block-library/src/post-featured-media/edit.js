@@ -95,7 +95,6 @@ export default function PostFeaturedMediaEdit( {
 		useFirstImageFromPost,
 	} = attributes;
 
-	// Featured image is a first-class post attribute.
 	const [ storedFeaturedImageId, setFeaturedImageId ] = useEntityProp(
 		'postType',
 		postTypeSlug,
@@ -103,18 +102,15 @@ export default function PostFeaturedMediaEdit( {
 		postId
 	);
 
-	// Featured video and audio are stored in post meta.
 	const [ meta, setMeta ] = useEntityProp(
 		'postType',
 		postTypeSlug,
 		'meta',
 		postId
 	);
-	const featuredVideoId = meta?._featured_video_id || 0;
-	const featuredAudioId = meta?._featured_audio_id || 0;
+	const featuredMediaId = meta?._featured_media_id || 0;
+	const featuredMediaType = meta?._featured_media_type || '';
 
-	// Optional fallback to the first image found in post content. Only applies
-	// to images — preserved from the legacy `core/post-featured-image` block.
 	const [ postContent ] = useEntityProp(
 		'postType',
 		postTypeSlug,
@@ -138,23 +134,14 @@ export default function PostFeaturedMediaEdit( {
 		return imageId || 0;
 	}, [ storedFeaturedImageId, useFirstImageFromPost, postContent ] );
 
-	// Priority: image > video > audio.
 	let activeType = null;
+	let activeId = 0;
 	if ( featuredImageId ) {
 		activeType = 'image';
-	} else if ( featuredVideoId ) {
-		activeType = 'video';
-	} else if ( featuredAudioId ) {
-		activeType = 'audio';
-	}
-
-	let activeId;
-	if ( activeType === 'image' ) {
 		activeId = featuredImageId;
-	} else if ( activeType === 'video' ) {
-		activeId = featuredVideoId;
-	} else {
-		activeId = featuredAudioId;
+	} else if ( featuredMediaId && featuredMediaType ) {
+		activeType = featuredMediaType;
+		activeId = featuredMediaId;
 	}
 
 	const { media, postPermalink, imageSizes } = useSelect(
@@ -204,23 +191,30 @@ export default function PostFeaturedMediaEdit( {
 
 	function onSelectMedia( newMedia ) {
 		const type = getMediaType( newMedia );
-		if ( type === 'video' ) {
-			setMeta( { ...meta, _featured_video_id: newMedia.id } );
-		} else if ( type === 'audio' ) {
-			setMeta( { ...meta, _featured_audio_id: newMedia.id } );
-		} else {
+		if ( type === 'image' ) {
 			setFeaturedImageId( newMedia.id );
+			setMeta( {
+				...meta,
+				_featured_media_id: 0,
+				_featured_media_type: '',
+			} );
+		} else {
+			setFeaturedImageId( 0 );
+			setMeta( {
+				...meta,
+				_featured_media_id: newMedia.id,
+				_featured_media_type: type,
+			} );
 		}
 	}
 
 	function onResetMedia() {
-		if ( activeType === 'image' ) {
-			setFeaturedImageId( 0 );
-		} else if ( activeType === 'video' ) {
-			setMeta( { ...meta, _featured_video_id: 0 } );
-		} else if ( activeType === 'audio' ) {
-			setMeta( { ...meta, _featured_audio_id: 0 } );
-		}
+		setFeaturedImageId( 0 );
+		setMeta( {
+			...meta,
+			_featured_media_id: 0,
+			_featured_media_type: '',
+		} );
 	}
 
 	const colorControls = blockEditingMode === 'default' && (
