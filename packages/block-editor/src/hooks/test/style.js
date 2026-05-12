@@ -1,11 +1,7 @@
 /**
  * Internal dependencies
  */
-import _style, {
-	getInlineStyles,
-	mergeStyleObjects,
-	omitStyle,
-} from '../style';
+import _style, { getInlineStyles, omitStyle } from '../style';
 
 describe( 'getInlineStyles', () => {
 	it( 'should return an empty object when called with undefined', () => {
@@ -117,41 +113,6 @@ describe( 'getInlineStyles', () => {
 			margin: '10px',
 			padding: '20px',
 		} );
-	} );
-} );
-
-describe( 'mergeStyleObjects', () => {
-	it( 'merges nested style values from left to right', () => {
-		expect(
-			mergeStyleObjects(
-				{
-					color: {
-						text: 'red',
-					},
-					typography: {
-						fontSize: '16px',
-					},
-				},
-				{
-					color: {
-						background: 'blue',
-						text: 'green',
-					},
-				}
-			)
-		).toEqual( {
-			color: {
-				background: 'blue',
-				text: 'green',
-			},
-			typography: {
-				fontSize: '16px',
-			},
-		} );
-	} );
-
-	it( 'returns undefined when no style objects are provided', () => {
-		expect( mergeStyleObjects( undefined, null ) ).toBeUndefined();
 	} );
 } );
 

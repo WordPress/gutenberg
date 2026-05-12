@@ -9,6 +9,7 @@ import {
 import { __ } from '@wordpress/i18n';
 import { addFilter } from '@wordpress/hooks';
 import { useSelect } from '@wordpress/data';
+import { mergeGlobalStyles } from '@wordpress/global-styles-engine';
 import {
 	getBlockSupport,
 	hasBlockSupport,
@@ -80,34 +81,6 @@ export function getInlineStyles( styles = {} ) {
 	} );
 
 	return output;
-}
-
-function isStyleObject( value ) {
-	return !! value && typeof value === 'object' && ! Array.isArray( value );
-}
-
-export function mergeStyleObjects( ...styles ) {
-	let merged;
-
-	styles.forEach( ( style ) => {
-		if ( ! isStyleObject( style ) ) {
-			return;
-		}
-
-		merged = merged || {};
-
-		Object.entries( style ).forEach( ( [ key, value ] ) => {
-			if ( isStyleObject( value ) && isStyleObject( merged[ key ] ) ) {
-				merged[ key ] = mergeStyleObjects( merged[ key ], value );
-			} else if ( isStyleObject( value ) ) {
-				merged[ key ] = mergeStyleObjects( value );
-			} else {
-				merged[ key ] = value;
-			}
-		} );
-	} );
-
-	return merged;
 }
 
 /**
@@ -393,13 +366,23 @@ function BlockStyleControls( {
 		if ( ! showStateOnCanvas || selectedState === 'default' ) {
 			return undefined;
 		}
-		const stateValue = mergeStyleObjects(
-			globalBlockStyles?.[ selectedState ],
-			style?.[ selectedState ]
-		);
-		if ( ! stateValue ) {
+		const globalStateValue = globalBlockStyles?.[ selectedState ];
+		const instanceStateValue = style?.[ selectedState ];
+		let stateValue;
+
+		if ( globalStateValue && instanceStateValue ) {
+			stateValue = mergeGlobalStyles(
+				globalStateValue,
+				instanceStateValue
+			);
+		} else if ( instanceStateValue ) {
+			stateValue = instanceStateValue;
+		} else if ( globalStateValue ) {
+			stateValue = globalStateValue;
+		} else {
 			return undefined;
 		}
+
 		const selector = buildCanvasStateSelector( clientId, name );
 		const css = compileCSS( stateValue, { selector } );
 		// Use !important to override utility classes (e.g. has-accent-3-color)
