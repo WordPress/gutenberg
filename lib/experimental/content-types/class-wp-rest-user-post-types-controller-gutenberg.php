@@ -178,7 +178,7 @@ class WP_REST_User_Post_Types_Controller_Gutenberg extends WP_REST_Posts_Control
 		);
 
 		$schema['properties']['count'] = array(
-			'description' => __( 'Number of posts in this post type with publish, future, draft, pending, or private status.', 'gutenberg' ),
+			'description' => __( 'Number of posts of this post type, matching the count shown in the admin list table\'s "All" view.', 'gutenberg' ),
 			'type'        => 'integer',
 			'context'     => array( 'view', 'edit' ),
 			'readonly'    => true,
@@ -239,12 +239,10 @@ class WP_REST_User_Post_Types_Controller_Gutenberg extends WP_REST_Posts_Control
 		}
 
 		if ( rest_is_field_included( 'count', $fields ) && 'publish' === $item->post_status ) {
-			// Drafts aren't registered, so the count is undefined — omit the
-			// field rather than report a value the server can't vouch for.
-			$counts = wp_count_posts( $item->post_name );
-			$total  = 0;
-			foreach ( array( 'publish', 'future', 'draft', 'pending', 'private' ) as $status ) {
-				$total += isset( $counts->$status ) ? (int) $counts->$status : 0;
+			$num_posts = wp_count_posts( $item->post_name, 'readable' );
+			$total     = array_sum( (array) $num_posts );
+			foreach ( get_post_stati( array( 'show_in_admin_all_list' => false ) ) as $state ) {
+				$total -= isset( $num_posts->$state ) ? (int) $num_posts->$state : 0;
 			}
 			$data['count'] = $total;
 		}

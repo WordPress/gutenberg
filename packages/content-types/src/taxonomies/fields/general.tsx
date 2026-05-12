@@ -171,7 +171,7 @@ export const countField: Field< TaxonomyFormData > = {
 		// `edit-tags.php` requires a `post_type` arg, so a taxonomy with no
 		// attached post types can't be linked even when it has terms.
 		if ( ! postType ) {
-			return <>{ count }</>;
+			return count;
 		}
 		return (
 			<Link
