@@ -2382,6 +2382,12 @@
 		"parent": "code"
 	},
 	{
+		"title": "Fast refresh",
+		"slug": "fast-refresh",
+		"markdown_source": "../docs/contributors/code/fast-refresh.md",
+		"parent": "code"
+	},
+	{
 		"title": "Git Workflow",
 		"slug": "git-workflow",
 		"markdown_source": "../docs/contributors/code/git-workflow.md",

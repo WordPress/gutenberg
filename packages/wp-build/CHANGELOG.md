@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Add a `WP_BUILD_HMR` environment variable that enables React Fast Refresh for IIFE bundles. When set, the package wraps each module's source through `react-refresh/babel` and prepends per-file `$RefreshReg$` / `$RefreshSig$` bindings to the non-minified build.
+-   In `WP_BUILD_HMR` mode, `bundlePackage` now reuses an `esbuild.context()` per package for the non-minified build and calls `context.rebuild()` on file changes instead of issuing a fresh `esbuild.build()`. The included react-refresh plugin also caches its babel output by content hash, so unchanged files skip babel on rebuilds.
+-   On rebuild failure (`rebuildPackage` / `rebuildRoute` / `rebuildWidget`), `WP_BUILD_HMR` mode writes a structured error to `build/hmr/error.json`. A companion live-reload server can pick this up to render an in-browser overlay; the file is removed on the next clean rebuild.
+
 ### Bug Fixes
 
 -   Register generated CSS module styles with `@wordpress/style-runtime` so they can be injected into registered documents, such as editor iframes ([#77965](https://github.com/WordPress/gutenberg/pull/77965)).

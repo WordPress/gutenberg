@@ -3,7 +3,14 @@
 /**
  * External dependencies
  */
-import { readFile, writeFile, copyFile, mkdir, unlink } from 'fs/promises';
+import {
+	readFile,
+	writeFile,
+	rename,
+	copyFile,
+	mkdir,
+	unlink,
+} from 'fs/promises';
 import path from 'path';
 import { createHash } from 'node:crypto';
 import { createRequire as createNodeRequire } from 'node:module';
@@ -73,10 +80,64 @@ import {
 	buildWorkers,
 	generateWorkerCode,
 } from './worker-build.mjs';
+import { reactRefreshPlugin } from './react-refresh-plugin.mjs';
 
 const ROOT_DIR = process.cwd();
 const PACKAGES_DIR = path.join( ROOT_DIR, 'packages' );
 const BUILD_DIR = path.join( ROOT_DIR, 'build' );
+
+// When WP_BUILD_HMR=1, the IIFE bundle is rebuilt on every source change
+// and the babel transform runs on every file in the dependency graph
+// (~2300 files for edit-site). Caching an esbuild.context() per package
+// turns subsequent rebuilds into incremental ones — only the changed
+// file re-runs onLoad, the rest is reused. Keyed by packageName.
+const hmrBundleContexts = new Map();
+
+// HMR error surface: when a rebuild fails, write a structured error to a
+// known path so bin/live-reload.mjs can pick it up and push it to the
+// browser via SSE. Cleared on the next successful rebuild.
+const HMR_ERROR_PATH = path.join( BUILD_DIR, 'hmr', 'error.json' );
+
+async function reportBuildError( packageName, error ) {
+	if ( process.env.WP_BUILD_HMR !== '1' ) {
+		return;
+	}
+	try {
+		await mkdir( path.dirname( HMR_ERROR_PATH ), { recursive: true } );
+		const payload = {
+			packageName,
+			message: error?.message ?? String( error ),
+			// esbuild errors expose location info on .errors[]; fall back
+			// to the JS stack for transformer/plugin errors.
+			locations: Array.isArray( error?.errors )
+				? error.errors
+						.map( ( e ) => e.location || null )
+						.filter( Boolean )
+				: [],
+			stack: error?.stack ?? null,
+			at: Date.now(),
+		};
+		// Atomic write: chokidar may fire on partial content otherwise,
+		// and bin/live-reload.mjs would JSON.parse a truncated file and
+		// drop the error event silently.
+		const tmp = HMR_ERROR_PATH + '.tmp';
+		await writeFile( tmp, JSON.stringify( payload, null, 2 ) );
+		await rename( tmp, HMR_ERROR_PATH );
+	} catch {
+		// best-effort
+	}
+}
+
+async function clearBuildError() {
+	if ( process.env.WP_BUILD_HMR !== '1' ) {
+		return;
+	}
+	try {
+		await unlink( HMR_ERROR_PATH );
+	} catch {
+		// File may not exist; that's the expected steady state.
+	}
+}
 
 const SOURCE_EXTENSIONS = '{js,mjs,ts,tsx}';
 const ASSET_EXTENSIONS = 'json';
@@ -576,6 +637,8 @@ async function bundlePackage( packageName, options = {} ) {
 			styleRuntimeAliasPlugin(),
 		];
 
+		const hmrEnabled = process.env.WP_BUILD_HMR === '1';
+
 		builds.push(
 			esbuild.build( {
 				...baseConfig,
@@ -591,23 +654,42 @@ async function bundlePackage( packageName, options = {} ) {
 						true // Generate asset file for minified build
 					),
 				],
-			} ),
-			esbuild.build( {
-				...baseConfig,
-				outfile: path.join( outputDir, 'index.js' ),
-				minify: false,
-				define: getDefine( true ),
-				plugins: [
-					...baseBundlePlugins,
-					wordpressExternalsPlugin(
-						'index.min',
-						'iife',
-						packageJson.wpScriptExtraDependencies || [],
-						false // Skip asset file for non-minified build
-					),
-				],
 			} )
 		);
+
+		const nonMinifiedConfig = {
+			...baseConfig,
+			outfile: path.join( outputDir, 'index.js' ),
+			minify: false,
+			define: getDefine( true ),
+			plugins: [
+				...baseBundlePlugins,
+				hmrEnabled && reactRefreshPlugin( PACKAGES_DIR ),
+				wordpressExternalsPlugin(
+					'index.min',
+					'iife',
+					packageJson.wpScriptExtraDependencies || [],
+					false // Skip asset file for non-minified build
+				),
+			].filter( Boolean ),
+		};
+
+		if ( hmrEnabled ) {
+			// Reuse a cached esbuild context so onLoad results (including
+			// the slow babel transform in reactRefreshPlugin) are kept
+			// across rebuilds. Only the changed file's onLoad re-runs;
+			// the rest is served from esbuild's internal cache. Cuts
+			// per-rebuild babel work from ~2300 file transforms down to
+			// just the file(s) that actually changed.
+			let ctx = hmrBundleContexts.get( packageName );
+			if ( ! ctx ) {
+				ctx = await esbuild.context( nonMinifiedConfig );
+				hmrBundleContexts.set( packageName, ctx );
+			}
+			builds.push( ctx.rebuild() );
+		} else {
+			builds.push( esbuild.build( nonMinifiedConfig ) );
+		}
 
 		builtScripts.push( {
 			handle: `${ handlePrefix }-${ packageName }`,
@@ -2231,7 +2313,9 @@ async function watchMode() {
 			await buildWidget( widgetName );
 			const buildTime = Date.now() - startTime;
 			console.log( `✅ widgets/${ widgetName } (${ buildTime }ms)` );
+			await clearBuildError();
 		} catch ( error ) {
+			await reportBuildError( `widgets/${ widgetName }`, error );
 			console.log(
 				`❌ widgets/${ widgetName } - Error: ${ error.message }`
 			);
@@ -2244,6 +2328,11 @@ async function watchMode() {
 	 * @param {string} packageName Package to rebuild (short name).
 	 */
 	async function rebuildPackage( packageName ) {
+		// Track whether ANY work in this rebuild failed (the package itself,
+		// any cascaded script, any cascaded route). Clear the error overlay
+		// only when the whole rebuild was clean.
+		let anyError = false;
+
 		try {
 			const startTime = Date.now();
 
@@ -2270,6 +2359,8 @@ async function watchMode() {
 						`✅ ${ script } (rebundled) (${ rebundleTime }ms)`
 					);
 				} catch ( error ) {
+					anyError = true;
+					await reportBuildError( script, error );
 					console.log(
 						`❌ ${ script } - Rebundle error: ${ error.message }`
 					);
@@ -2293,13 +2384,21 @@ async function watchMode() {
 						`✅ routes/${ route } (rebuilt) (${ rebuildTime }ms)`
 					);
 				} catch ( error ) {
+					anyError = true;
+					await reportBuildError( `routes/${ route }`, error );
 					console.log(
 						`❌ routes/${ route } - Rebuild error: ${ error.message }`
 					);
 				}
 			}
 		} catch ( error ) {
+			anyError = true;
+			await reportBuildError( packageName, error );
 			console.log( `❌ ${ packageName } - Error: ${ error.message }` );
+		}
+
+		if ( ! anyError ) {
+			await clearBuildError();
 		}
 	}
 
@@ -2314,7 +2413,9 @@ async function watchMode() {
 			await buildRoute( routeName );
 			const buildTime = Date.now() - startTime;
 			console.log( `✅ routes/${ routeName } (${ buildTime }ms)` );
+			await clearBuildError();
 		} catch ( error ) {
+			await reportBuildError( `routes/${ routeName }`, error );
 			console.log(
 				`❌ routes/${ routeName } - Error: ${ error.message }`
 			);

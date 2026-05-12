@@ -11,6 +11,7 @@ on:
             - '!lib/experiments-page.php'
             - '!lib/theme.json'
             - '!lib/experimental/**'
+            - '!lib/dev-hmr.php'
             - 'phpunit/**'
             - '!phpunit/experimental/**'
             - '!phpunit/blocks/**'
