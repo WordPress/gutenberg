@@ -237,4 +237,5 @@ if ( gutenberg_is_experiment_enabled( 'gutenberg-dashboard-widgets' ) ) {
 	require __DIR__ . '/experimental/dashboard-widgets/widget-types.php';
 	require __DIR__ . '/experimental/dashboard-widgets/dashboard-layout.php';
 	require __DIR__ . '/experimental/dashboard-widgets/default-layout-seed.php';
+	require __DIR__ . '/experimental/on-this-day/on-this-day.php';
 }
