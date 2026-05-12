@@ -16,22 +16,25 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
  * The fix hoists the WP import map into <head> on both `admin_print_scripts`
  * and `wp_print_scripts` at `PHP_INT_MIN` so it precedes any reasonable
  * third-party module emitter. This file exercises both the strong Firefox
- * repro (a real `import('@wordpress/boot')` issued from the early module
- * script) and a Chromium/WebKit baseline that asserts no regression on
- * engines that already support multiple import maps.
+ * repro (a dynamic `import()` of the first specifier in the page's import
+ * map, issued from an early `<script type="module">`) and a Chromium/WebKit
+ * baseline that asserts no regression on engines that already support
+ * multiple import maps.
  *
- * The strong Firefox tests carry the `@firefox` Playwright tag so the
- * Playwright `firefox` project (configured in `test/e2e/playwright.config.ts`)
- * runs them and the `chromium` / `webkit` projects skip them. The baseline
- * blocks are untagged (Chromium) or tagged `@webkit` (Safari proxy) per the
- * same config.
+ * Playwright project routing: `test/e2e/playwright.config.ts` is shared
+ * across the whole e2e suite, so per the implementer convention we use
+ * per-test `test.skip( browserName === '...' )` calls instead of editing
+ * the shared `grep` / `grepInvert` rules. The `@firefox`-tagged block runs
+ * only under firefox; the Chromium baseline runs only under chromium; the
+ * `@webkit`-tagged block runs only under webkit.
  */
 
 const AFFECTED_PAGES = [
 	{
 		label: 'Font Library',
-		// Verified against lib/experimental/fonts/load.php.
-		adminPath: 'admin.php',
+		// Verified against lib/experimental/fonts/load.php lines 19-26:
+		// the page is registered under themes.php via add_submenu_page().
+		adminPath: 'themes.php',
 		query: 'page=font-library-wp-admin',
 	},
 	{
@@ -92,6 +95,17 @@ function assertNoForbiddenConsole( messages ) {
 test.describe( 'Import map ordering — Firefox single-importmap (@firefox)', () => {
 	const PLUGIN_SLUG = 'gutenberg-test-early-module-script-bare-import';
 
+	// The Playwright firefox project carries `grep: /@firefox/` so this
+	// block runs there; the chromium project has no grep filter and would
+	// otherwise also run it. Skip explicitly so the strong-repro assertion
+	// (which only proves the bug under Firefox 150 default config) is
+	// scoped to firefox.
+	// eslint-disable-next-line playwright/no-skipped-test
+	test.skip(
+		( { browserName } ) => browserName !== 'firefox',
+		'@firefox-tagged regression assertion only exercises the bug under Firefox 150 default config.'
+	);
+
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.activatePlugin( PLUGIN_SLUG );
 	} );
@@ -117,12 +131,22 @@ test.describe( 'Import map ordering — Firefox single-importmap (@firefox)', ()
 				page.locator( 'head script[type="importmap"]' )
 			).toHaveCount( 1 );
 
-			// The strong repro: the early module script issues a dynamic
-			// `import('@wordpress/boot')`. On a pre-fix build under Firefox
-			// 150 default config the import map is locked by the earlier
-			// module load, the bare specifier fails to resolve, the global
-			// settles to `false`, and this assertion fails. On a fixed
-			// build it settles to `true`.
+			// The strong repro: the early module script introspects the
+			// document's `<script type="importmap">` element, picks the
+			// first bare specifier from `imports`, and dynamically imports
+			// it. On a pre-fix build under Firefox 150 default config, the
+			// WP map is emitted in the footer; the fixture's earlier
+			// `<script type="module">` in <head> locks an empty/no-WP-keys
+			// import map state, the dynamic import rejects with
+			// `"... was a bare specifier, but was not remapped to anything"`,
+			// the global settles to `false`, and this assertion fails.
+			// On a fixed build the WP map is in <head> ahead of the
+			// fixture, the import resolves, and the global settles to
+			// `true`. Every Gutenberg-enhanced admin page covered by this
+			// spec has at least `@wordpress/core-abilities` in its map
+			// (enqueued globally by lib/client-assets.php on
+			// `admin_enqueue_scripts`), so introspecting the first
+			// specifier always finds at least one candidate.
 			await expect
 				.poll(
 					() =>
@@ -131,7 +155,7 @@ test.describe( 'Import map ordering — Firefox single-importmap (@firefox)', ()
 						),
 					{
 						message:
-							'Early-fixture import("@wordpress/boot") must resolve once the WP import map is in <head>.',
+							'Early-fixture dynamic import of the first import-map specifier must resolve once the WP import map is in <head>.',
 						timeout: 15_000,
 					}
 				)
@@ -143,11 +167,19 @@ test.describe( 'Import map ordering — Firefox single-importmap (@firefox)', ()
 } );
 
 test.describe( 'Import map ordering — Chromium baseline (no regression)', () => {
-	// Untagged: the Playwright firefox project filters by `@firefox` and
-	// the webkit project filters by `@webkit`, so this block runs under
-	// the chromium project only. It validates AC5 (multi-importmap engines
-	// unchanged).
+	// This block runs only under the chromium project to validate AC5
+	// (multi-importmap engines unchanged). The firefox / webkit projects
+	// have their own grep filters, but Chromium has no grep, so without
+	// an explicit skip the firefox project would also pick this block up
+	// when the runner is invoked broadly. Restrict to chromium with an
+	// in-test conditional to avoid touching shared playwright.config.ts.
 	const PLUGIN_SLUG = 'gutenberg-test-early-module-script';
+
+	// eslint-disable-next-line playwright/no-skipped-test
+	test.skip(
+		( { browserName } ) => browserName !== 'chromium',
+		'Chromium baseline asserts multi-importmap engines are unchanged.'
+	);
 
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.activatePlugin( PLUGIN_SLUG );
@@ -176,9 +208,17 @@ test.describe( 'Import map ordering — Chromium baseline (no regression)', () =
 } );
 
 test.describe( 'Import map ordering — WebKit baseline (@webkit)', () => {
-	// Tagged @webkit: runs under the Playwright webkit project as the
-	// Safari 18+ proxy for AC5.
+	// Tagged @webkit: the webkit project runs only @webkit tests, but
+	// the chromium project has no grep filter and would otherwise also
+	// run this block. Restrict to webkit with an in-test conditional so
+	// this is the Safari 18+ proxy for AC5.
 	const PLUGIN_SLUG = 'gutenberg-test-early-module-script';
+
+	// eslint-disable-next-line playwright/no-skipped-test
+	test.skip(
+		( { browserName } ) => browserName !== 'webkit',
+		'@webkit-tagged block is the Safari 18+ proxy for AC5.'
+	);
 
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.activatePlugin( PLUGIN_SLUG );
