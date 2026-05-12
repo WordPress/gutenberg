@@ -19,9 +19,13 @@ import { FONT_FAMILY_SUPPORT_KEY } from './font-family';
 import { FONT_SIZE_SUPPORT_KEY } from './font-size';
 import { TEXT_ALIGN_SUPPORT_KEY } from './text-align';
 import { FIT_TEXT_SUPPORT_KEY } from './fit-text';
-import { cleanEmptyObject, buildStateResetAllFilter } from './utils';
+import { cleanEmptyObject } from './utils';
 import { store as blockEditorStore } from '../store';
-import { useBlockStyle } from './use-block-style';
+import {
+	getStyleForState,
+	setStyleForState,
+	useBlockStyleState,
+} from './block-style-state';
 
 function omit( object, keys ) {
 	return Object.fromEntries(
@@ -94,20 +98,9 @@ function attributesToStyle( attributes ) {
 	};
 }
 
-function TypographyInspectorControl( {
-	children,
-	resetAllFilter,
-	selectedState = 'default',
-} ) {
-	const isStateSelected = selectedState !== 'default';
+function TypographyInspectorControl( { children, resetAllFilter } ) {
 	const attributesResetAllFilter = useCallback(
 		( attributes ) => {
-			if ( isStateSelected ) {
-				return buildStateResetAllFilter(
-					selectedState,
-					resetAllFilter
-				)( attributes );
-			}
 			const existingStyle = attributesToStyle( attributes );
 			const updatedStyle = resetAllFilter( existingStyle );
 			return {
@@ -115,7 +108,7 @@ function TypographyInspectorControl( {
 				...styleToAttributes( updatedStyle ),
 			};
 		},
-		[ isStateSelected, selectedState, resetAllFilter ]
+		[ resetAllFilter ]
 	);
 
 	return (
@@ -128,27 +121,24 @@ function TypographyInspectorControl( {
 	);
 }
 
-export function TypographyPanel( {
-	clientId,
-	name,
-	setAttributes,
-	settings,
-	selectedState = 'default',
-} ) {
+export function TypographyPanel( { clientId, name, setAttributes, settings } ) {
+	const selectedState = useBlockStyleState();
 	const isEnabled = useHasTypographyPanel( settings );
 
-	const { fontFamily, fontSize, fitText } = useSelect(
+	const { style, fontFamily, fontSize, fitText } = useSelect(
 		( select ) => {
 			// Early return to avoid subscription when disabled.
 			if ( ! isEnabled ) {
 				return {};
 			}
 			const {
+				style: _style,
 				fontFamily: _fontFamily,
 				fontSize: _fontSize,
 				fitText: _fitText,
 			} = select( blockEditorStore ).getBlockAttributes( clientId ) || {};
 			return {
+				style: _style,
 				fontFamily: _fontFamily,
 				fontSize: _fontSize,
 				fitText: _fitText,
@@ -157,18 +147,21 @@ export function TypographyPanel( {
 		[ clientId, isEnabled ]
 	);
 
-	const [ style, setStyle ] = useBlockStyle( null, selectedState );
 	const isStateSelected = selectedState !== 'default';
 
 	const value = useMemo( () => {
 		if ( isStateSelected ) {
-			return style;
+			return getStyleForState( style, selectedState );
 		}
 		return attributesToStyle( { style, fontFamily, fontSize } );
-	}, [ isStateSelected, style, fontSize, fontFamily ] );
+	}, [ isStateSelected, selectedState, style, fontSize, fontFamily ] );
 
 	const onChange = isStateSelected
-		? setStyle
+		? ( newStyle ) => {
+				setAttributes( {
+					style: setStyleForState( style, selectedState, newStyle ),
+				} );
+		  }
 		: ( newStyle ) => {
 				const newAttributes = styleToAttributes( newStyle );
 
@@ -183,19 +176,6 @@ export function TypographyPanel( {
 				setAttributes( newAttributes );
 		  };
 
-	const TypographyWrapper = useMemo(
-		() =>
-			function TypographyWrapperComponent( props ) {
-				return (
-					<TypographyInspectorControl
-						{ ...props }
-						selectedState={ selectedState }
-					/>
-				);
-			},
-		[ selectedState ]
-	);
-
 	if ( ! isEnabled ) {
 		return null;
 	}
@@ -207,7 +187,7 @@ export function TypographyPanel( {
 
 	return (
 		<StylesTypographyPanel
-			as={ TypographyWrapper }
+			as={ TypographyInspectorControl }
 			panelId={ clientId }
 			settings={ settings }
 			value={ value }
