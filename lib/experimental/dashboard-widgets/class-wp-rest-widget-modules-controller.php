@@ -241,7 +241,7 @@ if ( ! class_exists( 'WP_REST_Widget_Modules_Controller' ) ) {
 					'presentation'  => array(
 						'description' => __( 'Authoring intent about how the widget wants to render.', 'gutenberg' ),
 						'type'        => array( 'string', 'null' ),
-						'enum'        => array( 'framed', 'full-bleed', null ),
+						'enum'        => array_merge( WP_Widget_Type::PRESENTATION_VALUES, array( null ) ),
 						'context'     => array( 'view', 'edit', 'embed' ),
 						'readonly'    => true,
 					),

@@ -9,7 +9,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import type { WidgetName, WidgetType } from '../types';
+import type { WidgetName, WidgetType, WidgetTypeMetadata } from '../types';
 
 /**
  * Registers the `widgetModule` core-data entity at module load.
@@ -39,7 +39,7 @@ interface WidgetModuleRecord {
 	name: string;
 	render_module?: string | null;
 	widget_module?: string | null;
-	presentation?: 'framed' | 'full-bleed' | null;
+	presentation?: WidgetTypeMetadata[ 'presentation' ] | null;
 }
 
 /**
