@@ -8,6 +8,7 @@ import type { DragEvent } from 'react';
  */
 import { throttle } from '@wordpress/compose';
 import { useEffect, useRef } from '@wordpress/element';
+import { getWpCompatOverlaySlot } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -99,6 +100,13 @@ export function Draggable( {
 	 */
 	function start( event: DragEvent ) {
 		const { ownerDocument } = event.target as HTMLElement;
+		// When enabled, the compat overlay slot takes precedence over
+		// the legacy placement modes — but only when it lives in the
+		// same document as the dragged element, so the clone's
+		// viewport-relative geometry resolves in a single coordinate
+		// space.
+		const slot = getWpCompatOverlaySlot();
+		const compatSlot = slot?.ownerDocument === ownerDocument ? slot : null;
 
 		event.dataTransfer.setData(
 			transferDataType,
@@ -141,8 +149,7 @@ export function Draggable( {
 			clonedDragComponent.innerHTML = dragComponentRef.current.innerHTML;
 			cloneWrapper.appendChild( clonedDragComponent );
 
-			// Inject the cloneWrapper into the DOM.
-			ownerDocument.body.appendChild( cloneWrapper );
+			( compatSlot ?? ownerDocument.body ).appendChild( cloneWrapper );
 		} else {
 			const element = ownerDocument.getElementById(
 				elementId
@@ -173,8 +180,9 @@ export function Draggable( {
 
 			cloneWrapper.appendChild( clone );
 
-			// Inject the cloneWrapper into the DOM.
-			if ( appendToOwnerDocument ) {
+			if ( compatSlot ) {
+				compatSlot.appendChild( cloneWrapper );
+			} else if ( appendToOwnerDocument ) {
 				ownerDocument.body.appendChild( cloneWrapper );
 			} else {
 				elementWrapper?.appendChild( cloneWrapper );

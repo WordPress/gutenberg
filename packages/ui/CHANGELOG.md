@@ -21,7 +21,6 @@
 
 ### Bug Fixes
 
--   `Text`: Provide CSS defense values for every variant when rendered as either a paragraph or heading element ([#78172](https://github.com/WordPress/gutenberg/pull/78172)).
 -   `Autocomplete`, `Select`: Do not show the interactive cursor for disabled select triggers or disabled popup items ([#78112](https://github.com/WordPress/gutenberg/pull/78112)).
 -   `Select`: Hide the browser focus ring on highlighted popup items ([#77919](https://github.com/WordPress/gutenberg/pull/77919)).
 -   `Drawer`: Restore the slide-out animation when the popup closes ([#77800](https://github.com/WordPress/gutenberg/pull/77800)).
@@ -41,6 +40,7 @@
 -   `CollapsibleCard.Header`: Pass `render={ <h2 /> }` (or any of `<h1>`–`<h6>`) to wrap the trigger in a heading and contribute to the document outline, following the W3C APG accordion pattern (heading wraps button) ([#77962](https://github.com/WordPress/gutenberg/pull/77962)).
 -   `Select`: Add a `Select.Positioner` subcomponent and a `positioner` slot prop on `Select.Popup` to customize the popup placement, mirroring the existing `portal` slot pattern ([#78168](https://github.com/WordPress/gutenberg/pull/78168)).
 -   `Autocomplete`: Add an `Autocomplete.Positioner` subcomponent and a `positioner` slot prop on `Autocomplete.Popup` to customize the popup placement, mirroring the existing `portal` slot pattern ([#78168](https://github.com/WordPress/gutenberg/pull/78168)).
+-   Export `getWpCompatOverlaySlot()` so consumers can route their own portals into the compat overlay slot. Returns the body-level `[data-wp-compat-overlay-slot]` element when the runtime opts in, lazily creating it on first call, and `undefined` otherwise ([#78183](https://github.com/WordPress/gutenberg/pull/78183)).
 
 ### Internal
 

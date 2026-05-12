@@ -17,5 +17,6 @@ export * from './stack';
 export * as Tabs from './tabs';
 export * from './text';
 export * as Tooltip from './tooltip';
+export { getWpCompatOverlaySlot } from './utils/wp-compat-overlay-slot';
 export { useEnableWpCompatOverlaySlot } from './utils/use-enable-wp-compat-overlay-slot';
 export * from './visually-hidden';

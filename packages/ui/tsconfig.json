@@ -21,6 +21,5 @@
 		{ "path": "../style-runtime" },
 		{ "path": "../theme" }
 	],
-	"files": [ "global.d.ts" ],
-	"exclude": []
+	"files": [ "global.d.ts" ]
 }

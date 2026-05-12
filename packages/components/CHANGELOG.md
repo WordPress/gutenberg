@@ -10,6 +10,7 @@
 -   `Button`: Align `link` variant underline (offset and thickness) with `ExternalLink` and `Link` from `@wordpress/ui` ([#77842](https://github.com/WordPress/gutenberg/pull/77842)).
 -   `Modal`: render as a bottom sheet on mobile so the height adapts to the content and CTAs stay within thumb reach ([#77956](https://github.com/WordPress/gutenberg/pull/77956)).
 -   `Text`: Use a theme-aware gray token for the muted variant ([#77999](https://github.com/WordPress/gutenberg/pull/77999)).
+-   `Draggable`: Migrate the drag clone into the `@wordpress/ui` compat overlay slot so an active drag shares stacking with `@wordpress/ui` overlays opened mid-drag. Auto-enabled in WordPress environments (where `window.wp.components` is on the global); other hosts fall back to the previous placement until they call `useEnableWpCompatOverlaySlot()`. Cross-document drags (dragging an element inside an iframe while the slot is in the parent document) also fall back to the previous placement so the clone's viewport-relative geometry stays in a single coordinate space ([#78183](https://github.com/WordPress/gutenberg/pull/78183)).
 
 ### Bug Fixes
 
@@ -21,11 +22,9 @@
 
 ### Internal
 
--   `Modal`, `Menu`, `DropdownMenu`: Adopt `--wpds-motion-easing-*` and `--wpds-motion-duration-*` design tokens for animation timing ([#76097](https://github.com/WordPress/gutenberg/pull/76097)).
 -   Update `date-fns` dependency to `v4.1.0` ([#78057](https://github.com/WordPress/gutenberg/pull/78057)).
 -   Update code to comply with `eslint-plugin-react-hooks` v7 ([#69962](https://github.com/WordPress/gutenberg/pull/69962)).
 -   `SlotFill`: Add dependencies to `updateFill` effect ([#77907](https://github.com/WordPress/gutenberg/pull/77907)).
--   `Popover`: Remove unnecessary close button z-index style ([#78180](https://github.com/WordPress/gutenberg/pull/78180)).
 
 ## 33.0.0 (2026-04-29)
 
