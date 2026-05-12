@@ -51,6 +51,14 @@ function render_block_core_post_featured_media( $attributes, $content, $block ) 
 	if ( $scale && ( ! empty( $attributes['height'] ) || ! empty( $attributes['aspectRatio'] ) ) ) {
 		$extra_styles .= 'object-fit:' . $scale . ';';
 	}
+	if ( ! empty( $attributes['style']['shadow'] ) ) {
+		$shadow_styles = wp_style_engine_get_styles( array( 'shadow' => $attributes['style']['shadow'] ) );
+		if ( ! empty( $shadow_styles['css'] ) ) {
+			$extra_styles .= $shadow_styles['css'];
+		}
+	}
+
+	$overlay = render_block_core_post_featured_media_overlay( $attributes );
 
 	$featured = function_exists( 'get_post_featured_media' )
 		? get_post_featured_media( $post_id )
@@ -87,7 +95,8 @@ function render_block_core_post_featured_media( $attributes, $content, $block ) 
 				$is_link,
 				$target,
 				$rel,
-				$post_id
+				$post_id,
+				$overlay
 			);
 		}
 	}
@@ -115,7 +124,8 @@ function render_block_core_post_featured_media( $attributes, $content, $block ) 
 			$is_link,
 			$target,
 			$rel,
-			$post_id
+			$post_id,
+			$overlay
 		);
 	}
 
@@ -133,9 +143,11 @@ function render_block_core_post_featured_media( $attributes, $content, $block ) 
 			$controls ? ' controls' : ''
 		);
 	} elseif ( 'audio' === $featured['type'] ) {
+		$style = 'width:100%;' . $extra_styles;
 		$inner = sprintf(
-			'<audio src="%s" style="width:100%%"%s></audio>',
+			'<audio src="%s" style="%s"%s></audio>',
 			esc_url( $src ),
+			esc_attr( $style ),
 			$controls ? ' controls' : ''
 		);
 	} else {
@@ -148,12 +160,17 @@ function render_block_core_post_featured_media( $attributes, $content, $block ) 
 		$is_link,
 		$target,
 		$rel,
-		$post_id
+		$post_id,
+		$overlay
 	);
 }
 
 /**
  * Wraps rendered featured-media HTML in an optional link and a `<figure>` element.
+ *
+ * The overlay element, when present, is rendered as a sibling of the media
+ * inside the figure — outside the post-permalink link so its dimmed area
+ * doesn't capture clicks intended for player controls or surrounding UI.
  *
  * @since 7.1.0
  *
@@ -163,9 +180,10 @@ function render_block_core_post_featured_media( $attributes, $content, $block ) 
  * @param string $target     Link target attribute value.
  * @param string $rel        Link rel attribute value.
  * @param int    $post_id    The post ID.
+ * @param string $overlay    Optional. Overlay `<span>` markup to append inside the figure.
  * @return string The complete block HTML.
  */
-function render_block_core_post_featured_media_wrap( $inner, $attributes, $is_link, $target, $rel, $post_id ) {
+function render_block_core_post_featured_media_wrap( $inner, $attributes, $is_link, $target, $rel, $post_id, $overlay = '' ) {
 	if ( $is_link ) {
 		$rel_attr = $rel ? sprintf( ' rel="%s"', esc_attr( $rel ) ) : '';
 		$inner    = sprintf(
@@ -192,7 +210,114 @@ function render_block_core_post_featured_media_wrap( $inner, $attributes, $is_li
 		? get_block_wrapper_attributes( array( 'style' => $wrapper_style ) )
 		: get_block_wrapper_attributes();
 
-	return "<figure {$wrapper_attributes}>{$inner}</figure>";
+	return "<figure {$wrapper_attributes}>{$inner}{$overlay}</figure>";
+}
+
+/**
+ * Builds the overlay `<span>` markup for the block when an overlay is configured.
+ *
+ * The overlay is only emitted when `dimRatio` is non-zero — without a dim, the
+ * overlay would be transparent. Color, gradient, and border are inherited from
+ * the block's standard supports and serialized into class + style here.
+ *
+ * @since 7.1.0
+ *
+ * @param array $attributes Block attributes.
+ * @return string Overlay markup, or an empty string when no overlay is needed.
+ */
+function render_block_core_post_featured_media_overlay( $attributes ) {
+	if ( empty( $attributes['dimRatio'] ) ) {
+		return '';
+	}
+
+	$class_names = array( 'wp-block-post-featured-media__overlay', 'has-background-dim' );
+	$styles      = array();
+
+	$class_names[] = 'has-background-dim-' . (int) $attributes['dimRatio'];
+
+	if ( ! empty( $attributes['overlayColor'] ) ) {
+		$class_names[] = 'has-' . $attributes['overlayColor'] . '-background-color';
+	}
+	if ( ! empty( $attributes['gradient'] ) || ! empty( $attributes['customGradient'] ) ) {
+		$class_names[] = 'has-background-gradient';
+	}
+	if ( ! empty( $attributes['gradient'] ) ) {
+		$class_names[] = 'has-' . $attributes['gradient'] . '-gradient-background';
+	}
+
+	if ( ! empty( $attributes['customGradient'] ) ) {
+		$styles[] = sprintf( 'background-image:%s', $attributes['customGradient'] );
+	}
+	if ( ! empty( $attributes['customOverlayColor'] ) ) {
+		$styles[] = sprintf( 'background-color:%s', $attributes['customOverlayColor'] );
+	}
+
+	$border = render_block_core_post_featured_media_border_attributes( $attributes );
+	if ( ! empty( $border['class'] ) ) {
+		$class_names[] = $border['class'];
+	}
+	if ( ! empty( $border['style'] ) ) {
+		$styles[] = $border['style'];
+	}
+
+	return sprintf(
+		'<span class="%s" style="%s" aria-hidden="true"></span>',
+		esc_attr( implode( ' ', $class_names ) ),
+		esc_attr( safecss_filter_attr( implode( ';', $styles ) ) )
+	);
+}
+
+/**
+ * Resolves the block's border support to a class/style pair via the style engine.
+ *
+ * @since 7.1.0
+ *
+ * @param array $attributes Block attributes.
+ * @return array {
+ *     Border-related attributes for the overlay element.
+ *
+ *     @type string $class Optional. Class names contributed by the style engine.
+ *     @type string $style Optional. Inline CSS contributed by the style engine.
+ * }
+ */
+function render_block_core_post_featured_media_border_attributes( $attributes ) {
+	$border_styles = array();
+	$sides         = array( 'top', 'right', 'bottom', 'left' );
+
+	if ( isset( $attributes['style']['border']['radius'] ) ) {
+		$border_styles['radius'] = $attributes['style']['border']['radius'];
+	}
+	if ( isset( $attributes['style']['border']['style'] ) ) {
+		$border_styles['style'] = $attributes['style']['border']['style'];
+	}
+	if ( isset( $attributes['style']['border']['width'] ) ) {
+		$border_styles['width'] = $attributes['style']['border']['width'];
+	}
+
+	$preset_color           = array_key_exists( 'borderColor', $attributes )
+		? "var:preset|color|{$attributes['borderColor']}"
+		: null;
+	$custom_color           = $attributes['style']['border']['color'] ?? null;
+	$border_styles['color'] = $preset_color ? $preset_color : $custom_color;
+
+	foreach ( $sides as $side ) {
+		$border                 = $attributes['style']['border'][ $side ] ?? null;
+		$border_styles[ $side ] = array(
+			'color' => $border['color'] ?? null,
+			'style' => $border['style'] ?? null,
+			'width' => $border['width'] ?? null,
+		);
+	}
+
+	$styles = wp_style_engine_get_styles( array( 'border' => $border_styles ) );
+	$out    = array();
+	if ( ! empty( $styles['classnames'] ) ) {
+		$out['class'] = $styles['classnames'];
+	}
+	if ( ! empty( $styles['css'] ) ) {
+		$out['style'] = $styles['css'];
+	}
+	return $out;
 }
 
 /**
