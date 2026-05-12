@@ -347,12 +347,23 @@ export default function ColorPanel( {
 	const hasBackgroundGradientSupport = !! settings?.background?.gradient;
 	const showGradientColors =
 		hasGradientColors && ! hasBackgroundGradientSupport;
+
 	const decodeValue = ( rawValue ) =>
 		getValueFromVariable( { settings }, '', rawValue );
-	const extractColorSlug = ( rawValue ) =>
-		rawValue?.startsWith( 'var:preset|color|' )
-			? rawValue.slice( 'var:preset|color|'.length )
-			: undefined;
+
+	const extractColorSlug = ( rawValue ) => {
+		if ( typeof rawValue !== 'string' ) {
+			return undefined;
+		}
+		if ( rawValue.startsWith( 'var:preset|color|' ) ) {
+			return rawValue.slice( 'var:preset|color|'.length );
+		}
+		const themeFormatMatch = rawValue.match(
+			/^var\(--wp--preset--color--([^)]+)\)$/
+		);
+		return themeFormatMatch?.[ 1 ];
+	};
+
 	const encodeColorValue = ( colorValue, slug ) => {
 		if ( slug ) {
 			return 'var:preset|color|' + slug;
@@ -367,6 +378,7 @@ export default function ColorPanel( {
 			? 'var:preset|color|' + colorObject.slug
 			: colorValue;
 	};
+
 	const encodeGradientValue = ( gradientValue ) => {
 		const allGradients = gradients.flatMap(
 			( { gradients: originGradients } ) => originGradients
@@ -476,7 +488,16 @@ export default function ColorPanel( {
 			[ 'color', 'text' ],
 			encodeColorValue( newColor, newSlug )
 		);
-		if ( textColor === linkColor ) {
+		// Compare raw encoded references, not decoded color values: two palette
+		// entries can share the same hex value but carry different slugs
+		// (e.g. var:preset|color|dark-text vs var:preset|color|dark-background).
+		// Comparing decoded values would incorrectly conflate them, forcing the
+		// link preset to follow the text preset even though the user chose
+		// independent palette slots.
+		if (
+			inheritedValue?.color?.text ===
+			inheritedValue?.elements?.link?.color?.text
+		) {
 			changedObject = setImmutably(
 				changedObject,
 				[ 'elements', 'link', 'color', 'text' ],
