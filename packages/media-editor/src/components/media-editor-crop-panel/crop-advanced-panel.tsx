@@ -41,8 +41,16 @@ export default function CropAdvancedPanel( {
 		return null;
 	}
 
-	const { rect, ranges, fineRotation, onEdit, onEditEnd, canMoveCropRect } =
-		controls;
+	const {
+		rect,
+		ranges,
+		fineRotation,
+		onEdit,
+		onEditEnd,
+		onSessionStart,
+		onSessionEnd,
+		canMoveCropRect,
+	} = controls;
 
 	return (
 		<PanelBody
@@ -68,6 +76,8 @@ export default function CropAdvancedPanel( {
 							suffix={ DEGREE_SUFFIX }
 							onCommit={ fineRotation.onEdit }
 							onCommitEnd={ fineRotation.onEditEnd }
+							onSessionStart={ onSessionStart }
+							onSessionEnd={ onSessionEnd }
 						/>
 					</FlexItem>
 				</Flex>
@@ -83,6 +93,8 @@ export default function CropAdvancedPanel( {
 							}
 							onCommit={ ( value ) => onEdit( 'left', value ) }
 							onCommitEnd={ onEditEnd }
+							onSessionStart={ onSessionStart }
+							onSessionEnd={ onSessionEnd }
 						/>
 					</FlexItem>
 					<FlexItem isBlock>
@@ -96,6 +108,8 @@ export default function CropAdvancedPanel( {
 							}
 							onCommit={ ( value ) => onEdit( 'top', value ) }
 							onCommitEnd={ onEditEnd }
+							onSessionStart={ onSessionStart }
+							onSessionEnd={ onSessionEnd }
 						/>
 					</FlexItem>
 				</Flex>
@@ -108,6 +122,8 @@ export default function CropAdvancedPanel( {
 							disabled={ ! ranges.width.isEditable }
 							onCommit={ ( value ) => onEdit( 'width', value ) }
 							onCommitEnd={ onEditEnd }
+							onSessionStart={ onSessionStart }
+							onSessionEnd={ onSessionEnd }
 						/>
 					</FlexItem>
 					<FlexItem isBlock>
@@ -118,6 +134,8 @@ export default function CropAdvancedPanel( {
 							disabled={ ! ranges.height.isEditable }
 							onCommit={ ( value ) => onEdit( 'height', value ) }
 							onCommitEnd={ onEditEnd }
+							onSessionStart={ onSessionStart }
+							onSessionEnd={ onSessionEnd }
 						/>
 					</FlexItem>
 				</Flex>

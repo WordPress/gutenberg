@@ -12,6 +12,8 @@ const mockSetCropRect = jest.fn();
 const mockSetRotation = jest.fn();
 const mockSettleCrop = jest.fn();
 const mockCommitHistory = jest.fn();
+const mockPauseHistory = jest.fn();
+const mockResumeHistory = jest.fn();
 
 const defaultState = {
 	image: { src: 'test.jpg', naturalWidth: 1000, naturalHeight: 500 },
@@ -56,6 +58,8 @@ jest.mock( '../../../image-editor', () => ( {
 		setRotation: mockSetRotation,
 		settleCrop: mockSettleCrop,
 		commitHistory: mockCommitHistory,
+		pauseHistory: mockPauseHistory,
+		resumeHistory: mockResumeHistory,
 	} ),
 } ) );
 
@@ -170,5 +174,21 @@ describe( 'useAdvancedCropControls', () => {
 		act( () => result.current.fineRotation.onEdit( 60 ) );
 
 		expect( mockSetRotation ).toHaveBeenCalledWith( 44.99 );
+	} );
+
+	it( 'exposes session start/end that pause and resume the controller history', () => {
+		const { result } = renderHook( () =>
+			useAdvancedCropControls( { freeformCrop: true } )
+		);
+
+		if ( ! result.current.isReady ) {
+			throw new Error( 'expected controls to be ready' );
+		}
+		act( () => result.current.onSessionStart() );
+		expect( mockPauseHistory ).toHaveBeenCalledTimes( 1 );
+		expect( mockResumeHistory ).not.toHaveBeenCalled();
+
+		act( () => result.current.onSessionEnd() );
+		expect( mockResumeHistory ).toHaveBeenCalledTimes( 1 );
 	} );
 } );

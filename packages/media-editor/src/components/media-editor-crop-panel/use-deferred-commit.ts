@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useRef, useState } from '@wordpress/element';
+import { useEffect, useRef, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -18,6 +18,18 @@ export interface UseDeferredCommitArgs {
 	commitStep: number;
 	onCommit: ( value: number ) => void;
 	onCommitEnd?: () => void;
+	/**
+	 * Called on focus, before any draft handling. Use to suspend
+	 * side-effects that should treat the whole focus → blur cycle as one
+	 * session — e.g. pausing the cropper's auto-history debounce.
+	 */
+	onSessionStart?: () => void;
+	/**
+	 * Called on blur, Enter, or Escape — unconditionally, even if the user
+	 * did not change anything. Pair with `onSessionStart` to bound an edit
+	 * session.
+	 */
+	onSessionEnd?: () => void;
 }
 
 export interface UseDeferredCommitReturn {
@@ -45,12 +57,14 @@ export interface UseDeferredCommitReturn {
  * bounds and committed, and `onCommitEnd` (typically `settleCrop` or
  * `commitHistory`) fires once. Escape restores the value captured on focus.
  *
- * @param args             Hook arguments.
+ * @param args                Hook arguments.
  * @param args.value
  * @param args.range
  * @param args.commitStep
  * @param args.onCommit
  * @param args.onCommitEnd
+ * @param args.onSessionStart
+ * @param args.onSessionEnd
  * @return Spreadable handlers + display value for a number input.
  */
 export function useDeferredCommit( {
@@ -59,6 +73,8 @@ export function useDeferredCommit( {
 	commitStep,
 	onCommit,
 	onCommitEnd,
+	onSessionStart,
+	onSessionEnd,
 }: UseDeferredCommitArgs ): UseDeferredCommitReturn {
 	const [ focused, setFocused ] = useState( false );
 	const [ draft, setDraft ] = useState( '' );
@@ -68,11 +84,43 @@ export function useDeferredCommit( {
 	const lastCommittedDraftValueRef = useRef< number | null >( null );
 	const hasPendingCommitEndRef = useRef( false );
 	const hasUserEditedDraftRef = useRef( false );
+	const onCommitEndRef = useRef( onCommitEnd );
+	const onSessionEndRef = useRef( onSessionEnd );
+	// Tracks whether `onSessionEnd` has already fired for the current focus
+	// session, so Enter/Escape and the subsequent blur do not double-fire.
+	const sessionEndedRef = useRef( true );
 	const bounds = getInputBounds( value, range, commitStep );
+
+	useEffect( () => {
+		onCommitEndRef.current = onCommitEnd;
+		onSessionEndRef.current = onSessionEnd;
+	}, [ onCommitEnd, onSessionEnd ] );
+
+	useEffect( () => {
+		return () => {
+			if ( sessionEndedRef.current ) {
+				return;
+			}
+			if ( hasPendingCommitEndRef.current ) {
+				onCommitEndRef.current?.();
+				hasPendingCommitEndRef.current = false;
+			}
+			sessionEndedRef.current = true;
+			onSessionEndRef.current?.();
+		};
+	}, [] );
+
+	const endSession = () => {
+		if ( sessionEndedRef.current ) {
+			return;
+		}
+		sessionEndedRef.current = true;
+		onSessionEndRef.current?.();
+	};
 
 	const runCommitEnd = () => {
 		if ( hasPendingCommitEndRef.current ) {
-			onCommitEnd?.();
+			onCommitEndRef.current?.();
 			hasPendingCommitEndRef.current = false;
 		}
 	};
@@ -120,9 +168,11 @@ export function useDeferredCommit( {
 		lastCommittedDraftValueRef.current = null;
 		hasPendingCommitEndRef.current = false;
 		hasUserEditedDraftRef.current = false;
+		sessionEndedRef.current = false;
 		setFocused( true );
 		draftRef.current = String( bounds.value );
 		setDraft( String( bounds.value ) );
+		onSessionStart?.();
 	};
 
 	const onChange = ( nextValue: string | undefined ) => {
@@ -137,11 +187,11 @@ export function useDeferredCommit( {
 
 	const onBlur = () => {
 		setFocused( false );
-		if ( skipBlurCommitRef.current ) {
-			skipBlurCommitRef.current = false;
-			return;
+		if ( ! skipBlurCommitRef.current ) {
+			completeDraft();
 		}
-		completeDraft();
+		skipBlurCommitRef.current = false;
+		endSession();
 	};
 
 	const onKeyDown = ( event: React.KeyboardEvent< HTMLInputElement > ) => {
@@ -150,6 +200,7 @@ export function useDeferredCommit( {
 			skipBlurCommitRef.current = true;
 			setFocused( false );
 			completeDraft();
+			endSession();
 			event.currentTarget.blur();
 		} else if ( event.key === 'Escape' ) {
 			event.preventDefault();
@@ -161,6 +212,7 @@ export function useDeferredCommit( {
 				runCommitEnd();
 				lastCommittedDraftValueRef.current = null;
 			}
+			endSession();
 			event.currentTarget.blur();
 		}
 	};
