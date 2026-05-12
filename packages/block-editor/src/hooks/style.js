@@ -8,6 +8,7 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { addFilter } from '@wordpress/hooks';
+import { useSelect } from '@wordpress/data';
 import {
 	getBlockSupport,
 	hasBlockSupport,
@@ -47,6 +48,8 @@ import { buildStateSelector, buildCanvasStateSelector } from './state-utils';
 import { BlockInspectorPreTabsFill } from '../components/block-inspector/inspector-pre-tabs-slot-fill';
 import { scopeSelector } from '../components/global-styles/utils';
 import { useBlockEditingMode } from '../components/block-editing-mode';
+import { store as blockEditorStore } from '../store';
+import { globalStylesDataKey } from '../store/private-keys';
 
 const styleSupportKeys = [
 	...TYPOGRAPHY_SUPPORT_KEYS,
@@ -77,6 +80,34 @@ export function getInlineStyles( styles = {} ) {
 	} );
 
 	return output;
+}
+
+function isStyleObject( value ) {
+	return !! value && typeof value === 'object' && ! Array.isArray( value );
+}
+
+export function mergeStyleObjects( ...styles ) {
+	let merged;
+
+	styles.forEach( ( style ) => {
+		if ( ! isStyleObject( style ) ) {
+			return;
+		}
+
+		merged = merged || {};
+
+		Object.entries( style ).forEach( ( [ key, value ] ) => {
+			if ( isStyleObject( value ) && isStyleObject( merged[ key ] ) ) {
+				merged[ key ] = mergeStyleObjects( merged[ key ], value );
+			} else if ( isStyleObject( value ) ) {
+				merged[ key ] = mergeStyleObjects( value );
+			} else {
+				merged[ key ] = value;
+			}
+		} );
+	} );
+
+	return merged;
 }
 
 /**
@@ -347,6 +378,12 @@ function BlockStyleControls( {
 	const blockEditingMode = useBlockEditingMode();
 	const [ selectedState, setSelectedState ] = useState( 'default' );
 	const [ showStateOnCanvas, setShowStateOnCanvas ] = useState( true );
+	const globalBlockStyles = useSelect(
+		( select ) =>
+			select( blockEditorStore ).getSettings()[ globalStylesDataKey ]
+				?.blocks?.[ name ],
+		[ name ]
+	);
 
 	// Inject state styles onto the editor canvas so the selected state is
 	// visible while editing. Scoped to this block instance via data-block so
@@ -356,7 +393,10 @@ function BlockStyleControls( {
 		if ( ! showStateOnCanvas || selectedState === 'default' ) {
 			return undefined;
 		}
-		const stateValue = style?.[ selectedState ];
+		const stateValue = mergeStyleObjects(
+			globalBlockStyles?.[ selectedState ],
+			style?.[ selectedState ]
+		);
 		if ( ! stateValue ) {
 			return undefined;
 		}
@@ -365,7 +405,14 @@ function BlockStyleControls( {
 		// Use !important to override utility classes (e.g. has-accent-3-color)
 		// that the block's default color support generates with !important.
 		return css ? css.replace( /;/g, ' !important;' ) : undefined;
-	}, [ showStateOnCanvas, selectedState, style, clientId, name ] );
+	}, [
+		showStateOnCanvas,
+		selectedState,
+		globalBlockStyles,
+		style,
+		clientId,
+		name,
+	] );
 	useStyleOverride( { css: canvasStateCSS } );
 
 	if ( blockEditingMode !== 'default' ) {
