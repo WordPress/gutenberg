@@ -33,6 +33,12 @@ const meta: Meta< typeof Card.Root > = {
 		'Card.FullBleed': Card.FullBleed,
 		'Card.Title': Card.Title,
 	},
+	parameters: {
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+		},
+	},
 };
 export default meta;
 
