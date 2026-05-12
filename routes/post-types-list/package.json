@@ -1,0 +1,16 @@
+{
+	"name": "@wordpress/post-types-list-route",
+	"version": "1.0.0",
+	"private": true,
+	"route": {
+		"path": "/post-types",
+		"page": [
+			"content-types"
+		]
+	},
+	"dependencies": {
+		"@wordpress/base-styles": "file:../../packages/base-styles",
+		"@wordpress/content-types": "file:../../packages/content-types",
+		"@wordpress/i18n": "file:../../packages/i18n"
+	}
+}

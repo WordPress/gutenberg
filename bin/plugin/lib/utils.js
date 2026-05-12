@@ -5,7 +5,7 @@
 const { confirm } = require( '@inquirer/prompts' );
 const fs = require( 'fs' );
 const childProcess = require( 'child_process' );
-const { v4: uuid } = require( 'uuid' );
+const { randomUUID } = require( 'crypto' );
 const path = require( 'path' );
 const os = require( 'os' );
 
@@ -123,7 +123,7 @@ async function askForConfirmation(
  * @return {string} Temporary Path.
  */
 function getRandomTemporaryPath() {
-	return path.join( os.tmpdir(), uuid() );
+	return path.join( os.tmpdir(), randomUUID() );
 }
 
 /**
