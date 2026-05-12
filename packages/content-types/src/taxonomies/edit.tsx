@@ -63,7 +63,13 @@ import {
 } from '../utils/fields';
 import type { TaxonomyFormData, TaxonomyRecord } from './types';
 import { BLANK_RECORD, serializeForSave, toFormData } from './utils';
-import { NEW_ID, TAXONOMIES_PATH, TAXONOMY_ENTITY } from '../constants';
+import { useMaybeInvalidateContentTypeCache } from '../utils/use-maybe-invalidate-content-type-cache';
+import {
+	NEW_ID,
+	POST_TYPE_ENTITY,
+	TAXONOMIES_PATH,
+	TAXONOMY_ENTITY,
+} from '../constants';
 
 type TaxonomyPageProps = {
 	isAddMode: boolean;
@@ -232,6 +238,7 @@ function TaxonomyPage( {
 	const { saveEntityRecord } = useDispatch( coreStore );
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
+	const maybeInvalidateCache = useMaybeInvalidateContentTypeCache();
 
 	async function onSave() {
 		if ( isSaving || ! isValid ) {
@@ -257,6 +264,11 @@ function TaxonomyPage( {
 						data.title.raw
 				  );
 			createSuccessNotice( successMessage, { type: 'snackbar' } );
+			maybeInvalidateCache(
+				initialData.config.object_type,
+				data.config.object_type,
+				POST_TYPE_ENTITY
+			);
 			if ( saved?.id !== undefined ) {
 				onSaved?.( { ...data, id: saved.id } );
 			}

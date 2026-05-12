@@ -5,6 +5,8 @@ export interface TaxonomyRecord {
 	status: 'publish' | 'draft';
 	title: { raw: string; rendered: string };
 	config: StoredConfig;
+	// WP core's `register_taxonomy()` accepts `array|string`, but the
+	// `wp_user_taxonomy` REST controller normalizes to `string[]`.
 	object_type: string[];
 }
 

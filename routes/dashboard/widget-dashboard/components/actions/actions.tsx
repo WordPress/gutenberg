@@ -28,8 +28,14 @@ import type { MoreActionsDropdownItem } from '../more-actions-dropdown';
  * @return {React.ReactNode} - The Actions component.
  */
 export function Actions(): React.ReactNode {
-	const { editMode, onEditChange, onLayoutReset } =
-		useDashboardInternalContext();
+	const {
+		editMode,
+		onEditChange,
+		onLayoutReset,
+		commitLayout,
+		cancelLayout,
+		hasUncommittedChanges,
+	} = useDashboardInternalContext();
 
 	const [ isEditActionsMounted, setIsEditActionsMounted ] =
 		useState( editMode );
@@ -68,16 +74,12 @@ export function Actions(): React.ReactNode {
 	}, [ setInserterOpen ] );
 
 	const cancel = useCallback( () => {
-		// eslint-disable-next-line no-console
-		console.log( 'cancel' ); // TODO: Implement cancel\
-		onEditChange?.( false );
-	}, [ onEditChange ] );
+		cancelLayout();
+	}, [ cancelLayout ] );
 
 	const done = useCallback( () => {
-		// eslint-disable-next-line no-console
-		console.log( 'done' ); // TODO: Implement done
-		onEditChange?.( false );
-	}, [ onEditChange ] );
+		commitLayout();
+	}, [ commitLayout ] );
 
 	const moreActionsItems: MoreActionsDropdownItem[] = [
 		{
@@ -126,6 +128,7 @@ export function Actions(): React.ReactNode {
 						tone="brand"
 						size="compact"
 						onClick={ done }
+						disabled={ ! hasUncommittedChanges }
 					>
 						{ __( 'Done' ) }
 					</Button>
@@ -140,6 +143,7 @@ export function Actions(): React.ReactNode {
 					{ __( 'Customize' ) }
 				</Button>
 			) }
+
 			<MoreActionsDropdown items={ moreActionsItems } />
 
 			<AlertDialog.Root
