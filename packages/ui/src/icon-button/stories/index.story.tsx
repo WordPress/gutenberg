@@ -20,6 +20,13 @@ const meta: Meta< typeof IconButton > = {
 			control: { type: 'boolean' },
 		},
 	},
+	parameters: {
+		componentStatus: {
+			status: 'use-with-caution',
+			whereUsed: 'global',
+			notes: 'Not yet recommended for use alongside components from `@wordpress/components`, pending review of style consistency with `@wordpress/components`, text overflow behavior, and overlays compatibility. See [WordPress/gutenberg#76135](https://github.com/WordPress/gutenberg/issues/76135).',
+		},
+	},
 };
 export default meta;
 
