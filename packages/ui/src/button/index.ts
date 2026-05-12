@@ -5,7 +5,6 @@ ButtonIcon.displayName = 'Button.Icon';
 
 /**
  * A versatile button component with multiple variants, tones, and sizes.
- * Built on design tokens for consistent theming and accessibility.
  */
 export const Button = Object.assign( _Button, {
 	/**

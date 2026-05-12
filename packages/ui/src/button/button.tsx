@@ -11,7 +11,6 @@ import defenseStyles from '../utils/css/global-css-defense.module.css';
 
 /**
  * A versatile button component with multiple variants, tones, and sizes.
- * Built on design tokens for consistent theming and accessibility.
  */
 export const Button = forwardRef< HTMLButtonElement, ButtonProps >(
 	function Button(
