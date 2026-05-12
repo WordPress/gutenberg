@@ -129,11 +129,7 @@ export type CursorPosition = {
 	absoluteOffset: number;
 
 	// The sender's `WPBlockSelection.attributeKey` (e.g. `content` or
-	// `body.0.cells.0.content`). Used by the receiver to scope the cursor
-	// DOM lookup to a specific RichText element, identified by the
-	// `data-wp-block-attribute-key` attribute that RichText writes to its
-	// contenteditable. Optional so older awareness payloads (without the
-	// field) still resolve to the containing block element as a fallback.
+	// `body.0.cells.0.content`).
 	attributeKey?: string;
 };
 
