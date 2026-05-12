@@ -287,7 +287,7 @@ describe( 'WidgetDashboard staging layer', () => {
 			model: 'grid',
 			minColumnWidth: 350,
 			rowHeight: 200,
-			spacing: 4,
+			spacing: 'md',
 		};
 
 		it( 'keeps settings mutations in staging without firing onGridSettingsChange', () => {
@@ -307,13 +307,13 @@ describe( 'WidgetDashboard staging layer', () => {
 			act( () => {
 				readProbe().mutateGridSettings( {
 					...initialSettings,
-					spacing: 6,
+					spacing: 'lg',
 				} );
 			} );
 
 			expect( onGridSettingsChange ).not.toHaveBeenCalled();
 			expect( readProbe().hasUncommittedChanges ).toBe( true );
-			expect( readProbe().gridSettings.spacing ).toBe( 6 );
+			expect( readProbe().gridSettings.spacing ).toBe( 'lg' );
 		} );
 
 		it( 'publishes both layout and settings on commit', () => {

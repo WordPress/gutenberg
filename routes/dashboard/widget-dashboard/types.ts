@@ -14,6 +14,7 @@ import type { IconType } from '@wordpress/components';
 import type { Field } from '@wordpress/dataviews';
 import type {
 	DashboardGridLayoutItem,
+	DashboardGridSpacing,
 	DashboardLanesLayoutItem,
 } from '@wordpress/grid';
 
@@ -283,9 +284,11 @@ interface BaseWidgetGridSettings {
 	minColumnWidth?: number;
 
 	/**
-	 * Grid gap multiplier (multiplied by 4px).
+	 * Gap size between tiles. Maps to the design-system gap scale
+	 * (`--wpds-dimension-gap-*`), so the rendered gap follows the
+	 * `density` chosen by an ancestor `ThemeProvider`.
 	 */
-	spacing?: number;
+	spacing?: DashboardGridSpacing;
 }
 
 /**

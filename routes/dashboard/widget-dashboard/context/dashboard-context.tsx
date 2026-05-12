@@ -35,7 +35,7 @@ import type {
 const DEFAULT_GRID: WidgetGridSettings = {
 	minColumnWidth: 350,
 	rowHeight: 200,
-	spacing: 4,
+	spacing: 'lg',
 };
 
 const DEFAULT_RESOLVE_WIDGET_MODULE: ResolveWidgetModule = ( moduleId ) =>

@@ -3,6 +3,7 @@
  */
 import { ToggleControl } from '@wordpress/components';
 import { useCallback } from '@wordpress/element';
+import type { DashboardGridSpacing } from '@wordpress/grid';
 import { __ } from '@wordpress/i18n';
 /* eslint-disable @wordpress/use-recommended-components */
 import {
@@ -29,6 +30,19 @@ const MODEL_ITEMS = [
 	{ value: 'grid', label: __( 'Standard grid' ) },
 	{ value: 'masonry', label: __( 'Masonry' ) },
 ] as const satisfies ReadonlyArray< { value: WidgetGridModel; label: string } >;
+
+const SPACING_ITEMS = [
+	{ value: 'xs', label: __( 'Extra small' ) },
+	{ value: 'sm', label: __( 'Small' ) },
+	{ value: 'md', label: __( 'Medium' ) },
+	{ value: 'lg', label: __( 'Large' ) },
+	{ value: 'xl', label: __( 'Extra large' ) },
+	{ value: '2xl', label: __( '2x extra large' ) },
+	{ value: '3xl', label: __( '3x extra large' ) },
+] as const satisfies ReadonlyArray< {
+	value: DashboardGridSpacing;
+	label: string;
+} >;
 
 const ROW_HEIGHT_AUTO = 'auto' as const;
 
@@ -116,8 +130,7 @@ export function LayoutSettings( {
 	);
 
 	const handleSpacingChange = useCallback(
-		( raw: unknown ) => {
-			const next = parsePositiveInt( raw );
+		( next: DashboardGridSpacing | undefined ) => {
 			onGridSettingsChange( {
 				...gridSettings,
 				spacing: next,
@@ -255,16 +268,24 @@ export function LayoutSettings( {
 							} }
 						/>
 
-						<InputControl
+						<SelectControl
 							label={ __( 'Gap' ) }
 							description={ __(
-								'Spacing multiplier between tiles. Effective gap is the multiplier times 4px.'
+								'Spacing size between tiles. Follows the active density of the design system.'
 							) }
-							type="number"
-							min={ 1 }
-							max={ 8 }
-							value={ gridSettings.spacing ?? '' }
-							onValueChange={ handleSpacingChange }
+							items={ [ ...SPACING_ITEMS ] }
+							value={ SPACING_ITEMS.find(
+								( item ) =>
+									item.value ===
+									( gridSettings.spacing ?? 'sm' )
+							) }
+							onValueChange={ ( item ) => {
+								if ( item ) {
+									handleSpacingChange(
+										item.value as DashboardGridSpacing
+									);
+								}
+							} }
 						/>
 
 						<Stack direction="column" gap="xs">
