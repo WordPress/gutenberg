@@ -7,7 +7,7 @@ const meta: Meta< typeof Button > = {
 	title: 'Design System/Components/Button',
 	component: Button,
 	subcomponents: {
-		Icon: Button.Icon,
+		'Button.Icon': Button.Icon,
 	},
 	argTypes: {
 		'aria-pressed': {
