@@ -647,10 +647,10 @@ function ImageEditorWithUndo( { src }: { src: string } ) {
 The cropper is keyboard-accessible and screen-reader friendly:
 
 **Keyboard controls:**
-- **Arrow keys** on the container: pan the image
+- **Arrow keys** on the container: pan the image (Shift for larger jumps)
 - **+/-** on the container: zoom in/out
 - **R** on the container: snap rotate 90°
-- **Tab** to crop handles, then **arrow keys** to resize (0.02 step per keypress)
+- **Tab** to crop handles, then **arrow keys** to resize (Shift for larger jumps)
 - Aspect ratio lock is respected during keyboard resize
 
 **Screen reader support:**

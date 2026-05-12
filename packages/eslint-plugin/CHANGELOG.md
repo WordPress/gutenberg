@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Added [`no-non-module-stylesheet-imports`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/no-non-module-stylesheet-imports.md) rule to prevent importing non-module stylesheets from JavaScript files ([#77984](https://github.com/WordPress/gutenberg/pull/77984)).
+
 ## 25.1.0 (2026-04-29)
 
 ### New Features

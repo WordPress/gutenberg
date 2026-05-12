@@ -63,6 +63,11 @@ export function PrivatePostLastRevision() {
 					onClick={ () => setCurrentRevisionId( lastRevisionId ) }
 					className="editor-private-post-last-revision__button"
 					text={ revisionsCount }
+					aria-label={ sprintf(
+						/* translators: %s: number of revisions. */
+						__( 'Open revisions screen: %s revisions' ),
+						revisionsCount
+					) }
 					variant="tertiary"
 					size="compact"
 				/>

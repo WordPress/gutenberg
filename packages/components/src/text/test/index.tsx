@@ -69,7 +69,7 @@ describe( 'Text', () => {
 			</Text>
 		);
 		expect( screen.getByRole( 'heading' ) ).toHaveStyle( {
-			color: COLORS.gray[ 700 ],
+			color: COLORS.theme.gray[ 700 ],
 		} );
 	} );
 

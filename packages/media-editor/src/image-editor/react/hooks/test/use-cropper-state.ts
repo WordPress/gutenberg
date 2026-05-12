@@ -123,6 +123,41 @@ describe( 'useCropperState', () => {
 		} );
 	} );
 
+	it( 'toggleFlip should toggle horizontal flip', () => {
+		const { result } = renderHook( () => useCropperState() );
+
+		act( () => {
+			result.current.toggleFlip( 'horizontal' );
+		} );
+
+		expect( result.current.state.flip ).toEqual( {
+			horizontal: true,
+			vertical: false,
+		} );
+
+		act( () => {
+			result.current.toggleFlip( 'horizontal' );
+		} );
+
+		expect( result.current.state.flip ).toEqual( {
+			horizontal: false,
+			vertical: false,
+		} );
+	} );
+
+	it( 'toggleFlip should toggle vertical flip independently', () => {
+		const { result } = renderHook( () => useCropperState() );
+
+		act( () => {
+			result.current.toggleFlip( 'vertical' );
+		} );
+
+		expect( result.current.state.flip ).toEqual( {
+			horizontal: false,
+			vertical: true,
+		} );
+	} );
+
 	it( 'should dispatch SET_CROP_RECT via setCropRect', () => {
 		const { result } = renderHook( () => useCropperState() );
 
@@ -887,6 +922,14 @@ describe( 'useCropperState', () => {
 		} );
 
 		// --- discrete actions ---
+
+		it( 'toggleFlip creates a history entry immediately', () => {
+			const { result } = renderHook( () => useCropperState() );
+			act( () => {
+				result.current.toggleFlip( 'horizontal' );
+			} );
+			expect( result.current.hasUndo ).toBe( true );
+		} );
 
 		it( 'setFlip creates a history entry immediately', () => {
 			const { result } = renderHook( () => useCropperState() );
