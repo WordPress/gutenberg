@@ -25,19 +25,31 @@ function render_block_core_post_featured_media( $attributes, $content, $block ) 
 
 	$post_id   = $block->context['postId'];
 	$is_link   = ! empty( $attributes['isLink'] );
-	$target    = $is_link ? ( $attributes['linkTarget'] ?? '_self' ) : '';
+	$target    = $is_link
+		? ( in_array( $attributes['linkTarget'] ?? '_self', array( '_self', '_blank' ), true )
+			? $attributes['linkTarget']
+			: '_self' )
+		: '';
 	$rel       = $is_link ? ( $attributes['rel'] ?? '' ) : '';
 	$size_slug = $attributes['sizeSlug'] ?? 'post-thumbnail';
 	$controls  = $attributes['controls'] ?? true;
+
+	// Restrict object-fit to the CSS spec values. Unknown values fall through
+	// to "don't emit object-fit at all" rather than being injected raw.
+	$scale = isset( $attributes['scale'] ) && in_array(
+		$attributes['scale'],
+		array( 'cover', 'contain', 'fill', 'none', 'scale-down' ),
+		true
+	) ? $attributes['scale'] : '';
 
 	$extra_styles = '';
 	if ( ! empty( $attributes['aspectRatio'] ) ) {
 		$extra_styles .= 'width:100%;height:100%;';
 	} elseif ( ! empty( $attributes['height'] ) ) {
-		$extra_styles .= 'height:' . esc_attr( safecss_filter_attr( $attributes['height'] ) ) . ';';
+		$extra_styles .= esc_attr( safecss_filter_attr( 'height:' . $attributes['height'] ) ) . ';';
 	}
-	if ( ! empty( $attributes['scale'] ) && ( ! empty( $attributes['height'] ) || ! empty( $attributes['aspectRatio'] ) ) ) {
-		$extra_styles .= 'object-fit:' . esc_attr( $attributes['scale'] ) . ';';
+	if ( $scale && ( ! empty( $attributes['height'] ) || ! empty( $attributes['aspectRatio'] ) ) ) {
+		$extra_styles .= 'object-fit:' . $scale . ';';
 	}
 
 	$featured = function_exists( 'get_post_featured_media' )

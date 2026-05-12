@@ -266,4 +266,44 @@ class Tests_Blocks_Render_Post_Featured_Media extends WP_UnitTestCase {
 	public function test_get_post_featured_media_returns_null_when_unset() {
 		$this->assertNull( get_post_featured_media( self::$post_id ) );
 	}
+
+	public function test_invalid_link_target_falls_back_to_self() {
+		$this->set_featured_media( self::$video_id, 'video' );
+
+		$output = $this->render_block(
+			array(
+				'isLink'     => true,
+				'linkTarget' => 'javascript:alert(1)',
+			)
+		);
+
+		$this->assertStringContainsString( 'target="_self"', $output );
+		$this->assertStringNotContainsString( 'javascript', $output );
+	}
+
+	public function test_valid_scale_is_emitted() {
+		$this->set_featured_media( self::$video_id, 'video' );
+
+		$output = $this->render_block(
+			array(
+				'aspectRatio' => '16/9',
+				'scale'       => 'contain',
+			)
+		);
+
+		$this->assertStringContainsString( 'object-fit:contain', $output );
+	}
+
+	public function test_invalid_scale_is_dropped() {
+		$this->set_featured_media( self::$video_id, 'video' );
+
+		$output = $this->render_block(
+			array(
+				'aspectRatio' => '16/9',
+				'scale'       => 'url(evil)',
+			)
+		);
+
+		$this->assertStringNotContainsString( 'object-fit', $output );
+	}
 }
