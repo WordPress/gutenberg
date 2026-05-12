@@ -395,6 +395,7 @@ function ViewTable< Item >( {
 		getItemId,
 		getItemLevel,
 		getItemParentId,
+		selection,
 		view,
 	} );
 

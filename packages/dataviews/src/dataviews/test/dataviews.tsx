@@ -623,6 +623,38 @@ describe( 'DataViews component', () => {
 			).not.toBeInTheDocument();
 		} );
 
+		it( 'opens ancestor tree rows for selected items', async () => {
+			render(
+				<DataViewWrapper
+					data={ hierarchicalData }
+					selection={ [ '4' ] }
+					onChangeSelection={ jest.fn() }
+					view={ {
+						...DEFAULT_VIEW,
+						fields: [],
+						titleField: 'title',
+						showLevels: true,
+						layout: {
+							hierarchyStyle: 'tree',
+						},
+					} }
+					getItemParentId={ ( item ) => item.parent }
+				/>
+			);
+
+			await waitFor( () => {
+				expect( screen.getByText( 'Grandchild' ) ).toBeInTheDocument();
+			} );
+			expect(
+				screen.getByRole( 'button', { name: 'Collapse Parent' } )
+			).toHaveAttribute( 'aria-expanded', 'true' );
+			expect(
+				screen.getByRole( 'button', {
+					name: 'Collapse Second child',
+				} )
+			).toHaveAttribute( 'aria-expanded', 'true' );
+		} );
+
 		it( 'limits tree hierarchy rows to the current group', () => {
 			render(
 				<DataViewWrapper

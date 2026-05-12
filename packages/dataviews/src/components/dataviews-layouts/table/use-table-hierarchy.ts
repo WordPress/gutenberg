@@ -13,7 +13,7 @@ import {
  * Internal dependencies
  */
 import type { ViewTable } from '../../../types';
-import { getTreeRows, getVisibleTreeRows } from './tree-rows';
+import { getTreeRows, getVisibleTreeRows, type TreeRow } from './tree-rows';
 
 export interface TableRenderRow< Item > {
 	item: Item;
@@ -32,7 +32,36 @@ interface UseTableHierarchyProps< Item > {
 	 */
 	getItemLevel?: ( item: Item ) => number;
 	getItemParentId?: ( item: Item ) => string | number | null | undefined;
+	selection: string[];
 	view: ViewTable;
+}
+
+function getSelectedAncestorIds< Item >(
+	treeRows: TreeRow< Item >[],
+	selection: string[]
+) {
+	const ancestorItemIds = new Set< string >();
+	const rowById = new Map(
+		treeRows.map( ( treeRow ) => [ treeRow.id, treeRow ] )
+	);
+
+	for ( const selectedItemId of selection ) {
+		let treeRow = rowById.get( selectedItemId );
+		const visitedItemIds = new Set< string >();
+
+		while ( treeRow?.parentId && ! visitedItemIds.has( treeRow.id ) ) {
+			visitedItemIds.add( treeRow.id );
+			const parentRow = rowById.get( treeRow.parentId );
+			if ( ! parentRow ) {
+				break;
+			}
+
+			ancestorItemIds.add( parentRow.id );
+			treeRow = parentRow;
+		}
+	}
+
+	return ancestorItemIds;
 }
 
 export function useTableHierarchy< Item >( {
@@ -40,6 +69,7 @@ export function useTableHierarchy< Item >( {
 	getItemId,
 	getItemLevel,
 	getItemParentId,
+	selection,
 	view,
 }: UseTableHierarchyProps< Item > ) {
 	const isTreeHierarchy = !! (
@@ -61,24 +91,12 @@ export function useTableHierarchy< Item >( {
 	}, [ data, getItemId, getItemParentId, isTextHierarchy, isTreeHierarchy ] );
 
 	const [ expandedItemIds, setExpandedItemIds ] = useState< Set< string > >(
-		() => {
-			if ( ! isTreeHierarchy ) {
-				return new Set();
-			}
-
-			return new Set(
-				view.layout?.expandChildren
-					? treeRows
-							.filter( ( treeRow ) => treeRow.childCount )
-							.map( ( treeRow ) => treeRow.id )
-					: []
-			);
-		}
+		new Set()
 	);
 	const manuallyCollapsedItemIdsRef = useRef< Set< string > >( new Set() );
 
 	useEffect( () => {
-		if ( ! isTreeHierarchy || ! view.layout?.expandChildren ) {
+		if ( ! isTreeHierarchy ) {
 			return;
 		}
 
@@ -86,20 +104,34 @@ export function useTableHierarchy< Item >( {
 			const nextExpandedItemIds = new Set( previousExpandedItemIds );
 			let hasChanges = false;
 
-			for ( const treeRow of treeRows ) {
-				if (
-					treeRow.childCount &&
-					! nextExpandedItemIds.has( treeRow.id ) &&
-					! manuallyCollapsedItemIdsRef.current.has( treeRow.id )
-				) {
-					nextExpandedItemIds.add( treeRow.id );
+			if ( view.layout?.expandChildren ) {
+				for ( const treeRow of treeRows ) {
+					if (
+						treeRow.childCount &&
+						! manuallyCollapsedItemIdsRef.current.has(
+							treeRow.id
+						) &&
+						! nextExpandedItemIds.has( treeRow.id )
+					) {
+						nextExpandedItemIds.add( treeRow.id );
+						hasChanges = true;
+					}
+				}
+			}
+
+			for ( const ancestorItemId of getSelectedAncestorIds(
+				treeRows,
+				selection
+			) ) {
+				if ( ! nextExpandedItemIds.has( ancestorItemId ) ) {
+					nextExpandedItemIds.add( ancestorItemId );
 					hasChanges = true;
 				}
 			}
 
 			return hasChanges ? nextExpandedItemIds : previousExpandedItemIds;
 		} );
-	}, [ treeRows, isTreeHierarchy, view.layout?.expandChildren ] );
+	}, [ treeRows, isTreeHierarchy, selection, view.layout?.expandChildren ] );
 
 	const showHierarchyBadge =
 		isTreeHierarchy && view.layout?.showHierarchyBadge !== false;
