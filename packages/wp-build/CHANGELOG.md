@@ -5,6 +5,7 @@
 ### Bug Fixes
 
 -   Register generated CSS module styles with `@wordpress/style-runtime` so they can be injected into registered documents, such as editor iframes ([#77965](https://github.com/WordPress/gutenberg/pull/77965)).
+-   `page.php.template`: Route the import map print through Gutenberg's idempotent helper when available so it survives an early `<script type="module">` in `<head>` on Firefox 150 (which only honors a single import map). Falls back to the previous direct `wp_script_modules()->print_import_map()` call when Gutenberg is not active ([#78041](https://github.com/WordPress/gutenberg/issues/78041)).
 
 ## 0.13.0 (2026-04-29)
 
