@@ -1038,10 +1038,10 @@ export const ToolbarVariant: Story = {
 /**
  * `Popover.Positioner` exposes `--available-height` and `--available-width`
  * CSS variables representing the space between the anchor and the viewport
- * edge. Apply them as `max-height` / `max-width` via the `style` prop (which
- * targets the positioner) to constrain the popup size. Then add
- * `overflow: auto` on an inner wrapper so scrolling happens inside the popup
- * content area — this replaces the legacy Popover's `resize` prop.
+ * edge. These cascade down to `Popover.Popup`, where applying them as
+ * `max-height` / `max-width` via the `style` prop constrains the popup size.
+ * Then add `overflow: auto` on an inner wrapper so scrolling happens inside
+ * the popup content area — this replaces the legacy Popover's `resize` prop.
  *
  * Open the popover and resize or scroll the container to see the popup shrink
  * to fit.
