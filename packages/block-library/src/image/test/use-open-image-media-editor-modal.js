@@ -581,6 +581,54 @@ describe( 'useOpenImageMediaEditorModal', () => {
 		} );
 	} );
 
+	it( 'does not sync caption when it has never been set on the block and only alt text was changed', async () => {
+		const originalAttachment = {
+			id: 1,
+			alt_text: 'Original alt',
+			caption: { raw: 'Existing caption' },
+		};
+		const updatedAttachment = {
+			id: 1,
+			alt_text: 'Updated alt',
+			caption: { raw: 'Existing caption' },
+		};
+		const registry = createRegistry( {
+			getEntityRecord: () => originalAttachment,
+			resolveGetEntityRecord: () => updatedAttachment,
+		} );
+		useRegistry.mockReturnValue( registry );
+		const setAttributes = jest.fn();
+		const openMediaEditorModal = jest.fn();
+		useMediaEditorModalSetting( openMediaEditorModal );
+		const { result } = renderHook( () =>
+			useOpenImageMediaEditorModal( {
+				attributes: {
+					id: 1,
+					url: 'original.jpg',
+					alt: 'Original alt',
+					// Mimics the _RichTextData object set on a block whose
+					// caption has never been explicitly edited by the user.
+					caption: { toString: () => '' },
+				},
+				setAttributes,
+			} )
+		);
+
+		await act( async () => {
+			await result.current();
+		} );
+		await act( async () => {
+			await openMediaEditorModal.mock.calls[ 0 ][ 0 ].onUpdate( {
+				id: 1,
+				url: 'original.jpg',
+			} );
+		} );
+
+		expect( setAttributes ).toHaveBeenCalledWith( {
+			alt: 'Updated alt',
+		} );
+	} );
+
 	it( 'does not overwrite custom captions when the original attachment is not cached', async () => {
 		const updatedAttachment = {
 			id: 1,
