@@ -125,7 +125,7 @@ function FullscreenModeClose( { showTooltip, icon, href, initialPost } ) {
 
 	const buttonLabel = postType?.labels?.view_items ?? __( 'Back' );
 
-	const isAdminBarInEditorEnabled = window.__experimentalAdminBarInEditor;
+	const hasAdminBarInEditor = window.__experimentalAdminBarInEditor;
 
 	return (
 		<motion.div
@@ -144,7 +144,7 @@ function FullscreenModeClose( { showTooltip, icon, href, initialPost } ) {
 				showTooltip={ showTooltip }
 				tooltipPosition="bottom"
 			>
-				{ ! isAdminBarInEditorEnabled && (
+				{ ! hasAdminBarInEditor && (
 					<motion.div
 						variants={ ! disableMotion && siteIconVariants }
 					>
@@ -154,7 +154,7 @@ function FullscreenModeClose( { showTooltip, icon, href, initialPost } ) {
 					</motion.div>
 				) }
 			</Button>
-			{ isAdminBarInEditorEnabled ? (
+			{ hasAdminBarInEditor ? (
 				<div className="edit-post-fullscreen-mode-close__back-icon">
 					<Icon icon={ isRTL() ? chevronRight : chevronLeft } />
 				</div>

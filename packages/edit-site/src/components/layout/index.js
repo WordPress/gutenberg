@@ -54,10 +54,9 @@ function Layout() {
 	const { query, name: routeKey, areas, widths } = useLocation();
 	// Force canvas to 'view' on notfound route to show the error message and allow navigation.
 	const canvas = routeKey === 'notfound' ? 'view' : query?.canvas ?? 'view';
-	const isAdminBarInEditorEnabled = window.__experimentalAdminBarInEditor;
-	const showDesktopSiteHub = ! isAdminBarInEditorEnabled;
-	const showMobileSiteHub =
-		! isAdminBarInEditorEnabled || routeKey !== 'home';
+	const hasAdminBarInEditor = window.__experimentalAdminBarInEditor;
+	const showDesktopSiteHub = ! hasAdminBarInEditor;
+	const showMobileSiteHub = ! hasAdminBarInEditor || routeKey !== 'home';
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const toggleRef = useRef();
 	const navigateRegionsProps = useNavigateRegions();

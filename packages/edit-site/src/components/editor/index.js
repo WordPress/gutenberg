@@ -208,7 +208,7 @@ export default function EditSiteEditor( { isHomeRoute = false } ) {
 		duration: disableMotion ? 0 : 0.2,
 	};
 
-	const isAdminBarInEditorEnabled = window.__experimentalAdminBarInEditor;
+	const hasAdminBarInEditor = window.__experimentalAdminBarInEditor;
 
 	return ! isBlockBasedTheme && isHomeRoute ? (
 		<SitePreview />
@@ -276,7 +276,7 @@ export default function EditSiteEditor( { isHomeRoute = false } ) {
 												);
 											} }
 										>
-											{ ! isAdminBarInEditorEnabled && (
+											{ ! hasAdminBarInEditor && (
 												<motion.div
 													variants={
 														! disableMotion &&
@@ -287,7 +287,7 @@ export default function EditSiteEditor( { isHomeRoute = false } ) {
 												</motion.div>
 											) }
 										</Button>
-										{ isAdminBarInEditorEnabled ? (
+										{ hasAdminBarInEditor ? (
 											<div className="edit-site-editor__back-icon">
 												<Icon
 													icon={

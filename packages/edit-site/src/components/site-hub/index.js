@@ -117,7 +117,7 @@ export const SiteHubMobile = memo(
 		const { path } = useLocation();
 		const history = useHistory();
 		const { navigate } = useContext( SidebarNavigationContext );
-		const isAdminBarInEditorEnabled = window.__experimentalAdminBarInEditor;
+		const hasAdminBarInEditor = window.__experimentalAdminBarInEditor;
 
 		const {
 			dashboardLink,
@@ -200,7 +200,7 @@ export const SiteHubMobile = memo(
 							} }
 							{ ...backButtonProps }
 						>
-							{ isAdminBarInEditorEnabled ? (
+							{ hasAdminBarInEditor ? (
 								<Icon
 									icon={
 										isRTL() ? arrowUpRight : arrowUpLeft

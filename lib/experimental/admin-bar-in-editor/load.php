@@ -27,7 +27,7 @@ function gutenberg_is_admin_bar_in_editor_experiment_enabled() {
 }
 
 /**
- * Enqueues assets used by the admin bar in editor experiment.
+ * Enables the admin bar in editor experiment.
  */
 function gutenberg_enable_admin_bar_in_editor_experiment() {
 	if ( ! gutenberg_is_admin_bar_in_editor_experiment_enabled() ) {
@@ -39,28 +39,22 @@ function gutenberg_enable_admin_bar_in_editor_experiment() {
 		'window.__experimentalAdminBarInEditor = true',
 		'before'
 	);
-
-	$screen  = get_current_screen();
-	$version = defined( 'GUTENBERG_VERSION' ) && ! SCRIPT_DEBUG
-		? GUTENBERG_VERSION
-		: time();
-
-	if ( 'site-editor' === $screen->id ) {
-		$handle       = 'gutenberg-admin-bar-in-editor-edit-site';
-		$style_path   = 'lib/experimental/admin-bar-in-editor/edit-site.css';
-		$dependencies = array( 'wp-edit-site' );
-	} else {
-		$handle       = 'gutenberg-admin-bar-in-editor-edit-post';
-		$style_path   = 'lib/experimental/admin-bar-in-editor/edit-post.css';
-		$dependencies = array( 'wp-edit-post' );
-	}
-
-	wp_enqueue_style(
-		$handle,
-		gutenberg_url( $style_path ),
-		$dependencies,
-		$version
-	);
 }
 
 add_action( 'admin_enqueue_scripts', 'gutenberg_enable_admin_bar_in_editor_experiment' );
+
+/**
+ * Adds a body class when the admin bar in editor experiment is enabled.
+ *
+ * @param string $classes Space-separated list of admin body classes.
+ * @return string Filtered list of admin body classes.
+ */
+function gutenberg_admin_bar_in_editor_body_class( $classes ) {
+	if ( ! gutenberg_is_admin_bar_in_editor_experiment_enabled() ) {
+		return $classes;
+	}
+
+	return $classes . ' has-admin-bar-in-editor';
+}
+
+add_filter( 'admin_body_class', 'gutenberg_admin_bar_in_editor_body_class' );
