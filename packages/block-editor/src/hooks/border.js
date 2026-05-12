@@ -23,7 +23,6 @@ import {
 	cleanEmptyObject,
 	shouldSkipSerialization,
 	useBlockSettings,
-	buildStateResetAllFilter,
 } from './utils';
 import {
 	useHasBorderPanel,
@@ -31,7 +30,11 @@ import {
 	BorderPanel as StylesBorderPanel,
 } from '../components/global-styles';
 import { store as blockEditorStore } from '../store';
-import { useBlockStyle } from './use-block-style';
+import {
+	getStyleForState,
+	setStyleForState,
+	useBlockStyleState,
+} from './block-style-state';
 
 export const BORDER_SUPPORT_KEY = '__experimentalBorder';
 export const SHADOW_SUPPORT_KEY = 'shadow';
@@ -118,21 +121,9 @@ function attributesToStyle( attributes ) {
 	};
 }
 
-function BordersInspectorControl( {
-	label,
-	children,
-	resetAllFilter,
-	selectedState = 'default',
-} ) {
-	const isStateSelected = selectedState !== 'default';
+function BordersInspectorControl( { label, children, resetAllFilter } ) {
 	const attributesResetAllFilter = useCallback(
 		( attributes ) => {
-			if ( isStateSelected ) {
-				return buildStateResetAllFilter(
-					selectedState,
-					resetAllFilter
-				)( attributes );
-			}
 			const existingStyle = attributesToStyle( attributes );
 			const updatedStyle = resetAllFilter( existingStyle );
 			return {
@@ -140,7 +131,7 @@ function BordersInspectorControl( {
 				...styleToAttributes( updatedStyle ),
 			};
 		},
-		[ isStateSelected, selectedState, resetAllFilter ]
+		[ resetAllFilter ]
 	);
 
 	return (
@@ -154,55 +145,40 @@ function BordersInspectorControl( {
 	);
 }
 
-export function BorderPanel( {
-	clientId,
-	name,
-	setAttributes,
-	settings,
-	selectedState = 'default',
-} ) {
+export function BorderPanel( { clientId, name, setAttributes, settings } ) {
+	const selectedState = useBlockStyleState();
 	const isEnabled = useHasBorderPanel( settings );
-	const { borderColor } = useSelect(
+	const { style, borderColor } = useSelect(
 		( select ) => {
 			// Early return to avoid subscription when disabled
 			if ( ! isEnabled ) {
 				return {};
 			}
-			const { borderColor: _borderColor } =
+			const { style: _style, borderColor: _borderColor } =
 				select( blockEditorStore ).getBlockAttributes( clientId ) || {};
-			return { borderColor: _borderColor };
+			return { style: _style, borderColor: _borderColor };
 		},
 		[ clientId, isEnabled ]
 	);
 
-	const [ style, setStyle ] = useBlockStyle( null, selectedState );
 	const isStateSelected = selectedState !== 'default';
 
 	const value = useMemo( () => {
 		if ( isStateSelected ) {
-			return style;
+			return getStyleForState( style, selectedState );
 		}
 		return attributesToStyle( { style, borderColor } );
-	}, [ isStateSelected, style, borderColor ] );
+	}, [ isStateSelected, selectedState, style, borderColor ] );
 
 	const onChange = isStateSelected
-		? setStyle
+		? ( newStyle ) => {
+				setAttributes( {
+					style: setStyleForState( style, selectedState, newStyle ),
+				} );
+		  }
 		: ( newStyle ) => {
 				setAttributes( styleToAttributes( newStyle ) );
 		  };
-
-	const BorderWrapper = useMemo(
-		() =>
-			function BorderWrapperComponent( props ) {
-				return (
-					<BordersInspectorControl
-						{ ...props }
-						selectedState={ selectedState }
-					/>
-				);
-			},
-		[ selectedState ]
-	);
 
 	if ( ! isEnabled ) {
 		return null;
@@ -221,7 +197,7 @@ export function BorderPanel( {
 
 	return (
 		<StylesBorderPanel
-			as={ BorderWrapper }
+			as={ BordersInspectorControl }
 			panelId={ clientId }
 			settings={ settings }
 			value={ value }

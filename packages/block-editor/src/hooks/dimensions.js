@@ -6,14 +6,8 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import {
-	Platform,
-	useState,
-	useEffect,
-	useCallback,
-	useMemo,
-} from '@wordpress/element';
-import { useDispatch } from '@wordpress/data';
+import { Platform, useState, useEffect, useCallback } from '@wordpress/element';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { getBlockSupport } from '@wordpress/blocks';
 import deprecated from '@wordpress/deprecated';
 
@@ -28,8 +22,12 @@ import {
 import { MarginVisualizer, PaddingVisualizer } from './spacing-visualizer';
 import { store as blockEditorStore } from '../store';
 import { unlock } from '../lock-unlock';
-import { shouldSkipSerialization, buildStateResetAllFilter } from './utils';
-import { useBlockStyle } from './use-block-style';
+import { cleanEmptyObject, shouldSkipSerialization } from './utils';
+import {
+	getStyleForState,
+	setStyleForState,
+	useBlockStyleState,
+} from './block-style-state';
 
 export const DIMENSIONS_SUPPORT_KEY = 'dimensions';
 export const SPACING_SUPPORT_KEY = 'spacing';
@@ -52,20 +50,9 @@ function useVisualizer() {
 	return [ property, setProperty ];
 }
 
-function DimensionsInspectorControl( {
-	children,
-	resetAllFilter,
-	selectedState = 'default',
-} ) {
-	const isStateSelected = selectedState !== 'default';
+function DimensionsInspectorControl( { children, resetAllFilter } ) {
 	const attributesResetAllFilter = useCallback(
 		( attributes ) => {
-			if ( isStateSelected ) {
-				return buildStateResetAllFilter(
-					selectedState,
-					resetAllFilter
-				)( attributes );
-			}
 			const existingStyle = attributes.style;
 			const updatedStyle = resetAllFilter( existingStyle );
 			return {
@@ -73,7 +60,7 @@ function DimensionsInspectorControl( {
 				style: updatedStyle,
 			};
 		},
-		[ isStateSelected, selectedState, resetAllFilter ]
+		[ resetAllFilter ]
 	);
 
 	return (
@@ -86,29 +73,36 @@ function DimensionsInspectorControl( {
 	);
 }
 
-export function DimensionsPanel( {
-	clientId,
-	name,
-	settings,
-	selectedState = 'default',
-} ) {
+export function DimensionsPanel( { clientId, name, setAttributes, settings } ) {
+	const selectedState = useBlockStyleState();
 	const isEnabled = useHasDimensionsPanel( settings );
 	const isStateSelected = selectedState !== 'default';
-	const [ visualizedProperty, setVisualizedProperty ] = useVisualizer();
-	const [ value, onChange ] = useBlockStyle( null, selectedState );
-
-	const DimensionsWrapper = useMemo(
-		() =>
-			function DimensionsWrapperComponent( props ) {
-				return (
-					<DimensionsInspectorControl
-						{ ...props }
-						selectedState={ selectedState }
-					/>
-				);
-			},
-		[ selectedState ]
+	const style = useSelect(
+		( select ) => {
+			// Early return to avoid subscription when disabled
+			if ( ! isEnabled ) {
+				return undefined;
+			}
+			return select( blockEditorStore ).getBlockAttributes( clientId )
+				?.style;
+		},
+		[ clientId, isEnabled ]
 	);
+	const [ visualizedProperty, setVisualizedProperty ] = useVisualizer();
+	const value = isStateSelected
+		? getStyleForState( style, selectedState )
+		: style;
+	const onChange = isStateSelected
+		? ( newStyle ) => {
+				setAttributes( {
+					style: setStyleForState( style, selectedState, newStyle ),
+				} );
+		  }
+		: ( newStyle ) => {
+				setAttributes( {
+					style: cleanEmptyObject( newStyle ),
+				} );
+		  };
 
 	if ( ! isEnabled ) {
 		return null;
@@ -134,7 +128,7 @@ export function DimensionsPanel( {
 	return (
 		<>
 			<StylesDimensionsPanel
-				as={ DimensionsWrapper }
+				as={ DimensionsInspectorControl }
 				panelId={ clientId }
 				settings={ settings }
 				value={ value }
