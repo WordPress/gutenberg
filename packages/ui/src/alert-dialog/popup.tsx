@@ -8,7 +8,7 @@ import {
 	privateApis as themePrivateApis,
 } from '@wordpress/theme';
 
-import { renderPortalWithChildren } from '../utils/render-portal-with-children';
+import { renderSlotWithChildren } from '../utils/render-slot-with-children';
 import { Button } from '../button';
 import dialogStyles from '../dialog/style.module.css';
 import focusStyles from '../utils/css/focus.module.css';
@@ -178,7 +178,7 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >(
 			</>
 		);
 
-		return renderPortalWithChildren( portal, <Portal />, portalChildren );
+		return renderSlotWithChildren( portal, <Portal />, portalChildren );
 	}
 );
 

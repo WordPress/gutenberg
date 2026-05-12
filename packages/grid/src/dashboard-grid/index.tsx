@@ -36,12 +36,10 @@ import {
  * Internal dependencies
  */
 import { GridItem } from './grid-item';
+import { GridOverlay } from '../shared/grid-overlay';
 import { resolveFillWidths } from './resolve-fill-widths';
-import type {
-	DashboardGridLayoutItem,
-	DashboardGridProps,
-	ResizeDelta,
-} from './types';
+import type { DashboardGridLayoutItem, DashboardGridProps } from './types';
+import type { ResizeDelta } from '../shared/types';
 import styles from './grid.module.css';
 
 // Reorder is driven by `temporaryLayout` + CSS Grid, not by dnd-kit
@@ -57,7 +55,8 @@ const NO_SORT_STRATEGY = () => null;
  * widths, and multi-row tiles.
  *
  * Each child's `key` must match an entry in the `layout` array;
- * children without a match are rendered outside the grid.
+ * children without a match render at the end of the grid without
+ * explicit placement and fall through CSS Grid's auto-flow.
  *
  * @example
  * ```jsx
@@ -97,6 +96,8 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 			onChangeLayout,
 			onPreviewLayout,
 			renderResizeHandle,
+			renderDragPreview,
+			renderGridOverlay,
 			...divProps
 		} = props;
 		// Preview layout applied during drag/resize before committing.
@@ -453,6 +454,52 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 			onPreviewLayout?.( updatedLayout );
 		} );
 
+		// Drag-overlay clone composition: the surface always wraps with a
+		// thin functional frame (lift, cursor, pointer pass-through). When
+		// `renderDragPreview` is supplied, the consumer's wrapper sits
+		// inside the frame around the cloned children; otherwise the
+		// cloned children render directly so any persistent chrome on
+		// them carries through unchanged.
+		const activeClone = activeId ? childrenMap.get( activeId ) : null;
+		const DragPreview = renderDragPreview;
+		const dragOverlayContent =
+			activeId && activeClone ? (
+				<div className={ styles[ 'drag-preview-frame' ] }>
+					{ DragPreview ? (
+						<DragPreview itemId={ activeId }>
+							{ activeClone }
+						</DragPreview>
+					) : (
+						activeClone
+					) }
+				</div>
+			) : null;
+
+		// Edit-mode background visual. Default paints diagonal stripes
+		// and dashed track guides; a consumer can replace it via
+		// `renderGridOverlay` while reusing the resolved column count,
+		// gap, and row height. `'auto'` collapses to `undefined` for
+		// the overlay so it falls back to columns-only (row dividers
+		// have no anchor when the row height is content-driven).
+		// Rendered unconditionally so the overlay can cross-fade on
+		// edit-mode toggles; `isActive` drives the opacity transition
+		// inside the overlay. Memoized so drag/resize re-renders skip
+		// reconciliation while inputs are stable.
+		const Overlay = renderGridOverlay ?? GridOverlay;
+		const overlayRowHeight =
+			typeof rowHeight === 'number' ? rowHeight : undefined;
+		const gridOverlay = useMemo(
+			() => (
+				<Overlay
+					columns={ effectiveColumns }
+					gapPx={ gapPx }
+					rowHeight={ overlayRowHeight }
+					isActive={ editMode }
+				/>
+			),
+			[ Overlay, editMode, effectiveColumns, gapPx, overlayRowHeight ]
+		);
+
 		return (
 			<DndContext
 				sensors={ sensors }
@@ -479,6 +526,7 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 							gap: gapPx,
 						} }
 					>
+						{ gridOverlay }
 						{ items.map( ( id ) => (
 							<GridItem
 								key={ id }
@@ -502,13 +550,7 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 						{ remaining }
 					</div>
 				</SortableContext>
-				<DragOverlay>
-					{ activeId && childrenMap.get( activeId ) ? (
-						<div className={ styles[ 'drag-preview' ] }>
-							{ childrenMap.get( activeId ) }
-						</div>
-					) : null }
-				</DragOverlay>
+				<DragOverlay>{ dragOverlayContent }</DragOverlay>
 			</DndContext>
 		);
 	}

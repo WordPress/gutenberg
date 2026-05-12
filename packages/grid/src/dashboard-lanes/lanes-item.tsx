@@ -13,9 +13,10 @@ import { useMergeRefs } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import ResizeHandle from './resize-handle';
-import type { GridItemProps, ResizeDelta } from './types';
-import styles from './grid-item.module.css';
+import ResizeHandle from '../shared/resize-handle';
+import { LANES_DATA_KEY } from './use-lane-placement';
+import type { ResizeDelta, ResizeHandleRenderProps } from '../shared/types';
+import styles from './lanes-item.module.css';
 
 function getItemCursor(
 	disabled: boolean,
@@ -24,80 +25,102 @@ function getItemCursor(
 	if ( disabled ) {
 		return 'default';
 	}
-
 	if ( interacting ) {
 		return undefined;
 	}
-
 	return 'grab';
 }
 
-export function GridItem( {
-	item,
-	maxColumns,
+/**
+ * Props for the internal `<LanesItem />` wrapper.
+ */
+export type LanesItemProps = {
+	/**
+	 * Item key. Forwarded to dnd-kit and emitted as the
+	 * `data-lanes-key` attribute the hook reads to map measured DOM
+	 * nodes back to logical items.
+	 */
+	itemKey: string;
+
+	/**
+	 * Inline placement style produced by `useLanePlacement`. On native
+	 * (`display: grid-lanes`), only `gridColumn: span N`. While
+	 * polyfilling, also `gridColumnStart` / `gridRowStart` /
+	 * `gridRowEnd: span N`.
+	 */
+	placementStyle: React.CSSProperties;
+
+	/**
+	 * Whether drag and resize interactions are disabled.
+	 */
+	disabled?: boolean;
+
+	/**
+	 * Whether any tile in the surface is currently being dragged or
+	 * resized. Used to mute `actionableArea` content with `inert`.
+	 */
+	interacting?: boolean;
+
+	children: React.ReactNode;
+
+	actionableArea?: React.ReactNode;
+
+	onResize: ( id: string, delta: ResizeDelta ) => void;
+
+	onResizeEnd: () => void;
+
+	renderResizeHandle?: React.ComponentType< ResizeHandleRenderProps >;
+};
+
+export function LanesItem( {
+	itemKey,
+	placementStyle,
 	disabled = false,
-	verticalResizable = true,
 	interacting = false,
 	children,
 	actionableArea = null,
 	onResize,
 	onResizeEnd,
 	renderResizeHandle,
-}: GridItemProps ) {
+}: LanesItemProps ) {
 	const [ previewDelta, setPreviewDelta ] = useState< ResizeDelta | null >(
 		null
 	);
 	const itemRef = useRef< HTMLDivElement >( null );
-	// Tile bounding rect at the first resize frame. The cursor `delta`
-	// from the handle is anchored to the gesture start, but the
-	// overlay needs to track the cursor against the *current* tile
-	// edge — which has shifted whenever the width/height stepped a
-	// column/row. Re-anchor locally by subtracting the tile growth.
+	// See `grid-item.tsx` for the rationale behind these refs: the
+	// resize handle reports cursor delta against the gesture start, so
+	// the overlay must re-anchor to the live tile rect to track the
+	// cursor through column steps and auto-scroll.
 	const initialResizeRectRef = useRef< DOMRect | null >( null );
-	// Document scroll position at the start of a resize. The handle's
-	// `delta` is in document coordinates; `getBoundingClientRect` is
-	// in viewport coordinates. Auto-scroll near the viewport edge
-	// shifts both: the delta inflates by the scroll change, while the
-	// tile's viewport bottom drifts up by the same amount. Without a
-	// scroll reference, the preview overlay would carry that
-	// inflation forward and drift away from the tile's edge.
 	const initialResizeScrollRef = useRef< {
 		x: number;
 		y: number;
 	} | null >( null );
-	// Latest cursor delta from the resize handle. Reading this in a
-	// `useLayoutEffect` lets the overlay re-measure the tile rect
-	// *after* React commits a width step but before paint, so the
-	// frame that follows a column step never renders the overlay
-	// at the pre-step offset.
 	const lastResizeDeltaRef = useRef< ResizeDelta | null >( null );
-	const { attributes, listeners, setNodeRef, isDragging } = useSortable( {
-		id: item.key,
+
+	const {
+		attributes,
+		listeners,
+		setNodeRef,
+		setActivatorNodeRef,
+		isDragging,
+	} = useSortable( {
+		id: itemKey,
 		disabled,
 	} );
 	const mergedRef = useMergeRefs( [ itemRef, setNodeRef ] );
-	/*
-	 * With `<DragOverlay>` handling the cursor-following clone, the
-	 * sortable item stays put in its grid cell and acts as a
-	 * placeholder. No `transform` is applied here — applying one
-	 * would double-move the placeholder alongside the overlay.
-	 */
-	const style = {
-		gridColumnEnd: `span ${
-			item.width === 'full'
-				? maxColumns
-				: Math.min(
-						typeof item.width === 'number' ? item.width : 1,
-						maxColumns
-				  )
-		}`,
-		gridRowEnd: `span ${ item.height || 1 }`,
 
-		// Suppress the grab hint while any gesture is active so the
-		// inline `cursor` on the tile doesn't override the gesture's
-		// document-level cursor (e.g. the resize lock). Setting
-		// `undefined` leaves the property off the DOM.
-		cursor: getItemCursor( disabled, interacting ),
+	const style: React.CSSProperties = {
+		...placementStyle,
+		// Without this, the item is stretched to its grid track
+		// (4px when no row span has been computed yet) and
+		// `getBoundingClientRect` reports the track size, not the
+		// content size. The hook would then place every tile at row
+		// 1 and they would all overlap. `start` lets the item size
+		// to its content for measurement, and stays a no-op once
+		// the hook has applied an explicit `grid-row-end: span N`
+		// that already matches the content height.
+		alignSelf: 'start',
 	};
 
 	const itemClassName = clsx(
@@ -106,10 +129,8 @@ export function GridItem( {
 	);
 
 	const handleResize = ( delta: ResizeDelta ) => {
-		const clamped = {
-			width: delta.width,
-			height: verticalResizable ? delta.height : 0,
-		};
+		// Lanes are horizontal-only: height is driven by content.
+		const clamped = { width: delta.width, height: 0 };
 		const node = itemRef.current;
 		if ( node && ! initialResizeRectRef.current ) {
 			initialResizeRectRef.current = node.getBoundingClientRect();
@@ -120,13 +141,7 @@ export function GridItem( {
 			};
 		}
 		lastResizeDeltaRef.current = clamped;
-		onResize( item.key, clamped );
-		// Provisional preview against the pre-commit rect; the
-		// `useLayoutEffect` below refines it once React commits the
-		// new tile size so a column step never paints with the
-		// stale offset. Subtract the scroll change so the overlay
-		// tracks the cursor's viewport-space position rather than
-		// drifting with the document scroll under it.
+		onResize( itemKey, clamped );
 		if (
 			node &&
 			initialResizeRectRef.current &&
@@ -140,13 +155,9 @@ export function GridItem( {
 			};
 			const offsetX =
 				currentRect.right - initialResizeRectRef.current.right;
-			const offsetY =
-				currentRect.bottom - initialResizeRectRef.current.bottom;
 			setPreviewDelta( {
 				width: clamped.width - offsetX - scrollDelta.x,
-				height: verticalResizable
-					? clamped.height - offsetY - scrollDelta.y
-					: 0,
+				height: 0,
 			} );
 		}
 	};
@@ -166,22 +177,16 @@ export function GridItem( {
 			y: ownerWindow.scrollY - initialScroll.y,
 		};
 		const offsetX = currentRect.right - initialRect.right;
-		const offsetY = currentRect.bottom - initialRect.bottom;
 		const next = {
 			width: lastDelta.width - offsetX - scrollDelta.x,
-			height: verticalResizable
-				? lastDelta.height - offsetY - scrollDelta.y
-				: 0,
+			height: 0,
 		};
-		// Use the updater form so the effect doesn't need `previewDelta`
-		// in its deps. Returning `prev` when nothing changed lets React
-		// bail out without a re-render.
 		setPreviewDelta( ( prev ) =>
 			next.width === prev?.width && next.height === prev?.height
 				? prev
 				: next
 		);
-	}, [ item.width, item.height, verticalResizable ] );
+	}, [ placementStyle ] );
 
 	const handleResizeEnd = () => {
 		setPreviewDelta( null );
@@ -196,7 +201,7 @@ export function GridItem( {
 			className={ styles[ 'preview-overlay' ] }
 			style={ {
 				insetInlineEnd: -previewDelta.width,
-				bottom: -previewDelta.height,
+				bottom: 0,
 			} }
 		/>
 	) : null;
@@ -206,7 +211,7 @@ export function GridItem( {
 			ref={ mergedRef }
 			className={ itemClassName }
 			style={ style }
-			{ ...attributes }
+			{ ...{ [ LANES_DATA_KEY ]: itemKey } }
 		>
 			{ actionableArea ? (
 				<div
@@ -217,13 +222,31 @@ export function GridItem( {
 				</div>
 			) : null }
 
-			<div { ...listeners } style={ { height: '100%' } }>
+			<div
+				ref={ setActivatorNodeRef }
+				{ ...attributes }
+				{ ...listeners }
+				style={ {
+					height: '100%',
+					// Keyboard activation needs `attributes` (tabIndex)
+					// and `listeners` (onKeyDown) on the same focused
+					// node; `setActivatorNodeRef` points dnd-kit's
+					// keyboard sensor here, the outer keeps `setNodeRef`
+					// for measurement.
+					//
+					// Cursor lives on this wrapper so `actionableArea`
+					// children (mounted outside it) keep their own;
+					// `undefined` during a gesture defers to the resize
+					// handle's document cursor lock.
+					cursor: getItemCursor( disabled, interacting ),
+				} }
+			>
 				<div className={ styles[ 'item-content' ] }>
 					{ children }
 					{ ! disabled && (
 						<ResizeHandle
-							itemId={ item.key }
-							verticalResizable={ verticalResizable }
+							itemId={ itemKey }
+							verticalResizable={ false }
 							onResize={ handleResize }
 							onResizeEnd={ handleResizeEnd }
 							renderResizeHandle={ renderResizeHandle }

@@ -141,6 +141,14 @@ export default {
 		'0 1px 2px 0 #0000000d, 0 2px 3px 0 #0000000a, 0 6px 6px 0 #00000008, 0 8px 8px 0 #00000005',
 	'--wpds-elevation-xs':
 		'0 1px 1px 0 #00000008, 0 1px 2px 0 #00000005, 0 3px 3px 0 #00000005, 0 4px 4px 0 #00000003',
+	'--wpds-motion-duration-lg': '300ms',
+	'--wpds-motion-duration-md': '200ms',
+	'--wpds-motion-duration-sm': '100ms',
+	'--wpds-motion-duration-xl': '400ms',
+	'--wpds-motion-duration-xs': '50ms',
+	'--wpds-motion-easing-balanced': 'cubic-bezier(0.4, 0, 0.2, 1)',
+	'--wpds-motion-easing-expressive': 'cubic-bezier(0.25, 0, 0, 1)',
+	'--wpds-motion-easing-subtle': 'cubic-bezier(0.15, 0, 0.15, 1)',
 	'--wpds-typography-font-family-body':
 		'-apple-system, system-ui, "Segoe UI", "Roboto", "Oxygen-Sans", "Ubuntu", "Cantarell", "Helvetica Neue", sans-serif',
 	'--wpds-typography-font-family-heading':
