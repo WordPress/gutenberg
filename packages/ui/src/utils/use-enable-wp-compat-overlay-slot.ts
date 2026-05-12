@@ -22,11 +22,14 @@
  * the same component.
  *
  * Timing: the opt-in is applied during the calling component's render so
- * that descendants in the same render pass — Tooltip's `Portal`, etc. —
- * synchronously read it through `getWpCompatOverlaySlot()` and pick up
- * the slot on first mount. The set is a single boolean assignment to a
- * cross-instance shared store; it is idempotent and safe to repeat,
- * including under React.StrictMode's double-render.
+ * that descendants of the hook caller in the same render pass — Tooltip's
+ * `Portal`, etc. — read it through `getWpCompatOverlaySlot()` and pick up
+ * the slot on first mount. Siblings rendered *before* the hook caller in
+ * the same pass won't see the flag until their next render — call the
+ * hook from a top-level component so every consumer is a descendant. The
+ * set is a single boolean assignment to a cross-instance shared store; it
+ * is idempotent and safe to repeat, including under React.StrictMode's
+ * double-render.
  */
 export function useEnableWpCompatOverlaySlot(): void {
 	if ( typeof window === 'undefined' ) {
@@ -43,10 +46,14 @@ export function useEnableWpCompatOverlaySlot(): void {
 	// time descendants that resolve the gate during render (Tooltip's
 	// `Portal` reads `getWpCompatOverlaySlot()` on every render to pick
 	// its container) have already seen the slot disabled and rendered
-	// against Base UI's default container. A pure idempotent boolean
-	// write is the kind of side effect render is allowed to emit:
-	// repeated calls (re-renders, StrictMode double-renders, multiple
-	// hook callers) all collapse to the same final state.
+	// against Base UI's default container. Render-phase visibility
+	// extends only to components rendered *after* this hook in the same
+	// pass — i.e. descendants of the caller. The "call from a top-level
+	// component" guidance in the JSDoc keeps that invariant trivially
+	// satisfied. A pure idempotent boolean write is the kind of side
+	// effect render is allowed to emit: repeated calls (re-renders,
+	// StrictMode double-renders, multiple hook callers) all collapse to
+	// the same final state.
 	const internalWindow = window as {
 		__wpUiCompatOverlaySlotEnabled?: boolean;
 	};
