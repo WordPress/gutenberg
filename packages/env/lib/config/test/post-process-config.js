@@ -348,6 +348,246 @@ describe( 'postProcessConfig', () => {
 		} );
 	} );
 
+	describe( 'port resolver routing (autoPortMode + defaultOriginPorts)', () => {
+		it( 'threads autoPortMode and defaultOriginPorts to resolveConfigPorts', async () => {
+			// Mock the resolver to return distinct fallback ports so the
+			// post-processed config does not trip validatePortUniqueness.
+			const portResolver = {
+				resolve: jest
+					.fn()
+					.mockResolvedValueOnce( 8890 )
+					.mockResolvedValueOnce( 8891 ),
+			};
+
+			const processed = await postProcessConfig(
+				{
+					env: {
+						development: {
+							port: 8888,
+							config: {
+								WP_HOME: 'http://localhost',
+								WP_SITEURL: 'http://localhost',
+							},
+						},
+						tests: {
+							port: 8889,
+							config: {
+								WP_HOME: 'http://localhost',
+								WP_SITEURL: 'http://localhost',
+							},
+						},
+					},
+				},
+				{
+					portResolver,
+					autoPortMode: 'defaults-only',
+					defaultOriginPorts: new Set( [
+						'development.port',
+						'tests.port',
+					] ),
+				}
+			);
+
+			expect( portResolver.resolve ).toHaveBeenCalledWith(
+				8888,
+				'env.development.port',
+				false
+			);
+			expect( portResolver.resolve ).toHaveBeenCalledWith(
+				8889,
+				'env.tests.port',
+				false
+			);
+			// Resolved port flows into the merged env config and into
+			// appendPortToWPConfigs's WP_HOME / WP_SITEURL outputs.
+			expect( processed.env.development.port ).toEqual( 8890 );
+			expect( processed.env.development.config.WP_HOME ).toEqual(
+				'http://localhost:8890'
+			);
+			expect( processed.env.development.config.WP_SITEURL ).toEqual(
+				'http://localhost:8890'
+			);
+			expect( processed.env.tests.port ).toEqual( 8891 );
+			expect( processed.env.tests.config.WP_HOME ).toEqual(
+				'http://localhost:8891'
+			);
+		} );
+
+		it( 'with autoPortMode=defaults-only routes user-set port to strict and default-origin port to non-strict', async () => {
+			const portResolver = {
+				resolve: jest
+					.fn()
+					.mockImplementation( ( preferred ) =>
+						Promise.resolve( preferred )
+					),
+			};
+
+			await postProcessConfig(
+				{
+					env: {
+						development: { port: 8888 },
+						tests: { port: 9001 },
+					},
+				},
+				{
+					portResolver,
+					autoPortMode: 'defaults-only',
+					defaultOriginPorts: new Set( [ 'development.port' ] ),
+				}
+			);
+
+			// development.port is default-origin → non-strict (false).
+			expect( portResolver.resolve ).toHaveBeenCalledWith(
+				8888,
+				'env.development.port',
+				false
+			);
+			// tests.port is user-set → strict (true).
+			expect( portResolver.resolve ).toHaveBeenCalledWith(
+				9001,
+				'env.tests.port',
+				true
+			);
+		} );
+
+		it( 'with autoPortMode=defaults-only skips phpmyadminPort entirely (B3 regression guard)', async () => {
+			const portResolver = {
+				resolve: jest
+					.fn()
+					.mockImplementation( ( preferred ) =>
+						Promise.resolve( preferred )
+					),
+			};
+
+			await postProcessConfig(
+				{
+					env: {
+						development: {
+							port: 8888,
+							phpmyadminPort: 8080,
+						},
+						tests: {
+							port: 8889,
+						},
+					},
+				},
+				{
+					portResolver,
+					autoPortMode: 'defaults-only',
+					defaultOriginPorts: new Set( [
+						'development.port',
+						'tests.port',
+					] ),
+				}
+			);
+
+			// Resolver was called for HTTP ports.
+			expect( portResolver.resolve ).toHaveBeenCalledWith(
+				8888,
+				'env.development.port',
+				false
+			);
+			expect( portResolver.resolve ).toHaveBeenCalledWith(
+				8889,
+				'env.tests.port',
+				false
+			);
+			// Resolver was NEVER called for phpmyadminPort under
+			// defaults-only mode (preserving today's behavior verbatim
+			// where phpmyadminPort is only auto-resolved under --auto-port).
+			const phpmyadminCalls = portResolver.resolve.mock.calls.filter(
+				( call ) => call[ 1 ].includes( 'phpmyadminPort' )
+			);
+			expect( phpmyadminCalls ).toHaveLength( 0 );
+		} );
+
+		it( 'with autoPortMode=all routes both http ports AND phpmyadminPort non-strict (preserves PR #74472 behavior)', async () => {
+			const portResolver = {
+				resolve: jest
+					.fn()
+					.mockImplementation( ( preferred ) =>
+						Promise.resolve( preferred )
+					),
+			};
+
+			await postProcessConfig(
+				{
+					env: {
+						development: {
+							port: 8888,
+							phpmyadminPort: 8080,
+						},
+						tests: { port: 8889 },
+					},
+				},
+				{
+					portResolver,
+					autoPortMode: 'all',
+					defaultOriginPorts: new Set(),
+				}
+			);
+
+			// All three ports get the non-strict (false) third argument.
+			expect( portResolver.resolve ).toHaveBeenCalledWith(
+				8888,
+				'env.development.port',
+				false
+			);
+			expect( portResolver.resolve ).toHaveBeenCalledWith(
+				8889,
+				'env.tests.port',
+				false
+			);
+			expect( portResolver.resolve ).toHaveBeenCalledWith(
+				8080,
+				'env.development.phpmyadminPort',
+				false
+			);
+		} );
+
+		it( 'defaults to autoPortMode=off and routes ports strict (back-compat for callers that do not pass options)', async () => {
+			const portResolver = {
+				resolve: jest
+					.fn()
+					.mockImplementation( ( preferred ) =>
+						Promise.resolve( preferred )
+					),
+			};
+
+			await postProcessConfig(
+				{
+					env: {
+						development: {
+							port: 8888,
+							phpmyadminPort: 8080,
+						},
+						tests: { port: 8889 },
+					},
+				},
+				{ portResolver }
+			);
+
+			// All ports get strict=true under the default 'off' mode.
+			// Note that 'off' does NOT skip phpmyadminPort — only
+			// 'defaults-only' does (the skip rule is mode-specific).
+			expect( portResolver.resolve ).toHaveBeenCalledWith(
+				8888,
+				'env.development.port',
+				true
+			);
+			expect( portResolver.resolve ).toHaveBeenCalledWith(
+				8889,
+				'env.tests.port',
+				true
+			);
+			expect( portResolver.resolve ).toHaveBeenCalledWith(
+				8080,
+				'env.development.phpmyadminPort',
+				true
+			);
+		} );
+	} );
+
 	describe( 'testsEnvironment', () => {
 		it( 'should ignore env overrides entirely when testsEnvironment is false', async () => {
 			const processed = await postProcessConfig( {

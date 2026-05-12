@@ -15,15 +15,17 @@ const { resolveConfigPorts } = require( '../resolve-available-ports' );
 /**
  * Performs any additional post-processing on the config object.
  *
- * @param {WPEnvironmentConfig} config               The config to process.
- * @param {Object}              options              Options for post-processing.
- * @param {Object}              options.portResolver An optional port resolver for automatic port selection.
+ * @param {WPEnvironmentConfig}         config                     The config to process.
+ * @param {Object}                      options                    Options for post-processing.
+ * @param {Object}                      options.portResolver       An optional port resolver for automatic port selection.
+ * @param {'off'|'all'|'defaults-only'} options.autoPortMode       The auto-port routing mode. `'off'` disables fallback (strict); `'all'` enables fallback for every port (today's PR #74472 behavior); `'defaults-only'` enables fallback only on default-origin HTTP ports (the new default behavior). Defaults to `'off'` so existing call sites that do not opt in keep their current behavior.
+ * @param {Set<string>}                 options.defaultOriginPorts The set of port keys (e.g. `'development.port'`, `'tests.port'`) whose effective value comes from the default config rather than any user-supplied source. Used by `'defaults-only'` mode to decide which ports may auto-fall-back. Defaults to an empty set.
  *
  * @return {Promise<WPEnvironmentConfig>} The config after post-processing.
  */
 module.exports = async function postProcessConfig(
 	config,
-	{ portResolver } = {}
+	{ portResolver, autoPortMode = 'off', defaultOriginPorts = new Set() } = {}
 ) {
 	// Make sure that we're operating on a config object that has
 	// complete environment configs for convenience.
@@ -33,7 +35,10 @@ module.exports = async function postProcessConfig(
 	// but before appending ports to URLs. This way appendPortToWPConfigs
 	// uses the resolved ports and we don't need to fix URLs afterward.
 	if ( portResolver ) {
-		config = await resolveConfigPorts( config, portResolver );
+		config = await resolveConfigPorts( config, portResolver, {
+			autoPortMode,
+			defaultOriginPorts,
+		} );
 	}
 
 	config = appendPortToWPConfigs( config );

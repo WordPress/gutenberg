@@ -77,6 +77,18 @@ function createPortResolver( spinner ) {
 					exclude: usedPorts,
 				} );
 
+				// Inform the user via the existing spinner channel when the
+				// preferred port was busy and we fell back to a different
+				// one. Reuses the same spinner instance the resolver already
+				// holds — introducing a separate logger or stream would be
+				// a regression detected by the test suite (AC7).
+				if ( spinner && resolvedPort !== preferredPort ) {
+					spinner.info(
+						`Port ${ preferredPort } (${ configPath }) was busy; using ${ resolvedPort } instead.`
+					);
+					spinner.start();
+				}
+
 				usedPorts.push( resolvedPort );
 
 				return resolvedPort;
@@ -93,17 +105,32 @@ function createPortResolver( spinner ) {
  * Resolves available ports on a config object. Iterates over the
  * defined port properties and resolves each one that has a value.
  *
- * @param {Object} config       The config object (after mergeRootToEnvironments).
- * @param {Object} portResolver A port resolver created by `createPortResolver`.
+ * @param {Object}                      config                       The config object (after mergeRootToEnvironments).
+ * @param {Object}                      portResolver                 A port resolver created by `createPortResolver`.
+ * @param {Object}                      [options]                    Routing options.
+ * @param {'off'|'all'|'defaults-only'} [options.autoPortMode]       The auto-port routing mode. `'off'` forces strict per-port (production never reaches this branch because the resolver itself is not created in `'off'` mode). `'all'` mirrors today's `--auto-port` behavior — every port (including phpmyadminPort) auto-falls-back. `'defaults-only'` only auto-falls-back HTTP ports whose value originated from the default config; user-set HTTP ports stay strict, and `phpmyadminPort` is skipped entirely (preserving today's behavior verbatim — phpmyadminPort is only resolved when the user explicitly opts in via `--auto-port`).
+ * @param {Set<string>}                 [options.defaultOriginPorts] The set of port keys (e.g. `'development.port'`, `'tests.port'`) whose effective value comes from the default config rather than any user-supplied source. Used by `'defaults-only'` mode.
  * @return {Promise<Object>} The config with resolved ports.
  */
-async function resolveConfigPorts( config, portResolver ) {
+async function resolveConfigPorts(
+	config,
+	portResolver,
+	{ autoPortMode = 'off', defaultOriginPorts = new Set() } = {}
+) {
 	for ( const { env, property } of PORT_DEFINITIONS ) {
 		const currentValue = config.env[ env ][ property ];
 
 		// Skip unconfigured ports (phpmyadminPort defaults to null
 		// and should stay null when not explicitly set).
 		if ( currentValue === undefined ) {
+			continue;
+		}
+
+		// Per-port skip rule. Under `defaults-only` mode we deliberately
+		// do not resolve `phpmyadminPort` at all so its behavior is
+		// identical to today's: it is only auto-resolved when the user
+		// has explicitly opted in via `--auto-port` (the `'all'` mode).
+		if ( autoPortMode === 'defaults-only' && property !== 'port' ) {
 			continue;
 		}
 
@@ -117,12 +144,31 @@ async function resolveConfigPorts( config, portResolver ) {
 			continue;
 		}
 
-		// When --auto-port is active (the only time this runs),
-		// always auto-fallback to an available port.
+		// Decide whether this port participates in auto-fallback.
+		// - `'off'`  → strict (defensive; the resolver is normally not
+		//   created in this mode, so this branch is reachable only when
+		//   the function is unit-tested directly).
+		// - `'all'`  → non-strict for every port. Preserves today's
+		//   `--auto-port` behavior, including the phpmyadminPort path.
+		// - `'defaults-only'` → non-strict only for HTTP ports whose value
+		//   came from `DEFAULT_ENVIRONMENT_CONFIG`. User-set HTTP ports
+		//   stay strict so the existing port-busy error surfaces.
+		let strict;
+		if ( autoPortMode === 'off' ) {
+			strict = true;
+		} else if ( autoPortMode === 'all' ) {
+			strict = false;
+		} else {
+			// 'defaults-only' — only `property === 'port'` reaches here
+			// because of the skip rule above.
+			strict = ! defaultOriginPorts.has( key );
+		}
+
 		const configPath = `env.${ key }`;
 		config.env[ env ][ property ] = await portResolver.resolve(
 			preferredPort,
-			configPath
+			configPath,
+			strict
 		);
 	}
 

@@ -21,16 +21,16 @@ const { getRuntime, getSavedRuntime, saveRuntime } = require( '../runtime' );
 /**
  * Starts the development server.
  *
- * @param {Object}      options
- * @param {Object}      options.spinner  A CLI spinner which indicates progress.
- * @param {boolean}     options.update   If true, update sources.
- * @param {string}      options.xdebug   The Xdebug mode to set.
- * @param {string}      options.spx      The SPX mode to set.
- * @param {boolean}     options.scripts  Indicates whether or not lifecycle scripts should be executed.
- * @param {boolean}     options.debug    True if debug mode is enabled.
- * @param {string}      options.runtime  The runtime to use ('docker' or 'playground').
- * @param {boolean}     options.autoPort If true, automatically find available ports when configured ports are busy.
- * @param {string|null} options.config   Path to a custom .wp-env.json configuration file.
+ * @param {Object}            options
+ * @param {Object}            options.spinner  A CLI spinner which indicates progress.
+ * @param {boolean}           options.update   If true, update sources.
+ * @param {string}            options.xdebug   The Xdebug mode to set.
+ * @param {string}            options.spx      The SPX mode to set.
+ * @param {boolean}           options.scripts  Indicates whether or not lifecycle scripts should be executed.
+ * @param {boolean}           options.debug    True if debug mode is enabled.
+ * @param {string}            options.runtime  The runtime to use ('docker' or 'playground').
+ * @param {boolean|undefined} options.autoPort Tri-state: `true` enables automatic port fallback for every port (including user-set ones); `false` disables fallback even on default ports; `undefined` (the typical case — flag not supplied) defers to `.wp-env.json`'s `autoPort` field, where unset/`null` means "auto-fallback only on default ports `8888`/`8889`".
+ * @param {string|null}       options.config   Path to a custom .wp-env.json configuration file.
  */
 module.exports = async function start( {
 	spinner,
