@@ -4,6 +4,70 @@ import { createRef } from '@wordpress/element';
 import * as Select from '../index';
 
 describe( 'Select', () => {
+	it( 'supports object item values', async () => {
+		const user = userEvent.setup();
+		const onValueChange = jest.fn();
+		const users = [
+			{ value: '1', label: 'User 1' },
+			{ value: '2', label: 'User 2' },
+		];
+
+		render(
+			<Select.Root
+				defaultValue={ users[ 0 ] }
+				items={ users }
+				onValueChange={ onValueChange }
+			>
+				<Select.Trigger>{ ( value ) => value?.label }</Select.Trigger>
+				<Select.Popup>
+					{ users.map( ( option ) => (
+						<Select.Item key={ option.value } value={ option }>
+							{ option.label }
+						</Select.Item>
+					) ) }
+				</Select.Popup>
+			</Select.Root>
+		);
+
+		const trigger = screen.getByRole( 'combobox' );
+
+		expect( trigger ).toHaveTextContent( 'User 1' );
+
+		await user.click( trigger );
+		await user.click(
+			await screen.findByRole( 'option', { name: 'User 2' } )
+		);
+
+		expect( trigger ).toHaveTextContent( 'User 2' );
+		expect( onValueChange ).toHaveBeenCalledTimes( 1 );
+		expect( onValueChange ).toHaveBeenLastCalledWith(
+			users[ 1 ],
+			expect.objectContaining( { reason: expect.any( String ) } )
+		);
+	} );
+
+	it( 'auto-resolves trigger label from items when value is an object', () => {
+		const users = [
+			{ value: '1', label: 'User 1' },
+			{ value: '2', label: 'User 2' },
+		];
+
+		render(
+			<Select.Root defaultValue={ users[ 0 ] } items={ users }>
+				<Select.Trigger />
+				<Select.Popup>
+					{ users.map( ( option ) => (
+						<Select.Item key={ option.value } value={ option }>
+							{ option.label }
+						</Select.Item>
+					) ) }
+				</Select.Popup>
+			</Select.Root>
+		);
+
+		expect( screen.getByRole( 'combobox' ) ).toHaveTextContent( 'User 1' );
+	} );
+
 	it( 'renders a default placeholder when no value is selected', () => {
 		render(
 			<Select.Root>
@@ -66,8 +130,10 @@ describe( 'Select', () => {
 			<Select.Root>
 				<Select.Trigger ref={ triggerRef } />
 				<Select.Popup ref={ popupRef }>
-					<Select.Item ref={ itemRef } value="Item 1" />
-					<Select.Item value="Item 2" />
+					<Select.Item ref={ itemRef } value="Item 1">
+						Item 1
+					</Select.Item>
+					<Select.Item value="Item 2">Item 2</Select.Item>
 				</Select.Popup>
 			</Select.Root>
 		);
@@ -101,7 +167,7 @@ describe( 'Select', () => {
 								<Select.Portal container={ containerRef } />
 							}
 						>
-							<Select.Item value="Item 1" />
+							<Select.Item value="Item 1">Item 1</Select.Item>
 						</Select.Popup>
 					</Select.Root>
 				</div>
@@ -127,7 +193,7 @@ describe( 'Select', () => {
 					<Select.Root>
 						<Select.Trigger />
 						<Select.Popup>
-							<Select.Item value="Item 1" />
+							<Select.Item value="Item 1">Item 1</Select.Item>
 						</Select.Popup>
 					</Select.Root>
 				</div>

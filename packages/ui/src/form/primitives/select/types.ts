@@ -7,8 +7,8 @@ import type { InputLayoutProps } from '../input-layout/types';
 export type PortalProps = ComponentPropsWithoutRef< typeof _Select.Portal >;
 
 // The second type parameter is the `multiple` flag (currently disabled).
-export type SelectRootProps = Omit<
-	_Select.Root.Props< string, false >,
+export type SelectRootProps< Value = unknown > = Omit<
+	_Select.Root.Props< Value, false >,
 	'multiple'
 >;
 
@@ -63,7 +63,7 @@ export type SelectItemProps = Omit<
 	/**
 	 * A unique value that identifies this select item.
 	 */
-	value?: string | null;
+	value?: unknown;
 	/**
 	 * The size of the item.
 	 *
@@ -72,8 +72,6 @@ export type SelectItemProps = Omit<
 	size?: InputLayoutProps[ 'size' ];
 	/**
 	 * The content of the item.
-	 *
-	 * @default `value`
 	 */
 	children?: _Select.Item.Props[ 'children' ];
 };

@@ -1,0 +1,25 @@
+.grid {
+	display: grid;
+}
+
+/*
+ * Functional frame for the drag-preview clone inside `<DragOverlay>`.
+ * Always applied, including when the consumer passes a
+ * `renderDragPreview` wrapper. Owns the lift cue (`scale`), the
+ * pointer feedback (`cursor`), and the pointer pass-through during
+ * the gesture. Visual chrome (shadow, radius, padding) belongs to
+ * the consumer, either on the children passed to <DashboardGrid />
+ * or via `renderDragPreview`.
+ */
+.drag-preview-frame {
+	height: 100%;
+	transform: scale(var(--wp-grid-drag-preview-scale, 1.05));
+	cursor: grabbing;
+	pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.drag-preview-frame {
+		transform: none;
+	}
+}
