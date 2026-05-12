@@ -122,6 +122,24 @@ The `resolvers` option should be passed as an object where each key is the name 
 
 Resolvers, in combination with [thunks](https://github.com/WordPress/gutenberg/blob/trunk/docs/how-to-guides/thunks.md#thunks-can-be-async), can be used to implement asynchronous data flows for your store.
 
+##### Object-form resolvers and `isFulfilled`
+
+A resolver can be defined as an object with a `fulfill` method and an optional `isFulfilled` method:
+
+```js
+resolvers: {
+	getPage: {
+		fulfill: ( id ) => async ( { dispatch } ) => {
+			const data = await fetchPage( id );
+			dispatch( { type: 'RECEIVE_PAGE', id, data } );
+		},
+		isFulfilled: ( state, id ) => !! state.pages[ id ],
+	},
+},
+```
+
+The `isFulfilled( state, ...args )` method lets you override the `hasFinishedResolution` meta selector for a given set of args. Normally, a resolver is skipped only when the resolution metadata records that it has already run for those args. With `isFulfilled`, you can look at the actual store state and decide that the data is already there — for example because it was loaded by a different resolver or preloaded server-side. When `isFulfilled` returns `true`, the `fulfill` method is not called and no resolution metadata is written.
+
 #### `controls` (deprecated)
 
 To handle asynchronous data flows, it is recommended to use [thunks](https://github.com/WordPress/gutenberg/blob/trunk/docs/how-to-guides/thunks.md#thunks-can-be-async) instead of `controls`.
