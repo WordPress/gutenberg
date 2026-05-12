@@ -24,7 +24,7 @@ permissions: {}
 
 jobs:
     check:
-        name: 'Check CHANGELOG diff (${{ matrix.package }})'
+        name: Check CHANGELOG diff (${{ matrix.package }})
         runs-on: 'ubuntu-24.04'
         permissions:
             contents: read
