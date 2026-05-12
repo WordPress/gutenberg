@@ -181,6 +181,10 @@
 	tbody {
 		td {
 			vertical-align: top;
+
+			&.dataviews-view-table__hierarchy-column {
+				padding-right: $grid-unit-05;
+			}
 		}
 		.dataviews-view-table__cell-content-wrapper {
 			min-height: $grid-unit-40;
@@ -206,7 +210,7 @@
 		.dataviews-view-table__hierarchy-cell,
 		.dataviews-view-table__checkbox-column > .dataviews-view-table__cell-content-wrapper,
 		.dataviews-view-table__primary-column {
-			transform: translateX(calc(var(--wp-dataviews-table-hierarchy-level, 0) * #{$grid-unit-30}));
+			transform: translateX(calc(var(--wp-dataviews-table-hierarchy-level, 0) * 36px));
 		}
 
 		.components-v-stack > .dataviews-view-table__cell-content-wrapper:not(:first-child) {
