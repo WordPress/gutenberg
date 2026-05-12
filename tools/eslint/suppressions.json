@@ -1483,12 +1483,17 @@
 			"count": 1
 		}
 	},
-	"packages/grid/src/grid.tsx": {
+	"packages/grid/src/dashboard-grid/index.tsx": {
 		"react-hooks/refs": {
 			"count": 13
 		}
 	},
-	"packages/grid/src/resize-handle.tsx": {
+	"packages/grid/src/dashboard-lanes/index.tsx": {
+		"react-hooks/refs": {
+			"count": 13
+		}
+	},
+	"packages/grid/src/shared/resize-handle.tsx": {
 		"react-hooks/immutability": {
 			"count": 1
 		}
@@ -1696,6 +1701,11 @@
 			"count": 1
 		},
 		"@wordpress/use-recommended-components": {
+			"count": 1
+		}
+	},
+	"routes/media-editor/stage.tsx": {
+		"@wordpress/no-non-module-stylesheet-imports": {
 			"count": 1
 		}
 	},

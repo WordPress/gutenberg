@@ -15,6 +15,7 @@ import activateAction from './actions/activate';
 import deactivateAction from './actions/deactivate';
 import deletePostTypeAction from './actions/delete';
 import duplicatePostTypeAction from './actions/duplicate';
+import viewPostsAction from './actions/view-posts';
 import {
 	hasArchiveField,
 	hierarchicalField,
@@ -52,6 +53,7 @@ export function PostTypesList() {
 			editAction,
 			quickEditPostTypeAction,
 			duplicatePostTypeAction,
+			viewPostsAction,
 			activateAction,
 			deactivateAction,
 			deletePostTypeAction,

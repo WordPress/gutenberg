@@ -16,7 +16,8 @@ import { Stack, Text } from '@wordpress/ui';
  */
 import type { TaxonomyFormData } from '../types';
 import type { CoreDataError } from '../../types';
-import { TAXONOMY_ENTITY } from '../../constants';
+import { useMaybeInvalidateContentTypeCache } from '../../utils/use-maybe-invalidate-content-type-cache';
+import { POST_TYPE_ENTITY, TAXONOMY_ENTITY } from '../../constants';
 
 function DeleteTaxonomyModal( {
 	items,
@@ -31,6 +32,7 @@ function DeleteTaxonomyModal( {
 	const { deleteEntityRecord } = useDispatch( coreStore );
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
+	const maybeInvalidateCache = useMaybeInvalidateContentTypeCache();
 
 	async function onDelete() {
 		if ( isDeleting ) {
@@ -120,6 +122,10 @@ function DeleteTaxonomyModal( {
 			}
 			createErrorNotice( errorMessage, { type: 'snackbar' } );
 		}
+		const deletedRefs = itemsToDelete
+			.filter( ( _, i ) => promiseResult[ i ].status === 'fulfilled' )
+			.flatMap( ( item ) => item.config.object_type );
+		maybeInvalidateCache( deletedRefs, [], POST_TYPE_ENTITY );
 		onActionPerformed?.( itemsToDelete );
 		setIsDeleting( false );
 		closeModal?.();
