@@ -437,10 +437,21 @@ export const RowHeight: Story = {
 };
 
 /**
- * Edit mode with drag, resize, and all width modes. The grid paints
- * its default overlay (diagonal stripes plus dashed column and row
- * tracks) behind the tiles to visualize the underlying template. A
- * state panel shows the raw layout JSON. Drag items to reorder;
+ * Edit mode with drag, resize, and all width modes. While `editMode`
+ * is on, `<DashboardGrid />` paints its default overlay behind the
+ * tiles to visualize the underlying template: diagonal stripes, a
+ * dashed outline on each column track, a subtle column fill that
+ * marks the drop zones against the gaps, and a 1px row divider when
+ * `rowHeight` is numeric. The overlay disappears when `editMode`
+ * flips back to `false`.
+ *
+ * Theme the default look in place via CSS custom properties exposed
+ * by the package (`--wp-grid-overlay-stripe-color`,
+ * `--wp-grid-overlay-track-color`, `--wp-grid-overlay-column-fill`),
+ * or replace the visual wholesale by passing `renderGridOverlay`.
+ * See the `Custom Grid Overlay` story for a full override example.
+ *
+ * A state panel shows the raw layout JSON. Drag items to reorder;
  * resize from the bottom-right handle. Keyboard sensor is enabled:
  * use Tab to focus an item, Space to grab, arrow keys to move, Space
  * to drop.
@@ -760,11 +771,17 @@ export const Customization: Story = {
 };
 
 /**
- * Replaces the package's default edit-mode overlay with a custom
- * visual. Receives the resolved column count, gap, and row height
- * from the grid; here, the override drops the row dividers, swaps to
- * an info tone, and labels each column track with its index. The
- * grid still owns when the overlay is rendered (only in edit mode).
+ * Example custom overlay supplied to `<DashboardGrid />` through the
+ * `renderGridOverlay` prop. Receives the grid's resolved column
+ * count, gap, and row height; this implementation drops the row
+ * dividers, swaps to an info tone, and labels each column track
+ * with its index. The grid keeps full control of *when* the overlay
+ * mounts (only when `editMode` is on); the consumer owns the
+ * markup.
+ *
+ * @param props         Render props supplied by the grid.
+ * @param props.columns Number of column tracks to mirror.
+ * @param props.gapPx   Gap between tracks in pixels.
  */
 function NumberedOverlay( { columns, gapPx }: GridOverlayRenderProps ) {
 	return (
@@ -813,6 +830,20 @@ function NumberedOverlay( { columns, gapPx }: GridOverlayRenderProps ) {
 	);
 }
 
+/**
+ * Replaces the package's default edit-mode overlay with a custom
+ * visual through the `renderGridOverlay` prop. The grid mounts the
+ * supplied component as a sibling behind the tiles whenever
+ * `editMode` is on, passing the resolved `{ columns, gapPx,
+ * rowHeight }` so the override can reproduce the column and row
+ * tracks pixel-accurately without re-deriving them.
+ *
+ * Here the override (see `NumberedOverlay` above) swaps the warning
+ * tone for info, drops the row dividers, and labels each column
+ * track with its index. Pass `renderGridOverlay={ () => null }` to
+ * suppress the overlay entirely while keeping `editMode` interactions
+ * on.
+ */
 export const CustomGridOverlayStory: Story = {
 	name: 'Custom Grid Overlay',
 	args: {
