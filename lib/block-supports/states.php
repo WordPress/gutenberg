@@ -9,6 +9,103 @@
  */
 
 /**
+ * Adds a fallback solid border style when border color or width is present.
+ *
+ * CSS does not render border color or width unless a border style is also set.
+ * State styles are emitted as stylesheet rules rather than inline styles, so
+ * they cannot rely on the block-library inline-style attribute fallback rules.
+ *
+ * @param array $border Border style object, optionally containing split side objects.
+ * @return array Border style object with a fallback style applied where needed.
+ */
+function gutenberg_get_state_border_with_fallback_style( $border ) {
+	if ( ! is_array( $border ) ) {
+		return $border;
+	}
+
+	$sides      = array( 'top', 'right', 'bottom', 'left' );
+	$has_sides  = false;
+	$normalized = $border;
+
+	foreach ( $sides as $side ) {
+		if ( array_key_exists( $side, $border ) ) {
+			$has_sides = true;
+			break;
+		}
+	}
+
+	if ( $has_sides ) {
+		foreach ( $sides as $side ) {
+			$normalized[ $side ] = gutenberg_get_state_border_with_fallback_style(
+				$border[ $side ] ?? null
+			);
+		}
+		return $normalized;
+	}
+
+	$has_color_or_width = ( isset( $border['color'] ) && '' !== $border['color'] ) ||
+		( isset( $border['width'] ) && '' !== $border['width'] && 0 !== $border['width'] );
+	if ( $has_color_or_width && empty( $border['style'] ) ) {
+		$normalized['style'] = 'solid';
+	}
+
+	return $normalized;
+}
+
+/**
+ * Adds fallback border styles to a state style object.
+ *
+ * @param array $style State style object that may contain a border object.
+ * @return array State style object with fallback border styles applied where needed.
+ */
+function gutenberg_get_state_style_with_fallback_border_styles( $style ) {
+	if ( ! is_array( $style ) || empty( $style['border'] ) || ! is_array( $style['border'] ) ) {
+		return $style;
+	}
+
+	$style['border'] = gutenberg_get_state_border_with_fallback_style( $style['border'] );
+	return $style;
+}
+
+/**
+ * Converts internal preset references to CSS custom property references.
+ *
+ * State styles are emitted as CSS rules and cannot rely on preset classnames.
+ * Converting `var:preset|color|contrast` to
+ * `var(--wp--preset--color--contrast)` ensures preset values are emitted as
+ * declarations by the style engine.
+ *
+ * @param mixed $value Style value to normalize.
+ * @return mixed Normalized style value.
+ */
+function gutenberg_normalize_state_preset_vars( $value ) {
+	if ( is_array( $value ) ) {
+		foreach ( $value as $key => $nested_value ) {
+			$value[ $key ] = gutenberg_normalize_state_preset_vars( $nested_value );
+		}
+		return $value;
+	}
+
+	if ( ! is_string( $value ) || ! str_starts_with( $value, 'var:preset|' ) ) {
+		return $value;
+	}
+
+	$unwrapped_name = str_replace( '|', '--', substr( $value, strlen( 'var:' ) ) );
+	return "var(--wp--$unwrapped_name)";
+}
+
+/**
+ * Normalizes a state style object before generating CSS declarations.
+ *
+ * @param array $style State style object.
+ * @return array Normalized state style object.
+ */
+function gutenberg_normalize_state_style_for_css_output( $style ) {
+	$style = gutenberg_get_state_style_with_fallback_border_styles( $style );
+	return gutenberg_normalize_state_preset_vars( $style );
+}
+
+/**
  * Renders per-instance pseudo-state styles on the frontend for blocks with
  * configured pseudo-state support.
  *
@@ -40,7 +137,9 @@ function gutenberg_render_block_states_support( $block_content, $block ) {
 			continue;
 		}
 
-		$compiled = wp_style_engine_get_styles( $style[ $state ] );
+		$compiled = wp_style_engine_get_styles(
+			gutenberg_normalize_state_style_for_css_output( $style[ $state ] )
+		);
 		if ( ! empty( $compiled['declarations'] ) ) {
 			$css_rules[] = array(
 				'state'        => $state,
@@ -66,7 +165,19 @@ function gutenberg_render_block_states_support( $block_content, $block ) {
 	 * with !important, so pseudo-state styles targeting the same properties must also
 	 * use !important to win. Properties without preset utility classes don't need it.
 	 */
-	$preset_class_properties = array( 'color', 'background-color', 'border-color', 'background', 'font-size', 'font-family' );
+	$preset_class_properties = array(
+		'color',
+		'background-color',
+		'border-color',
+		'border-width',
+		'border-top-width',
+		'border-right-width',
+		'border-bottom-width',
+		'border-left-width',
+		'background',
+		'font-size',
+		'font-family',
+	);
 
 	$style_rules = array();
 	foreach ( $css_rules as $rule ) {

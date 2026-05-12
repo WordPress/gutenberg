@@ -16,6 +16,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import {
 	setStyle as setStyleHelper,
 	setSetting as setSettingHelper,
+	getBorderWithFallbackStyle,
 } from '@wordpress/global-styles-engine';
 import type { GlobalStylesConfig } from '@wordpress/global-styles-engine';
 
@@ -39,41 +40,6 @@ const BACKGROUND_BLOCK_DEFAULT_VALUES = {
 	backgroundSize: 'cover',
 	backgroundPosition: '50% 50%', // used only when backgroundSize is 'contain'.
 };
-
-function applyFallbackStyle( border: any ) {
-	if ( ! border ) {
-		return border;
-	}
-
-	const hasColorOrWidth = border.color || border.width;
-
-	if ( ! border.style && hasColorOrWidth ) {
-		return { ...border, style: 'solid' };
-	}
-
-	if ( border.style && ! hasColorOrWidth ) {
-		return undefined;
-	}
-
-	return border;
-}
-
-function applyAllFallbackStyles( border: any ) {
-	if ( ! border ) {
-		return border;
-	}
-
-	if ( hasSplitBorders( border ) ) {
-		return {
-			top: applyFallbackStyle( border.top ),
-			right: applyFallbackStyle( border.right ),
-			bottom: applyFallbackStyle( border.bottom ),
-			left: applyFallbackStyle( border.left ),
-		};
-	}
-
-	return applyFallbackStyle( border );
-}
 
 const {
 	useHasDimensionsPanel,
@@ -318,7 +284,9 @@ function ScreenBlock( { name, variation }: ScreenBlockProps ) {
 		// split borders and the user condenses them into a flat border or
 		// vice-versa we'd get both sets of styles which would conflict.
 		const { radius, ...newBorder } = newStyle.border;
-		const border = applyAllFallbackStyles( newBorder );
+		const border = getBorderWithFallbackStyle( newBorder, {
+			removeStyleOnly: true,
+		} );
 		const updatedBorder = ! hasSplitBorders( border )
 			? {
 					top: border,

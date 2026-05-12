@@ -24,6 +24,10 @@ export { getBlockSelector } from './core/selectors';
 export { getTypographyFontSizeValue } from './utils/typography';
 export { getDimensionPresetCssVar } from './utils/dimensions';
 export {
+	getBorderWithFallbackStyle,
+	getStyleWithFallbackBorderStyles,
+} from './utils/border';
+export {
 	getValueFromVariable,
 	getPresetVariableFromValue,
 	getResolvedValue,
