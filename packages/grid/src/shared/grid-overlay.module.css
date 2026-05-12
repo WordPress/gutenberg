@@ -9,7 +9,7 @@
 		opacity 200ms ease,
 		visibility 0s linear 200ms;
 	background-image:
-		repeating-linear-gradient(135deg, var(--wp-grid-overlay-stripe-color, color-mix(in srgb, var(--wpds-color-bg-surface-warning) 15%, transparent))
+		repeating-linear-gradient(135deg, var(--wp-grid-overlay-stripe-color, color-mix(in srgb, var(--wpds-color-bg-surface-neutral) 15%, transparent))
 		0 6px, transparent 6px 12px);
 }
 
@@ -30,8 +30,8 @@
 .column {
 	outline:
 		1px dashed
-		var(--wp-grid-overlay-track-color, var(--wpds-color-stroke-surface-warning));
-	background-color: var(--wp-grid-overlay-column-fill, color-mix(in srgb, var(--wpds-color-bg-surface-warning) 10%, transparent));
+		var(--wp-grid-overlay-track-color, var(--wpds-color-stroke-surface-neutral));
+	background-color: var(--wp-grid-overlay-column-fill, color-mix(in srgb, var(--wpds-color-bg-surface-neutral) 10%, transparent));
 	position: relative;
 }
 
@@ -47,7 +47,7 @@
 	position: absolute;
 	inset: 0;
 	pointer-events: none;
-	background-image: linear-gradient(to bottom, var(--wp-grid-overlay-track-color, var(--wpds-color-stroke-surface-warning)) 0, var(--wp-grid-overlay-track-color, var(--wpds-color-stroke-surface-warning)) 1px, transparent 1px, transparent calc(var(--wp-grid-overlay-row-height) - 1px), var(--wp-grid-overlay-track-color, var(--wpds-color-stroke-surface-warning)) calc(var(--wp-grid-overlay-row-height) - 1px), var(--wp-grid-overlay-track-color, var(--wpds-color-stroke-surface-warning)) var(--wp-grid-overlay-row-height), transparent var(--wp-grid-overlay-row-height), transparent var(--wp-grid-overlay-row-tile));
+	background-image: linear-gradient(to bottom, var(--wp-grid-overlay-track-color, var(--wpds-color-stroke-surface-neutral)) 0, var(--wp-grid-overlay-track-color, var(--wpds-color-stroke-surface-neutral)) 1px, transparent 1px, transparent calc(var(--wp-grid-overlay-row-height) - 1px), var(--wp-grid-overlay-track-color, var(--wpds-color-stroke-surface-neutral)) calc(var(--wp-grid-overlay-row-height) - 1px), var(--wp-grid-overlay-track-color, var(--wpds-color-stroke-surface-neutral)) var(--wp-grid-overlay-row-height), transparent var(--wp-grid-overlay-row-height), transparent var(--wp-grid-overlay-row-tile));
 	background-size: 100% var(--wp-grid-overlay-row-tile);
 	background-repeat: repeat;
 	mask-image: repeating-linear-gradient(to right, #000 0 4px, transparent 4px 8px);
