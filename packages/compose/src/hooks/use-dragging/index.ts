@@ -51,19 +51,24 @@ export default function useDragging( {
 		eventsRef.current.onDragMove?.( event );
 	}, [] );
 
-	const endDrag = useCallback( ( event?: MouseEvent ): void => {
-		eventsRef.current.onDragEnd?.( event );
-		document.removeEventListener( 'mousemove', onMouseMove );
-		document.removeEventListener( 'mouseup', endDrag );
-		setIsDragging( false );
-	}, [] );
+	const endDrag = useCallback(
+		( event?: MouseEvent ): void => {
+			eventsRef.current.onDragEnd?.( event );
+			document.removeEventListener( 'mousemove', onMouseMove );
+			setIsDragging( false );
+		},
+		[ onMouseMove ]
+	);
 
-	const startDrag = useCallback( ( event: React.MouseEvent ): void => {
-		eventsRef.current.onDragStart?.( event );
-		document.addEventListener( 'mousemove', onMouseMove );
-		document.addEventListener( 'mouseup', endDrag );
-		setIsDragging( true );
-	}, [] );
+	const startDrag = useCallback(
+		( event: React.MouseEvent ): void => {
+			eventsRef.current.onDragStart?.( event );
+			document.addEventListener( 'mousemove', onMouseMove );
+			document.addEventListener( 'mouseup', endDrag, { once: true } );
+			setIsDragging( true );
+		},
+		[ onMouseMove, endDrag ]
+	);
 
 	// Remove the global events when unmounting if needed.
 	useEffect( () => {
@@ -73,7 +78,7 @@ export default function useDragging( {
 				document.removeEventListener( 'mouseup', endDrag );
 			}
 		};
-	}, [ isDragging ] );
+	}, [ isDragging, onMouseMove, endDrag ] );
 
 	return {
 		startDrag,
