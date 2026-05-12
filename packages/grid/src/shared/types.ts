@@ -110,6 +110,15 @@ export interface GridOverlayRenderProps {
 	 * is `'auto'`; in those cases the overlay paints columns only.
 	 */
 	rowHeight?: number;
+
+	/**
+	 * Whether the overlay should be visible. Surfaces render the
+	 * overlay even when `false` so the implementation can transition
+	 * opacity in and out; while `false`, the overlay must hide itself
+	 * (and ideally release paint cost via `visibility: hidden` or an
+	 * equivalent).
+	 */
+	isActive: boolean;
 }
 
 /**

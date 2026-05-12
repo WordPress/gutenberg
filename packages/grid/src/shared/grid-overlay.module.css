@@ -3,9 +3,28 @@
 	inset: 0;
 	display: grid;
 	pointer-events: none;
+	opacity: 0;
+	visibility: hidden;
+	transition:
+		opacity 200ms ease,
+		visibility 0s linear 200ms;
 	background-image:
 		repeating-linear-gradient(135deg, var(--wp-grid-overlay-stripe-color, color-mix(in srgb, var(--wpds-color-bg-surface-warning) 28%, transparent))
 		0 6px, transparent 6px 12px);
+}
+
+.overlay.is-active {
+	opacity: 1;
+	visibility: visible;
+	transition:
+		opacity 200ms ease,
+		visibility 0s linear 0s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.overlay {
+		transition: none;
+	}
 }
 
 .column {

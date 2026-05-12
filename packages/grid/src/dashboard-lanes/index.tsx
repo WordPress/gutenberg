@@ -425,16 +425,20 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 
 		// Edit-mode background visual. Lanes are content-driven
 		// vertically, so the overlay only mirrors columns; the default
-		// can be replaced wholesale via `renderGridOverlay`. Memoized
-		// so drag/resize re-renders don't reconstruct the element
-		// while its inputs are stable; React then shortcuts the
-		// reconciliation of the overlay subtree by identity.
+		// can be replaced wholesale via `renderGridOverlay`. Rendered
+		// unconditionally so the overlay can cross-fade on edit-mode
+		// toggles; `isActive` drives the opacity transition inside the
+		// overlay. Memoized so drag/resize re-renders skip
+		// reconciliation while inputs are stable.
 		const Overlay = renderGridOverlay ?? GridOverlay;
 		const gridOverlay = useMemo(
-			() =>
-				editMode ? (
-					<Overlay columns={ effectiveColumns } gapPx={ gapPx } />
-				) : null,
+			() => (
+				<Overlay
+					columns={ effectiveColumns }
+					gapPx={ gapPx }
+					isActive={ editMode }
+				/>
+			),
 			[ Overlay, editMode, effectiveColumns, gapPx ]
 		);
 

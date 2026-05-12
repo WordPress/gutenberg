@@ -19,17 +19,23 @@ import styles from './grid-overlay.module.css';
  * by passing a `renderGridOverlay` to either surface; themed in place
  * via the CSS custom properties documented in the package README.
  *
+ * Cross-fades in and out on `isActive` toggles via a CSS opacity
+ * transition; while inactive, `visibility: hidden` releases paint cost.
+ *
  * @param props           Render props supplied by the surface.
  * @param props.columns   Number of column tracks to mirror.
  * @param props.gapPx     Gap between tracks in pixels.
  * @param props.rowHeight Row height in pixels for surfaces with uniform
  *                        rows. Omitted on lane surfaces or auto-sized
  *                        grids; in that case row dividers are skipped.
+ * @param props.isActive  When `false`, the overlay fades out and stops
+ *                        consuming paint cost.
  */
 export function GridOverlay( {
 	columns,
 	gapPx,
 	rowHeight,
+	isActive,
 }: GridOverlayRenderProps ) {
 	const showRows = typeof rowHeight === 'number';
 	// Custom properties drive the row-divider gradient so the CSS file
@@ -51,6 +57,7 @@ export function GridOverlay( {
 			aria-hidden
 			className={ clsx(
 				styles.overlay,
+				isActive && styles[ 'is-active' ],
 				showRows && styles[ 'has-rows' ]
 			) }
 			style={ style }

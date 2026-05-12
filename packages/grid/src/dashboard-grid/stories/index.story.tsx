@@ -773,17 +773,22 @@ export const Customization: Story = {
 /**
  * Example custom overlay supplied to `<DashboardGrid />` through the
  * `renderGridOverlay` prop. Receives the grid's resolved column
- * count, gap, and row height; this implementation drops the row
- * dividers, swaps to an info tone, and labels each column track
- * with its index. The grid keeps full control of *when* the overlay
- * mounts (only when `editMode` is on); the consumer owns the
- * markup.
+ * count, gap, row height, and `isActive` flag; this implementation
+ * drops the row dividers, swaps to an info tone, labels each column
+ * track with its index, and fades in/out on `isActive` toggles. The
+ * grid always mounts the overlay; the consumer owns the visual and
+ * its transition.
  *
- * @param props         Render props supplied by the grid.
- * @param props.columns Number of column tracks to mirror.
- * @param props.gapPx   Gap between tracks in pixels.
+ * @param props          Render props supplied by the grid.
+ * @param props.columns  Number of column tracks to mirror.
+ * @param props.gapPx    Gap between tracks in pixels.
+ * @param props.isActive Whether the overlay should be visible.
  */
-function NumberedOverlay( { columns, gapPx }: GridOverlayRenderProps ) {
+function NumberedOverlay( {
+	columns,
+	gapPx,
+	isActive,
+}: GridOverlayRenderProps ) {
 	return (
 		<div
 			aria-hidden
@@ -794,6 +799,11 @@ function NumberedOverlay( { columns, gapPx }: GridOverlayRenderProps ) {
 				gridTemplateColumns: `repeat(${ columns }, minmax(0, 1fr))`,
 				gap: gapPx,
 				pointerEvents: 'none',
+				opacity: isActive ? 1 : 0,
+				visibility: isActive ? 'visible' : 'hidden',
+				transition: isActive
+					? 'opacity 200ms ease, visibility 0s linear 0s'
+					: 'opacity 200ms ease, visibility 0s linear 200ms',
 				backgroundImage: `repeating-linear-gradient(135deg, color-mix(in srgb, var(--wpds-color-bg-surface-info) 24%, transparent) 0 6px, transparent 6px 12px)`,
 			} }
 		>

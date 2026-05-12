@@ -348,15 +348,22 @@ export const EditMode: Story = {
 
 /**
  * Example custom overlay supplied to `<DashboardLanes />` through the
- * `renderGridOverlay` prop. Receives `{ columns, gapPx }` from the
- * surface (no `rowHeight` because lane heights are content-driven)
- * and is responsible for the markup mounted behind the tiles.
+ * `renderGridOverlay` prop. Receives `{ columns, gapPx, isActive }`
+ * from the surface (no `rowHeight` because lane heights are
+ * content-driven). The custom must honor `isActive` for the same
+ * cross-fade behavior as the default; the surface always mounts the
+ * overlay.
  *
- * @param props         Render props supplied by the surface.
- * @param props.columns Number of lane tracks to mirror.
- * @param props.gapPx   Gap between lanes in pixels.
+ * @param props          Render props supplied by the surface.
+ * @param props.columns  Number of lane tracks to mirror.
+ * @param props.gapPx    Gap between lanes in pixels.
+ * @param props.isActive Whether the overlay should be visible.
  */
-function NumberedLanesOverlay( { columns, gapPx }: GridOverlayRenderProps ) {
+function NumberedLanesOverlay( {
+	columns,
+	gapPx,
+	isActive,
+}: GridOverlayRenderProps ) {
 	return (
 		<div
 			aria-hidden
@@ -367,6 +374,11 @@ function NumberedLanesOverlay( { columns, gapPx }: GridOverlayRenderProps ) {
 				gridTemplateColumns: `repeat(${ columns }, minmax(0, 1fr))`,
 				gap: gapPx,
 				pointerEvents: 'none',
+				opacity: isActive ? 1 : 0,
+				visibility: isActive ? 'visible' : 'hidden',
+				transition: isActive
+					? 'opacity 200ms ease, visibility 0s linear 0s'
+					: 'opacity 200ms ease, visibility 0s linear 200ms',
 				backgroundImage: `repeating-linear-gradient(135deg, color-mix(in srgb, var(--wpds-color-bg-surface-info) 24%, transparent) 0 6px, transparent 6px 12px)`,
 			} }
 		>
