@@ -31,7 +31,10 @@ test.describe( 'Collaboration - Notes Sync', () => {
 			attributes: { content: 'Note target block' },
 		} );
 
-		await editor.clickBlockOptionsMenuItem( 'Add note' );
+		await page
+			.getByRole( 'toolbar', { name: 'Block tools' } )
+			.getByRole( 'button', { name: 'Add note', exact: true } )
+			.click();
 		await page
 			.getByRole( 'textbox', { name: 'New note', exact: true } )
 			.fill( 'Hello from User A' );
@@ -104,8 +107,11 @@ test.describe( 'Collaboration - Notes Sync', () => {
 			.filter( { hasText: 'Shared paragraph' } )
 			.click();
 
-		// User B adds a note using the block options menu.
-		await page2Editor.clickBlockOptionsMenuItem( 'Add note' );
+		// User B adds a note using the block toolbar button.
+		await page2
+			.getByRole( 'toolbar', { name: 'Block tools' } )
+			.getByRole( 'button', { name: 'Add note', exact: true } )
+			.click();
 		await page2
 			.getByRole( 'textbox', { name: 'New note', exact: true } )
 			.fill( 'Note from User B' );
@@ -164,7 +170,10 @@ test.describe( 'Collaboration - Notes Sync', () => {
 			attributes: { content: 'Block for reply test' },
 		} );
 
-		await editor.clickBlockOptionsMenuItem( 'Add note' );
+		await page
+			.getByRole( 'toolbar', { name: 'Block tools' } )
+			.getByRole( 'button', { name: 'Add note', exact: true } )
+			.click();
 		await page
 			.getByRole( 'textbox', { name: 'New note', exact: true } )
 			.fill( 'Main note' );

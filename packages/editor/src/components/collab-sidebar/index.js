@@ -22,7 +22,7 @@ import {
 } from './constants';
 import { Notes } from './notes';
 import { store as editorStore } from '../../store';
-import { AddNoteMenuItem } from './add-note-menu-item';
+import { AddNoteToolbarButton } from './add-note-toolbar-button';
 import { NoteAvatarIndicator } from './note-indicator-toolbar';
 import { useGlobalStylesContext } from '../global-styles-provider';
 import { useNoteThreads, useEnableFloatingSidebar } from './hooks';
@@ -142,7 +142,7 @@ function NotesSidebar( { postId } ) {
 		: null;
 
 	if ( isDistractionFree ) {
-		return <AddNoteMenuItem isDistractionFree />;
+		return null;
 	}
 
 	return (
@@ -153,9 +153,14 @@ function NotesSidebar( { postId } ) {
 					onClick={ () => openNoteForBlock( clientId ) }
 				/>
 			) }
-			<AddNoteMenuItem
-				onClick={ ( menuClientId ) => openNoteForBlock( menuClientId ) }
-			/>
+			{ ! currentThread && !! clientId && (
+				<AddNoteToolbarButton
+					clientId={ clientId }
+					onClick={ ( toolbarClientId ) =>
+						openNoteForBlock( toolbarClientId )
+					}
+				/>
+			) }
 			{ showAllNotesSidebar && (
 				<PluginSidebar
 					identifier={ ALL_NOTES_SIDEBAR }

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Notes Sidebar: Promote the "Add note" action from the block-toolbar overflow menu to a dedicated toolbar button placed before the ellipsis. The button only renders for blocks without an existing thread; blocks with a thread continue to show the avatar indicator ([#78188](https://github.com/WordPress/gutenberg/issues/78188)).
+
 ### Internal
 
 -   Update `date-fns` dependency to `v4.1.0` ([#78057](https://github.com/WordPress/gutenberg/pull/78057)).

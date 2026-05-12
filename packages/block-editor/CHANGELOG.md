@@ -6,6 +6,10 @@
 
 -   `BlockManager`: Add stacking context isolation to category list ([#77759](https://github.com/WordPress/gutenberg/pull/77759)).
 
+### Internal
+
+-   Remove unused `NoteIconSlotFill` private API and its block-settings dropdown slot. Notes are now promoted to a dedicated toolbar button rendered via the existing `NoteIconToolbarSlotFill` ([#78188](https://github.com/WordPress/gutenberg/issues/78188)).
+
 ## 15.18.0 (2026-04-29)
 
 ### Enhancements

@@ -37,14 +37,20 @@ test.describe( 'Block Notes', () => {
 			exact: true,
 		} );
 
-		await editor.clickBlockOptionsMenuItem( 'Add note' );
+		await page
+			.getByRole( 'toolbar', { name: 'Block tools' } )
+			.getByRole( 'button', { name: 'Add note', exact: true } )
+			.click();
 		await expect( form ).toBeFocused();
 		// Close the pinned notes sidebar.
 		await page
 			.getByRole( 'region', { name: 'Editor top bar' } )
 			.getByRole( 'button', { name: 'All notes', exact: true } )
 			.click();
-		await editor.clickBlockOptionsMenuItem( 'Add note' );
+		await page
+			.getByRole( 'toolbar', { name: 'Block tools' } )
+			.getByRole( 'button', { name: 'Add note', exact: true } )
+			.click();
 		await expect( form ).toBeFocused();
 	} );
 
@@ -53,7 +59,10 @@ test.describe( 'Block Notes', () => {
 			name: 'core/paragraph',
 			attributes: { content: 'Testing block comments' },
 		} );
-		await editor.clickBlockOptionsMenuItem( 'Add note' );
+		await page
+			.getByRole( 'toolbar', { name: 'Block tools' } )
+			.getByRole( 'button', { name: 'Add note', exact: true } )
+			.click();
 		await page
 			.getByRole( 'textbox', {
 				name: 'New note',
@@ -795,7 +804,10 @@ test.describe( 'Block Notes', () => {
 				name: 'core/paragraph',
 				attributes: { content: 'Testing block comments' },
 			} );
-			await editor.clickBlockOptionsMenuItem( 'Add note' );
+			await page
+				.getByRole( 'toolbar', { name: 'Block tools' } )
+				.getByRole( 'button', { name: 'Add note', exact: true } )
+				.click();
 			const textbox = page.getByRole( 'textbox', {
 				name: 'New note',
 				exact: true,
@@ -888,7 +900,10 @@ class BlockNoteUtils {
 					name: type,
 					attributes,
 				} );
-				await this.#editor.clickBlockOptionsMenuItem( 'Add note' );
+				await this.#page
+					.getByRole( 'toolbar', { name: 'Block tools' } )
+					.getByRole( 'button', { name: 'Add note', exact: true } )
+					.click();
 				await this.#page
 					.getByRole( 'textbox', {
 						name: 'New note',
