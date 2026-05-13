@@ -887,14 +887,14 @@ export default function DistributedEditingStatus( {
 							setActionStatus( {
 								status: 'success',
 								message: __(
-									'Local changes copied. Keep this data until the server confirms your update.'
+									'Protected local changes exported. Keep this copy until the server confirms the update.'
 								),
 							} );
 						} else {
 							setActionStatus( {
 								status: 'warning',
 								message: __(
-									'Clipboard unavailable. Local changes remain protected in this editor session; keep this tab open and try exporting again after clipboard access is available.'
+									'Clipboard unavailable. Protected local changes remain in this editor session; keep this tab open and try exporting again after clipboard access is available.'
 								),
 							} );
 						}
@@ -940,7 +940,7 @@ export default function DistributedEditingStatus( {
 						setActionStatus( {
 							status: 'info',
 							message: __(
-								'Server version refreshed. Local changes remain protected and exportable while you review before retrying.'
+								'Server version refreshed for review. Protected local changes remain in this editor session and can still be exported before retrying.'
 							),
 						} );
 						return refetchResult;
@@ -1015,7 +1015,7 @@ function getActionErrorMessage( actionKey ) {
 	switch ( actionKey ) {
 		case DISTRIBUTED_EDITING_NOTICE_ACTIONS.EXPORT_LOCAL_UPDATES:
 			return __(
-				'Local changes could not be copied. They remain protected and exportable in this editor session; keep this tab open before trying again.'
+				'Protected local changes could not be copied. They remain in this editor session and can still be exported after clipboard access is available.'
 			);
 		case DISTRIBUTED_EDITING_NOTICE_ACTIONS.PREPARE_RETRY_SUBMIT:
 			return __(
@@ -1031,7 +1031,7 @@ function getActionErrorMessage( actionKey ) {
 			);
 		case DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFETCH_SERVER_STATE:
 			return __(
-				'Server version could not be refreshed. Local changes remain protected and exportable in this editor session; keep this tab open before trying again.'
+				'Server version could not be refreshed. Protected local changes remain in this editor session and can still be exported; keep this tab open before trying again.'
 			);
 		case DISTRIBUTED_EDITING_NOTICE_ACTIONS.REBASE_LOCAL_UPDATES:
 			return __(
@@ -1155,7 +1155,7 @@ function getPendingChangesMessage( descriptor ) {
 		DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVING
 	) {
 		return __(
-			'Retry save is waiting for server confirmation. Local changes remain pending.'
+			'The guarded retry save is waiting for server confirmation. Protected local changes remain pending and exportable until confirmation.'
 		);
 	}
 
@@ -1375,7 +1375,7 @@ function getStaleBaseStatusText( descriptor ) {
 		return {
 			title: __( 'Retry save stale' ),
 			message: __(
-				'The server changed again before this retry save finished. Local changes are still protected; refresh the server version before trying again.'
+				'The server changed again before this retry save finished. Protected local changes are still exportable; refresh the server version before trying again.'
 			),
 		};
 	}
@@ -1387,7 +1387,7 @@ function getStaleBaseStatusText( descriptor ) {
 		return {
 			title: __( 'Retry submit stale' ),
 			message: __(
-				'The server changed after retry submit was prepared. Refresh the server version before continuing.'
+				'The server changed after retry submit was prepared. Protected local changes remain exportable; refresh the server version before continuing.'
 			),
 		};
 	}
@@ -1460,7 +1460,7 @@ function getStaleBaseStatusText( descriptor ) {
 	return {
 		title: __( 'Server version changed' ),
 		message: __(
-			'Refresh the server version before retrying local changes.'
+			'Refresh the server version before retrying local changes. Protected local changes remain in this editor session and can be exported before leaving.'
 		),
 	};
 }
@@ -1478,56 +1478,54 @@ function getRetrySaveStatusText( descriptor ) {
 			return {
 				title: __( 'Retry save in progress' ),
 				message: __(
-					'The editor is sending rebased changes through the guarded retry-save path. Keep this tab open until the server confirms the save.'
+					'The editor is sending rebased changes through the guarded retry-save path. Keep this tab open; protected local changes remain exportable until the server confirms the save.'
 				),
 			};
 		case DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVED:
 			return {
 				title: __( 'Retry save confirmed' ),
-				message: __(
-					'The server saved the rebased changes and cleared the local pending-change warning.'
-				),
+				message: getRetrySaveConfirmedMessage( descriptor ),
 			};
 		case DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.STALE_BASE_REJECTED:
 			return {
 				title: __( 'Retry save stale' ),
 				message: __(
-					'The server changed again before this retry save finished. Local changes are still protected; refresh the server version before trying again.'
+					'The server changed again before this retry save finished. Protected local changes are still exportable; refresh the server version before trying again.'
 				),
 			};
 		case DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_PERMISSION_DENIED:
 			return {
 				title: __( 'Retry save permission changed' ),
 				message: __(
-					'Editing permission changed before the retry save finished. Local changes are still protected; export them before leaving or ask for access to retry.'
+					'Editing permission changed before the retry save finished. Protected local changes are still exportable; ask for access before retrying.'
 				),
 			};
 		case DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_SYNC_META_TAMPERED:
 			return {
 				title: __( 'Retry save proof rejected' ),
 				message: __(
-					'The server rejected the retry-save proof because the sync metadata or proof flags changed unexpectedly. Local changes are still protected; export them before continuing.'
+					'The server rejected the retry-save proof because the sync metadata or proof flags changed unexpectedly. Protected local changes are still exportable; export them before continuing.'
 				),
 			};
 		case DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_FEATURE_DISABLED:
 			return {
 				title: __( 'Retry save disabled' ),
 				message: __(
-					'Distributed Editing was disabled before the retry save finished. Local changes are still protected; export them before leaving or retry after Distributed Editing is enabled.'
+					'Distributed Editing was disabled before the retry save finished. Protected local changes are still exportable; retry after Distributed Editing is enabled.'
 				),
 			};
 		case DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_ROUTE_MISMATCH:
 			return {
 				title: __( 'Retry save route changed' ),
 				message: __(
-					'The retry-save request targeted a different post route than this editor. Local changes are still protected; reload the editor and export them before leaving.'
+					'The retry-save request targeted a different post route than this editor. Protected local changes are still exportable; reload the editor only after exporting them.'
 				),
 			};
 		case DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_MALFORMED_SYNC_PAYLOAD:
 			return {
 				title: __( 'Retry save payload rejected' ),
 				message: __(
-					'The retry-save payload was incomplete or malformed. Local changes are still protected; export them before trying again.'
+					'The retry-save payload was incomplete or malformed. Protected local changes are still exportable; export them before trying again.'
 				),
 			};
 	}
@@ -1535,9 +1533,105 @@ function getRetrySaveStatusText( descriptor ) {
 	return {
 		title: __( 'Retry save unavailable' ),
 		message: __(
-			'Retry save returned an unrecognized state. Local changes remain protected until the server confirms a save.'
+			'Retry save returned an unrecognized state. Protected local changes remain exportable until the server confirms a save.'
 		),
 	};
+}
+
+function getRetrySaveConfirmedMessage( descriptor ) {
+	const serverVersion = normalizeDisplayValue(
+		descriptor.retrySaveServerVersion
+	);
+	const previousServerVersion = normalizeDisplayValue(
+		descriptor.retrySavePreviousServerVersion
+	);
+	const revisionCount = getRetrySaveRevisionCount( descriptor );
+
+	if ( serverVersion && previousServerVersion && revisionCount > 0 ) {
+		return sprintf(
+			/* translators: 1: previous sync version, 2: saved sync version, 3: number of revisions. */
+			_n(
+				'Server confirmed the guarded retry-save, advanced the sync version from %1$s to %2$s, and recorded %3$d revision. Protected local changes are no longer pending for this save.',
+				'Server confirmed the guarded retry-save, advanced the sync version from %1$s to %2$s, and recorded %3$d revisions. Protected local changes are no longer pending for this save.',
+				revisionCount
+			),
+			previousServerVersion,
+			serverVersion,
+			revisionCount
+		);
+	}
+
+	if ( serverVersion && previousServerVersion ) {
+		return sprintf(
+			/* translators: 1: previous sync version, 2: saved sync version. */
+			__(
+				'Server confirmed the guarded retry-save and advanced the sync version from %1$s to %2$s. Protected local changes are no longer pending for this save.'
+			),
+			previousServerVersion,
+			serverVersion
+		);
+	}
+
+	if ( serverVersion && revisionCount > 0 ) {
+		return sprintf(
+			/* translators: 1: saved sync version, 2: number of revisions. */
+			_n(
+				'Server confirmed the guarded retry-save at sync version %1$s and recorded %2$d revision. Protected local changes are no longer pending for this save.',
+				'Server confirmed the guarded retry-save at sync version %1$s and recorded %2$d revisions. Protected local changes are no longer pending for this save.',
+				revisionCount
+			),
+			serverVersion,
+			revisionCount
+		);
+	}
+
+	if ( serverVersion ) {
+		return sprintf(
+			/* translators: %s: saved sync version. */
+			__(
+				'Server confirmed the guarded retry-save at sync version %s. Protected local changes are no longer pending for this save.'
+			),
+			serverVersion
+		);
+	}
+
+	if ( revisionCount > 0 ) {
+		return sprintf(
+			/* translators: %d: number of revisions. */
+			_n(
+				'Server confirmed the guarded retry-save and recorded %d revision. Protected local changes are no longer pending for this save.',
+				'Server confirmed the guarded retry-save and recorded %d revisions. Protected local changes are no longer pending for this save.',
+				revisionCount
+			),
+			revisionCount
+		);
+	}
+
+	return __(
+		'Server confirmed the guarded retry-save. Protected local changes are no longer pending for this save.'
+	);
+}
+
+function getRetrySaveRevisionCount( descriptor ) {
+	if ( Array.isArray( descriptor.retrySaveCreatedRevisionIds ) ) {
+		const count = descriptor.retrySaveCreatedRevisionIds.filter(
+			( revisionId ) => normalizeDisplayValue( revisionId ) !== null
+		).length;
+
+		if ( count > 0 ) {
+			return count;
+		}
+	}
+
+	return descriptor.retrySaveRevisionCreated ? 1 : 0;
+}
+
+function normalizeDisplayValue( value ) {
+	if ( value === null || value === undefined || value === '' ) {
+		return null;
+	}
+
+	return String( value );
 }
 
 function getRetrySaveHandoffBlockedText( descriptor ) {
@@ -1548,35 +1642,35 @@ function getRetrySaveHandoffBlockedText( descriptor ) {
 			return {
 				title: __( 'Retry save needs accepted proof' ),
 				message: __(
-					'The editor could not verify accepted retry-save proof for this save. Local changes are still protected; export them before leaving or retry after the proof is ready.'
+					'The editor could not verify accepted retry-save proof for this save. Protected local changes are still exportable; retry after the proof is ready.'
 				),
 			};
 		case DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.SERVER_STATE_REFETCH_REQUIRED:
 			return {
 				title: __( 'Retry save needs server refresh' ),
 				message: __(
-					'The server state must be refreshed before retry-save can continue. Local changes are still protected; refresh the server version before trying again.'
+					'The server state must be refreshed before retry-save can continue. Protected local changes are still exportable; refreshing only fetches server state and does not save over local changes.'
 				),
 			};
 		case DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.MISSING_POST_ROUTE:
 			return {
 				title: __( 'Retry save route unavailable' ),
 				message: __(
-					'The editor could not identify the post route for retry-save. Local changes are still protected; export them before leaving or reload the editor.'
+					'The editor could not identify the post route for retry-save. Protected local changes are still exportable; reload the editor only after exporting them.'
 				),
 			};
 		case DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.MISSING_PROPOSED_CONTENT:
 			return {
 				title: __( 'Retry save content unavailable' ),
 				message: __(
-					'The editor could not read the proposed post content for retry-save. Local changes are still protected; export them before trying again.'
+					'The editor could not read the proposed post content for retry-save. Protected local changes are still exportable; export them before trying again.'
 				),
 			};
 		case DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.RETRY_SAVE_IN_PROGRESS:
 			return {
 				title: __( 'Retry save already in progress' ),
 				message: __(
-					'A retry save is already waiting for server confirmation. Local changes are still protected; keep this tab open until it finishes.'
+					'A retry save is already waiting for server confirmation. Protected local changes remain exportable; keep this tab open until it finishes.'
 				),
 			};
 	}
@@ -1584,7 +1678,7 @@ function getRetrySaveHandoffBlockedText( descriptor ) {
 	return {
 		title: __( 'Retry save blocked' ),
 		message: __(
-			'The editor blocked retry-save before normal save could run. Local changes are still protected; export them before continuing.'
+			'The editor blocked retry-save before normal save could run. Protected local changes are still exportable; export them before continuing.'
 		),
 	};
 }
