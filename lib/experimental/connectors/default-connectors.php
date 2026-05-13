@@ -15,13 +15,79 @@
  * @since 7.0.0
  */
 function _gutenberg_connectors_init(): void {
-	if ( ! class_exists( '\WordPress\AiClient\AiClient' ) ) {
-		return;
-	}
-
 	$registry = new WP_Connector_Registry();
 	WP_Connector_Registry::set_instance( $registry );
 
+	// Only register default AI providers if AI support is available.
+	if ( class_exists( '\WordPress\AiClient\AiClient' ) ) {
+		_gutenberg_register_default_ai_providers( $registry );
+	}
+
+	// Non-AI default connectors.
+	$registry->register(
+		'akismet',
+		array(
+			'name'           => __( 'Akismet Anti-Spam', 'gutenberg' ),
+			'description'    => __( 'Protect your site from spam.', 'gutenberg' ),
+			'type'           => 'spam_filtering',
+			'plugin'         => array(
+				'file'      => 'akismet/akismet.php',
+				'is_active' => static function (): bool {
+					return defined( 'AKISMET_VERSION' );
+				},
+			),
+			'authentication' => array(
+				'method'          => 'api_key',
+				'credentials_url' => 'https://akismet.com/get/',
+				'setting_name'    => 'wordpress_api_key',
+				'constant_name'   => 'WPCOM_API_KEY',
+			),
+		)
+	);
+
+	/**
+	 * Fires when the connector registry is ready for plugins to register connectors.
+	 *
+	 * Built-in connectors and any AI providers auto-discovered from the WP AI Client
+	 * registry have already been registered at this point and cannot be unhooked.
+	 *
+	 * AI provider plugins that register with the WP AI Client do not need to use
+	 * this action — their connectors are created automatically. This action is
+	 * primarily for registering non-AI-provider connectors or overriding metadata
+	 * on existing connectors.
+	 *
+	 * Use `$registry->register()` within this action to add new connectors.
+	 * To override an existing connector, unregister it first, then re-register
+	 * with updated data.
+	 *
+	 * Example — overriding metadata on an auto-discovered connector:
+	 *
+	 *     add_action( 'wp_connectors_init', function ( WP_Connector_Registry $registry ) {
+	 *         if ( $registry->is_registered( 'anthropic' ) ) {
+	 *             $connector = $registry->unregister( 'anthropic' );
+	 *             $connector['description'] = __( 'Custom description for Anthropic.', 'my-plugin' );
+	 *             $registry->register( 'anthropic', $connector );
+	 *         }
+	 *     } );
+	 *
+	 * @since 7.0.0
+	 *
+	 * @param WP_Connector_Registry $registry Connector registry instance.
+	 */
+	do_action( 'wp_connectors_init', $registry );
+}
+remove_action( 'init', '_wp_connectors_init', 15 );
+add_action( 'init', '_gutenberg_connectors_init', 15 );
+
+/**
+ * Registers connectors for the built-in AI providers.
+ *
+ * @access private
+ * @since 7.0.0
+ *
+ * @param WP_Connector_Registry $registry The connector registry instance.
+ */
+function _gutenberg_register_default_ai_providers( WP_Connector_Registry $registry ): void {
 	// Built-in connectors.
 	$defaults = array(
 		'anthropic' => array(
@@ -29,7 +95,7 @@ function _gutenberg_connectors_init(): void {
 			'description'    => __( 'Text generation with Claude.', 'gutenberg' ),
 			'type'           => 'ai_provider',
 			'plugin'         => array(
-				'slug' => 'ai-provider-for-anthropic',
+				'file' => 'ai-provider-for-anthropic/plugin.php',
 			),
 			'authentication' => array(
 				'method'          => 'api_key',
@@ -41,7 +107,7 @@ function _gutenberg_connectors_init(): void {
 			'description'    => __( 'Text and image generation with Gemini and Imagen.', 'gutenberg' ),
 			'type'           => 'ai_provider',
 			'plugin'         => array(
-				'slug' => 'ai-provider-for-google',
+				'file' => 'ai-provider-for-google/plugin.php',
 			),
 			'authentication' => array(
 				'method'          => 'api_key',
@@ -53,7 +119,7 @@ function _gutenberg_connectors_init(): void {
 			'description'    => __( 'Text and image generation with GPT and Dall-E.', 'gutenberg' ),
 			'type'           => 'ai_provider',
 			'plugin'         => array(
-				'slug' => 'ai-provider-for-openai',
+				'file' => 'ai-provider-for-openai/plugin.php',
 			),
 			'authentication' => array(
 				'method'          => 'api_key',
@@ -66,7 +132,7 @@ function _gutenberg_connectors_init(): void {
 	// Registry values (from provider plugins) take precedence over hardcoded fallbacks.
 	$ai_registry = \WordPress\AiClient\AiClient::defaultRegistry();
 
-	foreach ( $ai_registry->getRegisteredProviderIds() as $connector_id ) {
+	foreach ( array_filter( $ai_registry->getRegisteredProviderIds() ) as $connector_id ) {
 		$provider_class_name = $ai_registry->getProviderClassName( $connector_id );
 		$provider_metadata   = $provider_class_name::metadata();
 
@@ -76,9 +142,11 @@ function _gutenberg_connectors_init(): void {
 		if ( $is_api_key ) {
 			$credentials_url = $provider_metadata->getCredentialsUrl();
 			$authentication  = array(
-				'method'          => 'api_key',
-				'credentials_url' => $credentials_url ? $credentials_url : null,
+				'method' => 'api_key',
 			);
+			if ( $credentials_url ) {
+				$authentication['credentials_url'] = $credentials_url;
+			}
 		} else {
 			$authentication = array( 'method' => 'none' );
 		}
@@ -111,77 +179,65 @@ function _gutenberg_connectors_init(): void {
 				'description'    => $description ? $description : '',
 				'type'           => 'ai_provider',
 				'authentication' => $authentication,
-				'logo_url'       => $logo_url,
 			);
+			if ( $logo_url ) {
+				$defaults[ $connector_id ]['logo_url'] = $logo_url;
+			}
 		}
 	}
 
-	// Register all default connectors directly on the registry.
+	// Register all default AI connectors directly on the registry.
 	foreach ( $defaults as $id => $args ) {
+		if ( 'api_key' === $args['authentication']['method'] ) {
+			$sanitized_id = str_replace( '-', '_', $id );
+
+			$args['authentication']['setting_name'] = "connectors_ai_{$sanitized_id}_api_key";
+
+			// All AI providers use the {CONSTANT_CASE_ID}_API_KEY naming convention.
+			$constant_case_key = strtoupper( (string) preg_replace( '/([a-z])([A-Z])/', '$1_$2', $sanitized_id ) ) . '_API_KEY';
+
+			$args['authentication']['constant_name'] = $constant_case_key;
+			$args['authentication']['env_var_name']  = $constant_case_key;
+		}
+
+		$args['plugin']['is_active'] = static function () use ( $ai_registry, $id ): bool {
+			try {
+				return $ai_registry->hasProvider( $id );
+			} catch ( Exception $e ) {
+				return false;
+			}
+		};
+
 		$registry->register( $id, $args );
 	}
-
-	/**
-	 * Fires when the connector registry is ready for plugins to register connectors.
-	 *
-	 * Default connectors have already been registered at this point and cannot be
-	 * unhooked. Use `$registry->register()` within this action to add new connectors.
-	 *
-	 * Example usage:
-	 *
-	 *     add_action( 'wp_connectors_init', function ( WP_Connector_Registry $registry ) {
-	 *         $registry->register(
-	 *             'my_custom_ai',
-	 *             array(
-	 *                 'name'           => __( 'My Custom AI', 'my-plugin' ),
-	 *                 'description'    => __( 'Custom AI provider integration.', 'my-plugin' ),
-	 *                 'type'           => 'ai_provider',
-	 *                 'authentication' => array(
-	 *                     'method'          => 'api_key',
-	 *                     'credentials_url' => 'https://example.com/api-keys',
-	 *                 ),
-	 *             )
-	 *         );
-	 *     } );
-	 *
-	 * @since 7.0.0
-	 *
-	 * @param WP_Connector_Registry $registry Connector registry instance.
-	 */
-	do_action( 'wp_connectors_init', $registry );
 }
-remove_action( 'init', '_wp_connectors_init', 15 );
-add_action( 'init', '_gutenberg_connectors_init', 15 );
 
 /**
- * Determines the source of an API key for a given provider.
+ * Determines the source of an API key for a given connector.
  *
  * Checks in order: environment variable, PHP constant, database.
- * Uses the same naming convention as the WP AI Client ProviderRegistry.
+ * Environment variable and PHP constant are only checked when explicitly
+ * provided in the connector's authentication config.
  *
  * @access private
  *
- * @param string $provider_id  The provider ID (e.g., 'openai', 'anthropic', 'google').
- * @param string $setting_name The option name for the API key (e.g., 'connectors_ai_openai_api_key').
+ * @param string $setting_name  The option name for the API key (e.g., 'connectors_ai_openai_api_key').
+ * @param string $env_var_name  Optional. Environment variable name. Only checked when non-empty.
+ * @param string $constant_name Optional. PHP constant name. Only checked when non-empty.
  * @return string The key source: 'env', 'constant', 'database', or 'none'.
  */
-function _gutenberg_get_api_key_source( string $provider_id, string $setting_name ): string {
-	// Convert provider ID to CONSTANT_CASE for env var name.
-	// e.g., 'openai' -> 'OPENAI', 'anthropic' -> 'ANTHROPIC'.
-	$constant_case_id = strtoupper(
-		preg_replace( '/([a-z])([A-Z])/', '$1_$2', str_replace( '-', '_', $provider_id ) )
-	);
-	$env_var_name     = "{$constant_case_id}_API_KEY";
-
-	// Check environment variable first.
-	$env_value = getenv( $env_var_name );
-	if ( false !== $env_value && '' !== $env_value ) {
-		return 'env';
+function _gutenberg_get_api_key_source( string $setting_name, string $env_var_name = '', string $constant_name = '' ): string {
+	// Check environment variable (only if explicitly configured).
+	if ( '' !== $env_var_name ) {
+		$env_value = getenv( $env_var_name );
+		if ( false !== $env_value && '' !== $env_value ) {
+			return 'env';
+		}
 	}
 
-	// Check PHP constant.
-	if ( defined( $env_var_name ) ) {
-		$const_value = constant( $env_var_name );
+	// Check PHP constant (only if explicitly configured).
+	if ( '' !== $constant_name && defined( $constant_name ) ) {
+		$const_value = constant( $constant_name );
 		if ( is_string( $const_value ) && '' !== $const_value ) {
 			return 'constant';
 		}
@@ -284,7 +340,7 @@ function _gutenberg_connectors_rest_settings_dispatch( WP_REST_Response $respons
 
 	foreach ( wp_get_connectors() as $connector_id => $connector_data ) {
 		$auth = $connector_data['authentication'];
-		if ( 'ai_provider' !== $connector_data['type'] || 'api_key' !== $auth['method'] || empty( $auth['setting_name'] ) ) {
+		if ( 'api_key' !== $auth['method'] || empty( $auth['setting_name'] ) ) {
 			continue;
 		}
 
@@ -295,8 +351,9 @@ function _gutenberg_connectors_rest_settings_dispatch( WP_REST_Response $respons
 
 		$value = $data[ $setting_name ];
 
-		// On update, validate the key before masking.
-		if ( $is_update && is_string( $value ) && '' !== $value ) {
+		// On update, validate AI provider keys before masking.
+		// Non-AI connectors accept keys as-is; the service plugin handles its own validation.
+		if ( $is_update && is_string( $value ) && '' !== $value && 'ai_provider' === $connector_data['type'] ) {
 			if ( true !== _gutenberg_is_ai_api_key_valid( $value, $connector_id ) ) {
 				update_option( $setting_name, '' );
 				$data[ $setting_name ] = '';
@@ -323,20 +380,24 @@ add_filter( 'rest_post_dispatch', '_gutenberg_connectors_rest_settings_dispatch'
  * @access private
  */
 function _gutenberg_register_default_connector_settings(): void {
-	if ( ! class_exists( '\WordPress\AiClient\AiClient' ) ) {
-		return;
-	}
+	$existing_settings = get_registered_settings();
 
-	$ai_registry = \WordPress\AiClient\AiClient::defaultRegistry();
-
-	foreach ( wp_get_connectors() as $connector_id => $connector_data ) {
+	foreach ( wp_get_connectors() as $connector_data ) {
 		$auth = $connector_data['authentication'];
-		if ( 'ai_provider' !== $connector_data['type'] || 'api_key' !== $auth['method'] || empty( $auth['setting_name'] ) ) {
+		if ( 'api_key' !== $auth['method'] || empty( $auth['setting_name'] ) ) {
 			continue;
 		}
 
-		// Skip registering the setting if the provider is not in the registry.
-		if ( ! $ai_registry->hasProvider( $connector_id ) ) {
+		// Skip if the setting is already registered (e.g. by the connector's plugin).
+		if ( isset( $existing_settings[ $auth['setting_name'] ] ) ) {
+			continue;
+		}
+
+		if ( ! isset( $connector_data['plugin']['is_active'] ) || ! is_callable( $connector_data['plugin']['is_active'] ) ) {
+			continue;
+		}
+
+		if ( ! call_user_func( $connector_data['plugin']['is_active'] ) ) {
 			continue;
 		}
 
@@ -346,13 +407,13 @@ function _gutenberg_register_default_connector_settings(): void {
 			array(
 				'type'              => 'string',
 				'label'             => sprintf(
-					/* translators: %s: AI provider name. */
+					/* translators: %s: Connector name. */
 					__( '%s API Key', 'gutenberg' ),
 					$connector_data['name']
 				),
 				'description'       => sprintf(
-					/* translators: %s: AI provider name. */
-					__( 'API key for the %s AI provider.', 'gutenberg' ),
+					/* translators: %s: Connector name. */
+					__( 'API key for the %s connector.', 'gutenberg' ),
 					$connector_data['name']
 				),
 				'default'           => '',
@@ -392,13 +453,17 @@ function _gutenberg_pass_default_connector_keys_to_ai_client(): void {
 			}
 
 			// Skip if the key is already provided via env var or constant.
-			$key_source = _gutenberg_get_api_key_source( $connector_id, $auth['setting_name'] );
+			$key_source = _gutenberg_get_api_key_source(
+				$auth['setting_name'],
+				$auth['env_var_name'] ?? '',
+				$auth['constant_name'] ?? ''
+			);
 			if ( 'env' === $key_source || 'constant' === $key_source ) {
 				continue;
 			}
 
 			$api_key = get_option( $auth['setting_name'], '' );
-			if ( '' === $api_key ) {
+			if ( ! is_string( $api_key ) || '' === $api_key ) {
 				continue;
 			}
 
@@ -429,14 +494,8 @@ function _gutenberg_get_connector_script_module_data( array $data ): array {
 
 	$registry = \WordPress\AiClient\AiClient::defaultRegistry();
 
-	// Build a slug-to-file map for plugin installation status.
-	if ( ! function_exists( 'get_plugins' ) ) {
+	if ( ! function_exists( 'validate_plugin' ) ) {
 		require_once ABSPATH . 'wp-admin/includes/plugin.php';
-	}
-	$plugin_files_by_slug = array();
-	foreach ( array_keys( get_plugins() ) as $plugin_file ) {
-		$slug                          = str_contains( $plugin_file, '/' ) ? dirname( $plugin_file ) : str_replace( '.php', '', $plugin_file );
-		$plugin_files_by_slug[ $slug ] = $plugin_file;
 	}
 
 	$connectors = array();
@@ -447,11 +506,21 @@ function _gutenberg_get_connector_script_module_data( array $data ): array {
 		if ( 'api_key' === $auth['method'] ) {
 			$auth_out['settingName']    = $auth['setting_name'] ?? '';
 			$auth_out['credentialsUrl'] = $auth['credentials_url'] ?? null;
-			$auth_out['keySource']      = _gutenberg_get_api_key_source( $connector_id, $auth['setting_name'] ?? '' );
-			try {
-				$auth_out['isConnected'] = $registry->hasProvider( $connector_id ) && $registry->isProviderConfigured( $connector_id );
-			} catch ( Exception $e ) {
-				$auth_out['isConnected'] = false;
+			$auth_out['keySource']      = _gutenberg_get_api_key_source(
+				$auth['setting_name'] ?? '',
+				$auth['env_var_name'] ?? '',
+				$auth['constant_name'] ?? ''
+			);
+
+			if ( 'ai_provider' === $connector_data['type'] ) {
+				try {
+					$auth_out['isConnected'] = $registry->hasProvider( $connector_id ) && $registry->isProviderConfigured( $connector_id );
+				} catch ( Exception $e ) {
+					$auth_out['isConnected'] = false;
+				}
+			} else {
+				// For non-AI connectors, consider connected if a key exists from any source.
+				$auth_out['isConnected'] = 'none' !== $auth_out['keySource'];
 			}
 		}
 
@@ -463,15 +532,13 @@ function _gutenberg_get_connector_script_module_data( array $data ): array {
 			'authentication' => $auth_out,
 		);
 
-		if ( ! empty( $connector_data['plugin']['slug'] ) ) {
-			$plugin_slug = $connector_data['plugin']['slug'];
-			$plugin_file = $plugin_files_by_slug[ $plugin_slug ] ?? null;
-
-			$is_installed = null !== $plugin_file;
-			$is_activated = $is_installed && is_plugin_active( $plugin_file );
+		if ( ! empty( $connector_data['plugin']['file'] ) ) {
+			$file         = $connector_data['plugin']['file'];
+			$is_activated = (bool) call_user_func( $connector_data['plugin']['is_active'] );
+			$is_installed = $is_activated || 0 === validate_plugin( $file );
 
 			$connector_out['plugin'] = array(
-				'slug'        => $plugin_slug,
+				'file'        => $file,
 				'isInstalled' => $is_installed,
 				'isActivated' => $is_activated,
 			);
@@ -480,7 +547,8 @@ function _gutenberg_get_connector_script_module_data( array $data ): array {
 		$connectors[ $connector_id ] = $connector_out;
 	}
 	ksort( $connectors );
-	$data['connectors'] = $connectors;
+	$data['connectors']        = $connectors;
+	$data['isFileModDisabled'] = ! wp_is_file_mod_allowed( 'install_plugins' );
 	return $data;
 }
 remove_filter( 'script_module_data_options-connectors-wp-admin', '_wp_connectors_get_connector_script_module_data' );

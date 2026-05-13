@@ -454,6 +454,14 @@ _Returns_
 
 > **Deprecated** since 5.3, use `wp.blockEditor.InspectorControls` instead.
 
+### linkAutocompleter
+
+A link completer for posts and pages.
+
+_Type_
+
+-   `Object`
+
 ### LocalAutosaveMonitor
 
 Monitors local autosaves of a post in the editor. It uses several hooks and functions to manage autosave behavior:
@@ -1241,6 +1249,18 @@ _Returns_
 ### PostPublishPanel
 
 Renders a panel for publishing a post.
+
+_Parameters_
+
+-   _props_ `Object`: Component props.
+-   _props.forceIsDirty_ `[boolean]`: Whether to force the dirty state.
+-   _props.onClose_ `()=>void`: Called when the panel requests to close.
+-   _props.PostPublishExtension_ `[React.ComponentType]`: Component rendered after publishing.
+-   _props.PrePublishExtension_ `[React.ComponentType]`: Component rendered before publishing.
+
+_Returns_
+
+-   `React.JSX.Element`: The post publish panel.
 
 ### PostSavedState
 

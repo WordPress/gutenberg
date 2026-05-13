@@ -1,18 +1,13 @@
 /**
  * WordPress dependencies
  */
-import { combineReducers } from '@wordpress/data';
+import { combineReducers, keyedReducer } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
-import {
-	conservativeMapItem,
-	ifMatchingAction,
-	replaceAction,
-	onSubKey,
-} from '../utils';
+import { conservativeMapItem, ifMatchingAction, replaceAction } from '../utils';
 import { DEFAULT_ENTITY_KEY } from '../entities';
 import getQueryParts from './get-query-parts';
 
@@ -30,24 +25,33 @@ function getContextFromAction( action ) {
  * Returns a merged array of item IDs, given details of the received paginated
  * items. The array is sparse-like with `undefined` entries where holes exist.
  *
- * @param {?Array<number>} itemIds     Original item IDs (default empty array).
- * @param {number[]}       nextItemIds Item IDs to merge.
- * @param {number}         page        Page of items merged.
- * @param {number}         perPage     Number of items per page.
+ * @param {number[]|undefined} itemIds          Original item IDs (default empty array).
+ * @param {number[]}           nextItemIds      Item IDs to merge.
+ * @param {Object}             options          Options object.
+ * @param {number}             [options.page]   Page of items merged.
+ * @param {number}             [options.offset] Offset of items merged.
+ * @param {number}             options.perPage  Number of items per page.
  *
  * @return {number[]} Merged array of item IDs.
  */
-export function getMergedItemIds( itemIds, nextItemIds, page, perPage ) {
-	const receivedAllIds = page === 1 && perPage === -1;
-	if ( receivedAllIds ) {
+export function getMergedItemIds(
+	itemIds = [],
+	nextItemIds,
+	// The defaults for `page` and `perPage` are the same as in `getQueryParts`.
+	{ page = 1, offset, perPage = 10 } = {}
+) {
+	// If the query is unbounded, then `nextItemIds` is a complete replacement.
+	if ( perPage === -1 ) {
 		return nextItemIds;
 	}
-	const nextItemIdsStartIndex = ( page - 1 ) * perPage;
+
+	const nextItemIdsStartIndex = offset ?? ( page - 1 ) * perPage;
+	const nextItemIdsRange = Math.max( perPage, nextItemIds.length );
 
 	// If later page has already been received, default to the larger known
 	// size of the existing array, else calculate as extending the existing.
 	const size = Math.max(
-		itemIds?.length ?? 0,
+		itemIds.length,
 		nextItemIdsStartIndex + nextItemIds.length
 	);
 
@@ -59,10 +63,13 @@ export function getMergedItemIds( itemIds, nextItemIds, page, perPage ) {
 		// We need to check against the possible maximum upper boundary because
 		// a page could receive fewer than what was previously stored.
 		const isInNextItemsRange =
-			i >= nextItemIdsStartIndex && i < nextItemIdsStartIndex + perPage;
-		mergedItemIds[ i ] = isInNextItemsRange
-			? nextItemIds[ i - nextItemIdsStartIndex ]
-			: itemIds?.[ i ];
+			i >= nextItemIdsStartIndex &&
+			i < nextItemIdsStartIndex + nextItemIdsRange;
+		if ( isInNextItemsRange ) {
+			mergedItemIds[ i ] = nextItemIds[ i - nextItemIdsStartIndex ];
+		} else {
+			mergedItemIds[ i ] = itemIds[ i ];
+		}
 	}
 
 	return mergedItemIds;
@@ -209,11 +216,11 @@ const receiveQueries = compose( [
 	// an unhandled action.
 	ifMatchingAction( ( action ) => 'query' in action ),
 
-	// Inject query parts into action for use both in `onSubKey` and reducer.
+	// Inject query parts into action for use both in `keyedReducer` and reducer.
 	replaceAction( ( action ) => {
 		// `ifMatchingAction` still passes on initialization, where state is
 		// undefined and a query is not assigned. Avoid attempting to parse
-		// parts. `onSubKey` will omit by lack of `stableKey`.
+		// parts. `keyedReducer` will omit by lack of `stableKey`.
 		if ( action.query ) {
 			return {
 				...action,
@@ -224,11 +231,11 @@ const receiveQueries = compose( [
 		return action;
 	} ),
 
-	onSubKey( 'context' ),
+	keyedReducer( 'context' ),
 
 	// Queries shape is shared, but keyed by query `stableKey` part. Original
 	// reducer tracks only a single query object.
-	onSubKey( 'stableKey' ),
+	keyedReducer( 'stableKey' ),
 ] )( ( state = {}, action ) => {
 	if ( action.type !== 'RECEIVE_ITEMS' ) {
 		return state;
@@ -244,10 +251,13 @@ const receiveQueries = compose( [
 
 	return {
 		itemIds: getMergedItemIds(
-			state?.itemIds || [],
+			state.itemIds,
 			action.items.map( ( item ) => item?.[ key ] ).filter( Boolean ),
-			action.page,
-			action.perPage
+			{
+				page: action.page,
+				offset: action.offset,
+				perPage: action.perPage,
+			}
 		),
 		meta: action.meta,
 	};

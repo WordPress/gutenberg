@@ -1,3 +1,5 @@
+// Playwright fixtures use `use()` which is not a React hook.
+
 /**
  * External dependencies
  */
@@ -153,7 +155,7 @@ const test = base.extend<
 			await page.evaluate( () => {
 				window.localStorage.clear();
 			} );
-		} catch ( error ) {
+		} catch {
 			// noop.
 		}
 

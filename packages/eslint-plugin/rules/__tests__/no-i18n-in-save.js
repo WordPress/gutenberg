@@ -9,11 +9,13 @@ import { RuleTester } from 'eslint';
 import rule from '../no-i18n-in-save';
 
 const ruleTester = new RuleTester( {
-	parserOptions: {
+	languageOptions: {
 		ecmaVersion: 6,
 		sourceType: 'module',
-		ecmaFeatures: {
-			jsx: true,
+		parserOptions: {
+			ecmaFeatures: {
+				jsx: true,
+			},
 		},
 	},
 } );

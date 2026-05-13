@@ -21,7 +21,7 @@ const getStyleRulesForElement = ( element, styleSheets ) => {
 					found.push( rule.style );
 				}
 			} );
-		} catch ( e ) {}
+		} catch {}
 
 		return [ ...matchingRules, ...found ];
 	}, [] );

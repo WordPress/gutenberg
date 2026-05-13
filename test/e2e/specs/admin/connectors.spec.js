@@ -79,8 +79,8 @@ test.describe( 'Connectors', () => {
 			// Connector should be wrapped in a group with the heading as label.
 			const group = card.getByRole( 'group' );
 			await expect( group ).toBeVisible();
+			await expect( heading ).toHaveAttribute( 'id', /\S/ );
 			const headingId = await heading.getAttribute( 'id' );
-			expect( headingId ).toBeTruthy();
 			await expect( group ).toHaveAttribute(
 				'aria-labelledby',
 				headingId
@@ -88,7 +88,7 @@ test.describe( 'Connectors', () => {
 
 			const button = card.getByRole( 'button', { name: 'Install' } );
 			await expect( button ).toBeVisible();
-			// Install button should not have aria-expanded.
+			// Install button should not have aria-expanded until expanded.
 			await expect( button ).not.toHaveAttribute( 'aria-expanded' );
 		}
 
@@ -386,11 +386,13 @@ test.describe( 'Connectors', () => {
 		await expect( banner ).toBeVisible();
 
 		// Verify the banner message mentions the AI plugin.
-		await expect( banner.getByText( 'AI plugin' ) ).toBeVisible();
+		await expect(
+			banner.locator( 'p' ).getByText( 'AI plugin' )
+		).toBeVisible();
 
 		// Verify the Install button is present.
 		await expect(
-			banner.getByRole( 'button', { name: 'Install AI Experiments' } )
+			banner.getByRole( 'button', { name: 'Install the AI plugin' } )
 		).toBeVisible();
 
 		// Verify the Learn more link is present.
@@ -455,12 +457,38 @@ test.describe( 'Connectors', () => {
 
 	test.describe( 'Connectors page capability checks', () => {
 		const PLUGIN_SLUG = 'gutenberg-test-connectors-capability-restriction';
+		const installRequiredConnector = {
+			slug: 'gutenberg-test-connectors-never-installed',
+			name: 'Test Install Required Connector',
+			action: 'Install',
+			pluginSlug: 'gutenberg-test-connectors-never-installed',
+		};
+		const activateRequiredConnector = {
+			slug: 'hello',
+			name: 'Test Activate Required Connector',
+			action: 'Activate',
+			pluginSlug: 'hello',
+		};
+		const clearCapabilityRestriction = async ( requestUtils ) => {
+			await requestUtils.rest( {
+				path: '/wp/v2/settings',
+				method: 'POST',
+				data: {
+					gutenberg_test_cap_restriction: '',
+				},
+			} );
+		};
 
 		test.beforeAll( async ( { requestUtils } ) => {
 			await requestUtils.activatePlugin( PLUGIN_SLUG );
 		} );
 
+		test.afterEach( async ( { requestUtils } ) => {
+			await clearCapabilityRestriction( requestUtils );
+		} );
+
 		test.afterAll( async ( { requestUtils } ) => {
+			await clearCapabilityRestriction( requestUtils );
 			await requestUtils.deactivatePlugin( PLUGIN_SLUG );
 		} );
 
@@ -475,7 +503,7 @@ test.describe( 'Connectors', () => {
 		];
 
 		capabilities.forEach( ( [ restriction, label ] ) => {
-			test( `should show "Not available" when ${ label }`, async ( {
+			test( `should show unavailable connector actions when ${ label }`, async ( {
 				page,
 				admin,
 				requestUtils,
@@ -493,29 +521,123 @@ test.describe( 'Connectors', () => {
 					CONNECTORS_PAGE_QUERY
 				);
 
-				// AI plugin callout banner should be hidden when user lacks permissions.
-				await expect(
-					page.locator( '.ai-plugin-callout' )
-				).toBeHidden();
-
-				for ( const { slug } of CONNECTORS ) {
+				for ( const { slug, name, action, pluginSlug } of [
+					installRequiredConnector,
+					activateRequiredConnector,
+				] ) {
 					const card = page.locator( `.connector-item--${ slug }` );
 					await expect( card ).toBeVisible();
 					await expect(
-						card.getByText( 'Not available' )
+						card.getByRole( 'heading', { name, level: 2 } )
 					).toBeVisible();
+					const learnMoreLink = card.getByRole( 'link', {
+						name: 'Learn more',
+					} );
+					await expect( learnMoreLink ).toBeVisible();
+					await expect( learnMoreLink ).toHaveAttribute(
+						'href',
+						`https://wordpress.org/plugins/${ pluginSlug }/`
+					);
 					await expect(
-						card.getByRole( 'button', { name: 'Install' } )
+						card.getByRole( 'button', { name: action } )
 					).toBeHidden();
 				}
 
-				// Plugin directory link should be hidden.
 				await expect(
 					page.getByRole( 'link', {
 						name: 'search the plugin directory',
 					} )
 				).toBeHidden();
 			} );
+		} );
+	} );
+
+	test.describe( 'JS extensibility', () => {
+		const PLUGIN_SLUG = 'gutenberg-test-connectors-js-extensibility';
+
+		test.beforeAll( async ( { requestUtils } ) => {
+			await requestUtils.activatePlugin( PLUGIN_SLUG );
+		} );
+
+		test.afterAll( async ( { requestUtils } ) => {
+			await requestUtils.deactivatePlugin( PLUGIN_SLUG );
+		} );
+
+		test( 'should not display a card for a server-only connector without a JS render function', async ( {
+			page,
+			admin,
+		} ) => {
+			await admin.visitAdminPage(
+				SETTINGS_PAGE_PATH,
+				CONNECTORS_PAGE_QUERY
+			);
+
+			// The server registers test_server_only_service but no JS
+			// registerConnector call provides a render function for it,
+			// so no card should appear in the UI.
+			await expect(
+				page.getByRole( 'heading', {
+					name: 'Test Server Only Service',
+					level: 2,
+				} )
+			).toBeHidden();
+		} );
+
+		test( 'should display a custom connector registered via JS with merging strategy', async ( {
+			page,
+			admin,
+		} ) => {
+			await admin.visitAdminPage(
+				SETTINGS_PAGE_PATH,
+				CONNECTORS_PAGE_QUERY
+			);
+
+			const card = page.locator( '.connector-item--test_custom_service' );
+			await expect( card ).toBeVisible();
+
+			// Verify the custom content from the render function is visible.
+			await expect(
+				card.getByText( 'Custom rendered content for testing.' )
+			).toBeVisible();
+
+			// Verify label and description from the server-side PHP registration
+			// are merged with the client-side JS render function.
+			await expect(
+				card.getByRole( 'heading', {
+					name: 'Test Custom Service',
+					level: 2,
+				} )
+			).toBeVisible();
+			await expect(
+				card.getByText( 'A custom service for E2E testing.' )
+			).toBeVisible();
+		} );
+
+		test( 'should preserve a custom render for an api_key connector registered before registerDefaultConnectors', async ( {
+			page,
+			admin,
+		} ) => {
+			await admin.visitAdminPage(
+				SETTINGS_PAGE_PATH,
+				CONNECTORS_PAGE_QUERY
+			);
+
+			const card = page.locator(
+				'.connector-item--test_api_key_with_custom_render'
+			);
+			await expect( card ).toBeVisible();
+
+			// The JS-registered custom render must be visible inside the card.
+			await expect(
+				card.getByText(
+					'Custom render survived registerDefaultConnectors().'
+				)
+			).toBeVisible();
+
+			// The default API key input must not appear inside the card.
+			await expect(
+				card.getByRole( 'textbox', { name: 'API Key' } )
+			).toHaveCount( 0 );
 		} );
 	} );
 } );

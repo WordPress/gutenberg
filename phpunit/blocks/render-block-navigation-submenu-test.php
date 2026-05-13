@@ -122,15 +122,29 @@ class Render_Block_Navigation_Submenu_Test extends WP_UnitTestCase {
 
 		$navigation_submenu_block = new WP_Block( $block, $context );
 
-		$this->assertStringContainsString(
-			'<ul style="color:' . $context['customOverlayTextColor'] . ';background-color:' . $context['customOverlayBackgroundColor'] . '" class="wp-block-navigation__submenu-container has-text-color has-background">',
-			gutenberg_render_block_core_navigation_submenu(
-				$navigation_submenu_block->attributes,
-				array(),
-				$navigation_submenu_block
-			),
-			'Submenu block colors inherited from context not applied correctly'
-		);
+		if ( is_wp_version_compatible( '7.0' ) ) {
+			$this->assertStringContainsString(
+				'<ul style="color:' . $context['customOverlayTextColor'] . ';background-color:' . $context['customOverlayBackgroundColor'] . '" class="wp-block-navigation__submenu-container has-text-color has-background">',
+				gutenberg_render_block_core_navigation_submenu(
+					$navigation_submenu_block->attributes,
+					array(),
+					$navigation_submenu_block
+				),
+				'Submenu block colors inherited from context not applied correctly'
+			);
+		} else {
+			// Block markup for WP 6.9 (semicolon in style attribute)
+			// TODO: Remove the second expected markup after WP 6.9 support is dropped and the old markup is no longer generated.
+			$this->assertStringContainsString(
+				'<ul style="color:' . $context['customOverlayTextColor'] . ';background-color:' . $context['customOverlayBackgroundColor'] . ';" class="wp-block-navigation__submenu-container has-text-color has-background">',
+				gutenberg_render_block_core_navigation_submenu(
+					$navigation_submenu_block->attributes,
+					array(),
+					$navigation_submenu_block
+				),
+				'Submenu block colors inherited from context not applied correctly'
+			);
+		}
 	}
 
 	/**
@@ -158,15 +172,29 @@ class Render_Block_Navigation_Submenu_Test extends WP_UnitTestCase {
 
 		$navigation_submenu_block = new WP_Block( $block, $context );
 
-		$this->assertStringContainsString(
-			'<ul style="background-color:' . $context['customOverlayBackgroundColor'] . '" class="wp-block-navigation__submenu-container has-text-color has-' . $context['overlayTextColor'] . '-color has-background">',
-			gutenberg_render_block_core_navigation_submenu(
-				$navigation_submenu_block->attributes,
-				array(),
-				$navigation_submenu_block
-			),
-			'Submenu block colors inherited from context not applied correctly'
-		);
+		if ( is_wp_version_compatible( '7.0' ) ) {
+			$this->assertStringContainsString(
+				'<ul style="background-color:' . $context['customOverlayBackgroundColor'] . '" class="wp-block-navigation__submenu-container has-text-color has-' . $context['overlayTextColor'] . '-color has-background">',
+				gutenberg_render_block_core_navigation_submenu(
+					$navigation_submenu_block->attributes,
+					array(),
+					$navigation_submenu_block
+				),
+				'Submenu block colors inherited from context not applied correctly'
+			);
+		} else {
+			// Block markup for WP 6.9 (semicolon in style attribute)
+			// TODO: Remove the second expected markup after WP 6.9 support is dropped and the old markup is no longer generated.
+			$this->assertStringContainsString(
+				'<ul style="background-color:' . $context['customOverlayBackgroundColor'] . ';" class="wp-block-navigation__submenu-container has-text-color has-' . $context['overlayTextColor'] . '-color has-background">',
+				gutenberg_render_block_core_navigation_submenu(
+					$navigation_submenu_block->attributes,
+					array(),
+					$navigation_submenu_block
+				),
+				'Submenu block colors inherited from context not applied correctly'
+			);
+		}
 	}
 
 	/**

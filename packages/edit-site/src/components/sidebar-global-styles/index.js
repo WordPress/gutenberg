@@ -31,7 +31,7 @@ const GlobalStylesPageActions = ( {
 	const history = useHistory();
 
 	return (
-		<HStack>
+		<HStack className="edit-site-styles__header-actions">
 			<Button
 				isPressed={ isStyleBookOpened }
 				icon={ seen }
@@ -103,6 +103,7 @@ export default function SidebarGlobalStyles() {
 			}
 			className="edit-site-styles"
 			title={ __( 'Styles' ) }
+			headingLevel={ 2 }
 		>
 			<GlobalStylesUIWrapper
 				path={ section }

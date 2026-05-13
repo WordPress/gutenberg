@@ -11,7 +11,7 @@ describe( 'getQueryParts', () => {
 			context: 'default',
 			page: 2,
 			perPage: 2,
-			offset: undefined,
+			offset: null,
 			stableKey: '',
 			fields: null,
 			include: null,
@@ -29,7 +29,7 @@ describe( 'getQueryParts', () => {
 			context: 'default',
 			page: 1,
 			perPage: 10,
-			offset: undefined,
+			offset: null,
 			stableKey: 'include=1',
 			fields: null,
 			include: [ 1 ],
@@ -45,7 +45,7 @@ describe( 'getQueryParts', () => {
 			context: 'default',
 			page: 1,
 			perPage: 10,
-			offset: undefined,
+			offset: null,
 			stableKey: '%3F=%26&b=2',
 			fields: null,
 			include: null,
@@ -59,7 +59,7 @@ describe( 'getQueryParts', () => {
 			context: 'default',
 			page: 1,
 			perPage: 10,
-			offset: undefined,
+			offset: null,
 			stableKey: 'a%5B0%5D=1&a%5B1%5D=2',
 			fields: null,
 			include: null,
@@ -75,7 +75,7 @@ describe( 'getQueryParts', () => {
 			context: 'default',
 			page: 1,
 			perPage: 10,
-			offset: undefined,
+			offset: null,
 			stableKey: 'b=2',
 			fields: null,
 			include: null,
@@ -89,7 +89,7 @@ describe( 'getQueryParts', () => {
 			context: 'default',
 			page: 1,
 			perPage: -1,
-			offset: undefined,
+			offset: null,
 			stableKey: 'b=2',
 			fields: null,
 			include: null,
@@ -103,7 +103,7 @@ describe( 'getQueryParts', () => {
 			context: 'default',
 			page: 1,
 			perPage: 10,
-			offset: undefined,
+			offset: null,
 			stableKey: '_fields=id%2Ctitle',
 			fields: [ 'id', 'title' ],
 			include: null,
@@ -116,7 +116,7 @@ describe( 'getQueryParts', () => {
 		expect( parts ).toEqual( {
 			page: 1,
 			perPage: 10,
-			offset: undefined,
+			offset: null,
 			stableKey: '',
 			include: null,
 			fields: null,
@@ -124,7 +124,7 @@ describe( 'getQueryParts', () => {
 		} );
 	} );
 
-	it( 'extracts offset and includes it in stableKey', () => {
+	it( 'extracts offset and excludes it from stableKey', () => {
 		const parts = getQueryParts( {
 			per_page: 50,
 			offset: 100,
@@ -135,7 +135,7 @@ describe( 'getQueryParts', () => {
 			page: 1,
 			perPage: 50,
 			offset: 100,
-			stableKey: 'offset=100',
+			stableKey: '',
 			fields: null,
 			include: null,
 		} );
@@ -147,6 +147,6 @@ describe( 'getQueryParts', () => {
 			offset: 'abc',
 		} );
 
-		expect( parts.offset ).toBeUndefined();
+		expect( parts.offset ).toBeNull();
 	} );
 } );

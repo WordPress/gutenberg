@@ -6,7 +6,8 @@ export interface BreadcrumbItem {
 
 	/**
 	 * The router path that the breadcrumb item should link to.
-	 * It is optional because the current item does not have a link.
+	 * It is optional for the last item (the current page).
+	 * All preceding items should provide a `to` prop.
 	 */
 	to?: string;
 }
@@ -14,7 +15,9 @@ export interface BreadcrumbItem {
 export interface BreadcrumbsProps extends React.HTMLAttributes< HTMLElement > {
 	/**
 	 * An array of items to display in the breadcrumb trail.
-	 * The last item is considered the current item.
+	 * The last item is considered the current item and has an optional `to` prop.
+	 * All preceding items must have a `to` prop — in development mode,
+	 * an error is thrown when this requirement is not met.
 	 */
 	items: BreadcrumbItem[];
 	/**

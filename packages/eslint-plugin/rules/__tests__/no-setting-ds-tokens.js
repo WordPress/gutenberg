@@ -2,10 +2,12 @@ import { RuleTester } from 'eslint';
 import rule from '../no-setting-ds-tokens';
 
 const ruleTester = new RuleTester( {
-	parserOptions: {
+	languageOptions: {
 		ecmaVersion: 6,
-		ecmaFeatures: {
-			jsx: true,
+		parserOptions: {
+			ecmaFeatures: {
+				jsx: true,
+			},
 		},
 	},
 } );
@@ -33,6 +35,18 @@ ruleTester.run( 'no-setting-ds-tokens', rule, {
 		{
 			code: `const { '--wpds-color-fg-content-neutral': neutralColor } = styles;`,
 		},
+		{
+			code: `const css = '--my-custom-prop: red;';`,
+		},
+		{
+			code: 'const css = `--my-custom-prop-${ suffix }: red;`;',
+		},
+		{
+			code: 'const css = `--my-custom-prop: red;`;',
+		},
+		{
+			code: '<style>{ `--my-custom-prop-${ suffix }: red;` }</style>',
+		},
 	],
 	invalid: [
 		{
@@ -44,7 +58,7 @@ ruleTester.run( 'no-setting-ds-tokens', rule, {
 			],
 		},
 		{
-			code: `<div style={ { '--wpds-font-size-md': '10px', color: 'blue' } } />`,
+			code: `<div style={ { '--wpds-typography-font-size-md': '10px', color: 'blue' } } />`,
 			errors: [
 				{
 					messageId: 'disallowedSet',
@@ -60,7 +74,7 @@ ruleTester.run( 'no-setting-ds-tokens', rule, {
 			],
 		},
 		{
-			code: `function getStyles() { return { '--wpds-font-size-md': '10px' }; }`,
+			code: `function getStyles() { return { '--wpds-typography-font-size-md': '10px' }; }`,
 			errors: [
 				{
 					messageId: 'disallowedSet',
@@ -69,6 +83,46 @@ ruleTester.run( 'no-setting-ds-tokens', rule, {
 		},
 		{
 			code: `const config = { inner: { '--wpds-color-fg-content-neutral': 'red' } };`,
+			errors: [
+				{
+					messageId: 'disallowedSet',
+				},
+			],
+		},
+		{
+			code: `const css = '--wpds-color-fg-content-neutral: red;';`,
+			errors: [
+				{
+					messageId: 'disallowedSet',
+				},
+			],
+		},
+		{
+			code: 'const css = `--wpds-color-fg-content-neutral: red;`;',
+			errors: [
+				{
+					messageId: 'disallowedSet',
+				},
+			],
+		},
+		{
+			code: 'const css = `--wpds-color-fg-content-neutral: ${ value };`;',
+			errors: [
+				{
+					messageId: 'disallowedSet',
+				},
+			],
+		},
+		{
+			code: 'const css = `--wpds-color-${ suffix }: red;`;',
+			errors: [
+				{
+					messageId: 'disallowedSet',
+				},
+			],
+		},
+		{
+			code: '<style>{ `--wpds-color-${ suffix }: red;` }</style>',
 			errors: [
 				{
 					messageId: 'disallowedSet',

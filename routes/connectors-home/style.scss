@@ -29,6 +29,10 @@ $sticky-header-clearance: 120px;
 		scroll-margin-top: $sticky-header-clearance;
 	}
 
+	&__file-mods-notice {
+		margin-bottom: 16px;
+	}
+
 	&--empty {
 		flex-grow: 1;
 		display: flex;
@@ -60,18 +64,13 @@ $sticky-header-clearance: 120px;
 			flex-direction: column;
 			gap: 12px;
 			padding-top: 2px;
+			align-items: flex-start;
 
 			p {
 				margin: 0;
 				font-size: 13px;
 				line-height: 20px;
 			}
-		}
-
-		&__actions {
-			display: flex;
-			gap: 12px;
-			align-items: center;
 		}
 
 		&__decoration {
@@ -84,7 +83,6 @@ $sticky-header-clearance: 120px;
 	}
 
 	> p {
-		text-align: center;
 		color: $gray-600;
 	}
 

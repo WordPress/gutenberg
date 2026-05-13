@@ -102,6 +102,10 @@ export function DimensionsPanel( { clientId, name, setAttributes, settings } ) {
 		'__experimentalDefaultControls',
 	] );
 	const defaultControls = {
+		// In the block inspector, minHeight and minWidth should not
+		// be shown by default unless the block explicitly opts in.
+		minHeight: false,
+		minWidth: false,
 		...defaultDimensionsControls,
 		...defaultSpacingControls,
 	};
@@ -161,7 +165,8 @@ export function hasDimensionsSupport( blockName, feature = 'any' ) {
 			support?.aspectRatio ||
 			!! support?.height ||
 			!! support?.minHeight ||
-			!! support?.width
+			!! support?.width ||
+			!! support?.minWidth
 		);
 	}
 

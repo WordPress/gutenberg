@@ -17,6 +17,14 @@ const test = base.extend( {
 } );
 
 test.describe( 'Widgets screen', () => {
+	test.beforeAll( async ( { requestUtils } ) => {
+		await Promise.all( [
+			// TODO: Ideally we can bundle our test theme directly in the repo.
+			requestUtils.activateTheme( 'twentytwenty' ),
+			requestUtils.deleteAllWidgets(),
+		] );
+	} );
+
 	test.beforeEach( async ( { admin, editor } ) => {
 		await admin.visitAdminPage( 'widgets.php' );
 
@@ -27,14 +35,6 @@ test.describe( 'Widgets screen', () => {
 
 	test.afterEach( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllWidgets();
-	} );
-
-	test.beforeAll( async ( { requestUtils } ) => {
-		await Promise.all( [
-			// TODO: Ideally we can bundle our test theme directly in the repo.
-			requestUtils.activateTheme( 'twentytwenty' ),
-			requestUtils.deleteAllWidgets(),
-		] );
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {

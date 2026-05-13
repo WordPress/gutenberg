@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useId } from '@wordpress/element';
-import { Field } from '../../../..';
+import * as Field from '../';
+import { DETAILS_EXAMPLE } from '../../../stories/shared';
 
 const meta: Meta< typeof Field.Root > = {
 	title: 'Design System/Components/Form/Primitives/Field',
@@ -11,6 +12,13 @@ const meta: Meta< typeof Field.Root > = {
 		Control: Field.Control,
 		Description: Field.Description,
 		Details: Field.Details,
+	},
+	parameters: {
+		componentStatus: {
+			status: 'use-with-caution',
+			whereUsed: 'global',
+			notes: 'Not yet recommended for use alongside components from `@wordpress/components`, pending review of style consistency with `@wordpress/components` and component set completeness. See [WordPress/gutenberg#76135](https://github.com/WordPress/gutenberg/issues/76135).',
+		},
 	},
 };
 export default meta;
@@ -135,13 +143,7 @@ export const WithDetails: StoryObj< typeof Field.Root > = {
 				<Field.Control
 					render={ <input type="text" placeholder="Placeholder" /> }
 				/>
-				<Field.Details>
-					Details can include{ '	' }
-					<a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/a">
-						links to more information
-					</a>{ ' ' }
-					and other semantic elements.
-				</Field.Details>
+				<Field.Details>{ DETAILS_EXAMPLE }</Field.Details>
 			</>
 		),
 	},
