@@ -2,8 +2,16 @@
  * WordPress dependencies
  */
 import { __, sprintf, _n } from '@wordpress/i18n';
-// eslint-disable-next-line @wordpress/use-recommended-components -- Used here because it supports rendering as a `span` via the `render` prop to avoid invalid HTML.
-import { Badge, Button, Popover, Stack, Tooltip } from '@wordpress/ui';
+/* eslint-disable @wordpress/use-recommended-components -- Used here because it supports rendering as a `span` via the `render` prop to avoid invalid HTML. */
+import {
+	Badge,
+	Button,
+	Popover,
+	Stack,
+	Tooltip,
+	VisuallyHidden,
+} from '@wordpress/ui';
+/* eslint-enable @wordpress/use-recommended-components */
 
 const DEFAULT_MAX = 3;
 
@@ -21,6 +29,11 @@ export function OverflowingBadges( {
 	const moreLabel = sprintf(
 		/* translators: %d: number of additional items */
 		_n( 'Show %d more', 'Show %d more', hidden.length ),
+		hidden.length
+	);
+	const popoverTitle = sprintf(
+		/* translators: %d: number of additional items */
+		_n( '%d more item', '%d more items', hidden.length ),
 		hidden.length
 	);
 	return (
@@ -65,6 +78,9 @@ export function OverflowingBadges( {
 								}
 							/>
 							<Popover.Popup style={ { maxWidth: 320 } }>
+								<VisuallyHidden render={ <Popover.Title /> }>
+									{ popoverTitle }
+								</VisuallyHidden>
 								<Stack direction="row" wrap="wrap" gap="xs">
 									{ hidden.map( ( item ) => (
 										<Badge key={ item.key }>
