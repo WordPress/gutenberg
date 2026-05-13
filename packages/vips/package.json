@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/vips",
-	"version": "1.5.0",
+	"version": "1.5.1-next.v.202605131032.0+f6d6e7149",
 	"description": "Utils for working with libvips.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
