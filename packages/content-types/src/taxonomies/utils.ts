@@ -165,6 +165,7 @@ export function toFormData( row: TaxonomyRecord ): TaxonomyFormData {
 		status: row.status,
 		title: { raw: row.title.raw },
 		config: formConfig,
+		count: row.count,
 	};
 }
 

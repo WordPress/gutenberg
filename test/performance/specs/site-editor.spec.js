@@ -219,30 +219,24 @@ test.describe( 'Site Editor Performance', () => {
 					path: '/wp_template',
 				} );
 
-				// The Templates index page has changed, so we need to know which UI is in use in the branch.
-				// We do so by checking the presence of the dataviews component.
-				// If it's there, switch to the list layout before running the test.
-				// See https://github.com/WordPress/gutenberg/pull/59792
-				const isDataViewsUI = await page
-					.getByRole( 'button', { name: 'Layout' } )
-					.isVisible();
-				if ( isDataViewsUI ) {
-					await page
-						.getByRole( 'button', { name: 'Layout' } )
-						.click();
-					await page
-						.getByRole( 'menuitemradio' )
-						.filter( { has: page.getByText( 'List' ) } )
-						.click();
-				}
+				// Switch to the list layout before running the test.
+				await page.getByRole( 'button', { name: 'Layout' } ).click();
+				await page
+					.getByRole( 'menuitemradio' )
+					.filter( { has: page.getByText( 'List' ) } )
+					.click();
+
+				// Wait for the grid to be really visible.
+				await page.getByRole( 'grid' ).waitFor();
+
+				// List view shows the editor canvas, wait for it to be ready so
+				// that the loading doesn't contaminate the navigation test.
+				await admin.waitForSiteEditor();
 
 				await metrics.startTracing();
 				await page
-					.getByRole( 'button', {
-						name: 'Single Posts',
-						exact: true,
-					} )
-					.click( { force: true } );
+					.getByRole( 'button', { name: 'Single Posts' } )
+					.click();
 				await metrics.stopTracing();
 
 				// Get the durations.

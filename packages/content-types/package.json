@@ -48,7 +48,8 @@
 		"@wordpress/private-apis": "file:../private-apis",
 		"@wordpress/route": "file:../route",
 		"@wordpress/ui": "file:../ui",
-		"@wordpress/url": "file:../url"
+		"@wordpress/url": "file:../url",
+		"@wordpress/views": "file:../views"
 	},
 	"publishConfig": {
 		"access": "public"
