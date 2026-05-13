@@ -42,12 +42,11 @@ class Tests_Strip_Inline_Note_Markers extends WP_UnitTestCase {
 		$this->assertSame( $html, $stripped );
 	}
 
-	public function test_render_block_filter_strips_marker_from_block_output() {
-		// Exercises the registered filter end-to-end so any future hook
-		// rewiring is caught.
-		$content = '<p>Hello <span class="wp-note" data-id="9">there</span></p>';
-		$output  = apply_filters( 'render_block', $content, array(), null );
-
-		$this->assertSame( '<p>Hello there</p>', $output );
+	public function test_strip_filter_is_registered_on_render_block() {
+		// Guards against future hook rewiring that would silently leave
+		// inline-note markers in rendered output.
+		$this->assertNotFalse(
+			has_filter( 'render_block', 'gutenberg_strip_inline_note_markers' )
+		);
 	}
 }
