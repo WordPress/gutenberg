@@ -22,6 +22,35 @@ const BASE_RESET =
 	'mark.annotation-text-core-note{background-color:transparent;color:inherit;}';
 
 /**
+ * Build the CSS rule set that tints each inline-note marker with its author's
+ * avatar color. Pure helper extracted so it can be unit-tested without React.
+ *
+ * @param {Array}       threads    Unresolved note threads (each with `id` and `author`).
+ * @param {string|null} selectedId ID of the currently selected note, if any.
+ * @return {string} A serialized CSS string targeting the annotations the API renders.
+ */
+export function buildHighlightCss( threads, selectedId = null ) {
+	const rules = [ BASE_RESET ];
+	for ( const thread of threads ?? [] ) {
+		if ( ! thread?.id ) {
+			continue;
+		}
+		const color = getAvatarBorderColor( thread.author ?? 0 );
+		const sel = `#annotation-text-${ thread.id }`;
+		rules.push( `${ sel }{background-color:${ color }${ REST_ALPHA };}` );
+		rules.push(
+			`${ sel }:hover,${ sel }:focus-within{background-color:${ color }${ ACTIVE_ALPHA };}`
+		);
+		if ( selectedId && String( selectedId ) === String( thread.id ) ) {
+			rules.push(
+				`${ sel }{background-color:${ color }${ ACTIVE_ALPHA };}`
+			);
+		}
+	}
+	return rules.join( '' );
+}
+
+/**
  * Injects per-note background rules into the editor canvas so inline-note
  * markers carry their author's avatar color. The annotations API renders each
  * marker with `id="annotation-text-{noteId}"`, which we target directly.
@@ -38,29 +67,10 @@ const BASE_RESET =
  * @return {null} Renders nothing; styles are applied via `useStyleOverride`.
  */
 export function NoteHighlightStyles( { threads, selectedId } ) {
-	const css = useMemo( () => {
-		const rules = [ BASE_RESET ];
-		for ( const thread of threads ?? [] ) {
-			if ( ! thread?.id ) {
-				continue;
-			}
-			const color = getAvatarBorderColor( thread.author ?? 0 );
-			const sel = `#annotation-text-${ thread.id }`;
-			rules.push(
-				`${ sel }{background-color:${ color }${ REST_ALPHA };}`
-			);
-			rules.push(
-				`${ sel }:hover,${ sel }:focus-within{background-color:${ color }${ ACTIVE_ALPHA };}`
-			);
-			if ( selectedId && String( selectedId ) === String( thread.id ) ) {
-				rules.push(
-					`${ sel }{background-color:${ color }${ ACTIVE_ALPHA };}`
-				);
-			}
-		}
-		return rules.join( '' );
-	}, [ threads, selectedId ] );
-
+	const css = useMemo(
+		() => buildHighlightCss( threads, selectedId ),
+		[ threads, selectedId ]
+	);
 	useStyleOverride( { id: 'core-note-highlights', css } );
 	return null;
 }
