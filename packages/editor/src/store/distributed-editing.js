@@ -2347,9 +2347,14 @@ function getDistributedEditingRetrySaveNoticeStatus( retrySaveStatus ) {
 }
 
 function getDistributedEditingRetrySaveDescriptorFields( normalized ) {
+	const retrySaveReviewRequired =
+		normalized.retrySaveStatus ===
+		DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_UNFILTERED_HTML_REVIEW_REQUIRED;
+
 	return {
 		retrySaveStatus: normalized.retrySaveStatus,
 		retrySaveReason: normalized.retrySaveReason,
+		retrySaveReviewRequired,
 		retrySaveHandoffStatus: normalized.retrySaveHandoffStatus,
 		retrySaveHandoffReason: normalized.retrySaveHandoffReason,
 		retrySaveHandoffAllowsNormalSaveFallback:

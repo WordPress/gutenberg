@@ -900,9 +900,7 @@ export default function DistributedEditingStatus( {
 						if ( copiedPayload ) {
 							setActionStatus( {
 								status: 'success',
-								message: __(
-									'Protected local changes exported. Keep this copy until the server confirms the update.'
-								),
+								message: getExportSuccessMessage( item ),
 							} );
 						} else {
 							setActionStatus( {
@@ -953,9 +951,7 @@ export default function DistributedEditingStatus( {
 							await __experimentalRefreshDistributedEditingServerStateAfterStaleBase?.();
 						setActionStatus( {
 							status: 'info',
-							message: __(
-								'Server version refreshed for review. Protected local changes remain in this editor session and can still be exported before retrying.'
-							),
+							message: getRefetchSuccessMessage( item ),
 						} );
 						return refetchResult;
 					}
@@ -1146,6 +1142,8 @@ function getDistributedEditingStatusSurfaceItem( descriptor ) {
 			return {
 				...getBaseStatusItem( descriptor ),
 				...getRetrySaveStatusText( descriptor ),
+				retrySaveReviewRequired: descriptor.retrySaveReviewRequired,
+				retrySaveStatus: descriptor.retrySaveStatus,
 			};
 	}
 
@@ -1259,7 +1257,7 @@ function getNoticeActions( item, onAction ) {
 
 	return item.actionKeys
 		.map( ( actionKey ) => {
-			const label = getActionLabel( actionKey );
+			const label = getActionLabel( actionKey, item );
 
 			if ( ! label ) {
 				return null;
@@ -1273,11 +1271,14 @@ function getNoticeActions( item, onAction ) {
 		.filter( Boolean );
 }
 
-function getActionLabel( actionKey ) {
+function getActionLabel( actionKey, item ) {
 	switch ( actionKey ) {
 		case DISTRIBUTED_EDITING_NOTICE_ACTIONS.ACCEPT_SERVER_STATE:
 			return __( 'Accept server version' );
 		case DISTRIBUTED_EDITING_NOTICE_ACTIONS.EXPORT_LOCAL_UPDATES:
+			if ( isRetrySaveReviewRequiredItem( item ) ) {
+				return __( 'Export changes for review' );
+			}
 			return __( 'Export local changes' );
 		case DISTRIBUTED_EDITING_NOTICE_ACTIONS.PREPARE_RETRY_SUBMIT:
 			return __( 'Prepare retry submit' );
@@ -1294,6 +1295,38 @@ function getActionLabel( actionKey ) {
 	}
 
 	return null;
+}
+
+function getExportSuccessMessage( item ) {
+	if ( isRetrySaveReviewRequiredItem( item ) ) {
+		return __(
+			'Protected local changes exported for HTML review. Keep this copy until a user with unfiltered HTML permission can inspect it.'
+		);
+	}
+
+	return __(
+		'Protected local changes exported. Keep this copy until the server confirms the update.'
+	);
+}
+
+function getRefetchSuccessMessage( item ) {
+	if ( isRetrySaveReviewRequiredItem( item ) ) {
+		return __(
+			'Server version refreshed for HTML review. Protected local changes remain in this editor session and can still be exported before retrying.'
+		);
+	}
+
+	return __(
+		'Server version refreshed for review. Protected local changes remain in this editor session and can still be exported before retrying.'
+	);
+}
+
+function isRetrySaveReviewRequiredItem( item ) {
+	return (
+		item?.retrySaveReviewRequired ||
+		item?.retrySaveStatus ===
+			DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_UNFILTERED_HTML_REVIEW_REQUIRED
+	);
 }
 
 function getDistributedEditingStatusControlLabel( key ) {
@@ -1343,7 +1376,7 @@ function getDistributedEditingStatusControlLabel( key ) {
 		case 'staleBaseRetrySaveTampered':
 			return __( 'Retry save tampered' );
 		case 'staleBaseRetrySaveUnfilteredHtml':
-			return __( 'Retry save needs HTML review' );
+			return __( 'Retry save requires HTML review' );
 		case 'staleBaseRetrySaveHandoffBlockedProof':
 			return __( 'Retry save proof missing' );
 		case 'staleBaseRetrySaveHandoffRefetch':
@@ -1518,9 +1551,9 @@ function getRetrySaveStatusText( descriptor ) {
 			};
 		case DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_UNFILTERED_HTML_REVIEW_REQUIRED:
 			return {
-				title: __( 'Retry save needs HTML review' ),
+				title: __( 'Retry save requires HTML review' ),
 				message: __(
-					'The server rejected this retry save because the change could alter unfiltered HTML written by another collaborator. Protected local changes are still exportable; export them, ask an unfiltered HTML reviewer for help, or refresh the server version before retrying.'
+					'The server blocked this retry save because the proposed changes could alter unfiltered HTML from another collaborator. Protected local changes are still exportable; export a copy for review by someone with unfiltered HTML permission, or refresh the server version before deciding how to continue.'
 				),
 			};
 		case DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_SYNC_META_TAMPERED:

@@ -1092,6 +1092,104 @@ describe( 'DistributedEditingStatus', () => {
 		).toBeVisible();
 	} );
 
+	it( 'renders review-required retry-save chrome with export and refetch actions only', async () => {
+		const user = userEvent.setup();
+		const writeText = jest.fn().mockResolvedValue();
+		const actions = setupDistributedEditingStatusDispatch();
+
+		Object.defineProperty( globalThis.navigator, 'clipboard', {
+			value: { writeText },
+			configurable: true,
+		} );
+		setupDistributedEditingStatusSelect( {
+			currentPost: { id: 45, type: 'post' },
+			editedPostContent:
+				'<!-- wp:html --><script>window.localChange = true;</script><!-- /wp:html -->',
+			sessionState: {
+				disposition:
+					DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_UNFILTERED_HTML_REVIEW_REQUIRED,
+				reasonCode:
+					DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_UNFILTERED_HTML_WOULD_CHANGE_CONTENT,
+				pendingChangeCount: 1,
+				hasPendingChanges: true,
+				requiresServerStateRefetch: true,
+				requiresManualConflictResolution: true,
+				canExportLocalUpdates: true,
+				retrySaveStatus:
+					DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_UNFILTERED_HTML_REVIEW_REQUIRED,
+				retrySaveReason:
+					DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_UNFILTERED_HTML_WOULD_CHANGE_CONTENT,
+			},
+		} );
+
+		render( <DistributedEditingStatusChrome /> );
+
+		expect(
+			screen.getByText( 'Retry save requires HTML review' )
+		).toBeVisible();
+		expect(
+			screen.getByText(
+				'The server blocked this retry save because the proposed changes could alter unfiltered HTML from another collaborator. Protected local changes are still exportable; export a copy for review by someone with unfiltered HTML permission, or refresh the server version before deciding how to continue.'
+			)
+		).toBeVisible();
+		expect(
+			screen.queryByRole( 'button', { name: 'Export local changes' } )
+		).not.toBeInTheDocument();
+		expect(
+			screen.getByRole( 'button', { name: 'Export changes for review' } )
+		).toBeVisible();
+		expect(
+			screen.getByRole( 'button', { name: 'Refresh server version' } )
+		).toBeVisible();
+
+		await user.click(
+			screen.getByRole( 'button', {
+				name: 'Export changes for review',
+			} )
+		);
+
+		expect( writeText ).toHaveBeenCalledTimes( 1 );
+		expect( JSON.parse( writeText.mock.calls[ 0 ][ 0 ] ) ).toMatchObject( {
+			post: { id: 45, type: 'post' },
+			distributedEditingSessionState: {
+				disposition:
+					DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_UNFILTERED_HTML_REVIEW_REQUIRED,
+				retrySaveStatus:
+					DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_UNFILTERED_HTML_REVIEW_REQUIRED,
+				canExportLocalUpdates: true,
+			},
+		} );
+		expect(
+			await screen.findByText(
+				'Protected local changes exported for HTML review. Keep this copy until a user with unfiltered HTML permission can inspect it.'
+			)
+		).toBeVisible();
+
+		await user.click(
+			screen.getByRole( 'button', {
+				name: 'Refresh server version',
+			} )
+		);
+
+		expect(
+			actions.__experimentalRefreshDistributedEditingServerStateAfterStaleBase
+		).toHaveBeenCalledTimes( 1 );
+		expect(
+			actions.__experimentalSaveDistributedEditingRetryAfterProof
+		).not.toHaveBeenCalled();
+		expect(
+			actions.__experimentalPrepareDistributedEditingRetrySubmitAfterLocalRebase
+		).not.toHaveBeenCalled();
+		expect(
+			actions.__experimentalPrepareDistributedEditingRetrySubmitSaveAfterProof
+		).not.toHaveBeenCalled();
+		expect(
+			await screen.findByText(
+				'Server version refreshed for HTML review. Protected local changes remain in this editor session and can still be exported before retrying.'
+			)
+		).toBeVisible();
+	} );
+
 	it( 'reports blocked retry-save refetch failure while keeping export available', async () => {
 		const user = userEvent.setup();
 		const actions = setupDistributedEditingStatusDispatch();
@@ -2041,9 +2139,10 @@ describe( 'DistributedEditingStatusSurface', () => {
 					DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_UNFILTERED_HTML_WOULD_CHANGE_CONTENT,
 				retrySaveStatus:
 					DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_UNFILTERED_HTML_REVIEW_REQUIRED,
-				title: 'Retry save needs HTML review',
+				title: 'Retry save requires HTML review',
 				message:
-					'The server rejected this retry save because the change could alter unfiltered HTML written by another collaborator. Protected local changes are still exportable; export them, ask an unfiltered HTML reviewer for help, or refresh the server version before retrying.',
+					'The server blocked this retry save because the proposed changes could alter unfiltered HTML from another collaborator. Protected local changes are still exportable; export a copy for review by someone with unfiltered HTML permission, or refresh the server version before deciding how to continue.',
+				exportLabel: 'Export changes for review',
 				refetch: true,
 			},
 		];
@@ -2070,13 +2169,17 @@ describe( 'DistributedEditingStatusSurface', () => {
 			rerender( renderStatus( statusCase ) );
 			expect( screen.getByText( statusCase.title ) ).toBeVisible();
 			expect( screen.getByText( statusCase.message ) ).toBeVisible();
-			expect( screen.getByText( 'Export local changes' ) ).toBeVisible();
-			if ( statusCase.refetch ) {
-				expect(
-					screen.getByText( 'Refresh server version' )
-				).toBeVisible();
-			}
+			expect(
+				screen.getByText(
+					statusCase.exportLabel || 'Export local changes'
+				)
+			).toBeVisible();
 		}
+
+		rerender(
+			renderStatus( cases.find( ( statusCase ) => statusCase.refetch ) )
+		);
+		expect( screen.getByText( 'Refresh server version' ) ).toBeVisible();
 	} );
 
 	it( 'renders blocked retry-save handoff copy and actions', () => {

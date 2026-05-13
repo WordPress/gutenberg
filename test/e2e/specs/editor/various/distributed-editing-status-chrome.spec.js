@@ -1398,16 +1398,16 @@ test.describe( 'Distributed Editing status chrome', () => {
 		).toBeHidden();
 		await expect( statusChrome ).toBeVisible();
 		await expect(
-			statusChrome.getByText( 'Retry save needs HTML review' )
+			statusChrome.getByText( 'Retry save requires HTML review' )
 		).toBeVisible();
 		await expect(
 			statusChrome.getByText(
-				'The server rejected this retry save because the change could alter unfiltered HTML written by another collaborator. Protected local changes are still exportable; export them, ask an unfiltered HTML reviewer for help, or refresh the server version before retrying.'
+				'The server blocked this retry save because the proposed changes could alter unfiltered HTML from another collaborator. Protected local changes are still exportable; export a copy for review by someone with unfiltered HTML permission, or refresh the server version before deciding how to continue.'
 			)
 		).toBeVisible();
 		await expect(
 			statusChrome.getByRole( 'button', {
-				name: 'Export local changes',
+				name: 'Export changes for review',
 			} )
 		).toHaveCount( 1 );
 		await expect(
@@ -1417,7 +1417,7 @@ test.describe( 'Distributed Editing status chrome', () => {
 		).toHaveCount( 1 );
 
 		await statusChrome
-			.getByRole( 'button', { name: 'Export local changes' } )
+			.getByRole( 'button', { name: 'Export changes for review' } )
 			.click();
 		await expect( getActionStatus( statusChrome ) ).toHaveAttribute(
 			'data-distributed-editing-action-status',
@@ -1447,7 +1447,7 @@ test.describe( 'Distributed Editing status chrome', () => {
 			.click();
 		await expect(
 			statusChrome.getByText(
-				'Server version refreshed for review. Protected local changes remain in this editor session and can still be exported before retrying.'
+				'Server version refreshed for HTML review. Protected local changes remain in this editor session and can still be exported before retrying.'
 			)
 		).toBeVisible();
 		await expect

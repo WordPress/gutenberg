@@ -1248,6 +1248,7 @@ describe( 'distributed editing session state', () => {
 						DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_UNFILTERED_HTML_REVIEW_REQUIRED,
 					retrySaveReason:
 						DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_UNFILTERED_HTML_WOULD_CHANGE_CONTENT,
+					retrySaveReviewRequired: true,
 					retrySaveRequiresReviewerEscalation: true,
 					retrySaveReviewStatus: 'requires_reviewer_escalation',
 					retrySaveReviewAction: 'request_unfiltered_html_reviewer',
