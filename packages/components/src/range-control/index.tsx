@@ -66,7 +66,7 @@ function UnforwardedRangeControl(
 	forwardedRef: ForwardedRef< HTMLInputElement >
 ) {
 	const {
-		__nextHasNoMarginBottom = false,
+		__nextHasNoMarginBottom: _, // Prevent passing to internal component
 		afterIcon,
 		allowReset = false,
 		beforeIcon,
@@ -122,7 +122,7 @@ function UnforwardedRangeControl(
 	const [ showTooltip, setShowTooltip ] = useState( hasTooltip );
 	const [ isFocused, setIsFocused ] = useState( false );
 
-	const inputRef = useRef< HTMLInputElement >();
+	const inputRef = useRef< HTMLInputElement >( null );
 	const isCurrentlyFocused = inputRef.current?.matches( ':focus' );
 	const isThumbFocused = ! disabled && isFocused;
 
@@ -241,8 +241,6 @@ function UnforwardedRangeControl(
 
 	return (
 		<BaseControl
-			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
-			__associatedWPComponentName="RangeControl"
 			className={ classes }
 			label={ label }
 			hideLabelFromVision={ hideLabelFromVision }
@@ -259,7 +257,6 @@ function UnforwardedRangeControl(
 					</BeforeIconWrapper>
 				) }
 				<Wrapper
-					__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
 					className={ wrapperClasses }
 					color={ colorProp }
 					marks={ !! marks }
@@ -394,7 +391,6 @@ function UnforwardedRangeControl(
  *   const [ value, setValue ] = useState();
  *   return (
  *     <RangeControl
- *       __nextHasNoMarginBottom
  *       __next40pxDefaultSize
  *       help="Please select how transparent you would like this."
  *       initialPosition={ 50 }
@@ -409,5 +405,6 @@ function UnforwardedRangeControl(
  * ```
  */
 export const RangeControl = forwardRef( UnforwardedRangeControl );
+RangeControl.displayName = 'RangeControl';
 
 export default RangeControl;

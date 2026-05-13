@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/edit-site",
-	"version": "6.36.0",
+	"version": "6.45.0",
 	"description": "Edit Site Page module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -23,13 +23,21 @@
 		"node": ">=18.12.0",
 		"npm": ">=8.19.2"
 	},
-	"main": "build/index.js",
-	"module": "build-module/index.js",
+	"files": [
+		"src",
+		"build",
+		"build-module",
+		"build-style",
+		"build-types",
+		"*.md"
+	],
+	"main": "build/index.cjs",
+	"module": "build-module/index.mjs",
 	"exports": {
 		".": {
 			"types": "./build-types/index.d.ts",
-			"import": "./build-module/index.js",
-			"default": "./build/index.js"
+			"import": "./build-module/index.mjs",
+			"default": "./build/index.cjs"
 		},
 		"./package.json": "./package.json"
 	},
@@ -79,6 +87,7 @@
 		"@wordpress/reusable-blocks": "file:../reusable-blocks",
 		"@wordpress/router": "file:../router",
 		"@wordpress/style-engine": "file:../style-engine",
+		"@wordpress/ui": "file:../ui",
 		"@wordpress/url": "file:../url",
 		"@wordpress/viewport": "file:../viewport",
 		"@wordpress/views": "file:../views",

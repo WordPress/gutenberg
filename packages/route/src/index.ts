@@ -4,13 +4,17 @@
 import { useRouter } from '@tanstack/react-router';
 export {
 	Link,
+	notFound,
 	redirect,
+	useLinkProps,
 	useNavigate,
 	useParams,
 	useSearch,
 } from '@tanstack/react-router';
+
 export type {
 	AnyRoute,
+	AnyRouter,
 	LinkProps,
 	NavigateOptions,
 	RouteOptions,

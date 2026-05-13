@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, OKLCH, parse } from 'colorjs.io/fn';
+import { get, OKLCH } from 'colorjs.io/fn';
 
 /**
  * Internal dependencies
@@ -44,7 +44,7 @@ function getBgRampInfo( ramp: InternalRampResult ): {
 		pinLightness: {
 			stepName: STEP_TO_PIN,
 			value: clampAccentScaleReferenceLightness(
-				get( parse( ramp.ramp[ STEP_TO_PIN ] ), [ OKLCH, 'l' ] ),
+				get( ramp.ramp[ STEP_TO_PIN ], [ OKLCH, 'l' ] ),
 				ramp.direction
 			),
 		},

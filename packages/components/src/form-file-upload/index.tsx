@@ -54,6 +54,8 @@ export function FormFileUpload( {
 	const ui = render ? (
 		render( { openFileDialog } )
 	) : (
+		// Disable reason: the parent component already takes care of the `__next40pxDefaultSize` prop.
+		// eslint-disable-next-line @wordpress/components-no-missing-40px-size-prop
 		<Button onClick={ openFileDialog } { ...props }>
 			{ children }
 		</Button>

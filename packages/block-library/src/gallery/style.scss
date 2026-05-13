@@ -62,7 +62,7 @@ figure.wp-block-gallery.has-nested-images {
 		&:has(figcaption)::before {
 			content: "";
 			height: 100%;
-			max-height: 40%;
+			max-height: 3em;
 			pointer-events: none;
 
 			// Blur the background under the gradient scrim.

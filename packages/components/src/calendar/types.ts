@@ -188,6 +188,18 @@ export interface BaseProps
 	 */
 	numberOfMonths?: number;
 	/**
+	 * When `true`, days from adjacent months are shown in the grid and receive
+	 * the `outside` modifier and the class.
+	 * @default false
+	 */
+	showOutsideDays?: boolean;
+	/**
+	 * When `true`, the calendar always shows a fixed number of weeks (e.g. 6)
+	 * so the grid height does not change between months.
+	 * @default false
+	 */
+	fixedWeeks?: boolean;
+	/**
 	 * The earliest month to start the month navigation.
 	 */
 	startMonth?: Date;

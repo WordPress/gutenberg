@@ -56,7 +56,7 @@ export default function NavigationScreen( {
 	content: ReactNode;
 	description?: ReactNode;
 	backMenuItem?: string;
-	backButtonRef?: RefObject< HTMLButtonElement >;
+	backButtonRef?: RefObject< HTMLButtonElement | null >;
 	animationDirection?: 'forward' | 'backward';
 	navigationKey?: string;
 	onNavigate: ( {

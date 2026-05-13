@@ -1,18 +1,8 @@
-/**
- * WordPress dependencies
- */
-import { createContext } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { disabledStyles } from './styles/disabled-styles';
 import type { DisabledProps } from './types';
 import type { WordPressComponentProps } from '../context';
 import { useCx } from '../utils';
-
-const Context = createContext< boolean >( false );
-Context.displayName = 'DisabledContext';
+import Context from './context';
 
 const { Consumer, Provider } = Context;
 
@@ -36,7 +26,6 @@ const { Consumer, Provider } = Context;
  *	let input = (
  *		<TextControl
  *			__next40pxDefaultSize
- *			__nextHasNoMarginBottom
  *			label="Input"
  *			onChange={ () => {} }
  *		/>

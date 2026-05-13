@@ -6,12 +6,12 @@
 	padding: 0;
 	margin: 0;
 
-	.spacing-sizes-control__custom-value-input,
+	.spacing-sizes-control__unit-control,
 	.spacing-sizes-control__label {
 		margin-bottom: 0;
 	}
 
-	.spacing-sizes-control__range-control,
+	.spacing-sizes-control__preset-range,
 	.spacing-sizes-control__custom-value-range {
 		flex: 1;
 		margin-bottom: 0; // Needed for some instances of the range control, such as the Spacer block.
@@ -23,20 +23,14 @@
 	margin-bottom: $grid-unit-15;
 }
 
+.spacing-sizes-control__wrapper {
+	align-items: center;
+}
+
 .spacing-sizes-control__dropdown {
 	height: $grid-unit-30;
 }
 
-.spacing-sizes-control__custom-select-control,
-.spacing-sizes-control__custom-value-input {
-	flex: 1;
-}
-
-.spacing-sizes-control__icon,
-.spacing-sizes-control__custom-toggle {
-	flex: 0 0 auto;
-}
-
-.spacing-sizes-control__icon {
+.spacing-sizes-control__wrapper .preset-input-control__icon {
 	margin-left: $grid-unit-05 * -1; // Aligns the icon to the control header.
 }

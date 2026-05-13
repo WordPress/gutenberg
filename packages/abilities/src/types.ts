@@ -25,7 +25,7 @@ export type PermissionCallback = (
 export interface Ability {
 	/**
 	 * The unique name/identifier of the ability, with its namespace.
-	 * Example: 'my-plugin/my-ability'
+	 * Supports 2-4 segments (e.g. 'my-plugin/my-ability', 'core/posts/find', 'my-plugin/resource/sub/action').
 	 * @see WP_Ability::get_name()
 	 */
 	name: string;
@@ -63,14 +63,13 @@ export interface Ability {
 	output_schema?: Record< string, any >;
 
 	/**
-	 * Callback function for client-side abilities.
-	 * If present, the ability will be executed locally in the browser.
-	 * If not present, the ability will be executed via REST API on the server.
+	 * Callback function for ability execution.
+	 * This property is required for all abilities.
 	 */
 	callback?: AbilityCallback;
 
 	/**
-	 * Client Permission callback for abilities.
+	 * Permission callback for abilities.
 	 * Called before executing the ability to check if it's allowed.
 	 * If it returns false, the ability execution will be denied.
 	 */
@@ -78,13 +77,14 @@ export interface Ability {
 
 	/**
 	 * Metadata about the ability.
-	 * @see WP_Ability::get_meta()
 	 */
 	meta?: {
 		annotations?: {
-			readonly?: boolean | null;
-			destructive?: boolean | null;
-			idempotent?: boolean | null;
+			clientRegistered?: boolean;
+			serverRegistered?: boolean;
+			readonly?: boolean;
+			destructive?: boolean;
+			idempotent?: boolean;
 		};
 		[ key: string ]: any;
 	};
@@ -128,9 +128,14 @@ export interface AbilityCategory {
 
 	/**
 	 * Metadata about the category.
-	 * @see WP_Ability_Category::get_meta()
 	 */
-	meta?: Record< string, any >;
+	meta?: {
+		annotations?: {
+			clientRegistered?: boolean;
+			serverRegistered?: boolean;
+		};
+		[ key: string ]: any;
+	};
 }
 
 /**
@@ -154,21 +159,6 @@ export interface AbilityCategoryArgs {
 	 * Optional metadata about the category.
 	 */
 	meta?: Record< string, any >;
-}
-
-/**
- * The state shape for the abilities store.
- */
-export interface AbilitiesState {
-	/**
-	 * Map of ability names to ability objects.
-	 */
-	abilitiesByName: Record< string, Ability >;
-
-	/**
-	 * Map of category slugs to category objects.
-	 */
-	categoriesBySlug: Record< string, AbilityCategory >;
 }
 
 /**

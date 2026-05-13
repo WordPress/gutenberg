@@ -2,9 +2,9 @@
  * WordPress dependencies
  */
 import { loadView } from '@wordpress/views';
-import type { View } from '@wordpress/dataviews';
+import type { View, Filter } from '@wordpress/dataviews';
 
-const DEFAULT_VIEW: View = {
+export const DEFAULT_VIEW: View = {
 	type: 'grid' as const,
 	perPage: 20,
 	sort: {
@@ -16,6 +16,11 @@ const DEFAULT_VIEW: View = {
 	descriptionField: 'description',
 	mediaField: 'preview',
 	filters: [],
+};
+
+export const DEFAULT_VIEW_LEGACY: View = {
+	...DEFAULT_VIEW,
+	fields: [ 'author' ],
 };
 
 export const DEFAULT_LAYOUTS = {
@@ -30,29 +35,26 @@ export const DEFAULT_LAYOUTS = {
 	},
 };
 
-export function getDefaultView( activeView?: string ): View {
-	// User view: sort by date, newest first, include theme field
+type ActiveViewOverrides = {
+	filters?: Filter[];
+	sort?: View[ 'sort' ];
+};
+
+export function getActiveViewOverridesForTab(
+	activeView: string
+): ActiveViewOverrides {
+	// User view: sort by date, newest first
 	if ( activeView === 'user' ) {
 		return {
-			...DEFAULT_VIEW,
-			sort: {
-				field: 'date',
-				direction: 'desc' as const,
-			},
-			fields: [ 'author', 'active', 'slug', 'theme' ],
+			sort: { field: 'date', direction: 'desc' as const },
 		};
 	}
-
-	// Active view: default sorting
-	if ( activeView === 'active' || ! activeView ) {
-		return {
-			...DEFAULT_VIEW,
-		};
+	// Active view: no overrides
+	if ( activeView === 'active' ) {
+		return {};
 	}
-
 	// Author-based view: filter by author
 	return {
-		...DEFAULT_VIEW,
 		filters: [
 			{
 				field: 'author',
@@ -67,12 +69,48 @@ export async function ensureView(
 	activeView?: string,
 	search?: { page?: number; search?: string }
 ) {
-	const defaultView = getDefaultView( activeView );
 	return loadView( {
 		kind: 'postType',
 		name: 'wp_template',
-		slug: activeView ?? 'active',
-		defaultView,
+		slug: 'default-new',
+		defaultView: DEFAULT_VIEW,
+		activeViewOverrides: getActiveViewOverridesForTab(
+			activeView ?? 'active'
+		),
+		queryParams: search,
+	} );
+}
+
+export function getActiveViewOverridesForTabLegacy(
+	activeView: string
+): ActiveViewOverrides {
+	if ( activeView === 'all' ) {
+		return {};
+	}
+	// Author-based view
+	return {
+		filters: [
+			{
+				field: 'author',
+				operator: 'isAny',
+				value: [ activeView ],
+			},
+		],
+	};
+}
+
+export async function ensureViewLegacy(
+	activeView?: string,
+	search?: { page?: number; search?: string }
+) {
+	return loadView( {
+		kind: 'postType',
+		name: 'wp_template',
+		slug: 'default-new',
+		defaultView: DEFAULT_VIEW_LEGACY,
+		activeViewOverrides: getActiveViewOverridesForTabLegacy(
+			activeView ?? 'all'
+		),
 		queryParams: search,
 	} );
 }

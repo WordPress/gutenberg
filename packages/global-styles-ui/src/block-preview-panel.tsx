@@ -3,10 +3,10 @@
  */
 // @ts-expect-error: Not typed yet.
 import { BlockPreview } from '@wordpress/block-editor';
-// @ts-expect-error: Not typed yet.
 import { getBlockType, getBlockFromExample } from '@wordpress/blocks';
 import { __experimentalSpacer as Spacer } from '@wordpress/components';
 import { useMemo } from '@wordpress/element';
+import { __unstableGeneratePreviewStateStyles as generatePreviewStateStyles } from '@wordpress/global-styles-engine';
 
 /**
  * Internal dependencies
@@ -16,11 +16,15 @@ import { getVariationClassName } from './utils';
 interface BlockPreviewPanelProps {
 	name: string;
 	variation?: string;
+	selectedState?: string;
+	stateStyles?: any;
 }
 
 const BlockPreviewPanel = ( {
 	name,
 	variation = '',
+	selectedState = 'default',
+	stateStyles,
 }: BlockPreviewPanelProps ) => {
 	const blockExample = getBlockType( name )?.example;
 	const blocks = useMemo( () => {
@@ -41,6 +45,15 @@ const BlockPreviewPanel = ( {
 
 		return getBlockFromExample( name, example );
 	}, [ name, blockExample, variation ] );
+
+	// Generate CSS for the selected state.
+	const stateCSS = useMemo( () => {
+		if ( selectedState === 'default' || ! stateStyles ) {
+			return '';
+		}
+
+		return generatePreviewStateStyles( stateStyles, name );
+	}, [ selectedState, stateStyles, name ] );
 
 	const viewportWidth = blockExample?.viewportWidth ?? 500;
 	// Same as height of InserterPreviewPanel.
@@ -78,6 +91,7 @@ const BlockPreviewPanel = ( {
 									align-items:center;
 								}
 								.is-root-container { width: 100%; }
+								${ stateCSS }
 							`,
 							},
 						]

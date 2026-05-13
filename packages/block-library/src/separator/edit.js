@@ -40,7 +40,6 @@ const HtmlElementControl = ( { tagName, setAttributes } ) => {
 					  )
 			}
 			__next40pxDefaultSize
-			__nextHasNoMarginBottom
 		/>
 	);
 };

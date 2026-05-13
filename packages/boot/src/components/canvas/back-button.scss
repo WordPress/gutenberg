@@ -60,3 +60,8 @@
 		backdrop-filter: saturate(180%) blur(15px);
 	}
 }
+
+// Remove the header slide-in animation so the back logo does not move.
+.interface-interface-skeleton__header {
+	margin-top: 0 !important;
+}

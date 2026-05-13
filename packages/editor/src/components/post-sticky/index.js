@@ -32,7 +32,6 @@ export default function PostSticky() {
 				help={ __( 'Pin this post to the top of the blog.' ) }
 				checked={ postSticky }
 				onChange={ () => editPost( { sticky: ! postSticky } ) }
-				__nextHasNoMarginBottom
 			/>
 		</PostStickyCheck>
 	);

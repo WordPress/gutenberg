@@ -103,7 +103,7 @@ export const editMediaEntity =
 					dispatch.receiveEntityRecords(
 						kind,
 						name,
-						[ newRecord ],
+						newRecord,
 						undefined,
 						true,
 						undefined,
@@ -158,5 +158,36 @@ export function receiveEditorAssets( assets ) {
 	return {
 		type: 'RECEIVE_EDITOR_ASSETS',
 		assets,
+	};
+}
+
+/**
+ * Returns an action object used to set whether collaboration is supported.
+ *
+ * @param {boolean} supported Whether collaboration is supported.
+ *
+ * @return {Object} Action object.
+ */
+export const setCollaborationSupported =
+	( supported ) =>
+	( { dispatch } ) => {
+		dispatch( { type: 'SET_COLLABORATION_SUPPORTED', supported } );
+	};
+
+/**
+ * Returns an action object used to receive view config.
+ *
+ * @param {string} kind   Entity kind.
+ * @param {string} name   Entity name.
+ * @param {Object} config View config object.
+ *
+ * @return {Object} Action object.
+ */
+export function receiveViewConfig( kind, name, config ) {
+	return {
+		type: 'RECEIVE_VIEW_CONFIG',
+		kind,
+		name,
+		config,
 	};
 }

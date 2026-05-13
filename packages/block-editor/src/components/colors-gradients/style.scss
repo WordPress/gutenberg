@@ -49,6 +49,11 @@ $swatch-gap: 12px;
 }
 
 .block-editor-panel-color-gradient-settings__dropdown-content {
+	// Set minimum height to prevent content from being squashed when
+	// the popover is triggered near the bottom of the page, and flip
+	// the position accordingly.
+	min-height: 160px;
+
 	.block-editor-color-gradient-control__panel {
 		$panelPadding: $grid-unit-20;
 

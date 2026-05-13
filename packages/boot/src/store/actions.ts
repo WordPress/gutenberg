@@ -26,7 +26,15 @@ export function registerRoute( route: Route ) {
 	};
 }
 
+export function setDashboardLink( dashboardLink: string ) {
+	return {
+		type: 'SET_DASHBOARD_LINK' as const,
+		dashboardLink,
+	};
+}
+
 export type Action =
 	| ReturnType< typeof registerMenuItem >
 	| ReturnType< typeof updateMenuItem >
-	| ReturnType< typeof registerRoute >;
+	| ReturnType< typeof registerRoute >
+	| ReturnType< typeof setDashboardLink >;

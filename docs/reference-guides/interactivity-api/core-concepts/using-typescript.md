@@ -166,8 +166,8 @@ const { state } = store( 'myCounterPlugin', {
 		product: 2,
 	} as State, // Casts the entire state manually.
 	actions: {
-		increment() {
-			state.counter * state.product;
+		multiply() {
+			state.counter *= state.product;
 		},
 	},
 } );
@@ -269,7 +269,7 @@ That's it! Now you can access the context properties with the correct types.
 
 The derived state is data that is calculated based on the global state or local context. In the client store definition, it is defined using a getter in the `state` object.
 
-_Please, visit the [Understanding global state, local context and derived state](/docs/reference-guides/interactivity-api/core-concepts/undestanding-global-state-local-context-and-derived-state.md) guide to learn more about how derived state works in the Interactivity API._
+_Please, visit the [Understanding global state, local context, derived state and config](/docs/reference-guides/interactivity-api/core-concepts/understanding-global-state-local-context-derived-state-and-config.md) guide to learn more about how derived state works in the Interactivity API._
 
 Following our previous example, let's create a derived state that is the double of our counter.
 
@@ -452,7 +452,7 @@ This also means that you can use your async actions in external functions, and T
 ```ts
 const someAsyncFunction = async () => {
 	// This works fine and it's correctly typed.
-	await actions.delayedIncrement( 2000 );
+	await actions.delayedIncrement();
 };
 ```
 

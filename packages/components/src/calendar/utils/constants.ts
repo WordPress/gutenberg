@@ -7,6 +7,7 @@ const CLASSNAMES = {
 	root: 'components-calendar',
 	day: 'components-calendar__day',
 	day_button: 'components-calendar__day-button',
+	outside: 'components-calendar__day--outside',
 	caption_label: 'components-calendar__caption-label',
 	button_next: 'components-calendar__button-next',
 	button_previous: 'components-calendar__button-previous',

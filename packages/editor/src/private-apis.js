@@ -1,6 +1,11 @@
 /**
  * WordPress dependencies
  */
+import {
+	CreateTemplatePartModal,
+	patternTitleField,
+	templateTitleField,
+} from '@wordpress/fields';
 import * as interfaceApis from '@wordpress/interface';
 
 /**
@@ -18,11 +23,6 @@ import usePostFields from './components/post-fields';
 import ToolsMoreMenuGroup from './components/more-menu/tools-more-menu-group';
 import ViewMoreMenuGroup from './components/more-menu/view-more-menu-group';
 import ResizableEditor from './components/resizable-editor';
-import {
-	CreateTemplatePartModal,
-	patternTitleField,
-	templateTitleField,
-} from '@wordpress/fields';
 import { registerCoreBlockBindingsSources } from './bindings/api';
 import { getTemplateInfo } from './utils/get-template-info';
 import GlobalStylesUIWrapper from './components/global-styles';

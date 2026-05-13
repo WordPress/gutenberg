@@ -160,7 +160,19 @@ export function toVdom( root: Node ): ComponentChild {
 			} else if ( attributeName === 'ref' ) {
 				continue;
 			}
-			props[ attributeName ] = attributeValue;
+			// For boolean attributes with empty string values, use `true`.
+			// This prevents Preact from coercing "" to false. Camelcase
+			// mismatches (readonly→readOnly) are `undefined`, not `true`,
+			// falling through to Preact's setAttribute path, which handles them
+			// correctly: https://github.com/preactjs/preact/blob/bf7a195ac4b1706468e876e41b27428e3d8a08f3/src/diff/props.js#L114
+			if (
+				attributeValue === '' &&
+				elementNode[ attributeName ] === true
+			) {
+				props[ attributeName ] = true;
+			} else {
+				props[ attributeName ] = attributeValue;
+			}
 		}
 
 		if ( ignore && ! island ) {

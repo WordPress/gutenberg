@@ -118,14 +118,10 @@ export default function CreateNewTemplateModal( { onClose } ) {
 			size="small"
 			overlayClassName="editor-post-template__create-template-modal"
 		>
-			<form
-				className="editor-post-template__create-form"
-				onSubmit={ submit }
-			>
+			<form onSubmit={ submit }>
 				<VStack spacing="3">
 					<TextControl
 						__next40pxDefaultSize
-						__nextHasNoMarginBottom
 						label={ __( 'Name' ) }
 						value={ title }
 						onChange={ setTitle }

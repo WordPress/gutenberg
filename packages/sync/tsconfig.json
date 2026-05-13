@@ -4,5 +4,11 @@
 	"compilerOptions": {
 		"types": [ "node" ]
 	},
-	"references": [ { "path": "../hooks" }, { "path": "../url" } ]
+	"exclude": [ "src/y-utilities/y-multidoc-undomanager.js" ],
+	"references": [
+		{ "path": "../api-fetch" },
+		{ "path": "../hooks" },
+		{ "path": "../private-apis" },
+		{ "path": "../undo-manager" }
+	]
 }

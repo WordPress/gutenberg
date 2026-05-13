@@ -71,12 +71,12 @@ export function useEntityBinding( { clientId, attributes } ) {
 	const hasCorrectBinding =
 		hasUrlBinding && metadata?.bindings?.url?.source === expectedSource;
 
-	// Check if the bound entity is available (not deleted).
-	const isBoundEntityAvailable = useSelect(
+	// Check if the bound entity is available (not deleted) and return the entity record.
+	const { isBoundEntityAvailable, entityRecord } = useSelect(
 		( select ) => {
 			// First check: metadata/binding must exist
 			if ( ! hasCorrectBinding || ! id ) {
-				return false;
+				return { isBoundEntityAvailable: false, entityRecord: null };
 			}
 
 			const isPostType = kind === 'post-type';
@@ -84,12 +84,12 @@ export function useEntityBinding( { clientId, attributes } ) {
 
 			// Only check entity availability for post types and taxonomies.
 			if ( ! isPostType && ! isTaxonomy ) {
-				return false;
+				return { isBoundEntityAvailable: false, entityRecord: null };
 			}
 
 			// Skip check in disabled contexts to avoid unnecessary requests.
 			if ( blockEditingMode === 'disabled' ) {
-				return true; // Assume available in disabled contexts.
+				return { isBoundEntityAvailable: true, entityRecord: null };
 			}
 
 			// Second check: entity must exist
@@ -101,7 +101,7 @@ export function useEntityBinding( { clientId, attributes } ) {
 			// Convert 'tag' back to 'post_tag' for the API call
 			// (it was converted from 'post_tag' to 'tag' for storage in updateAttributes)
 			const typeForAPI = type === 'tag' ? 'post_tag' : type;
-			const entityRecord = getEntityRecord( entityType, typeForAPI, id );
+			const record = getEntityRecord( entityType, typeForAPI, id );
 			const hasResolved = hasFinishedResolution( 'getEntityRecord', [
 				entityType,
 				typeForAPI,
@@ -110,7 +110,11 @@ export function useEntityBinding( { clientId, attributes } ) {
 
 			// If resolution has finished and entityRecord is undefined, the entity was deleted.
 			// Return true if entity exists, false if deleted.
-			return hasResolved ? entityRecord !== undefined : true;
+			const isAvailable = hasResolved ? record !== undefined : true;
+			return {
+				isBoundEntityAvailable: isAvailable,
+				entityRecord: record || null,
+			};
 		},
 		[ kind, type, id, hasCorrectBinding, blockEditingMode ]
 	);
@@ -150,6 +154,7 @@ export function useEntityBinding( { clientId, attributes } ) {
 	return {
 		hasUrlBinding: hasCorrectBinding,
 		isBoundEntityAvailable,
+		entityRecord,
 		clearBinding,
 		createBinding,
 	};

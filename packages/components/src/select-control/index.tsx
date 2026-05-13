@@ -65,7 +65,7 @@ function UnforwardedSelectControl< V extends string >(
 		suffix,
 		variant = 'default',
 		__next40pxDefaultSize = false,
-		__nextHasNoMarginBottom = false,
+		__nextHasNoMarginBottom: _, // Prevent passing to internal component
 		__shouldNotWarnDeprecated36pxSize,
 		...restProps
 	} = useDeprecated36pxDefaultSizeProp( props );
@@ -103,13 +103,7 @@ function UnforwardedSelectControl< V extends string >(
 	} );
 
 	return (
-		<BaseControl
-			help={ help }
-			id={ id }
-			className={ classes }
-			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
-			__associatedWPComponentName="SelectControl"
-		>
+		<BaseControl help={ help } id={ id } className={ classes }>
 			<StyledInputBase
 				disabled={ disabled }
 				hideLabelFromVision={ hideLabelFromVision }
@@ -163,7 +157,6 @@ function UnforwardedSelectControl< V extends string >(
  *   return (
  *     <SelectControl
  *       __next40pxDefaultSize
- *       __nextHasNoMarginBottom
  *       label="Size"
  *       value={ size }
  *       options={ [
@@ -186,5 +179,8 @@ export const SelectControl = forwardRef( UnforwardedSelectControl ) as <
 		false
 	> & { ref?: React.Ref< HTMLSelectElement > }
 ) => React.JSX.Element | null;
+
+// @ts-expect-error TS says: "Property 'displayName' does not exist on type ..."
+SelectControl.displayName = 'SelectControl';
 
 export default SelectControl;

@@ -18,6 +18,10 @@
 	}
 }
 
+.block-editor-block-styles {
+	grid-column: 1 / -1;
+}
+
 .block-editor-block-styles__variants {
 	display: flex;
 	flex-wrap: wrap;
@@ -63,10 +67,3 @@
 	}
 }
 
-// To prevent overflow in the preview container,
-// ensure that block contents' margin and padding
-// do not add to the block container's width.
-.block-editor-block-styles__block-preview-container,
-.block-editor-block-styles__block-preview-container * {
-	box-sizing: border-box !important;
-}

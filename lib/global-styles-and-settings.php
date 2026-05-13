@@ -10,9 +10,7 @@
  *
  * @param array $types Types of styles to load. Optional.
  *                     See {@see 'WP_Theme_JSON::get_stylesheet'} for all valid types.
- *                     If empty, it'll load the following:
- *                     - for themes without theme.json: 'variables', 'presets', 'base-layout-styles'.
- *                     - for themes with theme.json: 'variables', 'presets', 'styles'.
+ *                     If empty, will load: 'variables', 'presets', 'styles'.
  *
  * @return string Stylesheet.
  */
@@ -30,11 +28,17 @@ function gutenberg_get_global_stylesheet( $types = array() ) {
 	$tree = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data();
 	$tree = WP_Theme_JSON_Resolver_Gutenberg::resolve_theme_file_uris( $tree );
 
-	$supports_theme_json = wp_theme_has_theme_json();
-	if ( empty( $types ) && ! $supports_theme_json ) {
-		$types = array( 'variables', 'presets', 'base-layout-styles' );
-	} elseif ( empty( $types ) ) {
+	if ( empty( $types ) ) {
 		$types = array( 'variables', 'presets', 'styles' );
+	}
+
+	/*
+	 * Enable base layout styles only mode for classic themes without theme.json.
+	 * This skips alignment styles that target .wp-site-blocks which is only used by block themes.
+	 */
+	$options = array();
+	if ( ! wp_is_block_theme() && ! wp_theme_has_theme_json() ) {
+		$options['base_layout_styles'] = true;
 	}
 
 	/*
@@ -54,7 +58,7 @@ function gutenberg_get_global_stylesheet( $types = array() ) {
 		 * @see wp_add_global_styles_for_blocks
 		 */
 		$origins          = array( 'default', 'theme', 'custom' );
-		$styles_variables = $tree->get_stylesheet( array( 'variables' ), $origins );
+		$styles_variables = $tree->get_stylesheet( array( 'variables' ), $origins, $options );
 		$types            = array_diff( $types, array( 'variables' ) );
 	}
 
@@ -72,18 +76,8 @@ function gutenberg_get_global_stylesheet( $types = array() ) {
 		 * at a later phase (render cycle) so we only render the ones in use.
 		 * @see wp_add_global_styles_for_blocks
 		 */
-		$origins = array( 'default', 'theme', 'custom' );
-
-		/*
-		* If the theme doesn't have theme.json but supports both appearance tools and color palette,
-		* the 'theme' origin should be included so color palette presets are also output.
-		*/
-		if ( ! $supports_theme_json && ( current_theme_supports( 'appearance-tools' ) || current_theme_supports( 'border' ) ) && current_theme_supports( 'editor-color-palette' ) ) {
-			$origins = array( 'default', 'theme' );
-		} elseif ( ! $supports_theme_json ) {
-			$origins = array( 'default' );
-		}
-		$styles_rest = $tree->get_stylesheet( $types, $origins );
+		$origins     = array( 'default', 'theme', 'custom' );
+		$styles_rest = $tree->get_stylesheet( $types, $origins, $options );
 	}
 	$stylesheet = $styles_variables . $styles_rest;
 	if ( $can_use_cached ) {
@@ -120,10 +114,7 @@ function gutenberg_get_global_settings( $path = array(), $context = array() ) {
 
 	// This is the default value when no origin is provided or when it is 'all'.
 	$origin = 'custom';
-	if (
-		! wp_theme_has_theme_json() ||
-		( isset( $context['origin'] ) && 'base' === $context['origin'] )
-	) {
+	if ( isset( $context['origin'] ) && 'base' === $context['origin'] ) {
 		$origin = 'theme';
 	}
 
@@ -159,10 +150,6 @@ function gutenberg_get_global_styles_custom_css() {
 		}
 	}
 
-	if ( ! wp_theme_has_theme_json() ) {
-		return '';
-	}
-
 	$tree       = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data();
 	$stylesheet = $tree->get_custom_css();
 
@@ -182,9 +169,6 @@ function gutenberg_get_global_styles_custom_css() {
  */
 function gutenberg_get_global_styles_base_custom_css() {
 	_deprecated_function( __FUNCTION__, 'Gutenberg 18.6.0', 'gutenberg_get_global_stylesheet' );
-	if ( ! wp_theme_has_theme_json() ) {
-		return '';
-	}
 
 	$can_use_cached = ! WP_DEBUG;
 
@@ -219,7 +203,7 @@ function gutenberg_add_global_styles_block_custom_css() {
 	_deprecated_function( __FUNCTION__, 'Gutenberg 18.6.0', 'gutenberg_add_global_styles_for_blocks' );
 	global $wp_styles;
 
-	if ( ! wp_theme_has_theme_json() || ! wp_should_load_separate_core_block_assets() ) {
+	if ( ! wp_should_load_separate_core_block_assets() ) {
 		return;
 	}
 

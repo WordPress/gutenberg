@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { useState, useEffect } from '@wordpress/element';
 import { insertObject, useAnchor } from '@wordpress/rich-text';
 import { RichTextToolbarButton } from '@wordpress/block-editor';
@@ -19,7 +19,7 @@ import { speak } from '@wordpress/a11y';
  */
 import { unlock } from '../lock-unlock';
 
-const { Badge } = unlock( componentsPrivateApis );
+const { Badge: WCBadge } = unlock( componentsPrivateApis );
 
 const name = 'core/math';
 const title = __( 'Math' );
@@ -53,7 +53,13 @@ function InlineUI( {
 				setError( null );
 			} catch ( err ) {
 				setError( err.message );
-				speak( err.message );
+				speak(
+					sprintf(
+						/* translators: %s: error message returned when parsing LaTeX. */
+						__( 'Error parsing mathematical expression: %s' ),
+						err.message
+					)
+				);
 				return;
 			}
 		}
@@ -84,7 +90,6 @@ function InlineUI( {
 			<div style={ { minWidth: '300px', padding: '4px' } }>
 				<VStack spacing={ 1 }>
 					<TextControl
-						__nextHasNoMarginBottom
 						__next40pxDefaultSize
 						hideLabelFromVision
 						label={ __( 'LaTeX math syntax' ) }
@@ -96,12 +101,16 @@ function InlineUI( {
 					/>
 					{ error && (
 						<>
-							<Badge
+							<WCBadge
 								intent="error"
 								className="wp-block-math__error"
 							>
-								{ error }
-							</Badge>
+								{ sprintf(
+									/* translators: %s: error message returned when parsing LaTeX. */
+									__( 'Error: %s' ),
+									error
+								) }
+							</WCBadge>
 							<style children=".wp-block-math__error .components-badge__content{white-space:normal}" />
 						</>
 					) }

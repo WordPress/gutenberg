@@ -7,20 +7,21 @@ import type { ComponentType } from 'react';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useState, useEffect } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
 import { Page } from '@wordpress/admin-ui';
 import {
 	privateApis as routePrivateApis,
 	type AnyRoute,
 } from '@wordpress/route';
+import { resolveSelect } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
  */
 import Root from '../root';
-import type { CanvasData, Route, RouteLoaderContext } from '../../store/types';
+import type { Route, RouteConfig, RouteLoaderContext } from '../../store/types';
 import { unlock } from '../../lock-unlock';
-import Canvas from '../canvas';
 
 const {
 	createLazyRoute,
@@ -30,7 +31,7 @@ const {
 	RouterProvider,
 	createBrowserHistory,
 	parseHref,
-	useMatches,
+	useLoaderData,
 } = unlock( routePrivateApis );
 
 // Not found component
@@ -44,51 +45,6 @@ function NotFoundComponent() {
 	);
 }
 
-function RouteComponent( {
-	stage: Stage,
-	inspector: Inspector,
-	canvas: CustomCanvas,
-}: {
-	stage?: ComponentType;
-	inspector?: ComponentType;
-	canvas?: ComponentType;
-} ) {
-	// Get canvas data from the current route's loader
-	const matches = useMatches();
-	const currentMatch = matches[ matches.length - 1 ];
-	const canvasData = ( currentMatch?.loaderData as any )?.canvas as
-		| CanvasData
-		| null
-		| undefined;
-
-	return (
-		<>
-			{ Stage && (
-				<div className="boot-layout__stage">
-					<Stage />
-				</div>
-			) }
-			{ Inspector && (
-				<div className="boot-layout__inspector">
-					<Inspector />
-				</div>
-			) }
-			{ /* Render custom canvas when canvas() returns null */ }
-			{ canvasData === null && CustomCanvas && (
-				<div className="boot-layout__canvas">
-					<CustomCanvas />
-				</div>
-			) }
-			{ /* Render default canvas when canvas() returns CanvasData */ }
-			{ canvasData && (
-				<div className="boot-layout__canvas">
-					<Canvas canvas={ canvasData } />
-				</div>
-			) }
-		</>
-	);
-}
-
 /**
  * Creates a TanStack route from a Route definition.
  *
@@ -96,52 +52,65 @@ function RouteComponent( {
  * @param parentRoute Parent route.
  * @return Tanstack Route.
  */
-async function createRouteFromDefinition(
-	route: Route,
-	parentRoute: AnyRoute
-) {
-	// Load route module for lifecycle functions if specified
-	let routeConfig: {
-		beforeLoad?: ( context: RouteLoaderContext ) => void | Promise< void >;
-		loader?: ( context: RouteLoaderContext ) => Promise< unknown >;
-		canvas?: ( context: RouteLoaderContext ) => Promise< any >;
-	} = {};
-
-	if ( route.route_module ) {
-		const module = await import( route.route_module );
-		routeConfig = module.route || {};
-	}
-
+function createRouteFromDefinition( route: Route, parentRoute: AnyRoute ) {
 	// Create route without component initially
 	let tanstackRoute = createRoute( {
 		getParentRoute: () => parentRoute,
 		path: route.path,
-		beforeLoad: routeConfig.beforeLoad
-			? ( opts: any ) =>
-					routeConfig.beforeLoad!( {
+		beforeLoad: async ( opts: any ) => {
+			// Import route module here (lazy)
+			if ( route.route_module ) {
+				const module = await import( route.route_module );
+				const routeConfig = module.route || {};
+
+				if ( routeConfig.beforeLoad ) {
+					return routeConfig.beforeLoad( {
 						params: opts.params || {},
 						search: opts.search || {},
-					} )
-			: undefined,
+					} );
+				}
+			}
+		},
 		loader: async ( opts: any ) => {
+			// Import route module here (lazy)
+			let routeConfig: RouteConfig = {};
+			if ( route.route_module ) {
+				const module = await import( route.route_module );
+				routeConfig = module.route || {};
+			}
+
 			const context: RouteLoaderContext = {
 				params: opts.params || {},
 				search: opts.deps || {},
 			};
 
-			// Call both loader and canvas functions if they exist
-			const [ loaderData, canvasData ] = await Promise.all( [
+			const [ , loaderData, canvasData, titleData ] = await Promise.all( [
+				resolveSelect( coreStore ).getEntityRecord(
+					'root',
+					'__unstableBase'
+				),
 				routeConfig.loader
 					? routeConfig.loader( context )
 					: Promise.resolve( undefined ),
 				routeConfig.canvas
 					? routeConfig.canvas( context )
 					: Promise.resolve( undefined ),
+				routeConfig.title
+					? routeConfig.title( context )
+					: Promise.resolve( undefined ),
 			] );
+
+			let inspector = true;
+			if ( routeConfig.inspector ) {
+				inspector = await routeConfig.inspector( context );
+			}
 
 			return {
 				...( loaderData as any ),
 				canvas: canvasData,
+				inspector,
+				title: titleData,
+				routeContentModule: route.content_module,
 			};
 		},
 		loaderDeps: ( opts: any ) => opts.search,
@@ -153,14 +122,27 @@ async function createRouteFromDefinition(
 			? await import( route.content_module )
 			: {};
 
+		const Stage = module.stage;
+		const Inspector = module.inspector;
+
 		return createLazyRoute( route.path )( {
-			component: function Component() {
+			component: function RouteComponent() {
+				const { inspector: showInspector } =
+					useLoaderData( { from: route.path } ) ?? {};
+
 				return (
-					<RouteComponent
-						stage={ module.stage }
-						inspector={ module.inspector }
-						canvas={ module.canvas }
-					/>
+					<>
+						{ Stage && (
+							<div className="boot-layout__stage">
+								<Stage />
+							</div>
+						) }
+						{ Inspector && showInspector && (
+							<div className="boot-layout__inspector">
+								<Inspector />
+							</div>
+						) }
+					</>
 				);
 			},
 		} );
@@ -176,7 +158,7 @@ async function createRouteFromDefinition(
  * @param rootComponent Root component to use for the router.
  * @return Router tree.
  */
-async function createRouteTree(
+function createRouteTree(
 	routes: Route[],
 	rootComponent: ComponentType = Root
 ) {
@@ -185,9 +167,9 @@ async function createRouteTree(
 		context: () => ( {} ),
 	} );
 
-	// Create routes from definitions
-	const dynamicRoutes = await Promise.all(
-		routes.map( ( route ) => createRouteFromDefinition( route, rootRoute ) )
+	// Create routes from definitions (now synchronous)
+	const dynamicRoutes = routes.map( ( route ) =>
+		createRouteFromDefinition( route, rootRoute )
 	);
 
 	return rootRoute.addChildren( dynamicRoutes );
@@ -219,36 +201,36 @@ export default function Router( {
 	routes,
 	rootComponent = Root,
 }: RouterProps ) {
-	const [ router, setRouter ] = useState< any >( null );
+	const router = useMemo( () => {
+		const history = createPathHistory();
+		const routeTree = createRouteTree( routes, rootComponent );
 
-	useEffect( () => {
-		let cancelled = false;
+		return createRouter( {
+			history,
+			routeTree,
+			defaultPreload: 'intent',
+			defaultNotFoundComponent: NotFoundComponent,
+			defaultViewTransition: {
+				types: ( {
+					fromLocation,
+				}: {
+					fromLocation?: unknown;
+					toLocation: unknown;
+					pathChanged: boolean;
+					hrefChanged: boolean;
+					hashChanged: boolean;
+				} ) => {
+					// Disable view transition on initial navigation (no previous location)
+					if ( ! fromLocation ) {
+						return false;
+					}
 
-		async function initializeRouter() {
-			const history = createPathHistory();
-			const routeTree = await createRouteTree( routes, rootComponent );
-
-			if ( ! cancelled ) {
-				const newRouter = createRouter( {
-					history,
-					routeTree,
-					defaultPreload: 'intent',
-					defaultNotFoundComponent: NotFoundComponent,
-				} );
-				setRouter( newRouter );
-			}
-		}
-
-		initializeRouter();
-
-		return () => {
-			cancelled = true;
-		};
+					// Enable with navigation type for subsequent navigations
+					return [ 'navigate' ];
+				},
+			},
+		} );
 	}, [ routes, rootComponent ] );
-
-	if ( ! router ) {
-		return <div>Loading routes...</div>;
-	}
 
 	return <RouterProvider router={ router } />;
 }

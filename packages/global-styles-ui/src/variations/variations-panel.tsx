@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-// @ts-expect-error: Not typed yet.
+import type { BlockStyle } from '@wordpress/blocks';
 import { store as blocksStore } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 import { __experimentalItemGroup as ItemGroup } from '@wordpress/components';
@@ -11,13 +11,6 @@ import { __experimentalItemGroup as ItemGroup } from '@wordpress/components';
  */
 import { NavigationButtonAsItem } from '../navigation-button';
 import { useStyle } from '../hooks';
-
-interface BlockStyle {
-	name: string;
-	label: string;
-	source?: string;
-	isDefault?: boolean;
-}
 
 interface VariationsPanelProps {
 	name: string;

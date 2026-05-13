@@ -4,10 +4,6 @@
 	.block-editor-contrast-checker {
 		grid-column: span 2;
 		margin-top: $grid-unit-20;
-
-		.components-notice__content {
-			margin-right: 0;
-		}
 	}
 
 	/* Increased specificity required to remove the slot wrapper's row gap */

@@ -31,7 +31,7 @@ import { PATTERN_SYNC_TYPES } from '../constants';
  * @param {string[]} props.clientIds              Client ids of selected blocks.
  * @param {string}   props.rootClientId           ID of the currently selected top-level block.
  * @param {()=>void} props.closeBlockSettingsMenu Callback to close the block settings menu dropdown.
- * @return {import('react').ComponentType} The menu control or null.
+ * @return {React.ComponentType} The menu control or null.
  */
 export default function PatternConvertButton( {
 	clientIds,
@@ -83,7 +83,6 @@ export default function PatternConvertButton( {
 				);
 
 			const isUnsyncedPattern =
-				window?.__experimentalContentOnlyPatternInsertion &&
 				blocks.length === 1 &&
 				blocks?.[ 0 ]?.attributes?.metadata?.patternName;
 
@@ -144,7 +143,6 @@ export default function PatternConvertButton( {
 
 			replaceBlocks( clientIds, newBlock );
 			setEditingPattern( newBlock.clientId, true );
-			closeBlockSettingsMenu();
 		}
 
 		createSuccessNotice(
@@ -165,6 +163,7 @@ export default function PatternConvertButton( {
 			}
 		);
 		setIsModalOpen( false );
+		closeBlockSettingsMenu();
 	};
 	return (
 		<>
@@ -187,6 +186,7 @@ export default function PatternConvertButton( {
 					} }
 					onClose={ () => {
 						setIsModalOpen( false );
+						closeBlockSettingsMenu();
 					} }
 				/>
 			) }

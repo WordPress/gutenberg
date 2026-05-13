@@ -31,6 +31,7 @@ function omit( object, keys ) {
 const LETTER_SPACING_SUPPORT_KEY = 'typography.__experimentalLetterSpacing';
 const TEXT_TRANSFORM_SUPPORT_KEY = 'typography.__experimentalTextTransform';
 const TEXT_DECORATION_SUPPORT_KEY = 'typography.__experimentalTextDecoration';
+const TEXT_INDENT_SUPPORT_KEY = 'typography.textIndent';
 const TEXT_COLUMNS_SUPPORT_KEY = 'typography.textColumns';
 const FONT_STYLE_SUPPORT_KEY = 'typography.__experimentalFontStyle';
 const FONT_WEIGHT_SUPPORT_KEY = 'typography.__experimentalFontWeight';
@@ -45,6 +46,7 @@ export const TYPOGRAPHY_SUPPORT_KEYS = [
 	TEXT_ALIGN_SUPPORT_KEY,
 	TEXT_COLUMNS_SUPPORT_KEY,
 	TEXT_DECORATION_SUPPORT_KEY,
+	TEXT_INDENT_SUPPORT_KEY,
 	WRITING_MODE_SUPPORT_KEY,
 	TEXT_TRANSFORM_SUPPORT_KEY,
 	LETTER_SPACING_SUPPORT_KEY,
@@ -144,7 +146,16 @@ export function TypographyPanel( { clientId, name, setAttributes, settings } ) {
 	);
 
 	const onChange = ( newStyle ) => {
-		setAttributes( styleToAttributes( newStyle ) );
+		const newAttributes = styleToAttributes( newStyle );
+
+		// If setting a font size and fitText is currently enabled, disable it
+		const hasFontSize =
+			newAttributes.fontSize || newAttributes.style?.typography?.fontSize;
+		if ( hasFontSize && fitText ) {
+			newAttributes.fitText = undefined;
+		}
+
+		setAttributes( newAttributes );
 	};
 
 	if ( ! isEnabled ) {
@@ -164,7 +175,6 @@ export function TypographyPanel( { clientId, name, setAttributes, settings } ) {
 			value={ value }
 			onChange={ onChange }
 			defaultControls={ defaultControls }
-			fitText={ fitText }
 		/>
 	);
 }

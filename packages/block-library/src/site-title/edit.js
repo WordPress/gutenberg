@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import clsx from 'clsx';
-
-/**
  * WordPress dependencies
  */
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -11,7 +6,6 @@ import { store as coreStore } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
 import {
 	RichText,
-	AlignmentControl,
 	InspectorControls,
 	BlockControls,
 	useBlockProps,
@@ -30,13 +24,14 @@ import { decodeEntities } from '@wordpress/html-entities';
  * Internal dependencies
  */
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+import useDeprecatedTextAlign from '../utils/deprecated-text-align-attributes';
 
-export default function SiteTitleEdit( {
-	attributes,
-	setAttributes,
-	insertBlocksAfter,
-} ) {
-	const { level, levelOptions, textAlign, isLink, linkTarget } = attributes;
+export default function SiteTitleEdit( props ) {
+	useDeprecatedTextAlign( props );
+
+	const { attributes, setAttributes, insertBlocksAfter } = props;
+
+	const { level, levelOptions, isLink, linkTarget } = attributes;
 	const { canUserEdit, title } = useSelect( ( select ) => {
 		const { canUser, getEntityRecord, getEditedEntityRecord } =
 			select( coreStore );
@@ -64,10 +59,8 @@ export default function SiteTitleEdit( {
 
 	const TagName = level === 0 ? 'p' : `h${ level }`;
 	const blockProps = useBlockProps( {
-		className: clsx( {
-			[ `has-text-align-${ textAlign }` ]: textAlign,
-			'wp-block-site-title__placeholder': ! canUserEdit && ! title,
-		} ),
+		className:
+			! canUserEdit && ! title && 'wp-block-site-title__placeholder',
 	} );
 	const siteTitleContent = canUserEdit ? (
 		<TagName { ...blockProps }>
@@ -114,12 +107,6 @@ export default function SiteTitleEdit( {
 							setAttributes( { level: newLevel } )
 						}
 					/>
-					<AlignmentControl
-						value={ textAlign }
-						onChange={ ( nextAlign ) => {
-							setAttributes( { textAlign: nextAlign } );
-						} }
-					/>
 				</BlockControls>
 			) }
 			<InspectorControls>
@@ -140,7 +127,6 @@ export default function SiteTitleEdit( {
 						isShownByDefault
 					>
 						<ToggleControl
-							__nextHasNoMarginBottom
 							label={ __( 'Make title link to home' ) }
 							onChange={ () =>
 								setAttributes( { isLink: ! isLink } )
@@ -158,7 +144,6 @@ export default function SiteTitleEdit( {
 							isShownByDefault
 						>
 							<ToggleControl
-								__nextHasNoMarginBottom
 								label={ __( 'Open in new tab' ) }
 								onChange={ ( value ) =>
 									setAttributes( {

@@ -6,7 +6,7 @@
 }
 
 .boot-navigation-screen .components-text {
-	color: var(--wpds-color-fg-content-neutral, #1e1e1e);
+	color: var(--wpds-color-fg-content-neutral);
 }
 
 .boot-navigation-screen__title-icon {
@@ -24,7 +24,7 @@
 	&#{&},
 	&#{&} .boot-navigation-screen__title {
 		line-height: variables.$font-line-height-x-large;
-		color: var(--wpds-color-fg-content-neutral, #1e1e1e);
+		color: var(--wpds-color-fg-content-neutral);
 	}
 }
 

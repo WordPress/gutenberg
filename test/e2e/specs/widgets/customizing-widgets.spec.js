@@ -286,7 +286,7 @@ test.describe( 'Widgets Customizer', () => {
 		await editHeadingWidget.click();
 
 		const headingBlock = page.locator(
-			'role=document[name="Block: Heading"i] >> text="First Heading"'
+			'role=document[name="Block: Heading 2"i] >> text="First Heading"'
 		);
 		await expect( headingBlock ).toBeFocused();
 	} );

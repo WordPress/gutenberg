@@ -178,9 +178,7 @@ export default function CoverInspectorControls( {
 		} );
 	};
 
-	const showFocalPointPicker =
-		isVideoBackground ||
-		( isImageBackground && ( ! hasParallax || isRepeated ) );
+	const showFocalPointPicker = isVideoBackground || isImageBackground;
 
 	const imperativeFocalPointPreview = ( value ) => {
 		const [ styleOfRef, property ] = mediaElement.current
@@ -225,7 +223,6 @@ export default function CoverInspectorControls( {
 									}
 								>
 									<ToggleControl
-										__nextHasNoMarginBottom
 										label={ __( 'Fixed background' ) }
 										checked={ !! hasParallax }
 										onChange={ toggleParallax }
@@ -243,7 +240,6 @@ export default function CoverInspectorControls( {
 									}
 								>
 									<ToggleControl
-										__nextHasNoMarginBottom
 										label={ __( 'Repeated background' ) }
 										checked={ isRepeated }
 										onChange={ toggleIsRepeated }
@@ -263,7 +259,6 @@ export default function CoverInspectorControls( {
 								}
 							>
 								<FocalPointPicker
-									__nextHasNoMarginBottom
 									label={ __( 'Focal point' ) }
 									url={ url }
 									value={ focalPoint }
@@ -297,7 +292,6 @@ export default function CoverInspectorControls( {
 								}
 							>
 								<TextareaControl
-									__nextHasNoMarginBottom
 									label={ __( 'Alternative text' ) }
 									value={ alt }
 									onChange={ ( newAlt ) =>
@@ -378,7 +372,6 @@ export default function CoverInspectorControls( {
 						panelId={ clientId }
 					>
 						<RangeControl
-							__nextHasNoMarginBottom
 							label={ __( 'Overlay opacity' ) }
 							value={ dimRatio }
 							onChange={ ( newDimRatio ) =>

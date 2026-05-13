@@ -56,6 +56,7 @@ describe( 'block serializer', () => {
 
 			it( 'should work when block type is passed as string', () => {
 				registerBlockType( 'core/fruit', {
+					apiVersion: 3,
 					title: 'Fruit',
 					category: 'widgets',
 					save: fruitBlockSave,
@@ -281,6 +282,7 @@ describe( 'block serializer', () => {
 	describe( 'serializeBlock()', () => {
 		it( 'serializes the freeform content fallback block without comment delimiters', () => {
 			registerBlockType( 'core/freeform', {
+				apiVersion: 3,
 				category: 'text',
 				title: 'freeform block',
 				attributes: {
@@ -301,6 +303,7 @@ describe( 'block serializer', () => {
 		} );
 		it( 'serializes the freeform content fallback block with comment delimiters in nested context', () => {
 			registerBlockType( 'core/freeform', {
+				apiVersion: 3,
 				category: 'text',
 				title: 'freeform block',
 				attributes: {
@@ -325,6 +328,7 @@ describe( 'block serializer', () => {
 		} );
 		it( 'serializes the unregistered fallback block without comment delimiters', () => {
 			registerBlockType( 'core/unregistered-block', {
+				apiVersion: 3,
 				category: 'text',
 				title: 'unregistered block',
 				attributes: {
@@ -345,6 +349,7 @@ describe( 'block serializer', () => {
 		} );
 		it( 'preserves content from invalid blocks when source information is present', () => {
 			registerBlockType( 'core/quote', {
+				apiVersion: 3,
 				category: 'text',
 				title: 'Quote',
 				attributes: { content: 'string' },
@@ -370,6 +375,7 @@ describe( 'block serializer', () => {
 		} );
 		it( 're-generates content from invalid blocks when source information is missing (losing content)', () => {
 			registerBlockType( 'core/quote', {
+				apiVersion: 3,
 				category: 'text',
 				title: 'Quote',
 				attributes: { content: 'string' },
@@ -390,6 +396,7 @@ describe( 'block serializer', () => {
 	describe( 'serialize()', () => {
 		beforeEach( () => {
 			const blockType = {
+				apiVersion: 3,
 				attributes: {
 					throw: {
 						type: 'boolean',
@@ -461,6 +468,7 @@ describe( 'block serializer', () => {
 	describe( 'getBlockInnerHTML', () => {
 		it( "should return the block's serialized inner HTML", () => {
 			const blockType = {
+				apiVersion: 3,
 				attributes: {
 					content: {
 						type: 'string',

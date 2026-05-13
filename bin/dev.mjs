@@ -3,7 +3,7 @@
 /**
  * External dependencies
  */
-import { spawn } from 'child_process';
+import { execSync, spawn } from 'child_process';
 import { fileURLToPath } from 'url';
 import path from 'path';
 import fs from 'fs';
@@ -134,6 +134,13 @@ async function dev() {
 			{ silent: true }
 		);
 
+		// Step 2.5: Generate worker placeholders
+		// This must happen before TypeScript compilation because some packages
+		// (like vips) have source files that import from generated worker-code.ts
+		await exec( 'node', [
+			'./bin/packages/generate-worker-placeholders.mjs',
+		] );
+
 		// Step 3: Validate TypeScript version
 		console.log( '\n🔍 Validating TypeScript version...' );
 		await exec( 'node', [
@@ -141,13 +148,16 @@ async function dev() {
 		] );
 
 		// Step 4: Build TypeScript types
-		console.log( '\n📘 Building TypeScript types...' );
-		await exec( 'tsc', [ '--build' ] ).catch( () => {
+		console.log( '\n📘 Building TypeScript types...\n' );
+		const tsStartTime = Date.now();
+		await exec( 'tsgo', [ '--build' ] ).catch( () => {
 			console.error(
 				'\n❌ TypeScript compilation failed. Try cleaning up first: `npm run clean:package-types`'
 			);
 			throw new Error( 'TypeScript compilation failed' );
 		} );
+		const buildTime = Date.now() - tsStartTime;
+		console.log( `   ✔ Built TypeScript types (${ buildTime }ms)` );
 
 		// Step 5: Check build type declaration files
 		console.log( '\n✅ Checking type declaration files...' );
@@ -166,23 +176,25 @@ async function dev() {
 			) }s)\n`
 		);
 
-		// Write a marker file to signal that the build is ready
-		readyMarkerFile.create();
-
 		// Step 7: Start watch mode with both TypeScript and package builds
 		console.log( '👀 Starting watch mode...\n' );
 		console.log( '   - TypeScript compiler watching for type changes' );
 		console.log( '   - Package builder watching for source changes\n' );
 
 		// Start TypeScript watch
-		const tscWatch = execAsync( 'tsc', [
+		const tscWatch = execAsync( 'tsgo', [
 			'--build',
 			'--watch',
 			'--preserveWatchOutput',
 		] );
 
-		// Start package build watch
-		const buildWatch = execAsync( 'wp-build', [ '--watch' ], {
+		// Start package build watch and wait for initial build to complete
+		// before signaling ready. wp-build outputs "Watching for changes..."
+		// when its initial build is done.
+		const buildWatch = spawn( 'wp-build', [ '--watch' ], {
+			cwd: ROOT_DIR,
+			stdio: [ 'inherit', 'pipe', 'inherit' ],
+			shell: true,
 			env: { ...process.env, NODE_ENV: 'development' },
 		} );
 
@@ -198,6 +210,47 @@ async function dev() {
 		process.on( 'SIGINT', cleanup );
 		process.on( 'SIGTERM', cleanup );
 
+		// Wait for wp-build to complete its initial build, then signal ready.
+		// Using .then() ensures cleanup handlers are registered before awaiting,
+		// so early termination still triggers cleanup.
+		let isReady = false;
+		buildWatch.stdout.on( 'data', async ( data ) => {
+			const output = data.toString();
+			process.stdout.write( output );
+			if ( ! isReady && output.includes( 'Watching for changes' ) ) {
+				isReady = true;
+
+				// Build blocks manifests after initial build completes
+				const blocksDirs = [
+					{
+						input: 'build/scripts/block-library',
+						output: 'build/scripts/block-library/blocks-manifest.php',
+					},
+					{
+						input: 'build/scripts/edit-widgets/blocks',
+						output: 'build/scripts/edit-widgets/blocks/blocks-manifest.php',
+					},
+					{
+						input: 'build/scripts/widgets/blocks',
+						output: 'build/scripts/widgets/blocks/blocks-manifest.php',
+					},
+				];
+				for ( const { input, output: outputPath } of blocksDirs ) {
+					await exec(
+						'wp-scripts',
+						[
+							'build-blocks-manifest',
+							`--input=${ input }`,
+							`--output=${ outputPath }`,
+						],
+						{ silent: true }
+					);
+				}
+
+				readyMarkerFile.create();
+			}
+		} );
+
 		// Keep the process running
 		await new Promise( () => {} );
 	} catch ( error ) {
@@ -206,4 +259,60 @@ async function dev() {
 	}
 }
 
+/**
+ * Warn if a webpack process is watching this checkout. A stale webpack
+ * dev server (e.g. left over from a previous setup) can clobber the
+ * non-minified index.js files in build/scripts/ with webpack chunk
+ * format, breaking the editor when SCRIPT_DEBUG is enabled.
+ *
+ * Best-effort and intentionally non-fatal: webpack processes that
+ * happen to be running for an unrelated project shouldn't block
+ * `npm run dev`. Match against this checkout's path (with trailing /)
+ * to avoid false positives on sibling directories.
+ */
+function checkForConflictingProcesses() {
+	try {
+		const ps = execSync( 'ps aux', { encoding: 'utf-8' } );
+		const repoPathPrefix = ROOT_DIR + '/';
+		const webpackLines = ps
+			.split( '\n' )
+			.filter(
+				( line ) =>
+					/webpack/.test( line ) &&
+					! /grep/.test( line ) &&
+					! line.includes( String( process.pid ) ) &&
+					line.includes( repoPathPrefix )
+			);
+
+		if ( webpackLines.length === 0 ) {
+			return;
+		}
+
+		const pids = webpackLines
+			.map( ( line ) => line.trim().split( /\s+/ )[ 1 ] )
+			.filter( Boolean );
+
+		console.warn(
+			`\n⚠️  Found ${ pids.length } webpack process(es) that look like they may be watching this checkout:\n`
+		);
+		for ( const line of webpackLines ) {
+			console.warn( `   ${ line.trim() }` );
+		}
+		console.warn(
+			`\nA stale webpack dev server can overwrite esbuild output in build/scripts/`
+		);
+		console.warn(
+			`with webpack chunk format, breaking the editor when SCRIPT_DEBUG is enabled.`
+		);
+		console.warn(
+			`If things look wrong, kill them with:  kill -9 ${ pids.join(
+				' '
+			) }\n`
+		);
+	} catch {
+		// If ps fails, just continue — this is a best-effort check.
+	}
+}
+
+checkForConflictingProcesses();
 dev();

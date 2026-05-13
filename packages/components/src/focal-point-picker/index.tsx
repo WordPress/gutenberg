@@ -13,7 +13,6 @@ import {
 	__experimentalUseDragging as useDragging,
 	useIsomorphicLayoutEffect,
 } from '@wordpress/compose';
-import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -45,14 +44,17 @@ const GRID_OVERLAY_TIMEOUT = 600;
 /**
  * Focal Point Picker is a component which creates a UI for identifying the most important visual point of an image.
  *
- * This component addresses a specific problem: with large background images it is common to see undesirable crops,
- * especially when viewing on smaller viewports such as mobile phones. This component allows the selection of
- * the point with the most important visual information and returns it as a pair of numbers between 0 and 1.
- * This value can be easily converted into the CSS `background-position` attribute, and will ensure that the
- * focal point is never cropped out, regardless of viewport.
+ * It addresses two common issues when displaying images in cropped containers. First, large
+ * background images can be cropped in undesirable ways, especially on smaller viewports such as
+ * mobile devices. Second, the CSS aspect-ratio property can inadvertently crop out the area of
+ * highest visual interest. This component allows the selection of the point with the most
+ * important visual information and returns it as a pair of numbers between 0 and 1.
+ * The output value can be applied to either CSS `background-position` (for elements with
+ * `background-image`) or `object-position` (for `<img>` / `<video>` elements rendered with
+ * `object-fit: cover`).
  *
- * - Example focal point picker value: `{ x: 0.5, y: 0.1 }`
- * - Corresponding CSS: `background-position: 50% 10%;`
+ * - Example focal point picker value: `{ x: 0.5, y: 0.1 }`;
+ * - Corresponding CSS: `object-position: 50% 10%`;
  *
  * ```jsx
  * import { FocalPointPicker } from '@wordpress/components';
@@ -61,35 +63,37 @@ const GRID_OVERLAY_TIMEOUT = 600;
  * const Example = () => {
  * 	const [ focalPoint, setFocalPoint ] = useState( {
  * 		x: 0.5,
- * 		y: 0.5,
+ * 		y: 0.1,
  * 	} );
  *
  * 	const url = '/path/to/image';
  *
  * 	// Example function to render the CSS styles based on Focal Point Picker value
  * 	const style = {
- * 		backgroundImage: `url(${ url })`,
- * 		backgroundPosition: `${ focalPoint.x * 100 }% ${ focalPoint.y * 100 }%`,
+ * 		width: '100%',
+ * 		aspectRatio: '16 / 9',
+ * 		objectFit: 'cover',
+ * 		objectPosition: `${ focalPoint.x * 100 }% ${ focalPoint.y * 100 }%`,
  * 	};
  *
  * 	return (
  * 		<>
  * 			<FocalPointPicker
- *        __nextHasNoMarginBottom
  * 				url={ url }
  * 				value={ focalPoint }
  * 				onDragStart={ setFocalPoint }
  * 				onDrag={ setFocalPoint }
  * 				onChange={ setFocalPoint }
  * 			/>
- * 			<div style={ style } />
+ * 			<img src={ url } alt="" style={ style } />
  * 		</>
  * 	);
  * };
  * ```
  */
 export function FocalPointPicker( {
-	__nextHasNoMarginBottom,
+	// Prevent passing to internal component.
+	__nextHasNoMarginBottom: _,
 	autoPlay = true,
 	className,
 	help,
@@ -109,14 +113,6 @@ export function FocalPointPicker( {
 }: WordPressComponentProps< FocalPointPickerProps, 'div', false > ) {
 	const [ point, setPoint ] = useState( valueProp );
 	const [ showGridOverlay, setShowGridOverlay ] = useState( false );
-
-	if ( ! __nextHasNoMarginBottom ) {
-		deprecated( 'Bottom margin styles for wp.components.FocalPointPicker', {
-			since: '6.7',
-			version: '7.0',
-			hint: 'Set the `__nextHasNoMarginBottom` prop to true to start opting into the new styles, which will become the default in a future version.',
-		} );
-	}
 
 	const { startDrag, endDrag, isDragging } = useDragging( {
 		onDragStart: ( event ) => {
@@ -289,18 +285,13 @@ export function FocalPointPicker( {
 				</MediaContainer>
 			</MediaWrapper>
 			<Controls
-				__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
 				hasHelpText={ !! help }
 				point={ { x, y } }
 				onChange={ ( value ) => {
 					onChange?.( getFinalValue( value ) );
 				} }
 			/>
-			{ !! help && (
-				<StyledHelp __nextHasNoMarginBottom={ __nextHasNoMarginBottom }>
-					{ help }
-				</StyledHelp>
-			) }
+			{ !! help && <StyledHelp>{ help }</StyledHelp> }
 		</Container>
 	);
 }

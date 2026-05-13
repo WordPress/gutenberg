@@ -6,7 +6,7 @@
 			"gutenberg-env",
 			"gutenberg-test-env",
 			"jest",
-			"@testing-library/jest-dom"
+			"style-imports"
 		]
 	},
 	"references": [
@@ -27,8 +27,10 @@
 		{ "path": "../private-apis" },
 		{ "path": "../react-i18n" },
 		{ "path": "../rich-text" },
+		{ "path": "../style-runtime" },
 		{ "path": "../warning" }
 	],
+	"files": [ "global.d.ts", "storybook.d.ts" ],
 	"exclude": [
 		"src/**/*.android.js",
 		"src/**/*.ios.js",

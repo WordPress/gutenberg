@@ -13,7 +13,7 @@ import useRefEffect from '../use-ref-effect';
  *
  * @param {Object}   config            Configuration object.
  * @param {boolean=} config.isDisabled Whether the element should be disabled.
- * @return {import('react').RefCallback<HTMLElement>} Element Ref.
+ * @return {React.RefCallback<HTMLElement>} Element Ref.
  *
  * @example
  * ```js

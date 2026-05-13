@@ -1,18 +1,7 @@
-/**
- * WordPress dependencies
- */
-import { useEffect } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
-import basicStyles from '../global-basic.lazy.scss';
-import wordPressStyles from '../global-wordpress.lazy.scss';
-
-/**
- * External dependencies
- */
 import clsx from 'clsx';
+import basicStyles from '../global-basic.scss?inline';
+import wordPressStyles from '../global-wordpress.scss?inline';
+import { useSharedStyle } from './utils/use-shared-style';
 
 /**
  * A Storybook decorator to inject global CSS.
@@ -53,10 +42,7 @@ export const WithGlobalCSS = ( Story, context ) => {
 	const { lazyStyles, externalStyles, classes } =
 		config[ context.globals.css ];
 
-	useEffect( () => {
-		lazyStyles.forEach( ( style ) => style.use() );
-		return () => lazyStyles.forEach( ( style ) => style.unuse() );
-	}, [ context.globals.css ] );
+	useSharedStyle( lazyStyles.join( '\n' ) );
 
 	return (
 		<div className={ clsx( classes ) }>

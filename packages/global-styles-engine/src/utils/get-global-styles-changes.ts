@@ -7,7 +7,6 @@ import memoize from 'memize';
  * WordPress dependencies
  */
 import { __, _n, sprintf } from '@wordpress/i18n';
-// @ts-expect-error blocks package not typed yet.
 import { getBlockTypes } from '@wordpress/blocks';
 
 type TranslationMap = Record< string, string >;

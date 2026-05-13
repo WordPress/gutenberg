@@ -45,4 +45,5 @@ function UnforwardedToolbarDropdownMenu(
 }
 
 export const ToolbarDropdownMenu = forwardRef( UnforwardedToolbarDropdownMenu );
+ToolbarDropdownMenu.displayName = 'ToolbarDropdownMenu';
 export default ToolbarDropdownMenu;

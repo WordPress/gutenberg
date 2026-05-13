@@ -50,7 +50,6 @@ const OrderedListSettings = ( { setAttributes, reversed, start, type } ) => {
 				<PanelBody title={ __( 'Settings' ) }>
 					<SelectControl
 						__next40pxDefaultSize
-						__nextHasNoMarginBottom
 						label={ __( 'List style' ) }
 						options={ LIST_STYLE_OPTIONS }
 						value={ type }
@@ -60,7 +59,6 @@ const OrderedListSettings = ( { setAttributes, reversed, start, type } ) => {
 					/>
 					<TextControl
 						__next40pxDefaultSize
-						__nextHasNoMarginBottom
 						label={ __( 'Start value' ) }
 						type="number"
 						onChange={ ( value ) => {
@@ -80,7 +78,6 @@ const OrderedListSettings = ( { setAttributes, reversed, start, type } ) => {
 						step="1"
 					/>
 					<ToggleControl
-						__nextHasNoMarginBottom
 						label={ __( 'Reverse order' ) }
 						checked={ reversed || false }
 						onChange={ ( value ) => {
@@ -115,7 +112,6 @@ const OrderedListSettings = ( { setAttributes, reversed, start, type } ) => {
 					>
 						<SelectControl
 							__next40pxDefaultSize
-							__nextHasNoMarginBottom
 							label={ __( 'List style' ) }
 							options={ LIST_STYLE_OPTIONS }
 							value={ type || 'decimal' }
@@ -136,7 +132,6 @@ const OrderedListSettings = ( { setAttributes, reversed, start, type } ) => {
 					>
 						<TextControl
 							__next40pxDefaultSize
-							__nextHasNoMarginBottom
 							label={ __( 'Start value' ) }
 							type="number"
 							onChange={ ( value ) => {
@@ -167,7 +162,6 @@ const OrderedListSettings = ( { setAttributes, reversed, start, type } ) => {
 						}
 					>
 						<ToggleControl
-							__nextHasNoMarginBottom
 							label={ __( 'Reverse order' ) }
 							checked={ reversed || false }
 							onChange={ ( value ) => {

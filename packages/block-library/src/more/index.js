@@ -27,7 +27,10 @@ export const settings = {
 	__experimentalLabel( attributes, { context } ) {
 		const customName = attributes?.metadata?.name;
 
-		if ( context === 'list-view' && customName ) {
+		if (
+			( context === 'list-view' || context === 'breadcrumb' ) &&
+			customName
+		) {
 			return customName;
 		}
 
@@ -40,12 +43,13 @@ export const settings = {
 	save,
 };
 
-if ( window.__experimentalContentOnlyPatternInsertion ) {
+if ( window.__experimentalContentOnlyInspectorFields ) {
 	settings[ fieldsKey ] = [
 		{
 			id: 'customText',
 			label: __( 'Content' ),
-			type: 'richtext',
+			type: 'text',
+			Edit: 'rich-text', // TODO: replace with custom component
 		},
 	];
 	settings[ formKey ] = {

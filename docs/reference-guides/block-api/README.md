@@ -5,7 +5,7 @@ Blocks are the fundamental element of the editor. They are the primary way in wh
 The following sections will walk you through the existing block APIs:
 
 -   [Annotations](/docs/reference-guides/block-api/block-annotations.md)
--   [API Versions](/docs/reference-guides/block-api/block-api-versions.md)
+-   [API Versions](/docs/reference-guides/block-api/block-api-versions/README.md)
 -   [Attributes](/docs/reference-guides/block-api/block-attributes.md)
 -   [Bindings](/docs/reference-guides/block-api/block-bindings.md)
 -   [Context](/docs/reference-guides/block-api/block-context.md)

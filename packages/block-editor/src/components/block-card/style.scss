@@ -2,9 +2,7 @@
 @use "@wordpress/base-styles/colors" as *;
 
 .block-editor-block-card {
-	align-items: flex-start;
 	color: $gray-900;
-	display: flex;
 	padding: $grid-unit-20;
 
 	&.is-parent {

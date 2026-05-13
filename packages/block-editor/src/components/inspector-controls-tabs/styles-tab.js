@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { PanelBody } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
 
@@ -24,14 +23,14 @@ function SectionBlockColorControls( {
 	const settings = useBlockSettings( blockName );
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
-	const { hasButton, hasHeading } = useSelect(
+	const { hasButtons, hasHeading } = useSelect(
 		( select ) => {
 			const blockNames =
 				select( blockEditorStore ).getBlockNamesByClientId(
 					contentClientIds
 				);
 			return {
-				hasButton: blockNames.includes( 'core/button' ),
+				hasButtons: blockNames.includes( 'core/buttons' ),
 				hasHeading: blockNames.includes( 'core/heading' ),
 			};
 		},
@@ -53,7 +52,7 @@ function SectionBlockColorControls( {
 			defaultControls={ {
 				text: true,
 				background: true,
-				button: hasButton,
+				button: hasButtons,
 				heading: hasHeading,
 			} }
 		/>
@@ -71,21 +70,14 @@ const StylesTab = ( {
 
 	return (
 		<>
-			{ hasBlockStyles && (
-				<div>
-					<PanelBody title={ __( 'Styles' ) }>
-						<BlockStyles clientId={ clientId } />
-					</PanelBody>
-				</div>
+			{ hasBlockStyles && <BlockStyles clientId={ clientId } /> }
+			{ isSectionBlock && (
+				<SectionBlockColorControls
+					blockName={ blockName }
+					clientId={ clientId }
+					contentClientIds={ contentClientIds }
+				/>
 			) }
-			{ isSectionBlock &&
-				window?.__experimentalContentOnlyPatternInsertion && (
-					<SectionBlockColorControls
-						blockName={ blockName }
-						clientId={ clientId }
-						contentClientIds={ contentClientIds }
-					/>
-				) }
 			{ ! isSectionBlock && (
 				<>
 					<InspectorControls.Slot
@@ -96,6 +88,7 @@ const StylesTab = ( {
 					<InspectorControls.Slot
 						group="background"
 						label={ __( 'Background image' ) }
+						className="background-block-support-panel__inner-wrapper"
 					/>
 					<InspectorControls.Slot group="filter" />
 					<InspectorControls.Slot

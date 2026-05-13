@@ -17,7 +17,6 @@ export default function TaxonomyControl( { value, onChange, ...props } ) {
 
 	return (
 		<SelectControl
-			__nextHasNoMarginBottom
 			__next40pxDefaultSize
 			options={ taxonomyOptions }
 			value={ value }

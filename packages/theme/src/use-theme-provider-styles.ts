@@ -3,13 +3,12 @@
  */
 import type { CSSProperties } from 'react';
 import {
-	parse,
+	clone,
+	set,
 	to,
-	get,
-	serialize,
 	sRGB,
 	HSL,
-	type ColorTypes,
+	type PlainColorObject,
 } from 'colorjs.io/fn';
 import memoize from 'memize';
 
@@ -30,6 +29,7 @@ import {
 	DEFAULT_SEED_COLORS,
 	type RampResult,
 } from './color-ramps';
+import { getColorString } from './color-ramps/lib/color-utils';
 import type { ThemeProviderProps } from './types';
 
 type Entry = [ string, string ];
@@ -93,58 +93,38 @@ const legacyWpComponentsOverridesCSS: Entry[] = [
 	],
 ];
 
-function customRgbFormat( color: ColorTypes ) {
+function customRgbFormat( color: PlainColorObject ): string {
 	const rgb = to( color, sRGB );
-	return [ get( rgb, 'srgb.r' ), get( rgb, 'srgb.g' ), get( rgb, 'srgb.b' ) ]
-		.map( ( n ) => Math.round( n * 255 ) )
+	return rgb.coords
+		.map( ( n ) => Math.round( ( n ?? 0 ) * 255 ) )
 		.join( ', ' );
 }
 
 function legacyWpAdminThemeOverridesCSS( accent: string ): Entry[] {
-	const parsedAccent = to( parse( accent ), HSL );
+	const parsedAccent = to( accent, HSL );
+	const parsedL = parsedAccent.coords[ 2 ] ?? 0;
 
-	const coords = parsedAccent.coords;
-	const darker10 = to(
-		{
-			space: HSL,
-			coords: [
-				coords[ 0 ], // h
-				coords[ 1 ], // s
-				Math.max( 0, Math.min( 100, coords[ 2 ] - 5 ) ), // l (reduced by 5%)
-			],
-		},
-		sRGB
+	// Create darker version of accent —
+	const darker10 = set(
+		clone( parsedAccent ),
+		[ HSL, 'l' ],
+		Math.max( 0, parsedL - 5 ) // L reduced by 5%
 	);
-	const darker20 = to(
-		{
-			space: HSL,
-			coords: [
-				coords[ 0 ], // h
-				coords[ 1 ], // s
-				Math.max( 0, Math.min( 100, coords[ 2 ] - 10 ) ), // l (reduced by 10%)
-			],
-		},
-		sRGB
+	const darker20 = set(
+		clone( parsedAccent ),
+		[ HSL, 'l' ],
+		Math.max( 0, parsedL - 10 ) // L reduced by 10%
 	);
 
 	return [
-		[
-			'--wp-admin-theme-color',
-			serialize( to( parsedAccent, sRGB ), { format: 'hex' } ),
-		],
+		[ '--wp-admin-theme-color', getColorString( parsedAccent ) ],
 		[ '--wp-admin-theme-color--rgb', customRgbFormat( parsedAccent ) ],
-		[
-			'--wp-admin-theme-color-darker-10',
-			serialize( darker10, { format: 'hex' } ),
-		],
+		[ '--wp-admin-theme-color-darker-10', getColorString( darker10 ) ],
 		[
 			'--wp-admin-theme-color-darker-10--rgb',
 			customRgbFormat( darker10 ),
 		],
-		[
-			'--wp-admin-theme-color-darker-20',
-			serialize( darker20, { format: 'hex' } ),
-		],
+		[ '--wp-admin-theme-color-darker-20', getColorString( darker20 ) ],
 		[
 			'--wp-admin-theme-color-darker-20--rgb',
 			customRgbFormat( darker20 ),
@@ -190,8 +170,10 @@ function generateStyles( {
 
 export function useThemeProviderStyles( {
 	color = {},
+	cursor,
 }: {
 	color?: ThemeProviderProps[ 'color' ];
+	cursor?: ThemeProviderProps[ 'cursor' ];
 } = {} ) {
 	const { resolvedSettings: inheritedSettings } = useContext( ThemeContext );
 
@@ -205,6 +187,7 @@ export function useThemeProviderStyles( {
 		DEFAULT_SEED_COLORS.primary;
 	const bg =
 		color.bg ?? inheritedSettings.color?.bg ?? DEFAULT_SEED_COLORS.bg;
+	const cursorControl = cursor?.control ?? inheritedSettings.cursor?.control;
 
 	const resolvedSettings = useMemo(
 		() => ( {
@@ -212,11 +195,12 @@ export function useThemeProviderStyles( {
 				primary,
 				bg,
 			},
+			cursor: cursorControl ? { control: cursorControl } : undefined,
 		} ),
-		[ primary, bg ]
+		[ primary, bg, cursorControl ]
 	);
 
-	const themeProviderStyles = useMemo( () => {
+	const colorStyles = useMemo( () => {
 		// Determine which seeds are needed for generating ramps.
 		const seeds = {
 			...DEFAULT_SEED_COLORS,
@@ -243,6 +227,16 @@ export function useThemeProviderStyles( {
 			computedColorRamps,
 		} );
 	}, [ primary, bg ] );
+
+	const themeProviderStyles: CSSProperties = useMemo(
+		() => ( {
+			...colorStyles,
+			...( cursorControl && {
+				'--wpds-cursor-control': cursorControl,
+			} ),
+		} ),
+		[ colorStyles, cursorControl ]
+	);
 
 	return {
 		resolvedSettings,

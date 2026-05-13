@@ -13,11 +13,11 @@ import { STYLE_BOOK_COLOR_GROUPS } from '../style-book/constants';
  * Style Book content component for global styles.
  * Provides the business logic for StyleBook behavior in the global styles context.
  *
- * @param {Object}                       props              Component props.
- * @param {string}                       props.path         Current path in global styles.
- * @param {Function}                     props.onPathChange Callback when the path changes.
- * @param {import('react').ForwardedRef} ref                Ref to the Style Book component.
- * @return {JSX.Element} The Style Book component.
+ * @param {Object}             props              Component props.
+ * @param {string}             props.path         Current path in global styles.
+ * @param {Function}           props.onPathChange Callback when the path changes.
+ * @param {React.ForwardedRef} ref                Ref to the Style Book component.
+ * @return {React.JSX.Element} The Style Book component.
  */
 function StylesCanvasStyleBook( { path, onPathChange }, ref ) {
 	return (

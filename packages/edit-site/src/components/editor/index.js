@@ -12,6 +12,7 @@ import { useInstanceId, useReducedMotion } from '@wordpress/compose';
 import {
 	EditorKeyboardShortcutsRegister,
 	privateApis as editorPrivateApis,
+	store as editorStore,
 } from '@wordpress/editor';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as coreDataStore } from '@wordpress/core-data';
@@ -38,6 +39,7 @@ import SavePanel from '../save-panel';
 import SiteEditorMoreMenu from '../more-menu';
 import SiteIcon from '../site-icon';
 import useEditorIframeProps from '../block-editor/use-editor-iframe-props';
+import { ViewportSync } from '../block-editor/use-viewport-sync';
 import useEditorTitle from './use-editor-title';
 import { useIsSiteEditorLoading } from '../layout/hooks';
 import { useAdaptEditorToCanvas } from './use-adapt-editor-to-canvas';
@@ -113,6 +115,7 @@ function getNavigationPath( location, postType ) {
 export default function EditSiteEditor( { isHomeRoute = false } ) {
 	const disableMotion = useReducedMotion();
 	const location = useLocation();
+	const history = useHistory();
 	const { canvas = 'view' } = location.query;
 	const isLoading = useIsSiteEditorLoading();
 	useAdaptEditorToCanvas( canvas );
@@ -142,10 +145,10 @@ export default function EditSiteEditor( { isHomeRoute = false } ) {
 		'edit-site-editor__loading-progress'
 	);
 
-	const settings = useSpecificEditorSettings();
+	const editorSettings = useSpecificEditorSettings();
 	const { resetZoomLevel } = unlock( useDispatch( blockEditorStore ) );
+	const { setCurrentRevisionId } = unlock( useDispatch( editorStore ) );
 	const { createSuccessNotice } = useDispatch( noticesStore );
-	const history = useHistory();
 	const onActionPerformed = useCallback(
 		( actionId, items ) => {
 			switch ( actionId ) {
@@ -212,7 +215,7 @@ export default function EditSiteEditor( { isHomeRoute = false } ) {
 			<EditorKeyboardShortcutsRegister />
 			{ isEditMode && <BlockKeyboardShortcuts /> }
 			{ ! isReady ? <CanvasLoader id={ loadingProgressId } /> : null }
-			{ isEditMode && (
+			{ isEditMode && isReady && (
 				<WelcomeGuide
 					postType={ postWithTemplate ? context.postType : postType }
 				/>
@@ -222,7 +225,7 @@ export default function EditSiteEditor( { isHomeRoute = false } ) {
 					postType={ postWithTemplate ? context.postType : postType }
 					postId={ postWithTemplate ? context.postId : postId }
 					templateId={ postWithTemplate ? postId : undefined }
-					settings={ settings }
+					settings={ editorSettings }
 					className="edit-site-editor__editor-interface"
 					customSaveButton={
 						_isPreviewingTheme && <SaveButton size="compact" />
@@ -236,6 +239,7 @@ export default function EditSiteEditor( { isHomeRoute = false } ) {
 						)
 					}
 				>
+					{ isEditMode && <ViewportSync /> }
 					{ isEditMode && (
 						<BackButton>
 							{ ( { length } ) =>
@@ -255,6 +259,7 @@ export default function EditSiteEditor( { isHomeRoute = false } ) {
 											tooltipPosition="middle right"
 											onClick={ () => {
 												resetZoomLevel();
+												setCurrentRevisionId( null );
 												history.navigate(
 													getNavigationPath(
 														location,

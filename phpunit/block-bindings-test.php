@@ -85,7 +85,7 @@ class Tests_Block_Bindings extends WP_UnitTestCase {
 <!-- /wp:paragraph -->
 HTML
 				,
-				'<p>test source value</p>',
+				'<p class="wp-block-paragraph">test source value</p>',
 			),
 			'button block'    => array(
 				'text',
@@ -162,19 +162,19 @@ HTML
 					$value = $source_args['key'];
 					return "The attribute name is '$attribute_name' and its binding has argument 'key' with value '$value'.";
 				},
-				"<p>The attribute name is 'content' and its binding has argument 'key' with value 'test'.</p>",
+				"<p class=\"wp-block-paragraph\">The attribute name is 'content' and its binding has argument 'key' with value 'test'.</p>",
 			),
 			'unsafe HTML should be sanitized' => array(
 				function () {
 					return '<script>alert("Unsafe HTML")</script>';
 				},
-				'<p>alert("Unsafe HTML")</p>',
+				'<p class="wp-block-paragraph">alert("Unsafe HTML")</p>',
 			),
 			'symbols and numbers should be rendered correctly' => array(
 				function () {
 					return '$12.50';
 				},
-				'<p>$12.50</p>',
+				'<p class="wp-block-paragraph">$12.50</p>',
 			),
 		);
 	}
@@ -386,7 +386,7 @@ HTML;
 		remove_filter( 'block_bindings_source_value', $filter_value );
 
 		$this->assertSame(
-			'<p>Filtered value: test_arg. Block instance: core/paragraph. Attribute name: content.</p>',
+			'<p class="wp-block-paragraph">Filtered value: test_arg. Block instance: core/paragraph. Attribute name: content.</p>',
 			trim( $result ),
 			'The block content should show the filtered value.'
 		);

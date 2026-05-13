@@ -121,3 +121,64 @@ if ( ! function_exists( 'gutenberg_resolve_pattern_blocks' ) ) {
 		return $blocks;
 	}
 }
+
+/**
+ * Update Query Loop's `taxQuery` prop to the new structure.
+ *
+ * @see 'query_loop_block_query_vars'
+ *
+ * @param array    $query The query vars.
+ * @param WP_Block $block Block instance.
+ * @return array   The filtered query vars.
+ */
+function gutenberg_update_tax_query_of_query_loop_block( $query, $block ) {
+	if ( empty( $block->context['query']['taxQuery'] ) ) {
+		return $query;
+	}
+
+	// If there are keys other than include/exclude, it's the old
+	// format and has been handled already.
+	if ( ! is_array( $block->context['query']['taxQuery'] ) || ! empty( array_diff( array_keys( $block->context['query']['taxQuery'] ), array( 'include', 'exclude' ) ) ) ) {
+		return $query;
+	}
+
+	// Build with the new structure.
+	$tax_query_input = $block->context['query']['taxQuery'];
+
+	// Helper function to build tax_query conditions from taxonomy terms.
+	$build_conditions = static function ( $terms, $operator = 'IN' ) {
+		$conditions = array();
+		foreach ( $terms as $taxonomy => $terms ) {
+			if ( ! empty( $terms ) && is_taxonomy_viewable( $taxonomy ) ) {
+				$conditions[] = array(
+					'taxonomy'         => $taxonomy,
+					'terms'            => array_filter( array_map( 'intval', $terms ) ),
+					'operator'         => $operator,
+					'include_children' => false,
+				);
+			}
+		}
+		return $conditions;
+	};
+	// Separate exclude from include terms.
+	$exclude_terms = isset( $tax_query_input['exclude'] ) && is_array( $tax_query_input['exclude'] )
+		? $tax_query_input['exclude']
+		: array();
+	$include_terms = isset( $tax_query_input['include'] ) && is_array( $tax_query_input['include'] )
+		? $tax_query_input['include']
+		: array();
+
+	$tax_query = array_merge(
+		$build_conditions( $include_terms ),
+		$build_conditions( $exclude_terms, 'NOT IN' )
+	);
+
+	if ( ! empty( $tax_query ) ) {
+		// Merge with any existing `tax_query` conditions.
+		$query['tax_query'] = array_merge( $query['tax_query'], $tax_query );
+	}
+
+	return $query;
+}
+
+add_filter( 'query_loop_block_query_vars', 'gutenberg_update_tax_query_of_query_loop_block', 10, 2 );

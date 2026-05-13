@@ -79,5 +79,6 @@ function UnforwardedFormToggle(
  * ```
  */
 export const FormToggle = forwardRef( UnforwardedFormToggle );
+FormToggle.displayName = 'FormToggle';
 
 export default FormToggle;

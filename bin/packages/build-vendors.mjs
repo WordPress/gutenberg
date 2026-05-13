@@ -1,11 +1,8 @@
 #!/usr/bin/env node
 
-/**
- * External dependencies
- */
-import { copyFile, mkdir, writeFile } from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { readFile, writeFile, mkdir } from 'fs/promises';
 import esbuild from 'esbuild';
 
 const __dirname = path.dirname( fileURLToPath( import.meta.url ) );
@@ -13,171 +10,169 @@ const ROOT_DIR = path.resolve( __dirname, '../..' );
 const BUILD_DIR = path.join( ROOT_DIR, 'build', 'scripts' );
 const VENDORS_DIR = path.join( BUILD_DIR, 'vendors' );
 
+const VENDOR_SCRIPTS = [
+	{
+		name: 'react',
+		global: 'React',
+		handle: 'react',
+		dependencies: [ 'wp-polyfill' ],
+	},
+	{
+		name: 'react-dom',
+		global: 'ReactDOM',
+		handle: 'react-dom',
+		dependencies: [ 'react' ],
+		contents: [
+			'module.exports = {',
+			'  ...require("react-dom"),',
+			'  ...require("react-dom/client"),',
+			'};',
+		].join( '\n' ),
+	},
+	{
+		name: 'react/jsx-runtime',
+		global: 'ReactJSXRuntime',
+		handle: 'react-jsx-runtime',
+		dependencies: [ 'react' ],
+	},
+];
+
 /**
- * Copy React and ReactDOM UMD files from node_modules.
- * These are pre-built browser-ready bundles that don't need processing.
+ * Read the version from a package's package.json in node_modules.
+ *
+ * @param {string} packageName npm package name (e.g., 'react', 'react-dom').
+ * @return {Promise<string>} The package version string.
  */
-async function copyReactUMDFiles() {
-	console.log( '📦 Copying React UMD files...' );
-
-	const filesToCopy = [
-		{
-			from: 'node_modules/react/umd/react.development.js',
-			to: 'react.js',
-		},
-		{
-			from: 'node_modules/react/umd/react.production.min.js',
-			to: 'react.min.js',
-		},
-		{
-			from: 'node_modules/react-dom/umd/react-dom.development.js',
-			to: 'react-dom.js',
-		},
-		{
-			from: 'node_modules/react-dom/umd/react-dom.production.min.js',
-			to: 'react-dom.min.js',
-		},
-	];
-
-	await mkdir( VENDORS_DIR, { recursive: true } );
-
-	await Promise.all(
-		filesToCopy.map( ( { from, to } ) => {
-			const source = path.join( ROOT_DIR, from );
-			const dest = path.join( VENDORS_DIR, to );
-			return copyFile( source, dest );
-		} )
+async function getPackageVersion( packageName ) {
+	const packageJsonPath = path.join(
+		ROOT_DIR,
+		'node_modules',
+		packageName,
+		'package.json'
 	);
-
-	console.log( '   ✔ Copied React UMD files' );
+	const packageJson = JSON.parse(
+		await readFile( packageJsonPath, 'utf-8' )
+	);
+	return packageJson.version;
 }
 
 /**
- * Bundle react-jsx-runtime using esbuild.
- * Creates a browser-ready bundle that exposes ReactJSXRuntime global.
+ * Generate a .asset.php file for a vendor script.
+ *
+ * @param {Object}   config              Vendor script configuration.
+ * @param {string}   config.handle       WordPress script handle.
+ * @param {string}   config.name         Package name (e.g., 'react', 'react/jsx-runtime').
+ * @param {string[]} config.dependencies WordPress script dependencies.
  */
-async function bundleReactJsxRuntime() {
-	console.log( '📦 Bundling react-jsx-runtime...' );
+async function generateAssetFile( config ) {
+	const { handle, name, dependencies } = config;
 
-	// Plugin to map React import to global window.React
-	const reactGlobalPlugin = {
-		name: 'react-global',
+	// The npm package name is the first segment of the name (e.g., 'react/jsx-runtime' -> 'react').
+	const packageName = name.split( '/' )[ 0 ];
+	const version = await getPackageVersion( packageName );
+
+	const dependenciesString = dependencies
+		.map( ( dep ) => `'${ dep }'` )
+		.join( ', ' );
+	const assetContent = `<?php return array('dependencies' => array(${ dependenciesString }), 'version' => '${ version }');`;
+
+	const assetFilePath = path.join( VENDORS_DIR, `${ handle }.min.asset.php` );
+	await mkdir( path.dirname( assetFilePath ), { recursive: true } );
+	await writeFile( assetFilePath, assetContent );
+}
+
+/**
+ * Bundle a vendor script from node_modules into an IIFE script.
+ * This is used to build packages like React that don't ship UMD builds.
+ *
+ * @param {Object}   config              Vendor script configuration.
+ * @param {string}   config.name         Package name (e.g., 'react', 'react-dom', 'react/jsx-runtime').
+ * @param {string}   config.global       Global variable name (e.g., 'React', 'ReactDOM').
+ * @param {string}   config.handle       WordPress script handle (e.g., 'react', 'react-dom').
+ * @param {string[]} config.dependencies WordPress script dependencies.
+ * @return {Promise<void>} Promise that resolves when all builds are finished.
+ */
+async function bundleVendorScript( config ) {
+	const { name, global, handle, contents } = config;
+
+	// Plugin that externalizes the `react` package.
+	const reactExternalPlugin = {
+		name: 'react-external',
 		setup( build ) {
-			// Intercept imports of 'react' and provide window.React instead
-			build.onResolve( { filter: /^react$/ }, ( args ) => ( {
-				path: args.path,
-				namespace: 'react-global',
-			} ) );
+			build.onResolve( { filter: /^react$/ }, ( args ) => {
+				if ( args.kind === 'entry-point' ) {
+					return null;
+				}
+				return {
+					path: 'react',
+					namespace: 'react-external',
+				};
+			} );
 
-			build.onLoad( { filter: /.*/, namespace: 'react-global' }, () => ( {
-				contents: 'module.exports = window.React',
-				loader: 'js',
-			} ) );
+			build.onLoad(
+				{ filter: /.*/, namespace: 'react-external' },
+				() => ( {
+					contents: `module.exports = globalThis.React`,
+					loader: 'js',
+				} )
+			);
 		},
 	};
 
-	const baseConfig = {
-		entryPoints: [ 'react/jsx-runtime' ],
+	const esbuildOptions = {
 		bundle: true,
 		format: 'iife',
-		globalName: 'ReactJSXRuntime',
-		target: 'es2015',
+		globalName: global,
+		target: 'esnext',
 		platform: 'browser',
-		plugins: [ reactGlobalPlugin ],
-		banner: {
-			js: '/* React JSX Runtime - https://react.dev/ */\n',
-		},
+		plugins: [ reactExternalPlugin ],
 	};
+
+	if ( contents ) {
+		esbuildOptions.stdin = {
+			contents,
+			resolveDir: ROOT_DIR,
+			loader: 'js',
+		};
+	} else {
+		esbuildOptions.entryPoints = [ name ];
+	}
 
 	await Promise.all( [
-		// Development build
 		esbuild.build( {
-			...baseConfig,
-			outfile: path.join( VENDORS_DIR, 'react-jsx-runtime.js' ),
+			...esbuildOptions,
+			outfile: path.join( VENDORS_DIR, handle + '.js' ),
 			minify: false,
 		} ),
-		// Production build
 		esbuild.build( {
-			...baseConfig,
-			outfile: path.join( VENDORS_DIR, 'react-jsx-runtime.min.js' ),
+			...esbuildOptions,
+			outfile: path.join( VENDORS_DIR, handle + '.min.js' ),
 			minify: true,
 		} ),
+		generateAssetFile( config ),
 	] );
-
-	console.log( '   ✔ Bundled react-jsx-runtime' );
-}
-
-/**
- * Bundle React Refresh files for hot module replacement during development.
- * Only needed when SCRIPT_DEBUG is enabled.
- */
-async function bundleReactRefresh() {
-	console.log( '📦 Bundling React Refresh...' );
-
-	// Bundle react-refresh-entry
-	const entryDir = path.join( BUILD_DIR, 'react-refresh-entry' );
-	await mkdir( entryDir, { recursive: true } );
-
-	await esbuild.build( {
-		entryPoints: [
-			'@pmmmwh/react-refresh-webpack-plugin/client/ReactRefreshEntry.js',
-		],
-		outfile: path.join( entryDir, 'index.min.js' ),
-		bundle: true,
-		format: 'iife',
-		target: 'es2015',
-		platform: 'browser',
-		minify: false,
-	} );
-
-	// Generate asset file for react-refresh-entry
-	const entryAssetContent = `<?php return array('dependencies' => array('wp-react-refresh-runtime'), 'version' => '${ Date.now() }');`;
-	await writeFile(
-		path.join( entryDir, 'index.min.asset.php' ),
-		entryAssetContent
-	);
-
-	// Bundle react-refresh-runtime
-	const runtimeDir = path.join( BUILD_DIR, 'react-refresh-runtime' );
-	await mkdir( runtimeDir, { recursive: true } );
-
-	await esbuild.build( {
-		entryPoints: [ 'react-refresh/runtime' ],
-		outfile: path.join( runtimeDir, 'index.min.js' ),
-		bundle: true,
-		format: 'iife',
-		globalName: 'ReactRefreshRuntime',
-		target: 'es2015',
-		platform: 'browser',
-		minify: false,
-	} );
-
-	// Generate asset file for react-refresh-runtime
-	const runtimeAssetContent = `<?php return array('dependencies' => array(), 'version' => '${ Date.now() }');`;
-	await writeFile(
-		path.join( runtimeDir, 'index.min.asset.php' ),
-		runtimeAssetContent
-	);
-
-	console.log( '   ✔ Bundled React Refresh' );
 }
 
 /**
  * Main build function.
  */
 async function buildVendors() {
-	console.log( '🔨 Building vendor files...\n' );
+	console.log( '\n📦 Bundling vendor scripts...\n' );
 
-	const startTime = Date.now();
-
-	await Promise.all( [
-		copyReactUMDFiles(),
-		bundleReactJsxRuntime(),
-		bundleReactRefresh(),
-	] );
-
-	const totalTime = Date.now() - startTime;
-	console.log( `\n🎉 Vendor files built successfully! (${ totalTime }ms)` );
+	for ( const vendorConfig of VENDOR_SCRIPTS ) {
+		try {
+			const startTime = Date.now();
+			await bundleVendorScript( vendorConfig );
+			const buildTime = Date.now() - startTime;
+			console.log(
+				`   ✔ Bundled vendor ${ vendorConfig.handle } (${ buildTime }ms)`
+			);
+		} catch ( error ) {
+			console.error(
+				`   ✘ Failed to bundle vendor ${ vendorConfig.handle }: ${ error.message }`
+			);
+		}
+	}
 }
 
 buildVendors().catch( ( error ) => {

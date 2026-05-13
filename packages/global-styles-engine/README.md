@@ -101,7 +101,7 @@ The global styles object follows the theme.json schema:
     color: { text: '#000', background: '#fff' },
     typography: { fontSize: '16px' },
     elements: {
-      button: { color: { background: '#blue' } }
+      button: { color: { background: 'blue' } }
     },
     blocks: {
       'core/paragraph': { color: { text: '#333' } }

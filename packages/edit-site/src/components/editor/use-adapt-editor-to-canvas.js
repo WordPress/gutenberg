@@ -7,22 +7,32 @@ import { store as editorStore } from '@wordpress/editor';
 import { useLayoutEffect } from '@wordpress/element';
 import { store as preferencesStore } from '@wordpress/preferences';
 
+/**
+ * Internal dependencies
+ */
+import { DEFAULT_DEVICE_TYPE } from '../block-editor/use-viewport-sync';
+
 export function useAdaptEditorToCanvas( canvas ) {
 	const { clearSelectedBlock } = useDispatch( blockEditorStore );
 	const {
+		editPost,
 		setDeviceType,
 		closePublishSidebar,
 		setIsListViewOpened,
 		setIsInserterOpened,
 	} = useDispatch( editorStore );
 	const { get: getPreference } = useSelect( preferencesStore );
+	const { getCurrentPost } = useSelect( editorStore );
 	const registry = useRegistry();
 	useLayoutEffect( () => {
 		const isMediumOrBigger =
 			window.matchMedia( '(min-width: 782px)' ).matches;
 		registry.batch( () => {
 			clearSelectedBlock();
-			setDeviceType( 'Desktop' );
+			if ( getCurrentPost()?.type ) {
+				editPost( { selection: undefined }, { undoIgnore: true } );
+			}
+			setDeviceType( DEFAULT_DEVICE_TYPE );
 			closePublishSidebar();
 			setIsInserterOpened( false );
 
@@ -44,10 +54,12 @@ export function useAdaptEditorToCanvas( canvas ) {
 		canvas,
 		registry,
 		clearSelectedBlock,
+		editPost,
 		setDeviceType,
 		closePublishSidebar,
 		setIsInserterOpened,
 		setIsListViewOpened,
 		getPreference,
+		getCurrentPost,
 	] );
 }

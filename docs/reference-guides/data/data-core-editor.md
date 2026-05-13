@@ -771,6 +771,14 @@ _Returns_
 
 -   `boolean`: Whether new post and unsaved values exist.
 
+### isCollaborationEnabledForCurrentPost
+
+Returns whether the collaboration is enabled for the current post.
+
+_Returns_
+
+-   `boolean`: Whether collaboration is enabled.
+
 ### isCurrentPostPending
 
 Returns true if post is pending review.

@@ -41,7 +41,7 @@ const SITE_EDITOR_AUTHORS_QUERY = {
 	capabilities: [ 'edit_theme_options' ],
 };
 const DEFAULT_QUERY = { per_page: 100, page: 1 };
-const EMPTY_ARRAY: RawRevision[] = [];
+const EMPTY_ARRAY: [] = [];
 
 export default function useGlobalStylesRevisions( {
 	query,
@@ -67,7 +67,6 @@ export default function useGlobalStylesRevisions( {
 				getRevisions,
 				__experimentalGetCurrentGlobalStylesId,
 				getEntityRecord,
-				// @ts-expect-error
 				isResolving,
 			} = select( coreStore );
 			const dirtyEntityRecords =
@@ -96,7 +95,7 @@ export default function useGlobalStylesRevisions( {
 				: EMPTY_ARRAY;
 			// @ts-expect-error - getUsers is not fully typed
 			const _authors: User[] =
-				getUsers( SITE_EDITOR_AUTHORS_QUERY ) || [];
+				getUsers( SITE_EDITOR_AUTHORS_QUERY ) || EMPTY_ARRAY;
 			const _isResolving = globalStylesId
 				? isResolving( 'getRevisions', [
 						'root',

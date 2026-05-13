@@ -140,8 +140,6 @@ export default function Edit( {
 						}
 					>
 						<ToggleControl
-							isBlock
-							__nextHasNoMarginBottom
 							label={ __( 'Auto-close' ) }
 							onChange={ ( value ) => {
 								setAttributes( {
@@ -161,8 +159,6 @@ export default function Edit( {
 						onDeselect={ () => setAttributes( { showIcon: true } ) }
 					>
 						<ToggleControl
-							isBlock
-							__nextHasNoMarginBottom
 							label={ __( 'Show icon' ) }
 							onChange={ ( value ) => {
 								setAttributes( {
@@ -188,7 +184,6 @@ export default function Edit( {
 							}
 						>
 							<ToggleGroupControl
-								__nextHasNoMarginBottom
 								__next40pxDefaultSize
 								isBlock
 								label={ __( 'Icon Position' ) }

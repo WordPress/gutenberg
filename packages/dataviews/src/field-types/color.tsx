@@ -11,7 +11,11 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import type { DataViewRenderFieldProps, Rules, SortDirection } from '../types';
+import type {
+	DataViewRenderFieldProps,
+	NormalizedField,
+	SortDirection,
+} from '../types';
 import type { FieldType } from '../types/private';
 import RenderFromElements from './utils/render-from-elements';
 import {
@@ -20,14 +24,16 @@ import {
 	OPERATOR_IS_NONE,
 	OPERATOR_IS_NOT,
 } from '../constants';
+import isValidElements from './utils/is-valid-elements';
+import isValidRequired from './utils/is-valid-required';
+import getValueFormatted from './utils/get-value-formatted-default';
 
 function render( { item, field }: DataViewRenderFieldProps< any > ) {
 	if ( field.hasElements ) {
 		return <RenderFromElements item={ item } field={ field } />;
 	}
 
-	const value = field.getValue( { item } );
-
+	const value = getValueFormatted( { item, field } );
 	if ( ! value || ! colord( value ).isValid() ) {
 		return value;
 	}
@@ -50,21 +56,18 @@ function render( { item, field }: DataViewRenderFieldProps< any > ) {
 	);
 }
 
-const isValid: Rules< any > = {
-	elements: true,
-	custom: ( item: any, normalizedField ) => {
-		const value = normalizedField.getValue( { item } );
+function isValidCustom< Item >( item: Item, field: NormalizedField< Item > ) {
+	const value = field.getValue( { item } );
 
-		if (
-			! [ undefined, '', null ].includes( value ) &&
-			! colord( value ).isValid()
-		) {
-			return __( 'Value must be a valid color.' );
-		}
+	if (
+		! [ undefined, '', null ].includes( value ) &&
+		! colord( value ).isValid()
+	) {
+		return __( 'Value must be a valid color.' );
+	}
 
-		return null;
-	},
-};
+	return null;
+}
 
 const sort = ( a: any, b: any, direction: SortDirection ) => {
 	// Convert colors to HSL for better sorting
@@ -99,7 +102,6 @@ export default {
 	render,
 	Edit: 'color',
 	sort,
-	isValid,
 	enableSorting: true,
 	enableGlobalSearch: false,
 	defaultOperators: [ OPERATOR_IS_ANY, OPERATOR_IS_NONE ],
@@ -109,5 +111,11 @@ export default {
 		OPERATOR_IS_ANY,
 		OPERATOR_IS_NONE,
 	],
-	getFormat: () => ( {} ),
+	format: {},
+	getValueFormatted,
+	validate: {
+		required: isValidRequired,
+		elements: isValidElements,
+		custom: isValidCustom,
+	},
 } satisfies FieldType< any >;

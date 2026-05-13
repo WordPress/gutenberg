@@ -35,8 +35,8 @@ const UnconnectedConfirmDialog = (
 
 	const cx = useCx();
 	const wrapperClassName = cx( styles.wrapper );
-	const cancelButtonRef = useRef();
-	const confirmButtonRef = useRef();
+	const cancelButtonRef = useRef< HTMLButtonElement >( null );
+	const confirmButtonRef = useRef< HTMLButtonElement >( null );
 
 	const [ isOpen, setIsOpen ] = useState< boolean >();
 	const [ shouldSelfClose, setShouldSelfClose ] = useState< boolean >();

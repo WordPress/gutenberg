@@ -8,7 +8,7 @@ import type {
 	SortDirection,
 } from '../types';
 import type { FieldType } from '../types/private';
-import { getControl } from '../dataform-controls';
+import { getControl } from '../components/dataform-controls';
 import getFilterBy from './utils/get-filter-by';
 import getValueFromId from './utils/get-value-from-id';
 import hasElements from './utils/has-elements';
@@ -27,6 +27,9 @@ import { default as telephone } from './telephone';
 import { default as color } from './color';
 import { default as url } from './url';
 import { default as noType } from './no-type';
+import getIsValid from './utils/get-is-valid';
+import getFilter from './utils/get-filter';
+import getFormat from './utils/get-format';
 
 /**
  *
@@ -70,7 +73,7 @@ export default function normalizeFields< Item >(
 	fields: Field< Item >[]
 ): NormalizedField< Item >[] {
 	return fields.map( ( field ) => {
-		const defaultProps = getFieldTypeByName< Item >( field.type );
+		const fieldType = getFieldTypeByName< Item >( field.type );
 
 		const getValue = field.getValue || getValueFromId( field.id );
 		const sort = function ( a: any, b: any, direction: SortDirection ) {
@@ -78,7 +81,7 @@ export default function normalizeFields< Item >(
 			const bValue = getValue( { item: b } );
 			return field.sort
 				? field.sort( aValue, bValue, direction )
-				: defaultProps.sort( aValue, bValue, direction );
+				: fieldType.sort( aValue, bValue, direction );
 		};
 
 		return {
@@ -93,26 +96,30 @@ export default function normalizeFields< Item >(
 			getElements: field.getElements,
 			hasElements: hasElements( field ),
 			isVisible: field.isVisible,
+			isDisabled:
+				typeof field.isDisabled === 'function'
+					? field.isDisabled
+					: () => !! field.isDisabled,
 			enableHiding: field.enableHiding ?? true,
 			readOnly: field.readOnly ?? false,
 			// The type provides defaults for the following props
-			type: defaultProps.type,
-			render: field.render ?? defaultProps.render,
-			Edit: getControl( field, defaultProps.Edit ),
+			type: fieldType.type,
+			render: field.render ?? fieldType.render,
+			Edit: getControl( field, fieldType.Edit ),
 			sort,
-			enableSorting: field.enableSorting ?? defaultProps.enableSorting,
+			enableSorting: field.enableSorting ?? fieldType.enableSorting,
 			enableGlobalSearch:
-				field.enableGlobalSearch ?? defaultProps.enableGlobalSearch,
-			isValid: {
-				...defaultProps.isValid,
-				...field.isValid,
-			},
+				field.enableGlobalSearch ?? fieldType.enableGlobalSearch,
+			isValid: getIsValid( field, fieldType ),
 			filterBy: getFilterBy(
 				field,
-				defaultProps.defaultOperators,
-				defaultProps.validOperators
+				fieldType.defaultOperators,
+				fieldType.validOperators
 			),
-			format: defaultProps.getFormat( field ),
+			filter: getFilter( fieldType ),
+			format: getFormat( field, fieldType ),
+			getValueFormatted:
+				field.getValueFormatted ?? fieldType.getValueFormatted,
 		};
 	} );
 }

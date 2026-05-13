@@ -7,6 +7,10 @@ The package defines an Interactivity API store with the `core/router` namespace,
 The `@wordpress/interactivity-router` package was [introduced in WordPress Core in v6.5](https://make.wordpress.org/core/2024/02/19/merge-announcement-interactivity-api/). This means this package is already bundled in Core in any version of WordPress higher than v6.5.
 
 <div class="callout callout-info">
+    For a comprehensive guide on how client-side navigation works, including getting started, block compatibility, and advanced use cases, see the <a href="https://developer.wordpress.org/block-editor/reference-guides/interactivity-api/core-concepts/client-side-navigation/">Client-Side Navigation guide</a>. To learn how to ensure your blocks are compatible with client-side navigation, see the <a href="https://developer.wordpress.org/block-editor/reference-guides/interactivity-api/core-concepts/client-side-navigation-compatibility/">Client-Side Navigation Compatibility guide</a>.
+</div>
+
+<div class="callout callout-info">
     Check the <a href="https://developer.wordpress.org/block-editor/reference-guides/interactivity-api/">Interactivity API Reference docs in the Block Editor handbook</a> to learn more about the Interactivity API.
 </div>
 
@@ -45,15 +49,6 @@ When loaded, this package [adds the following state and actions](https://github.
 const { state, actions } = store( 'core/router', {
 	state: {
 		url: window.location.href,
-		navigation: {
-			hasStarted: false,
-			hasFinished: false,
-			texts: {
-				loading: '',
-				loaded: '',
-			},
-			message: '',
-		},
 	},
 	actions: {
 		*navigate(href, options) {...},
@@ -70,7 +65,11 @@ const { state, actions } = store( 'core/router', {
 
 #### `data-wp-router-region`
 
-It defines a region that is updated on navigation. It requires a unique ID as the value and can only be used in root interactive elements, i.e., elements with `data-wp-interactive` that are not nested inside other elements with `data-wp-interactive`.
+It defines a region that is updated on navigation. It requires a unique ID as the value and must be used alongside `data-wp-interactive` to receive the proper namespace. Router regions can be placed anywhere within interactive regions, including nested interactive elements.
+
+<div class="callout callout-warning">
+When adding <code>data-wp-router-region</code> to a child element inside a parent with <code>data-wp-interactive</code>, always include <code>data-wp-interactive</code> on the child element as well. This is required for the router region to function correctly.
+</div>
 
 The value can be a string with the region ID, or a JSON object containing the `id` and an optional `attachTo` property.
 
@@ -78,12 +77,12 @@ Example:
 
 ```html
 <div data-wp-interactive="myblock" data-wp-router-region="main-list">
-  <ul>
-     <li><a href="/post-1">Post 1</a></li>
-     <li><a href="/post-2">Post 2</a></li>
-     <li><a href="/post-3">Post 3</a></li>
-  </ul>
-  <a data-wp-on--click="actions.navigate" href="/page/2">Page 2</a>
+	<ul>
+		<li><a href="/post-1">Post 1</a></li>
+		<li><a href="/post-2">Post 2</a></li>
+		<li><a href="/post-3">Post 3</a></li>
+	</ul>
+	<a data-wp-on--click="actions.navigate" href="/page/2">Page 2</a>
 </div>
 ```
 
@@ -100,10 +99,10 @@ Example with `attachTo`:
 
 ```html
 <div
-  data-wp-interactive="myblock"
-  data-wp-router-region='{ "id": "myblock/overlay", "attachTo": "body" }'
+	data-wp-interactive="myblock"
+	data-wp-router-region='{ "id": "myblock/overlay", "attachTo": "body" }'
 >
-  I'm in a new region!
+	I'm in a new region!
 </div>
 ```
 
@@ -151,7 +150,6 @@ prefetch( url: string, options: PrefetchOptions = {} )
 ### State
 
 `state.url` is a reactive property synchronized with the current URL.
-Properties under `state.navigation` are meant for loading bar animations.
 
 ## Installation
 

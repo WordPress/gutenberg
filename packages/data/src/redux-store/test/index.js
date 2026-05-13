@@ -285,6 +285,131 @@ describe( 'resolveSelect', () => {
 			'getItemsNoResolver',
 		] );
 	} );
+
+	it( 'resolves when a resolver implements isFulfilled', async () => {
+		const fulfilledResolver = () => {};
+		fulfilledResolver.isFulfilled = ( state ) => !! state.items;
+
+		const resolvedState = {
+			items: [ 'item' ],
+		};
+
+		registry.registerStore( 'demo', {
+			reducer: ( state = resolvedState ) => {
+				return state;
+			},
+			selectors: {
+				getItems: ( state ) => state.items,
+			},
+			resolvers: {
+				getItems: fulfilledResolver,
+			},
+		} );
+
+		const result = await registry.resolveSelect( 'demo' ).getItems();
+		expect( result ).toEqual( [ 'item' ] );
+	} );
+
+	it( 'handles isFulfilled with arguments correctly', async () => {
+		const fulfilledResolver = jest.fn();
+		fulfilledResolver.isFulfilled = ( state, id ) => state.pages?.[ id ];
+
+		const resolvedState = {
+			pages: {
+				1: { title: 'Page 1', content: 'Content 1' },
+				2: { title: 'Page 2', content: 'Content 2' },
+			},
+		};
+
+		registry.registerStore( 'demo', {
+			reducer: ( state = resolvedState ) => state,
+			selectors: {
+				getPage: ( state, id ) => state.pages?.[ id ],
+			},
+			resolvers: {
+				getPage: fulfilledResolver,
+			},
+		} );
+
+		const result1 = await registry.resolveSelect( 'demo' ).getPage( 1 );
+		expect( result1 ).toEqual( {
+			title: 'Page 1',
+			content: 'Content 1',
+		} );
+
+		const result2 = await registry.resolveSelect( 'demo' ).getPage( 2 );
+		expect( result2 ).toEqual( {
+			title: 'Page 2',
+			content: 'Content 2',
+		} );
+
+		// Resolver should not be called since isFulfilled returns truthy
+		expect( fulfilledResolver ).not.toHaveBeenCalled();
+	} );
+
+	it( 'does not change Redux state when isFulfilled returns true', async () => {
+		const fulfill = jest.fn();
+		const isFulfilled = () => true;
+
+		registry.registerStore( 'demo', {
+			reducer: ( state = { items: [ 'item' ] } ) => state,
+			selectors: {
+				getItems: ( state ) => state.items,
+			},
+			resolvers: {
+				getItems: { fulfill, isFulfilled },
+			},
+		} );
+
+		const listener = jest.fn();
+		const unsubscribe = registry.subscribe( listener );
+
+		// Call the selector — isFulfilled is true, so no resolution should happen.
+		registry.select( 'demo' ).getItems();
+
+		// Wait long enough for any setTimeout(0) resolver to have fired.
+		await new Promise( ( resolve ) => setTimeout( resolve, 10 ) );
+
+		expect( fulfill ).not.toHaveBeenCalled();
+		expect( listener ).not.toHaveBeenCalled();
+
+		unsubscribe();
+	} );
+
+	it( 'calls resolver when isFulfilled returns false', async () => {
+		const fulfill = jest.fn().mockImplementation( () => ( {
+			type: 'SET_DATA',
+			data: 'resolved data',
+		} ) );
+		const isFulfilled = jest.fn( ( state ) => state.hasData );
+
+		registry.registerStore( 'demo', {
+			reducer: ( state = { hasData: false }, action ) => {
+				if ( action.type === 'SET_DATA' ) {
+					return { hasData: true, data: action.data };
+				}
+				return state;
+			},
+			selectors: {
+				getData: ( state ) => state.data,
+			},
+			resolvers: {
+				getData: { fulfill, isFulfilled },
+			},
+		} );
+
+		const result = await registry.resolveSelect( 'demo' ).getData();
+
+		// Initial state has hasData: false, so resolver should be called
+		expect( fulfill ).toHaveBeenCalledTimes( 1 );
+		expect( result ).toBe( 'resolved data' );
+
+		// Subsequent call should use cached result, not calling `fulfill` again
+		const result2 = await registry.resolveSelect( 'demo' ).getData();
+		expect( result2 ).toBe( 'resolved data' );
+		// `fulfill` is only called once since resolution is already marked as finished
+		expect( fulfill ).toHaveBeenCalledTimes( 1 );
+	} );
 } );
 
 describe( 'normalizing args', () => {

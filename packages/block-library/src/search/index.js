@@ -30,27 +30,29 @@ export const settings = {
 	edit,
 };
 
-if ( window.__experimentalContentOnlyPatternInsertion ) {
+if ( window.__experimentalContentOnlyInspectorFields ) {
 	settings[ fieldsKey ] = [
 		{
 			id: 'label',
 			label: __( 'Label' ),
-			type: 'richtext',
-			shownByDefault: true,
+			type: 'text',
+			Edit: 'rich-text', // TODO: replace with custom component
 		},
 		{
 			id: 'buttonText',
 			label: __( 'Button text' ),
-			type: 'richtext',
+			type: 'text',
+			Edit: 'rich-text', // TODO: replace with custom component
 		},
 		{
 			id: 'placeholder',
 			label: __( 'Placeholder' ),
-			type: 'richtext',
+			type: 'text',
+			Edit: 'rich-text', // TODO: replace with custom component
 		},
 	];
 	settings[ formKey ] = {
-		fields: [ 'label' ],
+		fields: [ 'label', 'buttonText', 'placeholder' ],
 	};
 }
 

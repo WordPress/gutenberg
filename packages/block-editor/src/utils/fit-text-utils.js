@@ -4,7 +4,7 @@
  */
 
 /**
- * Find optimal font size using simple binary search between 5-600px.
+ * Find optimal font size using simple binary search between 0-2400px.
  *
  * @param {HTMLElement} textElement   The text element
  * @param {Function}    applyFontSize Function that receives font size in pixels
@@ -13,15 +13,30 @@
 function findOptimalFontSize( textElement, applyFontSize ) {
 	const alreadyHasScrollableHeight =
 		textElement.scrollHeight > textElement.clientHeight;
-	let minSize = 5;
+	let minSize = 0;
 	let maxSize = 2400;
 	let bestSize = minSize;
 
 	const computedStyle = window.getComputedStyle( textElement );
-	const paddingLeft = parseFloat( computedStyle.paddingLeft ) || 0;
-	const paddingRight = parseFloat( computedStyle.paddingRight ) || 0;
+	let paddingLeft = parseFloat( computedStyle.paddingLeft ) || 0;
+	let paddingRight = parseFloat( computedStyle.paddingRight ) || 0;
 	const range = document.createRange();
 	range.selectNodeContents( textElement );
+
+	let referenceElement = textElement;
+	const parentElement = textElement.parentElement;
+	if ( parentElement ) {
+		const parentElementComputedStyle =
+			window.getComputedStyle( parentElement );
+		if ( parentElementComputedStyle?.display === 'flex' ) {
+			referenceElement = parentElement;
+			paddingLeft +=
+				parseFloat( parentElementComputedStyle.paddingLeft ) || 0;
+			paddingRight +=
+				parseFloat( parentElementComputedStyle.paddingRight ) || 0;
+		}
+	}
+	let maxclientHeight = referenceElement.clientHeight;
 
 	while ( minSize <= maxSize ) {
 		const midSize = Math.floor( ( minSize + maxSize ) / 2 );
@@ -36,12 +51,23 @@ function findOptimalFontSize( textElement, applyFontSize ) {
 		// Check if text fits within the element's width and is not
 		// overflowing into the padding area.
 		const fitsWidth =
-			textElement.scrollWidth <= textElement.clientWidth &&
-			textWidth <= textElement.clientWidth - paddingLeft - paddingRight;
+			textElement.scrollWidth <= referenceElement.clientWidth &&
+			textWidth <=
+				referenceElement.clientWidth - paddingLeft - paddingRight;
 		// Check if text fits within the element's height.
 		const fitsHeight =
 			alreadyHasScrollableHeight ||
-			textElement.scrollHeight <= textElement.clientHeight;
+			textElement.scrollHeight <= referenceElement.clientHeight ||
+			textElement.scrollHeight <= maxclientHeight;
+
+		// When there are calculated line heights, text may jump in height
+		// the available space may decrease while the font size decreases,
+		// making text not fit.
+		// We store a maximum reference height: the maximum reference element height that was observed
+		// during the loop to avoid issues with such jumps.
+		if ( referenceElement.clientHeight > maxclientHeight ) {
+			maxclientHeight = referenceElement.clientHeight;
+		}
 
 		if ( fitsWidth && fitsHeight ) {
 			bestSize = midSize;

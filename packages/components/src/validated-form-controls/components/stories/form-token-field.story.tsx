@@ -6,7 +6,7 @@ import { useState } from '@wordpress/element';
 /**
  * External dependencies
  */
-import type { StoryObj, Meta } from '@storybook/react';
+import type { StoryObj, Meta } from '@storybook/react-vite';
 
 /**
  * Internal dependencies
@@ -36,39 +36,27 @@ export default meta;
 export const Default: StoryObj< typeof ValidatedFormTokenField > = {
 	render: function Template( { onChange, ...args } ) {
 		const [ value, setValue ] = useState< ( string | TokenItem )[] >( [] );
-		const [ customValidity, setCustomValidity ] =
-			useState<
-				React.ComponentProps<
-					typeof ValidatedFormTokenField
-				>[ 'customValidity' ]
-			>( undefined );
 
 		return (
 			<ValidatedFormTokenField
 				{ ...args }
 				value={ value }
-				onChange={ ( newValue, ...rest ) => {
+				onChange={ ( newValue ) => {
 					setValue( newValue );
-					onChange?.( newValue, ...rest );
+					onChange?.( newValue );
 				} }
-				onValidate={ ( v ) => {
-					if (
-						v?.some( ( token ) => {
-							const tokenValue =
-								typeof token === 'string' ? token : token.value;
-							return tokenValue.toLowerCase() === 'error';
-						} )
-					) {
-						setCustomValidity( {
-							type: 'invalid',
-							message: 'The tag "error" is not allowed.',
-						} );
-						return;
-					}
-
-					setCustomValidity( undefined );
-				} }
-				customValidity={ customValidity }
+				customValidity={
+					value?.some( ( token ) => {
+						const tokenValue =
+							typeof token === 'string' ? token : token.value;
+						return tokenValue.toLowerCase() === 'error';
+					} )
+						? {
+								type: 'invalid',
+								message: 'The tag "error" is not allowed.',
+						  }
+						: undefined
+				}
 			/>
 		);
 	},

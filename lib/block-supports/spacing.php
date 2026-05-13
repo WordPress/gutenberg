@@ -46,7 +46,7 @@ function gutenberg_apply_spacing_support( $block_type, $block_attributes ) {
 	$attributes          = array();
 	$has_padding_support = block_has_support( $block_type, array( 'spacing', 'padding' ), false );
 	$has_margin_support  = block_has_support( $block_type, array( 'spacing', 'margin' ), false );
-	$block_styles        = isset( $block_attributes['style'] ) ? $block_attributes['style'] : null;
+	$block_styles        = $block_attributes['style'] ?? null;
 
 	if ( ! $block_styles ) {
 		return $attributes;

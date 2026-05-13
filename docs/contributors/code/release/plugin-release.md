@@ -23,6 +23,7 @@
 -   Type `rc` for release candidate OR `stable` for final release
 -   Click `Run workflow`
 -   When the release draft is generated in [GitHub Releases](https://github.com/WordPress/gutenberg/releases), publish it for the workflow to continue
+-   For RC1 releases only: get team approval to publish @wordpress packages to npm - ask in [#core-editor](https://wordpress.slack.com/messages/C02QB2JS7) if needed ([see details](#publishing-the-wordpress-packages-to-npm))
 -   For stable releases only: wait for team approval to upload to WordPress.org - this is the last step of the workflow for the plugin to be deployed to the plugin directory ([example](https://github.com/WordPress/gutenberg/actions/runs/18559811968))
 
 #### Step 3: Edit the Release Notes
@@ -45,15 +46,17 @@ For urgent fixes after RC1 or critical bug fixes between major releases:
 
 -   For new RCs: Use PRs labeled `Backport to Gutenberg RC`
 -   For minor releases: Use PRs labeled `Backport to Gutenberg Minor Release`
+-   **Note:** You must be a member of the [Gutenberg Core Team](https://github.com/orgs/WordPress/teams/gutenberg-core) or work with one to cherry-pick to release branches
 -   Checkout the appropriate release branch: `git checkout release/X.Y`
--   Run: `npm run other:cherry-pick "[Label Name]"`
+-   Run: `npm run other:cherry-pick "[Label Name]"` (or request a member of the [Gutenberg Core Team](https://github.com/orgs/WordPress/teams/gutenberg-core) to run it)
 -   Reassign PRs to correct milestone (e.g., from `12.6` to `12.5`) **before** running the workflow
 
 #### Run Release Workflow
 
 -   Go to [Build Plugin Zip workflow](https://github.com/WordPress/gutenberg/actions/workflows/build-plugin-zip.yml)
--   Select the release branch from `Use workflow from` dropdown
--   Continue with the steps 2-4 above
+-   Select `trunk` if no RC exists for the next version, otherwise select the release branch from `Use workflow from` dropdown
+-   Type `stable` in the text input field
+-   Continue with steps 2-4 from the general release process above
 
 ---
 
@@ -150,7 +153,7 @@ This will trigger a GitHub Actions (GHA) workflow that will bump the plugin vers
 
 As part of the release workflow, all of the @wordpress packages are published to NPM. After the [Build Gutenberg Plugin Zip](https://github.com/WordPress/gutenberg/actions/workflows/build-plugin-zip.yml) action has created the draft release, you may see a message that the [Publish npm packages](https://github.com/WordPress/gutenberg/actions/workflows/publish-npm-packages.yml) action requires someone with appropriate permissions to trigger it.
 
-This message is misleading. You do not need to take any action to publish the @wordpress packages to NPM. The process is automated and will automatically run after the release notes are published.
+A member of the [Gutenberg Release](https://github.com/orgs/WordPress/teams/gutenberg-release), [Gutenberg Core](https://github.com/orgs/WordPress/teams/gutenberg-core), or [WordPress Core](https://github.com/orgs/WordPress/teams/wordpress-core) teams must [approve the deployment](https://docs.github.com/en/actions/how-tos/managing-workflow-runs-and-deployments/managing-deployments/reviewing-deployments#approving-or-rejecting-a-job). If needed, ask in [#core-editor](https://wordpress.slack.com/messages/C02QB2JS7) for someone to approve. This step is only needed for RC1 releases.
 
 ### Viewing the release draft
 
@@ -202,7 +205,9 @@ There are a couple of ways you might be made aware of these bugs as a release ma
 The cherry-picking process can be automated with the `npm run other:cherry-pick "[Insert Label]"` script, which is included in Gutenberg. You will need to use the label `Backport to Gutenberg RC` when running the command and ensure all PRs that need cherry-picking have the label assigned.
 
 <div class="callout callout-warning">
-To cherry-pick PRs, you must clone (not fork) the Gutenberg repository and have write access. Only members of the <a href="https://developer.wordpress.org/block-editor/contributors/repository-management/#teams">Gutenberg development team</a> have the necessary permissions to perform this action.</div>
+To cherry-pick PRs, you must clone (not fork) the Gutenberg repository and have write access. Only members of the <a href="https://developer.wordpress.org/block-editor/contributors/repository-management/#teams"><strong>Gutenberg Core</strong> team</a> have the necessary permissions to push directly to release branches.</div>
+
+#### For "Gutenberg Core" members with push access
 
 Once you have cloned the Gutenberg repository to your local development environment, begin by switching to the release branch:
 
@@ -228,6 +233,38 @@ Here is a screenshot of the process:
 
 ![Automated cherry-picking](https://developer.wordpress.org/files/2023/07/image-7.png)
 
+#### Alternative process for contributors who are not members of the "Gutenberg Core" team
+
+If you don't have write access to push directly to release branches, you can use this alternative approach **from your fork**:
+
+1. Ensure you have a fork of the Gutenberg repository and add the upstream remote:
+   ```
+   git remote add upstream https://github.com/WordPress/gutenberg.git
+   git fetch upstream
+   ```
+
+2. Create a new branch based on the upstream release branch:
+   ```
+   git checkout -b backport-fixes-X.Y.Z upstream/release/X.Y
+   ```
+
+3. Manually cherry-pick each PR commit (in chronological order):
+   ```
+   git cherry-pick [SHA]
+   ```
+   (The automated script won't work from a fork as it requires push access to the main repository)
+
+4. Push your branch to your fork:
+   ```
+   git push origin backport-fixes-X.Y.Z
+   ```
+
+5. Create a pull request from your fork targeting the `release/X.Y` branch in the main repository and request review from a member of the [Gutenberg Core](https://github.com/orgs/WordPress/teams/gutenberg-core) team
+
+6. Once approved and merged, coordinate with a member of the [Gutenberg Core](https://github.com/orgs/WordPress/teams/gutenberg-core) team or release lead to continue the release process
+
+Alternatively, you can ask a member of the [Gutenberg Core](https://github.com/orgs/WordPress/teams/gutenberg-core) team to run the cherry-pick command for you in the [#core-editor](https://wordpress.slack.com/messages/C02QB2JS7) Slack channel.
+
 #### Manual cherry-picking
 
 If you need to handle cherry-picking one at a time and one step at a time, you can follow this sequence manually. After checking out the corresponding release branch:
@@ -247,7 +284,8 @@ If the cherry-picked fixes deserve another release candidate before the stable v
 <div class="callout callout-info">
     <strong>Quick reference</strong>
     <ul>
-        <li>In the release draft, press the “Publish release” button.</li>
+        <li>In the release draft, press the "Publish release" button.</li>
+        <li>If publishing RC1, approve the npm publishing job in the <a href="https://github.com/WordPress/gutenberg/actions/workflows/build-plugin-zip.yml">Build Gutenberg Plugin Zip</a> workflow.</li>
         <li>If publishing a stable release, get approval from a member of the <a href="https://github.com/orgs/WordPress/teams/gutenberg-release">Gutenberg Release</a>, <a href="https://github.com/orgs/WordPress/teams/gutenberg-core">Gutenberg Core</a>, or the <a href="https://github.com/orgs/WordPress/teams/wordpress-core">WordPress Core</a> teams to upload the new plugin version to the WordPress.org plugin repository (SVN).</li>
         <li>Once uploaded, confirm that the latest version can be downloaded and updated from the WordPress plugin dashboard.</li>
     </ul>
@@ -389,13 +427,23 @@ Once you have the stable release branch in order and the correct Milestone assig
 
 ![Run workflow dropdown for the plugin release](https://developer.wordpress.org/files/2023/07/image-1.png)
 
-Go to Gutenberg's GitHub repository's Actions tab, and locate the ["Build Gutenberg Plugin Zip" action](https://github.com/WordPress/gutenberg/actions/workflows/build-plugin-zip.yml). You should now _carefully_ choose the next action based on information about the current Plugin release version:
+Go to Gutenberg's GitHub repository's Actions tab, and locate the ["Build Gutenberg Plugin Zip" action](https://github.com/WordPress/gutenberg/actions/workflows/build-plugin-zip.yml).
 
-_If_ the previous release version was **stable** (`X.Y.Z` - e.g. `12.5.0`, `12.5.1` .etc) leave the `Use workflow from` field as `trunk` and then specify `stable` in the text input field. The workflow will automatically create a minor release, with z incremented (`x.y.(z+1)`) as required.
+**Important:** The branch you select in the "Use workflow from" dropdown determines which release branch the workflow will use to create the minor release.
 
-_If_ however, the previous release was an **RC** (e.g. `X.Y.0-rc.1`) you will need to _manually_ select the _stable version's release branch_ (e.g. `12.5.0`) when creating the release. Failure to do this will cause the workflow to release the next major _stable_ version (e.g. `12.6.0`) which is not what you want.
+#### When to select `trunk`:
 
-To do this, when running the Workflow, select the appropriate `release/` branch from the `Use workflow from` dropdown (e.g. `release/12.5`) and specify `stable` in the text input field.
+If the **previous release was stable** (e.g., `12.5.0`, `12.5.1`) and **no RC exists for the next major version** (e.g., no `12.6.0-rc.1`):
+- Leave `Use workflow from` as `Branch: trunk`
+- Type `stable` in the text input field
+- The workflow will automatically increment the patch version (e.g., `12.5.1` → `12.5.2`)
+
+#### When to select the release branch:
+
+If **an RC already exists for the next major version** (e.g., `12.6.0-rc.1` exists and you need to release `12.5.1`):
+- Select the stable release branch from the `Use workflow from` dropdown (e.g., `release/12.5`)
+- Type `stable` in the text input field
+- Failure to do this will cause the workflow to release the next major stable version instead of a minor release
 
 #### Creating a minor release for previous stable releases
 

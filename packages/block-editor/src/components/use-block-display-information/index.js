@@ -89,12 +89,8 @@ export default function useBlockDisplayInformation( clientId ) {
 			// Check if this block is a pattern
 			const patternName = attributes?.metadata?.patternName;
 
-			if (
-				patternName &&
-				window?.__experimentalContentOnlyPatternInsertion
-			) {
+			if ( patternName ) {
 				const pattern = __experimentalGetParsedPattern( patternName );
-
 				const positionLabel = getPositionTypeLabel( attributes );
 				return {
 					isSynced: false,

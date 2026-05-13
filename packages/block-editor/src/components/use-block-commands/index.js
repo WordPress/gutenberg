@@ -18,14 +18,14 @@ import {
 	ungroup,
 	seen,
 	unseen,
+	blockDefault as blockDefaultIcon,
 } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
-import BlockIcon from '../block-icon';
 import { store as blockEditorStore } from '../../store';
-import { cleanEmptyObject } from '../../hooks/utils';
+import { unlock } from '../../lock-unlock';
 
 const getTransformCommands = () =>
 	function useTransformCommands() {
@@ -118,13 +118,25 @@ const getTransformCommands = () =>
 		const commands = possibleBlockTransformations.map(
 			( transformation ) => {
 				const { name, title, icon } = transformation;
+				/*
+				 * Command menu uses Icon from @wordpress/icons, which expects a ReactElement
+				 * (cloneElement). Normalize to blockDefaultIcon to avoid crash. See #55668 / PR #55676.
+				 */
+				const blockIcon =
+					! icon?.src || icon?.src === 'block-default'
+						? {
+								src: blockDefaultIcon,
+						  }
+						: icon;
+
 				return {
 					name:
 						'core/block-editor/transform-to-' +
 						name.replace( '/', '-' ),
 					/* translators: %s: Block or block variation name. */
 					label: sprintf( __( 'Transform to %s' ), title ),
-					icon: <BlockIcon icon={ icon } />,
+					icon: blockIcon?.src,
+					category: 'command',
 					callback: ( { close } ) => {
 						onBlockTransform( name );
 						close();
@@ -160,21 +172,22 @@ const getQuickActionsCommands = () =>
 			getBlockRootClientId,
 			getBlocksByClientId,
 			canRemoveBlocks,
-			getBlockName,
-		} = useSelect( blockEditorStore );
+			isBlockHiddenAnywhere,
+		} = unlock( useSelect( blockEditorStore ) );
+		const { getBlockEditingMode } = useSelect( blockEditorStore );
 		const { getDefaultBlockName, getGroupingBlockName } =
 			useSelect( blocksStore );
 
 		const blocks = getBlocksByClientId( clientIds );
 
+		const blockEditorDispatch = useDispatch( blockEditorStore );
 		const {
 			removeBlocks,
 			replaceBlocks,
 			duplicateBlocks,
 			insertAfterBlock,
 			insertBeforeBlock,
-			updateBlockAttributes,
-		} = useDispatch( blockEditorStore );
+		} = blockEditorDispatch;
 
 		const onGroup = () => {
 			if ( ! blocks.length ) {
@@ -209,6 +222,7 @@ const getQuickActionsCommands = () =>
 			return { isLoading: false, commands: [] };
 		}
 
+		const { showViewportModal } = unlock( blockEditorDispatch );
 		const rootClientId = getBlockRootClientId( clientIds[ 0 ] );
 		const canInsertDefaultBlock = canInsertBlockType(
 			getDefaultBlockName(),
@@ -222,10 +236,6 @@ const getQuickActionsCommands = () =>
 			);
 		} );
 		const canRemove = canRemoveBlocks( clientIds );
-
-		const canToggleBlockVisibility = blocks.every( ( { clientId } ) =>
-			hasBlockSupport( getBlockName( clientId ), 'visibility', true )
-		);
 
 		const commands = [];
 
@@ -292,33 +302,22 @@ const getQuickActionsCommands = () =>
 			} );
 		}
 
-		if ( canToggleBlockVisibility ) {
-			const hasHiddenBlock = blocks.some(
-				( block ) =>
-					block.attributes.metadata?.blockVisibility === false
-			);
+		const supportsVisibility = blocks.every(
+			( block ) =>
+				!! block && hasBlockSupport( block.name, 'visibility', true )
+		);
+		const allBlocksDefaultMode = clientIds.every(
+			( id ) => getBlockEditingMode( id ) === 'default'
+		);
 
+		if ( supportsVisibility && allBlocksDefaultMode ) {
+			const hasHiddenBlock = clientIds.some( ( id ) =>
+				isBlockHiddenAnywhere( id )
+			);
 			commands.push( {
-				name: 'core/toggle-block-visibility',
+				name: 'toggle-visibility',
 				label: hasHiddenBlock ? __( 'Show' ) : __( 'Hide' ),
-				callback: () => {
-					const attributesByClientId = Object.fromEntries(
-						blocks?.map( ( { clientId, attributes } ) => [
-							clientId,
-							{
-								metadata: cleanEmptyObject( {
-									...attributes?.metadata,
-									blockVisibility: hasHiddenBlock
-										? undefined
-										: false,
-								} ),
-							},
-						] )
-					);
-					updateBlockAttributes( clientIds, attributesByClientId, {
-						uniqueByBlock: true,
-					} );
-				},
+				callback: () => showViewportModal( clientIds ),
 				icon: hasHiddenBlock ? seen : unseen,
 			} );
 		}
@@ -328,6 +327,7 @@ const getQuickActionsCommands = () =>
 			commands: commands.map( ( command ) => ( {
 				...command,
 				name: 'core/block-editor/action-' + command.name,
+				category: 'command',
 				callback: ( { close } ) => {
 					command.callback();
 					close();

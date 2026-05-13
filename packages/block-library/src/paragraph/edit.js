@@ -21,7 +21,7 @@ import {
 	useBlockEditingMode,
 } from '@wordpress/block-editor';
 import { getBlockSupport } from '@wordpress/blocks';
-import { formatLtr } from '@wordpress/icons';
+import { formatLTR } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
@@ -32,7 +32,7 @@ function ParagraphRTLControl( { direction, setDirection } ) {
 	return (
 		isRTL() && (
 			<ToolbarButton
-				icon={ formatLtr }
+				icon={ formatLTR }
 				title={ _x( 'Left to right', 'editor button' ) }
 				isActive={ direction === 'ltr' }
 				onClick={ () => {
@@ -87,7 +87,6 @@ function DropCapControl( { clientId, attributes, setAttributes, name } ) {
 				panelId={ clientId }
 			>
 				<ToggleControl
-					__nextHasNoMarginBottom
 					label={ __( 'Drop cap' ) }
 					checked={ !! dropCap }
 					onChange={ () => setAttributes( { dropCap: ! dropCap } ) }
