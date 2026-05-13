@@ -153,12 +153,13 @@ function printStats( m, s ) {
 /**
  * Runs the performance tests on the current branch.
  *
- * @param {string} testSuite     Name of the tests set.
- * @param {string} testRunnerDir Path to the performance tests' clone.
- * @param {string} runKey        Unique identifier for the test run.
- * @param {string} sha           Resolved commit SHA for the branch under test.
+ * @param {string}  testSuite     Name of the tests set.
+ * @param {string}  testRunnerDir Path to the performance tests' clone.
+ * @param {string}  runKey        Unique identifier for the test run.
+ * @param {boolean} saveTraces    Whether the test runner should save Chromium
+ *                                traces as artifacts (only the head branch).
  */
-async function runTestSuite( testSuite, testRunnerDir, runKey, sha ) {
+async function runTestSuite( testSuite, testRunnerDir, runKey, saveTraces ) {
 	await runShellScript(
 		`npm run test:performance -- ${ testSuite }`,
 		testRunnerDir,
@@ -167,7 +168,9 @@ async function runTestSuite( testSuite, testRunnerDir, runKey, sha ) {
 			PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1',
 			WP_ARTIFACTS_PATH: ARTIFACTS_PATH,
 			RESULTS_ID: runKey,
-			WP_PERF_SHA: sha,
+			// Suppress trace writes on comparison branches so they don't
+			// overwrite the head branch's traces in the shared artifacts dir.
+			WP_PERF_NO_TRACE: saveTraces ? '' : '1',
 		}
 	);
 }
@@ -295,8 +298,6 @@ async function runPerformanceTests( branches, options ) {
 		.raw( 'init' )
 		.raw( 'remote', 'add', 'origin', config.gitRepositoryURL );
 
-	/** @type {Record<string, string>} */
-	const branchShas = {};
 	for ( const [ i, branch ] of branches.entries() ) {
 		logAtIndent(
 			2,
@@ -304,10 +305,6 @@ async function runPerformanceTests( branches, options ) {
 			formats.success( branch )
 		);
 		await sourceGit.raw( 'fetch', '--depth=1', 'origin', branch );
-		// @ts-ignore
-		branchShas[ branch ] = (
-			await sourceGit.raw( 'rev-parse', 'FETCH_HEAD' )
-		).trim();
 	}
 
 	const testRunnerBranch = options.testsBranch || branches[ 0 ];
@@ -478,7 +475,7 @@ async function runPerformanceTests( branches, options ) {
 				`Suite: ${ formats.success( testSuite ) } (round ${ i } of ${ TEST_ROUNDS })`
 			);
 
-			for ( const branch of branches ) {
+			for ( const [ branchIdx, branch ] of branches.entries() ) {
 				logAtIndent( 2, 'Branch:', formats.success( branch ) );
 
 				const sanitizedBranchName = sanitizeBranchName( branch );
@@ -490,30 +487,19 @@ async function runPerformanceTests( branches, options ) {
 				await runShellScript( `${ wpEnvPath } start`, envDir );
 
 				logAtIndent( 3, 'Running tests' );
+				// Only the head branch saves traces; comparison branches share
+				// the same artifacts directory and would otherwise overwrite.
 				await runTestSuite(
 					testSuite,
 					testRunnerDir,
 					runKey,
-					branchShas[ branch ]
+					branchIdx === 0
 				);
 
 				logAtIndent( 3, 'Stopping environment' );
 				await runShellScript( `${ wpEnvPath } stop`, envDir );
 			}
 		}
-	}
-
-	// Record the SHA of the branch under test (branches[0]) alongside the
-	// trace folders so downstream tooling — and a human poking at the
-	// downloaded artifact — knows which folder is the "current" run.
-	// The other SHA folder is the comparison side, recoverable from the
-	// workflow's invocation context.
-	const tracesDir = path.join( ARTIFACTS_PATH, 'traces' );
-	const headBranch = branches[ 0 ];
-	// @ts-ignore
-	const headSha = headBranch ? branchShas[ headBranch ] : undefined;
-	if ( fs.existsSync( tracesDir ) && headSha ) {
-		fs.writeFileSync( path.join( tracesDir, 'HEAD' ), headSha + '\n' );
 	}
 
 	logAtIndent( 0, 'Calculating results' );
