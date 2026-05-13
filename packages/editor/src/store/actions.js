@@ -265,7 +265,8 @@ export const __experimentalRefreshDistributedEditingRecoveryDryRun =
  * an error response; the error is reflected into DE-RTC state before being
  * rethrown for callers that need command-level handling.
  *
- * @param {Object} [options] Request options.
+ * @param {Object} [options]                   Request options.
+ * @param {string} [options.clientBaseContent] Serialized content at the client base version.
  *
  * @return {Function} Action thunk.
  */
@@ -299,17 +300,19 @@ export const __experimentalRefreshDistributedEditingStaleBaseRejection =
 				);
 
 			dispatch.setDistributedEditingSessionState(
-				getDistributedEditingSessionStateForStaleBaseRejectionResult(
-					response
-				)
+				getDistributedEditingSessionStateForStaleBaseRejectionResult( {
+					...response,
+					clientBaseContent: options.clientBaseContent,
+				} )
 			);
 
 			return response;
 		} catch ( error ) {
 			dispatch.setDistributedEditingSessionState(
-				getDistributedEditingSessionStateForStaleBaseRejectionResult(
-					error
-				)
+				getDistributedEditingSessionStateForStaleBaseRejectionResult( {
+					...error,
+					clientBaseContent: options.clientBaseContent,
+				} )
 			);
 
 			throw error;
@@ -397,11 +400,16 @@ export const __experimentalPlanDistributedEditingLocalRebaseAfterStaleBase =
 export const __experimentalRebaseDistributedEditingLocalUpdatesAfterStaleBase =
 	( options = {} ) =>
 	( { select, dispatch } ) => {
+		const currentSessionState =
+			select.getDistributedEditingSessionState?.() || {};
 		const result = getDistributedEditingStaleBaseLocalRebaseResult( {
-			currentSessionState:
-				select.getDistributedEditingSessionState?.() || {},
-			clientBaseContent: options.clientBaseContent,
-			serverContent: options.serverContent,
+			currentSessionState,
+			clientBaseContent:
+				options.clientBaseContent ??
+				currentSessionState.clientBaseContent,
+			serverContent:
+				options.serverContent ??
+				currentSessionState.refetchedServerContent,
 			localContent:
 				options.localContent ?? select.getEditedPostContent?.(),
 		} );

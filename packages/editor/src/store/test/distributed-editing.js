@@ -111,6 +111,8 @@ describe( 'distributed editing session state', () => {
 		expect( normalized ).toEqual( {
 			clientBaseVersion: 'server-v4',
 			serverVersion: 'server-v6',
+			clientBaseContent: null,
+			refetchedServerContent: null,
 			disposition:
 				DISTRIBUTED_EDITING_DISPOSITIONS.CONFLICT_REQUIRES_SERVER_STATE_ACCEPTANCE,
 			reasonCode:
@@ -143,6 +145,8 @@ describe( 'distributed editing session state', () => {
 					DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
 				client_base_version: 'server-v4',
 				server_version: 'server-v6',
+				client_base_content:
+					'<!-- wp:paragraph --><p>Base.</p><!-- /wp:paragraph -->',
 				pending_change_count: 2,
 				remote_change_count: 1,
 			} );
@@ -150,6 +154,8 @@ describe( 'distributed editing session state', () => {
 		expect( normalized ).toMatchObject( {
 			clientBaseVersion: 'server-v4',
 			serverVersion: 'server-v6',
+			clientBaseContent:
+				'<!-- wp:paragraph --><p>Base.</p><!-- /wp:paragraph -->',
 			disposition:
 				DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
 			reasonCode:
@@ -236,6 +242,8 @@ describe( 'distributed editing session state', () => {
 		expect( normalized ).toMatchObject( {
 			clientBaseVersion: 'server-v4',
 			serverVersion: 'server-v7',
+			refetchedServerContent:
+				'<!-- wp:paragraph --><p>Server state.</p><!-- /wp:paragraph -->',
 			disposition:
 				DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
 			reasonCode:
@@ -384,6 +392,57 @@ describe( 'distributed editing session state', () => {
 				canAttemptLocalRebase: false,
 				readyToRetrySubmit: true,
 				requiresManualConflictResolution: false,
+			},
+		} );
+		expect( result.candidatePostContent ).toBe(
+			'<!-- wp:paragraph --><p>Local alpha</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Remote beta</p><!-- /wp:paragraph -->'
+		);
+	} );
+
+	it( 'rebases stale-base local changes from remembered base and refetched server content', () => {
+		const baseContent =
+			'<!-- wp:paragraph --><p>Alpha</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Beta</p><!-- /wp:paragraph -->';
+		const serverContent =
+			'<!-- wp:paragraph --><p>Alpha</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Remote beta</p><!-- /wp:paragraph -->';
+		const localContent =
+			'<!-- wp:paragraph --><p>Local alpha</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Beta</p><!-- /wp:paragraph -->';
+		const result = getDistributedEditingStaleBaseLocalRebaseResult( {
+			currentSessionState:
+				getDistributedEditingSessionStateForStaleBaseLocalRebasePlan(
+					getDistributedEditingSessionStateForStaleBaseServerStateRefetchResult(
+						{
+							distributed_editing: {
+								server_version: 'server-v7',
+							},
+							content: {
+								raw: serverContent,
+							},
+						},
+						getDistributedEditingSessionStateForStaleBaseRejectionResult(
+							{
+								reason_code:
+									DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+								client_base_version: 'server-v4',
+								server_version: 'server-v6',
+								clientBaseContent: baseContent,
+								pending_change_count: 2,
+								remote_change_count: 1,
+							}
+						)
+					)
+				),
+			localContent,
+		} );
+
+		expect( result ).toMatchObject( {
+			status: DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.REBASED,
+			hasCandidatePostContent: true,
+			readyToRetrySubmit: true,
+			sessionState: {
+				clientBaseContent: baseContent,
+				refetchedServerContent: serverContent,
+				localRebaseResultStatus:
+					DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.REBASED,
 			},
 		} );
 		expect( result.candidatePostContent ).toBe(

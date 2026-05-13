@@ -134,6 +134,8 @@ const NOTICE_ID_BY_KIND = Object.freeze( {
 export const DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE = Object.freeze( {
 	clientBaseVersion: null,
 	serverVersion: null,
+	clientBaseContent: null,
+	refetchedServerContent: null,
 	disposition: DISTRIBUTED_EDITING_DISPOSITIONS.IDLE,
 	reasonCode: null,
 	pendingChangeCount: 0,
@@ -275,6 +277,12 @@ export function normalizeDistributedEditingSessionState( sessionState = {} ) {
 			sessionState.clientBaseVersion
 		),
 		serverVersion: normalizeNullableString( sessionState.serverVersion ),
+		clientBaseContent: normalizeNullableContentString(
+			sessionState.clientBaseContent
+		),
+		refetchedServerContent: normalizeNullableContentString(
+			sessionState.refetchedServerContent
+		),
 		disposition,
 		reasonCode,
 		pendingChangeCount,
@@ -390,6 +398,11 @@ export function getDistributedEditingSessionStateForStaleBaseRejectionResult(
 			responseOrError.server_version ||
 			responseData.serverVersion ||
 			responseData.server_version,
+		clientBaseContent:
+			responseOrError.clientBaseContent ??
+			responseOrError.client_base_content ??
+			responseData.clientBaseContent ??
+			responseData.client_base_content,
 		disposition:
 			DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
 		reasonCode,
@@ -440,6 +453,11 @@ export function getDistributedEditingSessionStateForStaleBaseServerStateRefetchR
 	const serverVersion =
 		getDistributedEditingServerVersionFromResponse( responseOrError ) ||
 		normalizeNullableString( currentSessionState.serverVersion );
+	const refetchedServerContent =
+		getDistributedEditingPostContentFromResponse( responseOrError ) ??
+		normalizeNullableContentString(
+			currentSessionState.refetchedServerContent
+		);
 	const pendingChangeCount = normalizeCount(
 		currentSessionState.pendingChangeCount
 	);
@@ -453,6 +471,7 @@ export function getDistributedEditingSessionStateForStaleBaseServerStateRefetchR
 	return normalizeDistributedEditingSessionState( {
 		...currentSessionState,
 		serverVersion,
+		refetchedServerContent,
 		disposition:
 			currentSessionState.disposition ||
 			DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
@@ -590,8 +609,8 @@ export function getDistributedEditingStaleBaseLocalRebaseResult( {
 	}
 
 	const mergeResult = getSerializedBlockLocalRebaseCandidate( {
-		clientBaseContent,
-		serverContent,
+		clientBaseContent: clientBaseContent ?? plannedState.clientBaseContent,
+		serverContent: serverContent ?? plannedState.refetchedServerContent,
 		localContent,
 	} );
 
@@ -837,6 +856,10 @@ function normalizeNullableString( value ) {
 	return typeof value === 'string' && value.length > 0 ? value : null;
 }
 
+function normalizeNullableContentString( value ) {
+	return typeof value === 'string' ? value : null;
+}
+
 function getDistributedEditingResponseData( responseOrError ) {
 	return responseOrError?.data &&
 		typeof responseOrError.data === 'object' &&
@@ -865,6 +888,25 @@ function getDistributedEditingServerVersionFromResponse( responseOrError ) {
 			responseOrError.modified ||
 			responseData.modified_gmt ||
 			responseData.modified
+	);
+}
+
+function getDistributedEditingPostContentFromResponse( responseOrError ) {
+	const responseData = getDistributedEditingResponseData( responseOrError );
+
+	return normalizeNullableContentString(
+		responseOrError?.content?.raw ??
+			responseOrError?.content_raw ??
+			responseOrError?.raw_content ??
+			responseData?.content?.raw ??
+			responseData?.content_raw ??
+			responseData?.raw_content ??
+			( typeof responseOrError?.content === 'string'
+				? responseOrError.content
+				: undefined ) ??
+			( typeof responseData?.content === 'string'
+				? responseData.content
+				: undefined )
 	);
 }
 

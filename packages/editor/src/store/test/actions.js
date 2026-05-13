@@ -169,6 +169,8 @@ describe( 'Post actions', () => {
 
 	describe( '__experimentalRefreshDistributedEditingStaleBaseRejection()', () => {
 		it( 'normalizes stale-base REST errors before rethrowing', async () => {
+			const baseContent =
+				'<!-- wp:paragraph --><p>Base.</p><!-- /wp:paragraph -->';
 			const post = {
 				id: postId,
 				type: 'post',
@@ -230,6 +232,7 @@ describe( 'Post actions', () => {
 							serverVersion: '6',
 							pendingChangeCount: 2,
 							remoteChangeCount: 3,
+							clientBaseContent: baseContent,
 						}
 					)
 			).rejects.toBe( error );
@@ -245,6 +248,7 @@ describe( 'Post actions', () => {
 					DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
 				clientBaseVersion: '4',
 				serverVersion: '6',
+				clientBaseContent: baseContent,
 				pendingChangeCount: 2,
 				remoteChangeCount: 3,
 				hasPendingChanges: true,
@@ -338,6 +342,7 @@ describe( 'Post actions', () => {
 					DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
 				clientBaseVersion: '4',
 				serverVersion: '7',
+				refetchedServerContent: 'remote bar',
 				pendingChangeCount: 2,
 				remoteChangeCount: 3,
 				requiresServerStateRefetch: false,
@@ -606,6 +611,81 @@ describe( 'Post actions', () => {
 				requiresManualConflictResolution: true,
 				canExportLocalUpdates: true,
 			} );
+		} );
+
+		it( 'uses remembered base and refetched server content for serialized-block local rebase', async () => {
+			const baseContent =
+				'<!-- wp:paragraph --><p>Alpha</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Beta</p><!-- /wp:paragraph -->';
+			const serverContent =
+				'<!-- wp:paragraph --><p>Alpha</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Remote beta</p><!-- /wp:paragraph -->';
+			const localContent =
+				'<!-- wp:paragraph --><p>Local alpha</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Beta</p><!-- /wp:paragraph -->';
+			const post = {
+				id: postId,
+				type: 'post',
+				title: 'bar',
+				content: baseContent,
+				status: 'draft',
+			};
+			let apiFetchCallCount = 0;
+
+			apiFetch.setFetchHandler( async () => {
+				apiFetchCallCount++;
+				throw new Error(
+					'Remembered local rebase must not call apiFetch.'
+				);
+			} );
+
+			const registry = createRegistryWithStores();
+
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', post );
+			registry.dispatch( editorStore ).setupEditor( post, {
+				content: localContent,
+			} );
+			registry
+				.dispatch( editorStore )
+				.setDistributedEditingSessionState( {
+					disposition:
+						DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+					reasonCode:
+						DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+					clientBaseVersion: '4',
+					serverVersion: '7',
+					clientBaseContent: baseContent,
+					refetchedServerContent: serverContent,
+					pendingChangeCount: 1,
+					remoteChangeCount: 1,
+					requiresServerStateRefetch: false,
+					refetchedServerState: true,
+					canAttemptLocalRebase: true,
+					localRebasePlanStatus:
+						DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES.READY,
+					canExportLocalUpdates: true,
+				} );
+
+			const result = await registry
+				.dispatch( editorStore )
+				.__experimentalRebaseDistributedEditingLocalUpdatesAfterStaleBase();
+
+			expect( apiFetchCallCount ).toBe( 0 );
+			expect( result ).toMatchObject( {
+				status: DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.REBASED,
+				hasCandidatePostContent: true,
+				readyToRetrySubmit: true,
+				sessionState: {
+					clientBaseContent: baseContent,
+					refetchedServerContent: serverContent,
+					localRebaseResultStatus:
+						DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.REBASED,
+				},
+			} );
+			expect(
+				registry.select( editorStore ).getEditedPostContent()
+			).toBe(
+				'<!-- wp:paragraph --><p>Local alpha</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Remote beta</p><!-- /wp:paragraph -->'
+			);
 		} );
 	} );
 
