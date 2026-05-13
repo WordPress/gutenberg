@@ -8,6 +8,8 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { addFilter } from '@wordpress/hooks';
+import { useSelect } from '@wordpress/data';
+import { mergeGlobalStyles } from '@wordpress/global-styles-engine';
 import {
 	getBlockSupport,
 	hasBlockSupport,
@@ -47,6 +49,8 @@ import { buildStateSelector, buildCanvasStateSelector } from './state-utils';
 import { BlockInspectorPreTabsFill } from '../components/block-inspector/inspector-pre-tabs-slot-fill';
 import { scopeSelector } from '../components/global-styles/utils';
 import { useBlockEditingMode } from '../components/block-editing-mode';
+import { store as blockEditorStore } from '../store';
+import { globalStylesDataKey } from '../store/private-keys';
 
 const styleSupportKeys = [
 	...TYPOGRAPHY_SUPPORT_KEYS,
@@ -347,6 +351,14 @@ function BlockStyleControls( {
 	const blockEditingMode = useBlockEditingMode();
 	const [ selectedState, setSelectedState ] = useState( 'default' );
 	const [ showStateOnCanvas, setShowStateOnCanvas ] = useState( true );
+	const globalBlockStyles = useSelect(
+		( select ) =>
+			select( blockEditorStore ).getSettings()[ globalStylesDataKey ]
+				?.blocks?.[ name ],
+		[ name ]
+	);
+	const globalStateValue = globalBlockStyles?.[ selectedState ];
+	const instanceStateValue = style?.[ selectedState ];
 
 	// Inject state styles onto the editor canvas so the selected state is
 	// visible while editing. Scoped to this block instance via data-block so
@@ -356,16 +368,34 @@ function BlockStyleControls( {
 		if ( ! showStateOnCanvas || selectedState === 'default' ) {
 			return undefined;
 		}
-		const stateValue = style?.[ selectedState ];
-		if ( ! stateValue ) {
+		let stateValue;
+
+		if ( globalStateValue && instanceStateValue ) {
+			stateValue = mergeGlobalStyles(
+				globalStateValue,
+				instanceStateValue
+			);
+		} else if ( instanceStateValue ) {
+			stateValue = instanceStateValue;
+		} else if ( globalStateValue ) {
+			stateValue = globalStateValue;
+		} else {
 			return undefined;
 		}
+
 		const selector = buildCanvasStateSelector( clientId, name );
 		const css = compileCSS( stateValue, { selector } );
 		// Use !important to override utility classes (e.g. has-accent-3-color)
 		// that the block's default color support generates with !important.
 		return css ? css.replace( /;/g, ' !important;' ) : undefined;
-	}, [ showStateOnCanvas, selectedState, style, clientId, name ] );
+	}, [
+		showStateOnCanvas,
+		selectedState,
+		globalStateValue,
+		instanceStateValue,
+		clientId,
+		name,
+	] );
 	useStyleOverride( { css: canvasStateCSS } );
 
 	if ( blockEditingMode !== 'default' ) {
