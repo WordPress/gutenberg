@@ -65,6 +65,9 @@ interface PollingManager {
 		log: () => void;
 		onStatusChange: () => void;
 		onSync: () => void;
+		onPermissionsChange: ( permissions: {
+			unfilteredHtml: boolean;
+		} ) => void;
 	} ) => void;
 	unregisterRoom: (
 		room: string,
@@ -172,6 +175,7 @@ describe( 'polling-manager', () => {
 				log: jest.fn(),
 				onStatusChange,
 				onSync: jest.fn(),
+				onPermissionsChange: jest.fn(),
 			} );
 
 			// Simulate a doc update that exceeds the mocked MAX_UPDATE_SIZE_IN_BYTES (10).
@@ -198,6 +202,7 @@ describe( 'polling-manager', () => {
 				log: jest.fn(),
 				onStatusChange: jest.fn(),
 				onSync: jest.fn(),
+				onPermissionsChange: jest.fn(),
 			} );
 
 			const onDocUpdate = getOnDocUpdate( doc );
@@ -235,6 +240,7 @@ describe( 'polling-manager', () => {
 				log: jest.fn(),
 				onStatusChange,
 				onSync: jest.fn(),
+				onPermissionsChange: jest.fn(),
 			} );
 
 			// Flush the initial poll so 'connected' status is emitted first.
@@ -286,6 +292,7 @@ describe( 'polling-manager', () => {
 				log: jest.fn(),
 				onStatusChange,
 				onSync: jest.fn(),
+				onPermissionsChange: jest.fn(),
 			} );
 
 			await jest.advanceTimersByTimeAsync( 0 );
@@ -326,6 +333,7 @@ describe( 'polling-manager', () => {
 				log: jest.fn(),
 				onStatusChange,
 				onSync: jest.fn(),
+				onPermissionsChange: jest.fn(),
 			} );
 
 			await jest.advanceTimersByTimeAsync( 0 );
@@ -359,6 +367,7 @@ describe( 'polling-manager', () => {
 				log: jest.fn(),
 				onStatusChange: jest.fn(),
 				onSync: jest.fn(),
+				onPermissionsChange: jest.fn(),
 			} );
 
 			await jest.advanceTimersByTimeAsync( 0 );
@@ -398,6 +407,7 @@ describe( 'polling-manager', () => {
 				log: jest.fn(),
 				onStatusChange,
 				onSync: jest.fn(),
+				onPermissionsChange: jest.fn(),
 			} );
 
 			await jest.advanceTimersByTimeAsync( 1000 );
@@ -438,6 +448,7 @@ describe( 'polling-manager', () => {
 				log: jest.fn(),
 				onStatusChange,
 				onSync: jest.fn(),
+				onPermissionsChange: jest.fn(),
 			} );
 
 			// First poll passes.
@@ -501,6 +512,7 @@ describe( 'polling-manager', () => {
 				log: jest.fn(),
 				onStatusChange: jest.fn(),
 				onSync: jest.fn(),
+				onPermissionsChange: jest.fn(),
 			} );
 
 			await jest.advanceTimersByTimeAsync( 0 );
@@ -544,6 +556,7 @@ describe( 'polling-manager', () => {
 				log: jest.fn(),
 				onStatusChange,
 				onSync: jest.fn(),
+				onPermissionsChange: jest.fn(),
 			} );
 
 			await jest.advanceTimersByTimeAsync( 0 );
@@ -556,6 +569,98 @@ describe( 'polling-manager', () => {
 					} ),
 				} )
 			);
+		} );
+	} );
+
+	describe( 'permissions signal', () => {
+		it( 'calls onPermissionsChange with permissions from server response', async () => {
+			mockPostSyncUpdate.mockResolvedValue( {
+				rooms: [
+					{
+						room: 'test-room',
+						end_cursor: 1,
+						awareness: {},
+						updates: [],
+						permissions: { unfiltered_html: false },
+					},
+				],
+			} );
+
+			const onPermissionsChange = jest.fn();
+
+			pollingManager.registerRoom( {
+				room: 'test-room',
+				doc: createMockDoc( 1 ),
+				awareness: createMockAwareness(),
+				log: jest.fn(),
+				onStatusChange: jest.fn(),
+				onSync: jest.fn(),
+				onPermissionsChange,
+			} );
+
+			await jest.advanceTimersByTimeAsync( 0 );
+
+			expect( onPermissionsChange ).toHaveBeenCalledWith( {
+				unfilteredHtml: false,
+			} );
+		} );
+
+		it( 'defaults permissions to false when absent from response', async () => {
+			mockPostSyncUpdate.mockResolvedValue( syncResponse );
+
+			const onPermissionsChange = jest.fn();
+
+			pollingManager.registerRoom( {
+				room: 'test-room',
+				doc: createMockDoc( 1 ),
+				awareness: createMockAwareness(),
+				log: jest.fn(),
+				onStatusChange: jest.fn(),
+				onSync: jest.fn(),
+				onPermissionsChange,
+			} );
+
+			await jest.advanceTimersByTimeAsync( 0 );
+
+			expect( onPermissionsChange ).toHaveBeenCalledWith( {
+				unfilteredHtml: false,
+			} );
+		} );
+
+		it( 'defaults permissions to false for non-boolean values', async () => {
+			// A malformed response from a future or buggy server should not
+			// be silently treated as trusted.
+			mockPostSyncUpdate.mockResolvedValue( {
+				rooms: [
+					{
+						room: 'test-room',
+						end_cursor: 1,
+						awareness: {},
+						updates: [],
+						permissions: {
+							unfiltered_html: 'true' as unknown as boolean,
+						},
+					},
+				],
+			} );
+
+			const onPermissionsChange = jest.fn();
+
+			pollingManager.registerRoom( {
+				room: 'test-room',
+				doc: createMockDoc( 1 ),
+				awareness: createMockAwareness(),
+				log: jest.fn(),
+				onStatusChange: jest.fn(),
+				onSync: jest.fn(),
+				onPermissionsChange,
+			} );
+
+			await jest.advanceTimersByTimeAsync( 0 );
+
+			expect( onPermissionsChange ).toHaveBeenCalledWith( {
+				unfilteredHtml: false,
+			} );
 		} );
 	} );
 
@@ -590,6 +695,7 @@ describe( 'polling-manager', () => {
 				log: jest.fn(),
 				onStatusChange: jest.fn(),
 				onSync: jest.fn(),
+				onPermissionsChange: jest.fn(),
 			} );
 
 			pollingManager.registerRoom( {
@@ -599,6 +705,7 @@ describe( 'polling-manager', () => {
 				log: jest.fn(),
 				onStatusChange: jest.fn(),
 				onSync: jest.fn(),
+				onPermissionsChange: jest.fn(),
 			} );
 
 			// First poll: detects collaborators on primary room, resumes all queues.
@@ -662,6 +769,7 @@ describe( 'polling-manager', () => {
 				log: jest.fn(),
 				onStatusChange: jest.fn(),
 				onSync: jest.fn(),
+				onPermissionsChange: jest.fn(),
 			} );
 
 			pollingManager.registerRoom( {
@@ -671,6 +779,7 @@ describe( 'polling-manager', () => {
 				log: jest.fn(),
 				onStatusChange: jest.fn(),
 				onSync: jest.fn(),
+				onPermissionsChange: jest.fn(),
 			} );
 
 			// First poll: no collaborators.
@@ -714,6 +823,7 @@ describe( 'polling-manager', () => {
 				log: jest.fn(),
 				onStatusChange: jest.fn(),
 				onSync: jest.fn(),
+				onPermissionsChange: jest.fn(),
 			} );
 
 			pollingManager.registerRoom( {
@@ -723,6 +833,7 @@ describe( 'polling-manager', () => {
 				log: jest.fn(),
 				onStatusChange: jest.fn(),
 				onSync: jest.fn(),
+				onPermissionsChange: jest.fn(),
 			} );
 
 			// First poll: no collaborators, queues stay paused.
@@ -835,6 +946,7 @@ describe( 'polling-manager', () => {
 				log: jest.fn(),
 				onStatusChange: jest.fn(),
 				onSync: jest.fn(),
+				onPermissionsChange: jest.fn(),
 			} );
 
 			// Flush the initial poll (queue is paused, so no updates sent).
@@ -893,6 +1005,7 @@ describe( 'polling-manager', () => {
 				log: jest.fn(),
 				onStatusChange: jest.fn(),
 				onSync: jest.fn(),
+				onPermissionsChange: jest.fn(),
 			} );
 
 			await jest.advanceTimersByTimeAsync( 0 );
@@ -942,6 +1055,7 @@ describe( 'polling-manager', () => {
 				log: jest.fn(),
 				onStatusChange: jest.fn(),
 				onSync: jest.fn(),
+				onPermissionsChange: jest.fn(),
 			} );
 
 			// registerRoom → poll() → start() → postSyncUpdate (pending).
@@ -965,6 +1079,7 @@ describe( 'polling-manager', () => {
 				log: jest.fn(),
 				onStatusChange: jest.fn(),
 				onSync: jest.fn(),
+				onPermissionsChange: jest.fn(),
 			} );
 
 			// Flush so the first poll completes and schedules a timeout.
@@ -1011,6 +1126,7 @@ describe( 'polling-manager', () => {
 				log: jest.fn(),
 				onStatusChange: onStatusChangeA,
 				onSync: jest.fn(),
+				onPermissionsChange: jest.fn(),
 			} );
 			pollingManager.registerRoom( {
 				room: 'other-room',
@@ -1019,6 +1135,7 @@ describe( 'polling-manager', () => {
 				log: jest.fn(),
 				onStatusChange: onStatusChangeB,
 				onSync: jest.fn(),
+				onPermissionsChange: jest.fn(),
 			} );
 
 			await jest.advanceTimersByTimeAsync( 0 );
@@ -1074,6 +1191,7 @@ describe( 'polling-manager', () => {
 				log: jest.fn(),
 				onStatusChange,
 				onSync: jest.fn(),
+				onPermissionsChange: jest.fn(),
 			} );
 
 			await jest.advanceTimersByTimeAsync( 0 );
@@ -1110,6 +1228,7 @@ describe( 'polling-manager', () => {
 				log: jest.fn(),
 				onStatusChange: jest.fn(),
 				onSync: jest.fn(),
+				onPermissionsChange: jest.fn(),
 			} );
 
 			await jest.advanceTimersByTimeAsync( 0 );
@@ -1157,6 +1276,7 @@ describe( 'polling-manager', () => {
 				log: jest.fn(),
 				onStatusChange: jest.fn(),
 				onSync: jest.fn(),
+				onPermissionsChange: jest.fn(),
 			} );
 			pollingManager.registerRoom( {
 				room: 'postType/post:10',
@@ -1165,6 +1285,7 @@ describe( 'polling-manager', () => {
 				log: jest.fn(),
 				onStatusChange: jest.fn(),
 				onSync: jest.fn(),
+				onPermissionsChange: jest.fn(),
 			} );
 
 			await jest.advanceTimersByTimeAsync( 0 );
@@ -1212,6 +1333,7 @@ describe( 'polling-manager', () => {
 				log: jest.fn(),
 				onStatusChange: jest.fn(),
 				onSync: jest.fn(),
+				onPermissionsChange: jest.fn(),
 			} );
 
 			await jest.advanceTimersByTimeAsync( 0 );
@@ -1242,6 +1364,7 @@ describe( 'polling-manager', () => {
 				log: jest.fn(),
 				onStatusChange: jest.fn(),
 				onSync: jest.fn(),
+				onPermissionsChange: jest.fn(),
 			} );
 
 			await jest.advanceTimersByTimeAsync( 0 );
@@ -1278,6 +1401,7 @@ describe( 'polling-manager', () => {
 				log: jest.fn(),
 				onStatusChange: jest.fn(),
 				onSync: jest.fn(),
+				onPermissionsChange: jest.fn(),
 			} );
 
 			await jest.advanceTimersByTimeAsync( 0 );

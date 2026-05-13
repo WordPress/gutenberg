@@ -827,6 +827,171 @@ describe( 'SyncManager', () => {
 			} );
 		} );
 
+		it( 'sanitizes remote changes by default before any permissions signal', async () => {
+			// Capture the Y.Doc from provider creator. Do NOT signal permissions.
+			let capturedDoc: Y.Doc | null = null;
+			mockProviderCreator.mockImplementation( async ( { ydoc } ) => {
+				capturedDoc = ydoc;
+				return mockProviderResult;
+			} );
+
+			const manager = createSyncManager();
+
+			await manager.load(
+				mockSyncConfig,
+				'post',
+				'123',
+				mockRecord,
+				mockHandlers
+			);
+
+			// Clear calls of editRecord, which is called during load.
+			mockHandlers.editRecord.mockClear();
+
+			expect( capturedDoc ).not.toBeNull();
+
+			// Simulate a non-local Y.Doc apply (e.g. loading the
+			// `_crdt_document` post meta on initial load) carrying an XSS
+			// payload before the first poll has confirmed the room's
+			// permissions.
+			const remoteDoc = new Y.Doc();
+			remoteDoc
+				.getMap( CRDT_RECORD_MAP_KEY )
+				.set( 'title', '<script>alert("xss")</script>Safe Title' );
+			Y.applyUpdateV2(
+				capturedDoc as unknown as Y.Doc,
+				Y.encodeStateAsUpdateV2( remoteDoc )
+			);
+			remoteDoc.destroy();
+
+			// Wait a tick.
+			await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
+
+			expect( mockHandlers.editRecord ).toHaveBeenCalledTimes( 1 );
+			expect( mockHandlers.editRecord ).toHaveBeenCalledWith( {
+				title: 'Safe Title',
+			} );
+		} );
+
+		it( 'sanitizes remote changes when marked untrusted', async () => {
+			// Capture the Y.Doc and the permissions callback from the provider.
+			let capturedDoc: Y.Doc | null = null;
+			let permissionsCallback:
+				| ( ( v: { unfilteredHtml: boolean } ) => void )
+				| null = null;
+			mockProviderCreator.mockImplementation( async ( { ydoc } ) => {
+				capturedDoc = ydoc;
+				return {
+					destroy: jest.fn(),
+					on: jest.fn(
+						( event: string, cb: ( ...args: any[] ) => void ) => {
+							if ( event === 'permissions' ) {
+								permissionsCallback = cb;
+							}
+						}
+					),
+				};
+			} );
+
+			const manager = createSyncManager();
+
+			await manager.load(
+				mockSyncConfig,
+				'post',
+				'123',
+				mockRecord,
+				mockHandlers
+			);
+
+			// Signal that the session is untrusted.
+			expect( permissionsCallback ).not.toBeNull();
+			permissionsCallback!( { unfilteredHtml: false } );
+
+			// Clear calls of editRecord, which is called during load.
+			mockHandlers.editRecord.mockClear();
+
+			expect( capturedDoc ).not.toBeNull();
+
+			// Simulate a remote change with an XSS payload.
+			const remoteDoc = new Y.Doc();
+			remoteDoc
+				.getMap( CRDT_RECORD_MAP_KEY )
+				.set( 'title', '<script>alert("xss")</script>Safe Title' );
+			Y.applyUpdateV2(
+				capturedDoc as unknown as Y.Doc,
+				Y.encodeStateAsUpdateV2( remoteDoc )
+			);
+			remoteDoc.destroy();
+
+			// Wait a tick.
+			await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
+
+			expect( mockHandlers.editRecord ).toHaveBeenCalledTimes( 1 );
+			expect( mockHandlers.editRecord ).toHaveBeenCalledWith( {
+				title: 'Safe Title',
+			} );
+		} );
+
+		it( 'does not sanitize remote changes when marked trusted', async () => {
+			// Capture the Y.Doc and the permissions callback from the provider.
+			let capturedDoc: Y.Doc | null = null;
+			let permissionsCallback:
+				| ( ( v: { unfilteredHtml: boolean } ) => void )
+				| null = null;
+			mockProviderCreator.mockImplementation( async ( { ydoc } ) => {
+				capturedDoc = ydoc;
+				return {
+					destroy: jest.fn(),
+					on: jest.fn(
+						( event: string, cb: ( ...args: any[] ) => void ) => {
+							if ( event === 'permissions' ) {
+								permissionsCallback = cb;
+							}
+						}
+					),
+				};
+			} );
+
+			const manager = createSyncManager();
+
+			await manager.load(
+				mockSyncConfig,
+				'post',
+				'123',
+				mockRecord,
+				mockHandlers
+			);
+
+			// Signal that the session is trusted (overrides default-false).
+			expect( permissionsCallback ).not.toBeNull();
+			permissionsCallback!( { unfilteredHtml: true } );
+
+			// Clear calls of editRecord, which is called during load.
+			mockHandlers.editRecord.mockClear();
+
+			expect( capturedDoc ).not.toBeNull();
+
+			// Simulate a remote change with HTML content that would be
+			// modified by the sanitizer (e.g. an img with onerror).
+			const remoteDoc = new Y.Doc();
+			const htmlContent = '<img src="x" onerror="alert(1)">';
+			remoteDoc.getMap( CRDT_RECORD_MAP_KEY ).set( 'title', htmlContent );
+			Y.applyUpdateV2(
+				capturedDoc as unknown as Y.Doc,
+				Y.encodeStateAsUpdateV2( remoteDoc )
+			);
+			remoteDoc.destroy();
+
+			// Wait a tick.
+			await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
+
+			expect( mockHandlers.editRecord ).toHaveBeenCalledTimes( 1 );
+			// Content passes through unsanitized because permissions.unfilteredHtml is true.
+			expect( mockHandlers.editRecord ).toHaveBeenCalledWith( {
+				title: htmlContent,
+			} );
+		} );
+
 		it( 'does not edit the local record for local transactions', async () => {
 			// Capture the Y.Doc from provider creator.
 			let capturedDoc: Y.Doc | null = null;

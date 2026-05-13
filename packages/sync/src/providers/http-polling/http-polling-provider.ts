@@ -10,8 +10,10 @@ import { Awareness } from 'y-protocols/awareness';
  */
 import type {
 	ConnectionStatus,
+	Permissions,
 	ProviderCreator,
 	ProviderCreatorResult,
+	ProviderEventMap,
 } from '../../types';
 import { pollingManager } from './polling-manager';
 
@@ -23,11 +25,10 @@ export interface ProviderOptions {
 }
 
 /**
- * Event types for HttpPollingProvider.
- * ObservableV2 expects event handlers as functions.
+ * Event types for HttpPollingProvider, Derived from ProviderEventMap.
  */
 type HttpPollingEvents = {
-	status: ( status: ConnectionStatus ) => void;
+	[ K in keyof ProviderEventMap ]: ( data: ProviderEventMap[ K ] ) => void;
 };
 
 /**
@@ -60,6 +61,7 @@ class HttpPollingProvider extends ObservableV2< HttpPollingEvents > {
 			log: this.log,
 			onStatusChange: this.emitStatus,
 			onSync: this.onSync,
+			onPermissionsChange: this.emitPermissions,
 		} );
 	}
 
@@ -136,6 +138,15 @@ class HttpPollingProvider extends ObservableV2< HttpPollingEvents > {
 	};
 
 	/**
+	 * Emit the current set of shared contributor permissions.
+	 *
+	 * @param permissions Per-ability flags shared by all contributors.
+	 */
+	protected emitPermissions = ( permissions: Permissions ): void => {
+		this.emit( 'permissions', [ permissions ] );
+	};
+
+	/**
 	 * Handle synchronization events from the polling manager.
 	 */
 	protected onSync = (): void => {
@@ -170,7 +181,10 @@ export function createHttpPollingProvider(): ProviderCreator {
 			// Adapter: ObservableV2.on is compatible with ProviderOn
 			// The callback receives data as the first parameter
 			on: ( event, callback ) => {
-				provider.on( event, callback );
+				provider.on(
+					event,
+					callback as HttpPollingEvents[ typeof event ]
+				);
 			},
 		};
 	};

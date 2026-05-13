@@ -297,6 +297,14 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 				$cursor    = $room_request['after'];
 				$room      = $room_request['room'];
 
+				// Track every authenticated access to this room, not just
+				// requests that carry document updates. Awareness-only polls
+				// still represent an active participant whose capabilities
+				// must be considered when computing shared room permissions.
+				if ( method_exists( $this->storage, 'track_contributor' ) ) {
+					$this->storage->track_contributor( $room, get_current_user_id() );
+				}
+
 				// Merge awareness state.
 				$merged_awareness = $this->process_awareness_update( $room, $client_id, $awareness );
 
@@ -574,9 +582,10 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 		 * @param bool   $is_compactor True if this client is nominated to perform compaction.
 		 * @return array{
 		 *   end_cursor: int,
-		 *   should_compact: bool,
 		 *   room: string,
+		 *   should_compact: bool,
 		 *   total_updates: int,
+		 *   permissions: array{unfiltered_html: bool},
 		 *   updates: array<int, array{data: string, type: string}>,
 		 * } Response data for this room.
 		 */
@@ -599,13 +608,51 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 
 			$should_compact = $is_compactor && $total_updates > self::COMPACTION_THRESHOLD;
 
+			// Collect permissions flags that describe whether ALL contributors
+			// in the room share a given RTC-related ability. The client uses
+			// these to decide things like whether to sanitize remote CRDT
+			// changes before writing them to the local entity store.
+			$contributors = method_exists( $this->storage, 'get_contributors' )
+				? $this->storage->get_contributors( $room )
+				: array();
+
+			$permissions = array(
+				'unfiltered_html' => $this->all_contributors_have_cap(
+					$contributors,
+					'unfiltered_html'
+				),
+			);
+
 			return array(
 				'end_cursor'     => $this->storage->get_cursor( $room ),
+				'permissions'    => $permissions,
 				'room'           => $room,
 				'should_compact' => $should_compact,
 				'total_updates'  => $total_updates,
 				'updates'        => $typed_updates,
 			);
+		}
+
+		/**
+		 * Determines whether every tracked contributor in a room holds a
+		 * given capability.
+		 *
+		 * @param int[]  $contributors WordPress user IDs tracked for the room.
+		 * @param string $capability   Capability name (e.g. 'unfiltered_html').
+		 * @return bool True only when the list is non-empty and every user has the cap.
+		 */
+		private function all_contributors_have_cap( array $contributors, string $capability ): bool {
+			if ( empty( $contributors ) ) {
+				return false;
+			}
+
+			foreach ( $contributors as $contributor_id ) {
+				if ( ! user_can( $contributor_id, $capability ) ) {
+					return false;
+				}
+			}
+
+			return true;
 		}
 	}
 }

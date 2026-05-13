@@ -14,10 +14,26 @@ import type { Awareness } from 'y-protocols/awareness';
  */
 import type { ConnectionError } from './errors';
 
+/**
+ * A single attribute spec from `wp_kses_allowed_html()`. `true` means the
+ * attribute is allowed with any value. More specific server-side constraint
+ * objects (e.g. `maxlen`, `values`, `valueless`) aren't enforced client-side.
+ */
+export type KsesAttributeSpec = true | object;
+
+/**
+ * Tag -> attribute -> spec, mirroring `wp_kses_allowed_html( 'post' )` from PHP.
+ */
+export type KsesAllowedHtml = Record<
+	string,
+	Record< string, KsesAttributeSpec >
+>;
+
 /* globalThis */
 declare global {
 	interface Window {
 		_wpCollaborationEnabled?: string;
+		_wpCollaborationKsesHtml?: KsesAllowedHtml;
 	}
 }
 
@@ -38,11 +54,21 @@ export type Origin = any;
 export type ObjectData = Record< string, unknown >;
 
 /**
+ * Per-capability flags that are `true` if ALL contributors in the current
+ * sync room share the given ability.
+ */
+export interface Permissions {
+	/** Whether all contributors have the ability to send unfiltered HTML. */
+	unfilteredHtml: boolean;
+}
+
+/**
  * Event map for provider events.
  * Add new event types here as needed.
  */
 export interface ProviderEventMap {
 	status: ConnectionStatus;
+	permissions: Permissions;
 }
 
 /**

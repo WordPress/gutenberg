@@ -43,6 +43,14 @@ if ( ! class_exists( 'WP_Sync_Post_Meta_Storage' ) ) {
 		const SYNC_UPDATE_META_KEY = 'wp_sync_update_data';
 
 		/**
+		 * Meta key for tracking contributor user IDs.
+		 *
+		 * @since 7.0.0
+		 * @var string
+		 */
+		const CONTRIBUTORS_META_KEY = 'wp_sync_contributors';
+
+		/**
 		 * Cache of cursors by room.
 		 *
 		 * @since 7.0.0
@@ -500,6 +508,72 @@ if ( ! class_exists( 'WP_Sync_Post_Meta_Storage' ) ) {
 			}
 
 			return true;
+		}
+
+		/**
+		 * Records a user as a contributor who has submitted updates to a room.
+		 *
+		 * Skips the insert when the user is already tracked. A rare race
+		 * between concurrent requests can produce at most one extra row
+		 * per user, which get_contributors() handles via array_unique.
+		 *
+		 * @since 7.0.0
+		 *
+		 * @param string $room    Room identifier.
+		 * @param int    $user_id WordPress user ID.
+		 * @return void
+		 */
+		public function track_contributor( string $room, int $user_id ): void {
+			$post_id = $this->get_storage_post_id( $room );
+			if ( null === $post_id ) {
+				return;
+			}
+
+			$contributors = get_post_meta( $post_id, self::CONTRIBUTORS_META_KEY, false );
+			if ( is_array( $contributors ) && in_array( (string) $user_id, $contributors, true ) ) {
+				return;
+			}
+
+			add_post_meta( $post_id, self::CONTRIBUTORS_META_KEY, $user_id );
+		}
+
+		/**
+		 * Gets all contributor user IDs for a room.
+		 *
+		 * @since 7.0.0
+		 *
+		 * @param string $room Room identifier.
+		 * @return int[] Array of unique WordPress user IDs.
+		 */
+		public function get_contributors( string $room ): array {
+			$post_id = $this->get_storage_post_id( $room );
+			if ( null === $post_id ) {
+				return array();
+			}
+
+			$values = get_post_meta( $post_id, self::CONTRIBUTORS_META_KEY, false );
+			if ( ! is_array( $values ) || 0 === count( $values ) ) {
+				return array();
+			}
+
+			return array_values( array_unique( array_map( 'intval', $values ) ) );
+		}
+
+		/**
+		 * Clears the contributor list for a room.
+		 *
+		 * @since 7.0.0
+		 *
+		 * @param string $room Room identifier.
+		 * @return void
+		 */
+		public function clear_contributors( string $room ): void {
+			$post_id = $this->get_storage_post_id( $room );
+			if ( null === $post_id ) {
+				return;
+			}
+
+			delete_post_meta( $post_id, self::CONTRIBUTORS_META_KEY );
 		}
 	}
 }
