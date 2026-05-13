@@ -35,6 +35,7 @@ import {
 	DimensionsPanel,
 } from './dimensions';
 import {
+	cleanEmptyObject,
 	shouldSkipSerialization,
 	useStyleOverride,
 	useBlockSettings,
@@ -53,20 +54,6 @@ import { store as blockEditorStore } from '../store';
 import { globalStylesDataKey } from '../store/private-keys';
 
 const BORDER_SIDES = [ 'Top', 'Right', 'Bottom', 'Left' ];
-
-function cleanEmptyObject( object ) {
-	if ( ! object ) {
-		return undefined;
-	}
-
-	const cleaned = Object.fromEntries(
-		Object.entries( object ).filter(
-			( [ , value ] ) => value !== undefined
-		)
-	);
-
-	return Object.keys( cleaned ).length ? cleaned : undefined;
-}
 
 const styleSupportKeys = [
 	...TYPOGRAPHY_SUPPORT_KEYS,
