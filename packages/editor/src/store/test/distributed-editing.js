@@ -344,6 +344,17 @@ describe( 'distributed editing session state', () => {
 		} );
 	} );
 
+	const getReadyStaleBaseLocalRebaseSessionState = () =>
+		getDistributedEditingSessionStateForStaleBaseLocalRebasePlan( {
+			disposition:
+				DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+			reasonCode:
+				DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+			refetchedServerState: true,
+			pendingChangeCount: 1,
+			canAttemptLocalRebase: true,
+		} );
+
 	it( 'rebases stale-base local changes over remote serialized block changes', () => {
 		const baseContent =
 			'<!-- wp:paragraph --><p>Alpha</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Beta</p><!-- /wp:paragraph -->';
@@ -397,6 +408,134 @@ describe( 'distributed editing session state', () => {
 		expect( result.candidatePostContent ).toBe(
 			'<!-- wp:paragraph --><p>Local alpha</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Remote beta</p><!-- /wp:paragraph -->'
 		);
+	} );
+
+	it( 'rebases one-sided insertion into an empty serialized post', () => {
+		const localContent =
+			'<!-- wp:paragraph --><p>Local draft</p><!-- /wp:paragraph -->';
+		const result = getDistributedEditingStaleBaseLocalRebaseResult( {
+			currentSessionState: getReadyStaleBaseLocalRebaseSessionState(),
+			clientBaseContent: '',
+			serverContent: '',
+			localContent,
+		} );
+
+		expect( result ).toMatchObject( {
+			status: DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.REBASED,
+			reason: null,
+			hasCandidatePostContent: true,
+			mergedBlockCount: 1,
+			readyToRetrySubmit: true,
+			requiresManualConflictResolution: false,
+		} );
+		expect( result.candidatePostContent ).toBe( localContent );
+	} );
+
+	it( 'rebases one-sided serialized block deletion', () => {
+		const baseContent =
+			'<!-- wp:paragraph --><p>Alpha</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Beta</p><!-- /wp:paragraph -->';
+		const localContent =
+			'<!-- wp:paragraph --><p>Alpha</p><!-- /wp:paragraph -->';
+		const result = getDistributedEditingStaleBaseLocalRebaseResult( {
+			currentSessionState: getReadyStaleBaseLocalRebaseSessionState(),
+			clientBaseContent: baseContent,
+			serverContent: baseContent,
+			localContent,
+		} );
+
+		expect( result ).toMatchObject( {
+			status: DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.REBASED,
+			reason: null,
+			hasCandidatePostContent: true,
+			mergedBlockCount: 1,
+			readyToRetrySubmit: true,
+			requiresManualConflictResolution: false,
+		} );
+		expect( result.candidatePostContent ).toBe( localContent );
+	} );
+
+	it( 'requires manual conflict for concurrent serialized block insertions', () => {
+		const baseContent =
+			'<!-- wp:paragraph --><p>Alpha</p><!-- /wp:paragraph -->';
+		const result = getDistributedEditingStaleBaseLocalRebaseResult( {
+			currentSessionState: getReadyStaleBaseLocalRebaseSessionState(),
+			clientBaseContent: baseContent,
+			serverContent:
+				'<!-- wp:paragraph --><p>Alpha</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Remote beta</p><!-- /wp:paragraph -->',
+			localContent:
+				'<!-- wp:paragraph --><p>Alpha</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Local gamma</p><!-- /wp:paragraph -->',
+		} );
+
+		expect( result ).toMatchObject( {
+			status: DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.MANUAL_CONFLICT_REQUIRED,
+			reason: 'block_inserted',
+			hasCandidatePostContent: false,
+			readyToRetrySubmit: false,
+			requiresManualConflictResolution: true,
+		} );
+	} );
+
+	it( 'requires manual conflict for concurrent serialized block deletions', () => {
+		const baseContent =
+			'<!-- wp:paragraph --><p>Alpha</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Beta</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Gamma</p><!-- /wp:paragraph -->';
+		const result = getDistributedEditingStaleBaseLocalRebaseResult( {
+			currentSessionState: getReadyStaleBaseLocalRebaseSessionState(),
+			clientBaseContent: baseContent,
+			serverContent:
+				'<!-- wp:paragraph --><p>Alpha</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Beta</p><!-- /wp:paragraph -->',
+			localContent:
+				'<!-- wp:paragraph --><p>Alpha</p><!-- /wp:paragraph -->',
+		} );
+
+		expect( result ).toMatchObject( {
+			status: DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.MANUAL_CONFLICT_REQUIRED,
+			reason: 'block_deleted',
+			hasCandidatePostContent: false,
+			readyToRetrySubmit: false,
+			requiresManualConflictResolution: true,
+		} );
+	} );
+
+	it( 'requires manual conflict for serialized block reorder against local edits', () => {
+		const alphaBlock =
+			'<!-- wp:paragraph --><p>Alpha</p><!-- /wp:paragraph -->';
+		const betaBlock =
+			'<!-- wp:paragraph --><p>Beta</p><!-- /wp:paragraph -->';
+		const localAlphaBlock =
+			'<!-- wp:paragraph --><p>Local alpha</p><!-- /wp:paragraph -->';
+		const result = getDistributedEditingStaleBaseLocalRebaseResult( {
+			currentSessionState: getReadyStaleBaseLocalRebaseSessionState(),
+			clientBaseContent: alphaBlock + betaBlock,
+			serverContent: betaBlock + alphaBlock,
+			localContent: localAlphaBlock + betaBlock,
+		} );
+
+		expect( result ).toMatchObject( {
+			status: DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.MANUAL_CONFLICT_REQUIRED,
+			reason: 'block_reordered',
+			hasCandidatePostContent: false,
+			readyToRetrySubmit: false,
+			requiresManualConflictResolution: true,
+		} );
+	} );
+
+	it( 'rejects freeform HTML local rebase content as unsafe', () => {
+		const baseContent =
+			'<!-- wp:paragraph --><p>Alpha</p><!-- /wp:paragraph -->';
+		const result = getDistributedEditingStaleBaseLocalRebaseResult( {
+			currentSessionState: getReadyStaleBaseLocalRebaseSessionState(),
+			clientBaseContent: baseContent,
+			serverContent: baseContent,
+			localContent: '<p>Freeform alpha</p>',
+		} );
+
+		expect( result ).toMatchObject( {
+			status: DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.UNSAFE_CONTENT_BOUNDARY,
+			reason: 'freeform_html',
+			hasCandidatePostContent: false,
+			readyToRetrySubmit: false,
+			requiresManualConflictResolution: true,
+		} );
 	} );
 
 	it( 'rebases stale-base local changes from remembered base and refetched server content', () => {

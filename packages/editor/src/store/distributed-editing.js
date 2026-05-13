@@ -1007,7 +1007,24 @@ function getSerializedBlockLocalRebaseCandidate( {
 	) {
 		return {
 			status: 'manual_conflict_required',
-			reason: 'block_count_changed',
+			reason: getSerializedBlockStructureConflictReason(
+				baseBlocks.blocks,
+				serverBlocks.blocks,
+				localBlocks.blocks
+			),
+		};
+	}
+
+	if (
+		isPureSerializedBlockReorder(
+			baseBlocks.blocks,
+			serverBlocks.blocks
+		) ||
+		isPureSerializedBlockReorder( baseBlocks.blocks, localBlocks.blocks )
+	) {
+		return {
+			status: 'manual_conflict_required',
+			reason: 'block_reordered',
 		};
 	}
 
@@ -1041,6 +1058,79 @@ function getSerializedBlockLocalRebaseCandidate( {
 	};
 }
 
+function getSerializedBlockStructureConflictReason(
+	baseBlocks,
+	serverBlocks,
+	localBlocks
+) {
+	if (
+		isPureSerializedBlockReorder( baseBlocks, serverBlocks ) ||
+		isPureSerializedBlockReorder( baseBlocks, localBlocks )
+	) {
+		return 'block_reordered';
+	}
+
+	const serverDelta = serverBlocks.length - baseBlocks.length;
+	const localDelta = localBlocks.length - baseBlocks.length;
+	const changedDeltas = [ serverDelta, localDelta ].filter(
+		( delta ) => delta !== 0
+	);
+
+	if (
+		changedDeltas.length > 0 &&
+		changedDeltas.every( ( delta ) => delta > 0 )
+	) {
+		return 'block_inserted';
+	}
+
+	if (
+		changedDeltas.length > 0 &&
+		changedDeltas.every( ( delta ) => delta < 0 )
+	) {
+		return 'block_deleted';
+	}
+
+	return 'block_count_changed';
+}
+
+function isPureSerializedBlockReorder( baseBlocks, candidateBlocks ) {
+	if (
+		baseBlocks.length <= 1 ||
+		baseBlocks.length !== candidateBlocks.length ||
+		baseBlocks.every(
+			( block, index ) => block === candidateBlocks[ index ]
+		)
+	) {
+		return false;
+	}
+
+	return haveSameSerializedBlockMultiset( baseBlocks, candidateBlocks );
+}
+
+function haveSameSerializedBlockMultiset( firstBlocks, secondBlocks ) {
+	const counts = new Map();
+
+	for ( const block of firstBlocks ) {
+		counts.set( block, ( counts.get( block ) ?? 0 ) + 1 );
+	}
+
+	for ( const block of secondBlocks ) {
+		const count = counts.get( block );
+
+		if ( ! count ) {
+			return false;
+		}
+
+		if ( count === 1 ) {
+			counts.delete( block );
+		} else {
+			counts.set( block, count - 1 );
+		}
+	}
+
+	return counts.size === 0;
+}
+
 function getSerializedBlockTokens( content ) {
 	if ( typeof content !== 'string' ) {
 		return {
@@ -1063,6 +1153,13 @@ function getSerializedBlockTokens( content ) {
 
 	while ( offset < content.length ) {
 		const openingCommentStart = content.indexOf( '<!-- wp:', offset );
+
+		if ( openingCommentStart === -1 ) {
+			return {
+				status: 'unsafe',
+				reason: 'freeform_html',
+			};
+		}
 
 		if ( openingCommentStart !== offset ) {
 			return {
