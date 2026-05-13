@@ -4,6 +4,11 @@
 
 Getting started, extension points, and integration patterns.
 
+The examples below distinguish between two surfaces:
+
+-   **Core cropper API**: plain `CropperState`, `TransformOperation[]`, source-region helpers, and canvas export helpers. This surface has no React dependency and no undo/redo policy.
+-   **React adapter**: `<Cropper>`, `useCropperState`, and the controller object used by the media editor UI. This surface provides the bundled UI wiring over core state.
+
 ## Getting started
 
 ### Step 1: Mount a basic cropper
@@ -32,16 +37,15 @@ The cropper fills its parent container. Wrap it in a sized element:
 </div>
 ```
 
-### Step 2: Add controls
+### Step 2: Add React controls
 
-`useCropperState` returns a single `controller` object bundling the state and a named setter for every supported transition:
+`useCropperState` is the bundled React controller used by the media editor UI. It wraps the core cropper state with named setters that are convenient for controls:
 
 ```tsx
 const controller = useCropperState();
 const {
   state,
-  setZoom, setZoomAtPoint, setRotation, setFlip, snapRotate90, setCropRect,
-  applyOperation, reset, isDirty, getCroppedImage,
+  setZoom, toggleFlip, snapRotate90, reset, isDirty, getCroppedImage,
 } = controller;
 
 // Zoom slider
@@ -53,7 +57,7 @@ const {
 <button onClick={ () => snapRotate90( 1 ) }>Rotate right</button>
 
 // Flip
-<button onClick={ () => setFlip( { horizontal: !state.flip.horizontal, vertical: state.flip.vertical } ) }>
+<button onClick={ () => toggleFlip( 'horizontal' ) }>
   Flip H
 </button>
 
@@ -79,10 +83,10 @@ const pct = getSourceRegionPercent( state, { width: naturalWidth, height: natura
 ## Architecture overview
 
 ```
-Consumer (plugin/theme/AI agent)
+React UI / media editor shell
     |
     v
-useCropperState()          -- State management (reducer + convenience setters)
+useCropperState()          -- React controller over core state
     |
     v
 <Cropper>                  -- Orchestrates rendering and interaction
@@ -92,7 +96,7 @@ useCropperState()          -- State management (reducer + convenience setters)
     +-- useTransformStyle()-- State → CSS matrix
     |
     v
-Pipeline / Export          -- TransformOperation[] → canvas → Blob
+Core helpers              -- TransformOperation[] → source region / canvas export
 ```
 
 ## Extension points
@@ -131,9 +135,9 @@ function MyCropper() {
 | `stencilTransition` | `string?` | CSS transition for settle animation |
 | `cropBounds` | `{minX,minY,maxX,maxY}?` | Allowed crop handle limits |
 
-### 2. Transform pipeline (AI agent integration)
+### 2. Transform pipeline
 
-The pipeline is the primary interface for programmatic control. Operations are JSON-serializable, making them ideal for AI agents, undo/redo stacks, and remote control.
+The pipeline is the primary core API for programmatic control. Operations are JSON-serializable, making them useful for remote control, reproducible transforms, and history stacks in whichever shell owns history.
 
 ```typescript
 import { useCropperState } from '../image-editor';
@@ -331,10 +335,10 @@ Accepts any `CanvasImageSource`: `HTMLImageElement`, `HTMLCanvasElement`, `Offsc
 
 ### 7. State change notifications
 
-The `Cropper` component provides two notification mechanisms:
+The React `Cropper` component provides two notification mechanisms:
 
 - **`onStateChange`** — fires on every state change (every frame during a drag). Use for real-time syncing, live previews, or analytics.
-- **`onGestureStart` / `onGestureEnd`** — fire at gesture boundaries (pointerdown/pointerup, wheel burst start/end). Use for undo/redo snapshots, debounced saves, or "user finished editing" detection.
+- **`onGestureStart` / `onGestureEnd`** — fire at gesture boundaries (pointerdown/pointerup, wheel burst start/end). These are React adapter callbacks for shell behavior such as showing active UI, grouping modal undo history, or debounced saves. They are not part of the core cropper API.
 
 ```tsx
 <Cropper
@@ -345,12 +349,11 @@ The `Cropper` component provides two notification mechanisms:
     updateLivePreview( currentState );
   } }
   onGestureStart={ () => {
-    // User started interacting — snapshot for undo.
-    saveSnapshot( state );
+    setIsEditing( true );
   } }
   onGestureEnd={ () => {
-    // User finished interacting — safe to save/sync.
-    autosaveDraft( state );
+    setIsEditing( false );
+    queueDraftSave();
   } }
 />
 ```
@@ -498,149 +501,18 @@ const savedCropState = { ...state };
 const controller = useCropperState( savedCropState );
 ```
 
-### Undo/redo with gesture support
+### Undo/redo policy
 
-The `Cropper` component fires `onGestureStart` and `onGestureEnd` callbacks at the boundaries of continuous interactions (pan drags, handle resizes, wheel/pinch zoom). These let you snapshot state before and after each gesture, treating the entire drag as a single undo step.
+Undo/redo is not a core cropper concept. Core state is serializable and can be snapshotted or replayed through `TransformOperation[]`, but core does not decide where history boundaries are or how history is presented.
 
-**Two kinds of undo entries:**
+The bundled media editor React controller includes history state because the modal needs undo and redo controls. That history policy belongs to the React adapter and modal shell:
 
-1. **Toolbar operations** (rotate, flip, zoom buttons) — snapshot state before calling a setter, then apply the `TransformOperation`.
-2. **Gestures** (drag, resize, wheel zoom) — snapshot state in `onGestureStart`, compare with the current state in `onGestureEnd`, and push the before-state onto the undo stack.
+-   Continuous canvas interactions should undo as one user action.
+-   Sidebar controls such as zoom and toolbar controls such as fine rotation should also group repeated pointer/key changes into one undo entry.
+-   Discrete commands such as flip, 90° rotation, reset, and pipeline operations should create one undo entry per command.
+-   Modal shortcuts should route `Cmd/Ctrl+Z` and redo shortcuts to the React controller except when focus is inside metadata fields.
 
-See the `UndoRedo` story for a complete working example. Here is the core pattern:
-
-```tsx
-import { Cropper, useCropperState } from '../image-editor';
-import type { CropperState, TransformOperation } from '../image-editor';
-import { useState, useCallback, useRef, useEffect } from '@wordpress/element';
-
-function ImageEditorWithUndo( { src }: { src: string } ) {
-  const controller = useCropperState();
-  const { state, applyOperation, reset } = controller;
-
-  // Keep a ref to the latest state so gesture callbacks never go stale.
-  const stateRef = useRef( state );
-  stateRef.current = state;
-
-  // Undo/redo stacks store full CropperState snapshots.
-  const [ past, setPast ] = useState< CropperState[] >( [] );
-  const [ future, setFuture ] = useState< CropperState[] >( [] );
-
-  // Ref to hold the state snapshot captured at gesture start.
-  const snapshotRef = useRef< CropperState | null >( null );
-
-  // --- Toolbar operations ---
-
-  const applyToolbarOp = useCallback(
-    ( op: TransformOperation ) => {
-      // Snapshot current state before applying.
-      setPast( ( prev ) => [ ...prev, { ...state } ] );
-      setFuture( [] );
-      applyOperation( op );
-    },
-    [ state, applyOperation ]
-  );
-
-  // --- Gesture-based undo ---
-
-  const handleGestureStart = useCallback( () => {
-    // Capture state at the start of the gesture (via ref to avoid stale closure).
-    snapshotRef.current = { ...stateRef.current };
-  }, [] );
-
-  const handleGestureEnd = useCallback( () => {
-    if ( ! snapshotRef.current ) {
-      return;
-    }
-    const before = snapshotRef.current;
-    snapshotRef.current = null;
-
-    // Push the before-state as an undo entry.
-    setPast( ( prev ) => [ ...prev, before ] );
-    setFuture( [] );
-  }, [] );
-
-  // --- Undo / Redo ---
-
-  const undo = useCallback( () => {
-    if ( past.length === 0 ) {
-      return;
-    }
-    const newPast = [ ...past ];
-    const previous = newPast.pop()!;
-    setPast( newPast );
-    setFuture( ( prev ) => [ ...prev, { ...state } ] );
-    reset( previous );
-  }, [ past, state, reset ] );
-
-  const redo = useCallback( () => {
-    if ( future.length === 0 ) {
-      return;
-    }
-    const newFuture = [ ...future ];
-    const next = newFuture.pop()!;
-    setPast( ( prev ) => [ ...prev, { ...state } ] );
-    setFuture( newFuture );
-    reset( next );
-  }, [ future, state, reset ] );
-
-  // --- Keyboard shortcuts (use refs to avoid stale closures) ---
-
-  const undoRef = useRef( undo );
-  const redoRef = useRef( redo );
-  undoRef.current = undo;
-  redoRef.current = redo;
-
-  useEffect( () => {
-    const handler = ( e: KeyboardEvent ) => {
-      if ( ( e.metaKey || e.ctrlKey ) && e.key === 'z' ) {
-        e.preventDefault();
-        if ( e.shiftKey ) {
-          redoRef.current();
-        } else {
-          undoRef.current();
-        }
-      }
-    };
-    document.addEventListener( 'keydown', handler );
-    return () => document.removeEventListener( 'keydown', handler );
-  }, [] );
-
-  return (
-    <div>
-      <div>
-        <button onClick={ undo } disabled={ past.length === 0 }>
-          Undo ({ past.length })
-        </button>
-        <button onClick={ redo } disabled={ future.length === 0 }>
-          Redo ({ future.length })
-        </button>
-        <button onClick={ () => applyToolbarOp( { type: 'rotate', degrees: 15 } ) }>
-          Rotate +15
-        </button>
-      </div>
-
-      <Cropper
-        src={ src }
-        controller={ controller }
-        freeformCrop
-        onGestureStart={ handleGestureStart }
-        onGestureEnd={ handleGestureEnd }
-      />
-    </div>
-  );
-}
-```
-
-**Key implementation details:**
-
-| Concern | Solution |
-|---------|----------|
-| Stale closures in gesture callbacks | Use `useRef` for state (`stateRef`) and snapshot (`snapshotRef`). The callbacks are stable (`[]` deps) and always read the latest value. |
-| Stale closures in keyboard handler | Use `undoRef` / `redoRef` updated on every render, with the listener registered once (`[]` deps). |
-| Wheel zoom boundaries | The `useInteraction` hook debounces wheel events — it fires `onGestureStart` on the first scroll tick and `onGestureEnd` after 300ms of inactivity, grouping a burst of scroll events into one undo step. |
-| Handle resize settle | `onGestureEnd` fires after the settle animation (crop re-centers). The undo snapshot captures the final settled state. |
-| Pipeline display | For toolbar ops, log the `TransformOperation`. For gestures, compare before/after state and generate a descriptive label (e.g., "gesture: pan, zoom 1.5x"). |
+If another shell reuses the core cropper directly, it should define its own history policy around snapshots or transform operations rather than depending on the media editor's React history plumbing.
 
 ## Accessibility
 
@@ -648,13 +520,16 @@ The cropper is keyboard-accessible and screen-reader friendly:
 
 **Keyboard controls:**
 - **Arrow keys** on the container: pan the image (Shift for larger jumps)
-- **+/-** on the container: zoom in/out
+- **+/-** or **=/_** on the container: zoom in/out
 - **R** on the container: snap rotate 90°
+- **Shift+R** on the container: snap rotate 90° counter-clockwise
+- **H** on the container: flip horizontally
+- **V** on the container: flip vertically
 - **Tab** to crop handles, then **arrow keys** to resize (Shift for larger jumps)
 - Aspect ratio lock is respected during keyboard resize
 
 **Screen reader support:**
-- Container is a focusable `role="group"` with `aria-label="Image editor"`. We deliberately avoid `role="application"` because it disables the screen reader's default keybindings — too heavy for a single widget.
+- Container is a focusable `role="group"` with `aria-label="Crop area"`. We deliberately avoid `role="application"` because it disables the screen reader's default keybindings — too heavy for a single widget.
 - Resize handles are native `<button>` elements with descriptive `aria-label` (e.g., "Resize top-left corner"). Native buttons give correct focus behavior and announcements without extra ARIA.
 - An ARIA live region announces state changes (zoom, rotation, crop dimensions) with 300ms debounce.
 
