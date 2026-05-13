@@ -176,16 +176,9 @@ async function dragBetweenCells( {
 	const startX = startBox.x + Math.min( 20, startBox.width / 2 );
 	const endX = endBox.x + Math.min( 20, endBox.width / 2 );
 
-	await page.mouse.move(
-		startX,
-		startBox.y + startBox.height / 2
-	);
+	await page.mouse.move( startX, startBox.y + startBox.height / 2 );
 	await page.mouse.down();
-	await page.mouse.move(
-		endX,
-		endBox.y + endBox.height / 2,
-		{ steps: 12 }
-	);
+	await page.mouse.move( endX, endBox.y + endBox.height / 2, { steps: 12 } );
 	await page.mouse.up();
 }
 
