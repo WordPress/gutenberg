@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { select as dataSelect, useDispatch, useSelect } from '@wordpress/data';
 import { useRef } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
@@ -10,7 +10,10 @@ import { comment as commentIcon } from '@wordpress/icons';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as interfaceStore } from '@wordpress/interface';
 import { store as preferencesStore } from '@wordpress/preferences';
-import { getFormatType, registerFormatType } from '@wordpress/rich-text';
+import {
+	registerFormatType,
+	store as richTextStore,
+} from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
@@ -38,7 +41,7 @@ import { unlock } from '../../lock-unlock';
 
 // Guard against repeated module evaluation under HMR; `registerFormatType`
 // warns when the same name is registered twice.
-if ( ! getFormatType( NOTE_FORMAT_NAME ) ) {
+if ( ! dataSelect( richTextStore ).getFormatType( NOTE_FORMAT_NAME ) ) {
 	registerFormatType( NOTE_FORMAT_NAME, noteFormat );
 }
 
