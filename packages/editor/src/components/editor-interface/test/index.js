@@ -54,6 +54,7 @@ jest.mock( '../../distributed-editing-status', () => {
 
 afterEach( () => {
 	delete globalThis.__experimentalDistributedEditingStatusInspector;
+	window.history.pushState( {}, '', '/' );
 } );
 
 describe( 'EditorInterfaceNotices', () => {
@@ -76,6 +77,16 @@ describe( 'EditorInterfaceNotices', () => {
 
 	it( 'mounts distributed editing inspector behind the manual browser flag', () => {
 		globalThis.__experimentalDistributedEditingStatusInspector = true;
+
+		render( <EditorInterfaceNotices /> );
+
+		expect(
+			screen.getByText( 'Distributed editing status inspector mount' )
+		).toBeVisible();
+	} );
+
+	it( 'mounts distributed editing inspector behind the development URL flag', () => {
+		window.history.pushState( {}, '', '/?de-rtc-inspector=1' );
 
 		render( <EditorInterfaceNotices /> );
 

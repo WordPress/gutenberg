@@ -27,7 +27,23 @@ export default function EditorInterfaceNotices() {
 }
 
 function shouldRenderDistributedEditingStatusInspector() {
-	return Boolean(
-		globalThis?.__experimentalDistributedEditingStatusInspector
+	if (
+		Boolean( globalThis?.__experimentalDistributedEditingStatusInspector )
+	) {
+		return true;
+	}
+
+	return isDistributedEditingStatusInspectorUrlFlagPresent();
+}
+
+function isDistributedEditingStatusInspectorUrlFlagPresent() {
+	if ( ! globalThis?.location?.search ) {
+		return false;
+	}
+
+	return (
+		new URLSearchParams( globalThis.location.search ).get(
+			'de-rtc-inspector'
+		) === '1'
 	);
 }
