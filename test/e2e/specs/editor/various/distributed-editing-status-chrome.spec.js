@@ -7,11 +7,45 @@ const BASE_CONTENT =
 	'<!-- wp:paragraph --><p>Original client base</p><!-- /wp:paragraph -->';
 const SERVER_CONTENT =
 	'<!-- wp:paragraph --><p>Server changed copy</p><!-- /wp:paragraph -->';
+const PRODUCTION_STATUS_CHROME_SELECTOR =
+	'[data-distributed-editing-placement="editor-interface-notices"][role="region"][aria-label="Distributed editing status"]';
+const INTERNAL_INSPECTOR_SELECTOR =
+	'[data-distributed-editing-placement="internal-inspector"]';
 
 function getStatusChrome( page ) {
-	return page.locator(
-		'[data-distributed-editing-placement="editor-interface-notices"]'
+	return page.locator( PRODUCTION_STATUS_CHROME_SELECTOR );
+}
+
+function getActionStatus( statusChrome ) {
+	return statusChrome.locator(
+		'[data-distributed-editing-action-status][role="status"]'
 	);
+}
+
+async function getDistributedEditingState( page ) {
+	return page.evaluate( () => {
+		const state = window.wp.data
+			.select( 'core/editor' )
+			.getDistributedEditingSessionState();
+
+		return {
+			disposition: state.disposition,
+			readyToRetrySubmit: state.readyToRetrySubmit,
+			retrySubmitHandoffStatus: state.retrySubmitHandoffStatus,
+			retrySubmitPrepared: state.retrySubmitPrepared,
+			retrySubmitProofStatus: state.retrySubmitProofStatus,
+			retrySubmitAccepted: state.retrySubmitAccepted,
+			retrySubmitSavePathRequired: state.retrySubmitSavePathRequired,
+			retrySubmitSaveStatus: state.retrySubmitSaveStatus,
+			retrySubmitSavePrepared: state.retrySubmitSavePrepared,
+			retrySubmitSaveReady: state.retrySubmitSaveReady,
+			retrySubmitSavesPost: state.retrySubmitSavesPost,
+			retrySubmitMutatesPostContent: state.retrySubmitMutatesPostContent,
+			retrySubmitCreatesRevision: state.retrySubmitCreatesRevision,
+			retrySubmitClaimsSaved: state.retrySubmitClaimsSaved,
+			canExportLocalUpdates: state.canExportLocalUpdates,
+		};
+	} );
 }
 
 function isRetrySubmitProofRequest( url ) {
@@ -19,6 +53,15 @@ function isRetrySubmitProofRequest( url ) {
 		decodeURIComponent( url.href ).includes( '/wp/v2/posts/' ) &&
 		decodeURIComponent( url.href ).includes(
 			'/distributed-editing/retry-submit'
+		)
+	);
+}
+
+function isGuardedRetrySaveRequest( url ) {
+	return (
+		decodeURIComponent( url.href ).includes( '/wp/v2/posts/' ) &&
+		decodeURIComponent( url.href ).includes(
+			'/distributed-editing/retry-save'
 		)
 	);
 }
@@ -67,6 +110,7 @@ test.describe( 'Distributed Editing status chrome', () => {
 		).toBeFocused();
 
 		let proofRequestCount = 0;
+		let guardedRetrySaveRequestCount = 0;
 		await page.route( isRetrySubmitProofRequest, async ( route ) => {
 			const request = route.request();
 
@@ -99,12 +143,28 @@ test.describe( 'Distributed Editing status chrome', () => {
 				} ),
 			} );
 		} );
+		await page.route( isGuardedRetrySaveRequest, async ( route ) => {
+			guardedRetrySaveRequestCount += 1;
+
+			await route.fulfill( {
+				status: 500,
+				contentType: 'application/json',
+				body: JSON.stringify( {
+					code: 'unexpected_retry_save_request',
+					message:
+						'The status chrome spec should not call guarded retry-save.',
+				} ),
+			} );
+		} );
 
 		// There is no public editor workflow yet that can create the stale-base
 		// local-rebase handoff. Seed that state, then drive the production chrome.
 		await seedPostRebaseState( page );
 
 		const statusChrome = getStatusChrome( page );
+		await expect(
+			page.locator( INTERNAL_INSPECTOR_SELECTOR )
+		).toBeHidden();
 		await expect( statusChrome ).toBeVisible();
 		await expect(
 			statusChrome.getByText( 'Local changes rebased' )
@@ -114,10 +174,39 @@ test.describe( 'Distributed Editing status chrome', () => {
 				'Local changes were merged with the server version and are ready for the next submit.'
 			)
 		).toBeVisible();
+		await expect(
+			statusChrome.getByRole( 'button', {
+				name: 'Export local changes',
+			} )
+		).toBeVisible();
+		await expect(
+			statusChrome.getByRole( 'button', {
+				name: 'Refresh server version',
+			} )
+		).toBeVisible();
+		await expect(
+			statusChrome.getByRole( 'button', {
+				name: 'Prepare retry submit',
+			} )
+		).toBeVisible();
+		await expect(
+			statusChrome.getByRole( 'button', {
+				name: 'Refresh retry proof',
+			} )
+		).toBeHidden();
+		await expect(
+			statusChrome.getByRole( 'button', {
+				name: 'Prepare guarded save',
+			} )
+		).toBeHidden();
 
 		await statusChrome
 			.getByRole( 'button', { name: 'Prepare retry submit' } )
 			.click();
+		await expect( getActionStatus( statusChrome ) ).toHaveAttribute(
+			'data-distributed-editing-action-status',
+			'info'
+		);
 		await expect(
 			statusChrome.getByText(
 				'Retry submit prepared. Request server proof when ready.'
@@ -128,10 +217,28 @@ test.describe( 'Distributed Editing status chrome', () => {
 				'Local changes are staged for the future retry path. No save has been sent yet.'
 			)
 		).toBeVisible();
+		await expect
+			.poll( () => getDistributedEditingState( page ) )
+			.toMatchObject( {
+				disposition: 'rejected_stale_base_version',
+				retrySubmitHandoffStatus: 'prepared',
+				retrySubmitPrepared: true,
+				readyToRetrySubmit: false,
+				canExportLocalUpdates: true,
+			} );
+		await expect(
+			statusChrome.getByRole( 'button', {
+				name: 'Refresh retry proof',
+			} )
+		).toBeVisible();
 
 		await statusChrome
 			.getByRole( 'button', { name: 'Refresh retry proof' } )
 			.click();
+		await expect( getActionStatus( statusChrome ) ).toHaveAttribute(
+			'data-distributed-editing-action-status',
+			'info'
+		);
 		await expect(
 			statusChrome.getByText(
 				'Retry submit proof refreshed. Save again to continue through the guarded retry path.'
@@ -142,10 +249,38 @@ test.describe( 'Distributed Editing status chrome', () => {
 				'Retry submit accepted the rebased changes for a future save. Local changes are still awaiting confirmation.'
 			)
 		).toBeVisible();
+		await expect(
+			statusChrome.getByRole( 'button', {
+				name: 'Refresh retry proof',
+			} )
+		).toBeHidden();
+		await expect(
+			statusChrome.getByRole( 'button', {
+				name: 'Prepare guarded save',
+			} )
+		).toBeVisible();
+		await expect
+			.poll( () => getDistributedEditingState( page ) )
+			.toMatchObject( {
+				disposition: 'idle',
+				retrySubmitProofStatus: 'accepted_for_future_save',
+				retrySubmitAccepted: true,
+				retrySubmitSavePathRequired: true,
+				retrySubmitSaveStatus: 'none',
+				retrySubmitSavesPost: false,
+				retrySubmitMutatesPostContent: false,
+				retrySubmitCreatesRevision: false,
+				retrySubmitClaimsSaved: false,
+				canExportLocalUpdates: true,
+			} );
 
 		await statusChrome
 			.getByRole( 'button', { name: 'Prepare guarded save' } )
 			.click();
+		await expect( getActionStatus( statusChrome ) ).toHaveAttribute(
+			'data-distributed-editing-action-status',
+			'info'
+		);
 		await expect(
 			statusChrome.getByText(
 				'Guarded save path prepared. Save again to submit through the retry path.'
@@ -158,26 +293,8 @@ test.describe( 'Distributed Editing status chrome', () => {
 		).toBeVisible();
 
 		await expect
-			.poll( () =>
-				page.evaluate( () => {
-					const state = window.wp.data
-						.select( 'core/editor' )
-						.getDistributedEditingSessionState();
-
-					return {
-						retrySubmitSaveStatus: state.retrySubmitSaveStatus,
-						retrySubmitSavePrepared: state.retrySubmitSavePrepared,
-						retrySubmitSaveReady: state.retrySubmitSaveReady,
-						retrySubmitSavesPost: state.retrySubmitSavesPost,
-						retrySubmitMutatesPostContent:
-							state.retrySubmitMutatesPostContent,
-						retrySubmitCreatesRevision:
-							state.retrySubmitCreatesRevision,
-						retrySubmitClaimsSaved: state.retrySubmitClaimsSaved,
-					};
-				} )
-			)
-			.toEqual( {
+			.poll( () => getDistributedEditingState( page ) )
+			.toMatchObject( {
 				retrySubmitSaveStatus: 'ready',
 				retrySubmitSavePrepared: true,
 				retrySubmitSaveReady: true,
@@ -187,5 +304,6 @@ test.describe( 'Distributed Editing status chrome', () => {
 				retrySubmitClaimsSaved: false,
 			} );
 		expect( proofRequestCount ).toBe( 1 );
+		expect( guardedRetrySaveRequestCount ).toBe( 0 );
 	} );
 } );
