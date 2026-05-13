@@ -1458,12 +1458,12 @@ describe( 'distributed editing session state', () => {
 	} );
 
 	it( 'summarizes board-demo retry-save flow progress without exposing raw content', () => {
-		const baseContent =
-			'<!-- wp:paragraph --><p>Base</p><!-- /wp:paragraph -->';
-		const serverContent =
-			'<!-- wp:paragraph --><p>Server</p><!-- /wp:paragraph -->';
-		const localContent =
-			'<!-- wp:paragraph --><p>Local</p><!-- /wp:paragraph -->';
+		const baseRawToken = 'alpha-raw-turn-0051';
+		const serverRawToken = 'bravo-raw-turn-0051';
+		const localRawToken = 'charlie-raw-turn-0051';
+		const baseContent = `<!-- wp:paragraph --><p>${ baseRawToken }</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>unchanged second</p><!-- /wp:paragraph -->`;
+		const serverContent = `<!-- wp:paragraph --><p>${ baseRawToken }</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>${ serverRawToken }</p><!-- /wp:paragraph -->`;
+		const localContent = `<!-- wp:paragraph --><p>${ localRawToken }</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>unchanged second</p><!-- /wp:paragraph -->`;
 		const refetchedState =
 			getDistributedEditingSessionStateForStaleBaseServerStateRefetchResult(
 				{
@@ -1555,9 +1555,11 @@ describe( 'distributed editing session state', () => {
 		} );
 		expect( preparedFlow ).not.toHaveProperty( 'clientBaseContent' );
 		expect( preparedFlow ).not.toHaveProperty( 'refetchedServerContent' );
-		expect( JSON.stringify( preparedFlow ) ).not.toContain( 'Base' );
-		expect( JSON.stringify( preparedFlow ) ).not.toContain( 'Server' );
-		expect( JSON.stringify( preparedFlow ) ).not.toContain( 'Local' );
+		expect( JSON.stringify( preparedFlow ) ).not.toContain( baseRawToken );
+		expect( JSON.stringify( preparedFlow ) ).not.toContain(
+			serverRawToken
+		);
+		expect( JSON.stringify( preparedFlow ) ).not.toContain( localRawToken );
 		expect(
 			hasDistributedEditingRetrySaveSavedStateEvidenceForSessionState(
 				preparedState

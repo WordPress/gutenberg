@@ -2304,6 +2304,10 @@ describe( 'Post actions', () => {
 					retrySaveStatus:
 						DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVED,
 					retrySaveAccepted: true,
+					retrySaveServerVersion: '8',
+					retrySaveSavesPost: true,
+					retrySaveMutatesPostContent: true,
+					retrySaveClaimsSaved: true,
 				} );
 
 			await expect(

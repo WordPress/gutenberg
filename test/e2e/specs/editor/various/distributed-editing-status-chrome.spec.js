@@ -73,7 +73,6 @@ async function getDistributedEditingState( page ) {
 			requiresServerStateRefetch: state.requiresServerStateRefetch,
 			refetchedServerContent: state.refetchedServerContent,
 			refetchedServerState: state.refetchedServerState,
-			retrySaveStatus: state.retrySaveStatus,
 			retrySaveHandoffStatus: state.retrySaveHandoffStatus,
 			retrySaveHandoffReason: state.retrySaveHandoffReason,
 			retrySaveHandoffBlocksNormalSave:
