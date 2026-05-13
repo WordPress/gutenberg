@@ -19,6 +19,8 @@ import {
 	DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES,
 	DISTRIBUTED_EDITING_NOTICE_KINDS,
 	DISTRIBUTED_EDITING_REASON_CODES,
+	DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES,
+	DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_STATUSES,
 	DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_REASONS,
 	DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_STATUSES,
 	DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES,
@@ -27,6 +29,8 @@ import {
 	DISTRIBUTED_EDITING_RETRY_SAVE_HANDOFF_STATUSES,
 	DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS,
 	DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES,
+	DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS,
+	DISTRIBUTED_EDITING_SAVE_POLICY_STATUSES,
 	DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE,
 } from '../distributed-editing';
 import { store as editorStore } from '..';
@@ -79,6 +83,200 @@ const getMethod = ( options ) =>
 	options.headers?.[ 'X-HTTP-Method-Override' ] || options.method || 'GET';
 
 describe( 'Post actions', () => {
+	describe( '__experimentalOpenDistributedEditingRiskyBlockReview()', () => {
+		it( 'opens the pre-publish sidebar when risky-block policy requires review', async () => {
+			const registry = createRegistryWithStores();
+
+			registry
+				.dispatch( editorStore )
+				.setDistributedEditingSessionState( {
+					riskyBlockReviewStatus:
+						DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_STATUSES.REVIEW_REQUIRED,
+					riskyBlockReviewItems: [
+						{
+							id: 'risk-html-added',
+							blockClientId: 'block-risk-html-added',
+							reviewStatus:
+								DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES.PENDING_REVIEW,
+						},
+					],
+					riskyBlockReviewPendingCount: 1,
+					riskyBlockReviewPrePublishPanelRequired: true,
+				} );
+
+			expect(
+				registry.select( editorStore ).isPublishSidebarOpened()
+			).toBe( false );
+
+			const result = await registry
+				.dispatch( editorStore )
+				.__experimentalOpenDistributedEditingRiskyBlockReview();
+
+			expect( result ).toMatchObject( {
+				status: 'pre_publish_review_opened',
+				opensPublishSidebar: true,
+				focusesReviewPanel: true,
+				reviewPanel: 'distributed_editing_risky_block_review',
+				savesPost: false,
+				callsNormalSavePost: false,
+				callsRetrySaveEndpoint: false,
+				mutatesEditorContent: false,
+				changesPostLock: false,
+				claimsSaved: false,
+			} );
+			expect(
+				registry.select( editorStore ).isPublishSidebarOpened()
+			).toBe( true );
+		} );
+
+		it( 'does not open the pre-publish sidebar when review is not required', async () => {
+			const registry = createRegistryWithStores();
+
+			const result = await registry
+				.dispatch( editorStore )
+				.__experimentalOpenDistributedEditingRiskyBlockReview();
+
+			expect( result ).toMatchObject( {
+				status: 'pre_publish_review_not_required',
+				opensPublishSidebar: false,
+				savesPost: false,
+				callsNormalSavePost: false,
+			} );
+			expect(
+				registry.select( editorStore ).isPublishSidebarOpened()
+			).toBe( false );
+		} );
+	} );
+
+	describe( '__experimentalFocusDistributedEditingRiskyBlockReviewItem()', () => {
+		it( 'returns a no-write block focus handoff for a review item', async () => {
+			const registry = createRegistryWithStores();
+
+			registry
+				.dispatch( editorStore )
+				.setDistributedEditingSessionState( {
+					riskyBlockReviewStatus:
+						DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_STATUSES.REVIEW_REQUIRED,
+					riskyBlockReviewItems: [
+						{
+							id: 'risk-html-added',
+							blockClientId: 'block-risk-html-added',
+							reviewStatus:
+								DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES.PENDING_REVIEW,
+						},
+					],
+					riskyBlockReviewPendingCount: 1,
+				} );
+
+			const result = await registry
+				.dispatch( editorStore )
+				.__experimentalFocusDistributedEditingRiskyBlockReviewItem(
+					'risk-html-added'
+				);
+
+			expect( result ).toMatchObject( {
+				status: 'review_item_block_focused',
+				reviewItemId: 'risk-html-added',
+				blockClientId: 'block-risk-html-added',
+				selectsBlock: true,
+				savesPost: false,
+				callsNormalSavePost: false,
+				callsRetrySaveEndpoint: false,
+				mutatesEditorContent: false,
+				changesPostLock: false,
+				claimsSaved: false,
+			} );
+		} );
+	} );
+
+	describe( '__experimentalResolveDistributedEditingRiskyBlockReviewItem()', () => {
+		it( 'records reviewer approval and rejection without writing', async () => {
+			const registry = createRegistryWithStores();
+
+			registry
+				.dispatch( editorStore )
+				.setDistributedEditingSessionState( {
+					riskyBlockReviewStatus:
+						DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_STATUSES.REVIEW_REQUIRED,
+					riskyBlockReviewItems: [
+						{
+							id: 'risk-approve',
+							reviewStatus:
+								DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES.PENDING_REVIEW,
+						},
+						{
+							id: 'risk-reject',
+							reviewStatus:
+								DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES.PENDING_REVIEW,
+						},
+					],
+					riskyBlockReviewPendingCount: 2,
+					riskyBlockReviewPrePublishPanelRequired: true,
+				} );
+
+			const approval = await registry
+				.dispatch( editorStore )
+				.__experimentalResolveDistributedEditingRiskyBlockReviewItem( {
+					reviewItemId: 'risk-approve',
+					decision: 'approved',
+				} );
+			const rejection = await registry
+				.dispatch( editorStore )
+				.__experimentalResolveDistributedEditingRiskyBlockReviewItem( {
+					reviewItemId: 'risk-reject',
+					decision: 'rejected',
+					rejectionReason: 'unsafe_script_change',
+				} );
+
+			expect( approval ).toMatchObject( {
+				status: 'review_item_resolved',
+				reviewItemId: 'risk-approve',
+				reviewStatus:
+					DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES.APPROVED_FOR_RETRY_SAVE,
+				savesPost: false,
+				callsNormalSavePost: false,
+				callsRetrySaveEndpoint: false,
+				mutatesEditorContent: false,
+				changesPostLock: false,
+				claimsSaved: false,
+			} );
+			expect( rejection ).toMatchObject( {
+				status: 'review_item_resolved',
+				reviewItemId: 'risk-reject',
+				reviewStatus:
+					DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES.REJECTED,
+				pendingReviewItemCount: 0,
+				approvedReviewItemCount: 1,
+				rejectedReviewItemCount: 1,
+				saveClickAction:
+					DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.CONTINUE_GUARDED_RETRY_SAVE,
+				savesPost: false,
+			} );
+			expect(
+				registry
+					.select( editorStore )
+					.getDistributedEditingRiskyBlockReviewState()
+			).toMatchObject( {
+				status: DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_STATUSES.REVIEW_RESOLVED,
+				pendingReviewItemCount: 0,
+				approvedReviewItemCount: 1,
+				rejectedReviewItemCount: 1,
+			} );
+			expect(
+				registry
+					.select( editorStore )
+					.getDistributedEditingSavePolicyState()
+			).toMatchObject( {
+				status: DISTRIBUTED_EDITING_SAVE_POLICY_STATUSES.READY_FOR_REVIEWED_RETRY_SAVE,
+				clickAction:
+					DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.CONTINUE_GUARDED_RETRY_SAVE,
+				savesPost: false,
+				shouldCallNormalSavePost: false,
+				shouldCallRetrySaveEndpoint: false,
+			} );
+		} );
+	} );
+
 	describe( '__experimentalRefreshDistributedEditingRecoveryDryRun()', () => {
 		it( 'requests a dry run for the current post and keeps success inert', async () => {
 			const post = {

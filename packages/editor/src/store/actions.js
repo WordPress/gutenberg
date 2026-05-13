@@ -39,10 +39,12 @@ import {
 	getDistributedEditingSessionStateForRetrySaveReviewApprovalProofResult,
 	getDistributedEditingSessionStateForRetrySaveRequest,
 	getDistributedEditingSessionStateForRetrySaveResult,
+	getDistributedEditingSessionStateForRiskyBlockReviewItemResolution,
 	getDistributedEditingSessionStateForRetrySubmitHandoff,
 	getDistributedEditingSessionStateForRetrySubmitProofResult,
 	getDistributedEditingSessionStateForRetrySubmitSavePreparation,
 	getDistributedEditingRetrySavePolicyForSessionState,
+	DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS,
 	getDistributedEditingStaleBaseLocalRebaseResult,
 	getDistributedEditingSessionStateForStaleBaseLocalRebasePlan,
 	getDistributedEditingSessionStateForStaleBaseRejectionResult,
@@ -218,6 +220,184 @@ export function resetDistributedEditingSessionState() {
 		type: 'RESET_DISTRIBUTED_EDITING_SESSION_STATE',
 	};
 }
+
+/**
+ * Opens the pre-publish review surface when DE-RTC risky-block policy requires
+ * human review. This is a UI handoff only: it does not save, retry-save,
+ * dispatch notices, mutate content, or change post locks.
+ *
+ * @return {Function} Action thunk.
+ */
+export const __experimentalOpenDistributedEditingRiskyBlockReview =
+	() =>
+	( { select, dispatch } ) => {
+		const savePolicy =
+			select.getDistributedEditingSavePolicyState?.() || {};
+		const shouldOpenPrePublishReview =
+			savePolicy.opensPrePublishReview ||
+			savePolicy.clickAction ===
+				DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.OPEN_PRE_PUBLISH_REVIEW;
+
+		if ( ! shouldOpenPrePublishReview ) {
+			return {
+				status: 'pre_publish_review_not_required',
+				opensPublishSidebar: false,
+				focusesReviewPanel: false,
+				savesPost: false,
+				callsNormalSavePost: false,
+				callsRetrySaveEndpoint: false,
+				dispatchesNotice: false,
+				mutatesEditorContent: false,
+				mutatesPersistedPostContent: false,
+				changesPostLock: false,
+				claimsSaved: false,
+			};
+		}
+
+		dispatch.openPublishSidebar();
+
+		return {
+			status: 'pre_publish_review_opened',
+			opensPublishSidebar: true,
+			focusesReviewPanel: true,
+			reviewPanel: 'distributed_editing_risky_block_review',
+			savesPost: false,
+			callsNormalSavePost: false,
+			callsRetrySaveEndpoint: false,
+			dispatchesNotice: false,
+			mutatesEditorContent: false,
+			mutatesPersistedPostContent: false,
+			changesPostLock: false,
+			claimsSaved: false,
+		};
+	};
+
+/**
+ * Focuses the editor block represented by a DE-RTC risky-block review item.
+ * Selecting a block is allowed for review ergonomics, but this action must not
+ * edit block content, save, retry-save, dispatch notices, or change post locks.
+ *
+ * @param {string} reviewItemId Risky-block review item id.
+ *
+ * @return {Function} Action thunk.
+ */
+export const __experimentalFocusDistributedEditingRiskyBlockReviewItem =
+	( reviewItemId ) =>
+	( { select, registry } ) => {
+		const reviewState =
+			select.getDistributedEditingRiskyBlockReviewState?.() || {};
+		const reviewItem = Array.isArray( reviewState.reviewItems )
+			? reviewState.reviewItems.find(
+					( item ) => item.id === reviewItemId
+			  )
+			: null;
+
+		if ( ! reviewItem ) {
+			return {
+				status: 'review_item_not_found',
+				reviewItemId,
+				selectsBlock: false,
+				savesPost: false,
+				mutatesEditorContent: false,
+				changesPostLock: false,
+				claimsSaved: false,
+			};
+		}
+
+		if ( reviewItem.blockClientId ) {
+			registry
+				.dispatch( blockEditorStore )
+				.selectBlock( reviewItem.blockClientId );
+		}
+
+		return {
+			status: reviewItem.blockClientId
+				? 'review_item_block_focused'
+				: 'review_item_has_no_block_client_id',
+			reviewItemId,
+			blockClientId: reviewItem.blockClientId,
+			selectsBlock: Boolean( reviewItem.blockClientId ),
+			savesPost: false,
+			callsNormalSavePost: false,
+			callsRetrySaveEndpoint: false,
+			dispatchesNotice: false,
+			mutatesEditorContent: false,
+			mutatesPersistedPostContent: false,
+			changesPostLock: false,
+			claimsSaved: false,
+		};
+	};
+
+/**
+ * Records a hash-only reviewer decision for one risky-block item. This updates
+ * only local DE-RTC session state for a future guarded save handoff.
+ *
+ * @param {Object} resolution Review decision data.
+ *
+ * @return {Function} Action thunk.
+ */
+export const __experimentalResolveDistributedEditingRiskyBlockReviewItem =
+	( resolution = {} ) =>
+	( { select, dispatch } ) => {
+		const reviewItemId = resolution.reviewItemId || resolution.id;
+		const currentSessionState =
+			select.getDistributedEditingSessionState?.() || {};
+		const currentItems = Array.isArray(
+			currentSessionState.riskyBlockReviewItems
+		)
+			? currentSessionState.riskyBlockReviewItems
+			: [];
+		const currentItem = currentItems.find(
+			( item ) => item.id === reviewItemId
+		);
+
+		if ( ! currentItem ) {
+			return {
+				status: 'review_item_not_found',
+				reviewItemId,
+				decision: resolution.decision || 'approved',
+				savesPost: false,
+				callsNormalSavePost: false,
+				callsRetrySaveEndpoint: false,
+				dispatchesNotice: false,
+				mutatesEditorContent: false,
+				mutatesPersistedPostContent: false,
+				changesPostLock: false,
+				claimsSaved: false,
+			};
+		}
+
+		const sessionState =
+			getDistributedEditingSessionStateForRiskyBlockReviewItemResolution(
+				currentSessionState,
+				resolution
+			);
+		const resolvedItem = sessionState.riskyBlockReviewItems.find(
+			( item ) => item.id === reviewItemId
+		);
+
+		dispatch.setDistributedEditingSessionState( sessionState );
+
+		return {
+			status: 'review_item_resolved',
+			reviewItemId,
+			decision: resolution.decision || 'approved',
+			reviewStatus: resolvedItem?.reviewStatus,
+			pendingReviewItemCount: sessionState.riskyBlockReviewPendingCount,
+			approvedReviewItemCount: sessionState.riskyBlockReviewApprovedCount,
+			rejectedReviewItemCount: sessionState.riskyBlockReviewRejectedCount,
+			saveClickAction: sessionState.riskyBlockReviewSaveClickAction,
+			savesPost: false,
+			callsNormalSavePost: false,
+			callsRetrySaveEndpoint: false,
+			dispatchesNotice: false,
+			mutatesEditorContent: false,
+			mutatesPersistedPostContent: false,
+			changesPostLock: false,
+			claimsSaved: false,
+			sessionState,
+		};
+	};
 
 /**
  * Requests a Distributed Editing recovery dry run and stores inert status.
@@ -589,95 +769,96 @@ export const __experimentalPrepareDistributedEditingRetrySubmitSaveAfterProof =
  * @return {Function} Action thunk.
  */
 export const __experimentalRefreshDistributedEditingRetrySaveReviewApprovalProof =
-	( options = {} ) =>
-	async ( { select, dispatch, registry } ) => {
-		const currentPost = select.getCurrentPost?.() || {};
-		const postType = options.postType || currentPost.type;
-		const postId = options.postId ?? currentPost.id;
-		const postTypeRecord = postType
-			? registry.select( coreStore ).getPostType( postType )
-			: null;
-		const restBase =
-			options.restBase ||
-			postTypeRecord?.rest_base ||
-			DISTRIBUTED_EDITING_RECOVERY_REST_BASE;
-		const currentSessionState =
-			select.getDistributedEditingSessionState?.() || {};
-		const requestArgs = {
-			postId,
-			restBase,
-			clientBaseVersion:
-				options.clientBaseVersion ??
-				currentSessionState.serverVersion ??
-				currentSessionState.clientBaseVersion,
-			acceptedProofServerVersion:
-				options.acceptedProofServerVersion ??
-				options.reviewedServerVersion ??
-				currentSessionState.retrySaveServerVersion ??
-				currentSessionState.serverVersion,
-			pendingChangeCount:
-				options.pendingChangeCount ??
-				currentSessionState.pendingChangeCount,
-			reviewAction:
-				options.reviewAction ??
-				currentSessionState.retrySaveReviewAction,
-			reviewRequiredCapability:
-				options.reviewRequiredCapability ??
-				currentSessionState.retrySaveReviewRequiredCapability,
-			reviewerCapability:
-				options.reviewerCapability ??
-				currentSessionState.retrySaveReviewerCapability,
-			reviewScope:
-				options.reviewScope ??
-				currentSessionState.retrySaveReviewScope,
-			proposedPostContentHash:
-				options.proposedPostContentHash ??
-				currentSessionState.retrySaveReviewProposedContentHash,
-			reviewedProposedPostContentHash:
-				options.reviewedProposedPostContentHash ??
-				options.proposedPostContentHash ??
-				currentSessionState.retrySaveReviewProposedContentHash,
-			candidatePostContentHash:
-				options.candidatePostContentHash ??
-				currentSessionState.retrySaveReviewCandidateContentHash,
-			reviewedCandidatePostContentHash:
-				options.reviewedCandidatePostContentHash ??
-				options.candidatePostContentHash ??
-				currentSessionState.retrySaveReviewCandidateContentHash,
-			filteredProposedPostContentHash:
-				options.filteredProposedPostContentHash ??
-				currentSessionState.retrySaveReviewFilteredProposedContentHash,
-			filteredCandidatePostContentHash:
-				options.filteredCandidatePostContentHash ??
-				currentSessionState.retrySaveReviewFilteredCandidateContentHash,
-			reviewApprovalProof: options.reviewApprovalProof,
-		};
 
-		try {
-			const response =
-				await requestDistributedEditingRetrySaveReviewApprovalProof(
-					requestArgs
+		( options = {} ) =>
+		async ( { select, dispatch, registry } ) => {
+			const currentPost = select.getCurrentPost?.() || {};
+			const postType = options.postType || currentPost.type;
+			const postId = options.postId ?? currentPost.id;
+			const postTypeRecord = postType
+				? registry.select( coreStore ).getPostType( postType )
+				: null;
+			const restBase =
+				options.restBase ||
+				postTypeRecord?.rest_base ||
+				DISTRIBUTED_EDITING_RECOVERY_REST_BASE;
+			const currentSessionState =
+				select.getDistributedEditingSessionState?.() || {};
+			const requestArgs = {
+				postId,
+				restBase,
+				clientBaseVersion:
+					options.clientBaseVersion ??
+					currentSessionState.serverVersion ??
+					currentSessionState.clientBaseVersion,
+				acceptedProofServerVersion:
+					options.acceptedProofServerVersion ??
+					options.reviewedServerVersion ??
+					currentSessionState.retrySaveServerVersion ??
+					currentSessionState.serverVersion,
+				pendingChangeCount:
+					options.pendingChangeCount ??
+					currentSessionState.pendingChangeCount,
+				reviewAction:
+					options.reviewAction ??
+					currentSessionState.retrySaveReviewAction,
+				reviewRequiredCapability:
+					options.reviewRequiredCapability ??
+					currentSessionState.retrySaveReviewRequiredCapability,
+				reviewerCapability:
+					options.reviewerCapability ??
+					currentSessionState.retrySaveReviewerCapability,
+				reviewScope:
+					options.reviewScope ??
+					currentSessionState.retrySaveReviewScope,
+				proposedPostContentHash:
+					options.proposedPostContentHash ??
+					currentSessionState.retrySaveReviewProposedContentHash,
+				reviewedProposedPostContentHash:
+					options.reviewedProposedPostContentHash ??
+					options.proposedPostContentHash ??
+					currentSessionState.retrySaveReviewProposedContentHash,
+				candidatePostContentHash:
+					options.candidatePostContentHash ??
+					currentSessionState.retrySaveReviewCandidateContentHash,
+				reviewedCandidatePostContentHash:
+					options.reviewedCandidatePostContentHash ??
+					options.candidatePostContentHash ??
+					currentSessionState.retrySaveReviewCandidateContentHash,
+				filteredProposedPostContentHash:
+					options.filteredProposedPostContentHash ??
+					currentSessionState.retrySaveReviewFilteredProposedContentHash,
+				filteredCandidatePostContentHash:
+					options.filteredCandidatePostContentHash ??
+					currentSessionState.retrySaveReviewFilteredCandidateContentHash,
+				reviewApprovalProof: options.reviewApprovalProof,
+			};
+
+			try {
+				const response =
+					await requestDistributedEditingRetrySaveReviewApprovalProof(
+						requestArgs
+					);
+
+				dispatch.setDistributedEditingSessionState(
+					getDistributedEditingSessionStateForRetrySaveReviewApprovalProofResult(
+						response,
+						currentSessionState
+					)
 				);
 
-			dispatch.setDistributedEditingSessionState(
-				getDistributedEditingSessionStateForRetrySaveReviewApprovalProofResult(
-					response,
-					currentSessionState
-				)
-			);
+				return response;
+			} catch ( error ) {
+				dispatch.setDistributedEditingSessionState(
+					getDistributedEditingSessionStateForRetrySaveReviewApprovalProofResult(
+						error,
+						currentSessionState
+					)
+				);
 
-			return response;
-		} catch ( error ) {
-			dispatch.setDistributedEditingSessionState(
-				getDistributedEditingSessionStateForRetrySaveReviewApprovalProofResult(
-					error,
-					currentSessionState
-				)
-			);
-
-			throw error;
-		}
-	};
+				throw error;
+			}
+		};
 
 /**
  * Requests the guarded retry-save endpoint and stores the normalized result.

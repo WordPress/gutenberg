@@ -56,6 +56,33 @@ jest.mock( '../../distributed-editing-status', () => {
 	};
 } );
 
+jest.mock( '../../distributed-editing-risky-block-review', () => {
+	const { createElement } = require( '@wordpress/element' );
+
+	function MockDistributedEditingRiskyBlockReviewPrePublishPanel() {
+		return createElement(
+			'div',
+			null,
+			'Distributed editing risky block review pre-publish mount'
+		);
+	}
+
+	function MockDistributedEditingRiskyBlockReviewStatusChrome() {
+		return createElement(
+			'div',
+			null,
+			'Distributed editing risky block review chrome mount'
+		);
+	}
+
+	return {
+		__esModule: true,
+		default: MockDistributedEditingRiskyBlockReviewPrePublishPanel,
+		DistributedEditingRiskyBlockReviewStatusChrome:
+			MockDistributedEditingRiskyBlockReviewStatusChrome,
+	};
+} );
+
 afterEach( () => {
 	delete globalThis.__experimentalDistributedEditingStatusInspector;
 	window.history.pushState( {}, '', '/' );
@@ -70,6 +97,16 @@ describe( 'EditorInterfaceNotices', () => {
 		).toBeInTheDocument();
 		expect(
 			screen.getByText( 'Template validation notice mount' )
+		).toBeVisible();
+		expect(
+			screen.getByText(
+				'Distributed editing risky block review chrome mount'
+			)
+		).toBeVisible();
+		expect(
+			screen.getByText(
+				'Distributed editing risky block review pre-publish mount'
+			)
 		).toBeVisible();
 		expect(
 			screen.getByText( 'Distributed editing status chrome mount' )
