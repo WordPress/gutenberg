@@ -737,7 +737,7 @@ function mergeYArray(
 				newElement,
 				query,
 				cursorPosition,
-				cursorScope
+				appendCursorScopeKey( cursorScope, ( left + i ).toString() )
 			);
 		} else {
 			// Element is the wrong type (e.g. partial migration) or the
@@ -874,7 +874,7 @@ function mergeYMapValues(
 			yMap,
 			key,
 			cursorPosition,
-			cursorScope
+			appendCursorScopeKey( cursorScope, key )
 		);
 	}
 
@@ -937,6 +937,16 @@ function updateYBlockAttribute(
 interface RichTextCursorScope {
 	attributeKey: string;
 	clientId: string | undefined;
+}
+
+function appendCursorScopeKey(
+	cursorScope: RichTextCursorScope,
+	key: string
+): RichTextCursorScope {
+	return {
+		...cursorScope,
+		attributeKey: `${ cursorScope.attributeKey }.${ key }`,
+	};
 }
 
 interface DeltaWithOps {
