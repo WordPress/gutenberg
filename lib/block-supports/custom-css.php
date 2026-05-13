@@ -99,15 +99,15 @@ function gutenberg_render_custom_css_class_name( $block_content, $block ) {
 	}
 
 	// Parse out the 'wp-custom-css-*' class name added by gutenberg_render_custom_css_support_styles().
-	$tag = new WP_HTML_Tag_Processor( '<div>' );
-	$tag->next_tag(); // Advance to the DIV.
-	$tag->set_attribute( 'class', $class_name_attr );
 	$custom_class_name = null;
-	foreach ( $tag->class_list() as $class_name ) {
-		if ( str_starts_with( $class_name, 'wp-custom-css-' ) ) {
-			$custom_class_name = $class_name;
+	$token_delimiter   = " \t\f\r\n";
+	$class_token       = strtok( $class_name_attr, $token_delimiter );
+	while ( false !== $class_token ) {
+		if ( str_starts_with( $class_token, 'wp-custom-css-' ) ) {
+			$custom_class_name = $class_token;
 			break;
 		}
+		$class_token = strtok( $token_delimiter );
 	}
 	if ( null === $custom_class_name ) {
 		return $block_content;
