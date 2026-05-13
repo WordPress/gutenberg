@@ -56,12 +56,6 @@ export function Caption( {
 		}
 	}, [ isSelected, isCaptionEmpty ] );
 
-	useEffect( () => {
-		if ( readOnly && isCaptionEmpty ) {
-			setShowCaption( false );
-		}
-	}, [ readOnly, isCaptionEmpty ] );
-
 	// Focus the caption when we click to add one.
 	const ref = useCallback(
 		( node ) => {

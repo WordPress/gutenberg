@@ -1023,6 +1023,7 @@ export default function Image( {
 								/>
 							</ToolsPanelItem>
 						) }
+
 						{ ! lockAltControls && ! lightboxChecked && (
 							<ToolsPanelItem
 								label={ __( 'Mark as decorative' ) }
@@ -1397,20 +1398,20 @@ export default function Image( {
 			{ img }
 			{ resizableBox }
 
-			<Caption
-				attributes={ attributes }
-				setAttributes={ setAttributes }
-				isSelected={ isSingleSelected }
-				insertBlocksAfter={ insertBlocksAfter }
-				label={ __( 'Image caption text' ) }
-				showToolbarButton={
-					isSingleSelected &&
-					( hasNonContentControls || isContentOnlyMode ) &&
-					! hideCaptionControls &&
-					! isDecorative
-				}
-				readOnly={ isDecorative }
-			/>
+			{ ! isDecorative && (
+				<Caption
+					attributes={ attributes }
+					setAttributes={ setAttributes }
+					isSelected={ isSingleSelected }
+					insertBlocksAfter={ insertBlocksAfter }
+					label={ __( 'Image caption text' ) }
+					showToolbarButton={
+						isSingleSelected &&
+						( hasNonContentControls || isContentOnlyMode ) &&
+						! hideCaptionControls
+					}
+				/>
+			) }
 
 			{ isDecorativeConfirmVisible && (
 				<ConfirmDialog
