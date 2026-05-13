@@ -40,7 +40,8 @@
 		gap: var(--wpds-dimension-gap-sm);
 		aspect-ratio: var(--wp-ui-button-aspect-ratio);
 		min-width: var(--wp-ui-button-min-width);
-		height: var(--wp-ui-button-height);
+		max-width: 100%;
+		min-height: var(--wp-ui-button-height);
 		padding-inline: var(--wp-ui-button-padding-inline);
 		border-style: solid;
 		border-width: 1px;
@@ -52,8 +53,10 @@
 		font-size: var(--wp-ui-button-font-size);
 		font-weight: var(--wp-ui-button-font-weight);
 		line-height: var(--wpds-typography-line-height-sm);
+		text-align: center;
 		text-decoration: none;
 		color: var(--wp-ui-button-foreground-color);
+		overflow-wrap: anywhere;
 		cursor: var(--wpds-cursor-control);
 
 		@media not ( prefers-reduced-motion ) {
