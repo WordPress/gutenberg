@@ -205,6 +205,50 @@ export const DISTRIBUTED_EDITING_RETRY_SAVE_REVIEW_APPROVAL_PROOF_STATUSES =
 	} );
 
 /**
+ * Stable KSES risky-block review statuses. These are editor data states for
+ * future block annotation and pre-publish review UI; they do not save.
+ */
+export const DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_STATUSES = Object.freeze( {
+	NONE: 'none',
+	NO_REVIEW_REQUIRED: 'no_review_required',
+	REVIEW_REQUIRED: 'review_required',
+	REVIEW_RESOLVED: 'review_resolved',
+	STALE_AFTER_REVIEW: 'stale_after_review',
+	REJECTED_RAW_CONTENT: 'rejected_raw_content',
+} );
+
+/**
+ * Stable per-block KSES review statuses.
+ */
+export const DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES =
+	Object.freeze( {
+		PENDING_REVIEW: 'pending_review',
+		APPROVED_FOR_RETRY_SAVE: 'approved_for_retry_save',
+		REJECTED: 'rejected',
+		STALE_AFTER_REVIEW: 'stale_after_review',
+	} );
+
+/**
+ * Stable Save policy states for DE-RTC human review handoff.
+ */
+export const DISTRIBUTED_EDITING_SAVE_POLICY_STATUSES = Object.freeze( {
+	UPDATE_READY: 'update_ready',
+	REVIEW_REQUIRED: 'review_required',
+	READY_FOR_REVIEWED_RETRY_SAVE: 'ready_for_reviewed_retry_save',
+	REFETCH_REQUIRED: 'refetch_required',
+} );
+
+/**
+ * Stable Save click actions for DE-RTC human review handoff.
+ */
+export const DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS = Object.freeze( {
+	CONTINUE_SAVE: 'continue_save',
+	OPEN_PRE_PUBLISH_REVIEW: 'open_pre_publish_review',
+	CONTINUE_GUARDED_RETRY_SAVE: 'continue_guarded_retry_save',
+	REFETCH_SERVER_STATE: 'refetch_server_state',
+} );
+
+/**
  * Stable retry-save save-flow handoff statuses.
  */
 export const DISTRIBUTED_EDITING_RETRY_SAVE_HANDOFF_STATUSES = Object.freeze( {
@@ -282,6 +326,14 @@ const VALID_RETRY_SAVE_REVIEW_APPROVAL_PROOF_STATUSES = new Set(
 	Object.values(
 		DISTRIBUTED_EDITING_RETRY_SAVE_REVIEW_APPROVAL_PROOF_STATUSES
 	)
+);
+
+const VALID_RISKY_BLOCK_REVIEW_STATUSES = new Set(
+	Object.values( DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_STATUSES )
+);
+
+const VALID_RISKY_BLOCK_REVIEW_ITEM_STATUSES = new Set(
+	Object.values( DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES )
 );
 
 const VALID_RETRY_SAVE_HANDOFF_STATUSES = new Set(
@@ -406,6 +458,31 @@ export const DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE = Object.freeze( {
 	retrySaveReviewApprovalMutatesPostContent: false,
 	retrySaveReviewApprovalCreatesRevision: false,
 	retrySaveReviewApprovalClaimsSaved: false,
+	riskyBlockReviewStatus:
+		DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_STATUSES.NONE,
+	riskyBlockReviewReasonCode: null,
+	riskyBlockReviewItems: [],
+	riskyBlockReviewItemCount: 0,
+	riskyBlockReviewPendingCount: 0,
+	riskyBlockReviewApprovedCount: 0,
+	riskyBlockReviewRejectedCount: 0,
+	riskyBlockReviewHasPendingItems: false,
+	riskyBlockReviewPrePublishPanelRequired: false,
+	riskyBlockReviewSaveButtonLabel: 'Update',
+	riskyBlockReviewSaveClickAction:
+		DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.CONTINUE_SAVE,
+	riskyBlockReviewCanExportLocalUpdates: false,
+	riskyBlockReviewRequiresServerStateRefetch: false,
+	riskyBlockReviewReviewedServerVersion: null,
+	riskyBlockReviewCurrentServerVersion: null,
+	riskyBlockReviewRawContentIncluded: false,
+	riskyBlockReviewExposesRawContent: false,
+	riskyBlockReviewDispatchesNotice: false,
+	riskyBlockReviewMutatesEditorContent: false,
+	riskyBlockReviewCallsNormalSavePost: false,
+	riskyBlockReviewCallsRetrySaveEndpoint: false,
+	riskyBlockReviewChangesPostLock: false,
+	riskyBlockReviewClaimsSaved: false,
 	requiresManualConflictResolution: false,
 	mustOfferLocalCopy: false,
 	canExportLocalUpdates: false,
@@ -592,6 +669,10 @@ export function normalizeDistributedEditingSessionState( sessionState = {} ) {
 		Boolean( sessionState.retrySaveReviewApprovalAccepted ) ||
 		retrySaveReviewApprovalProofStatus ===
 			DISTRIBUTED_EDITING_RETRY_SAVE_REVIEW_APPROVAL_PROOF_STATUSES.ACCEPTED_FOR_RETRY_SAVE;
+	const riskyBlockReviewFields =
+		normalizeRiskyBlockReviewMetadataFields( sessionState );
+	const hasPendingRiskyBlockReviewItems =
+		riskyBlockReviewFields.riskyBlockReviewHasPendingItems;
 	const retrySaveHandoffStatus = VALID_RETRY_SAVE_HANDOFF_STATUSES.has(
 		sessionState.retrySaveHandoffStatus
 	)
@@ -616,9 +697,12 @@ export function normalizeDistributedEditingSessionState( sessionState = {} ) {
 		( retrySaveStatus === DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVING &&
 			hasPendingChanges ) ||
 		( retrySaveHandoffBlocksNormalSave && hasPendingChanges ) ||
+		hasPendingRiskyBlockReviewItems ||
 		( requiresManualConflictResolution && hasPendingChanges );
 	const canExportLocalUpdates =
-		Boolean( sessionState.canExportLocalUpdates ) || mustOfferLocalCopy;
+		Boolean( sessionState.canExportLocalUpdates ) ||
+		riskyBlockReviewFields.riskyBlockReviewCanExportLocalUpdates ||
+		mustOfferLocalCopy;
 
 	return {
 		clientBaseVersion: normalizeNullableString(
@@ -709,6 +793,7 @@ export function normalizeDistributedEditingSessionState( sessionState = {} ) {
 			retrySaveReviewApprovalProofStatus,
 			retrySaveReviewApprovalAccepted,
 		} ),
+		...riskyBlockReviewFields,
 		requiresManualConflictResolution,
 		mustOfferLocalCopy,
 		canExportLocalUpdates,
@@ -1384,6 +1469,454 @@ export function getDistributedEditingRetrySaveFlowStateForSessionState(
 			normalized
 		),
 	};
+}
+
+/**
+ * Returns inert editor state for WordPress KSES risky-block classification.
+ *
+ * The WordPress helper returns hash-only block review items. This maps that
+ * authority vocabulary into editor state for future annotations and
+ * pre-publish review routing without saving, dispatching notices, exposing raw
+ * block content, or changing post locks.
+ *
+ * @param {Object} responseOrError     WordPress KSES classification response or error.
+ * @param {Object} currentSessionState Current DE-RTC session state.
+ *
+ * @return {Object} Normalized DE-RTC session state.
+ */
+export function getDistributedEditingSessionStateForKsesRiskyBlockReviewClassificationResult(
+	responseOrError = {},
+	currentSessionState = {}
+) {
+	const normalizedCurrent =
+		normalizeDistributedEditingSessionState( currentSessionState );
+	const responseData = getDistributedEditingResponseData( responseOrError );
+	const result = normalizeNullableString(
+		getFirstDefined( responseOrError.result, responseData.result )
+	);
+	const reasonCode = normalizeNullableString(
+		getFirstDefined(
+			responseOrError.code,
+			responseOrError.reasonCode,
+			responseOrError.reason_code,
+			responseData.reasonCode,
+			responseData.reason_code
+		)
+	);
+	const reviewItems = normalizeRiskyBlockReviewItems(
+		getFirstDefined(
+			responseOrError.reviewItems,
+			responseOrError.review_items,
+			responseData.reviewItems,
+			responseData.review_items
+		)
+	);
+	const pendingReviewItemCount = normalizeCountWithFallback(
+		getFirstDefined(
+			responseOrError.pendingReviewItemCount,
+			responseOrError.pending_review_item_count,
+			responseData.pendingReviewItemCount,
+			responseData.pending_review_item_count
+		),
+		countRiskyBlockReviewItemsByStatus(
+			reviewItems,
+			DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES.PENDING_REVIEW
+		)
+	);
+	const prePublishReviewRequired = Boolean(
+		getFirstDefined(
+			responseOrError.prePublishReviewRequired,
+			responseOrError.pre_publish_review_required,
+			responseData.prePublishReviewRequired,
+			responseData.pre_publish_review_required
+		)
+	);
+	const rawContentRejected = result === 'raw_content_rejected';
+	const reviewRequired =
+		result === 'block_review_required' ||
+		pendingReviewItemCount > 0 ||
+		( prePublishReviewRequired && reviewItems.length > 0 );
+	let riskyBlockReviewStatus =
+		DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_STATUSES.NO_REVIEW_REQUIRED;
+
+	if ( rawContentRejected ) {
+		riskyBlockReviewStatus =
+			DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_STATUSES.REJECTED_RAW_CONTENT;
+	} else if ( reviewRequired ) {
+		riskyBlockReviewStatus =
+			DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_STATUSES.REVIEW_REQUIRED;
+	}
+	const serverVersion = normalizeNullableString(
+		getFirstDefined(
+			responseOrError.serverVersion,
+			responseOrError.server_version,
+			responseData.serverVersion,
+			responseData.server_version
+		)
+	);
+	const clientBaseVersion = normalizeNullableString(
+		getFirstDefined(
+			responseOrError.clientBaseVersion,
+			responseOrError.client_base_version,
+			responseData.clientBaseVersion,
+			responseData.client_base_version
+		)
+	);
+	const pendingChangeCount = reviewRequired
+		? normalizedCurrent.pendingChangeCount || pendingReviewItemCount || 1
+		: normalizedCurrent.pendingChangeCount;
+	let disposition = normalizedCurrent.disposition;
+	let normalizedReasonCode = normalizedCurrent.reasonCode;
+	let riskyBlockReviewReasonCode = null;
+
+	if ( rawContentRejected ) {
+		disposition =
+			DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_SYNC_META_TAMPERED;
+		normalizedReasonCode =
+			reasonCode ||
+			DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_SYNC_META_TAMPERED;
+		riskyBlockReviewReasonCode = normalizedReasonCode;
+	} else if ( reviewRequired ) {
+		disposition =
+			DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_UNFILTERED_HTML_REVIEW_REQUIRED;
+		normalizedReasonCode =
+			reasonCode ||
+			DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_UNFILTERED_HTML_WOULD_CHANGE_CONTENT;
+		riskyBlockReviewReasonCode = normalizedReasonCode;
+	}
+
+	return normalizeDistributedEditingSessionState( {
+		...normalizedCurrent,
+		clientBaseVersion:
+			clientBaseVersion || normalizedCurrent.clientBaseVersion,
+		serverVersion: serverVersion || normalizedCurrent.serverVersion,
+		disposition,
+		reasonCode: normalizedReasonCode,
+		pendingChangeCount,
+		hasPendingChanges:
+			normalizedCurrent.hasPendingChanges || reviewRequired,
+		isAwaitingServerConfirmation:
+			normalizedCurrent.isAwaitingServerConfirmation || reviewRequired,
+		requiresManualConflictResolution:
+			normalizedCurrent.requiresManualConflictResolution ||
+			reviewRequired,
+		riskyBlockReviewStatus,
+		riskyBlockReviewReasonCode,
+		riskyBlockReviewItems: reviewItems,
+		riskyBlockReviewItemCount: normalizeCountWithFallback(
+			getFirstDefined(
+				responseOrError.reviewItemCount,
+				responseOrError.review_item_count,
+				responseData.reviewItemCount,
+				responseData.review_item_count
+			),
+			reviewItems.length
+		),
+		riskyBlockReviewPendingCount: pendingReviewItemCount,
+		riskyBlockReviewApprovedCount: 0,
+		riskyBlockReviewRejectedCount: 0,
+		riskyBlockReviewPrePublishPanelRequired:
+			reviewRequired && prePublishReviewRequired,
+		riskyBlockReviewSaveButtonLabel: reviewRequired
+			? 'Review changes'
+			: 'Update',
+		riskyBlockReviewSaveClickAction: reviewRequired
+			? DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.OPEN_PRE_PUBLISH_REVIEW
+			: DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.CONTINUE_SAVE,
+		riskyBlockReviewCanExportLocalUpdates: reviewRequired,
+		riskyBlockReviewRequiresServerStateRefetch: false,
+		riskyBlockReviewRawContentIncluded: false,
+		riskyBlockReviewExposesRawContent: false,
+		riskyBlockReviewDispatchesNotice: false,
+		riskyBlockReviewMutatesEditorContent: false,
+		riskyBlockReviewCallsNormalSavePost: false,
+		riskyBlockReviewCallsRetrySaveEndpoint: false,
+		riskyBlockReviewChangesPostLock: false,
+		riskyBlockReviewClaimsSaved: false,
+		mustOfferLocalCopy:
+			normalizedCurrent.mustOfferLocalCopy || reviewRequired,
+		canExportLocalUpdates:
+			normalizedCurrent.canExportLocalUpdates || reviewRequired,
+	} );
+}
+
+/**
+ * Returns the risky-block review state as a nested object for selectors and
+ * future annotation surfaces.
+ *
+ * @param {Object} sessionState DE-RTC session state.
+ *
+ * @return {Object} Risky block review state.
+ */
+export function getDistributedEditingRiskyBlockReviewStateForSessionState(
+	sessionState = {}
+) {
+	const normalized = normalizeDistributedEditingSessionState( sessionState );
+
+	return {
+		status: normalized.riskyBlockReviewStatus,
+		reasonCode:
+			normalized.riskyBlockReviewReasonCode || normalized.reasonCode,
+		reviewItems: normalized.riskyBlockReviewItems,
+		reviewItemCount: normalized.riskyBlockReviewItemCount,
+		pendingReviewItemCount: normalized.riskyBlockReviewPendingCount,
+		approvedReviewItemCount: normalized.riskyBlockReviewApprovedCount,
+		rejectedReviewItemCount: normalized.riskyBlockReviewRejectedCount,
+		hasPendingReviewItems: normalized.riskyBlockReviewHasPendingItems,
+		prePublishPanelRequired:
+			normalized.riskyBlockReviewPrePublishPanelRequired,
+		saveButtonLabel: normalized.riskyBlockReviewSaveButtonLabel,
+		saveClickAction: normalized.riskyBlockReviewSaveClickAction,
+		canExportLocalUpdates: normalized.riskyBlockReviewCanExportLocalUpdates,
+		requiresServerStateRefetch:
+			normalized.riskyBlockReviewRequiresServerStateRefetch,
+		reviewedServerVersion: normalized.riskyBlockReviewReviewedServerVersion,
+		currentServerVersion: normalized.riskyBlockReviewCurrentServerVersion,
+		rawContentIncluded: normalized.riskyBlockReviewRawContentIncluded,
+		exposesRawContent: normalized.riskyBlockReviewExposesRawContent,
+		dispatchesNotice: normalized.riskyBlockReviewDispatchesNotice,
+		mutatesEditorContent: normalized.riskyBlockReviewMutatesEditorContent,
+		callsNormalSavePost: normalized.riskyBlockReviewCallsNormalSavePost,
+		callsRetrySaveEndpoint:
+			normalized.riskyBlockReviewCallsRetrySaveEndpoint,
+		changesPostLock: normalized.riskyBlockReviewChangesPostLock,
+		claimsSaved: normalized.riskyBlockReviewClaimsSaved,
+	};
+}
+
+/**
+ * Returns the DE-RTC Save policy state for risky-block review handoff.
+ *
+ * This is only policy data. It does not open the pre-publish sidebar, save,
+ * retry-save, dispatch notices, mutate content, or change post locks.
+ *
+ * @param {Object} sessionState DE-RTC session state.
+ *
+ * @return {Object} Save policy state.
+ */
+export function getDistributedEditingSavePolicyStateForSessionState(
+	sessionState = {}
+) {
+	const reviewState =
+		getDistributedEditingRiskyBlockReviewStateForSessionState(
+			sessionState
+		);
+	let status = DISTRIBUTED_EDITING_SAVE_POLICY_STATUSES.UPDATE_READY;
+	let reason = null;
+	let saveButtonLabel = 'Update';
+	let clickAction = DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.CONTINUE_SAVE;
+	let blocksNormalSavePost = false;
+	let opensPrePublishReview = false;
+	let requiresServerStateRefetch = false;
+
+	if ( reviewState.requiresServerStateRefetch ) {
+		status = DISTRIBUTED_EDITING_SAVE_POLICY_STATUSES.REFETCH_REQUIRED;
+		reason = 'risky_block_review_stale';
+		saveButtonLabel = 'Refetch required';
+		clickAction =
+			DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.REFETCH_SERVER_STATE;
+		blocksNormalSavePost = true;
+		requiresServerStateRefetch = true;
+	} else if ( reviewState.hasPendingReviewItems ) {
+		status = DISTRIBUTED_EDITING_SAVE_POLICY_STATUSES.REVIEW_REQUIRED;
+		reason = 'risky_block_review_required';
+		saveButtonLabel = 'Review changes';
+		clickAction =
+			DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.OPEN_PRE_PUBLISH_REVIEW;
+		blocksNormalSavePost = true;
+		opensPrePublishReview = true;
+	} else if (
+		reviewState.status ===
+			DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_STATUSES.REVIEW_RESOLVED ||
+		reviewState.approvedReviewItemCount > 0
+	) {
+		status =
+			DISTRIBUTED_EDITING_SAVE_POLICY_STATUSES.READY_FOR_REVIEWED_RETRY_SAVE;
+		clickAction =
+			DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.CONTINUE_GUARDED_RETRY_SAVE;
+	}
+
+	return {
+		status,
+		reason,
+		saveButtonLabel,
+		clickAction,
+		blocksNormalSavePost,
+		opensPrePublishReview,
+		requiresServerStateRefetch,
+		reviewItemCount: reviewState.reviewItemCount,
+		pendingReviewItemCount: reviewState.pendingReviewItemCount,
+		approvedReviewItemCount: reviewState.approvedReviewItemCount,
+		rejectedReviewItemCount: reviewState.rejectedReviewItemCount,
+		savesPost: false,
+		shouldCallNormalSavePost: false,
+		shouldCallRetrySaveEndpoint: false,
+		dispatchesNotice: false,
+		mutatesEditorContent: false,
+		mutatesPersistedPostContent: false,
+		changesPostLock: false,
+		claimsSaved: false,
+	};
+}
+
+/**
+ * Returns inert editor state after a reviewer approves or rejects one risky
+ * block item.
+ *
+ * @param {Object} currentSessionState Current DE-RTC session state.
+ * @param {Object} resolution          Review resolution data.
+ *
+ * @return {Object} Normalized DE-RTC session state.
+ */
+export function getDistributedEditingSessionStateForRiskyBlockReviewItemResolution(
+	currentSessionState = {},
+	resolution = {}
+) {
+	const normalized =
+		normalizeDistributedEditingSessionState( currentSessionState );
+	const reviewItemId = normalizeNullableString(
+		resolution.reviewItemId || resolution.id
+	);
+	const nextReviewStatus =
+		resolution.decision === 'rejected'
+			? DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES.REJECTED
+			: DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES.APPROVED_FOR_RETRY_SAVE;
+	const reviewItemIndex = normalized.riskyBlockReviewItems.findIndex(
+		( item ) => item.id === reviewItemId
+	);
+
+	if ( reviewItemIndex === -1 ) {
+		return normalized;
+	}
+
+	const reviewItems = normalized.riskyBlockReviewItems.map(
+		( item, index ) => {
+			if ( index !== reviewItemIndex ) {
+				return item;
+			}
+
+			return normalizeRiskyBlockReviewItem( {
+				...item,
+				reviewStatus: nextReviewStatus,
+				reviewerId: resolution.reviewerId,
+				approvalProofHash:
+					nextReviewStatus ===
+					DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES.APPROVED_FOR_RETRY_SAVE
+						? resolution.approvalProofHash ||
+						  `sha256:${ item.id }:approval-proof`
+						: null,
+				rejectionReason:
+					nextReviewStatus ===
+					DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES.REJECTED
+						? resolution.rejectionReason || 'reviewer_rejected'
+						: null,
+			} );
+		}
+	);
+
+	const pendingReviewItemCount = countRiskyBlockReviewItemsByStatus(
+		reviewItems,
+		DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES.PENDING_REVIEW
+	);
+	const approvedReviewItemCount = countRiskyBlockReviewItemsByStatus(
+		reviewItems,
+		DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES.APPROVED_FOR_RETRY_SAVE
+	);
+	const rejectedReviewItemCount = countRiskyBlockReviewItemsByStatus(
+		reviewItems,
+		DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES.REJECTED
+	);
+	const hasPendingReviewItems = pendingReviewItemCount > 0;
+
+	return normalizeDistributedEditingSessionState( {
+		...normalized,
+		reasonCode: hasPendingReviewItems ? normalized.reasonCode : null,
+		riskyBlockReviewStatus: hasPendingReviewItems
+			? DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_STATUSES.REVIEW_REQUIRED
+			: DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_STATUSES.REVIEW_RESOLVED,
+		riskyBlockReviewReasonCode: hasPendingReviewItems
+			? normalized.riskyBlockReviewReasonCode
+			: null,
+		riskyBlockReviewItems: reviewItems,
+		riskyBlockReviewPendingCount: pendingReviewItemCount,
+		riskyBlockReviewApprovedCount: approvedReviewItemCount,
+		riskyBlockReviewRejectedCount: rejectedReviewItemCount,
+		riskyBlockReviewPrePublishPanelRequired: hasPendingReviewItems,
+		riskyBlockReviewSaveButtonLabel: hasPendingReviewItems
+			? 'Review changes'
+			: 'Update',
+		riskyBlockReviewSaveClickAction: hasPendingReviewItems
+			? DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.OPEN_PRE_PUBLISH_REVIEW
+			: DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.CONTINUE_GUARDED_RETRY_SAVE,
+		riskyBlockReviewCanExportLocalUpdates: true,
+		mustOfferLocalCopy: true,
+		canExportLocalUpdates: true,
+	} );
+}
+
+/**
+ * Returns inert editor state when a reviewed risky-block decision has gone
+ * stale against a newer server version.
+ *
+ * @param {Object} currentSessionState Current DE-RTC session state.
+ * @param {Object} staleCheck          Server version comparison.
+ *
+ * @return {Object} Normalized DE-RTC session state.
+ */
+export function getDistributedEditingSessionStateForStaleRiskyBlockReview(
+	currentSessionState = {},
+	staleCheck = {}
+) {
+	const normalized =
+		normalizeDistributedEditingSessionState( currentSessionState );
+	const reviewedServerVersion =
+		normalizeNullableString( staleCheck.reviewedServerVersion ) ||
+		normalized.riskyBlockReviewItems[ 0 ]?.serverVersion ||
+		normalized.serverVersion;
+	const currentServerVersion =
+		normalizeNullableString( staleCheck.currentServerVersion ) ||
+		normalized.serverVersion;
+
+	if (
+		! reviewedServerVersion ||
+		! currentServerVersion ||
+		reviewedServerVersion === currentServerVersion
+	) {
+		return normalized;
+	}
+
+	return normalizeDistributedEditingSessionState( {
+		...normalized,
+		disposition:
+			DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+		reasonCode:
+			DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+		serverVersion: currentServerVersion,
+		requiresServerStateRefetch: true,
+		refetchedServerState: false,
+		riskyBlockReviewStatus:
+			DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_STATUSES.STALE_AFTER_REVIEW,
+		riskyBlockReviewReasonCode:
+			DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+		riskyBlockReviewItems: normalized.riskyBlockReviewItems.map( ( item ) =>
+			normalizeRiskyBlockReviewItem( {
+				...item,
+				reviewStatus:
+					DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES.STALE_AFTER_REVIEW,
+			} )
+		),
+		riskyBlockReviewPendingCount: 0,
+		riskyBlockReviewPrePublishPanelRequired: false,
+		riskyBlockReviewSaveButtonLabel: 'Refetch required',
+		riskyBlockReviewSaveClickAction:
+			DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.REFETCH_SERVER_STATE,
+		riskyBlockReviewCanExportLocalUpdates: true,
+		riskyBlockReviewRequiresServerStateRefetch: true,
+		riskyBlockReviewReviewedServerVersion: reviewedServerVersion,
+		riskyBlockReviewCurrentServerVersion: currentServerVersion,
+		mustOfferLocalCopy: true,
+		canExportLocalUpdates: true,
+	} );
 }
 
 function canPrepareDistributedEditingRetrySubmitSaveFromStatusChrome(
@@ -2111,19 +2644,6 @@ export function getDistributedEditingSessionStateForRetrySaveReviewApprovalProof
 	const result = normalizeNullableString(
 		responseOrError.result || responseData.result
 	);
-	const detail = normalizeNullableString(
-		responseOrError.detail ||
-			responseData.detail ||
-			responseOrError.errorDetail ||
-			responseData.errorDetail
-	);
-	const reasonCode = normalizeNullableString(
-		responseOrError.code ||
-			responseOrError.reasonCode ||
-			responseOrError.reason_code ||
-			responseData.reasonCode ||
-			responseData.reason_code
-	);
 	const pendingChangeCount =
 		normalizeCount(
 			responseOrError.pendingChangeCount ??
@@ -2165,8 +2685,7 @@ export function getDistributedEditingSessionStateForRetrySaveReviewApprovalProof
 		);
 	const hasApprovalAccepted =
 		result === 'review_approval_accepted_for_retry_save' ||
-		result ===
-			'retry_save_review_approval_accepted_for_future_save' ||
+		result === 'retry_save_review_approval_accepted_for_future_save' ||
 		result === 'retry_save_reviewer_approval_accepted' ||
 		responseOrError.retrySaveReviewApprovalAccepted === true ||
 		responseOrError.retry_save_review_approval_accepted === true ||
@@ -2216,13 +2735,25 @@ export function getDistributedEditingSessionStateForRetrySaveReviewApprovalProof
 			retrySaveReviewApprovalProofReason: null,
 			retrySaveReviewApprovalAccepted: true,
 			retrySaveReviewApprovalServerVersion: serverVersion,
-			retrySaveReviewApprovalPreviousServerVersion:
-				previousServerVersion,
+			retrySaveReviewApprovalPreviousServerVersion: previousServerVersion,
 			mustOfferLocalCopy: true,
 			canExportLocalUpdates: true,
 		} );
 	}
 
+	const detail = normalizeNullableString(
+		responseOrError.detail ||
+			responseData.detail ||
+			responseOrError.errorDetail ||
+			responseData.errorDetail
+	);
+	const reasonCode = normalizeNullableString(
+		responseOrError.code ||
+			responseOrError.reasonCode ||
+			responseOrError.reason_code ||
+			responseData.reasonCode ||
+			responseData.reason_code
+	);
 	let disposition = normalizedCurrent.disposition;
 	let proofStatus =
 		DISTRIBUTED_EDITING_RETRY_SAVE_REVIEW_APPROVAL_PROOF_STATUSES.NONE;
@@ -2685,9 +3216,7 @@ function getDistributedEditingRetrySaveReviewMetadataFields( normalized ) {
 	};
 }
 
-function getDistributedEditingRetrySaveReviewApprovalProofFields(
-	normalized
-) {
+function getDistributedEditingRetrySaveReviewApprovalProofFields( normalized ) {
 	return {
 		retrySaveReviewApprovalProofStatus:
 			normalized.retrySaveReviewApprovalProofStatus,
@@ -2699,14 +3228,12 @@ function getDistributedEditingRetrySaveReviewApprovalProofFields(
 			normalized.retrySaveReviewApprovalServerVersion,
 		retrySaveReviewApprovalPreviousServerVersion:
 			normalized.retrySaveReviewApprovalPreviousServerVersion,
-		retrySaveReviewApprovalAction:
-			normalized.retrySaveReviewApprovalAction,
+		retrySaveReviewApprovalAction: normalized.retrySaveReviewApprovalAction,
 		retrySaveReviewApprovalRequiredCapability:
 			normalized.retrySaveReviewApprovalRequiredCapability,
 		retrySaveReviewApprovalReviewerCapability:
 			normalized.retrySaveReviewApprovalReviewerCapability,
-		retrySaveReviewApprovalScope:
-			normalized.retrySaveReviewApprovalScope,
+		retrySaveReviewApprovalScope: normalized.retrySaveReviewApprovalScope,
 		retrySaveReviewApprovalProposedContentHash:
 			normalized.retrySaveReviewApprovalProposedContentHash,
 		retrySaveReviewApprovalCandidateContentHash:
@@ -3017,6 +3544,253 @@ function normalizeRetrySaveReviewApprovalProofFields( sessionState = {} ) {
 			sessionState.retrySaveReviewApprovalClaimsSaved
 		),
 	};
+}
+
+function normalizeRiskyBlockReviewMetadataFields( sessionState = {} ) {
+	const reviewItems = normalizeRiskyBlockReviewItems(
+		sessionState.riskyBlockReviewItems
+	);
+	const calculatedPendingCount = countRiskyBlockReviewItemsByStatus(
+		reviewItems,
+		DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES.PENDING_REVIEW
+	);
+	const calculatedApprovedCount = countRiskyBlockReviewItemsByStatus(
+		reviewItems,
+		DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES.APPROVED_FOR_RETRY_SAVE
+	);
+	const calculatedRejectedCount = countRiskyBlockReviewItemsByStatus(
+		reviewItems,
+		DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES.REJECTED
+	);
+	const riskyBlockReviewItemCount = normalizeCountWithFallback(
+		sessionState.riskyBlockReviewItemCount,
+		reviewItems.length
+	);
+	const riskyBlockReviewPendingCount = normalizeCountWithFallback(
+		sessionState.riskyBlockReviewPendingCount,
+		calculatedPendingCount
+	);
+	const riskyBlockReviewApprovedCount = normalizeCountWithFallback(
+		sessionState.riskyBlockReviewApprovedCount,
+		calculatedApprovedCount
+	);
+	const riskyBlockReviewRejectedCount = normalizeCountWithFallback(
+		sessionState.riskyBlockReviewRejectedCount,
+		calculatedRejectedCount
+	);
+	const riskyBlockReviewHasPendingItems = riskyBlockReviewPendingCount > 0;
+	const requestedStatus = VALID_RISKY_BLOCK_REVIEW_STATUSES.has(
+		sessionState.riskyBlockReviewStatus
+	)
+		? sessionState.riskyBlockReviewStatus
+		: DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE.riskyBlockReviewStatus;
+	let riskyBlockReviewStatus = requestedStatus;
+
+	if (
+		requestedStatus === DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_STATUSES.NONE
+	) {
+		if ( riskyBlockReviewHasPendingItems ) {
+			riskyBlockReviewStatus =
+				DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_STATUSES.REVIEW_REQUIRED;
+		} else if (
+			riskyBlockReviewApprovedCount > 0 ||
+			riskyBlockReviewRejectedCount > 0
+		) {
+			riskyBlockReviewStatus =
+				DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_STATUSES.REVIEW_RESOLVED;
+		}
+	}
+	const riskyBlockReviewRequiresServerStateRefetch =
+		Boolean( sessionState.riskyBlockReviewRequiresServerStateRefetch ) ||
+		riskyBlockReviewStatus ===
+			DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_STATUSES.STALE_AFTER_REVIEW;
+	const riskyBlockReviewPrePublishPanelRequired =
+		Boolean( sessionState.riskyBlockReviewPrePublishPanelRequired ) &&
+		riskyBlockReviewHasPendingItems;
+	let riskyBlockReviewSaveButtonLabel = 'Update';
+	let riskyBlockReviewSaveClickAction =
+		DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.CONTINUE_SAVE;
+
+	if ( riskyBlockReviewRequiresServerStateRefetch ) {
+		riskyBlockReviewSaveButtonLabel = 'Refetch required';
+		riskyBlockReviewSaveClickAction =
+			DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.REFETCH_SERVER_STATE;
+	} else if ( riskyBlockReviewHasPendingItems ) {
+		riskyBlockReviewSaveButtonLabel = 'Review changes';
+		riskyBlockReviewSaveClickAction =
+			DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.OPEN_PRE_PUBLISH_REVIEW;
+	}
+
+	riskyBlockReviewSaveButtonLabel =
+		normalizeNullableString(
+			sessionState.riskyBlockReviewSaveButtonLabel
+		) || riskyBlockReviewSaveButtonLabel;
+	riskyBlockReviewSaveClickAction =
+		normalizeNullableString(
+			sessionState.riskyBlockReviewSaveClickAction
+		) || riskyBlockReviewSaveClickAction;
+
+	return {
+		riskyBlockReviewStatus,
+		riskyBlockReviewReasonCode: normalizeNullableString(
+			sessionState.riskyBlockReviewReasonCode
+		),
+		riskyBlockReviewItems: reviewItems,
+		riskyBlockReviewItemCount,
+		riskyBlockReviewPendingCount,
+		riskyBlockReviewApprovedCount,
+		riskyBlockReviewRejectedCount,
+		riskyBlockReviewHasPendingItems,
+		riskyBlockReviewPrePublishPanelRequired,
+		riskyBlockReviewSaveButtonLabel,
+		riskyBlockReviewSaveClickAction,
+		riskyBlockReviewCanExportLocalUpdates:
+			Boolean( sessionState.riskyBlockReviewCanExportLocalUpdates ) ||
+			riskyBlockReviewHasPendingItems ||
+			riskyBlockReviewStatus ===
+				DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_STATUSES.STALE_AFTER_REVIEW,
+		riskyBlockReviewRequiresServerStateRefetch,
+		riskyBlockReviewReviewedServerVersion: normalizeNullableString(
+			sessionState.riskyBlockReviewReviewedServerVersion
+		),
+		riskyBlockReviewCurrentServerVersion: normalizeNullableString(
+			sessionState.riskyBlockReviewCurrentServerVersion
+		),
+		riskyBlockReviewRawContentIncluded: Boolean(
+			sessionState.riskyBlockReviewRawContentIncluded
+		),
+		riskyBlockReviewExposesRawContent: Boolean(
+			sessionState.riskyBlockReviewExposesRawContent
+		),
+		riskyBlockReviewDispatchesNotice: Boolean(
+			sessionState.riskyBlockReviewDispatchesNotice
+		),
+		riskyBlockReviewMutatesEditorContent: Boolean(
+			sessionState.riskyBlockReviewMutatesEditorContent
+		),
+		riskyBlockReviewCallsNormalSavePost: Boolean(
+			sessionState.riskyBlockReviewCallsNormalSavePost
+		),
+		riskyBlockReviewCallsRetrySaveEndpoint: Boolean(
+			sessionState.riskyBlockReviewCallsRetrySaveEndpoint
+		),
+		riskyBlockReviewChangesPostLock: Boolean(
+			sessionState.riskyBlockReviewChangesPostLock
+		),
+		riskyBlockReviewClaimsSaved: Boolean(
+			sessionState.riskyBlockReviewClaimsSaved
+		),
+	};
+}
+
+function normalizeRiskyBlockReviewItems( value ) {
+	if ( ! Array.isArray( value ) ) {
+		return [];
+	}
+
+	return value
+		.map( ( item ) => normalizeRiskyBlockReviewItem( item ) )
+		.filter( ( item ) => item.id !== null );
+}
+
+function normalizeRiskyBlockReviewItem( item = {} ) {
+	const reviewStatus = VALID_RISKY_BLOCK_REVIEW_ITEM_STATUSES.has(
+		getFirstDefined( item.reviewStatus, item.review_status )
+	)
+		? getFirstDefined( item.reviewStatus, item.review_status )
+		: DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES.PENDING_REVIEW;
+
+	return {
+		id: normalizeNullableString( item.id ),
+		blockClientId: normalizeNullableString(
+			getFirstDefined( item.blockClientId, item.block_client_id )
+		),
+		blockName: normalizeNullableString(
+			getFirstDefined( item.blockName, item.block_name )
+		),
+		blockLabel: normalizeNullableString(
+			getFirstDefined( item.blockLabel, item.block_label )
+		),
+		blockPath: normalizeBlockPath(
+			getFirstDefined( item.blockPath, item.block_path )
+		),
+		changeKind: normalizeNullableString(
+			getFirstDefined( item.changeKind, item.change_kind )
+		),
+		riskReason: normalizeNullableString(
+			getFirstDefined( item.riskReason, item.risk_reason )
+		),
+		authorId: normalizeNullableInteger(
+			getFirstDefined( item.authorId, item.author_id )
+		),
+		baseVersion: normalizeNullableString(
+			getFirstDefined( item.baseVersion, item.base_version )
+		),
+		serverVersion: normalizeNullableString(
+			getFirstDefined( item.serverVersion, item.server_version )
+		),
+		baseContentHash: normalizeNullableString(
+			getFirstDefined( item.baseContentHash, item.base_content_hash )
+		),
+		proposedContentHash: normalizeNullableString(
+			getFirstDefined(
+				item.proposedContentHash,
+				item.proposed_content_hash
+			)
+		),
+		ksesFilteredContentHash: normalizeNullableString(
+			getFirstDefined(
+				item.ksesFilteredContentHash,
+				item.kses_filtered_content_hash
+			)
+		),
+		reviewStatus,
+		reviewEvidenceType: normalizeNullableString(
+			getFirstDefined(
+				item.reviewEvidenceType,
+				item.review_evidence_type
+			)
+		),
+		contentReviewPolicy: normalizeNullableString(
+			getFirstDefined(
+				item.contentReviewPolicy,
+				item.content_review_policy
+			)
+		),
+		reviewerId: normalizeNullableInteger(
+			getFirstDefined( item.reviewerId, item.reviewer_id )
+		),
+		approvalProofHash: normalizeNullableString(
+			getFirstDefined( item.approvalProofHash, item.approval_proof_hash )
+		),
+		rejectionReason: normalizeNullableString(
+			getFirstDefined( item.rejectionReason, item.rejection_reason )
+		),
+		rawContentIncluded: false,
+		exposesRawContent: false,
+		annotation: normalizeRiskyBlockReviewAnnotation( item.annotation ),
+	};
+}
+
+function normalizeRiskyBlockReviewAnnotation( annotation = {} ) {
+	return {
+		visualTreatment:
+			normalizeNullableString( annotation.visualTreatment ) ||
+			'blue_warning_marker_with_focus_wash',
+		hasWarningMarker: annotation.hasWarningMarker !== false,
+		hasSubtleBlueWash: annotation.hasSubtleBlueWash !== false,
+		washActivation:
+			normalizeNullableString( annotation.washActivation ) ||
+			'selected_focused_hovered_or_review_target',
+		hasAccessibleLabel: annotation.hasAccessibleLabel !== false,
+		hasListViewParity: annotation.hasListViewParity !== false,
+		reliesOnColorAlone: false,
+	};
+}
+
+function countRiskyBlockReviewItemsByStatus( reviewItems, reviewStatus ) {
+	return reviewItems.filter( ( item ) => item.reviewStatus === reviewStatus )
+		.length;
 }
 
 function getRetrySaveReviewMetadataFromResponseOrError(
@@ -3425,8 +4199,7 @@ function getRetrySaveReviewApprovalProofFieldsFromResponseOrError(
 			approvalContract.raw_content_included
 		),
 		retrySaveReviewApprovalSavesPost: approvalSavesPost,
-		retrySaveReviewApprovalMutatesPostContent:
-			approvalMutatesPostContent,
+		retrySaveReviewApprovalMutatesPostContent: approvalMutatesPostContent,
 		retrySaveReviewApprovalCreatesRevision: approvalCreatesRevision,
 		retrySaveReviewApprovalClaimsSaved: approvalClaimsSaved,
 	} );
@@ -3444,12 +4217,35 @@ function normalizeCount( value ) {
 	return Number.isInteger( count ) && count > 0 ? count : 0;
 }
 
+function normalizeCountWithFallback( value, fallback ) {
+	if ( value === undefined || value === null ) {
+		return normalizeCount( fallback );
+	}
+
+	return normalizeCount( value );
+}
+
 function normalizeNullableString( value ) {
 	return typeof value === 'string' && value.length > 0 ? value : null;
 }
 
+function normalizeNullableInteger( value ) {
+	const number = Number( value );
+	return Number.isInteger( number ) && number > 0 ? number : null;
+}
+
 function normalizeNullableContentString( value ) {
 	return typeof value === 'string' ? value : null;
+}
+
+function normalizeBlockPath( value ) {
+	if ( ! Array.isArray( value ) ) {
+		return [];
+	}
+
+	return value
+		.map( ( item ) => Number( item ) )
+		.filter( ( item ) => Number.isInteger( item ) && item >= 0 );
 }
 
 function normalizeIdList( value ) {

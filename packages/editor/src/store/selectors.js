@@ -33,7 +33,9 @@ import { getTemplateInfo } from '../utils/get-template-info';
 import {
 	DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE,
 	getDistributedEditingNoticeDescriptorsForSessionState,
+	getDistributedEditingRiskyBlockReviewStateForSessionState,
 	getDistributedEditingRetrySaveFlowStateForSessionState,
+	getDistributedEditingSavePolicyStateForSessionState,
 	getDistributedEditingUnloadWarningStateForSessionState,
 	hasDistributedEditingRetrySaveSavedStateEvidenceForSessionState,
 	shouldWarnBeforeLeavingDistributedEditingSessionState,
@@ -440,6 +442,33 @@ export function hasDistributedEditingRetrySaveSavedStateEvidence( state ) {
  */
 export function getDistributedEditingRetrySaveFlowState( state ) {
 	return getDistributedEditingRetrySaveFlowStateForSessionState(
+		getDistributedEditingSessionState( state )
+	);
+}
+
+/**
+ * Returns the current DE-RTC risky-block review state for editor annotation and
+ * pre-publish review consumers.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {Object} Risky block review state.
+ */
+export function getDistributedEditingRiskyBlockReviewState( state ) {
+	return getDistributedEditingRiskyBlockReviewStateForSessionState(
+		getDistributedEditingSessionState( state )
+	);
+}
+
+/**
+ * Returns the current DE-RTC Save policy state for human review handoff.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {Object} Save policy state.
+ */
+export function getDistributedEditingSavePolicyState( state ) {
+	return getDistributedEditingSavePolicyStateForSessionState(
 		getDistributedEditingSessionState( state )
 	);
 }

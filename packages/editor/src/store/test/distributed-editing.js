@@ -15,6 +15,10 @@ import {
 	DISTRIBUTED_EDITING_NOTICE_IDS,
 	DISTRIBUTED_EDITING_NOTICE_KINDS,
 	DISTRIBUTED_EDITING_REASON_CODES,
+	DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES,
+	DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_STATUSES,
+	DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS,
+	DISTRIBUTED_EDITING_SAVE_POLICY_STATUSES,
 	DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_REASONS,
 	DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_STATUSES,
 	DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES,
@@ -30,7 +34,12 @@ import {
 	getDistributedEditingLocalUpdatesExportPayload,
 	getDistributedEditingRetrySaveFlowStateForSessionState,
 	getDistributedEditingRetrySavePolicyForSessionState,
+	getDistributedEditingRiskyBlockReviewStateForSessionState,
+	getDistributedEditingSavePolicyStateForSessionState,
 	getDistributedEditingStaleBaseLocalRebaseResult,
+	getDistributedEditingSessionStateForKsesRiskyBlockReviewClassificationResult,
+	getDistributedEditingSessionStateForRiskyBlockReviewItemResolution,
+	getDistributedEditingSessionStateForStaleRiskyBlockReview,
 	getDistributedEditingSessionStateForRetrySaveHandoff,
 	getDistributedEditingSessionStateForRetrySaveRequest,
 	getDistributedEditingSessionStateForRetrySaveReviewApprovalProofResult,
@@ -60,7 +69,9 @@ import { distributedEditingSession } from '../reducer';
 import {
 	canExportDistributedEditingLocalUpdates,
 	getDistributedEditingNoticeDescriptors,
+	getDistributedEditingRiskyBlockReviewState,
 	getDistributedEditingRetrySaveFlowState,
+	getDistributedEditingSavePolicyState,
 	getDistributedEditingSessionDisposition,
 	getDistributedEditingSessionReasonCode,
 	getDistributedEditingSessionState,
@@ -242,6 +253,31 @@ describe( 'distributed editing session state', () => {
 			retrySaveReviewApprovalMutatesPostContent: false,
 			retrySaveReviewApprovalCreatesRevision: false,
 			retrySaveReviewApprovalClaimsSaved: false,
+			riskyBlockReviewStatus:
+				DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_STATUSES.NONE,
+			riskyBlockReviewReasonCode: null,
+			riskyBlockReviewItems: [],
+			riskyBlockReviewItemCount: 0,
+			riskyBlockReviewPendingCount: 0,
+			riskyBlockReviewApprovedCount: 0,
+			riskyBlockReviewRejectedCount: 0,
+			riskyBlockReviewHasPendingItems: false,
+			riskyBlockReviewPrePublishPanelRequired: false,
+			riskyBlockReviewSaveButtonLabel: 'Update',
+			riskyBlockReviewSaveClickAction:
+				DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.CONTINUE_SAVE,
+			riskyBlockReviewCanExportLocalUpdates: false,
+			riskyBlockReviewRequiresServerStateRefetch: false,
+			riskyBlockReviewReviewedServerVersion: null,
+			riskyBlockReviewCurrentServerVersion: null,
+			riskyBlockReviewRawContentIncluded: false,
+			riskyBlockReviewExposesRawContent: false,
+			riskyBlockReviewDispatchesNotice: false,
+			riskyBlockReviewMutatesEditorContent: false,
+			riskyBlockReviewCallsNormalSavePost: false,
+			riskyBlockReviewCallsRetrySaveEndpoint: false,
+			riskyBlockReviewChangesPostLock: false,
+			riskyBlockReviewClaimsSaved: false,
 			requiresManualConflictResolution: false,
 			mustOfferLocalCopy: true,
 			canExportLocalUpdates: true,
@@ -1469,8 +1505,7 @@ describe( 'distributed editing session state', () => {
 					serverVersion: '12',
 					pendingChangeCount: 2,
 					hasPendingChanges: true,
-					retrySaveReviewAction:
-						'request_unfiltered_html_reviewer',
+					retrySaveReviewAction: 'request_unfiltered_html_reviewer',
 					retrySaveReviewRequiredCapability: 'unfiltered_html',
 					retrySaveReviewerCapability: 'unfiltered_html',
 					retrySaveReviewScope: 'collaborative_post_content',
@@ -1487,15 +1522,12 @@ describe( 'distributed editing session state', () => {
 				DISTRIBUTED_EDITING_RETRY_SAVE_REVIEW_APPROVAL_PROOF_STATUSES.ACCEPTED_FOR_RETRY_SAVE,
 			retrySaveReviewApprovalAccepted: true,
 			retrySaveReviewApprovalServerVersion: '12',
-			retrySaveReviewApprovalAction:
-				'retry_save_with_reviewer_approval',
+			retrySaveReviewApprovalAction: 'retry_save_with_reviewer_approval',
 			retrySaveReviewApprovalRequiredCapability: 'unfiltered_html',
 			retrySaveReviewApprovalReviewerCapability: 'unfiltered_html',
 			retrySaveReviewApprovalScope: 'collaborative_post_content',
-			retrySaveReviewApprovalProposedContentHash:
-				proposedContentHash,
-			retrySaveReviewApprovalCandidateContentHash:
-				candidateContentHash,
+			retrySaveReviewApprovalProposedContentHash: proposedContentHash,
+			retrySaveReviewApprovalCandidateContentHash: candidateContentHash,
 			retrySaveReviewApprovalRawContentIncluded: false,
 			retrySaveReviewApprovalSavesPost: false,
 			retrySaveReviewApprovalMutatesPostContent: false,
@@ -1569,6 +1601,383 @@ describe( 'distributed editing session state', () => {
 			canExportLocalUpdates: true,
 			retrySaveReviewApprovalSavesPost: false,
 			retrySaveReviewApprovalRawContentIncluded: false,
+		} );
+	} );
+
+	it( 'normalizes WordPress KSES risky block review classification into inert editor state', () => {
+		const rawContentToken = 'turn-0061-raw-risky-html';
+		const normalized =
+			getDistributedEditingSessionStateForKsesRiskyBlockReviewClassificationResult(
+				{
+					result: 'block_review_required',
+					reason_code:
+						DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_UNFILTERED_HTML_WOULD_CHANGE_CONTENT,
+					post_id: 44,
+					rest_base: 'posts',
+					server_version: '21',
+					client_base_version: '21',
+					review_item_count: 1,
+					pending_review_item_count: 1,
+					pre_publish_review_required: true,
+					save_action: 'open_pre_publish_review',
+					raw_content: rawContentToken,
+					raw_content_included: false,
+					exposes_raw_content: false,
+					saves_post: false,
+					mutates_post_content: false,
+					creates_revision: false,
+					claims_saved: false,
+					review_items: [
+						{
+							id: 'kses-review-turn-0061',
+							block_client_id: 'server-block-0',
+							block_name: 'core/html',
+							block_label: 'HTML',
+							block_path: [ 0 ],
+							change_kind: 'modified_block',
+							risk_reason: 'kses_would_remove_script',
+							author_id: 17,
+							base_version: '21',
+							server_version: '21',
+							base_content_hash:
+								'1111111111111111111111111111111111111111111111111111111111111111',
+							proposed_content_hash:
+								'2222222222222222222222222222222222222222222222222222222222222222',
+							kses_filtered_content_hash:
+								'3333333333333333333333333333333333333333333333333333333333333333',
+							review_status: 'pending_review',
+							review_evidence_type: 'kses_block_hash_only_change',
+							content_review_policy: 'kses',
+							raw_content: rawContentToken,
+							raw_content_included: false,
+							exposes_raw_content: false,
+						},
+					],
+				}
+			);
+		const selectorState = { distributedEditingSession: normalized };
+		const reviewState =
+			getDistributedEditingRiskyBlockReviewStateForSessionState(
+				normalized
+			);
+		const savePolicy =
+			getDistributedEditingSavePolicyStateForSessionState( normalized );
+
+		expect( normalized ).toMatchObject( {
+			disposition:
+				DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_UNFILTERED_HTML_REVIEW_REQUIRED,
+			reasonCode:
+				DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_UNFILTERED_HTML_WOULD_CHANGE_CONTENT,
+			clientBaseVersion: '21',
+			serverVersion: '21',
+			pendingChangeCount: 1,
+			hasPendingChanges: true,
+			isAwaitingServerConfirmation: true,
+			requiresManualConflictResolution: true,
+			mustOfferLocalCopy: true,
+			canExportLocalUpdates: true,
+			riskyBlockReviewStatus:
+				DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_STATUSES.REVIEW_REQUIRED,
+			riskyBlockReviewItemCount: 1,
+			riskyBlockReviewPendingCount: 1,
+			riskyBlockReviewPrePublishPanelRequired: true,
+			riskyBlockReviewSaveButtonLabel: 'Review changes',
+			riskyBlockReviewSaveClickAction:
+				DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.OPEN_PRE_PUBLISH_REVIEW,
+			riskyBlockReviewRawContentIncluded: false,
+			riskyBlockReviewExposesRawContent: false,
+			riskyBlockReviewDispatchesNotice: false,
+			riskyBlockReviewMutatesEditorContent: false,
+			riskyBlockReviewCallsNormalSavePost: false,
+			riskyBlockReviewCallsRetrySaveEndpoint: false,
+			riskyBlockReviewChangesPostLock: false,
+			riskyBlockReviewClaimsSaved: false,
+		} );
+		expect( reviewState ).toMatchObject( {
+			status: DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_STATUSES.REVIEW_REQUIRED,
+			pendingReviewItemCount: 1,
+			hasPendingReviewItems: true,
+			prePublishPanelRequired: true,
+			saveButtonLabel: 'Review changes',
+			saveClickAction:
+				DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.OPEN_PRE_PUBLISH_REVIEW,
+			canExportLocalUpdates: true,
+			dispatchesNotice: false,
+			mutatesEditorContent: false,
+			callsNormalSavePost: false,
+			callsRetrySaveEndpoint: false,
+			changesPostLock: false,
+			claimsSaved: false,
+			reviewItems: [
+				expect.objectContaining( {
+					id: 'kses-review-turn-0061',
+					blockClientId: 'server-block-0',
+					blockName: 'core/html',
+					blockLabel: 'HTML',
+					blockPath: [ 0 ],
+					changeKind: 'modified_block',
+					riskReason: 'kses_would_remove_script',
+					authorId: 17,
+					baseVersion: '21',
+					serverVersion: '21',
+					reviewStatus:
+						DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES.PENDING_REVIEW,
+					reviewEvidenceType: 'kses_block_hash_only_change',
+					contentReviewPolicy: 'kses',
+					rawContentIncluded: false,
+					exposesRawContent: false,
+					annotation: {
+						visualTreatment: 'blue_warning_marker_with_focus_wash',
+						hasWarningMarker: true,
+						hasSubtleBlueWash: true,
+						washActivation:
+							'selected_focused_hovered_or_review_target',
+						hasAccessibleLabel: true,
+						hasListViewParity: true,
+						reliesOnColorAlone: false,
+					},
+				} ),
+			],
+		} );
+		expect( savePolicy ).toEqual( {
+			status: DISTRIBUTED_EDITING_SAVE_POLICY_STATUSES.REVIEW_REQUIRED,
+			reason: 'risky_block_review_required',
+			saveButtonLabel: 'Review changes',
+			clickAction:
+				DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.OPEN_PRE_PUBLISH_REVIEW,
+			blocksNormalSavePost: true,
+			opensPrePublishReview: true,
+			requiresServerStateRefetch: false,
+			reviewItemCount: 1,
+			pendingReviewItemCount: 1,
+			approvedReviewItemCount: 0,
+			rejectedReviewItemCount: 0,
+			savesPost: false,
+			shouldCallNormalSavePost: false,
+			shouldCallRetrySaveEndpoint: false,
+			dispatchesNotice: false,
+			mutatesEditorContent: false,
+			mutatesPersistedPostContent: false,
+			changesPostLock: false,
+			claimsSaved: false,
+		} );
+		expect(
+			getDistributedEditingRiskyBlockReviewState( selectorState )
+		).toEqual( reviewState );
+		expect( getDistributedEditingSavePolicyState( selectorState ) ).toEqual(
+			savePolicy
+		);
+		expect( JSON.stringify( normalized ) ).not.toContain( rawContentToken );
+		expect( JSON.stringify( reviewState ) ).not.toContain(
+			rawContentToken
+		);
+		expect( JSON.stringify( savePolicy ) ).not.toContain( rawContentToken );
+	} );
+
+	it( 'keeps privileged KSES block classifications on the normal save policy', () => {
+		const normalized =
+			getDistributedEditingSessionStateForKsesRiskyBlockReviewClassificationResult(
+				{
+					result: 'no_review_required',
+					reason_code: null,
+					user_can_unfiltered_html: true,
+					server_version: '22',
+					client_base_version: '22',
+					review_items: [],
+					review_item_count: 0,
+					pending_review_item_count: 0,
+					pre_publish_review_required: false,
+					save_action: 'continue_save',
+					raw_content_included: false,
+				}
+			);
+		const reviewState =
+			getDistributedEditingRiskyBlockReviewStateForSessionState(
+				normalized
+			);
+		const savePolicy =
+			getDistributedEditingSavePolicyStateForSessionState( normalized );
+
+		expect( normalized ).toMatchObject( {
+			disposition: DISTRIBUTED_EDITING_DISPOSITIONS.IDLE,
+			reasonCode: null,
+			hasPendingChanges: false,
+			isAwaitingServerConfirmation: false,
+			riskyBlockReviewStatus:
+				DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_STATUSES.NO_REVIEW_REQUIRED,
+			riskyBlockReviewItemCount: 0,
+			riskyBlockReviewPendingCount: 0,
+			riskyBlockReviewPrePublishPanelRequired: false,
+			riskyBlockReviewCanExportLocalUpdates: false,
+		} );
+		expect( reviewState ).toMatchObject( {
+			status: DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_STATUSES.NO_REVIEW_REQUIRED,
+			reviewItems: [],
+			hasPendingReviewItems: false,
+			prePublishPanelRequired: false,
+		} );
+		expect( savePolicy ).toMatchObject( {
+			status: DISTRIBUTED_EDITING_SAVE_POLICY_STATUSES.UPDATE_READY,
+			clickAction: DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.CONTINUE_SAVE,
+			blocksNormalSavePost: false,
+			opensPrePublishReview: false,
+		} );
+	} );
+
+	it( 'records risky block review resolution and stale-after-review without save side effects', () => {
+		const initial =
+			getDistributedEditingSessionStateForKsesRiskyBlockReviewClassificationResult(
+				{
+					result: 'block_review_required',
+					reason_code:
+						DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_UNFILTERED_HTML_WOULD_CHANGE_CONTENT,
+					server_version: '30',
+					client_base_version: '30',
+					review_item_count: 2,
+					pending_review_item_count: 2,
+					pre_publish_review_required: true,
+					review_items: [
+						{
+							id: 'risk-added',
+							block_client_id: 'server-block-0',
+							block_name: 'core/html',
+							block_label: 'HTML',
+							block_path: [ 0 ],
+							change_kind: 'added_block',
+							risk_reason: 'kses_would_remove_script',
+							base_content_hash:
+								'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+							proposed_content_hash:
+								'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb',
+							kses_filtered_content_hash:
+								'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc',
+							review_status: 'pending_review',
+						},
+						{
+							id: 'risk-deleted',
+							block_client_id: 'server-block-1',
+							block_name: 'core/html',
+							block_label: 'HTML',
+							block_path: [ 1 ],
+							change_kind: 'deleted_block',
+							risk_reason: 'unfiltered_html_block_deleted',
+							base_content_hash:
+								'dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd',
+							proposed_content_hash:
+								'eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
+							kses_filtered_content_hash:
+								'ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff',
+							review_status: 'pending_review',
+						},
+					],
+				}
+			);
+		const approved =
+			getDistributedEditingSessionStateForRiskyBlockReviewItemResolution(
+				initial,
+				{
+					reviewItemId: 'risk-added',
+					decision: 'approved',
+					reviewerId: 1,
+					approvalProofHash: 'sha256:risk-added:approval-proof',
+				}
+			);
+		const resolved =
+			getDistributedEditingSessionStateForRiskyBlockReviewItemResolution(
+				approved,
+				{
+					reviewItemId: 'risk-deleted',
+					decision: 'rejected',
+					reviewerId: 1,
+					rejectionReason: 'reviewer_rejected',
+				}
+			);
+		const stale = getDistributedEditingSessionStateForStaleRiskyBlockReview(
+			resolved,
+			{
+				reviewedServerVersion: '30',
+				currentServerVersion: '31',
+			}
+		);
+		const resolvedReviewState =
+			getDistributedEditingRiskyBlockReviewStateForSessionState(
+				resolved
+			);
+		const resolvedSavePolicy =
+			getDistributedEditingSavePolicyStateForSessionState( resolved );
+		const staleReviewState =
+			getDistributedEditingRiskyBlockReviewStateForSessionState( stale );
+		const staleSavePolicy =
+			getDistributedEditingSavePolicyStateForSessionState( stale );
+
+		expect( resolvedReviewState ).toMatchObject( {
+			status: DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_STATUSES.REVIEW_RESOLVED,
+			pendingReviewItemCount: 0,
+			approvedReviewItemCount: 1,
+			rejectedReviewItemCount: 1,
+			hasPendingReviewItems: false,
+			prePublishPanelRequired: false,
+			saveClickAction:
+				DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.CONTINUE_GUARDED_RETRY_SAVE,
+			canExportLocalUpdates: true,
+			reviewItems: [
+				expect.objectContaining( {
+					id: 'risk-added',
+					reviewStatus:
+						DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES.APPROVED_FOR_RETRY_SAVE,
+					reviewerId: 1,
+					approvalProofHash: 'sha256:risk-added:approval-proof',
+					rawContentIncluded: false,
+				} ),
+				expect.objectContaining( {
+					id: 'risk-deleted',
+					reviewStatus:
+						DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES.REJECTED,
+					reviewerId: 1,
+					rejectionReason: 'reviewer_rejected',
+					rawContentIncluded: false,
+				} ),
+			],
+		} );
+		expect( resolvedSavePolicy ).toMatchObject( {
+			status: DISTRIBUTED_EDITING_SAVE_POLICY_STATUSES.READY_FOR_REVIEWED_RETRY_SAVE,
+			clickAction:
+				DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.CONTINUE_GUARDED_RETRY_SAVE,
+			blocksNormalSavePost: false,
+			shouldCallNormalSavePost: false,
+			shouldCallRetrySaveEndpoint: false,
+			claimsSaved: false,
+		} );
+		expect( staleReviewState ).toMatchObject( {
+			status: DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_STATUSES.STALE_AFTER_REVIEW,
+			reasonCode:
+				DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+			pendingReviewItemCount: 0,
+			requiresServerStateRefetch: true,
+			reviewedServerVersion: '30',
+			currentServerVersion: '31',
+			saveClickAction:
+				DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.REFETCH_SERVER_STATE,
+			canExportLocalUpdates: true,
+		} );
+		expect( staleReviewState.reviewItems ).toEqual(
+			expect.arrayContaining( [
+				expect.objectContaining( {
+					reviewStatus:
+						DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES.STALE_AFTER_REVIEW,
+				} ),
+			] )
+		);
+		expect( staleSavePolicy ).toMatchObject( {
+			status: DISTRIBUTED_EDITING_SAVE_POLICY_STATUSES.REFETCH_REQUIRED,
+			reason: 'risky_block_review_stale',
+			clickAction:
+				DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.REFETCH_SERVER_STATE,
+			blocksNormalSavePost: true,
+			requiresServerStateRefetch: true,
+			shouldCallNormalSavePost: false,
+			shouldCallRetrySaveEndpoint: false,
+			claimsSaved: false,
 		} );
 	} );
 

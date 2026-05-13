@@ -310,6 +310,42 @@ _Returns_
 
 -   `Array`: Notice descriptors.
 
+### getDistributedEditingRetrySaveFlowState
+
+Returns a side-effect-free DE-RTC retry-save flow summary for status or demo consumers.
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+
+_Returns_
+
+-   `Object`: Retry-save flow state.
+
+### getDistributedEditingRiskyBlockReviewState
+
+Returns the current DE-RTC risky-block review state for editor annotation and pre-publish review consumers.
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+
+_Returns_
+
+-   `Object`: Risky block review state.
+
+### getDistributedEditingSavePolicyState
+
+Returns the current DE-RTC Save policy state for human review handoff.
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+
+_Returns_
+
+-   `Object`: Save policy state.
+
 ### getDistributedEditingSessionDisposition
 
 Returns the current distributed editing terminal disposition.
@@ -710,6 +746,18 @@ _Parameters_
 _Returns_
 
 -   `boolean`: Whether content includes unsaved changes.
+
+### hasDistributedEditingRetrySaveSavedStateEvidence
+
+Returns true when retry-save has server evidence that it persisted the guarded write.
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+
+_Returns_
+
+-   `boolean`: Whether retry-save saved-state evidence exists.
 
 ### hasEditorRedo
 

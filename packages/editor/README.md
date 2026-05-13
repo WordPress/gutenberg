@@ -312,6 +312,10 @@ Stable no-write planning statuses for stale-base local rebase preparation.
 
 Stable local rebase result statuses for stale-base handling.
 
+### DISTRIBUTED_EDITING_LOCAL_UPDATES_EXPORT_FORMAT
+
+Undocumented declaration.
+
 ### DISTRIBUTED_EDITING_NOTICE_ACTIONS
 
 Stable action keys that future UI can map to rendered buttons or menu items.
@@ -348,6 +352,10 @@ Stable retry-save policy blocker reasons.
 
 Stable retry-save policy statuses for deciding whether a future save workflow may call the guarded retry-save write boundary.
 
+### DISTRIBUTED_EDITING_RETRY_SAVE_REVIEW_APPROVAL_PROOF_STATUSES
+
+Stable retry-save reviewer approval proof statuses. These describe only the inert proof result; they do not authorize a save or retry-save call.
+
 ### DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES
 
 Stable retry-save statuses for the guarded write boundary.
@@ -371,6 +379,22 @@ Stable retry-submit save-preparation blocker reasons.
 ### DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES
 
 Stable retry-submit save-preparation statuses.
+
+### DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES
+
+Stable per-block KSES review statuses.
+
+### DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_STATUSES
+
+Stable KSES risky-block review statuses. These are editor data states for future block annotation and pre-publish review UI; they do not save.
+
+### DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS
+
+Stable Save click actions for DE-RTC human review handoff.
+
+### DISTRIBUTED_EDITING_SAVE_POLICY_STATUSES
+
+Stable Save policy states for DE-RTC human review handoff.
 
 ### DISTRIBUTED_EDITING_UNLOAD_WARNING_REASONS
 
@@ -542,6 +566,23 @@ getDerivedStateFromError is used to render a fallback UI after an error has been
 
 > **Deprecated** since 5.3, use `wp.blockEditor.getColorObjectByColorValue` instead.
 
+### getDistributedEditingLocalUpdatesExportPayload
+
+Returns the stable JSON payload for exporting protected local DE-RTC edits.
+
+This is pure data contract construction. It does not write to the browser clipboard, save, dispatch notices, persist editor state, or change post locks.
+
+_Parameters_
+
+-   _args_ `Object`: Export payload inputs.
+-   _args.currentPost_ `Object`: Current edited post.
+-   _args.editedPostContent_ `string`: Current serialized local editor content.
+-   _args.sessionState_ `Object`: Current DE-RTC session state.
+
+_Returns_
+
+-   `Object`: Exportable local-updates payload.
+
 ### getDistributedEditingNoticeDescriptorsForSessionState
 
 Returns stable notice descriptors for the current DE-RTC session state. Descriptors intentionally avoid rendered copy and side effects; future UI can translate the descriptor kind and action keys into notices, toasts, or status indicators.
@@ -582,6 +623,18 @@ _Returns_
 
 -   `string`: REST path.
 
+### getDistributedEditingRetrySaveFlowStateForSessionState
+
+Returns a side-effect-free progress summary for the board-demo retry-save path without exposing raw post content.
+
+_Parameters_
+
+-   _sessionState_ `Object`: DE-RTC session state.
+
+_Returns_
+
+-   `Object`: Retry-save flow state.
+
 ### getDistributedEditingRetrySavePolicyForSessionState
 
 Returns a no-side-effect policy decision for whether a future editor save workflow may call the guarded retry-save endpoint.
@@ -597,6 +650,20 @@ _Returns_
 
 -   `Object`: Retry-save policy decision.
 
+### getDistributedEditingRetrySaveReviewApprovalEndpointPath
+
+Returns the current DE-RTC retry-save reviewer approval proof endpoint path for a post.
+
+_Parameters_
+
+-   _args_ `Object`: Endpoint args.
+-   _args.postId_ `number`: Post ID.
+-   _args.restBase_ `[string]`: REST base for the edited post type.
+
+_Returns_
+
+-   `string`: REST path.
+
 ### getDistributedEditingRetrySubmitEndpointPath
 
 Returns the current DE-RTC retry-submit proof endpoint path for a post.
@@ -611,6 +678,32 @@ _Returns_
 
 -   `string`: REST path.
 
+### getDistributedEditingRiskyBlockReviewStateForSessionState
+
+Returns the risky-block review state as a nested object for selectors and future annotation surfaces.
+
+_Parameters_
+
+-   _sessionState_ `Object`: DE-RTC session state.
+
+_Returns_
+
+-   `Object`: Risky block review state.
+
+### getDistributedEditingSavePolicyStateForSessionState
+
+Returns the DE-RTC Save policy state for risky-block review handoff.
+
+This is only policy data. It does not open the pre-publish sidebar, save, retry-save, dispatch notices, mutate content, or change post locks.
+
+_Parameters_
+
+-   _sessionState_ `Object`: DE-RTC session state.
+
+_Returns_
+
+-   `Object`: Save policy state.
+
 ### getDistributedEditingServerStateEndpointPath
 
 Returns the current edited post endpoint path for DE-RTC server-state reads.
@@ -624,6 +717,21 @@ _Parameters_
 _Returns_
 
 -   `string`: REST path.
+
+### getDistributedEditingSessionStateForKsesRiskyBlockReviewClassificationResult
+
+Returns inert editor state for WordPress KSES risky-block classification.
+
+The WordPress helper returns hash-only block review items. This maps that authority vocabulary into editor state for future annotations and pre-publish review routing without saving, dispatching notices, exposing raw block content, or changing post locks.
+
+_Parameters_
+
+-   _responseOrError_ `Object`: WordPress KSES classification response or error.
+-   _currentSessionState_ `Object`: Current DE-RTC session state.
+
+_Returns_
+
+-   `Object`: Normalized DE-RTC session state.
 
 ### getDistributedEditingSessionStateForRecoveryDryRunResult
 
@@ -684,6 +792,21 @@ _Returns_
 
 -   `Object`: Normalized DE-RTC session state.
 
+### getDistributedEditingSessionStateForRetrySaveReviewApprovalProofResult
+
+Returns DE-RTC editor state for retry-save reviewer approval proof.
+
+The proof result is inert. Accepted proof keeps local edits pending and exportable for a later save/retry-save integration turn; all rejection paths keep the same local protection and store only metadata/hash evidence.
+
+_Parameters_
+
+-   _responseOrError_ `Object`: REST response or API error.
+-   _currentSessionState_ `Object`: Current DE-RTC session state.
+
+_Returns_
+
+-   `Object`: Normalized DE-RTC session state.
+
 ### getDistributedEditingSessionStateForRetrySubmitHandoff
 
 Consumes a successful local rebase retry handoff without submitting it.
@@ -722,6 +845,19 @@ Accepted proof is only a precondition. This helper does not submit to the server
 _Parameters_
 
 -   _currentSessionState_ `Object`: Current DE-RTC session state.
+
+_Returns_
+
+-   `Object`: Normalized DE-RTC session state.
+
+### getDistributedEditingSessionStateForRiskyBlockReviewItemResolution
+
+Returns inert editor state after a reviewer approves or rejects one risky block item.
+
+_Parameters_
+
+-   _currentSessionState_ `Object`: Current DE-RTC session state.
+-   _resolution_ `Object`: Review resolution data.
 
 _Returns_
 
@@ -769,6 +905,19 @@ _Parameters_
 _Returns_
 
 -   `Object`: DE-RTC session state.
+
+### getDistributedEditingSessionStateForStaleRiskyBlockReview
+
+Returns inert editor state when a reviewed risky-block decision has gone stale against a newer server version.
+
+_Parameters_
+
+-   _currentSessionState_ `Object`: Current DE-RTC session state.
+-   _staleCheck_ `Object`: Server version comparison.
+
+_Returns_
+
+-   `Object`: Normalized DE-RTC session state.
 
 ### getDistributedEditingStaleBaseEndpointPath
 
@@ -845,6 +994,18 @@ _Parameters_
 _Returns_
 
 -   `Object`: The corresponding icon.
+
+### hasDistributedEditingRetrySaveSavedStateEvidenceForSessionState
+
+Returns whether the current retry-save state contains server evidence that the guarded write persisted the post and may be treated as saved.
+
+_Parameters_
+
+-   _sessionState_ `Object`: DE-RTC session state.
+
+_Returns_
+
+-   `boolean`: Whether retry-save saved-state evidence exists.
 
 ### InnerBlocks
 
