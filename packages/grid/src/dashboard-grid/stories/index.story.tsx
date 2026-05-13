@@ -28,7 +28,6 @@ const meta: Meta< typeof DashboardGrid > = {
 	tags: [ 'status-experimental' ],
 	args: {
 		columns: 6,
-		spacing: 'sm',
 		rowHeight: 80,
 		editMode: false,
 	},
@@ -42,12 +41,6 @@ const meta: Meta< typeof DashboardGrid > = {
 			control: { type: 'number', min: 80, max: 600, step: 8 },
 			description:
 				'Enables responsive mode. Per-column lower bound in pixels.',
-		},
-		spacing: {
-			control: { type: 'select' },
-			options: [ 'xs', 'sm', 'md', 'lg', 'xl', '2xl', '3xl' ],
-			description:
-				'Gap size from the design-system scale; follows the active density.',
 		},
 		rowHeight: {
 			control: { type: 'number', min: 24, max: 400, step: 4 },
@@ -463,7 +456,6 @@ export const RowHeight: Story = {
 export const EditMode: Story = {
 	args: {
 		columns: 12,
-		spacing: 'lg',
 		rowHeight: 80,
 		editMode: true,
 	},
@@ -713,7 +705,6 @@ function CustomDragPreview( { children }: DragPreviewRenderProps ) {
 export const Customization: Story = {
 	args: {
 		columns: 6,
-		spacing: 'sm',
 		rowHeight: 80,
 		editMode: true,
 		layout: [
@@ -785,14 +776,9 @@ export const Customization: Story = {
  *
  * @param props          Render props supplied by the grid.
  * @param props.columns  Number of column tracks to mirror.
- * @param props.gapPx    Gap between tracks in pixels.
  * @param props.isActive Whether the overlay should be visible.
  */
-function NumberedOverlay( {
-	columns,
-	gapPx,
-	isActive,
-}: GridOverlayRenderProps ) {
+function NumberedOverlay( { columns, isActive }: GridOverlayRenderProps ) {
 	return (
 		<div
 			aria-hidden
@@ -801,7 +787,7 @@ function NumberedOverlay( {
 				inset: 0,
 				display: 'grid',
 				gridTemplateColumns: `repeat(${ columns }, minmax(0, 1fr))`,
-				gap: gapPx,
+				gap: 'var(--wpds-dimension-gap-sm)',
 				pointerEvents: 'none',
 				opacity: isActive ? 1 : 0,
 				visibility: isActive ? 'visible' : 'hidden',
@@ -848,9 +834,9 @@ function NumberedOverlay( {
  * Replaces the package's default edit-mode overlay with a custom
  * visual through the `renderGridOverlay` prop. The grid mounts the
  * supplied component as a sibling behind the tiles whenever
- * `editMode` is on, passing the resolved `{ columns, gapPx,
- * rowHeight }` so the override can reproduce the column and row
- * tracks pixel-accurately without re-deriving them.
+ * `editMode` is on, passing the resolved `{ columns, rowHeight }`
+ * so the override can reproduce the column and row tracks
+ * pixel-accurately without re-deriving them.
  *
  * Here the override (see `NumberedOverlay` above) swaps the warning
  * tone for info, drops the row dividers, and labels each column
@@ -862,7 +848,6 @@ export const CustomGridOverlayStory: Story = {
 	name: 'Custom Grid Overlay',
 	args: {
 		columns: 12,
-		spacing: 'lg',
 		rowHeight: 80,
 		editMode: true,
 		layout: [

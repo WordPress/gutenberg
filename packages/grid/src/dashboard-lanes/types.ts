@@ -6,7 +6,6 @@ import type {
 	GridOverlayRenderProps,
 	ResizeHandleRenderProps,
 } from '../shared/types';
-import type { DashboardGridSpacing } from '../shared/spacing';
 
 /**
  * Lanes layout item definition.
@@ -74,19 +73,12 @@ interface BaseDashboardLanesProps
 
 	/**
 	 * Inline styles on the surface root. Merged underneath the
-	 * surface's own layout styles, so `display`, `gridTemplateColumns`,
-	 * and `gap` always win.
+	 * surface's own layout styles, so `display` and
+	 * `gridTemplateColumns` always win. The gap between tiles is
+	 * owned by the design-system gap token and is not configurable
+	 * per instance; override it via a theme or density change.
 	 */
 	style?: React.CSSProperties;
-
-	/**
-	 * Gap size between tiles. Maps to the design-system gap scale
-	 * (`--wpds-dimension-gap-*`), so the rendered gap follows the
-	 * `density` chosen by an ancestor `ThemeProvider`.
-	 *
-	 * @default 'sm'
-	 */
-	spacing?: DashboardGridSpacing;
 
 	/**
 	 * `flow-tolerance` value in pixels. When two candidate lanes

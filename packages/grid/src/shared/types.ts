@@ -3,11 +3,6 @@
  */
 import type { useDraggable } from '@dnd-kit/core';
 
-/**
- * Internal dependencies
- */
-import type { DashboardGridSpacing } from './spacing';
-
 // `useDraggable`'s `listeners` and `attributes` types are not exported
 // from `@dnd-kit/core`'s public surface, so derive them from the hook
 // itself rather than via a deep import.
@@ -103,22 +98,6 @@ export interface GridOverlayRenderProps {
 	 * container width, not the prop value.
 	 */
 	columns: number;
-
-	/**
-	 * Gap size between tracks. Same `spacing` value the surface
-	 * received, exposed so the overlay can render its gap through the
-	 * design-system token (`--wpds-dimension-gap-{size}`) and follow
-	 * the active density.
-	 */
-	spacing: DashboardGridSpacing;
-
-	/**
-	 * Pixel fallback for the gap at `default` density. Provided as a
-	 * convenience for overlays that need a numeric value (e.g., calc
-	 * expressions in inline styles); under non-default density the
-	 * rendered gap may differ from this value.
-	 */
-	gapPx: number;
 
 	/**
 	 * Row height in pixels for surfaces with uniform rows. Omitted on

@@ -29,14 +29,12 @@
 
 ### Breaking changes
 
--   `spacing` is now a size key from the design-system gap scale
-    (`'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl'`) instead of a
-    numeric multiplier. The rendered gap resolves through
-    `--wpds-dimension-gap-{size}`, so it follows the `density` chosen by
-    an ancestor `ThemeProvider`. The default is `'sm'`, which maps to
-    the previous default at `density: 'default'`. Custom overlays
-    receive an additional `spacing` field on `GridOverlayRenderProps`;
-    `gapPx` is retained as a numeric fallback at `default` density.
+-   Remove the `spacing` prop from `DashboardGrid` and `DashboardLanes`.
+    The gap between tiles is now owned by the design-system gap token
+    (`--wpds-dimension-gap-sm`) applied in CSS; override via theme or
+    density rather than per instance. `GridOverlayRenderProps` no
+    longer exposes `spacing` or `gapPx`; the overlay inherits the same
+    gap token. The `DashboardGridSpacing` type export is removed.
 
 ### Internal
 

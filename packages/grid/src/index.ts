@@ -15,4 +15,3 @@ export type {
 	ResizeDelta,
 	ResizeHandleRenderProps,
 } from './shared/types';
-export type { DashboardGridSpacing } from './shared/spacing';
