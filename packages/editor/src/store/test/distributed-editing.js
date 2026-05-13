@@ -156,6 +156,36 @@ describe( 'distributed editing session state', () => {
 		} );
 	} );
 
+	it( 'normalizes stale-base rejection data from REST error payloads', () => {
+		const normalized =
+			getDistributedEditingSessionStateForStaleBaseRejectionResult( {
+				code: DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+				data: {
+					reason_code:
+						DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+					client_base_version: 'server-v4',
+					server_version: 'server-v6',
+					pending_change_count: 2,
+					remote_change_count: 3,
+					can_attempt_local_rebase: false,
+				},
+			} );
+
+		expect( normalized ).toMatchObject( {
+			clientBaseVersion: 'server-v4',
+			serverVersion: 'server-v6',
+			disposition:
+				DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+			reasonCode:
+				DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+			pendingChangeCount: 2,
+			remoteChangeCount: 3,
+			requiresServerStateRefetch: true,
+			canAttemptLocalRebase: false,
+			canExportLocalUpdates: true,
+		} );
+	} );
+
 	it( 'treats degraded live feedback as connection degradation only', () => {
 		const normalized = normalizeDistributedEditingSessionState( {
 			disposition:

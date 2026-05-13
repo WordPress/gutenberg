@@ -536,6 +536,20 @@ _Returns_
 
 -   `Object`: DE-RTC session state.
 
+### getDistributedEditingStaleBaseEndpointPath
+
+Returns the current DE-RTC stale-base endpoint path for a post.
+
+_Parameters_
+
+-   _args_ `Object`: Endpoint args.
+-   _args.postId_ `number`: Post ID.
+-   _args.restBase_ `[string]`: REST base for the edited post type.
+
+_Returns_
+
+-   `string`: REST path.
+
 ### getDistributedEditingStatusSurfaceItems
 
 Returns inert, renderable status items for DE-RTC notice descriptors.

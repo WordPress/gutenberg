@@ -26,9 +26,13 @@ import { __, sprintf } from '@wordpress/i18n';
 import { localAutosaveSet } from './local-autosave';
 import {
 	__experimentalRequestDistributedEditingRecoveryDryRun as requestDistributedEditingRecoveryDryRun,
+	__experimentalRequestDistributedEditingStaleBaseRejection as requestDistributedEditingStaleBaseRejection,
 	DISTRIBUTED_EDITING_RECOVERY_REST_BASE,
 } from './distributed-editing-api';
-import { getDistributedEditingSessionStateForRecoveryDryRunResult } from './distributed-editing';
+import {
+	getDistributedEditingSessionStateForRecoveryDryRunResult,
+	getDistributedEditingSessionStateForStaleBaseRejectionResult,
+} from './distributed-editing';
 import {
 	getNotificationArgumentsForSaveSuccess,
 	getNotificationArgumentsForSaveFail,
@@ -241,6 +245,65 @@ export const __experimentalRefreshDistributedEditingRecoveryDryRun =
 		} catch ( error ) {
 			dispatch.setDistributedEditingSessionState(
 				getDistributedEditingSessionStateForRecoveryDryRunResult(
+					error
+				)
+			);
+
+			throw error;
+		}
+	};
+
+/**
+ * Requests a Distributed Editing stale-base rejection contract and stores state.
+ *
+ * The action does not save, apply recovery, refetch, rebase, retry, dispatch
+ * notices, or persist editor state. The current REST contract is intentionally
+ * an error response; the error is reflected into DE-RTC state before being
+ * rethrown for callers that need command-level handling.
+ *
+ * @param {Object} [options] Request options.
+ *
+ * @return {Function} Action thunk.
+ */
+export const __experimentalRefreshDistributedEditingStaleBaseRejection =
+	( options = {} ) =>
+	async ( { select, dispatch, registry } ) => {
+		const currentPost = select.getCurrentPost?.() || {};
+		const postType = options.postType || currentPost.type;
+		const postId = options.postId ?? currentPost.id;
+		const postTypeRecord = postType
+			? registry.select( coreStore ).getPostType( postType )
+			: null;
+		const restBase =
+			options.restBase ||
+			postTypeRecord?.rest_base ||
+			DISTRIBUTED_EDITING_RECOVERY_REST_BASE;
+		const requestArgs = {
+			postId,
+			restBase,
+			clientBaseVersion: options.clientBaseVersion,
+			serverVersion: options.serverVersion,
+			pendingChangeCount: options.pendingChangeCount,
+			remoteChangeCount: options.remoteChangeCount,
+			canAttemptLocalRebase: options.canAttemptLocalRebase,
+		};
+
+		try {
+			const response =
+				await requestDistributedEditingStaleBaseRejection(
+					requestArgs
+				);
+
+			dispatch.setDistributedEditingSessionState(
+				getDistributedEditingSessionStateForStaleBaseRejectionResult(
+					response
+				)
+			);
+
+			return response;
+		} catch ( error ) {
+			dispatch.setDistributedEditingSessionState(
+				getDistributedEditingSessionStateForStaleBaseRejectionResult(
 					error
 				)
 			);

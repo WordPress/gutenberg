@@ -253,10 +253,13 @@ export function normalizeDistributedEditingSessionState( sessionState = {} ) {
 export function getDistributedEditingSessionStateForRecoveryDryRunResult(
 	responseOrError = {}
 ) {
+	const responseData = getDistributedEditingResponseData( responseOrError );
 	const reasonCode = normalizeNullableString(
 		responseOrError.code ||
 			responseOrError.reasonCode ||
-			responseOrError.reason_code
+			responseOrError.reason_code ||
+			responseData.reasonCode ||
+			responseData.reason_code
 	);
 
 	switch ( reasonCode ) {
@@ -309,38 +312,54 @@ export function getDistributedEditingSessionStateForRecoveryDryRunResult(
 export function getDistributedEditingSessionStateForStaleBaseRejectionResult(
 	responseOrError = {}
 ) {
+	const responseData = getDistributedEditingResponseData( responseOrError );
 	const reasonCode =
 		normalizeNullableString(
 			responseOrError.code ||
 				responseOrError.reasonCode ||
-				responseOrError.reason_code
+				responseOrError.reason_code ||
+				responseData.reasonCode ||
+				responseData.reason_code
 		) || DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED;
 
 	return normalizeDistributedEditingSessionState( {
 		clientBaseVersion:
 			responseOrError.clientBaseVersion ||
-			responseOrError.client_base_version,
+			responseOrError.client_base_version ||
+			responseData.clientBaseVersion ||
+			responseData.client_base_version,
 		serverVersion:
-			responseOrError.serverVersion || responseOrError.server_version,
+			responseOrError.serverVersion ||
+			responseOrError.server_version ||
+			responseData.serverVersion ||
+			responseData.server_version,
 		disposition:
 			DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
 		reasonCode,
 		pendingChangeCount:
 			responseOrError.pendingChangeCount ||
 			responseOrError.pending_change_count ||
+			responseData.pendingChangeCount ||
+			responseData.pending_change_count ||
 			1,
 		remoteChangeCount:
 			responseOrError.remoteChangeCount ||
 			responseOrError.remote_change_count ||
+			responseData.remoteChangeCount ||
+			responseData.remote_change_count ||
 			1,
 		requiresServerStateRefetch: true,
 		canAttemptLocalRebase:
 			responseOrError.canAttemptLocalRebase ??
 			responseOrError.can_attempt_local_rebase ??
+			responseData.canAttemptLocalRebase ??
+			responseData.can_attempt_local_rebase ??
 			false,
 		requiresManualConflictResolution:
 			responseOrError.requiresManualConflictResolution ||
-			responseOrError.requires_manual_conflict_resolution,
+			responseOrError.requires_manual_conflict_resolution ||
+			responseData.requiresManualConflictResolution ||
+			responseData.requires_manual_conflict_resolution,
 		canExportLocalUpdates: true,
 	} );
 }
@@ -549,4 +568,12 @@ function normalizeCount( value ) {
 
 function normalizeNullableString( value ) {
 	return typeof value === 'string' && value.length > 0 ? value : null;
+}
+
+function getDistributedEditingResponseData( responseOrError ) {
+	return responseOrError?.data &&
+		typeof responseOrError.data === 'object' &&
+		! Array.isArray( responseOrError.data )
+		? responseOrError.data
+		: {};
 }

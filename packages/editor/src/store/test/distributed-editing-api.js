@@ -8,7 +8,9 @@ import apiFetch from '@wordpress/api-fetch';
  */
 import {
 	__experimentalRequestDistributedEditingRecoveryDryRun,
+	__experimentalRequestDistributedEditingStaleBaseRejection,
 	getDistributedEditingRecoveryEndpointPath,
+	getDistributedEditingStaleBaseEndpointPath,
 } from '../distributed-editing-api';
 
 describe( 'distributed editing REST helpers', () => {
@@ -27,6 +29,14 @@ describe( 'distributed editing REST helpers', () => {
 				restBase: 'pages',
 			} )
 		).toBe( '/wp/v2/pages/42/distributed-editing/recovery' );
+	} );
+
+	it( 'builds the current stale-base endpoint path', () => {
+		expect(
+			getDistributedEditingStaleBaseEndpointPath( {
+				postId: 42,
+			} )
+		).toBe( '/wp/v2/posts/42/distributed-editing/stale-base' );
 	} );
 
 	it( 'rejects unsupported REST bases until WordPress exposes them', () => {
@@ -67,6 +77,44 @@ describe( 'distributed editing REST helpers', () => {
 		).resolves.toEqual( {
 			mode: 'dry_run',
 			result: 'candidate_update_valid',
+		} );
+	} );
+
+	it( 'requests stale-base rejection without exposing save or retry behavior', async () => {
+		apiFetch.setFetchHandler( async ( options ) => {
+			expect( options.path ).toMatch(
+				/^\/wp\/v2\/pages\/42\/distributed-editing\/stale-base/
+			);
+			expect( options.method ).toBe( 'POST' );
+			expect( options.data ).toEqual( {
+				client_base_version: '4',
+				server_version: '6',
+				pending_change_count: 2,
+				remote_change_count: 3,
+				can_attempt_local_rebase: false,
+			} );
+
+			throw {
+				code: 'stale_base_version_rejected',
+				message: 'Distributed Editing rejected a stale base.',
+				data: {
+					status: 409,
+					reason_code: 'stale_base_version_rejected',
+				},
+			};
+		} );
+
+		await expect(
+			__experimentalRequestDistributedEditingStaleBaseRejection( {
+				postId: 42,
+				restBase: 'pages',
+				clientBaseVersion: '4',
+				serverVersion: '6',
+				pendingChangeCount: 2,
+				remoteChangeCount: 3,
+			} )
+		).rejects.toMatchObject( {
+			code: 'stale_base_version_rejected',
 		} );
 	} );
 } );

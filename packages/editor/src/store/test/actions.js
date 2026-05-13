@@ -165,6 +165,95 @@ describe( 'Post actions', () => {
 		} );
 	} );
 
+	describe( '__experimentalRefreshDistributedEditingStaleBaseRejection()', () => {
+		it( 'normalizes stale-base REST errors before rethrowing', async () => {
+			const post = {
+				id: postId,
+				type: 'post',
+				title: 'bar',
+				content: 'bar',
+				status: 'draft',
+			};
+			const error = {
+				code: DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+				message:
+					'Distributed Editing rejected the update because the client base version is stale.',
+				data: {
+					status: 409,
+					reason_code:
+						DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+					client_base_version: '4',
+					server_version: '6',
+					pending_change_count: 2,
+					remote_change_count: 3,
+					requires_server_state_refetch: true,
+					can_attempt_local_rebase: false,
+					can_export_local_updates: true,
+				},
+			};
+
+			apiFetch.setFetchHandler( async ( options ) => {
+				const { path, method, data } = options;
+
+				expect( method ).toBe( 'POST' );
+				expect( path ).toMatch(
+					new RegExp(
+						`^/wp/v2/posts/${ postId }/distributed-editing/stale-base`
+					)
+				);
+				expect( data ).toEqual( {
+					client_base_version: '4',
+					server_version: '6',
+					pending_change_count: 2,
+					remote_change_count: 3,
+					can_attempt_local_rebase: false,
+				} );
+
+				throw error;
+			} );
+
+			const registry = createRegistryWithStores();
+
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', post );
+			registry.dispatch( editorStore ).setupEditor( post, {} );
+
+			await expect(
+				registry
+					.dispatch( editorStore )
+					.__experimentalRefreshDistributedEditingStaleBaseRejection(
+						{
+							clientBaseVersion: '4',
+							serverVersion: '6',
+							pendingChangeCount: 2,
+							remoteChangeCount: 3,
+						}
+					)
+			).rejects.toBe( error );
+
+			expect(
+				registry
+					.select( editorStore )
+					.getDistributedEditingSessionState()
+			).toMatchObject( {
+				disposition:
+					DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+				reasonCode:
+					DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+				clientBaseVersion: '4',
+				serverVersion: '6',
+				pendingChangeCount: 2,
+				remoteChangeCount: 3,
+				hasPendingChanges: true,
+				isAwaitingServerConfirmation: true,
+				requiresServerStateRefetch: true,
+				canAttemptLocalRebase: false,
+				canExportLocalUpdates: true,
+			} );
+		} );
+	} );
+
 	describe( 'savePost()', () => {
 		it( 'saves a modified post', async () => {
 			const post = {
