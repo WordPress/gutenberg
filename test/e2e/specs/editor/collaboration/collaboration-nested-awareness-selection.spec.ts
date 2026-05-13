@@ -174,7 +174,7 @@ async function selectAcrossCells( {
 			const ownerDocument = startElement.ownerDocument;
 			// Build the native range directly; table RichText mouse drags are
 			// geometry-dependent in headless browsers.
-			const getTextNode = ( element, last = false ) => {
+			const getTextNode = ( element: Element, last = false ) => {
 				const walker = ownerDocument.createTreeWalker(
 					element,
 					NodeFilter.SHOW_TEXT
@@ -398,6 +398,7 @@ test.describe( 'Collaboration - Nested Awareness Selection', () => {
 		collaborationUtils,
 		requestUtils,
 		editor,
+		page,
 	} ) => {
 		const post = await requestUtils.createPost( {
 			title: 'Nested Awareness Selection Cross Cell Native Selection Test',
