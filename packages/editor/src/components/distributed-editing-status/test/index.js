@@ -43,9 +43,21 @@ import {
 	getDistributedEditingUnloadWarningStateForSessionState,
 } from '../../../store/distributed-editing';
 
-jest.mock( '@wordpress/data/src/components/use-select', () => jest.fn() );
-jest.mock( '@wordpress/data/src/components/use-dispatch', () => ( {
-	useDispatch: jest.fn(),
+jest.mock( '@wordpress/data', () => {
+	const path = require( 'path' );
+	const packageJsonPath = require.resolve( '@wordpress/data/package.json' );
+	const actual = jest.requireActual(
+		path.join( path.dirname( packageJsonPath ), 'build/index.cjs' )
+	);
+
+	return {
+		...actual,
+		useDispatch: jest.fn(),
+		useSelect: jest.fn(),
+	};
+} );
+jest.mock( '../../../store', () => ( {
+	store: { name: 'core/editor' },
 } ) );
 
 function setupDistributedEditingStatusSelect( {
@@ -772,13 +784,13 @@ describe( 'DistributedEditingStatus', () => {
 		expect( screen.getByText( 'Retry save in progress' ) ).toBeVisible();
 		expect(
 			screen.getByText(
-				'The editor is sending rebased changes through the guarded retry-save path. Keep this tab open until the server confirms the save.'
+				'The editor is sending rebased changes through the guarded retry-save path. Keep this tab open; protected local changes remain exportable until the server confirms the save.'
 			)
 		).toBeVisible();
 		expect( screen.getByText( 'Changes pending' ) ).toBeVisible();
 		expect(
 			screen.getByText(
-				'Retry save is waiting for server confirmation. Local changes remain pending.'
+				'The guarded retry save is waiting for server confirmation. Protected local changes remain pending and exportable until confirmation.'
 			)
 		).toBeVisible();
 
@@ -812,7 +824,7 @@ describe( 'DistributedEditingStatus', () => {
 		).not.toHaveBeenCalled();
 		expect(
 			await screen.findByText(
-				'Local changes copied. Keep this data until the server confirms your update.'
+				'Protected local changes exported. Keep this copy until the server confirms the update.'
 			)
 		).toBeVisible();
 	} );
@@ -846,7 +858,7 @@ describe( 'DistributedEditingStatus', () => {
 		expect( screen.getByText( 'Retry save confirmed' ) ).toBeVisible();
 		expect(
 			screen.getByText(
-				'The server saved the rebased changes and cleared the local pending-change warning.'
+				'Server confirmed the guarded retry-save, advanced the sync version from 7 to 8, and recorded 1 revision. Protected local changes are no longer pending for this save.'
 			)
 		).toBeVisible();
 		expect(
@@ -898,7 +910,7 @@ describe( 'DistributedEditingStatus', () => {
 		).toBeVisible();
 		expect(
 			screen.getByText(
-				'A retry save is already waiting for server confirmation. Local changes are still protected; keep this tab open until it finishes.'
+				'A retry save is already waiting for server confirmation. Protected local changes remain exportable; keep this tab open until it finishes.'
 			)
 		).toBeVisible();
 
@@ -933,7 +945,7 @@ describe( 'DistributedEditingStatus', () => {
 		).not.toHaveBeenCalled();
 		expect(
 			await screen.findByText(
-				'Local changes copied. Keep this data until the server confirms your update.'
+				'Protected local changes exported. Keep this copy until the server confirms the update.'
 			)
 		).toBeVisible();
 	} );
@@ -998,7 +1010,7 @@ describe( 'DistributedEditingStatus', () => {
 		).not.toHaveBeenCalled();
 		expect(
 			await screen.findByText(
-				'Local changes copied. Keep this data until the server confirms your update.'
+				'Protected local changes exported. Keep this copy until the server confirms the update.'
 			)
 		).toBeVisible();
 	} );
@@ -1033,7 +1045,7 @@ describe( 'DistributedEditingStatus', () => {
 		);
 
 		expect( await screen.findByRole( 'status' ) ).toHaveTextContent(
-			'Clipboard unavailable. Local changes remain protected in this editor session; keep this tab open and try exporting again after clipboard access is available.'
+			'Clipboard unavailable. Protected local changes remain in this editor session; keep this tab open and try exporting again after clipboard access is available.'
 		);
 		expect(
 			actions.__experimentalSaveDistributedEditingRetryAfterProof
@@ -1074,7 +1086,7 @@ describe( 'DistributedEditingStatus', () => {
 		).not.toHaveBeenCalled();
 		expect(
 			await screen.findByText(
-				'Server version refreshed. Local changes remain protected and exportable while you review before retrying.'
+				'Server version refreshed for review. Protected local changes remain in this editor session and can still be exported before retrying.'
 			)
 		).toBeVisible();
 	} );
@@ -1125,7 +1137,7 @@ describe( 'DistributedEditingStatus', () => {
 		);
 		expect(
 			screen.getByText(
-				'Server version could not be refreshed. Local changes remain protected and exportable in this editor session; keep this tab open before trying again.'
+				'Server version could not be refreshed. Protected local changes remain in this editor session and can still be exported; keep this tab open before trying again.'
 			)
 		).toBeVisible();
 	} );
@@ -1196,7 +1208,7 @@ describe( 'DistributedEditingStatus', () => {
 		);
 		expect(
 			screen.getByText(
-				'Server version refreshed. Local changes remain protected and exportable while you review before retrying.'
+				'Server version refreshed for review. Protected local changes remain in this editor session and can still be exported before retrying.'
 			)
 		).toBeVisible();
 	} );
@@ -1902,7 +1914,7 @@ describe( 'DistributedEditingStatusSurface', () => {
 		expect( screen.getByText( 'Retry save in progress' ) ).toBeVisible();
 		expect(
 			screen.getByText(
-				'The editor is sending rebased changes through the guarded retry-save path. Keep this tab open until the server confirms the save.'
+				'The editor is sending rebased changes through the guarded retry-save path. Keep this tab open; protected local changes remain exportable until the server confirms the save.'
 			)
 		).toBeVisible();
 
@@ -1915,7 +1927,7 @@ describe( 'DistributedEditingStatusSurface', () => {
 		expect( screen.getByText( 'Retry save confirmed' ) ).toBeVisible();
 		expect(
 			screen.getByText(
-				'The server saved the rebased changes and cleared the local pending-change warning.'
+				'Server confirmed the guarded retry-save. Protected local changes are no longer pending for this save.'
 			)
 		).toBeVisible();
 	} );
@@ -1958,7 +1970,7 @@ describe( 'DistributedEditingStatusSurface', () => {
 		expect( screen.getAllByText( 'Retry save stale' ) ).toHaveLength( 2 );
 		expect(
 			screen.getAllByText(
-				'The server changed again before this retry save finished. Local changes are still protected; refresh the server version before trying again.'
+				'The server changed again before this retry save finished. Protected local changes are still exportable; refresh the server version before trying again.'
 			)
 		).toHaveLength( 2 );
 
@@ -1971,7 +1983,7 @@ describe( 'DistributedEditingStatusSurface', () => {
 		expect( screen.getByText( 'Retry save proof rejected' ) ).toBeVisible();
 		expect(
 			screen.getByText(
-				'The server rejected the retry-save proof because the sync metadata or proof flags changed unexpectedly. Local changes are still protected; export them before continuing.'
+				'The server rejected the retry-save proof because the sync metadata or proof flags changed unexpectedly. Protected local changes are still exportable; export them before continuing.'
 			)
 		).toBeVisible();
 	} );
@@ -1986,7 +1998,7 @@ describe( 'DistributedEditingStatusSurface', () => {
 					DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_PERMISSION_DENIED,
 				title: 'Retry save permission changed',
 				message:
-					'Editing permission changed before the retry save finished. Local changes are still protected; export them before leaving or ask for access to retry.',
+					'Editing permission changed before the retry save finished. Protected local changes are still exportable; ask for access before retrying.',
 			},
 			{
 				disposition:
@@ -1997,7 +2009,7 @@ describe( 'DistributedEditingStatusSurface', () => {
 					DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_FEATURE_DISABLED,
 				title: 'Retry save disabled',
 				message:
-					'Distributed Editing was disabled before the retry save finished. Local changes are still protected; export them before leaving or retry after Distributed Editing is enabled.',
+					'Distributed Editing was disabled before the retry save finished. Protected local changes are still exportable; retry after Distributed Editing is enabled.',
 			},
 			{
 				disposition:
@@ -2008,7 +2020,7 @@ describe( 'DistributedEditingStatusSurface', () => {
 					DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_ROUTE_MISMATCH,
 				title: 'Retry save route changed',
 				message:
-					'The retry-save request targeted a different post route than this editor. Local changes are still protected; reload the editor and export them before leaving.',
+					'The retry-save request targeted a different post route than this editor. Protected local changes are still exportable; reload the editor only after exporting them.',
 			},
 			{
 				disposition:
@@ -2019,7 +2031,7 @@ describe( 'DistributedEditingStatusSurface', () => {
 					DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_MALFORMED_SYNC_PAYLOAD,
 				title: 'Retry save payload rejected',
 				message:
-					'The retry-save payload was incomplete or malformed. Local changes are still protected; export them before trying again.',
+					'The retry-save payload was incomplete or malformed. Protected local changes are still exportable; export them before trying again.',
 			},
 		];
 		const onAction = jest.fn();
@@ -2055,32 +2067,32 @@ describe( 'DistributedEditingStatusSurface', () => {
 				reason: DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.RETRY_SUBMIT_PROOF_NOT_ACCEPTED,
 				title: 'Retry save needs accepted proof',
 				message:
-					'The editor could not verify accepted retry-save proof for this save. Local changes are still protected; export them before leaving or retry after the proof is ready.',
+					'The editor could not verify accepted retry-save proof for this save. Protected local changes are still exportable; retry after the proof is ready.',
 			},
 			{
 				reason: DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.SERVER_STATE_REFETCH_REQUIRED,
 				title: 'Retry save needs server refresh',
 				message:
-					'The server state must be refreshed before retry-save can continue. Local changes are still protected; refresh the server version before trying again.',
+					'The server state must be refreshed before retry-save can continue. Protected local changes are still exportable; refreshing only fetches server state and does not save over local changes.',
 				refetch: true,
 			},
 			{
 				reason: DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.MISSING_POST_ROUTE,
 				title: 'Retry save route unavailable',
 				message:
-					'The editor could not identify the post route for retry-save. Local changes are still protected; export them before leaving or reload the editor.',
+					'The editor could not identify the post route for retry-save. Protected local changes are still exportable; reload the editor only after exporting them.',
 			},
 			{
 				reason: DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.MISSING_PROPOSED_CONTENT,
 				title: 'Retry save content unavailable',
 				message:
-					'The editor could not read the proposed post content for retry-save. Local changes are still protected; export them before trying again.',
+					'The editor could not read the proposed post content for retry-save. Protected local changes are still exportable; export them before trying again.',
 			},
 			{
 				reason: DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.RETRY_SAVE_IN_PROGRESS,
 				title: 'Retry save already in progress',
 				message:
-					'A retry save is already waiting for server confirmation. Local changes are still protected; keep this tab open until it finishes.',
+					'A retry save is already waiting for server confirmation. Protected local changes remain exportable; keep this tab open until it finishes.',
 				retrySaveStatus: DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVING,
 			},
 		];
@@ -2144,7 +2156,7 @@ describe( 'DistributedEditingStatusSurface', () => {
 		expect( screen.getByText( 'Retry submit stale' ) ).toBeVisible();
 		expect(
 			screen.getByText(
-				'The server changed after retry submit was prepared. Refresh the server version before continuing.'
+				'The server changed after retry submit was prepared. Protected local changes remain exportable; refresh the server version before continuing.'
 			)
 		).toBeVisible();
 	} );
