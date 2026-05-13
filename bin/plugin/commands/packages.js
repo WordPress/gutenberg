@@ -350,6 +350,7 @@ async function publishPackagesToNpm( {
 	gitWorkingDirectoryPath,
 	interactive,
 	minimumVersionBump,
+	npmReleaseBranch,
 	releaseType,
 } ) {
 	log( '>> Installing npm packages.' );
@@ -423,8 +424,12 @@ async function publishPackagesToNpm( {
 		log(
 			'>> Bumping version of public packages changed since the last release.'
 		);
+		// --no-push keeps the version commit and package tags local until
+		// `lerna publish` succeeds, so a failed retry can re-version
+		// without hitting "tag '@wordpress/<pkg>@<version>' already exists"
+		// on origin.
 		await command(
-			`npx lerna version ${ minimumVersionBump } --no-private ${ yesFlag }`,
+			`npx lerna version ${ minimumVersionBump } --no-private --no-push ${ yesFlag }`,
 			{
 				cwd: gitWorkingDirectoryPath,
 				stdio: 'inherit',
@@ -453,6 +458,13 @@ async function publishPackagesToNpm( {
 				}
 			);
 		}
+
+		log( '>> Pushing version commit and tags to remote.' );
+		await SimpleGit( gitWorkingDirectoryPath ).push(
+			'origin',
+			npmReleaseBranch,
+			[ '--follow-tags' ]
+		);
 	}
 
 	const afterCommitHash = await SimpleGit( gitWorkingDirectoryPath ).revparse(
