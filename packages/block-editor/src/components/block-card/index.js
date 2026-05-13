@@ -187,7 +187,7 @@ function BlockCard( {
 						}
 					>
 						<BlockIcon icon={ icon } showColors />
-						<Stack direction="column">
+						<Stack direction="column" gap="xs">
 							<TitleElement className="block-editor-block-card__title">
 								<span className="block-editor-block-card__name">
 									{ !! name?.length ? name : title }
