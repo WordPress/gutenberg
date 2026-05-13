@@ -175,6 +175,33 @@ export const DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES = Object.freeze( {
 	REJECTED_MALFORMED_SYNC_PAYLOAD: 'rejected_malformed_sync_payload',
 } );
 
+/**
+ * Stable retry-save policy statuses for deciding whether a future save
+ * workflow may call the guarded retry-save write boundary.
+ */
+export const DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_STATUSES = Object.freeze( {
+	READY: 'ready',
+	BLOCKED: 'blocked',
+} );
+
+/**
+ * Stable retry-save policy blocker reasons.
+ */
+export const DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS = Object.freeze( {
+	NO_PENDING_CHANGES: 'no_pending_changes',
+	MISSING_POST_ROUTE: 'missing_post_route',
+	MISSING_PROPOSED_CONTENT: 'missing_proposed_content',
+	MISSING_VERSION_PROOF: 'missing_version_proof',
+	RETRY_SUBMIT_PROOF_NOT_ACCEPTED: 'retry_submit_proof_not_accepted',
+	RETRY_SUBMIT_SAVE_NOT_READY: 'retry_submit_save_not_ready',
+	RETRY_SUBMIT_PROOF_CLAIMED_SAVE: 'retry_submit_proof_claimed_save',
+	SERVER_STATE_ACCEPTANCE_REQUIRED: 'server_state_acceptance_required',
+	SERVER_STATE_REFETCH_REQUIRED: 'server_state_refetch_required',
+	MANUAL_CONFLICT_REQUIRED: 'manual_conflict_required',
+	RETRY_SAVE_IN_PROGRESS: 'retry_save_in_progress',
+	RETRY_SAVE_ALREADY_CONFIRMED: 'retry_save_already_confirmed',
+} );
+
 const VALID_REASON_CODES = new Set(
 	Object.values( DISTRIBUTED_EDITING_REASON_CODES )
 );
@@ -1628,6 +1655,152 @@ export function getDistributedEditingSessionStateForRetrySaveResult(
 		previousServerVersion,
 		retrySaveFlags,
 	} );
+}
+
+/**
+ * Returns a no-side-effect policy decision for whether a future editor save
+ * workflow may call the guarded retry-save endpoint.
+ *
+ * The policy is intentionally stricter than the low-level retry-save action:
+ * the future save workflow must have accepted proof, a prepared save handoff,
+ * a concrete post route, proposed content, and version proof before it may
+ * leave the normal save path.
+ *
+ * @param {Object} currentSessionState Current DE-RTC session state.
+ * @param {Object} [context]           Current editor and route context.
+ *
+ * @return {Object} Retry-save policy decision.
+ */
+export function getDistributedEditingRetrySavePolicyForSessionState(
+	currentSessionState = {},
+	context = {}
+) {
+	const normalized =
+		normalizeDistributedEditingSessionState( currentSessionState );
+	const pendingChangeCount =
+		normalizeCount( context.pendingChangeCount ) ||
+		normalized.pendingChangeCount;
+	const hasPendingChanges =
+		normalized.hasPendingChanges || pendingChangeCount > 0;
+	const postId = context.postId ?? null;
+	const restBase = normalizeNullableString( context.restBase );
+	const proposedPostContent = context.proposedPostContent;
+	const hasProposedPostContent = typeof proposedPostContent === 'string';
+	const clientBaseVersion =
+		normalizeNullableString( context.clientBaseVersion ) ||
+		normalized.serverVersion ||
+		normalized.clientBaseVersion;
+	const acceptedProofServerVersion =
+		normalizeNullableString( context.acceptedProofServerVersion ) ||
+		normalized.serverVersion;
+	const rebasedFromVersion =
+		normalizeNullableString( context.rebasedFromVersion ) ||
+		normalized.clientBaseVersion;
+	const hasAcceptedProof =
+		normalized.retrySubmitProofStatus ===
+			DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.ACCEPTED_FOR_FUTURE_SAVE &&
+		normalized.retrySubmitAccepted &&
+		normalized.retrySubmitSavePathRequired;
+	const hasPreparedSavePath =
+		normalized.retrySubmitSaveStatus ===
+			DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.READY &&
+		normalized.retrySubmitSaveReady;
+	const proofClaimedSave =
+		normalized.retrySubmitSavesPost ||
+		normalized.retrySubmitMutatesPostContent ||
+		normalized.retrySubmitCreatesRevision ||
+		normalized.retrySubmitClaimsSaved;
+	let reason = null;
+
+	if ( ! hasPendingChanges ) {
+		reason =
+			DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.NO_PENDING_CHANGES;
+	} else if (
+		normalized.retrySaveStatus ===
+		DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVING
+	) {
+		reason =
+			DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.RETRY_SAVE_IN_PROGRESS;
+	} else if (
+		normalized.retrySaveStatus ===
+		DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVED
+	) {
+		reason =
+			DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.RETRY_SAVE_ALREADY_CONFIRMED;
+	} else if ( normalized.requiresManualConflictResolution ) {
+		reason =
+			DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.MANUAL_CONFLICT_REQUIRED;
+	} else if ( normalized.requiresServerStateAcceptance ) {
+		reason =
+			DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.SERVER_STATE_ACCEPTANCE_REQUIRED;
+	} else if ( normalized.requiresServerStateRefetch ) {
+		reason =
+			DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.SERVER_STATE_REFETCH_REQUIRED;
+	} else if ( proofClaimedSave ) {
+		reason =
+			DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.RETRY_SUBMIT_PROOF_CLAIMED_SAVE;
+	} else if ( ! hasAcceptedProof ) {
+		reason =
+			DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.RETRY_SUBMIT_PROOF_NOT_ACCEPTED;
+	} else if ( ! hasPreparedSavePath ) {
+		reason =
+			DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.RETRY_SUBMIT_SAVE_NOT_READY;
+	} else if ( ! postId || ! restBase ) {
+		reason =
+			DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.MISSING_POST_ROUTE;
+	} else if ( ! hasProposedPostContent ) {
+		reason =
+			DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.MISSING_PROPOSED_CONTENT;
+	} else if (
+		! clientBaseVersion ||
+		! acceptedProofServerVersion ||
+		! rebasedFromVersion
+	) {
+		reason =
+			DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.MISSING_VERSION_PROOF;
+	}
+
+	const canRetrySave = reason === null;
+
+	return {
+		status: canRetrySave
+			? DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_STATUSES.READY
+			: DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_STATUSES.BLOCKED,
+		reason,
+		canRetrySave,
+		shouldCallRetrySaveEndpoint: canRetrySave,
+		shouldCallNormalSavePost: false,
+		changesPostLock: false,
+		dispatchesNotice: false,
+		mutatesEditorContent: false,
+		claimsSaved: false,
+		protectsLocalChanges: hasPendingChanges,
+		canExportLocalUpdates:
+			normalized.canExportLocalUpdates || hasPendingChanges,
+		requiresServerStateRefetch:
+			normalized.requiresServerStateRefetch ||
+			reason ===
+				DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.SERVER_STATE_REFETCH_REQUIRED,
+		hasAcceptedProof,
+		hasPreparedSavePath,
+		hasPostRoute: Boolean( postId && restBase ),
+		hasProposedPostContent,
+		hasVersionProof: Boolean(
+			clientBaseVersion &&
+				acceptedProofServerVersion &&
+				rebasedFromVersion
+		),
+		request: canRetrySave
+			? {
+					postId,
+					restBase,
+					clientBaseVersion,
+					acceptedProofServerVersion,
+					rebasedFromVersion,
+					pendingChangeCount,
+			  }
+			: null,
+	};
 }
 
 /**

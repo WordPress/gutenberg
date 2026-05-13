@@ -19,9 +19,12 @@ import {
 	DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES,
 	DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_REASONS,
 	DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES,
+	DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS,
+	DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_STATUSES,
 	DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES,
 	DISTRIBUTED_EDITING_UNLOAD_WARNING_REASONS,
 	DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE,
+	getDistributedEditingRetrySavePolicyForSessionState,
 	getDistributedEditingStaleBaseLocalRebaseResult,
 	getDistributedEditingSessionStateForRetrySaveRequest,
 	getDistributedEditingSessionStateForRetrySaveResult,
@@ -1008,6 +1011,208 @@ describe( 'distributed editing session state', () => {
 			isAwaitingServerConfirmation: true,
 			canExportLocalUpdates: true,
 		} );
+	} );
+
+	it( 'marks guarded retry-save policy ready only after accepted proof and save preparation', () => {
+		const policy = getDistributedEditingRetrySavePolicyForSessionState(
+			{
+				clientBaseVersion: '4',
+				serverVersion: '7',
+				pendingChangeCount: 2,
+				hasPendingChanges: true,
+				retrySubmitProofStatus:
+					DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.ACCEPTED_FOR_FUTURE_SAVE,
+				retrySubmitAccepted: true,
+				retrySubmitSavePathRequired: true,
+				retrySubmitSaveStatus:
+					DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.READY,
+				retrySubmitSaveReady: true,
+				canExportLocalUpdates: true,
+			},
+			{
+				postId: 44,
+				restBase: 'posts',
+				proposedPostContent:
+					'<!-- wp:paragraph --><p>Rebased save.</p><!-- /wp:paragraph -->',
+			}
+		);
+
+		expect( policy ).toEqual( {
+			status: DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_STATUSES.READY,
+			reason: null,
+			canRetrySave: true,
+			shouldCallRetrySaveEndpoint: true,
+			shouldCallNormalSavePost: false,
+			changesPostLock: false,
+			dispatchesNotice: false,
+			mutatesEditorContent: false,
+			claimsSaved: false,
+			protectsLocalChanges: true,
+			canExportLocalUpdates: true,
+			requiresServerStateRefetch: false,
+			hasAcceptedProof: true,
+			hasPreparedSavePath: true,
+			hasPostRoute: true,
+			hasProposedPostContent: true,
+			hasVersionProof: true,
+			request: {
+				postId: 44,
+				restBase: 'posts',
+				clientBaseVersion: '7',
+				acceptedProofServerVersion: '7',
+				rebasedFromVersion: '4',
+				pendingChangeCount: 2,
+			},
+		} );
+	} );
+
+	it( 'blocks guarded retry-save policy without side effects for unsafe save states', () => {
+		const readySessionState = {
+			clientBaseVersion: '4',
+			serverVersion: '7',
+			pendingChangeCount: 1,
+			hasPendingChanges: true,
+			retrySubmitProofStatus:
+				DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.ACCEPTED_FOR_FUTURE_SAVE,
+			retrySubmitAccepted: true,
+			retrySubmitSavePathRequired: true,
+			retrySubmitSaveStatus:
+				DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.READY,
+			retrySubmitSaveReady: true,
+			canExportLocalUpdates: true,
+		};
+		const readyContext = {
+			postId: 44,
+			restBase: 'posts',
+			proposedPostContent:
+				'<!-- wp:paragraph --><p>Rebased save.</p><!-- /wp:paragraph -->',
+		};
+		const cases = [
+			[
+				{
+					...readySessionState,
+					pendingChangeCount: 0,
+					hasPendingChanges: false,
+					canExportLocalUpdates: false,
+				},
+				readyContext,
+				DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.NO_PENDING_CHANGES,
+				false,
+			],
+			[
+				{
+					...readySessionState,
+					retrySubmitAccepted: false,
+					retrySubmitProofStatus:
+						DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.NONE,
+				},
+				readyContext,
+				DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.RETRY_SUBMIT_PROOF_NOT_ACCEPTED,
+				false,
+			],
+			[
+				{
+					...readySessionState,
+					retrySubmitSaveStatus:
+						DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.BLOCKED,
+					retrySubmitSaveReady: false,
+				},
+				readyContext,
+				DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.RETRY_SUBMIT_SAVE_NOT_READY,
+				false,
+			],
+			[
+				{
+					...readySessionState,
+					retrySubmitClaimsSaved: true,
+				},
+				readyContext,
+				DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.RETRY_SUBMIT_PROOF_CLAIMED_SAVE,
+				false,
+			],
+			[
+				{
+					...readySessionState,
+					requiresServerStateRefetch: true,
+				},
+				readyContext,
+				DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.SERVER_STATE_REFETCH_REQUIRED,
+				true,
+			],
+			[
+				{
+					...readySessionState,
+					requiresManualConflictResolution: true,
+				},
+				readyContext,
+				DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.MANUAL_CONFLICT_REQUIRED,
+				false,
+			],
+			[
+				{
+					...readySessionState,
+					retrySaveStatus:
+						DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVING,
+				},
+				readyContext,
+				DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.RETRY_SAVE_IN_PROGRESS,
+				false,
+			],
+			[
+				readySessionState,
+				{ ...readyContext, postId: null },
+				DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.MISSING_POST_ROUTE,
+				false,
+			],
+			[
+				readySessionState,
+				{ ...readyContext, proposedPostContent: null },
+				DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.MISSING_PROPOSED_CONTENT,
+				false,
+			],
+			[
+				{
+					...readySessionState,
+					clientBaseVersion: null,
+					serverVersion: null,
+				},
+				readyContext,
+				DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.MISSING_VERSION_PROOF,
+				false,
+			],
+		];
+
+		for ( const [
+			sessionState,
+			context,
+			expectedReason,
+			expectedRefetch,
+		] of cases ) {
+			expect(
+				getDistributedEditingRetrySavePolicyForSessionState(
+					sessionState,
+					context
+				)
+			).toMatchObject( {
+				status: DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_STATUSES.BLOCKED,
+				reason: expectedReason,
+				canRetrySave: false,
+				shouldCallRetrySaveEndpoint: false,
+				shouldCallNormalSavePost: false,
+				changesPostLock: false,
+				dispatchesNotice: false,
+				mutatesEditorContent: false,
+				claimsSaved: false,
+				protectsLocalChanges:
+					expectedReason !==
+					DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.NO_PENDING_CHANGES,
+				canExportLocalUpdates:
+					expectedReason !==
+					DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.NO_PENDING_CHANGES,
+				requiresServerStateRefetch: expectedRefetch,
+				request: null,
+			} );
+		}
 	} );
 
 	it( 'rebases stale-base local changes from remembered base and refetched server content', () => {

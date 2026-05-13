@@ -320,6 +320,14 @@ Undocumented declaration.
 
 Undocumented declaration.
 
+### DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS
+
+Stable retry-save policy blocker reasons.
+
+### DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_STATUSES
+
+Stable retry-save policy statuses for deciding whether a future save workflow may call the guarded retry-save write boundary.
+
 ### DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES
 
 Stable retry-save statuses for the guarded write boundary.
@@ -553,6 +561,21 @@ _Parameters_
 _Returns_
 
 -   `string`: REST path.
+
+### getDistributedEditingRetrySavePolicyForSessionState
+
+Returns a no-side-effect policy decision for whether a future editor save workflow may call the guarded retry-save endpoint.
+
+The policy is intentionally stricter than the low-level retry-save action: the future save workflow must have accepted proof, a prepared save handoff, a concrete post route, proposed content, and version proof before it may leave the normal save path.
+
+_Parameters_
+
+-   _currentSessionState_ `Object`: Current DE-RTC session state.
+-   _context_ `[Object]`: Current editor and route context.
+
+_Returns_
+
+-   `Object`: Retry-save policy decision.
 
 ### getDistributedEditingRetrySubmitEndpointPath
 
