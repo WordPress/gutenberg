@@ -120,6 +120,29 @@ const scenarios: Scenario[] = [
 		),
 	},
 	{
+		name: 'Grid (min-content column)',
+		css: 'width: {w}px; grid-template-columns: min-content 1fr',
+		render: ( story, w ) => (
+			<div
+				style={ {
+					...constraintOutline,
+					display: 'grid',
+					gridTemplateColumns: 'min-content 1fr',
+					gap: 8,
+					width: w,
+				} }
+			>
+				{ story }
+				<div
+					style={ {
+						background: '#f0f0f0',
+						borderRadius: 2,
+					} }
+				/>
+			</div>
+		),
+	},
+	{
 		name: 'Fixed width + height',
 		css: 'width: {w}px; height: {h}px',
 		render: ( story, w, h ) => (
