@@ -52,6 +52,22 @@ import { useBlockEditingMode } from '../components/block-editing-mode';
 import { store as blockEditorStore } from '../store';
 import { globalStylesDataKey } from '../store/private-keys';
 
+const BORDER_SIDES = [ 'Top', 'Right', 'Bottom', 'Left' ];
+
+function cleanEmptyObject( object ) {
+	if ( ! object ) {
+		return undefined;
+	}
+
+	const cleaned = Object.fromEntries(
+		Object.entries( object ).filter(
+			( [ , value ] ) => value !== undefined
+		)
+	);
+
+	return Object.keys( cleaned ).length ? cleaned : undefined;
+}
+
 const styleSupportKeys = [
 	...TYPOGRAPHY_SUPPORT_KEYS,
 	BORDER_SUPPORT_KEY,
@@ -81,6 +97,71 @@ export function getInlineStyles( styles = {} ) {
 	} );
 
 	return output;
+}
+
+/**
+ * Returns fallback border styles for visible state border styles.
+ *
+ * State styles are emitted as stylesheet rules rather than inline styles, so
+ * they cannot rely on the block-library inline-style attribute fallback rules.
+ *
+ * @param {Object} stateStyles State style object.
+ * @return {Object|undefined} Style object containing fallback border styles.
+ */
+function getStateFallbackBorderStyles( stateStyles ) {
+	const border = stateStyles?.border;
+	if ( ! border ) {
+		return undefined;
+	}
+
+	const hasBorderStyle = !! border.style;
+	const hasBorderColor = !! border.color;
+	const hasBorderWidth = !! border.width;
+	const fallbackBorder = {};
+
+	if ( ! hasBorderStyle && ( hasBorderColor || hasBorderWidth ) ) {
+		fallbackBorder.style = 'solid';
+	}
+
+	BORDER_SIDES.forEach( ( side ) => {
+		const sideKey = side.toLowerCase();
+		const sideBorder = border[ sideKey ];
+		const hasSideStyle = !! sideBorder?.style;
+		const hasSideColor = !! sideBorder?.color;
+		const hasSideWidth = !! sideBorder?.width;
+
+		if (
+			! hasBorderStyle &&
+			! hasSideStyle &&
+			( hasSideColor || hasSideWidth )
+		) {
+			fallbackBorder[ sideKey ] = { style: 'solid' };
+		}
+	} );
+
+	return cleanEmptyObject( { border: cleanEmptyObject( fallbackBorder ) } );
+}
+
+/**
+ * Generates CSS for a block instance state style object.
+ *
+ * State declarations need to win over preset utility classes, but fallback
+ * border styles should not become important because they must not override
+ * explicitly authored default border styles.
+ *
+ * @param {Object} stateStyles State style object.
+ * @param {string} selector    CSS selector for the generated style.
+ * @return {string} Generated stylesheet.
+ */
+export function getStateStylesCSS( stateStyles, selector ) {
+	const css = compileCSS( stateStyles, { selector } );
+	const importantCSS = css ? css.replace( /;/g, ' !important;' ) : undefined;
+	const fallbackBorderStyles = getStateFallbackBorderStyles( stateStyles );
+	const fallbackCSS = fallbackBorderStyles
+		? compileCSS( fallbackBorderStyles, { selector } )
+		: undefined;
+
+	return [ importantCSS, fallbackCSS ].filter( Boolean ).join( '\n' );
 }
 
 /**
@@ -384,10 +465,7 @@ function BlockStyleControls( {
 		}
 
 		const selector = buildCanvasStateSelector( clientId, name );
-		const css = compileCSS( stateValue, { selector } );
-		// Use !important to override utility classes (e.g. has-accent-3-color)
-		// that the block's default color support generates with !important.
-		return css ? css.replace( /;/g, ' !important;' ) : undefined;
+		return getStateStylesCSS( stateValue, selector );
 	}, [
 		showStateOnCanvas,
 		selectedState,
@@ -585,13 +663,7 @@ function useBlockProps( { name, style } ) {
 						name,
 						state
 					);
-					// State styles use !important to override utility classes
-					// like .has-accent-3-background-color which the block's
-					// default color support generates with !important.
-					const css = compileCSS( stateStyles, { selector } ).replace(
-						/;/g,
-						' !important;'
-					);
+					const css = getStateStylesCSS( stateStyles, selector );
 					if ( css ) {
 						cssRules.push( css );
 					}
