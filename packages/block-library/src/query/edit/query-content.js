@@ -42,7 +42,6 @@ export default function QueryContent( {
 		query,
 		enhancedPagination,
 		tagName: TagName = 'div',
-		query: { inherit } = {},
 	} = attributes;
 	const { templateSlug } = context;
 	const { isSingular } = getQueryContextFromTemplate( templateSlug );
@@ -95,11 +94,10 @@ export default function QueryContent( {
 	);
 	useEffect( () => {
 		const newQuery = {};
-		// When we inherit from global query always need to set the `perPage`
-		// based on the reading settings.
-		if ( inherit && query.perPage !== postsPerPage ) {
-			newQuery.perPage = postsPerPage;
-		} else if ( ! query.perPage && postsPerPage ) {
+		// Initialise perPage from the global reading settings when not explicitly set.
+		// This intentionally does not re-sync when inherit changes so that a perPage
+		// override set in Default mode is preserved.
+		if ( ! query.perPage && postsPerPage ) {
 			newQuery.perPage = postsPerPage;
 		}
 
@@ -109,7 +107,6 @@ export default function QueryContent( {
 		}
 	}, [
 		query.perPage,
-		inherit,
 		postsPerPage,
 		__unstableMarkNextChangeAsNotPersistent,
 		updateQuery,
