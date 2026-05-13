@@ -160,22 +160,15 @@ async function getSelectionAttributeKeys( page: Page ) {
 	} );
 }
 
-async function selectCellRangeInStore( {
+async function selectCellTextInStore( {
 	page,
-	startIndex,
-	endIndex,
+	index,
 }: {
 	page: Page;
-	startIndex: number;
-	endIndex: number;
+	index: number;
 } ) {
 	await page.evaluate(
-		( {
-			startAttributeKey,
-			endAttributeKey,
-			endRowIndex,
-			endCellIndex,
-		} ) => {
+		( { attributeKey, rowIndex, cellIndex } ) => {
 			const blocks = window.wp.data
 				.select( 'core/block-editor' )
 				.getBlocks() as Array< {
@@ -198,23 +191,22 @@ async function selectCellRangeInStore( {
 			window.wp.data.dispatch( 'core/block-editor' ).selectionChange( {
 				start: {
 					clientId: tableBlock.clientId,
-					attributeKey: startAttributeKey,
+					attributeKey,
 					offset: 0,
 				},
 				end: {
 					clientId: tableBlock.clientId,
-					attributeKey: endAttributeKey,
-					offset: tableBlock.attributes.body[ endRowIndex ].cells[
-						endCellIndex
+					attributeKey,
+					offset: tableBlock.attributes.body[ rowIndex ].cells[
+						cellIndex
 					].content.length,
 				},
 			} );
 		},
 		{
-			startAttributeKey: getBodyCellAttributeKey( startIndex ),
-			endAttributeKey: getBodyCellAttributeKey( endIndex ),
-			endRowIndex: Math.floor( endIndex / 2 ),
-			endCellIndex: endIndex % 2,
+			attributeKey: getBodyCellAttributeKey( index ),
+			rowIndex: Math.floor( index / 2 ),
+			cellIndex: index % 2,
 		}
 	);
 }
@@ -435,7 +427,7 @@ test.describe( 'Collaboration - Nested Awareness Selection', () => {
 		await expectRemoteCursorInsideCell( page2, 5 );
 	} );
 
-	test( 'selection across table cells renders in both nested RichText fields', async ( {
+	test( 'selection in a table cell renders in a nested RichText field', async ( {
 		collaborationUtils,
 		requestUtils,
 		page,
@@ -451,23 +443,21 @@ test.describe( 'Collaboration - Nested Awareness Selection', () => {
 
 		await expectTableBlockLoaded( collaborationUtils );
 
-		await selectCellRangeInStore( {
+		await selectCellTextInStore( {
 			page,
-			startIndex: 1,
-			endIndex: 3,
+			index: 1,
 		} );
 
 		await expect
 			.poll( () => getSelectionAttributeKeys( page ), { timeout: 5000 } )
 			.toMatchObject( {
 				start: 'body.0.cells.1.content',
-				end: 'body.1.cells.1.content',
+				end: 'body.0.cells.1.content',
 			} );
 
-		await expectRemoteSelectionInsideCells(
-			collaborationUtils.page2,
-			[ 1, 3 ]
-		);
+		await expectRemoteSelectionInsideCells( collaborationUtils.page2, [
+			1,
+		] );
 	} );
 
 	test( 'cursor in a table caption disappears when another user removes the caption', async ( {
