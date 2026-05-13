@@ -1,4 +1,3 @@
-@use "sass:math";
 @use "@wordpress/base-styles/variables" as vars;
 @use "@wordpress/base-styles/mixins" as *;
 
@@ -259,8 +258,8 @@
 				content: "";
 				border-radius: 50%;
 				box-sizing: inherit;
-				width: math.div(vars.$radio-input-size-sm, 2);
-				height: math.div(vars.$radio-input-size-sm, 2);
+				width: vars.$radio-input-size-sm * 0.5;
+				height: vars.$radio-input-size-sm * 0.5;
 				position: absolute;
 				top: 50%;
 				left: 50%;
@@ -272,8 +271,8 @@
 				border: 4px solid var(--wpds-color-fg-interactive-brand-strong);
 
 				@include break-small() {
-					width: math.div(vars.$radio-input-size, 2);
-					height: math.div(vars.$radio-input-size, 2);
+					width: vars.$radio-input-size * 0.5;
+					height: vars.$radio-input-size * 0.5;
 				}
 			}
 		}
