@@ -336,7 +336,6 @@ export const DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE = Object.freeze( {
 	retrySaveClaimsSaved: false,
 	retrySaveRevisionCreated: false,
 	retrySaveCreatedRevisionIds: [],
-	retrySaveRequiresReviewerEscalation: false,
 	retrySaveReviewStatus: null,
 	retrySaveReviewAction: null,
 	retrySaveReviewRequiredCapability: null,
@@ -344,6 +343,25 @@ export const DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE = Object.freeze( {
 	retrySaveReviewScope: null,
 	retrySaveEscalationReason: null,
 	retrySaveRawContentIncluded: false,
+	retrySaveReviewContractType: null,
+	retrySaveRequiresReviewerEscalation: false,
+	retrySaveReviewEscalationRequired: false,
+	retrySaveReviewEscalationReason: null,
+	retrySaveReviewRequiresUnfilteredHtml: false,
+	retrySaveReviewUnfilteredHtmlAllowed: false,
+	retrySaveReviewAuthorshipRequired: false,
+	retrySaveReviewContentCapabilityRequired: false,
+	retrySaveReviewContentFilter: null,
+	retrySaveReviewContentFilterContext: null,
+	retrySaveReviewContentWouldChangeByKses: false,
+	retrySaveReviewProposedContentWouldChangeByKses: false,
+	retrySaveReviewCandidateContentWouldChangeByKses: false,
+	retrySaveReviewProposedContentHash: null,
+	retrySaveReviewFilteredProposedContentHash: null,
+	retrySaveReviewCandidateContentHash: null,
+	retrySaveReviewFilteredCandidateContentHash: null,
+	retrySaveReviewRawContentIncluded: false,
+	retrySaveReviewRecoveryActions: [],
 	requiresManualConflictResolution: false,
 	mustOfferLocalCopy: false,
 	canExportLocalUpdates: false,
@@ -385,6 +403,7 @@ export function isDistributedEditingConflictDisposition( disposition ) {
 		DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
 		DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_SYNC_META_TAMPERED,
 		DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_MALFORMED_SYNC_PAYLOAD,
+		DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_UNFILTERED_HTML_REVIEW_REQUIRED,
 	].includes( disposition );
 }
 
@@ -630,30 +649,7 @@ export function normalizeDistributedEditingSessionState( sessionState = {} ) {
 		retrySaveCreatedRevisionIds: normalizeIdList(
 			sessionState.retrySaveCreatedRevisionIds
 		),
-		retrySaveRequiresReviewerEscalation: Boolean(
-			sessionState.retrySaveRequiresReviewerEscalation
-		),
-		retrySaveReviewStatus: normalizeNullableString(
-			sessionState.retrySaveReviewStatus
-		),
-		retrySaveReviewAction: normalizeNullableString(
-			sessionState.retrySaveReviewAction
-		),
-		retrySaveReviewRequiredCapability: normalizeNullableString(
-			sessionState.retrySaveReviewRequiredCapability
-		),
-		retrySaveReviewerCapability: normalizeNullableString(
-			sessionState.retrySaveReviewerCapability
-		),
-		retrySaveReviewScope: normalizeNullableString(
-			sessionState.retrySaveReviewScope
-		),
-		retrySaveEscalationReason: normalizeNullableString(
-			sessionState.retrySaveEscalationReason
-		),
-		retrySaveRawContentIncluded: Boolean(
-			sessionState.retrySaveRawContentIncluded
-		),
+		...normalizeRetrySaveReviewMetadataFields( sessionState ),
 		requiresManualConflictResolution,
 		mustOfferLocalCopy,
 		canExportLocalUpdates,
@@ -1324,6 +1320,7 @@ export function getDistributedEditingRetrySaveFlowStateForSessionState(
 			normalized.retrySavePreviousServerVersion,
 		retrySaveRevisionCreated: normalized.retrySaveRevisionCreated,
 		retrySaveCreatedRevisionIds: normalized.retrySaveCreatedRevisionIds,
+		...getDistributedEditingRetrySaveReviewMetadataFields( normalized ),
 	};
 }
 
@@ -1845,14 +1842,7 @@ export function getDistributedEditingSessionStateForRetrySaveRequest(
 		retrySaveClaimsSaved: false,
 		retrySaveRevisionCreated: false,
 		retrySaveCreatedRevisionIds: [],
-		retrySaveRequiresReviewerEscalation: false,
-		retrySaveReviewStatus: null,
-		retrySaveReviewAction: null,
-		retrySaveReviewRequiredCapability: null,
-		retrySaveReviewerCapability: null,
-		retrySaveReviewScope: null,
-		retrySaveEscalationReason: null,
-		retrySaveRawContentIncluded: false,
+		...normalizeRetrySaveReviewMetadataFields(),
 		mustOfferLocalCopy: true,
 		canExportLocalUpdates: true,
 	} );
@@ -1999,14 +1989,7 @@ export function getDistributedEditingSessionStateForRetrySaveResult(
 			retrySaveServerVersion: serverVersion,
 			retrySavePreviousServerVersion: previousServerVersion,
 			...retrySaveFlags,
-			retrySaveRequiresReviewerEscalation: false,
-			retrySaveReviewStatus: null,
-			retrySaveReviewAction: null,
-			retrySaveReviewRequiredCapability: null,
-			retrySaveReviewerCapability: null,
-			retrySaveReviewScope: null,
-			retrySaveEscalationReason: null,
-			retrySaveRawContentIncluded: false,
+			...normalizeRetrySaveReviewMetadataFields(),
 			requiresManualConflictResolution: false,
 			mustOfferLocalCopy: false,
 			canExportLocalUpdates: false,
@@ -2023,10 +2006,11 @@ export function getDistributedEditingSessionStateForRetrySaveResult(
 						responseData.reasonCode ||
 						responseData.reason_code
 			  );
-	const retrySaveReviewFields = getRetrySaveReviewFieldsFromResponse(
-		responseOrError,
-		responseData
-	);
+	const retrySaveReviewMetadata =
+		getRetrySaveReviewMetadataFromResponseOrError(
+			responseOrError,
+			responseData
+		);
 
 	return getDistributedEditingRejectedRetrySaveState( {
 		normalizedCurrent,
@@ -2039,7 +2023,7 @@ export function getDistributedEditingSessionStateForRetrySaveResult(
 		serverVersion,
 		previousServerVersion,
 		retrySaveFlags,
-		retrySaveReviewFields,
+		retrySaveReviewMetadata,
 	} );
 }
 
@@ -2371,8 +2355,12 @@ function getDistributedEditingRetrySaveDescriptorFields( normalized ) {
 		retrySaveClaimsSaved: normalized.retrySaveClaimsSaved,
 		retrySaveRevisionCreated: normalized.retrySaveRevisionCreated,
 		retrySaveCreatedRevisionIds: normalized.retrySaveCreatedRevisionIds,
-		retrySaveRequiresReviewerEscalation:
-			normalized.retrySaveRequiresReviewerEscalation,
+		...getDistributedEditingRetrySaveReviewMetadataFields( normalized ),
+	};
+}
+
+function getDistributedEditingRetrySaveReviewMetadataFields( normalized ) {
+	return {
 		retrySaveReviewStatus: normalized.retrySaveReviewStatus,
 		retrySaveReviewAction: normalized.retrySaveReviewAction,
 		retrySaveReviewRequiredCapability:
@@ -2381,6 +2369,42 @@ function getDistributedEditingRetrySaveDescriptorFields( normalized ) {
 		retrySaveReviewScope: normalized.retrySaveReviewScope,
 		retrySaveEscalationReason: normalized.retrySaveEscalationReason,
 		retrySaveRawContentIncluded: normalized.retrySaveRawContentIncluded,
+		retrySaveReviewContractType: normalized.retrySaveReviewContractType,
+		retrySaveRequiresReviewerEscalation:
+			normalized.retrySaveRequiresReviewerEscalation,
+		retrySaveReviewEscalationRequired:
+			normalized.retrySaveReviewEscalationRequired,
+		retrySaveReviewEscalationReason:
+			normalized.retrySaveReviewEscalationReason,
+		retrySaveReviewRequiresUnfilteredHtml:
+			normalized.retrySaveReviewRequiresUnfilteredHtml,
+		retrySaveReviewUnfilteredHtmlAllowed:
+			normalized.retrySaveReviewUnfilteredHtmlAllowed,
+		retrySaveReviewAuthorshipRequired:
+			normalized.retrySaveReviewAuthorshipRequired,
+		retrySaveReviewContentCapabilityRequired:
+			normalized.retrySaveReviewContentCapabilityRequired,
+		retrySaveReviewContentFilter: normalized.retrySaveReviewContentFilter,
+		retrySaveReviewContentFilterContext:
+			normalized.retrySaveReviewContentFilterContext,
+		retrySaveReviewContentWouldChangeByKses:
+			normalized.retrySaveReviewContentWouldChangeByKses,
+		retrySaveReviewProposedContentWouldChangeByKses:
+			normalized.retrySaveReviewProposedContentWouldChangeByKses,
+		retrySaveReviewCandidateContentWouldChangeByKses:
+			normalized.retrySaveReviewCandidateContentWouldChangeByKses,
+		retrySaveReviewProposedContentHash:
+			normalized.retrySaveReviewProposedContentHash,
+		retrySaveReviewFilteredProposedContentHash:
+			normalized.retrySaveReviewFilteredProposedContentHash,
+		retrySaveReviewCandidateContentHash:
+			normalized.retrySaveReviewCandidateContentHash,
+		retrySaveReviewFilteredCandidateContentHash:
+			normalized.retrySaveReviewFilteredCandidateContentHash,
+		retrySaveReviewRawContentIncluded:
+			normalized.retrySaveReviewRawContentIncluded,
+		retrySaveReviewRecoveryActions:
+			normalized.retrySaveReviewRecoveryActions,
 	};
 }
 
@@ -2405,7 +2429,7 @@ function getDistributedEditingRejectedRetrySaveState( {
 	serverVersion,
 	previousServerVersion,
 	retrySaveFlags,
-	retrySaveReviewFields = {},
+	retrySaveReviewMetadata = {},
 } ) {
 	let disposition = normalizedCurrent.disposition;
 	let retrySaveStatus = DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.NONE;
@@ -2506,7 +2530,7 @@ function getDistributedEditingRejectedRetrySaveState( {
 		retrySaveServerVersion: serverVersion,
 		retrySavePreviousServerVersion: previousServerVersion,
 		...retrySaveFlags,
-		...retrySaveReviewFields,
+		...retrySaveReviewMetadata,
 		requiresManualConflictResolution,
 		mustOfferLocalCopy: normalizeCount( pendingChangeCount ) > 0,
 		canExportLocalUpdates:
@@ -2515,73 +2539,308 @@ function getDistributedEditingRejectedRetrySaveState( {
 	} );
 }
 
-function getRetrySaveReviewFieldsFromResponse( responseOrError, responseData ) {
-	const reviewContract =
-		responseOrError.reviewContract ||
-		responseOrError.review_contract ||
-		responseData.reviewContract ||
-		responseData.review_contract ||
-		{};
+function normalizeRetrySaveReviewMetadataFields( sessionState = {} ) {
+	const retrySaveReviewEscalationReason = normalizeNullableString(
+		getFirstDefined(
+			sessionState.retrySaveReviewEscalationReason,
+			sessionState.retrySaveEscalationReason
+		)
+	);
+	const retrySaveReviewRawContentIncluded = Boolean(
+		getFirstDefined(
+			sessionState.retrySaveReviewRawContentIncluded,
+			sessionState.retrySaveRawContentIncluded
+		)
+	);
 
 	return {
-		retrySaveRequiresReviewerEscalation: Boolean(
-			responseOrError.requiresReviewerEscalation ||
-				responseOrError.requires_reviewer_escalation ||
-				responseData.requiresReviewerEscalation ||
-				responseData.requires_reviewer_escalation ||
-				reviewContract.escalationRequired ||
-				reviewContract.escalation_required
-		),
 		retrySaveReviewStatus: normalizeNullableString(
-			responseOrError.reviewStatus ||
-				responseOrError.review_status ||
-				responseData.reviewStatus ||
-				responseData.review_status ||
-				reviewContract.status
+			sessionState.retrySaveReviewStatus
 		),
 		retrySaveReviewAction: normalizeNullableString(
-			responseOrError.reviewAction ||
-				responseOrError.review_action ||
-				responseData.reviewAction ||
-				responseData.review_action
+			sessionState.retrySaveReviewAction
 		),
 		retrySaveReviewRequiredCapability: normalizeNullableString(
-			responseOrError.reviewRequiredCapability ||
-				responseOrError.review_required_capability ||
-				responseData.reviewRequiredCapability ||
-				responseData.review_required_capability
+			sessionState.retrySaveReviewRequiredCapability
 		),
 		retrySaveReviewerCapability: normalizeNullableString(
-			responseOrError.reviewerCapability ||
-				responseOrError.reviewer_capability ||
-				responseData.reviewerCapability ||
-				responseData.reviewer_capability ||
-				reviewContract.reviewerCapability ||
-				reviewContract.reviewer_capability
+			sessionState.retrySaveReviewerCapability
 		),
 		retrySaveReviewScope: normalizeNullableString(
-			responseOrError.reviewScope ||
-				responseOrError.review_scope ||
-				responseData.reviewScope ||
-				responseData.review_scope
+			sessionState.retrySaveReviewScope
 		),
-		retrySaveEscalationReason: normalizeNullableString(
-			responseOrError.escalationReason ||
-				responseOrError.escalation_reason ||
-				responseData.escalationReason ||
-				responseData.escalation_reason ||
-				reviewContract.escalationReason ||
-				reviewContract.escalation_reason
+		retrySaveReviewContractType: normalizeNullableString(
+			sessionState.retrySaveReviewContractType
 		),
-		retrySaveRawContentIncluded: Boolean(
-			responseOrError.rawContentIncluded ||
-				responseOrError.raw_content_included ||
-				responseData.rawContentIncluded ||
-				responseData.raw_content_included ||
-				reviewContract.rawContentIncluded ||
-				reviewContract.raw_content_included
+		retrySaveRequiresReviewerEscalation: Boolean(
+			sessionState.retrySaveRequiresReviewerEscalation
+		),
+		retrySaveReviewEscalationRequired: Boolean(
+			sessionState.retrySaveReviewEscalationRequired
+		),
+		retrySaveEscalationReason: retrySaveReviewEscalationReason,
+		retrySaveRawContentIncluded: retrySaveReviewRawContentIncluded,
+		retrySaveReviewEscalationReason,
+		retrySaveReviewRequiresUnfilteredHtml: Boolean(
+			sessionState.retrySaveReviewRequiresUnfilteredHtml
+		),
+		retrySaveReviewUnfilteredHtmlAllowed: Boolean(
+			sessionState.retrySaveReviewUnfilteredHtmlAllowed
+		),
+		retrySaveReviewAuthorshipRequired: Boolean(
+			sessionState.retrySaveReviewAuthorshipRequired
+		),
+		retrySaveReviewContentCapabilityRequired: Boolean(
+			sessionState.retrySaveReviewContentCapabilityRequired
+		),
+		retrySaveReviewContentFilter: normalizeNullableString(
+			sessionState.retrySaveReviewContentFilter
+		),
+		retrySaveReviewContentFilterContext: normalizeNullableString(
+			sessionState.retrySaveReviewContentFilterContext
+		),
+		retrySaveReviewContentWouldChangeByKses: Boolean(
+			sessionState.retrySaveReviewContentWouldChangeByKses
+		),
+		retrySaveReviewProposedContentWouldChangeByKses: Boolean(
+			sessionState.retrySaveReviewProposedContentWouldChangeByKses
+		),
+		retrySaveReviewCandidateContentWouldChangeByKses: Boolean(
+			sessionState.retrySaveReviewCandidateContentWouldChangeByKses
+		),
+		retrySaveReviewProposedContentHash: normalizeNullableString(
+			sessionState.retrySaveReviewProposedContentHash
+		),
+		retrySaveReviewFilteredProposedContentHash: normalizeNullableString(
+			sessionState.retrySaveReviewFilteredProposedContentHash
+		),
+		retrySaveReviewCandidateContentHash: normalizeNullableString(
+			sessionState.retrySaveReviewCandidateContentHash
+		),
+		retrySaveReviewFilteredCandidateContentHash: normalizeNullableString(
+			sessionState.retrySaveReviewFilteredCandidateContentHash
+		),
+		retrySaveReviewRawContentIncluded,
+		retrySaveReviewRecoveryActions: normalizeStringList(
+			sessionState.retrySaveReviewRecoveryActions
 		),
 	};
+}
+
+function getRetrySaveReviewMetadataFromResponseOrError(
+	responseOrError = {},
+	responseData = {}
+) {
+	const reviewContract = normalizeObject(
+		getFirstDefined(
+			responseOrError.reviewContract,
+			responseOrError.review_contract,
+			responseData.reviewContract,
+			responseData.review_contract
+		)
+	);
+	const permissionContract = normalizeObject(
+		getFirstDefined(
+			responseOrError.permissionContract,
+			responseOrError.permission_contract,
+			responseData.permissionContract,
+			responseData.permission_contract
+		)
+	);
+
+	return normalizeRetrySaveReviewMetadataFields( {
+		retrySaveReviewStatus: getFirstDefined(
+			responseOrError.reviewStatus,
+			responseOrError.review_status,
+			responseData.reviewStatus,
+			responseData.review_status,
+			reviewContract.status
+		),
+		retrySaveReviewAction: getFirstDefined(
+			responseOrError.reviewAction,
+			responseOrError.review_action,
+			responseData.reviewAction,
+			responseData.review_action,
+			reviewContract.action,
+			reviewContract.reviewAction,
+			reviewContract.review_action,
+			permissionContract.unfiltered_html_review_action
+		),
+		retrySaveReviewRequiredCapability: getFirstDefined(
+			responseOrError.reviewRequiredCapability,
+			responseOrError.review_required_capability,
+			responseData.reviewRequiredCapability,
+			responseData.review_required_capability,
+			reviewContract.requiredCapability,
+			reviewContract.required_capability,
+			reviewContract.reviewRequiredCapability,
+			reviewContract.review_required_capability,
+			permissionContract.unfiltered_html_review_capability
+		),
+		retrySaveReviewerCapability: getFirstDefined(
+			responseOrError.reviewerCapability,
+			responseOrError.reviewer_capability,
+			responseData.reviewerCapability,
+			responseData.reviewer_capability,
+			reviewContract.reviewerCapability,
+			reviewContract.reviewer_capability
+		),
+		retrySaveReviewScope: getFirstDefined(
+			responseOrError.reviewScope,
+			responseOrError.review_scope,
+			responseData.reviewScope,
+			responseData.review_scope,
+			reviewContract.scope,
+			reviewContract.reviewScope,
+			reviewContract.review_scope,
+			permissionContract.unfiltered_html_review_scope
+		),
+		retrySaveReviewContractType: getFirstDefined(
+			responseOrError.reviewContractType,
+			responseOrError.review_contract_type,
+			responseData.reviewContractType,
+			responseData.review_contract_type,
+			reviewContract.type
+		),
+		retrySaveRequiresReviewerEscalation: getFirstDefined(
+			responseOrError.requiresReviewerEscalation,
+			responseOrError.requires_reviewer_escalation,
+			responseData.requiresReviewerEscalation,
+			responseData.requires_reviewer_escalation,
+			reviewContract.escalationRequired,
+			reviewContract.escalation_required
+		),
+		retrySaveReviewEscalationRequired: getFirstDefined(
+			responseOrError.escalationRequired,
+			responseOrError.escalation_required,
+			responseData.escalationRequired,
+			responseData.escalation_required,
+			reviewContract.escalationRequired,
+			reviewContract.escalation_required
+		),
+		retrySaveReviewEscalationReason: getFirstDefined(
+			responseOrError.escalationReason,
+			responseOrError.escalation_reason,
+			responseData.escalationReason,
+			responseData.escalation_reason,
+			reviewContract.escalationReason,
+			reviewContract.escalation_reason
+		),
+		retrySaveReviewRequiresUnfilteredHtml: getFirstDefined(
+			responseOrError.requiresUnfilteredHtml,
+			responseOrError.requires_unfiltered_html,
+			responseData.requiresUnfilteredHtml,
+			responseData.requires_unfiltered_html,
+			permissionContract.unfiltered_html_review_required
+		),
+		retrySaveReviewUnfilteredHtmlAllowed: getFirstDefined(
+			responseOrError.unfilteredHtmlAllowed,
+			responseOrError.unfiltered_html_allowed,
+			responseData.unfilteredHtmlAllowed,
+			responseData.unfiltered_html_allowed,
+			permissionContract.unfiltered_html_allowed
+		),
+		retrySaveReviewAuthorshipRequired: getFirstDefined(
+			responseOrError.authorshipReviewRequired,
+			responseOrError.authorship_review_required,
+			responseData.authorshipReviewRequired,
+			responseData.authorship_review_required,
+			permissionContract.authorship_review_required
+		),
+		retrySaveReviewContentCapabilityRequired: getFirstDefined(
+			responseOrError.contentCapabilityReviewRequired,
+			responseOrError.content_capability_review_required,
+			responseData.contentCapabilityReviewRequired,
+			responseData.content_capability_review_required,
+			permissionContract.content_capability_review_required
+		),
+		retrySaveReviewContentFilter: getFirstDefined(
+			responseOrError.contentFilter,
+			responseOrError.content_filter,
+			responseData.contentFilter,
+			responseData.content_filter,
+			reviewContract.contentFilter,
+			reviewContract.content_filter
+		),
+		retrySaveReviewContentFilterContext: getFirstDefined(
+			responseOrError.contentFilterContext,
+			responseOrError.content_filter_context,
+			responseData.contentFilterContext,
+			responseData.content_filter_context,
+			reviewContract.contentFilterContext,
+			reviewContract.content_filter_context
+		),
+		retrySaveReviewContentWouldChangeByKses: getFirstDefined(
+			responseOrError.contentWouldChangeByKses,
+			responseOrError.content_would_change_by_kses,
+			responseData.contentWouldChangeByKses,
+			responseData.content_would_change_by_kses,
+			reviewContract.contentWouldChangeByKses,
+			reviewContract.content_would_change_by_kses
+		),
+		retrySaveReviewProposedContentWouldChangeByKses: getFirstDefined(
+			responseOrError.proposedContentWouldChangeByKses,
+			responseOrError.proposed_content_would_change_by_kses,
+			responseData.proposedContentWouldChangeByKses,
+			responseData.proposed_content_would_change_by_kses,
+			reviewContract.proposedContentWouldChangeByKses,
+			reviewContract.proposed_content_would_change_by_kses
+		),
+		retrySaveReviewCandidateContentWouldChangeByKses: getFirstDefined(
+			responseOrError.candidateContentWouldChangeByKses,
+			responseOrError.candidate_content_would_change_by_kses,
+			responseData.candidateContentWouldChangeByKses,
+			responseData.candidate_content_would_change_by_kses,
+			reviewContract.candidateContentWouldChangeByKses,
+			reviewContract.candidate_content_would_change_by_kses
+		),
+		retrySaveReviewProposedContentHash: getFirstDefined(
+			responseOrError.proposedContentHash,
+			responseOrError.proposed_content_hash,
+			responseData.proposedContentHash,
+			responseData.proposed_content_hash,
+			reviewContract.proposedContentHash,
+			reviewContract.proposed_content_hash
+		),
+		retrySaveReviewFilteredProposedContentHash: getFirstDefined(
+			responseOrError.ksesFilteredProposedContentHash,
+			responseOrError.kses_filtered_proposed_content_hash,
+			responseData.ksesFilteredProposedContentHash,
+			responseData.kses_filtered_proposed_content_hash,
+			reviewContract.ksesFilteredProposedContentHash,
+			reviewContract.kses_filtered_proposed_content_hash
+		),
+		retrySaveReviewCandidateContentHash: getFirstDefined(
+			responseOrError.candidateContentHash,
+			responseOrError.candidate_content_hash,
+			responseData.candidateContentHash,
+			responseData.candidate_content_hash,
+			reviewContract.candidateContentHash,
+			reviewContract.candidate_content_hash
+		),
+		retrySaveReviewFilteredCandidateContentHash: getFirstDefined(
+			responseOrError.ksesFilteredCandidateContentHash,
+			responseOrError.kses_filtered_candidate_content_hash,
+			responseData.ksesFilteredCandidateContentHash,
+			responseData.kses_filtered_candidate_content_hash,
+			reviewContract.ksesFilteredCandidateContentHash,
+			reviewContract.kses_filtered_candidate_content_hash
+		),
+		retrySaveReviewRawContentIncluded: getFirstDefined(
+			responseOrError.rawContentIncluded,
+			responseOrError.raw_content_included,
+			responseData.rawContentIncluded,
+			responseData.raw_content_included,
+			reviewContract.rawContentIncluded,
+			reviewContract.raw_content_included
+		),
+		retrySaveReviewRecoveryActions: getFirstDefined(
+			responseOrError.recoveryActions,
+			responseOrError.recovery_actions,
+			responseData.recoveryActions,
+			responseData.recovery_actions
+		),
+	} );
 }
 
 function hasDistributedEditingLocalRebaseInputs( normalized ) {
@@ -2612,6 +2871,26 @@ function normalizeIdList( value ) {
 	return value
 		.map( ( item ) => Number( item ) )
 		.filter( ( item ) => Number.isInteger( item ) && item > 0 );
+}
+
+function normalizeObject( value ) {
+	return value && typeof value === 'object' && ! Array.isArray( value )
+		? value
+		: {};
+}
+
+function getFirstDefined( ...values ) {
+	return values.find( ( value ) => value !== undefined && value !== null );
+}
+
+function normalizeStringList( value ) {
+	if ( ! Array.isArray( value ) ) {
+		return [];
+	}
+
+	return value
+		.map( ( item ) => normalizeNullableString( item ) )
+		.filter( Boolean );
 }
 
 function getDistributedEditingResponseData( responseOrError ) {

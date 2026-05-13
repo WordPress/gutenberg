@@ -113,6 +113,11 @@ describe( 'distributed editing session state', () => {
 		).toBe( true );
 		expect(
 			isDistributedEditingConflictDisposition(
+				DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_UNFILTERED_HTML_REVIEW_REQUIRED
+			)
+		).toBe( true );
+		expect(
+			isDistributedEditingConflictDisposition(
 				DISTRIBUTED_EDITING_DISPOSITIONS.ACCEPTED_WITH_DEGRADED_LIVE_FEEDBACK
 			)
 		).toBe( false );
@@ -189,7 +194,6 @@ describe( 'distributed editing session state', () => {
 			retrySaveClaimsSaved: false,
 			retrySaveRevisionCreated: false,
 			retrySaveCreatedRevisionIds: [],
-			retrySaveRequiresReviewerEscalation: false,
 			retrySaveReviewStatus: null,
 			retrySaveReviewAction: null,
 			retrySaveReviewRequiredCapability: null,
@@ -197,6 +201,25 @@ describe( 'distributed editing session state', () => {
 			retrySaveReviewScope: null,
 			retrySaveEscalationReason: null,
 			retrySaveRawContentIncluded: false,
+			retrySaveReviewContractType: null,
+			retrySaveRequiresReviewerEscalation: false,
+			retrySaveReviewEscalationRequired: false,
+			retrySaveReviewEscalationReason: null,
+			retrySaveReviewRequiresUnfilteredHtml: false,
+			retrySaveReviewUnfilteredHtmlAllowed: false,
+			retrySaveReviewAuthorshipRequired: false,
+			retrySaveReviewContentCapabilityRequired: false,
+			retrySaveReviewContentFilter: null,
+			retrySaveReviewContentFilterContext: null,
+			retrySaveReviewContentWouldChangeByKses: false,
+			retrySaveReviewProposedContentWouldChangeByKses: false,
+			retrySaveReviewCandidateContentWouldChangeByKses: false,
+			retrySaveReviewProposedContentHash: null,
+			retrySaveReviewFilteredProposedContentHash: null,
+			retrySaveReviewCandidateContentHash: null,
+			retrySaveReviewFilteredCandidateContentHash: null,
+			retrySaveReviewRawContentIncluded: false,
+			retrySaveReviewRecoveryActions: [],
 			requiresManualConflictResolution: false,
 			mustOfferLocalCopy: true,
 			canExportLocalUpdates: true,
@@ -1156,29 +1179,68 @@ describe( 'distributed editing session state', () => {
 	} );
 
 	it( 'normalizes retry-save unfiltered HTML review rejections as exportable manual review', () => {
+		const rawContentToken = 'raw-review-content-must-not-leak';
+		const proposedContentHash =
+			'1111111111111111111111111111111111111111111111111111111111111111';
+		const filteredProposedContentHash =
+			'2222222222222222222222222222222222222222222222222222222222222222';
+		const candidateContentHash =
+			'3333333333333333333333333333333333333333333333333333333333333333';
+		const filteredCandidateContentHash =
+			'4444444444444444444444444444444444444444444444444444444444444444';
 		const normalized = getDistributedEditingSessionStateForRetrySaveResult(
 			{
 				code: DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_UNFILTERED_HTML_WOULD_CHANGE_CONTENT,
+				raw_content: rawContentToken,
 				data: {
 					reason_code:
 						DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_UNFILTERED_HTML_WOULD_CHANGE_CONTENT,
 					detail: 'collaborative_unfiltered_html_review_required',
 					pending_change_count: 2,
 					server_version: '7',
+					requires_unfiltered_html: true,
+					unfiltered_html_allowed: false,
+					authorship_review_required: true,
+					content_capability_review_required: true,
 					requires_reviewer_escalation: true,
 					review_status: 'requires_reviewer_escalation',
 					review_action: 'request_unfiltered_html_reviewer',
 					review_required_capability: 'unfiltered_html',
-					reviewer_capability: 'unfiltered_html',
 					review_scope: 'collaborative_post_content',
-					escalation_reason: 'proposed_content_would_change_by_kses',
+					reviewer_capability: 'unfiltered_html',
+					escalation_required: true,
+					escalation_reason:
+						'proposed_content_and_retry_save_candidate_would_change_by_kses',
+					content_filter: 'wp_filter_post_kses',
+					content_filter_context: 'content_save_pre',
+					content_would_change_by_kses: true,
+					proposed_content_hash: proposedContentHash,
+					kses_filtered_proposed_content_hash:
+						filteredProposedContentHash,
+					candidate_content_hash: candidateContentHash,
+					kses_filtered_candidate_content_hash:
+						filteredCandidateContentHash,
+					raw_content: rawContentToken,
 					raw_content_included: false,
 					review_contract: {
 						status: 'requires_reviewer_escalation',
 						type: 'unfiltered_html_content_capability_review',
 						reviewer_capability: 'unfiltered_html',
+						escalation_required: true,
 						escalation_reason:
-							'proposed_content_would_change_by_kses',
+							'proposed_content_and_retry_save_candidate_would_change_by_kses',
+						content_filter: 'wp_filter_post_kses',
+						content_filter_context: 'content_save_pre',
+						content_would_change_by_kses: true,
+						proposed_content_would_change_by_kses: true,
+						candidate_content_would_change_by_kses: true,
+						proposed_content_hash: proposedContentHash,
+						kses_filtered_proposed_content_hash:
+							filteredProposedContentHash,
+						candidate_content_hash: candidateContentHash,
+						kses_filtered_candidate_content_hash:
+							filteredCandidateContentHash,
+						raw_content: rawContentToken,
 						raw_content_included: false,
 					},
 					recovery_actions: [
@@ -1186,6 +1248,19 @@ describe( 'distributed editing session state', () => {
 						'request_unfiltered_html_reviewer',
 						'refetch_server_state',
 					],
+					permission_contract: {
+						unfiltered_html_allowed: false,
+						unfiltered_html_review_required: true,
+						authorship_review_required: true,
+						content_capability_review_required: true,
+						unfiltered_html_rejection_code:
+							DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_UNFILTERED_HTML_WOULD_CHANGE_CONTENT,
+						unfiltered_html_review_action:
+							'request_unfiltered_html_reviewer',
+						unfiltered_html_review_capability: 'unfiltered_html',
+						unfiltered_html_review_scope:
+							'collaborative_post_content',
+					},
 					saves_post: false,
 					mutates_post_content: false,
 					creates_revision: false,
@@ -1207,6 +1282,14 @@ describe( 'distributed editing session state', () => {
 		);
 		const notices =
 			getDistributedEditingNoticeDescriptorsForSessionState( normalized );
+		const retrySaveDescriptor = notices.find(
+			( descriptor ) =>
+				descriptor.kind === DISTRIBUTED_EDITING_NOTICE_KINDS.RETRY_SAVE
+		);
+		const flow =
+			getDistributedEditingRetrySaveFlowStateForSessionState(
+				normalized
+			);
 
 		expect( normalized ).toMatchObject( {
 			disposition:
@@ -1227,17 +1310,87 @@ describe( 'distributed editing session state', () => {
 			retrySaveSavesPost: false,
 			retrySaveMutatesPostContent: false,
 			retrySaveClaimsSaved: false,
-			retrySaveRequiresReviewerEscalation: true,
 			retrySaveReviewStatus: 'requires_reviewer_escalation',
 			retrySaveReviewAction: 'request_unfiltered_html_reviewer',
 			retrySaveReviewRequiredCapability: 'unfiltered_html',
 			retrySaveReviewerCapability: 'unfiltered_html',
 			retrySaveReviewScope: 'collaborative_post_content',
-			retrySaveEscalationReason: 'proposed_content_would_change_by_kses',
+			retrySaveEscalationReason:
+				'proposed_content_and_retry_save_candidate_would_change_by_kses',
 			retrySaveRawContentIncluded: false,
+			retrySaveReviewContractType:
+				'unfiltered_html_content_capability_review',
+			retrySaveRequiresReviewerEscalation: true,
+			retrySaveReviewEscalationRequired: true,
+			retrySaveReviewEscalationReason:
+				'proposed_content_and_retry_save_candidate_would_change_by_kses',
+			retrySaveReviewRequiresUnfilteredHtml: true,
+			retrySaveReviewUnfilteredHtmlAllowed: false,
+			retrySaveReviewAuthorshipRequired: true,
+			retrySaveReviewContentCapabilityRequired: true,
+			retrySaveReviewContentFilter: 'wp_filter_post_kses',
+			retrySaveReviewContentFilterContext: 'content_save_pre',
+			retrySaveReviewContentWouldChangeByKses: true,
+			retrySaveReviewProposedContentWouldChangeByKses: true,
+			retrySaveReviewCandidateContentWouldChangeByKses: true,
+			retrySaveReviewProposedContentHash: proposedContentHash,
+			retrySaveReviewFilteredProposedContentHash:
+				filteredProposedContentHash,
+			retrySaveReviewCandidateContentHash: candidateContentHash,
+			retrySaveReviewFilteredCandidateContentHash:
+				filteredCandidateContentHash,
+			retrySaveReviewRawContentIncluded: false,
+			retrySaveReviewRecoveryActions: [
+				'export_local_updates',
+				'request_unfiltered_html_reviewer',
+				'refetch_server_state',
+			],
 			mustOfferLocalCopy: true,
 			canExportLocalUpdates: true,
 		} );
+		expect( normalized ).not.toHaveProperty( 'raw_content' );
+		expect( JSON.stringify( normalized ) ).not.toContain( rawContentToken );
+		expect( retrySaveDescriptor ).toMatchObject( {
+			retrySaveReviewStatus: 'requires_reviewer_escalation',
+			retrySaveReviewAction: 'request_unfiltered_html_reviewer',
+			retrySaveReviewRequiredCapability: 'unfiltered_html',
+			retrySaveReviewerCapability: 'unfiltered_html',
+			retrySaveReviewScope: 'collaborative_post_content',
+			retrySaveReviewContractType:
+				'unfiltered_html_content_capability_review',
+			retrySaveRequiresReviewerEscalation: true,
+			retrySaveReviewEscalationReason:
+				'proposed_content_and_retry_save_candidate_would_change_by_kses',
+			retrySaveReviewProposedContentHash: proposedContentHash,
+			retrySaveReviewFilteredCandidateContentHash:
+				filteredCandidateContentHash,
+			retrySaveReviewRawContentIncluded: false,
+			retrySaveReviewRecoveryActions: [
+				'export_local_updates',
+				'request_unfiltered_html_reviewer',
+				'refetch_server_state',
+			],
+		} );
+		expect( JSON.stringify( retrySaveDescriptor ) ).not.toContain(
+			rawContentToken
+		);
+		expect( flow ).toMatchObject( {
+			hasProtectedLocalChanges: true,
+			requiresServerStateRefetch: true,
+			requiresManualConflictResolution: true,
+			canExportLocalUpdates: true,
+			retrySaveStatus:
+				DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_UNFILTERED_HTML_REVIEW_REQUIRED,
+			retrySaveReason:
+				DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_UNFILTERED_HTML_WOULD_CHANGE_CONTENT,
+			retrySaveReviewAction: 'request_unfiltered_html_reviewer',
+			retrySaveReviewRequiredCapability: 'unfiltered_html',
+			retrySaveReviewerCapability: 'unfiltered_html',
+			retrySaveReviewEscalationReason:
+				'proposed_content_and_retry_save_candidate_would_change_by_kses',
+			retrySaveReviewRawContentIncluded: false,
+		} );
+		expect( JSON.stringify( flow ) ).not.toContain( rawContentToken );
 		expect( notices ).toEqual(
 			expect.arrayContaining( [
 				expect.objectContaining( {
@@ -1256,7 +1409,7 @@ describe( 'distributed editing session state', () => {
 					retrySaveReviewerCapability: 'unfiltered_html',
 					retrySaveReviewScope: 'collaborative_post_content',
 					retrySaveEscalationReason:
-						'proposed_content_would_change_by_kses',
+						'proposed_content_and_retry_save_candidate_would_change_by_kses',
 					retrySaveRawContentIncluded: false,
 					actionKeys: [
 						DISTRIBUTED_EDITING_NOTICE_ACTIONS.EXPORT_LOCAL_UPDATES,

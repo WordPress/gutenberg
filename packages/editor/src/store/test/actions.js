@@ -17,6 +17,7 @@ import {
 	DISTRIBUTED_EDITING_DISPOSITIONS,
 	DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES,
 	DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES,
+	DISTRIBUTED_EDITING_NOTICE_KINDS,
 	DISTRIBUTED_EDITING_REASON_CODES,
 	DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_REASONS,
 	DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_STATUSES,
@@ -1644,6 +1645,219 @@ describe( 'Post actions', () => {
 					DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
 				canExportLocalUpdates: true,
 			} );
+		} );
+
+		it( 'normalizes live retry-save unfiltered HTML review errors with reviewer metadata', async () => {
+			const rawContentToken = 'live-review-raw-content-must-not-leak';
+			const proposedContentHash =
+				'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
+			const filteredProposedContentHash =
+				'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb';
+			const candidateContentHash =
+				'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc';
+			const filteredCandidateContentHash =
+				'dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd';
+			const post = {
+				id: postId,
+				type: 'post',
+				title: 'bar',
+				content:
+					'<!-- wp:paragraph --><p>Rebased with script review</p><!-- /wp:paragraph -->',
+				status: 'draft',
+			};
+			const error = {
+				code: DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_UNFILTERED_HTML_WOULD_CHANGE_CONTENT,
+				message:
+					'Distributed Editing rejected the update because collaborative content changes require unfiltered HTML review.',
+				data: {
+					status: 403,
+					reason_code:
+						DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_UNFILTERED_HTML_WOULD_CHANGE_CONTENT,
+					detail: 'collaborative_unfiltered_html_review_required',
+					pending_change_count: 2,
+					server_version: '7',
+					requires_unfiltered_html: true,
+					unfiltered_html_allowed: false,
+					authorship_review_required: true,
+					content_capability_review_required: true,
+					requires_reviewer_escalation: true,
+					review_action: 'request_unfiltered_html_reviewer',
+					review_required_capability: 'unfiltered_html',
+					review_scope: 'collaborative_post_content',
+					review_status: 'requires_reviewer_escalation',
+					reviewer_capability: 'unfiltered_html',
+					escalation_required: true,
+					escalation_reason:
+						'proposed_content_and_retry_save_candidate_would_change_by_kses',
+					content_filter: 'wp_filter_post_kses',
+					content_filter_context: 'content_save_pre',
+					content_would_change_by_kses: true,
+					proposed_content_hash: proposedContentHash,
+					kses_filtered_proposed_content_hash:
+						filteredProposedContentHash,
+					candidate_content_hash: candidateContentHash,
+					kses_filtered_candidate_content_hash:
+						filteredCandidateContentHash,
+					raw_content: rawContentToken,
+					raw_content_included: false,
+					review_contract: {
+						status: 'requires_reviewer_escalation',
+						type: 'unfiltered_html_content_capability_review',
+						reviewer_capability: 'unfiltered_html',
+						escalation_required: true,
+						escalation_reason:
+							'proposed_content_and_retry_save_candidate_would_change_by_kses',
+						content_would_change_by_kses: true,
+						proposed_content_would_change_by_kses: true,
+						candidate_content_would_change_by_kses: true,
+						raw_content: rawContentToken,
+						raw_content_included: false,
+					},
+					recovery_actions: [
+						'export_local_updates',
+						'request_unfiltered_html_reviewer',
+						'refetch_server_state',
+					],
+					requires_manual_conflict_resolution: true,
+					can_export_local_updates: true,
+					saves_post: false,
+					mutates_post_content: false,
+					creates_revision: false,
+					claims_saved: false,
+				},
+			};
+
+			apiFetch.setFetchHandler( async () => {
+				throw error;
+			} );
+
+			const registry = createRegistryWithStores();
+
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', post );
+			registry.dispatch( editorStore ).setupEditor( post, {
+				content: post.content,
+			} );
+			registry
+				.dispatch( editorStore )
+				.setDistributedEditingSessionState( {
+					clientBaseVersion: '4',
+					serverVersion: '7',
+					pendingChangeCount: 2,
+					retrySubmitProofStatus:
+						DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.ACCEPTED_FOR_FUTURE_SAVE,
+					retrySubmitAccepted: true,
+					retrySubmitSavePathRequired: true,
+					retrySubmitSaveStatus:
+						DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.READY,
+					retrySubmitSaveReady: true,
+					canExportLocalUpdates: true,
+				} );
+
+			await expect(
+				registry
+					.dispatch( editorStore )
+					.__experimentalSaveDistributedEditingRetryAfterProof()
+			).rejects.toBe( error );
+
+			const sessionState = registry
+				.select( editorStore )
+				.getDistributedEditingSessionState();
+			const retrySaveDescriptor = registry
+				.select( editorStore )
+				.getDistributedEditingNoticeDescriptors()
+				.find(
+					( descriptor ) =>
+						descriptor.kind ===
+						DISTRIBUTED_EDITING_NOTICE_KINDS.RETRY_SAVE
+				);
+			const retrySaveFlow = registry
+				.select( editorStore )
+				.getDistributedEditingRetrySaveFlowState();
+
+			expect(
+				registry.select( editorStore ).getEditedPostContent()
+			).toBe( post.content );
+			expect( sessionState ).toMatchObject( {
+				disposition:
+					DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_UNFILTERED_HTML_REVIEW_REQUIRED,
+				reasonCode:
+					DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_UNFILTERED_HTML_WOULD_CHANGE_CONTENT,
+				serverVersion: '7',
+				pendingChangeCount: 2,
+				hasPendingChanges: true,
+				requiresServerStateRefetch: true,
+				requiresManualConflictResolution: true,
+				retrySaveStatus:
+					DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_UNFILTERED_HTML_REVIEW_REQUIRED,
+				retrySaveReason:
+					DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_UNFILTERED_HTML_WOULD_CHANGE_CONTENT,
+				retrySaveReviewStatus: 'requires_reviewer_escalation',
+				retrySaveReviewAction: 'request_unfiltered_html_reviewer',
+				retrySaveReviewRequiredCapability: 'unfiltered_html',
+				retrySaveReviewerCapability: 'unfiltered_html',
+				retrySaveReviewScope: 'collaborative_post_content',
+				retrySaveReviewContractType:
+					'unfiltered_html_content_capability_review',
+				retrySaveRequiresReviewerEscalation: true,
+				retrySaveReviewEscalationRequired: true,
+				retrySaveReviewEscalationReason:
+					'proposed_content_and_retry_save_candidate_would_change_by_kses',
+				retrySaveReviewRequiresUnfilteredHtml: true,
+				retrySaveReviewUnfilteredHtmlAllowed: false,
+				retrySaveReviewAuthorshipRequired: true,
+				retrySaveReviewContentCapabilityRequired: true,
+				retrySaveReviewContentFilter: 'wp_filter_post_kses',
+				retrySaveReviewContentFilterContext: 'content_save_pre',
+				retrySaveReviewContentWouldChangeByKses: true,
+				retrySaveReviewProposedContentWouldChangeByKses: true,
+				retrySaveReviewCandidateContentWouldChangeByKses: true,
+				retrySaveReviewProposedContentHash: proposedContentHash,
+				retrySaveReviewFilteredProposedContentHash:
+					filteredProposedContentHash,
+				retrySaveReviewCandidateContentHash: candidateContentHash,
+				retrySaveReviewFilteredCandidateContentHash:
+					filteredCandidateContentHash,
+				retrySaveReviewRawContentIncluded: false,
+				retrySaveReviewRecoveryActions: [
+					'export_local_updates',
+					'request_unfiltered_html_reviewer',
+					'refetch_server_state',
+				],
+				canExportLocalUpdates: true,
+			} );
+			expect( sessionState ).not.toHaveProperty( 'raw_content' );
+			expect( JSON.stringify( sessionState ) ).not.toContain(
+				rawContentToken
+			);
+			expect( retrySaveDescriptor ).toMatchObject( {
+				retrySaveReviewAction: 'request_unfiltered_html_reviewer',
+				retrySaveReviewRequiredCapability: 'unfiltered_html',
+				retrySaveReviewerCapability: 'unfiltered_html',
+				retrySaveReviewScope: 'collaborative_post_content',
+				retrySaveReviewEscalationReason:
+					'proposed_content_and_retry_save_candidate_would_change_by_kses',
+				retrySaveReviewProposedContentHash: proposedContentHash,
+				retrySaveReviewFilteredCandidateContentHash:
+					filteredCandidateContentHash,
+				retrySaveReviewRawContentIncluded: false,
+			} );
+			expect( JSON.stringify( retrySaveDescriptor ) ).not.toContain(
+				rawContentToken
+			);
+			expect( retrySaveFlow ).toMatchObject( {
+				hasProtectedLocalChanges: true,
+				requiresServerStateRefetch: true,
+				requiresManualConflictResolution: true,
+				retrySaveReviewAction: 'request_unfiltered_html_reviewer',
+				retrySaveReviewRequiredCapability: 'unfiltered_html',
+				retrySaveReviewerCapability: 'unfiltered_html',
+				retrySaveReviewRawContentIncluded: false,
+			} );
+			expect( JSON.stringify( retrySaveFlow ) ).not.toContain(
+				rawContentToken
+			);
 		} );
 	} );
 
