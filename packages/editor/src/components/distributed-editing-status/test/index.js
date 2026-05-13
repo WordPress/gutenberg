@@ -107,6 +107,15 @@ function setupDistributedEditingStatusDispatch() {
 }
 
 afterEach( () => {
+	if (
+		Object.prototype.hasOwnProperty.call(
+			globalThis.navigator,
+			'clipboard'
+		)
+	) {
+		delete globalThis.navigator.clipboard;
+	}
+
 	useDispatch.mockReset();
 	useSelect.mockReset();
 } );
@@ -770,6 +779,48 @@ describe( 'DistributedEditingStatus', () => {
 		expect(
 			actions.__experimentalSaveDistributedEditingRetryAfterProof
 		).not.toHaveBeenCalled();
+		expect(
+			await screen.findByText(
+				'Local changes copied. Keep this data until the server confirms your update.'
+			)
+		).toBeVisible();
+	} );
+
+	it( 'reports clipboard denial from production editor chrome without saving', async () => {
+		const user = userEvent.setup();
+		const actions = setupDistributedEditingStatusDispatch();
+
+		Object.defineProperty( globalThis.navigator, 'clipboard', {
+			value: undefined,
+			configurable: true,
+		} );
+		setupDistributedEditingStatusSelect( {
+			sessionState: {
+				pendingChangeCount: 1,
+				hasPendingChanges: true,
+				canExportLocalUpdates: true,
+				retrySaveHandoffStatus:
+					DISTRIBUTED_EDITING_RETRY_SAVE_HANDOFF_STATUSES.RETRY_SAVE_BLOCKED,
+				retrySaveHandoffReason:
+					DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.RETRY_SUBMIT_PROOF_NOT_ACCEPTED,
+				retrySaveHandoffBlocksNormalSave: true,
+			},
+		} );
+
+		render( <DistributedEditingStatusChrome /> );
+
+		await user.click(
+			screen.getByRole( 'button', {
+				name: 'Export local changes',
+			} )
+		);
+
+		expect( await screen.findByRole( 'status' ) ).toHaveTextContent(
+			'Clipboard unavailable. Copying local changes is not available in this browser session.'
+		);
+		expect(
+			actions.__experimentalSaveDistributedEditingRetryAfterProof
+		).not.toHaveBeenCalled();
 	} );
 
 	it( 'refetches server state from production editor chrome without saving', async () => {
@@ -804,6 +855,111 @@ describe( 'DistributedEditingStatus', () => {
 		expect(
 			actions.__experimentalSaveDistributedEditingRetryAfterProof
 		).not.toHaveBeenCalled();
+		expect(
+			await screen.findByText(
+				'Server version refreshed. Review local changes before retrying.'
+			)
+		).toBeVisible();
+	} );
+
+	it( 'plans local rebase from production editor chrome when inputs are not ready', async () => {
+		const user = userEvent.setup();
+		const actions = setupDistributedEditingStatusDispatch();
+
+		setupDistributedEditingStatusSelect( {
+			noticeDescriptors: [
+				{
+					id: 'local-rebase-plan',
+					kind: DISTRIBUTED_EDITING_NOTICE_KINDS.STALE_BASE_REJECTED,
+					status: 'warning',
+					disposition:
+						DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+					pendingChangeCount: 1,
+					remoteChangeCount: 1,
+					canAttemptLocalRebase: true,
+					localRebasePlanStatus:
+						DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES.READY,
+					hasLocalRebaseInputs: false,
+					actionKeys: [
+						DISTRIBUTED_EDITING_NOTICE_ACTIONS.REBASE_LOCAL_UPDATES,
+					],
+				},
+			],
+			sessionState: {
+				pendingChangeCount: 1,
+				disposition:
+					DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+			},
+		} );
+
+		render( <DistributedEditingStatusChrome /> );
+
+		await user.click(
+			screen.getByRole( 'button', {
+				name: 'Retry local changes',
+			} )
+		);
+
+		expect(
+			actions.__experimentalPlanDistributedEditingLocalRebaseAfterStaleBase
+		).toHaveBeenCalledTimes( 1 );
+		expect(
+			actions.__experimentalRebaseDistributedEditingLocalUpdatesAfterStaleBase
+		).not.toHaveBeenCalled();
+		expect(
+			actions.__experimentalSaveDistributedEditingRetryAfterProof
+		).not.toHaveBeenCalled();
+		expect(
+			await screen.findByText( 'Local rebase readiness refreshed.' )
+		).toBeVisible();
+	} );
+
+	it( 'rebases local updates from production editor chrome without saving', async () => {
+		const user = userEvent.setup();
+		const actions = setupDistributedEditingStatusDispatch();
+
+		setupDistributedEditingStatusSelect( {
+			sessionState: {
+				pendingChangeCount: 1,
+				remoteChangeCount: 1,
+				disposition:
+					DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+				reasonCode:
+					DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+				refetchedServerState: true,
+				canAttemptLocalRebase: true,
+				canExportLocalUpdates: true,
+				localRebasePlanStatus:
+					DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES.READY,
+				clientBaseContent:
+					'<!-- wp:paragraph --><p>Base</p><!-- /wp:paragraph -->',
+				refetchedServerContent:
+					'<!-- wp:paragraph --><p>Server</p><!-- /wp:paragraph -->',
+			},
+		} );
+
+		render( <DistributedEditingStatusChrome /> );
+
+		await user.click(
+			screen.getByRole( 'button', {
+				name: 'Retry local changes',
+			} )
+		);
+
+		expect(
+			actions.__experimentalRebaseDistributedEditingLocalUpdatesAfterStaleBase
+		).toHaveBeenCalledTimes( 1 );
+		expect(
+			actions.__experimentalPlanDistributedEditingLocalRebaseAfterStaleBase
+		).not.toHaveBeenCalled();
+		expect(
+			actions.__experimentalSaveDistributedEditingRetryAfterProof
+		).not.toHaveBeenCalled();
+		expect(
+			await screen.findByText(
+				'Local changes retried over the refreshed server version.'
+			)
+		).toBeVisible();
 	} );
 
 	it( 'mounts the status surface for unload-warning state', () => {

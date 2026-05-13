@@ -755,6 +755,7 @@ export function DistributedEditingRetrySaveControls( { onResult, onError } ) {
  * @param {Object}   props                    Component props.
  * @param {Array}    props.noticeDescriptors  DE-RTC notice descriptors.
  * @param {Object}   props.unloadWarningState DE-RTC unload-warning state.
+ * @param {Object}   props.actionStatus       Local action status.
  * @param {Function} props.onAction           Optional action handler.
  * @param {string}   props.placement          Status surface placement.
  *
@@ -763,6 +764,7 @@ export function DistributedEditingRetrySaveControls( { onResult, onError } ) {
 export function DistributedEditingStatusSurface( {
 	noticeDescriptors = [],
 	unloadWarningState = {},
+	actionStatus = null,
 	onAction,
 	placement = 'standalone-status-surface',
 } ) {
@@ -770,8 +772,13 @@ export function DistributedEditingStatusSurface( {
 		getDistributedEditingStatusSurfaceItems( noticeDescriptors );
 	const unloadWarningMessage =
 		getDistributedEditingUnloadWarningMessage( unloadWarningState );
+	const actionStatusMessage = actionStatus?.message;
 
-	if ( ! statusItems.length && ! unloadWarningMessage ) {
+	if (
+		! statusItems.length &&
+		! unloadWarningMessage &&
+		! actionStatusMessage
+	) {
 		return null;
 	}
 
@@ -799,6 +806,18 @@ export function DistributedEditingStatusSurface( {
 					{ unloadWarningMessage }
 				</div>
 			) }
+			{ actionStatusMessage && (
+				<div
+					aria-live="polite"
+					className="editor-distributed-editing-status__action-status"
+					data-distributed-editing-action-status={
+						actionStatus?.status || 'info'
+					}
+					role="status"
+				>
+					{ actionStatusMessage }
+				</div>
+			) }
 		</div>
 	);
 }
@@ -816,6 +835,7 @@ export default function DistributedEditingStatus( {
 	onAction,
 	placement = 'selector-backed-status',
 } ) {
+	const [ actionStatus, setActionStatus ] = useState( null );
 	const {
 		currentPost,
 		editedPostContent,
@@ -846,23 +866,77 @@ export default function DistributedEditingStatus( {
 	} = useDispatch( editorStore ) || {};
 	const handleAction = useCallback(
 		async ( actionKey, item ) => {
-			onAction?.( actionKey, item );
+			try {
+				onAction?.( actionKey, item );
 
-			switch ( actionKey ) {
-				case DISTRIBUTED_EDITING_NOTICE_ACTIONS.EXPORT_LOCAL_UPDATES:
-					return copyDistributedEditingLocalUpdatesToClipboard( {
-						currentPost,
-						editedPostContent,
-						sessionState,
-					} );
-				case DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFETCH_SERVER_STATE:
-					return __experimentalRefreshDistributedEditingServerStateAfterStaleBase?.();
-				case DISTRIBUTED_EDITING_NOTICE_ACTIONS.REBASE_LOCAL_UPDATES:
-					if ( item?.hasLocalRebaseInputs ) {
-						return __experimentalRebaseDistributedEditingLocalUpdatesAfterStaleBase?.();
+				switch ( actionKey ) {
+					case DISTRIBUTED_EDITING_NOTICE_ACTIONS.EXPORT_LOCAL_UPDATES: {
+						const copiedPayload =
+							await copyDistributedEditingLocalUpdatesToClipboard(
+								{
+									currentPost,
+									editedPostContent,
+									sessionState,
+								}
+							);
+
+						if ( copiedPayload ) {
+							setActionStatus( {
+								status: 'success',
+								message: __(
+									'Local changes copied. Keep this data until the server confirms your update.'
+								),
+							} );
+						} else {
+							setActionStatus( {
+								status: 'warning',
+								message: __(
+									'Clipboard unavailable. Copying local changes is not available in this browser session.'
+								),
+							} );
+						}
+
+						return copiedPayload;
 					}
+					case DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFETCH_SERVER_STATE: {
+						const refetchResult =
+							await __experimentalRefreshDistributedEditingServerStateAfterStaleBase?.();
+						setActionStatus( {
+							status: 'info',
+							message: __(
+								'Server version refreshed. Review local changes before retrying.'
+							),
+						} );
+						return refetchResult;
+					}
+					case DISTRIBUTED_EDITING_NOTICE_ACTIONS.REBASE_LOCAL_UPDATES: {
+						if ( item?.hasLocalRebaseInputs ) {
+							const rebaseResult =
+								await __experimentalRebaseDistributedEditingLocalUpdatesAfterStaleBase?.();
+							setActionStatus( {
+								status: 'info',
+								message: __(
+									'Local changes retried over the refreshed server version.'
+								),
+							} );
+							return rebaseResult;
+						}
 
-					return __experimentalPlanDistributedEditingLocalRebaseAfterStaleBase?.();
+						const planResult =
+							await __experimentalPlanDistributedEditingLocalRebaseAfterStaleBase?.();
+						setActionStatus( {
+							status: 'info',
+							message: __( 'Local rebase readiness refreshed.' ),
+						} );
+						return planResult;
+					}
+				}
+			} catch {
+				setActionStatus( {
+					status: 'error',
+					message: getActionErrorMessage( actionKey ),
+				} );
+				return null;
 			}
 
 			return undefined;
@@ -889,11 +963,33 @@ export default function DistributedEditingStatus( {
 
 	return (
 		<DistributedEditingStatusSurface
+			actionStatus={ actionStatus }
 			noticeDescriptors={ noticeDescriptors }
 			onAction={ handleAction }
 			placement={ placement }
 			unloadWarningState={ unloadWarningState }
 		/>
+	);
+}
+
+function getActionErrorMessage( actionKey ) {
+	switch ( actionKey ) {
+		case DISTRIBUTED_EDITING_NOTICE_ACTIONS.EXPORT_LOCAL_UPDATES:
+			return __(
+				'Local changes could not be copied. They remain protected in this editor session.'
+			);
+		case DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFETCH_SERVER_STATE:
+			return __(
+				'Server version could not be refreshed. Local changes remain protected.'
+			);
+		case DISTRIBUTED_EDITING_NOTICE_ACTIONS.REBASE_LOCAL_UPDATES:
+			return __(
+				'Local changes could not be retried. They remain protected in this editor session.'
+			);
+	}
+
+	return __(
+		'Distributed editing action failed. Local changes remain protected.'
 	);
 }
 
@@ -932,7 +1028,7 @@ async function copyDistributedEditingLocalUpdatesToClipboard( {
  * @param {Object}   props          Component props.
  * @param {Function} props.onAction Optional action handler.
  *
- * @return {React.ReactNode} Rendered status surface.
+ * @return {React.ReactNode} Rendered status chrome.
  */
 export function DistributedEditingStatusChrome( { onAction } ) {
 	return (
@@ -955,6 +1051,7 @@ function getDistributedEditingStatusSurfaceItem( descriptor ) {
 			return {
 				...getBaseStatusItem( descriptor ),
 				...getStaleBaseStatusText( descriptor ),
+				hasLocalRebaseInputs: descriptor.hasLocalRebaseInputs,
 			};
 		case DISTRIBUTED_EDITING_NOTICE_KINDS.MANUAL_RESOLUTION_REQUIRED:
 			return {

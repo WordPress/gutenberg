@@ -281,7 +281,7 @@ _Parameters_
 
 _Returns_
 
--   `React.ReactNode`: Rendered status surface.
+-   `React.ReactNode`: Rendered status chrome.
 
 ### DistributedEditingStatusSurface
 
@@ -292,6 +292,7 @@ _Parameters_
 -   _props_ `Object`: Component props.
 -   _props.noticeDescriptors_ `Array`: DE-RTC notice descriptors.
 -   _props.unloadWarningState_ `Object`: DE-RTC unload-warning state.
+-   _props.actionStatus_ `Object`: Local action status.
 -   _props.onAction_ `Function`: Optional action handler.
 -   _props.placement_ `string`: Status surface placement.
 
