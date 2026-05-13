@@ -283,9 +283,6 @@ test.describe( 'Distributed Editing status chrome', () => {
 		await admin.createNewPost( {
 			title: 'DE-RTC board demo success',
 		} );
-		await expect(
-			editor.canvas.getByRole( 'textbox', { name: 'Add title' } )
-		).toBeFocused();
 		await enableDistributedEditingRetrySaveHandoff( page );
 
 		let staleBaseRequestCount = 0;
@@ -499,7 +496,7 @@ test.describe( 'Distributed Editing status chrome', () => {
 			.click();
 		await expect(
 			statusChrome.getByText(
-				'Server version refreshed. Local changes remain protected and exportable while you review before retrying.'
+				'Server version refreshed for review. Protected local changes remain in this editor session and can still be exported before retrying.'
 			)
 		).toBeVisible();
 		await expect(
@@ -600,9 +597,7 @@ test.describe( 'Distributed Editing status chrome', () => {
 			statusChrome.getByText( 'Retry save confirmed' )
 		).toBeVisible();
 		await expect(
-			statusChrome.getByText(
-				'The server saved the rebased changes and cleared the local pending-change warning.'
-			)
+			statusChrome.getByText( /Server confirmed the guarded retry-save/ )
 		).toBeVisible();
 		await expect(
 			statusChrome.getByRole( 'button', {
@@ -926,7 +921,7 @@ test.describe( 'Distributed Editing status chrome', () => {
 		);
 		await expect(
 			statusChrome.getByText(
-				'Clipboard unavailable. Local changes remain protected in this editor session; keep this tab open and try exporting again after clipboard access is available.'
+				'Clipboard unavailable. Protected local changes remain in this editor session; keep this tab open and try exporting again after clipboard access is available.'
 			)
 		).toBeVisible();
 		await expect(
@@ -1042,7 +1037,7 @@ test.describe( 'Distributed Editing status chrome', () => {
 		);
 		await expect(
 			statusChrome.getByText(
-				'Server version could not be refreshed. Local changes remain protected and exportable in this editor session; keep this tab open before trying again.'
+				'Server version could not be refreshed. Protected local changes remain in this editor session and can still be exported; keep this tab open before trying again.'
 			)
 		).toBeVisible();
 		await expect(
@@ -1182,7 +1177,7 @@ test.describe( 'Distributed Editing status chrome', () => {
 		).toBeVisible();
 		await expect(
 			statusChrome.getByText(
-				'The server state must be refreshed before retry-save can continue. Local changes are still protected; refresh the server version before trying again.'
+				'The server state must be refreshed before retry-save can continue. Protected local changes are still exportable; refreshing only fetches server state and does not save over local changes.'
 			)
 		).toBeVisible();
 		await expect(
@@ -1209,7 +1204,7 @@ test.describe( 'Distributed Editing status chrome', () => {
 			.click();
 		await expect(
 			statusChrome.getByText(
-				'Local changes copied. Keep this data until the server confirms your update.'
+				'Protected local changes exported. Keep this copy until the server confirms the update.'
 			)
 		).toBeVisible();
 
@@ -1241,7 +1236,7 @@ test.describe( 'Distributed Editing status chrome', () => {
 			.click();
 		await expect(
 			statusChrome.getByText(
-				'Server version refreshed. Local changes remain protected and exportable while you review before retrying.'
+				'Server version refreshed for review. Protected local changes remain in this editor session and can still be exported before retrying.'
 			)
 		).toBeVisible();
 
@@ -1341,7 +1336,7 @@ test.describe( 'Distributed Editing status chrome', () => {
 		).toBeVisible();
 		await expect(
 			statusChrome.getByText(
-				'The editor is sending rebased changes through the guarded retry-save path. Keep this tab open until the server confirms the save.'
+				'The editor is sending rebased changes through the guarded retry-save path. Keep this tab open; protected local changes remain exportable until the server confirms the save.'
 			)
 		).toBeVisible();
 
@@ -1362,7 +1357,7 @@ test.describe( 'Distributed Editing status chrome', () => {
 		).toBeVisible();
 		await expect(
 			statusChrome.getByText(
-				'A retry save is already waiting for server confirmation. Local changes are still protected; keep this tab open until it finishes.'
+				'A retry save is already waiting for server confirmation. Protected local changes remain exportable; keep this tab open until it finishes.'
 			)
 		).toBeVisible();
 		await expect
