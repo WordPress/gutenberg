@@ -448,6 +448,13 @@ function MediaEditorContent( {
 						metadataEdits[ key ] = pendingEdits[ key ];
 					}
 				}
+				// The `/edit` endpoint creates a new attachment for the crop
+				// and doesn't inherit `post_parent` from the source (unlike
+				// title/caption/etc.), so carry the existing value across when
+				// the user hasn't explicitly edited it.
+				if ( ! ( 'post' in metadataEdits ) && media?.post ) {
+					metadataEdits.post = media.post;
+				}
 
 				saved = ( await apiFetch( {
 					path: `/wp/v2/media/${ id }/edit`,
