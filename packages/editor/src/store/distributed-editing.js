@@ -8,6 +8,7 @@ export const DISTRIBUTED_EDITING_REASON_CODES = Object.freeze( {
 	SYNC_META_UNAVAILABLE_AFTER_REVISION_SCAN:
 		'sync_meta_unavailable_after_revision_scan',
 	STALE_BASE_VERSION_REJECTED: 'stale_base_version_rejected',
+	DE_RTC_SYNC_META_UNRECOVERABLE: 'de_rtc_sync_meta_unrecoverable',
 	DE_RTC_FEATURE_DISABLED: 'de_rtc_feature_disabled',
 	REST_CANNOT_EDIT: 'rest_cannot_edit',
 	REST_POST_INVALID_ID: 'rest_post_invalid_id',
@@ -223,7 +224,9 @@ export function getDistributedEditingSessionStateForRecoveryDryRunResult(
 	responseOrError = {}
 ) {
 	const reasonCode = normalizeNullableString(
-		responseOrError.code || responseOrError.reasonCode
+		responseOrError.code ||
+			responseOrError.reasonCode ||
+			responseOrError.reason_code
 	);
 
 	switch ( reasonCode ) {
@@ -254,6 +257,7 @@ export function getDistributedEditingSessionStateForRecoveryDryRunResult(
 			disposition:
 				DISTRIBUTED_EDITING_DISPOSITIONS.REQUIRES_MANUAL_RESOLUTION_NO_SYNC_META,
 			reasonCode:
+				reasonCode ||
 				DISTRIBUTED_EDITING_REASON_CODES.SYNC_META_UNAVAILABLE_AFTER_REVISION_SCAN,
 			canExportLocalUpdates: true,
 		} );

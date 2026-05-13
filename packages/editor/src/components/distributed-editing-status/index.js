@@ -3,6 +3,7 @@
  */
 import { Button, Notice } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
+import { useState } from '@wordpress/element';
 import { __, _n, sprintf } from '@wordpress/i18n';
 
 /**
@@ -171,7 +172,87 @@ export function DistributedEditingStatusInspector( { onAction, onSelect } ) {
 			role="group"
 		>
 			<DistributedEditingStatusTestControls onSelect={ onSelect } />
+			<DistributedEditingRecoveryDryRunControls />
 			<DistributedEditingStatus onAction={ onAction } />
+		</div>
+	);
+}
+
+/**
+ * Renders the internal recovery dry-run control for manual inspection.
+ *
+ * The control calls the proof-only dry-run action and exposes the normalized
+ * editor state it records. It does not save, apply recovery, persist state,
+ * dispatch notices, or change post locks.
+ *
+ * @param {Object}   props          Component props.
+ * @param {Function} props.onResult Optional success observer.
+ * @param {Function} props.onError  Optional failure observer.
+ *
+ * @return {React.ReactNode} Rendered internal dry-run controls.
+ */
+export function DistributedEditingRecoveryDryRunControls( {
+	onResult,
+	onError,
+} ) {
+	const [ commandStatus, setCommandStatus ] = useState( 'idle' );
+	const { __experimentalRefreshDistributedEditingRecoveryDryRun } =
+		useDispatch( editorStore );
+	const sessionState = useSelect( ( select ) => {
+		const { getDistributedEditingSessionState } = select( editorStore );
+
+		return getDistributedEditingSessionState();
+	}, [] );
+	const normalized = normalizeDistributedEditingSessionState( sessionState );
+	const isRunning = commandStatus === 'running';
+
+	async function runRecoveryDryRun() {
+		setCommandStatus( 'running' );
+
+		try {
+			const response =
+				await __experimentalRefreshDistributedEditingRecoveryDryRun();
+
+			setCommandStatus( 'succeeded' );
+			onResult?.( response );
+		} catch ( error ) {
+			setCommandStatus( 'failed' );
+			onError?.( error );
+		}
+	}
+
+	return (
+		<div
+			aria-label={ __( 'Distributed editing recovery dry-run' ) }
+			className="editor-distributed-editing-status__recovery-dry-run"
+			role="group"
+		>
+			<Button
+				__next40pxDefaultSize
+				accessibleWhenDisabled
+				disabled={ isRunning }
+				isBusy={ isRunning }
+				onClick={ runRecoveryDryRun }
+				variant="secondary"
+			>
+				{ __( 'Run recovery dry run' ) }
+			</Button>
+			<dl className="editor-distributed-editing-status__recovery-dry-run-state">
+				<div>
+					<dt>{ __( 'Command' ) }</dt>
+					<dd>
+						{ getRecoveryDryRunCommandStatusLabel( commandStatus ) }
+					</dd>
+				</div>
+				<div>
+					<dt>{ __( 'Disposition' ) }</dt>
+					<dd>{ normalized.disposition }</dd>
+				</div>
+				<div>
+					<dt>{ __( 'Reason' ) }</dt>
+					<dd>{ normalized.reasonCode || __( 'None' ) }</dd>
+				</div>
+			</dl>
 		</div>
 	);
 }
@@ -432,6 +513,19 @@ function getDistributedEditingStatusControlLabel( key ) {
 	}
 
 	return key;
+}
+
+function getRecoveryDryRunCommandStatusLabel( commandStatus ) {
+	switch ( commandStatus ) {
+		case 'running':
+			return __( 'Running' );
+		case 'succeeded':
+			return __( 'Succeeded' );
+		case 'failed':
+			return __( 'Failed' );
+	}
+
+	return __( 'Idle' );
 }
 
 function normalizeCount( value ) {

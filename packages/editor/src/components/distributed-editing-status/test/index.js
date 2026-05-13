@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -14,6 +14,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
  */
 import DistributedEditingStatus, {
 	DistributedEditingStatusInspector,
+	DistributedEditingRecoveryDryRunControls,
 	DistributedEditingStatusTestControls,
 	DistributedEditingStatusSurface,
 	getDistributedEditingStatusControlStates,
@@ -55,6 +56,11 @@ function setupDistributedEditingStatusSelect( {
 
 function setupDistributedEditingStatusDispatch() {
 	const actions = {
+		__experimentalRefreshDistributedEditingRecoveryDryRun: jest
+			.fn()
+			.mockResolvedValue( {
+				result: 'candidate_update_valid',
+			} ),
 		resetDistributedEditingSessionState: jest.fn(),
 		setDistributedEditingSessionState: jest.fn(),
 	};
@@ -186,11 +192,89 @@ describe( 'DistributedEditingStatusInspector', () => {
 			} )
 		).toBeVisible();
 		expect(
+			screen.getByRole( 'button', {
+				name: 'Run recovery dry run',
+			} )
+		).toBeVisible();
+		expect(
 			screen.getByRole( 'region', {
 				name: 'Distributed editing status',
 			} )
 		).toBeVisible();
 		expect( screen.getByText( 'Remote changes received' ) ).toBeVisible();
+	} );
+} );
+
+describe( 'DistributedEditingRecoveryDryRunControls', () => {
+	it( 'runs the dry-run action and records command success', async () => {
+		const user = userEvent.setup();
+		const actions = setupDistributedEditingStatusDispatch();
+		const onResult = jest.fn();
+		setupDistributedEditingStatusSelect();
+
+		render(
+			<DistributedEditingRecoveryDryRunControls onResult={ onResult } />
+		);
+
+		expect( screen.getByText( 'Command' ) ).toBeVisible();
+		expect( screen.getByText( 'Disposition' ) ).toBeVisible();
+		expect( screen.getByText( 'Reason' ) ).toBeVisible();
+		expect( screen.getByText( 'Idle' ) ).toBeVisible();
+		expect( screen.getByText( 'idle' ) ).toBeVisible();
+		expect( screen.getByText( 'None' ) ).toBeVisible();
+
+		await user.click(
+			screen.getByRole( 'button', {
+				name: 'Run recovery dry run',
+			} )
+		);
+
+		expect(
+			actions.__experimentalRefreshDistributedEditingRecoveryDryRun
+		).toHaveBeenCalledTimes( 1 );
+		await waitFor( () =>
+			expect( screen.getByText( 'Succeeded' ) ).toBeVisible()
+		);
+		expect( onResult ).toHaveBeenCalledWith( {
+			result: 'candidate_update_valid',
+		} );
+	} );
+
+	it( 'records command failure without swallowing the normalized state display', async () => {
+		const user = userEvent.setup();
+		const actions = setupDistributedEditingStatusDispatch();
+		const error = { code: 'rest_cannot_edit' };
+		const onError = jest.fn();
+		actions.__experimentalRefreshDistributedEditingRecoveryDryRun.mockRejectedValue(
+			error
+		);
+		setupDistributedEditingStatusSelect( {
+			sessionState: {
+				disposition:
+					DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_PERMISSION_DENIED,
+				reasonCode: DISTRIBUTED_EDITING_REASON_CODES.REST_CANNOT_EDIT,
+			},
+		} );
+
+		render(
+			<DistributedEditingRecoveryDryRunControls onError={ onError } />
+		);
+
+		expect(
+			screen.getByText( 'rejected_permission_denied' )
+		).toBeVisible();
+		expect( screen.getByText( 'rest_cannot_edit' ) ).toBeVisible();
+
+		await user.click(
+			screen.getByRole( 'button', {
+				name: 'Run recovery dry run',
+			} )
+		);
+
+		await waitFor( () =>
+			expect( screen.getByText( 'Failed' ) ).toBeVisible()
+		);
+		expect( onError ).toHaveBeenCalledWith( error );
 	} );
 } );
 

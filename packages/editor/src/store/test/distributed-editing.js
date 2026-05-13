@@ -188,6 +188,22 @@ describe( 'distributed editing session state', () => {
 			hasPendingChanges: false,
 			isAwaitingServerConfirmation: false,
 		} );
+
+		expect(
+			getDistributedEditingSessionStateForRecoveryDryRunResult( {
+				result: 'manual_resolution_required',
+				reason_code:
+					DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_SYNC_META_UNRECOVERABLE,
+			} )
+		).toMatchObject( {
+			disposition:
+				DISTRIBUTED_EDITING_DISPOSITIONS.REQUIRES_MANUAL_RESOLUTION_NO_SYNC_META,
+			reasonCode:
+				DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_SYNC_META_UNRECOVERABLE,
+			canExportLocalUpdates: true,
+			hasPendingChanges: false,
+			isAwaitingServerConfirmation: false,
+		} );
 	} );
 
 	it( 'is immutable-friendly for reducer or selector consumers', () => {
