@@ -15,6 +15,7 @@ import { store as preferencesStore } from '@wordpress/preferences';
 import * as actions from '../actions';
 import {
 	DISTRIBUTED_EDITING_DISPOSITIONS,
+	DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES,
 	DISTRIBUTED_EDITING_REASON_CODES,
 	DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE,
 } from '../distributed-editing';
@@ -342,6 +343,113 @@ describe( 'Post actions', () => {
 				refetchedServerState: true,
 				canAttemptLocalRebase: true,
 				canExportLocalUpdates: true,
+			} );
+		} );
+	} );
+
+	describe( '__experimentalPlanDistributedEditingLocalRebaseAfterStaleBase()', () => {
+		it( 'plans a local rebase without fetching, applying, saving, or retrying', async () => {
+			const post = {
+				id: postId,
+				type: 'post',
+				title: 'bar',
+				content: 'bar',
+				status: 'draft',
+			};
+			let apiFetchCallCount = 0;
+
+			apiFetch.setFetchHandler( async () => {
+				apiFetchCallCount++;
+				throw new Error(
+					'Local rebase planning must not call apiFetch.'
+				);
+			} );
+
+			const registry = createRegistryWithStores();
+
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', post );
+			registry.dispatch( editorStore ).setupEditor( post, {
+				content: 'local bar',
+			} );
+			registry
+				.dispatch( editorStore )
+				.setDistributedEditingSessionState( {
+					disposition:
+						DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+					reasonCode:
+						DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+					clientBaseVersion: '4',
+					serverVersion: '7',
+					pendingChangeCount: 2,
+					remoteChangeCount: 3,
+					requiresServerStateRefetch: false,
+					refetchedServerState: true,
+					canAttemptLocalRebase: true,
+					canExportLocalUpdates: true,
+				} );
+
+			const plannedState = await registry
+				.dispatch( editorStore )
+				.__experimentalPlanDistributedEditingLocalRebaseAfterStaleBase();
+
+			expect( apiFetchCallCount ).toBe( 0 );
+			expect(
+				registry.select( editorStore ).getEditedPostContent()
+			).toBe( 'local bar' );
+			expect( registry.select( editorStore ).isEditedPostDirty() ).toBe(
+				true
+			);
+			expect( plannedState ).toMatchObject( {
+				disposition:
+					DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+				reasonCode:
+					DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+				clientBaseVersion: '4',
+				serverVersion: '7',
+				pendingChangeCount: 2,
+				refetchedServerState: true,
+				canAttemptLocalRebase: true,
+				localRebasePlanStatus:
+					DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES.READY,
+				readyToRetrySubmit: false,
+				canExportLocalUpdates: true,
+			} );
+			expect(
+				registry
+					.select( editorStore )
+					.getDistributedEditingSessionState()
+			).toMatchObject( plannedState );
+		} );
+
+		it( 'records that planning still needs server state before refetch', async () => {
+			const registry = createRegistryWithStores();
+
+			registry
+				.dispatch( editorStore )
+				.setDistributedEditingSessionState( {
+					disposition:
+						DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+					reasonCode:
+						DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+					clientBaseVersion: '4',
+					serverVersion: '6',
+					pendingChangeCount: 2,
+					requiresServerStateRefetch: true,
+				} );
+
+			const plannedState = await registry
+				.dispatch( editorStore )
+				.__experimentalPlanDistributedEditingLocalRebaseAfterStaleBase();
+
+			expect( plannedState ).toMatchObject( {
+				requiresServerStateRefetch: true,
+				refetchedServerState: false,
+				canAttemptLocalRebase: false,
+				localRebasePlanStatus:
+					DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES.NEEDS_SERVER_STATE,
+				readyToRetrySubmit: false,
 			} );
 		} );
 	} );

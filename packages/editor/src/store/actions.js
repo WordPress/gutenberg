@@ -32,6 +32,7 @@ import {
 } from './distributed-editing-api';
 import {
 	getDistributedEditingSessionStateForRecoveryDryRunResult,
+	getDistributedEditingSessionStateForStaleBaseLocalRebasePlan,
 	getDistributedEditingSessionStateForStaleBaseRejectionResult,
 	getDistributedEditingSessionStateForStaleBaseServerStateRefetchResult,
 } from './distributed-editing';
@@ -353,6 +354,28 @@ export const __experimentalRefreshDistributedEditingServerStateAfterStaleBase =
 		);
 
 		return response;
+	};
+
+/**
+ * Plans a local rebase after a stale-base server-state refetch.
+ *
+ * The action only records whether a later rebase attempt is locally possible.
+ * It does not refetch, apply server content, modify blocks, retry a submit,
+ * save, dispatch notices, persist editor state, or change post locks.
+ *
+ * @return {Function} Action thunk.
+ */
+export const __experimentalPlanDistributedEditingLocalRebaseAfterStaleBase =
+	() =>
+	( { select, dispatch } ) => {
+		const plannedSessionState =
+			getDistributedEditingSessionStateForStaleBaseLocalRebasePlan(
+				select.getDistributedEditingSessionState?.() || {}
+			);
+
+		dispatch.setDistributedEditingSessionState( plannedSessionState );
+
+		return plannedSessionState;
 	};
 
 /**

@@ -78,12 +78,27 @@ export const DISTRIBUTED_EDITING_UNLOAD_WARNING_REASONS = Object.freeze( {
 	AWAITING_SERVER_CONFIRMATION: 'awaiting-server-confirmation',
 } );
 
+/**
+ * Stable no-write planning statuses for stale-base local rebase preparation.
+ */
+export const DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES = Object.freeze( {
+	NONE: 'none',
+	READY: 'ready',
+	NEEDS_SERVER_STATE: 'needs_server_state',
+	NO_PENDING_CHANGES: 'no_pending_changes',
+	MANUAL_CONFLICT_REQUIRED: 'manual_conflict_required',
+} );
+
 const VALID_REASON_CODES = new Set(
 	Object.values( DISTRIBUTED_EDITING_REASON_CODES )
 );
 
 const VALID_DISPOSITIONS = new Set(
 	Object.values( DISTRIBUTED_EDITING_DISPOSITIONS )
+);
+
+const VALID_LOCAL_REBASE_PLAN_STATUSES = new Set(
+	Object.values( DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES )
 );
 
 const NOTICE_ID_BY_KIND = Object.freeze( {
@@ -116,6 +131,8 @@ export const DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE = Object.freeze( {
 	requiresServerStateRefetch: false,
 	refetchedServerState: false,
 	canAttemptLocalRebase: false,
+	localRebasePlanStatus: DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES.NONE,
+	readyToRetrySubmit: false,
 	requiresManualConflictResolution: false,
 	mustOfferLocalCopy: false,
 	canExportLocalUpdates: false,
@@ -180,6 +197,9 @@ export function normalizeDistributedEditingSessionState( sessionState = {} ) {
 	const pendingChangeCount = normalizeCount(
 		sessionState.pendingChangeCount
 	);
+	const hasExplicitPendingChangeCount =
+		sessionState.pendingChangeCount !== undefined &&
+		sessionState.pendingChangeCount !== null;
 	const remoteChangeCount = normalizeCount( sessionState.remoteChangeCount );
 	const isStaleBaseRejection =
 		disposition ===
@@ -187,7 +207,7 @@ export function normalizeDistributedEditingSessionState( sessionState = {} ) {
 	const hasPendingChanges =
 		Boolean( sessionState.hasPendingChanges ) ||
 		pendingChangeCount > 0 ||
-		isStaleBaseRejection;
+		( isStaleBaseRejection && ! hasExplicitPendingChangeCount );
 	const isAwaitingServerConfirmation =
 		Boolean( sessionState.isAwaitingServerConfirmation ) ||
 		hasPendingChanges;
@@ -211,6 +231,14 @@ export function normalizeDistributedEditingSessionState( sessionState = {} ) {
 	);
 	const canAttemptLocalRebase =
 		Boolean( sessionState.canAttemptLocalRebase ) &&
+		! requiresManualConflictResolution;
+	const localRebasePlanStatus = VALID_LOCAL_REBASE_PLAN_STATUSES.has(
+		sessionState.localRebasePlanStatus
+	)
+		? sessionState.localRebasePlanStatus
+		: DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE.localRebasePlanStatus;
+	const readyToRetrySubmit =
+		Boolean( sessionState.readyToRetrySubmit ) &&
 		! requiresManualConflictResolution;
 	const mustOfferLocalCopy =
 		Boolean( sessionState.mustOfferLocalCopy ) ||
@@ -237,6 +265,8 @@ export function normalizeDistributedEditingSessionState( sessionState = {} ) {
 		requiresServerStateRefetch,
 		refetchedServerState,
 		canAttemptLocalRebase,
+		localRebasePlanStatus,
+		readyToRetrySubmit,
 		requiresManualConflictResolution,
 		mustOfferLocalCopy,
 		canExportLocalUpdates,
@@ -341,16 +371,16 @@ export function getDistributedEditingSessionStateForStaleBaseRejectionResult(
 			DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
 		reasonCode,
 		pendingChangeCount:
-			responseOrError.pendingChangeCount ||
-			responseOrError.pending_change_count ||
-			responseData.pendingChangeCount ||
-			responseData.pending_change_count ||
+			responseOrError.pendingChangeCount ??
+			responseOrError.pending_change_count ??
+			responseData.pendingChangeCount ??
+			responseData.pending_change_count ??
 			1,
 		remoteChangeCount:
-			responseOrError.remoteChangeCount ||
-			responseOrError.remote_change_count ||
-			responseData.remoteChangeCount ||
-			responseData.remote_change_count ||
+			responseOrError.remoteChangeCount ??
+			responseOrError.remote_change_count ??
+			responseData.remoteChangeCount ??
+			responseData.remote_change_count ??
 			1,
 		requiresServerStateRefetch: true,
 		canAttemptLocalRebase:
@@ -412,9 +442,77 @@ export function getDistributedEditingSessionStateForStaleBaseServerStateRefetchR
 		requiresServerStateRefetch: false,
 		canAttemptLocalRebase:
 			pendingChangeCount > 0 && ! requiresManualConflictResolution,
+		localRebasePlanStatus:
+			DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES.NONE,
+		readyToRetrySubmit: false,
 		canExportLocalUpdates:
 			Boolean( currentSessionState.canExportLocalUpdates ) ||
 			pendingChangeCount > 0,
+	} );
+}
+
+/**
+ * Returns DE-RTC editor state for no-write stale-base local rebase planning.
+ *
+ * This records whether the editor has enough information to attempt a future
+ * local rebase. It does not perform a rebase, apply fetched server content,
+ * prepare a retry submit, save, persist editor state, or change post locks.
+ *
+ * @param {Object} currentSessionState Current DE-RTC session state.
+ *
+ * @return {Object} DE-RTC session state.
+ */
+export function getDistributedEditingSessionStateForStaleBaseLocalRebasePlan(
+	currentSessionState = {}
+) {
+	const normalized =
+		normalizeDistributedEditingSessionState( currentSessionState );
+	const pendingChangeCount = normalizeCount( normalized.pendingChangeCount );
+	const sharedPlanState = {
+		...normalized,
+		pendingChangeCount,
+		readyToRetrySubmit: false,
+	};
+
+	if ( normalized.requiresManualConflictResolution ) {
+		return normalizeDistributedEditingSessionState( {
+			...sharedPlanState,
+			canAttemptLocalRebase: false,
+			localRebasePlanStatus:
+				DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES.MANUAL_CONFLICT_REQUIRED,
+			canExportLocalUpdates:
+				normalized.canExportLocalUpdates || pendingChangeCount > 0,
+		} );
+	}
+
+	if (
+		normalized.requiresServerStateRefetch ||
+		! normalized.refetchedServerState
+	) {
+		return normalizeDistributedEditingSessionState( {
+			...sharedPlanState,
+			canAttemptLocalRebase: false,
+			localRebasePlanStatus:
+				DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES.NEEDS_SERVER_STATE,
+		} );
+	}
+
+	if ( pendingChangeCount < 1 ) {
+		return normalizeDistributedEditingSessionState( {
+			...sharedPlanState,
+			canAttemptLocalRebase: false,
+			localRebasePlanStatus:
+				DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES.NO_PENDING_CHANGES,
+			canExportLocalUpdates: normalized.canExportLocalUpdates,
+		} );
+	}
+
+	return normalizeDistributedEditingSessionState( {
+		...sharedPlanState,
+		canAttemptLocalRebase: true,
+		localRebasePlanStatus:
+			DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES.READY,
+		canExportLocalUpdates: true,
 	} );
 }
 

@@ -8,6 +8,7 @@ import deepFreeze from 'deep-freeze';
  */
 import {
 	DISTRIBUTED_EDITING_DISPOSITIONS,
+	DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES,
 	DISTRIBUTED_EDITING_NOTICE_ACTIONS,
 	DISTRIBUTED_EDITING_NOTICE_IDS,
 	DISTRIBUTED_EDITING_NOTICE_KINDS,
@@ -15,6 +16,7 @@ import {
 	DISTRIBUTED_EDITING_UNLOAD_WARNING_REASONS,
 	DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE,
 	getDistributedEditingSessionStateForRecoveryDryRunResult,
+	getDistributedEditingSessionStateForStaleBaseLocalRebasePlan,
 	getDistributedEditingSessionStateForStaleBaseRejectionResult,
 	getDistributedEditingSessionStateForStaleBaseServerStateRefetchResult,
 	getDistributedEditingNoticeDescriptorsForSessionState,
@@ -121,6 +123,9 @@ describe( 'distributed editing session state', () => {
 			requiresServerStateRefetch: false,
 			refetchedServerState: false,
 			canAttemptLocalRebase: false,
+			localRebasePlanStatus:
+				DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES.NONE,
+			readyToRetrySubmit: false,
 			requiresManualConflictResolution: false,
 			mustOfferLocalCopy: true,
 			canExportLocalUpdates: true,
@@ -239,6 +244,91 @@ describe( 'distributed editing session state', () => {
 			refetchedServerState: true,
 			canAttemptLocalRebase: true,
 			canExportLocalUpdates: true,
+		} );
+	} );
+
+	it( 'plans stale-base local rebase without preparing a retry submit', () => {
+		const refetchedState =
+			getDistributedEditingSessionStateForStaleBaseServerStateRefetchResult(
+				{
+					distributed_editing: {
+						server_version: 'server-v7',
+					},
+				},
+				getDistributedEditingSessionStateForStaleBaseRejectionResult( {
+					reason_code:
+						DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+					client_base_version: 'server-v4',
+					server_version: 'server-v6',
+					pending_change_count: 2,
+					remote_change_count: 3,
+				} )
+			);
+		const planned =
+			getDistributedEditingSessionStateForStaleBaseLocalRebasePlan(
+				refetchedState
+			);
+
+		expect( planned ).toMatchObject( {
+			clientBaseVersion: 'server-v4',
+			serverVersion: 'server-v7',
+			disposition:
+				DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+			reasonCode:
+				DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+			pendingChangeCount: 2,
+			requiresServerStateRefetch: false,
+			refetchedServerState: true,
+			canAttemptLocalRebase: true,
+			localRebasePlanStatus:
+				DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES.READY,
+			readyToRetrySubmit: false,
+			canExportLocalUpdates: true,
+		} );
+	} );
+
+	it( 'blocks stale-base local rebase planning until server state is refetched', () => {
+		const planned =
+			getDistributedEditingSessionStateForStaleBaseLocalRebasePlan(
+				getDistributedEditingSessionStateForStaleBaseRejectionResult( {
+					reason_code:
+						DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+					client_base_version: 'server-v4',
+					server_version: 'server-v6',
+					pending_change_count: 2,
+				} )
+			);
+
+		expect( planned ).toMatchObject( {
+			requiresServerStateRefetch: true,
+			refetchedServerState: false,
+			canAttemptLocalRebase: false,
+			localRebasePlanStatus:
+				DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES.NEEDS_SERVER_STATE,
+			readyToRetrySubmit: false,
+		} );
+	} );
+
+	it( 'blocks stale-base local rebase planning when no local changes remain', () => {
+		const planned =
+			getDistributedEditingSessionStateForStaleBaseLocalRebasePlan( {
+				disposition:
+					DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+				reasonCode:
+					DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+				refetchedServerState: true,
+				pendingChangeCount: 0,
+			} );
+
+		expect( planned ).toMatchObject( {
+			pendingChangeCount: 0,
+			hasPendingChanges: false,
+			isAwaitingServerConfirmation: false,
+			refetchedServerState: true,
+			canAttemptLocalRebase: false,
+			localRebasePlanStatus:
+				DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES.NO_PENDING_CHANGES,
+			readyToRetrySubmit: false,
 		} );
 	} );
 

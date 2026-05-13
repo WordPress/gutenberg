@@ -288,6 +288,10 @@ _Returns_
 
 Stable DE-RTC terminal dispositions shared with the root model runner.
 
+### DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES
+
+Stable no-write planning statuses for stale-base local rebase preparation.
+
 ### DISTRIBUTED_EDITING_NOTICE_ACTIONS
 
 Stable action keys that future UI can map to rendered buttons or menu items.
@@ -531,6 +535,20 @@ This maps REST proof-boundary results into the existing editor-state vocabulary 
 _Parameters_
 
 -   _responseOrError_ `Object`: REST response or API error.
+
+_Returns_
+
+-   `Object`: DE-RTC session state.
+
+### getDistributedEditingSessionStateForStaleBaseLocalRebasePlan
+
+Returns DE-RTC editor state for no-write stale-base local rebase planning.
+
+This records whether the editor has enough information to attempt a future local rebase. It does not perform a rebase, apply fetched server content, prepare a retry submit, save, persist editor state, or change post locks.
+
+_Parameters_
+
+-   _currentSessionState_ `Object`: Current DE-RTC session state.
 
 _Returns_
 
