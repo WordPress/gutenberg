@@ -8,7 +8,6 @@
 /**
  * Internal dependencies
  */
-import { UploadError } from '../../upload-error';
 import type { QueueItemId } from '../types';
 
 export interface RetryDelayOptions {
@@ -59,8 +58,12 @@ export function calculateRetryDelay( options: RetryDelayOptions ): number {
 }
 
 /**
- * Patterns in error messages that indicate a retryable condition.
- * These are used as fallbacks when the error is not an UploadError.
+ * Patterns in error messages that indicate a transient/retryable condition.
+ *
+ * The upload path rejects with plain `Error` instances from `fetch` and
+ * `@wordpress/api-fetch`, so message matching is the most reliable signal.
+ * Covers Chrome (`Failed to fetch`), Safari (`Load failed`), Node DNS/TCP
+ * failures, and the localized `apiFetch` `fetch_error` message.
  */
 const RETRYABLE_MESSAGE_PATTERNS = [
 	/network/i,
@@ -71,22 +74,20 @@ const RETRYABLE_MESSAGE_PATTERNS = [
 	/socket/i,
 	/ETIMEDOUT/i,
 	/ENOTFOUND/i,
-	/Could not get a valid response/i, // apiFetch fetch_error (English)
-	/Failed to fetch/i, // Chrome raw fetch TypeError
-	/Load failed/i, // Safari raw fetch TypeError
+	/Could not get a valid response/i,
+	/Failed to fetch/i,
+	/Load failed/i,
 ];
 
 /**
- * Determines if an error should trigger an automatic retry.
+ * Determines whether an upload error should trigger an automatic retry.
  *
- * An error is retryable if:
- * 1. The retry count hasn't exceeded the maximum
- * 2. The error is an UploadError with isRetryable = true, OR
- * 3. The error message matches known retryable patterns (network issues, etc.)
+ * Returns `false` once the retry budget is exhausted, otherwise returns
+ * `true` if the error message looks transient (see `RETRYABLE_MESSAGE_PATTERNS`).
  *
- * @param error      - The error that occurred.
- * @param retryCount - The number of retries already attempted.
- * @param maxRetries - The maximum number of retries allowed.
+ * @param error      The error that occurred.
+ * @param retryCount The number of retries already attempted.
+ * @param maxRetries The maximum number of retries allowed.
  * @return Whether the error should be retried.
  */
 export function shouldRetryError(
@@ -94,17 +95,10 @@ export function shouldRetryError(
 	retryCount: number,
 	maxRetries: number
 ): boolean {
-	// Don't retry if we've exceeded the maximum attempts.
 	if ( retryCount >= maxRetries ) {
 		return false;
 	}
 
-	// UploadError has its own isRetryable classification.
-	if ( error instanceof UploadError ) {
-		return error.isRetryable;
-	}
-
-	// For generic errors, check message patterns.
 	const message = error.message || '';
 	return RETRYABLE_MESSAGE_PATTERNS.some( ( pattern ) =>
 		pattern.test( message )
