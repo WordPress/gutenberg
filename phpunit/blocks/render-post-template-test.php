@@ -167,6 +167,71 @@ END;
 	}
 
 	/**
+	 * Tests that a `perPage` override on a Default (inherit=true) Query Loop is applied.
+	 *
+	 * @see https://github.com/WordPress/gutenberg/issues/73913
+	 */
+	public function test_rendering_post_template_with_per_page_override_on_default_query() {
+		global $wp_query, $wp_the_query;
+
+		// Two posts exist from set_up; set main query to return both.
+		$wp_query     = new WP_Query( array( 'post_type' => 'post' ) );
+		$wp_the_query = $wp_query;
+
+		// perPage=1 should cap output at one post even though the main query has two.
+		$content  = '<!-- wp:query {"query":{"inherit":true,"perPage":1}} -->';
+		$content .= '<!-- wp:post-template -->';
+		$content .= '<!-- wp:post-title /-->';
+		$content .= '<!-- /wp:post-template -->';
+		$content .= '<!-- /wp:query -->';
+
+		$output = do_blocks( $content );
+
+		$this->assertSame(
+			1,
+			substr_count( $output, 'wp-block-post-title' ),
+			'Expected exactly 1 post with perPage=1.'
+		);
+	}
+
+	/**
+	 * Tests that a `perPage` override on a Default query preserves the main query's archive context.
+	 *
+	 * @see https://github.com/WordPress/gutenberg/issues/73913
+	 */
+	public function test_rendering_post_template_per_page_override_preserves_archive_context() {
+		global $wp_query, $wp_the_query;
+
+		// Assign only $post to a dedicated category; $other_post is not in it.
+		$category = self::factory()->category->create_and_get( array( 'name' => 'Dog Category' ) );
+		wp_set_post_categories( self::$post->ID, array( $category->term_id ) );
+
+		// Set the main query to that category archive (one post in scope).
+		$wp_query     = new WP_Query( array( 'category_name' => $category->slug ) );
+		$wp_the_query = $wp_query;
+
+		// perPage=5 is larger than available; only posts in the category should appear.
+		$content  = '<!-- wp:query {"query":{"inherit":true,"perPage":5}} -->';
+		$content .= '<!-- wp:post-template -->';
+		$content .= '<!-- wp:post-title /-->';
+		$content .= '<!-- /wp:post-template -->';
+		$content .= '<!-- /wp:query -->';
+
+		$output = do_blocks( $content );
+
+		$this->assertStringContainsString(
+			self::$post->post_title,
+			$output,
+			'Post in the archive category should be shown.'
+		);
+		$this->assertStringNotContainsString(
+			self::$other_post->post_title,
+			$output,
+			'Post outside the archive category should not appear when archive context is inherited.'
+		);
+	}
+
+	/**
 	 * Tests that the `core/post-template` block rewinds the default query when not in a single post of any post type.
 	 */
 	public function test_rendering_post_template_with_main_query_loop_not_single_post() {
