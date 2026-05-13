@@ -17,6 +17,8 @@
 	// used by bin/live-reload.mjs and lib/dev-hmr.php.
 	const PORT = 35729;
 	const BATCH_MS = 50;
+	const MODULE_RELOAD_DELAY_MS = 5000;
+	const RECENT_LOAD_MS = 3000;
 	const runtime = window.__hmr_runtime;
 
 	if ( ! runtime ) {
@@ -88,6 +90,9 @@
 	const source = new EventSource( 'http://localhost:' + PORT + '/events' );
 	let pendingFiles = [];
 	let batchTimer = null;
+	let moduleReloadTimer = null;
+	let pendingModuleReloadFiles = [];
+	const recentScriptLoads = new Map();
 
 	// SSE disconnect indicator: small fixed-position badge that appears
 	// after the connection has been down for a few seconds. Without it,
@@ -177,9 +182,14 @@
 
 		const jsFiles = [];
 		const cssFiles = [];
+		const seenFiles = {};
 
 		for ( let i = 0; i < files.length; i++ ) {
 			const file = files[ i ];
+			if ( seenFiles[ file ] ) {
+				continue;
+			}
+			seenFiles[ file ] = true;
 			// Skip minified and RTL variants — the dev page loads the
 			// non-minified LTR variants, and reporting these as misses
 			// would force a full reload.
@@ -205,7 +215,7 @@
 		if ( jsFiles.length > 0 ) {
 			if ( ! runtime ) {
 				console.log( '[HMR] No runtime, full reload' );
-				window.location.reload();
+				reloadPage( 'missing runtime' );
 				return;
 			}
 			hotUpdateJS( jsFiles );
@@ -278,17 +288,39 @@
 		// this filter, every cascade rebuild would trigger N "Script tag
 		// not found → full reload" misses for those view scripts.
 		const onPage = [];
+		const moduleScripts = [];
 		const skipped = [];
 		for ( let i = 0; i < filePaths.length; i++ ) {
-			if ( findScriptTagFor( filePaths[ i ] ) ) {
-				onPage.push( filePaths[ i ] );
+			const filePath = filePaths[ i ];
+			if ( wasRecentlyLoaded( filePath ) ) {
+				skipped.push( filePath );
+				continue;
+			}
+			const script = findScriptTagFor( filePath );
+			if ( script ) {
+				if ( script.type === 'module' ) {
+					moduleScripts.push( filePath );
+					continue;
+				}
+				onPage.push( filePath );
 			} else {
-				skipped.push( filePaths[ i ] );
+				skipped.push( filePath );
 			}
 		}
 		if ( skipped.length > 0 ) {
 			console.log(
 				'[HMR] Not on this page, skipping: ' + skipped.join( ', ' )
+			);
+		}
+		if ( moduleScripts.length > 0 && onPage.length === 0 ) {
+			scheduleModuleReload( moduleScripts );
+			return;
+		}
+		cancelModuleReload();
+		if ( moduleScripts.length > 0 ) {
+			console.log(
+				'[HMR] Module script changed in a Fast Refresh batch, skipping: ' +
+					moduleScripts.join( ', ' )
 			);
 		}
 		if ( onPage.length === 0 ) {
@@ -310,13 +342,13 @@
 					console.log(
 						'[HMR] performReactRefresh() returned null — registry has no pending updates. Falling back to full reload.'
 					);
-					window.location.reload();
+					reloadPage( 'no pending React refresh updates' );
 				} else {
 					console.log( '[HMR] React components refreshed' );
 				}
 			} catch ( e ) {
 				console.error( '[HMR] React refresh failed:', e );
-				window.location.reload();
+				reloadPage( 'React refresh failed' );
 			}
 		}
 
@@ -329,27 +361,62 @@
 						onAllLoaded();
 					}
 				},
-				function ( failedPath ) {
-					if ( ! hasError ) {
-						hasError = true;
-						console.error(
-							'[HMR] Script load error: ' +
-								failedPath +
-								', full reload'
-						);
-						window.location.reload();
+					function ( failedPath ) {
+						if ( ! hasError ) {
+							hasError = true;
+							console.error(
+								'[HMR] Script load error: ' +
+									failedPath +
+									', full reload'
+							);
+							reloadPage( 'script load error: ' + failedPath );
+						}
 					}
-				}
 			);
 		}
 	}
 
+	function wasRecentlyLoaded( filePath ) {
+		const loadedAt = recentScriptLoads.get( filePath );
+		return !! loadedAt && Date.now() - loadedAt < RECENT_LOAD_MS;
+	}
+
+	function scheduleModuleReload( filePaths ) {
+		for ( let i = 0; i < filePaths.length; i++ ) {
+			pendingModuleReloadFiles.push( filePaths[ i ] );
+		}
+		clearTimeout( moduleReloadTimer );
+		moduleReloadTimer = setTimeout( function () {
+			const files = pendingModuleReloadFiles.slice();
+			pendingModuleReloadFiles = [];
+			moduleReloadTimer = null;
+			console.log(
+				'[HMR] Module script changed, full reload: ' +
+					files.join( ', ' )
+			);
+			reloadPage( 'module script changed: ' + files.join( ', ' ) );
+		}, MODULE_RELOAD_DELAY_MS );
+		console.log(
+			'[HMR] Module script changed, waiting for Fast Refresh batch: ' +
+				filePaths.join( ', ' )
+		);
+	}
+
+	function cancelModuleReload() {
+		if ( ! moduleReloadTimer ) {
+			return;
+		}
+		clearTimeout( moduleReloadTimer );
+		moduleReloadTimer = null;
+		pendingModuleReloadFiles = [];
+	}
+
 	/**
-	 * Find the `<script src>` URL on this page that matches `filePath` at
+	 * Find the `<script src>` tag on this page that matches `filePath` at
 	 * a path boundary, or null if none does.
 	 *
 	 * @param {string} filePath Relative path under build/.
-	 * @return {?string} The matching src (query stripped), or null.
+	 * @return {?HTMLScriptElement} The matching script tag, or null.
 	 */
 	function findScriptTagFor( filePath ) {
 		const scripts = document.querySelectorAll( 'script[src]' );
@@ -360,7 +427,7 @@
 			}
 			const srcBase = src.split( '?' )[ 0 ];
 			if ( pathEndsWith( srcBase, filePath ) ) {
-				return srcBase;
+				return scripts[ i ];
 			}
 		}
 		return null;
@@ -375,24 +442,42 @@
 	 * @param {Function} onError  Called with filePath on error.
 	 */
 	function loadScript( filePath, onLoad, onError ) {
-		const originalSrc = findScriptTagFor( filePath );
+		const originalScript = findScriptTagFor( filePath );
 
-		if ( ! originalSrc ) {
+		if ( ! originalScript ) {
 			console.log(
 				'[HMR] Script tag not found for: ' + filePath + ', full reload'
 			);
-			window.location.reload();
+			reloadPage( 'script tag not found: ' + filePath );
 			return;
 		}
 
+		const originalSrc = originalScript
+			.getAttribute( 'src' )
+			.split( '?' )[ 0 ];
 		const script = document.createElement( 'script' );
 		script.src = originalSrc + '?hmr=' + Date.now();
+		if ( originalScript.noModule ) {
+			script.noModule = true;
+		}
+		if ( originalScript.crossOrigin ) {
+			script.crossOrigin = originalScript.crossOrigin;
+		}
+		if ( originalScript.referrerPolicy ) {
+			script.referrerPolicy = originalScript.referrerPolicy;
+		}
 		script.onload = onLoad;
 		script.onerror = function () {
 			onError( filePath );
 		};
+		recentScriptLoads.set( filePath, Date.now() );
 		document.head.appendChild( script );
 		console.log( '[HMR] Loading: ' + filePath );
+	}
+
+	function reloadPage( reason ) {
+		console.log( '[HMR] Full reload: ' + reason );
+		window.location.reload();
 	}
 
 	/**

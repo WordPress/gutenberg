@@ -95,15 +95,16 @@ const hmrBundleContexts = new Map();
 
 // HMR error surface: when a rebuild fails, write a structured error to a
 // known path so bin/live-reload.mjs can pick it up and push it to the
-// browser via SSE. Cleared on the next successful rebuild.
+// browser via SSE. Errors are tracked per target, so a clean rebuild of
+// one package does not clear another package's active error.
 const HMR_ERROR_PATH = path.join( BUILD_DIR, 'hmr', 'error.json' );
+const hmrBuildErrors = new Map();
 
 async function reportBuildError( packageName, error ) {
 	if ( process.env.WP_BUILD_HMR !== '1' ) {
 		return;
 	}
 	try {
-		await mkdir( path.dirname( HMR_ERROR_PATH ), { recursive: true } );
 		const payload = {
 			packageName,
 			message: error?.message ?? String( error ),
@@ -117,26 +118,47 @@ async function reportBuildError( packageName, error ) {
 			stack: error?.stack ?? null,
 			at: Date.now(),
 		};
-		// Atomic write: chokidar may fire on partial content otherwise,
-		// and bin/live-reload.mjs would JSON.parse a truncated file and
-		// drop the error event silently.
-		const tmp = HMR_ERROR_PATH + '.tmp';
-		await writeFile( tmp, JSON.stringify( payload, null, 2 ) );
-		await rename( tmp, HMR_ERROR_PATH );
+		hmrBuildErrors.set( packageName, payload );
+		await writeCurrentBuildError();
 	} catch {
 		// best-effort
 	}
 }
 
-async function clearBuildError() {
+async function clearBuildError( packageName ) {
 	if ( process.env.WP_BUILD_HMR !== '1' ) {
 		return;
 	}
 	try {
+		if ( packageName ) {
+			hmrBuildErrors.delete( packageName );
+		}
+
+		if ( hmrBuildErrors.size > 0 ) {
+			await writeCurrentBuildError();
+			return;
+		}
+
 		await unlink( HMR_ERROR_PATH );
 	} catch {
-		// File may not exist; that's the expected steady state.
+		// File may not exist, and HMR error reporting is best effort.
 	}
+}
+
+async function writeCurrentBuildError() {
+	await mkdir( path.dirname( HMR_ERROR_PATH ), { recursive: true } );
+	const payload = Array.from( hmrBuildErrors.values() ).sort(
+		( a, b ) => b.at - a.at
+	)[ 0 ];
+	if ( ! payload ) {
+		return;
+	}
+	// Atomic write: chokidar may fire on partial content otherwise,
+	// and bin/live-reload.mjs would JSON.parse a truncated file and
+	// drop the error event silently.
+	const tmp = HMR_ERROR_PATH + '.tmp';
+	await writeFile( tmp, JSON.stringify( payload, null, 2 ) );
+	await rename( tmp, HMR_ERROR_PATH );
 }
 
 const SOURCE_EXTENSIONS = '{js,mjs,ts,tsx}';
@@ -2313,7 +2335,7 @@ async function watchMode() {
 			await buildWidget( widgetName );
 			const buildTime = Date.now() - startTime;
 			console.log( `✅ widgets/${ widgetName } (${ buildTime }ms)` );
-			await clearBuildError();
+			await clearBuildError( `widgets/${ widgetName }` );
 		} catch ( error ) {
 			await reportBuildError( `widgets/${ widgetName }`, error );
 			console.log(
@@ -2328,11 +2350,6 @@ async function watchMode() {
 	 * @param {string} packageName Package to rebuild (short name).
 	 */
 	async function rebuildPackage( packageName ) {
-		// Track whether ANY work in this rebuild failed (the package itself,
-		// any cascaded script, any cascaded route). Clear the error overlay
-		// only when the whole rebuild was clean.
-		let anyError = false;
-
 		try {
 			const startTime = Date.now();
 
@@ -2341,6 +2358,7 @@ async function watchMode() {
 
 			const buildTime = Date.now() - startTime;
 			console.log( `✅ ${ packageName } (${ buildTime }ms)` );
+			await clearBuildError( packageName );
 
 			const fullName = shortToFull.get( packageName );
 			const affectedScripts = findScriptsToRebundle(
@@ -2358,8 +2376,8 @@ async function watchMode() {
 					console.log(
 						`✅ ${ script } (rebundled) (${ rebundleTime }ms)`
 					);
+					await clearBuildError( script );
 				} catch ( error ) {
-					anyError = true;
 					await reportBuildError( script, error );
 					console.log(
 						`❌ ${ script } - Rebundle error: ${ error.message }`
@@ -2383,8 +2401,8 @@ async function watchMode() {
 					console.log(
 						`✅ routes/${ route } (rebuilt) (${ rebuildTime }ms)`
 					);
+					await clearBuildError( `routes/${ route }` );
 				} catch ( error ) {
-					anyError = true;
 					await reportBuildError( `routes/${ route }`, error );
 					console.log(
 						`❌ routes/${ route } - Rebuild error: ${ error.message }`
@@ -2392,13 +2410,8 @@ async function watchMode() {
 				}
 			}
 		} catch ( error ) {
-			anyError = true;
 			await reportBuildError( packageName, error );
 			console.log( `❌ ${ packageName } - Error: ${ error.message }` );
-		}
-
-		if ( ! anyError ) {
-			await clearBuildError();
 		}
 	}
 
@@ -2413,7 +2426,7 @@ async function watchMode() {
 			await buildRoute( routeName );
 			const buildTime = Date.now() - startTime;
 			console.log( `✅ routes/${ routeName } (${ buildTime }ms)` );
-			await clearBuildError();
+			await clearBuildError( `routes/${ routeName }` );
 		} catch ( error ) {
 			await reportBuildError( `routes/${ routeName }`, error );
 			console.log(
