@@ -8,8 +8,6 @@
 /**
  * Render the custom CSS stylesheet and add class name to block as required.
  *
- * @since 7.0.0
- *
  * @param array $parsed_block The parsed block.
  * @return array The same parsed block with custom CSS class name added if appropriate.
  */
@@ -58,8 +56,6 @@ function gutenberg_render_custom_css_support_styles( $parsed_block ) {
 
 /**
  * Enqueues the block custom CSS styles.
- *
- * @since 7.0.0
  */
 function gutenberg_enqueue_block_custom_css() {
 	wp_enqueue_style( 'wp-block-custom-css' );
@@ -70,8 +66,6 @@ function gutenberg_enqueue_block_custom_css() {
  *
  * The class name is generated in `gutenberg_render_custom_css_support_styles`
  * and stored in block attributes. This filter adds it to the actual markup.
- *
- * @since 7.0.0
  *
  * @param string $block_content Rendered block content.
  * @param array  $block         Block object.
@@ -135,6 +129,142 @@ function gutenberg_register_custom_css_support( $block_type ) {
 		);
 	}
 }
+
+/**
+ * Strips `style.css` attributes from all blocks in post content.
+ *
+ * Uses WP_Block_Parser::next_token() to scan block tokens and surgically
+ * replace only the attribute JSON that changed — no parse_blocks() +
+ * serialize_blocks() round-trip needed.
+ *
+ * @param string $content Post content to filter, expected to be escaped with slashes.
+ * @return string Filtered post content with block custom CSS removed.
+ */
+function gutenberg_strip_custom_css_from_blocks( $content ) {
+	if ( ! has_blocks( $content ) ) {
+		return $content;
+	}
+
+	$unslashed = stripslashes( $content );
+
+	$parser           = new WP_Block_Parser();
+	$parser->document = $unslashed;
+	$parser->offset   = 0;
+	$end              = strlen( $unslashed );
+	$replacements     = array();
+
+	while ( $parser->offset < $end ) {
+		$next_token = $parser->next_token();
+		list( $token_type, , $attrs, $start_offset, $token_length ) = $next_token;
+
+		if ( 'no-more-tokens' === $token_type ) {
+			break;
+		}
+
+		$parser->offset = $start_offset + $token_length;
+
+		if ( 'block-opener' !== $token_type && 'void-block' !== $token_type ) {
+			continue;
+		}
+
+		if ( ! isset( $attrs['style']['css'] ) ) {
+			continue;
+		}
+
+		// Remove css and clean up empty style.
+		unset( $attrs['style']['css'] );
+		if ( empty( $attrs['style'] ) ) {
+			unset( $attrs['style'] );
+		}
+
+		// Locate the JSON portion within the token.
+		$token_string   = substr( $unslashed, $start_offset, $token_length );
+		$json_rel_start = strcspn( $token_string, '{' );
+		$json_rel_end   = strrpos( $token_string, '}' );
+
+		$json_start  = $start_offset + $json_rel_start;
+		$json_length = $json_rel_end - $json_rel_start + 1;
+
+		// Re-encode attributes. If attrs is now empty, remove JSON and trailing space.
+		if ( empty( $attrs ) ) {
+			// Remove the trailing space after JSON: `{"style":{"css":"x"}} ` → ``
+			$replacements[] = array( $json_start, $json_length + 1, '' );
+		} else {
+			$replacements[] = array( $json_start, $json_length, serialize_block_attributes( $attrs ) );
+		}
+	}
+
+	if ( empty( $replacements ) ) {
+		return $content;
+	}
+
+	// Build the result by splicing replacements into the original string.
+	$result = '';
+	$was_at = 0;
+
+	foreach ( $replacements as $replacement ) {
+		list( $offset, $length, $new_json ) = $replacement;
+		$result                            .= substr( $unslashed, $was_at, $offset - $was_at ) . $new_json;
+		$was_at                             = $offset + $length;
+	}
+
+	if ( $was_at < $end ) {
+		$result .= substr( $unslashed, $was_at );
+	}
+
+	return addslashes( $result );
+}
+
+/**
+ * Adds the filters to strip custom CSS from block content on save.
+ * @access private
+ */
+function gutenberg_custom_css_kses_init_filters() {
+	add_filter( 'content_save_pre', 'gutenberg_strip_custom_css_from_blocks', 8 );
+	add_filter( 'content_filtered_save_pre', 'gutenberg_strip_custom_css_from_blocks', 8 );
+}
+
+/**
+ * Removes the filters that strip custom CSS from block content on save.
+ * @access private
+ */
+function gutenberg_custom_css_remove_filters() {
+	remove_filter( 'content_save_pre', 'gutenberg_strip_custom_css_from_blocks', 8 );
+	remove_filter( 'content_filtered_save_pre', 'gutenberg_strip_custom_css_from_blocks', 8 );
+}
+
+/**
+ * Registers the custom CSS content filters if the user does not have the edit_css capability.
+ * @access private
+ */
+function gutenberg_custom_css_kses_init() {
+	gutenberg_custom_css_remove_filters();
+	if ( ! current_user_can( 'edit_css' ) ) {
+		gutenberg_custom_css_kses_init_filters();
+	}
+}
+
+/**
+ * Initializes custom CSS content filters when imported data should be filtered.
+ *
+ * This filter is the last being executed on force_filtered_html_on_import.
+ * If the input of the filter is true it means we are in an import situation and should
+ * enable the custom CSS filters, independently of the user capabilities.
+ * @access private
+ *
+ * @param mixed $arg Input argument of the filter.
+ * @return mixed Input argument of the filter.
+ */
+function gutenberg_custom_css_force_filtered_html_on_import_filter( $arg ) {
+	if ( $arg ) {
+		gutenberg_custom_css_kses_init_filters();
+	}
+	return $arg;
+}
+
+add_action( 'init', 'gutenberg_custom_css_kses_init', 20 );
+add_action( 'set_current_user', 'gutenberg_custom_css_kses_init' );
+add_filter( 'force_filtered_html_on_import', 'gutenberg_custom_css_force_filtered_html_on_import_filter', 999 );
 
 // Register the block support.
 WP_Block_Supports::get_instance()->register(

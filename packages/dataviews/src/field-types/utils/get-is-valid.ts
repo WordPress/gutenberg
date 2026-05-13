@@ -4,13 +4,42 @@
 import type { Field, NormalizedRules } from '../../types';
 import type { FieldType } from '../../types/private';
 
+function supportsNumericRangeConstraint( type?: string ) {
+	return type === 'integer' || type === 'number';
+}
+
+function supportsDateRangeConstraint( type?: string ) {
+	return type === 'date' || type === 'datetime';
+}
+
+function normalizeRangeRule< Item >(
+	value: number | string | undefined,
+	fieldType: FieldType< Item >,
+	key: 'min' | 'max'
+): NormalizedRules< Item >[ 'min' ] {
+	const validator = fieldType.validate[ key ];
+	if (
+		validator &&
+		( ( typeof value === 'number' &&
+			supportsNumericRangeConstraint( fieldType.type ) ) ||
+			( typeof value === 'string' &&
+				supportsDateRangeConstraint( fieldType.type ) ) )
+	) {
+		return { constraint: value, validate: validator } as NonNullable<
+			NormalizedRules< Item >[ typeof key ]
+		>;
+	}
+	return undefined;
+}
+
 export default function getIsValid< Item >(
 	field: Field< Item >,
 	fieldType: FieldType< Item >
 ): NormalizedRules< Item > {
+	const rules = field.isValid;
 	let required;
 	if (
-		field.isValid?.required === true &&
+		rules?.required === true &&
 		fieldType.validate.required !== undefined
 	) {
 		required = {
@@ -21,9 +50,9 @@ export default function getIsValid< Item >(
 
 	let elements;
 	if (
-		( field.isValid?.elements === true ||
+		( rules?.elements === true ||
 			// elements is enabled unless the field opts-out
-			( field.isValid?.elements === undefined &&
+			( rules?.elements === undefined &&
 				( !! field.elements || !! field.getElements ) ) ) &&
 		fieldType.validate.elements !== undefined
 	) {
@@ -33,62 +62,46 @@ export default function getIsValid< Item >(
 		};
 	}
 
-	let min;
-	if (
-		typeof field.isValid?.min === 'number' &&
-		fieldType.validate.min !== undefined
-	) {
-		min = {
-			constraint: field.isValid.min,
-			validate: fieldType.validate.min,
-		};
-	}
+	const min = normalizeRangeRule( rules?.min, fieldType, 'min' );
+	const max = normalizeRangeRule( rules?.max, fieldType, 'max' );
 
-	let max;
-	if (
-		typeof field.isValid?.max === 'number' &&
-		fieldType.validate.max !== undefined
-	) {
-		max = {
-			constraint: field.isValid.max,
-			validate: fieldType.validate.max,
-		};
-	}
-
+	const minLengthValue = rules?.minLength;
 	let minLength;
 	if (
-		typeof field.isValid?.minLength === 'number' &&
+		typeof minLengthValue === 'number' &&
 		fieldType.validate.minLength !== undefined
 	) {
 		minLength = {
-			constraint: field.isValid.minLength,
+			constraint: minLengthValue,
 			validate: fieldType.validate.minLength,
 		};
 	}
 
+	const maxLengthValue = rules?.maxLength;
 	let maxLength;
 	if (
-		typeof field.isValid?.maxLength === 'number' &&
+		typeof maxLengthValue === 'number' &&
 		fieldType.validate.maxLength !== undefined
 	) {
 		maxLength = {
-			constraint: field.isValid.maxLength,
+			constraint: maxLengthValue,
 			validate: fieldType.validate.maxLength,
 		};
 	}
 
+	const patternValue = rules?.pattern;
 	let pattern;
 	if (
-		field.isValid?.pattern !== undefined &&
+		patternValue !== undefined &&
 		fieldType.validate.pattern !== undefined
 	) {
 		pattern = {
-			constraint: field.isValid?.pattern,
+			constraint: patternValue,
 			validate: fieldType.validate.pattern,
 		};
 	}
 
-	const custom = field.isValid?.custom ?? fieldType.validate.custom;
+	const custom = rules?.custom ?? fieldType.validate.custom;
 
 	return {
 		required,

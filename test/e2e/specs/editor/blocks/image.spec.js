@@ -4,7 +4,7 @@
 const path = require( 'path' );
 const fs = require( 'fs/promises' );
 const os = require( 'os' );
-const { v4: uuid } = require( 'uuid' );
+const { randomUUID } = require( 'crypto' );
 
 /** @typedef {import('@playwright/test').Page} Page */
 
@@ -298,8 +298,8 @@ test.describe( 'Image', () => {
 		).toBeHidden();
 
 		// Assert that the image is edited.
+		await expect( image ).not.toHaveAttribute( 'src', initialImageSrc );
 		const updatedImageSrc = await image.getAttribute( 'src' );
-		expect( initialImageSrc ).not.toEqual( updatedImageSrc );
 
 		await expect
 			.poll( () => image.boundingBox() )
@@ -360,8 +360,8 @@ test.describe( 'Image', () => {
 		).toBeHidden();
 
 		// Assert that the image is edited.
+		await expect( image ).not.toHaveAttribute( 'src', initialImageSrc );
 		const updatedImageSrc = await image.getAttribute( 'src' );
-		expect( updatedImageSrc ).not.toEqual( initialImageSrc );
 
 		await expect
 			.poll( () => image.boundingBox() )
@@ -969,12 +969,12 @@ test.describe( 'Image - lightbox', () => {
 		);
 	} );
 
-	test.afterAll( async ( { requestUtils } ) => {
-		await requestUtils.deleteAllMedia();
-	} );
-
 	test.beforeEach( async ( { admin } ) => {
 		await admin.createNewPost();
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllMedia();
 	} );
 
 	test.describe( 'should respect theme.json settings and block overrides', () => {
@@ -1153,7 +1153,7 @@ class ImageBlockUtils {
 		const tmpDirectory = await fs.mkdtemp(
 			path.join( os.tmpdir(), 'gutenberg-test-image-' )
 		);
-		const fileName = uuid();
+		const fileName = randomUUID();
 		const tmpFileName = path.join( tmpDirectory, fileName + '.png' );
 		const filePath = customFile
 			? this.basePath + '/' + customFile

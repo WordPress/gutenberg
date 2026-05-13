@@ -17,6 +17,7 @@ import { PostEditorAwareness } from './awareness/post-editor-awareness';
 import { getSyncManager } from './sync';
 import {
 	applyPostChangesToCRDTDoc,
+	defaultCollectionSyncConfig,
 	defaultSyncConfig,
 	getPostChangesFromCRDTDoc,
 	POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
@@ -50,10 +51,6 @@ export const rootEntitiesConfig = [
 				'home',
 				'image_sizes',
 				'image_size_threshold',
-				'image_output_formats',
-				'jpeg_interlaced',
-				'png_interlaced',
-				'gif_interlaced',
 				'name',
 				'site_icon',
 				'site_icon_url',
@@ -147,6 +144,7 @@ export const rootEntitiesConfig = [
 		plural: 'comments',
 		label: __( 'Comment' ),
 		supportsPagination: true,
+		syncConfig: defaultCollectionSyncConfig,
 	},
 	{
 		name: 'menu',
@@ -249,14 +247,7 @@ export const rootEntitiesConfig = [
 		key: 'name',
 		supportsPagination: false,
 	},
-].map( ( entity ) => {
-	const syncEnabledRootEntities = new Set( [ 'comment' ] );
-
-	if ( syncEnabledRootEntities.has( entity.name ) ) {
-		entity.syncConfig = defaultSyncConfig;
-	}
-	return entity;
-} );
+];
 
 export const deprecatedEntities = {
 	root: {

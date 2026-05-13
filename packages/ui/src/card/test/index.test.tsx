@@ -82,7 +82,6 @@ describe( 'Card', () => {
 			render(
 				<Card.Root>
 					<Card.Header>
-						{ /* eslint-disable-next-line jsx-a11y/heading-has-content -- content provided via render prop */ }
 						<Card.Title render={ <h2 /> }>Heading</Card.Title>
 					</Card.Header>
 				</Card.Root>
@@ -91,6 +90,23 @@ describe( 'Card', () => {
 			expect(
 				screen.getByRole( 'heading', { level: 2, name: 'Heading' } )
 			).toBeVisible();
+		} );
+
+		it( 'forwards ref to custom Title render element', () => {
+			const titleRef = createRef< HTMLHeadingElement >();
+
+			render(
+				<Card.Root>
+					<Card.Header>
+						<Card.Title ref={ titleRef } render={ <h3 /> }>
+							Heading
+						</Card.Title>
+					</Card.Header>
+				</Card.Root>
+			);
+
+			expect( titleRef.current ).toBeInstanceOf( HTMLHeadingElement );
+			expect( titleRef.current?.tagName ).toBe( 'H3' );
 		} );
 	} );
 } );

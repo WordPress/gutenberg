@@ -9,15 +9,15 @@ test.describe( 'Search', () => {
 		await admin.createNewPost();
 	} );
 
-	test.afterAll( async ( { requestUtils } ) => {
-		await requestUtils.deleteAllMenus();
-	} );
-
 	test.afterEach( async ( { requestUtils } ) => {
 		await Promise.all( [
 			requestUtils.deleteAllPosts(),
 			requestUtils.deleteAllMenus(),
 		] );
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllMenus();
 	} );
 
 	test( 'should auto-configure itself to sensible defaults when inserted into a Navigation block', async ( {

@@ -2,7 +2,7 @@
 @use "@wordpress/base-styles/colors" as *;
 
 .block-editor-block-patterns-list__list-item {
-	cursor: pointer;
+	cursor: var(--wpds-cursor-control);
 	margin-bottom: $grid-unit-20;
 
 	// The list item contains absolutely positioned visually hidden text,

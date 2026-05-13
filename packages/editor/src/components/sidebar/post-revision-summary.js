@@ -2,7 +2,12 @@
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { __experimentalVStack as VStack } from '@wordpress/components';
+import {
+	ExternalLink,
+	__experimentalVStack as VStack,
+} from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
+import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -15,7 +20,6 @@ import { PostContentInformationUI } from '../post-content-information';
 import RevisionFieldsDiffPanel from '../revision-fields-diff';
 import PostPanelSection from '../post-panel-section';
 import PostCardPanel from '../post-card-panel';
-import { OpenRevisionsClassicScreen } from './post-summary';
 
 export default function PostRevisionSummary() {
 	const { revisionId, postId, postContent } = useSelect( ( select ) => {
@@ -40,7 +44,13 @@ export default function PostRevisionSummary() {
 						<PostContentInformationUI postContent={ postContent } />
 						<RevisionCreatedPanel />
 					</VStack>
-					<OpenRevisionsClassicScreen revisionId={ revisionId } />
+					<ExternalLink
+						href={ addQueryArgs( 'revision.php', {
+							revision: revisionId,
+						} ) }
+					>
+						{ __( 'Open classic revisions screen' ) }
+					</ExternalLink>
 					<RevisionAuthorPanel />
 				</VStack>
 			</PostPanelSection>

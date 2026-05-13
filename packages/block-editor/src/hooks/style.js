@@ -382,6 +382,84 @@ const elementTypes = [
 // Used for generating the instance ID
 const STYLE_BLOCK_PROPS_REFERENCE = {};
 
+/**
+ * Generates CSS rules for block element styles (buttons, links, headings, etc.).
+ *
+ * Iterates over supported element types and compiles their styles, including
+ * pseudo-selectors (e.g. :hover) and related sub-elements (e.g. h1-h6 for headings),
+ * into scoped CSS rule strings.
+ *
+ * @param {Object} blockElementStyles The block's `style.elements` object.
+ * @param {string} blockName          The block name, used for skip-serialization checks.
+ * @param {string} baseSelector       The base CSS selector to scope rules under.
+ * @return {string|undefined} Concatenated CSS rules string, or undefined if none.
+ */
+function getElementCSSRules( blockElementStyles, blockName, baseSelector ) {
+	if ( ! blockElementStyles ) {
+		return;
+	}
+
+	const rules = [];
+
+	elementTypes.forEach( ( { elementType, pseudo, elements } ) => {
+		const skipSerialization = shouldSkipSerialization(
+			blockName,
+			COLOR_SUPPORT_KEY,
+			elementType
+		);
+
+		if ( skipSerialization ) {
+			return;
+		}
+
+		const elementStyles = blockElementStyles?.[ elementType ];
+
+		// Process primary element type styles.
+		if ( elementStyles ) {
+			const selector = scopeSelector(
+				baseSelector,
+				ELEMENTS[ elementType ]
+			);
+
+			rules.push( compileCSS( elementStyles, { selector } ) );
+
+			// Process any interactive states for the element type.
+			if ( pseudo ) {
+				pseudo.forEach( ( pseudoSelector ) => {
+					if ( elementStyles[ pseudoSelector ] ) {
+						rules.push(
+							compileCSS( elementStyles[ pseudoSelector ], {
+								selector: scopeSelector(
+									baseSelector,
+									`${ ELEMENTS[ elementType ] }${ pseudoSelector }`
+								),
+							} )
+						);
+					}
+				} );
+			}
+		}
+
+		// Process related elements e.g. h1-h6 for headings
+		if ( elements ) {
+			elements.forEach( ( element ) => {
+				if ( blockElementStyles[ element ] ) {
+					rules.push(
+						compileCSS( blockElementStyles[ element ], {
+							selector: scopeSelector(
+								baseSelector,
+								ELEMENTS[ element ]
+							),
+						} )
+					);
+				}
+			} );
+		}
+	} );
+
+	return rules.length > 0 ? rules.join( '' ) : undefined;
+}
+
 function useBlockProps( { name, style } ) {
 	const blockElementsContainerIdentifier = useInstanceId(
 		STYLE_BLOCK_PROPS_REFERENCE,
@@ -391,75 +469,11 @@ function useBlockProps( { name, style } ) {
 	const baseElementSelector = `.${ blockElementsContainerIdentifier }`;
 	const blockElementStyles = style?.elements;
 
-	const styles = useMemo( () => {
-		if ( ! blockElementStyles ) {
-			return;
-		}
-
-		const elementCSSRules = [];
-
-		elementTypes.forEach( ( { elementType, pseudo, elements } ) => {
-			const skipSerialization = shouldSkipSerialization(
-				name,
-				COLOR_SUPPORT_KEY,
-				elementType
-			);
-
-			if ( skipSerialization ) {
-				return;
-			}
-
-			const elementStyles = blockElementStyles?.[ elementType ];
-
-			// Process primary element type styles.
-			if ( elementStyles ) {
-				const selector = scopeSelector(
-					baseElementSelector,
-					ELEMENTS[ elementType ]
-				);
-
-				elementCSSRules.push(
-					compileCSS( elementStyles, { selector } )
-				);
-
-				// Process any interactive states for the element type.
-				if ( pseudo ) {
-					pseudo.forEach( ( pseudoSelector ) => {
-						if ( elementStyles[ pseudoSelector ] ) {
-							elementCSSRules.push(
-								compileCSS( elementStyles[ pseudoSelector ], {
-									selector: scopeSelector(
-										baseElementSelector,
-										`${ ELEMENTS[ elementType ] }${ pseudoSelector }`
-									),
-								} )
-							);
-						}
-					} );
-				}
-			}
-
-			// Process related elements e.g. h1-h6 for headings
-			if ( elements ) {
-				elements.forEach( ( element ) => {
-					if ( blockElementStyles[ element ] ) {
-						elementCSSRules.push(
-							compileCSS( blockElementStyles[ element ], {
-								selector: scopeSelector(
-									baseElementSelector,
-									ELEMENTS[ element ]
-								),
-							} )
-						);
-					}
-				} );
-			}
-		} );
-
-		return elementCSSRules.length > 0
-			? elementCSSRules.join( '' )
-			: undefined;
-	}, [ baseElementSelector, blockElementStyles, name ] );
+	const styles = useMemo(
+		() =>
+			getElementCSSRules( blockElementStyles, name, baseElementSelector ),
+		[ baseElementSelector, blockElementStyles, name ]
+	);
 
 	useStyleOverride( { css: styles } );
 

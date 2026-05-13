@@ -24,6 +24,7 @@ test.describe( 'Preferences modal', () => {
 			await expect( prePublishToggle ).toBeVisible();
 		} );
 	} );
+
 	test.describe( 'Preferences modal adaps to viewport', () => {
 		test( 'Enable pre-publish checks is not visible on mobile', async ( {
 			page,

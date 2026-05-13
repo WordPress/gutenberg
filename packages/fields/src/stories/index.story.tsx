@@ -183,12 +183,6 @@ export const DataViewsPreview = () => {
 		totalPages: 1,
 	};
 
-	const defaultLayouts = {
-		table: {},
-		list: {},
-		grid: {},
-	};
-
 	return (
 		<div style={ { padding: '20px' } }>
 			<h2>Fields Package DataViews Preview</h2>
@@ -203,7 +197,6 @@ export const DataViewsPreview = () => {
 				view={ view }
 				onChangeView={ ( nextView: View ) => setView( nextView ) }
 				paginationInfo={ paginationInfo }
-				defaultLayouts={ defaultLayouts }
 			/>
 		</div>
 	);
