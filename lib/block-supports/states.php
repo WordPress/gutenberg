@@ -142,9 +142,10 @@ function gutenberg_render_block_states_support( $block_content, $block ) {
 	 * so only one CSS rule is emitted. The store is flushed to the page by
 	 * gutenberg_enqueue_stored_styles() rather than injected inline here.
 	 *
-	 * Preset utility classes (e.g. .has-accent-3-background-color) are generated
-	 * with !important, so pseudo-state styles targeting the same properties must also
-	 * use !important to win. Properties without preset utility classes don't need it.
+	 * Some block support declarations need !important to apply reliably. Preset-backed
+	 * declarations need to override preset utility classes such as .has-accent-3-background-color,
+	 * while border declarations need to override base styles that can be serialized inline.
+	 * Properties that do not have either conflict do not need !important.
 	 */
 	$important_properties = array(
 		'color',
