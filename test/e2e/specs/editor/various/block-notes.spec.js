@@ -1169,6 +1169,117 @@ test.describe( 'Block Notes', () => {
 			expect( alpha ).toBeLessThan( 0.35 );
 		} );
 	} );
+
+	test.describe( 'Sidebar UI polish', () => {
+		test( 'shows an anchor excerpt preview on inline note threads', async ( {
+			editor,
+			page,
+			blockNoteUtils,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: {
+					content: 'The quick brown fox jumps over the lazy dog.',
+				},
+			} );
+
+			await blockNoteUtils.addInlineNote( {
+				anchor: 'lazy dog',
+				comment: 'Anchor preview test',
+			} );
+
+			const preview = page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'blockquote', {
+					name: 'Anchored to: lazy dog',
+				} );
+
+			await expect( preview ).toBeVisible();
+			await expect( preview ).toHaveText( 'lazy dog' );
+		} );
+
+		test( 'does not render an anchor preview for block-level notes', async ( {
+			page,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Block-level only.' },
+				comment: 'Block note has no anchor',
+			} );
+
+			const preview = page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.locator(
+					'.editor-collab-sidebar-panel__inline-anchor-preview'
+				);
+
+			await expect( preview ).toHaveCount( 0 );
+		} );
+
+		test( 'separates unresolved and resolved threads with a Resolved divider in the All notes sidebar', async ( {
+			page,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Unresolved block' },
+				comment: 'Unresolved comment',
+			} );
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Will resolve block' },
+				comment: 'Will-be-resolved comment',
+			} );
+
+			// Resolve the most recently added note (currently active).
+			await page.getByRole( 'button', { name: 'Resolve' } ).click();
+			await expect(
+				page
+					.getByRole( 'button', { name: 'Dismiss this notice' } )
+					.filter( { hasText: 'Note marked as resolved.' } )
+			).toBeVisible();
+
+			await blockNoteUtils.openBlockNoteSidebar();
+
+			const settings = page.getByRole( 'region', {
+				name: 'Editor settings',
+			} );
+
+			// The "Resolved" divider must appear once, between threads.
+			const divider = settings.locator(
+				'.editor-collab-sidebar-panel__resolved-divider'
+			);
+			await expect( divider ).toHaveCount( 1 );
+			await expect( divider ).toHaveText( 'Resolved' );
+
+			// Order: unresolved thread, divider, resolved thread.
+			const threads = settings.getByRole( 'treeitem' );
+			await expect( threads.first() ).toContainText(
+				'Unresolved comment'
+			);
+			await expect( threads.last() ).toContainText(
+				'Will-be-resolved comment'
+			);
+		} );
+
+		test( 'omits the Resolved divider when no resolved threads exist', async ( {
+			page,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Only unresolved' },
+				comment: 'Only unresolved comment',
+			} );
+			await blockNoteUtils.openBlockNoteSidebar();
+
+			const divider = page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.locator( '.editor-collab-sidebar-panel__resolved-divider' );
+			await expect( divider ).toHaveCount( 0 );
+		} );
+	} );
 } );
 
 class BlockNoteUtils {
@@ -1229,6 +1340,62 @@ class BlockNoteUtils {
 			this.#page
 				.getByRole( 'region', { name: 'Editor settings' } )
 				.getByRole( 'treeitem', { name: `Note: ${ content }` } )
+		).toBeVisible();
+	}
+
+	async addInlineNote( { anchor, comment } ) {
+		// Select the anchor substring inside the most recently inserted block.
+		// Programmatic selection is more reliable than keyboard navigation
+		// across iframes and matches the same path Gutenberg's RichText uses.
+		await this.#editor.canvas
+			.locator( '[contenteditable="true"]' )
+			.last()
+			.evaluate( ( block, anchorText ) => {
+				const doc = block.ownerDocument;
+				const walker = doc.createTreeWalker(
+					block,
+					NodeFilter.SHOW_TEXT
+				);
+				let textNode;
+				while ( ( textNode = walker.nextNode() ) ) {
+					const idx = textNode.textContent.indexOf( anchorText );
+					if ( idx >= 0 ) {
+						const range = doc.createRange();
+						range.setStart( textNode, idx );
+						range.setEnd( textNode, idx + anchorText.length );
+						const sel = doc.defaultView.getSelection();
+						sel.removeAllRanges();
+						sel.addRange( range );
+						doc.dispatchEvent( new Event( 'selectionchange' ) );
+						return;
+					}
+				}
+				throw new Error(
+					`Anchor text "${ anchorText }" not found in block`
+				);
+			}, anchor );
+
+		// Open the block toolbar's "More" formats menu, then trigger the inline
+		// "Add note" rich-text format.
+		await this.#page
+			.getByRole( 'region', { name: 'Editor content' } )
+			.getByRole( 'button', { name: 'More', exact: true } )
+			.click();
+		await this.#page
+			.getByRole( 'menuitem', { name: 'Add note', exact: true } )
+			.click();
+
+		await this.#page
+			.getByRole( 'textbox', { name: 'New note', exact: true } )
+			.fill( comment );
+		await this.#page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'button', { name: 'Add note', exact: true } )
+			.click();
+		await expect(
+			this.#page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'treeitem', { name: `Note: ${ comment }` } )
 		).toBeVisible();
 	}
 
