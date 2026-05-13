@@ -719,15 +719,19 @@ const useEntitiesInfo = (
 						recordsToExcludePerEntity?.[ slug ]?.map(
 							( { id } ) => id
 						) || [];
-					accumulator[ slug ] = !! select(
-						coreStore
-					).getEntityRecords( entityName, slug, {
-						per_page: 1,
-						_fields: 'id',
-						context: 'view',
-						exclude: existingEntitiesIds,
-						...additionalQueryParameters[ slug ],
-					} )?.length;
+					const records = select( coreStore ).getEntityRecords(
+						entityName,
+						slug,
+						{
+							per_page: 1,
+							_fields: 'id',
+							context: 'view',
+							exclude: existingEntitiesIds,
+							...additionalQueryParameters[ slug ],
+						}
+					);
+					accumulator[ slug ] =
+						records === null || records.length > 0;
 					return accumulator;
 				},
 				{}

@@ -1,7 +1,13 @@
 /**
  * WordPress dependencies
  */
-import { useCallback, useEffect, useMemo, useRef } from '@wordpress/element';
+import {
+	useCallback,
+	useEffect,
+	useId,
+	useMemo,
+	useRef,
+} from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -20,6 +26,7 @@ import {
 	type CropBounds,
 	type ResizeDragState,
 } from '../../../core/stencil-math';
+import { VISUALLY_HIDDEN_STYLE } from '../../visually-hidden-style';
 
 /**
  * Corner handle positions only — used when aspect ratio is locked.
@@ -127,6 +134,7 @@ export function RectangleStencil( {
 	);
 	const keyboardSettleTimerRef = useRef< ReturnType< typeof setTimeout > >();
 	const keyboardResizeActiveRef = useRef( false );
+	const resizeHandleDescriptionId = useId();
 	const hasLockedRatio = !! ( aspectRatio && aspectRatio > 0 );
 
 	// Clear the pending keyboard settle timer on unmount so it can't
@@ -477,6 +485,16 @@ export function RectangleStencil( {
 				transition: stencilTransition,
 			} }
 		>
+			{ freeformCrop && (
+				<div
+					id={ resizeHandleDescriptionId }
+					style={ VISUALLY_HIDDEN_STYLE }
+				>
+					{ __(
+						'Use arrow keys to resize the crop area. Hold Shift for larger steps.'
+					) }
+				</div>
+			) }
 			{ /* The crop rectangle border. pointer-events: none is set in
 				   CSS so clicks pass through to the container for panning. */ }
 			<div
@@ -506,6 +524,7 @@ export function RectangleStencil( {
 						onTouchStart={ ( event ) => event.stopPropagation() }
 						onKeyDown={ ( event ) => handleKeyDown( pos, event ) }
 						aria-label={ getHandleLabel( pos ) }
+						aria-describedby={ resizeHandleDescriptionId }
 					/>
 				) ) }
 		</div>

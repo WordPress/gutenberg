@@ -23,7 +23,7 @@ const meta: Meta< typeof Icon > = {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
 		componentStatus: {
-			status: 'stable',
+			status: 'recommended',
 			whereUsed: 'global',
 			notes: 'Prefer this component over the `Icon` component from `@wordpress/icons`.',
 		},

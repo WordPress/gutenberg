@@ -23,6 +23,13 @@ const meta: Meta< typeof InputControl > = {
 		value: { control: false },
 		type: { control: 'text' },
 	},
+	parameters: {
+		componentStatus: {
+			status: 'use-with-caution',
+			whereUsed: 'global',
+			notes: 'Not yet recommended for use alongside components from `@wordpress/components`, pending review of style consistency with `@wordpress/components`. See [WordPress/gutenberg#76135](https://github.com/WordPress/gutenberg/issues/76135).',
+		},
+	},
 };
 export default meta;
 
