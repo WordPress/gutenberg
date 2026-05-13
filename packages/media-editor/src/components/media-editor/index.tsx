@@ -65,6 +65,11 @@ const METADATA_EDIT_KEYS = [
 	'post',
 ] as const;
 
+// Embed query for the attachment's author and parent post. Shared between
+// the `getEntityRecord` read and the matching `invalidateResolution` so the
+// two stay in lockstep.
+const ATTACHMENT_EMBED_QUERY = { _embed: 'author,wp:attached-to' } as const;
+
 // Scope save-failure snackbars so they don't leak into the host editor/page.
 const NOTICES_CONTEXT = 'media-editor';
 const PLACEMENT_CONTROL_IDLE_MS = 300;
@@ -248,9 +253,12 @@ function MediaEditorContent( {
 			// `_embedded['wp:attached-to']` land on the record for the Details
 			// fields to read. `getEditedEntityRecord` doesn't formally accept a
 			// query, so we can't embed via that selector directly.
-			getEntityRecord( 'postType', 'attachment', id, {
-				_embed: 'author,wp:attached-to',
-			} );
+			getEntityRecord(
+				'postType',
+				'attachment',
+				id,
+				ATTACHMENT_EMBED_QUERY
+			);
 			return {
 				media: getEditedEntityRecord(
 					'postType',
@@ -326,7 +334,7 @@ function MediaEditorContent( {
 			'postType',
 			'attachment',
 			id,
-			{ _embed: 'author,wp:attached-to' },
+			ATTACHMENT_EMBED_QUERY,
 		] );
 	}, [ id, invalidateResolution ] );
 
@@ -451,8 +459,12 @@ function MediaEditorContent( {
 				// The `/edit` endpoint creates a new attachment for the crop
 				// and doesn't inherit `post_parent` from the source (unlike
 				// title/caption/etc.), so carry the existing value across when
-				// the user hasn't explicitly edited it.
-				if ( ! ( 'post' in metadataEdits ) && media?.post ) {
+				// the user hasn't explicitly edited it. Use a defined-check so
+				// an explicit `0` (unattached) is also preserved.
+				if (
+					! ( 'post' in metadataEdits ) &&
+					media?.post !== undefined
+				) {
 					metadataEdits.post = media.post;
 				}
 
