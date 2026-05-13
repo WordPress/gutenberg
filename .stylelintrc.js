@@ -60,7 +60,7 @@ module.exports = {
 	},
 	overrides: [
 		{
-			files: [ '**/*.module.{css,scss}' ],
+			files: [ '**/*.module.{css,scss}', 'routes/**/*.{css,scss}' ],
 			rules: {
 				'function-no-unknown': [
 					true,
