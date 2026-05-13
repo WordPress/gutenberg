@@ -23,6 +23,40 @@ interface EditorStoreBlock {
 }
 
 /**
+ * Find the block Y.Map that contains a nested Yjs type.
+ *
+ * Rich-text attributes are often stored directly at attributes.content, but
+ * blocks can also store rich text deeper inside object or array attributes.
+ * Walk upward until we find the block map instead of assuming a fixed parent
+ * depth.
+ *
+ * @param yType - The nested Yjs type to start from.
+ * @return The containing block Y.Map, or null if no block ancestor exists.
+ */
+export function getContainingBlockYMap(
+	yType: Y.AbstractType< any >
+): Y.Map< unknown > | null {
+	let current: Y.AbstractType< any > | null = yType;
+
+	while ( current ) {
+		const parent = current.parent;
+
+		if (
+			parent instanceof Y.Map &&
+			parent.parent instanceof Y.Array &&
+			parent.get( 'clientId' ) !== undefined &&
+			parent.get( 'innerBlocks' ) instanceof Y.Array
+		) {
+			return parent;
+		}
+
+		current = parent instanceof Y.AbstractType ? parent : null;
+	}
+
+	return null;
+}
+
+/**
  * Given a Y.Map within a Ydoc, traverse up the Yjs block tree to compute the
  * index path from the root.
  *

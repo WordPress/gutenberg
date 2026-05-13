@@ -106,6 +106,7 @@ export function useRenderCursors(
 			let start: ResolvedSelection = {
 				richTextOffset: null,
 				localClientId: null,
+				attributeKey: null,
 			};
 			let end: ResolvedSelection | undefined;
 

@@ -24,7 +24,6 @@ test.describe( 'Collaboration with meta boxes', () => {
 			collaborationUtils,
 			requestUtils,
 			admin,
-			editor,
 			page,
 		} ) => {
 			// Create a draft post.
@@ -35,14 +34,7 @@ test.describe( 'Collaboration with meta boxes', () => {
 			} );
 
 			// User 1 (admin) opens the post.
-			await admin.visitAdminPage(
-				'post.php',
-				`post=${ post.id }&action=edit`
-			);
-			await editor.setPreferences( 'core/edit-post', {
-				welcomeGuide: false,
-				fullscreenMode: false,
-			} );
+			await admin.editPost( post.id );
 
 			// Wait for collaboration runtime and entity record to be ready.
 			await collaborationUtils.waitForEntityReady( page );
@@ -132,7 +124,6 @@ test.describe( 'Collaboration with meta boxes', () => {
 			collaborationUtils,
 			requestUtils,
 			admin,
-			editor,
 			page,
 		} ) => {
 			// Create a draft post.
@@ -143,14 +134,7 @@ test.describe( 'Collaboration with meta boxes', () => {
 			} );
 
 			// User 1 (admin) opens the post.
-			await admin.visitAdminPage(
-				'post.php',
-				`post=${ post.id }&action=edit`
-			);
-			await editor.setPreferences( 'core/edit-post', {
-				welcomeGuide: false,
-				fullscreenMode: false,
-			} );
+			await admin.editPost( post.id );
 
 			// Wait for collaboration runtime and entity record to be ready.
 			await collaborationUtils.waitForEntityReady( page );
