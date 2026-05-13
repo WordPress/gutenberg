@@ -94,6 +94,28 @@ export function getDistributedEditingRetrySaveEndpointPath( {
 }
 
 /**
+ * Returns the current DE-RTC retry-save reviewer approval proof endpoint path
+ * for a post.
+ *
+ * @param {Object} args                    Endpoint args.
+ * @param {number} args.postId             Post ID.
+ * @param {string} [args.restBase='posts'] REST base for the edited post type.
+ *
+ * @return {string} REST path.
+ */
+export function getDistributedEditingRetrySaveReviewApprovalEndpointPath( {
+	postId,
+	restBase = DISTRIBUTED_EDITING_RECOVERY_REST_BASE,
+} = {} ) {
+	return getDistributedEditingEndpointPath( {
+		postId,
+		restBase,
+		operation: 'review-approval',
+		errorSubject: 'retry-save reviewer approval',
+	} );
+}
+
+/**
  * Returns the current edited post endpoint path for DE-RTC server-state reads.
  *
  * @param {Object} args                    Endpoint args.
@@ -334,6 +356,112 @@ export function __experimentalRequestDistributedEditingRetrySave( {
 
 	return apiFetch( {
 		path: getDistributedEditingRetrySaveEndpointPath( {
+			postId,
+			restBase,
+		} ),
+		method: 'POST',
+		data,
+	} );
+}
+
+/**
+ * Requests reviewer approval proof for a retry-save review rejection.
+ *
+ * This low-level helper sends only proof metadata and hash evidence. It does
+ * not send raw post content, save, call retry-save, dispatch notices, persist
+ * editor state, or change post locks.
+ *
+ * @param {Object} args                                      Request args.
+ * @param {number} args.postId                               Post ID.
+ * @param {string} [args.restBase='posts']                   REST base for the edited post type.
+ * @param {string} args.clientBaseVersion                    Client sync version being reviewed.
+ * @param {string} [args.acceptedProofServerVersion]         Server version reviewed by the approver.
+ * @param {number} [args.pendingChangeCount=1]               Pending local change groups.
+ * @param {string} [args.reviewAction]                       Review action requested by the server.
+ * @param {string} [args.reviewRequiredCapability]           Capability required to review the change.
+ * @param {string} [args.reviewerCapability]                 Capability held by the reviewer.
+ * @param {string} [args.reviewScope]                        Review scope.
+ * @param {string} [args.proposedPostContentHash]            Hash of proposed post content.
+ * @param {string} [args.reviewedProposedPostContentHash]    Reviewer-approved proposed content hash.
+ * @param {string} [args.candidatePostContentHash]           Hash of server candidate post content.
+ * @param {string} [args.reviewedCandidatePostContentHash]   Reviewer-approved candidate content hash.
+ * @param {string} [args.filteredProposedPostContentHash]    Hash of KSES-filtered proposed content.
+ * @param {string} [args.filteredCandidatePostContentHash]   Hash of KSES-filtered candidate content.
+ * @param {string} [args.reviewApprovalProof]                Opaque reviewer approval proof.
+ *
+ * @return {Promise<Object>} REST response or error.
+ */
+export function __experimentalRequestDistributedEditingRetrySaveReviewApprovalProof( {
+	postId,
+	restBase = DISTRIBUTED_EDITING_RECOVERY_REST_BASE,
+	clientBaseVersion,
+	acceptedProofServerVersion,
+	pendingChangeCount = 1,
+	reviewAction,
+	reviewRequiredCapability,
+	reviewerCapability,
+	reviewScope,
+	proposedPostContentHash,
+	reviewedProposedPostContentHash,
+	candidatePostContentHash,
+	reviewedCandidatePostContentHash,
+	filteredProposedPostContentHash,
+	filteredCandidatePostContentHash,
+	reviewApprovalProof,
+} = {} ) {
+	const data = {
+		client_base_version: clientBaseVersion,
+		pending_change_count: pendingChangeCount,
+	};
+
+	if ( acceptedProofServerVersion ) {
+		data.accepted_proof_server_version = acceptedProofServerVersion;
+	}
+
+	if ( reviewAction ) {
+		data.review_action = reviewAction;
+	}
+
+	if ( reviewRequiredCapability ) {
+		data.review_required_capability = reviewRequiredCapability;
+	}
+
+	if ( reviewerCapability ) {
+		data.reviewer_capability = reviewerCapability;
+	}
+
+	if ( reviewScope ) {
+		data.review_scope = reviewScope;
+	}
+
+	if ( proposedPostContentHash ) {
+		data.proposed_post_content_hash = proposedPostContentHash;
+		data.reviewed_proposed_content_hash =
+			reviewedProposedPostContentHash || proposedPostContentHash;
+	}
+
+	if ( candidatePostContentHash ) {
+		data.candidate_post_content_hash = candidatePostContentHash;
+		data.reviewed_candidate_content_hash =
+			reviewedCandidatePostContentHash || candidatePostContentHash;
+	}
+
+	if ( filteredProposedPostContentHash ) {
+		data.kses_filtered_proposed_content_hash =
+			filteredProposedPostContentHash;
+	}
+
+	if ( filteredCandidatePostContentHash ) {
+		data.kses_filtered_candidate_content_hash =
+			filteredCandidatePostContentHash;
+	}
+
+	if ( reviewApprovalProof ) {
+		data.review_approval_proof = reviewApprovalProof;
+	}
+
+	return apiFetch( {
+		path: getDistributedEditingRetrySaveReviewApprovalEndpointPath( {
 			postId,
 			restBase,
 		} ),

@@ -13,6 +13,10 @@ export const DISTRIBUTED_EDITING_REASON_CODES = Object.freeze( {
 	DE_RTC_MALFORMED_SYNC_PAYLOAD: 'de_rtc_malformed_sync_payload',
 	DE_RTC_UNFILTERED_HTML_WOULD_CHANGE_CONTENT:
 		'de_rtc_unfiltered_html_would_change_content',
+	DE_RTC_REVIEW_APPROVAL_REQUIRES_UNFILTERED_HTML:
+		'de_rtc_review_approval_requires_unfiltered_html',
+	DE_RTC_REVIEW_APPROVAL_HASH_MISMATCH:
+		'de_rtc_review_approval_hash_mismatch',
 	DE_RTC_FEATURE_DISABLED: 'de_rtc_feature_disabled',
 	REST_CANNOT_EDIT: 'rest_cannot_edit',
 	REST_POST_INVALID_ID: 'rest_post_invalid_id',
@@ -187,6 +191,20 @@ export const DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES = Object.freeze( {
 } );
 
 /**
+ * Stable retry-save reviewer approval proof statuses. These describe only the
+ * inert proof result; they do not authorize a save or retry-save call.
+ */
+export const DISTRIBUTED_EDITING_RETRY_SAVE_REVIEW_APPROVAL_PROOF_STATUSES =
+	Object.freeze( {
+		NONE: 'none',
+		ACCEPTED_FOR_RETRY_SAVE: 'accepted_for_retry_save',
+		STALE_BASE_REJECTED: 'stale_base_rejected',
+		REJECTED_PERMISSION_DENIED: 'rejected_permission_denied',
+		REJECTED_ROUTE_MISMATCH: 'rejected_route_mismatch',
+		REJECTED_HASH_MISMATCH: 'rejected_hash_mismatch',
+	} );
+
+/**
  * Stable retry-save save-flow handoff statuses.
  */
 export const DISTRIBUTED_EDITING_RETRY_SAVE_HANDOFF_STATUSES = Object.freeze( {
@@ -258,6 +276,12 @@ const VALID_RETRY_SUBMIT_SAVE_STATUSES = new Set(
 
 const VALID_RETRY_SAVE_STATUSES = new Set(
 	Object.values( DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES )
+);
+
+const VALID_RETRY_SAVE_REVIEW_APPROVAL_PROOF_STATUSES = new Set(
+	Object.values(
+		DISTRIBUTED_EDITING_RETRY_SAVE_REVIEW_APPROVAL_PROOF_STATUSES
+	)
 );
 
 const VALID_RETRY_SAVE_HANDOFF_STATUSES = new Set(
@@ -362,6 +386,26 @@ export const DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE = Object.freeze( {
 	retrySaveReviewFilteredCandidateContentHash: null,
 	retrySaveReviewRawContentIncluded: false,
 	retrySaveReviewRecoveryActions: [],
+	retrySaveReviewApprovalProofStatus:
+		DISTRIBUTED_EDITING_RETRY_SAVE_REVIEW_APPROVAL_PROOF_STATUSES.NONE,
+	retrySaveReviewApprovalProofReason: null,
+	retrySaveReviewApprovalAccepted: false,
+	retrySaveReviewApprovalServerVersion: null,
+	retrySaveReviewApprovalPreviousServerVersion: null,
+	retrySaveReviewApprovalAction: null,
+	retrySaveReviewApprovalRequiredCapability: null,
+	retrySaveReviewApprovalReviewerCapability: null,
+	retrySaveReviewApprovalScope: null,
+	retrySaveReviewApprovalProposedContentHash: null,
+	retrySaveReviewApprovalCandidateContentHash: null,
+	retrySaveReviewApprovalExpectedProposedContentHash: null,
+	retrySaveReviewApprovalExpectedCandidateContentHash: null,
+	retrySaveReviewApprovalHashMismatch: false,
+	retrySaveReviewApprovalRawContentIncluded: false,
+	retrySaveReviewApprovalSavesPost: false,
+	retrySaveReviewApprovalMutatesPostContent: false,
+	retrySaveReviewApprovalCreatesRevision: false,
+	retrySaveReviewApprovalClaimsSaved: false,
 	requiresManualConflictResolution: false,
 	mustOfferLocalCopy: false,
 	canExportLocalUpdates: false,
@@ -538,6 +582,16 @@ export function normalizeDistributedEditingSessionState( sessionState = {} ) {
 	const retrySaveAccepted =
 		Boolean( sessionState.retrySaveAccepted ) ||
 		retrySaveStatus === DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVED;
+	const retrySaveReviewApprovalProofStatus =
+		VALID_RETRY_SAVE_REVIEW_APPROVAL_PROOF_STATUSES.has(
+			sessionState.retrySaveReviewApprovalProofStatus
+		)
+			? sessionState.retrySaveReviewApprovalProofStatus
+			: DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE.retrySaveReviewApprovalProofStatus;
+	const retrySaveReviewApprovalAccepted =
+		Boolean( sessionState.retrySaveReviewApprovalAccepted ) ||
+		retrySaveReviewApprovalProofStatus ===
+			DISTRIBUTED_EDITING_RETRY_SAVE_REVIEW_APPROVAL_PROOF_STATUSES.ACCEPTED_FOR_RETRY_SAVE;
 	const retrySaveHandoffStatus = VALID_RETRY_SAVE_HANDOFF_STATUSES.has(
 		sessionState.retrySaveHandoffStatus
 	)
@@ -650,6 +704,11 @@ export function normalizeDistributedEditingSessionState( sessionState = {} ) {
 			sessionState.retrySaveCreatedRevisionIds
 		),
 		...normalizeRetrySaveReviewMetadataFields( sessionState ),
+		...normalizeRetrySaveReviewApprovalProofFields( {
+			...sessionState,
+			retrySaveReviewApprovalProofStatus,
+			retrySaveReviewApprovalAccepted,
+		} ),
 		requiresManualConflictResolution,
 		mustOfferLocalCopy,
 		canExportLocalUpdates,
@@ -1321,6 +1380,9 @@ export function getDistributedEditingRetrySaveFlowStateForSessionState(
 		retrySaveRevisionCreated: normalized.retrySaveRevisionCreated,
 		retrySaveCreatedRevisionIds: normalized.retrySaveCreatedRevisionIds,
 		...getDistributedEditingRetrySaveReviewMetadataFields( normalized ),
+		...getDistributedEditingRetrySaveReviewApprovalProofFields(
+			normalized
+		),
 	};
 }
 
@@ -2028,6 +2090,218 @@ export function getDistributedEditingSessionStateForRetrySaveResult(
 }
 
 /**
+ * Returns DE-RTC editor state for retry-save reviewer approval proof.
+ *
+ * The proof result is inert. Accepted proof keeps local edits pending and
+ * exportable for a later save/retry-save integration turn; all rejection paths
+ * keep the same local protection and store only metadata/hash evidence.
+ *
+ * @param {Object} responseOrError     REST response or API error.
+ * @param {Object} currentSessionState Current DE-RTC session state.
+ *
+ * @return {Object} Normalized DE-RTC session state.
+ */
+export function getDistributedEditingSessionStateForRetrySaveReviewApprovalProofResult(
+	responseOrError = {},
+	currentSessionState = {}
+) {
+	const normalizedCurrent =
+		normalizeDistributedEditingSessionState( currentSessionState );
+	const responseData = getDistributedEditingResponseData( responseOrError );
+	const result = normalizeNullableString(
+		responseOrError.result || responseData.result
+	);
+	const detail = normalizeNullableString(
+		responseOrError.detail ||
+			responseData.detail ||
+			responseOrError.errorDetail ||
+			responseData.errorDetail
+	);
+	const reasonCode = normalizeNullableString(
+		responseOrError.code ||
+			responseOrError.reasonCode ||
+			responseOrError.reason_code ||
+			responseData.reasonCode ||
+			responseData.reason_code
+	);
+	const pendingChangeCount =
+		normalizeCount(
+			responseOrError.pendingChangeCount ??
+				responseOrError.pending_change_count ??
+				responseData.pendingChangeCount ??
+				responseData.pending_change_count
+		) ||
+		normalizedCurrent.pendingChangeCount ||
+		( normalizedCurrent.hasPendingChanges ? 1 : 0 );
+	const serverVersion =
+		normalizeNullableString(
+			responseOrError.serverVersion ||
+				responseOrError.server_version ||
+				responseOrError.reviewedServerVersion ||
+				responseOrError.reviewed_server_version ||
+				responseData.serverVersion ||
+				responseData.server_version ||
+				responseData.reviewedServerVersion ||
+				responseData.reviewed_server_version
+		) ||
+		normalizedCurrent.retrySaveReviewApprovalServerVersion ||
+		normalizedCurrent.retrySaveServerVersion ||
+		normalizedCurrent.serverVersion;
+	const previousServerVersion =
+		normalizeNullableString(
+			responseOrError.previousServerVersion ||
+				responseOrError.previous_server_version ||
+				responseData.previousServerVersion ||
+				responseData.previous_server_version
+		) ||
+		normalizedCurrent.retrySaveReviewApprovalServerVersion ||
+		normalizedCurrent.retrySaveServerVersion ||
+		normalizedCurrent.serverVersion;
+	const approvalProofFields =
+		getRetrySaveReviewApprovalProofFieldsFromResponseOrError(
+			responseOrError,
+			responseData,
+			normalizedCurrent
+		);
+	const hasApprovalAccepted =
+		result === 'review_approval_accepted_for_retry_save' ||
+		result ===
+			'retry_save_review_approval_accepted_for_future_save' ||
+		result === 'retry_save_reviewer_approval_accepted' ||
+		responseOrError.retrySaveReviewApprovalAccepted === true ||
+		responseOrError.retry_save_review_approval_accepted === true ||
+		responseOrError.reviewApprovalAccepted === true ||
+		responseOrError.review_approval_accepted === true ||
+		responseData.retrySaveReviewApprovalAccepted === true ||
+		responseData.retry_save_review_approval_accepted === true ||
+		responseData.reviewApprovalAccepted === true ||
+		responseData.review_approval_accepted === true;
+
+	if ( hasApprovalAccepted ) {
+		return normalizeDistributedEditingSessionState( {
+			...normalizedCurrent,
+			disposition: DISTRIBUTED_EDITING_DISPOSITIONS.IDLE,
+			reasonCode: null,
+			serverVersion,
+			pendingChangeCount: pendingChangeCount || 1,
+			hasPendingChanges: true,
+			isAwaitingServerConfirmation: true,
+			requiresServerStateAcceptance: false,
+			requiresServerStateRefetch: false,
+			refetchedServerState: false,
+			requiresManualConflictResolution: false,
+			retrySubmitProofStatus:
+				DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.NONE,
+			retrySubmitProofReason: null,
+			retrySubmitAccepted: false,
+			retrySubmitSavePathRequired: false,
+			retrySubmitSaveStatus:
+				DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.BLOCKED,
+			retrySubmitSaveReason:
+				'retry_save_review_approval_requires_save_handoff',
+			retrySubmitSavePrepared: false,
+			retrySubmitSaveReady: false,
+			retrySaveStatus: DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.NONE,
+			retrySaveReason: null,
+			retrySaveAccepted: false,
+			retrySaveSavesPost: false,
+			retrySaveMutatesPostContent: false,
+			retrySaveCreatesRevision: false,
+			retrySaveClaimsSaved: false,
+			retrySaveRevisionCreated: false,
+			retrySaveCreatedRevisionIds: [],
+			...approvalProofFields,
+			retrySaveReviewApprovalProofStatus:
+				DISTRIBUTED_EDITING_RETRY_SAVE_REVIEW_APPROVAL_PROOF_STATUSES.ACCEPTED_FOR_RETRY_SAVE,
+			retrySaveReviewApprovalProofReason: null,
+			retrySaveReviewApprovalAccepted: true,
+			retrySaveReviewApprovalServerVersion: serverVersion,
+			retrySaveReviewApprovalPreviousServerVersion:
+				previousServerVersion,
+			mustOfferLocalCopy: true,
+			canExportLocalUpdates: true,
+		} );
+	}
+
+	let disposition = normalizedCurrent.disposition;
+	let proofStatus =
+		DISTRIBUTED_EDITING_RETRY_SAVE_REVIEW_APPROVAL_PROOF_STATUSES.NONE;
+	let requiresServerStateRefetch = false;
+	let requiresManualConflictResolution =
+		normalizedCurrent.requiresManualConflictResolution;
+
+	switch ( reasonCode ) {
+		case DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED:
+			disposition =
+				DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION;
+			proofStatus =
+				DISTRIBUTED_EDITING_RETRY_SAVE_REVIEW_APPROVAL_PROOF_STATUSES.STALE_BASE_REJECTED;
+			requiresServerStateRefetch = true;
+			requiresManualConflictResolution = false;
+			break;
+
+		case DISTRIBUTED_EDITING_REASON_CODES.REST_CANNOT_EDIT:
+		case DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_REVIEW_APPROVAL_REQUIRES_UNFILTERED_HTML:
+			disposition =
+				DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_PERMISSION_DENIED;
+			proofStatus =
+				DISTRIBUTED_EDITING_RETRY_SAVE_REVIEW_APPROVAL_PROOF_STATUSES.REJECTED_PERMISSION_DENIED;
+			break;
+
+		case DISTRIBUTED_EDITING_REASON_CODES.REST_POST_INVALID_ID:
+			disposition =
+				DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_ROUTE_MISMATCH;
+			proofStatus =
+				DISTRIBUTED_EDITING_RETRY_SAVE_REVIEW_APPROVAL_PROOF_STATUSES.REJECTED_ROUTE_MISMATCH;
+			break;
+
+		case DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_REVIEW_APPROVAL_HASH_MISMATCH:
+		case DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_SYNC_META_TAMPERED:
+			disposition =
+				DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_SYNC_META_TAMPERED;
+			proofStatus =
+				DISTRIBUTED_EDITING_RETRY_SAVE_REVIEW_APPROVAL_PROOF_STATUSES.REJECTED_HASH_MISMATCH;
+			break;
+	}
+
+	if (
+		result === 'hash_mismatch' ||
+		result === 'review_approval_hash_mismatch' ||
+		detail === 'retry_save_review_approval_hash_mismatch'
+	) {
+		disposition =
+			DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_SYNC_META_TAMPERED;
+		proofStatus =
+			DISTRIBUTED_EDITING_RETRY_SAVE_REVIEW_APPROVAL_PROOF_STATUSES.REJECTED_HASH_MISMATCH;
+	}
+
+	return normalizeDistributedEditingSessionState( {
+		...normalizedCurrent,
+		disposition,
+		reasonCode,
+		serverVersion,
+		pendingChangeCount: pendingChangeCount || 1,
+		hasPendingChanges: true,
+		isAwaitingServerConfirmation: true,
+		requiresServerStateRefetch,
+		refetchedServerState: false,
+		requiresManualConflictResolution,
+		...approvalProofFields,
+		retrySaveReviewApprovalProofStatus: proofStatus,
+		retrySaveReviewApprovalProofReason: reasonCode || detail || result,
+		retrySaveReviewApprovalAccepted: false,
+		retrySaveReviewApprovalServerVersion: serverVersion,
+		retrySaveReviewApprovalPreviousServerVersion: previousServerVersion,
+		retrySaveReviewApprovalHashMismatch:
+			approvalProofFields.retrySaveReviewApprovalHashMismatch ||
+			proofStatus ===
+				DISTRIBUTED_EDITING_RETRY_SAVE_REVIEW_APPROVAL_PROOF_STATUSES.REJECTED_HASH_MISMATCH,
+		mustOfferLocalCopy: true,
+		canExportLocalUpdates: true,
+	} );
+}
+
+/**
  * Returns a no-side-effect policy decision for whether a future editor save
  * workflow may call the guarded retry-save endpoint.
  *
@@ -2356,6 +2630,9 @@ function getDistributedEditingRetrySaveDescriptorFields( normalized ) {
 		retrySaveRevisionCreated: normalized.retrySaveRevisionCreated,
 		retrySaveCreatedRevisionIds: normalized.retrySaveCreatedRevisionIds,
 		...getDistributedEditingRetrySaveReviewMetadataFields( normalized ),
+		...getDistributedEditingRetrySaveReviewApprovalProofFields(
+			normalized
+		),
 	};
 }
 
@@ -2405,6 +2682,51 @@ function getDistributedEditingRetrySaveReviewMetadataFields( normalized ) {
 			normalized.retrySaveReviewRawContentIncluded,
 		retrySaveReviewRecoveryActions:
 			normalized.retrySaveReviewRecoveryActions,
+	};
+}
+
+function getDistributedEditingRetrySaveReviewApprovalProofFields(
+	normalized
+) {
+	return {
+		retrySaveReviewApprovalProofStatus:
+			normalized.retrySaveReviewApprovalProofStatus,
+		retrySaveReviewApprovalProofReason:
+			normalized.retrySaveReviewApprovalProofReason,
+		retrySaveReviewApprovalAccepted:
+			normalized.retrySaveReviewApprovalAccepted,
+		retrySaveReviewApprovalServerVersion:
+			normalized.retrySaveReviewApprovalServerVersion,
+		retrySaveReviewApprovalPreviousServerVersion:
+			normalized.retrySaveReviewApprovalPreviousServerVersion,
+		retrySaveReviewApprovalAction:
+			normalized.retrySaveReviewApprovalAction,
+		retrySaveReviewApprovalRequiredCapability:
+			normalized.retrySaveReviewApprovalRequiredCapability,
+		retrySaveReviewApprovalReviewerCapability:
+			normalized.retrySaveReviewApprovalReviewerCapability,
+		retrySaveReviewApprovalScope:
+			normalized.retrySaveReviewApprovalScope,
+		retrySaveReviewApprovalProposedContentHash:
+			normalized.retrySaveReviewApprovalProposedContentHash,
+		retrySaveReviewApprovalCandidateContentHash:
+			normalized.retrySaveReviewApprovalCandidateContentHash,
+		retrySaveReviewApprovalExpectedProposedContentHash:
+			normalized.retrySaveReviewApprovalExpectedProposedContentHash,
+		retrySaveReviewApprovalExpectedCandidateContentHash:
+			normalized.retrySaveReviewApprovalExpectedCandidateContentHash,
+		retrySaveReviewApprovalHashMismatch:
+			normalized.retrySaveReviewApprovalHashMismatch,
+		retrySaveReviewApprovalRawContentIncluded:
+			normalized.retrySaveReviewApprovalRawContentIncluded,
+		retrySaveReviewApprovalSavesPost:
+			normalized.retrySaveReviewApprovalSavesPost,
+		retrySaveReviewApprovalMutatesPostContent:
+			normalized.retrySaveReviewApprovalMutatesPostContent,
+		retrySaveReviewApprovalCreatesRevision:
+			normalized.retrySaveReviewApprovalCreatesRevision,
+		retrySaveReviewApprovalClaimsSaved:
+			normalized.retrySaveReviewApprovalClaimsSaved,
 	};
 }
 
@@ -2627,6 +2949,76 @@ function normalizeRetrySaveReviewMetadataFields( sessionState = {} ) {
 	};
 }
 
+function normalizeRetrySaveReviewApprovalProofFields( sessionState = {} ) {
+	const retrySaveReviewApprovalProofStatus =
+		VALID_RETRY_SAVE_REVIEW_APPROVAL_PROOF_STATUSES.has(
+			sessionState.retrySaveReviewApprovalProofStatus
+		)
+			? sessionState.retrySaveReviewApprovalProofStatus
+			: DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE.retrySaveReviewApprovalProofStatus;
+
+	return {
+		retrySaveReviewApprovalProofStatus,
+		retrySaveReviewApprovalProofReason: normalizeNullableString(
+			sessionState.retrySaveReviewApprovalProofReason
+		),
+		retrySaveReviewApprovalAccepted:
+			Boolean( sessionState.retrySaveReviewApprovalAccepted ) ||
+			retrySaveReviewApprovalProofStatus ===
+				DISTRIBUTED_EDITING_RETRY_SAVE_REVIEW_APPROVAL_PROOF_STATUSES.ACCEPTED_FOR_RETRY_SAVE,
+		retrySaveReviewApprovalServerVersion: normalizeNullableString(
+			sessionState.retrySaveReviewApprovalServerVersion
+		),
+		retrySaveReviewApprovalPreviousServerVersion: normalizeNullableString(
+			sessionState.retrySaveReviewApprovalPreviousServerVersion
+		),
+		retrySaveReviewApprovalAction: normalizeNullableString(
+			sessionState.retrySaveReviewApprovalAction
+		),
+		retrySaveReviewApprovalRequiredCapability: normalizeNullableString(
+			sessionState.retrySaveReviewApprovalRequiredCapability
+		),
+		retrySaveReviewApprovalReviewerCapability: normalizeNullableString(
+			sessionState.retrySaveReviewApprovalReviewerCapability
+		),
+		retrySaveReviewApprovalScope: normalizeNullableString(
+			sessionState.retrySaveReviewApprovalScope
+		),
+		retrySaveReviewApprovalProposedContentHash: normalizeNullableString(
+			sessionState.retrySaveReviewApprovalProposedContentHash
+		),
+		retrySaveReviewApprovalCandidateContentHash: normalizeNullableString(
+			sessionState.retrySaveReviewApprovalCandidateContentHash
+		),
+		retrySaveReviewApprovalExpectedProposedContentHash:
+			normalizeNullableString(
+				sessionState.retrySaveReviewApprovalExpectedProposedContentHash
+			),
+		retrySaveReviewApprovalExpectedCandidateContentHash:
+			normalizeNullableString(
+				sessionState.retrySaveReviewApprovalExpectedCandidateContentHash
+			),
+		retrySaveReviewApprovalHashMismatch: Boolean(
+			sessionState.retrySaveReviewApprovalHashMismatch
+		),
+		retrySaveReviewApprovalRawContentIncluded: Boolean(
+			sessionState.retrySaveReviewApprovalRawContentIncluded
+		),
+		retrySaveReviewApprovalSavesPost: Boolean(
+			sessionState.retrySaveReviewApprovalSavesPost
+		),
+		retrySaveReviewApprovalMutatesPostContent: Boolean(
+			sessionState.retrySaveReviewApprovalMutatesPostContent
+		),
+		retrySaveReviewApprovalCreatesRevision: Boolean(
+			sessionState.retrySaveReviewApprovalCreatesRevision
+		),
+		retrySaveReviewApprovalClaimsSaved: Boolean(
+			sessionState.retrySaveReviewApprovalClaimsSaved
+		),
+	};
+}
+
 function getRetrySaveReviewMetadataFromResponseOrError(
 	responseOrError = {},
 	responseData = {}
@@ -2840,6 +3232,203 @@ function getRetrySaveReviewMetadataFromResponseOrError(
 			responseData.recoveryActions,
 			responseData.recovery_actions
 		),
+	} );
+}
+
+function getRetrySaveReviewApprovalProofFieldsFromResponseOrError(
+	responseOrError = {},
+	responseData = {},
+	currentSessionState = {}
+) {
+	const approvalContract = normalizeObject(
+		getFirstDefined(
+			responseOrError.reviewApprovalContract,
+			responseOrError.review_approval_contract,
+			responseOrError.approvalContract,
+			responseOrError.approval_contract,
+			responseData.reviewApprovalContract,
+			responseData.review_approval_contract,
+			responseData.approvalContract,
+			responseData.approval_contract
+		)
+	);
+	const reviewContract = normalizeObject(
+		getFirstDefined(
+			responseOrError.reviewContract,
+			responseOrError.review_contract,
+			responseData.reviewContract,
+			responseData.review_contract
+		)
+	);
+	const approvalSavesPost = Boolean(
+		getFirstDefined(
+			responseOrError.savesPost,
+			responseOrError.saves_post,
+			responseData.savesPost,
+			responseData.saves_post,
+			approvalContract.savesPost,
+			approvalContract.saves_post
+		)
+	);
+	const approvalMutatesPostContent = Boolean(
+		getFirstDefined(
+			responseOrError.mutatesPostContent,
+			responseOrError.mutates_post_content,
+			responseData.mutatesPostContent,
+			responseData.mutates_post_content,
+			approvalContract.mutatesPostContent,
+			approvalContract.mutates_post_content
+		)
+	);
+	const approvalCreatesRevision = Boolean(
+		getFirstDefined(
+			responseOrError.createsRevision,
+			responseOrError.creates_revision,
+			responseData.createsRevision,
+			responseData.creates_revision,
+			approvalContract.createsRevision,
+			approvalContract.creates_revision
+		)
+	);
+	const approvalClaimsSaved = Boolean(
+		getFirstDefined(
+			responseOrError.claimsSaved,
+			responseOrError.claims_saved,
+			responseData.claimsSaved,
+			responseData.claims_saved,
+			approvalContract.claimsSaved,
+			approvalContract.claims_saved
+		)
+	);
+
+	return normalizeRetrySaveReviewApprovalProofFields( {
+		retrySaveReviewApprovalAction: getFirstDefined(
+			responseOrError.approvalAction,
+			responseOrError.approval_action,
+			responseData.approvalAction,
+			responseData.approval_action,
+			approvalContract.approvalAction,
+			approvalContract.approval_action,
+			responseOrError.reviewAction,
+			responseOrError.review_action,
+			responseData.reviewAction,
+			responseData.review_action,
+			approvalContract.reviewAction,
+			approvalContract.review_action,
+			reviewContract.reviewAction,
+			reviewContract.review_action,
+			currentSessionState.retrySaveReviewAction
+		),
+		retrySaveReviewApprovalRequiredCapability: getFirstDefined(
+			responseOrError.reviewRequiredCapability,
+			responseOrError.review_required_capability,
+			responseData.reviewRequiredCapability,
+			responseData.review_required_capability,
+			approvalContract.reviewRequiredCapability,
+			approvalContract.review_required_capability,
+			reviewContract.reviewRequiredCapability,
+			reviewContract.review_required_capability,
+			currentSessionState.retrySaveReviewRequiredCapability
+		),
+		retrySaveReviewApprovalReviewerCapability: getFirstDefined(
+			responseOrError.reviewerCapability,
+			responseOrError.reviewer_capability,
+			responseData.reviewerCapability,
+			responseData.reviewer_capability,
+			approvalContract.reviewerCapability,
+			approvalContract.reviewer_capability,
+			reviewContract.reviewerCapability,
+			reviewContract.reviewer_capability,
+			currentSessionState.retrySaveReviewerCapability
+		),
+		retrySaveReviewApprovalScope: getFirstDefined(
+			responseOrError.reviewScope,
+			responseOrError.review_scope,
+			responseData.reviewScope,
+			responseData.review_scope,
+			approvalContract.reviewScope,
+			approvalContract.review_scope,
+			reviewContract.reviewScope,
+			reviewContract.review_scope,
+			currentSessionState.retrySaveReviewScope
+		),
+		retrySaveReviewApprovalProposedContentHash: getFirstDefined(
+			responseOrError.proposedPostContentHash,
+			responseOrError.proposed_post_content_hash,
+			responseOrError.proposedContentHash,
+			responseOrError.proposed_content_hash,
+			responseData.proposedPostContentHash,
+			responseData.proposed_post_content_hash,
+			responseData.proposedContentHash,
+			responseData.proposed_content_hash,
+			approvalContract.proposedPostContentHash,
+			approvalContract.proposed_post_content_hash,
+			approvalContract.proposedContentHash,
+			approvalContract.proposed_content_hash,
+			reviewContract.proposedContentHash,
+			reviewContract.proposed_content_hash,
+			currentSessionState.retrySaveReviewProposedContentHash
+		),
+		retrySaveReviewApprovalCandidateContentHash: getFirstDefined(
+			responseOrError.candidatePostContentHash,
+			responseOrError.candidate_post_content_hash,
+			responseOrError.candidateContentHash,
+			responseOrError.candidate_content_hash,
+			responseData.candidatePostContentHash,
+			responseData.candidate_post_content_hash,
+			responseData.candidateContentHash,
+			responseData.candidate_content_hash,
+			approvalContract.candidatePostContentHash,
+			approvalContract.candidate_post_content_hash,
+			approvalContract.candidateContentHash,
+			approvalContract.candidate_content_hash,
+			reviewContract.candidateContentHash,
+			reviewContract.candidate_content_hash,
+			currentSessionState.retrySaveReviewCandidateContentHash
+		),
+		retrySaveReviewApprovalExpectedProposedContentHash: getFirstDefined(
+			responseOrError.expectedProposedPostContentHash,
+			responseOrError.expected_proposed_post_content_hash,
+			responseOrError.expectedPostContentHash,
+			responseOrError.expected_post_content_hash,
+			responseData.expectedProposedPostContentHash,
+			responseData.expected_proposed_post_content_hash,
+			responseData.expectedPostContentHash,
+			responseData.expected_post_content_hash,
+			approvalContract.expectedProposedPostContentHash,
+			approvalContract.expected_proposed_post_content_hash,
+			approvalContract.expectedPostContentHash,
+			approvalContract.expected_post_content_hash
+		),
+		retrySaveReviewApprovalExpectedCandidateContentHash: getFirstDefined(
+			responseOrError.expectedCandidatePostContentHash,
+			responseOrError.expected_candidate_post_content_hash,
+			responseData.expectedCandidatePostContentHash,
+			responseData.expected_candidate_post_content_hash,
+			approvalContract.expectedCandidatePostContentHash,
+			approvalContract.expected_candidate_post_content_hash
+		),
+		retrySaveReviewApprovalHashMismatch: getFirstDefined(
+			responseOrError.hashMismatch,
+			responseOrError.hash_mismatch,
+			responseData.hashMismatch,
+			responseData.hash_mismatch,
+			approvalContract.hashMismatch,
+			approvalContract.hash_mismatch
+		),
+		retrySaveReviewApprovalRawContentIncluded: getFirstDefined(
+			responseOrError.rawContentIncluded,
+			responseOrError.raw_content_included,
+			responseData.rawContentIncluded,
+			responseData.raw_content_included,
+			approvalContract.rawContentIncluded,
+			approvalContract.raw_content_included
+		),
+		retrySaveReviewApprovalSavesPost: approvalSavesPost,
+		retrySaveReviewApprovalMutatesPostContent:
+			approvalMutatesPostContent,
+		retrySaveReviewApprovalCreatesRevision: approvalCreatesRevision,
+		retrySaveReviewApprovalClaimsSaved: approvalClaimsSaved,
 	} );
 }
 

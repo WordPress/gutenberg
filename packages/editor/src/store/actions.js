@@ -27,6 +27,7 @@ import { localAutosaveSet } from './local-autosave';
 import {
 	__experimentalRequestDistributedEditingRecoveryDryRun as requestDistributedEditingRecoveryDryRun,
 	__experimentalRequestDistributedEditingRetrySave as requestDistributedEditingRetrySave,
+	__experimentalRequestDistributedEditingRetrySaveReviewApprovalProof as requestDistributedEditingRetrySaveReviewApprovalProof,
 	__experimentalRequestDistributedEditingRetrySubmitProbe as requestDistributedEditingRetrySubmitProbe,
 	__experimentalRequestDistributedEditingServerStateRefetch as requestDistributedEditingServerStateRefetch,
 	__experimentalRequestDistributedEditingStaleBaseRejection as requestDistributedEditingStaleBaseRejection,
@@ -35,6 +36,7 @@ import {
 import {
 	getDistributedEditingSessionStateForRecoveryDryRunResult,
 	getDistributedEditingSessionStateForRetrySaveHandoff,
+	getDistributedEditingSessionStateForRetrySaveReviewApprovalProofResult,
 	getDistributedEditingSessionStateForRetrySaveRequest,
 	getDistributedEditingSessionStateForRetrySaveResult,
 	getDistributedEditingSessionStateForRetrySubmitHandoff,
@@ -572,6 +574,109 @@ export const __experimentalPrepareDistributedEditingRetrySubmitSaveAfterProof =
 			claimsSaved: false,
 			sessionState,
 		};
+	};
+
+/**
+ * Requests retry-save reviewer approval proof and stores inert proof state.
+ *
+ * The action sends only version, capability, scope, and hash evidence. It does
+ * not call normal save, call retry-save, mutate editor content, dispatch
+ * notices, persist editor state, create revisions, claim saved, or change post
+ * locks.
+ *
+ * @param {Object} [options] Request options.
+ *
+ * @return {Function} Action thunk.
+ */
+export const __experimentalRefreshDistributedEditingRetrySaveReviewApprovalProof =
+	( options = {} ) =>
+	async ( { select, dispatch, registry } ) => {
+		const currentPost = select.getCurrentPost?.() || {};
+		const postType = options.postType || currentPost.type;
+		const postId = options.postId ?? currentPost.id;
+		const postTypeRecord = postType
+			? registry.select( coreStore ).getPostType( postType )
+			: null;
+		const restBase =
+			options.restBase ||
+			postTypeRecord?.rest_base ||
+			DISTRIBUTED_EDITING_RECOVERY_REST_BASE;
+		const currentSessionState =
+			select.getDistributedEditingSessionState?.() || {};
+		const requestArgs = {
+			postId,
+			restBase,
+			clientBaseVersion:
+				options.clientBaseVersion ??
+				currentSessionState.serverVersion ??
+				currentSessionState.clientBaseVersion,
+			acceptedProofServerVersion:
+				options.acceptedProofServerVersion ??
+				options.reviewedServerVersion ??
+				currentSessionState.retrySaveServerVersion ??
+				currentSessionState.serverVersion,
+			pendingChangeCount:
+				options.pendingChangeCount ??
+				currentSessionState.pendingChangeCount,
+			reviewAction:
+				options.reviewAction ??
+				currentSessionState.retrySaveReviewAction,
+			reviewRequiredCapability:
+				options.reviewRequiredCapability ??
+				currentSessionState.retrySaveReviewRequiredCapability,
+			reviewerCapability:
+				options.reviewerCapability ??
+				currentSessionState.retrySaveReviewerCapability,
+			reviewScope:
+				options.reviewScope ??
+				currentSessionState.retrySaveReviewScope,
+			proposedPostContentHash:
+				options.proposedPostContentHash ??
+				currentSessionState.retrySaveReviewProposedContentHash,
+			reviewedProposedPostContentHash:
+				options.reviewedProposedPostContentHash ??
+				options.proposedPostContentHash ??
+				currentSessionState.retrySaveReviewProposedContentHash,
+			candidatePostContentHash:
+				options.candidatePostContentHash ??
+				currentSessionState.retrySaveReviewCandidateContentHash,
+			reviewedCandidatePostContentHash:
+				options.reviewedCandidatePostContentHash ??
+				options.candidatePostContentHash ??
+				currentSessionState.retrySaveReviewCandidateContentHash,
+			filteredProposedPostContentHash:
+				options.filteredProposedPostContentHash ??
+				currentSessionState.retrySaveReviewFilteredProposedContentHash,
+			filteredCandidatePostContentHash:
+				options.filteredCandidatePostContentHash ??
+				currentSessionState.retrySaveReviewFilteredCandidateContentHash,
+			reviewApprovalProof: options.reviewApprovalProof,
+		};
+
+		try {
+			const response =
+				await requestDistributedEditingRetrySaveReviewApprovalProof(
+					requestArgs
+				);
+
+			dispatch.setDistributedEditingSessionState(
+				getDistributedEditingSessionStateForRetrySaveReviewApprovalProofResult(
+					response,
+					currentSessionState
+				)
+			);
+
+			return response;
+		} catch ( error ) {
+			dispatch.setDistributedEditingSessionState(
+				getDistributedEditingSessionStateForRetrySaveReviewApprovalProofResult(
+					error,
+					currentSessionState
+				)
+			);
+
+			throw error;
+		}
 	};
 
 /**

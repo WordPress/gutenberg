@@ -23,6 +23,7 @@ import {
 	DISTRIBUTED_EDITING_RETRY_SAVE_HANDOFF_STATUSES,
 	DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS,
 	DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_STATUSES,
+	DISTRIBUTED_EDITING_RETRY_SAVE_REVIEW_APPROVAL_PROOF_STATUSES,
 	DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES,
 	DISTRIBUTED_EDITING_UNLOAD_WARNING_REASONS,
 	DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE,
@@ -32,6 +33,7 @@ import {
 	getDistributedEditingStaleBaseLocalRebaseResult,
 	getDistributedEditingSessionStateForRetrySaveHandoff,
 	getDistributedEditingSessionStateForRetrySaveRequest,
+	getDistributedEditingSessionStateForRetrySaveReviewApprovalProofResult,
 	getDistributedEditingSessionStateForRetrySaveResult,
 	getDistributedEditingSessionStateForRetrySubmitHandoff,
 	getDistributedEditingSessionStateForRetrySubmitProofResult,
@@ -220,6 +222,26 @@ describe( 'distributed editing session state', () => {
 			retrySaveReviewFilteredCandidateContentHash: null,
 			retrySaveReviewRawContentIncluded: false,
 			retrySaveReviewRecoveryActions: [],
+			retrySaveReviewApprovalProofStatus:
+				DISTRIBUTED_EDITING_RETRY_SAVE_REVIEW_APPROVAL_PROOF_STATUSES.NONE,
+			retrySaveReviewApprovalProofReason: null,
+			retrySaveReviewApprovalAccepted: false,
+			retrySaveReviewApprovalServerVersion: null,
+			retrySaveReviewApprovalPreviousServerVersion: null,
+			retrySaveReviewApprovalAction: null,
+			retrySaveReviewApprovalRequiredCapability: null,
+			retrySaveReviewApprovalReviewerCapability: null,
+			retrySaveReviewApprovalScope: null,
+			retrySaveReviewApprovalProposedContentHash: null,
+			retrySaveReviewApprovalCandidateContentHash: null,
+			retrySaveReviewApprovalExpectedProposedContentHash: null,
+			retrySaveReviewApprovalExpectedCandidateContentHash: null,
+			retrySaveReviewApprovalHashMismatch: false,
+			retrySaveReviewApprovalRawContentIncluded: false,
+			retrySaveReviewApprovalSavesPost: false,
+			retrySaveReviewApprovalMutatesPostContent: false,
+			retrySaveReviewApprovalCreatesRevision: false,
+			retrySaveReviewApprovalClaimsSaved: false,
 			requiresManualConflictResolution: false,
 			mustOfferLocalCopy: true,
 			canExportLocalUpdates: true,
@@ -1418,6 +1440,136 @@ describe( 'distributed editing session state', () => {
 				} ),
 			] )
 		);
+	} );
+
+	it( 'normalizes accepted retry-save review approval proof without saving', () => {
+		const proposedContentHash = 'sha256:review-approval-proposed';
+		const candidateContentHash = 'sha256:review-approval-candidate';
+		const normalized =
+			getDistributedEditingSessionStateForRetrySaveReviewApprovalProofResult(
+				{
+					result: 'review_approval_accepted_for_retry_save',
+					review_approval_accepted: true,
+					server_version: '12',
+					pending_change_count: 2,
+					approval_action: 'retry_save_with_reviewer_approval',
+					review_action: 'request_unfiltered_html_reviewer',
+					review_required_capability: 'unfiltered_html',
+					reviewer_capability: 'unfiltered_html',
+					review_scope: 'collaborative_post_content',
+					proposed_post_content_hash: proposedContentHash,
+					candidate_post_content_hash: candidateContentHash,
+					raw_content_included: false,
+					saves_post: false,
+					mutates_post_content: false,
+					creates_revision: false,
+					claims_saved: false,
+				},
+				{
+					serverVersion: '12',
+					pendingChangeCount: 2,
+					hasPendingChanges: true,
+					retrySaveReviewAction:
+						'request_unfiltered_html_reviewer',
+					retrySaveReviewRequiredCapability: 'unfiltered_html',
+					retrySaveReviewerCapability: 'unfiltered_html',
+					retrySaveReviewScope: 'collaborative_post_content',
+				}
+			);
+
+		expect( normalized ).toMatchObject( {
+			disposition: DISTRIBUTED_EDITING_DISPOSITIONS.IDLE,
+			reasonCode: null,
+			pendingChangeCount: 2,
+			hasPendingChanges: true,
+			isAwaitingServerConfirmation: true,
+			retrySaveReviewApprovalProofStatus:
+				DISTRIBUTED_EDITING_RETRY_SAVE_REVIEW_APPROVAL_PROOF_STATUSES.ACCEPTED_FOR_RETRY_SAVE,
+			retrySaveReviewApprovalAccepted: true,
+			retrySaveReviewApprovalServerVersion: '12',
+			retrySaveReviewApprovalAction:
+				'retry_save_with_reviewer_approval',
+			retrySaveReviewApprovalRequiredCapability: 'unfiltered_html',
+			retrySaveReviewApprovalReviewerCapability: 'unfiltered_html',
+			retrySaveReviewApprovalScope: 'collaborative_post_content',
+			retrySaveReviewApprovalProposedContentHash:
+				proposedContentHash,
+			retrySaveReviewApprovalCandidateContentHash:
+				candidateContentHash,
+			retrySaveReviewApprovalRawContentIncluded: false,
+			retrySaveReviewApprovalSavesPost: false,
+			retrySaveReviewApprovalMutatesPostContent: false,
+			retrySaveReviewApprovalCreatesRevision: false,
+			retrySaveReviewApprovalClaimsSaved: false,
+			mustOfferLocalCopy: true,
+			canExportLocalUpdates: true,
+		} );
+		expect( normalized.retrySaveStatus ).toBe(
+			DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.NONE
+		);
+		expect( JSON.stringify( normalized ) ).not.toContain(
+			'raw-review-approval-content'
+		);
+	} );
+
+	it( 'normalizes retry-save review approval rejections while preserving local changes', () => {
+		const stale =
+			getDistributedEditingSessionStateForRetrySaveReviewApprovalProofResult(
+				{
+					code: DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+					data: {
+						reason_code:
+							DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+						server_version: '13',
+						pending_change_count: 2,
+						raw_content_included: false,
+					},
+				},
+				{
+					serverVersion: '12',
+					pendingChangeCount: 2,
+					hasPendingChanges: true,
+				}
+			);
+		const permissionDenied =
+			getDistributedEditingSessionStateForRetrySaveReviewApprovalProofResult(
+				{
+					code: DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_REVIEW_APPROVAL_REQUIRES_UNFILTERED_HTML,
+					data: {
+						reason_code:
+							DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_REVIEW_APPROVAL_REQUIRES_UNFILTERED_HTML,
+						pending_change_count: 2,
+						raw_content_included: false,
+					},
+				},
+				{
+					serverVersion: '12',
+					pendingChangeCount: 2,
+					hasPendingChanges: true,
+				}
+			);
+
+		expect( stale ).toMatchObject( {
+			disposition:
+				DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+			retrySaveReviewApprovalProofStatus:
+				DISTRIBUTED_EDITING_RETRY_SAVE_REVIEW_APPROVAL_PROOF_STATUSES.STALE_BASE_REJECTED,
+			requiresServerStateRefetch: true,
+			canExportLocalUpdates: true,
+			retrySaveReviewApprovalSavesPost: false,
+			retrySaveReviewApprovalRawContentIncluded: false,
+		} );
+		expect( permissionDenied ).toMatchObject( {
+			disposition:
+				DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_PERMISSION_DENIED,
+			reasonCode:
+				DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_REVIEW_APPROVAL_REQUIRES_UNFILTERED_HTML,
+			retrySaveReviewApprovalProofStatus:
+				DISTRIBUTED_EDITING_RETRY_SAVE_REVIEW_APPROVAL_PROOF_STATUSES.REJECTED_PERMISSION_DENIED,
+			canExportLocalUpdates: true,
+			retrySaveReviewApprovalSavesPost: false,
+			retrySaveReviewApprovalRawContentIncluded: false,
+		} );
 	} );
 
 	it( 'marks guarded retry-save policy ready only after accepted proof and save preparation', () => {

@@ -9,11 +9,13 @@ import apiFetch from '@wordpress/api-fetch';
 import {
 	__experimentalRequestDistributedEditingRecoveryDryRun,
 	__experimentalRequestDistributedEditingRetrySave,
+	__experimentalRequestDistributedEditingRetrySaveReviewApprovalProof,
 	__experimentalRequestDistributedEditingRetrySubmitProbe,
 	__experimentalRequestDistributedEditingServerStateRefetch,
 	__experimentalRequestDistributedEditingStaleBaseRejection,
 	getDistributedEditingRecoveryEndpointPath,
 	getDistributedEditingRetrySaveEndpointPath,
+	getDistributedEditingRetrySaveReviewApprovalEndpointPath,
 	getDistributedEditingRetrySubmitEndpointPath,
 	getDistributedEditingServerStateEndpointPath,
 	getDistributedEditingStaleBaseEndpointPath,
@@ -61,6 +63,15 @@ describe( 'distributed editing REST helpers', () => {
 				restBase: 'pages',
 			} )
 		).toBe( '/wp/v2/pages/42/distributed-editing/retry-save' );
+	} );
+
+	it( 'builds the current retry-save review approval endpoint path', () => {
+		expect(
+			getDistributedEditingRetrySaveReviewApprovalEndpointPath( {
+				postId: 42,
+				restBase: 'pages',
+			} )
+		).toBe( '/wp/v2/pages/42/distributed-editing/review-approval' );
 	} );
 
 	it( 'builds the current server-state endpoint path', () => {
@@ -290,6 +301,61 @@ describe( 'distributed editing REST helpers', () => {
 		).resolves.toEqual( {
 			result: 'retry_save_applied',
 			retry_save_accepted: true,
+		} );
+	} );
+
+	it( 'requests retry-save review approval with hash-only evidence', async () => {
+		const proposedHash =
+			'0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef';
+		const candidateHash =
+			'abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789';
+
+		apiFetch.setFetchHandler( async ( options ) => {
+			expect( options.path ).toMatch(
+				/^\/wp\/v2\/pages\/42\/distributed-editing\/review-approval/
+			);
+			expect( options.method ).toBe( 'POST' );
+			expect( options.data ).toEqual( {
+				client_base_version: '11',
+				accepted_proof_server_version: '11',
+				pending_change_count: 2,
+				review_action: 'request_unfiltered_html_reviewer',
+				review_required_capability: 'unfiltered_html',
+				reviewer_capability: 'unfiltered_html',
+				review_scope: 'collaborative_post_content',
+				proposed_post_content_hash: proposedHash,
+				reviewed_proposed_content_hash: proposedHash,
+				candidate_post_content_hash: candidateHash,
+				reviewed_candidate_content_hash: candidateHash,
+			} );
+			expect( options.data.proposed_post_content ).toBeUndefined();
+			expect( options.data.raw_content ).toBeUndefined();
+
+			return {
+				result: 'review_approval_accepted_for_retry_save',
+				review_approval_accepted: true,
+			};
+		} );
+
+		await expect(
+			__experimentalRequestDistributedEditingRetrySaveReviewApprovalProof(
+				{
+					postId: 42,
+					restBase: 'pages',
+					clientBaseVersion: '11',
+					acceptedProofServerVersion: '11',
+					pendingChangeCount: 2,
+					reviewAction: 'request_unfiltered_html_reviewer',
+					reviewRequiredCapability: 'unfiltered_html',
+					reviewerCapability: 'unfiltered_html',
+					reviewScope: 'collaborative_post_content',
+					proposedPostContentHash: proposedHash,
+					candidatePostContentHash: candidateHash,
+				}
+			)
+		).resolves.toEqual( {
+			result: 'review_approval_accepted_for_retry_save',
+			review_approval_accepted: true,
 		} );
 	} );
 
