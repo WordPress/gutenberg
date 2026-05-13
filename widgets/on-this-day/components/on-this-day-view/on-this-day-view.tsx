@@ -10,7 +10,8 @@ import { decodeEntities } from '@wordpress/html-entities';
 import { humanTimeDiff } from '@wordpress/date';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { calendar } from '@wordpress/icons';
-import { EmptyState, Link, Stack, Text } from '@wordpress/ui';
+// eslint-disable-next-line @wordpress/use-recommended-components
+import { EmptyState, Link, Stack, Text, Button } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -68,7 +69,7 @@ export function OnThisDayView( {
 
 	if ( ! post ) {
 		return (
-			<EmptyState.Root className={ styles.noPostsToday }>
+			<EmptyState.Root className={ styles[ 'no-posts-today' ] }>
 				<EmptyState.Icon icon={ calendar } />
 				<EmptyState.Title>
 					{ __( 'Nothing on this day yet' ) }
@@ -76,6 +77,10 @@ export function OnThisDayView( {
 				<EmptyState.Description>
 					{ __( 'No posts published on this date in past years.' ) }
 				</EmptyState.Description>
+
+				<EmptyState.Actions>
+					<Button>{ __( 'Add a post' ) }</Button>
+				</EmptyState.Actions>
 			</EmptyState.Root>
 		);
 	}
@@ -104,7 +109,7 @@ export function OnThisDayView( {
 			) }
 			style={ containerStyle }
 		>
-			<Stack direction="column" gap="xs" className={ styles.content }>
+			<Stack direction="column" gap="xs" className={ styles.header }>
 				<Text variant="heading-md">{ relativeTime }</Text>
 				<Text variant="heading-xl" className={ styles[ 'post-title' ] }>
 					<Link
