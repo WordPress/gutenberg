@@ -68,6 +68,38 @@ function gutenberg_get_state_style_with_fallback_border_styles( $style ) {
 }
 
 /**
+ * Returns border-style properties explicitly set by the state style object.
+ *
+ * The fallback border style is generated later, so only styles present in the
+ * raw state style should be treated as authored declarations that need to win
+ * over base block styles.
+ *
+ * @param array $style State style object that may contain border style values.
+ * @return array CSS border-style property names explicitly set by the state.
+ */
+function gutenberg_get_authored_state_border_style_properties( $style ) {
+	if ( ! is_array( $style ) || empty( $style['border'] ) || ! is_array( $style['border'] ) ) {
+		return array();
+	}
+
+	$border     = $style['border'];
+	$properties = array();
+
+	if ( isset( $border['style'] ) && '' !== $border['style'] ) {
+		$properties[] = 'border-style';
+	}
+
+	$sides = array( 'top', 'right', 'bottom', 'left' );
+	foreach ( $sides as $side ) {
+		if ( isset( $border[ $side ]['style'] ) && '' !== $border[ $side ]['style'] ) {
+			$properties[] = "border-$side-style";
+		}
+	}
+
+	return $properties;
+}
+
+/**
  * Converts internal preset references to CSS custom property references.
  *
  * State styles are emitted as CSS rules and cannot rely on preset classnames.
@@ -137,13 +169,15 @@ function gutenberg_render_block_states_support( $block_content, $block ) {
 			continue;
 		}
 
-		$compiled = wp_style_engine_get_styles(
+		$authored_border_style_properties = gutenberg_get_authored_state_border_style_properties( $style[ $state ] );
+		$compiled                         = wp_style_engine_get_styles(
 			gutenberg_normalize_state_style_for_css_output( $style[ $state ] )
 		);
 		if ( ! empty( $compiled['declarations'] ) ) {
 			$css_rules[] = array(
-				'state'        => $state,
-				'declarations' => $compiled['declarations'],
+				'state'                            => $state,
+				'declarations'                     => $compiled['declarations'],
+				'authored_border_style_properties' => $authored_border_style_properties,
 			);
 		}
 	}
@@ -174,6 +208,11 @@ function gutenberg_render_block_states_support( $block_content, $block ) {
 		'border-right-width',
 		'border-bottom-width',
 		'border-left-width',
+		'border-style',
+		'border-top-style',
+		'border-right-style',
+		'border-bottom-style',
+		'border-left-style',
 		'background',
 		'font-size',
 		'font-family',
@@ -183,7 +222,9 @@ function gutenberg_render_block_states_support( $block_content, $block ) {
 	foreach ( $css_rules as $rule ) {
 		$declarations = array();
 		foreach ( $rule['declarations'] as $property => $value ) {
-			$declarations[ $property ] = in_array( $property, $preset_class_properties, true )
+			$is_border_style_property  = preg_match( '/^border(?:-(?:top|right|bottom|left))?-style$/', $property );
+			$is_fallback_border_style  = $is_border_style_property && ! in_array( $property, $rule['authored_border_style_properties'], true );
+			$declarations[ $property ] = in_array( $property, $preset_class_properties, true ) && ! $is_fallback_border_style
 				? $value . ' !important'
 				: $value;
 		}

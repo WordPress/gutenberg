@@ -65,13 +65,15 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 	private function build_expected_state_output( $state_styles ) {
 		$css_rules = array();
 		foreach ( $state_styles as $state => $style ) {
-			$compiled = wp_style_engine_get_styles(
+			$authored_border_style_properties = gutenberg_get_authored_state_border_style_properties( $style );
+			$compiled                         = wp_style_engine_get_styles(
 				gutenberg_normalize_state_style_for_css_output( $style )
 			);
 			if ( ! empty( $compiled['declarations'] ) ) {
 				$css_rules[] = array(
-					'state'        => $state,
-					'declarations' => $compiled['declarations'],
+					'state'                            => $state,
+					'declarations'                     => $compiled['declarations'],
+					'authored_border_style_properties' => $authored_border_style_properties,
 				);
 			}
 		}
@@ -134,6 +136,32 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 					'left'   => null,
 				),
 			),
+			$actual
+		);
+	}
+
+	/**
+	 * Tests that authored border-style properties are detected before fallbacks are added.
+	 *
+	 * @covers ::gutenberg_get_authored_state_border_style_properties
+	 */
+	public function test_gets_authored_state_border_style_properties() {
+		$actual = gutenberg_get_authored_state_border_style_properties(
+			array(
+				'border' => array(
+					'style' => 'solid',
+					'top'   => array(
+						'style' => 'dashed',
+					),
+					'right' => array(
+						'width' => '2px',
+					),
+				),
+			)
+		);
+
+		$this->assertSame(
+			array( 'border-style', 'border-top-style' ),
 			$actual
 		);
 	}
@@ -437,6 +465,44 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 		$actual_stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) );
 		$this->assertStringContainsString(
 			'border-width:2px !important;',
+			$actual_stylesheet
+		);
+		$this->assertStringContainsString(
+			'border-style:solid;',
+			$actual_stylesheet
+		);
+		$this->assertStringNotContainsString(
+			'border-style:solid !important;',
+			$actual_stylesheet
+		);
+	}
+
+	/**
+	 * Tests that explicitly-authored hover border style declarations use !important.
+	 *
+	 * @covers ::gutenberg_render_block_states_support
+	 */
+	public function test_hover_authored_border_style_generates_important_css_declaration() {
+		$this->ensure_block_registered( 'core/navigation-link' );
+
+		$block_content = '<div class="wp-block-test">Hello</div>';
+		$state_styles  = array(
+			':hover' => array(
+				'border' => array(
+					'style' => 'solid',
+				),
+			),
+		);
+		$block         = array(
+			'blockName' => 'core/navigation-link',
+			'attrs'     => array( 'style' => $state_styles ),
+		);
+
+		gutenberg_render_block_states_support( $block_content, $block );
+		$actual_stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) );
+
+		$this->assertStringContainsString(
+			'border-style:solid !important;',
 			$actual_stylesheet
 		);
 	}
