@@ -16,10 +16,6 @@ import {
 	getResolvedRefValue,
 	getResolvedValue,
 } from '../utils/common';
-import {
-	getBorderWithFallbackStyle,
-	getStyleWithFallbackBorderStyles,
-} from '../utils/border';
 
 describe( 'editor utils', () => {
 	const themeJson: GlobalStylesConfig = {
@@ -105,78 +101,6 @@ describe( 'editor utils', () => {
 			],
 		},
 	};
-
-	describe( 'getBorderWithFallbackStyle', () => {
-		it( 'adds solid style when border color is set', () => {
-			expect(
-				getBorderWithFallbackStyle( { color: '#000000' } )
-			).toEqual( {
-				color: '#000000',
-				style: 'solid',
-			} );
-		} );
-
-		it( 'adds solid style when border width is set', () => {
-			expect( getBorderWithFallbackStyle( { width: '2px' } ) ).toEqual( {
-				width: '2px',
-				style: 'solid',
-			} );
-		} );
-
-		it( 'preserves existing border style', () => {
-			expect(
-				getBorderWithFallbackStyle( {
-					color: '#000000',
-					style: 'dashed',
-				} )
-			).toEqual( {
-				color: '#000000',
-				style: 'dashed',
-			} );
-		} );
-
-		it( 'removes style-only borders when configured', () => {
-			expect(
-				getBorderWithFallbackStyle(
-					{ style: 'solid' },
-					{ removeStyleOnly: true }
-				)
-			).toBeUndefined();
-		} );
-
-		it( 'normalizes split borders', () => {
-			expect(
-				getBorderWithFallbackStyle( {
-					top: { width: '2px' },
-					right: { color: '#000000', style: 'dotted' },
-				} )
-			).toEqual( {
-				top: { width: '2px', style: 'solid' },
-				right: { color: '#000000', style: 'dotted' },
-				bottom: undefined,
-				left: undefined,
-			} );
-		} );
-	} );
-
-	describe( 'getStyleWithFallbackBorderStyles', () => {
-		it( 'normalizes the border object on a style object', () => {
-			expect(
-				getStyleWithFallbackBorderStyles( {
-					border: { color: '#000000' },
-					color: { text: '#ffffff' },
-				} )
-			).toEqual( {
-				border: { color: '#000000', style: 'solid' },
-				color: { text: '#ffffff' },
-			} );
-		} );
-
-		it( 'returns styles without border unchanged', () => {
-			const style = { color: { text: '#ffffff' } };
-			expect( getStyleWithFallbackBorderStyles( style ) ).toBe( style );
-		} );
-	} );
 
 	describe( 'getValueFromVariable', () => {
 		describe( 'when provided an invalid variable', () => {

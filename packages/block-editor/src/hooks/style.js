@@ -17,7 +17,6 @@ import {
 } from '@wordpress/blocks';
 import { useInstanceId } from '@wordpress/compose';
 import { getCSSRules, compileCSS } from '@wordpress/style-engine';
-import { getStyleWithFallbackBorderStyles } from '@wordpress/global-styles-engine';
 
 /**
  * Internal dependencies
@@ -385,12 +384,7 @@ function BlockStyleControls( {
 		}
 
 		const selector = buildCanvasStateSelector( clientId, name );
-		const css = compileCSS(
-			getStyleWithFallbackBorderStyles( stateValue ),
-			{
-				selector,
-			}
-		);
+		const css = compileCSS( stateValue, { selector } );
 		// Use !important to override utility classes (e.g. has-accent-3-color)
 		// that the block's default color support generates with !important.
 		return css ? css.replace( /;/g, ' !important;' ) : undefined;
@@ -594,10 +588,10 @@ function useBlockProps( { name, style } ) {
 					// State styles use !important to override utility classes
 					// like .has-accent-3-background-color which the block's
 					// default color support generates with !important.
-					const css = compileCSS(
-						getStyleWithFallbackBorderStyles( stateStyles ),
-						{ selector }
-					).replace( /;/g, ' !important;' );
+					const css = compileCSS( stateStyles, { selector } ).replace(
+						/;/g,
+						' !important;'
+					);
 					if ( css ) {
 						cssRules.push( css );
 					}
