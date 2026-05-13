@@ -213,19 +213,8 @@
 .editor-collab-sidebar-panel__inline-anchor-preview {
 	margin: 0;
 	padding: 4px 8px;
-	border-left: 2px solid
-		color-mix(
-			in srgb,
-			var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9))
-				60%,
-			transparent
-		);
-	background-color: color-mix(
-		in srgb,
-		var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9))
-			8%,
-		transparent
-	);
+	border-left: 2px solid color-mix(in srgb, var(--wp-admin-theme-color, #3858e9) 60%, transparent);
+	background-color: color-mix(in srgb, var(--wp-admin-theme-color, #3858e9) 8%, transparent);
 	font-size: $helptext-font-size;
 	font-style: italic;
 	color: $gray-700;
