@@ -152,7 +152,7 @@ export const TextOverflow: StoryFn< typeof Button > = ( props ) => {
 };
 TextOverflow.args = {
 	children:
-		'This is an extremely long button label that should demonstrate text overflow behavior',
+		'This is an extremely long label thatshoulddemonstratetextoverflow behavior',
 };
 TextOverflow.parameters = {
 	textOverflowContainers: true,

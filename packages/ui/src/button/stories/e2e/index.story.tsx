@@ -12,7 +12,7 @@ type Story = StoryObj< typeof Button >;
 export const TextOverflow: Story = {
 	args: {
 		children:
-			'This is an extremely long button label that should demonstrate text overflow behavior',
+			'This is an extremely long label thatshoulddemonstratetextoverflow behavior',
 	},
 	parameters: {
 		textOverflowContainers: true,
