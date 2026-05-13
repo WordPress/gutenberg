@@ -64,6 +64,7 @@ export default function useInspectorControlsTabs(
 		...( useSlotFills( borderGroup.name ) || [] ),
 		...( useSlotFills( colorGroup.name ) || [] ),
 		...( useSlotFills( layoutGroup.name ) || [] ),
+		...( useSlotFills( positionGroup.name ) || [] ),
 		...( useSlotFills( dimensionsGroup.name ) || [] ),
 		...( useSlotFills( stylesGroup.name ) || [] ),
 		...( useSlotFills( typographyGroup.name ) || [] ),
@@ -72,7 +73,7 @@ export default function useInspectorControlsTabs(
 	const hasStyleFills = styleFills.length;
 
 	// Settings Tab: If we don't have multiple tabs to display
-	// (i.e. both list view and styles), check only the default and position
+	// (i.e. both list view and styles), check only the default
 	// InspectorControls slots. If we have multiple tabs, we'll need to check
 	// the advanced controls slot as well to ensure they are rendered.
 	const advancedFills = [
@@ -82,7 +83,6 @@ export default function useInspectorControlsTabs(
 
 	const settingsFills = [
 		...( useSlotFills( defaultGroup.name ) || [] ),
-		...( useSlotFills( positionGroup.name ) || [] ),
 		...( hasListFills && hasStyleFills > 1 ? advancedFills : [] ),
 	];
 

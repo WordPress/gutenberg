@@ -61,13 +61,13 @@ function StyleInspectorSlots( {
 				label={ __( 'Typography' ) }
 			/>
 			<InspectorControls.Slot group="layout" label={ __( 'Layout' ) } />
+			{ showPositionControls && <PositionControls /> }
 			<InspectorControls.Slot
 				group="dimensions"
 				label={ __( 'Dimensions' ) }
 			/>
 			<InspectorControls.Slot group="border" label={ borderPanelLabel } />
 			<InspectorControls.Slot group="styles" />
-			{ showPositionControls && <PositionControls /> }
 			{ showBindingsControls && (
 				<InspectorControls.Slot group="bindings" />
 			) }
