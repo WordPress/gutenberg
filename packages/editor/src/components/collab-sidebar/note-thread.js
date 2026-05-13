@@ -22,6 +22,7 @@ import {
  * Internal dependencies
  */
 import { AddNote } from './add-note';
+import { InlineAnchorPreview } from './inline-anchor-preview';
 import { Note } from './note';
 import { NoteCard } from './note-card';
 import { NoteForm } from './note-form';
@@ -236,6 +237,7 @@ export function NoteThread( {
 					{ __( 'Original block deleted.' ) }
 				</p>
 			) }
+			<InlineAnchorPreview note={ note } />
 			<Note
 				note={ note }
 				isSelected={ isSelected }

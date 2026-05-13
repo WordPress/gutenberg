@@ -207,3 +207,32 @@
 	border-radius: 1px;
 	transition: background-color 0.1s ease-in-out;
 }
+
+// Anchor preview rendered in a thread when the note is inline. The blockquote
+// styling makes the anchor visually subordinate to the note content itself.
+.editor-collab-sidebar-panel__inline-anchor-preview {
+	margin: 0;
+	padding: 4px 8px;
+	border-left: 2px solid
+		color-mix(
+			in srgb,
+			var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9))
+				60%,
+			transparent
+		);
+	background-color: color-mix(
+		in srgb,
+		var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9))
+			8%,
+		transparent
+	);
+	font-size: $helptext-font-size;
+	font-style: italic;
+	color: $gray-700;
+	line-height: 1.4;
+	border-radius: 0 2px 2px 0;
+	// Truncate to a single line; the aria-label carries the full excerpt.
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
