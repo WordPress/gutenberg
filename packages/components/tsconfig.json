@@ -27,6 +27,7 @@
 		{ "path": "../private-apis" },
 		{ "path": "../react-i18n" },
 		{ "path": "../rich-text" },
+		{ "path": "../style-runtime" },
 		{ "path": "../warning" }
 	],
 	"files": [ "global.d.ts", "storybook.d.ts" ],

@@ -9,7 +9,7 @@ import type { SelectItemProps } from './types';
 
 export const Item = forwardRef< HTMLDivElement, SelectItemProps >(
 	function Item(
-		{ className, value, size = 'default', children = value, ...restProps },
+		{ className, value, size = 'default', children, ...restProps },
 		ref
 	) {
 		return (

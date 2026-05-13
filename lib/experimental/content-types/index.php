@@ -2,10 +2,11 @@
 /**
  * Registers the private CPTs that store user-defined content types:
  *   - wp_user_taxonomy     (user-defined taxonomies)
+ *   - wp_user_post_type    (user-defined post types)
  *
- * Each record holds the registration intent for one taxonomy. On `init`,
- * this file also reads each published record and calls
- * `register_taxonomy()` for it.
+ * Each record holds the registration intent for one taxonomy or post type.
+ * On `init`, the corresponding files read each published record and call
+ * `register_taxonomy()` / `register_post_type()` for it.
  *
  * @package gutenberg
  */
@@ -15,6 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 require_once __DIR__ . '/class-wp-rest-user-taxonomies-controller-gutenberg.php';
+require_once __DIR__ . '/class-wp-rest-user-post-types-controller-gutenberg.php';
 
 /**
  * Post meta key that stores the post types attached to a user-defined
@@ -49,6 +51,51 @@ const GUTENBERG_USER_TAXONOMY_CONFIG_MARKER = 'isUserTaxonomyConfigJSON';
  * column width.
  */
 const GUTENBERG_USER_TAXONOMY_SLUG_PATTERN = '/^[a-z0-9_-]{1,32}$/';
+
+/**
+ * Option key flagging that the next `init` should regenerate rewrite rules.
+ * Set by the REST controllers when a wp_user_post_type or wp_user_taxonomy
+ * write changes a field that affects rewrite rules (slug, has_archive,
+ * public) or toggles whether the record is registered.
+ */
+const GUTENBERG_USER_CONTENT_TYPES_FLUSH_OPTION = '_gutenberg_user_content_types_flush_rewrite_rules';
+
+/**
+ * Flags the next `init` to regenerate rewrite rules. Flushing inline in the
+ * REST handler would regenerate against the pre-update registration — the
+ * post type / taxonomy registers at `init` priority 20, before the REST
+ * request handler runs, so by the time we'd flush, the registered state
+ * still reflects the old record. Deferring to the next request's
+ * `init` (priority 30, after registration runs against the new record)
+ * picks up the new rewrite rules.
+ */
+function gutenberg_user_content_types_schedule_flush_rewrite_rules() {
+	// Autoload off — the option is short-lived (cleared on next init), and
+	// keeping it out of the alloptions cache means a stray uncleared row
+	// can't bloat every page load.
+	update_option( GUTENBERG_USER_CONTENT_TYPES_FLUSH_OPTION, '1', false );
+}
+
+/**
+ * Regenerates the rewrite rules option if a recent write scheduled a flush.
+ *
+ * Runs at `init` priority 30 — after `register_post_type()` and
+ * `register_taxonomy()` have been called for user-defined records at
+ * priority 20, so the regenerated rules see the new registration state.
+ *
+ * Soft flush only — the standard `.htaccess` block doesn't depend on
+ * individual post type or taxonomy registrations, so there's nothing for
+ * a hard flush to update there, and avoiding the file write keeps this
+ * cheap.
+ */
+function gutenberg_user_content_types_maybe_flush_rewrite_rules() {
+	if ( ! get_option( GUTENBERG_USER_CONTENT_TYPES_FLUSH_OPTION ) ) {
+		return;
+	}
+	delete_option( GUTENBERG_USER_CONTENT_TYPES_FLUSH_OPTION );
+	flush_rewrite_rules( false );
+}
+add_action( 'init', 'gutenberg_user_content_types_maybe_flush_rewrite_rules', 30 );
 
 /**
  * Registers the wp_user_taxonomy CPT.
@@ -93,6 +140,7 @@ function gutenberg_register_user_taxonomy_cpt() {
 			'has_archive'           => false,
 			'rewrite'               => false,
 			'query_var'             => false,
+			'_builtin'              => true, /* internal use only. don't use this when registering your own post type. */
 		)
 	);
 
@@ -228,6 +276,75 @@ function gutenberg_user_taxonomy_read_object_type( $post_id ) {
 }
 
 /**
+ * Appends a post-type slug to a wp_user_taxonomy record's
+ * `_wp_user_taxonomy_object_type` meta if not already present. No-op if
+ * the slug is already attached.
+ *
+ * @param int    $tax_post_id wp_user_taxonomy record ID.
+ * @param string $object_type Post type slug to attach.
+ */
+function gutenberg_user_taxonomy_attach_object_type( $tax_post_id, $object_type ) {
+	if ( 'wp_user_taxonomy' !== get_post_type( $tax_post_id ) ) {
+		return;
+	}
+	$clean = is_string( $object_type ) ? sanitize_key( $object_type ) : '';
+	if ( '' === $clean ) {
+		return;
+	}
+	$existing = (array) get_post_meta( $tax_post_id, GUTENBERG_USER_TAXONOMY_OBJECT_TYPE_META_KEY );
+	if ( in_array( $clean, $existing, true ) ) {
+		return;
+	}
+	add_post_meta( $tax_post_id, GUTENBERG_USER_TAXONOMY_OBJECT_TYPE_META_KEY, $clean );
+}
+
+/**
+ * Removes a single post-type slug from a wp_user_taxonomy record's
+ * `_wp_user_taxonomy_object_type` meta. Other slugs remain.
+ *
+ * @param int    $tax_post_id wp_user_taxonomy record ID.
+ * @param string $object_type Post type slug to detach.
+ */
+function gutenberg_user_taxonomy_detach_object_type( $tax_post_id, $object_type ) {
+	if ( 'wp_user_taxonomy' !== get_post_type( $tax_post_id ) ) {
+		return;
+	}
+	$clean = is_string( $object_type ) ? sanitize_key( $object_type ) : '';
+	if ( '' === $clean ) {
+		return;
+	}
+	delete_post_meta( $tax_post_id, GUTENBERG_USER_TAXONOMY_OBJECT_TYPE_META_KEY, $clean );
+}
+
+/**
+ * Replaces every `_wp_user_taxonomy_object_type` meta row on a record
+ * with the given list. Each value is sanitized via `sanitize_key()` and
+ * filtered against `post_type_exists()` so only registered post types
+ * land in storage; duplicates are collapsed.
+ *
+ * @param int                $tax_post_id  wp_user_taxonomy record ID.
+ * @param array<int, string> $object_types Post type slugs to store.
+ */
+function gutenberg_user_taxonomy_replace_object_types( $tax_post_id, array $object_types ) {
+	$values = array();
+	foreach ( $object_types as $slug ) {
+		if ( ! is_string( $slug ) ) {
+			continue;
+		}
+		$clean = sanitize_key( $slug );
+		if ( '' !== $clean && post_type_exists( $clean ) ) {
+			$values[] = $clean;
+		}
+	}
+	$values = array_values( array_unique( $values ) );
+
+	delete_post_meta( $tax_post_id, GUTENBERG_USER_TAXONOMY_OBJECT_TYPE_META_KEY );
+	foreach ( $values as $slug ) {
+		add_post_meta( $tax_post_id, GUTENBERG_USER_TAXONOMY_OBJECT_TYPE_META_KEY, $slug );
+	}
+}
+
+/**
  * Builds register_taxonomy() arguments from a wp_user_taxonomy record.
  * Returns null for invalid records so callers can skip them uniformly.
  *
@@ -277,15 +394,30 @@ function gutenberg_build_user_taxonomy_args( WP_Post $record ) {
 	}
 
 	$args = array(
-		'labels'       => $labels,
-		'public'       => ! empty( $config['public'] ),
-		'hierarchical' => ! empty( $config['hierarchical'] ),
-		'show_in_rest' => true,
+		'labels' => $labels,
 	);
 
 	if ( ! empty( $config['description'] ) ) {
 		$args['description'] = (string) $config['description'];
 	}
+
+	$bool_keys = array(
+		'public',
+		'hierarchical',
+		'publicly_queryable',
+		'show_ui',
+		'show_in_menu',
+		'show_in_nav_menus',
+		'show_tagcloud',
+		'show_in_quick_edit',
+		'show_admin_column',
+	);
+	foreach ( $bool_keys as $key ) {
+		if ( array_key_exists( $key, $config ) ) {
+			$args[ $key ] = (bool) $config[ $key ];
+		}
+	}
+	$args['show_in_rest'] = isset( $config['show_in_rest'] ) ? (bool) $config['show_in_rest'] : true;
 
 	return array( $slug, $object_type, $args );
 }

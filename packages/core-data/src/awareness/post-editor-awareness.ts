@@ -16,7 +16,10 @@ import {
 	LOCAL_CURSOR_UPDATE_DEBOUNCE_IN_MS,
 } from './config';
 import { STORE_NAME as coreStore } from '../name';
-import { htmlIndexToRichTextOffset } from '../utils/crdt-utils';
+import {
+	asHtmlStringIndex,
+	htmlIndexToRichTextOffset,
+} from '../utils/crdt-utils';
 import {
 	areSelectionsStatesEqual,
 	getSelectionState,
@@ -291,7 +294,7 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 		return {
 			richTextOffset: htmlIndexToRichTextOffset(
 				absolutePosition.type.toString(),
-				absolutePosition.index
+				asHtmlStringIndex( absolutePosition.index )
 			),
 			localClientId,
 		};
