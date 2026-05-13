@@ -219,35 +219,66 @@ export default function useSelectionObserver() {
 						// (e.g. the user started dragging from the block
 						// wrapper padding), dispatch a full
 						// selectionChange so the format toolbar appears.
-						const richTextElement =
+						// If it spans multiple RichText fields in the same
+						// block, preserve each endpoint's attribute key.
+						const richTextElementStart =
 							! selection.isCollapsed &&
-							( getRichTextElement( startNode ) ||
-								getRichTextElement( endNode ) );
+							getRichTextElement( startNode );
+						const richTextElementEnd =
+							! selection.isCollapsed &&
+							getRichTextElement( endNode );
+						const richTextElement =
+							richTextElementStart || richTextElementEnd;
+						const hasMultipleRichTextElements =
+							richTextElementStart &&
+							richTextElementEnd &&
+							richTextElementStart !== richTextElementEnd;
 
 						if (
 							richTextElement &&
-							ownerDocument.activeElement !== richTextElement
+							( hasMultipleRichTextElements ||
+								ownerDocument.activeElement !==
+									richTextElement )
 						) {
 							const range = selection.getRangeAt( 0 );
-							const richTextData = create( {
-								element: richTextElement,
+							const startElement =
+								richTextElementStart || richTextElement;
+							const endElement =
+								richTextElementEnd || richTextElement;
+							const richTextDataStart = create( {
+								element: startElement,
 								range,
 								__unstableIsEditableTree: true,
 							} );
+							const richTextDataEnd =
+								startElement === endElement
+									? richTextDataStart
+									: create( {
+											element: endElement,
+											range,
+											__unstableIsEditableTree: true,
+									  } );
 							selectionChange( {
 								start: {
 									clientId: startClientId,
 									attributeKey:
-										richTextElement.dataset
+										startElement.dataset
 											.wpBlockAttributeKey,
-									offset: richTextData.start ?? 0,
+									offset: hasMultipleRichTextElements
+										? richTextDataStart.start ??
+										  richTextDataStart.end ??
+										  0
+										: richTextDataStart.start ?? 0,
 								},
 								end: {
 									clientId: startClientId,
 									attributeKey:
-										richTextElement.dataset
-											.wpBlockAttributeKey,
-									offset: richTextData.end,
+										endElement.dataset.wpBlockAttributeKey,
+									offset: hasMultipleRichTextElements
+										? richTextDataEnd.end ??
+										  richTextDataEnd.start ??
+										  0
+										: richTextDataEnd.end,
 								},
 							} );
 						} else {
