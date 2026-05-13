@@ -9,10 +9,8 @@
 	display: grid;
 	grid-template-columns: 1fr auto;
 	align-items: start;
-	font-family: $default-font;
-	font-size: $default-font-size;
 	padding: var(--wpds-dimension-padding-md);
-	border: 1px solid var(--wp-components-notice-border-color);
+	border: var(--wpds-border-width-xs) solid var(--wp-components-notice-border-color);
 	border-radius: var(--wpds-border-radius-lg);
 	background-color: var(--wp-components-notice-background-color);
 	color: var(--wp-components-notice-text-color);
@@ -39,9 +37,13 @@
 .components-notice__content {
 	grid-column: 1;
 	grid-row: 1;
+	font-family: var(--wpds-typography-font-family-body);
+	font-size: var(--wpds-typography-font-size-md);
 	line-height: var(--wpds-typography-line-height-sm);
 
 	// Vertically center single-line content with the dismiss button.
+	// TODO: Replace `$button-size-small` with a WPDS size token once size tokens
+	// land in `@wordpress/theme`.
 	padding-block: calc((#{$button-size-small} - 1lh) / 2);
 }
 
