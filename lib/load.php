@@ -121,6 +121,7 @@ require __DIR__ . '/compat/wordpress-7.0/media.php';
 require __DIR__ . '/compat/wordpress-7.0/command-palette.php';
 require __DIR__ . '/compat/wordpress-7.0/meta-box-rtc-compat.php';
 require __DIR__ . '/compat/wordpress-7.0/script-modules.php';
+require __DIR__ . '/compat/wordpress-7.0/fonts.php';
 
 // WordPress 7.1 compat.
 require __DIR__ . '/compat/wordpress-7.1/classic-block.php';
@@ -133,7 +134,6 @@ require __DIR__ . '/experimental/kses.php';
 require __DIR__ . '/experimental/script-modules.php';
 require __DIR__ . '/experimental/pages/site-editor.php';
 require __DIR__ . '/experimental/extensible-site-editor.php';
-require __DIR__ . '/experimental/fonts/load.php';
 if ( gutenberg_is_experiment_enabled( 'gutenberg-media-editor' ) ) {
 	require __DIR__ . '/experimental/media-editor/load.php';
 }
