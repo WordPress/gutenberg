@@ -19,6 +19,7 @@ export { default as EditorNotices } from './editor-notices';
 export { default as EditorSnackbars } from './editor-snackbars';
 export {
 	default as DistributedEditingStatus,
+	DistributedEditingStatusChrome,
 	DistributedEditingStatusSurface,
 	getDistributedEditingStatusSurfaceItems,
 } from './distributed-editing-status';

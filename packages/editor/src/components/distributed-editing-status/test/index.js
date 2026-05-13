@@ -15,6 +15,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import DistributedEditingStatus, {
 	DistributedEditingLocalRebaseStateInspector,
 	DistributedEditingRetrySaveControls,
+	DistributedEditingStatusChrome,
 	DistributedEditingStatusInspector,
 	DistributedEditingRecoveryDryRunControls,
 	DistributedEditingStatusTestControls,
@@ -378,6 +379,14 @@ describe( 'DistributedEditingStatusInspector', () => {
 				name: 'Distributed editing status',
 			} )
 		).toBeVisible();
+		expect(
+			screen.getByRole( 'region', {
+				name: 'Distributed editing status',
+			} )
+		).toHaveAttribute(
+			'data-distributed-editing-placement',
+			'internal-inspector'
+		);
 		expect( screen.getByText( 'Remote changes received' ) ).toBeVisible();
 	} );
 } );
@@ -662,6 +671,26 @@ describe( 'DistributedEditingStatus', () => {
 		expect(
 			screen.getByText( '1 local change is awaiting confirmation.' )
 		).toBeVisible();
+	} );
+
+	it( 'mounts production editor chrome with explicit placement', () => {
+		setupDistributedEditingStatusSelect( {
+			sessionState: {
+				pendingChangeCount: 1,
+			},
+		} );
+
+		render( <DistributedEditingStatusChrome /> );
+
+		expect(
+			screen.getByRole( 'region', {
+				name: 'Distributed editing status',
+			} )
+		).toHaveAttribute(
+			'data-distributed-editing-placement',
+			'editor-interface-notices'
+		);
+		expect( screen.getByText( 'Changes pending' ) ).toBeVisible();
 	} );
 
 	it( 'mounts the status surface for unload-warning state', () => {

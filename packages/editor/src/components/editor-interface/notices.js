@@ -7,7 +7,8 @@ import { InlineNotices } from '@wordpress/notices';
  * Internal dependencies
  */
 import TemplateValidationNotice from '../template-validation-notice';
-import DistributedEditingStatus, {
+import {
+	DistributedEditingStatusChrome,
 	DistributedEditingStatusInspector,
 } from '../distributed-editing-status';
 
@@ -18,7 +19,7 @@ export default function EditorInterfaceNotices() {
 			dismissibleNoticesClassName="editor-notices__dismissible"
 		>
 			<TemplateValidationNotice />
-			<DistributedEditingStatus />
+			<DistributedEditingStatusChrome />
 			{ shouldRenderDistributedEditingStatusInspector() && (
 				<DistributedEditingStatusInspector />
 			) }

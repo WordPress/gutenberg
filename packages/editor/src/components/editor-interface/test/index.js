@@ -32,8 +32,12 @@ jest.mock( '../../template-validation-notice', () => {
 jest.mock( '../../distributed-editing-status', () => {
 	const { createElement } = require( '@wordpress/element' );
 
-	function MockDistributedEditingStatus() {
-		return createElement( 'div', null, 'Distributed editing status mount' );
+	function MockDistributedEditingStatusChrome() {
+		return createElement(
+			'div',
+			null,
+			'Distributed editing status chrome mount'
+		);
 	}
 
 	function MockDistributedEditingStatusInspector() {
@@ -46,7 +50,7 @@ jest.mock( '../../distributed-editing-status', () => {
 
 	return {
 		__esModule: true,
-		default: MockDistributedEditingStatus,
+		DistributedEditingStatusChrome: MockDistributedEditingStatusChrome,
 		DistributedEditingStatusInspector:
 			MockDistributedEditingStatusInspector,
 	};
@@ -68,7 +72,7 @@ describe( 'EditorInterfaceNotices', () => {
 			screen.getByText( 'Template validation notice mount' )
 		).toBeVisible();
 		expect(
-			screen.getByText( 'Distributed editing status mount' )
+			screen.getByText( 'Distributed editing status chrome mount' )
 		).toBeVisible();
 		expect(
 			screen.queryByText( 'Distributed editing status inspector mount' )

@@ -264,6 +264,20 @@ _Parameters_
 
 -   _props_ `Object`: Component props.
 -   _props.onAction_ `Function`: Optional action handler.
+-   _props.placement_ `string`: Status surface placement.
+
+_Returns_
+
+-   `React.ReactNode`: Rendered status surface.
+
+### DistributedEditingStatusChrome
+
+Renders the selector-backed DE-RTC status in production editor chrome.
+
+_Parameters_
+
+-   _props_ `Object`: Component props.
+-   _props.onAction_ `Function`: Optional action handler.
 
 _Returns_
 
@@ -279,6 +293,7 @@ _Parameters_
 -   _props.noticeDescriptors_ `Array`: DE-RTC notice descriptors.
 -   _props.unloadWarningState_ `Object`: DE-RTC unload-warning state.
 -   _props.onAction_ `Function`: Optional action handler.
+-   _props.placement_ `string`: Status surface placement.
 
 _Returns_
 

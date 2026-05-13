@@ -496,7 +496,10 @@ export function DistributedEditingStatusInspector( { onAction, onSelect } ) {
 			<DistributedEditingRecoveryDryRunControls />
 			<DistributedEditingRetrySaveControls />
 			<DistributedEditingLocalRebaseStateInspector />
-			<DistributedEditingStatus onAction={ onAction } />
+			<DistributedEditingStatus
+				onAction={ onAction }
+				placement="internal-inspector"
+			/>
 		</div>
 	);
 }
@@ -753,6 +756,7 @@ export function DistributedEditingRetrySaveControls( { onResult, onError } ) {
  * @param {Array}    props.noticeDescriptors  DE-RTC notice descriptors.
  * @param {Object}   props.unloadWarningState DE-RTC unload-warning state.
  * @param {Function} props.onAction           Optional action handler.
+ * @param {string}   props.placement          Status surface placement.
  *
  * @return {React.ReactNode} Rendered status surface.
  */
@@ -760,6 +764,7 @@ export function DistributedEditingStatusSurface( {
 	noticeDescriptors = [],
 	unloadWarningState = {},
 	onAction,
+	placement = 'standalone-status-surface',
 } ) {
 	const statusItems =
 		getDistributedEditingStatusSurfaceItems( noticeDescriptors );
@@ -774,6 +779,7 @@ export function DistributedEditingStatusSurface( {
 		<div
 			aria-label={ __( 'Distributed editing status' ) }
 			className="editor-distributed-editing-status"
+			data-distributed-editing-placement={ placement }
 			role="region"
 		>
 			{ statusItems.map( ( item ) => (
@@ -800,12 +806,16 @@ export function DistributedEditingStatusSurface( {
 /**
  * Renders the selector-backed DE-RTC status surface.
  *
- * @param {Object}   props          Component props.
- * @param {Function} props.onAction Optional action handler.
+ * @param {Object}   props           Component props.
+ * @param {Function} props.onAction  Optional action handler.
+ * @param {string}   props.placement Status surface placement.
  *
  * @return {React.ReactNode} Rendered status surface.
  */
-export default function DistributedEditingStatus( { onAction } ) {
+export default function DistributedEditingStatus( {
+	onAction,
+	placement = 'selector-backed-status',
+} ) {
 	const { sessionState, noticeDescriptors, unloadWarningState } = useSelect(
 		( select ) => {
 			const {
@@ -836,7 +846,25 @@ export default function DistributedEditingStatus( { onAction } ) {
 		<DistributedEditingStatusSurface
 			noticeDescriptors={ noticeDescriptors }
 			onAction={ onAction }
+			placement={ placement }
 			unloadWarningState={ unloadWarningState }
+		/>
+	);
+}
+
+/**
+ * Renders the selector-backed DE-RTC status in production editor chrome.
+ *
+ * @param {Object}   props          Component props.
+ * @param {Function} props.onAction Optional action handler.
+ *
+ * @return {React.ReactNode} Rendered status surface.
+ */
+export function DistributedEditingStatusChrome( { onAction } ) {
+	return (
+		<DistributedEditingStatus
+			onAction={ onAction }
+			placement="editor-interface-notices"
 		/>
 	);
 }
