@@ -25,6 +25,8 @@ export interface CropInputProps {
 	suffix?: React.ReactNode;
 	onCommit: ( value: number ) => void;
 	onCommitEnd?: () => void;
+	commitOnChange?: boolean;
+	onPreview?: ( value: number | null ) => void;
 	onSessionStart?: () => void;
 	onSessionEnd?: () => void;
 }
@@ -34,7 +36,7 @@ const PX_SUFFIX = <InputControlSuffixWrapper>px</InputControlSuffixWrapper>;
 /**
  * Numeric crop control with live preview and deferred finalization.
  *
- * All of the focus / draft / idle / Enter / Escape state lives in
+ * All of the focus / draft / Enter / Escape state lives in
  * `useDeferredCommit`; this component just renders.
  *
  * @param props Component props.
@@ -52,6 +54,8 @@ export default function CropInput( props: CropInputProps ) {
 		suffix = PX_SUFFIX,
 		onCommit,
 		onCommitEnd,
+		commitOnChange,
+		onPreview,
 		onSessionStart,
 		onSessionEnd,
 	} = props;
@@ -61,6 +65,8 @@ export default function CropInput( props: CropInputProps ) {
 		commitStep,
 		onCommit,
 		onCommitEnd,
+		commitOnChange,
+		onPreview,
 		onSessionStart,
 		onSessionEnd,
 	} );

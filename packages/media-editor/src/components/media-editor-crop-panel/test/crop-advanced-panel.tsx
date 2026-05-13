@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -14,6 +14,7 @@ const mockSettleCrop = jest.fn();
 const mockCommitHistory = jest.fn();
 const mockPauseHistory = jest.fn();
 const mockResumeHistory = jest.fn();
+const mockSetPreviewCropRect = jest.fn();
 const mockNormalizedRect = { x: 0, y: 0, width: 1, height: 1 };
 const mockDefaultCropperState = {
 	image: {
@@ -26,6 +27,9 @@ const mockDefaultCropperState = {
 		horizontal: false,
 		vertical: false,
 	},
+	pan: { x: 0, y: 0 },
+	zoom: 1,
+	cropRect: { x: 0.1, y: 0.1, width: 0.4, height: 0.4 },
 };
 const mockDefaultCropGeometry = {
 	isReady: true,
@@ -74,6 +78,14 @@ const mockApplyCropEdit = jest.fn( ( rect, field, value ) => {
 	};
 } );
 const mockCropPixelRectToNormalizedRect = jest.fn( () => mockNormalizedRect );
+const mockGetCropPixelRect = jest.fn( ( _state, imageSize ) => ( {
+	left: 0,
+	top: 0,
+	width: imageSize.width,
+	height: imageSize.height,
+	right: imageSize.width,
+	bottom: imageSize.height,
+} ) );
 
 function setMockCropGeometry( overrides: MockCropGeometryOverrides = {} ) {
 	mockCropGeometry = {
@@ -113,7 +125,6 @@ jest.mock( '../../../image-editor', () => ( {
 		settleCrop: mockSettleCrop,
 		commitHistory: mockCommitHistory,
 		pauseHistory: mockPauseHistory,
-		resumeHistory: mockResumeHistory,
 	} ),
 } ) );
 
@@ -123,15 +134,22 @@ jest.mock( '../../../image-editor/core/crop-geometry', () => ( {
 	cropPixelRectToNormalizedRect: (
 		...args: Parameters< typeof mockCropPixelRectToNormalizedRect >
 	) => mockCropPixelRectToNormalizedRect( ...args ),
+	getCropPixelRect: ( ...args: Parameters< typeof mockGetCropPixelRect > ) =>
+		mockGetCropPixelRect( ...args ),
 } ) );
 
 jest.mock( '../../../image-editor/react/hooks/use-crop-geometry', () => ( {
 	useCropGeometry: () => mockCropGeometry,
 } ) );
 
+jest.mock( '../../../image-editor/react/components/cropper-provider', () => ( {
+	useSetCropperPreviewRect: () => mockSetPreviewCropRect,
+} ) );
+
 describe( 'CropAdvancedPanel', () => {
 	beforeEach( () => {
 		jest.clearAllMocks();
+		mockPauseHistory.mockReturnValue( mockResumeHistory );
 		jest.useRealTimers();
 		setMockCropGeometry();
 		setMockCropperState();
@@ -174,7 +192,6 @@ describe( 'CropAdvancedPanel', () => {
 		fireEvent.focus( widthInput );
 		fireEvent.change( widthInput, { target: { value: '1' } } );
 
-		expect( mockApplyCropEdit ).not.toHaveBeenCalled();
 		expect( mockSetCropRect ).not.toHaveBeenCalled();
 		expect( mockSettleCrop ).not.toHaveBeenCalled();
 	} );
@@ -191,7 +208,7 @@ describe( 'CropAdvancedPanel', () => {
 		expect( mockApplyCropEdit ).toHaveBeenCalledWith(
 			expect.any( Object ),
 			'width',
-			1000,
+			900,
 			expect.objectContaining( {
 				bounds: expect.objectContaining( { maxWidth: 1000 } ),
 			} )
@@ -209,9 +226,9 @@ describe( 'CropAdvancedPanel', () => {
 		fireEvent.change( widthInput, { target: { value: '600' } } );
 		fireEvent.change( widthInput, { target: { value: '650' } } );
 
-		// Live commits update the preview, but settle waits for explicit
-		// completion so the cropper cannot reshape state mid-edit.
-		expect( mockSetCropRect ).toHaveBeenCalled();
+		// Draft edits update only the preview overlay until completion.
+		expect( mockSetPreviewCropRect ).toHaveBeenCalled();
+		expect( mockSetCropRect ).not.toHaveBeenCalled();
 		expect( mockSettleCrop ).not.toHaveBeenCalled();
 
 		fireEvent.blur( widthInput );
@@ -230,7 +247,7 @@ describe( 'CropAdvancedPanel', () => {
 		// Draft stays exactly as typed; nothing fires until the user signals
 		// completion explicitly.
 		expect( widthInput ).toHaveValue( 9999 );
-		expect( mockApplyCropEdit ).not.toHaveBeenCalled();
+		expect( mockSetCropRect ).not.toHaveBeenCalled();
 		expect( mockSettleCrop ).not.toHaveBeenCalled();
 
 		fireEvent.blur( widthInput );
@@ -238,7 +255,7 @@ describe( 'CropAdvancedPanel', () => {
 		expect( mockApplyCropEdit ).toHaveBeenCalledWith(
 			expect.any( Object ),
 			'width',
-			1000,
+			900,
 			expect.objectContaining( {
 				bounds: expect.objectContaining( { maxWidth: 1000 } ),
 			} )
@@ -246,7 +263,7 @@ describe( 'CropAdvancedPanel', () => {
 		expect( mockSettleCrop ).toHaveBeenCalledTimes( 1 );
 	} );
 
-	it( 'keeps a focused crop input unchanged when external crop state changes', () => {
+	it( 'updates a focused crop input when external crop state changes', async () => {
 		const { rerender } = render( <CropAdvancedPanel freeformCrop /> );
 
 		fireEvent.click( screen.getByRole( 'button', { name: 'Advanced' } ) );
@@ -261,12 +278,12 @@ describe( 'CropAdvancedPanel', () => {
 		} );
 		rerender( <CropAdvancedPanel freeformCrop /> );
 
-		// Focused inputs are sovereign: external state changes leave the
-		// displayed value alone until the user blurs.
-		expect( screen.getByLabelText( 'Width' ) ).toHaveValue( 400 );
+		await waitFor( () =>
+			expect( screen.getByLabelText( 'Width' ) ).toHaveValue( 250 )
+		);
 	} );
 
-	it( 'keeps an in-progress draft when external crop state changes', () => {
+	it( 'cancels an in-progress crop preview when external crop state changes', async () => {
 		const { rerender } = render( <CropAdvancedPanel freeformCrop /> );
 
 		fireEvent.click( screen.getByRole( 'button', { name: 'Advanced' } ) );
@@ -282,10 +299,55 @@ describe( 'CropAdvancedPanel', () => {
 		} );
 		rerender( <CropAdvancedPanel freeformCrop /> );
 
-		expect( screen.getByLabelText( 'Width' ) ).toHaveValue( 600 );
+		await waitFor( () =>
+			expect( screen.getByLabelText( 'Width' ) ).toHaveValue( 250 )
+		);
+		expect( mockSetPreviewCropRect ).toHaveBeenLastCalledWith( null );
+	} );
+
+	it( 'previews image-bound manual position edits without moving the cropper', () => {
+		setMockCropGeometry( {
+			rect: {
+				top: -85,
+				bottom: 115,
+			},
+			imageBounds: {
+				minTop: -100,
+				maxBottom: 500,
+				maxHeight: 600,
+			},
+		} );
+		render( <CropAdvancedPanel freeformCrop /> );
+
+		fireEvent.click( screen.getByRole( 'button', { name: 'Advanced' } ) );
+		const topInput = screen.getByLabelText( 'Crop vertical position' );
+		fireEvent.focus( topInput );
+		fireEvent.change( topInput, { target: { value: '-84' } } );
+
+		expect( topInput ).toHaveValue( -84 );
+		expect( mockSetPreviewCropRect ).toHaveBeenCalled();
+		expect( mockSetCropRect ).not.toHaveBeenCalled();
+
+		fireEvent.blur( topInput );
+
+		expect( mockApplyCropEdit ).toHaveBeenCalledWith(
+			expect.any( Object ),
+			'top',
+			-84,
+			expect.objectContaining( {
+				bounds: expect.objectContaining( { minTop: -100 } ),
+			} )
+		);
+		expect( mockSetCropRect ).toHaveBeenCalledWith( mockNormalizedRect );
+		expect( mockSettleCrop ).toHaveBeenCalledTimes( 1 );
 	} );
 
 	it( 'treats near-integer maximum bounds as the expected integer pixel value', () => {
+		setMockCropperState( {
+			image: {
+				naturalWidth: 2560,
+			},
+		} );
 		setMockCropGeometry( {
 			rect: {
 				left: 0,
@@ -317,6 +379,11 @@ describe( 'CropAdvancedPanel', () => {
 	} );
 
 	it( 'uses the image max width when the crop left has subpixel drift', () => {
+		setMockCropperState( {
+			image: {
+				naturalWidth: 1350,
+			},
+		} );
 		setMockCropGeometry( {
 			rect: {
 				left: 0.5,
@@ -444,29 +511,28 @@ describe( 'CropAdvancedPanel', () => {
 		expect( mockSetRotation ).toHaveBeenCalledWith( 44.99 );
 	} );
 
-	it( 'pauses history on focus and resumes on blur so a focus session is one undo step', () => {
+	it( 'does not pause history while crop fields only preview drafts', () => {
 		render( <CropAdvancedPanel freeformCrop /> );
 
 		fireEvent.click( screen.getByRole( 'button', { name: 'Advanced' } ) );
 		const widthInput = screen.getByLabelText( 'Width' );
 
 		fireEvent.focus( widthInput );
-		expect( mockPauseHistory ).toHaveBeenCalledTimes( 1 );
+		expect( mockPauseHistory ).not.toHaveBeenCalled();
 		expect( mockResumeHistory ).not.toHaveBeenCalled();
 
 		fireEvent.change( widthInput, { target: { value: '600' } } );
 		fireEvent.change( widthInput, { target: { value: '700' } } );
 
-		// Still paused — intermediate state changes do not record entries.
-		expect( mockPauseHistory ).toHaveBeenCalledTimes( 1 );
+		expect( mockPauseHistory ).not.toHaveBeenCalled();
 		expect( mockResumeHistory ).not.toHaveBeenCalled();
 
 		fireEvent.blur( widthInput );
 
-		expect( mockResumeHistory ).toHaveBeenCalledTimes( 1 );
+		expect( mockResumeHistory ).not.toHaveBeenCalled();
 	} );
 
-	it( 'still pauses + resumes when the user types an out-of-range value', () => {
+	it( 'does not pause history for out-of-range crop drafts', () => {
 		render( <CropAdvancedPanel freeformCrop /> );
 
 		fireEvent.click( screen.getByRole( 'button', { name: 'Advanced' } ) );
@@ -476,8 +542,8 @@ describe( 'CropAdvancedPanel', () => {
 		fireEvent.change( widthInput, { target: { value: '9999' } } );
 		fireEvent.blur( widthInput );
 
-		expect( mockPauseHistory ).toHaveBeenCalledTimes( 1 );
-		expect( mockResumeHistory ).toHaveBeenCalledTimes( 1 );
+		expect( mockPauseHistory ).not.toHaveBeenCalled();
+		expect( mockResumeHistory ).not.toHaveBeenCalled();
 	} );
 
 	it( 'pauses fine rotation edits too', () => {

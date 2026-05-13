@@ -73,10 +73,13 @@ export function getInputBounds(
 		};
 	}
 
+	// Keep the displayed value separate from the commit range. A transient
+	// cropper state may already be outside bounds after rotation, but arrow,
+	// wheel, and typed commits should still be judged against the real range.
 	return {
 		value: snapped,
-		min: Math.min( snapped, min ),
-		max: Math.max( snapped, max ),
+		min,
+		max,
 	};
 }
 
