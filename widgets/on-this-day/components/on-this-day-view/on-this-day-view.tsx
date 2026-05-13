@@ -49,10 +49,9 @@ export interface OnThisDayViewProps extends UseOnThisDayPostResult {
  * Presentation for the `On This Day` widget. Decouples chrome and data
  * fetching from the layout so Storybook and tests can drive each branch
  * directly.
- * @param root0
- * @param root0.post
- * @param root0.isResolving
- * @param root0.effect
+ *
+ * @param {OnThisDayViewProps} props - The props for the `On This Day` widget.
+ * @return {React.ReactNode} - The `On This Day` widget.
  */
 export function OnThisDayView( {
 	post,
@@ -69,7 +68,7 @@ export function OnThisDayView( {
 
 	if ( ! post ) {
 		return (
-			<EmptyState.Root>
+			<EmptyState.Root className={ styles.noPostsToday }>
 				<EmptyState.Icon icon={ calendar } />
 				<EmptyState.Title>
 					{ __( 'Nothing on this day yet' ) }
