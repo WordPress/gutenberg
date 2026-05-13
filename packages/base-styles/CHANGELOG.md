@@ -4,12 +4,14 @@
 
 ### Breaking Changes
 
--   Remove the following entries from the `z-index()` helper ([#77753](https://github.com/WordPress/gutenberg/pull/77753), [#77759](https://github.com/WordPress/gutenberg/pull/77759), [#77772](https://github.com/WordPress/gutenberg/pull/77772), [#77806](https://github.com/WordPress/gutenberg/pull/77806), [#77807](https://github.com/WordPress/gutenberg/pull/77807), [#77808](https://github.com/WordPress/gutenberg/pull/77808), [#78180](https://github.com/WordPress/gutenberg/pull/78180)):
+-   Remove the following entries from the `z-index()` helper ([#77753](https://github.com/WordPress/gutenberg/pull/77753), [#77759](https://github.com/WordPress/gutenberg/pull/77759), [#77772](https://github.com/WordPress/gutenberg/pull/77772), [#77806](https://github.com/WordPress/gutenberg/pull/77806), [#77807](https://github.com/WordPress/gutenberg/pull/77807), [#77808](https://github.com/WordPress/gutenberg/pull/77808), [#78180](https://github.com/WordPress/gutenberg/pull/78180), [#78181](https://github.com/WordPress/gutenberg/pull/78181)):
     -   `.block-editor-block-manager__category-title`
     -   `.block-editor-block-manager__disabled-blocks-count`
     -   `.block-library-query-pattern__selection-search`
     -   `.block-library-template-part__selection-search`
     -   `.components-popover__close`
+    -   `.edit-post-meta-boxes-area .spinner`
+    -   `.edit-post-meta-boxes-area.is-loading::before`
     -   `.edit-site-layout__canvas-container.is-resizing::after`
     -   `.edit-site-layout__canvas-container`
     -   `.edit-site-layout__sidebar`
