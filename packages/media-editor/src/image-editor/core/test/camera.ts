@@ -14,7 +14,7 @@ import {
 } from '../containment';
 import { getSourceRegion, getSourceRegionPercent } from '../source-region';
 import { computeTransformStyle } from '../transform-style';
-import { DEFAULT_STATE } from '../constants';
+import { DEFAULT_STATE, MAX_ZOOM } from '../constants';
 import type { CropperState, Size } from '../types';
 
 const CONTAINER: Size = { width: 800, height: 600 };
@@ -163,6 +163,11 @@ describe( 'restrictPanZoom', () => {
 		const state = makeState( { rotation: 45, zoom: 1 } );
 		const result = restrictPanZoom( state, IMAGE, state.cropRect );
 		expect( result.zoom ).toBeGreaterThanOrEqual( 1 );
+	} );
+	it( 'caps zoom at MAX_ZOOM', () => {
+		const state = makeState( { zoom: MAX_ZOOM * 2 } );
+		const result = restrictPanZoom( state, IMAGE, state.cropRect );
+		expect( result.zoom ).toBe( MAX_ZOOM );
 	} );
 	it( 'allows zoom below 1 when a fine-rotated portrait crop remains covered', () => {
 		const cropRect = { x: 0.46, y: 0, width: 0.08, height: 1 };

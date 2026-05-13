@@ -7,7 +7,7 @@ import { mat2d, vec2 } from 'gl-matrix';
  * Internal dependencies
  */
 import type { CropperState, NormalizedRect, Size } from './types';
-import { ABSOLUTE_MIN_ZOOM, MIN_ZOOM } from './constants';
+import { ABSOLUTE_MIN_ZOOM, MAX_ZOOM, MIN_ZOOM } from './constants';
 import { degreesToRadians } from './math/rotation';
 import {
 	isValidSize,
@@ -326,7 +326,7 @@ export function restrictPanZoom(
 		ABSOLUTE_MIN_ZOOM,
 		getMinZoomForCover( safeState.rotation, aspectRatio, safeCropRect )
 	);
-	const zoom = Math.max( safeState.zoom, minZoom );
+	const zoom = Math.min( MAX_ZOOM, Math.max( safeState.zoom, minZoom ) );
 
 	// Step 2: build camera with candidate pan and corrected zoom.
 	const candidateState = { ...safeState, zoom };

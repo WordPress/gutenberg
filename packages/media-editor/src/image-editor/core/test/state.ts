@@ -356,6 +356,7 @@ describe( 'cropperReducer — SETTLE_CROP', () => {
 
 	it( 'preserves image selection across 50 random crop/zoom/pan combos', () => {
 		let passCount = 0;
+		let skippedCappedCount = 0;
 		for ( let i = 0; i < 50; i++ ) {
 			// Generate deterministic-ish crop rects.
 			const cropW = 0.15 + ( ( i * 7 ) % 8 ) / 10;
@@ -383,6 +384,21 @@ describe( 'cropperReducer — SETTLE_CROP', () => {
 				type: 'SETTLE_CROP',
 			} );
 
+			const normalizedRatio =
+				state.cropRect.width / state.cropRect.height;
+			let newH = 1;
+			let newW = normalizedRatio;
+			if ( newW > 1 ) {
+				newW = 1;
+				newH = 1 / normalizedRatio;
+			}
+			const expectedUncappedZoom =
+				state.zoom * ( newH / state.cropRect.height );
+			if ( expectedUncappedZoom > MAX_ZOOM ) {
+				skippedCappedCount++;
+				continue;
+			}
+
 			const regionBefore = getCropWorldRegion( state, IMAGE, CONTAINER );
 			const regionAfter = getCropWorldRegion( settled, IMAGE, CONTAINER );
 
@@ -408,7 +424,8 @@ describe( 'cropperReducer — SETTLE_CROP', () => {
 			expect( dh ).toBeLessThanOrEqual( tol );
 			passCount++;
 		}
-		expect( passCount ).toBe( 50 );
+		expect( passCount + skippedCappedCount ).toBe( 50 );
+		expect( passCount ).toBeGreaterThan( 0 );
 	} );
 
 	it( 'diagonal corner drag: small crop settles accurately', () => {
@@ -493,6 +510,26 @@ describe( 'cropperReducer — SETTLE_CROP', () => {
 		const wBefore = regionBefore.maxX - regionBefore.minX;
 		const wAfter = regionAfter.maxX - regionAfter.minX;
 		expect( wAfter ).toBeCloseTo( wBefore, 1 );
+	} );
+
+	it( 'caps settle zoom for crops smaller than the maximum zoom can preserve', () => {
+		const afterDrag = enforceContainment(
+			makeState( {
+				cropRect: { x: 0.475, y: 0.475, width: 0.05, height: 0.05 },
+				zoom: 1,
+				pan: { x: 0, y: 0 },
+			} )
+		);
+
+		const settled = cropperReducer( afterDrag, { type: 'SETTLE_CROP' } );
+
+		expect( settled.zoom ).toBe( MAX_ZOOM );
+
+		const regionAfter = getCropWorldRegion( settled, IMAGE, CONTAINER );
+		expect( regionAfter.minX ).toBeGreaterThanOrEqual( -0.001 );
+		expect( regionAfter.minY ).toBeGreaterThanOrEqual( -0.001 );
+		expect( regionAfter.maxX ).toBeLessThanOrEqual( 1.001 );
+		expect( regionAfter.maxY ).toBeLessThanOrEqual( 1.001 );
 	} );
 } );
 
