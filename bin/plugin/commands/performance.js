@@ -503,27 +503,30 @@ async function runPerformanceTests( branches, options ) {
 		}
 	}
 
-	// Add role symlinks (head -> first branch's SHA, base -> second branch's
-	// SHA, etc.) so downloaded artifacts are navigable without knowing the SHAs
-	// in advance. Artifact upload will dereference these, so the uploaded zip
-	// contains both the SHA directories and the role-named duplicates.
+	// Write a manifest mapping each role to its branch SHA so downloaded
+	// artifacts are navigable without consulting workflow metadata. (Earlier
+	// we created filesystem symlinks for `head` and `base`, but
+	// `actions/upload-artifact` dereferences symlinks and the uploaded zip
+	// ended up carrying a full duplicate of every trace — doubling the
+	// artifact size for no extra information.)
 	const tracesDir = path.join( ARTIFACTS_PATH, 'traces' );
 	if ( fs.existsSync( tracesDir ) ) {
 		const roles = [ 'head', 'base' ];
+		/** @type {Record<string, { sha: string, input: string }>} */
+		const manifest = {};
 		for ( const [ i, branch ] of branches.entries() ) {
 			const role = roles[ i ] ?? `branch-${ i }`;
 			// @ts-ignore
 			const sha = branchShas[ branch ];
-			const target = path.join( tracesDir, sha );
-			if ( ! fs.existsSync( target ) ) {
+			if ( ! sha ) {
 				continue;
 			}
-			const linkPath = path.join( tracesDir, role );
-			if ( fs.existsSync( linkPath ) ) {
-				fs.rmSync( linkPath, { recursive: true, force: true } );
-			}
-			fs.symlinkSync( sha, linkPath, 'dir' );
+			manifest[ role ] = { sha, input: branch };
 		}
+		fs.writeFileSync(
+			path.join( tracesDir, 'manifest.json' ),
+			JSON.stringify( manifest, null, '\t' ) + '\n'
+		);
 	}
 
 	logAtIndent( 0, 'Calculating results' );
