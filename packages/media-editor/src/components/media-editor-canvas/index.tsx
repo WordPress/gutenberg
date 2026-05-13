@@ -107,7 +107,6 @@ export default function MediaEditorCanvas( {
 			/>
 			<CropDimensionsBadge
 				state={ controller.state }
-				aspectRatio={ aspectRatio }
 				visible={ isBadgeVisible }
 			/>
 		</div>
