@@ -1834,13 +1834,36 @@ describe( 'Post actions', () => {
 				consumesAcceptedProof: true,
 			} );
 
-			await registry.dispatch( editorStore ).savePost();
+			expect(
+				registry
+					.select( editorStore )
+					.shouldUseDistributedEditingRetrySaveForSavePost()
+			).toBe( false );
+
+			await expect(
+				registry.dispatch( editorStore ).savePost()
+			).resolves.toBeUndefined();
 
 			expect( retrySaveCalls ).toBe( 0 );
 			expect( normalSaveCalls ).toBe( 1 );
 			expect( registry.select( editorStore ).isEditedPostDirty() ).toBe(
 				false
 			);
+			expect(
+				registry
+					.select( editorStore )
+					.getDistributedEditingSessionState()
+			).toMatchObject( {
+				retrySubmitSaveStatus:
+					DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.READY,
+				retrySubmitSavePrepared: true,
+				canExportLocalUpdates: true,
+				retrySaveStatus:
+					DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.NONE,
+				retrySaveHandoffStatus:
+					DISTRIBUTED_EDITING_RETRY_SAVE_HANDOFF_STATUSES.NONE,
+				retrySaveHandoffBlocksNormalSave: false,
+			} );
 		} );
 
 		it( 'lets an explicit retry-save false option bypass the setting gate', async () => {
@@ -1926,15 +1949,146 @@ describe( 'Post actions', () => {
 				consumesAcceptedProof: true,
 			} );
 
-			await registry.dispatch( editorStore ).savePost( {
-				__experimentalUseDistributedEditingRetrySave: false,
-			} );
+			expect(
+				registry
+					.select( editorStore )
+					.shouldUseDistributedEditingRetrySaveForSavePost()
+			).toBe( true );
+			expect(
+				registry
+					.select( editorStore )
+					.shouldUseDistributedEditingRetrySaveForSavePost( {
+						__experimentalUseDistributedEditingRetrySave: false,
+					} )
+			).toBe( false );
+
+			await expect(
+				registry.dispatch( editorStore ).savePost( {
+					__experimentalUseDistributedEditingRetrySave: false,
+				} )
+			).resolves.toBeUndefined();
 
 			expect( retrySaveCalls ).toBe( 0 );
 			expect( normalSaveCalls ).toBe( 1 );
 			expect( registry.select( editorStore ).isEditedPostDirty() ).toBe(
 				false
 			);
+			expect(
+				registry
+					.select( editorStore )
+					.getDistributedEditingSessionState()
+			).toMatchObject( {
+				retrySubmitSaveStatus:
+					DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.READY,
+				retrySubmitSavePrepared: true,
+				canExportLocalUpdates: true,
+				retrySaveStatus:
+					DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.NONE,
+				retrySaveHandoffStatus:
+					DISTRIBUTED_EDITING_RETRY_SAVE_HANDOFF_STATUSES.NONE,
+				retrySaveHandoffBlocksNormalSave: false,
+			} );
+		} );
+
+		it( 'blocks setting-enabled savePost normal fallback when prepared retry-save work is already in flight', async () => {
+			const post = {
+				id: postId,
+				type: 'post',
+				title: 'bar',
+				content: 'bar',
+				status: 'draft',
+			};
+			let apiCalls = 0;
+
+			apiFetch.setFetchHandler( async ( options ) => {
+				apiCalls++;
+				const method = getMethod( options );
+				const { path } = options;
+
+				throw {
+					code: 'unexpected_path',
+					message: `Unexpected path: ${ method } ${ path }`,
+				};
+			} );
+
+			const registry = createRegistryWithStores();
+
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', post );
+			registry.dispatch( editorStore ).setupEditor( post, {
+				content: 'new bar',
+			} );
+			registry.dispatch( editorStore ).updateEditorSettings( {
+				distributedEditing: {
+					enabled: true,
+					retrySaveHandoff: true,
+				},
+			} );
+			registry
+				.dispatch( editorStore )
+				.setDistributedEditingSessionState( {
+					clientBaseVersion: '4',
+					serverVersion: '7',
+					pendingChangeCount: 1,
+					retrySubmitProofStatus:
+						DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.ACCEPTED_FOR_FUTURE_SAVE,
+					retrySubmitAccepted: true,
+					retrySubmitSavePathRequired: true,
+					canExportLocalUpdates: true,
+				} );
+
+			await expect(
+				registry
+					.dispatch( editorStore )
+					.__experimentalPrepareDistributedEditingRetrySubmitSaveAfterProof()
+			).resolves.toMatchObject( {
+				status: DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.READY,
+				consumesAcceptedProof: true,
+			} );
+
+			registry
+				.dispatch( editorStore )
+				.updateDistributedEditingSessionState( {
+					retrySaveStatus:
+						DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVING,
+				} );
+
+			await expect(
+				registry.dispatch( editorStore ).savePost()
+			).resolves.toMatchObject( {
+				status: 'retry_save_blocked',
+				reason: DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.RETRY_SAVE_IN_PROGRESS,
+				allowsNormalSaveFallback: false,
+				blocksNormalSavePost: true,
+				callsRetrySaveAction: false,
+				callsNormalSavePost: false,
+			} );
+
+			expect( apiCalls ).toBe( 0 );
+			expect( registry.select( editorStore ).isEditedPostDirty() ).toBe(
+				true
+			);
+			expect(
+				registry
+					.select( editorStore )
+					.getDistributedEditingSessionState()
+			).toMatchObject( {
+				hasPendingChanges: true,
+				isAwaitingServerConfirmation: true,
+				mustOfferLocalCopy: true,
+				canExportLocalUpdates: true,
+				retrySubmitSaveStatus:
+					DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.READY,
+				retrySubmitSavePrepared: true,
+				retrySaveStatus:
+					DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVING,
+				retrySaveHandoffStatus:
+					DISTRIBUTED_EDITING_RETRY_SAVE_HANDOFF_STATUSES.RETRY_SAVE_BLOCKED,
+				retrySaveHandoffReason:
+					DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.RETRY_SAVE_IN_PROGRESS,
+				retrySaveHandoffBlocksNormalSave: true,
+			} );
 		} );
 
 		it( 'blocks experimental savePost normal fallback when retry-save policy protects local changes', async () => {
