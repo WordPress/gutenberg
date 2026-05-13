@@ -37,8 +37,7 @@ function fail( summary, details = '' ) {
 /*
  * Fast path: skip the full check if neither lockfile has changed since the
  * last successful run. Both files' mtimes are written into a cache file
- * inside node_modules (so a fresh install wipes it). `--verbose` always
- * forces a fresh check so debug output reflects the current state.
+ * inside node_modules (so a fresh install wipes it).
  */
 let currentMtimes;
 try {
@@ -60,21 +59,19 @@ try {
 	throw err;
 }
 
-if ( ! verbose ) {
-	let cached;
-	try {
-		cached = JSON.parse( await fs.promises.readFile( CACHE_FILE, 'utf8' ) );
-	} catch {
-		cached = null;
-	}
+try {
+	const cached = JSON.parse(
+		await fs.promises.readFile( CACHE_FILE, 'utf8' )
+	);
 	if (
-		cached &&
 		cached.lockfile === currentMtimes.lockfile &&
 		cached.hiddenLockfile === currentMtimes.hiddenLockfile
 	) {
 		console.log( '\n   ✔ All good.' );
 		process.exit( 0 );
 	}
+} catch {
+	// No cache or unreadable — fall through to a full check.
 }
 
 const [ lockText, hiddenText ] = await Promise.all( [
