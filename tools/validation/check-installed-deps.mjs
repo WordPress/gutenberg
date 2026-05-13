@@ -59,6 +59,7 @@ try {
 	throw err;
 }
 
+let needsCheck = true;
 try {
 	const cached = JSON.parse(
 		await fs.promises.readFile( CACHE_FILE, 'utf8' )
@@ -67,82 +68,86 @@ try {
 		cached.lockfile === currentMtimes.lockfile &&
 		cached.hiddenLockfile === currentMtimes.hiddenLockfile
 	) {
-		console.log( '\n   ✔ All good.' );
-		process.exit( 0 );
+		needsCheck = false;
 	}
 } catch {
 	// No cache or unreadable — fall through to a full check.
 }
 
-const [ lockText, hiddenText ] = await Promise.all( [
-	fs.promises.readFile( LOCKFILE, 'utf8' ),
-	fs.promises.readFile( HIDDEN_LOCKFILE, 'utf8' ),
-] );
-const lock = JSON.parse( lockText );
-const hidden = JSON.parse( hiddenText );
+if ( needsCheck ) {
+	const [ lockText, hiddenText ] = await Promise.all( [
+		fs.promises.readFile( LOCKFILE, 'utf8' ),
+		fs.promises.readFile( HIDDEN_LOCKFILE, 'utf8' ),
+	] );
+	const lock = JSON.parse( lockText );
+	const hidden = JSON.parse( hiddenText );
 
-const lockPkgs = lock.packages || {};
-const hiddenPkgs = hidden.packages || {};
+	const lockPkgs = lock.packages || {};
+	const hiddenPkgs = hidden.packages || {};
 
-const reportedMismatches = [];
-const MAX_REPORTED = 5;
-let totalMismatches = 0;
+	const reportedMismatches = [];
+	const MAX_REPORTED = 5;
+	let totalMismatches = 0;
 
-for ( const [ pkgPath, info ] of Object.entries( lockPkgs ) ) {
-	/*
-	 * Skip entries without an `integrity` field — these are the root project
-	 * and workspace/link packages (file: or workspace: refs), which aren't
-	 * fetched from a registry and have no installed counterpart to verify.
-	 */
-	if ( ! info.integrity ) {
-		continue;
-	}
-
-	const installed = hiddenPkgs[ pkgPath ];
-
-	let mismatch;
-	if ( ! installed ) {
+	for ( const [ pkgPath, info ] of Object.entries( lockPkgs ) ) {
 		/*
-		 * Optional deps may be skipped by npm on the current platform
-		 * (e.g. macOS-only fsevents on Linux). Don't flag them as missing.
-		 * Real drift on an optional dep would still be caught below as
-		 * an integrity mismatch.
+		 * Skip entries without an `integrity` field — these are the root
+		 * project and workspace/link packages (file: or workspace: refs),
+		 * which aren't fetched from a registry and have no installed
+		 * counterpart to verify.
 		 */
-		if ( info.optional ) {
+		if ( ! info.integrity ) {
 			continue;
 		}
-		mismatch = `missing: ${ pkgPath }`;
-	} else if ( installed.integrity !== info.integrity ) {
-		mismatch = `integrity mismatch: ${ pkgPath }`;
+
+		const installed = hiddenPkgs[ pkgPath ];
+
+		let mismatch;
+		if ( ! installed ) {
+			/*
+			 * Optional deps may be skipped by npm on the current platform
+			 * (e.g. macOS-only fsevents on Linux). Don't flag them as
+			 * missing. Real drift on an optional dep would still be caught
+			 * below as an integrity mismatch.
+			 */
+			if ( info.optional ) {
+				continue;
+			}
+			mismatch = `missing: ${ pkgPath }`;
+		} else if ( installed.integrity !== info.integrity ) {
+			mismatch = `integrity mismatch: ${ pkgPath }`;
+		}
+
+		if ( ! mismatch ) {
+			continue;
+		}
+
+		totalMismatches++;
+		if ( reportedMismatches.length < MAX_REPORTED ) {
+			reportedMismatches.push( mismatch );
+		}
 	}
 
-	if ( ! mismatch ) {
-		continue;
-	}
-
-	totalMismatches++;
-	if ( reportedMismatches.length < MAX_REPORTED ) {
-		reportedMismatches.push( mismatch );
-	}
-}
-
-if ( totalMismatches > 0 ) {
-	const detailLines = reportedMismatches.map( ( m ) => `\t${ m }` );
-	if ( totalMismatches > reportedMismatches.length ) {
-		detailLines.push(
-			`\t... and ${ totalMismatches - reportedMismatches.length } more.`
+	if ( totalMismatches > 0 ) {
+		const detailLines = reportedMismatches.map( ( m ) => `\t${ m }` );
+		if ( totalMismatches > reportedMismatches.length ) {
+			detailLines.push(
+				`\t... and ${
+					totalMismatches - reportedMismatches.length
+				} more.`
+			);
+		}
+		fail(
+			`Mismatches found: ${ totalMismatches }`,
+			detailLines.join( os.EOL )
 		);
 	}
-	fail(
-		`Mismatches found: ${ totalMismatches }`,
-		detailLines.join( os.EOL )
-	);
-}
 
-try {
-	fs.writeFileSync( CACHE_FILE, JSON.stringify( currentMtimes ) );
-} catch {
-	// Cache write failure is not fatal — we'll just re-check next time.
+	try {
+		fs.writeFileSync( CACHE_FILE, JSON.stringify( currentMtimes ) );
+	} catch {
+		// Cache write failure is not fatal — we'll just re-check next time.
+	}
 }
 
 console.log( '\n   ✔ All good.' );
