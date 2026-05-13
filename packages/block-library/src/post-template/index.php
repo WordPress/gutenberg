@@ -56,16 +56,16 @@ function render_block_core_post_template( $attributes, $content, $block ) {
 	if ( $use_global_query ) {
 		global $wp_query;
 
+		$query = block_core_query_get_inherited_query( $block );
+
 		/*
 		 * If already in the main query loop, duplicate the query instance to not tamper with the main instance.
 		 * Since this is a nested query, it should start at the beginning, therefore rewind posts.
 		 * Otherwise, the main query loop has not started yet and this block is responsible for doing so.
 		 */
-		if ( in_the_loop() ) {
+		if ( $query === $wp_query && in_the_loop() ) {
 			$query = clone $wp_query;
 			$query->rewind_posts();
-		} else {
-			$query = $wp_query;
 		}
 	} else {
 		$query_args = build_query_vars_from_query_block( $block, $page );

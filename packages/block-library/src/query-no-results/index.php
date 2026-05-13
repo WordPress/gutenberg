@@ -29,8 +29,7 @@ function render_block_core_query_no_results( $attributes, $content, $block ) {
 	// Override the custom query with the global query if needed.
 	$use_global_query = ( isset( $block->context['query']['inherit'] ) && $block->context['query']['inherit'] );
 	if ( $use_global_query ) {
-		global $wp_query;
-		$query = $wp_query;
+		$query = block_core_query_get_inherited_query( $block );
 	} else {
 		$query_args = build_query_vars_from_query_block( $block, $page );
 		$query      = new WP_Query( $query_args );
