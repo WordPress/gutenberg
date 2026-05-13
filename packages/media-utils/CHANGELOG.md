@@ -6,6 +6,10 @@
 
 -   Remove the `window.__heicUploadSupport` type declaration, following the removal of the redundant flag ([#80452](https://github.com/WordPress/gutenberg/pull/80452)).
 
+### Bug Fix
+
+-   `MediaUpload`: Fix `allowedTypes` being ignored when `gallery` prop is `true` ([#53619](https://github.com/WordPress/gutenberg/issues/53619)).
+
 ## 5.51.0 (2026-07-14)
 
 ### Enhancements
