@@ -122,7 +122,6 @@ require __DIR__ . '/compat/wordpress-7.0/command-palette.php';
 require __DIR__ . '/compat/wordpress-7.0/meta-box-rtc-compat.php';
 require __DIR__ . '/compat/wordpress-7.0/script-modules.php';
 require __DIR__ . '/compat/wordpress-7.0/fonts.php';
-require __DIR__ . '/compat/wordpress-7.0/visual-revisions.php';
 
 // WordPress 7.1 compat.
 require __DIR__ . '/compat/wordpress-7.1/classic-block.php';
