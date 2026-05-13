@@ -46,11 +46,6 @@ function StyleInspectorSlots( {
 	return (
 		<>
 			<InspectorControls.Slot />
-			<InspectorControls.Slot group="layout" label={ __( 'Layout' ) } />
-			<InspectorControls.Slot
-				group="dimensions"
-				label={ __( 'Dimensions' ) }
-			/>
 			<InspectorControls.Slot
 				group="color"
 				label={ __( 'Color' ) }
@@ -64,6 +59,11 @@ function StyleInspectorSlots( {
 			<InspectorControls.Slot
 				group="typography"
 				label={ __( 'Typography' ) }
+			/>
+			<InspectorControls.Slot group="layout" label={ __( 'Layout' ) } />
+			<InspectorControls.Slot
+				group="dimensions"
+				label={ __( 'Dimensions' ) }
 			/>
 			<InspectorControls.Slot group="border" label={ borderPanelLabel } />
 			{ showPositionControls && <PositionControls /> }
