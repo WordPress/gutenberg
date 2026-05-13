@@ -46,8 +46,12 @@ body.has-admin-bar-in-editor {
 	}
 
 	#site-editor-v2-app {
+		position: fixed;
+		top: 32px;
+		left: 0;
+		right: 0;
+		bottom: 0;
 		height: calc(100vh - 32px) !important;
-		margin-top: 32px;
 	}
 
 	.boot-layout.has-full-canvas .boot-layout__canvas {
@@ -57,8 +61,8 @@ body.has-admin-bar-in-editor {
 
 	@media (max-width: 782px) {
 		#site-editor-v2-app {
+			top: 46px;
 			height: calc(100vh - 46px) !important;
-			margin-top: 46px;
 		}
 
 		.boot-layout__stage,
