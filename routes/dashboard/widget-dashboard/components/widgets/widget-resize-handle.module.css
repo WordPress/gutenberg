@@ -7,7 +7,7 @@
 	padding: 0;
 	background: transparent;
 	/* Nudge painted affordance away from tile chrome; hit target stays flush. */
-	--widget-resize-handle-visual-inset: var(--wpds-border-width-md);
+	--widget-resize-handle-visual-inset: var(--wpds-dimension-padding-xs);
 	--widget-resize-handle-hover-scale: 1.18;
 }
 
