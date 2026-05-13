@@ -7,6 +7,8 @@ import type CollaborationUtils from './fixtures/collaboration-utils';
 type Editor = import('@wordpress/e2e-test-utils-playwright').Editor;
 type Page = import('@playwright/test').Page;
 
+type Box = { x: number; y: number; width: number; height: number };
+
 const TWO_ROW_TABLE_CONTENT =
 	'<!-- wp:table -->\n' +
 	'<figure class="wp-block-table"><table><tbody>' +
@@ -51,6 +53,15 @@ function getBodyCellAttributeKey( index: number ) {
 function getBodyCellRichText( editor: Editor, index: number ) {
 	return editor.canvas.locator(
 		`[data-wp-block-attribute-key="${ getBodyCellAttributeKey( index ) }"]`
+	);
+}
+
+function boxesIntersect( a: Box, b: Box ) {
+	return (
+		a.x < b.x + b.width &&
+		a.x + a.width > b.x &&
+		a.y < b.y + b.height &&
+		a.y + a.height > b.y
 	);
 }
 
@@ -149,70 +160,100 @@ async function getSelectionAttributeKeys( page: Page ) {
 	} );
 }
 
-async function selectAcrossCells( {
-	editor,
+async function selectCellRangeInStore( {
+	page,
 	startIndex,
 	endIndex,
 }: {
-	editor: Editor;
+	page: Page;
 	startIndex: number;
 	endIndex: number;
 } ) {
-	const startCell = getBodyCellRichText( editor, startIndex );
-	const endCell = getBodyCellRichText( editor, endIndex );
+	await page.evaluate(
+		( {
+			startAttributeKey,
+			endAttributeKey,
+			endRowIndex,
+			endCellIndex,
+		} ) => {
+			const blocks = window.wp.data
+				.select( 'core/block-editor' )
+				.getBlocks() as Array< {
+				name: string;
+				clientId: string;
+				attributes: {
+					body: Array< {
+						cells: Array< { content: string } >;
+					} >;
+				};
+			} >;
+			const tableBlock = blocks.find(
+				( block ) => block.name === 'core/table'
+			);
 
-	await startCell.scrollIntoViewIfNeeded();
-	await endCell.scrollIntoViewIfNeeded();
-
-	const endCellHandle = await endCell.elementHandle();
-	if ( ! endCellHandle ) {
-		throw new Error( 'Could not resolve end table cell element' );
-	}
-
-	try {
-		await startCell.evaluate( ( startElement, endElement ) => {
-			const ownerDocument = startElement.ownerDocument;
-			// Build the native range directly; table RichText mouse drags are
-			// geometry-dependent in headless browsers.
-			const getTextNode = ( element: Element, last = false ) => {
-				const walker = ownerDocument.createTreeWalker(
-					element,
-					NodeFilter.SHOW_TEXT
-				);
-				let textNode = walker.nextNode();
-				if ( ! last ) {
-					return textNode;
-				}
-				let nextTextNode = walker.nextNode();
-				while ( nextTextNode ) {
-					textNode = nextTextNode;
-					nextTextNode = walker.nextNode();
-				}
-				return textNode;
-			};
-			const startTextNode = getTextNode( startElement );
-			const endTextNode = getTextNode( endElement, true );
-			const selection = ownerDocument.defaultView?.getSelection();
-
-			if ( ! startTextNode || ! endTextNode || ! selection ) {
-				throw new Error( 'Could not resolve table cell text nodes' );
+			if ( ! tableBlock ) {
+				throw new Error( 'Could not resolve table block' );
 			}
 
-			const range = ownerDocument.createRange();
-			range.setStart( startTextNode, 0 );
-			range.setEnd( endTextNode, endTextNode.textContent?.length ?? 0 );
+			window.wp.data.dispatch( 'core/block-editor' ).selectionChange( {
+				start: {
+					clientId: tableBlock.clientId,
+					attributeKey: startAttributeKey,
+					offset: 0,
+				},
+				end: {
+					clientId: tableBlock.clientId,
+					attributeKey: endAttributeKey,
+					offset: tableBlock.attributes.body[ endRowIndex ].cells[
+						endCellIndex
+					].content.length,
+				},
+			} );
+		},
+		{
+			startAttributeKey: getBodyCellAttributeKey( startIndex ),
+			endAttributeKey: getBodyCellAttributeKey( endIndex ),
+			endRowIndex: Math.floor( endIndex / 2 ),
+			endCellIndex: endIndex % 2,
+		}
+	);
+}
 
-			selection.removeAllRanges();
-			selection.addRange( range );
-			ownerDocument.dispatchEvent(
-				new Event( 'selectionchange', { bubbles: true } )
-			);
-			ownerDocument.defaultView?.dispatchEvent(
-				new MouseEvent( 'mouseup', { bubbles: true } )
-			);
-		}, endCellHandle );
-	} finally {
-		await endCellHandle.dispose();
+async function expectRemoteSelectionInsideCells(
+	page: Page,
+	cellIndices: number[]
+) {
+	const editorFrame = page.frameLocator( 'iframe[name="editor-canvas"]' );
+	const selectionRects = editorFrame.locator(
+		'.collaborators-overlay-selection-rect'
+	);
+
+	await expect
+		.poll( () => selectionRects.count(), { timeout: 15000 } )
+		.toBeGreaterThanOrEqual( cellIndices.length );
+
+	const rectBoxes: Box[] = [];
+	const rectCount = await selectionRects.count();
+	for ( let i = 0; i < rectCount; i++ ) {
+		const rectBox = await selectionRects.nth( i ).boundingBox();
+		if ( rectBox && rectBox.width > 0 && rectBox.height > 0 ) {
+			rectBoxes.push( rectBox );
+		}
+	}
+
+	for ( const cellIndex of cellIndices ) {
+		const cellBox = await editorFrame
+			.locator( 'role=textbox[name="Body cell text"i]' )
+			.nth( cellIndex )
+			.boundingBox();
+
+		if ( ! cellBox ) {
+			throw new Error( 'Remote target cell bounding box not available' );
+		}
+
+		expect(
+			rectBoxes.some( ( rectBox ) => boxesIntersect( rectBox, cellBox ) )
+		).toBe( true );
 	}
 }
 
@@ -394,14 +435,13 @@ test.describe( 'Collaboration - Nested Awareness Selection', () => {
 		await expectRemoteCursorInsideCell( page2, 5 );
 	} );
 
-	test( 'native selection across table cells preserves distinct attribute keys', async ( {
+	test( 'selection across table cells renders in both nested RichText fields', async ( {
 		collaborationUtils,
 		requestUtils,
-		editor,
 		page,
 	} ) => {
 		const post = await requestUtils.createPost( {
-			title: 'Nested Awareness Selection Cross Cell Native Selection Test',
+			title: 'Nested Awareness Selection Cross Cell Selection Test',
 			status: 'draft',
 			date_gmt: new Date().toISOString(),
 			content: TWO_ROW_TABLE_CONTENT,
@@ -411,8 +451,8 @@ test.describe( 'Collaboration - Nested Awareness Selection', () => {
 
 		await expectTableBlockLoaded( collaborationUtils );
 
-		await selectAcrossCells( {
-			editor,
+		await selectCellRangeInStore( {
+			page,
 			startIndex: 1,
 			endIndex: 3,
 		} );
@@ -423,6 +463,11 @@ test.describe( 'Collaboration - Nested Awareness Selection', () => {
 				start: 'body.0.cells.1.content',
 				end: 'body.1.cells.1.content',
 			} );
+
+		await expectRemoteSelectionInsideCells(
+			collaborationUtils.page2,
+			[ 1, 3 ]
+		);
 	} );
 
 	test( 'cursor in a table caption disappears when another user removes the caption', async ( {
