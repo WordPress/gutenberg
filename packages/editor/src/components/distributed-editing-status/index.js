@@ -152,6 +152,31 @@ export function DistributedEditingStatusTestControls( {
 }
 
 /**
+ * Renders the internal DE-RTC status inspection surface. This deliberately
+ * combines the status controls and mounted status surface without transport so
+ * manual browser checks can exercise representative states before the runtime
+ * integration exists.
+ *
+ * @param {Object}   props          Component props.
+ * @param {Function} props.onAction Optional status action handler.
+ * @param {Function} props.onSelect Optional control selection observer.
+ *
+ * @return {React.ReactNode} Rendered internal inspection surface.
+ */
+export function DistributedEditingStatusInspector( { onAction, onSelect } ) {
+	return (
+		<div
+			aria-label={ __( 'Distributed editing status inspection' ) }
+			className="editor-distributed-editing-status__inspector"
+			role="group"
+		>
+			<DistributedEditingStatusTestControls onSelect={ onSelect } />
+			<DistributedEditingStatus onAction={ onAction } />
+		</div>
+	);
+}
+
+/**
  * Renders an inert DE-RTC status surface from pure selector output.
  *
  * @param {Object}   props                    Component props.

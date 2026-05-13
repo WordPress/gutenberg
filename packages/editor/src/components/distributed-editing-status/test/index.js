@@ -13,6 +13,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import DistributedEditingStatus, {
+	DistributedEditingStatusInspector,
 	DistributedEditingStatusTestControls,
 	DistributedEditingStatusSurface,
 	getDistributedEditingStatusControlStates,
@@ -160,6 +161,36 @@ describe( 'DistributedEditingStatusTestControls', () => {
 			actions.setDistributedEditingSessionState
 		).not.toHaveBeenCalled();
 		expect( onSelect ).toHaveBeenCalledWith( 'idle', {} );
+	} );
+} );
+
+describe( 'DistributedEditingStatusInspector', () => {
+	it( 'renders internal controls with the selector-backed status surface', () => {
+		setupDistributedEditingStatusDispatch();
+		setupDistributedEditingStatusSelect( {
+			sessionState: {
+				remoteChangeCount: 1,
+			},
+		} );
+
+		render( <DistributedEditingStatusInspector /> );
+
+		expect(
+			screen.getByRole( 'group', {
+				name: 'Distributed editing status inspection',
+			} )
+		).toBeVisible();
+		expect(
+			screen.getByRole( 'button', {
+				name: 'Pending local changes',
+			} )
+		).toBeVisible();
+		expect(
+			screen.getByRole( 'region', {
+				name: 'Distributed editing status',
+			} )
+		).toBeVisible();
+		expect( screen.getByText( 'Remote changes received' ) ).toBeVisible();
 	} );
 } );
 
