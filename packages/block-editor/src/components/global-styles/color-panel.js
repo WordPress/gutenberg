@@ -31,6 +31,7 @@ import ColorGradientControl from '../colors-gradients/control';
 import { useColorsPerOrigin, useGradientsPerOrigin } from './hooks';
 import { useToolsPanelDropdownMenuProps } from './utils';
 import { setImmutably } from '../../utils/object';
+import { extractColorSlug } from '../../utils/color-values';
 import { unlock } from '../../lock-unlock';
 
 export function useHasColorPanel( settings ) {
@@ -144,6 +145,29 @@ export function ColorToolsPanel( {
 	);
 }
 
+/**
+ * Encodes a colour value for storage in the style object.
+ *
+ * When a `slug` is provided it is used directly (slug-based selection path).
+ * Otherwise the function falls back to looking up the hex value in the
+ * palette; if found it encodes the slug, otherwise it stores the raw hex.
+ *
+ * Extracted to module scope so it is not re-created on every render.
+ * Callers inside `ColorPanel` pass the live `colors` array from the closure.
+ *
+ * @param {Array}       allColors  Flat array of `{ color, slug }` objects.
+ * @param {string|void} colorValue Hex or CSS colour string.
+ * @param {string|void} slug       Optional palette slug from slug-aware selection.
+ * @return {string|void} Encoded value suitable for the style object.
+ */
+function encodeColorValueWithPalette( allColors, colorValue, slug ) {
+	if ( slug ) {
+		return 'var:preset|color|' + slug;
+	}
+	const colorObject = allColors.find( ( { color } ) => color === colorValue );
+	return colorObject ? 'var:preset|color|' + colorObject.slug : colorValue;
+}
+
 const DEFAULT_CONTROLS = {
 	text: true,
 	background: true,
@@ -193,11 +217,7 @@ function ColorPanelTab( {
 			colorValue={ isGradient ? undefined : inheritedValue }
 			colorSlug={ isGradient ? undefined : inheritedSlug }
 			gradientValue={ isGradient ? inheritedValue : undefined }
-			onColorChange={
-				isGradient
-					? undefined
-					: ( newColor, newSlug ) => setValue( newColor, newSlug )
-			}
+			onColorChange={ isGradient ? undefined : setValue }
 			onGradientChange={ isGradient ? setValue : undefined }
 			clearable={ inheritedValue === userValue }
 			headingLevel={ 3 }
@@ -351,33 +371,9 @@ export default function ColorPanel( {
 	const decodeValue = ( rawValue ) =>
 		getValueFromVariable( { settings }, '', rawValue );
 
-	const extractColorSlug = ( rawValue ) => {
-		if ( typeof rawValue !== 'string' ) {
-			return undefined;
-		}
-		if ( rawValue.startsWith( 'var:preset|color|' ) ) {
-			return rawValue.slice( 'var:preset|color|'.length );
-		}
-		const themeFormatMatch = rawValue.match(
-			/^var\(--wp--preset--color--([^)]+)\)$/
-		);
-		return themeFormatMatch?.[ 1 ];
-	};
-
-	const encodeColorValue = ( colorValue, slug ) => {
-		if ( slug ) {
-			return 'var:preset|color|' + slug;
-		}
-		const allColors = colors.flatMap(
-			( { colors: originColors } ) => originColors
-		);
-		const colorObject = allColors.find(
-			( { color } ) => color === colorValue
-		);
-		return colorObject
-			? 'var:preset|color|' + colorObject.slug
-			: colorValue;
-	};
+	const allColors = colors.flatMap(
+		( { colors: originColors } ) => originColors
+	);
 
 	const encodeGradientValue = ( gradientValue ) => {
 		const allGradients = gradients.flatMap(
@@ -404,7 +400,7 @@ export default function ColorPanel( {
 		const newValue = setImmutably(
 			value,
 			[ 'color', 'background' ],
-			encodeColorValue( newColor, newSlug )
+			encodeColorValueWithPalette( allColors, newColor, newSlug )
 		);
 		if ( ! hasBackgroundGradientSupport ) {
 			newValue.color.gradient = undefined;
@@ -443,7 +439,7 @@ export default function ColorPanel( {
 			setImmutably(
 				value,
 				[ 'elements', 'link', 'color', 'text' ],
-				encodeColorValue( newColor, newSlug )
+				encodeColorValueWithPalette( allColors, newColor, newSlug )
 			)
 		);
 	};
@@ -458,7 +454,7 @@ export default function ColorPanel( {
 			setImmutably(
 				value,
 				[ 'elements', 'link', ':hover', 'color', 'text' ],
-				encodeColorValue( newColor, newSlug )
+				encodeColorValueWithPalette( allColors, newColor, newSlug )
 			)
 		);
 	};
@@ -486,7 +482,7 @@ export default function ColorPanel( {
 		let changedObject = setImmutably(
 			value,
 			[ 'color', 'text' ],
-			encodeColorValue( newColor, newSlug )
+			encodeColorValueWithPalette( allColors, newColor, newSlug )
 		);
 		// Compare raw encoded references, not decoded color values: two palette
 		// entries can share the same hex value but carry different slugs
@@ -501,7 +497,7 @@ export default function ColorPanel( {
 			changedObject = setImmutably(
 				changedObject,
 				[ 'elements', 'link', 'color', 'text' ],
-				encodeColorValue( newColor, newSlug )
+				encodeColorValueWithPalette( allColors, newColor, newSlug )
 			);
 		}
 
@@ -717,7 +713,11 @@ export default function ColorPanel( {
 				setImmutably(
 					value,
 					[ 'elements', name, 'color', 'text' ],
-					encodeColorValue( newTextColor, newSlug )
+					encodeColorValueWithPalette(
+						allColors,
+						newTextColor,
+						newSlug
+					)
 				)
 			);
 		};
@@ -725,7 +725,11 @@ export default function ColorPanel( {
 			const newValue = setImmutably(
 				value,
 				[ 'elements', name, 'color', 'background' ],
-				encodeColorValue( newBackgroundColor, newSlug )
+				encodeColorValueWithPalette(
+					allColors,
+					newBackgroundColor,
+					newSlug
+				)
 			);
 			newValue.elements[ name ].color.gradient = undefined;
 			onChange( newValue );
