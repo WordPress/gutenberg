@@ -77,9 +77,9 @@ export function OnThisDayView( {
 					{ __( 'Nothing on this day yet' ) }
 				</EmptyState.Title>
 				<EmptyState.Description>
-					{ __(
-						'Your blogging memories are still being made. Check back again soon.'
-					) }
+					{ __( 'Your blogging memories are still being made.' ) }
+					<br />
+					{ __( 'Check back again soon.' ) }
 				</EmptyState.Description>
 
 				{ ! hasAnyPosts && (
