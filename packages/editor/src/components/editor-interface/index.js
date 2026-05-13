@@ -14,14 +14,12 @@ import { BlockBreadcrumb, BlockToolbar } from '@wordpress/block-editor';
 import { useViewportMatch } from '@wordpress/compose';
 import { useState, useCallback } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
-import { InlineNotices } from '@wordpress/notices';
 
 /**
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
-import TemplateValidationNotice from '../template-validation-notice';
 import Header from '../header';
 import InserterSidebar from '../inserter-sidebar';
 import ListViewSidebar from '../list-view-sidebar';
@@ -31,6 +29,7 @@ import TextEditor from '../text-editor';
 import VisualEditor from '../visual-editor';
 import StylesCanvas from '../styles-canvas';
 import { MediaPreview } from '../media';
+import EditorInterfaceNotices from './notices';
 
 const interfaceLabels = {
 	/* translators: accessibility text for the editor top bar landmark region. */
@@ -44,15 +43,6 @@ const interfaceLabels = {
 	/* translators: accessibility text for the editor footer landmark region. */
 	footer: __( 'Editor footer' ),
 };
-
-const Notices = () => (
-	<InlineNotices
-		pinnedNoticesClassName="editor-notices__pinned"
-		dismissibleNoticesClassName="editor-notices__dismissible"
-	>
-		<TemplateValidationNotice />
-	</InlineNotices>
-);
 
 export default function EditorInterface( {
 	className,
@@ -184,7 +174,7 @@ export default function EditorInterface( {
 					/>
 				)
 			}
-			editorNotices={ <Notices /> }
+			editorNotices={ <EditorInterfaceNotices /> }
 			secondarySidebar={
 				! isAttachment &&
 				! isPreviewMode &&
@@ -198,7 +188,9 @@ export default function EditorInterface( {
 			}
 			content={
 				<>
-					{ ! isDistractionFree && ! isPreviewMode && <Notices /> }
+					{ ! isDistractionFree && ! isPreviewMode && (
+						<EditorInterfaceNotices />
+					) }
 					{ shouldShowMediaEditor && (
 						<MediaPreview { ...iframeProps } />
 					) }

@@ -10,9 +10,11 @@ import { __, _n, sprintf } from '@wordpress/i18n';
  */
 import { store as editorStore } from '../../store';
 import {
+	DISTRIBUTED_EDITING_DISPOSITIONS,
 	DISTRIBUTED_EDITING_NOTICE_ACTIONS,
 	DISTRIBUTED_EDITING_NOTICE_KINDS,
 	DISTRIBUTED_EDITING_UNLOAD_WARNING_REASONS,
+	normalizeDistributedEditingSessionState,
 } from '../../store/distributed-editing';
 
 /**
@@ -28,6 +30,33 @@ export function getDistributedEditingStatusSurfaceItems(
 	return noticeDescriptors
 		.map( getDistributedEditingStatusSurfaceItem )
 		.filter( Boolean );
+}
+
+/**
+ * Returns whether the selector-backed DE-RTC status surface should mount for
+ * the current internal session state.
+ *
+ * @param {Object} sessionState       DE-RTC session state.
+ * @param {Object} unloadWarningState DE-RTC unload-warning state.
+ *
+ * @return {boolean} Whether the status surface should render.
+ */
+export function shouldRenderDistributedEditingStatus(
+	sessionState = {},
+	unloadWarningState = {}
+) {
+	const normalized = normalizeDistributedEditingSessionState( sessionState );
+
+	return (
+		normalized.disposition !== DISTRIBUTED_EDITING_DISPOSITIONS.IDLE ||
+		normalized.hasPendingChanges ||
+		normalized.isAwaitingServerConfirmation ||
+		normalized.isConnectionDegraded ||
+		normalized.hasRemoteChanges ||
+		normalized.requiresServerStateAcceptance ||
+		normalized.mustOfferLocalCopy ||
+		Boolean( unloadWarningState?.shouldWarn )
+	);
 }
 
 /**
@@ -90,17 +119,31 @@ export function DistributedEditingStatusSurface( {
  * @return {React.ReactNode} Rendered status surface.
  */
 export default function DistributedEditingStatus( { onAction } ) {
-	const { noticeDescriptors, unloadWarningState } = useSelect( ( select ) => {
-		const {
-			getDistributedEditingNoticeDescriptors,
-			getDistributedEditingUnloadWarningState,
-		} = select( editorStore );
+	const { sessionState, noticeDescriptors, unloadWarningState } = useSelect(
+		( select ) => {
+			const {
+				getDistributedEditingSessionState,
+				getDistributedEditingNoticeDescriptors,
+				getDistributedEditingUnloadWarningState,
+			} = select( editorStore );
 
-		return {
-			noticeDescriptors: getDistributedEditingNoticeDescriptors(),
-			unloadWarningState: getDistributedEditingUnloadWarningState(),
-		};
-	}, [] );
+			return {
+				sessionState: getDistributedEditingSessionState(),
+				noticeDescriptors: getDistributedEditingNoticeDescriptors(),
+				unloadWarningState: getDistributedEditingUnloadWarningState(),
+			};
+		},
+		[]
+	);
+
+	if (
+		! shouldRenderDistributedEditingStatus(
+			sessionState,
+			unloadWarningState
+		)
+	) {
+		return null;
+	}
 
 	return (
 		<DistributedEditingStatusSurface

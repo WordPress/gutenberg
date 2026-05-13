@@ -5,11 +5,17 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
+ * WordPress dependencies
+ */
+import { useSelect } from '@wordpress/data';
+
+/**
  * Internal dependencies
  */
-import {
+import DistributedEditingStatus, {
 	DistributedEditingStatusSurface,
 	getDistributedEditingStatusSurfaceItems,
+	shouldRenderDistributedEditingStatus,
 } from '../';
 import {
 	DISTRIBUTED_EDITING_DISPOSITIONS,
@@ -20,6 +26,119 @@ import {
 	getDistributedEditingNoticeDescriptorsForSessionState,
 	getDistributedEditingUnloadWarningStateForSessionState,
 } from '../../../store/distributed-editing';
+
+jest.mock( '@wordpress/data/src/components/use-select', () => jest.fn() );
+
+function setupDistributedEditingStatusSelect( {
+	sessionState = {},
+	noticeDescriptors = getDistributedEditingNoticeDescriptorsForSessionState(
+		sessionState
+	),
+	unloadWarningState = getDistributedEditingUnloadWarningStateForSessionState(
+		sessionState
+	),
+} = {} ) {
+	useSelect.mockImplementation( ( mapSelect ) =>
+		mapSelect( () => ( {
+			getDistributedEditingSessionState: () => sessionState,
+			getDistributedEditingNoticeDescriptors: () => noticeDescriptors,
+			getDistributedEditingUnloadWarningState: () => unloadWarningState,
+		} ) )
+	);
+}
+
+afterEach( () => {
+	useSelect.mockReset();
+} );
+
+describe( 'shouldRenderDistributedEditingStatus', () => {
+	it( 'does not render for idle internal state', () => {
+		expect( shouldRenderDistributedEditingStatus() ).toBe( false );
+	} );
+
+	it( 'renders for non-idle, pending, remote, and unload-warning states', () => {
+		expect(
+			shouldRenderDistributedEditingStatus( {
+				disposition:
+					DISTRIBUTED_EDITING_DISPOSITIONS.ACCEPTED_WITH_DEGRADED_LIVE_FEEDBACK,
+			} )
+		).toBe( true );
+		expect(
+			shouldRenderDistributedEditingStatus( {
+				pendingChangeCount: 1,
+			} )
+		).toBe( true );
+		expect(
+			shouldRenderDistributedEditingStatus( {
+				remoteChangeCount: 1,
+			} )
+		).toBe( true );
+		expect(
+			shouldRenderDistributedEditingStatus( {
+				disposition:
+					DISTRIBUTED_EDITING_DISPOSITIONS.CONFLICT_REQUIRES_SERVER_STATE_ACCEPTANCE,
+			} )
+		).toBe( true );
+		expect(
+			shouldRenderDistributedEditingStatus( {
+				disposition:
+					DISTRIBUTED_EDITING_DISPOSITIONS.REQUIRES_MANUAL_RESOLUTION_NO_SYNC_META,
+			} )
+		).toBe( true );
+		expect(
+			shouldRenderDistributedEditingStatus( {}, { shouldWarn: true } )
+		).toBe( true );
+	} );
+} );
+
+describe( 'DistributedEditingStatus', () => {
+	it( 'does not mount the status surface for an idle session', () => {
+		setupDistributedEditingStatusSelect();
+
+		const { container } = render( <DistributedEditingStatus /> );
+
+		expect( container ).toBeEmptyDOMElement();
+	} );
+
+	it( 'mounts the status surface for pending local changes', () => {
+		setupDistributedEditingStatusSelect( {
+			sessionState: {
+				pendingChangeCount: 1,
+			},
+		} );
+
+		render( <DistributedEditingStatus /> );
+
+		expect(
+			screen.getByRole( 'region', {
+				name: 'Distributed editing status',
+			} )
+		).toBeVisible();
+		expect( screen.getByText( 'Changes pending' ) ).toBeVisible();
+		expect(
+			screen.getByText( '1 local change is awaiting confirmation.' )
+		).toBeVisible();
+	} );
+
+	it( 'mounts the status surface for unload-warning state', () => {
+		setupDistributedEditingStatusSelect( {
+			noticeDescriptors: [],
+			unloadWarningState: {
+				shouldWarn: true,
+				reason: DISTRIBUTED_EDITING_UNLOAD_WARNING_REASONS.AWAITING_SERVER_CONFIRMATION,
+				pendingChangeCount: 0,
+			},
+		} );
+
+		render( <DistributedEditingStatus /> );
+
+		expect(
+			screen.getByText(
+				'Leaving now may lose unconfirmed local changes.'
+			)
+		).toBeVisible();
+	} );
+} );
 
 describe( 'DistributedEditingStatusSurface', () => {
 	it( 'renders nothing for an idle session', () => {
