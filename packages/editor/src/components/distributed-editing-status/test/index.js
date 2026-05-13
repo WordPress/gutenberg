@@ -175,6 +175,7 @@ describe( 'getDistributedEditingStatusControlStates', () => {
 			'staleBaseRetrySaveSaved',
 			'staleBaseRetrySaveStale',
 			'staleBaseRetrySaveTampered',
+			'staleBaseRetrySaveUnfilteredHtml',
 			'staleBaseRetrySaveHandoffBlockedProof',
 			'staleBaseRetrySaveHandoffRefetch',
 			'staleBaseRetrySaveHandoffMissingRoute',
@@ -2033,6 +2034,18 @@ describe( 'DistributedEditingStatusSurface', () => {
 				message:
 					'The retry-save payload was incomplete or malformed. Protected local changes are still exportable; export them before trying again.',
 			},
+			{
+				disposition:
+					DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_UNFILTERED_HTML_REVIEW_REQUIRED,
+				reasonCode:
+					DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_UNFILTERED_HTML_WOULD_CHANGE_CONTENT,
+				retrySaveStatus:
+					DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_UNFILTERED_HTML_REVIEW_REQUIRED,
+				title: 'Retry save needs HTML review',
+				message:
+					'The server rejected this retry save because the change could alter unfiltered HTML written by another collaborator. Protected local changes are still exportable; export them, ask an unfiltered HTML reviewer for help, or refresh the server version before retrying.',
+				refetch: true,
+			},
 		];
 		const onAction = jest.fn();
 		const renderStatus = ( statusCase ) => (
@@ -2058,6 +2071,11 @@ describe( 'DistributedEditingStatusSurface', () => {
 			expect( screen.getByText( statusCase.title ) ).toBeVisible();
 			expect( screen.getByText( statusCase.message ) ).toBeVisible();
 			expect( screen.getByText( 'Export local changes' ) ).toBeVisible();
+			if ( statusCase.refetch ) {
+				expect(
+					screen.getByText( 'Refresh server version' )
+				).toBeVisible();
+			}
 		}
 	} );
 

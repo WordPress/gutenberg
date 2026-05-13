@@ -1147,6 +1147,86 @@ describe( 'distributed editing session state', () => {
 		} );
 	} );
 
+	it( 'normalizes retry-save unfiltered HTML review rejections as exportable manual review', () => {
+		const normalized = getDistributedEditingSessionStateForRetrySaveResult(
+			{
+				code: DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_UNFILTERED_HTML_WOULD_CHANGE_CONTENT,
+				data: {
+					reason_code:
+						DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_UNFILTERED_HTML_WOULD_CHANGE_CONTENT,
+					detail: 'collaborative_unfiltered_html_review_required',
+					pending_change_count: 2,
+					server_version: '7',
+					requires_reviewer_escalation: true,
+					review_action: 'request_unfiltered_html_reviewer',
+					recovery_actions: [
+						'export_local_updates',
+						'request_unfiltered_html_reviewer',
+						'refetch_server_state',
+					],
+					saves_post: false,
+					mutates_post_content: false,
+					creates_revision: false,
+					claims_saved: false,
+				},
+			},
+			{
+				serverVersion: '7',
+				pendingChangeCount: 2,
+				retrySubmitProofStatus:
+					DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.ACCEPTED_FOR_FUTURE_SAVE,
+				retrySubmitAccepted: true,
+				retrySubmitSavePathRequired: true,
+				retrySubmitSaveStatus:
+					DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.READY,
+				retrySubmitSaveReady: true,
+				canExportLocalUpdates: true,
+			}
+		);
+		const notices =
+			getDistributedEditingNoticeDescriptorsForSessionState( normalized );
+
+		expect( normalized ).toMatchObject( {
+			disposition:
+				DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_UNFILTERED_HTML_REVIEW_REQUIRED,
+			reasonCode:
+				DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_UNFILTERED_HTML_WOULD_CHANGE_CONTENT,
+			pendingChangeCount: 2,
+			hasPendingChanges: true,
+			isAwaitingServerConfirmation: true,
+			requiresServerStateRefetch: true,
+			requiresManualConflictResolution: true,
+			retrySaveStatus:
+				DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_UNFILTERED_HTML_REVIEW_REQUIRED,
+			retrySaveReason:
+				DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_UNFILTERED_HTML_WOULD_CHANGE_CONTENT,
+			retrySaveAccepted: false,
+			retrySaveServerVersion: '7',
+			retrySaveSavesPost: false,
+			retrySaveMutatesPostContent: false,
+			retrySaveClaimsSaved: false,
+			mustOfferLocalCopy: true,
+			canExportLocalUpdates: true,
+		} );
+		expect( notices ).toEqual(
+			expect.arrayContaining( [
+				expect.objectContaining( {
+					kind: DISTRIBUTED_EDITING_NOTICE_KINDS.RETRY_SAVE,
+					status: 'warning',
+					priority: 'blocking',
+					retrySaveStatus:
+						DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_UNFILTERED_HTML_REVIEW_REQUIRED,
+					retrySaveReason:
+						DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_UNFILTERED_HTML_WOULD_CHANGE_CONTENT,
+					actionKeys: [
+						DISTRIBUTED_EDITING_NOTICE_ACTIONS.EXPORT_LOCAL_UPDATES,
+						DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFETCH_SERVER_STATE,
+					],
+				} ),
+			] )
+		);
+	} );
+
 	it( 'marks guarded retry-save policy ready only after accepted proof and save preparation', () => {
 		const policy = getDistributedEditingRetrySavePolicyForSessionState(
 			{

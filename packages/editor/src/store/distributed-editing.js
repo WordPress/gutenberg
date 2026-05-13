@@ -11,6 +11,8 @@ export const DISTRIBUTED_EDITING_REASON_CODES = Object.freeze( {
 	DE_RTC_SYNC_META_UNRECOVERABLE: 'de_rtc_sync_meta_unrecoverable',
 	DE_RTC_SYNC_META_TAMPERED: 'de_rtc_sync_meta_tampered',
 	DE_RTC_MALFORMED_SYNC_PAYLOAD: 'de_rtc_malformed_sync_payload',
+	DE_RTC_UNFILTERED_HTML_WOULD_CHANGE_CONTENT:
+		'de_rtc_unfiltered_html_would_change_content',
 	DE_RTC_FEATURE_DISABLED: 'de_rtc_feature_disabled',
 	REST_CANNOT_EDIT: 'rest_cannot_edit',
 	REST_POST_INVALID_ID: 'rest_post_invalid_id',
@@ -33,6 +35,8 @@ export const DISTRIBUTED_EDITING_DISPOSITIONS = Object.freeze( {
 	REJECTED_ROUTE_MISMATCH: 'rejected_route_mismatch',
 	REJECTED_SYNC_META_TAMPERED: 'rejected_sync_meta_tampered',
 	REJECTED_MALFORMED_SYNC_PAYLOAD: 'rejected_malformed_sync_payload',
+	REJECTED_UNFILTERED_HTML_REVIEW_REQUIRED:
+		'rejected_unfiltered_html_review_required',
 } );
 
 /**
@@ -178,6 +182,8 @@ export const DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES = Object.freeze( {
 	REJECTED_ROUTE_MISMATCH: 'rejected_route_mismatch',
 	REJECTED_SYNC_META_TAMPERED: 'rejected_sync_meta_tampered',
 	REJECTED_MALFORMED_SYNC_PAYLOAD: 'rejected_malformed_sync_payload',
+	REJECTED_UNFILTERED_HTML_REVIEW_REQUIRED:
+		'rejected_unfiltered_html_review_required',
 } );
 
 /**
@@ -1132,6 +1138,8 @@ export function getDistributedEditingNoticeDescriptorsForSessionState(
 						: [] ),
 					...( normalized.retrySaveStatus ===
 						DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.STALE_BASE_REJECTED ||
+					normalized.retrySaveStatus ===
+						DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_UNFILTERED_HTML_REVIEW_REQUIRED ||
 					normalized.retrySaveHandoffReason ===
 						DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.SERVER_STATE_REFETCH_REQUIRED
 						? [
@@ -2333,6 +2341,8 @@ function getDistributedEditingRejectedRetrySaveState( {
 	let disposition = normalizedCurrent.disposition;
 	let retrySaveStatus = DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.NONE;
 	let requiresServerStateRefetch = false;
+	let requiresManualConflictResolution =
+		normalizedCurrent.requiresManualConflictResolution;
 
 	switch ( reasonCode ) {
 		case DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED:
@@ -2377,6 +2387,15 @@ function getDistributedEditingRejectedRetrySaveState( {
 			retrySaveStatus =
 				DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_MALFORMED_SYNC_PAYLOAD;
 			break;
+
+		case DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_UNFILTERED_HTML_WOULD_CHANGE_CONTENT:
+			disposition =
+				DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_UNFILTERED_HTML_REVIEW_REQUIRED;
+			retrySaveStatus =
+				DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_UNFILTERED_HTML_REVIEW_REQUIRED;
+			requiresServerStateRefetch = true;
+			requiresManualConflictResolution = true;
+			break;
 	}
 
 	if ( result === 'stale_base_rejected' ) {
@@ -2418,6 +2437,7 @@ function getDistributedEditingRejectedRetrySaveState( {
 		retrySaveServerVersion: serverVersion,
 		retrySavePreviousServerVersion: previousServerVersion,
 		...retrySaveFlags,
+		requiresManualConflictResolution,
 		mustOfferLocalCopy: normalizeCount( pendingChangeCount ) > 0,
 		canExportLocalUpdates:
 			normalizedCurrent.canExportLocalUpdates ||

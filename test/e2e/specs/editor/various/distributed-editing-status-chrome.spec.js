@@ -42,6 +42,7 @@ async function getDistributedEditingState( page ) {
 
 		return {
 			disposition: state.disposition,
+			reasonCode: state.reasonCode,
 			readyToRetrySubmit: state.readyToRetrySubmit,
 			retrySubmitHandoffStatus: state.retrySubmitHandoffStatus,
 			retrySubmitPrepared: state.retrySubmitPrepared,
@@ -56,6 +57,7 @@ async function getDistributedEditingState( page ) {
 			retrySubmitCreatesRevision: state.retrySubmitCreatesRevision,
 			retrySubmitClaimsSaved: state.retrySubmitClaimsSaved,
 			retrySaveStatus: state.retrySaveStatus,
+			retrySaveReason: state.retrySaveReason,
 			retrySaveAccepted: state.retrySaveAccepted,
 			retrySaveServerVersion: state.retrySaveServerVersion,
 			retrySavePreviousServerVersion:
@@ -253,6 +255,38 @@ async function seedRetrySaveInProgressState( page ) {
 					retrySubmitSavePrepared: true,
 					retrySubmitSaveReady: true,
 					retrySaveStatus: 'saving',
+				} );
+		},
+		{
+			baseContent: BASE_CONTENT,
+		}
+	);
+}
+
+async function seedRetrySaveUnfilteredHtmlReviewState( page ) {
+	await page.evaluate(
+		( { baseContent } ) => {
+			window.wp.data
+				.dispatch( 'core/editor' )
+				.setDistributedEditingSessionState( {
+					disposition: 'rejected_unfiltered_html_review_required',
+					reasonCode: 'de_rtc_unfiltered_html_would_change_content',
+					clientBaseVersion: '7',
+					serverVersion: '7',
+					clientBaseContent: baseContent,
+					pendingChangeCount: 1,
+					hasPendingChanges: true,
+					isAwaitingServerConfirmation: true,
+					requiresServerStateRefetch: true,
+					requiresManualConflictResolution: true,
+					canExportLocalUpdates: true,
+					mustOfferLocalCopy: true,
+					retrySubmitSaveStatus: 'blocked',
+					retrySubmitSaveReason: 'permission_denied',
+					retrySaveStatus: 'rejected_unfiltered_html_review_required',
+					retrySaveReason:
+						'de_rtc_unfiltered_html_would_change_content',
+					retrySaveAccepted: false,
 				} );
 		},
 		{
@@ -1267,6 +1301,170 @@ test.describe( 'Distributed Editing status chrome', () => {
 				canExportLocalUpdates: true,
 				retrySaveHandoffStatus: 'retry_save_blocked',
 				retrySaveHandoffReason: 'server_state_refetch_required',
+			} );
+		await expect
+			.poll( editor.getEditedPostContent )
+			.toBe( LOCAL_PENDING_CONTENT );
+		expect( refetchRequestCount ).toBe( 1 );
+		expect( guardedRetrySaveRequestCount ).toBe( 0 );
+		expect( postWriteRequestCount ).toBe( 0 );
+	} );
+
+	test( 'shows unfiltered HTML retry-save review with export and refetch actions', async ( {
+		admin,
+		context,
+		editor,
+		page,
+	} ) => {
+		await admin.createNewPost();
+		await expect(
+			editor.canvas.getByRole( 'textbox', { name: 'Add title' } )
+		).toBeFocused();
+		await context.grantPermissions( [
+			'clipboard-read',
+			'clipboard-write',
+		] );
+
+		let refetchRequestCount = 0;
+		let guardedRetrySaveRequestCount = 0;
+		let postWriteRequestCount = 0;
+
+		await page.route( isGuardedRetrySaveRequest, async ( route ) => {
+			guardedRetrySaveRequestCount += 1;
+
+			await route.fulfill( {
+				status: 500,
+				contentType: 'application/json',
+				body: JSON.stringify( {
+					code: 'unexpected_retry_save_request',
+					message:
+						'Unfiltered HTML review status chrome should not submit another guarded retry-save.',
+				} ),
+			} );
+		} );
+		await page.route( isPostRestRequest, async ( route ) => {
+			const request = route.request();
+			const requestUrl = new URL( request.url() );
+
+			if (
+				request.method() === 'GET' &&
+				isPostEditRefetchRequest( requestUrl )
+			) {
+				refetchRequestCount += 1;
+				const postIdMatch = requestUrl.pathname.match(
+					/\/wp\/v2\/posts\/(\d+)/
+				);
+
+				await route.fulfill( {
+					contentType: 'application/json',
+					body: JSON.stringify( {
+						id: Number( postIdMatch?.[ 1 ] || 1 ),
+						modified_gmt: '2026-05-13T00:00:00',
+						content: {
+							raw: REFETCHED_CONTENT,
+						},
+						distributed_editing: {
+							server_version: '8',
+						},
+					} ),
+				} );
+				return;
+			}
+
+			if ( request.method() !== 'GET' ) {
+				postWriteRequestCount += 1;
+
+				await route.fulfill( {
+					status: 500,
+					contentType: 'application/json',
+					body: JSON.stringify( {
+						code: 'unexpected_post_write_request',
+						message:
+							'Unfiltered HTML review status chrome should not fall back to a normal post save.',
+					} ),
+				} );
+				return;
+			}
+
+			await route.continue();
+		} );
+
+		await editPostContent( page, editor, LOCAL_PENDING_CONTENT );
+		await seedRetrySaveUnfilteredHtmlReviewState( page );
+
+		const statusChrome = getStatusChrome( page );
+		await expect(
+			page.locator( INTERNAL_INSPECTOR_SELECTOR )
+		).toBeHidden();
+		await expect( statusChrome ).toBeVisible();
+		await expect(
+			statusChrome.getByText( 'Retry save needs HTML review' )
+		).toBeVisible();
+		await expect(
+			statusChrome.getByText(
+				'The server rejected this retry save because the change could alter unfiltered HTML written by another collaborator. Protected local changes are still exportable; export them, ask an unfiltered HTML reviewer for help, or refresh the server version before retrying.'
+			)
+		).toBeVisible();
+		await expect(
+			statusChrome.getByRole( 'button', {
+				name: 'Export local changes',
+			} )
+		).toHaveCount( 1 );
+		await expect(
+			statusChrome.getByRole( 'button', {
+				name: 'Refresh server version',
+			} )
+		).toHaveCount( 1 );
+
+		await statusChrome
+			.getByRole( 'button', { name: 'Export local changes' } )
+			.click();
+		await expect( getActionStatus( statusChrome ) ).toHaveAttribute(
+			'data-distributed-editing-action-status',
+			'success'
+		);
+
+		const clipboardPayload = JSON.parse(
+			await page.evaluate( async () => {
+				return await window.navigator.clipboard.readText();
+			} )
+		);
+		expect( clipboardPayload ).toMatchObject( {
+			format: 'wp/de-rtc-local-updates',
+			postContent: LOCAL_PENDING_CONTENT,
+			distributedEditingSessionState: {
+				disposition: 'rejected_unfiltered_html_review_required',
+				reasonCode: 'de_rtc_unfiltered_html_would_change_content',
+				pendingChangeCount: 1,
+				canExportLocalUpdates: true,
+				retrySaveStatus: 'rejected_unfiltered_html_review_required',
+				retrySaveReason: 'de_rtc_unfiltered_html_would_change_content',
+			},
+		} );
+
+		await statusChrome
+			.getByRole( 'button', { name: 'Refresh server version' } )
+			.click();
+		await expect(
+			statusChrome.getByText(
+				'Server version refreshed for review. Protected local changes remain in this editor session and can still be exported before retrying.'
+			)
+		).toBeVisible();
+		await expect
+			.poll( () => getDistributedEditingState( page ) )
+			.toMatchObject( {
+				disposition: 'rejected_unfiltered_html_review_required',
+				reasonCode: 'de_rtc_unfiltered_html_would_change_content',
+				refetchedServerContent: REFETCHED_CONTENT,
+				refetchedServerState: true,
+				requiresServerStateRefetch: false,
+				canExportLocalUpdates: true,
+				hasPendingChanges: true,
+				mustOfferLocalCopy: true,
+				retrySubmitSaveStatus: 'blocked',
+				retrySaveStatus: 'rejected_unfiltered_html_review_required',
+				retrySaveReason: 'de_rtc_unfiltered_html_would_change_content',
+				retrySaveAccepted: false,
 			} );
 		await expect
 			.poll( editor.getEditedPostContent )

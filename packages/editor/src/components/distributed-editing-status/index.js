@@ -299,6 +299,20 @@ const DISTRIBUTED_EDITING_STATUS_CONTROL_STATE_DEFINITIONS = Object.freeze( {
 		retrySaveReason:
 			DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_SYNC_META_TAMPERED,
 	} ),
+	staleBaseRetrySaveUnfilteredHtml: Object.freeze( {
+		disposition:
+			DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_UNFILTERED_HTML_REVIEW_REQUIRED,
+		reasonCode:
+			DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_UNFILTERED_HTML_WOULD_CHANGE_CONTENT,
+		pendingChangeCount: 1,
+		requiresServerStateRefetch: true,
+		requiresManualConflictResolution: true,
+		canExportLocalUpdates: true,
+		retrySaveStatus:
+			DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_UNFILTERED_HTML_REVIEW_REQUIRED,
+		retrySaveReason:
+			DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_UNFILTERED_HTML_WOULD_CHANGE_CONTENT,
+	} ),
 	staleBaseRetrySaveHandoffBlockedProof: Object.freeze( {
 		pendingChangeCount: 1,
 		hasPendingChanges: true,
@@ -1328,6 +1342,8 @@ function getDistributedEditingStatusControlLabel( key ) {
 			return __( 'Retry save stale' );
 		case 'staleBaseRetrySaveTampered':
 			return __( 'Retry save tampered' );
+		case 'staleBaseRetrySaveUnfilteredHtml':
+			return __( 'Retry save needs HTML review' );
 		case 'staleBaseRetrySaveHandoffBlockedProof':
 			return __( 'Retry save proof missing' );
 		case 'staleBaseRetrySaveHandoffRefetch':
@@ -1498,6 +1514,13 @@ function getRetrySaveStatusText( descriptor ) {
 				title: __( 'Retry save permission changed' ),
 				message: __(
 					'Editing permission changed before the retry save finished. Protected local changes are still exportable; ask for access before retrying.'
+				),
+			};
+		case DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_UNFILTERED_HTML_REVIEW_REQUIRED:
+			return {
+				title: __( 'Retry save needs HTML review' ),
+				message: __(
+					'The server rejected this retry save because the change could alter unfiltered HTML written by another collaborator. Protected local changes are still exportable; export them, ask an unfiltered HTML reviewer for help, or refresh the server version before retrying.'
 				),
 			};
 		case DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_SYNC_META_TAMPERED:
