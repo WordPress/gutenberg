@@ -33,7 +33,9 @@ import { getTemplateInfo } from '../utils/get-template-info';
 import {
 	DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE,
 	getDistributedEditingNoticeDescriptorsForSessionState,
+	getDistributedEditingRetrySaveFlowStateForSessionState,
 	getDistributedEditingUnloadWarningStateForSessionState,
+	hasDistributedEditingRetrySaveSavedStateEvidenceForSessionState,
 	shouldWarnBeforeLeavingDistributedEditingSessionState,
 } from './distributed-editing';
 
@@ -410,6 +412,34 @@ export function getDistributedEditingNoticeDescriptors( state ) {
  */
 export function getDistributedEditingUnloadWarningState( state ) {
 	return getDistributedEditingUnloadWarningStateForSessionState(
+		getDistributedEditingSessionState( state )
+	);
+}
+
+/**
+ * Returns true when retry-save has server evidence that it persisted the
+ * guarded write.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {boolean} Whether retry-save saved-state evidence exists.
+ */
+export function hasDistributedEditingRetrySaveSavedStateEvidence( state ) {
+	return hasDistributedEditingRetrySaveSavedStateEvidenceForSessionState(
+		getDistributedEditingSessionState( state )
+	);
+}
+
+/**
+ * Returns a side-effect-free DE-RTC retry-save flow summary for status or demo
+ * consumers.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {Object} Retry-save flow state.
+ */
+export function getDistributedEditingRetrySaveFlowState( state ) {
+	return getDistributedEditingRetrySaveFlowStateForSessionState(
 		getDistributedEditingSessionState( state )
 	);
 }

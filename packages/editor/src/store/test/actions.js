@@ -1740,6 +1740,18 @@ describe( 'Post actions', () => {
 				status: 'retry_save_submitted',
 				callsRetrySaveAction: true,
 				callsNormalSavePost: false,
+				claimsSaved: true,
+				hasRetrySaveSavedStateEvidence: true,
+				sessionState: {
+					retrySaveStatus:
+						DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVED,
+					retrySaveAccepted: true,
+					retrySaveServerVersion: '8',
+					retrySaveSavesPost: true,
+					retrySaveMutatesPostContent: true,
+					retrySaveClaimsSaved: true,
+					canExportLocalUpdates: false,
+				},
 				response: {
 					result: 'retry_save_applied',
 					retry_save_accepted: true,

@@ -45,6 +45,7 @@ import {
 	getDistributedEditingSessionStateForStaleBaseLocalRebasePlan,
 	getDistributedEditingSessionStateForStaleBaseRejectionResult,
 	getDistributedEditingSessionStateForStaleBaseServerStateRefetchResult,
+	hasDistributedEditingRetrySaveSavedStateEvidenceForSessionState,
 } from './distributed-editing';
 import {
 	getNotificationArgumentsForSaveSuccess,
@@ -749,6 +750,11 @@ export const __experimentalMaybeSavePostWithDistributedEditingRetryPolicy =
 					acceptedProofClaimsSaved: options.acceptedProofClaimsSaved,
 				}
 			);
+		const sessionState = select.getDistributedEditingSessionState?.() || {};
+		const hasSavedStateEvidence =
+			hasDistributedEditingRetrySaveSavedStateEvidenceForSessionState(
+				sessionState
+			);
 
 		return {
 			status: 'retry_save_submitted',
@@ -757,6 +763,9 @@ export const __experimentalMaybeSavePostWithDistributedEditingRetryPolicy =
 			allowsNormalSaveFallback: false,
 			callsRetrySaveAction: true,
 			callsNormalSavePost: false,
+			claimsSaved: hasSavedStateEvidence,
+			hasRetrySaveSavedStateEvidence: hasSavedStateEvidence,
+			sessionState,
 			response,
 		};
 	};
