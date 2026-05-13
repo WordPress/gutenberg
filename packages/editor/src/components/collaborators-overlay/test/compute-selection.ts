@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import { computeSelectionVisual } from '../compute-selection';
-import { getCursorPosition } from '../cursor-dom-utils';
+import { getCursorPosition, getSelectionRects } from '../cursor-dom-utils';
 
 jest.mock( '@wordpress/core-data', () => ( {
 	SelectionDirection: {
@@ -31,8 +31,10 @@ jest.mock( '../cursor-dom-utils', () => ( {
 } ) );
 
 const mockGetCursorPosition = getCursorPosition as jest.Mock;
+const mockGetSelectionRects = getSelectionRects as jest.Mock;
 const SelectionType = {
 	Cursor: 'cursor',
+	SelectionInOneBlock: 'selection-in-one-block',
 } as const;
 
 type ResolvedSelection = {
@@ -72,6 +74,7 @@ describe( 'computeSelectionVisual', () => {
 
 	beforeEach( () => {
 		mockGetCursorPosition.mockClear();
+		mockGetSelectionRects.mockClear();
 	} );
 
 	it( 'anchors cursor selections to the matching nested RichText element', () => {
@@ -129,5 +132,67 @@ describe( 'computeSelectionVisual', () => {
 
 		expect( result.coords ).toBeUndefined();
 		expect( mockGetCursorPosition ).not.toHaveBeenCalled();
+	} );
+
+	it( 'renders a same-block selection across different nested RichText elements', () => {
+		const overlayContext = createOverlayContext(
+			'<div data-block="block-1">' +
+				'<div data-wp-block-attribute-key="body.0.cells.1.content">Beta start text</div>' +
+				'<div data-wp-block-attribute-key="body.1.cells.1.content">Delta end text</div>' +
+				'</div>'
+		);
+		const startElement = document.querySelector(
+			'[data-wp-block-attribute-key="body.0.cells.1.content"]'
+		);
+		const endElement = document.querySelector(
+			'[data-wp-block-attribute-key="body.1.cells.1.content"]'
+		);
+		const startRect = { x: 10, y: 10, width: 30, height: 12 };
+		const endRect = { x: 10, y: 40, width: 30, height: 12 };
+		mockGetSelectionRects
+			.mockReturnValueOnce( [ startRect ] )
+			.mockReturnValueOnce( [ endRect ] );
+
+		const start: ResolvedSelection = {
+			richTextOffset: 4,
+			localClientId: 'block-1',
+			attributeKey: 'body.0.cells.1.content',
+		};
+		const end: ResolvedSelection = {
+			richTextOffset: 8,
+			localClientId: 'block-1',
+			attributeKey: 'body.1.cells.1.content',
+		};
+
+		const result = computeSelectionVisual(
+			{ type: SelectionType.SelectionInOneBlock },
+			start,
+			end,
+			overlayContext
+		);
+
+		expect( mockGetSelectionRects ).toHaveBeenNthCalledWith(
+			1,
+			startElement,
+			4,
+			Number.MAX_SAFE_INTEGER,
+			document,
+			overlayContext.overlayRect
+		);
+		expect( mockGetSelectionRects ).toHaveBeenNthCalledWith(
+			2,
+			endElement,
+			0,
+			8,
+			document,
+			overlayContext.overlayRect
+		);
+		expect( mockGetCursorPosition ).toHaveBeenCalledWith(
+			8,
+			endElement,
+			document,
+			overlayContext.overlayRect
+		);
+		expect( result.selectionRects ).toEqual( [ startRect, endRect ] );
 	} );
 } );
