@@ -18,6 +18,7 @@ import { store as noticesStore } from '@wordpress/notices';
 import { getScrollContainer } from '@wordpress/dom';
 import { decodeEntities } from '@wordpress/html-entities';
 import { store as interfaceStore } from '@wordpress/interface';
+import { store as annotationsStore } from '@wordpress/annotations';
 import { RichTextData, applyFormat, create } from '@wordpress/rich-text';
 
 /**
@@ -30,6 +31,7 @@ import { createBoardStore } from './board-store';
 import { NOTE_FORMAT_NAME } from './format';
 import {
 	calculateNotePositions,
+	findNoteRange,
 	getNoteIdsFromMetadata,
 	addNoteIdToMetadata,
 	removeNoteIdFromMetadata,
@@ -509,4 +511,90 @@ export function useFloatingBoard( {
 		registerThread: store.registerThread,
 		unregisterThread: store.unregisterThread,
 	};
+}
+
+const NOTE_ANNOTATION_SOURCE = 'core-note';
+
+/**
+ * Decorate inline-note ranges using the annotations API. The preferred anchor
+ * is the in-content `core/note` marker (resilient to edits); the comment
+ * `_wp_note_selection` meta is the fallback for content without a marker.
+ *
+ * @param {Array} threads Note threads, including resolved status and meta.
+ */
+export function useAnnotateBlocks( threads ) {
+	const { getBlockAttributes } = useSelect( blockEditorStore );
+	const {
+		__experimentalAddAnnotation,
+		__experimentalRemoveAnnotationsBySource,
+	} = useDispatch( annotationsStore );
+
+	const annotations = useMemo( () => {
+		if ( ! threads?.length ) {
+			return [];
+		}
+		const out = [];
+		for ( const thread of threads ) {
+			// Resolved threads shouldn't decorate; reopened threads still apply.
+			if ( thread.status !== 'hold' || ! thread.blockClientId ) {
+				continue;
+			}
+			const attributes = getBlockAttributes( thread.blockClientId );
+			if ( ! attributes ) {
+				continue;
+			}
+			// Meta is the fallback anchor and may be missing or returned as `[]`
+			// when WordPress serializes an empty object meta.
+			const selection =
+				thread.meta?._wp_note_selection &&
+				! Array.isArray( thread.meta._wp_note_selection )
+					? thread.meta._wp_note_selection
+					: null;
+			const attributeKey = selection?.attributeKey;
+			if ( ! attributeKey ) {
+				continue;
+			}
+			// Prefer the in-content marker; fall back to stored offsets.
+			const range =
+				findNoteRange( attributes[ attributeKey ], thread.id ) ??
+				( selection &&
+				Number.isInteger( selection.start ) &&
+				Number.isInteger( selection.end )
+					? { start: selection.start, end: selection.end }
+					: null );
+			if ( ! range ) {
+				continue;
+			}
+			out.push( {
+				id: String( thread.id ),
+				clientId: thread.blockClientId,
+				attributeKey,
+				start: range.start,
+				end: range.end,
+			} );
+		}
+		return out;
+	}, [ threads, getBlockAttributes ] );
+
+	useEffect( () => {
+		if ( annotations.length === 0 ) {
+			return;
+		}
+		for ( const a of annotations ) {
+			__experimentalAddAnnotation( {
+				id: a.id,
+				source: NOTE_ANNOTATION_SOURCE,
+				blockClientId: a.clientId,
+				richTextIdentifier: a.attributeKey,
+				range: { start: a.start, end: a.end },
+			} );
+		}
+		return () => {
+			__experimentalRemoveAnnotationsBySource( NOTE_ANNOTATION_SOURCE );
+		};
+	}, [
+		annotations,
+		__experimentalAddAnnotation,
+		__experimentalRemoveAnnotationsBySource,
+	] );
 }

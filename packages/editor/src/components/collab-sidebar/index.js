@@ -26,7 +26,11 @@ import { store as editorStore } from '../../store';
 import { AddNoteMenuItem } from './add-note-menu-item';
 import { NoteAvatarIndicator } from './note-indicator-toolbar';
 import { useGlobalStylesContext } from '../global-styles-provider';
-import { useNoteThreads, useEnableFloatingSidebar } from './hooks';
+import {
+	useAnnotateBlocks,
+	useEnableFloatingSidebar,
+	useNoteThreads,
+} from './hooks';
 import { getNoteIdsFromMetadata, pickPrimaryNote } from './utils';
 import { NOTE_FORMAT_NAME, noteFormat } from './format';
 import PostTypeSupportCheck from '../post-type-support-check';
@@ -76,6 +80,7 @@ function NotesSidebar( { postId } ) {
 	);
 
 	const { notes, unresolvedNotes } = useNoteThreads( postId );
+	useAnnotateBlocks( unresolvedNotes );
 
 	// Only enable the floating sidebar for large viewports.
 	const showFloatingSidebar = isLargeViewport;
