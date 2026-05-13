@@ -269,7 +269,14 @@ export class Metrics {
 			return;
 		}
 
-		const tracesDir = join( artifactsPath, 'traces' );
+		// During the perf comparison flow, traces from each branch live in a
+		// SHA-named subdirectory so the two sides don't collide. Outside that
+		// flow (e.g. local single-branch runs) the SHA env var is unset and
+		// traces go directly under `traces/`.
+		const sha = process.env.WP_PERF_SHA;
+		const tracesDir = sha
+			? join( artifactsPath, 'traces', sha )
+			: join( artifactsPath, 'traces' );
 		const filePath = join( tracesDir, `${ name }.trace.json` );
 		await mkdir( tracesDir, { recursive: true } );
 		await resolveTraceSourceMaps( traceJSON, fetchMap );

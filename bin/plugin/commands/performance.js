@@ -156,8 +156,9 @@ function printStats( m, s ) {
  * @param {string} testSuite     Name of the tests set.
  * @param {string} testRunnerDir Path to the performance tests' clone.
  * @param {string} runKey        Unique identifier for the test run.
+ * @param {string} sha           Resolved commit SHA for the branch under test.
  */
-async function runTestSuite( testSuite, testRunnerDir, runKey ) {
+async function runTestSuite( testSuite, testRunnerDir, runKey, sha ) {
 	await runShellScript(
 		`npm run test:performance -- ${ testSuite }`,
 		testRunnerDir,
@@ -166,6 +167,7 @@ async function runTestSuite( testSuite, testRunnerDir, runKey ) {
 			PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1',
 			WP_ARTIFACTS_PATH: ARTIFACTS_PATH,
 			RESULTS_ID: runKey,
+			WP_PERF_SHA: sha,
 		}
 	);
 }
@@ -293,6 +295,8 @@ async function runPerformanceTests( branches, options ) {
 		.raw( 'init' )
 		.raw( 'remote', 'add', 'origin', config.gitRepositoryURL );
 
+	/** @type {Record<string, string>} */
+	const branchShas = {};
 	for ( const [ i, branch ] of branches.entries() ) {
 		logAtIndent(
 			2,
@@ -300,6 +304,10 @@ async function runPerformanceTests( branches, options ) {
 			formats.success( branch )
 		);
 		await sourceGit.raw( 'fetch', '--depth=1', 'origin', branch );
+		// @ts-ignore
+		branchShas[ branch ] = (
+			await sourceGit.raw( 'rev-parse', 'FETCH_HEAD' )
+		).trim();
 	}
 
 	const testRunnerBranch = options.testsBranch || branches[ 0 ];
@@ -482,11 +490,39 @@ async function runPerformanceTests( branches, options ) {
 				await runShellScript( `${ wpEnvPath } start`, envDir );
 
 				logAtIndent( 3, 'Running tests' );
-				await runTestSuite( testSuite, testRunnerDir, runKey );
+				await runTestSuite(
+					testSuite,
+					testRunnerDir,
+					runKey,
+					branchShas[ branch ]
+				);
 
 				logAtIndent( 3, 'Stopping environment' );
 				await runShellScript( `${ wpEnvPath } stop`, envDir );
 			}
+		}
+	}
+
+	// Add role symlinks (head -> first branch's SHA, base -> second branch's
+	// SHA, etc.) so downloaded artifacts are navigable without knowing the SHAs
+	// in advance. Artifact upload will dereference these, so the uploaded zip
+	// contains both the SHA directories and the role-named duplicates.
+	const tracesDir = path.join( ARTIFACTS_PATH, 'traces' );
+	if ( fs.existsSync( tracesDir ) ) {
+		const roles = [ 'head', 'base' ];
+		for ( const [ i, branch ] of branches.entries() ) {
+			const role = roles[ i ] ?? `branch-${ i }`;
+			// @ts-ignore
+			const sha = branchShas[ branch ];
+			const target = path.join( tracesDir, sha );
+			if ( ! fs.existsSync( target ) ) {
+				continue;
+			}
+			const linkPath = path.join( tracesDir, role );
+			if ( fs.existsSync( linkPath ) ) {
+				fs.rmSync( linkPath, { recursive: true, force: true } );
+			}
+			fs.symlinkSync( sha, linkPath, 'dir' );
 		}
 	}
 
