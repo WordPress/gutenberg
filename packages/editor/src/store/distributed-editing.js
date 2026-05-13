@@ -79,6 +79,8 @@ export const DISTRIBUTED_EDITING_NOTICE_ACTIONS = Object.freeze( {
 	REVIEW_REMOTE_CHANGES: 'review-remote-changes',
 } );
 
+const DISTRIBUTED_EDITING_SYNC_META_SCRIPT_SOURCE = `<script\\b(?=[^>]*\\btype\\s*=\\s*(['"])wp/post-sync-meta\\1)[^>]*>([\\s\\S]*?)<\\/script\\s*>`;
+
 /**
  * Stable reasons for browser unload protection.
  */
@@ -2332,6 +2334,10 @@ function getDistributedEditingServerVersionFromResponse( responseOrError ) {
 		responseData.distributed_editing ||
 		responseData.distributedEditing ||
 		{};
+	const rawPostContent =
+		getDistributedEditingRawPostContentFromResponse( responseOrError );
+	const postContentSyncMeta =
+		getDistributedEditingSyncMetaFromPostContent( rawPostContent );
 
 	return normalizeNullableString(
 		responseOrError.serverVersion ||
@@ -2340,6 +2346,7 @@ function getDistributedEditingServerVersionFromResponse( responseOrError ) {
 			responseData.server_version ||
 			distributedEditingData.serverVersion ||
 			distributedEditingData.server_version ||
+			postContentSyncMeta?.version ||
 			responseOrError.modified_gmt ||
 			responseOrError.modified ||
 			responseData.modified_gmt ||
@@ -2348,6 +2355,13 @@ function getDistributedEditingServerVersionFromResponse( responseOrError ) {
 }
 
 function getDistributedEditingPostContentFromResponse( responseOrError ) {
+	const rawPostContent =
+		getDistributedEditingRawPostContentFromResponse( responseOrError );
+
+	return stripDistributedEditingSyncMetaFromPostContent( rawPostContent );
+}
+
+function getDistributedEditingRawPostContentFromResponse( responseOrError ) {
 	const responseData = getDistributedEditingResponseData( responseOrError );
 
 	return normalizeNullableContentString(
@@ -2364,6 +2378,84 @@ function getDistributedEditingPostContentFromResponse( responseOrError ) {
 				? responseData.content
 				: undefined )
 	);
+}
+
+function stripDistributedEditingSyncMetaFromPostContent( postContent ) {
+	const parsed =
+		parseDistributedEditingSyncMetaFromPostContent( postContent );
+
+	return parsed?.postContent ?? normalizeNullableContentString( postContent );
+}
+
+function getDistributedEditingSyncMetaFromPostContent( postContent ) {
+	return parseDistributedEditingSyncMetaFromPostContent( postContent )
+		?.syncMeta;
+}
+
+function parseDistributedEditingSyncMetaFromPostContent( postContent ) {
+	const content = normalizeNullableContentString( postContent );
+
+	if ( content === null ) {
+		return null;
+	}
+
+	const prefixPattern = new RegExp(
+		`^\\s*${ DISTRIBUTED_EDITING_SYNC_META_SCRIPT_SOURCE }\\s*`,
+		'i'
+	);
+	const prefixMatch = content.match( prefixPattern );
+
+	if ( prefixMatch ) {
+		return createDistributedEditingSyncMetaParseResult( {
+			postContent: content.slice( prefixMatch[ 0 ].length ),
+			scriptContent: prefixMatch[ 2 ],
+		} );
+	}
+
+	const trailerPattern = new RegExp(
+		`\\s*${ DISTRIBUTED_EDITING_SYNC_META_SCRIPT_SOURCE }\\s*$`,
+		'i'
+	);
+	const trailerMatch = content.match( trailerPattern );
+
+	if ( trailerMatch ) {
+		return createDistributedEditingSyncMetaParseResult( {
+			postContent: content.slice(
+				0,
+				content.length - trailerMatch[ 0 ].length
+			),
+			scriptContent: trailerMatch[ 2 ],
+		} );
+	}
+
+	return {
+		postContent: content,
+		syncMeta: null,
+	};
+}
+
+function createDistributedEditingSyncMetaParseResult( {
+	postContent,
+	scriptContent,
+} ) {
+	try {
+		const syncMeta = JSON.parse( scriptContent );
+
+		return {
+			postContent,
+			syncMeta:
+				syncMeta &&
+				typeof syncMeta === 'object' &&
+				! Array.isArray( syncMeta )
+					? syncMeta
+					: null,
+		};
+	} catch {
+		return {
+			postContent,
+			syncMeta: null,
+		};
+	}
 }
 
 function createLocalRebaseResult( {

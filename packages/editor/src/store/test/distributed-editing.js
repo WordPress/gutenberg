@@ -352,6 +352,67 @@ describe( 'distributed editing session state', () => {
 		} );
 	} );
 
+	it( 'strips refetched sync metadata and keeps its server version for local rebase', () => {
+		const baseContent =
+			'<!-- wp:paragraph --><p>Alpha</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Beta</p><!-- /wp:paragraph -->';
+		const serverContent =
+			'<!-- wp:paragraph --><p>Alpha</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Remote beta</p><!-- /wp:paragraph -->';
+		const localContent =
+			'<!-- wp:paragraph --><p>Local alpha</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Beta</p><!-- /wp:paragraph -->';
+		const syncMeta =
+			'<script type="wp/post-sync-meta" data-sync-meta-format="diff-match-patch">{"version":"server-v7","previous_version":"server-v6"}</script>';
+		const refetchedState =
+			getDistributedEditingSessionStateForStaleBaseServerStateRefetchResult(
+				{
+					modified_gmt: '2026-05-13T00:00:00',
+					content: {
+						raw: serverContent + syncMeta,
+					},
+				},
+				getDistributedEditingSessionStateForStaleBaseRejectionResult( {
+					reason_code:
+						DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+					client_base_version: 'server-v4',
+					server_version: 'server-v6',
+					client_base_content: baseContent,
+					pending_change_count: 2,
+					remote_change_count: 1,
+				} )
+			);
+		const planned =
+			getDistributedEditingSessionStateForStaleBaseLocalRebasePlan(
+				refetchedState
+			);
+		const result = getDistributedEditingStaleBaseLocalRebaseResult( {
+			currentSessionState: planned,
+			localContent,
+		} );
+
+		expect( refetchedState ).toMatchObject( {
+			serverVersion: 'server-v7',
+			refetchedServerContent: serverContent,
+			refetchedServerState: true,
+			requiresServerStateRefetch: false,
+			canAttemptLocalRebase: true,
+		} );
+		expect( planned.localRebasePlanStatus ).toBe(
+			DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES.READY
+		);
+		expect( result ).toMatchObject( {
+			status: DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.REBASED,
+			readyToRetrySubmit: true,
+			sessionState: {
+				serverVersion: 'server-v7',
+				refetchedServerContent: serverContent,
+				localRebaseResultStatus:
+					DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.REBASED,
+			},
+		} );
+		expect( result.candidatePostContent ).toBe(
+			'<!-- wp:paragraph --><p>Local alpha</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Remote beta</p><!-- /wp:paragraph -->'
+		);
+	} );
+
 	it( 'blocks stale-base local rebase planning until server state is refetched', () => {
 		const planned =
 			getDistributedEditingSessionStateForStaleBaseLocalRebasePlan(
