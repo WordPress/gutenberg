@@ -22,7 +22,7 @@ body.has-admin-bar-in-editor {
 	}
 
 	&.is-fullscreen-mode {
-		--wp-admin-bar-in-editor-height: 46px;
+		--wp-admin-bar-height: 46px;
 
 		.editor-header:has(> .editor-header__back-button) {
 			grid-template-columns: 32px minmax(0, max-content) minmax(min-content, 1fr) 64px;
@@ -39,7 +39,7 @@ body.has-admin-bar-in-editor {
 
 	@media (min-width: 782px) {
 		&.is-fullscreen-mode {
-			--wp-admin-bar-in-editor-height: 32px;
+			--wp-admin-bar-height: 32px;
 			margin-top: 0;
 			height: 100%;
 
@@ -51,15 +51,15 @@ body.has-admin-bar-in-editor {
 			.editor-post-publish-panel,
 			.is-entity-save-view-open .interface-interface-skeleton__actions:focus,
 			.is-entity-save-view-open .interface-interface-skeleton__actions:focus-within {
-				top: var(--wp-admin-bar-in-editor-height);
+				top: var(--wp-admin-bar-height);
 			}
 
 			.block-editor__container {
-				min-height: calc(100vh - var(--wp-admin-bar-in-editor-height));
+				min-height: calc(100vh - var(--wp-admin-bar-height));
 			}
 
 			&:has(.editor-editor-interface.is-distraction-free) {
-				--wp-admin-bar-in-editor-height: 0;
+				--wp-admin-bar-height: 0;
 
 				#wpadminbar {
 					display: none;

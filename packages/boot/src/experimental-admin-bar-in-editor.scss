@@ -13,6 +13,38 @@ body.has-admin-bar-in-editor {
 		background-color: transparent;
 	}
 
+	.boot-layout {
+		background: var(--wp-admin-bar-color-bg, var(--wpds-color-bg-surface-neutral-weak));
+		color: var(--wp-admin-menu-submenu-color-fg, var(--wpds-color-fg-content-neutral));
+	}
+
+	.boot-layout__sidebar.is-mobile {
+		background: var(--wp-admin-bar-color-bg, var(--wpds-color-bg-surface-neutral-weak));
+	}
+
+	.boot-navigation-item.components-item {
+		color: var(--wp-admin-menu-submenu-color-fg, var(--wpds-color-fg-interactive-neutral));
+
+		&.active,
+		&:hover,
+		&:focus,
+		&[aria-current="true"] {
+			color: var(--wp-admin-bar-color-fg, var(--wpds-color-fg-interactive-brand-active));
+		}
+
+		&.active,
+		&[aria-current="true"] {
+			background: var(--wp-admin-menu-current-color-bg, var(--wpds-color-bg-interactive-brand-weak-active));
+		}
+	}
+
+	.boot-sidebar__back-button,
+	.boot-sidebar__back-button:hover:not(:disabled, [aria-disabled="true"]),
+	.boot-sidebar__back-button:focus,
+	.boot-sidebar__back-button:focus-visible {
+		color: var(--wp-admin-bar-color-fg, var(--wpds-color-fg-content-neutral));
+	}
+
 	#site-editor-v2-app {
 		height: calc(100vh - 32px) !important;
 		margin-top: 32px;
