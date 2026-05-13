@@ -34,28 +34,36 @@ function fail( summary, details = '' ) {
 	process.exit( 1 );
 }
 
-if ( ! fs.existsSync( HIDDEN_LOCKFILE ) ) {
-	fail(
-		'node_modules is missing or incomplete.',
-		`\t${ path.relative( ROOT, HIDDEN_LOCKFILE ) } not found.`
-	);
-}
-
 /*
  * Fast path: skip the full check if neither lockfile has changed since the
  * last successful run. Both files' mtimes are written into a cache file
  * inside node_modules (so a fresh install wipes it). `--verbose` always
  * forces a fresh check so debug output reflects the current state.
  */
-const currentMtimes = {
-	lockfile: fs.statSync( LOCKFILE ).mtimeMs,
-	hiddenLockfile: fs.statSync( HIDDEN_LOCKFILE ).mtimeMs,
-};
+let currentMtimes;
+try {
+	const [ lockStat, hiddenStat ] = await Promise.all( [
+		fs.promises.stat( LOCKFILE ),
+		fs.promises.stat( HIDDEN_LOCKFILE ),
+	] );
+	currentMtimes = {
+		lockfile: lockStat.mtimeMs,
+		hiddenLockfile: hiddenStat.mtimeMs,
+	};
+} catch ( err ) {
+	if ( err.code === 'ENOENT' && err.path === HIDDEN_LOCKFILE ) {
+		fail(
+			'node_modules is missing or incomplete.',
+			`\t${ path.relative( ROOT, HIDDEN_LOCKFILE ) } not found.`
+		);
+	}
+	throw err;
+}
 
 if ( ! verbose ) {
 	let cached;
 	try {
-		cached = JSON.parse( fs.readFileSync( CACHE_FILE, 'utf8' ) );
+		cached = JSON.parse( await fs.promises.readFile( CACHE_FILE, 'utf8' ) );
 	} catch {
 		cached = null;
 	}
@@ -69,8 +77,12 @@ if ( ! verbose ) {
 	}
 }
 
-const lock = JSON.parse( fs.readFileSync( LOCKFILE, 'utf8' ) );
-const hidden = JSON.parse( fs.readFileSync( HIDDEN_LOCKFILE, 'utf8' ) );
+const [ lockText, hiddenText ] = await Promise.all( [
+	fs.promises.readFile( LOCKFILE, 'utf8' ),
+	fs.promises.readFile( HIDDEN_LOCKFILE, 'utf8' ),
+] );
+const lock = JSON.parse( lockText );
+const hidden = JSON.parse( hiddenText );
 
 const lockPkgs = lock.packages || {};
 const hiddenPkgs = hidden.packages || {};
