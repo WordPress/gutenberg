@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
+import { useCallback } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -10,11 +10,7 @@ import { useMediaEditorContext } from '../media-editor-provider';
 import { getMediaTypeFromMimeType } from '../../utils';
 import { Cropper, useCropper } from '../../image-editor';
 import CropDimensionsBadge from './crop-dimensions-badge';
-
-// Linger time on the dimensions badge after a gesture ends. Long enough
-// to let the eye land on the final value, short enough that the chrome
-// isn't sitting on the image during idle review.
-const DIMENSIONS_BADGE_LINGER_MS = 500;
+import { useCropDimensionsBadge } from './use-crop-dimensions-badge';
 
 export interface MediaEditorCanvasProps {
 	/** Fixed aspect ratio (width / height). `undefined` means free. */
@@ -56,31 +52,19 @@ export default function MediaEditorCanvas( {
 }: MediaEditorCanvasProps ) {
 	const { media } = useMediaEditorContext();
 	const controller = useCropper();
-
-	const [ isBadgeVisible, setIsBadgeVisible ] = useState( false );
-	const lingerTimerRef = useRef< ReturnType< typeof setTimeout > >();
-
-	useEffect( () => {
-		return () => {
-			clearTimeout( lingerTimerRef.current );
-		};
-	}, [] );
+	const badge = useCropDimensionsBadge();
 
 	const handleGestureStart = useCallback( () => {
-		clearTimeout( lingerTimerRef.current );
-		setIsBadgeVisible( true );
 		onGestureStart?.();
 		controller.commitHistory();
-	}, [ controller, onGestureStart ] );
+		badge.onGestureStart();
+	}, [ controller, onGestureStart, badge ] );
 
 	const handleGestureEnd = useCallback( () => {
 		controller.commitHistory();
 		onGestureEnd?.();
-		clearTimeout( lingerTimerRef.current );
-		lingerTimerRef.current = setTimeout( () => {
-			setIsBadgeVisible( false );
-		}, DIMENSIONS_BADGE_LINGER_MS );
-	}, [ controller, onGestureEnd ] );
+		badge.onGestureEnd();
+	}, [ controller, onGestureEnd, badge ] );
 
 	const mediaUrl = media?.source_url;
 	const mediaType = getMediaTypeFromMimeType( media?.mime_type );
@@ -107,7 +91,7 @@ export default function MediaEditorCanvas( {
 			/>
 			<CropDimensionsBadge
 				state={ controller.state }
-				visible={ isBadgeVisible }
+				visible={ badge.visible }
 			/>
 		</div>
 	);
