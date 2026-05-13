@@ -44,6 +44,8 @@ export interface StoredConfig {
 	show_in_quick_edit: boolean;
 	show_admin_column: boolean;
 	show_in_rest: boolean;
+	sort?: boolean;
+	default_term?: { name: string };
 }
 
 import type { ContentType } from '../types';
@@ -67,6 +69,11 @@ export interface TaxonomyFormData extends ContentType {
 		show_tagcloud: boolean;
 		show_in_quick_edit: boolean;
 		show_admin_column: boolean;
+		sort: boolean;
+		// Form-only — controls whether `default_term` is sent on save.
+		// Not part of `StoredConfig`; stripped by `serializeForSave`.
+		default_term_enabled: boolean;
+		default_term: { name: string };
 	};
 	count?: number;
 }
