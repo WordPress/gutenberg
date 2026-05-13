@@ -39,6 +39,14 @@ const DISTRIBUTED_EDITING_STATUS_CONTROL_STATE_DEFINITIONS = Object.freeze( {
 			DISTRIBUTED_EDITING_REASON_CODES.SYNC_META_RESTORED_FROM_REVISION_CONFLICT,
 		pendingChangeCount: 1,
 	} ),
+	staleBaseRejected: Object.freeze( {
+		disposition:
+			DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+		reasonCode:
+			DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+		pendingChangeCount: 1,
+		remoteChangeCount: 1,
+	} ),
 	manualResolution: Object.freeze( {
 		disposition:
 			DISTRIBUTED_EDITING_DISPOSITIONS.REQUIRES_MANUAL_RESOLUTION_NO_SYNC_META,
@@ -360,6 +368,14 @@ function getDistributedEditingStatusSurfaceItem( descriptor ) {
 				title: __( 'Server version available' ),
 				message: __( 'Accept the server version before continuing.' ),
 			};
+		case DISTRIBUTED_EDITING_NOTICE_KINDS.STALE_BASE_REJECTED:
+			return {
+				...getBaseStatusItem( descriptor ),
+				title: __( 'Server version changed' ),
+				message: __(
+					'Refresh the server version before retrying local changes.'
+				),
+			};
 		case DISTRIBUTED_EDITING_NOTICE_KINDS.MANUAL_RESOLUTION_REQUIRED:
 			return {
 				...getBaseStatusItem( descriptor ),
@@ -489,6 +505,10 @@ function getActionLabel( actionKey ) {
 			return __( 'Accept server version' );
 		case DISTRIBUTED_EDITING_NOTICE_ACTIONS.EXPORT_LOCAL_UPDATES:
 			return __( 'Export local changes' );
+		case DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFETCH_SERVER_STATE:
+			return __( 'Refresh server version' );
+		case DISTRIBUTED_EDITING_NOTICE_ACTIONS.REBASE_LOCAL_UPDATES:
+			return __( 'Retry local changes' );
 		case DISTRIBUTED_EDITING_NOTICE_ACTIONS.REVIEW_REMOTE_CHANGES:
 			return __( 'Review changes' );
 	}
@@ -508,6 +528,8 @@ function getDistributedEditingStatusControlLabel( key ) {
 			return __( 'Remote changes' );
 		case 'serverStateConflict':
 			return __( 'Server state conflict' );
+		case 'staleBaseRejected':
+			return __( 'Stale base rejected' );
 		case 'manualResolution':
 			return __( 'Manual resolution' );
 	}

@@ -522,6 +522,20 @@ _Returns_
 
 -   `Object`: DE-RTC session state.
 
+### getDistributedEditingSessionStateForStaleBaseRejectionResult
+
+Returns DE-RTC editor state for a stale-base rejection response.
+
+The state keeps local changes pending and copyable, but does not attempt a refetch, rebase, retry, save, apply, or conflict resolution by itself.
+
+_Parameters_
+
+-   _responseOrError_ `Object`: REST response or API error.
+
+_Returns_
+
+-   `Object`: DE-RTC session state.
+
 ### getDistributedEditingStatusSurfaceItems
 
 Returns inert, renderable status items for DE-RTC notice descriptors.

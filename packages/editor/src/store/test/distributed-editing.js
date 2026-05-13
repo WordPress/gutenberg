@@ -15,6 +15,7 @@ import {
 	DISTRIBUTED_EDITING_UNLOAD_WARNING_REASONS,
 	DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE,
 	getDistributedEditingSessionStateForRecoveryDryRunResult,
+	getDistributedEditingSessionStateForStaleBaseRejectionResult,
 	getDistributedEditingNoticeDescriptorsForSessionState,
 	getDistributedEditingUnloadWarningStateForSessionState,
 	isDistributedEditingConflictDisposition,
@@ -71,6 +72,11 @@ describe( 'distributed editing session state', () => {
 			)
 		).toBe( true );
 		expect(
+			isValidDistributedEditingDisposition(
+				DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION
+			)
+		).toBe( true );
+		expect(
 			isValidDistributedEditingDisposition( 'unknown_disposition' )
 		).toBe( false );
 		expect(
@@ -111,6 +117,40 @@ describe( 'distributed editing session state', () => {
 			remoteChangeCount: 1,
 			hasRemoteChanges: true,
 			requiresServerStateAcceptance: true,
+			requiresServerStateRefetch: false,
+			canAttemptLocalRebase: false,
+			requiresManualConflictResolution: false,
+			mustOfferLocalCopy: true,
+			canExportLocalUpdates: true,
+		} );
+	} );
+
+	it( 'normalizes stale-base rejection state without retry side effects', () => {
+		const normalized =
+			getDistributedEditingSessionStateForStaleBaseRejectionResult( {
+				reason_code:
+					DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+				client_base_version: 'server-v4',
+				server_version: 'server-v6',
+				pending_change_count: 2,
+				remote_change_count: 1,
+			} );
+
+		expect( normalized ).toMatchObject( {
+			clientBaseVersion: 'server-v4',
+			serverVersion: 'server-v6',
+			disposition:
+				DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+			reasonCode:
+				DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+			pendingChangeCount: 2,
+			hasPendingChanges: true,
+			isAwaitingServerConfirmation: true,
+			remoteChangeCount: 1,
+			hasRemoteChanges: true,
+			requiresServerStateRefetch: true,
+			canAttemptLocalRebase: false,
+			requiresManualConflictResolution: false,
 			mustOfferLocalCopy: true,
 			canExportLocalUpdates: true,
 		} );
@@ -316,6 +356,39 @@ describe( 'distributed editing session state', () => {
 			status: 'info',
 			priority: 'status',
 		} );
+	} );
+
+	it( 'builds stale-base rejection notice descriptors', () => {
+		const notices = getDistributedEditingNoticeDescriptorsForSessionState(
+			getDistributedEditingSessionStateForStaleBaseRejectionResult( {
+				clientBaseVersion: 'server-v4',
+				serverVersion: 'server-v6',
+				pendingChangeCount: 1,
+			} )
+		);
+
+		expect( notices ).toEqual( [
+			expect.objectContaining( {
+				id: DISTRIBUTED_EDITING_NOTICE_IDS.STALE_BASE_REJECTED,
+				kind: DISTRIBUTED_EDITING_NOTICE_KINDS.STALE_BASE_REJECTED,
+				status: 'warning',
+				priority: 'blocking',
+				reasonCode:
+					DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+				disposition:
+					DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+				pendingChangeCount: 1,
+				remoteChangeCount: 1,
+				actionKeys: [
+					DISTRIBUTED_EDITING_NOTICE_ACTIONS.EXPORT_LOCAL_UPDATES,
+					DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFETCH_SERVER_STATE,
+				],
+			} ),
+			expect.objectContaining( {
+				id: DISTRIBUTED_EDITING_NOTICE_IDS.REMOTE_CHANGES_RECEIVED,
+				kind: DISTRIBUTED_EDITING_NOTICE_KINDS.REMOTE_CHANGES_RECEIVED,
+			} ),
+		] );
 	} );
 
 	it( 'builds unload-warning integration state without rendered copy', () => {

@@ -86,6 +86,7 @@ describe( 'getDistributedEditingStatusControlStates', () => {
 			'degradedConnection',
 			'remoteChanges',
 			'serverStateConflict',
+			'staleBaseRejected',
 			'manualResolution',
 		] );
 		expect( states.pendingLocalChanges ).toEqual( {
@@ -105,6 +106,14 @@ describe( 'getDistributedEditingStatusControlStates', () => {
 			reasonCode:
 				DISTRIBUTED_EDITING_REASON_CODES.SYNC_META_RESTORED_FROM_REVISION_CONFLICT,
 			pendingChangeCount: 1,
+		} );
+		expect( states.staleBaseRejected ).toEqual( {
+			disposition:
+				DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+			reasonCode:
+				DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+			pendingChangeCount: 1,
+			remoteChangeCount: 1,
 		} );
 		expect( states.manualResolution ).toEqual( {
 			disposition:
@@ -309,6 +318,12 @@ describe( 'shouldRenderDistributedEditingStatus', () => {
 		expect(
 			shouldRenderDistributedEditingStatus( {
 				disposition:
+					DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+			} )
+		).toBe( true );
+		expect(
+			shouldRenderDistributedEditingStatus( {
+				disposition:
 					DISTRIBUTED_EDITING_DISPOSITIONS.REQUIRES_MANUAL_RESOLUTION_NO_SYNC_META,
 			} )
 		).toBe( true );
@@ -476,6 +491,58 @@ describe( 'DistributedEditingStatusSurface', () => {
 				name: 'Export local changes',
 			} )
 		).not.toBeInTheDocument();
+	} );
+
+	it( 'renders stale-base rejection actions for inspected state', async () => {
+		const user = userEvent.setup();
+		const onAction = jest.fn();
+		const noticeDescriptors =
+			getDistributedEditingNoticeDescriptorsForSessionState( {
+				disposition:
+					DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+				reasonCode:
+					DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+				pendingChangeCount: 1,
+				remoteChangeCount: 1,
+				canAttemptLocalRebase: true,
+			} );
+
+		render(
+			<DistributedEditingStatusSurface
+				noticeDescriptors={ noticeDescriptors }
+				onAction={ onAction }
+			/>
+		);
+
+		expect( screen.getByText( 'Server version changed' ) ).toBeVisible();
+		expect(
+			screen.getByText(
+				'Refresh the server version before retrying local changes.'
+			)
+		).toBeVisible();
+
+		await user.click(
+			screen.getByRole( 'button', {
+				name: 'Refresh server version',
+			} )
+		);
+
+		expect( onAction ).toHaveBeenCalledWith(
+			DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFETCH_SERVER_STATE,
+			expect.objectContaining( {
+				kind: DISTRIBUTED_EDITING_NOTICE_KINDS.STALE_BASE_REJECTED,
+			} )
+		);
+		expect(
+			screen.getByRole( 'button', {
+				name: 'Retry local changes',
+			} )
+		).toBeVisible();
+		expect(
+			screen.getByRole( 'button', {
+				name: 'Export local changes',
+			} )
+		).toBeVisible();
 	} );
 
 	it( 'renders manual resolution for missing sync metadata', () => {

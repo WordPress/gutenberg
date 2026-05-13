@@ -25,6 +25,7 @@ export const DISTRIBUTED_EDITING_DISPOSITIONS = Object.freeze( {
 		'conflict_requires_server_state_acceptance',
 	REQUIRES_MANUAL_RESOLUTION_NO_SYNC_META:
 		'requires_manual_resolution_no_sync_meta',
+	REJECTED_STALE_BASE_VERSION: 'rejected_stale_base_version',
 	REJECTED_FEATURE_DISABLED: 'rejected_feature_disabled',
 	REJECTED_PERMISSION_DENIED: 'rejected_permission_denied',
 	REJECTED_ROUTE_MISMATCH: 'rejected_route_mismatch',
@@ -36,6 +37,7 @@ export const DISTRIBUTED_EDITING_DISPOSITIONS = Object.freeze( {
  */
 export const DISTRIBUTED_EDITING_NOTICE_KINDS = Object.freeze( {
 	SERVER_STATE_ACCEPTANCE_REQUIRED: 'server-state-acceptance-required',
+	STALE_BASE_REJECTED: 'stale-base-rejected',
 	MANUAL_RESOLUTION_REQUIRED: 'manual-resolution-required',
 	CONNECTION_DEGRADED: 'connection-degraded',
 	REMOTE_CHANGES_RECEIVED: 'remote-changes-received',
@@ -48,6 +50,7 @@ export const DISTRIBUTED_EDITING_NOTICE_KINDS = Object.freeze( {
 export const DISTRIBUTED_EDITING_NOTICE_IDS = Object.freeze( {
 	SERVER_STATE_ACCEPTANCE_REQUIRED:
 		'core/editor/distributed-editing/server-state-acceptance-required',
+	STALE_BASE_REJECTED: 'core/editor/distributed-editing/stale-base-rejected',
 	MANUAL_RESOLUTION_REQUIRED:
 		'core/editor/distributed-editing/manual-resolution-required',
 	CONNECTION_DEGRADED: 'core/editor/distributed-editing/connection-degraded',
@@ -62,6 +65,8 @@ export const DISTRIBUTED_EDITING_NOTICE_IDS = Object.freeze( {
 export const DISTRIBUTED_EDITING_NOTICE_ACTIONS = Object.freeze( {
 	ACCEPT_SERVER_STATE: 'accept-server-state',
 	EXPORT_LOCAL_UPDATES: 'export-local-updates',
+	REFETCH_SERVER_STATE: 'refetch-server-state',
+	REBASE_LOCAL_UPDATES: 'rebase-local-updates',
 	REVIEW_REMOTE_CHANGES: 'review-remote-changes',
 } );
 
@@ -84,6 +89,8 @@ const VALID_DISPOSITIONS = new Set(
 const NOTICE_ID_BY_KIND = Object.freeze( {
 	[ DISTRIBUTED_EDITING_NOTICE_KINDS.SERVER_STATE_ACCEPTANCE_REQUIRED ]:
 		DISTRIBUTED_EDITING_NOTICE_IDS.SERVER_STATE_ACCEPTANCE_REQUIRED,
+	[ DISTRIBUTED_EDITING_NOTICE_KINDS.STALE_BASE_REJECTED ]:
+		DISTRIBUTED_EDITING_NOTICE_IDS.STALE_BASE_REJECTED,
 	[ DISTRIBUTED_EDITING_NOTICE_KINDS.MANUAL_RESOLUTION_REQUIRED ]:
 		DISTRIBUTED_EDITING_NOTICE_IDS.MANUAL_RESOLUTION_REQUIRED,
 	[ DISTRIBUTED_EDITING_NOTICE_KINDS.CONNECTION_DEGRADED ]:
@@ -106,6 +113,9 @@ export const DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE = Object.freeze( {
 	remoteChangeCount: 0,
 	hasRemoteChanges: false,
 	requiresServerStateAcceptance: false,
+	requiresServerStateRefetch: false,
+	canAttemptLocalRebase: false,
+	requiresManualConflictResolution: false,
 	mustOfferLocalCopy: false,
 	canExportLocalUpdates: false,
 } );
@@ -143,6 +153,7 @@ export function isDistributedEditingConflictDisposition( disposition ) {
 	return [
 		DISTRIBUTED_EDITING_DISPOSITIONS.CONFLICT_REQUIRES_SERVER_STATE_ACCEPTANCE,
 		DISTRIBUTED_EDITING_DISPOSITIONS.REQUIRES_MANUAL_RESOLUTION_NO_SYNC_META,
+		DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
 	].includes( disposition );
 }
 
@@ -169,8 +180,13 @@ export function normalizeDistributedEditingSessionState( sessionState = {} ) {
 		sessionState.pendingChangeCount
 	);
 	const remoteChangeCount = normalizeCount( sessionState.remoteChangeCount );
+	const isStaleBaseRejection =
+		disposition ===
+		DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION;
 	const hasPendingChanges =
-		Boolean( sessionState.hasPendingChanges ) || pendingChangeCount > 0;
+		Boolean( sessionState.hasPendingChanges ) ||
+		pendingChangeCount > 0 ||
+		isStaleBaseRejection;
 	const isAwaitingServerConfirmation =
 		Boolean( sessionState.isAwaitingServerConfirmation ) ||
 		hasPendingChanges;
@@ -184,9 +200,20 @@ export function normalizeDistributedEditingSessionState( sessionState = {} ) {
 		Boolean( sessionState.requiresServerStateAcceptance ) ||
 		disposition ===
 			DISTRIBUTED_EDITING_DISPOSITIONS.CONFLICT_REQUIRES_SERVER_STATE_ACCEPTANCE;
+	const requiresServerStateRefetch =
+		Boolean( sessionState.requiresServerStateRefetch ) ||
+		isStaleBaseRejection;
+	const requiresManualConflictResolution = Boolean(
+		sessionState.requiresManualConflictResolution
+	);
+	const canAttemptLocalRebase =
+		Boolean( sessionState.canAttemptLocalRebase ) &&
+		! requiresManualConflictResolution;
 	const mustOfferLocalCopy =
 		Boolean( sessionState.mustOfferLocalCopy ) ||
-		( requiresServerStateAcceptance && hasPendingChanges );
+		( requiresServerStateAcceptance && hasPendingChanges ) ||
+		( requiresServerStateRefetch && hasPendingChanges ) ||
+		( requiresManualConflictResolution && hasPendingChanges );
 	const canExportLocalUpdates =
 		Boolean( sessionState.canExportLocalUpdates ) || mustOfferLocalCopy;
 
@@ -204,6 +231,9 @@ export function normalizeDistributedEditingSessionState( sessionState = {} ) {
 		remoteChangeCount,
 		hasRemoteChanges,
 		requiresServerStateAcceptance,
+		requiresServerStateRefetch,
+		canAttemptLocalRebase,
+		requiresManualConflictResolution,
 		mustOfferLocalCopy,
 		canExportLocalUpdates,
 	};
@@ -267,6 +297,55 @@ export function getDistributedEditingSessionStateForRecoveryDryRunResult(
 }
 
 /**
+ * Returns DE-RTC editor state for a stale-base rejection response.
+ *
+ * The state keeps local changes pending and copyable, but does not attempt a
+ * refetch, rebase, retry, save, apply, or conflict resolution by itself.
+ *
+ * @param {Object} responseOrError REST response or API error.
+ *
+ * @return {Object} DE-RTC session state.
+ */
+export function getDistributedEditingSessionStateForStaleBaseRejectionResult(
+	responseOrError = {}
+) {
+	const reasonCode =
+		normalizeNullableString(
+			responseOrError.code ||
+				responseOrError.reasonCode ||
+				responseOrError.reason_code
+		) || DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED;
+
+	return normalizeDistributedEditingSessionState( {
+		clientBaseVersion:
+			responseOrError.clientBaseVersion ||
+			responseOrError.client_base_version,
+		serverVersion:
+			responseOrError.serverVersion || responseOrError.server_version,
+		disposition:
+			DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+		reasonCode,
+		pendingChangeCount:
+			responseOrError.pendingChangeCount ||
+			responseOrError.pending_change_count ||
+			1,
+		remoteChangeCount:
+			responseOrError.remoteChangeCount ||
+			responseOrError.remote_change_count ||
+			1,
+		requiresServerStateRefetch: true,
+		canAttemptLocalRebase:
+			responseOrError.canAttemptLocalRebase ??
+			responseOrError.can_attempt_local_rebase ??
+			false,
+		requiresManualConflictResolution:
+			responseOrError.requiresManualConflictResolution ||
+			responseOrError.requires_manual_conflict_resolution,
+		canExportLocalUpdates: true,
+	} );
+}
+
+/**
  * Returns stable notice descriptors for the current DE-RTC session state.
  * Descriptors intentionally avoid rendered copy and side effects; future UI can
  * translate the descriptor kind and action keys into notices, toasts, or
@@ -300,6 +379,30 @@ export function getDistributedEditingNoticeDescriptorsForSessionState(
 		);
 	} else if (
 		normalized.disposition ===
+		DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION
+	) {
+		descriptors.push(
+			createNoticeDescriptor( normalized, {
+				kind: DISTRIBUTED_EDITING_NOTICE_KINDS.STALE_BASE_REJECTED,
+				status: 'warning',
+				priority: 'blocking',
+				actionKeys: [
+					...( normalized.canExportLocalUpdates
+						? [
+								DISTRIBUTED_EDITING_NOTICE_ACTIONS.EXPORT_LOCAL_UPDATES,
+						  ]
+						: [] ),
+					DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFETCH_SERVER_STATE,
+					...( normalized.canAttemptLocalRebase
+						? [
+								DISTRIBUTED_EDITING_NOTICE_ACTIONS.REBASE_LOCAL_UPDATES,
+						  ]
+						: [] ),
+				],
+			} )
+		);
+	} else if (
+		normalized.disposition ===
 		DISTRIBUTED_EDITING_DISPOSITIONS.REQUIRES_MANUAL_RESOLUTION_NO_SYNC_META
 	) {
 		descriptors.push(
@@ -328,7 +431,9 @@ export function getDistributedEditingNoticeDescriptorsForSessionState(
 
 	if (
 		normalized.isAwaitingServerConfirmation &&
-		! normalized.requiresServerStateAcceptance
+		! normalized.requiresServerStateAcceptance &&
+		normalized.disposition !==
+			DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION
 	) {
 		descriptors.push(
 			createNoticeDescriptor( normalized, {
