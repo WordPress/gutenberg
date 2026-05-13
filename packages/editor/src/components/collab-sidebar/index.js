@@ -28,6 +28,7 @@ import { Notes } from './notes';
 import { store as editorStore } from '../../store';
 import { AddNoteMenuItem } from './add-note-menu-item';
 import { NoteAvatarIndicator } from './note-indicator-toolbar';
+import { NoteHighlightStyles } from './note-highlight-styles';
 import { useGlobalStylesContext } from '../global-styles-provider';
 import {
 	useAnnotateBlocks,
@@ -175,6 +176,10 @@ function NotesSidebar( { postId } ) {
 
 	return (
 		<>
+			<NoteHighlightStyles
+				threads={ unresolvedNotes }
+				selectedId={ selectedNote?.id }
+			/>
 			{ !! currentThread && (
 				<NoteAvatarIndicator
 					note={ currentThread }
