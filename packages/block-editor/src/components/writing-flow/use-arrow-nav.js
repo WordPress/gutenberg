@@ -167,11 +167,13 @@ export default function useArrowNav() {
 	const {
 		getMultiSelectedBlocksStartClientId,
 		getMultiSelectedBlocksEndClientId,
+		getSelectedBlockClientId,
+		getAdjacentBlockClientId,
 		getSettings,
 		hasMultiSelection,
 		__unstableIsFullySelected,
 	} = useSelect( blockEditorStore );
-	const { selectBlock } = useDispatch( blockEditorStore );
+	const { selectBlock, multiSelect } = useDispatch( blockEditorStore );
 	return useRefEffect( ( node ) => {
 		// Here a DOMRect is stored while moving the caret vertically so
 		// vertical position of the start position can be restored. This is to
@@ -180,15 +182,6 @@ export default function useArrowNav() {
 
 		function onMouseDown() {
 			verticalRect = null;
-		}
-
-		function isClosestTabbableABlock( target, isReverse ) {
-			const closestTabbable = getClosestTabbable(
-				target,
-				isReverse,
-				node
-			);
-			return closestTabbable && getBlockClientId( closestTabbable );
 		}
 
 		function onKeyDown( event ) {
@@ -226,6 +219,21 @@ export default function useArrowNav() {
 			// selection to the start or end of the selection.
 			if ( hasMultiSelection() ) {
 				if ( shiftKey ) {
+					if ( __unstableIsFullySelected() && isVertical ) {
+						const endId = getMultiSelectedBlocksEndClientId();
+						const adjacentClientId = getAdjacentBlockClientId(
+							endId,
+							isReverseDir ? -1 : 1
+						);
+
+						if ( adjacentClientId ) {
+							multiSelect(
+								getMultiSelectedBlocksStartClientId(),
+								adjacentClientId
+							);
+							event.preventDefault();
+						}
+					}
 					return;
 				}
 
@@ -268,55 +276,96 @@ export default function useArrowNav() {
 			// In the case of RTL scripts, right means previous and left means
 			// next, which is the exact reverse of LTR.
 			const isReverseDir = isRTL( target ) ? ! isReverse : isReverse;
-			const { keepCaretInsideBlock } = getSettings();
 
 			if ( shiftKey ) {
 				if (
-					isClosestTabbableABlock( target, isReverse ) &&
-					isNavEdge( target, isReverse )
+					( ! target.isContentEditable ||
+						__unstableIsFullySelected() ) &&
+					isVertical
 				) {
+					const clientId = getSelectedBlockClientId();
+					const adjacentClientId = getAdjacentBlockClientId(
+						clientId,
+						isReverseDir ? -1 : 1
+					);
+
+					if ( adjacentClientId ) {
+						multiSelect( clientId, adjacentClientId );
+						event.preventDefault();
+					}
+					return;
+				}
+
+				const closestTabbable = getClosestTabbable(
+					target,
+					isReverse,
+					node
+				);
+				const isClosestBlock =
+					closestTabbable && getBlockClientId( closestTabbable );
+
+				if ( isClosestBlock && isNavEdge( target, isReverse ) ) {
+					if ( closestTabbable.contentEditable !== 'true' ) {
+						const clientId = getSelectedBlockClientId();
+						const adjacentClientId = getAdjacentBlockClientId(
+							clientId,
+							isReverseDir ? -1 : 1
+						);
+
+						if ( adjacentClientId ) {
+							multiSelect( clientId, adjacentClientId );
+							event.preventDefault();
+						}
+						return;
+					}
+
 					node.contentEditable = true;
 					// Firefox doesn't automatically move focus.
 					node.focus();
 				}
-			} else if (
-				isVertical &&
-				isVerticalEdge( target, isReverse ) &&
-				// When Alt is pressed, only intercept if the caret is also at
-				// the horizontal edge.
-				( altKey ? isHorizontalEdge( target, isReverseDir ) : true ) &&
-				! keepCaretInsideBlock
-			) {
-				const closestTabbable = getClosestTabbable(
-					target,
-					isReverse,
-					node,
-					true
-				);
-
-				if ( closestTabbable ) {
-					placeCaretAtVerticalEdge(
-						closestTabbable,
-						// When Alt is pressed, place the caret at the furthest
-						// horizontal edge and the furthest vertical edge.
-						altKey ? ! isReverse : isReverse,
-						altKey ? undefined : verticalRect
+			} else {
+				const { keepCaretInsideBlock } = getSettings();
+				if (
+					isVertical &&
+					isVerticalEdge( target, isReverse ) &&
+					// When Alt is pressed, only intercept if the caret is also at
+					// the horizontal edge.
+					( altKey
+						? isHorizontalEdge( target, isReverseDir )
+						: true ) &&
+					! keepCaretInsideBlock
+				) {
+					const closestTabbable = getClosestTabbable(
+						target,
+						isReverse,
+						node,
+						true
 					);
+
+					if ( closestTabbable ) {
+						placeCaretAtVerticalEdge(
+							closestTabbable,
+							// When Alt is pressed, place the caret at the furthest
+							// horizontal edge and the furthest vertical edge.
+							altKey ? ! isReverse : isReverse,
+							altKey ? undefined : verticalRect
+						);
+						event.preventDefault();
+					}
+				} else if (
+					isHorizontal &&
+					defaultView.getSelection().isCollapsed &&
+					isHorizontalEdge( target, isReverseDir ) &&
+					! keepCaretInsideBlock
+				) {
+					const closestTabbable = getClosestTabbable(
+						target,
+						isReverseDir,
+						node
+					);
+					placeCaretAtHorizontalEdge( closestTabbable, isReverse );
 					event.preventDefault();
 				}
-			} else if (
-				isHorizontal &&
-				defaultView.getSelection().isCollapsed &&
-				isHorizontalEdge( target, isReverseDir ) &&
-				! keepCaretInsideBlock
-			) {
-				const closestTabbable = getClosestTabbable(
-					target,
-					isReverseDir,
-					node
-				);
-				placeCaretAtHorizontalEdge( closestTabbable, isReverse );
-				event.preventDefault();
 			}
 		}
 
