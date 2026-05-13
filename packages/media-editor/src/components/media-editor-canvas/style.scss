@@ -1,3 +1,5 @@
+@use "@wordpress/base-styles/variables" as *;
+
 // The canvas wrapper fills the modal's canvas area so the cropper has a
 // sized parent (the cropper uses 100% width/height of its container).
 // `position: relative` establishes a stacking context for any future
@@ -6,4 +8,29 @@
 	position: relative;
 	width: 100%;
 	height: 100%;
+}
+
+// Live output-dimensions readout, surfaced only during gesture. Sits in
+// the bottom-left corner so it stays clear of the close/save controls
+// on the top-right of the modal. Pointer events are off so it can never
+// intercept a crop handle that wanders behind it during a resize.
+.media-editor-canvas__dimensions-badge {
+	position: absolute;
+	left: $grid-unit-15;
+	bottom: $grid-unit-15;
+	padding: $grid-unit-05 $grid-unit-10;
+	border-radius: $radius-small;
+	background: rgba(0, 0, 0, 0.72);
+	color: #fff;
+	font-size: 12px;
+	line-height: 1.4;
+	font-variant-numeric: tabular-nums;
+	pointer-events: none;
+	opacity: 0;
+	transition: opacity 120ms ease-out;
+	z-index: 1;
+
+	&.is-visible {
+		opacity: 1;
+	}
 }
