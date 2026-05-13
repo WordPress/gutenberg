@@ -2058,6 +2058,12 @@
 		"parent": "packages-style-engine"
 	},
 	{
+		"title": "@wordpress/style-runtime",
+		"slug": "packages-style-runtime",
+		"markdown_source": "../packages/style-runtime/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/stylelint-config",
 		"slug": "packages-stylelint-config",
 		"markdown_source": "../packages/stylelint-config/README.md",

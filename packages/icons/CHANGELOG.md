@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 13.0.0 (2026-04-29)
+
 ### Breaking Changes
 
 - Rename Tabs-related icons: `tabs-menu` to `tab-list`, `tabs-menu-item` to `tab`, and `tab` to `tab-panel`. ([#77418](https://github.com/WordPress/gutenberg/pull/77418))

@@ -1,3 +1,8 @@
+// Handle touch target size — used both for the handle ::before hit area and
+// for the inner canvas inset (half the touch target on each side so the full
+// reach extends to the crop edge).
+$handle-touch-target-size: 44px;
+
 .wp-media-editor-image-editor {
 	position: relative;
 	overflow: hidden;
@@ -6,6 +11,30 @@
 	touch-action: none;
 	user-select: none;
 	cursor: grab;
+
+	// Inner gutter for resize handles. Handles use negative offsets and a
+	// touch target that extends past the crop edge; the root clips overflow
+	// (required for the dimming overlay's box-shadow trick), so a flush
+	// handle would be clipped. The inner `__canvas` wrapper is inset by half
+	// the touch target, reserving reach room on all sides while keeping the
+	// root as the clipping boundary.
+	&__canvas {
+		position: absolute;
+		inset: calc($handle-touch-target-size / 2);
+
+		// Suppress the browser's default focus ring — the crop rectangle
+		// border provides the custom keyboard-focus indicator instead.
+		&:focus {
+			outline: none;
+		}
+	}
+
+	// Inner stage — receives the viewport pan transform so the canvas div
+	// itself stays fixed, preventing the root background from showing through.
+	&__stage {
+		position: absolute;
+		inset: 0;
+	}
 
 	&--dragging {
 		cursor: grabbing;
@@ -42,6 +71,22 @@
 		position: absolute;
 		pointer-events: none;
 		overflow: hidden;
+		transition: opacity 0.15s ease;
+	}
+
+	&__canvas--grid-interactive &__grid {
+		opacity: 0;
+		transition-delay: 0.1s;
+	}
+
+	&__canvas--show-grid &__grid {
+		opacity: 1;
+		transition-delay: 0s;
+	}
+
+	&__canvas--settling &__grid {
+		opacity: 0;
+		transition: none;
 	}
 
 	&__grid-line {
@@ -66,12 +111,22 @@
 		border: 1px solid rgba(255, 255, 255, 0.7);
 		box-sizing: border-box;
 		pointer-events: none;
+		transition: border-color 0.15s ease, box-shadow 0.15s ease;
+	}
+
+	// Blue border on the crop rectangle when the canvas has keyboard focus.
+	// Uses a JS-controlled class rather than :focus-visible — browsers can
+	// restore :focus-visible across programmatic focus calls, making pure
+	// CSS unreliable for pointer-to-keyboard transitions.
+	&__canvas--focus-visible &__stencil-rect {
+		border-color: var(--wp-image-editor-focus-color, var(--wp-admin-theme-color, #007cba));
+		box-shadow: 0 0 0 1px var(--wp-image-editor-focus-color, var(--wp-admin-theme-color, #007cba));
 	}
 
 	&__handle {
 		// Reset native <button> UA styles — the handle is a button for
 		// accessibility (native keyboard focus, button semantics), but
-		// it's styled as a small draggable square.
+		// it's styled as a small draggable circle.
 		appearance: none;
 		margin: 0;
 		padding: 0;
@@ -83,17 +138,31 @@
 		height: 12px;
 		background: rgba(255, 255, 255, 0.6);
 		border: 1px solid rgba(255, 255, 255, 0.9);
+		border-radius: 50%;
 		box-sizing: border-box;
 		pointer-events: auto;
+		transition: background-color 0.15s ease, box-shadow 0.15s ease;
 
-		// Extend touch target to 44px minimum for accessibility.
+		&:focus {
+			outline: none;
+		}
+
+		// Double ring (white inner + theme-color outer) for legibility
+		// over the dark dimming overlay.
+		&:focus-visible {
+			background: var(--wp-image-editor-focus-color, var(--wp-admin-theme-color, #007cba));
+			border-color: transparent;
+			box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--wp-image-editor-focus-color, var(--wp-admin-theme-color, #007cba));
+		}
+
+		// Extend touch target to the minimum accessible hit area.
 		&::before {
 			content: "";
 			position: absolute;
 			top: 50%;
 			left: 50%;
-			width: 44px;
-			height: 44px;
+			width: $handle-touch-target-size;
+			height: $handle-touch-target-size;
 			transform: translate(-50%, -50%);
 		}
 

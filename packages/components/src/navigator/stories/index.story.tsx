@@ -30,7 +30,7 @@ const meta: Meta< typeof Navigator > = {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
 		componentStatus: {
-			status: 'stable',
+			status: 'recommended',
 			whereUsed: 'global',
 		},
 	},

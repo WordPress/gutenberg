@@ -9,7 +9,7 @@ import {
 import { unlock } from '../lock-unlock';
 import resetStyles from '../utils/css/resets.module.css';
 import { useDeprioritizedInitialFocus } from '../utils/use-deprioritized-initial-focus';
-import { renderPortalWithChildren } from '../utils/render-portal-with-children';
+import { renderSlotWithChildren } from '../utils/render-slot-with-children';
 import { PopoverValidationProvider } from './context';
 import { Portal } from './portal';
 import styles from './style.module.css';
@@ -47,7 +47,6 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function PopoverPopup(
 		side = 'bottom',
 		sideOffset = 8,
 		sticky,
-		style,
 		variant = 'default',
 		...props
 	},
@@ -55,7 +54,7 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function PopoverPopup(
 ) {
 	const { resolvedInitialFocus, popupRef } = useDeprioritizedInitialFocus( {
 		initialFocus,
-		deprioritizedAttribute: CLOSE_ATTR,
+		deprioritizedAttributes: [ CLOSE_ATTR ],
 	} );
 	const mergedPopupRef = useMergeRefs( [ ref, popupRef ] );
 
@@ -75,19 +74,17 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function PopoverPopup(
 			side={ side }
 			sideOffset={ sideOffset }
 			sticky={ sticky }
-			style={ style }
-			className={ clsx(
-				resetStyles[ 'box-sizing' ],
-				styles.positioner,
-				className
-			) }
+			className={ clsx( resetStyles[ 'box-sizing' ], styles.positioner ) }
 		>
 			<ThemeProvider>
 				<_Popover.Popup
 					ref={ mergedPopupRef }
 					initialFocus={ resolvedInitialFocus }
 					finalFocus={ finalFocus }
-					className={ clsx( variant !== 'unstyled' && styles.popup ) }
+					className={ clsx(
+						variant !== 'unstyled' && styles.popup,
+						className
+					) }
 					{ ...props }
 				>
 					<PopoverValidationProvider>
@@ -105,7 +102,7 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function PopoverPopup(
 		</>
 	);
 
-	return renderPortalWithChildren( portal, <Portal />, portalChildren );
+	return renderSlotWithChildren( portal, <Portal />, portalChildren );
 } );
 
 export { Popup };

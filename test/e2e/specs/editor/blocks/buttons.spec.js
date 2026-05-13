@@ -266,79 +266,6 @@ test.describe( 'Buttons', () => {
 		] );
 	} );
 
-	test.describe( 'Width support', () => {
-		test.beforeAll( async ( { requestUtils } ) => {
-			await requestUtils.activateTheme( 'emptytheme' );
-		} );
-
-		test.beforeEach( async ( { admin } ) => {
-			await admin.createNewPost();
-		} );
-
-		test.afterAll( async ( { requestUtils } ) => {
-			await requestUtils.activateTheme( 'twentytwentyone' );
-		} );
-
-		test( 'can resize width', async ( { editor, page } ) => {
-			// Mock spacing units to include % for the width control
-			await page.waitForFunction( () => window?.wp?.data );
-			await page.evaluate( () => {
-				const settings = window.wp.data
-					.select( 'core/block-editor' )
-					.getSettings();
-				window.wp.data.dispatch( 'core/block-editor' ).updateSettings( {
-					...settings,
-					spacing: { units: [ 'px', '%', 'em', 'rem', 'vh', 'vw' ] },
-				} );
-			} );
-
-			await editor.insertBlock( { name: 'core/buttons' } );
-			await page.keyboard.type( 'Content' );
-
-			// Select the inner Button block (not the outer Buttons container)
-			const buttonBlock = editor.canvas
-				.getByRole( 'document', {
-					name: 'Block: Button',
-					exact: true,
-				} )
-				.filter( { hasText: 'Content' } );
-			await editor.selectBlocks( buttonBlock );
-
-			await editor.openDocumentSettingsSidebar();
-
-			const settingsPanel = page.getByRole( 'region', {
-				name: 'Editor settings',
-			} );
-
-			// Switch from preset slider to custom value input
-			await settingsPanel
-				.getByRole( 'group', { name: 'Width' } )
-				.getByLabel( 'Set custom value' )
-				.click();
-
-			// Change the unit from px to % using the combobox
-			await settingsPanel
-				.getByRole( 'combobox', { name: 'Select unit' } )
-				.first()
-				.selectOption( '%' );
-
-			// Set the width value
-			await settingsPanel
-				.getByRole( 'spinbutton', { name: 'Width', exact: true } )
-				.fill( '25' );
-
-			// Check the content.
-			const content = await editor.getEditedPostContent();
-			expect( content ).toBe(
-				`<!-- wp:buttons -->
-<div class="wp-block-buttons"><!-- wp:button {"style":{"dimensions":{"width":"25%"}}} -->
-<div class="wp-block-button"><a class="wp-block-button__link wp-element-button">Content</a></div>
-<!-- /wp:button --></div>
-<!-- /wp:buttons -->`
-			);
-		} );
-	} );
-
 	test( 'can apply named colors', async ( { editor, page } ) => {
 		await editor.insertBlock( { name: 'core/buttons' } );
 		await page.keyboard.type( 'Content' );
@@ -448,6 +375,131 @@ test.describe( 'Buttons', () => {
 <!-- /wp:button --></div>
 <!-- /wp:buttons -->`
 		);
+	} );
+
+	test( 'copies attributes when inserting a sibling via the appender', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( { name: 'core/buttons' } );
+		await page.keyboard.type( 'Content' );
+		await editor.openDocumentSettingsSidebar();
+
+		// Apply named colors to the first button.
+		const settings = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+		await settings.getByRole( 'button', { name: 'Text' } ).click();
+		await page.getByRole( 'option', { name: 'Cyan bluish gray' } ).click();
+		await settings.getByRole( 'button', { name: 'Background' } ).click();
+		await page.getByRole( 'option', { name: 'Vivid red' } ).click();
+
+		// Select the parent Buttons block so the appender is visible.
+		await editor.selectBlocks(
+			editor.canvas.getByRole( 'document', { name: 'Block: Buttons' } )
+		);
+
+		// Insert a sibling via the appender; should auto-insert a button.
+		await editor.canvas
+			.getByRole( 'button', { name: 'Add button' } )
+			.click();
+
+		// The new button should inherit color attributes from its sibling.
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/buttons',
+				innerBlocks: [
+					{
+						name: 'core/button',
+						attributes: {
+							text: 'Content',
+							backgroundColor: 'vivid-red',
+							textColor: 'cyan-bluish-gray',
+						},
+					},
+					{
+						name: 'core/button',
+						attributes: {
+							backgroundColor: 'vivid-red',
+							textColor: 'cyan-bluish-gray',
+						},
+					},
+				],
+			},
+		] );
+	} );
+
+	test.describe( 'Width support', () => {
+		test.beforeAll( async ( { requestUtils } ) => {
+			await requestUtils.activateTheme( 'emptytheme' );
+		} );
+
+		test.beforeEach( async ( { admin } ) => {
+			await admin.createNewPost();
+		} );
+
+		test.afterAll( async ( { requestUtils } ) => {
+			await requestUtils.activateTheme( 'twentytwentyone' );
+		} );
+
+		test( 'can resize width', async ( { editor, page } ) => {
+			// Mock spacing units to include % for the width control
+			await page.waitForFunction( () => window?.wp?.data );
+			await page.evaluate( () => {
+				const settings = window.wp.data
+					.select( 'core/block-editor' )
+					.getSettings();
+				window.wp.data.dispatch( 'core/block-editor' ).updateSettings( {
+					...settings,
+					spacing: { units: [ 'px', '%', 'em', 'rem', 'vh', 'vw' ] },
+				} );
+			} );
+
+			await editor.insertBlock( { name: 'core/buttons' } );
+			await page.keyboard.type( 'Content' );
+
+			// Select the inner Button block (not the outer Buttons container)
+			const buttonBlock = editor.canvas
+				.getByRole( 'document', {
+					name: 'Block: Button',
+					exact: true,
+				} )
+				.filter( { hasText: 'Content' } );
+			await editor.selectBlocks( buttonBlock );
+
+			await editor.openDocumentSettingsSidebar();
+
+			const settingsPanel = page.getByRole( 'region', {
+				name: 'Editor settings',
+			} );
+
+			// Switch from preset slider to custom value input
+			await settingsPanel
+				.getByRole( 'group', { name: 'Width' } )
+				.getByLabel( 'Set custom value' )
+				.click();
+
+			// Change the unit from px to % using the combobox
+			await settingsPanel
+				.getByRole( 'combobox', { name: 'Select unit' } )
+				.first()
+				.selectOption( '%' );
+
+			// Set the width value
+			await settingsPanel
+				.getByRole( 'spinbutton', { name: 'Width', exact: true } )
+				.fill( '25' );
+
+			// Check the content.
+			const content = await editor.getEditedPostContent();
+			expect( content ).toBe(
+				`<!-- wp:buttons -->
+<div class="wp-block-buttons"><!-- wp:button {"style":{"dimensions":{"width":"25%"}}} -->
+<div class="wp-block-button"><a class="wp-block-button__link wp-element-button">Content</a></div>
+<!-- /wp:button --></div>
+<!-- /wp:buttons -->`
+			);
+		} );
 	} );
 
 	test.describe( 'Block transforms', () => {

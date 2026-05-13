@@ -10,7 +10,15 @@ const meta: Meta< typeof Tooltip.Root > = {
 		Provider: Tooltip.Provider,
 		Trigger: Tooltip.Trigger,
 		Popup: Tooltip.Popup,
+		Positioner: Tooltip.Positioner,
 		Portal: Tooltip.Portal,
+	},
+	parameters: {
+		componentStatus: {
+			status: 'use-with-caution',
+			whereUsed: 'global',
+			notes: 'Not yet recommended for use alongside components from `@wordpress/components`, pending review of overlays compatibility. See [WordPress/gutenberg#76135](https://github.com/WordPress/gutenberg/issues/76135).',
+		},
 	},
 };
 export default meta;
@@ -40,8 +48,11 @@ export const Disabled: StoryObj< typeof Tooltip.Root > = {
 };
 
 /**
- * Use the `side` prop to control where the tooltip appears relative to the
- * trigger element.
+ * Customize where the tooltip appears relative to the trigger by passing a
+ * `<Tooltip.Positioner />` element to `Tooltip.Popup`'s `positioner` prop.
+ * `Tooltip.Positioner` accepts `side`, `align`, `sideOffset`, and collision
+ * settings; when `positioner` is omitted, the tooltip uses the defaults
+ * (`side="top"`, `align="center"`, `sideOffset={ 4 }`).
  */
 export const Positioning: StoryObj< typeof Tooltip.Root > = {
 	render: () => (
@@ -55,25 +66,65 @@ export const Positioning: StoryObj< typeof Tooltip.Root > = {
 		>
 			<Tooltip.Root>
 				<Tooltip.Trigger aria-label="Up">⬆️</Tooltip.Trigger>
-				<Tooltip.Popup side="top">Up</Tooltip.Popup>
+				<Tooltip.Popup positioner={ <Tooltip.Positioner side="top" /> }>
+					Up
+				</Tooltip.Popup>
 			</Tooltip.Root>
 
 			<Tooltip.Root>
 				<Tooltip.Trigger aria-label="Forward">➡️</Tooltip.Trigger>
-				<Tooltip.Popup side="right">Forward</Tooltip.Popup>
+				<Tooltip.Popup
+					positioner={ <Tooltip.Positioner side="right" /> }
+				>
+					Forward
+				</Tooltip.Popup>
 			</Tooltip.Root>
 
 			<Tooltip.Root>
 				<Tooltip.Trigger aria-label="Down">⬇️</Tooltip.Trigger>
-				<Tooltip.Popup side="bottom">Down</Tooltip.Popup>
+				<Tooltip.Popup
+					positioner={ <Tooltip.Positioner side="bottom" /> }
+				>
+					Down
+				</Tooltip.Popup>
 			</Tooltip.Root>
 
 			<Tooltip.Root>
 				<Tooltip.Trigger aria-label="Back">⬅️</Tooltip.Trigger>
-				<Tooltip.Popup side="left">Back</Tooltip.Popup>
+				<Tooltip.Popup
+					positioner={ <Tooltip.Positioner side="left" /> }
+				>
+					Back
+				</Tooltip.Popup>
 			</Tooltip.Root>
 		</div>
 	),
+};
+
+/**
+ * Beyond `side`, `Tooltip.Positioner` accepts the rest of the positioner
+ * surface — `align`, `alignOffset`, `sideOffset`, collision settings, and
+ * more — for fine-grained placement.
+ */
+export const WithCustomPositioner: StoryObj< typeof Tooltip.Root > = {
+	args: {
+		children: (
+			<>
+				<Tooltip.Trigger aria-label="Save">💾</Tooltip.Trigger>
+				<Tooltip.Popup
+					positioner={
+						<Tooltip.Positioner
+							side="right"
+							align="start"
+							sideOffset={ 16 }
+						/>
+					}
+				>
+					Save
+				</Tooltip.Popup>
+			</>
+		),
+	},
 };
 
 /**
@@ -81,14 +132,14 @@ export const Positioning: StoryObj< typeof Tooltip.Root > = {
  * create situations where a tooltip renders below another popover when you
  * want it above.
  *
- * The `--wp-ui-tooltip-z-index` CSS variable is an escape hatch for that
- * case. Override it either:
+ * The `--wp-ui-tooltip-z-index` CSS variable controls the z-index of the
+ * tooltip's positioner. Override it either:
  *
  * - **Globally**, by setting the variable on `:root` or `body` (raises every
  *   tooltip in the page), or
  * - **Per instance**, by passing a `Tooltip.Portal` with a `style` (or
  *   `className`) to `Tooltip.Popup`'s `portal` prop. The variable cascades
- *   from the portal wrapper to the popup rendered inside it.
+ *   from the portal wrapper to everything rendered inside it.
  *
  * This story demonstrates the per-instance approach.
  */

@@ -1,5 +1,6 @@
 import { Action } from './action';
 import { CloseIcon } from './close-icon';
+import { Content } from './content';
 import { Description } from './description';
 import { Footer } from './footer';
 import { Header } from './header';
@@ -12,6 +13,7 @@ import { Trigger } from './trigger';
 export {
 	Action,
 	CloseIcon,
+	Content,
 	Description,
 	Footer,
 	Header,

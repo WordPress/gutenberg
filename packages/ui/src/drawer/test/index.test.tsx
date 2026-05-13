@@ -27,6 +27,7 @@ describe( 'Drawer', () => {
 		const titleRef = createRef< HTMLHeadingElement >();
 		const descriptionRef = createRef< HTMLParagraphElement >();
 		const closeIconRef = createRef< HTMLButtonElement >();
+		const contentRef = createRef< HTMLDivElement >();
 
 		render(
 			<Drawer.Root>
@@ -38,9 +39,11 @@ describe( 'Drawer', () => {
 						</Drawer.Title>
 						<Drawer.CloseIcon ref={ closeIconRef } />
 					</Drawer.Header>
-					<Drawer.Description ref={ descriptionRef }>
-						A test description
-					</Drawer.Description>
+					<Drawer.Content ref={ contentRef }>
+						<Drawer.Description ref={ descriptionRef }>
+							A test description
+						</Drawer.Description>
+					</Drawer.Content>
 					<Drawer.Footer ref={ footerRef }>
 						<Drawer.Action ref={ actionRef }>Close</Drawer.Action>
 					</Drawer.Footer>
@@ -64,6 +67,7 @@ describe( 'Drawer', () => {
 		expect( footerRef.current ).toBeInstanceOf( HTMLElement );
 		expect( footerRef.current?.tagName ).toBe( 'FOOTER' );
 		expect( actionRef.current ).toBeInstanceOf( HTMLButtonElement );
+		expect( contentRef.current ).toBeInstanceOf( HTMLDivElement );
 	} );
 
 	it( 'renders Drawer.Header and supports render/className props', async () => {
@@ -776,6 +780,374 @@ describe( 'Drawer', () => {
 			expect( errors ).toHaveLength( 0 );
 
 			cleanup();
+		} );
+	} );
+
+	describe( 'overlay scroll container', () => {
+		it( 'marks Drawer.Content with data-wp-ui-overlay-scroll-container', async () => {
+			const user = userEvent.setup();
+			const contentRef = createRef< HTMLDivElement >();
+
+			render(
+				<Drawer.Root>
+					<Drawer.Trigger>Open</Drawer.Trigger>
+					<Drawer.Popup>
+						<Drawer.Title>Title</Drawer.Title>
+						<Drawer.Content ref={ contentRef }>
+							<p>Body</p>
+						</Drawer.Content>
+					</Drawer.Popup>
+				</Drawer.Root>
+			);
+
+			await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
+			await waitFor( () => {
+				expect( contentRef.current ).toBeInstanceOf( HTMLDivElement );
+			} );
+
+			expect( contentRef.current ).toHaveAttribute(
+				'data-wp-ui-overlay-scroll-container'
+			);
+		} );
+
+		// Locks the wrapper structure that Drawer.Content relies on:
+		//
+		// - The forwarded ref / scroll listener / overlay-chrome class
+		//   must land on the visible scroll container (the outer div),
+		//   so it does NOT carry [data-drawer-content].
+		// - Base UI's [data-drawer-content] marker must sit *inside*
+		//   that scroll container so the popup-edge padding gutter
+		//   falls outside the marker and stays mouse-draggable for
+		//   swipe-dismiss (Base UI excludes mouse-drag swipe over
+		//   [data-drawer-content] to preserve text selection).
+		//
+		// Not asserted here: the marker rendering as a real block-level
+		// element rather than `display: contents` (which would neuter
+		// `useOverlayScrollStateAttributes`'s `ResizeObserver`). CSS
+		// modules resolve to empty stubs in this jsdom test environment,
+		// so a `display: contents` regression introduced via CSS would
+		// not be observable from `getComputedStyle`. Catching it
+		// requires reviewing the marker's stylesheet rules at code
+		// review time.
+		it( 'wraps a [data-drawer-content] marker as the only direct child', async () => {
+			const user = userEvent.setup();
+			const contentRef = createRef< HTMLDivElement >();
+
+			render(
+				<Drawer.Root>
+					<Drawer.Trigger>Open</Drawer.Trigger>
+					<Drawer.Popup>
+						<Drawer.Title>Title</Drawer.Title>
+						<Drawer.Content ref={ contentRef }>
+							<p>Body</p>
+						</Drawer.Content>
+					</Drawer.Popup>
+				</Drawer.Root>
+			);
+
+			await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
+			await waitFor( () => {
+				expect( contentRef.current ).toBeInstanceOf( HTMLDivElement );
+			} );
+
+			expect( contentRef.current ).not.toHaveAttribute(
+				'data-drawer-content'
+			);
+
+			// Direct DOM access is intentional: this test locks the
+			// concrete element-level wrapping that other invariants
+			// (mouse-drag swipe-dismiss, ResizeObserver-driven scroll
+			// state) silently depend on.
+			// eslint-disable-next-line testing-library/no-node-access
+			const marker = contentRef.current?.firstElementChild;
+			expect( marker ).toBeInstanceOf( HTMLDivElement );
+			expect( marker ).toHaveAttribute( 'data-drawer-content' );
+			// eslint-disable-next-line testing-library/no-node-access
+			expect( contentRef.current?.children ).toHaveLength( 1 );
+		} );
+
+		it( 'sets data-wp-ui-overlay-modal on the popup when modal is true', async () => {
+			const user = userEvent.setup();
+			const popupRef = createRef< HTMLDivElement >();
+
+			render(
+				<Drawer.Root modal>
+					<Drawer.Trigger>Open</Drawer.Trigger>
+					<Drawer.Popup ref={ popupRef }>
+						<Drawer.Title>Title</Drawer.Title>
+					</Drawer.Popup>
+				</Drawer.Root>
+			);
+
+			await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
+			await waitFor( () => {
+				expect( popupRef.current ).toBeInstanceOf( HTMLDivElement );
+			} );
+
+			expect( popupRef.current ).toHaveAttribute(
+				'data-wp-ui-overlay-modal'
+			);
+		} );
+
+		it.each( [
+			[ 'false', false as const ],
+			[ 'trap-focus', 'trap-focus' as const ],
+		] )(
+			'omits data-wp-ui-overlay-modal on the popup when modal is %s',
+			async ( _label, modal ) => {
+				const user = userEvent.setup();
+				const popupRef = createRef< HTMLDivElement >();
+
+				render(
+					<Drawer.Root modal={ modal }>
+						<Drawer.Trigger>Open</Drawer.Trigger>
+						<Drawer.Popup ref={ popupRef }>
+							<Drawer.Title>Title</Drawer.Title>
+						</Drawer.Popup>
+					</Drawer.Root>
+				);
+
+				await user.click(
+					screen.getByRole( 'button', { name: 'Open' } )
+				);
+				await waitFor( () => {
+					expect( popupRef.current ).toBeInstanceOf( HTMLDivElement );
+				} );
+
+				expect( popupRef.current ).not.toHaveAttribute(
+					'data-wp-ui-overlay-modal'
+				);
+			}
+		);
+
+		it( 'pins Drawer.Header when rendered as a sibling of Drawer.Content', async () => {
+			const user = userEvent.setup();
+			const popupRef = createRef< HTMLDivElement >();
+			const headerRef = createRef< HTMLElement >();
+			const contentRef = createRef< HTMLDivElement >();
+
+			render(
+				<Drawer.Root>
+					<Drawer.Trigger>Open</Drawer.Trigger>
+					<Drawer.Popup ref={ popupRef }>
+						<Drawer.Header ref={ headerRef }>
+							<Drawer.Title>Title</Drawer.Title>
+						</Drawer.Header>
+						<Drawer.Content ref={ contentRef }>
+							<p>Body</p>
+						</Drawer.Content>
+					</Drawer.Popup>
+				</Drawer.Root>
+			);
+
+			await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
+			await waitFor( () => {
+				expect( headerRef.current ).toBeInstanceOf( HTMLElement );
+			} );
+
+			expect( popupRef.current ).toContainElement( headerRef.current );
+			expect( popupRef.current ).toContainElement( contentRef.current );
+			expect( contentRef.current ).not.toContainElement(
+				headerRef.current
+			);
+			// And it sits *before* the scroll container — the CSS
+			// sticky-separator selectors rely on that DOM order.
+			const position = headerRef.current!.compareDocumentPosition(
+				contentRef.current!
+			);
+			expect(
+				// eslint-disable-next-line no-bitwise
+				position & Node.DOCUMENT_POSITION_FOLLOWING
+			).toBeTruthy();
+		} );
+
+		it( 'scrolls Drawer.Header with the body when nested inside Drawer.Content', async () => {
+			const user = userEvent.setup();
+			const headerRef = createRef< HTMLElement >();
+			const contentRef = createRef< HTMLDivElement >();
+
+			render(
+				<Drawer.Root>
+					<Drawer.Trigger>Open</Drawer.Trigger>
+					<Drawer.Popup>
+						<Drawer.Content ref={ contentRef }>
+							<Drawer.Header ref={ headerRef }>
+								<Drawer.Title>Title</Drawer.Title>
+							</Drawer.Header>
+							<p>Body</p>
+						</Drawer.Content>
+					</Drawer.Popup>
+				</Drawer.Root>
+			);
+
+			await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
+			await waitFor( () => {
+				expect( headerRef.current ).toBeInstanceOf( HTMLElement );
+			} );
+
+			expect( contentRef.current ).toContainElement( headerRef.current );
+		} );
+
+		it( 'invokes a consumer-supplied onScroll on Drawer.Content', async () => {
+			const user = userEvent.setup();
+			const onScroll = jest.fn();
+			const contentRef = createRef< HTMLDivElement >();
+
+			render(
+				<Drawer.Root>
+					<Drawer.Trigger>Open</Drawer.Trigger>
+					<Drawer.Popup>
+						<Drawer.Title>Title</Drawer.Title>
+						<Drawer.Content
+							ref={ contentRef }
+							onScroll={ onScroll }
+						>
+							<p>Body</p>
+						</Drawer.Content>
+					</Drawer.Popup>
+				</Drawer.Root>
+			);
+
+			await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
+			await waitFor( () => {
+				expect( contentRef.current ).toBeInstanceOf( HTMLDivElement );
+			} );
+
+			act( () => {
+				contentRef.current?.dispatchEvent(
+					new Event( 'scroll', { bubbles: true } )
+				);
+			} );
+
+			expect( onScroll ).toHaveBeenCalledTimes( 1 );
+		} );
+
+		it( 'toggles tabindex="0" on Drawer.Content based on overflow', async () => {
+			const user = userEvent.setup();
+			const contentRef = createRef< HTMLDivElement >();
+
+			render(
+				<Drawer.Root>
+					<Drawer.Trigger>Open</Drawer.Trigger>
+					<Drawer.Popup>
+						<Drawer.Title>Title</Drawer.Title>
+						<Drawer.Content ref={ contentRef }>
+							<p>Body</p>
+						</Drawer.Content>
+					</Drawer.Popup>
+				</Drawer.Root>
+			);
+
+			await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
+			await waitFor( () => {
+				expect( contentRef.current ).toBeInstanceOf( HTMLDivElement );
+			} );
+
+			const content = contentRef.current!;
+			Object.defineProperty( content, 'scrollHeight', {
+				configurable: true,
+				value: 500,
+			} );
+			Object.defineProperty( content, 'clientHeight', {
+				configurable: true,
+				value: 100,
+			} );
+			Object.defineProperty( content, 'scrollTop', {
+				configurable: true,
+				value: 0,
+			} );
+
+			act( () => {
+				content.dispatchEvent(
+					new Event( 'scroll', { bubbles: true } )
+				);
+			} );
+
+			expect( content ).toHaveAttribute( 'tabindex', '0' );
+
+			Object.defineProperty( content, 'scrollHeight', {
+				configurable: true,
+				value: 100,
+			} );
+
+			act( () => {
+				content.dispatchEvent(
+					new Event( 'scroll', { bubbles: true } )
+				);
+			} );
+
+			expect( content ).not.toHaveAttribute( 'tabindex' );
+		} );
+
+		it( 'toggles data-wp-ui-overlay-scrolled-from-* based on scroll position', async () => {
+			const user = userEvent.setup();
+			const contentRef = createRef< HTMLDivElement >();
+
+			render(
+				<Drawer.Root>
+					<Drawer.Trigger>Open</Drawer.Trigger>
+					<Drawer.Popup>
+						<Drawer.Title>Title</Drawer.Title>
+						<Drawer.Content ref={ contentRef }>
+							<p>Body</p>
+						</Drawer.Content>
+					</Drawer.Popup>
+				</Drawer.Root>
+			);
+
+			await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
+			await waitFor( () => {
+				expect( contentRef.current ).toBeInstanceOf( HTMLDivElement );
+			} );
+
+			// JSDOM doesn't lay out elements, so we simulate an
+			// overflowing scroll container by stubbing layout metrics
+			// per scenario and dispatching a scroll event.
+			const content = contentRef.current!;
+			Object.defineProperty( content, 'scrollHeight', {
+				configurable: true,
+				value: 500,
+			} );
+			Object.defineProperty( content, 'clientHeight', {
+				configurable: true,
+				value: 100,
+			} );
+
+			const setScrollTop = ( value: number ) => {
+				Object.defineProperty( content, 'scrollTop', {
+					configurable: true,
+					value,
+				} );
+				act( () => {
+					content.dispatchEvent(
+						new Event( 'scroll', { bubbles: true } )
+					);
+				} );
+			};
+
+			setScrollTop( 0 );
+			expect( content ).not.toHaveAttribute(
+				'data-wp-ui-overlay-scrolled-from-top'
+			);
+			expect( content ).toHaveAttribute(
+				'data-wp-ui-overlay-scrolled-from-bottom'
+			);
+
+			setScrollTop( 200 );
+			expect( content ).toHaveAttribute(
+				'data-wp-ui-overlay-scrolled-from-top'
+			);
+			expect( content ).toHaveAttribute(
+				'data-wp-ui-overlay-scrolled-from-bottom'
+			);
+
+			setScrollTop( 400 );
+			expect( content ).toHaveAttribute(
+				'data-wp-ui-overlay-scrolled-from-top'
+			);
+			expect( content ).not.toHaveAttribute(
+				'data-wp-ui-overlay-scrolled-from-bottom'
+			);
 		} );
 	} );
 } );
