@@ -2,7 +2,6 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { formatBold, formatItalic } from '@wordpress/icons';
 import { Icon } from '../../icon';
 import * as Tooltip from '../';
-import { WithWpCompatOverlaySlot } from '../../utils/with-wp-compat-overlay-slot';
 
 const meta: Meta< typeof Tooltip.Root > = {
 	title: 'Design System/Components/Tooltip',
@@ -159,30 +158,6 @@ export const WithCustomZIndex: StoryObj< typeof Tooltip.Root > = {
 				>
 					Save
 				</Tooltip.Popup>
-			</>
-		),
-	},
-};
-
-/**
- * Demonstrates the `@wordpress/ui` compat overlay slot. With the slot
- * enabled (via the `WithWpCompatOverlaySlot` decorator), the tooltip
- * popup portals into the body-level `[data-wp-compat-overlay-slot]`
- * container instead of the default portal. Inspect the DOM via
- * DevTools to verify.
- *
- * The default `Tooltip` story above (without the decorator) reflects
- * the dormant baseline — the standard consumer experience when no
- * opt-in has been done.
- */
-export const InsideWpCompatOverlaySlot: StoryObj< typeof Tooltip.Root > = {
-	name: 'Inside WP Compat Overlay Slot',
-	decorators: [ WithWpCompatOverlaySlot ],
-	args: {
-		children: (
-			<>
-				<Tooltip.Trigger aria-label="Save">💾</Tooltip.Trigger>
-				<Tooltip.Popup>Save</Tooltip.Popup>
 			</>
 		),
 	},
