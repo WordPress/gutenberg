@@ -31,7 +31,4 @@ $suggestion-author-color: var(--suggestion-author-color, #{$suggestion-addition-
 	color: $suggestion-author-color;
 	text-decoration: underline;
 	text-decoration-color: $suggestion-author-color;
-	box-shadow:
-		-1px 0 0 0 $suggestion-author-color,
-		1px 0 0 0 $suggestion-author-color;
 }
