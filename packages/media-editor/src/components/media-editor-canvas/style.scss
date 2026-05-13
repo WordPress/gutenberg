@@ -1,4 +1,5 @@
 @use "@wordpress/base-styles/breakpoints" as *;
+@use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/base-styles/variables" as *;
 
 // The canvas wrapper fills the modal's canvas area so the cropper has a
@@ -12,20 +13,22 @@
 }
 
 // Live output-dimensions readout, surfaced only during gesture. Sits in
-// the bottom-left corner so it stays clear of the close/save controls
-// on the top-right of the modal. Pointer events are off so it can never
-// intercept a crop handle that wanders behind it during a resize.
+// the top-left as an unobtrusive info pill — light surface against the
+// dimmed canvas reads as informational rather than as a toast/alert.
+// Pointer events are off so it can never intercept a crop handle that
+// wanders behind it during a resize.
 .media-editor-canvas__dimensions-badge {
 	position: absolute;
+	top: $grid-unit-15;
 	left: $grid-unit-15;
-	bottom: $grid-unit-15;
 	padding: $grid-unit-05 $grid-unit-10;
-	border-radius: $radius-small;
-	background: rgba(0, 0, 0, 0.72);
-	color: #fff;
-	font-size: 12px;
+	border-radius: $radius-full;
+	background: #fff;
+	color: $gray-900;
+	font-size: 11px;
 	line-height: 1.4;
 	font-variant-numeric: tabular-nums;
+	box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.08);
 	pointer-events: none;
 	opacity: 0;
 	transition: opacity 120ms ease-out;
