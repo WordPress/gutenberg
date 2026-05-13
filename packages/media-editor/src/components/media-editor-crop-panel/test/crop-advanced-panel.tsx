@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -263,48 +263,6 @@ describe( 'CropAdvancedPanel', () => {
 		expect( mockSettleCrop ).toHaveBeenCalledTimes( 1 );
 	} );
 
-	it( 'updates a focused crop input when external crop state changes', async () => {
-		const { rerender } = render( <CropAdvancedPanel freeformCrop /> );
-
-		fireEvent.click( screen.getByRole( 'button', { name: 'Advanced' } ) );
-		const widthInput = screen.getByLabelText( 'Width' );
-		fireEvent.focus( widthInput );
-
-		setMockCropGeometry( {
-			rect: {
-				width: 250,
-				right: 350,
-			},
-		} );
-		rerender( <CropAdvancedPanel freeformCrop /> );
-
-		await waitFor( () =>
-			expect( screen.getByLabelText( 'Width' ) ).toHaveValue( 250 )
-		);
-	} );
-
-	it( 'cancels an in-progress crop preview when external crop state changes', async () => {
-		const { rerender } = render( <CropAdvancedPanel freeformCrop /> );
-
-		fireEvent.click( screen.getByRole( 'button', { name: 'Advanced' } ) );
-		const widthInput = screen.getByLabelText( 'Width' );
-		fireEvent.focus( widthInput );
-		fireEvent.change( widthInput, { target: { value: '600' } } );
-
-		setMockCropGeometry( {
-			rect: {
-				width: 250,
-				right: 350,
-			},
-		} );
-		rerender( <CropAdvancedPanel freeformCrop /> );
-
-		await waitFor( () =>
-			expect( screen.getByLabelText( 'Width' ) ).toHaveValue( 250 )
-		);
-		expect( mockSetPreviewCropRect ).toHaveBeenLastCalledWith( null );
-	} );
-
 	it( 'previews image-bound manual position edits without moving the cropper', () => {
 		setMockCropGeometry( {
 			rect: {
@@ -342,104 +300,7 @@ describe( 'CropAdvancedPanel', () => {
 		expect( mockSettleCrop ).toHaveBeenCalledTimes( 1 );
 	} );
 
-	it( 'treats near-integer maximum bounds as the expected integer pixel value', () => {
-		setMockCropperState( {
-			image: {
-				naturalWidth: 2560,
-			},
-		} );
-		setMockCropGeometry( {
-			rect: {
-				left: 0,
-				right: 400,
-			},
-			imageBounds: {
-				maxRight: 2559.999999999,
-				maxWidth: 2559.999999999,
-			},
-		} );
-		render( <CropAdvancedPanel freeformCrop /> );
-
-		fireEvent.click( screen.getByRole( 'button', { name: 'Advanced' } ) );
-		const widthInput = screen.getByLabelText( 'Width' );
-		fireEvent.focus( widthInput );
-		fireEvent.change( widthInput, { target: { value: '2560' } } );
-		fireEvent.blur( widthInput );
-
-		expect( mockApplyCropEdit ).toHaveBeenCalledWith(
-			expect.any( Object ),
-			'width',
-			2560,
-			expect.objectContaining( {
-				bounds: expect.objectContaining( {
-					maxRight: 2559.999999999,
-				} ),
-			} )
-		);
-	} );
-
-	it( 'uses the image max width when the crop left has subpixel drift', () => {
-		setMockCropperState( {
-			image: {
-				naturalWidth: 1350,
-			},
-		} );
-		setMockCropGeometry( {
-			rect: {
-				left: 0.5,
-				right: 400.5,
-			},
-			imageBounds: {
-				maxRight: 1350,
-				maxWidth: 1350,
-			},
-		} );
-		render( <CropAdvancedPanel freeformCrop /> );
-
-		fireEvent.click( screen.getByRole( 'button', { name: 'Advanced' } ) );
-		const widthInput = screen.getByLabelText( 'Width' );
-		fireEvent.focus( widthInput );
-		fireEvent.change( widthInput, { target: { value: '1350' } } );
-		fireEvent.blur( widthInput );
-
-		expect( mockApplyCropEdit ).toHaveBeenCalledWith(
-			expect.objectContaining( { left: 0.5 } ),
-			'width',
-			1350,
-			expect.objectContaining( {
-				bounds: expect.objectContaining( {
-					maxRight: 1350,
-					maxWidth: 1350,
-				} ),
-			} )
-		);
-	} );
-
-	it( 'treats near-integer minimum bounds as the expected integer pixel value', () => {
-		setMockCropGeometry( {
-			imageBounds: {
-				minLeft: 0.000000001,
-			},
-		} );
-		render( <CropAdvancedPanel freeformCrop /> );
-
-		fireEvent.click( screen.getByRole( 'button', { name: 'Advanced' } ) );
-		const leftInput = screen.getByLabelText( 'Crop horizontal position' );
-		fireEvent.focus( leftInput );
-		fireEvent.change( leftInput, { target: { value: '0' } } );
-		fireEvent.blur( leftInput );
-
-		expect( mockApplyCropEdit ).toHaveBeenCalledWith(
-			expect.any( Object ),
-			'left',
-			0,
-			expect.objectContaining( {
-				bounds: expect.objectContaining( { minLeft: 0.000000001 } ),
-			} )
-		);
-	} );
-
-	it( 'applies manual fine rotation changes from the advanced panel', () => {
+	it( 'wires the fine rotation field to the controls hook', () => {
 		render( <CropAdvancedPanel freeformCrop /> );
 
 		fireEvent.click( screen.getByRole( 'button', { name: 'Advanced' } ) );
@@ -450,113 +311,5 @@ describe( 'CropAdvancedPanel', () => {
 
 		expect( mockSetRotation ).toHaveBeenCalledWith( 30 );
 		expect( mockCommitHistory ).toHaveBeenCalledTimes( 1 );
-	} );
-
-	it( 'displays manual fine rotation half-degree values', () => {
-		setMockCropperState( {
-			rotation: 12.5,
-		} );
-		render( <CropAdvancedPanel freeformCrop /> );
-
-		fireEvent.click( screen.getByRole( 'button', { name: 'Advanced' } ) );
-
-		expect( screen.getByLabelText( 'Fine rotation angle' ) ).toHaveValue(
-			12.5
-		);
-	} );
-
-	it( 'uses half-degree steps for manual fine rotation', () => {
-		render( <CropAdvancedPanel freeformCrop /> );
-
-		fireEvent.click( screen.getByRole( 'button', { name: 'Advanced' } ) );
-
-		expect(
-			screen.getByLabelText( 'Fine rotation angle' )
-		).toHaveAttribute( 'step', '0.5' );
-	} );
-
-	it( 'allows manual fine rotation half-degree changes', () => {
-		render( <CropAdvancedPanel freeformCrop /> );
-
-		fireEvent.click( screen.getByRole( 'button', { name: 'Advanced' } ) );
-		const rotationInput = screen.getByLabelText( 'Fine rotation angle' );
-		fireEvent.focus( rotationInput );
-		fireEvent.change( rotationInput, { target: { value: '12.5' } } );
-		fireEvent.blur( rotationInput );
-
-		expect( mockSetRotation ).toHaveBeenCalledWith( 12.5 );
-	} );
-
-	it( 'snaps manual fine rotation changes to half-degree increments', () => {
-		render( <CropAdvancedPanel freeformCrop /> );
-
-		fireEvent.click( screen.getByRole( 'button', { name: 'Advanced' } ) );
-		const rotationInput = screen.getByLabelText( 'Fine rotation angle' );
-		fireEvent.focus( rotationInput );
-		fireEvent.change( rotationInput, { target: { value: '12.3' } } );
-		fireEvent.blur( rotationInput );
-
-		expect( mockSetRotation ).toHaveBeenCalledWith( 12.5 );
-	} );
-
-	it( 'clamps manual fine rotation changes to the rotation bounds', () => {
-		render( <CropAdvancedPanel freeformCrop /> );
-
-		fireEvent.click( screen.getByRole( 'button', { name: 'Advanced' } ) );
-		const rotationInput = screen.getByLabelText( 'Fine rotation angle' );
-		fireEvent.focus( rotationInput );
-		fireEvent.change( rotationInput, { target: { value: '47' } } );
-		fireEvent.blur( rotationInput );
-
-		expect( mockSetRotation ).toHaveBeenCalledWith( 44.99 );
-	} );
-
-	it( 'does not pause history while crop fields only preview drafts', () => {
-		render( <CropAdvancedPanel freeformCrop /> );
-
-		fireEvent.click( screen.getByRole( 'button', { name: 'Advanced' } ) );
-		const widthInput = screen.getByLabelText( 'Width' );
-
-		fireEvent.focus( widthInput );
-		expect( mockPauseHistory ).not.toHaveBeenCalled();
-		expect( mockResumeHistory ).not.toHaveBeenCalled();
-
-		fireEvent.change( widthInput, { target: { value: '600' } } );
-		fireEvent.change( widthInput, { target: { value: '700' } } );
-
-		expect( mockPauseHistory ).not.toHaveBeenCalled();
-		expect( mockResumeHistory ).not.toHaveBeenCalled();
-
-		fireEvent.blur( widthInput );
-
-		expect( mockResumeHistory ).not.toHaveBeenCalled();
-	} );
-
-	it( 'does not pause history for out-of-range crop drafts', () => {
-		render( <CropAdvancedPanel freeformCrop /> );
-
-		fireEvent.click( screen.getByRole( 'button', { name: 'Advanced' } ) );
-		const widthInput = screen.getByLabelText( 'Width' );
-
-		fireEvent.focus( widthInput );
-		fireEvent.change( widthInput, { target: { value: '9999' } } );
-		fireEvent.blur( widthInput );
-
-		expect( mockPauseHistory ).not.toHaveBeenCalled();
-		expect( mockResumeHistory ).not.toHaveBeenCalled();
-	} );
-
-	it( 'pauses fine rotation edits too', () => {
-		render( <CropAdvancedPanel freeformCrop /> );
-
-		fireEvent.click( screen.getByRole( 'button', { name: 'Advanced' } ) );
-		const rotationInput = screen.getByLabelText( 'Fine rotation angle' );
-
-		fireEvent.focus( rotationInput );
-		fireEvent.change( rotationInput, { target: { value: '12.5' } } );
-		fireEvent.blur( rotationInput );
-
-		expect( mockPauseHistory ).toHaveBeenCalledTimes( 1 );
-		expect( mockResumeHistory ).toHaveBeenCalledTimes( 1 );
 	} );
 } );
