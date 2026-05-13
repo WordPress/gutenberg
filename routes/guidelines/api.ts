@@ -37,7 +37,7 @@ export async function fetchGuidelines(): Promise< RestGuidelinesResponse > {
 	const { setFromResponse } = dispatch( coreGuidelinesStore );
 
 	const response = ( await apiFetch( {
-		path: '/wp/v2/guidelines?context=edit',
+		path: '/wp/v2/content-guidelines?context=edit',
 	} ) ) as RestGuidelinesResponse;
 
 	setFromResponse( response );
@@ -97,7 +97,9 @@ async function saveGuidelinesBypassingStore(
 		},
 	};
 
-	const path = id ? `/wp/v2/guidelines/${ id }` : '/wp/v2/guidelines';
+	const path = id
+		? `/wp/v2/content-guidelines/${ id }`
+		: '/wp/v2/content-guidelines';
 	const method = id ? 'PUT' : 'POST';
 
 	const response = ( await apiFetch( {
@@ -246,7 +248,7 @@ export async function fetchGuidelinesRevisions( {
 	} );
 
 	const response = ( await apiFetch( {
-		path: `/wp/v2/guidelines/${ guidelinesId }/revisions?${ params }`,
+		path: `/wp/v2/content-guidelines/${ guidelinesId }/revisions?${ params }`,
 		parse: false,
 	} ) ) as Response;
 
@@ -265,7 +267,7 @@ export async function restoreGuidelinesRevision(
 	revisionId: number
 ): Promise< RestGuidelinesResponse > {
 	return ( await apiFetch( {
-		path: `/wp/v2/guidelines/${ guidelinesId }/revisions/${ revisionId }/restore`,
+		path: `/wp/v2/content-guidelines/${ guidelinesId }/revisions/${ revisionId }/restore`,
 		method: 'POST',
 	} ) ) as RestGuidelinesResponse;
 }

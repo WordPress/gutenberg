@@ -57,12 +57,15 @@ if ( ! function_exists( 'wp_get_connector' ) ) {
 	 *     @type array  $plugin         {
 	 *         Optional. Plugin data for install/activate UI.
 	 *
-	 *         @type string $slug The WordPress.org plugin slug.
+	 *         @type string   $file      The plugin's main file path relative to the plugins
+	 *                                   directory (e.g. 'my-plugin/my-plugin.php' or 'hello.php').
+	 *         @type callable $is_active Callback to determine whether the plugin is active. Receives no arguments and must return bool.
+	 *                                   Defaults to `__return_true`.
 	 *     }
 	 * }
 	 * @phpstan-return ?array{
 	 *     name: non-empty-string,
-	 *     description: non-empty-string,
+	 *     description: string,
 	 *     logo_url?: non-empty-string,
 	 *     type: non-empty-string,
 	 *     authentication: array{
@@ -72,8 +75,9 @@ if ( ! function_exists( 'wp_get_connector' ) ) {
 	 *         constant_name?: non-empty-string,
 	 *         env_var_name?: non-empty-string
 	 *     },
-	 *     plugin?: array{
-	 *         slug: non-empty-string
+	 *     plugin: array{
+	 *         file?: non-empty-string,
+	 *         is_active: callable(): bool,
 	 *     }
 	 * }
 	 */
@@ -119,13 +123,16 @@ if ( ! function_exists( 'wp_get_connectors' ) ) {
 	 *         @type array       $plugin         {
 	 *             Optional. Plugin data for install/activate UI.
 	 *
-	 *             @type string $slug The WordPress.org plugin slug.
+	 *             @type string   $file      The plugin's main file path relative to the plugins
+	 *                                       directory (e.g. 'my-plugin/my-plugin.php' or 'hello.php').
+	 *             @type callable $is_active Callback to determine whether the plugin is active. Receives no arguments and must return bool.
+	 *                                       Defaults to `__return_true`.
 	 *         }
 	 *     }
 	 * }
 	 * @phpstan-return array<string, array{
 	 *     name: non-empty-string,
-	 *     description: non-empty-string,
+	 *     description: string,
 	 *     logo_url?: non-empty-string,
 	 *     type: non-empty-string,
 	 *     authentication: array{
@@ -135,8 +142,9 @@ if ( ! function_exists( 'wp_get_connectors' ) ) {
 	 *         constant_name?: non-empty-string,
 	 *         env_var_name?: non-empty-string
 	 *     },
-	 *     plugin?: array{
-	 *         slug: non-empty-string
+	 *     plugin: array{
+	 *         file?: non-empty-string,
+	 *         is_active: callable(): bool,
 	 *     }
 	 * }>
 	 */
@@ -163,7 +171,7 @@ if ( ! function_exists( '_wp_connectors_resolve_ai_provider_logo_url' ) ) {
 	 * @param string $path Absolute file path to the logo. Must be within
 	 *                     WP_PLUGIN_DIR or WPMU_PLUGIN_DIR; triggers
 	 *                     _doing_it_wrong() otherwise.
-	 * @return string|null The logo URL, or null if the path is empty or
+	 * @return non-empty-string|null The logo URL, or null if the path is empty or
 	 *                     outside the supported directories.
 	 */
 	function _wp_connectors_resolve_ai_provider_logo_url( string $path ): ?string {
@@ -179,12 +187,14 @@ if ( ! function_exists( '_wp_connectors_resolve_ai_provider_logo_url' ) ) {
 
 		$mu_plugin_dir = wp_normalize_path( WPMU_PLUGIN_DIR );
 		if ( str_starts_with( $path, $mu_plugin_dir . '/' ) ) {
-			return plugins_url( substr( $path, strlen( $mu_plugin_dir ) ), WPMU_PLUGIN_DIR . '/.' );
+			$logo_url = plugins_url( substr( $path, strlen( $mu_plugin_dir ) ), WPMU_PLUGIN_DIR . '/.' );
+			return $logo_url ? $logo_url : null;
 		}
 
 		$plugin_dir = wp_normalize_path( WP_PLUGIN_DIR );
 		if ( str_starts_with( $path, $plugin_dir . '/' ) ) {
-			return plugins_url( substr( $path, strlen( $plugin_dir ) ) );
+			$logo_url = plugins_url( substr( $path, strlen( $plugin_dir ) ) );
+			return $logo_url ? $logo_url : null;
 		}
 
 		_doing_it_wrong(

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 15.18.0 (2026-04-29)
+
 - Update `registerBlockType` to accept the attributes type as a generic.
 - Update `registerBlockVariation`, `unregisterBlockVariation` type signature to match the dispatch call.
 

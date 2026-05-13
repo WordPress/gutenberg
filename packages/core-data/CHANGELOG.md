@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 7.45.0 (2026-04-29)
+
+### Internal
+
+-   Remove redundant `createSelector` wrapper from `getQueriedItems`; the inner deep-equality cache already handles inlined query objects.
+
 ## 7.44.0 (2026-04-15)
 
 ### Bug Fixes

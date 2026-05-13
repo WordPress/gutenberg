@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 14.2.0 (2026-04-29)
+
 ### Enhancements
 
 - DataForm: Render field `description` as help text in the `array` control.[#77554](https://github.com/WordPress/gutenberg/pull/77554)

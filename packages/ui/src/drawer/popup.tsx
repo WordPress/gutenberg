@@ -9,7 +9,7 @@ import {
 import { unlock } from '../lock-unlock';
 import { useDeprioritizedInitialFocus } from '../utils/use-deprioritized-initial-focus';
 import { SCROLL_CONTAINER_ATTR } from '../utils/use-overlay-scroll-state-attributes';
-import { renderPortalWithChildren } from '../utils/render-portal-with-children';
+import { renderSlotWithChildren } from '../utils/render-slot-with-children';
 import { DrawerValidationProvider, useDrawerModal } from './context';
 import { Portal } from './portal';
 import styles from './style.module.css';
@@ -24,8 +24,7 @@ const CLOSE_ICON_ATTR = 'data-wp-ui-drawer-close-icon';
  * Renders the drawer popup element that contains the drawer content.
  * Uses a portal to render outside the DOM hierarchy.
  *
- * When `portal` is omitted, defaults to `Drawer.Portal`. Portal merging is
- * handled by `renderPortalWithChildren` (shared with other overlay `Popup`s).
+ * When `portal` is omitted, defaults to `Drawer.Portal`.
  *
  * The popup is a flex column; scroll ownership lives on `Drawer.Content`,
  * which children are expected to render. Without it, long body content will
@@ -94,7 +93,7 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function DrawerPopup(
 		</>
 	);
 
-	return renderPortalWithChildren( portal, <Portal />, portalChildren );
+	return renderSlotWithChildren( portal, <Portal />, portalChildren );
 } );
 
 export { Popup };

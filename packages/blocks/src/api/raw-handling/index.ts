@@ -33,8 +33,15 @@ export function deprecatedGetPhrasingContentSchema(
 /**
  * Converts an HTML string to known blocks.
  *
- * @param $1
- * @param $1.HTML The HTML to convert.
+ * @param options      Options.
+ * @param options.HTML The HTML to convert.
+ *
+ * @example
+ * ```js
+ * import { rawHandler } from '@wordpress/blocks';
+ *
+ * const blocks = rawHandler( { HTML: '<p>Hello</p><p>World</p>' } );
+ * ```
  *
  * @return A list of blocks.
  */
