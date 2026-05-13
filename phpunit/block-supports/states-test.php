@@ -14,6 +14,7 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 	public function set_up() {
 		parent::set_up();
 		$this->test_block_name = null;
+		WP_Style_Engine_CSS_Rules_Store_Gutenberg::remove_all_stores();
 	}
 
 	public function tear_down() {
@@ -21,6 +22,7 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 			unregister_block_type( $this->test_block_name );
 		}
 		$this->test_block_name = null;
+		WP_Style_Engine_CSS_Rules_Store_Gutenberg::remove_all_stores();
 		parent::tear_down();
 	}
 
@@ -63,7 +65,9 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 	private function build_expected_state_output( $state_styles ) {
 		$css_rules = array();
 		foreach ( $state_styles as $state => $style ) {
-			$compiled = wp_style_engine_get_styles( $style );
+			$compiled = wp_style_engine_get_styles(
+				gutenberg_normalize_state_style_for_css_output( $style )
+			);
 			if ( ! empty( $compiled['declarations'] ) ) {
 				$css_rules[] = array(
 					'state'        => $state,
@@ -74,6 +78,78 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 
 		return array(
 			'unique_class' => 'wp-states-' . substr( md5( wp_json_encode( $css_rules ) ), 0, 8 ),
+		);
+	}
+
+	/**
+	 * Tests that fallback border-style declarations are added after CSS generation.
+	 *
+	 * @covers ::gutenberg_get_state_declarations_with_fallback_border_styles
+	 */
+	public function test_adds_fallback_border_style_declarations() {
+		$actual = gutenberg_get_state_declarations_with_fallback_border_styles(
+			array(
+				'border-color'     => '#000000',
+				'border-top-width' => '2px',
+			)
+		);
+
+		$this->assertSame(
+			array(
+				'border-color'     => '#000000',
+				'border-top-width' => '2px',
+				'border-style'     => 'solid',
+				'border-top-style' => 'solid',
+			),
+			$actual
+		);
+	}
+
+	/**
+	 * Tests that authored border-style declarations are preserved.
+	 *
+	 * @covers ::gutenberg_get_state_declarations_with_fallback_border_styles
+	 */
+	public function test_preserves_authored_border_style_declarations() {
+		$actual = gutenberg_get_state_declarations_with_fallback_border_styles(
+			array(
+				'border-color'      => '#000000',
+				'border-style'      => 'dashed !important',
+				'border-left-width' => '2px',
+			)
+		);
+
+		$this->assertSame(
+			array(
+				'border-color'      => '#000000',
+				'border-style'      => 'dashed !important',
+				'border-left-width' => '2px',
+			),
+			$actual
+		);
+	}
+
+	/**
+	 * Tests that preset values are converted to CSS custom property references.
+	 *
+	 * @covers ::gutenberg_normalize_state_preset_vars
+	 */
+	public function test_converts_state_preset_vars_to_css_vars() {
+		$actual = gutenberg_normalize_state_preset_vars(
+			array(
+				'border' => array(
+					'color' => 'var:preset|color|accent-1',
+				),
+			)
+		);
+
+		$this->assertSame(
+			array(
+				'border' => array(
+					'color' => 'var(--wp--preset--color--accent-1)',
+				),
+			),
+			$actual
 		);
 	}
 
@@ -348,6 +424,157 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 		$actual   = gutenberg_render_block_states_support( $block_content, $block );
 
 		$this->assertSame( $expected, $actual );
+
+		$actual_stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) );
+		$this->assertStringContainsString(
+			'border-width:2px !important;',
+			$actual_stylesheet
+		);
+		$this->assertStringContainsString(
+			'border-style:solid;',
+			$actual_stylesheet
+		);
+		$this->assertStringNotContainsString(
+			'border-style:solid !important;',
+			$actual_stylesheet
+		);
+	}
+
+	/**
+	 * Tests that explicitly-authored hover border style declarations use !important.
+	 *
+	 * @covers ::gutenberg_render_block_states_support
+	 */
+	public function test_hover_authored_border_style_generates_important_css_declaration() {
+		$this->ensure_block_registered( 'core/navigation-link' );
+
+		$block_content = '<div class="wp-block-test">Hello</div>';
+		$state_styles  = array(
+			':hover' => array(
+				'border' => array(
+					'style' => 'solid',
+				),
+			),
+		);
+		$block         = array(
+			'blockName' => 'core/navigation-link',
+			'attrs'     => array( 'style' => $state_styles ),
+		);
+
+		gutenberg_render_block_states_support( $block_content, $block );
+		$actual_stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) );
+
+		$this->assertStringContainsString(
+			'border-style:solid !important;',
+			$actual_stylesheet
+		);
+	}
+
+	/**
+	 * Tests that explicitly-authored side border style declarations use !important.
+	 *
+	 * @covers ::gutenberg_render_block_states_support
+	 */
+	public function test_hover_authored_side_border_style_generates_important_css_declaration() {
+		$this->ensure_block_registered( 'core/navigation-link' );
+
+		$block_content = '<div class="wp-block-test">Hello</div>';
+		$state_styles  = array(
+			':hover' => array(
+				'border' => array(
+					'top' => array(
+						'style' => 'dashed',
+					),
+				),
+			),
+		);
+		$block         = array(
+			'blockName' => 'core/navigation-link',
+			'attrs'     => array( 'style' => $state_styles ),
+		);
+
+		gutenberg_render_block_states_support( $block_content, $block );
+		$actual_stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) );
+
+		$this->assertStringContainsString(
+			'border-top-style:dashed !important;',
+			$actual_stylesheet
+		);
+	}
+
+	/**
+	 * Tests that hover side border color declarations use !important.
+	 *
+	 * @covers ::gutenberg_render_block_states_support
+	 */
+	public function test_hover_side_border_color_generates_important_css_declaration() {
+		$this->ensure_block_registered( 'core/navigation-link' );
+
+		$block_content = '<div class="wp-block-test">Hello</div>';
+		$state_styles  = array(
+			':hover' => array(
+				'border' => array(
+					'top' => array(
+						'color' => '#0000ff',
+					),
+				),
+			),
+		);
+		$block         = array(
+			'blockName' => 'core/navigation-link',
+			'attrs'     => array( 'style' => $state_styles ),
+		);
+
+		gutenberg_render_block_states_support( $block_content, $block );
+		$actual_stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) );
+
+		$this->assertStringContainsString(
+			'border-top-color:#0000ff !important;',
+			$actual_stylesheet
+		);
+		$this->assertStringContainsString(
+			'border-top-style:solid;',
+			$actual_stylesheet
+		);
+	}
+
+	/**
+	 * Tests that a preset hover border color is emitted as a CSS declaration.
+	 *
+	 * @covers ::gutenberg_render_block_states_support
+	 */
+	public function test_hover_preset_border_color_generates_css_declaration() {
+		$this->ensure_block_registered( 'core/navigation-link' );
+
+		$block_content = '<div class="wp-block-test">Hello</div>';
+		$state_styles  = array(
+			':hover' => array(
+				'border' => array(
+					'color' => 'var:preset|color|accent-1',
+				),
+			),
+		);
+		$block         = array(
+			'blockName' => 'core/navigation-link',
+			'attrs'     => array( 'style' => $state_styles ),
+		);
+
+		$parts = $this->build_expected_state_output( $state_styles );
+		gutenberg_render_block_states_support( $block_content, $block );
+		$actual_stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) );
+
+		$this->assertStringContainsString(
+			'.' . $parts['unique_class'] . ':hover{',
+			$actual_stylesheet
+		);
+		$this->assertStringContainsString(
+			'border-color:var(--wp--preset--color--accent-1) !important;',
+			$actual_stylesheet
+		);
+		$this->assertStringContainsString(
+			'border-style:solid;',
+			$actual_stylesheet
+		);
 	}
 
 	/**
