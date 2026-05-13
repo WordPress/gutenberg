@@ -10,7 +10,10 @@ import type { FullConfig } from '@playwright/test';
 import { RequestUtils } from '@wordpress/e2e-test-utils-playwright';
 
 async function globalSetup( config: FullConfig ) {
-	await import( './ensure-plugin-build-mode.mjs' );
+	const { ensurePluginBuildMode } = await import(
+		'./ensure-plugin-build-mode.mjs'
+	);
+	ensurePluginBuildMode();
 
 	const { storageState, baseURL } = config.projects[ 0 ].use;
 	const storageStatePath =
