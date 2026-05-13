@@ -9,11 +9,6 @@ import type { FullConfig } from '@playwright/test';
  */
 import { RequestUtils } from '@wordpress/e2e-test-utils-playwright';
 
-/**
- * Internal dependencies
- */
-import { setupRtcWebSocketProvider } from './rtc-websocket-setup';
-
 async function globalSetup( config: FullConfig ) {
 	const { storageState, baseURL } = config.projects[ 0 ].use;
 	const storageStatePath =
@@ -41,7 +36,6 @@ async function globalSetup( config: FullConfig ) {
 		requestUtils.deleteAllPosts(),
 		requestUtils.deleteAllBlocks(),
 		requestUtils.resetPreferences(),
-		setupRtcWebSocketProvider( requestUtils ),
 	] );
 
 	await requestContext.dispose();
