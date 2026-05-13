@@ -8,6 +8,10 @@ import { combineReducers } from '@wordpress/data';
  */
 import { EDITOR_SETTINGS_DEFAULTS } from './defaults';
 import dataviewsReducer from '../dataviews/store/reducer';
+import {
+	DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE,
+	normalizeDistributedEditingSessionState,
+} from './distributed-editing';
 
 /**
  * Returns a post attribute value, flattening nested rendered content using its
@@ -194,6 +198,38 @@ export function postLock( state = { isLocked: false }, action ) {
 	switch ( action.type ) {
 		case 'UPDATE_POST_LOCK':
 			return action.lock;
+	}
+
+	return state;
+}
+
+/**
+ * Reducer returning the distributed editing session state.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function distributedEditingSession(
+	state = DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE,
+	action
+) {
+	switch ( action.type ) {
+		case 'SET_DISTRIBUTED_EDITING_SESSION_STATE':
+			return normalizeDistributedEditingSessionState(
+				action.sessionState
+			);
+
+		case 'UPDATE_DISTRIBUTED_EDITING_SESSION_STATE':
+			return normalizeDistributedEditingSessionState( {
+				...state,
+				...action.sessionState,
+			} );
+
+		case 'RESET_DISTRIBUTED_EDITING_SESSION_STATE':
+		case 'SET_EDITED_POST':
+			return DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE;
 	}
 
 	return state;
@@ -480,6 +516,7 @@ export default combineReducers( {
 	saving,
 	deleting,
 	postLock,
+	distributedEditingSession,
 	template,
 	postSavingLock,
 	editorSettings,

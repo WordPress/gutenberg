@@ -16,6 +16,25 @@ import {
 	normalizeDistributedEditingSessionState,
 	shouldWarnBeforeLeavingDistributedEditingSessionState,
 } from '../distributed-editing';
+import {
+	resetDistributedEditingSessionState,
+	setDistributedEditingSessionState,
+	updateDistributedEditingSessionState,
+} from '../actions';
+import { distributedEditingSession } from '../reducer';
+import {
+	canExportDistributedEditingLocalUpdates,
+	getDistributedEditingSessionDisposition,
+	getDistributedEditingSessionReasonCode,
+	getDistributedEditingSessionState,
+	hasPendingDistributedEditingChanges,
+	hasRemoteDistributedEditingChanges,
+	isAwaitingDistributedEditingServerConfirmation,
+	isDistributedEditingConnectionDegraded,
+	mustOfferDistributedEditingLocalCopy,
+	requiresDistributedEditingServerStateAcceptance,
+	shouldWarnBeforeLeavingDistributedEditingSession,
+} from '../selectors';
 
 describe( 'distributed editing session state', () => {
 	it( 'validates the shared reason-code and disposition vocabulary', () => {
@@ -128,5 +147,196 @@ describe( 'distributed editing session state', () => {
 		expect(
 			shouldWarnBeforeLeavingDistributedEditingSessionState( normalized )
 		).toBe( true );
+	} );
+} );
+
+describe( 'distributed editing store actions', () => {
+	it( 'creates a replacement session action', () => {
+		const sessionState = {
+			disposition:
+				DISTRIBUTED_EDITING_DISPOSITIONS.ACCEPTED_WITH_DEGRADED_LIVE_FEEDBACK,
+		};
+
+		expect( setDistributedEditingSessionState( sessionState ) ).toEqual( {
+			type: 'SET_DISTRIBUTED_EDITING_SESSION_STATE',
+			sessionState,
+		} );
+	} );
+
+	it( 'creates an update session action', () => {
+		const sessionState = {
+			pendingChangeCount: 1,
+		};
+
+		expect( updateDistributedEditingSessionState( sessionState ) ).toEqual(
+			{
+				type: 'UPDATE_DISTRIBUTED_EDITING_SESSION_STATE',
+				sessionState,
+			}
+		);
+	} );
+
+	it( 'creates a reset session action', () => {
+		expect( resetDistributedEditingSessionState() ).toEqual( {
+			type: 'RESET_DISTRIBUTED_EDITING_SESSION_STATE',
+		} );
+	} );
+} );
+
+describe( 'distributed editing reducer', () => {
+	it( 'defaults to the normalized idle session state', () => {
+		expect( distributedEditingSession( undefined, {} ) ).toBe(
+			DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE
+		);
+	} );
+
+	it( 'replaces session state through the shared vocabulary normalizer', () => {
+		const state = distributedEditingSession(
+			undefined,
+			setDistributedEditingSessionState( {
+				clientBaseVersion: 'server-v4',
+				serverVersion: 'server-v6',
+				disposition:
+					DISTRIBUTED_EDITING_DISPOSITIONS.CONFLICT_REQUIRES_SERVER_STATE_ACCEPTANCE,
+				reasonCode:
+					DISTRIBUTED_EDITING_REASON_CODES.SYNC_META_RESTORED_FROM_REVISION_CONFLICT,
+				pendingChangeCount: 2,
+				remoteChangeCount: 1,
+			} )
+		);
+
+		expect( state ).toMatchObject( {
+			clientBaseVersion: 'server-v4',
+			serverVersion: 'server-v6',
+			disposition:
+				DISTRIBUTED_EDITING_DISPOSITIONS.CONFLICT_REQUIRES_SERVER_STATE_ACCEPTANCE,
+			reasonCode:
+				DISTRIBUTED_EDITING_REASON_CODES.SYNC_META_RESTORED_FROM_REVISION_CONFLICT,
+			pendingChangeCount: 2,
+			hasPendingChanges: true,
+			isAwaitingServerConfirmation: true,
+			remoteChangeCount: 1,
+			hasRemoteChanges: true,
+			requiresServerStateAcceptance: true,
+			mustOfferLocalCopy: true,
+			canExportLocalUpdates: true,
+		} );
+	} );
+
+	it( 'updates session state without losing existing normalized flags', () => {
+		const original = deepFreeze(
+			distributedEditingSession(
+				undefined,
+				setDistributedEditingSessionState( {
+					pendingChangeCount: 1,
+				} )
+			)
+		);
+		const state = distributedEditingSession(
+			original,
+			updateDistributedEditingSessionState( {
+				isConnectionDegraded: true,
+			} )
+		);
+
+		expect( state ).toMatchObject( {
+			pendingChangeCount: 1,
+			hasPendingChanges: true,
+			isAwaitingServerConfirmation: true,
+			isConnectionDegraded: true,
+		} );
+	} );
+
+	it( 'resets session state explicitly and when a new post is edited', () => {
+		const conflictState = deepFreeze(
+			distributedEditingSession(
+				undefined,
+				setDistributedEditingSessionState( {
+					disposition:
+						DISTRIBUTED_EDITING_DISPOSITIONS.REQUIRES_MANUAL_RESOLUTION_NO_SYNC_META,
+					reasonCode:
+						DISTRIBUTED_EDITING_REASON_CODES.SYNC_META_UNAVAILABLE_AFTER_REVISION_SCAN,
+					hasPendingChanges: true,
+				} )
+			)
+		);
+
+		expect(
+			distributedEditingSession(
+				conflictState,
+				resetDistributedEditingSessionState()
+			)
+		).toBe( DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE );
+		expect(
+			distributedEditingSession( conflictState, {
+				type: 'SET_EDITED_POST',
+				postType: 'post',
+				postId: 1,
+			} )
+		).toBe( DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE );
+	} );
+} );
+
+describe( 'distributed editing selectors', () => {
+	it( 'returns default session state when the store slice is unavailable', () => {
+		expect( getDistributedEditingSessionState( {} ) ).toBe(
+			DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE
+		);
+		expect( hasPendingDistributedEditingChanges( {} ) ).toBe( false );
+		expect( shouldWarnBeforeLeavingDistributedEditingSession( {} ) ).toBe(
+			false
+		);
+	} );
+
+	it( 'selects conflict and copy/export requirements from session state', () => {
+		const state = {
+			distributedEditingSession: normalizeDistributedEditingSessionState(
+				{
+					disposition:
+						DISTRIBUTED_EDITING_DISPOSITIONS.CONFLICT_REQUIRES_SERVER_STATE_ACCEPTANCE,
+					reasonCode:
+						DISTRIBUTED_EDITING_REASON_CODES.SYNC_META_RESTORED_FROM_REVISION_CONFLICT,
+					pendingChangeCount: 2,
+					remoteChangeCount: 1,
+				}
+			),
+		};
+
+		expect( getDistributedEditingSessionDisposition( state ) ).toBe(
+			DISTRIBUTED_EDITING_DISPOSITIONS.CONFLICT_REQUIRES_SERVER_STATE_ACCEPTANCE
+		);
+		expect( getDistributedEditingSessionReasonCode( state ) ).toBe(
+			DISTRIBUTED_EDITING_REASON_CODES.SYNC_META_RESTORED_FROM_REVISION_CONFLICT
+		);
+		expect( hasPendingDistributedEditingChanges( state ) ).toBe( true );
+		expect( isAwaitingDistributedEditingServerConfirmation( state ) ).toBe(
+			true
+		);
+		expect( hasRemoteDistributedEditingChanges( state ) ).toBe( true );
+		expect( requiresDistributedEditingServerStateAcceptance( state ) ).toBe(
+			true
+		);
+		expect( mustOfferDistributedEditingLocalCopy( state ) ).toBe( true );
+		expect( canExportDistributedEditingLocalUpdates( state ) ).toBe( true );
+		expect(
+			shouldWarnBeforeLeavingDistributedEditingSession( state )
+		).toBe( true );
+	} );
+
+	it( 'selects degraded connection state without forcing unload warnings', () => {
+		const state = {
+			distributedEditingSession: normalizeDistributedEditingSessionState(
+				{
+					disposition:
+						DISTRIBUTED_EDITING_DISPOSITIONS.ACCEPTED_WITH_DEGRADED_LIVE_FEEDBACK,
+				}
+			),
+		};
+
+		expect( isDistributedEditingConnectionDegraded( state ) ).toBe( true );
+		expect( hasPendingDistributedEditingChanges( state ) ).toBe( false );
+		expect(
+			shouldWarnBeforeLeavingDistributedEditingSession( state )
+		).toBe( false );
 	} );
 } );

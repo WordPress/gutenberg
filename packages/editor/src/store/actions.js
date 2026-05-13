@@ -153,6 +153,48 @@ export function setEditedPost( postType, postId ) {
 }
 
 /**
+ * Returns an action object used in signalling that the distributed editing
+ * session state should be replaced.
+ *
+ * @param {Object} sessionState Distributed editing session state.
+ *
+ * @return {Object} Action object.
+ */
+export function setDistributedEditingSessionState( sessionState = {} ) {
+	return {
+		type: 'SET_DISTRIBUTED_EDITING_SESSION_STATE',
+		sessionState,
+	};
+}
+
+/**
+ * Returns an action object used in signalling that the distributed editing
+ * session state should be partially updated.
+ *
+ * @param {Object} sessionState Partial distributed editing session state.
+ *
+ * @return {Object} Action object.
+ */
+export function updateDistributedEditingSessionState( sessionState = {} ) {
+	return {
+		type: 'UPDATE_DISTRIBUTED_EDITING_SESSION_STATE',
+		sessionState,
+	};
+}
+
+/**
+ * Returns an action object used in signalling that the distributed editing
+ * session state should be reset for the current editor.
+ *
+ * @return {Object} Action object.
+ */
+export function resetDistributedEditingSessionState() {
+	return {
+		type: 'RESET_DISTRIBUTED_EDITING_SESSION_STATE',
+	};
+}
+
+/**
  * Returns an action object used in signalling that attributes of the post have
  * been edited.
  *

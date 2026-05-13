@@ -30,6 +30,10 @@ import { getPostRawValue } from './reducer';
 import { getTemplatePartIcon } from '../utils/get-template-part-icon';
 import { unlock } from '../lock-unlock';
 import { getTemplateInfo } from '../utils/get-template-info';
+import {
+	DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE,
+	shouldWarnBeforeLeavingDistributedEditingSessionState,
+} from './distributed-editing';
 
 /**
  * Shared reference to an empty object for cases where it is important to avoid
@@ -200,6 +204,139 @@ export function getCurrentPostType( state ) {
  */
 export function getCurrentPostId( state ) {
 	return state.postId;
+}
+
+/**
+ * Returns the distributed editing session state for the current editor.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {Object} Distributed editing session state.
+ */
+export function getDistributedEditingSessionState( state ) {
+	return (
+		state.distributedEditingSession ||
+		DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE
+	);
+}
+
+/**
+ * Returns the current distributed editing terminal disposition.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {string} Distributed editing disposition.
+ */
+export function getDistributedEditingSessionDisposition( state ) {
+	return getDistributedEditingSessionState( state ).disposition;
+}
+
+/**
+ * Returns the current distributed editing reason code.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {?string} Distributed editing reason code.
+ */
+export function getDistributedEditingSessionReasonCode( state ) {
+	return getDistributedEditingSessionState( state ).reasonCode;
+}
+
+/**
+ * Returns true if the distributed editing session has local pending changes.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {boolean} Whether local pending changes exist.
+ */
+export function hasPendingDistributedEditingChanges( state ) {
+	return getDistributedEditingSessionState( state ).hasPendingChanges;
+}
+
+/**
+ * Returns true if the distributed editing session is awaiting server
+ * confirmation.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {boolean} Whether server confirmation is pending.
+ */
+export function isAwaitingDistributedEditingServerConfirmation( state ) {
+	return getDistributedEditingSessionState( state )
+		.isAwaitingServerConfirmation;
+}
+
+/**
+ * Returns true if the distributed editing connection has degraded.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {boolean} Whether the connection is degraded.
+ */
+export function isDistributedEditingConnectionDegraded( state ) {
+	return getDistributedEditingSessionState( state ).isConnectionDegraded;
+}
+
+/**
+ * Returns true if remote edits have been observed in the distributed editing
+ * session.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {boolean} Whether remote changes exist.
+ */
+export function hasRemoteDistributedEditingChanges( state ) {
+	return getDistributedEditingSessionState( state ).hasRemoteChanges;
+}
+
+/**
+ * Returns true if the current distributed editing session must accept server
+ * state before continuing.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {boolean} Whether server state acceptance is required.
+ */
+export function requiresDistributedEditingServerStateAcceptance( state ) {
+	return getDistributedEditingSessionState( state )
+		.requiresServerStateAcceptance;
+}
+
+/**
+ * Returns true if the editor must offer a local-copy/export path before
+ * replacing the post with server state.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {boolean} Whether a local copy must be offered.
+ */
+export function mustOfferDistributedEditingLocalCopy( state ) {
+	return getDistributedEditingSessionState( state ).mustOfferLocalCopy;
+}
+
+/**
+ * Returns true if the current distributed editing session can export local
+ * updates.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {boolean} Whether local updates can be exported.
+ */
+export function canExportDistributedEditingLocalUpdates( state ) {
+	return getDistributedEditingSessionState( state ).canExportLocalUpdates;
+}
+
+/**
+ * Returns true if distributed editing should protect the session from unload.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {boolean} Whether the session should warn before leaving.
+ */
+export function shouldWarnBeforeLeavingDistributedEditingSession( state ) {
+	return shouldWarnBeforeLeavingDistributedEditingSessionState(
+		getDistributedEditingSessionState( state )
+	);
 }
 
 /**
