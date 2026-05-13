@@ -3,7 +3,7 @@
  */
 import { Button, Notice } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useState } from '@wordpress/element';
+import { useCallback, useState } from '@wordpress/element';
 import { __, _n, sprintf } from '@wordpress/i18n';
 
 /**
@@ -816,21 +816,66 @@ export default function DistributedEditingStatus( {
 	onAction,
 	placement = 'selector-backed-status',
 } ) {
-	const { sessionState, noticeDescriptors, unloadWarningState } = useSelect(
-		( select ) => {
-			const {
-				getDistributedEditingSessionState,
-				getDistributedEditingNoticeDescriptors,
-				getDistributedEditingUnloadWarningState,
-			} = select( editorStore );
+	const {
+		currentPost,
+		editedPostContent,
+		sessionState,
+		noticeDescriptors,
+		unloadWarningState,
+	} = useSelect( ( select ) => {
+		const {
+			getCurrentPost,
+			getDistributedEditingSessionState,
+			getDistributedEditingNoticeDescriptors,
+			getDistributedEditingUnloadWarningState,
+			getEditedPostContent,
+		} = select( editorStore );
 
-			return {
-				sessionState: getDistributedEditingSessionState(),
-				noticeDescriptors: getDistributedEditingNoticeDescriptors(),
-				unloadWarningState: getDistributedEditingUnloadWarningState(),
-			};
+		return {
+			currentPost: getCurrentPost?.() || {},
+			editedPostContent: getEditedPostContent?.() || '',
+			sessionState: getDistributedEditingSessionState(),
+			noticeDescriptors: getDistributedEditingNoticeDescriptors(),
+			unloadWarningState: getDistributedEditingUnloadWarningState(),
+		};
+	}, [] );
+	const {
+		__experimentalPlanDistributedEditingLocalRebaseAfterStaleBase,
+		__experimentalRebaseDistributedEditingLocalUpdatesAfterStaleBase,
+		__experimentalRefreshDistributedEditingServerStateAfterStaleBase,
+	} = useDispatch( editorStore ) || {};
+	const handleAction = useCallback(
+		async ( actionKey, item ) => {
+			onAction?.( actionKey, item );
+
+			switch ( actionKey ) {
+				case DISTRIBUTED_EDITING_NOTICE_ACTIONS.EXPORT_LOCAL_UPDATES:
+					return copyDistributedEditingLocalUpdatesToClipboard( {
+						currentPost,
+						editedPostContent,
+						sessionState,
+					} );
+				case DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFETCH_SERVER_STATE:
+					return __experimentalRefreshDistributedEditingServerStateAfterStaleBase?.();
+				case DISTRIBUTED_EDITING_NOTICE_ACTIONS.REBASE_LOCAL_UPDATES:
+					if ( item?.hasLocalRebaseInputs ) {
+						return __experimentalRebaseDistributedEditingLocalUpdatesAfterStaleBase?.();
+					}
+
+					return __experimentalPlanDistributedEditingLocalRebaseAfterStaleBase?.();
+			}
+
+			return undefined;
 		},
-		[]
+		[
+			__experimentalPlanDistributedEditingLocalRebaseAfterStaleBase,
+			__experimentalRebaseDistributedEditingLocalUpdatesAfterStaleBase,
+			__experimentalRefreshDistributedEditingServerStateAfterStaleBase,
+			currentPost,
+			editedPostContent,
+			onAction,
+			sessionState,
+		]
 	);
 
 	if (
@@ -845,11 +890,40 @@ export default function DistributedEditingStatus( {
 	return (
 		<DistributedEditingStatusSurface
 			noticeDescriptors={ noticeDescriptors }
-			onAction={ onAction }
+			onAction={ handleAction }
 			placement={ placement }
 			unloadWarningState={ unloadWarningState }
 		/>
 	);
+}
+
+async function copyDistributedEditingLocalUpdatesToClipboard( {
+	currentPost,
+	editedPostContent,
+	sessionState,
+} ) {
+	const clipboard = globalThis?.navigator?.clipboard;
+
+	if ( typeof clipboard?.writeText !== 'function' ) {
+		return null;
+	}
+
+	const payload = {
+		version: 1,
+		format: 'wp/de-rtc-local-updates',
+		post: {
+			id: currentPost?.id ?? null,
+			type: currentPost?.type ?? null,
+		},
+		postContent: editedPostContent ?? '',
+		distributedEditingSessionState:
+			normalizeDistributedEditingSessionState( sessionState ),
+	};
+	const text = JSON.stringify( payload );
+
+	await clipboard.writeText( text );
+
+	return payload;
 }
 
 /**

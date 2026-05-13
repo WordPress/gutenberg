@@ -49,6 +49,8 @@ jest.mock( '@wordpress/data/src/components/use-dispatch', () => ( {
 } ) );
 
 function setupDistributedEditingStatusSelect( {
+	currentPost = { id: 1, type: 'post' },
+	editedPostContent = '',
 	sessionState = {},
 	noticeDescriptors = getDistributedEditingNoticeDescriptorsForSessionState(
 		sessionState
@@ -59,9 +61,11 @@ function setupDistributedEditingStatusSelect( {
 } = {} ) {
 	useSelect.mockImplementation( ( mapSelect ) =>
 		mapSelect( () => ( {
+			getCurrentPost: () => currentPost,
 			getDistributedEditingSessionState: () => sessionState,
 			getDistributedEditingNoticeDescriptors: () => noticeDescriptors,
 			getDistributedEditingUnloadWarningState: () => unloadWarningState,
+			getEditedPostContent: () => editedPostContent,
 		} ) )
 	);
 }
@@ -77,6 +81,21 @@ function setupDistributedEditingStatusDispatch() {
 			.fn()
 			.mockResolvedValue( {
 				result: 'retry_save_applied',
+			} ),
+		__experimentalPlanDistributedEditingLocalRebaseAfterStaleBase: jest
+			.fn()
+			.mockResolvedValue( {
+				status: 'ready',
+			} ),
+		__experimentalRebaseDistributedEditingLocalUpdatesAfterStaleBase: jest
+			.fn()
+			.mockResolvedValue( {
+				status: 'rebased',
+			} ),
+		__experimentalRefreshDistributedEditingServerStateAfterStaleBase: jest
+			.fn()
+			.mockResolvedValue( {
+				result: 'server_state_refetched',
 			} ),
 		resetDistributedEditingSessionState: jest.fn(),
 		setDistributedEditingSessionState: jest.fn(),
@@ -691,6 +710,100 @@ describe( 'DistributedEditingStatus', () => {
 			'editor-interface-notices'
 		);
 		expect( screen.getByText( 'Changes pending' ) ).toBeVisible();
+	} );
+
+	it( 'copies local updates from production editor chrome without saving', async () => {
+		const user = userEvent.setup();
+		const writeText = jest.fn().mockResolvedValue();
+		const actions = setupDistributedEditingStatusDispatch();
+
+		Object.defineProperty( globalThis.navigator, 'clipboard', {
+			value: { writeText },
+			configurable: true,
+		} );
+		setupDistributedEditingStatusSelect( {
+			currentPost: { id: 42, type: 'post' },
+			editedPostContent:
+				'<!-- wp:paragraph --><p>Local update</p><!-- /wp:paragraph -->',
+			sessionState: {
+				pendingChangeCount: 1,
+				hasPendingChanges: true,
+				canExportLocalUpdates: true,
+				retrySaveHandoffStatus:
+					DISTRIBUTED_EDITING_RETRY_SAVE_HANDOFF_STATUSES.RETRY_SAVE_BLOCKED,
+				retrySaveHandoffReason:
+					DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.RETRY_SUBMIT_PROOF_NOT_ACCEPTED,
+				retrySaveHandoffBlocksNormalSave: true,
+			},
+		} );
+
+		render( <DistributedEditingStatusChrome /> );
+
+		await user.click(
+			screen.getByRole( 'button', {
+				name: 'Export local changes',
+			} )
+		);
+
+		expect( writeText ).toHaveBeenCalledTimes( 1 );
+		expect( JSON.parse( writeText.mock.calls[ 0 ][ 0 ] ) ).toMatchObject( {
+			version: 1,
+			format: 'wp/de-rtc-local-updates',
+			post: {
+				id: 42,
+				type: 'post',
+			},
+			postContent:
+				'<!-- wp:paragraph --><p>Local update</p><!-- /wp:paragraph -->',
+			distributedEditingSessionState: {
+				pendingChangeCount: 1,
+				retrySaveHandoffStatus:
+					DISTRIBUTED_EDITING_RETRY_SAVE_HANDOFF_STATUSES.RETRY_SAVE_BLOCKED,
+				retrySaveHandoffReason:
+					DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.RETRY_SUBMIT_PROOF_NOT_ACCEPTED,
+				canExportLocalUpdates: true,
+			},
+		} );
+		expect(
+			actions.__experimentalRefreshDistributedEditingServerStateAfterStaleBase
+		).not.toHaveBeenCalled();
+		expect(
+			actions.__experimentalSaveDistributedEditingRetryAfterProof
+		).not.toHaveBeenCalled();
+	} );
+
+	it( 'refetches server state from production editor chrome without saving', async () => {
+		const user = userEvent.setup();
+		const actions = setupDistributedEditingStatusDispatch();
+
+		setupDistributedEditingStatusSelect( {
+			sessionState: {
+				pendingChangeCount: 1,
+				hasPendingChanges: true,
+				canExportLocalUpdates: true,
+				requiresServerStateRefetch: true,
+				retrySaveHandoffStatus:
+					DISTRIBUTED_EDITING_RETRY_SAVE_HANDOFF_STATUSES.RETRY_SAVE_BLOCKED,
+				retrySaveHandoffReason:
+					DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.SERVER_STATE_REFETCH_REQUIRED,
+				retrySaveHandoffBlocksNormalSave: true,
+			},
+		} );
+
+		render( <DistributedEditingStatusChrome /> );
+
+		await user.click(
+			screen.getByRole( 'button', {
+				name: 'Refresh server version',
+			} )
+		);
+
+		expect(
+			actions.__experimentalRefreshDistributedEditingServerStateAfterStaleBase
+		).toHaveBeenCalledTimes( 1 );
+		expect(
+			actions.__experimentalSaveDistributedEditingRetryAfterProof
+		).not.toHaveBeenCalled();
 	} );
 
 	it( 'mounts the status surface for unload-warning state', () => {
