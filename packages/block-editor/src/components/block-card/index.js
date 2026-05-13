@@ -9,11 +9,9 @@ import clsx from 'clsx';
 import {
 	Button,
 	Icon,
-	__experimentalText as WCText,
-	__experimentalVStack as VStack,
-	__experimentalHStack as HStack,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
+import { Text, Stack } from '@wordpress/ui';
 import { useDispatch, useSelect } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
 import { __, sprintf, isRTL } from '@wordpress/i18n';
@@ -150,8 +148,8 @@ function BlockCard( {
 				className
 			) }
 		>
-			<VStack>
-				<HStack justify="flex-start" spacing={ 0 }>
+			<Stack direction="column" gap="sm">
+				<Stack direction="row" align="center" justify="flex-start">
 					{ parentBlockClientId && (
 						<Button
 							onClick={ () => selectBlock( parentBlockClientId ) }
@@ -189,7 +187,7 @@ function BlockCard( {
 						}
 					>
 						<BlockIcon icon={ icon } showColors />
-						<VStack spacing={ 1 }>
+						<Stack direction="column" gap="xs">
 							<TitleElement className="block-editor-block-card__title">
 								<span className="block-editor-block-card__name">
 									{ !! name?.length ? name : title }
@@ -201,15 +199,15 @@ function BlockCard( {
 									) }
 							</TitleElement>
 							{ children }
-						</VStack>
+						</Stack>
 					</OptionalParentSelectButton>
-				</HStack>
+				</Stack>
 				{ ! parentClientId && ! isChild && description && (
-					<WCText className="block-editor-block-card__description">
+					<Text className="block-editor-block-card__description">
 						{ description }
-					</WCText>
+					</Text>
 				) }
-			</VStack>
+			</Stack>
 		</div>
 	);
 }
