@@ -304,6 +304,10 @@ Stable DE-RTC notice kinds. These are integration points for future UI and notic
 
 Stable DE-RTC reason codes shared with the root model runner and WordPress authority layer.
 
+### DISTRIBUTED_EDITING_RECOVERY_REST_BASE
+
+Undocumented declaration.
+
 ### DISTRIBUTED_EDITING_UNLOAD_WARNING_REASONS
 
 Stable reasons for browser unload protection.
@@ -485,6 +489,20 @@ _Parameters_
 _Returns_
 
 -   `Array`: Notice descriptors.
+
+### getDistributedEditingRecoveryEndpointPath
+
+Returns the current DE-RTC recovery endpoint path for a post.
+
+_Parameters_
+
+-   _args_ `Object`: Endpoint args.
+-   _args.postId_ `number`: Post ID.
+-   _args.restBase_ `[string]`: REST base for the edited post type.
+
+_Returns_
+
+-   `string`: REST path.
 
 ### getDistributedEditingStatusSurfaceItems
 
