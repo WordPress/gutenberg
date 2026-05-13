@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/route",
-	"version": "0.11.0",
+	"version": "0.11.1-next.v.202605131006.0+2a3d07cab",
 	"description": "Routing utilities for WordPress admin interfaces.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
