@@ -23,6 +23,7 @@ import {
 	DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES,
 	DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_REASONS,
 	DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES,
+	DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS,
 	DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES,
 	DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE,
 } from '../distributed-editing';
@@ -1514,6 +1515,253 @@ describe( 'Post actions', () => {
 	} );
 
 	describe( 'savePost()', () => {
+		it( 'routes experimental savePost through guarded retry-save when policy is ready', async () => {
+			const originalPostContent =
+				'<!-- wp:paragraph --><p>Original.</p><!-- /wp:paragraph -->';
+			const editedPostContent =
+				'<!-- wp:paragraph --><p>Rebased savePost.</p><!-- /wp:paragraph -->';
+			const proposedPostContentHash =
+				'9999999999999999999999999999999999999999999999999999999999999999';
+			const post = {
+				id: postId,
+				type: 'post',
+				title: 'bar',
+				content: originalPostContent,
+				status: 'draft',
+			};
+			let retrySaveCalls = 0;
+			let normalSaveCalls = 0;
+			let retrySaveRequestData = null;
+
+			apiFetch.setFetchHandler( async ( options ) => {
+				const method = getMethod( options );
+				const { path, data } = options;
+
+				if (
+					method === 'POST' &&
+					path.startsWith(
+						`/wp/v2/posts/${ postId }/distributed-editing/retry-save`
+					)
+				) {
+					retrySaveCalls++;
+					retrySaveRequestData = data;
+
+					return {
+						result: 'retry_save_applied',
+						retry_save_accepted: true,
+						previous_server_version: '7',
+						server_version: '8',
+						pending_change_count: 2,
+						saves_post: true,
+						mutates_post_content: true,
+						creates_revision: true,
+						claims_saved: true,
+						revision_created: true,
+						created_revision_ids: [ 7002 ],
+					};
+				}
+
+				if (
+					method === 'PUT' &&
+					path.startsWith( `/wp/v2/posts/${ postId }` )
+				) {
+					normalSaveCalls++;
+				}
+
+				throw {
+					code: 'unknown_path',
+					message: `Unknown path: ${ method } ${ path }`,
+				};
+			} );
+
+			const registry = createRegistryWithStores();
+
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', post );
+			registry.dispatch( editorStore ).setupEditor( post, {
+				content: editedPostContent,
+			} );
+			registry
+				.dispatch( editorStore )
+				.setDistributedEditingSessionState( {
+					clientBaseVersion: '4',
+					serverVersion: '7',
+					pendingChangeCount: 2,
+					retrySubmitProofStatus:
+						DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.ACCEPTED_FOR_FUTURE_SAVE,
+					retrySubmitAccepted: true,
+					retrySubmitSavePathRequired: true,
+					retrySubmitSaveStatus:
+						DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.READY,
+					retrySubmitSaveReady: true,
+					canExportLocalUpdates: true,
+				} );
+
+			await expect(
+				registry.dispatch( editorStore ).savePost( {
+					__experimentalUseDistributedEditingRetrySave: true,
+					proposedPostContentHash,
+				} )
+			).resolves.toMatchObject( {
+				status: 'retry_save_submitted',
+				callsRetrySaveAction: true,
+				callsNormalSavePost: false,
+				response: {
+					result: 'retry_save_applied',
+					retry_save_accepted: true,
+				},
+			} );
+
+			expect( retrySaveCalls ).toBe( 1 );
+			expect( normalSaveCalls ).toBe( 0 );
+			expect( retrySaveRequestData ).toEqual( {
+				client_base_version: '7',
+				accepted_proof_server_version: '7',
+				rebased_from_version: '4',
+				pending_change_count: 2,
+				proposed_post_content: editedPostContent,
+				accepted_proof_saves_post: false,
+				accepted_proof_mutates_post_content: false,
+				accepted_proof_creates_revision: false,
+				accepted_proof_claims_saved: false,
+				proposed_post_content_hash: proposedPostContentHash,
+			} );
+			expect(
+				registry
+					.select( editorStore )
+					.getDistributedEditingSessionState()
+			).toMatchObject( {
+				retrySaveStatus: DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVED,
+				retrySaveAccepted: true,
+				canExportLocalUpdates: false,
+			} );
+		} );
+
+		it( 'blocks experimental savePost normal fallback when retry-save policy protects local changes', async () => {
+			const post = {
+				id: postId,
+				type: 'post',
+				title: 'bar',
+				content: 'bar',
+				status: 'draft',
+			};
+			let apiCalls = 0;
+
+			apiFetch.setFetchHandler( async ( options ) => {
+				apiCalls++;
+				const method = getMethod( options );
+				const { path } = options;
+
+				throw {
+					code: 'unexpected_path',
+					message: `Unexpected path: ${ method } ${ path }`,
+				};
+			} );
+
+			const registry = createRegistryWithStores();
+
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', post );
+			registry.dispatch( editorStore ).setupEditor( post, {
+				content: 'new bar',
+			} );
+			registry
+				.dispatch( editorStore )
+				.setDistributedEditingSessionState( {
+					clientBaseVersion: '4',
+					serverVersion: '7',
+					pendingChangeCount: 1,
+					hasPendingChanges: true,
+					canExportLocalUpdates: true,
+				} );
+
+			await expect(
+				registry.dispatch( editorStore ).savePost( {
+					__experimentalUseDistributedEditingRetrySave: true,
+				} )
+			).resolves.toMatchObject( {
+				status: 'retry_save_blocked',
+				reason: DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.RETRY_SUBMIT_PROOF_NOT_ACCEPTED,
+				allowsNormalSaveFallback: false,
+				callsRetrySaveAction: false,
+				callsNormalSavePost: false,
+			} );
+
+			expect( apiCalls ).toBe( 0 );
+			expect( registry.select( editorStore ).isEditedPostDirty() ).toBe(
+				true
+			);
+		} );
+
+		it( 'falls back to normal savePost when retry-save policy has no local changes to protect', async () => {
+			const post = {
+				id: postId,
+				type: 'post',
+				title: 'bar',
+				content: 'bar',
+				excerpt: 'crackers',
+				status: 'draft',
+			};
+			let retrySaveCalls = 0;
+			let normalSaveCalls = 0;
+
+			apiFetch.setFetchHandler( async ( options ) => {
+				const method = getMethod( options );
+				const { path, data } = options;
+
+				if (
+					path.startsWith(
+						`/wp/v2/posts/${ postId }/distributed-editing/retry-save`
+					)
+				) {
+					retrySaveCalls++;
+				}
+
+				if (
+					method === 'PUT' &&
+					path.startsWith( `/wp/v2/posts/${ postId }` )
+				) {
+					normalSaveCalls++;
+					return { ...post, ...data };
+				}
+
+				if (
+					method === 'GET' &&
+					path.startsWith( '/wp/v2/types/post' )
+				) {
+					return {
+						json: () => Promise.resolve( {} ),
+					};
+				}
+
+				throw {
+					code: 'unknown_path',
+					message: `Unknown path: ${ method } ${ path }`,
+				};
+			} );
+
+			const registry = createRegistryWithStores();
+
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', post );
+			registry.dispatch( editorStore ).setupEditor( post, {
+				content: 'new bar',
+			} );
+
+			await registry.dispatch( editorStore ).savePost( {
+				__experimentalUseDistributedEditingRetrySave: true,
+			} );
+
+			expect( retrySaveCalls ).toBe( 0 );
+			expect( normalSaveCalls ).toBe( 1 );
+			expect( registry.select( editorStore ).isEditedPostDirty() ).toBe(
+				false
+			);
+		} );
+
 		it( 'saves a modified post', async () => {
 			const post = {
 				id: postId,

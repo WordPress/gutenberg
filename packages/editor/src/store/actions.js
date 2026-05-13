@@ -39,6 +39,7 @@ import {
 	getDistributedEditingSessionStateForRetrySubmitHandoff,
 	getDistributedEditingSessionStateForRetrySubmitProofResult,
 	getDistributedEditingSessionStateForRetrySubmitSavePreparation,
+	getDistributedEditingRetrySavePolicyForSessionState,
 	getDistributedEditingStaleBaseLocalRebaseResult,
 	getDistributedEditingSessionStateForStaleBaseLocalRebasePlan,
 	getDistributedEditingSessionStateForStaleBaseRejectionResult,
@@ -664,6 +665,91 @@ export const __experimentalSaveDistributedEditingRetryAfterProof =
 	};
 
 /**
+ * Consults the DE-RTC retry-save policy and performs the guarded retry-save
+ * handoff only when the policy is ready.
+ *
+ * This is the first explicit bridge between save-flow code and the guarded
+ * retry-save endpoint. It still does not call normal save itself. Callers may
+ * continue to normal save only when the returned status is
+ * `normal_save_fallback`.
+ *
+ * @param {Object} [options] Request and policy options.
+ *
+ * @return {Function} Action thunk.
+ */
+export const __experimentalMaybeSavePostWithDistributedEditingRetryPolicy =
+	( options = {} ) =>
+	async ( { select, dispatch, registry } ) => {
+		const currentPost = select.getCurrentPost?.() || {};
+		const postType = options.postType || currentPost.type;
+		const postId = options.postId ?? currentPost.id;
+		const postTypeRecord = postType
+			? registry.select( coreStore ).getPostType( postType )
+			: null;
+		const restBase =
+			options.restBase ||
+			postTypeRecord?.rest_base ||
+			DISTRIBUTED_EDITING_RECOVERY_REST_BASE;
+		const currentSessionState =
+			select.getDistributedEditingSessionState?.() || {};
+		const proposedPostContent =
+			options.proposedPostContent ?? select.getEditedPostContent?.();
+		const policy = getDistributedEditingRetrySavePolicyForSessionState(
+			currentSessionState,
+			{
+				postId,
+				restBase,
+				proposedPostContent,
+				clientBaseVersion: options.clientBaseVersion,
+				acceptedProofServerVersion: options.acceptedProofServerVersion,
+				rebasedFromVersion: options.rebasedFromVersion,
+				pendingChangeCount: options.pendingChangeCount,
+			}
+		);
+
+		if ( ! policy.canRetrySave ) {
+			const allowsNormalSaveFallback = ! policy.protectsLocalChanges;
+
+			return {
+				status: allowsNormalSaveFallback
+					? 'normal_save_fallback'
+					: 'retry_save_blocked',
+				reason: policy.reason,
+				policy,
+				allowsNormalSaveFallback,
+				callsRetrySaveAction: false,
+				callsNormalSavePost: false,
+				response: null,
+			};
+		}
+
+		const response =
+			await dispatch.__experimentalSaveDistributedEditingRetryAfterProof(
+				{
+					...policy.request,
+					proposedPostContent,
+					proposedPostContentHash: options.proposedPostContentHash,
+					acceptedProofSavesPost: options.acceptedProofSavesPost,
+					acceptedProofMutatesPostContent:
+						options.acceptedProofMutatesPostContent,
+					acceptedProofCreatesRevision:
+						options.acceptedProofCreatesRevision,
+					acceptedProofClaimsSaved: options.acceptedProofClaimsSaved,
+				}
+			);
+
+		return {
+			status: 'retry_save_submitted',
+			reason: null,
+			policy,
+			allowsNormalSaveFallback: false,
+			callsRetrySaveAction: true,
+			callsNormalSavePost: false,
+			response,
+		};
+	};
+
+/**
  * Returns an action object used in signalling that attributes of the post have
  * been edited.
  *
@@ -701,6 +787,20 @@ export const savePost =
 
 		const content = select.getEditedPostContent();
 		dispatch.editPost( { content }, { undoIgnore: true } );
+
+		if ( options.__experimentalUseDistributedEditingRetrySave ) {
+			const retrySaveHandoff =
+				await dispatch.__experimentalMaybeSavePostWithDistributedEditingRetryPolicy(
+					{
+						...options,
+						proposedPostContent: content,
+					}
+				);
+
+			if ( ! retrySaveHandoff.allowsNormalSaveFallback ) {
+				return retrySaveHandoff;
+			}
+		}
 
 		const previousRecord = select.getCurrentPost();
 		let edits = {
