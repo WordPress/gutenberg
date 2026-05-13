@@ -131,7 +131,7 @@ interface DashboardGridLayoutItem {
 `style`, etc.) flow through. The grid's own layout styles
 (`gridTemplateColumns`, `gridAutoRows`) override any user-supplied
 `style` for those properties. The gap between tiles is owned by the
-design-system gap token (`--wpds-dimension-gap-sm` by default) and
+design-system gap token (`--wpds-dimension-gap-md` by default) and
 is not configurable per instance; theme it through a `ThemeProvider`
 density change or token override.
 

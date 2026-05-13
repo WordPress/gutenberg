@@ -43,10 +43,10 @@ import type { ResizeDelta } from '../shared/types';
 import styles from './grid.module.css';
 
 // Fallback gap in pixels for math that runs before the computed gap
-// can be read from the DOM. Matches the `'sm'` step the surface
-// resolves to in CSS (`--wpds-dimension-gap-sm`); the next layout
+// can be read from the DOM. Matches the `'md'` step the surface
+// resolves to in CSS (`--wpds-dimension-gap-md`); the next layout
 // effect overwrites this with the actual computed value.
-const FALLBACK_GAP_PX = 8;
+const FALLBACK_GAP_PX = 12;
 
 // Reorder is driven by `temporaryLayout` + CSS Grid, not by dnd-kit
 // transforms. Hoist the no-op strategy outside the component so its

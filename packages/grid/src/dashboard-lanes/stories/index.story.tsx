@@ -362,7 +362,7 @@ function NumberedLanesOverlay( { columns, isActive }: GridOverlayRenderProps ) {
 				inset: 0,
 				display: 'grid',
 				gridTemplateColumns: `repeat(${ columns }, minmax(0, 1fr))`,
-				gap: 'var(--wpds-dimension-gap-sm)',
+				gap: 'var(--wpds-dimension-gap-md)',
 				pointerEvents: 'none',
 				opacity: isActive ? 1 : 0,
 				visibility: isActive ? 'visible' : 'hidden',

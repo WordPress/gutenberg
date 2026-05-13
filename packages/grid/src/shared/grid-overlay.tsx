@@ -50,7 +50,7 @@ export function GridOverlay( {
 		...( showRows
 			? ( {
 					'--wp-grid-overlay-row-height': `${ rowHeight }px`,
-					'--wp-grid-overlay-row-tile': `calc(${ rowHeight }px + var(--wpds-dimension-gap-sm))`,
+					'--wp-grid-overlay-row-tile': `calc(${ rowHeight }px + var(--wpds-dimension-gap-md))`,
 			  } as React.CSSProperties )
 			: {} ),
 	};
