@@ -7,6 +7,8 @@ const BASE_CONTENT =
 	'<!-- wp:paragraph --><p>Original client base</p><!-- /wp:paragraph -->';
 const SERVER_CONTENT =
 	'<!-- wp:paragraph --><p>Server changed copy</p><!-- /wp:paragraph -->';
+const REFETCHED_CONTENT =
+	'<!-- wp:paragraph --><p>Refetched server copy</p><!-- /wp:paragraph -->';
 
 function getStatusChrome( page ) {
 	return page.locator(
@@ -20,6 +22,16 @@ function isRetrySubmitProofRequest( url ) {
 		decodeURIComponent( url.href ).includes(
 			'/distributed-editing/retry-submit'
 		)
+	);
+}
+
+function isPostEditRefetchRequest( url ) {
+	const decodedUrl = decodeURIComponent( url.href );
+
+	return (
+		decodedUrl.includes( '/wp/v2/posts/' ) &&
+		decodedUrl.includes( 'context=edit' ) &&
+		! decodedUrl.includes( '/distributed-editing/' )
 	);
 }
 
@@ -47,6 +59,33 @@ async function seedPostRebaseState( page ) {
 		{
 			baseContent: BASE_CONTENT,
 			serverContent: SERVER_CONTENT,
+		}
+	);
+}
+
+async function seedBlockedRetrySaveRefetchState( page ) {
+	await page.evaluate(
+		( { baseContent } ) => {
+			window.wp.data
+				.dispatch( 'core/editor' )
+				.setDistributedEditingSessionState( {
+					disposition: 'rejected_stale_base_version',
+					reasonCode: 'stale_base_version_rejected',
+					clientBaseVersion: '4',
+					serverVersion: '7',
+					clientBaseContent: baseContent,
+					pendingChangeCount: 1,
+					remoteChangeCount: 1,
+					hasPendingChanges: true,
+					requiresServerStateRefetch: true,
+					canExportLocalUpdates: true,
+					retrySaveHandoffStatus: 'retry_save_blocked',
+					retrySaveHandoffReason: 'server_state_refetch_required',
+					retrySaveHandoffBlocksNormalSave: true,
+				} );
+		},
+		{
+			baseContent: BASE_CONTENT,
 		}
 	);
 }
@@ -187,5 +226,115 @@ test.describe( 'Distributed Editing status chrome', () => {
 				retrySubmitClaimsSaved: false,
 			} );
 		expect( proofRequestCount ).toBe( 1 );
+	} );
+
+	test( 'refreshes server state from a blocked retry-save status without saving', async ( {
+		admin,
+		editor,
+		page,
+	} ) => {
+		await admin.createNewPost();
+		await expect(
+			editor.canvas.getByRole( 'textbox', { name: 'Add title' } )
+		).toBeFocused();
+
+		let refetchRequestCount = 0;
+		await page.route( isPostEditRefetchRequest, async ( route ) => {
+			const request = route.request();
+
+			if ( request.method() !== 'GET' ) {
+				await route.continue();
+				return;
+			}
+
+			refetchRequestCount += 1;
+			const postIdMatch = new URL( request.url() ).pathname.match(
+				/\/wp\/v2\/posts\/(\d+)/
+			);
+
+			await route.fulfill( {
+				contentType: 'application/json',
+				body: JSON.stringify( {
+					id: Number( postIdMatch?.[ 1 ] || 1 ),
+					modified_gmt: '2026-05-13T00:00:00',
+					content: {
+						raw: REFETCHED_CONTENT,
+					},
+					distributed_editing: {
+						server_version: '8',
+					},
+				} ),
+			} );
+		} );
+
+		await seedBlockedRetrySaveRefetchState( page );
+
+		const statusChrome = getStatusChrome( page );
+		await expect( statusChrome ).toBeVisible();
+		await expect(
+			statusChrome.getByText( 'Retry save needs server refresh' )
+		).toBeVisible();
+		await expect(
+			statusChrome.getByText(
+				'The server state must be refreshed before retry-save can continue. Local changes are still protected; refresh the server version before trying again.'
+			)
+		).toBeVisible();
+		await expect(
+			statusChrome
+				.getByRole( 'button', {
+					name: 'Export local changes',
+				} )
+				.first()
+		).toBeVisible();
+		await expect(
+			statusChrome.getByRole( 'button', {
+				name: 'Export local changes',
+			} )
+		).toHaveCount( 2 );
+		await expect(
+			statusChrome.getByRole( 'button', {
+				name: 'Refresh server version',
+			} )
+		).toHaveCount( 2 );
+
+		await statusChrome
+			.getByRole( 'button', { name: 'Refresh server version' } )
+			.first()
+			.click();
+		await expect(
+			statusChrome.getByText(
+				'Server version refreshed. Review local changes before retrying.'
+			)
+		).toBeVisible();
+
+		await expect
+			.poll( () =>
+				page.evaluate( () => {
+					const state = window.wp.data
+						.select( 'core/editor' )
+						.getDistributedEditingSessionState();
+
+					return {
+						serverVersion: state.serverVersion,
+						refetchedServerContent: state.refetchedServerContent,
+						refetchedServerState: state.refetchedServerState,
+						requiresServerStateRefetch:
+							state.requiresServerStateRefetch,
+						canExportLocalUpdates: state.canExportLocalUpdates,
+						retrySaveHandoffStatus: state.retrySaveHandoffStatus,
+						retrySaveHandoffReason: state.retrySaveHandoffReason,
+					};
+				} )
+			)
+			.toEqual( {
+				serverVersion: '8',
+				refetchedServerContent: REFETCHED_CONTENT,
+				refetchedServerState: true,
+				requiresServerStateRefetch: false,
+				canExportLocalUpdates: true,
+				retrySaveHandoffStatus: 'retry_save_blocked',
+				retrySaveHandoffReason: 'server_state_refetch_required',
+			} );
+		expect( refetchRequestCount ).toBe( 1 );
 	} );
 } );
