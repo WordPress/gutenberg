@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { useMemo } from '@wordpress/element';
+import { useStyleOverride } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -14,10 +15,19 @@ import { getAvatarBorderColor } from './utils';
 const REST_ALPHA = '40';
 const ACTIVE_ALPHA = '80';
 
+// Reset the browser's default `<mark>` styling so the per-author rules below
+// are what readers actually see (without it, `mark` ships with a bright yellow
+// background in every browser). Scoped to our annotation source.
+const BASE_RESET =
+	'mark.annotation-text-core-note{background-color:transparent;color:inherit;}';
+
 /**
- * Emits a `<style>` element with per-note background rules so inline-note
+ * Injects per-note background rules into the editor canvas so inline-note
  * markers carry their author's avatar color. The annotations API renders each
  * marker with `id="annotation-text-{noteId}"`, which we target directly.
+ *
+ * Uses `useStyleOverride` so the styles reach the iframed canvas; a plain
+ * `<style>` element rendered in the sidebar would only affect the parent doc.
  *
  * Opacity boosts on `:hover`, `:focus-within`, and when the matching thread is
  * the editor's selected note.
@@ -25,15 +35,12 @@ const ACTIVE_ALPHA = '80';
  * @param {Object}      props
  * @param {Array}       props.threads      Unresolved note threads.
  * @param {string|null} [props.selectedId] ID of the currently selected note.
- * @return {JSX.Element|null} The style element or `null` when there are no threads.
+ * @return {null} Renders nothing; styles are applied via `useStyleOverride`.
  */
 export function NoteHighlightStyles( { threads, selectedId } ) {
 	const css = useMemo( () => {
-		if ( ! threads?.length ) {
-			return '';
-		}
-		const rules = [];
-		for ( const thread of threads ) {
+		const rules = [ BASE_RESET ];
+		for ( const thread of threads ?? [] ) {
 			if ( ! thread?.id ) {
 				continue;
 			}
@@ -54,8 +61,6 @@ export function NoteHighlightStyles( { threads, selectedId } ) {
 		return rules.join( '' );
 	}, [ threads, selectedId ] );
 
-	if ( ! css ) {
-		return null;
-	}
-	return <style>{ css }</style>;
+	useStyleOverride( { id: 'core-note-highlights', css } );
+	return null;
 }
