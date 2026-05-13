@@ -11,7 +11,7 @@ import { parse, __unstableSerializeAndClean } from '@wordpress/blocks';
 import { STORE_NAME } from '../name';
 import useEntityId from './use-entity-id';
 import { updateFootnotesFromMeta } from '../footnotes';
-import { parsedBlocksCache, getCacheKey } from '../parsed-blocks-cache';
+import { parsedBlocksCache } from '../parsed-blocks-cache';
 
 const EMPTY_ARRAY = [];
 
@@ -36,17 +36,22 @@ const EMPTY_ARRAY = [];
 export default function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 	const providerId = useEntityId( kind, name );
 	const id = _id ?? providerId;
-	const { content, editedBlocks, meta } = useSelect(
+	const { content, editedBlocks, meta, contentObject } = useSelect(
 		( select ) => {
 			if ( ! id ) {
 				return {};
 			}
-			const { getEditedEntityRecord } = select( STORE_NAME );
+			const { getEditedEntityRecord, getEntityRecord } =
+				select( STORE_NAME );
 			const editedRecord = getEditedEntityRecord( kind, name, id );
+			const rawRecord = getEntityRecord( kind, name, id );
 			return {
 				editedBlocks: editedRecord.blocks,
 				content: editedRecord.content,
 				meta: editedRecord.meta,
+				// WeakMap key. Stable while content is unchanged; replaced
+				// whenever the record's content changes.
+				contentObject: rawRecord?.content,
 			};
 		},
 		[ kind, name, id ]
@@ -67,21 +72,20 @@ export default function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 			return EMPTY_ARRAY;
 		}
 
-		// Cache parsed blocks by entity identity. Store the content
-		// alongside the blocks so we can validate it hasn't changed.
-		const cacheKey = getCacheKey( kind, name, id );
-		const cached = parsedBlocksCache.get( cacheKey );
-		let _blocks;
-
-		if ( cached && cached.content === content ) {
-			_blocks = cached.blocks;
-		} else {
-			_blocks = parse( content );
-			parsedBlocksCache.set( cacheKey, { content, blocks: _blocks } );
+		// Only consult the cache when `content` is the unedited raw value.
+		// An edited-content render would otherwise pollute the entry that
+		// later unedited renders depend on.
+		if ( contentObject && content === contentObject.raw ) {
+			let _blocks = parsedBlocksCache.get( contentObject );
+			if ( ! _blocks ) {
+				_blocks = parse( content );
+				parsedBlocksCache.set( contentObject, _blocks );
+			}
+			return _blocks;
 		}
 
-		return _blocks;
-	}, [ kind, name, id, editedBlocks, content ] );
+		return parse( content );
+	}, [ id, editedBlocks, content, contentObject ] );
 
 	const onChange = useCallback(
 		( newBlocks, options ) => {
