@@ -40,6 +40,8 @@
 	grid-column: 1;
 	grid-row: 1;
 
+	line-height: var(--wpds-typography-line-height-sm);
+
 	// Vertically center single-line content with the dismiss button.
 	padding-block: calc((#{$button-size-small} - 1lh) / 2);
 }
