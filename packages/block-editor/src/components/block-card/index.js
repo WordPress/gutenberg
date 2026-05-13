@@ -149,7 +149,7 @@ function BlockCard( {
 			) }
 		>
 			<Stack direction="column" gap="sm">
-				<Stack direction="row" justify="flex-start">
+				<Stack direction="row" align="center" justify="flex-start">
 					{ parentBlockClientId && (
 						<Button
 							onClick={ () => selectBlock( parentBlockClientId ) }
