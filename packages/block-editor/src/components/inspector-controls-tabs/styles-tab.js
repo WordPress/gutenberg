@@ -82,6 +82,14 @@ const StylesTab = ( {
 			{ ! isSectionBlock && (
 				<>
 					<InspectorControls.Slot
+						group="layout"
+						label={ __( 'Layout' ) }
+					/>
+					<InspectorControls.Slot
+						group="dimensions"
+						label={ __( 'Dimensions' ) }
+					/>
+					<InspectorControls.Slot
 						group="color"
 						label={ __( 'Color' ) }
 						className="color-block-support-panel__inner-wrapper"
@@ -97,18 +105,10 @@ const StylesTab = ( {
 						label={ __( 'Typography' ) }
 					/>
 					<InspectorControls.Slot
-						group="layout"
-						label={ __( 'Layout' ) }
-					/>
-					<PositionControls />
-					<InspectorControls.Slot
-						group="dimensions"
-						label={ __( 'Dimensions' ) }
-					/>
-					<InspectorControls.Slot
 						group="border"
 						label={ borderPanelLabel }
 					/>
+					<PositionControls />
 					<InspectorControls.Slot group="styles" />
 				</>
 			) }
