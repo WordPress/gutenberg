@@ -8,8 +8,10 @@ import apiFetch from '@wordpress/api-fetch';
  */
 import {
 	__experimentalRequestDistributedEditingRecoveryDryRun,
+	__experimentalRequestDistributedEditingServerStateRefetch,
 	__experimentalRequestDistributedEditingStaleBaseRejection,
 	getDistributedEditingRecoveryEndpointPath,
+	getDistributedEditingServerStateEndpointPath,
 	getDistributedEditingStaleBaseEndpointPath,
 } from '../distributed-editing-api';
 
@@ -37,6 +39,15 @@ describe( 'distributed editing REST helpers', () => {
 				postId: 42,
 			} )
 		).toBe( '/wp/v2/posts/42/distributed-editing/stale-base' );
+	} );
+
+	it( 'builds the current server-state endpoint path', () => {
+		expect(
+			getDistributedEditingServerStateEndpointPath( {
+				postId: 42,
+				restBase: 'pages',
+			} )
+		).toBe( '/wp/v2/pages/42' );
 	} );
 
 	it( 'rejects unsupported REST bases until WordPress exposes them', () => {
@@ -115,6 +126,30 @@ describe( 'distributed editing REST helpers', () => {
 			} )
 		).rejects.toMatchObject( {
 			code: 'stale_base_version_rejected',
+		} );
+	} );
+
+	it( 'requests server state for stale-base refetch without write data', async () => {
+		apiFetch.setFetchHandler( async ( options ) => {
+			expect( options.path ).toMatch(
+				/^\/wp\/v2\/posts\/42\?context=edit/
+			);
+			expect( options.method ).toBe( 'GET' );
+			expect( options.data ).toBeUndefined();
+
+			return {
+				id: 42,
+				modified_gmt: '2026-05-13T12:00:00',
+			};
+		} );
+
+		await expect(
+			__experimentalRequestDistributedEditingServerStateRefetch( {
+				postId: 42,
+			} )
+		).resolves.toEqual( {
+			id: 42,
+			modified_gmt: '2026-05-13T12:00:00',
 		} );
 	} );
 } );

@@ -51,12 +51,40 @@ export function getDistributedEditingStaleBaseEndpointPath( {
 	} );
 }
 
+/**
+ * Returns the current edited post endpoint path for DE-RTC server-state reads.
+ *
+ * @param {Object} args                    Endpoint args.
+ * @param {number} args.postId             Post ID.
+ * @param {string} [args.restBase='posts'] REST base for the edited post type.
+ *
+ * @return {string} REST path.
+ */
+export function getDistributedEditingServerStateEndpointPath( {
+	postId,
+	restBase = DISTRIBUTED_EDITING_RECOVERY_REST_BASE,
+} = {} ) {
+	const parsedPostId = getDistributedEditingPostId( postId, 'server-state' );
+
+	assertDistributedEditingRestBase( restBase, 'server-state' );
+
+	return `/wp/v2/${ restBase }/${ parsedPostId }`;
+}
+
 function getDistributedEditingEndpointPath( {
 	postId,
 	restBase,
 	operation,
 	errorSubject,
 } ) {
+	const parsedPostId = getDistributedEditingPostId( postId, errorSubject );
+
+	assertDistributedEditingRestBase( restBase, errorSubject );
+
+	return `/wp/v2/${ restBase }/${ parsedPostId }/distributed-editing/${ operation }`;
+}
+
+function getDistributedEditingPostId( postId, errorSubject ) {
 	const parsedPostId = Number( postId );
 
 	if ( ! Number.isInteger( parsedPostId ) || parsedPostId <= 0 ) {
@@ -65,13 +93,15 @@ function getDistributedEditingEndpointPath( {
 		);
 	}
 
+	return parsedPostId;
+}
+
+function assertDistributedEditingRestBase( restBase, errorSubject ) {
 	if ( ! DISTRIBUTED_EDITING_RECOVERY_REST_BASES.includes( restBase ) ) {
 		throw new TypeError(
 			`Distributed Editing ${ errorSubject } currently supports posts and pages REST bases only.`
 		);
 	}
-
-	return `/wp/v2/${ restBase }/${ parsedPostId }/distributed-editing/${ operation }`;
 }
 
 /**
@@ -152,5 +182,30 @@ export function __experimentalRequestDistributedEditingStaleBaseRejection( {
 		} ),
 		method: 'POST',
 		data,
+	} );
+}
+
+/**
+ * Refetches the current server post state for a stale-base session.
+ *
+ * This helper reads the post only. It does not save, apply the response to the
+ * editor entity, rebase local edits, retry a submit, or change post locks.
+ *
+ * @param {Object} args                    Request args.
+ * @param {number} args.postId             Post ID.
+ * @param {string} [args.restBase='posts'] REST base for the edited post type.
+ *
+ * @return {Promise<Object>} REST response.
+ */
+export function __experimentalRequestDistributedEditingServerStateRefetch( {
+	postId,
+	restBase = DISTRIBUTED_EDITING_RECOVERY_REST_BASE,
+} = {} ) {
+	return apiFetch( {
+		path: `${ getDistributedEditingServerStateEndpointPath( {
+			postId,
+			restBase,
+		} ) }?context=edit`,
+		method: 'GET',
 	} );
 }

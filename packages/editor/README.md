@@ -508,6 +508,20 @@ _Returns_
 
 -   `string`: REST path.
 
+### getDistributedEditingServerStateEndpointPath
+
+Returns the current edited post endpoint path for DE-RTC server-state reads.
+
+_Parameters_
+
+-   _args_ `Object`: Endpoint args.
+-   _args.postId_ `number`: Post ID.
+-   _args.restBase_ `[string]`: REST base for the edited post type.
+
+_Returns_
+
+-   `string`: REST path.
+
 ### getDistributedEditingSessionStateForRecoveryDryRunResult
 
 Returns inert DE-RTC editor state for a recovery dry-run response or error.
@@ -531,6 +545,21 @@ The state keeps local changes pending and copyable, but does not attempt a refet
 _Parameters_
 
 -   _responseOrError_ `Object`: REST response or API error.
+
+_Returns_
+
+-   `Object`: DE-RTC session state.
+
+### getDistributedEditingSessionStateForStaleBaseServerStateRefetchResult
+
+Returns DE-RTC editor state after refetching server state for stale-base.
+
+This preserves local pending-change state and marks the session ready for a future local rebase decision. It does not apply server content, clear local edits, retry a submit, save, or change post locks.
+
+_Parameters_
+
+-   _responseOrError_ `Object`: REST response or API error.
+-   _currentSessionState_ `Object`: Current DE-RTC session state.
 
 _Returns_
 

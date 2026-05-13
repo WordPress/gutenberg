@@ -26,12 +26,14 @@ import { __, sprintf } from '@wordpress/i18n';
 import { localAutosaveSet } from './local-autosave';
 import {
 	__experimentalRequestDistributedEditingRecoveryDryRun as requestDistributedEditingRecoveryDryRun,
+	__experimentalRequestDistributedEditingServerStateRefetch as requestDistributedEditingServerStateRefetch,
 	__experimentalRequestDistributedEditingStaleBaseRejection as requestDistributedEditingStaleBaseRejection,
 	DISTRIBUTED_EDITING_RECOVERY_REST_BASE,
 } from './distributed-editing-api';
 import {
 	getDistributedEditingSessionStateForRecoveryDryRunResult,
 	getDistributedEditingSessionStateForStaleBaseRejectionResult,
+	getDistributedEditingSessionStateForStaleBaseServerStateRefetchResult,
 } from './distributed-editing';
 import {
 	getNotificationArgumentsForSaveSuccess,
@@ -310,6 +312,47 @@ export const __experimentalRefreshDistributedEditingStaleBaseRejection =
 
 			throw error;
 		}
+	};
+
+/**
+ * Refetches server state after a stale-base rejection and stores inert status.
+ *
+ * The action reads the latest post representation but does not apply it to the
+ * editor, clear local changes, rebase, retry, save, dispatch notices, persist
+ * editor state, or change post locks.
+ *
+ * @param {Object} [options] Request options.
+ *
+ * @return {Function} Action thunk.
+ */
+export const __experimentalRefreshDistributedEditingServerStateAfterStaleBase =
+	( options = {} ) =>
+	async ( { select, dispatch, registry } ) => {
+		const currentPost = select.getCurrentPost?.() || {};
+		const postType = options.postType || currentPost.type;
+		const postId = options.postId ?? currentPost.id;
+		const postTypeRecord = postType
+			? registry.select( coreStore ).getPostType( postType )
+			: null;
+		const restBase =
+			options.restBase ||
+			postTypeRecord?.rest_base ||
+			DISTRIBUTED_EDITING_RECOVERY_REST_BASE;
+		const currentSessionState =
+			select.getDistributedEditingSessionState?.() || {};
+		const response = await requestDistributedEditingServerStateRefetch( {
+			postId,
+			restBase,
+		} );
+
+		dispatch.setDistributedEditingSessionState(
+			getDistributedEditingSessionStateForStaleBaseServerStateRefetchResult(
+				response,
+				currentSessionState
+			)
+		);
+
+		return response;
 	};
 
 /**

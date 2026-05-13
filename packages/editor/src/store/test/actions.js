@@ -254,6 +254,98 @@ describe( 'Post actions', () => {
 		} );
 	} );
 
+	describe( '__experimentalRefreshDistributedEditingServerStateAfterStaleBase()', () => {
+		it( 'refetches server state without applying it over local edits', async () => {
+			const post = {
+				id: postId,
+				type: 'post',
+				title: 'bar',
+				content: 'bar',
+				status: 'draft',
+			};
+			const serverResponse = {
+				id: postId,
+				type: 'post',
+				content: {
+					raw: 'remote bar',
+				},
+				distributed_editing: {
+					server_version: '7',
+				},
+			};
+
+			apiFetch.setFetchHandler( async ( options ) => {
+				const { path, method, data } = options;
+
+				expect( method ).toBe( 'GET' );
+				expect( path ).toMatch(
+					new RegExp( `^/wp/v2/posts/${ postId }\\?context=edit` )
+				);
+				expect( data ).toBeUndefined();
+
+				return serverResponse;
+			} );
+
+			const registry = createRegistryWithStores();
+
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', post );
+			registry.dispatch( editorStore ).setupEditor( post, {
+				content: 'local bar',
+			} );
+			registry
+				.dispatch( editorStore )
+				.setDistributedEditingSessionState( {
+					disposition:
+						DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+					reasonCode:
+						DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+					clientBaseVersion: '4',
+					serverVersion: '6',
+					pendingChangeCount: 2,
+					remoteChangeCount: 3,
+					requiresServerStateRefetch: true,
+					canExportLocalUpdates: true,
+				} );
+
+			expect( registry.select( editorStore ).isEditedPostDirty() ).toBe(
+				true
+			);
+
+			await expect(
+				registry
+					.dispatch( editorStore )
+					.__experimentalRefreshDistributedEditingServerStateAfterStaleBase()
+			).resolves.toBe( serverResponse );
+
+			expect(
+				registry.select( editorStore ).getEditedPostContent()
+			).toBe( 'local bar' );
+			expect( registry.select( editorStore ).isEditedPostDirty() ).toBe(
+				true
+			);
+			expect(
+				registry
+					.select( editorStore )
+					.getDistributedEditingSessionState()
+			).toMatchObject( {
+				disposition:
+					DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+				reasonCode:
+					DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+				clientBaseVersion: '4',
+				serverVersion: '7',
+				pendingChangeCount: 2,
+				remoteChangeCount: 3,
+				requiresServerStateRefetch: false,
+				refetchedServerState: true,
+				canAttemptLocalRebase: true,
+				canExportLocalUpdates: true,
+			} );
+		} );
+	} );
+
 	describe( 'savePost()', () => {
 		it( 'saves a modified post', async () => {
 			const post = {

@@ -16,6 +16,7 @@ import {
 	DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE,
 	getDistributedEditingSessionStateForRecoveryDryRunResult,
 	getDistributedEditingSessionStateForStaleBaseRejectionResult,
+	getDistributedEditingSessionStateForStaleBaseServerStateRefetchResult,
 	getDistributedEditingNoticeDescriptorsForSessionState,
 	getDistributedEditingUnloadWarningStateForSessionState,
 	isDistributedEditingConflictDisposition,
@@ -118,6 +119,7 @@ describe( 'distributed editing session state', () => {
 			hasRemoteChanges: true,
 			requiresServerStateAcceptance: true,
 			requiresServerStateRefetch: false,
+			refetchedServerState: false,
 			canAttemptLocalRebase: false,
 			requiresManualConflictResolution: false,
 			mustOfferLocalCopy: true,
@@ -149,6 +151,7 @@ describe( 'distributed editing session state', () => {
 			remoteChangeCount: 1,
 			hasRemoteChanges: true,
 			requiresServerStateRefetch: true,
+			refetchedServerState: false,
 			canAttemptLocalRebase: false,
 			requiresManualConflictResolution: false,
 			mustOfferLocalCopy: true,
@@ -181,6 +184,7 @@ describe( 'distributed editing session state', () => {
 			pendingChangeCount: 2,
 			remoteChangeCount: 3,
 			requiresServerStateRefetch: true,
+			refetchedServerState: false,
 			canAttemptLocalRebase: false,
 			canExportLocalUpdates: true,
 		} );
@@ -197,6 +201,45 @@ describe( 'distributed editing session state', () => {
 		expect(
 			shouldWarnBeforeLeavingDistributedEditingSessionState( normalized )
 		).toBe( false );
+	} );
+
+	it( 'marks stale-base server state as refetched without applying server content', () => {
+		const normalized =
+			getDistributedEditingSessionStateForStaleBaseServerStateRefetchResult(
+				{
+					distributed_editing: {
+						server_version: 'server-v7',
+					},
+					content: {
+						raw: '<!-- wp:paragraph --><p>Server state.</p><!-- /wp:paragraph -->',
+					},
+				},
+				getDistributedEditingSessionStateForStaleBaseRejectionResult( {
+					reason_code:
+						DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+					client_base_version: 'server-v4',
+					server_version: 'server-v6',
+					pending_change_count: 2,
+					remote_change_count: 3,
+				} )
+			);
+
+		expect( normalized ).toMatchObject( {
+			clientBaseVersion: 'server-v4',
+			serverVersion: 'server-v7',
+			disposition:
+				DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+			reasonCode:
+				DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+			pendingChangeCount: 2,
+			remoteChangeCount: 3,
+			hasPendingChanges: true,
+			isAwaitingServerConfirmation: true,
+			requiresServerStateRefetch: false,
+			refetchedServerState: true,
+			canAttemptLocalRebase: true,
+			canExportLocalUpdates: true,
+		} );
 	} );
 
 	it( 'drops unknown reason codes and dispositions', () => {

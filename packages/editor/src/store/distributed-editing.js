@@ -114,6 +114,7 @@ export const DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE = Object.freeze( {
 	hasRemoteChanges: false,
 	requiresServerStateAcceptance: false,
 	requiresServerStateRefetch: false,
+	refetchedServerState: false,
 	canAttemptLocalRebase: false,
 	requiresManualConflictResolution: false,
 	mustOfferLocalCopy: false,
@@ -200,9 +201,11 @@ export function normalizeDistributedEditingSessionState( sessionState = {} ) {
 		Boolean( sessionState.requiresServerStateAcceptance ) ||
 		disposition ===
 			DISTRIBUTED_EDITING_DISPOSITIONS.CONFLICT_REQUIRES_SERVER_STATE_ACCEPTANCE;
+	const refetchedServerState = Boolean( sessionState.refetchedServerState );
 	const requiresServerStateRefetch =
-		Boolean( sessionState.requiresServerStateRefetch ) ||
-		isStaleBaseRejection;
+		( Boolean( sessionState.requiresServerStateRefetch ) ||
+			isStaleBaseRejection ) &&
+		! refetchedServerState;
 	const requiresManualConflictResolution = Boolean(
 		sessionState.requiresManualConflictResolution
 	);
@@ -232,6 +235,7 @@ export function normalizeDistributedEditingSessionState( sessionState = {} ) {
 		hasRemoteChanges,
 		requiresServerStateAcceptance,
 		requiresServerStateRefetch,
+		refetchedServerState,
 		canAttemptLocalRebase,
 		requiresManualConflictResolution,
 		mustOfferLocalCopy,
@@ -361,6 +365,56 @@ export function getDistributedEditingSessionStateForStaleBaseRejectionResult(
 			responseData.requiresManualConflictResolution ||
 			responseData.requires_manual_conflict_resolution,
 		canExportLocalUpdates: true,
+	} );
+}
+
+/**
+ * Returns DE-RTC editor state after refetching server state for stale-base.
+ *
+ * This preserves local pending-change state and marks the session ready for a
+ * future local rebase decision. It does not apply server content, clear local
+ * edits, retry a submit, save, or change post locks.
+ *
+ * @param {Object} responseOrError     REST response or API error.
+ * @param {Object} currentSessionState Current DE-RTC session state.
+ *
+ * @return {Object} DE-RTC session state.
+ */
+export function getDistributedEditingSessionStateForStaleBaseServerStateRefetchResult(
+	responseOrError = {},
+	currentSessionState = {}
+) {
+	const serverVersion =
+		getDistributedEditingServerVersionFromResponse( responseOrError ) ||
+		normalizeNullableString( currentSessionState.serverVersion );
+	const pendingChangeCount = normalizeCount(
+		currentSessionState.pendingChangeCount
+	);
+	const remoteChangeCount = normalizeCount(
+		currentSessionState.remoteChangeCount
+	);
+	const requiresManualConflictResolution = Boolean(
+		currentSessionState.requiresManualConflictResolution
+	);
+
+	return normalizeDistributedEditingSessionState( {
+		...currentSessionState,
+		serverVersion,
+		disposition:
+			currentSessionState.disposition ||
+			DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+		reasonCode:
+			currentSessionState.reasonCode ||
+			DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+		pendingChangeCount,
+		remoteChangeCount,
+		refetchedServerState: true,
+		requiresServerStateRefetch: false,
+		canAttemptLocalRebase:
+			pendingChangeCount > 0 && ! requiresManualConflictResolution,
+		canExportLocalUpdates:
+			Boolean( currentSessionState.canExportLocalUpdates ) ||
+			pendingChangeCount > 0,
 	} );
 }
 
@@ -576,4 +630,27 @@ function getDistributedEditingResponseData( responseOrError ) {
 		! Array.isArray( responseOrError.data )
 		? responseOrError.data
 		: {};
+}
+
+function getDistributedEditingServerVersionFromResponse( responseOrError ) {
+	const responseData = getDistributedEditingResponseData( responseOrError );
+	const distributedEditingData =
+		responseOrError?.distributed_editing ||
+		responseOrError?.distributedEditing ||
+		responseData.distributed_editing ||
+		responseData.distributedEditing ||
+		{};
+
+	return normalizeNullableString(
+		responseOrError.serverVersion ||
+			responseOrError.server_version ||
+			responseData.serverVersion ||
+			responseData.server_version ||
+			distributedEditingData.serverVersion ||
+			distributedEditingData.server_version ||
+			responseOrError.modified_gmt ||
+			responseOrError.modified ||
+			responseData.modified_gmt ||
+			responseData.modified
+	);
 }
