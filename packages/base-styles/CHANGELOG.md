@@ -62,7 +62,6 @@
     -   `.edit-widgets-sidebar {greater than small}`
     -   `.interface-complementary-area .components-panel`
     -   `.interface-complementary-area .components-panel__header`
-    -   `.nux-dot-tip`
     -   `.wp-block-template-part__placeholder-preview-filter-input`
 
 ## 6.20.0 (2026-04-15)
