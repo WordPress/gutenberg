@@ -25,6 +25,11 @@ import { __, sprintf } from '@wordpress/i18n';
  */
 import { localAutosaveSet } from './local-autosave';
 import {
+	__experimentalRequestDistributedEditingRecoveryDryRun as requestDistributedEditingRecoveryDryRun,
+	DISTRIBUTED_EDITING_RECOVERY_REST_BASE,
+} from './distributed-editing-api';
+import { getDistributedEditingSessionStateForRecoveryDryRunResult } from './distributed-editing';
+import {
 	getNotificationArgumentsForSaveSuccess,
 	getNotificationArgumentsForSaveFail,
 	getNotificationArgumentsForTrashFail,
@@ -193,6 +198,56 @@ export function resetDistributedEditingSessionState() {
 		type: 'RESET_DISTRIBUTED_EDITING_SESSION_STATE',
 	};
 }
+
+/**
+ * Requests a Distributed Editing recovery dry run and stores inert status.
+ *
+ * The action does not save, apply recovery, replace post locks, dispatch
+ * notices, or persist editor state. API errors are reflected into DE-RTC state
+ * before being rethrown for callers that need command-level handling.
+ *
+ * @param {Object} [options] Request options.
+ *
+ * @return {Function} Action thunk.
+ */
+export const __experimentalRefreshDistributedEditingRecoveryDryRun =
+	( options = {} ) =>
+	async ( { select, dispatch, registry } ) => {
+		const currentPost = select.getCurrentPost?.() || {};
+		const postType = options.postType || currentPost.type;
+		const postId = options.postId ?? currentPost.id;
+		const postTypeRecord = postType
+			? registry.select( coreStore ).getPostType( postType )
+			: null;
+		const restBase =
+			options.restBase ||
+			postTypeRecord?.rest_base ||
+			DISTRIBUTED_EDITING_RECOVERY_REST_BASE;
+
+		try {
+			const response = await requestDistributedEditingRecoveryDryRun( {
+				postId,
+				restBase,
+				candidatePostContentHash: options.candidatePostContentHash,
+			} );
+
+			dispatch.setDistributedEditingSessionState(
+				getDistributedEditingSessionStateForRecoveryDryRunResult(
+					response
+				)
+			);
+
+			return response;
+		} catch ( error ) {
+			dispatch.setDistributedEditingSessionState(
+				getDistributedEditingSessionStateForRecoveryDryRunResult(
+					error
+				)
+			);
+
+			throw error;
+		}
+	};
 
 /**
  * Returns an action object used in signalling that attributes of the post have

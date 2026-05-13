@@ -508,6 +508,20 @@ _Returns_
 
 -   `string`: REST path.
 
+### getDistributedEditingSessionStateForRecoveryDryRunResult
+
+Returns inert DE-RTC editor state for a recovery dry-run response or error.
+
+This maps REST proof-boundary results into the existing editor-state vocabulary without dispatching notices, saving, applying recovery updates, or changing post locks.
+
+_Parameters_
+
+-   _responseOrError_ `Object`: REST response or API error.
+
+_Returns_
+
+-   `Object`: DE-RTC session state.
+
 ### getDistributedEditingStatusSurfaceItems
 
 Returns inert, renderable status items for DE-RTC notice descriptors.

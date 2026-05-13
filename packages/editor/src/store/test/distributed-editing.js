@@ -14,6 +14,7 @@ import {
 	DISTRIBUTED_EDITING_REASON_CODES,
 	DISTRIBUTED_EDITING_UNLOAD_WARNING_REASONS,
 	DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE,
+	getDistributedEditingSessionStateForRecoveryDryRunResult,
 	getDistributedEditingNoticeDescriptorsForSessionState,
 	getDistributedEditingUnloadWarningStateForSessionState,
 	isDistributedEditingConflictDisposition,
@@ -51,12 +52,22 @@ describe( 'distributed editing session state', () => {
 				DISTRIBUTED_EDITING_REASON_CODES.SYNC_META_RESTORED_FROM_REVISION_CONFLICT
 			)
 		).toBe( true );
+		expect(
+			isValidDistributedEditingReasonCode(
+				DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_FEATURE_DISABLED
+			)
+		).toBe( true );
 		expect( isValidDistributedEditingReasonCode( 'unknown_reason' ) ).toBe(
 			false
 		);
 		expect(
 			isValidDistributedEditingDisposition(
 				DISTRIBUTED_EDITING_DISPOSITIONS.CONFLICT_REQUIRES_SERVER_STATE_ACCEPTANCE
+			)
+		).toBe( true );
+		expect(
+			isValidDistributedEditingDisposition(
+				DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_PERMISSION_DENIED
 			)
 		).toBe( true );
 		expect(
@@ -131,6 +142,52 @@ describe( 'distributed editing session state', () => {
 		expect( normalized ).toEqual(
 			DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE
 		);
+	} );
+
+	it( 'normalizes recovery dry-run REST results into inert session state', () => {
+		expect(
+			getDistributedEditingSessionStateForRecoveryDryRunResult( {
+				mode: 'dry_run',
+				result: 'candidate_update_valid',
+			} )
+		).toBe( DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE );
+
+		expect(
+			getDistributedEditingSessionStateForRecoveryDryRunResult( {
+				code: DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_FEATURE_DISABLED,
+			} )
+		).toMatchObject( {
+			disposition:
+				DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_FEATURE_DISABLED,
+			reasonCode:
+				DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_FEATURE_DISABLED,
+			hasPendingChanges: false,
+			isAwaitingServerConfirmation: false,
+		} );
+
+		expect(
+			getDistributedEditingSessionStateForRecoveryDryRunResult( {
+				code: DISTRIBUTED_EDITING_REASON_CODES.REST_CANNOT_EDIT,
+			} )
+		).toMatchObject( {
+			disposition:
+				DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_PERMISSION_DENIED,
+			reasonCode: DISTRIBUTED_EDITING_REASON_CODES.REST_CANNOT_EDIT,
+			hasPendingChanges: false,
+			isAwaitingServerConfirmation: false,
+		} );
+
+		expect(
+			getDistributedEditingSessionStateForRecoveryDryRunResult( {
+				code: DISTRIBUTED_EDITING_REASON_CODES.REST_POST_INVALID_ID,
+			} )
+		).toMatchObject( {
+			disposition:
+				DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_ROUTE_MISMATCH,
+			reasonCode: DISTRIBUTED_EDITING_REASON_CODES.REST_POST_INVALID_ID,
+			hasPendingChanges: false,
+			isAwaitingServerConfirmation: false,
+		} );
 	} );
 
 	it( 'is immutable-friendly for reducer or selector consumers', () => {

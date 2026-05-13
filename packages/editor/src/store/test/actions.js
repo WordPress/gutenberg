@@ -13,6 +13,11 @@ import { store as preferencesStore } from '@wordpress/preferences';
  */
 
 import * as actions from '../actions';
+import {
+	DISTRIBUTED_EDITING_DISPOSITIONS,
+	DISTRIBUTED_EDITING_REASON_CODES,
+	DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE,
+} from '../distributed-editing';
 import { store as editorStore } from '..';
 
 const postId = 44;
@@ -63,6 +68,103 @@ const getMethod = ( options ) =>
 	options.headers?.[ 'X-HTTP-Method-Override' ] || options.method || 'GET';
 
 describe( 'Post actions', () => {
+	describe( '__experimentalRefreshDistributedEditingRecoveryDryRun()', () => {
+		it( 'requests a dry run for the current post and keeps success inert', async () => {
+			const post = {
+				id: postId,
+				type: 'post',
+				title: 'bar',
+				content: 'bar',
+				status: 'draft',
+			};
+
+			apiFetch.setFetchHandler( async ( options ) => {
+				const { path, method, data } = options;
+
+				expect( method ).toBe( 'POST' );
+				expect( path ).toMatch(
+					new RegExp(
+						`^/wp/v2/posts/${ postId }/distributed-editing/recovery`
+					)
+				);
+				expect( data ).toEqual( {
+					mode: 'dry_run',
+				} );
+
+				return {
+					mode: 'dry_run',
+					result: 'candidate_update_valid',
+				};
+			} );
+
+			const registry = createRegistryWithStores();
+
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', post );
+			registry.dispatch( editorStore ).setupEditor( post, {} );
+
+			await expect(
+				registry
+					.dispatch( editorStore )
+					.__experimentalRefreshDistributedEditingRecoveryDryRun()
+			).resolves.toEqual( {
+				mode: 'dry_run',
+				result: 'candidate_update_valid',
+			} );
+
+			expect(
+				registry
+					.select( editorStore )
+					.getDistributedEditingSessionState()
+			).toEqual( DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE );
+		} );
+
+		it( 'normalizes feature-disabled errors before rethrowing', async () => {
+			const post = {
+				id: postId,
+				type: 'post',
+				title: 'bar',
+				content: 'bar',
+				status: 'draft',
+			};
+			const error = {
+				code: DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_FEATURE_DISABLED,
+				message: 'Distributed Editing is not enabled for this post.',
+			};
+
+			apiFetch.setFetchHandler( async () => {
+				throw error;
+			} );
+
+			const registry = createRegistryWithStores();
+
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', post );
+			registry.dispatch( editorStore ).setupEditor( post, {} );
+
+			await expect(
+				registry
+					.dispatch( editorStore )
+					.__experimentalRefreshDistributedEditingRecoveryDryRun()
+			).rejects.toBe( error );
+
+			expect(
+				registry
+					.select( editorStore )
+					.getDistributedEditingSessionState()
+			).toMatchObject( {
+				disposition:
+					DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_FEATURE_DISABLED,
+				reasonCode:
+					DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_FEATURE_DISABLED,
+				hasPendingChanges: false,
+				isAwaitingServerConfirmation: false,
+			} );
+		} );
+	} );
+
 	describe( 'savePost()', () => {
 		it( 'saves a modified post', async () => {
 			const post = {

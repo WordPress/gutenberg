@@ -8,6 +8,9 @@ export const DISTRIBUTED_EDITING_REASON_CODES = Object.freeze( {
 	SYNC_META_UNAVAILABLE_AFTER_REVISION_SCAN:
 		'sync_meta_unavailable_after_revision_scan',
 	STALE_BASE_VERSION_REJECTED: 'stale_base_version_rejected',
+	DE_RTC_FEATURE_DISABLED: 'de_rtc_feature_disabled',
+	REST_CANNOT_EDIT: 'rest_cannot_edit',
+	REST_POST_INVALID_ID: 'rest_post_invalid_id',
 } );
 
 /**
@@ -21,6 +24,9 @@ export const DISTRIBUTED_EDITING_DISPOSITIONS = Object.freeze( {
 		'conflict_requires_server_state_acceptance',
 	REQUIRES_MANUAL_RESOLUTION_NO_SYNC_META:
 		'requires_manual_resolution_no_sync_meta',
+	REJECTED_FEATURE_DISABLED: 'rejected_feature_disabled',
+	REJECTED_PERMISSION_DENIED: 'rejected_permission_denied',
+	REJECTED_ROUTE_MISMATCH: 'rejected_route_mismatch',
 } );
 
 /**
@@ -200,6 +206,60 @@ export function normalizeDistributedEditingSessionState( sessionState = {} ) {
 		mustOfferLocalCopy,
 		canExportLocalUpdates,
 	};
+}
+
+/**
+ * Returns inert DE-RTC editor state for a recovery dry-run response or error.
+ *
+ * This maps REST proof-boundary results into the existing editor-state
+ * vocabulary without dispatching notices, saving, applying recovery updates, or
+ * changing post locks.
+ *
+ * @param {Object} responseOrError REST response or API error.
+ *
+ * @return {Object} DE-RTC session state.
+ */
+export function getDistributedEditingSessionStateForRecoveryDryRunResult(
+	responseOrError = {}
+) {
+	const reasonCode = normalizeNullableString(
+		responseOrError.code || responseOrError.reasonCode
+	);
+
+	switch ( reasonCode ) {
+		case DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_FEATURE_DISABLED:
+			return normalizeDistributedEditingSessionState( {
+				disposition:
+					DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_FEATURE_DISABLED,
+				reasonCode,
+			} );
+
+		case DISTRIBUTED_EDITING_REASON_CODES.REST_CANNOT_EDIT:
+			return normalizeDistributedEditingSessionState( {
+				disposition:
+					DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_PERMISSION_DENIED,
+				reasonCode,
+			} );
+
+		case DISTRIBUTED_EDITING_REASON_CODES.REST_POST_INVALID_ID:
+			return normalizeDistributedEditingSessionState( {
+				disposition:
+					DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_ROUTE_MISMATCH,
+				reasonCode,
+			} );
+	}
+
+	if ( responseOrError.result === 'manual_resolution_required' ) {
+		return normalizeDistributedEditingSessionState( {
+			disposition:
+				DISTRIBUTED_EDITING_DISPOSITIONS.REQUIRES_MANUAL_RESOLUTION_NO_SYNC_META,
+			reasonCode:
+				DISTRIBUTED_EDITING_REASON_CODES.SYNC_META_UNAVAILABLE_AFTER_REVISION_SCAN,
+			canExportLocalUpdates: true,
+		} );
+	}
+
+	return DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE;
 }
 
 /**
