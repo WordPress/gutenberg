@@ -48,6 +48,110 @@ class WP_Duotone_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertMatchesRegularExpression( $expected, WP_Duotone_Gutenberg::render_duotone_support( $block_content, $block, $wp_block ) );
 	}
 
+	/**
+	 * Tests whether a duotone filter applied to a block style variation in global styles
+	 * is correctly rendered on the front end.
+	 *
+	 * @covers ::render_duotone_support
+	 */
+	public function test_gutenberg_render_duotone_support_block_style_variation() {
+		$block         = array(
+			'blockName' => 'core/image',
+			'attrs'     => array(
+				'className' => 'is-style-rounded',
+			),
+		);
+		$wp_block      = new WP_Block( $block );
+		$block_content = '<figure class="wp-block-image size-full is-style-rounded"><img src="/my-image.jpg" /></figure>';
+
+		$wp_duotone = new WP_Duotone_Gutenberg();
+
+		$global_styles_block_names_property = new ReflectionProperty( 'WP_Duotone_Gutenberg', 'global_styles_block_names' );
+		$global_styles_block_names_property->setAccessible( true );
+		$previous_block_names = $global_styles_block_names_property->getValue();
+		$global_styles_block_names_property->setValue( $wp_duotone, array( 'core/image:rounded' => 'blue-orange' ) );
+
+		$global_styles_presets_property = new ReflectionProperty( 'WP_Duotone_Gutenberg', 'global_styles_presets' );
+		$global_styles_presets_property->setAccessible( true );
+		$previous_presets = $global_styles_presets_property->getValue();
+		$global_styles_presets_property->setValue(
+			$wp_duotone,
+			array(
+				'wp-duotone-blue-orange' => array(
+					'slug'   => 'blue-orange',
+					'colors' => array( '#0000ff', '#ffa500' ),
+				),
+			)
+		);
+
+		$expected = '<figure class="wp-block-image size-full is-style-rounded wp-duotone-blue-orange"><img src="/my-image.jpg" /></figure>';
+		$actual   = WP_Duotone_Gutenberg::render_duotone_support( $block_content, $block, $wp_block );
+
+		$global_styles_block_names_property->setValue( $wp_duotone, $previous_block_names );
+		$global_styles_presets_property->setValue( $wp_duotone, $previous_presets );
+		$global_styles_block_names_property->setAccessible( false );
+		$global_styles_presets_property->setAccessible( false );
+
+		$this->assertSame( $expected, $actual );
+	}
+
+	/**
+	 * Tests whether a duotone filter applied to a block style variation in global styles
+	 * correctly overrides the default duotone filter applied to the base block.
+	 *
+	 * @covers ::render_duotone_support
+	 */
+	public function test_gutenberg_render_duotone_support_block_style_variation_precedence() {
+		$block         = array(
+			'blockName' => 'core/image',
+			'attrs'     => array(
+				'className' => 'is-style-rounded',
+			),
+		);
+		$wp_block      = new WP_Block( $block );
+		$block_content = '<figure class="wp-block-image size-full is-style-rounded"><img src="/my-image.jpg" /></figure>';
+
+		$wp_duotone = new WP_Duotone_Gutenberg();
+
+		$global_styles_block_names_property = new ReflectionProperty( 'WP_Duotone_Gutenberg', 'global_styles_block_names' );
+		$global_styles_block_names_property->setAccessible( true );
+		$previous_block_names = $global_styles_block_names_property->getValue();
+		$global_styles_block_names_property->setValue(
+			$wp_duotone,
+			array(
+				'core/image'         => 'red-yellow',
+				'core/image:rounded' => 'blue-orange',
+			)
+		);
+
+		$global_styles_presets_property = new ReflectionProperty( 'WP_Duotone_Gutenberg', 'global_styles_presets' );
+		$global_styles_presets_property->setAccessible( true );
+		$previous_presets = $global_styles_presets_property->getValue();
+		$global_styles_presets_property->setValue(
+			$wp_duotone,
+			array(
+				'wp-duotone-red-yellow'  => array(
+					'slug'   => 'red-yellow',
+					'colors' => array( '#ff0000', '#ffff00' ),
+				),
+				'wp-duotone-blue-orange' => array(
+					'slug'   => 'blue-orange',
+					'colors' => array( '#0000ff', '#ffa500' ),
+				),
+			)
+		);
+
+		$expected = '<figure class="wp-block-image size-full is-style-rounded wp-duotone-blue-orange"><img src="/my-image.jpg" /></figure>';
+		$actual   = WP_Duotone_Gutenberg::render_duotone_support( $block_content, $block, $wp_block );
+
+		$global_styles_block_names_property->setValue( $wp_duotone, $previous_block_names );
+		$global_styles_presets_property->setValue( $wp_duotone, $previous_presets );
+		$global_styles_block_names_property->setAccessible( false );
+		$global_styles_presets_property->setAccessible( false );
+
+		$this->assertSame( $expected, $actual );
+	}
+
 
 	/**
 	 * Tests whether the CSS declarations are generated even if the block content is
