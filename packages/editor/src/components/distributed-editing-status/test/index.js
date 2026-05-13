@@ -87,6 +87,11 @@ function setupDistributedEditingStatusDispatch() {
 			.mockResolvedValue( {
 				status: 'ready',
 			} ),
+		__experimentalPrepareDistributedEditingRetrySubmitAfterLocalRebase: jest
+			.fn()
+			.mockResolvedValue( {
+				status: 'prepared',
+			} ),
 		__experimentalRebaseDistributedEditingLocalUpdatesAfterStaleBase: jest
 			.fn()
 			.mockResolvedValue( {
@@ -958,6 +963,56 @@ describe( 'DistributedEditingStatus', () => {
 		expect(
 			await screen.findByText(
 				'Local changes retried over the refreshed server version.'
+			)
+		).toBeVisible();
+	} );
+
+	it( 'prepares retry submit from production editor chrome without saving', async () => {
+		const user = userEvent.setup();
+		const actions = setupDistributedEditingStatusDispatch();
+
+		setupDistributedEditingStatusSelect( {
+			sessionState: {
+				pendingChangeCount: 1,
+				remoteChangeCount: 1,
+				disposition:
+					DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+				reasonCode:
+					DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+				refetchedServerState: true,
+				canExportLocalUpdates: true,
+				localRebasePlanStatus:
+					DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES.READY,
+				localRebaseResultStatus:
+					DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.REBASED,
+				readyToRetrySubmit: true,
+				clientBaseContent:
+					'<!-- wp:paragraph --><p>Base</p><!-- /wp:paragraph -->',
+				refetchedServerContent:
+					'<!-- wp:paragraph --><p>Server</p><!-- /wp:paragraph -->',
+			},
+		} );
+
+		render( <DistributedEditingStatusChrome /> );
+
+		await user.click(
+			screen.getByRole( 'button', {
+				name: 'Prepare retry submit',
+			} )
+		);
+
+		expect(
+			actions.__experimentalPrepareDistributedEditingRetrySubmitAfterLocalRebase
+		).toHaveBeenCalledTimes( 1 );
+		expect(
+			actions.__experimentalSaveDistributedEditingRetryAfterProof
+		).not.toHaveBeenCalled();
+		expect(
+			actions.__experimentalRefreshDistributedEditingServerStateAfterStaleBase
+		).not.toHaveBeenCalled();
+		expect(
+			await screen.findByText(
+				'Retry submit prepared. Save again to request server proof.'
 			)
 		).toBeVisible();
 	} );

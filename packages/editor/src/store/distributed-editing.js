@@ -71,6 +71,7 @@ export const DISTRIBUTED_EDITING_NOTICE_IDS = Object.freeze( {
 export const DISTRIBUTED_EDITING_NOTICE_ACTIONS = Object.freeze( {
 	ACCEPT_SERVER_STATE: 'accept-server-state',
 	EXPORT_LOCAL_UPDATES: 'export-local-updates',
+	PREPARE_RETRY_SUBMIT: 'prepare-retry-submit',
 	REFETCH_SERVER_STATE: 'refetch-server-state',
 	REBASE_LOCAL_UPDATES: 'rebase-local-updates',
 	REVIEW_REMOTE_CHANGES: 'review-remote-changes',
@@ -1016,6 +1017,12 @@ export function getDistributedEditingNoticeDescriptorsForSessionState(
 					hasDistributedEditingLocalRebaseInputs( normalized )
 						? [
 								DISTRIBUTED_EDITING_NOTICE_ACTIONS.REBASE_LOCAL_UPDATES,
+						  ]
+						: [] ),
+					...( normalized.readyToRetrySubmit &&
+					! normalized.retrySubmitPrepared
+						? [
+								DISTRIBUTED_EDITING_NOTICE_ACTIONS.PREPARE_RETRY_SUBMIT,
 						  ]
 						: [] ),
 				],

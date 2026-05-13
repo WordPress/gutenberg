@@ -861,6 +861,7 @@ export default function DistributedEditingStatus( {
 	}, [] );
 	const {
 		__experimentalPlanDistributedEditingLocalRebaseAfterStaleBase,
+		__experimentalPrepareDistributedEditingRetrySubmitAfterLocalRebase,
 		__experimentalRebaseDistributedEditingLocalUpdatesAfterStaleBase,
 		__experimentalRefreshDistributedEditingServerStateAfterStaleBase,
 	} = useDispatch( editorStore ) || {};
@@ -897,6 +898,17 @@ export default function DistributedEditingStatus( {
 						}
 
 						return copiedPayload;
+					}
+					case DISTRIBUTED_EDITING_NOTICE_ACTIONS.PREPARE_RETRY_SUBMIT: {
+						const prepareResult =
+							await __experimentalPrepareDistributedEditingRetrySubmitAfterLocalRebase?.();
+						setActionStatus( {
+							status: 'info',
+							message: __(
+								'Retry submit prepared. Save again to request server proof.'
+							),
+						} );
+						return prepareResult;
 					}
 					case DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFETCH_SERVER_STATE: {
 						const refetchResult =
@@ -943,6 +955,7 @@ export default function DistributedEditingStatus( {
 		},
 		[
 			__experimentalPlanDistributedEditingLocalRebaseAfterStaleBase,
+			__experimentalPrepareDistributedEditingRetrySubmitAfterLocalRebase,
 			__experimentalRebaseDistributedEditingLocalUpdatesAfterStaleBase,
 			__experimentalRefreshDistributedEditingServerStateAfterStaleBase,
 			currentPost,
@@ -977,6 +990,10 @@ function getActionErrorMessage( actionKey ) {
 		case DISTRIBUTED_EDITING_NOTICE_ACTIONS.EXPORT_LOCAL_UPDATES:
 			return __(
 				'Local changes could not be copied. They remain protected in this editor session.'
+			);
+		case DISTRIBUTED_EDITING_NOTICE_ACTIONS.PREPARE_RETRY_SUBMIT:
+			return __(
+				'Retry submit could not be prepared. Local changes remain protected.'
 			);
 		case DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFETCH_SERVER_STATE:
 			return __(
@@ -1214,6 +1231,8 @@ function getActionLabel( actionKey ) {
 			return __( 'Accept server version' );
 		case DISTRIBUTED_EDITING_NOTICE_ACTIONS.EXPORT_LOCAL_UPDATES:
 			return __( 'Export local changes' );
+		case DISTRIBUTED_EDITING_NOTICE_ACTIONS.PREPARE_RETRY_SUBMIT:
+			return __( 'Prepare retry submit' );
 		case DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFETCH_SERVER_STATE:
 			return __( 'Refresh server version' );
 		case DISTRIBUTED_EDITING_NOTICE_ACTIONS.REBASE_LOCAL_UPDATES:
