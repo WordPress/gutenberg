@@ -67,6 +67,14 @@ export interface UseOnThisDayPostResult {
 	 * `true` until the underlying `getEntityRecords` resolver has settled.
 	 */
 	isResolving: boolean;
+
+	/**
+	 * Whether the user has at least one published post overall. Used by
+	 * the surface to bifurcate the empty state between "write your first
+	 * post" (no history) and "broaden the search" (history exists but
+	 * nothing matches the current filter).
+	 */
+	hasAnyPosts: boolean;
 }
 
 /**
@@ -195,6 +203,15 @@ export default function useOnThisDayPost( {
 		( select ) => {
 			const { getEntityRecords, getEntityRecord } = select( coreStore );
 
+			const anyPostsProbe = getEntityRecords( 'postType', 'post', {
+				per_page: 1,
+				status: 'publish',
+				_fields: 'id',
+			} ) as Array< { id: number } > | null;
+			const probeIsResolving = anyPostsProbe === null;
+			const hasAnyPosts =
+				anyPostsProbe !== null && anyPostsProbe.length > 0;
+
 			const dateQuery = buildTimeRangeQuery(
 				timeRange,
 				customDate,
@@ -202,7 +219,11 @@ export default function useOnThisDayPost( {
 			);
 
 			if ( ! dateQuery ) {
-				return { post: null, isResolving: false };
+				return {
+					post: null,
+					isResolving: probeIsResolving,
+					hasAnyPosts,
+				};
 			}
 
 			const records = getEntityRecords( 'postType', 'post', {
@@ -215,13 +236,17 @@ export default function useOnThisDayPost( {
 			} ) as RawPost[] | null;
 
 			if ( records === null ) {
-				return { post: null, isResolving: true };
+				return { post: null, isResolving: true, hasAnyPosts };
 			}
 
 			const raw = records[ 0 ];
 
 			if ( ! raw ) {
-				return { post: null, isResolving: false };
+				return {
+					post: null,
+					isResolving: probeIsResolving,
+					hasAnyPosts,
+				};
 			}
 
 			const mediaId = raw.featured_media ?? 0;
@@ -242,6 +267,7 @@ export default function useOnThisDayPost( {
 					featuredImageUrl: media?.source_url ?? null,
 				},
 				isResolving: false,
+				hasAnyPosts,
 			};
 		},
 		[ timeRange, customDate ]

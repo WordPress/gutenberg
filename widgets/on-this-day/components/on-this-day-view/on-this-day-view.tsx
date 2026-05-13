@@ -58,8 +58,9 @@ export interface OnThisDayViewProps extends UseOnThisDayPostResult {
 export function OnThisDayView( {
 	post,
 	isResolving,
+	hasAnyPosts,
 	effect = 'vintage',
-}: OnThisDayViewProps ) {
+}: OnThisDayViewProps ): React.ReactNode {
 	if ( isResolving ) {
 		return (
 			<Text variant="body-md" aria-busy="true">
@@ -76,21 +77,24 @@ export function OnThisDayView( {
 					{ __( 'Nothing on this day yet' ) }
 				</EmptyState.Title>
 				<EmptyState.Description>
-					{ __( 'Your blogging memories are still being made.' ) }
-					{ __( 'Check back again soon.' ) }
+					{ __(
+						'Your blogging memories are still being made. Check back again soon.'
+					) }
 				</EmptyState.Description>
 
-				<EmptyState.Actions>
-					<Button
-						nativeButton={ false }
-						render={
-							// eslint-disable-next-line jsx-a11y/anchor-has-content -- Button clones this anchor and injects the label as children at render time.
-							<a href={ addQueryArgs( 'post-new.php' ) } />
-						}
-					>
-						{ __( 'Write a new post' ) }
-					</Button>
-				</EmptyState.Actions>
+				{ ! hasAnyPosts && (
+					<EmptyState.Actions>
+						<Button
+							nativeButton={ false }
+							render={
+								// eslint-disable-next-line jsx-a11y/anchor-has-content -- Button clones this anchor and injects the label as children at render time.
+								<a href={ addQueryArgs( 'post-new.php' ) } />
+							}
+						>
+							{ __( 'Write your first post' ) }
+						</Button>
+					</EmptyState.Actions>
+				) }
 			</EmptyState.Root>
 		);
 	}
