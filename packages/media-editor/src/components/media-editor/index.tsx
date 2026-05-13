@@ -273,6 +273,7 @@ function MediaEditorContent( {
 	const {
 		clearEntityRecordEdits,
 		editEntityRecord,
+		invalidateResolution,
 		receiveEntityRecords,
 		saveEditedEntityRecord,
 	} = useDispatch( coreStore );
@@ -316,6 +317,18 @@ function MediaEditorContent( {
 		setIsPlacementActive( false );
 		setIsCanvasGestureActive( false );
 	}, [ id ] );
+
+	// Bust the cached `_embed` resolution each time the editor mounts (or the
+	// id changes) so embedded data such as the attached post's title or the
+	// author's name reflects any edits made elsewhere since the last open.
+	useEffect( () => {
+		invalidateResolution( 'getEntityRecord', [
+			'postType',
+			'attachment',
+			id,
+			{ _embed: 'author,wp:attached-to' },
+		] );
+	}, [ id, invalidateResolution ] );
 
 	const mediaType = getMediaTypeFromMimeType( media?.mime_type ).type;
 	const isImage = !! media && mediaType === 'image';
