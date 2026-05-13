@@ -123,13 +123,8 @@ if ( ! function_exists( 'wp_collaboration_inject_setting' ) ) {
 			function () use ( $option_name ) {
 				$option_value = get_option( $option_name );
 
-				if ( wp_is_collaboration_allowed() ) :
+				if ( ! wp_is_collaboration_allowed() ) :
 					?>
-					<label for="wp_collaboration_enabled">
-						<input name="wp_collaboration_enabled" type="checkbox" id="wp_collaboration_enabled" value="1" <?php checked( '1', $option_value ); ?>/>
-						<?php _e( "Enable early access to real-time collaboration. Real-time collaboration may affect your website's performance.", 'gutenberg' ); ?>
-					</label>
-				<?php else : ?>
 					<div class="notice notice-warning inline">
 						<?php
 						printf(
@@ -139,6 +134,27 @@ if ( ! function_exists( 'wp_collaboration_inject_setting' ) ) {
 						);
 						?>
 					</div>
+				<?php elseif ( ! wp_revisions_are_globally_supported() ) : ?>
+					<div class="notice notice-warning inline">
+						<?php
+						printf(
+								/* translators: %s: Prefix "Note:". */
+							'<p>' . __( '%s Real-time collaboration requires post revisions. Enable revisions in your site configuration to use collaboration.', 'gutenberg' ) . '</p>',
+							'<strong>' . __( 'Note:', 'gutenberg' ) . '</strong>'
+						);
+						?>
+					</div>
+					<p>
+						<label for="wp_collaboration_enabled">
+							<input name="wp_collaboration_enabled_disabled" type="checkbox" id="wp_collaboration_enabled" disabled="disabled" <?php checked( '1', $option_value ); ?>/>
+							<?php _e( "Enable early access to real-time collaboration. Real-time collaboration may affect your website's performance.", 'gutenberg' ); ?>
+						</label>
+					</p>
+				<?php else : ?>
+					<label for="wp_collaboration_enabled">
+						<input name="wp_collaboration_enabled" type="checkbox" id="wp_collaboration_enabled" value="1" <?php checked( '1', $option_value ); ?>/>
+						<?php _e( "Enable early access to real-time collaboration. Real-time collaboration may affect your website's performance.", 'gutenberg' ); ?>
+					</label>
 					<?php
 				endif;
 			},
@@ -148,6 +164,31 @@ if ( ! function_exists( 'wp_collaboration_inject_setting' ) ) {
 	add_action( 'admin_init', 'gutenberg_register_real_time_collaboration_setting' );
 }
 
+if ( ! function_exists( 'wp_revisions_are_globally_supported' ) ) {
+	/**
+	 * Determines whether post revisions are enabled site-wide.
+	 *
+	 * When {@see WP_POST_REVISIONS} is false or 0, WordPress does not store
+	 * revisions. Real-time collaboration depends on revision-related flows and
+	 * must remain off in that configuration.
+	 *
+	 * @since 7.0.0
+	 *
+	 * @return bool Whether revisions are globally supported.
+	 */
+	function wp_revisions_are_globally_supported() {
+		if ( ! defined( 'WP_POST_REVISIONS' ) ) {
+			return true;
+		}
+
+		if ( false === WP_POST_REVISIONS ) {
+			return false;
+		}
+
+		return 0 !== (int) WP_POST_REVISIONS;
+	}
+}
+
 if ( ! function_exists( 'wp_is_collaboration_enabled' ) ) {
 	/**
 	 * Determines whether real-time collaboration is enabled.
@@ -155,13 +196,19 @@ if ( ! function_exists( 'wp_is_collaboration_enabled' ) ) {
 	 * If the WP_ALLOW_COLLABORATION constant is false,
 	 * collaboration is always disabled regardless of the database option.
 	 * Otherwise, falls back to the 'wp_collaboration_enabled' option.
+	 * Collaboration is also disabled when post revisions are turned off
+	 * site-wide (see {@see wp_revisions_are_globally_supported()}).
 	 *
 	 * @since 7.0.0
 	 *
 	 * @return bool Whether real-time collaboration is enabled.
 	 */
 	function wp_is_collaboration_enabled() {
-		return ( wp_is_collaboration_allowed() && (bool) get_option( 'wp_collaboration_enabled' ) );
+		return (
+			wp_is_collaboration_allowed() &&
+			(bool) get_option( 'wp_collaboration_enabled' ) &&
+			wp_revisions_are_globally_supported()
+		);
 	}
 }
 
