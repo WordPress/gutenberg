@@ -264,16 +264,9 @@ function ContentOnlyControls( {
 	);
 }
 
-function getAltHelp( {
-	lockAltControls,
-	lockAltControlsMessage,
-	isDecorative,
-} ) {
+function getAltHelp( { lockAltControls, lockAltControlsMessage } ) {
 	if ( lockAltControls ) {
 		return <>{ lockAltControlsMessage }</>;
-	}
-	if ( isDecorative ) {
-		return __( 'Alternative text is not required for decorative images.' );
 	}
 	return (
 		<>
@@ -287,8 +280,6 @@ function getAltHelp( {
 			>
 				{ __( 'Describe the purpose of the image.' ) }
 			</ExternalLink>
-			<br />
-			{ __( 'Leave empty if decorative.' ) }
 		</>
 	);
 }
@@ -1028,7 +1019,6 @@ export default function Image( {
 									help={ getAltHelp( {
 										lockAltControls,
 										lockAltControlsMessage,
-										isDecorative,
 									} ) }
 								/>
 							</ToolsPanelItem>
