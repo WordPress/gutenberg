@@ -73,6 +73,7 @@ export const DISTRIBUTED_EDITING_NOTICE_ACTIONS = Object.freeze( {
 	EXPORT_LOCAL_UPDATES: 'export-local-updates',
 	PREPARE_RETRY_SUBMIT: 'prepare-retry-submit',
 	REFETCH_SERVER_STATE: 'refetch-server-state',
+	REFRESH_RETRY_SUBMIT_PROOF: 'refresh-retry-submit-proof',
 	REBASE_LOCAL_UPDATES: 'rebase-local-updates',
 	REVIEW_REMOTE_CHANGES: 'review-remote-changes',
 } );
@@ -1023,6 +1024,13 @@ export function getDistributedEditingNoticeDescriptorsForSessionState(
 					! normalized.retrySubmitPrepared
 						? [
 								DISTRIBUTED_EDITING_NOTICE_ACTIONS.PREPARE_RETRY_SUBMIT,
+						  ]
+						: [] ),
+					...( normalized.retrySubmitPrepared &&
+					normalized.retrySubmitProofStatus !==
+						DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.ACCEPTED_FOR_FUTURE_SAVE
+						? [
+								DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFRESH_RETRY_SUBMIT_PROOF,
 						  ]
 						: [] ),
 				],

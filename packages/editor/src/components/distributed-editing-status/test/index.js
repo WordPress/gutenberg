@@ -92,6 +92,11 @@ function setupDistributedEditingStatusDispatch() {
 			.mockResolvedValue( {
 				status: 'prepared',
 			} ),
+		__experimentalRefreshDistributedEditingRetrySubmitProof: jest
+			.fn()
+			.mockResolvedValue( {
+				result: 'retry_submit_accepted_for_future_save',
+			} ),
 		__experimentalRebaseDistributedEditingLocalUpdatesAfterStaleBase: jest
 			.fn()
 			.mockResolvedValue( {
@@ -1012,7 +1017,62 @@ describe( 'DistributedEditingStatus', () => {
 		).not.toHaveBeenCalled();
 		expect(
 			await screen.findByText(
-				'Retry submit prepared. Save again to request server proof.'
+				'Retry submit prepared. Request server proof when ready.'
+			)
+		).toBeVisible();
+	} );
+
+	it( 'refreshes retry-submit proof from production editor chrome without saving', async () => {
+		const user = userEvent.setup();
+		const actions = setupDistributedEditingStatusDispatch();
+
+		setupDistributedEditingStatusSelect( {
+			sessionState: {
+				pendingChangeCount: 1,
+				remoteChangeCount: 1,
+				disposition:
+					DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+				reasonCode:
+					DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+				refetchedServerState: true,
+				canExportLocalUpdates: true,
+				localRebasePlanStatus:
+					DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES.READY,
+				localRebaseResultStatus:
+					DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.REBASED,
+				retrySubmitHandoffStatus:
+					DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_STATUSES.PREPARED,
+				retrySubmitPrepared: true,
+				clientBaseContent:
+					'<!-- wp:paragraph --><p>Base</p><!-- /wp:paragraph -->',
+				refetchedServerContent:
+					'<!-- wp:paragraph --><p>Server</p><!-- /wp:paragraph -->',
+			},
+		} );
+
+		render( <DistributedEditingStatusChrome /> );
+
+		await user.click(
+			screen.getByRole( 'button', {
+				name: 'Refresh retry proof',
+			} )
+		);
+
+		expect(
+			actions.__experimentalRefreshDistributedEditingRetrySubmitProof
+		).toHaveBeenCalledTimes( 1 );
+		expect(
+			actions.__experimentalSaveDistributedEditingRetryAfterProof
+		).not.toHaveBeenCalled();
+		expect(
+			actions.__experimentalRefreshDistributedEditingServerStateAfterStaleBase
+		).not.toHaveBeenCalled();
+		expect(
+			actions.__experimentalPrepareDistributedEditingRetrySubmitAfterLocalRebase
+		).not.toHaveBeenCalled();
+		expect(
+			await screen.findByText(
+				'Retry submit proof refreshed. Save again to continue through the guarded retry path.'
 			)
 		).toBeVisible();
 	} );

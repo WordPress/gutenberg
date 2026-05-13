@@ -1696,6 +1696,41 @@ describe( 'distributed editing session state', () => {
 		} );
 	} );
 
+	it( 'adds retry-submit proof refresh action after prepared handoff', () => {
+		const notices = getDistributedEditingNoticeDescriptorsForSessionState( {
+			disposition:
+				DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+			reasonCode:
+				DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+			pendingChangeCount: 1,
+			remoteChangeCount: 1,
+			requiresServerStateRefetch: false,
+			refetchedServerState: true,
+			canExportLocalUpdates: true,
+			localRebasePlanStatus:
+				DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES.READY,
+			localRebaseResultStatus:
+				DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.REBASED,
+			retrySubmitHandoffStatus:
+				DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_STATUSES.PREPARED,
+			retrySubmitPrepared: true,
+			clientBaseContent: '',
+			refetchedServerContent: '',
+		} );
+
+		expect( notices[ 0 ] ).toMatchObject( {
+			kind: DISTRIBUTED_EDITING_NOTICE_KINDS.STALE_BASE_REJECTED,
+			retrySubmitHandoffStatus:
+				DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_STATUSES.PREPARED,
+			retrySubmitPrepared: true,
+			actionKeys: [
+				DISTRIBUTED_EDITING_NOTICE_ACTIONS.EXPORT_LOCAL_UPDATES,
+				DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFETCH_SERVER_STATE,
+				DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFRESH_RETRY_SUBMIT_PROOF,
+			],
+		} );
+	} );
+
 	it( 'builds unload-warning integration state without rendered copy', () => {
 		const warningState =
 			getDistributedEditingUnloadWarningStateForSessionState( {

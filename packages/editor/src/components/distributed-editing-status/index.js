@@ -863,6 +863,7 @@ export default function DistributedEditingStatus( {
 		__experimentalPlanDistributedEditingLocalRebaseAfterStaleBase,
 		__experimentalPrepareDistributedEditingRetrySubmitAfterLocalRebase,
 		__experimentalRebaseDistributedEditingLocalUpdatesAfterStaleBase,
+		__experimentalRefreshDistributedEditingRetrySubmitProof,
 		__experimentalRefreshDistributedEditingServerStateAfterStaleBase,
 	} = useDispatch( editorStore ) || {};
 	const handleAction = useCallback(
@@ -905,10 +906,21 @@ export default function DistributedEditingStatus( {
 						setActionStatus( {
 							status: 'info',
 							message: __(
-								'Retry submit prepared. Save again to request server proof.'
+								'Retry submit prepared. Request server proof when ready.'
 							),
 						} );
 						return prepareResult;
+					}
+					case DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFRESH_RETRY_SUBMIT_PROOF: {
+						const proofResult =
+							await __experimentalRefreshDistributedEditingRetrySubmitProof?.();
+						setActionStatus( {
+							status: 'info',
+							message: __(
+								'Retry submit proof refreshed. Save again to continue through the guarded retry path.'
+							),
+						} );
+						return proofResult;
 					}
 					case DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFETCH_SERVER_STATE: {
 						const refetchResult =
@@ -957,6 +969,7 @@ export default function DistributedEditingStatus( {
 			__experimentalPlanDistributedEditingLocalRebaseAfterStaleBase,
 			__experimentalPrepareDistributedEditingRetrySubmitAfterLocalRebase,
 			__experimentalRebaseDistributedEditingLocalUpdatesAfterStaleBase,
+			__experimentalRefreshDistributedEditingRetrySubmitProof,
 			__experimentalRefreshDistributedEditingServerStateAfterStaleBase,
 			currentPost,
 			editedPostContent,
@@ -994,6 +1007,10 @@ function getActionErrorMessage( actionKey ) {
 		case DISTRIBUTED_EDITING_NOTICE_ACTIONS.PREPARE_RETRY_SUBMIT:
 			return __(
 				'Retry submit could not be prepared. Local changes remain protected.'
+			);
+		case DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFRESH_RETRY_SUBMIT_PROOF:
+			return __(
+				'Retry submit proof could not be refreshed. Local changes remain protected.'
 			);
 		case DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFETCH_SERVER_STATE:
 			return __(
@@ -1233,6 +1250,8 @@ function getActionLabel( actionKey ) {
 			return __( 'Export local changes' );
 		case DISTRIBUTED_EDITING_NOTICE_ACTIONS.PREPARE_RETRY_SUBMIT:
 			return __( 'Prepare retry submit' );
+		case DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFRESH_RETRY_SUBMIT_PROOF:
+			return __( 'Refresh retry proof' );
 		case DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFETCH_SERVER_STATE:
 			return __( 'Refresh server version' );
 		case DISTRIBUTED_EDITING_NOTICE_ACTIONS.REBASE_LOCAL_UPDATES:
