@@ -1011,26 +1011,28 @@ export default function Image( {
 								/>
 							</ToolsPanelItem>
 						) }
-						<ToolsPanelItem
-							label={ __( 'Alternative text' ) }
-							isShownByDefault
-							hasValue={ () => !! alt }
-							onDeselect={ () =>
-								setAttributes( { alt: undefined } )
-							}
-						>
-							<TextareaControl
+						{ ! isDecorative && (
+							<ToolsPanelItem
 								label={ __( 'Alternative text' ) }
-								value={ alt || '' }
-								onChange={ updateAlt }
-								readOnly={ lockAltControls || isDecorative }
-								help={ getAltHelp( {
-									lockAltControls,
-									lockAltControlsMessage,
-									isDecorative,
-								} ) }
-							/>
-						</ToolsPanelItem>
+								isShownByDefault
+								hasValue={ () => !! alt }
+								onDeselect={ () =>
+									setAttributes( { alt: undefined } )
+								}
+							>
+								<TextareaControl
+									label={ __( 'Alternative text' ) }
+									value={ alt || '' }
+									onChange={ updateAlt }
+									readOnly={ lockAltControls }
+									help={ getAltHelp( {
+										lockAltControls,
+										lockAltControlsMessage,
+										isDecorative,
+									} ) }
+								/>
+							</ToolsPanelItem>
+						) }
 						{ ! lockAltControls && ! lightboxChecked && (
 							<ToolsPanelItem
 								label={ __( 'Mark as decorative' ) }
