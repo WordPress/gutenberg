@@ -65,6 +65,11 @@ const METADATA_EDIT_KEYS = [
 	'post',
 ] as const;
 
+// Embed query for the attachment's author and parent post. Shared between
+// the `getEntityRecord` read and the matching `invalidateResolution` so the
+// two stay in lockstep.
+const ATTACHMENT_EMBED_QUERY = { _embed: 'author,wp:attached-to' } as const;
+
 // Scope save-failure snackbars so they don't leak into the host editor/page.
 const NOTICES_CONTEXT = 'media-editor';
 const PLACEMENT_CONTROL_IDLE_MS = 300;
@@ -239,8 +244,21 @@ function MediaEditorContent( {
 
 	const { media, hasEdits } = useSelect(
 		( select ) => {
-			const { getEditedEntityRecord, hasEditsForEntityRecord } =
-				select( coreStore );
+			const {
+				getEditedEntityRecord,
+				getEntityRecord,
+				hasEditsForEntityRecord,
+			} = select( coreStore );
+			// Trigger an _embed fetch so `_embedded.author` and
+			// `_embedded['wp:attached-to']` land on the record for the Details
+			// fields to read. `getEditedEntityRecord` doesn't formally accept a
+			// query, so we can't embed via that selector directly.
+			getEntityRecord(
+				'postType',
+				'attachment',
+				id,
+				ATTACHMENT_EMBED_QUERY
+			);
 			return {
 				media: getEditedEntityRecord(
 					'postType',
@@ -263,6 +281,7 @@ function MediaEditorContent( {
 	const {
 		clearEntityRecordEdits,
 		editEntityRecord,
+		invalidateResolution,
 		receiveEntityRecords,
 		saveEditedEntityRecord,
 	} = useDispatch( coreStore );
@@ -306,6 +325,18 @@ function MediaEditorContent( {
 		setIsPlacementActive( false );
 		setIsCanvasGestureActive( false );
 	}, [ id ] );
+
+	// Bust the cached `_embed` resolution each time the editor mounts (or the
+	// id changes) so embedded data such as the attached post's title or the
+	// author's name reflects any edits made elsewhere since the last open.
+	useEffect( () => {
+		invalidateResolution( 'getEntityRecord', [
+			'postType',
+			'attachment',
+			id,
+			ATTACHMENT_EMBED_QUERY,
+		] );
+	}, [ id, invalidateResolution ] );
 
 	const mediaType = getMediaTypeFromMimeType( media?.mime_type ).type;
 	const isImage = !! media && mediaType === 'image';
@@ -424,6 +455,17 @@ function MediaEditorContent( {
 					if ( pendingEdits && key in pendingEdits ) {
 						metadataEdits[ key ] = pendingEdits[ key ];
 					}
+				}
+				// The `/edit` endpoint creates a new attachment for the crop
+				// and doesn't inherit `post_parent` from the source (unlike
+				// title/caption/etc.), so carry the existing value across when
+				// the user hasn't explicitly edited it. Use a defined-check so
+				// an explicit `0` (unattached) is also preserved.
+				if (
+					! ( 'post' in metadataEdits ) &&
+					media?.post !== undefined
+				) {
+					metadataEdits.post = media.post;
 				}
 
 				saved = ( await apiFetch( {
