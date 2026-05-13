@@ -1079,6 +1079,77 @@ describe( 'DistributedEditingStatus', () => {
 		).toBeVisible();
 	} );
 
+	it( 'surfaces blocked retry-save refetch as a production chrome action transition', async () => {
+		const user = userEvent.setup();
+		const actions = setupDistributedEditingStatusDispatch();
+		const onAction = jest.fn();
+
+		setupDistributedEditingStatusSelect( {
+			sessionState: {
+				pendingChangeCount: 1,
+				hasPendingChanges: true,
+				canExportLocalUpdates: true,
+				requiresServerStateRefetch: true,
+				retrySaveHandoffStatus:
+					DISTRIBUTED_EDITING_RETRY_SAVE_HANDOFF_STATUSES.RETRY_SAVE_BLOCKED,
+				retrySaveHandoffReason:
+					DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.SERVER_STATE_REFETCH_REQUIRED,
+				retrySaveHandoffBlocksNormalSave: true,
+			},
+		} );
+
+		render( <DistributedEditingStatusChrome onAction={ onAction } /> );
+
+		const statusChrome = screen.getByRole( 'region', {
+			name: 'Distributed editing status',
+		} );
+
+		expect( statusChrome ).toHaveAttribute(
+			'data-distributed-editing-placement',
+			'editor-interface-notices'
+		);
+		expect(
+			screen.getByText( 'Retry save needs server refresh' )
+		).toBeVisible();
+		expect(
+			screen.getByRole( 'button', {
+				name: 'Export local changes',
+			} )
+		).toBeVisible();
+
+		await user.click(
+			screen.getByRole( 'button', {
+				name: 'Refresh server version',
+			} )
+		);
+
+		expect( onAction ).toHaveBeenCalledWith(
+			DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFETCH_SERVER_STATE,
+			expect.objectContaining( {
+				kind: DISTRIBUTED_EDITING_NOTICE_KINDS.RETRY_SAVE,
+				actionKeys: expect.arrayContaining( [
+					DISTRIBUTED_EDITING_NOTICE_ACTIONS.EXPORT_LOCAL_UPDATES,
+					DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFETCH_SERVER_STATE,
+				] ),
+			} )
+		);
+		expect(
+			actions.__experimentalRefreshDistributedEditingServerStateAfterStaleBase
+		).toHaveBeenCalledTimes( 1 );
+		expect(
+			actions.__experimentalSaveDistributedEditingRetryAfterProof
+		).not.toHaveBeenCalled();
+		expect( await screen.findByRole( 'status' ) ).toHaveAttribute(
+			'data-distributed-editing-action-status',
+			'info'
+		);
+		expect(
+			screen.getByText(
+				'Server version refreshed. Review local changes before retrying.'
+			)
+		).toBeVisible();
+	} );
+
 	it( 'plans local rebase from production editor chrome when inputs are not ready', async () => {
 		const user = userEvent.setup();
 		const actions = setupDistributedEditingStatusDispatch();
