@@ -39,6 +39,43 @@ import {
 
 const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
 
+// Sentinel that sorts a block-level (whole-block) note before any inline note
+// within the same block. Negative so any real character offset (>= 0) ranks
+// after it. Number.NEGATIVE_INFINITY would work too; -1 is enough and keeps
+// the diff arithmetic in safe integers.
+export const BLOCK_LEVEL_NOTE_START = -1;
+
+/**
+ * Resolve an inline note's character offset in its block so threads can be
+ * sorted by reading order. Block-level notes (whose meta carries no inline
+ * selection) sort first within their block via a sentinel.
+ *
+ * @param {Object}  thread     Materialized thread record (with `.id` and `.meta`).
+ * @param {?Object} attributes Block attributes for the thread's block.
+ * @return {number} Marker start offset, or `BLOCK_LEVEL_NOTE_START` when there is no inline anchor.
+ */
+export function getInlineMarkerStart( thread, attributes ) {
+	const selection =
+		thread?.meta?._wp_note_selection &&
+		! Array.isArray( thread.meta._wp_note_selection )
+			? thread.meta._wp_note_selection
+			: null;
+	const attributeKey = selection?.attributeKey;
+	if ( ! attributeKey || ! attributes ) {
+		return BLOCK_LEVEL_NOTE_START;
+	}
+	const range = findNoteRange( attributes[ attributeKey ], thread.id );
+	if ( range ) {
+		return range.start;
+	}
+	// Inline note whose marker has been stripped (e.g. by an undo). Fall back
+	// to the stored offset, then to the block-level sentinel.
+	if ( Number.isInteger( selection.start ) ) {
+		return selection.start;
+	}
+	return BLOCK_LEVEL_NOTE_START;
+}
+
 export function useNoteThreads( postId ) {
 	const queryArgs = {
 		post: postId,
@@ -115,16 +152,36 @@ export function useNoteThreads( postId ) {
 			return { notes: [], unresolvedNotes: [] };
 		}
 
-		// Single partition over notes-in-block-order. Each block can have
-		// multiple note IDs, so iterate the flattened list.
+		// Order within a block: block-level notes (no inline anchor) come
+		// first as the "overall comment", then inline notes ascending by
+		// marker start offset. Ties (rare; two markers at the same offset)
+		// fall back to creation order via thread id. Blocks themselves are
+		// already iterated in document order above.
 		const unresolved = [];
 		const resolved = [];
-		for ( const noteIds of Object.values( blocksWithNotes ) ) {
-			for ( const noteId of noteIds ) {
-				const thread = threadsById.get( noteId );
-				if ( ! thread ) {
-					continue;
-				}
+		for ( const [ clientId, noteIds ] of Object.entries(
+			blocksWithNotes
+		) ) {
+			const attributes = getBlockAttributes( clientId );
+			const orderedThreads = noteIds
+				.map( ( noteId ) => {
+					const thread = threadsById.get( noteId );
+					if ( ! thread ) {
+						return null;
+					}
+					return {
+						thread,
+						start: getInlineMarkerStart( thread, attributes ),
+					};
+				} )
+				.filter( Boolean )
+				.sort( ( a, b ) => {
+					if ( a.start !== b.start ) {
+						return a.start - b.start;
+					}
+					return a.thread.id - b.thread.id;
+				} );
+			for ( const { thread } of orderedThreads ) {
 				if ( thread.status === 'hold' ) {
 					unresolved.push( thread );
 				} else if ( thread.status === 'approved' ) {
