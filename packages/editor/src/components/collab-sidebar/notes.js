@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useEffect, useMemo, useRef } from '@wordpress/element';
+import { Fragment, useEffect, useMemo, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { Stack } from '@wordpress/ui';
@@ -267,33 +267,57 @@ export function Notes( { notes, sidebarRef, isFloating = false, styles } ) {
 							sidebarRef={ sidebarRef }
 						/>
 					) }
-					{ threads.map( ( thread ) => (
-						<NoteThread
-							key={ thread.id }
-							note={ thread }
-							onAddReply={ onAddReply }
-							onDeleteNote={ handleDelete }
-							onEditNote={ onEditNote }
-							isSelected={ selectedNote === thread.id }
-							sidebarRef={ sidebarRef }
-							floating={
-								isFloating
-									? {
-											y: notePositions[ thread.id ],
-											registerThread,
-											unregisterThread,
-									  }
-									: undefined
-							}
-							onKeyDown={ ( event ) =>
-								navigate(
-									event,
-									thread,
-									selectedNote === thread.id
-								)
-							}
-						/>
-					) ) }
+					{ threads.map( ( thread, index ) => {
+						// In the All notes sidebar, insert a separator between
+						// the last unresolved thread and the first resolved
+						// thread. `useNoteThreads` returns threads already
+						// partitioned in that order, so a single status flip
+						// is enough to locate the boundary.
+						const showResolvedDivider =
+							! isFloating &&
+							thread.status === 'approved' &&
+							( index === 0 ||
+								threads[ index - 1 ].status !== 'approved' );
+
+						return (
+							<Fragment key={ thread.id }>
+								{ showResolvedDivider && (
+									<div
+										className="editor-collab-sidebar-panel__resolved-divider"
+										role="presentation"
+									>
+										<span>{ __( 'Resolved' ) }</span>
+									</div>
+								) }
+								<NoteThread
+									note={ thread }
+									onAddReply={ onAddReply }
+									onDeleteNote={ handleDelete }
+									onEditNote={ onEditNote }
+									isSelected={ selectedNote === thread.id }
+									sidebarRef={ sidebarRef }
+									floating={
+										isFloating
+											? {
+													y: notePositions[
+														thread.id
+													],
+													registerThread,
+													unregisterThread,
+											  }
+											: undefined
+									}
+									onKeyDown={ ( event ) =>
+										navigate(
+											event,
+											thread,
+											selectedNote === thread.id
+										)
+									}
+								/>
+							</Fragment>
+						);
+					} ) }
 				</>
 			) }
 		</Stack>

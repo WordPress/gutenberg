@@ -236,3 +236,25 @@
 	text-overflow: ellipsis;
 	white-space: nowrap;
 }
+
+// Visual separator between unresolved and resolved threads in the All notes
+// sidebar (per Joen's mock in #76316). The label sits on a horizontal rule
+// so the threshold reads clearly without taking a full row of space.
+.editor-collab-sidebar-panel__resolved-divider {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	margin: 8px 0;
+	font-size: $helptext-font-size;
+	font-weight: 500;
+	color: $gray-700;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+
+	&::after {
+		content: "";
+		flex: 1;
+		height: 1px;
+		background-color: $gray-200;
+	}
+}
