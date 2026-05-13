@@ -18,6 +18,7 @@ import { store as noticesStore } from '@wordpress/notices';
 import { getScrollContainer } from '@wordpress/dom';
 import { decodeEntities } from '@wordpress/html-entities';
 import { store as interfaceStore } from '@wordpress/interface';
+import { RichTextData, applyFormat, create } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
@@ -26,6 +27,7 @@ import { store as editorStore } from '../../store';
 import { FLOATING_NOTES_SIDEBAR } from './constants';
 import { unlock } from '../../lock-unlock';
 import { createBoardStore } from './board-store';
+import { NOTE_FORMAT_NAME } from './format';
 import {
 	calculateNotePositions,
 	getNoteIdsFromMetadata,
@@ -146,12 +148,75 @@ export function useNoteThreads( postId ) {
 	};
 }
 
+/**
+ * Read an inline selection from block-editor selection state, returning
+ * normalized anchor data when a non-collapsed selection sits inside a single
+ * rich-text attribute. Returns null for block-level or collapsed selections.
+ *
+ * @param {Function} getSelectionStart Block-editor selector.
+ * @param {Function} getSelectionEnd   Block-editor selector.
+ * @return {?Object} { clientId, attributeKey, start, end } or null.
+ */
+function readInlineSelection( getSelectionStart, getSelectionEnd ) {
+	const start = getSelectionStart();
+	const end = getSelectionEnd();
+	if (
+		! start?.clientId ||
+		start.clientId !== end.clientId ||
+		! start.attributeKey ||
+		start.offset === undefined ||
+		end.offset === undefined ||
+		start.offset === end.offset
+	) {
+		return null;
+	}
+	// Normalize direction so callers don't have to think about reversed ranges.
+	const [ startOffset, endOffset ] =
+		start.offset < end.offset
+			? [ start.offset, end.offset ]
+			: [ end.offset, start.offset ];
+	return {
+		clientId: start.clientId,
+		attributeKey: start.attributeKey,
+		start: startOffset,
+		end: endOffset,
+	};
+}
+
+/**
+ * Wrap a rich-text range with a core/note marker. Returns a new
+ * RichTextData ready to write back into block attributes, or null when the
+ * incoming value isn't a rich-text instance (legacy/string attributes).
+ *
+ * @param {*}      value Existing block attribute value.
+ * @param {number} id    New note id to embed as `data-id`.
+ * @param {number} start Range start offset.
+ * @param {number} end   Range end offset.
+ * @return {?RichTextData} Wrapped value or null when the attribute isn't rich text.
+ */
+function wrapInlineNote( value, id, start, end ) {
+	if ( ! ( value instanceof RichTextData ) ) {
+		return null;
+	}
+	const record = applyFormat(
+		create( { html: value.toHTMLString() } ),
+		{ type: NOTE_FORMAT_NAME, attributes: { 'data-id': String( id ) } },
+		start,
+		end
+	);
+	return new RichTextData( record );
+}
+
 export function useNoteActions() {
 	const { createNotice } = useDispatch( noticesStore );
 	const { saveEntityRecord, deleteEntityRecord } = useDispatch( coreStore );
 	const { getCurrentPostId } = useSelect( editorStore );
-	const { getBlockAttributes, getSelectedBlockClientId } =
-		useSelect( blockEditorStore );
+	const {
+		getBlockAttributes,
+		getSelectedBlockClientId,
+		getSelectionStart,
+		getSelectionEnd,
+	} = useSelect( blockEditorStore );
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
 	const onError = ( error ) => {
@@ -167,6 +232,13 @@ export function useNoteActions() {
 
 	const onCreate = async ( { content, parent } ) => {
 		try {
+			// Capture inline selection *before* the async save: focus may shift
+			// during the round-trip and the editor's stored selection can
+			// collapse if the user clicks elsewhere.
+			const inlineSelection = ! parent
+				? readInlineSelection( getSelectionStart, getSelectionEnd )
+				: null;
+
 			const savedRecord = await saveEntityRecord(
 				'root',
 				'comment',
@@ -176,6 +248,18 @@ export function useNoteActions() {
 					status: 'hold',
 					type: 'note',
 					parent: parent || 0,
+					...( inlineSelection
+						? {
+								meta: {
+									_wp_note_selection: {
+										attributeKey:
+											inlineSelection.attributeKey,
+										start: inlineSelection.start,
+										end: inlineSelection.end,
+									},
+								},
+						  }
+						: {} ),
 				},
 				{ throwOnError: true }
 			);
@@ -186,18 +270,36 @@ export function useNoteActions() {
 			// a 2-element array and the later write wins, dropping the other
 			// id. Tracking issue: https://github.com/WordPress/gutenberg/issues/74751.
 			if ( ! parent && savedRecord?.id ) {
-				const clientId = getSelectedBlockClientId();
+				const clientId =
+					inlineSelection?.clientId || getSelectedBlockClientId();
 				if ( ! clientId ) {
 					return savedRecord;
 				}
-				const metadata = getBlockAttributes( clientId )?.metadata;
+				const attributes = getBlockAttributes( clientId );
+				const metadata = attributes?.metadata;
 				const updatedMetadata = addNoteIdToMetadata(
 					metadata,
 					savedRecord.id
 				);
-				updateBlockAttributes( clientId, {
+				const newAttributes = {
 					metadata: cleanEmptyObject( updatedMetadata ),
-				} );
+				};
+
+				// Inline path: also wrap the selected text with a core/note
+				// marker so the anchor survives later edits.
+				if ( inlineSelection ) {
+					const wrapped = wrapInlineNote(
+						attributes?.[ inlineSelection.attributeKey ],
+						savedRecord.id,
+						inlineSelection.start,
+						inlineSelection.end
+					);
+					if ( wrapped ) {
+						newAttributes[ inlineSelection.attributeKey ] = wrapped;
+					}
+				}
+
+				updateBlockAttributes( clientId, newAttributes );
 			}
 
 			createNotice(
