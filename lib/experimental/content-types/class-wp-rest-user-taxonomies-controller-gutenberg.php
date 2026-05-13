@@ -137,6 +137,13 @@ class WP_REST_User_Taxonomies_Controller_Gutenberg extends WP_REST_Posts_Control
 			)
 		);
 
+		$schema['properties']['count'] = array(
+			'description' => __( 'Number of terms in this taxonomy.', 'gutenberg' ),
+			'type'        => 'integer',
+			'context'     => array( 'view', 'edit' ),
+			'readonly'    => true,
+		);
+
 		$this->schema = $schema;
 		return $this->add_additional_fields_schema( $this->schema );
 	}
@@ -169,6 +176,18 @@ class WP_REST_User_Taxonomies_Controller_Gutenberg extends WP_REST_Posts_Control
 
 		if ( rest_is_field_included( 'object_type', $fields ) ) {
 			$data['object_type'] = gutenberg_user_taxonomy_read_object_type( $item->ID );
+		}
+
+		if ( rest_is_field_included( 'count', $fields ) && 'publish' === $item->post_status ) {
+			// Drafts aren't registered, so the count is undefined — omit the
+			// field rather than report a value the server can't vouch for.
+			$count         = wp_count_terms(
+				array(
+					'taxonomy'   => $item->post_name,
+					'hide_empty' => false,
+				)
+			);
+			$data['count'] = is_wp_error( $count ) ? 0 : (int) $count;
 		}
 
 		$response->set_data( $data );

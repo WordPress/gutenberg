@@ -89,7 +89,7 @@ $sticky-header-clearance: 120px;
 	@media (max-width: 680px) {
 		.ai-plugin-callout {
 			padding: 12px;
-			padding-inline-end: 84px;
+			padding-inline-end: 145px;
 
 			&__decoration {
 				width: 134px;
@@ -102,6 +102,10 @@ $sticky-header-clearance: 120px;
 
 	@media (max-width: 480px) {
 		padding: 8px;
+
+		.ai-plugin-callout {
+			padding-inline-end: 130px;
+		}
 
 		.components-item {
 			padding: 12px;
