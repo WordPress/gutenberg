@@ -72,6 +72,7 @@ export const DISTRIBUTED_EDITING_NOTICE_ACTIONS = Object.freeze( {
 	ACCEPT_SERVER_STATE: 'accept-server-state',
 	EXPORT_LOCAL_UPDATES: 'export-local-updates',
 	PREPARE_RETRY_SUBMIT: 'prepare-retry-submit',
+	PREPARE_RETRY_SUBMIT_SAVE: 'prepare-retry-submit-save',
 	REFETCH_SERVER_STATE: 'refetch-server-state',
 	REFRESH_RETRY_SUBMIT_PROOF: 'refresh-retry-submit-proof',
 	REBASE_LOCAL_UPDATES: 'rebase-local-updates',
@@ -1116,6 +1117,15 @@ export function getDistributedEditingNoticeDescriptorsForSessionState(
 				kind: DISTRIBUTED_EDITING_NOTICE_KINDS.PENDING_CHANGES,
 				status: 'info',
 				priority: 'status',
+				actionKeys: [
+					...( canPrepareDistributedEditingRetrySubmitSaveFromStatusChrome(
+						normalized
+					)
+						? [
+								DISTRIBUTED_EDITING_NOTICE_ACTIONS.PREPARE_RETRY_SUBMIT_SAVE,
+						  ]
+						: [] ),
+				],
 				extra: getDistributedEditingRetrySubmitProofDescriptorFields(
 					normalized
 				),
@@ -1139,6 +1149,22 @@ export function getDistributedEditingNoticeDescriptorsForSessionState(
 	}
 
 	return descriptors;
+}
+
+function canPrepareDistributedEditingRetrySubmitSaveFromStatusChrome(
+	normalized
+) {
+	return (
+		normalized.retrySubmitProofStatus ===
+			DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.ACCEPTED_FOR_FUTURE_SAVE &&
+		normalized.retrySubmitAccepted &&
+		normalized.retrySubmitSavePathRequired &&
+		! normalized.retrySubmitSavePrepared &&
+		! normalized.retrySubmitSavesPost &&
+		! normalized.retrySubmitMutatesPostContent &&
+		! normalized.retrySubmitCreatesRevision &&
+		! normalized.retrySubmitClaimsSaved
+	);
 }
 
 /**

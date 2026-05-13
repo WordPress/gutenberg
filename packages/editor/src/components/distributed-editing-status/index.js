@@ -862,6 +862,7 @@ export default function DistributedEditingStatus( {
 	const {
 		__experimentalPlanDistributedEditingLocalRebaseAfterStaleBase,
 		__experimentalPrepareDistributedEditingRetrySubmitAfterLocalRebase,
+		__experimentalPrepareDistributedEditingRetrySubmitSaveAfterProof,
 		__experimentalRebaseDistributedEditingLocalUpdatesAfterStaleBase,
 		__experimentalRefreshDistributedEditingRetrySubmitProof,
 		__experimentalRefreshDistributedEditingServerStateAfterStaleBase,
@@ -910,6 +911,17 @@ export default function DistributedEditingStatus( {
 							),
 						} );
 						return prepareResult;
+					}
+					case DISTRIBUTED_EDITING_NOTICE_ACTIONS.PREPARE_RETRY_SUBMIT_SAVE: {
+						const prepareSaveResult =
+							await __experimentalPrepareDistributedEditingRetrySubmitSaveAfterProof?.();
+						setActionStatus( {
+							status: 'info',
+							message: __(
+								'Guarded save path prepared. Save again to submit through the retry path.'
+							),
+						} );
+						return prepareSaveResult;
 					}
 					case DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFRESH_RETRY_SUBMIT_PROOF: {
 						const proofResult =
@@ -968,6 +980,7 @@ export default function DistributedEditingStatus( {
 		[
 			__experimentalPlanDistributedEditingLocalRebaseAfterStaleBase,
 			__experimentalPrepareDistributedEditingRetrySubmitAfterLocalRebase,
+			__experimentalPrepareDistributedEditingRetrySubmitSaveAfterProof,
 			__experimentalRebaseDistributedEditingLocalUpdatesAfterStaleBase,
 			__experimentalRefreshDistributedEditingRetrySubmitProof,
 			__experimentalRefreshDistributedEditingServerStateAfterStaleBase,
@@ -1007,6 +1020,10 @@ function getActionErrorMessage( actionKey ) {
 		case DISTRIBUTED_EDITING_NOTICE_ACTIONS.PREPARE_RETRY_SUBMIT:
 			return __(
 				'Retry submit could not be prepared. Local changes remain protected.'
+			);
+		case DISTRIBUTED_EDITING_NOTICE_ACTIONS.PREPARE_RETRY_SUBMIT_SAVE:
+			return __(
+				'Guarded save path could not be prepared. Local changes remain protected.'
 			);
 		case DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFRESH_RETRY_SUBMIT_PROOF:
 			return __(
@@ -1250,6 +1267,8 @@ function getActionLabel( actionKey ) {
 			return __( 'Export local changes' );
 		case DISTRIBUTED_EDITING_NOTICE_ACTIONS.PREPARE_RETRY_SUBMIT:
 			return __( 'Prepare retry submit' );
+		case DISTRIBUTED_EDITING_NOTICE_ACTIONS.PREPARE_RETRY_SUBMIT_SAVE:
+			return __( 'Prepare guarded save' );
 		case DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFRESH_RETRY_SUBMIT_PROOF:
 			return __( 'Refresh retry proof' );
 		case DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFETCH_SERVER_STATE:

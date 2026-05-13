@@ -1731,6 +1731,29 @@ describe( 'distributed editing session state', () => {
 		} );
 	} );
 
+	it( 'adds guarded retry-save preparation action after accepted proof', () => {
+		const notices = getDistributedEditingNoticeDescriptorsForSessionState( {
+			pendingChangeCount: 1,
+			retrySubmitProofStatus:
+				DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.ACCEPTED_FOR_FUTURE_SAVE,
+			retrySubmitAccepted: true,
+			retrySubmitSavePathRequired: true,
+			canExportLocalUpdates: true,
+		} );
+
+		expect( notices[ 0 ] ).toMatchObject( {
+			kind: DISTRIBUTED_EDITING_NOTICE_KINDS.PENDING_CHANGES,
+			retrySubmitProofStatus:
+				DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.ACCEPTED_FOR_FUTURE_SAVE,
+			retrySubmitAccepted: true,
+			retrySubmitSavePathRequired: true,
+			retrySubmitSavePrepared: false,
+			actionKeys: [
+				DISTRIBUTED_EDITING_NOTICE_ACTIONS.PREPARE_RETRY_SUBMIT_SAVE,
+			],
+		} );
+	} );
+
 	it( 'builds unload-warning integration state without rendered copy', () => {
 		const warningState =
 			getDistributedEditingUnloadWarningStateForSessionState( {

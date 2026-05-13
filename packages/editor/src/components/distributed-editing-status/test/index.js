@@ -92,6 +92,11 @@ function setupDistributedEditingStatusDispatch() {
 			.mockResolvedValue( {
 				status: 'prepared',
 			} ),
+		__experimentalPrepareDistributedEditingRetrySubmitSaveAfterProof: jest
+			.fn()
+			.mockResolvedValue( {
+				status: 'ready',
+			} ),
 		__experimentalRefreshDistributedEditingRetrySubmitProof: jest
 			.fn()
 			.mockResolvedValue( {
@@ -1073,6 +1078,48 @@ describe( 'DistributedEditingStatus', () => {
 		expect(
 			await screen.findByText(
 				'Retry submit proof refreshed. Save again to continue through the guarded retry path.'
+			)
+		).toBeVisible();
+	} );
+
+	it( 'prepares guarded retry save from accepted proof chrome without saving', async () => {
+		const user = userEvent.setup();
+		const actions = setupDistributedEditingStatusDispatch();
+
+		setupDistributedEditingStatusSelect( {
+			sessionState: {
+				pendingChangeCount: 1,
+				retrySubmitProofStatus:
+					DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.ACCEPTED_FOR_FUTURE_SAVE,
+				retrySubmitAccepted: true,
+				retrySubmitSavePathRequired: true,
+				canExportLocalUpdates: true,
+			},
+		} );
+
+		render( <DistributedEditingStatusChrome /> );
+
+		await user.click(
+			screen.getByRole( 'button', {
+				name: 'Prepare guarded save',
+			} )
+		);
+
+		expect(
+			actions.__experimentalPrepareDistributedEditingRetrySubmitSaveAfterProof
+		).toHaveBeenCalledTimes( 1 );
+		expect(
+			actions.__experimentalSaveDistributedEditingRetryAfterProof
+		).not.toHaveBeenCalled();
+		expect(
+			actions.__experimentalRefreshDistributedEditingRetrySubmitProof
+		).not.toHaveBeenCalled();
+		expect(
+			actions.__experimentalRefreshDistributedEditingServerStateAfterStaleBase
+		).not.toHaveBeenCalled();
+		expect(
+			await screen.findByText(
+				'Guarded save path prepared. Save again to submit through the retry path.'
 			)
 		).toBeVisible();
 	} );
