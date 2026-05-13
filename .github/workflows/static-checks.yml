@@ -39,12 +39,15 @@ jobs:
                     - node: '24'
                       os: 'ubuntu-24.04'
                       annotations: true
-                exclude:
-                    # On PRs: Only test Node 20 on Ubuntu and Windows
-                    - event: 'pull_request'
-                      node: '22'
-                    - event: 'pull_request'
-                      os: 'macos-15'
+                # TEMPORARY (revert before merge of #77995):
+                # PR exclusions dropped to validate the new installed-deps
+                # check across all Node versions and on macOS.
+                # exclude:
+                #     # On PRs: Only test Node 20 on Ubuntu and Windows
+                #     - event: 'pull_request'
+                #       node: '22'
+                #     - event: 'pull_request'
+                #       os: 'macos-15'
 
         steps:
             - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
