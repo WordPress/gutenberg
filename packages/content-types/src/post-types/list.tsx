@@ -43,7 +43,12 @@ const DEFAULT_VIEW: View = {
 	page: 1,
 	fields: [ 'taxonomies', 'count', 'status' ],
 	titleField: 'title',
-	layout: {},
+	layout: {
+		styles: {
+			taxonomies: { minWidth: 230 },
+			supports: { minWidth: 230 },
+		},
+	},
 };
 
 export function PostTypesList() {

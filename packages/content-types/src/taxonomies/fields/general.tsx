@@ -19,6 +19,7 @@ import {
 	createDescriptionField,
 	SlugEdit,
 } from '../../utils/fields';
+import { OverflowingBadges } from '../../utils/overflowing-badges';
 import { usePublicPostTypes } from '../utils';
 import type { TaxonomyFormData } from '../types';
 
@@ -144,11 +145,12 @@ export function useObjectTypeField(): Field< TaxonomyFormData > {
 					return <span aria-hidden="true">—</span>;
 				}
 				return (
-					<>
-						{ slugs
-							.map( ( s ) => labelMap[ s ] ?? s )
-							.join( ', ' ) }
-					</>
+					<OverflowingBadges
+						items={ slugs.map( ( s ) => ( {
+							key: s,
+							label: labelMap[ s ] ?? s,
+						} ) ) }
+					/>
 				);
 			},
 			isValid: { required: true },
