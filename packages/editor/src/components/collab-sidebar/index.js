@@ -10,6 +10,7 @@ import { comment as commentIcon } from '@wordpress/icons';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as interfaceStore } from '@wordpress/interface';
 import { store as preferencesStore } from '@wordpress/preferences';
+import { getFormatType, registerFormatType } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
@@ -27,8 +28,15 @@ import { NoteAvatarIndicator } from './note-indicator-toolbar';
 import { useGlobalStylesContext } from '../global-styles-provider';
 import { useNoteThreads, useEnableFloatingSidebar } from './hooks';
 import { getNoteIdsFromMetadata, pickPrimaryNote } from './utils';
+import { NOTE_FORMAT_NAME, noteFormat } from './format';
 import PostTypeSupportCheck from '../post-type-support-check';
 import { unlock } from '../../lock-unlock';
+
+// Guard against repeated module evaluation under HMR; `registerFormatType`
+// warns when the same name is registered twice.
+if ( ! getFormatType( NOTE_FORMAT_NAME ) ) {
+	registerFormatType( NOTE_FORMAT_NAME, noteFormat );
+}
 
 function NotesSidebar( { postId } ) {
 	const { getActiveComplementaryArea } = useSelect( interfaceStore );
