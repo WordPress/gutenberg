@@ -250,6 +250,49 @@ describe( 'distributed editing REST helpers', () => {
 		} );
 	} );
 
+	it( 'requests retry-save with page routes and default accepted proof fields', async () => {
+		const proposedPostContent =
+			'<!-- wp:paragraph --><p>Retry-save page content.</p><!-- /wp:paragraph -->';
+
+		apiFetch.setFetchHandler( async ( options ) => {
+			expect( options.path ).toMatch(
+				/^\/wp\/v2\/pages\/42\/distributed-editing\/retry-save/
+			);
+			expect( options.method ).toBe( 'POST' );
+			expect( options.data ).toEqual( {
+				client_base_version: '11',
+				accepted_proof_server_version: '11',
+				pending_change_count: 1,
+				proposed_post_content: proposedPostContent,
+				accepted_proof_saves_post: false,
+				accepted_proof_mutates_post_content: false,
+				accepted_proof_creates_revision: false,
+				accepted_proof_claims_saved: false,
+			} );
+			expect( options.data.rebased_from_version ).toBeUndefined();
+			expect( options.data.proposed_post_content_hash ).toBeUndefined();
+			expect( options.data.mode ).toBeUndefined();
+
+			return {
+				result: 'retry_save_applied',
+				retry_save_accepted: true,
+			};
+		} );
+
+		await expect(
+			__experimentalRequestDistributedEditingRetrySave( {
+				postId: 42,
+				restBase: 'pages',
+				clientBaseVersion: '11',
+				acceptedProofServerVersion: '11',
+				proposedPostContent,
+			} )
+		).resolves.toEqual( {
+			result: 'retry_save_applied',
+			retry_save_accepted: true,
+		} );
+	} );
+
 	it( 'requests server state for stale-base refetch without write data', async () => {
 		apiFetch.setFetchHandler( async ( options ) => {
 			expect( options.path ).toMatch(

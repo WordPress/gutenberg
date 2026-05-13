@@ -1231,6 +1231,205 @@ describe( 'Post actions', () => {
 			} );
 		} );
 
+		it( 'builds retry-save requests from edited page content and default proof fields', async () => {
+			const originalPostContent =
+				'<!-- wp:paragraph --><p>Original page.</p><!-- /wp:paragraph -->';
+			const editedPostContent =
+				'<!-- wp:paragraph --><p>Edited page retry-save.</p><!-- /wp:paragraph -->';
+			const proposedPostContentHash =
+				'abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789';
+			const page = {
+				id: postId,
+				type: 'page',
+				title: 'bar',
+				content: originalPostContent,
+				status: 'draft',
+			};
+
+			apiFetch.setFetchHandler( async ( options ) => {
+				const { path, method, data } = options;
+
+				expect( method ).toBe( 'POST' );
+				expect( path ).toMatch(
+					new RegExp(
+						`^/wp/v2/pages/${ postId }/distributed-editing/retry-save`
+					)
+				);
+				expect( data ).toEqual( {
+					client_base_version: '12',
+					accepted_proof_server_version: '12',
+					rebased_from_version: '9',
+					pending_change_count: 3,
+					proposed_post_content: editedPostContent,
+					accepted_proof_saves_post: false,
+					accepted_proof_mutates_post_content: false,
+					accepted_proof_creates_revision: false,
+					accepted_proof_claims_saved: false,
+					proposed_post_content_hash: proposedPostContentHash,
+				} );
+
+				return {
+					result: 'retry_save_applied',
+					retry_save_accepted: true,
+					previous_server_version: '12',
+					server_version: '13',
+					pending_change_count: 3,
+					saves_post: true,
+					mutates_post_content: true,
+					creates_revision: true,
+					claims_saved: true,
+					revision_created: true,
+					created_revision_ids: [ 7013 ],
+				};
+			} );
+
+			const registry = createRegistryWithStores();
+
+			registry.dispatch( coreStore ).addEntities( [
+				{
+					...postTypeConfig,
+					name: 'page',
+					baseURL: '/wp/v2/pages',
+				},
+			] );
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'root', 'postType', [
+					{
+						...postTypeEntity,
+						slug: 'page',
+						rest_base: 'pages',
+					},
+				] );
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'page', page );
+			registry.dispatch( editorStore ).setupEditor( page, {
+				content: originalPostContent,
+			} );
+			registry.dispatch( editorStore ).editPost( {
+				content: editedPostContent,
+			} );
+			registry
+				.dispatch( editorStore )
+				.setDistributedEditingSessionState( {
+					clientBaseVersion: '9',
+					serverVersion: '12',
+					pendingChangeCount: 3,
+					retrySubmitProofStatus:
+						DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.ACCEPTED_FOR_FUTURE_SAVE,
+					retrySubmitAccepted: true,
+					retrySubmitSavePathRequired: true,
+					retrySubmitSaveStatus:
+						DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.READY,
+					retrySubmitSaveReady: true,
+					canExportLocalUpdates: true,
+				} );
+
+			await expect(
+				registry
+					.dispatch( editorStore )
+					.__experimentalSaveDistributedEditingRetryAfterProof( {
+						proposedPostContentHash,
+					} )
+			).resolves.toMatchObject( {
+				result: 'retry_save_applied',
+				retry_save_accepted: true,
+			} );
+
+			expect(
+				registry.select( editorStore ).getEditedPostContent()
+			).toBe( editedPostContent );
+		} );
+
+		it( 'passes accepted proof persistence flags into retry-save requests', async () => {
+			const proposedPostContent =
+				'<!-- wp:paragraph --><p>Rejected proof flags.</p><!-- /wp:paragraph -->';
+			const post = {
+				id: postId,
+				type: 'post',
+				title: 'bar',
+				content: proposedPostContent,
+				status: 'draft',
+			};
+			const error = {
+				code: DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_SYNC_META_TAMPERED,
+				message:
+					'Distributed Editing rejected retry save because accepted proof claimed persistence.',
+				data: {
+					status: 409,
+					reason_code:
+						DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_SYNC_META_TAMPERED,
+					detail: 'retry_save_proof_claimed_persistence',
+					pending_change_count: 1,
+				},
+			};
+
+			apiFetch.setFetchHandler( async ( options ) => {
+				const { data } = options;
+
+				expect( data ).toMatchObject( {
+					client_base_version: '15',
+					accepted_proof_server_version: '15',
+					rebased_from_version: '14',
+					pending_change_count: 1,
+					proposed_post_content: proposedPostContent,
+					accepted_proof_saves_post: true,
+					accepted_proof_mutates_post_content: true,
+					accepted_proof_creates_revision: true,
+					accepted_proof_claims_saved: true,
+				} );
+
+				throw error;
+			} );
+
+			const registry = createRegistryWithStores();
+
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', post );
+			registry.dispatch( editorStore ).setupEditor( post, {
+				content: proposedPostContent,
+			} );
+			registry
+				.dispatch( editorStore )
+				.setDistributedEditingSessionState( {
+					clientBaseVersion: '14',
+					serverVersion: '15',
+					pendingChangeCount: 1,
+					retrySubmitProofStatus:
+						DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.ACCEPTED_FOR_FUTURE_SAVE,
+					retrySubmitAccepted: true,
+					retrySubmitSavePathRequired: true,
+					retrySubmitSaveStatus:
+						DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.READY,
+					retrySubmitSaveReady: true,
+					retrySubmitSavesPost: true,
+					retrySubmitMutatesPostContent: true,
+					retrySubmitCreatesRevision: true,
+					retrySubmitClaimsSaved: true,
+					canExportLocalUpdates: true,
+				} );
+
+			await expect(
+				registry
+					.dispatch( editorStore )
+					.__experimentalSaveDistributedEditingRetryAfterProof()
+			).rejects.toBe( error );
+
+			expect(
+				registry
+					.select( editorStore )
+					.getDistributedEditingSessionState()
+			).toMatchObject( {
+				retrySaveStatus:
+					DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_SYNC_META_TAMPERED,
+				retrySaveReason:
+					DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_SYNC_META_TAMPERED,
+				canExportLocalUpdates: true,
+			} );
+		} );
+
 		it( 'normalizes retry-save stale errors before rethrowing', async () => {
 			const post = {
 				id: postId,
