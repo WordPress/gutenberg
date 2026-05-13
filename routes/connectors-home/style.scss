@@ -86,7 +86,7 @@ $sticky-header-clearance: 120px;
 		color: $gray-600;
 	}
 
-	@media (max-width: 680px) {
+	@media ( max-width: 680px ) {
 		.ai-plugin-callout {
 			padding: 12px;
 			padding-inline-end: 84px;
@@ -100,7 +100,7 @@ $sticky-header-clearance: 120px;
 		}
 	}
 
-	@media (max-width: 480px) {
+	@media ( max-width: 480px ) {
 		padding: 8px;
 
 		.components-item {

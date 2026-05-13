@@ -1,7 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { __experimentalHStack as HStack, Button } from '@wordpress/components';
+import {
+	__experimentalHStack as HStack,
+	Button,
+	ExternalLink,
+} from '@wordpress/components';
 import { useRef } from '@wordpress/element';
 import {
 	__experimentalRegisterConnector as registerConnector,
@@ -13,7 +17,7 @@ import {
 } from '@wordpress/connectors';
 import { select } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
-import { Badge, Link } from '@wordpress/ui';
+import { Badge } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -109,16 +113,15 @@ const ConnectedBadge = () => (
 );
 
 const PluginDirectoryLink = ( { slug }: { slug: string } ) => (
-	<Link
+	<ExternalLink
 		href={ sprintf(
 			/* translators: %s: plugin slug. */
 			__( 'https://wordpress.org/plugins/%s/' ),
 			slug
 		) }
-		openInNewTab
 	>
 		{ __( 'Learn more' ) }
-	</Link>
+	</ExternalLink>
 );
 
 const UnavailableActionBadge = () => <Badge>{ __( 'Not available' ) }</Badge>;

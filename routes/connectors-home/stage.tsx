@@ -16,7 +16,6 @@ import { useSelect } from '@wordpress/data';
 import { createInterpolateElement } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
-// eslint-disable-next-line @wordpress/use-recommended-components
 import { Notice } from '@wordpress/ui';
 
 /**
@@ -94,6 +93,17 @@ function ConnectorsPage() {
 	);
 	const isEmpty = renderableConnectors.length === 0;
 
+	const showFileModsNotice =
+		manualInstallPluginSlugs.length > 0 &&
+		( isFileModDisabled || ! canInstallPlugins );
+	const fileModsNoticeMessage = isFileModDisabled
+		? __(
+				'Plugins cannot be installed here due to your site configuration. Install them manually using your normal deployment workflow.'
+		  )
+		: __(
+				'You do not have permission to install plugins. Please ask a site administrator to install them for you.'
+		  );
+
 	return (
 		<Page
 			title={ __( 'Connectors' ) }
@@ -106,23 +116,16 @@ function ConnectorsPage() {
 					isEmpty ? ' connectors-page--empty' : ''
 				}` }
 			>
-				{ manualInstallPluginSlugs.length > 0 &&
-					( isFileModDisabled || ! canInstallPlugins ) && (
-						<Notice.Root
-							intent="info"
-							className="connectors-page__file-mods-notice"
-						>
-							<Notice.Description>
-								{ isFileModDisabled
-									? __(
-											'Plugins cannot be installed here due to your site configuration. Install them manually using your normal deployment workflow.'
-									  )
-									: __(
-											'You do not have permission to install plugins. Please ask a site administrator to install them for you.'
-									  ) }
-							</Notice.Description>
-						</Notice.Root>
-					) }
+				{ showFileModsNotice && (
+					<Notice.Root
+						intent="info"
+						className="connectors-page__file-mods-notice"
+					>
+						<Notice.Description>
+							{ fileModsNoticeMessage }
+						</Notice.Description>
+					</Notice.Root>
+				) }
 				{ isEmpty ? (
 					<VStack
 						alignment="center"
