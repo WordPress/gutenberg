@@ -336,6 +336,14 @@ export const DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE = Object.freeze( {
 	retrySaveClaimsSaved: false,
 	retrySaveRevisionCreated: false,
 	retrySaveCreatedRevisionIds: [],
+	retrySaveRequiresReviewerEscalation: false,
+	retrySaveReviewStatus: null,
+	retrySaveReviewAction: null,
+	retrySaveReviewRequiredCapability: null,
+	retrySaveReviewerCapability: null,
+	retrySaveReviewScope: null,
+	retrySaveEscalationReason: null,
+	retrySaveRawContentIncluded: false,
 	requiresManualConflictResolution: false,
 	mustOfferLocalCopy: false,
 	canExportLocalUpdates: false,
@@ -621,6 +629,30 @@ export function normalizeDistributedEditingSessionState( sessionState = {} ) {
 		),
 		retrySaveCreatedRevisionIds: normalizeIdList(
 			sessionState.retrySaveCreatedRevisionIds
+		),
+		retrySaveRequiresReviewerEscalation: Boolean(
+			sessionState.retrySaveRequiresReviewerEscalation
+		),
+		retrySaveReviewStatus: normalizeNullableString(
+			sessionState.retrySaveReviewStatus
+		),
+		retrySaveReviewAction: normalizeNullableString(
+			sessionState.retrySaveReviewAction
+		),
+		retrySaveReviewRequiredCapability: normalizeNullableString(
+			sessionState.retrySaveReviewRequiredCapability
+		),
+		retrySaveReviewerCapability: normalizeNullableString(
+			sessionState.retrySaveReviewerCapability
+		),
+		retrySaveReviewScope: normalizeNullableString(
+			sessionState.retrySaveReviewScope
+		),
+		retrySaveEscalationReason: normalizeNullableString(
+			sessionState.retrySaveEscalationReason
+		),
+		retrySaveRawContentIncluded: Boolean(
+			sessionState.retrySaveRawContentIncluded
 		),
 		requiresManualConflictResolution,
 		mustOfferLocalCopy,
@@ -1813,6 +1845,14 @@ export function getDistributedEditingSessionStateForRetrySaveRequest(
 		retrySaveClaimsSaved: false,
 		retrySaveRevisionCreated: false,
 		retrySaveCreatedRevisionIds: [],
+		retrySaveRequiresReviewerEscalation: false,
+		retrySaveReviewStatus: null,
+		retrySaveReviewAction: null,
+		retrySaveReviewRequiredCapability: null,
+		retrySaveReviewerCapability: null,
+		retrySaveReviewScope: null,
+		retrySaveEscalationReason: null,
+		retrySaveRawContentIncluded: false,
 		mustOfferLocalCopy: true,
 		canExportLocalUpdates: true,
 	} );
@@ -1959,6 +1999,14 @@ export function getDistributedEditingSessionStateForRetrySaveResult(
 			retrySaveServerVersion: serverVersion,
 			retrySavePreviousServerVersion: previousServerVersion,
 			...retrySaveFlags,
+			retrySaveRequiresReviewerEscalation: false,
+			retrySaveReviewStatus: null,
+			retrySaveReviewAction: null,
+			retrySaveReviewRequiredCapability: null,
+			retrySaveReviewerCapability: null,
+			retrySaveReviewScope: null,
+			retrySaveEscalationReason: null,
+			retrySaveRawContentIncluded: false,
 			requiresManualConflictResolution: false,
 			mustOfferLocalCopy: false,
 			canExportLocalUpdates: false,
@@ -1975,6 +2023,10 @@ export function getDistributedEditingSessionStateForRetrySaveResult(
 						responseData.reasonCode ||
 						responseData.reason_code
 			  );
+	const retrySaveReviewFields = getRetrySaveReviewFieldsFromResponse(
+		responseOrError,
+		responseData
+	);
 
 	return getDistributedEditingRejectedRetrySaveState( {
 		normalizedCurrent,
@@ -1987,6 +2039,7 @@ export function getDistributedEditingSessionStateForRetrySaveResult(
 		serverVersion,
 		previousServerVersion,
 		retrySaveFlags,
+		retrySaveReviewFields,
 	} );
 }
 
@@ -2313,6 +2366,16 @@ function getDistributedEditingRetrySaveDescriptorFields( normalized ) {
 		retrySaveClaimsSaved: normalized.retrySaveClaimsSaved,
 		retrySaveRevisionCreated: normalized.retrySaveRevisionCreated,
 		retrySaveCreatedRevisionIds: normalized.retrySaveCreatedRevisionIds,
+		retrySaveRequiresReviewerEscalation:
+			normalized.retrySaveRequiresReviewerEscalation,
+		retrySaveReviewStatus: normalized.retrySaveReviewStatus,
+		retrySaveReviewAction: normalized.retrySaveReviewAction,
+		retrySaveReviewRequiredCapability:
+			normalized.retrySaveReviewRequiredCapability,
+		retrySaveReviewerCapability: normalized.retrySaveReviewerCapability,
+		retrySaveReviewScope: normalized.retrySaveReviewScope,
+		retrySaveEscalationReason: normalized.retrySaveEscalationReason,
+		retrySaveRawContentIncluded: normalized.retrySaveRawContentIncluded,
 	};
 }
 
@@ -2337,6 +2400,7 @@ function getDistributedEditingRejectedRetrySaveState( {
 	serverVersion,
 	previousServerVersion,
 	retrySaveFlags,
+	retrySaveReviewFields = {},
 } ) {
 	let disposition = normalizedCurrent.disposition;
 	let retrySaveStatus = DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.NONE;
@@ -2437,12 +2501,82 @@ function getDistributedEditingRejectedRetrySaveState( {
 		retrySaveServerVersion: serverVersion,
 		retrySavePreviousServerVersion: previousServerVersion,
 		...retrySaveFlags,
+		...retrySaveReviewFields,
 		requiresManualConflictResolution,
 		mustOfferLocalCopy: normalizeCount( pendingChangeCount ) > 0,
 		canExportLocalUpdates:
 			normalizedCurrent.canExportLocalUpdates ||
 			normalizeCount( pendingChangeCount ) > 0,
 	} );
+}
+
+function getRetrySaveReviewFieldsFromResponse( responseOrError, responseData ) {
+	const reviewContract =
+		responseOrError.reviewContract ||
+		responseOrError.review_contract ||
+		responseData.reviewContract ||
+		responseData.review_contract ||
+		{};
+
+	return {
+		retrySaveRequiresReviewerEscalation: Boolean(
+			responseOrError.requiresReviewerEscalation ||
+				responseOrError.requires_reviewer_escalation ||
+				responseData.requiresReviewerEscalation ||
+				responseData.requires_reviewer_escalation ||
+				reviewContract.escalationRequired ||
+				reviewContract.escalation_required
+		),
+		retrySaveReviewStatus: normalizeNullableString(
+			responseOrError.reviewStatus ||
+				responseOrError.review_status ||
+				responseData.reviewStatus ||
+				responseData.review_status ||
+				reviewContract.status
+		),
+		retrySaveReviewAction: normalizeNullableString(
+			responseOrError.reviewAction ||
+				responseOrError.review_action ||
+				responseData.reviewAction ||
+				responseData.review_action
+		),
+		retrySaveReviewRequiredCapability: normalizeNullableString(
+			responseOrError.reviewRequiredCapability ||
+				responseOrError.review_required_capability ||
+				responseData.reviewRequiredCapability ||
+				responseData.review_required_capability
+		),
+		retrySaveReviewerCapability: normalizeNullableString(
+			responseOrError.reviewerCapability ||
+				responseOrError.reviewer_capability ||
+				responseData.reviewerCapability ||
+				responseData.reviewer_capability ||
+				reviewContract.reviewerCapability ||
+				reviewContract.reviewer_capability
+		),
+		retrySaveReviewScope: normalizeNullableString(
+			responseOrError.reviewScope ||
+				responseOrError.review_scope ||
+				responseData.reviewScope ||
+				responseData.review_scope
+		),
+		retrySaveEscalationReason: normalizeNullableString(
+			responseOrError.escalationReason ||
+				responseOrError.escalation_reason ||
+				responseData.escalationReason ||
+				responseData.escalation_reason ||
+				reviewContract.escalationReason ||
+				reviewContract.escalation_reason
+		),
+		retrySaveRawContentIncluded: Boolean(
+			responseOrError.rawContentIncluded ||
+				responseOrError.raw_content_included ||
+				responseData.rawContentIncluded ||
+				responseData.raw_content_included ||
+				reviewContract.rawContentIncluded ||
+				reviewContract.raw_content_included
+		),
+	};
 }
 
 function hasDistributedEditingLocalRebaseInputs( normalized ) {
