@@ -65,15 +65,13 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 	private function build_expected_state_output( $state_styles ) {
 		$css_rules = array();
 		foreach ( $state_styles as $state => $style ) {
-			$authored_border_style_properties = gutenberg_get_authored_state_border_style_properties( $style );
-			$compiled                         = wp_style_engine_get_styles(
+			$compiled = wp_style_engine_get_styles(
 				gutenberg_normalize_state_style_for_css_output( $style )
 			);
 			if ( ! empty( $compiled['declarations'] ) ) {
 				$css_rules[] = array(
-					'state'                            => $state,
-					'declarations'                     => $compiled['declarations'],
-					'authored_border_style_properties' => $authored_border_style_properties,
+					'state'        => $state,
+					'declarations' => $compiled['declarations'],
 				);
 			}
 		}
@@ -84,84 +82,49 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Tests that border style fallback is added for state styles with border color.
+	 * Tests that fallback border-style declarations are added after CSS generation.
 	 *
-	 * @covers ::gutenberg_get_state_style_with_fallback_border_styles
+	 * @covers ::gutenberg_get_state_declarations_with_fallback_border_styles
 	 */
-	public function test_adds_border_style_fallback_for_state_border_color() {
-		$actual = gutenberg_get_state_style_with_fallback_border_styles(
+	public function test_adds_fallback_border_style_declarations() {
+		$actual = gutenberg_get_state_declarations_with_fallback_border_styles(
 			array(
-				'border' => array(
-					'color' => '#000000',
-				),
+				'border-color'     => '#000000',
+				'border-top-width' => '2px',
 			)
 		);
 
 		$this->assertSame(
 			array(
-				'border' => array(
-					'color' => '#000000',
-					'style' => 'solid',
-				),
+				'border-color'     => '#000000',
+				'border-top-width' => '2px',
+				'border-style'     => 'solid',
+				'border-top-style' => 'solid',
 			),
 			$actual
 		);
 	}
 
 	/**
-	 * Tests that border style fallback is added to split state borders.
+	 * Tests that authored border-style declarations are preserved.
 	 *
-	 * @covers ::gutenberg_get_state_style_with_fallback_border_styles
+	 * @covers ::gutenberg_get_state_declarations_with_fallback_border_styles
 	 */
-	public function test_adds_border_style_fallback_for_split_state_border_width() {
-		$actual = gutenberg_get_state_style_with_fallback_border_styles(
+	public function test_preserves_authored_border_style_declarations() {
+		$actual = gutenberg_get_state_declarations_with_fallback_border_styles(
 			array(
-				'border' => array(
-					'top' => array(
-						'width' => '2px',
-					),
-				),
+				'border-color'      => '#000000',
+				'border-style'      => 'dashed !important',
+				'border-left-width' => '2px',
 			)
 		);
 
 		$this->assertSame(
 			array(
-				'border' => array(
-					'top'    => array(
-						'width' => '2px',
-						'style' => 'solid',
-					),
-					'right'  => null,
-					'bottom' => null,
-					'left'   => null,
-				),
+				'border-color'      => '#000000',
+				'border-style'      => 'dashed !important',
+				'border-left-width' => '2px',
 			),
-			$actual
-		);
-	}
-
-	/**
-	 * Tests that authored border-style properties are detected before fallbacks are added.
-	 *
-	 * @covers ::gutenberg_get_authored_state_border_style_properties
-	 */
-	public function test_gets_authored_state_border_style_properties() {
-		$actual = gutenberg_get_authored_state_border_style_properties(
-			array(
-				'border' => array(
-					'style' => 'solid',
-					'top'   => array(
-						'style' => 'dashed',
-					),
-					'right' => array(
-						'width' => '2px',
-					),
-				),
-			)
-		);
-
-		$this->assertSame(
-			array( 'border-style', 'border-top-style' ),
 			$actual
 		);
 	}
@@ -503,6 +466,38 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 
 		$this->assertStringContainsString(
 			'border-style:solid !important;',
+			$actual_stylesheet
+		);
+	}
+
+	/**
+	 * Tests that explicitly-authored side border style declarations use !important.
+	 *
+	 * @covers ::gutenberg_render_block_states_support
+	 */
+	public function test_hover_authored_side_border_style_generates_important_css_declaration() {
+		$this->ensure_block_registered( 'core/navigation-link' );
+
+		$block_content = '<div class="wp-block-test">Hello</div>';
+		$state_styles  = array(
+			':hover' => array(
+				'border' => array(
+					'top' => array(
+						'style' => 'dashed',
+					),
+				),
+			),
+		);
+		$block         = array(
+			'blockName' => 'core/navigation-link',
+			'attrs'     => array( 'style' => $state_styles ),
+		);
+
+		gutenberg_render_block_states_support( $block_content, $block );
+		$actual_stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) );
+
+		$this->assertStringContainsString(
+			'border-top-style:dashed !important;',
 			$actual_stylesheet
 		);
 	}
