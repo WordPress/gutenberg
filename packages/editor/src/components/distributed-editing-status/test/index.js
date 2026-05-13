@@ -7,13 +7,15 @@ import userEvent from '@testing-library/user-event';
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import DistributedEditingStatus, {
+	DistributedEditingStatusTestControls,
 	DistributedEditingStatusSurface,
+	getDistributedEditingStatusControlStates,
 	getDistributedEditingStatusSurfaceItems,
 	shouldRenderDistributedEditingStatus,
 } from '../';
@@ -28,6 +30,9 @@ import {
 } from '../../../store/distributed-editing';
 
 jest.mock( '@wordpress/data/src/components/use-select', () => jest.fn() );
+jest.mock( '@wordpress/data/src/components/use-dispatch', () => ( {
+	useDispatch: jest.fn(),
+} ) );
 
 function setupDistributedEditingStatusSelect( {
 	sessionState = {},
@@ -47,8 +52,115 @@ function setupDistributedEditingStatusSelect( {
 	);
 }
 
+function setupDistributedEditingStatusDispatch() {
+	const actions = {
+		resetDistributedEditingSessionState: jest.fn(),
+		setDistributedEditingSessionState: jest.fn(),
+	};
+
+	useDispatch.mockReturnValue( actions );
+
+	return actions;
+}
+
 afterEach( () => {
+	useDispatch.mockReset();
 	useSelect.mockReset();
+} );
+
+describe( 'getDistributedEditingStatusControlStates', () => {
+	it( 'returns copyable representative internal control states', () => {
+		const states = getDistributedEditingStatusControlStates();
+		const nextStates = getDistributedEditingStatusControlStates();
+
+		expect( Object.keys( states ) ).toEqual( [
+			'idle',
+			'pendingLocalChanges',
+			'degradedConnection',
+			'remoteChanges',
+			'serverStateConflict',
+			'manualResolution',
+		] );
+		expect( states.pendingLocalChanges ).toEqual( {
+			pendingChangeCount: 2,
+		} );
+		expect( states.pendingLocalChanges ).not.toBe(
+			nextStates.pendingLocalChanges
+		);
+		expect( states.degradedConnection ).toEqual( {
+			disposition:
+				DISTRIBUTED_EDITING_DISPOSITIONS.ACCEPTED_WITH_DEGRADED_LIVE_FEEDBACK,
+			isConnectionDegraded: true,
+		} );
+		expect( states.serverStateConflict ).toEqual( {
+			disposition:
+				DISTRIBUTED_EDITING_DISPOSITIONS.CONFLICT_REQUIRES_SERVER_STATE_ACCEPTANCE,
+			reasonCode:
+				DISTRIBUTED_EDITING_REASON_CODES.SYNC_META_RESTORED_FROM_REVISION_CONFLICT,
+			pendingChangeCount: 1,
+		} );
+		expect( states.manualResolution ).toEqual( {
+			disposition:
+				DISTRIBUTED_EDITING_DISPOSITIONS.REQUIRES_MANUAL_RESOLUTION_NO_SYNC_META,
+			reasonCode:
+				DISTRIBUTED_EDITING_REASON_CODES.SYNC_META_UNAVAILABLE_AFTER_REVISION_SCAN,
+			canExportLocalUpdates: true,
+		} );
+	} );
+} );
+
+describe( 'DistributedEditingStatusTestControls', () => {
+	it( 'sets representative non-idle session state without transport', async () => {
+		const user = userEvent.setup();
+		const actions = setupDistributedEditingStatusDispatch();
+		const onSelect = jest.fn();
+
+		render(
+			<DistributedEditingStatusTestControls onSelect={ onSelect } />
+		);
+
+		await user.click(
+			screen.getByRole( 'button', {
+				name: 'Pending local changes',
+			} )
+		);
+
+		expect(
+			actions.setDistributedEditingSessionState
+		).toHaveBeenCalledWith( {
+			pendingChangeCount: 2,
+		} );
+		expect(
+			actions.resetDistributedEditingSessionState
+		).not.toHaveBeenCalled();
+		expect( onSelect ).toHaveBeenCalledWith( 'pendingLocalChanges', {
+			pendingChangeCount: 2,
+		} );
+	} );
+
+	it( 'resets representative idle state without transport', async () => {
+		const user = userEvent.setup();
+		const actions = setupDistributedEditingStatusDispatch();
+		const onSelect = jest.fn();
+
+		render(
+			<DistributedEditingStatusTestControls onSelect={ onSelect } />
+		);
+
+		await user.click(
+			screen.getByRole( 'button', {
+				name: 'Idle',
+			} )
+		);
+
+		expect(
+			actions.resetDistributedEditingSessionState
+		).toHaveBeenCalledTimes( 1 );
+		expect(
+			actions.setDistributedEditingSessionState
+		).not.toHaveBeenCalled();
+		expect( onSelect ).toHaveBeenCalledWith( 'idle', {} );
+	} );
 } );
 
 describe( 'shouldRenderDistributedEditingStatus', () => {

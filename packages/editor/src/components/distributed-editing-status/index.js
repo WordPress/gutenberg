@@ -1,8 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { Notice } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
+import { Button, Notice } from '@wordpress/components';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { __, _n, sprintf } from '@wordpress/i18n';
 
 /**
@@ -13,9 +13,39 @@ import {
 	DISTRIBUTED_EDITING_DISPOSITIONS,
 	DISTRIBUTED_EDITING_NOTICE_ACTIONS,
 	DISTRIBUTED_EDITING_NOTICE_KINDS,
+	DISTRIBUTED_EDITING_REASON_CODES,
 	DISTRIBUTED_EDITING_UNLOAD_WARNING_REASONS,
 	normalizeDistributedEditingSessionState,
 } from '../../store/distributed-editing';
+
+const DISTRIBUTED_EDITING_STATUS_CONTROL_STATE_DEFINITIONS = Object.freeze( {
+	idle: Object.freeze( {} ),
+	pendingLocalChanges: Object.freeze( {
+		pendingChangeCount: 2,
+	} ),
+	degradedConnection: Object.freeze( {
+		disposition:
+			DISTRIBUTED_EDITING_DISPOSITIONS.ACCEPTED_WITH_DEGRADED_LIVE_FEEDBACK,
+		isConnectionDegraded: true,
+	} ),
+	remoteChanges: Object.freeze( {
+		remoteChangeCount: 2,
+	} ),
+	serverStateConflict: Object.freeze( {
+		disposition:
+			DISTRIBUTED_EDITING_DISPOSITIONS.CONFLICT_REQUIRES_SERVER_STATE_ACCEPTANCE,
+		reasonCode:
+			DISTRIBUTED_EDITING_REASON_CODES.SYNC_META_RESTORED_FROM_REVISION_CONFLICT,
+		pendingChangeCount: 1,
+	} ),
+	manualResolution: Object.freeze( {
+		disposition:
+			DISTRIBUTED_EDITING_DISPOSITIONS.REQUIRES_MANUAL_RESOLUTION_NO_SYNC_META,
+		reasonCode:
+			DISTRIBUTED_EDITING_REASON_CODES.SYNC_META_UNAVAILABLE_AFTER_REVISION_SCAN,
+		canExportLocalUpdates: true,
+	} ),
+} );
 
 /**
  * Returns inert, renderable status items for DE-RTC notice descriptors.
@@ -56,6 +86,68 @@ export function shouldRenderDistributedEditingStatus(
 		normalized.requiresServerStateAcceptance ||
 		normalized.mustOfferLocalCopy ||
 		Boolean( unloadWarningState?.shouldWarn )
+	);
+}
+
+/**
+ * Returns representative DE-RTC session states for internal status-surface
+ * checks. These are not transport fixtures and are not mounted in production
+ * editor chrome.
+ *
+ * @return {Object} Session states keyed by control name.
+ */
+export function getDistributedEditingStatusControlStates() {
+	return Object.fromEntries(
+		Object.entries(
+			DISTRIBUTED_EDITING_STATUS_CONTROL_STATE_DEFINITIONS
+		).map( ( [ key, sessionState ] ) => [ key, { ...sessionState } ] )
+	);
+}
+
+/**
+ * Renders internal controls that can place the editor store into representative
+ * DE-RTC status states without network transport.
+ *
+ * @param {Object}   props          Component props.
+ * @param {Object}   props.states   Optional keyed session states.
+ * @param {Function} props.onSelect Optional selection observer.
+ *
+ * @return {React.ReactNode} Rendered internal controls.
+ */
+export function DistributedEditingStatusTestControls( {
+	states = getDistributedEditingStatusControlStates(),
+	onSelect,
+} ) {
+	const {
+		resetDistributedEditingSessionState,
+		setDistributedEditingSessionState,
+	} = useDispatch( editorStore );
+
+	return (
+		<div
+			aria-label={ __( 'Distributed editing status test controls' ) }
+			className="editor-distributed-editing-status__test-controls"
+			role="group"
+		>
+			{ Object.entries( states ).map( ( [ key, sessionState ] ) => (
+				<Button
+					__next40pxDefaultSize
+					key={ key }
+					onClick={ () => {
+						if ( key === 'idle' ) {
+							resetDistributedEditingSessionState();
+						} else {
+							setDistributedEditingSessionState( sessionState );
+						}
+
+						onSelect?.( key, sessionState );
+					} }
+					variant="secondary"
+				>
+					{ getDistributedEditingStatusControlLabel( key ) }
+				</Button>
+			) ) }
+		</div>
 	);
 }
 
@@ -296,6 +388,25 @@ function getActionLabel( actionKey ) {
 	}
 
 	return null;
+}
+
+function getDistributedEditingStatusControlLabel( key ) {
+	switch ( key ) {
+		case 'idle':
+			return __( 'Idle' );
+		case 'pendingLocalChanges':
+			return __( 'Pending local changes' );
+		case 'degradedConnection':
+			return __( 'Degraded connection' );
+		case 'remoteChanges':
+			return __( 'Remote changes' );
+		case 'serverStateConflict':
+			return __( 'Server state conflict' );
+		case 'manualResolution':
+			return __( 'Manual resolution' );
+	}
+
+	return key;
 }
 
 function normalizeCount( value ) {
