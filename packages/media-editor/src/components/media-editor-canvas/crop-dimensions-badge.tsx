@@ -16,7 +16,7 @@ import type { CropperState } from '../../image-editor';
  * @param height Output crop height in source pixels.
  */
 export function formatBadgeText( width: number, height: number ): string {
-	return `${ Math.round( width ) } × ${ Math.round( height ) }`;
+	return `W: ${ Math.round( width ) }px H: ${ Math.round( height ) }px`;
 }
 
 export interface CropDimensionsBadgeProps {
