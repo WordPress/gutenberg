@@ -7,11 +7,11 @@ const meta: Meta< typeof Tooltip.Root > = {
 	title: 'Design System/Components/Tooltip',
 	component: Tooltip.Root,
 	subcomponents: {
-		Provider: Tooltip.Provider,
-		Trigger: Tooltip.Trigger,
-		Popup: Tooltip.Popup,
-		Positioner: Tooltip.Positioner,
-		Portal: Tooltip.Portal,
+		'Tooltip.Provider': Tooltip.Provider,
+		'Tooltip.Trigger': Tooltip.Trigger,
+		'Tooltip.Popup': Tooltip.Popup,
+		'Tooltip.Positioner': Tooltip.Positioner,
+		'Tooltip.Portal': Tooltip.Portal,
 	},
 	parameters: {
 		componentStatus: {

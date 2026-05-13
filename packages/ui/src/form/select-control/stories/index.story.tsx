@@ -9,7 +9,7 @@ const meta: Meta< typeof SelectControl > = {
 	title: 'Design System/Components/Form/SelectControl',
 	component: SelectControl,
 	subcomponents: {
-		Item: SelectControl.Item,
+		'SelectControl.Item': SelectControl.Item,
 	},
 	argTypes: {
 		onValueChange: { action: 'onValueChange' },
