@@ -10,6 +10,8 @@ import { defineConfig, devices } from '@playwright/test';
  */
 import baseConfig from '@wordpress/scripts/config/playwright.config.js';
 
+const e2eConfigDir = fileURLToPath( new URL( '.', 'file:' + __filename ).href );
+
 const baseTestIgnore: Array< string | RegExp > = [];
 if ( Array.isArray( baseConfig.testIgnore ) ) {
 	baseTestIgnore.push( ...baseConfig.testIgnore );
@@ -21,7 +23,9 @@ const config = defineConfig( {
 	...baseConfig,
 	webServer: {
 		...baseConfig.webServer,
-		command: 'npm run --prefix ../.. wp-env-test -- start',
+		command:
+			'node ./config/ensure-plugin-build-mode.mjs && npm run --prefix ../.. wp-env-test -- start',
+		cwd: e2eConfigDir,
 	},
 	reporter: process.env.CI
 		? [ [ 'github' ], [ './config/flaky-tests-reporter.ts' ], [ 'blob' ] ]
