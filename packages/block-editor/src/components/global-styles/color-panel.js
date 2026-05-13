@@ -484,12 +484,19 @@ export default function ColorPanel( {
 			[ 'color', 'text' ],
 			encodeColorValueWithPalette( allColors, newColor, newSlug )
 		);
-		// Compare raw encoded references, not decoded color values: two palette
-		// entries can share the same hex value but carry different slugs
-		// (e.g. var:preset|color|dark-text vs var:preset|color|dark-background).
-		// Comparing decoded values would incorrectly conflate them, forcing the
-		// link preset to follow the text preset even though the user chose
-		// independent palette slots.
+		// Compare raw encoded references (e.g. var:preset|color|slug), not
+		// decoded hex values. Two palette entries can share the same hex but
+		// carry different slugs (e.g. var:preset|color|dark-background and
+		// var:preset|color|dark-text both resolving to #000); comparing decoded
+		// values would conflate them and incorrectly force the link colour to
+		// follow the text colour even when the user deliberately chose a
+		// different palette slot.
+		//
+		// Note: this is stricter than the previous decoded comparison, if text
+		// and link were stored in different formats that happen to resolve to
+		// the same hex the old check would sync them and this one will not.
+		// In practice this cannot arise as both values go through the same
+		// encoding path.
 		if (
 			inheritedValue?.color?.text ===
 			inheritedValue?.elements?.link?.color?.text
