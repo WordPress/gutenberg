@@ -32,6 +32,8 @@ const RESULTS_FILE_SUFFIX = '.performance-results.json';
  * @property {string=}  wpVersion   The WordPress version to be used as the base install for testing.
  */
 
+const perfStartTime = performance.now();
+
 /**
  * A logging helper for printing steps and their substeps.
  *
@@ -40,9 +42,21 @@ const RESULTS_FILE_SUFFIX = '.performance-results.json';
  * @param {...any} args   Rest of the arguments to pass to console.log.
  */
 function logAtIndent( indent, msg, ...args ) {
+	const elapsed = performance.now() - perfStartTime;
+	const totalSeconds = Math.floor( elapsed / 100 ) / 10;
+	const minutes = Math.floor( totalSeconds / 60 );
+	const seconds = ( totalSeconds % 60 ).toFixed( 1 ).padStart( 4, '0' );
+	const timestamp = `[${ String( minutes ).padStart(
+		2,
+		'0'
+	) }:${ seconds }]`;
+
 	const prefix = indent === 0 ? '▶ ' : '> ';
 	const newline = indent === 0 ? '\n' : '';
-	return log( newline + '    '.repeat( indent ) + prefix + msg, ...args );
+	return log(
+		newline + timestamp + ' ' + '    '.repeat( indent ) + prefix + msg,
+		...args
+	);
 }
 
 /**
