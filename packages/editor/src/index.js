@@ -4,6 +4,7 @@
 import './hooks';
 
 export { storeConfig, store } from './store';
+export * from './store/distributed-editing';
 export * from './components';
 export * from './utils';
 export * from './private-apis';
