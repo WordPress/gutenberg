@@ -1048,7 +1048,7 @@ function getStaleBaseStatusText( descriptor ) {
 		return {
 			title: __( 'Retry save stale' ),
 			message: __(
-				'The server changed before retry save completed. Refresh the server version before continuing.'
+				'The server changed again before this retry save finished. Local changes are still protected; refresh the server version before trying again.'
 			),
 		};
 	}
@@ -1144,63 +1144,65 @@ function getRetrySaveStatusText( descriptor ) {
 			return {
 				title: __( 'Retry save in progress' ),
 				message: __(
-					'Local changes are being sent through the guarded retry-save path.'
+					'The editor is sending rebased changes through the guarded retry-save path. Keep this tab open until the server confirms the save.'
 				),
 			};
 		case DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVED:
 			return {
 				title: __( 'Retry save confirmed' ),
 				message: __(
-					'The server confirmed the retry-save update and cleared local pending changes.'
+					'The server saved the rebased changes and cleared the local pending-change warning.'
 				),
 			};
 		case DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.STALE_BASE_REJECTED:
 			return {
 				title: __( 'Retry save stale' ),
 				message: __(
-					'The server changed before retry save completed. Refresh the server version before continuing.'
+					'The server changed again before this retry save finished. Local changes are still protected; refresh the server version before trying again.'
 				),
 			};
 		case DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_PERMISSION_DENIED:
 			return {
-				title: __( 'Retry save blocked' ),
+				title: __( 'Retry save permission changed' ),
 				message: __(
-					'Permission changed before the retry save completed. Export local changes before continuing.'
+					'Editing permission changed before the retry save finished. Local changes are still protected; export them before leaving or ask for access to retry.'
 				),
 			};
 		case DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_SYNC_META_TAMPERED:
 			return {
-				title: __( 'Retry save rejected' ),
+				title: __( 'Retry save proof rejected' ),
 				message: __(
-					'The retry-save proof was rejected. Export local changes before continuing.'
+					'The server rejected the retry-save proof because the sync metadata or proof flags changed unexpectedly. Local changes are still protected; export them before continuing.'
 				),
 			};
 		case DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_FEATURE_DISABLED:
 			return {
 				title: __( 'Retry save disabled' ),
 				message: __(
-					'Distributed Editing was disabled before the retry save completed.'
+					'Distributed Editing was disabled before the retry save finished. Local changes are still protected; export them before leaving or retry after Distributed Editing is enabled.'
 				),
 			};
 		case DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_ROUTE_MISMATCH:
 			return {
-				title: __( 'Retry save route mismatch' ),
+				title: __( 'Retry save route changed' ),
 				message: __(
-					'The retry-save request did not match the current post route.'
+					'The retry-save request targeted a different post route than this editor. Local changes are still protected; reload the editor and export them before leaving.'
 				),
 			};
 		case DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_MALFORMED_SYNC_PAYLOAD:
 			return {
-				title: __( 'Retry save malformed' ),
+				title: __( 'Retry save payload rejected' ),
 				message: __(
-					'The retry-save payload could not be accepted. Export local changes before continuing.'
+					'The retry-save payload was incomplete or malformed. Local changes are still protected; export them before trying again.'
 				),
 			};
 	}
 
 	return {
 		title: __( 'Retry save unavailable' ),
-		message: __( 'Retry save did not return a recognized state.' ),
+		message: __(
+			'Retry save returned an unrecognized state. Local changes remain protected until the server confirms a save.'
+		),
 	};
 }
 

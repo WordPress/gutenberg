@@ -1089,7 +1089,7 @@ describe( 'DistributedEditingStatusSurface', () => {
 		expect( screen.getByText( 'Retry save in progress' ) ).toBeVisible();
 		expect(
 			screen.getByText(
-				'Local changes are being sent through the guarded retry-save path.'
+				'The editor is sending rebased changes through the guarded retry-save path. Keep this tab open until the server confirms the save.'
 			)
 		).toBeVisible();
 
@@ -1102,7 +1102,7 @@ describe( 'DistributedEditingStatusSurface', () => {
 		expect( screen.getByText( 'Retry save confirmed' ) ).toBeVisible();
 		expect(
 			screen.getByText(
-				'The server confirmed the retry-save update and cleared local pending changes.'
+				'The server saved the rebased changes and cleared the local pending-change warning.'
 			)
 		).toBeVisible();
 	} );
@@ -1145,7 +1145,7 @@ describe( 'DistributedEditingStatusSurface', () => {
 		expect( screen.getAllByText( 'Retry save stale' ) ).toHaveLength( 2 );
 		expect(
 			screen.getAllByText(
-				'The server changed before retry save completed. Refresh the server version before continuing.'
+				'The server changed again before this retry save finished. Local changes are still protected; refresh the server version before trying again.'
 			)
 		).toHaveLength( 2 );
 
@@ -1155,12 +1155,85 @@ describe( 'DistributedEditingStatusSurface', () => {
 			/>
 		);
 
-		expect( screen.getByText( 'Retry save rejected' ) ).toBeVisible();
+		expect( screen.getByText( 'Retry save proof rejected' ) ).toBeVisible();
 		expect(
 			screen.getByText(
-				'The retry-save proof was rejected. Export local changes before continuing.'
+				'The server rejected the retry-save proof because the sync metadata or proof flags changed unexpectedly. Local changes are still protected; export them before continuing.'
 			)
 		).toBeVisible();
+	} );
+
+	it( 'renders guarded retry-save actionable rejection copy', () => {
+		const cases = [
+			{
+				disposition:
+					DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_PERMISSION_DENIED,
+				reasonCode: DISTRIBUTED_EDITING_REASON_CODES.REST_CANNOT_EDIT,
+				retrySaveStatus:
+					DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_PERMISSION_DENIED,
+				title: 'Retry save permission changed',
+				message:
+					'Editing permission changed before the retry save finished. Local changes are still protected; export them before leaving or ask for access to retry.',
+			},
+			{
+				disposition:
+					DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_FEATURE_DISABLED,
+				reasonCode:
+					DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_FEATURE_DISABLED,
+				retrySaveStatus:
+					DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_FEATURE_DISABLED,
+				title: 'Retry save disabled',
+				message:
+					'Distributed Editing was disabled before the retry save finished. Local changes are still protected; export them before leaving or retry after Distributed Editing is enabled.',
+			},
+			{
+				disposition:
+					DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_ROUTE_MISMATCH,
+				reasonCode:
+					DISTRIBUTED_EDITING_REASON_CODES.REST_POST_INVALID_ID,
+				retrySaveStatus:
+					DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_ROUTE_MISMATCH,
+				title: 'Retry save route changed',
+				message:
+					'The retry-save request targeted a different post route than this editor. Local changes are still protected; reload the editor and export them before leaving.',
+			},
+			{
+				disposition:
+					DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_MALFORMED_SYNC_PAYLOAD,
+				reasonCode:
+					DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_MALFORMED_SYNC_PAYLOAD,
+				retrySaveStatus:
+					DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_MALFORMED_SYNC_PAYLOAD,
+				title: 'Retry save payload rejected',
+				message:
+					'The retry-save payload was incomplete or malformed. Local changes are still protected; export them before trying again.',
+			},
+		];
+		const onAction = jest.fn();
+		const renderStatus = ( statusCase ) => (
+			<DistributedEditingStatusSurface
+				noticeDescriptors={ getDistributedEditingNoticeDescriptorsForSessionState(
+					{
+						disposition: statusCase.disposition,
+						reasonCode: statusCase.reasonCode,
+						pendingChangeCount: 1,
+						canExportLocalUpdates: true,
+						retrySaveStatus: statusCase.retrySaveStatus,
+						retrySaveReason: statusCase.reasonCode,
+					}
+				) }
+				onAction={ onAction }
+			/>
+		);
+
+		const { rerender } = render( renderStatus( cases[ 0 ] ) );
+
+		for ( const statusCase of cases ) {
+			rerender( renderStatus( statusCase ) );
+			expect( screen.getByText( statusCase.title ) ).toBeVisible();
+			expect( screen.getByText( statusCase.message ) ).toBeVisible();
+			expect( screen.getByText( 'Export local changes' ) ).toBeVisible();
+		}
 	} );
 
 	it( 'renders stale retry-submit proof after prepared handoff', () => {
