@@ -183,6 +183,23 @@ describe( 'getStateStylesCSS', () => {
 			'.wp-block-test:hover { border-top-width: 2px !important; }\n.wp-block-test:hover { border-top-style: solid; }'
 		);
 	} );
+
+	it( 'adds important to side border color', () => {
+		expect(
+			getStateStylesCSS(
+				{
+					border: {
+						top: {
+							color: '#0000ff',
+						},
+					},
+				},
+				'.wp-block-test:hover'
+			)
+		).toBe(
+			'.wp-block-test:hover { border-top-color: #0000ff !important; }\n.wp-block-test:hover { border-top-style: solid; }'
+		);
+	} );
 } );
 
 describe( 'addSaveProps', () => {

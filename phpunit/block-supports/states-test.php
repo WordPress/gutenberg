@@ -503,6 +503,42 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Tests that hover side border color declarations use !important.
+	 *
+	 * @covers ::gutenberg_render_block_states_support
+	 */
+	public function test_hover_side_border_color_generates_important_css_declaration() {
+		$this->ensure_block_registered( 'core/navigation-link' );
+
+		$block_content = '<div class="wp-block-test">Hello</div>';
+		$state_styles  = array(
+			':hover' => array(
+				'border' => array(
+					'top' => array(
+						'color' => '#0000ff',
+					),
+				),
+			),
+		);
+		$block         = array(
+			'blockName' => 'core/navigation-link',
+			'attrs'     => array( 'style' => $state_styles ),
+		);
+
+		gutenberg_render_block_states_support( $block_content, $block );
+		$actual_stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) );
+
+		$this->assertStringContainsString(
+			'border-top-color:#0000ff !important;',
+			$actual_stylesheet
+		);
+		$this->assertStringContainsString(
+			'border-top-style:solid;',
+			$actual_stylesheet
+		);
+	}
+
+	/**
 	 * Tests that a preset hover border color is emitted as a CSS declaration.
 	 *
 	 * @covers ::gutenberg_render_block_states_support
