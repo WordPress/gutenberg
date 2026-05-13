@@ -1,0 +1,126 @@
+.handle {
+	position: absolute;
+	bottom: 0;
+	inset-inline-end: 0;
+	z-index: 1;
+	box-sizing: border-box;
+	padding: 0;
+	background: transparent;
+	/* Nudge painted affordance away from tile chrome; hit target stays flush. */
+	--widget-resize-handle-visual-inset: var(--wpds-border-width-md);
+	--widget-resize-handle-hover-scale: 1.18;
+}
+
+.handle:focus-visible {
+	outline: var(--wpds-border-width-focus) solid var(--wpds-color-stroke-focus-brand);
+	outline-offset: 2px;
+	border-radius: var(--wpds-border-radius-sm);
+}
+
+.resizing {
+	opacity: 0.72;
+}
+
+/*
+ * Larger box = hit target; small `::after` = visual only (still uses
+ * logical borders so RTL needs no mirroring).
+ */
+.handleCorner {
+	width: 24px;
+	height: 24px;
+	cursor: nwse-resize;
+}
+
+.handleCorner::after {
+	content: "";
+	position: absolute;
+	bottom: var(--widget-resize-handle-visual-inset);
+	inset-inline-end: var(--widget-resize-handle-visual-inset);
+	width: 12px;
+	height: 12px;
+	box-sizing: border-box;
+	border-block-end: var(--wpds-border-width-sm) solid
+		var(--wpds-color-fg-interactive-brand);
+	border-inline-end: var(--wpds-border-width-sm) solid
+		var(--wpds-color-fg-interactive-brand);
+	border-block-start: none;
+	border-inline-start: none;
+	/* Elbow only: matches tile scale; arm ends stay square. */
+	border-end-end-radius: var(--wpds-border-radius-md);
+	transform: scale(1);
+	transform-origin: inline-end block-end;
+}
+
+.handleCorner.resizing::after,
+.handleCorner:hover::after,
+.handleCorner:focus-visible::after {
+	transform: scale(var(--widget-resize-handle-hover-scale));
+	border-block-end: var(--wpds-border-width-sm) solid
+		var(--wpds-color-fg-interactive-brand-active);
+	border-inline-end: var(--wpds-border-width-sm) solid
+		var(--wpds-color-fg-interactive-brand-active);
+}
+
+.handleHorizontal {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 24px;
+	height: 40px;
+	padding-inline-end: var(--widget-resize-handle-visual-inset);
+	cursor: ew-resize;
+	border: none;
+}
+
+@media not ( prefers-reduced-motion ) {
+	.handleCorner::after {
+		transition:
+			transform var(--wpds-motion-duration-xs)
+				var(--wpds-motion-easing-subtle),
+			border-block-end-color var(--wpds-motion-duration-xs)
+				var(--wpds-motion-easing-subtle),
+			border-inline-end-color var(--wpds-motion-duration-xs)
+				var(--wpds-motion-easing-subtle);
+	}
+
+	.handleHorizontal::after {
+		transition:
+			transform var(--wpds-motion-duration-xs)
+				var(--wpds-motion-easing-subtle),
+			background-color var(--wpds-motion-duration-xs)
+				var(--wpds-motion-easing-subtle);
+	}
+}
+
+.handleHorizontal::after {
+	content: "";
+	width: var(--wpds-border-width-sm);
+	height: 12px;
+	background-color: var(--wpds-color-fg-interactive-brand);
+	transform: scale(1);
+	transform-origin: center block-end;
+}
+
+.handleHorizontal.resizing::after,
+.handleHorizontal:hover::after,
+.handleHorizontal:focus-visible::after {
+	transform: scale(var(--widget-resize-handle-hover-scale));
+	background-color: var(--wpds-color-fg-interactive-brand-active);
+}
+
+@media (forced-colors: active) {
+	.handleCorner::after,
+	.handleCorner.resizing::after,
+	.handleCorner:hover::after,
+	.handleCorner:focus-visible::after {
+		border-block-end-color: Highlight;
+		border-inline-end-color: Highlight;
+	}
+
+	.handleHorizontal::after,
+	.handleHorizontal.resizing::after,
+	.handleHorizontal:hover::after,
+	.handleHorizontal:focus-visible::after {
+		background-color: Highlight;
+	}
+}
