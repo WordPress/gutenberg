@@ -520,7 +520,7 @@ test.describe( 'Distributed Editing status chrome', () => {
 			.click();
 		await expect(
 			statusChrome.getByText(
-				'Server version refreshed. Review local changes before retrying.'
+				'Server version refreshed. Local changes remain protected and exportable while you review before retrying.'
 			)
 		).toBeVisible();
 
