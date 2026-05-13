@@ -52,6 +52,27 @@ export function getDistributedEditingStaleBaseEndpointPath( {
 }
 
 /**
+ * Returns the current DE-RTC retry-submit proof endpoint path for a post.
+ *
+ * @param {Object} args                    Endpoint args.
+ * @param {number} args.postId             Post ID.
+ * @param {string} [args.restBase='posts'] REST base for the edited post type.
+ *
+ * @return {string} REST path.
+ */
+export function getDistributedEditingRetrySubmitEndpointPath( {
+	postId,
+	restBase = DISTRIBUTED_EDITING_RECOVERY_REST_BASE,
+} = {} ) {
+	return getDistributedEditingEndpointPath( {
+		postId,
+		restBase,
+		operation: 'retry-submit',
+		errorSubject: 'retry-submit',
+	} );
+}
+
+/**
  * Returns the current edited post endpoint path for DE-RTC server-state reads.
  *
  * @param {Object} args                    Endpoint args.
@@ -177,6 +198,54 @@ export function __experimentalRequestDistributedEditingStaleBaseRejection( {
 
 	return apiFetch( {
 		path: getDistributedEditingStaleBaseEndpointPath( {
+			postId,
+			restBase,
+		} ),
+		method: 'POST',
+		data,
+	} );
+}
+
+/**
+ * Requests the retry-submit proof contract for locally rebased edits.
+ *
+ * This helper posts only proof metadata. It does not send raw post content,
+ * save, apply recovery, change post locks, dispatch notices, or claim that
+ * pending local changes have been persisted.
+ *
+ * @param {Object} args                           Request args.
+ * @param {number} args.postId                    Post ID.
+ * @param {string} [args.restBase='posts']        REST base for the edited post type.
+ * @param {string} args.clientBaseVersion         Current sync version after local rebase.
+ * @param {string} [args.rebasedFromVersion]      Original stale sync version.
+ * @param {number} [args.pendingChangeCount=1]    Pending local change groups.
+ * @param {string} [args.proposedPostContentHash] SHA-256 hash of proposed post content.
+ *
+ * @return {Promise<Object>} REST response or error.
+ */
+export function __experimentalRequestDistributedEditingRetrySubmitProbe( {
+	postId,
+	restBase = DISTRIBUTED_EDITING_RECOVERY_REST_BASE,
+	clientBaseVersion,
+	rebasedFromVersion,
+	pendingChangeCount = 1,
+	proposedPostContentHash,
+} = {} ) {
+	const data = {
+		client_base_version: clientBaseVersion,
+		pending_change_count: pendingChangeCount,
+	};
+
+	if ( rebasedFromVersion ) {
+		data.rebased_from_version = rebasedFromVersion;
+	}
+
+	if ( proposedPostContentHash ) {
+		data.proposed_post_content_hash = proposedPostContentHash;
+	}
+
+	return apiFetch( {
+		path: getDistributedEditingRetrySubmitEndpointPath( {
 			postId,
 			restBase,
 		} ),

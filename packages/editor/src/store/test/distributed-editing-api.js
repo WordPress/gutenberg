@@ -8,9 +8,11 @@ import apiFetch from '@wordpress/api-fetch';
  */
 import {
 	__experimentalRequestDistributedEditingRecoveryDryRun,
+	__experimentalRequestDistributedEditingRetrySubmitProbe,
 	__experimentalRequestDistributedEditingServerStateRefetch,
 	__experimentalRequestDistributedEditingStaleBaseRejection,
 	getDistributedEditingRecoveryEndpointPath,
+	getDistributedEditingRetrySubmitEndpointPath,
 	getDistributedEditingServerStateEndpointPath,
 	getDistributedEditingStaleBaseEndpointPath,
 } from '../distributed-editing-api';
@@ -39,6 +41,15 @@ describe( 'distributed editing REST helpers', () => {
 				postId: 42,
 			} )
 		).toBe( '/wp/v2/posts/42/distributed-editing/stale-base' );
+	} );
+
+	it( 'builds the current retry-submit endpoint path', () => {
+		expect(
+			getDistributedEditingRetrySubmitEndpointPath( {
+				postId: 42,
+				restBase: 'pages',
+			} )
+		).toBe( '/wp/v2/pages/42/distributed-editing/retry-submit' );
 	} );
 
 	it( 'builds the current server-state endpoint path', () => {
@@ -126,6 +137,50 @@ describe( 'distributed editing REST helpers', () => {
 			} )
 		).rejects.toMatchObject( {
 			code: 'stale_base_version_rejected',
+		} );
+	} );
+
+	it( 'requests retry-submit proof without raw content or save behavior', async () => {
+		const proposedPostContentHash =
+			'fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210';
+
+		apiFetch.setFetchHandler( async ( options ) => {
+			expect( options.path ).toMatch(
+				/^\/wp\/v2\/posts\/42\/distributed-editing\/retry-submit/
+			);
+			expect( options.method ).toBe( 'POST' );
+			expect( options.data ).toEqual( {
+				client_base_version: '7',
+				rebased_from_version: '4',
+				pending_change_count: 2,
+				proposed_post_content_hash: proposedPostContentHash,
+			} );
+			expect( options.data.content ).toBeUndefined();
+			expect( options.data.mode ).toBeUndefined();
+
+			return {
+				result: 'retry_submit_accepted_for_future_save',
+				retry_submit_accepted: true,
+				saves_post: false,
+				mutates_post_content: false,
+				claims_saved: false,
+			};
+		} );
+
+		await expect(
+			__experimentalRequestDistributedEditingRetrySubmitProbe( {
+				postId: 42,
+				clientBaseVersion: '7',
+				rebasedFromVersion: '4',
+				pendingChangeCount: 2,
+				proposedPostContentHash,
+			} )
+		).resolves.toEqual( {
+			result: 'retry_submit_accepted_for_future_save',
+			retry_submit_accepted: true,
+			saves_post: false,
+			mutates_post_content: false,
+			claims_saved: false,
 		} );
 	} );
 

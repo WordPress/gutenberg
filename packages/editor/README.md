@@ -524,6 +524,20 @@ _Returns_
 
 -   `string`: REST path.
 
+### getDistributedEditingRetrySubmitEndpointPath
+
+Returns the current DE-RTC retry-submit proof endpoint path for a post.
+
+_Parameters_
+
+-   _args_ `Object`: Endpoint args.
+-   _args.postId_ `number`: Post ID.
+-   _args.restBase_ `[string]`: REST base for the edited post type.
+
+_Returns_
+
+-   `string`: REST path.
+
 ### getDistributedEditingServerStateEndpointPath
 
 Returns the current edited post endpoint path for DE-RTC server-state reads.
