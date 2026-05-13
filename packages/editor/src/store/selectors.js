@@ -32,6 +32,8 @@ import { unlock } from '../lock-unlock';
 import { getTemplateInfo } from '../utils/get-template-info';
 import {
 	DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE,
+	getDistributedEditingNoticeDescriptorsForSessionState,
+	getDistributedEditingUnloadWarningStateForSessionState,
 	shouldWarnBeforeLeavingDistributedEditingSessionState,
 } from './distributed-editing';
 
@@ -335,6 +337,34 @@ export function canExportDistributedEditingLocalUpdates( state ) {
  */
 export function shouldWarnBeforeLeavingDistributedEditingSession( state ) {
 	return shouldWarnBeforeLeavingDistributedEditingSessionState(
+		getDistributedEditingSessionState( state )
+	);
+}
+
+/**
+ * Returns stable notice descriptors for distributed editing. The descriptors
+ * are pure integration data; rendering copy and dispatch side effects belong to
+ * future UI code.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {Array} Notice descriptors.
+ */
+export function getDistributedEditingNoticeDescriptors( state ) {
+	return getDistributedEditingNoticeDescriptorsForSessionState(
+		getDistributedEditingSessionState( state )
+	);
+}
+
+/**
+ * Returns unload-warning integration state for distributed editing.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {Object} Unload-warning state.
+ */
+export function getDistributedEditingUnloadWarningState( state ) {
+	return getDistributedEditingUnloadWarningStateForSessionState(
 		getDistributedEditingSessionState( state )
 	);
 }

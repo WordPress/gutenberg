@@ -8,8 +8,14 @@ import deepFreeze from 'deep-freeze';
  */
 import {
 	DISTRIBUTED_EDITING_DISPOSITIONS,
+	DISTRIBUTED_EDITING_NOTICE_ACTIONS,
+	DISTRIBUTED_EDITING_NOTICE_IDS,
+	DISTRIBUTED_EDITING_NOTICE_KINDS,
 	DISTRIBUTED_EDITING_REASON_CODES,
+	DISTRIBUTED_EDITING_UNLOAD_WARNING_REASONS,
 	DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE,
+	getDistributedEditingNoticeDescriptorsForSessionState,
+	getDistributedEditingUnloadWarningStateForSessionState,
 	isDistributedEditingConflictDisposition,
 	isValidDistributedEditingDisposition,
 	isValidDistributedEditingReasonCode,
@@ -24,9 +30,11 @@ import {
 import { distributedEditingSession } from '../reducer';
 import {
 	canExportDistributedEditingLocalUpdates,
+	getDistributedEditingNoticeDescriptors,
 	getDistributedEditingSessionDisposition,
 	getDistributedEditingSessionReasonCode,
 	getDistributedEditingSessionState,
+	getDistributedEditingUnloadWarningState,
 	hasPendingDistributedEditingChanges,
 	hasRemoteDistributedEditingChanges,
 	isAwaitingDistributedEditingServerConfirmation,
@@ -147,6 +155,121 @@ describe( 'distributed editing session state', () => {
 		expect(
 			shouldWarnBeforeLeavingDistributedEditingSessionState( normalized )
 		).toBe( true );
+	} );
+
+	it( 'builds blocking notice descriptors for server-state acceptance', () => {
+		const notices = getDistributedEditingNoticeDescriptorsForSessionState( {
+			disposition:
+				DISTRIBUTED_EDITING_DISPOSITIONS.CONFLICT_REQUIRES_SERVER_STATE_ACCEPTANCE,
+			reasonCode:
+				DISTRIBUTED_EDITING_REASON_CODES.SYNC_META_RESTORED_FROM_REVISION_CONFLICT,
+			pendingChangeCount: 2,
+			remoteChangeCount: 1,
+		} );
+
+		expect( notices ).toEqual( [
+			{
+				id: DISTRIBUTED_EDITING_NOTICE_IDS.SERVER_STATE_ACCEPTANCE_REQUIRED,
+				kind: DISTRIBUTED_EDITING_NOTICE_KINDS.SERVER_STATE_ACCEPTANCE_REQUIRED,
+				status: 'warning',
+				priority: 'blocking',
+				reasonCode:
+					DISTRIBUTED_EDITING_REASON_CODES.SYNC_META_RESTORED_FROM_REVISION_CONFLICT,
+				disposition:
+					DISTRIBUTED_EDITING_DISPOSITIONS.CONFLICT_REQUIRES_SERVER_STATE_ACCEPTANCE,
+				pendingChangeCount: 2,
+				remoteChangeCount: 1,
+				actionKeys: [
+					DISTRIBUTED_EDITING_NOTICE_ACTIONS.EXPORT_LOCAL_UPDATES,
+					DISTRIBUTED_EDITING_NOTICE_ACTIONS.ACCEPT_SERVER_STATE,
+				],
+				noticeOptions: {
+					id: DISTRIBUTED_EDITING_NOTICE_IDS.SERVER_STATE_ACCEPTANCE_REQUIRED,
+					type: 'default',
+					isDismissible: false,
+				},
+			},
+			{
+				id: DISTRIBUTED_EDITING_NOTICE_IDS.REMOTE_CHANGES_RECEIVED,
+				kind: DISTRIBUTED_EDITING_NOTICE_KINDS.REMOTE_CHANGES_RECEIVED,
+				status: 'info',
+				priority: 'snackbar',
+				reasonCode:
+					DISTRIBUTED_EDITING_REASON_CODES.SYNC_META_RESTORED_FROM_REVISION_CONFLICT,
+				disposition:
+					DISTRIBUTED_EDITING_DISPOSITIONS.CONFLICT_REQUIRES_SERVER_STATE_ACCEPTANCE,
+				pendingChangeCount: 2,
+				remoteChangeCount: 1,
+				actionKeys: [
+					DISTRIBUTED_EDITING_NOTICE_ACTIONS.REVIEW_REMOTE_CHANGES,
+				],
+				noticeOptions: {
+					id: DISTRIBUTED_EDITING_NOTICE_IDS.REMOTE_CHANGES_RECEIVED,
+					type: 'snackbar',
+					isDismissible: true,
+				},
+			},
+		] );
+	} );
+
+	it( 'builds manual-resolution and status notice descriptors', () => {
+		const notices = getDistributedEditingNoticeDescriptorsForSessionState( {
+			disposition:
+				DISTRIBUTED_EDITING_DISPOSITIONS.REQUIRES_MANUAL_RESOLUTION_NO_SYNC_META,
+			reasonCode:
+				DISTRIBUTED_EDITING_REASON_CODES.SYNC_META_UNAVAILABLE_AFTER_REVISION_SCAN,
+			canExportLocalUpdates: true,
+			isConnectionDegraded: true,
+			hasPendingChanges: true,
+		} );
+
+		expect( notices.map( ( notice ) => notice.kind ) ).toEqual( [
+			DISTRIBUTED_EDITING_NOTICE_KINDS.MANUAL_RESOLUTION_REQUIRED,
+			DISTRIBUTED_EDITING_NOTICE_KINDS.CONNECTION_DEGRADED,
+			DISTRIBUTED_EDITING_NOTICE_KINDS.PENDING_CHANGES,
+		] );
+		expect( notices[ 0 ] ).toMatchObject( {
+			status: 'error',
+			priority: 'blocking',
+			actionKeys: [
+				DISTRIBUTED_EDITING_NOTICE_ACTIONS.EXPORT_LOCAL_UPDATES,
+			],
+		} );
+		expect( notices[ 1 ] ).toMatchObject( {
+			status: 'warning',
+			priority: 'status',
+		} );
+		expect( notices[ 2 ] ).toMatchObject( {
+			status: 'info',
+			priority: 'status',
+		} );
+	} );
+
+	it( 'builds unload-warning integration state without rendered copy', () => {
+		const warningState =
+			getDistributedEditingUnloadWarningStateForSessionState( {
+				pendingChangeCount: 1,
+				canExportLocalUpdates: true,
+			} );
+
+		expect( warningState ).toEqual( {
+			shouldWarn: true,
+			reason: DISTRIBUTED_EDITING_UNLOAD_WARNING_REASONS.PENDING_CHANGES,
+			reasonCode: null,
+			disposition: DISTRIBUTED_EDITING_DISPOSITIONS.IDLE,
+			pendingChangeCount: 1,
+			isAwaitingServerConfirmation: true,
+			canExportLocalUpdates: true,
+			mustOfferLocalCopy: false,
+		} );
+		expect(
+			getDistributedEditingUnloadWarningStateForSessionState( {
+				isConnectionDegraded: true,
+			} )
+		).toMatchObject( {
+			shouldWarn: false,
+			reason: null,
+		} );
 	} );
 } );
 
@@ -321,6 +444,22 @@ describe( 'distributed editing selectors', () => {
 		expect(
 			shouldWarnBeforeLeavingDistributedEditingSession( state )
 		).toBe( true );
+		expect(
+			getDistributedEditingNoticeDescriptors( state ).map(
+				( notice ) => notice.kind
+			)
+		).toEqual( [
+			DISTRIBUTED_EDITING_NOTICE_KINDS.SERVER_STATE_ACCEPTANCE_REQUIRED,
+			DISTRIBUTED_EDITING_NOTICE_KINDS.REMOTE_CHANGES_RECEIVED,
+		] );
+		expect(
+			getDistributedEditingUnloadWarningState( state )
+		).toMatchObject( {
+			shouldWarn: true,
+			reason: DISTRIBUTED_EDITING_UNLOAD_WARNING_REASONS.PENDING_CHANGES,
+			canExportLocalUpdates: true,
+			mustOfferLocalCopy: true,
+		} );
 	} );
 
 	it( 'selects degraded connection state without forcing unload warnings', () => {
@@ -338,5 +477,18 @@ describe( 'distributed editing selectors', () => {
 		expect(
 			shouldWarnBeforeLeavingDistributedEditingSession( state )
 		).toBe( false );
+		expect( getDistributedEditingNoticeDescriptors( state ) ).toEqual( [
+			expect.objectContaining( {
+				kind: DISTRIBUTED_EDITING_NOTICE_KINDS.CONNECTION_DEGRADED,
+				status: 'warning',
+				priority: 'status',
+			} ),
+		] );
+		expect(
+			getDistributedEditingUnloadWarningState( state )
+		).toMatchObject( {
+			shouldWarn: false,
+			reason: null,
+		} );
 	} );
 } );
