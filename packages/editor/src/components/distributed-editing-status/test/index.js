@@ -14,6 +14,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
  */
 import DistributedEditingStatus, {
 	DistributedEditingLocalRebaseStateInspector,
+	DistributedEditingRetrySaveControls,
 	DistributedEditingStatusInspector,
 	DistributedEditingRecoveryDryRunControls,
 	DistributedEditingStatusTestControls,
@@ -68,6 +69,11 @@ function setupDistributedEditingStatusDispatch() {
 			.fn()
 			.mockResolvedValue( {
 				result: 'candidate_update_valid',
+			} ),
+		__experimentalSaveDistributedEditingRetryAfterProof: jest
+			.fn()
+			.mockResolvedValue( {
+				result: 'retry_save_applied',
 			} ),
 		resetDistributedEditingSessionState: jest.fn(),
 		setDistributedEditingSessionState: jest.fn(),
@@ -337,6 +343,11 @@ describe( 'DistributedEditingStatusInspector', () => {
 				name: 'Run recovery dry run',
 			} )
 		).toBeVisible();
+		expect(
+			screen.getByRole( 'button', {
+				name: 'Run guarded retry save',
+			} )
+		).toBeVisible();
 		expect( screen.getByText( 'Local rebase plan' ) ).toBeVisible();
 		expect( screen.getByText( 'Local rebase result' ) ).toBeVisible();
 		expect(
@@ -469,6 +480,76 @@ describe( 'DistributedEditingRecoveryDryRunControls', () => {
 		await user.click(
 			screen.getByRole( 'button', {
 				name: 'Run recovery dry run',
+			} )
+		);
+
+		await waitFor( () =>
+			expect( screen.getByText( 'Failed' ) ).toBeVisible()
+		);
+		expect( onError ).toHaveBeenCalledWith( error );
+	} );
+} );
+
+describe( 'DistributedEditingRetrySaveControls', () => {
+	it( 'runs the guarded retry-save action and records command success', async () => {
+		const user = userEvent.setup();
+		const actions = setupDistributedEditingStatusDispatch();
+		const onResult = jest.fn();
+		setupDistributedEditingStatusSelect();
+
+		render( <DistributedEditingRetrySaveControls onResult={ onResult } /> );
+
+		expect( screen.getByText( 'Command' ) ).toBeVisible();
+		expect( screen.getByText( 'Guarded retry save' ) ).toBeVisible();
+		expect( screen.getByText( 'Guarded retry save reason' ) ).toBeVisible();
+		expect( screen.getByText( 'Idle' ) ).toBeVisible();
+		expect( screen.getByText( 'none' ) ).toBeVisible();
+		expect( screen.getByText( 'None' ) ).toBeVisible();
+
+		await user.click(
+			screen.getByRole( 'button', {
+				name: 'Run guarded retry save',
+			} )
+		);
+
+		expect(
+			actions.__experimentalSaveDistributedEditingRetryAfterProof
+		).toHaveBeenCalledTimes( 1 );
+		await waitFor( () =>
+			expect( screen.getByText( 'Succeeded' ) ).toBeVisible()
+		);
+		expect( onResult ).toHaveBeenCalledWith( {
+			result: 'retry_save_applied',
+		} );
+	} );
+
+	it( 'records command failure while preserving normalized retry-save state', async () => {
+		const user = userEvent.setup();
+		const actions = setupDistributedEditingStatusDispatch();
+		const error = { code: 'de_rtc_sync_meta_tampered' };
+		const onError = jest.fn();
+		actions.__experimentalSaveDistributedEditingRetryAfterProof.mockRejectedValue(
+			error
+		);
+		setupDistributedEditingStatusSelect( {
+			sessionState: {
+				retrySaveStatus:
+					DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_SYNC_META_TAMPERED,
+				retrySaveReason:
+					DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_SYNC_META_TAMPERED,
+			},
+		} );
+
+		render( <DistributedEditingRetrySaveControls onError={ onError } /> );
+
+		expect(
+			screen.getByText( 'rejected_sync_meta_tampered' )
+		).toBeVisible();
+		expect( screen.getByText( 'de_rtc_sync_meta_tampered' ) ).toBeVisible();
+
+		await user.click(
+			screen.getByRole( 'button', {
+				name: 'Run guarded retry save',
 			} )
 		);
 

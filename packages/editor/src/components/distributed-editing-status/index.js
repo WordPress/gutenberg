@@ -433,6 +433,7 @@ export function DistributedEditingStatusInspector( { onAction, onSelect } ) {
 		>
 			<DistributedEditingStatusTestControls onSelect={ onSelect } />
 			<DistributedEditingRecoveryDryRunControls />
+			<DistributedEditingRetrySaveControls />
 			<DistributedEditingLocalRebaseStateInspector />
 			<DistributedEditingStatus onAction={ onAction } />
 		</div>
@@ -603,6 +604,81 @@ export function DistributedEditingRecoveryDryRunControls( {
 				<div>
 					<dt>{ __( 'Reason' ) }</dt>
 					<dd>{ normalized.reasonCode || __( 'None' ) }</dd>
+				</div>
+			</dl>
+		</div>
+	);
+}
+
+/**
+ * Renders the internal guarded retry-save control for manual inspection.
+ *
+ * The control calls the existing retry-save action and shows the normalized
+ * state recorded by the store. It is deliberately mounted only in the internal
+ * inspector, and it does not call the normal editor save path, dispatch
+ * notices, expose retained post content, or change post locks.
+ *
+ * @param {Object}   props          Component props.
+ * @param {Function} props.onResult Optional success observer.
+ * @param {Function} props.onError  Optional failure observer.
+ *
+ * @return {React.ReactNode} Rendered internal retry-save controls.
+ */
+export function DistributedEditingRetrySaveControls( { onResult, onError } ) {
+	const [ commandStatus, setCommandStatus ] = useState( 'idle' );
+	const { __experimentalSaveDistributedEditingRetryAfterProof } =
+		useDispatch( editorStore );
+	const sessionState = useSelect( ( select ) => {
+		const { getDistributedEditingSessionState } = select( editorStore );
+
+		return getDistributedEditingSessionState();
+	}, [] );
+	const normalized = normalizeDistributedEditingSessionState( sessionState );
+	const isRunning = commandStatus === 'running';
+
+	async function runRetrySave() {
+		setCommandStatus( 'running' );
+
+		try {
+			const response =
+				await __experimentalSaveDistributedEditingRetryAfterProof();
+
+			setCommandStatus( 'succeeded' );
+			onResult?.( response );
+		} catch ( error ) {
+			setCommandStatus( 'failed' );
+			onError?.( error );
+		}
+	}
+
+	return (
+		<div
+			aria-label={ __( 'Distributed editing retry save' ) }
+			className="editor-distributed-editing-status__retry-save"
+			role="group"
+		>
+			<Button
+				__next40pxDefaultSize
+				accessibleWhenDisabled
+				disabled={ isRunning }
+				isBusy={ isRunning }
+				onClick={ runRetrySave }
+				variant="secondary"
+			>
+				{ __( 'Run guarded retry save' ) }
+			</Button>
+			<dl className="editor-distributed-editing-status__retry-save-state">
+				<div>
+					<dt>{ __( 'Command' ) }</dt>
+					<dd>{ getCommandStatusLabel( commandStatus ) }</dd>
+				</div>
+				<div>
+					<dt>{ __( 'Guarded retry save' ) }</dt>
+					<dd>{ normalized.retrySaveStatus }</dd>
+				</div>
+				<div>
+					<dt>{ __( 'Guarded retry save reason' ) }</dt>
+					<dd>{ normalized.retrySaveReason || __( 'None' ) }</dd>
 				</div>
 			</dl>
 		</div>
@@ -943,6 +1019,10 @@ function getDistributedEditingStatusControlLabel( key ) {
 }
 
 function getRecoveryDryRunCommandStatusLabel( commandStatus ) {
+	return getCommandStatusLabel( commandStatus );
+}
+
+function getCommandStatusLabel( commandStatus ) {
 	switch ( commandStatus ) {
 		case 'running':
 			return __( 'Running' );
