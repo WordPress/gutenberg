@@ -215,6 +215,8 @@ export const DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS = Object.freeze( {
 	MANUAL_CONFLICT_REQUIRED: 'manual_conflict_required',
 	RETRY_SAVE_IN_PROGRESS: 'retry_save_in_progress',
 	RETRY_SAVE_ALREADY_CONFIRMED: 'retry_save_already_confirmed',
+	RETRY_SAVE_MISSING_SAVED_STATE_EVIDENCE:
+		'retry_save_missing_saved_state_evidence',
 } );
 
 export const DISTRIBUTED_EDITING_LOCAL_UPDATES_EXPORT_FORMAT =
@@ -1189,6 +1191,102 @@ export function getDistributedEditingNoticeDescriptorsForSessionState(
 	return descriptors;
 }
 
+/**
+ * Returns whether the current retry-save state contains server evidence that
+ * the guarded write persisted the post and may be treated as saved.
+ *
+ * @param {Object} sessionState DE-RTC session state.
+ *
+ * @return {boolean} Whether retry-save saved-state evidence exists.
+ */
+export function hasDistributedEditingRetrySaveSavedStateEvidenceForSessionState(
+	sessionState = {}
+) {
+	const normalized = normalizeDistributedEditingSessionState( sessionState );
+
+	return (
+		normalized.retrySaveStatus ===
+			DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVED &&
+		normalized.retrySaveAccepted &&
+		normalized.retrySaveServerVersion !== null &&
+		normalized.retrySaveSavesPost &&
+		normalized.retrySaveMutatesPostContent &&
+		normalized.retrySaveClaimsSaved
+	);
+}
+
+/**
+ * Returns a side-effect-free progress summary for the board-demo retry-save
+ * path without exposing raw post content.
+ *
+ * @param {Object} sessionState DE-RTC session state.
+ *
+ * @return {Object} Retry-save flow state.
+ */
+export function getDistributedEditingRetrySaveFlowStateForSessionState(
+	sessionState = {}
+) {
+	const normalized = normalizeDistributedEditingSessionState( sessionState );
+	const hasProtectedLocalChanges =
+		normalized.hasPendingChanges &&
+		( normalized.mustOfferLocalCopy ||
+			normalized.canExportLocalUpdates ||
+			normalized.isAwaitingServerConfirmation );
+	const hasServerRefetchEvidence =
+		normalized.refetchedServerState &&
+		normalized.serverVersion !== null &&
+		normalized.refetchedServerContent !== null &&
+		! normalized.requiresServerStateRefetch;
+	const hasLocalRebaseEvidence =
+		normalized.localRebaseResultStatus ===
+			DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.REBASED &&
+		! normalized.requiresManualConflictResolution;
+	const hasRetrySubmitHandoff =
+		normalized.retrySubmitPrepared ||
+		normalized.retrySubmitHandoffStatus ===
+			DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_STATUSES.PREPARED;
+	const hasAcceptedRetrySubmitProof =
+		normalized.retrySubmitProofStatus ===
+			DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.ACCEPTED_FOR_FUTURE_SAVE &&
+		normalized.retrySubmitAccepted &&
+		normalized.retrySubmitSavePathRequired &&
+		! normalized.retrySubmitSavesPost &&
+		! normalized.retrySubmitMutatesPostContent &&
+		! normalized.retrySubmitCreatesRevision &&
+		! normalized.retrySubmitClaimsSaved;
+	const hasRetrySavePreparation =
+		normalized.retrySubmitSaveStatus ===
+			DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.READY &&
+		normalized.retrySubmitSaveReady;
+	const hasRetrySaveSavedStateEvidence =
+		hasDistributedEditingRetrySaveSavedStateEvidenceForSessionState(
+			normalized
+		);
+
+	return {
+		hasProtectedLocalChanges,
+		hasServerRefetchEvidence,
+		hasLocalRebaseEvidence,
+		hasRetrySubmitHandoff,
+		hasAcceptedRetrySubmitProof,
+		hasRetrySavePreparation,
+		hasRetrySaveSavedStateEvidence,
+		canClaimSaved: hasRetrySaveSavedStateEvidence,
+		claimsSaved: hasRetrySaveSavedStateEvidence,
+		requiresServerStateRefetch: normalized.requiresServerStateRefetch,
+		requiresManualConflictResolution:
+			normalized.requiresManualConflictResolution,
+		canExportLocalUpdates: normalized.canExportLocalUpdates,
+		retrySaveStatus: normalized.retrySaveStatus,
+		retrySaveReason: normalized.retrySaveReason,
+		retrySaveServerVersion: normalized.retrySaveServerVersion,
+		retrySavePreviousServerVersion:
+			normalized.retrySavePreviousServerVersion,
+		retrySaveRevisionCreated: normalized.retrySaveRevisionCreated,
+		retrySaveCreatedRevisionIds: normalized.retrySaveCreatedRevisionIds,
+	};
+}
+
 function canPrepareDistributedEditingRetrySubmitSaveFromStatusChrome(
 	normalized
 ) {
@@ -1792,13 +1890,22 @@ export function getDistributedEditingSessionStateForRetrySaveResult(
 			responseData.created_revision_ids ||
 			[],
 	};
+	const hasSavedStateEvidence = hasRetrySaveResponseSavedStateEvidence( {
+		serverVersion,
+		retrySaveFlags,
+	} );
+	const rejectedPendingChangeCount =
+		normalizeCount( pendingChangeCount ) ||
+		normalizedCurrent.pendingChangeCount ||
+		( normalizedCurrent.hasPendingChanges ? 1 : 0 );
 
 	if (
 		result === 'retry_save_applied' &&
 		( responseOrError.retrySaveAccepted === true ||
 			responseOrError.retry_save_accepted === true ||
 			responseData.retrySaveAccepted === true ||
-			responseData.retry_save_accepted === true )
+			responseData.retry_save_accepted === true ) &&
+		hasSavedStateEvidence
 	) {
 		return normalizeDistributedEditingSessionState( {
 			...normalizedCurrent,
@@ -1850,19 +1957,25 @@ export function getDistributedEditingSessionStateForRetrySaveResult(
 		} );
 	}
 
-	const reasonCode = normalizeNullableString(
-		responseOrError.code ||
-			responseOrError.reasonCode ||
-			responseOrError.reason_code ||
-			responseData.reasonCode ||
-			responseData.reason_code
-	);
+	const reasonCode =
+		result === 'retry_save_applied'
+			? DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_MALFORMED_SYNC_PAYLOAD
+			: normalizeNullableString(
+					responseOrError.code ||
+						responseOrError.reasonCode ||
+						responseOrError.reason_code ||
+						responseData.reasonCode ||
+						responseData.reason_code
+			  );
 
 	return getDistributedEditingRejectedRetrySaveState( {
 		normalizedCurrent,
 		reasonCode,
-		result,
-		pendingChangeCount,
+		result:
+			result === 'retry_save_applied'
+				? DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.RETRY_SAVE_MISSING_SAVED_STATE_EVIDENCE
+				: result,
+		pendingChangeCount: rejectedPendingChangeCount,
 		serverVersion,
 		previousServerVersion,
 		retrySaveFlags,
@@ -1922,6 +2035,10 @@ export function getDistributedEditingRetrySavePolicyForSessionState(
 		normalized.retrySubmitMutatesPostContent ||
 		normalized.retrySubmitCreatesRevision ||
 		normalized.retrySubmitClaimsSaved;
+	const hasRetrySaveSavedStateEvidence =
+		hasDistributedEditingRetrySaveSavedStateEvidenceForSessionState(
+			normalized
+		);
 	let reason = null;
 
 	if (
@@ -1932,10 +2049,17 @@ export function getDistributedEditingRetrySavePolicyForSessionState(
 			DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.RETRY_SAVE_IN_PROGRESS;
 	} else if (
 		normalized.retrySaveStatus ===
-		DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVED
+			DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVED &&
+		hasRetrySaveSavedStateEvidence
 	) {
 		reason =
 			DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.RETRY_SAVE_ALREADY_CONFIRMED;
+	} else if (
+		normalized.retrySaveStatus ===
+		DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVED
+	) {
+		reason =
+			DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.RETRY_SAVE_MISSING_SAVED_STATE_EVIDENCE;
 	} else if ( ! hasPendingChanges ) {
 		reason =
 			DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.NO_PENDING_CHANGES;
@@ -1985,7 +2109,7 @@ export function getDistributedEditingRetrySavePolicyForSessionState(
 		changesPostLock: false,
 		dispatchesNotice: false,
 		mutatesEditorContent: false,
-		claimsSaved: false,
+		claimsSaved: hasRetrySaveSavedStateEvidence,
 		protectsLocalChanges: hasPendingChanges,
 		canExportLocalUpdates:
 			normalized.canExportLocalUpdates || hasPendingChanges,
@@ -1995,6 +2119,7 @@ export function getDistributedEditingRetrySavePolicyForSessionState(
 				DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.SERVER_STATE_REFETCH_REQUIRED,
 		hasAcceptedProof,
 		hasPreparedSavePath,
+		hasRetrySaveSavedStateEvidence,
 		hasPostRoute: Boolean( postId && restBase ),
 		hasProposedPostContent,
 		hasVersionProof: Boolean(
@@ -2013,6 +2138,18 @@ export function getDistributedEditingRetrySavePolicyForSessionState(
 			  }
 			: null,
 	};
+}
+
+function hasRetrySaveResponseSavedStateEvidence( {
+	serverVersion,
+	retrySaveFlags,
+} ) {
+	return Boolean(
+		serverVersion &&
+			retrySaveFlags.retrySaveSavesPost &&
+			retrySaveFlags.retrySaveMutatesPostContent &&
+			retrySaveFlags.retrySaveClaimsSaved
+	);
 }
 
 /**
