@@ -736,6 +736,208 @@ describe( 'DistributedEditingStatus', () => {
 		expect( screen.getByText( 'Changes pending' ) ).toBeVisible();
 	} );
 
+	it( 'renders retry-save in-progress feedback from production editor chrome without saving', async () => {
+		const user = userEvent.setup();
+		const writeText = jest.fn().mockResolvedValue();
+		const actions = setupDistributedEditingStatusDispatch();
+
+		Object.defineProperty( globalThis.navigator, 'clipboard', {
+			value: { writeText },
+			configurable: true,
+		} );
+		setupDistributedEditingStatusSelect( {
+			currentPost: { id: 43, type: 'post' },
+			editedPostContent:
+				'<!-- wp:paragraph --><p>Saving update</p><!-- /wp:paragraph -->',
+			sessionState: {
+				pendingChangeCount: 1,
+				hasPendingChanges: true,
+				isAwaitingServerConfirmation: true,
+				canExportLocalUpdates: true,
+				mustOfferLocalCopy: true,
+				retrySaveStatus: DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVING,
+			},
+		} );
+
+		render( <DistributedEditingStatusChrome /> );
+
+		expect(
+			screen.getByRole( 'region', {
+				name: 'Distributed editing status',
+			} )
+		).toHaveAttribute(
+			'data-distributed-editing-placement',
+			'editor-interface-notices'
+		);
+		expect( screen.getByText( 'Retry save in progress' ) ).toBeVisible();
+		expect(
+			screen.getByText(
+				'The editor is sending rebased changes through the guarded retry-save path. Keep this tab open until the server confirms the save.'
+			)
+		).toBeVisible();
+		expect( screen.getByText( 'Changes pending' ) ).toBeVisible();
+		expect(
+			screen.getByText(
+				'Retry save is waiting for server confirmation. Local changes remain pending.'
+			)
+		).toBeVisible();
+
+		await user.click(
+			screen.getByRole( 'button', {
+				name: 'Export local changes',
+			} )
+		);
+
+		expect( writeText ).toHaveBeenCalledTimes( 1 );
+		expect( JSON.parse( writeText.mock.calls[ 0 ][ 0 ] ) ).toMatchObject( {
+			version: 1,
+			format: 'wp/de-rtc-local-updates',
+			post: {
+				id: 43,
+				type: 'post',
+			},
+			postContent:
+				'<!-- wp:paragraph --><p>Saving update</p><!-- /wp:paragraph -->',
+			distributedEditingSessionState: {
+				pendingChangeCount: 1,
+				retrySaveStatus: DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVING,
+				canExportLocalUpdates: true,
+			},
+		} );
+		expect(
+			actions.__experimentalSaveDistributedEditingRetryAfterProof
+		).not.toHaveBeenCalled();
+		expect(
+			actions.__experimentalRefreshDistributedEditingServerStateAfterStaleBase
+		).not.toHaveBeenCalled();
+		expect(
+			await screen.findByText(
+				'Local changes copied. Keep this data until the server confirms your update.'
+			)
+		).toBeVisible();
+	} );
+
+	it( 'renders already-confirmed retry-save state from production editor chrome without recovery actions', () => {
+		setupDistributedEditingStatusSelect( {
+			sessionState: {
+				retrySaveStatus: DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVED,
+				retrySaveAccepted: true,
+				retrySaveServerVersion: '8',
+				retrySavePreviousServerVersion: '7',
+				retrySaveSavesPost: true,
+				retrySaveMutatesPostContent: true,
+				retrySaveCreatesRevision: true,
+				retrySaveClaimsSaved: true,
+				retrySaveRevisionCreated: true,
+				retrySaveCreatedRevisionIds: [ 7002 ],
+			},
+		} );
+
+		render( <DistributedEditingStatusChrome /> );
+
+		expect(
+			screen.getByRole( 'region', {
+				name: 'Distributed editing status',
+			} )
+		).toHaveAttribute(
+			'data-distributed-editing-placement',
+			'editor-interface-notices'
+		);
+		expect( screen.getByText( 'Retry save confirmed' ) ).toBeVisible();
+		expect(
+			screen.getByText(
+				'The server saved the rebased changes and cleared the local pending-change warning.'
+			)
+		).toBeVisible();
+		expect(
+			screen.queryByRole( 'button', {
+				name: 'Export local changes',
+			} )
+		).not.toBeInTheDocument();
+		expect(
+			screen.queryByRole( 'button', {
+				name: 'Refresh server version',
+			} )
+		).not.toBeInTheDocument();
+		expect(
+			screen.queryByText( 'Changes pending' )
+		).not.toBeInTheDocument();
+	} );
+
+	it( 'renders blocked retry-save in-progress handoff feedback from production editor chrome without saving', async () => {
+		const user = userEvent.setup();
+		const writeText = jest.fn().mockResolvedValue();
+		const actions = setupDistributedEditingStatusDispatch();
+
+		Object.defineProperty( globalThis.navigator, 'clipboard', {
+			value: { writeText },
+			configurable: true,
+		} );
+		setupDistributedEditingStatusSelect( {
+			currentPost: { id: 44, type: 'post' },
+			editedPostContent:
+				'<!-- wp:paragraph --><p>Blocked update</p><!-- /wp:paragraph -->',
+			sessionState: {
+				pendingChangeCount: 1,
+				hasPendingChanges: true,
+				isAwaitingServerConfirmation: true,
+				canExportLocalUpdates: true,
+				retrySaveStatus: DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVING,
+				retrySaveHandoffStatus:
+					DISTRIBUTED_EDITING_RETRY_SAVE_HANDOFF_STATUSES.RETRY_SAVE_BLOCKED,
+				retrySaveHandoffReason:
+					DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.RETRY_SAVE_IN_PROGRESS,
+				retrySaveHandoffBlocksNormalSave: true,
+			},
+		} );
+
+		render( <DistributedEditingStatusChrome /> );
+
+		expect(
+			screen.getByText( 'Retry save already in progress' )
+		).toBeVisible();
+		expect(
+			screen.getByText(
+				'A retry save is already waiting for server confirmation. Local changes are still protected; keep this tab open until it finishes.'
+			)
+		).toBeVisible();
+
+		await user.click(
+			screen.getByRole( 'button', {
+				name: 'Export local changes',
+			} )
+		);
+
+		expect( writeText ).toHaveBeenCalledTimes( 1 );
+		expect( JSON.parse( writeText.mock.calls[ 0 ][ 0 ] ) ).toMatchObject( {
+			post: {
+				id: 44,
+				type: 'post',
+			},
+			postContent:
+				'<!-- wp:paragraph --><p>Blocked update</p><!-- /wp:paragraph -->',
+			distributedEditingSessionState: {
+				retrySaveStatus: DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVING,
+				retrySaveHandoffStatus:
+					DISTRIBUTED_EDITING_RETRY_SAVE_HANDOFF_STATUSES.RETRY_SAVE_BLOCKED,
+				retrySaveHandoffReason:
+					DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.RETRY_SAVE_IN_PROGRESS,
+				canExportLocalUpdates: true,
+			},
+		} );
+		expect(
+			actions.__experimentalSaveDistributedEditingRetryAfterProof
+		).not.toHaveBeenCalled();
+		expect(
+			actions.__experimentalRefreshDistributedEditingServerStateAfterStaleBase
+		).not.toHaveBeenCalled();
+		expect(
+			await screen.findByText(
+				'Local changes copied. Keep this data until the server confirms your update.'
+			)
+		).toBeVisible();
+	} );
+
 	it( 'copies local updates from production editor chrome without saving', async () => {
 		const user = userEvent.setup();
 		const writeText = jest.fn().mockResolvedValue();
