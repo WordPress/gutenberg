@@ -50,7 +50,11 @@
 	/* Elbow only: matches tile scale; arm ends stay square. */
 	border-end-end-radius: var(--wpds-border-radius-md);
 	transform: scale(1);
-	transform-origin: inline-end block-end;
+	transform-origin: 100% 100%;
+}
+
+[dir="rtl"] .handleCorner::after {
+	transform-origin: 0% 100%;
 }
 
 .handleCorner.resizing::after,
@@ -102,7 +106,7 @@
 	height: 12px;
 	background-color: var(--wpds-color-fg-interactive-brand);
 	transform: scale(1);
-	transform-origin: center block-end;
+	transform-origin: 50% 100%;
 }
 
 .handleHorizontal.resizing::after,
