@@ -14,7 +14,6 @@ import type { IconType } from '@wordpress/components';
 import type { Field } from '@wordpress/dataviews';
 import type {
 	DashboardGridLayoutItem,
-	DashboardGridSpacing,
 	DashboardLanesLayoutItem,
 } from '@wordpress/grid';
 
@@ -270,6 +269,11 @@ export type WidgetGridModel = 'grid' | 'masonry';
  * are mutually exclusive at runtime; the underlying grid component
  * handles the conflict so the dashboard does not enforce the xor at
  * the type level (keeps `react-docgen-typescript` serialization clean).
+ *
+ * `spacing` is intentionally absent: the gap between tiles is
+ * presentational and lives with the design-system theme/density, not
+ * with per-dashboard settings. The grid surface keeps the prop for
+ * programmatic overrides, but the dashboard does not propagate it.
  */
 interface BaseWidgetGridSettings {
 	/**
@@ -282,13 +286,6 @@ interface BaseWidgetGridSettings {
 	 * with `columns`.
 	 */
 	minColumnWidth?: number;
-
-	/**
-	 * Gap size between tiles. Maps to the design-system gap scale
-	 * (`--wpds-dimension-gap-*`), so the rendered gap follows the
-	 * `density` chosen by an ancestor `ThemeProvider`.
-	 */
-	spacing?: DashboardGridSpacing;
 }
 
 /**

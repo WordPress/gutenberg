@@ -3,7 +3,6 @@
  */
 import { ToggleControl } from '@wordpress/components';
 import { useCallback } from '@wordpress/element';
-import type { DashboardGridSpacing } from '@wordpress/grid';
 import { __ } from '@wordpress/i18n';
 /* eslint-disable @wordpress/use-recommended-components */
 import {
@@ -31,19 +30,6 @@ const MODEL_ITEMS = [
 	{ value: 'masonry', label: __( 'Masonry' ) },
 ] as const satisfies ReadonlyArray< { value: WidgetGridModel; label: string } >;
 
-const SPACING_ITEMS = [
-	{ value: 'xs', label: __( 'Extra small' ) },
-	{ value: 'sm', label: __( 'Small' ) },
-	{ value: 'md', label: __( 'Medium' ) },
-	{ value: 'lg', label: __( 'Large' ) },
-	{ value: 'xl', label: __( 'Extra large' ) },
-	{ value: '2xl', label: __( '2x extra large' ) },
-	{ value: '3xl', label: __( '3x extra large' ) },
-] as const satisfies ReadonlyArray< {
-	value: DashboardGridSpacing;
-	label: string;
-} >;
-
 const ROW_HEIGHT_AUTO = 'auto' as const;
 
 function getModelValue( settings: WidgetGridSettings ): WidgetGridModel {
@@ -67,11 +53,15 @@ interface LayoutSettingsProps {
 }
 
 /**
- * Non-modal side drawer for grid-level settings (model, gap, min
- * column width, row height). Reads from and writes to the staging
- * copy in `useDashboardInternalContext`, so every edit shows up live
+ * Non-modal side drawer for grid-level settings (model, column
+ * behavior, row height). Reads from and writes to the staging copy
+ * in `useDashboardInternalContext`, so every edit shows up live
  * behind the drawer and is committed or rolled back by the drawer's
  * Save / Cancel buttons.
+ *
+ * Gap is intentionally absent: the spacing between tiles is a
+ * design-system concern (theme / density / viewport tokens) and
+ * should not be configurable per dashboard.
  *
  * Save commits the staging buffer; Cancel reverts it. Closing the
  * drawer through the X icon, an Escape press, or any path other than
@@ -127,16 +117,6 @@ export function LayoutSettings( {
 			onGridSettingsChange,
 			onLayoutChange,
 		]
-	);
-
-	const handleSpacingChange = useCallback(
-		( next: DashboardGridSpacing | undefined ) => {
-			onGridSettingsChange( {
-				...gridSettings,
-				spacing: next,
-			} as WidgetGridSettings );
-		},
-		[ gridSettings, onGridSettingsChange ]
 	);
 
 	const handleMinColumnWidthChange = useCallback(
@@ -263,26 +243,6 @@ export function LayoutSettings( {
 								if ( item ) {
 									handleModelChange(
 										item.value as WidgetGridModel
-									);
-								}
-							} }
-						/>
-
-						<SelectControl
-							label={ __( 'Gap' ) }
-							description={ __(
-								'Spacing size between tiles. Follows the active density of the design system.'
-							) }
-							items={ [ ...SPACING_ITEMS ] }
-							value={ SPACING_ITEMS.find(
-								( item ) =>
-									item.value ===
-									( gridSettings.spacing ?? 'sm' )
-							) }
-							onValueChange={ ( item ) => {
-								if ( item ) {
-									handleSpacingChange(
-										item.value as DashboardGridSpacing
 									);
 								}
 							} }

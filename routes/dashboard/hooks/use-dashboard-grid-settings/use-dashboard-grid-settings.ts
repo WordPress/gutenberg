@@ -23,7 +23,6 @@ const DEFAULT_GRID_SETTINGS: WidgetGridSettings = {
 	model: 'grid',
 	minColumnWidth: 350,
 	rowHeight: 200,
-	spacing: 'lg',
 };
 
 /**

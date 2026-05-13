@@ -148,7 +148,6 @@ export const Widgets = forwardRef< HTMLDivElement, WidgetsProps >(
 				<DashboardLanes
 					layout={ gridLayout as DashboardLanesLayoutItem[] }
 					columns={ gridSettings.columns }
-					spacing={ gridSettings.spacing }
 					flowTolerance={ gridSettings.flowTolerance }
 					editMode={ editMode }
 					onChangeLayout={ handleMasonryChange }
@@ -162,7 +161,6 @@ export const Widgets = forwardRef< HTMLDivElement, WidgetsProps >(
 				<DashboardLanes
 					layout={ gridLayout as DashboardLanesLayoutItem[] }
 					minColumnWidth={ gridSettings.minColumnWidth }
-					spacing={ gridSettings.spacing }
 					flowTolerance={ gridSettings.flowTolerance }
 					editMode={ editMode }
 					onChangeLayout={ handleMasonryChange }
@@ -176,7 +174,6 @@ export const Widgets = forwardRef< HTMLDivElement, WidgetsProps >(
 				<DashboardGrid
 					layout={ gridLayout as DashboardGridLayoutItem[] }
 					columns={ gridSettings.columns }
-					spacing={ gridSettings.spacing }
 					rowHeight={ gridSettings.rowHeight }
 					editMode={ editMode }
 					onChangeLayout={ handleGridChange }
@@ -190,7 +187,6 @@ export const Widgets = forwardRef< HTMLDivElement, WidgetsProps >(
 				<DashboardGrid
 					layout={ gridLayout as DashboardGridLayoutItem[] }
 					minColumnWidth={ gridSettings.minColumnWidth }
-					spacing={ gridSettings.spacing }
 					rowHeight={ gridSettings.rowHeight }
 					editMode={ editMode }
 					onChangeLayout={ handleGridChange }
