@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { act, renderHook } from '@testing-library/react';
+import { act, renderHook, waitFor } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -58,6 +58,22 @@ describe( 'useDeferredCommit', () => {
 		expect( onCommit ).toHaveBeenCalledWith( 250 );
 	} );
 
+	it( 'keeps input bounds active while focused', () => {
+		const { result } = renderHook( () =>
+			useDeferredCommit( {
+				value: 100,
+				range: RANGE,
+				commitStep: 1,
+				onCommit: jest.fn(),
+			} )
+		);
+
+		act( () => result.current.onFocus() );
+
+		expect( result.current.min ).toBe( 0 );
+		expect( result.current.max ).toBe( 500 );
+	} );
+
 	it( 'does not commit out-of-range drafts until completion', () => {
 		const onCommit = jest.fn();
 		const { result } = renderHook( () =>
@@ -72,6 +88,119 @@ describe( 'useDeferredCommit', () => {
 		act( () => result.current.onFocus() );
 		act( () => result.current.onChange( '9999' ) );
 
+		expect( onCommit ).not.toHaveBeenCalled();
+	} );
+
+	it( 'previews valid drafts without committing when live commits are disabled', () => {
+		const onCommit = jest.fn();
+		const onPreview = jest.fn();
+		const { result } = renderHook( () =>
+			useDeferredCommit( {
+				value: 100,
+				range: RANGE,
+				commitStep: 1,
+				commitOnChange: false,
+				onCommit,
+				onPreview,
+			} )
+		);
+
+		act( () => result.current.onFocus() );
+		act( () => result.current.onChange( '250' ) );
+
+		expect( onPreview ).toHaveBeenCalledWith( 250 );
+		expect( onCommit ).not.toHaveBeenCalled();
+	} );
+
+	it( 'commits deferred preview drafts on blur', () => {
+		const onCommit = jest.fn();
+		const onCommitEnd = jest.fn();
+		const onPreview = jest.fn();
+		const { result } = renderHook( () =>
+			useDeferredCommit( {
+				value: 100,
+				range: RANGE,
+				commitStep: 1,
+				commitOnChange: false,
+				onCommit,
+				onCommitEnd,
+				onPreview,
+			} )
+		);
+
+		act( () => result.current.onFocus() );
+		act( () => result.current.onChange( '250' ) );
+		act( () => result.current.onBlur() );
+
+		expect( onCommit ).toHaveBeenCalledWith( 250 );
+		expect( onPreview ).toHaveBeenLastCalledWith( null );
+		expect( onCommitEnd ).toHaveBeenCalledTimes( 1 );
+	} );
+
+	it( 'clears deferred previews on Escape without committing', () => {
+		const onCommit = jest.fn();
+		const onPreview = jest.fn();
+		const { result } = renderHook( () =>
+			useDeferredCommit( {
+				value: 100,
+				range: RANGE,
+				commitStep: 1,
+				commitOnChange: false,
+				onCommit,
+				onPreview,
+			} )
+		);
+
+		act( () => result.current.onFocus() );
+		act( () => result.current.onChange( '250' ) );
+		act( () => result.current.onKeyDown( fakeKeyboardEvent( 'Escape' ) ) );
+
+		expect( onPreview ).toHaveBeenLastCalledWith( null );
+		expect( onCommit ).not.toHaveBeenCalled();
+	} );
+
+	it( 'cancels deferred previews when value changes externally during focus', async () => {
+		const onCommit = jest.fn();
+		const onPreview = jest.fn();
+		const { result, rerender } = renderHook(
+			( { value }: { value: number } ) =>
+				useDeferredCommit( {
+					value,
+					range: RANGE,
+					commitStep: 1,
+					commitOnChange: false,
+					onCommit,
+					onPreview,
+				} ),
+			{ initialProps: { value: 100 } }
+		);
+
+		act( () => result.current.onFocus() );
+		act( () => result.current.onChange( '250' ) );
+		rerender( { value: 300 } );
+
+		await waitFor( () => expect( result.current.value ).toBe( '300' ) );
+		expect( onPreview ).toHaveBeenLastCalledWith( null );
+		expect( onCommit ).not.toHaveBeenCalled();
+	} );
+
+	it( 'does not commit outward edits from an already out-of-range value', () => {
+		const onCommit = jest.fn();
+		const { result } = renderHook( () =>
+			useDeferredCommit( {
+				value: -10,
+				range: RANGE,
+				commitStep: 1,
+				onCommit,
+			} )
+		);
+
+		act( () => result.current.onFocus() );
+		act( () => result.current.onChange( '-9' ) );
+
+		expect( result.current.value ).toBe( '-9' );
+		expect( result.current.min ).toBe( 0 );
+		expect( result.current.max ).toBe( 500 );
 		expect( onCommit ).not.toHaveBeenCalled();
 	} );
 
@@ -115,9 +244,8 @@ describe( 'useDeferredCommit', () => {
 		act( () => result.current.onChange( '350' ) );
 
 		// Live commits fire as the user types, but the completion signal
-		// waits for an explicit boundary (blur or Enter) so a settle or
-		// history flush cannot reshape state mid-edit and spring the input
-		// back under the cursor.
+		// waits for an explicit boundary (blur or Enter) so session cleanup
+		// and final history flushing still happen once.
 		expect( onCommit ).toHaveBeenCalledTimes( 3 );
 		expect( onCommitEnd ).not.toHaveBeenCalled();
 	} );
@@ -395,7 +523,7 @@ describe( 'useDeferredCommit', () => {
 		expect( onSessionEnd ).toHaveBeenCalledTimes( 1 );
 	} );
 
-	it( 'flushes a pending live commit before ending an active session on unmount', () => {
+	it( 'ends an active session before flushing a pending live commit on unmount', () => {
 		const onCommitEnd = jest.fn();
 		const onSessionEnd = jest.fn();
 		const { result, unmount } = renderHook( () =>
@@ -415,8 +543,8 @@ describe( 'useDeferredCommit', () => {
 
 		expect( onCommitEnd ).toHaveBeenCalledTimes( 1 );
 		expect( onSessionEnd ).toHaveBeenCalledTimes( 1 );
-		expect( onCommitEnd.mock.invocationCallOrder[ 0 ] ).toBeLessThan(
-			onSessionEnd.mock.invocationCallOrder[ 0 ]
+		expect( onSessionEnd.mock.invocationCallOrder[ 0 ] ).toBeLessThan(
+			onCommitEnd.mock.invocationCallOrder[ 0 ]
 		);
 	} );
 } );

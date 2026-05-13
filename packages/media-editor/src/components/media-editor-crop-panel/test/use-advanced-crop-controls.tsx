@@ -14,6 +14,7 @@ const mockSettleCrop = jest.fn();
 const mockCommitHistory = jest.fn();
 const mockPauseHistory = jest.fn();
 const mockResumeHistory = jest.fn();
+const mockSetPreviewCropRect = jest.fn();
 
 const defaultState = {
 	image: { src: 'test.jpg', naturalWidth: 1000, naturalHeight: 500 },
@@ -59,7 +60,6 @@ jest.mock( '../../../image-editor', () => ( {
 		settleCrop: mockSettleCrop,
 		commitHistory: mockCommitHistory,
 		pauseHistory: mockPauseHistory,
-		resumeHistory: mockResumeHistory,
 	} ),
 } ) );
 
@@ -67,9 +67,14 @@ jest.mock( '../../../image-editor/react/hooks/use-crop-geometry', () => ( {
 	useCropGeometry: () => mockCropGeometry,
 } ) );
 
+jest.mock( '../../../image-editor/react/components/cropper-provider', () => ( {
+	useSetCropperPreviewRect: () => mockSetPreviewCropRect,
+} ) );
+
 describe( 'useAdvancedCropControls', () => {
 	beforeEach( () => {
 		jest.clearAllMocks();
+		mockPauseHistory.mockReturnValue( mockResumeHistory );
 		mockCropperState = defaultState;
 		mockCropGeometry = defaultGeometry;
 	} );
@@ -94,7 +99,28 @@ describe( 'useAdvancedCropControls', () => {
 		expect( result.current.ranges.left.minValue ).toBe( 0 );
 		expect( result.current.ranges.left.maxValue ).toBe( 600 );
 		expect( result.current.ranges.width.minValue ).toBe( 50 );
-		expect( result.current.ranges.width.maxValue ).toBe( 1000 );
+		expect( result.current.ranges.width.maxValue ).toBe( 900 );
+	} );
+
+	it( 'allows manual position ranges to reach the image bounds', () => {
+		mockCropGeometry = {
+			...defaultGeometry,
+			imageBounds: {
+				...defaultGeometry.imageBounds,
+				minTop: -100,
+				maxBottom: 600,
+				maxHeight: 700,
+			},
+		};
+		const { result } = renderHook( () =>
+			useAdvancedCropControls( { freeformCrop: true } )
+		);
+
+		if ( ! result.current.isReady ) {
+			throw new Error( 'expected controls to be ready' );
+		}
+		expect( result.current.ranges.top.minValue ).toBe( -100 );
+		expect( result.current.ranges.top.maxValue ).toBe( 400 );
 	} );
 
 	it( 'flags width/height as not editable when freeform is off', () => {
@@ -118,8 +144,8 @@ describe( 'useAdvancedCropControls', () => {
 			throw new Error( 'expected controls to be ready' );
 		}
 		// Aspect ratio 2:1 caps width by 2 * maxHeight and height by maxWidth / 2.
-		expect( result.current.ranges.width.maxValue ).toBe( 1000 );
-		expect( result.current.ranges.height.maxValue ).toBe( 500 );
+		expect( result.current.ranges.width.maxValue ).toBe( 900 );
+		expect( result.current.ranges.height.maxValue ).toBe( 450 );
 	} );
 
 	it( 'commits a width edit and couples height under an aspect ratio', () => {
@@ -133,6 +159,22 @@ describe( 'useAdvancedCropControls', () => {
 		act( () => result.current.onEdit( 'width', 600 ) );
 
 		expect( mockSetCropRect ).toHaveBeenCalledTimes( 1 );
+		expect( mockSettleCrop ).not.toHaveBeenCalled();
+	} );
+
+	it( 'previews a width edit without committing cropper state', () => {
+		const { result } = renderHook( () =>
+			useAdvancedCropControls( { freeformCrop: true, aspectRatio: 2 } )
+		);
+
+		if ( ! result.current.isReady ) {
+			throw new Error( 'expected controls to be ready' );
+		}
+		act( () => result.current.onPreview( 'width', 600 ) );
+
+		expect( mockSetPreviewCropRect ).toHaveBeenCalledTimes( 1 );
+		expect( mockSetCropRect ).not.toHaveBeenCalled();
+		expect( mockSettleCrop ).not.toHaveBeenCalled();
 	} );
 
 	it( 'settles after a discrete edit ends', () => {

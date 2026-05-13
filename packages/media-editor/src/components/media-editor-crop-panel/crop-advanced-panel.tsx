@@ -45,6 +45,7 @@ export default function CropAdvancedPanel( {
 		rect,
 		ranges,
 		fineRotation,
+		onPreview,
 		onEdit,
 		onEditEnd,
 		onSessionStart,
@@ -91,10 +92,12 @@ export default function CropAdvancedPanel( {
 							disabled={
 								! canMoveCropRect || ! ranges.left.isEditable
 							}
+							commitOnChange={ false }
+							onPreview={ ( value ) =>
+								onPreview( 'left', value )
+							}
 							onCommit={ ( value ) => onEdit( 'left', value ) }
 							onCommitEnd={ onEditEnd }
-							onSessionStart={ onSessionStart }
-							onSessionEnd={ onSessionEnd }
 						/>
 					</FlexItem>
 					<FlexItem isBlock>
@@ -106,10 +109,10 @@ export default function CropAdvancedPanel( {
 							disabled={
 								! canMoveCropRect || ! ranges.top.isEditable
 							}
+							commitOnChange={ false }
+							onPreview={ ( value ) => onPreview( 'top', value ) }
 							onCommit={ ( value ) => onEdit( 'top', value ) }
 							onCommitEnd={ onEditEnd }
-							onSessionStart={ onSessionStart }
-							onSessionEnd={ onSessionEnd }
 						/>
 					</FlexItem>
 				</Flex>
@@ -120,10 +123,12 @@ export default function CropAdvancedPanel( {
 							value={ rect.width }
 							range={ ranges.width }
 							disabled={ ! ranges.width.isEditable }
+							commitOnChange={ false }
+							onPreview={ ( value ) =>
+								onPreview( 'width', value )
+							}
 							onCommit={ ( value ) => onEdit( 'width', value ) }
 							onCommitEnd={ onEditEnd }
-							onSessionStart={ onSessionStart }
-							onSessionEnd={ onSessionEnd }
 						/>
 					</FlexItem>
 					<FlexItem isBlock>
@@ -132,10 +137,12 @@ export default function CropAdvancedPanel( {
 							value={ rect.height }
 							range={ ranges.height }
 							disabled={ ! ranges.height.isEditable }
+							commitOnChange={ false }
+							onPreview={ ( value ) =>
+								onPreview( 'height', value )
+							}
 							onCommit={ ( value ) => onEdit( 'height', value ) }
 							onCommitEnd={ onEditEnd }
-							onSessionStart={ onSessionStart }
-							onSessionEnd={ onSessionEnd }
 						/>
 					</FlexItem>
 				</Flex>

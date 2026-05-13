@@ -70,14 +70,14 @@ describe( 'getInputBounds', () => {
 		expect( bounds.max ).toBe( 2560 );
 	} );
 
-	it( 'expands min downward when current value is outside the snapped min', () => {
+	it( 'keeps bounds strict when current value is outside the snapped min', () => {
 		const range = makeRange( 5, 100 );
 		const bounds = getInputBounds( 3, range, 1 );
 
-		// `value` is snapped to step but `min` opens up so the current value
-		// stays representable in the input.
+		// The input may display an out-of-range state, but commits still use
+		// the real range so arrow/wheel edits cannot keep pushing outward.
 		expect( bounds.value ).toBe( 3 );
-		expect( bounds.min ).toBe( 3 );
+		expect( bounds.min ).toBe( 5 );
 		expect( bounds.max ).toBe( 100 );
 	} );
 } );

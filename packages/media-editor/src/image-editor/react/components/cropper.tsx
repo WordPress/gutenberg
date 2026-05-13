@@ -40,9 +40,13 @@ import {
 	snapCropRectToSourcePixelGrid,
 	snapCropRectToSourcePixels,
 } from '../../core/source-region';
+import { CropPreviewOverlay } from './overlays/crop-preview-overlay';
 import { ViewportProvider, useViewport } from './viewport-provider';
 import { VISUALLY_HIDDEN_STYLE } from '../visually-hidden-style';
-import { useOptionalSetCropperCanvasSize } from './cropper-provider';
+import {
+	useOptionalCropperPreviewRect,
+	useOptionalSetCropperCanvasSize,
+} from './cropper-provider';
 
 /** Threshold for comparing normalized crop rect values. */
 const CROP_RECT_EPSILON = 1e-6;
@@ -181,6 +185,7 @@ function CropperInner(
 		resetViewport,
 	} = useViewport();
 	const setCropperCanvasSize = useOptionalSetCropperCanvasSize();
+	const previewCropRect = useOptionalCropperPreviewRect();
 	// Canvas measurement via ResizeObserver. The canvas is the inner
 	// positioning context for image/stencil/handles — inset from the root
 	// by the handle gutter, so crop math operates on the reduced box.
@@ -997,6 +1002,8 @@ function CropperInner(
 						'wp-media-editor-image-editor__canvas--show-grid',
 					settling &&
 						'wp-media-editor-image-editor__canvas--settling',
+					previewCropRect &&
+						'wp-media-editor-image-editor__canvas--previewing',
 					// Marks the cropper as in keyboard-interaction mode.
 					// CSS uses :focus on the canvas to show the stencil
 					// outline and :focus on a handle to show its ring,
@@ -1050,7 +1057,7 @@ function CropperInner(
 					{ /* Dimming overlay outside the crop area */ }
 					{ showDimming && (
 						<DimmingOverlay
-							cropRect={ state.cropRect }
+							cropRect={ previewCropRect ?? state.cropRect }
 							containerSize={ canvasSize }
 							imageSize={ scaledVisualSize }
 							transition={ settleStencilTransition }
@@ -1067,7 +1074,9 @@ function CropperInner(
 						onResizeEnd={ handleResizeEnd }
 						onEscape={ handleEscape }
 						aspectRatio={ aspectRatio }
-						freeformCrop={ freeformCrop }
+						freeformCrop={
+							previewCropRect ? false : freeformCrop
+						}
 						isResizeDisabled={ isTouchPinching }
 						stencilTransition={ settleStencilTransition }
 						cropBounds={ cropBounds }
@@ -1079,7 +1088,7 @@ function CropperInner(
 					{ /* Rule-of-thirds grid */ }
 					{ ( showGrid === true || isInteractiveGrid ) && (
 						<GridOverlay
-							cropRect={ state.cropRect }
+							cropRect={ previewCropRect ?? state.cropRect }
 							containerSize={ canvasSize }
 							imageSize={ scaledVisualSize }
 						/>
@@ -1094,6 +1103,14 @@ function CropperInner(
 							activeHandle={ activeHandle }
 							outputWidth={ outputSize.width }
 							outputHeight={ outputSize.height }
+						/>
+					) }
+
+					{ previewCropRect && (
+						<CropPreviewOverlay
+							cropRect={ previewCropRect }
+							containerSize={ canvasSize }
+							imageSize={ scaledVisualSize }
 						/>
 					) }
 				</div>

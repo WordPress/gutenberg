@@ -15,6 +15,7 @@ import {
 	type CropPixelRectBounds,
 } from '../../image-editor/core/crop-geometry';
 import { fineRotation } from '../../image-editor/core/fine-rotation';
+import { useSetCropperPreviewRect } from '../../image-editor/react/components/cropper-provider';
 import { useCropGeometry } from '../../image-editor/react/hooks/use-crop-geometry';
 import { makeRange, type CropInputRange } from './crop-input-utils';
 
@@ -42,19 +43,17 @@ export type AdvancedCropControlsState =
 			canMoveCropRect: boolean;
 			ranges: AdvancedCropRanges;
 			fineRotation: AdvancedFineRotationConfig;
+			onPreview: ( field: CropEditField, value: number | null ) => void;
 			onEdit: ( field: CropEditField, value: number ) => void;
 			onEditEnd: () => void;
 			/**
-			 * Pass to each numeric control's `onSessionStart`. Pauses the
-			 * cropper's auto-history debounce so a focused edit session
-			 * accumulates state changes without producing intermediate
-			 * undo entries.
+			 * Pass to live numeric controls' `onSessionStart` so the focused
+			 * edit session opens one undo boundary.
 			 */
 			onSessionStart: () => void;
 			/**
-			 * Pass to each numeric control's `onSessionEnd`. Resumes the
-			 * debounce. The session's single undo entry is recorded by
-			 * `onEditEnd` (which calls `settleCrop` → `commitHistory`).
+			 * Pass to live numeric controls' `onSessionEnd` so the focused
+			 * edit session closes one undo boundary.
 			 */
 			onSessionEnd: () => void;
 	  };
@@ -65,17 +64,18 @@ export interface UseAdvancedCropControlsArgs {
 	onPlacementControlInteraction?: () => void;
 }
 
+// 1px — absorbs sub-pixel drift from rotation/zoom that would otherwise
+// leave `rect.left` at, say, 0.0003 when the user clearly placed the crop
+// against the image edge. Treat anything closer than 1px to the edge as
+// anchored so the width/height ranges report a clean "from edge to edge".
+const EDGE_SNAP_EPSILON = 1;
+
 /**
  * Hook that wires the advanced crop panel to the cropper controller.
  *
- * Resolves the current crop geometry, computes editable ranges, and returns
- * commit handlers that:
- *  - call `setCropRect` immediately on each valid edit so the preview tracks
- *    typing,
- *  - call `settleCrop` on edit completion so the resize-end re-center fires
- *    once per discrete edit (rotation uses `commitHistory` instead — fine
- *    rotation doesn't reshape the crop, it just needs the gesture's history
- *    entry flushed).
+ * Crop rectangle controls are draft-first: valid drafts paint a preview
+ * rectangle, then blur/Enter commits the rect once and settles the cropper.
+ * Fine rotation remains live because visual feedback is essential there.
  *
  * Returns `{ isReady: false }` until the cropper has measurements; the panel
  * component should render nothing in that case.
@@ -100,6 +100,7 @@ export function useAdvancedCropControls( {
 		endGesture,
 	} = useMediaEditor();
 	const geometry = useCropGeometry();
+	const setPreviewCropRect = useSetCropperPreviewRect();
 
 	const imageSize = useMemo(
 		() =>
@@ -112,26 +113,60 @@ export function useAdvancedCropControls( {
 		[ state.image ]
 	);
 
-	const onEdit = useCallback(
-		( field: CropEditField, value: number ) => {
+	const getEditedRect = useCallback(
+		( field: CropEditField, value: number ): CropPixelRect | null => {
 			if ( ! geometry.isReady ) {
-				return;
+				return null;
 			}
-			const next = applyCropEdit( geometry.rect, field, value, {
+			return applyCropEdit( geometry.rect, field, value, {
 				aspectRatio,
 				bounds: geometry.imageBounds,
 			} );
+		},
+		[ geometry, aspectRatio ]
+	);
+
+	const onPreview = useCallback(
+		( field: CropEditField, value: number | null ) => {
+			if ( value === null ) {
+				setPreviewCropRect( null );
+				return;
+			}
+			const next = getEditedRect( field, value );
+			setPreviewCropRect(
+				next
+					? cropPixelRectToNormalizedRect( next, state, imageSize )
+					: null
+			);
+			onPlacementControlInteraction?.();
+		},
+		[
+			getEditedRect,
+			state,
+			imageSize,
+			setPreviewCropRect,
+			onPlacementControlInteraction,
+		]
+	);
+
+	const onEdit = useCallback(
+		( field: CropEditField, value: number ) => {
+			const next = getEditedRect( field, value );
+			setPreviewCropRect( null );
+			if ( ! next ) {
+				return;
+			}
 			setCropRect(
 				cropPixelRectToNormalizedRect( next, state, imageSize )
 			);
 			onPlacementControlInteraction?.();
 		},
 		[
-			geometry,
-			aspectRatio,
+			getEditedRect,
 			setCropRect,
 			state,
 			imageSize,
+			setPreviewCropRect,
 			onPlacementControlInteraction,
 		]
 	);
@@ -194,6 +229,7 @@ export function useAdvancedCropControls( {
 		imageBounds,
 		canMoveCropRect: freeformCrop,
 		ranges,
+		onPreview,
 		onSessionStart,
 		onSessionEnd,
 		fineRotation: {
@@ -210,18 +246,22 @@ export function useAdvancedCropControls( {
 
 function buildRanges(
 	rect: CropPixelRect,
-	imageBounds: CropPixelRectBounds,
+	bounds: CropPixelRectBounds,
 	aspectRatio: number | undefined,
 	freeformCrop: boolean
 ): AdvancedCropRanges {
-	const left = makeRange(
-		imageBounds.minLeft,
-		imageBounds.maxRight - rect.width
-	);
-	const top = makeRange(
-		imageBounds.minTop,
-		imageBounds.maxBottom - rect.height
-	);
+	const anchoredLeft =
+		Math.abs( rect.left - bounds.minLeft ) < EDGE_SNAP_EPSILON
+			? bounds.minLeft
+			: rect.left;
+	const anchoredTop =
+		Math.abs( rect.top - bounds.minTop ) < EDGE_SNAP_EPSILON
+			? bounds.minTop
+			: rect.top;
+	const maxWidthAtCurrentLeft = bounds.maxRight - anchoredLeft;
+	const maxHeightAtCurrentTop = bounds.maxBottom - anchoredTop;
+	const left = makeRange( bounds.minLeft, bounds.maxRight - rect.width );
+	const top = makeRange( bounds.minTop, bounds.maxBottom - rect.height );
 
 	if ( ! freeformCrop ) {
 		return {
@@ -232,16 +272,20 @@ function buildRanges(
 		};
 	}
 
-	let minWidth = imageBounds.minWidth;
-	let maxWidth = imageBounds.maxWidth;
-	let minHeight = imageBounds.minHeight;
-	let maxHeight = imageBounds.maxHeight;
+	let minWidth = bounds.minWidth;
+	let maxWidth = maxWidthAtCurrentLeft;
+	let minHeight = bounds.minHeight;
+	let maxHeight = maxHeightAtCurrentTop;
 
 	if ( aspectRatio && aspectRatio > 0 ) {
-		minWidth = Math.max( minWidth, imageBounds.minHeight * aspectRatio );
-		maxWidth = Math.min( maxWidth, imageBounds.maxHeight * aspectRatio );
-		minHeight = Math.max( minHeight, imageBounds.minWidth / aspectRatio );
-		maxHeight = Math.min( maxHeight, imageBounds.maxWidth / aspectRatio );
+		// Aspect-ratio coupling: lower bounds use the image's hard minimum
+		// (independent of current position), upper bounds use the
+		// position-anchored max so the coupled dimension can't push the
+		// crop past the bottom/right edge of the image.
+		minWidth = Math.max( minWidth, bounds.minHeight * aspectRatio );
+		maxWidth = Math.min( maxWidth, maxHeightAtCurrentTop * aspectRatio );
+		minHeight = Math.max( minHeight, bounds.minWidth / aspectRatio );
+		maxHeight = Math.min( maxHeight, maxWidthAtCurrentLeft / aspectRatio );
 	}
 
 	return {
