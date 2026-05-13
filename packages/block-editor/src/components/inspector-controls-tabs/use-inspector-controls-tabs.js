@@ -111,13 +111,17 @@ export default function useInspectorControlsTabs(
 		tabs.push( TAB_SETTINGS );
 	}
 
-	if ( hasBlockStyles || hasStyleFills ) {
+	const { tabSettings, isPreviewMode } = useSelect( ( select ) => {
+		const settings = select( blockEditorStore ).getSettings();
+		return {
+			tabSettings: settings.blockInspectorTabs,
+			isPreviewMode: settings.isPreviewMode,
+		};
+	}, [] );
+
+	if ( ! isPreviewMode && ( hasBlockStyles || hasStyleFills ) ) {
 		tabs.push( TAB_STYLES );
 	}
-
-	const tabSettings = useSelect( ( select ) => {
-		return select( blockEditorStore ).getSettings().blockInspectorTabs;
-	}, [] );
 
 	const showTabs = getShowTabs( blockName, tabSettings );
 	return showTabs ? tabs : EMPTY_ARRAY;
