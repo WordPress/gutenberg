@@ -13,6 +13,7 @@ const meta: Meta< typeof Popover.Root > = {
 	component: Popover.Root,
 	subcomponents: {
 		'Popover.Trigger': Popover.Trigger,
+		'Popover.Portal': Popover.Portal,
 		'Popover.Popup': Popover.Popup,
 		'Popover.Arrow': Popover.Arrow,
 		'Popover.Title': Popover.Title,
@@ -21,6 +22,13 @@ const meta: Meta< typeof Popover.Root > = {
 	},
 	argTypes: {
 		children: { control: false },
+	},
+	parameters: {
+		componentStatus: {
+			status: 'use-with-caution',
+			whereUsed: 'global',
+			notes: 'Not yet recommended for use alongside components from `@wordpress/components`, pending review of overlays compatibility. See [WordPress/gutenberg#76135](https://github.com/WordPress/gutenberg/issues/76135).',
+		},
 	},
 };
 export default meta;
@@ -443,10 +451,11 @@ export const OverlayPlacement: Story = {
 };
 
 /**
- * To render the popup inline (without a portal), create a local ref to a
- * `<span>` with `display: contents` and pass it as the `container` prop.
- * The popup will render inside the span rather than being portaled to
- * `document.body`, while retaining all positioning behavior.
+ * To keep the floating layer **in page flow** next to surrounding layout,
+ * create a local ref to a `<span>` with `display: contents` and pass
+ * `portal={ <Popover.Portal container={ ref } /> }`. The popup still uses a
+ * portal, but the portal **mounts** into that subtree instead of
+ * `document.body`, while retaining positioning behavior.
  *
  * **Note:** `backdrop` will not cover the full viewport in this mode.
  */
@@ -463,7 +472,11 @@ export const Inline: Story = {
 						ref={ inlineContainerRef }
 						style={ { display: 'contents' } }
 					/>
-					<Popover.Popup container={ inlineContainerRef }>
+					<Popover.Popup
+						portal={
+							<Popover.Portal container={ inlineContainerRef } />
+						}
+					>
 						<Popover.Arrow />
 						<Popover.Title
 							style={ {
@@ -473,8 +486,10 @@ export const Inline: Story = {
 							Inline Popover
 						</Popover.Title>
 						<Popover.Description>
-							This popup is rendered in place — no portal is used.
-							Inspect the DOM to see it lives inside its parent.
+							This example still uses `Popover.Portal`, but the
+							portal `container` is the in-tree span above, so the
+							portal node mounts inside the wrapper instead of
+							`document.body`.
 						</Popover.Description>
 					</Popover.Popup>
 				</Popover.Root>
@@ -572,8 +587,8 @@ export const CollisionAvoidance: Story = {
 
 /**
  * When the popover's trigger lives inside an iframe but the popover should
- * render in the parent document, pass a parent-document element to the
- * `container` prop on `Popover.Popup`.
+ * render in the parent document, pass a parent-document element through
+ * `portal={ <Popover.Portal container={ ... } /> }` on `Popover.Popup`.
  *
  * This technique is used in Gutenberg where the block editor canvas is an
  * iframe but toolbars and menus must appear outside it.
@@ -624,8 +639,12 @@ export const CrossIframe: Story = {
 									Popover&apos;s anchor (inside iframe)
 								</Popover.Trigger>
 								<Popover.Popup
-									container={
-										portalContainerRef as React.RefObject< HTMLElement >
+									portal={
+										<Popover.Portal
+											container={
+												portalContainerRef as React.RefObject< HTMLElement >
+											}
+										/>
 									}
 									collisionBoundary={
 										iframeBoundary ?? undefined
@@ -661,9 +680,9 @@ export const CrossIframe: Story = {
  * `@wordpress/components` as the render target.
  *
  * The `Slot` renders a `div` in the parent document, and its forwarded ref
- * is passed to `Popover.Popup`'s `container` prop so the popup portals into
- * the slot element. This mirrors the legacy Popover's `WithSlotOutsideIframe`
- * pattern.
+ * is passed to `Popover.Portal`'s `container` prop (via `Popover.Popup`'s
+ * `portal` prop) so the popup portals into the slot element. This mirrors the
+ * legacy Popover's `WithSlotOutsideIframe` pattern.
  */
 export const CrossIframeWithSlotFill: Story = {
 	name: 'Cross-Iframe (SlotFill)',
@@ -713,8 +732,12 @@ export const CrossIframeWithSlotFill: Story = {
 									Popover&apos;s anchor (inside iframe)
 								</Popover.Trigger>
 								<Popover.Popup
-									container={
-										slotRef as React.RefObject< HTMLElement >
+									portal={
+										<Popover.Portal
+											container={
+												slotRef as React.RefObject< HTMLElement >
+											}
+										/>
 									}
 									collisionBoundary={
 										iframeBoundary ?? undefined
@@ -746,12 +769,19 @@ export const CrossIframeWithSlotFill: Story = {
 
 /**
  * Popovers in Gutenberg are managed with explicit z-index values, which can
- * create situations where a popover renders below another popover, when you
- * want it to be rendered above.
+ * create situations where a popover renders below another popover when you
+ * want it above.
  *
- * The `--wp-ui-popover-z-index` CSS variable, available on the
- * `Popover.Popup` component, is an escape hatch that can be used to override
- * the z-index of a given popover on a case-by-case basis.
+ * The `--wp-ui-popover-z-index` CSS variable controls the z-index of the
+ * popover's positioner (and its optional backdrop). Override it either:
+ *
+ * - **Globally**, by setting the variable on `:root` or `body` (raises every
+ *   popover in the page), or
+ * - **Per instance**, by passing a `Popover.Portal` with a `style` (or
+ *   `className`) to `Popover.Popup`'s `portal` prop. The variable cascades
+ *   from the portal wrapper to everything rendered inside it.
+ *
+ * This story demonstrates the per-instance approach.
  */
 export const WithCustomZIndex: Story = {
 	name: 'With Custom z-index',
@@ -759,7 +789,13 @@ export const WithCustomZIndex: Story = {
 		children: (
 			<>
 				<Popover.Trigger>Open Popover</Popover.Trigger>
-				<Popover.Popup style={ { '--wp-ui-popover-z-index': '9999' } }>
+				<Popover.Popup
+					portal={
+						<Popover.Portal
+							style={ { '--wp-ui-popover-z-index': '9999' } }
+						/>
+					}
+				>
 					<Popover.Arrow />
 					<Popover.Title
 						style={ {
@@ -769,8 +805,9 @@ export const WithCustomZIndex: Story = {
 						Custom z-index
 					</Popover.Title>
 					<Popover.Description>
-						This popover&apos;s positioner has z-index: 9999 via the
-						`--wp-ui-popover-z-index` CSS custom property.
+						This popover renders at `z-index: 9999` via the
+						`--wp-ui-popover-z-index` CSS custom property, set on
+						`Popover.Portal` through the `portal` prop.
 					</Popover.Description>
 				</Popover.Popup>
 			</>

@@ -2,7 +2,11 @@
 
 ## Unreleased
 
-## 15.18.0-next.0 (2026-04-20)
+### Enhancements
+
+-   `BlockManager`: Add stacking context isolation to category list ([#77759](https://github.com/WordPress/gutenberg/pull/77759)).
+
+## 15.18.0 (2026-04-29)
 
 ### Enhancements
 

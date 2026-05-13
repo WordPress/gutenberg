@@ -2,6 +2,6 @@
 
 ## Unreleased
 
-## 0.1.1-next.0 (2026-04-20)
+## 0.2.0 (2026-04-29)
 
 -   Initial release.

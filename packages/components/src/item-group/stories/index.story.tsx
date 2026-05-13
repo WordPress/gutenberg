@@ -24,7 +24,7 @@ const meta: Meta< typeof ItemGroup > = {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
 		componentStatus: {
-			status: 'stable',
+			status: 'recommended',
 			whereUsed: 'global',
 		},
 	},

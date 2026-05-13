@@ -7,7 +7,14 @@ const meta: Meta< typeof InputLayout > = {
 	title: 'Design System/Components/Form/Primitives/InputLayout',
 	component: InputLayout,
 	subcomponents: {
-		Slot: InputLayout.Slot,
+		'InputLayout.Slot': InputLayout.Slot,
+	},
+	parameters: {
+		componentStatus: {
+			status: 'use-with-caution',
+			whereUsed: 'global',
+			notes: 'Not yet recommended for use alongside components from `@wordpress/components`, pending review of style consistency with `@wordpress/components`, and component set completeness. See [WordPress/gutenberg#76135](https://github.com/WordPress/gutenberg/issues/76135).',
+		},
 	},
 };
 export default meta;

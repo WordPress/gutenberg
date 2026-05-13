@@ -24,6 +24,7 @@ function Text( { children }: { children: React.ReactNode } ) {
 }
 
 const meta: Meta< typeof Card.Root > = {
+	tags: [ 'manifest' ],
 	title: 'Design System/Components/Card',
 	component: Card.Root,
 	subcomponents: {
@@ -31,6 +32,12 @@ const meta: Meta< typeof Card.Root > = {
 		'Card.Content': Card.Content,
 		'Card.FullBleed': Card.FullBleed,
 		'Card.Title': Card.Title,
+	},
+	parameters: {
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+		},
 	},
 };
 export default meta;

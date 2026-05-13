@@ -85,8 +85,8 @@ describe( 'Tooltip', () => {
 		).not.toBeInTheDocument();
 	} );
 
-	describe( 'container', () => {
-		it( 'should render inside the container when provided', async () => {
+	describe( 'portal', () => {
+		it( 'should render inside the portal container when a custom target is provided', async () => {
 			const user = userEvent.setup();
 			const containerRef = createRef< HTMLDivElement >();
 
@@ -99,7 +99,13 @@ describe( 'Tooltip', () => {
 								ref={ containerRef }
 								data-testid="custom-container"
 							/>
-							<Tooltip.Popup container={ containerRef }>
+							<Tooltip.Popup
+								portal={
+									<Tooltip.Portal
+										container={ containerRef }
+									/>
+								}
+							>
 								Tooltip content
 							</Tooltip.Popup>
 						</Tooltip.Root>

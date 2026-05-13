@@ -57,6 +57,40 @@ Why?
 -   `.Root` has required subparts, signalling an expectation that it must be composed
     -   A non-root component can still have _optional_ sub-parts, like a `Button.Icon`
 
+### When exporting with `Object.assign`
+
+-   Add the primary component's JSDoc description to both the implementation export, and the public `Object.assign` wrapper. Storybook reads the implementation component's JSDoc for the component description, while IDEs can read the latter.
+-   All subcomponents should set their `displayName` to the full public name before the `Object.assign` export:
+
+```ts
+ButtonIcon.displayName = 'Button.Icon';
+
+/**
+ * A versatile button component with multiple variants, tones, and sizes.
+ */
+export const Button = Object.assign( _Button, {
+	/**
+	 * An icon component specifically designed to work well when rendered inside
+	 * a `Button` component.
+	 */
+	Icon: ButtonIcon,
+} );
+```
+
+### In Storybook
+
+-   Include public subcomponents in the component's Storybook `subcomponents` metadata, keying them as the full compound name in dot notation:
+
+```ts
+const meta: Meta< typeof Button > = {
+	title: 'Design System/Components/Button',
+	component: Button,
+	subcomponents: {
+		'Button.Icon': Button.Icon,
+	},
+};
+```
+
 ## `render` Prop and Ref Forwarding
 
 All `@wordpress/ui` components support a `render` prop (via the `ComponentProps` utility type) that lets consumers swap the underlying HTML element. This section codifies the two canonical implementation patterns, the rules for handling `render`, and common anti-patterns to avoid.
