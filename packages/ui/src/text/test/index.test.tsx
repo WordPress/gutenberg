@@ -34,10 +34,7 @@ describe( 'Text', () => {
 	} );
 
 	it( 'supports the render prop', () => {
-		render(
-			// eslint-disable-next-line jsx-a11y/heading-has-content
-			<Text render={ <h2 /> }>Section title</Text>
-		);
+		render( <Text render={ <h2 /> }>Section title</Text> );
 
 		expect(
 			screen.getByRole( 'heading', { level: 2, name: 'Section title' } )

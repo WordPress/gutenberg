@@ -38,8 +38,4 @@
 		margin-inline: calc(-1 * var(--wp-ui-card-padding));
 		width: calc(100% + 2 * var(--wp-ui-card-padding));
 	}
-
-	.title {
-		margin: 0;
-	}
 }

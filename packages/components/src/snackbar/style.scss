@@ -16,7 +16,7 @@
 	width: 100%;
 	max-width: var(--wpds-dimension-surface-width-lg);
 	box-sizing: border-box;
-	cursor: pointer;
+	cursor: var(--wpds-cursor-control);
 
 	// Re-enable pointer events, which are disabled by the
 	// .components-snackbar-list styles.
@@ -47,7 +47,7 @@
 
 	.components-snackbar__dismiss-button {
 		margin-left: $grid-unit-30;
-		cursor: pointer;
+		cursor: var(--wpds-cursor-control);
 	}
 }
 

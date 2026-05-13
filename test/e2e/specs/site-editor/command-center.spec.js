@@ -8,16 +8,16 @@ test.describe( 'Site editor command palette', () => {
 		await requestUtils.activateTheme( 'emptytheme' );
 	} );
 
+	test.beforeEach( async ( { admin } ) => {
+		// Navigate to the site editor.
+		await admin.visitSiteEditor();
+	} );
+
 	test.afterAll( async ( { requestUtils } ) => {
 		await Promise.all( [
 			requestUtils.activateTheme( 'twentytwentyone' ),
 			requestUtils.deleteAllPages(),
 		] );
-	} );
-
-	test.beforeEach( async ( { admin } ) => {
-		// Navigate to the site editor.
-		await admin.visitSiteEditor();
 	} );
 
 	test( 'Open the command palette and navigate to the page create page', async ( {
@@ -103,7 +103,7 @@ test.describe( 'Site editor command palette', () => {
 
 		// Results heading should appear, Suggestions should not.
 		await expect( list.getByText( 'Results' ) ).toBeVisible();
-		await expect( list.getByText( 'Suggestions' ) ).not.toBeVisible();
+		await expect( list.getByText( 'Suggestions' ) ).toBeHidden();
 	} );
 
 	test( 'Recent commands show after using a command', async ( {

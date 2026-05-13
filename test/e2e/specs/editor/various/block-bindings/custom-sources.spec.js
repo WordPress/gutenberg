@@ -6,6 +6,7 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 test.describe( 'Registered sources', () => {
 	let imagePlaceholderSrc;
 	let testingImgSrc;
+
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.activatePlugin( 'gutenberg-test-block-bindings' );
 		await requestUtils.deleteAllMedia();
@@ -58,6 +59,7 @@ test.describe( 'Registered sources', () => {
 				page.getByLabel( 'Attributes options' )
 			).toBeHidden();
 		} );
+
 		test( 'It should show the attributes panel, no sources registered, readOnlyAttributes.', async ( {
 			editor,
 			page,
@@ -126,6 +128,7 @@ test.describe( 'Registered sources', () => {
 				previewPage.locator( '#connected-paragraph' )
 			).toHaveText( 'Text Field Value' );
 		} );
+
 		test( 'should show the returned value in heading content', async ( {
 			editor,
 		} ) => {
@@ -155,6 +158,7 @@ test.describe( 'Registered sources', () => {
 				previewPage.locator( '#connected-heading' )
 			).toHaveText( 'Text Field Value' );
 		} );
+
 		test( 'should show the returned values in button attributes', async ( {
 			editor,
 		} ) => {
@@ -190,6 +194,7 @@ test.describe( 'Registered sources', () => {
 			await expect( buttonDom ).toHaveText( 'Text Field Value' );
 			await expect( buttonDom ).toHaveAttribute( 'href', testingImgSrc );
 		} );
+
 		test( 'should show the returned values in image attributes', async ( {
 			editor,
 			page,
@@ -232,10 +237,9 @@ test.describe( 'Registered sources', () => {
 			);
 
 			// Alt textarea should have the custom field value.
-			const altValue = await page
-				.getByRole( 'textbox', { name: 'Alternative text' } )
-				.inputValue();
-			expect( altValue ).toBe( 'Text Field Value' );
+			await expect(
+				page.getByRole( 'textbox', { name: 'Alternative text' } )
+			).toHaveValue( 'Text Field Value' );
 
 			// Title input should have the original value.
 			await page.getByRole( 'tab', { name: 'Settings' } ).click();
@@ -249,11 +253,11 @@ test.describe( 'Registered sources', () => {
 			if ( isAdvancedPanelOpen === 'false' ) {
 				await advancedButton.click();
 			}
-			const titleValue = await page
-				.getByRole( 'tabpanel', { name: 'Settings' } )
-				.getByLabel( 'Title attribute' )
-				.inputValue();
-			expect( titleValue ).toBe( 'default title value' );
+			await expect(
+				page
+					.getByRole( 'tabpanel', { name: 'Settings' } )
+					.getByLabel( 'Title attribute' )
+			).toHaveValue( 'default title value' );
 
 			// Check the frontend uses the values of the custom fields.
 			const previewPage = await editor.openPreviewPage();
@@ -268,6 +272,7 @@ test.describe( 'Registered sources', () => {
 				'default title value'
 			);
 		} );
+
 		test( 'should fall back to source label when `getValues` is undefined', async ( {
 			editor,
 		} ) => {
@@ -290,6 +295,7 @@ test.describe( 'Registered sources', () => {
 			} );
 			await expect( paragraphBlock ).toHaveText( 'Server Source' );
 		} );
+
 		test( 'should fall back to null when `getValues` is undefined in URL attributes', async ( {
 			editor,
 		} ) => {
@@ -363,6 +369,7 @@ test.describe( 'Registered sources', () => {
 				'false'
 			);
 		}
+
 		test.describe( 'canUserEditValue returns false', () => {
 			test( 'paragraph', async ( { editor, page } ) => {
 				await testParagraphControlsAreLocked( {
@@ -371,6 +378,7 @@ test.describe( 'Registered sources', () => {
 					page,
 				} );
 			} );
+
 			test( 'heading', async ( { editor, page } ) => {
 				await editor.insertBlock( {
 					name: 'core/heading',
@@ -413,6 +421,7 @@ test.describe( 'Registered sources', () => {
 					'false'
 				);
 			} );
+
 			test( 'button', async ( { editor, page } ) => {
 				await editor.insertBlock( {
 					name: 'core/buttons',
@@ -480,6 +489,7 @@ test.describe( 'Registered sources', () => {
 						.getByRole( 'button', { name: 'Unlink' } )
 				).toBeHidden();
 			} );
+
 			test( 'image', async ( { editor, page } ) => {
 				await editor.insertBlock( {
 					name: 'core/image',
@@ -529,8 +539,7 @@ test.describe( 'Registered sources', () => {
 					name: 'Alternative text',
 				} );
 				await expect( altInput ).toHaveAttribute( 'readonly' );
-				const altValue = await altInput.inputValue();
-				expect( altValue ).toBe( 'Text Field Value' );
+				await expect( altInput ).toHaveValue( 'Text Field Value' );
 
 				// Title input is enabled and with the original value.
 				await page.getByRole( 'tab', { name: 'Settings' } ).click();
@@ -543,13 +552,14 @@ test.describe( 'Registered sources', () => {
 						.getByRole( 'tabpanel', { name: 'Settings' } )
 						.getByLabel( 'Title attribute' )
 				).toHaveAttribute( 'readonly' );
-				const titleValue = await page
-					.getByRole( 'tabpanel', { name: 'Settings' } )
-					.getByLabel( 'Title attribute' )
-					.inputValue();
-				expect( titleValue ).toBe( 'Text Field Value' );
+				await expect(
+					page
+						.getByRole( 'tabpanel', { name: 'Settings' } )
+						.getByLabel( 'Title attribute' )
+				).toHaveValue( 'Text Field Value' );
 			} );
 		} );
+
 		// The following tests just check the paragraph and assume is the case for the rest of the blocks.
 		test( 'canUserEditValue is not defined', async ( { editor, page } ) => {
 			await testParagraphControlsAreLocked( {
@@ -558,6 +568,7 @@ test.describe( 'Registered sources', () => {
 				page,
 			} );
 		} );
+
 		test( 'setValues is not defined', async ( { editor, page } ) => {
 			await testParagraphControlsAreLocked( {
 				source: 'testing/complete-source-undefined',
@@ -565,6 +576,7 @@ test.describe( 'Registered sources', () => {
 				page,
 			} );
 		} );
+
 		test( 'source is not defined', async ( { editor, page } ) => {
 			await testParagraphControlsAreLocked( {
 				source: 'testing/undefined-source',
@@ -615,6 +627,7 @@ test.describe( 'Registered sources', () => {
 				previewPage.locator( '#connected-paragraph' )
 			).toHaveText( 'new value' );
 		} );
+
 		// Related issue: https://github.com/WordPress/gutenberg/issues/62347
 		test( 'should be possible to use symbols and numbers as the custom field value', async ( {
 			editor,
@@ -649,6 +662,7 @@ test.describe( 'Registered sources', () => {
 				previewPage.locator( '#paragraph-binding' )
 			).toHaveText( '$10.00' );
 		} );
+
 		test( 'should be possible to edit the value of the url custom field from the button', async ( {
 			editor,
 			page,
@@ -703,6 +717,7 @@ test.describe( 'Registered sources', () => {
 				previewPage.locator( '#button-url-binding a' )
 			).toHaveAttribute( 'href', '#url-custom-field-modified' );
 		} );
+
 		test( 'should be possible to edit the value of the url custom field from the image', async ( {
 			editor,
 			page,
@@ -759,6 +774,7 @@ test.describe( 'Registered sources', () => {
 				previewPage.locator( '#image-url-binding img' )
 			).toHaveAttribute( 'src', testingImgSrc );
 		} );
+
 		test( 'should be possible to edit the value of the text custom field from the image alt', async ( {
 			editor,
 			page,
@@ -838,6 +854,7 @@ test.describe( 'Registered sources', () => {
 			} );
 			await expect( paragraphBlock ).toHaveText( 'Text Field Value' );
 		} );
+
 		test( 'should be possible to connect the paragraph content', async ( {
 			editor,
 			page,
@@ -851,6 +868,7 @@ test.describe( 'Registered sources', () => {
 			} );
 			await expect( contentAttribute ).toBeVisible();
 		} );
+
 		test( 'should be possible to connect the heading content', async ( {
 			editor,
 			page,
@@ -864,6 +882,7 @@ test.describe( 'Registered sources', () => {
 			} );
 			await expect( contentAttribute ).toBeVisible();
 		} );
+
 		test( 'should be possible to connect the button supported attributes', async ( {
 			editor,
 			page,
@@ -906,6 +925,7 @@ test.describe( 'Registered sources', () => {
 			} );
 			await expect( tagNameAttribute ).toBeHidden();
 		} );
+
 		test( 'should be possible to connect the image supported attributes', async ( {
 			editor,
 			page,
@@ -942,6 +962,7 @@ test.describe( 'Registered sources', () => {
 			} );
 			await expect( linkClassAttribute ).toBeHidden();
 		} );
+
 		test( 'should show all the available fields in the dropdown UI', async ( {
 			editor,
 			page,
@@ -977,6 +998,7 @@ test.describe( 'Registered sources', () => {
 			await expect( urlField ).toBeVisible();
 			await expect( urlField ).not.toBeChecked();
 		} );
+
 		test( 'should show the connected fields in the attributes panel', async ( {
 			editor,
 			page,
@@ -1035,6 +1057,7 @@ test.describe( 'Registered sources', () => {
 			await expect( newEmptyParagraph ).toHaveText( '' );
 			await expect( newEmptyParagraph ).toBeEditable();
 		} );
+
 		test( 'should add empty paragraph block when pressing enter in heading', async ( {
 			editor,
 			page,
@@ -1080,6 +1103,7 @@ test.describe( 'Registered sources', () => {
 			await expect( newEmptyParagraph ).toHaveText( '' );
 			await expect( newEmptyParagraph ).toBeEditable();
 		} );
+
 		test( 'should add empty button block when pressing enter in button', async ( {
 			editor,
 			page,
@@ -1125,6 +1149,7 @@ test.describe( 'Registered sources', () => {
 				newEmptyButton.getByRole( 'textbox' )
 			).toBeEditable();
 		} );
+
 		test( 'should show placeholder prompt when value is empty and can edit', async ( {
 			editor,
 		} ) => {
@@ -1156,6 +1181,7 @@ test.describe( 'Registered sources', () => {
 				'Add Empty Field Label'
 			);
 		} );
+
 		test( 'should show source label when value is empty, cannot edit, and `getFieldsList` is undefined', async ( {
 			editor,
 		} ) => {
@@ -1184,6 +1210,7 @@ test.describe( 'Registered sources', () => {
 				'Can User Edit: False'
 			);
 		} );
+
 		test( 'should show placeholder attribute over bindings placeholder', async ( {
 			editor,
 		} ) => {
@@ -1239,6 +1266,7 @@ test.describe( 'Registered sources', () => {
 		} );
 		await expect( contentButton ).toContainText( 'Server Source' );
 	} );
+
 	test( 'should show an "Source not registered" warning for not registered sources', async ( {
 		editor,
 		page,

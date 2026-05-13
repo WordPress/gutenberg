@@ -49,19 +49,13 @@ export default function inlineAliasValues( {
 
 				if ( shouldInline ) {
 					// Track this token for inlining
-					inlineMap[ id ] = [];
+					inlineMap[ id ] ??= [];
 
 					// Track aliased tokens for output file
 					if ( token.aliasedBy ) {
 						aliasedBy[ tokenId( id ) ] =
 							token.aliasedBy.map( tokenId );
 					}
-				}
-
-				// Check if this token's main value references a primitive
-				if ( token.aliasOf && pattern.test( token.aliasOf ) ) {
-					inlineMap[ token.aliasOf ] ??= [];
-					inlineMap[ token.aliasOf ].push( token );
 				}
 
 				// Check if any mode values reference a primitive

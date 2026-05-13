@@ -11,16 +11,19 @@
 /**
  * External dependencies
  */
+const { readFileSync } = require( 'fs' );
 const { red, yellow } = require( 'chalk' );
 
 /**
  * Internal dependencies
  */
-// Ignore reason: `package-lock.json` exists outside `bin` `rootDir`.
-// @ts-ignore
-const packageLock = require( '../package-lock' );
 
-const dependencies = Object.entries( packageLock.packages );
+const packageLock = JSON.parse( readFileSync( './package-lock.json', 'utf8' ) );
+
+const dependencies = /** @type {Array<[string, any]>} */ (
+	Object.entries( packageLock.packages )
+);
+
 for ( const [ name, dependency ] of dependencies ) {
 	if ( dependency.resolved === false ) {
 		console.log(

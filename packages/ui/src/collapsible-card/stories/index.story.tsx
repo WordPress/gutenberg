@@ -12,10 +12,10 @@ function Text( { children }: { children: React.ReactNode } ) {
 		<p
 			style={ {
 				margin: 0,
-				fontFamily: 'var(--wpds-font-family-body)',
-				fontSize: 'var(--wpds-font-size-md)',
-				fontWeight: 'var(--wpds-font-weight-regular)',
-				lineHeight: 'var(--wpds-font-line-height-sm)',
+				fontFamily: 'var(--wpds-typography-font-family-body)',
+				fontSize: 'var(--wpds-typography-font-size-md)',
+				fontWeight: 'var(--wpds-typography-font-weight-regular)',
+				lineHeight: 'var(--wpds-typography-line-height-sm)',
 				textWrap: 'pretty',
 				color: 'var(--wpds-color-fg-content-neutral-weak)',
 			} }
@@ -26,12 +26,19 @@ function Text( { children }: { children: React.ReactNode } ) {
 }
 
 const meta: Meta< typeof CollapsibleCard.Root > = {
+	tags: [ 'manifest' ],
 	title: 'Design System/Components/CollapsibleCard',
 	component: CollapsibleCard.Root,
 	subcomponents: {
 		'CollapsibleCard.Header': CollapsibleCard.Header,
 		'CollapsibleCard.HeaderDescription': CollapsibleCard.HeaderDescription,
 		'CollapsibleCard.Content': CollapsibleCard.Content,
+	},
+	parameters: {
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+		},
 	},
 };
 export default meta;
@@ -159,6 +166,61 @@ export const Stacked: Story = {
 };
 
 /**
+ * `CollapsibleCard.Header` renders a `<div>` wrapper by default. Pass an
+ * `<h1>`–`<h6>` React element to the `render` prop to wrap the trigger in
+ * a heading and contribute to the document outline. The right level
+ * depends on the surrounding outline, so the consumer is expected to opt
+ * in.
+ */
+export const WithHeadingElement: Story = {
+	parameters: { controls: { disable: true } },
+	render: () => (
+		<div
+			style={ {
+				display: 'flex',
+				flexDirection: 'column',
+				gap: 'var(--wpds-dimension-gap-lg)',
+			} }
+		>
+			<CollapsibleCard.Root>
+				<CollapsibleCard.Header render={ <h2 /> }>
+					<Card.Title>Heading level 2</Card.Title>
+				</CollapsibleCard.Header>
+				<CollapsibleCard.Content>
+					<Text>
+						The wrapper renders as an h2 element when the consumer
+						passes an h2 React element to the render prop.
+					</Text>
+				</CollapsibleCard.Content>
+			</CollapsibleCard.Root>
+			<CollapsibleCard.Root>
+				<CollapsibleCard.Header render={ <h3 /> }>
+					<Card.Title>Heading level 3</Card.Title>
+				</CollapsibleCard.Header>
+				<CollapsibleCard.Content>
+					<Text>
+						Pass any of h1–h6 to choose the level that fits the
+						surrounding document outline.
+					</Text>
+				</CollapsibleCard.Content>
+			</CollapsibleCard.Root>
+			<CollapsibleCard.Root>
+				<CollapsibleCard.Header>
+					<Card.Title>No heading (default)</Card.Title>
+				</CollapsibleCard.Header>
+				<CollapsibleCard.Content>
+					<Text>
+						Without a render prop, the header wraps the trigger in a
+						plain div and does not contribute to the document
+						outline.
+					</Text>
+				</CollapsibleCard.Content>
+			</CollapsibleCard.Root>
+		</div>
+	),
+};
+
+/**
  * A collapsible card with a `HeaderDescription` that provides supplementary
  * information (e.g. status, summary) as an `aria-describedby` relationship.
  */
@@ -183,7 +245,7 @@ export const WithHeaderDescription: Story = {
 					<CollapsibleCard.HeaderDescription>
 						<span
 							style={ {
-								fontSize: 'var(--wpds-font-size-sm)',
+								fontSize: 'var(--wpds-typography-font-size-sm)',
 								color: 'var(--wpds-color-fg-content-neutral-weak)',
 							} }
 						>

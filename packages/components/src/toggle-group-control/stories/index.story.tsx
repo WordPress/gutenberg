@@ -33,12 +33,12 @@ const meta: Meta< typeof ToggleGroupControl > = {
 		onChange: { action: 'onChange' },
 		value: { control: false },
 	},
-	tags: [ 'status-experimental' ],
+	tags: [ 'status-experimental', 'manifest' ],
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
 		componentStatus: {
-			status: 'stable',
+			status: 'recommended',
 			whereUsed: 'global',
 			notes: 'Will be superseded by `ToggleGroupControl` in `@wordpress/ui`, but continue using for now.',
 		},

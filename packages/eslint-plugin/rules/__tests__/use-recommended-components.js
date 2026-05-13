@@ -1,5 +1,3 @@
-/* eslint-env jest */
-
 /**
  * External dependencies
  */
@@ -11,7 +9,7 @@ import { RuleTester } from 'eslint';
 import rule, { ALLOWLIST, DENYLIST } from '../use-recommended-components';
 
 const ruleTester = new RuleTester( {
-	parserOptions: {
+	languageOptions: {
 		sourceType: 'module',
 		ecmaVersion: 6,
 	},
@@ -29,8 +27,10 @@ ruleTester.run( 'use-recommended-components', rule, {
 
 		// Allowed @wordpress/ui components.
 		"import { Badge } from '@wordpress/ui';",
+		"import { Link } from '@wordpress/ui';",
 		"import { Stack } from '@wordpress/ui';",
-		"import { Badge, Stack } from '@wordpress/ui';",
+		"import { Text } from '@wordpress/ui';",
+		"import { Badge, Link, Stack, Text } from '@wordpress/ui';",
 	],
 
 	invalid: [

@@ -100,6 +100,13 @@ describe( 'getMergedItemIds', () => {
 
 		expect( result ).toEqual( [ 1, 2, 9, undefined, 5, 6 ] );
 	} );
+
+	it( 'should keep all received IDs when response exceeds default perPage', () => {
+		const nextItemIds = [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 ];
+		const result = getMergedItemIds( [], nextItemIds );
+
+		expect( result ).toEqual( nextItemIds );
+	} );
 } );
 
 describe( 'itemIsComplete', () => {

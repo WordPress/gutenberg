@@ -39,7 +39,7 @@
 	}
 
 	> button[aria-expanded] {
-		cursor: pointer;
+		cursor: var(--wpds-cursor-control);
 		width: 100%;
 		display: flex;
 		justify-content: space-between;

@@ -32,6 +32,7 @@ import {
 	getNavigationMenus,
 } from './menus';
 import { deleteAllPages, createPage } from './pages';
+import { createRecord } from './records';
 import { resetPreferences } from './preferences';
 import { getSiteSettings, updateSiteSettings } from './site-settings';
 import { deleteAllWidgets, addWidgetBlock } from './widgets';
@@ -134,6 +135,10 @@ class RequestUtils {
 	getMaxBatchSize: typeof getMaxBatchSize = getMaxBatchSize.bind( this );
 	// .bind() drops the generic types. Re-casting it to keep the type signature.
 	batchRest: typeof batchRest = batchRest.bind( this ) as typeof batchRest;
+	// .bind() drops the generic types. Re-casting it to keep the type signature.
+	createRecord: typeof createRecord = createRecord.bind(
+		this
+	) as typeof createRecord;
 	/** @borrows getPluginsMap as this.getPluginsMap */
 	getPluginsMap: typeof getPluginsMap = getPluginsMap.bind( this );
 	/** @borrows activatePlugin as this.activatePlugin */
