@@ -48,8 +48,56 @@ function gutenberg_register_block_comment_metadata() {
 			},
 		)
 	);
+
+	register_meta(
+		'comment',
+		'_wp_note_selection',
+		array(
+			'type'          => 'object',
+			'description'   => __( 'Inline note text selection anchor', 'gutenberg' ),
+			'single'        => true,
+			'show_in_rest'  => array(
+				'schema' => array(
+					'type'       => 'object',
+					'properties' => array(
+						'attributeKey' => array( 'type' => 'string' ),
+						'start'        => array( 'type' => 'integer' ),
+						'end'          => array( 'type' => 'integer' ),
+					),
+				),
+			),
+			'auth_callback' => function ( $allowed, $meta_key, $object_id ) {
+				return current_user_can( 'edit_comment', $object_id );
+			},
+		)
+	);
 }
 add_action( 'init', 'gutenberg_register_block_comment_metadata' );
+
+/**
+ * Strip inline note span markers from rendered block output.
+ *
+ * Inline notes are anchored in raw block content with
+ * `<span class="wp-note" data-id="N">…</span>` so the marker survives edits,
+ * but the public HTML should not expose note metadata. `render_block`
+ * unwraps the spans before output while leaving the raw `post_content`
+ * (and the REST `raw` view, revisions, exports) intact.
+ *
+ * @param string $block_content Rendered block HTML.
+ * @return string Block HTML with wp-note span wrappers unwrapped.
+ */
+function gutenberg_strip_inline_note_markers( $block_content ) {
+	if ( false === strpos( $block_content, 'wp-note' ) ) {
+		return $block_content;
+	}
+
+	return preg_replace(
+		'#<span(?=[^>]*\bclass="[^"]*\bwp-note\b)[^>]*>(.*?)</span>#s',
+		'$1',
+		$block_content
+	);
+}
+add_filter( 'render_block', 'gutenberg_strip_inline_note_markers' );
 
 /**
  * Updates the comment type for avatars in the WordPress REST API.
