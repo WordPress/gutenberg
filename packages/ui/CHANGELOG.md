@@ -23,6 +23,10 @@
 -   `Drawer`: Restore the slide-out animation when the popup closes ([#77800](https://github.com/WordPress/gutenberg/pull/77800)).
 -   `Drawer`: Forward the `render` prop on `Drawer.Content` to the scroll container instead of leaking it as a DOM attribute, matching `Dialog.Content` ([#77941](https://github.com/WordPress/gutenberg/pull/77941)).
 
+### New Features
+
+-   Add `useEnableWpCompatOverlaySlot()` hook to opt into a body-level overlay container that stacks `@wordpress/ui` overlays above `@wordpress/components` overlays in mixed-library compositions. The slot auto-enables wherever `window.wp.components` is on the global (the typical script-loader setup for WordPress plugins and admin screens), so the hook is mostly relevant for hosts that bundle `@wordpress/components` (or only `@wordpress/ui`) directly — apps that aren't built with standard WordPress build tooling. Per-component support will be added incrementally ([#77851](https://github.com/WordPress/gutenberg/pull/77851)).
+
 ### Enhancements
 
 -   `Select`: Add a `placeholder` prop to `Select.Trigger`, and support `null` item values for clearable placeholder options ([#78076](https://github.com/WordPress/gutenberg/pull/78076)).
@@ -34,6 +38,10 @@
 ### Internal
 
 -   `Dialog`: Use `--wpds-motion-*` design tokens for animation duration and easing ([#76097](https://github.com/WordPress/gutenberg/pull/76097)).
+
+### Internal
+
+-   Add internal `getWpCompatOverlaySlot()` helper and a co-located unlayered CSS module that lazily provide a body-level `[data-wp-compat-overlay-slot]` container at z-index `1000000003`, gated by `useEnableWpCompatOverlaySlot()` and by auto-detection of `window.wp.components` ([#77851](https://github.com/WordPress/gutenberg/pull/77851)).
 
 ## 0.12.0 (2026-04-29)
 

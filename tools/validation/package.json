@@ -1,0 +1,29 @@
+{
+	"name": "@wordpress/validation-tools",
+	"version": "0.0.0",
+	"description": "Validation scripts used across the Gutenberg monorepo.",
+	"private": true,
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"gutenberg",
+		"validation"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/tools/validation",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "tools/validation"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"type": "module",
+	"publishConfig": {
+		"access": "public"
+	},
+	"scripts": {
+		"check-installed-deps": "node ./check-installed-deps.mjs"
+	}
+}

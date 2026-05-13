@@ -122,8 +122,20 @@ async function dev() {
 	readyMarkerFile.cleanup();
 
 	try {
+		// Step 0: Verify node_modules is in sync with package-lock.json
+		console.log( '🔍 Checking dependencies...' );
+		await exec( 'npm', [
+			'run',
+			'check-installed-deps',
+			'--workspace',
+			'@wordpress/validation-tools',
+			'--silent',
+		] ).catch( () => {
+			throw new Error( 'Run `npm install` to update.' );
+		} );
+
 		// Step 1: Clean packages
-		console.log( '🧹 Cleaning packages...' );
+		console.log( '\n🧹 Cleaning packages...' );
 		await exec( 'npm', [ 'run', 'clean:packages' ], { silent: true } );
 
 		// Step 2: Build workspaces
@@ -134,17 +146,11 @@ async function dev() {
 			{ silent: true }
 		);
 
-		// Step 2.5: Generate worker placeholders
+		// Step 3: Generate worker placeholders
 		// This must happen before TypeScript compilation because some packages
 		// (like vips) have source files that import from generated worker-code.ts
 		await exec( 'node', [
 			'./bin/packages/generate-worker-placeholders.mjs',
-		] );
-
-		// Step 3: Validate TypeScript version
-		console.log( '\n🔍 Validating TypeScript version...' );
-		await exec( 'node', [
-			'./bin/packages/validate-typescript-version.js',
 		] );
 
 		// Step 4: Build TypeScript types
