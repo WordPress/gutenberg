@@ -314,17 +314,20 @@ export function createSyncManager( debug = false ): SyncManager {
 		// Initialize the Yjs document with the necessary CRDT state.
 		initializeYjsDoc( ydoc );
 
-		// Get and apply the persisted CRDT document, if it exists.
-		// Observers are attached after hydration so the applyUpdateV2 inside
-		// _applyPersistedCrdtDoc does not trigger _updateEntityRecord with the
-		// just-loaded state, which would dispatch a redundant editRecord whose
-		// blocks already match the editor's parsed content.
+		// Get and apply the persisted CRDT document, if it exists. Observers are
+		// attached after this load-time CRDT initialization so local hydration
+		// does not trigger a redundant CRDT-to-store update.
 		internal.applyPersistedCrdtDoc( objectType, objectId, record );
 
 		// Attach observers.
 		recordMap.observeDeep( onRecordUpdate );
 		stateMap.observe( onStateMapUpdate );
 		hasObserversAttached = true;
+
+		// Reflect CRDT-normalized runtime values, such as hidden table row
+		// identities, back into the local edited record after it exists in the
+		// store.
+		await internal.hydrateRecordFromCrdtDoc( objectType, objectId );
 	}
 
 	/**
@@ -619,6 +622,44 @@ export function createSyncManager( debug = false ): SyncManager {
 	}
 
 	/**
+	 * Hydrate the local edited record from the live CRDT document after load-time
+	 * initialization. Some synced fields normalize runtime-only data into the CRDT
+	 * document, such as hidden table row identity symbols, without changing the
+	 * serialized entity content.
+	 *
+	 * @param {ObjectType} objectType Object type.
+	 * @param {ObjectID}   objectId   Object ID.
+	 */
+	async function hydrateRecordFromCrdtDoc(
+		objectType: ObjectType,
+		objectId: ObjectID
+	): Promise< void > {
+		const entityId = getEntityId( objectType, objectId );
+		const entityState = entityStates.get( entityId );
+
+		if ( ! entityState ) {
+			log( 'hydrateRecordFromCrdtDoc', 'no entity state', entityId );
+			return;
+		}
+
+		const { handlers, syncConfig, ydoc } = entityState;
+		const changes = syncConfig.getChangesFromCRDTDoc(
+			ydoc,
+			await handlers.getEditedRecord()
+		);
+		const changedKeys = Object.keys( changes );
+
+		if ( 0 === changedKeys.length ) {
+			return;
+		}
+
+		log( 'hydrateRecordFromCrdtDoc', 'changes', entityId, {
+			changedKeys,
+		} );
+		handlers.editRecord( changes, { undoIgnore: true } );
+	}
+
+	/**
 	 * Update CRDT document with changes from the local store.
 	 *
 	 * @param {ObjectType}               objectType             Object type.
@@ -735,6 +776,7 @@ export function createSyncManager( debug = false ): SyncManager {
 	// Collect internal functions so that they can be wrapped before calling.
 	const internal = {
 		applyPersistedCrdtDoc: debugWrap( _applyPersistedCrdtDoc ),
+		hydrateRecordFromCrdtDoc: debugWrap( hydrateRecordFromCrdtDoc ),
 		updateEntityRecord: debugWrap( _updateEntityRecord ),
 	};
 
