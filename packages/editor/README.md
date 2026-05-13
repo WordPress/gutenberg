@@ -252,6 +252,62 @@ _Returns_
 
 > **Deprecated** since 5.3, use `wp.blockEditor.DefaultBlockAppender` instead.
 
+### DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE
+
+Undocumented declaration.
+
+### DistributedEditingStatus
+
+Renders the selector-backed DE-RTC status surface.
+
+_Parameters_
+
+-   _props_ `Object`: Component props.
+-   _props.onAction_ `Function`: Optional action handler.
+
+_Returns_
+
+-   `React.ReactNode`: Rendered status surface.
+
+### DistributedEditingStatusSurface
+
+Renders an inert DE-RTC status surface from pure selector output.
+
+_Parameters_
+
+-   _props_ `Object`: Component props.
+-   _props.noticeDescriptors_ `Array`: DE-RTC notice descriptors.
+-   _props.unloadWarningState_ `Object`: DE-RTC unload-warning state.
+-   _props.onAction_ `Function`: Optional action handler.
+
+_Returns_
+
+-   `React.ReactNode`: Rendered status surface.
+
+### DISTRIBUTED_EDITING_DISPOSITIONS
+
+Stable DE-RTC terminal dispositions shared with the root model runner.
+
+### DISTRIBUTED_EDITING_NOTICE_ACTIONS
+
+Stable action keys that future UI can map to rendered buttons or menu items.
+
+### DISTRIBUTED_EDITING_NOTICE_IDS
+
+Stable notice ids for the future `@wordpress/notices` integration.
+
+### DISTRIBUTED_EDITING_NOTICE_KINDS
+
+Stable DE-RTC notice kinds. These are integration points for future UI and notice dispatch code, not rendered notice copy.
+
+### DISTRIBUTED_EDITING_REASON_CODES
+
+Stable DE-RTC reason codes shared with the root model runner and WordPress authority layer.
+
+### DISTRIBUTED_EDITING_UNLOAD_WARNING_REASONS
+
+Stable reasons for browser unload protection.
+
 ### DocumentBar
 
 This component renders a navigation bar at the top of the editor. It displays the title of the current document, a back button (if applicable), and a command center button. It also handles different states of the document, such as "not found" or "unsynced".
@@ -418,6 +474,42 @@ getDerivedStateFromError is used to render a fallback UI after an error has been
 
 > **Deprecated** since 5.3, use `wp.blockEditor.getColorObjectByColorValue` instead.
 
+### getDistributedEditingNoticeDescriptorsForSessionState
+
+Returns stable notice descriptors for the current DE-RTC session state. Descriptors intentionally avoid rendered copy and side effects; future UI can translate the descriptor kind and action keys into notices, toasts, or status indicators.
+
+_Parameters_
+
+-   _sessionState_ `Object`: DE-RTC session state.
+
+_Returns_
+
+-   `Array`: Notice descriptors.
+
+### getDistributedEditingStatusSurfaceItems
+
+Returns inert, renderable status items for DE-RTC notice descriptors.
+
+_Parameters_
+
+-   _noticeDescriptors_ `Array`: DE-RTC notice descriptors.
+
+_Returns_
+
+-   `Array`: Status items.
+
+### getDistributedEditingUnloadWarningStateForSessionState
+
+Returns the browser-unload integration state for DE-RTC.
+
+_Parameters_
+
+-   _sessionState_ `Object`: DE-RTC session state.
+
+_Returns_
+
+-   `Object`: Unload-warning state.
+
 ### getFontSize
 
 > **Deprecated** since 5.3, use `wp.blockEditor.getFontSize` instead.
@@ -453,6 +545,42 @@ _Returns_
 ### InspectorControls
 
 > **Deprecated** since 5.3, use `wp.blockEditor.InspectorControls` instead.
+
+### isDistributedEditingConflictDisposition
+
+Returns whether the disposition requires explicit human conflict handling.
+
+_Parameters_
+
+-   _disposition_ `string`: Candidate disposition.
+
+_Returns_
+
+-   `boolean`: Whether the disposition is a conflict disposition.
+
+### isValidDistributedEditingDisposition
+
+Returns whether the provided value is a known DE-RTC terminal disposition.
+
+_Parameters_
+
+-   _disposition_ `string`: Candidate disposition.
+
+_Returns_
+
+-   `boolean`: Whether the disposition is known.
+
+### isValidDistributedEditingReasonCode
+
+Returns whether the provided value is a known DE-RTC reason code.
+
+_Parameters_
+
+-   _reasonCode_ `string`: Candidate reason code.
+
+_Returns_
+
+-   `boolean`: Whether the reason code is known.
 
 ### linkAutocompleter
 
@@ -508,6 +636,18 @@ _Parameters_
 ### NavigableToolbar
 
 > **Deprecated** since 5.3, use `wp.blockEditor.NavigableToolbar` instead.
+
+### normalizeDistributedEditingSessionState
+
+Normalize user-provided or server-provided DE-RTC session state into the small editor vocabulary consumed by future UI components.
+
+_Parameters_
+
+-   _sessionState_ `Object`: Partial DE-RTC session state.
+
+_Returns_
+
+-   `Object`: Normalized DE-RTC session state.
 
 ### ObserveTyping
 
@@ -1615,6 +1755,18 @@ _Parameters_
 ### ServerSideRender
 
 Undocumented declaration.
+
+### shouldWarnBeforeLeavingDistributedEditingSessionState
+
+Returns whether the browser should protect the session from unload.
+
+_Parameters_
+
+-   _sessionState_ `Object`: DE-RTC session state.
+
+_Returns_
+
+-   `boolean`: Whether the session has unconfirmed local edits.
 
 ### SkipToSelectedBlock
 
