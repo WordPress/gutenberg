@@ -1073,6 +1073,260 @@ describe( 'distributed editing session state', () => {
 		} );
 	} );
 
+	it( 'keeps stale-again proof blocked for server refetch during human save policy', () => {
+		const staleAgainState =
+			getDistributedEditingSessionStateForRetrySubmitProofResult(
+				{
+					code: DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+					data: {
+						reason_code:
+							DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+						client_base_version: '7',
+						server_version: '8',
+						pending_change_count: 1,
+						remote_change_count: 1,
+					},
+				},
+				{
+					clientBaseVersion: '4',
+					serverVersion: '7',
+					clientBaseContent:
+						'<!-- wp:paragraph --><p>Base.</p><!-- /wp:paragraph -->',
+					pendingChangeCount: 1,
+					retrySubmitHandoffStatus:
+						DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_STATUSES.PREPARED,
+					retrySubmitPrepared: true,
+					canExportLocalUpdates: true,
+				}
+			);
+		const policy = getDistributedEditingRetrySavePolicyForSessionState(
+			staleAgainState,
+			{
+				postId: 44,
+				restBase: 'posts',
+				proposedPostContent:
+					'<!-- wp:paragraph --><p>Locally rebased.</p><!-- /wp:paragraph -->',
+			}
+		);
+		const handoffState =
+			getDistributedEditingSessionStateForRetrySaveHandoff(
+				staleAgainState,
+				{
+					status: DISTRIBUTED_EDITING_RETRY_SAVE_HANDOFF_STATUSES.RETRY_SAVE_BLOCKED,
+					reason: policy.reason,
+					policy,
+				}
+			);
+		const state = { distributedEditingSession: handoffState };
+
+		expect( staleAgainState ).toMatchObject( {
+			disposition:
+				DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+			reasonCode:
+				DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+			requiresServerStateRefetch: true,
+			retrySubmitProofStatus:
+				DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.STALE_BASE_REJECTED,
+			retrySubmitAccepted: false,
+			retrySubmitSavePathRequired: false,
+			canExportLocalUpdates: true,
+		} );
+		expect( policy ).toMatchObject( {
+			status: DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_STATUSES.BLOCKED,
+			reason: DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.SERVER_STATE_REFETCH_REQUIRED,
+			canRetrySave: false,
+			shouldCallRetrySaveEndpoint: false,
+			shouldCallNormalSavePost: false,
+			protectsLocalChanges: true,
+			canExportLocalUpdates: true,
+			requiresServerStateRefetch: true,
+			hasAcceptedProof: false,
+			hasPreparedSavePath: false,
+			request: null,
+		} );
+		expect( requiresDistributedEditingServerStateAcceptance( state ) ).toBe(
+			false
+		);
+		expect( hasPendingDistributedEditingChanges( state ) ).toBe( true );
+		expect( canExportDistributedEditingLocalUpdates( state ) ).toBe( true );
+		expect( getDistributedEditingNoticeDescriptors( state ) ).toEqual(
+			expect.arrayContaining( [
+				expect.objectContaining( {
+					kind: DISTRIBUTED_EDITING_NOTICE_KINDS.STALE_BASE_REJECTED,
+					actionKeys: expect.arrayContaining( [
+						DISTRIBUTED_EDITING_NOTICE_ACTIONS.EXPORT_LOCAL_UPDATES,
+						DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFETCH_SERVER_STATE,
+					] ),
+				} ),
+				expect.objectContaining( {
+					kind: DISTRIBUTED_EDITING_NOTICE_KINDS.RETRY_SAVE,
+					retrySaveHandoffStatus:
+						DISTRIBUTED_EDITING_RETRY_SAVE_HANDOFF_STATUSES.RETRY_SAVE_BLOCKED,
+					retrySaveHandoffReason:
+						DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.SERVER_STATE_REFETCH_REQUIRED,
+					actionKeys: expect.arrayContaining( [
+						DISTRIBUTED_EDITING_NOTICE_ACTIONS.EXPORT_LOCAL_UPDATES,
+						DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFETCH_SERVER_STATE,
+					] ),
+				} ),
+			] )
+		);
+	} );
+
+	it( 'keeps retry-save-in-progress blocked and exportable during human save policy', () => {
+		const savingState =
+			getDistributedEditingSessionStateForRetrySaveRequest(
+				{
+					clientBaseVersion: '4',
+					serverVersion: '7',
+					pendingChangeCount: 2,
+					retrySubmitProofStatus:
+						DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.ACCEPTED_FOR_FUTURE_SAVE,
+					retrySubmitAccepted: true,
+					retrySubmitSavePathRequired: true,
+					retrySubmitSaveStatus:
+						DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.READY,
+					retrySubmitSaveReady: true,
+					canExportLocalUpdates: true,
+				},
+				{ pendingChangeCount: 2 }
+			);
+		const policy = getDistributedEditingRetrySavePolicyForSessionState(
+			savingState,
+			{
+				postId: 44,
+				restBase: 'posts',
+				proposedPostContent:
+					'<!-- wp:paragraph --><p>Rebased save.</p><!-- /wp:paragraph -->',
+			}
+		);
+		const handoffState =
+			getDistributedEditingSessionStateForRetrySaveHandoff( savingState, {
+				status: DISTRIBUTED_EDITING_RETRY_SAVE_HANDOFF_STATUSES.RETRY_SAVE_BLOCKED,
+				reason: policy.reason,
+				policy,
+			} );
+		const state = { distributedEditingSession: handoffState };
+
+		expect( policy ).toMatchObject( {
+			status: DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_STATUSES.BLOCKED,
+			reason: DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.RETRY_SAVE_IN_PROGRESS,
+			canRetrySave: false,
+			shouldCallRetrySaveEndpoint: false,
+			shouldCallNormalSavePost: false,
+			protectsLocalChanges: true,
+			canExportLocalUpdates: true,
+			requiresServerStateRefetch: false,
+			request: null,
+		} );
+		expect( hasPendingDistributedEditingChanges( state ) ).toBe( true );
+		expect( isAwaitingDistributedEditingServerConfirmation( state ) ).toBe(
+			true
+		);
+		expect( canExportDistributedEditingLocalUpdates( state ) ).toBe( true );
+		expect(
+			shouldWarnBeforeLeavingDistributedEditingSession( state )
+		).toBe( true );
+		expect( getDistributedEditingNoticeDescriptors( state ) ).toEqual(
+			expect.arrayContaining( [
+				expect.objectContaining( {
+					kind: DISTRIBUTED_EDITING_NOTICE_KINDS.RETRY_SAVE,
+					status: 'warning',
+					priority: 'blocking',
+					retrySaveStatus:
+						DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVING,
+					retrySaveHandoffReason:
+						DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.RETRY_SAVE_IN_PROGRESS,
+					actionKeys: [
+						DISTRIBUTED_EDITING_NOTICE_ACTIONS.EXPORT_LOCAL_UPDATES,
+					],
+				} ),
+			] )
+		);
+	} );
+
+	it( 'classifies already-confirmed retry-save before no-pending human save policy fallback', () => {
+		const savedState = getDistributedEditingSessionStateForRetrySaveResult(
+			{
+				result: 'retry_save_applied',
+				retry_save_accepted: true,
+				previous_server_version: '7',
+				server_version: '8',
+				pending_change_count: 1,
+				saves_post: true,
+				mutates_post_content: true,
+				creates_revision: true,
+				claims_saved: true,
+			},
+			{
+				clientBaseVersion: '4',
+				serverVersion: '7',
+				pendingChangeCount: 1,
+				retrySubmitProofStatus:
+					DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.ACCEPTED_FOR_FUTURE_SAVE,
+				retrySubmitAccepted: true,
+				retrySubmitSavePathRequired: true,
+				retrySubmitSaveStatus:
+					DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.READY,
+				retrySubmitSaveReady: true,
+				canExportLocalUpdates: true,
+			}
+		);
+		const policy = getDistributedEditingRetrySavePolicyForSessionState(
+			savedState,
+			{
+				postId: 44,
+				restBase: 'posts',
+				proposedPostContent:
+					'<!-- wp:paragraph --><p>Already saved.</p><!-- /wp:paragraph -->',
+			}
+		);
+		const state = { distributedEditingSession: savedState };
+
+		expect( savedState ).toMatchObject( {
+			disposition: DISTRIBUTED_EDITING_DISPOSITIONS.IDLE,
+			pendingChangeCount: 0,
+			hasPendingChanges: false,
+			isAwaitingServerConfirmation: false,
+			retrySaveStatus: DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVED,
+			retrySaveAccepted: true,
+			retrySaveServerVersion: '8',
+			retrySavePreviousServerVersion: '7',
+			canExportLocalUpdates: false,
+		} );
+		expect( policy ).toMatchObject( {
+			status: DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_STATUSES.BLOCKED,
+			reason: DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.RETRY_SAVE_ALREADY_CONFIRMED,
+			canRetrySave: false,
+			shouldCallRetrySaveEndpoint: false,
+			shouldCallNormalSavePost: false,
+			protectsLocalChanges: false,
+			canExportLocalUpdates: false,
+			requiresServerStateRefetch: false,
+			request: null,
+		} );
+		expect( hasPendingDistributedEditingChanges( state ) ).toBe( false );
+		expect( canExportDistributedEditingLocalUpdates( state ) ).toBe(
+			false
+		);
+		expect(
+			shouldWarnBeforeLeavingDistributedEditingSession( state )
+		).toBe( false );
+		expect( getDistributedEditingNoticeDescriptors( state ) ).toEqual(
+			expect.arrayContaining( [
+				expect.objectContaining( {
+					kind: DISTRIBUTED_EDITING_NOTICE_KINDS.RETRY_SAVE,
+					status: 'success',
+					priority: 'status',
+					retrySaveStatus:
+						DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVED,
+					retrySaveAccepted: true,
+					actionKeys: [],
+				} ),
+			] )
+		);
+	} );
+
 	it( 'blocks guarded retry-save policy without side effects for unsafe save states', () => {
 		const readySessionState = {
 			clientBaseVersion: '4',

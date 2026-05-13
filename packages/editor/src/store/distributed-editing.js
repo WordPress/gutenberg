@@ -1886,10 +1886,7 @@ export function getDistributedEditingRetrySavePolicyForSessionState(
 		normalized.retrySubmitClaimsSaved;
 	let reason = null;
 
-	if ( ! hasPendingChanges ) {
-		reason =
-			DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.NO_PENDING_CHANGES;
-	} else if (
+	if (
 		normalized.retrySaveStatus ===
 		DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVING
 	) {
@@ -1901,6 +1898,9 @@ export function getDistributedEditingRetrySavePolicyForSessionState(
 	) {
 		reason =
 			DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.RETRY_SAVE_ALREADY_CONFIRMED;
+	} else if ( ! hasPendingChanges ) {
+		reason =
+			DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.NO_PENDING_CHANGES;
 	} else if ( normalized.requiresManualConflictResolution ) {
 		reason =
 			DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.MANUAL_CONFLICT_REQUIRED;
