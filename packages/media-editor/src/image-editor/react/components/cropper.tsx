@@ -1068,7 +1068,10 @@ function CropperInner(
 						draggable={ false }
 					/>
 
-					{ /* Dimming overlay outside the crop area */ }
+					{ /* Dimming overlay outside the crop area. Follows the
+					     preview rect when one is active so the framed area
+					     reads as "the crop moved" rather than a separate
+					     overlay on top of the still-framed original. */ }
 					{ showDimming && (
 						<DimmingOverlay
 							cropRect={ previewCropRect ?? state.cropRect }
@@ -1088,9 +1091,7 @@ function CropperInner(
 						onResizeEnd={ handleResizeEnd }
 						onEscape={ handleEscape }
 						aspectRatio={ aspectRatio }
-						freeformCrop={
-							previewCropRect ? false : freeformCrop
-						}
+						freeformCrop={ previewCropRect ? false : freeformCrop }
 						isResizeDisabled={ isTouchPinching || disabled }
 						stencilTransition={ settleStencilTransition }
 						cropBounds={ cropBounds }
@@ -1099,7 +1100,9 @@ function CropperInner(
 						keyboardResizeStep={ keyboardResizeStep }
 					/>
 
-					{ /* Rule-of-thirds grid */ }
+					{ /* Rule-of-thirds grid. Follows the preview rect when
+					     one is active so the framing reads as "the crop
+					     moved" together with the dimming overlay. */ }
 					{ ( showGrid === true || isInteractiveGrid ) && (
 						<GridOverlay
 							cropRect={ previewCropRect ?? state.cropRect }
