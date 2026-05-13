@@ -19,6 +19,7 @@ import type { CropperState, Size } from '../types';
 
 const CONTAINER: Size = { width: 800, height: 600 };
 const IMAGE: Size = { width: 1600, height: 900 };
+const PORTRAIT_IMAGE: Size = { width: 900, height: 1600 };
 
 function makeState( overrides: Partial< CropperState > = {} ): CropperState {
 	return {
@@ -30,6 +31,47 @@ function makeState( overrides: Partial< CropperState > = {} ): CropperState {
 		},
 		...overrides,
 	};
+}
+
+function expectImageCoversCrop( state: CropperState, imageSize: Size ): void {
+	const container: Size = { width: 1000, height: 1000 };
+	const camera = createCamera( state, container, imageSize );
+	const snapRotation = Math.round( state.rotation / 90 ) * 90;
+	const baseCamera = createCamera(
+		{
+			...state,
+			pan: { x: 0, y: 0 },
+			zoom: 1,
+			rotation: snapRotation,
+		},
+		container,
+		imageSize
+	);
+	const vb = getVisibleBounds( baseCamera );
+	const cr = state.cropRect;
+	const stencilCorners: [ number, number ][] = [
+		[ vb.left + cr.x * vb.width, vb.top + cr.y * vb.height ],
+		[ vb.left + ( cr.x + cr.width ) * vb.width, vb.top + cr.y * vb.height ],
+		[
+			vb.left + ( cr.x + cr.width ) * vb.width,
+			vb.top + ( cr.y + cr.height ) * vb.height,
+		],
+		[
+			vb.left + cr.x * vb.width,
+			vb.top + ( cr.y + cr.height ) * vb.height,
+		],
+	];
+
+	for ( const corner of stencilCorners ) {
+		const w = screenToWorld( camera, {
+			x: corner[ 0 ],
+			y: corner[ 1 ],
+		} );
+		expect( w.x ).toBeGreaterThanOrEqual( -0.001 );
+		expect( w.x ).toBeLessThanOrEqual( 1.001 );
+		expect( w.y ).toBeGreaterThanOrEqual( -0.001 );
+		expect( w.y ).toBeLessThanOrEqual( 1.001 );
+	}
 }
 
 describe( 'createCamera', () => {
@@ -121,6 +163,30 @@ describe( 'restrictPanZoom', () => {
 		const state = makeState( { rotation: 45, zoom: 1 } );
 		const result = restrictPanZoom( state, IMAGE, state.cropRect );
 		expect( result.zoom ).toBeGreaterThanOrEqual( 1 );
+	} );
+	it( 'allows zoom below 1 when a fine-rotated portrait crop remains covered', () => {
+		const cropRect = { x: 0.46, y: 0, width: 0.08, height: 1 };
+		const state = makeState( {
+			image: {
+				src: 'portrait.jpg',
+				naturalWidth: PORTRAIT_IMAGE.width,
+				naturalHeight: PORTRAIT_IMAGE.height,
+			},
+			rotation: 19,
+			zoom: 0.9,
+			cropRect,
+		} );
+		const result = restrictPanZoom( state, PORTRAIT_IMAGE, cropRect );
+
+		expect( result.zoom ).toBeGreaterThan( 0.9 );
+		expect( result.zoom ).toBeLessThan( 1 );
+
+		const restrictedState = makeState( {
+			...state,
+			pan: result.pan,
+			zoom: result.zoom,
+		} );
+		expectImageCoversCrop( restrictedState, PORTRAIT_IMAGE );
 	} );
 	it( 'at 90° with zoom=1, allows zero pan on landscape image', () => {
 		// At zoom=1, 90° rotation, the image exactly covers the visual area.
