@@ -173,13 +173,16 @@ async function dragBetweenCells( {
 		throw new Error( 'Could not resolve table cell bounding boxes' );
 	}
 
+	const startX = startBox.x + Math.min( 20, startBox.width / 2 );
+	const endX = endBox.x + Math.min( 20, endBox.width / 2 );
+
 	await page.mouse.move(
-		startBox.x + startBox.width * 0.75,
+		startX,
 		startBox.y + startBox.height / 2
 	);
 	await page.mouse.down();
 	await page.mouse.move(
-		endBox.x + endBox.width * 0.75,
+		endX,
 		endBox.y + endBox.height / 2,
 		{ steps: 12 }
 	);
@@ -443,7 +446,11 @@ test.describe( 'Collaboration - Nested Awareness Selection', () => {
 			.click();
 		await editor2.clickBlockToolbarButton( 'Remove caption' );
 
-		await collaborationUtils.waitForConvergence( { timeout: 15000 } );
+		await expect(
+			editor2.canvas.getByRole( 'textbox', {
+				name: 'Table caption text',
+			} )
+		).toHaveCount( 0 );
 
 		await expect.poll( () => cursor.count(), { timeout: 10000 } ).toBe( 0 );
 	} );

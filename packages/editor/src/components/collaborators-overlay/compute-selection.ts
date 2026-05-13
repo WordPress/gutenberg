@@ -41,8 +41,8 @@ export interface SelectionVisual {
  * Resolve the most specific editor element the selection refers to.
  *
  * When the sender carries an `attributeKey`, narrow to the RichText element
- * matching `data-wp-block-attribute-key` inside the block. This is what makes
- * cursor placement work for blocks with multiple RichText fields (e.g.
+ * matching `data-wp-block-attribute-key` on or inside the block. This is what
+ * makes cursor placement work for blocks with multiple RichText fields (e.g.
  * `core/table` cells: `body.0.cells.0.content`, etc.). Falls back to the
  * block element only when `attributeKey` is missing (WholeBlock selections
  * or older senders). Keyed selections must resolve to the exact RichText
@@ -70,6 +70,13 @@ function resolveTargetElement(
 
 	if ( ! blockElement || ! resolvedSelection.attributeKey ) {
 		return blockElement ?? null;
+	}
+
+	if (
+		blockElement.getAttribute( 'data-wp-block-attribute-key' ) ===
+		resolvedSelection.attributeKey
+	) {
+		return blockElement;
 	}
 
 	return (

@@ -110,6 +110,36 @@ describe( 'computeSelectionVisual', () => {
 		);
 	} );
 
+	it( 'anchors keyed cursor selections to the block element when it is the RichText element', () => {
+		const overlayContext = createOverlayContext(
+			'<p data-block="block-1" data-wp-block-attribute-key="content">Alpha</p>'
+		);
+
+		const start: ResolvedSelection = {
+			richTextOffset: 2,
+			localClientId: 'block-1',
+			attributeKey: 'content',
+		};
+
+		computeSelectionVisual(
+			{ type: SelectionType.Cursor },
+			start,
+			undefined,
+			overlayContext
+		);
+
+		const targetElement = document.querySelector(
+			'[data-block="block-1"]'
+		);
+
+		expect( mockGetCursorPosition ).toHaveBeenCalledWith(
+			2,
+			targetElement,
+			document,
+			overlayContext.overlayRect
+		);
+	} );
+
 	it( 'does not fall back to the whole block for a missing keyed RichText target', () => {
 		const overlayContext = createOverlayContext(
 			'<div data-block="block-1">' +
