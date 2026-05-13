@@ -35,6 +35,7 @@ import {
 	getDistributedEditingSessionStateForRecoveryDryRunResult,
 	getDistributedEditingSessionStateForRetrySubmitHandoff,
 	getDistributedEditingSessionStateForRetrySubmitProofResult,
+	getDistributedEditingSessionStateForRetrySubmitSavePreparation,
 	getDistributedEditingStaleBaseLocalRebaseResult,
 	getDistributedEditingSessionStateForStaleBaseLocalRebasePlan,
 	getDistributedEditingSessionStateForStaleBaseRejectionResult,
@@ -440,9 +441,8 @@ export const __experimentalRebaseDistributedEditingLocalUpdatesAfterStaleBase =
  * @return {Function} Action thunk.
  */
 export const __experimentalPrepareDistributedEditingRetrySubmitAfterLocalRebase =
-
-		() =>
-		( { select, dispatch } ) => {
+	() => {
+		return ( { select, dispatch } ) => {
 			const currentSessionState =
 				select.getDistributedEditingSessionState?.() || {};
 			const sessionState =
@@ -465,6 +465,7 @@ export const __experimentalPrepareDistributedEditingRetrySubmitAfterLocalRebase 
 				sessionState,
 			};
 		};
+	};
 
 /**
  * Requests the retry-submit proof endpoint and stores inert retry state.
@@ -530,6 +531,41 @@ export const __experimentalRefreshDistributedEditingRetrySubmitProof =
 
 			throw error;
 		}
+	};
+
+/**
+ * Prepares accepted retry-submit proof for a future guarded save path.
+ *
+ * The action consumes no server resources and performs no persistence. It only
+ * records whether the current accepted proof can be handed to a later save-path
+ * consumer.
+ *
+ * @return {Function} Action thunk.
+ */
+export const __experimentalPrepareDistributedEditingRetrySubmitSaveAfterProof =
+	() =>
+	( { select, dispatch } ) => {
+		const currentSessionState =
+			select.getDistributedEditingSessionState?.() || {};
+		const sessionState =
+			getDistributedEditingSessionStateForRetrySubmitSavePreparation(
+				currentSessionState
+			);
+
+		dispatch.setDistributedEditingSessionState( sessionState );
+
+		return {
+			status: sessionState.retrySubmitSaveStatus,
+			reason: sessionState.retrySubmitSaveReason,
+			consumesAcceptedProof:
+				Boolean( currentSessionState.retrySubmitAccepted ) &&
+				sessionState.retrySubmitSaveReady,
+			submitsToServer: false,
+			savesPost: false,
+			mutatesPersistedPostContent: false,
+			claimsSaved: false,
+			sessionState,
+		};
 	};
 
 /**

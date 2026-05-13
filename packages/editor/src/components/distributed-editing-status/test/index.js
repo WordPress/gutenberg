@@ -31,6 +31,8 @@ import {
 	DISTRIBUTED_EDITING_REASON_CODES,
 	DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_STATUSES,
 	DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES,
+	DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_REASONS,
+	DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES,
 	DISTRIBUTED_EDITING_UNLOAD_WARNING_REASONS,
 	getDistributedEditingNoticeDescriptorsForSessionState,
 	getDistributedEditingUnloadWarningStateForSessionState,
@@ -102,6 +104,8 @@ describe( 'getDistributedEditingStatusControlStates', () => {
 			'staleBaseRetryPrepared',
 			'staleBaseRetryProofAccepted',
 			'staleBaseRetryProofStale',
+			'staleBaseRetrySaveReady',
+			'staleBaseRetrySaveBlockedPermission',
 			'manualResolution',
 		] );
 		expect( states.pendingLocalChanges ).toEqual( {
@@ -190,6 +194,26 @@ describe( 'getDistributedEditingStatusControlStates', () => {
 			retrySubmitProofReason:
 				DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
 			requiresServerStateRefetch: true,
+			canExportLocalUpdates: true,
+		} );
+		expect( states.staleBaseRetrySaveReady ).toMatchObject( {
+			retrySubmitProofStatus:
+				DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.ACCEPTED_FOR_FUTURE_SAVE,
+			retrySubmitSaveStatus:
+				DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.READY,
+			retrySubmitSavePrepared: true,
+			retrySubmitSaveReady: true,
+			canExportLocalUpdates: true,
+		} );
+		expect( states.staleBaseRetrySaveBlockedPermission ).toMatchObject( {
+			disposition:
+				DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_PERMISSION_DENIED,
+			retrySubmitProofStatus:
+				DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.REJECTED_PERMISSION_DENIED,
+			retrySubmitSaveStatus:
+				DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.BLOCKED,
+			retrySubmitSaveReason:
+				DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_REASONS.PERMISSION_DENIED,
 			canExportLocalUpdates: true,
 		} );
 		expect( states.manualResolution ).toEqual( {
@@ -316,7 +340,7 @@ describe( 'DistributedEditingLocalRebaseStateInspector', () => {
 		expect( screen.getByText( 'Local rebase result' ) ).toBeVisible();
 		expect( screen.getByText( 'rebased' ) ).toBeVisible();
 		expect( screen.getByText( 'Local rebase reason' ) ).toBeVisible();
-		expect( screen.getByText( 'None' ) ).toBeVisible();
+		expect( screen.getAllByText( 'None' ) ).toHaveLength( 2 );
 		expect( screen.getByText( 'Client base input' ) ).toBeVisible();
 		expect( screen.getByText( 'Refetched server input' ) ).toBeVisible();
 		expect( screen.getAllByText( 'Available' ) ).toHaveLength( 2 );
@@ -325,6 +349,8 @@ describe( 'DistributedEditingLocalRebaseStateInspector', () => {
 		expect( screen.getByText( 'Retry handoff' ) ).toBeVisible();
 		expect( screen.getByText( 'Retry proof' ) ).toBeVisible();
 		expect( screen.getByText( 'Retry accepted' ) ).toBeVisible();
+		expect( screen.getByText( 'Retry save' ) ).toBeVisible();
+		expect( screen.getByText( 'Retry save reason' ) ).toBeVisible();
 		expect( screen.queryByText( /wp:paragraph/ ) ).not.toBeInTheDocument();
 	} );
 
@@ -340,7 +366,7 @@ describe( 'DistributedEditingLocalRebaseStateInspector', () => {
 		render( <DistributedEditingLocalRebaseStateInspector /> );
 
 		expect( screen.getByText( 'ready' ) ).toBeVisible();
-		expect( screen.getAllByText( 'none' ) ).toHaveLength( 3 );
+		expect( screen.getAllByText( 'none' ) ).toHaveLength( 4 );
 		expect( screen.getByText( 'Missing' ) ).toBeVisible();
 		expect( screen.getByText( 'Available' ) ).toBeVisible();
 		expect( screen.getByText( 'Not ready' ) ).toBeVisible();
@@ -891,6 +917,36 @@ describe( 'DistributedEditingStatusSurface', () => {
 		expect(
 			screen.getByText(
 				'Retry submit accepted the rebased changes for a future save. Local changes are still awaiting confirmation.'
+			)
+		).toBeVisible();
+		expect( screen.queryByText( /saved/i ) ).not.toBeInTheDocument();
+	} );
+
+	it( 'renders retry-submit save readiness without claiming completion', () => {
+		const noticeDescriptors =
+			getDistributedEditingNoticeDescriptorsForSessionState( {
+				pendingChangeCount: 1,
+				retrySubmitProofStatus:
+					DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.ACCEPTED_FOR_FUTURE_SAVE,
+				retrySubmitAccepted: true,
+				retrySubmitSavePathRequired: true,
+				retrySubmitSaveStatus:
+					DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.READY,
+				retrySubmitSavePrepared: true,
+				retrySubmitSaveReady: true,
+				canExportLocalUpdates: true,
+			} );
+
+		render(
+			<DistributedEditingStatusSurface
+				noticeDescriptors={ noticeDescriptors }
+			/>
+		);
+
+		expect( screen.getByText( 'Changes pending' ) ).toBeVisible();
+		expect(
+			screen.getByText(
+				'Retry submit is ready for the guarded save path. Local changes remain pending until that save finishes.'
 			)
 		).toBeVisible();
 		expect( screen.queryByText( /saved/i ) ).not.toBeInTheDocument();

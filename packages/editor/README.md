@@ -332,6 +332,14 @@ Stable retry-submit handoff statuses for staged local rebase results.
 
 Stable retry-submit proof statuses for the proof-only REST response.
 
+### DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_REASONS
+
+Stable retry-submit save-preparation blocker reasons.
+
+### DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES
+
+Stable retry-submit save-preparation statuses.
+
 ### DISTRIBUTED_EDITING_UNLOAD_WARNING_REASONS
 
 Stable reasons for browser unload protection.
@@ -593,6 +601,20 @@ The response only proves whether a locally rebased candidate is still based on t
 _Parameters_
 
 -   _responseOrError_ `Object`: REST response or API error.
+-   _currentSessionState_ `Object`: Current DE-RTC session state.
+
+_Returns_
+
+-   `Object`: Normalized DE-RTC session state.
+
+### getDistributedEditingSessionStateForRetrySubmitSavePreparation
+
+Prepares inert editor state for a future retry-submit save path.
+
+Accepted proof is only a precondition. This helper does not submit to the server, save, mutate persisted post content, create revisions, claim saved state, dispatch notices, persist editor state, or change post locks.
+
+_Parameters_
+
 -   _currentSessionState_ `Object`: Current DE-RTC session state.
 
 _Returns_

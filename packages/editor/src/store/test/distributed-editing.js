@@ -17,11 +17,14 @@ import {
 	DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_REASONS,
 	DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_STATUSES,
 	DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES,
+	DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_REASONS,
+	DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES,
 	DISTRIBUTED_EDITING_UNLOAD_WARNING_REASONS,
 	DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE,
 	getDistributedEditingStaleBaseLocalRebaseResult,
 	getDistributedEditingSessionStateForRetrySubmitHandoff,
 	getDistributedEditingSessionStateForRetrySubmitProofResult,
+	getDistributedEditingSessionStateForRetrySubmitSavePreparation,
 	getDistributedEditingSessionStateForRecoveryDryRunResult,
 	getDistributedEditingSessionStateForStaleBaseLocalRebasePlan,
 	getDistributedEditingSessionStateForStaleBaseRejectionResult,
@@ -151,6 +154,11 @@ describe( 'distributed editing session state', () => {
 			retrySubmitMutatesPostContent: false,
 			retrySubmitCreatesRevision: false,
 			retrySubmitClaimsSaved: false,
+			retrySubmitSaveStatus:
+				DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.NONE,
+			retrySubmitSaveReason: null,
+			retrySubmitSavePrepared: false,
+			retrySubmitSaveReady: false,
 			requiresManualConflictResolution: false,
 			mustOfferLocalCopy: true,
 			canExportLocalUpdates: true,
@@ -754,6 +762,93 @@ describe( 'distributed editing session state', () => {
 			retrySubmitSavePathRequired: false,
 			hasPendingChanges: true,
 			isAwaitingServerConfirmation: true,
+			canExportLocalUpdates: true,
+		} );
+	} );
+
+	it( 'prepares accepted retry-submit proof for a future save path without claiming a save', () => {
+		const prepared =
+			getDistributedEditingSessionStateForRetrySubmitSavePreparation( {
+				pendingChangeCount: 2,
+				retrySubmitProofStatus:
+					DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.ACCEPTED_FOR_FUTURE_SAVE,
+				retrySubmitAccepted: true,
+				retrySubmitSavePathRequired: true,
+				retrySubmitSavesPost: false,
+				retrySubmitMutatesPostContent: false,
+				retrySubmitCreatesRevision: false,
+				retrySubmitClaimsSaved: false,
+				canExportLocalUpdates: true,
+			} );
+
+		expect( prepared ).toMatchObject( {
+			pendingChangeCount: 2,
+			hasPendingChanges: true,
+			isAwaitingServerConfirmation: true,
+			retrySubmitProofStatus:
+				DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.ACCEPTED_FOR_FUTURE_SAVE,
+			retrySubmitAccepted: true,
+			retrySubmitSavePathRequired: true,
+			retrySubmitSaveStatus:
+				DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.READY,
+			retrySubmitSaveReason: null,
+			retrySubmitSavePrepared: true,
+			retrySubmitSaveReady: true,
+			retrySubmitSavesPost: false,
+			retrySubmitMutatesPostContent: false,
+			retrySubmitCreatesRevision: false,
+			retrySubmitClaimsSaved: false,
+			mustOfferLocalCopy: true,
+			canExportLocalUpdates: true,
+		} );
+	} );
+
+	it( 'blocks retry-submit save preparation when proof was rejected', () => {
+		const blocked =
+			getDistributedEditingSessionStateForRetrySubmitSavePreparation( {
+				disposition:
+					DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_PERMISSION_DENIED,
+				reasonCode: DISTRIBUTED_EDITING_REASON_CODES.REST_CANNOT_EDIT,
+				pendingChangeCount: 1,
+				retrySubmitProofStatus:
+					DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.REJECTED_PERMISSION_DENIED,
+				retrySubmitProofReason:
+					DISTRIBUTED_EDITING_REASON_CODES.REST_CANNOT_EDIT,
+				canExportLocalUpdates: true,
+			} );
+
+		expect( blocked ).toMatchObject( {
+			disposition:
+				DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_PERMISSION_DENIED,
+			retrySubmitSaveStatus:
+				DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.BLOCKED,
+			retrySubmitSaveReason:
+				DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_REASONS.PERMISSION_DENIED,
+			retrySubmitSavePrepared: false,
+			retrySubmitSaveReady: false,
+			hasPendingChanges: true,
+			canExportLocalUpdates: true,
+		} );
+	} );
+
+	it( 'blocks retry-submit save preparation when proof claims persistence', () => {
+		const blocked =
+			getDistributedEditingSessionStateForRetrySubmitSavePreparation( {
+				pendingChangeCount: 1,
+				retrySubmitProofStatus:
+					DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.ACCEPTED_FOR_FUTURE_SAVE,
+				retrySubmitAccepted: true,
+				retrySubmitSavePathRequired: true,
+				retrySubmitClaimsSaved: true,
+				canExportLocalUpdates: true,
+			} );
+
+		expect( blocked ).toMatchObject( {
+			retrySubmitSaveStatus:
+				DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.BLOCKED,
+			retrySubmitSaveReason:
+				DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_REASONS.RETRY_SUBMIT_PROOF_CLAIMED_SAVE,
+			retrySubmitSaveReady: false,
 			canExportLocalUpdates: true,
 		} );
 	} );

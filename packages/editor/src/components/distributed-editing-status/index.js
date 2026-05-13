@@ -19,6 +19,8 @@ import {
 	DISTRIBUTED_EDITING_REASON_CODES,
 	DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_STATUSES,
 	DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES,
+	DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_REASONS,
+	DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES,
 	DISTRIBUTED_EDITING_UNLOAD_WARNING_REASONS,
 	normalizeDistributedEditingSessionState,
 } from '../../store/distributed-editing';
@@ -222,6 +224,34 @@ const DISTRIBUTED_EDITING_STATUS_CONTROL_STATE_DEFINITIONS = Object.freeze( {
 		retrySubmitProofReason:
 			DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
 		clientBaseContent: '',
+	} ),
+	staleBaseRetrySaveReady: Object.freeze( {
+		pendingChangeCount: 1,
+		retrySubmitProofStatus:
+			DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.ACCEPTED_FOR_FUTURE_SAVE,
+		retrySubmitAccepted: true,
+		retrySubmitSavePathRequired: true,
+		retrySubmitSaveStatus:
+			DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.READY,
+		retrySubmitSavePrepared: true,
+		retrySubmitSaveReady: true,
+		canExportLocalUpdates: true,
+		mustOfferLocalCopy: true,
+	} ),
+	staleBaseRetrySaveBlockedPermission: Object.freeze( {
+		disposition:
+			DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_PERMISSION_DENIED,
+		reasonCode: DISTRIBUTED_EDITING_REASON_CODES.REST_CANNOT_EDIT,
+		pendingChangeCount: 1,
+		retrySubmitProofStatus:
+			DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.REJECTED_PERMISSION_DENIED,
+		retrySubmitProofReason:
+			DISTRIBUTED_EDITING_REASON_CODES.REST_CANNOT_EDIT,
+		retrySubmitSaveStatus:
+			DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.BLOCKED,
+		retrySubmitSaveReason:
+			DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_REASONS.PERMISSION_DENIED,
+		canExportLocalUpdates: true,
 	} ),
 	manualResolution: Object.freeze( {
 		disposition:
@@ -433,6 +463,14 @@ export function DistributedEditingLocalRebaseStateInspector() {
 						? __( 'Accepted for future save' )
 						: __( 'Not accepted' ) }
 				</dd>
+			</div>
+			<div>
+				<dt>{ __( 'Retry save' ) }</dt>
+				<dd>{ normalized.retrySubmitSaveStatus }</dd>
+			</div>
+			<div>
+				<dt>{ __( 'Retry save reason' ) }</dt>
+				<dd>{ normalized.retrySubmitSaveReason || __( 'None' ) }</dd>
 			</div>
 		</dl>
 	);
@@ -667,6 +705,15 @@ function getBaseStatusItem( descriptor ) {
 
 function getPendingChangesMessage( descriptor ) {
 	if (
+		descriptor.retrySubmitSaveStatus ===
+		DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.READY
+	) {
+		return __(
+			'Retry submit is ready for the guarded save path. Local changes remain pending until that save finishes.'
+		);
+	}
+
+	if (
 		descriptor.retrySubmitProofStatus ===
 		DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.ACCEPTED_FOR_FUTURE_SAVE
 	) {
@@ -808,6 +855,10 @@ function getDistributedEditingStatusControlLabel( key ) {
 			return __( 'Retry proof accepted' );
 		case 'staleBaseRetryProofStale':
 			return __( 'Retry proof stale' );
+		case 'staleBaseRetrySaveReady':
+			return __( 'Retry save ready' );
+		case 'staleBaseRetrySaveBlockedPermission':
+			return __( 'Retry save blocked' );
 		case 'manualResolution':
 			return __( 'Manual resolution' );
 	}

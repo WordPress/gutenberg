@@ -21,6 +21,8 @@ import {
 	DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_REASONS,
 	DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_STATUSES,
 	DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES,
+	DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_REASONS,
+	DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES,
 	DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE,
 } from '../distributed-editing';
 import { store as editorStore } from '..';
@@ -996,6 +998,119 @@ describe( 'Post actions', () => {
 					DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.STALE_BASE_REJECTED,
 				retrySubmitProofReason:
 					DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+				canExportLocalUpdates: true,
+			} );
+		} );
+	} );
+
+	describe( '__experimentalPrepareDistributedEditingRetrySubmitSaveAfterProof()', () => {
+		it( 'prepares accepted retry-submit proof without fetching or saving', async () => {
+			const post = {
+				id: postId,
+				type: 'post',
+				title: 'bar',
+				content:
+					'<!-- wp:paragraph --><p>Rebased</p><!-- /wp:paragraph -->',
+				status: 'draft',
+			};
+			let apiFetchCallCount = 0;
+
+			apiFetch.setFetchHandler( async () => {
+				apiFetchCallCount++;
+				throw new Error(
+					'Retry-submit save preparation must not call apiFetch.'
+				);
+			} );
+
+			const registry = createRegistryWithStores();
+
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', post );
+			registry.dispatch( editorStore ).setupEditor( post, {
+				content: post.content,
+			} );
+			registry
+				.dispatch( editorStore )
+				.setDistributedEditingSessionState( {
+					pendingChangeCount: 2,
+					retrySubmitProofStatus:
+						DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.ACCEPTED_FOR_FUTURE_SAVE,
+					retrySubmitAccepted: true,
+					retrySubmitSavePathRequired: true,
+					canExportLocalUpdates: true,
+				} );
+
+			const result = await registry
+				.dispatch( editorStore )
+				.__experimentalPrepareDistributedEditingRetrySubmitSaveAfterProof();
+
+			expect( apiFetchCallCount ).toBe( 0 );
+			expect( result ).toMatchObject( {
+				status: DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.READY,
+				reason: null,
+				consumesAcceptedProof: true,
+				submitsToServer: false,
+				savesPost: false,
+				mutatesPersistedPostContent: false,
+				claimsSaved: false,
+				sessionState: {
+					hasPendingChanges: true,
+					isAwaitingServerConfirmation: true,
+					retrySubmitSaveStatus:
+						DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.READY,
+					retrySubmitSavePrepared: true,
+					retrySubmitSaveReady: true,
+					canExportLocalUpdates: true,
+				},
+			} );
+			expect(
+				registry.select( editorStore ).getEditedPostContent()
+			).toBe( post.content );
+		} );
+
+		it( 'blocks retry-submit save preparation when proof was denied', async () => {
+			const registry = createRegistryWithStores();
+
+			registry
+				.dispatch( editorStore )
+				.setDistributedEditingSessionState( {
+					disposition:
+						DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_PERMISSION_DENIED,
+					reasonCode:
+						DISTRIBUTED_EDITING_REASON_CODES.REST_CANNOT_EDIT,
+					pendingChangeCount: 1,
+					retrySubmitProofStatus:
+						DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.REJECTED_PERMISSION_DENIED,
+					retrySubmitProofReason:
+						DISTRIBUTED_EDITING_REASON_CODES.REST_CANNOT_EDIT,
+					canExportLocalUpdates: true,
+				} );
+
+			const result = await registry
+				.dispatch( editorStore )
+				.__experimentalPrepareDistributedEditingRetrySubmitSaveAfterProof();
+
+			expect( result ).toMatchObject( {
+				status: DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.BLOCKED,
+				reason: DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_REASONS.PERMISSION_DENIED,
+				consumesAcceptedProof: false,
+				submitsToServer: false,
+				savesPost: false,
+				mutatesPersistedPostContent: false,
+				claimsSaved: false,
+			} );
+			expect(
+				registry
+					.select( editorStore )
+					.getDistributedEditingSessionState()
+			).toMatchObject( {
+				retrySubmitSaveStatus:
+					DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.BLOCKED,
+				retrySubmitSaveReason:
+					DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_REASONS.PERMISSION_DENIED,
+				retrySubmitSavePrepared: false,
+				retrySubmitSaveReady: false,
 				canExportLocalUpdates: true,
 			} );
 		} );
