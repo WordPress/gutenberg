@@ -90,6 +90,8 @@ module.exports = {
 					{
 						ignore: [
 							// Doesn't affect RTL styles
+							'border-bottom',
+							'border-top',
 							'width',
 							'min-width',
 							'max-width',
@@ -98,8 +100,12 @@ module.exports = {
 							'max-height',
 							'margin-top',
 							'margin-bottom',
+							'overflow-x',
+							'overflow-y',
 							'padding-top',
 							'padding-bottom',
+							'scroll-margin-top',
+							'scroll-margin-bottom',
 							'top',
 							'bottom',
 						],
