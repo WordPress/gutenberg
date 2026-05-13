@@ -42,7 +42,7 @@ export function getTransformedAttributes(
 	// Handle metadata transformation.
 	if ( attributes.metadata ) {
 		// The metadata properties that should be preserved after the transform.
-		// The noteId, name, and blockVisibility properties are separately handled
+		// The name and blockVisibility properties are separately handled
 		// in the `core/metadata/addTransforms` hook.
 		const transformedMetadata = [];
 

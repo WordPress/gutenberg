@@ -73,11 +73,6 @@ export function addTransforms( result, source, index, results ) {
 
 	const preservedMetadata = {};
 
-	// Notes
-	if ( sourceMetadata.noteId && ! result.attributes?.metadata?.noteId ) {
-		preservedMetadata.noteId = sourceMetadata.noteId;
-	}
-
 	// Custom name
 	if (
 		sourceMetadata.name &&

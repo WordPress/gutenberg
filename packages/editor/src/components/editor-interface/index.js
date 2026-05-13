@@ -26,8 +26,6 @@ import Header from '../header';
 import InserterSidebar from '../inserter-sidebar';
 import ListViewSidebar from '../list-view-sidebar';
 import { RevisionsHeader, RevisionsCanvas } from '../post-revisions-preview';
-import { CollaboratorsOverlay } from '../collaborators-overlay';
-import { useCollaboratorNotifications } from '../collaborators-presence/use-collaborator-notifications';
 import SavePublishPanels from '../save-publish-panels';
 import TextEditor from '../text-editor';
 import VisualEditor from '../visual-editor';
@@ -70,8 +68,6 @@ export default function EditorInterface( {
 } ) {
 	const {
 		mode,
-		postId,
-		postType,
 		isAttachment,
 		isInserterOpened,
 		isListViewOpened,
@@ -85,12 +81,8 @@ export default function EditorInterface( {
 		showDiff,
 	} = useSelect( ( select ) => {
 		const { get } = select( preferencesStore );
-		const {
-			getEditorSettings,
-			getPostTypeLabel,
-			getCurrentPostType,
-			getCurrentPostId,
-		} = select( editorStore );
+		const { getEditorSettings, getPostTypeLabel, getCurrentPostType } =
+			select( editorStore );
 		const {
 			getStylesPath,
 			getShowStylebook,
@@ -109,8 +101,6 @@ export default function EditorInterface( {
 
 		return {
 			mode: _mode,
-			postId: getCurrentPostId(),
-			postType: getCurrentPostType(),
 			isInserterOpened: select( editorStore ).isInserterOpened(),
 			isListViewOpened: select( editorStore ).isListViewOpened(),
 			isDistractionFree: get( 'core', 'distractionFree' ),
@@ -127,10 +117,6 @@ export default function EditorInterface( {
 		};
 	}, [] );
 	const { setShowRevisionDiff } = unlock( useDispatch( editorStore ) );
-
-	// Runs unconditionally so join/leave/save notifications are dispatched
-	// regardless of viewport width or whether the header centre area is visible.
-	useCollaboratorNotifications( postId, postType );
 
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const secondarySidebarLabel = isListViewOpened
@@ -242,10 +228,6 @@ export default function EditorInterface( {
 								/>
 							) }
 							{ children }
-							<CollaboratorsOverlay
-								postId={ postId }
-								postType={ postType }
-							/>
 						</>
 					) }
 				</>

@@ -34,7 +34,6 @@ import {
 	useQuickEditPostAction,
 } from '../dataviews-actions';
 
-import useNotesCount from './use-notes-count';
 import { QuickEditModal } from './quick-edit-modal';
 
 const { usePostActions, usePostFields } = unlock( editorPrivateApis );
@@ -178,13 +177,6 @@ export default function PostList( { postType } ) {
 		hasResolved,
 	} = useEntityRecordsWithPermissions( 'postType', postType, queryArgs );
 
-	const postIds = useMemo(
-		() => records?.map( ( record ) => record.id ) ?? [],
-		[ records ]
-	);
-	const { notesCount, isLoading: isLoadingNotesCount } =
-		useNotesCount( postIds );
-
 	// The REST API sort the authors by ID, but we want to sort them by name.
 	const data = useMemo( () => {
 		let processedRecords = records;
@@ -197,15 +189,8 @@ export default function PostList( { postType } ) {
 			).data;
 		}
 
-		if ( processedRecords ) {
-			return processedRecords.map( ( record ) => ( {
-				...record,
-				notesCount: notesCount[ record.id ] ?? 0,
-			} ) );
-		}
-
 		return processedRecords;
-	}, [ records, fields, view?.sort, notesCount ] );
+	}, [ records, fields, view?.sort ] );
 
 	const ids = data?.map( ( record ) => getItemId( record ) ) ?? [];
 	const prevIds = usePrevious( ids ) ?? [];
@@ -310,9 +295,7 @@ export default function PostList( { postType } ) {
 				fields={ fields }
 				actions={ actions }
 				data={ data || EMPTY_ARRAY }
-				isLoading={
-					isLoadingData || isLoadingNotesCount || ! hasResolved
-				}
+				isLoading={ isLoadingData || ! hasResolved }
 				view={ view }
 				onChangeView={ onChangeView }
 				selection={ selection }

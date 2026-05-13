@@ -9,7 +9,7 @@ The Gutenberg plugin adds editing, customization, and site building to WordPress
 
 == Description ==
 
-“Gutenberg” is a codename for a whole new paradigm for creating with WordPress, that aims to revolutionize the entire publishing experience as much as <a href="https://en.wikipedia.org/wiki/Johannes_Gutenberg">Johannes Gutenberg</a> did the printed word. The project is <a href="https://wordpress.org/about/roadmap/">following a four-phase process</a> that will touch major pieces of WordPress — Editing, Customization, Collaboration, and Multilingual.
+“Gutenberg” is a codename for a whole new paradigm for creating with WordPress, that aims to revolutionize the entire publishing experience as much as <a href="https://en.wikipedia.org/wiki/Johannes_Gutenberg">Johannes Gutenberg</a> did the printed word. The project is <a href="https://wordpress.org/about/roadmap/">following a four-phase process</a> that will touch major pieces of WordPress — Editing, Customization, Workflows, and Multilingual.
 
 Following the introduction of post block editing in December 2018, Gutenberg later introduced full site editing (FSE) in 2021, <a href="https://wordpress.org/news/2022/01/josephine/">which shipped with WordPress 5.9 in early 2022</a>.
 
@@ -65,7 +65,7 @@ View the <a href="https://developer.wordpress.org/block-editor/principles/versio
 
 = What’s next for the project? =
 
-The four phases of the project are Editing, Customization, Collaboration, and Multilingual. You can hear more about the project and phases from Matt in his State of the Word talks for <a href="https://ma.tt/2021/12/state-of-the-word-in-person/">2021</a>, <a href="https://ma.tt/2020/12/sotw-2020/">2020</a>, <a href="https://ma.tt/2019/11/state-of-the-word-2019/">2019</a>, and <a href="https://ma.tt/2018/12/state-of-the-word-2018/">2018</a>. Additionally, you can follow the <a href="https://make.wordpress.org/core/tag/gutenberg-new/">biweekly release notes</a> and <a href="https://make.wordpress.org/core/tag/gutenberg-next/">monthly project plan updates</a> on the <a href="https://make.wordpress.org/core/?s=gutenberg">Make WordPress Core blog</a> for more up to date information about what’s happening now.
+The four phases of the project are Editing, Customization, Workflows, and Multilingual. You can hear more about the project and phases from Matt in his State of the Word talks for <a href="https://ma.tt/2021/12/state-of-the-word-in-person/">2021</a>, <a href="https://ma.tt/2020/12/sotw-2020/">2020</a>, <a href="https://ma.tt/2019/11/state-of-the-word-2019/">2019</a>, and <a href="https://ma.tt/2018/12/state-of-the-word-2018/">2018</a>. Additionally, you can follow the <a href="https://make.wordpress.org/core/tag/gutenberg-new/">biweekly release notes</a> and <a href="https://make.wordpress.org/core/tag/gutenberg-next/">monthly project plan updates</a> on the <a href="https://make.wordpress.org/core/?s=gutenberg">Make WordPress Core blog</a> for more up to date information about what’s happening now.
 
 
 = Where can I read more about Gutenberg? =

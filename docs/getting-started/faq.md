@@ -24,7 +24,7 @@ There are four phases of Gutenberg which you can see on the [official WordPress 
 
 1. Easier Editing — Already available in WordPress since 5.0, with ongoing improvements.
 2. Customization — Full Site editing, Block Patterns, Block Directory, Block based themes.
-3. Collaboration — A more intuitive way to co-author content
+3. Workflows — A more intuitive way to co-author content
 4. Multi-lingual — Core implementation for Multi-lingual sites
 
 ### When was Gutenberg started?
@@ -215,5 +215,4 @@ In PHP:
 ```php
 $blocks = parse_blocks( $post_content );
 ```
-
 

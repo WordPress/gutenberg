@@ -143,11 +143,7 @@ The following contributors merged PRs in this release:
 - Declare `convert_format` as boolean arg on sideload route. ([77565](https://github.com/WordPress/gutenberg/pull/77565))
 - Upload Media: Use `.jpg` extension for HEIC-to-JPEG client conversion. ([77506](https://github.com/WordPress/gutenberg/pull/77506))
 
-#### Collaboration
 
-- RTC: Fix "Connection Lost" dialog when too many entities are loaded. ([77631](https://github.com/WordPress/gutenberg/pull/77631))
-- RTC: Fix connection-lost error on large updates caused by mismatch between update size bounds check and expanded base64 update size. ([77669](https://github.com/WordPress/gutenberg/pull/77669))
-- RTC: Fix divergence when two offline users reconnect. ([77980](https://github.com/WordPress/gutenberg/pull/77980))
 
 ### Accessibility
 
@@ -170,7 +166,6 @@ The following contributors merged PRs in this release:
 
 - Notes: Extract floating notes state into a dedicated store. ([77424](https://github.com/WordPress/gutenberg/pull/77424))
 - Notes: Reduce passes in useBlockComments memo and rename outputs. ([77440](https://github.com/WordPress/gutenberg/pull/77440))
-- RTC: Attach sync observers after hydrating persisted CRDT doc. ([77966](https://github.com/WordPress/gutenberg/pull/77966))
 
 ### Experiments
 
@@ -318,14 +313,12 @@ The following contributors merged PRs in this release:
 
 - Connectors: Stop end-to-end capability restriction from leaking across specs. ([77857](https://github.com/WordPress/gutenberg/pull/77857))
 - Fix PHP multisite tests. ([77825](https://github.com/WordPress/gutenberg/pull/77825))
-- RTC: Fix compaction unit test. ([77986](https://github.com/WordPress/gutenberg/pull/77986))
 
 ## First-time contributors
 
 The following PRs were merged by first-time contributors:
 
 - @adithya-naik: Image: Preserve aspectRatio and scale when switching to wide/full alignment. ([76914](https://github.com/WordPress/gutenberg/pull/76914))
-- @danluu: RTC: Fix connection-lost error on large updates caused by mismatch between update size bounds check and expanded base64 update size. ([77669](https://github.com/WordPress/gutenberg/pull/77669))
 - @hi0001234d: Connectors: Add `role="list"` wrapper to connector cards for valid ARIA structure. ([77689](https://github.com/WordPress/gutenberg/pull/77689))
 - @rajanarahul93: Featured Image: Change toggle label to 'Make image a link'. ([71931](https://github.com/WordPress/gutenberg/pull/71931))
 - @vishnupprajapat: Taxonomies: Add spacing above Add Taxonomy modal actions. ([77523](https://github.com/WordPress/gutenberg/pull/77523))
@@ -406,8 +399,6 @@ The following contributors merged PRs in this release:
 #### Post Editor
 
 - DataViews: Simplify `defaultLayouts` prop. ([77232](https://github.com/WordPress/gutenberg/pull/77232))
-- RTC: Add filterable flag for meta box RTC compatibility. ([76939](https://github.com/WordPress/gutenberg/pull/76939))
-- RTC: Change SyncConnectionModal to isSyncConnectionErrorHandled filter and drop IS_GUTENBERG_PLUGIN check. ([76853](https://github.com/WordPress/gutenberg/pull/76853))
 
 #### Block Editor
 
@@ -434,11 +425,8 @@ The following contributors merged PRs in this release:
 
 - Media Modal Experiment: Set matching picker grid layout properties for when a user switches layouts. ([77118](https://github.com/WordPress/gutenberg/pull/77118))
 
-#### Collaboration
 
 - Backport: Improve validation and permission checks for `WP_HTTP_Polling_Sync_Server`. ([76987](https://github.com/WordPress/gutenberg/pull/76987))
-- RTC: Add optional `shouldSync` function to entity sync configuration. ([76947](https://github.com/WordPress/gutenberg/pull/76947))
-- RTC: Respect WP_ALLOW_COLLABORATION in Gutenberg for activation hook. ([77084](https://github.com/WordPress/gutenberg/pull/77084))
 
 #### Site Editor
 
@@ -455,7 +443,6 @@ The following contributors merged PRs in this release:
 - DataViews: Fix `compact` density clipping and remove top/bottom padding. ([77054](https://github.com/WordPress/gutenberg/pull/77054))
 - Fix autocomplete overlapping trigger matching. ([77018](https://github.com/WordPress/gutenberg/pull/77018))
 - FormTokenField: Fix disabled styles. ([77137](https://github.com/WordPress/gutenberg/pull/77137))
-- RTC: Fix inline inserter reset on update sync. ([76980](https://github.com/WordPress/gutenberg/pull/76980))
 - RadioControl: Add support for disabling radio group. ([77127](https://github.com/WordPress/gutenberg/pull/77127))
 - Remove sandbox `allow-same-origin` for core/html blocks. ([77212](https://github.com/WordPress/gutenberg/pull/77212))
 - TextArea: Add disabled styles. ([77129](https://github.com/WordPress/gutenberg/pull/77129))
@@ -468,7 +455,6 @@ The following contributors merged PRs in this release:
 - Image block: Hide drag handles while an upload is in progress. ([77121](https://github.com/WordPress/gutenberg/pull/77121))
 - Paragraph: Prevent `onEnter` splitting of parent block when insertion of that block type is not allowed. ([77291](https://github.com/WordPress/gutenberg/pull/77291))
 - Post Author Biography: Preserve occurrence of white spaces. ([71133](https://github.com/WordPress/gutenberg/pull/71133))
-- RTC: Core/cover block minor compatibility fixes. ([76916](https://github.com/WordPress/gutenberg/pull/76916))
 - Search block: Match behavior of global styling for border and color with local styling (inspector controls) to remove inconsistency. ([77060](https://github.com/WordPress/gutenberg/pull/77060))
 - Search block: Derive 'isSearchFieldHidden' value. ([77082](https://github.com/WordPress/gutenberg/pull/77082))
 - Separator Block: Apply default block variation when inserting via `---` shortcut. ([77135](https://github.com/WordPress/gutenberg/pull/77135))
@@ -479,7 +465,6 @@ The following contributors merged PRs in this release:
 - Fix SyntaxError in Autocompleter UI when pasting matching content. ([76961](https://github.com/WordPress/gutenberg/pull/76961))
 - LinkPicker: Decode HTML entities in link preview title. ([77170](https://github.com/WordPress/gutenberg/pull/77170))
 - Prevent Enter key from inserting paragraphs in contentOnly sections. ([76989](https://github.com/WordPress/gutenberg/pull/76989))
-- RTC: Fix "Edit as HTML" content reset during collaboration. ([77043](https://github.com/WordPress/gutenberg/pull/77043))
 - Writing Flow: Fix format toolbar not appearing when selecting text from block edge. ([77136](https://github.com/WordPress/gutenberg/pull/77136))
 - contentOnly template lock: Fix block insertion and removal rules. ([77119](https://github.com/WordPress/gutenberg/pull/77119))
 - Fix numeric value clearing in preset input controls. ([77139](https://github.com/WordPress/gutenberg/pull/77139))
@@ -492,9 +477,6 @@ The following contributors merged PRs in this release:
 
 - Core Data: Fix 'useEntityProp' for raw attributes. ([77120](https://github.com/WordPress/gutenberg/pull/77120))
 - Core Data: Fix incorrect pagination for non-paginated entities. ([76406](https://github.com/WordPress/gutenberg/pull/76406))
-- RTC: Fix core/table cell merging. ([76913](https://github.com/WordPress/gutenberg/pull/76913))
-- RTC: Fix orphaned meta causing dirty editor state. ([77529](https://github.com/WordPress/gutenberg/pull/77529))
-- RTC: Improve array attribute stability when structural changes occur. ([77164](https://github.com/WordPress/gutenberg/pull/77164))
 - getMergedItemsIds: Receive full page bigger than perPage. ([77262](https://github.com/WordPress/gutenberg/pull/77262))
 
 #### Connectors
@@ -509,15 +491,10 @@ The following contributors merged PRs in this release:
 
 - Fields: Fix `postContentInfoField` when there are edits. ([76901](https://github.com/WordPress/gutenberg/pull/76901))
 - Fix: Restore editor canvas padding in classic themes. ([76864](https://github.com/WordPress/gutenberg/pull/76864))
-- RTC: Fix button flickering on retry dialog. ([77234](https://github.com/WordPress/gutenberg/pull/77234))
-- RTC: Predefined retry schedules for disconnect dialog, make more lenient. ([76966](https://github.com/WordPress/gutenberg/pull/76966))
 - Revision: Fix 'Show changes' button reset state. ([77122](https://github.com/WordPress/gutenberg/pull/77122))
 
-#### Collaboration
 
 - Fix failing 'WP_HTTP_Polling_Sync_Server' unit test. ([77025](https://github.com/WordPress/gutenberg/pull/77025))
-- RTC: Fix disconnect dialog due to uneditable entity. ([77242](https://github.com/WordPress/gutenberg/pull/77242))
-- RTC: Isolate sync update failures to prevent full disconnect. ([76968](https://github.com/WordPress/gutenberg/pull/76968))
 
 #### Global Styles
 
@@ -564,7 +541,6 @@ The following contributors merged PRs in this release:
 
 ### Documentation
 
-- Add missing documentation in `collaboration.php`. ([77173](https://github.com/WordPress/gutenberg/pull/77173))
 - Autocomplete: Clarify 'isDebounced' setting limitation. ([77062](https://github.com/WordPress/gutenberg/pull/77062))
 - Docs: Add README for DatePicker and TimePicker Components. ([70365](https://github.com/WordPress/gutenberg/pull/70365))
 - Editor: Fix 'selectedNote' action JSDoc. ([77080](https://github.com/WordPress/gutenberg/pull/77080))
@@ -615,7 +591,6 @@ The following contributors merged PRs in this release:
 - BlockStyleVariationOverridesWithConfig: Change name and fix lint errors. ([77130](https://github.com/WordPress/gutenberg/pull/77130))
 - ESLint plugin: Disable `jsx-a11y/heading-has-content`. ([77073](https://github.com/WordPress/gutenberg/pull/77073))
 - Edit Post: Fix warning in 'useMetaBoxInitialization' hook. ([77311](https://github.com/WordPress/gutenberg/pull/77311))
-- RTC: Store metaboxes RTC-compatible flag on location entries. ([77361](https://github.com/WordPress/gutenberg/pull/77361))
 - Revisions: Simplify fetching. ([77086](https://github.com/WordPress/gutenberg/pull/77086))
 
 #### Block Library
@@ -681,7 +656,6 @@ The following PRs were merged by first-time contributors:
 - @mehrazmorshed: Fix: A sentence has no ending punctuation in README.md file. ([77027](https://github.com/WordPress/gutenberg/pull/77027))
 - @prachigarg19: Fix duotone filter not applying on style variation switch. ([77229](https://github.com/WordPress/gutenberg/pull/77229))
 - @samvaidya: Image block: Validate attachment ID exists before treating image as local. ([77178](https://github.com/WordPress/gutenberg/pull/77178))
-- @sandipr942: Added missing documentation in `collaboration.php`. ([77173](https://github.com/WordPress/gutenberg/pull/77173))
 - @superdav42: Connectors: Don't clobber third-party custom render in registerDefaultConnectors. ([77116](https://github.com/WordPress/gutenberg/pull/77116))
 
 ## Contributors
@@ -747,8 +721,6 @@ The following contributors merged PRs in this release:
 #### Connectors
 - Improve AI plugin button. ([76759](https://github.com/WordPress/gutenberg/pull/76759))
 
-#### Collaboration
-- Add backport for WP_ALLOW_COLLABORATION. ([76716](https://github.com/WordPress/gutenberg/pull/76716))
 
 #### Guidelines
 - Improvements to the UX. ([76383](https://github.com/WordPress/gutenberg/pull/76383))
@@ -806,10 +778,6 @@ The following contributors merged PRs in this release:
 - Revisions: Fix template revisions retrieval and sorting. ([76760](https://github.com/WordPress/gutenberg/pull/76760))
 - Style Book: Fix missing styles for classic themes in stylebook route. ([76843](https://github.com/WordPress/gutenberg/pull/76843))
 
-#### Collaboration
-- RTC: Fix notes not syncing between collaborative editors. ([76873](https://github.com/WordPress/gutenberg/pull/76873))
-- RTC: Fix stuck "Join" link in post list when lock expires. ([76795](https://github.com/WordPress/gutenberg/pull/76795))
-- RTC: Restore on failed request with compaction update. ([76872](https://github.com/WordPress/gutenberg/pull/76872))
 
 #### Client Side Media
 - Build: Remove unused JXL WASM module from vips worker. ([76639](https://github.com/WordPress/gutenberg/pull/76639))
@@ -915,12 +883,9 @@ The following contributors merged PRs in this release:
 
 #### Testing
 - Fix: Flaky RichText format end-to-end test. ([76958](https://github.com/WordPress/gutenberg/pull/76958))
-- RTC: Add end-to-end block gauntlet. ([76849](https://github.com/WordPress/gutenberg/pull/76849))
 - e2e: Add end-to-end tests for template and template part revisions. ([76923](https://github.com/WordPress/gutenberg/pull/76923))
 - end-to-end Tests: Enable client-side media processing for site editor image test. ([76648](https://github.com/WordPress/gutenberg/pull/76648))
 
-#### Collaboration
-- RTC: Update post lock backport PR. ([76661](https://github.com/WordPress/gutenberg/pull/76661))
 
 
 ## First-time contributors
@@ -960,31 +925,15 @@ Build: detect version and generate asset.php for vendor scripts ([76811](https:/
 
 ### Bug Fixes
 
-#### Collaboration
-- RTC: Fix editor freeze when replacing code editor content. ([76815](https://github.com/WordPress/gutenberg/pull/76815))
-- RTC: Remove stale wp_enable_real_time_collaboration option check. ([76810](https://github.com/WordPress/gutenberg/pull/76810))
-- RTC: Fix RichTextData deserialization ([76607](https://github.com/WordPress/gutenberg/pull/76607))
-- RTC: Change RTC option name ([76643](https://github.com/WordPress/gutenberg/pull/76643))
-- RTC: Backport race condition fix ([76649](https://github.com/WordPress/gutenberg/pull/76649))
-- RTC: Use activation hook to enable RTC by default ([76736](https://github.com/WordPress/gutenberg/pull/76736))
-- RTC: Remove stale wp_enable_real_time_collaboration option check ([76810](https://github.com/WordPress/gutenberg/pull/76810))
-- Preferences: Hide collaboration options when RTC is not enabled. ([76819](https://github.com/WordPress/gutenberg/pull/76819))
 
 #### Post Editor
 
 
 ### Enhancements
 
-#### Collaboration
- - Real Time Collaboration: Introduce filters for the polling intervals. ([76518](https://github.com/WordPress/gutenberg/pull/76518))
- - RTC: Scroll to collaborator on click ([76561](https://github.com/WordPress/gutenberg/pull/76561))
- - RTC: Increase polling intervals, increase polling on primary room only ([76704](https://github.com/WordPress/gutenberg/pull/76704))
- - RTC: Use prepared queries instead of *_post_meta functions ([76779](https://github.com/WordPress/gutenberg/pull/76779))
 
 ### Tests
 
-#### Collaboration
- - RTC: Add E2E "stress test" with complex interactions ([76055](https://github.com/WordPress/gutenberg/pull/76055))
  - Fix navigation block rendering unit test ([76685](https://github.com/WordPress/gutenberg/pull/76685))
  - Fix navigation block unit test and e2e test ([76692](https://github.com/WordPress/gutenberg/pull/76692))
 
@@ -1002,8 +951,6 @@ The following contributors merged PRs in this release:
 
 ### Features
 
-#### Collaboration
-- RTC: Add preference for collaborator notifications. ([76460](https://github.com/WordPress/gutenberg/pull/76460))
 
 ### Enhancements
 
@@ -1018,7 +965,6 @@ The following contributors merged PRs in this release:
 - Adopt surface-width design tokens for Dialog, Notice, and Modal widths. ([76494](https://github.com/WordPress/gutenberg/pull/76494))
 - Collapsible.Card: Make contents hidden until found. ([76498](https://github.com/WordPress/gutenberg/pull/76498))
 - CollapsibleCard: Move trigger to the whole header. ([76265](https://github.com/WordPress/gutenberg/pull/76265))
-- Editor: Polish real-time collaboration presence UI and move Avatar to editor package.
 ([75652](https://github.com/WordPress/gutenberg/pull/75652))
 - Field.Label, Fieldset.Legend: Add `visuallyHidden` prop. ([76052](https://github.com/WordPress/gutenberg/pull/76052))
 - Refactor admin-ui Page component to use @wordpress/theme tokens and @wordpress/ui layout primitive.
@@ -1067,19 +1013,9 @@ The following contributors merged PRs in this release:
 
 #### Post Editor
 - Add Site Logo & Icon screen to Design panel. ([76116](https://github.com/WordPress/gutenberg/pull/76116))
-- Editor: Show own presence in collaborative editing sessions. ([76413](https://github.com/WordPress/gutenberg/pull/76413))
 - Fields: Add `format` field. ([76308](https://github.com/WordPress/gutenberg/pull/76308))
 - Media: Add hooks and extension points for client-side media processing. ([74913](https://github.com/WordPress/gutenberg/pull/74913))
 
-#### Collaboration
-- RTC: Add collaborator selection highlighting in rich text. ([76107](https://github.com/WordPress/gutenberg/pull/76107))
-- RTC: Allow filtering of `SyncConnectionModal`. ([76554](https://github.com/WordPress/gutenberg/pull/76554))
-- RTC: Auto-register custom taxonomy rest_base values for CRDT sync. ([75983](https://github.com/WordPress/gutenberg/pull/75983))
-- RTC: Do not sync role=local attributes. ([76267](https://github.com/WordPress/gutenberg/pull/76267))
-- RTC: Implement disconnection debounce after initial connection. ([76114](https://github.com/WordPress/gutenberg/pull/76114))
-- RTC: Implement front-end peer limits. ([76565](https://github.com/WordPress/gutenberg/pull/76565))
-- RTC: Remove post list lock icon and replace user-specific lock text. ([76322](https://github.com/WordPress/gutenberg/pull/76322))
-- Use V2 Yjs methods for HTTP Polling. ([76304](https://github.com/WordPress/gutenberg/pull/76304))
 - Add a limit for the default provider. ([76437](https://github.com/WordPress/gutenberg/pull/76437))
 
 #### Content Guidelines
@@ -1117,7 +1053,6 @@ The following contributors merged PRs in this release:
 - Notes: Disable for in-editor revisions. ([76180](https://github.com/WordPress/gutenberg/pull/76180))
 - Page Parent: Change the default value of 'fieldValue' state. ([76354](https://github.com/WordPress/gutenberg/pull/76354))
 - Page/Post Content Focus Mode: Fix insertion into Post Content block. ([76477](https://github.com/WordPress/gutenberg/pull/76477))
-- RTC: Place sync connection modal in front of popover. ([76431](https://github.com/WordPress/gutenberg/pull/76431))
 - Revisions: Show changed block attributes in inspector sidebar. ([76550](https://github.com/WordPress/gutenberg/pull/76550))
 - Revisions: Use useSubRegistry={false} to fix global store selectors. ([76152](https://github.com/WordPress/gutenberg/pull/76152))
 - Site Editor: Ensure editor settings are populated with server-side settings ASAP.
@@ -1193,14 +1128,10 @@ The following contributors merged PRs in this release:
 - Fix last column classname in `table` layout. ([76133](https://github.com/WordPress/gutenberg/pull/76133))
 - Fix layout scrolling in constrained-height containers. ([76453](https://github.com/WordPress/gutenberg/pull/76453))
 
-#### Collaboration
-- Fix list sidebar reset during real-time collaboration. ([76025](https://github.com/WordPress/gutenberg/pull/76025))
 - Fix backport changelog PR for Gutenberg #75746. ([76154](https://github.com/WordPress/gutenberg/pull/76154))
 - Use apiFetch capabilities, allow nonce refresh. ([76283](https://github.com/WordPress/gutenberg/pull/76283))
 - Fix backport changelog for #76060. ([76174](https://github.com/WordPress/gutenberg/pull/76174))
 - Verify client ID to avoid awareness mutation. ([76056](https://github.com/WordPress/gutenberg/pull/76056))
-- Disable RTC in the site editor. ([76223](https://github.com/WordPress/gutenberg/pull/76223))
-- Fix CRDT serialization of nested RichText attributes. ([76597](https://github.com/WordPress/gutenberg/pull/76597))
 - Fix TypeError in areEditorStatesEqual when selection is undefined. ([76163](https://github.com/WordPress/gutenberg/pull/76163))
 - Fix cursor index sync with rich text formatting. ([76418](https://github.com/WordPress/gutenberg/pull/76418))
 - Fix error when entity record doesn't have 'meta' property. ([76311](https://github.com/WordPress/gutenberg/pull/76311))
@@ -1276,7 +1207,6 @@ high loading priority. ([76302](https://github.com/WordPress/gutenberg/pull/7630
 - Data: Update documentation for global 'dispatch' and 'select' methods. ([76134](https://github.com/WordPress/gutenberg/pull/76134))
 - Docs: Document controlled/uncontrolled prop naming conventions for `@wordpress/ui`.
 ([76281](https://github.com/WordPress/gutenberg/pull/76281))
-- RTC: Update sync documentation. ([75972](https://github.com/WordPress/gutenberg/pull/75972))
 - Storybook: Add basic accent color guidance. ([76340](https://github.com/WordPress/gutenberg/pull/76340))
 - Storybook: Redesign Icon library page. ([76034](https://github.com/WordPress/gutenberg/pull/76034))
 - Storybook: Rename "Components (Deprecated)" to "Deprecated". ([76362](https://github.com/WordPress/gutenberg/pull/76362))
@@ -1312,7 +1242,6 @@ high loading priority. ([76302](https://github.com/WordPress/gutenberg/pull/7630
 - Core Data: Fix the list of properties persisted in autosaves. ([76451](https://github.com/WordPress/gutenberg/pull/76451))
 
 
-#### Collaboration
 - Move event hooks from editor to core-data. ([76358](https://github.com/WordPress/gutenberg/pull/76358))
 - Replace apiFetch with core-data store selectors. ([76333](https://github.com/WordPress/gutenberg/pull/76333))
 
@@ -1365,9 +1294,6 @@ high loading priority. ([76302](https://github.com/WordPress/gutenberg/pull/7630
 #### Testing
 - Auto Cherry-Pick: Fix race condition in workflow trigger. ([76083](https://github.com/WordPress/gutenberg/pull/76083))
 - Fix "should undo bold" flaky test. ([76464](https://github.com/WordPress/gutenberg/pull/76464))
-- RTC: Fix 'networkidle' and other end-to-end tests that are flaky. ([76214](https://github.com/WordPress/gutenberg/pull/76214))
-- RTC: Fix `post-editor-template-mode` end-to-end test. ([76209](https://github.com/WordPress/gutenberg/pull/76209))
-- RTC: Fix tests related to publish undo stack. ([76206](https://github.com/WordPress/gutenberg/pull/76206))
 - Tests: Skip connector logo URL tests when AI Client is unavailable. ([76343](https://github.com/WordPress/gutenberg/pull/76343))
 - Update Node version to v24 for flaky test reporter. ([76492](https://github.com/WordPress/gutenberg/pull/76492))
 - end-to-end Tests: Add connector setup flow tests with test AI provider. ([76433](https://github.com/WordPress/gutenberg/pull/76433))
@@ -1385,7 +1311,6 @@ The following PRs were merged by first-time contributors:
 - @kannan-ravi: Add word-break property to visually hidden styles to prevent screen reader issues. ([75539](https://github.com/WordPress/gutenberg/pull/75539))
 - @markusfoo: Interactivity API: Fix router initialization race condition on Safari/Firefox. ([76053](https://github.com/WordPress/gutenberg/pull/76053))
 - @sagarjadhav: HTML & Shortcode: Disable viewport visibility support. ([76138](https://github.com/WordPress/gutenberg/pull/76138))
-- @smithjw1: RTC: Auto-register custom taxonomy rest_base values for CRDT sync. ([75983](https://github.com/WordPress/gutenberg/pull/75983))
 - @wwahammy: Correct input of setIsLoading. ([76381](https://github.com/WordPress/gutenberg/pull/76381))
 
 ## Contributors
@@ -1460,7 +1385,6 @@ The following contributors merged PRs in this release:
 
 #### Post Editor
 - Center navigation preview content in preview pane. ([75741](https://github.com/WordPress/gutenberg/pull/75741))
-- RTC: Add session activity notifications. ([76065](https://github.com/WordPress/gutenberg/pull/76065))
 
 #### Block Editor
 - Add previews for style variation transforms. ([75889](https://github.com/WordPress/gutenberg/pull/75889))
@@ -1494,21 +1418,6 @@ The following contributors merged PRs in this release:
 - wp-build: Deregister script modules before re-registering. ([75909](https://github.com/WordPress/gutenberg/pull/75909))
 - CI: Don't build release notes during plugin build workflow for WP Core sync ([76398](https://github.com/WordPress/gutenberg/pull/76398))
 
-#### Collaboration
-- Fix change-detection and new-post end-to-end tests after RTC enabled by default. ([75751](https://github.com/WordPress/gutenberg/pull/75751))
-- RTC: Back off when the window loses focus. ([75843](https://github.com/WordPress/gutenberg/pull/75843))
-- RTC: Bugfix: Fix casing of getPersistedCRDTDoc. ([75922](https://github.com/WordPress/gutenberg/pull/75922))
-- RTC: Fix fallthrough for sync update switch statement. ([76060](https://github.com/WordPress/gutenberg/pull/76060))
-- RTC: Fix stale CRDT document persisted on save. ([75975](https://github.com/WordPress/gutenberg/pull/75975))
-- RTC: Fix syncing of emoji / surrogate pairs. ([76049](https://github.com/WordPress/gutenberg/pull/76049))
-- RTC: Fix undefined array_first() call in sync storage. ([75869](https://github.com/WordPress/gutenberg/pull/75869))
-- RTC: Prevent duplicate poll cycles. ([76059](https://github.com/WordPress/gutenberg/pull/76059))
-- Real-time collaboration: Fix disconnect dialog on navigate. ([75886](https://github.com/WordPress/gutenberg/pull/75886))
-- Real-time collaboration: Improve collaboration within the same rich text. ([75703](https://github.com/WordPress/gutenberg/pull/75703))
-- Real-time collaboration: Remove ghost awareness state explicitly when refreshing. ([75883](https://github.com/WordPress/gutenberg/pull/75883))
-- [Real-time Collaboration] Fix sync issue on refresh. ([76017](https://github.com/WordPress/gutenberg/pull/76017))
-- Real-time collaboration: Improve disconnect dialog. ([75970](https://github.com/WordPress/gutenberg/pull/75970))
-- RTC: Enable RTC by default ([75739](https://github.com/WordPress/gutenberg/pull/75739))
 
 #### Block Library
 - Block Support: Fix custom CSS not saved when style schema is not defined. ([75797](https://github.com/WordPress/gutenberg/pull/75797))
@@ -1548,7 +1457,6 @@ The following contributors merged PRs in this release:
 - Editor: Remove View dropdown and pinned items from revisions header. ([75951](https://github.com/WordPress/gutenberg/pull/75951))
 - Fix: Template revisions infinite spinner. ([75953](https://github.com/WordPress/gutenberg/pull/75953))
 - Preserve note selection on browser tab switch. ([75955](https://github.com/WordPress/gutenberg/pull/75955))
-- Real-time collaboration: Fix style mounting in RTC overlay. ([75700](https://github.com/WordPress/gutenberg/pull/75700))
 
 #### Components
 - DateTimePicker: Fix day text wrapping. ([76084](https://github.com/WordPress/gutenberg/pull/76084))
@@ -1608,7 +1516,6 @@ The following contributors merged PRs in this release:
 ### Experiments
 
 #### Post Editor
-- RTC: Disable multiple collaborators if meta boxes are present. ([75939](https://github.com/WordPress/gutenberg/pull/75939))
 
 #### Content Guidelines
 - Add experimental REST API and custom post type. ([75164](https://github.com/WordPress/gutenberg/pull/75164))
@@ -1639,11 +1546,6 @@ The following contributors merged PRs in this release:
 - Interactivity: Fix incomplete `Window.scheduler` type causing TS2430 in downstream projects. ([76070](https://github.com/WordPress/gutenberg/pull/76070))
 - UI: Update `@base-ui/react` from 1.0.0 to 1.2.0. ([75698](https://github.com/WordPress/gutenberg/pull/75698))
 
-#### Collaboration
-- RTC: Add debug logging to SyncManager. ([75924](https://github.com/WordPress/gutenberg/pull/75924))
-- RTC: Merge document meta map into state map. ([75830](https://github.com/WordPress/gutenberg/pull/75830))
-- RTC: Move WordPress meta key from sync package to core-data. ([75846](https://github.com/WordPress/gutenberg/pull/75846))
-- RTC: Updates from backport PR. ([75711](https://github.com/WordPress/gutenberg/pull/75711))
 
 #### Components
 - Convert focus on mount hook to TypeScript. ([75442](https://github.com/WordPress/gutenberg/pull/75442))
@@ -1678,7 +1580,6 @@ The following contributors merged PRs in this release:
 - Cover block: Add end-to-end test coverage for bugfixes. ([75483](https://github.com/WordPress/gutenberg/pull/75483))
 - Fix flaky Quick Edit end-to-end test. ([75714](https://github.com/WordPress/gutenberg/pull/75714))
 - Re-enable Font Library end-to-end tests. ([75712](https://github.com/WordPress/gutenberg/pull/75712))
-- Real-time collaboration: Expand mergeCrdtBlocks() automated testing. ([75923](https://github.com/WordPress/gutenberg/pull/75923))
 - Skip cross origin isolation end-to-end tests. ([75764](https://github.com/WordPress/gutenberg/pull/75764))
 - Try fix failing patterns end-to-end test. ([75759](https://github.com/WordPress/gutenberg/pull/75759))
 - Workflows: Use pull_request_target for cherry-pick workflow. ([75775](https://github.com/WordPress/gutenberg/pull/75775))
@@ -1820,9 +1721,6 @@ The following contributors merged PRs in this release:
 - Notes: Pressing Escape should cancel adding a note. ([75288](https://github.com/WordPress/gutenberg/pull/75288))
 - Notes: Update shortcut category. ([75461](https://github.com/WordPress/gutenberg/pull/75461))
 - Post Content Block: Improve removal confirmation modal. ([75001](https://github.com/WordPress/gutenberg/pull/75001))
-- Real-time collaboration:
-  - Add collaborators cursor awareness. ([75398](https://github.com/WordPress/gutenberg/pull/75398))
-  - Add global setting to enable real-time collaboration. ([75286](https://github.com/WordPress/gutenberg/pull/75286))
   - Move PHP code to compat / backports directory. ([75366](https://github.com/WordPress/gutenberg/pull/75366))
   - Remove block client IDs from Awareness, fix "Show Template" view. ([75590](https://github.com/WordPress/gutenberg/pull/75590))
 - Set snackbar position to center. ([75294](https://github.com/WordPress/gutenberg/pull/75294))
@@ -1872,7 +1770,6 @@ The following contributors merged PRs in this release:
 - DataViews: Use public ColorPicker instead of internal Picker export. ([75394](https://github.com/WordPress/gutenberg/pull/75394))
 - DateCalendar, DateRangeCalendar: Use lighter gray for disabled dates. ([75683](https://github.com/WordPress/gutenberg/pull/75683))
 - ToggleGroupControl: Add visual emphasis to selected item. ([75138](https://github.com/WordPress/gutenberg/pull/75138))
-- [Real-time collaboration] Refine collaborator overlay with Avatar component integration. ([75595](https://github.com/WordPress/gutenberg/pull/75595))
 
 #### Icons
 - Icons Registry: Don't expose "internal" icons. ([75526](https://github.com/WordPress/gutenberg/pull/75526))
@@ -1887,7 +1784,6 @@ The following contributors merged PRs in this release:
 
 ### New APIs
 
-- Real-time collaboration: Remove @wordpress/sync from bundled packages and add private APIs. ([74671](https://github.com/WordPress/gutenberg/pull/74671))
 
 
 ### Bug Fixes
@@ -2000,9 +1896,7 @@ The following contributors merged PRs in this release:
   - Fix block toolbar click action. ([75614](https://github.com/WordPress/gutenberg/pull/75614))
   - Fix new note creation from the List View. ([75566](https://github.com/WordPress/gutenberg/pull/75566))
   - Fix sidebar display logic for small screens. ([75454](https://github.com/WordPress/gutenberg/pull/75454))
-- Real-time Collaboration: Fix revision restore bug. ([75233](https://github.com/WordPress/gutenberg/pull/75233))
 - Restore deprecated Pullquote Block. ([75122](https://github.com/WordPress/gutenberg/pull/75122))
-- [Real-time collaboration] Fix <CollaboratorsPresence> layout issue. ([75599](https://github.com/WordPress/gutenberg/pull/75599))
 
 #### Components
 - Button: Prevent outline flicker when focused and active at the same time. ([75346](https://github.com/WordPress/gutenberg/pull/75346))
@@ -2015,17 +1909,14 @@ The following contributors merged PRs in this release:
 - ToggleControl: Pass full props to the input element. ([74956](https://github.com/WordPress/gutenberg/pull/74956))
 - ToggleControl: Prevent console warning for `__nextHasNoMarginBottom`. ([75296](https://github.com/WordPress/gutenberg/pull/75296))
 
-#### Collaboration
 - Add cap check for single taxonomy term entities. ([75708](https://github.com/WordPress/gutenberg/pull/75708))
 - Add minimum cap check to sync endpoint. ([75681](https://github.com/WordPress/gutenberg/pull/75681))
 - Always target autosave revision. ([75105](https://github.com/WordPress/gutenberg/pull/75105))
-- Bugfix for CRDT user selection and add tests. ([75075](https://github.com/WordPress/gutenberg/pull/75075))
 - Bugfix: Set the removed users to empty for awareness. ([75337](https://github.com/WordPress/gutenberg/pull/75337))
 - Fix comment syncing on site editor. ([75746](https://github.com/WordPress/gutenberg/pull/75746))
 - Fix entity save call / initial persistence. ([75841](https://github.com/WordPress/gutenberg/pull/75841))
 - Pick user fields instead of spreading the entire object. ([75528](https://github.com/WordPress/gutenberg/pull/75528))
 - Remove disconnected users from Awareness. ([75253](https://github.com/WordPress/gutenberg/pull/75253))
-- Remove IS_GUTENBERG_PLUGIN checks for collaborative editing. ([75699](https://github.com/WordPress/gutenberg/pull/75699))
 - Update diff package. ([75644](https://github.com/WordPress/gutenberg/pull/75644))
 
 #### DataViews
@@ -2074,20 +1965,15 @@ The following contributors merged PRs in this release:
 
 - Add useBlocker to private APIs for enhanced routing control. ([75687](https://github.com/WordPress/gutenberg/pull/75687))
 - Playlist block. ([50664](https://github.com/WordPress/gutenberg/pull/50664))
-- Real-time Collaboration: Fix broken unit tests for awareness. ([75362](https://github.com/WordPress/gutenberg/pull/75362))
 - SVG Icon registration API. ([72215](https://github.com/WordPress/gutenberg/pull/72215))
 
-#### Collaboration
-- Add collaborators presence UI. ([75065](https://github.com/WordPress/gutenberg/pull/75065))
 - Add hook for accessing awareness data. ([75009](https://github.com/WordPress/gutenberg/pull/75009))
 - Add sync connection status handling. ([75066](https://github.com/WordPress/gutenberg/pull/75066))
 - Add tests for the awareness code in core-data. ([75074](https://github.com/WordPress/gutenberg/pull/75074))
 - Add tests for the awareness code in sync. ([75077](https://github.com/WordPress/gutenberg/pull/75077))
 - Compact on request with encodeStateAsUpdate. ([75682](https://github.com/WordPress/gutenberg/pull/75682))
 - Fix auto draft bug for Y.text titles. ([75560](https://github.com/WordPress/gutenberg/pull/75560))
-- Import Yjs correctly in core-data. ([75500](https://github.com/WordPress/gutenberg/pull/75500))
 - Sync post content and undefined `blocks` value. ([75437](https://github.com/WordPress/gutenberg/pull/75437))
-- Update the y-protocols version and remove the unnecessary diff types. ([75657](https://github.com/WordPress/gutenberg/pull/75657))
 - Use Y.text for title, content and excerpt. ([75448](https://github.com/WordPress/gutenberg/pull/75448))
 
 ### Documentation
@@ -2103,7 +1989,6 @@ The following contributors merged PRs in this release:
 - Docs: Simplifying Gutenberg versions table. ([75209](https://github.com/WordPress/gutenberg/pull/75209))
 - Fix awareness timeout documentation unit. ([75284](https://github.com/WordPress/gutenberg/pull/75284))
 - Fix: Navigation Overlay Close Block: Add missing @since tag #75247. ([75250](https://github.com/WordPress/gutenberg/pull/75250))
-- Real-time collaboration: Update 'sync.providers' filter inline comments. ([75248](https://github.com/WordPress/gutenberg/pull/75248))
 - Removed Unused Global Documentation. ([75631](https://github.com/WordPress/gutenberg/pull/75631))
 - Scripts: Fix contributor guide link in README. ([75161](https://github.com/WordPress/gutenberg/pull/75161))
 - Storybook: Add Stories for LetterSpacingControl component. ([73480](https://github.com/WordPress/gutenberg/pull/73480))
@@ -2158,9 +2043,6 @@ The following contributors merged PRs in this release:
 
 #### Post Editor
 - Notes: Use preferences store when applicable. ([75008](https://github.com/WordPress/gutenberg/pull/75008))
-- Real-time Collaboration: Change users to collaborators. ([75237](https://github.com/WordPress/gutenberg/pull/75237))
-- Real-time collaboration: Fix <CollaboratorsPresence> type imports. ([75232](https://github.com/WordPress/gutenberg/pull/75232))
-- Real-time collaboration: Make the collaborators presence button translatable. ([75252](https://github.com/WordPress/gutenberg/pull/75252))
 - Remove deprecated __nextHasNoMarginBottom prop. ([75139](https://github.com/WordPress/gutenberg/pull/75139))
 - RichText: Move useFormatTypes to rich-text package. ([75387](https://github.com/WordPress/gutenberg/pull/75387))
 - useMergeRefs: Migrate to TypeScript. ([75569](https://github.com/WordPress/gutenberg/pull/75569))
@@ -2169,16 +2051,13 @@ The following contributors merged PRs in this release:
 - DataForm: Style SummaryButton in panel layout with `is-disabled` classname. ([75470](https://github.com/WordPress/gutenberg/pull/75470))
 - Externalize theme stylesheet. ([75182](https://github.com/WordPress/gutenberg/pull/75182))
 
-#### Collaboration
 - Move AwarenessState to @wordpress/core-data. ([75216](https://github.com/WordPress/gutenberg/pull/75216))
-- Real-time collaboration: Update and unpin sync package dependencies. ([75059](https://github.com/WordPress/gutenberg/pull/75059))
 
 
 ### Tools
 
 - AGENTS.md: Add CLAUDE.md symlinks, architecture decisions, and common pitfalls. ([75507](https://github.com/WordPress/gutenberg/pull/75507))
 - Duotone: Add sgomes as owner. ([75519](https://github.com/WordPress/gutenberg/pull/75519))
-- Real-Time Collaboration: Add end-to-end tests for RTC. ([75598](https://github.com/WordPress/gutenberg/pull/75598))
 
 #### Testing
 - Add end-to-end test for loading settings in site editor preload spec. ([75661](https://github.com/WordPress/gutenberg/pull/75661))
@@ -2206,7 +2085,6 @@ The following PRs were merged by first-time contributors:
 - @Abmarne: Fix: Navigation Overlay Close Block: Add missing @since tag #75247. ([75250](https://github.com/WordPress/gutenberg/pull/75250))
 - @anandrajaram21: Storybook: Add Stories for LetterSpacingControl component. ([73480](https://github.com/WordPress/gutenberg/pull/73480))
 - @czarflix: DataForm: Mark fields as required or optional automatically. ([74430](https://github.com/WordPress/gutenberg/pull/74430))
-- @dabowman: [Real-time collaboration] Refine collaborator overlay with Avatar component integration. ([75595](https://github.com/WordPress/gutenberg/pull/75595))
 - @gmjuhasz: Media & Text: Fix RTLCSS control directives appearing in production CSS. ([73205](https://github.com/WordPress/gutenberg/pull/73205))
 - @LiamSarsfield: wp-env: Fix MySQL startup race condition causing database connection errors. ([75046](https://github.com/WordPress/gutenberg/pull/75046))
 - @Marianne380: Navigation Submenu: Restore `openSubmenusOnClick` to `usesContext` for backward compatibility. ([75435](https://github.com/WordPress/gutenberg/pull/75435))
@@ -2323,10 +2201,6 @@ The following contributors merged PRs in this release:
 #### Icons
 - Add missing chevron-up-small icon. ([74607](https://github.com/WordPress/gutenberg/pull/74607))
 
-#### Collaboration
-- Real-time collaboration: Add default HTTP polling sync provider. ([74564](https://github.com/WordPress/gutenberg/pull/74564))
-- Real-time collaboration: Sync collections. ([74665](https://github.com/WordPress/gutenberg/pull/74665))
-- Real-time collaboration: Use relative positions in undo stack. ([74878](https://github.com/WordPress/gutenberg/pull/74878))
 
 ### Bug Fixes
 
@@ -2366,9 +2240,6 @@ The following contributors merged PRs in this release:
 - Pattern Editing: Prevent double-click editing for template parts and synced patterns. ([74755](https://github.com/WordPress/gutenberg/pull/74755))
 - Calculate viewport based on iframe size in resizable editor. ([75156](https://github.com/WordPress/gutenberg/pull/75156))
 
-#### Collaboration
-- Real-time collaboration: Do not wrap persisted doc applied update in transaction. ([74753](https://github.com/WordPress/gutenberg/pull/74753))
-- Real-time collaboration: Pass non-cleaned (but merged) edits to `SyncManager#update`. ([74912](https://github.com/WordPress/gutenberg/pull/74912))
 - Sync: Refactor ProviderCreator signature to an object. ([74871](https://github.com/WordPress/gutenberg/pull/74871))
 
 #### Interactivity API
@@ -2411,8 +2282,6 @@ The following contributors merged PRs in this release:
 #### Media
 - Media Modal Experiment: Add a simple notices-based uploading state. ([74965](https://github.com/WordPress/gutenberg/pull/74965))
 
-#### Collaboration
-- Real-time Collaboration: Add user and selection information to awareness. ([74728](https://github.com/WordPress/gutenberg/pull/74728))
 
 #### Post Editor
 - Media Editor: Add a simple media editor package and integrate into the editor package. ([74601](https://github.com/WordPress/gutenberg/pull/74601))
@@ -2443,7 +2312,6 @@ The following contributors merged PRs in this release:
 ### Code Quality
 
 - core-data: Fix missing dependencies. ([74934](https://github.com/WordPress/gutenberg/pull/74934))
-- core-data: Fix yjs import and missing dependency. ([74950](https://github.com/WordPress/gutenberg/pull/74950))
 - dataviews: Fix missing dependency - @storybook/addon-docs. ([74935](https://github.com/WordPress/gutenberg/pull/74935))
 
 #### Block Library
@@ -2472,7 +2340,6 @@ The following contributors merged PRs in this release:
 - Block Visibility: Fix flaky end-to-end test. ([74931](https://github.com/WordPress/gutenberg/pull/74931))
 - Fix end-to-end tests: Update function names to include wp_ prefix. ([74688](https://github.com/WordPress/gutenberg/pull/74688))
 - Fix flaky 'Revisions' end-to-end test. ([75002](https://github.com/WordPress/gutenberg/pull/75002))
-- Real-time collaboration: Fix undo tests. ([74955](https://github.com/WordPress/gutenberg/pull/74955))
 - e2e: Fix flaky tests for settings sidebar. ([74929](https://github.com/WordPress/gutenberg/pull/74929))
 - end-to-end tests: Bump all test blocks to API v3. ([74941](https://github.com/WordPress/gutenberg/pull/74941))
 - end-to-end tests: Remove `switchToLegacyCanvas` from multi select and a11y suite. ([74845](https://github.com/WordPress/gutenberg/pull/74845))
@@ -2662,9 +2529,6 @@ The following contributors merged PRs in this release:
 - List View: Ensure element exists in document before focusing. ([74613](https://github.com/WordPress/gutenberg/pull/74613))
 - Pattern Editing: Prevent double-click editing for template parts and synced patterns. ([74755](https://github.com/WordPress/gutenberg/pull/74755))
 
-#### Collaboration
-- Real-time collaboration: Do not wrap persisted doc applied update in transaction. ([74753](https://github.com/WordPress/gutenberg/pull/74753))
-- Real-time collaboration: Pass non-cleaned (but merged) edits to `SyncManager#update`. ([74912](https://github.com/WordPress/gutenberg/pull/74912))
 - Sync: Refactor ProviderCreator signature to an object. ([74871](https://github.com/WordPress/gutenberg/pull/74871))
 
 #### Interactivity API
@@ -2707,8 +2571,6 @@ The following contributors merged PRs in this release:
 #### Media
 - Media Modal Experiment: Add a simple notices-based uploading state. ([74965](https://github.com/WordPress/gutenberg/pull/74965))
 
-#### Collaboration
-- Real-time Collaboration: Add user and selection information to awareness. ([74728](https://github.com/WordPress/gutenberg/pull/74728))
 
 #### Post Editor
 - Media Editor: Add a simple media editor package and integrate into the editor package. ([74601](https://github.com/WordPress/gutenberg/pull/74601))
@@ -2738,7 +2600,6 @@ The following contributors merged PRs in this release:
 ### Code Quality
 
 - core-data: Fix missing dependencies. ([74934](https://github.com/WordPress/gutenberg/pull/74934))
-- core-data: Fix yjs import and missing dependency. ([74950](https://github.com/WordPress/gutenberg/pull/74950))
 - dataviews: Fix missing dependency - @storybook/addon-docs. ([74935](https://github.com/WordPress/gutenberg/pull/74935))
 
 #### Block Library
@@ -2767,7 +2628,6 @@ The following contributors merged PRs in this release:
 - Block Visibility: Fix flaky end-to-end test. ([74931](https://github.com/WordPress/gutenberg/pull/74931))
 - Fix end-to-end tests: Update function names to include wp_ prefix. ([74688](https://github.com/WordPress/gutenberg/pull/74688))
 - Fix flaky 'Revisions' end-to-end test. ([75002](https://github.com/WordPress/gutenberg/pull/75002))
-- Real-time collaboration: Fix undo tests. ([74955](https://github.com/WordPress/gutenberg/pull/74955))
 - e2e: Fix flaky tests for settings sidebar. ([74929](https://github.com/WordPress/gutenberg/pull/74929))
 - end-to-end tests: Bump all test blocks to API v3. ([74941](https://github.com/WordPress/gutenberg/pull/74941))
 - end-to-end tests: Remove `switchToLegacyCanvas` from multi select and a11y suite. ([74845](https://github.com/WordPress/gutenberg/pull/74845))
@@ -2789,10 +2649,6 @@ The following contributors merged PRs in this release:
 - Move grid manual mode sync into 7.1 folder. ([74792](https://github.com/WordPress/gutenberg/pull/74792))
 - Remove comment about non-existing property. ([75003](https://github.com/WordPress/gutenberg/pull/75003))
 
-#### Collaboration
-- Real-time collaboration: Add default HTTP polling sync provider. ([74564](https://github.com/WordPress/gutenberg/pull/74564))
-- Real-time collaboration: Sync collections. ([74665](https://github.com/WordPress/gutenberg/pull/74665))
-- Real-time collaboration: Use relative positions in undo stack. ([74878](https://github.com/WordPress/gutenberg/pull/74878))
 
 
 ## First-time contributors
@@ -2856,8 +2712,6 @@ The following contributors merged PRs in this release:
 
 ### Features
 
-#### Collaboration
-- Real-time collaboration: Move collaborative editing from experiments to default Gutenberg plugin experience. ([74562](https://github.com/WordPress/gutenberg/pull/74562))
 
 #### Block Library
 - Add Line Indent support. ([73114](https://github.com/WordPress/gutenberg/pull/73114))
@@ -3102,10 +2956,6 @@ The following contributors merged PRs in this release:
 - Fix row selection in table layout in Firefox. ([73945](https://github.com/WordPress/gutenberg/pull/73945))
 - Fix: Dataview: Column header move item in RTL moves in the opposite direction to the arrow. ([74644](https://github.com/WordPress/gutenberg/pull/74644))
 
-#### Collaboration
-- Real-time collaboration: Apply only detected changes from the persisted CRDT document. ([74668](https://github.com/WordPress/gutenberg/pull/74668))
-- Real-time collaboration: Do not overwrite a "floating" date. ([73984](https://github.com/WordPress/gutenberg/pull/73984))
-- Real-time collaboration: Refetch entity when it is saved by a peer. ([74637](https://github.com/WordPress/gutenberg/pull/74637))
 
 #### Site Editor
 - If the route cannot be found treat the canvas mode as view. ([74642](https://github.com/WordPress/gutenberg/pull/74642))
@@ -3163,7 +3013,6 @@ The following contributors merged PRs in this release:
 #### Plugin
 - Blocks: Fix root URL cache fatal error. ([74459](https://github.com/WordPress/gutenberg/pull/74459))
 
-#### Collaboration
 - Create a reverse map for faster itemBlock lookups. ([73930](https://github.com/WordPress/gutenberg/pull/73930))
 
 
@@ -3185,13 +3034,6 @@ The following contributors merged PRs in this release:
 - Render custom overlay template parts in Navigation block (behind experiment). ([73967](https://github.com/WordPress/gutenberg/pull/73967))
 - Update navigation-overlay-close block to be used as server side rendering. ([74579](https://github.com/WordPress/gutenberg/pull/74579))
 
-#### Collaboration
-- Real-time Collaboration: Add Yjs awareness foundation. ([74565](https://github.com/WordPress/gutenberg/pull/74565))
-- Real-time collaboration: Add type guard for rich-text attributes. ([73946](https://github.com/WordPress/gutenberg/pull/73946))
-- Real-time collaboration: Fix persisted document meta and add tests. ([73985](https://github.com/WordPress/gutenberg/pull/73985))
-- Real-time collaboration: Improve type safety with `YMapWrap`. ([73948](https://github.com/WordPress/gutenberg/pull/73948))
-- Real-time collaboration: Use alternative diff in quill-delta, provide incremental text updates. ([73699](https://github.com/WordPress/gutenberg/pull/73699))
-- Remove WebRTC and IndexedDB providers. ([74555](https://github.com/WordPress/gutenberg/pull/74555))
 
 #### Site Editor
 - Add extensible site editor experiment. ([74123](https://github.com/WordPress/gutenberg/pull/74123))
@@ -3201,7 +3043,6 @@ The following contributors merged PRs in this release:
 
 #### Post Editor
 - Navigation Overlay: Fix area and icon name. ([74520](https://github.com/WordPress/gutenberg/pull/74520))
-- Real-time collaboration: Allow post-locked-modal to be overridden when `collaborative-editing` is enabled. ([72326](https://github.com/WordPress/gutenberg/pull/72326))
 
 #### Font Library
 - Allow access for hybrid themes. ([73876](https://github.com/WordPress/gutenberg/pull/73876))
@@ -3435,12 +3276,10 @@ The following PRs were merged by first-time contributors:
 - @JosVelasco: Block Editor: Prevent browser autocomplete in Navigation link search. ([74305](https://github.com/WordPress/gutenberg/pull/74305))
 - @madhavraj2004: api-fetch: Add named export to fix TypeScript callable issues. ([74576](https://github.com/WordPress/gutenberg/pull/74576))
 - @manhphuc: Fix: Align Document Outline padding in List View sidebar to match surrounding panels (#73576). ([73595](https://github.com/WordPress/gutenberg/pull/73595))
-- @maxschmeling: Real-time collaboration: Move collaborative editing from experiments to default Gutenberg plugin experience. ([74562](https://github.com/WordPress/gutenberg/pull/74562))
 - @Menrath: change: wp-env: Strip version suffix for non-wp-org zip sources. ([74195](https://github.com/WordPress/gutenberg/pull/74195))
 - @mordeth: DataViews: Add groupBy.showLabel configuration option to control group header label visibility. ([74161](https://github.com/WordPress/gutenberg/pull/74161))
 - @Ndimande-dev: Update nested-blocks-inner-blocks.md. ([74534](https://github.com/WordPress/gutenberg/pull/74534))
 - @Ninos: Fix: Prevent `accordion-heading` submitting/sending forms (button `type="button"`). ([74177](https://github.com/WordPress/gutenberg/pull/74177))
-- @pkevan: Real-time collaboration: Allow post-locked-modal to be overridden when `collaborative-editing` is enabled. ([72326](https://github.com/WordPress/gutenberg/pull/72326))
 - @Rishicreates20: Fix punctuation and formatting in README.md. ([74440](https://github.com/WordPress/gutenberg/pull/74440))
 - @rutviksavsani: Fix the dataviews experiment locked fields position on toggle. ([74326](https://github.com/WordPress/gutenberg/pull/74326))
 - @saranshsinhaa: [Tabs block] Button and Tab Styling options #73932. ([74103](https://github.com/WordPress/gutenberg/pull/74103))
@@ -3602,9 +3441,6 @@ The following contributors merged PRs in this release:
 - Add Overlay template part area behind Experiment. ([73359](https://github.com/WordPress/gutenberg/pull/73359))
 - Add overlay template part selector to Navigation block (behind experiment). ([73760](https://github.com/WordPress/gutenberg/pull/73760))
 
-#### Collaboration
-- Real-time collaboration: Add UndoManager support for collaborative editing. ([72407](https://github.com/WordPress/gutenberg/pull/72407))
-- Real-time collaboration: Disable syncing for "synthetic" template posts. ([73526](https://github.com/WordPress/gutenberg/pull/73526))
 
 #### Font Library
 - Under dedicated font library page. ([73630](https://github.com/WordPress/gutenberg/pull/73630))
@@ -3663,7 +3499,6 @@ The following contributors merged PRs in this release:
 #### Site Editor
 - Fix 'useNavigateToPreviousEntityRecord' internal deps. ([73740](https://github.com/WordPress/gutenberg/pull/73740))
 
-#### Collaboration
 - Notes: Simplify editing mode change position tracking. ([73696](https://github.com/WordPress/gutenberg/pull/73696))
 
 #### Patterns
@@ -3837,7 +3672,6 @@ The following contributors merged PRs in this release:
 - iAPI: Fix using `getServerContext` in derived state getters. ([73518](https://github.com/WordPress/gutenberg/pull/73518))
 - iAPI: Return a deep-clone object from `getServerState` and `getServerContext` functions. ([73437](https://github.com/WordPress/gutenberg/pull/73437))
 
-#### Collaboration
 - Notes position alignment in HTML. ([73046](https://github.com/WordPress/gutenberg/pull/73046))
 - Notes: Collapse note on blur. ([73158](https://github.com/WordPress/gutenberg/pull/73158))
 - Notes: Fix warning in comment content check. ([73198](https://github.com/WordPress/gutenberg/pull/73198))
@@ -3944,7 +3778,6 @@ The following contributors merged PRs in this release:
 #### Block bindings
 - Make `core/post-data` source code more semantic. ([73394](https://github.com/WordPress/gutenberg/pull/73394))
 
-#### Collaboration
 - Notes: Ignore flood and duplicate checks. ([73232](https://github.com/WordPress/gutenberg/pull/73232))
 
 #### Block Library
@@ -3977,7 +3810,6 @@ The following contributors merged PRs in this release:
 
 - UI: Remove shorthand prop options from Box component. ([73529](https://github.com/WordPress/gutenberg/pull/73529))
 
-#### Collaboration
 - Notes: Improve delete confirm message for replies. ([73173](https://github.com/WordPress/gutenberg/pull/73173))
 - Update button label from "Add new note" to "Add new reply". ([73189](https://github.com/WordPress/gutenberg/pull/73189))
 
@@ -4166,7 +3998,6 @@ The following contributors merged PRs in this release:
 - iAPI: Fix using `getServerContext` in derived state getters. ([73518](https://github.com/WordPress/gutenberg/pull/73518))
 - iAPI: Return a deep-clone object from `getServerState` and `getServerContext` functions. ([73437](https://github.com/WordPress/gutenberg/pull/73437))
 
-#### Collaboration
 - Notes position alignment in HTML. ([73046](https://github.com/WordPress/gutenberg/pull/73046))
 - Notes: Collapse note on blur. ([73158](https://github.com/WordPress/gutenberg/pull/73158))
 - Notes: Fix warning in comment content check. ([73198](https://github.com/WordPress/gutenberg/pull/73198))
@@ -4270,7 +4101,6 @@ The following contributors merged PRs in this release:
 #### Block bindings
 - Make `core/post-data` source code more semantic. ([73394](https://github.com/WordPress/gutenberg/pull/73394))
 
-#### Collaboration
 - Notes: Ignore flood and duplicate checks. ([73232](https://github.com/WordPress/gutenberg/pull/73232))
 
 #### Block Library
@@ -4303,7 +4133,6 @@ The following contributors merged PRs in this release:
 
 - UI: Remove shorthand prop options from Box component. ([73529](https://github.com/WordPress/gutenberg/pull/73529))
 
-#### Collaboration
 - Notes: Improve delete confirm message for replies. ([73173](https://github.com/WordPress/gutenberg/pull/73173))
 - Update button label from "Add new note" to "Add new reply". ([73189](https://github.com/WordPress/gutenberg/pull/73189))
 
@@ -4411,7 +4240,6 @@ The following contributors merged PRs in this release:
 - Paragraph: Migrate to text-align block support. ([73111](https://github.com/WordPress/gutenberg/pull/73111))
 - Update/twitter to X embed icon and text. ([73110](https://github.com/WordPress/gutenberg/pull/73110))
 
-#### Collaboration
 - Notes: Add form submission shortcut. ([72868](https://github.com/WordPress/gutenberg/pull/72868))
 - Notes: Add keyboard support for tree navigation. ([73136](https://github.com/WordPress/gutenberg/pull/73136))
 - Notes: Disable "Add note" button in Distraction free mode. ([72954](https://github.com/WordPress/gutenberg/pull/72954))
@@ -4455,7 +4283,6 @@ The following contributors merged PRs in this release:
 - block-editor: Remove types from package.json exports. ([72817](https://github.com/WordPress/gutenberg/pull/72817))
 - i18n: Use _x() for Template Activation labels. ([72928](https://github.com/WordPress/gutenberg/pull/72928))
 
-#### Collaboration
 - Block Notes: Adjust note date tooltip position. ([72843](https://github.com/WordPress/gutenberg/pull/72843))
 - Change sidebar title - Change Notes to All notes. ([72885](https://github.com/WordPress/gutenberg/pull/72885))
 - Disable Notes in Code Editor. ([72859](https://github.com/WordPress/gutenberg/pull/72859))
@@ -4559,7 +4386,6 @@ The following contributors merged PRs in this release:
 
 ### Accessibility
 
-#### Collaboration
 - Notes: Fix block toolbar display for show icon labels. ([73010](https://github.com/WordPress/gutenberg/pull/73010))
 - Notes: Fix focus return when resolving floating note. ([72994](https://github.com/WordPress/gutenberg/pull/72994))
 - Notes: Focus action button when comment editing is cancelled or comment is updated. ([72895](https://github.com/WordPress/gutenberg/pull/72895))
@@ -4584,7 +4410,6 @@ The following contributors merged PRs in this release:
 #### Block Editor
 - Reduce inspector subscriptions by not subscribing if panel is not enabled. ([73013](https://github.com/WordPress/gutenberg/pull/73013))
 
-#### Collaboration
 - Notes: Return early when there are no notes. ([72820](https://github.com/WordPress/gutenberg/pull/72820))
 
 #### Layout
@@ -4634,7 +4459,6 @@ The following contributors merged PRs in this release:
 - Breadcrumb: Some code quality improvements. ([72873](https://github.com/WordPress/gutenberg/pull/72873))
 - Remove old polyfills for server block definitions. ([72827](https://github.com/WordPress/gutenberg/pull/72827))
 
-#### Collaboration
 - Notes: Remove unnecessary useCallback from keyboard navigation handler. ([73152](https://github.com/WordPress/gutenberg/pull/73152))
 
 #### Block bindings
@@ -4728,7 +4552,6 @@ The following contributors merged PRs in this release:
 - ComboboxControl: Display reset button only if there's a value. ([72595](https://github.com/WordPress/gutenberg/pull/72595))
 - TabPanel: Update tab font-weight. ([72455](https://github.com/WordPress/gutenberg/pull/72455))
 
-#### Collaboration
 - Notes: Update delete confirmation message. ([72737](https://github.com/WordPress/gutenberg/pull/72737))
 
 #### Global Styles
@@ -4749,7 +4572,6 @@ The following contributors merged PRs in this release:
 - Template activation: Fix undefined array key PHP warning. ([72729](https://github.com/WordPress/gutenberg/pull/72729))
 - Use default popover placement for image format popover. ([72550](https://github.com/WordPress/gutenberg/pull/72550))
 
-#### Collaboration
 - Block Notes: Fix issue where box shadow is cut off when active note is the last one. ([72606](https://github.com/WordPress/gutenberg/pull/72606))
 - Ensure "Add Note" component floats next to block in unpinned mode. ([72494](https://github.com/WordPress/gutenberg/pull/72494))
 - Notes: Always open histroy sidebar if note is resolved. ([72708](https://github.com/WordPress/gutenberg/pull/72708))
@@ -4845,10 +4667,6 @@ The following contributors merged PRs in this release:
 
 ### Experiments
 
-#### Collaboration
-- Real-time collaboration: Add support for syncing post meta. ([72332](https://github.com/WordPress/gutenberg/pull/72332))
-- Real-time collaboration: Ensure Yjs imports are inside experimental flag check. ([72503](https://github.com/WordPress/gutenberg/pull/72503))
-- Real-time collaboration: Implement CRDT persistence for collaborative editing. ([72373](https://github.com/WordPress/gutenberg/pull/72373))
 
 
 ### Documentation
@@ -4885,7 +4703,6 @@ The following contributors merged PRs in this release:
 - Template activation: Initialise old autosave and revisions endpoints. ([72680](https://github.com/WordPress/gutenberg/pull/72680))
 - Template activation: Remove reset action. ([72679](https://github.com/WordPress/gutenberg/pull/72679))
 
-#### Collaboration
 - Notes: Remove custom 'PluginMoreMenuItem' handler. ([72640](https://github.com/WordPress/gutenberg/pull/72640))
 - Notes: Render the sidebar next to the default editor sidebar. ([72618](https://github.com/WordPress/gutenberg/pull/72618))
 
@@ -5083,7 +4900,6 @@ The following contributors merged PRs in this release:
 - Term Name: Decode HTML entities. ([72375](https://github.com/WordPress/gutenberg/pull/72375))
 - Terms Query: Fix display all terms in editor. ([72419](https://github.com/WordPress/gutenberg/pull/72419))
 
-#### Collaboration
 - Block Comments: Ensure sort order matches blocks. ([72069](https://github.com/WordPress/gutenberg/pull/72069))
 - Block Comments: Fix the canvas re-ordering synchronization. ([72112](https://github.com/WordPress/gutenberg/pull/72112))
 - Notes: Don't render 'no results' message for floating sidebar. ([72484](https://github.com/WordPress/gutenberg/pull/72484))
@@ -5156,7 +4972,6 @@ The following contributors merged PRs in this release:
 
 ### Accessibility
 
-#### Collaboration
 - Block Comments: Add focus on Comment deletion. ([71974](https://github.com/WordPress/gutenberg/pull/71974))
 - Block Comments: Avoid focus loss after creating a comment. ([72139](https://github.com/WordPress/gutenberg/pull/72139))
 - Block Comments: Improve focus management for comment interactions. ([71814](https://github.com/WordPress/gutenberg/pull/71814))
@@ -5187,11 +5002,8 @@ The following contributors merged PRs in this release:
 
 ### Experiments
 
-#### Collaboration
 - Collaborative editing: Make syncing a side-concern instead of a replacement for local state. ([72114](https://github.com/WordPress/gutenberg/pull/72114))
-- Improve CRDT "merge logic" for post entities. ([72262](https://github.com/WordPress/gutenberg/pull/72262))
 - Improve entity "sync configs". ([72145](https://github.com/WordPress/gutenberg/pull/72145))
-- Move Yjs providers into subfolder. ([72224](https://github.com/WordPress/gutenberg/pull/72224))
 - Refactor sync provider into a `createSyncManager` factory function. ([72183](https://github.com/WordPress/gutenberg/pull/72183))
 - Block Comments: Always show comment menu item. ([72153](https://github.com/WordPress/gutenberg/pull/72153))
 - Block Comments: Capture resolution history & display in thread. ([71563](https://github.com/WordPress/gutenberg/pull/71563))
@@ -5266,7 +5078,6 @@ The following contributors merged PRs in this release:
 - Time to Read: Don't use `wp_word_count()` function. ([72091](https://github.com/WordPress/gutenberg/pull/72091))
 - Update Terms Query block variation names and icons. ([72298](https://github.com/WordPress/gutenberg/pull/72298))
 
-#### Collaboration
 - Block Comment: Add utility function to focus thead. ([72024](https://github.com/WordPress/gutenberg/pull/72024))
 - Block Comments: Extract CRUD actions into a separate hook. ([72152](https://github.com/WordPress/gutenberg/pull/72152))
 - Block Comments: Refactor active sidebar tracking. ([72177](https://github.com/WordPress/gutenberg/pull/72177))
@@ -5295,7 +5106,6 @@ The following contributors merged PRs in this release:
 
 ### Tools
 
-- Changelog automation: Add "Collaboration" mapping. ([72075](https://github.com/WordPress/gutenberg/pull/72075))
 - Create Block: Enable `alias` package installation. ([72079](https://github.com/WordPress/gutenberg/pull/72079))
 - Remove redundant max percentage from download progress. ([72282](https://github.com/WordPress/gutenberg/pull/72282))
 
@@ -5348,7 +5158,6 @@ The following contributors merged PRs in this release:
 - Try: Fix flaky router styles end-to-end tests. ([72329](https://github.com/WordPress/gutenberg/pull/72329))
 - Workflows: Performance: Fix RegExp for wpVersion option. ([72327](https://github.com/WordPress/gutenberg/pull/72327))
 
-#### Collaboration
 - Changelog automation: Change "Block Commenting" to "Notes". ([72192](https://github.com/WordPress/gutenberg/pull/72192))
 
 
@@ -10522,7 +10331,6 @@ The following contributors merged PRs in this release:
 - Backport: Caching of global styles for blocks from core. ([66349](https://github.com/WordPress/gutenberg/pull/66349))
 - Style Book: Add color tab. ([65692](https://github.com/WordPress/gutenberg/pull/65692))
 
-#### Real-time Collaboration
 - Inline Commenting: Disable comments on published posts for now. ([66583](https://github.com/WordPress/gutenberg/pull/66583))
 
 
@@ -10848,7 +10656,6 @@ Error: There are no unreleased pull requests associated with the milestone.
 - Backport: Caching of global styles for blocks from core. ([66349](https://github.com/WordPress/gutenberg/pull/66349))
 - Style Book: Add color tab. ([65692](https://github.com/WordPress/gutenberg/pull/65692))
 
-#### Real-time Collaboration
 - Inline Commenting: Disable comments on published posts for now. ([66583](https://github.com/WordPress/gutenberg/pull/66583))
 
 #### Post Editor
@@ -11180,7 +10987,6 @@ The following contributors merged PRs in this release:
 - Backport: Caching of global styles for blocks from core. ([66349](https://github.com/WordPress/gutenberg/pull/66349))
 - Style Book: Add color tab. ([65692](https://github.com/WordPress/gutenberg/pull/65692))
 
-#### Real-time Collaboration
 - Inline Commenting: Disable comments on published posts for now. ([66583](https://github.com/WordPress/gutenberg/pull/66583))
 
 #### Post Editor
@@ -23190,7 +22996,6 @@ The following contributors merged PRs in this release:
 
 #### Code Quality
 
--   Fix: Use y-webrtc room name terminology instead of docName. ([55260](https://github.com/WordPress/gutenberg/pull/55260))
 
 ### Accessibility
 
@@ -23576,7 +23381,6 @@ The following contributors merged PRs in this release:
 -   Docs: Remove outdated info. ([54707](https://github.com/WordPress/gutenberg/pull/54707))
 -   Docs: Remove the Full Site Editing doc. ([54516](https://github.com/WordPress/gutenberg/pull/54516))
 -   Docs: Rename Block Hooks handbook page to Block Filters. ([54862](https://github.com/WordPress/gutenberg/pull/54862))
--   Document the current state of the Real-Time collaboration experiment. ([54932](https://github.com/WordPress/gutenberg/pull/54932))
 -   Fix a broken MD link in callout. ([54772](https://github.com/WordPress/gutenberg/pull/54772))
 -   Platform Docs: Add a documentation page explaining how to use the block library. ([54967](https://github.com/WordPress/gutenberg/pull/54967))
 -   Update the documentation of the block editor and replace @wordpress/element with react. ([54908](https://github.com/WordPress/gutenberg/pull/54908))
@@ -23912,7 +23716,6 @@ The following contributors merged PRs in this release:
 -   Docs: Remove outdated info. ([54707](https://github.com/WordPress/gutenberg/pull/54707))
 -   Docs: Remove the Full Site Editing doc. ([54516](https://github.com/WordPress/gutenberg/pull/54516))
 -   Docs: Rename Block Hooks handbook page to Block Filters. ([54862](https://github.com/WordPress/gutenberg/pull/54862))
--   Document the current state of the Real-Time collaboration experiment. ([54932](https://github.com/WordPress/gutenberg/pull/54932))
 -   Fix a broken MD link in callout. ([54772](https://github.com/WordPress/gutenberg/pull/54772))
 -   Platform Docs: Add a documentation page explaining how to use the block library. ([54967](https://github.com/WordPress/gutenberg/pull/54967))
 -   Update the documentation of the block editor and replace @wordpress/element with react. ([54908](https://github.com/WordPress/gutenberg/pull/54908))

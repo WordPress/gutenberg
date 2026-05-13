@@ -24,12 +24,12 @@ describe( 'metadata', () => {
 			const source = [
 				{
 					name: 'core/foo',
-					attributes: { metadata: { noteId: 1 } },
+					attributes: { metadata: { name: 'One' } },
 					innerBlocks: [],
 				},
 				{
 					name: 'core/foo',
-					attributes: { metadata: { noteId: 2 } },
+					attributes: { metadata: { name: 'Two' } },
 					innerBlocks: [],
 				},
 			];
@@ -47,7 +47,7 @@ describe( 'metadata', () => {
 			const source = [
 				{
 					name: 'core/foo',
-					attributes: { metadata: { noteId: 1 } },
+					attributes: { metadata: { name: 'One' } },
 					innerBlocks: [],
 				},
 			];
@@ -77,12 +77,12 @@ describe( 'metadata', () => {
 			const source = [
 				{
 					name: 'core/foo',
-					attributes: { metadata: { noteId: 1 } },
+					attributes: { metadata: { name: 'One' } },
 					innerBlocks: [],
 				},
 				{
 					name: 'core/foo',
-					attributes: { metadata: { noteId: 2 } },
+					attributes: { metadata: { name: 'Two' } },
 					innerBlocks: [],
 				},
 			];
@@ -100,17 +100,17 @@ describe( 'metadata', () => {
 			const source = [
 				{
 					name: 'core/foo',
-					attributes: { metadata: { noteId: 1 } },
+					attributes: { metadata: { name: 'One' } },
 					innerBlocks: [],
 				},
 				{
 					name: 'core/foo',
-					attributes: { metadata: { noteId: 2 } },
+					attributes: { metadata: { name: 'Two' } },
 					innerBlocks: [],
 				},
 				{
 					name: 'core/foo',
-					attributes: { metadata: { noteId: 3 } },
+					attributes: { metadata: { name: 'Three' } },
 					innerBlocks: [],
 				},
 			];
@@ -136,26 +136,30 @@ describe( 'metadata', () => {
 		} );
 
 		it( 'should preserve metadata in many-to-many transforms with same counts', () => {
+			registerBlockType( 'core/bar', {
+				apiVersion: 3,
+				title: 'Bar',
+			} );
 			const source = [
 				{
 					name: 'core/foo',
-					attributes: { metadata: { noteId: 1 } },
+					attributes: { metadata: { name: 'One' } },
 					innerBlocks: [],
 				},
 				{
 					name: 'core/foo',
-					attributes: { metadata: { noteId: 2 } },
+					attributes: { metadata: { name: 'Two' } },
 					innerBlocks: [],
 				},
 			];
 			const results = [
 				{
 					name: 'core/bar',
-					attributes: { metadata: { noteId: 1 } },
+					attributes: { metadata: { name: 'One' } },
 				},
 				{
 					name: 'core/bar',
-					attributes: { metadata: { noteId: 2 } },
+					attributes: { metadata: { name: 'Two' } },
 				},
 			];
 
@@ -165,10 +169,10 @@ describe( 'metadata', () => {
 			);
 
 			expect( firstTransformed.attributes.metadata ).toEqual( {
-				noteId: 1,
+				name: 'One',
 			} );
 			expect( secondTransformed.attributes.metadata ).toEqual( {
-				noteId: 2,
+				name: 'Two',
 			} );
 		} );
 
@@ -289,7 +293,6 @@ describe( 'metadata', () => {
 					name: 'core/foo',
 					attributes: {
 						metadata: {
-							noteId: 1,
 							name: 'Custom Name',
 							blockVisibility: false,
 						},
@@ -301,7 +304,6 @@ describe( 'metadata', () => {
 				name: 'core/bar',
 				attributes: {
 					metadata: {
-						noteId: 2,
 						name: 'Existing Name',
 						blockVisibility: true,
 					},
@@ -311,7 +313,6 @@ describe( 'metadata', () => {
 			const transformed = addTransforms( result, source, 0, [ result ] );
 
 			expect( transformed.attributes.metadata ).toEqual( {
-				noteId: 2,
 				name: 'Existing Name',
 				blockVisibility: true,
 			} );

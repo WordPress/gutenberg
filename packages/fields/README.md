@@ -120,10 +120,6 @@ _Returns_
 
 Undocumented declaration.
 
-### notesField
-
-Notes count field for post types that support editor.notes.
-
 ### orderField
 
 Order field for BasePost.

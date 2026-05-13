@@ -1885,27 +1885,3 @@ export const getPostTypeLabel = createRegistrySelector(
 export function isPublishSidebarOpened( state ) {
 	return state.publishSidebarActive;
 }
-
-/**
- * Returns whether the collaboration is enabled for the current post.
- *
- * @return {boolean} Whether collaboration is enabled.
- */
-export const isCollaborationEnabledForCurrentPost = createRegistrySelector(
-	( select ) => ( state ) => {
-		// Return early, if collaboration is not supported.
-		if ( ! unlock( select( coreStore ) ).isCollaborationSupported() ) {
-			return false;
-		}
-
-		const currentPostType = getCurrentPostType( state );
-		const entityConfig = select( coreStore ).getEntityConfig(
-			'postType',
-			currentPostType
-		);
-
-		return Boolean(
-			entityConfig?.syncConfig && window._wpCollaborationEnabled
-		);
-	}
-);

@@ -18,7 +18,7 @@ const noop = () => {};
  * between external (original) and internal (cloned) client IDs.
  *
  * This allows the block editor to use unique internal IDs while preserving
- * stable external IDs for features like real-time collaboration.
+ * stable external IDs for external stores and integrations.
  *
  * @param {Object} block   The block to clone.
  * @param {Object} mapping The mapping object with externalToInternal and internalToExternal Maps.

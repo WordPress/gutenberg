@@ -31,8 +31,7 @@ function BlockHTML( { clientId } ) {
 
 	// Derive block content as a primitive string so the effect only fires
 	// when the serialized content genuinely changes, not when the block
-	// object reference changes (which happens on every RESET_BLOCKS during
-	// RTC sync, even for unchanged blocks).
+	// object reference changes.
 	const blockContent = useMemo(
 		() => ( block ? getBlockContent( block ) : '' ),
 		[ block ]

@@ -160,7 +160,7 @@ exports[`getChangelog verify that the changelog is properly formatted 1`] = `
 - Docs: Remove outdated info. ([54707](https://github.com/WordPress/gutenberg/pull/54707))
 - Docs: Remove the Full Site Editing doc. ([54516](https://github.com/WordPress/gutenberg/pull/54516))
 - Docs: Rename Block Hooks handbook page to Block Filters. ([54862](https://github.com/WordPress/gutenberg/pull/54862))
-- Document the current state of the Real-Time collaboration experiment. ([54932](https://github.com/WordPress/gutenberg/pull/54932))
+- Document the current state of the block editor experiment. ([54932](https://github.com/WordPress/gutenberg/pull/54932))
 - Fix a broken MD link in callout. ([54772](https://github.com/WordPress/gutenberg/pull/54772))
 - Platform Docs: Add a documentation page explaining how to use the block library. ([54967](https://github.com/WordPress/gutenberg/pull/54967))
 - Update the documentation of the block editor and replace @wordpress/element with react. ([54908](https://github.com/WordPress/gutenberg/pull/54908))

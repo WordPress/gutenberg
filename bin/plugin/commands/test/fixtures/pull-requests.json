@@ -5213,7 +5213,7 @@
 		"id": 1919094222,
 		"node_id": "PR_kwDOBNHdeM5bhzAq",
 		"number": 54932,
-		"title": "Document the current state of the Real-Time collaboration experiment",
+		"title": "Document the current state of the block editor experiment",
 		"user": {
 			"login": "oandregal",
 			"id": 583546,
@@ -5248,10 +5248,10 @@
 				"id": 1663133831,
 				"node_id": "MDU6TGFiZWwxNjYzMTMzODMx",
 				"url": "https://api.github.com/repos/WordPress/gutenberg/labels/[Feature]%20Collaborative%20Editing",
-				"name": "[Feature] Collaborative Editing",
+				"name": "[Feature] Editing",
 				"color": "fbca04",
 				"default": false,
-				"description": "Phase 3 of the Gutenberg roadmap around collaborative workflows"
+				"description": "Block editor workflows"
 			}
 		],
 		"state": "closed",
@@ -5349,7 +5349,7 @@
 			"patch_url": "https://github.com/WordPress/gutenberg/pull/54932.patch",
 			"merged_at": "2023-10-03T11:12:15Z"
 		},
-		"body": "Related https://github.com/WordPress/gutenberg/issues/52593\r\n\r\nAdd some notes to document how the Real-Time collaboration experiment works at the moment. This is a minimal and ongoing effort, to have some low-level notes to help navigate the code, complementing what has already been shared in make/core and the tracking issue.",
+		"body": "Related https://github.com/WordPress/gutenberg/issues/52593\r\n\r\nAdd some notes to document how the block editor experiment works at the moment. This is a minimal and ongoing effort, to have some low-level notes to help navigate the code, complementing what has already been shared in make/core and the tracking issue.",
 		"reactions": {
 			"url": "https://api.github.com/repos/WordPress/gutenberg/issues/54932/reactions",
 			"total_count": 1,

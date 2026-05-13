@@ -19,11 +19,6 @@ import { receiveItems, removeItems, receiveQueriedItems } from './queried-data';
 import { DEFAULT_ENTITY_KEY } from './entities';
 import { createBatch } from './batch';
 import { STORE_NAME } from './name';
-import {
-	LOCAL_EDITOR_ORIGIN,
-	LOCAL_UNDO_IGNORED_ORIGIN,
-	getSyncManager,
-} from './sync';
 import logEntityDeprecation from './utils/log-entity-deprecation';
 
 function addTitleToAutoDraft( record ) {
@@ -344,13 +339,6 @@ export const deleteEntityRecord =
 				} );
 
 				await dispatch( removeItems( kind, name, recordId, true ) );
-
-				if ( entityConfig.syncConfig ) {
-					const objectType = `${ kind }/${ name }`;
-					const objectId = recordId;
-
-					getSyncManager()?.unload( objectType, objectId );
-				}
 			} catch ( _error ) {
 				hasError = true;
 				error = _error;
@@ -430,41 +418,6 @@ export const editEntityRecord =
 				return acc;
 			}, {} ),
 		};
-		if ( entityConfig.syncConfig ) {
-			const objectType = `${ kind }/${ name }`;
-			const objectId = recordId;
-
-			// Determine whether this edit should create a new undo level.
-			//
-			// In Gutenberg, block changes flow through two callbacks:
-			// - `onInput`: For transient/in-progress changes (e.g., typing each
-			//   character). These use `isCached: true` and get merged into
-			//   the current undo item.
-			// - `onChange`: For persistent/completed changes (e.g., formatting
-			//   transforms, block insertions). These use `isCached: false` and
-			//   should create a new undo level.
-			//
-			// Additionally, `undoIgnore: true` means the change should not
-			// affect the undo history at all (e.g., selection-only changes).
-			const isNewUndoLevel = options.undoIgnore
-				? false
-				: ! options.isCached;
-
-			// Use an untracked origin for undoIgnore changes so the Yjs
-			// UndoManager does not capture them as undo levels, while
-			// still syncing them to the CRDT document and other peers.
-			const origin = options.undoIgnore
-				? LOCAL_UNDO_IGNORED_ORIGIN
-				: LOCAL_EDITOR_ORIGIN;
-
-			getSyncManager()?.update(
-				objectType,
-				objectId,
-				editsWithMerges,
-				origin,
-				{ isNewUndoLevel }
-			);
-		}
 		if ( ! options.undoIgnore ) {
 			select.getUndoManager().addRecord(
 				[
@@ -602,7 +555,6 @@ export const saveEntityRecord =
 		const {
 			isAutosave = false,
 			__unstableFetch = apiFetch,
-			__unstableSkipSyncUpdate = false,
 			throwOnError = false,
 		} = options;
 
@@ -790,17 +742,6 @@ export const saveEntityRecord =
 						true,
 						edits
 					);
-					if ( entityConfig.syncConfig ) {
-						// Use an untracked origin so that the save
-						// response does not create undo levels.
-						getSyncManager()?.update(
-							`${ kind }/${ name }`,
-							recordId,
-							__unstableSkipSyncUpdate ? {} : updatedRecord,
-							LOCAL_UNDO_IGNORED_ORIGIN,
-							{ isSave: true }
-						);
-					}
 				}
 			} catch ( _error ) {
 				hasError = true;
@@ -1114,32 +1055,3 @@ export const receiveRevisions =
 			invalidateCache,
 		} );
 	};
-
-/**
- * Returns an action object used to set the sync connection status for an entity or collection.
- *
- * @param {string}             kind   Kind of the entity.
- * @param {string}             name   Name of the entity.
- * @param {number|string|null} key    The entity key, or null for collections.
- * @param {Object|null}        status The connection state object or null on unload.
- *
- * @return {Object} Action object.
- */
-export function setSyncConnectionStatus( kind, name, key, status ) {
-	if ( ! status ) {
-		return {
-			type: 'CLEAR_SYNC_CONNECTION_STATUS',
-			kind,
-			name,
-			key,
-		};
-	}
-
-	return {
-		type: 'SET_SYNC_CONNECTION_STATUS',
-		kind,
-		name,
-		key,
-		status,
-	};
-}

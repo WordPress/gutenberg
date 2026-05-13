@@ -499,28 +499,6 @@ export const getCurrentRevision = createRegistrySelector(
 );
 
 /**
- * Returns the currently selected note ID.
- *
- * @param {Object} state Global application state.
- *
- * @return {undefined|number|'new'} The selected note ID, 'new' for the new note form, or undefined if none.
- */
-export function getSelectedNote( state ) {
-	return state.selectedNote?.noteId;
-}
-
-/**
- * Returns whether the selected note should be focused.
- *
- * @param {Object} state Global application state.
- *
- * @return {boolean} Whether the selected note should be focused.
- */
-export function isNoteFocused( state ) {
-	return !! state.selectedNote?.options?.focus;
-}
-
-/**
  * Returns the previous revision (the one before the current revision).
  * Used for diffing between revisions.
  *

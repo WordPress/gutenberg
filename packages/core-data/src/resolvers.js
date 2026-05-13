@@ -15,7 +15,6 @@ import apiFetch from '@wordpress/api-fetch';
  */
 import { STORE_NAME } from './name';
 import { additionalEntityConfigLoaders, DEFAULT_ENTITY_KEY } from './entities';
-import { getSyncManager } from './sync';
 import {
 	forwardResolver,
 	getNormalizedCommaSeparable,
@@ -23,11 +22,9 @@ import {
 	getUserPermissionsFromAllowHeader,
 	ALLOWED_RESOURCE_ACTIONS,
 	RECEIVE_INTERMEDIATE_RESULTS,
-	isNumericID,
 	normalizeQueryForResolution,
 } from './utils';
 import { fetchBlockPatterns } from './fetch';
-import { restoreSelection, getSelectionHistory } from './utils/crdt-selection';
 
 /**
  * Requests authors from the REST API.
@@ -154,139 +151,6 @@ export const getEntityRecord =
 					action,
 					{ kind, name, id: key },
 				] );
-			}
-
-			// Entity supports syncing.
-			if ( entityConfig.syncConfig && isNumericID( key ) && ! query ) {
-				const objectType = `${ kind }/${ name }`;
-				const objectId = key;
-
-				// Use the new transient "read/write" config to compute transients for
-				// the sync manager. Otherwise these transients are not available
-				// if / until the record is edited. Use a copy of the record so that
-				// it does not change the behavior outside this experimental flag.
-				const recordWithTransients = { ...record };
-				Object.entries( entityConfig.transientEdits ?? {} )
-					.filter(
-						( [ propName, transientConfig ] ) =>
-							undefined === recordWithTransients[ propName ] &&
-							transientConfig &&
-							'object' === typeof transientConfig &&
-							'read' in transientConfig &&
-							'function' === typeof transientConfig.read
-					)
-					.forEach( ( [ propName, transientConfig ] ) => {
-						recordWithTransients[ propName ] =
-							transientConfig.read( recordWithTransients );
-					} );
-
-				// Load the entity record for syncing. Do not await promise.
-				void getSyncManager()?.load(
-					entityConfig.syncConfig,
-					objectType,
-					objectId,
-					recordWithTransients,
-					{
-						// Handle edits sourced from the sync manager.
-						editRecord: ( edits, options = {} ) => {
-							if ( ! Object.keys( edits ).length ) {
-								return;
-							}
-
-							dispatch( {
-								type: 'EDIT_ENTITY_RECORD',
-								kind,
-								name,
-								recordId: key,
-								edits,
-								meta: {
-									undo: undefined,
-								},
-								options,
-							} );
-						},
-						// Get the current entity record (with edits)
-						getEditedRecord: async () =>
-							await resolveSelect.getEditedEntityRecord(
-								kind,
-								name,
-								key
-							),
-						// Handle sync connection status changes.
-						onStatusChange: ( status ) => {
-							dispatch.setSyncConnectionStatus(
-								kind,
-								name,
-								key,
-								status
-							);
-						},
-						// Refetch the current entity record from the database.
-						refetchRecord: async () => {
-							dispatch.receiveEntityRecords(
-								kind,
-								name,
-								await apiFetch( { path, parse: true } ),
-								query
-							);
-						},
-						// Persist the CRDT document.
-						//
-						// TODO: Currently, persisted CRDT documents are stored in post meta.
-						// This effectively means that only post entities support CRDT
-						// persistence. As we add support for syncing additional entity,
-						// we'll need to revisit where persisted CRDT documents are stored.
-						persistCRDTDoc: () => {
-							resolveSelect
-								.getEditedEntityRecord( kind, name, key )
-								.then( ( editedRecord ) => {
-									// Don't persist the CRDT document if the record is still an
-									// auto-draft or if the entity does not support meta.
-									const { meta, status } = editedRecord;
-									if ( 'auto-draft' === status || ! meta ) {
-										return;
-									}
-
-									// Trigger a save to persist the CRDT document. The entity's
-									// pre-persist hooks will create the persisted CRDT document
-									// and apply it to the record's meta.
-									dispatch.saveEntityRecord(
-										kind,
-										name,
-										editedRecord,
-										{ __unstableSkipSyncUpdate: true }
-									);
-								} );
-						},
-						addUndoMeta: ( ydoc, meta ) => {
-							const selectionHistory =
-								getSelectionHistory( ydoc );
-
-							if ( selectionHistory ) {
-								meta.set(
-									'selectionHistory',
-									selectionHistory
-								);
-							}
-						},
-						restoreUndoMeta: ( ydoc, meta ) => {
-							const selectionHistory =
-								meta.get( 'selectionHistory' );
-
-							if ( selectionHistory ) {
-								// Because Yjs initiates an undo, we need to
-								// wait until the content is restored before
-								// we can update the selection.
-								// Use setTimeout() to wait until content is
-								// finished updating, and then set the correct
-								// selection.
-								setTimeout( () => {
-									restoreSelection( selectionHistory, ydoc );
-								}, 0 );
-							}
-						},
-					}
-				);
 			}
 
 			registry.batch( () => {
@@ -476,32 +340,6 @@ export const getEntityRecords =
 					totalItems: records.length,
 					totalPages: 1,
 				};
-			}
-
-			if ( entityConfig.syncConfig && -1 === query.per_page ) {
-				const objectType = `${ kind }/${ name }`;
-				getSyncManager()?.loadCollection(
-					entityConfig.syncConfig,
-					objectType,
-					{
-						onStatusChange: ( status ) => {
-							dispatch.setSyncConnectionStatus(
-								kind,
-								name,
-								null,
-								status
-							);
-						},
-						refetchRecords: async () => {
-							dispatch.receiveEntityRecords(
-								kind,
-								name,
-								await apiFetch( { path, parse: true } ),
-								query
-							);
-						},
-					}
-				);
 			}
 
 			// If we request fields but the result doesn't contain the fields,

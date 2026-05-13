@@ -14,11 +14,6 @@ import { RegistryProvider, createRegistry } from '@wordpress/data';
 import { useMetaBoxInitialization } from '../use-meta-box-initialization';
 import { STORE_NAME } from '../../../store/constants';
 
-// Mock unlock to be an identity function so private actions are directly accessible.
-jest.mock( '../../../lock-unlock', () => ( {
-	unlock: ( value ) => value,
-} ) );
-
 const storeConfig = {
 	actions: {
 		forceUpdate: jest.fn( () => ( { type: 'FORCE_UPDATE' } ) ),
@@ -27,34 +22,16 @@ const storeConfig = {
 		action.type === 'FORCE_UPDATE' ? { ...state } : state,
 };
 
-const setCollaborationSupported = jest.fn( () => ( {
-	type: 'SET_COLLABORATION_SUPPORTED',
-} ) );
-
 const initializeMetaBoxes = jest.fn( () => ( {
 	type: 'META_BOXES_INITIALIZED',
 } ) );
 
-function createMockStores( {
-	isEditorReady = true,
-	isCollaborationEnabled = true,
-	metaBoxes = [],
-} = {} ) {
+function createMockStores( { isEditorReady = true, metaBoxes = [] } = {} ) {
 	return {
 		'core/editor': {
 			...storeConfig,
 			selectors: {
 				__unstableIsEditorReady: jest.fn( () => isEditorReady ),
-				isCollaborationEnabledForCurrentPost: jest.fn(
-					() => isCollaborationEnabled
-				),
-			},
-		},
-		core: {
-			...storeConfig,
-			actions: {
-				...storeConfig.actions,
-				setCollaborationSupported,
 			},
 		},
 		[ STORE_NAME ]: {
@@ -89,11 +66,10 @@ function renderHook( registry, enabled = true ) {
 
 describe( 'useMetaBoxInitialization', () => {
 	afterEach( () => {
-		setCollaborationSupported.mockClear();
 		initializeMetaBoxes.mockClear();
 	} );
 
-	it( 'disables collaboration when metaboxes are present', () => {
+	it( 'initializes metaboxes when enabled and the editor is ready', () => {
 		const mockStores = createMockStores( {
 			metaBoxes: [
 				{ id: 'my-metabox', title: 'My Meta Box' },
@@ -105,87 +81,23 @@ describe( 'useMetaBoxInitialization', () => {
 		renderHook( registry );
 
 		expect( initializeMetaBoxes ).toHaveBeenCalled();
-		expect( setCollaborationSupported ).toHaveBeenCalledWith( false );
 	} );
 
-	it( 'does not disable collaboration when all metaboxes are rtcCompatible', () => {
-		const mockStores = createMockStores( {
-			metaBoxes: [
-				{
-					id: 'my-metabox',
-					title: 'My Meta Box',
-					__rtc_compatible: true,
-				},
-				{
-					id: 'another-metabox',
-					title: 'Another',
-					__rtc_compatible: true,
-				},
-			],
-		} );
+	it( 'does not initialize metaboxes when disabled', () => {
+		const mockStores = createMockStores();
+		const registry = createRegistry( mockStores );
+
+		renderHook( registry, false );
+
+		expect( initializeMetaBoxes ).not.toHaveBeenCalled();
+	} );
+
+	it( 'does not initialize metaboxes until the editor is ready', () => {
+		const mockStores = createMockStores( { isEditorReady: false } );
 		const registry = createRegistry( mockStores );
 
 		renderHook( registry );
 
-		expect( initializeMetaBoxes ).toHaveBeenCalled();
-		expect( setCollaborationSupported ).not.toHaveBeenCalled();
-	} );
-
-	it( 'disables collaboration when some metaboxes lack rtcCompatible', () => {
-		const mockStores = createMockStores( {
-			metaBoxes: [
-				{
-					id: 'compatible-metabox',
-					title: 'Compatible',
-					__rtc_compatible: true,
-				},
-				{ id: 'incompatible-metabox', title: 'Incompatible' },
-			],
-		} );
-		const registry = createRegistry( mockStores );
-
-		renderHook( registry );
-
-		expect( setCollaborationSupported ).toHaveBeenCalledWith( false );
-	} );
-
-	it( 'does not disable collaboration when the only metabox is rtcCompatible', () => {
-		const mockStores = createMockStores( {
-			metaBoxes: [
-				{
-					id: 'compatible-metabox',
-					title: 'Compatible',
-					__rtc_compatible: true,
-				},
-			],
-		} );
-		const registry = createRegistry( mockStores );
-
-		renderHook( registry );
-
-		expect( setCollaborationSupported ).not.toHaveBeenCalled();
-	} );
-
-	it( 'does not disable collaboration when there are no metaboxes', () => {
-		const mockStores = createMockStores( {
-			metaBoxes: [],
-		} );
-		const registry = createRegistry( mockStores );
-
-		renderHook( registry );
-
-		expect( setCollaborationSupported ).not.toHaveBeenCalled();
-	} );
-
-	it( 'does not disable collaboration when collaboration is not enabled', () => {
-		const mockStores = createMockStores( {
-			isCollaborationEnabled: false,
-			metaBoxes: [ { id: 'my-metabox', title: 'My Meta Box' } ],
-		} );
-		const registry = createRegistry( mockStores );
-
-		renderHook( registry );
-
-		expect( setCollaborationSupported ).not.toHaveBeenCalled();
+		expect( initializeMetaBoxes ).not.toHaveBeenCalled();
 	} );
 } );

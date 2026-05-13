@@ -178,9 +178,7 @@ test.describe( 'undo', () => {
 		await pageUtils.pressKeys( 'primary+a' );
 		await pageUtils.pressKeys( 'primary+b' );
 
-		// Real-time collaboration causes block CRDT content to be updated
-		// asynchronously, and the RTC undo manager relies on up-to-date CRDT
-		// content. Ensure the bold has been applied before trying to undo.
+		// Ensure the bold has been applied before trying to undo.
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/paragraph',

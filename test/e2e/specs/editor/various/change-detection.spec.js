@@ -65,8 +65,8 @@ test.describe( 'Change detection', () => {
 			).toBeDisabled(),
 		] );
 
-		// New auto-drafts are promoted to drafts on first autosave, including
-		// when RTC is enabled, so the editor should no longer be dirty.
+		// New auto-drafts are promoted to drafts on first autosave, so the
+		// editor should no longer be dirty.
 		expect( await changeDetectionUtils.getIsDirty() ).toBe( false );
 	} );
 
@@ -524,8 +524,8 @@ test.describe( 'Change detection', () => {
 			).toBeDisabled(),
 		] );
 
-		// New auto-drafts are promoted to drafts on first autosave, including
-		// when RTC is enabled, so content edits should be clean afterward.
+		// New auto-drafts are promoted to drafts on first autosave, so content
+		// edits should be clean afterward.
 		expect( await changeDetectionUtils.getIsDirty() ).toBe( false );
 	} );
 } );

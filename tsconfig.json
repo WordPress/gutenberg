@@ -76,7 +76,6 @@
 		{ "path": "packages/shortcode" },
 		{ "path": "packages/style-engine" },
 		{ "path": "packages/style-runtime" },
-		{ "path": "packages/sync" },
 		{ "path": "packages/theme" },
 		{ "path": "packages/token-list" },
 		{ "path": "packages/ui" },
