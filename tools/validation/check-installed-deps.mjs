@@ -17,6 +17,11 @@ const __dirname = path.dirname( fileURLToPath( import.meta.url ) );
 const ROOT = path.resolve( __dirname, '../..' );
 const LOCKFILE = path.join( ROOT, 'package-lock.json' );
 const HIDDEN_LOCKFILE = path.join( ROOT, 'node_modules', '.package-lock.json' );
+const CACHE_FILE = path.join(
+	ROOT,
+	'node_modules',
+	'.check-installed-deps.cache.json'
+);
 
 const verbose = process.argv.includes( '--verbose' );
 
@@ -34,6 +39,34 @@ if ( ! fs.existsSync( HIDDEN_LOCKFILE ) ) {
 		'node_modules is missing or incomplete.',
 		`\t${ path.relative( ROOT, HIDDEN_LOCKFILE ) } not found.`
 	);
+}
+
+/*
+ * Fast path: skip the full check if neither lockfile has changed since the
+ * last successful run. Both files' mtimes are written into a cache file
+ * inside node_modules (so a fresh install wipes it). `--verbose` always
+ * forces a fresh check so debug output reflects the current state.
+ */
+const currentMtimes = {
+	lockfile: fs.statSync( LOCKFILE ).mtimeMs,
+	hiddenLockfile: fs.statSync( HIDDEN_LOCKFILE ).mtimeMs,
+};
+
+if ( ! verbose ) {
+	let cached;
+	try {
+		cached = JSON.parse( fs.readFileSync( CACHE_FILE, 'utf8' ) );
+	} catch {
+		cached = null;
+	}
+	if (
+		cached &&
+		cached.lockfile === currentMtimes.lockfile &&
+		cached.hiddenLockfile === currentMtimes.hiddenLockfile
+	) {
+		console.log( '\n   ✔ All good.' );
+		process.exit( 0 );
+	}
 }
 
 const lock = JSON.parse( fs.readFileSync( LOCKFILE, 'utf8' ) );
@@ -95,6 +128,12 @@ if ( totalMismatches > 0 ) {
 		`Mismatches found: ${ totalMismatches }`,
 		detailLines.join( os.EOL )
 	);
+}
+
+try {
+	fs.writeFileSync( CACHE_FILE, JSON.stringify( currentMtimes ) );
+} catch {
+	// Cache write failure is not fatal — we'll just re-check next time.
 }
 
 console.log( '\n   ✔ All good.' );
