@@ -320,6 +320,10 @@ Undocumented declaration.
 
 Undocumented declaration.
 
+### DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES
+
+Stable retry-save statuses for the guarded write boundary.
+
 ### DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_REASONS
 
 Stable retry-submit handoff blocker reasons.
@@ -591,6 +595,36 @@ _Parameters_
 _Returns_
 
 -   `Object`: DE-RTC session state.
+
+### getDistributedEditingSessionStateForRetrySaveRequest
+
+Returns inert editor state while the guarded retry-save request is in flight.
+
+The state keeps pending local changes copyable while the server determines whether the accepted retry-submit proof may be persisted.
+
+_Parameters_
+
+-   _currentSessionState_ `Object`: Current DE-RTC session state.
+-   _options_ `[Object]`: Request-state options.
+
+_Returns_
+
+-   `Object`: Normalized DE-RTC session state.
+
+### getDistributedEditingSessionStateForRetrySaveResult
+
+Returns DE-RTC editor state for the guarded retry-save response.
+
+Success is the first DE-RTC editor state allowed to clear pending local changes because the WordPress authority endpoint claims persistence. All rejection paths keep local changes pending and exportable.
+
+_Parameters_
+
+-   _responseOrError_ `Object`: REST response or API error.
+-   _currentSessionState_ `Object`: Current DE-RTC session state.
+
+_Returns_
+
+-   `Object`: Normalized DE-RTC session state.
 
 ### getDistributedEditingSessionStateForRetrySubmitHandoff
 

@@ -33,6 +33,7 @@ import {
 	DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES,
 	DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_REASONS,
 	DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES,
+	DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES,
 	DISTRIBUTED_EDITING_UNLOAD_WARNING_REASONS,
 	getDistributedEditingNoticeDescriptorsForSessionState,
 	getDistributedEditingUnloadWarningStateForSessionState,
@@ -106,6 +107,10 @@ describe( 'getDistributedEditingStatusControlStates', () => {
 			'staleBaseRetryProofStale',
 			'staleBaseRetrySaveReady',
 			'staleBaseRetrySaveBlockedPermission',
+			'staleBaseRetrySaveSaving',
+			'staleBaseRetrySaveSaved',
+			'staleBaseRetrySaveStale',
+			'staleBaseRetrySaveTampered',
 			'manualResolution',
 		] );
 		expect( states.pendingLocalChanges ).toEqual( {
@@ -214,6 +219,32 @@ describe( 'getDistributedEditingStatusControlStates', () => {
 				DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.BLOCKED,
 			retrySubmitSaveReason:
 				DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_REASONS.PERMISSION_DENIED,
+			canExportLocalUpdates: true,
+		} );
+		expect( states.staleBaseRetrySaveSaving ).toMatchObject( {
+			retrySaveStatus: DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVING,
+			pendingChangeCount: 1,
+			canExportLocalUpdates: true,
+		} );
+		expect( states.staleBaseRetrySaveSaved ).toMatchObject( {
+			retrySaveStatus: DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVED,
+			retrySaveAccepted: true,
+			retrySaveClaimsSaved: true,
+			retrySaveCreatedRevisionIds: [ 7002 ],
+		} );
+		expect( states.staleBaseRetrySaveStale ).toMatchObject( {
+			disposition:
+				DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+			retrySaveStatus:
+				DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.STALE_BASE_REJECTED,
+			requiresServerStateRefetch: true,
+			canExportLocalUpdates: true,
+		} );
+		expect( states.staleBaseRetrySaveTampered ).toMatchObject( {
+			disposition:
+				DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_SYNC_META_TAMPERED,
+			retrySaveStatus:
+				DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_SYNC_META_TAMPERED,
 			canExportLocalUpdates: true,
 		} );
 		expect( states.manualResolution ).toEqual( {
@@ -340,7 +371,7 @@ describe( 'DistributedEditingLocalRebaseStateInspector', () => {
 		expect( screen.getByText( 'Local rebase result' ) ).toBeVisible();
 		expect( screen.getByText( 'rebased' ) ).toBeVisible();
 		expect( screen.getByText( 'Local rebase reason' ) ).toBeVisible();
-		expect( screen.getAllByText( 'None' ) ).toHaveLength( 2 );
+		expect( screen.getAllByText( 'None' ) ).toHaveLength( 3 );
 		expect( screen.getByText( 'Client base input' ) ).toBeVisible();
 		expect( screen.getByText( 'Refetched server input' ) ).toBeVisible();
 		expect( screen.getAllByText( 'Available' ) ).toHaveLength( 2 );
@@ -351,6 +382,8 @@ describe( 'DistributedEditingLocalRebaseStateInspector', () => {
 		expect( screen.getByText( 'Retry accepted' ) ).toBeVisible();
 		expect( screen.getByText( 'Retry save' ) ).toBeVisible();
 		expect( screen.getByText( 'Retry save reason' ) ).toBeVisible();
+		expect( screen.getByText( 'Guarded retry save' ) ).toBeVisible();
+		expect( screen.getByText( 'Guarded retry save reason' ) ).toBeVisible();
 		expect( screen.queryByText( /wp:paragraph/ ) ).not.toBeInTheDocument();
 	} );
 
@@ -366,7 +399,7 @@ describe( 'DistributedEditingLocalRebaseStateInspector', () => {
 		render( <DistributedEditingLocalRebaseStateInspector /> );
 
 		expect( screen.getByText( 'ready' ) ).toBeVisible();
-		expect( screen.getAllByText( 'none' ) ).toHaveLength( 4 );
+		expect( screen.getAllByText( 'none' ) ).toHaveLength( 5 );
 		expect( screen.getByText( 'Missing' ) ).toBeVisible();
 		expect( screen.getByText( 'Available' ) ).toBeVisible();
 		expect( screen.getByText( 'Not ready' ) ).toBeVisible();
@@ -950,6 +983,103 @@ describe( 'DistributedEditingStatusSurface', () => {
 			)
 		).toBeVisible();
 		expect( screen.queryByText( /saved/i ) ).not.toBeInTheDocument();
+	} );
+
+	it( 'renders guarded retry-save progress and confirmed states', () => {
+		const savingDescriptors =
+			getDistributedEditingNoticeDescriptorsForSessionState( {
+				pendingChangeCount: 1,
+				retrySaveStatus: DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVING,
+				canExportLocalUpdates: true,
+			} );
+		const savedDescriptors =
+			getDistributedEditingNoticeDescriptorsForSessionState( {
+				retrySaveStatus: DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVED,
+				retrySaveAccepted: true,
+				retrySaveClaimsSaved: true,
+			} );
+
+		const { rerender } = render(
+			<DistributedEditingStatusSurface
+				noticeDescriptors={ savingDescriptors }
+			/>
+		);
+
+		expect( screen.getByText( 'Retry save in progress' ) ).toBeVisible();
+		expect(
+			screen.getByText(
+				'Local changes are being sent through the guarded retry-save path.'
+			)
+		).toBeVisible();
+
+		rerender(
+			<DistributedEditingStatusSurface
+				noticeDescriptors={ savedDescriptors }
+			/>
+		);
+
+		expect( screen.getByText( 'Retry save confirmed' ) ).toBeVisible();
+		expect(
+			screen.getByText(
+				'The server confirmed the retry-save update and cleared local pending changes.'
+			)
+		).toBeVisible();
+	} );
+
+	it( 'renders guarded retry-save stale and tampered rejection states', () => {
+		const staleDescriptors =
+			getDistributedEditingNoticeDescriptorsForSessionState( {
+				disposition:
+					DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+				reasonCode:
+					DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+				pendingChangeCount: 1,
+				requiresServerStateRefetch: true,
+				canExportLocalUpdates: true,
+				retrySaveStatus:
+					DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.STALE_BASE_REJECTED,
+				retrySaveReason:
+					DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+			} );
+		const tamperedDescriptors =
+			getDistributedEditingNoticeDescriptorsForSessionState( {
+				disposition:
+					DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_SYNC_META_TAMPERED,
+				reasonCode:
+					DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_SYNC_META_TAMPERED,
+				pendingChangeCount: 1,
+				canExportLocalUpdates: true,
+				retrySaveStatus:
+					DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_SYNC_META_TAMPERED,
+				retrySaveReason:
+					DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_SYNC_META_TAMPERED,
+			} );
+
+		const { rerender } = render(
+			<DistributedEditingStatusSurface
+				noticeDescriptors={ staleDescriptors }
+			/>
+		);
+
+		expect( screen.getAllByText( 'Retry save stale' ) ).toHaveLength( 2 );
+		expect(
+			screen.getAllByText(
+				'The server changed before retry save completed. Refresh the server version before continuing.'
+			)
+		).toHaveLength( 2 );
+
+		rerender(
+			<DistributedEditingStatusSurface
+				noticeDescriptors={ tamperedDescriptors }
+			/>
+		);
+
+		expect( screen.getByText( 'Retry save rejected' ) ).toBeVisible();
+		expect(
+			screen.getByText(
+				'The retry-save proof was rejected. Export local changes before continuing.'
+			)
+		).toBeVisible();
 	} );
 
 	it( 'renders stale retry-submit proof after prepared handoff', () => {

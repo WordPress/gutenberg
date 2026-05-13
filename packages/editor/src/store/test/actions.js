@@ -23,6 +23,7 @@ import {
 	DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES,
 	DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_REASONS,
 	DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES,
+	DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES,
 	DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE,
 } from '../distributed-editing';
 import { store as editorStore } from '..';
@@ -1111,6 +1112,203 @@ describe( 'Post actions', () => {
 					DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_REASONS.PERMISSION_DENIED,
 				retrySubmitSavePrepared: false,
 				retrySubmitSaveReady: false,
+				canExportLocalUpdates: true,
+			} );
+		} );
+	} );
+
+	describe( '__experimentalSaveDistributedEditingRetryAfterProof()', () => {
+		it( 'normalizes confirmed retry-save writes and clears pending state', async () => {
+			const proposedPostContent =
+				'<!-- wp:paragraph --><p>Rebased and saved</p><!-- /wp:paragraph -->';
+			const proposedPostContentHash =
+				'0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef';
+			const post = {
+				id: postId,
+				type: 'post',
+				title: 'bar',
+				content: proposedPostContent,
+				status: 'draft',
+			};
+
+			apiFetch.setFetchHandler( async ( options ) => {
+				const { path, method, data } = options;
+
+				expect( method ).toBe( 'POST' );
+				expect( path ).toMatch(
+					new RegExp(
+						`^/wp/v2/posts/${ postId }/distributed-editing/retry-save`
+					)
+				);
+				expect( data ).toEqual( {
+					client_base_version: '7',
+					accepted_proof_server_version: '7',
+					rebased_from_version: '4',
+					pending_change_count: 2,
+					proposed_post_content: proposedPostContent,
+					accepted_proof_saves_post: false,
+					accepted_proof_mutates_post_content: false,
+					accepted_proof_creates_revision: false,
+					accepted_proof_claims_saved: false,
+					proposed_post_content_hash: proposedPostContentHash,
+				} );
+
+				return {
+					result: 'retry_save_applied',
+					retry_save_accepted: true,
+					previous_server_version: '7',
+					server_version: '8',
+					pending_change_count: 2,
+					saves_post: true,
+					mutates_post_content: true,
+					creates_revision: true,
+					claims_saved: true,
+					revision_created: true,
+					created_revision_ids: [ 7002 ],
+				};
+			} );
+
+			const registry = createRegistryWithStores();
+
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', post );
+			registry.dispatch( editorStore ).setupEditor( post, {
+				content: post.content,
+			} );
+			registry
+				.dispatch( editorStore )
+				.setDistributedEditingSessionState( {
+					clientBaseVersion: '4',
+					serverVersion: '7',
+					pendingChangeCount: 2,
+					retrySubmitProofStatus:
+						DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.ACCEPTED_FOR_FUTURE_SAVE,
+					retrySubmitAccepted: true,
+					retrySubmitSavePathRequired: true,
+					retrySubmitSaveStatus:
+						DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.READY,
+					retrySubmitSaveReady: true,
+					canExportLocalUpdates: true,
+				} );
+
+			await expect(
+				registry
+					.dispatch( editorStore )
+					.__experimentalSaveDistributedEditingRetryAfterProof( {
+						proposedPostContentHash,
+					} )
+			).resolves.toMatchObject( {
+				result: 'retry_save_applied',
+				retry_save_accepted: true,
+			} );
+
+			expect(
+				registry.select( editorStore ).getEditedPostContent()
+			).toBe( proposedPostContent );
+			expect(
+				registry
+					.select( editorStore )
+					.getDistributedEditingSessionState()
+			).toMatchObject( {
+				disposition: DISTRIBUTED_EDITING_DISPOSITIONS.IDLE,
+				reasonCode: null,
+				pendingChangeCount: 0,
+				hasPendingChanges: false,
+				isAwaitingServerConfirmation: false,
+				retrySubmitSavePathRequired: false,
+				retrySaveStatus: DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVED,
+				retrySaveAccepted: true,
+				retrySaveServerVersion: '8',
+				retrySavePreviousServerVersion: '7',
+				retrySaveSavesPost: true,
+				retrySaveMutatesPostContent: true,
+				retrySaveCreatesRevision: true,
+				retrySaveClaimsSaved: true,
+				retrySaveRevisionCreated: true,
+				retrySaveCreatedRevisionIds: [ 7002 ],
+				canExportLocalUpdates: false,
+			} );
+		} );
+
+		it( 'normalizes retry-save stale errors before rethrowing', async () => {
+			const post = {
+				id: postId,
+				type: 'post',
+				title: 'bar',
+				content:
+					'<!-- wp:paragraph --><p>Rebased</p><!-- /wp:paragraph -->',
+				status: 'draft',
+			};
+			const error = {
+				code: DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+				message:
+					'Distributed Editing rejected retry save because the server advanced again.',
+				data: {
+					status: 409,
+					reason_code:
+						DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+					client_base_version: '7',
+					server_version: '8',
+					pending_change_count: 1,
+				},
+			};
+
+			apiFetch.setFetchHandler( async () => {
+				throw error;
+			} );
+
+			const registry = createRegistryWithStores();
+
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', post );
+			registry.dispatch( editorStore ).setupEditor( post, {
+				content: post.content,
+			} );
+			registry
+				.dispatch( editorStore )
+				.setDistributedEditingSessionState( {
+					clientBaseVersion: '4',
+					serverVersion: '7',
+					pendingChangeCount: 1,
+					retrySubmitProofStatus:
+						DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.ACCEPTED_FOR_FUTURE_SAVE,
+					retrySubmitAccepted: true,
+					retrySubmitSavePathRequired: true,
+					retrySubmitSaveStatus:
+						DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.READY,
+					retrySubmitSaveReady: true,
+					canExportLocalUpdates: true,
+				} );
+
+			await expect(
+				registry
+					.dispatch( editorStore )
+					.__experimentalSaveDistributedEditingRetryAfterProof()
+			).rejects.toBe( error );
+
+			expect(
+				registry.select( editorStore ).getEditedPostContent()
+			).toBe( post.content );
+			expect(
+				registry
+					.select( editorStore )
+					.getDistributedEditingSessionState()
+			).toMatchObject( {
+				disposition:
+					DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+				reasonCode:
+					DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+				serverVersion: '8',
+				pendingChangeCount: 1,
+				hasPendingChanges: true,
+				isAwaitingServerConfirmation: true,
+				requiresServerStateRefetch: true,
+				retrySaveStatus:
+					DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.STALE_BASE_REJECTED,
+				retrySaveReason:
+					DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
 				canExportLocalUpdates: true,
 			} );
 		} );

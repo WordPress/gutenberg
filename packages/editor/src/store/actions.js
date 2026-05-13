@@ -26,6 +26,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import { localAutosaveSet } from './local-autosave';
 import {
 	__experimentalRequestDistributedEditingRecoveryDryRun as requestDistributedEditingRecoveryDryRun,
+	__experimentalRequestDistributedEditingRetrySave as requestDistributedEditingRetrySave,
 	__experimentalRequestDistributedEditingRetrySubmitProbe as requestDistributedEditingRetrySubmitProbe,
 	__experimentalRequestDistributedEditingServerStateRefetch as requestDistributedEditingServerStateRefetch,
 	__experimentalRequestDistributedEditingStaleBaseRejection as requestDistributedEditingStaleBaseRejection,
@@ -33,6 +34,8 @@ import {
 } from './distributed-editing-api';
 import {
 	getDistributedEditingSessionStateForRecoveryDryRunResult,
+	getDistributedEditingSessionStateForRetrySaveRequest,
+	getDistributedEditingSessionStateForRetrySaveResult,
 	getDistributedEditingSessionStateForRetrySubmitHandoff,
 	getDistributedEditingSessionStateForRetrySubmitProofResult,
 	getDistributedEditingSessionStateForRetrySubmitSavePreparation,
@@ -566,6 +569,98 @@ export const __experimentalPrepareDistributedEditingRetrySubmitSaveAfterProof =
 			claimsSaved: false,
 			sessionState,
 		};
+	};
+
+/**
+ * Requests the guarded retry-save endpoint and stores the normalized result.
+ *
+ * This action is still separate from `savePost()`. It submits the explicit
+ * retry-save proof request, records success or rejection in DE-RTC state, and
+ * preserves pending/export protection unless the server confirms persistence.
+ *
+ * @param {Object} [options] Request options.
+ *
+ * @return {Function} Action thunk.
+ */
+export const __experimentalSaveDistributedEditingRetryAfterProof =
+	( options = {} ) =>
+	async ( { select, dispatch, registry } ) => {
+		const currentPost = select.getCurrentPost?.() || {};
+		const postType = options.postType || currentPost.type;
+		const postId = options.postId ?? currentPost.id;
+		const postTypeRecord = postType
+			? registry.select( coreStore ).getPostType( postType )
+			: null;
+		const restBase =
+			options.restBase ||
+			postTypeRecord?.rest_base ||
+			DISTRIBUTED_EDITING_RECOVERY_REST_BASE;
+		const currentSessionState =
+			select.getDistributedEditingSessionState?.() || {};
+		const pendingChangeCount =
+			options.pendingChangeCount ??
+			currentSessionState.pendingChangeCount;
+		const savingSessionState =
+			getDistributedEditingSessionStateForRetrySaveRequest(
+				currentSessionState,
+				{ pendingChangeCount }
+			);
+		const requestArgs = {
+			postId,
+			restBase,
+			clientBaseVersion:
+				options.clientBaseVersion ??
+				currentSessionState.serverVersion ??
+				currentSessionState.clientBaseVersion,
+			acceptedProofServerVersion:
+				options.acceptedProofServerVersion ??
+				currentSessionState.serverVersion,
+			rebasedFromVersion:
+				options.rebasedFromVersion ??
+				currentSessionState.clientBaseVersion,
+			pendingChangeCount:
+				pendingChangeCount ?? savingSessionState.pendingChangeCount,
+			proposedPostContent:
+				options.proposedPostContent ?? select.getEditedPostContent?.(),
+			proposedPostContentHash: options.proposedPostContentHash,
+			acceptedProofSavesPost:
+				options.acceptedProofSavesPost ??
+				currentSessionState.retrySubmitSavesPost,
+			acceptedProofMutatesPostContent:
+				options.acceptedProofMutatesPostContent ??
+				currentSessionState.retrySubmitMutatesPostContent,
+			acceptedProofCreatesRevision:
+				options.acceptedProofCreatesRevision ??
+				currentSessionState.retrySubmitCreatesRevision,
+			acceptedProofClaimsSaved:
+				options.acceptedProofClaimsSaved ??
+				currentSessionState.retrySubmitClaimsSaved,
+		};
+
+		dispatch.setDistributedEditingSessionState( savingSessionState );
+
+		try {
+			const response =
+				await requestDistributedEditingRetrySave( requestArgs );
+
+			dispatch.setDistributedEditingSessionState(
+				getDistributedEditingSessionStateForRetrySaveResult(
+					response,
+					savingSessionState
+				)
+			);
+
+			return response;
+		} catch ( error ) {
+			dispatch.setDistributedEditingSessionState(
+				getDistributedEditingSessionStateForRetrySaveResult(
+					error,
+					savingSessionState
+				)
+			);
+
+			throw error;
+		}
 	};
 
 /**

@@ -21,6 +21,7 @@ import {
 	DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES,
 	DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_REASONS,
 	DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES,
+	DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES,
 	DISTRIBUTED_EDITING_UNLOAD_WARNING_REASONS,
 	normalizeDistributedEditingSessionState,
 } from '../../store/distributed-editing';
@@ -253,6 +254,49 @@ const DISTRIBUTED_EDITING_STATUS_CONTROL_STATE_DEFINITIONS = Object.freeze( {
 			DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_REASONS.PERMISSION_DENIED,
 		canExportLocalUpdates: true,
 	} ),
+	staleBaseRetrySaveSaving: Object.freeze( {
+		pendingChangeCount: 1,
+		retrySaveStatus: DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVING,
+		canExportLocalUpdates: true,
+		mustOfferLocalCopy: true,
+	} ),
+	staleBaseRetrySaveSaved: Object.freeze( {
+		retrySaveStatus: DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVED,
+		retrySaveAccepted: true,
+		retrySaveServerVersion: '8',
+		retrySavePreviousServerVersion: '7',
+		retrySaveSavesPost: true,
+		retrySaveMutatesPostContent: true,
+		retrySaveCreatesRevision: true,
+		retrySaveClaimsSaved: true,
+		retrySaveRevisionCreated: true,
+		retrySaveCreatedRevisionIds: [ 7002 ],
+	} ),
+	staleBaseRetrySaveStale: Object.freeze( {
+		disposition:
+			DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+		reasonCode:
+			DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+		pendingChangeCount: 1,
+		remoteChangeCount: 1,
+		requiresServerStateRefetch: true,
+		canExportLocalUpdates: true,
+		retrySaveStatus:
+			DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.STALE_BASE_REJECTED,
+		retrySaveReason:
+			DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+	} ),
+	staleBaseRetrySaveTampered: Object.freeze( {
+		disposition:
+			DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_SYNC_META_TAMPERED,
+		reasonCode: DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_SYNC_META_TAMPERED,
+		pendingChangeCount: 1,
+		canExportLocalUpdates: true,
+		retrySaveStatus:
+			DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_SYNC_META_TAMPERED,
+		retrySaveReason:
+			DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_SYNC_META_TAMPERED,
+	} ),
 	manualResolution: Object.freeze( {
 		disposition:
 			DISTRIBUTED_EDITING_DISPOSITIONS.REQUIRES_MANUAL_RESOLUTION_NO_SYNC_META,
@@ -300,6 +344,8 @@ export function shouldRenderDistributedEditingStatus(
 		normalized.hasRemoteChanges ||
 		normalized.requiresServerStateAcceptance ||
 		normalized.mustOfferLocalCopy ||
+		normalized.retrySaveStatus !==
+			DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.NONE ||
 		Boolean( unloadWarningState?.shouldWarn )
 	);
 }
@@ -471,6 +517,14 @@ export function DistributedEditingLocalRebaseStateInspector() {
 			<div>
 				<dt>{ __( 'Retry save reason' ) }</dt>
 				<dd>{ normalized.retrySubmitSaveReason || __( 'None' ) }</dd>
+			</div>
+			<div>
+				<dt>{ __( 'Guarded retry save' ) }</dt>
+				<dd>{ normalized.retrySaveStatus }</dd>
+			</div>
+			<div>
+				<dt>{ __( 'Guarded retry save reason' ) }</dt>
+				<dd>{ normalized.retrySaveReason || __( 'None' ) }</dd>
 			</div>
 		</dl>
 	);
@@ -687,6 +741,11 @@ function getDistributedEditingStatusSurfaceItem( descriptor ) {
 				title: __( 'Changes pending' ),
 				message: getPendingChangesMessage( descriptor ),
 			};
+		case DISTRIBUTED_EDITING_NOTICE_KINDS.RETRY_SAVE:
+			return {
+				...getBaseStatusItem( descriptor ),
+				...getRetrySaveStatusText( descriptor ),
+			};
 	}
 
 	return null;
@@ -704,6 +763,15 @@ function getBaseStatusItem( descriptor ) {
 }
 
 function getPendingChangesMessage( descriptor ) {
+	if (
+		descriptor.retrySaveStatus ===
+		DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVING
+	) {
+		return __(
+			'Retry save is waiting for server confirmation. Local changes remain pending.'
+		);
+	}
+
 	if (
 		descriptor.retrySubmitSaveStatus ===
 		DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.READY
@@ -859,6 +927,14 @@ function getDistributedEditingStatusControlLabel( key ) {
 			return __( 'Retry save ready' );
 		case 'staleBaseRetrySaveBlockedPermission':
 			return __( 'Retry save blocked' );
+		case 'staleBaseRetrySaveSaving':
+			return __( 'Retry save saving' );
+		case 'staleBaseRetrySaveSaved':
+			return __( 'Retry save saved' );
+		case 'staleBaseRetrySaveStale':
+			return __( 'Retry save stale' );
+		case 'staleBaseRetrySaveTampered':
+			return __( 'Retry save tampered' );
 		case 'manualResolution':
 			return __( 'Manual resolution' );
 	}
@@ -885,6 +961,18 @@ function normalizeCount( value ) {
 }
 
 function getStaleBaseStatusText( descriptor ) {
+	if (
+		descriptor.retrySaveStatus ===
+		DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.STALE_BASE_REJECTED
+	) {
+		return {
+			title: __( 'Retry save stale' ),
+			message: __(
+				'The server changed before retry save completed. Refresh the server version before continuing.'
+			),
+		};
+	}
+
 	if (
 		descriptor.retrySubmitProofStatus ===
 		DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.STALE_BASE_REJECTED
@@ -967,6 +1055,72 @@ function getStaleBaseStatusText( descriptor ) {
 		message: __(
 			'Refresh the server version before retrying local changes.'
 		),
+	};
+}
+
+function getRetrySaveStatusText( descriptor ) {
+	switch ( descriptor.retrySaveStatus ) {
+		case DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVING:
+			return {
+				title: __( 'Retry save in progress' ),
+				message: __(
+					'Local changes are being sent through the guarded retry-save path.'
+				),
+			};
+		case DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVED:
+			return {
+				title: __( 'Retry save confirmed' ),
+				message: __(
+					'The server confirmed the retry-save update and cleared local pending changes.'
+				),
+			};
+		case DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.STALE_BASE_REJECTED:
+			return {
+				title: __( 'Retry save stale' ),
+				message: __(
+					'The server changed before retry save completed. Refresh the server version before continuing.'
+				),
+			};
+		case DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_PERMISSION_DENIED:
+			return {
+				title: __( 'Retry save blocked' ),
+				message: __(
+					'Permission changed before the retry save completed. Export local changes before continuing.'
+				),
+			};
+		case DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_SYNC_META_TAMPERED:
+			return {
+				title: __( 'Retry save rejected' ),
+				message: __(
+					'The retry-save proof was rejected. Export local changes before continuing.'
+				),
+			};
+		case DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_FEATURE_DISABLED:
+			return {
+				title: __( 'Retry save disabled' ),
+				message: __(
+					'Distributed Editing was disabled before the retry save completed.'
+				),
+			};
+		case DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_ROUTE_MISMATCH:
+			return {
+				title: __( 'Retry save route mismatch' ),
+				message: __(
+					'The retry-save request did not match the current post route.'
+				),
+			};
+		case DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_MALFORMED_SYNC_PAYLOAD:
+			return {
+				title: __( 'Retry save malformed' ),
+				message: __(
+					'The retry-save payload could not be accepted. Export local changes before continuing.'
+				),
+			};
+	}
+
+	return {
+		title: __( 'Retry save unavailable' ),
+		message: __( 'Retry save did not return a recognized state.' ),
 	};
 }
 

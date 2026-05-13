@@ -19,9 +19,12 @@ import {
 	DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES,
 	DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_REASONS,
 	DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES,
+	DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES,
 	DISTRIBUTED_EDITING_UNLOAD_WARNING_REASONS,
 	DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE,
 	getDistributedEditingStaleBaseLocalRebaseResult,
+	getDistributedEditingSessionStateForRetrySaveRequest,
+	getDistributedEditingSessionStateForRetrySaveResult,
 	getDistributedEditingSessionStateForRetrySubmitHandoff,
 	getDistributedEditingSessionStateForRetrySubmitProofResult,
 	getDistributedEditingSessionStateForRetrySubmitSavePreparation,
@@ -159,6 +162,17 @@ describe( 'distributed editing session state', () => {
 			retrySubmitSaveReason: null,
 			retrySubmitSavePrepared: false,
 			retrySubmitSaveReady: false,
+			retrySaveStatus: DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.NONE,
+			retrySaveReason: null,
+			retrySaveAccepted: false,
+			retrySaveServerVersion: null,
+			retrySavePreviousServerVersion: null,
+			retrySaveSavesPost: false,
+			retrySaveMutatesPostContent: false,
+			retrySaveCreatesRevision: false,
+			retrySaveClaimsSaved: false,
+			retrySaveRevisionCreated: false,
+			retrySaveCreatedRevisionIds: [],
 			requiresManualConflictResolution: false,
 			mustOfferLocalCopy: true,
 			canExportLocalUpdates: true,
@@ -849,6 +863,149 @@ describe( 'distributed editing session state', () => {
 			retrySubmitSaveReason:
 				DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_REASONS.RETRY_SUBMIT_PROOF_CLAIMED_SAVE,
 			retrySubmitSaveReady: false,
+			canExportLocalUpdates: true,
+		} );
+	} );
+
+	it( 'marks guarded retry-save requests as pending and exportable', () => {
+		const saving = getDistributedEditingSessionStateForRetrySaveRequest(
+			{
+				serverVersion: '7',
+				pendingChangeCount: 2,
+				retrySubmitSaveStatus:
+					DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.READY,
+				retrySubmitSaveReady: true,
+				canExportLocalUpdates: true,
+			},
+			{ pendingChangeCount: 2 }
+		);
+
+		expect( saving ).toMatchObject( {
+			serverVersion: '7',
+			pendingChangeCount: 2,
+			hasPendingChanges: true,
+			isAwaitingServerConfirmation: true,
+			retrySaveStatus: DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVING,
+			retrySaveReason: null,
+			retrySaveAccepted: false,
+			retrySavePreviousServerVersion: '7',
+			mustOfferLocalCopy: true,
+			canExportLocalUpdates: true,
+		} );
+	} );
+
+	it( 'normalizes confirmed retry-save responses as saved and clears pending changes', () => {
+		const normalized = getDistributedEditingSessionStateForRetrySaveResult(
+			{
+				result: 'retry_save_applied',
+				retry_save_accepted: true,
+				previous_server_version: '7',
+				server_version: '8',
+				pending_change_count: 2,
+				save_path_required: false,
+				saves_post: true,
+				mutates_post_content: true,
+				creates_revision: true,
+				claims_saved: true,
+				revision_created: true,
+				created_revision_ids: [ 7002 ],
+			},
+			{
+				serverVersion: '7',
+				pendingChangeCount: 2,
+				retrySubmitProofStatus:
+					DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.ACCEPTED_FOR_FUTURE_SAVE,
+				retrySubmitAccepted: true,
+				retrySubmitSavePathRequired: true,
+				retrySubmitSaveStatus:
+					DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.READY,
+				retrySubmitSaveReady: true,
+				canExportLocalUpdates: true,
+			}
+		);
+
+		expect( normalized ).toMatchObject( {
+			disposition: DISTRIBUTED_EDITING_DISPOSITIONS.IDLE,
+			reasonCode: null,
+			pendingChangeCount: 0,
+			hasPendingChanges: false,
+			isAwaitingServerConfirmation: false,
+			retrySubmitAccepted: false,
+			retrySubmitSavePathRequired: false,
+			retrySubmitSaveStatus:
+				DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.NONE,
+			retrySaveStatus: DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVED,
+			retrySaveAccepted: true,
+			retrySaveServerVersion: '8',
+			retrySavePreviousServerVersion: '7',
+			retrySaveSavesPost: true,
+			retrySaveMutatesPostContent: true,
+			retrySaveCreatesRevision: true,
+			retrySaveClaimsSaved: true,
+			retrySaveRevisionCreated: true,
+			retrySaveCreatedRevisionIds: [ 7002 ],
+			mustOfferLocalCopy: false,
+			canExportLocalUpdates: false,
+		} );
+	} );
+
+	it( 'normalizes retry-save stale and tampered rejections without dropping local copy protection', () => {
+		const stale = getDistributedEditingSessionStateForRetrySaveResult(
+			{
+				code: DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+				data: {
+					reason_code:
+						DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+					client_base_version: '7',
+					server_version: '8',
+					pending_change_count: 1,
+				},
+			},
+			{
+				serverVersion: '7',
+				pendingChangeCount: 1,
+			}
+		);
+		const tampered = getDistributedEditingSessionStateForRetrySaveResult(
+			{
+				code: DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_SYNC_META_TAMPERED,
+				data: {
+					reason_code:
+						DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_SYNC_META_TAMPERED,
+					pending_change_count: 1,
+				},
+			},
+			{
+				serverVersion: '7',
+				pendingChangeCount: 1,
+			}
+		);
+
+		expect( stale ).toMatchObject( {
+			disposition:
+				DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+			reasonCode:
+				DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+			requiresServerStateRefetch: true,
+			retrySaveStatus:
+				DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.STALE_BASE_REJECTED,
+			retrySaveReason:
+				DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+			hasPendingChanges: true,
+			isAwaitingServerConfirmation: true,
+			canExportLocalUpdates: true,
+		} );
+		expect( tampered ).toMatchObject( {
+			disposition:
+				DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_SYNC_META_TAMPERED,
+			reasonCode:
+				DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_SYNC_META_TAMPERED,
+			retrySaveStatus:
+				DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_SYNC_META_TAMPERED,
+			retrySaveReason:
+				DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_SYNC_META_TAMPERED,
+			hasPendingChanges: true,
+			isAwaitingServerConfirmation: true,
 			canExportLocalUpdates: true,
 		} );
 	} );

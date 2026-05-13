@@ -9,6 +9,8 @@ export const DISTRIBUTED_EDITING_REASON_CODES = Object.freeze( {
 		'sync_meta_unavailable_after_revision_scan',
 	STALE_BASE_VERSION_REJECTED: 'stale_base_version_rejected',
 	DE_RTC_SYNC_META_UNRECOVERABLE: 'de_rtc_sync_meta_unrecoverable',
+	DE_RTC_SYNC_META_TAMPERED: 'de_rtc_sync_meta_tampered',
+	DE_RTC_MALFORMED_SYNC_PAYLOAD: 'de_rtc_malformed_sync_payload',
 	DE_RTC_FEATURE_DISABLED: 'de_rtc_feature_disabled',
 	REST_CANNOT_EDIT: 'rest_cannot_edit',
 	REST_POST_INVALID_ID: 'rest_post_invalid_id',
@@ -29,6 +31,8 @@ export const DISTRIBUTED_EDITING_DISPOSITIONS = Object.freeze( {
 	REJECTED_FEATURE_DISABLED: 'rejected_feature_disabled',
 	REJECTED_PERMISSION_DENIED: 'rejected_permission_denied',
 	REJECTED_ROUTE_MISMATCH: 'rejected_route_mismatch',
+	REJECTED_SYNC_META_TAMPERED: 'rejected_sync_meta_tampered',
+	REJECTED_MALFORMED_SYNC_PAYLOAD: 'rejected_malformed_sync_payload',
 } );
 
 /**
@@ -42,6 +46,7 @@ export const DISTRIBUTED_EDITING_NOTICE_KINDS = Object.freeze( {
 	CONNECTION_DEGRADED: 'connection-degraded',
 	REMOTE_CHANGES_RECEIVED: 'remote-changes-received',
 	PENDING_CHANGES: 'pending-changes',
+	RETRY_SAVE: 'retry-save',
 } );
 
 /**
@@ -57,6 +62,7 @@ export const DISTRIBUTED_EDITING_NOTICE_IDS = Object.freeze( {
 	REMOTE_CHANGES_RECEIVED:
 		'core/editor/distributed-editing/remote-changes-received',
 	PENDING_CHANGES: 'core/editor/distributed-editing/pending-changes',
+	RETRY_SAVE: 'core/editor/distributed-editing/retry-save',
 } );
 
 /**
@@ -154,6 +160,21 @@ export const DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_REASONS = Object.freeze( {
 	ROUTE_MISMATCH: 'route_mismatch',
 } );
 
+/**
+ * Stable retry-save statuses for the guarded write boundary.
+ */
+export const DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES = Object.freeze( {
+	NONE: 'none',
+	SAVING: 'saving',
+	SAVED: 'saved',
+	STALE_BASE_REJECTED: 'stale_base_rejected',
+	REJECTED_FEATURE_DISABLED: 'rejected_feature_disabled',
+	REJECTED_PERMISSION_DENIED: 'rejected_permission_denied',
+	REJECTED_ROUTE_MISMATCH: 'rejected_route_mismatch',
+	REJECTED_SYNC_META_TAMPERED: 'rejected_sync_meta_tampered',
+	REJECTED_MALFORMED_SYNC_PAYLOAD: 'rejected_malformed_sync_payload',
+} );
+
 const VALID_REASON_CODES = new Set(
 	Object.values( DISTRIBUTED_EDITING_REASON_CODES )
 );
@@ -182,6 +203,10 @@ const VALID_RETRY_SUBMIT_SAVE_STATUSES = new Set(
 	Object.values( DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES )
 );
 
+const VALID_RETRY_SAVE_STATUSES = new Set(
+	Object.values( DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES )
+);
+
 const NOTICE_ID_BY_KIND = Object.freeze( {
 	[ DISTRIBUTED_EDITING_NOTICE_KINDS.SERVER_STATE_ACCEPTANCE_REQUIRED ]:
 		DISTRIBUTED_EDITING_NOTICE_IDS.SERVER_STATE_ACCEPTANCE_REQUIRED,
@@ -195,6 +220,8 @@ const NOTICE_ID_BY_KIND = Object.freeze( {
 		DISTRIBUTED_EDITING_NOTICE_IDS.REMOTE_CHANGES_RECEIVED,
 	[ DISTRIBUTED_EDITING_NOTICE_KINDS.PENDING_CHANGES ]:
 		DISTRIBUTED_EDITING_NOTICE_IDS.PENDING_CHANGES,
+	[ DISTRIBUTED_EDITING_NOTICE_KINDS.RETRY_SAVE ]:
+		DISTRIBUTED_EDITING_NOTICE_IDS.RETRY_SAVE,
 } );
 
 export const DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE = Object.freeze( {
@@ -236,6 +263,17 @@ export const DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE = Object.freeze( {
 	retrySubmitSaveReason: null,
 	retrySubmitSavePrepared: false,
 	retrySubmitSaveReady: false,
+	retrySaveStatus: DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.NONE,
+	retrySaveReason: null,
+	retrySaveAccepted: false,
+	retrySaveServerVersion: null,
+	retrySavePreviousServerVersion: null,
+	retrySaveSavesPost: false,
+	retrySaveMutatesPostContent: false,
+	retrySaveCreatesRevision: false,
+	retrySaveClaimsSaved: false,
+	retrySaveRevisionCreated: false,
+	retrySaveCreatedRevisionIds: [],
 	requiresManualConflictResolution: false,
 	mustOfferLocalCopy: false,
 	canExportLocalUpdates: false,
@@ -275,6 +313,8 @@ export function isDistributedEditingConflictDisposition( disposition ) {
 		DISTRIBUTED_EDITING_DISPOSITIONS.CONFLICT_REQUIRES_SERVER_STATE_ACCEPTANCE,
 		DISTRIBUTED_EDITING_DISPOSITIONS.REQUIRES_MANUAL_RESOLUTION_NO_SYNC_META,
 		DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+		DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_SYNC_META_TAMPERED,
+		DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_MALFORMED_SYNC_PAYLOAD,
 	].includes( disposition );
 }
 
@@ -401,12 +441,22 @@ export function normalizeDistributedEditingSessionState( sessionState = {} ) {
 			DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.READY;
 	const retrySubmitSaveReady =
 		Boolean( sessionState.retrySubmitSaveReady ) || retrySubmitSavePrepared;
+	const retrySaveStatus = VALID_RETRY_SAVE_STATUSES.has(
+		sessionState.retrySaveStatus
+	)
+		? sessionState.retrySaveStatus
+		: DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE.retrySaveStatus;
+	const retrySaveAccepted =
+		Boolean( sessionState.retrySaveAccepted ) ||
+		retrySaveStatus === DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVED;
 
 	const mustOfferLocalCopy =
 		Boolean( sessionState.mustOfferLocalCopy ) ||
 		( requiresServerStateAcceptance && hasPendingChanges ) ||
 		( requiresServerStateRefetch && hasPendingChanges ) ||
 		( retrySubmitSavePathRequired && hasPendingChanges ) ||
+		( retrySaveStatus === DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVING &&
+			hasPendingChanges ) ||
 		( requiresManualConflictResolution && hasPendingChanges );
 	const canExportLocalUpdates =
 		Boolean( sessionState.canExportLocalUpdates ) || mustOfferLocalCopy;
@@ -463,6 +513,31 @@ export function normalizeDistributedEditingSessionState( sessionState = {} ) {
 		),
 		retrySubmitSavePrepared,
 		retrySubmitSaveReady,
+		retrySaveStatus,
+		retrySaveReason: normalizeNullableString(
+			sessionState.retrySaveReason
+		),
+		retrySaveAccepted,
+		retrySaveServerVersion: normalizeNullableString(
+			sessionState.retrySaveServerVersion
+		),
+		retrySavePreviousServerVersion: normalizeNullableString(
+			sessionState.retrySavePreviousServerVersion
+		),
+		retrySaveSavesPost: Boolean( sessionState.retrySaveSavesPost ),
+		retrySaveMutatesPostContent: Boolean(
+			sessionState.retrySaveMutatesPostContent
+		),
+		retrySaveCreatesRevision: Boolean(
+			sessionState.retrySaveCreatesRevision
+		),
+		retrySaveClaimsSaved: Boolean( sessionState.retrySaveClaimsSaved ),
+		retrySaveRevisionCreated: Boolean(
+			sessionState.retrySaveRevisionCreated
+		),
+		retrySaveCreatedRevisionIds: normalizeIdList(
+			sessionState.retrySaveCreatedRevisionIds
+		),
 		requiresManualConflictResolution,
 		mustOfferLocalCopy,
 		canExportLocalUpdates,
@@ -907,6 +982,41 @@ export function getDistributedEditingNoticeDescriptorsForSessionState(
 	}
 
 	if (
+		normalized.retrySaveStatus !==
+		DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.NONE
+	) {
+		descriptors.push(
+			createNoticeDescriptor( normalized, {
+				kind: DISTRIBUTED_EDITING_NOTICE_KINDS.RETRY_SAVE,
+				status: getDistributedEditingRetrySaveNoticeStatus(
+					normalized.retrySaveStatus
+				),
+				priority:
+					normalized.retrySaveStatus ===
+					DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVED
+						? 'status'
+						: 'blocking',
+				actionKeys: [
+					...( normalized.canExportLocalUpdates
+						? [
+								DISTRIBUTED_EDITING_NOTICE_ACTIONS.EXPORT_LOCAL_UPDATES,
+						  ]
+						: [] ),
+					...( normalized.retrySaveStatus ===
+					DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.STALE_BASE_REJECTED
+						? [
+								DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFETCH_SERVER_STATE,
+						  ]
+						: [] ),
+				],
+				extra: getDistributedEditingRetrySaveDescriptorFields(
+					normalized
+				),
+			} )
+		);
+	}
+
+	if (
 		normalized.isAwaitingServerConfirmation &&
 		! normalized.requiresServerStateAcceptance &&
 		normalized.disposition !==
@@ -1321,6 +1431,206 @@ export function getDistributedEditingSessionStateForRetrySubmitSavePreparation(
 }
 
 /**
+ * Returns inert editor state while the guarded retry-save request is in flight.
+ *
+ * The state keeps pending local changes copyable while the server determines
+ * whether the accepted retry-submit proof may be persisted.
+ *
+ * @param {Object} currentSessionState Current DE-RTC session state.
+ * @param {Object} [options]           Request-state options.
+ *
+ * @return {Object} Normalized DE-RTC session state.
+ */
+export function getDistributedEditingSessionStateForRetrySaveRequest(
+	currentSessionState = {},
+	options = {}
+) {
+	const normalized =
+		normalizeDistributedEditingSessionState( currentSessionState );
+	const pendingChangeCount =
+		normalizeCount( options.pendingChangeCount ) ||
+		normalized.pendingChangeCount ||
+		1;
+
+	return normalizeDistributedEditingSessionState( {
+		...normalized,
+		pendingChangeCount,
+		hasPendingChanges: true,
+		isAwaitingServerConfirmation: true,
+		retrySaveStatus: DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVING,
+		retrySaveReason: null,
+		retrySaveAccepted: false,
+		retrySaveServerVersion: null,
+		retrySavePreviousServerVersion: normalized.serverVersion,
+		retrySaveSavesPost: false,
+		retrySaveMutatesPostContent: false,
+		retrySaveCreatesRevision: false,
+		retrySaveClaimsSaved: false,
+		retrySaveRevisionCreated: false,
+		retrySaveCreatedRevisionIds: [],
+		mustOfferLocalCopy: true,
+		canExportLocalUpdates: true,
+	} );
+}
+
+/**
+ * Returns DE-RTC editor state for the guarded retry-save response.
+ *
+ * Success is the first DE-RTC editor state allowed to clear pending local
+ * changes because the WordPress authority endpoint claims persistence. All
+ * rejection paths keep local changes pending and exportable.
+ *
+ * @param {Object} responseOrError     REST response or API error.
+ * @param {Object} currentSessionState Current DE-RTC session state.
+ *
+ * @return {Object} Normalized DE-RTC session state.
+ */
+export function getDistributedEditingSessionStateForRetrySaveResult(
+	responseOrError = {},
+	currentSessionState = {}
+) {
+	const normalizedCurrent =
+		normalizeDistributedEditingSessionState( currentSessionState );
+	const responseData = getDistributedEditingResponseData( responseOrError );
+	const result = normalizeNullableString(
+		responseOrError.result || responseData.result
+	);
+	const pendingChangeCount =
+		responseOrError.pendingChangeCount ??
+		responseOrError.pending_change_count ??
+		responseData.pendingChangeCount ??
+		responseData.pending_change_count ??
+		normalizedCurrent.pendingChangeCount;
+	const serverVersion =
+		normalizeNullableString(
+			responseOrError.serverVersion ||
+				responseOrError.server_version ||
+				responseData.serverVersion ||
+				responseData.server_version
+		) || normalizedCurrent.serverVersion;
+	const previousServerVersion =
+		normalizeNullableString(
+			responseOrError.previousServerVersion ||
+				responseOrError.previous_server_version ||
+				responseData.previousServerVersion ||
+				responseData.previous_server_version
+		) || normalizedCurrent.serverVersion;
+	const retrySaveFlags = {
+		retrySaveSavesPost: Boolean(
+			responseOrError.savesPost ||
+				responseOrError.saves_post ||
+				responseData.savesPost ||
+				responseData.saves_post
+		),
+		retrySaveMutatesPostContent: Boolean(
+			responseOrError.mutatesPostContent ||
+				responseOrError.mutates_post_content ||
+				responseData.mutatesPostContent ||
+				responseData.mutates_post_content
+		),
+		retrySaveCreatesRevision: Boolean(
+			responseOrError.createsRevision ||
+				responseOrError.creates_revision ||
+				responseData.createsRevision ||
+				responseData.creates_revision
+		),
+		retrySaveClaimsSaved: Boolean(
+			responseOrError.claimsSaved ||
+				responseOrError.claims_saved ||
+				responseData.claimsSaved ||
+				responseData.claims_saved
+		),
+		retrySaveRevisionCreated: Boolean(
+			responseOrError.revisionCreated ||
+				responseOrError.revision_created ||
+				responseData.revisionCreated ||
+				responseData.revision_created
+		),
+		retrySaveCreatedRevisionIds:
+			responseOrError.createdRevisionIds ||
+			responseOrError.created_revision_ids ||
+			responseData.createdRevisionIds ||
+			responseData.created_revision_ids ||
+			[],
+	};
+
+	if (
+		result === 'retry_save_applied' &&
+		( responseOrError.retrySaveAccepted === true ||
+			responseOrError.retry_save_accepted === true ||
+			responseData.retrySaveAccepted === true ||
+			responseData.retry_save_accepted === true )
+	) {
+		return normalizeDistributedEditingSessionState( {
+			...normalizedCurrent,
+			disposition: DISTRIBUTED_EDITING_DISPOSITIONS.IDLE,
+			reasonCode: null,
+			serverVersion,
+			pendingChangeCount: 0,
+			hasPendingChanges: false,
+			isAwaitingServerConfirmation: false,
+			remoteChangeCount: 0,
+			hasRemoteChanges: false,
+			requiresServerStateAcceptance: false,
+			requiresServerStateRefetch: false,
+			refetchedServerState: false,
+			canAttemptLocalRebase: false,
+			localRebasePlanStatus:
+				DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES.NONE,
+			localRebaseResultStatus:
+				DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.NONE,
+			localRebaseResultReason: null,
+			readyToRetrySubmit: false,
+			retrySubmitHandoffStatus:
+				DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_STATUSES.NONE,
+			retrySubmitHandoffReason: null,
+			retrySubmitPrepared: false,
+			retrySubmitProofStatus:
+				DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.NONE,
+			retrySubmitProofReason: null,
+			retrySubmitAccepted: false,
+			retrySubmitSavePathRequired: false,
+			retrySubmitSavesPost: false,
+			retrySubmitMutatesPostContent: false,
+			retrySubmitCreatesRevision: false,
+			retrySubmitClaimsSaved: false,
+			retrySubmitSaveStatus:
+				DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.NONE,
+			retrySubmitSaveReason: null,
+			retrySubmitSavePrepared: false,
+			retrySubmitSaveReady: false,
+			retrySaveStatus: DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVED,
+			retrySaveReason: null,
+			retrySaveAccepted: true,
+			retrySaveServerVersion: serverVersion,
+			retrySavePreviousServerVersion: previousServerVersion,
+			...retrySaveFlags,
+			requiresManualConflictResolution: false,
+			mustOfferLocalCopy: false,
+			canExportLocalUpdates: false,
+		} );
+	}
+
+	const reasonCode = normalizeNullableString(
+		responseOrError.code ||
+			responseOrError.reasonCode ||
+			responseOrError.reason_code ||
+			responseData.reasonCode ||
+			responseData.reason_code
+	);
+
+	return getDistributedEditingRejectedRetrySaveState( {
+		normalizedCurrent,
+		reasonCode,
+		result,
+		pendingChangeCount,
+		serverVersion,
+		previousServerVersion,
+		retrySaveFlags,
+	} );
+}
+
+/**
  * Returns the browser-unload integration state for DE-RTC.
  *
  * @param {Object} sessionState DE-RTC session state.
@@ -1437,6 +1747,36 @@ function getDistributedEditingRetrySubmitProofDescriptorFields( normalized ) {
 		retrySubmitSaveReason: normalized.retrySubmitSaveReason,
 		retrySubmitSavePrepared: normalized.retrySubmitSavePrepared,
 		retrySubmitSaveReady: normalized.retrySubmitSaveReady,
+		...getDistributedEditingRetrySaveDescriptorFields( normalized ),
+	};
+}
+
+function getDistributedEditingRetrySaveNoticeStatus( retrySaveStatus ) {
+	switch ( retrySaveStatus ) {
+		case DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVED:
+			return 'success';
+		case DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_SYNC_META_TAMPERED:
+		case DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_MALFORMED_SYNC_PAYLOAD:
+			return 'error';
+	}
+
+	return 'warning';
+}
+
+function getDistributedEditingRetrySaveDescriptorFields( normalized ) {
+	return {
+		retrySaveStatus: normalized.retrySaveStatus,
+		retrySaveReason: normalized.retrySaveReason,
+		retrySaveAccepted: normalized.retrySaveAccepted,
+		retrySaveServerVersion: normalized.retrySaveServerVersion,
+		retrySavePreviousServerVersion:
+			normalized.retrySavePreviousServerVersion,
+		retrySaveSavesPost: normalized.retrySaveSavesPost,
+		retrySaveMutatesPostContent: normalized.retrySaveMutatesPostContent,
+		retrySaveCreatesRevision: normalized.retrySaveCreatesRevision,
+		retrySaveClaimsSaved: normalized.retrySaveClaimsSaved,
+		retrySaveRevisionCreated: normalized.retrySaveRevisionCreated,
+		retrySaveCreatedRevisionIds: normalized.retrySaveCreatedRevisionIds,
 	};
 }
 
@@ -1450,6 +1790,110 @@ function getBlockedRetrySubmitSavePreparationState( normalized, reason ) {
 		retrySubmitSaveReady: false,
 		canExportLocalUpdates:
 			normalized.canExportLocalUpdates || normalized.hasPendingChanges,
+	} );
+}
+
+function getDistributedEditingRejectedRetrySaveState( {
+	normalizedCurrent,
+	reasonCode,
+	result,
+	pendingChangeCount,
+	serverVersion,
+	previousServerVersion,
+	retrySaveFlags,
+} ) {
+	let disposition = normalizedCurrent.disposition;
+	let retrySaveStatus = DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.NONE;
+	let requiresServerStateRefetch = false;
+
+	switch ( reasonCode ) {
+		case DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED:
+			disposition =
+				DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION;
+			retrySaveStatus =
+				DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.STALE_BASE_REJECTED;
+			requiresServerStateRefetch = true;
+			break;
+
+		case DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_FEATURE_DISABLED:
+			disposition =
+				DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_FEATURE_DISABLED;
+			retrySaveStatus =
+				DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_FEATURE_DISABLED;
+			break;
+
+		case DISTRIBUTED_EDITING_REASON_CODES.REST_CANNOT_EDIT:
+			disposition =
+				DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_PERMISSION_DENIED;
+			retrySaveStatus =
+				DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_PERMISSION_DENIED;
+			break;
+
+		case DISTRIBUTED_EDITING_REASON_CODES.REST_POST_INVALID_ID:
+			disposition =
+				DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_ROUTE_MISMATCH;
+			retrySaveStatus =
+				DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_ROUTE_MISMATCH;
+			break;
+
+		case DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_SYNC_META_TAMPERED:
+			disposition =
+				DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_SYNC_META_TAMPERED;
+			retrySaveStatus =
+				DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_SYNC_META_TAMPERED;
+			break;
+
+		case DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_MALFORMED_SYNC_PAYLOAD:
+			disposition =
+				DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_MALFORMED_SYNC_PAYLOAD;
+			retrySaveStatus =
+				DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_MALFORMED_SYNC_PAYLOAD;
+			break;
+	}
+
+	if ( result === 'stale_base_rejected' ) {
+		disposition =
+			DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION;
+		retrySaveStatus =
+			DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.STALE_BASE_REJECTED;
+		requiresServerStateRefetch = true;
+	}
+
+	return normalizeDistributedEditingSessionState( {
+		...normalizedCurrent,
+		disposition,
+		reasonCode,
+		serverVersion,
+		pendingChangeCount,
+		hasPendingChanges: normalizeCount( pendingChangeCount ) > 0,
+		isAwaitingServerConfirmation: normalizeCount( pendingChangeCount ) > 0,
+		requiresServerStateRefetch,
+		refetchedServerState: false,
+		canAttemptLocalRebase: false,
+		readyToRetrySubmit: false,
+		retrySubmitProofStatus:
+			DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.NONE,
+		retrySubmitAccepted: false,
+		retrySubmitSavePathRequired: false,
+		retrySubmitSaveStatus:
+			DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.BLOCKED,
+		retrySubmitSaveReason:
+			reasonCode ===
+			DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED
+				? DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_REASONS.STALE_BASE_REJECTED
+				: normalizedCurrent.retrySubmitSaveReason,
+		retrySubmitSavePrepared: false,
+		retrySubmitSaveReady: false,
+		retrySaveStatus,
+		retrySaveReason: reasonCode || result,
+		retrySaveAccepted: false,
+		retrySaveServerVersion: serverVersion,
+		retrySavePreviousServerVersion: previousServerVersion,
+		...retrySaveFlags,
+		mustOfferLocalCopy: normalizeCount( pendingChangeCount ) > 0,
+		canExportLocalUpdates:
+			normalizedCurrent.canExportLocalUpdates ||
+			normalizeCount( pendingChangeCount ) > 0,
 	} );
 }
 
@@ -1471,6 +1915,16 @@ function normalizeNullableString( value ) {
 
 function normalizeNullableContentString( value ) {
 	return typeof value === 'string' ? value : null;
+}
+
+function normalizeIdList( value ) {
+	if ( ! Array.isArray( value ) ) {
+		return [];
+	}
+
+	return value
+		.map( ( item ) => Number( item ) )
+		.filter( ( item ) => Number.isInteger( item ) && item > 0 );
 }
 
 function getDistributedEditingResponseData( responseOrError ) {
