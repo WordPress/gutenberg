@@ -28,7 +28,12 @@ Options
                         \`.trace.json\` suffix replaced by \`.deminified.trace.json\`.
 `;
 
+/**
+ * @param {string[]} argv Command-line arguments.
+ * @return {{ positional: string[], buildDir: string | null, out: string | null }} Parsed args.
+ */
 function parseArgs( argv ) {
+	/** @type {{ positional: string[], buildDir: string | null, out: string | null }} */
 	const args = { positional: [], buildDir: null, out: null };
 	for ( let i = 0; i < argv.length; i++ ) {
 		const arg = argv[ i ];
@@ -75,6 +80,11 @@ function mapUrlToLocalPath( url, buildDir ) {
 	return path.join( buildDir, `${ match[ 1 ] }.map` );
 }
 
+/**
+ * @param {string} url      Script URL from the trace.
+ * @param {string} buildDir Local path to the gutenberg `build/` directory.
+ * @return {Promise<string | null>} Source map text, or null when missing.
+ */
 async function readMap( url, buildDir ) {
 	const localPath = mapUrlToLocalPath( url, buildDir );
 	if ( ! localPath ) {
@@ -87,9 +97,15 @@ async function readMap( url, buildDir ) {
 	}
 }
 
+/**
+ * @param {any}    trace    Parsed trace JSON, mutated in place.
+ * @param {string} buildDir Local path to the gutenberg `build/` directory.
+ * @return {Promise<{ resolved: number, missing: number, rewritten: number }>} Counters.
+ */
 async function resolveTrace( trace, buildDir ) {
 	const events = Array.isArray( trace.traceEvents ) ? trace.traceEvents : [];
 
+	/** @type {Set<string>} */
 	const urls = new Set();
 	for ( const event of events ) {
 		const nodes = event?.args?.data?.cpuProfile?.nodes;
