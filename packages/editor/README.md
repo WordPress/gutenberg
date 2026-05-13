@@ -292,6 +292,10 @@ Stable DE-RTC terminal dispositions shared with the root model runner.
 
 Stable no-write planning statuses for stale-base local rebase preparation.
 
+### DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES
+
+Stable local rebase result statuses for stale-base handling.
+
 ### DISTRIBUTED_EDITING_NOTICE_ACTIONS
 
 Stable action keys that future UI can map to rendered buttons or menu items.
@@ -596,6 +600,24 @@ _Parameters_
 _Returns_
 
 -   `string`: REST path.
+
+### getDistributedEditingStaleBaseLocalRebaseResult
+
+Returns a serialized post-content candidate from a local stale-base rebase.
+
+This is a conservative three-way merge over whole serialized block tokens. It only merges when each input is composed of complete top-level Gutenberg block comment-delimited tokens and non-overlapping block positions changed. It does not save, retry a submit, call the server, or change post locks.
+
+_Parameters_
+
+-   _args_ `Object`: Local rebase inputs.
+-   _args.currentSessionState_ `Object`: Current DE-RTC session state.
+-   _args.clientBaseContent_ `string`: Serialized content at the client base version.
+-   _args.serverContent_ `string`: Serialized content from the refetched server version.
+-   _args.localContent_ `string`: Current serialized local editor content.
+
+_Returns_
+
+-   `Object`: Local rebase result.
 
 ### getDistributedEditingStatusSurfaceItems
 

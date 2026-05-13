@@ -89,6 +89,17 @@ export const DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES = Object.freeze( {
 	MANUAL_CONFLICT_REQUIRED: 'manual_conflict_required',
 } );
 
+/**
+ * Stable local rebase result statuses for stale-base handling.
+ */
+export const DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES = Object.freeze( {
+	NONE: 'none',
+	REBASED: 'rebased',
+	BLOCKED_NEEDS_READY_PLAN: 'blocked_needs_ready_plan',
+	MANUAL_CONFLICT_REQUIRED: 'manual_conflict_required',
+	UNSAFE_CONTENT_BOUNDARY: 'unsafe_content_boundary',
+} );
+
 const VALID_REASON_CODES = new Set(
 	Object.values( DISTRIBUTED_EDITING_REASON_CODES )
 );
@@ -99,6 +110,10 @@ const VALID_DISPOSITIONS = new Set(
 
 const VALID_LOCAL_REBASE_PLAN_STATUSES = new Set(
 	Object.values( DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES )
+);
+
+const VALID_LOCAL_REBASE_RESULT_STATUSES = new Set(
+	Object.values( DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES )
 );
 
 const NOTICE_ID_BY_KIND = Object.freeze( {
@@ -132,6 +147,8 @@ export const DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE = Object.freeze( {
 	refetchedServerState: false,
 	canAttemptLocalRebase: false,
 	localRebasePlanStatus: DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES.NONE,
+	localRebaseResultStatus:
+		DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.NONE,
 	readyToRetrySubmit: false,
 	requiresManualConflictResolution: false,
 	mustOfferLocalCopy: false,
@@ -237,6 +254,11 @@ export function normalizeDistributedEditingSessionState( sessionState = {} ) {
 	)
 		? sessionState.localRebasePlanStatus
 		: DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE.localRebasePlanStatus;
+	const localRebaseResultStatus = VALID_LOCAL_REBASE_RESULT_STATUSES.has(
+		sessionState.localRebaseResultStatus
+	)
+		? sessionState.localRebaseResultStatus
+		: DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE.localRebaseResultStatus;
 	const readyToRetrySubmit =
 		Boolean( sessionState.readyToRetrySubmit ) &&
 		! requiresManualConflictResolution;
@@ -266,6 +288,7 @@ export function normalizeDistributedEditingSessionState( sessionState = {} ) {
 		refetchedServerState,
 		canAttemptLocalRebase,
 		localRebasePlanStatus,
+		localRebaseResultStatus,
 		readyToRetrySubmit,
 		requiresManualConflictResolution,
 		mustOfferLocalCopy,
@@ -444,6 +467,8 @@ export function getDistributedEditingSessionStateForStaleBaseServerStateRefetchR
 			pendingChangeCount > 0 && ! requiresManualConflictResolution,
 		localRebasePlanStatus:
 			DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES.NONE,
+		localRebaseResultStatus:
+			DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.NONE,
 		readyToRetrySubmit: false,
 		canExportLocalUpdates:
 			Boolean( currentSessionState.canExportLocalUpdates ) ||
@@ -480,6 +505,7 @@ export function getDistributedEditingSessionStateForStaleBaseLocalRebasePlan(
 			canAttemptLocalRebase: false,
 			localRebasePlanStatus:
 				DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES.MANUAL_CONFLICT_REQUIRED,
+			localRebaseResultStatus: normalized.localRebaseResultStatus,
 			canExportLocalUpdates:
 				normalized.canExportLocalUpdates || pendingChangeCount > 0,
 		} );
@@ -494,6 +520,7 @@ export function getDistributedEditingSessionStateForStaleBaseLocalRebasePlan(
 			canAttemptLocalRebase: false,
 			localRebasePlanStatus:
 				DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES.NEEDS_SERVER_STATE,
+			localRebaseResultStatus: normalized.localRebaseResultStatus,
 		} );
 	}
 
@@ -503,6 +530,7 @@ export function getDistributedEditingSessionStateForStaleBaseLocalRebasePlan(
 			canAttemptLocalRebase: false,
 			localRebasePlanStatus:
 				DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES.NO_PENDING_CHANGES,
+			localRebaseResultStatus: normalized.localRebaseResultStatus,
 			canExportLocalUpdates: normalized.canExportLocalUpdates,
 		} );
 	}
@@ -512,7 +540,94 @@ export function getDistributedEditingSessionStateForStaleBaseLocalRebasePlan(
 		canAttemptLocalRebase: true,
 		localRebasePlanStatus:
 			DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES.READY,
+		localRebaseResultStatus: normalized.localRebaseResultStatus,
 		canExportLocalUpdates: true,
+	} );
+}
+
+/**
+ * Returns a serialized post-content candidate from a local stale-base rebase.
+ *
+ * This is a conservative three-way merge over whole serialized block tokens. It
+ * only merges when each input is composed of complete top-level Gutenberg block
+ * comment-delimited tokens and non-overlapping block positions changed. It does
+ * not save, retry a submit, call the server, or change post locks.
+ *
+ * @param {Object} args                     Local rebase inputs.
+ * @param {Object} args.currentSessionState Current DE-RTC session state.
+ * @param {string} args.clientBaseContent   Serialized content at the client base version.
+ * @param {string} args.serverContent       Serialized content from the refetched server version.
+ * @param {string} args.localContent        Current serialized local editor content.
+ *
+ * @return {Object} Local rebase result.
+ */
+export function getDistributedEditingStaleBaseLocalRebaseResult( {
+	currentSessionState = {},
+	clientBaseContent,
+	serverContent,
+	localContent,
+} = {} ) {
+	const plannedState =
+		getDistributedEditingSessionStateForStaleBaseLocalRebasePlan(
+			currentSessionState
+		);
+
+	if (
+		plannedState.localRebasePlanStatus !==
+		DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES.READY
+	) {
+		return createLocalRebaseResult( {
+			status: DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.BLOCKED_NEEDS_READY_PLAN,
+			sessionState: normalizeDistributedEditingSessionState( {
+				...plannedState,
+				canAttemptLocalRebase: false,
+				localRebaseResultStatus:
+					DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.BLOCKED_NEEDS_READY_PLAN,
+				readyToRetrySubmit: false,
+			} ),
+			reason: plannedState.localRebasePlanStatus,
+		} );
+	}
+
+	const mergeResult = getSerializedBlockLocalRebaseCandidate( {
+		clientBaseContent,
+		serverContent,
+		localContent,
+	} );
+
+	if ( mergeResult.status !== 'rebased' ) {
+		const resultStatus =
+			mergeResult.status === 'unsafe_content_boundary'
+				? DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.UNSAFE_CONTENT_BOUNDARY
+				: DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.MANUAL_CONFLICT_REQUIRED;
+
+		return createLocalRebaseResult( {
+			status: resultStatus,
+			sessionState: normalizeDistributedEditingSessionState( {
+				...plannedState,
+				canAttemptLocalRebase: false,
+				localRebaseResultStatus: resultStatus,
+				readyToRetrySubmit: false,
+				requiresManualConflictResolution: true,
+				canExportLocalUpdates: true,
+			} ),
+			reason: mergeResult.reason,
+		} );
+	}
+
+	return createLocalRebaseResult( {
+		status: DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.REBASED,
+		sessionState: normalizeDistributedEditingSessionState( {
+			...plannedState,
+			canAttemptLocalRebase: false,
+			localRebaseResultStatus:
+				DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.REBASED,
+			readyToRetrySubmit: true,
+			requiresManualConflictResolution: false,
+			canExportLocalUpdates: true,
+		} ),
+		candidatePostContent: mergeResult.candidatePostContent,
+		mergedBlockCount: mergeResult.mergedBlockCount,
 	} );
 }
 
@@ -751,4 +866,235 @@ function getDistributedEditingServerVersionFromResponse( responseOrError ) {
 			responseData.modified_gmt ||
 			responseData.modified
 	);
+}
+
+function createLocalRebaseResult( {
+	status,
+	sessionState,
+	reason = null,
+	candidatePostContent = null,
+	mergedBlockCount = 0,
+} ) {
+	return {
+		status,
+		reason,
+		sessionState,
+		candidatePostContent,
+		hasCandidatePostContent: candidatePostContent !== null,
+		mergedBlockCount,
+		readyToRetrySubmit: sessionState.readyToRetrySubmit,
+		requiresManualConflictResolution:
+			sessionState.requiresManualConflictResolution,
+	};
+}
+
+function getSerializedBlockLocalRebaseCandidate( {
+	clientBaseContent,
+	serverContent,
+	localContent,
+} ) {
+	const baseBlocks = getSerializedBlockTokens( clientBaseContent );
+	const serverBlocks = getSerializedBlockTokens( serverContent );
+	const localBlocks = getSerializedBlockTokens( localContent );
+
+	for ( const blockSet of [ baseBlocks, serverBlocks, localBlocks ] ) {
+		if ( blockSet.status !== 'safe' ) {
+			return {
+				status: 'unsafe_content_boundary',
+				reason: blockSet.reason,
+			};
+		}
+	}
+
+	if ( serverBlocks.content === localBlocks.content ) {
+		return {
+			status: 'rebased',
+			candidatePostContent: serverBlocks.content,
+			mergedBlockCount: serverBlocks.blocks.length,
+		};
+	}
+
+	if ( serverBlocks.content === baseBlocks.content ) {
+		return {
+			status: 'rebased',
+			candidatePostContent: localBlocks.content,
+			mergedBlockCount: localBlocks.blocks.length,
+		};
+	}
+
+	if ( localBlocks.content === baseBlocks.content ) {
+		return {
+			status: 'rebased',
+			candidatePostContent: serverBlocks.content,
+			mergedBlockCount: serverBlocks.blocks.length,
+		};
+	}
+
+	if (
+		baseBlocks.blocks.length !== serverBlocks.blocks.length ||
+		baseBlocks.blocks.length !== localBlocks.blocks.length
+	) {
+		return {
+			status: 'manual_conflict_required',
+			reason: 'block_count_changed',
+		};
+	}
+
+	const mergedBlocks = [];
+
+	for ( let index = 0; index < baseBlocks.blocks.length; index++ ) {
+		const baseBlock = baseBlocks.blocks[ index ];
+		const serverBlock = serverBlocks.blocks[ index ];
+		const localBlock = localBlocks.blocks[ index ];
+		const serverChanged = serverBlock !== baseBlock;
+		const localChanged = localBlock !== baseBlock;
+
+		if ( serverChanged && localChanged && serverBlock !== localBlock ) {
+			return {
+				status: 'manual_conflict_required',
+				reason: 'same_block_changed',
+			};
+		}
+
+		if ( localChanged ) {
+			mergedBlocks.push( localBlock );
+		} else {
+			mergedBlocks.push( serverBlock );
+		}
+	}
+
+	return {
+		status: 'rebased',
+		candidatePostContent: mergedBlocks.join( '' ),
+		mergedBlockCount: mergedBlocks.length,
+	};
+}
+
+function getSerializedBlockTokens( content ) {
+	if ( typeof content !== 'string' ) {
+		return {
+			status: 'unsafe',
+			reason: 'content_not_string',
+		};
+	}
+
+	const unsafeBlockCommentReason = getUnsafeBlockCommentReason( content );
+
+	if ( unsafeBlockCommentReason ) {
+		return {
+			status: 'unsafe',
+			reason: unsafeBlockCommentReason,
+		};
+	}
+
+	const blocks = [];
+	let offset = 0;
+
+	while ( offset < content.length ) {
+		const openingCommentStart = content.indexOf( '<!-- wp:', offset );
+
+		if ( openingCommentStart !== offset ) {
+			return {
+				status: 'unsafe',
+				reason: 'content_outside_serialized_blocks',
+			};
+		}
+
+		const openingCommentEnd = content.indexOf( '-->', openingCommentStart );
+
+		if ( openingCommentEnd === -1 ) {
+			return {
+				status: 'unsafe',
+				reason: 'block_comment_unclosed',
+			};
+		}
+
+		const openingComment = content.slice(
+			openingCommentStart,
+			openingCommentEnd + 3
+		);
+		const openingCommentData =
+			getSerializedBlockOpeningCommentData( openingComment );
+
+		if ( ! openingCommentData ) {
+			return {
+				status: 'unsafe',
+				reason: 'block_comment_invalid',
+			};
+		}
+
+		if ( openingCommentData.selfClosing ) {
+			blocks.push( openingComment );
+			offset = openingCommentEnd + 3;
+			continue;
+		}
+
+		const closingComment = `<!-- /wp:${ openingCommentData.blockName } -->`;
+		const closingCommentStart = content.indexOf(
+			closingComment,
+			openingCommentEnd + 3
+		);
+
+		if ( closingCommentStart === -1 ) {
+			return {
+				status: 'unsafe',
+				reason: 'block_closing_comment_missing',
+			};
+		}
+
+		const closingCommentEnd = closingCommentStart + closingComment.length;
+		blocks.push( content.slice( openingCommentStart, closingCommentEnd ) );
+		offset = closingCommentEnd;
+	}
+
+	if ( blocks.length === 0 && content.length > 0 ) {
+		return {
+			status: 'unsafe',
+			reason: 'content_without_serialized_blocks',
+		};
+	}
+
+	return {
+		status: 'safe',
+		content,
+		blocks,
+	};
+}
+
+function getUnsafeBlockCommentReason( content ) {
+	const blockCommentPattern = /<!--\s+wp:([^\s]+)([\s\S]*?)-->/g;
+	let match;
+
+	while ( ( match = blockCommentPattern.exec( content ) ) ) {
+		const rawAttributes = match[ 2 ].trim().replace( /\s\/$/, '' ).trim();
+
+		if ( rawAttributes.length === 0 ) {
+			continue;
+		}
+
+		if ( ! rawAttributes.startsWith( '{' ) ) {
+			return 'block_comment_attributes_not_json';
+		}
+
+		try {
+			JSON.parse( rawAttributes );
+		} catch {
+			return 'block_comment_json_invalid';
+		}
+	}
+
+	return null;
+}
+
+function getSerializedBlockOpeningCommentData( openingComment ) {
+	const match = openingComment.match( /^<!--\s+wp:([^\s]+)([\s\S]*?)-->$/ );
+
+	if ( ! match ) {
+		return null;
+	}
+
+	return {
+		blockName: match[ 1 ],
+		selfClosing: match[ 2 ].trim().endsWith( '/' ),
+	};
 }

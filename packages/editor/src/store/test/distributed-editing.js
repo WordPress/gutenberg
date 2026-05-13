@@ -9,12 +9,14 @@ import deepFreeze from 'deep-freeze';
 import {
 	DISTRIBUTED_EDITING_DISPOSITIONS,
 	DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES,
+	DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES,
 	DISTRIBUTED_EDITING_NOTICE_ACTIONS,
 	DISTRIBUTED_EDITING_NOTICE_IDS,
 	DISTRIBUTED_EDITING_NOTICE_KINDS,
 	DISTRIBUTED_EDITING_REASON_CODES,
 	DISTRIBUTED_EDITING_UNLOAD_WARNING_REASONS,
 	DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE,
+	getDistributedEditingStaleBaseLocalRebaseResult,
 	getDistributedEditingSessionStateForRecoveryDryRunResult,
 	getDistributedEditingSessionStateForStaleBaseLocalRebasePlan,
 	getDistributedEditingSessionStateForStaleBaseRejectionResult,
@@ -125,6 +127,8 @@ describe( 'distributed editing session state', () => {
 			canAttemptLocalRebase: false,
 			localRebasePlanStatus:
 				DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES.NONE,
+			localRebaseResultStatus:
+				DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.NONE,
 			readyToRetrySubmit: false,
 			requiresManualConflictResolution: false,
 			mustOfferLocalCopy: true,
@@ -329,6 +333,128 @@ describe( 'distributed editing session state', () => {
 			localRebasePlanStatus:
 				DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES.NO_PENDING_CHANGES,
 			readyToRetrySubmit: false,
+		} );
+	} );
+
+	it( 'rebases stale-base local changes over remote serialized block changes', () => {
+		const baseContent =
+			'<!-- wp:paragraph --><p>Alpha</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Beta</p><!-- /wp:paragraph -->';
+		const serverContent =
+			'<!-- wp:paragraph --><p>Alpha</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Remote beta</p><!-- /wp:paragraph -->';
+		const localContent =
+			'<!-- wp:paragraph --><p>Local alpha</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Beta</p><!-- /wp:paragraph -->';
+		const result = getDistributedEditingStaleBaseLocalRebaseResult( {
+			currentSessionState:
+				getDistributedEditingSessionStateForStaleBaseLocalRebasePlan(
+					getDistributedEditingSessionStateForStaleBaseServerStateRefetchResult(
+						{
+							distributed_editing: {
+								server_version: 'server-v7',
+							},
+						},
+						getDistributedEditingSessionStateForStaleBaseRejectionResult(
+							{
+								reason_code:
+									DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+								client_base_version: 'server-v4',
+								server_version: 'server-v6',
+								pending_change_count: 2,
+								remote_change_count: 1,
+							}
+						)
+					)
+				),
+			clientBaseContent: baseContent,
+			serverContent,
+			localContent,
+		} );
+
+		expect( result ).toMatchObject( {
+			status: DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.REBASED,
+			reason: null,
+			hasCandidatePostContent: true,
+			mergedBlockCount: 2,
+			readyToRetrySubmit: true,
+			requiresManualConflictResolution: false,
+			sessionState: {
+				localRebasePlanStatus:
+					DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES.READY,
+				localRebaseResultStatus:
+					DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.REBASED,
+				canAttemptLocalRebase: false,
+				readyToRetrySubmit: true,
+				requiresManualConflictResolution: false,
+			},
+		} );
+		expect( result.candidatePostContent ).toBe(
+			'<!-- wp:paragraph --><p>Local alpha</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Remote beta</p><!-- /wp:paragraph -->'
+		);
+	} );
+
+	it( 'requires manual conflict when local and remote edit the same serialized block', () => {
+		const baseContent =
+			'<!-- wp:paragraph --><p>Alpha</p><!-- /wp:paragraph -->';
+		const result = getDistributedEditingStaleBaseLocalRebaseResult( {
+			currentSessionState:
+				getDistributedEditingSessionStateForStaleBaseLocalRebasePlan( {
+					disposition:
+						DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+					reasonCode:
+						DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+					refetchedServerState: true,
+					pendingChangeCount: 1,
+					canAttemptLocalRebase: true,
+				} ),
+			clientBaseContent: baseContent,
+			serverContent:
+				'<!-- wp:paragraph --><p>Remote alpha</p><!-- /wp:paragraph -->',
+			localContent:
+				'<!-- wp:paragraph --><p>Local alpha</p><!-- /wp:paragraph -->',
+		} );
+
+		expect( result ).toMatchObject( {
+			status: DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.MANUAL_CONFLICT_REQUIRED,
+			reason: 'same_block_changed',
+			hasCandidatePostContent: false,
+			readyToRetrySubmit: false,
+			requiresManualConflictResolution: true,
+			sessionState: {
+				canAttemptLocalRebase: false,
+				localRebaseResultStatus:
+					DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.MANUAL_CONFLICT_REQUIRED,
+				readyToRetrySubmit: false,
+				requiresManualConflictResolution: true,
+				canExportLocalUpdates: true,
+			},
+		} );
+	} );
+
+	it( 'rejects non-canonical serialized block content as unsafe', () => {
+		const baseContent =
+			'<!-- wp:paragraph --><p>Alpha</p><!-- /wp:paragraph -->';
+		const result = getDistributedEditingStaleBaseLocalRebaseResult( {
+			currentSessionState:
+				getDistributedEditingSessionStateForStaleBaseLocalRebasePlan( {
+					disposition:
+						DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+					reasonCode:
+						DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+					refetchedServerState: true,
+					pendingChangeCount: 1,
+					canAttemptLocalRebase: true,
+				} ),
+			clientBaseContent: baseContent,
+			serverContent: baseContent,
+			localContent:
+				'<!-- wp:paragraph {"bad": } --><p>Alpha</p><!-- /wp:paragraph -->',
+		} );
+
+		expect( result ).toMatchObject( {
+			status: DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.UNSAFE_CONTENT_BOUNDARY,
+			reason: 'block_comment_json_invalid',
+			hasCandidatePostContent: false,
+			readyToRetrySubmit: false,
+			requiresManualConflictResolution: true,
 		} );
 	} );
 

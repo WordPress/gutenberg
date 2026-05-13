@@ -32,6 +32,7 @@ import {
 } from './distributed-editing-api';
 import {
 	getDistributedEditingSessionStateForRecoveryDryRunResult,
+	getDistributedEditingStaleBaseLocalRebaseResult,
 	getDistributedEditingSessionStateForStaleBaseLocalRebasePlan,
 	getDistributedEditingSessionStateForStaleBaseRejectionResult,
 	getDistributedEditingSessionStateForStaleBaseServerStateRefetchResult,
@@ -376,6 +377,45 @@ export const __experimentalPlanDistributedEditingLocalRebaseAfterStaleBase =
 		dispatch.setDistributedEditingSessionState( plannedSessionState );
 
 		return plannedSessionState;
+	};
+
+/**
+ * Rebases local stale-base edits over refetched server content.
+ *
+ * The action computes a conservative serialized-block merge and applies the
+ * merged candidate to the editor only when the merge is safe. It does not
+ * refetch, retry a submit, save, dispatch notices, persist editor state, or
+ * change post locks.
+ *
+ * @param {Object} options                   Rebase options.
+ * @param {string} options.clientBaseContent Serialized content at the client base version.
+ * @param {string} options.serverContent     Serialized content from the refetched server version.
+ * @param {string} [options.localContent]    Serialized local editor content override.
+ *
+ * @return {Function} Action thunk.
+ */
+export const __experimentalRebaseDistributedEditingLocalUpdatesAfterStaleBase =
+	( options = {} ) =>
+	( { select, dispatch } ) => {
+		const result = getDistributedEditingStaleBaseLocalRebaseResult( {
+			currentSessionState:
+				select.getDistributedEditingSessionState?.() || {},
+			clientBaseContent: options.clientBaseContent,
+			serverContent: options.serverContent,
+			localContent:
+				options.localContent ?? select.getEditedPostContent?.(),
+		} );
+
+		if ( result.hasCandidatePostContent ) {
+			dispatch.editPost(
+				{ content: result.candidatePostContent },
+				{ undoIgnore: true }
+			);
+		}
+
+		dispatch.setDistributedEditingSessionState( result.sessionState );
+
+		return result;
 	};
 
 /**
