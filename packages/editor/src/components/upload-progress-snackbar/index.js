@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useEffect, useRef } from '@wordpress/element';
+import { useEffect, useRef, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
 import { store as uploadStore } from '@wordpress/upload-media';
@@ -69,10 +69,10 @@ export default function UploadProgressSnackbar() {
 	// Track peak total across sources during a session. The CSM queue removes
 	// items on completion, and the tracker tops out at its recorded total, so
 	// `total` has to be tracked as the high-water mark.
-	const peakRef = useRef( 0 );
+	const [ peak, setPeak ] = useState( 0 );
 	const sessionTotal = csmRemaining + ( tracker ? tracker.total : 0 );
-	if ( sessionTotal > peakRef.current ) {
-		peakRef.current = sessionTotal;
+	if ( sessionTotal > peak ) {
+		setPeak( sessionTotal );
 	}
 
 	const { createNotice, removeNotice } = useDispatch( noticesStore );
@@ -125,10 +125,10 @@ export default function UploadProgressSnackbar() {
 				completionTimeoutRef.current = setTimeout( () => {
 					removeNotice( NOTICE_ID );
 					completionTimeoutRef.current = null;
-					peakRef.current = 0;
+					setPeak( 0 );
 				}, COMPLETION_DISPLAY_MS );
 			} else {
-				peakRef.current = 0;
+				setPeak( 0 );
 			}
 		}
 
@@ -138,7 +138,7 @@ export default function UploadProgressSnackbar() {
 			return;
 		}
 
-		const total = peakRef.current;
+		const total = peak;
 		const current = total - remaining + 1;
 
 		// Prefer the CSM queue's first original filename, then fall back to
@@ -174,7 +174,7 @@ export default function UploadProgressSnackbar() {
 				dismissedRef.current = true;
 			},
 		} );
-	}, [ remaining, csmOriginals, tracker, createNotice, removeNotice ] );
+	}, [ remaining, peak, csmOriginals, tracker, createNotice, removeNotice ] );
 
 	return null;
 }
