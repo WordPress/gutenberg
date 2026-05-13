@@ -215,6 +215,9 @@ export const DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS = Object.freeze( {
 	RETRY_SAVE_ALREADY_CONFIRMED: 'retry_save_already_confirmed',
 } );
 
+export const DISTRIBUTED_EDITING_LOCAL_UPDATES_EXPORT_FORMAT =
+	'wp/de-rtc-local-updates';
+
 const VALID_REASON_CODES = new Set(
 	Object.values( DISTRIBUTED_EDITING_REASON_CODES )
 );
@@ -612,6 +615,39 @@ export function normalizeDistributedEditingSessionState( sessionState = {} ) {
 		requiresManualConflictResolution,
 		mustOfferLocalCopy,
 		canExportLocalUpdates,
+	};
+}
+
+/**
+ * Returns the stable JSON payload for exporting protected local DE-RTC edits.
+ *
+ * This is pure data contract construction. It does not write to the browser
+ * clipboard, save, dispatch notices, persist editor state, or change post
+ * locks.
+ *
+ * @param {Object} args                   Export payload inputs.
+ * @param {Object} args.currentPost       Current edited post.
+ * @param {string} args.editedPostContent Current serialized local editor content.
+ * @param {Object} args.sessionState      Current DE-RTC session state.
+ *
+ * @return {Object} Exportable local-updates payload.
+ */
+export function getDistributedEditingLocalUpdatesExportPayload( {
+	currentPost = {},
+	editedPostContent = '',
+	sessionState = {},
+} = {} ) {
+	return {
+		version: 1,
+		format: DISTRIBUTED_EDITING_LOCAL_UPDATES_EXPORT_FORMAT,
+		post: {
+			id: currentPost?.id ?? null,
+			type: currentPost?.type ?? null,
+		},
+		postContent:
+			typeof editedPostContent === 'string' ? editedPostContent : '',
+		distributedEditingSessionState:
+			normalizeDistributedEditingSessionState( sessionState ),
 	};
 }
 

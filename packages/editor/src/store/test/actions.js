@@ -359,6 +359,138 @@ describe( 'Post actions', () => {
 				canExportLocalUpdates: true,
 			} );
 		} );
+
+		it( 'refetches after blocked retry-save without saving, notices, locks, or dropping local changes', async () => {
+			const clientBaseContent =
+				'<!-- wp:paragraph --><p>Base.</p><!-- /wp:paragraph -->';
+			const localContent =
+				'<!-- wp:paragraph --><p>Local edits.</p><!-- /wp:paragraph -->';
+			const refetchedServerContent =
+				'<!-- wp:paragraph --><p>Server edits.</p><!-- /wp:paragraph -->';
+			const post = {
+				id: postId,
+				type: 'post',
+				title: 'bar',
+				content: clientBaseContent,
+				status: 'draft',
+			};
+			const serverResponse = {
+				id: postId,
+				type: 'post',
+				content: {
+					raw: refetchedServerContent,
+				},
+				distributed_editing: {
+					server_version: '8',
+				},
+			};
+			let apiFetchCallCount = 0;
+
+			apiFetch.setFetchHandler( async ( options ) => {
+				apiFetchCallCount++;
+				const { path, method, data } = options;
+
+				expect( method ).toBe( 'GET' );
+				expect( path ).toMatch(
+					new RegExp( `^/wp/v2/posts/${ postId }\\?context=edit` )
+				);
+				expect( data ).toBeUndefined();
+
+				return serverResponse;
+			} );
+
+			const registry = createRegistryWithStores();
+
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', post );
+			registry.dispatch( editorStore ).setupEditor( post, {
+				content: localContent,
+			} );
+			registry
+				.dispatch( editorStore )
+				.setDistributedEditingSessionState( {
+					disposition:
+						DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+					reasonCode:
+						DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+					clientBaseVersion: '4',
+					serverVersion: '7',
+					clientBaseContent,
+					pendingChangeCount: 2,
+					remoteChangeCount: 1,
+					requiresServerStateRefetch: true,
+					canExportLocalUpdates: true,
+					retrySaveHandoffStatus:
+						DISTRIBUTED_EDITING_RETRY_SAVE_HANDOFF_STATUSES.RETRY_SAVE_BLOCKED,
+					retrySaveHandoffReason:
+						DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.SERVER_STATE_REFETCH_REQUIRED,
+					retrySaveHandoffBlocksNormalSave: true,
+				} );
+
+			expect( registry.select( editorStore ).isEditedPostDirty() ).toBe(
+				true
+			);
+			expect( registry.select( editorStore ).isPostSavingLocked() ).toBe(
+				false
+			);
+			expect(
+				registry.select( editorStore ).isPostAutosavingLocked()
+			).toBe( false );
+			expect( registry.select( noticesStore ).getNotices() ).toEqual(
+				[]
+			);
+
+			await expect(
+				registry
+					.dispatch( editorStore )
+					.__experimentalRefreshDistributedEditingServerStateAfterStaleBase()
+			).resolves.toBe( serverResponse );
+
+			expect( apiFetchCallCount ).toBe( 1 );
+			expect(
+				registry.select( editorStore ).getEditedPostContent()
+			).toBe( localContent );
+			expect( registry.select( editorStore ).isEditedPostDirty() ).toBe(
+				true
+			);
+			expect( registry.select( editorStore ).isPostSavingLocked() ).toBe(
+				false
+			);
+			expect(
+				registry.select( editorStore ).isPostAutosavingLocked()
+			).toBe( false );
+			expect( registry.select( noticesStore ).getNotices() ).toEqual(
+				[]
+			);
+			expect(
+				registry
+					.select( editorStore )
+					.getDistributedEditingSessionState()
+			).toMatchObject( {
+				disposition:
+					DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+				reasonCode:
+					DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+				clientBaseVersion: '4',
+				serverVersion: '8',
+				clientBaseContent,
+				refetchedServerContent,
+				pendingChangeCount: 2,
+				hasPendingChanges: true,
+				isAwaitingServerConfirmation: true,
+				requiresServerStateRefetch: false,
+				refetchedServerState: true,
+				canAttemptLocalRebase: true,
+				mustOfferLocalCopy: true,
+				canExportLocalUpdates: true,
+				retrySaveHandoffStatus:
+					DISTRIBUTED_EDITING_RETRY_SAVE_HANDOFF_STATUSES.RETRY_SAVE_BLOCKED,
+				retrySaveHandoffReason:
+					DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.SERVER_STATE_REFETCH_REQUIRED,
+				retrySaveHandoffBlocksNormalSave: true,
+			} );
+		} );
 	} );
 
 	describe( '__experimentalPlanDistributedEditingLocalRebaseAfterStaleBase()', () => {
@@ -2064,6 +2196,15 @@ describe( 'Post actions', () => {
 			} );
 
 			expect( apiCalls ).toBe( 0 );
+			expect( registry.select( noticesStore ).getNotices() ).toEqual(
+				[]
+			);
+			expect( registry.select( editorStore ).isPostSavingLocked() ).toBe(
+				false
+			);
+			expect(
+				registry.select( editorStore ).isPostAutosavingLocked()
+			).toBe( false );
 			expect( registry.select( editorStore ).isEditedPostDirty() ).toBe(
 				true
 			);

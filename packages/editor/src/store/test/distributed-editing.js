@@ -10,6 +10,7 @@ import {
 	DISTRIBUTED_EDITING_DISPOSITIONS,
 	DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES,
 	DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES,
+	DISTRIBUTED_EDITING_LOCAL_UPDATES_EXPORT_FORMAT,
 	DISTRIBUTED_EDITING_NOTICE_ACTIONS,
 	DISTRIBUTED_EDITING_NOTICE_IDS,
 	DISTRIBUTED_EDITING_NOTICE_KINDS,
@@ -25,6 +26,7 @@ import {
 	DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES,
 	DISTRIBUTED_EDITING_UNLOAD_WARNING_REASONS,
 	DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE,
+	getDistributedEditingLocalUpdatesExportPayload,
 	getDistributedEditingRetrySavePolicyForSessionState,
 	getDistributedEditingStaleBaseLocalRebaseResult,
 	getDistributedEditingSessionStateForRetrySaveHandoff,
@@ -1529,6 +1531,92 @@ describe( 'distributed editing session state', () => {
 				} ),
 			] )
 		);
+	} );
+
+	it( 'builds a local-updates export payload from blocked retry-save refetch state', () => {
+		const clientBaseContent =
+			'<!-- wp:paragraph --><p>Base</p><!-- /wp:paragraph -->';
+		const refetchedServerContent =
+			'<!-- wp:paragraph --><p>Server</p><!-- /wp:paragraph -->';
+		const editedPostContent =
+			'<!-- wp:paragraph --><p>Local</p><!-- /wp:paragraph -->';
+		const blockedState =
+			getDistributedEditingSessionStateForRetrySaveHandoff(
+				getDistributedEditingSessionStateForStaleBaseRejectionResult( {
+					reason_code:
+						DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+					client_base_version: 'server-v4',
+					server_version: 'server-v7',
+					client_base_content: clientBaseContent,
+					pending_change_count: 2,
+					remote_change_count: 1,
+				} ),
+				{
+					status: DISTRIBUTED_EDITING_RETRY_SAVE_HANDOFF_STATUSES.RETRY_SAVE_BLOCKED,
+					reason: DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.SERVER_STATE_REFETCH_REQUIRED,
+					policy: {
+						protectsLocalChanges: true,
+						requiresServerStateRefetch: true,
+					},
+				}
+			);
+		const refetchedState =
+			getDistributedEditingSessionStateForStaleBaseServerStateRefetchResult(
+				{
+					distributed_editing: {
+						server_version: 'server-v8',
+					},
+					content: {
+						raw: refetchedServerContent,
+					},
+				},
+				blockedState
+			);
+		const payload = getDistributedEditingLocalUpdatesExportPayload( {
+			currentPost: {
+				id: 44,
+				type: 'post',
+				title: 'Ignored outside export payload',
+			},
+			editedPostContent,
+			sessionState: refetchedState,
+		} );
+
+		expect( Object.keys( payload ) ).toEqual( [
+			'version',
+			'format',
+			'post',
+			'postContent',
+			'distributedEditingSessionState',
+		] );
+		expect( payload ).toMatchObject( {
+			version: 1,
+			format: DISTRIBUTED_EDITING_LOCAL_UPDATES_EXPORT_FORMAT,
+			post: {
+				id: 44,
+				type: 'post',
+			},
+			postContent: editedPostContent,
+			distributedEditingSessionState: {
+				clientBaseVersion: 'server-v4',
+				serverVersion: 'server-v8',
+				clientBaseContent,
+				refetchedServerContent,
+				pendingChangeCount: 2,
+				hasPendingChanges: true,
+				isAwaitingServerConfirmation: true,
+				requiresServerStateRefetch: false,
+				refetchedServerState: true,
+				mustOfferLocalCopy: true,
+				canExportLocalUpdates: true,
+				retrySaveHandoffStatus:
+					DISTRIBUTED_EDITING_RETRY_SAVE_HANDOFF_STATUSES.RETRY_SAVE_BLOCKED,
+				retrySaveHandoffReason:
+					DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.SERVER_STATE_REFETCH_REQUIRED,
+				retrySaveHandoffBlocksNormalSave: true,
+			},
+		} );
+		expect( Object.keys( payload.post ) ).toEqual( [ 'id', 'type' ] );
 	} );
 
 	it( 'rebases stale-base local changes from remembered base and refetched server content', () => {
