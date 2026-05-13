@@ -15,6 +15,7 @@ import type { YBlock, YBlocks } from './crdt-blocks';
 import {
 	asRichTextOffset,
 	getRootMap,
+	getYTextByAttributeKey,
 	richTextOffsetToHtmlIndex,
 } from './crdt-utils';
 import type {
@@ -173,7 +174,9 @@ function getCursorPosition(
 	}
 
 	const attributes = block.get( 'attributes' );
-	const currentYText = attributes?.get( selection.attributeKey );
+	const currentYText = attributes
+		? getYTextByAttributeKey( attributes, selection.attributeKey )
+		: null;
 
 	// If the attribute is not a Y.Text, return null.
 	if ( ! ( currentYText instanceof Y.Text ) ) {
@@ -191,6 +194,7 @@ function getCursorPosition(
 	return {
 		relativePosition,
 		absoluteOffset: selection.offset,
+		attributeKey: selection.attributeKey,
 	};
 }
 
