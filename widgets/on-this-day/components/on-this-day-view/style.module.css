@@ -13,6 +13,25 @@
 	max-width: 100%;
 }
 
+/*
+ * Neutralize wp-admin's global anchor styles when the action CTA renders
+ * the Button as `<a>`. They live outside CSS layers and would beat the
+ * Button's own layered rules, so we restore the Button's foreground
+ * variables explicitly at a specificity that wp-admin cannot win.
+ */
+.no-posts-today a:any-link {
+	color: var(--wp-ui-button-foreground-color);
+	text-decoration: none;
+}
+
+.no-posts-today a:any-link:hover,
+.no-posts-today a:any-link:focus,
+.no-posts-today a:any-link:active {
+	color: var(--wp-ui-button-foreground-color-active);
+	text-decoration: none;
+}
+
+
 .header {
 	padding: var(--wpds-dimension-padding-lg);
 	border-start-start-radius: var(--wpds-border-radius-lg);

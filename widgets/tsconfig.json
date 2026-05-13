@@ -18,6 +18,7 @@
 		{ "path": "../packages/i18n" },
 		{ "path": "../packages/icons" },
 		{ "path": "../packages/ui" },
+		{ "path": "../packages/url" },
 		{ "path": "../routes/dashboard/widget-types" }
 	],
 	"include": [ "**/*.ts", "**/*.tsx" ],

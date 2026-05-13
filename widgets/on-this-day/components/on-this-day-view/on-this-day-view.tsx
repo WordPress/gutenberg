@@ -12,6 +12,7 @@ import { __, _n, sprintf } from '@wordpress/i18n';
 import { calendar } from '@wordpress/icons';
 // eslint-disable-next-line @wordpress/use-recommended-components
 import { EmptyState, Link, Stack, Text, Button } from '@wordpress/ui';
+import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -75,11 +76,20 @@ export function OnThisDayView( {
 					{ __( 'Nothing on this day yet' ) }
 				</EmptyState.Title>
 				<EmptyState.Description>
-					{ __( 'No posts published on this date in past years.' ) }
+					{ __( 'Your blogging memories are still being made.' ) }
+					{ __( 'Check back again soon.' ) }
 				</EmptyState.Description>
 
 				<EmptyState.Actions>
-					<Button>{ __( 'Add a post' ) }</Button>
+					<Button
+						nativeButton={ false }
+						render={
+							// eslint-disable-next-line jsx-a11y/anchor-has-content -- Button clones this anchor and injects the label as children at render time.
+							<a href={ addQueryArgs( 'post-new.php' ) } />
+						}
+					>
+						{ __( 'Write a new post' ) }
+					</Button>
 				</EmptyState.Actions>
 			</EmptyState.Root>
 		);
