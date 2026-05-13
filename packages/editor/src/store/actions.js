@@ -800,7 +800,9 @@ export const savePost =
 		const content = select.getEditedPostContent();
 		dispatch.editPost( { content }, { undoIgnore: true } );
 
-		if ( options.__experimentalUseDistributedEditingRetrySave ) {
+		if (
+			select.shouldUseDistributedEditingRetrySaveForSavePost( options )
+		) {
 			const retrySaveHandoff =
 				await dispatch.__experimentalMaybeSavePostWithDistributedEditingRetryPolicy(
 					{

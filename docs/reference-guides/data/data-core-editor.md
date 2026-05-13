@@ -940,6 +940,18 @@ _Returns_
 
 -   `boolean`: Whether the connection is degraded.
 
+### isDistributedEditingRetrySaveHandoffEnabled
+
+Returns true when WordPress enabled the Distributed Editing retry-save handoff for the current post editor.
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+
+_Returns_
+
+-   `boolean`: Whether the editor setting enables retry-save handoff.
+
 ### isEditedPostAutosaveable
 
 Returns true if the post can be autosaved, or false otherwise.
@@ -1325,6 +1337,21 @@ _Parameters_
 _Returns_
 
 -   `boolean`: Whether server state acceptance is required.
+
+### shouldUseDistributedEditingRetrySaveForSavePost
+
+Returns true when the current editor should route savePost through the Distributed Editing retry-save handoff.
+
+Explicit test/spike options keep their existing behavior. Without that option, the production gate comes from WordPress block editor settings and stays disabled unless the current post is opted in by the server.
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+-   _options_ `Object`: Save options.
+
+_Returns_
+
+-   `boolean`: Whether savePost should use the retry-save handoff.
 
 ### shouldWarnBeforeLeavingDistributedEditingSession
 

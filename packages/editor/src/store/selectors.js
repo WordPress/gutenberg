@@ -269,6 +269,51 @@ export function isAwaitingDistributedEditingServerConfirmation( state ) {
 }
 
 /**
+ * Returns true when the current editor should route savePost through the
+ * Distributed Editing retry-save handoff.
+ *
+ * Explicit test/spike options keep their existing behavior. Without that
+ * option, the production gate comes from WordPress block editor settings and
+ * stays disabled unless the current post is opted in by the server.
+ *
+ * @param {Object} state   Editor state.
+ * @param {Object} options Save options.
+ * @return {boolean} Whether savePost should use the retry-save handoff.
+ */
+export function shouldUseDistributedEditingRetrySaveForSavePost(
+	state,
+	options = EMPTY_OBJECT
+) {
+	if (
+		Object.prototype.hasOwnProperty.call(
+			options,
+			'__experimentalUseDistributedEditingRetrySave'
+		)
+	) {
+		return Boolean( options.__experimentalUseDistributedEditingRetrySave );
+	}
+
+	return isDistributedEditingRetrySaveHandoffEnabled( state );
+}
+
+/**
+ * Returns true when WordPress enabled the Distributed Editing retry-save
+ * handoff for the current post editor.
+ *
+ * @param {Object} state Editor state.
+ * @return {boolean} Whether the editor setting enables retry-save handoff.
+ */
+export function isDistributedEditingRetrySaveHandoffEnabled( state ) {
+	const distributedEditingSettings =
+		getEditorSettings( state ).distributedEditing || EMPTY_OBJECT;
+
+	return Boolean(
+		distributedEditingSettings.enabled &&
+			distributedEditingSettings.retrySaveHandoff !== false
+	);
+}
+
+/**
  * Returns true if the distributed editing connection has degraded.
  *
  * @param {Object} state Editor state.
