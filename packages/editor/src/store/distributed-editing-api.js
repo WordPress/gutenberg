@@ -73,6 +73,27 @@ export function getDistributedEditingRetrySubmitEndpointPath( {
 }
 
 /**
+ * Returns the current DE-RTC retry-save endpoint path for a post.
+ *
+ * @param {Object} args                    Endpoint args.
+ * @param {number} args.postId             Post ID.
+ * @param {string} [args.restBase='posts'] REST base for the edited post type.
+ *
+ * @return {string} REST path.
+ */
+export function getDistributedEditingRetrySaveEndpointPath( {
+	postId,
+	restBase = DISTRIBUTED_EDITING_RECOVERY_REST_BASE,
+} = {} ) {
+	return getDistributedEditingEndpointPath( {
+		postId,
+		restBase,
+		operation: 'retry-save',
+		errorSubject: 'retry-save',
+	} );
+}
+
+/**
  * Returns the current edited post endpoint path for DE-RTC server-state reads.
  *
  * @param {Object} args                    Endpoint args.
@@ -246,6 +267,73 @@ export function __experimentalRequestDistributedEditingRetrySubmitProbe( {
 
 	return apiFetch( {
 		path: getDistributedEditingRetrySubmitEndpointPath( {
+			postId,
+			restBase,
+		} ),
+		method: 'POST',
+		data,
+	} );
+}
+
+/**
+ * Requests the retry-save write contract for accepted retry-submit proof.
+ *
+ * This low-level helper is intentionally not wired to savePost. The server owns
+ * sync-meta mutation; callers send proposed post content without sync metadata
+ * and keep pending/export protection until the response is normalized by a
+ * later editor action.
+ *
+ * @param {Object}  args                                         Request args.
+ * @param {number}  args.postId                                  Post ID.
+ * @param {string}  [args.restBase='posts']                      REST base for the edited post type.
+ * @param {string}  args.clientBaseVersion                       Current sync version after local rebase.
+ * @param {string}  args.acceptedProofServerVersion              Server version from accepted retry-submit proof.
+ * @param {string}  [args.rebasedFromVersion]                    Original stale sync version.
+ * @param {number}  [args.pendingChangeCount=1]                  Pending local change groups.
+ * @param {string}  args.proposedPostContent                     Proposed post content without sync metadata.
+ * @param {string}  [args.proposedPostContentHash]               SHA-256 hash of proposed post content.
+ * @param {boolean} [args.acceptedProofSavesPost=false]          Whether accepted proof claimed a save.
+ * @param {boolean} [args.acceptedProofMutatesPostContent=false] Whether accepted proof claimed content mutation.
+ * @param {boolean} [args.acceptedProofCreatesRevision=false]    Whether accepted proof claimed revision creation.
+ * @param {boolean} [args.acceptedProofClaimsSaved=false]        Whether accepted proof claimed saved state.
+ *
+ * @return {Promise<Object>} REST response or error.
+ */
+export function __experimentalRequestDistributedEditingRetrySave( {
+	postId,
+	restBase = DISTRIBUTED_EDITING_RECOVERY_REST_BASE,
+	clientBaseVersion,
+	acceptedProofServerVersion,
+	rebasedFromVersion,
+	pendingChangeCount = 1,
+	proposedPostContent,
+	proposedPostContentHash,
+	acceptedProofSavesPost = false,
+	acceptedProofMutatesPostContent = false,
+	acceptedProofCreatesRevision = false,
+	acceptedProofClaimsSaved = false,
+} = {} ) {
+	const data = {
+		client_base_version: clientBaseVersion,
+		accepted_proof_server_version: acceptedProofServerVersion,
+		pending_change_count: pendingChangeCount,
+		proposed_post_content: proposedPostContent,
+		accepted_proof_saves_post: acceptedProofSavesPost,
+		accepted_proof_mutates_post_content: acceptedProofMutatesPostContent,
+		accepted_proof_creates_revision: acceptedProofCreatesRevision,
+		accepted_proof_claims_saved: acceptedProofClaimsSaved,
+	};
+
+	if ( rebasedFromVersion ) {
+		data.rebased_from_version = rebasedFromVersion;
+	}
+
+	if ( proposedPostContentHash ) {
+		data.proposed_post_content_hash = proposedPostContentHash;
+	}
+
+	return apiFetch( {
+		path: getDistributedEditingRetrySaveEndpointPath( {
 			postId,
 			restBase,
 		} ),

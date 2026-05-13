@@ -8,10 +8,12 @@ import apiFetch from '@wordpress/api-fetch';
  */
 import {
 	__experimentalRequestDistributedEditingRecoveryDryRun,
+	__experimentalRequestDistributedEditingRetrySave,
 	__experimentalRequestDistributedEditingRetrySubmitProbe,
 	__experimentalRequestDistributedEditingServerStateRefetch,
 	__experimentalRequestDistributedEditingStaleBaseRejection,
 	getDistributedEditingRecoveryEndpointPath,
+	getDistributedEditingRetrySaveEndpointPath,
 	getDistributedEditingRetrySubmitEndpointPath,
 	getDistributedEditingServerStateEndpointPath,
 	getDistributedEditingStaleBaseEndpointPath,
@@ -50,6 +52,15 @@ describe( 'distributed editing REST helpers', () => {
 				restBase: 'pages',
 			} )
 		).toBe( '/wp/v2/pages/42/distributed-editing/retry-submit' );
+	} );
+
+	it( 'builds the current retry-save endpoint path', () => {
+		expect(
+			getDistributedEditingRetrySaveEndpointPath( {
+				postId: 42,
+				restBase: 'pages',
+			} )
+		).toBe( '/wp/v2/pages/42/distributed-editing/retry-save' );
 	} );
 
 	it( 'builds the current server-state endpoint path', () => {
@@ -181,6 +192,61 @@ describe( 'distributed editing REST helpers', () => {
 			saves_post: false,
 			mutates_post_content: false,
 			claims_saved: false,
+		} );
+	} );
+
+	it( 'requests retry-save with proposed content and accepted proof evidence', async () => {
+		const proposedPostContent =
+			'<!-- wp:paragraph --><p>Retry-save proposed content.</p><!-- /wp:paragraph -->';
+		const proposedPostContentHash =
+			'0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef';
+
+		apiFetch.setFetchHandler( async ( options ) => {
+			expect( options.path ).toMatch(
+				/^\/wp\/v2\/posts\/42\/distributed-editing\/retry-save/
+			);
+			expect( options.method ).toBe( 'POST' );
+			expect( options.data ).toEqual( {
+				client_base_version: '8',
+				accepted_proof_server_version: '8',
+				rebased_from_version: '5',
+				pending_change_count: 2,
+				proposed_post_content: proposedPostContent,
+				proposed_post_content_hash: proposedPostContentHash,
+				accepted_proof_saves_post: false,
+				accepted_proof_mutates_post_content: false,
+				accepted_proof_creates_revision: false,
+				accepted_proof_claims_saved: false,
+			} );
+			expect( options.data.mode ).toBeUndefined();
+
+			return {
+				result: 'retry_save_applied',
+				retry_save_accepted: true,
+				saves_post: true,
+				mutates_post_content: true,
+				creates_revision: true,
+				claims_saved: true,
+			};
+		} );
+
+		await expect(
+			__experimentalRequestDistributedEditingRetrySave( {
+				postId: 42,
+				clientBaseVersion: '8',
+				acceptedProofServerVersion: '8',
+				rebasedFromVersion: '5',
+				pendingChangeCount: 2,
+				proposedPostContent,
+				proposedPostContentHash,
+			} )
+		).resolves.toEqual( {
+			result: 'retry_save_applied',
+			retry_save_accepted: true,
+			saves_post: true,
+			mutates_post_content: true,
+			creates_revision: true,
+			claims_saved: true,
 		} );
 	} );
 
