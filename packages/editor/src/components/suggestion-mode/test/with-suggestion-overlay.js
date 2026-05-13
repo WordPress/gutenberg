@@ -176,95 +176,40 @@ describe( 'withSuggestionOverlay', () => {
 		} );
 	} );
 
-	it( 'surfaces diff marks once the overlay change settles', () => {
-		// A discrete edit (e.g. range Delete) generates one overlay write
-		// then silence — after the ~100 ms idle window, the HOC swaps the
-		// clean proposed value for the marked HTML so reviewers see the
-		// strikethrough/insertion without leaving the block.
-		jest.useFakeTimers();
-		try {
-			const setAttributes = jest.fn();
-			renderWithProviders(
-				<Wrapped
-					clientId="a"
-					name="core/paragraph"
-					attributes={ { content: 'Hello' } }
-					setAttributes={ setAttributes }
-				/>,
-				{ intent: 'suggest' }
-			);
+	it( 'suppresses diff marks while the block is selected so RichText reconciliation does not fight the caret', () => {
+		// Regression: a prior implementation flipped the value prop from
+		// the clean overlay value to the marked HTML 100 ms after the
+		// suggester paused typing. Because the marked render contains
+		// `<del>`/`<ins>` wrappers, the suggester's caret could land
+		// inside or at the boundary of a format element; the next
+		// keystroke would then be stripped (lost into a `<del>`) or
+		// prepended to the existing addition (producing reversed
+		// insertions like "egap" instead of "page"). Keeping the gate
+		// strictly on `isSelected` means RichText never sees the marked
+		// value while the caret is live, so editing stays well-formed.
+		const setAttributes = jest.fn();
+		renderWithProviders(
+			<Wrapped
+				clientId="a"
+				name="core/paragraph"
+				attributes={ { content: 'Hello' } }
+				setAttributes={ setAttributes }
+			/>,
+			{ intent: 'suggest' }
+		);
 
-			fireEvent.click( screen.getByRole( 'button', { name: 'edit' } ) );
+		// `renderWithProviders` doesn't register `blockEditorStore`, so
+		// `isBlockSelected` falls through to the safe default of `true`
+		// — the same condition the HOC sees while a real user has the
+		// caret in the block.
+		fireEvent.click( screen.getByRole( 'button', { name: 'edit' } ) );
 
-			// Immediately after the click, the gate still suppresses marks.
-			expect( screen.getByTestId( 'content' ) ).toHaveTextContent(
-				'proposed'
-			);
-			expect( screen.getByTestId( 'content' ) ).not.toHaveTextContent(
-				/<del/
-			);
-
-			act( () => {
-				jest.advanceTimersByTime( 100 );
-			} );
-
-			// After the idle window, the rendered content carries both the
-			// deletion (`Hello`) and the addition (`proposed`) wrappers.
-			expect( screen.getByTestId( 'content' ) ).toHaveTextContent(
-				/<del class="has-suggestion-deletion">Hello<\/del>/
-			);
-			expect( screen.getByTestId( 'content' ) ).toHaveTextContent(
-				/<ins class="has-suggestion-addition">proposed<\/ins>/
-			);
-		} finally {
-			jest.useRealTimers();
-		}
-	} );
-
-	it( 'keeps marks suppressed while overlay writes churn within the idle window', () => {
-		// Continuous typing flushes one setAttributes per keystroke. Each
-		// write resets the debounce timer, so marks stay hidden until the
-		// user pauses — RichText doesn't see a marked value mid-burst.
-		// Each click triggers a fresh setAttributes call, which the
-		// reducer turns into a new `overlayAttributes` reference even when
-		// the proposed value is unchanged, so two clicks model a typing
-		// burst that re-arms the debounce.
-		jest.useFakeTimers();
-		try {
-			const setAttributes = jest.fn();
-			renderWithProviders(
-				<Wrapped
-					clientId="a"
-					name="core/paragraph"
-					attributes={ { content: 'Hello' } }
-					setAttributes={ setAttributes }
-				/>,
-				{ intent: 'suggest' }
-			);
-
-			fireEvent.click( screen.getByRole( 'button', { name: 'edit' } ) );
-			act( () => {
-				jest.advanceTimersByTime( 80 );
-			} );
-			fireEvent.click( screen.getByRole( 'button', { name: 'edit' } ) );
-			act( () => {
-				jest.advanceTimersByTime( 80 );
-			} );
-
-			expect( screen.getByTestId( 'content' ) ).not.toHaveTextContent(
-				/<del/
-			);
-
-			// Once the user actually pauses for 100 ms, marks render.
-			act( () => {
-				jest.advanceTimersByTime( 100 );
-			} );
-			expect( screen.getByTestId( 'content' ) ).toHaveTextContent(
-				/<del class="has-suggestion-deletion">Hello<\/del>/
-			);
-		} finally {
-			jest.useRealTimers();
-		}
+		expect( screen.getByTestId( 'content' ) ).toHaveTextContent(
+			'proposed'
+		);
+		expect( screen.getByTestId( 'content' ) ).not.toHaveTextContent(
+			/<(del|ins)/
+		);
 	} );
 
 	it( 'wraps for marks but writes through to the real block when a hydrated entry exists outside Suggest intent', () => {
@@ -273,80 +218,84 @@ describe( 'withSuggestionOverlay', () => {
 		// (via the wrapping HOC) but any keystrokes the reviewer types into
 		// the canvas must land on the real block, not get captured into
 		// the suggester's overlay.
-		jest.useFakeTimers();
-		try {
-			// Trigger the hydration via a button the test can click, so the
-			// `seedFromComment` callback is only consumed inside React's
-			// event handler rather than reassigned from inside a render.
-			function SeedButton() {
-				const { seedFromComment } = useSuggestionOverlay();
-				return (
-					<button
-						type="button"
-						onClick={ () =>
-							seedFromComment(
-								'a',
-								'core/paragraph',
-								42,
-								{ content: 'before' },
-								{ content: 'after' }
-							)
-						}
-					>
-						seed
-					</button>
-				);
-			}
-
-			const setAttributes = jest.fn();
-			// Real block content stays at the suggester's recorded baseline
-			// (`before`) — that's the production state: until the suggestion
-			// is accepted, the live block-editor store still holds the
-			// baseline value, and only the overlay carries the proposed
-			// `after`.
-			renderWithProviders(
-				<>
-					<SeedButton />
-					<Wrapped
-						clientId="a"
-						name="core/paragraph"
-						attributes={ { content: 'before' } }
-						setAttributes={ setAttributes }
-					/>
-				</>,
-				{ intent: 'edit' }
+		//
+		// `blocks` is passed so that the block-editor store is registered
+		// and `isBlockSelected('a')` returns false — the reviewer is just
+		// looking at the block, not editing it — which is what frees the
+		// HOC to render marks.
+		function SeedButton() {
+			const { seedFromComment } = useSuggestionOverlay();
+			return (
+				<button
+					type="button"
+					onClick={ () =>
+						seedFromComment(
+							'a',
+							'core/paragraph',
+							42,
+							{ content: 'before' },
+							{ content: 'after' }
+						)
+					}
+				>
+					seed
+				</button>
 			);
-
-			// Initially there's no entry, so the HOC is a pass-through in
-			// Edit intent — no marks, real setAttributes wired up.
-			expect( screen.getByTestId( 'content' ) ).not.toHaveTextContent(
-				/<(del|ins)/
-			);
-
-			// Hydrate from a persisted comment.
-			fireEvent.click( screen.getByRole( 'button', { name: 'seed' } ) );
-			act( () => {
-				jest.advanceTimersByTime( 100 );
-			} );
-
-			// Now the wrap is active and the marks render even outside
-			// Suggest intent.
-			expect( screen.getByTestId( 'content' ) ).toHaveTextContent(
-				/<del class="has-suggestion-deletion">before<\/del>/
-			);
-			expect( screen.getByTestId( 'content' ) ).toHaveTextContent(
-				/<ins class="has-suggestion-addition">after<\/ins>/
-			);
-
-			// Reviewer types — write goes through to the real block, not
-			// the overlay.
-			fireEvent.click( screen.getByRole( 'button', { name: 'edit' } ) );
-			expect( setAttributes ).toHaveBeenCalledWith( {
-				content: 'proposed',
-			} );
-		} finally {
-			jest.useRealTimers();
 		}
+
+		const setAttributes = jest.fn();
+		// Real block content stays at the suggester's recorded baseline
+		// (`before`) — that's the production state: until the suggestion
+		// is accepted, the live block-editor store still holds the
+		// baseline value, and only the overlay carries the proposed
+		// `after`.
+		renderWithProviders(
+			<>
+				<SeedButton />
+				<Wrapped
+					clientId="a"
+					name="core/paragraph"
+					attributes={ { content: 'before' } }
+					setAttributes={ setAttributes }
+				/>
+			</>,
+			{
+				intent: 'edit',
+				blocks: [
+					{
+						clientId: 'a',
+						name: 'core/paragraph',
+						attributes: { content: 'before' },
+						innerBlocks: [],
+					},
+				],
+			}
+		);
+
+		// Initially there's no entry, so the HOC is a pass-through in
+		// Edit intent — no marks, real setAttributes wired up.
+		expect( screen.getByTestId( 'content' ) ).not.toHaveTextContent(
+			/<(del|ins)/
+		);
+
+		// Hydrate from a persisted comment.
+		fireEvent.click( screen.getByRole( 'button', { name: 'seed' } ) );
+
+		// Now the wrap is active and the marks render even outside
+		// Suggest intent.
+		expect( screen.getByTestId( 'content' ) ).toHaveTextContent(
+			/<del class="has-suggestion-deletion">before<\/del>/
+		);
+		expect( screen.getByTestId( 'content' ) ).toHaveTextContent(
+			/<ins class="has-suggestion-addition">after<\/ins>/
+		);
+
+		// Reviewer types — write goes through to the real block, not
+		// the overlay.
+		fireEvent.click( screen.getByRole( 'button', { name: 'edit' } ) );
+		expect( setAttributes ).toHaveBeenCalledWith( {
+			content: 'proposed',
+		} );
 	} );
 
 	it( 'drops marks for a hydrated entry when real content has diverged from the suggester baseline', () => {
@@ -356,63 +305,65 @@ describe( 'withSuggestionOverlay', () => {
 		// otherwise overwrite the reviewer's text with the suggester's stale
 		// `after` and the diff marks would visually attribute the reviewer's
 		// edits to the suggester. The guard skips the merge in that case.
-		jest.useFakeTimers();
-		try {
-			function SeedButton() {
-				const { seedFromComment } = useSuggestionOverlay();
-				return (
-					<button
-						type="button"
-						onClick={ () =>
-							seedFromComment(
-								'a',
-								'core/paragraph',
-								42,
-								{ content: 'before' },
-								{ content: 'after' }
-							)
-						}
-					>
-						seed
-					</button>
-				);
-			}
-
-			const setAttributes = jest.fn();
-			// Real block content has already diverged from the suggester's
-			// recorded baseline (`before`) — e.g. the reviewer just typed.
-			renderWithProviders(
-				<>
-					<SeedButton />
-					<Wrapped
-						clientId="a"
-						name="core/paragraph"
-						attributes={ { content: 'reviewer typed' } }
-						setAttributes={ setAttributes }
-					/>
-				</>,
-				{ intent: 'edit' }
+		function SeedButton() {
+			const { seedFromComment } = useSuggestionOverlay();
+			return (
+				<button
+					type="button"
+					onClick={ () =>
+						seedFromComment(
+							'a',
+							'core/paragraph',
+							42,
+							{ content: 'before' },
+							{ content: 'after' }
+						)
+					}
+				>
+					seed
+				</button>
 			);
-
-			fireEvent.click( screen.getByRole( 'button', { name: 'seed' } ) );
-			act( () => {
-				jest.advanceTimersByTime( 100 );
-			} );
-
-			// Real content wins. No del/ins wrappers — the divergence
-			// guard skipped the overlay merge and the diff rendering.
-			expect( screen.getByTestId( 'content' ) ).toHaveTextContent(
-				'reviewer typed'
-			);
-			expect( screen.getByTestId( 'content' ) ).not.toHaveTextContent(
-				/<del/
-			);
-			expect( screen.getByTestId( 'content' ) ).not.toHaveTextContent(
-				/<ins/
-			);
-		} finally {
-			jest.useRealTimers();
 		}
+
+		const setAttributes = jest.fn();
+		// Real block content has already diverged from the suggester's
+		// recorded baseline (`before`) — e.g. the reviewer just typed.
+		renderWithProviders(
+			<>
+				<SeedButton />
+				<Wrapped
+					clientId="a"
+					name="core/paragraph"
+					attributes={ { content: 'reviewer typed' } }
+					setAttributes={ setAttributes }
+				/>
+			</>,
+			{
+				intent: 'edit',
+				blocks: [
+					{
+						clientId: 'a',
+						name: 'core/paragraph',
+						attributes: { content: 'reviewer typed' },
+						innerBlocks: [],
+					},
+				],
+			}
+		);
+
+		fireEvent.click( screen.getByRole( 'button', { name: 'seed' } ) );
+
+		// Real content wins. No del/ins wrappers — the divergence
+		// guard skipped the overlay merge and the diff rendering.
+		expect( screen.getByTestId( 'content' ) ).toHaveTextContent(
+			'reviewer typed'
+		);
+		expect( screen.getByTestId( 'content' ) ).not.toHaveTextContent(
+			/<del/
+		);
+		expect( screen.getByTestId( 'content' ) ).not.toHaveTextContent(
+			/<ins/
+		);
 	} );
 
 	it( 'keeps marks for the suggester themselves even when overlay attributes diverge from baseline (no reviewer guard)', () => {
@@ -421,33 +372,39 @@ describe( 'withSuggestionOverlay', () => {
 		// regardless of whether the real block content (kept at baseline by
 		// the overlay) matches the recorded baseline. This pins the guard
 		// to `! isSuggestMode` so a future refactor can't widen it.
-		jest.useFakeTimers();
-		try {
-			const setAttributes = jest.fn();
-			renderWithProviders(
-				<Wrapped
-					clientId="a"
-					name="core/paragraph"
-					attributes={ { content: 'Hello' } }
-					setAttributes={ setAttributes }
-				/>,
-				{ intent: 'suggest' }
-			);
+		//
+		// Registering the block in the editor store makes
+		// `isBlockSelected('a')` return false (no block selected), so the
+		// HOC's selection gate doesn't suppress marks here.
+		const setAttributes = jest.fn();
+		renderWithProviders(
+			<Wrapped
+				clientId="a"
+				name="core/paragraph"
+				attributes={ { content: 'Hello' } }
+				setAttributes={ setAttributes }
+			/>,
+			{
+				intent: 'suggest',
+				blocks: [
+					{
+						clientId: 'a',
+						name: 'core/paragraph',
+						attributes: { content: 'Hello' },
+						innerBlocks: [],
+					},
+				],
+			}
+		);
 
-			fireEvent.click( screen.getByRole( 'button', { name: 'edit' } ) );
-			act( () => {
-				jest.advanceTimersByTime( 100 );
-			} );
+		fireEvent.click( screen.getByRole( 'button', { name: 'edit' } ) );
 
-			expect( screen.getByTestId( 'content' ) ).toHaveTextContent(
-				/<del class="has-suggestion-deletion">Hello<\/del>/
-			);
-			expect( screen.getByTestId( 'content' ) ).toHaveTextContent(
-				/<ins class="has-suggestion-addition">proposed<\/ins>/
-			);
-		} finally {
-			jest.useRealTimers();
-		}
+		expect( screen.getByTestId( 'content' ) ).toHaveTextContent(
+			/<del class="has-suggestion-deletion">Hello<\/del>/
+		);
+		expect( screen.getByTestId( 'content' ) ).toHaveTextContent(
+			/<ins class="has-suggestion-addition">proposed<\/ins>/
+		);
 	} );
 
 	it( 're-captures baseline when overlay is cleared then re-edited', () => {

@@ -32,13 +32,7 @@ import clsx from 'clsx';
  */
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
-import {
-	useCallback,
-	useEffect,
-	useMemo,
-	useRef,
-	useState,
-} from '@wordpress/element';
+import { useCallback, useMemo, useRef } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 import { store as coreStore } from '@wordpress/core-data';
 
@@ -377,34 +371,6 @@ function SuggestingBlockEdit( { BlockEdit, props, isSuggestMode } ) {
 		]
 	);
 
-	// Idle-debounce mark rendering: when `overlayAttributes` is unchanged
-	// across a ~100 ms window, treat the user as no longer typing and
-	// surface the marks. A discrete edit (range Delete, single Backspace,
-	// paste) generates one overlay write followed by silence, so marks
-	// appear within ~100 ms — imperceptibly close to "immediately" without
-	// fighting RichText's value-prop reconciliation mid-burst. Continuous
-	// typing re-arms the timer on every keystroke, so marks stay hidden
-	// until the user pauses.
-	const [ isOverlayIdle, setIsOverlayIdle ] = useState( false );
-	const lastOverlayRef = useRef( overlayAttributes );
-	if ( lastOverlayRef.current !== overlayAttributes ) {
-		// Reset the idle flag synchronously during render. This is React's
-		// "storing information from previous renders" pattern — calling
-		// `setIsOverlayIdle` here causes React to retry the render with the
-		// new state value before committing, so the current render computes
-		// the gate against the fresh `false` without a one-frame flash of
-		// marked output between an overlay change and the effect below.
-		lastOverlayRef.current = overlayAttributes;
-		setIsOverlayIdle( false );
-	}
-	useEffect( () => {
-		if ( ! overlayAttributes ) {
-			return;
-		}
-		const handle = window.setTimeout( () => setIsOverlayIdle( true ), 100 );
-		return () => window.clearTimeout( handle );
-	}, [ overlayAttributes ] );
-
 	const mergedAttributes = useMemo( () => {
 		// Reviewer view of a hydrated entry: only merge + mark while the
 		// real block's rich-text content still matches the suggester's
@@ -418,12 +384,14 @@ function SuggestingBlockEdit( { BlockEdit, props, isSuggestMode } ) {
 			return attributes;
 		}
 		const merged = mergeOverlayAttributes( attributes, overlayAttributes );
-		// Skip marking only while the block is selected AND the user is
-		// actively writing into the overlay (`! isOverlayIdle`). The block
-		// being merely selected isn't enough — a user who has stopped typing
-		// expects to see their change reflected. Once focus moves away, the
-		// `isSelected` check goes false and marks render immediately.
-		if ( isSelected && ! isOverlayIdle ) {
+		// While the block is selected, hand back the plain proposed value
+		// so the user's caret doesn't fight RichText's value-prop
+		// reconciliation when marks are swapped in mid-edit. Round-tripping
+		// marked HTML through RichText can land the caret inside a `<del>`
+		// or at the start of an `<ins>`, which then turns the next
+		// keystroke into a stripped/reversed insertion. Marks reappear as
+		// soon as focus moves off the block.
+		if ( isSelected ) {
 			return merged;
 		}
 		return applyDiffMarks( merged, baselineAttributes, authorColor );
@@ -432,7 +400,6 @@ function SuggestingBlockEdit( { BlockEdit, props, isSuggestMode } ) {
 		overlayAttributes,
 		baselineAttributes,
 		isSelected,
-		isOverlayIdle,
 		authorColor,
 		isHydratedReviewerView,
 	] );
