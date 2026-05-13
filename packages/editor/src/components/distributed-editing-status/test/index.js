@@ -1033,7 +1033,7 @@ describe( 'DistributedEditingStatus', () => {
 		);
 
 		expect( await screen.findByRole( 'status' ) ).toHaveTextContent(
-			'Clipboard unavailable. Copying local changes is not available in this browser session.'
+			'Clipboard unavailable. Local changes remain protected in this editor session; keep this tab open and try exporting again after clipboard access is available.'
 		);
 		expect(
 			actions.__experimentalSaveDistributedEditingRetryAfterProof
@@ -1074,7 +1074,58 @@ describe( 'DistributedEditingStatus', () => {
 		).not.toHaveBeenCalled();
 		expect(
 			await screen.findByText(
-				'Server version refreshed. Review local changes before retrying.'
+				'Server version refreshed. Local changes remain protected and exportable while you review before retrying.'
+			)
+		).toBeVisible();
+	} );
+
+	it( 'reports blocked retry-save refetch failure while keeping export available', async () => {
+		const user = userEvent.setup();
+		const actions = setupDistributedEditingStatusDispatch();
+		actions.__experimentalRefreshDistributedEditingServerStateAfterStaleBase.mockRejectedValue(
+			{ code: 'rest_cannot_edit' }
+		);
+
+		setupDistributedEditingStatusSelect( {
+			sessionState: {
+				pendingChangeCount: 1,
+				hasPendingChanges: true,
+				canExportLocalUpdates: true,
+				requiresServerStateRefetch: true,
+				retrySaveHandoffStatus:
+					DISTRIBUTED_EDITING_RETRY_SAVE_HANDOFF_STATUSES.RETRY_SAVE_BLOCKED,
+				retrySaveHandoffReason:
+					DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.SERVER_STATE_REFETCH_REQUIRED,
+				retrySaveHandoffBlocksNormalSave: true,
+			},
+		} );
+
+		render( <DistributedEditingStatusChrome /> );
+
+		await user.click(
+			screen.getByRole( 'button', {
+				name: 'Refresh server version',
+			} )
+		);
+
+		expect(
+			actions.__experimentalRefreshDistributedEditingServerStateAfterStaleBase
+		).toHaveBeenCalledTimes( 1 );
+		expect(
+			actions.__experimentalSaveDistributedEditingRetryAfterProof
+		).not.toHaveBeenCalled();
+		expect(
+			screen.getByRole( 'button', {
+				name: 'Export local changes',
+			} )
+		).toBeVisible();
+		expect( await screen.findByRole( 'status' ) ).toHaveAttribute(
+			'data-distributed-editing-action-status',
+			'error'
+		);
+		expect(
+			screen.getByText(
+				'Server version could not be refreshed. Local changes remain protected and exportable in this editor session; keep this tab open before trying again.'
 			)
 		).toBeVisible();
 	} );
@@ -1145,7 +1196,7 @@ describe( 'DistributedEditingStatus', () => {
 		);
 		expect(
 			screen.getByText(
-				'Server version refreshed. Review local changes before retrying.'
+				'Server version refreshed. Local changes remain protected and exportable while you review before retrying.'
 			)
 		).toBeVisible();
 	} );

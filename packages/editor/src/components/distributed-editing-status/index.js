@@ -894,7 +894,7 @@ export default function DistributedEditingStatus( {
 							setActionStatus( {
 								status: 'warning',
 								message: __(
-									'Clipboard unavailable. Copying local changes is not available in this browser session.'
+									'Clipboard unavailable. Local changes remain protected in this editor session; keep this tab open and try exporting again after clipboard access is available.'
 								),
 							} );
 						}
@@ -940,7 +940,7 @@ export default function DistributedEditingStatus( {
 						setActionStatus( {
 							status: 'info',
 							message: __(
-								'Server version refreshed. Review local changes before retrying.'
+								'Server version refreshed. Local changes remain protected and exportable while you review before retrying.'
 							),
 						} );
 						return refetchResult;
@@ -1015,7 +1015,7 @@ function getActionErrorMessage( actionKey ) {
 	switch ( actionKey ) {
 		case DISTRIBUTED_EDITING_NOTICE_ACTIONS.EXPORT_LOCAL_UPDATES:
 			return __(
-				'Local changes could not be copied. They remain protected in this editor session.'
+				'Local changes could not be copied. They remain protected and exportable in this editor session; keep this tab open before trying again.'
 			);
 		case DISTRIBUTED_EDITING_NOTICE_ACTIONS.PREPARE_RETRY_SUBMIT:
 			return __(
@@ -1031,7 +1031,7 @@ function getActionErrorMessage( actionKey ) {
 			);
 		case DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFETCH_SERVER_STATE:
 			return __(
-				'Server version could not be refreshed. Local changes remain protected.'
+				'Server version could not be refreshed. Local changes remain protected and exportable in this editor session; keep this tab open before trying again.'
 			);
 		case DISTRIBUTED_EDITING_NOTICE_ACTIONS.REBASE_LOCAL_UPDATES:
 			return __(
