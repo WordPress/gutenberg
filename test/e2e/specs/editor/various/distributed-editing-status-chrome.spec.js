@@ -67,6 +67,17 @@ async function getDistributedEditingState( page ) {
 			retrySaveRevisionCreated: state.retrySaveRevisionCreated,
 			retrySaveCreatedRevisionIds: state.retrySaveCreatedRevisionIds,
 			canExportLocalUpdates: state.canExportLocalUpdates,
+			hasPendingChanges: state.hasPendingChanges,
+			isAwaitingServerConfirmation: state.isAwaitingServerConfirmation,
+			mustOfferLocalCopy: state.mustOfferLocalCopy,
+			requiresServerStateRefetch: state.requiresServerStateRefetch,
+			refetchedServerContent: state.refetchedServerContent,
+			refetchedServerState: state.refetchedServerState,
+			retrySaveStatus: state.retrySaveStatus,
+			retrySaveHandoffStatus: state.retrySaveHandoffStatus,
+			retrySaveHandoffReason: state.retrySaveHandoffReason,
+			retrySaveHandoffBlocksNormalSave:
+				state.retrySaveHandoffBlocksNormalSave,
 		};
 	} );
 }
@@ -215,6 +226,49 @@ async function seedBlockedRetrySaveRefetchState( page ) {
 			baseContent: BASE_CONTENT,
 		}
 	);
+}
+
+async function seedRetrySaveInProgressState( page ) {
+	await page.evaluate(
+		( { baseContent } ) => {
+			window.wp.data.dispatch( 'core/editor' ).updateEditorSettings( {
+				distributedEditing: {
+					enabled: true,
+					retrySaveHandoff: true,
+				},
+			} );
+			window.wp.data
+				.dispatch( 'core/editor' )
+				.setDistributedEditingSessionState( {
+					disposition: 'idle',
+					clientBaseVersion: '4',
+					serverVersion: '7',
+					clientBaseContent: baseContent,
+					pendingChangeCount: 1,
+					hasPendingChanges: true,
+					canExportLocalUpdates: true,
+					retrySubmitProofStatus: 'accepted_for_future_save',
+					retrySubmitAccepted: true,
+					retrySubmitSavePathRequired: true,
+					retrySubmitSaveStatus: 'ready',
+					retrySubmitSavePrepared: true,
+					retrySubmitSaveReady: true,
+					retrySaveStatus: 'saving',
+				} );
+		},
+		{
+			baseContent: BASE_CONTENT,
+		}
+	);
+}
+
+async function editPostContent( page, editor, content ) {
+	await page.evaluate( ( nextContent ) => {
+		window.wp.data
+			.dispatch( 'core/editor' )
+			.editPost( { content: nextContent } );
+	}, content );
+	await expect.poll( editor.getEditedPostContent ).toBe( content );
 }
 
 test.describe( 'Distributed Editing status chrome', () => {
@@ -797,6 +851,234 @@ test.describe( 'Distributed Editing status chrome', () => {
 		expect( guardedRetrySaveRequestCount ).toBe( 0 );
 	} );
 
+	test( 'reports unavailable clipboard from blocked retry-save status without writing', async ( {
+		admin,
+		editor,
+		page,
+	} ) => {
+		await admin.createNewPost();
+		await expect(
+			editor.canvas.getByRole( 'textbox', { name: 'Add title' } )
+		).toBeFocused();
+
+		let guardedRetrySaveRequestCount = 0;
+		let postWriteRequestCount = 0;
+
+		await page.route( isGuardedRetrySaveRequest, async ( route ) => {
+			guardedRetrySaveRequestCount += 1;
+
+			await route.fulfill( {
+				status: 500,
+				contentType: 'application/json',
+				body: JSON.stringify( {
+					code: 'unexpected_retry_save_request',
+					message:
+						'Exporting blocked status chrome changes should not call guarded retry-save.',
+				} ),
+			} );
+		} );
+		await page.route( isPostRestRequest, async ( route ) => {
+			const request = route.request();
+
+			if ( request.method() !== 'GET' ) {
+				postWriteRequestCount += 1;
+
+				await route.fulfill( {
+					status: 500,
+					contentType: 'application/json',
+					body: JSON.stringify( {
+						code: 'unexpected_post_write_request',
+						message:
+							'Exporting blocked status chrome changes should not save post content.',
+					} ),
+				} );
+				return;
+			}
+
+			await route.continue();
+		} );
+
+		await editPostContent( page, editor, LOCAL_PENDING_CONTENT );
+		await seedBlockedRetrySaveRefetchState( page );
+		await page.evaluate( () => {
+			Object.defineProperty( window.navigator, 'clipboard', {
+				configurable: true,
+				value: undefined,
+			} );
+		} );
+
+		const statusChrome = getStatusChrome( page );
+		await expect(
+			page.locator( INTERNAL_INSPECTOR_SELECTOR )
+		).toBeHidden();
+		await expect( statusChrome ).toBeVisible();
+		await expect(
+			statusChrome.getByText( 'Retry save needs server refresh' )
+		).toBeVisible();
+
+		await statusChrome
+			.getByRole( 'button', { name: 'Export local changes' } )
+			.first()
+			.click();
+
+		await expect( getActionStatus( statusChrome ) ).toHaveAttribute(
+			'data-distributed-editing-action-status',
+			'warning'
+		);
+		await expect(
+			statusChrome.getByText(
+				'Clipboard unavailable. Local changes remain protected in this editor session; keep this tab open and try exporting again after clipboard access is available.'
+			)
+		).toBeVisible();
+		await expect(
+			statusChrome
+				.getByRole( 'button', {
+					name: 'Export local changes',
+				} )
+				.first()
+		).toBeVisible();
+		await expect
+			.poll( editor.getEditedPostContent )
+			.toBe( LOCAL_PENDING_CONTENT );
+		await expect
+			.poll( () => getDistributedEditingState( page ) )
+			.toMatchObject( {
+				canExportLocalUpdates: true,
+				hasPendingChanges: true,
+				mustOfferLocalCopy: true,
+				retrySaveHandoffStatus: 'retry_save_blocked',
+				retrySaveHandoffReason: 'server_state_refetch_required',
+				retrySaveHandoffBlocksNormalSave: true,
+			} );
+		expect( guardedRetrySaveRequestCount ).toBe( 0 );
+		expect( postWriteRequestCount ).toBe( 0 );
+	} );
+
+	test( 'reports refetch failure from blocked retry-save status without save side effects', async ( {
+		admin,
+		editor,
+		page,
+	} ) => {
+		await admin.createNewPost();
+		await expect(
+			editor.canvas.getByRole( 'textbox', { name: 'Add title' } )
+		).toBeFocused();
+
+		let refetchRequestCount = 0;
+		let guardedRetrySaveRequestCount = 0;
+		let postWriteRequestCount = 0;
+
+		await page.route( isGuardedRetrySaveRequest, async ( route ) => {
+			guardedRetrySaveRequestCount += 1;
+
+			await route.fulfill( {
+				status: 500,
+				contentType: 'application/json',
+				body: JSON.stringify( {
+					code: 'unexpected_retry_save_request',
+					message:
+						'Failing status chrome server refetch should not call guarded retry-save.',
+				} ),
+			} );
+		} );
+		await page.route( isPostRestRequest, async ( route ) => {
+			const request = route.request();
+			const requestUrl = new URL( request.url() );
+
+			if (
+				request.method() === 'GET' &&
+				isPostEditRefetchRequest( requestUrl )
+			) {
+				refetchRequestCount += 1;
+
+				await route.fulfill( {
+					status: 503,
+					contentType: 'application/json',
+					body: JSON.stringify( {
+						code: 'de_rtc_refetch_unavailable',
+						message: 'The server version could not be refreshed.',
+					} ),
+				} );
+				return;
+			}
+
+			if ( request.method() !== 'GET' ) {
+				postWriteRequestCount += 1;
+
+				await route.fulfill( {
+					status: 500,
+					contentType: 'application/json',
+					body: JSON.stringify( {
+						code: 'unexpected_post_write_request',
+						message:
+							'Failing status chrome server refetch should not save post content.',
+					} ),
+				} );
+				return;
+			}
+
+			await route.continue();
+		} );
+
+		await editPostContent( page, editor, LOCAL_PENDING_CONTENT );
+		await seedBlockedRetrySaveRefetchState( page );
+
+		const statusChrome = getStatusChrome( page );
+		await expect(
+			page.locator( INTERNAL_INSPECTOR_SELECTOR )
+		).toBeHidden();
+		await expect( statusChrome ).toBeVisible();
+		await expect(
+			statusChrome.getByText( 'Retry save needs server refresh' )
+		).toBeVisible();
+
+		await statusChrome
+			.getByRole( 'button', { name: 'Refresh server version' } )
+			.first()
+			.click();
+
+		await expect( getActionStatus( statusChrome ) ).toHaveAttribute(
+			'data-distributed-editing-action-status',
+			'error'
+		);
+		await expect(
+			statusChrome.getByText(
+				'Server version could not be refreshed. Local changes remain protected and exportable in this editor session; keep this tab open before trying again.'
+			)
+		).toBeVisible();
+		await expect(
+			statusChrome
+				.getByRole( 'button', {
+					name: 'Export local changes',
+				} )
+				.first()
+		).toBeVisible();
+		await expect(
+			statusChrome
+				.getByRole( 'button', {
+					name: 'Refresh server version',
+				} )
+				.first()
+		).toBeVisible();
+		await expect
+			.poll( () => getDistributedEditingState( page ) )
+			.toMatchObject( {
+				refetchedServerContent: null,
+				refetchedServerState: false,
+				requiresServerStateRefetch: true,
+				canExportLocalUpdates: true,
+				retrySaveHandoffStatus: 'retry_save_blocked',
+				retrySaveHandoffReason: 'server_state_refetch_required',
+				retrySaveHandoffBlocksNormalSave: true,
+			} );
+		await expect
+			.poll( editor.getEditedPostContent )
+			.toBe( LOCAL_PENDING_CONTENT );
+		expect( refetchRequestCount ).toBe( 1 );
+		expect( guardedRetrySaveRequestCount ).toBe( 0 );
+		expect( postWriteRequestCount ).toBe( 0 );
+	} );
+
 	test( 'refreshes server state from a blocked retry-save status without saving', async ( {
 		admin,
 		context,
@@ -996,6 +1278,111 @@ test.describe( 'Distributed Editing status chrome', () => {
 			.poll( editor.getEditedPostContent )
 			.toBe( LOCAL_PENDING_CONTENT );
 		expect( refetchRequestCount ).toBe( 1 );
+		expect( guardedRetrySaveRequestCount ).toBe( 0 );
+		expect( postWriteRequestCount ).toBe( 0 );
+	} );
+
+	test( 'blocks normal save while retry-save is already in progress', async ( {
+		admin,
+		editor,
+		page,
+	} ) => {
+		await admin.createNewPost();
+		await expect(
+			editor.canvas.getByRole( 'textbox', { name: 'Add title' } )
+		).toBeFocused();
+
+		let guardedRetrySaveRequestCount = 0;
+		let postWriteRequestCount = 0;
+
+		await page.route( isGuardedRetrySaveRequest, async ( route ) => {
+			guardedRetrySaveRequestCount += 1;
+
+			await route.fulfill( {
+				status: 500,
+				contentType: 'application/json',
+				body: JSON.stringify( {
+					code: 'unexpected_retry_save_request',
+					message:
+						'Blocked in-flight retry-save state should not submit another guarded retry-save.',
+				} ),
+			} );
+		} );
+		await page.route( isPostRestRequest, async ( route ) => {
+			const request = route.request();
+
+			if ( request.method() !== 'GET' ) {
+				postWriteRequestCount += 1;
+
+				await route.fulfill( {
+					status: 500,
+					contentType: 'application/json',
+					body: JSON.stringify( {
+						code: 'unexpected_post_write_request',
+						message:
+							'Blocked in-flight retry-save state should not fall back to normal post save.',
+					} ),
+				} );
+				return;
+			}
+
+			await route.continue();
+		} );
+
+		await editPostContent( page, editor, LOCAL_PENDING_CONTENT );
+		await seedRetrySaveInProgressState( page );
+
+		const statusChrome = getStatusChrome( page );
+		await expect(
+			page.locator( INTERNAL_INSPECTOR_SELECTOR )
+		).toBeHidden();
+		await expect( statusChrome ).toBeVisible();
+		await expect(
+			statusChrome.getByText( 'Retry save in progress' )
+		).toBeVisible();
+		await expect(
+			statusChrome.getByText(
+				'The editor is sending rebased changes through the guarded retry-save path. Keep this tab open until the server confirms the save.'
+			)
+		).toBeVisible();
+
+		const saveResult = await page.evaluate( async () => {
+			return await window.wp.data.dispatch( 'core/editor' ).savePost();
+		} );
+
+		expect( saveResult ).toMatchObject( {
+			status: 'retry_save_blocked',
+			reason: 'retry_save_in_progress',
+			allowsNormalSaveFallback: false,
+			blocksNormalSavePost: true,
+			callsRetrySaveAction: false,
+			callsNormalSavePost: false,
+		} );
+		await expect(
+			statusChrome.getByText( 'Retry save already in progress' )
+		).toBeVisible();
+		await expect(
+			statusChrome.getByText(
+				'A retry save is already waiting for server confirmation. Local changes are still protected; keep this tab open until it finishes.'
+			)
+		).toBeVisible();
+		await expect
+			.poll( () => getDistributedEditingState( page ) )
+			.toMatchObject( {
+				hasPendingChanges: true,
+				isAwaitingServerConfirmation: true,
+				mustOfferLocalCopy: true,
+				canExportLocalUpdates: true,
+				retrySubmitSaveStatus: 'ready',
+				retrySubmitSavePrepared: true,
+				retrySaveStatus: 'saving',
+				retrySaveHandoffStatus: 'retry_save_blocked',
+				retrySaveHandoffReason: 'retry_save_in_progress',
+				retrySaveHandoffBlocksNormalSave: true,
+			} );
+		await expect
+			.poll( editor.getEditedPostContent )
+			.toBe( LOCAL_PENDING_CONTENT );
 		expect( guardedRetrySaveRequestCount ).toBe( 0 );
 		expect( postWriteRequestCount ).toBe( 0 );
 	} );
