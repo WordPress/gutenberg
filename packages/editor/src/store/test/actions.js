@@ -1858,8 +1858,7 @@ describe( 'Post actions', () => {
 					DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.READY,
 				retrySubmitSavePrepared: true,
 				canExportLocalUpdates: true,
-				retrySaveStatus:
-					DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.NONE,
+				retrySaveStatus: DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.NONE,
 				retrySaveHandoffStatus:
 					DISTRIBUTED_EDITING_RETRY_SAVE_HANDOFF_STATUSES.NONE,
 				retrySaveHandoffBlocksNormalSave: false,
@@ -1982,8 +1981,7 @@ describe( 'Post actions', () => {
 					DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.READY,
 				retrySubmitSavePrepared: true,
 				canExportLocalUpdates: true,
-				retrySaveStatus:
-					DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.NONE,
+				retrySaveStatus: DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.NONE,
 				retrySaveHandoffStatus:
 					DISTRIBUTED_EDITING_RETRY_SAVE_HANDOFF_STATUSES.NONE,
 				retrySaveHandoffBlocksNormalSave: false,
@@ -2081,8 +2079,7 @@ describe( 'Post actions', () => {
 				retrySubmitSaveStatus:
 					DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.READY,
 				retrySubmitSavePrepared: true,
-				retrySaveStatus:
-					DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVING,
+				retrySaveStatus: DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVING,
 				retrySaveHandoffStatus:
 					DISTRIBUTED_EDITING_RETRY_SAVE_HANDOFF_STATUSES.RETRY_SAVE_BLOCKED,
 				retrySaveHandoffReason:
