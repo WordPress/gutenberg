@@ -292,10 +292,10 @@ describe( 'distributed editing session state', () => {
 			requiresServerStateRefetch: false,
 			refetchedServerState: true,
 			canAttemptLocalRebase: true,
+			canExportLocalUpdates: true,
 			localRebasePlanStatus:
 				DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES.READY,
 			readyToRetrySubmit: false,
-			canExportLocalUpdates: true,
 		} );
 	} );
 
@@ -737,6 +737,81 @@ describe( 'distributed editing session state', () => {
 				kind: DISTRIBUTED_EDITING_NOTICE_KINDS.REMOTE_CHANGES_RECEIVED,
 			} ),
 		] );
+	} );
+
+	it( 'adds local rebase readiness to stale-base notice descriptors without raw content', () => {
+		const baseContent =
+			'<!-- wp:paragraph --><p>Base</p><!-- /wp:paragraph -->';
+		const serverContent =
+			'<!-- wp:paragraph --><p>Server</p><!-- /wp:paragraph -->';
+		const notices = getDistributedEditingNoticeDescriptorsForSessionState( {
+			disposition:
+				DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+			reasonCode:
+				DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+			pendingChangeCount: 1,
+			remoteChangeCount: 1,
+			requiresServerStateRefetch: false,
+			refetchedServerState: true,
+			canAttemptLocalRebase: true,
+			canExportLocalUpdates: true,
+			localRebasePlanStatus:
+				DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES.READY,
+			clientBaseContent: baseContent,
+			refetchedServerContent: serverContent,
+		} );
+
+		expect( notices[ 0 ] ).toMatchObject( {
+			kind: DISTRIBUTED_EDITING_NOTICE_KINDS.STALE_BASE_REJECTED,
+			canAttemptLocalRebase: true,
+			localRebasePlanStatus:
+				DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES.READY,
+			localRebaseResultStatus:
+				DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.NONE,
+			readyToRetrySubmit: false,
+			hasClientBaseContent: true,
+			hasRefetchedServerContent: true,
+			hasLocalRebaseInputs: true,
+			actionKeys: [
+				DISTRIBUTED_EDITING_NOTICE_ACTIONS.EXPORT_LOCAL_UPDATES,
+				DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFETCH_SERVER_STATE,
+				DISTRIBUTED_EDITING_NOTICE_ACTIONS.REBASE_LOCAL_UPDATES,
+			],
+		} );
+		expect( JSON.stringify( notices[ 0 ] ) ).not.toContain( baseContent );
+		expect( JSON.stringify( notices[ 0 ] ) ).not.toContain( serverContent );
+	} );
+
+	it( 'withholds local rebase notice actions when remembered inputs are missing', () => {
+		const notices = getDistributedEditingNoticeDescriptorsForSessionState( {
+			disposition:
+				DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+			reasonCode:
+				DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+			pendingChangeCount: 1,
+			remoteChangeCount: 1,
+			requiresServerStateRefetch: false,
+			refetchedServerState: true,
+			canAttemptLocalRebase: true,
+			canExportLocalUpdates: true,
+			localRebasePlanStatus:
+				DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES.READY,
+			refetchedServerContent: '',
+		} );
+
+		expect( notices[ 0 ] ).toMatchObject( {
+			kind: DISTRIBUTED_EDITING_NOTICE_KINDS.STALE_BASE_REJECTED,
+			canAttemptLocalRebase: true,
+			localRebasePlanStatus:
+				DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES.READY,
+			hasClientBaseContent: false,
+			hasRefetchedServerContent: true,
+			hasLocalRebaseInputs: false,
+			actionKeys: [
+				DISTRIBUTED_EDITING_NOTICE_ACTIONS.EXPORT_LOCAL_UPDATES,
+				DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFETCH_SERVER_STATE,
+			],
+		} );
 	} );
 
 	it( 'builds unload-warning integration state without rendered copy', () => {

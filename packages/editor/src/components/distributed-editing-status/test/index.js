@@ -13,6 +13,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import DistributedEditingStatus, {
+	DistributedEditingLocalRebaseStateInspector,
 	DistributedEditingStatusInspector,
 	DistributedEditingRecoveryDryRunControls,
 	DistributedEditingStatusTestControls,
@@ -23,6 +24,8 @@ import DistributedEditingStatus, {
 } from '../';
 import {
 	DISTRIBUTED_EDITING_DISPOSITIONS,
+	DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES,
+	DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES,
 	DISTRIBUTED_EDITING_NOTICE_ACTIONS,
 	DISTRIBUTED_EDITING_NOTICE_KINDS,
 	DISTRIBUTED_EDITING_REASON_CODES,
@@ -87,6 +90,10 @@ describe( 'getDistributedEditingStatusControlStates', () => {
 			'remoteChanges',
 			'serverStateConflict',
 			'staleBaseRejected',
+			'staleBaseRebaseReady',
+			'staleBaseRebaseMissingInputs',
+			'staleBaseRebased',
+			'staleBaseRebaseConflict',
 			'manualResolution',
 		] );
 		expect( states.pendingLocalChanges ).toEqual( {
@@ -114,6 +121,31 @@ describe( 'getDistributedEditingStatusControlStates', () => {
 				DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
 			pendingChangeCount: 1,
 			remoteChangeCount: 1,
+		} );
+		expect( states.staleBaseRebaseReady ).toEqual( {
+			disposition:
+				DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+			reasonCode:
+				DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+			pendingChangeCount: 1,
+			remoteChangeCount: 1,
+			requiresServerStateRefetch: false,
+			refetchedServerState: true,
+			canAttemptLocalRebase: true,
+			canExportLocalUpdates: true,
+			localRebasePlanStatus:
+				DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES.READY,
+			clientBaseContent: '',
+			refetchedServerContent: '',
+		} );
+		expect( states.staleBaseRebased ).toMatchObject( {
+			localRebasePlanStatus:
+				DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES.READY,
+			localRebaseResultStatus:
+				DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.REBASED,
+			readyToRetrySubmit: true,
+			clientBaseContent: '',
+			refetchedServerContent: '',
 		} );
 		expect( states.manualResolution ).toEqual( {
 			disposition:
@@ -205,12 +237,63 @@ describe( 'DistributedEditingStatusInspector', () => {
 				name: 'Run recovery dry run',
 			} )
 		).toBeVisible();
+		expect( screen.getByText( 'Local rebase plan' ) ).toBeVisible();
+		expect( screen.getByText( 'Local rebase result' ) ).toBeVisible();
 		expect(
 			screen.getByRole( 'region', {
 				name: 'Distributed editing status',
 			} )
 		).toBeVisible();
 		expect( screen.getByText( 'Remote changes received' ) ).toBeVisible();
+	} );
+} );
+
+describe( 'DistributedEditingLocalRebaseStateInspector', () => {
+	it( 'exposes local rebase status and input readiness without raw content', () => {
+		setupDistributedEditingStatusSelect( {
+			sessionState: {
+				localRebasePlanStatus:
+					DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES.READY,
+				localRebaseResultStatus:
+					DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.REBASED,
+				clientBaseContent:
+					'<!-- wp:paragraph --><p>Base</p><!-- /wp:paragraph -->',
+				refetchedServerContent:
+					'<!-- wp:paragraph --><p>Server</p><!-- /wp:paragraph -->',
+				readyToRetrySubmit: true,
+			},
+		} );
+
+		render( <DistributedEditingLocalRebaseStateInspector /> );
+
+		expect( screen.getByText( 'Local rebase plan' ) ).toBeVisible();
+		expect( screen.getByText( 'ready' ) ).toBeVisible();
+		expect( screen.getByText( 'Local rebase result' ) ).toBeVisible();
+		expect( screen.getByText( 'rebased' ) ).toBeVisible();
+		expect( screen.getByText( 'Client base input' ) ).toBeVisible();
+		expect( screen.getByText( 'Refetched server input' ) ).toBeVisible();
+		expect( screen.getAllByText( 'Available' ) ).toHaveLength( 2 );
+		expect( screen.getByText( 'Retry submit' ) ).toBeVisible();
+		expect( screen.getByText( 'Ready' ) ).toBeVisible();
+		expect( screen.queryByText( /wp:paragraph/ ) ).not.toBeInTheDocument();
+	} );
+
+	it( 'marks missing local rebase inputs in the internal inspector', () => {
+		setupDistributedEditingStatusSelect( {
+			sessionState: {
+				localRebasePlanStatus:
+					DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES.READY,
+				refetchedServerContent: '',
+			},
+		} );
+
+		render( <DistributedEditingLocalRebaseStateInspector /> );
+
+		expect( screen.getByText( 'ready' ) ).toBeVisible();
+		expect( screen.getByText( 'none' ) ).toBeVisible();
+		expect( screen.getByText( 'Missing' ) ).toBeVisible();
+		expect( screen.getByText( 'Available' ) ).toBeVisible();
+		expect( screen.getByText( 'Not ready' ) ).toBeVisible();
 	} );
 } );
 
@@ -505,6 +588,12 @@ describe( 'DistributedEditingStatusSurface', () => {
 				pendingChangeCount: 1,
 				remoteChangeCount: 1,
 				canAttemptLocalRebase: true,
+				refetchedServerState: true,
+				localRebasePlanStatus:
+					DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES.READY,
+				canExportLocalUpdates: true,
+				clientBaseContent: '',
+				refetchedServerContent: '',
 			} );
 
 		render(
@@ -514,10 +603,10 @@ describe( 'DistributedEditingStatusSurface', () => {
 			/>
 		);
 
-		expect( screen.getByText( 'Server version changed' ) ).toBeVisible();
+		expect( screen.getByText( 'Local rebase ready' ) ).toBeVisible();
 		expect(
 			screen.getByText(
-				'Refresh the server version before retrying local changes.'
+				'Local changes can be rebased over the refreshed server version.'
 			)
 		).toBeVisible();
 
@@ -543,6 +632,82 @@ describe( 'DistributedEditingStatusSurface', () => {
 				name: 'Export local changes',
 			} )
 		).toBeVisible();
+	} );
+
+	it( 'renders stale-base missing-input status without a rebase action', () => {
+		const noticeDescriptors =
+			getDistributedEditingNoticeDescriptorsForSessionState( {
+				disposition:
+					DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+				reasonCode:
+					DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+				pendingChangeCount: 1,
+				remoteChangeCount: 1,
+				canAttemptLocalRebase: true,
+				refetchedServerState: true,
+				localRebasePlanStatus:
+					DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES.READY,
+				canExportLocalUpdates: true,
+				refetchedServerContent: '',
+			} );
+
+		render(
+			<DistributedEditingStatusSurface
+				noticeDescriptors={ noticeDescriptors }
+				onAction={ jest.fn() }
+			/>
+		);
+
+		expect(
+			screen.getByText( 'Local rebase inputs missing' )
+		).toBeVisible();
+		expect(
+			screen.getByText(
+				'Retain both the client base and refreshed server version before retrying local changes.'
+			)
+		).toBeVisible();
+		expect(
+			screen.queryByRole( 'button', {
+				name: 'Retry local changes',
+			} )
+		).not.toBeInTheDocument();
+	} );
+
+	it( 'renders stale-base rebase result status without leaking content', () => {
+		const noticeDescriptors =
+			getDistributedEditingNoticeDescriptorsForSessionState( {
+				disposition:
+					DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+				reasonCode:
+					DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+				pendingChangeCount: 1,
+				remoteChangeCount: 1,
+				refetchedServerState: true,
+				localRebasePlanStatus:
+					DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES.READY,
+				localRebaseResultStatus:
+					DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.REBASED,
+				readyToRetrySubmit: true,
+				canExportLocalUpdates: true,
+				clientBaseContent:
+					'<!-- wp:paragraph --><p>Base</p><!-- /wp:paragraph -->',
+				refetchedServerContent:
+					'<!-- wp:paragraph --><p>Server</p><!-- /wp:paragraph -->',
+			} );
+
+		render(
+			<DistributedEditingStatusSurface
+				noticeDescriptors={ noticeDescriptors }
+			/>
+		);
+
+		expect( screen.getByText( 'Local changes rebased' ) ).toBeVisible();
+		expect(
+			screen.getByText(
+				'Local changes were merged with the server version and are ready for the next submit.'
+			)
+		).toBeVisible();
+		expect( screen.queryByText( /wp:paragraph/ ) ).not.toBeInTheDocument();
 	} );
 
 	it( 'renders manual resolution for missing sync metadata', () => {

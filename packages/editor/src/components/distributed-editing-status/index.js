@@ -12,6 +12,8 @@ import { __, _n, sprintf } from '@wordpress/i18n';
 import { store as editorStore } from '../../store';
 import {
 	DISTRIBUTED_EDITING_DISPOSITIONS,
+	DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES,
+	DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES,
 	DISTRIBUTED_EDITING_NOTICE_ACTIONS,
 	DISTRIBUTED_EDITING_NOTICE_KINDS,
 	DISTRIBUTED_EDITING_REASON_CODES,
@@ -46,6 +48,73 @@ const DISTRIBUTED_EDITING_STATUS_CONTROL_STATE_DEFINITIONS = Object.freeze( {
 			DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
 		pendingChangeCount: 1,
 		remoteChangeCount: 1,
+	} ),
+	staleBaseRebaseReady: Object.freeze( {
+		disposition:
+			DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+		reasonCode:
+			DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+		pendingChangeCount: 1,
+		remoteChangeCount: 1,
+		requiresServerStateRefetch: false,
+		refetchedServerState: true,
+		canAttemptLocalRebase: true,
+		canExportLocalUpdates: true,
+		localRebasePlanStatus:
+			DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES.READY,
+		clientBaseContent: '',
+		refetchedServerContent: '',
+	} ),
+	staleBaseRebaseMissingInputs: Object.freeze( {
+		disposition:
+			DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+		reasonCode:
+			DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+		pendingChangeCount: 1,
+		remoteChangeCount: 1,
+		requiresServerStateRefetch: false,
+		refetchedServerState: true,
+		canAttemptLocalRebase: true,
+		canExportLocalUpdates: true,
+		localRebasePlanStatus:
+			DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES.READY,
+		refetchedServerContent: '',
+	} ),
+	staleBaseRebased: Object.freeze( {
+		disposition:
+			DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+		reasonCode:
+			DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+		pendingChangeCount: 1,
+		remoteChangeCount: 1,
+		requiresServerStateRefetch: false,
+		refetchedServerState: true,
+		canExportLocalUpdates: true,
+		localRebasePlanStatus:
+			DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES.READY,
+		localRebaseResultStatus:
+			DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.REBASED,
+		readyToRetrySubmit: true,
+		clientBaseContent: '',
+		refetchedServerContent: '',
+	} ),
+	staleBaseRebaseConflict: Object.freeze( {
+		disposition:
+			DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+		reasonCode:
+			DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+		pendingChangeCount: 1,
+		remoteChangeCount: 1,
+		requiresServerStateRefetch: false,
+		refetchedServerState: true,
+		canExportLocalUpdates: true,
+		localRebasePlanStatus:
+			DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES.READY,
+		localRebaseResultStatus:
+			DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.MANUAL_CONFLICT_REQUIRED,
+		requiresManualConflictResolution: true,
+		clientBaseContent: '',
+		refetchedServerContent: '',
 	} ),
 	manualResolution: Object.freeze( {
 		disposition:
@@ -181,8 +250,64 @@ export function DistributedEditingStatusInspector( { onAction, onSelect } ) {
 		>
 			<DistributedEditingStatusTestControls onSelect={ onSelect } />
 			<DistributedEditingRecoveryDryRunControls />
+			<DistributedEditingLocalRebaseStateInspector />
 			<DistributedEditingStatus onAction={ onAction } />
 		</div>
+	);
+}
+
+/**
+ * Renders internal local-rebase state details for manual inspection.
+ *
+ * The inspector exposes readiness booleans and status enum values only. It does
+ * not render retained post content, dispatch actions, save, retry submits,
+ * persist editor state, or change post locks.
+ *
+ * @return {React.ReactNode} Rendered internal local-rebase state inspector.
+ */
+export function DistributedEditingLocalRebaseStateInspector() {
+	const sessionState = useSelect( ( select ) => {
+		const { getDistributedEditingSessionState } = select( editorStore );
+
+		return getDistributedEditingSessionState();
+	}, [] );
+	const normalized = normalizeDistributedEditingSessionState( sessionState );
+
+	return (
+		<dl className="editor-distributed-editing-status__local-rebase-state">
+			<div>
+				<dt>{ __( 'Local rebase plan' ) }</dt>
+				<dd>{ normalized.localRebasePlanStatus }</dd>
+			</div>
+			<div>
+				<dt>{ __( 'Local rebase result' ) }</dt>
+				<dd>{ normalized.localRebaseResultStatus }</dd>
+			</div>
+			<div>
+				<dt>{ __( 'Client base input' ) }</dt>
+				<dd>
+					{ normalized.clientBaseContent !== null
+						? __( 'Available' )
+						: __( 'Missing' ) }
+				</dd>
+			</div>
+			<div>
+				<dt>{ __( 'Refetched server input' ) }</dt>
+				<dd>
+					{ normalized.refetchedServerContent !== null
+						? __( 'Available' )
+						: __( 'Missing' ) }
+				</dd>
+			</div>
+			<div>
+				<dt>{ __( 'Retry submit' ) }</dt>
+				<dd>
+					{ normalized.readyToRetrySubmit
+						? __( 'Ready' )
+						: __( 'Not ready' ) }
+				</dd>
+			</div>
+		</dl>
 	);
 }
 
@@ -371,10 +496,7 @@ function getDistributedEditingStatusSurfaceItem( descriptor ) {
 		case DISTRIBUTED_EDITING_NOTICE_KINDS.STALE_BASE_REJECTED:
 			return {
 				...getBaseStatusItem( descriptor ),
-				title: __( 'Server version changed' ),
-				message: __(
-					'Refresh the server version before retrying local changes.'
-				),
+				...getStaleBaseStatusText( descriptor ),
 			};
 		case DISTRIBUTED_EDITING_NOTICE_KINDS.MANUAL_RESOLUTION_REQUIRED:
 			return {
@@ -530,6 +652,14 @@ function getDistributedEditingStatusControlLabel( key ) {
 			return __( 'Server state conflict' );
 		case 'staleBaseRejected':
 			return __( 'Stale base rejected' );
+		case 'staleBaseRebaseReady':
+			return __( 'Local rebase ready' );
+		case 'staleBaseRebaseMissingInputs':
+			return __( 'Local rebase inputs missing' );
+		case 'staleBaseRebased':
+			return __( 'Local changes rebased' );
+		case 'staleBaseRebaseConflict':
+			return __( 'Local rebase conflict' );
 		case 'manualResolution':
 			return __( 'Manual resolution' );
 	}
@@ -553,4 +683,70 @@ function getRecoveryDryRunCommandStatusLabel( commandStatus ) {
 function normalizeCount( value ) {
 	const count = Number( value );
 	return Number.isInteger( count ) && count > 0 ? count : 0;
+}
+
+function getStaleBaseStatusText( descriptor ) {
+	switch ( descriptor.localRebaseResultStatus ) {
+		case DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.REBASED:
+			return {
+				title: __( 'Local changes rebased' ),
+				message: __(
+					'Local changes were merged with the server version and are ready for the next submit.'
+				),
+			};
+		case DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.MANUAL_CONFLICT_REQUIRED:
+			return {
+				title: __( 'Local rebase needs review' ),
+				message: __(
+					'Local and server changes could not be merged automatically.'
+				),
+			};
+		case DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.UNSAFE_CONTENT_BOUNDARY:
+			return {
+				title: __( 'Local rebase blocked' ),
+				message: __(
+					'The local change boundary is unsafe and needs manual review.'
+				),
+			};
+		case DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.BLOCKED_NEEDS_READY_PLAN:
+			return {
+				title: __( 'Local rebase not ready' ),
+				message: __(
+					'Refresh and prepare the server version before retrying local changes.'
+				),
+			};
+	}
+
+	if (
+		descriptor.localRebasePlanStatus ===
+			DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES.READY &&
+		descriptor.hasLocalRebaseInputs === false
+	) {
+		return {
+			title: __( 'Local rebase inputs missing' ),
+			message: __(
+				'Retain both the client base and refreshed server version before retrying local changes.'
+			),
+		};
+	}
+
+	if (
+		descriptor.localRebasePlanStatus ===
+			DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES.READY &&
+		descriptor.hasLocalRebaseInputs
+	) {
+		return {
+			title: __( 'Local rebase ready' ),
+			message: __(
+				'Local changes can be rebased over the refreshed server version.'
+			),
+		};
+	}
+
+	return {
+		title: __( 'Server version changed' ),
+		message: __(
+			'Refresh the server version before retrying local changes.'
+		),
+	};
 }

@@ -698,12 +698,16 @@ export function getDistributedEditingNoticeDescriptorsForSessionState(
 						  ]
 						: [] ),
 					DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFETCH_SERVER_STATE,
-					...( normalized.canAttemptLocalRebase
+					...( normalized.canAttemptLocalRebase &&
+					hasDistributedEditingLocalRebaseInputs( normalized )
 						? [
 								DISTRIBUTED_EDITING_NOTICE_ACTIONS.REBASE_LOCAL_UPDATES,
 						  ]
 						: [] ),
 				],
+				extra: getDistributedEditingLocalRebaseDescriptorFields(
+					normalized
+				),
 			} )
 		);
 	} else if (
@@ -825,6 +829,7 @@ function createNoticeDescriptor(
 		type = 'default',
 		isDismissible = false,
 		actionKeys = [],
+		extra = {},
 	}
 ) {
 	const id = NOTICE_ID_BY_KIND[ kind ];
@@ -839,12 +844,36 @@ function createNoticeDescriptor(
 		pendingChangeCount: normalized.pendingChangeCount,
 		remoteChangeCount: normalized.remoteChangeCount,
 		actionKeys,
+		...extra,
 		noticeOptions: {
 			id,
 			type,
 			isDismissible,
 		},
 	};
+}
+
+function getDistributedEditingLocalRebaseDescriptorFields( normalized ) {
+	const hasClientBaseContent = normalized.clientBaseContent !== null;
+	const hasRefetchedServerContent =
+		normalized.refetchedServerContent !== null;
+
+	return {
+		canAttemptLocalRebase: normalized.canAttemptLocalRebase,
+		localRebasePlanStatus: normalized.localRebasePlanStatus,
+		localRebaseResultStatus: normalized.localRebaseResultStatus,
+		readyToRetrySubmit: normalized.readyToRetrySubmit,
+		hasClientBaseContent,
+		hasRefetchedServerContent,
+		hasLocalRebaseInputs: hasClientBaseContent && hasRefetchedServerContent,
+	};
+}
+
+function hasDistributedEditingLocalRebaseInputs( normalized ) {
+	return (
+		normalized.clientBaseContent !== null &&
+		normalized.refetchedServerContent !== null
+	);
 }
 
 function normalizeCount( value ) {
