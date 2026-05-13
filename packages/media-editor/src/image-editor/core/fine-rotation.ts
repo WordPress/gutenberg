@@ -15,6 +15,28 @@ const FINE_ROTATION_EPSILON = 1e-6;
  * offset stably representable in the same snap base.
  */
 const FINE_ROTATION_BOUNDARY_EPSILON = 0.01;
+const FINE_ROTATION_SAFE_MAX =
+	MAX_ROTATION_OFFSET - FINE_ROTATION_BOUNDARY_EPSILON;
+
+/**
+ * Normalize the internal boundary pullback back to the advertised endpoint.
+ *
+ * The cropper stores ±44.99° instead of ±45° to keep snap-base derivation
+ * stable, but the fine-rotation control should still read that state as the
+ * public ±45° endpoint it committed.
+ *
+ * @param offset Signed fine-rotation offset in degrees.
+ * @return Offset normalized for display and consumers.
+ */
+function normalizeOffsetForDisplay( offset: number ): number {
+	const absOffset = Math.abs( offset );
+
+	if ( absOffset >= FINE_ROTATION_SAFE_MAX - FINE_ROTATION_EPSILON ) {
+		return Math.sign( offset ) * MAX_ROTATION_OFFSET;
+	}
+
+	return offset;
+}
 
 /**
  * Fine-rotation policy: discrete `±MAX_ROTATION_OFFSET` adjustment around the
@@ -54,7 +76,9 @@ export const fineRotation = {
 	 */
 	offsetFromState( rotation: number, flip: Flip ): number {
 		const baseAngle = Math.round( rotation / 90 ) * 90;
-		return ( rotation - baseAngle ) * this.visualDirection( flip );
+		return normalizeOffsetForDisplay(
+			( rotation - baseAngle ) * this.visualDirection( flip )
+		);
 	},
 
 	/**
@@ -74,11 +98,8 @@ export const fineRotation = {
 	absoluteFromOffset( rotation: number, flip: Flip, offset: number ): number {
 		const baseAngle = Math.round( rotation / 90 ) * 90;
 		const safeOffset = Math.max(
-			-MAX_ROTATION_OFFSET + FINE_ROTATION_BOUNDARY_EPSILON,
-			Math.min(
-				MAX_ROTATION_OFFSET - FINE_ROTATION_BOUNDARY_EPSILON,
-				offset
-			)
+			-FINE_ROTATION_SAFE_MAX,
+			Math.min( FINE_ROTATION_SAFE_MAX, offset )
 		);
 		return baseAngle + safeOffset * this.visualDirection( flip );
 	},
