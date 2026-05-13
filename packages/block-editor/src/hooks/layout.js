@@ -8,6 +8,7 @@ import clsx from 'clsx';
  */
 import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
+import { useCallback } from '@wordpress/element';
 import {
 	getBlockSupport,
 	hasBlockSupport,
@@ -41,7 +42,31 @@ const VARIATION_PREFIX = 'is-style-';
 
 const layoutBlockSupportKey = 'layout';
 const { kebabCase } = unlock( componentsPrivateApis );
-const resetLayoutFilter = () => ( { layout: undefined } );
+
+export function getResetLayout(
+	layoutBlockSupport = {},
+	blockVariation,
+	currentLayout = {}
+) {
+	const defaultBlockLayout =
+		layoutBlockSupport && typeof layoutBlockSupport === 'object'
+			? layoutBlockSupport.default
+			: undefined;
+	const resetLayout =
+		blockVariation?.attributes?.layout ?? defaultBlockLayout;
+	const resetLayoutWithoutType = resetLayout
+		? Object.fromEntries(
+				Object.entries( resetLayout ).filter(
+					( [ key ] ) => key !== 'type'
+				)
+		  )
+		: {};
+
+	return cleanEmptyObject( {
+		...resetLayoutWithoutType,
+		type: currentLayout?.type,
+	} );
+}
 
 function hasLayoutBlockSupport( blockName ) {
 	return (
@@ -164,7 +189,33 @@ function LayoutPanelPure( {
 			themeSupportsLayout: getSettings().supportsLayout,
 		};
 	}, [] );
+	const { getActiveBlockVariation } = useSelect( blocksStore );
 	const blockEditingMode = useBlockEditingMode();
+	const resetLayoutFilter = useCallback(
+		( attributes = {}, context = {} ) => {
+			const resetBlockName = context.name || blockName;
+			const resetBlockAttributes = context.attributes || attributes;
+			const resetLayoutBlockSupport = getBlockSupport(
+				resetBlockName,
+				layoutBlockSupportKey,
+				{}
+			);
+			const activeBlockVariation = getActiveBlockVariation(
+				resetBlockName,
+				resetBlockAttributes,
+				'block'
+			);
+
+			return {
+				layout: getResetLayout(
+					resetLayoutBlockSupport,
+					activeBlockVariation,
+					resetBlockAttributes.layout
+				),
+			};
+		},
+		[ blockName, getActiveBlockVariation ]
+	);
 
 	if ( blockEditingMode !== 'default' ) {
 		return null;
