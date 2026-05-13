@@ -149,14 +149,12 @@ async function getSelectionAttributeKeys( page: Page ) {
 	} );
 }
 
-async function dragBetweenCells( {
+async function selectAcrossCells( {
 	editor,
-	page,
 	startIndex,
 	endIndex,
 }: {
 	editor: Editor;
-	page: Page;
 	startIndex: number;
 	endIndex: number;
 } ) {
@@ -166,20 +164,56 @@ async function dragBetweenCells( {
 	await startCell.scrollIntoViewIfNeeded();
 	await endCell.scrollIntoViewIfNeeded();
 
-	const startBox = await startCell.boundingBox();
-	const endBox = await endCell.boundingBox();
-
-	if ( ! startBox || ! endBox ) {
-		throw new Error( 'Could not resolve table cell bounding boxes' );
+	const endCellHandle = await endCell.elementHandle();
+	if ( ! endCellHandle ) {
+		throw new Error( 'Could not resolve end table cell element' );
 	}
 
-	const startX = startBox.x + Math.min( 20, startBox.width / 2 );
-	const endX = endBox.x + Math.min( 20, endBox.width / 2 );
+	try {
+		await startCell.evaluate( ( startElement, endElement ) => {
+			const ownerDocument = startElement.ownerDocument;
+			// Build the native range directly; table RichText mouse drags are
+			// geometry-dependent in headless browsers.
+			const getTextNode = ( element, last = false ) => {
+				const walker = ownerDocument.createTreeWalker(
+					element,
+					NodeFilter.SHOW_TEXT
+				);
+				let textNode = walker.nextNode();
+				if ( ! last ) {
+					return textNode;
+				}
+				let nextTextNode = walker.nextNode();
+				while ( nextTextNode ) {
+					textNode = nextTextNode;
+					nextTextNode = walker.nextNode();
+				}
+				return textNode;
+			};
+			const startTextNode = getTextNode( startElement );
+			const endTextNode = getTextNode( endElement, true );
+			const selection = ownerDocument.defaultView?.getSelection();
 
-	await page.mouse.move( startX, startBox.y + startBox.height / 2 );
-	await page.mouse.down();
-	await page.mouse.move( endX, endBox.y + endBox.height / 2, { steps: 12 } );
-	await page.mouse.up();
+			if ( ! startTextNode || ! endTextNode || ! selection ) {
+				throw new Error( 'Could not resolve table cell text nodes' );
+			}
+
+			const range = ownerDocument.createRange();
+			range.setStart( startTextNode, 0 );
+			range.setEnd( endTextNode, endTextNode.textContent?.length ?? 0 );
+
+			selection.removeAllRanges();
+			selection.addRange( range );
+			ownerDocument.dispatchEvent(
+				new Event( 'selectionchange', { bubbles: true } )
+			);
+			ownerDocument.defaultView?.dispatchEvent(
+				new MouseEvent( 'mouseup', { bubbles: true } )
+			);
+		}, endCellHandle );
+	} finally {
+		await endCellHandle.dispose();
+	}
 }
 
 test.describe( 'Collaboration - Nested Awareness Selection', () => {
@@ -360,14 +394,13 @@ test.describe( 'Collaboration - Nested Awareness Selection', () => {
 		await expectRemoteCursorInsideCell( page2, 5 );
 	} );
 
-	test( 'mouse drag selection across table cells preserves distinct attribute keys', async ( {
+	test( 'native selection across table cells preserves distinct attribute keys', async ( {
 		collaborationUtils,
 		requestUtils,
 		editor,
-		page,
 	} ) => {
 		const post = await requestUtils.createPost( {
-			title: 'Nested Awareness Selection Cross Cell Drag Test',
+			title: 'Nested Awareness Selection Cross Cell Native Selection Test',
 			status: 'draft',
 			date_gmt: new Date().toISOString(),
 			content: TWO_ROW_TABLE_CONTENT,
@@ -377,9 +410,8 @@ test.describe( 'Collaboration - Nested Awareness Selection', () => {
 
 		await expectTableBlockLoaded( collaborationUtils );
 
-		await dragBetweenCells( {
+		await selectAcrossCells( {
 			editor,
-			page,
 			startIndex: 1,
 			endIndex: 3,
 		} );
