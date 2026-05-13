@@ -84,19 +84,19 @@
 	.handleCorner::after {
 		transition:
 			transform var(--wpds-motion-duration-xs)
-			var(--wpds-motion-easing-subtle),
+			var(--wpds-motion-easing-balanced),
 			border-block-end-color var(--wpds-motion-duration-xs)
-			var(--wpds-motion-easing-subtle),
+			var(--wpds-motion-easing-balanced),
 			border-inline-end-color var(--wpds-motion-duration-xs)
-			var(--wpds-motion-easing-subtle);
+			var(--wpds-motion-easing-balanced);
 	}
 
 	.handleHorizontal::after {
 		transition:
 			transform var(--wpds-motion-duration-xs)
-			var(--wpds-motion-easing-subtle),
+			var(--wpds-motion-easing-balanced),
 			background-color var(--wpds-motion-duration-xs)
-			var(--wpds-motion-easing-subtle);
+			var(--wpds-motion-easing-balanced);
 	}
 }
 
