@@ -8,25 +8,10 @@ $z-layers: (
 	".block-editor-block-list__block.is-selected": 20,
 	".editor-text-editor__toolbar": 1,
 
-	// These next three share a stacking context
-	".block-library-template-part__selection-search": 2, // higher sticky element
-	".block-library-query-pattern__selection-search": 2, // higher sticky element
-	".editor-post-template__swap-template-search": 2, // higher sticky element
-
 	".components-modal__header": 10,
-	".edit-post-meta-boxes-area.is-loading::before": 1,
-	".edit-post-meta-boxes-area .spinner": 5,
-	".components-popover__close": 5,
 	".edit-post-layout__footer": 30,
 	".interface-interface-skeleton__header": 30,
 	".interface-interface-skeleton__content": 20,
-
-	".wp-block-cover.is-placeholder .components-placeholder.is-large": 1, // Cover block resizer component inside a large placeholder.
-	// These z-index are now used only for a deprecated version of the cover block.
-	".wp-block-cover__inner-container": 1, // InnerBlocks area inside cover image block.
-	".wp-block-cover.has-background-dim::before": 1, // Overlay area inside block cover need to be higher than the video background.
-	".wp-block-cover__image-background": 0, // Image background inside cover block.
-	".wp-block-cover__video-background": 0, // Video background inside cover block.
 
 	// Fixed position appender:
 	".block-editor-block-list__block .block-list-appender": 2,
@@ -135,28 +120,11 @@ $z-layers: (
 	// Show tooltips above NUX tips, wp-admin menus, submenus, and sidebar:
 	".components-tooltip": 1000002,
 
-	// Make sure block manager sticky category titles appear above the options
-	".block-editor-block-manager__category-title": 1,
-	// And block manager sticky disabled block count is higher still
-	".block-editor-block-manager__disabled-blocks-count": 2,
-
 	// Appear under the customizer heading UI, but over anything else.
 	".customize-widgets__topbar": 8,
 
 	// Appear under the topbar.
 	".customize-widgets__block-toolbar": 7,
-
-	// Site editor layout
-	".edit-site-templates__dataviews-list-pagination": 2,
-	".edit-site-layout__canvas-container": 2,
-	".edit-site-layout__sidebar": 1,
-	".edit-site-layout__canvas-container.is-resizing::after": 100,
-	// Title needs to appear above other UI the section content.
-	".edit-site-sidebar-navigation-screen__title-icon": 1,
-
-	// Ensure modal footer actions appear above modal contents
-	".editor-start-template-options__modal__actions": 1,
-	".editor-start-page-options__modal__actions": 1,
 
 	// Ensure checkbox + actions don't overlap table header
 	".dataviews-view-table thead": 1,

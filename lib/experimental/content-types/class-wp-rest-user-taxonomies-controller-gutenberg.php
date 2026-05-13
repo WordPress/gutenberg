@@ -76,14 +76,22 @@ class WP_REST_User_Taxonomies_Controller_Gutenberg extends WP_REST_Posts_Control
 			'type'                 => 'object',
 			'additionalProperties' => false,
 			'properties'           => array(
-				'public'       => array( 'type' => 'boolean' ),
-				'hierarchical' => array( 'type' => 'boolean' ),
+				'public'             => array( 'type' => 'boolean' ),
+				'hierarchical'       => array( 'type' => 'boolean' ),
 				// Caps payload size; well above any reasonable description.
-				'description'  => array(
+				'description'        => array(
 					'type'      => 'string',
 					'maxLength' => 1000,
 				),
-				'labels'       => array(
+				'publicly_queryable' => array( 'type' => 'boolean' ),
+				'show_ui'            => array( 'type' => 'boolean' ),
+				'show_in_menu'       => array( 'type' => 'boolean' ),
+				'show_in_nav_menus'  => array( 'type' => 'boolean' ),
+				'show_tagcloud'      => array( 'type' => 'boolean' ),
+				'show_in_quick_edit' => array( 'type' => 'boolean' ),
+				'show_admin_column'  => array( 'type' => 'boolean' ),
+				'show_in_rest'       => array( 'type' => 'boolean' ),
+				'labels'             => array(
 					'type'                 => 'object',
 					'additionalProperties' => false,
 					'properties'           => $label_props,
@@ -129,6 +137,13 @@ class WP_REST_User_Taxonomies_Controller_Gutenberg extends WP_REST_Posts_Control
 			)
 		);
 
+		$schema['properties']['count'] = array(
+			'description' => __( 'Number of terms in this taxonomy.', 'gutenberg' ),
+			'type'        => 'integer',
+			'context'     => array( 'view', 'edit' ),
+			'readonly'    => true,
+		);
+
 		$this->schema = $schema;
 		return $this->add_additional_fields_schema( $this->schema );
 	}
@@ -161,6 +176,18 @@ class WP_REST_User_Taxonomies_Controller_Gutenberg extends WP_REST_Posts_Control
 
 		if ( rest_is_field_included( 'object_type', $fields ) ) {
 			$data['object_type'] = gutenberg_user_taxonomy_read_object_type( $item->ID );
+		}
+
+		if ( rest_is_field_included( 'count', $fields ) && 'publish' === $item->post_status ) {
+			// Drafts aren't registered, so the count is undefined — omit the
+			// field rather than report a value the server can't vouch for.
+			$count         = wp_count_terms(
+				array(
+					'taxonomy'   => $item->post_name,
+					'hide_empty' => false,
+				)
+			);
+			$data['count'] = is_wp_error( $count ) ? 0 : (int) $count;
 		}
 
 		$response->set_data( $data );
@@ -330,14 +357,21 @@ class WP_REST_User_Taxonomies_Controller_Gutenberg extends WP_REST_Posts_Control
 		if ( is_wp_error( $response ) ) {
 			return $response;
 		}
-		if ( ! $request->has_param( 'object_type' ) ) {
-			return $response;
-		}
 
 		$data    = $response->get_data();
 		$post_id = (int) $data['id'];
 
-		$this->save_object_type_meta( $post_id, $request );
+		// A new record published in this request will register on the next
+		// `init`, so the rewrite rules need to follow.
+		if ( 'publish' === get_post_status( $post_id ) ) {
+			gutenberg_user_content_types_schedule_flush_rewrite_rules();
+		}
+
+		if ( ! $request->has_param( 'object_type' ) ) {
+			return $response;
+		}
+
+		gutenberg_user_taxonomy_replace_object_types( $post_id, (array) $request['object_type'] );
 
 		$refreshed = $this->prepare_item_for_response( get_post( $post_id ), $request );
 		if ( ! is_wp_error( $refreshed ) ) {
@@ -356,17 +390,29 @@ class WP_REST_User_Taxonomies_Controller_Gutenberg extends WP_REST_Posts_Control
 	 * @return WP_REST_Response|WP_Error
 	 */
 	public function update_item( $request ) {
+		$post_id         = (int) $request['id'];
+		$existing        = get_post( $post_id );
+		$previous_slug   = $existing instanceof WP_Post ? (string) $existing->post_name : '';
+		$previous_status = $existing instanceof WP_Post ? (string) $existing->post_status : '';
+		$previous_config = $existing instanceof WP_Post
+			? self::decode_stored_config( $existing->post_content )
+			: array();
+
 		$response = parent::update_item( $request );
 		if ( is_wp_error( $response ) ) {
 			return $response;
 		}
+
+		$post = get_post( $post_id );
+		if ( $post instanceof WP_Post && self::update_needs_rewrite_flush( $previous_status, $previous_slug, $previous_config, $post ) ) {
+			gutenberg_user_content_types_schedule_flush_rewrite_rules();
+		}
+
 		if ( ! $request->has_param( 'object_type' ) ) {
 			return $response;
 		}
 
-		$post_id = (int) $request['id'];
-
-		$this->save_object_type_meta( $post_id, $request );
+		gutenberg_user_taxonomy_replace_object_types( $post_id, (array) $request['object_type'] );
 
 		$refreshed = $this->prepare_item_for_response( get_post( $post_id ), $request );
 		if ( ! is_wp_error( $refreshed ) ) {
@@ -377,32 +423,109 @@ class WP_REST_User_Taxonomies_Controller_Gutenberg extends WP_REST_Posts_Control
 	}
 
 	/**
-	 * Persists the `object_type` array from the request as repeated rows of
-	 * `_wp_user_taxonomy_object_type` post meta. Stored separately from the
-	 * JSON config so listings can filter via `meta_query` IN. Callers must
-	 * have already verified that the request includes the `object_type`
-	 * param.
+	 * Force-deletes or trashes a record. Mirrors the post-types side: when
+	 * the record was registered (status was `publish`), the next `init`
+	 * stops calling `register_taxonomy()` for it, and the rewrite rules
+	 * need to follow. Trash leaves the row but transitions status, which
+	 * the registration loop already filters on, so it's covered the same
+	 * way as force-delete.
 	 *
-	 * @param int             $post_id Saved post ID.
+	 * Inheriting `WP_REST_Posts_Controller::delete_item()` for the actual
+	 * removal — we only wrap to capture pre-delete state and schedule the
+	 * deferred flush.
+	 *
 	 * @param WP_REST_Request $request REST request.
+	 * @return WP_REST_Response|WP_Error
 	 */
-	private function save_object_type_meta( $post_id, $request ) {
-		$values = array();
-		foreach ( (array) $request['object_type'] as $slug ) {
-			if ( ! is_string( $slug ) ) {
-				continue;
-			}
-			$clean = sanitize_key( $slug );
-			if ( '' !== $clean && post_type_exists( $clean ) ) {
-				$values[] = $clean;
-			}
+	public function delete_item( $request ) {
+		$existing       = get_post( (int) $request['id'] );
+		$was_registered = $existing instanceof WP_Post && 'publish' === $existing->post_status;
+		$response       = parent::delete_item( $request );
+		if ( is_wp_error( $response ) ) {
+			return $response;
 		}
-		$values = array_values( array_unique( $values ) );
+		if ( $was_registered ) {
+			gutenberg_user_content_types_schedule_flush_rewrite_rules();
+		}
+		return $response;
+	}
 
-		delete_post_meta( $post_id, GUTENBERG_USER_TAXONOMY_OBJECT_TYPE_META_KEY );
-		foreach ( $values as $slug ) {
-			add_post_meta( $post_id, GUTENBERG_USER_TAXONOMY_OBJECT_TYPE_META_KEY, $slug );
+	/**
+	 * Decides whether an `update_item` mutation needs the rewrite rules
+	 * regenerated. Triggers on:
+	 *   - status crossing the `publish` boundary in either direction
+	 *     (registration toggles on next `init`),
+	 *   - while remaining published, a change in slug, `public`, or
+	 *     `publicly_queryable` — the fields that change the rewrite rules
+	 *     `register_taxonomy()` emits. `publicly_queryable` flips
+	 *     `query_var`, which in turn swaps the `add_rewrite_tag` query
+	 *     string between `{slug}=` and `taxonomy={name}&term=`.
+	 *
+	 * Other config edits (labels, hierarchical, show_ui, show_in_rest, etc.)
+	 * don't affect rewrite rules. `hierarchical` only changes the rewrite
+	 * tag regex when paired with `rewrite['hierarchical'] = true`, which
+	 * `gutenberg_build_user_taxonomy_args()` never sets — `rewrite` is
+	 * left at its `true` default, so `rewrite['hierarchical']` parses to
+	 * false.
+	 *
+	 * @param string  $previous_status Status the record had before update.
+	 * @param string  $previous_slug   Slug before update.
+	 * @param array   $previous_config Decoded config before update.
+	 * @param WP_Post $current_post    Record after update.
+	 * @return bool
+	 */
+	private static function update_needs_rewrite_flush( $previous_status, $previous_slug, $previous_config, WP_Post $current_post ) {
+		$current_status = (string) $current_post->post_status;
+		$was_active     = 'publish' === $previous_status;
+		$is_active      = 'publish' === $current_status;
+
+		if ( $was_active !== $is_active ) {
+			return true;
 		}
+		if ( ! $is_active ) {
+			return false;
+		}
+
+		if ( $previous_slug !== (string) $current_post->post_name ) {
+			return true;
+		}
+
+		$current_config = self::decode_stored_config( $current_post->post_content );
+		if ( ! empty( $previous_config['public'] ) !== ! empty( $current_config['public'] ) ) {
+			return true;
+		}
+		// `publicly_queryable` defaults to `public` when omitted from the
+		// stored config, so compare effective values rather than raw flags
+		// — otherwise toggling `publicly_queryable` between "absent (=public)"
+		// and "explicitly equal to public" would trip a no-op flush.
+		$prev_pq = array_key_exists( 'publicly_queryable', $previous_config )
+			? ! empty( $previous_config['publicly_queryable'] )
+			: ! empty( $previous_config['public'] );
+		$curr_pq = array_key_exists( 'publicly_queryable', $current_config )
+			? ! empty( $current_config['publicly_queryable'] )
+			: ! empty( $current_config['public'] );
+		if ( $prev_pq !== $curr_pq ) {
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Decodes the stored `post_content` JSON for a wp_user_taxonomy record
+	 * down to its sanitized config array. Returns an empty array on invalid
+	 * JSON so callers can use `! empty()` semantics for boolean fields.
+	 *
+	 * @param string $post_content Raw stored JSON.
+	 * @return array
+	 */
+	private static function decode_stored_config( $post_content ) {
+		$decoded = json_decode( (string) $post_content, true );
+		if ( JSON_ERROR_NONE !== json_last_error() || ! is_array( $decoded ) ) {
+			return array();
+		}
+		unset( $decoded[ GUTENBERG_USER_TAXONOMY_CONFIG_MARKER ] );
+		return $decoded;
 	}
 
 	/**
