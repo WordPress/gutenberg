@@ -4,6 +4,10 @@
 import apiFetch from '@wordpress/api-fetch';
 
 export const DISTRIBUTED_EDITING_RECOVERY_REST_BASE = 'posts';
+export const DISTRIBUTED_EDITING_RECOVERY_REST_BASES = Object.freeze( [
+	'posts',
+	'pages',
+] );
 
 /**
  * Returns the current DE-RTC recovery endpoint path for a post.
@@ -26,13 +30,13 @@ export function getDistributedEditingRecoveryEndpointPath( {
 		);
 	}
 
-	if ( restBase !== DISTRIBUTED_EDITING_RECOVERY_REST_BASE ) {
+	if ( ! DISTRIBUTED_EDITING_RECOVERY_REST_BASES.includes( restBase ) ) {
 		throw new TypeError(
-			'Distributed Editing recovery currently supports the posts REST base only.'
+			'Distributed Editing recovery currently supports posts and pages REST bases only.'
 		);
 	}
 
-	return `/wp/v2/${ DISTRIBUTED_EDITING_RECOVERY_REST_BASE }/${ parsedPostId }/distributed-editing/recovery`;
+	return `/wp/v2/${ restBase }/${ parsedPostId }/distributed-editing/recovery`;
 }
 
 /**

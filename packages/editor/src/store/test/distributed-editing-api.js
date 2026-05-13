@@ -20,14 +20,23 @@ describe( 'distributed editing REST helpers', () => {
 		).toBe( '/wp/v2/posts/42/distributed-editing/recovery' );
 	} );
 
-	it( 'rejects unsupported REST bases until WordPress exposes them', () => {
-		expect( () =>
+	it( 'builds the current page recovery endpoint path', () => {
+		expect(
 			getDistributedEditingRecoveryEndpointPath( {
 				postId: 42,
 				restBase: 'pages',
 			} )
+		).toBe( '/wp/v2/pages/42/distributed-editing/recovery' );
+	} );
+
+	it( 'rejects unsupported REST bases until WordPress exposes them', () => {
+		expect( () =>
+			getDistributedEditingRecoveryEndpointPath( {
+				postId: 42,
+				restBase: 'blocks',
+			} )
 		).toThrow(
-			'Distributed Editing recovery currently supports the posts REST base only.'
+			'Distributed Editing recovery currently supports posts and pages REST bases only.'
 		);
 	} );
 

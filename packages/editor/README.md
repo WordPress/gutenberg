@@ -308,6 +308,10 @@ Stable DE-RTC reason codes shared with the root model runner and WordPress autho
 
 Undocumented declaration.
 
+### DISTRIBUTED_EDITING_RECOVERY_REST_BASES
+
+Undocumented declaration.
+
 ### DISTRIBUTED_EDITING_UNLOAD_WARNING_REASONS
 
 Stable reasons for browser unload protection.
