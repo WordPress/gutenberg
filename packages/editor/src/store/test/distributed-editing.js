@@ -19,6 +19,7 @@ import {
 	DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES,
 	DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_REASONS,
 	DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES,
+	DISTRIBUTED_EDITING_RETRY_SAVE_HANDOFF_STATUSES,
 	DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS,
 	DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_STATUSES,
 	DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES,
@@ -26,6 +27,7 @@ import {
 	DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE,
 	getDistributedEditingRetrySavePolicyForSessionState,
 	getDistributedEditingStaleBaseLocalRebaseResult,
+	getDistributedEditingSessionStateForRetrySaveHandoff,
 	getDistributedEditingSessionStateForRetrySaveRequest,
 	getDistributedEditingSessionStateForRetrySaveResult,
 	getDistributedEditingSessionStateForRetrySubmitHandoff,
@@ -167,6 +169,11 @@ describe( 'distributed editing session state', () => {
 			retrySubmitSaveReady: false,
 			retrySaveStatus: DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.NONE,
 			retrySaveReason: null,
+			retrySaveHandoffStatus:
+				DISTRIBUTED_EDITING_RETRY_SAVE_HANDOFF_STATUSES.NONE,
+			retrySaveHandoffReason: null,
+			retrySaveHandoffAllowsNormalSaveFallback: false,
+			retrySaveHandoffBlocksNormalSave: false,
 			retrySaveAccepted: false,
 			retrySaveServerVersion: null,
 			retrySavePreviousServerVersion: null,
@@ -1213,6 +1220,61 @@ describe( 'distributed editing session state', () => {
 				request: null,
 			} );
 		}
+	} );
+
+	it( 'records blocked retry-save handoff state with export and refetch protection', () => {
+		const sessionState =
+			getDistributedEditingSessionStateForRetrySaveHandoff(
+				{
+					clientBaseVersion: '4',
+					serverVersion: '7',
+					pendingChangeCount: 1,
+					hasPendingChanges: true,
+				},
+				{
+					status: DISTRIBUTED_EDITING_RETRY_SAVE_HANDOFF_STATUSES.RETRY_SAVE_BLOCKED,
+					reason: DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.SERVER_STATE_REFETCH_REQUIRED,
+					policy: {
+						protectsLocalChanges: true,
+						requiresServerStateRefetch: true,
+					},
+				}
+			);
+		const notices =
+			getDistributedEditingNoticeDescriptorsForSessionState(
+				sessionState
+			);
+
+		expect( sessionState ).toMatchObject( {
+			hasPendingChanges: true,
+			isAwaitingServerConfirmation: true,
+			requiresServerStateRefetch: true,
+			mustOfferLocalCopy: true,
+			canExportLocalUpdates: true,
+			retrySaveHandoffStatus:
+				DISTRIBUTED_EDITING_RETRY_SAVE_HANDOFF_STATUSES.RETRY_SAVE_BLOCKED,
+			retrySaveHandoffReason:
+				DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.SERVER_STATE_REFETCH_REQUIRED,
+			retrySaveHandoffAllowsNormalSaveFallback: false,
+			retrySaveHandoffBlocksNormalSave: true,
+		} );
+		expect( notices ).toEqual(
+			expect.arrayContaining( [
+				expect.objectContaining( {
+					kind: DISTRIBUTED_EDITING_NOTICE_KINDS.RETRY_SAVE,
+					status: 'warning',
+					priority: 'blocking',
+					retrySaveHandoffStatus:
+						DISTRIBUTED_EDITING_RETRY_SAVE_HANDOFF_STATUSES.RETRY_SAVE_BLOCKED,
+					retrySaveHandoffReason:
+						DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.SERVER_STATE_REFETCH_REQUIRED,
+					actionKeys: [
+						DISTRIBUTED_EDITING_NOTICE_ACTIONS.EXPORT_LOCAL_UPDATES,
+						DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFETCH_SERVER_STATE,
+					],
+				} ),
+			] )
+		);
 	} );
 
 	it( 'rebases stale-base local changes from remembered base and refetched server content', () => {

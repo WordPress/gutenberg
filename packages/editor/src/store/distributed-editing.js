@@ -176,6 +176,16 @@ export const DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES = Object.freeze( {
 } );
 
 /**
+ * Stable retry-save save-flow handoff statuses.
+ */
+export const DISTRIBUTED_EDITING_RETRY_SAVE_HANDOFF_STATUSES = Object.freeze( {
+	NONE: 'none',
+	RETRY_SAVE_SUBMITTED: 'retry_save_submitted',
+	RETRY_SAVE_BLOCKED: 'retry_save_blocked',
+	NORMAL_SAVE_FALLBACK: 'normal_save_fallback',
+} );
+
+/**
  * Stable retry-save policy statuses for deciding whether a future save
  * workflow may call the guarded retry-save write boundary.
  */
@@ -232,6 +242,10 @@ const VALID_RETRY_SUBMIT_SAVE_STATUSES = new Set(
 
 const VALID_RETRY_SAVE_STATUSES = new Set(
 	Object.values( DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES )
+);
+
+const VALID_RETRY_SAVE_HANDOFF_STATUSES = new Set(
+	Object.values( DISTRIBUTED_EDITING_RETRY_SAVE_HANDOFF_STATUSES )
 );
 
 const NOTICE_ID_BY_KIND = Object.freeze( {
@@ -292,6 +306,11 @@ export const DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE = Object.freeze( {
 	retrySubmitSaveReady: false,
 	retrySaveStatus: DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.NONE,
 	retrySaveReason: null,
+	retrySaveHandoffStatus:
+		DISTRIBUTED_EDITING_RETRY_SAVE_HANDOFF_STATUSES.NONE,
+	retrySaveHandoffReason: null,
+	retrySaveHandoffAllowsNormalSaveFallback: false,
+	retrySaveHandoffBlocksNormalSave: false,
 	retrySaveAccepted: false,
 	retrySaveServerVersion: null,
 	retrySavePreviousServerVersion: null,
@@ -476,6 +495,21 @@ export function normalizeDistributedEditingSessionState( sessionState = {} ) {
 	const retrySaveAccepted =
 		Boolean( sessionState.retrySaveAccepted ) ||
 		retrySaveStatus === DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVED;
+	const retrySaveHandoffStatus = VALID_RETRY_SAVE_HANDOFF_STATUSES.has(
+		sessionState.retrySaveHandoffStatus
+	)
+		? sessionState.retrySaveHandoffStatus
+		: DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE.retrySaveHandoffStatus;
+	const retrySaveHandoffAllowsNormalSaveFallback =
+		retrySaveHandoffStatus ===
+			DISTRIBUTED_EDITING_RETRY_SAVE_HANDOFF_STATUSES.NORMAL_SAVE_FALLBACK ||
+		Boolean( sessionState.retrySaveHandoffAllowsNormalSaveFallback );
+	const retrySaveHandoffBlocksNormalSave =
+		retrySaveHandoffStatus ===
+			DISTRIBUTED_EDITING_RETRY_SAVE_HANDOFF_STATUSES.RETRY_SAVE_BLOCKED &&
+		! retrySaveHandoffAllowsNormalSaveFallback &&
+		( Boolean( sessionState.retrySaveHandoffBlocksNormalSave ) ||
+			hasPendingChanges );
 
 	const mustOfferLocalCopy =
 		Boolean( sessionState.mustOfferLocalCopy ) ||
@@ -484,6 +518,7 @@ export function normalizeDistributedEditingSessionState( sessionState = {} ) {
 		( retrySubmitSavePathRequired && hasPendingChanges ) ||
 		( retrySaveStatus === DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVING &&
 			hasPendingChanges ) ||
+		( retrySaveHandoffBlocksNormalSave && hasPendingChanges ) ||
 		( requiresManualConflictResolution && hasPendingChanges );
 	const canExportLocalUpdates =
 		Boolean( sessionState.canExportLocalUpdates ) || mustOfferLocalCopy;
@@ -544,6 +579,12 @@ export function normalizeDistributedEditingSessionState( sessionState = {} ) {
 		retrySaveReason: normalizeNullableString(
 			sessionState.retrySaveReason
 		),
+		retrySaveHandoffStatus,
+		retrySaveHandoffReason: normalizeNullableString(
+			sessionState.retrySaveHandoffReason
+		),
+		retrySaveHandoffAllowsNormalSaveFallback,
+		retrySaveHandoffBlocksNormalSave,
 		retrySaveAccepted,
 		retrySaveServerVersion: normalizeNullableString(
 			sessionState.retrySaveServerVersion
@@ -935,6 +976,9 @@ export function getDistributedEditingNoticeDescriptorsForSessionState(
 ) {
 	const normalized = normalizeDistributedEditingSessionState( sessionState );
 	const descriptors = [];
+	const hasRetrySaveHandoffBlock =
+		normalized.retrySaveHandoffStatus ===
+		DISTRIBUTED_EDITING_RETRY_SAVE_HANDOFF_STATUSES.RETRY_SAVE_BLOCKED;
 
 	if ( normalized.requiresServerStateAcceptance ) {
 		descriptors.push(
@@ -1010,7 +1054,8 @@ export function getDistributedEditingNoticeDescriptorsForSessionState(
 
 	if (
 		normalized.retrySaveStatus !==
-		DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.NONE
+			DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.NONE ||
+		hasRetrySaveHandoffBlock
 	) {
 		descriptors.push(
 			createNoticeDescriptor( normalized, {
@@ -1030,7 +1075,9 @@ export function getDistributedEditingNoticeDescriptorsForSessionState(
 						  ]
 						: [] ),
 					...( normalized.retrySaveStatus ===
-					DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.STALE_BASE_REJECTED
+						DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.STALE_BASE_REJECTED ||
+					normalized.retrySaveHandoffReason ===
+						DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.SERVER_STATE_REFETCH_REQUIRED
 						? [
 								DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFETCH_SERVER_STATE,
 						  ]
@@ -1077,6 +1124,92 @@ export function getDistributedEditingNoticeDescriptorsForSessionState(
 	}
 
 	return descriptors;
+}
+
+/**
+ * Returns inert editor state for a retry-save save-flow handoff result.
+ *
+ * Blocked handoffs with protected local changes must become visible to the
+ * status surface because savePost will not fall back to normal save.
+ *
+ * @param {Object} currentSessionState Current DE-RTC session state.
+ * @param {Object} handoff             Retry-save handoff result.
+ *
+ * @return {Object} Normalized DE-RTC session state.
+ */
+export function getDistributedEditingSessionStateForRetrySaveHandoff(
+	currentSessionState = {},
+	handoff = {}
+) {
+	const normalized =
+		normalizeDistributedEditingSessionState( currentSessionState );
+	const status = VALID_RETRY_SAVE_HANDOFF_STATUSES.has( handoff.status )
+		? handoff.status
+		: DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE.retrySaveHandoffStatus;
+	const reason = normalizeNullableString( handoff.reason );
+	const policy = handoff.policy ?? {};
+
+	if (
+		status ===
+		DISTRIBUTED_EDITING_RETRY_SAVE_HANDOFF_STATUSES.RETRY_SAVE_BLOCKED
+	) {
+		const pendingChangeCount =
+			normalizeCount( handoff.pendingChangeCount ) ||
+			normalizeCount( policy.request?.pendingChangeCount ) ||
+			normalized.pendingChangeCount ||
+			( policy.protectsLocalChanges || normalized.hasPendingChanges
+				? 1
+				: 0 );
+
+		return normalizeDistributedEditingSessionState( {
+			...normalized,
+			pendingChangeCount,
+			hasPendingChanges:
+				normalized.hasPendingChanges ||
+				Boolean( policy.protectsLocalChanges ) ||
+				pendingChangeCount > 0,
+			isAwaitingServerConfirmation: true,
+			requiresServerStateRefetch:
+				normalized.requiresServerStateRefetch ||
+				Boolean( policy.requiresServerStateRefetch ) ||
+				reason ===
+					DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.SERVER_STATE_REFETCH_REQUIRED,
+			retrySaveHandoffStatus: status,
+			retrySaveHandoffReason: reason,
+			retrySaveHandoffAllowsNormalSaveFallback: false,
+			retrySaveHandoffBlocksNormalSave: true,
+			mustOfferLocalCopy: true,
+			canExportLocalUpdates: true,
+		} );
+	}
+
+	if (
+		status ===
+		DISTRIBUTED_EDITING_RETRY_SAVE_HANDOFF_STATUSES.NORMAL_SAVE_FALLBACK
+	) {
+		return normalizeDistributedEditingSessionState( {
+			...normalized,
+			retrySaveHandoffStatus: status,
+			retrySaveHandoffReason: reason,
+			retrySaveHandoffAllowsNormalSaveFallback: true,
+			retrySaveHandoffBlocksNormalSave: false,
+		} );
+	}
+
+	if (
+		status ===
+		DISTRIBUTED_EDITING_RETRY_SAVE_HANDOFF_STATUSES.RETRY_SAVE_SUBMITTED
+	) {
+		return normalizeDistributedEditingSessionState( {
+			...normalized,
+			retrySaveHandoffStatus: status,
+			retrySaveHandoffReason: null,
+			retrySaveHandoffAllowsNormalSaveFallback: false,
+			retrySaveHandoffBlocksNormalSave: false,
+		} );
+	}
+
+	return normalized;
 }
 
 /**
@@ -1940,6 +2073,12 @@ function getDistributedEditingRetrySaveDescriptorFields( normalized ) {
 	return {
 		retrySaveStatus: normalized.retrySaveStatus,
 		retrySaveReason: normalized.retrySaveReason,
+		retrySaveHandoffStatus: normalized.retrySaveHandoffStatus,
+		retrySaveHandoffReason: normalized.retrySaveHandoffReason,
+		retrySaveHandoffAllowsNormalSaveFallback:
+			normalized.retrySaveHandoffAllowsNormalSaveFallback,
+		retrySaveHandoffBlocksNormalSave:
+			normalized.retrySaveHandoffBlocksNormalSave,
 		retrySaveAccepted: normalized.retrySaveAccepted,
 		retrySaveServerVersion: normalized.retrySaveServerVersion,
 		retrySavePreviousServerVersion:

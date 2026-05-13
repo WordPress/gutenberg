@@ -23,6 +23,7 @@ import {
 	DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES,
 	DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_REASONS,
 	DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES,
+	DISTRIBUTED_EDITING_RETRY_SAVE_HANDOFF_STATUSES,
 	DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS,
 	DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES,
 	DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE,
@@ -1685,6 +1686,7 @@ describe( 'Post actions', () => {
 				status: 'retry_save_blocked',
 				reason: DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.RETRY_SUBMIT_PROOF_NOT_ACCEPTED,
 				allowsNormalSaveFallback: false,
+				blocksNormalSavePost: true,
 				callsRetrySaveAction: false,
 				callsNormalSavePost: false,
 			} );
@@ -1693,6 +1695,21 @@ describe( 'Post actions', () => {
 			expect( registry.select( editorStore ).isEditedPostDirty() ).toBe(
 				true
 			);
+			expect(
+				registry
+					.select( editorStore )
+					.getDistributedEditingSessionState()
+			).toMatchObject( {
+				hasPendingChanges: true,
+				isAwaitingServerConfirmation: true,
+				mustOfferLocalCopy: true,
+				canExportLocalUpdates: true,
+				retrySaveHandoffStatus:
+					DISTRIBUTED_EDITING_RETRY_SAVE_HANDOFF_STATUSES.RETRY_SAVE_BLOCKED,
+				retrySaveHandoffReason:
+					DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.RETRY_SUBMIT_PROOF_NOT_ACCEPTED,
+				retrySaveHandoffBlocksNormalSave: true,
+			} );
 		} );
 
 		it( 'falls back to normal savePost when retry-save policy has no local changes to protect', async () => {

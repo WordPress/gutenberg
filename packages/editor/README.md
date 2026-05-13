@@ -320,6 +320,10 @@ Undocumented declaration.
 
 Undocumented declaration.
 
+### DISTRIBUTED_EDITING_RETRY_SAVE_HANDOFF_STATUSES
+
+Stable retry-save save-flow handoff statuses.
+
 ### DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS
 
 Stable retry-save policy blocker reasons.
@@ -618,6 +622,21 @@ _Parameters_
 _Returns_
 
 -   `Object`: DE-RTC session state.
+
+### getDistributedEditingSessionStateForRetrySaveHandoff
+
+Returns inert editor state for a retry-save save-flow handoff result.
+
+Blocked handoffs with protected local changes must become visible to the status surface because savePost will not fall back to normal save.
+
+_Parameters_
+
+-   _currentSessionState_ `Object`: Current DE-RTC session state.
+-   _handoff_ `Object`: Retry-save handoff result.
+
+_Returns_
+
+-   `Object`: Normalized DE-RTC session state.
 
 ### getDistributedEditingSessionStateForRetrySaveRequest
 

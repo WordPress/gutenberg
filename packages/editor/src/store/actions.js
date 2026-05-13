@@ -34,6 +34,7 @@ import {
 } from './distributed-editing-api';
 import {
 	getDistributedEditingSessionStateForRecoveryDryRunResult,
+	getDistributedEditingSessionStateForRetrySaveHandoff,
 	getDistributedEditingSessionStateForRetrySaveRequest,
 	getDistributedEditingSessionStateForRetrySaveResult,
 	getDistributedEditingSessionStateForRetrySubmitHandoff,
@@ -709,18 +710,29 @@ export const __experimentalMaybeSavePostWithDistributedEditingRetryPolicy =
 
 		if ( ! policy.canRetrySave ) {
 			const allowsNormalSaveFallback = ! policy.protectsLocalChanges;
-
-			return {
+			const handoff = {
 				status: allowsNormalSaveFallback
 					? 'normal_save_fallback'
 					: 'retry_save_blocked',
 				reason: policy.reason,
 				policy,
 				allowsNormalSaveFallback,
+				blocksNormalSavePost: ! allowsNormalSaveFallback,
 				callsRetrySaveAction: false,
 				callsNormalSavePost: false,
 				response: null,
 			};
+
+			if ( ! allowsNormalSaveFallback ) {
+				dispatch.setDistributedEditingSessionState(
+					getDistributedEditingSessionStateForRetrySaveHandoff(
+						currentSessionState,
+						handoff
+					)
+				);
+			}
+
+			return handoff;
 		}
 
 		const response =

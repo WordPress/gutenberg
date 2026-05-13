@@ -34,6 +34,8 @@ import {
 	DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES,
 	DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_REASONS,
 	DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES,
+	DISTRIBUTED_EDITING_RETRY_SAVE_HANDOFF_STATUSES,
+	DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS,
 	DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES,
 	DISTRIBUTED_EDITING_UNLOAD_WARNING_REASONS,
 	getDistributedEditingNoticeDescriptorsForSessionState,
@@ -117,6 +119,11 @@ describe( 'getDistributedEditingStatusControlStates', () => {
 			'staleBaseRetrySaveSaved',
 			'staleBaseRetrySaveStale',
 			'staleBaseRetrySaveTampered',
+			'staleBaseRetrySaveHandoffBlockedProof',
+			'staleBaseRetrySaveHandoffRefetch',
+			'staleBaseRetrySaveHandoffMissingRoute',
+			'staleBaseRetrySaveHandoffMissingContent',
+			'staleBaseRetrySaveHandoffInProgress',
 			'manualResolution',
 		] );
 		expect( states.pendingLocalChanges ).toEqual( {
@@ -251,6 +258,22 @@ describe( 'getDistributedEditingStatusControlStates', () => {
 				DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_SYNC_META_TAMPERED,
 			retrySaveStatus:
 				DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_SYNC_META_TAMPERED,
+			canExportLocalUpdates: true,
+		} );
+		expect( states.staleBaseRetrySaveHandoffBlockedProof ).toMatchObject( {
+			retrySaveHandoffStatus:
+				DISTRIBUTED_EDITING_RETRY_SAVE_HANDOFF_STATUSES.RETRY_SAVE_BLOCKED,
+			retrySaveHandoffReason:
+				DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.RETRY_SUBMIT_PROOF_NOT_ACCEPTED,
+			retrySaveHandoffBlocksNormalSave: true,
+			canExportLocalUpdates: true,
+		} );
+		expect( states.staleBaseRetrySaveHandoffRefetch ).toMatchObject( {
+			requiresServerStateRefetch: true,
+			retrySaveHandoffStatus:
+				DISTRIBUTED_EDITING_RETRY_SAVE_HANDOFF_STATUSES.RETRY_SAVE_BLOCKED,
+			retrySaveHandoffReason:
+				DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.SERVER_STATE_REFETCH_REQUIRED,
 			canExportLocalUpdates: true,
 		} );
 		expect( states.manualResolution ).toEqual( {
@@ -598,6 +621,12 @@ describe( 'shouldRenderDistributedEditingStatus', () => {
 			shouldRenderDistributedEditingStatus( {
 				disposition:
 					DISTRIBUTED_EDITING_DISPOSITIONS.REQUIRES_MANUAL_RESOLUTION_NO_SYNC_META,
+			} )
+		).toBe( true );
+		expect(
+			shouldRenderDistributedEditingStatus( {
+				retrySaveHandoffStatus:
+					DISTRIBUTED_EDITING_RETRY_SAVE_HANDOFF_STATUSES.RETRY_SAVE_BLOCKED,
 			} )
 		).toBe( true );
 		expect(
@@ -1234,6 +1263,75 @@ describe( 'DistributedEditingStatusSurface', () => {
 			expect( screen.getByText( statusCase.message ) ).toBeVisible();
 			expect( screen.getByText( 'Export local changes' ) ).toBeVisible();
 		}
+	} );
+
+	it( 'renders blocked retry-save handoff copy and actions', () => {
+		const cases = [
+			{
+				reason: DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.RETRY_SUBMIT_PROOF_NOT_ACCEPTED,
+				title: 'Retry save needs accepted proof',
+				message:
+					'The editor could not verify accepted retry-save proof for this save. Local changes are still protected; export them before leaving or retry after the proof is ready.',
+			},
+			{
+				reason: DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.SERVER_STATE_REFETCH_REQUIRED,
+				title: 'Retry save needs server refresh',
+				message:
+					'The server state must be refreshed before retry-save can continue. Local changes are still protected; refresh the server version before trying again.',
+				refetch: true,
+			},
+			{
+				reason: DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.MISSING_POST_ROUTE,
+				title: 'Retry save route unavailable',
+				message:
+					'The editor could not identify the post route for retry-save. Local changes are still protected; export them before leaving or reload the editor.',
+			},
+			{
+				reason: DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.MISSING_PROPOSED_CONTENT,
+				title: 'Retry save content unavailable',
+				message:
+					'The editor could not read the proposed post content for retry-save. Local changes are still protected; export them before trying again.',
+			},
+			{
+				reason: DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.RETRY_SAVE_IN_PROGRESS,
+				title: 'Retry save already in progress',
+				message:
+					'A retry save is already waiting for server confirmation. Local changes are still protected; keep this tab open until it finishes.',
+				retrySaveStatus: DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVING,
+			},
+		];
+		const onAction = jest.fn();
+		const renderStatus = ( statusCase ) => (
+			<DistributedEditingStatusSurface
+				noticeDescriptors={ getDistributedEditingNoticeDescriptorsForSessionState(
+					{
+						pendingChangeCount: 1,
+						hasPendingChanges: true,
+						canExportLocalUpdates: true,
+						retrySaveStatus:
+							statusCase.retrySaveStatus ||
+							DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.NONE,
+						retrySaveHandoffStatus:
+							DISTRIBUTED_EDITING_RETRY_SAVE_HANDOFF_STATUSES.RETRY_SAVE_BLOCKED,
+						retrySaveHandoffReason: statusCase.reason,
+						retrySaveHandoffBlocksNormalSave: true,
+					}
+				) }
+				onAction={ onAction }
+			/>
+		);
+
+		const { rerender } = render( renderStatus( cases[ 0 ] ) );
+
+		for ( const statusCase of cases ) {
+			rerender( renderStatus( statusCase ) );
+			expect( screen.getByText( statusCase.title ) ).toBeVisible();
+			expect( screen.getByText( statusCase.message ) ).toBeVisible();
+			expect( screen.getByText( 'Export local changes' ) ).toBeVisible();
+		}
+
+		rerender( renderStatus( cases[ 1 ] ) );
+		expect( screen.getByText( 'Refresh server version' ) ).toBeVisible();
 	} );
 
 	it( 'renders stale retry-submit proof after prepared handoff', () => {
