@@ -16,10 +16,12 @@ import {
 	DISTRIBUTED_EDITING_REASON_CODES,
 	DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_REASONS,
 	DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_STATUSES,
+	DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES,
 	DISTRIBUTED_EDITING_UNLOAD_WARNING_REASONS,
 	DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE,
 	getDistributedEditingStaleBaseLocalRebaseResult,
 	getDistributedEditingSessionStateForRetrySubmitHandoff,
+	getDistributedEditingSessionStateForRetrySubmitProofResult,
 	getDistributedEditingSessionStateForRecoveryDryRunResult,
 	getDistributedEditingSessionStateForStaleBaseLocalRebasePlan,
 	getDistributedEditingSessionStateForStaleBaseRejectionResult,
@@ -140,6 +142,15 @@ describe( 'distributed editing session state', () => {
 				DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_STATUSES.NONE,
 			retrySubmitHandoffReason: null,
 			retrySubmitPrepared: false,
+			retrySubmitProofStatus:
+				DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.NONE,
+			retrySubmitProofReason: null,
+			retrySubmitAccepted: false,
+			retrySubmitSavePathRequired: false,
+			retrySubmitSavesPost: false,
+			retrySubmitMutatesPostContent: false,
+			retrySubmitCreatesRevision: false,
+			retrySubmitClaimsSaved: false,
 			requiresManualConflictResolution: false,
 			mustOfferLocalCopy: true,
 			canExportLocalUpdates: true,
@@ -605,6 +616,145 @@ describe( 'distributed editing session state', () => {
 				DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_REASONS.MANUAL_CONFLICT_REQUIRED,
 			retrySubmitPrepared: false,
 			requiresManualConflictResolution: true,
+		} );
+	} );
+
+	it( 'normalizes accepted retry-submit proof without claiming a save', () => {
+		const normalized =
+			getDistributedEditingSessionStateForRetrySubmitProofResult(
+				{
+					result: 'retry_submit_accepted_for_future_save',
+					retry_submit_accepted: true,
+					save_path_required: true,
+					saves_post: false,
+					mutates_post_content: false,
+					creates_revision: false,
+					claims_saved: false,
+				},
+				{
+					disposition:
+						DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+					reasonCode:
+						DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+					clientBaseVersion: '4',
+					serverVersion: '7',
+					pendingChangeCount: 2,
+					localRebaseResultStatus:
+						DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.REBASED,
+					retrySubmitHandoffStatus:
+						DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_STATUSES.PREPARED,
+					retrySubmitPrepared: true,
+				}
+			);
+
+		expect( normalized ).toMatchObject( {
+			disposition: DISTRIBUTED_EDITING_DISPOSITIONS.IDLE,
+			reasonCode: null,
+			pendingChangeCount: 2,
+			hasPendingChanges: true,
+			isAwaitingServerConfirmation: true,
+			remoteChangeCount: 0,
+			hasRemoteChanges: false,
+			retrySubmitHandoffStatus:
+				DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_STATUSES.PREPARED,
+			retrySubmitPrepared: true,
+			retrySubmitProofStatus:
+				DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.ACCEPTED_FOR_FUTURE_SAVE,
+			retrySubmitAccepted: true,
+			retrySubmitSavePathRequired: true,
+			retrySubmitSavesPost: false,
+			retrySubmitMutatesPostContent: false,
+			retrySubmitCreatesRevision: false,
+			retrySubmitClaimsSaved: false,
+			mustOfferLocalCopy: true,
+			canExportLocalUpdates: true,
+		} );
+	} );
+
+	it( 'normalizes stale retry-submit proof after handoff as a new stale-base rejection', () => {
+		const normalized =
+			getDistributedEditingSessionStateForRetrySubmitProofResult(
+				{
+					code: DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+					data: {
+						reason_code:
+							DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+						client_base_version: '7',
+						server_version: '8',
+						pending_change_count: 1,
+						remote_change_count: 1,
+					},
+				},
+				{
+					clientBaseVersion: '4',
+					serverVersion: '7',
+					clientBaseContent:
+						'<!-- wp:paragraph --><p>Base.</p><!-- /wp:paragraph -->',
+					refetchedServerContent:
+						'<!-- wp:paragraph --><p>Server.</p><!-- /wp:paragraph -->',
+					pendingChangeCount: 1,
+					refetchedServerState: true,
+					localRebasePlanStatus:
+						DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES.READY,
+					localRebaseResultStatus:
+						DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.REBASED,
+					retrySubmitHandoffStatus:
+						DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_STATUSES.PREPARED,
+					retrySubmitPrepared: true,
+					canExportLocalUpdates: true,
+				}
+			);
+
+		expect( normalized ).toMatchObject( {
+			disposition:
+				DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+			reasonCode:
+				DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+			clientBaseVersion: '7',
+			serverVersion: '8',
+			clientBaseContent:
+				'<!-- wp:paragraph --><p>Base.</p><!-- /wp:paragraph -->',
+			refetchedServerState: false,
+			requiresServerStateRefetch: true,
+			localRebasePlanStatus:
+				DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES.NONE,
+			localRebaseResultStatus:
+				DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.NONE,
+			readyToRetrySubmit: false,
+			retrySubmitHandoffStatus:
+				DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_STATUSES.NONE,
+			retrySubmitPrepared: false,
+			retrySubmitProofStatus:
+				DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.STALE_BASE_REJECTED,
+			retrySubmitProofReason:
+				DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+			canExportLocalUpdates: true,
+		} );
+	} );
+
+	it( 'normalizes retry-submit proof permission errors without losing local copy protection', () => {
+		const normalized =
+			getDistributedEditingSessionStateForRetrySubmitProofResult(
+				{
+					code: DISTRIBUTED_EDITING_REASON_CODES.REST_CANNOT_EDIT,
+				},
+				{
+					pendingChangeCount: 1,
+					canExportLocalUpdates: true,
+				}
+			);
+
+		expect( normalized ).toMatchObject( {
+			disposition:
+				DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_PERMISSION_DENIED,
+			reasonCode: DISTRIBUTED_EDITING_REASON_CODES.REST_CANNOT_EDIT,
+			retrySubmitProofStatus:
+				DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.REJECTED_PERMISSION_DENIED,
+			retrySubmitAccepted: false,
+			retrySubmitSavePathRequired: false,
+			hasPendingChanges: true,
+			isAwaitingServerConfirmation: true,
+			canExportLocalUpdates: true,
 		} );
 	} );
 

@@ -121,6 +121,18 @@ export const DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_REASONS = Object.freeze( {
 	MANUAL_CONFLICT_REQUIRED: 'manual_conflict_required',
 } );
 
+/**
+ * Stable retry-submit proof statuses for the proof-only REST response.
+ */
+export const DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES = Object.freeze( {
+	NONE: 'none',
+	ACCEPTED_FOR_FUTURE_SAVE: 'accepted_for_future_save',
+	STALE_BASE_REJECTED: 'stale_base_rejected',
+	REJECTED_FEATURE_DISABLED: 'rejected_feature_disabled',
+	REJECTED_PERMISSION_DENIED: 'rejected_permission_denied',
+	REJECTED_ROUTE_MISMATCH: 'rejected_route_mismatch',
+} );
+
 const VALID_REASON_CODES = new Set(
 	Object.values( DISTRIBUTED_EDITING_REASON_CODES )
 );
@@ -139,6 +151,10 @@ const VALID_LOCAL_REBASE_RESULT_STATUSES = new Set(
 
 const VALID_RETRY_SUBMIT_HANDOFF_STATUSES = new Set(
 	Object.values( DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_STATUSES )
+);
+
+const VALID_RETRY_SUBMIT_PROOF_STATUSES = new Set(
+	Object.values( DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES )
 );
 
 const NOTICE_ID_BY_KIND = Object.freeze( {
@@ -182,6 +198,15 @@ export const DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE = Object.freeze( {
 		DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_STATUSES.NONE,
 	retrySubmitHandoffReason: null,
 	retrySubmitPrepared: false,
+	retrySubmitProofStatus:
+		DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.NONE,
+	retrySubmitProofReason: null,
+	retrySubmitAccepted: false,
+	retrySubmitSavePathRequired: false,
+	retrySubmitSavesPost: false,
+	retrySubmitMutatesPostContent: false,
+	retrySubmitCreatesRevision: false,
+	retrySubmitClaimsSaved: false,
 	requiresManualConflictResolution: false,
 	mustOfferLocalCopy: false,
 	canExportLocalUpdates: false,
@@ -324,11 +349,24 @@ export function normalizeDistributedEditingSessionState( sessionState = {} ) {
 		retrySubmitHandoffStatus =
 			DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_STATUSES.BLOCKED;
 	}
+	const retrySubmitProofStatus = VALID_RETRY_SUBMIT_PROOF_STATUSES.has(
+		sessionState.retrySubmitProofStatus
+	)
+		? sessionState.retrySubmitProofStatus
+		: DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE.retrySubmitProofStatus;
+	const retrySubmitAccepted =
+		Boolean( sessionState.retrySubmitAccepted ) ||
+		retrySubmitProofStatus ===
+			DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.ACCEPTED_FOR_FUTURE_SAVE;
+	const retrySubmitSavePathRequired =
+		Boolean( sessionState.retrySubmitSavePathRequired ) ||
+		retrySubmitAccepted;
 
 	const mustOfferLocalCopy =
 		Boolean( sessionState.mustOfferLocalCopy ) ||
 		( requiresServerStateAcceptance && hasPendingChanges ) ||
 		( requiresServerStateRefetch && hasPendingChanges ) ||
+		( retrySubmitSavePathRequired && hasPendingChanges ) ||
 		( requiresManualConflictResolution && hasPendingChanges );
 	const canExportLocalUpdates =
 		Boolean( sessionState.canExportLocalUpdates ) || mustOfferLocalCopy;
@@ -365,6 +403,20 @@ export function normalizeDistributedEditingSessionState( sessionState = {} ) {
 			sessionState.retrySubmitHandoffReason
 		),
 		retrySubmitPrepared,
+		retrySubmitProofStatus,
+		retrySubmitProofReason: normalizeNullableString(
+			sessionState.retrySubmitProofReason
+		),
+		retrySubmitAccepted,
+		retrySubmitSavePathRequired,
+		retrySubmitSavesPost: Boolean( sessionState.retrySubmitSavesPost ),
+		retrySubmitMutatesPostContent: Boolean(
+			sessionState.retrySubmitMutatesPostContent
+		),
+		retrySubmitCreatesRevision: Boolean(
+			sessionState.retrySubmitCreatesRevision
+		),
+		retrySubmitClaimsSaved: Boolean( sessionState.retrySubmitClaimsSaved ),
 		requiresManualConflictResolution,
 		mustOfferLocalCopy,
 		canExportLocalUpdates,
@@ -819,6 +871,9 @@ export function getDistributedEditingNoticeDescriptorsForSessionState(
 				kind: DISTRIBUTED_EDITING_NOTICE_KINDS.PENDING_CHANGES,
 				status: 'info',
 				priority: 'status',
+				extra: getDistributedEditingRetrySubmitProofDescriptorFields(
+					normalized
+				),
 			} )
 		);
 	}
@@ -905,6 +960,224 @@ export function getDistributedEditingSessionStateForRetrySubmitHandoff(
 			DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_STATUSES.PREPARED,
 		retrySubmitHandoffReason: null,
 		retrySubmitPrepared: true,
+	} );
+}
+
+/**
+ * Returns inert DE-RTC editor state for a retry-submit proof response.
+ *
+ * The response only proves whether a locally rebased candidate is still based
+ * on the current server sync version. Accepted proof keeps local changes
+ * pending until a later save-path consumer persists them.
+ *
+ * @param {Object} responseOrError     REST response or API error.
+ * @param {Object} currentSessionState Current DE-RTC session state.
+ *
+ * @return {Object} Normalized DE-RTC session state.
+ */
+export function getDistributedEditingSessionStateForRetrySubmitProofResult(
+	responseOrError = {},
+	currentSessionState = {}
+) {
+	const normalizedCurrent =
+		normalizeDistributedEditingSessionState( currentSessionState );
+	const responseData = getDistributedEditingResponseData( responseOrError );
+	const result = normalizeNullableString(
+		responseOrError.result || responseData.result
+	);
+	const pendingChangeCount =
+		responseOrError.pendingChangeCount ??
+		responseOrError.pending_change_count ??
+		responseData.pendingChangeCount ??
+		responseData.pending_change_count ??
+		normalizedCurrent.pendingChangeCount;
+	const remoteChangeCount =
+		responseOrError.remoteChangeCount ??
+		responseOrError.remote_change_count ??
+		responseData.remoteChangeCount ??
+		responseData.remote_change_count ??
+		normalizedCurrent.remoteChangeCount;
+	const commonNoWriteFlags = {
+		retrySubmitSavesPost: Boolean(
+			responseOrError.savesPost ||
+				responseOrError.saves_post ||
+				responseData.savesPost ||
+				responseData.saves_post
+		),
+		retrySubmitMutatesPostContent: Boolean(
+			responseOrError.mutatesPostContent ||
+				responseOrError.mutates_post_content ||
+				responseData.mutatesPostContent ||
+				responseData.mutates_post_content
+		),
+		retrySubmitCreatesRevision: Boolean(
+			responseOrError.createsRevision ||
+				responseOrError.creates_revision ||
+				responseData.createsRevision ||
+				responseData.creates_revision
+		),
+		retrySubmitClaimsSaved: Boolean(
+			responseOrError.claimsSaved ||
+				responseOrError.claims_saved ||
+				responseData.claimsSaved ||
+				responseData.claims_saved
+		),
+	};
+
+	if (
+		result === 'retry_submit_accepted_for_future_save' ||
+		responseOrError.retrySubmitAccepted === true ||
+		responseOrError.retry_submit_accepted === true ||
+		responseData.retrySubmitAccepted === true ||
+		responseData.retry_submit_accepted === true
+	) {
+		return normalizeDistributedEditingSessionState( {
+			...normalizedCurrent,
+			disposition: DISTRIBUTED_EDITING_DISPOSITIONS.IDLE,
+			reasonCode: null,
+			pendingChangeCount,
+			remoteChangeCount: 0,
+			hasRemoteChanges: false,
+			requiresServerStateAcceptance: false,
+			requiresServerStateRefetch: false,
+			canAttemptLocalRebase: false,
+			readyToRetrySubmit: false,
+			retrySubmitProofStatus:
+				DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.ACCEPTED_FOR_FUTURE_SAVE,
+			retrySubmitProofReason: null,
+			retrySubmitAccepted: true,
+			retrySubmitSavePathRequired: true,
+			mustOfferLocalCopy: true,
+			canExportLocalUpdates: true,
+			...commonNoWriteFlags,
+		} );
+	}
+
+	const reasonCode = normalizeNullableString(
+		responseOrError.code ||
+			responseOrError.reasonCode ||
+			responseOrError.reason_code ||
+			responseData.reasonCode ||
+			responseData.reason_code
+	);
+
+	switch ( reasonCode ) {
+		case DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED: {
+			const staleState =
+				getDistributedEditingSessionStateForStaleBaseRejectionResult( {
+					...responseOrError,
+					clientBaseVersion:
+						responseOrError.clientBaseVersion ??
+						responseOrError.client_base_version ??
+						responseData.clientBaseVersion ??
+						responseData.client_base_version ??
+						normalizedCurrent.clientBaseVersion,
+					serverVersion:
+						responseOrError.serverVersion ??
+						responseOrError.server_version ??
+						responseData.serverVersion ??
+						responseData.server_version ??
+						normalizedCurrent.serverVersion,
+					clientBaseContent:
+						responseOrError.clientBaseContent ??
+						responseOrError.client_base_content ??
+						responseData.clientBaseContent ??
+						responseData.client_base_content ??
+						normalizedCurrent.clientBaseContent,
+					pendingChangeCount,
+					remoteChangeCount,
+					canAttemptLocalRebase: false,
+				} );
+
+			return normalizeDistributedEditingSessionState( {
+				...staleState,
+				refetchedServerState: false,
+				requiresServerStateRefetch: true,
+				canAttemptLocalRebase: false,
+				localRebasePlanStatus:
+					DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES.NONE,
+				localRebaseResultStatus:
+					DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.NONE,
+				localRebaseResultReason: null,
+				readyToRetrySubmit: false,
+				retrySubmitHandoffStatus:
+					DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_STATUSES.NONE,
+				retrySubmitHandoffReason: null,
+				retrySubmitPrepared: false,
+				retrySubmitProofStatus:
+					DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.STALE_BASE_REJECTED,
+				retrySubmitProofReason: reasonCode,
+				retrySubmitAccepted: false,
+				retrySubmitSavePathRequired: false,
+				canExportLocalUpdates: true,
+				...commonNoWriteFlags,
+			} );
+		}
+
+		case DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_FEATURE_DISABLED:
+			return normalizeDistributedEditingSessionState( {
+				...normalizedCurrent,
+				disposition:
+					DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_FEATURE_DISABLED,
+				reasonCode,
+				pendingChangeCount,
+				retrySubmitProofStatus:
+					DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.REJECTED_FEATURE_DISABLED,
+				retrySubmitProofReason: reasonCode,
+				retrySubmitAccepted: false,
+				retrySubmitSavePathRequired: false,
+				canExportLocalUpdates:
+					normalizedCurrent.canExportLocalUpdates ||
+					normalizeCount( pendingChangeCount ) > 0,
+				...commonNoWriteFlags,
+			} );
+
+		case DISTRIBUTED_EDITING_REASON_CODES.REST_CANNOT_EDIT:
+			return normalizeDistributedEditingSessionState( {
+				...normalizedCurrent,
+				disposition:
+					DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_PERMISSION_DENIED,
+				reasonCode,
+				pendingChangeCount,
+				retrySubmitProofStatus:
+					DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.REJECTED_PERMISSION_DENIED,
+				retrySubmitProofReason: reasonCode,
+				retrySubmitAccepted: false,
+				retrySubmitSavePathRequired: false,
+				canExportLocalUpdates:
+					normalizedCurrent.canExportLocalUpdates ||
+					normalizeCount( pendingChangeCount ) > 0,
+				...commonNoWriteFlags,
+			} );
+
+		case DISTRIBUTED_EDITING_REASON_CODES.REST_POST_INVALID_ID:
+			return normalizeDistributedEditingSessionState( {
+				...normalizedCurrent,
+				disposition:
+					DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_ROUTE_MISMATCH,
+				reasonCode,
+				pendingChangeCount,
+				retrySubmitProofStatus:
+					DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.REJECTED_ROUTE_MISMATCH,
+				retrySubmitProofReason: reasonCode,
+				retrySubmitAccepted: false,
+				retrySubmitSavePathRequired: false,
+				canExportLocalUpdates:
+					normalizedCurrent.canExportLocalUpdates ||
+					normalizeCount( pendingChangeCount ) > 0,
+				...commonNoWriteFlags,
+			} );
+	}
+
+	return normalizeDistributedEditingSessionState( {
+		...normalizedCurrent,
+		pendingChangeCount,
+		retrySubmitProofStatus:
+			DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.NONE,
+		retrySubmitProofReason: reasonCode,
+		retrySubmitAccepted: false,
+		retrySubmitSavePathRequired: false,
+		...commonNoWriteFlags,
 	} );
 }
 
@@ -1004,9 +1277,23 @@ function getDistributedEditingLocalRebaseDescriptorFields( normalized ) {
 		retrySubmitHandoffStatus: normalized.retrySubmitHandoffStatus,
 		retrySubmitHandoffReason: normalized.retrySubmitHandoffReason,
 		retrySubmitPrepared: normalized.retrySubmitPrepared,
+		...getDistributedEditingRetrySubmitProofDescriptorFields( normalized ),
 		hasClientBaseContent,
 		hasRefetchedServerContent,
 		hasLocalRebaseInputs: hasClientBaseContent && hasRefetchedServerContent,
+	};
+}
+
+function getDistributedEditingRetrySubmitProofDescriptorFields( normalized ) {
+	return {
+		retrySubmitProofStatus: normalized.retrySubmitProofStatus,
+		retrySubmitProofReason: normalized.retrySubmitProofReason,
+		retrySubmitAccepted: normalized.retrySubmitAccepted,
+		retrySubmitSavePathRequired: normalized.retrySubmitSavePathRequired,
+		retrySubmitSavesPost: normalized.retrySubmitSavesPost,
+		retrySubmitMutatesPostContent: normalized.retrySubmitMutatesPostContent,
+		retrySubmitCreatesRevision: normalized.retrySubmitCreatesRevision,
+		retrySubmitClaimsSaved: normalized.retrySubmitClaimsSaved,
 	};
 }
 

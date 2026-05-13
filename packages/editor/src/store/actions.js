@@ -26,6 +26,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import { localAutosaveSet } from './local-autosave';
 import {
 	__experimentalRequestDistributedEditingRecoveryDryRun as requestDistributedEditingRecoveryDryRun,
+	__experimentalRequestDistributedEditingRetrySubmitProbe as requestDistributedEditingRetrySubmitProbe,
 	__experimentalRequestDistributedEditingServerStateRefetch as requestDistributedEditingServerStateRefetch,
 	__experimentalRequestDistributedEditingStaleBaseRejection as requestDistributedEditingStaleBaseRejection,
 	DISTRIBUTED_EDITING_RECOVERY_REST_BASE,
@@ -33,6 +34,7 @@ import {
 import {
 	getDistributedEditingSessionStateForRecoveryDryRunResult,
 	getDistributedEditingSessionStateForRetrySubmitHandoff,
+	getDistributedEditingSessionStateForRetrySubmitProofResult,
 	getDistributedEditingStaleBaseLocalRebaseResult,
 	getDistributedEditingSessionStateForStaleBaseLocalRebasePlan,
 	getDistributedEditingSessionStateForStaleBaseRejectionResult,
@@ -463,6 +465,72 @@ export const __experimentalPrepareDistributedEditingRetrySubmitAfterLocalRebase 
 				sessionState,
 			};
 		};
+
+/**
+ * Requests the retry-submit proof endpoint and stores inert retry state.
+ *
+ * The action only records whether the prepared retry is still accepted for a
+ * future save path. It does not save, dispatch notices, persist editor state,
+ * mutate post content, create revisions, claim saved, or change post locks.
+ *
+ * @param {Object} [options] Request options.
+ *
+ * @return {Function} Action thunk.
+ */
+export const __experimentalRefreshDistributedEditingRetrySubmitProof =
+	( options = {} ) =>
+	async ( { select, dispatch, registry } ) => {
+		const currentPost = select.getCurrentPost?.() || {};
+		const postType = options.postType || currentPost.type;
+		const postId = options.postId ?? currentPost.id;
+		const postTypeRecord = postType
+			? registry.select( coreStore ).getPostType( postType )
+			: null;
+		const restBase =
+			options.restBase ||
+			postTypeRecord?.rest_base ||
+			DISTRIBUTED_EDITING_RECOVERY_REST_BASE;
+		const currentSessionState =
+			select.getDistributedEditingSessionState?.() || {};
+		const requestArgs = {
+			postId,
+			restBase,
+			clientBaseVersion:
+				options.clientBaseVersion ??
+				currentSessionState.serverVersion ??
+				currentSessionState.clientBaseVersion,
+			rebasedFromVersion:
+				options.rebasedFromVersion ??
+				currentSessionState.clientBaseVersion,
+			pendingChangeCount:
+				options.pendingChangeCount ??
+				currentSessionState.pendingChangeCount,
+			proposedPostContentHash: options.proposedPostContentHash,
+		};
+
+		try {
+			const response =
+				await requestDistributedEditingRetrySubmitProbe( requestArgs );
+
+			dispatch.setDistributedEditingSessionState(
+				getDistributedEditingSessionStateForRetrySubmitProofResult(
+					response,
+					currentSessionState
+				)
+			);
+
+			return response;
+		} catch ( error ) {
+			dispatch.setDistributedEditingSessionState(
+				getDistributedEditingSessionStateForRetrySubmitProofResult(
+					error,
+					currentSessionState
+				)
+			);
+
+			throw error;
+		}
+	};
 
 /**
  * Returns an action object used in signalling that attributes of the post have

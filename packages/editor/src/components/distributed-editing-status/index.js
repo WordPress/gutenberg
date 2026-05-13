@@ -18,6 +18,7 @@ import {
 	DISTRIBUTED_EDITING_NOTICE_KINDS,
 	DISTRIBUTED_EDITING_REASON_CODES,
 	DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_STATUSES,
+	DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES,
 	DISTRIBUTED_EDITING_UNLOAD_WARNING_REASONS,
 	normalizeDistributedEditingSessionState,
 } from '../../store/distributed-editing';
@@ -194,6 +195,33 @@ const DISTRIBUTED_EDITING_STATUS_CONTROL_STATE_DEFINITIONS = Object.freeze( {
 		retrySubmitPrepared: true,
 		clientBaseContent: '',
 		refetchedServerContent: '',
+	} ),
+	staleBaseRetryProofAccepted: Object.freeze( {
+		pendingChangeCount: 1,
+		retrySubmitHandoffStatus:
+			DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_STATUSES.PREPARED,
+		retrySubmitPrepared: true,
+		retrySubmitProofStatus:
+			DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.ACCEPTED_FOR_FUTURE_SAVE,
+		retrySubmitAccepted: true,
+		retrySubmitSavePathRequired: true,
+		canExportLocalUpdates: true,
+		mustOfferLocalCopy: true,
+	} ),
+	staleBaseRetryProofStale: Object.freeze( {
+		disposition:
+			DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+		reasonCode:
+			DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+		pendingChangeCount: 1,
+		remoteChangeCount: 1,
+		requiresServerStateRefetch: true,
+		canExportLocalUpdates: true,
+		retrySubmitProofStatus:
+			DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.STALE_BASE_REJECTED,
+		retrySubmitProofReason:
+			DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+		clientBaseContent: '',
 	} ),
 	manualResolution: Object.freeze( {
 		disposition:
@@ -393,6 +421,18 @@ export function DistributedEditingLocalRebaseStateInspector() {
 			<div>
 				<dt>{ __( 'Retry handoff' ) }</dt>
 				<dd>{ normalized.retrySubmitHandoffStatus }</dd>
+			</div>
+			<div>
+				<dt>{ __( 'Retry proof' ) }</dt>
+				<dd>{ normalized.retrySubmitProofStatus }</dd>
+			</div>
+			<div>
+				<dt>{ __( 'Retry accepted' ) }</dt>
+				<dd>
+					{ normalized.retrySubmitAccepted
+						? __( 'Accepted for future save' )
+						: __( 'Not accepted' ) }
+				</dd>
 			</div>
 		</dl>
 	);
@@ -626,6 +666,15 @@ function getBaseStatusItem( descriptor ) {
 }
 
 function getPendingChangesMessage( descriptor ) {
+	if (
+		descriptor.retrySubmitProofStatus ===
+		DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.ACCEPTED_FOR_FUTURE_SAVE
+	) {
+		return __(
+			'Retry submit accepted the rebased changes for a future save. Local changes are still awaiting confirmation.'
+		);
+	}
+
 	const count = normalizeCount( descriptor.pendingChangeCount );
 
 	if ( count > 0 ) {
@@ -755,6 +804,10 @@ function getDistributedEditingStatusControlLabel( key ) {
 			return __( 'Freeform HTML blocked' );
 		case 'staleBaseRetryPrepared':
 			return __( 'Retry handoff prepared' );
+		case 'staleBaseRetryProofAccepted':
+			return __( 'Retry proof accepted' );
+		case 'staleBaseRetryProofStale':
+			return __( 'Retry proof stale' );
 		case 'manualResolution':
 			return __( 'Manual resolution' );
 	}
@@ -781,6 +834,18 @@ function normalizeCount( value ) {
 }
 
 function getStaleBaseStatusText( descriptor ) {
+	if (
+		descriptor.retrySubmitProofStatus ===
+		DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.STALE_BASE_REJECTED
+	) {
+		return {
+			title: __( 'Retry submit stale' ),
+			message: __(
+				'The server changed after retry submit was prepared. Refresh the server version before continuing.'
+			),
+		};
+	}
+
 	if (
 		descriptor.retrySubmitHandoffStatus ===
 		DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_STATUSES.PREPARED

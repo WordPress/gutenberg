@@ -30,6 +30,7 @@ import {
 	DISTRIBUTED_EDITING_NOTICE_KINDS,
 	DISTRIBUTED_EDITING_REASON_CODES,
 	DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_STATUSES,
+	DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES,
 	DISTRIBUTED_EDITING_UNLOAD_WARNING_REASONS,
 	getDistributedEditingNoticeDescriptorsForSessionState,
 	getDistributedEditingUnloadWarningStateForSessionState,
@@ -99,6 +100,8 @@ describe( 'getDistributedEditingStatusControlStates', () => {
 			'staleBaseRebaseBlockReordered',
 			'staleBaseRebaseFreeformHtml',
 			'staleBaseRetryPrepared',
+			'staleBaseRetryProofAccepted',
+			'staleBaseRetryProofStale',
 			'manualResolution',
 		] );
 		expect( states.pendingLocalChanges ).toEqual( {
@@ -170,6 +173,24 @@ describe( 'getDistributedEditingStatusControlStates', () => {
 			retrySubmitHandoffStatus:
 				DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_STATUSES.PREPARED,
 			retrySubmitPrepared: true,
+		} );
+		expect( states.staleBaseRetryProofAccepted ).toMatchObject( {
+			pendingChangeCount: 1,
+			retrySubmitProofStatus:
+				DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.ACCEPTED_FOR_FUTURE_SAVE,
+			retrySubmitAccepted: true,
+			retrySubmitSavePathRequired: true,
+			canExportLocalUpdates: true,
+		} );
+		expect( states.staleBaseRetryProofStale ).toMatchObject( {
+			disposition:
+				DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+			retrySubmitProofStatus:
+				DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.STALE_BASE_REJECTED,
+			retrySubmitProofReason:
+				DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+			requiresServerStateRefetch: true,
+			canExportLocalUpdates: true,
 		} );
 		expect( states.manualResolution ).toEqual( {
 			disposition:
@@ -302,6 +323,8 @@ describe( 'DistributedEditingLocalRebaseStateInspector', () => {
 		expect( screen.getByText( 'Retry submit' ) ).toBeVisible();
 		expect( screen.getByText( 'Ready' ) ).toBeVisible();
 		expect( screen.getByText( 'Retry handoff' ) ).toBeVisible();
+		expect( screen.getByText( 'Retry proof' ) ).toBeVisible();
+		expect( screen.getByText( 'Retry accepted' ) ).toBeVisible();
 		expect( screen.queryByText( /wp:paragraph/ ) ).not.toBeInTheDocument();
 	} );
 
@@ -317,7 +340,7 @@ describe( 'DistributedEditingLocalRebaseStateInspector', () => {
 		render( <DistributedEditingLocalRebaseStateInspector /> );
 
 		expect( screen.getByText( 'ready' ) ).toBeVisible();
-		expect( screen.getAllByText( 'none' ) ).toHaveLength( 2 );
+		expect( screen.getAllByText( 'none' ) ).toHaveLength( 3 );
 		expect( screen.getByText( 'Missing' ) ).toBeVisible();
 		expect( screen.getByText( 'Available' ) ).toBeVisible();
 		expect( screen.getByText( 'Not ready' ) ).toBeVisible();
@@ -840,6 +863,66 @@ describe( 'DistributedEditingStatusSurface', () => {
 		expect(
 			screen.getByText(
 				'Local changes are staged for the future retry path. No save has been sent yet.'
+			)
+		).toBeVisible();
+	} );
+
+	it( 'renders accepted retry-submit proof without claiming a save', () => {
+		const noticeDescriptors =
+			getDistributedEditingNoticeDescriptorsForSessionState( {
+				pendingChangeCount: 1,
+				retrySubmitProofStatus:
+					DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.ACCEPTED_FOR_FUTURE_SAVE,
+				retrySubmitAccepted: true,
+				retrySubmitSavePathRequired: true,
+				retrySubmitSavesPost: false,
+				retrySubmitMutatesPostContent: false,
+				retrySubmitClaimsSaved: false,
+				canExportLocalUpdates: true,
+			} );
+
+		render(
+			<DistributedEditingStatusSurface
+				noticeDescriptors={ noticeDescriptors }
+			/>
+		);
+
+		expect( screen.getByText( 'Changes pending' ) ).toBeVisible();
+		expect(
+			screen.getByText(
+				'Retry submit accepted the rebased changes for a future save. Local changes are still awaiting confirmation.'
+			)
+		).toBeVisible();
+		expect( screen.queryByText( /saved/i ) ).not.toBeInTheDocument();
+	} );
+
+	it( 'renders stale retry-submit proof after prepared handoff', () => {
+		const noticeDescriptors =
+			getDistributedEditingNoticeDescriptorsForSessionState( {
+				disposition:
+					DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+				reasonCode:
+					DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+				pendingChangeCount: 1,
+				remoteChangeCount: 1,
+				requiresServerStateRefetch: true,
+				canExportLocalUpdates: true,
+				retrySubmitProofStatus:
+					DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.STALE_BASE_REJECTED,
+				retrySubmitProofReason:
+					DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+			} );
+
+		render(
+			<DistributedEditingStatusSurface
+				noticeDescriptors={ noticeDescriptors }
+			/>
+		);
+
+		expect( screen.getByText( 'Retry submit stale' ) ).toBeVisible();
+		expect(
+			screen.getByText(
+				'The server changed after retry submit was prepared. Refresh the server version before continuing.'
 			)
 		).toBeVisible();
 	} );

@@ -20,6 +20,7 @@ import {
 	DISTRIBUTED_EDITING_REASON_CODES,
 	DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_REASONS,
 	DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_STATUSES,
+	DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES,
 	DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE,
 } from '../distributed-editing';
 import { store as editorStore } from '..';
@@ -815,6 +816,187 @@ describe( 'Post actions', () => {
 				retrySubmitHandoffReason:
 					DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_REASONS.MANUAL_CONFLICT_REQUIRED,
 				retrySubmitPrepared: false,
+			} );
+		} );
+	} );
+
+	describe( '__experimentalRefreshDistributedEditingRetrySubmitProof()', () => {
+		it( 'normalizes accepted retry-submit proof without saving', async () => {
+			const proposedPostContentHash =
+				'fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210';
+			const post = {
+				id: postId,
+				type: 'post',
+				title: 'bar',
+				content:
+					'<!-- wp:paragraph --><p>Rebased</p><!-- /wp:paragraph -->',
+				status: 'draft',
+			};
+
+			apiFetch.setFetchHandler( async ( options ) => {
+				const { path, method, data } = options;
+
+				expect( method ).toBe( 'POST' );
+				expect( path ).toMatch(
+					new RegExp(
+						`^/wp/v2/posts/${ postId }/distributed-editing/retry-submit`
+					)
+				);
+				expect( data ).toEqual( {
+					client_base_version: '7',
+					rebased_from_version: '4',
+					pending_change_count: 2,
+					proposed_post_content_hash: proposedPostContentHash,
+				} );
+				expect( data.content ).toBeUndefined();
+
+				return {
+					result: 'retry_submit_accepted_for_future_save',
+					retry_submit_accepted: true,
+					save_path_required: true,
+					saves_post: false,
+					mutates_post_content: false,
+					creates_revision: false,
+					claims_saved: false,
+				};
+			} );
+
+			const registry = createRegistryWithStores();
+
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', post );
+			registry.dispatch( editorStore ).setupEditor( post, {
+				content: post.content,
+			} );
+			registry
+				.dispatch( editorStore )
+				.setDistributedEditingSessionState( {
+					disposition:
+						DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+					reasonCode:
+						DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+					clientBaseVersion: '4',
+					serverVersion: '7',
+					pendingChangeCount: 2,
+					localRebaseResultStatus:
+						DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.REBASED,
+					retrySubmitHandoffStatus:
+						DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_STATUSES.PREPARED,
+					retrySubmitPrepared: true,
+					canExportLocalUpdates: true,
+				} );
+
+			await expect(
+				registry
+					.dispatch( editorStore )
+					.__experimentalRefreshDistributedEditingRetrySubmitProof( {
+						proposedPostContentHash,
+					} )
+			).resolves.toMatchObject( {
+				result: 'retry_submit_accepted_for_future_save',
+				retry_submit_accepted: true,
+			} );
+
+			expect(
+				registry.select( editorStore ).getEditedPostContent()
+			).toBe( post.content );
+			expect(
+				registry
+					.select( editorStore )
+					.getDistributedEditingSessionState()
+			).toMatchObject( {
+				disposition: DISTRIBUTED_EDITING_DISPOSITIONS.IDLE,
+				reasonCode: null,
+				pendingChangeCount: 2,
+				hasPendingChanges: true,
+				isAwaitingServerConfirmation: true,
+				retrySubmitProofStatus:
+					DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.ACCEPTED_FOR_FUTURE_SAVE,
+				retrySubmitAccepted: true,
+				retrySubmitSavePathRequired: true,
+				retrySubmitSavesPost: false,
+				retrySubmitMutatesPostContent: false,
+				retrySubmitCreatesRevision: false,
+				retrySubmitClaimsSaved: false,
+				canExportLocalUpdates: true,
+			} );
+		} );
+
+		it( 'normalizes stale retry-submit proof errors before rethrowing', async () => {
+			const post = {
+				id: postId,
+				type: 'post',
+				title: 'bar',
+				content: 'bar',
+				status: 'draft',
+			};
+			const error = {
+				code: DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+				message:
+					'Distributed Editing rejected the retry because the server advanced again.',
+				data: {
+					status: 409,
+					reason_code:
+						DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+					client_base_version: '7',
+					server_version: '8',
+					pending_change_count: 1,
+					remote_change_count: 1,
+				},
+			};
+
+			apiFetch.setFetchHandler( async () => {
+				throw error;
+			} );
+
+			const registry = createRegistryWithStores();
+
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', post );
+			registry.dispatch( editorStore ).setupEditor( post, {} );
+			registry
+				.dispatch( editorStore )
+				.setDistributedEditingSessionState( {
+					clientBaseVersion: '4',
+					serverVersion: '7',
+					pendingChangeCount: 1,
+					refetchedServerState: true,
+					localRebaseResultStatus:
+						DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.REBASED,
+					retrySubmitHandoffStatus:
+						DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_STATUSES.PREPARED,
+					retrySubmitPrepared: true,
+					canExportLocalUpdates: true,
+				} );
+
+			await expect(
+				registry
+					.dispatch( editorStore )
+					.__experimentalRefreshDistributedEditingRetrySubmitProof()
+			).rejects.toBe( error );
+
+			expect(
+				registry
+					.select( editorStore )
+					.getDistributedEditingSessionState()
+			).toMatchObject( {
+				disposition:
+					DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+				reasonCode:
+					DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+				clientBaseVersion: '7',
+				serverVersion: '8',
+				requiresServerStateRefetch: true,
+				retrySubmitHandoffStatus:
+					DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_STATUSES.NONE,
+				retrySubmitPrepared: false,
+				retrySubmitProofStatus:
+					DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.STALE_BASE_REJECTED,
+				retrySubmitProofReason:
+					DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+				canExportLocalUpdates: true,
 			} );
 		} );
 	} );
