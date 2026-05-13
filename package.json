@@ -104,6 +104,7 @@
 		"sass-loader": "16.0.3",
 		"semver": "7.5.4",
 		"simple-git": "3.24.0",
+		"source-map": "0.6.1",
 		"sprintf-js": "1.1.1",
 		"style-loader": "3.2.1",
 		"stylelint-plugin-logical-css": "^1.2.3",

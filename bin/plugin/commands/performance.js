@@ -502,6 +502,29 @@ async function runPerformanceTests( branches, options ) {
 		}
 	}
 
+	// Copy the head branch's script source maps next to the traces so the
+	// artifact is self-contained: downloaders can run
+	// `bin/resolve-trace-source-maps.js` directly without checking out the
+	// repo or running `npm run build`.
+	const headBranch = branches[ 0 ];
+	// @ts-ignore
+	const headBuildScriptsDir = path.join(
+		// @ts-ignore
+		branchDirs[ headBranch ],
+		'plugin',
+		'build',
+		'scripts'
+	);
+	if ( fs.existsSync( headBuildScriptsDir ) ) {
+		const destScriptsDir = path.join( ARTIFACTS_PATH, 'build', 'scripts' );
+		fs.mkdirSync( destScriptsDir, { recursive: true } );
+		fs.cpSync( headBuildScriptsDir, destScriptsDir, {
+			recursive: true,
+			filter: ( src ) =>
+				fs.statSync( src ).isDirectory() || src.endsWith( '.map' ),
+		} );
+	}
+
 	logAtIndent( 0, 'Calculating results' );
 
 	const resultFiles = getFilesFromDir( ARTIFACTS_PATH ).filter( ( file ) =>

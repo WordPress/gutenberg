@@ -9,11 +9,6 @@ import type { Page, Browser } from '@playwright/test';
 // @ts-expect-error
 import type { Metric } from 'web-vitals';
 
-/**
- * Internal dependencies
- */
-import { resolveTraceSourceMaps } from './resolve-trace-source-maps';
-
 type EventType =
 	| 'click'
 	| 'focus'
@@ -276,10 +271,12 @@ export class Metrics {
 			return;
 		}
 
+		// Traces are saved minified. Run bin/resolve-trace-source-maps.js
+		// against a downloaded trace + matching `build/` directory to rewrite
+		// minified `functionName`s back to their source identifiers.
 		const tracesDir = join( artifactsPath, 'traces' );
 		const filePath = join( tracesDir, `${ name }.trace.json` );
 		await mkdir( tracesDir, { recursive: true } );
-		await resolveTraceSourceMaps( traceJSON, fetchMap );
 		await writeFile( filePath, JSON.stringify( traceJSON ) );
 	}
 
@@ -434,41 +431,5 @@ export class Metrics {
 		await this.page.reload();
 
 		return this.webVitals;
-	}
-}
-
-/**
- * Fetch a source map for a script URL. Strips any query string (WordPress
- * appends `?ver=…` cache-busters that, with Apache's default rules, would
- * otherwise let the bogus `<url>.map?ver=…` request resolve to the script
- * body itself). Returns the body text, or `null` when the map is missing or
- * unreachable. Used to deminify function names in saved traces; failures
- * are intentionally silent so the trace is still saved when individual
- * maps are unavailable (e.g. external scripts, runtime-injected code).
- *
- * @param scriptUrl URL of the script whose source map to fetch.
- */
-async function fetchMap( scriptUrl: string ): Promise< string | null > {
-	if ( ! /^https?:\/\//.test( scriptUrl ) ) {
-		return null;
-	}
-	let mapUrl: URL;
-	try {
-		mapUrl = new URL( scriptUrl );
-	} catch {
-		return null;
-	}
-	mapUrl.search = '';
-	mapUrl.hash = '';
-	mapUrl.pathname = `${ mapUrl.pathname }.map`;
-
-	try {
-		const response = await fetch( mapUrl );
-		if ( ! response.ok ) {
-			return null;
-		}
-		return await response.text();
-	} catch {
-		return null;
 	}
 }
