@@ -2088,6 +2088,108 @@ describe( 'Post actions', () => {
 			} );
 		} );
 
+		it( 'blocks setting-enabled savePost normal fallback when retry-save already confirmed protected local work', async () => {
+			const post = {
+				id: postId,
+				type: 'post',
+				title: 'bar',
+				content: 'bar',
+				status: 'draft',
+			};
+			let apiCalls = 0;
+
+			apiFetch.setFetchHandler( async ( options ) => {
+				apiCalls++;
+				const method = getMethod( options );
+				const { path } = options;
+
+				throw {
+					code: 'unexpected_path',
+					message: `Unexpected path: ${ method } ${ path }`,
+				};
+			} );
+
+			const registry = createRegistryWithStores();
+
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', post );
+			registry.dispatch( editorStore ).setupEditor( post, {
+				content: 'new bar',
+			} );
+			registry.dispatch( editorStore ).updateEditorSettings( {
+				distributedEditing: {
+					enabled: true,
+					retrySaveHandoff: true,
+				},
+			} );
+			registry
+				.dispatch( editorStore )
+				.setDistributedEditingSessionState( {
+					clientBaseVersion: '4',
+					serverVersion: '7',
+					pendingChangeCount: 1,
+					retrySubmitProofStatus:
+						DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.ACCEPTED_FOR_FUTURE_SAVE,
+					retrySubmitAccepted: true,
+					retrySubmitSavePathRequired: true,
+					canExportLocalUpdates: true,
+				} );
+
+			await expect(
+				registry
+					.dispatch( editorStore )
+					.__experimentalPrepareDistributedEditingRetrySubmitSaveAfterProof()
+			).resolves.toMatchObject( {
+				status: DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.READY,
+				consumesAcceptedProof: true,
+			} );
+
+			registry
+				.dispatch( editorStore )
+				.updateDistributedEditingSessionState( {
+					retrySaveStatus:
+						DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVED,
+					retrySaveAccepted: true,
+				} );
+
+			await expect(
+				registry.dispatch( editorStore ).savePost()
+			).resolves.toMatchObject( {
+				status: 'retry_save_blocked',
+				reason: DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.RETRY_SAVE_ALREADY_CONFIRMED,
+				allowsNormalSaveFallback: false,
+				blocksNormalSavePost: true,
+				callsRetrySaveAction: false,
+				callsNormalSavePost: false,
+			} );
+
+			expect( apiCalls ).toBe( 0 );
+			expect( registry.select( editorStore ).isEditedPostDirty() ).toBe(
+				true
+			);
+			expect(
+				registry
+					.select( editorStore )
+					.getDistributedEditingSessionState()
+			).toMatchObject( {
+				hasPendingChanges: true,
+				isAwaitingServerConfirmation: true,
+				mustOfferLocalCopy: true,
+				canExportLocalUpdates: true,
+				retrySubmitSaveStatus:
+					DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.READY,
+				retrySubmitSavePrepared: true,
+				retrySaveStatus: DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVED,
+				retrySaveAccepted: true,
+				retrySaveHandoffStatus:
+					DISTRIBUTED_EDITING_RETRY_SAVE_HANDOFF_STATUSES.RETRY_SAVE_BLOCKED,
+				retrySaveHandoffReason:
+					DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.RETRY_SAVE_ALREADY_CONFIRMED,
+				retrySaveHandoffBlocksNormalSave: true,
+			} );
+		} );
+
 		it( 'blocks experimental savePost normal fallback when retry-save policy protects local changes', async () => {
 			const post = {
 				id: postId,
