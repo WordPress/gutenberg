@@ -41,8 +41,9 @@ export function getActiveViewOverridesForTab( activeView ) {
 		filters: [
 			{
 				field: 'author',
-				operator: 'isAny',
-				value: [ activeView ],
+				operator: 'is',
+				value: activeView,
+				isLocked: true,
 			},
 		],
 	};

@@ -46,7 +46,7 @@ export function parseDropEvent( event ) {
 			result,
 			JSON.parse( event.dataTransfer.getData( 'wp-blocks' ) )
 		);
-	} catch ( err ) {
+	} catch {
 		return result;
 	}
 

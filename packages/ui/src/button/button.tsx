@@ -7,7 +7,11 @@ import { type ButtonProps } from './types';
 import styles from './style.module.css';
 import resetStyles from '../utils/css/resets.module.css';
 import focusStyles from '../utils/css/focus.module.css';
+import defenseStyles from '../utils/css/global-css-defense.module.css';
 
+/**
+ * A versatile button component with multiple variants, tones, and sizes.
+ */
 export const Button = forwardRef< HTMLButtonElement, ButtonProps >(
 	function Button(
 		{
@@ -25,6 +29,7 @@ export const Button = forwardRef< HTMLButtonElement, ButtonProps >(
 		ref
 	) {
 		const mergedClassName = clsx(
+			defenseStyles.button,
 			resetStyles[ 'box-sizing' ],
 			focusStyles[ 'outset-ring--focus-except-active' ],
 			variant !== 'unstyled' && styles.button,

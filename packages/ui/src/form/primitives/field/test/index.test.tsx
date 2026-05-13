@@ -34,6 +34,30 @@ describe( 'Field', () => {
 		expect( detailsRef.current ).toBeInstanceOf( HTMLDivElement );
 	} );
 
+	it( 'keeps the accessible name when the label is visually hidden', () => {
+		render(
+			<Field.Root>
+				<Field.Label hideFromVision>Field Label</Field.Label>
+				<Field.Control render={ <input /> } />
+			</Field.Root>
+		);
+
+		expect(
+			screen.getByRole( 'textbox', { name: 'Field Label' } )
+		).toBeVisible();
+	} );
+
+	it( 'preserves the native label element when hideFromVision is enabled', () => {
+		render(
+			<Field.Root>
+				<Field.Label hideFromVision>Field Label</Field.Label>
+				<Field.Control render={ <input /> } />
+			</Field.Root>
+		);
+
+		expect( screen.getByText( 'Field Label' ).tagName ).toBe( 'LABEL' );
+	} );
+
 	it( 'renders details with a semantically associated description for the control', () => {
 		render(
 			<Field.Root>

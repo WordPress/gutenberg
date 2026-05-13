@@ -34,7 +34,7 @@ const meta: Meta< typeof Flex > = {
 		componentStatus: {
 			status: 'not-recommended',
 			whereUsed: 'global',
-			notes: 'Planned for deprecation. For use cases not covered by `HStack` and `VStack`, write your own CSS.',
+			notes: 'Planned for deprecation. For use cases not covered by `Stack` from `@wordpress/ui`, write your own CSS.',
 		},
 	},
 };

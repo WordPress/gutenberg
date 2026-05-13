@@ -5,17 +5,15 @@
 @use "./rich-text/styles.scss" as *;
 
 .block-editor-block-fields__container {
-	padding: 0 $grid-unit-20;
+	padding: 0 $grid-unit-20 $grid-unit-20;
 
 	&:first-of-type {
 		padding-block-start: $grid-unit-10;
-		// Add border for the entire content controls and remove the similar border
-		// for tools panel.
-		border-top: $border-width solid $gray-200;
-	}
-
-	&:last-of-type {
-		padding-block-end: $grid-unit-20;
+		/*
+		 * Add border for the entire content controls and remove the similar border
+		 * for tools panel.
+		 */
+		border-block-start: $border-width solid $gray-200;
 	}
 }
 
@@ -30,6 +28,6 @@
 
 .block-editor-block-fields__header-title {
 	flex: 1;
-	// Override the default margin on a h2 element.
+	/* Override the default margin on a h2 element. */
 	margin: 0 !important;
 }

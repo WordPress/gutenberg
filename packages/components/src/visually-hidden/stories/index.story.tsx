@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
-
-/**
- * Internal dependencies
- */
 import { VisuallyHidden } from '..';
 
 const meta: Meta< typeof VisuallyHidden > = {
@@ -22,8 +15,9 @@ const meta: Meta< typeof VisuallyHidden > = {
 		},
 		docs: { canvas: { sourceState: 'shown' } },
 		componentStatus: {
-			status: 'stable',
+			status: 'not-recommended',
 			whereUsed: 'global',
+			notes: 'Use `VisuallyHidden` from `@wordpress/ui` instead.',
 		},
 	},
 };

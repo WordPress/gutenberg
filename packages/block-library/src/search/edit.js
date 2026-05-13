@@ -70,7 +70,6 @@ export default function SearchEdit( {
 		buttonText,
 		buttonPosition,
 		buttonUseIcon,
-		isSearchFieldHidden,
 		style,
 	} = attributes;
 
@@ -139,6 +138,7 @@ export default function SearchEdit( {
 	const isButtonPositionOutside = 'button-outside' === buttonPosition;
 	const hasNoButton = 'no-button' === buttonPosition;
 	const hasOnlyButton = 'button-only' === buttonPosition;
+	const isSearchFieldHidden = hasOnlyButton && ! isSelected;
 	const searchFieldRef = useRef();
 	const buttonRef = useRef();
 
@@ -146,25 +146,6 @@ export default function SearchEdit( {
 		availableUnits: [ '%', 'px' ],
 		defaultValues: { '%': PC_WIDTH_DEFAULT, px: PX_WIDTH_DEFAULT },
 	} );
-
-	useEffect( () => {
-		if ( hasOnlyButton && ! isSelected ) {
-			setAttributes( {
-				isSearchFieldHidden: true,
-			} );
-		}
-	}, [ hasOnlyButton, isSelected, setAttributes ] );
-
-	// Show the search field when width changes.
-	useEffect( () => {
-		if ( ! hasOnlyButton || ! isSelected ) {
-			return;
-		}
-
-		setAttributes( {
-			isSearchFieldHidden: false,
-		} );
-	}, [ hasOnlyButton, isSelected, setAttributes, width ] );
 
 	const getBlockClassNames = () => {
 		return clsx(
@@ -183,7 +164,7 @@ export default function SearchEdit( {
 			buttonUseIcon && ! hasNoButton
 				? 'wp-block-search__icon-button'
 				: undefined,
-			hasOnlyButton && isSearchFieldHidden
+			isSearchFieldHidden
 				? 'wp-block-search__searchfield-hidden'
 				: undefined
 		);
@@ -223,10 +204,12 @@ export default function SearchEdit( {
 		// If the input is inside the wrapper, the wrapper gets the border color styles/classes, not the input control.
 		const textFieldClasses = clsx(
 			'wp-block-search__input',
+			hasNoButton ? colorProps.className : undefined,
 			isButtonPositionInside ? undefined : borderProps.className,
 			typographyProps.className
 		);
 		const textFieldStyles = {
+			...( hasNoButton ? colorProps.style : {} ),
 			...( isButtonPositionInside
 				? {
 						borderRadius: borderProps.style?.borderRadius,
@@ -292,14 +275,6 @@ export default function SearchEdit( {
 				  }
 				: borderProps.style ),
 		};
-		const handleButtonClick = () => {
-			if ( hasOnlyButton ) {
-				setAttributes( {
-					isSearchFieldHidden: ! isSearchFieldHidden,
-				} );
-			}
-		};
-
 		return (
 			<>
 				{ buttonUseIcon && (
@@ -312,7 +287,6 @@ export default function SearchEdit( {
 								? stripHTML( buttonText )
 								: __( 'Search' )
 						}
-						onClick={ handleButtonClick }
 						ref={ buttonRef }
 					>
 						<Icon icon={ search } />
@@ -331,7 +305,6 @@ export default function SearchEdit( {
 						onChange={ ( html ) =>
 							setAttributes( { buttonText: html } )
 						}
-						onClick={ handleButtonClick }
 					/>
 				) }
 			</>
@@ -351,7 +324,6 @@ export default function SearchEdit( {
 							showLabel: true,
 							buttonUseIcon: false,
 							buttonPosition: 'button-outside',
-							isSearchFieldHidden: false,
 						} );
 					} }
 					dropdownMenuProps={ dropdownMenuProps }
@@ -382,7 +354,6 @@ export default function SearchEdit( {
 						onDeselect={ () => {
 							setAttributes( {
 								buttonPosition: 'button-outside',
-								isSearchFieldHidden: false,
 							} );
 						} }
 						isShownByDefault
@@ -394,8 +365,6 @@ export default function SearchEdit( {
 							onChange={ ( value ) => {
 								setAttributes( {
 									buttonPosition: value,
-									isSearchFieldHidden:
-										value === 'button-only',
 								} );
 							} }
 							options={ buttonPositionControls }

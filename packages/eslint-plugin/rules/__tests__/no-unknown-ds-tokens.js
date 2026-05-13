@@ -2,10 +2,12 @@ import { RuleTester } from 'eslint';
 import rule from '../no-unknown-ds-tokens';
 
 const ruleTester = new RuleTester( {
-	parserOptions: {
+	languageOptions: {
 		ecmaVersion: 6,
-		ecmaFeatures: {
-			jsx: true,
+		parserOptions: {
+			ecmaFeatures: {
+				jsx: true,
+			},
 		},
 	},
 } );
@@ -38,6 +40,18 @@ ruleTester.run( 'no-unknown-ds-tokens', rule, {
 		},
 		{
 			code: '`var(--wpds-color-fg-content-neutral) ${ suffix }`',
+		},
+		{
+			code: `const style = { '--wpds-color-fg-content-neutral': 'red' };`,
+		},
+		{
+			code: `const css = '--wpds-color-fg-content-neutral: red;';`,
+		},
+		{
+			code: 'const css = `--wpds-color-fg-content-neutral: red;`;',
+		},
+		{
+			code: 'const css = `--wpds-color-fg-content-neutral: ${ value };`;',
 		},
 	],
 	invalid: [
@@ -138,6 +152,106 @@ ruleTester.run( 'no-unknown-ds-tokens', rule, {
 					messageId: 'onlyKnownTokens',
 					data: {
 						tokenNames: "'--wpds-nonexistent-token'",
+					},
+				},
+			],
+		},
+		{
+			code: `const css = '--wpds-nonexistent-token: red;';`,
+			errors: [
+				{
+					messageId: 'onlyKnownTokens',
+					data: {
+						tokenNames: "'--wpds-nonexistent-token'",
+					},
+				},
+			],
+		},
+		{
+			code: `const token = '--wpds-color-fg-content-neutral';`,
+			errors: [
+				{
+					messageId: 'bareToken',
+					data: {
+						tokenNames: "'--wpds-color-fg-content-neutral'",
+					},
+				},
+			],
+		},
+		{
+			code: 'const token = `--wpds-color-fg-content-neutral`;',
+			errors: [
+				{
+					messageId: 'bareToken',
+					data: {
+						tokenNames: "'--wpds-color-fg-content-neutral'",
+					},
+				},
+			],
+		},
+		{
+			code: '<div style={ { gap: `--wpds-color-fg-content-neutral` } } />',
+			errors: [
+				{
+					messageId: 'bareToken',
+					data: {
+						tokenNames: "'--wpds-color-fg-content-neutral'",
+					},
+				},
+			],
+		},
+		{
+			code: '`${ prefix }: --wpds-color-fg-content-neutral`',
+			errors: [
+				{
+					messageId: 'bareToken',
+					data: {
+						tokenNames: "'--wpds-color-fg-content-neutral'",
+					},
+				},
+			],
+		},
+		{
+			code: '`var(--wpds-color-fg-content-neutral) --wpds-color-fg-content-neutral ${ x }`',
+			errors: [
+				{
+					messageId: 'bareToken',
+					data: {
+						tokenNames: "'--wpds-color-fg-content-neutral'",
+					},
+				},
+			],
+		},
+		{
+			code: `const css = '--wpds-color-fg-content-neutral: red; color: --wpds-color-bg-surface-neutral;';`,
+			errors: [
+				{
+					messageId: 'bareToken',
+					data: {
+						tokenNames: "'--wpds-color-bg-surface-neutral'",
+					},
+				},
+			],
+		},
+		{
+			code: `const css = '--wpds-color-fg-content-neutral: red; background: --wpds-color-fg-content-neutral;';`,
+			errors: [
+				{
+					messageId: 'bareToken',
+					data: {
+						tokenNames: "'--wpds-color-fg-content-neutral'",
+					},
+				},
+			],
+		},
+		{
+			code: `const css = '--wpds-other-nonexistent-token: red; color: var(--wpds-nonexistent-token);';`,
+			errors: [
+				{
+					messageId: 'onlyKnownTokens',
+					data: {
+						tokenNames:
+							"'--wpds-other-nonexistent-token', '--wpds-nonexistent-token'",
 					},
 				},
 			],

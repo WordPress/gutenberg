@@ -7,13 +7,9 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { Spinner } from '@wordpress/components';
-import {
-	privateApis as blockEditorPrivateApis,
-	store as blockEditorStore,
-} from '@wordpress/block-editor';
-import { createBlock, parse } from '@wordpress/blocks';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
-import { useEffect, useMemo, useRef } from '@wordpress/element';
+import { useEffect } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 
 /**
@@ -27,12 +23,8 @@ import {
 	unregisterDiffFormatTypes,
 } from './diff-format-types';
 import { useDiffMarkers } from './diff-markers';
-import { preserveClientIds } from './preserve-client-ids';
-import { diffRevisionContent } from './block-diff';
 
-const { ExperimentalBlockEditorProvider, usePrivateStyleOverride } = unlock(
-	blockEditorPrivateApis
-);
+const { usePrivateStyleOverride } = unlock( blockEditorPrivateApis );
 
 // SVG filter for removed blocks: grayscale + red tint
 const REVISION_REMOVED_FILTER_SVG = `
@@ -103,7 +95,7 @@ const REVISION_DIFF_STYLES = `
 function withRevisionDiffClasses( BlockListBlock ) {
 	return ( props ) => {
 		const { block, className } = props;
-		const diffStatus = block?.__revisionDiffStatus;
+		const diffStatus = block?.__revisionDiffStatus?.status;
 
 		const enhancedClassName = clsx( className, {
 			'is-revision-added': diffStatus === 'added',
@@ -150,12 +142,11 @@ function CanvasContent( { showDiff } ) {
 
 /**
  * Canvas component that renders a post revision in read-only mode.
+ * Block preparation and settings are handled by the parent EditorProvider.
  *
- * @param {Object}  props          Component props.
- * @param {boolean} props.showDiff Whether to show diff highlighting.
  * @return {React.JSX.Element} The revisions canvas component.
  */
-export default function RevisionsCanvas( { showDiff } ) {
+export default function RevisionsCanvas() {
 	useEffect( () => {
 		registerDiffFormatTypes();
 		return () => {
@@ -163,83 +154,23 @@ export default function RevisionsCanvas( { showDiff } ) {
 		};
 	}, [] );
 
-	const { revision, previousRevision, postType, blockEditorSettings } =
-		useSelect( ( select ) => {
-			const {
-				getCurrentRevision,
-				getPreviousRevision,
-				getCurrentPostType,
-			} = unlock( select( editorStore ) );
-			return {
-				revision: getCurrentRevision(),
-				previousRevision: getPreviousRevision(),
-				postType: getCurrentPostType(),
-				blockEditorSettings: select( blockEditorStore ).getSettings(),
-			};
-		}, [] );
-
-	// Track previously rendered blocks to preserve clientIds between renders.
-	const previousBlocksRef = useRef( [] );
-
-	const blocks = useMemo( () => {
-		const currentContent = revision?.content?.raw ?? '';
-
-		let parsedBlocks;
-		if ( showDiff ) {
-			const previousContent = previousRevision?.content?.raw || '';
-			// diffRevisionContent handles both normal diffing and the case
-			// where there's no previous revision (oldest revision shows all as added).
-			parsedBlocks = diffRevisionContent(
-				currentContent,
-				previousContent
-			);
-		} else {
-			// When diff is disabled, just parse the current revision content.
-			parsedBlocks = parse( currentContent );
-		}
-
-		if ( postType === 'wp_navigation' ) {
-			parsedBlocks = [
-				createBlock(
-					'core/navigation',
-					{ templateLock: false },
-					parsedBlocks
-				),
-			];
-		}
-
-		// Preserve clientIds from previous render to prevent React unmount/remount.
-		const blocksWithStableIds = preserveClientIds(
-			parsedBlocks,
-			previousBlocksRef.current
+	const { revision, showDiff } = useSelect( ( select ) => {
+		const { getCurrentRevision, isShowingRevisionDiff } = unlock(
+			select( editorStore )
 		);
-
-		// Update ref for next render.
-		previousBlocksRef.current = blocksWithStableIds;
-
-		return blocksWithStableIds;
-	}, [
-		revision?.content?.raw,
-		previousRevision?.content?.raw,
-		postType,
-		showDiff,
-	] );
-
-	const settings = useMemo(
-		() => ( {
-			...blockEditorSettings,
-			isPreviewMode: true,
-		} ),
-		[ blockEditorSettings ]
-	);
+		return {
+			revision: getCurrentRevision(),
+			showDiff: isShowingRevisionDiff(),
+		};
+	}, [] );
 
 	return revision ? (
-		<ExperimentalBlockEditorProvider value={ blocks } settings={ settings }>
+		<>
 			<DiffStyleOverrides showDiff={ showDiff } />
 			<div className="editor-revisions-canvas__content">
 				<CanvasContent showDiff={ showDiff } />
 			</div>
-		</ExperimentalBlockEditorProvider>
+		</>
 	) : (
 		<div className="editor-revisions-canvas__loading">
 			<Spinner />

@@ -99,7 +99,7 @@ const LinkControlSearchInput = forwardRef(
 					if ( suggestion?.url ) {
 						onSelect( suggestion );
 					}
-				} catch ( e ) {}
+				} catch {}
 				return;
 			}
 

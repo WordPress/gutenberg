@@ -8,7 +8,7 @@ describe( 'Notice', () => {
 		it( 'forwards ref', () => {
 			const rootRef = createRef< HTMLDivElement >();
 			const titleRef = createRef< HTMLSpanElement >();
-			const descriptionRef = createRef< HTMLDivElement >();
+			const descriptionRef = createRef< HTMLSpanElement >();
 			const actionsRef = createRef< HTMLDivElement >();
 			const actionButtonRef = createRef< HTMLButtonElement >();
 			const actionLinkRef = createRef< HTMLAnchorElement >();
@@ -36,7 +36,7 @@ describe( 'Notice', () => {
 			);
 			expect( rootRef.current ).toBeInstanceOf( HTMLDivElement );
 			expect( titleRef.current ).toBeInstanceOf( HTMLSpanElement );
-			expect( descriptionRef.current ).toBeInstanceOf( HTMLDivElement );
+			expect( descriptionRef.current ).toBeInstanceOf( HTMLSpanElement );
 			expect( actionsRef.current ).toBeInstanceOf( HTMLDivElement );
 			expect( actionButtonRef.current ).toBeInstanceOf(
 				HTMLButtonElement

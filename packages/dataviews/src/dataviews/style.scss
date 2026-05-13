@@ -15,7 +15,6 @@
 .dataviews-wrapper,
 .dataviews-picker-wrapper {
 	height: 100%;
-	overflow: auto;
 	box-sizing: border-box;
 	scroll-padding-bottom: $grid-unit-80;
 	/* stylelint-disable-next-line property-no-unknown -- '@container' not globally permitted */
@@ -119,7 +118,7 @@
 }
 
 .dataviews-title-field--clickable {
-	cursor: pointer;
+	cursor: var(--wpds-cursor-control);
 	color: $gray-800;
 	&:hover {
 		color: var(--wp-admin-theme-color);
@@ -127,11 +126,9 @@
 	@include link-reset();
 }
 
-/**
- * When DataViews are placed within cards, apply a consistent top padding.
- */
-.components-card__body:has(> .dataviews-wrapper),
-.components-card__body:has(> .dataviews-picker-wrapper) {
-	padding: $grid-unit-10 0 0;
-	overflow: hidden; // Prevent cells with white backgrounds overflowing the card
+.dataviews__view-actions--infinite-scroll {
+	position: sticky;
+	top: 0;
+	z-index: 2; // Ensure it appears above dataview items when scrolling.
+	background-color: #fff;
 }

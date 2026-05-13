@@ -25,6 +25,20 @@ export interface ThemeProviderSettings {
 	};
 
 	/**
+	 * The set of cursor options to apply to the theme.
+	 */
+	cursor?: {
+		/**
+		 * The cursor style for interactive controls that are not links
+		 * (e.g. buttons, checkboxes, and toggles).
+		 *
+		 * By default, it inherits from the parent `ThemeProvider`,
+		 * and falls back to the prebuilt default (`default`).
+		 */
+		control?: 'default' | 'pointer';
+	};
+
+	/**
 	 * The density of the theme. If left unspecified, the theme inherits from
 	 * the density of the closest `ThemeProvider`, or uses the default density
 	 * if there is no inherited density.

@@ -3,38 +3,52 @@
 /**
  * External dependencies
  */
-import spawn from 'cross-spawn';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 /**
  * Internal dependencies
  */
-import { checkDeps, getLicenses } from '../packages/scripts/utils/license.js';
+import {
+	checkDeps,
+	collectDeps,
+	readPackageJson,
+} from '../packages/scripts/utils/license.js';
 
-const ignored = [
-	'@ampproject/remapping',
-	// Jest internals with Apache-2.0 license - only used for testing, not distributed.
-	'bser',
-	'fb-watchman',
-	'walker',
-];
+const __dirname = path.dirname( fileURLToPath( import.meta.url ) );
+const ROOT_DIR = path.resolve( __dirname, '..' );
 
 /*
- * `wp-scripts check-licenses` uses prod and dev dependencies of the package to scan for dependencies. With npm workspaces, workspace packages (the @wordpress/* packages) are not listed in the main package json and this approach does not work.
+ * This script checks licenses for production dependencies of packages that are
+ * shipped with WordPress (those with wpScript or wpScriptModuleExports in package.json).
  *
- * Instead, work from an npm query that uses some custom information in package.json files to declare packages that are shipped with WordPress (and must be GPLv2 compatible) or other files that may use more permissive licenses.
+ * It works independently of the package manager (npm, pnpm, etc.) by:
+ * 1. Reading package.json files to find wpScript packages
+ * 2. Reading their production dependencies
+ * 3. Resolving each dependency using Node's module resolution
+ * 4. Reading the license from each resolved package
  */
 
-const licenses = getLicenses( true );
-const query = `.workspace:attr([wpScript],[wpScriptModuleExports]) :is(.prod):not(${ licenses
-	.map( ( license ) => `[license=${ JSON.stringify( license ) }]` )
-	.join( ',' ) })`;
+const packagesDir = path.join( ROOT_DIR, 'packages' );
+const depsMap = new Map();
+const visited = new Set();
 
-// Use `npm query` to grab a list of all the packages for workspaces.
-const child = spawn.sync( 'npm', [ 'query', query ] );
+// Find all workspace packages with wpScript or wpScriptModuleExports
+for ( const dir of fs.readdirSync( packagesDir ) ) {
+	const pkgDir = path.join( packagesDir, dir );
+	const pkgJson = readPackageJson( pkgDir );
 
-const dependenciesToProcess = JSON.parse( child.stdout.toString() );
+	if ( pkgJson?.wpScript || pkgJson?.wpScriptModuleExports ) {
+		collectDeps( pkgJson.dependencies, pkgDir, {
+			gpl2: true,
+			depsMap,
+			visited,
+			shouldSkip: ( depName ) => depName.startsWith( '@wordpress/' ),
+		} );
+	}
+}
 
-checkDeps( dependenciesToProcess, {
-	ignored,
+checkDeps( Array.from( depsMap.values() ), {
 	gpl2: true,
 } );

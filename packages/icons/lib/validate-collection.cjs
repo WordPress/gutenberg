@@ -16,7 +16,7 @@ async function validateCollection() {
 
 	try {
 		await stat( manifestPath );
-	} catch ( error ) {
+	} catch {
 		throw new Error(
 			`Could not find icons manifest at '${ manifestPath }'`
 		);

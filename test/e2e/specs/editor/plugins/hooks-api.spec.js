@@ -9,12 +9,12 @@ test.describe( 'Using Hooks API', () => {
 		await requestUtils.activatePlugin( 'gutenberg-test-hooks-api' );
 	} );
 
-	test.afterAll( async ( { requestUtils } ) => {
-		await requestUtils.deactivatePlugin( 'gutenberg-test-hooks-api' );
-	} );
-
 	test.beforeEach( async ( { admin } ) => {
 		await admin.createNewPost();
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.deactivatePlugin( 'gutenberg-test-hooks-api' );
 	} );
 
 	test( 'Should contain a reset block button on the sidebar', async ( {

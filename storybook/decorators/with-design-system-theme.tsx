@@ -1,13 +1,7 @@
-/**
- * External dependencies
- */
-import type { StoryContext } from 'storybook/internal/types';
-
-/**
- * WordPress dependencies
- */
 import { privateApis as themeApis } from '@wordpress/theme';
 import { __dangerousOptInToUnstableAPIsOnlyForCoreModules } from '@wordpress/private-apis';
+import type { StoryContext } from 'storybook/internal/types';
+import { storyIdMatchesDesignSystemTheme } from './utils/design-system-theme-story-matchers';
 
 const { unlock } = __dangerousOptInToUnstableAPIsOnlyForCoreModules(
 	'I acknowledge private features are not for use in themes or plugins and doing so will break in the next version of WordPress.',
@@ -27,14 +21,15 @@ export function WithDesignSystemTheme(
 	Story: React.ComponentType< any >,
 	context: StoryContext
 ) {
-	const isDesignSystemComponentsStory = context.id?.startsWith(
-		'design-system-components-'
+	const shouldApplyDesignSystemTheme = storyIdMatchesDesignSystemTheme(
+		context.id
 	);
-	if ( ! isDesignSystemComponentsStory ) {
+	if ( ! shouldApplyDesignSystemTheme ) {
 		return <Story { ...context } />;
 	}
 
 	const colorTheme = context.globals.dsColorTheme;
+	const cursorControl = context.globals.dsCursorControl || undefined;
 	const density = context.globals.dsDensity;
 
 	let color;
@@ -43,7 +38,12 @@ export function WithDesignSystemTheme(
 	}
 
 	return (
-		<ThemeProvider color={ color } density={ density } isRoot>
+		<ThemeProvider
+			color={ color }
+			cursor={ cursorControl ? { control: cursorControl } : undefined }
+			density={ density }
+			isRoot
+		>
 			<div
 				style={
 					color?.bg
@@ -66,7 +66,7 @@ export function WithDesignSystemTheme(
 							display: 'block',
 							opacity: 0.5,
 							marginTop: 'var(--wpds-dimension-gap-md)',
-							fontSize: 'var(--wpds-font-size-xs)',
+							fontSize: 'var(--wpds-typography-font-size-xs)',
 							color: 'var(--wpds-color-fg-content-neutral-weak)',
 							textTransform: 'uppercase',
 							textAlign: 'end',

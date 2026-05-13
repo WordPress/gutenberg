@@ -37,7 +37,7 @@ const plugin = {
 			const ext = args.path.match( /(\.[^.]+)$/ )?.[ 1 ] || '.js';
 
 			return {
-				contents: addFallbackToVar( source ),
+				contents: addFallbackToVar( source, { escapeQuotes: true } ),
 				loader: LOADER_MAP[ ext ] || 'jsx',
 			};
 		} );
