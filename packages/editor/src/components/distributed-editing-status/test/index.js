@@ -29,6 +29,7 @@ import {
 	DISTRIBUTED_EDITING_NOTICE_ACTIONS,
 	DISTRIBUTED_EDITING_NOTICE_KINDS,
 	DISTRIBUTED_EDITING_REASON_CODES,
+	DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_STATUSES,
 	DISTRIBUTED_EDITING_UNLOAD_WARNING_REASONS,
 	getDistributedEditingNoticeDescriptorsForSessionState,
 	getDistributedEditingUnloadWarningStateForSessionState,
@@ -94,6 +95,10 @@ describe( 'getDistributedEditingStatusControlStates', () => {
 			'staleBaseRebaseMissingInputs',
 			'staleBaseRebased',
 			'staleBaseRebaseConflict',
+			'staleBaseRebaseBlockInserted',
+			'staleBaseRebaseBlockReordered',
+			'staleBaseRebaseFreeformHtml',
+			'staleBaseRetryPrepared',
 			'manualResolution',
 		] );
 		expect( states.pendingLocalChanges ).toEqual( {
@@ -146,6 +151,25 @@ describe( 'getDistributedEditingStatusControlStates', () => {
 			readyToRetrySubmit: true,
 			clientBaseContent: '',
 			refetchedServerContent: '',
+		} );
+		expect( states.staleBaseRebaseBlockInserted ).toMatchObject( {
+			localRebaseResultStatus:
+				DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.MANUAL_CONFLICT_REQUIRED,
+			localRebaseResultReason: 'block_inserted',
+			requiresManualConflictResolution: true,
+		} );
+		expect( states.staleBaseRebaseFreeformHtml ).toMatchObject( {
+			localRebaseResultStatus:
+				DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.UNSAFE_CONTENT_BOUNDARY,
+			localRebaseResultReason: 'freeform_html',
+			requiresManualConflictResolution: true,
+		} );
+		expect( states.staleBaseRetryPrepared ).toMatchObject( {
+			localRebaseResultStatus:
+				DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.REBASED,
+			retrySubmitHandoffStatus:
+				DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_STATUSES.PREPARED,
+			retrySubmitPrepared: true,
 		} );
 		expect( states.manualResolution ).toEqual( {
 			disposition:
@@ -267,14 +291,17 @@ describe( 'DistributedEditingLocalRebaseStateInspector', () => {
 		render( <DistributedEditingLocalRebaseStateInspector /> );
 
 		expect( screen.getByText( 'Local rebase plan' ) ).toBeVisible();
-		expect( screen.getByText( 'ready' ) ).toBeVisible();
+		expect( screen.getAllByText( 'ready' ) ).toHaveLength( 2 );
 		expect( screen.getByText( 'Local rebase result' ) ).toBeVisible();
 		expect( screen.getByText( 'rebased' ) ).toBeVisible();
+		expect( screen.getByText( 'Local rebase reason' ) ).toBeVisible();
+		expect( screen.getByText( 'None' ) ).toBeVisible();
 		expect( screen.getByText( 'Client base input' ) ).toBeVisible();
 		expect( screen.getByText( 'Refetched server input' ) ).toBeVisible();
 		expect( screen.getAllByText( 'Available' ) ).toHaveLength( 2 );
 		expect( screen.getByText( 'Retry submit' ) ).toBeVisible();
 		expect( screen.getByText( 'Ready' ) ).toBeVisible();
+		expect( screen.getByText( 'Retry handoff' ) ).toBeVisible();
 		expect( screen.queryByText( /wp:paragraph/ ) ).not.toBeInTheDocument();
 	} );
 
@@ -290,7 +317,7 @@ describe( 'DistributedEditingLocalRebaseStateInspector', () => {
 		render( <DistributedEditingLocalRebaseStateInspector /> );
 
 		expect( screen.getByText( 'ready' ) ).toBeVisible();
-		expect( screen.getByText( 'none' ) ).toBeVisible();
+		expect( screen.getAllByText( 'none' ) ).toHaveLength( 2 );
 		expect( screen.getByText( 'Missing' ) ).toBeVisible();
 		expect( screen.getByText( 'Available' ) ).toBeVisible();
 		expect( screen.getByText( 'Not ready' ) ).toBeVisible();
@@ -708,6 +735,113 @@ describe( 'DistributedEditingStatusSurface', () => {
 			)
 		).toBeVisible();
 		expect( screen.queryByText( /wp:paragraph/ ) ).not.toBeInTheDocument();
+	} );
+
+	it( 'renders reason-specific stale-base rebase conflict status', () => {
+		const noticeDescriptors =
+			getDistributedEditingNoticeDescriptorsForSessionState( {
+				disposition:
+					DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+				reasonCode:
+					DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+				pendingChangeCount: 1,
+				remoteChangeCount: 1,
+				refetchedServerState: true,
+				localRebasePlanStatus:
+					DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES.READY,
+				localRebaseResultStatus:
+					DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.MANUAL_CONFLICT_REQUIRED,
+				localRebaseResultReason: 'block_reordered',
+				requiresManualConflictResolution: true,
+				canExportLocalUpdates: true,
+				clientBaseContent:
+					'<!-- wp:paragraph --><p>Base</p><!-- /wp:paragraph -->',
+				refetchedServerContent:
+					'<!-- wp:paragraph --><p>Server</p><!-- /wp:paragraph -->',
+			} );
+
+		render(
+			<DistributedEditingStatusSurface
+				noticeDescriptors={ noticeDescriptors }
+			/>
+		);
+
+		expect( screen.getByText( 'Local rebase needs review' ) ).toBeVisible();
+		expect(
+			screen.getByText(
+				'Blocks were reordered while local edits were pending. Review the local and server versions before continuing.'
+			)
+		).toBeVisible();
+		expect( screen.queryByText( /wp:paragraph/ ) ).not.toBeInTheDocument();
+	} );
+
+	it( 'renders reason-specific unsafe freeform HTML status', () => {
+		const noticeDescriptors =
+			getDistributedEditingNoticeDescriptorsForSessionState( {
+				disposition:
+					DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+				reasonCode:
+					DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+				pendingChangeCount: 1,
+				remoteChangeCount: 1,
+				refetchedServerState: true,
+				localRebasePlanStatus:
+					DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES.READY,
+				localRebaseResultStatus:
+					DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.UNSAFE_CONTENT_BOUNDARY,
+				localRebaseResultReason: 'freeform_html',
+				requiresManualConflictResolution: true,
+				canExportLocalUpdates: true,
+			} );
+
+		render(
+			<DistributedEditingStatusSurface
+				noticeDescriptors={ noticeDescriptors }
+			/>
+		);
+
+		expect( screen.getByText( 'Local rebase blocked' ) ).toBeVisible();
+		expect(
+			screen.getByText(
+				'The content is not represented by whole serialized blocks and needs manual review.'
+			)
+		).toBeVisible();
+	} );
+
+	it( 'renders prepared retry-submit handoff status without claiming a save', () => {
+		const noticeDescriptors =
+			getDistributedEditingNoticeDescriptorsForSessionState( {
+				disposition:
+					DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+				reasonCode:
+					DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+				pendingChangeCount: 1,
+				remoteChangeCount: 1,
+				refetchedServerState: true,
+				localRebasePlanStatus:
+					DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES.READY,
+				localRebaseResultStatus:
+					DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.REBASED,
+				retrySubmitHandoffStatus:
+					DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_STATUSES.PREPARED,
+				retrySubmitPrepared: true,
+				canExportLocalUpdates: true,
+				clientBaseContent: '',
+				refetchedServerContent: '',
+			} );
+
+		render(
+			<DistributedEditingStatusSurface
+				noticeDescriptors={ noticeDescriptors }
+			/>
+		);
+
+		expect( screen.getByText( 'Retry submit prepared' ) ).toBeVisible();
+		expect(
+			screen.getByText(
+				'Local changes are staged for the future retry path. No save has been sent yet.'
+			)
+		).toBeVisible();
 	} );
 
 	it( 'renders manual resolution for missing sync metadata', () => {

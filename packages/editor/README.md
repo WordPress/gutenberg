@@ -320,6 +320,14 @@ Undocumented declaration.
 
 Undocumented declaration.
 
+### DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_REASONS
+
+Stable retry-submit handoff blocker reasons.
+
+### DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_STATUSES
+
+Stable retry-submit handoff statuses for staged local rebase results.
+
 ### DISTRIBUTED_EDITING_UNLOAD_WARNING_REASONS
 
 Stable reasons for browser unload protection.
@@ -543,6 +551,20 @@ _Parameters_
 _Returns_
 
 -   `Object`: DE-RTC session state.
+
+### getDistributedEditingSessionStateForRetrySubmitHandoff
+
+Consumes a successful local rebase retry handoff without submitting it.
+
+This prepares inert state for a future save-path retry consumer. It does not call the server, save, dispatch notices, persist editor state, or change post locks.
+
+_Parameters_
+
+-   _currentSessionState_ `Object`: Current DE-RTC session state.
+
+_Returns_
+
+-   `Object`: Normalized DE-RTC session state.
 
 ### getDistributedEditingSessionStateForStaleBaseLocalRebasePlan
 

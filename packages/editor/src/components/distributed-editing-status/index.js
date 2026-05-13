@@ -17,6 +17,7 @@ import {
 	DISTRIBUTED_EDITING_NOTICE_ACTIONS,
 	DISTRIBUTED_EDITING_NOTICE_KINDS,
 	DISTRIBUTED_EDITING_REASON_CODES,
+	DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_STATUSES,
 	DISTRIBUTED_EDITING_UNLOAD_WARNING_REASONS,
 	normalizeDistributedEditingSessionState,
 } from '../../store/distributed-editing';
@@ -112,7 +113,85 @@ const DISTRIBUTED_EDITING_STATUS_CONTROL_STATE_DEFINITIONS = Object.freeze( {
 			DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES.READY,
 		localRebaseResultStatus:
 			DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.MANUAL_CONFLICT_REQUIRED,
+		localRebaseResultReason: 'same_block_changed',
 		requiresManualConflictResolution: true,
+		clientBaseContent: '',
+		refetchedServerContent: '',
+	} ),
+	staleBaseRebaseBlockInserted: Object.freeze( {
+		disposition:
+			DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+		reasonCode:
+			DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+		pendingChangeCount: 1,
+		remoteChangeCount: 1,
+		requiresServerStateRefetch: false,
+		refetchedServerState: true,
+		canExportLocalUpdates: true,
+		localRebasePlanStatus:
+			DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES.READY,
+		localRebaseResultStatus:
+			DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.MANUAL_CONFLICT_REQUIRED,
+		localRebaseResultReason: 'block_inserted',
+		requiresManualConflictResolution: true,
+		clientBaseContent: '',
+		refetchedServerContent: '',
+	} ),
+	staleBaseRebaseBlockReordered: Object.freeze( {
+		disposition:
+			DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+		reasonCode:
+			DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+		pendingChangeCount: 1,
+		remoteChangeCount: 1,
+		requiresServerStateRefetch: false,
+		refetchedServerState: true,
+		canExportLocalUpdates: true,
+		localRebasePlanStatus:
+			DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES.READY,
+		localRebaseResultStatus:
+			DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.MANUAL_CONFLICT_REQUIRED,
+		localRebaseResultReason: 'block_reordered',
+		requiresManualConflictResolution: true,
+		clientBaseContent: '',
+		refetchedServerContent: '',
+	} ),
+	staleBaseRebaseFreeformHtml: Object.freeze( {
+		disposition:
+			DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+		reasonCode:
+			DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+		pendingChangeCount: 1,
+		remoteChangeCount: 1,
+		requiresServerStateRefetch: false,
+		refetchedServerState: true,
+		canExportLocalUpdates: true,
+		localRebasePlanStatus:
+			DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES.READY,
+		localRebaseResultStatus:
+			DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.UNSAFE_CONTENT_BOUNDARY,
+		localRebaseResultReason: 'freeform_html',
+		requiresManualConflictResolution: true,
+		clientBaseContent: '',
+		refetchedServerContent: '',
+	} ),
+	staleBaseRetryPrepared: Object.freeze( {
+		disposition:
+			DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+		reasonCode:
+			DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+		pendingChangeCount: 1,
+		remoteChangeCount: 1,
+		requiresServerStateRefetch: false,
+		refetchedServerState: true,
+		canExportLocalUpdates: true,
+		localRebasePlanStatus:
+			DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES.READY,
+		localRebaseResultStatus:
+			DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.REBASED,
+		retrySubmitHandoffStatus:
+			DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_STATUSES.PREPARED,
+		retrySubmitPrepared: true,
 		clientBaseContent: '',
 		refetchedServerContent: '',
 	} ),
@@ -284,6 +363,10 @@ export function DistributedEditingLocalRebaseStateInspector() {
 				<dd>{ normalized.localRebaseResultStatus }</dd>
 			</div>
 			<div>
+				<dt>{ __( 'Local rebase reason' ) }</dt>
+				<dd>{ normalized.localRebaseResultReason || __( 'None' ) }</dd>
+			</div>
+			<div>
 				<dt>{ __( 'Client base input' ) }</dt>
 				<dd>
 					{ normalized.clientBaseContent !== null
@@ -306,6 +389,10 @@ export function DistributedEditingLocalRebaseStateInspector() {
 						? __( 'Ready' )
 						: __( 'Not ready' ) }
 				</dd>
+			</div>
+			<div>
+				<dt>{ __( 'Retry handoff' ) }</dt>
+				<dd>{ normalized.retrySubmitHandoffStatus }</dd>
 			</div>
 		</dl>
 	);
@@ -660,6 +747,14 @@ function getDistributedEditingStatusControlLabel( key ) {
 			return __( 'Local changes rebased' );
 		case 'staleBaseRebaseConflict':
 			return __( 'Local rebase conflict' );
+		case 'staleBaseRebaseBlockInserted':
+			return __( 'Block inserted conflict' );
+		case 'staleBaseRebaseBlockReordered':
+			return __( 'Block reordered conflict' );
+		case 'staleBaseRebaseFreeformHtml':
+			return __( 'Freeform HTML blocked' );
+		case 'staleBaseRetryPrepared':
+			return __( 'Retry handoff prepared' );
 		case 'manualResolution':
 			return __( 'Manual resolution' );
 	}
@@ -686,6 +781,18 @@ function normalizeCount( value ) {
 }
 
 function getStaleBaseStatusText( descriptor ) {
+	if (
+		descriptor.retrySubmitHandoffStatus ===
+		DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_STATUSES.PREPARED
+	) {
+		return {
+			title: __( 'Retry submit prepared' ),
+			message: __(
+				'Local changes are staged for the future retry path. No save has been sent yet.'
+			),
+		};
+	}
+
 	switch ( descriptor.localRebaseResultStatus ) {
 		case DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.REBASED:
 			return {
@@ -697,16 +804,12 @@ function getStaleBaseStatusText( descriptor ) {
 		case DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.MANUAL_CONFLICT_REQUIRED:
 			return {
 				title: __( 'Local rebase needs review' ),
-				message: __(
-					'Local and server changes could not be merged automatically.'
-				),
+				message: getManualLocalRebaseConflictMessage( descriptor ),
 			};
 		case DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.UNSAFE_CONTENT_BOUNDARY:
 			return {
 				title: __( 'Local rebase blocked' ),
-				message: __(
-					'The local change boundary is unsafe and needs manual review.'
-				),
+				message: getUnsafeLocalRebaseBoundaryMessage( descriptor ),
 			};
 		case DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.BLOCKED_NEEDS_READY_PLAN:
 			return {
@@ -749,4 +852,37 @@ function getStaleBaseStatusText( descriptor ) {
 			'Refresh the server version before retrying local changes.'
 		),
 	};
+}
+
+function getManualLocalRebaseConflictMessage( descriptor ) {
+	switch ( descriptor.localRebaseResultReason ) {
+		case 'block_inserted':
+			return __(
+				'Blocks were inserted in more than one version. Review the local and server versions before continuing.'
+			);
+		case 'block_deleted':
+			return __(
+				'Blocks were deleted in more than one version. Review the local and server versions before continuing.'
+			);
+		case 'block_reordered':
+			return __(
+				'Blocks were reordered while local edits were pending. Review the local and server versions before continuing.'
+			);
+		case 'same_block_changed':
+			return __(
+				'Local and server changes touched the same block. Review both versions before continuing.'
+			);
+	}
+
+	return __( 'Local and server changes could not be merged automatically.' );
+}
+
+function getUnsafeLocalRebaseBoundaryMessage( descriptor ) {
+	if ( descriptor.localRebaseResultReason === 'freeform_html' ) {
+		return __(
+			'The content is not represented by whole serialized blocks and needs manual review.'
+		);
+	}
+
+	return __( 'The local change boundary is unsafe and needs manual review.' );
 }

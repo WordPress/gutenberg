@@ -32,6 +32,7 @@ import {
 } from './distributed-editing-api';
 import {
 	getDistributedEditingSessionStateForRecoveryDryRunResult,
+	getDistributedEditingSessionStateForRetrySubmitHandoff,
 	getDistributedEditingStaleBaseLocalRebaseResult,
 	getDistributedEditingSessionStateForStaleBaseLocalRebasePlan,
 	getDistributedEditingSessionStateForStaleBaseRejectionResult,
@@ -425,6 +426,43 @@ export const __experimentalRebaseDistributedEditingLocalUpdatesAfterStaleBase =
 
 		return result;
 	};
+
+/**
+ * Prepares the retry-submit handoff after a successful local rebase.
+ *
+ * The action consumes the inert `readyToRetrySubmit` flag and records that a
+ * future save-path consumer may use the rebased editor content. It does not
+ * submit to the server, call REST, save, dispatch notices, persist editor
+ * state, or change post locks.
+ *
+ * @return {Function} Action thunk.
+ */
+export const __experimentalPrepareDistributedEditingRetrySubmitAfterLocalRebase =
+
+		() =>
+		( { select, dispatch } ) => {
+			const currentSessionState =
+				select.getDistributedEditingSessionState?.() || {};
+			const sessionState =
+				getDistributedEditingSessionStateForRetrySubmitHandoff(
+					currentSessionState
+				);
+
+			dispatch.setDistributedEditingSessionState( sessionState );
+
+			return {
+				status: sessionState.retrySubmitHandoffStatus,
+				reason: sessionState.retrySubmitHandoffReason,
+				consumesReadyToRetrySubmit:
+					Boolean( currentSessionState.readyToRetrySubmit ) &&
+					sessionState.retrySubmitPrepared,
+				submitsToServer: false,
+				savesPost: false,
+				mutatesPersistedPostContent: false,
+				claimsSaved: false,
+				sessionState,
+			};
+		};
 
 /**
  * Returns an action object used in signalling that attributes of the post have

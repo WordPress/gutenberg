@@ -14,9 +14,12 @@ import {
 	DISTRIBUTED_EDITING_NOTICE_IDS,
 	DISTRIBUTED_EDITING_NOTICE_KINDS,
 	DISTRIBUTED_EDITING_REASON_CODES,
+	DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_REASONS,
+	DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_STATUSES,
 	DISTRIBUTED_EDITING_UNLOAD_WARNING_REASONS,
 	DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE,
 	getDistributedEditingStaleBaseLocalRebaseResult,
+	getDistributedEditingSessionStateForRetrySubmitHandoff,
 	getDistributedEditingSessionStateForRecoveryDryRunResult,
 	getDistributedEditingSessionStateForStaleBaseLocalRebasePlan,
 	getDistributedEditingSessionStateForStaleBaseRejectionResult,
@@ -131,7 +134,12 @@ describe( 'distributed editing session state', () => {
 				DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES.NONE,
 			localRebaseResultStatus:
 				DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.NONE,
+			localRebaseResultReason: null,
 			readyToRetrySubmit: false,
+			retrySubmitHandoffStatus:
+				DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_STATUSES.NONE,
+			retrySubmitHandoffReason: null,
+			retrySubmitPrepared: false,
 			requiresManualConflictResolution: false,
 			mustOfferLocalCopy: true,
 			canExportLocalUpdates: true,
@@ -472,6 +480,9 @@ describe( 'distributed editing session state', () => {
 			hasCandidatePostContent: false,
 			readyToRetrySubmit: false,
 			requiresManualConflictResolution: true,
+			sessionState: {
+				localRebaseResultReason: 'block_inserted',
+			},
 		} );
 	} );
 
@@ -534,6 +545,65 @@ describe( 'distributed editing session state', () => {
 			reason: 'freeform_html',
 			hasCandidatePostContent: false,
 			readyToRetrySubmit: false,
+			requiresManualConflictResolution: true,
+			sessionState: {
+				localRebaseResultReason: 'freeform_html',
+			},
+		} );
+	} );
+
+	it( 'prepares a no-save retry handoff after a successful local rebase', () => {
+		const prepared = getDistributedEditingSessionStateForRetrySubmitHandoff(
+			{
+				disposition:
+					DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+				reasonCode:
+					DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+				pendingChangeCount: 1,
+				localRebaseResultStatus:
+					DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.REBASED,
+				readyToRetrySubmit: true,
+			}
+		);
+
+		expect( prepared ).toMatchObject( {
+			localRebaseResultStatus:
+				DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.REBASED,
+			readyToRetrySubmit: false,
+			retrySubmitHandoffStatus:
+				DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_STATUSES.PREPARED,
+			retrySubmitHandoffReason: null,
+			retrySubmitPrepared: true,
+			requiresManualConflictResolution: false,
+		} );
+	} );
+
+	it( 'blocks no-save retry handoff before a successful local rebase', () => {
+		const blocked = getDistributedEditingSessionStateForRetrySubmitHandoff(
+			{
+				disposition:
+					DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+				reasonCode:
+					DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+				pendingChangeCount: 1,
+				localRebaseResultStatus:
+					DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.MANUAL_CONFLICT_REQUIRED,
+				localRebaseResultReason: 'block_reordered',
+				requiresManualConflictResolution: true,
+				readyToRetrySubmit: true,
+			}
+		);
+
+		expect( blocked ).toMatchObject( {
+			localRebaseResultStatus:
+				DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.MANUAL_CONFLICT_REQUIRED,
+			localRebaseResultReason: 'block_reordered',
+			readyToRetrySubmit: false,
+			retrySubmitHandoffStatus:
+				DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_STATUSES.BLOCKED,
+			retrySubmitHandoffReason:
+				DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_REASONS.MANUAL_CONFLICT_REQUIRED,
+			retrySubmitPrepared: false,
 			requiresManualConflictResolution: true,
 		} );
 	} );
@@ -907,7 +977,11 @@ describe( 'distributed editing session state', () => {
 				DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES.READY,
 			localRebaseResultStatus:
 				DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.NONE,
+			localRebaseResultReason: null,
 			readyToRetrySubmit: false,
+			retrySubmitHandoffStatus:
+				DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_STATUSES.NONE,
+			retrySubmitPrepared: false,
 			hasClientBaseContent: true,
 			hasRefetchedServerContent: true,
 			hasLocalRebaseInputs: true,

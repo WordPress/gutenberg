@@ -18,6 +18,8 @@ import {
 	DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES,
 	DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES,
 	DISTRIBUTED_EDITING_REASON_CODES,
+	DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_REASONS,
+	DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_STATUSES,
 	DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE,
 } from '../distributed-editing';
 import { store as editorStore } from '..';
@@ -686,6 +688,134 @@ describe( 'Post actions', () => {
 			).toBe(
 				'<!-- wp:paragraph --><p>Local alpha</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Remote beta</p><!-- /wp:paragraph -->'
 			);
+		} );
+	} );
+
+	describe( '__experimentalPrepareDistributedEditingRetrySubmitAfterLocalRebase()', () => {
+		it( 'prepares retry-submit handoff without fetching or saving', async () => {
+			const post = {
+				id: postId,
+				type: 'post',
+				title: 'bar',
+				content:
+					'<!-- wp:paragraph --><p>Rebased</p><!-- /wp:paragraph -->',
+				status: 'draft',
+			};
+			let apiFetchCallCount = 0;
+
+			apiFetch.setFetchHandler( async () => {
+				apiFetchCallCount++;
+				throw new Error( 'Retry handoff must not call apiFetch.' );
+			} );
+
+			const registry = createRegistryWithStores();
+
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', post );
+			registry.dispatch( editorStore ).setupEditor( post, {
+				content: post.content,
+			} );
+			registry
+				.dispatch( editorStore )
+				.setDistributedEditingSessionState( {
+					disposition:
+						DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+					reasonCode:
+						DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+					pendingChangeCount: 1,
+					refetchedServerState: true,
+					localRebasePlanStatus:
+						DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES.READY,
+					localRebaseResultStatus:
+						DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.REBASED,
+					readyToRetrySubmit: true,
+					canExportLocalUpdates: true,
+				} );
+
+			const result = await registry
+				.dispatch( editorStore )
+				.__experimentalPrepareDistributedEditingRetrySubmitAfterLocalRebase();
+
+			expect( apiFetchCallCount ).toBe( 0 );
+			expect( result ).toMatchObject( {
+				status: DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_STATUSES.PREPARED,
+				reason: null,
+				consumesReadyToRetrySubmit: true,
+				submitsToServer: false,
+				savesPost: false,
+				mutatesPersistedPostContent: false,
+				claimsSaved: false,
+				sessionState: {
+					readyToRetrySubmit: false,
+					retrySubmitHandoffStatus:
+						DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_STATUSES.PREPARED,
+					retrySubmitPrepared: true,
+				},
+			} );
+			expect(
+				registry.select( editorStore ).getEditedPostContent()
+			).toBe( post.content );
+			expect(
+				registry
+					.select( editorStore )
+					.getDistributedEditingSessionState()
+			).toMatchObject( {
+				readyToRetrySubmit: false,
+				retrySubmitHandoffStatus:
+					DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_STATUSES.PREPARED,
+				retrySubmitHandoffReason: null,
+				retrySubmitPrepared: true,
+			} );
+		} );
+
+		it( 'blocks retry-submit handoff for unresolved local rebase conflicts', async () => {
+			const registry = createRegistryWithStores();
+
+			registry
+				.dispatch( editorStore )
+				.setDistributedEditingSessionState( {
+					disposition:
+						DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+					reasonCode:
+						DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+					pendingChangeCount: 1,
+					refetchedServerState: true,
+					localRebasePlanStatus:
+						DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES.READY,
+					localRebaseResultStatus:
+						DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.MANUAL_CONFLICT_REQUIRED,
+					localRebaseResultReason: 'block_reordered',
+					requiresManualConflictResolution: true,
+					canExportLocalUpdates: true,
+				} );
+
+			const result = await registry
+				.dispatch( editorStore )
+				.__experimentalPrepareDistributedEditingRetrySubmitAfterLocalRebase();
+
+			expect( result ).toMatchObject( {
+				status: DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_STATUSES.BLOCKED,
+				reason: DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_REASONS.MANUAL_CONFLICT_REQUIRED,
+				consumesReadyToRetrySubmit: false,
+				submitsToServer: false,
+				savesPost: false,
+				mutatesPersistedPostContent: false,
+				claimsSaved: false,
+			} );
+			expect(
+				registry
+					.select( editorStore )
+					.getDistributedEditingSessionState()
+			).toMatchObject( {
+				localRebaseResultReason: 'block_reordered',
+				readyToRetrySubmit: false,
+				retrySubmitHandoffStatus:
+					DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_STATUSES.BLOCKED,
+				retrySubmitHandoffReason:
+					DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_REASONS.MANUAL_CONFLICT_REQUIRED,
+				retrySubmitPrepared: false,
+			} );
 		} );
 	} );
 

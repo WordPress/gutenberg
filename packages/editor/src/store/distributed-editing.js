@@ -100,6 +100,27 @@ export const DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES = Object.freeze( {
 	UNSAFE_CONTENT_BOUNDARY: 'unsafe_content_boundary',
 } );
 
+/**
+ * Stable retry-submit handoff statuses for staged local rebase results.
+ */
+export const DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_STATUSES = Object.freeze(
+	{
+		NONE: 'none',
+		READY: 'ready',
+		PREPARED: 'prepared',
+		BLOCKED: 'blocked',
+	}
+);
+
+/**
+ * Stable retry-submit handoff blocker reasons.
+ */
+export const DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_REASONS = Object.freeze( {
+	RETRY_SUBMIT_NOT_READY: 'retry_submit_not_ready',
+	LOCAL_REBASE_NOT_REBASED: 'local_rebase_not_rebased',
+	MANUAL_CONFLICT_REQUIRED: 'manual_conflict_required',
+} );
+
 const VALID_REASON_CODES = new Set(
 	Object.values( DISTRIBUTED_EDITING_REASON_CODES )
 );
@@ -114,6 +135,10 @@ const VALID_LOCAL_REBASE_PLAN_STATUSES = new Set(
 
 const VALID_LOCAL_REBASE_RESULT_STATUSES = new Set(
 	Object.values( DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES )
+);
+
+const VALID_RETRY_SUBMIT_HANDOFF_STATUSES = new Set(
+	Object.values( DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_STATUSES )
 );
 
 const NOTICE_ID_BY_KIND = Object.freeze( {
@@ -151,7 +176,12 @@ export const DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE = Object.freeze( {
 	localRebasePlanStatus: DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES.NONE,
 	localRebaseResultStatus:
 		DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.NONE,
+	localRebaseResultReason: null,
 	readyToRetrySubmit: false,
+	retrySubmitHandoffStatus:
+		DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_STATUSES.NONE,
+	retrySubmitHandoffReason: null,
+	retrySubmitPrepared: false,
 	requiresManualConflictResolution: false,
 	mustOfferLocalCopy: false,
 	canExportLocalUpdates: false,
@@ -261,9 +291,40 @@ export function normalizeDistributedEditingSessionState( sessionState = {} ) {
 	)
 		? sessionState.localRebaseResultStatus
 		: DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE.localRebaseResultStatus;
+	const localRebaseResultReason = normalizeNullableString(
+		sessionState.localRebaseResultReason
+	);
+	const requestedRetrySubmitHandoffStatus =
+		VALID_RETRY_SUBMIT_HANDOFF_STATUSES.has(
+			sessionState.retrySubmitHandoffStatus
+		)
+			? sessionState.retrySubmitHandoffStatus
+			: DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE.retrySubmitHandoffStatus;
+	const retrySubmitPrepared =
+		Boolean( sessionState.retrySubmitPrepared ) ||
+		requestedRetrySubmitHandoffStatus ===
+			DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_STATUSES.PREPARED;
 	const readyToRetrySubmit =
 		Boolean( sessionState.readyToRetrySubmit ) &&
-		! requiresManualConflictResolution;
+		! requiresManualConflictResolution &&
+		! retrySubmitPrepared;
+	let retrySubmitHandoffStatus =
+		DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_STATUSES.NONE;
+
+	if ( retrySubmitPrepared ) {
+		retrySubmitHandoffStatus =
+			DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_STATUSES.PREPARED;
+	} else if ( readyToRetrySubmit ) {
+		retrySubmitHandoffStatus =
+			DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_STATUSES.READY;
+	} else if (
+		requestedRetrySubmitHandoffStatus ===
+		DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_STATUSES.BLOCKED
+	) {
+		retrySubmitHandoffStatus =
+			DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_STATUSES.BLOCKED;
+	}
+
 	const mustOfferLocalCopy =
 		Boolean( sessionState.mustOfferLocalCopy ) ||
 		( requiresServerStateAcceptance && hasPendingChanges ) ||
@@ -297,7 +358,13 @@ export function normalizeDistributedEditingSessionState( sessionState = {} ) {
 		canAttemptLocalRebase,
 		localRebasePlanStatus,
 		localRebaseResultStatus,
+		localRebaseResultReason,
 		readyToRetrySubmit,
+		retrySubmitHandoffStatus,
+		retrySubmitHandoffReason: normalizeNullableString(
+			sessionState.retrySubmitHandoffReason
+		),
+		retrySubmitPrepared,
 		requiresManualConflictResolution,
 		mustOfferLocalCopy,
 		canExportLocalUpdates,
@@ -602,6 +669,7 @@ export function getDistributedEditingStaleBaseLocalRebaseResult( {
 				canAttemptLocalRebase: false,
 				localRebaseResultStatus:
 					DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.BLOCKED_NEEDS_READY_PLAN,
+				localRebaseResultReason: plannedState.localRebasePlanStatus,
 				readyToRetrySubmit: false,
 			} ),
 			reason: plannedState.localRebasePlanStatus,
@@ -626,6 +694,7 @@ export function getDistributedEditingStaleBaseLocalRebaseResult( {
 				...plannedState,
 				canAttemptLocalRebase: false,
 				localRebaseResultStatus: resultStatus,
+				localRebaseResultReason: mergeResult.reason,
 				readyToRetrySubmit: false,
 				requiresManualConflictResolution: true,
 				canExportLocalUpdates: true,
@@ -641,6 +710,7 @@ export function getDistributedEditingStaleBaseLocalRebaseResult( {
 			canAttemptLocalRebase: false,
 			localRebaseResultStatus:
 				DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.REBASED,
+			localRebaseResultReason: null,
 			readyToRetrySubmit: true,
 			requiresManualConflictResolution: false,
 			canExportLocalUpdates: true,
@@ -772,6 +842,73 @@ export function getDistributedEditingNoticeDescriptorsForSessionState(
 }
 
 /**
+ * Consumes a successful local rebase retry handoff without submitting it.
+ *
+ * This prepares inert state for a future save-path retry consumer. It does not
+ * call the server, save, dispatch notices, persist editor state, or change post
+ * locks.
+ *
+ * @param {Object} currentSessionState Current DE-RTC session state.
+ *
+ * @return {Object} Normalized DE-RTC session state.
+ */
+export function getDistributedEditingSessionStateForRetrySubmitHandoff(
+	currentSessionState = {}
+) {
+	const normalized =
+		normalizeDistributedEditingSessionState( currentSessionState );
+
+	if ( normalized.retrySubmitPrepared ) {
+		return normalized;
+	}
+
+	if ( normalized.requiresManualConflictResolution ) {
+		return normalizeDistributedEditingSessionState( {
+			...normalized,
+			readyToRetrySubmit: false,
+			retrySubmitHandoffStatus:
+				DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_STATUSES.BLOCKED,
+			retrySubmitHandoffReason:
+				DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_REASONS.MANUAL_CONFLICT_REQUIRED,
+		} );
+	}
+
+	if (
+		normalized.localRebaseResultStatus !==
+		DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.REBASED
+	) {
+		return normalizeDistributedEditingSessionState( {
+			...normalized,
+			readyToRetrySubmit: false,
+			retrySubmitHandoffStatus:
+				DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_STATUSES.BLOCKED,
+			retrySubmitHandoffReason:
+				DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_REASONS.LOCAL_REBASE_NOT_REBASED,
+		} );
+	}
+
+	if ( ! normalized.readyToRetrySubmit ) {
+		return normalizeDistributedEditingSessionState( {
+			...normalized,
+			readyToRetrySubmit: false,
+			retrySubmitHandoffStatus:
+				DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_STATUSES.BLOCKED,
+			retrySubmitHandoffReason:
+				DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_REASONS.RETRY_SUBMIT_NOT_READY,
+		} );
+	}
+
+	return normalizeDistributedEditingSessionState( {
+		...normalized,
+		readyToRetrySubmit: false,
+		retrySubmitHandoffStatus:
+			DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_STATUSES.PREPARED,
+		retrySubmitHandoffReason: null,
+		retrySubmitPrepared: true,
+	} );
+}
+
+/**
  * Returns the browser-unload integration state for DE-RTC.
  *
  * @param {Object} sessionState DE-RTC session state.
@@ -862,7 +999,11 @@ function getDistributedEditingLocalRebaseDescriptorFields( normalized ) {
 		canAttemptLocalRebase: normalized.canAttemptLocalRebase,
 		localRebasePlanStatus: normalized.localRebasePlanStatus,
 		localRebaseResultStatus: normalized.localRebaseResultStatus,
+		localRebaseResultReason: normalized.localRebaseResultReason,
 		readyToRetrySubmit: normalized.readyToRetrySubmit,
+		retrySubmitHandoffStatus: normalized.retrySubmitHandoffStatus,
+		retrySubmitHandoffReason: normalized.retrySubmitHandoffReason,
+		retrySubmitPrepared: normalized.retrySubmitPrepared,
 		hasClientBaseContent,
 		hasRefetchedServerContent,
 		hasLocalRebaseInputs: hasClientBaseContent && hasRefetchedServerContent,
