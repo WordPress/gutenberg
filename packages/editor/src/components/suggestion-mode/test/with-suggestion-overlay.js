@@ -23,6 +23,8 @@ import { render, screen, act, fireEvent } from '@testing-library/react';
  */
 import { createRegistry, RegistryProvider } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
+import { store as blockEditorStore } from '@wordpress/block-editor';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -38,13 +40,26 @@ import {
 } from '../overlay-context';
 import { store as editorStore } from '../../../store';
 
-function renderWithProviders( ui, { intent = 'edit' } = {} ) {
+function renderWithProviders( ui, { intent = 'edit', blocks = null } = {} ) {
 	const registry = createRegistry();
 	// `setEditorIntent` dispatches a snackbar via the notices store when
 	// the intent actually changes, so the store needs to be registered even
 	// in tests that only care about the overlay HOC.
 	registry.register( noticesStore );
 	registry.register( editorStore );
+	// `blockEditorStore` is only registered when the test passes `blocks`.
+	// Registering it unconditionally activates the overlay provider's
+	// orphan-prune effect, which would clobber overlay entries whose
+	// `clientId` doesn't correspond to a real block — most tests use a
+	// synthetic `clientId="a"` and never register a matching block.
+	// Tests that need `isBlockSelected` to return false (e.g. the
+	// hydrated-reviewer scenarios) opt in by passing `blocks` with a
+	// matching `clientId`.
+	if ( blocks ) {
+		registry.register( preferencesStore );
+		registry.register( blockEditorStore );
+		registry.dispatch( blockEditorStore ).resetBlocks( blocks );
+	}
 	registry.dispatch( editorStore ).setEditorIntent( intent );
 
 	const wrapper = ( { children } ) => (
