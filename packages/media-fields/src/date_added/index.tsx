@@ -9,11 +9,13 @@ import type { Field } from '@wordpress/dataviews';
  * Internal dependencies
  */
 import type { MediaItem } from '../types';
+import DateView from '../utils/date-view';
 
 const dateAddedField: Partial< Field< MediaItem > > = {
 	id: 'date',
 	type: 'datetime',
 	label: __( 'Date added' ),
+	render: DateView,
 	filterBy: {
 		operators: [ 'before', 'after' ],
 	},
