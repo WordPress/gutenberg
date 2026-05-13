@@ -9,7 +9,7 @@ import {
 	Spinner,
 	TextareaControl,
 	TextControl,
-	ToggleControl,
+	CheckboxControl,
 	ToolbarButton,
 	ToolbarGroup,
 	__experimentalConfirmDialog as ConfirmDialog,
@@ -1033,13 +1033,13 @@ export default function Image( {
 									setAttributes( { isDecorative: false } )
 								}
 							>
-								<ToggleControl
+								<CheckboxControl
 									__nextHasNoMarginBottom
 									label={ __( 'Mark as decorative' ) }
 									checked={ !! isDecorative }
 									onChange={ updateIsDecorative }
 									help={ __(
-										'Enable if this image is purely decorative and should be ignored by assistive technologies.'
+										'Hidden from assistive technologies.'
 									) }
 								/>
 							</ToolsPanelItem>
@@ -1425,7 +1425,7 @@ export default function Image( {
 					size="medium"
 				>
 					{ __(
-						'Marking this image as decorative will remove its alt text, caption, and any link. Continue?'
+						'Marking this image as decorative will remove any alt text, caption, and links. Continue?'
 					) }
 				</ConfirmDialog>
 			) }
