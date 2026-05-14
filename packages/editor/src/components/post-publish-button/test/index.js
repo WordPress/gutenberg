@@ -201,6 +201,11 @@ describe( 'PostPublishButton', () => {
 						'Accepted Distributed Editing proof is ready for guarded retry save.',
 					clickAction: 'continue_guarded_retry_save',
 					authorityState: 'ready_for_guarded_update',
+					localChangesState: 'protected_local_changes_exportable',
+					reviewCheckpointState: 'review_accepted',
+					authoritativePostState: 'ready_for_guarded_update',
+					saveStateSummaryText:
+						'Reviewed local changes are ready for guarded update; the authoritative post is not updated yet.',
 					authoritativePostUpdated: false,
 				} }
 			/>
@@ -232,6 +237,22 @@ describe( 'PostPublishButton', () => {
 		expect( button ).toHaveAttribute(
 			'data-distributed-editing-save-button-authority-state',
 			'ready_for_guarded_update'
+		);
+		expect( button ).toHaveAttribute(
+			'data-distributed-editing-save-button-local-changes-state',
+			'protected_local_changes_exportable'
+		);
+		expect( button ).toHaveAttribute(
+			'data-distributed-editing-save-button-review-checkpoint-state',
+			'review_accepted'
+		);
+		expect( button ).toHaveAttribute(
+			'data-distributed-editing-save-button-authoritative-post-state',
+			'ready_for_guarded_update'
+		);
+		expect( button ).toHaveAttribute(
+			'data-distributed-editing-save-button-state-summary',
+			'Reviewed local changes are ready for guarded update; the authoritative post is not updated yet.'
 		);
 		expect( button ).toHaveAttribute(
 			'data-distributed-editing-save-button-authoritative-post-updated',
@@ -284,6 +305,12 @@ describe( 'PostPublishButton', () => {
 					statusText: 'Distributed Editing retry save confirmed.',
 					disabled: true,
 					authorityState: 'authoritative_update_confirmed',
+					localChangesState: 'authoritative_update_confirmed',
+					reviewCheckpointState: 'review_consumed',
+					authoritativePostState:
+						'authoritative_update_confirmed',
+					saveStateSummaryText:
+						'The authoritative post accepted the Distributed Editing update.',
 					authoritativePostUpdated: true,
 				} }
 			/>
@@ -309,6 +336,22 @@ describe( 'PostPublishButton', () => {
 		expect( button ).toHaveAttribute(
 			'data-distributed-editing-save-button-authority-state',
 			'authoritative_update_confirmed'
+		);
+		expect( button ).toHaveAttribute(
+			'data-distributed-editing-save-button-local-changes-state',
+			'authoritative_update_confirmed'
+		);
+		expect( button ).toHaveAttribute(
+			'data-distributed-editing-save-button-review-checkpoint-state',
+			'review_consumed'
+		);
+		expect( button ).toHaveAttribute(
+			'data-distributed-editing-save-button-authoritative-post-state',
+			'authoritative_update_confirmed'
+		);
+		expect( button ).toHaveAttribute(
+			'data-distributed-editing-save-button-state-summary',
+			'The authoritative post accepted the Distributed Editing update.'
 		);
 		expect( button ).toHaveAttribute(
 			'data-distributed-editing-save-button-authoritative-post-updated',
