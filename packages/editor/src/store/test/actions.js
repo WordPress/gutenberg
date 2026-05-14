@@ -2416,6 +2416,12 @@ describe( 'Post actions', () => {
 				result: 'fresh_review_request_accepted_for_admin_review',
 				requested: true,
 				accepted: true,
+				actionTranscriptItemCount: 1,
+				actionTranscriptLatestEventType:
+					DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.FRESH_REVIEW_REQUESTED,
+				actionTranscriptEntriesRedacted: true,
+				actionTranscriptCallsSave: false,
+				actionTranscriptClaimsSaved: false,
 				callsFreshReviewRequestEndpoint: true,
 				callsRetrySaveEndpoint: false,
 				callsNormalSavePost: false,
@@ -2447,6 +2453,15 @@ describe( 'Post actions', () => {
 				localUpdatesImportFreshReviewRequestRestRoute:
 					'post_fresh_review_request',
 				localUpdatesImportFreshReviewRequestClaimsSaved: false,
+				actionTranscriptItemCount: 1,
+				actionTranscriptLatestEventType:
+					DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.FRESH_REVIEW_REQUESTED,
+				actionTranscriptEntriesRedacted: true,
+				actionTranscriptExposesRawContent: false,
+				actionTranscriptExposesProofInternals: false,
+				actionTranscriptExposesActorIds: false,
+				actionTranscriptCallsSave: false,
+				actionTranscriptClaimsSaved: false,
 				retrySaveClaimsSaved: false,
 				canExportLocalUpdates: true,
 			} );
@@ -2522,6 +2537,15 @@ describe( 'Post actions', () => {
 				localUpdatesImportFreshReviewRequestAccepted: false,
 				localUpdatesImportFreshReviewRequestRequested: false,
 				localUpdatesImportFreshReviewRequestClaimsSaved: false,
+				actionTranscriptItemCount: 1,
+				actionTranscriptLatestEventType:
+					DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.FRESH_REVIEW_REQUESTED,
+				actionTranscriptEntriesRedacted: true,
+				actionTranscriptExposesRawContent: false,
+				actionTranscriptExposesProofInternals: false,
+				actionTranscriptExposesActorIds: false,
+				actionTranscriptCallsSave: false,
+				actionTranscriptClaimsSaved: false,
 				canExportLocalUpdates: true,
 				mustOfferLocalCopy: true,
 			} );

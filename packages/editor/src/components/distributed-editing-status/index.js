@@ -2091,6 +2091,10 @@ function getActionTranscriptMessage( descriptor ) {
 			return __(
 				'The editor recorded that review is required without exposing the reviewed content.'
 			);
+		case DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.FRESH_REVIEW_REQUESTED:
+			return __(
+				'The editor requested fresh review and kept the activity record content-free.'
+			);
 	}
 
 	const count = normalizeCount( descriptor.actionTranscriptItemCount );

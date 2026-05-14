@@ -1303,16 +1303,35 @@ export function __experimentalRequestDistributedEditingFreshReviewForImportedLoc
 					response,
 					currentSessionState
 				);
+			const nextSessionState =
+				getDistributedEditingSessionStateWithActionTranscriptEvent(
+					sessionState,
+					{
+						eventType:
+							DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.FRESH_REVIEW_REQUESTED,
+						reasonCode: sessionState.reasonCode,
+					}
+				);
 
-			dispatch.setDistributedEditingSessionState( sessionState );
+			dispatch.setDistributedEditingSessionState( nextSessionState );
 
 			return {
-				status: sessionState.localUpdatesImportReviewRequestStatus,
-				result: sessionState.localUpdatesImportFreshReviewRequestResult,
+				status: nextSessionState.localUpdatesImportReviewRequestStatus,
+				result: nextSessionState.localUpdatesImportFreshReviewRequestResult,
 				requested:
-					sessionState.localUpdatesImportFreshReviewRequestRequested,
+					nextSessionState.localUpdatesImportFreshReviewRequestRequested,
 				accepted:
-					sessionState.localUpdatesImportFreshReviewRequestAccepted,
+					nextSessionState.localUpdatesImportFreshReviewRequestAccepted,
+				actionTranscriptItemCount:
+					nextSessionState.actionTranscriptItemCount,
+				actionTranscriptLatestEventType:
+					nextSessionState.actionTranscriptLatestEventType,
+				actionTranscriptEntriesRedacted:
+					nextSessionState.actionTranscriptEntriesRedacted,
+				actionTranscriptCallsSave:
+					nextSessionState.actionTranscriptCallsSave,
+				actionTranscriptClaimsSaved:
+					nextSessionState.actionTranscriptClaimsSaved,
 				callsFreshReviewRequestEndpoint: true,
 				callsRetrySaveEndpoint: false,
 				callsNormalSavePost: false,
@@ -1320,15 +1339,25 @@ export function __experimentalRequestDistributedEditingFreshReviewForImportedLoc
 				dispatchesNotice: false,
 				changesPostLock: false,
 				claimsSaved: false,
-				sessionState,
+				sessionState: nextSessionState,
 			};
 		} catch ( error ) {
-			dispatch.setDistributedEditingSessionState(
+			const sessionState =
 				getDistributedEditingSessionStateForFreshReviewRequestResult(
 					error,
 					currentSessionState
-				)
-			);
+				);
+			const nextSessionState =
+				getDistributedEditingSessionStateWithActionTranscriptEvent(
+					sessionState,
+					{
+						eventType:
+							DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.FRESH_REVIEW_REQUESTED,
+						reasonCode: sessionState.reasonCode,
+					}
+				);
+
+			dispatch.setDistributedEditingSessionState( nextSessionState );
 
 			throw error;
 		}

@@ -110,6 +110,7 @@ export const DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES = Object.freeze(
 		RETRY_SUBMIT_PROOF_REFRESHED: 'retry_submit_proof_refreshed',
 		SAVE_STATE_CHANGED: 'save_state_changed',
 		REVIEW_REQUIRED: 'review_required',
+		FRESH_REVIEW_REQUESTED: 'fresh_review_requested',
 	}
 );
 
@@ -125,6 +126,8 @@ const DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_DEFINITIONS = Object.freeze( {
 	[ DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.SAVE_STATE_CHANGED ]:
 		Object.freeze( { source: 'editor' } ),
 	[ DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.REVIEW_REQUIRED ]:
+		Object.freeze( { source: 'review' } ),
+	[ DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.FRESH_REVIEW_REQUESTED ]:
 		Object.freeze( { source: 'review' } ),
 } );
 
