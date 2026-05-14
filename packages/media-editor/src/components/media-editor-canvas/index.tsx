@@ -9,8 +9,6 @@ import { useCallback } from '@wordpress/element';
 import { useMediaEditorContext } from '../media-editor-provider';
 import { getMediaTypeFromMimeType } from '../../utils';
 import { Cropper, useCropper } from '../../image-editor';
-import CropDimensionsBadge from './crop-dimensions-badge';
-import { useCropDimensionsBadge } from './use-crop-dimensions-badge';
 
 export interface MediaEditorCanvasProps {
 	/** Fixed aspect ratio (width / height). `undefined` means free. */
@@ -52,19 +50,16 @@ export default function MediaEditorCanvas( {
 }: MediaEditorCanvasProps ) {
 	const { media } = useMediaEditorContext();
 	const controller = useCropper();
-	const badge = useCropDimensionsBadge();
 
 	const handleGestureStart = useCallback( () => {
 		onGestureStart?.();
 		controller.commitHistory();
-		badge.onGestureStart();
-	}, [ controller, onGestureStart, badge ] );
+	}, [ controller, onGestureStart ] );
 
 	const handleGestureEnd = useCallback( () => {
 		controller.commitHistory();
 		onGestureEnd?.();
-		badge.onGestureEnd();
-	}, [ controller, onGestureEnd, badge ] );
+	}, [ controller, onGestureEnd ] );
 
 	const mediaUrl = media?.source_url;
 	const mediaType = getMediaTypeFromMimeType( media?.mime_type );
@@ -88,10 +83,6 @@ export default function MediaEditorCanvas( {
 				// step before the canvas gesture begins.
 				onGestureStart={ handleGestureStart }
 				onGestureEnd={ handleGestureEnd }
-			/>
-			<CropDimensionsBadge
-				state={ controller.state }
-				visible={ badge.visible }
 			/>
 		</div>
 	);

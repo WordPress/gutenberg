@@ -37,6 +37,8 @@ import { useAriaAnnouncer } from '../hooks/use-aria-announcer';
 import { RectangleStencil } from './stencils/rectangle-stencil';
 import { DimmingOverlay } from './overlays/dimming-overlay';
 import { GridOverlay } from './overlays/grid-overlay';
+import { DimensionsOverlay } from './overlays/dimensions-overlay';
+import { getSourceRegion } from '../../core/source-region';
 import { ViewportProvider, useViewport } from './viewport-provider';
 import { VISUALLY_HIDDEN_STYLE } from '../visually-hidden-style';
 
@@ -333,6 +335,12 @@ function CropperInner(
 	const [ isResizing, setIsResizing ] = useState( false );
 	const isResizingRef = useRef( false );
 	const isSettlingRef = useRef( false );
+	// Direction of the handle the user is currently dragging via pointer.
+	// `null` for keyboard-driven resizes and outside of pointer drags.
+	// Drives the live dimensions tooltip overlay.
+	const [ activeHandle, setActiveHandle ] = useState<
+		'n' | 's' | 'e' | 'w' | 'nw' | 'ne' | 'sw' | 'se' | null
+	>( null );
 
 	// Use the interaction hook for mouse, touch, and keyboard events.
 	const {
@@ -485,6 +493,20 @@ function CropperInner(
 		isInteractiveGrid &&
 		( isInteractionPlacementActive || isResizing || isPlacementActive );
 
+	// Output crop size in source pixels — drives the live tooltip
+	// overlay. Only computed during pointer drags, so the per-frame
+	// state churn during pan/zoom doesn't pay for it.
+	const outputSize = useMemo( () => {
+		if ( ! activeHandle || ! state.image ) {
+			return null;
+		}
+		const region = getSourceRegion( state, {
+			width: state.image.naturalWidth,
+			height: state.image.naturalHeight,
+		} );
+		return { width: region.width, height: region.height };
+	}, [ activeHandle, state ] );
+
 	/**
 	 * Handle Escape on a resize handle — return focus to the canvas so
 	 * arrow keys pan the image rather than resize.
@@ -496,18 +518,22 @@ function CropperInner(
 		canvasRef.current?.focus( { preventScroll: true } );
 	}, [] );
 
-	const handleResizeStart = useCallback( () => {
-		isResizingRef.current = true;
-		setIsResizing( true );
-		// Clear any in-flight settle so transitions don't apply during the
-		// new drag (rapid successive resizes would otherwise inherit the
-		// previous settle animation).
-		clearTimeout( settleTimerRef.current );
-		isSettlingRef.current = false;
-		setSettling( false );
-		resetViewport();
-		onGestureStart?.();
-	}, [ onGestureStart, resetViewport ] );
+	const handleResizeStart = useCallback(
+		( handle?: 'n' | 's' | 'e' | 'w' | 'nw' | 'ne' | 'sw' | 'se' ) => {
+			isResizingRef.current = true;
+			setIsResizing( true );
+			setActiveHandle( handle ?? null );
+			// Clear any in-flight settle so transitions don't apply during the
+			// new drag (rapid successive resizes would otherwise inherit the
+			// previous settle animation).
+			clearTimeout( settleTimerRef.current );
+			isSettlingRef.current = false;
+			setSettling( false );
+			resetViewport();
+			onGestureStart?.();
+		},
+		[ onGestureStart, resetViewport ]
+	);
 
 	/**
 	 * Handle resize end — settle the crop rect (re-center, fill height)
@@ -516,6 +542,7 @@ function CropperInner(
 	const handleResizeEnd = useCallback( () => {
 		isResizingRef.current = false;
 		setIsResizing( false );
+		setActiveHandle( null );
 		isSettlingRef.current = true;
 		setSettling( true );
 		// Reset viewport pan first so it transitions back to zero in sync
@@ -699,6 +726,18 @@ function CropperInner(
 							cropRect={ state.cropRect }
 							containerSize={ canvasSize }
 							imageSize={ visualSize }
+						/>
+					) }
+
+					{ /* Live dimensions tooltip pinned to the dragged handle. */ }
+					{ activeHandle && outputSize && (
+						<DimensionsOverlay
+							cropRect={ state.cropRect }
+							containerSize={ canvasSize }
+							imageSize={ visualSize }
+							activeHandle={ activeHandle }
+							outputWidth={ outputSize.width }
+							outputHeight={ outputSize.height }
 						/>
 					) }
 				</div>

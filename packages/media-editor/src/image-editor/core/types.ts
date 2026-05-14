@@ -171,8 +171,14 @@ export interface StencilProps {
 	imageSize: Size;
 	/** Callback when the crop rectangle changes (during drag). */
 	onCropChange: ( rect: NormalizedRect ) => void;
-	/** Callback when a resize drag starts (pointerdown on handle). */
-	onResizeStart?: () => void;
+	/**
+	 * Callback when a resize drag starts (pointerdown on handle). The
+	 * handle direction is passed for pointer drags only — keyboard-driven
+	 * resizes invoke this without an argument.
+	 */
+	onResizeStart?: (
+		handle?: 'n' | 's' | 'e' | 'w' | 'nw' | 'ne' | 'sw' | 'se'
+	) => void;
 	/** Callback when a resize drag ends (mouseup after handle drag). */
 	onResizeEnd?: () => void;
 	/** Optional fixed aspect ratio (width / height) in pixel space. */
