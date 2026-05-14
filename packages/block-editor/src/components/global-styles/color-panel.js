@@ -19,7 +19,7 @@ import {
 	Button,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
-import { useCallback, useRef } from '@wordpress/element';
+import { useCallback, useMemo, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { getValueFromVariable } from '@wordpress/global-styles-engine';
 import { reset as resetIcon } from '@wordpress/icons';
@@ -146,17 +146,17 @@ export function ColorToolsPanel( {
 }
 
 /**
- * Encodes a colour value for storage in the style object.
+ * Encodes a color value for storage in the style object.
  *
  * When a `slug` is provided it is used directly (slug-based selection path).
  * Otherwise the function falls back to looking up the hex value in the
  * palette; if found it encodes the slug, otherwise it stores the raw hex.
  *
  * Extracted to module scope so it is not re-created on every render.
- * Callers inside `ColorPanel` pass the live `colors` array from the closure.
+ * Callers pass the flattened palette (`allColors`), computed once in `ColorPanel` from the per-origin `colors` array.
  *
  * @param {Array}       allColors  Flat array of `{ color, slug }` objects.
- * @param {string|void} colorValue Hex or CSS colour string.
+ * @param {string|void} colorValue Hex or CSS color string.
  * @param {string|void} slug       Optional palette slug from slug-aware selection.
  * @return {string|void} Encoded value suitable for the style object.
  */
@@ -371,8 +371,9 @@ export default function ColorPanel( {
 	const decodeValue = ( rawValue ) =>
 		getValueFromVariable( { settings }, '', rawValue );
 
-	const allColors = colors.flatMap(
-		( { colors: originColors } ) => originColors
+	const allColors = useMemo(
+		() => colors.flatMap( ( { colors: originColors } ) => originColors ),
+		[ colors ]
 	);
 
 	const encodeGradientValue = ( gradientValue ) => {
@@ -487,16 +488,15 @@ export default function ColorPanel( {
 		// Compare raw encoded references (e.g. var:preset|color|slug), not
 		// decoded hex values. Two palette entries can share the same hex but
 		// carry different slugs (e.g. var:preset|color|dark-background and
-		// var:preset|color|dark-text both resolving to #000); comparing decoded
-		// values would conflate them and incorrectly force the link colour to
-		// follow the text colour even when the user deliberately chose a
-		// different palette slot.
-		//
-		// Note: this is stricter than the previous decoded comparison, if text
-		// and link were stored in different formats that happen to resolve to
-		// the same hex the old check would sync them and this one will not.
-		// In practice this cannot arise as both values go through the same
-		// encoding path.
+		// values would conflate them and incorrectly force the link color to
+		// values would conflate them and incorrectly force the link color to
+		// follow the text color even when the user deliberately chose a
+		// Note: this is stricter than the previous decoded comparison.
+		// If text and link were stored in different formats that resolved to
+		// the same hex (e.g. one as `var:preset|color|x` and the other as
+		// `var(--wp--preset--color--x)`), the old check would sync them
+		// and this one will not. In practice this should not arise because
+		// both values are written through the same encoding path.
 		if (
 			inheritedValue?.color?.text ===
 			inheritedValue?.elements?.link?.color?.text

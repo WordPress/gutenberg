@@ -14,7 +14,7 @@ import ColorPanel from '../color-panel';
 // ---------------------------------------------------------------------------
 
 // Two palette entries that share the same decoded hex value (#000) but carry
-// distinct slugs. This mirrors the duplicate-colour scenario that motivated
+// distinct slugs. This mirrors the duplicate-color scenario that motivated
 // the slug-based selection work.
 const DUPLICATE_PALETTE_SETTINGS = {
 	color: {
@@ -42,7 +42,7 @@ const DUPLICATE_PALETTE_SETTINGS = {
 // ---------------------------------------------------------------------------
 
 describe( 'ColorPanel — setTextColor', () => {
-	// Helper: open the Text-colour dropdown and return the rendered swatches.
+	// Helper: open the Text-color dropdown and return the rendered swatches.
 	async function openTextDropdown() {
 		await click(
 			screen.getByRole( 'button', { name: /Text/, expanded: false } )
@@ -51,7 +51,7 @@ describe( 'ColorPanel — setTextColor', () => {
 		return screen.findAllByRole( 'option' );
 	}
 
-	it( 'encodes a slug-selected colour as var:preset|color|<slug> rather than falling back to a hex-value lookup', async () => {
+	it( 'encodes a slug-selected color as var:preset|color|<slug> rather than falling back to a hex-value lookup', async () => {
 		const onChange = jest.fn();
 
 		await render(
@@ -74,7 +74,7 @@ describe( 'ColorPanel — setTextColor', () => {
 		expect( result?.color?.text ).toBe( 'var:preset|color|dark-text' );
 	} );
 
-	it( 'syncs the link colour when text and link share the same raw preset reference', async () => {
+	it( 'syncs the link color when text and link share the same raw preset reference', async () => {
 		const onChange = jest.fn();
 		const sharedRef = 'var:preset|color|dark-background';
 
@@ -102,7 +102,7 @@ describe( 'ColorPanel — setTextColor', () => {
 		);
 	} );
 
-	it( 'does NOT sync the link colour when text and link have different raw refs, even if their decoded hex values match', async () => {
+	it( 'does NOT sync the link color when text and link have different raw refs, even if their decoded hex values match', async () => {
 		const onChange = jest.fn();
 
 		await render(
