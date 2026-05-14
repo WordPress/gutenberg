@@ -32,6 +32,7 @@ import { unlock } from '../lock-unlock';
 import { getTemplateInfo } from '../utils/get-template-info';
 import {
 	DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE,
+	getDistributedEditingActionTranscriptStateForSessionState,
 	getDistributedEditingFreshReviewDecisionStateForSessionState,
 	getDistributedEditingFreshReviewLifecycleStateForSessionState,
 	getDistributedEditingFreshReviewPreSaveStateForSessionState,
@@ -459,6 +460,19 @@ export function shouldWarnBeforeLeavingDistributedEditingSession( state ) {
  */
 export function getDistributedEditingNoticeDescriptors( state ) {
 	return getDistributedEditingNoticeDescriptorsForSessionState(
+		getDistributedEditingSessionState( state )
+	);
+}
+
+/**
+ * Returns support-safe Distributed Editing action transcript state.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {Object} Content-free action transcript state.
+ */
+export function getDistributedEditingActionTranscriptState( state ) {
+	return getDistributedEditingActionTranscriptStateForSessionState(
 		getDistributedEditingSessionState( state )
 	);
 }

@@ -7,6 +7,7 @@ import deepFreeze from 'deep-freeze';
  * Internal dependencies
  */
 import {
+	DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES,
 	DISTRIBUTED_EDITING_DISPOSITIONS,
 	DISTRIBUTED_EDITING_FRESH_REVIEW_AUTHORITY_STATUSES,
 	DISTRIBUTED_EDITING_FRESH_REVIEW_DECISION_STATUSES,
@@ -49,6 +50,7 @@ import {
 	DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES,
 	DISTRIBUTED_EDITING_UNLOAD_WARNING_REASONS,
 	DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE,
+	getDistributedEditingActionTranscriptStateForSessionState,
 	getDistributedEditingLocalUpdatesExportPayload,
 	getDistributedEditingFreshReviewDecisionStateForSessionState,
 	getDistributedEditingFreshReviewLifecycleStateForSessionState,
@@ -106,6 +108,7 @@ import {
 import { distributedEditingSession } from '../reducer';
 import {
 	canExportDistributedEditingLocalUpdates,
+	getDistributedEditingActionTranscriptState,
 	getDistributedEditingFreshReviewDecisionState,
 	getDistributedEditingFreshReviewLifecycleState,
 	getDistributedEditingFreshReviewPreSaveState,
@@ -179,6 +182,110 @@ describe( 'distributed editing session state', () => {
 				DISTRIBUTED_EDITING_DISPOSITIONS.ACCEPTED_WITH_DEGRADED_LIVE_FEEDBACK
 			)
 		).toBe( false );
+	} );
+
+	it( 'normalizes content-free action transcript items without retaining unsafe payloads', () => {
+		const normalized = normalizeDistributedEditingSessionState( {
+			actionTranscriptItems: [
+				{
+					eventType:
+						DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.LOCAL_EDITOR_ACTION,
+					rawContent:
+						'<!-- wp:paragraph --><p>Do not expose me</p><!-- /wp:paragraph -->',
+				},
+				{
+					eventType:
+						DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.LOCAL_EDITOR_ACTION,
+					reasonCode:
+						DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+				},
+				{
+					eventType:
+						DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.REMOTE_CHANGE_RECEIVED,
+					reviewerId: 7,
+				},
+				{
+					eventType:
+						DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.REMOTE_CHANGE_RECEIVED,
+				},
+			],
+		} );
+
+		expect( normalized ).toMatchObject( {
+			actionTranscriptItemCount: 2,
+			actionTranscriptDroppedItemCount: 2,
+			actionTranscriptLatestEventType:
+				DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.REMOTE_CHANGE_RECEIVED,
+			actionTranscriptLatestEventSource: 'remote',
+			actionTranscriptHasLocalEvents: true,
+			actionTranscriptHasRemoteEvents: true,
+			actionTranscriptEntriesRedacted: true,
+			actionTranscriptExposesRawContent: false,
+			actionTranscriptExposesProofInternals: false,
+			actionTranscriptExposesActorIds: false,
+			actionTranscriptCallsRest: false,
+			actionTranscriptCallsSave: false,
+			actionTranscriptMutatesEditorContent: false,
+			actionTranscriptChangesPostLock: false,
+			actionTranscriptClaimsSaved: false,
+		} );
+		expect(
+			JSON.stringify( normalized.actionTranscriptItems )
+		).not.toMatch( /Do not expose me|reviewerId|reviewer_id|rawContent/ );
+	} );
+
+	it( 'describes action transcript state and notice descriptors without side effects', () => {
+		const sessionState = normalizeDistributedEditingSessionState( {
+			actionTranscriptItems: [
+				{
+					eventType:
+						DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.SERVER_STATE_REFETCHED,
+				},
+			],
+		} );
+		const transcriptState =
+			getDistributedEditingActionTranscriptStateForSessionState(
+				sessionState
+			);
+		const descriptor =
+			getDistributedEditingNoticeDescriptorsForSessionState(
+				sessionState
+			).find(
+				( item ) =>
+					item.kind ===
+					DISTRIBUTED_EDITING_NOTICE_KINDS.ACTION_TRANSCRIPT
+			);
+
+		expect( transcriptState ).toMatchObject( {
+			status: 'available',
+			itemCount: 1,
+			latestEventType:
+				DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.SERVER_STATE_REFETCHED,
+			latestEventSource: 'server',
+			entriesRedacted: true,
+			exposesRawContent: false,
+			exposesProofInternals: false,
+			exposesActorIds: false,
+			callsRest: false,
+			callsSave: false,
+			mutatesEditorContent: false,
+			changesPostLock: false,
+			claimsSaved: false,
+		} );
+		expect( descriptor ).toEqual(
+			expect.objectContaining( {
+				id: DISTRIBUTED_EDITING_NOTICE_IDS.ACTION_TRANSCRIPT,
+				kind: DISTRIBUTED_EDITING_NOTICE_KINDS.ACTION_TRANSCRIPT,
+				status: 'info',
+				priority: 'status',
+				actionTranscriptItemCount: 1,
+				actionTranscriptLatestEventType:
+					DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.SERVER_STATE_REFETCHED,
+				actionTranscriptEntriesRedacted: true,
+				actionTranscriptCallsSave: false,
+				actionTranscriptClaimsSaved: false,
+			} )
+		);
 	} );
 
 	it( 'normalizes pending state from runner-compatible conflict terms', () => {
@@ -6807,6 +6914,34 @@ describe( 'distributed editing selectors', () => {
 		expect( shouldWarnBeforeLeavingDistributedEditingSession( {} ) ).toBe(
 			false
 		);
+	} );
+
+	it( 'selects content-free action transcript state', () => {
+		const state = {
+			distributedEditingSession: normalizeDistributedEditingSessionState(
+				{
+					actionTranscriptItems: [
+						{
+							eventType:
+								DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.SAVE_STATE_CHANGED,
+						},
+					],
+				}
+			),
+		};
+
+		expect(
+			getDistributedEditingActionTranscriptState( state )
+		).toMatchObject( {
+			status: 'available',
+			itemCount: 1,
+			latestEventType:
+				DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.SAVE_STATE_CHANGED,
+			entriesRedacted: true,
+			exposesRawContent: false,
+			callsSave: false,
+			claimsSaved: false,
+		} );
 	} );
 
 	it( 'selects conflict and copy/export requirements from session state', () => {

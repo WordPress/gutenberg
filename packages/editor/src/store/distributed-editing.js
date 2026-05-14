@@ -56,6 +56,7 @@ export const DISTRIBUTED_EDITING_NOTICE_KINDS = Object.freeze( {
 	PENDING_CHANGES: 'pending-changes',
 	RETRY_SAVE: 'retry-save',
 	LOCAL_UPDATES_IMPORT_BLOCKED: 'local-updates-import-blocked',
+	ACTION_TRANSCRIPT: 'action-transcript',
 } );
 
 /**
@@ -74,6 +75,7 @@ export const DISTRIBUTED_EDITING_NOTICE_IDS = Object.freeze( {
 	RETRY_SAVE: 'core/editor/distributed-editing/retry-save',
 	LOCAL_UPDATES_IMPORT_BLOCKED:
 		'core/editor/distributed-editing/local-updates-import-blocked',
+	ACTION_TRANSCRIPT: 'core/editor/distributed-editing/action-transcript',
 } );
 
 /**
@@ -94,6 +96,36 @@ export const DISTRIBUTED_EDITING_NOTICE_ACTIONS = Object.freeze( {
 	SUBMIT_FRESH_REVIEW_DECISION: 'submit-fresh-review-decision',
 	VALIDATE_FRESH_REVIEW_HANDOFF: 'validate-fresh-review-handoff',
 } );
+
+/**
+ * Stable content-free transcript event types. These are the first editor-side
+ * operation-log vocabulary for DE-RTC. They describe categories of activity,
+ * never raw block content, proof internals, or actor identities.
+ */
+export const DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES = Object.freeze(
+	{
+		LOCAL_EDITOR_ACTION: 'local_editor_action',
+		REMOTE_CHANGE_RECEIVED: 'remote_change_received',
+		SERVER_STATE_REFETCHED: 'server_state_refetched',
+		SAVE_STATE_CHANGED: 'save_state_changed',
+		REVIEW_REQUIRED: 'review_required',
+	}
+);
+
+const DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_DEFINITIONS = Object.freeze( {
+	[ DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.LOCAL_EDITOR_ACTION ]:
+		Object.freeze( { source: 'local' } ),
+	[ DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.REMOTE_CHANGE_RECEIVED ]:
+		Object.freeze( { source: 'remote' } ),
+	[ DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.SERVER_STATE_REFETCHED ]:
+		Object.freeze( { source: 'server' } ),
+	[ DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.SAVE_STATE_CHANGED ]:
+		Object.freeze( { source: 'editor' } ),
+	[ DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.REVIEW_REQUIRED ]:
+		Object.freeze( { source: 'review' } ),
+} );
+
+const MAX_DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_ITEMS = 10;
 
 const DISTRIBUTED_EDITING_SYNC_META_SCRIPT_SOURCE = `<script\\b(?=[^>]*\\btype\\s*=\\s*(['"])wp/post-sync-meta\\1)[^>]*>([\\s\\S]*?)<\\/script\\s*>`;
 
@@ -604,6 +636,10 @@ const VALID_LOCAL_UPDATES_REVIEW_REQUEST_STATUSES = new Set(
 	Object.values( DISTRIBUTED_EDITING_LOCAL_UPDATES_REVIEW_REQUEST_STATUSES )
 );
 
+const VALID_ACTION_TRANSCRIPT_EVENT_TYPES = new Set(
+	Object.values( DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES )
+);
+
 const VALID_FRESH_REVIEW_DECISION_STATUSES = new Set(
 	Object.values( DISTRIBUTED_EDITING_FRESH_REVIEW_DECISION_STATUSES )
 );
@@ -637,6 +673,8 @@ const NOTICE_ID_BY_KIND = Object.freeze( {
 		DISTRIBUTED_EDITING_NOTICE_IDS.RETRY_SAVE,
 	[ DISTRIBUTED_EDITING_NOTICE_KINDS.LOCAL_UPDATES_IMPORT_BLOCKED ]:
 		DISTRIBUTED_EDITING_NOTICE_IDS.LOCAL_UPDATES_IMPORT_BLOCKED,
+	[ DISTRIBUTED_EDITING_NOTICE_KINDS.ACTION_TRANSCRIPT ]:
+		DISTRIBUTED_EDITING_NOTICE_IDS.ACTION_TRANSCRIPT,
 } );
 
 export const DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE = Object.freeze( {
@@ -652,6 +690,24 @@ export const DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE = Object.freeze( {
 	isConnectionDegraded: false,
 	remoteChangeCount: 0,
 	hasRemoteChanges: false,
+	actionTranscriptItems: [],
+	actionTranscriptItemCount: 0,
+	actionTranscriptDroppedItemCount: 0,
+	actionTranscriptLatestEventType: null,
+	actionTranscriptLatestEventSource: null,
+	actionTranscriptHasLocalEvents: false,
+	actionTranscriptHasRemoteEvents: false,
+	actionTranscriptHasServerEvents: false,
+	actionTranscriptHasEditorEvents: false,
+	actionTranscriptEntriesRedacted: true,
+	actionTranscriptExposesRawContent: false,
+	actionTranscriptExposesProofInternals: false,
+	actionTranscriptExposesActorIds: false,
+	actionTranscriptCallsRest: false,
+	actionTranscriptCallsSave: false,
+	actionTranscriptMutatesEditorContent: false,
+	actionTranscriptChangesPostLock: false,
+	actionTranscriptClaimsSaved: false,
 	requiresServerStateAcceptance: false,
 	requiresServerStateRefetch: false,
 	refetchedServerState: false,
@@ -978,6 +1034,137 @@ export function isDistributedEditingConflictDisposition( disposition ) {
 	].includes( disposition );
 }
 
+function getDistributedEditingActionTranscriptRawItems( sessionState = {} ) {
+	const rawItems = getFirstDefined(
+		sessionState.actionTranscriptItems,
+		sessionState.distributedEditingActionTranscriptItems,
+		sessionState.operationTranscriptItems,
+		sessionState.transcriptItems
+	);
+
+	return Array.isArray( rawItems ) ? rawItems : [];
+}
+
+function transcriptItemExposesRawContent( item = {} ) {
+	return Boolean(
+		item.rawContent ||
+			item.postContent ||
+			item.post_content ||
+			item.blockContent ||
+			item.block_content ||
+			item.content ||
+			item.html ||
+			item.text ||
+			item.value ||
+			item.blocks ||
+			item.edits?.content ||
+			item.edits?.post_content
+	);
+}
+
+function transcriptItemExposesProofInternals( item = {} ) {
+	return Boolean(
+		item.proof ||
+			item.proofSignature ||
+			item.proof_signature ||
+			item.token ||
+			item.reviewToken ||
+			item.review_token ||
+			item.acceptedReviewApprovalProof
+	);
+}
+
+function transcriptItemExposesActorIds( item = {} ) {
+	return Boolean(
+		item.userId ||
+			item.user_id ||
+			item.actorId ||
+			item.actor_id ||
+			item.reviewerId ||
+			item.reviewer_id ||
+			item.saverId ||
+			item.saver_id
+	);
+}
+
+function normalizeDistributedEditingActionTranscriptItem( item = {}, index ) {
+	const eventType = VALID_ACTION_TRANSCRIPT_EVENT_TYPES.has( item.eventType )
+		? item.eventType
+		: null;
+
+	if ( ! eventType ) {
+		return null;
+	}
+
+	const exposesRawContent = transcriptItemExposesRawContent( item );
+	const exposesProofInternals = transcriptItemExposesProofInternals( item );
+	const exposesActorIds = transcriptItemExposesActorIds( item );
+
+	if ( exposesRawContent || exposesProofInternals || exposesActorIds ) {
+		return null;
+	}
+
+	const definition =
+		DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_DEFINITIONS[ eventType ];
+
+	return {
+		id: `de-rtc-action-transcript-${ index + 1 }`,
+		eventType,
+		source: definition?.source || 'editor',
+		sequence: index + 1,
+		reasonCode: isValidDistributedEditingReasonCode( item.reasonCode )
+			? item.reasonCode
+			: null,
+		redacted: true,
+		exposesRawContent: false,
+		exposesProofInternals: false,
+		exposesActorIds: false,
+	};
+}
+
+function normalizeDistributedEditingActionTranscriptFields(
+	sessionState = {}
+) {
+	const rawItems =
+		getDistributedEditingActionTranscriptRawItems( sessionState );
+	const actionTranscriptItems = rawItems
+		.map( normalizeDistributedEditingActionTranscriptItem )
+		.filter( Boolean )
+		.slice( -MAX_DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_ITEMS );
+	const latestItem =
+		actionTranscriptItems[ actionTranscriptItems.length - 1 ] || null;
+
+	return {
+		actionTranscriptItems,
+		actionTranscriptItemCount: actionTranscriptItems.length,
+		actionTranscriptDroppedItemCount:
+			rawItems.length - actionTranscriptItems.length,
+		actionTranscriptLatestEventType: latestItem?.eventType || null,
+		actionTranscriptLatestEventSource: latestItem?.source || null,
+		actionTranscriptHasLocalEvents: actionTranscriptItems.some(
+			( item ) => item.source === 'local'
+		),
+		actionTranscriptHasRemoteEvents: actionTranscriptItems.some(
+			( item ) => item.source === 'remote'
+		),
+		actionTranscriptHasServerEvents: actionTranscriptItems.some(
+			( item ) => item.source === 'server'
+		),
+		actionTranscriptHasEditorEvents: actionTranscriptItems.some(
+			( item ) => item.source === 'editor'
+		),
+		actionTranscriptEntriesRedacted: true,
+		actionTranscriptExposesRawContent: false,
+		actionTranscriptExposesProofInternals: false,
+		actionTranscriptExposesActorIds: false,
+		actionTranscriptCallsRest: false,
+		actionTranscriptCallsSave: false,
+		actionTranscriptMutatesEditorContent: false,
+		actionTranscriptChangesPostLock: false,
+		actionTranscriptClaimsSaved: false,
+	};
+}
+
 /**
  * Normalize user-provided or server-provided DE-RTC session state into the
  * small editor vocabulary consumed by future UI components.
@@ -1241,6 +1428,7 @@ export function normalizeDistributedEditingSessionState( sessionState = {} ) {
 		isConnectionDegraded,
 		remoteChangeCount,
 		hasRemoteChanges,
+		...normalizeDistributedEditingActionTranscriptFields( sessionState ),
 		requiresServerStateAcceptance,
 		requiresServerStateRefetch,
 		refetchedServerState,
@@ -1381,6 +1569,43 @@ export function normalizeDistributedEditingSessionState( sessionState = {} ) {
 		requiresManualConflictResolution,
 		mustOfferLocalCopy,
 		canExportLocalUpdates,
+	};
+}
+
+/**
+ * Returns a support-safe operation transcript summary for DE-RTC editor
+ * activity. The summary is derived only from stable event types and cannot
+ * expose raw post content, proof internals, or actor identities.
+ *
+ * @param {Object} sessionState DE-RTC session state.
+ *
+ * @return {Object} Content-free action transcript state.
+ */
+export function getDistributedEditingActionTranscriptStateForSessionState(
+	sessionState = {}
+) {
+	const normalized = normalizeDistributedEditingSessionState( sessionState );
+
+	return {
+		status: normalized.actionTranscriptItemCount > 0 ? 'available' : 'none',
+		items: normalized.actionTranscriptItems,
+		itemCount: normalized.actionTranscriptItemCount,
+		droppedItemCount: normalized.actionTranscriptDroppedItemCount,
+		latestEventType: normalized.actionTranscriptLatestEventType,
+		latestEventSource: normalized.actionTranscriptLatestEventSource,
+		hasLocalEvents: normalized.actionTranscriptHasLocalEvents,
+		hasRemoteEvents: normalized.actionTranscriptHasRemoteEvents,
+		hasServerEvents: normalized.actionTranscriptHasServerEvents,
+		hasEditorEvents: normalized.actionTranscriptHasEditorEvents,
+		entriesRedacted: normalized.actionTranscriptEntriesRedacted,
+		exposesRawContent: normalized.actionTranscriptExposesRawContent,
+		exposesProofInternals: normalized.actionTranscriptExposesProofInternals,
+		exposesActorIds: normalized.actionTranscriptExposesActorIds,
+		callsRest: normalized.actionTranscriptCallsRest,
+		callsSave: normalized.actionTranscriptCallsSave,
+		mutatesEditorContent: normalized.actionTranscriptMutatesEditorContent,
+		changesPostLock: normalized.actionTranscriptChangesPostLock,
+		claimsSaved: normalized.actionTranscriptClaimsSaved,
 	};
 }
 
@@ -3827,6 +4052,8 @@ export function getDistributedEditingNoticeDescriptorsForSessionState(
 		getDistributedEditingFreshReviewPreSaveStateForSessionState(
 			normalized
 		);
+	const actionTranscriptState =
+		getDistributedEditingActionTranscriptStateForSessionState( normalized );
 
 	if ( normalized.requiresServerStateAcceptance ) {
 		descriptors.push(
@@ -4194,6 +4421,50 @@ export function getDistributedEditingNoticeDescriptorsForSessionState(
 				actionKeys: [
 					DISTRIBUTED_EDITING_NOTICE_ACTIONS.REVIEW_REMOTE_CHANGES,
 				],
+			} )
+		);
+	}
+
+	if ( actionTranscriptState.status === 'available' ) {
+		descriptors.push(
+			createNoticeDescriptor( normalized, {
+				kind: DISTRIBUTED_EDITING_NOTICE_KINDS.ACTION_TRANSCRIPT,
+				status: 'info',
+				priority: 'status',
+				extra: {
+					actionTranscriptStatus: actionTranscriptState.status,
+					actionTranscriptItemCount: actionTranscriptState.itemCount,
+					actionTranscriptDroppedItemCount:
+						actionTranscriptState.droppedItemCount,
+					actionTranscriptLatestEventType:
+						actionTranscriptState.latestEventType,
+					actionTranscriptLatestEventSource:
+						actionTranscriptState.latestEventSource,
+					actionTranscriptHasLocalEvents:
+						actionTranscriptState.hasLocalEvents,
+					actionTranscriptHasRemoteEvents:
+						actionTranscriptState.hasRemoteEvents,
+					actionTranscriptHasServerEvents:
+						actionTranscriptState.hasServerEvents,
+					actionTranscriptHasEditorEvents:
+						actionTranscriptState.hasEditorEvents,
+					actionTranscriptEntriesRedacted:
+						actionTranscriptState.entriesRedacted,
+					actionTranscriptExposesRawContent:
+						actionTranscriptState.exposesRawContent,
+					actionTranscriptExposesProofInternals:
+						actionTranscriptState.exposesProofInternals,
+					actionTranscriptExposesActorIds:
+						actionTranscriptState.exposesActorIds,
+					actionTranscriptCallsRest: actionTranscriptState.callsRest,
+					actionTranscriptCallsSave: actionTranscriptState.callsSave,
+					actionTranscriptMutatesEditorContent:
+						actionTranscriptState.mutatesEditorContent,
+					actionTranscriptChangesPostLock:
+						actionTranscriptState.changesPostLock,
+					actionTranscriptClaimsSaved:
+						actionTranscriptState.claimsSaved,
+				},
 			} )
 		);
 	}

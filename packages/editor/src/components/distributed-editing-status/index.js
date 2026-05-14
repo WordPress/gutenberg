@@ -12,6 +12,7 @@ import { __, _n, sprintf } from '@wordpress/i18n';
 import { store as editorStore } from '../../store';
 import {
 	DISTRIBUTED_EDITING_DISPOSITIONS,
+	DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES,
 	DISTRIBUTED_EDITING_FRESH_REVIEW_DECISION_STATUSES,
 	DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_PLACEMENTS,
 	DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_STATUSES,
@@ -434,6 +435,7 @@ export function shouldRenderDistributedEditingStatus(
 		normalized.isAwaitingServerConfirmation ||
 		normalized.isConnectionDegraded ||
 		normalized.hasRemoteChanges ||
+		normalized.actionTranscriptItemCount > 0 ||
 		normalized.requiresServerStateAcceptance ||
 		normalized.mustOfferLocalCopy ||
 		normalized.retrySaveStatus !==
@@ -1293,6 +1295,15 @@ export function DistributedEditingStatusSurface( {
 						data-distributed-editing-fresh-review-surface={
 							freshReviewAuthorityStatus?.surface || undefined
 						}
+						data-distributed-editing-transcript-event-type={
+							item.actionTranscriptLatestEventType || undefined
+						}
+						data-distributed-editing-transcript-item-count={
+							item.actionTranscriptItemCount || undefined
+						}
+						data-distributed-editing-transcript-redacted={ formatDataBoolean(
+							item.actionTranscriptEntriesRedacted
+						) }
 					>
 						<Notice
 							className="editor-distributed-editing-status__notice"
@@ -1931,6 +1942,19 @@ function getDistributedEditingStatusSurfaceItem( descriptor ) {
 					descriptor.localUpdatesImportFreshReviewLifecycleAction ||
 					descriptor.localUpdatesImportFreshReviewDecisionLifecycleAction,
 			};
+		case DISTRIBUTED_EDITING_NOTICE_KINDS.ACTION_TRANSCRIPT:
+			return {
+				...getBaseStatusItem( descriptor ),
+				title: __( 'Recent editing activity' ),
+				message: getActionTranscriptMessage( descriptor ),
+				actionTranscriptItemCount: descriptor.actionTranscriptItemCount,
+				actionTranscriptLatestEventType:
+					descriptor.actionTranscriptLatestEventType,
+				actionTranscriptLatestEventSource:
+					descriptor.actionTranscriptLatestEventSource,
+				actionTranscriptEntriesRedacted:
+					descriptor.actionTranscriptEntriesRedacted,
+			};
 	}
 
 	return null;
@@ -1948,6 +1972,10 @@ function getBaseStatusItem( descriptor ) {
 }
 
 function getFreshReviewStatusItemTestId( item, freshReviewAuthorityStatus ) {
+	if ( item.actionTranscriptLatestEventType ) {
+		return 'distributed-editing-action-transcript-status';
+	}
+
 	if ( item.freshReviewPreSaveStatus ) {
 		return 'distributed-editing-pre-save-status';
 	}
@@ -2035,6 +2063,47 @@ function getRemoteChangesMessage( descriptor ) {
 	}
 
 	return __( 'Remote changes are available for review.' );
+}
+
+function getActionTranscriptMessage( descriptor ) {
+	switch ( descriptor.actionTranscriptLatestEventType ) {
+		case DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.LOCAL_EDITOR_ACTION:
+			return __(
+				'A local editor action was recorded without exposing post content.'
+			);
+		case DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.REMOTE_CHANGE_RECEIVED:
+			return __(
+				'Remote editing activity was recorded for review without exposing post content.'
+			);
+		case DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.SERVER_STATE_REFETCHED:
+			return __(
+				'WordPress refreshed server state and kept the activity record content-free.'
+			);
+		case DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.SAVE_STATE_CHANGED:
+			return __(
+				'The editor Save state changed and the activity record stayed content-free.'
+			);
+		case DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.REVIEW_REQUIRED:
+			return __(
+				'The editor recorded that review is required without exposing the reviewed content.'
+			);
+	}
+
+	const count = normalizeCount( descriptor.actionTranscriptItemCount );
+
+	if ( count > 0 ) {
+		return sprintf(
+			/* translators: %d: number of content-free transcript events. */
+			_n(
+				'%d content-free editing activity is available.',
+				'%d content-free editing activities are available.',
+				count
+			),
+			count
+		);
+	}
+
+	return __( 'Content-free editing activity is available.' );
 }
 
 function getDistributedEditingUnloadWarningMessage( unloadWarningState ) {

@@ -29,6 +29,7 @@ import DistributedEditingStatus, {
 } from '../';
 import PluginPrePublishPanel from '../../plugin-pre-publish-panel';
 import {
+	DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES,
 	DISTRIBUTED_EDITING_DISPOSITIONS,
 	DISTRIBUTED_EDITING_FRESH_REVIEW_DECISION_STATUSES,
 	DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_PLACEMENTS,
@@ -782,6 +783,16 @@ describe( 'shouldRenderDistributedEditingStatus', () => {
 			} )
 		).toBe( true );
 		expect(
+			shouldRenderDistributedEditingStatus( {
+				actionTranscriptItems: [
+					{
+						eventType:
+							DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.LOCAL_EDITOR_ACTION,
+					},
+				],
+			} )
+		).toBe( true );
+		expect(
 			shouldRenderDistributedEditingStatus( {}, { shouldWarn: true } )
 		).toBe( true );
 	} );
@@ -814,6 +825,57 @@ describe( 'DistributedEditingStatus', () => {
 		expect(
 			screen.getByText( '1 local change is awaiting confirmation.' )
 		).toBeVisible();
+	} );
+
+	it( 'mounts a content-free action transcript status entry', () => {
+		setupDistributedEditingStatusSelect( {
+			sessionState: {
+				actionTranscriptItems: [
+					{
+						eventType:
+							DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.LOCAL_EDITOR_ACTION,
+						rawContent:
+							'<!-- wp:paragraph --><p>Hidden draft</p><!-- /wp:paragraph -->',
+					},
+					{
+						eventType:
+							DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.REMOTE_CHANGE_RECEIVED,
+					},
+				],
+			},
+		} );
+
+		render( <DistributedEditingStatusChrome /> );
+
+		const status = screen.getByRole( 'region', {
+			name: 'Distributed editing status',
+		} );
+		const transcriptItem = screen.getByTestId(
+			'distributed-editing-action-transcript-status'
+		);
+
+		expect( status ).toHaveAttribute(
+			'data-distributed-editing-placement',
+			'editor-interface-notices'
+		);
+		expect( transcriptItem ).toHaveAttribute(
+			'data-distributed-editing-transcript-event-type',
+			DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.REMOTE_CHANGE_RECEIVED
+		);
+		expect( transcriptItem ).toHaveAttribute(
+			'data-distributed-editing-transcript-item-count',
+			'1'
+		);
+		expect( transcriptItem ).toHaveAttribute(
+			'data-distributed-editing-transcript-redacted',
+			'true'
+		);
+		expect(
+			screen.getByText(
+				'Remote editing activity was recorded for review without exposing post content.'
+			)
+		).toBeVisible();
+		expect( status ).not.toHaveTextContent( 'Hidden draft' );
 	} );
 
 	it( 'mounts production editor chrome with explicit placement', () => {
