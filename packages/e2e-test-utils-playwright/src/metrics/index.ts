@@ -3,7 +3,7 @@
  */
 import { mkdir, writeFile } from 'fs/promises';
 import { join } from 'path';
-import type { Page, Browser } from '@playwright/test';
+import type { Page, Browser, Frame } from '@playwright/test';
 // resolution-mode support in TypeScript 5.3 will resolve this.
 // See https://devblogs.microsoft.com/typescript/announcing-typescript-5-3-beta/
 // @ts-expect-error
@@ -227,13 +227,12 @@ export class Metrics {
 			return performance.timeOrigin + nav.responseEnd;
 		} );
 
-		const iframeHandle = await this.page.waitForSelector(
-			'iframe[name="editor-canvas"]'
-		);
-		const frame = await iframeHandle.contentFrame();
-		if ( ! frame ) {
-			throw new Error( 'Editor canvas iframe could not be entered.' );
-		}
+		const isEditorCanvas = ( f: Frame ) => f.name() === 'editor-canvas';
+		const frame =
+			this.page.frames().find( isEditorCanvas ) ??
+			( await this.page.waitForEvent( 'frameattached', {
+				predicate: isEditorCanvas,
+			} ) );
 		const fcpAbs = await frame.evaluate(
 			() =>
 				new Promise< number >( ( resolve, reject ) => {
