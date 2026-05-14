@@ -1089,6 +1089,11 @@
 			"count": 2
 		}
 	},
+	"packages/editor/src/components/suggestion-mode/auto-save.js": {
+		"react-hooks/refs": {
+			"count": 6
+		}
+	},
 	"packages/editor/src/components/suggestion-mode/store-interceptor.js": {
 		"react-hooks/refs": {
 			"count": 4
@@ -1101,6 +1106,11 @@
 	},
 	"packages/editor/src/components/suggestion-mode/suggestion-summary.js": {
 		"@wordpress/use-recommended-components": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/suggestion-mode/test/auto-save.js": {
+		"react-hooks/globals": {
 			"count": 1
 		}
 	},

@@ -81,6 +81,8 @@ const OverlayContext = createContext( {
 	captureBaseline: () => {},
 	setOverlayAttributes: () => {},
 	clearOverlay: () => {},
+	setCommentId: () => {},
+	setSyncedOpsKey: () => {},
 	hasOverlay: () => false,
 	requestInterceptorBypass: () => {},
 	consumeInterceptorBypass: () => false,
@@ -105,6 +107,8 @@ export function overlayReducer( state, action ) {
 					blockName: action.blockName,
 					baselineAttributes: action.attributes,
 					overlayAttributes: {},
+					commentId: null,
+					syncedOpsKey: null,
 				},
 			};
 		}
@@ -130,6 +134,32 @@ export function overlayReducer( state, action ) {
 			}
 			const { [ action.clientId ]: _removed, ...rest } = state;
 			return rest;
+		}
+		case 'SET_COMMENT_ID': {
+			const entry = state[ action.clientId ];
+			if ( ! entry ) {
+				return state;
+			}
+			return {
+				...state,
+				[ action.clientId ]: {
+					...entry,
+					commentId: action.commentId,
+				},
+			};
+		}
+		case 'SET_SYNCED_OPS_KEY': {
+			const entry = state[ action.clientId ];
+			if ( ! entry ) {
+				return state;
+			}
+			return {
+				...state,
+				[ action.clientId ]: {
+					...entry,
+					syncedOpsKey: action.syncedOpsKey,
+				},
+			};
 		}
 		case 'PRUNE_ORPHANS': {
 			// Action carries a serializable array; the reducer materializes a
@@ -191,6 +221,18 @@ export function SuggestionOverlayProvider( { children } ) {
 
 	const clearOverlay = useCallback(
 		( clientId ) => dispatch( { type: 'CLEAR_OVERLAY', clientId } ),
+		[]
+	);
+
+	const setCommentId = useCallback(
+		( clientId, commentId ) =>
+			dispatch( { type: 'SET_COMMENT_ID', clientId, commentId } ),
+		[]
+	);
+
+	const setSyncedOpsKey = useCallback(
+		( clientId, syncedOpsKey ) =>
+			dispatch( { type: 'SET_SYNCED_OPS_KEY', clientId, syncedOpsKey } ),
 		[]
 	);
 
@@ -271,6 +313,8 @@ export function SuggestionOverlayProvider( { children } ) {
 			captureBaseline,
 			setOverlayAttributes,
 			clearOverlay,
+			setCommentId,
+			setSyncedOpsKey,
 			hasOverlay,
 			requestInterceptorBypass,
 			consumeInterceptorBypass,
@@ -280,6 +324,8 @@ export function SuggestionOverlayProvider( { children } ) {
 			captureBaseline,
 			setOverlayAttributes,
 			clearOverlay,
+			setCommentId,
+			setSyncedOpsKey,
 			hasOverlay,
 			requestInterceptorBypass,
 			consumeInterceptorBypass,
