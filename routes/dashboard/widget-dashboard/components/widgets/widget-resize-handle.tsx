@@ -6,6 +6,7 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
+import { forwardRef } from '@wordpress/element';
 import type { ResizeHandleRenderProps } from '@wordpress/grid';
 
 /**
@@ -13,14 +14,22 @@ import type { ResizeHandleRenderProps } from '@wordpress/grid';
  */
 import styles from './widget-resize-handle.module.css';
 
+type WidgetResizeHandleProps = Omit< ResizeHandleRenderProps, 'ref' >;
+
 /**
  * Rounded L-shaped resize affordance for the widget dashboard. Passed to
  * `DashboardGrid` via `renderResizeHandle` so the grid keeps gesture wiring.
  *
- * @param props Props from `DashboardGrid` / `ResizeHandle`.
+ * Uses `forwardRef` because the grid attaches dnd-kit's merged node ref via
+ * the JSX `ref` attribute, not as a regular prop.
  */
-export function WidgetResizeHandle( props: ResizeHandleRenderProps ) {
-	const { ref, listeners, attributes, verticalResizable, isResizing } = props;
+export const WidgetResizeHandle = forwardRef<
+	HTMLDivElement,
+	WidgetResizeHandleProps
+>( function WidgetResizeHandle(
+	{ listeners, attributes, verticalResizable, isResizing },
+	ref
+) {
 	if ( ! verticalResizable ) {
 		return (
 			<div
@@ -48,4 +57,4 @@ export function WidgetResizeHandle( props: ResizeHandleRenderProps ) {
 			{ ...attributes }
 		></div>
 	);
-}
+} );
