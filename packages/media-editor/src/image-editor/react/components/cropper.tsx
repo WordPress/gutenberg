@@ -103,6 +103,44 @@ function computeInscribedRect(
 	};
 }
 
+// Largest zoom at which the inscribed rect of `aspectRatio` still satisfies
+// `minCropPixels` on both axes. Used on aspect-ratio change to lower the
+// zoom just enough so the new ratio can be expressed without violating
+// the source-pixel floor. Returns Infinity for an unset ratio.
+function computeMaxZoomForRatio(
+	aspectRatio: number | undefined,
+	bbox: Size,
+	minCropPixels: number
+): number {
+	if (
+		! aspectRatio ||
+		aspectRatio <= 0 ||
+		bbox.width <= 0 ||
+		bbox.height <= 0
+	) {
+		return Infinity;
+	}
+	// Inscribed rect proportions in viewport-normalized space (zoom-
+	// independent). One axis fills (=1), the other follows from the
+	// pixel aspect ratio and the bbox aspect.
+	const bboxAspect = bbox.width / bbox.height;
+	let wV: number;
+	let hV: number;
+	if ( aspectRatio <= bboxAspect ) {
+		hV = 1;
+		wV = ( aspectRatio * bbox.height ) / bbox.width;
+	} else {
+		wV = 1;
+		hV = bbox.width / ( aspectRatio * bbox.height );
+	}
+	// At zoom Z, source-pixel dims = wV*bbox.width/Z and hV*bbox.height/Z.
+	// For both ≥ minCropPixels: Z ≤ min(wV*bbox.W, hV*bbox.H) / minCropPixels.
+	return Math.min(
+		( wV * bbox.width ) / minCropPixels,
+		( hV * bbox.height ) / minCropPixels
+	);
+}
+
 /**
  * Props for the Cropper component.
  */
@@ -208,7 +246,8 @@ function CropperInner(
 	}: CropperProps,
 	ref: React.ForwardedRef< HTMLDivElement >
 ) {
-	const { state, setImage, setCropRect, settleCrop } = controller;
+	const { state, setImage, setCropRect, settleCrop, setZoomAtPoint } =
+		controller;
 	const {
 		viewport: viewportState,
 		setViewportPan,
@@ -380,7 +419,9 @@ function CropperInner(
 	] );
 
 	// In freeform mode, when aspectRatio changes, reshape the crop to the
-	// largest inscribed rect of the new ratio.
+	// largest inscribed rect of the new ratio. If the current zoom is so
+	// high that the inscribed rect would violate the source-pixel floor,
+	// lower zoom (and reset pan) just enough that both axes satisfy it.
 	const prevAspectRatioRef = useRef( aspectRatio );
 	useEffect( () => {
 		if ( prevAspectRatioRef.current === aspectRatio ) {
@@ -393,14 +434,52 @@ function CropperInner(
 			visualSize.width === 0 ||
 			visualSize.height === 0 ||
 			! aspectRatio ||
-			aspectRatio <= 0
+			aspectRatio <= 0 ||
+			naturalWidth <= 0 ||
+			naturalHeight <= 0
 		) {
 			return;
 		}
-		setCropRect(
-			computeInscribedRect( aspectRatio, visualSize, minCropSize )
+
+		const snapRotation = Math.round( state.rotation / 90 ) * 90;
+		const bbox = getRotatedBBox(
+			naturalWidth,
+			naturalHeight,
+			snapRotation
 		);
-	}, [ aspectRatio, freeformCrop, visualSize, setCropRect, minCropSize ] );
+		const ratioMaxZoom = computeMaxZoomForRatio(
+			aspectRatio,
+			bbox,
+			MIN_CROP_PIXELS
+		);
+		const targetZoom = Math.min( state.zoom, ratioMaxZoom );
+		if ( targetZoom < state.zoom ) {
+			setZoomAtPoint( targetZoom, { x: 0, y: 0 } );
+		}
+		// Compute the floor at the (possibly lowered) target zoom so the
+		// inscribed rect we pass to setCropRect is the natural fit for
+		// the new ratio at that zoom — no post-scaling needed.
+		const targetMinCropSize: Size = {
+			width: Math.min( 1, ( MIN_CROP_PIXELS * targetZoom ) / bbox.width ),
+			height: Math.min(
+				1,
+				( MIN_CROP_PIXELS * targetZoom ) / bbox.height
+			),
+		};
+		setCropRect(
+			computeInscribedRect( aspectRatio, visualSize, targetMinCropSize )
+		);
+	}, [
+		aspectRatio,
+		freeformCrop,
+		visualSize,
+		setCropRect,
+		setZoomAtPoint,
+		naturalWidth,
+		naturalHeight,
+		state.rotation,
+		state.zoom,
+	] );
 
 	// Compute the crop handle bounds from the actual image footprint.
 	// Depends on the full state object because getImageCropBounds reads
