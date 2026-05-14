@@ -5096,13 +5096,6 @@ describe( 'Post actions', () => {
 					serverVersion: '12',
 					pendingChangeCount: 1,
 					hasPendingChanges: true,
-					retrySubmitProofStatus:
-						DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.ACCEPTED_FOR_FUTURE_SAVE,
-					retrySubmitAccepted: true,
-					retrySubmitSavePathRequired: true,
-					retrySubmitSaveStatus:
-						DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.READY,
-					retrySubmitSaveReady: true,
 					localUpdatesImportStatus:
 						DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_STATUSES.BLOCKED,
 					localUpdatesImportReason:

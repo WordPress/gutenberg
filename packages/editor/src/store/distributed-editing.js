@@ -7046,12 +7046,12 @@ export function getDistributedEditingRetrySavePolicyForSessionState(
 	const rebasedFromVersion =
 		normalizeNullableString( context.rebasedFromVersion ) ||
 		normalized.clientBaseVersion;
-	const hasAcceptedProof =
+	const hasAcceptedRetrySubmitProof =
 		normalized.retrySubmitProofStatus ===
 			DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.ACCEPTED_FOR_FUTURE_SAVE &&
 		normalized.retrySubmitAccepted &&
 		normalized.retrySubmitSavePathRequired;
-	const hasPreparedSavePath =
+	const hasPreparedRetrySubmitSavePath =
 		normalized.retrySubmitSaveStatus ===
 			DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.READY &&
 		normalized.retrySubmitSaveReady;
@@ -7072,6 +7072,13 @@ export function getDistributedEditingRetrySavePolicyForSessionState(
 		getDistributedEditingAcceptedFreshReviewConsumeValidationForRetrySaveRequest(
 			normalized
 		);
+	const hasAcceptedReviewProof = Boolean(
+		acceptedReviewApprovalProof || acceptedFreshReviewConsumeValidation
+	);
+	const hasAcceptedProof =
+		hasAcceptedRetrySubmitProof || hasAcceptedReviewProof;
+	const hasPreparedSavePath =
+		hasPreparedRetrySubmitSavePath || hasAcceptedReviewProof;
 	let reason = null;
 
 	if (
