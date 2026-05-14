@@ -41,9 +41,6 @@ test.describe( 'Preload', () => {
 
 		// To do: these should all be removed or preloaded.
 		expect( requests ).toEqual( [
-			// Abilities system initialization.
-			'/wp-abilities/v1/categories',
-			'/wp-abilities/v1/abilities',
 			// Seems to be coming from `enableComplementaryArea`.
 			'/wp/v2/users/me',
 			'/wp/v2/settings',
