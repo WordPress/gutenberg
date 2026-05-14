@@ -579,8 +579,10 @@ function selectRoomsForRequest(): RoomState[] {
 	return overflowSlice;
 }
 
+const textEncoder = new TextEncoder();
+
 function getJsonByteLength( value: unknown ): number {
-	return new TextEncoder().encode( JSON.stringify( value ) ).byteLength;
+	return textEncoder.encode( JSON.stringify( value ) ).byteLength;
 }
 
 function createPayloadRoom(
@@ -601,7 +603,7 @@ function getUpdatePayloadSizeDelta(
 	update: SyncUpdate
 ): number {
 	const commaSize = room.updates.length === 0 ? 0 : 1;
-	return commaSize + JSON.stringify( update ).length;
+	return commaSize + getJsonByteLength( update );
 }
 
 function buildPayloadForRequest( selectedRoomStates: RoomState[] ): {
