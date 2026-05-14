@@ -17,11 +17,13 @@ const REQUIRED_COLOR_SPACES = [ sRGB, HSL, OKLCH ];
  * - `toGamut(..., { method: 'css' })`, which internally resolves `OKLCH` via
  *   the registry regardless of the target gamut. This is a quirk of
  *   `colorjs.io` (the function uses `ColorSpace.get('oklch')` instead of
- *   referencing the imported `OKLCH` object) and should be reported upstream.
+ *   referencing the imported `OKLCH` object) and is an upstream bug.
  *
  * Since the set of spaces we need to support is package-wide rather than
  * per-call-site, this function takes no arguments and always registers the
  * same set.
+ *
+ * @see https://github.com/color-js/color.js/pull/734
  */
 export function ensureColorSpacesRegistered() {
 	for ( const space of REQUIRED_COLOR_SPACES ) {
