@@ -58,6 +58,7 @@ import {
 	getDistributedEditingSessionStateForRetrySubmitHandoff,
 	getDistributedEditingSessionStateForRetrySubmitProofResult,
 	getDistributedEditingSessionStateForRetrySubmitSavePreparation,
+	getDistributedEditingSessionStateForFreshReviewRequestResult,
 	getDistributedEditingSessionStateForRecoveryDryRunResult,
 	getDistributedEditingSessionStateForStaleBaseLocalRebasePlan,
 	getDistributedEditingSessionStateForStaleBaseRejectionResult,
@@ -305,8 +306,18 @@ describe( 'distributed editing session state', () => {
 			localUpdatesImportVerifiedPostContentHash: null,
 			localUpdatesImportReviewRequestStatus:
 				DISTRIBUTED_EDITING_LOCAL_UPDATES_REVIEW_REQUEST_STATUSES.NONE,
+			localUpdatesImportReviewRequestReason: null,
 			localUpdatesImportRequiresFreshReview: false,
 			localUpdatesImportReviewActionKey: null,
+			localUpdatesImportFreshReviewRequestResult: null,
+			localUpdatesImportFreshReviewRequestAction: null,
+			localUpdatesImportFreshReviewRequestRestRoute: null,
+			localUpdatesImportFreshReviewRequestAccepted: false,
+			localUpdatesImportFreshReviewRequestRequested: false,
+			localUpdatesImportFreshReviewRequestSavesPost: false,
+			localUpdatesImportFreshReviewRequestMutatesPostContent: false,
+			localUpdatesImportFreshReviewRequestCreatesRevision: false,
+			localUpdatesImportFreshReviewRequestClaimsSaved: false,
 			riskyBlockReviewStatus:
 				DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_STATUSES.NONE,
 			riskyBlockReviewReasonCode: null,
@@ -4935,5 +4946,153 @@ describe( 'distributed editing selectors', () => {
 				} ),
 			] )
 		);
+	} );
+
+	it( 'normalizes accepted fresh-review requests without saving or exposing proof internals', () => {
+		const currentSessionState = normalizeDistributedEditingSessionState( {
+			serverVersion: '12',
+			clientBaseVersion: '7',
+			pendingChangeCount: 1,
+			localUpdatesImportStatus:
+				DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_STATUSES.BLOCKED,
+			localUpdatesImportReason:
+				DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.FRESH_REVIEW_REQUIRED,
+			localUpdatesImportPostId: '44',
+			localUpdatesImportPostType: 'post',
+			localUpdatesImportVerifiedPostContentHash:
+				'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+			hasPendingChanges: true,
+			canExportLocalUpdates: true,
+		} );
+		const sessionState =
+			getDistributedEditingSessionStateForFreshReviewRequestResult(
+				{
+					result: 'fresh_review_request_accepted_for_admin_review',
+					fresh_review_request_status: 'requested',
+					fresh_review_request_action: 'request_admin_review',
+					rest_route: 'post_fresh_review_request',
+					saves_post: false,
+					mutates_post_content: false,
+					creates_revision: false,
+					claims_saved: false,
+				},
+				currentSessionState
+			);
+		const reviewRequestState =
+			getDistributedEditingLocalUpdatesImportReviewRequestStateForSessionState(
+				sessionState
+			);
+		const descriptor =
+			getDistributedEditingNoticeDescriptorsForSessionState(
+				sessionState
+			).find(
+				( item ) =>
+					item.kind ===
+					DISTRIBUTED_EDITING_NOTICE_KINDS.LOCAL_UPDATES_IMPORT_BLOCKED
+			);
+
+		expect( sessionState ).toMatchObject( {
+			localUpdatesImportReviewRequestStatus:
+				DISTRIBUTED_EDITING_LOCAL_UPDATES_REVIEW_REQUEST_STATUSES.REQUESTED,
+			localUpdatesImportReviewActionKey: null,
+			localUpdatesImportFreshReviewRequestAccepted: true,
+			localUpdatesImportFreshReviewRequestRequested: true,
+			localUpdatesImportFreshReviewRequestResult:
+				'fresh_review_request_accepted_for_admin_review',
+			localUpdatesImportFreshReviewRequestAction: 'request_admin_review',
+			localUpdatesImportFreshReviewRequestRestRoute:
+				'post_fresh_review_request',
+			localUpdatesImportFreshReviewRequestSavesPost: false,
+			localUpdatesImportFreshReviewRequestMutatesPostContent: false,
+			localUpdatesImportFreshReviewRequestCreatesRevision: false,
+			localUpdatesImportFreshReviewRequestClaimsSaved: false,
+			retrySaveClaimsSaved: false,
+			canExportLocalUpdates: true,
+			mustOfferLocalCopy: true,
+		} );
+		expect( reviewRequestState ).toMatchObject( {
+			status: DISTRIBUTED_EDITING_LOCAL_UPDATES_REVIEW_REQUEST_STATUSES.REQUESTED,
+			actionKey: null,
+			requestAccepted: true,
+			requestRequested: true,
+			shouldCallRetrySaveEndpoint: false,
+			shouldCallNormalSavePost: false,
+			mutatesEditorContent: false,
+			claimsSaved: false,
+			exposesTokenInternals: false,
+			exposesProofSignature: false,
+			exposesReviewedBlockItems: false,
+			exposesReviewerIds: false,
+			exposesRawContent: false,
+		} );
+		expect( descriptor ).toEqual(
+			expect.objectContaining( {
+				status: 'info',
+				localUpdatesImportFreshReviewRequestAccepted: true,
+				localUpdatesImportFreshReviewRequestRequested: true,
+				localUpdatesImportFreshReviewRequestAction:
+					'request_admin_review',
+				localUpdatesImportFreshReviewRequestRestRoute:
+					'post_fresh_review_request',
+				localUpdatesImportFreshReviewRequestClaimsSaved: false,
+				actionKeys: [],
+			} )
+		);
+		expect( JSON.stringify( descriptor ) ).not.toMatch(
+			/proof_signature|reviewer_user_id|low_privileged_saver_user_id|reviewed_block_items|postContent|post_content/
+		);
+	} );
+
+	it( 'normalizes rejected fresh-review requests while preserving exportable local state', () => {
+		const currentSessionState = normalizeDistributedEditingSessionState( {
+			pendingChangeCount: 1,
+			localUpdatesImportStatus:
+				DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_STATUSES.BLOCKED,
+			localUpdatesImportReason:
+				DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.FRESH_REVIEW_REQUIRED,
+			canExportLocalUpdates: true,
+		} );
+		const sessionState =
+			getDistributedEditingSessionStateForFreshReviewRequestResult(
+				{
+					code: DISTRIBUTED_EDITING_REASON_CODES.REST_CANNOT_EDIT,
+					data: {
+						rest_route: 'post_fresh_review_request',
+						fresh_review_request_action: 'request_admin_review',
+					},
+				},
+				currentSessionState
+			);
+
+		expect( sessionState ).toMatchObject( {
+			disposition:
+				DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_PERMISSION_DENIED,
+			reasonCode: DISTRIBUTED_EDITING_REASON_CODES.REST_CANNOT_EDIT,
+			localUpdatesImportReviewRequestStatus:
+				DISTRIBUTED_EDITING_LOCAL_UPDATES_REVIEW_REQUEST_STATUSES.REJECTED_PERMISSION_DENIED,
+			localUpdatesImportReviewRequestReason:
+				DISTRIBUTED_EDITING_REASON_CODES.REST_CANNOT_EDIT,
+			localUpdatesImportFreshReviewRequestAccepted: false,
+			localUpdatesImportFreshReviewRequestRequested: false,
+			localUpdatesImportFreshReviewRequestRestRoute:
+				'post_fresh_review_request',
+			localUpdatesImportFreshReviewRequestClaimsSaved: false,
+			canExportLocalUpdates: true,
+			mustOfferLocalCopy: true,
+		} );
+		expect(
+			getDistributedEditingLocalUpdatesImportReviewRequestStateForSessionState(
+				sessionState
+			)
+		).toMatchObject( {
+			actionKey: DISTRIBUTED_EDITING_NOTICE_ACTIONS.REQUEST_FRESH_REVIEW,
+			requestAccepted: false,
+			requestRequested: false,
+			canExportLocalUpdates: true,
+			shouldCallRetrySaveEndpoint: false,
+			shouldCallNormalSavePost: false,
+			mutatesEditorContent: false,
+			claimsSaved: false,
+		} );
 	} );
 } );

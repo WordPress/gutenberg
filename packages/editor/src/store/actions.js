@@ -25,6 +25,7 @@ import { __, sprintf } from '@wordpress/i18n';
  */
 import { localAutosaveSet } from './local-autosave';
 import {
+	__experimentalRequestDistributedEditingFreshReviewForImportedLocalUpdates as requestDistributedEditingFreshReviewForImportedLocalUpdates,
 	__experimentalRequestDistributedEditingRecoveryDryRun as requestDistributedEditingRecoveryDryRun,
 	__experimentalRequestDistributedEditingRetrySave as requestDistributedEditingRetrySave,
 	__experimentalRequestDistributedEditingRetrySaveReviewApprovalProof as requestDistributedEditingRetrySaveReviewApprovalProof,
@@ -36,6 +37,7 @@ import {
 import {
 	getDistributedEditingSessionStateForRecoveryDryRunResult,
 	getDistributedEditingSessionStateForRetrySaveHandoff,
+	getDistributedEditingSessionStateForFreshReviewRequestResult,
 	getDistributedEditingSessionStateForRetrySaveReviewApprovalProofResult,
 	getDistributedEditingSessionStateForRetrySaveRequest,
 	getDistributedEditingSessionStateForRetrySaveResult,
@@ -888,6 +890,122 @@ export const __experimentalImportDistributedEditingLocalUpdates =
 
 		return result;
 	};
+
+/**
+ * Requests a fresh admin review for an imported local-updates handoff that
+ * cannot reuse accepted proof.
+ *
+ * The action sends only hash/status/version evidence to the planned proof
+ * endpoint. It does not retry-save, call normal save, mutate editor content,
+ * dispatch global notices, persist editor state outside the editor store, or
+ * change post locks.
+ *
+ * @param {Object} [options] Request options.
+ *
+ * @return {Function} Action thunk.
+ */
+export function __experimentalRequestDistributedEditingFreshReviewForImportedLocalUpdates(
+	options = {}
+) {
+	return async ( { select, dispatch, registry } ) => {
+		const currentSessionState =
+			select.getDistributedEditingSessionState?.() || {};
+
+		if ( ! currentSessionState.localUpdatesImportRequiresFreshReview ) {
+			return {
+				status: 'fresh_review_request_not_ready',
+				reason: 'fresh_review_not_required',
+				callsFreshReviewRequestEndpoint: false,
+				callsRetrySaveEndpoint: false,
+				callsNormalSavePost: false,
+				mutatesEditorContent: false,
+				dispatchesNotice: false,
+				changesPostLock: false,
+				claimsSaved: false,
+				sessionState: currentSessionState,
+			};
+		}
+
+		const currentPost = select.getCurrentPost?.() || {};
+		const postType =
+			options.postType ||
+			currentSessionState.localUpdatesImportPostType ||
+			currentPost.type;
+		const postId =
+			options.postId ??
+			currentSessionState.localUpdatesImportPostId ??
+			currentPost.id;
+		const postTypeRecord = postType
+			? registry.select( coreStore ).getPostType( postType )
+			: null;
+		const restBase =
+			options.restBase ||
+			postTypeRecord?.rest_base ||
+			DISTRIBUTED_EDITING_RECOVERY_REST_BASE;
+		const requestArgs = {
+			postId,
+			restBase,
+			clientBaseVersion:
+				options.clientBaseVersion ??
+				currentSessionState.clientBaseVersion,
+			serverVersion:
+				options.serverVersion ?? currentSessionState.serverVersion,
+			pendingChangeCount:
+				options.pendingChangeCount ??
+				currentSessionState.pendingChangeCount,
+			proposedPostContentHash:
+				options.proposedPostContentHash ??
+				currentSessionState.localUpdatesImportVerifiedPostContentHash,
+			localUpdatesImportStatus:
+				currentSessionState.localUpdatesImportStatus,
+			localUpdatesImportReason:
+				currentSessionState.localUpdatesImportReason,
+			freshReviewRequestStatus:
+				currentSessionState.localUpdatesImportReviewRequestStatus,
+			freshReviewRequestAction: options.freshReviewRequestAction,
+		};
+
+		try {
+			const response =
+				await requestDistributedEditingFreshReviewForImportedLocalUpdates(
+					requestArgs
+				);
+			const sessionState =
+				getDistributedEditingSessionStateForFreshReviewRequestResult(
+					response,
+					currentSessionState
+				);
+
+			dispatch.setDistributedEditingSessionState( sessionState );
+
+			return {
+				status: sessionState.localUpdatesImportReviewRequestStatus,
+				result: sessionState.localUpdatesImportFreshReviewRequestResult,
+				requested:
+					sessionState.localUpdatesImportFreshReviewRequestRequested,
+				accepted:
+					sessionState.localUpdatesImportFreshReviewRequestAccepted,
+				callsFreshReviewRequestEndpoint: true,
+				callsRetrySaveEndpoint: false,
+				callsNormalSavePost: false,
+				mutatesEditorContent: false,
+				dispatchesNotice: false,
+				changesPostLock: false,
+				claimsSaved: false,
+				sessionState,
+			};
+		} catch ( error ) {
+			dispatch.setDistributedEditingSessionState(
+				getDistributedEditingSessionStateForFreshReviewRequestResult(
+					error,
+					currentSessionState
+				)
+			);
+
+			throw error;
+		}
+	};
+}
 
 /**
  * Prepares the retry-submit handoff after a successful local rebase.

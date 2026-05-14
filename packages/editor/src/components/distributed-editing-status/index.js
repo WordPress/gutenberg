@@ -16,6 +16,7 @@ import {
 	DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES,
 	DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS,
 	DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_STATUSES,
+	DISTRIBUTED_EDITING_LOCAL_UPDATES_REVIEW_REQUEST_STATUSES,
 	DISTRIBUTED_EDITING_NOTICE_ACTIONS,
 	DISTRIBUTED_EDITING_NOTICE_KINDS,
 	DISTRIBUTED_EDITING_REASON_CODES,
@@ -1044,6 +1045,7 @@ export default function DistributedEditingStatus( {
 		__experimentalPlanDistributedEditingLocalRebaseAfterStaleBase,
 		__experimentalPrepareDistributedEditingRetrySubmitAfterLocalRebase,
 		__experimentalPrepareDistributedEditingRetrySubmitSaveAfterProof,
+		__experimentalRequestDistributedEditingFreshReviewForImportedLocalUpdates,
 		__experimentalRebaseDistributedEditingLocalUpdatesAfterStaleBase,
 		__experimentalRefreshDistributedEditingRetrySubmitProof,
 		__experimentalRefreshDistributedEditingServerStateAfterStaleBase,
@@ -1147,10 +1149,21 @@ export default function DistributedEditingStatus( {
 						setActionStatus( {
 							status: 'info',
 							message: __(
-								'Fresh review is required before this handoff can be imported for retry save. No save, server request, or editor content change was made.'
+								'Requesting a fresh admin review without saving or changing editor content.'
 							),
 						} );
-						return item;
+						const requestResult =
+							await __experimentalRequestDistributedEditingFreshReviewForImportedLocalUpdates?.();
+						setActionStatus( {
+							status: requestResult?.accepted
+								? 'success'
+								: 'warning',
+							message:
+								getFreshReviewRequestActionMessage(
+									requestResult
+								),
+						} );
+						return requestResult;
 					}
 				}
 			} catch {
@@ -1167,6 +1180,7 @@ export default function DistributedEditingStatus( {
 			__experimentalPlanDistributedEditingLocalRebaseAfterStaleBase,
 			__experimentalPrepareDistributedEditingRetrySubmitAfterLocalRebase,
 			__experimentalPrepareDistributedEditingRetrySubmitSaveAfterProof,
+			__experimentalRequestDistributedEditingFreshReviewForImportedLocalUpdates,
 			__experimentalRebaseDistributedEditingLocalUpdatesAfterStaleBase,
 			__experimentalRefreshDistributedEditingRetrySubmitProof,
 			__experimentalRefreshDistributedEditingServerStateAfterStaleBase,
@@ -1225,12 +1239,24 @@ function getActionErrorMessage( actionKey ) {
 			);
 		case DISTRIBUTED_EDITING_NOTICE_ACTIONS.REQUEST_FRESH_REVIEW:
 			return __(
-				'Fresh-review request could not be opened. No save or server request was made, and local changes remain protected.'
+				'Fresh-review request could not be accepted. No save or editor content change was made, and local changes remain protected.'
 			);
 	}
 
 	return __(
 		'Distributed editing action failed. Local changes remain protected.'
+	);
+}
+
+function getFreshReviewRequestActionMessage( requestResult ) {
+	if ( requestResult?.accepted ) {
+		return __(
+			'Fresh review request accepted for admin review. No save was made, and protected local changes remain exportable.'
+		);
+	}
+
+	return __(
+		'Fresh review request finished without a review handoff. No save was made, and protected local changes remain exportable.'
 	);
 }
 
@@ -1329,7 +1355,11 @@ function getDistributedEditingStatusSurfaceItem( descriptor ) {
 		case DISTRIBUTED_EDITING_NOTICE_KINDS.LOCAL_UPDATES_IMPORT_BLOCKED:
 			return {
 				...getBaseStatusItem( descriptor ),
-				title: __( 'Fresh review needed' ),
+				title:
+					descriptor.localUpdatesImportReviewRequestStatus ===
+					DISTRIBUTED_EDITING_LOCAL_UPDATES_REVIEW_REQUEST_STATUSES.REQUESTED
+						? __( 'Fresh review requested' )
+						: __( 'Fresh review needed' ),
 				message:
 					getLocalUpdatesImportReviewRequestMessage( descriptor ),
 				localUpdatesImportStatus: descriptor.localUpdatesImportStatus,
@@ -1628,6 +1658,30 @@ function getLocalUpdatesImportBlockedMessage( reason ) {
 }
 
 function getLocalUpdatesImportReviewRequestMessage( descriptor ) {
+	if (
+		descriptor?.localUpdatesImportReviewRequestStatus ===
+		DISTRIBUTED_EDITING_LOCAL_UPDATES_REVIEW_REQUEST_STATUSES.REQUESTED
+	) {
+		return __(
+			'Fresh review request was accepted for admin review. No retry save or normal save was made; protected local changes remain exportable until review returns.'
+		);
+	}
+
+	if (
+		[
+			DISTRIBUTED_EDITING_LOCAL_UPDATES_REVIEW_REQUEST_STATUSES.STALE_BASE_REJECTED,
+			DISTRIBUTED_EDITING_LOCAL_UPDATES_REVIEW_REQUEST_STATUSES.REJECTED_FEATURE_DISABLED,
+			DISTRIBUTED_EDITING_LOCAL_UPDATES_REVIEW_REQUEST_STATUSES.REJECTED_PERMISSION_DENIED,
+			DISTRIBUTED_EDITING_LOCAL_UPDATES_REVIEW_REQUEST_STATUSES.REJECTED_ROUTE_MISMATCH,
+			DISTRIBUTED_EDITING_LOCAL_UPDATES_REVIEW_REQUEST_STATUSES.REJECTED_SYNC_META_TAMPERED,
+			DISTRIBUTED_EDITING_LOCAL_UPDATES_REVIEW_REQUEST_STATUSES.REJECTED_MALFORMED_SYNC_PAYLOAD,
+		].includes( descriptor?.localUpdatesImportReviewRequestStatus )
+	) {
+		return __(
+			'Fresh review request was rejected before any save. Protected local changes remain exportable; keep this editor session open before trying again.'
+		);
+	}
+
 	if (
 		descriptor?.localUpdatesImportReason ===
 		DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.FRESH_REVIEW_REQUIRED

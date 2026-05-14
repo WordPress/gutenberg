@@ -120,6 +120,27 @@ export function getDistributedEditingRetrySaveReviewApprovalEndpointPath( {
 }
 
 /**
+ * Returns the current DE-RTC fresh-review request endpoint path for a post.
+ *
+ * @param {Object} args                    Endpoint args.
+ * @param {number} args.postId             Post ID.
+ * @param {string} [args.restBase='posts'] REST base for the edited post type.
+ *
+ * @return {string} REST path.
+ */
+export function getDistributedEditingFreshReviewRequestEndpointPath( {
+	postId,
+	restBase = DISTRIBUTED_EDITING_RECOVERY_REST_BASE,
+} = {} ) {
+	return getDistributedEditingEndpointPath( {
+		postId,
+		restBase,
+		operation: 'fresh-review-request',
+		errorSubject: 'fresh-review request',
+	} );
+}
+
+/**
  * Returns the current edited post endpoint path for DE-RTC server-state reads.
  *
  * @param {Object} args                    Endpoint args.
@@ -845,6 +866,80 @@ export function __experimentalRequestDistributedEditingRetrySaveReviewApprovalPr
 
 	return apiFetch( {
 		path: getDistributedEditingRetrySaveReviewApprovalEndpointPath( {
+			postId,
+			restBase,
+		} ),
+		method: 'POST',
+		data,
+	} );
+}
+
+/**
+ * Requests a fresh admin review for imported local updates that cannot reuse
+ * stale or unavailable accepted proof.
+ *
+ * This low-level helper sends only route, version, status, and hash evidence.
+ * It does not send raw post content, proof tokens, proof signatures, reviewed
+ * block items, reviewer/saver ids, save, retry-save, dispatch notices, persist
+ * editor state, or change post locks.
+ *
+ * @param {Object} args                                          Request args.
+ * @param {number} args.postId                                   Post ID.
+ * @param {string} [args.restBase='posts']                       REST base for the edited post type.
+ * @param {string} [args.clientBaseVersion]                      Client sync version from the blocked handoff.
+ * @param {string} [args.serverVersion]                          Server sync version from the blocked handoff.
+ * @param {number} [args.pendingChangeCount=1]                   Pending local change groups.
+ * @param {string} [args.proposedPostContentHash]                SHA-256 hash of protected proposed post content.
+ * @param {string} [args.localUpdatesImportStatus]               Current import status.
+ * @param {string} [args.localUpdatesImportReason]               Current import blocker reason.
+ * @param {string} [args.freshReviewRequestStatus]               Current fresh-review request status.
+ * @param {string} [args.freshReviewRequestAction='request_admin_review'] Fresh-review action requested.
+ *
+ * @return {Promise<Object>} REST response or error.
+ */
+export function __experimentalRequestDistributedEditingFreshReviewForImportedLocalUpdates( {
+	postId,
+	restBase = DISTRIBUTED_EDITING_RECOVERY_REST_BASE,
+	clientBaseVersion,
+	serverVersion,
+	pendingChangeCount = 1,
+	proposedPostContentHash,
+	localUpdatesImportStatus,
+	localUpdatesImportReason,
+	freshReviewRequestStatus,
+	freshReviewRequestAction = 'request_admin_review',
+} = {} ) {
+	const data = {
+		pending_change_count: pendingChangeCount,
+		fresh_review_request_action: freshReviewRequestAction,
+	};
+
+	if ( clientBaseVersion ) {
+		data.client_base_version = clientBaseVersion;
+	}
+
+	if ( serverVersion ) {
+		data.server_version = serverVersion;
+	}
+
+	if ( proposedPostContentHash ) {
+		data.proposed_post_content_hash = proposedPostContentHash;
+	}
+
+	if ( localUpdatesImportStatus ) {
+		data.local_updates_import_status = localUpdatesImportStatus;
+	}
+
+	if ( localUpdatesImportReason ) {
+		data.local_updates_import_reason = localUpdatesImportReason;
+	}
+
+	if ( freshReviewRequestStatus ) {
+		data.fresh_review_request_status = freshReviewRequestStatus;
+	}
+
+	return apiFetch( {
+		path: getDistributedEditingFreshReviewRequestEndpointPath( {
 			postId,
 			restBase,
 		} ),

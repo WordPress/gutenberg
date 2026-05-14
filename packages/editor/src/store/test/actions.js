@@ -19,6 +19,7 @@ import {
 	DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES,
 	DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS,
 	DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_STATUSES,
+	DISTRIBUTED_EDITING_LOCAL_UPDATES_REVIEW_REQUEST_STATUSES,
 	DISTRIBUTED_EDITING_NOTICE_ACTIONS,
 	DISTRIBUTED_EDITING_NOTICE_KINDS,
 	DISTRIBUTED_EDITING_REASON_CODES,
@@ -1443,19 +1444,41 @@ describe( 'Post actions', () => {
 			} );
 		}
 
-		function setupImportEditor( initialContent = 'original content' ) {
+		function setupImportEditor(
+			initialContent = 'original content',
+			{ postType = 'post', restBase = 'posts' } = {}
+		) {
 			const post = {
 				id: postId,
-				type: 'post',
+				type: postType,
 				title: 'bar',
 				content: initialContent,
 				status: 'draft',
 			};
 			const registry = createRegistryWithStores();
 
+			if ( postType !== 'post' ) {
+				registry.dispatch( coreStore ).addEntities( [
+					{
+						...postTypeConfig,
+						name: postType,
+						baseURL: `/wp/v2/${ restBase }`,
+					},
+				] );
+				registry
+					.dispatch( coreStore )
+					.receiveEntityRecords( 'root', 'postType', [
+						{
+							...postTypeEntity,
+							slug: postType,
+							rest_base: restBase,
+						},
+					] );
+			}
+
 			registry
 				.dispatch( coreStore )
-				.receiveEntityRecords( 'postType', 'post', post );
+				.receiveEntityRecords( 'postType', postType, post );
 			registry.dispatch( editorStore ).setupEditor( post, {
 				content: initialContent,
 			} );
@@ -1711,6 +1734,191 @@ describe( 'Post actions', () => {
 				localUpdatesImportRequiresFreshReview: true,
 				localUpdatesImportReviewActionKey:
 					DISTRIBUTED_EDITING_NOTICE_ACTIONS.REQUEST_FRESH_REVIEW,
+			} );
+		} );
+
+		it( 'requests fresh admin review for imported local updates using hash-only page route evidence', async () => {
+			const registry = setupImportEditor( 'original content', {
+				postType: 'page',
+				restBase: 'pages',
+			} );
+			const payload = getDistributedEditingLocalUpdatesExportPayload( {
+				currentPost: {
+					id: postId,
+					type: 'page',
+				},
+				editedPostContent: approvedPostContent,
+				sessionState: {
+					serverVersion: '12',
+					clientBaseVersion: '7',
+					pendingChangeCount: 1,
+					retrySaveStatus:
+						DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_MALFORMED_SYNC_PAYLOAD,
+					retrySaveReason:
+						'unknown_retry_save_review_approval_proof_token',
+				},
+			} );
+
+			await registry
+				.dispatch( editorStore )
+				.__experimentalImportDistributedEditingLocalUpdates(
+					JSON.stringify( payload )
+				);
+
+			let apiCallCount = 0;
+			apiFetch.setFetchHandler( async ( options ) => {
+				apiCallCount++;
+
+				expect( getMethod( options ) ).toBe( 'POST' );
+				expect( options.path ).toContain(
+					'/wp/v2/pages/44/distributed-editing/fresh-review-request'
+				);
+				expect( options.data ).toEqual( {
+					client_base_version: '7',
+					server_version: '12',
+					pending_change_count: 1,
+					proposed_post_content_hash: approvedPostContentHash,
+					local_updates_import_status:
+						DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_STATUSES.BLOCKED,
+					local_updates_import_reason:
+						DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.FRESH_REVIEW_REQUIRED,
+					fresh_review_request_status:
+						DISTRIBUTED_EDITING_LOCAL_UPDATES_REVIEW_REQUEST_STATUSES.FRESH_REVIEW_REQUIRED,
+					fresh_review_request_action: 'request_admin_review',
+				} );
+				expect( JSON.stringify( options.data ) ).not.toMatch(
+					/proposed_post_content["':]|raw_post_content|proof_signature|reviewer_user_id|low_privileged_saver_user_id|reviewed_block_items/
+				);
+
+				return {
+					result: 'fresh_review_request_accepted_for_admin_review',
+					fresh_review_request_status: 'requested',
+					fresh_review_request_action: 'request_admin_review',
+					rest_route: 'post_fresh_review_request',
+					saves_post: false,
+					mutates_post_content: false,
+					creates_revision: false,
+					claims_saved: false,
+				};
+			} );
+
+			const result = await registry
+				.dispatch( editorStore )
+				.__experimentalRequestDistributedEditingFreshReviewForImportedLocalUpdates();
+
+			expect( result ).toMatchObject( {
+				status: DISTRIBUTED_EDITING_LOCAL_UPDATES_REVIEW_REQUEST_STATUSES.REQUESTED,
+				result: 'fresh_review_request_accepted_for_admin_review',
+				requested: true,
+				accepted: true,
+				callsFreshReviewRequestEndpoint: true,
+				callsRetrySaveEndpoint: false,
+				callsNormalSavePost: false,
+				mutatesEditorContent: false,
+				dispatchesNotice: false,
+				changesPostLock: false,
+				claimsSaved: false,
+			} );
+			expect( apiCallCount ).toBe( 1 );
+			expect(
+				registry.select( editorStore ).getEditedPostContent()
+			).toBe( 'original content' );
+			expect( registry.select( editorStore ).isPostSavingLocked() ).toBe(
+				false
+			);
+			expect( registry.select( noticesStore ).getNotices() ).toEqual(
+				[]
+			);
+			expect(
+				registry
+					.select( editorStore )
+					.getDistributedEditingSessionState()
+			).toMatchObject( {
+				localUpdatesImportReviewRequestStatus:
+					DISTRIBUTED_EDITING_LOCAL_UPDATES_REVIEW_REQUEST_STATUSES.REQUESTED,
+				localUpdatesImportReviewActionKey: null,
+				localUpdatesImportFreshReviewRequestAccepted: true,
+				localUpdatesImportFreshReviewRequestRequested: true,
+				localUpdatesImportFreshReviewRequestRestRoute:
+					'post_fresh_review_request',
+				localUpdatesImportFreshReviewRequestClaimsSaved: false,
+				retrySaveClaimsSaved: false,
+				canExportLocalUpdates: true,
+			} );
+		} );
+
+		it( 'preserves local state after fresh-review request rejection without saving or content mutation', async () => {
+			const registry = setupImportEditor();
+
+			registry
+				.dispatch( editorStore )
+				.setDistributedEditingSessionState( {
+					serverVersion: '12',
+					clientBaseVersion: '7',
+					pendingChangeCount: 1,
+					hasPendingChanges: true,
+					canExportLocalUpdates: true,
+					localUpdatesImportStatus:
+						DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_STATUSES.BLOCKED,
+					localUpdatesImportReason:
+						DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.FRESH_REVIEW_REQUIRED,
+					localUpdatesImportPostId: String( postId ),
+					localUpdatesImportPostType: 'post',
+					localUpdatesImportVerifiedPostContentHash:
+						approvedPostContentHash,
+				} );
+
+			let apiCallCount = 0;
+			apiFetch.setFetchHandler( async ( options ) => {
+				apiCallCount++;
+				expect( options.path ).toContain(
+					'/wp/v2/posts/44/distributed-editing/fresh-review-request'
+				);
+
+				throw {
+					code: DISTRIBUTED_EDITING_REASON_CODES.REST_CANNOT_EDIT,
+					data: {
+						rest_route: 'post_fresh_review_request',
+						fresh_review_request_action: 'request_admin_review',
+					},
+				};
+			} );
+
+			await expect(
+				registry
+					.dispatch( editorStore )
+					.__experimentalRequestDistributedEditingFreshReviewForImportedLocalUpdates()
+			).rejects.toMatchObject( {
+				code: DISTRIBUTED_EDITING_REASON_CODES.REST_CANNOT_EDIT,
+			} );
+
+			expect( apiCallCount ).toBe( 1 );
+			expect(
+				registry.select( editorStore ).getEditedPostContent()
+			).toBe( 'original content' );
+			expect( registry.select( editorStore ).isPostSavingLocked() ).toBe(
+				false
+			);
+			expect( registry.select( noticesStore ).getNotices() ).toEqual(
+				[]
+			);
+			expect(
+				registry
+					.select( editorStore )
+					.getDistributedEditingSessionState()
+			).toMatchObject( {
+				disposition:
+					DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_PERMISSION_DENIED,
+				reasonCode: DISTRIBUTED_EDITING_REASON_CODES.REST_CANNOT_EDIT,
+				localUpdatesImportReviewRequestStatus:
+					DISTRIBUTED_EDITING_LOCAL_UPDATES_REVIEW_REQUEST_STATUSES.REJECTED_PERMISSION_DENIED,
+				localUpdatesImportReviewActionKey:
+					DISTRIBUTED_EDITING_NOTICE_ACTIONS.REQUEST_FRESH_REVIEW,
+				localUpdatesImportFreshReviewRequestAccepted: false,
+				localUpdatesImportFreshReviewRequestRequested: false,
+				localUpdatesImportFreshReviewRequestClaimsSaved: false,
+				canExportLocalUpdates: true,
+				mustOfferLocalCopy: true,
 			} );
 		} );
 	} );

@@ -116,6 +116,13 @@ function setupDistributedEditingStatusDispatch() {
 			.mockResolvedValue( {
 				status: 'ready',
 			} ),
+		__experimentalRequestDistributedEditingFreshReviewForImportedLocalUpdates:
+			jest.fn().mockResolvedValue( {
+				status: DISTRIBUTED_EDITING_LOCAL_UPDATES_REVIEW_REQUEST_STATUSES.REQUESTED,
+				result: 'fresh_review_request_accepted_for_admin_review',
+				accepted: true,
+				requested: true,
+			} ),
 		__experimentalRefreshDistributedEditingRetrySubmitProof: jest
 			.fn()
 			.mockResolvedValue( {
@@ -1933,6 +1940,58 @@ describe( 'DistributedEditingStatus', () => {
 		).toBeVisible();
 	} );
 
+	it( 'requests fresh review from production editor chrome without saving or mutating content', async () => {
+		const user = userEvent.setup();
+		const actions = setupDistributedEditingStatusDispatch();
+
+		setupDistributedEditingStatusSelect( {
+			sessionState: {
+				pendingChangeCount: 1,
+				hasPendingChanges: true,
+				canExportLocalUpdates: true,
+				localUpdatesImportStatus:
+					DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_STATUSES.BLOCKED,
+				localUpdatesImportReason:
+					DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.FRESH_REVIEW_REQUIRED,
+				localUpdatesImportVerifiedPostContentHash:
+					'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+				localUpdatesImportReviewRequestStatus:
+					DISTRIBUTED_EDITING_LOCAL_UPDATES_REVIEW_REQUEST_STATUSES.FRESH_REVIEW_REQUIRED,
+			},
+		} );
+
+		render( <DistributedEditingStatusChrome /> );
+
+		await user.click(
+			screen.getByRole( 'button', {
+				name: 'Request fresh review',
+			} )
+		);
+
+		expect(
+			actions.__experimentalRequestDistributedEditingFreshReviewForImportedLocalUpdates
+		).toHaveBeenCalledTimes( 1 );
+		expect(
+			actions.__experimentalSaveDistributedEditingRetryAfterProof
+		).not.toHaveBeenCalled();
+		expect(
+			actions.__experimentalPrepareDistributedEditingRetrySubmitSaveAfterProof
+		).not.toHaveBeenCalled();
+		expect(
+			actions.__experimentalRefreshDistributedEditingServerStateAfterStaleBase
+		).not.toHaveBeenCalled();
+		expect(
+			await screen.findByText(
+				'Fresh review request accepted for admin review. No save was made, and protected local changes remain exportable.'
+			)
+		).toBeVisible();
+		expect(
+			screen.queryByText(
+				/proof_signature|reviewer_user_id|reviewed_block_items/i
+			)
+		).not.toBeInTheDocument();
+	} );
+
 	it( 'mounts the status surface for unload-warning state', () => {
 		setupDistributedEditingStatusSelect( {
 			noticeDescriptors: [],
@@ -2433,6 +2492,53 @@ describe( 'DistributedEditingStatusSurface', () => {
 		);
 		expect(
 			screen.queryByRole( 'button', { name: /save/i } )
+		).not.toBeInTheDocument();
+	} );
+
+	it( 'renders accepted fresh-review request status without retry-save actions or proof internals', () => {
+		const noticeDescriptors =
+			getDistributedEditingNoticeDescriptorsForSessionState( {
+				pendingChangeCount: 1,
+				canExportLocalUpdates: true,
+				localUpdatesImportStatus:
+					DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_STATUSES.BLOCKED,
+				localUpdatesImportReason:
+					DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.FRESH_REVIEW_REQUIRED,
+				localUpdatesImportReviewRequestStatus:
+					DISTRIBUTED_EDITING_LOCAL_UPDATES_REVIEW_REQUEST_STATUSES.REQUESTED,
+				localUpdatesImportFreshReviewRequestAccepted: true,
+				localUpdatesImportFreshReviewRequestRequested: true,
+				localUpdatesImportFreshReviewRequestResult:
+					'fresh_review_request_accepted_for_admin_review',
+				localUpdatesImportFreshReviewRequestAction:
+					'request_admin_review',
+				localUpdatesImportFreshReviewRequestRestRoute:
+					'post_fresh_review_request',
+				localUpdatesImportFreshReviewRequestClaimsSaved: false,
+			} );
+
+		render(
+			<DistributedEditingStatusSurface
+				noticeDescriptors={ noticeDescriptors }
+			/>
+		);
+
+		expect( screen.getByText( 'Fresh review requested' ) ).toBeVisible();
+		expect(
+			screen.getByText(
+				'Fresh review request was accepted for admin review. No retry save or normal save was made; protected local changes remain exportable until review returns.'
+			)
+		).toBeVisible();
+		expect(
+			screen.queryByRole( 'button', {
+				name: 'Request fresh review',
+			} )
+		).not.toBeInTheDocument();
+		expect( screen.queryByText( /saved/i ) ).not.toBeInTheDocument();
+		expect(
+			screen.queryByText(
+				/proof_signature|reviewer_user_id|reviewed_block_items/i
+			)
 		).not.toBeInTheDocument();
 	} );
 
