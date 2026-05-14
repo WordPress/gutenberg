@@ -113,6 +113,7 @@ export const DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES = Object.freeze(
 		FRESH_REVIEW_REQUESTED: 'fresh_review_requested',
 		FRESH_REVIEW_DECISION_SUBMITTED: 'fresh_review_decision_submitted',
 		FRESH_REVIEW_CONSUME_VALIDATED: 'fresh_review_consume_validated',
+		FRESH_REVIEW_RETRY_SAVE_CONFIRMED: 'fresh_review_retry_save_confirmed',
 	}
 );
 
@@ -135,6 +136,8 @@ const DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_DEFINITIONS = Object.freeze( {
 		Object.freeze( { source: 'review' } ),
 	[ DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.FRESH_REVIEW_CONSUME_VALIDATED ]:
 		Object.freeze( { source: 'review' } ),
+	[ DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.FRESH_REVIEW_RETRY_SAVE_CONFIRMED ]:
+		Object.freeze( { source: 'server' } ),
 } );
 
 const MAX_DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_ITEMS = 10;

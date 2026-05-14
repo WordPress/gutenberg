@@ -3917,6 +3917,22 @@ describe( 'Post actions', () => {
 				acceptedFreshReviewRequestRecordId: 'fresh-review-request-123',
 				claimsSaved: true,
 			} );
+			expect(
+				registry
+					.select( editorStore )
+					.getDistributedEditingSessionState()
+			).toMatchObject( {
+				retrySaveStatus: DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVED,
+				retrySaveFreshReviewDecisionConsumptionValidated: true,
+				actionTranscriptItemCount: 3,
+				actionTranscriptLatestEventType:
+					DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.FRESH_REVIEW_RETRY_SAVE_CONFIRMED,
+				actionTranscriptLatestEventSource: 'server',
+				actionTranscriptEntriesRedacted: true,
+				actionTranscriptExposesRawContent: false,
+				actionTranscriptExposesProofInternals: false,
+				actionTranscriptExposesActorIds: false,
+			} );
 		} );
 
 		it( 'exposes a browser-callable fresh-review retry-save handoff action', async () => {
@@ -4078,6 +4094,14 @@ describe( 'Post actions', () => {
 				retrySaveFreshReviewDecisionConsumptionValidated: true,
 				hasPendingChanges: false,
 				canExportLocalUpdates: false,
+				actionTranscriptItemCount: 3,
+				actionTranscriptLatestEventType:
+					DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.FRESH_REVIEW_RETRY_SAVE_CONFIRMED,
+				actionTranscriptLatestEventSource: 'server',
+				actionTranscriptEntriesRedacted: true,
+				actionTranscriptExposesRawContent: false,
+				actionTranscriptExposesProofInternals: false,
+				actionTranscriptExposesActorIds: false,
 			} );
 		} );
 

@@ -2301,8 +2301,7 @@ export const __experimentalSaveDistributedEditingRetryAfterProof =
 					response,
 					transcriptSavingSessionState
 				);
-
-			dispatch.setDistributedEditingSessionState(
+			let nextSessionState =
 				getDistributedEditingSessionStateWithActionTranscriptEvent(
 					retrySaveResultSessionState,
 					{
@@ -2310,8 +2309,31 @@ export const __experimentalSaveDistributedEditingRetryAfterProof =
 							DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.SAVE_STATE_CHANGED,
 						reasonCode: retrySaveResultSessionState.retrySaveReason,
 					}
-				)
-			);
+				);
+			const freshReviewRetrySaveConfirmed =
+				response?.result === 'retry_save_applied' &&
+				Boolean( acceptedFreshReviewConsumeValidation ) &&
+				( response?.fresh_review_decision_consumed === true ||
+					response?.fresh_review_decision_consumption_consumed ===
+						true ||
+					response?.fresh_review_retry_save_handoff_consumed ===
+						true ||
+					response?.fresh_review_request_record_consumed === true ||
+					response?.fresh_review_decision_consumption_result ===
+						'fresh_review_decision_consumed_for_retry_save' );
+
+			if ( freshReviewRetrySaveConfirmed ) {
+				nextSessionState =
+					getDistributedEditingSessionStateWithActionTranscriptEvent(
+						nextSessionState,
+						{
+							eventType:
+								DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.FRESH_REVIEW_RETRY_SAVE_CONFIRMED,
+						}
+					);
+			}
+
+			dispatch.setDistributedEditingSessionState( nextSessionState );
 			if ( shouldApplyProposedPostContent ) {
 				dispatch.editPost(
 					{ content: proposedPostContent },

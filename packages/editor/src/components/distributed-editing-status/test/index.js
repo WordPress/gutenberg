@@ -999,6 +999,47 @@ describe( 'DistributedEditingStatus', () => {
 		).not.toBeInTheDocument();
 	} );
 
+	it( 'describes a fresh-review confirmed save transcript without proof internals', () => {
+		setupDistributedEditingStatusSelect( {
+			sessionState: {
+				actionTranscriptItems: [
+					{
+						eventType:
+							DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.FRESH_REVIEW_RETRY_SAVE_CONFIRMED,
+						proofSignature: 'hidden-fresh-review-save-proof',
+					},
+					{
+						eventType:
+							DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.FRESH_REVIEW_RETRY_SAVE_CONFIRMED,
+					},
+				],
+			},
+		} );
+
+		render( <DistributedEditingStatusChrome /> );
+
+		const transcriptItem = screen.getByTestId(
+			'distributed-editing-action-transcript-status'
+		);
+
+		expect( transcriptItem ).toHaveAttribute(
+			'data-distributed-editing-transcript-event-type',
+			DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.FRESH_REVIEW_RETRY_SAVE_CONFIRMED
+		);
+		expect( transcriptItem ).toHaveAttribute(
+			'data-distributed-editing-transcript-redacted',
+			'true'
+		);
+		expect(
+			screen.getByText(
+				'WordPress confirmed the fresh-review guarded save and kept the activity record content-free.'
+			)
+		).toBeVisible();
+		expect(
+			screen.queryByText( 'hidden-fresh-review-save-proof' )
+		).not.toBeInTheDocument();
+	} );
+
 	it( 'mounts production editor chrome with explicit placement', () => {
 		setupDistributedEditingStatusSelect( {
 			sessionState: {
