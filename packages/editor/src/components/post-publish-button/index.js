@@ -98,10 +98,28 @@ export class PostPublishButton extends Component {
 			isSavingNonPostEntityChanges,
 			postStatus,
 			postStatusHasChanged,
+			distributedEditingSaveButtonState,
 		} = this.props;
+		const hasDistributedEditingSaveButtonState = Boolean(
+			distributedEditingSaveButtonState?.status &&
+				distributedEditingSaveButtonState.status !== 'update_ready'
+		);
+		const distributedEditingSaveButtonDisabled = Boolean(
+			hasDistributedEditingSaveButtonState &&
+				distributedEditingSaveButtonState.disabled
+		);
+		const distributedEditingSaveButtonBusy = Boolean(
+			hasDistributedEditingSaveButtonState &&
+				distributedEditingSaveButtonState.busy
+		);
+		const distributedEditingSaveButtonStatusText =
+			hasDistributedEditingSaveButtonState
+				? distributedEditingSaveButtonState.statusText
+				: undefined;
 
 		const isButtonDisabled =
 			isPostSavingLocked ||
+			distributedEditingSaveButtonDisabled ||
 			( ( isSaving ||
 				! isSaveable ||
 				( ! isPublishable && ! forceIsDirty ) ) &&
@@ -109,6 +127,7 @@ export class PostPublishButton extends Component {
 
 		const isToggleDisabled =
 			isPostSavingLocked ||
+			distributedEditingSaveButtonDisabled ||
 			( ( isPublished ||
 				isSaving ||
 				! isSaveable ||
@@ -149,21 +168,26 @@ export class PostPublishButton extends Component {
 		const buttonProps = {
 			'aria-disabled': isButtonDisabled,
 			className: 'editor-post-publish-button',
-			isBusy: ! isAutoSaving && isSaving,
+			isBusy:
+				( ! isAutoSaving && isSaving ) ||
+				distributedEditingSaveButtonBusy,
 			variant: 'primary',
 			onClick: this.createOnClick( onClickButton ),
 			'aria-haspopup': hasNonPostEntityChanges ? 'dialog' : undefined,
+			title: distributedEditingSaveButtonStatusText,
 		};
 
 		const toggleProps = {
 			'aria-disabled': isToggleDisabled,
 			'aria-expanded': isOpen,
 			className: 'editor-post-publish-panel__toggle',
-			isBusy: isSaving && isPublished,
+			isBusy:
+				( isSaving && isPublished ) || distributedEditingSaveButtonBusy,
 			variant: 'primary',
 			size: 'compact',
 			onClick: this.createOnClick( onClickToggle ),
 			'aria-haspopup': hasNonPostEntityChanges ? 'dialog' : undefined,
+			title: distributedEditingSaveButtonStatusText,
 		};
 		const componentProps = isToggle ? toggleProps : buttonProps;
 		return (
@@ -173,7 +197,11 @@ export class PostPublishButton extends Component {
 					className={ `${ componentProps.className } editor-post-publish-button__button` }
 					size="compact"
 				>
-					<PublishButtonLabel />
+					<PublishButtonLabel
+						distributedEditingSaveButtonState={
+							distributedEditingSaveButtonState
+						}
+					/>
 				</Button>
 			</>
 		);
@@ -201,6 +229,7 @@ export default compose( [
 			isSavingNonPostEntityChanges,
 			getEditedPostAttribute,
 			getPostEdits,
+			getDistributedEditingSaveButtonState,
 		} = select( editorStore );
 		return {
 			isSaving: isSavingPost(),
@@ -219,6 +248,8 @@ export default compose( [
 			postStatusHasChanged: getPostEdits()?.status,
 			hasNonPostEntityChanges: hasNonPostEntityChanges(),
 			isSavingNonPostEntityChanges: isSavingNonPostEntityChanges(),
+			distributedEditingSaveButtonState:
+				getDistributedEditingSaveButtonState?.(),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {

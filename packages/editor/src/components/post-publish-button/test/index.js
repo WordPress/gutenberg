@@ -186,4 +186,58 @@ describe( 'PostPublishButton', () => {
 			screen.getByRole( 'button', { name: 'Submit for Review' } )
 		).toHaveClass( 'is-busy' );
 	} );
+
+	it( 'should show active Distributed Editing save descriptor text', () => {
+		render(
+			<PostPublishButton
+				isSaveable
+				isPublishable
+				distributedEditingSaveButtonState={ {
+					status: 'accepted_but_unconsumed',
+					label: 'Submit reviewed changes',
+					statusText:
+						'Accepted Distributed Editing proof is ready for guarded retry save.',
+				} }
+			/>
+		);
+
+		expect(
+			screen.getByRole( 'button', {
+				name: 'Submit reviewed changes',
+			} )
+		).toHaveAttribute(
+			'title',
+			'Accepted Distributed Editing proof is ready for guarded retry save.'
+		);
+	} );
+
+	it( 'should expose Distributed Editing in-flight save state without clicking through', async () => {
+		const user = userEvent.setup();
+		const savePostStatus = jest.fn();
+		render(
+			<PostPublishButton
+				isSaveable
+				isPublishable
+				savePostStatus={ savePostStatus }
+				distributedEditingSaveButtonState={ {
+					status: 'fresh_review_validating',
+					label: 'Validating review',
+					statusText:
+						'Fresh-review validation is in progress before guarded save.',
+					disabled: true,
+					busy: true,
+				} }
+			/>
+		);
+
+		const button = screen.getByRole( 'button', {
+			name: 'Validating review',
+		} );
+		expect( button ).toHaveAttribute( 'aria-disabled', 'true' );
+		expect( button ).toHaveClass( 'is-busy' );
+
+		await user.click( button );
+
+		expect( savePostStatus ).not.toHaveBeenCalled();
+	} );
 } );

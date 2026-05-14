@@ -14,9 +14,14 @@ import { ATTACHMENT_POST_TYPE } from '../../store/constants';
 /**
  * Renders the label for the publish button.
  *
+ * @param {Object} [props]                                   Component props.
+ * @param {Object} [props.distributedEditingSaveButtonState] DE-RTC Save button descriptor.
+ *
  * @return {string} The label for the publish button.
  */
-export default function PublishButtonLabel() {
+export default function PublishButtonLabel( {
+	distributedEditingSaveButtonState,
+} = {} ) {
 	const isSmallerThanMediumViewport = useViewportMatch( 'medium', '<' );
 	const {
 		isPublished,
@@ -58,6 +63,15 @@ export default function PublishButtonLabel() {
 			postStatus: getEditedPostAttribute( 'status' ),
 		};
 	}, [] );
+
+	if (
+		distributedEditingSaveButtonState?.status &&
+		distributedEditingSaveButtonState.status !== 'update_ready' &&
+		distributedEditingSaveButtonState.label
+	) {
+		return distributedEditingSaveButtonState.label;
+	}
+
 	if ( isPublishing ) {
 		/* translators: button label text should, if possible, be under 16 characters. */
 		return __( 'Publishing…' );

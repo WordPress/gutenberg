@@ -87,4 +87,30 @@ describe( 'PublishButtonLabel', () => {
 		const label = PublishButtonLabel();
 		expect( label ).toBe( 'Publish' );
 	} );
+
+	it( 'should show a Distributed Editing save descriptor label when active', () => {
+		useSelect.mockImplementation( () => ( {
+			hasPublishAction: true,
+		} ) );
+		const label = PublishButtonLabel( {
+			distributedEditingSaveButtonState: {
+				status: 'accepted_but_unconsumed',
+				label: 'Submit reviewed changes',
+			},
+		} );
+		expect( label ).toBe( 'Submit reviewed changes' );
+	} );
+
+	it( 'should ignore the default Distributed Editing save descriptor', () => {
+		useSelect.mockImplementation( () => ( {
+			hasPublishAction: true,
+		} ) );
+		const label = PublishButtonLabel( {
+			distributedEditingSaveButtonState: {
+				status: 'update_ready',
+				label: 'Update',
+			},
+		} );
+		expect( label ).toBe( 'Publish' );
+	} );
 } );
