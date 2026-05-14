@@ -12,7 +12,6 @@ import {
 	CheckboxControl,
 	ToolbarButton,
 	ToolbarGroup,
-	__experimentalConfirmDialog as ConfirmDialog,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalUseCustomUnits as useCustomUnits,
@@ -31,7 +30,6 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	BlockControls,
 	InspectorControls,
-	RichText,
 	__experimentalImageURLInputUI as ImageURLInputUI,
 	MediaReplaceFlow,
 	store as blockEditorStore,
@@ -321,7 +319,6 @@ export default function Image( {
 		lightbox,
 		metadata,
 		isDecorative,
-		caption,
 	} = attributes;
 	const [ imageElement, setImageElement ] = useState();
 	const [ resizeDelta, setResizeDelta ] = useState( null );
@@ -589,32 +586,18 @@ export default function Image( {
 		setAttributes( { alt: newAlt } );
 	}
 
-	const [ isDecorativeConfirmVisible, setIsDecorativeConfirmVisible ] =
-		useState( false );
-
-	function applyDecorative() {
-		setAttributes( {
-			isDecorative: true,
-			alt: '',
-			caption: undefined,
-			href: undefined,
-			linkDestination: undefined,
-			linkTarget: undefined,
-			rel: undefined,
-		} );
-	}
-
 	function updateIsDecorative( value ) {
-		if ( ! value ) {
-			setAttributes( { isDecorative: false } );
-			return;
-		}
-		const hasDataToLose = alt || ! RichText.isEmpty( caption ) || href;
-		if ( hasDataToLose ) {
-			setIsDecorativeConfirmVisible( true );
-		} else {
-			applyDecorative();
-		}
+		setAttributes( {
+			isDecorative: value || undefined,
+			...( value && {
+				alt: '',
+				caption: undefined,
+				href: undefined,
+				linkDestination: undefined,
+				linkTarget: undefined,
+				rel: undefined,
+			} ),
+		} );
 	}
 
 	const imperativeFocalPointPreview = ( value ) => {
@@ -1411,23 +1394,6 @@ export default function Image( {
 						! hideCaptionControls
 					}
 				/>
-			) }
-
-			{ isDecorativeConfirmVisible && (
-				<ConfirmDialog
-					isOpen
-					onConfirm={ () => {
-						setIsDecorativeConfirmVisible( false );
-						applyDecorative();
-					} }
-					onCancel={ () => setIsDecorativeConfirmVisible( false ) }
-					confirmButtonText={ __( 'Mark as decorative' ) }
-					size="medium"
-				>
-					{ __(
-						'Marking this image as decorative will remove any alt text, caption, and links. Continue?'
-					) }
-				</ConfirmDialog>
 			) }
 		</>
 	);
