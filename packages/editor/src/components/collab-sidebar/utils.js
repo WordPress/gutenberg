@@ -91,30 +91,24 @@ export function getNoteExcerpt( text, excerptLength = 10 ) {
 }
 
 /**
- * Normalizes noteId metadata to always return an array of numeric ids.
- * Handles both scalar (legacy, possibly string-typed) and array (new) values.
+ * Normalizes noteId metadata to always return an array of unique numeric ids,
+ * preserving insertion order. Handles both scalar (legacy, possibly
+ * string-typed) and array (new) values.
  *
  * @param {Object} metadata Block metadata object
  * @return {number[]} Array of note IDs (may be empty)
  */
 export function getNoteIdsFromMetadata( metadata ) {
-	if ( ! metadata || metadata.noteId === null ) {
-		return [];
-	}
-	const raw = Array.isArray( metadata.noteId )
-		? metadata.noteId
-		: [ metadata.noteId ];
-	const ids = [];
+	const noteId = metadata?.noteId;
+	const raw = Array.isArray( noteId ) ? noteId : [ noteId ];
+	const ids = new Set();
 	for ( const value of raw ) {
-		if ( ! value ) {
-			continue;
-		}
 		const id = Number( value );
 		if ( Number.isFinite( id ) && id > 0 ) {
-			ids.push( id );
+			ids.add( id );
 		}
 	}
-	return ids;
+	return [ ...ids ];
 }
 
 /**
@@ -126,15 +120,13 @@ export function getNoteIdsFromMetadata( metadata ) {
  * @return {Object} Updated metadata object
  */
 export function addNoteIdToMetadata( metadata, noteId ) {
-	const existingIds = getNoteIdsFromMetadata( metadata );
+	const ids = new Set( getNoteIdsFromMetadata( metadata ) );
 	const id = Number( noteId );
-	if ( existingIds.includes( id ) ) {
+	if ( ids.has( id ) ) {
 		return metadata;
 	}
-	return {
-		...metadata,
-		noteId: [ ...existingIds, id ],
-	};
+	ids.add( id );
+	return { ...metadata, noteId: [ ...ids ] };
 }
 
 /**
@@ -159,12 +151,11 @@ export function pickPrimaryNote( threads ) {
  * @return {Object} Updated metadata object
  */
 export function removeNoteIdFromMetadata( metadata, noteId ) {
-	const existingIds = getNoteIdsFromMetadata( metadata );
-	const id = Number( noteId );
-	const newIds = existingIds.filter( ( existing ) => existing !== id );
+	const ids = new Set( getNoteIdsFromMetadata( metadata ) );
+	ids.delete( Number( noteId ) );
 	return {
 		...metadata,
-		noteId: newIds.length > 0 ? newIds : undefined,
+		noteId: ids.size > 0 ? [ ...ids ] : undefined,
 	};
 }
 

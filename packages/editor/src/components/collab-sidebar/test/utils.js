@@ -76,6 +76,21 @@ describe( 'getNoteIdsFromMetadata', () => {
 			getNoteIdsFromMetadata( { noteId: [ null, undefined, 0, '' ] } )
 		).toEqual( [] );
 	} );
+
+	it( 'deduplicates repeated ids while preserving first occurrence order', () => {
+		expect( getNoteIdsFromMetadata( { noteId: [ 1, 1, 1 ] } ) ).toEqual( [
+			1,
+		] );
+		expect(
+			getNoteIdsFromMetadata( { noteId: [ 1, 2, 1, 3, 2 ] } )
+		).toEqual( [ 1, 2, 3 ] );
+	} );
+
+	it( 'deduplicates across numeric and string-typed duplicates', () => {
+		expect(
+			getNoteIdsFromMetadata( { noteId: [ 1, '1', 2, '2' ] } )
+		).toEqual( [ 1, 2 ] );
+	} );
 } );
 
 describe( 'addNoteIdToMetadata', () => {
