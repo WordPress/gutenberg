@@ -25,7 +25,7 @@ export default function TypographyPanel( {
 	let prefixParts: string[] = [];
 	if ( element === 'heading' ) {
 		prefixParts = prefixParts.concat( [ 'elements', headingLevel ] );
-	} else if ( element && element !== 'text' ) {
+	} else if ( element && element !== 'text' && element !== 'default' ) {
 		prefixParts = prefixParts.concat( [ 'elements', element ] );
 	}
 	const prefix = prefixParts.join( '.' );

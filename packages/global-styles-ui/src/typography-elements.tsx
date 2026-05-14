@@ -24,7 +24,9 @@ interface ElementItemProps {
 
 function ElementItem( { parentMenu, element, label }: ElementItemProps ) {
 	const prefix =
-		element === 'text' || ! element ? '' : `elements.${ element }.`;
+		element === 'text' || element === 'default' || ! element
+			? ''
+			: `elements.${ element }.`;
 	const extraStyles =
 		element === 'link'
 			? {
@@ -80,6 +82,11 @@ function TypographyElements() {
 		<VStack spacing={ 3 }>
 			<Subtitle level={ 3 }>{ __( 'Elements' ) }</Subtitle>
 			<ItemGroup isBordered isSeparated>
+				<ElementItem
+					parentMenu={ parentMenu }
+					element="default"
+					label={ __( 'Default' ) }
+				/>
 				<ElementItem
 					parentMenu={ parentMenu }
 					element="text"

@@ -1,7 +1,10 @@
 /**
  * WordPress dependencies
  */
-import { areGlobalStylesEqual } from '@wordpress/global-styles-engine';
+import {
+	areGlobalStylesEqual,
+	setStyle,
+} from '@wordpress/global-styles-engine';
 import type { GlobalStylesConfig } from '@wordpress/global-styles-engine';
 import { __ } from '@wordpress/i18n';
 
@@ -383,4 +386,48 @@ export function getNewIndexFromPresets(
 		return currentHighest;
 	}, 0 );
 	return highestPresetValue + 1;
+}
+
+/**
+ * Typography elements that can have font family applied.
+ * Includes general elements plus individual heading levels.
+ */
+export const TYPOGRAPHY_ELEMENTS = [
+	'link',
+	'heading',
+	'h1',
+	'h2',
+	'h3',
+	'h4',
+	'h5',
+	'h6',
+	'button',
+	'caption',
+	'cite',
+] as const;
+
+/**
+ * Applies a font family to all typography elements.
+ *
+ * @param user       The current user global styles config.
+ * @param fontFamily The font family value to apply (e.g., "var:preset|font-family|dm-sans").
+ * @return Updated global styles config with font applied to all elements.
+ */
+export function applyFontFamilyToAllElements(
+	user: GlobalStylesConfig,
+	fontFamily: string
+): GlobalStylesConfig {
+	let updatedConfig = user;
+
+	TYPOGRAPHY_ELEMENTS.forEach( ( element ) => {
+		const stylePath = `elements.${ element }.typography.fontFamily`;
+		updatedConfig = setStyle(
+			updatedConfig,
+			stylePath,
+			fontFamily,
+			undefined // blockName
+		);
+	} );
+
+	return updatedConfig;
 }
