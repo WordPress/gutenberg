@@ -7,10 +7,14 @@ import type { FullBleedProps } from './types';
  * A container that breaks out of the card's padding to span edge-to-edge.
  * Useful for full-width images, dividers, or embedded content.
  *
- * When placed as the **first child** of `Card.Header`, the element also
- * extends flush to the card's top edge. The card's `overflow: clip` and
- * `border-radius` ensure the content is correctly clipped to the card's
- * rounded corners.
+ * Additional edge-bumping behavior based on placement:
+ *
+ * - As the **first child** of `Card.Header`, it extends flush to the card's
+ *   top edge — ideal for hero images. Siblings that follow (e.g. `Card.Title`)
+ *   keep normal spacing below the bleed area.
+ * - As the **only child** of `Card.Content`, it extends flush to the card's
+ *   top edge when `Content` is the first card child, and to the bottom edge
+ *   when it is the last.
  *
  * Must be used as a direct child of `Card.Content` or `Card.Header`.
  */
