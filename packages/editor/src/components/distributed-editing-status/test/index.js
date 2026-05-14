@@ -866,12 +866,34 @@ describe( 'DistributedEditingStatus', () => {
 			'data-distributed-editing-local-protection',
 			'idle'
 		);
+		expect( shell ).toHaveAttribute(
+			'data-distributed-editing-save-state',
+			'update_ready'
+		);
+		expect( shell ).toHaveAttribute(
+			'data-distributed-editing-save-action',
+			'continue_save'
+		);
+		expect( shell ).toHaveAttribute(
+			'data-distributed-editing-authority-state',
+			'ready_to_update_authoritative_post'
+		);
 		expect(
 			screen.getByText( 'Distributed Editing enabled' )
 		).toBeVisible();
 		expect(
 			screen.getByText(
 				'WordPress will protect local changes and show sync status here when review, refresh, or server confirmation is needed.'
+			)
+		).toBeVisible();
+		expect( screen.getByText( 'Save state' ) ).toBeVisible();
+		expect(
+			screen.getByText( 'Save can update the authoritative post.' )
+		).toBeVisible();
+		expect( screen.getByText( 'WordPress post' ) ).toBeVisible();
+		expect(
+			screen.getByText(
+				'Save can update the authoritative WordPress post.'
 			)
 		).toBeVisible();
 		expect(
@@ -915,6 +937,56 @@ describe( 'DistributedEditingStatus', () => {
 			)
 		).toBeVisible();
 		expect( screen.getByText( 'Changes pending' ) ).toBeVisible();
+	} );
+
+	it( 'summarizes review-required Save state in the enabled editor shell', () => {
+		setupDistributedEditingStatusSelect( {
+			editorSettings: {
+				distributedEditing: {
+					enabled: true,
+				},
+			},
+			sessionState: {
+				pendingChangeCount: 1,
+				hasPendingChanges: true,
+				canExportLocalUpdates: true,
+				riskyBlockReviewStatus: 'review_required',
+				riskyBlockReviewHasPendingItems: true,
+				riskyBlockReviewItemCount: 1,
+				riskyBlockReviewPendingCount: 1,
+				riskyBlockReviewSaveButtonLabel: 'Review changes',
+				riskyBlockReviewSaveClickAction: 'open_pre_publish_review',
+				riskyBlockReviewCanExportLocalUpdates: true,
+			},
+		} );
+
+		render( <DistributedEditingStatusChrome /> );
+
+		const shell = screen.getByRole( 'region', {
+			name: 'Distributed editing enabled status',
+		} );
+		expect( shell ).toHaveAttribute(
+			'data-distributed-editing-save-state',
+			'review_required'
+		);
+		expect( shell ).toHaveAttribute(
+			'data-distributed-editing-save-action',
+			'open_pre_publish_review'
+		);
+		expect( shell ).toHaveAttribute(
+			'data-distributed-editing-authority-state',
+			'review_required_before_update'
+		);
+		expect(
+			screen.getByText(
+				'Protected local changes need review before the authoritative post can update.'
+			)
+		).toBeVisible();
+		expect(
+			screen.getByText(
+				'The authoritative WordPress post cannot be updated until risky changes are approved or removed.'
+			)
+		).toBeVisible();
 	} );
 
 	it( 'imports pasted protected local updates from production editor chrome without saving', async () => {

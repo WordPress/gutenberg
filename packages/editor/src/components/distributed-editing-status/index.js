@@ -36,6 +36,7 @@ import {
 	getDistributedEditingFreshReviewDecisionStateForSessionState,
 	getDistributedEditingFreshReviewPreSaveStateForSessionState,
 	getDistributedEditingLocalUpdatesExportPayload,
+	getDistributedEditingSavePolicyStateForSessionState,
 	normalizeDistributedEditingSessionState,
 } from '../../store/distributed-editing';
 import PluginPrePublishPanel from '../plugin-pre-publish-panel';
@@ -1646,6 +1647,8 @@ async function copyDistributedEditingLocalUpdatesToClipboard( {
 
 function getDistributedEditingEnabledShellState( sessionState ) {
 	const normalized = normalizeDistributedEditingSessionState( sessionState );
+	const savePolicyState =
+		getDistributedEditingSavePolicyStateForSessionState( normalized );
 	const isConnectionDegraded = Boolean(
 		normalized.isConnectionDegraded ||
 			normalized.disposition ===
@@ -1663,6 +1666,11 @@ function getDistributedEditingEnabledShellState( sessionState ) {
 		return {
 			serverContact: 'degraded',
 			localProtection: hasProtectedLocalChanges ? 'protected' : 'idle',
+			saveState: savePolicyState.status,
+			saveAction: savePolicyState.clickAction || 'none',
+			authorityState: savePolicyState.saveButtonAuthorityState,
+			saveStateSummaryText: savePolicyState.saveButtonStateSummaryText,
+			authorityStatusText: savePolicyState.saveButtonAuthorityStatusText,
 			message: __(
 				'Updates may be delayed. Local changes remain protected and exportable.'
 			),
@@ -1673,6 +1681,11 @@ function getDistributedEditingEnabledShellState( sessionState ) {
 		return {
 			serverContact: 'nominal',
 			localProtection: 'protected',
+			saveState: savePolicyState.status,
+			saveAction: savePolicyState.clickAction || 'none',
+			authorityState: savePolicyState.saveButtonAuthorityState,
+			saveStateSummaryText: savePolicyState.saveButtonStateSummaryText,
+			authorityStatusText: savePolicyState.saveButtonAuthorityStatusText,
 			message: __(
 				'Local changes are protected and remain exportable while WordPress waits for server confirmation.'
 			),
@@ -1682,6 +1695,11 @@ function getDistributedEditingEnabledShellState( sessionState ) {
 	return {
 		serverContact: 'nominal',
 		localProtection: 'idle',
+		saveState: savePolicyState.status,
+		saveAction: savePolicyState.clickAction || 'none',
+		authorityState: savePolicyState.saveButtonAuthorityState,
+		saveStateSummaryText: savePolicyState.saveButtonStateSummaryText,
+		authorityStatusText: savePolicyState.saveButtonAuthorityStatusText,
 		message: __(
 			'WordPress will protect local changes and show sync status here when review, refresh, or server confirmation is needed.'
 		),
@@ -1723,9 +1741,14 @@ export function DistributedEditingEnabledShell( {
 		<div
 			aria-label={ __( 'Distributed editing enabled status' ) }
 			className="editor-distributed-editing-status__enabled-shell"
+			data-distributed-editing-authority-state={
+				shellState.authorityState
+			}
 			data-distributed-editing-local-protection={
 				shellState.localProtection
 			}
+			data-distributed-editing-save-action={ shellState.saveAction }
+			data-distributed-editing-save-state={ shellState.saveState }
 			data-distributed-editing-server-contact={ shellState.serverContact }
 			data-distributed-editing-shell="enabled"
 			data-distributed-editing-shell-placement={ placement }
@@ -1734,6 +1757,14 @@ export function DistributedEditingEnabledShell( {
 			<Notice status="info" isDismissible={ false }>
 				<strong>{ __( 'Distributed Editing enabled' ) }</strong>
 				<div>{ shellState.message }</div>
+				<div className="editor-distributed-editing-status__enabled-shell-save-state">
+					<strong>{ __( 'Save state' ) }</strong>
+					<div>{ shellState.saveStateSummaryText }</div>
+				</div>
+				<div className="editor-distributed-editing-status__enabled-shell-authority-state">
+					<strong>{ __( 'WordPress post' ) }</strong>
+					<div>{ shellState.authorityStatusText }</div>
+				</div>
 			</Notice>
 		</div>
 	);
