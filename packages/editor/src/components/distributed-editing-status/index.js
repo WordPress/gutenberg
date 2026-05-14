@@ -856,7 +856,7 @@ export function DistributedEditingLocalUpdatesImportControls( {
 
 	return (
 		<div
-			aria-label={ __( 'Distributed editing local updates import' ) }
+			aria-label={ __( 'Distributed editing reviewed changes import' ) }
 			className="editor-distributed-editing-status__local-updates-import"
 			role="group"
 		>
@@ -866,13 +866,13 @@ export function DistributedEditingLocalUpdatesImportControls( {
 					onClick={ () => setIsOpen( true ) }
 					variant="secondary"
 				>
-					{ __( 'Import protected changes' ) }
+					{ __( 'Import reviewed changes' ) }
 				</Button>
 			) : (
 				<>
 					<TextareaControl
 						className="editor-distributed-editing-status__local-updates-import-payload"
-						label={ __( 'Protected changes payload' ) }
+						label={ __( 'Reviewed changes payload' ) }
 						onChange={ setPayloadText }
 						value={ payloadText }
 					/>
@@ -885,7 +885,7 @@ export function DistributedEditingLocalUpdatesImportControls( {
 							onClick={ importLocalUpdates }
 							variant="primary"
 						>
-							{ __( 'Validate and import' ) }
+							{ __( 'Validate review proof and import' ) }
 						</Button>
 						<Button
 							__next40pxDefaultSize
@@ -1319,8 +1319,14 @@ function getPendingChangesMessage( descriptor ) {
 		descriptor.localUpdatesImportStatus ===
 		DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_STATUSES.IMPORTED_FOR_RETRY_SAVE
 	) {
+		if ( descriptor.localUpdatesImportHasAcceptedReviewApprovalProof ) {
+			return __(
+				'Admin-reviewed changes were imported locally with signed review proof and are ready for guarded save. They remain protected and exportable until the server confirms that path.'
+			);
+		}
+
 		return __(
-			'Protected changes were imported locally with signed review proof and are ready for the guarded save path. They remain protected and exportable until the server confirms that path.'
+			'Protected recovery changes were imported locally and are ready for guarded save. They remain protected and exportable until the server confirms that path.'
 		);
 	}
 
@@ -1478,25 +1484,34 @@ function getLocalUpdatesImportStatusMessage( {
 } ) {
 	if ( commandStatus === 'running' ) {
 		return __(
-			'Checking the protected changes payload, post route, content hash, and signed review proof.'
+			'Checking the reviewed changes payload, post route, content hash, and signed admin review proof.'
 		);
 	}
 
 	if ( commandStatus === 'failed' ) {
 		return __(
-			'Import failed before any local change was applied. Protected local changes remain protected, and no server request was sent.'
+			'Reviewed changes import failed before any local change was applied. Protected local changes remain protected, and no server request was sent.'
 		);
 	}
 
 	const status = importResult?.status || normalized.localUpdatesImportStatus;
 	const reason = importResult?.reason || normalized.localUpdatesImportReason;
+	const hasAcceptedReviewApprovalProof =
+		importResult?.hasAcceptedReviewApprovalProof ||
+		normalized.localUpdatesImportHasAcceptedReviewApprovalProof;
 
 	if (
 		status ===
 		DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_STATUSES.IMPORTED_FOR_RETRY_SAVE
 	) {
+		if ( hasAcceptedReviewApprovalProof ) {
+			return __(
+				'Admin-reviewed changes were imported into this editor only, with route, hash, and signed review proof checks passing. They remain protected until guarded save is confirmed; no server request was sent.'
+			);
+		}
+
 		return __(
-			'Protected changes were imported into this editor only, with route, hash, and signed proof checks passing. They remain protected until a guarded save is confirmed; no server request was sent.'
+			'Protected recovery changes were imported into this editor only, with route and hash checks passing. They remain protected until guarded save is confirmed; no server request was sent.'
 		);
 	}
 
@@ -1537,20 +1552,20 @@ function getLocalUpdatesImportBlockedMessage( reason ) {
 			);
 		case DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.MISSING_REVIEW_APPROVAL_PROOF:
 			return __(
-				'Import blocked: the protected changes are missing accepted review proof. Nothing was imported, and local changes remain protected.'
+				'Import blocked: this admin review handoff is missing accepted review proof. Nothing was imported, and local changes remain protected.'
 			);
 		case DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.EXPIRED_REVIEW_APPROVAL_PROOF:
 			return __(
-				'Import blocked: the accepted review proof for these protected changes has expired. Nothing was imported, and local changes remain protected.'
+				'Import blocked: the accepted admin review proof for these protected changes has expired. Nothing was imported, and local changes remain protected.'
 			);
 		case DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.EXTRA_SESSION_STATE_OVEREXPOSED:
 			return __(
-				'Import blocked: this protected-changes payload exposes extra distributed editing session state. Nothing was imported, and local changes remain protected.'
+				'Import blocked: this reviewed-changes payload exposes extra distributed editing session state. Nothing was imported, and local changes remain protected.'
 			);
 	}
 
 	return __(
-		'Import blocked before any local change was applied. Protected local changes remain protected, and no server request was sent.'
+		'Reviewed changes import was blocked before any local change was applied. Protected local changes remain protected, and no server request was sent.'
 	);
 }
 

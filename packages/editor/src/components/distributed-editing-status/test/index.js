@@ -813,6 +813,7 @@ describe( 'DistributedEditingStatus', () => {
 				dispatchesNotice: false,
 				changesPostLock: false,
 				claimsSaved: false,
+				hasAcceptedReviewApprovalProof: true,
 			}
 		);
 
@@ -820,18 +821,18 @@ describe( 'DistributedEditingStatus', () => {
 
 		await user.click(
 			screen.getByRole( 'button', {
-				name: 'Import protected changes',
+				name: 'Import reviewed changes',
 			} )
 		);
 		fireEvent.change(
 			screen.getByRole( 'textbox', {
-				name: 'Protected changes payload',
+				name: 'Reviewed changes payload',
 			} ),
 			{ target: { value: payloadText } }
 		);
 		await user.click(
 			screen.getByRole( 'button', {
-				name: 'Validate and import',
+				name: 'Validate review proof and import',
 			} )
 		);
 
@@ -845,7 +846,7 @@ describe( 'DistributedEditingStatus', () => {
 			actions.__experimentalRefreshDistributedEditingServerStateAfterStaleBase
 		).not.toHaveBeenCalled();
 		expect( await screen.findByRole( 'status' ) ).toHaveTextContent(
-			'Protected changes were imported into this editor only, with route, hash, and signed proof checks passing. They remain protected until a guarded save is confirmed; no server request was sent.'
+			'Admin-reviewed changes were imported into this editor only, with route, hash, and signed review proof checks passing. They remain protected until guarded save is confirmed; no server request was sent.'
 		);
 	} );
 
@@ -864,11 +865,11 @@ describe( 'DistributedEditingStatus', () => {
 		],
 		[
 			DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.MISSING_REVIEW_APPROVAL_PROOF,
-			'Import blocked: the protected changes are missing accepted review proof. Nothing was imported, and local changes remain protected.',
+			'Import blocked: this admin review handoff is missing accepted review proof. Nothing was imported, and local changes remain protected.',
 		],
 		[
 			DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.EXTRA_SESSION_STATE_OVEREXPOSED,
-			'Import blocked: this protected-changes payload exposes extra distributed editing session state. Nothing was imported, and local changes remain protected.',
+			'Import blocked: this reviewed-changes payload exposes extra distributed editing session state. Nothing was imported, and local changes remain protected.',
 		],
 	] )(
 		'reports blocked local-updates import for %s without saving',
@@ -900,18 +901,18 @@ describe( 'DistributedEditingStatus', () => {
 
 			await user.click(
 				screen.getByRole( 'button', {
-					name: 'Import protected changes',
+					name: 'Import reviewed changes',
 				} )
 			);
 			fireEvent.change(
 				screen.getByRole( 'textbox', {
-					name: 'Protected changes payload',
+					name: 'Reviewed changes payload',
 				} ),
 				{ target: { value: '{"version":1}' } }
 			);
 			await user.click(
 				screen.getByRole( 'button', {
-					name: 'Validate and import',
+					name: 'Validate review proof and import',
 				} )
 			);
 
@@ -1236,6 +1237,9 @@ describe( 'DistributedEditingStatus', () => {
 			},
 		} );
 		expect( payload.acceptedReviewApprovalProof ).toMatchObject( {
+			proof_envelope_type: 'field_based_review_approval_proof',
+		} );
+		expect( payload.acceptedReviewApprovalProof.proof ).toMatchObject( {
 			postId: '42',
 			postType: 'post',
 			serverVersion: '12',
@@ -2221,6 +2225,7 @@ describe( 'DistributedEditingStatusSurface', () => {
 				pendingChangeCount: 1,
 				localUpdatesImportStatus:
 					DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_STATUSES.IMPORTED_FOR_RETRY_SAVE,
+				localUpdatesImportHasAcceptedReviewApprovalProof: true,
 				canExportLocalUpdates: true,
 			} );
 
@@ -2233,10 +2238,37 @@ describe( 'DistributedEditingStatusSurface', () => {
 		expect( screen.getByText( 'Changes pending' ) ).toBeVisible();
 		expect(
 			screen.getByText(
-				'Protected changes were imported locally with signed review proof and are ready for the guarded save path. They remain protected and exportable until the server confirms that path.'
+				'Admin-reviewed changes were imported locally with signed review proof and are ready for guarded save. They remain protected and exportable until the server confirms that path.'
 			)
 		).toBeVisible();
 		expect( screen.queryByText( /saved/i ) ).not.toBeInTheDocument();
+	} );
+
+	it( 'renders generic protected import readiness separately from reviewed proof imports', () => {
+		const noticeDescriptors =
+			getDistributedEditingNoticeDescriptorsForSessionState( {
+				pendingChangeCount: 1,
+				localUpdatesImportStatus:
+					DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_STATUSES.IMPORTED_FOR_RETRY_SAVE,
+				localUpdatesImportHasAcceptedReviewApprovalProof: false,
+				canExportLocalUpdates: true,
+			} );
+
+		render(
+			<DistributedEditingStatusSurface
+				noticeDescriptors={ noticeDescriptors }
+			/>
+		);
+
+		expect( screen.getByText( 'Changes pending' ) ).toBeVisible();
+		expect(
+			screen.getByText(
+				'Protected recovery changes were imported locally and are ready for guarded save. They remain protected and exportable until the server confirms that path.'
+			)
+		).toBeVisible();
+		expect(
+			screen.queryByText( /Admin-reviewed changes were imported/ )
+		).not.toBeInTheDocument();
 	} );
 
 	it( 'renders retry-submit save readiness without claiming completion', () => {
