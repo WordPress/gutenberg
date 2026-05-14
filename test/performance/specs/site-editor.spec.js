@@ -81,6 +81,9 @@ test.describe( 'Site Editor Performance', () => {
 				perfUtils,
 				metrics,
 			} ) => {
+				// Start tracing before navigating so the page load is captured.
+				await metrics.startTracing();
+
 				// Go to the test draft.
 				await admin.visitSiteEditor( {
 					postId: draftId,
@@ -91,6 +94,12 @@ test.describe( 'Site Editor Performance', () => {
 				// Wait for the first block.
 				const canvas = await perfUtils.getCanvas();
 				await canvas.locator( '.wp-block' ).first().waitFor();
+
+				// Stop tracing. Save just one representative sample.
+				await metrics.stopTracing(
+					i === Math.floor( iterations / 2 ) &&
+						'site-editor-first-block'
+				);
 
 				// Get the durations.
 				const loadingDurations = await metrics.getLoadingDurations();
@@ -183,7 +192,7 @@ test.describe( 'Site Editor Performance', () => {
 			} );
 
 			// Stop tracing.
-			await metrics.stopTracing();
+			await metrics.stopTracing( 'site-editor-type' );
 
 			// Get the durations.
 			const [ keyDownEvents, keyPressEvents, keyUpEvents ] =
@@ -237,7 +246,10 @@ test.describe( 'Site Editor Performance', () => {
 				await page
 					.getByRole( 'button', { name: 'Single Posts' } )
 					.click();
-				await metrics.stopTracing();
+				// Stop tracing. Save just one representative sample.
+				await metrics.stopTracing(
+					i === Math.floor( iterations / 2 ) && 'site-editor-navigate'
+				);
 
 				// Get the durations.
 				const [ mouseClickEvents ] = metrics.getClickEventDurations();

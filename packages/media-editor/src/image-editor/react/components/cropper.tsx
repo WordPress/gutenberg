@@ -24,6 +24,7 @@ import { __ } from '@wordpress/i18n';
  */
 import type {
 	CropperState,
+	HandlePosition,
 	StencilProps,
 	Size,
 	NormalizedRect,
@@ -37,6 +38,8 @@ import { useAriaAnnouncer } from '../hooks/use-aria-announcer';
 import { RectangleStencil } from './stencils/rectangle-stencil';
 import { DimmingOverlay } from './overlays/dimming-overlay';
 import { GridOverlay } from './overlays/grid-overlay';
+import { DimensionsOverlay } from './overlays/dimensions-overlay';
+import { getSourceRegion } from '../../core/source-region';
 import { ViewportProvider, useViewport } from './viewport-provider';
 import { VISUALLY_HIDDEN_STYLE } from '../visually-hidden-style';
 
@@ -90,6 +93,8 @@ export interface CropperProps {
 	isPlacementActive?: boolean;
 	/** Show the dimming overlay outside the crop area. */
 	showDimming?: boolean;
+	/** Show the live output dimensions tooltip during a resize. */
+	showDimensions?: boolean;
 	/** Minimum zoom level. */
 	minZoom?: number;
 	/** Maximum zoom level. */
@@ -142,6 +147,7 @@ export interface CropperProps {
  * @param root0.showGrid          Grid overlay mode: false | true | 'interactive'.
  * @param root0.isPlacementActive Keep grid visible during external placement activity.
  * @param root0.showDimming       Show dimming overlay outside crop.
+ * @param root0.showDimensions    Show live dimensions tooltip during resize.
  * @param root0.minZoom           Minimum zoom level.
  * @param root0.maxZoom           Maximum zoom level.
  * @param root0.aspectRatio       Fixed aspect ratio (width/height).
@@ -162,6 +168,7 @@ function CropperInner(
 		showGrid = false,
 		isPlacementActive = false,
 		showDimming = true,
+		showDimensions = true,
 		minZoom,
 		maxZoom,
 		aspectRatio,
@@ -344,6 +351,12 @@ function CropperInner(
 	const [ isResizing, setIsResizing ] = useState( false );
 	const isResizingRef = useRef( false );
 	const isSettlingRef = useRef( false );
+	// Direction of the handle the user is currently resizing — pointer or
+	// keyboard. `null` outside of an active resize. Drives the live
+	// dimensions tooltip overlay.
+	const [ activeHandle, setActiveHandle ] = useState< HandlePosition | null >(
+		null
+	);
 
 	// Use the interaction hook for mouse, touch, and keyboard events.
 	const {
@@ -500,6 +513,20 @@ function CropperInner(
 		isInteractiveGrid &&
 		( isInteractionPlacementActive || isResizing || isPlacementActive );
 
+	// Output crop size in source pixels — drives the live tooltip
+	// overlay. Only computed during pointer drags, so the per-frame
+	// state churn during pan/zoom doesn't pay for it.
+	const outputSize = useMemo( () => {
+		if ( ! showDimensions || ! activeHandle || ! state.image ) {
+			return null;
+		}
+		const region = getSourceRegion( state, {
+			width: state.image.naturalWidth,
+			height: state.image.naturalHeight,
+		} );
+		return { width: region.width, height: region.height };
+	}, [ showDimensions, activeHandle, state ] );
+
 	/**
 	 * Handle Escape on a resize handle — return focus to the canvas so
 	 * arrow keys pan the image rather than resize.
@@ -511,18 +538,22 @@ function CropperInner(
 		canvasRef.current?.focus( { preventScroll: true } );
 	}, [] );
 
-	const handleResizeStart = useCallback( () => {
-		isResizingRef.current = true;
-		setIsResizing( true );
-		// Clear any in-flight settle so transitions don't apply during the
-		// new drag (rapid successive resizes would otherwise inherit the
-		// previous settle animation).
-		clearTimeout( settleTimerRef.current );
-		isSettlingRef.current = false;
-		setSettling( false );
-		resetViewport();
-		onGestureStart?.();
-	}, [ onGestureStart, resetViewport ] );
+	const handleResizeStart = useCallback(
+		( handle?: HandlePosition ) => {
+			isResizingRef.current = true;
+			setIsResizing( true );
+			setActiveHandle( handle ?? null );
+			// Clear any in-flight settle so transitions don't apply during the
+			// new drag (rapid successive resizes would otherwise inherit the
+			// previous settle animation).
+			clearTimeout( settleTimerRef.current );
+			isSettlingRef.current = false;
+			setSettling( false );
+			resetViewport();
+			onGestureStart?.();
+		},
+		[ onGestureStart, resetViewport ]
+	);
 
 	/**
 	 * Handle resize end — settle the crop rect (re-center, fill height)
@@ -531,6 +562,7 @@ function CropperInner(
 	const handleResizeEnd = useCallback( () => {
 		isResizingRef.current = false;
 		setIsResizing( false );
+		setActiveHandle( null );
 		isSettlingRef.current = true;
 		setSettling( true );
 		// Reset viewport pan first so it transitions back to zero in sync
@@ -716,6 +748,18 @@ function CropperInner(
 							cropRect={ state.cropRect }
 							containerSize={ canvasSize }
 							imageSize={ visualSize }
+						/>
+					) }
+
+					{ /* Live dimensions tooltip pinned to the dragged handle. */ }
+					{ activeHandle && outputSize && (
+						<DimensionsOverlay
+							cropRect={ state.cropRect }
+							containerSize={ canvasSize }
+							imageSize={ visualSize }
+							activeHandle={ activeHandle }
+							outputWidth={ outputSize.width }
+							outputHeight={ outputSize.height }
 						/>
 					) }
 				</div>

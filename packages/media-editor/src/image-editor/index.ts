@@ -22,6 +22,7 @@ export type {
 	Size,
 	Flip,
 	StencilProps,
+	HandlePosition,
 } from './core';
 
 // Deterministic cropper helpers.

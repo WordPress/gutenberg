@@ -2,6 +2,24 @@
 
 ## Unreleased
 
+### Enhancements
+
+- DataViews: Refresh filter chip styling to align with `Button`. [#75204](https://github.com/WordPress/gutenberg/pull/75204)
+- DataForms: Increase the minimum width of the panel layout popover from 256px to 320px so option labels have more room. [#75204](https://github.com/WordPress/gutenberg/pull/75204)
+
+### Bug Fixes
+
+- DataViews: Restore the `padding` rule on grid item titles that was lost when the wrapping element's class was renamed. [#75204](https://github.com/WordPress/gutenberg/pull/75204)
+- DataViews: Restore the original 16px padding on the first/last table header cells (had drifted to 32px during the token migration). [#75204](https://github.com/WordPress/gutenberg/pull/75204)
+- DataViews: Restore the original 4px gap inside table header buttons (had drifted to 8px during the token migration). [#75204](https://github.com/WordPress/gutenberg/pull/75204)
+- DataViews: Restore the original 24px gap on the default-density grid (had drifted to 32px during the token migration). [#75204](https://github.com/WordPress/gutenberg/pull/75204)
+- DataForms: Restore the original 24px minimum height on panel-layout fields (trigger, label, control) (had drifted to 32px during the token migration). [#75204](https://github.com/WordPress/gutenberg/pull/75204)
+- DataViews: Restore the original 28px end-padding on resettable filter chips (had drifted to 32px during the token migration). [#75204](https://github.com/WordPress/gutenberg/pull/75204)
+
+### Code Quality
+
+- DataViews: Migrate styles from `@wordpress/base-styles` SCSS variables to `@wordpress/theme` CSS custom properties (design tokens) where possible. [#75204](https://github.com/WordPress/gutenberg/pull/75204)
+
 ## 14.2.0 (2026-04-29)
 
 ### Enhancements

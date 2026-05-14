@@ -106,6 +106,20 @@ $handle-touch-target-size: 44px;
 		}
 	}
 
+	&__dimensions-tooltip {
+		position: absolute;
+		padding: 2px 6px;
+		background: #fff;
+		color: #1e1e1e;
+		font-size: 11px;
+		line-height: 1.4;
+		font-variant-numeric: tabular-nums;
+		box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.08);
+		pointer-events: none;
+		white-space: nowrap;
+		z-index: 2;
+	}
+
 	&__stencil-rect {
 		position: absolute;
 		border: 1px solid rgba(255, 255, 255, 0.7);

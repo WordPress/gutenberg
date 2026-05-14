@@ -1,6 +1,10 @@
-import { SelectionDirection, SelectionType } from '@wordpress/core-data';
-import type { ResolvedSelection } from '@wordpress/core-data';
+import { privateApis as coreDataPrivateApis } from '@wordpress/core-data';
+import type {
+	CoreDataPrivateApis,
+	ResolvedSelection,
+} from '@wordpress/core-data';
 
+import { unlock } from '../../lock-unlock';
 import {
 	getCursorPosition,
 	getSelectionRects,
@@ -9,6 +13,10 @@ import {
 	isNodeBefore,
 } from './cursor-dom-utils';
 import type { CursorCoords, SelectionRect } from './cursor-dom-utils';
+
+const { SelectionDirection, SelectionType } = unlock(
+	coreDataPrivateApis
+) as Pick< CoreDataPrivateApis, 'SelectionDirection' | 'SelectionType' >;
 
 /** Common parameters passed to cursor/selection computation helpers. */
 interface OverlayContext {

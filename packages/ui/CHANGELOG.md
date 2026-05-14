@@ -10,6 +10,8 @@
 -   `Select`: `Select.Item` no longer renders its `value` as fallback item content. Pass item content explicitly as `children`. Migrate `<Select.Item value="Foo" />` to `<Select.Item value="Foo">Foo</Select.Item>` ([#77861](https://github.com/WordPress/gutenberg/pull/77861)).
 -   `Tooltip`: **`Popup` positioner API** ([#78089](https://github.com/WordPress/gutenberg/pull/78089)). Add a `Tooltip.Positioner` subcomponent and an optional `positioner` prop on `Tooltip.Popup` (when omitted, the default `Tooltip.Positioner` is used). Remove `side`, `align`, and `sideOffset` from `Tooltip.Popup`; pass `positioner={ <Tooltip.Positioner side="…" align="…" sideOffset={ … } /> }` instead. The new subcomponent exposes the full positioner surface (`alignOffset`, `anchor`, `collisionAvoidance`, `collisionBoundary`, `collisionPadding`, `sticky`, etc.) and mirrors the existing `portal` slot pattern.
 -   `CollapsibleCard.Header`: Now renders an outer `<div>` wrapper around the trigger. Forwarded props (`className`, `aria-*`, `data-*`) and `ref` land on this outer wrapper instead of the inner click-target div ([#77962](https://github.com/WordPress/gutenberg/pull/77962)).
+-   `Popover`: **`Popup` positioner API** ([#78168](https://github.com/WordPress/gutenberg/pull/78168)). Add a `Popover.Positioner` subcomponent and an optional `positioner` prop on `Popover.Popup` (when omitted, the default `Popover.Positioner` is used). Remove `side`, `align`, `sideOffset`, `alignOffset`, `anchor`, `arrowPadding`, `collisionAvoidance`, `collisionBoundary`, `collisionPadding`, and `sticky` from `Popover.Popup`; pass `positioner={ <Popover.Positioner side="…" align="…" anchor={ … } /> }` instead.
+-   `Tooltip`, `Popover`, `Select`, `Autocomplete`, `Dialog`, `Drawer`, `AlertDialog`: Narrow the TypeScript types of the `Portal` subcomponent props to the package's standard `ComponentProps` shape. `className` and `style` no longer accept the `(state) => …` callback variant, and `render` no longer accepts the two-arg `(props, state) => …` variant from Base UI. Runtime behavior is unchanged ([#78168](https://github.com/WordPress/gutenberg/pull/78168)).
 
 ### New Features
 
@@ -34,6 +36,8 @@
 -   `Drawer`: Allow mouse-drag swipe-dismiss in the popup-edge padding gutter ([#77800](https://github.com/WordPress/gutenberg/pull/77800)).
 -   `IconButton`: Add a `positioner` prop, accepting a `<Tooltip.Positioner />` element, to customize how the tooltip is positioned relative to the button ([#78089](https://github.com/WordPress/gutenberg/pull/78089)).
 -   `CollapsibleCard.Header`: Pass `render={ <h2 /> }` (or any of `<h1>`–`<h6>`) to wrap the trigger in a heading and contribute to the document outline, following the W3C APG accordion pattern (heading wraps button) ([#77962](https://github.com/WordPress/gutenberg/pull/77962)).
+-   `Select`: Add a `Select.Positioner` subcomponent and a `positioner` slot prop on `Select.Popup` to customize the popup placement, mirroring the existing `portal` slot pattern ([#78168](https://github.com/WordPress/gutenberg/pull/78168)).
+-   `Autocomplete`: Add an `Autocomplete.Positioner` subcomponent and a `positioner` slot prop on `Autocomplete.Popup` to customize the popup placement, mirroring the existing `portal` slot pattern ([#78168](https://github.com/WordPress/gutenberg/pull/78168)).
 
 ### Internal
 
