@@ -78,7 +78,7 @@ export function findColorMeetingRequirements(
 		}
 
 		return clampToGamut( {
-			spaceId: 'oklch',
+			space: OKLCH,
 			coords: [ newL, newC, get( seed, [ OKLCH, 'h' ] ) ],
 		} );
 	}
