@@ -19,12 +19,14 @@ const { RichTextControl } = unlock( blockEditorPrivateApis );
  */
 interface RichTextFieldConfig {
 	clientId?: string;
+	className?: string;
 	placeholder?: string;
 	allowedFormats?: string[];
 	disableFormats?: boolean;
 	withoutInteractiveFormatting?: boolean;
 	preserveWhiteSpace?: boolean;
 	disableLineBreaks?: boolean;
+	autocompleters?: unknown[];
 }
 
 interface RichTextEditProps< Item >
@@ -32,7 +34,7 @@ interface RichTextEditProps< Item >
 		DataFormControlProps< Item >,
 		'data' | 'field' | 'onChange' | 'hideLabelFromVision'
 	> {
-	config: RichTextFieldConfig;
+	config?: RichTextFieldConfig;
 }
 
 export default function RichTextEdit< Item >( {
@@ -52,6 +54,7 @@ export default function RichTextEdit< Item >( {
 			placeholder={ config?.placeholder }
 			id={ field.id }
 			clientId={ config?.clientId }
+			className={ config?.className }
 			hideLabelFromVision={ hideLabelFromVision }
 			allowedFormats={ config?.allowedFormats }
 			disableFormats={ config?.disableFormats }
@@ -60,6 +63,7 @@ export default function RichTextEdit< Item >( {
 			}
 			preserveWhiteSpace={ config?.preserveWhiteSpace }
 			disableLineBreaks={ config?.disableLineBreaks }
+			autocompleters={ config?.autocompleters }
 		/>
 	);
 }
