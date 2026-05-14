@@ -331,11 +331,6 @@
 			"count": 2
 		}
 	},
-	"packages/block-library/src/cover/edit/inspector-controls.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
 	"packages/block-library/src/embed/embed-placeholder.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 3
