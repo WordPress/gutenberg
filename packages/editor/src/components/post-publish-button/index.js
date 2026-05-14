@@ -130,6 +130,15 @@ export class PostPublishButton extends Component {
 						'data-distributed-editing-save-button-reason':
 							distributedEditingSaveButtonState.reason ||
 							undefined,
+						'data-distributed-editing-save-button-authority-state':
+							distributedEditingSaveButtonState.authorityState ||
+							undefined,
+						'data-distributed-editing-save-button-authoritative-post-updated':
+							String(
+								Boolean(
+									distributedEditingSaveButtonState.authoritativePostUpdated
+								)
+							),
 				  }
 				: {};
 

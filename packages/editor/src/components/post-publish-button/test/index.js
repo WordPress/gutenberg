@@ -200,6 +200,8 @@ describe( 'PostPublishButton', () => {
 					statusText:
 						'Accepted Distributed Editing proof is ready for guarded retry save.',
 					clickAction: 'continue_guarded_retry_save',
+					authorityState: 'ready_for_guarded_update',
+					authoritativePostUpdated: false,
 				} }
 			/>
 		);
@@ -226,6 +228,14 @@ describe( 'PostPublishButton', () => {
 		expect( button ).toHaveAttribute(
 			'data-distributed-editing-save-button-reason',
 			'fresh_review_accepted_but_unconsumed'
+		);
+		expect( button ).toHaveAttribute(
+			'data-distributed-editing-save-button-authority-state',
+			'ready_for_guarded_update'
+		);
+		expect( button ).toHaveAttribute(
+			'data-distributed-editing-save-button-authoritative-post-updated',
+			'false'
 		);
 	} );
 
@@ -273,6 +283,8 @@ describe( 'PostPublishButton', () => {
 					label: 'Retry save confirmed',
 					statusText: 'Distributed Editing retry save confirmed.',
 					disabled: true,
+					authorityState: 'authoritative_update_confirmed',
+					authoritativePostUpdated: true,
 				} }
 			/>
 		);
@@ -293,6 +305,14 @@ describe( 'PostPublishButton', () => {
 		);
 		expect( button ).not.toHaveAttribute(
 			'data-distributed-editing-save-button-reason'
+		);
+		expect( button ).toHaveAttribute(
+			'data-distributed-editing-save-button-authority-state',
+			'authoritative_update_confirmed'
+		);
+		expect( button ).toHaveAttribute(
+			'data-distributed-editing-save-button-authoritative-post-updated',
+			'true'
 		);
 	} );
 

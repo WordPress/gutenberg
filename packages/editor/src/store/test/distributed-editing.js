@@ -31,6 +31,7 @@ import {
 	DISTRIBUTED_EDITING_REVIEW_APPROVAL_PROOF_ENVELOPE_TYPE,
 	DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES,
 	DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_STATUSES,
+	DISTRIBUTED_EDITING_SAVE_AUTHORITY_STATES,
 	DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES,
 	DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS,
 	DISTRIBUTED_EDITING_SAVE_POLICY_STATUSES,
@@ -3989,6 +3990,8 @@ describe( 'distributed editing session state', () => {
 				DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.OPEN_PRE_PUBLISH_REVIEW,
 			blocksNormalSavePost: true,
 			opensPrePublishReview: true,
+			authorityState:
+				DISTRIBUTED_EDITING_SAVE_AUTHORITY_STATES.REVIEW_REQUIRED_BEFORE_UPDATE,
 			canExportLocalUpdates: true,
 			shouldCallNormalSavePost: false,
 			shouldCallRetrySaveEndpoint: false,
@@ -4004,6 +4007,9 @@ describe( 'distributed editing session state', () => {
 			blocksNormalSavePost: true,
 			hasAcceptedButUnconsumed: true,
 			hasAcceptedFreshReviewConsumeValidation: true,
+			authorityState:
+				DISTRIBUTED_EDITING_SAVE_AUTHORITY_STATES.READY_FOR_GUARDED_UPDATE,
+			authoritativePostUpdated: false,
 			shouldCallNormalSavePost: false,
 			shouldCallRetrySaveEndpoint: false,
 			claimsSaved: false,
@@ -4013,6 +4019,9 @@ describe( 'distributed editing session state', () => {
 			saveButtonStatus:
 				DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES.ACCEPTED_BUT_UNCONSUMED,
 			saveButtonSource: 'fresh_review',
+			saveButtonAuthorityState:
+				DISTRIBUTED_EDITING_SAVE_AUTHORITY_STATES.READY_FOR_GUARDED_UPDATE,
+			saveButtonAuthoritativePostUpdated: false,
 			blocksNormalSavePost: true,
 			shouldCallNormalSavePost: false,
 			shouldCallRetrySaveEndpoint: false,
@@ -4032,6 +4041,9 @@ describe( 'distributed editing session state', () => {
 			disabled: true,
 			busy: true,
 			blocksNormalSavePost: true,
+			authorityState:
+				DISTRIBUTED_EDITING_SAVE_AUTHORITY_STATES.AWAITING_SERVER_CONFIRMATION,
+			pendingServerConfirmation: true,
 			claimsSaved: false,
 		} );
 		expect( buttonStates.freshReviewValidating ).toMatchObject( {
@@ -4040,6 +4052,8 @@ describe( 'distributed editing session state', () => {
 			disabled: true,
 			busy: true,
 			blocksNormalSavePost: true,
+			authorityState:
+				DISTRIBUTED_EDITING_SAVE_AUTHORITY_STATES.REVIEW_VALIDATION_IN_PROGRESS,
 			claimsSaved: false,
 		} );
 		expect( buttonStates.retrySaveConfirmed ).toMatchObject( {
@@ -4048,6 +4062,9 @@ describe( 'distributed editing session state', () => {
 			disabled: true,
 			blocksNormalSavePost: true,
 			hasRetrySaveSavedStateEvidence: true,
+			authorityState:
+				DISTRIBUTED_EDITING_SAVE_AUTHORITY_STATES.AUTHORITATIVE_UPDATE_CONFIRMED,
+			authoritativePostUpdated: true,
 			claimsSaved: true,
 		} );
 		expect( buttonStates.refetchRequired ).toMatchObject( {
@@ -4058,6 +4075,8 @@ describe( 'distributed editing session state', () => {
 			requiresServerStateRefetch: true,
 			canRefetchServerState: true,
 			blocksNormalSavePost: true,
+			authorityState:
+				DISTRIBUTED_EDITING_SAVE_AUTHORITY_STATES.SERVER_REFRESH_REQUIRED_BEFORE_UPDATE,
 			claimsSaved: false,
 		} );
 		expect( JSON.stringify( buttonStates ) ).not.toContain(

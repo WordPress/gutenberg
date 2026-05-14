@@ -52,6 +52,7 @@ export default function PostSavedState( { forceIsDirty } ) {
 		postStatus,
 		postStatusHasChanged,
 		postType,
+		distributedEditingSaveButtonState,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -66,6 +67,7 @@ export default function PostSavedState( { forceIsDirty } ) {
 				isAutosavingPost,
 				getEditedPostAttribute,
 				getPostEdits,
+				getDistributedEditingSaveButtonState,
 			} = select( editorStore );
 			const { get } = select( preferencesStore );
 			return {
@@ -83,12 +85,17 @@ export default function PostSavedState( { forceIsDirty } ) {
 				postStatus: getEditedPostAttribute( 'status' ),
 				postStatusHasChanged: !! getPostEdits()?.status,
 				postType: select( editorStore ).getCurrentPostType(),
+				distributedEditingSaveButtonState:
+					getDistributedEditingSaveButtonState?.(),
 			};
 		},
 		[ forceIsDirty ]
 	);
 	const isPending = postStatus === 'pending';
-	const { savePost } = useDispatch( editorStore );
+	const {
+		__experimentalMaybeHandleDistributedEditingSaveButtonClick,
+		savePost,
+	} = useDispatch( editorStore );
 
 	const wasSaving = usePrevious( isSaving );
 
@@ -141,12 +148,54 @@ export default function PostSavedState( { forceIsDirty } ) {
 	/* translators: button label text should, if possible, be under 16 characters. */
 	const shortLabel = __( 'Save' );
 
+	const hasDistributedEditingSaveButtonState = Boolean(
+		distributedEditingSaveButtonState?.status &&
+			distributedEditingSaveButtonState.status !== 'update_ready'
+	);
+	const distributedEditingSaveButtonDisabled = Boolean(
+		hasDistributedEditingSaveButtonState &&
+			distributedEditingSaveButtonState.disabled
+	);
+	const distributedEditingSaveButtonBusy = Boolean(
+		hasDistributedEditingSaveButtonState &&
+			distributedEditingSaveButtonState.busy
+	);
+	const distributedEditingAuthoritativePostUpdated = Boolean(
+		hasDistributedEditingSaveButtonState &&
+			distributedEditingSaveButtonState.authoritativePostUpdated
+	);
+	const distributedEditingSaveButtonDataAttributes =
+		hasDistributedEditingSaveButtonState
+			? {
+					'data-distributed-editing-save-button-status':
+						distributedEditingSaveButtonState.status,
+					'data-distributed-editing-save-button-source':
+						distributedEditingSaveButtonState.source || undefined,
+					'data-distributed-editing-save-button-click-action':
+						distributedEditingSaveButtonState.clickAction ||
+						undefined,
+					'data-distributed-editing-save-button-reason':
+						distributedEditingSaveButtonState.reason || undefined,
+					'data-distributed-editing-save-button-authority-state':
+						distributedEditingSaveButtonState.authorityState ||
+						undefined,
+					'data-distributed-editing-save-button-authoritative-post-updated':
+						String( distributedEditingAuthoritativePostUpdated ),
+			  }
+			: {};
 	const isSaved = forceSavedMessage || ( ! isNew && ! isDirty );
-	const isSavedState = isSaving || isSaved;
-	const isDisabled = isSaving || isSaved || ! isSaveable || isSavingLocked;
+	const isSavedState = hasDistributedEditingSaveButtonState
+		? distributedEditingSaveButtonBusy ||
+		  distributedEditingAuthoritativePostUpdated
+		: isSaving || isSaved;
+	const isDisabled = hasDistributedEditingSaveButtonState
+		? distributedEditingSaveButtonDisabled || ! isSaveable || isSavingLocked
+		: isSaving || isSaved || ! isSaveable || isSavingLocked;
 	let text;
 
-	if ( isSaving ) {
+	if ( hasDistributedEditingSaveButtonState ) {
+		text = distributedEditingSaveButtonState.label;
+	} else if ( isSaving ) {
 		text = isAutosaving ? __( 'Autosaving' ) : __( 'Saving' );
 	} else if ( isSaved ) {
 		text = __( 'Saved' );
@@ -158,23 +207,41 @@ export default function PostSavedState( { forceIsDirty } ) {
 
 	// Use common Button instance for all saved states so that focus is not
 	// lost.
+	const onSaveClick = async () => {
+		const saveButtonClickRouting =
+			await __experimentalMaybeHandleDistributedEditingSaveButtonClick?.();
+
+		if (
+			saveButtonClickRouting &&
+			! saveButtonClickRouting.allowsNormalSaveFallback
+		) {
+			return saveButtonClickRouting;
+		}
+
+		return savePost();
+	};
+
 	return (
 		<Button
+			{ ...distributedEditingSaveButtonDataAttributes }
 			className={
-				isSaveable || isSaving
+				isSaveable || isSaving || hasDistributedEditingSaveButtonState
 					? clsx( {
 							'editor-post-save-draft': ! isSavedState,
 							'editor-post-saved-state': isSavedState,
-							'is-saving': isSaving,
+							'is-saving':
+								isSaving || distributedEditingSaveButtonBusy,
 							'is-autosaving': isAutosaving,
-							'is-saved': isSaved,
+							'is-saved':
+								isSaved ||
+								distributedEditingAuthoritativePostUpdated,
 							[ getAnimateClassName( {
 								type: 'loading',
-							} ) ]: isSaving,
+							} ) ]: isSaving || distributedEditingSaveButtonBusy,
 					  } )
 					: undefined
 			}
-			onClick={ isDisabled ? undefined : () => savePost() }
+			onClick={ isDisabled ? undefined : onSaveClick }
 			/*
 			 * We want the tooltip to show the keyboard shortcut only when the
 			 * button does something, i.e. when it's not disabled.
@@ -182,11 +249,25 @@ export default function PostSavedState( { forceIsDirty } ) {
 			shortcut={ isDisabled ? undefined : displayShortcut.primary( 's' ) }
 			variant="tertiary"
 			size="compact"
+			isBusy={ isSaving || distributedEditingSaveButtonBusy }
 			icon={ isLargeViewport ? undefined : cloudUpload }
 			label={ text || label }
 			aria-disabled={ isDisabled }
+			title={
+				hasDistributedEditingSaveButtonState
+					? distributedEditingSaveButtonState.statusText
+					: undefined
+			}
 		>
-			{ isSavedState && <Icon icon={ isSaved ? check : cloud } /> }
+			{ isSavedState && (
+				<Icon
+					icon={
+						isSaved || distributedEditingAuthoritativePostUpdated
+							? check
+							: cloud
+					}
+				/>
+			) }
 			{ text }
 		</Button>
 	);

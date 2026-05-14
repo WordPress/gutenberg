@@ -275,6 +275,22 @@ export const DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES = Object.freeze( {
 } );
 
 /**
+ * Stable authoritative-post states for DE-RTC Save semantics. These clarify
+ * what the Save button means without treating local editor state, autosaves,
+ * review proof, or pending server confirmation as the saved WordPress post.
+ */
+export const DISTRIBUTED_EDITING_SAVE_AUTHORITY_STATES = Object.freeze( {
+	READY_TO_UPDATE: 'ready_to_update_authoritative_post',
+	REVIEW_REQUIRED_BEFORE_UPDATE: 'review_required_before_update',
+	SERVER_REFRESH_REQUIRED_BEFORE_UPDATE:
+		'server_refresh_required_before_update',
+	READY_FOR_GUARDED_UPDATE: 'ready_for_guarded_update',
+	REVIEW_VALIDATION_IN_PROGRESS: 'review_validation_in_progress',
+	AWAITING_SERVER_CONFIRMATION: 'awaiting_server_confirmation',
+	AUTHORITATIVE_UPDATE_CONFIRMED: 'authoritative_update_confirmed',
+} );
+
+/**
  * Stable fresh-review pre-save statuses. These are pure placement hints for
  * future Save/pre-publish UI and do not perform the action they describe.
  */
@@ -5527,12 +5543,18 @@ export function getDistributedEditingSaveButtonStateForSessionState(
 	let label = 'Update';
 	let statusText = 'Ready to update';
 	let clickAction = DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.CONTINUE_SAVE;
+	let authorityState =
+		DISTRIBUTED_EDITING_SAVE_AUTHORITY_STATES.READY_TO_UPDATE;
+	let authorityStatusText =
+		'Save can update the authoritative WordPress post.';
 	let disabled = false;
 	let busy = false;
 	let opensPrePublishReview = false;
 	let requiresServerStateRefetch = false;
 	let canRefetchServerState = false;
 	let claimsSaved = false;
+	let authoritativePostUpdated = false;
+	let pendingServerConfirmation = false;
 
 	if ( hasRetrySaveSavedStateEvidence ) {
 		status = DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES.RETRY_SAVE_CONFIRMED;
@@ -5544,6 +5566,11 @@ export function getDistributedEditingSaveButtonStateForSessionState(
 		clickAction = null;
 		disabled = true;
 		claimsSaved = true;
+		authorityState =
+			DISTRIBUTED_EDITING_SAVE_AUTHORITY_STATES.AUTHORITATIVE_UPDATE_CONFIRMED;
+		authorityStatusText =
+			'The authoritative WordPress post has accepted the Distributed Editing retry save.';
+		authoritativePostUpdated = true;
 	} else if (
 		normalized.retrySaveStatus ===
 		DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVING
@@ -5559,6 +5586,11 @@ export function getDistributedEditingSaveButtonStateForSessionState(
 		clickAction = null;
 		disabled = true;
 		busy = true;
+		authorityState =
+			DISTRIBUTED_EDITING_SAVE_AUTHORITY_STATES.AWAITING_SERVER_CONFIRMATION;
+		authorityStatusText =
+			'The authoritative WordPress post has not confirmed these protected changes yet.';
+		pendingServerConfirmation = true;
 	} else if (
 		freshReviewPreSaveState.status ===
 		DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_STATUSES.VALIDATING
@@ -5574,6 +5606,10 @@ export function getDistributedEditingSaveButtonStateForSessionState(
 		clickAction = null;
 		disabled = true;
 		busy = true;
+		authorityState =
+			DISTRIBUTED_EDITING_SAVE_AUTHORITY_STATES.REVIEW_VALIDATION_IN_PROGRESS;
+		authorityStatusText =
+			'Review proof is being validated before the authoritative WordPress post can be updated.';
 	} else if (
 		reviewState.requiresServerStateRefetch ||
 		freshReviewPreSaveState.requiresServerStateRefetch ||
@@ -5600,6 +5636,10 @@ export function getDistributedEditingSaveButtonStateForSessionState(
 			DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.REFETCH_SERVER_STATE;
 		requiresServerStateRefetch = true;
 		canRefetchServerState = true;
+		authorityState =
+			DISTRIBUTED_EDITING_SAVE_AUTHORITY_STATES.SERVER_REFRESH_REQUIRED_BEFORE_UPDATE;
+		authorityStatusText =
+			'Server state must be refreshed before the authoritative WordPress post can be updated.';
 	} else if (
 		reviewState.hasPendingReviewItems ||
 		freshReviewPreSaveState.opensPrePublishReview ||
@@ -5626,6 +5666,10 @@ export function getDistributedEditingSaveButtonStateForSessionState(
 		clickAction =
 			DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.OPEN_PRE_PUBLISH_REVIEW;
 		opensPrePublishReview = true;
+		authorityState =
+			DISTRIBUTED_EDITING_SAVE_AUTHORITY_STATES.REVIEW_REQUIRED_BEFORE_UPDATE;
+		authorityStatusText =
+			'Review is required before the authoritative WordPress post can be updated.';
 	} else if ( hasAcceptedButUnconsumed ) {
 		status =
 			DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES.ACCEPTED_BUT_UNCONSUMED;
@@ -5647,6 +5691,10 @@ export function getDistributedEditingSaveButtonStateForSessionState(
 			'Accepted Distributed Editing proof is ready for guarded retry save.';
 		clickAction =
 			DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.CONTINUE_GUARDED_RETRY_SAVE;
+		authorityState =
+			DISTRIBUTED_EDITING_SAVE_AUTHORITY_STATES.READY_FOR_GUARDED_UPDATE;
+		authorityStatusText =
+			'Reviewed changes are ready for a guarded update of the authoritative WordPress post.';
 	}
 
 	const blocksNormalSavePost =
@@ -5670,6 +5718,10 @@ export function getDistributedEditingSaveButtonStateForSessionState(
 		label,
 		statusText,
 		clickAction,
+		authorityState,
+		authorityStatusText,
+		authoritativePostUpdated,
+		pendingServerConfirmation,
 		disabled,
 		busy,
 		blocksNormalSavePost,
@@ -5814,6 +5866,11 @@ export function getDistributedEditingSavePolicyStateForSessionState(
 		saveButtonReason: saveButton.reason,
 		saveButtonSource: saveButton.source,
 		saveButtonStatusText: saveButton.statusText,
+		saveButtonAuthorityState: saveButton.authorityState,
+		saveButtonAuthorityStatusText: saveButton.authorityStatusText,
+		saveButtonAuthoritativePostUpdated: saveButton.authoritativePostUpdated,
+		saveButtonPendingServerConfirmation:
+			saveButton.pendingServerConfirmation,
 		saveButtonDisabled: saveButton.disabled,
 		saveButtonBusy: saveButton.busy,
 		saveButtonActionKeys: saveButton.actionKeys,

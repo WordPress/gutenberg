@@ -448,6 +448,10 @@ Stable per-block KSES review statuses.
 
 Stable KSES risky-block review statuses. These are editor data states for future block annotation and pre-publish review UI; they do not save.
 
+### DISTRIBUTED_EDITING_SAVE_AUTHORITY_STATES
+
+Stable authoritative-post states for DE-RTC Save semantics. These clarify what the Save button means without treating local editor state, autosaves, review proof, or pending server confirmation as the saved WordPress post.
+
 ### DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES
 
 Stable Save button semantic states for DE-RTC sessions. These are copy and policy descriptors only; they do not call REST, save, dispatch notices, persist editor state, or change post locks.
