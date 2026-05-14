@@ -7,7 +7,10 @@ import readline from 'readline';
 import { spawnSync } from 'node:child_process';
 
 const REPO = 'WordPress/gutenberg';
-const LABEL = process.argv[ 2 ] || 'Backport to WP Beta/RC';
+const DRY_RUN = process.argv.includes( '--dry-run' );
+const LABEL =
+	process.argv.slice( 2 ).find( ( arg ) => ! arg.startsWith( '--' ) ) ||
+	'Backport to WP Beta/RC';
 const BACKPORT_COMPLETED_LABEL = 'Backported to WP Core';
 const BRANCH = getCurrentBranch();
 const GITHUB_CLI_AVAILABLE = spawnSync( 'gh', [ 'auth', 'status' ] )
@@ -32,7 +35,9 @@ async function main() {
 	if ( ! GITHUB_CLI_AVAILABLE ) {
 		await reportGhUnavailable();
 	}
-
+	console.log( `Label: "${ LABEL }"` );
+	console.log( `Dry run: ${ DRY_RUN }` );
+	console.log( '' );
 	console.log( `You are on branch "${ BRANCH }".` );
 	console.log( `This script will:` );
 	console.log(
@@ -56,13 +61,21 @@ async function main() {
 
 	const PRs = await fetchPRs();
 	console.log( 'Trying to cherry-pick one by one...' );
+	const headBeforeCherryPick = cli( 'git', [ 'rev-parse', 'HEAD' ] );
 	const [ successes, failures ] = cherryPickAll( PRs );
 	console.log( 'Cherry-picking finished!' );
+
+	if ( DRY_RUN ) {
+		console.log(
+			'Dry run: resetting branch to original HEAD, no commits will be kept.'
+		);
+		cli( 'git', [ 'reset', '--hard', headBeforeCherryPick ] );
+	}
 
 	reportSummaryNextSteps( successes, failures );
 
 	if ( successes.length ) {
-		if ( AUTO_PROPAGATE_RESULTS_TO_GITHUB ) {
+		if ( AUTO_PROPAGATE_RESULTS_TO_GITHUB && ! DRY_RUN ) {
 			console.log( `About to push to origin/${ BRANCH }` );
 			await promptDoYouWantToProceed();
 			cli( 'git', [ 'push', 'origin', BRANCH ] );
@@ -70,6 +83,11 @@ async function main() {
 			console.log( `Commenting and removing labels...` );
 			successes.forEach( GHcommentAndRemoveLabel );
 		} else {
+			if ( DRY_RUN ) {
+				console.log(
+					'Dry run: skipping push, comments, and label removal.'
+				);
+			}
 			console.log( 'Cherry-picked PRs with copy-able comments:' );
 			successes.forEach( reportSuccessManual );
 		}
@@ -346,7 +364,10 @@ function reportSummaryNextSteps( successes, failures ) {
 	console.log( '' );
 
 	const nextSteps = [];
-	if ( successes.length && ! AUTO_PROPAGATE_RESULTS_TO_GITHUB ) {
+	if (
+		successes.length &&
+		( ! AUTO_PROPAGATE_RESULTS_TO_GITHUB || DRY_RUN )
+	) {
 		nextSteps.push( 'Push this branch' );
 		nextSteps.push( 'Go to each of the cherry-picked Pull Requests' );
 		nextSteps.push( `Remove the ${ LABEL } label` );
