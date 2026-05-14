@@ -1021,6 +1021,18 @@ export function DistributedEditingFreshReviewDecisionPanel( {
 		return result;
 	}
 
+	function inspectJumpTarget( reviewItem ) {
+		const jumpAction = reviewItem?.jumpToBlockAction;
+		const nextCommandStatus =
+			jumpAction?.commandStatus ||
+			( jumpAction?.enabled
+				? 'jump-target-available'
+				: 'jump-target-unavailable' );
+
+		setCommandStatus( nextCommandStatus );
+		return jumpAction;
+	}
+
 	async function submitDecision() {
 		setCommandStatus( 'submitting' );
 
@@ -1130,6 +1142,33 @@ export function DistributedEditingFreshReviewDecisionPanel( {
 											{ message }
 										</span>
 									)
+								) }
+								{ item.jumpToBlockAction
+									?.reportsCommandStatus && (
+									<Button
+										__next40pxDefaultSize
+										accessibleWhenDisabled
+										aria-label={ sprintf(
+											/* translators: %s: review item label. */
+											__( 'Inspect jump target for %s' ),
+											label
+										) }
+										className="editor-distributed-editing-status__fresh-review-decision-item-affordance-command"
+										data-distributed-editing-fresh-review-item-affordance-command="jump-to-block"
+										disabled={
+											! item.jumpToBlockAction.enabled ||
+											[
+												'running',
+												'submitting',
+											].includes( commandStatus )
+										}
+										onClick={ () =>
+											inspectJumpTarget( item )
+										}
+										variant="tertiary"
+									>
+										{ __( 'Jump target' ) }
+									</Button>
 								) }
 								<Button
 									__next40pxDefaultSize
@@ -1686,6 +1725,18 @@ function getFreshReviewDecisionCommandMessage( commandStatus ) {
 		);
 	}
 
+	if ( commandStatus === 'jump-target-available' ) {
+		return __(
+			'Jump target checked. The editor found a block target for this review item; no block was selected, no focus moved, and no save was made.'
+		);
+	}
+
+	if ( commandStatus === 'jump-target-unavailable' ) {
+		return __(
+			'Jump target checked. This review item does not have a block target yet; no block was selected, no focus moved, and no save was made.'
+		);
+	}
+
 	return __(
 		'Fresh-review decisions can be recorded after every hash-only item is approved or rejected.'
 	);
@@ -1856,7 +1907,87 @@ export function DistributedEditingStatusChrome( { onAction } ) {
 				onAction={ onAction }
 				placement="editor-interface-notices"
 			/>
+			<DistributedEditingFreshReviewJumpInspectionStatus />
 		</>
+	);
+}
+
+function DistributedEditingFreshReviewJumpInspectionStatus() {
+	const [ commandStatus, setCommandStatus ] = useState( 'idle' );
+	const decisionState = useSelect( ( select ) => {
+		const {
+			getDistributedEditingFreshReviewDecisionState,
+			getDistributedEditingSessionState,
+		} = select( editorStore );
+		const sessionState = getDistributedEditingSessionState?.() || {};
+
+		return (
+			getDistributedEditingFreshReviewDecisionState?.() ||
+			getDistributedEditingFreshReviewDecisionStateForSessionState(
+				sessionState
+			)
+		);
+	}, [] );
+	const reviewItem = decisionState?.reviewItems?.find(
+		( item ) => item.jumpToBlockAction?.reportsCommandStatus
+	);
+
+	if ( ! reviewItem ) {
+		return null;
+	}
+
+	const label =
+		reviewItem.blockLabel ||
+		reviewItem.blockName ||
+		reviewItem.id ||
+		__( 'Review item' );
+
+	function inspectJumpTarget() {
+		const jumpAction = reviewItem.jumpToBlockAction;
+		const nextCommandStatus =
+			jumpAction?.commandStatus ||
+			( jumpAction?.enabled
+				? 'jump-target-available'
+				: 'jump-target-unavailable' );
+
+		setCommandStatus( nextCommandStatus );
+		return jumpAction;
+	}
+
+	return (
+		<div
+			aria-label={ __( 'Distributed editing fresh review jump status' ) }
+			className="editor-distributed-editing-status__fresh-review-jump-inspection"
+			data-distributed-editing-fresh-review-jump-inspection
+			data-distributed-editing-fresh-review-jump-inspection-placement="editor-interface-notices"
+			role="group"
+		>
+			<Button
+				__next40pxDefaultSize
+				accessibleWhenDisabled
+				aria-label={ sprintf(
+					/* translators: %s: review item label. */
+					__( 'Inspect jump target for %s' ),
+					label
+				) }
+				data-distributed-editing-fresh-review-item-affordance-command="jump-to-block"
+				disabled={ ! reviewItem.jumpToBlockAction?.enabled }
+				onClick={ inspectJumpTarget }
+				variant="tertiary"
+			>
+				{ __( 'Jump target' ) }
+			</Button>
+			<div
+				aria-live="polite"
+				className="editor-distributed-editing-status__fresh-review-jump-inspection-command"
+				data-distributed-editing-fresh-review-jump-inspection-status={
+					commandStatus
+				}
+				role="status"
+			>
+				{ getFreshReviewDecisionCommandMessage( commandStatus ) }
+			</div>
+		</div>
 	);
 }
 

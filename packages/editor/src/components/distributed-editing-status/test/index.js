@@ -1127,6 +1127,78 @@ describe( 'DistributedEditingStatus', () => {
 		).not.toBeInTheDocument();
 	} );
 
+	it( 'reports fresh-review jump inspection status from production chrome without saving', async () => {
+		const user = userEvent.setup();
+		const actions = setupDistributedEditingStatusDispatch();
+
+		setupDistributedEditingStatusSelect( {
+			sessionState: {
+				pendingChangeCount: 1,
+				hasPendingChanges: true,
+				canExportLocalUpdates: true,
+				localUpdatesImportStatus:
+					DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_STATUSES.BLOCKED,
+				localUpdatesImportReason:
+					DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.FRESH_REVIEW_REQUIRED,
+				localUpdatesImportReviewRequestStatus:
+					DISTRIBUTED_EDITING_LOCAL_UPDATES_REVIEW_REQUEST_STATUSES.REQUESTED,
+				localUpdatesImportFreshReviewRequestAccepted: true,
+				localUpdatesImportFreshReviewRequestRequested: true,
+				localUpdatesImportFreshReviewDecisionStatus:
+					DISTRIBUTED_EDITING_FRESH_REVIEW_DECISION_STATUSES.AWAITING_REVIEW,
+				localUpdatesImportFreshReviewDecisionPanelRequired: true,
+				localUpdatesImportFreshReviewDecisionItems: [
+					{
+						id: 'fresh-review-chrome-jump',
+						blockClientId: 'fresh-review-chrome-jump-client',
+						blockLabel: 'Chrome jump HTML change',
+						baseContentHash:
+							'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+						proposedContentHash:
+							'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb',
+						rawBlockContent:
+							'<script>fresh-review-chrome-jump-raw</script>',
+					},
+				],
+			},
+		} );
+
+		render( <DistributedEditingStatusChrome /> );
+
+		expect(
+			screen.getByRole( 'group', {
+				name: 'Distributed editing fresh review jump status',
+			} )
+		).toBeVisible();
+
+		await user.click(
+			screen.getByRole( 'button', {
+				name: 'Inspect jump target for Chrome jump HTML change',
+			} )
+		);
+
+		expect(
+			screen.getByText(
+				'Jump target checked. The editor found a block target for this review item; no block was selected, no focus moved, and no save was made.'
+			)
+		).toBeVisible();
+		expect(
+			actions.__experimentalResolveDistributedEditingFreshReviewDecisionItem
+		).not.toHaveBeenCalled();
+		expect(
+			actions.__experimentalSubmitDistributedEditingFreshReviewDecision
+		).not.toHaveBeenCalled();
+		expect(
+			actions.__experimentalSaveDistributedEditingRetryAfterProof
+		).not.toHaveBeenCalled();
+		expect(
+			actions.__experimentalRequestDistributedEditingFreshReviewForImportedLocalUpdates
+		).not.toHaveBeenCalled();
+		expect(
+			screen.queryByText( /fresh-review-chrome-jump-raw|script/i )
+		).not.toBeInTheDocument();
+	} );
+
 	it( 'updates the enabled editor shell for protected degraded state', () => {
 		setupDistributedEditingStatusSelect( {
 			editorSettings: {
@@ -3713,6 +3785,21 @@ describe( 'DistributedEditingStatusSurface', () => {
 		expect(
 			screen.getAllByText( 'Compare evidence available.' )
 		).toHaveLength( 2 );
+
+		await user.click(
+			screen.getByRole( 'button', {
+				name: 'Inspect jump target for Approve HTML change',
+			} )
+		);
+
+		expect(
+			actions.__experimentalResolveDistributedEditingFreshReviewDecisionItem
+		).not.toHaveBeenCalled();
+		expect(
+			screen.getByText(
+				'Jump target checked. The editor found a block target for this review item; no block was selected, no focus moved, and no save was made.'
+			)
+		).toBeVisible();
 
 		await user.click(
 			screen.getByRole( 'button', {

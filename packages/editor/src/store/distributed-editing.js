@@ -2068,6 +2068,17 @@ function createDistributedEditingFreshReviewItemAffordanceDescriptor(
 	item,
 	{ enabled = true, reason = null } = {}
 ) {
+	const reportsCommandStatus =
+		actionKey ===
+		DISTRIBUTED_EDITING_NOTICE_ACTIONS.JUMP_TO_FRESH_REVIEW_ITEM;
+	let commandStatus = null;
+
+	if ( reportsCommandStatus ) {
+		commandStatus = enabled
+			? 'jump-target-available'
+			: 'jump-target-unavailable';
+	}
+
 	return {
 		actionKey,
 		enabled: Boolean( enabled ),
@@ -2089,6 +2100,11 @@ function createDistributedEditingFreshReviewItemAffordanceDescriptor(
 		placement:
 			DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_PLACEMENTS.PRE_PUBLISH_REVIEW,
 		descriptorOnly: true,
+		reportsCommandStatus,
+		commandStatus,
+		commandStatusPlacement: reportsCommandStatus
+			? 'fresh_review_decision_panel'
+			: null,
 		callsRestEndpoint: false,
 		callsSave: false,
 		callsNormalSavePost: false,
