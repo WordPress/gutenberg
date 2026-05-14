@@ -9,11 +9,13 @@ import apiFetch from '@wordpress/api-fetch';
 import {
 	__experimentalRequestDistributedEditingRecoveryDryRun,
 	__experimentalRequestDistributedEditingFreshReviewDecision,
+	__experimentalRequestDistributedEditingFreshReviewRetrySaveHandoffValidation,
 	__experimentalRequestDistributedEditingRetrySave,
 	__experimentalRequestDistributedEditingRetrySaveReviewApprovalProof,
 	__experimentalRequestDistributedEditingRetrySubmitProbe,
 	__experimentalRequestDistributedEditingServerStateRefetch,
 	__experimentalRequestDistributedEditingStaleBaseRejection,
+	getDistributedEditingFreshReviewConsumeEndpointPath,
 	getDistributedEditingFreshReviewDecisionEndpointPath,
 	getDistributedEditingRecoveryEndpointPath,
 	getDistributedEditingRetrySaveEndpointPath,
@@ -83,6 +85,15 @@ describe( 'distributed editing REST helpers', () => {
 				restBase: 'pages',
 			} )
 		).toBe( '/wp/v2/pages/42/distributed-editing/fresh-review-decision' );
+	} );
+
+	it( 'builds the current fresh-review consume endpoint path', () => {
+		expect(
+			getDistributedEditingFreshReviewConsumeEndpointPath( {
+				postId: 42,
+				restBase: 'pages',
+			} )
+		).toBe( '/wp/v2/pages/42/distributed-editing/fresh-review-consume' );
 	} );
 
 	it( 'builds the current server-state endpoint path', () => {
@@ -685,8 +696,7 @@ describe( 'distributed editing REST helpers', () => {
 						proposed_content_hash: reviewedBlockHash,
 						reviewed_proposed_content_hash: reviewedBlockHash,
 						review_status: 'approved_for_retry_save',
-						review_evidence_type:
-							'kses_block_hash_only_change',
+						review_evidence_type: 'kses_block_hash_only_change',
 						raw_content_included: false,
 						exposes_raw_content: false,
 					},
@@ -736,6 +746,57 @@ describe( 'distributed editing REST helpers', () => {
 		).resolves.toEqual( {
 			result: 'fresh_review_decision_approved_for_retry_save',
 			fresh_review_decision_accepted: true,
+		} );
+	} );
+
+	it( 'validates fresh-review retry-save handoff with hash-only evidence', async () => {
+		const proposedHash =
+			'0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef';
+		const candidateHash =
+			'abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789';
+
+		apiFetch.setFetchHandler( async ( options ) => {
+			expect( options.path ).toMatch(
+				/^\/wp\/v2\/pages\/42\/distributed-editing\/fresh-review-consume/
+			);
+			expect( options.method ).toBe( 'POST' );
+			expect( options.data ).toEqual( {
+				fresh_review_request_record_id: 'fresh-review-request-123',
+				client_base_version: '7',
+				server_version: '12',
+				proposed_post_content_hash: proposedHash,
+				reviewed_proposed_content_hash: proposedHash,
+				candidate_post_content_hash: candidateHash,
+				reviewed_candidate_content_hash: candidateHash,
+			} );
+			expect( options.data.proposed_post_content ).toBeUndefined();
+			expect( options.data.raw_content ).toBeUndefined();
+			expect( options.data.reviewed_block_items ).toBeUndefined();
+			expect( options.data.review_approval_proof ).toBeUndefined();
+
+			return {
+				result: 'fresh_review_decision_eligible_for_retry_save_handoff',
+				fresh_review_decision_consumption_validated: true,
+				fresh_review_decision_eligible_for_retry_save: true,
+			};
+		} );
+
+		await expect(
+			__experimentalRequestDistributedEditingFreshReviewRetrySaveHandoffValidation(
+				{
+					postId: 42,
+					restBase: 'pages',
+					freshReviewRequestRecordId: 'fresh-review-request-123',
+					clientBaseVersion: '7',
+					serverVersion: '12',
+					proposedPostContentHash: proposedHash,
+					candidatePostContentHash: candidateHash,
+				}
+			)
+		).resolves.toEqual( {
+			result: 'fresh_review_decision_eligible_for_retry_save_handoff',
+			fresh_review_decision_consumption_validated: true,
+			fresh_review_decision_eligible_for_retry_save: true,
 		} );
 	} );
 

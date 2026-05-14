@@ -1489,6 +1489,7 @@ export function getDistributedEditingSessionStateForFreshReviewRetrySaveHandoffV
 		[
 			'fresh_review_decision_handoff_validated_for_retry_save',
 			'fresh_review_decision_consumption_accepted_for_retry_save',
+			'fresh_review_decision_eligible_for_retry_save_handoff',
 		].includes( result );
 
 	if ( accepted ) {

@@ -162,6 +162,28 @@ export function getDistributedEditingFreshReviewDecisionEndpointPath( {
 }
 
 /**
+ * Returns the current DE-RTC fresh-review decision consumption endpoint path
+ * for a post.
+ *
+ * @param {Object} args                    Endpoint args.
+ * @param {number} args.postId             Post ID.
+ * @param {string} [args.restBase='posts'] REST base for the edited post type.
+ *
+ * @return {string} REST path.
+ */
+export function getDistributedEditingFreshReviewConsumeEndpointPath( {
+	postId,
+	restBase = DISTRIBUTED_EDITING_RECOVERY_REST_BASE,
+} = {} ) {
+	return getDistributedEditingEndpointPath( {
+		postId,
+		restBase,
+		operation: 'fresh-review-consume',
+		errorSubject: 'fresh-review consume',
+	} );
+}
+
+/**
  * Returns the current edited post endpoint path for DE-RTC server-state reads.
  *
  * @param {Object} args                    Endpoint args.
@@ -904,16 +926,16 @@ export function __experimentalRequestDistributedEditingRetrySaveReviewApprovalPr
  * block items, reviewer/saver ids, save, retry-save, dispatch notices, persist
  * editor state, or change post locks.
  *
- * @param {Object} args                                          Request args.
- * @param {number} args.postId                                   Post ID.
- * @param {string} [args.restBase='posts']                       REST base for the edited post type.
- * @param {string} [args.clientBaseVersion]                      Client sync version from the blocked handoff.
- * @param {string} [args.serverVersion]                          Server sync version from the blocked handoff.
- * @param {number} [args.pendingChangeCount=1]                   Pending local change groups.
- * @param {string} [args.proposedPostContentHash]                SHA-256 hash of protected proposed post content.
- * @param {string} [args.localUpdatesImportStatus]               Current import status.
- * @param {string} [args.localUpdatesImportReason]               Current import blocker reason.
- * @param {string} [args.freshReviewRequestStatus]               Current fresh-review request status.
+ * @param {Object} args                                                   Request args.
+ * @param {number} args.postId                                            Post ID.
+ * @param {string} [args.restBase='posts']                                REST base for the edited post type.
+ * @param {string} [args.clientBaseVersion]                               Client sync version from the blocked handoff.
+ * @param {string} [args.serverVersion]                                   Server sync version from the blocked handoff.
+ * @param {number} [args.pendingChangeCount=1]                            Pending local change groups.
+ * @param {string} [args.proposedPostContentHash]                         SHA-256 hash of protected proposed post content.
+ * @param {string} [args.localUpdatesImportStatus]                        Current import status.
+ * @param {string} [args.localUpdatesImportReason]                        Current import blocker reason.
+ * @param {string} [args.freshReviewRequestStatus]                        Current fresh-review request status.
  * @param {string} [args.freshReviewRequestAction='request_admin_review'] Fresh-review action requested.
  *
  * @return {Promise<Object>} REST response or error.
@@ -975,18 +997,18 @@ export function __experimentalRequestDistributedEditingFreshReviewForImportedLoc
  * This low-level helper does not save, retry-save, submit raw content,
  * dispatch notices, persist editor state, or change post locks.
  *
- * @param {Object} args                                      Request args.
- * @param {number} args.postId                               Post ID.
- * @param {string} [args.restBase='posts']                   REST base for the edited post type.
- * @param {string} args.freshReviewRequestRecordId           Opaque fresh-review request record ID.
- * @param {string} args.clientBaseVersion                    Client base version from the request.
- * @param {string} args.serverVersion                        Current server sync version.
- * @param {string} [args.freshReviewDecision='approved']     Reviewer decision.
- * @param {string} args.proposedPostContentHash              Hash of proposed post content.
- * @param {string} [args.reviewedProposedContentHash]        Reviewer-confirmed proposed content hash.
- * @param {string} [args.candidatePostContentHash]           Optional candidate hash.
- * @param {string} [args.reviewedCandidateContentHash]       Optional reviewer-confirmed candidate hash.
- * @param {Array}  [args.reviewedBlockItems]                 Hash-only reviewed block items.
+ * @param {Object} args                                  Request args.
+ * @param {number} args.postId                           Post ID.
+ * @param {string} [args.restBase='posts']               REST base for the edited post type.
+ * @param {string} args.freshReviewRequestRecordId       Opaque fresh-review request record ID.
+ * @param {string} args.clientBaseVersion                Client base version from the request.
+ * @param {string} args.serverVersion                    Current server sync version.
+ * @param {string} [args.freshReviewDecision='approved'] Reviewer decision.
+ * @param {string} args.proposedPostContentHash          Hash of proposed post content.
+ * @param {string} [args.reviewedProposedContentHash]    Reviewer-confirmed proposed content hash.
+ * @param {string} [args.candidatePostContentHash]       Optional candidate hash.
+ * @param {string} [args.reviewedCandidateContentHash]   Optional reviewer-confirmed candidate hash.
+ * @param {Array}  [args.reviewedBlockItems]             Hash-only reviewed block items.
  *
  * @return {Promise<Object>} REST response or error.
  */
@@ -1035,6 +1057,73 @@ export function __experimentalRequestDistributedEditingFreshReviewDecision( {
 
 	return apiFetch( {
 		path: getDistributedEditingFreshReviewDecisionEndpointPath( {
+			postId,
+			restBase,
+		} ),
+		method: 'POST',
+		data,
+	} );
+}
+
+/**
+ * Validates a recorded fresh-review decision for a future retry-save handoff.
+ *
+ * This low-level helper sends only hash and version evidence. It does not send
+ * raw post content, save, retry-save, dispatch notices, persist editor state,
+ * resolve proof tokens, or change post locks.
+ *
+ * @param {Object} args                                Request args.
+ * @param {number} args.postId                         Post ID.
+ * @param {string} [args.restBase='posts']             REST base for the edited post type.
+ * @param {string} args.freshReviewRequestRecordId     Opaque fresh-review request record ID.
+ * @param {string} args.clientBaseVersion              Client base version from the recorded decision.
+ * @param {string} args.serverVersion                  Current server sync version.
+ * @param {string} args.proposedPostContentHash        Hash of proposed post content.
+ * @param {string} [args.reviewedProposedContentHash]  Reviewer-confirmed proposed content hash.
+ * @param {string} [args.candidatePostContentHash]     Optional candidate hash.
+ * @param {string} [args.reviewedCandidateContentHash] Optional reviewer-confirmed candidate hash.
+ *
+ * @return {Promise<Object>} REST response or error.
+ */
+export function __experimentalRequestDistributedEditingFreshReviewRetrySaveHandoffValidation( {
+	postId,
+	restBase = DISTRIBUTED_EDITING_RECOVERY_REST_BASE,
+	freshReviewRequestRecordId,
+	clientBaseVersion,
+	serverVersion,
+	proposedPostContentHash,
+	reviewedProposedContentHash,
+	candidatePostContentHash,
+	reviewedCandidateContentHash,
+} = {} ) {
+	const data = {};
+
+	if ( freshReviewRequestRecordId ) {
+		data.fresh_review_request_record_id = freshReviewRequestRecordId;
+	}
+
+	if ( clientBaseVersion ) {
+		data.client_base_version = clientBaseVersion;
+	}
+
+	if ( serverVersion ) {
+		data.server_version = serverVersion;
+	}
+
+	if ( proposedPostContentHash ) {
+		data.proposed_post_content_hash = proposedPostContentHash;
+		data.reviewed_proposed_content_hash =
+			reviewedProposedContentHash || proposedPostContentHash;
+	}
+
+	if ( candidatePostContentHash ) {
+		data.candidate_post_content_hash = candidatePostContentHash;
+		data.reviewed_candidate_content_hash =
+			reviewedCandidateContentHash || candidatePostContentHash;
+	}
+
+	return apiFetch( {
+		path: getDistributedEditingFreshReviewConsumeEndpointPath( {
 			postId,
 			restBase,
 		} ),
