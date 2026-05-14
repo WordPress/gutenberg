@@ -140,6 +140,44 @@ const DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_DEFINITIONS = Object.freeze( {
 		Object.freeze( { source: 'server' } ),
 } );
 
+const DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_SUPPORT_LABELS = Object.freeze( {
+	[ DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.LOCAL_EDITOR_ACTION ]:
+		'Local editor action recorded',
+	[ DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.REMOTE_CHANGE_RECEIVED ]:
+		'Remote editing activity recorded',
+	[ DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.SERVER_STATE_REFETCHED ]:
+		'Server state refetched',
+	[ DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.RETRY_SUBMIT_PROOF_REFRESHED ]:
+		'Retry proof refreshed',
+	[ DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.SAVE_STATE_CHANGED ]:
+		'Save-state changed',
+	[ DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.REVIEW_REQUIRED ]:
+		'Review required',
+	[ DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.FRESH_REVIEW_REQUESTED ]:
+		'Fresh review requested',
+	[ DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.FRESH_REVIEW_DECISION_SUBMITTED ]:
+		'Fresh-review decision submitted',
+	[ DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.FRESH_REVIEW_CONSUME_VALIDATED ]:
+		'Fresh-review handoff validated',
+	[ DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.FRESH_REVIEW_RETRY_SAVE_CONFIRMED ]:
+		'Fresh-review guarded save confirmed',
+} );
+
+const DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_SUPPORT_CHRONOLOGY_TEXT =
+	Object.freeze( {
+		none: 'No Distributed Editing activity transcript entries are available.',
+		activity_recorded:
+			'Distributed Editing activity was recorded; no fresh-review chronology is complete.',
+		fresh_review_requested:
+			'Fresh review was requested for protected local updates.',
+		fresh_review_decision_submitted:
+			'Fresh-review decision was submitted; guarded save still needs validation and server authority.',
+		fresh_review_handoff_validated:
+			'Fresh-review handoff was validated; retry-save still requires server confirmation.',
+		fresh_review_guarded_save_confirmed:
+			'Fresh-review guarded save confirmation was recorded; use save-authority evidence to confirm persistence.',
+	} );
+
 const MAX_DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_ITEMS = 10;
 
 const DISTRIBUTED_EDITING_SYNC_META_SCRIPT_SOURCE = `<script\\b(?=[^>]*\\btype\\s*=\\s*(['"])wp/post-sync-meta\\1)[^>]*>([\\s\\S]*?)<\\/script\\s*>`;
@@ -1726,6 +1764,134 @@ export function getDistributedEditingActionTranscriptSupportSummaryForSessionSta
 	};
 }
 
+function getDistributedEditingActionTranscriptSupportLabel( eventType ) {
+	return (
+		DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_SUPPORT_LABELS[ eventType ] ||
+		'Distributed Editing activity recorded'
+	);
+}
+
+function getDistributedEditingActionTranscriptSupportChronologyStatus(
+	summary
+) {
+	if ( ! summary.available ) {
+		return 'none';
+	}
+
+	if ( summary.hasFreshReviewRetrySaveConfirmation ) {
+		return 'fresh_review_guarded_save_confirmed';
+	}
+
+	if ( summary.hasFreshReviewConsumeValidation ) {
+		return 'fresh_review_handoff_validated';
+	}
+
+	if ( summary.hasFreshReviewDecision ) {
+		return 'fresh_review_decision_submitted';
+	}
+
+	if ( summary.hasFreshReviewRequest ) {
+		return 'fresh_review_requested';
+	}
+
+	return 'activity_recorded';
+}
+
+function getDistributedEditingActionTranscriptSupportEventCountText( summary ) {
+	const eventText =
+		summary.itemCount === 1
+			? '1 redacted transcript event'
+			: `${ summary.itemCount } redacted transcript events`;
+
+	if ( summary.droppedItemCount < 1 ) {
+		return `Recorded ${ eventText }.`;
+	}
+
+	const droppedText =
+		summary.droppedItemCount === 1
+			? '1 unsafe entry was dropped'
+			: `${ summary.droppedItemCount } unsafe entries were dropped`;
+
+	return `Recorded ${ eventText }; ${ droppedText }.`;
+}
+
+/**
+ * Returns a support-facing report for the current DE-RTC action transcript.
+ * The report adds readable labels and chronology text to the redacted summary,
+ * but remains content-free diagnostic communication rather than save authority.
+ *
+ * @param {Object} sessionState DE-RTC session state.
+ *
+ * @return {Object} Content-free action transcript support report.
+ */
+export function getDistributedEditingActionTranscriptSupportReportForSessionState(
+	sessionState = {}
+) {
+	const summary =
+		getDistributedEditingActionTranscriptSupportSummaryForSessionState(
+			sessionState
+		);
+	const chronologyStatus =
+		getDistributedEditingActionTranscriptSupportChronologyStatus( summary );
+
+	return {
+		status: summary.status,
+		available: summary.available,
+		headline: summary.available
+			? 'Distributed Editing activity transcript report'
+			: 'No Distributed Editing activity transcript report',
+		summaryText: summary.available
+			? getDistributedEditingActionTranscriptSupportEventCountText(
+					summary
+			  )
+			: 'No redacted transcript events are available for support.',
+		chronologyStatus,
+		chronologyText:
+			DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_SUPPORT_CHRONOLOGY_TEXT[
+				chronologyStatus
+			],
+		latestEventLabel: summary.latestEventType
+			? getDistributedEditingActionTranscriptSupportLabel(
+					summary.latestEventType
+			  )
+			: null,
+		timelineItemCount: summary.itemCount,
+		droppedItemCount: summary.droppedItemCount,
+		timelineItems: summary.items.map( ( item ) => ( {
+			eventType: item.eventType,
+			source: item.source,
+			sequence: item.sequence,
+			reasonCode: item.reasonCode,
+			label: getDistributedEditingActionTranscriptSupportLabel(
+				item.eventType
+			),
+			redacted: true,
+		} ) ),
+		canShareWithSupport:
+			summary.entriesRedacted &&
+			! summary.exposesRawContent &&
+			! summary.exposesProofInternals &&
+			! summary.exposesActorIds,
+		requiresSaveAuthorityForPersistence: true,
+		entriesRedacted: summary.entriesRedacted,
+		exposesRawContent: summary.exposesRawContent,
+		exposesProofInternals: summary.exposesProofInternals,
+		exposesTokenMaterial: false,
+		exposesActorIds: summary.exposesActorIds,
+		dispatchesNotice: false,
+		callsRest: summary.callsRest,
+		callsSave: summary.callsSave,
+		callsRetrySaveEndpoint: false,
+		callsNormalSavePost: false,
+		savesPost: false,
+		mutatesEditorContent: summary.mutatesEditorContent,
+		mutatesPersistedPostContent: false,
+		createsRevision: false,
+		changesPostLock: summary.changesPostLock,
+		claimsSaved: summary.claimsSaved,
+	};
+}
+
 /**
  * Returns a pure recovery descriptor for failed opaque reviewed-proof token
  * handoffs. The descriptor is product communication state only; it does not
@@ -2786,6 +2952,10 @@ export function getDistributedEditingLocalUpdatesExportPayload( {
 		getDistributedEditingActionTranscriptSupportSummaryForSessionState(
 			normalizedSessionState
 		);
+	const actionTranscriptReport =
+		getDistributedEditingActionTranscriptSupportReportForSessionState(
+			normalizedSessionState
+		);
 
 	return {
 		version: 1,
@@ -2799,6 +2969,7 @@ export function getDistributedEditingLocalUpdatesExportPayload( {
 		pendingChangeCount: normalizedSessionState.pendingChangeCount,
 		saveAuthority,
 		actionTranscriptSummary,
+		actionTranscriptReport,
 		...( ( acceptedReviewApprovalProofEnvelope || reviewTokenRecovery ) &&
 		proofServerVersion
 			? { serverVersion: proofServerVersion }

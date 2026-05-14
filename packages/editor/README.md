@@ -686,6 +686,18 @@ _Returns_
 
 -   `Object`: Content-free action transcript state.
 
+### getDistributedEditingActionTranscriptSupportReportForSessionState
+
+Returns a support-facing report for the current DE-RTC action transcript. The report adds readable labels and chronology text to the redacted summary, but remains content-free diagnostic communication rather than save authority.
+
+_Parameters_
+
+-   _sessionState_ `Object`: DE-RTC session state.
+
+_Returns_
+
+-   `Object`: Content-free action transcript support report.
+
 ### getDistributedEditingActionTranscriptSupportSummaryForSessionState
 
 Returns a support-export summary for the current DE-RTC action transcript. The summary deliberately keeps chronology to stable event names, sources, counts, and redaction flags so it can travel with support diagnostics without exposing raw post content, proof internals, or actor identities.

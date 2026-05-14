@@ -51,6 +51,7 @@ import {
 	DISTRIBUTED_EDITING_UNLOAD_WARNING_REASONS,
 	DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE,
 	getDistributedEditingActionTranscriptStateForSessionState,
+	getDistributedEditingActionTranscriptSupportReportForSessionState,
 	getDistributedEditingActionTranscriptSupportSummaryForSessionState,
 	getDistributedEditingLocalUpdatesExportPayload,
 	getDistributedEditingFreshReviewDecisionStateForSessionState,
@@ -364,6 +365,102 @@ describe( 'distributed editing session state', () => {
 		} );
 		expect( JSON.stringify( summary ) ).not.toMatch(
 			/Do not expose support content|hidden-proof|reviewerId|"7"/
+		);
+	} );
+
+	it( 'formats action transcript support reports without exposing unsafe payloads or save authority', () => {
+		const report =
+			getDistributedEditingActionTranscriptSupportReportForSessionState( {
+				actionTranscriptItems: [
+					{
+						eventType:
+							DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.FRESH_REVIEW_REQUESTED,
+					},
+					{
+						eventType:
+							DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.FRESH_REVIEW_DECISION_SUBMITTED,
+					},
+					{
+						eventType:
+							DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.FRESH_REVIEW_CONSUME_VALIDATED,
+					},
+					{
+						eventType:
+							DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.FRESH_REVIEW_RETRY_SAVE_CONFIRMED,
+					},
+					{
+						eventType:
+							DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.FRESH_REVIEW_RETRY_SAVE_CONFIRMED,
+						proofSignature: 'turn0145-hidden-proof',
+					},
+					{
+						eventType:
+							DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.LOCAL_EDITOR_ACTION,
+						rawContent:
+							'<!-- wp:paragraph --><p>Do not expose support report content</p><!-- /wp:paragraph -->',
+					},
+				],
+			} );
+
+		expect( report ).toMatchObject( {
+			status: 'available',
+			available: true,
+			headline: 'Distributed Editing activity transcript report',
+			summaryText:
+				'Recorded 4 redacted transcript events; 2 unsafe entries were dropped.',
+			chronologyStatus: 'fresh_review_guarded_save_confirmed',
+			chronologyText:
+				'Fresh-review guarded save confirmation was recorded; use save-authority evidence to confirm persistence.',
+			latestEventLabel: 'Fresh-review guarded save confirmed',
+			timelineItemCount: 4,
+			droppedItemCount: 2,
+			canShareWithSupport: true,
+			requiresSaveAuthorityForPersistence: true,
+			entriesRedacted: true,
+			exposesRawContent: false,
+			exposesProofInternals: false,
+			exposesTokenMaterial: false,
+			exposesActorIds: false,
+			dispatchesNotice: false,
+			callsRest: false,
+			callsSave: false,
+			callsRetrySaveEndpoint: false,
+			callsNormalSavePost: false,
+			savesPost: false,
+			mutatesEditorContent: false,
+			mutatesPersistedPostContent: false,
+			createsRevision: false,
+			changesPostLock: false,
+			claimsSaved: false,
+		} );
+		expect( report.timelineItems ).toEqual( [
+			expect.objectContaining( {
+				eventType:
+					DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.FRESH_REVIEW_REQUESTED,
+				label: 'Fresh review requested',
+				redacted: true,
+			} ),
+			expect.objectContaining( {
+				eventType:
+					DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.FRESH_REVIEW_DECISION_SUBMITTED,
+				label: 'Fresh-review decision submitted',
+				redacted: true,
+			} ),
+			expect.objectContaining( {
+				eventType:
+					DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.FRESH_REVIEW_CONSUME_VALIDATED,
+				label: 'Fresh-review handoff validated',
+				redacted: true,
+			} ),
+			expect.objectContaining( {
+				eventType:
+					DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.FRESH_REVIEW_RETRY_SAVE_CONFIRMED,
+				label: 'Fresh-review guarded save confirmed',
+				redacted: true,
+			} ),
+		] );
+		expect( JSON.stringify( report ) ).not.toMatch(
+			/Do not expose support report content|turn0145-hidden-proof|rawContent|proofSignature/
 		);
 	} );
 
@@ -5839,6 +5936,7 @@ describe( 'distributed editing session state', () => {
 			'pendingChangeCount',
 			'saveAuthority',
 			'actionTranscriptSummary',
+			'actionTranscriptReport',
 			'acceptedReviewApprovalProof',
 		] );
 		expect( payload ).toMatchObject( {
@@ -5865,6 +5963,19 @@ describe( 'distributed editing session state', () => {
 				exposesRawContent: false,
 				exposesProofInternals: false,
 				exposesActorIds: false,
+			},
+			actionTranscriptReport: {
+				status: 'none',
+				available: false,
+				headline: 'No Distributed Editing activity transcript report',
+				chronologyStatus: 'none',
+				timelineItemCount: 0,
+				canShareWithSupport: true,
+				exposesRawContent: false,
+				exposesProofInternals: false,
+				exposesTokenMaterial: false,
+				exposesActorIds: false,
+				claimsSaved: false,
 			},
 			acceptedReviewApprovalProof: null,
 		} );
@@ -5998,6 +6109,29 @@ describe( 'distributed editing session state', () => {
 			claimsSaved: false,
 		} );
 		expect( JSON.stringify( payload.actionTranscriptSummary ) ).not.toMatch(
+			/Local transcript export update|turn0144-hidden-proof|turn0144-reviewer-id|rawContent|proofSignature|reviewerId/
+		);
+		expect( payload.actionTranscriptReport ).toMatchObject( {
+			status: 'available',
+			available: true,
+			chronologyStatus: 'fresh_review_guarded_save_confirmed',
+			latestEventLabel: 'Fresh-review guarded save confirmed',
+			timelineItemCount: 4,
+			droppedItemCount: 3,
+			canShareWithSupport: true,
+			requiresSaveAuthorityForPersistence: true,
+			entriesRedacted: true,
+			exposesRawContent: false,
+			exposesProofInternals: false,
+			exposesTokenMaterial: false,
+			exposesActorIds: false,
+			callsRest: false,
+			callsSave: false,
+			mutatesEditorContent: false,
+			changesPostLock: false,
+			claimsSaved: false,
+		} );
+		expect( JSON.stringify( payload.actionTranscriptReport ) ).not.toMatch(
 			/Local transcript export update|turn0144-hidden-proof|turn0144-reviewer-id|rawContent|proofSignature|reviewerId/
 		);
 	} );
@@ -6248,6 +6382,7 @@ describe( 'distributed editing session state', () => {
 			'pendingChangeCount',
 			'saveAuthority',
 			'actionTranscriptSummary',
+			'actionTranscriptReport',
 			'serverVersion',
 			'clientBaseVersion',
 			'acceptedReviewApprovalProof',
