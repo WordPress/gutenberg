@@ -93,9 +93,9 @@ function Notice( {
 }: NoticeProps ) {
 	useSpokenMessage( spokenMessage, politeness );
 
-	const classes = clsx( className, 'components-notice', 'is-' + status, {
-		'is-dismissible': isDismissible,
-	} );
+	// Dismissibility is not a wrapper modifier; target `.components-notice__dismiss`
+	// or `.components-notice:has(.components-notice__dismiss)` from outside CSS.
+	const classes = clsx( className, 'components-notice', 'is-' + status );
 
 	if ( __unstableHTML && typeof children === 'string' ) {
 		children = <RawHTML>{ children }</RawHTML>;

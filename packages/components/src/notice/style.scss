@@ -41,7 +41,11 @@
 	font-size: var(--wpds-typography-font-size-md);
 	line-height: var(--wpds-typography-line-height-sm);
 
-	// Vertically center single-line content with the dismiss button.
+	// Centers single-line copy with the dismiss row when it is present. The same
+	// padding is kept when the notice is not dismissible so block height stays
+	// consistent across variants, matching `@wordpress/ui` Notice (`.title` /
+	// `.description` always use `--text-vertical-padding` whether or not `CloseIcon`
+	// is rendered).
 	// TODO: Replace `$button-size-small` with a WPDS size token once size tokens
 	// land in `@wordpress/theme`.
 	padding-block: calc((#{$button-size-small} - 1lh) / 2);

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   `Notice`: Remove the `is-dismissible` root class. Use `.components-notice:has(.components-notice__dismiss)` (or select `.components-notice__dismiss`) for styles that should only apply when the dismiss control is present.
+
 ### Enhancements
 
 -   `Tabs`, `TabPanel`: Align selected tab colors and indicators with `@wordpress/ui` `Tabs` ([#78418](https://github.com/WordPress/gutenberg/pull/78418)).
