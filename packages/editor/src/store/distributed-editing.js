@@ -9401,11 +9401,43 @@ function normalizeRiskyBlockReviewItem( item = {} ) {
 		),
 		rawContentIncluded: false,
 		exposesRawContent: false,
-		annotation: normalizeRiskyBlockReviewAnnotation( item.annotation ),
+		annotation: normalizeRiskyBlockReviewAnnotation(
+			item.annotation,
+			item
+		),
 	};
 }
 
-function normalizeRiskyBlockReviewAnnotation( annotation = {} ) {
+function normalizeRiskyBlockReviewAnnotation( annotation = {}, item = {} ) {
+	const blockLabel =
+		normalizeNullableString(
+			getFirstDefined(
+				item.blockLabel,
+				item.block_label,
+				item.blockName,
+				item.block_name
+			)
+		) || 'Review item';
+	const saveAuthorityLabel =
+		normalizeNullableString(
+			getFirstDefined(
+				annotation.saveAuthorityLabel,
+				annotation.save_authority_label,
+				annotation.accessibleLabel,
+				annotation.accessible_label
+			)
+		) || `HTML review required before Save for ${ blockLabel }`;
+	const saveAuthorityMessage =
+		normalizeNullableString(
+			getFirstDefined(
+				annotation.saveAuthorityMessage,
+				annotation.save_authority_message,
+				annotation.guidance,
+				annotation.guidance_message
+			)
+		) ||
+		'This highlighted block needs HTML review before Save can update the post.';
+
 	return {
 		visualTreatment:
 			normalizeNullableString( annotation.visualTreatment ) ||
@@ -9417,6 +9449,9 @@ function normalizeRiskyBlockReviewAnnotation( annotation = {} ) {
 			'selected_focused_hovered_or_review_target',
 		hasAccessibleLabel: annotation.hasAccessibleLabel !== false,
 		hasListViewParity: annotation.hasListViewParity !== false,
+		saveAuthorityLabel,
+		saveAuthorityMessage,
+		hasSaveAuthorityCopy: true,
 		reliesOnColorAlone: false,
 	};
 }

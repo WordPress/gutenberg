@@ -175,9 +175,12 @@ describe( 'getDistributedEditingRiskyBlockReviewWrapperProps', () => {
 		expect( wrapperProps ).toMatchObject( {
 			className:
 				'existing-wrapper has-distributed-editing-risky-block-review',
+			'aria-label': 'HTML review required before Save for Custom HTML',
 			'data-distributed-editing-risky-block-review': 'pending_review',
 			'data-distributed-editing-risky-block-review-item-id':
 				'risk-html-added',
+			'data-distributed-editing-risky-block-review-label':
+				'HTML review required before Save for Custom HTML',
 			'data-distributed-editing-risky-block-review-treatment':
 				'blue_warning_marker_with_focus_wash',
 		} );
@@ -219,7 +222,7 @@ describe( 'DistributedEditingRiskyBlockReviewListViewMarker', () => {
 		);
 
 		const marker = screen.getByRole( 'img', {
-			name: 'HTML review required for Custom HTML',
+			name: 'HTML review required before Save for Custom HTML',
 		} );
 
 		expect( marker ).toBeVisible();
@@ -246,7 +249,7 @@ describe( 'DistributedEditingRiskyBlockReviewListViewMarker', () => {
 
 		expect(
 			screen.queryByRole( 'img', {
-				name: 'HTML review required for Custom HTML',
+				name: 'HTML review required before Save for Custom HTML',
 			} )
 		).not.toBeInTheDocument();
 	} );
@@ -269,7 +272,14 @@ describe( 'DistributedEditingRiskyBlockReviewPrePublishPanel', () => {
 			screen.getByText( 'Distributed Editing HTML review' )
 		).toBeVisible();
 		expect(
-			screen.getByText( '1 block needs HTML review before saving.' )
+			screen.getByText(
+				'1 highlighted block needs HTML review before Save can update the post.'
+			)
+		).toBeVisible();
+		expect(
+			screen.getByText(
+				'This highlighted block needs HTML review before Save can update the post.'
+			)
 		).toBeVisible();
 		expect( screen.getByText( 'Custom HTML' ) ).toBeVisible();
 		expect(
@@ -338,6 +348,11 @@ describe( 'DistributedEditingRiskyBlockReviewPanel', () => {
 
 		expect(
 			screen.getByText( 'HTML review is resolved for this update.' )
+		).toBeVisible();
+		expect(
+			screen.getByText(
+				'Custom HTML was approved for the guarded Save path.'
+			)
 		).toBeVisible();
 		expect(
 			screen.getByRole( 'button', {

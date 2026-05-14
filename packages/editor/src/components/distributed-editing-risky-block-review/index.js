@@ -60,6 +60,15 @@ export function getDistributedEditingRiskyBlockReviewWrapperProps(
 	wrapperProps = {},
 	reviewItem = {}
 ) {
+	const annotationLabel = getRiskyBlockReviewAnnotationLabel( reviewItem );
+	const ariaLabel = wrapperProps[ 'aria-label' ]
+		? sprintf(
+				/* translators: 1: existing block label, 2: DE-RTC review label. */
+				__( '%1$s. %2$s' ),
+				wrapperProps[ 'aria-label' ],
+				annotationLabel
+		  )
+		: annotationLabel;
 	const style = {
 		...wrapperProps.style,
 		boxShadow: [
@@ -81,9 +90,11 @@ export function getDistributedEditingRiskyBlockReviewWrapperProps(
 			reviewItem.reviewStatus || 'pending_review',
 		'data-distributed-editing-risky-block-review-item-id':
 			reviewItem.id || '',
+		'data-distributed-editing-risky-block-review-label': annotationLabel,
 		'data-distributed-editing-risky-block-review-treatment':
 			reviewItem.annotation?.visualTreatment ||
 			'blue_warning_marker_with_focus_wash',
+		'aria-label': ariaLabel,
 		style,
 	};
 }
@@ -223,15 +234,11 @@ export function DistributedEditingRiskyBlockReviewListViewMarker( { block } ) {
 		return null;
 	}
 
-	const label = getRiskyBlockReviewItemLabel( reviewItem, 0 );
+	const label = getRiskyBlockReviewAnnotationLabel( reviewItem, 0 );
 
 	return (
 		<span
-			aria-label={ sprintf(
-				/* translators: %s: block label. */
-				__( 'HTML review required for %s' ),
-				label
-			) }
+			aria-label={ label }
 			className="editor-distributed-editing-risky-block-review__list-view-marker"
 			data-distributed-editing-risky-block-review-item-id={
 				reviewItem.id || ''
@@ -437,6 +444,12 @@ function DistributedEditingRiskyBlockReviewItem( {
 					variant="tertiary"
 				/>
 			</div>
+			<p className="editor-distributed-editing-risky-block-review__item-guidance">
+				{ getRiskyBlockReviewItemAffordanceMessage(
+					reviewItem,
+					index
+				) }
+			</p>
 			<div className="editor-distributed-editing-risky-block-review__item-meta">
 				<span>{ getChangeKindLabel( reviewItem.changeKind ) }</span>
 				<span>{ getRiskReasonLabel( reviewItem.riskReason ) }</span>
@@ -543,8 +556,8 @@ function getRiskyBlockReviewSummaryMessage( reviewState = {} ) {
 		return sprintf(
 			/* translators: %d: number of blocks requiring HTML review. */
 			_n(
-				'%d block needs HTML review before saving.',
-				'%d blocks need HTML review before saving.',
+				'%d highlighted block needs HTML review before Save can update the post.',
+				'%d highlighted blocks need HTML review before Save can update the post.',
 				pendingCount
 			),
 			pendingCount
@@ -552,6 +565,53 @@ function getRiskyBlockReviewSummaryMessage( reviewState = {} ) {
 	}
 
 	return __( 'HTML review is resolved for this update.' );
+}
+
+function getRiskyBlockReviewAnnotationLabel( reviewItem, index = 0 ) {
+	if ( reviewItem.annotation?.saveAuthorityLabel ) {
+		return reviewItem.annotation.saveAuthorityLabel;
+	}
+
+	return sprintf(
+		/* translators: %s: block label. */
+		__( 'HTML review required before Save for %s' ),
+		getRiskyBlockReviewItemLabel( reviewItem, index )
+	);
+}
+
+function getRiskyBlockReviewItemAffordanceMessage( reviewItem, index ) {
+	if ( reviewItem.annotation?.saveAuthorityMessage ) {
+		return reviewItem.annotation.saveAuthorityMessage;
+	}
+
+	const label = getRiskyBlockReviewItemLabel( reviewItem, index );
+
+	switch ( reviewItem.reviewStatus ) {
+		case DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES.APPROVED_FOR_RETRY_SAVE:
+			return sprintf(
+				/* translators: %s: block label. */
+				__( '%s was approved for the guarded Save path.' ),
+				label
+			);
+		case DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES.REJECTED:
+			return sprintf(
+				/* translators: %s: block label. */
+				__(
+					'%s was rejected and will not be included in the guarded Save path.'
+				),
+				label
+			);
+		case DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES.STALE_AFTER_REVIEW:
+			return sprintf(
+				/* translators: %s: block label. */
+				__( '%s needs a server refresh before review can continue.' ),
+				label
+			);
+	}
+
+	return __(
+		'This highlighted block needs HTML review before Save can update the post.'
+	);
 }
 
 function getRiskyBlockReviewItemLabel( reviewItem, index ) {

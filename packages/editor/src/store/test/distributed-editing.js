@@ -3276,6 +3276,11 @@ describe( 'distributed editing session state', () => {
 							'selected_focused_hovered_or_review_target',
 						hasAccessibleLabel: true,
 						hasListViewParity: true,
+						saveAuthorityLabel:
+							'HTML review required before Save for HTML',
+						saveAuthorityMessage:
+							'This highlighted block needs HTML review before Save can update the post.',
+						hasSaveAuthorityCopy: true,
 						reliesOnColorAlone: false,
 					},
 				} ),
