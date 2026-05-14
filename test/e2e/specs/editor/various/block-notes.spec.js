@@ -1253,13 +1253,25 @@ test.describe( 'Block Notes', () => {
 			await expect( divider ).toHaveCount( 1 );
 			await expect( divider ).toHaveText( 'Resolved' );
 
-			// Order: unresolved thread, divider, resolved thread.
-			const threads = settings.getByRole( 'treeitem' );
-			await expect( threads.first() ).toContainText(
-				'Unresolved comment'
+			// Match treeitems by their accessible name; the resolved thread
+			// collapses into a "Marked as resolved" tombstone whose visible
+			// text no longer contains the original comment body.
+			const unresolvedThread = settings.getByRole( 'treeitem', {
+				name: 'Note: Unresolved comment',
+			} );
+			const resolvedThread = settings.getByRole( 'treeitem', {
+				name: 'Note: Will-be-resolved comment',
+			} );
+			await expect( unresolvedThread ).toBeVisible();
+			await expect( resolvedThread ).toBeVisible();
+
+			// Unresolved → divider → resolved, verified by sibling DOM order.
+			const dividerBeforeResolved = settings.locator(
+				'.editor-collab-sidebar-panel__resolved-divider + [role="treeitem"]'
 			);
-			await expect( threads.last() ).toContainText(
-				'Will-be-resolved comment'
+			await expect( dividerBeforeResolved ).toHaveAttribute(
+				'aria-label',
+				'Note: Will-be-resolved comment'
 			);
 		} );
 
