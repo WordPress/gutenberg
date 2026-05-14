@@ -392,7 +392,7 @@ export function RectangleStencil( {
 
 			if ( ! keyboardResizeActiveRef.current ) {
 				keyboardResizeActiveRef.current = true;
-				onResizeStart?.();
+				onResizeStart?.( handle );
 			}
 
 			const scheduleKeyboardResizeEnd = () => {

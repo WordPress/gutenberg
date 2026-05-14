@@ -336,9 +336,9 @@ function CropperInner(
 	const [ isResizing, setIsResizing ] = useState( false );
 	const isResizingRef = useRef( false );
 	const isSettlingRef = useRef( false );
-	// Direction of the handle the user is currently dragging via pointer.
-	// `null` for keyboard-driven resizes and outside of pointer drags.
-	// Drives the live dimensions tooltip overlay.
+	// Direction of the handle the user is currently resizing — pointer or
+	// keyboard. `null` outside of an active resize. Drives the live
+	// dimensions tooltip overlay.
 	const [ activeHandle, setActiveHandle ] = useState< HandlePosition | null >(
 		null
 	);

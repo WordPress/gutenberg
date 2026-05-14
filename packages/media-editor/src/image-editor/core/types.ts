@@ -179,9 +179,11 @@ export interface StencilProps {
 	/** Callback when the crop rectangle changes (during drag). */
 	onCropChange: ( rect: NormalizedRect ) => void;
 	/**
-	 * Callback when a resize drag starts (pointerdown on handle). The
-	 * handle direction is passed for pointer drags only — keyboard-driven
-	 * resizes invoke this without an argument.
+	 * Callback when a resize interaction starts — pointerdown on a handle
+	 * or the first arrow-key press on a focused handle. The handle direction
+	 * is passed so downstream overlays can anchor to it. The argument is
+	 * optional to keep custom stencils that don't track a direction
+	 * backward-compatible.
 	 */
 	onResizeStart?: ( handle?: HandlePosition ) => void;
 	/** Callback when a resize drag ends (mouseup after handle drag). */
