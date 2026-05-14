@@ -51,6 +51,7 @@ import {
 	DISTRIBUTED_EDITING_UNLOAD_WARNING_REASONS,
 	DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE,
 	getDistributedEditingActionTranscriptStateForSessionState,
+	getDistributedEditingActionTranscriptSupportSummaryForSessionState,
 	getDistributedEditingLocalUpdatesExportPayload,
 	getDistributedEditingFreshReviewDecisionStateForSessionState,
 	getDistributedEditingFreshReviewLifecycleStateForSessionState,
@@ -286,6 +287,83 @@ describe( 'distributed editing session state', () => {
 				actionTranscriptCallsSave: false,
 				actionTranscriptClaimsSaved: false,
 			} )
+		);
+	} );
+
+	it( 'summarizes action transcripts for support exports without unsafe payloads', () => {
+		const summary =
+			getDistributedEditingActionTranscriptSupportSummaryForSessionState(
+				{
+					actionTranscriptItems: [
+						{
+							eventType:
+								DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.FRESH_REVIEW_REQUESTED,
+						},
+						{
+							eventType:
+								DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.FRESH_REVIEW_DECISION_SUBMITTED,
+							reviewerId: 7,
+						},
+						{
+							eventType:
+								DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.FRESH_REVIEW_DECISION_SUBMITTED,
+						},
+						{
+							eventType:
+								DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.FRESH_REVIEW_CONSUME_VALIDATED,
+							reasonCode:
+								DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_MALFORMED_SYNC_PAYLOAD,
+						},
+						{
+							eventType:
+								DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.FRESH_REVIEW_RETRY_SAVE_CONFIRMED,
+							proofSignature: 'hidden-proof',
+						},
+						{
+							eventType:
+								DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.FRESH_REVIEW_RETRY_SAVE_CONFIRMED,
+						},
+						{
+							eventType:
+								DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.LOCAL_EDITOR_ACTION,
+							rawContent:
+								'<!-- wp:paragraph --><p>Do not expose support content</p><!-- /wp:paragraph -->',
+						},
+					],
+				}
+			);
+
+		expect( summary ).toMatchObject( {
+			status: 'available',
+			available: true,
+			itemCount: 4,
+			droppedItemCount: 3,
+			latestEventType:
+				DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.FRESH_REVIEW_RETRY_SAVE_CONFIRMED,
+			latestEventSource: 'server',
+			eventTypes: [
+				DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.FRESH_REVIEW_REQUESTED,
+				DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.FRESH_REVIEW_DECISION_SUBMITTED,
+				DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.FRESH_REVIEW_CONSUME_VALIDATED,
+				DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.FRESH_REVIEW_RETRY_SAVE_CONFIRMED,
+			],
+			eventSources: [ 'review', 'review', 'review', 'server' ],
+			hasFreshReviewRequest: true,
+			hasFreshReviewDecision: true,
+			hasFreshReviewConsumeValidation: true,
+			hasFreshReviewRetrySaveConfirmation: true,
+			entriesRedacted: true,
+			exposesRawContent: false,
+			exposesProofInternals: false,
+			exposesActorIds: false,
+			callsRest: false,
+			callsSave: false,
+			mutatesEditorContent: false,
+			changesPostLock: false,
+			claimsSaved: false,
+		} );
+		expect( JSON.stringify( summary ) ).not.toMatch(
+			/Do not expose support content|hidden-proof|reviewerId|"7"/
 		);
 	} );
 
@@ -5760,6 +5838,7 @@ describe( 'distributed editing session state', () => {
 			'postContent',
 			'pendingChangeCount',
 			'saveAuthority',
+			'actionTranscriptSummary',
 			'acceptedReviewApprovalProof',
 		] );
 		expect( payload ).toMatchObject( {
@@ -5776,6 +5855,16 @@ describe( 'distributed editing session state', () => {
 				saveButtonStatus: expect.any( String ),
 				pendingServerConfirmation: expect.any( Boolean ),
 				authoritativePostUpdated: expect.any( Boolean ),
+			},
+			actionTranscriptSummary: {
+				status: 'none',
+				available: false,
+				itemCount: 0,
+				droppedItemCount: 0,
+				entriesRedacted: true,
+				exposesRawContent: false,
+				exposesProofInternals: false,
+				exposesActorIds: false,
 			},
 			acceptedReviewApprovalProof: null,
 		} );
@@ -5834,6 +5923,82 @@ describe( 'distributed editing session state', () => {
 		);
 		expect( JSON.stringify( payload.saveAuthority ) ).not.toContain(
 			'"7"'
+		);
+	} );
+
+	it( 'exports action transcript summaries with protected local updates', () => {
+		const editedPostContent =
+			'<!-- wp:paragraph --><p>Local transcript export update</p><!-- /wp:paragraph -->';
+		const payload = getDistributedEditingLocalUpdatesExportPayload( {
+			currentPost: {
+				id: 46,
+				type: 'post',
+			},
+			editedPostContent,
+			sessionState: {
+				pendingChangeCount: 1,
+				hasPendingChanges: true,
+				canExportLocalUpdates: true,
+				actionTranscriptItems: [
+					{
+						eventType:
+							DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.FRESH_REVIEW_REQUESTED,
+					},
+					{
+						eventType:
+							DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.FRESH_REVIEW_DECISION_SUBMITTED,
+						reviewerId: 'turn0144-reviewer-id',
+					},
+					{
+						eventType:
+							DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.FRESH_REVIEW_DECISION_SUBMITTED,
+					},
+					{
+						eventType:
+							DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.FRESH_REVIEW_CONSUME_VALIDATED,
+					},
+					{
+						eventType:
+							DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.FRESH_REVIEW_RETRY_SAVE_CONFIRMED,
+						proofSignature: 'turn0144-hidden-proof',
+					},
+					{
+						eventType:
+							DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.FRESH_REVIEW_RETRY_SAVE_CONFIRMED,
+					},
+					{
+						eventType:
+							DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.LOCAL_EDITOR_ACTION,
+						rawContent: editedPostContent,
+					},
+				],
+			},
+		} );
+
+		expect( payload.actionTranscriptSummary ).toMatchObject( {
+			status: 'available',
+			available: true,
+			itemCount: 4,
+			droppedItemCount: 3,
+			latestEventType:
+				DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.FRESH_REVIEW_RETRY_SAVE_CONFIRMED,
+			latestEventSource: 'server',
+			hasFreshReviewRequest: true,
+			hasFreshReviewDecision: true,
+			hasFreshReviewConsumeValidation: true,
+			hasFreshReviewRetrySaveConfirmation: true,
+			entriesRedacted: true,
+			exposesRawContent: false,
+			exposesProofInternals: false,
+			exposesActorIds: false,
+			callsRest: false,
+			callsSave: false,
+			mutatesEditorContent: false,
+			changesPostLock: false,
+			claimsSaved: false,
+		} );
+		expect( JSON.stringify( payload.actionTranscriptSummary ) ).not.toMatch(
+			/Local transcript export update|turn0144-hidden-proof|turn0144-reviewer-id|rawContent|proofSignature|reviewerId/
 		);
 	} );
 
@@ -6082,6 +6247,7 @@ describe( 'distributed editing session state', () => {
 			'postContent',
 			'pendingChangeCount',
 			'saveAuthority',
+			'actionTranscriptSummary',
 			'serverVersion',
 			'clientBaseVersion',
 			'acceptedReviewApprovalProof',

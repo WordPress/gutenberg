@@ -300,6 +300,10 @@ _Returns_
 
 -   `React.ReactNode`: Rendered status surface.
 
+### DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES
+
+Stable content-free transcript event types. These are the first editor-side operation-log vocabulary for DE-RTC. They describe categories of activity, never raw block content, proof internals, or actor identities.
+
 ### DISTRIBUTED_EDITING_DISPOSITIONS
 
 Stable DE-RTC terminal dispositions shared with the root model runner.
@@ -456,6 +460,10 @@ Stable authoritative-post states for DE-RTC Save semantics. These clarify what t
 
 Stable Save button semantic states for DE-RTC sessions. These are copy and policy descriptors only; they do not call REST, save, dispatch notices, persist editor state, or change post locks.
 
+### DISTRIBUTED_EDITING_SAVE_LOCAL_CHANGES_STATES
+
+Stable local-change states for DE-RTC Save semantics. These clarify whether the editor is carrying protected local work independent of the authoritative WordPress post.
+
 ### DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS
 
 Stable Save click actions for DE-RTC human review handoff.
@@ -463,6 +471,10 @@ Stable Save click actions for DE-RTC human review handoff.
 ### DISTRIBUTED_EDITING_SAVE_POLICY_STATUSES
 
 Stable Save policy states for DE-RTC human review handoff.
+
+### DISTRIBUTED_EDITING_SAVE_REVIEW_CHECKPOINT_STATES
+
+Stable review checkpoint states for DE-RTC Save semantics. These separate review work from both local editor dirtiness and authoritative post updates.
 
 ### DISTRIBUTED_EDITING_UNLOAD_WARNING_REASONS
 
@@ -661,6 +673,30 @@ _Parameters_
 _Returns_
 
 -   `Object|null`: Accepted review-approval proof for retry-save.
+
+### getDistributedEditingActionTranscriptStateForSessionState
+
+Returns a support-safe operation transcript summary for DE-RTC editor activity. The summary is derived only from stable event types and cannot expose raw post content, proof internals, or actor identities.
+
+_Parameters_
+
+-   _sessionState_ `Object`: DE-RTC session state.
+
+_Returns_
+
+-   `Object`: Content-free action transcript state.
+
+### getDistributedEditingActionTranscriptSupportSummaryForSessionState
+
+Returns a support-export summary for the current DE-RTC action transcript. The summary deliberately keeps chronology to stable event names, sources, counts, and redaction flags so it can travel with support diagnostics without exposing raw post content, proof internals, or actor identities.
+
+_Parameters_
+
+-   _sessionState_ `Object`: DE-RTC session state.
+
+_Returns_
+
+-   `Object`: Content-free action transcript support summary.
 
 ### getDistributedEditingFreshReviewConsumeEndpointPath
 
@@ -1304,6 +1340,19 @@ _Parameters_
 _Returns_
 
 -   `Object`: Normalized DE-RTC session state.
+
+### getDistributedEditingSessionStateWithActionTranscriptEvent
+
+Returns session state with one content-free action transcript event appended. Unsafe events are counted as dropped and are not retained.
+
+_Parameters_
+
+-   _sessionState_ `Object`: DE-RTC session state.
+-   _transcriptEvent_ `Object`: Candidate transcript event.
+
+_Returns_
+
+-   `Object`: Session state with the transcript event applied.
 
 ### getDistributedEditingStaleBaseEndpointPath
 

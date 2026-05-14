@@ -1663,6 +1663,70 @@ export function getDistributedEditingActionTranscriptStateForSessionState(
 }
 
 /**
+ * Returns a support-export summary for the current DE-RTC action transcript.
+ * The summary deliberately keeps chronology to stable event names, sources,
+ * counts, and redaction flags so it can travel with support diagnostics without
+ * exposing raw post content, proof internals, or actor identities.
+ *
+ * @param {Object} sessionState DE-RTC session state.
+ *
+ * @return {Object} Content-free action transcript support summary.
+ */
+export function getDistributedEditingActionTranscriptSupportSummaryForSessionState(
+	sessionState = {}
+) {
+	const transcript =
+		getDistributedEditingActionTranscriptStateForSessionState(
+			sessionState
+		);
+	const eventTypes = transcript.items.map( ( item ) => item.eventType );
+	const eventSources = transcript.items.map( ( item ) => item.source );
+
+	return {
+		status: transcript.status,
+		available: transcript.status === 'available',
+		itemCount: transcript.itemCount,
+		droppedItemCount: transcript.droppedItemCount,
+		latestEventType: transcript.latestEventType,
+		latestEventSource: transcript.latestEventSource,
+		eventTypes,
+		eventSources,
+		items: transcript.items.map( ( item ) => ( {
+			eventType: item.eventType,
+			source: item.source,
+			sequence: item.sequence,
+			reasonCode: item.reasonCode,
+			redacted: true,
+		} ) ),
+		hasLocalEvents: transcript.hasLocalEvents,
+		hasRemoteEvents: transcript.hasRemoteEvents,
+		hasServerEvents: transcript.hasServerEvents,
+		hasEditorEvents: transcript.hasEditorEvents,
+		hasFreshReviewRequest: eventTypes.includes(
+			DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.FRESH_REVIEW_REQUESTED
+		),
+		hasFreshReviewDecision: eventTypes.includes(
+			DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.FRESH_REVIEW_DECISION_SUBMITTED
+		),
+		hasFreshReviewConsumeValidation: eventTypes.includes(
+			DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.FRESH_REVIEW_CONSUME_VALIDATED
+		),
+		hasFreshReviewRetrySaveConfirmation: eventTypes.includes(
+			DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.FRESH_REVIEW_RETRY_SAVE_CONFIRMED
+		),
+		entriesRedacted: transcript.entriesRedacted,
+		exposesRawContent: transcript.exposesRawContent,
+		exposesProofInternals: transcript.exposesProofInternals,
+		exposesActorIds: transcript.exposesActorIds,
+		callsRest: transcript.callsRest,
+		callsSave: transcript.callsSave,
+		mutatesEditorContent: transcript.mutatesEditorContent,
+		changesPostLock: transcript.changesPostLock,
+		claimsSaved: transcript.claimsSaved,
+	};
+}
+
+/**
  * Returns a pure recovery descriptor for failed opaque reviewed-proof token
  * handoffs. The descriptor is product communication state only; it does not
  * inspect token internals, call REST, save, retry, dispatch notices, mutate
@@ -2718,6 +2782,10 @@ export function getDistributedEditingLocalUpdatesExportPayload( {
 	const saveAuthority = getDistributedEditingSaveAuthorityExportPayload(
 		normalizedSessionState
 	);
+	const actionTranscriptSummary =
+		getDistributedEditingActionTranscriptSupportSummaryForSessionState(
+			normalizedSessionState
+		);
 
 	return {
 		version: 1,
@@ -2730,6 +2798,7 @@ export function getDistributedEditingLocalUpdatesExportPayload( {
 			typeof editedPostContent === 'string' ? editedPostContent : '',
 		pendingChangeCount: normalizedSessionState.pendingChangeCount,
 		saveAuthority,
+		actionTranscriptSummary,
 		...( ( acceptedReviewApprovalProofEnvelope || reviewTokenRecovery ) &&
 		proofServerVersion
 			? { serverVersion: proofServerVersion }

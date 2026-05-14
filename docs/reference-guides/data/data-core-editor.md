@@ -298,6 +298,18 @@ _Returns_
 
 -   `string`: Device type.
 
+### getDistributedEditingActionTranscriptState
+
+Returns support-safe Distributed Editing action transcript state.
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+
+_Returns_
+
+-   `Object`: Content-free action transcript state.
+
 ### getDistributedEditingFreshReviewDecisionState
 
 Returns the current DE-RTC fresh-review decision state.
