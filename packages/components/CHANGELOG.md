@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 33.1.0 (2026-05-14)
+
 ### Enhancements
 
 -   `StyleProvider`: Add support for injecting package CSS module styles into target documents ([#77965](https://github.com/WordPress/gutenberg/pull/77965)).
