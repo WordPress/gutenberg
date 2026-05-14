@@ -3,9 +3,7 @@ import { forwardRef } from '@wordpress/element';
 import type { PortalProps } from './types';
 
 /**
- * Root element that portals `Select` listbox content. Pass to
- * `Select.Popup`'s `portal` prop. When `portal` is omitted, `Select.Popup`
- * uses this component with default props.
+ * Used to apply custom portal behavior to `Select`'s listbox content.
  */
 const Portal = forwardRef< HTMLDivElement, PortalProps >(
 	function SelectPortal( props, ref ) {

@@ -7,10 +7,7 @@ import styles from './style.module.css';
 import { ITEM_POPUP_POSITIONER_PROPS } from '../constants';
 
 /**
- * Positions the floating select popup relative to its trigger. Pass to
- * `Select.Popup`'s `positioner` prop to customize `side`, `align`,
- * `sideOffset`, collision behavior, etc. When `positioner` is omitted,
- * `Select.Popup` uses this component with default props.
+ * Used to apply custom positioning to `Select`'s listbox content.
  */
 const Positioner = forwardRef< HTMLDivElement, PositionerProps >(
 	function SelectPositioner( { className, ...props }, ref ) {

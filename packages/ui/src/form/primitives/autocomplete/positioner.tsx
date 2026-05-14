@@ -7,10 +7,7 @@ import styles from './style.module.css';
 import { ITEM_POPUP_POSITIONER_PROPS } from '../constants';
 
 /**
- * Positions the floating autocomplete popup relative to its input. Pass to
- * `Autocomplete.Popup`'s `positioner` prop to customize `side`, `align`,
- * `sideOffset`, collision behavior, etc. When `positioner` is omitted,
- * `Autocomplete.Popup` uses this component with default props.
+ * Used to apply custom positioning to `Autocomplete`'s popup content.
  */
 const Positioner = forwardRef< HTMLDivElement, PositionerProps >(
 	function AutocompletePositioner( { className, ...props }, ref ) {

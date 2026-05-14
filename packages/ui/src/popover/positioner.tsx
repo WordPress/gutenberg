@@ -6,10 +6,7 @@ import resetStyles from '../utils/css/resets.module.css';
 import styles from './style.module.css';
 
 /**
- * Positions the floating popover content relative to the anchor. Pass to
- * `Popover.Popup`'s `positioner` prop to customize `side`, `align`,
- * `sideOffset`, collision behavior, etc. When `positioner` is omitted,
- * `Popover.Popup` uses this component with default props.
+ * Used to apply custom positioning to `Popover`'s floating content.
  */
 const Positioner = forwardRef< HTMLDivElement, PositionerProps >(
 	function PopoverPositioner(
