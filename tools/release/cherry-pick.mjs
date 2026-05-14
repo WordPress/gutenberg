@@ -30,7 +30,7 @@ const AUTO_PROPAGATE_RESULTS_TO_GITHUB = GITHUB_CLI_AVAILABLE;
  */
 async function main() {
 	if ( ! GITHUB_CLI_AVAILABLE ) {
-		await reportGhUnavailable();
+		reportGhUnavailable();
 	}
 
 	console.log( `You are on branch "${ BRANCH }".` );
@@ -499,27 +499,22 @@ function getCurrentBranch() {
 }
 
 /**
- * Reports when the gh CLI tool is missing, describes the consequences, asks
- * whether to proceed.
- *
- * @return {Promise<void>}
+ * Reports that the gh CLI tool is missing and exits.
+ * The script cannot function without gh because it is required for GitHub API
+ * authentication via `gh auth token`.
  */
-async function reportGhUnavailable() {
-	console.log(
-		'GitHub CLI is not setup. This script will not be able to automatically'
+function reportGhUnavailable() {
+	console.error(
+		'Error: GitHub CLI (gh) is not installed or not authenticated.'
 	);
-	console.log(
-		'comment on the processed PRs and remove the backport label from them.'
+	console.error(
+		'This script requires gh to authenticate with the GitHub API.'
 	);
-	console.log(
-		'Instead, you will see a detailed list of next steps to perform manually.'
+	console.error( '' );
+	console.error(
+		'Install gh from https://cli.github.com/ and run `gh auth login`, then try again.'
 	);
-	console.log( '' );
-	console.log(
-		'To enable automatic handling, install the `gh` utility from https://cli.github.com/'
-	);
-	console.log( '' );
-	await promptDoYouWantToProceed();
+	process.exit( 1 );
 }
 
 /**
