@@ -2905,6 +2905,20 @@ export function getDistributedEditingSessionStateForRetrySaveRequest(
 ) {
 	const normalized =
 		normalizeDistributedEditingSessionState( currentSessionState );
+	const acceptedReviewApprovalProof = normalizeObject(
+		options.acceptedReviewApprovalProof
+	);
+	const hasAcceptedReviewApprovalProof =
+		Object.keys( acceptedReviewApprovalProof ).length > 0;
+	const reviewApprovalProofFields = hasAcceptedReviewApprovalProof
+		? getRetrySaveReviewApprovalProofFieldsFromResponseOrError(
+				{
+					acceptedReviewApprovalProof,
+				},
+				{},
+				normalized
+		  )
+		: getDistributedEditingRetrySaveReviewApprovalProofFields( normalized );
 	const pendingChangeCount =
 		normalizeCount( options.pendingChangeCount ) ||
 		normalized.pendingChangeCount ||
@@ -2927,6 +2941,15 @@ export function getDistributedEditingSessionStateForRetrySaveRequest(
 		retrySaveRevisionCreated: false,
 		retrySaveCreatedRevisionIds: [],
 		...normalizeRetrySaveReviewMetadataFields(),
+		...reviewApprovalProofFields,
+		...( hasAcceptedReviewApprovalProof
+			? {
+					retrySaveReviewApprovalProofStatus:
+						DISTRIBUTED_EDITING_RETRY_SAVE_REVIEW_APPROVAL_PROOF_STATUSES.ACCEPTED_FOR_RETRY_SAVE,
+					retrySaveReviewApprovalProofReason: null,
+					retrySaveReviewApprovalAccepted: true,
+			  }
+			: {} ),
 		mustOfferLocalCopy: true,
 		canExportLocalUpdates: true,
 	} );
@@ -3818,6 +3841,15 @@ function getDistributedEditingRetrySaveReviewApprovalProofFields( normalized ) {
 			normalized.retrySaveReviewApprovalRawContentIncluded,
 		retrySaveReviewApprovalProofSignature:
 			normalized.retrySaveReviewApprovalProofSignature,
+		retrySaveReviewApprovalIssuedAt:
+			normalized.retrySaveReviewApprovalIssuedAt,
+		retrySaveReviewApprovalExpiresAt:
+			normalized.retrySaveReviewApprovalExpiresAt,
+		retrySaveReviewApprovalSiteId: normalized.retrySaveReviewApprovalSiteId,
+		retrySaveReviewApprovalSiteUrl:
+			normalized.retrySaveReviewApprovalSiteUrl,
+		retrySaveReviewApprovalSiteUuid:
+			normalized.retrySaveReviewApprovalSiteUuid,
 		retrySaveReviewApprovalSavesPost:
 			normalized.retrySaveReviewApprovalSavesPost,
 		retrySaveReviewApprovalMutatesPostContent:
@@ -4201,13 +4233,13 @@ function normalizeRetrySaveReviewApprovalProofFields( sessionState = {} ) {
 		retrySaveReviewApprovalProofSignature: normalizeNullableString(
 			sessionState.retrySaveReviewApprovalProofSignature
 		),
-		retrySaveReviewApprovalIssuedAt: normalizeNullableString(
+		retrySaveReviewApprovalIssuedAt: normalizeNullableIdString(
 			getFirstDefined(
 				sessionState.retrySaveReviewApprovalIssuedAt,
 				sessionState.retrySaveReviewApprovalIssued_at
 			)
 		),
-		retrySaveReviewApprovalExpiresAt: normalizeNullableString(
+		retrySaveReviewApprovalExpiresAt: normalizeNullableIdString(
 			getFirstDefined(
 				sessionState.retrySaveReviewApprovalExpiresAt,
 				sessionState.retrySaveReviewApprovalExpires_at
@@ -5148,7 +5180,8 @@ function getRetrySaveReviewApprovalProofFieldsFromResponseOrError(
 			responseData.proofSignature,
 			responseData.proof_signature,
 			approvalContract.proofSignature,
-			approvalContract.proof_signature
+			approvalContract.proof_signature,
+			currentSessionState.retrySaveReviewApprovalProofSignature
 		),
 		retrySaveReviewApprovalIssuedAt: getFirstDefined(
 			responseOrError.issuedAt,
@@ -5156,7 +5189,8 @@ function getRetrySaveReviewApprovalProofFieldsFromResponseOrError(
 			responseData.issuedAt,
 			responseData.issued_at,
 			approvalContract.issuedAt,
-			approvalContract.issued_at
+			approvalContract.issued_at,
+			currentSessionState.retrySaveReviewApprovalIssuedAt
 		),
 		retrySaveReviewApprovalExpiresAt: getFirstDefined(
 			responseOrError.expiresAt,
@@ -5164,7 +5198,8 @@ function getRetrySaveReviewApprovalProofFieldsFromResponseOrError(
 			responseData.expiresAt,
 			responseData.expires_at,
 			approvalContract.expiresAt,
-			approvalContract.expires_at
+			approvalContract.expires_at,
+			currentSessionState.retrySaveReviewApprovalExpiresAt
 		),
 		retrySaveReviewApprovalSiteId: getFirstDefined(
 			responseOrError.siteId,
@@ -5172,7 +5207,8 @@ function getRetrySaveReviewApprovalProofFieldsFromResponseOrError(
 			responseData.siteId,
 			responseData.site_id,
 			approvalContract.siteId,
-			approvalContract.site_id
+			approvalContract.site_id,
+			currentSessionState.retrySaveReviewApprovalSiteId
 		),
 		retrySaveReviewApprovalSiteUrl: getFirstDefined(
 			responseOrError.siteUrl,
@@ -5180,7 +5216,8 @@ function getRetrySaveReviewApprovalProofFieldsFromResponseOrError(
 			responseData.siteUrl,
 			responseData.site_url,
 			approvalContract.siteUrl,
-			approvalContract.site_url
+			approvalContract.site_url,
+			currentSessionState.retrySaveReviewApprovalSiteUrl
 		),
 		retrySaveReviewApprovalSiteUuid: getFirstDefined(
 			responseOrError.siteUuid,
@@ -5188,7 +5225,8 @@ function getRetrySaveReviewApprovalProofFieldsFromResponseOrError(
 			responseData.siteUuid,
 			responseData.site_uuid,
 			approvalContract.siteUuid,
-			approvalContract.site_uuid
+			approvalContract.site_uuid,
+			currentSessionState.retrySaveReviewApprovalSiteUuid
 		),
 		retrySaveReviewApprovalSavesPost: approvalSavesPost,
 		retrySaveReviewApprovalMutatesPostContent: approvalMutatesPostContent,

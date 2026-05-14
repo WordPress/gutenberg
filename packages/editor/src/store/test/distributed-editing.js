@@ -1077,6 +1077,15 @@ describe( 'distributed editing session state', () => {
 				retrySubmitSaveStatus:
 					DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.READY,
 				retrySubmitSaveReady: true,
+				retrySaveReviewApprovalProofStatus:
+					DISTRIBUTED_EDITING_RETRY_SAVE_REVIEW_APPROVAL_PROOF_STATUSES.ACCEPTED_FOR_RETRY_SAVE,
+				retrySaveReviewApprovalAccepted: true,
+				retrySaveReviewApprovalProofSignature:
+					'8888888888888888888888888888888888888888888888888888888888888888',
+				retrySaveReviewApprovalIssuedAt: '1893456000',
+				retrySaveReviewApprovalExpiresAt: '1893456300',
+				retrySaveReviewApprovalSiteId: '1',
+				retrySaveReviewApprovalSiteUrl: 'http://example.test',
 				canExportLocalUpdates: true,
 			},
 			{ pendingChangeCount: 2 }
@@ -1091,6 +1100,53 @@ describe( 'distributed editing session state', () => {
 			retrySaveReason: null,
 			retrySaveAccepted: false,
 			retrySavePreviousServerVersion: '7',
+			retrySaveReviewApprovalProofStatus:
+				DISTRIBUTED_EDITING_RETRY_SAVE_REVIEW_APPROVAL_PROOF_STATUSES.ACCEPTED_FOR_RETRY_SAVE,
+			retrySaveReviewApprovalProofSignature:
+				'8888888888888888888888888888888888888888888888888888888888888888',
+			retrySaveReviewApprovalIssuedAt: '1893456000',
+			retrySaveReviewApprovalExpiresAt: '1893456300',
+			retrySaveReviewApprovalSiteUrl: 'http://example.test',
+			mustOfferLocalCopy: true,
+			canExportLocalUpdates: true,
+		} );
+	} );
+
+	it( 'captures explicit accepted review proof on guarded retry-save request state', () => {
+		const saving = getDistributedEditingSessionStateForRetrySaveRequest(
+			{
+				serverVersion: '7',
+				pendingChangeCount: 1,
+				canExportLocalUpdates: true,
+			},
+			{
+				pendingChangeCount: 1,
+				acceptedReviewApprovalProof: {
+					post_id: '44',
+					post_type: 'post',
+					proof_signature:
+						'8888888888888888888888888888888888888888888888888888888888888888',
+					issued_at: '1893456000',
+					expires_at: '1893456300',
+					site_id: '1',
+					site_url: 'http://example.test',
+				},
+			}
+		);
+
+		expect( saving ).toMatchObject( {
+			retrySaveStatus: DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVING,
+			retrySaveReviewApprovalProofStatus:
+				DISTRIBUTED_EDITING_RETRY_SAVE_REVIEW_APPROVAL_PROOF_STATUSES.ACCEPTED_FOR_RETRY_SAVE,
+			retrySaveReviewApprovalAccepted: true,
+			retrySaveReviewApprovalPostId: '44',
+			retrySaveReviewApprovalPostType: 'post',
+			retrySaveReviewApprovalProofSignature:
+				'8888888888888888888888888888888888888888888888888888888888888888',
+			retrySaveReviewApprovalIssuedAt: '1893456000',
+			retrySaveReviewApprovalExpiresAt: '1893456300',
+			retrySaveReviewApprovalSiteId: '1',
+			retrySaveReviewApprovalSiteUrl: 'http://example.test',
 			mustOfferLocalCopy: true,
 			canExportLocalUpdates: true,
 		} );
@@ -1594,6 +1650,10 @@ describe( 'distributed editing session state', () => {
 						block_review_status: 'approved_for_retry_save',
 						proof_signature:
 							'8888888888888888888888888888888888888888888888888888888888888888',
+						issued_at: '1893456000',
+						expires_at: '1893456300',
+						site_id: '1',
+						site_url: 'http://example.test',
 						raw_content_included: false,
 						saves_post: false,
 						mutates_post_content: false,
@@ -1680,6 +1740,10 @@ describe( 'distributed editing session state', () => {
 			retrySaveReviewApprovalRawContentIncluded: false,
 			retrySaveReviewApprovalProofSignature:
 				'8888888888888888888888888888888888888888888888888888888888888888',
+			retrySaveReviewApprovalIssuedAt: '1893456000',
+			retrySaveReviewApprovalExpiresAt: '1893456300',
+			retrySaveReviewApprovalSiteId: '1',
+			retrySaveReviewApprovalSiteUrl: 'http://example.test',
 			mustOfferLocalCopy: true,
 			canExportLocalUpdates: true,
 		} );
@@ -1688,6 +1752,10 @@ describe( 'distributed editing session state', () => {
 				DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_PERMISSION_DENIED,
 			retrySaveRequiresUnfilteredHtmlSaver: true,
 			retrySaveReviewApprovalAccepted: true,
+			retrySaveReviewApprovalIssuedAt: '1893456000',
+			retrySaveReviewApprovalExpiresAt: '1893456300',
+			retrySaveReviewApprovalSiteId: '1',
+			retrySaveReviewApprovalSiteUrl: 'http://example.test',
 			retrySaveReviewApprovalReviewedBlockItemCount: 1,
 			retrySaveReviewApprovalRequiresUnfilteredHtmlSaver: true,
 			actionKeys: [
@@ -1695,6 +1763,115 @@ describe( 'distributed editing session state', () => {
 			],
 		} );
 		expect( JSON.stringify( normalized ) ).not.toContain( '<iframe' );
+	} );
+
+	it( 'preserves signed review proof lifetime fields when a continuation response omits them', () => {
+		const normalized = getDistributedEditingSessionStateForRetrySaveResult(
+			{
+				code: DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_REVIEW_APPROVAL_REQUIRES_UNFILTERED_HTML,
+				data: {
+					reason_code:
+						DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_REVIEW_APPROVAL_REQUIRES_UNFILTERED_HTML,
+					pending_change_count: 1,
+					server_version: '12',
+					review_approval_proof_accepted: true,
+					accepted_review_approval_proof_available: true,
+					accepted_review_approval_proof: {
+						post_id: '43',
+						post_type: 'post',
+						proof_signature:
+							'8888888888888888888888888888888888888888888888888888888888888888',
+					},
+				},
+			},
+			{
+				serverVersion: '12',
+				pendingChangeCount: 1,
+				hasPendingChanges: true,
+				retrySubmitProofStatus:
+					DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.ACCEPTED_FOR_FUTURE_SAVE,
+				retrySubmitAccepted: true,
+				retrySubmitSavePathRequired: true,
+				retrySubmitSaveStatus:
+					DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.READY,
+				retrySubmitSavePrepared: true,
+				retrySubmitSaveReady: true,
+				retrySaveReviewApprovalProofStatus:
+					DISTRIBUTED_EDITING_RETRY_SAVE_REVIEW_APPROVAL_PROOF_STATUSES.ACCEPTED_FOR_RETRY_SAVE,
+				retrySaveReviewApprovalAccepted: true,
+				retrySaveReviewApprovalProofSignature:
+					'8888888888888888888888888888888888888888888888888888888888888888',
+				retrySaveReviewApprovalIssuedAt: '1893456000',
+				retrySaveReviewApprovalExpiresAt: '1893456300',
+				retrySaveReviewApprovalSiteId: '1',
+				retrySaveReviewApprovalSiteUrl: 'http://example.test',
+			}
+		);
+
+		expect( normalized ).toMatchObject( {
+			retrySaveReviewApprovalProofStatus:
+				DISTRIBUTED_EDITING_RETRY_SAVE_REVIEW_APPROVAL_PROOF_STATUSES.ACCEPTED_FOR_RETRY_SAVE,
+			retrySaveReviewApprovalProofSignature:
+				'8888888888888888888888888888888888888888888888888888888888888888',
+			retrySaveReviewApprovalIssuedAt: '1893456000',
+			retrySaveReviewApprovalExpiresAt: '1893456300',
+			retrySaveReviewApprovalSiteId: '1',
+			retrySaveReviewApprovalSiteUrl: 'http://example.test',
+		} );
+	} );
+
+	it( 'preserves explicit proof lifetime fields through retry-save saving state', () => {
+		const proofSignature =
+			'8888888888888888888888888888888888888888888888888888888888888888';
+		const saving = getDistributedEditingSessionStateForRetrySaveRequest(
+			{
+				serverVersion: '12',
+				clientBaseVersion: '10',
+				pendingChangeCount: 1,
+				hasPendingChanges: true,
+			},
+			{
+				pendingChangeCount: 1,
+				acceptedReviewApprovalProof: {
+					post_id: '43',
+					post_type: 'post',
+					proof_signature: proofSignature,
+					issued_at: 1893456000,
+					expires_at: 1893456300,
+					site_id: '1',
+					site_url: 'http://example.test',
+				},
+			}
+		);
+		const normalized = getDistributedEditingSessionStateForRetrySaveResult(
+			{
+				code: DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_REVIEW_APPROVAL_REQUIRES_UNFILTERED_HTML,
+				data: {
+					reason_code:
+						DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_REVIEW_APPROVAL_REQUIRES_UNFILTERED_HTML,
+					pending_change_count: 1,
+					server_version: '12',
+					review_approval_proof_accepted: true,
+					accepted_review_approval_proof_available: true,
+					accepted_review_approval_proof: {
+						post_id: '43',
+						post_type: 'post',
+						proof_signature: proofSignature,
+					},
+				},
+			},
+			saving
+		);
+
+		expect( normalized ).toMatchObject( {
+			retrySaveReviewApprovalProofStatus:
+				DISTRIBUTED_EDITING_RETRY_SAVE_REVIEW_APPROVAL_PROOF_STATUSES.ACCEPTED_FOR_RETRY_SAVE,
+			retrySaveReviewApprovalProofSignature: proofSignature,
+			retrySaveReviewApprovalIssuedAt: '1893456000',
+			retrySaveReviewApprovalExpiresAt: '1893456300',
+			retrySaveReviewApprovalSiteId: '1',
+			retrySaveReviewApprovalSiteUrl: 'http://example.test',
+		} );
 	} );
 
 	it( 'normalizes accepted retry-save review approval proof without saving', () => {

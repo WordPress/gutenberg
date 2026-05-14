@@ -1164,10 +1164,18 @@ export const __experimentalSaveDistributedEditingRetryAfterProof =
 		const pendingChangeCount =
 			options.pendingChangeCount ??
 			currentSessionState.pendingChangeCount;
+		const acceptedReviewApprovalProof =
+			options.acceptedReviewApprovalProof ??
+			getDistributedEditingAcceptedReviewApprovalProofForRetrySaveRequest(
+				currentSessionState
+			);
 		const savingSessionState =
 			getDistributedEditingSessionStateForRetrySaveRequest(
 				currentSessionState,
-				{ pendingChangeCount }
+				{
+					pendingChangeCount,
+					acceptedReviewApprovalProof,
+				}
 			);
 		const requestArgs = {
 			postId,
@@ -1199,11 +1207,7 @@ export const __experimentalSaveDistributedEditingRetryAfterProof =
 			acceptedProofClaimsSaved:
 				options.acceptedProofClaimsSaved ??
 				currentSessionState.retrySubmitClaimsSaved,
-			acceptedReviewApprovalProof:
-				options.acceptedReviewApprovalProof ??
-				getDistributedEditingAcceptedReviewApprovalProofForRetrySaveRequest(
-					currentSessionState
-				),
+			acceptedReviewApprovalProof,
 		};
 
 		dispatch.setDistributedEditingSessionState( savingSessionState );

@@ -1434,6 +1434,10 @@ describe( 'Post actions', () => {
 					retrySaveReviewApprovalCandidateContentHash:
 						candidatePostContentHash,
 					retrySaveReviewApprovalProofSignature: proofSignature,
+					retrySaveReviewApprovalIssuedAt: '1893456000',
+					retrySaveReviewApprovalExpiresAt: '1893456300',
+					retrySaveReviewApprovalSiteId: '1',
+					retrySaveReviewApprovalSiteUrl: 'http://example.test',
 				},
 			} );
 		}
@@ -1509,6 +1513,9 @@ describe( 'Post actions', () => {
 				localUpdatesImportHasAcceptedReviewApprovalProof: true,
 				localUpdatesImportVerifiedPostContentHash:
 					approvedPostContentHash,
+				retrySaveReviewApprovalIssuedAt: '1893456000',
+				retrySaveReviewApprovalExpiresAt: '1893456300',
+				retrySaveReviewApprovalSiteUrl: 'http://example.test',
 				retrySubmitSaveStatus:
 					DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.READY,
 				canExportLocalUpdates: true,

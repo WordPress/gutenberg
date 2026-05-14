@@ -274,6 +274,9 @@ describe( 'distributed editing REST helpers', () => {
 					reviewed_block_item_count: 1,
 					proof_signature:
 						'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc',
+					issued_at: 1893456000,
+					expires_at: 1893456300,
+					site_id: 1,
 					site_url: 'http://example.test',
 					raw_content_included: false,
 					saves_post: false,
@@ -337,6 +340,9 @@ describe( 'distributed editing REST helpers', () => {
 					reviewedBlockItemCount: 1,
 					proofSignature:
 						'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc',
+					issuedAt: '1893456000',
+					expiresAt: '1893456300',
+					siteId: '1',
 					siteUrl: 'http://example.test',
 					rawContentIncluded: false,
 					savesPost: false,

@@ -477,8 +477,12 @@ function normalizeAcceptedReviewApprovalProofForRetrySaveRequest( proof ) {
 		),
 		proof_signature:
 			proof.proofSignature ?? proof.proof_signature ?? undefined,
-		issued_at: proof.issuedAt ?? proof.issued_at ?? undefined,
-		expires_at: proof.expiresAt ?? proof.expires_at ?? undefined,
+		issued_at: normalizeProofPositiveInteger(
+			proof.issuedAt ?? proof.issued_at
+		),
+		expires_at: normalizeProofPositiveInteger(
+			proof.expiresAt ?? proof.expires_at
+		),
 		site_id: normalizeProofPositiveInteger( proof.siteId ?? proof.site_id ),
 		site_url: proof.siteUrl ?? proof.site_url ?? undefined,
 		site_uuid: proof.siteUuid ?? proof.site_uuid ?? undefined,
