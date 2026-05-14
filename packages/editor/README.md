@@ -304,6 +304,38 @@ _Returns_
 
 Stable DE-RTC terminal dispositions shared with the root model runner.
 
+### DISTRIBUTED_EDITING_FRESH_REVIEW_AUTHORITY_STATUSES
+
+Stable reviewer-authority statuses for fresh-review handoffs.
+
+### DISTRIBUTED_EDITING_FRESH_REVIEW_DECISION_STATUSES
+
+Stable local fresh-review decision statuses for requested imports. These are proof-opaque editor states only; they do not save or submit proof.
+
+### DISTRIBUTED_EDITING_FRESH_REVIEW_LIFECYCLE_RETRIEVAL_STATUSES
+
+Stable support-safe lifecycle retrieval statuses.
+
+### DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_PLACEMENTS
+
+Stable fresh-review pre-save placements for future editor chrome.
+
+### DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_STATUSES
+
+Stable fresh-review pre-save statuses. These are pure placement hints for future Save/pre-publish UI and do not perform the action they describe.
+
+### DISTRIBUTED_EDITING_FRESH_REVIEW_RETRY_SAVE_HANDOFF_REASONS
+
+Stable fresh-review retry-save handoff blocker reasons.
+
+### DISTRIBUTED_EDITING_FRESH_REVIEW_RETRY_SAVE_HANDOFF_STATUSES
+
+Stable fresh-review retry-save handoff statuses. These describe only the editor-side validation handoff for a recorded decision; they do not save.
+
+### DISTRIBUTED_EDITING_FRESH_REVIEW_REVIEW_LIST_STATUSES
+
+Stable fresh-review review-list statuses for future pre-publish UI.
+
 ### DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES
 
 Stable no-write planning statuses for stale-base local rebase preparation.
@@ -324,6 +356,10 @@ Stable local-updates import blocker reasons.
 
 Stable local-updates import statuses for cross-user handoff payloads.
 
+### DISTRIBUTED_EDITING_LOCAL_UPDATES_REVIEW_REQUEST_STATUSES
+
+Stable no-save review request statuses for blocked local-updates imports.
+
 ### DISTRIBUTED_EDITING_NOTICE_ACTIONS
 
 Stable action keys that future UI can map to rendered buttons or menu items.
@@ -335,6 +371,10 @@ Stable notice ids for the future `@wordpress/notices` integration.
 ### DISTRIBUTED_EDITING_NOTICE_KINDS
 
 Stable DE-RTC notice kinds. These are integration points for future UI and notice dispatch code, not rendered notice copy.
+
+### DISTRIBUTED_EDITING_OPAQUE_REVIEW_APPROVAL_PROOF_TOKEN_ENVELOPE_TYPE
+
+Undocumented declaration.
 
 ### DISTRIBUTED_EDITING_REASON_CODES
 
@@ -388,6 +428,18 @@ Stable retry-submit save-preparation blocker reasons.
 
 Stable retry-submit save-preparation statuses.
 
+### DISTRIBUTED_EDITING_REVIEW_APPROVAL_PROOF_ENVELOPE_TYPE
+
+Undocumented declaration.
+
+### DISTRIBUTED_EDITING_REVIEW_TOKEN_RECOVERY_REASONS
+
+Stable review-token recovery reasons for failed opaque proof-token handoffs.
+
+### DISTRIBUTED_EDITING_REVIEW_TOKEN_RECOVERY_STATUSES
+
+Stable review-token recovery statuses for failed opaque proof-token handoffs. These are product communication states only; they do not save, retry, or inspect the server-side proof behind the token.
+
 ### DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES
 
 Stable per-block KSES review statuses.
@@ -395,6 +447,10 @@ Stable per-block KSES review statuses.
 ### DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_STATUSES
 
 Stable KSES risky-block review statuses. These are editor data states for future block annotation and pre-publish review UI; they do not save.
+
+### DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES
+
+Stable Save button semantic states for DE-RTC sessions. These are copy and policy descriptors only; they do not call REST, save, dispatch notices, persist editor state, or change post locks.
 
 ### DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS
 
@@ -574,6 +630,20 @@ getDerivedStateFromError is used to render a fallback UI after an error has been
 
 > **Deprecated** since 5.3, use `wp.blockEditor.getColorObjectByColorValue` instead.
 
+### getDistributedEditingAcceptedFreshReviewConsumeValidationForRetrySaveRequest
+
+Returns accepted fresh-review consume validation for retry-save requests.
+
+This projection is hash-only and identity-redacted. It is available only after the no-write consume validation accepted the recorded fresh-review decision for a future retry-save handoff.
+
+_Parameters_
+
+-   _sessionState_ `Object`: Current DE-RTC session state.
+
+_Returns_
+
+-   `Object|null`: Accepted fresh-review consume validation evidence.
+
 ### getDistributedEditingAcceptedReviewApprovalProofForRetrySaveRequest
 
 Builds the accepted review-approval proof object for guarded retry-save.
@@ -587,6 +657,110 @@ _Parameters_
 _Returns_
 
 -   `Object|null`: Accepted review-approval proof for retry-save.
+
+### getDistributedEditingFreshReviewConsumeEndpointPath
+
+Returns the current DE-RTC fresh-review decision consumption endpoint path for a post.
+
+_Parameters_
+
+-   _args_ `Object`: Endpoint args.
+-   _args.postId_ `number`: Post ID.
+-   _args.restBase_ `[string]`: REST base for the edited post type.
+
+_Returns_
+
+-   `string`: REST path.
+
+### getDistributedEditingFreshReviewDecisionEndpointPath
+
+Returns the current DE-RTC fresh-review decision endpoint path for a post.
+
+_Parameters_
+
+-   _args_ `Object`: Endpoint args.
+-   _args.postId_ `number`: Post ID.
+-   _args.restBase_ `[string]`: REST base for the edited post type.
+
+_Returns_
+
+-   `string`: REST path.
+
+### getDistributedEditingFreshReviewDecisionStateForSessionState
+
+Returns proof-opaque fresh-review decision state for internal reviewer panels and status surfaces. It may expose hash-only reviewed-block evidence, but it must not expose raw content, proof signatures, or reviewer identity.
+
+_Parameters_
+
+-   _sessionState_ `Object`: DE-RTC session state.
+
+_Returns_
+
+-   `Object`: Fresh-review decision state.
+
+### getDistributedEditingFreshReviewLifecycleStateForSessionState
+
+Returns support-safe fresh-review lifecycle evidence for future UI.
+
+_Parameters_
+
+-   _sessionState_ `Object`: DE-RTC session state.
+
+_Returns_
+
+-   `Object`: Fresh-review lifecycle state.
+
+### getDistributedEditingFreshReviewPrePublishStateForSessionState
+
+Returns the pure fresh-review pre-publish surface state. The returned review items and actions are descriptors only; they do not open UI, call REST, save, retry-save, dispatch notices, mutate content, expose raw content, or change post locks.
+
+_Parameters_
+
+-   _sessionState_ `Object`: DE-RTC session state.
+
+_Returns_
+
+-   `Object`: Fresh-review pre-publish state.
+
+### getDistributedEditingFreshReviewPreSaveStateForSessionState
+
+Returns a fresh-review lifecycle descriptor for future Save/pre-save UI.
+
+This is only placement and policy evidence. It does not open the pre-publish sidebar, save, retry-save, dispatch notices, mutate content, inspect proof internals, or change post locks.
+
+_Parameters_
+
+-   _sessionState_ `Object`: DE-RTC session state.
+
+_Returns_
+
+-   `Object`: Fresh-review pre-save state.
+
+### getDistributedEditingFreshReviewRequestEndpointPath
+
+Returns the current DE-RTC fresh-review request endpoint path for a post.
+
+_Parameters_
+
+-   _args_ `Object`: Endpoint args.
+-   _args.postId_ `number`: Post ID.
+-   _args.restBase_ `[string]`: REST base for the edited post type.
+
+_Returns_
+
+-   `string`: REST path.
+
+### getDistributedEditingFreshReviewRetrySaveHandoffStateForSessionState
+
+Returns no-save fresh-review retry-save handoff state for a recorded reviewer decision. This is a validation handoff only; it does not call retry-save or normal save.
+
+_Parameters_
+
+-   _sessionState_ `Object`: DE-RTC session state.
+
+_Returns_
+
+-   `Object`: Fresh-review retry-save handoff state.
 
 ### getDistributedEditingLocalUpdatesExportPayload
 
@@ -616,12 +790,25 @@ _Parameters_
 -   _args_ `Object`: Import inputs.
 -   _args.payload_ `Object`: Parsed local-updates payload.
 -   _args.currentPost_ `Object`: Current editor post.
+-   _args.currentSessionState_ `Object`: Current DE-RTC session state.
 -   _args.computedPostContentHash_ `string`: SHA-256 of payload postContent.
 -   _args.now_ `[number]`: Current Unix timestamp in seconds.
 
 _Returns_
 
 -   `Object`: Import result.
+
+### getDistributedEditingLocalUpdatesImportReviewRequestStateForSessionState
+
+Returns a pure fresh-review request descriptor for blocked local-updates imports. This keeps receiving-admin handoffs actionable without reusing stale proof, saving, calling REST, dispatching notices, mutating content, or exposing proof internals.
+
+_Parameters_
+
+-   _sessionState_ `Object`: DE-RTC session state.
+
+_Returns_
+
+-   `Object`: Local-updates import review request state.
 
 ### getDistributedEditingNoticeDescriptorsForSessionState
 
@@ -730,6 +917,19 @@ _Returns_
 
 -   `string`: REST path.
 
+### getDistributedEditingReviewedBlockItemsForFreshReviewDecision
+
+Builds hash-only reviewed-block decision evidence for a future fresh-review proof endpoint. It does not include raw content or reviewer identity.
+
+_Parameters_
+
+-   _sessionState_ `Object`: Current DE-RTC session state.
+-   _options_ `[Object]`: Optional explicit source items.
+
+_Returns_
+
+-   `Array`: Hash-only reviewed block decision items.
+
 ### getDistributedEditingReviewedBlockItemsForRetrySaveReviewApprovalProof
 
 Builds hash-only reviewed block items for the review-approval proof request.
@@ -745,6 +945,18 @@ _Returns_
 
 -   `Array`: Reviewed block items for the REST helper.
 
+### getDistributedEditingReviewTokenRecoveryStateForSessionState
+
+Returns a pure recovery descriptor for failed opaque reviewed-proof token handoffs. The descriptor is product communication state only; it does not inspect token internals, call REST, save, retry, dispatch notices, mutate content, or change post locks.
+
+_Parameters_
+
+-   _sessionState_ `Object`: DE-RTC session state.
+
+_Returns_
+
+-   `Object`: Review token recovery descriptor.
+
 ### getDistributedEditingRiskyBlockReviewStateForSessionState
 
 Returns the risky-block review state as a nested object for selectors and future annotation surfaces.
@@ -756,6 +968,18 @@ _Parameters_
 _Returns_
 
 -   `Object`: Risky block review state.
+
+### getDistributedEditingSaveButtonStateForSessionState
+
+Returns the pure DE-RTC Save button semantics descriptor for the current session. The descriptor ranks review, retry-save, refetch, and fresh-review handoff state so UI can describe what the next Save click means without reading raw content, proof internals, or reviewer identity.
+
+_Parameters_
+
+-   _sessionState_ `Object`: DE-RTC session state.
+
+_Returns_
+
+-   `Object`: Save button semantics descriptor.
 
 ### getDistributedEditingSavePolicyStateForSessionState
 
@@ -784,6 +1008,97 @@ _Parameters_
 _Returns_
 
 -   `string`: REST path.
+
+### getDistributedEditingSessionStateForFreshReviewDecisionItemResolution
+
+Returns editor state after one fresh-review decision is approved or rejected. The state remains proof-opaque and no-write.
+
+_Parameters_
+
+-   _currentSessionState_ `Object`: Current DE-RTC session state.
+-   _resolution_ `Object`: Review decision data.
+
+_Returns_
+
+-   `Object`: Normalized DE-RTC session state.
+
+### getDistributedEditingSessionStateForFreshReviewDecisionItems
+
+Returns editor state after loading hash-only reviewed-block evidence for a requested fresh review. This only prepares an internal decision panel.
+
+_Parameters_
+
+-   _currentSessionState_ `Object`: Current DE-RTC session state.
+-   _decision_ `Object`: Decision evidence inputs.
+
+_Returns_
+
+-   `Object`: Normalized DE-RTC session state.
+
+### getDistributedEditingSessionStateForFreshReviewDecisionResult
+
+Returns editor state for a server-backed fresh-review decision response or error. The result remains proof-opaque and must not imply a save.
+
+_Parameters_
+
+-   _responseOrError_ `Object`: REST response or API error.
+-   _currentSessionState_ `Object`: Current DE-RTC session state.
+
+_Returns_
+
+-   `Object`: Normalized DE-RTC session state.
+
+### getDistributedEditingSessionStateForFreshReviewLifecycleRetrievalResult
+
+Returns editor state after receiving support-safe fresh-review lifecycle evidence. This is response normalization only; it does not call REST, save, retry-save, dispatch notices, mutate content, expose private identity, or change post locks.
+
+_Parameters_
+
+-   _responseOrError_ `Object`: REST-like response or API error.
+-   _currentSessionState_ `Object`: Current DE-RTC session state.
+
+_Returns_
+
+-   `Object`: Normalized DE-RTC session state.
+
+### getDistributedEditingSessionStateForFreshReviewRequestResult
+
+Returns inert DE-RTC editor state for a fresh-review request response or error. The request can only record hash/version request evidence; it must not save, retry-save, mutate editor content, dispatch notices, persist state, or change post locks.
+
+_Parameters_
+
+-   _responseOrError_ `Object`: REST response or API error.
+-   _currentSessionState_ `Object`: Current DE-RTC session state.
+
+_Returns_
+
+-   `Object`: Normalized DE-RTC session state.
+
+### getDistributedEditingSessionStateForFreshReviewRetrySaveHandoffValidation
+
+Returns editor state when a recorded fresh-review approval is staged for a future retry-save validation consumer. This is a local handoff only.
+
+_Parameters_
+
+-   _currentSessionState_ `Object`: Current DE-RTC session state.
+-   _options_ `[Object]`: Hash/version validation inputs.
+
+_Returns_
+
+-   `Object`: Normalized DE-RTC session state.
+
+### getDistributedEditingSessionStateForFreshReviewRetrySaveHandoffValidationResult
+
+Returns editor state for a future server validation result for a recorded fresh-review decision handoff. This consumes a response shape only; it does not call transport or persist outside the editor store.
+
+_Parameters_
+
+-   _responseOrError_ `Object`: REST response or API error.
+-   _currentSessionState_ `Object`: Current DE-RTC session state.
+
+_Returns_
+
+-   `Object`: Normalized DE-RTC session state.
 
 ### getDistributedEditingSessionStateForKsesRiskyBlockReviewClassificationResult
 
@@ -1925,6 +2240,11 @@ Renders the publish button.
 ### PostPublishButtonLabel
 
 Renders the label for the publish button.
+
+_Parameters_
+
+-   _props_ `[Object]`: Component props.
+-   _props.distributedEditingSaveButtonState_ `[Object]`: DE-RTC Save button descriptor.
 
 _Returns_
 

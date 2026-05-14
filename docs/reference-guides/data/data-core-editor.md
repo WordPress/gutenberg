@@ -298,6 +298,78 @@ _Returns_
 
 -   `string`: Device type.
 
+### getDistributedEditingFreshReviewDecisionState
+
+Returns the current DE-RTC fresh-review decision state.
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+
+_Returns_
+
+-   `Object`: Fresh-review decision state.
+
+### getDistributedEditingFreshReviewLifecycleState
+
+Returns the current DE-RTC fresh-review lifecycle evidence for future support-safe UI consumers.
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+
+_Returns_
+
+-   `Object`: Fresh-review lifecycle state.
+
+### getDistributedEditingFreshReviewPrePublishState
+
+Returns the current DE-RTC fresh-review pre-publish surface state.
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+
+_Returns_
+
+-   `Object`: Fresh-review pre-publish state.
+
+### getDistributedEditingFreshReviewPreSaveState
+
+Returns the current DE-RTC fresh-review placement for future Save and pre-publish review consumers.
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+
+_Returns_
+
+-   `Object`: Fresh-review pre-save state.
+
+### getDistributedEditingFreshReviewRetrySaveHandoffState
+
+Returns the current DE-RTC fresh-review retry-save handoff state.
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+
+_Returns_
+
+-   `Object`: Fresh-review retry-save handoff state.
+
+### getDistributedEditingLocalUpdatesImportReviewRequestState
+
+Returns the current DE-RTC local-updates import review request state.
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+
+_Returns_
+
+-   `Object`: Local-updates import review request state.
+
 ### getDistributedEditingNoticeDescriptors
 
 Returns stable notice descriptors for distributed editing. The descriptors are pure integration data; rendering copy and dispatch side effects belong to future UI code.
@@ -322,6 +394,18 @@ _Returns_
 
 -   `Object`: Retry-save flow state.
 
+### getDistributedEditingReviewTokenRecoveryState
+
+Returns a side-effect-free DE-RTC review-token recovery descriptor for status and import/export consumers.
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+
+_Returns_
+
+-   `Object`: Review token recovery state.
+
 ### getDistributedEditingRiskyBlockReviewState
 
 Returns the current DE-RTC risky-block review state for editor annotation and pre-publish review consumers.
@@ -333,6 +417,18 @@ _Parameters_
 _Returns_
 
 -   `Object`: Risky block review state.
+
+### getDistributedEditingSaveButtonState
+
+Returns the current DE-RTC Save button semantics descriptor.
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+
+_Returns_
+
+-   `Object`: Save button state.
 
 ### getDistributedEditingSavePolicyState
 

@@ -272,17 +272,17 @@ export default compose( [
 	} ),
 	withDispatch( ( dispatch ) => {
 		const {
-			__experimentalMaybeRouteSavePostToDistributedEditingRiskyBlockReview,
+			__experimentalMaybeHandleDistributedEditingSaveButtonClick,
 			editPost,
 			savePost,
 		} = dispatch( editorStore );
 		return {
 			savePostStatus: async ( status ) => {
-				const riskyBlockReviewRouting =
-					await __experimentalMaybeRouteSavePostToDistributedEditingRiskyBlockReview();
+				const saveButtonClickRouting =
+					await __experimentalMaybeHandleDistributedEditingSaveButtonClick();
 
-				if ( ! riskyBlockReviewRouting.allowsNormalSaveFallback ) {
-					return riskyBlockReviewRouting;
+				if ( ! saveButtonClickRouting.allowsNormalSaveFallback ) {
+					return saveButtonClickRouting;
 				}
 
 				editPost( { status }, { undoIgnore: true } );

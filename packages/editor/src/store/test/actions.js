@@ -469,6 +469,321 @@ describe( 'Post actions', () => {
 		} );
 	} );
 
+	describe( '__experimentalMaybeHandleDistributedEditingSaveButtonClick()', () => {
+		it( 'refetches server state from a Save button click without saving when stale state requires refetch', async () => {
+			const post = {
+				id: postId,
+				type: 'post',
+				title: 'bar',
+				content: 'bar',
+				status: 'draft',
+			};
+			const serverResponse = {
+				id: postId,
+				type: 'post',
+				content: {
+					raw: 'remote bar from Save click',
+				},
+				distributed_editing: {
+					server_version: '27',
+				},
+			};
+			let refetchCalls = 0;
+
+			apiFetch.setFetchHandler( async ( options ) => {
+				const { path, method, data } = options;
+
+				refetchCalls++;
+				expect( method ).toBe( 'GET' );
+				expect( path ).toMatch(
+					new RegExp( `^/wp/v2/posts/${ postId }\\?context=edit` )
+				);
+				expect( data ).toBeUndefined();
+
+				return serverResponse;
+			} );
+
+			const registry = createRegistryWithStores();
+
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', post );
+			registry.dispatch( editorStore ).setupEditor( post, {
+				content: 'local bar from Save click',
+			} );
+			registry.dispatch( editorStore ).updateEditorSettings( {
+				distributedEditing: {
+					enabled: true,
+					retrySaveHandoff: true,
+					riskyBlockReview: true,
+				},
+			} );
+			registry
+				.dispatch( editorStore )
+				.setDistributedEditingSessionState( {
+					disposition:
+						DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+					reasonCode:
+						DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+					clientBaseVersion: '25',
+					serverVersion: '26',
+					pendingChangeCount: 1,
+					remoteChangeCount: 1,
+					requiresServerStateRefetch: true,
+					hasPendingChanges: true,
+					canExportLocalUpdates: true,
+				} );
+
+			await expect(
+				registry
+					.dispatch( editorStore )
+					.__experimentalMaybeHandleDistributedEditingSaveButtonClick()
+			).resolves.toMatchObject( {
+				status: 'server_state_refetched_before_save',
+				reason: DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.SERVER_STATE_REFETCH_REQUIRED,
+				allowsNormalSaveFallback: false,
+				blocksNormalSavePost: true,
+				requiresServerStateRefetch: false,
+				refetchedServerState: true,
+				requiresRiskyBlockReviewServerStateRefetch: false,
+				callsServerStateRefetchEndpoint: true,
+				callsNormalSavePost: false,
+				callsRetrySaveEndpoint: false,
+				mutatesEditorContent: false,
+				mutatesPersistedPostContent: false,
+				changesPostLock: false,
+				claimsSaved: false,
+			} );
+
+			expect( refetchCalls ).toBe( 1 );
+			expect(
+				registry.select( editorStore ).getEditedPostContent()
+			).toBe( 'local bar from Save click' );
+			expect(
+				registry
+					.select( editorStore )
+					.getDistributedEditingSessionState()
+			).toMatchObject( {
+				serverVersion: '27',
+				refetchedServerContent: 'remote bar from Save click',
+				requiresServerStateRefetch: false,
+				refetchedServerState: true,
+				canExportLocalUpdates: true,
+			} );
+			expect( registry.select( noticesStore ).getNotices() ).toEqual(
+				[]
+			);
+		} );
+
+		it( 'clears a risky-review-specific refetch gate after a Save button refetch without saving', async () => {
+			const post = {
+				id: postId,
+				type: 'post',
+				title: 'bar',
+				content: 'bar',
+				status: 'draft',
+			};
+			const serverResponse = {
+				id: postId,
+				type: 'post',
+				content: {
+					raw: 'remote bar after risky review refetch',
+				},
+				distributed_editing: {
+					server_version: '28',
+				},
+			};
+			let refetchCalls = 0;
+
+			apiFetch.setFetchHandler( async ( options ) => {
+				const { path, method, data } = options;
+
+				refetchCalls++;
+				expect( method ).toBe( 'GET' );
+				expect( path ).toMatch(
+					new RegExp( `^/wp/v2/posts/${ postId }\\?context=edit` )
+				);
+				expect( data ).toBeUndefined();
+
+				return serverResponse;
+			} );
+
+			const registry = createRegistryWithStores();
+
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', post );
+			registry.dispatch( editorStore ).setupEditor( post, {
+				content: 'local risky bar from Save click',
+			} );
+			registry.dispatch( editorStore ).updateEditorSettings( {
+				distributedEditing: {
+					enabled: true,
+					retrySaveHandoff: true,
+					riskyBlockReview: true,
+				},
+			} );
+			registry
+				.dispatch( editorStore )
+				.setDistributedEditingSessionState( {
+					disposition:
+						DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+					reasonCode:
+						DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+					clientBaseVersion: '25',
+					serverVersion: '27',
+					pendingChangeCount: 1,
+					remoteChangeCount: 1,
+					hasPendingChanges: true,
+					canExportLocalUpdates: true,
+					riskyBlockReviewStatus:
+						DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_STATUSES.REVIEW_REQUIRED,
+					riskyBlockReviewRequiresServerStateRefetch: true,
+					riskyBlockReviewItems: [
+						{
+							id: 'risk-html-stale',
+							reviewStatus:
+								DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES.PENDING_REVIEW,
+						},
+					],
+					riskyBlockReviewPendingCount: 1,
+					riskyBlockReviewPrePublishPanelRequired: false,
+				} );
+
+			await expect(
+				registry
+					.dispatch( editorStore )
+					.__experimentalMaybeHandleDistributedEditingSaveButtonClick()
+			).resolves.toMatchObject( {
+				status: 'server_state_refetched_before_save',
+				allowsNormalSaveFallback: false,
+				blocksNormalSavePost: true,
+				requiresServerStateRefetch: false,
+				refetchedServerState: true,
+				requiresRiskyBlockReviewServerStateRefetch: false,
+				callsServerStateRefetchEndpoint: true,
+				callsNormalSavePost: false,
+				callsRetrySaveEndpoint: false,
+				mutatesEditorContent: false,
+				mutatesPersistedPostContent: false,
+				changesPostLock: false,
+				claimsSaved: false,
+			} );
+
+			expect( refetchCalls ).toBe( 1 );
+			expect(
+				registry.select( editorStore ).getEditedPostContent()
+			).toBe( 'local risky bar from Save click' );
+			expect(
+				registry
+					.select( editorStore )
+					.getDistributedEditingSessionState()
+			).toMatchObject( {
+				serverVersion: '28',
+				refetchedServerContent: 'remote bar after risky review refetch',
+				requiresServerStateRefetch: false,
+				refetchedServerState: true,
+				riskyBlockReviewRequiresServerStateRefetch: false,
+				riskyBlockReviewStatus:
+					DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_STATUSES.REVIEW_REQUIRED,
+				riskyBlockReviewSaveClickAction:
+					DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.OPEN_PRE_PUBLISH_REVIEW,
+				canExportLocalUpdates: true,
+			} );
+			expect(
+				registry
+					.select( editorStore )
+					.getDistributedEditingSaveButtonState()
+			).toMatchObject( {
+				status: DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES.REVIEW_BLOCKED,
+				clickAction:
+					DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.OPEN_PRE_PUBLISH_REVIEW,
+				blocksNormalSavePost: true,
+			} );
+		} );
+
+		it( 'falls back to the ordinary Save click when Distributed Editing settings are disabled', async () => {
+			const registry = createRegistryWithStores();
+			let apiCalls = 0;
+
+			apiFetch.setFetchHandler( async () => {
+				apiCalls++;
+				throw new Error( 'Disabled Save click should not call REST.' );
+			} );
+			registry.dispatch( editorStore ).updateEditorSettings( {
+				distributedEditing: {
+					enabled: false,
+					retrySaveHandoff: true,
+					riskyBlockReview: true,
+				},
+			} );
+			registry
+				.dispatch( editorStore )
+				.setDistributedEditingSessionState( {
+					disposition:
+						DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+					reasonCode:
+						DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+					pendingChangeCount: 1,
+					requiresServerStateRefetch: true,
+					hasPendingChanges: true,
+					canExportLocalUpdates: true,
+				} );
+
+			await expect(
+				registry
+					.dispatch( editorStore )
+					.__experimentalMaybeHandleDistributedEditingSaveButtonClick()
+			).resolves.toMatchObject( {
+				status: 'normal_save_fallback',
+				allowsNormalSaveFallback: true,
+				blocksNormalSavePost: false,
+				callsServerStateRefetchEndpoint: false,
+				callsNormalSavePost: false,
+				callsRetrySaveEndpoint: false,
+				claimsSaved: false,
+			} );
+
+			expect( apiCalls ).toBe( 0 );
+		} );
+
+		it( 'blocks disabled in-flight Distributed Editing Save button states without fallback', async () => {
+			const registry = createRegistryWithStores();
+
+			registry.dispatch( editorStore ).updateEditorSettings( {
+				distributedEditing: {
+					enabled: true,
+					retrySaveHandoff: true,
+					riskyBlockReview: true,
+				},
+			} );
+			registry
+				.dispatch( editorStore )
+				.setDistributedEditingSessionState( {
+					hasPendingChanges: true,
+					pendingChangeCount: 1,
+					canExportLocalUpdates: true,
+					retrySaveStatus:
+						DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVING,
+				} );
+
+			await expect(
+				registry
+					.dispatch( editorStore )
+					.__experimentalMaybeHandleDistributedEditingSaveButtonClick()
+			).resolves.toMatchObject( {
+				status: 'distributed_editing_save_button_blocked',
+				reason: DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.RETRY_SAVE_IN_PROGRESS,
+				allowsNormalSaveFallback: false,
+				blocksNormalSavePost: true,
+				callsServerStateRefetchEndpoint: false,
+				callsNormalSavePost: false,
+				callsRetrySaveEndpoint: false,
+				claimsSaved: false,
+			} );
+		} );
+	} );
+
 	describe( '__experimentalFocusDistributedEditingRiskyBlockReviewItem()', () => {
 		it( 'returns a no-write block focus handoff for a review item', async () => {
 			const registry = createRegistryWithStores();
