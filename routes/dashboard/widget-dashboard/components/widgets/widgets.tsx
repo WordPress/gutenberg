@@ -18,6 +18,7 @@ import type {
  */
 import { useDashboardInternalContext } from '../../context/dashboard-context';
 import { WidgetChrome } from '../widget-chrome';
+import { WidgetResizeHandle } from './widget-resize-handle';
 import styles from './widgets.module.css';
 import type { DashboardWidget, WidgetName } from '../../types';
 
@@ -96,6 +97,7 @@ export const Widgets = forwardRef< HTMLDivElement, WidgetsProps >(
 			editMode,
 			onChangeLayout: handleLayoutChange,
 			renderDragPreview,
+			renderResizeHandle: WidgetResizeHandle,
 		};
 
 		return (
