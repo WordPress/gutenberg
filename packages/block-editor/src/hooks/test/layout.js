@@ -5,7 +5,7 @@ import { getResetLayout } from '../layout';
 
 describe( 'layout', () => {
 	describe( 'getResetLayout()', () => {
-		it( 'should reset to variation layout defaults without resetting the current layout type', () => {
+		it( 'should reset to variation layout defaults', () => {
 			const layout = getResetLayout(
 				{ default: { type: 'flex' } },
 				{
@@ -15,17 +15,16 @@ describe( 'layout', () => {
 							columnCount: 3,
 						},
 					},
-				},
-				{ type: 'flex', columnCount: 6 }
+				}
 			);
 
 			expect( layout ).toEqual( {
-				type: 'flex',
+				type: 'grid',
 				columnCount: 3,
 			} );
 		} );
 
-		it( 'should fall back to the block support layout defaults without resetting the current layout type', () => {
+		it( 'should fall back to the block support layout defaults', () => {
 			const layout = getResetLayout(
 				{
 					default: {
@@ -33,21 +32,12 @@ describe( 'layout', () => {
 						flexWrap: 'nowrap',
 					},
 				},
-				undefined,
-				{ type: 'grid', flexWrap: 'wrap' }
+				undefined
 			);
 
 			expect( layout ).toEqual( {
-				type: 'grid',
-				flexWrap: 'nowrap',
-			} );
-		} );
-
-		it( 'should preserve the current layout type when there is no layout config', () => {
-			expect(
-				getResetLayout( undefined, undefined, { type: 'flex' } )
-			).toEqual( {
 				type: 'flex',
+				flexWrap: 'nowrap',
 			} );
 		} );
 

@@ -43,28 +43,23 @@ const VARIATION_PREFIX = 'is-style-';
 const layoutBlockSupportKey = 'layout';
 const { kebabCase } = unlock( componentsPrivateApis );
 
-export function getResetLayout(
-	layoutBlockSupport = {},
-	blockVariation,
-	currentLayout = {}
-) {
-	const defaultBlockLayout =
-		layoutBlockSupport && typeof layoutBlockSupport === 'object'
-			? layoutBlockSupport.default
-			: undefined;
-	const resetLayout =
-		blockVariation?.attributes?.layout ?? defaultBlockLayout;
-	const resetLayoutWithoutType = resetLayout
-		? Object.fromEntries(
-				Object.entries( resetLayout ).filter(
-					( [ key ] ) => key !== 'type'
-				)
-		  )
-		: {};
+function getDefaultLayout( layoutBlockSupport = {}, blockVariation ) {
+	const defaultBlockLayout = layoutBlockSupport?.default;
 
+	return blockVariation?.attributes?.layout ?? defaultBlockLayout;
+}
+
+/**
+ * Returns the layout values to use when resetting layout controls.
+ *
+ * @param { Object }           layoutBlockSupport Block layout support settings.
+ * @param { Object|undefined } blockVariation     Block variation settings.
+ *
+ * @return { Object|undefined } Reset layout values.
+ */
+export function getResetLayout( layoutBlockSupport = {}, blockVariation ) {
 	return cleanEmptyObject( {
-		...resetLayoutWithoutType,
-		type: currentLayout?.type,
+		...getDefaultLayout( layoutBlockSupport, blockVariation ),
 	} );
 }
 
@@ -183,38 +178,43 @@ function LayoutPanelPure( {
 	const settings = useBlockSettings( blockName );
 	// Block settings come from theme.json under settings.[blockName].
 	const { layout: layoutSettings } = settings;
-	const { themeSupportsLayout } = useSelect( ( select ) => {
-		const { getSettings } = select( blockEditorStore );
-		return {
-			themeSupportsLayout: getSettings().supportsLayout,
-		};
-	}, [] );
-	const { getActiveBlockVariation } = useSelect( blocksStore );
+	const { themeSupportsLayout, activeBlockVariation } = useSelect(
+		( select ) => {
+			const { getBlockAttributes, getSettings } =
+				select( blockEditorStore );
+			return {
+				activeBlockVariation: select(
+					blocksStore
+				).getActiveBlockVariation(
+					blockName,
+					getBlockAttributes( clientId ) || {},
+					'block'
+				),
+				themeSupportsLayout: getSettings().supportsLayout,
+			};
+		},
+		[ blockName, clientId ]
+	);
+
 	const blockEditingMode = useBlockEditingMode();
 	const resetLayoutFilter = useCallback(
-		( attributes = {}, context = {} ) => {
+		( ...resetArgs ) => {
+			const context = resetArgs[ 1 ] || {};
 			const resetBlockName = context.name || blockName;
-			const resetBlockAttributes = context.attributes || attributes;
 			const resetLayoutBlockSupport = getBlockSupport(
 				resetBlockName,
 				layoutBlockSupportKey,
 				{}
 			);
-			const activeBlockVariation = getActiveBlockVariation(
-				resetBlockName,
-				resetBlockAttributes,
-				'block'
-			);
 
 			return {
 				layout: getResetLayout(
 					resetLayoutBlockSupport,
-					activeBlockVariation,
-					resetBlockAttributes.layout
+					activeBlockVariation
 				),
 			};
 		},
-		[ blockName, getActiveBlockVariation ]
+		[ blockName, activeBlockVariation ]
 	);
 
 	if ( blockEditingMode !== 'default' ) {
@@ -278,6 +278,13 @@ function LayoutPanelPure( {
 	) {
 		return null;
 	}
+	const defaultLayout = cleanEmptyObject( {
+		...getDefaultLayout( layoutBlockSupport, activeBlockVariation ),
+	} );
+	const resetLayoutDefaults = getResetLayout(
+		layoutBlockSupport,
+		activeBlockVariation
+	);
 	const layoutType = getLayoutType( blockLayoutType );
 	const constrainedType = getLayoutType( 'constrained' );
 	const displayControlsForLegacyLayouts =
@@ -288,13 +295,15 @@ function LayoutPanelPure( {
 		setAttributes( { layout: { type: newType } } );
 	const onChangeLayout = ( newLayout ) =>
 		setAttributes( { layout: cleanEmptyObject( newLayout ) } );
-	const resetLayout = () => setAttributes( { layout: undefined } );
+	const resetLayout = () => setAttributes( { layout: defaultLayout } );
 	const resetInheritToggle = () =>
 		setAttributes( { layout: { type: 'default' } } );
 	const isUsingContentWidth = () =>
 		layoutType?.name === 'constrained' || hasContentSizeOrLegacySettings;
 	const hasInheritToggleValue = () => layout?.type === 'constrained';
-	const hasLayoutTypeValue = () => !! layout?.type;
+	const hasLayoutTypeValue = () =>
+		( usedLayout?.type ?? 'default' ) !==
+		( defaultLayout?.type ?? 'default' );
 
 	return (
 		<>
@@ -356,6 +365,7 @@ function LayoutPanelPure( {
 						value={ layout }
 						onChange={ onChangeLayout }
 						layoutBlockSupport={ blockSupportAndThemeSettings }
+						resetLayout={ resetLayoutDefaults }
 						name={ blockName }
 						clientId={ clientId }
 					/>
@@ -366,6 +376,7 @@ function LayoutPanelPure( {
 						value={ layout }
 						onChange={ onChangeLayout }
 						layoutBlockSupport={ blockSupportAndThemeSettings }
+						resetLayout={ resetLayoutDefaults }
 						name={ blockName }
 						clientId={ clientId }
 					/>

@@ -68,9 +68,9 @@ export default {
 	label: __( 'Grid' ),
 	inspectorControls: function GridLayoutInspectorControls( {
 		layout = {},
-		value: savedLayout = {},
 		onChange,
 		layoutBlockSupport = {},
+		resetLayout = {},
 		clientId,
 	} ) {
 		const { allowSizingOnChildren = false } = layoutBlockSupport;
@@ -82,35 +82,38 @@ export default {
 			! layout?.isManualPlacement ||
 			window.__experimentalEnableGridInteractivity;
 		const defaultColumnCount = layout.isManualPlacement ? 3 : undefined;
-		const hasGridTypeValue = () => !! savedLayout.isManualPlacement;
+		const hasLayoutValue = ( key, defaultValue ) =>
+			( layout?.[ key ] ?? defaultValue ) !==
+			( resetLayout?.[ key ] ?? defaultValue );
+		const hasGridTypeValue = () =>
+			hasLayoutValue( 'isManualPlacement', false );
 		const hasColumnsAndRowsValue = () =>
-			( savedLayout.columnCount !== undefined &&
-				savedLayout.columnCount !== defaultColumnCount ) ||
-			!! savedLayout.rowCount;
+			hasLayoutValue( 'columnCount', defaultColumnCount ) ||
+			hasLayoutValue( 'rowCount' );
 		const hasMinimumColumnWidthValue = () =>
-			!! savedLayout.minimumColumnWidth;
+			hasLayoutValue( 'minimumColumnWidth' );
 		const resetGridType = () =>
 			onChange(
 				cleanEmptyObject( {
 					...layout,
-					isManualPlacement: undefined,
-					rowCount: undefined,
-					minimumColumnWidth: undefined,
+					isManualPlacement: resetLayout?.isManualPlacement,
+					rowCount: resetLayout?.rowCount,
+					minimumColumnWidth: resetLayout?.minimumColumnWidth,
 				} )
 			);
 		const resetColumnsAndRows = () =>
 			onChange(
 				cleanEmptyObject( {
 					...layout,
-					columnCount: defaultColumnCount,
-					rowCount: undefined,
+					columnCount: resetLayout?.columnCount ?? defaultColumnCount,
+					rowCount: resetLayout?.rowCount,
 				} )
 			);
 		const resetMinimumColumnWidth = () =>
 			onChange(
 				cleanEmptyObject( {
 					...layout,
-					minimumColumnWidth: undefined,
+					minimumColumnWidth: resetLayout?.minimumColumnWidth,
 				} )
 			);
 

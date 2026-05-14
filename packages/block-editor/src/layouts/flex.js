@@ -69,9 +69,9 @@ export default {
 	label: __( 'Flex' ),
 	inspectorControls: function FlexLayoutInspectorControls( {
 		layout = {},
-		value: savedLayout = {},
 		onChange,
 		layoutBlockSupport = {},
+		resetLayout = {},
 		clientId,
 	} ) {
 		const {
@@ -79,32 +79,40 @@ export default {
 			allowJustification = true,
 			allowWrap = true,
 		} = layoutBlockSupport;
+		const hasLayoutValue = ( key, defaultValue ) =>
+			( layout?.[ key ] ?? defaultValue ) !==
+			( resetLayout?.[ key ] ?? defaultValue );
 		const hasJustificationValue = () =>
-			!! savedLayout.justifyContent &&
-			savedLayout.justifyContent !== 'left';
+			hasLayoutValue( 'justifyContent', 'left' );
 		const hasOrientationValue = () =>
-			!! savedLayout.orientation &&
-			savedLayout.orientation !== 'horizontal';
-		const hasWrapValue = () => savedLayout.flexWrap === 'nowrap';
+			hasLayoutValue( 'orientation', 'horizontal' );
+		const hasWrapValue = () => hasLayoutValue( 'flexWrap', 'wrap' );
 		const resetJustification = () =>
 			onChange(
 				cleanEmptyObject( {
 					...layout,
-					justifyContent: undefined,
+					justifyContent: resetLayout?.justifyContent,
 				} )
 			);
 		const resetOrientation = () => {
 			const { verticalAlignment, justifyContent } = layout;
+			const nextOrientation = resetLayout?.orientation;
+			const isHorizontal =
+				! nextOrientation || nextOrientation === 'horizontal';
 			onChange(
 				cleanEmptyObject( {
 					...layout,
-					orientation: undefined,
+					orientation: nextOrientation,
 					verticalAlignment:
-						verticalAlignment === 'space-between'
+						resetLayout?.verticalAlignment ??
+						( isHorizontal && verticalAlignment === 'space-between'
 							? 'center'
-							: verticalAlignment,
+							: verticalAlignment ),
 					justifyContent:
-						justifyContent === 'stretch' ? 'left' : justifyContent,
+						resetLayout?.justifyContent ??
+						( isHorizontal && justifyContent === 'stretch'
+							? 'left'
+							: justifyContent ),
 				} )
 			);
 		};
@@ -112,7 +120,7 @@ export default {
 			onChange(
 				cleanEmptyObject( {
 					...layout,
-					flexWrap: undefined,
+					flexWrap: resetLayout?.flexWrap,
 				} )
 			);
 

@@ -35,9 +35,9 @@ export default {
 	label: __( 'Constrained' ),
 	inspectorControls: function DefaultLayoutInspectorControls( {
 		layout,
-		value: savedLayout = {},
 		onChange,
 		layoutBlockSupport = {},
+		resetLayout = {},
 		clientId,
 	} ) {
 		const { wideSize, contentSize, justifyContent = 'center' } = layout;
@@ -72,32 +72,34 @@ export default {
 		const units = useCustomUnits( {
 			availableUnits: availableUnits || [ '%', 'px', 'em', 'rem', 'vw' ],
 		} );
+		const hasLayoutValue = ( key, defaultValue ) =>
+			( layout?.[ key ] ?? defaultValue ) !==
+			( resetLayout?.[ key ] ?? defaultValue );
 		const resetContentSize = () =>
 			onChange(
 				cleanEmptyObject( {
 					...layout,
-					contentSize: undefined,
+					contentSize: resetLayout?.contentSize,
 				} )
 			);
 		const resetWideSize = () =>
 			onChange(
 				cleanEmptyObject( {
 					...layout,
-					wideSize: undefined,
+					wideSize: resetLayout?.wideSize,
 				} )
 			);
 		const resetJustification = () =>
 			onChange(
 				cleanEmptyObject( {
 					...layout,
-					justifyContent: undefined,
+					justifyContent: resetLayout?.justifyContent,
 				} )
 			);
-		const hasContentSizeValue = () => !! savedLayout.contentSize;
-		const hasWideSizeValue = () => !! savedLayout.wideSize;
+		const hasContentSizeValue = () => hasLayoutValue( 'contentSize' );
+		const hasWideSizeValue = () => hasLayoutValue( 'wideSize' );
 		const hasJustificationValue = () =>
-			!! savedLayout.justifyContent &&
-			savedLayout.justifyContent !== 'center';
+			hasLayoutValue( 'justifyContent', 'center' );
 
 		return (
 			<>
