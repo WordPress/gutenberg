@@ -32,6 +32,7 @@ const handleError = ( error ) => {
 	// https://github.com/facebook/jest/blob/1be8d737abd0e2f30e3314184a0efc372ad6d88f/packages/jest-jasmine2/src/jasmine/Env.ts#L250-L251
 	// Emitting an uncaughtException event to the process will throw an
 	// empty error which is very hard to debug in puppeteer context.
+	// eslint-disable-next-line no-console
 	console.error( error );
 };
 
@@ -69,6 +70,7 @@ class PuppeteerEnvironment extends NodeEnvironment {
 					// eslint-disable-next-line no-debugger
 					debugger;
 				} );
+				// eslint-disable-next-line no-console
 				console.log(
 					chalk.blue(
 						'\n\n🕵️‍  Code is paused, press enter to resume'
