@@ -258,7 +258,7 @@ export function LayoutSettings( {
 								<InputControl
 									label={ __( 'Number of columns' ) }
 									description={ __(
-										'Total columns across the dashboard width.'
+										'Number of columns across the dashboard.'
 									) }
 									type="number"
 									min={ 1 }
