@@ -2,13 +2,18 @@ jest.mock( '@terrazzo/plugin-css', () => ( { FORMAT_ID: 'css/value' } ) );
 jest.mock( 'colorjs.io/fn', () => {
 	const OKLCH = { id: 'oklch' };
 	const sRGB = { id: 'srgb' };
+	const registry: Record< string, unknown > = {};
 	return {
 		__esModule: true,
 		OKLCH,
 		sRGB,
-		P3: { id: 'p3' },
 		HSL: { id: 'hsl' },
-		ColorSpace: { register: jest.fn(), registry: {} },
+		ColorSpace: {
+			register: jest.fn( ( s: { id: string } ) => {
+				registry[ s.id ] = s;
+			} ),
+			registry,
+		},
 		to: jest.fn( () => [ 0, 0, 0 ] ),
 		get: jest.fn( () => 0 ),
 	};
