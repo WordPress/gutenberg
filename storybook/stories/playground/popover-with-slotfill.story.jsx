@@ -80,8 +80,12 @@ export const CrossIframeWithSlotFill = {
 									portal={
 										<Popover.Portal container={ slotRef } />
 									}
-									collisionBoundary={
-										iframeBoundary ?? undefined
+									positioner={
+										<Popover.Positioner
+											collisionBoundary={
+												iframeBoundary ?? undefined
+											}
+										/>
 									}
 								>
 									<Popover.Arrow />
