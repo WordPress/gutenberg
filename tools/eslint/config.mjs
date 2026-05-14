@@ -207,13 +207,9 @@ export default dedupePlugins( [
 	...wpPlugin.configs.recommended,
 
 	// eslint-comments recommended (manually converted to flat config).
-	// Register under both names so that existing `eslint-comments/*` rule
-	// references (used below) continue to work alongside the canonical
-	// `@eslint-community/eslint-comments/*` names from the recommended config.
 	{
 		plugins: {
 			'@eslint-community/eslint-comments': eslintCommentsPlugin,
-			'eslint-comments': eslintCommentsPlugin,
 		},
 		rules: eslintCommentsPlugin.configs.recommended.rules,
 	},
@@ -226,6 +222,9 @@ export default dedupePlugins( [
 
 	// Global settings applicable to all files.
 	{
+		linterOptions: {
+			reportUnusedDisableDirectives: 'error',
+		},
 		languageOptions: {
 			globals: {
 				wp: 'off',
@@ -270,7 +269,6 @@ export default dedupePlugins( [
 					},
 				},
 			],
-			'eslint-comments/no-unused-disable': 'error',
 			'import/default': 'error',
 			'import/named': 'error',
 			'no-restricted-imports': [
