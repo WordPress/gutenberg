@@ -1320,146 +1320,22 @@ export const __experimentalSubmitDistributedEditingFreshReviewDecision =
  * @return {Function} Action thunk.
  */
 export const __experimentalPrepareDistributedEditingFreshReviewRetrySaveHandoffValidation =
-	( validationResult = null, options = {} ) =>
-	( { select, dispatch } ) => {
-		const currentSessionState =
-			select.getDistributedEditingSessionState?.() || {};
-		const preparedSessionState =
-			getDistributedEditingSessionStateForFreshReviewRetrySaveHandoffValidation(
-				currentSessionState,
-				options
-			);
-		const sessionState = validationResult
-			? getDistributedEditingSessionStateForFreshReviewRetrySaveHandoffValidationResult(
-					validationResult,
-					preparedSessionState
-			  )
-			: preparedSessionState;
 
-		dispatch.setDistributedEditingSessionState( sessionState );
-
-		return {
-			status: sessionState.localUpdatesImportFreshReviewRetrySaveHandoffStatus,
-			reason: sessionState.localUpdatesImportFreshReviewRetrySaveHandoffReason,
-			result: sessionState.localUpdatesImportFreshReviewRetrySaveHandoffResult,
-			ready: sessionState.localUpdatesImportFreshReviewRetrySaveHandoffReady,
-			validating:
-				sessionState.localUpdatesImportFreshReviewRetrySaveHandoffValidating,
-			accepted:
-				sessionState.localUpdatesImportFreshReviewRetrySaveHandoffAccepted,
-			callsFreshReviewValidationEndpoint: false,
-			callsFreshReviewDecisionEndpoint: false,
-			callsRetrySaveEndpoint: false,
-			callsNormalSavePost: false,
-			savesPost: false,
-			dispatchesNotice: false,
-			mutatesEditorContent: false,
-			mutatesPersistedPostContent: false,
-			changesPostLock: false,
-			claimsSaved: false,
-			exposesRawContent: false,
-			exposesProofSignature: false,
-			exposesReviewerIds: false,
-			sessionState,
-		};
-	};
-
-/**
- * Validates a recorded fresh-review approval against the server before a future
- * retry-save handoff. The server call is still no-write and sends only hash and
- * version evidence.
- *
- * @param {Object} [options] Validation options.
- *
- * @return {Function} Action thunk.
- */
-export const __experimentalValidateDistributedEditingFreshReviewRetrySaveHandoff =
-	( options = {} ) =>
-	async ( { select, dispatch, registry } ) => {
-		const currentSessionState =
-			select.getDistributedEditingSessionState?.() || {};
-		const preparedSessionState =
-			getDistributedEditingSessionStateForFreshReviewRetrySaveHandoffValidation(
-				currentSessionState,
-				options
-			);
-
-		dispatch.setDistributedEditingSessionState( preparedSessionState );
-
-		if (
-			! preparedSessionState.localUpdatesImportFreshReviewRetrySaveHandoffValidating
-		) {
-			return {
-				status: preparedSessionState.localUpdatesImportFreshReviewRetrySaveHandoffStatus,
-				reason: preparedSessionState.localUpdatesImportFreshReviewRetrySaveHandoffReason,
-				callsFreshReviewValidationEndpoint: false,
-				callsFreshReviewDecisionEndpoint: false,
-				callsRetrySaveEndpoint: false,
-				callsNormalSavePost: false,
-				savesPost: false,
-				dispatchesNotice: false,
-				mutatesEditorContent: false,
-				mutatesPersistedPostContent: false,
-				changesPostLock: false,
-				claimsSaved: false,
-				exposesRawContent: false,
-				exposesProofSignature: false,
-				exposesReviewerIds: false,
-				sessionState: preparedSessionState,
-			};
-		}
-
-		const currentPost = select.getCurrentPost?.() || {};
-		const postType =
-			options.postType ||
-			preparedSessionState.localUpdatesImportPostType ||
-			currentPost.type;
-		const postId =
-			options.postId ??
-			preparedSessionState.localUpdatesImportPostId ??
-			currentPost.id;
-		const postTypeRecord = postType
-			? registry.select( coreStore ).getPostType( postType )
-			: null;
-		const restBase =
-			options.restBase ||
-			postTypeRecord?.rest_base ||
-			DISTRIBUTED_EDITING_RECOVERY_REST_BASE;
-
-		try {
-			const response =
-				await requestDistributedEditingFreshReviewRetrySaveHandoffValidation(
-					{
-						postId,
-						restBase,
-						freshReviewRequestRecordId:
-							options.freshReviewRequestRecordId ??
-							preparedSessionState.localUpdatesImportFreshReviewRequestRecordId,
-						clientBaseVersion:
-							options.clientBaseVersion ??
-							preparedSessionState.clientBaseVersion,
-						serverVersion:
-							options.serverVersion ??
-							preparedSessionState.serverVersion,
-						proposedPostContentHash:
-							options.proposedPostContentHash ??
-							preparedSessionState.localUpdatesImportVerifiedPostContentHash,
-						reviewedProposedContentHash:
-							options.reviewedProposedContentHash ??
-							options.proposedPostContentHash ??
-							preparedSessionState.localUpdatesImportVerifiedPostContentHash,
-						candidatePostContentHash:
-							options.candidatePostContentHash,
-						reviewedCandidateContentHash:
-							options.reviewedCandidateContentHash ??
-							options.candidatePostContentHash,
-					}
+		( validationResult = null, options = {} ) =>
+		( { select, dispatch } ) => {
+			const currentSessionState =
+				select.getDistributedEditingSessionState?.() || {};
+			const preparedSessionState =
+				getDistributedEditingSessionStateForFreshReviewRetrySaveHandoffValidation(
+					currentSessionState,
+					options
 				);
-			const sessionState =
-				getDistributedEditingSessionStateForFreshReviewRetrySaveHandoffValidationResult(
-					response,
-					preparedSessionState
-				);
+			const sessionState = validationResult
+				? getDistributedEditingSessionStateForFreshReviewRetrySaveHandoffValidationResult(
+						validationResult,
+						preparedSessionState
+				  )
+				: preparedSessionState;
 
 			dispatch.setDistributedEditingSessionState( sessionState );
 
@@ -1467,9 +1343,12 @@ export const __experimentalValidateDistributedEditingFreshReviewRetrySaveHandoff
 				status: sessionState.localUpdatesImportFreshReviewRetrySaveHandoffStatus,
 				reason: sessionState.localUpdatesImportFreshReviewRetrySaveHandoffReason,
 				result: sessionState.localUpdatesImportFreshReviewRetrySaveHandoffResult,
+				ready: sessionState.localUpdatesImportFreshReviewRetrySaveHandoffReady,
+				validating:
+					sessionState.localUpdatesImportFreshReviewRetrySaveHandoffValidating,
 				accepted:
 					sessionState.localUpdatesImportFreshReviewRetrySaveHandoffAccepted,
-				callsFreshReviewValidationEndpoint: true,
+				callsFreshReviewValidationEndpoint: false,
 				callsFreshReviewDecisionEndpoint: false,
 				callsRetrySaveEndpoint: false,
 				callsNormalSavePost: false,
@@ -1484,18 +1363,142 @@ export const __experimentalValidateDistributedEditingFreshReviewRetrySaveHandoff
 				exposesReviewerIds: false,
 				sessionState,
 			};
-		} catch ( error ) {
-			const sessionState =
-				getDistributedEditingSessionStateForFreshReviewRetrySaveHandoffValidationResult(
-					error,
-					preparedSessionState
+		};
+
+/**
+ * Validates a recorded fresh-review approval against the server before a future
+ * retry-save handoff. The server call is still no-write and sends only hash and
+ * version evidence.
+ *
+ * @param {Object} [options] Validation options.
+ *
+ * @return {Function} Action thunk.
+ */
+export const __experimentalValidateDistributedEditingFreshReviewRetrySaveHandoff =
+
+		( options = {} ) =>
+		async ( { select, dispatch, registry } ) => {
+			const currentSessionState =
+				select.getDistributedEditingSessionState?.() || {};
+			const preparedSessionState =
+				getDistributedEditingSessionStateForFreshReviewRetrySaveHandoffValidation(
+					currentSessionState,
+					options
 				);
 
-			dispatch.setDistributedEditingSessionState( sessionState );
+			dispatch.setDistributedEditingSessionState( preparedSessionState );
 
-			throw error;
-		}
-	};
+			if (
+				! preparedSessionState.localUpdatesImportFreshReviewRetrySaveHandoffValidating
+			) {
+				return {
+					status: preparedSessionState.localUpdatesImportFreshReviewRetrySaveHandoffStatus,
+					reason: preparedSessionState.localUpdatesImportFreshReviewRetrySaveHandoffReason,
+					callsFreshReviewValidationEndpoint: false,
+					callsFreshReviewDecisionEndpoint: false,
+					callsRetrySaveEndpoint: false,
+					callsNormalSavePost: false,
+					savesPost: false,
+					dispatchesNotice: false,
+					mutatesEditorContent: false,
+					mutatesPersistedPostContent: false,
+					changesPostLock: false,
+					claimsSaved: false,
+					exposesRawContent: false,
+					exposesProofSignature: false,
+					exposesReviewerIds: false,
+					sessionState: preparedSessionState,
+				};
+			}
+
+			const currentPost = select.getCurrentPost?.() || {};
+			const postType =
+				options.postType ||
+				preparedSessionState.localUpdatesImportPostType ||
+				currentPost.type;
+			const postId =
+				options.postId ??
+				preparedSessionState.localUpdatesImportPostId ??
+				currentPost.id;
+			const postTypeRecord = postType
+				? registry.select( coreStore ).getPostType( postType )
+				: null;
+			const restBase =
+				options.restBase ||
+				postTypeRecord?.rest_base ||
+				DISTRIBUTED_EDITING_RECOVERY_REST_BASE;
+
+			try {
+				const response =
+					await requestDistributedEditingFreshReviewRetrySaveHandoffValidation(
+						{
+							postId,
+							restBase,
+							freshReviewRequestRecordId:
+								options.freshReviewRequestRecordId ??
+								preparedSessionState.localUpdatesImportFreshReviewRequestRecordId,
+							clientBaseVersion:
+								options.clientBaseVersion ??
+								preparedSessionState.serverVersion ??
+								preparedSessionState.clientBaseVersion,
+							serverVersion:
+								options.serverVersion ??
+								preparedSessionState.serverVersion,
+							proposedPostContentHash:
+								options.proposedPostContentHash ??
+								preparedSessionState.localUpdatesImportVerifiedPostContentHash,
+							reviewedProposedContentHash:
+								options.reviewedProposedContentHash ??
+								options.proposedPostContentHash ??
+								preparedSessionState.localUpdatesImportVerifiedPostContentHash,
+							candidatePostContentHash:
+								options.candidatePostContentHash,
+							reviewedCandidateContentHash:
+								options.reviewedCandidateContentHash ??
+								options.candidatePostContentHash,
+						}
+					);
+				const sessionState =
+					getDistributedEditingSessionStateForFreshReviewRetrySaveHandoffValidationResult(
+						response,
+						preparedSessionState
+					);
+
+				dispatch.setDistributedEditingSessionState( sessionState );
+
+				return {
+					status: sessionState.localUpdatesImportFreshReviewRetrySaveHandoffStatus,
+					reason: sessionState.localUpdatesImportFreshReviewRetrySaveHandoffReason,
+					result: sessionState.localUpdatesImportFreshReviewRetrySaveHandoffResult,
+					accepted:
+						sessionState.localUpdatesImportFreshReviewRetrySaveHandoffAccepted,
+					callsFreshReviewValidationEndpoint: true,
+					callsFreshReviewDecisionEndpoint: false,
+					callsRetrySaveEndpoint: false,
+					callsNormalSavePost: false,
+					savesPost: false,
+					dispatchesNotice: false,
+					mutatesEditorContent: false,
+					mutatesPersistedPostContent: false,
+					changesPostLock: false,
+					claimsSaved: false,
+					exposesRawContent: false,
+					exposesProofSignature: false,
+					exposesReviewerIds: false,
+					sessionState,
+				};
+			} catch ( error ) {
+				const sessionState =
+					getDistributedEditingSessionStateForFreshReviewRetrySaveHandoffValidationResult(
+						error,
+						preparedSessionState
+					);
+
+				dispatch.setDistributedEditingSessionState( sessionState );
+
+				throw error;
+			}
+		};
 
 /**
  * Prepares the retry-submit handoff after a successful local rebase.
@@ -1851,6 +1854,46 @@ export const __experimentalSaveDistributedEditingRetryAfterProof =
 
 			throw error;
 		}
+	};
+
+/**
+ * Browser-callable fresh-review retry-save handoff.
+ *
+ * This is a narrow alias for the guarded retry-save write boundary after the
+ * fresh-review consume validation state is accepted. The underlying retry-save
+ * action still builds the hash-only fresh-review evidence from editor state and
+ * remains responsible for all persistence and rejection normalization.
+ *
+ * @param {Object} [options] Request options.
+ *
+ * @return {Function} Action thunk.
+ */
+export const __experimentalSaveDistributedEditingFreshReviewRetrySaveHandoff =
+	( options = {} ) =>
+	async ( { select, dispatch } ) => {
+		const currentSessionState =
+			select.getDistributedEditingSessionState?.() || {};
+		const acceptedFreshReviewConsumeValidation =
+			options.acceptedFreshReviewConsumeValidation ??
+			getDistributedEditingAcceptedFreshReviewConsumeValidationForRetrySaveRequest(
+				currentSessionState
+			);
+		const freshReviewServerVersion =
+			acceptedFreshReviewConsumeValidation?.serverVersion ??
+			acceptedFreshReviewConsumeValidation?.server_version ??
+			currentSessionState.retrySaveFreshReviewServerVersion ??
+			currentSessionState.localUpdatesImportFreshReviewRetrySaveHandoffServerVersion;
+
+		return dispatch.__experimentalSaveDistributedEditingRetryAfterProof( {
+			...options,
+			...( freshReviewServerVersion
+				? {
+						clientBaseVersion: freshReviewServerVersion,
+						acceptedProofServerVersion: freshReviewServerVersion,
+				  }
+				: {} ),
+			acceptedFreshReviewConsumeValidation,
+		} );
 	};
 
 /**

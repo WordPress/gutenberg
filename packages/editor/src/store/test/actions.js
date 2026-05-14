@@ -2312,7 +2312,7 @@ describe( 'Post actions', () => {
 				expect( options.method ).toBe( 'POST' );
 				expect( options.data ).toEqual( {
 					fresh_review_request_record_id: 'fresh-review-request-123',
-					client_base_version: '7',
+					client_base_version: '12',
 					server_version: '12',
 					proposed_post_content_hash: proposedHash,
 					reviewed_proposed_content_hash: proposedHash,
@@ -2326,6 +2326,8 @@ describe( 'Post actions', () => {
 					rest_route: 'post_fresh_review_consume',
 					fresh_review_decision_consumption_validated: true,
 					fresh_review_decision_eligible_for_retry_save: true,
+					client_base_version: '12',
+					server_version: '12',
 					raw_content:
 						'<script>do not leak consume validation raw</script>',
 					proof_signature: 'do-not-leak-consume-proof',
@@ -3094,7 +3096,7 @@ describe( 'Post actions', () => {
 					pending_change_count: 1,
 					proposed_post_content: proposedPostContent,
 					proposed_post_content_hash: proposedPostContentHash,
-					accepted_fresh_review_consume_validation: {
+					accepted_fresh_review_decision: {
 						type: 'fresh_review_decision_consumption_validation',
 						status: 'eligible_for_retry_save_handoff',
 						result: 'fresh_review_decision_eligible_for_retry_save_handoff',
@@ -3124,16 +3126,13 @@ describe( 'Post actions', () => {
 					},
 				} );
 				expect(
-					options.data.accepted_fresh_review_consume_validation
-						.raw_content
+					options.data.accepted_fresh_review_decision.raw_content
 				).toBeUndefined();
 				expect(
-					options.data.accepted_fresh_review_consume_validation
-						.reviewer_user_id
+					options.data.accepted_fresh_review_decision.reviewer_user_id
 				).toBeUndefined();
 				expect(
-					options.data.accepted_fresh_review_consume_validation
-						.proof_signature
+					options.data.accepted_fresh_review_decision.proof_signature
 				).toBeUndefined();
 
 				return {
@@ -3246,6 +3245,168 @@ describe( 'Post actions', () => {
 				hasAcceptedFreshReviewConsumeValidation: true,
 				acceptedFreshReviewRequestRecordId: 'fresh-review-request-123',
 				claimsSaved: true,
+			} );
+		} );
+
+		it( 'exposes a browser-callable fresh-review retry-save handoff action', async () => {
+			const proposedPostContent =
+				'<!-- wp:paragraph --><p>Fresh-review alias save.</p><!-- /wp:paragraph -->';
+			const proposedPostContentHash =
+				'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
+			const candidatePostContentHash =
+				'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb';
+			const post = {
+				id: postId,
+				type: 'post',
+				title: 'bar',
+				content: proposedPostContent,
+				status: 'draft',
+			};
+
+			apiFetch.setFetchHandler( async ( options ) => {
+				expect( options.path ).toMatch(
+					new RegExp(
+						`^/wp/v2/posts/${ postId }/distributed-editing/retry-save`
+					)
+				);
+				expect( options.data ).toMatchObject( {
+					client_base_version: '12',
+					accepted_proof_server_version: '12',
+					proposed_post_content: proposedPostContent,
+					proposed_post_content_hash: proposedPostContentHash,
+					accepted_fresh_review_decision: {
+						type: 'fresh_review_decision_consumption_validation',
+						rest_route: 'post_fresh_review_consume',
+						fresh_review_request_record_id:
+							'fresh-review-request-123',
+						client_base_version: '7',
+						server_version: '12',
+						proposed_post_content_hash: proposedPostContentHash,
+						candidate_post_content_hash: candidatePostContentHash,
+						fresh_review_decision_consumption_validated: true,
+						fresh_review_decision_eligible_for_retry_save: true,
+					},
+				} );
+
+				return {
+					result: 'retry_save_applied',
+					retry_save_accepted: true,
+					previous_server_version: '12',
+					server_version: '13',
+					saves_post: true,
+					mutates_post_content: true,
+					creates_revision: true,
+					claims_saved: true,
+					revision_created: true,
+					created_revision_ids: [ 8001 ],
+					fresh_review_decision_consumed: true,
+					fresh_review_request_record_id: 'fresh-review-request-123',
+				};
+			} );
+
+			const registry = createRegistryWithStores();
+
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', post );
+			registry.dispatch( editorStore ).setupEditor( post, {
+				content: post.content,
+			} );
+			registry
+				.dispatch( editorStore )
+				.setDistributedEditingSessionState( {
+					clientBaseVersion: '7',
+					serverVersion: '12',
+					pendingChangeCount: 1,
+					retrySubmitProofStatus:
+						DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.ACCEPTED_FOR_FUTURE_SAVE,
+					retrySubmitAccepted: true,
+					retrySubmitSavePathRequired: true,
+					retrySubmitSaveStatus:
+						DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.READY,
+					retrySubmitSaveReady: true,
+					localUpdatesImportStatus:
+						DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_STATUSES.BLOCKED,
+					localUpdatesImportReason:
+						DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.FRESH_REVIEW_REQUIRED,
+					localUpdatesImportVerifiedPostContentHash:
+						proposedPostContentHash,
+					localUpdatesImportReviewRequestStatus:
+						DISTRIBUTED_EDITING_LOCAL_UPDATES_REVIEW_REQUEST_STATUSES.DECISION_RECORDED,
+					localUpdatesImportFreshReviewRequestRecordId:
+						'fresh-review-request-123',
+					localUpdatesImportFreshReviewRequestAccepted: true,
+					localUpdatesImportFreshReviewRequestRequested: true,
+					localUpdatesImportFreshReviewDecisionStatus:
+						DISTRIBUTED_EDITING_FRESH_REVIEW_DECISION_STATUSES.RECORDED,
+					localUpdatesImportFreshReviewDecisionResult:
+						'fresh_review_decision_approved_for_retry_save',
+					localUpdatesImportFreshReviewDecisionAccepted: true,
+					localUpdatesImportFreshReviewDecisionSubmitted: true,
+					localUpdatesImportFreshReviewDecisionDecision: 'approved',
+					localUpdatesImportFreshReviewDecisionReviewedBlockItemCount: 1,
+					localUpdatesImportFreshReviewRetrySaveHandoffStatus:
+						DISTRIBUTED_EDITING_FRESH_REVIEW_RETRY_SAVE_HANDOFF_STATUSES.ACCEPTED_FOR_RETRY_SAVE,
+					localUpdatesImportFreshReviewRetrySaveHandoffResult:
+						'fresh_review_decision_eligible_for_retry_save_handoff',
+					localUpdatesImportFreshReviewRetrySaveHandoffRestRoute:
+						'post_fresh_review_consume',
+					localUpdatesImportFreshReviewRetrySaveHandoffClientBaseVersion:
+						'7',
+					localUpdatesImportFreshReviewRetrySaveHandoffServerVersion:
+						'12',
+					localUpdatesImportFreshReviewRetrySaveHandoffProposedContentHash:
+						proposedPostContentHash,
+					localUpdatesImportFreshReviewRetrySaveHandoffCandidateContentHash:
+						candidatePostContentHash,
+					localUpdatesImportFreshReviewRetrySaveHandoffHashEvidenceStatus:
+						'accepted',
+					retrySaveFreshReviewConsumeValidationStatus:
+						'accepted_for_retry_save',
+					retrySaveFreshReviewConsumeValidationAccepted: true,
+					retrySaveFreshReviewDecisionConsumptionValidated: true,
+					retrySaveFreshReviewDecisionEligibleForRetrySave: true,
+					retrySaveFreshReviewRequestRecordId:
+						'fresh-review-request-123',
+					retrySaveFreshReviewRequestStatus: 'decision_recorded',
+					retrySaveFreshReviewDecisionStatus: 'approved',
+					retrySaveFreshReviewClientBaseVersion: '7',
+					retrySaveFreshReviewServerVersion: '12',
+					retrySaveFreshReviewProposedContentHash:
+						proposedPostContentHash,
+					retrySaveFreshReviewCandidateContentHash:
+						candidatePostContentHash,
+					retrySaveFreshReviewReviewedBlockItemCount: 1,
+					retrySaveFreshReviewHashEvidenceStatus: 'accepted',
+					canExportLocalUpdates: true,
+				} );
+
+			await expect(
+				registry
+					.dispatch( editorStore )
+					.__experimentalSaveDistributedEditingFreshReviewRetrySaveHandoff(
+						{
+							clientBaseVersion: 'stale-browser-base',
+							acceptedProofServerVersion:
+								'stale-browser-proof-version',
+							proposedPostContentHash,
+						}
+					)
+			).resolves.toMatchObject( {
+				result: 'retry_save_applied',
+				fresh_review_decision_consumed: true,
+			} );
+
+			expect(
+				registry
+					.select( editorStore )
+					.getDistributedEditingSessionState()
+			).toMatchObject( {
+				retrySaveStatus: DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVED,
+				retrySaveAccepted: true,
+				retrySaveFreshReviewDecisionConsumptionValidated: true,
+				hasPendingChanges: false,
+				canExportLocalUpdates: false,
 			} );
 		} );
 

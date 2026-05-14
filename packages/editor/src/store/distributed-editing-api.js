@@ -441,7 +441,7 @@ export function __experimentalRequestDistributedEditingRetrySave( {
 		);
 
 	if ( normalizedFreshReviewConsumeValidation ) {
-		data.accepted_fresh_review_consume_validation =
+		data.accepted_fresh_review_decision =
 			normalizedFreshReviewConsumeValidation;
 	}
 

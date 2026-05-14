@@ -542,7 +542,7 @@ describe( 'distributed editing REST helpers', () => {
 				pending_change_count: 1,
 				proposed_post_content: proposedPostContent,
 				proposed_post_content_hash: proposedHash,
-				accepted_fresh_review_consume_validation: {
+				accepted_fresh_review_decision: {
 					type: 'fresh_review_decision_consumption_validation',
 					status: 'eligible_for_retry_save_handoff',
 					result: 'fresh_review_decision_eligible_for_retry_save_handoff',
@@ -570,16 +570,13 @@ describe( 'distributed editing REST helpers', () => {
 				},
 			} );
 			expect(
-				options.data.accepted_fresh_review_consume_validation
-					.raw_content
+				options.data.accepted_fresh_review_decision.raw_content
 			).toBeUndefined();
 			expect(
-				options.data.accepted_fresh_review_consume_validation
-					.reviewer_user_id
+				options.data.accepted_fresh_review_decision.reviewer_user_id
 			).toBeUndefined();
 			expect(
-				options.data.accepted_fresh_review_consume_validation
-					.proof_signature
+				options.data.accepted_fresh_review_decision.proof_signature
 			).toBeUndefined();
 
 			return {
