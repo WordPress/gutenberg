@@ -3,68 +3,39 @@
  */
 import { useSyncExternalStore } from '@wordpress/element';
 
-type MQLCache = Map< string, MediaQueryList >;
-
 type MQLSubscriber = {
 	subscribe: ( onStoreChange: () => void ) => () => void;
 	getValue: () => boolean;
 };
 
-const perWindowCache = new WeakMap< Window, MQLCache >();
-
-// One subscriber object per MediaQueryList, with a single underlying
-// `change` listener that fans out to all React consumers. Without this,
-// every component that calls `useMediaQuery` registers its own listener
-// on the (shared) MediaQueryList, which adds noticeable cost when many
-// components mount at once (~85 ms during a large-post editor mount).
-const subscriberCache = new WeakMap< MediaQueryList, MQLSubscriber >();
+// One subscriber per (window, query). The underlying MediaQueryList lives
+// inside the subscriber's closure; a single `change` listener fans out to
+// every React consumer via an in-JS `Set` to avoid the per-consumer
+// `addEventListener` cost (~85 ms during a large-post editor mount).
+const perWindowCache = new WeakMap< Window, Map< string, MQLSubscriber > >();
 
 const EMPTY_SUBSCRIBER: MQLSubscriber = {
 	subscribe: () => () => {},
 	getValue: () => false,
 };
 
-/**
- * A new MediaQueryList object for the media query
- *
- * @param view    Window.
- * @param [query] Media Query.
- */
-function getMediaQueryList(
-	view: Window,
-	query?: string
-): MediaQueryList | null {
-	if ( ! query ) {
-		return null;
+function getMQLSubscriber( view: Window, query?: string ): MQLSubscriber {
+	if ( ! query || typeof view?.matchMedia !== 'function' ) {
+		return EMPTY_SUBSCRIBER;
 	}
 
-	const matchMediaCache: MQLCache = perWindowCache.get( view ) ?? new Map();
-
-	if ( ! perWindowCache.has( view ) ) {
-		perWindowCache.set( view, matchMediaCache );
+	let queryCache = perWindowCache.get( view );
+	if ( ! queryCache ) {
+		queryCache = new Map();
+		perWindowCache.set( view, queryCache );
 	}
 
-	let match = matchMediaCache.get( query );
-
-	if ( match ) {
-		return match;
-	}
-
-	if ( typeof view?.matchMedia === 'function' ) {
-		match = view.matchMedia( query );
-		matchMediaCache.set( query, match );
-		return match;
-	}
-
-	return null;
-}
-
-function getSubscriber( mediaQueryList: MediaQueryList ): MQLSubscriber {
-	const cached = subscriberCache.get( mediaQueryList );
+	const cached = queryCache.get( query );
 	if ( cached ) {
 		return cached;
 	}
 
+	const mediaQueryList = view.matchMedia( query );
 	const listeners = new Set< () => void >();
 	const notify = () => {
 		for ( const listener of listeners ) {
@@ -91,7 +62,7 @@ function getSubscriber( mediaQueryList: MediaQueryList ): MQLSubscriber {
 		},
 	};
 
-	subscriberCache.set( mediaQueryList, subscriber );
+	queryCache.set( query, subscriber );
 	return subscriber;
 }
 
@@ -106,10 +77,7 @@ export default function useMediaQuery(
 	query?: string,
 	view: Window = window
 ): boolean {
-	const mediaQueryList = getMediaQueryList( view, query );
-	const source = mediaQueryList
-		? getSubscriber( mediaQueryList )
-		: EMPTY_SUBSCRIBER;
+	const source = getMQLSubscriber( view, query );
 
 	return useSyncExternalStore(
 		source.subscribe,
