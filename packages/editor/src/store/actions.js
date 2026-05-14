@@ -60,6 +60,7 @@ import {
 	getDistributedEditingSessionStateForRetrySubmitSavePreparation,
 	getDistributedEditingRetrySavePolicyForSessionState,
 	getDistributedEditingSessionStateWithActionTranscriptEvent,
+	DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES,
 	DISTRIBUTED_EDITING_LOCAL_UPDATES_REVIEW_REQUEST_STATUSES,
 	DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_STATUSES,
 	DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES,
@@ -1049,11 +1050,20 @@ export const __experimentalRefreshDistributedEditingServerStateAfterStaleBase =
 			postId,
 			restBase,
 		} );
-
-		dispatch.setDistributedEditingSessionState(
+		const refetchedSessionState =
 			getDistributedEditingSessionStateForStaleBaseServerStateRefetchResult(
 				response,
 				currentSessionState
+			);
+
+		dispatch.setDistributedEditingSessionState(
+			getDistributedEditingSessionStateWithActionTranscriptEvent(
+				refetchedSessionState,
+				{
+					eventType:
+						DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.SERVER_STATE_REFETCHED,
+					reasonCode: refetchedSessionState.reasonCode,
+				}
 			)
 		);
 
@@ -2080,6 +2090,15 @@ export const __experimentalSaveDistributedEditingRetryAfterProof =
 					acceptedFreshReviewConsumeValidation,
 				}
 			);
+		const transcriptSavingSessionState =
+			getDistributedEditingSessionStateWithActionTranscriptEvent(
+				savingSessionState,
+				{
+					eventType:
+						DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.SAVE_STATE_CHANGED,
+					reasonCode: savingSessionState.retrySaveReason,
+				}
+			);
 		const proposedPostContent =
 			options.proposedPostContent ??
 			getDistributedEditingFreshReviewImportedPostContentForRetrySave( {
@@ -2131,7 +2150,9 @@ export const __experimentalSaveDistributedEditingRetryAfterProof =
 			acceptedFreshReviewConsumeValidation,
 		};
 
-		dispatch.setDistributedEditingSessionState( savingSessionState );
+		dispatch.setDistributedEditingSessionState(
+			transcriptSavingSessionState
+		);
 
 		try {
 			const response =
@@ -2140,11 +2161,20 @@ export const __experimentalSaveDistributedEditingRetryAfterProof =
 				response?.result === 'retry_save_applied' &&
 				typeof proposedPostContent === 'string' &&
 				select.getEditedPostContent?.() !== proposedPostContent;
-
-			dispatch.setDistributedEditingSessionState(
+			const retrySaveResultSessionState =
 				getDistributedEditingSessionStateForRetrySaveResult(
 					response,
-					savingSessionState
+					transcriptSavingSessionState
+				);
+
+			dispatch.setDistributedEditingSessionState(
+				getDistributedEditingSessionStateWithActionTranscriptEvent(
+					retrySaveResultSessionState,
+					{
+						eventType:
+							DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.SAVE_STATE_CHANGED,
+						reasonCode: retrySaveResultSessionState.retrySaveReason,
+					}
 				)
 			);
 			if ( shouldApplyProposedPostContent ) {
@@ -2162,10 +2192,20 @@ export const __experimentalSaveDistributedEditingRetryAfterProof =
 
 			return response;
 		} catch ( error ) {
-			dispatch.setDistributedEditingSessionState(
+			const retrySaveResultSessionState =
 				getDistributedEditingSessionStateForRetrySaveResult(
 					error,
-					savingSessionState
+					transcriptSavingSessionState
+				);
+
+			dispatch.setDistributedEditingSessionState(
+				getDistributedEditingSessionStateWithActionTranscriptEvent(
+					retrySaveResultSessionState,
+					{
+						eventType:
+							DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.SAVE_STATE_CHANGED,
+						reasonCode: retrySaveResultSessionState.retrySaveReason,
+					}
 				)
 			);
 

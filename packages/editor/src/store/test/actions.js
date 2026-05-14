@@ -1281,6 +1281,12 @@ describe( 'Post actions', () => {
 				refetchedServerState: true,
 				canAttemptLocalRebase: true,
 				canExportLocalUpdates: true,
+				actionTranscriptItemCount: 1,
+				actionTranscriptLatestEventType:
+					DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.SERVER_STATE_REFETCHED,
+				actionTranscriptEntriesRedacted: true,
+				actionTranscriptCallsSave: false,
+				actionTranscriptClaimsSaved: false,
 			} );
 		} );
 
@@ -3519,6 +3525,12 @@ describe( 'Post actions', () => {
 				retrySaveRevisionCreated: true,
 				retrySaveCreatedRevisionIds: [ 7002 ],
 				canExportLocalUpdates: false,
+				actionTranscriptItemCount: 2,
+				actionTranscriptLatestEventType:
+					DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.SAVE_STATE_CHANGED,
+				actionTranscriptEntriesRedacted: true,
+				actionTranscriptCallsSave: false,
+				actionTranscriptClaimsSaved: false,
 			} );
 		} );
 
