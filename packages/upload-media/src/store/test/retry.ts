@@ -2,6 +2,7 @@
  * Internal dependencies
  */
 import { calculateRetryDelay, shouldRetryError } from '../utils/retry';
+import { UploadError } from '../../upload-error';
 
 describe( 'calculateRetryDelay', () => {
 	const originalRandom = Math.random;
@@ -218,6 +219,17 @@ describe( 'shouldRetryError', () => {
 
 		it( 'should handle errors with empty messages', () => {
 			expect( shouldRetryError( new Error( '' ), 0, 3 ) ).toBe( false );
+		} );
+
+		it( 'should not retry an UploadError whose message does not match a transient pattern', () => {
+			// Mirrors the messages thrown by validate-* and image-processing
+			// throw sites — none of them should be retried.
+			const error = new UploadError( {
+				code: 'IMAGE_TRANSCODING_ERROR',
+				message: 'Image could not be transcoded.',
+				file: new File( [ 'x' ], 'x.jpg', { type: 'image/jpeg' } ),
+			} );
+			expect( shouldRetryError( error, 0, 3 ) ).toBe( false );
 		} );
 	} );
 
