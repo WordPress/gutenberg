@@ -91,9 +91,9 @@ test.describe( 'Site Editor Performance', () => {
 					canvas: 'edit',
 				} );
 
-				// Wait for the first block.
+				// Wait for the first block (the h1 heading) to be rendered.
 				const canvas = await perfUtils.getCanvas();
-				await canvas.locator( '.wp-block' ).first().waitFor();
+				await canvas.locator( 'h1.wp-block' ).first().waitFor();
 
 				// Capture timing metrics before `stopTracing()`, which
 				// blocks for the trace download/parse and would otherwise

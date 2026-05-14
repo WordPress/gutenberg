@@ -3,7 +3,7 @@
  */
 import { mkdir, writeFile } from 'fs/promises';
 import { join } from 'path';
-import type { Page, Browser } from '@playwright/test';
+import type { Page, Browser, Frame } from '@playwright/test';
 // resolution-mode support in TypeScript 5.3 will resolve this.
 // See https://devblogs.microsoft.com/typescript/announcing-typescript-5-3-beta/
 // @ts-expect-error
@@ -58,6 +58,50 @@ export class Metrics {
 		this.page = page;
 		this.browser = page.context().browser()!;
 		this.trace = { traceEvents: [] };
+
+		// Emit a User Timing mark inside each editor-canvas iframe the moment
+		// its first contentful paint fires. The mark is captured in saved
+		// traces under the `blink.user_timing` category and renders as a
+		// labeled vertical line in DevTools / speedscope / trace.cafe.
+		//
+		// `page.addInitScript` doesn't reliably reach blob:-URL iframes (and
+		// Gutenberg's editor canvas is one), so attach inside the frame as
+		// soon as it appears. `performance.mark`'s `startTime` option lets
+		// us stamp the mark at the actual FCP timestamp rather than when
+		// the observer callback runs.
+		page.on( 'frameattached', ( frame ) => {
+			if ( frame.name() !== 'editor-canvas' ) {
+				return;
+			}
+			void frame
+				.evaluate( () => {
+					const emit = ( startTime: number ): void => {
+						performance.mark( 'iframe-fcp', { startTime } );
+					};
+					const existing = performance
+						.getEntriesByName( 'first-contentful-paint' )
+						.at( 0 );
+					if ( existing ) {
+						emit( existing.startTime );
+						return;
+					}
+					new PerformanceObserver( ( list, observer ) => {
+						const fcp = list
+							.getEntries()
+							.find(
+								( entry ) =>
+									entry.name === 'first-contentful-paint'
+							);
+						if ( fcp ) {
+							emit( fcp.startTime );
+							observer.disconnect();
+						}
+					} ).observe( { type: 'paint', buffered: true } );
+				} )
+				.catch( () => {
+					/* frame may detach mid-evaluate; ignore */
+				} );
+		} );
 	}
 
 	/**
@@ -162,6 +206,72 @@ export class Metrics {
 	}
 
 	/**
+	 * Waits for the editor canvas iframe's first contentful paint and
+	 * returns its time, in milliseconds, from the top frame's response end.
+	 *
+	 * Event-driven via a `PerformanceObserver` inside the iframe whose
+	 * Promise is awaited directly through `frame.evaluate()` — no polling,
+	 * no DOM probe wait. Throws if FCP fires before any `.wp-block` is in
+	 * the iframe DOM, since the metric would otherwise silently measure a
+	 * paint of something other than the block tree (e.g., a placeholder).
+	 *
+	 * The two frames' clocks are bridged via their absolute `timeOrigin`s.
+	 *
+	 * @return Duration in ms.
+	 */
+	async getFirstBlockTime(): Promise< number > {
+		const topResponseEndAbs = await this.page.evaluate( () => {
+			const [ nav ] = performance.getEntriesByType(
+				'navigation'
+			) as PerformanceNavigationTiming[];
+			return performance.timeOrigin + nav.responseEnd;
+		} );
+
+		const isEditorCanvas = ( f: Frame ) => f.name() === 'editor-canvas';
+		const frame =
+			this.page.frames().find( isEditorCanvas ) ??
+			( await this.page.waitForEvent( 'frameattached', {
+				predicate: isEditorCanvas,
+			} ) );
+		const fcpAbs = await frame.evaluate(
+			() =>
+				new Promise< number >( ( resolve, reject ) => {
+					function emit( startTime: number ): void {
+						if ( ! document.querySelector( '.wp-block' ) ) {
+							reject(
+								new Error(
+									'Editor canvas FCP fired before any `.wp-block` was rendered — the metric would no longer measure the block paint moment.'
+								)
+							);
+							return;
+						}
+						resolve( performance.timeOrigin + startTime );
+					}
+					const existing = performance
+						.getEntriesByName( 'first-contentful-paint' )
+						.at( 0 );
+					if ( existing ) {
+						emit( existing.startTime );
+						return;
+					}
+					new PerformanceObserver( ( list, observer ) => {
+						const fcp = list
+							.getEntries()
+							.find(
+								( entry ) =>
+									entry.name === 'first-contentful-paint'
+							);
+						if ( fcp ) {
+							observer.disconnect();
+							emit( fcp.startTime );
+						}
+					} ).observe( { type: 'paint', buffered: true } );
+				} )
+		);
+		return fcpAbs - topResponseEndAbs;
+	}
+
+	/**
 	 * Returns the loading durations using the Navigation Timing API. All the
 	 * durations exclude the server response time.
 	 *
@@ -228,6 +338,10 @@ export class Metrics {
 				'disabled-by-default-devtools.timeline.stack',
 				'disabled-by-default-v8.cpu_profiler',
 				'v8.execute',
+				// Capture User Timing marks (e.g. the `iframe-fcp` mark we
+				// emit when an iframe paints first contentful pixels) so the
+				// trace viewer renders them as labeled markers.
+				'blink.user_timing',
 			],
 			...options,
 		} );
