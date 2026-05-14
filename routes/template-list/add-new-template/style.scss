@@ -12,8 +12,7 @@
 		}
 
 		&__suggestions_list {
-			margin-left: - $grid-unit-15;
-			margin-right: - $grid-unit-15;
+			margin-inline: - $grid-unit-15;
 			width: calc(100% + #{$grid-unit-15 * 2});
 		}
 	}
