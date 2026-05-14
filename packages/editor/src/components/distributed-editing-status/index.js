@@ -1644,6 +1644,101 @@ async function copyDistributedEditingLocalUpdatesToClipboard( {
 	return payload;
 }
 
+function getDistributedEditingEnabledShellState( sessionState ) {
+	const normalized = normalizeDistributedEditingSessionState( sessionState );
+	const isConnectionDegraded = Boolean(
+		normalized.isConnectionDegraded ||
+			normalized.disposition ===
+				DISTRIBUTED_EDITING_DISPOSITIONS.ACCEPTED_WITH_DEGRADED_LIVE_FEEDBACK
+	);
+	const hasProtectedLocalChanges = Boolean(
+		normalized.hasPendingChanges ||
+			normalized.mustOfferLocalCopy ||
+			normalized.canExportLocalUpdates ||
+			normalized.isAwaitingServerConfirmation ||
+			normalized.pendingChangeCount > 0
+	);
+
+	if ( isConnectionDegraded ) {
+		return {
+			serverContact: 'degraded',
+			localProtection: hasProtectedLocalChanges ? 'protected' : 'idle',
+			message: __(
+				'Updates may be delayed. Local changes remain protected and exportable.'
+			),
+		};
+	}
+
+	if ( hasProtectedLocalChanges ) {
+		return {
+			serverContact: 'nominal',
+			localProtection: 'protected',
+			message: __(
+				'Local changes are protected and remain exportable while WordPress waits for server confirmation.'
+			),
+		};
+	}
+
+	return {
+		serverContact: 'nominal',
+		localProtection: 'idle',
+		message: __(
+			'WordPress will protect local changes and show sync status here when review, refresh, or server confirmation is needed.'
+		),
+	};
+}
+
+/**
+ * Renders the always-visible DE-RTC enabled shell in editor chrome.
+ *
+ * This shell communicates that the feature is enabled even when there are no
+ * pending actions. It is deliberately inert: it does not dispatch, fetch,
+ * mutate editor content, save, or change post locks.
+ *
+ * @param {Object} props           Component props.
+ * @param {string} props.placement Chrome placement label.
+ *
+ * @return {React.ReactNode} Rendered enabled shell.
+ */
+export function DistributedEditingEnabledShell( {
+	placement = 'editor-interface-notices',
+} ) {
+	const { editorSettings, sessionState } = useSelect( ( select ) => {
+		const { getDistributedEditingSessionState, getEditorSettings } =
+			select( editorStore );
+
+		return {
+			editorSettings: getEditorSettings?.() || {},
+			sessionState: getDistributedEditingSessionState?.() || {},
+		};
+	}, [] );
+
+	if ( ! editorSettings?.distributedEditing?.enabled ) {
+		return null;
+	}
+
+	const shellState = getDistributedEditingEnabledShellState( sessionState );
+
+	return (
+		<div
+			aria-label={ __( 'Distributed editing enabled status' ) }
+			className="editor-distributed-editing-status__enabled-shell"
+			data-distributed-editing-local-protection={
+				shellState.localProtection
+			}
+			data-distributed-editing-server-contact={ shellState.serverContact }
+			data-distributed-editing-shell="enabled"
+			data-distributed-editing-shell-placement={ placement }
+			role="region"
+		>
+			<Notice status="info" isDismissible={ false }>
+				<strong>{ __( 'Distributed Editing enabled' ) }</strong>
+				<div>{ shellState.message }</div>
+			</Notice>
+		</div>
+	);
+}
+
 /**
  * Renders the selector-backed DE-RTC status in production editor chrome.
  *
@@ -1655,6 +1750,7 @@ async function copyDistributedEditingLocalUpdatesToClipboard( {
 export function DistributedEditingStatusChrome( { onAction } ) {
 	return (
 		<>
+			<DistributedEditingEnabledShell />
 			<DistributedEditingLocalUpdatesImportControls />
 			<DistributedEditingStatus
 				onAction={ onAction }

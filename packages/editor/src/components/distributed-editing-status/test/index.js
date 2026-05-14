@@ -836,6 +836,87 @@ describe( 'DistributedEditingStatus', () => {
 		expect( screen.getByText( 'Changes pending' ) ).toBeVisible();
 	} );
 
+	it( 'mounts the enabled editor shell from production chrome', () => {
+		setupDistributedEditingStatusSelect( {
+			editorSettings: {
+				distributedEditing: {
+					enabled: true,
+				},
+			},
+		} );
+
+		render( <DistributedEditingStatusChrome /> );
+
+		const shell = screen.getByRole( 'region', {
+			name: 'Distributed editing enabled status',
+		} );
+		expect( shell ).toHaveAttribute(
+			'data-distributed-editing-shell',
+			'enabled'
+		);
+		expect( shell ).toHaveAttribute(
+			'data-distributed-editing-shell-placement',
+			'editor-interface-notices'
+		);
+		expect( shell ).toHaveAttribute(
+			'data-distributed-editing-server-contact',
+			'nominal'
+		);
+		expect( shell ).toHaveAttribute(
+			'data-distributed-editing-local-protection',
+			'idle'
+		);
+		expect(
+			screen.getByText( 'Distributed Editing enabled' )
+		).toBeVisible();
+		expect(
+			screen.getByText(
+				'WordPress will protect local changes and show sync status here when review, refresh, or server confirmation is needed.'
+			)
+		).toBeVisible();
+		expect(
+			screen.queryByRole( 'region', {
+				name: 'Distributed editing status',
+			} )
+		).not.toBeInTheDocument();
+	} );
+
+	it( 'updates the enabled editor shell for protected degraded state', () => {
+		setupDistributedEditingStatusSelect( {
+			editorSettings: {
+				distributedEditing: {
+					enabled: true,
+				},
+			},
+			sessionState: {
+				pendingChangeCount: 1,
+				hasPendingChanges: true,
+				canExportLocalUpdates: true,
+				isConnectionDegraded: true,
+			},
+		} );
+
+		render( <DistributedEditingStatusChrome /> );
+
+		const shell = screen.getByRole( 'region', {
+			name: 'Distributed editing enabled status',
+		} );
+		expect( shell ).toHaveAttribute(
+			'data-distributed-editing-server-contact',
+			'degraded'
+		);
+		expect( shell ).toHaveAttribute(
+			'data-distributed-editing-local-protection',
+			'protected'
+		);
+		expect(
+			screen.getByText(
+				'Updates may be delayed. Local changes remain protected and exportable.'
+			)
+		).toBeVisible();
+		expect( screen.getByText( 'Changes pending' ) ).toBeVisible();
+	} );
+
 	it( 'imports pasted protected local updates from production editor chrome without saving', async () => {
 		const user = userEvent.setup();
 		const actions = setupDistributedEditingStatusDispatch();
