@@ -12,7 +12,7 @@ import type { TaxonomyFormData } from '../types';
 
 export const sortField = createBooleanField( 'sort', __( 'Sort terms' ), {
 	description: __(
-		'Whether terms in this taxonomy should be sorted in the order they are provided to wp_set_object_terms().'
+		'Whether terms in this taxonomy should be saved in the order they are assigned to an item.'
 	),
 } );
 
