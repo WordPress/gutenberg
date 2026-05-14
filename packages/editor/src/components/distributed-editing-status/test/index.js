@@ -908,7 +908,7 @@ describe( 'DistributedEditingStatus', () => {
 		],
 		[
 			DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.POST_ROUTE_MISMATCH,
-			'Import blocked: the protected changes target a different post route. Nothing was imported, and local changes remain protected.',
+			'Import blocked: the protected changes target a different editor route. Nothing was imported, and local changes remain protected.',
 		],
 		[
 			DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.MISSING_REVIEW_APPROVAL_PROOF,
@@ -2904,7 +2904,7 @@ describe( 'DistributedEditingStatusSurface', () => {
 					DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_ROUTE_MISMATCH,
 				title: 'Fresh-review retry save route changed',
 				message:
-					'The reviewed retry-save request targeted a different post route than this editor. Protected local changes are still exportable; reload only after exporting them.',
+					'The reviewed retry-save request targeted a different editor route. Protected local changes are still exportable; reload only after exporting them.',
 			},
 			{
 				disposition:
@@ -3534,7 +3534,7 @@ describe( 'DistributedEditingStatusSurface', () => {
 					DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_ROUTE_MISMATCH,
 				title: 'Retry save route changed',
 				message:
-					'The retry-save request targeted a different post route than this editor. Protected local changes are still exportable; reload the editor only after exporting them.',
+					'The retry-save request targeted a different editor route. Protected local changes are still exportable; reload the editor only after exporting them.',
 			},
 			{
 				disposition:
@@ -3645,7 +3645,7 @@ describe( 'DistributedEditingStatusSurface', () => {
 				reason: DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.MISSING_POST_ROUTE,
 				title: 'Retry save route unavailable',
 				message:
-					'The editor could not identify the post route for retry-save. Protected local changes are still exportable; reload the editor only after exporting them.',
+					'The editor could not identify the route for retry-save. Protected local changes are still exportable; reload the editor only after exporting them.',
 			},
 			{
 				reason: DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.MISSING_PROPOSED_CONTENT,

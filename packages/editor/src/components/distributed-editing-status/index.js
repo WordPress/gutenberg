@@ -2282,7 +2282,7 @@ function getLocalUpdatesImportStatusMessage( {
 } ) {
 	if ( commandStatus === 'running' ) {
 		return __(
-			'Checking the reviewed changes payload, post route, content hash, and signed admin review proof.'
+			'Checking the reviewed changes payload, editor route, content hash, and signed admin review proof.'
 		);
 	}
 
@@ -2334,7 +2334,7 @@ function getLocalUpdatesImportBlockedMessage( reason ) {
 			);
 		case DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.POST_ROUTE_MISMATCH:
 			return __(
-				'Import blocked: the protected changes target a different post route. Nothing was imported, and local changes remain protected.'
+				'Import blocked: the protected changes target a different editor route. Nothing was imported, and local changes remain protected.'
 			);
 		case DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.MISSING_POST_CONTENT:
 			return __(
@@ -2812,7 +2812,7 @@ function getRetrySaveStatusText( descriptor ) {
 			return {
 				title: __( 'Retry save route changed' ),
 				message: __(
-					'The retry-save request targeted a different post route than this editor. Protected local changes are still exportable; reload the editor only after exporting them.'
+					'The retry-save request targeted a different editor route. Protected local changes are still exportable; reload the editor only after exporting them.'
 				),
 			};
 		case DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_MALFORMED_SYNC_PAYLOAD:
@@ -2905,7 +2905,7 @@ function getFreshReviewRetrySaveStatusText( descriptor ) {
 			return {
 				title: __( 'Fresh-review retry save route changed' ),
 				message: __(
-					'The reviewed retry-save request targeted a different post route than this editor. Protected local changes are still exportable; reload only after exporting them.'
+					'The reviewed retry-save request targeted a different editor route. Protected local changes are still exportable; reload only after exporting them.'
 				),
 			};
 		case DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_MALFORMED_SYNC_PAYLOAD:
@@ -3127,7 +3127,7 @@ function getRetrySaveHandoffBlockedText( descriptor ) {
 			return {
 				title: __( 'Retry save route unavailable' ),
 				message: __(
-					'The editor could not identify the post route for retry-save. Protected local changes are still exportable; reload the editor only after exporting them.'
+					'The editor could not identify the route for retry-save. Protected local changes are still exportable; reload the editor only after exporting them.'
 				),
 			};
 		case DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.MISSING_PROPOSED_CONTENT:
