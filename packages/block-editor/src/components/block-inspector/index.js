@@ -40,14 +40,17 @@ import { unlock } from '../../lock-unlock';
 
 function StyleInspectorSlots( {
 	blockName,
+	showDefaultControls = true,
 	showAdvancedControls = true,
+	showLayoutControls = true,
 	showPositionControls = true,
 	showBindingsControls = true,
+	showStylesControls = true,
 } ) {
 	const borderPanelLabel = useBorderPanelLabel( { blockName } );
 	return (
 		<>
-			<InspectorControls.Slot />
+			{ showDefaultControls && <InspectorControls.Slot /> }
 			<InspectorControls.Slot
 				group="color"
 				label={ __( 'Color' ) }
@@ -62,14 +65,19 @@ function StyleInspectorSlots( {
 				group="typography"
 				label={ __( 'Typography' ) }
 			/>
-			<InspectorControls.Slot group="layout" label={ __( 'Layout' ) } />
+			{ showLayoutControls && (
+				<InspectorControls.Slot
+					group="layout"
+					label={ __( 'Layout' ) }
+				/>
+			) }
 			<InspectorControls.Slot
 				group="dimensions"
 				label={ __( 'Dimensions' ) }
 			/>
 			<InspectorControls.Slot group="border" label={ borderPanelLabel } />
 			{ showPositionControls && <PositionControls /> }
-			<InspectorControls.Slot group="styles" />
+			{ showStylesControls && <InspectorControls.Slot group="styles" /> }
 			{ showBindingsControls && (
 				<InspectorControls.Slot group="bindings" />
 			) }
@@ -195,7 +203,8 @@ function BlockInspector() {
 		blockType?.name,
 		contentClientIds,
 		isSectionBlock,
-		hasBlockStyles
+		hasBlockStyles,
+		selectedBlockStyleState !== 'default'
 	);
 	const hasMultipleTabs = availableTabs?.length > 1;
 
@@ -209,6 +218,7 @@ function BlockInspector() {
 		useBlockInspectorAnimationSettings( blockType );
 
 	const hasSelectedBlocks = selectedBlockCount > 1;
+	const isBlockStyleStateSelected = selectedBlockStyleState !== 'default';
 
 	if ( hasSelectedBlocks && ! isSectionBlockInSelection ) {
 		return (
@@ -278,6 +288,7 @@ function BlockInspector() {
 				editedContentOnlySection={ editedContentOnlySection }
 				blockEditingMode={ blockEditingMode }
 				selectedBlockStyleState={ selectedBlockStyleState }
+				isBlockStyleStateSelected={ isBlockStyleStateSelected }
 			/>
 		</BlockInspectorSingleBlockWrapper>
 	);
@@ -331,6 +342,7 @@ const BlockInspectorSingleBlock = ( {
 	editedContentOnlySection,
 	blockEditingMode,
 	selectedBlockStyleState,
+	isBlockStyleStateSelected,
 } ) => {
 	const listViewRef = useRef( null );
 	const hasMultipleTabs = availableTabs?.length > 1;
@@ -393,24 +405,44 @@ const BlockInspectorSingleBlock = ( {
 						tabs={ availableTabs }
 						isSectionBlock={ isSectionBlock }
 						contentClientIds={ contentClientIds }
+						isBlockStyleStateSelected={ isBlockStyleStateSelected }
 					/>
 				</>
 			) }
 			{ ! hasMultipleTabs && (
 				<>
-					{ hasBlockStyles && (
+					{ ! isBlockStyleStateSelected && hasBlockStyles && (
 						<BlockStyles clientId={ renderedBlockClientId } />
 					) }
-					<ContentTab contentClientIds={ contentClientIds } />
-					<InspectorControls.Slot group="content" />
-					<InspectorControls.Slot group="list" ref={ listViewRef } />
-					<ListViewContentPopover listViewRef={ listViewRef } />
+					{ ! isBlockStyleStateSelected && (
+						<>
+							<ContentTab contentClientIds={ contentClientIds } />
+							<InspectorControls.Slot group="content" />
+							<InspectorControls.Slot
+								group="list"
+								ref={ listViewRef }
+							/>
+							<ListViewContentPopover
+								listViewRef={ listViewRef }
+							/>
+						</>
+					) }
 					{ ! isSectionBlock && (
-						<StyleInspectorSlots blockName={ blockName } />
+						<StyleInspectorSlots
+							blockName={ blockName }
+							showDefaultControls={ ! isBlockStyleStateSelected }
+							showAdvancedControls={ ! isBlockStyleStateSelected }
+							showLayoutControls={ ! isBlockStyleStateSelected }
+							showPositionControls={ ! isBlockStyleStateSelected }
+							showBindingsControls={ ! isBlockStyleStateSelected }
+							showStylesControls={ ! isBlockStyleStateSelected }
+						/>
 					) }
 				</>
 			) }
-			<InspectorControlsLastItem.Slot />
+			{ ! isBlockStyleStateSelected && (
+				<InspectorControlsLastItem.Slot />
+			) }
 			<SkipToSelectedBlock key="back" />
 		</div>
 	);

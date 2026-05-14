@@ -32,7 +32,8 @@ export default function useInspectorControlsTabs(
 	blockName,
 	contentClientIds,
 	isSectionBlock,
-	hasBlockStyles
+	hasBlockStyles,
+	isBlockStyleStateSelected = false
 ) {
 	const tabs = [];
 	const {
@@ -60,15 +61,23 @@ export default function useInspectorControlsTabs(
 
 	// Styles Tab: Add this tab if there are any fills for block supports
 	// e.g. border, color, spacing, typography, etc.
+	const borderFills = useSlotFills( borderGroup.name ) || [];
+	const colorFills = useSlotFills( colorGroup.name ) || [];
+	const layoutFills = useSlotFills( layoutGroup.name ) || [];
+	const positionFills = useSlotFills( positionGroup.name ) || [];
+	const dimensionsFills = useSlotFills( dimensionsGroup.name ) || [];
+	const stylesFills = useSlotFills( stylesGroup.name ) || [];
+	const typographyFills = useSlotFills( typographyGroup.name ) || [];
+	const effectsFills = useSlotFills( effectsGroup.name ) || [];
 	const styleFills = [
-		...( useSlotFills( borderGroup.name ) || [] ),
-		...( useSlotFills( colorGroup.name ) || [] ),
-		...( useSlotFills( layoutGroup.name ) || [] ),
-		...( useSlotFills( positionGroup.name ) || [] ),
-		...( useSlotFills( dimensionsGroup.name ) || [] ),
-		...( useSlotFills( stylesGroup.name ) || [] ),
-		...( useSlotFills( typographyGroup.name ) || [] ),
-		...( useSlotFills( effectsGroup.name ) || [] ),
+		...borderFills,
+		...colorFills,
+		...( isBlockStyleStateSelected ? EMPTY_ARRAY : layoutFills ),
+		...( isBlockStyleStateSelected ? EMPTY_ARRAY : positionFills ),
+		...dimensionsFills,
+		...( isBlockStyleStateSelected ? EMPTY_ARRAY : stylesFills ),
+		...typographyFills,
+		...effectsFills,
 	];
 	const hasStyleFills = styleFills.length;
 
@@ -95,20 +104,21 @@ export default function useInspectorControlsTabs(
 		hasContentFills ||
 		( ! shouldShowBlockFields && contentClientIds?.length );
 
-	if ( hasContentTab ) {
+	if ( ! isBlockStyleStateSelected && hasContentTab ) {
 		tabs.push( TAB_CONTENT );
 	}
 
 	// Add the tabs in the order that they will default to if available.
 	// List View > Content > Settings > Styles.
-	if ( hasListFills ) {
+	if ( ! isBlockStyleStateSelected && hasListFills ) {
 		tabs.push( TAB_LIST_VIEW );
 	}
 
 	if (
-		settingsFills.length ||
-		// Advanced fills show up in settings tab if available or they blend into the default tab, if there's only one tab.
-		( advancedFills.length && ( hasContentTab || hasListFills ) )
+		! isBlockStyleStateSelected &&
+		( settingsFills.length ||
+			// Advanced fills show up in settings tab if available or they blend into the default tab, if there's only one tab.
+			( advancedFills.length && ( hasContentTab || hasListFills ) ) )
 	) {
 		tabs.push( TAB_SETTINGS );
 	}
@@ -121,7 +131,10 @@ export default function useInspectorControlsTabs(
 		};
 	}, [] );
 
-	if ( ! isPreviewMode && ( hasBlockStyles || hasStyleFills ) ) {
+	if (
+		! isPreviewMode &&
+		( ( ! isBlockStyleStateSelected && hasBlockStyles ) || hasStyleFills )
+	) {
 		tabs.push( TAB_STYLES );
 	}
 
