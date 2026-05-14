@@ -363,6 +363,101 @@ export function useSuggestionsProvider() {
 	);
 
 	/**
+	 * Update an existing suggestion's payload (auto-save path). Replaces
+	 * the `_wp_suggestion` meta on the comment without changing its author,
+	 * status, or thread identity, so the user sees a single note
+	 * accumulating edits rather than a new note per save burst.
+	 *
+	 * @param {Object}                args            Update arguments.
+	 * @param {number|string}         args.commentId  Comment id of the
+	 *                                                existing suggestion.
+	 * @param {string}                args.blockName  Block name (recorded
+	 *                                                on the payload).
+	 * @param {SuggestionOperation[]} args.operations Latest operations.
+	 * @return {Promise<Object>} The saved comment record.
+	 */
+	const updateSuggestion = useCallback(
+		async ( { commentId, blockName, operations } ) => {
+			if ( ! commentId ) {
+				throw new Error( 'No comment id for suggestion update.' );
+			}
+
+			const payload = /** @type {SuggestionPayload} */ ( {
+				schemaVersion: SCHEMA_VERSION,
+				blockName,
+				baseRevision: postModified,
+				operations,
+			} );
+
+			if ( payloadByteLength( payload ) > PAYLOAD_MAX_BYTES ) {
+				const error = new Error(
+					__( 'Suggestion is too large to save.' )
+				);
+				createNotice( 'error', error.message, {
+					type: 'snackbar',
+					isDismissible: true,
+				} );
+				throw error;
+			}
+
+			try {
+				return await saveEntityRecord(
+					'root',
+					'comment',
+					{
+						id: commentId,
+						meta: {
+							_wp_suggestion: JSON.stringify( payload ),
+						},
+					},
+					{ throwOnError: true }
+				);
+			} catch ( error ) {
+				createNotice(
+					'error',
+					error?.message || __( 'Unable to update suggestion.' ),
+					{ type: 'snackbar', isDismissible: true }
+				);
+				throw error;
+			}
+		},
+		[ postModified, saveEntityRecord, createNotice ]
+	);
+
+	/**
+	 * Delete a suggestion. The auto-saver calls this when the overlay is
+	 * fully reverted to baseline — the user retracted their edit, so the
+	 * note no longer carries a meaningful suggestion.
+	 *
+	 * @param {Object}        args           Delete arguments.
+	 * @param {number|string} args.commentId Comment id to trash.
+	 * @return {Promise<void>}
+	 */
+	const deleteSuggestion = useCallback(
+		async ( { commentId } ) => {
+			if ( ! commentId ) {
+				return;
+			}
+			try {
+				await saveEntityRecord(
+					'root',
+					'comment',
+					{ id: commentId, status: 'trash' },
+					{ throwOnError: true }
+				);
+			} catch ( error ) {
+				createNotice(
+					'error',
+					error?.message || __( 'Unable to remove suggestion.' ),
+					{ type: 'snackbar', isDismissible: true }
+				);
+				throw error;
+			}
+		},
+		[ saveEntityRecord, createNotice ]
+	);
+
+	/**
 	 * Apply a suggestion to the live block, then persist the lifecycle
 	 * status to the comment meta. On a server failure the block is rolled
 	 * back so the UI is never left in a half-applied state.
@@ -546,6 +641,8 @@ export function useSuggestionsProvider() {
 
 	return {
 		createSuggestion,
+		updateSuggestion,
+		deleteSuggestion,
 		applySuggestion,
 		rejectSuggestion,
 	};
