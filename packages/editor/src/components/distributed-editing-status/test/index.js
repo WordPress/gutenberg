@@ -7,6 +7,7 @@ import userEvent from '@testing-library/user-event';
 /**
  * WordPress dependencies
  */
+import { SlotFillProvider } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 
 /**
@@ -15,6 +16,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import DistributedEditingStatus, {
 	DistributedEditingLocalRebaseStateInspector,
 	DistributedEditingFreshReviewDecisionPanel,
+	DistributedEditingFreshReviewPrePublishPanel,
 	DistributedEditingRetrySaveControls,
 	DistributedEditingStatusChrome,
 	DistributedEditingStatusInspector,
@@ -25,6 +27,7 @@ import DistributedEditingStatus, {
 	getDistributedEditingStatusSurfaceItems,
 	shouldRenderDistributedEditingStatus,
 } from '../';
+import PluginPrePublishPanel from '../../plugin-pre-publish-panel';
 import {
 	DISTRIBUTED_EDITING_DISPOSITIONS,
 	DISTRIBUTED_EDITING_FRESH_REVIEW_DECISION_STATUSES,
@@ -3228,6 +3231,128 @@ describe( 'DistributedEditingStatusSurface', () => {
 				'Fresh-review decision recorded for the request. No save was made, and the reviewed-block evidence remained hash-only.'
 			)
 		).toBeVisible();
+	} );
+
+	it( 'renders the fresh-review decision panel in the pre-publish slot', async () => {
+		const user = userEvent.setup();
+		const actions = setupDistributedEditingStatusDispatch();
+
+		setupDistributedEditingStatusSelect( {
+			sessionState: {
+				pendingChangeCount: 1,
+				hasPendingChanges: true,
+				canExportLocalUpdates: true,
+				localUpdatesImportStatus:
+					DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_STATUSES.BLOCKED,
+				localUpdatesImportReason:
+					DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.FRESH_REVIEW_REQUIRED,
+				localUpdatesImportRequiresFreshReview: true,
+				localUpdatesImportReviewRequestStatus:
+					DISTRIBUTED_EDITING_LOCAL_UPDATES_REVIEW_REQUEST_STATUSES.REQUESTED,
+				localUpdatesImportFreshReviewRequestAccepted: true,
+				localUpdatesImportFreshReviewRequestRequested: true,
+				localUpdatesImportFreshReviewDecisionStatus:
+					DISTRIBUTED_EDITING_FRESH_REVIEW_DECISION_STATUSES.AWAITING_REVIEW,
+				localUpdatesImportFreshReviewDecisionPanelRequired: true,
+				localUpdatesImportFreshReviewDecisionItems: [
+					{
+						id: 'fresh-pre-publish',
+						blockLabel: 'Pre-publish HTML change',
+						proposedContentHash:
+							'eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
+						rawBlockContent:
+							'<script>fresh-pre-publish-raw</script>',
+						reviewerUserId: 7,
+						proofSignature: 'fresh-pre-publish-proof',
+					},
+				],
+			},
+		} );
+
+		render(
+			<SlotFillProvider>
+				<DistributedEditingFreshReviewPrePublishPanel />
+				<PluginPrePublishPanel.Slot />
+			</SlotFillProvider>
+		);
+
+		expect(
+			screen.getByText( 'Distributed Editing fresh review' )
+		).toBeVisible();
+		const panel = screen.getByTestId(
+			'distributed-editing-fresh-review-pre-publish-panel'
+		);
+
+		expect( panel ).toHaveAttribute(
+			'data-distributed-editing-fresh-review-redacted',
+			'true'
+		);
+		expect( panel ).toHaveAttribute(
+			'data-distributed-editing-fresh-review-blocks-normal-save',
+			'true'
+		);
+		expect( panel ).toHaveAttribute(
+			'data-distributed-editing-fresh-review-review-item-count',
+			'1'
+		);
+		expect( panel ).toHaveAttribute(
+			'data-distributed-editing-pre-save-status',
+			DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_STATUSES.REVIEW_REQUIRED
+		);
+		expect(
+			screen.getByRole( 'group', {
+				name: 'Distributed editing fresh review decisions',
+			} )
+		).toBeVisible();
+		expect( screen.getByText( 'Pre-publish HTML change' ) ).toBeVisible();
+
+		await user.click(
+			screen.getByRole( 'button', {
+				name: 'Approve Pre-publish HTML change',
+			} )
+		);
+
+		expect(
+			actions.__experimentalResolveDistributedEditingFreshReviewDecisionItem
+		).toHaveBeenCalledWith( {
+			reviewItemId: 'fresh-pre-publish',
+			decision: 'approved',
+			rejectionReason: null,
+		} );
+		expect(
+			actions.__experimentalSaveDistributedEditingRetryAfterProof
+		).not.toHaveBeenCalled();
+		expect(
+			screen.queryByText(
+				/fresh-pre-publish-raw|fresh-pre-publish-proof|reviewerUserId/i
+			)
+		).not.toBeInTheDocument();
+		expect(
+			await screen.findByText(
+				'Fresh-review decision recorded locally. No save was made, and the reviewed-block evidence remains hash-only.'
+			)
+		).toBeVisible();
+	} );
+
+	it( 'does not mount the fresh-review pre-publish panel without fresh-review state', () => {
+		setupDistributedEditingStatusDispatch();
+		setupDistributedEditingStatusSelect();
+
+		render(
+			<SlotFillProvider>
+				<DistributedEditingFreshReviewPrePublishPanel />
+				<PluginPrePublishPanel.Slot />
+			</SlotFillProvider>
+		);
+
+		expect(
+			screen.queryByText( 'Distributed Editing fresh review' )
+		).not.toBeInTheDocument();
+		expect(
+			screen.queryByTestId(
+				'distributed-editing-fresh-review-pre-publish-panel'
+			)
+		).not.toBeInTheDocument();
 	} );
 
 	it( 'renders retry-submit save readiness without claiming completion', () => {

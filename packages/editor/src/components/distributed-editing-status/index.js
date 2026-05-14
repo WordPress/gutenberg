@@ -34,9 +34,11 @@ import {
 	DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES,
 	DISTRIBUTED_EDITING_UNLOAD_WARNING_REASONS,
 	getDistributedEditingFreshReviewDecisionStateForSessionState,
+	getDistributedEditingFreshReviewPreSaveStateForSessionState,
 	getDistributedEditingLocalUpdatesExportPayload,
 	normalizeDistributedEditingSessionState,
 } from '../../store/distributed-editing';
+import PluginPrePublishPanel from '../plugin-pre-publish-panel';
 
 const DISTRIBUTED_EDITING_OPAQUE_REVIEW_APPROVAL_PROOF_TOKEN_REJECTION_DETAILS =
 	Object.freeze( {
@@ -1129,6 +1131,84 @@ export function DistributedEditingFreshReviewDecisionPanel( {
 				{ getFreshReviewDecisionCommandMessage( commandStatus ) }
 			</div>
 		</div>
+	);
+}
+
+/**
+ * Renders the fresh-review decision surface inside the existing pre-publish
+ * flow. It presents hash-only approve/reject controls and records only local
+ * reviewer decisions. It does not save, call retry-save, dispatch notices,
+ * mutate editor content, or change post locks.
+ *
+ * @param {Object}  props              Component props.
+ * @param {boolean} props.forceVisible Whether to show without requested state.
+ *
+ * @return {React.ReactNode} Rendered pre-publish Fill.
+ */
+export function DistributedEditingFreshReviewPrePublishPanel( {
+	forceVisible = false,
+} ) {
+	const { decisionState, preSaveState } = useSelect( ( select ) => {
+		const {
+			getDistributedEditingFreshReviewDecisionState,
+			getDistributedEditingFreshReviewPreSaveState,
+			getDistributedEditingSessionState,
+		} = select( editorStore );
+		const sessionState = getDistributedEditingSessionState?.() || {};
+
+		return {
+			decisionState:
+				getDistributedEditingFreshReviewDecisionState?.() ||
+				getDistributedEditingFreshReviewDecisionStateForSessionState(
+					sessionState
+				),
+			preSaveState:
+				getDistributedEditingFreshReviewPreSaveState?.() ||
+				getDistributedEditingFreshReviewPreSaveStateForSessionState(
+					sessionState
+				),
+		};
+	}, [] );
+	const shouldRender =
+		forceVisible ||
+		preSaveState?.opensPrePublishReview ||
+		decisionState?.panelRequired ||
+		decisionState?.reviewItemCount > 0;
+
+	if ( ! shouldRender ) {
+		return null;
+	}
+
+	return (
+		<PluginPrePublishPanel
+			className="editor-distributed-editing-status__fresh-review-pre-publish-panel"
+			initialOpen
+			title={ __( 'Distributed Editing fresh review' ) }
+		>
+			<div
+				data-distributed-editing-fresh-review-blocks-normal-save={ formatDataBoolean(
+					preSaveState?.blocksNormalSavePost
+				) }
+				data-distributed-editing-fresh-review-pre-publish-panel
+				data-distributed-editing-fresh-review-redacted="true"
+				data-distributed-editing-fresh-review-review-item-count={
+					decisionState?.reviewItemCount || undefined
+				}
+				data-distributed-editing-pre-save-placement={
+					preSaveState?.placement || undefined
+				}
+				data-distributed-editing-pre-save-status={
+					preSaveState?.status || undefined
+				}
+				data-testid="distributed-editing-fresh-review-pre-publish-panel"
+			>
+				<DistributedEditingFreshReviewDecisionPanel
+					forceVisible={
+						forceVisible || preSaveState?.opensPrePublishReview
+					}
+				/>
+			</div>
+		</PluginPrePublishPanel>
 	);
 }
 

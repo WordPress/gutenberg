@@ -8,6 +8,7 @@ import { InlineNotices } from '@wordpress/notices';
  */
 import TemplateValidationNotice from '../template-validation-notice';
 import {
+	DistributedEditingFreshReviewPrePublishPanel,
 	DistributedEditingStatusChrome,
 	DistributedEditingStatusInspector,
 } from '../distributed-editing-status';
@@ -24,6 +25,7 @@ export default function EditorInterfaceNotices() {
 			<TemplateValidationNotice />
 			<DistributedEditingRiskyBlockReviewStatusChrome />
 			<DistributedEditingRiskyBlockReviewPrePublishPanel />
+			<DistributedEditingFreshReviewPrePublishPanel />
 			<DistributedEditingStatusChrome />
 			{ shouldRenderDistributedEditingStatusInspector() && (
 				<DistributedEditingStatusInspector />

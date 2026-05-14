@@ -48,8 +48,18 @@ jest.mock( '../../distributed-editing-status', () => {
 		);
 	}
 
+	function MockDistributedEditingFreshReviewPrePublishPanel() {
+		return createElement(
+			'div',
+			null,
+			'Distributed editing fresh review pre-publish mount'
+		);
+	}
+
 	return {
 		__esModule: true,
+		DistributedEditingFreshReviewPrePublishPanel:
+			MockDistributedEditingFreshReviewPrePublishPanel,
 		DistributedEditingStatusChrome: MockDistributedEditingStatusChrome,
 		DistributedEditingStatusInspector:
 			MockDistributedEditingStatusInspector,
@@ -106,6 +116,11 @@ describe( 'EditorInterfaceNotices', () => {
 		expect(
 			screen.getByText(
 				'Distributed editing risky block review pre-publish mount'
+			)
+		).toBeVisible();
+		expect(
+			screen.getByText(
+				'Distributed editing fresh review pre-publish mount'
 			)
 		).toBeVisible();
 		expect(
