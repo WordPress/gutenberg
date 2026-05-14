@@ -99,11 +99,15 @@ export default function PostDateEdit( props ) {
 
 	const blockEditingMode = useBlockEditingMode();
 
+	const validDatetime = datetime || new Date();
 	let postDate = (
-		<time dateTime={ dateI18n( 'c', datetime ) } ref={ setPopoverAnchor }>
+		<time
+			dateTime={ dateI18n( 'c', validDatetime ) }
+			ref={ setPopoverAnchor }
+		>
 			{ format === 'human-diff'
-				? humanTimeDiff( datetime )
-				: dateI18n( format || siteFormat, datetime ) }
+				? humanTimeDiff( validDatetime )
+				: dateI18n( format || siteFormat, validDatetime ) }
 		</time>
 	);
 
@@ -137,9 +141,7 @@ export default function PostDateEdit( props ) {
 										currentDate={ datetime }
 										onChange={ ( newDatetime ) =>
 											setAttributes( {
-												datetime:
-													newDatetime ??
-													new Date().toISOString(),
+												datetime: newDatetime,
 											} )
 										}
 										is12Hour={ is12HourFormat(
