@@ -82,6 +82,33 @@ function StyleInspectorSlots( {
 	);
 }
 
+function StyleStateInspectorSlots( { blockName } ) {
+	const borderPanelLabel = useBorderPanelLabel( { blockName } );
+	return (
+		<>
+			<InspectorControls.Slot
+				group="color"
+				label={ __( 'Color' ) }
+				className="color-block-support-panel__inner-wrapper"
+			/>
+			<InspectorControls.Slot
+				group="background"
+				label={ __( 'Background image' ) }
+				className="background-block-support-panel__inner-wrapper"
+			/>
+			<InspectorControls.Slot
+				group="typography"
+				label={ __( 'Typography' ) }
+			/>
+			<InspectorControls.Slot
+				group="dimensions"
+				label={ __( 'Dimensions' ) }
+			/>
+			<InspectorControls.Slot group="border" label={ borderPanelLabel } />
+		</>
+	);
+}
+
 function BlockInspector() {
 	const {
 		selectedBlockCount,
@@ -209,6 +236,7 @@ function BlockInspector() {
 		useBlockInspectorAnimationSettings( blockType );
 
 	const hasSelectedBlocks = selectedBlockCount > 1;
+	const isBlockStyleStateSelected = selectedBlockStyleState !== 'default';
 
 	if ( hasSelectedBlocks && ! isSectionBlockInSelection ) {
 		return (
@@ -278,6 +306,7 @@ function BlockInspector() {
 				editedContentOnlySection={ editedContentOnlySection }
 				blockEditingMode={ blockEditingMode }
 				selectedBlockStyleState={ selectedBlockStyleState }
+				isBlockStyleStateSelected={ isBlockStyleStateSelected }
 			/>
 		</BlockInspectorSingleBlockWrapper>
 	);
@@ -331,6 +360,7 @@ const BlockInspectorSingleBlock = ( {
 	editedContentOnlySection,
 	blockEditingMode,
 	selectedBlockStyleState,
+	isBlockStyleStateSelected,
 } ) => {
 	const listViewRef = useRef( null );
 	const hasMultipleTabs = availableTabs?.length > 1;
@@ -384,7 +414,10 @@ const BlockInspectorSingleBlock = ( {
 			<EditContents clientId={ renderedBlockClientId } />
 			<BlockVariationTransforms blockClientId={ renderedBlockClientId } />
 			<BlockInspectorPreTabsSlot />
-			{ hasMultipleTabs && (
+			{ isBlockStyleStateSelected && ! isSectionBlock && (
+				<StyleStateInspectorSlots blockName={ blockName } />
+			) }
+			{ ! isBlockStyleStateSelected && hasMultipleTabs && (
 				<>
 					<InspectorControlsTabs
 						hasBlockStyles={ hasBlockStyles }
@@ -396,7 +429,7 @@ const BlockInspectorSingleBlock = ( {
 					/>
 				</>
 			) }
-			{ ! hasMultipleTabs && (
+			{ ! isBlockStyleStateSelected && ! hasMultipleTabs && (
 				<>
 					{ hasBlockStyles && (
 						<BlockStyles clientId={ renderedBlockClientId } />
@@ -410,7 +443,9 @@ const BlockInspectorSingleBlock = ( {
 					) }
 				</>
 			) }
-			<InspectorControlsLastItem.Slot />
+			{ ! isBlockStyleStateSelected && (
+				<InspectorControlsLastItem.Slot />
+			) }
 			<SkipToSelectedBlock key="back" />
 		</div>
 	);
