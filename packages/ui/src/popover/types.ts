@@ -1,13 +1,11 @@
-import type { ComponentPropsWithoutRef, ReactElement, ReactNode } from 'react';
+import type { ReactElement, ReactNode } from 'react';
 import type { Popover as _Popover } from '@base-ui/react/popover';
 
 import type { ComponentProps } from '../utils/types';
 
-export type PortalProps = ComponentPropsWithoutRef< typeof _Popover.Portal >;
+export type PortalProps = ComponentProps< typeof _Popover.Portal >;
 
-export type PositionerProps = ComponentPropsWithoutRef<
-	typeof _Popover.Positioner
->;
+export type PositionerProps = ComponentProps< typeof _Popover.Positioner >;
 
 export interface RootProps
 	extends Pick<

@@ -1,14 +1,12 @@
 import type { Select as _Select } from '@base-ui/react/select';
-import type { ComponentPropsWithoutRef, ReactElement } from 'react';
+import type { ReactElement } from 'react';
 
 import type { ComponentProps } from '../../../utils/types';
 import type { InputLayoutProps } from '../input-layout/types';
 
-export type PortalProps = ComponentPropsWithoutRef< typeof _Select.Portal >;
+export type PortalProps = ComponentProps< typeof _Select.Portal >;
 
-export type PositionerProps = ComponentPropsWithoutRef<
-	typeof _Select.Positioner
->;
+export type PositionerProps = ComponentProps< typeof _Select.Positioner >;
 
 // The second type parameter is the `multiple` flag (currently disabled).
 export type SelectRootProps< Value = unknown > = Omit<

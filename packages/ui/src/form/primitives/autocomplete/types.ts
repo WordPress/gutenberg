@@ -1,16 +1,12 @@
 import type { Autocomplete as _Autocomplete } from '@base-ui/react/autocomplete';
-import type { ComponentPropsWithoutRef, ReactElement } from 'react';
+import type { ReactElement } from 'react';
 import type { ComponentProps } from '../../../utils/types';
 
 export type AutocompleteCollectionProps = _Autocomplete.Collection.Props;
 
-export type PortalProps = ComponentPropsWithoutRef<
-	typeof _Autocomplete.Portal
->;
+export type PortalProps = ComponentProps< typeof _Autocomplete.Portal >;
 
-export type PositionerProps = ComponentPropsWithoutRef<
-	typeof _Autocomplete.Positioner
->;
+export type PositionerProps = ComponentProps< typeof _Autocomplete.Positioner >;
 
 export type AutocompleteClearProps = ComponentProps<
 	typeof _Autocomplete.Clear
