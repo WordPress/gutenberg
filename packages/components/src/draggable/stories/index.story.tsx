@@ -123,11 +123,17 @@ export const Default: StoryFn< typeof Draggable > = DefaultTemplate.bind( {} );
 Default.args = {};
 
 /**
- * `appendToOwnerDocument` is used to append the element being dragged to the body of the owner document.
+ * `appendToOwnerDocument` appends the dragged element's clone to the owner
+ * document's body instead of the element's parent, which is useful when an
+ * ancestor's stacking context (e.g. its `z-index`) would otherwise place the
+ * clone behind other content.
  *
- * This is useful when the element being dragged should not receive styles from its parent.
- * For example, when the element's parent sets a `z-index` value that would cause the dragged
- * element to be rendered behind other elements.
+ * Note: in WordPress environments and any host that opts into the
+ * `@wordpress/ui` compat overlay slot, the clone always lives in the slot
+ * (which is itself body-level), so this prop is a no-op in the same-document
+ * case. It still applies for cross-document drags (e.g. drag inside an iframe
+ * while the slot is in the parent), where the clone falls back to the
+ * legacy placement.
  */
 export const AppendElementToOwnerDocument: StoryFn< typeof Draggable > =
 	DefaultTemplate.bind( {} );
