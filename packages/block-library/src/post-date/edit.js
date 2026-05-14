@@ -137,7 +137,9 @@ export default function PostDateEdit( props ) {
 										currentDate={ datetime }
 										onChange={ ( newDatetime ) =>
 											setAttributes( {
-												datetime: newDatetime,
+												datetime:
+													newDatetime ??
+													new Date().toISOString(),
 											} )
 										}
 										is12Hour={ is12HourFormat(
