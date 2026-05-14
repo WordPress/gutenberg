@@ -78,6 +78,7 @@ test.describe( 'Site Editor Performance', () => {
 		for ( let i = 1; i <= iterations; i++ ) {
 			test( `Run the test (${ i } of ${ iterations })`, async ( {
 				admin,
+				perfUtils,
 				metrics,
 			} ) => {
 				// Start tracing before navigating so the page load is captured.
@@ -90,10 +91,9 @@ test.describe( 'Site Editor Performance', () => {
 					canvas: 'edit',
 				} );
 
-				// Wait for the editor canvas to paint contentful pixels —
-				// bounds the metric on the browser's actual FCP, not a
-				// DOM-probe + polling race.
-				await metrics.waitForEditorFirstContentfulPaint();
+				// Wait for the first block (the h1 heading) to be rendered.
+				const canvas = await perfUtils.getCanvas();
+				await canvas.locator( 'h1.wp-block' ).first().waitFor();
 
 				// Stop tracing. Save just one representative sample.
 				await metrics.stopTracing(
@@ -103,21 +103,18 @@ test.describe( 'Site Editor Performance', () => {
 
 				// Get the durations.
 				const loadingDurations = await metrics.getLoadingDurations();
-				const firstBlockTime = await metrics.getFirstBlockTime();
 
 				// Save the results.
 				if ( i > throwaway ) {
 					Object.entries( loadingDurations ).forEach(
 						( [ metric, duration ] ) => {
 							if ( metric === 'timeSinceResponseEnd' ) {
-								return;
+								results.firstBlock.push( duration );
+							} else {
+								results[ metric ].push( duration );
 							}
-							results[ metric ].push( duration );
 						}
 					);
-					if ( firstBlockTime !== null ) {
-						results.firstBlock.push( firstBlockTime );
-					}
 
 					const serverTiming = await metrics.getServerTiming();
 

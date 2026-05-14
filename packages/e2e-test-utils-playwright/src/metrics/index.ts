@@ -58,6 +58,28 @@ export class Metrics {
 		this.page = page;
 		this.browser = page.context().browser()!;
 		this.trace = { traceEvents: [] };
+
+		// Emit a User Timing mark inside every iframe the moment its first
+		// contentful paint fires. The mark is captured in saved traces under
+		// the `blink.user_timing` category and renders as a labeled vertical
+		// line in DevTools / speedscope / trace.cafe, making the FCP moment
+		// easy to find when inspecting a trace.
+		void page.addInitScript( () => {
+			if ( window === window.top ) {
+				return;
+			}
+			new PerformanceObserver( ( list ) => {
+				if (
+					list
+						.getEntries()
+						.some(
+							( entry ) => entry.name === 'first-contentful-paint'
+						)
+				) {
+					performance.mark( 'iframe-fcp' );
+				}
+			} ).observe( { type: 'paint', buffered: true } );
+		} );
 	}
 
 	/**
@@ -162,85 +184,6 @@ export class Metrics {
 	}
 
 	/**
-	 * Waits until the editor canvas iframe (or the top frame, when the
-	 * canvas is rendered inline) reports a `first-contentful-paint` entry.
-	 * Polls the iframe's `performance.getEntriesByName('first-contentful-paint')`
-	 * via `Page.waitForFunction`, so the wait completes the moment the
-	 * browser stamps FCP — not when the DOM contains a probe element.
-	 *
-	 * @return Promise resolving once FCP has fired in the editor canvas.
-	 */
-	async waitForEditorFirstContentfulPaint(): Promise< void > {
-		await this.page.waitForFunction( () => {
-			const iframe = document.querySelector< HTMLIFrameElement >(
-				'iframe[name="editor-canvas"]'
-			);
-			const target = iframe?.contentWindow ?? window;
-			try {
-				return (
-					target.performance?.getEntriesByName(
-						'first-contentful-paint'
-					).length > 0
-				);
-			} catch {
-				return false;
-			}
-		} );
-	}
-
-	/**
-	 * Returns the time, in milliseconds, from when the navigation response
-	 * finished arriving until the editor canvas first painted contentful
-	 * pixels. Bridges the top frame's and the iframe's clocks via their
-	 * absolute `timeOrigin`s.
-	 *
-	 * Reads the browser's `firstContentfulPaint` paint-timing entry directly
-	 * rather than measuring `performance.now()` after a DOM-probe wait,
-	 * which removes Playwright's polling jitter and any DOM-vs-paint race.
-	 *
-	 * Falls back to the top frame's FCP when the editor canvas is rendered
-	 * inline (non-iframed).
-	 *
-	 * @return Duration in ms, or null when no paint entry is available.
-	 */
-	async getFirstBlockTime(): Promise< number | null > {
-		const topResponseEndAbs = await this.page.evaluate( () => {
-			const [ nav ] = performance.getEntriesByType(
-				'navigation'
-			) as PerformanceNavigationTiming[];
-			if ( ! nav ) {
-				return null;
-			}
-			return performance.timeOrigin + nav.responseEnd;
-		} );
-		if ( topResponseEndAbs === null ) {
-			return null;
-		}
-
-		const editorFrame = this.page
-			.frames()
-			.find( ( frame ) => frame.name() === 'editor-canvas' );
-		const targetFrame = editorFrame ?? this.page.mainFrame();
-
-		const fcpAbs: number | null = await targetFrame.evaluate( () => {
-			const fcp = (
-				performance.getEntriesByType( 'paint' ) as
-					| PerformancePaintTiming[]
-					| undefined
-			 )?.find( ( entry ) => entry.name === 'first-contentful-paint' );
-			if ( ! fcp ) {
-				return null;
-			}
-			return performance.timeOrigin + fcp.startTime;
-		} );
-		if ( fcpAbs === null ) {
-			return null;
-		}
-
-		return fcpAbs - topResponseEndAbs;
-	}
-
-	/**
 	 * Returns the loading durations using the Navigation Timing API. All the
 	 * durations exclude the server response time.
 	 *
@@ -307,6 +250,10 @@ export class Metrics {
 				'disabled-by-default-devtools.timeline.stack',
 				'disabled-by-default-v8.cpu_profiler',
 				'v8.execute',
+				// Capture User Timing marks (e.g. the `iframe-fcp` mark we
+				// emit when an iframe paints first contentful pixels) so the
+				// trace viewer renders them as labeled markers.
+				'blink.user_timing',
 			],
 			...options,
 		} );
