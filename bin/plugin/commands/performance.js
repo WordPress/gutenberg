@@ -481,38 +481,37 @@ async function runPerformanceTests( branches, options ) {
 
 	const wpEnvPath = path.join( testRunnerDir, 'node_modules/.bin/wp-env' );
 
-	for ( const testSuite of testSuites ) {
-		for ( let i = 1; i <= TEST_ROUNDS; i++ ) {
+	for ( let i = 1; i <= TEST_ROUNDS; i++ ) {
+		for ( const [ branchIdx, branch ] of branches.entries() ) {
 			logAtIndent(
 				1,
 				// prettier-ignore
-				`Suite: ${ formats.success( testSuite ) } (round ${ i } of ${ TEST_ROUNDS })`
+				`Branch: ${ formats.success( branch ) } (round ${ i } of ${ TEST_ROUNDS })`
 			);
 
-			for ( const [ branchIdx, branch ] of branches.entries() ) {
-				logAtIndent( 2, 'Branch:', formats.success( branch ) );
+			const sanitizedBranchName = sanitizeBranchName( branch );
+			// @ts-ignore
+			const envDir = branchDirs[ branch ];
 
-				const sanitizedBranchName = sanitizeBranchName( branch );
+			logAtIndent( 2, 'Starting environment' );
+			await runShellScript( `${ wpEnvPath } start`, envDir );
+
+			for ( const testSuite of testSuites ) {
+				logAtIndent( 2, `Suite: ${ formats.success( testSuite ) }` );
+
 				const runKey = `${ testSuite }_${ sanitizedBranchName }_round-${ i }`;
-				// @ts-ignore
-				const envDir = branchDirs[ branch ];
-
-				logAtIndent( 3, 'Starting environment' );
-				await runShellScript( `${ wpEnvPath } start`, envDir );
 
 				logAtIndent( 3, 'Running tests' );
-				// Only the head branch saves traces; comparison branches share
-				// the same artifacts directory and would otherwise overwrite.
 				await runTestSuite(
 					testSuite,
 					testRunnerDir,
 					runKey,
 					branchIdx === 0
 				);
-
-				logAtIndent( 3, 'Stopping environment' );
-				await runShellScript( `${ wpEnvPath } stop`, envDir );
 			}
+
+			logAtIndent( 2, 'Stopping environment' );
+			await runShellScript( `${ wpEnvPath } stop`, envDir );
 		}
 	}
 
