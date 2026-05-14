@@ -39,8 +39,8 @@
 	bottom: var(--widget-resize-handle-visual-inset);
 	inset-inline-end: var(--widget-resize-handle-visual-inset);
 	/* @TODO: Replace with a `size` token once that category exists in the theme package. */
-	width: calc(var(--wpds-dimension-base) * 3);
-	height: calc(var(--wpds-dimension-base) * 3);
+	width: calc(var(--wpds-dimension-base) * 2);
+	height: calc(var(--wpds-dimension-base) * 2);
 	box-sizing: border-box;
 	border-block-end:
 		var(--wpds-border-width-sm) solid
