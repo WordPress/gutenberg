@@ -491,6 +491,8 @@ export default function ColorPanel( {
 		// values would conflate them and incorrectly force the link color to
 		// values would conflate them and incorrectly force the link color to
 		// follow the text color even when the user deliberately chose a
+		// different palette slot.
+		//
 		// Note: this is stricter than the previous decoded comparison.
 		// If text and link were stored in different formats that resolved to
 		// the same hex (e.g. one as `var:preset|color|x` and the other as
