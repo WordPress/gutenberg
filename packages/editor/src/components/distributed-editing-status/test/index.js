@@ -919,6 +919,45 @@ describe( 'DistributedEditingStatus', () => {
 		).not.toBeInTheDocument();
 	} );
 
+	it( 'describes a fresh-review decision transcript without proof internals', () => {
+		setupDistributedEditingStatusSelect( {
+			sessionState: {
+				actionTranscriptItems: [
+					{
+						eventType:
+							DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.FRESH_REVIEW_DECISION_SUBMITTED,
+						reviewerId: 123,
+					},
+					{
+						eventType:
+							DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.FRESH_REVIEW_DECISION_SUBMITTED,
+					},
+				],
+			},
+		} );
+
+		render( <DistributedEditingStatusChrome /> );
+
+		const transcriptItem = screen.getByTestId(
+			'distributed-editing-action-transcript-status'
+		);
+
+		expect( transcriptItem ).toHaveAttribute(
+			'data-distributed-editing-transcript-event-type',
+			DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.FRESH_REVIEW_DECISION_SUBMITTED
+		);
+		expect( transcriptItem ).toHaveAttribute(
+			'data-distributed-editing-transcript-redacted',
+			'true'
+		);
+		expect(
+			screen.getByText(
+				'The editor submitted a fresh-review decision and kept the activity record content-free.'
+			)
+		).toBeVisible();
+		expect( screen.queryByText( '123' ) ).not.toBeInTheDocument();
+	} );
+
 	it( 'mounts production editor chrome with explicit placement', () => {
 		setupDistributedEditingStatusSelect( {
 			sessionState: {

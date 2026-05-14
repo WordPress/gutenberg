@@ -2793,6 +2793,12 @@ describe( 'Post actions', () => {
 				result: 'fresh_review_decision_approved_for_retry_save',
 				decision: 'approved',
 				accepted: true,
+				actionTranscriptItemCount: 1,
+				actionTranscriptLatestEventType:
+					DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.FRESH_REVIEW_DECISION_SUBMITTED,
+				actionTranscriptEntriesRedacted: true,
+				actionTranscriptCallsSave: false,
+				actionTranscriptClaimsSaved: false,
 				callsFreshReviewDecisionEndpoint: true,
 				callsRetrySaveEndpoint: false,
 				callsNormalSavePost: false,
@@ -2829,6 +2835,21 @@ describe( 'Post actions', () => {
 				callsNormalSavePost: false,
 				callsRetrySaveEndpoint: false,
 				claimsSaved: false,
+			} );
+			expect(
+				registry
+					.select( editorStore )
+					.getDistributedEditingSessionState()
+			).toMatchObject( {
+				actionTranscriptItemCount: 1,
+				actionTranscriptLatestEventType:
+					DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.FRESH_REVIEW_DECISION_SUBMITTED,
+				actionTranscriptEntriesRedacted: true,
+				actionTranscriptExposesRawContent: false,
+				actionTranscriptExposesProofInternals: false,
+				actionTranscriptExposesActorIds: false,
+				actionTranscriptCallsSave: false,
+				actionTranscriptClaimsSaved: false,
 			} );
 		} );
 

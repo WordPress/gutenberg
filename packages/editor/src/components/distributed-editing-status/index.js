@@ -2095,6 +2095,10 @@ function getActionTranscriptMessage( descriptor ) {
 			return __(
 				'The editor requested fresh review and kept the activity record content-free.'
 			);
+		case DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.FRESH_REVIEW_DECISION_SUBMITTED:
+			return __(
+				'The editor submitted a fresh-review decision and kept the activity record content-free.'
+			);
 	}
 
 	const count = normalizeCount( descriptor.actionTranscriptItemCount );

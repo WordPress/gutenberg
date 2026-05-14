@@ -1618,16 +1618,36 @@ export const __experimentalSubmitDistributedEditingFreshReviewDecision =
 					response,
 					currentSessionState
 				);
+			const nextSessionState =
+				getDistributedEditingSessionStateWithActionTranscriptEvent(
+					sessionState,
+					{
+						eventType:
+							DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.FRESH_REVIEW_DECISION_SUBMITTED,
+						reasonCode:
+							sessionState.localUpdatesImportFreshReviewDecisionReason,
+					}
+				);
 
-			dispatch.setDistributedEditingSessionState( sessionState );
+			dispatch.setDistributedEditingSessionState( nextSessionState );
 
 			return {
-				status: sessionState.localUpdatesImportFreshReviewDecisionStatus,
-				result: sessionState.localUpdatesImportFreshReviewDecisionResult,
+				status: nextSessionState.localUpdatesImportFreshReviewDecisionStatus,
+				result: nextSessionState.localUpdatesImportFreshReviewDecisionResult,
 				decision:
-					sessionState.localUpdatesImportFreshReviewDecisionDecision,
+					nextSessionState.localUpdatesImportFreshReviewDecisionDecision,
 				accepted:
-					sessionState.localUpdatesImportFreshReviewDecisionAccepted,
+					nextSessionState.localUpdatesImportFreshReviewDecisionAccepted,
+				actionTranscriptItemCount:
+					nextSessionState.actionTranscriptItemCount,
+				actionTranscriptLatestEventType:
+					nextSessionState.actionTranscriptLatestEventType,
+				actionTranscriptEntriesRedacted:
+					nextSessionState.actionTranscriptEntriesRedacted,
+				actionTranscriptCallsSave:
+					nextSessionState.actionTranscriptCallsSave,
+				actionTranscriptClaimsSaved:
+					nextSessionState.actionTranscriptClaimsSaved,
 				callsFreshReviewDecisionEndpoint: true,
 				callsRetrySaveEndpoint: false,
 				callsNormalSavePost: false,
@@ -1637,15 +1657,26 @@ export const __experimentalSubmitDistributedEditingFreshReviewDecision =
 				mutatesPersistedPostContent: false,
 				changesPostLock: false,
 				claimsSaved: false,
-				sessionState,
+				sessionState: nextSessionState,
 			};
 		} catch ( error ) {
-			dispatch.setDistributedEditingSessionState(
+			const sessionState =
 				getDistributedEditingSessionStateForFreshReviewDecisionResult(
 					error,
 					currentSessionState
-				)
-			);
+				);
+			const nextSessionState =
+				getDistributedEditingSessionStateWithActionTranscriptEvent(
+					sessionState,
+					{
+						eventType:
+							DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.FRESH_REVIEW_DECISION_SUBMITTED,
+						reasonCode:
+							sessionState.localUpdatesImportFreshReviewDecisionReason,
+					}
+				);
+
+			dispatch.setDistributedEditingSessionState( nextSessionState );
 
 			throw error;
 		}
