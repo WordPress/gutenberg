@@ -48,7 +48,7 @@ import TemplatePartMenuItems from '../template-part-menu-items';
 import MediaEditorModalMount from '../media/media-editor-modal';
 import {
 	SuggestionOverlayProvider,
-	SuggestionAutoSave,
+	SuggestionCommitBar,
 	SuggestionStoreInterceptor,
 	registerSuggestionOverlayFilter,
 } from '../suggestion-mode';
@@ -479,7 +479,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 										<PatternRenameModal />
 										<PatternDuplicateModal />
 										<SuggestionStoreInterceptor />
-										<SuggestionAutoSave />
+										<SuggestionCommitBar />
 										{ window?.__experimentalMediaEditorModal && (
 											<MediaEditorModalMount />
 										) }
