@@ -194,9 +194,6 @@ jobs:
             matrix:
                 IS_GUTENBERG_PLUGIN: [true, false]
 
-        outputs:
-            job_status: ${{ job.status }}
-
         steps:
             - name: Checkout code
               uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -261,7 +258,7 @@ jobs:
             packages: write
         if: |
             always() &&
-            needs.build.outputs.job_status == 'success' &&
+            needs.build.result == 'success' &&
             github.repository == 'WordPress/gutenberg' &&
             github.event_name == 'push'
 
@@ -312,7 +309,7 @@ jobs:
             contents: write
         if: |
             always() &&
-            ( needs.build.outputs.job_status == 'failure' ) &&
+            needs.build.result == 'failure' &&
             needs.bump-version.outputs.release_branch_commit
 
         steps:
