@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Code Quality
+
+-   Remove CSS overrides targeting `.components-modal__frame` and `[role="document"]` for duplicate template part and duplicate pattern modals, replaced by declarative `modalSize` prop. ([#78028](https://github.com/WordPress/gutenberg/pull/78028))
+
 ## 6.45.0 (2026-04-29)
 
 ## 6.44.0 (2026-04-15)

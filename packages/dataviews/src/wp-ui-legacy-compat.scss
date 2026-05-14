@@ -1,0 +1,33 @@
+// Bridges @wordpress/ui overlay z-indexes with the legacy
+// @wordpress/components stacking values while both systems coexist.
+//
+// `:root` defaults align @wordpress/ui's Dialog and Tooltip with the
+// equivalent @wordpress/components overlays so they don't disappear
+// behind (or float over) each other. The per-portal override raises
+// action modals back above legacy Popovers, matching the previous
+// `.dataviews-action-modal` z-index.
+//
+// Why `:root` rather than a `.dataviews-wrapper` class scope:
+//
+// - Dialog and Tooltip from @wordpress/ui are portaled to `<body>`
+//   and are not descendants of `.dataviews-wrapper`, so a class scope
+//   wouldn't cascade to them.
+// - The override is intentionally global because the bundle bridges
+//   two stacking systems wherever both coexist; any editor surface
+//   that loads dataviews benefits from the alignment.
+// - Per-instance overrides for action modals already happen on the
+//   portal class (`.dataviews-action-modal__portal`) below.
+//
+// These rules can go away once all overlays share a single stacking
+// system.
+
+@use "@wordpress/base-styles/z-index" as *;
+
+:root {
+	--wp-ui-dialog-z-index: #{z-index(".components-modal__screen-overlay")};
+	--wp-ui-tooltip-z-index: #{z-index(".components-tooltip")};
+}
+
+.dataviews-action-modal__portal {
+	--wp-ui-dialog-z-index: #{z-index(".dataviews-action-modal")};
+}

@@ -7,12 +7,7 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { useInstanceId, usePrevious } from '@wordpress/compose';
-import {
-	Button,
-	privateApis as componentsPrivateApis,
-	Spinner,
-	Composite,
-} from '@wordpress/components';
+import { Button, Spinner, Composite } from '@wordpress/components';
 import {
 	useCallback,
 	useEffect,
@@ -24,13 +19,13 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { moreVertical } from '@wordpress/icons';
 import { useRegistry } from '@wordpress/data';
-import { Stack, VisuallyHidden } from '@wordpress/ui';
+// eslint-disable-next-line @wordpress/use-recommended-components
+import { Dialog, Stack, VisuallyHidden } from '@wordpress/ui';
 
 /**
  * Internal dependencies
  */
-import { unlock } from '../../../lock-unlock';
-import { ActionsMenuGroup, ActionModal } from '../../dataviews-item-actions';
+import { ActionModal, ItemActionsMenu } from '../../dataviews-item-actions';
 import DataViewsContext from '../../dataviews-context';
 import { useDelayedLoading } from '../../../hooks/use-delayed-loading';
 import type {
@@ -38,9 +33,9 @@ import type {
 	NormalizedField,
 	ViewList as ViewListType,
 	ViewListProps,
-	ActionModal as ActionModalType,
 } from '../../../types';
 import getDataByGroup from '../utils/get-data-by-group';
+import getActionLabel from '../../../utils/get-action-label';
 
 interface ListViewItemProps< Item > {
 	view: ViewListType;
@@ -56,8 +51,6 @@ interface ListViewItemProps< Item > {
 	onDropdownTriggerKeyDown: React.KeyboardEventHandler< HTMLButtonElement >;
 	posinset?: number;
 }
-
-const { Menu } = unlock( componentsPrivateApis );
 
 function generateItemWrapperCompositeId( idPrefix: string ) {
 	return `${ idPrefix }-item-wrapper`;
@@ -83,41 +76,52 @@ function PrimaryActionGridCell< Item >( {
 } ) {
 	const registry = useRegistry();
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
+	const closeModal = useCallback( () => setIsModalOpen( false ), [] );
 
 	const compositeItemId = generatePrimaryActionCompositeId(
 		idPrefix,
 		primaryAction.id
 	);
 
-	const label =
-		typeof primaryAction.label === 'string'
-			? primaryAction.label
-			: primaryAction.label( [ item ] );
+	const label = getActionLabel( primaryAction, [ item ] );
 
-	return 'RenderModal' in primaryAction ? (
-		<div role="gridcell" key={ primaryAction.id }>
-			<Composite.Item
-				id={ compositeItemId }
-				render={
-					<Button
-						disabled={ !! primaryAction.disabled }
-						accessibleWhenDisabled
-						text={ label }
-						size="small"
-						onClick={ () => setIsModalOpen( true ) }
+	if ( 'RenderModal' in primaryAction ) {
+		// Compose `Composite.Item` → `Dialog.Trigger` → `Button` so all
+		// three layers' props merge onto the same DOM button:
+		// composite-item navigation, dialog-trigger ARIA, and the
+		// visual `Button` styling.
+		return (
+			<div role="gridcell" key={ primaryAction.id }>
+				<Dialog.Root
+					open={ isModalOpen }
+					onOpenChange={ setIsModalOpen }
+					disablePointerDismissal={ primaryAction.hideModalHeader }
+				>
+					<Composite.Item
+						id={ compositeItemId }
+						render={
+							<Dialog.Trigger
+								render={
+									<Button
+										disabled={ !! primaryAction.disabled }
+										accessibleWhenDisabled
+										text={ label }
+										size="small"
+									/>
+								}
+							/>
+						}
 					/>
-				}
-			>
-				{ isModalOpen && (
 					<ActionModal< Item >
 						action={ primaryAction }
 						items={ [ item ] }
-						closeModal={ () => setIsModalOpen( false ) }
+						closeModal={ closeModal }
 					/>
-				) }
-			</Composite.Item>
-		</div>
-	) : (
+				</Dialog.Root>
+			</div>
+		);
+	}
+	return (
 		<div role="gridcell" key={ primaryAction.id }>
 			<Composite.Item
 				id={ compositeItemId }
@@ -164,9 +168,6 @@ function ListItem< Item >( {
 
 	const registry = useRegistry();
 	const [ isHovered, setIsHovered ] = useState( false );
-	const [ activeModalAction, setActiveModalAction ] = useState(
-		null as ActionModalType< Item > | null
-	);
 	const handleHover: React.MouseEventHandler = ( { type } ) => {
 		const isHover = type === 'mouseenter';
 		setIsHovered( isHover );
@@ -235,44 +236,28 @@ function ListItem< Item >( {
 			) }
 			{ ! hasOnlyOnePrimaryAction && (
 				<div role="gridcell">
-					<Menu placement="bottom-end">
-						<Menu.TriggerButton
-							render={
-								<Composite.Item
-									id={ generateDropdownTriggerCompositeId(
-										idPrefix
-									) }
-									render={
-										<Button
-											size="small"
-											icon={ moreVertical }
-											label={ __( 'Actions' ) }
-											accessibleWhenDisabled
-											disabled={ ! actions.length }
-											onKeyDown={
-												onDropdownTriggerKeyDown
-											}
-										/>
-									}
-								/>
-							}
-						/>
-						<Menu.Popover>
-							<ActionsMenuGroup
-								actions={ eligibleActions }
-								item={ item }
-								registry={ registry }
-								setActiveModalAction={ setActiveModalAction }
+					<ItemActionsMenu
+						item={ item }
+						actions={ eligibleActions }
+						registry={ registry }
+						renderTrigger={
+							<Composite.Item
+								id={ generateDropdownTriggerCompositeId(
+									idPrefix
+								) }
+								render={
+									<Button
+										size="small"
+										icon={ moreVertical }
+										label={ __( 'Actions' ) }
+										accessibleWhenDisabled
+										disabled={ ! actions.length }
+										onKeyDown={ onDropdownTriggerKeyDown }
+									/>
+								}
 							/>
-						</Menu.Popover>
-					</Menu>
-					{ !! activeModalAction && (
-						<ActionModal
-							action={ activeModalAction }
-							items={ [ item ] }
-							closeModal={ () => setActiveModalAction( null ) }
-						/>
-					) }
+						}
+					/>
 				</div>
 			) }
 		</Stack>

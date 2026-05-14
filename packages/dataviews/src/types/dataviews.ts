@@ -426,6 +426,11 @@ export interface ActionModal< Item > extends ActionBase< Item > {
 	/**
 	 * The size of the modal.
 	 *
+	 * - `'small'` — narrow max-width.
+	 * - `'medium'` — moderate max-width.
+	 * - `'large'` — wide max-width.
+	 * - `'fill'` — fills the available viewport area.
+	 *
 	 * @default 'medium'
 	 */
 	modalSize?: 'small' | 'medium' | 'large' | 'fill';

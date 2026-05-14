@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -354,8 +354,14 @@ describe( 'DataForm component', () => {
 			} );
 			await user.click( cancelButton );
 
-			// Modal should be closed
-			expect( screen.queryByRole( 'dialog' ) ).not.toBeInTheDocument();
+			// Modal should be closed once the exit transition completes.
+			// `Dialog.Root` stays mounted in the React tree and the popup
+			// unmounts asynchronously after the close animation resolves.
+			await waitFor( () => {
+				expect(
+					screen.queryByRole( 'dialog' )
+				).not.toBeInTheDocument();
+			} );
 		} );
 
 		it( 'should apply changes and close modal when apply button is clicked', async () => {
@@ -398,9 +404,88 @@ describe( 'DataForm component', () => {
 			} );
 			await user.click( applyButton );
 
-			// Modal should be closed and onChange should be called
-			expect( screen.queryByRole( 'dialog' ) ).not.toBeInTheDocument();
+			// Modal should be closed once the exit transition completes.
+			// `Dialog.Root` stays mounted in the React tree and the popup
+			// unmounts asynchronously after the close animation resolves.
+			await waitFor( () => {
+				expect(
+					screen.queryByRole( 'dialog' )
+				).not.toBeInTheDocument();
+			} );
 			expect( onChange ).toHaveBeenCalledWith( { title: 'New Title' } );
+		} );
+
+		it( 'should disable Apply when the form is invalid (Cancel stays enabled)', async () => {
+			const onChange = jest.fn();
+			const requiredTitleFields = fields.map( ( field ) =>
+				field.id === 'title'
+					? { ...field, isValid: { required: true } }
+					: field
+			);
+			const formWithRequiredTitle = {
+				fields: [ 'title' ],
+				layout: {
+					type: 'panel',
+					labelPosition: 'side',
+					openAs: 'modal',
+				} as const,
+			};
+
+			render(
+				<Dataform
+					onChange={ onChange }
+					fields={ requiredTitleFields }
+					form={ formWithRequiredTitle }
+					data={ data }
+				/>
+			);
+
+			const user = await userEvent.setup();
+			await user.click( fieldsSelector.title.view() );
+
+			expect( screen.getByRole( 'dialog' ) ).toBeInTheDocument();
+
+			// Apply is enabled while the title is non-empty.
+			const applyButton = screen.getByRole( 'button', {
+				name: /apply/i,
+			} );
+			const cancelButton = screen.getByRole( 'button', {
+				name: /cancel/i,
+			} );
+			expect( applyButton ).not.toHaveAttribute(
+				'aria-disabled',
+				'true'
+			);
+			expect( cancelButton ).not.toHaveAttribute(
+				'aria-disabled',
+				'true'
+			);
+
+			// Clear the title to violate the `required` constraint.
+			await user.clear( fieldsSelector.title.edit() );
+
+			// Apply is disabled, Cancel stays enabled — users must always
+			// be able to discard the draft. `Dialog.Action` uses the
+			// focusable-when-disabled pattern (`aria-disabled="true"`)
+			// rather than the native `disabled` attribute, so assert on
+			// the ARIA state and on the functional consequence (click does
+			// not dispatch the change).
+			expect( applyButton ).toHaveAttribute( 'aria-disabled', 'true' );
+			expect( cancelButton ).not.toHaveAttribute(
+				'aria-disabled',
+				'true'
+			);
+			await user.click( applyButton );
+			expect( onChange ).not.toHaveBeenCalled();
+
+			// Cancel still closes the modal.
+			await user.click( cancelButton );
+			await waitFor( () => {
+				expect(
+					screen.queryByRole( 'dialog' )
+				).not.toBeInTheDocument();
+			} );
+			expect( onChange ).not.toHaveBeenCalled();
 		} );
 
 		it( 'should call onChange with the correct value for each typed character', async () => {

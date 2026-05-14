@@ -2,11 +2,19 @@
 
 ## Unreleased
 
-## 14.2.0 (2026-04-29)
-
 ### Enhancements
 
-- DataForm: Render field `description` as help text in the `array` control.[#77554](https://github.com/WordPress/gutenberg/pull/77554)
+- DataForm: `PanelModal`'s Apply button is now disabled while the in-progress form has validation errors, preventing invalid edits from being committed silently. Cancel remains enabled so users can always discard the draft. ([#78028](https://github.com/WordPress/gutenberg/pull/78028))
+
+### Code Quality
+
+- DataViews: Item actions now share a single `ItemActionsMenu` host that renders the kebab `<Menu>` and the per-action `Dialog.Root` as siblings. The dialog is hoisted out of `Menu.Popover`'s `unmountOnHide` subtree so a modal action stays mounted while the menu closes. `ButtonTrigger` (used in the inline-button path) gained `forwardRef` and spreads unknown props so it composes under `Dialog.Trigger`. A new `genericForwardRef` helper centralises the `forwardRef`-with-generics TypeScript workaround. ([#78028](https://github.com/WordPress/gutenberg/pull/78028))
+
+### Breaking Changes
+
+- DataViews: Migrate action modals and DataForm panel modals from `@wordpress/components` `Modal` to `@wordpress/ui` `Dialog`. Action modals with `hideModalHeader: true` now render a `Dialog.Popup` with `role="alertdialog"` and `disablePointerDismissal`, requiring an explicit user action to dismiss. Custom CSS targeting `.components-modal__*` classes inside action modals will no longer work. The `dataforms-layouts-panel__modal` CSS class on the panel modal and the `dataforms-layouts-panel__modal-footer` CSS class have been removed. The `modalFocusOnMount` value `'firstElement'` now behaves like `'firstContentElement'` (the new Dialog primitive's smart default already skips the close icon and focuses the first content tabbable, so the legacy distinction between the two is no longer meaningful). ([#78028](https://github.com/WordPress/gutenberg/pull/78028))
+
+## 14.2.0 (2026-04-29)
 
 ## 14.1.0 (2026-04-15)
 

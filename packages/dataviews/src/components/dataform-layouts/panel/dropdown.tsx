@@ -154,6 +154,7 @@ function PanelDropdown< Item >( {
 						disabled={ fieldDefinition.readOnly === true }
 						onClick={ onToggle }
 						aria-expanded={ isOpen }
+						aria-haspopup="true"
 					/>
 				) }
 				renderContent={ ( { onClose } ) => (

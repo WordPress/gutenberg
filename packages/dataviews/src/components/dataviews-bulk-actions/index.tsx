@@ -1,18 +1,20 @@
 /**
- * External dependencies
- */
-import type { ReactElement } from 'react';
-
-/**
  * WordPress dependencies
  */
 import { Button, CheckboxControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useMemo, useState, useRef, useContext } from '@wordpress/element';
+import {
+	useCallback,
+	useMemo,
+	useState,
+	useRef,
+	useContext,
+} from '@wordpress/element';
 import { useRegistry } from '@wordpress/data';
 import { closeSmall } from '@wordpress/icons';
 import { useViewportMatch } from '@wordpress/compose';
-import { Stack } from '@wordpress/ui';
+// eslint-disable-next-line @wordpress/use-recommended-components
+import { Dialog, Stack } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -23,39 +25,36 @@ import type { Action, ActionModal as ActionModalType } from '../../types';
 import type { SetSelection } from '../../types/private';
 import type { ActionTriggerProps } from '../dataviews-item-actions';
 import getFooterMessage from '../../utils/get-footer-message';
+import genericForwardRef from '../../utils/generic-forward-ref';
+import getActionLabel from '../../utils/get-action-label';
 
 interface ActionWithModalProps< Item > {
 	action: ActionModalType< Item >;
 	items: Item[];
-	ActionTriggerComponent: (
-		props: ActionTriggerProps< Item >
-	) => ReactElement;
 }
 
 function ActionWithModal< Item >( {
 	action,
 	items,
-	ActionTriggerComponent,
 }: ActionWithModalProps< Item > ) {
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
-	const actionTriggerProps = {
-		action,
-		onClick: () => {
-			setIsModalOpen( true );
-		},
-		items,
-	};
+	const closeModal = useCallback( () => setIsModalOpen( false ), [] );
+
 	return (
-		<>
-			<ActionTriggerComponent { ...actionTriggerProps } />
-			{ isModalOpen && (
-				<ActionModal
-					action={ action }
-					items={ items }
-					closeModal={ () => setIsModalOpen( false ) }
-				/>
-			) }
-		</>
+		<Dialog.Root
+			open={ isModalOpen }
+			onOpenChange={ setIsModalOpen }
+			disablePointerDismissal={ action.hideModalHeader }
+		>
+			<Dialog.Trigger
+				render={ <ActionTrigger action={ action } items={ items } /> }
+			/>
+			<ActionModal
+				action={ action }
+				items={ items }
+				closeModal={ closeModal }
+			/>
+		</Dialog.Root>
 	);
 }
 
@@ -178,19 +177,23 @@ interface ToolbarContentProps< Item > {
 	};
 }
 
-function ActionTrigger< Item >( {
-	action,
-	onClick,
-	isBusy,
-	items,
-}: ActionTriggerProps< Item > ) {
-	const label =
-		typeof action.label === 'string' ? action.label : action.label( items );
+// `forwardRef` + `{ ...rest }` so this component composes under
+// `<Dialog.Trigger render={ <ActionTrigger … /> } />`: the trigger's
+// merged `onClick` and ARIA state (`aria-haspopup="dialog"`,
+// `aria-expanded`, `aria-controls`) flow straight onto the underlying
+// `Button`. Direct callers (the inline `ActionButton` path) keep
+// passing `onClick` / `isBusy` explicitly.
+const ActionTrigger = genericForwardRef( function ActionTrigger< Item >(
+	{ action, onClick, isBusy, items, ...rest }: ActionTriggerProps< Item >,
+	ref: React.Ref< HTMLButtonElement >
+) {
+	const label = getActionLabel( action, items );
 	const isMobile = useViewportMatch( 'medium', '<' );
 
 	if ( isMobile ) {
 		return (
 			<Button
+				ref={ ref }
 				disabled={ isBusy }
 				accessibleWhenDisabled
 				label={ label }
@@ -198,22 +201,25 @@ function ActionTrigger< Item >( {
 				size="compact"
 				onClick={ onClick }
 				isBusy={ isBusy }
+				{ ...rest }
 			/>
 		);
 	}
 
 	return (
 		<Button
+			ref={ ref }
 			disabled={ isBusy }
 			accessibleWhenDisabled
 			size="compact"
 			onClick={ onClick }
 			isBusy={ isBusy }
+			{ ...rest }
 		>
 			{ label }
 		</Button>
 	);
-}
+} );
 
 const EMPTY_ARRAY: [] = [];
 
@@ -235,7 +241,6 @@ function ActionButton< Item >( {
 				key={ action.id }
 				action={ action }
 				items={ selectedEligibleItems }
-				ActionTriggerComponent={ ActionTrigger }
 			/>
 		);
 	}
