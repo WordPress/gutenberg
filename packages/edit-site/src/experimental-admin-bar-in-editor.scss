@@ -1,16 +1,11 @@
 // Styles for the experimental admin bar in editor.
 
 body.has-admin-bar-in-editor {
-	--wp-admin-bar-height: 46px;
 	margin-top: 0;
 	height: 100%;
 
-	@media (min-width: 782px) {
-		--wp-admin-bar-height: 32px;
-	}
-
 	&:has(.editor-editor-interface.is-distraction-free) {
-		--wp-admin-bar-height: 0;
+		--wp-admin--admin-bar--height: 0;
 	}
 
 	.edit-site-site-hub__title,
@@ -42,27 +37,27 @@ body.has-admin-bar-in-editor {
 
 	.edit-site {
 		box-sizing: border-box;
-		padding-top: var(--wp-admin-bar-height);
+		padding-top: var(--wp-admin--admin-bar--height, 0);
 		height: 100vh;
 		min-height: 100vh;
 
 		@media (min-width: 600px) {
 			padding-top: 0;
-			top: var(--wp-admin-bar-height);
-			height: calc(100vh - var(--wp-admin-bar-height));
-			min-height: calc(100vh - var(--wp-admin-bar-height));
+			top: var(--wp-admin--admin-bar--height, 0);
+			height: calc(100vh - var(--wp-admin--admin-bar--height, 0));
+			min-height: calc(100vh - var(--wp-admin--admin-bar--height, 0));
 		}
 	}
 
 	.edit-site-layout.is-full-canvas .edit-site-layout__sidebar-region {
-		top: var(--wp-admin-bar-height);
-		height: calc(100vh - var(--wp-admin-bar-height));
+		top: var(--wp-admin--admin-bar--height, 0);
+		height: calc(100vh - var(--wp-admin--admin-bar--height, 0));
 	}
 
 	&.is-fullscreen-mode {
 		.is-entity-save-view-open .interface-interface-skeleton__actions:focus,
 		.is-entity-save-view-open .interface-interface-skeleton__actions:focus-within {
-			top: var(--wp-admin-bar-height);
+			top: var(--wp-admin--admin-bar--height, 0);
 		}
 
 		#wpadminbar {
