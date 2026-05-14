@@ -32,6 +32,7 @@ import {
 	DISTRIBUTED_EDITING_UNLOAD_WARNING_REASONS,
 	DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE,
 	getDistributedEditingLocalUpdatesExportPayload,
+	getDistributedEditingReviewedBlockItemsForRetrySaveReviewApprovalProof,
 	getDistributedEditingRetrySaveFlowStateForSessionState,
 	getDistributedEditingRetrySavePolicyForSessionState,
 	getDistributedEditingRiskyBlockReviewStateForSessionState,
@@ -248,6 +249,11 @@ describe( 'distributed editing session state', () => {
 			retrySaveReviewApprovalExpectedProposedContentHash: null,
 			retrySaveReviewApprovalExpectedCandidateContentHash: null,
 			retrySaveReviewApprovalHashMismatch: false,
+			retrySaveReviewApprovalReviewedBlockItems: [],
+			retrySaveReviewApprovalReviewedBlockItemCount: 0,
+			retrySaveReviewApprovalBlockReviewStatus: null,
+			retrySaveReviewApprovalUnapprovedBlockItemIds: [],
+			retrySaveReviewApprovalMismatchedBlockItemFields: [],
 			retrySaveReviewApprovalRawContentIncluded: false,
 			retrySaveReviewApprovalSavesPost: false,
 			retrySaveReviewApprovalMutatesPostContent: false,
@@ -1481,6 +1487,7 @@ describe( 'distributed editing session state', () => {
 	it( 'normalizes accepted retry-save review approval proof without saving', () => {
 		const proposedContentHash = 'sha256:review-approval-proposed';
 		const candidateContentHash = 'sha256:review-approval-candidate';
+		const reviewedBlockHash = 'sha256:review-approval-risky-block';
 		const normalized =
 			getDistributedEditingSessionStateForRetrySaveReviewApprovalProofResult(
 				{
@@ -1495,6 +1502,27 @@ describe( 'distributed editing session state', () => {
 					review_scope: 'collaborative_post_content',
 					proposed_post_content_hash: proposedContentHash,
 					candidate_post_content_hash: candidateContentHash,
+					reviewed_block_item_count: 1,
+					block_review_status: 'approved_for_retry_save',
+					reviewed_block_items: [
+						{
+							id: 'risk-html-approve',
+							block_client_id: 'server-block-0',
+							block_name: 'core/html',
+							block_label: 'HTML',
+							block_path: [ 0 ],
+							change_kind: 'added_block',
+							risk_reason: 'kses_would_remove_script',
+							proposed_content_hash: reviewedBlockHash,
+							reviewed_proposed_content_hash: reviewedBlockHash,
+							kses_filtered_content_hash:
+								'sha256:review-approval-risky-block-filtered',
+							review_status: 'approved_for_retry_save',
+							review_evidence_type: 'kses_block_hash_only_change',
+							content_review_policy: 'kses',
+							raw_content_included: true,
+						},
+					],
 					raw_content_included: false,
 					saves_post: false,
 					mutates_post_content: false,
@@ -1528,6 +1556,21 @@ describe( 'distributed editing session state', () => {
 			retrySaveReviewApprovalScope: 'collaborative_post_content',
 			retrySaveReviewApprovalProposedContentHash: proposedContentHash,
 			retrySaveReviewApprovalCandidateContentHash: candidateContentHash,
+			retrySaveReviewApprovalReviewedBlockItemCount: 1,
+			retrySaveReviewApprovalBlockReviewStatus: 'approved_for_retry_save',
+			retrySaveReviewApprovalReviewedBlockItems: [
+				expect.objectContaining( {
+					id: 'risk-html-approve',
+					blockClientId: 'server-block-0',
+					proposedContentHash: reviewedBlockHash,
+					reviewedProposedContentHash: reviewedBlockHash,
+					reviewStatus: 'approved_for_retry_save',
+					reviewEvidenceType: 'kses_block_hash_only_change',
+					contentReviewPolicy: 'kses',
+					rawContentIncluded: false,
+					exposesRawContent: false,
+				} ),
+			],
 			retrySaveReviewApprovalRawContentIncluded: false,
 			retrySaveReviewApprovalSavesPost: false,
 			retrySaveReviewApprovalMutatesPostContent: false,
@@ -1580,6 +1623,25 @@ describe( 'distributed editing session state', () => {
 					hasPendingChanges: true,
 				}
 			);
+		const malformed =
+			getDistributedEditingSessionStateForRetrySaveReviewApprovalProofResult(
+				{
+					code: DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_MALFORMED_SYNC_PAYLOAD,
+					data: {
+						result: 'malformed_approval_payload',
+						reason_code:
+							DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_MALFORMED_SYNC_PAYLOAD,
+						pending_change_count: 2,
+						unapproved_review_item_ids: [ 'risk-html-approve' ],
+						raw_content_included: false,
+					},
+				},
+				{
+					serverVersion: '12',
+					pendingChangeCount: 2,
+					hasPendingChanges: true,
+				}
+			);
 
 		expect( stale ).toMatchObject( {
 			disposition:
@@ -1598,6 +1660,20 @@ describe( 'distributed editing session state', () => {
 				DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_REVIEW_APPROVAL_REQUIRES_UNFILTERED_HTML,
 			retrySaveReviewApprovalProofStatus:
 				DISTRIBUTED_EDITING_RETRY_SAVE_REVIEW_APPROVAL_PROOF_STATUSES.REJECTED_PERMISSION_DENIED,
+			canExportLocalUpdates: true,
+			retrySaveReviewApprovalSavesPost: false,
+			retrySaveReviewApprovalRawContentIncluded: false,
+		} );
+		expect( malformed ).toMatchObject( {
+			disposition:
+				DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_MALFORMED_SYNC_PAYLOAD,
+			reasonCode:
+				DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_MALFORMED_SYNC_PAYLOAD,
+			retrySaveReviewApprovalProofStatus:
+				DISTRIBUTED_EDITING_RETRY_SAVE_REVIEW_APPROVAL_PROOF_STATUSES.REJECTED_MALFORMED_SYNC_PAYLOAD,
+			retrySaveReviewApprovalUnapprovedBlockItemIds: [
+				'risk-html-approve',
+			],
 			canExportLocalUpdates: true,
 			retrySaveReviewApprovalSavesPost: false,
 			retrySaveReviewApprovalRawContentIncluded: false,
@@ -1909,6 +1985,10 @@ describe( 'distributed editing session state', () => {
 			getDistributedEditingRiskyBlockReviewStateForSessionState( stale );
 		const staleSavePolicy =
 			getDistributedEditingSavePolicyStateForSessionState( stale );
+		const reviewedBlockItems =
+			getDistributedEditingReviewedBlockItemsForRetrySaveReviewApprovalProof(
+				resolved
+			);
 
 		expect( resolvedReviewState ).toMatchObject( {
 			status: DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_STATUSES.REVIEW_RESOLVED,
@@ -1941,6 +2021,7 @@ describe( 'distributed editing session state', () => {
 		} );
 		expect( resolvedSavePolicy ).toMatchObject( {
 			status: DISTRIBUTED_EDITING_SAVE_POLICY_STATUSES.READY_FOR_REVIEWED_RETRY_SAVE,
+			saveButtonLabel: 'Submit reviewed changes',
 			clickAction:
 				DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.CONTINUE_GUARDED_RETRY_SAVE,
 			blocksNormalSavePost: false,
@@ -1948,6 +2029,27 @@ describe( 'distributed editing session state', () => {
 			shouldCallRetrySaveEndpoint: false,
 			claimsSaved: false,
 		} );
+		expect( reviewedBlockItems ).toEqual( [
+			expect.objectContaining( {
+				id: 'risk-added',
+				blockClientId: 'server-block-0',
+				proposedContentHash:
+					'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb',
+				reviewedProposedContentHash:
+					'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb',
+				ksesFilteredContentHash:
+					'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc',
+				reviewStatus:
+					DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES.APPROVED_FOR_RETRY_SAVE,
+				reviewEvidenceType: 'kses_block_hash_only_change',
+				contentReviewPolicy: 'kses',
+				rawContentIncluded: false,
+				exposesRawContent: false,
+			} ),
+		] );
+		expect( JSON.stringify( reviewedBlockItems ) ).not.toContain(
+			'raw-risky-html'
+		);
 		expect( staleReviewState ).toMatchObject( {
 			status: DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_STATUSES.STALE_AFTER_REVIEW,
 			reasonCode:

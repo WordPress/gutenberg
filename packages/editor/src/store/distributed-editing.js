@@ -202,6 +202,7 @@ export const DISTRIBUTED_EDITING_RETRY_SAVE_REVIEW_APPROVAL_PROOF_STATUSES =
 		REJECTED_PERMISSION_DENIED: 'rejected_permission_denied',
 		REJECTED_ROUTE_MISMATCH: 'rejected_route_mismatch',
 		REJECTED_HASH_MISMATCH: 'rejected_hash_mismatch',
+		REJECTED_MALFORMED_SYNC_PAYLOAD: 'rejected_malformed_sync_payload',
 	} );
 
 /**
@@ -453,6 +454,11 @@ export const DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE = Object.freeze( {
 	retrySaveReviewApprovalExpectedProposedContentHash: null,
 	retrySaveReviewApprovalExpectedCandidateContentHash: null,
 	retrySaveReviewApprovalHashMismatch: false,
+	retrySaveReviewApprovalReviewedBlockItems: [],
+	retrySaveReviewApprovalReviewedBlockItemCount: 0,
+	retrySaveReviewApprovalBlockReviewStatus: null,
+	retrySaveReviewApprovalUnapprovedBlockItemIds: [],
+	retrySaveReviewApprovalMismatchedBlockItemFields: [],
 	retrySaveReviewApprovalRawContentIncluded: false,
 	retrySaveReviewApprovalSavesPost: false,
 	retrySaveReviewApprovalMutatesPostContent: false,
@@ -697,6 +703,7 @@ export function normalizeDistributedEditingSessionState( sessionState = {} ) {
 		( retrySaveStatus === DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVING &&
 			hasPendingChanges ) ||
 		( retrySaveHandoffBlocksNormalSave && hasPendingChanges ) ||
+		( retrySaveReviewApprovalAccepted && hasPendingChanges ) ||
 		hasPendingRiskyBlockReviewItems ||
 		( requiresManualConflictResolution && hasPendingChanges );
 	const canExportLocalUpdates =
@@ -1685,6 +1692,50 @@ export function getDistributedEditingRiskyBlockReviewStateForSessionState(
 }
 
 /**
+ * Builds hash-only reviewed block items for the review-approval proof request.
+ *
+ * Only block review items approved for retry-save are included. Rejected and
+ * pending review items remain local review state; they are not sent to the
+ * reviewer-proof endpoint. The returned items intentionally omit raw content.
+ *
+ * @param {Object} sessionState Current DE-RTC session state.
+ * @param {Object} [options]    Optional explicit source items.
+ *
+ * @return {Array} Reviewed block items for the REST helper.
+ */
+export function getDistributedEditingReviewedBlockItemsForRetrySaveReviewApprovalProof(
+	sessionState = {},
+	options = {}
+) {
+	const sourceItems = Array.isArray( options.reviewedBlockItems )
+		? normalizeRetrySaveReviewApprovalReviewedBlockItems(
+				options.reviewedBlockItems
+		  )
+		: normalizeDistributedEditingSessionState( sessionState )
+				.riskyBlockReviewItems;
+
+	return sourceItems
+		.filter(
+			( item ) =>
+				item.reviewStatus ===
+				DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES.APPROVED_FOR_RETRY_SAVE
+		)
+		.map( ( item ) =>
+			normalizeRetrySaveReviewApprovalReviewedBlockItem( {
+				...item,
+				reviewedProposedContentHash:
+					item.reviewedProposedContentHash ||
+					item.proposedContentHash,
+				reviewStatus:
+					DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES.APPROVED_FOR_RETRY_SAVE,
+				reviewEvidenceType:
+					item.reviewEvidenceType || 'kses_block_hash_only_change',
+				contentReviewPolicy: item.contentReviewPolicy || 'kses',
+			} )
+		);
+}
+
+/**
  * Returns the DE-RTC Save policy state for risky-block review handoff.
  *
  * This is only policy data. It does not open the pre-publish sidebar, save,
@@ -1732,6 +1783,7 @@ export function getDistributedEditingSavePolicyStateForSessionState(
 	) {
 		status =
 			DISTRIBUTED_EDITING_SAVE_POLICY_STATUSES.READY_FOR_REVIEWED_RETRY_SAVE;
+		saveButtonLabel = 'Submit reviewed changes';
 		clickAction =
 			DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.CONTINUE_GUARDED_RETRY_SAVE;
 	}
@@ -2793,6 +2845,13 @@ export function getDistributedEditingSessionStateForRetrySaveReviewApprovalProof
 			proofStatus =
 				DISTRIBUTED_EDITING_RETRY_SAVE_REVIEW_APPROVAL_PROOF_STATUSES.REJECTED_HASH_MISMATCH;
 			break;
+
+		case DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_MALFORMED_SYNC_PAYLOAD:
+			disposition =
+				DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_MALFORMED_SYNC_PAYLOAD;
+			proofStatus =
+				DISTRIBUTED_EDITING_RETRY_SAVE_REVIEW_APPROVAL_PROOF_STATUSES.REJECTED_MALFORMED_SYNC_PAYLOAD;
+			break;
 	}
 
 	if (
@@ -3244,6 +3303,16 @@ function getDistributedEditingRetrySaveReviewApprovalProofFields( normalized ) {
 			normalized.retrySaveReviewApprovalExpectedCandidateContentHash,
 		retrySaveReviewApprovalHashMismatch:
 			normalized.retrySaveReviewApprovalHashMismatch,
+		retrySaveReviewApprovalReviewedBlockItems:
+			normalized.retrySaveReviewApprovalReviewedBlockItems,
+		retrySaveReviewApprovalReviewedBlockItemCount:
+			normalized.retrySaveReviewApprovalReviewedBlockItemCount,
+		retrySaveReviewApprovalBlockReviewStatus:
+			normalized.retrySaveReviewApprovalBlockReviewStatus,
+		retrySaveReviewApprovalUnapprovedBlockItemIds:
+			normalized.retrySaveReviewApprovalUnapprovedBlockItemIds,
+		retrySaveReviewApprovalMismatchedBlockItemFields:
+			normalized.retrySaveReviewApprovalMismatchedBlockItemFields,
 		retrySaveReviewApprovalRawContentIncluded:
 			normalized.retrySaveReviewApprovalRawContentIncluded,
 		retrySaveReviewApprovalSavesPost:
@@ -3528,6 +3597,26 @@ function normalizeRetrySaveReviewApprovalProofFields( sessionState = {} ) {
 		retrySaveReviewApprovalHashMismatch: Boolean(
 			sessionState.retrySaveReviewApprovalHashMismatch
 		),
+		retrySaveReviewApprovalReviewedBlockItems:
+			normalizeRetrySaveReviewApprovalReviewedBlockItems(
+				sessionState.retrySaveReviewApprovalReviewedBlockItems
+			),
+		retrySaveReviewApprovalReviewedBlockItemCount:
+			normalizeCountWithFallback(
+				sessionState.retrySaveReviewApprovalReviewedBlockItemCount,
+				normalizeRetrySaveReviewApprovalReviewedBlockItems(
+					sessionState.retrySaveReviewApprovalReviewedBlockItems
+				).length
+			),
+		retrySaveReviewApprovalBlockReviewStatus: normalizeNullableString(
+			sessionState.retrySaveReviewApprovalBlockReviewStatus
+		),
+		retrySaveReviewApprovalUnapprovedBlockItemIds: normalizeStringList(
+			sessionState.retrySaveReviewApprovalUnapprovedBlockItemIds
+		),
+		retrySaveReviewApprovalMismatchedBlockItemFields: normalizeStringList(
+			sessionState.retrySaveReviewApprovalMismatchedBlockItemFields
+		),
 		retrySaveReviewApprovalRawContentIncluded: Boolean(
 			sessionState.retrySaveReviewApprovalRawContentIncluded
 		),
@@ -3543,6 +3632,84 @@ function normalizeRetrySaveReviewApprovalProofFields( sessionState = {} ) {
 		retrySaveReviewApprovalClaimsSaved: Boolean(
 			sessionState.retrySaveReviewApprovalClaimsSaved
 		),
+	};
+}
+
+function normalizeRetrySaveReviewApprovalReviewedBlockItems( value ) {
+	if ( ! Array.isArray( value ) ) {
+		return [];
+	}
+
+	return value
+		.map( ( item ) =>
+			normalizeRetrySaveReviewApprovalReviewedBlockItem( item )
+		)
+		.filter( ( item ) => item.id !== null );
+}
+
+function normalizeRetrySaveReviewApprovalReviewedBlockItem( item = {} ) {
+	const proposedContentHash = normalizeNullableString(
+		getFirstDefined( item.proposedContentHash, item.proposed_content_hash )
+	);
+
+	return {
+		id: normalizeNullableString( item.id ),
+		blockClientId: normalizeNullableString(
+			getFirstDefined( item.blockClientId, item.block_client_id )
+		),
+		blockName: normalizeNullableString(
+			getFirstDefined( item.blockName, item.block_name )
+		),
+		blockLabel: normalizeNullableString(
+			getFirstDefined( item.blockLabel, item.block_label )
+		),
+		blockPath: normalizeBlockPath(
+			getFirstDefined( item.blockPath, item.block_path )
+		),
+		changeKind: normalizeNullableString(
+			getFirstDefined( item.changeKind, item.change_kind )
+		),
+		riskReason: normalizeNullableString(
+			getFirstDefined( item.riskReason, item.risk_reason )
+		),
+		baseContentHash: normalizeNullableString(
+			getFirstDefined( item.baseContentHash, item.base_content_hash )
+		),
+		proposedContentHash,
+		reviewedProposedContentHash:
+			normalizeNullableString(
+				getFirstDefined(
+					item.reviewedProposedContentHash,
+					item.reviewed_proposed_content_hash
+				)
+			) || proposedContentHash,
+		ksesFilteredContentHash: normalizeNullableString(
+			getFirstDefined(
+				item.ksesFilteredContentHash,
+				item.kses_filtered_content_hash
+			)
+		),
+		reviewStatus:
+			normalizeNullableString(
+				getFirstDefined( item.reviewStatus, item.review_status )
+			) ||
+			DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES.APPROVED_FOR_RETRY_SAVE,
+		reviewEvidenceType:
+			normalizeNullableString(
+				getFirstDefined(
+					item.reviewEvidenceType,
+					item.review_evidence_type
+				)
+			) || 'kses_block_hash_only_change',
+		contentReviewPolicy:
+			normalizeNullableString(
+				getFirstDefined(
+					item.contentReviewPolicy,
+					item.content_review_policy
+				)
+			) || 'kses',
+		rawContentIncluded: false,
+		exposesRawContent: false,
 	};
 }
 
@@ -4074,6 +4241,18 @@ function getRetrySaveReviewApprovalProofFieldsFromResponseOrError(
 			approvalContract.claims_saved
 		)
 	);
+	const reviewedBlockItems =
+		normalizeRetrySaveReviewApprovalReviewedBlockItems(
+			getFirstDefined(
+				responseOrError.reviewedBlockItems,
+				responseOrError.reviewed_block_items,
+				responseData.reviewedBlockItems,
+				responseData.reviewed_block_items,
+				approvalContract.reviewedBlockItems,
+				approvalContract.reviewed_block_items,
+				currentSessionState.retrySaveReviewApprovalReviewedBlockItems
+			)
+		);
 
 	return normalizeRetrySaveReviewApprovalProofFields( {
 		retrySaveReviewApprovalAction: getFirstDefined(
@@ -4189,6 +4368,44 @@ function getRetrySaveReviewApprovalProofFieldsFromResponseOrError(
 			responseData.hash_mismatch,
 			approvalContract.hashMismatch,
 			approvalContract.hash_mismatch
+		),
+		retrySaveReviewApprovalReviewedBlockItems: reviewedBlockItems,
+		retrySaveReviewApprovalReviewedBlockItemCount: getFirstDefined(
+			responseOrError.reviewedBlockItemCount,
+			responseOrError.reviewed_block_item_count,
+			responseData.reviewedBlockItemCount,
+			responseData.reviewed_block_item_count,
+			approvalContract.reviewedBlockItemCount,
+			approvalContract.reviewed_block_item_count,
+			reviewedBlockItems.length
+		),
+		retrySaveReviewApprovalBlockReviewStatus: getFirstDefined(
+			responseOrError.blockReviewStatus,
+			responseOrError.block_review_status,
+			responseData.blockReviewStatus,
+			responseData.block_review_status,
+			approvalContract.blockReviewStatus,
+			approvalContract.block_review_status
+		),
+		retrySaveReviewApprovalUnapprovedBlockItemIds: getFirstDefined(
+			responseOrError.unapprovedBlockItemIds,
+			responseOrError.unapproved_block_item_ids,
+			responseOrError.unapprovedReviewItemIds,
+			responseOrError.unapproved_review_item_ids,
+			responseData.unapprovedBlockItemIds,
+			responseData.unapproved_block_item_ids,
+			responseData.unapprovedReviewItemIds,
+			responseData.unapproved_review_item_ids
+		),
+		retrySaveReviewApprovalMismatchedBlockItemFields: getFirstDefined(
+			responseOrError.mismatchedBlockItemFields,
+			responseOrError.mismatched_block_item_fields,
+			responseOrError.mismatchedHashEvidenceFields,
+			responseOrError.mismatched_hash_evidence_fields,
+			responseData.mismatchedBlockItemFields,
+			responseData.mismatched_block_item_fields,
+			responseData.mismatchedHashEvidenceFields,
+			responseData.mismatched_hash_evidence_fields
 		),
 		retrySaveReviewApprovalRawContentIncluded: getFirstDefined(
 			responseOrError.rawContentIncluded,

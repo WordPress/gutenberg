@@ -371,23 +371,24 @@ export function __experimentalRequestDistributedEditingRetrySave( {
  * not send raw post content, save, call retry-save, dispatch notices, persist
  * editor state, or change post locks.
  *
- * @param {Object} args                                      Request args.
- * @param {number} args.postId                               Post ID.
- * @param {string} [args.restBase='posts']                   REST base for the edited post type.
- * @param {string} args.clientBaseVersion                    Client sync version being reviewed.
- * @param {string} [args.acceptedProofServerVersion]         Server version reviewed by the approver.
- * @param {number} [args.pendingChangeCount=1]               Pending local change groups.
- * @param {string} [args.reviewAction]                       Review action requested by the server.
- * @param {string} [args.reviewRequiredCapability]           Capability required to review the change.
- * @param {string} [args.reviewerCapability]                 Capability held by the reviewer.
- * @param {string} [args.reviewScope]                        Review scope.
- * @param {string} [args.proposedPostContentHash]            Hash of proposed post content.
- * @param {string} [args.reviewedProposedPostContentHash]    Reviewer-approved proposed content hash.
- * @param {string} [args.candidatePostContentHash]           Hash of server candidate post content.
- * @param {string} [args.reviewedCandidatePostContentHash]   Reviewer-approved candidate content hash.
- * @param {string} [args.filteredProposedPostContentHash]    Hash of KSES-filtered proposed content.
- * @param {string} [args.filteredCandidatePostContentHash]   Hash of KSES-filtered candidate content.
- * @param {string} [args.reviewApprovalProof]                Opaque reviewer approval proof.
+ * @param {Object} args                                    Request args.
+ * @param {number} args.postId                             Post ID.
+ * @param {string} [args.restBase='posts']                 REST base for the edited post type.
+ * @param {string} args.clientBaseVersion                  Client sync version being reviewed.
+ * @param {string} [args.acceptedProofServerVersion]       Server version reviewed by the approver.
+ * @param {number} [args.pendingChangeCount=1]             Pending local change groups.
+ * @param {string} [args.reviewAction]                     Review action requested by the server.
+ * @param {string} [args.reviewRequiredCapability]         Capability required to review the change.
+ * @param {string} [args.reviewerCapability]               Capability held by the reviewer.
+ * @param {string} [args.reviewScope]                      Review scope.
+ * @param {string} [args.proposedPostContentHash]          Hash of proposed post content.
+ * @param {string} [args.reviewedProposedPostContentHash]  Reviewer-approved proposed content hash.
+ * @param {string} [args.candidatePostContentHash]         Hash of server candidate post content.
+ * @param {string} [args.reviewedCandidatePostContentHash] Reviewer-approved candidate content hash.
+ * @param {string} [args.filteredProposedPostContentHash]  Hash of KSES-filtered proposed content.
+ * @param {string} [args.filteredCandidatePostContentHash] Hash of KSES-filtered candidate content.
+ * @param {Array}  [args.reviewedBlockItems]               Hash-only approved risky block review items.
+ * @param {string} [args.reviewApprovalProof]              Opaque reviewer approval proof.
  *
  * @return {Promise<Object>} REST response or error.
  */
@@ -407,6 +408,7 @@ export function __experimentalRequestDistributedEditingRetrySaveReviewApprovalPr
 	reviewedCandidatePostContentHash,
 	filteredProposedPostContentHash,
 	filteredCandidatePostContentHash,
+	reviewedBlockItems,
 	reviewApprovalProof,
 } = {} ) {
 	const data = {
@@ -456,6 +458,13 @@ export function __experimentalRequestDistributedEditingRetrySaveReviewApprovalPr
 			filteredCandidatePostContentHash;
 	}
 
+	const normalizedReviewedBlockItems =
+		normalizeReviewedBlockItemsForRequest( reviewedBlockItems );
+
+	if ( normalizedReviewedBlockItems.length > 0 ) {
+		data.reviewed_block_items = normalizedReviewedBlockItems;
+	}
+
 	if ( reviewApprovalProof ) {
 		data.review_approval_proof = reviewApprovalProof;
 	}
@@ -468,6 +477,63 @@ export function __experimentalRequestDistributedEditingRetrySaveReviewApprovalPr
 		method: 'POST',
 		data,
 	} );
+}
+
+function normalizeReviewedBlockItemsForRequest( reviewedBlockItems ) {
+	if ( ! Array.isArray( reviewedBlockItems ) ) {
+		return [];
+	}
+
+	return reviewedBlockItems
+		.map( ( item ) => normalizeReviewedBlockItemForRequest( item ) )
+		.filter( ( item ) => item.id );
+}
+
+function normalizeReviewedBlockItemForRequest( item = {} ) {
+	const proposedContentHash =
+		item.proposedContentHash ?? item.proposed_content_hash ?? null;
+	const reviewedProposedContentHash =
+		item.reviewedProposedContentHash ??
+		item.reviewed_proposed_content_hash ??
+		proposedContentHash;
+	const normalized = {
+		id: item.id ?? null,
+		block_client_id:
+			item.blockClientId ?? item.block_client_id ?? undefined,
+		block_name: item.blockName ?? item.block_name ?? undefined,
+		block_label: item.blockLabel ?? item.block_label ?? undefined,
+		block_path: Array.isArray( item.blockPath )
+			? item.blockPath
+			: item.block_path,
+		change_kind: item.changeKind ?? item.change_kind ?? undefined,
+		risk_reason: item.riskReason ?? item.risk_reason ?? undefined,
+		base_content_hash:
+			item.baseContentHash ?? item.base_content_hash ?? undefined,
+		proposed_content_hash: proposedContentHash,
+		reviewed_proposed_content_hash: reviewedProposedContentHash,
+		kses_filtered_content_hash:
+			item.ksesFilteredContentHash ??
+			item.kses_filtered_content_hash ??
+			undefined,
+		review_status:
+			item.reviewStatus ??
+			item.review_status ??
+			'approved_for_retry_save',
+		review_evidence_type:
+			item.reviewEvidenceType ??
+			item.review_evidence_type ??
+			'kses_block_hash_only_change',
+		content_review_policy:
+			item.contentReviewPolicy ?? item.content_review_policy ?? 'kses',
+	};
+
+	for ( const [ key, value ] of Object.entries( normalized ) ) {
+		if ( value === undefined || value === null ) {
+			delete normalized[ key ];
+		}
+	}
+
+	return normalized;
 }
 
 /**

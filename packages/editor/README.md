@@ -678,6 +678,21 @@ _Returns_
 
 -   `string`: REST path.
 
+### getDistributedEditingReviewedBlockItemsForRetrySaveReviewApprovalProof
+
+Builds hash-only reviewed block items for the review-approval proof request.
+
+Only block review items approved for retry-save are included. Rejected and pending review items remain local review state; they are not sent to the reviewer-proof endpoint. The returned items intentionally omit raw content.
+
+_Parameters_
+
+-   _sessionState_ `Object`: Current DE-RTC session state.
+-   _options_ `[Object]`: Optional explicit source items.
+
+_Returns_
+
+-   `Array`: Reviewed block items for the REST helper.
+
 ### getDistributedEditingRiskyBlockReviewStateForSessionState
 
 Returns the risky-block review state as a nested object for selectors and future annotation surfaces.

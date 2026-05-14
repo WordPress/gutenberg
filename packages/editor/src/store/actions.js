@@ -40,6 +40,7 @@ import {
 	getDistributedEditingSessionStateForRetrySaveRequest,
 	getDistributedEditingSessionStateForRetrySaveResult,
 	getDistributedEditingSessionStateForRiskyBlockReviewItemResolution,
+	getDistributedEditingReviewedBlockItemsForRetrySaveReviewApprovalProof,
 	getDistributedEditingSessionStateForRetrySubmitHandoff,
 	getDistributedEditingSessionStateForRetrySubmitProofResult,
 	getDistributedEditingSessionStateForRetrySubmitSavePreparation,
@@ -867,10 +868,10 @@ export const __experimentalPrepareDistributedEditingRetrySubmitSaveAfterProof =
 /**
  * Requests retry-save reviewer approval proof and stores inert proof state.
  *
- * The action sends only version, capability, scope, and hash evidence. It does
- * not call normal save, call retry-save, mutate editor content, dispatch
- * notices, persist editor state, create revisions, claim saved, or change post
- * locks.
+ * The action sends only version, capability, scope, and hash evidence,
+ * including approved risky-block review items when available. It does not call
+ * normal save, call retry-save, mutate editor content, dispatch notices,
+ * persist editor state, create revisions, claim saved, or change post locks.
  *
  * @param {Object} [options] Request options.
  *
@@ -939,6 +940,12 @@ export const __experimentalRefreshDistributedEditingRetrySaveReviewApprovalProof
 				filteredCandidatePostContentHash:
 					options.filteredCandidatePostContentHash ??
 					currentSessionState.retrySaveReviewFilteredCandidateContentHash,
+				reviewedBlockItems:
+					options.reviewedBlockItems ??
+					options.reviewedBlockReviewItems ??
+					getDistributedEditingReviewedBlockItemsForRetrySaveReviewApprovalProof(
+						currentSessionState
+					),
 				reviewApprovalProof: options.reviewApprovalProof,
 			};
 

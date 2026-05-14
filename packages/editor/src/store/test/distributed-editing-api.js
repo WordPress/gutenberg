@@ -309,6 +309,8 @@ describe( 'distributed editing REST helpers', () => {
 			'0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef';
 		const candidateHash =
 			'abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789';
+		const reviewedBlockHash =
+			'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb';
 
 		apiFetch.setFetchHandler( async ( options ) => {
 			expect( options.path ).toMatch(
@@ -327,9 +329,35 @@ describe( 'distributed editing REST helpers', () => {
 				reviewed_proposed_content_hash: proposedHash,
 				candidate_post_content_hash: candidateHash,
 				reviewed_candidate_content_hash: candidateHash,
+				reviewed_block_items: [
+					{
+						id: 'risk-html-approve',
+						block_client_id: 'server-block-0',
+						block_name: 'core/html',
+						block_label: 'HTML',
+						block_path: [ 0 ],
+						change_kind: 'added_block',
+						risk_reason: 'kses_would_remove_script',
+						base_content_hash:
+							'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+						proposed_content_hash: reviewedBlockHash,
+						reviewed_proposed_content_hash: reviewedBlockHash,
+						kses_filtered_content_hash:
+							'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc',
+						review_status: 'approved_for_retry_save',
+						review_evidence_type: 'kses_block_hash_only_change',
+						content_review_policy: 'kses',
+					},
+				],
 			} );
 			expect( options.data.proposed_post_content ).toBeUndefined();
 			expect( options.data.raw_content ).toBeUndefined();
+			expect(
+				options.data.reviewed_block_items[ 0 ].raw_content
+			).toBeUndefined();
+			expect(
+				options.data.reviewed_block_items[ 0 ].raw_content_included
+			).toBeUndefined();
 
 			return {
 				result: 'review_approval_accepted_for_retry_save',
@@ -351,6 +379,28 @@ describe( 'distributed editing REST helpers', () => {
 					reviewScope: 'collaborative_post_content',
 					proposedPostContentHash: proposedHash,
 					candidatePostContentHash: candidateHash,
+					reviewedBlockItems: [
+						{
+							id: 'risk-html-approve',
+							blockClientId: 'server-block-0',
+							blockName: 'core/html',
+							blockLabel: 'HTML',
+							blockPath: [ 0 ],
+							changeKind: 'added_block',
+							riskReason: 'kses_would_remove_script',
+							baseContentHash:
+								'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+							proposedContentHash: reviewedBlockHash,
+							reviewedProposedContentHash: reviewedBlockHash,
+							ksesFilteredContentHash:
+								'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc',
+							reviewStatus: 'approved_for_retry_save',
+							reviewEvidenceType: 'kses_block_hash_only_change',
+							contentReviewPolicy: 'kses',
+							rawContent: 'raw-review-content-must-not-send',
+							rawContentIncluded: true,
+						},
+					],
 				}
 			)
 		).resolves.toEqual( {
