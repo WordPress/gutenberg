@@ -8,7 +8,6 @@ import { __ } from '@wordpress/i18n';
  */
 import StateControl from '../components/global-styles/state-control';
 import StateControlBadges from '../components/global-styles/state-control-badges';
-import { BlockCardControlsFill } from '../components/block-card';
 import { useToolsPanelDropdownMenuProps } from '../components/global-styles/utils';
 
 export const PSEUDO_STATE_LABELS = {
@@ -55,15 +54,13 @@ export function BlockStatesControl( { name, value, onChange } ) {
 	}
 
 	return (
-		<BlockCardControlsFill>
-			<StateControl
-				pseudoStates={ stateOptions }
-				pseudoStateValue={ value }
-				onChangePseudoState={ onChange }
-				popoverProps={ dropdownMenuProps.popoverProps }
-				showText={ false }
-			/>
-		</BlockCardControlsFill>
+		<StateControl
+			pseudoStates={ stateOptions }
+			pseudoStateValue={ value }
+			onChangePseudoState={ onChange }
+			popoverProps={ dropdownMenuProps.popoverProps }
+			showText={ false }
+		/>
 	);
 }
 

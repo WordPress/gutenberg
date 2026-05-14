@@ -42,6 +42,7 @@ import {
 	editedContentOnlySection,
 	withDerivedBlockEditingModes,
 	viewportModalClientIds,
+	selectedBlockStyleStates,
 } from '../reducer';
 import { getBlockOrder, getBlocks } from '../selectors';
 import { unlock } from '../../lock-unlock';
@@ -5811,6 +5812,86 @@ describe( 'state', () => {
 						} )
 					)
 				);
+			} );
+		} );
+	} );
+
+	describe( 'selectedBlockStyleStates', () => {
+		it( 'defaults to an empty object', () => {
+			const state = selectedBlockStyleStates( undefined, {} );
+
+			expect( state ).toEqual( {} );
+		} );
+
+		it( 'stores a selected state for a block', () => {
+			const state = selectedBlockStyleStates( undefined, {
+				type: 'SET_SELECTED_BLOCK_STYLE_STATE',
+				clientId: 'client-1',
+				value: ':hover',
+			} );
+
+			expect( state ).toEqual( {
+				'client-1': ':hover',
+			} );
+		} );
+
+		it( 'removes the selected state when default is selected', () => {
+			const state = selectedBlockStyleStates(
+				{ 'client-1': ':hover' },
+				{
+					type: 'SET_SELECTED_BLOCK_STYLE_STATE',
+					clientId: 'client-1',
+					value: 'default',
+				}
+			);
+
+			expect( state ).toEqual( {} );
+		} );
+
+		it( 'removes states for removed blocks', () => {
+			const state = selectedBlockStyleStates(
+				{ 'client-1': ':hover', 'client-2': ':focus' },
+				{
+					type: 'REMOVE_BLOCKS',
+					clientIds: [ 'client-1' ],
+				}
+			);
+
+			expect( state ).toEqual( {
+				'client-2': ':focus',
+			} );
+		} );
+
+		it( 'removes states for replaced blocks', () => {
+			const state = selectedBlockStyleStates(
+				{ 'client-1': ':hover', 'client-2': ':focus' },
+				{
+					type: 'REPLACE_BLOCKS',
+					clientIds: [ 'client-2' ],
+				}
+			);
+
+			expect( state ).toEqual( {
+				'client-1': ':hover',
+			} );
+		} );
+
+		it( 'removes states for blocks missing after reset', () => {
+			const state = selectedBlockStyleStates(
+				{ 'client-1': ':hover', 'client-2': ':focus' },
+				{
+					type: 'RESET_BLOCKS',
+					blocks: [
+						{
+							clientId: 'client-2',
+							innerBlocks: [],
+						},
+					],
+				}
+			);
+
+			expect( state ).toEqual( {
+				'client-2': ':focus',
 			} );
 		} );
 	} );

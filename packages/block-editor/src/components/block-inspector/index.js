@@ -9,7 +9,7 @@ import {
 	store as blocksStore,
 } from '@wordpress/blocks';
 import { __unstableMotion as motion } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { useRef } from '@wordpress/element';
 
 /**
@@ -33,6 +33,7 @@ import AdvancedControls from '../inspector-controls-tabs/advanced-controls-panel
 import PositionControls from '../inspector-controls-tabs/position-controls-panel';
 import useBlockInspectorAnimationSettings from './useBlockInspectorAnimationSettings';
 import { useBorderPanelLabel } from '../../hooks/border';
+import { BlockStatesControl } from '../../hooks/states';
 import ContentTab from '../inspector-controls-tabs/content-tab';
 import ViewportVisibilityInfo from '../block-visibility/viewport-visibility-info';
 import { unlock } from '../../lock-unlock';
@@ -331,6 +332,23 @@ const BlockInspectorSingleBlock = ( {
 		renderedBlockClientId
 	);
 	const isBlockSynced = blockInformation.isSynced;
+	const { blockEditingMode, selectedBlockStyleState } = useSelect(
+		( select ) => {
+			const blockEditorSelect = select( blockEditorStore );
+			return {
+				blockEditingMode: blockEditorSelect.getBlockEditingMode(
+					renderedBlockClientId
+				),
+				selectedBlockStyleState: unlock(
+					blockEditorSelect
+				).getSelectedBlockStyleState( renderedBlockClientId ),
+			};
+		},
+		[ renderedBlockClientId ]
+	);
+	const { setSelectedBlockStyleState } = unlock(
+		useDispatch( blockEditorStore )
+	);
 
 	return (
 		<div className="block-editor-block-inspector">
@@ -349,6 +367,20 @@ const BlockInspectorSingleBlock = ( {
 				className={ isBlockSynced && 'is-synced' }
 				isChild={ hasParentChildBlockCards }
 				clientId={ renderedBlockClientId }
+				controls={
+					blockEditingMode === 'default' && (
+						<BlockStatesControl
+							name={ blockName }
+							value={ selectedBlockStyleState }
+							onChange={ ( value ) =>
+								setSelectedBlockStyleState(
+									renderedBlockClientId,
+									value
+								)
+							}
+						/>
+					)
+				}
 			/>
 			<ViewportVisibilityInfo clientId={ renderedBlockClientId } />
 			<EditContents clientId={ renderedBlockClientId } />

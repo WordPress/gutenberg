@@ -9,7 +9,6 @@ import clsx from 'clsx';
 import {
 	Button,
 	Icon,
-	createSlotFill,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { Text, Stack } from '@wordpress/ui';
@@ -32,10 +31,6 @@ import { store as blockEditorStore } from '../../store';
 import BlockIcon from '../block-icon';
 
 const { Badge: WCBadge } = unlock( componentsPrivateApis );
-
-const BlockCardControlsKey = Symbol( 'BlockCardControls' );
-export const { Fill: BlockCardControlsFill, Slot: BlockCardControlsSlot } =
-	createSlotFill( BlockCardControlsKey );
 
 function OptionalParentSelectButton( { children, onClick } ) {
 	if ( ! onClick ) {
@@ -84,6 +79,7 @@ function OptionalParentSelectButton( { children, onClick } ) {
  * @param {string}        [props.parentClientId]        The parent clientId, if this card is for a parent block.
  * @param {string}        [props.isChild]               Whether the block card is for a child block, in which case, indent the block using an arrow.
  * @param {string}        [props.clientId]              Whether the block card is for a child block, in which case, indent the block using an arrow.
+ * @param {Element}       [props.controls]              Controls rendered beside the block title.
  * @param {Element}       [props.children]              Children.
  * @return {Element}                        Block card component.
  */
@@ -99,6 +95,7 @@ function BlockCard( {
 	isChild,
 	children,
 	clientId,
+	controls,
 } ) {
 	if ( blockType ) {
 		deprecated( '`blockType` property in `BlockCard component`', {
@@ -212,7 +209,7 @@ function BlockCard( {
 							</Stack>
 						</OptionalParentSelectButton>
 					</Stack>
-					<BlockCardControlsSlot />
+					{ controls }
 				</Stack>
 				{ ! parentClientId && ! isChild && description && (
 					<Text className="block-editor-block-card__description">

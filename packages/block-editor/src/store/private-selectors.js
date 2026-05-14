@@ -1052,3 +1052,15 @@ export function getViewportModalClientIds( state ) {
 export function getRequestedInspectorTab( state ) {
 	return state.requestedInspectorTab;
 }
+
+/**
+ * Returns the selected pseudo-state for a block's style controls.
+ *
+ * @param {Object} state    Global application state.
+ * @param {string} clientId The block client ID.
+ *
+ * @return {string} The selected block style state.
+ */
+export function getSelectedBlockStyleState( state, clientId ) {
+	return state.selectedBlockStyleStates?.[ clientId ] ?? 'default';
+}

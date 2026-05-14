@@ -2275,6 +2275,77 @@ export function requestedInspectorTab( state = null, action ) {
 	return state;
 }
 
+/**
+ * Reducer tracking selected pseudo-states for block style controls.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function selectedBlockStyleStates( state = {}, action ) {
+	switch ( action.type ) {
+		case 'SET_SELECTED_BLOCK_STYLE_STATE': {
+			if ( ! action.clientId ) {
+				return state;
+			}
+
+			if ( ! action.value || action.value === 'default' ) {
+				if ( ! Object.hasOwn( state, action.clientId ) ) {
+					return state;
+				}
+				const nextState = { ...state };
+				delete nextState[ action.clientId ];
+				return nextState;
+			}
+
+			if ( state[ action.clientId ] === action.value ) {
+				return state;
+			}
+
+			return {
+				...state,
+				[ action.clientId ]: action.value,
+			};
+		}
+
+		case 'REMOVE_BLOCKS':
+		case 'REPLACE_BLOCKS': {
+			if ( ! action.clientIds?.length ) {
+				return state;
+			}
+
+			let hasChanges = false;
+			const nextState = { ...state };
+			action.clientIds.forEach( ( clientId ) => {
+				if ( Object.hasOwn( nextState, clientId ) ) {
+					delete nextState[ clientId ];
+					hasChanges = true;
+				}
+			} );
+
+			return hasChanges ? nextState : state;
+		}
+
+		case 'RESET_BLOCKS': {
+			const clientIds = getFlattenedClientIds( action.blocks );
+			let hasChanges = false;
+			const nextState = { ...state };
+
+			Object.keys( nextState ).forEach( ( clientId ) => {
+				if ( ! clientIds[ clientId ] ) {
+					delete nextState[ clientId ];
+					hasChanges = true;
+				}
+			} );
+
+			return hasChanges ? nextState : state;
+		}
+	}
+
+	return state;
+}
+
 const combinedReducers = combineReducers( {
 	blocks,
 	isDragging,
@@ -2310,6 +2381,7 @@ const combinedReducers = combineReducers( {
 	listViewExpandRevision,
 	listViewContentPanelOpen,
 	requestedInspectorTab,
+	selectedBlockStyleStates,
 } );
 
 /**
