@@ -39,8 +39,13 @@
 		width: calc(100% + 2 * var(--wp-ui-card-padding));
 	}
 
-	/* When FullBleed sits at the start of the first card section, extend it flush to the card's top edge. */
-	:is(.header, .content):first-child > .fullbleed:first-child {
+	/*
+	 * When FullBleed sits at the start of the first *root* card section, extend
+	 * it flush to the card's top edge. Must use `.root >` so `Card.Content`
+	 * nested inside `CollapsibleCard`'s panel is not treated as `:first-child`
+	 * (which would pull FullBleed up into the header gap).
+	 */
+	.root > :is(.header, .content):first-child > .fullbleed:first-child {
 		margin-block-start: calc(-1 * var(--wp-ui-card-padding));
 	}
 

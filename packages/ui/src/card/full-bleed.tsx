@@ -13,8 +13,10 @@ import type { FullBleedProps } from './types';
  *   top edge — ideal for hero images. Siblings that follow (e.g. `Card.Title`)
  *   keep normal spacing below the bleed area.
  * - As the **only child** of `Card.Content`, it extends flush to the card's
- *   top edge when `Content` is the first card child, and to the bottom edge
- *   when it is the last.
+ *   top edge when `Content` is the first **direct** child of `Card.Root`, and
+ *   to the bottom edge when it is the last direct `Header`/`Content` section.
+ *   (`CollapsibleCard` wraps content in a panel, so top-edge bumping does not
+ *   apply there — the header/content gap stays intact.)
  *
  * Must be used as a direct child of `Card.Content` or `Card.Header`.
  */
