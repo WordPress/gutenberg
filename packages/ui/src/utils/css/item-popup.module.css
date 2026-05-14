@@ -59,7 +59,6 @@
 		align-items: center;
 		justify-content: flex-start;
 		gap: var(--wpds-dimension-gap-xs);
-		cursor: var(--wpds-cursor-control);
 		min-height: var(--wp-ui-popup-item-height);
 		border-radius: var(--wpds-border-radius-sm);
 		user-select: none;
@@ -69,6 +68,10 @@
 		/* Optically adjust the prefix icon to a more balanced position. */
 		padding-inline-start: calc(var(--wp-ui-popup-item-padding-inline) - 4px);
 		padding-inline-end: var(--wp-ui-popup-item-padding-inline);
+
+		&:not([data-disabled]) {
+			cursor: var(--wpds-cursor-control);
+		}
 
 		&.is-size-compact {
 			--wp-ui-popup-item-height: 32px;

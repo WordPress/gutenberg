@@ -4,11 +4,30 @@
 import { render, screen } from '@testing-library/react';
 
 /**
+ * WordPress dependencies
+ */
+import { __experimentalToolsPanel as ToolsPanel } from '@wordpress/components';
+
+/**
  * Internal dependencies
  */
 import flex from '../flex';
 
 const FlexLayoutInspectorControls = flex.inspectorControls;
+const PANEL_ID = 'test-panel';
+
+function renderInspectorControls( props = {} ) {
+	return render(
+		<ToolsPanel label="Layout" resetAll={ jest.fn() } panelId={ PANEL_ID }>
+			<FlexLayoutInspectorControls
+				clientId={ PANEL_ID }
+				layout={ {} }
+				onChange={ jest.fn() }
+				{ ...props }
+			/>
+		</ToolsPanel>
+	);
+}
 
 describe( 'getLayoutStyle', () => {
 	it( 'should return an empty string if no non-default params are provided', () => {
@@ -29,9 +48,7 @@ describe( 'getLayoutStyle', () => {
 
 describe( 'FlexLayoutInspectorControls', () => {
 	it( 'should render the wrap toggle by default', () => {
-		render(
-			<FlexLayoutInspectorControls layout={ {} } onChange={ jest.fn() } />
-		);
+		renderInspectorControls();
 
 		expect(
 			screen.getByRole( 'checkbox', {
@@ -41,13 +58,9 @@ describe( 'FlexLayoutInspectorControls', () => {
 	} );
 
 	it( 'should render the wrap toggle when allowWrap is true', () => {
-		render(
-			<FlexLayoutInspectorControls
-				layout={ {} }
-				onChange={ jest.fn() }
-				layoutBlockSupport={ { allowWrap: true } }
-			/>
-		);
+		renderInspectorControls( {
+			layoutBlockSupport: { allowWrap: true },
+		} );
 
 		expect(
 			screen.getByRole( 'checkbox', {
@@ -57,13 +70,9 @@ describe( 'FlexLayoutInspectorControls', () => {
 	} );
 
 	it( 'should not render the wrap toggle when allowWrap is false', () => {
-		render(
-			<FlexLayoutInspectorControls
-				layout={ {} }
-				onChange={ jest.fn() }
-				layoutBlockSupport={ { allowWrap: false } }
-			/>
-		);
+		renderInspectorControls( {
+			layoutBlockSupport: { allowWrap: false },
+		} );
 
 		expect(
 			screen.queryByRole( 'checkbox', {

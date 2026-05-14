@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "23.1.1",
+	"version": "23.2.0-rc.1",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -114,7 +114,7 @@
 	},
 	"scripts": {
 		"build": "node ./bin/build.mjs",
-		"build:profile-types": "rimraf ./ts-traces && npm run clean:package-types && node ./bin/packages/validate-typescript-version.js && ( tsgo --build --extendedDiagnostics --generateTrace ./ts-traces || ( echo 'tsc failed.'; exit 1 ) ) && node ./bin/packages/check-build-type-declaration-files.js && npx --yes @typescript/analyze-trace ts-traces > ts-traces/analysis.txt && node -p \"'\\n\\nDone! Build traces saved to ts-traces/ directory.\\nTrace analysis saved to ts-traces/analysis.txt.'\"",
+		"build:profile-types": "rimraf ./ts-traces && npm run clean:package-types && npm run check-installed-deps --workspace @wordpress/validation-tools --silent && ( tsgo --build --extendedDiagnostics --generateTrace ./ts-traces || ( echo 'tsc failed.'; exit 1 ) ) && node ./bin/packages/check-build-type-declaration-files.js && npx --yes @typescript/analyze-trace ts-traces > ts-traces/analysis.txt && node -p \"'\\n\\nDone! Build traces saved to ts-traces/ directory.\\nTrace analysis saved to ts-traces/analysis.txt.'\"",
 		"build:plugin-zip": "bash ./bin/build-plugin-zip.sh",
 		"clean:package-types": "tsgo --build --clean && rimraf --glob \"./packages/*/build-types\"",
 		"clean:packages": "rimraf --glob \"./packages/*/{build,build-module,build-wp,build-style}\" \"./build\"",
@@ -171,6 +171,8 @@
 		"test:e2e:debug": "npm exec --workspace @wordpress/e2e-tests-playwright -- wp-scripts test-playwright --config playwright.config.ts --ui",
 		"test:e2e:playwright": "npm run test:e2e",
 		"test:e2e:playwright:debug": "npm run test:e2e:debug",
+		"test:e2e:rtc-websocket": "npm exec --workspace @wordpress/e2e-tests-playwright -- wp-scripts test-playwright --config playwright.rtc-websocket.config.ts",
+		"test:e2e:rtc-websocket:debug": "npm exec --workspace @wordpress/e2e-tests-playwright -- wp-scripts test-playwright --config playwright.rtc-websocket.config.ts --ui",
 		"test:e2e:storybook": "npm exec --workspace @wordpress/storybook-playwright -- playwright test --config playwright.config.ts",
 		"test:e2e:watch": "npm run test:e2e -- --watch",
 		"test:native": "npm run --workspace @wordpress/native-tests test:native --",

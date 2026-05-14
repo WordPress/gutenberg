@@ -1,7 +1,7 @@
 {
 	"name": "@wordpress/validation-tools",
 	"version": "0.0.0",
-	"description": "Validation scripts used across the Gutenberg monorepo (license checks, tsconfig validation, package-lock validation).",
+	"description": "Validation scripts used across the Gutenberg monorepo.",
 	"private": true,
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -22,6 +22,7 @@
 	"engines": {
 		"node": ">=20.10.0"
 	},
+	"type": "module",
 	"devDependencies": {
 		"@wordpress/scripts": "file:../../packages/scripts",
 		"chalk": "^4.1.1",
@@ -33,6 +34,7 @@
 		"access": "public"
 	},
 	"scripts": {
+		"check-installed-deps": "node ./check-installed-deps.mjs",
 		"check-licenses": "node ./check-licenses.js",
 		"validate-package-lock": "node ./validate-package-lock.js",
 		"validate-tsconfig": "node ./validate-tsconfig.mjs",
