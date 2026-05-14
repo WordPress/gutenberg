@@ -11,14 +11,15 @@
 /**
  * External dependencies
  */
+const path = require( 'path' );
 const { readFileSync } = require( 'fs' );
 const { red, yellow } = require( 'chalk' );
 
 /**
  * Internal dependencies
  */
-
-const packageLock = JSON.parse( readFileSync( './package-lock.json', 'utf8' ) );
+const packageLockPath = path.resolve( __dirname, '../../package-lock.json' );
+const packageLock = JSON.parse( readFileSync( packageLockPath, 'utf8' ) );
 
 const dependencies = /** @type {Array<[string, any]>} */ (
 	Object.entries( packageLock.packages )

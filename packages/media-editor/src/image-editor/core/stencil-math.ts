@@ -1,15 +1,12 @@
 /**
  * Internal dependencies
  */
-import type { NormalizedRect, Size } from './types';
+import type { HandlePosition, NormalizedRect, Size } from './types';
+
+export type { HandlePosition };
 
 /** Minimum crop rect dimension in normalized space (5% of visual area). */
 export const MIN_CROP_SIZE = 0.05;
-
-/**
- * Handle position identifiers for the 8 resize handles.
- */
-export type HandlePosition = 'n' | 's' | 'e' | 'w' | 'nw' | 'ne' | 'sw' | 'se';
 
 /**
  * Bounds within which the crop rect must stay.

@@ -1,4 +1,4 @@
-name: OPTIONAL - Verify @wordpress/components CHANGELOG update
+name: OPTIONAL - Verify package CHANGELOG updates
 
 on:
     pull_request:
@@ -7,13 +7,16 @@ on:
             - trunk
         paths:
             - 'packages/components/**'
-            - '!packages/components/src/**/stories/**'
-            - '!packages/components/src/**/test/**'
-            - '!packages/components/src/**/*.android.js'
-            - '!packages/components/src/**/*.ios.js'
-            - '!packages/components/src/**/*.native.js'
-            - '!packages/components/src/**/*.native.scss'
-            - '!packages/components/src/**/react-native-*'
+            - 'packages/dataviews/**'
+            - 'packages/ui/**'
+            - 'packages/theme/**'
+            - '!packages/*/src/**/stories/**'
+            - '!packages/*/src/**/test/**'
+            - '!packages/*/src/**/*.android.js'
+            - '!packages/*/src/**/*.ios.js'
+            - '!packages/*/src/**/*.native.js'
+            - '!packages/*/src/**/*.native.scss'
+            - '!packages/*/src/**/react-native-*'
 
 # Disable permissions for all available scopes by default.
 # Any needed permissions should be configured at the job level.
@@ -21,10 +24,18 @@ permissions: {}
 
 jobs:
     check:
-        name: Check CHANGELOG diff
+        name: Check CHANGELOG diff (${{ matrix.package }})
         runs-on: 'ubuntu-24.04'
         permissions:
             contents: read
+        strategy:
+            fail-fast: false
+            matrix:
+                package:
+                    - components
+                    - dataviews
+                    - ui
+                    - theme
         steps:
             - name: 'Get PR commit count'
               env:
@@ -40,12 +51,34 @@ jobs:
                   persist-credentials: false
             - name: 'Fetch relevant history from origin'
               run: git fetch origin "$GITHUB_BASE_REF"
+            - name: Determine if package has relevant changes
+              id: filter
+              env:
+                  BASE_SHA: ${{ github.event.pull_request.base.sha }}
+                  PACKAGE_PATH: packages/${{ matrix.package }}
+              run: |
+                  # The workflow's `paths:` filter triggers on the union of all
+                  # tracked packages, so this matrix entry may run on a PR that
+                  # doesn't touch its package. Short-circuit if that's the case.
+                  relevant_changes=$(git diff --name-only "$BASE_SHA" HEAD -- "${PACKAGE_PATH}/" \
+                      | grep -Ev "^${PACKAGE_PATH}/src/(.+/)?(stories|test)/" \
+                      | grep -Ev "^${PACKAGE_PATH}/src/.*(\.android\.js|\.ios\.js|\.native\.js|\.native\.scss)$" \
+                      | grep -Ev "^${PACKAGE_PATH}/src/(.+/)?react-native-" || true)
+
+                  if [ -z "$relevant_changes" ]; then
+                      echo "No relevant changes under ${PACKAGE_PATH}; skipping CHANGELOG check."
+                      echo "has_changes=false" >> "$GITHUB_OUTPUT"
+                  else
+                      echo "has_changes=true" >> "$GITHUB_OUTPUT"
+                  fi
             - name: Check CHANGELOG status
+              if: steps.filter.outputs.has_changes == 'true'
               env:
                   PR_NUMBER: ${{ github.event.number }}
                   BASE_SHA: ${{ github.event.pull_request.base.sha }}
+                  PACKAGE_PATH: packages/${{ matrix.package }}
               run: |
-                  changelog_path="packages/components/CHANGELOG.md"
+                  changelog_path="${PACKAGE_PATH}/CHANGELOG.md"
                   optional_check_notice="This isn't a required check, so if you think your changes are small enough that they don't warrant a CHANGELOG entry, please go ahead and merge without one."
 
                   # Fail if the PR doesn't touch the changelog
@@ -65,7 +98,7 @@ jobs:
                   if ! grep -nq -e "${pr_link_grep_pattern}" "${changelog_path}"; then
                       echo "Please add a CHANGELOG entry to $changelog_path, and make sure your CHANGELOG entry has a link to the current PR."
                       echo
-                        echo "${optional_check_notice}"
+                      echo "${optional_check_notice}"
                       exit 1
                   fi
 
