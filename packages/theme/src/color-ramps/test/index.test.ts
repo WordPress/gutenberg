@@ -1,4 +1,4 @@
-import { HSL, type PlainColorObject } from 'colorjs.io/fn';
+import { HSL } from 'colorjs.io/fn';
 import { buildRamp } from '../lib';
 import { getColorString } from '../lib/color-utils';
 import { BG_RAMP_CONFIG, ACCENT_RAMP_CONFIG } from '../lib/ramp-configs';
@@ -10,13 +10,19 @@ const hStops = [ 0, 60, 120, 180, 240, 300 ];
 
 describe( 'buildRamps', () => {
 	it( 'background ramp snapshots', () => {
-		const allBgColors: PlainColorObject[] = lStops.flatMap( ( l ) =>
+		// Generate a set of HSL colors across a broad perceivable range to test
+		// support for building ramps with various combinations of lightness,
+		// saturation, and hue. Convert to hex strings to mirror real-world
+		// consumer usage (`ThemeProvider` is initialized with a hex value).
+		const allBgColors: string[] = lStops.flatMap( ( l ) =>
 			sStops.flatMap( ( s ) =>
-				hStops.map( ( h ) => ( {
-					space: HSL,
-					coords: [ h, s, l ] as [ number, number, number ],
-					alpha: 1,
-				} ) )
+				hStops.map( ( h ) =>
+					getColorString( {
+						space: HSL,
+						coords: [ h, s, l ] as [ number, number, number ],
+						alpha: 1,
+					} )
+				)
 			)
 		);
 
