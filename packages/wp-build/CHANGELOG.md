@@ -2,8 +2,6 @@
 
 ## Unreleased
 
-## 0.14.0 (2026-05-13)
-
 ### Bug Fixes
 
 -   Register generated CSS module styles with `@wordpress/style-runtime` so they can be injected into registered documents, such as editor iframes ([#77965](https://github.com/WordPress/gutenberg/pull/77965)).
