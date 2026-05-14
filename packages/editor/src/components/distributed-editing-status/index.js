@@ -1085,6 +1085,10 @@ export function DistributedEditingFreshReviewDecisionPanel( {
 							getFreshReviewDecisionItemActionTranscriptContextMessage(
 								item.actionTranscriptReportContext
 							);
+						const affordanceMessages =
+							getFreshReviewDecisionItemAffordanceMessages(
+								item
+							);
 
 						return (
 							<li
@@ -1113,6 +1117,19 @@ export function DistributedEditingFreshReviewDecisionPanel( {
 									<span className="editor-distributed-editing-status__fresh-review-decision-item-report">
 										{ actionTranscriptReportContextMessage }
 									</span>
+								) }
+								{ affordanceMessages.map(
+									( { key, message } ) => (
+										<span
+											className="editor-distributed-editing-status__fresh-review-decision-item-affordance"
+											data-distributed-editing-fresh-review-item-affordance={
+												key
+											}
+											key={ key }
+										>
+											{ message }
+										</span>
+									)
 								) }
 								<Button
 									__next40pxDefaultSize
@@ -2595,6 +2612,30 @@ function getFreshReviewDecisionItemActionTranscriptContextMessage( context ) {
 		eventText,
 		droppedText
 	);
+}
+
+function getFreshReviewDecisionItemAffordanceMessages( item ) {
+	const messages = [];
+
+	if ( item?.jumpToBlockAction?.descriptorOnly ) {
+		messages.push( {
+			key: 'jump-to-block',
+			message: item.jumpToBlockAction.enabled
+				? __( 'Jump target identified.' )
+				: __( 'Jump target unavailable.' ),
+		} );
+	}
+
+	if ( item?.compareAction?.descriptorOnly ) {
+		messages.push( {
+			key: 'compare',
+			message: item.compareAction.enabled
+				? __( 'Compare evidence available.' )
+				: __( 'Compare evidence unavailable.' ),
+		} );
+	}
+
+	return messages;
 }
 
 function getLocalUpdatesImportStatusMessage( {

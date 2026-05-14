@@ -84,7 +84,9 @@ export const DISTRIBUTED_EDITING_NOTICE_IDS = Object.freeze( {
 export const DISTRIBUTED_EDITING_NOTICE_ACTIONS = Object.freeze( {
 	ACCEPT_SERVER_STATE: 'accept-server-state',
 	APPROVE_FRESH_REVIEW_ITEM: 'approve-fresh-review-item',
+	COMPARE_FRESH_REVIEW_ITEM: 'compare-fresh-review-item',
 	EXPORT_LOCAL_UPDATES: 'export-local-updates',
+	JUMP_TO_FRESH_REVIEW_ITEM: 'jump-to-fresh-review-item',
 	PREPARE_RETRY_SUBMIT: 'prepare-retry-submit',
 	PREPARE_RETRY_SUBMIT_SAVE: 'prepare-retry-submit-save',
 	REFETCH_SERVER_STATE: 'refetch-server-state',
@@ -2008,6 +2010,7 @@ function getDistributedEditingFreshReviewItemsWithActionTranscriptReportContext(
 
 	return reviewItems.map( ( item ) => ( {
 		...item,
+		...getDistributedEditingFreshReviewItemAffordanceFields( item ),
 		actionTranscriptReportContext,
 		hasActionTranscriptReportContext: Boolean(
 			actionTranscriptReportContext?.available
@@ -2017,6 +2020,93 @@ function getDistributedEditingFreshReviewItemsWithActionTranscriptReportContext(
 				actionTranscriptReportContext.canShareWithSupport
 		),
 	} ) );
+}
+
+function getDistributedEditingFreshReviewItemAffordanceFields( item ) {
+	const jumpToBlockAction =
+		createDistributedEditingFreshReviewItemAffordanceDescriptor(
+			DISTRIBUTED_EDITING_NOTICE_ACTIONS.JUMP_TO_FRESH_REVIEW_ITEM,
+			item,
+			{
+				enabled: Boolean(
+					item.blockClientId || item.blockPath?.length
+				),
+				reason:
+					item.blockClientId || item.blockPath?.length
+						? null
+						: 'missing_block_target',
+			}
+		);
+	const compareAction =
+		createDistributedEditingFreshReviewItemAffordanceDescriptor(
+			DISTRIBUTED_EDITING_NOTICE_ACTIONS.COMPARE_FRESH_REVIEW_ITEM,
+			item,
+			{
+				enabled: Boolean(
+					item.baseContentHash && item.proposedContentHash
+				),
+				reason:
+					item.baseContentHash && item.proposedContentHash
+						? null
+						: 'missing_hash_evidence',
+			}
+		);
+
+	return {
+		supportsJumpToBlock: true,
+		supportsCompare: true,
+		canJumpToBlock: jumpToBlockAction.enabled,
+		canCompare: compareAction.enabled,
+		jumpToBlockAction,
+		compareAction,
+		affordanceActionDescriptors: [ jumpToBlockAction, compareAction ],
+	};
+}
+
+function createDistributedEditingFreshReviewItemAffordanceDescriptor(
+	actionKey,
+	item,
+	{ enabled = true, reason = null } = {}
+) {
+	return {
+		actionKey,
+		enabled: Boolean( enabled ),
+		itemId: normalizeNullableString( item.id ),
+		blockClientId: normalizeNullableString( item.blockClientId ),
+		blockName: normalizeNullableString( item.blockName ),
+		blockLabel: normalizeNullableString( item.blockLabel ),
+		blockPath: item.blockPath,
+		changeKind: normalizeNullableString( item.changeKind ),
+		riskReason: normalizeNullableString( item.riskReason ),
+		baseContentHash: normalizeNullableString( item.baseContentHash ),
+		proposedContentHash: normalizeNullableString(
+			item.proposedContentHash
+		),
+		reviewedProposedContentHash: normalizeNullableString(
+			item.reviewedProposedContentHash
+		),
+		reason: normalizeNullableString( reason ),
+		placement:
+			DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_PLACEMENTS.PRE_PUBLISH_REVIEW,
+		descriptorOnly: true,
+		callsRestEndpoint: false,
+		callsSave: false,
+		callsNormalSavePost: false,
+		callsRetrySaveEndpoint: false,
+		dispatchesNotice: false,
+		savesPost: false,
+		mutatesEditorContent: false,
+		mutatesPersistedPostContent: false,
+		selectsBlock: false,
+		movesFocus: false,
+		opensComparison: false,
+		createsRevision: false,
+		changesPostLock: false,
+		claimsSaved: false,
+		exposesRawContent: false,
+		exposesProofSignature: false,
+		exposesReviewerIds: false,
+	};
 }
 
 /**
@@ -6047,6 +6137,8 @@ function getDistributedEditingFreshReviewPrePublishReviewItems(
 					DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_PLACEMENTS.PRE_PUBLISH_REVIEW,
 			}
 		);
+		const jumpToBlockAction = item.jumpToBlockAction;
+		const compareAction = item.compareAction;
 
 		return {
 			id: item.id,
@@ -6067,11 +6159,22 @@ function getDistributedEditingFreshReviewPrePublishReviewItems(
 			isPendingReview,
 			isApprovedForRetrySave,
 			isRejected,
+			supportsJumpToBlock: item.supportsJumpToBlock,
+			supportsCompare: item.supportsCompare,
+			canJumpToBlock: item.canJumpToBlock,
+			canCompare: item.canCompare,
 			canApprove: canRecordLocalDecisions && ! isApprovedForRetrySave,
 			canReject: canRecordLocalDecisions && ! isRejected,
 			approveAction,
 			rejectAction,
-			actionDescriptors: [ approveAction, rejectAction ],
+			jumpToBlockAction,
+			compareAction,
+			actionDescriptors: [
+				jumpToBlockAction,
+				compareAction,
+				approveAction,
+				rejectAction,
+			].filter( Boolean ),
 			rawContentIncluded: false,
 			exposesRawContent: false,
 			exposesProofSignature: false,

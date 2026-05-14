@@ -3662,7 +3662,10 @@ describe( 'DistributedEditingStatusSurface', () => {
 				localUpdatesImportFreshReviewDecisionItems: [
 					{
 						id: 'fresh-approve',
+						blockClientId: 'fresh-approve-client',
 						blockLabel: 'Approve HTML change',
+						baseContentHash:
+							'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
 						proposedContentHash:
 							'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb',
 						rawBlockContent:
@@ -3670,7 +3673,10 @@ describe( 'DistributedEditingStatusSurface', () => {
 					},
 					{
 						id: 'fresh-reject',
+						blockClientId: 'fresh-reject-client',
 						blockLabel: 'Reject HTML change',
+						baseContentHash:
+							'dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd',
 						proposedContentHash:
 							'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc',
 						rawBlockContent:
@@ -3700,6 +3706,12 @@ describe( 'DistributedEditingStatusSurface', () => {
 			screen.getAllByText(
 				'Activity context: Fresh-review guarded save confirmed; 4 redacted transcript events, 2 unsafe entries dropped. Diagnostic only; save-authority evidence is still required.'
 			)
+		).toHaveLength( 2 );
+		expect( screen.getAllByText( 'Jump target identified.' ) ).toHaveLength(
+			2
+		);
+		expect(
+			screen.getAllByText( 'Compare evidence available.' )
 		).toHaveLength( 2 );
 
 		await user.click(

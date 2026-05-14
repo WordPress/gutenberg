@@ -3845,8 +3845,12 @@ describe( 'distributed editing session state', () => {
 		const rawContentToken = 'fresh-review-pre-publish-raw-token';
 		const approvedHash =
 			'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
+		const approvedBaseHash =
+			'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc';
 		const rejectedHash =
 			'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb';
+		const rejectedBaseHash =
+			'dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd';
 		const requestedState =
 			getDistributedEditingSessionStateForFreshReviewDecisionItems(
 				{
@@ -3873,6 +3877,7 @@ describe( 'distributed editing session state', () => {
 							blockPath: [ 0 ],
 							changeKind: 'modified_block',
 							riskReason: 'kses_would_remove_script',
+							baseContentHash: approvedBaseHash,
 							proposedContentHash: approvedHash,
 							rawContent: `<script>${ rawContentToken }</script>`,
 							proofSignature: 'fresh-review-pre-publish-proof',
@@ -3886,6 +3891,7 @@ describe( 'distributed editing session state', () => {
 							blockPath: [ 1 ],
 							changeKind: 'deleted_block',
 							riskReason: 'unfiltered_html_block_deleted',
+							baseContentHash: rejectedBaseHash,
 							proposedContentHash: rejectedHash,
 							rawContent: `<script>${ rawContentToken }</script>`,
 						},
@@ -3987,6 +3993,45 @@ describe( 'distributed editing session state', () => {
 			id: 'fresh-review-pre-publish-approve',
 			proposedContentHash: approvedHash,
 			isPendingReview: true,
+			supportsJumpToBlock: true,
+			supportsCompare: true,
+			canJumpToBlock: true,
+			canCompare: true,
+			jumpToBlockAction: expect.objectContaining( {
+				actionKey:
+					DISTRIBUTED_EDITING_NOTICE_ACTIONS.JUMP_TO_FRESH_REVIEW_ITEM,
+				itemId: 'fresh-review-pre-publish-approve',
+				blockClientId: 'client-html-approve',
+				blockPath: [ 0 ],
+				enabled: true,
+				descriptorOnly: true,
+				callsRestEndpoint: false,
+				dispatchesNotice: false,
+				mutatesEditorContent: false,
+				selectsBlock: false,
+				movesFocus: false,
+				opensComparison: false,
+				claimsSaved: false,
+				exposesRawContent: false,
+			} ),
+			compareAction: expect.objectContaining( {
+				actionKey:
+					DISTRIBUTED_EDITING_NOTICE_ACTIONS.COMPARE_FRESH_REVIEW_ITEM,
+				itemId: 'fresh-review-pre-publish-approve',
+				baseContentHash: approvedBaseHash,
+				proposedContentHash: approvedHash,
+				enabled: true,
+				reason: null,
+				descriptorOnly: true,
+				callsRestEndpoint: false,
+				dispatchesNotice: false,
+				mutatesEditorContent: false,
+				selectsBlock: false,
+				movesFocus: false,
+				opensComparison: false,
+				claimsSaved: false,
+				exposesRawContent: false,
+			} ),
 			canApprove: true,
 			canReject: true,
 			approveAction: expect.objectContaining( {
@@ -4014,6 +4059,16 @@ describe( 'distributed editing session state', () => {
 			exposesProofSignature: false,
 			exposesReviewerIds: false,
 		} );
+		expect(
+			requestedPrePublishState.reviewItems[ 0 ].actionDescriptors.map(
+				( descriptor ) => descriptor.actionKey
+			)
+		).toEqual( [
+			DISTRIBUTED_EDITING_NOTICE_ACTIONS.JUMP_TO_FRESH_REVIEW_ITEM,
+			DISTRIBUTED_EDITING_NOTICE_ACTIONS.COMPARE_FRESH_REVIEW_ITEM,
+			DISTRIBUTED_EDITING_NOTICE_ACTIONS.APPROVE_FRESH_REVIEW_ITEM,
+			DISTRIBUTED_EDITING_NOTICE_ACTIONS.REJECT_FRESH_REVIEW_ITEM,
+		] );
 		expect(
 			getDistributedEditingFreshReviewPrePublishState( selectorState )
 		).toEqual( requestedPrePublishState );
@@ -4053,12 +4108,16 @@ describe( 'distributed editing session state', () => {
 			expect.objectContaining( {
 				id: 'fresh-review-pre-publish-approve',
 				isApprovedForRetrySave: true,
+				supportsJumpToBlock: true,
+				supportsCompare: true,
 				canApprove: false,
 				canReject: true,
 			} ),
 			expect.objectContaining( {
 				id: 'fresh-review-pre-publish-reject',
 				isRejected: true,
+				supportsJumpToBlock: true,
+				supportsCompare: true,
 				canApprove: true,
 				canReject: false,
 				rejectionReason: 'reviewer_rejected_deleted_block',
