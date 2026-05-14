@@ -55,12 +55,22 @@ function gutenberg_render_custom_css_support_styles( $parsed_block ) {
 
 	if ( ! empty( $processed_css ) ) {
 		/*
-		 * Register and add inline style for block custom CSS.
-		 * The style depends on global-styles to ensure custom CSS loads after
-		 * and can override global styles.
+		 * Track which class names have already had their CSS enqueued to prevent
+		 * duplicate styles when the same block is rendered multiple times inside
+		 * a Query Loop (render_block_data fires once per loop iteration).
 		 */
-		wp_register_style( 'wp-block-custom-css', false, array( 'global-styles' ) );
-		wp_add_inline_style( 'wp-block-custom-css', $processed_css );
+		static $enqueued_class_names = array();
+
+		if ( ! isset( $enqueued_class_names[ $class_name ] ) ) {
+			$enqueued_class_names[ $class_name ] = true;
+			/*
+			 * Register and add inline style for block custom CSS.
+			 * The style depends on global-styles to ensure custom CSS loads after
+			 * and can override global styles.
+			 */
+			wp_register_style( 'wp-block-custom-css', false, array( 'global-styles' ) );
+			wp_add_inline_style( 'wp-block-custom-css', $processed_css );
+		}
 	}
 
 	return $parsed_block;
