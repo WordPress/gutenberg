@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+- DataViews: Fix link styling in table layout when the title field itself is a link element. [#73489](https://github.com/WordPress/gutenberg/pull/73489)
+
 ## 14.2.0 (2026-04-29)
 
 ### Enhancements

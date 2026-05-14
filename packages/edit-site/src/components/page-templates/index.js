@@ -15,6 +15,8 @@ import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { addQueryArgs } from '@wordpress/url';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useEvent } from '@wordpress/compose';
+// eslint-disable-next-line @wordpress/use-recommended-components
+import { Link } from '@wordpress/ui';
 import { useView } from '@wordpress/views';
 import { Modal } from '@wordpress/components';
 import { store as noticesStore } from '@wordpress/notices';
@@ -348,6 +350,16 @@ export default function PageTemplates() {
 						);
 					}
 				} }
+				renderItemLink={ ( { item, ...props } ) =>
+					typeof item.id !== 'string' ? (
+						<Link
+							href={ `/${ item.type }/${ item.id }?canvas=edit` }
+							{ ...props }
+						/>
+					) : (
+						<div { ...props } />
+					)
+				}
 				selection={ selection }
 				defaultLayouts={ defaultLayouts }
 				onReset={

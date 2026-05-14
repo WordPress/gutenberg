@@ -13,6 +13,8 @@ import { useSelect } from '@wordpress/data';
 import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { useEvent, usePrevious } from '@wordpress/compose';
+// eslint-disable-next-line @wordpress/use-recommended-components
+import { Link } from '@wordpress/ui';
 import { addQueryArgs } from '@wordpress/url';
 import { useView, useViewConfig } from '@wordpress/views';
 
@@ -321,6 +323,12 @@ export default function PostList( { postType } ) {
 				onClickItem={ ( { id } ) => {
 					history.navigate( `/${ postType }/${ id }?canvas=edit` );
 				} }
+				renderItemLink={ ( { item, ...props } ) => (
+					<Link
+						href={ `/${ postType }/${ item.id }?canvas=edit` }
+						{ ...props }
+					/>
+				) }
 				getItemId={ getItemId }
 				getItemLevel={ getItemLevel }
 				defaultLayouts={ defaultLayouts }

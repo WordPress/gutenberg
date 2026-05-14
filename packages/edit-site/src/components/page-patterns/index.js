@@ -11,6 +11,8 @@ import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { useView, useViewConfig } from '@wordpress/views';
 import { useSelect } from '@wordpress/data';
+// eslint-disable-next-line @wordpress/use-recommended-components
+import { Link } from '@wordpress/ui';
 import { addQueryArgs } from '@wordpress/url';
 
 /**
@@ -213,6 +215,19 @@ export default function DataviewsPatterns() {
 							}?canvas=edit`
 						);
 					} }
+					renderItemLink={ ( { item, ...props } ) => (
+						<Link
+							href={ `/${ item.type }/${
+								[
+									PATTERN_TYPES.user,
+									TEMPLATE_PART_POST_TYPE,
+								].includes( item.type )
+									? item.id
+									: item.name
+							}?canvas=edit` }
+							{ ...props }
+						/>
+					) }
 					view={ view }
 					onChangeView={ updateView }
 					defaultLayouts={ defaultLayouts }
