@@ -32,7 +32,7 @@ import type {
 import type { UseCropperStateReturn } from '../hooks/use-cropper-state';
 import { getImageFit, getRotatedBBox } from '../../core/camera';
 import { getImageCropBounds } from '../../core/containment';
-import { MIN_CROP_PIXELS } from '../../core/constants';
+import { MIN_CROP_PIXELS, MIN_ZOOM } from '../../core/constants';
 import { useInteraction } from '../hooks/use-interaction';
 import { useTransformStyle } from '../hooks/use-transform-style';
 import { useAriaAnnouncer } from '../hooks/use-aria-announcer';
@@ -49,14 +49,10 @@ const CROP_RECT_EPSILON = 1e-6;
 
 // Largest rect of the given pixel aspect ratio that fits inside the visual
 // bounds, centered in [0,1] × [0,1] normalized space. Returns a full-frame
-// rect (1×1) if `aspectRatio` is unset or non-positive. If `minCropSize`
-// is supplied and the inscribed rect would fall below it on either axis,
-// the rect is scaled up (preserving ratio) until both axes satisfy the
-// floor, capped at the viewport edges.
+// rect (1×1) if `aspectRatio` is unset or non-positive.
 function computeInscribedRect(
 	aspectRatio: number | undefined,
-	visualSize: Size,
-	minCropSize?: Size
+	visualSize: Size
 ): NormalizedRect {
 	let w = 1;
 	let h = 1;
@@ -73,27 +69,6 @@ function computeInscribedRect(
 		} else {
 			h = 1 / normalizedRatio;
 		}
-
-		// Enforce the per-axis minimum (in normalized space). Scale up
-		// the binding axis to the floor and re-derive the other axis
-		// from the ratio so the rect doesn't fall below MIN_CROP_PIXELS
-		// in source pixels on either side.
-		if ( minCropSize ) {
-			if ( w < minCropSize.width ) {
-				w = Math.min( 1, minCropSize.width );
-				h = w / normalizedRatio;
-			}
-			if ( h < minCropSize.height ) {
-				h = Math.min( 1, minCropSize.height );
-				w = h * normalizedRatio;
-			}
-			// Final cap in case both floors push past [0,1]. At extreme
-			// zoom the ratio may no longer be expressible inside the
-			// viewport — accept the deformation rather than crop below
-			// the source-pixel floor.
-			w = Math.min( 1, w );
-			h = Math.min( 1, h );
-		}
 	}
 	return {
 		x: ( 1 - w ) / 2,
@@ -101,44 +76,6 @@ function computeInscribedRect(
 		width: w,
 		height: h,
 	};
-}
-
-// Largest zoom at which the inscribed rect of `aspectRatio` still satisfies
-// `minCropPixels` on both axes. Used on aspect-ratio change to lower the
-// zoom just enough so the new ratio can be expressed without violating
-// the source-pixel floor. Returns Infinity for an unset ratio.
-function computeMaxZoomForRatio(
-	aspectRatio: number | undefined,
-	bbox: Size,
-	minCropPixels: number
-): number {
-	if (
-		! aspectRatio ||
-		aspectRatio <= 0 ||
-		bbox.width <= 0 ||
-		bbox.height <= 0
-	) {
-		return Infinity;
-	}
-	// Inscribed rect proportions in viewport-normalized space (zoom-
-	// independent). One axis fills (=1), the other follows from the
-	// pixel aspect ratio and the bbox aspect.
-	const bboxAspect = bbox.width / bbox.height;
-	let wV: number;
-	let hV: number;
-	if ( aspectRatio <= bboxAspect ) {
-		hV = 1;
-		wV = ( aspectRatio * bbox.height ) / bbox.width;
-	} else {
-		wV = 1;
-		hV = bbox.width / ( aspectRatio * bbox.height );
-	}
-	// At zoom Z, source-pixel dims = wV*bbox.width/Z and hV*bbox.height/Z.
-	// For both ≥ minCropPixels: Z ≤ min(wV*bbox.W, hV*bbox.H) / minCropPixels.
-	return Math.min(
-		( wV * bbox.width ) / minCropPixels,
-		( hV * bbox.height ) / minCropPixels
-	);
 }
 
 /**
@@ -394,11 +331,7 @@ function CropperInner(
 		) {
 			return;
 		}
-		const rect = computeInscribedRect(
-			aspectRatio,
-			visualSize,
-			minCropSize
-		);
+		const rect = computeInscribedRect( aspectRatio, visualSize );
 		const current = state.cropRect;
 		if (
 			Math.abs( current.x - rect.x ) < CROP_RECT_EPSILON &&
@@ -409,19 +342,13 @@ function CropperInner(
 			return;
 		}
 		setCropRect( rect );
-	}, [
-		freeformCrop,
-		aspectRatio,
-		visualSize,
-		setCropRect,
-		state.cropRect,
-		minCropSize,
-	] );
+	}, [ freeformCrop, aspectRatio, visualSize, setCropRect, state.cropRect ] );
 
 	// In freeform mode, when aspectRatio changes, reshape the crop to the
-	// largest inscribed rect of the new ratio. If the current zoom is so
-	// high that the inscribed rect would violate the source-pixel floor,
-	// lower zoom (and reset pan) just enough that both axes satisfy it.
+	// largest inscribed rect of the new ratio. Reset zoom and pan so the
+	// inscribed rect has the full image to work with — without this, a
+	// prior SETTLE_CROP could leave the viewport too zoomed-in for the
+	// new ratio to satisfy the source-pixel floor.
 	const prevAspectRatioRef = useRef( aspectRatio );
 	useEffect( () => {
 		if ( prevAspectRatioRef.current === aspectRatio ) {
@@ -434,52 +361,13 @@ function CropperInner(
 			visualSize.width === 0 ||
 			visualSize.height === 0 ||
 			! aspectRatio ||
-			aspectRatio <= 0 ||
-			naturalWidth <= 0 ||
-			naturalHeight <= 0
+			aspectRatio <= 0
 		) {
 			return;
 		}
-
-		const snapRotation = Math.round( state.rotation / 90 ) * 90;
-		const bbox = getRotatedBBox(
-			naturalWidth,
-			naturalHeight,
-			snapRotation
-		);
-		const ratioMaxZoom = computeMaxZoomForRatio(
-			aspectRatio,
-			bbox,
-			MIN_CROP_PIXELS
-		);
-		const targetZoom = Math.min( state.zoom, ratioMaxZoom );
-		if ( targetZoom < state.zoom ) {
-			setZoomAtPoint( targetZoom, { x: 0, y: 0 } );
-		}
-		// Compute the floor at the (possibly lowered) target zoom so the
-		// inscribed rect we pass to setCropRect is the natural fit for
-		// the new ratio at that zoom — no post-scaling needed.
-		const targetMinCropSize: Size = {
-			width: Math.min( 1, ( MIN_CROP_PIXELS * targetZoom ) / bbox.width ),
-			height: Math.min(
-				1,
-				( MIN_CROP_PIXELS * targetZoom ) / bbox.height
-			),
-		};
-		setCropRect(
-			computeInscribedRect( aspectRatio, visualSize, targetMinCropSize )
-		);
-	}, [
-		aspectRatio,
-		freeformCrop,
-		visualSize,
-		setCropRect,
-		setZoomAtPoint,
-		naturalWidth,
-		naturalHeight,
-		state.rotation,
-		state.zoom,
-	] );
+		setZoomAtPoint( MIN_ZOOM, { x: 0, y: 0 } );
+		setCropRect( computeInscribedRect( aspectRatio, visualSize ) );
+	}, [ aspectRatio, freeformCrop, visualSize, setCropRect, setZoomAtPoint ] );
 
 	// Compute the crop handle bounds from the actual image footprint.
 	// Depends on the full state object because getImageCropBounds reads
