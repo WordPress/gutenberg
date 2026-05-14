@@ -4,8 +4,8 @@
 
 ### Breaking Changes
 
--   `Notice`: Remove the `is-dismissible` root class. Use `.components-notice:has(.components-notice__dismiss)` (or select `.components-notice__dismiss`) for styles that should only apply when the dismiss control is present.
--   `Notice`: Render `.components-notice__actions` as a sibling of `.components-notice__content` (not nested inside it). Update any custom CSS that targeted actions with a descendant selector under `__content` (for example `.components-notice__content .components-notice__actions`) to use `.components-notice__actions` or `.components-notice .components-notice__actions` instead.
+-   `Notice`: Remove the `is-dismissible` root class. Use `.components-notice:has(.components-notice__dismiss)` (or select `.components-notice__dismiss`) for styles that should only apply when the dismiss control is present ([#78231](https://github.com/WordPress/gutenberg/pull/78231)).
+-   `Notice`: Render `.components-notice__actions` as a sibling of `.components-notice__content` (not nested inside it). Update any custom CSS that targeted actions with a descendant selector under `__content` (for example `.components-notice__content .components-notice__actions`) to use `.components-notice__actions` or `.components-notice .components-notice__actions` instead ([#78231](https://github.com/WordPress/gutenberg/pull/78231)).
 
 ### Enhancements
 
@@ -24,7 +24,7 @@
 -   `Button`: Align `link` variant underline (offset and thickness) with `ExternalLink` and `Link` from `@wordpress/ui` ([#77842](https://github.com/WordPress/gutenberg/pull/77842)).
 -   `Modal`: render as a bottom sheet on mobile so the height adapts to the content and CTAs stay within thumb reach ([#77956](https://github.com/WordPress/gutenberg/pull/77956)).
 -   `Text`: Use a theme-aware gray token for the muted variant ([#77999](https://github.com/WordPress/gutenberg/pull/77999)).
--   `Notice`: Align appearance with `Notice` from `@wordpress/ui` (full border, rounded corners, tinted intent surfaces, design-token-driven colors and spacing, `closeSmall` dismiss icon, compact action buttons, and grid layout that places actions in their own row for symmetric padding).
+-   `Notice`: Align appearance with `Notice` from `@wordpress/ui` (full border, rounded corners, tinted intent surfaces, design-token-driven colors and spacing, `closeSmall` dismiss icon, compact action buttons, and grid layout that places actions in their own row for symmetric padding) ([#78231](https://github.com/WordPress/gutenberg/pull/78231)).
 
 ### Bug Fixes
 
