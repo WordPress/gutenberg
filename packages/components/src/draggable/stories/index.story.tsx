@@ -32,7 +32,15 @@ const meta: Meta< typeof Draggable > = {
 	},
 	parameters: {
 		controls: { expanded: true },
-		docs: { source: { code: '' } },
+		docs: {
+			source: { code: '' },
+			// Render each story in its own iframe on the autodocs page.
+			// The drag clone uses `position: fixed`, which would otherwise
+			// resolve against Storybook's docs-page wrappers (they create
+			// containing blocks via `transform`) instead of the viewport,
+			// pinning the clone in the wrong place.
+			story: { inline: false, height: '250px' },
+		},
 		componentStatus: {
 			status: 'use-with-caution',
 			whereUsed: 'global',
