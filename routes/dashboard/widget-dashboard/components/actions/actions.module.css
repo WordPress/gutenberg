@@ -12,11 +12,11 @@
 	}
 
 	.editActionsEnter {
-		animation: actions-slide-in 220ms ease-out forwards;
+		animation: actions-slide-in var(--wpds-motion-duration-md) var(--wpds-motion-easing-expressive) forwards;
 	}
 
 	.editActionsExit {
-		animation: actions-fold-out 50ms ease-in forwards;
+		animation: actions-fold-out var(--wpds-motion-duration-sm) var(--wpds-motion-easing-balanced) forwards;
 	}
 
 	@keyframes actions-slide-in {

@@ -7,11 +7,11 @@ import {
 	privateApis as themePrivateApis,
 } from '@wordpress/theme';
 import { unlock } from '../lock-unlock';
-import resetStyles from '../utils/css/resets.module.css';
 import { useDeprioritizedInitialFocus } from '../utils/use-deprioritized-initial-focus';
 import { renderSlotWithChildren } from '../utils/render-slot-with-children';
 import { PopoverValidationProvider } from './context';
 import { Portal } from './portal';
+import { Positioner } from './positioner';
 import styles from './style.module.css';
 import type { PopupProps } from './types';
 
@@ -26,27 +26,18 @@ const CLOSE_ATTR = 'data-wp-ui-popover-close';
  * Handles portal rendering, positioning relative to the anchor, collision
  * avoidance, focus management, and optional backdrop. Use
  * `portal={ <Popover.Portal container={ ... } /> }` for cross-document
- * scenarios such as iframes.
+ * scenarios such as iframes, and `positioner={ <Popover.Positioner … /> }`
+ * to customize placement.
  */
 const Popup = forwardRef< HTMLDivElement, PopupProps >( function PopoverPopup(
 	{
-		align = 'center',
-		alignOffset,
-		anchor,
-		// Matches the popup's border-radius (--wpds-border-radius-md).
-		arrowPadding = 8,
 		backdrop = false,
 		children,
 		className,
-		collisionAvoidance,
-		collisionBoundary,
-		collisionPadding,
 		portal,
+		positioner,
 		finalFocus,
 		initialFocus,
-		side = 'bottom',
-		sideOffset = 8,
-		sticky,
 		variant = 'default',
 		...props
 	},
@@ -62,43 +53,35 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function PopoverPopup(
 		<_Popover.Backdrop className={ styles.backdrop } />
 	) : null;
 
-	const positioner = (
-		<_Popover.Positioner
-			align={ align }
-			alignOffset={ alignOffset }
-			anchor={ anchor }
-			arrowPadding={ arrowPadding }
-			collisionAvoidance={ collisionAvoidance }
-			collisionBoundary={ collisionBoundary }
-			collisionPadding={ collisionPadding }
-			side={ side }
-			sideOffset={ sideOffset }
-			sticky={ sticky }
-			className={ clsx( resetStyles[ 'box-sizing' ], styles.positioner ) }
-		>
-			<ThemeProvider>
-				<_Popover.Popup
-					ref={ mergedPopupRef }
-					initialFocus={ resolvedInitialFocus }
-					finalFocus={ finalFocus }
-					className={ clsx(
-						variant !== 'unstyled' && styles.popup,
-						className
-					) }
-					{ ...props }
-				>
-					<PopoverValidationProvider>
-						{ children }
-					</PopoverValidationProvider>
-				</_Popover.Popup>
-			</ThemeProvider>
-		</_Popover.Positioner>
+	const popupContent = (
+		<ThemeProvider>
+			<_Popover.Popup
+				ref={ mergedPopupRef }
+				initialFocus={ resolvedInitialFocus }
+				finalFocus={ finalFocus }
+				className={ clsx(
+					variant !== 'unstyled' && styles.popup,
+					className
+				) }
+				{ ...props }
+			>
+				<PopoverValidationProvider>
+					{ children }
+				</PopoverValidationProvider>
+			</_Popover.Popup>
+		</ThemeProvider>
+	);
+
+	const positionedPopup = renderSlotWithChildren(
+		positioner,
+		<Positioner />,
+		popupContent
 	);
 
 	const portalChildren = (
 		<>
 			{ backdropElement }
-			{ positioner }
+			{ positionedPopup }
 		</>
 	);
 

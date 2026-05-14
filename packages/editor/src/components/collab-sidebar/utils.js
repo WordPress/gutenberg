@@ -91,6 +91,75 @@ export function getNoteExcerpt( text, excerptLength = 10 ) {
 }
 
 /**
+ * Normalizes noteId metadata to always return an array of unique numeric ids,
+ * preserving insertion order. Handles both scalar (legacy, possibly
+ * string-typed) and array (new) values.
+ *
+ * @param {Object} metadata Block metadata object
+ * @return {number[]} Array of note IDs (may be empty)
+ */
+export function getNoteIdsFromMetadata( metadata ) {
+	const noteId = metadata?.noteId;
+	const raw = Array.isArray( noteId ) ? noteId : [ noteId ];
+	const ids = new Set();
+	for ( const value of raw ) {
+		const id = Number( value );
+		if ( Number.isFinite( id ) && id > 0 ) {
+			ids.add( id );
+		}
+	}
+	return [ ...ids ];
+}
+
+/**
+ * Adds a note ID to the metadata.
+ * Converts scalar to array if needed, otherwise appends.
+ *
+ * @param {Object} metadata Existing block metadata
+ * @param {number} noteId   Note ID to add
+ * @return {Object} Updated metadata object
+ */
+export function addNoteIdToMetadata( metadata, noteId ) {
+	const ids = new Set( getNoteIdsFromMetadata( metadata ) );
+	const id = Number( noteId );
+	if ( ids.has( id ) ) {
+		return metadata;
+	}
+	ids.add( id );
+	return { ...metadata, noteId: [ ...ids ] };
+}
+
+/**
+ * Picks the most relevant thread from a list: first unresolved, else first.
+ *
+ * @param {Array} threads Ordered list of thread objects.
+ * @return {Object|null} Selected thread or null when the list is empty.
+ */
+export function pickPrimaryNote( threads ) {
+	return (
+		threads.find( ( thread ) => thread.status === 'hold' ) ??
+		threads[ 0 ] ??
+		null
+	);
+}
+
+/**
+ * Removes a note ID from the metadata.
+ *
+ * @param {Object} metadata Existing block metadata
+ * @param {number} noteId   Note ID to remove
+ * @return {Object} Updated metadata object
+ */
+export function removeNoteIdFromMetadata( metadata, noteId ) {
+	const ids = new Set( getNoteIdsFromMetadata( metadata ) );
+	ids.delete( Number( noteId ) );
+	return {
+		...metadata,
+		noteId: ids.size > 0 ? [ ...ids ] : undefined,
+	};
+}
+
+/**
  * Calculate final top positions for all floating note threads in the
  * editor's content coordinate space. Adjusts positions to prevent overlapping
  * by pushing threads above the selected one upward and threads below it downward.

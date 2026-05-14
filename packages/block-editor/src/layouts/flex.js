@@ -12,11 +12,11 @@ import {
 	arrowDown,
 } from '@wordpress/icons';
 import {
-	ToggleControl,
 	Flex,
-	FlexItem,
+	ToggleControl,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
+	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 
 /**
@@ -30,7 +30,7 @@ import {
 	JustifyContentControl,
 	BlockVerticalAlignmentControl,
 } from '../components';
-import { shouldSkipSerialization } from '../hooks/utils';
+import { cleanEmptyObject, shouldSkipSerialization } from '../hooks/utils';
 import { LAYOUT_DEFINITIONS } from './definitions';
 
 // Used with the default, horizontal flex orientation.
@@ -71,34 +71,111 @@ export default {
 		layout = {},
 		onChange,
 		layoutBlockSupport = {},
+		resetLayout = {},
+		clientId,
 	} ) {
 		const {
 			allowOrientation = true,
 			allowJustification = true,
 			allowWrap = true,
 		} = layoutBlockSupport;
+		const hasLayoutValue = ( key, defaultValue ) =>
+			( layout?.[ key ] ?? defaultValue ) !==
+			( resetLayout?.[ key ] ?? defaultValue );
+		const hasJustificationValue = () =>
+			hasLayoutValue( 'justifyContent', 'left' );
+		const hasOrientationValue = () =>
+			hasLayoutValue( 'orientation', 'horizontal' );
+		const hasWrapValue = () => hasLayoutValue( 'flexWrap', 'wrap' );
+		const resetJustification = () =>
+			onChange(
+				cleanEmptyObject( {
+					...layout,
+					justifyContent: resetLayout?.justifyContent,
+				} )
+			);
+		const resetOrientation = () => {
+			const { verticalAlignment, justifyContent } = layout;
+			const nextOrientation = resetLayout?.orientation;
+			const isHorizontal =
+				! nextOrientation || nextOrientation === 'horizontal';
+			onChange(
+				cleanEmptyObject( {
+					...layout,
+					orientation: nextOrientation,
+					verticalAlignment:
+						resetLayout?.verticalAlignment ??
+						( isHorizontal && verticalAlignment === 'space-between'
+							? 'center'
+							: verticalAlignment ),
+					justifyContent:
+						resetLayout?.justifyContent ??
+						( isHorizontal && justifyContent === 'stretch'
+							? 'left'
+							: justifyContent ),
+				} )
+			);
+		};
+		const resetWrap = () =>
+			onChange(
+				cleanEmptyObject( {
+					...layout,
+					flexWrap: resetLayout?.flexWrap,
+				} )
+			);
+
 		return (
 			<>
-				<Flex>
-					{ allowJustification && (
-						<FlexItem>
-							<FlexLayoutJustifyContentControl
-								layout={ layout }
-								onChange={ onChange }
-							/>
-						</FlexItem>
-					) }
-					{ allowOrientation && (
-						<FlexItem>
-							<OrientationControl
-								layout={ layout }
-								onChange={ onChange }
-							/>
-						</FlexItem>
-					) }
-				</Flex>
+				{ ( allowJustification || allowOrientation ) && (
+					<Flex
+						align="flex-start"
+						className="block-editor-hooks__flex-layout-controls"
+						gap={ 4 }
+						justify="flex-start"
+					>
+						{ allowJustification && (
+							<ToolsPanelItem
+								label={ __( 'Justification' ) }
+								hasValue={ hasJustificationValue }
+								onDeselect={ resetJustification }
+								isShownByDefault
+								panelId={ clientId }
+							>
+								<FlexLayoutJustifyContentControl
+									layout={ layout }
+									onChange={ onChange }
+								/>
+							</ToolsPanelItem>
+						) }
+						{ allowOrientation && (
+							<ToolsPanelItem
+								label={ __( 'Orientation' ) }
+								hasValue={ hasOrientationValue }
+								onDeselect={ resetOrientation }
+								isShownByDefault
+								panelId={ clientId }
+							>
+								<OrientationControl
+									layout={ layout }
+									onChange={ onChange }
+								/>
+							</ToolsPanelItem>
+						) }
+					</Flex>
+				) }
 				{ allowWrap && (
-					<FlexWrapControl layout={ layout } onChange={ onChange } />
+					<ToolsPanelItem
+						label={ __( 'Wrapping' ) }
+						hasValue={ hasWrapValue }
+						onDeselect={ resetWrap }
+						isShownByDefault
+						panelId={ clientId }
+					>
+						<FlexWrapControl
+							layout={ layout }
+							onChange={ onChange }
+						/>
+					</ToolsPanelItem>
 				) }
 			</>
 		);
