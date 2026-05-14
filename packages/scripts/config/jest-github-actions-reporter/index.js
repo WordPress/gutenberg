@@ -28,7 +28,6 @@ class GithubActionsReporter {
 		const messages = getMessages( _aggregatedResults.testResults );
 
 		for ( const message of messages ) {
-			// eslint-disable-next-line no-console
 			console.log( message );
 		}
 	}
