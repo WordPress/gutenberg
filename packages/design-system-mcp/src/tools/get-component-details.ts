@@ -7,7 +7,7 @@ const inputSchema = z.object( {
 	name: z
 		.union( [
 			z.string().min( 1 ),
-			z.array( z.string().min( 1 ) ).min( 1 ),
+			z.array( z.string().min( 1 ) ).min( 1 ).max( 10 ),
 		] )
 		.describe(
 			'A component name, or an array of component names to fetch in a single call (e.g. "Button" or ["Button", "Tabs"]).'
