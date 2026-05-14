@@ -23,7 +23,7 @@ const OVERLAP_MARGIN = 20;
  */
 const AVATAR_BORDER_COLORS = [
 	'#C36EFF', // Purple
-	'#FF51A8', // Pink
+	'#D94145', // Red
 	'#E4780A', // Orange
 	'#FF35EE', // Magenta
 	'#879F11', // Olive
