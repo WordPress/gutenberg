@@ -37,7 +37,7 @@ export const MAX_SYNC_REQUEST_BODY_SIZE_IN_BYTES = 15 * 1024 * 1024;
 
 // Keep a single maximum-sized encoded update plus room metadata sendable if a
 // request-body-too-large response forces the client to shrink its retry budget.
-export const MIN_SYNC_REQUEST_BODY_SIZE_IN_BYTES = 2 * 1024 * 1024;
+export const MIN_SYNC_REQUEST_BODY_SIZE_LIMIT_IN_BYTES = 0.2 * 1024 * 1024;
 
 export const POLLING_INTERVAL_IN_MS = applyFilters(
 	'sync.pollingManager.pollingInterval',

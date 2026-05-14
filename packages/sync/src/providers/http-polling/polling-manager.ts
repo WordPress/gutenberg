@@ -21,7 +21,7 @@ import {
 	ERROR_RETRY_DELAYS_SOLO_MS,
 	ERROR_RETRY_DELAYS_WITH_COLLABORATORS_MS,
 	MAX_SYNC_REQUEST_BODY_SIZE_IN_BYTES,
-	MIN_SYNC_REQUEST_BODY_SIZE_IN_BYTES,
+	MIN_SYNC_REQUEST_BODY_SIZE_LIMIT_IN_BYTES,
 	MAX_ROOMS_PER_REQUEST,
 	MAX_UPDATE_SIZE_IN_BYTES,
 	POLLING_INTERVAL_IN_MS,
@@ -830,7 +830,7 @@ function poll(): void {
 				}
 			} else if ( isRequestBodyTooLargeError( error ) ) {
 				syncRequestBodySizeLimit = Math.max(
-					MIN_SYNC_REQUEST_BODY_SIZE_IN_BYTES,
+					MIN_SYNC_REQUEST_BODY_SIZE_LIMIT_IN_BYTES,
 					Math.floor( syncRequestBodySizeLimit / 2 )
 				);
 				pollInterval = hasCollaborators
