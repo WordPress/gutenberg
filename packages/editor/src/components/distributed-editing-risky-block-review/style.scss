@@ -84,6 +84,21 @@
 	width: 8px;
 }
 
+.editor-distributed-editing-risky-block-review__list-view-marker {
+	align-items: center;
+	color: var(--wp-admin-theme-color, #2271b1);
+	display: inline-flex;
+	flex: 0 0 $grid-unit-30;
+	height: $grid-unit-40;
+	justify-content: center;
+	margin-right: -$grid-unit-05;
+	width: $grid-unit-30;
+
+	svg {
+		fill: currentColor;
+	}
+}
+
 .editor-distributed-editing-risky-block-review__item-meta,
 .editor-distributed-editing-risky-block-review__item-evidence {
 	color: $gray-700;

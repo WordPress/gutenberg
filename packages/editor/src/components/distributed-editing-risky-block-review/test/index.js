@@ -14,6 +14,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import DistributedEditingRiskyBlockReviewPrePublishPanel, {
+	DistributedEditingRiskyBlockReviewListViewMarker,
 	DistributedEditingRiskyBlockReviewPanel,
 	DistributedEditingRiskyBlockReviewStatusChrome,
 	getDistributedEditingRiskyBlockReviewWrapperProps,
@@ -204,6 +205,50 @@ describe( 'DistributedEditingRiskyBlockReviewStatusChrome', () => {
 			actions.__experimentalOpenDistributedEditingRiskyBlockReview
 		).toHaveBeenCalledTimes( 1 );
 		expect( actions.savePost ).not.toHaveBeenCalled();
+	} );
+} );
+
+describe( 'DistributedEditingRiskyBlockReviewListViewMarker', () => {
+	it( 'renders a content-free accessible marker for the matching pending block', () => {
+		setupSelect();
+
+		render(
+			<DistributedEditingRiskyBlockReviewListViewMarker
+				block={ { clientId: 'block-risk-html-added' } }
+			/>
+		);
+
+		const marker = screen.getByRole( 'img', {
+			name: 'HTML review required for Custom HTML',
+		} );
+
+		expect( marker ).toBeVisible();
+		expect( marker ).toHaveAttribute(
+			'data-distributed-editing-risky-block-review-list-view-marker'
+		);
+		expect( marker ).toHaveAttribute(
+			'data-distributed-editing-risky-block-review-item-id',
+			'risk-html-added'
+		);
+		expect(
+			screen.queryByText( '<script>secret</script>' )
+		).not.toBeInTheDocument();
+	} );
+
+	it( 'does not render when the matching block has no pending review item', () => {
+		setupSelect();
+
+		render(
+			<DistributedEditingRiskyBlockReviewListViewMarker
+				block={ { clientId: 'block-without-risk' } }
+			/>
+		);
+
+		expect(
+			screen.queryByRole( 'img', {
+				name: 'HTML review required for Custom HTML',
+			} )
+		).not.toBeInTheDocument();
 	} );
 } );
 

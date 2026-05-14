@@ -1,10 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	__experimentalListView as ListView,
-	privateApis as blockEditorPrivateApis,
-} from '@wordpress/block-editor';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { useFocusOnMount, useMergeRefs } from '@wordpress/compose';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { focus } from '@wordpress/dom';
@@ -17,10 +14,11 @@ import { ESCAPE } from '@wordpress/keycodes';
  * Internal dependencies
  */
 import ListViewOutline from './list-view-outline';
+import { DistributedEditingRiskyBlockReviewListViewMarker } from '../distributed-editing-risky-block-review';
 import { unlock } from '../../lock-unlock';
 import { store as editorStore } from '../../store';
 
-const { TabbedSidebar } = unlock( blockEditorPrivateApis );
+const { PrivateListView, TabbedSidebar } = unlock( blockEditorPrivateApis );
 
 export default function ListViewSidebar() {
 	const { setIsListViewOpened } = useDispatch( editorStore );
@@ -126,8 +124,15 @@ export default function ListViewSidebar() {
 						panel: (
 							<div className="editor-list-view-sidebar__list-view-container">
 								<div className="editor-list-view-sidebar__list-view-panel-content">
-									<ListView
+									<PrivateListView
+										additionalBlockContent={
+											DistributedEditingRiskyBlockReviewListViewMarker
+										}
+										blockSettingsMenu={ undefined }
 										dropZoneElement={ dropZoneElement }
+										onSelect={ null }
+										rootClientId={ null }
+										showAppender={ false }
 									/>
 								</div>
 							</div>

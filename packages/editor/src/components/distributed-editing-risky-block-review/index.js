@@ -6,7 +6,7 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { Button, Notice } from '@wordpress/components';
+import { Button, Icon, Notice } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { addFilter } from '@wordpress/hooks';
 import { check, closeSmall, caution, seen } from '@wordpress/icons';
@@ -203,6 +203,47 @@ export function DistributedEditingRiskyBlockReviewStatusChrome( {
 				<div>{ getRiskyBlockReviewSummaryMessage( reviewState ) }</div>
 			</Notice>
 		</div>
+	);
+}
+
+/**
+ * Renders a content-free marker for risky review items inside the editor List View.
+ *
+ * @param {Object} props       Component props.
+ * @param {Object} props.block List View block object.
+ *
+ * @return {React.ReactNode} Rendered List View marker.
+ */
+export function DistributedEditingRiskyBlockReviewListViewMarker( { block } ) {
+	const reviewItem = usePendingRiskyBlockReviewItemForClientId(
+		block?.clientId
+	);
+
+	if ( ! reviewItem ) {
+		return null;
+	}
+
+	const label = getRiskyBlockReviewItemLabel( reviewItem, 0 );
+
+	return (
+		<span
+			aria-label={ sprintf(
+				/* translators: %s: block label. */
+				__( 'HTML review required for %s' ),
+				label
+			) }
+			className="editor-distributed-editing-risky-block-review__list-view-marker"
+			data-distributed-editing-risky-block-review-item-id={
+				reviewItem.id || ''
+			}
+			data-distributed-editing-risky-block-review-list-view-marker
+			data-distributed-editing-risky-block-review-treatment={
+				reviewItem.annotation?.visualTreatment || 'icon_warning_marker'
+			}
+			role="img"
+		>
+			<Icon icon={ caution } size={ 18 } />
+		</span>
 	);
 }
 
@@ -449,6 +490,40 @@ function useDistributedEditingRiskyBlockReviewState() {
 			savePolicy: getDistributedEditingSavePolicyState?.() || {},
 		};
 	}, [] );
+}
+
+function usePendingRiskyBlockReviewItemForClientId( clientId ) {
+	return useSelect(
+		( select ) => {
+			if ( ! clientId ) {
+				return null;
+			}
+
+			const { getDistributedEditingRiskyBlockReviewState } =
+				select( editorStore );
+			const reviewState =
+				getDistributedEditingRiskyBlockReviewState?.() || {};
+
+			if (
+				! shouldRenderDistributedEditingRiskyBlockReview(
+					reviewState
+				) ||
+				! Array.isArray( reviewState.reviewItems )
+			) {
+				return null;
+			}
+
+			return (
+				reviewState.reviewItems.find(
+					( item ) =>
+						item.blockClientId === clientId &&
+						item.reviewStatus ===
+							DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES.PENDING_REVIEW
+				) || null
+			);
+		},
+		[ clientId ]
+	);
 }
 
 function getRiskyBlockReviewSummaryMessage( reviewState = {} ) {
