@@ -64,9 +64,14 @@ export default function usePatternSettings() {
 			...restStoredSettings
 		} = storedSettings;
 
+		// Preserve non-global styles from settings.styles (e.g., editor styles from add_editor_style)
+		const nonGlobalStyles = ( styles ?? [] ).filter(
+			( style ) => ! style.isGlobalStyles
+		);
+
 		return {
 			...restStoredSettings,
-			styles: globalStyles,
+			styles: [ ...nonGlobalStyles, ...globalStyles ],
 			__experimentalFeatures: globalSettings,
 			[ globalStylesDataKey ]: mergedConfig.styles ?? {},
 			__experimentalBlockPatterns: blockPatterns,

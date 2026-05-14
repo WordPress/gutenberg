@@ -1,6 +1,6 @@
 import type { CropperState, Size } from '../types';
 import { DEFAULT_STATE } from '../constants';
-import { cropperReducer, enforceContainment } from '../state';
+import { cropperReducer, enforceContainment, isStateDirty } from '../state';
 import {
 	createCamera,
 	screenToWorld,
@@ -123,6 +123,26 @@ describe( 'enforceContainment', () => {
 		const enforced = enforceContainment( state );
 		const enforced2 = enforceContainment( enforced );
 		expect( enforced2 ).toBe( enforced );
+	} );
+} );
+
+describe( 'isStateDirty', () => {
+	it( 'ignores floating-point noise from containment math', () => {
+		const initial = makeState();
+		const current = makeState( {
+			pan: { x: initial.pan.x, y: initial.pan.y + 2e-8 },
+		} );
+
+		expect( isStateDirty( current, initial ) ).toBe( false );
+	} );
+
+	it( 'detects visible cropper state changes', () => {
+		const initial = makeState();
+		const current = makeState( {
+			pan: { x: initial.pan.x, y: initial.pan.y + 0.01 },
+		} );
+
+		expect( isStateDirty( current, initial ) ).toBe( true );
 	} );
 } );
 

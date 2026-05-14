@@ -32,12 +32,52 @@ class Tests_Collaboration_WpSyncPostMetaStorage extends WP_UnitTestCase {
 		parent::set_up();
 		update_option( 'wp_collaboration_enabled', 1 );
 
-		// Reset storage post ID cache to ensure clean state after transaction rollback.
+		$this->reset_storage_post_id_cache();
+	}
+
+	/**
+	 * Resets the static room-to-storage-post cache.
+	 */
+	private function reset_storage_post_id_cache(): void {
 		$reflection = new ReflectionProperty( 'WP_Sync_Post_Meta_Storage', 'storage_post_ids' );
 		if ( PHP_VERSION_ID < 80100 ) {
 			$reflection->setAccessible( true );
 		}
 		$reflection->setValue( null, array() );
+	}
+
+	/**
+	 * Gets active storage posts that could be used as room storage lineages.
+	 *
+	 * @param string $room Room identifier.
+	 * @return array<int, object> Matching storage posts.
+	 */
+	private function get_storage_post_lineages( string $room ): array {
+		global $wpdb;
+
+		$room_hash = md5( $room );
+		return $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT ID, post_name FROM {$wpdb->posts}
+				WHERE post_type = %s
+					AND post_status = 'publish'
+					AND ( post_name = %s OR post_name LIKE %s )
+				ORDER BY ID ASC",
+				WP_Sync_Post_Meta_Storage::POST_TYPE,
+				$room_hash,
+				$wpdb->esc_like( $room_hash . '-' ) . '%'
+			)
+		);
+	}
+
+	/**
+	 * Skips tests that need Gutenberg's compatibility implementation.
+	 */
+	private function skip_if_sync_storage_class_is_provided_by_wordpress_core(): void {
+		$reflection = new ReflectionClass( 'WP_Sync_Post_Meta_Storage' );
+		if ( false === strpos( $reflection->getFileName(), '/wp-content/plugins/' ) ) {
+			$this->markTestSkipped( 'The active WP_Sync_Post_Meta_Storage class is provided by WordPress core, not Gutenberg.' );
+		}
 	}
 
 	/**
@@ -708,6 +748,160 @@ class Tests_Collaboration_WpSyncPostMetaStorage extends WP_UnitTestCase {
 			$concurrent_update['data'],
 			$update_data,
 			'Concurrent update should survive compaction.'
+		);
+	}
+
+	public function test_first_access_race_does_not_split_room_storage() {
+		$this->skip_if_sync_storage_class_is_provided_by_wordpress_core();
+
+		$storage   = new WP_Sync_Post_Meta_Storage();
+		$room      = $this->get_room() . ':first-access-race';
+		$room_hash = md5( $room );
+		$update    = array(
+			'type' => 'update',
+			'data' => base64_encode( 'first-access-race' ),
+		);
+
+		$did_inject       = false;
+		$injected_post_id = 0;
+		$injector         = static function ( $data ) use ( &$did_inject, &$injected_post_id, $room_hash ) {
+			if (
+				$did_inject ||
+				! is_array( $data ) ||
+				( $data['post_type'] ?? null ) !== WP_Sync_Post_Meta_Storage::POST_TYPE ||
+				( $data['post_name'] ?? null ) !== $room_hash
+			) {
+				return $data;
+			}
+
+			$did_inject       = true;
+			$injected_post_id = wp_insert_post(
+				array(
+					'post_type'   => WP_Sync_Post_Meta_Storage::POST_TYPE,
+					'post_status' => 'publish',
+					'post_title'  => 'Sync Storage',
+					'post_name'   => $room_hash,
+				)
+			);
+
+			return $data;
+		};
+
+		add_filter( 'wp_insert_post_data', $injector, 10, 1 );
+		try {
+			$this->assertTrue( $storage->add_update( $room, $update ) );
+		} finally {
+			remove_filter( 'wp_insert_post_data', $injector, 10 );
+		}
+
+		$this->assertTrue( $did_inject, 'Expected first-access race injection to occur.' );
+		$this->assertIsInt( $injected_post_id, 'Expected injected storage post to be created.' );
+		$this->assertGreaterThan( 0, $injected_post_id, 'Expected injected storage post to be created.' );
+
+		$lineages = $this->get_storage_post_lineages( $room );
+		$this->assertCount( 1, $lineages, 'First-access race split room storage.' );
+		$this->assertSame(
+			$room_hash,
+			$lineages[0]->post_name,
+			'The surviving storage lineage must use the exact room hash slug.'
+		);
+
+		$this->reset_storage_post_id_cache();
+		$fresh_storage = new WP_Sync_Post_Meta_Storage();
+		$updates       = $fresh_storage->get_updates_after_cursor( $room, 0 );
+
+		$this->assertContains(
+			$update['data'],
+			wp_list_pluck( $updates, 'data' ),
+			'An acknowledged first-access update must be visible to a fresh storage instance.'
+		);
+	}
+
+	public function test_existing_duplicate_storage_lineage_is_left_for_future_repair() {
+		global $wpdb;
+
+		$this->skip_if_sync_storage_class_is_provided_by_wordpress_core();
+
+		$storage   = new WP_Sync_Post_Meta_Storage();
+		$room      = $this->get_room() . ':suffix-id-before-exact';
+		$room_hash = md5( $room );
+
+		$suffixed_post_id = wp_insert_post(
+			array(
+				'post_type'   => WP_Sync_Post_Meta_Storage::POST_TYPE,
+				'post_status' => 'publish',
+				'post_title'  => 'Sync Storage',
+				'post_name'   => $room_hash . '-2',
+			)
+		);
+		$this->assertIsInt( $suffixed_post_id );
+		$this->assertGreaterThan( 0, $suffixed_post_id );
+		$this->assertSame( $room_hash . '-2', get_post_field( 'post_name', $suffixed_post_id ) );
+
+		$suffixed_update = array(
+			'type' => 'update',
+			'data' => base64_encode( 'suffixed-lineage-update' ),
+		);
+		$this->assertNotFalse(
+			$wpdb->insert(
+				$wpdb->postmeta,
+				array(
+					'post_id'    => $suffixed_post_id,
+					'meta_key'   => WP_Sync_Post_Meta_Storage::SYNC_UPDATE_META_KEY,
+					'meta_value' => wp_json_encode( $suffixed_update ),
+				),
+				array( '%d', '%s', '%s' )
+			)
+		);
+
+		$exact_post_id = wp_insert_post(
+			array(
+				'post_type'   => WP_Sync_Post_Meta_Storage::POST_TYPE,
+				'post_status' => 'publish',
+				'post_title'  => 'Sync Storage',
+				'post_name'   => $room_hash,
+			)
+		);
+		$this->assertIsInt( $exact_post_id );
+		$this->assertGreaterThan( $suffixed_post_id, $exact_post_id );
+		$this->assertSame( $room_hash, get_post_field( 'post_name', $exact_post_id ) );
+
+		$exact_update = array(
+			'type' => 'update',
+			'data' => base64_encode( 'exact-lineage-update' ),
+		);
+		$this->assertTrue( $storage->add_update( $room, $exact_update ) );
+
+		$lineages = $this->get_storage_post_lineages( $room );
+		$this->assertCount( 2, $lineages, 'Existing duplicate storage should be left for a future repair path.' );
+		$this->assertSame( $room_hash . '-2', $lineages[0]->post_name );
+		$this->assertSame( $room_hash, $lineages[1]->post_name );
+
+		$this->reset_storage_post_id_cache();
+		$fresh_storage = new WP_Sync_Post_Meta_Storage();
+		$updates       = $fresh_storage->get_updates_after_cursor( $room, 0 );
+		$update_data   = wp_list_pluck( $updates, 'data' );
+
+		$this->assertContains(
+			$exact_update['data'],
+			$update_data,
+			'Fresh readers should use the exact room hash lineage for new writes.'
+		);
+		$this->assertNotContains(
+			$suffixed_update['data'],
+			$update_data,
+			'Historical duplicate repair is intentionally not performed in the request path.'
+		);
+		$this->assertSame(
+			wp_json_encode( $suffixed_update ),
+			$wpdb->get_var(
+				$wpdb->prepare(
+					"SELECT meta_value FROM {$wpdb->postmeta} WHERE post_id = %d AND meta_key = %s LIMIT 1",
+					$suffixed_post_id,
+					WP_Sync_Post_Meta_Storage::SYNC_UPDATE_META_KEY
+				)
+			),
+			'Existing duplicate updates must not be deleted by the smaller first-access fix.'
 		);
 	}
 }

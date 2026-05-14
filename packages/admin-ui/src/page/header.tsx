@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { Stack } from '@wordpress/ui';
+import { Stack, Text } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -30,12 +30,13 @@ export default function Header( {
 } ) {
 	const HeadingTag = `h${ headingLevel }` as const;
 	return (
-		<Stack
-			direction="column"
-			className={ styles.header }
-			render={ <header /> }
-		>
-			<Stack direction="row" justify="space-between" gap="sm">
+		<Stack direction="column" className={ styles.header }>
+			<Stack
+				className={ styles[ 'header-content' ] }
+				direction="row"
+				gap="sm"
+				justify="space-between"
+			>
 				<Stack direction="row" gap="sm" align="center" justify="start">
 					{ showSidebarToggle && (
 						<SidebarToggleSlot
@@ -52,25 +53,36 @@ export default function Header( {
 						</div>
 					) }
 					{ title && (
-						<HeadingTag className={ styles[ 'header-title' ] }>
+						<Text
+							className={ styles[ 'header-title' ] }
+							render={ <HeadingTag /> }
+							variant="heading-lg"
+						>
 							{ title }
-						</HeadingTag>
+						</Text>
 					) }
 					{ breadcrumbs }
 					{ badges }
 				</Stack>
-				<Stack
-					direction="row"
-					gap="sm"
-					style={ { width: 'auto', flexShrink: 0 } }
-					className={ styles[ 'header-actions' ] }
-					align="center"
-				>
-					{ actions }
-				</Stack>
+				{ actions && (
+					<Stack
+						align="center"
+						className={ styles[ 'header-actions' ] }
+						direction="row"
+						gap="sm"
+					>
+						{ actions }
+					</Stack>
+				) }
 			</Stack>
 			{ subTitle && (
-				<p className={ styles[ 'header-subtitle' ] }>{ subTitle }</p>
+				<Text
+					render={ <p /> }
+					variant="body-md"
+					className={ styles[ 'header-subtitle' ] }
+				>
+					{ subTitle }
+				</Text>
 			) }
 		</Stack>
 	);

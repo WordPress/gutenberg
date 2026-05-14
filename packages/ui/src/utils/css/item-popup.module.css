@@ -13,7 +13,7 @@
 		min-width: var(--anchor-width);
 		max-width: var(--available-width);
 		border-radius: var(--wpds-border-radius-md);
-		border: 1px solid var(--wpds-color-stroke-surface-neutral);
+		border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
 		box-shadow: var(--wpds-elevation-md);
 		background-color: var(--wpds-color-bg-surface-neutral-strong);
 		font-family: var(--wpds-typography-font-family-body);
@@ -45,7 +45,7 @@
 		padding-block: var(--wp-ui-popup-padding);
 
 		.list-scrollable-container:not(:empty) + & {
-			border-block-start: 1px solid var(--wpds-color-stroke-surface-neutral);
+			border-block-start: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
 		}
 	}
 
@@ -59,7 +59,6 @@
 		align-items: center;
 		justify-content: flex-start;
 		gap: var(--wpds-dimension-gap-xs);
-		cursor: var(--wpds-cursor-control);
 		min-height: var(--wp-ui-popup-item-height);
 		border-radius: var(--wpds-border-radius-sm);
 		user-select: none;
@@ -69,6 +68,10 @@
 		/* Optically adjust the prefix icon to a more balanced position. */
 		padding-inline-start: calc(var(--wp-ui-popup-item-padding-inline) - 4px);
 		padding-inline-end: var(--wp-ui-popup-item-padding-inline);
+
+		&:not([data-disabled]) {
+			cursor: var(--wpds-cursor-control);
+		}
 
 		&.is-size-compact {
 			--wp-ui-popup-item-height: 32px;
@@ -90,6 +93,7 @@
 		&[data-highlighted]:not([aria-disabled="true"]) {
 			background-color: var(--wpds-color-bg-interactive-brand-weak-active);
 			color: var(--wpds-color-fg-interactive-neutral);
+			outline: none; /* Disable user agent focus ring */
 
 			@media ( forced-colors: active ) {
 				outline: 1px solid Highlight;

@@ -36,7 +36,7 @@ Wraps the heading and panel in one unit. ([Source](https://github.com/WordPress/
 -	**Category:** design
 -	**Parent:** core/accordion
 -	**Allowed Blocks:** core/accordion-heading, core/accordion-panel
--	**Supports:** color (background, gradients, text), contentRole, interactivity, layout (~~allowEditing~~), shadow, spacing (blockGap, margin), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** color (background, gradients, text), contentRole, interactivity, layout (~~allowEditing~~), shadow, spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** openByDefault
 
 ## Accordion Panel
@@ -418,7 +418,7 @@ Create a link that always points to the homepage of the site. Usually not necess
 -	**Category:** design
 -	**Parent:** core/navigation
 -	**Supports:** anchor, interactivity (clientNavigation), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
--	**Attributes:** label
+-	**Attributes:** description, label, opensInNewTab
 
 ## Custom HTML
 

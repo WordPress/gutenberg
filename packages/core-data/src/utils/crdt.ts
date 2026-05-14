@@ -21,10 +21,11 @@ import {
  */
 import { BaseAwareness } from '../awareness/base-awareness';
 import {
+	type Block,
 	deserializeBlockAttributes,
 	mergeCrdtBlocks,
+	type MergeCursorPosition,
 	mergeRichTextUpdate,
-	type Block,
 	type YBlock,
 	type YBlocks,
 } from './crdt-blocks';
@@ -37,6 +38,7 @@ import {
 	updateSelectionHistory,
 } from './crdt-selection';
 import {
+	asRichTextOffset,
 	createYMap,
 	getRootMap,
 	isYMap,
@@ -161,12 +163,13 @@ export function applyPostChangesToCRDTDoc(
 
 				// Block changes from typing are bundled with a 'selection' update.
 				// Pass the resulting cursor position to the mergeCrdtBlocks function.
-				const cursorPosition =
-					changes.selection?.selectionStart?.offset ?? null;
+				const newCursorPosition = parseCursorSelection(
+					changes.selection
+				);
 
 				// Merge blocks does not need `setValue` because it is operating on a
 				// Yjs type that is already in the Y.Doc.
-				mergeCrdtBlocks( currentBlocks, newValue, cursorPosition );
+				mergeCrdtBlocks( currentBlocks, newValue, newCursorPosition );
 				break;
 			}
 
@@ -258,6 +261,29 @@ export function applyPostChangesToCRDTDoc(
 			updateSelectionHistory( ydoc, selection );
 		}, 0 );
 	}
+}
+
+/**
+ * Only returns a selection object if it describes a selection within a block, with
+ * a cursor inside a RichText field associated with one of that block’s attributes.
+ *
+ * @param selection Selection object which might represent a selection within a block,
+ *                  within a RichText field associated with a particular attribute of
+ *                  that block, or none at all.
+ */
+function parseCursorSelection( selection?: WPSelection ): MergeCursorPosition {
+	const selectionStart = selection?.selectionStart;
+
+	return selectionStart?.clientId &&
+		selectionStart.attributeKey &&
+		'number' === typeof selectionStart.offset &&
+		Number.isInteger( selectionStart.offset )
+		? {
+				attributeKey: selectionStart.attributeKey,
+				clientId: selectionStart.clientId,
+				offset: asRichTextOffset( selectionStart.offset ),
+		  }
+		: null;
 }
 
 function defaultGetChangesFromCRDTDoc( crdtDoc: CRDTDoc ): ObjectData {
