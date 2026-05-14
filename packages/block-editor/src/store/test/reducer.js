@@ -42,7 +42,7 @@ import {
 	editedContentOnlySection,
 	withDerivedBlockEditingModes,
 	viewportModalClientIds,
-	selectedBlockStyleStates,
+	selectedBlockStyleState,
 } from '../reducer';
 import { getBlockOrder, getBlocks } from '../selectors';
 import { unlock } from '../../lock-unlock';
@@ -5816,28 +5816,45 @@ describe( 'state', () => {
 		} );
 	} );
 
-	describe( 'selectedBlockStyleStates', () => {
-		it( 'defaults to an empty object', () => {
-			const state = selectedBlockStyleStates( undefined, {} );
+	describe( 'selectedBlockStyleState', () => {
+		it( 'defaults to undefined', () => {
+			const state = selectedBlockStyleState( undefined, {} );
 
-			expect( state ).toEqual( {} );
+			expect( state ).toBeUndefined();
 		} );
 
 		it( 'stores a selected state for a block', () => {
-			const state = selectedBlockStyleStates( undefined, {
+			const state = selectedBlockStyleState( undefined, {
 				type: 'SET_SELECTED_BLOCK_STYLE_STATE',
 				clientId: 'client-1',
 				value: ':hover',
 			} );
 
 			expect( state ).toEqual( {
-				'client-1': ':hover',
+				clientId: 'client-1',
+				value: ':hover',
+			} );
+		} );
+
+		it( 'replaces the selected state when another block is selected', () => {
+			const state = selectedBlockStyleState(
+				{ clientId: 'client-1', value: ':hover' },
+				{
+					type: 'SET_SELECTED_BLOCK_STYLE_STATE',
+					clientId: 'client-2',
+					value: ':focus',
+				}
+			);
+
+			expect( state ).toEqual( {
+				clientId: 'client-2',
+				value: ':focus',
 			} );
 		} );
 
 		it( 'removes the selected state when default is selected', () => {
-			const state = selectedBlockStyleStates(
-				{ 'client-1': ':hover' },
+			const state = selectedBlockStyleState(
+				{ clientId: 'client-1', value: ':hover' },
 				{
 					type: 'SET_SELECTED_BLOCK_STYLE_STATE',
 					clientId: 'client-1',
@@ -5845,40 +5862,148 @@ describe( 'state', () => {
 				}
 			);
 
-			expect( state ).toEqual( {} );
+			expect( state ).toBeUndefined();
 		} );
 
-		it( 'removes states for removed blocks', () => {
-			const state = selectedBlockStyleStates(
-				{ 'client-1': ':hover', 'client-2': ':focus' },
+		it( 'clears the selected state when clientId is missing', () => {
+			const state = selectedBlockStyleState(
+				{ clientId: 'client-1', value: ':hover' },
+				{
+					type: 'SET_SELECTED_BLOCK_STYLE_STATE',
+					value: ':focus',
+				}
+			);
+
+			expect( state ).toBeUndefined();
+		} );
+
+		it( 'clears the selected state when value is missing', () => {
+			const state = selectedBlockStyleState(
+				{ clientId: 'client-1', value: ':hover' },
+				{
+					type: 'SET_SELECTED_BLOCK_STYLE_STATE',
+					clientId: 'client-1',
+				}
+			);
+
+			expect( state ).toBeUndefined();
+		} );
+
+		it( 'keeps the selected state when the same block is selected', () => {
+			const originalState = { clientId: 'client-1', value: ':hover' };
+			const state = selectedBlockStyleState( originalState, {
+				type: 'SELECT_BLOCK',
+				clientId: 'client-1',
+			} );
+
+			expect( state ).toBe( originalState );
+		} );
+
+		it( 'clears the selected state when another block is selected', () => {
+			const state = selectedBlockStyleState(
+				{ clientId: 'client-1', value: ':hover' },
+				{
+					type: 'SELECT_BLOCK',
+					clientId: 'client-2',
+				}
+			);
+
+			expect( state ).toBeUndefined();
+		} );
+
+		it( 'keeps the selected state for selection changes in the same block', () => {
+			const originalState = { clientId: 'client-1', value: ':hover' };
+			const state = selectedBlockStyleState( originalState, {
+				type: 'SELECTION_CHANGE',
+				clientId: 'client-1',
+			} );
+
+			expect( state ).toBe( originalState );
+		} );
+
+		it( 'clears the selected state for selection changes in another block', () => {
+			const state = selectedBlockStyleState(
+				{ clientId: 'client-1', value: ':hover' },
+				{
+					type: 'SELECTION_CHANGE',
+					clientId: 'client-2',
+				}
+			);
+
+			expect( state ).toBeUndefined();
+		} );
+
+		it( 'keeps the selected state when selection resets to the same block', () => {
+			const originalState = { clientId: 'client-1', value: ':hover' };
+			const state = selectedBlockStyleState( originalState, {
+				type: 'RESET_SELECTION',
+				selectionStart: { clientId: 'client-1' },
+			} );
+
+			expect( state ).toBe( originalState );
+		} );
+
+		it( 'clears the selected state when selection resets to another block', () => {
+			const state = selectedBlockStyleState(
+				{ clientId: 'client-1', value: ':hover' },
+				{
+					type: 'RESET_SELECTION',
+					selectionStart: { clientId: 'client-2' },
+				}
+			);
+
+			expect( state ).toBeUndefined();
+		} );
+
+		it( 'clears the selected state when the selection is cleared', () => {
+			const state = selectedBlockStyleState(
+				{ clientId: 'client-1', value: ':hover' },
+				{
+					type: 'CLEAR_SELECTED_BLOCK',
+				}
+			);
+
+			expect( state ).toBeUndefined();
+		} );
+
+		it( 'clears the selected state when multiple blocks are selected', () => {
+			const state = selectedBlockStyleState(
+				{ clientId: 'client-1', value: ':hover' },
+				{
+					type: 'MULTI_SELECT',
+				}
+			);
+
+			expect( state ).toBeUndefined();
+		} );
+
+		it( 'clears the selected state when the block is removed', () => {
+			const state = selectedBlockStyleState(
+				{ clientId: 'client-1', value: ':hover' },
 				{
 					type: 'REMOVE_BLOCKS',
 					clientIds: [ 'client-1' ],
 				}
 			);
 
-			expect( state ).toEqual( {
-				'client-2': ':focus',
-			} );
+			expect( state ).toBeUndefined();
 		} );
 
-		it( 'removes states for replaced blocks', () => {
-			const state = selectedBlockStyleStates(
-				{ 'client-1': ':hover', 'client-2': ':focus' },
+		it( 'clears the selected state when the block is replaced', () => {
+			const state = selectedBlockStyleState(
+				{ clientId: 'client-2', value: ':focus' },
 				{
 					type: 'REPLACE_BLOCKS',
 					clientIds: [ 'client-2' ],
 				}
 			);
 
-			expect( state ).toEqual( {
-				'client-1': ':hover',
-			} );
+			expect( state ).toBeUndefined();
 		} );
 
-		it( 'removes states for blocks missing after reset', () => {
-			const state = selectedBlockStyleStates(
-				{ 'client-1': ':hover', 'client-2': ':focus' },
+		it( 'clears the selected state when the block is missing after reset', () => {
+			const state = selectedBlockStyleState(
+				{ clientId: 'client-1', value: ':hover' },
 				{
 					type: 'RESET_BLOCKS',
 					blocks: [
@@ -5890,9 +6015,22 @@ describe( 'state', () => {
 				}
 			);
 
-			expect( state ).toEqual( {
-				'client-2': ':focus',
+			expect( state ).toBeUndefined();
+		} );
+
+		it( 'keeps the selected state when the block exists after reset', () => {
+			const originalState = { clientId: 'client-2', value: ':focus' };
+			const state = selectedBlockStyleState( originalState, {
+				type: 'RESET_BLOCKS',
+				blocks: [
+					{
+						clientId: 'client-2',
+						innerBlocks: [],
+					},
+				],
 			} );
+
+			expect( state ).toBe( originalState );
 		} );
 	} );
 

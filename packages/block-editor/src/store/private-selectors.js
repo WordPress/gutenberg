@@ -1062,5 +1062,9 @@ export function getRequestedInspectorTab( state ) {
  * @return {string} The selected block style state.
  */
 export function getSelectedBlockStyleState( state, clientId ) {
-	return state.selectedBlockStyleStates?.[ clientId ] ?? 'default';
+	if ( state.selectedBlockStyleState?.clientId !== clientId ) {
+		return 'default';
+	}
+
+	return state.selectedBlockStyleState.value ?? 'default';
 }

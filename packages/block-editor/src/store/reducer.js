@@ -2259,7 +2259,7 @@ export function listViewContentPanelOpen( state = false, action ) {
  * @param {Object|null} state  Current state.
  * @param {Object}      action Dispatched action.
  *
- * @return {Object|null} Updated state.
+ * @return {Object|undefined} Updated state.
  */
 export function requestedInspectorTab( state = null, action ) {
 	switch ( action.type ) {
@@ -2276,70 +2276,75 @@ export function requestedInspectorTab( state = null, action ) {
 }
 
 /**
- * Reducer tracking selected pseudo-states for block style controls.
+ * Reducer tracking the selected pseudo-state for block style controls.
  *
  * @param {Object} state  Current state.
  * @param {Object} action Dispatched action.
  *
- * @return {Object} Updated state.
+ * @return {Object|null} Updated state.
  */
-export function selectedBlockStyleStates( state = {}, action ) {
+export function selectedBlockStyleState( state = undefined, action ) {
 	switch ( action.type ) {
 		case 'SET_SELECTED_BLOCK_STYLE_STATE': {
-			if ( ! action.clientId ) {
-				return state;
-			}
-
-			if ( ! action.value || action.value === 'default' ) {
-				if ( ! Object.hasOwn( state, action.clientId ) ) {
-					return state;
-				}
-				const nextState = { ...state };
-				delete nextState[ action.clientId ];
-				return nextState;
-			}
-
-			if ( state[ action.clientId ] === action.value ) {
-				return state;
+			if (
+				! action.clientId ||
+				! action.value ||
+				action.value === 'default'
+			) {
+				return undefined;
 			}
 
 			return {
-				...state,
-				[ action.clientId ]: action.value,
+				clientId: action.clientId,
+				value: action.value,
 			};
 		}
 
-		case 'REMOVE_BLOCKS':
-		case 'REPLACE_BLOCKS': {
-			if ( ! action.clientIds?.length ) {
-				return state;
+		case 'SELECT_BLOCK':
+		case 'SELECTION_CHANGE': {
+			if ( state?.clientId && state.clientId !== action.clientId ) {
+				return undefined;
 			}
 
-			let hasChanges = false;
-			const nextState = { ...state };
-			action.clientIds.forEach( ( clientId ) => {
-				if ( Object.hasOwn( nextState, clientId ) ) {
-					delete nextState[ clientId ];
-					hasChanges = true;
-				}
-			} );
+			break;
+		}
 
-			return hasChanges ? nextState : state;
+		case 'RESET_SELECTION': {
+			if (
+				state?.clientId &&
+				state.clientId !== action.selectionStart?.clientId
+			) {
+				return undefined;
+			}
+
+			break;
+		}
+
+		case 'CLEAR_SELECTED_BLOCK':
+		case 'MULTI_SELECT':
+			return undefined;
+
+		case 'REMOVE_BLOCKS':
+		case 'REPLACE_BLOCKS': {
+			if (
+				state?.clientId &&
+				action.clientIds?.includes( state.clientId )
+			) {
+				return undefined;
+			}
+
+			break;
 		}
 
 		case 'RESET_BLOCKS': {
-			const clientIds = getFlattenedClientIds( action.blocks );
-			let hasChanges = false;
-			const nextState = { ...state };
+			if (
+				state?.clientId &&
+				! getFlattenedClientIds( action.blocks )[ state.clientId ]
+			) {
+				return undefined;
+			}
 
-			Object.keys( nextState ).forEach( ( clientId ) => {
-				if ( ! clientIds[ clientId ] ) {
-					delete nextState[ clientId ];
-					hasChanges = true;
-				}
-			} );
-
-			return hasChanges ? nextState : state;
+			break;
 		}
 	}
 
@@ -2381,7 +2386,7 @@ const combinedReducers = combineReducers( {
 	listViewExpandRevision,
 	listViewContentPanelOpen,
 	requestedInspectorTab,
-	selectedBlockStyleStates,
+	selectedBlockStyleState,
 } );
 
 /**
