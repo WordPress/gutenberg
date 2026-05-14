@@ -91,8 +91,8 @@ export function getNoteExcerpt( text, excerptLength = 10 ) {
 }
 
 /**
- * Normalizes noteId metadata to always return an array.
- * Handles both scalar (legacy) and array (new) noteId values.
+ * Normalizes noteId metadata to always return an array of numeric ids.
+ * Handles both scalar (legacy, possibly string-typed) and array (new) values.
  *
  * @param {Object} metadata Block metadata object
  * @return {number[]} Array of note IDs (may be empty)
@@ -101,12 +101,20 @@ export function getNoteIdsFromMetadata( metadata ) {
 	if ( ! metadata || metadata.noteId === null ) {
 		return [];
 	}
-	// New format: noteId is an array.
-	if ( Array.isArray( metadata.noteId ) ) {
-		return metadata.noteId.filter( Boolean );
+	const raw = Array.isArray( metadata.noteId )
+		? metadata.noteId
+		: [ metadata.noteId ];
+	const ids = [];
+	for ( const value of raw ) {
+		if ( ! value ) {
+			continue;
+		}
+		const id = Number( value );
+		if ( Number.isFinite( id ) && id > 0 ) {
+			ids.push( id );
+		}
 	}
-	// Legacy format: noteId is a scalar.
-	return metadata.noteId ? [ metadata.noteId ] : [];
+	return ids;
 }
 
 /**
@@ -119,15 +127,13 @@ export function getNoteIdsFromMetadata( metadata ) {
  */
 export function addNoteIdToMetadata( metadata, noteId ) {
 	const existingIds = getNoteIdsFromMetadata( metadata );
-	// Compare as strings so a string-typed legacy id (e.g. '5') and a numeric
-	// id (5) are treated as duplicates.
-	const noteIdKey = String( noteId );
-	if ( existingIds.some( ( id ) => String( id ) === noteIdKey ) ) {
+	const id = Number( noteId );
+	if ( existingIds.includes( id ) ) {
 		return metadata;
 	}
 	return {
 		...metadata,
-		noteId: [ ...existingIds, noteId ],
+		noteId: [ ...existingIds, id ],
 	};
 }
 
@@ -154,10 +160,8 @@ export function pickPrimaryNote( threads ) {
  */
 export function removeNoteIdFromMetadata( metadata, noteId ) {
 	const existingIds = getNoteIdsFromMetadata( metadata );
-	// Compare as strings so a string-typed legacy id (e.g. '5') matches a
-	// numeric id (5) when removing.
-	const noteIdKey = String( noteId );
-	const newIds = existingIds.filter( ( id ) => String( id ) !== noteIdKey );
+	const id = Number( noteId );
+	const newIds = existingIds.filter( ( existing ) => existing !== id );
 	return {
 		...metadata,
 		noteId: newIds.length > 0 ? newIds : undefined,

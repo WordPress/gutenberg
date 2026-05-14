@@ -43,10 +43,14 @@ describe( 'getNoteIdsFromMetadata', () => {
 		expect( getNoteIdsFromMetadata( { noteId: 42 } ) ).toEqual( [ 42 ] );
 	} );
 
-	it( 'handles string noteId (legacy format)', () => {
-		expect( getNoteIdsFromMetadata( { noteId: '42' } ) ).toEqual( [
-			'42',
-		] );
+	it( 'coerces a string-typed legacy noteId to a number', () => {
+		expect( getNoteIdsFromMetadata( { noteId: '42' } ) ).toEqual( [ 42 ] );
+	} );
+
+	it( 'drops non-numeric and non-positive ids', () => {
+		expect(
+			getNoteIdsFromMetadata( { noteId: [ 1, 'abc', -3, 2 ] } )
+		).toEqual( [ 1, 2 ] );
 	} );
 
 	it( 'returns array from array noteId', () => {
