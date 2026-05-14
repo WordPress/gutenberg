@@ -2666,6 +2666,192 @@ describe( 'DistributedEditingStatusSurface', () => {
 		).not.toBeInTheDocument();
 	} );
 
+	it( 'renders fresh-review retry-save success without proof internals', () => {
+		const noticeDescriptors =
+			getDistributedEditingNoticeDescriptorsForSessionState( {
+				retrySaveStatus: DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVED,
+				retrySaveAccepted: true,
+				retrySaveServerVersion: '13',
+				retrySavePreviousServerVersion: '12',
+				retrySaveSavesPost: true,
+				retrySaveMutatesPostContent: true,
+				retrySaveCreatesRevision: true,
+				retrySaveClaimsSaved: true,
+				retrySaveRevisionCreated: true,
+				retrySaveCreatedRevisionIds: [ 9013 ],
+				retrySaveFreshReviewConsumeValidationAccepted: true,
+				retrySaveFreshReviewDecisionConsumptionValidated: true,
+				retrySaveFreshReviewReviewedBlockItemCount: 1,
+				retrySaveFreshReviewRequestRecordId: 'fresh-review-request-123',
+				retrySaveFreshReviewProposedContentHash:
+					'0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef',
+				rawContent: '<script>fresh-review-success-raw</script>',
+				proofSignature: 'fresh-review-success-proof',
+				reviewerUserId: 7,
+			} );
+		const surfaceItems =
+			getDistributedEditingStatusSurfaceItems( noticeDescriptors );
+
+		render(
+			<DistributedEditingStatusSurface
+				noticeDescriptors={ noticeDescriptors }
+			/>
+		);
+
+		expect(
+			screen.getByText( 'Fresh-review retry save confirmed' )
+		).toBeVisible();
+		expect(
+			screen.getByText(
+				'Server confirmed the fresh-review retry-save, advanced the sync version from 12 to 13, and recorded 1 revision. Protected local changes are no longer pending for this save.'
+			)
+		).toBeVisible();
+		expect(
+			screen.queryByRole( 'button', { name: /Export|Refresh|Save/i } )
+		).not.toBeInTheDocument();
+		expect( JSON.stringify( surfaceItems ) ).not.toMatch(
+			/fresh-review-request-123|0123456789abcdef|fresh-review-success-raw|fresh-review-success-proof|reviewerUserId/i
+		);
+	} );
+
+	it( 'renders fresh-review retry-save rejections with export and refetch protection', () => {
+		const cases = [
+			{
+				disposition:
+					DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+				reasonCode:
+					DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+				retrySaveStatus:
+					DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.STALE_BASE_REJECTED,
+				title: 'Fresh-review retry save stale',
+				message:
+					'The server changed after fresh review was validated. Protected local changes are still exportable; refresh the server version before trying again.',
+				refetch: true,
+			},
+			{
+				disposition:
+					DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_PERMISSION_DENIED,
+				reasonCode: DISTRIBUTED_EDITING_REASON_CODES.REST_CANNOT_EDIT,
+				retrySaveStatus:
+					DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_PERMISSION_DENIED,
+				title: 'Fresh-review retry save needs permission',
+				message:
+					'Permission changed before the reviewed changes could be saved. Protected local changes are still exportable for another fresh review or a later retry.',
+			},
+			{
+				disposition:
+					DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_FEATURE_DISABLED,
+				reasonCode:
+					DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_FEATURE_DISABLED,
+				retrySaveStatus:
+					DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_FEATURE_DISABLED,
+				title: 'Fresh-review retry save disabled',
+				message:
+					'Distributed Editing was disabled before the reviewed changes could be saved. Protected local changes are still exportable for a later retry.',
+			},
+			{
+				disposition:
+					DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_ROUTE_MISMATCH,
+				reasonCode:
+					DISTRIBUTED_EDITING_REASON_CODES.REST_POST_INVALID_ID,
+				retrySaveStatus:
+					DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_ROUTE_MISMATCH,
+				title: 'Fresh-review retry save route changed',
+				message:
+					'The reviewed retry-save request targeted a different post route than this editor. Protected local changes are still exportable; reload only after exporting them.',
+			},
+			{
+				disposition:
+					DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_SYNC_META_TAMPERED,
+				reasonCode:
+					DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_SYNC_META_TAMPERED,
+				retrySaveStatus:
+					DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_SYNC_META_TAMPERED,
+				title: 'Fresh-review retry save proof rejected',
+				message:
+					'The server rejected the reviewed retry-save proof before saving. Protected local changes are still exportable for a new review; no normal save fallback was used.',
+			},
+			{
+				disposition:
+					DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_MALFORMED_SYNC_PAYLOAD,
+				reasonCode:
+					DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_MALFORMED_SYNC_PAYLOAD,
+				retrySaveStatus:
+					DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_MALFORMED_SYNC_PAYLOAD,
+				title: 'Fresh-review retry save payload rejected',
+				message:
+					'The reviewed retry-save payload was incomplete or malformed. Protected local changes are still exportable for a new review before trying again.',
+			},
+		];
+		const onAction = jest.fn();
+		const renderStatus = ( statusCase ) => {
+			const noticeDescriptors =
+				getDistributedEditingNoticeDescriptorsForSessionState( {
+					disposition: statusCase.disposition,
+					reasonCode: statusCase.reasonCode,
+					pendingChangeCount: 1,
+					hasPendingChanges: true,
+					canExportLocalUpdates: true,
+					requiresServerStateRefetch: Boolean( statusCase.refetch ),
+					retrySaveStatus: statusCase.retrySaveStatus,
+					retrySaveReason: statusCase.reasonCode,
+					retrySaveFreshReviewConsumeValidationAccepted: true,
+					retrySaveFreshReviewDecisionConsumptionValidated: true,
+					retrySaveFreshReviewReviewedBlockItemCount: 1,
+					retrySaveFreshReviewRequestRecordId:
+						'fresh-review-request-123',
+					retrySaveFreshReviewProposedContentHash:
+						'abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789',
+					rawContent: '<script>fresh-review-rejected-raw</script>',
+					proofSignature: 'fresh-review-rejected-proof',
+					reviewerUserId: 7,
+				} );
+
+			expect(
+				JSON.stringify(
+					getDistributedEditingStatusSurfaceItems( noticeDescriptors )
+				)
+			).not.toMatch(
+				/fresh-review-request-123|abcdef0123456789|fresh-review-rejected-raw|fresh-review-rejected-proof|reviewerUserId/i
+			);
+
+			return (
+				<DistributedEditingStatusSurface
+					noticeDescriptors={ noticeDescriptors }
+					onAction={ onAction }
+				/>
+			);
+		};
+
+		const { rerender } = render( renderStatus( cases[ 0 ] ) );
+
+		for ( const statusCase of cases ) {
+			rerender( renderStatus( statusCase ) );
+			expect( screen.getByText( statusCase.title ) ).toBeVisible();
+			expect( screen.getByText( statusCase.message ) ).toBeVisible();
+			expect(
+				screen.getByRole( 'button', {
+					name: 'Export for fresh review',
+				} )
+			).toBeVisible();
+			expect(
+				screen.queryByText(
+					/fresh-review-rejected-raw|fresh-review-rejected-proof|reviewerUserId|reviewed_block_items/i
+				)
+			).not.toBeInTheDocument();
+			expect(
+				screen.queryByRole( 'button', { name: /^Save$/i } )
+			).not.toBeInTheDocument();
+		}
+
+		rerender( renderStatus( cases[ 0 ] ) );
+		expect(
+			screen.getAllByRole( 'button', {
+				name: 'Refresh server version',
+			} ).length
+		).toBeGreaterThan( 0 );
+	} );
+
 	it( 'renders the internal fresh-review decision panel with approve and reject controls', async () => {
 		const user = userEvent.setup();
 		const actions = setupDistributedEditingStatusDispatch();

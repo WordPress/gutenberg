@@ -5408,6 +5408,10 @@ export function getDistributedEditingSessionStateForRetrySaveResult(
 		} );
 	}
 
+	const hasFreshReviewConsumeValidation = Boolean(
+		retrySaveFreshReviewConsumeValidationFields.retrySaveFreshReviewConsumeValidationAccepted ||
+			retrySaveFreshReviewConsumeValidationFields.retrySaveFreshReviewDecisionConsumptionValidated
+	);
 	const reasonCode =
 		result === 'retry_save_applied'
 			? DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_MALFORMED_SYNC_PAYLOAD
@@ -5435,7 +5439,8 @@ export function getDistributedEditingSessionStateForRetrySaveResult(
 			responseData
 		);
 	const retrySaveReviewApprovalProofFields =
-		opaqueReviewApprovalProofTokenRejectionDetail
+		opaqueReviewApprovalProofTokenRejectionDetail ||
+		hasFreshReviewConsumeValidation
 			? normalizeRetrySaveReviewApprovalProofFields()
 			: getRetrySaveReviewApprovalProofFieldsFromResponseOrError(
 					responseOrError,
@@ -5444,6 +5449,7 @@ export function getDistributedEditingSessionStateForRetrySaveResult(
 			  );
 	const hasAcceptedReviewApprovalProof = Boolean(
 		! opaqueReviewApprovalProofTokenRejectionDetail &&
+			! hasFreshReviewConsumeValidation &&
 			( responseOrError.reviewApprovalProofAccepted ||
 				responseOrError.review_approval_proof_accepted ||
 				responseOrError.acceptedReviewApprovalProofAvailable ||
@@ -6040,6 +6046,21 @@ function getDistributedEditingRetrySaveDescriptorFields( normalized ) {
 	const retrySaveReviewRequired =
 		normalized.retrySaveStatus ===
 		DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_UNFILTERED_HTML_REVIEW_REQUIRED;
+	const retrySaveFreshReviewConsumed = Boolean(
+		normalized.retrySaveFreshReviewConsumeValidationAccepted ||
+			normalized.retrySaveFreshReviewDecisionConsumptionValidated
+	);
+	const retrySaveFreshReviewRetrySaveAccepted =
+		retrySaveFreshReviewConsumed &&
+		normalized.retrySaveStatus ===
+			DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVED;
+	const retrySaveFreshReviewRetrySaveRejected =
+		retrySaveFreshReviewConsumed &&
+		! [
+			DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.NONE,
+			DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVING,
+			DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVED,
+		].includes( normalized.retrySaveStatus );
 	const retrySaveRequiresUnfilteredHtmlSaver =
 		normalized.retrySaveRequiresUnfilteredHtmlSaver ||
 		( normalized.retrySaveStatus ===
@@ -6068,6 +6089,13 @@ function getDistributedEditingRetrySaveDescriptorFields( normalized ) {
 		retrySaveClaimsSaved: normalized.retrySaveClaimsSaved,
 		retrySaveRevisionCreated: normalized.retrySaveRevisionCreated,
 		retrySaveCreatedRevisionIds: normalized.retrySaveCreatedRevisionIds,
+		retrySaveFreshReviewConsumed,
+		retrySaveFreshReviewRetrySaveAccepted,
+		retrySaveFreshReviewRetrySaveRejected,
+		retrySaveFreshReviewReviewedBlockItemCount:
+			normalized.retrySaveFreshReviewReviewedBlockItemCount,
+		retrySaveFreshReviewRequiresFreshReview:
+			retrySaveFreshReviewRetrySaveRejected,
 		reviewTokenRecoveryStatus: normalized.reviewTokenRecoveryStatus,
 		reviewTokenRecoveryReason: normalized.reviewTokenRecoveryReason,
 		reviewTokenRecoveryRequiresFreshReview:

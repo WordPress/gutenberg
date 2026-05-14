@@ -1582,6 +1582,16 @@ function getDistributedEditingStatusSurfaceItem( descriptor ) {
 				...getRetrySaveStatusText( descriptor ),
 				retrySaveReviewRequired: descriptor.retrySaveReviewRequired,
 				retrySaveStatus: descriptor.retrySaveStatus,
+				retrySaveFreshReviewConsumed:
+					descriptor.retrySaveFreshReviewConsumed,
+				retrySaveFreshReviewRetrySaveAccepted:
+					descriptor.retrySaveFreshReviewRetrySaveAccepted,
+				retrySaveFreshReviewRetrySaveRejected:
+					descriptor.retrySaveFreshReviewRetrySaveRejected,
+				retrySaveFreshReviewReviewedBlockItemCount:
+					descriptor.retrySaveFreshReviewReviewedBlockItemCount,
+				retrySaveFreshReviewRequiresFreshReview:
+					descriptor.retrySaveFreshReviewRequiresFreshReview,
 				reviewTokenRecoveryStatus: descriptor.reviewTokenRecoveryStatus,
 				reviewTokenRecoveryReason: descriptor.reviewTokenRecoveryReason,
 				reviewTokenRecoveryRequiresFreshReview:
@@ -1772,6 +1782,9 @@ function getActionLabel( actionKey, item ) {
 		case DISTRIBUTED_EDITING_NOTICE_ACTIONS.ACCEPT_SERVER_STATE:
 			return __( 'Accept server version' );
 		case DISTRIBUTED_EDITING_NOTICE_ACTIONS.EXPORT_LOCAL_UPDATES:
+			if ( isRetrySaveFreshReviewRetrySaveRejectedItem( item ) ) {
+				return __( 'Export for fresh review' );
+			}
 			if ( isRetrySaveFreshReviewRequiredItem( item ) ) {
 				return __( 'Export for fresh review' );
 			}
@@ -1799,6 +1812,12 @@ function getActionLabel( actionKey, item ) {
 }
 
 function getExportSuccessMessage( item ) {
+	if ( isRetrySaveFreshReviewRetrySaveRejectedItem( item ) ) {
+		return __(
+			'Fresh-review handoff copied. Keep this copy until the server version is refreshed or a new review can be completed.'
+		);
+	}
+
 	if ( isRetrySaveFreshReviewRequiredItem( item ) ) {
 		return __(
 			'Fresh-review handoff copied. Send it to an admin reviewer; local changes remain protected until a new review proof is issued.'
@@ -2013,6 +2032,12 @@ function getLocalUpdatesImportReviewRequestMessage( descriptor ) {
 }
 
 function getRefetchSuccessMessage( item ) {
+	if ( isRetrySaveFreshReviewRetrySaveItem( item ) ) {
+		return __(
+			'Server version refreshed for fresh-review retry save. Protected local changes remain in this editor session and can still be exported before retrying.'
+		);
+	}
+
 	if ( isRetrySaveReviewRequiredItem( item ) ) {
 		return __(
 			'Server version refreshed for HTML review. Protected local changes remain in this editor session and can still be exported before retrying.'
@@ -2037,6 +2062,23 @@ function isRetrySaveFreshReviewRequiredItem( item ) {
 		item?.reviewTokenRecoveryRequiresFreshReview ||
 		item?.reviewTokenRecoveryStatus ===
 			DISTRIBUTED_EDITING_REVIEW_TOKEN_RECOVERY_STATUSES.FRESH_REVIEW_REQUIRED
+	);
+}
+
+function isRetrySaveFreshReviewRetrySaveItem( item ) {
+	return Boolean(
+		item?.retrySaveFreshReviewConsumed ||
+			item?.retrySaveFreshReviewConsumeValidationAccepted ||
+			item?.retrySaveFreshReviewDecisionConsumptionValidated
+	);
+}
+
+function isRetrySaveFreshReviewRetrySaveRejectedItem( item ) {
+	return (
+		isRetrySaveFreshReviewRetrySaveItem( item ) &&
+		item?.retrySaveStatus !==
+			DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVING &&
+		item?.retrySaveStatus !== DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVED
 	);
 }
 
@@ -2233,6 +2275,14 @@ function getRetrySaveStatusText( descriptor ) {
 		return getRetrySaveHandoffBlockedText( descriptor );
 	}
 
+	if ( isRetrySaveFreshReviewRetrySaveItem( descriptor ) ) {
+		const freshReviewText = getFreshReviewRetrySaveStatusText( descriptor );
+
+		if ( freshReviewText ) {
+			return freshReviewText;
+		}
+	}
+
 	switch ( descriptor.retrySaveStatus ) {
 		case DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVING:
 			return {
@@ -2339,6 +2389,74 @@ function getRetrySaveStatusText( descriptor ) {
 	};
 }
 
+function getFreshReviewRetrySaveStatusText( descriptor ) {
+	switch ( descriptor.retrySaveStatus ) {
+		case DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVING:
+			return {
+				title: __( 'Fresh-review retry save in progress' ),
+				message: __(
+					'The editor is sending reviewed local changes through the guarded retry-save path. Keep this tab open; protected local changes remain exportable until the server confirms the save.'
+				),
+			};
+		case DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVED:
+			return {
+				title: __( 'Fresh-review retry save confirmed' ),
+				message: getFreshReviewRetrySaveConfirmedMessage( descriptor ),
+			};
+		case DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.STALE_BASE_REJECTED:
+			return {
+				title: __( 'Fresh-review retry save stale' ),
+				message: __(
+					'The server changed after fresh review was validated. Protected local changes are still exportable; refresh the server version before trying again.'
+				),
+			};
+		case DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_PERMISSION_DENIED:
+			return {
+				title: __( 'Fresh-review retry save needs permission' ),
+				message: __(
+					'Permission changed before the reviewed changes could be saved. Protected local changes are still exportable for another fresh review or a later retry.'
+				),
+			};
+		case DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_UNFILTERED_HTML_REVIEW_REQUIRED:
+			return {
+				title: __( 'Fresh-review retry save needs HTML review' ),
+				message: __(
+					'The server still requires HTML review before these changes can be saved. Protected local changes are exportable for a new review, or the server version can be refreshed before deciding how to continue.'
+				),
+			};
+		case DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_SYNC_META_TAMPERED:
+			return {
+				title: __( 'Fresh-review retry save proof rejected' ),
+				message: __(
+					'The server rejected the reviewed retry-save proof before saving. Protected local changes are still exportable for a new review; no normal save fallback was used.'
+				),
+			};
+		case DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_FEATURE_DISABLED:
+			return {
+				title: __( 'Fresh-review retry save disabled' ),
+				message: __(
+					'Distributed Editing was disabled before the reviewed changes could be saved. Protected local changes are still exportable for a later retry.'
+				),
+			};
+		case DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_ROUTE_MISMATCH:
+			return {
+				title: __( 'Fresh-review retry save route changed' ),
+				message: __(
+					'The reviewed retry-save request targeted a different post route than this editor. Protected local changes are still exportable; reload only after exporting them.'
+				),
+			};
+		case DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_MALFORMED_SYNC_PAYLOAD:
+			return {
+				title: __( 'Fresh-review retry save payload rejected' ),
+				message: __(
+					'The reviewed retry-save payload was incomplete or malformed. Protected local changes are still exportable for a new review before trying again.'
+				),
+			};
+	}
+
+	return null;
+}
+
 function isExpiredOpaqueReviewApprovalProofTokenRetrySave( descriptor ) {
 	return (
 		descriptor.retrySaveReason ===
@@ -2424,6 +2542,55 @@ function getRetrySaveConfirmedMessage( descriptor ) {
 
 	return __(
 		'Server confirmed the guarded retry-save. Protected local changes are no longer pending for this save.'
+	);
+}
+
+function getFreshReviewRetrySaveConfirmedMessage( descriptor ) {
+	const serverVersion = normalizeDisplayValue(
+		descriptor.retrySaveServerVersion
+	);
+	const previousServerVersion = normalizeDisplayValue(
+		descriptor.retrySavePreviousServerVersion
+	);
+	const revisionCount = getRetrySaveRevisionCount( descriptor );
+
+	if ( serverVersion && previousServerVersion && revisionCount > 0 ) {
+		return sprintf(
+			/* translators: 1: previous sync version, 2: saved sync version, 3: number of revisions. */
+			_n(
+				'Server confirmed the fresh-review retry-save, advanced the sync version from %1$s to %2$s, and recorded %3$d revision. Protected local changes are no longer pending for this save.',
+				'Server confirmed the fresh-review retry-save, advanced the sync version from %1$s to %2$s, and recorded %3$d revisions. Protected local changes are no longer pending for this save.',
+				revisionCount
+			),
+			previousServerVersion,
+			serverVersion,
+			revisionCount
+		);
+	}
+
+	if ( serverVersion && previousServerVersion ) {
+		return sprintf(
+			/* translators: 1: previous sync version, 2: saved sync version. */
+			__(
+				'Server confirmed the fresh-review retry-save and advanced the sync version from %1$s to %2$s. Protected local changes are no longer pending for this save.'
+			),
+			previousServerVersion,
+			serverVersion
+		);
+	}
+
+	if ( serverVersion ) {
+		return sprintf(
+			/* translators: %s: saved sync version. */
+			__(
+				'Server confirmed the fresh-review retry-save at sync version %s. Protected local changes are no longer pending for this save.'
+			),
+			serverVersion
+		);
+	}
+
+	return __(
+		'Server confirmed the fresh-review retry-save. Protected local changes are no longer pending for this save.'
 	);
 }
 

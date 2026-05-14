@@ -2100,6 +2100,143 @@ describe( 'distributed editing session state', () => {
 		} );
 	} );
 
+	it( 'describes fresh-review retry-save success and rejection without save fallback', () => {
+		const proposedPostContentHash =
+			'0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef';
+		const savedState = getDistributedEditingSessionStateForRetrySaveResult(
+			{
+				result: 'retry_save_applied',
+				retry_save_accepted: true,
+				previous_server_version: '12',
+				server_version: '13',
+				saves_post: true,
+				mutates_post_content: true,
+				creates_revision: true,
+				claims_saved: true,
+				revision_created: true,
+				created_revision_ids: [ 9013 ],
+				proof_signature: 'fresh-review-success-proof',
+				reviewer_user_id: 9,
+			},
+			{
+				pendingChangeCount: 1,
+				hasPendingChanges: true,
+				canExportLocalUpdates: true,
+				retrySaveFreshReviewConsumeValidationStatus:
+					'accepted_for_retry_save',
+				retrySaveFreshReviewConsumeValidationAccepted: true,
+				retrySaveFreshReviewDecisionConsumptionValidated: true,
+				retrySaveFreshReviewDecisionEligibleForRetrySave: true,
+				retrySaveFreshReviewRequestRecordId: 'fresh-review-request-123',
+				retrySaveFreshReviewClientBaseVersion: '7',
+				retrySaveFreshReviewServerVersion: '12',
+				retrySaveFreshReviewProposedContentHash:
+					proposedPostContentHash,
+				retrySaveFreshReviewReviewedProposedContentHash:
+					proposedPostContentHash,
+				retrySaveFreshReviewReviewedBlockItemCount: 1,
+			}
+		);
+		const savedDescriptor =
+			getDistributedEditingNoticeDescriptorsForSessionState(
+				savedState
+			).find(
+				( descriptor ) =>
+					descriptor.kind ===
+					DISTRIBUTED_EDITING_NOTICE_KINDS.RETRY_SAVE
+			);
+		const rejectedState =
+			getDistributedEditingSessionStateForRetrySaveResult(
+				{
+					code: DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+					data: {
+						reason_code:
+							DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+						result: 'stale_base_rejected',
+						server_version: '14',
+						pending_change_count: 1,
+						proof_signature: 'fresh-review-rejected-proof',
+						reviewer_user_id: 9,
+					},
+				},
+				{
+					pendingChangeCount: 1,
+					hasPendingChanges: true,
+					canExportLocalUpdates: true,
+					retrySaveFreshReviewConsumeValidationStatus:
+						'accepted_for_retry_save',
+					retrySaveFreshReviewConsumeValidationAccepted: true,
+					retrySaveFreshReviewDecisionConsumptionValidated: true,
+					retrySaveFreshReviewDecisionEligibleForRetrySave: true,
+					retrySaveFreshReviewRequestRecordId:
+						'fresh-review-request-123',
+					retrySaveFreshReviewClientBaseVersion: '7',
+					retrySaveFreshReviewServerVersion: '12',
+					retrySaveFreshReviewProposedContentHash:
+						proposedPostContentHash,
+					retrySaveFreshReviewReviewedProposedContentHash:
+						proposedPostContentHash,
+					retrySaveFreshReviewReviewedBlockItemCount: 1,
+				}
+			);
+		const rejectedDescriptor =
+			getDistributedEditingNoticeDescriptorsForSessionState(
+				rejectedState
+			).find(
+				( descriptor ) =>
+					descriptor.kind ===
+					DISTRIBUTED_EDITING_NOTICE_KINDS.RETRY_SAVE
+			);
+
+		expect( savedState ).toMatchObject( {
+			disposition: DISTRIBUTED_EDITING_DISPOSITIONS.IDLE,
+			pendingChangeCount: 0,
+			hasPendingChanges: false,
+			retrySaveStatus: DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVED,
+			retrySaveFreshReviewConsumeValidationAccepted: true,
+			retrySaveFreshReviewDecisionConsumptionValidated: true,
+			canExportLocalUpdates: false,
+		} );
+		expect( savedDescriptor ).toMatchObject( {
+			status: 'success',
+			priority: 'status',
+			retrySaveFreshReviewConsumed: true,
+			retrySaveFreshReviewRetrySaveAccepted: true,
+			retrySaveFreshReviewRetrySaveRejected: false,
+			retrySaveFreshReviewReviewedBlockItemCount: 1,
+			actionKeys: [],
+		} );
+		expect( rejectedState ).toMatchObject( {
+			disposition:
+				DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+			retrySaveStatus:
+				DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.STALE_BASE_REJECTED,
+			retrySaveFreshReviewConsumeValidationAccepted: true,
+			retrySaveFreshReviewDecisionConsumptionValidated: true,
+			canExportLocalUpdates: true,
+			retrySaveHandoffAllowsNormalSaveFallback: false,
+			retrySaveHandoffBlocksNormalSave: false,
+		} );
+		expect( rejectedDescriptor ).toMatchObject( {
+			status: 'warning',
+			priority: 'blocking',
+			retrySaveFreshReviewConsumed: true,
+			retrySaveFreshReviewRetrySaveAccepted: false,
+			retrySaveFreshReviewRetrySaveRejected: true,
+			retrySaveFreshReviewRequiresFreshReview: true,
+			actionKeys: expect.arrayContaining( [
+				DISTRIBUTED_EDITING_NOTICE_ACTIONS.EXPORT_LOCAL_UPDATES,
+				DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFETCH_SERVER_STATE,
+			] ),
+		} );
+		expect( JSON.stringify( savedDescriptor ) ).not.toMatch(
+			/fresh-review-success-proof|reviewer_user_id|raw_content/
+		);
+		expect( JSON.stringify( rejectedDescriptor ) ).not.toMatch(
+			/fresh-review-rejected-proof|reviewer_user_id|raw_content/
+		);
+	} );
+
 	it( 'normalizes retry-save unfiltered HTML review rejections as exportable manual review', () => {
 		const rawContentToken = 'raw-review-content-must-not-leak';
 		const proposedContentHash =
