@@ -3220,6 +3220,12 @@ describe( 'Post actions', () => {
 				retrySubmitCreatesRevision: false,
 				retrySubmitClaimsSaved: false,
 				canExportLocalUpdates: true,
+				actionTranscriptItemCount: 1,
+				actionTranscriptLatestEventType:
+					DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.RETRY_SUBMIT_PROOF_REFRESHED,
+				actionTranscriptEntriesRedacted: true,
+				actionTranscriptCallsSave: false,
+				actionTranscriptClaimsSaved: false,
 			} );
 		} );
 

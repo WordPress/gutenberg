@@ -107,6 +107,7 @@ export const DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES = Object.freeze(
 		LOCAL_EDITOR_ACTION: 'local_editor_action',
 		REMOTE_CHANGE_RECEIVED: 'remote_change_received',
 		SERVER_STATE_REFETCHED: 'server_state_refetched',
+		RETRY_SUBMIT_PROOF_REFRESHED: 'retry_submit_proof_refreshed',
 		SAVE_STATE_CHANGED: 'save_state_changed',
 		REVIEW_REQUIRED: 'review_required',
 	}
@@ -118,6 +119,8 @@ const DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_DEFINITIONS = Object.freeze( {
 	[ DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.REMOTE_CHANGE_RECEIVED ]:
 		Object.freeze( { source: 'remote' } ),
 	[ DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.SERVER_STATE_REFETCHED ]:
+		Object.freeze( { source: 'server' } ),
+	[ DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.RETRY_SUBMIT_PROOF_REFRESHED ]:
 		Object.freeze( { source: 'server' } ),
 	[ DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.SAVE_STATE_CHANGED ]:
 		Object.freeze( { source: 'editor' } ),

@@ -1876,20 +1876,41 @@ export const __experimentalRefreshDistributedEditingRetrySubmitProof =
 		try {
 			const response =
 				await requestDistributedEditingRetrySubmitProbe( requestArgs );
-
-			dispatch.setDistributedEditingSessionState(
+			const retrySubmitProofSessionState =
 				getDistributedEditingSessionStateForRetrySubmitProofResult(
 					response,
 					currentSessionState
+				);
+
+			dispatch.setDistributedEditingSessionState(
+				getDistributedEditingSessionStateWithActionTranscriptEvent(
+					retrySubmitProofSessionState,
+					{
+						eventType:
+							DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.RETRY_SUBMIT_PROOF_REFRESHED,
+						reasonCode:
+							retrySubmitProofSessionState.retrySubmitProofReason,
+					}
 				)
 			);
 
 			return response;
 		} catch ( error ) {
-			dispatch.setDistributedEditingSessionState(
+			const retrySubmitProofSessionState =
 				getDistributedEditingSessionStateForRetrySubmitProofResult(
 					error,
 					currentSessionState
+				);
+
+			dispatch.setDistributedEditingSessionState(
+				getDistributedEditingSessionStateWithActionTranscriptEvent(
+					retrySubmitProofSessionState,
+					{
+						eventType:
+							DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.RETRY_SUBMIT_PROOF_REFRESHED,
+						reasonCode:
+							retrySubmitProofSessionState.retrySubmitProofReason,
+					}
 				)
 			);
 

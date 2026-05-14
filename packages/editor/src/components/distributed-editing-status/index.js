@@ -2079,6 +2079,10 @@ function getActionTranscriptMessage( descriptor ) {
 			return __(
 				'WordPress refreshed server state and kept the activity record content-free.'
 			);
+		case DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.RETRY_SUBMIT_PROOF_REFRESHED:
+			return __(
+				'WordPress refreshed retry proof and kept the activity record content-free.'
+			);
 		case DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.SAVE_STATE_CHANGED:
 			return __(
 				'The editor Save state changed and the activity record stayed content-free.'

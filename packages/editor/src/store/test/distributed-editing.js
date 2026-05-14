@@ -319,12 +319,20 @@ describe( 'distributed editing session state', () => {
 						DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
 				}
 			);
+		sessionState =
+			getDistributedEditingSessionStateWithActionTranscriptEvent(
+				sessionState,
+				{
+					eventType:
+						DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.RETRY_SUBMIT_PROOF_REFRESHED,
+				}
+			);
 
 		expect( sessionState ).toMatchObject( {
-			actionTranscriptItemCount: 2,
+			actionTranscriptItemCount: 3,
 			actionTranscriptDroppedItemCount: 1,
 			actionTranscriptLatestEventType:
-				DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.SERVER_STATE_REFETCHED,
+				DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.RETRY_SUBMIT_PROOF_REFRESHED,
 			actionTranscriptHasLocalEvents: true,
 			actionTranscriptHasServerEvents: true,
 			actionTranscriptEntriesRedacted: true,
