@@ -1841,15 +1841,35 @@ export const __experimentalValidateDistributedEditingFreshReviewRetrySaveHandoff
 						response,
 						preparedSessionState
 					);
+				const nextSessionState =
+					getDistributedEditingSessionStateWithActionTranscriptEvent(
+						sessionState,
+						{
+							eventType:
+								DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.FRESH_REVIEW_CONSUME_VALIDATED,
+							reasonCode:
+								sessionState.localUpdatesImportFreshReviewRetrySaveHandoffReason,
+						}
+					);
 
-				dispatch.setDistributedEditingSessionState( sessionState );
+				dispatch.setDistributedEditingSessionState( nextSessionState );
 
 				return {
-					status: sessionState.localUpdatesImportFreshReviewRetrySaveHandoffStatus,
-					reason: sessionState.localUpdatesImportFreshReviewRetrySaveHandoffReason,
-					result: sessionState.localUpdatesImportFreshReviewRetrySaveHandoffResult,
+					status: nextSessionState.localUpdatesImportFreshReviewRetrySaveHandoffStatus,
+					reason: nextSessionState.localUpdatesImportFreshReviewRetrySaveHandoffReason,
+					result: nextSessionState.localUpdatesImportFreshReviewRetrySaveHandoffResult,
 					accepted:
-						sessionState.localUpdatesImportFreshReviewRetrySaveHandoffAccepted,
+						nextSessionState.localUpdatesImportFreshReviewRetrySaveHandoffAccepted,
+					actionTranscriptItemCount:
+						nextSessionState.actionTranscriptItemCount,
+					actionTranscriptLatestEventType:
+						nextSessionState.actionTranscriptLatestEventType,
+					actionTranscriptEntriesRedacted:
+						nextSessionState.actionTranscriptEntriesRedacted,
+					actionTranscriptCallsSave:
+						nextSessionState.actionTranscriptCallsSave,
+					actionTranscriptClaimsSaved:
+						nextSessionState.actionTranscriptClaimsSaved,
 					callsFreshReviewValidationEndpoint: true,
 					callsFreshReviewDecisionEndpoint: false,
 					callsRetrySaveEndpoint: false,
@@ -1863,7 +1883,7 @@ export const __experimentalValidateDistributedEditingFreshReviewRetrySaveHandoff
 					exposesRawContent: false,
 					exposesProofSignature: false,
 					exposesReviewerIds: false,
-					sessionState,
+					sessionState: nextSessionState,
 				};
 			} catch ( error ) {
 				const sessionState =
@@ -1871,8 +1891,18 @@ export const __experimentalValidateDistributedEditingFreshReviewRetrySaveHandoff
 						error,
 						preparedSessionState
 					);
+				const nextSessionState =
+					getDistributedEditingSessionStateWithActionTranscriptEvent(
+						sessionState,
+						{
+							eventType:
+								DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.FRESH_REVIEW_CONSUME_VALIDATED,
+							reasonCode:
+								sessionState.localUpdatesImportFreshReviewRetrySaveHandoffReason,
+						}
+					);
 
-				dispatch.setDistributedEditingSessionState( sessionState );
+				dispatch.setDistributedEditingSessionState( nextSessionState );
 
 				throw error;
 			}

@@ -2099,6 +2099,10 @@ function getActionTranscriptMessage( descriptor ) {
 			return __(
 				'The editor submitted a fresh-review decision and kept the activity record content-free.'
 			);
+		case DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.FRESH_REVIEW_CONSUME_VALIDATED:
+			return __(
+				'The editor validated fresh-review handoff proof and kept the activity record content-free.'
+			);
 	}
 
 	const count = normalizeCount( descriptor.actionTranscriptItemCount );

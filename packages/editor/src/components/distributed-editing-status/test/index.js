@@ -958,6 +958,47 @@ describe( 'DistributedEditingStatus', () => {
 		expect( screen.queryByText( '123' ) ).not.toBeInTheDocument();
 	} );
 
+	it( 'describes a fresh-review consume-validation transcript without proof internals', () => {
+		setupDistributedEditingStatusSelect( {
+			sessionState: {
+				actionTranscriptItems: [
+					{
+						eventType:
+							DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.FRESH_REVIEW_CONSUME_VALIDATED,
+						proofSignature: 'hidden-consume-validation-proof',
+					},
+					{
+						eventType:
+							DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.FRESH_REVIEW_CONSUME_VALIDATED,
+					},
+				],
+			},
+		} );
+
+		render( <DistributedEditingStatusChrome /> );
+
+		const transcriptItem = screen.getByTestId(
+			'distributed-editing-action-transcript-status'
+		);
+
+		expect( transcriptItem ).toHaveAttribute(
+			'data-distributed-editing-transcript-event-type',
+			DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.FRESH_REVIEW_CONSUME_VALIDATED
+		);
+		expect( transcriptItem ).toHaveAttribute(
+			'data-distributed-editing-transcript-redacted',
+			'true'
+		);
+		expect(
+			screen.getByText(
+				'The editor validated fresh-review handoff proof and kept the activity record content-free.'
+			)
+		).toBeVisible();
+		expect(
+			screen.queryByText( 'hidden-consume-validation-proof' )
+		).not.toBeInTheDocument();
+	} );
+
 	it( 'mounts production editor chrome with explicit placement', () => {
 		setupDistributedEditingStatusSelect( {
 			sessionState: {

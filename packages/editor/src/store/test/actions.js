@@ -3032,6 +3032,21 @@ describe( 'Post actions', () => {
 				claimsSaved: false,
 				exposesRawContent: false,
 				exposesProofSignature: false,
+				actionTranscriptLatestEventType:
+					DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.FRESH_REVIEW_CONSUME_VALIDATED,
+				actionTranscriptEntriesRedacted: true,
+				actionTranscriptCallsSave: false,
+				actionTranscriptClaimsSaved: false,
+			} );
+			expect( result.sessionState ).toMatchObject( {
+				actionTranscriptLatestEventType:
+					DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.FRESH_REVIEW_CONSUME_VALIDATED,
+				actionTranscriptEntriesRedacted: true,
+				actionTranscriptExposesRawContent: false,
+				actionTranscriptExposesProofInternals: false,
+				actionTranscriptExposesActorIds: false,
+				actionTranscriptCallsSave: false,
+				actionTranscriptClaimsSaved: false,
 			} );
 			expect( apiFetchCallCount ).toBe( 1 );
 			expect(

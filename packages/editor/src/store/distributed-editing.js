@@ -112,6 +112,7 @@ export const DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES = Object.freeze(
 		REVIEW_REQUIRED: 'review_required',
 		FRESH_REVIEW_REQUESTED: 'fresh_review_requested',
 		FRESH_REVIEW_DECISION_SUBMITTED: 'fresh_review_decision_submitted',
+		FRESH_REVIEW_CONSUME_VALIDATED: 'fresh_review_consume_validated',
 	}
 );
 
@@ -131,6 +132,8 @@ const DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_DEFINITIONS = Object.freeze( {
 	[ DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.FRESH_REVIEW_REQUESTED ]:
 		Object.freeze( { source: 'review' } ),
 	[ DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.FRESH_REVIEW_DECISION_SUBMITTED ]:
+		Object.freeze( { source: 'review' } ),
+	[ DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.FRESH_REVIEW_CONSUME_VALIDATED ]:
 		Object.freeze( { source: 'review' } ),
 } );
 
