@@ -35,7 +35,7 @@
 .revision-diff-markers {
 	position: relative;
 	flex-shrink: 0;
-	width: 24px;
+	width: max(16px, 1rem);
 	background: rgba(0, 0, 0, 0.05);
 
 	.revision-diff-marker {
