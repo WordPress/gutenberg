@@ -1,4 +1,9 @@
 /**
+ * Internal dependencies
+ */
+import { subscribeSharedListener } from './shared-listener';
+
+/**
  * Prevents focus from being captured by the element when clicking _outside_
  * around the element. This may happen when the parent element is flex.
  * @see https://github.com/WordPress/gutenberg/pull/65857
@@ -34,11 +39,19 @@ export function preventFocusCapture() {
 			}
 		}
 
-		defaultView.addEventListener( 'pointerdown', onPointerDown );
-		defaultView.addEventListener( 'pointerup', onPointerUp );
+		const unsubscribePointerDown = subscribeSharedListener(
+			defaultView,
+			'pointerdown',
+			onPointerDown
+		);
+		const unsubscribePointerUp = subscribeSharedListener(
+			defaultView,
+			'pointerup',
+			onPointerUp
+		);
 		return () => {
-			defaultView.removeEventListener( 'pointerdown', onPointerDown );
-			defaultView.removeEventListener( 'pointerup', onPointerUp );
+			unsubscribePointerDown();
+			unsubscribePointerUp();
 		};
 	};
 }
