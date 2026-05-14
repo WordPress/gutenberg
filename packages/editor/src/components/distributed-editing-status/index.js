@@ -846,7 +846,7 @@ export function DistributedEditingLocalUpdatesImportControls( {
 		normalized,
 	} );
 	const actionTranscriptReportMessage =
-		getLocalUpdatesImportActionTranscriptReportMessage(
+		getActionTranscriptSupportReportMessage(
 			importResult?.actionTranscriptReport ||
 				normalized.localUpdatesImportActionTranscriptReport
 		);
@@ -999,6 +999,11 @@ export function DistributedEditingFreshReviewDecisionPanel( {
 		return null;
 	}
 
+	const actionTranscriptReportMessage =
+		getActionTranscriptSupportReportMessage(
+			decisionState?.actionTranscriptReport
+		);
+
 	async function resolveDecision( reviewItem, decision ) {
 		setCommandStatus( 'running' );
 
@@ -1037,6 +1042,11 @@ export function DistributedEditingFreshReviewDecisionPanel( {
 			role="group"
 		>
 			<strong>{ __( 'Fresh review decisions' ) }</strong>
+			{ actionTranscriptReportMessage && (
+				<p className="editor-distributed-editing-status__fresh-review-decision-report">
+					{ actionTranscriptReportMessage }
+				</p>
+			) }
 			<dl className="editor-distributed-editing-status__fresh-review-decision-state">
 				<div>
 					<dt>{ __( 'Decision status' ) }</dt>
@@ -1271,6 +1281,10 @@ export function DistributedEditingStatusSurface( {
 			{ statusItems.map( ( item ) => {
 				const freshReviewAuthorityStatus =
 					getFreshReviewAuthorityStatusProps( item );
+				const actionTranscriptReportMessage =
+					getActionTranscriptSupportReportMessage(
+						item.localUpdatesImportActionTranscriptReport
+					);
 
 				return (
 					<div
@@ -1326,6 +1340,11 @@ export function DistributedEditingStatusSurface( {
 						>
 							<strong>{ item.title }</strong>
 							<div>{ item.message }</div>
+							{ actionTranscriptReportMessage && (
+								<div className="editor-distributed-editing-status__support-report">
+									{ actionTranscriptReportMessage }
+								</div>
+							) }
 							<FreshReviewAuthorityStatus
 								status={ freshReviewAuthorityStatus }
 							/>
@@ -2510,7 +2529,7 @@ function getFreshReviewReviewItemCountMessage( descriptor ) {
 	);
 }
 
-function getLocalUpdatesImportActionTranscriptReportMessage( report ) {
+function getActionTranscriptSupportReportMessage( report ) {
 	if ( ! report?.available || ! report.canShareWithSupport ) {
 		return null;
 	}

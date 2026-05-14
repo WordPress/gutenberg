@@ -7672,6 +7672,30 @@ describe( 'distributed editing selectors', () => {
 			localUpdatesImportPostType: 'post',
 			localUpdatesImportVerifiedPostContentHash:
 				'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+			localUpdatesImportActionTranscriptReport: {
+				available: true,
+				timelineItems: [
+					{
+						eventType:
+							DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.FRESH_REVIEW_REQUESTED,
+					},
+					{
+						eventType:
+							DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.FRESH_REVIEW_DECISION_SUBMITTED,
+					},
+					{
+						eventType:
+							DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.FRESH_REVIEW_CONSUME_VALIDATED,
+					},
+					{
+						eventType:
+							DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.FRESH_REVIEW_RETRY_SAVE_CONFIRMED,
+					},
+				],
+				droppedItemCount: 2,
+				chronologyText: 'turn0147-accepted-request-raw-content-marker',
+				headline: 'turn0147-accepted-request-hidden-proof',
+			},
 			hasPendingChanges: true,
 			canExportLocalUpdates: true,
 		} );
@@ -7701,6 +7725,10 @@ describe( 'distributed editing selectors', () => {
 					item.kind ===
 					DISTRIBUTED_EDITING_NOTICE_KINDS.LOCAL_UPDATES_IMPORT_BLOCKED
 			);
+		const decisionState =
+			getDistributedEditingFreshReviewDecisionStateForSessionState(
+				sessionState
+			);
 
 		expect( sessionState ).toMatchObject( {
 			localUpdatesImportReviewRequestStatus:
@@ -7717,6 +7745,16 @@ describe( 'distributed editing selectors', () => {
 			localUpdatesImportFreshReviewRequestMutatesPostContent: false,
 			localUpdatesImportFreshReviewRequestCreatesRevision: false,
 			localUpdatesImportFreshReviewRequestClaimsSaved: false,
+			localUpdatesImportActionTranscriptReport: {
+				available: true,
+				chronologyStatus: 'fresh_review_guarded_save_confirmed',
+				timelineItemCount: 4,
+				droppedItemCount: 2,
+				canShareWithSupport: true,
+				requiresSaveAuthorityForPersistence: true,
+				callsSave: false,
+				claimsSaved: false,
+			},
 			retrySaveClaimsSaved: false,
 			canExportLocalUpdates: true,
 			mustOfferLocalCopy: true,
@@ -7726,6 +7764,13 @@ describe( 'distributed editing selectors', () => {
 			actionKey: null,
 			requestAccepted: true,
 			requestRequested: true,
+			hasActionTranscriptReport: true,
+			canShowActionTranscriptReport: true,
+			actionTranscriptReport: {
+				available: true,
+				chronologyStatus: 'fresh_review_guarded_save_confirmed',
+				requiresSaveAuthorityForPersistence: true,
+			},
 			shouldCallRetrySaveEndpoint: false,
 			shouldCallNormalSavePost: false,
 			mutatesEditorContent: false,
@@ -7746,11 +7791,42 @@ describe( 'distributed editing selectors', () => {
 				localUpdatesImportFreshReviewRequestRestRoute:
 					'post_fresh_review_request',
 				localUpdatesImportFreshReviewRequestClaimsSaved: false,
+				localUpdatesImportHasActionTranscriptReport: true,
+				localUpdatesImportCanShowActionTranscriptReport: true,
+				localUpdatesImportActionTranscriptReport:
+					expect.objectContaining( {
+						available: true,
+						chronologyStatus: 'fresh_review_guarded_save_confirmed',
+						requiresSaveAuthorityForPersistence: true,
+					} ),
 				actionKeys: [],
 			} )
 		);
+		expect( decisionState ).toMatchObject( {
+			requestStatus:
+				DISTRIBUTED_EDITING_LOCAL_UPDATES_REVIEW_REQUEST_STATUSES.REQUESTED,
+			accepted: true,
+			hasActionTranscriptReport: true,
+			canShowActionTranscriptReport: true,
+			actionTranscriptReport: {
+				available: true,
+				chronologyStatus: 'fresh_review_guarded_save_confirmed',
+				timelineItemCount: 4,
+				droppedItemCount: 2,
+				requiresSaveAuthorityForPersistence: true,
+				callsSave: false,
+				claimsSaved: false,
+			},
+			callsNormalSavePost: false,
+			callsRetrySaveEndpoint: false,
+			mutatesEditorContent: false,
+			claimsSaved: false,
+		} );
 		expect( JSON.stringify( descriptor ) ).not.toMatch(
-			/proof_signature|reviewer_user_id|low_privileged_saver_user_id|reviewed_block_items|postContent|post_content/
+			/proof_signature|reviewer_user_id|low_privileged_saver_user_id|reviewed_block_items|postContent|post_content|turn0147-accepted-request-hidden-proof|turn0147-accepted-request-raw-content-marker/
+		);
+		expect( JSON.stringify( decisionState ) ).not.toMatch(
+			/proof_signature|reviewer_user_id|low_privileged_saver_user_id|reviewed_block_items|postContent|post_content|turn0147-accepted-request-hidden-proof|turn0147-accepted-request-raw-content-marker/
 		);
 	} );
 

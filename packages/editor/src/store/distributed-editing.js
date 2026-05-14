@@ -2144,6 +2144,16 @@ export function getDistributedEditingFreshReviewDecisionStateForSessionState(
 			normalized.localUpdatesImportFreshReviewDecisionReviewedBlockItems,
 		reviewedBlockItemCount:
 			normalized.localUpdatesImportFreshReviewDecisionReviewedBlockItemCount,
+		actionTranscriptReport:
+			normalized.localUpdatesImportActionTranscriptReport,
+		hasActionTranscriptReport: Boolean(
+			normalized.localUpdatesImportActionTranscriptReport?.available
+		),
+		canShowActionTranscriptReport: Boolean(
+			normalized.localUpdatesImportActionTranscriptReport?.available &&
+				normalized.localUpdatesImportActionTranscriptReport
+					.canShareWithSupport
+		),
 		canExportLocalUpdates: normalized.canExportLocalUpdates,
 		savesPost: false,
 		callsNormalSavePost: false,

@@ -2878,7 +2878,11 @@ describe( 'DistributedEditingStatusSurface', () => {
 				'Retry submit accepted the rebased changes for a future save. Local changes are still awaiting confirmation.'
 			)
 		).toBeVisible();
-		expect( screen.queryByText( /saved/i ) ).not.toBeInTheDocument();
+		expect(
+			screen.queryByText(
+				/retry save applied|post saved|saved successfully|changes are saved/i
+			)
+		).not.toBeInTheDocument();
 	} );
 
 	it( 'renders imported protected changes as local guarded-save readiness', () => {
@@ -3003,6 +3007,31 @@ describe( 'DistributedEditingStatusSurface', () => {
 				localUpdatesImportFreshReviewRequestRestRoute:
 					'post_fresh_review_request',
 				localUpdatesImportFreshReviewRequestClaimsSaved: false,
+				localUpdatesImportActionTranscriptReport: {
+					available: true,
+					timelineItems: [
+						{
+							eventType:
+								DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.FRESH_REVIEW_REQUESTED,
+						},
+						{
+							eventType:
+								DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.FRESH_REVIEW_DECISION_SUBMITTED,
+						},
+						{
+							eventType:
+								DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.FRESH_REVIEW_CONSUME_VALIDATED,
+						},
+						{
+							eventType:
+								DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.FRESH_REVIEW_RETRY_SAVE_CONFIRMED,
+						},
+					],
+					droppedItemCount: 2,
+					chronologyText:
+						'turn0147-accepted-status-raw-content-marker',
+					headline: 'turn0147-accepted-status-hidden-proof',
+				},
 			} );
 
 		render(
@@ -3015,6 +3044,11 @@ describe( 'DistributedEditingStatusSurface', () => {
 		expect(
 			screen.getByText(
 				'Protected changes need hash-only admin review before Save can continue. Risky block evidence remains redacted until the review surface opens. No normal save or retry save has run; protected local changes remain exportable.'
+			)
+		).toBeVisible();
+		expect(
+			screen.getByText(
+				'Fresh-review guarded save confirmation was recorded; use save-authority evidence to confirm persistence. Recorded 4 redacted transcript events; 2 unsafe entries were dropped. This transcript is diagnostic only; save authority evidence is still required before treating these changes as saved.'
 			)
 		).toBeVisible();
 		const preSaveStatus = screen.getByTestId(
@@ -3045,10 +3079,14 @@ describe( 'DistributedEditingStatusSurface', () => {
 				name: 'Request fresh review',
 			} )
 		).not.toBeInTheDocument();
-		expect( screen.queryByText( /saved/i ) ).not.toBeInTheDocument();
 		expect(
 			screen.queryByText(
-				/proof_signature|reviewer_user_id|reviewed_block_items/i
+				/retry save applied|post saved|saved successfully|changes are saved/i
+			)
+		).not.toBeInTheDocument();
+		expect(
+			screen.queryByText(
+				/proof_signature|reviewer_user_id|reviewed_block_items|turn0147-accepted-status-hidden-proof|turn0147-accepted-status-raw-content-marker/i
 			)
 		).not.toBeInTheDocument();
 	} );
@@ -3071,6 +3109,30 @@ describe( 'DistributedEditingStatusSurface', () => {
 				localUpdatesImportFreshReviewDecisionStatus:
 					DISTRIBUTED_EDITING_FRESH_REVIEW_DECISION_STATUSES.AWAITING_REVIEW,
 				localUpdatesImportFreshReviewDecisionPanelRequired: true,
+				localUpdatesImportActionTranscriptReport: {
+					available: true,
+					timelineItems: [
+						{
+							eventType:
+								DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.FRESH_REVIEW_REQUESTED,
+						},
+						{
+							eventType:
+								DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.FRESH_REVIEW_DECISION_SUBMITTED,
+						},
+						{
+							eventType:
+								DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.FRESH_REVIEW_CONSUME_VALIDATED,
+						},
+						{
+							eventType:
+								DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.FRESH_REVIEW_RETRY_SAVE_CONFIRMED,
+						},
+					],
+					droppedItemCount: 2,
+					chronologyText: 'turn0147-decision-raw-content-marker',
+					headline: 'turn0147-decision-hidden-proof',
+				},
 				localUpdatesImportFreshReviewDecisionItems: [
 					{
 						id: 'fresh-risk-html',
@@ -3572,6 +3634,31 @@ describe( 'DistributedEditingStatusSurface', () => {
 				localUpdatesImportFreshReviewDecisionStatus:
 					DISTRIBUTED_EDITING_FRESH_REVIEW_DECISION_STATUSES.AWAITING_REVIEW,
 				localUpdatesImportFreshReviewDecisionPanelRequired: true,
+				localUpdatesImportActionTranscriptReport: {
+					available: true,
+					timelineItems: [
+						{
+							eventType:
+								DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.FRESH_REVIEW_REQUESTED,
+						},
+						{
+							eventType:
+								DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.FRESH_REVIEW_DECISION_SUBMITTED,
+						},
+						{
+							eventType:
+								DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.FRESH_REVIEW_CONSUME_VALIDATED,
+						},
+						{
+							eventType:
+								DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.FRESH_REVIEW_RETRY_SAVE_CONFIRMED,
+						},
+					],
+					droppedItemCount: 2,
+					chronologyText:
+						'turn0147-internal-panel-raw-content-marker',
+					headline: 'turn0147-internal-panel-hidden-proof',
+				},
 				localUpdatesImportFreshReviewDecisionItems: [
 					{
 						id: 'fresh-approve',
@@ -3601,6 +3688,11 @@ describe( 'DistributedEditingStatusSurface', () => {
 			} )
 		).toBeVisible();
 		expect( screen.getByText( 'Fresh review decisions' ) ).toBeVisible();
+		expect(
+			screen.getByText(
+				'Fresh-review guarded save confirmation was recorded; use save-authority evidence to confirm persistence. Recorded 4 redacted transcript events; 2 unsafe entries were dropped. This transcript is diagnostic only; save authority evidence is still required before treating these changes as saved.'
+			)
+		).toBeVisible();
 		expect( screen.getByText( 'Awaiting review' ) ).toBeVisible();
 		expect( screen.getByText( 'Approve HTML change' ) ).toBeVisible();
 		expect( screen.getByText( 'Reject HTML change' ) ).toBeVisible();
@@ -3638,7 +3730,7 @@ describe( 'DistributedEditingStatusSurface', () => {
 		).not.toHaveBeenCalled();
 		expect(
 			screen.queryByText(
-				/fresh-approve-raw-content|fresh-reject-raw-content/i
+				/fresh-approve-raw-content|fresh-reject-raw-content|proofSignature|reviewerId|postContent/i
 			)
 		).not.toBeInTheDocument();
 		expect(
