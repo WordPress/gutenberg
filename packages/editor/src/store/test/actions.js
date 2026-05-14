@@ -215,6 +215,12 @@ describe( 'Post actions', () => {
 				opensPublishSidebar: true,
 				focusesReviewPanel: true,
 				reviewPanel: 'distributed_editing_risky_block_review',
+				actionTranscriptItemCount: 1,
+				actionTranscriptLatestEventType:
+					DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.REVIEW_REQUIRED,
+				actionTranscriptEntriesRedacted: true,
+				actionTranscriptCallsSave: false,
+				actionTranscriptClaimsSaved: false,
 				savesPost: false,
 				callsNormalSavePost: false,
 				callsRetrySaveEndpoint: false,
@@ -225,6 +231,18 @@ describe( 'Post actions', () => {
 			expect(
 				registry.select( editorStore ).isPublishSidebarOpened()
 			).toBe( true );
+			expect(
+				registry
+					.select( editorStore )
+					.getDistributedEditingSessionState()
+			).toMatchObject( {
+				actionTranscriptItemCount: 1,
+				actionTranscriptLatestEventType:
+					DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.REVIEW_REQUIRED,
+				actionTranscriptEntriesRedacted: true,
+				actionTranscriptCallsSave: false,
+				actionTranscriptClaimsSaved: false,
+			} );
 		} );
 
 		it( 'does not open the pre-publish sidebar when review is not required', async () => {
@@ -4899,6 +4917,9 @@ describe( 'Post actions', () => {
 				mutatesEditorContent: false,
 				changesPostLock: false,
 				claimsSaved: false,
+				actionTranscriptItemCount: 1,
+				actionTranscriptLatestEventType:
+					DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.REVIEW_REQUIRED,
 			} );
 
 			expect( apiCalls ).toBe( 0 );
@@ -4914,6 +4935,18 @@ describe( 'Post actions', () => {
 			expect(
 				registry.select( editorStore ).getEditedPostContent()
 			).toBe( editedPostContent );
+			expect(
+				registry
+					.select( editorStore )
+					.getDistributedEditingSessionState()
+			).toMatchObject( {
+				actionTranscriptItemCount: 1,
+				actionTranscriptLatestEventType:
+					DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.REVIEW_REQUIRED,
+				actionTranscriptEntriesRedacted: true,
+				actionTranscriptCallsSave: false,
+				actionTranscriptClaimsSaved: false,
+			} );
 		} );
 
 		it( 'routes resolved risky-block savePost through review-approval proof before normal save', async () => {

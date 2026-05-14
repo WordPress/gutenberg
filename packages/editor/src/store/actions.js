@@ -315,12 +315,36 @@ export const __experimentalOpenDistributedEditingRiskyBlockReview =
 		}
 
 		dispatch.openPublishSidebar();
+		const nextSessionState =
+			getDistributedEditingSessionStateWithActionTranscriptEvent(
+				select.getDistributedEditingSessionState?.() || {},
+				{
+					eventType:
+						DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.REVIEW_REQUIRED,
+					reasonCode:
+						savePolicy.reason ||
+						savePolicy.saveButtonReason ||
+						'risky_block_review_required',
+				}
+			);
+
+		dispatch.setDistributedEditingSessionState( nextSessionState );
 
 		return {
 			status: 'pre_publish_review_opened',
 			opensPublishSidebar: true,
 			focusesReviewPanel: true,
 			reviewPanel: 'distributed_editing_risky_block_review',
+			actionTranscriptItemCount:
+				nextSessionState.actionTranscriptItemCount,
+			actionTranscriptLatestEventType:
+				nextSessionState.actionTranscriptLatestEventType,
+			actionTranscriptEntriesRedacted:
+				nextSessionState.actionTranscriptEntriesRedacted,
+			actionTranscriptCallsSave:
+				nextSessionState.actionTranscriptCallsSave,
+			actionTranscriptClaimsSaved:
+				nextSessionState.actionTranscriptClaimsSaved,
 			savesPost: false,
 			callsNormalSavePost: false,
 			callsRetrySaveEndpoint: false,
