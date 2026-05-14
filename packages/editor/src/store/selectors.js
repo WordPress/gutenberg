@@ -33,6 +33,7 @@ import { getTemplateInfo } from '../utils/get-template-info';
 import {
 	DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE,
 	getDistributedEditingFreshReviewDecisionStateForSessionState,
+	getDistributedEditingFreshReviewLifecycleStateForSessionState,
 	getDistributedEditingFreshReviewPreSaveStateForSessionState,
 	getDistributedEditingFreshReviewRetrySaveHandoffStateForSessionState,
 	getDistributedEditingLocalUpdatesImportReviewRequestStateForSessionState,
@@ -566,6 +567,20 @@ export function getDistributedEditingFreshReviewRetrySaveHandoffState( state ) {
  */
 export function getDistributedEditingFreshReviewPreSaveState( state ) {
 	return getDistributedEditingFreshReviewPreSaveStateForSessionState(
+		getDistributedEditingSessionState( state )
+	);
+}
+
+/**
+ * Returns the current DE-RTC fresh-review lifecycle evidence for future
+ * support-safe UI consumers.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {Object} Fresh-review lifecycle state.
+ */
+export function getDistributedEditingFreshReviewLifecycleState( state ) {
+	return getDistributedEditingFreshReviewLifecycleStateForSessionState(
 		getDistributedEditingSessionState( state )
 	);
 }

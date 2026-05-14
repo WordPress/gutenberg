@@ -8,9 +8,12 @@ import deepFreeze from 'deep-freeze';
  */
 import {
 	DISTRIBUTED_EDITING_DISPOSITIONS,
+	DISTRIBUTED_EDITING_FRESH_REVIEW_AUTHORITY_STATUSES,
 	DISTRIBUTED_EDITING_FRESH_REVIEW_DECISION_STATUSES,
+	DISTRIBUTED_EDITING_FRESH_REVIEW_LIFECYCLE_RETRIEVAL_STATUSES,
 	DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_PLACEMENTS,
 	DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_STATUSES,
+	DISTRIBUTED_EDITING_FRESH_REVIEW_REVIEW_LIST_STATUSES,
 	DISTRIBUTED_EDITING_FRESH_REVIEW_RETRY_SAVE_HANDOFF_STATUSES,
 	DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES,
 	DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES,
@@ -44,6 +47,7 @@ import {
 	DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE,
 	getDistributedEditingLocalUpdatesExportPayload,
 	getDistributedEditingFreshReviewDecisionStateForSessionState,
+	getDistributedEditingFreshReviewLifecycleStateForSessionState,
 	getDistributedEditingFreshReviewPreSaveStateForSessionState,
 	getDistributedEditingFreshReviewRetrySaveHandoffStateForSessionState,
 	getDistributedEditingLocalUpdatesImportResult,
@@ -62,6 +66,7 @@ import {
 	getDistributedEditingSessionStateForFreshReviewDecisionItemResolution,
 	getDistributedEditingSessionStateForFreshReviewDecisionItems,
 	getDistributedEditingSessionStateForFreshReviewDecisionResult,
+	getDistributedEditingSessionStateForFreshReviewLifecycleRetrievalResult,
 	getDistributedEditingSessionStateForFreshReviewRetrySaveHandoffValidation,
 	getDistributedEditingSessionStateForFreshReviewRetrySaveHandoffValidationResult,
 	getDistributedEditingSessionStateForStaleRiskyBlockReview,
@@ -96,6 +101,7 @@ import { distributedEditingSession } from '../reducer';
 import {
 	canExportDistributedEditingLocalUpdates,
 	getDistributedEditingFreshReviewDecisionState,
+	getDistributedEditingFreshReviewLifecycleState,
 	getDistributedEditingFreshReviewPreSaveState,
 	getDistributedEditingLocalUpdatesImportReviewRequestState,
 	getDistributedEditingNoticeDescriptors,
@@ -3531,6 +3537,281 @@ describe( 'distributed editing session state', () => {
 					freshReviewPreSaveCanExportLocalUpdates: true,
 					shouldCallNormalSavePost: false,
 					shouldCallRetrySaveEndpoint: false,
+					claimsSaved: false,
+				} ),
+			] )
+		);
+	} );
+
+	it( 'normalizes consumed fresh-review lifecycle evidence without exposing private data', () => {
+		const rawContentToken = 'fresh-review-lifecycle-raw-content';
+		const normalized =
+			getDistributedEditingSessionStateForFreshReviewLifecycleRetrievalResult(
+				{
+					result: 'fresh_review_lifecycle_debug_available',
+					rest_route: 'post_fresh_review_lifecycle',
+					fresh_review_lifecycle_debug_available: true,
+					fresh_review_support_evidence_available: true,
+					fresh_review_request_record_id: 'fresh-review-request-123',
+					fresh_review_request_record: {
+						lifecycle_status: 'retry_save_consumed',
+						raw_content: rawContentToken,
+						reviewer_user_id: 7,
+					},
+					fresh_review_debug_contract: {
+						contract: 'support_safe_fresh_review_lifecycle_debug',
+						lifecycle_status: 'retry_save_consumed',
+						lifecycle_event: 'consumed',
+						lifecycle_reason: 'guarded_retry_save_applied',
+						decision_recorded: true,
+						decision_status: 'approved',
+						decision_consumed: true,
+						retry_save_applied: true,
+						consumes_review_decision: true,
+						previous_server_version: '56',
+						saved_server_version: '57',
+						reviewed_block_item_count: 1,
+						reviewed_block_decision_counts: {
+							approved: 1,
+							rejected: 0,
+						},
+						hash_evidence_fields: [
+							'proposed_post_content_hash',
+							'saved_post_content_hash',
+						],
+						version_evidence_fields: [
+							'previous_server_version',
+							'saved_server_version',
+						],
+						reviewer_identity_retained: false,
+						reviewer_capability_drift_recheck_supported: false,
+						requires_new_review_if_reviewer_authority_cannot_be_rechecked: true,
+						exposes_raw_content: false,
+						exposes_reviewer_identity: false,
+						exposes_saver_identity: false,
+						exposes_proof_internals: false,
+						raw_content: rawContentToken,
+					},
+				},
+				{
+					pendingChangeCount: 1,
+					hasPendingChanges: true,
+					mustOfferLocalCopy: true,
+					canExportLocalUpdates: true,
+					localUpdatesImportFreshReviewRequestRecordId:
+						'fresh-review-request-123',
+					localUpdatesImportFreshReviewRequestAccepted: true,
+					localUpdatesImportFreshReviewRequestRequested: true,
+				}
+			);
+		const lifecycleState =
+			getDistributedEditingFreshReviewLifecycleStateForSessionState(
+				normalized
+			);
+		const preSaveState =
+			getDistributedEditingFreshReviewPreSaveStateForSessionState(
+				normalized
+			);
+		const selectorState = { distributedEditingSession: normalized };
+
+		expect( lifecycleState ).toMatchObject( {
+			retrievalStatus:
+				DISTRIBUTED_EDITING_FRESH_REVIEW_LIFECYCLE_RETRIEVAL_STATUSES.AVAILABLE,
+			result: 'fresh_review_lifecycle_debug_available',
+			restRoute: 'post_fresh_review_lifecycle',
+			debugAvailable: true,
+			supportEvidenceAvailable: true,
+			requestRecordId: 'fresh-review-request-123',
+			decisionStatus: 'approved',
+			decisionRecorded: true,
+			decisionConsumed: true,
+			retrySaveApplied: true,
+			consumesReviewDecision: true,
+			lifecycleStatus: 'retry_save_consumed',
+			lifecycleEvent: 'consumed',
+			lifecycleReason: 'guarded_retry_save_applied',
+			previousServerVersion: '56',
+			savedServerVersion: '57',
+			reviewedBlockItemCount: 1,
+			approvedBlockItemCount: 1,
+			rejectedBlockItemCount: 0,
+			hashEvidenceFields: [
+				'proposed_post_content_hash',
+				'saved_post_content_hash',
+			],
+			versionEvidenceFields: [
+				'previous_server_version',
+				'saved_server_version',
+			],
+			reviewListStatus:
+				DISTRIBUTED_EDITING_FRESH_REVIEW_REVIEW_LIST_STATUSES.CONSUMED,
+			reviewerAuthorityStatus:
+				DISTRIBUTED_EDITING_FRESH_REVIEW_AUTHORITY_STATUSES.RECHECK_UNSUPPORTED,
+			requiresFreshReviewDueToAuthority: false,
+			reviewerCapabilityDriftRecheckSupported: false,
+			reviewerIdentityRetained: false,
+			requiresNewReviewIfReviewerAuthorityCannotBeRechecked: true,
+			canExportLocalUpdates: true,
+			hasProtectedLocalChanges: true,
+			shouldCallRetrySaveEndpoint: false,
+			shouldCallNormalSavePost: false,
+			dispatchesNotice: false,
+			mutatesEditorContent: false,
+			mutatesPersistedPostContent: false,
+			changesPostLock: false,
+			claimsSaved: false,
+			exposesRawContent: false,
+			exposesProofSignature: false,
+			exposesReviewerIds: false,
+			exposesProofInternals: false,
+		} );
+		expect( preSaveState ).toMatchObject( {
+			reviewListStatus:
+				DISTRIBUTED_EDITING_FRESH_REVIEW_REVIEW_LIST_STATUSES.CONSUMED,
+			lifecycleRetrievalStatus:
+				DISTRIBUTED_EDITING_FRESH_REVIEW_LIFECYCLE_RETRIEVAL_STATUSES.AVAILABLE,
+			lifecycleStatus: 'retry_save_consumed',
+			lifecycleDecisionConsumed: true,
+			lifecycleRetrySaveApplied: true,
+			reviewerAuthorityStatus:
+				DISTRIBUTED_EDITING_FRESH_REVIEW_AUTHORITY_STATUSES.RECHECK_UNSUPPORTED,
+		} );
+		expect(
+			getDistributedEditingFreshReviewLifecycleState( selectorState )
+		).toEqual( lifecycleState );
+		expect( JSON.stringify( lifecycleState ) ).not.toContain(
+			rawContentToken
+		);
+		expect( JSON.stringify( preSaveState ) ).not.toContain(
+			rawContentToken
+		);
+		expect( JSON.stringify( lifecycleState ) ).not.toContain(
+			'reviewer_user_id'
+		);
+	} );
+
+	it( 'keeps reviewer-authority drift fresh-review state exportable and blocks normal save fallback', () => {
+		const normalized =
+			getDistributedEditingSessionStateForFreshReviewLifecycleRetrievalResult(
+				{
+					code: 'de_rtc_review_approval_requires_unfiltered_html',
+					detail: 'retry_save_fresh_review_requires_unfiltered_html_saver',
+					rest_route: 'post_retry_save',
+					fresh_review_support_evidence_available: true,
+					fresh_review_request_record_id: 'fresh-review-request-123',
+					fresh_review_decision_lifecycle_status: 'capability_drift',
+					fresh_review_decision_lifecycle_action:
+						'request_new_fresh_review',
+				},
+				{
+					pendingChangeCount: 1,
+					hasPendingChanges: true,
+					requiresServerStateRefetch: true,
+					localUpdatesImportStatus:
+						DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_STATUSES.BLOCKED,
+					localUpdatesImportReason:
+						DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.FRESH_REVIEW_REQUIRED,
+					localUpdatesImportFreshReviewRequestRecordId:
+						'fresh-review-request-123',
+					localUpdatesImportFreshReviewRequestAccepted: true,
+					localUpdatesImportFreshReviewRequestRequested: true,
+				}
+			);
+		const preSaveState =
+			getDistributedEditingFreshReviewPreSaveStateForSessionState(
+				normalized
+			);
+		const lifecycleState =
+			getDistributedEditingFreshReviewLifecycleStateForSessionState(
+				normalized
+			);
+		const retrySavePolicy =
+			getDistributedEditingRetrySavePolicyForSessionState( normalized, {
+				pendingChangeCount: 1,
+				postId: 1,
+				restBase: 'posts',
+				proposedPostContent:
+					'<!-- wp:paragraph --><p>Pending reviewed edit.</p><!-- /wp:paragraph -->',
+				clientBaseVersion: '56',
+				acceptedProofServerVersion: '56',
+				rebasedFromVersion: '55',
+			} );
+		const descriptors =
+			getDistributedEditingNoticeDescriptorsForSessionState( normalized );
+
+		expect( normalized ).toMatchObject( {
+			mustOfferLocalCopy: true,
+			canExportLocalUpdates: true,
+			requiresServerStateRefetch: true,
+			localUpdatesImportFreshReviewDecisionLifecycleStatus:
+				'capability_drift',
+			localUpdatesImportFreshReviewDecisionLifecycleAction:
+				'request_new_fresh_review',
+			localUpdatesImportFreshReviewReviewerAuthorityStatus:
+				DISTRIBUTED_EDITING_FRESH_REVIEW_AUTHORITY_STATUSES.AUTHORITY_DRIFT_REQUIRES_FRESH_REVIEW,
+			localUpdatesImportFreshReviewRequiresFreshReviewDueToAuthority: true,
+		} );
+		expect( preSaveState ).toMatchObject( {
+			status: DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_STATUSES.REVIEW_REQUIRED,
+			reason: 'fresh_review_authority_drift_requires_new_review',
+			placement:
+				DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_PLACEMENTS.PRE_PUBLISH_REVIEW,
+			clickAction:
+				DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.OPEN_PRE_PUBLISH_REVIEW,
+			blocksNormalSavePost: true,
+			requiresServerStateRefetch: true,
+			canRefetchServerState: true,
+			canExportLocalUpdates: true,
+			actionKeys: [
+				DISTRIBUTED_EDITING_NOTICE_ACTIONS.EXPORT_LOCAL_UPDATES,
+				DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFETCH_SERVER_STATE,
+			],
+			reviewListStatus:
+				DISTRIBUTED_EDITING_FRESH_REVIEW_REVIEW_LIST_STATUSES.BLOCKED,
+			decisionLifecycleStatus: 'capability_drift',
+			decisionLifecycleAction: 'request_new_fresh_review',
+			reviewerAuthorityStatus:
+				DISTRIBUTED_EDITING_FRESH_REVIEW_AUTHORITY_STATUSES.AUTHORITY_DRIFT_REQUIRES_FRESH_REVIEW,
+			requiresFreshReviewDueToAuthority: true,
+			reviewerAuthorityDriftRequiresFreshReview: true,
+			shouldCallNormalSavePost: false,
+			shouldCallRetrySaveEndpoint: false,
+			dispatchesNotice: false,
+			mutatesEditorContent: false,
+			mutatesPersistedPostContent: false,
+			changesPostLock: false,
+			claimsSaved: false,
+		} );
+		expect( lifecycleState ).toMatchObject( {
+			reviewerAuthorityStatus:
+				DISTRIBUTED_EDITING_FRESH_REVIEW_AUTHORITY_STATUSES.AUTHORITY_DRIFT_REQUIRES_FRESH_REVIEW,
+			requiresFreshReviewDueToAuthority: true,
+			canExportLocalUpdates: true,
+			shouldCallNormalSavePost: false,
+			shouldCallRetrySaveEndpoint: false,
+			changesPostLock: false,
+		} );
+		expect( retrySavePolicy ).toMatchObject( {
+			status: DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_STATUSES.BLOCKED,
+			reason: DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.SERVER_STATE_REFETCH_REQUIRED,
+			canRetrySave: false,
+			shouldCallRetrySaveEndpoint: false,
+			shouldCallNormalSavePost: false,
+			canExportLocalUpdates: true,
+			requiresServerStateRefetch: true,
+		} );
+		expect( descriptors ).toEqual(
+			expect.arrayContaining( [
+				expect.objectContaining( {
+					kind: DISTRIBUTED_EDITING_NOTICE_KINDS.LOCAL_UPDATES_IMPORT_BLOCKED,
+					freshReviewPreSaveStatus:
+						DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_STATUSES.REVIEW_REQUIRED,
+					freshReviewPreSaveReviewListStatus:
+						DISTRIBUTED_EDITING_FRESH_REVIEW_REVIEW_LIST_STATUSES.BLOCKED,
+					freshReviewReviewerAuthorityStatus:
+						DISTRIBUTED_EDITING_FRESH_REVIEW_AUTHORITY_STATUSES.AUTHORITY_DRIFT_REQUIRES_FRESH_REVIEW,
+					freshReviewRequiresFreshReviewDueToAuthority: true,
+					shouldCallNormalSavePost: false,
 					claimsSaved: false,
 				} ),
 			] )

@@ -281,6 +281,43 @@ export const DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_PLACEMENTS =
 	} );
 
 /**
+ * Stable fresh-review review-list statuses for future pre-publish UI.
+ */
+export const DISTRIBUTED_EDITING_FRESH_REVIEW_REVIEW_LIST_STATUSES =
+	Object.freeze( {
+		NONE: 'none',
+		REVIEW_REQUIRED: 'review_required',
+		AWAITING_REVIEW: 'awaiting_review',
+		DECISION_READY: 'decision_ready',
+		DECISION_RECORDED: 'decision_recorded',
+		CONSUMED: 'consumed',
+		BLOCKED: 'blocked',
+	} );
+
+/**
+ * Stable support-safe lifecycle retrieval statuses.
+ */
+export const DISTRIBUTED_EDITING_FRESH_REVIEW_LIFECYCLE_RETRIEVAL_STATUSES =
+	Object.freeze( {
+		NONE: 'none',
+		RETRIEVING: 'retrieving',
+		AVAILABLE: 'available',
+		UNAVAILABLE: 'unavailable',
+	} );
+
+/**
+ * Stable reviewer-authority statuses for fresh-review handoffs.
+ */
+export const DISTRIBUTED_EDITING_FRESH_REVIEW_AUTHORITY_STATUSES =
+	Object.freeze( {
+		NONE: 'none',
+		RECHECK_UNSUPPORTED: 'recheck_unsupported',
+		FRESH_REVIEW_REQUIRED: 'fresh_review_required',
+		AUTHORITY_DRIFT_REQUIRES_FRESH_REVIEW:
+			'authority_drift_requires_fresh_review',
+	} );
+
+/**
  * Stable retry-save save-flow handoff statuses.
  */
 export const DISTRIBUTED_EDITING_RETRY_SAVE_HANDOFF_STATUSES = Object.freeze( {
@@ -508,6 +545,12 @@ const VALID_FRESH_REVIEW_DECISION_STATUSES = new Set(
 const VALID_FRESH_REVIEW_RETRY_SAVE_HANDOFF_STATUSES = new Set(
 	Object.values(
 		DISTRIBUTED_EDITING_FRESH_REVIEW_RETRY_SAVE_HANDOFF_STATUSES
+	)
+);
+
+const VALID_FRESH_REVIEW_LIFECYCLE_RETRIEVAL_STATUSES = new Set(
+	Object.values(
+		DISTRIBUTED_EDITING_FRESH_REVIEW_LIFECYCLE_RETRIEVAL_STATUSES
 	)
 );
 
@@ -763,6 +806,42 @@ export const DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE = Object.freeze( {
 	localUpdatesImportFreshReviewRetrySaveHandoffReviewedCandidateContentHash:
 		null,
 	localUpdatesImportFreshReviewRetrySaveHandoffHashEvidenceStatus: null,
+	localUpdatesImportFreshReviewLifecycleRetrievalStatus:
+		DISTRIBUTED_EDITING_FRESH_REVIEW_LIFECYCLE_RETRIEVAL_STATUSES.NONE,
+	localUpdatesImportFreshReviewLifecycleResult: null,
+	localUpdatesImportFreshReviewLifecycleRestRoute: null,
+	localUpdatesImportFreshReviewLifecycleDebugAvailable: false,
+	localUpdatesImportFreshReviewSupportEvidenceAvailable: false,
+	localUpdatesImportFreshReviewLifecycleStatus: null,
+	localUpdatesImportFreshReviewLifecycleEvent: null,
+	localUpdatesImportFreshReviewLifecycleReason: null,
+	localUpdatesImportFreshReviewLifecycleAction: null,
+	localUpdatesImportFreshReviewLifecycleRequestStatus: null,
+	localUpdatesImportFreshReviewLifecycleDecisionStatus: null,
+	localUpdatesImportFreshReviewLifecycleDecisionRecorded: false,
+	localUpdatesImportFreshReviewLifecycleDecisionConsumed: false,
+	localUpdatesImportFreshReviewLifecycleRetrySaveApplied: false,
+	localUpdatesImportFreshReviewLifecycleConsumesReviewDecision: false,
+	localUpdatesImportFreshReviewLifecycleImportedHandoff: false,
+	localUpdatesImportFreshReviewLifecyclePreviousServerVersion: null,
+	localUpdatesImportFreshReviewLifecycleSavedServerVersion: null,
+	localUpdatesImportFreshReviewLifecycleReviewedBlockItemCount: 0,
+	localUpdatesImportFreshReviewLifecycleApprovedBlockItemCount: 0,
+	localUpdatesImportFreshReviewLifecycleRejectedBlockItemCount: 0,
+	localUpdatesImportFreshReviewLifecycleHashEvidenceFields: [],
+	localUpdatesImportFreshReviewLifecycleVersionEvidenceFields: [],
+	localUpdatesImportFreshReviewLifecycleReviewerIdentityRetained: false,
+	localUpdatesImportFreshReviewLifecycleReviewerCapabilityDriftRecheckSupported: false,
+	localUpdatesImportFreshReviewLifecycleRequiresNewReviewIfReviewerAuthorityCannotBeRechecked: false,
+	localUpdatesImportFreshReviewLifecycleExposesRawContent: false,
+	localUpdatesImportFreshReviewLifecycleExposesProofInternals: false,
+	localUpdatesImportFreshReviewLifecycleExposesReviewerIdentity: false,
+	localUpdatesImportFreshReviewLifecycleExposesSaverIdentity: false,
+	localUpdatesImportFreshReviewDecisionLifecycleStatus: null,
+	localUpdatesImportFreshReviewDecisionLifecycleAction: null,
+	localUpdatesImportFreshReviewReviewerAuthorityStatus:
+		DISTRIBUTED_EDITING_FRESH_REVIEW_AUTHORITY_STATUSES.NONE,
+	localUpdatesImportFreshReviewRequiresFreshReviewDueToAuthority: false,
 	riskyBlockReviewStatus:
 		DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_STATUSES.NONE,
 	riskyBlockReviewReasonCode: null,
@@ -1231,6 +1310,7 @@ export function normalizeDistributedEditingSessionState( sessionState = {} ) {
 		),
 		...freshReviewDecisionFields,
 		...freshReviewRetrySaveHandoffFields,
+		...normalizeFreshReviewLifecycleFields( sessionState ),
 		...riskyBlockReviewFields,
 		requiresManualConflictResolution,
 		mustOfferLocalCopy,
@@ -1754,6 +1834,88 @@ export function getDistributedEditingSessionStateForFreshReviewRetrySaveHandoffV
 			result || reasonCode ? 'rejected' : null,
 		mustOfferLocalCopy: true,
 		canExportLocalUpdates: true,
+	} );
+}
+
+/**
+ * Returns editor state after receiving support-safe fresh-review lifecycle
+ * evidence. This is response normalization only; it does not call REST, save,
+ * retry-save, dispatch notices, mutate content, expose private identity, or
+ * change post locks.
+ *
+ * @param {Object} responseOrError     REST-like response or API error.
+ * @param {Object} currentSessionState Current DE-RTC session state.
+ *
+ * @return {Object} Normalized DE-RTC session state.
+ */
+export function getDistributedEditingSessionStateForFreshReviewLifecycleRetrievalResult(
+	responseOrError = {},
+	currentSessionState = {}
+) {
+	const normalizedCurrent =
+		normalizeDistributedEditingSessionState( currentSessionState );
+	const responseData = getDistributedEditingResponseData( responseOrError );
+	const response = {
+		...responseData,
+		...responseOrError,
+		localUpdatesImportFreshReviewLifecycleRetrievalStatus:
+			responseOrError.freshReviewLifecycleDebugAvailable === true ||
+			responseOrError.fresh_review_lifecycle_debug_available === true ||
+			responseData.freshReviewLifecycleDebugAvailable === true ||
+			responseData.fresh_review_lifecycle_debug_available === true
+				? DISTRIBUTED_EDITING_FRESH_REVIEW_LIFECYCLE_RETRIEVAL_STATUSES.AVAILABLE
+				: DISTRIBUTED_EDITING_FRESH_REVIEW_LIFECYCLE_RETRIEVAL_STATUSES.UNAVAILABLE,
+		localUpdatesImportFreshReviewLifecycleResult: getFirstDefined(
+			responseOrError.result,
+			responseData.result
+		),
+		localUpdatesImportFreshReviewLifecycleRestRoute: getFirstDefined(
+			responseOrError.restRoute,
+			responseOrError.rest_route,
+			responseData.restRoute,
+			responseData.rest_route
+		),
+		localUpdatesImportFreshReviewDebugContract: getFirstDefined(
+			responseOrError.freshReviewDebugContract,
+			responseOrError.fresh_review_debug_contract,
+			responseData.freshReviewDebugContract,
+			responseData.fresh_review_debug_contract
+		),
+		localUpdatesImportFreshReviewRequestRecord: getFirstDefined(
+			responseOrError.freshReviewRequestRecord,
+			responseOrError.fresh_review_request_record,
+			responseData.freshReviewRequestRecord,
+			responseData.fresh_review_request_record
+		),
+		localUpdatesImportFreshReviewLifecycleDebugAvailable: getFirstDefined(
+			responseOrError.freshReviewLifecycleDebugAvailable,
+			responseOrError.fresh_review_lifecycle_debug_available,
+			responseData.freshReviewLifecycleDebugAvailable,
+			responseData.fresh_review_lifecycle_debug_available
+		),
+		localUpdatesImportFreshReviewSupportEvidenceAvailable: getFirstDefined(
+			responseOrError.freshReviewSupportEvidenceAvailable,
+			responseOrError.fresh_review_support_evidence_available,
+			responseData.freshReviewSupportEvidenceAvailable,
+			responseData.fresh_review_support_evidence_available
+		),
+	};
+	const lifecycleFields = normalizeFreshReviewLifecycleFields( response );
+	const hasProtectedLocalChanges = Boolean(
+		normalizedCurrent.hasPendingChanges ||
+			normalizedCurrent.mustOfferLocalCopy ||
+			normalizedCurrent.canExportLocalUpdates
+	);
+
+	return normalizeDistributedEditingSessionState( {
+		...normalizedCurrent,
+		...lifecycleFields,
+		...( hasProtectedLocalChanges
+			? {
+					mustOfferLocalCopy: true,
+					canExportLocalUpdates: true,
+			  }
+			: {} ),
 	} );
 }
 
@@ -3760,6 +3922,24 @@ export function getDistributedEditingNoticeDescriptorsForSessionState(
 						freshReviewPreSaveState.requiresServerStateRefetch,
 					freshReviewPreSaveCanExportLocalUpdates:
 						freshReviewPreSaveState.canExportLocalUpdates,
+					freshReviewPreSaveReviewListStatus:
+						freshReviewPreSaveState.reviewListStatus,
+					freshReviewPreSaveActionKeys:
+						freshReviewPreSaveState.actionKeys,
+					freshReviewLifecycleRetrievalStatus:
+						freshReviewPreSaveState.lifecycleRetrievalStatus,
+					freshReviewLifecycleStatus:
+						freshReviewPreSaveState.lifecycleStatus,
+					freshReviewLifecycleAction:
+						freshReviewPreSaveState.lifecycleAction,
+					freshReviewDecisionLifecycleStatus:
+						freshReviewPreSaveState.decisionLifecycleStatus,
+					freshReviewDecisionLifecycleAction:
+						freshReviewPreSaveState.decisionLifecycleAction,
+					freshReviewReviewerAuthorityStatus:
+						freshReviewPreSaveState.reviewerAuthorityStatus,
+					freshReviewRequiresFreshReviewDueToAuthority:
+						freshReviewPreSaveState.requiresFreshReviewDueToAuthority,
 					localUpdatesImportFreshReviewRetrySaveHandoffCallsNormalSavePost:
 						normalized.localUpdatesImportFreshReviewRetrySaveHandoffCallsNormalSavePost,
 					localUpdatesImportFreshReviewRetrySaveHandoffCallsRetrySaveEndpoint:
@@ -4512,11 +4692,29 @@ export function getDistributedEditingFreshReviewPreSaveStateForSessionState(
 		normalized.localUpdatesImportFreshReviewRetrySaveHandoffReason;
 	const decisionStatus =
 		normalized.localUpdatesImportFreshReviewDecisionStatus;
+	const lifecycleRetrievalStatus =
+		normalized.localUpdatesImportFreshReviewLifecycleRetrievalStatus;
+	const decisionLifecycleStatus =
+		normalized.localUpdatesImportFreshReviewDecisionLifecycleStatus;
+	const decisionLifecycleAction =
+		normalized.localUpdatesImportFreshReviewDecisionLifecycleAction;
+	const reviewerAuthorityStatus =
+		normalized.localUpdatesImportFreshReviewReviewerAuthorityStatus;
+	const requiresFreshReviewDueToAuthority =
+		normalized.localUpdatesImportFreshReviewRequiresFreshReviewDueToAuthority;
+	const reviewListStatus =
+		getDistributedEditingFreshReviewListStatusFromNormalizedState(
+			normalized
+		);
 	const hasFreshReviewRequest = Boolean(
 		normalized.localUpdatesImportRequiresFreshReview ||
 			normalized.localUpdatesImportFreshReviewRequestRequested ||
 			normalized.localUpdatesImportFreshReviewRequestAccepted ||
 			normalized.localUpdatesImportFreshReviewDecisionPanelRequired ||
+			reviewListStatus !==
+				DISTRIBUTED_EDITING_FRESH_REVIEW_REVIEW_LIST_STATUSES.NONE ||
+			lifecycleRetrievalStatus !==
+				DISTRIBUTED_EDITING_FRESH_REVIEW_LIFECYCLE_RETRIEVAL_STATUSES.NONE ||
 			decisionStatus !==
 				DISTRIBUTED_EDITING_FRESH_REVIEW_DECISION_STATUSES.NONE ||
 			handoffStatus !==
@@ -4527,7 +4725,7 @@ export function getDistributedEditingFreshReviewPreSaveStateForSessionState(
 	let placement = DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_PLACEMENTS.NONE;
 	let saveButtonLabel = 'Update';
 	let clickAction = null;
-	let requiresServerStateRefetch = false;
+	let requiresServerStateRefetch = normalized.requiresServerStateRefetch;
 
 	if (
 		hasProtectedLocalChanges &&
@@ -4535,7 +4733,19 @@ export function getDistributedEditingFreshReviewPreSaveStateForSessionState(
 		normalized.retrySaveStatus !==
 			DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVED
 	) {
-		if (
+		if ( requiresFreshReviewDueToAuthority ) {
+			status =
+				DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_STATUSES.REVIEW_REQUIRED;
+			reason =
+				decisionLifecycleStatus === 'capability_drift'
+					? 'fresh_review_authority_drift_requires_new_review'
+					: 'fresh_review_consumed_requires_new_review';
+			placement =
+				DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_PLACEMENTS.PRE_PUBLISH_REVIEW;
+			saveButtonLabel = 'Review changes';
+			clickAction =
+				DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.OPEN_PRE_PUBLISH_REVIEW;
+		} else if (
 			handoffStatus ===
 				DISTRIBUTED_EDITING_FRESH_REVIEW_RETRY_SAVE_HANDOFF_STATUSES.ACCEPTED_FOR_RETRY_SAVE ||
 			normalized.retrySaveFreshReviewConsumeValidationAccepted ||
@@ -4618,6 +4828,14 @@ export function getDistributedEditingFreshReviewPreSaveStateForSessionState(
 
 	const isActive =
 		status !== DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_STATUSES.NONE;
+	const actionKeys = [
+		isActive && normalized.canExportLocalUpdates
+			? DISTRIBUTED_EDITING_NOTICE_ACTIONS.EXPORT_LOCAL_UPDATES
+			: null,
+		requiresServerStateRefetch
+			? DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFETCH_SERVER_STATE
+			: null,
+	].filter( Boolean );
 
 	return {
 		status,
@@ -4630,8 +4848,82 @@ export function getDistributedEditingFreshReviewPreSaveStateForSessionState(
 			placement ===
 			DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_PLACEMENTS.PRE_PUBLISH_REVIEW,
 		requiresServerStateRefetch,
+		canRefetchServerState: requiresServerStateRefetch,
+		actionKeys,
 		canExportLocalUpdates: isActive && normalized.canExportLocalUpdates,
 		hasProtectedLocalChanges,
+		reviewListStatus,
+		reviewList: {
+			status: reviewListStatus,
+			itemCount:
+				normalized.localUpdatesImportFreshReviewDecisionItemCount,
+			pendingItemCount:
+				normalized.localUpdatesImportFreshReviewDecisionPendingCount,
+			approvedItemCount:
+				normalized.localUpdatesImportFreshReviewDecisionApprovedCount,
+			rejectedItemCount:
+				normalized.localUpdatesImportFreshReviewDecisionRejectedCount,
+			reviewedBlockItemCount:
+				normalized.localUpdatesImportFreshReviewDecisionReviewedBlockItemCount ||
+				normalized.retrySaveFreshReviewReviewedBlockItemCount ||
+				normalized.localUpdatesImportFreshReviewLifecycleReviewedBlockItemCount,
+			opensPrePublishReview:
+				placement ===
+				DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_PLACEMENTS.PRE_PUBLISH_REVIEW,
+			canExportLocalUpdates: isActive && normalized.canExportLocalUpdates,
+			exposesRawContent: false,
+			exposesProofSignature: false,
+			exposesReviewerIds: false,
+		},
+		lifecycleRetrievalStatus,
+		lifecycleResult:
+			normalized.localUpdatesImportFreshReviewLifecycleResult,
+		lifecycleRestRoute:
+			normalized.localUpdatesImportFreshReviewLifecycleRestRoute,
+		lifecycleDebugAvailable:
+			normalized.localUpdatesImportFreshReviewLifecycleDebugAvailable,
+		supportEvidenceAvailable:
+			normalized.localUpdatesImportFreshReviewSupportEvidenceAvailable,
+		lifecycleStatus:
+			normalized.localUpdatesImportFreshReviewLifecycleStatus,
+		lifecycleEvent: normalized.localUpdatesImportFreshReviewLifecycleEvent,
+		lifecycleReason:
+			normalized.localUpdatesImportFreshReviewLifecycleReason,
+		lifecycleAction:
+			normalized.localUpdatesImportFreshReviewLifecycleAction,
+		lifecycleDecisionRecorded:
+			normalized.localUpdatesImportFreshReviewLifecycleDecisionRecorded,
+		lifecycleDecisionConsumed:
+			normalized.localUpdatesImportFreshReviewLifecycleDecisionConsumed,
+		lifecycleRetrySaveApplied:
+			normalized.localUpdatesImportFreshReviewLifecycleRetrySaveApplied,
+		lifecyclePreviousServerVersion:
+			normalized.localUpdatesImportFreshReviewLifecyclePreviousServerVersion,
+		lifecycleSavedServerVersion:
+			normalized.localUpdatesImportFreshReviewLifecycleSavedServerVersion,
+		lifecycleReviewedBlockItemCount:
+			normalized.localUpdatesImportFreshReviewLifecycleReviewedBlockItemCount,
+		lifecycleApprovedBlockItemCount:
+			normalized.localUpdatesImportFreshReviewLifecycleApprovedBlockItemCount,
+		lifecycleRejectedBlockItemCount:
+			normalized.localUpdatesImportFreshReviewLifecycleRejectedBlockItemCount,
+		lifecycleHashEvidenceFields:
+			normalized.localUpdatesImportFreshReviewLifecycleHashEvidenceFields,
+		lifecycleVersionEvidenceFields:
+			normalized.localUpdatesImportFreshReviewLifecycleVersionEvidenceFields,
+		decisionLifecycleStatus,
+		decisionLifecycleAction,
+		reviewerAuthorityStatus,
+		requiresFreshReviewDueToAuthority,
+		reviewerAuthorityDriftRequiresFreshReview:
+			reviewerAuthorityStatus ===
+			DISTRIBUTED_EDITING_FRESH_REVIEW_AUTHORITY_STATUSES.AUTHORITY_DRIFT_REQUIRES_FRESH_REVIEW,
+		reviewerCapabilityDriftRecheckSupported:
+			normalized.localUpdatesImportFreshReviewLifecycleReviewerCapabilityDriftRecheckSupported,
+		reviewerIdentityRetained:
+			normalized.localUpdatesImportFreshReviewLifecycleReviewerIdentityRetained,
+		requiresNewReviewIfReviewerAuthorityCannotBeRechecked:
+			normalized.localUpdatesImportFreshReviewLifecycleRequiresNewReviewIfReviewerAuthorityCannotBeRechecked,
 		requestStatus: normalized.localUpdatesImportReviewRequestStatus,
 		requestAccepted:
 			normalized.localUpdatesImportFreshReviewRequestAccepted,
@@ -4676,6 +4968,149 @@ export function getDistributedEditingFreshReviewPreSaveStateForSessionState(
 		exposesProofSignature: false,
 		exposesReviewerIds: false,
 	};
+}
+
+/**
+ * Returns support-safe fresh-review lifecycle evidence for future UI.
+ *
+ * @param {Object} sessionState DE-RTC session state.
+ *
+ * @return {Object} Fresh-review lifecycle state.
+ */
+export function getDistributedEditingFreshReviewLifecycleStateForSessionState(
+	sessionState = {}
+) {
+	const normalized = normalizeDistributedEditingSessionState( sessionState );
+	const reviewListStatus =
+		getDistributedEditingFreshReviewListStatusFromNormalizedState(
+			normalized
+		);
+
+	return {
+		retrievalStatus:
+			normalized.localUpdatesImportFreshReviewLifecycleRetrievalStatus,
+		result: normalized.localUpdatesImportFreshReviewLifecycleResult,
+		restRoute: normalized.localUpdatesImportFreshReviewLifecycleRestRoute,
+		debugAvailable:
+			normalized.localUpdatesImportFreshReviewLifecycleDebugAvailable,
+		supportEvidenceAvailable:
+			normalized.localUpdatesImportFreshReviewSupportEvidenceAvailable,
+		requestRecordId:
+			normalized.localUpdatesImportFreshReviewRequestRecordId,
+		requestStatus:
+			normalized.localUpdatesImportFreshReviewLifecycleRequestStatus,
+		decisionStatus:
+			normalized.localUpdatesImportFreshReviewLifecycleDecisionStatus,
+		decisionRecorded:
+			normalized.localUpdatesImportFreshReviewLifecycleDecisionRecorded,
+		decisionConsumed:
+			normalized.localUpdatesImportFreshReviewLifecycleDecisionConsumed,
+		retrySaveApplied:
+			normalized.localUpdatesImportFreshReviewLifecycleRetrySaveApplied,
+		consumesReviewDecision:
+			normalized.localUpdatesImportFreshReviewLifecycleConsumesReviewDecision,
+		importedHandoff:
+			normalized.localUpdatesImportFreshReviewLifecycleImportedHandoff,
+		lifecycleStatus:
+			normalized.localUpdatesImportFreshReviewLifecycleStatus,
+		lifecycleEvent: normalized.localUpdatesImportFreshReviewLifecycleEvent,
+		lifecycleReason:
+			normalized.localUpdatesImportFreshReviewLifecycleReason,
+		lifecycleAction:
+			normalized.localUpdatesImportFreshReviewLifecycleAction,
+		previousServerVersion:
+			normalized.localUpdatesImportFreshReviewLifecyclePreviousServerVersion,
+		savedServerVersion:
+			normalized.localUpdatesImportFreshReviewLifecycleSavedServerVersion,
+		reviewedBlockItemCount:
+			normalized.localUpdatesImportFreshReviewLifecycleReviewedBlockItemCount,
+		approvedBlockItemCount:
+			normalized.localUpdatesImportFreshReviewLifecycleApprovedBlockItemCount,
+		rejectedBlockItemCount:
+			normalized.localUpdatesImportFreshReviewLifecycleRejectedBlockItemCount,
+		hashEvidenceFields:
+			normalized.localUpdatesImportFreshReviewLifecycleHashEvidenceFields,
+		versionEvidenceFields:
+			normalized.localUpdatesImportFreshReviewLifecycleVersionEvidenceFields,
+		reviewListStatus,
+		reviewerAuthorityStatus:
+			normalized.localUpdatesImportFreshReviewReviewerAuthorityStatus,
+		requiresFreshReviewDueToAuthority:
+			normalized.localUpdatesImportFreshReviewRequiresFreshReviewDueToAuthority,
+		reviewerCapabilityDriftRecheckSupported:
+			normalized.localUpdatesImportFreshReviewLifecycleReviewerCapabilityDriftRecheckSupported,
+		reviewerIdentityRetained:
+			normalized.localUpdatesImportFreshReviewLifecycleReviewerIdentityRetained,
+		requiresNewReviewIfReviewerAuthorityCannotBeRechecked:
+			normalized.localUpdatesImportFreshReviewLifecycleRequiresNewReviewIfReviewerAuthorityCannotBeRechecked,
+		canExportLocalUpdates: normalized.canExportLocalUpdates,
+		hasProtectedLocalChanges: Boolean(
+			normalized.hasPendingChanges ||
+				normalized.mustOfferLocalCopy ||
+				normalized.canExportLocalUpdates
+		),
+		shouldCallRetrySaveEndpoint: false,
+		shouldCallNormalSavePost: false,
+		dispatchesNotice: false,
+		mutatesEditorContent: false,
+		mutatesPersistedPostContent: false,
+		changesPostLock: false,
+		claimsSaved: false,
+		exposesRawContent: false,
+		exposesProofSignature: false,
+		exposesReviewerIds: false,
+		exposesSaverIds: false,
+		exposesProofInternals: false,
+	};
+}
+
+function getDistributedEditingFreshReviewListStatusFromNormalizedState(
+	normalized
+) {
+	if (
+		normalized.localUpdatesImportFreshReviewLifecycleDecisionConsumed ||
+		normalized.localUpdatesImportFreshReviewLifecycleRetrySaveApplied ||
+		normalized.localUpdatesImportFreshReviewLifecycleStatus ===
+			'retry_save_consumed'
+	) {
+		return DISTRIBUTED_EDITING_FRESH_REVIEW_REVIEW_LIST_STATUSES.CONSUMED;
+	}
+
+	if (
+		normalized.localUpdatesImportFreshReviewRequiresFreshReviewDueToAuthority ||
+		normalized.localUpdatesImportFreshReviewRetrySaveHandoffStatus ===
+			DISTRIBUTED_EDITING_FRESH_REVIEW_RETRY_SAVE_HANDOFF_STATUSES.BLOCKED
+	) {
+		return DISTRIBUTED_EDITING_FRESH_REVIEW_REVIEW_LIST_STATUSES.BLOCKED;
+	}
+
+	if (
+		normalized.localUpdatesImportFreshReviewDecisionStatus ===
+		DISTRIBUTED_EDITING_FRESH_REVIEW_DECISION_STATUSES.RECORDED
+	) {
+		return DISTRIBUTED_EDITING_FRESH_REVIEW_REVIEW_LIST_STATUSES.DECISION_RECORDED;
+	}
+
+	if (
+		normalized.localUpdatesImportFreshReviewDecisionStatus ===
+		DISTRIBUTED_EDITING_FRESH_REVIEW_DECISION_STATUSES.READY
+	) {
+		return DISTRIBUTED_EDITING_FRESH_REVIEW_REVIEW_LIST_STATUSES.DECISION_READY;
+	}
+
+	if (
+		normalized.localUpdatesImportFreshReviewDecisionPanelRequired ||
+		normalized.localUpdatesImportFreshReviewDecisionStatus ===
+			DISTRIBUTED_EDITING_FRESH_REVIEW_DECISION_STATUSES.AWAITING_REVIEW
+	) {
+		return DISTRIBUTED_EDITING_FRESH_REVIEW_REVIEW_LIST_STATUSES.AWAITING_REVIEW;
+	}
+
+	if ( normalized.localUpdatesImportRequiresFreshReview ) {
+		return DISTRIBUTED_EDITING_FRESH_REVIEW_REVIEW_LIST_STATUSES.REVIEW_REQUIRED;
+	}
+
+	return DISTRIBUTED_EDITING_FRESH_REVIEW_REVIEW_LIST_STATUSES.NONE;
 }
 
 /**
@@ -7225,6 +7660,399 @@ function normalizeRetrySaveReviewApprovalReviewedBlockItem( item = {} ) {
 			) || 'kses',
 		rawContentIncluded: false,
 		exposesRawContent: false,
+	};
+}
+
+function normalizeFreshReviewLifecycleFields( sessionState = {} ) {
+	const freshReviewRequestRecord = normalizeObject(
+		getFirstDefined(
+			sessionState.localUpdatesImportFreshReviewRequestRecord,
+			sessionState.freshReviewRequestRecord,
+			sessionState.fresh_review_request_record
+		)
+	);
+	const debugContract = normalizeObject(
+		getFirstDefined(
+			sessionState.localUpdatesImportFreshReviewDebugContract,
+			sessionState.freshReviewDebugContract,
+			sessionState.fresh_review_debug_contract
+		)
+	);
+	const requestedRetrievalStatus =
+		VALID_FRESH_REVIEW_LIFECYCLE_RETRIEVAL_STATUSES.has(
+			sessionState.localUpdatesImportFreshReviewLifecycleRetrievalStatus
+		)
+			? sessionState.localUpdatesImportFreshReviewLifecycleRetrievalStatus
+			: DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE.localUpdatesImportFreshReviewLifecycleRetrievalStatus;
+	const lifecycleDebugAvailable = Boolean(
+		getFirstDefined(
+			sessionState.localUpdatesImportFreshReviewLifecycleDebugAvailable,
+			sessionState.freshReviewLifecycleDebugAvailable,
+			sessionState.fresh_review_lifecycle_debug_available
+		)
+	);
+	const supportEvidenceAvailable = Boolean(
+		getFirstDefined(
+			sessionState.localUpdatesImportFreshReviewSupportEvidenceAvailable,
+			sessionState.freshReviewSupportEvidenceAvailable,
+			sessionState.fresh_review_support_evidence_available
+		)
+	);
+	const result = normalizeNullableString(
+		getFirstDefined(
+			sessionState.localUpdatesImportFreshReviewLifecycleResult,
+			sessionState.freshReviewLifecycleResult,
+			sessionState.result
+		)
+	);
+	let retrievalStatus = requestedRetrievalStatus;
+
+	if ( lifecycleDebugAvailable || supportEvidenceAvailable ) {
+		retrievalStatus =
+			DISTRIBUTED_EDITING_FRESH_REVIEW_LIFECYCLE_RETRIEVAL_STATUSES.AVAILABLE;
+	} else if (
+		result ||
+		normalizeNullableString(
+			getFirstDefined(
+				sessionState.detail,
+				sessionState.data?.detail,
+				sessionState.freshReviewLifecycleDetail,
+				sessionState.fresh_review_lifecycle_detail
+			)
+		) === 'fresh_review_lifecycle_record_unavailable'
+	) {
+		retrievalStatus =
+			DISTRIBUTED_EDITING_FRESH_REVIEW_LIFECYCLE_RETRIEVAL_STATUSES.UNAVAILABLE;
+	}
+
+	const decisionCounts = normalizeFreshReviewReviewedBlockDecisionCounts(
+		getFirstDefined(
+			sessionState.localUpdatesImportFreshReviewLifecycleReviewedBlockDecisionCounts,
+			sessionState.freshReviewReviewedBlockDecisionCounts,
+			sessionState.fresh_review_reviewed_block_decision_counts,
+			debugContract.reviewedBlockDecisionCounts,
+			debugContract.reviewed_block_decision_counts,
+			freshReviewRequestRecord.reviewedBlockDecisionCounts,
+			freshReviewRequestRecord.reviewed_block_decision_counts
+		)
+	);
+	const approvedBlockItemCount = normalizeCountWithFallback(
+		getFirstDefined(
+			sessionState.localUpdatesImportFreshReviewLifecycleApprovedBlockItemCount,
+			sessionState.freshReviewApprovedBlockItemCount,
+			sessionState.fresh_review_approved_block_item_count
+		),
+		decisionCounts.approved
+	);
+	const rejectedBlockItemCount = normalizeCountWithFallback(
+		getFirstDefined(
+			sessionState.localUpdatesImportFreshReviewLifecycleRejectedBlockItemCount,
+			sessionState.freshReviewRejectedBlockItemCount,
+			sessionState.fresh_review_rejected_block_item_count
+		),
+		decisionCounts.rejected
+	);
+	const lifecycleStatus = normalizeNullableString(
+		getFirstDefined(
+			sessionState.localUpdatesImportFreshReviewLifecycleStatus,
+			sessionState.freshReviewLifecycleStatus,
+			sessionState.fresh_review_lifecycle_status,
+			debugContract.lifecycleStatus,
+			debugContract.lifecycle_status,
+			freshReviewRequestRecord.lifecycleStatus,
+			freshReviewRequestRecord.lifecycle_status
+		)
+	);
+	const lifecycleAction = normalizeNullableString(
+		getFirstDefined(
+			sessionState.localUpdatesImportFreshReviewLifecycleAction,
+			sessionState.freshReviewLifecycleAction,
+			sessionState.fresh_review_lifecycle_action
+		)
+	);
+	const decisionLifecycleStatus = normalizeNullableString(
+		getFirstDefined(
+			sessionState.localUpdatesImportFreshReviewDecisionLifecycleStatus,
+			sessionState.freshReviewDecisionLifecycleStatus,
+			sessionState.fresh_review_decision_lifecycle_status
+		)
+	);
+	const decisionLifecycleAction = normalizeNullableString(
+		getFirstDefined(
+			sessionState.localUpdatesImportFreshReviewDecisionLifecycleAction,
+			sessionState.freshReviewDecisionLifecycleAction,
+			sessionState.fresh_review_decision_lifecycle_action,
+			lifecycleAction
+		)
+	);
+	const reviewerCapabilityDriftRecheckSupported = Boolean(
+		getFirstDefined(
+			sessionState.localUpdatesImportFreshReviewLifecycleReviewerCapabilityDriftRecheckSupported,
+			sessionState.freshReviewReviewerCapabilityDriftRecheckSupported,
+			debugContract.reviewerCapabilityDriftRecheckSupported,
+			debugContract.reviewer_capability_drift_recheck_supported
+		)
+	);
+	const requiresNewReviewIfReviewerAuthorityCannotBeRechecked = Boolean(
+		getFirstDefined(
+			sessionState.localUpdatesImportFreshReviewLifecycleRequiresNewReviewIfReviewerAuthorityCannotBeRechecked,
+			sessionState.freshReviewRequiresNewReviewIfReviewerAuthorityCannotBeRechecked,
+			debugContract.requiresNewReviewIfReviewerAuthorityCannotBeRechecked,
+			debugContract.requires_new_review_if_reviewer_authority_cannot_be_rechecked
+		)
+	);
+	const hasAuthorityDrift =
+		decisionLifecycleStatus === 'capability_drift' ||
+		lifecycleStatus === 'capability_drift';
+	const requiresFreshReviewDueToAuthority = Boolean(
+		sessionState.localUpdatesImportFreshReviewRequiresFreshReviewDueToAuthority ||
+			hasAuthorityDrift ||
+			decisionLifecycleAction === 'request_new_fresh_review'
+	);
+	let reviewerAuthorityStatus =
+		DISTRIBUTED_EDITING_FRESH_REVIEW_AUTHORITY_STATUSES.NONE;
+
+	if ( hasAuthorityDrift ) {
+		reviewerAuthorityStatus =
+			DISTRIBUTED_EDITING_FRESH_REVIEW_AUTHORITY_STATUSES.AUTHORITY_DRIFT_REQUIRES_FRESH_REVIEW;
+	} else if ( requiresFreshReviewDueToAuthority ) {
+		reviewerAuthorityStatus =
+			DISTRIBUTED_EDITING_FRESH_REVIEW_AUTHORITY_STATUSES.FRESH_REVIEW_REQUIRED;
+	} else if (
+		requiresNewReviewIfReviewerAuthorityCannotBeRechecked &&
+		! reviewerCapabilityDriftRecheckSupported
+	) {
+		reviewerAuthorityStatus =
+			DISTRIBUTED_EDITING_FRESH_REVIEW_AUTHORITY_STATUSES.RECHECK_UNSUPPORTED;
+	}
+
+	return {
+		localUpdatesImportFreshReviewLifecycleRetrievalStatus: retrievalStatus,
+		localUpdatesImportFreshReviewLifecycleResult: result,
+		localUpdatesImportFreshReviewLifecycleRestRoute:
+			normalizeNullableString(
+				getFirstDefined(
+					sessionState.localUpdatesImportFreshReviewLifecycleRestRoute,
+					sessionState.freshReviewLifecycleRestRoute,
+					sessionState.restRoute,
+					sessionState.rest_route
+				)
+			),
+		localUpdatesImportFreshReviewLifecycleDebugAvailable:
+			lifecycleDebugAvailable,
+		localUpdatesImportFreshReviewSupportEvidenceAvailable:
+			supportEvidenceAvailable,
+		localUpdatesImportFreshReviewLifecycleStatus: lifecycleStatus,
+		localUpdatesImportFreshReviewLifecycleEvent: normalizeNullableString(
+			getFirstDefined(
+				sessionState.localUpdatesImportFreshReviewLifecycleEvent,
+				sessionState.freshReviewLifecycleEvent,
+				sessionState.fresh_review_lifecycle_event,
+				debugContract.lifecycleEvent,
+				debugContract.lifecycle_event,
+				freshReviewRequestRecord.lifecycleEvent,
+				freshReviewRequestRecord.lifecycle_event
+			)
+		),
+		localUpdatesImportFreshReviewLifecycleReason: normalizeNullableString(
+			getFirstDefined(
+				sessionState.localUpdatesImportFreshReviewLifecycleReason,
+				sessionState.freshReviewLifecycleReason,
+				sessionState.fresh_review_lifecycle_reason,
+				debugContract.lifecycleReason,
+				debugContract.lifecycle_reason,
+				freshReviewRequestRecord.lifecycleReason,
+				freshReviewRequestRecord.lifecycle_reason
+			)
+		),
+		localUpdatesImportFreshReviewLifecycleAction: lifecycleAction,
+		localUpdatesImportFreshReviewLifecycleRequestStatus:
+			normalizeNullableString(
+				getFirstDefined(
+					sessionState.localUpdatesImportFreshReviewLifecycleRequestStatus,
+					sessionState.freshReviewRequestStatus,
+					sessionState.fresh_review_request_status,
+					freshReviewRequestRecord.status,
+					freshReviewRequestRecord.lifecycle_status
+				)
+			),
+		localUpdatesImportFreshReviewLifecycleDecisionStatus:
+			normalizeNullableString(
+				getFirstDefined(
+					sessionState.localUpdatesImportFreshReviewLifecycleDecisionStatus,
+					sessionState.freshReviewDecisionStatus,
+					sessionState.fresh_review_decision_status,
+					debugContract.decisionStatus,
+					debugContract.decision_status,
+					freshReviewRequestRecord.decisionStatus,
+					freshReviewRequestRecord.decision_status
+				)
+			),
+		localUpdatesImportFreshReviewLifecycleDecisionRecorded: Boolean(
+			getFirstDefined(
+				sessionState.localUpdatesImportFreshReviewLifecycleDecisionRecorded,
+				sessionState.freshReviewDecisionRecorded,
+				sessionState.fresh_review_decision_recorded,
+				debugContract.decisionRecorded,
+				debugContract.decision_recorded
+			)
+		),
+		localUpdatesImportFreshReviewLifecycleDecisionConsumed: Boolean(
+			getFirstDefined(
+				sessionState.localUpdatesImportFreshReviewLifecycleDecisionConsumed,
+				sessionState.freshReviewDecisionConsumed,
+				sessionState.fresh_review_decision_consumed,
+				debugContract.decisionConsumed,
+				debugContract.decision_consumed
+			)
+		),
+		localUpdatesImportFreshReviewLifecycleRetrySaveApplied: Boolean(
+			getFirstDefined(
+				sessionState.localUpdatesImportFreshReviewLifecycleRetrySaveApplied,
+				sessionState.freshReviewRetrySaveApplied,
+				sessionState.fresh_review_retry_save_applied,
+				debugContract.retrySaveApplied,
+				debugContract.retry_save_applied
+			)
+		),
+		localUpdatesImportFreshReviewLifecycleConsumesReviewDecision: Boolean(
+			getFirstDefined(
+				sessionState.localUpdatesImportFreshReviewLifecycleConsumesReviewDecision,
+				sessionState.freshReviewConsumesReviewDecision,
+				sessionState.fresh_review_consumes_review_decision,
+				debugContract.consumesReviewDecision,
+				debugContract.consumes_review_decision
+			)
+		),
+		localUpdatesImportFreshReviewLifecycleImportedHandoff: Boolean(
+			getFirstDefined(
+				sessionState.localUpdatesImportFreshReviewLifecycleImportedHandoff,
+				sessionState.freshReviewImportedHandoff,
+				sessionState.fresh_review_imported_handoff,
+				debugContract.importedFreshReviewHandoff,
+				debugContract.imported_fresh_review_handoff
+			)
+		),
+		localUpdatesImportFreshReviewLifecyclePreviousServerVersion:
+			normalizeNullableString(
+				getFirstDefined(
+					sessionState.localUpdatesImportFreshReviewLifecyclePreviousServerVersion,
+					sessionState.freshReviewPreviousServerVersion,
+					sessionState.fresh_review_previous_server_version,
+					debugContract.previousServerVersion,
+					debugContract.previous_server_version
+				)
+			),
+		localUpdatesImportFreshReviewLifecycleSavedServerVersion:
+			normalizeNullableString(
+				getFirstDefined(
+					sessionState.localUpdatesImportFreshReviewLifecycleSavedServerVersion,
+					sessionState.freshReviewSavedServerVersion,
+					sessionState.fresh_review_saved_server_version,
+					debugContract.savedServerVersion,
+					debugContract.saved_server_version
+				)
+			),
+		localUpdatesImportFreshReviewLifecycleReviewedBlockItemCount:
+			normalizeCountWithFallback(
+				getFirstDefined(
+					sessionState.localUpdatesImportFreshReviewLifecycleReviewedBlockItemCount,
+					sessionState.freshReviewReviewedBlockItemCount,
+					sessionState.fresh_review_reviewed_block_item_count,
+					debugContract.reviewedBlockItemCount,
+					debugContract.reviewed_block_item_count
+				),
+				0
+			),
+		localUpdatesImportFreshReviewLifecycleApprovedBlockItemCount:
+			approvedBlockItemCount,
+		localUpdatesImportFreshReviewLifecycleRejectedBlockItemCount:
+			rejectedBlockItemCount,
+		localUpdatesImportFreshReviewLifecycleHashEvidenceFields:
+			normalizeStringList(
+				getFirstDefined(
+					sessionState.localUpdatesImportFreshReviewLifecycleHashEvidenceFields,
+					sessionState.freshReviewHashEvidenceFields,
+					sessionState.fresh_review_hash_evidence_fields,
+					debugContract.hashEvidenceFields,
+					debugContract.hash_evidence_fields
+				)
+			),
+		localUpdatesImportFreshReviewLifecycleVersionEvidenceFields:
+			normalizeStringList(
+				getFirstDefined(
+					sessionState.localUpdatesImportFreshReviewLifecycleVersionEvidenceFields,
+					sessionState.freshReviewVersionEvidenceFields,
+					sessionState.fresh_review_version_evidence_fields,
+					debugContract.versionEvidenceFields,
+					debugContract.version_evidence_fields
+				)
+			),
+		localUpdatesImportFreshReviewLifecycleReviewerIdentityRetained: Boolean(
+			getFirstDefined(
+				sessionState.localUpdatesImportFreshReviewLifecycleReviewerIdentityRetained,
+				sessionState.freshReviewReviewerIdentityRetained,
+				debugContract.reviewerIdentityRetained,
+				debugContract.reviewer_identity_retained
+			)
+		),
+		localUpdatesImportFreshReviewLifecycleReviewerCapabilityDriftRecheckSupported:
+			reviewerCapabilityDriftRecheckSupported,
+		localUpdatesImportFreshReviewLifecycleRequiresNewReviewIfReviewerAuthorityCannotBeRechecked:
+			requiresNewReviewIfReviewerAuthorityCannotBeRechecked,
+		localUpdatesImportFreshReviewLifecycleExposesRawContent: Boolean(
+			getFirstDefined(
+				sessionState.localUpdatesImportFreshReviewLifecycleExposesRawContent,
+				sessionState.freshReviewLifecycleExposesRawContent,
+				debugContract.exposesRawContent,
+				debugContract.exposes_raw_content
+			)
+		),
+		localUpdatesImportFreshReviewLifecycleExposesProofInternals: Boolean(
+			getFirstDefined(
+				sessionState.localUpdatesImportFreshReviewLifecycleExposesProofInternals,
+				sessionState.freshReviewLifecycleExposesProofInternals,
+				debugContract.exposesProofInternals,
+				debugContract.exposes_proof_internals
+			)
+		),
+		localUpdatesImportFreshReviewLifecycleExposesReviewerIdentity: Boolean(
+			getFirstDefined(
+				sessionState.localUpdatesImportFreshReviewLifecycleExposesReviewerIdentity,
+				sessionState.freshReviewLifecycleExposesReviewerIdentity,
+				debugContract.exposesReviewerIdentity,
+				debugContract.exposes_reviewer_identity
+			)
+		),
+		localUpdatesImportFreshReviewLifecycleExposesSaverIdentity: Boolean(
+			getFirstDefined(
+				sessionState.localUpdatesImportFreshReviewLifecycleExposesSaverIdentity,
+				sessionState.freshReviewLifecycleExposesSaverIdentity,
+				debugContract.exposesSaverIdentity,
+				debugContract.exposes_saver_identity
+			)
+		),
+		localUpdatesImportFreshReviewDecisionLifecycleStatus:
+			decisionLifecycleStatus,
+		localUpdatesImportFreshReviewDecisionLifecycleAction:
+			decisionLifecycleAction,
+		localUpdatesImportFreshReviewReviewerAuthorityStatus:
+			reviewerAuthorityStatus,
+		localUpdatesImportFreshReviewRequiresFreshReviewDueToAuthority:
+			requiresFreshReviewDueToAuthority,
+	};
+}
+
+function normalizeFreshReviewReviewedBlockDecisionCounts( value ) {
+	const counts = normalizeObject( value );
+
+	return {
+		approved: normalizeCount(
+			getFirstDefined( counts.approved, counts.approved_count )
+		),
+		rejected: normalizeCount(
+			getFirstDefined( counts.rejected, counts.rejected_count )
+		),
 	};
 }
 
