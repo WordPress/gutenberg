@@ -35,6 +35,7 @@ import {
 	getDistributedEditingFreshReviewDecisionStateForSessionState,
 	getDistributedEditingFreshReviewLifecycleStateForSessionState,
 	getDistributedEditingFreshReviewPreSaveStateForSessionState,
+	getDistributedEditingFreshReviewPrePublishStateForSessionState,
 	getDistributedEditingFreshReviewRetrySaveHandoffStateForSessionState,
 	getDistributedEditingLocalUpdatesImportReviewRequestStateForSessionState,
 	getDistributedEditingNoticeDescriptorsForSessionState,
@@ -567,6 +568,19 @@ export function getDistributedEditingFreshReviewRetrySaveHandoffState( state ) {
  */
 export function getDistributedEditingFreshReviewPreSaveState( state ) {
 	return getDistributedEditingFreshReviewPreSaveStateForSessionState(
+		getDistributedEditingSessionState( state )
+	);
+}
+
+/**
+ * Returns the current DE-RTC fresh-review pre-publish surface state.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {Object} Fresh-review pre-publish state.
+ */
+export function getDistributedEditingFreshReviewPrePublishState( state ) {
+	return getDistributedEditingFreshReviewPrePublishStateForSessionState(
 		getDistributedEditingSessionState( state )
 	);
 }

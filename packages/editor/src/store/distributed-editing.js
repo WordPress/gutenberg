@@ -81,14 +81,18 @@ export const DISTRIBUTED_EDITING_NOTICE_IDS = Object.freeze( {
  */
 export const DISTRIBUTED_EDITING_NOTICE_ACTIONS = Object.freeze( {
 	ACCEPT_SERVER_STATE: 'accept-server-state',
+	APPROVE_FRESH_REVIEW_ITEM: 'approve-fresh-review-item',
 	EXPORT_LOCAL_UPDATES: 'export-local-updates',
 	PREPARE_RETRY_SUBMIT: 'prepare-retry-submit',
 	PREPARE_RETRY_SUBMIT_SAVE: 'prepare-retry-submit-save',
 	REFETCH_SERVER_STATE: 'refetch-server-state',
 	REFRESH_RETRY_SUBMIT_PROOF: 'refresh-retry-submit-proof',
 	REBASE_LOCAL_UPDATES: 'rebase-local-updates',
+	REJECT_FRESH_REVIEW_ITEM: 'reject-fresh-review-item',
 	REVIEW_REMOTE_CHANGES: 'review-remote-changes',
 	REQUEST_FRESH_REVIEW: 'request-fresh-review',
+	SUBMIT_FRESH_REVIEW_DECISION: 'submit-fresh-review-decision',
+	VALIDATE_FRESH_REVIEW_HANDOFF: 'validate-fresh-review-handoff',
 } );
 
 const DISTRIBUTED_EDITING_SYNC_META_SCRIPT_SOURCE = `<script\\b(?=[^>]*\\btype\\s*=\\s*(['"])wp/post-sync-meta\\1)[^>]*>([\\s\\S]*?)<\\/script\\s*>`;
@@ -1979,12 +1983,20 @@ export function getDistributedEditingSessionStateForFreshReviewDecisionItemResol
 	const reviewItemId = normalizeNullableString(
 		resolution.reviewItemId || resolution.id
 	);
+	const decision = normalizeFreshReviewLocalDecision(
+		getFirstDefined(
+			resolution.decision,
+			resolution.reviewDecision,
+			resolution.review_decision
+		)
+	);
 
 	if (
 		! normalized.localUpdatesImportRequiresFreshReview ||
 		normalized.localUpdatesImportReviewRequestStatus !==
 			DISTRIBUTED_EDITING_LOCAL_UPDATES_REVIEW_REQUEST_STATUSES.REQUESTED ||
-		! reviewItemId
+		! reviewItemId ||
+		! decision
 	) {
 		return normalized;
 	}
@@ -1996,7 +2008,7 @@ export function getDistributedEditingSessionStateForFreshReviewDecisionItemResol
 			}
 
 			const reviewStatus =
-				resolution.decision === 'rejected'
+				decision === 'rejected'
 					? DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES.REJECTED
 					: DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES.APPROVED_FOR_RETRY_SAVE;
 
@@ -2025,6 +2037,27 @@ export function getDistributedEditingSessionStateForFreshReviewDecisionItemResol
 		mustOfferLocalCopy: true,
 		canExportLocalUpdates: true,
 	} );
+}
+
+function normalizeFreshReviewLocalDecision( decision ) {
+	const normalizedDecision = normalizeNullableString( decision );
+
+	if (
+		[
+			'approve',
+			'approved',
+			'approved_for_retry_save',
+			DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES.APPROVED_FOR_RETRY_SAVE,
+		].includes( normalizedDecision )
+	) {
+		return 'approved';
+	}
+
+	if ( [ 'reject', 'rejected' ].includes( normalizedDecision ) ) {
+		return 'rejected';
+	}
+
+	return null;
 }
 
 /**
@@ -4959,6 +4992,300 @@ export function getDistributedEditingFreshReviewPreSaveStateForSessionState(
 			normalized.retrySaveFreshReviewDecisionConsumptionValidated,
 		shouldCallNormalSavePost: false,
 		shouldCallRetrySaveEndpoint: false,
+		dispatchesNotice: false,
+		mutatesEditorContent: false,
+		mutatesPersistedPostContent: false,
+		changesPostLock: false,
+		claimsSaved: false,
+		exposesRawContent: false,
+		exposesProofSignature: false,
+		exposesReviewerIds: false,
+	};
+}
+
+/**
+ * Returns the pure fresh-review pre-publish surface state. The returned review
+ * items and actions are descriptors only; they do not open UI, call REST, save,
+ * retry-save, dispatch notices, mutate content, expose raw content, or change
+ * post locks.
+ *
+ * @param {Object} sessionState DE-RTC session state.
+ *
+ * @return {Object} Fresh-review pre-publish state.
+ */
+export function getDistributedEditingFreshReviewPrePublishStateForSessionState(
+	sessionState = {}
+) {
+	const normalized = normalizeDistributedEditingSessionState( sessionState );
+	const preSaveState =
+		getDistributedEditingFreshReviewPreSaveStateForSessionState(
+			normalized
+		);
+	const decisionState =
+		getDistributedEditingFreshReviewDecisionStateForSessionState(
+			normalized
+		);
+	const lifecycleState =
+		getDistributedEditingFreshReviewLifecycleStateForSessionState(
+			normalized
+		);
+	const canRecordLocalDecisions =
+		normalized.localUpdatesImportRequiresFreshReview &&
+		normalized.localUpdatesImportReviewRequestStatus ===
+			DISTRIBUTED_EDITING_LOCAL_UPDATES_REVIEW_REQUEST_STATUSES.REQUESTED &&
+		[
+			DISTRIBUTED_EDITING_FRESH_REVIEW_DECISION_STATUSES.AWAITING_REVIEW,
+			DISTRIBUTED_EDITING_FRESH_REVIEW_DECISION_STATUSES.READY,
+		].includes( decisionState.status ) &&
+		! decisionState.decisionSubmitted &&
+		! decisionState.decisionAccepted;
+	const reviewItems = getDistributedEditingFreshReviewPrePublishReviewItems(
+		decisionState.reviewItems,
+		{
+			canRecordLocalDecisions,
+		}
+	);
+	const canSubmitReviewDecision =
+		canRecordLocalDecisions &&
+		decisionState.ready &&
+		reviewItems.length > 0;
+	const isActive =
+		preSaveState.status !==
+			DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_STATUSES.NONE ||
+		decisionState.panelRequired ||
+		reviewItems.length > 0 ||
+		lifecycleState.retrievalStatus !==
+			DISTRIBUTED_EDITING_FRESH_REVIEW_LIFECYCLE_RETRIEVAL_STATUSES.NONE;
+	const saveAction = preSaveState.clickAction
+		? createFreshReviewPrePublishActionDescriptor(
+				preSaveState.clickAction,
+				{
+					enabled:
+						preSaveState.status !==
+						DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_STATUSES.VALIDATING,
+					reason: preSaveState.reason,
+					placement: preSaveState.placement,
+				}
+		  )
+		: null;
+	const submitDecisionAction =
+		reviewItems.length > 0
+			? createFreshReviewPrePublishActionDescriptor(
+					DISTRIBUTED_EDITING_NOTICE_ACTIONS.SUBMIT_FRESH_REVIEW_DECISION,
+					{
+						enabled: canSubmitReviewDecision,
+						reason: canSubmitReviewDecision
+							? null
+							: 'fresh_review_decision_not_ready',
+						placement:
+							DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_PLACEMENTS.PRE_PUBLISH_REVIEW,
+					}
+			  )
+			: null;
+	const validateHandoffAction =
+		preSaveState.status ===
+		DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_STATUSES.VALIDATION_REQUIRED
+			? createFreshReviewPrePublishActionDescriptor(
+					DISTRIBUTED_EDITING_NOTICE_ACTIONS.VALIDATE_FRESH_REVIEW_HANDOFF,
+					{
+						enabled: true,
+						reason: preSaveState.reason,
+						placement: preSaveState.placement,
+					}
+			  )
+			: null;
+	const exportAction = preSaveState.canExportLocalUpdates
+		? createFreshReviewPrePublishActionDescriptor(
+				DISTRIBUTED_EDITING_NOTICE_ACTIONS.EXPORT_LOCAL_UPDATES,
+				{
+					enabled: true,
+					placement: preSaveState.placement,
+				}
+		  )
+		: null;
+	const refetchAction = preSaveState.canRefetchServerState
+		? createFreshReviewPrePublishActionDescriptor(
+				DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFETCH_SERVER_STATE,
+				{
+					enabled: true,
+					placement: preSaveState.placement,
+				}
+		  )
+		: null;
+	const actionDescriptors = [
+		saveAction,
+		submitDecisionAction,
+		validateHandoffAction,
+		exportAction,
+		refetchAction,
+	].filter( Boolean );
+
+	return {
+		status: preSaveState.status,
+		reason: preSaveState.reason,
+		placement: preSaveState.placement,
+		isActive,
+		panelRequired:
+			preSaveState.opensPrePublishReview || decisionState.panelRequired,
+		reviewListStatus: preSaveState.reviewListStatus,
+		saveButtonLabel: preSaveState.saveButtonLabel,
+		saveClickAction: preSaveState.clickAction,
+		blocksNormalSavePost: preSaveState.blocksNormalSavePost,
+		opensPrePublishReview: preSaveState.opensPrePublishReview,
+		requiresServerStateRefetch: preSaveState.requiresServerStateRefetch,
+		canRefetchServerState: preSaveState.canRefetchServerState,
+		canExportLocalUpdates: preSaveState.canExportLocalUpdates,
+		hasProtectedLocalChanges: preSaveState.hasProtectedLocalChanges,
+		requestStatus: preSaveState.requestStatus,
+		requestAccepted: preSaveState.requestAccepted,
+		requested: preSaveState.requested,
+		decisionStatus: decisionState.status,
+		decision: decisionState.decision,
+		decisionReady: decisionState.ready,
+		canRecordLocalDecisions,
+		canSubmitReviewDecision,
+		reviewItems,
+		reviewItemCount: decisionState.reviewItemCount,
+		pendingReviewItemCount: decisionState.pendingReviewItemCount,
+		approvedReviewItemCount: decisionState.approvedReviewItemCount,
+		rejectedReviewItemCount: decisionState.rejectedReviewItemCount,
+		hasPendingReviewItems: decisionState.pendingReviewItemCount > 0,
+		allReviewItemsResolved:
+			decisionState.reviewItemCount > 0 &&
+			decisionState.pendingReviewItemCount === 0,
+		reviewedBlockItems: decisionState.reviewedBlockItems,
+		reviewedBlockItemCount: decisionState.reviewedBlockItemCount,
+		actionKeys: actionDescriptors
+			.filter( ( descriptor ) => descriptor.enabled )
+			.map( ( descriptor ) => descriptor.actionKey ),
+		actionDescriptors,
+		saveAction,
+		submitDecisionAction,
+		validateHandoffAction,
+		exportAction,
+		refetchAction,
+		lifecycle: lifecycleState,
+		lifecycleRetrievalStatus: preSaveState.lifecycleRetrievalStatus,
+		lifecycleStatus: preSaveState.lifecycleStatus,
+		lifecycleAction: preSaveState.lifecycleAction,
+		decisionLifecycleStatus: preSaveState.decisionLifecycleStatus,
+		decisionLifecycleAction: preSaveState.decisionLifecycleAction,
+		reviewerAuthorityStatus: preSaveState.reviewerAuthorityStatus,
+		requiresFreshReviewDueToAuthority:
+			preSaveState.requiresFreshReviewDueToAuthority,
+		reviewerAuthorityDriftRequiresFreshReview:
+			preSaveState.reviewerAuthorityDriftRequiresFreshReview,
+		handoffStatus: preSaveState.handoffStatus,
+		handoffReason: preSaveState.handoffReason,
+		handoffReady: preSaveState.handoffReady,
+		handoffValidating: preSaveState.handoffValidating,
+		handoffAccepted: preSaveState.handoffAccepted,
+		freshReviewConsumed: preSaveState.freshReviewConsumed,
+		shouldCallNormalSavePost: false,
+		shouldCallRetrySaveEndpoint: false,
+		callsRestEndpoint: false,
+		dispatchesNotice: false,
+		mutatesEditorContent: false,
+		mutatesPersistedPostContent: false,
+		changesPostLock: false,
+		claimsSaved: false,
+		rawContentIncluded: false,
+		exposesRawContent: false,
+		exposesProofSignature: false,
+		exposesReviewerIds: false,
+		exposesSaverIds: false,
+		exposesProofInternals: false,
+	};
+}
+
+function getDistributedEditingFreshReviewPrePublishReviewItems(
+	reviewItems,
+	{ canRecordLocalDecisions = false } = {}
+) {
+	return reviewItems.map( ( item ) => {
+		const isPendingReview =
+			item.reviewStatus ===
+			DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES.PENDING_REVIEW;
+		const isApprovedForRetrySave =
+			item.reviewStatus ===
+			DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES.APPROVED_FOR_RETRY_SAVE;
+		const isRejected =
+			item.reviewStatus ===
+			DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES.REJECTED;
+		const approveAction = createFreshReviewPrePublishActionDescriptor(
+			DISTRIBUTED_EDITING_NOTICE_ACTIONS.APPROVE_FRESH_REVIEW_ITEM,
+			{
+				enabled: canRecordLocalDecisions && ! isApprovedForRetrySave,
+				itemId: item.id,
+				decision: 'approved',
+				placement:
+					DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_PLACEMENTS.PRE_PUBLISH_REVIEW,
+			}
+		);
+		const rejectAction = createFreshReviewPrePublishActionDescriptor(
+			DISTRIBUTED_EDITING_NOTICE_ACTIONS.REJECT_FRESH_REVIEW_ITEM,
+			{
+				enabled: canRecordLocalDecisions && ! isRejected,
+				itemId: item.id,
+				decision: 'rejected',
+				placement:
+					DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_PLACEMENTS.PRE_PUBLISH_REVIEW,
+			}
+		);
+
+		return {
+			id: item.id,
+			blockClientId: item.blockClientId,
+			blockName: item.blockName,
+			blockLabel: item.blockLabel,
+			blockPath: item.blockPath,
+			changeKind: item.changeKind,
+			riskReason: item.riskReason,
+			baseContentHash: item.baseContentHash,
+			proposedContentHash: item.proposedContentHash,
+			reviewedProposedContentHash: item.reviewedProposedContentHash,
+			ksesFilteredContentHash: item.ksesFilteredContentHash,
+			reviewStatus: item.reviewStatus,
+			reviewEvidenceType: item.reviewEvidenceType,
+			contentReviewPolicy: item.contentReviewPolicy,
+			rejectionReason: item.rejectionReason,
+			isPendingReview,
+			isApprovedForRetrySave,
+			isRejected,
+			canApprove: canRecordLocalDecisions && ! isApprovedForRetrySave,
+			canReject: canRecordLocalDecisions && ! isRejected,
+			approveAction,
+			rejectAction,
+			actionDescriptors: [ approveAction, rejectAction ],
+			rawContentIncluded: false,
+			exposesRawContent: false,
+			exposesProofSignature: false,
+			exposesReviewerIds: false,
+		};
+	} );
+}
+
+function createFreshReviewPrePublishActionDescriptor(
+	actionKey,
+	{
+		enabled = true,
+		itemId = null,
+		decision = null,
+		reason = null,
+		placement = null,
+	} = {}
+) {
+	return {
+		actionKey,
+		enabled: Boolean( enabled ),
+		itemId: normalizeNullableString( itemId ),
+		decision: normalizeNullableString( decision ),
+		reason: normalizeNullableString( reason ),
+		placement: normalizeNullableString( placement ),
+		descriptorOnly: true,
+		callsRestEndpoint: false,
+		callsNormalSavePost: false,
+		callsRetrySaveEndpoint: false,
 		dispatchesNotice: false,
 		mutatesEditorContent: false,
 		mutatesPersistedPostContent: false,

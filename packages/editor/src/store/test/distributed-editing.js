@@ -49,6 +49,7 @@ import {
 	getDistributedEditingFreshReviewDecisionStateForSessionState,
 	getDistributedEditingFreshReviewLifecycleStateForSessionState,
 	getDistributedEditingFreshReviewPreSaveStateForSessionState,
+	getDistributedEditingFreshReviewPrePublishStateForSessionState,
 	getDistributedEditingFreshReviewRetrySaveHandoffStateForSessionState,
 	getDistributedEditingLocalUpdatesImportResult,
 	getDistributedEditingLocalUpdatesImportReviewRequestStateForSessionState,
@@ -103,6 +104,7 @@ import {
 	getDistributedEditingFreshReviewDecisionState,
 	getDistributedEditingFreshReviewLifecycleState,
 	getDistributedEditingFreshReviewPreSaveState,
+	getDistributedEditingFreshReviewPrePublishState,
 	getDistributedEditingLocalUpdatesImportReviewRequestState,
 	getDistributedEditingNoticeDescriptors,
 	getDistributedEditingReviewTokenRecoveryState,
@@ -3465,6 +3467,261 @@ describe( 'distributed editing session state', () => {
 		);
 	} );
 
+	it( 'exposes fresh-review pre-publish items and local decision action descriptors only', () => {
+		const rawContentToken = 'fresh-review-pre-publish-raw-token';
+		const approvedHash =
+			'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
+		const rejectedHash =
+			'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb';
+		const requestedState =
+			getDistributedEditingSessionStateForFreshReviewDecisionItems(
+				{
+					pendingChangeCount: 1,
+					hasPendingChanges: true,
+					mustOfferLocalCopy: true,
+					canExportLocalUpdates: true,
+					localUpdatesImportStatus:
+						DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_STATUSES.BLOCKED,
+					localUpdatesImportReason:
+						DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.FRESH_REVIEW_REQUIRED,
+					localUpdatesImportReviewRequestStatus:
+						DISTRIBUTED_EDITING_LOCAL_UPDATES_REVIEW_REQUEST_STATUSES.REQUESTED,
+					localUpdatesImportFreshReviewRequestAccepted: true,
+					localUpdatesImportFreshReviewRequestRequested: true,
+				},
+				{
+					reviewItems: [
+						{
+							id: 'fresh-review-pre-publish-approve',
+							blockClientId: 'client-html-approve',
+							blockName: 'core/html',
+							blockLabel: 'Approved HTML',
+							blockPath: [ 0 ],
+							changeKind: 'modified_block',
+							riskReason: 'kses_would_remove_script',
+							proposedContentHash: approvedHash,
+							rawContent: `<script>${ rawContentToken }</script>`,
+							proofSignature: 'fresh-review-pre-publish-proof',
+							reviewerId: 7,
+						},
+						{
+							id: 'fresh-review-pre-publish-reject',
+							blockClientId: 'client-html-reject',
+							blockName: 'core/html',
+							blockLabel: 'Rejected HTML',
+							blockPath: [ 1 ],
+							changeKind: 'deleted_block',
+							riskReason: 'unfiltered_html_block_deleted',
+							proposedContentHash: rejectedHash,
+							rawContent: `<script>${ rawContentToken }</script>`,
+						},
+					],
+				}
+			);
+		const requestedPrePublishState =
+			getDistributedEditingFreshReviewPrePublishStateForSessionState(
+				requestedState
+			);
+		const selectorState = {
+			distributedEditingSession: requestedState,
+		};
+		const ignoredUnknownDecision =
+			getDistributedEditingSessionStateForFreshReviewDecisionItemResolution(
+				requestedState,
+				{
+					reviewItemId: 'fresh-review-pre-publish-approve',
+					decision: 'maybe',
+				}
+			);
+		const approvedState =
+			getDistributedEditingSessionStateForFreshReviewDecisionItemResolution(
+				requestedState,
+				{
+					reviewItemId: 'fresh-review-pre-publish-approve',
+					decision: 'approved',
+				}
+			);
+		const resolvedState =
+			getDistributedEditingSessionStateForFreshReviewDecisionItemResolution(
+				approvedState,
+				{
+					reviewItemId: 'fresh-review-pre-publish-reject',
+					decision: 'rejected',
+					rejectionReason: 'reviewer_rejected_deleted_block',
+				}
+			);
+		const resolvedPrePublishState =
+			getDistributedEditingFreshReviewPrePublishStateForSessionState(
+				resolvedState
+			);
+
+		expect( requestedPrePublishState ).toMatchObject( {
+			status: DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_STATUSES.REVIEW_REQUIRED,
+			placement:
+				DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_PLACEMENTS.PRE_PUBLISH_REVIEW,
+			isActive: true,
+			panelRequired: true,
+			reviewListStatus:
+				DISTRIBUTED_EDITING_FRESH_REVIEW_REVIEW_LIST_STATUSES.AWAITING_REVIEW,
+			saveButtonLabel: 'Review changes',
+			saveClickAction:
+				DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.OPEN_PRE_PUBLISH_REVIEW,
+			blocksNormalSavePost: true,
+			opensPrePublishReview: true,
+			canRecordLocalDecisions: true,
+			canSubmitReviewDecision: false,
+			reviewItemCount: 2,
+			pendingReviewItemCount: 2,
+			hasPendingReviewItems: true,
+			allReviewItemsResolved: false,
+			saveAction: expect.objectContaining( {
+				actionKey:
+					DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.OPEN_PRE_PUBLISH_REVIEW,
+				descriptorOnly: true,
+				callsRestEndpoint: false,
+				callsNormalSavePost: false,
+				callsRetrySaveEndpoint: false,
+			} ),
+			submitDecisionAction: expect.objectContaining( {
+				actionKey:
+					DISTRIBUTED_EDITING_NOTICE_ACTIONS.SUBMIT_FRESH_REVIEW_DECISION,
+				enabled: false,
+				descriptorOnly: true,
+				callsRestEndpoint: false,
+			} ),
+			exportAction: expect.objectContaining( {
+				actionKey:
+					DISTRIBUTED_EDITING_NOTICE_ACTIONS.EXPORT_LOCAL_UPDATES,
+				enabled: true,
+				descriptorOnly: true,
+				callsRestEndpoint: false,
+			} ),
+			refetchAction: null,
+			shouldCallNormalSavePost: false,
+			shouldCallRetrySaveEndpoint: false,
+			callsRestEndpoint: false,
+			dispatchesNotice: false,
+			mutatesEditorContent: false,
+			mutatesPersistedPostContent: false,
+			changesPostLock: false,
+			claimsSaved: false,
+			exposesRawContent: false,
+			exposesProofSignature: false,
+			exposesReviewerIds: false,
+		} );
+		expect( requestedPrePublishState.reviewItems[ 0 ] ).toMatchObject( {
+			id: 'fresh-review-pre-publish-approve',
+			proposedContentHash: approvedHash,
+			isPendingReview: true,
+			canApprove: true,
+			canReject: true,
+			approveAction: expect.objectContaining( {
+				actionKey:
+					DISTRIBUTED_EDITING_NOTICE_ACTIONS.APPROVE_FRESH_REVIEW_ITEM,
+				itemId: 'fresh-review-pre-publish-approve',
+				decision: 'approved',
+				enabled: true,
+				descriptorOnly: true,
+				callsRestEndpoint: false,
+				dispatchesNotice: false,
+			} ),
+			rejectAction: expect.objectContaining( {
+				actionKey:
+					DISTRIBUTED_EDITING_NOTICE_ACTIONS.REJECT_FRESH_REVIEW_ITEM,
+				itemId: 'fresh-review-pre-publish-approve',
+				decision: 'rejected',
+				enabled: true,
+				descriptorOnly: true,
+				callsRestEndpoint: false,
+				dispatchesNotice: false,
+			} ),
+			rawContentIncluded: false,
+			exposesRawContent: false,
+			exposesProofSignature: false,
+			exposesReviewerIds: false,
+		} );
+		expect(
+			getDistributedEditingFreshReviewPrePublishState( selectorState )
+		).toEqual( requestedPrePublishState );
+		expect(
+			getDistributedEditingFreshReviewDecisionStateForSessionState(
+				ignoredUnknownDecision
+			)
+		).toMatchObject( {
+			pendingReviewItemCount: 2,
+			approvedReviewItemCount: 0,
+			rejectedReviewItemCount: 0,
+		} );
+		expect( resolvedPrePublishState ).toMatchObject( {
+			decisionStatus:
+				DISTRIBUTED_EDITING_FRESH_REVIEW_DECISION_STATUSES.READY,
+			reviewListStatus:
+				DISTRIBUTED_EDITING_FRESH_REVIEW_REVIEW_LIST_STATUSES.DECISION_READY,
+			canRecordLocalDecisions: true,
+			canSubmitReviewDecision: true,
+			pendingReviewItemCount: 0,
+			approvedReviewItemCount: 1,
+			rejectedReviewItemCount: 1,
+			allReviewItemsResolved: true,
+			reviewedBlockItemCount: 2,
+			submitDecisionAction: expect.objectContaining( {
+				actionKey:
+					DISTRIBUTED_EDITING_NOTICE_ACTIONS.SUBMIT_FRESH_REVIEW_DECISION,
+				enabled: true,
+				descriptorOnly: true,
+				callsRestEndpoint: false,
+			} ),
+			shouldCallNormalSavePost: false,
+			shouldCallRetrySaveEndpoint: false,
+			claimsSaved: false,
+		} );
+		expect( resolvedPrePublishState.reviewItems ).toEqual( [
+			expect.objectContaining( {
+				id: 'fresh-review-pre-publish-approve',
+				isApprovedForRetrySave: true,
+				canApprove: false,
+				canReject: true,
+			} ),
+			expect.objectContaining( {
+				id: 'fresh-review-pre-publish-reject',
+				isRejected: true,
+				canApprove: true,
+				canReject: false,
+				rejectionReason: 'reviewer_rejected_deleted_block',
+			} ),
+		] );
+		expect( requestedPrePublishState.actionKeys ).toEqual(
+			expect.arrayContaining( [
+				DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.OPEN_PRE_PUBLISH_REVIEW,
+				DISTRIBUTED_EDITING_NOTICE_ACTIONS.EXPORT_LOCAL_UPDATES,
+			] )
+		);
+		expect( requestedPrePublishState.actionKeys ).not.toContain(
+			DISTRIBUTED_EDITING_NOTICE_ACTIONS.SUBMIT_FRESH_REVIEW_DECISION
+		);
+		expect( requestedPrePublishState.actionKeys ).not.toContain(
+			DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFETCH_SERVER_STATE
+		);
+		expect( resolvedPrePublishState.actionKeys ).toEqual(
+			expect.arrayContaining( [
+				DISTRIBUTED_EDITING_NOTICE_ACTIONS.SUBMIT_FRESH_REVIEW_DECISION,
+				DISTRIBUTED_EDITING_NOTICE_ACTIONS.EXPORT_LOCAL_UPDATES,
+			] )
+		);
+		expect( JSON.stringify( requestedPrePublishState ) ).not.toContain(
+			rawContentToken
+		);
+		expect( JSON.stringify( requestedPrePublishState ) ).not.toContain(
+			'fresh-review-pre-publish-proof'
+		);
+		expect( JSON.stringify( requestedPrePublishState ) ).not.toMatch(
+			/"reviewerId"\s*:\s*7|reviewer_user_id/
+		);
+		expect( JSON.stringify( resolvedPrePublishState ) ).not.toContain(
+			rawContentToken
+		);
+	} );
+
 	it( 'keeps accepted fresh-review validation ready for guarded retry save without calling save', () => {
 		const normalized = normalizeDistributedEditingSessionState( {
 			pendingChangeCount: 1,
@@ -3725,6 +3982,10 @@ describe( 'distributed editing session state', () => {
 			getDistributedEditingFreshReviewLifecycleStateForSessionState(
 				normalized
 			);
+		const prePublishState =
+			getDistributedEditingFreshReviewPrePublishStateForSessionState(
+				normalized
+			);
 		const retrySavePolicy =
 			getDistributedEditingRetrySavePolicyForSessionState( normalized, {
 				pendingChangeCount: 1,
@@ -3791,6 +4052,38 @@ describe( 'distributed editing session state', () => {
 			shouldCallRetrySaveEndpoint: false,
 			changesPostLock: false,
 		} );
+		expect( prePublishState ).toMatchObject( {
+			status: DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_STATUSES.REVIEW_REQUIRED,
+			reviewListStatus:
+				DISTRIBUTED_EDITING_FRESH_REVIEW_REVIEW_LIST_STATUSES.BLOCKED,
+			blocksNormalSavePost: true,
+			requiresServerStateRefetch: true,
+			canRefetchServerState: true,
+			canExportLocalUpdates: true,
+			exportAction: expect.objectContaining( {
+				actionKey:
+					DISTRIBUTED_EDITING_NOTICE_ACTIONS.EXPORT_LOCAL_UPDATES,
+				descriptorOnly: true,
+				callsRestEndpoint: false,
+			} ),
+			refetchAction: expect.objectContaining( {
+				actionKey:
+					DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFETCH_SERVER_STATE,
+				descriptorOnly: true,
+				callsRestEndpoint: false,
+			} ),
+			shouldCallNormalSavePost: false,
+			shouldCallRetrySaveEndpoint: false,
+			callsRestEndpoint: false,
+			changesPostLock: false,
+			claimsSaved: false,
+		} );
+		expect( prePublishState.actionKeys ).toEqual(
+			expect.arrayContaining( [
+				DISTRIBUTED_EDITING_NOTICE_ACTIONS.EXPORT_LOCAL_UPDATES,
+				DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFETCH_SERVER_STATE,
+			] )
+		);
 		expect( retrySavePolicy ).toMatchObject( {
 			status: DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_STATUSES.BLOCKED,
 			reason: DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.SERVER_STATE_REFETCH_REQUIRED,
