@@ -571,8 +571,6 @@ export default dedupePlugins( [
 			'tools/**/*.mjs',
 			'packages/env/**',
 			'packages/theme/bin/**/*.[tj]s?(x)',
-			'tools/validation/**/*.js',
-			'tools/validation/**/*.mjs',
 		],
 		rules: {
 			'no-console': 'off',
