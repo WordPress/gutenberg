@@ -13,6 +13,8 @@ import { store as editorStore } from '../../store';
 import {
 	DISTRIBUTED_EDITING_DISPOSITIONS,
 	DISTRIBUTED_EDITING_FRESH_REVIEW_DECISION_STATUSES,
+	DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_PLACEMENTS,
+	DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_STATUSES,
 	DISTRIBUTED_EDITING_FRESH_REVIEW_RETRY_SAVE_HANDOFF_STATUSES,
 	DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES,
 	DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES,
@@ -1170,32 +1172,62 @@ export function DistributedEditingStatusSurface( {
 			data-distributed-editing-placement={ placement }
 			role="region"
 		>
-			{ statusItems.map( ( item ) => (
-				<div
-					key={ item.id }
-					data-testid={
-						item.freshReviewPreSaveStatus
-							? 'distributed-editing-pre-save-status'
-							: undefined
-					}
-					data-distributed-editing-pre-save-placement={
-						item.freshReviewPreSavePlacement || undefined
-					}
-					data-distributed-editing-pre-save-status={
-						item.freshReviewPreSaveStatus || undefined
-					}
-				>
-					<Notice
-						className="editor-distributed-editing-status__notice"
-						isDismissible={ false }
-						status={ item.status }
-						actions={ getNoticeActions( item, onAction ) }
+			{ statusItems.map( ( item ) => {
+				const freshReviewAuthorityStatus =
+					getFreshReviewAuthorityStatusProps( item );
+
+				return (
+					<div
+						key={ item.id }
+						data-testid={ getFreshReviewStatusItemTestId(
+							item,
+							freshReviewAuthorityStatus
+						) }
+						data-distributed-editing-pre-save-placement={
+							item.freshReviewPreSavePlacement || undefined
+						}
+						data-distributed-editing-pre-save-status={
+							item.freshReviewPreSaveStatus || undefined
+						}
+						data-distributed-editing-fresh-review-action={
+							freshReviewAuthorityStatus?.action || undefined
+						}
+						data-distributed-editing-fresh-review-blocks-normal-save={ formatDataBoolean(
+							freshReviewAuthorityStatus?.blocksNormalSavePost
+						) }
+						data-distributed-editing-fresh-review-exportable={ formatDataBoolean(
+							freshReviewAuthorityStatus?.canExportLocalUpdates
+						) }
+						data-distributed-editing-fresh-review-lifecycle={
+							freshReviewAuthorityStatus?.lifecycleStatus ||
+							undefined
+						}
+						data-distributed-editing-fresh-review-redacted={
+							freshReviewAuthorityStatus ? 'true' : undefined
+						}
+						data-distributed-editing-fresh-review-review-item-count={
+							freshReviewAuthorityStatus?.reviewItemCount ||
+							undefined
+						}
+						data-distributed-editing-fresh-review-surface={
+							freshReviewAuthorityStatus?.surface || undefined
+						}
 					>
-						<strong>{ item.title }</strong>
-						<div>{ item.message }</div>
-					</Notice>
-				</div>
-			) ) }
+						<Notice
+							className="editor-distributed-editing-status__notice"
+							isDismissible={ false }
+							status={ item.status }
+							actions={ getNoticeActions( item, onAction ) }
+						>
+							<strong>{ item.title }</strong>
+							<div>{ item.message }</div>
+							<FreshReviewAuthorityStatus
+								status={ freshReviewAuthorityStatus }
+							/>
+						</Notice>
+					</div>
+				);
+			} ) }
 			{ unloadWarningMessage && (
 				<div className="editor-distributed-editing-status__unload-warning">
 					{ unloadWarningMessage }
@@ -1606,10 +1638,26 @@ function getDistributedEditingStatusSurfaceItem( descriptor ) {
 					descriptor.retrySaveFreshReviewReviewedBlockItemCount,
 				retrySaveFreshReviewRequiresFreshReview:
 					descriptor.retrySaveFreshReviewRequiresFreshReview,
+				retrySaveFreshReviewConsumeValidationStatus:
+					descriptor.retrySaveFreshReviewConsumeValidationStatus,
+				retrySaveFreshReviewConsumeValidationReason:
+					descriptor.retrySaveFreshReviewConsumeValidationReason,
+				retrySaveFreshReviewDecisionStatus:
+					descriptor.retrySaveFreshReviewDecisionStatus,
+				retrySaveFreshReviewDecisionLifecycleStatus:
+					descriptor.retrySaveFreshReviewDecisionLifecycleStatus,
+				retrySaveFreshReviewDecisionLifecycleAction:
+					descriptor.retrySaveFreshReviewDecisionLifecycleAction,
 				reviewTokenRecoveryStatus: descriptor.reviewTokenRecoveryStatus,
 				reviewTokenRecoveryReason: descriptor.reviewTokenRecoveryReason,
 				reviewTokenRecoveryRequiresFreshReview:
 					descriptor.reviewTokenRecoveryRequiresFreshReview,
+				freshReviewLifecycleStatus:
+					descriptor.freshReviewLifecycleStatus ||
+					descriptor.freshReviewDecisionLifecycleStatus,
+				freshReviewLifecycleAction:
+					descriptor.freshReviewLifecycleAction ||
+					descriptor.freshReviewDecisionLifecycleAction,
 			};
 		case DISTRIBUTED_EDITING_NOTICE_KINDS.LOCAL_UPDATES_IMPORT_BLOCKED:
 			return {
@@ -1643,6 +1691,8 @@ function getDistributedEditingStatusSurfaceItem( descriptor ) {
 					descriptor.localUpdatesImportFreshReviewDecisionReviewedBlockItemCount,
 				localUpdatesImportFreshReviewRetrySaveHandoffStatus:
 					descriptor.localUpdatesImportFreshReviewRetrySaveHandoffStatus,
+				localUpdatesImportFreshReviewRetrySaveHandoffReason:
+					descriptor.localUpdatesImportFreshReviewRetrySaveHandoffReason,
 				localUpdatesImportFreshReviewRetrySaveHandoffReady:
 					descriptor.localUpdatesImportFreshReviewRetrySaveHandoffReady,
 				localUpdatesImportFreshReviewRetrySaveHandoffValidating:
@@ -1650,8 +1700,29 @@ function getDistributedEditingStatusSurfaceItem( descriptor ) {
 				localUpdatesImportFreshReviewRetrySaveHandoffAccepted:
 					descriptor.localUpdatesImportFreshReviewRetrySaveHandoffAccepted,
 				freshReviewPreSaveStatus: descriptor.freshReviewPreSaveStatus,
+				freshReviewPreSaveReason: descriptor.freshReviewPreSaveReason,
 				freshReviewPreSavePlacement:
 					descriptor.freshReviewPreSavePlacement,
+				freshReviewPreSaveClickAction:
+					descriptor.freshReviewPreSaveClickAction,
+				freshReviewPreSaveBlocksNormalSavePost:
+					descriptor.freshReviewPreSaveBlocksNormalSavePost,
+				freshReviewPreSaveOpensPrePublishReview:
+					descriptor.freshReviewPreSaveOpensPrePublishReview,
+				freshReviewPreSaveRequiresServerStateRefetch:
+					descriptor.freshReviewPreSaveRequiresServerStateRefetch,
+				freshReviewPreSaveCanExportLocalUpdates:
+					descriptor.freshReviewPreSaveCanExportLocalUpdates,
+				freshReviewLifecycleStatus:
+					descriptor.freshReviewLifecycleStatus ||
+					descriptor.freshReviewDecisionLifecycleStatus ||
+					descriptor.localUpdatesImportFreshReviewLifecycleStatus ||
+					descriptor.localUpdatesImportFreshReviewDecisionLifecycleStatus,
+				freshReviewLifecycleAction:
+					descriptor.freshReviewLifecycleAction ||
+					descriptor.freshReviewDecisionLifecycleAction ||
+					descriptor.localUpdatesImportFreshReviewLifecycleAction ||
+					descriptor.localUpdatesImportFreshReviewDecisionLifecycleAction,
 			};
 	}
 
@@ -1667,6 +1738,18 @@ function getBaseStatusItem( descriptor ) {
 			? descriptor.actionKeys
 			: [],
 	};
+}
+
+function getFreshReviewStatusItemTestId( item, freshReviewAuthorityStatus ) {
+	if ( item.freshReviewPreSaveStatus ) {
+		return 'distributed-editing-pre-save-status';
+	}
+
+	if ( freshReviewAuthorityStatus ) {
+		return 'distributed-editing-fresh-review-status';
+	}
+
+	return undefined;
 }
 
 function getPendingChangesMessage( descriptor ) {
@@ -1852,6 +1935,266 @@ function getExportSuccessMessage( item ) {
 	);
 }
 
+function FreshReviewAuthorityStatus( { status } ) {
+	if ( ! status ) {
+		return null;
+	}
+
+	const rows = [
+		status.preSaveStatusLabel
+			? {
+					label: __( 'Pre-save state' ),
+					value: status.preSaveStatusLabel,
+			  }
+			: null,
+		status.lifecycleStatusLabel
+			? {
+					label: __( 'Review lifecycle' ),
+					value: status.lifecycleStatusLabel,
+			  }
+			: null,
+		status.reviewItemCount > 0
+			? {
+					label: __( 'Review items' ),
+					value: sprintf(
+						/* translators: %d: number of redacted fresh-review items. */
+						_n(
+							'%d redacted item',
+							'%d redacted items',
+							status.reviewItemCount
+						),
+						status.reviewItemCount
+					),
+			  }
+			: null,
+	].filter( Boolean );
+
+	if ( ! rows.length ) {
+		return null;
+	}
+
+	return (
+		<dl
+			className="editor-distributed-editing-status__fresh-review-authority"
+			data-testid="distributed-editing-fresh-review-authority"
+			data-distributed-editing-fresh-review-redacted="true"
+		>
+			{ rows.map( ( row ) => (
+				<div
+					key={ row.label }
+					className="editor-distributed-editing-status__fresh-review-authority-row"
+				>
+					<dt>{ row.label }</dt>
+					<dd>{ row.value }</dd>
+				</div>
+			) ) }
+		</dl>
+	);
+}
+
+function getFreshReviewAuthorityStatusProps( item ) {
+	const preSaveStatus = getActiveFreshReviewPreSaveStatus(
+		item?.freshReviewPreSaveStatus
+	);
+	const lifecycleStatus = getFreshReviewLifecycleStatus( item );
+	const reviewItemCount = getFreshReviewReviewItemCount( item );
+
+	if ( ! preSaveStatus && ! lifecycleStatus && reviewItemCount <= 0 ) {
+		return null;
+	}
+
+	return {
+		action:
+			item.freshReviewPreSaveClickAction ||
+			item.freshReviewLifecycleAction ||
+			item.retrySaveFreshReviewDecisionLifecycleAction ||
+			undefined,
+		blocksNormalSavePost: Boolean(
+			item.freshReviewPreSaveBlocksNormalSavePost
+		),
+		canExportLocalUpdates: Boolean(
+			item.freshReviewPreSaveCanExportLocalUpdates ||
+				item.canExportLocalUpdates ||
+				item.actionKeys?.includes(
+					DISTRIBUTED_EDITING_NOTICE_ACTIONS.EXPORT_LOCAL_UPDATES
+				)
+		),
+		lifecycleStatus,
+		lifecycleStatusLabel:
+			getFreshReviewLifecycleStatusLabel( lifecycleStatus ),
+		preSaveStatus,
+		preSaveStatusLabel: getFreshReviewPreSaveStatusLabel( preSaveStatus ),
+		reviewItemCount,
+		surface:
+			item.freshReviewPreSavePlacement ||
+			( item.freshReviewPreSaveOpensPrePublishReview
+				? DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_PLACEMENTS.PRE_PUBLISH_REVIEW
+				: undefined ),
+	};
+}
+
+function getActiveFreshReviewPreSaveStatus( status ) {
+	if (
+		! status ||
+		status === DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_STATUSES.NONE
+	) {
+		return null;
+	}
+
+	return status;
+}
+
+function getFreshReviewLifecycleStatus( item ) {
+	return (
+		normalizeDisplayValue(
+			item?.freshReviewLifecycleStatus ||
+				item?.freshReviewDecisionLifecycleStatus ||
+				item?.retrySaveFreshReviewDecisionLifecycleStatus
+		) ||
+		( item?.retrySaveFreshReviewConsumed ? 'retry_save_consumed' : null )
+	);
+}
+
+function getFreshReviewReviewItemCount( item ) {
+	return Math.max(
+		normalizeCount(
+			item?.localUpdatesImportFreshReviewDecisionReviewedBlockItemCount
+		),
+		normalizeCount( item?.localUpdatesImportFreshReviewDecisionItemCount ),
+		normalizeCount( item?.retrySaveFreshReviewReviewedBlockItemCount )
+	);
+}
+
+function getFreshReviewPreSaveStatusLabel( status ) {
+	switch ( status ) {
+		case DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_STATUSES.REVIEW_REQUIRED:
+			return __( 'Review required' );
+		case DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_STATUSES.VALIDATION_REQUIRED:
+			return __( 'Validation required' );
+		case DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_STATUSES.VALIDATING:
+			return __( 'Validating review' );
+		case DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_STATUSES.READY_FOR_GUARDED_RETRY_SAVE:
+			return __( 'Ready for guarded save' );
+		case DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_STATUSES.REFETCH_REQUIRED:
+			return __( 'Server refresh required' );
+		case DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_STATUSES.BLOCKED:
+			return __( 'Blocked' );
+	}
+
+	return null;
+}
+
+function getFreshReviewLifecycleStatusLabel( status ) {
+	switch ( status ) {
+		case 'already_consumed':
+		case 'fresh_review_decision_already_consumed_for_retry_save':
+			return __( 'Already consumed' );
+		case 'retry_save_consumed':
+		case 'consumed':
+		case 'retry_save_consumed_for_post':
+			return __( 'Consumed by retry save' );
+		case 'accepted':
+		case 'accepted_for_retry_save':
+			return __( 'Accepted for retry save' );
+		case 'blocked':
+			return __( 'Blocked' );
+		case 'review_required':
+			return __( 'Review required' );
+	}
+
+	return null;
+}
+
+function getFreshReviewPreSaveStatusText( descriptor ) {
+	const status = getActiveFreshReviewPreSaveStatus(
+		descriptor?.freshReviewPreSaveStatus
+	);
+
+	switch ( status ) {
+		case DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_STATUSES.REVIEW_REQUIRED:
+			return {
+				title: __( 'Fresh review required' ),
+				message: sprintf(
+					/* translators: %s: review item count sentence. */
+					__(
+						'Protected changes need hash-only admin review before Save can continue. %s No normal save or retry save has run; protected local changes remain exportable.'
+					),
+					getFreshReviewReviewItemCountMessage( descriptor )
+				),
+			};
+		case DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_STATUSES.VALIDATION_REQUIRED:
+			return {
+				title: __( 'Fresh review validation required' ),
+				message: __(
+					'Reviewed changes are ready for server validation before guarded retry save. Save should continue only through fresh-review validation; no normal save fallback has run, and protected local changes remain exportable.'
+				),
+			};
+		case DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_STATUSES.VALIDATING:
+			return {
+				title: __( 'Fresh review validating' ),
+				message: __(
+					'The editor is validating hash-only fresh-review proof before any guarded retry save. No normal save has run; keep protected local changes exportable until validation finishes.'
+				),
+			};
+		case DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_STATUSES.READY_FOR_GUARDED_RETRY_SAVE:
+			return {
+				title: __( 'Fresh review ready for guarded save' ),
+				message: __(
+					'Hash-only fresh review proof is accepted for a future guarded retry save. Save may continue only through that guarded path; no normal save fallback has run, and protected local changes remain exportable until server confirmation.'
+				),
+			};
+		case DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_STATUSES.REFETCH_REQUIRED:
+			return {
+				title: __( 'Fresh review needs server refresh' ),
+				message: __(
+					'The server version must be refreshed before fresh review can continue. Refreshing only fetches server state; it does not save over protected local changes, which remain exportable.'
+				),
+			};
+		case DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_STATUSES.BLOCKED:
+			if (
+				isAlreadyConsumedFreshReviewLifecycle( descriptor ) ||
+				descriptor?.freshReviewPreSaveReason ===
+					'fresh_review_decision_already_consumed_for_retry_save'
+			) {
+				return {
+					title: __( 'Fresh review already used' ),
+					message: __(
+						'This fresh-review decision was already consumed by a retry save. Request a new fresh review or refresh the server version before continuing; protected local changes remain exportable.'
+					),
+				};
+			}
+
+			return {
+				title: __( 'Fresh review blocked' ),
+				message: __(
+					'Fresh review cannot continue from the current proof state. Request a new review or refresh the server version before continuing; protected local changes remain exportable.'
+				),
+			};
+	}
+
+	return null;
+}
+
+function getFreshReviewReviewItemCountMessage( descriptor ) {
+	const count = getFreshReviewReviewItemCount( descriptor );
+
+	if ( count > 0 ) {
+		return sprintf(
+			/* translators: %d: number of redacted risky-block review items. */
+			_n(
+				'%d risky block is represented only by redacted review evidence.',
+				'%d risky blocks are represented only by redacted review evidence.',
+				count
+			),
+			count
+		);
+	}
+
+	return __(
+		'Risky block evidence remains redacted until the review surface opens.'
+	);
+}
+
 function getLocalUpdatesImportStatusMessage( {
 	commandStatus,
 	importResult,
@@ -1949,6 +2292,13 @@ function getLocalUpdatesImportBlockedMessage( reason ) {
 }
 
 function getLocalUpdatesImportReviewRequestTitle( descriptor ) {
+	const freshReviewPreSaveText =
+		getFreshReviewPreSaveStatusText( descriptor );
+
+	if ( freshReviewPreSaveText ) {
+		return freshReviewPreSaveText.title;
+	}
+
 	if (
 		[
 			DISTRIBUTED_EDITING_FRESH_REVIEW_RETRY_SAVE_HANDOFF_STATUSES.VALIDATING,
@@ -1971,6 +2321,13 @@ function getLocalUpdatesImportReviewRequestTitle( descriptor ) {
 }
 
 function getLocalUpdatesImportReviewRequestMessage( descriptor ) {
+	const freshReviewPreSaveText =
+		getFreshReviewPreSaveStatusText( descriptor );
+
+	if ( freshReviewPreSaveText ) {
+		return freshReviewPreSaveText.message;
+	}
+
 	if (
 		descriptor?.localUpdatesImportFreshReviewRetrySaveHandoffStatus ===
 		DISTRIBUTED_EDITING_FRESH_REVIEW_RETRY_SAVE_HANDOFF_STATUSES.ACCEPTED_FOR_RETRY_SAVE
@@ -2442,6 +2799,15 @@ function getFreshReviewRetrySaveStatusText( descriptor ) {
 				),
 			};
 		case DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_SYNC_META_TAMPERED:
+			if ( isAlreadyConsumedFreshReviewLifecycle( descriptor ) ) {
+				return {
+					title: __( 'Fresh-review decision already consumed' ),
+					message: __(
+						'This fresh-review decision was already used by a server retry save. Protected local changes remain exportable; request a new fresh review or refresh the server version before continuing.'
+					),
+				};
+			}
+
 			return {
 				title: __( 'Fresh-review retry save proof rejected' ),
 				message: __(
@@ -2631,6 +2997,32 @@ function normalizeDisplayValue( value ) {
 	}
 
 	return String( value );
+}
+
+function formatDataBoolean( value ) {
+	if ( value === null || value === undefined ) {
+		return undefined;
+	}
+
+	return value ? 'true' : 'false';
+}
+
+function isAlreadyConsumedFreshReviewLifecycle( descriptor ) {
+	return (
+		[
+			descriptor?.freshReviewLifecycleStatus,
+			descriptor?.freshReviewDecisionLifecycleStatus,
+			descriptor?.retrySaveFreshReviewDecisionLifecycleStatus,
+			descriptor?.freshReviewPreSaveReason,
+			descriptor?.retrySaveFreshReviewConsumeValidationReason,
+			descriptor?.retrySaveReason,
+		].includes( 'fresh_review_decision_already_consumed_for_retry_save' ) ||
+		[
+			descriptor?.freshReviewLifecycleStatus,
+			descriptor?.freshReviewDecisionLifecycleStatus,
+			descriptor?.retrySaveFreshReviewDecisionLifecycleStatus,
+		].includes( 'already_consumed' )
+	);
 }
 
 function getRetrySaveHandoffBlockedText( descriptor ) {

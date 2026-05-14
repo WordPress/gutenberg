@@ -2542,12 +2542,35 @@ describe( 'DistributedEditingStatusSurface', () => {
 			/>
 		);
 
-		expect( screen.getByText( 'Fresh review requested' ) ).toBeVisible();
+		expect( screen.getByText( 'Fresh review required' ) ).toBeVisible();
 		expect(
 			screen.getByText(
-				'Fresh review request was accepted for admin review. No retry save or normal save was made; protected local changes remain exportable until review returns.'
+				'Protected changes need hash-only admin review before Save can continue. Risky block evidence remains redacted until the review surface opens. No normal save or retry save has run; protected local changes remain exportable.'
 			)
 		).toBeVisible();
+		const preSaveStatus = screen.getByTestId(
+			'distributed-editing-pre-save-status'
+		);
+
+		expect( preSaveStatus ).toHaveAttribute(
+			'data-distributed-editing-fresh-review-surface',
+			DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_PLACEMENTS.PRE_PUBLISH_REVIEW
+		);
+		expect( preSaveStatus ).toHaveAttribute(
+			'data-distributed-editing-fresh-review-action',
+			'open_pre_publish_review'
+		);
+		expect( preSaveStatus ).toHaveAttribute(
+			'data-distributed-editing-fresh-review-blocks-normal-save',
+			'true'
+		);
+		expect( preSaveStatus ).toHaveAttribute(
+			'data-distributed-editing-fresh-review-redacted',
+			'true'
+		);
+		expect(
+			screen.getByTestId( 'distributed-editing-fresh-review-authority' )
+		).toHaveTextContent( 'Review required' );
 		expect(
 			screen.queryByRole( 'button', {
 				name: 'Request fresh review',
@@ -2599,12 +2622,23 @@ describe( 'DistributedEditingStatusSurface', () => {
 			/>
 		);
 
-		expect( screen.getByText( 'Fresh review requested' ) ).toBeVisible();
+		expect( screen.getByText( 'Fresh review required' ) ).toBeVisible();
 		expect(
 			screen.getByText(
-				'Fresh review request was accepted. A reviewer can approve or reject the hash-only block decisions in the internal review panel; no retry save or normal save was made.'
+				'Protected changes need hash-only admin review before Save can continue. 1 risky block is represented only by redacted review evidence. No normal save or retry save has run; protected local changes remain exportable.'
 			)
 		).toBeVisible();
+		const preSaveStatus = screen.getByTestId(
+			'distributed-editing-pre-save-status'
+		);
+
+		expect( preSaveStatus ).toHaveAttribute(
+			'data-distributed-editing-fresh-review-review-item-count',
+			'1'
+		);
+		expect(
+			screen.getByTestId( 'distributed-editing-fresh-review-authority' )
+		).toHaveTextContent( '1 redacted item' );
 		expect(
 			screen.queryByText(
 				/fresh-review-raw-content|fresh-review-proof-signature|reviewerId|reviewed_block_items/i
@@ -2655,7 +2689,7 @@ describe( 'DistributedEditingStatusSurface', () => {
 
 		expect(
 			screen.getByText(
-				'Fresh review decision is staged for validation before a future guarded retry save. No retry save or normal save was made, and protected local changes remain exportable.'
+				'The editor is validating hash-only fresh-review proof before any guarded retry save. No normal save has run; keep protected local changes exportable until validation finishes.'
 			)
 		).toBeVisible();
 		const preSaveStatus = screen.getByTestId(
@@ -2670,9 +2704,95 @@ describe( 'DistributedEditingStatusSurface', () => {
 			'data-distributed-editing-pre-save-status',
 			DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_STATUSES.VALIDATING
 		);
+		expect( preSaveStatus ).toHaveAttribute(
+			'data-distributed-editing-fresh-review-blocks-normal-save',
+			'true'
+		);
+		expect( preSaveStatus ).toHaveAttribute(
+			'data-distributed-editing-fresh-review-exportable',
+			'true'
+		);
+		expect(
+			screen.getByTestId( 'distributed-editing-fresh-review-authority' )
+		).toHaveTextContent( 'Validating review' );
 		expect(
 			screen.queryByText(
 				/fresh-review-handoff-raw|fresh-review-handoff-proof|reviewerUserId|reviewed_block_items/i
+			)
+		).not.toBeInTheDocument();
+		expect(
+			screen.queryByRole( 'button', { name: /save/i } )
+		).not.toBeInTheDocument();
+	} );
+
+	it( 'renders fresh-review validation-required placement as pre-save review evidence', () => {
+		const noticeDescriptors =
+			getDistributedEditingNoticeDescriptorsForSessionState( {
+				pendingChangeCount: 1,
+				hasPendingChanges: true,
+				canExportLocalUpdates: true,
+				localUpdatesImportStatus:
+					DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_STATUSES.BLOCKED,
+				localUpdatesImportReason:
+					DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.FRESH_REVIEW_REQUIRED,
+				localUpdatesImportRequiresFreshReview: true,
+				localUpdatesImportReviewRequestStatus:
+					DISTRIBUTED_EDITING_LOCAL_UPDATES_REVIEW_REQUEST_STATUSES.DECISION_RECORDED,
+				localUpdatesImportFreshReviewRequestAccepted: true,
+				localUpdatesImportFreshReviewRequestRequested: true,
+				localUpdatesImportFreshReviewDecisionStatus:
+					DISTRIBUTED_EDITING_FRESH_REVIEW_DECISION_STATUSES.RECORDED,
+				localUpdatesImportFreshReviewDecisionAccepted: true,
+				localUpdatesImportFreshReviewDecisionSubmitted: true,
+				localUpdatesImportFreshReviewDecisionDecision: 'approved',
+				localUpdatesImportFreshReviewDecisionReviewedBlockItemCount: 2,
+				localUpdatesImportFreshReviewRetrySaveHandoffStatus:
+					DISTRIBUTED_EDITING_FRESH_REVIEW_RETRY_SAVE_HANDOFF_STATUSES.READY,
+				localUpdatesImportFreshReviewRetrySaveHandoffReady: true,
+				rawContent: '<script>fresh-review-validation-raw</script>',
+				proofSignature: 'fresh-review-validation-proof',
+				reviewerUserId: 7,
+			} );
+
+		render(
+			<DistributedEditingStatusSurface
+				noticeDescriptors={ noticeDescriptors }
+			/>
+		);
+
+		expect(
+			screen.getByText( 'Fresh review validation required' )
+		).toBeVisible();
+		expect(
+			screen.getByText(
+				'Reviewed changes are ready for server validation before guarded retry save. Save should continue only through fresh-review validation; no normal save fallback has run, and protected local changes remain exportable.'
+			)
+		).toBeVisible();
+		const preSaveStatus = screen.getByTestId(
+			'distributed-editing-pre-save-status'
+		);
+
+		expect( preSaveStatus ).toHaveAttribute(
+			'data-distributed-editing-pre-save-placement',
+			DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_PLACEMENTS.PRE_SAVE_STATUS
+		);
+		expect( preSaveStatus ).toHaveAttribute(
+			'data-distributed-editing-pre-save-status',
+			DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_STATUSES.VALIDATION_REQUIRED
+		);
+		expect( preSaveStatus ).toHaveAttribute(
+			'data-distributed-editing-fresh-review-review-item-count',
+			'2'
+		);
+		expect(
+			screen.getByTestId( 'distributed-editing-fresh-review-authority' )
+		).toHaveTextContent( 'Validation required' );
+		expect(
+			screen.getByTestId( 'distributed-editing-fresh-review-authority' )
+		).toHaveTextContent( '2 redacted items' );
+		expect(
+			screen.queryByText(
+				/fresh-review-validation-raw|fresh-review-validation-proof|reviewerUserId|reviewed_block_items/i
 			)
 		).not.toBeInTheDocument();
 		expect(
@@ -2864,6 +2984,103 @@ describe( 'DistributedEditingStatusSurface', () => {
 				name: 'Refresh server version',
 			} ).length
 		).toBeGreaterThan( 0 );
+	} );
+
+	it( 'renders consumed fresh-review lifecycle as redacted replay guidance', () => {
+		const onAction = jest.fn();
+		const noticeDescriptors = [
+			{
+				id: 'fresh-review-consumed-replay',
+				kind: DISTRIBUTED_EDITING_NOTICE_KINDS.RETRY_SAVE,
+				status: 'error',
+				actionKeys: [
+					DISTRIBUTED_EDITING_NOTICE_ACTIONS.EXPORT_LOCAL_UPDATES,
+					DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFETCH_SERVER_STATE,
+				],
+				retrySaveStatus:
+					DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_SYNC_META_TAMPERED,
+				retrySaveReason:
+					'fresh_review_decision_already_consumed_for_retry_save',
+				retrySaveFreshReviewConsumed: true,
+				retrySaveFreshReviewRetrySaveRejected: true,
+				retrySaveFreshReviewReviewedBlockItemCount: 2,
+				retrySaveFreshReviewDecisionLifecycleStatus: 'already_consumed',
+				retrySaveFreshReviewDecisionLifecycleAction:
+					'request_new_fresh_review',
+				retrySaveFreshReviewRequestRecordId:
+					'fresh-review-consumed-record',
+				retrySaveFreshReviewProposedContentHash:
+					'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+				rawContent: '<script>fresh-review-consumed-raw</script>',
+				proofSignature: 'fresh-review-consumed-proof',
+				reviewerUserId: 7,
+			},
+		];
+		const surfaceItems =
+			getDistributedEditingStatusSurfaceItems( noticeDescriptors );
+
+		render(
+			<DistributedEditingStatusSurface
+				noticeDescriptors={ noticeDescriptors }
+				onAction={ onAction }
+			/>
+		);
+
+		expect(
+			screen.getByText( 'Fresh-review decision already consumed' )
+		).toBeVisible();
+		expect(
+			screen.getByText(
+				'This fresh-review decision was already used by a server retry save. Protected local changes remain exportable; request a new fresh review or refresh the server version before continuing.'
+			)
+		).toBeVisible();
+
+		const authorityStatus = screen.getByTestId(
+			'distributed-editing-fresh-review-authority'
+		);
+		const statusItem = screen.getByTestId(
+			'distributed-editing-fresh-review-status'
+		);
+
+		expect( statusItem ).toHaveAttribute(
+			'data-distributed-editing-fresh-review-lifecycle',
+			'already_consumed'
+		);
+		expect( statusItem ).toHaveAttribute(
+			'data-distributed-editing-fresh-review-action',
+			'request_new_fresh_review'
+		);
+		expect( statusItem ).toHaveAttribute(
+			'data-distributed-editing-fresh-review-review-item-count',
+			'2'
+		);
+		expect( statusItem ).toHaveAttribute(
+			'data-distributed-editing-fresh-review-redacted',
+			'true'
+		);
+		expect( authorityStatus ).toHaveTextContent( 'Already consumed' );
+		expect( authorityStatus ).toHaveTextContent( '2 redacted items' );
+		expect(
+			screen.getByRole( 'button', {
+				name: 'Export for fresh review',
+			} )
+		).toBeVisible();
+		expect(
+			screen.getByRole( 'button', {
+				name: 'Refresh server version',
+			} )
+		).toBeVisible();
+		expect(
+			screen.queryByText(
+				/fresh-review-consumed-record|aaaaaaaaaaaaaaaa|fresh-review-consumed-raw|fresh-review-consumed-proof|reviewerUserId/i
+			)
+		).not.toBeInTheDocument();
+		expect( JSON.stringify( surfaceItems ) ).not.toMatch(
+			/fresh-review-consumed-record|aaaaaaaaaaaaaaaa|fresh-review-consumed-raw|fresh-review-consumed-proof|reviewerUserId/i
+		);
+		expect(
+			screen.queryByRole( 'button', { name: /^Save$/i } )
+		).not.toBeInTheDocument();
 	} );
 
 	it( 'renders the internal fresh-review decision panel with approve and reject controls', async () => {
