@@ -1962,6 +1962,63 @@ function normalizeDistributedEditingLocalUpdatesImportActionTranscriptReport(
 	return normalized?.available ? normalized : null;
 }
 
+function getDistributedEditingFreshReviewItemActionTranscriptReportContext(
+	report
+) {
+	if ( ! report?.available || ! report.canShareWithSupport ) {
+		return null;
+	}
+
+	return {
+		available: true,
+		chronologyStatus: normalizeNullableString( report.chronologyStatus ),
+		latestEventLabel: normalizeNullableString( report.latestEventLabel ),
+		timelineItemCount: normalizeCount( report.timelineItemCount ),
+		droppedItemCount: normalizeCount( report.droppedItemCount ),
+		canShareWithSupport: true,
+		requiresSaveAuthorityForPersistence:
+			report.requiresSaveAuthorityForPersistence !== false,
+		entriesRedacted: report.entriesRedacted !== false,
+		exposesRawContent: false,
+		exposesProofInternals: false,
+		exposesTokenMaterial: false,
+		exposesActorIds: false,
+		dispatchesNotice: false,
+		callsRest: false,
+		callsSave: false,
+		callsRetrySaveEndpoint: false,
+		callsNormalSavePost: false,
+		savesPost: false,
+		mutatesEditorContent: false,
+		mutatesPersistedPostContent: false,
+		createsRevision: false,
+		changesPostLock: false,
+		claimsSaved: false,
+	};
+}
+
+function getDistributedEditingFreshReviewItemsWithActionTranscriptReportContext(
+	reviewItems,
+	report
+) {
+	const actionTranscriptReportContext =
+		getDistributedEditingFreshReviewItemActionTranscriptReportContext(
+			report
+		);
+
+	return reviewItems.map( ( item ) => ( {
+		...item,
+		actionTranscriptReportContext,
+		hasActionTranscriptReportContext: Boolean(
+			actionTranscriptReportContext?.available
+		),
+		canShowActionTranscriptReportContext: Boolean(
+			actionTranscriptReportContext?.available &&
+				actionTranscriptReportContext.canShareWithSupport
+		),
+	} ) );
+}
+
 /**
  * Returns a pure recovery descriptor for failed opaque reviewed-proof token
  * handoffs. The descriptor is product communication state only; it does not
@@ -2109,6 +2166,13 @@ export function getDistributedEditingFreshReviewDecisionStateForSessionState(
 	sessionState = {}
 ) {
 	const normalized = normalizeDistributedEditingSessionState( sessionState );
+	const actionTranscriptReport =
+		normalized.localUpdatesImportActionTranscriptReport;
+	const reviewItems =
+		getDistributedEditingFreshReviewItemsWithActionTranscriptReportContext(
+			normalized.localUpdatesImportFreshReviewDecisionItems,
+			actionTranscriptReport
+		);
 
 	return {
 		status: normalized.localUpdatesImportFreshReviewDecisionStatus,
@@ -2131,7 +2195,7 @@ export function getDistributedEditingFreshReviewDecisionStateForSessionState(
 		panelRequired:
 			normalized.localUpdatesImportFreshReviewDecisionPanelRequired,
 		ready: normalized.localUpdatesImportFreshReviewDecisionReady,
-		reviewItems: normalized.localUpdatesImportFreshReviewDecisionItems,
+		reviewItems,
 		reviewItemCount:
 			normalized.localUpdatesImportFreshReviewDecisionItemCount,
 		pendingReviewItemCount:
@@ -2144,15 +2208,11 @@ export function getDistributedEditingFreshReviewDecisionStateForSessionState(
 			normalized.localUpdatesImportFreshReviewDecisionReviewedBlockItems,
 		reviewedBlockItemCount:
 			normalized.localUpdatesImportFreshReviewDecisionReviewedBlockItemCount,
-		actionTranscriptReport:
-			normalized.localUpdatesImportActionTranscriptReport,
-		hasActionTranscriptReport: Boolean(
-			normalized.localUpdatesImportActionTranscriptReport?.available
-		),
+		actionTranscriptReport,
+		hasActionTranscriptReport: Boolean( actionTranscriptReport?.available ),
 		canShowActionTranscriptReport: Boolean(
-			normalized.localUpdatesImportActionTranscriptReport?.available &&
-				normalized.localUpdatesImportActionTranscriptReport
-					.canShareWithSupport
+			actionTranscriptReport?.available &&
+				actionTranscriptReport.canShareWithSupport
 		),
 		canExportLocalUpdates: normalized.canExportLocalUpdates,
 		savesPost: false,

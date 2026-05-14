@@ -7729,6 +7729,24 @@ describe( 'distributed editing selectors', () => {
 			getDistributedEditingFreshReviewDecisionStateForSessionState(
 				sessionState
 			);
+		const decisionStateWithItems =
+			getDistributedEditingFreshReviewDecisionStateForSessionState(
+				getDistributedEditingSessionStateForFreshReviewDecisionItems(
+					sessionState,
+					{
+						items: [
+							{
+								id: 'fresh-review-context-item',
+								blockLabel: 'Fresh review context item',
+								proposedContentHash:
+									'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb',
+								rawBlockContent:
+									'<script>turn0148-hidden-item-content</script>',
+							},
+						],
+					}
+				)
+			);
 
 		expect( sessionState ).toMatchObject( {
 			localUpdatesImportReviewRequestStatus:
@@ -7822,11 +7840,50 @@ describe( 'distributed editing selectors', () => {
 			mutatesEditorContent: false,
 			claimsSaved: false,
 		} );
+		expect( decisionStateWithItems.reviewItems ).toEqual( [
+			expect.objectContaining( {
+				id: 'fresh-review-context-item',
+				hasActionTranscriptReportContext: true,
+				canShowActionTranscriptReportContext: true,
+				actionTranscriptReportContext: expect.objectContaining( {
+					available: true,
+					chronologyStatus: 'fresh_review_guarded_save_confirmed',
+					latestEventLabel: 'Fresh-review guarded save confirmed',
+					timelineItemCount: 4,
+					droppedItemCount: 2,
+					canShareWithSupport: true,
+					requiresSaveAuthorityForPersistence: true,
+					entriesRedacted: true,
+					exposesRawContent: false,
+					exposesProofInternals: false,
+					exposesTokenMaterial: false,
+					exposesActorIds: false,
+					dispatchesNotice: false,
+					callsRest: false,
+					callsSave: false,
+					callsRetrySaveEndpoint: false,
+					callsNormalSavePost: false,
+					savesPost: false,
+					mutatesEditorContent: false,
+					mutatesPersistedPostContent: false,
+					createsRevision: false,
+					changesPostLock: false,
+					claimsSaved: false,
+				} ),
+				rawContentIncluded: false,
+				exposesRawContent: false,
+				exposesProofSignature: false,
+				exposesReviewerIds: false,
+			} ),
+		] );
 		expect( JSON.stringify( descriptor ) ).not.toMatch(
-			/proof_signature|reviewer_user_id|low_privileged_saver_user_id|reviewed_block_items|postContent|post_content|turn0147-accepted-request-hidden-proof|turn0147-accepted-request-raw-content-marker/
+			/proof_signature|reviewer_user_id|low_privileged_saver_user_id|reviewed_block_items|postContent|post_content|turn0147-accepted-request-hidden-proof|turn0147-accepted-request-raw-content-marker|turn0148-hidden-item-content/
 		);
 		expect( JSON.stringify( decisionState ) ).not.toMatch(
-			/proof_signature|reviewer_user_id|low_privileged_saver_user_id|reviewed_block_items|postContent|post_content|turn0147-accepted-request-hidden-proof|turn0147-accepted-request-raw-content-marker/
+			/proof_signature|reviewer_user_id|low_privileged_saver_user_id|reviewed_block_items|postContent|post_content|turn0147-accepted-request-hidden-proof|turn0147-accepted-request-raw-content-marker|turn0148-hidden-item-content/
+		);
+		expect( JSON.stringify( decisionStateWithItems ) ).not.toMatch(
+			/proof_signature|reviewer_user_id|low_privileged_saver_user_id|reviewed_block_items|postContent|post_content|turn0147-accepted-request-hidden-proof|turn0147-accepted-request-raw-content-marker|turn0148-hidden-item-content/
 		);
 	} );
 

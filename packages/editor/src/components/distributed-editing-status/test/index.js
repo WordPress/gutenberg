@@ -3696,6 +3696,11 @@ describe( 'DistributedEditingStatusSurface', () => {
 		expect( screen.getByText( 'Awaiting review' ) ).toBeVisible();
 		expect( screen.getByText( 'Approve HTML change' ) ).toBeVisible();
 		expect( screen.getByText( 'Reject HTML change' ) ).toBeVisible();
+		expect(
+			screen.getAllByText(
+				'Activity context: Fresh-review guarded save confirmed; 4 redacted transcript events, 2 unsafe entries dropped. Diagnostic only; save-authority evidence is still required.'
+			)
+		).toHaveLength( 2 );
 
 		await user.click(
 			screen.getByRole( 'button', {

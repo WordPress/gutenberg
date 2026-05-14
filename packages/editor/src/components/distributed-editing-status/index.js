@@ -1081,6 +1081,10 @@ export function DistributedEditingFreshReviewDecisionPanel( {
 							item.blockName ||
 							item.id ||
 							__( 'Review item' );
+						const actionTranscriptReportContextMessage =
+							getFreshReviewDecisionItemActionTranscriptContextMessage(
+								item.actionTranscriptReportContext
+							);
 
 						return (
 							<li
@@ -1105,6 +1109,11 @@ export function DistributedEditingFreshReviewDecisionPanel( {
 								</Button>
 								<span>{ label }</span>
 								<span>{ item.reviewStatus }</span>
+								{ actionTranscriptReportContextMessage && (
+									<span className="editor-distributed-editing-status__fresh-review-decision-item-report">
+										{ actionTranscriptReportContextMessage }
+									</span>
+								) }
 								<Button
 									__next40pxDefaultSize
 									accessibleWhenDisabled
@@ -2543,6 +2552,49 @@ function getActionTranscriptSupportReportMessage( report ) {
 	]
 		.filter( Boolean )
 		.join( ' ' );
+}
+
+function getFreshReviewDecisionItemActionTranscriptContextMessage( context ) {
+	if ( ! context?.available || ! context.canShareWithSupport ) {
+		return null;
+	}
+
+	const eventCount = context.timelineItemCount || 0;
+	const droppedCount = context.droppedItemCount || 0;
+	const eventText = sprintf(
+		/* translators: %d: redacted transcript event count. */
+		_n(
+			'%d redacted transcript event',
+			'%d redacted transcript events',
+			eventCount
+		),
+		eventCount
+	);
+	const droppedText =
+		droppedCount > 0
+			? sprintf(
+					/* translators: %d: unsafe transcript entry count. */
+					_n(
+						', %d unsafe entry dropped',
+						', %d unsafe entries dropped',
+						droppedCount
+					),
+					droppedCount
+			  )
+			: '';
+	const latestEventLabel =
+		context.latestEventLabel ||
+		__( 'Distributed Editing activity recorded' );
+
+	return sprintf(
+		/* translators: 1: latest transcript event label, 2: transcript event count text, 3: dropped unsafe entry text. */
+		__(
+			'Activity context: %1$s; %2$s%3$s. Diagnostic only; save-authority evidence is still required.'
+		),
+		latestEventLabel,
+		eventText,
+		droppedText
+	);
 }
 
 function getLocalUpdatesImportStatusMessage( {
