@@ -14,6 +14,9 @@
 	border-radius: var(--wpds-border-radius-lg);
 	background-color: var(--wp-components-notice-background-color);
 	color: var(--wp-components-notice-text-color);
+	font-family: var(--wpds-typography-font-family-body);
+	font-size: var(--wpds-typography-font-size-md);
+	line-height: var(--wpds-typography-line-height-sm);
 
 	&.is-success {
 		--wp-components-notice-background-color: var(--wpds-color-bg-surface-success-weak);
@@ -37,9 +40,6 @@
 .components-notice__content {
 	grid-column: 1;
 	grid-row: 1;
-	font-family: var(--wpds-typography-font-family-body);
-	font-size: var(--wpds-typography-font-size-md);
-	line-height: var(--wpds-typography-line-height-sm);
 
 	// Centers single-line copy with the dismiss row when it is present. The same
 	// padding is kept when the notice is not dismissible so block height stays
