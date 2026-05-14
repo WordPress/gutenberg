@@ -6,6 +6,7 @@
 .editor-text-editor {
 	@include reset;
 	position: relative;
+	isolation: isolate;
 	width: 100%;
 	background-color: $white;
 	flex-grow: 1;
