@@ -13,28 +13,16 @@ import { ITEM_POPUP_POSITIONER_PROPS } from '../constants';
  * `Select.Popup` uses this component with default props.
  */
 const Positioner = forwardRef< HTMLDivElement, PositionerProps >(
-	function SelectPositioner(
-		{
-			align = ITEM_POPUP_POSITIONER_PROPS.align,
-			// Override Base UI's `true` default so the popup is placed
-			// relative to the trigger rather than aligned with the
-			// highlighted item. Consumers can opt back in by passing `true`.
-			alignItemWithTrigger = false,
-			className,
-			collisionPadding = ITEM_POPUP_POSITIONER_PROPS.collisionPadding,
-			sideOffset = ITEM_POPUP_POSITIONER_PROPS.sideOffset,
-			...props
-		},
-		ref
-	) {
+	function SelectPositioner( { className, ...props }, ref ) {
 		return (
 			<_Select.Positioner
-				ref={ ref }
-				align={ align }
-				alignItemWithTrigger={ alignItemWithTrigger }
-				collisionPadding={ collisionPadding }
-				sideOffset={ sideOffset }
+				{ ...ITEM_POPUP_POSITIONER_PROPS }
+				// Override Base UI's `true` default so the popup is placed
+				// relative to the trigger rather than aligned with the
+				// highlighted item. Consumers can opt back in by passing `true`.
+				alignItemWithTrigger={ false }
 				{ ...props }
+				ref={ ref }
 				className={ clsx(
 					resetStyles[ 'box-sizing' ],
 					styles.positioner,

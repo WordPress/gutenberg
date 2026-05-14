@@ -13,23 +13,12 @@ import { ITEM_POPUP_POSITIONER_PROPS } from '../constants';
  * `Autocomplete.Popup` uses this component with default props.
  */
 const Positioner = forwardRef< HTMLDivElement, PositionerProps >(
-	function AutocompletePositioner(
-		{
-			align = ITEM_POPUP_POSITIONER_PROPS.align,
-			className,
-			collisionPadding = ITEM_POPUP_POSITIONER_PROPS.collisionPadding,
-			sideOffset = ITEM_POPUP_POSITIONER_PROPS.sideOffset,
-			...props
-		},
-		ref
-	) {
+	function AutocompletePositioner( { className, ...props }, ref ) {
 		return (
 			<_Autocomplete.Positioner
-				ref={ ref }
-				align={ align }
-				collisionPadding={ collisionPadding }
-				sideOffset={ sideOffset }
+				{ ...ITEM_POPUP_POSITIONER_PROPS }
 				{ ...props }
+				ref={ ref }
 				className={ clsx(
 					resetStyles[ 'box-sizing' ],
 					styles.positioner,
