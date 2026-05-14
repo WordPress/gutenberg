@@ -62,6 +62,7 @@
 		height: 100%;
 		justify-content: flex-start;
 		position: relative;
+		isolation: isolate;
 
 		.dataviews-view-grid__title-actions {
 			padding: var(--wpds-dimension-padding-sm) 0 var(--wpds-dimension-padding-xs);

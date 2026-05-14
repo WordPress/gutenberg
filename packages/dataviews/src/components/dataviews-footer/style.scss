@@ -13,8 +13,8 @@
 		transition: padding ease-out 0.1s;
 	}
 
-	// Ensure footer stays above the preview field.
-	z-index: 2;
+	// Ensure the footer stays above the scrolling content, independent of DOM order.
+	z-index: 1;
 
 	.is-refreshing {
 		@include dataviews-refreshing();

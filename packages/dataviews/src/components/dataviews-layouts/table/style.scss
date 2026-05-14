@@ -128,7 +128,7 @@
 	thead {
 		position: sticky;
 		inset-block-start: 0;
-		// Ensure checkbox and row actions don't overlap the table header.
+		// Ensure the header stays above the scrolling content.
 		z-index: 1;
 		background-color: inherit;
 
