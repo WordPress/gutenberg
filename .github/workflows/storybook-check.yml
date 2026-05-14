@@ -1,6 +1,10 @@
 name: Storybook build and Smoke Tests
 
-on: pull_request
+on:
+    pull_request:
+    push:
+        branches:
+            - trunk
 
 # Cancels all previous workflow runs for pull requests that have not completed.
 concurrency:
