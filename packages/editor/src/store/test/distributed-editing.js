@@ -16,6 +16,7 @@ import {
 	DISTRIBUTED_EDITING_NOTICE_ACTIONS,
 	DISTRIBUTED_EDITING_NOTICE_IDS,
 	DISTRIBUTED_EDITING_NOTICE_KINDS,
+	DISTRIBUTED_EDITING_OPAQUE_REVIEW_APPROVAL_PROOF_TOKEN_ENVELOPE_TYPE,
 	DISTRIBUTED_EDITING_REASON_CODES,
 	DISTRIBUTED_EDITING_REVIEW_APPROVAL_PROOF_ENVELOPE_TYPE,
 	DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES,
@@ -243,6 +244,7 @@ describe( 'distributed editing session state', () => {
 			retrySaveReviewApprovalProofStatus:
 				DISTRIBUTED_EDITING_RETRY_SAVE_REVIEW_APPROVAL_PROOF_STATUSES.NONE,
 			retrySaveReviewApprovalProofReason: null,
+			retrySaveReviewApprovalProofEnvelope: null,
 			retrySaveReviewApprovalAccepted: false,
 			retrySaveReviewApprovalPostId: null,
 			retrySaveReviewApprovalPostType: null,
@@ -1978,6 +1980,71 @@ describe( 'distributed editing session state', () => {
 		);
 	} );
 
+	it( 'preserves opaque review approval proof token envelopes from approval responses', () => {
+		const opaqueTokenEnvelope = {
+			proof_envelope_type:
+				DISTRIBUTED_EDITING_OPAQUE_REVIEW_APPROVAL_PROOF_TOKEN_ENVELOPE_TYPE,
+			token: 'de-rtc-review-token.turn-0077',
+			token_version: 1,
+			issued_at: 1893456000,
+			expires_at: 1893456300,
+			post: {
+				id: 44,
+				type: 'post',
+			},
+		};
+		const normalized =
+			getDistributedEditingSessionStateForRetrySaveReviewApprovalProofResult(
+				{
+					result: 'review_approval_accepted_for_retry_save',
+					review_approval_accepted: true,
+					server_version: '12',
+					pending_change_count: 1,
+					proposed_post_content_hash:
+						'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+					candidate_post_content_hash:
+						'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb',
+					review_approval_proof: opaqueTokenEnvelope,
+					saves_post: false,
+					mutates_post_content: false,
+					creates_revision: false,
+					claims_saved: false,
+				},
+				{
+					serverVersion: '12',
+					pendingChangeCount: 1,
+					hasPendingChanges: true,
+				}
+			);
+
+		expect( normalized ).toMatchObject( {
+			retrySaveReviewApprovalProofStatus:
+				DISTRIBUTED_EDITING_RETRY_SAVE_REVIEW_APPROVAL_PROOF_STATUSES.ACCEPTED_FOR_RETRY_SAVE,
+			retrySaveReviewApprovalAccepted: true,
+			retrySaveReviewApprovalProofEnvelope: opaqueTokenEnvelope,
+			retrySaveReviewApprovalProofSignature: null,
+			retrySaveReviewApprovalReviewedBlockItems: [],
+			retrySaveReviewApprovalPostId: '44',
+			retrySaveReviewApprovalPostType: 'post',
+			retrySaveReviewApprovalIssuedAt: '1893456000',
+			retrySaveReviewApprovalExpiresAt: '1893456300',
+			retrySaveReviewApprovalProposedContentHash:
+				'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+		} );
+		expect(
+			getDistributedEditingAcceptedReviewApprovalProofForRetrySaveRequest(
+				normalized
+			)
+		).toEqual( opaqueTokenEnvelope );
+		expect(
+			JSON.stringify(
+				getDistributedEditingAcceptedReviewApprovalProofForRetrySaveRequest(
+					normalized
+				)
+			)
+		).not.toContain( 'proof_signature' );
+	} );
+
 	it( 'builds hash-only accepted review approval proof for retry-save requests', () => {
 		const proposedContentHash =
 			'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
@@ -3474,6 +3541,131 @@ describe( 'distributed editing session state', () => {
 				postId: '44',
 				postType: 'post',
 				proofSignature,
+			},
+		} );
+	} );
+
+	it( 'prefers opaque review approval proof token envelopes for local-updates handoff', () => {
+		const postContent =
+			'<!-- wp:html --><script>approved</script><!-- /wp:html -->';
+		const proposedPostContentHash =
+			'7e479a6c51c9e8167f1542af0c730ae0009236c4936876ebbf85bcd7c3ab7dd0';
+		const opaqueTokenEnvelope = {
+			proof_envelope_type:
+				DISTRIBUTED_EDITING_OPAQUE_REVIEW_APPROVAL_PROOF_TOKEN_ENVELOPE_TYPE,
+			token: 'de-rtc-review-token.turn-0077',
+			token_version: 1,
+			issued_at: 1893456000,
+			expires_at: 1893456300,
+			post: {
+				id: 44,
+				type: 'post',
+			},
+		};
+		const payload = getDistributedEditingLocalUpdatesExportPayload( {
+			currentPost: {
+				id: 44,
+				type: 'post',
+			},
+			editedPostContent: postContent,
+			sessionState: {
+				serverVersion: '12',
+				clientBaseVersion: '7',
+				pendingChangeCount: 1,
+				retrySaveReviewApprovalProofStatus:
+					DISTRIBUTED_EDITING_RETRY_SAVE_REVIEW_APPROVAL_PROOF_STATUSES.ACCEPTED_FOR_RETRY_SAVE,
+				retrySaveReviewApprovalAccepted: true,
+				retrySaveReviewApprovalProofEnvelope: opaqueTokenEnvelope,
+				retrySaveReviewApprovalPostId: '44',
+				retrySaveReviewApprovalPostType: 'post',
+				retrySaveReviewApprovalServerVersion: '12',
+				retrySaveReviewApprovalRebasedFromVersion: '7',
+				retrySaveReviewApprovalProposedContentHash:
+					proposedPostContentHash,
+				retrySaveReviewApprovalCandidateContentHash:
+					'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb',
+				retrySaveReviewApprovalProofSignature:
+					'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc',
+				retrySaveReviewApprovalReviewedBlockItems: [
+					{
+						id: 'risk-html-approved',
+						proposedContentHash: proposedPostContentHash,
+						reviewedProposedContentHash: proposedPostContentHash,
+						reviewStatus: 'approved_for_retry_save',
+					},
+				],
+			},
+		} );
+
+		expect( Object.keys( payload ) ).toEqual( [
+			'version',
+			'format',
+			'post',
+			'postContent',
+			'pendingChangeCount',
+			'acceptedReviewApprovalProof',
+		] );
+		expect( payload.acceptedReviewApprovalProof ).toEqual(
+			opaqueTokenEnvelope
+		);
+		expect(
+			JSON.stringify( payload.acceptedReviewApprovalProof )
+		).not.toContain( 'proofSignature' );
+		expect(
+			JSON.stringify( payload.acceptedReviewApprovalProof )
+		).not.toContain( 'reviewedBlockItems' );
+		expect( payload.acceptedReviewApprovalProof.proof ).toBeUndefined();
+
+		const result = getDistributedEditingLocalUpdatesImportResult( {
+			payload,
+			currentPost: {
+				id: 44,
+				type: 'post',
+			},
+			computedPostContentHash: proposedPostContentHash,
+			now: 1893456100,
+		} );
+
+		expect( result ).toMatchObject( {
+			status: DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_STATUSES.IMPORTED_FOR_RETRY_SAVE,
+			reason: null,
+			postContent,
+			hasAcceptedReviewApprovalProof: true,
+			acceptedReviewApprovalProof: opaqueTokenEnvelope,
+			mutatesEditorContent: true,
+			callsRetrySaveEndpoint: false,
+			callsNormalSavePost: false,
+			claimsSaved: false,
+		} );
+		expect( result.sessionState ).toMatchObject( {
+			retrySaveReviewApprovalProofEnvelope: opaqueTokenEnvelope,
+			retrySaveReviewApprovalProofStatus:
+				DISTRIBUTED_EDITING_RETRY_SAVE_REVIEW_APPROVAL_PROOF_STATUSES.ACCEPTED_FOR_RETRY_SAVE,
+			retrySaveReviewApprovalAccepted: true,
+			retrySaveReviewApprovalProofSignature: null,
+			retrySaveReviewApprovalReviewedBlockItems: [],
+			localUpdatesImportHasAcceptedReviewApprovalProof: true,
+		} );
+
+		expect(
+			getDistributedEditingRetrySavePolicyForSessionState(
+				result.sessionState,
+				{
+					postId: 44,
+					restBase: 'posts',
+					proposedPostContent: postContent,
+					clientBaseVersion: '12',
+					acceptedProofServerVersion: '12',
+					rebasedFromVersion: '7',
+				}
+			)
+		).toMatchObject( {
+			status: DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_STATUSES.READY,
+			canRetrySave: true,
+			hasAcceptedReviewApprovalProof: true,
+			acceptedReviewApprovalReviewedBlockItemCount: 0,
+			request: {
+				acceptedReviewApprovalProof: opaqueTokenEnvelope,
 			},
 		} );
 	} );

@@ -294,6 +294,9 @@ export const DISTRIBUTED_EDITING_LOCAL_UPDATES_EXPORT_FORMAT =
 export const DISTRIBUTED_EDITING_REVIEW_APPROVAL_PROOF_ENVELOPE_TYPE =
 	'field_based_review_approval_proof';
 
+export const DISTRIBUTED_EDITING_OPAQUE_REVIEW_APPROVAL_PROOF_TOKEN_ENVELOPE_TYPE =
+	'opaque_review_approval_proof_token';
+
 /**
  * Stable local-updates import statuses for cross-user handoff payloads.
  */
@@ -476,6 +479,7 @@ export const DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE = Object.freeze( {
 	retrySaveReviewApprovalProofStatus:
 		DISTRIBUTED_EDITING_RETRY_SAVE_REVIEW_APPROVAL_PROOF_STATUSES.NONE,
 	retrySaveReviewApprovalProofReason: null,
+	retrySaveReviewApprovalProofEnvelope: null,
 	retrySaveReviewApprovalAccepted: false,
 	retrySaveReviewApprovalPostId: null,
 	retrySaveReviewApprovalPostType: null,
@@ -915,6 +919,10 @@ export function getDistributedEditingLocalUpdatesExportPayload( {
 		getDistributedEditingAcceptedReviewApprovalProofForRetrySaveRequest(
 			normalizedSessionState
 		);
+	const acceptedReviewApprovalProofEnvelope =
+		getDistributedEditingReviewApprovalProofEnvelope(
+			acceptedReviewApprovalProof
+		);
 
 	return {
 		version: 1,
@@ -926,10 +934,7 @@ export function getDistributedEditingLocalUpdatesExportPayload( {
 		postContent:
 			typeof editedPostContent === 'string' ? editedPostContent : '',
 		pendingChangeCount: normalizedSessionState.pendingChangeCount,
-		acceptedReviewApprovalProof:
-			getDistributedEditingReviewApprovalProofEnvelope(
-				acceptedReviewApprovalProof
-			),
+		acceptedReviewApprovalProof: acceptedReviewApprovalProofEnvelope,
 	};
 }
 
@@ -938,11 +943,236 @@ function getDistributedEditingReviewApprovalProofEnvelope( proof ) {
 		return null;
 	}
 
+	const envelopeType = getReviewApprovalProofEnvelopeType( proof );
+
+	if ( envelopeType ) {
+		return normalizeReviewApprovalProofEnvelope( proof );
+	}
+
 	return {
 		proof_envelope_type:
 			DISTRIBUTED_EDITING_REVIEW_APPROVAL_PROOF_ENVELOPE_TYPE,
 		proof,
 	};
+}
+
+function getReviewApprovalProofEnvelopeType( proofOrEnvelope ) {
+	const object = normalizeObject( proofOrEnvelope );
+
+	return normalizeNullableString(
+		getFirstDefined( object.proofEnvelopeType, object.proof_envelope_type )
+	);
+}
+
+function isOpaqueReviewApprovalProofTokenEnvelope( proofOrEnvelope ) {
+	return (
+		getReviewApprovalProofEnvelopeType( proofOrEnvelope ) ===
+		DISTRIBUTED_EDITING_OPAQUE_REVIEW_APPROVAL_PROOF_TOKEN_ENVELOPE_TYPE
+	);
+}
+
+function normalizeReviewApprovalProofEnvelope( proofOrEnvelope ) {
+	const object = normalizeObject( proofOrEnvelope );
+	const envelopeType = getReviewApprovalProofEnvelopeType( object );
+
+	if (
+		envelopeType === DISTRIBUTED_EDITING_REVIEW_APPROVAL_PROOF_ENVELOPE_TYPE
+	) {
+		const proof = normalizeObject( object.proof );
+
+		return Object.keys( proof ).length > 0
+			? {
+					proof_envelope_type:
+						DISTRIBUTED_EDITING_REVIEW_APPROVAL_PROOF_ENVELOPE_TYPE,
+					proof,
+			  }
+			: null;
+	}
+
+	if (
+		envelopeType !==
+		DISTRIBUTED_EDITING_OPAQUE_REVIEW_APPROVAL_PROOF_TOKEN_ENVELOPE_TYPE
+	) {
+		return null;
+	}
+
+	if ( containsRawContentEvidence( object ) ) {
+		return null;
+	}
+
+	const token = normalizeNullableString(
+		getFirstDefined(
+			object.token,
+			object.proofToken,
+			object.proof_token,
+			object.reviewApprovalProofToken,
+			object.review_approval_proof_token
+		)
+	);
+
+	if ( ! token ) {
+		return null;
+	}
+
+	const tokenVersion = normalizeNullableInteger(
+		getFirstDefined( object.tokenVersion, object.token_version )
+	);
+	const post = normalizeReviewApprovalProofEnvelopePost(
+		getFirstDefined( object.post, object.postRoute, object.post_route, {
+			id: getFirstDefined( object.postId, object.post_id ),
+			type: getFirstDefined( object.postType, object.post_type ),
+		} )
+	);
+	const issuedAt = normalizeNullableInteger(
+		getFirstDefined( object.issuedAt, object.issued_at )
+	);
+	const expiresAt = normalizeNullableInteger(
+		getFirstDefined( object.expiresAt, object.expires_at )
+	);
+
+	return {
+		proof_envelope_type:
+			DISTRIBUTED_EDITING_OPAQUE_REVIEW_APPROVAL_PROOF_TOKEN_ENVELOPE_TYPE,
+		token,
+		...( tokenVersion ? { token_version: tokenVersion } : {} ),
+		...( issuedAt ? { issued_at: issuedAt } : {} ),
+		...( expiresAt ? { expires_at: expiresAt } : {} ),
+		...( post ? { post } : {} ),
+	};
+}
+
+function normalizeReviewApprovalProofEnvelopePost( post ) {
+	const normalizedPost = normalizeObject( post );
+	const id = normalizeNullableInteger( normalizedPost.id );
+	const type = normalizeNullableString( normalizedPost.type );
+
+	if ( ! id && ! type ) {
+		return null;
+	}
+
+	return {
+		...( id ? { id } : {} ),
+		...( type ? { type } : {} ),
+	};
+}
+
+function getReviewApprovalProofFromProofOrEnvelope( proofOrEnvelope ) {
+	const envelope = normalizeReviewApprovalProofEnvelope( proofOrEnvelope );
+
+	if (
+		envelope?.proof_envelope_type ===
+		DISTRIBUTED_EDITING_REVIEW_APPROVAL_PROOF_ENVELOPE_TYPE
+	) {
+		return normalizeObject( envelope.proof );
+	}
+
+	if ( envelope ) {
+		return {};
+	}
+
+	return normalizeObject( proofOrEnvelope );
+}
+
+function getReviewApprovalProofEnvelopeMetadata( proofOrEnvelope ) {
+	const envelope = normalizeReviewApprovalProofEnvelope( proofOrEnvelope );
+
+	if (
+		envelope?.proof_envelope_type !==
+		DISTRIBUTED_EDITING_OPAQUE_REVIEW_APPROVAL_PROOF_TOKEN_ENVELOPE_TYPE
+	) {
+		return {};
+	}
+
+	return {
+		post_id: envelope.post?.id,
+		post_type: envelope.post?.type,
+		issued_at: envelope.issued_at,
+		expires_at: envelope.expires_at,
+	};
+}
+
+function getPreferredReviewApprovalProofOrEnvelope( ...proofOrEnvelopes ) {
+	const candidates = proofOrEnvelopes
+		.map( ( proofOrEnvelope ) =>
+			proofOrEnvelope === undefined || proofOrEnvelope === null
+				? null
+				: proofOrEnvelope
+		)
+		.filter( Boolean );
+	const opaqueEnvelope = candidates
+		.map( normalizeReviewApprovalProofEnvelope )
+		.find( isOpaqueReviewApprovalProofTokenEnvelope );
+
+	if ( opaqueEnvelope ) {
+		return opaqueEnvelope;
+	}
+
+	const fieldBasedEnvelope = candidates
+		.map( normalizeReviewApprovalProofEnvelope )
+		.find(
+			( envelope ) =>
+				envelope?.proof_envelope_type ===
+				DISTRIBUTED_EDITING_REVIEW_APPROVAL_PROOF_ENVELOPE_TYPE
+		);
+
+	if ( fieldBasedEnvelope ) {
+		return fieldBasedEnvelope;
+	}
+
+	return candidates.map( normalizeObject ).find( ( candidate ) => {
+		return ! getReviewApprovalProofEnvelopeType( candidate );
+	} );
+}
+
+function containsRawContentEvidence( value ) {
+	if ( Array.isArray( value ) ) {
+		return value.some( containsRawContentEvidence );
+	}
+
+	if ( ! value || typeof value !== 'object' ) {
+		return false;
+	}
+
+	const forbiddenRawContentKeys = new Set( [
+		'rawContent',
+		'raw_content',
+		'postContent',
+		'post_content',
+		'proposedPostContent',
+		'proposed_post_content',
+		'reviewedPostContent',
+		'reviewed_post_content',
+		'candidatePostContent',
+		'candidate_post_content',
+		'blockContent',
+		'block_content',
+		'rawBlockContent',
+		'raw_block_content',
+	] );
+
+	for ( const [ key, nestedValue ] of Object.entries( value ) ) {
+		if ( forbiddenRawContentKeys.has( key ) ) {
+			return true;
+		}
+
+		if (
+			[
+				'rawContentIncluded',
+				'raw_content_included',
+				'exposesRawContent',
+				'exposes_raw_content',
+			].includes( key ) &&
+			Boolean( nestedValue )
+		) {
+			return true;
+		}
+
+		if ( containsRawContentEvidence( nestedValue ) ) {
+			return true;
+		}
+	}
+
+	return false;
 }
 
 function exposesDistributedEditingSessionState( payload ) {
@@ -983,6 +1213,22 @@ function getDistributedEditingSessionStateFromLocalUpdatesImportPayload(
 		getRetrySaveReviewApprovalProofFieldsFromResponseOrError(
 			{
 				acceptedReviewApprovalProof,
+				serverVersion: getFirstDefined(
+					payload.serverVersion,
+					payload.server_version,
+					payload.acceptedProofServerVersion,
+					payload.accepted_proof_server_version
+				),
+				rebasedFromVersion: getFirstDefined(
+					payload.rebasedFromVersion,
+					payload.rebased_from_version,
+					payload.clientBaseVersion,
+					payload.client_base_version
+				),
+				proposedPostContentHash: getFirstDefined(
+					payload.proposedPostContentHash,
+					payload.proposed_post_content_hash
+				),
 			},
 			{},
 			{}
@@ -1003,33 +1249,13 @@ function getDistributedEditingSessionStateFromLocalUpdatesImportPayload(
 function getAcceptedReviewApprovalProofFromLocalUpdatesImportPayload(
 	payload
 ) {
-	const proofOrEnvelope = normalizeObject(
-		getFirstDefined(
-			payload.acceptedReviewApprovalProof,
-			payload.accepted_review_approval_proof,
-			payload.reviewApprovalProof,
-			payload.review_approval_proof,
-			payload.proof
-		)
+	return getPreferredReviewApprovalProofOrEnvelope(
+		payload.acceptedReviewApprovalProof,
+		payload.accepted_review_approval_proof,
+		payload.reviewApprovalProof,
+		payload.review_approval_proof,
+		payload.proof
 	);
-	const envelopeType = normalizeNullableString(
-		getFirstDefined(
-			proofOrEnvelope.proofEnvelopeType,
-			proofOrEnvelope.proof_envelope_type
-		)
-	);
-
-	if ( ! envelopeType ) {
-		return proofOrEnvelope;
-	}
-
-	if (
-		envelopeType !== DISTRIBUTED_EDITING_REVIEW_APPROVAL_PROOF_ENVELOPE_TYPE
-	) {
-		return {};
-	}
-
-	return normalizeObject( proofOrEnvelope.proof );
 }
 
 /**
@@ -1149,10 +1375,17 @@ export function getDistributedEditingLocalUpdatesImportResult( {
 		getDistributedEditingAcceptedReviewApprovalProofForRetrySaveRequest(
 			importedSessionState
 		);
+	const acceptedReviewApprovalProofEnvelope =
+		normalizeReviewApprovalProofEnvelope( acceptedReviewApprovalProof );
+	const hasOpaqueReviewApprovalProofToken =
+		isOpaqueReviewApprovalProofTokenEnvelope(
+			acceptedReviewApprovalProofEnvelope
+		);
 
 	if (
 		! acceptedReviewApprovalProof ||
-		! acceptedReviewApprovalProof.proofSignature
+		( ! hasOpaqueReviewApprovalProofToken &&
+			! acceptedReviewApprovalProof.proofSignature )
 	) {
 		return createLocalUpdatesImportBlockedResult(
 			DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.MISSING_REVIEW_APPROVAL_PROOF,
@@ -1163,13 +1396,22 @@ export function getDistributedEditingLocalUpdatesImportResult( {
 		);
 	}
 
+	const acceptedReviewApprovalProofPostId =
+		acceptedReviewApprovalProofEnvelope?.post?.id !== undefined
+			? String( acceptedReviewApprovalProofEnvelope.post.id )
+			: acceptedReviewApprovalProof.postId;
+	const acceptedReviewApprovalProofPostType =
+		acceptedReviewApprovalProofEnvelope?.post?.type ||
+		acceptedReviewApprovalProof.postType;
+
 	if (
 		( postId !== null &&
-			acceptedReviewApprovalProof.postId !== null &&
-			acceptedReviewApprovalProof.postId !== String( postId ) ) ||
+			acceptedReviewApprovalProofPostId !== null &&
+			acceptedReviewApprovalProofPostId !== undefined &&
+			acceptedReviewApprovalProofPostId !== String( postId ) ) ||
 		( postType &&
-			acceptedReviewApprovalProof.postType &&
-			acceptedReviewApprovalProof.postType !== postType )
+			acceptedReviewApprovalProofPostType &&
+			acceptedReviewApprovalProofPostType !== postType )
 	) {
 		return createLocalUpdatesImportBlockedResult(
 			DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.POST_ROUTE_MISMATCH,
@@ -1193,13 +1435,22 @@ export function getDistributedEditingLocalUpdatesImportResult( {
 	}
 
 	const expectedPostContentHash = normalizeSha256Hash(
-		acceptedReviewApprovalProof.proposedPostContentHash
+		getFirstDefined(
+			acceptedReviewApprovalProof.proposedPostContentHash,
+			acceptedReviewApprovalProof.proposed_post_content_hash,
+			acceptedReviewApprovalProofEnvelope?.proposed_post_content_hash,
+			normalizedPayload.proposedPostContentHash,
+			normalizedPayload.proposed_post_content_hash
+		)
 	);
 	const verifiedPostContentHash = normalizeSha256Hash(
 		computedPostContentHash
 	);
 
-	if ( ! expectedPostContentHash || ! verifiedPostContentHash ) {
+	if (
+		( ! expectedPostContentHash && ! hasOpaqueReviewApprovalProofToken ) ||
+		( expectedPostContentHash && ! verifiedPostContentHash )
+	) {
 		return createLocalUpdatesImportBlockedResult(
 			DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.MISSING_HASH_EVIDENCE,
 			{
@@ -1209,7 +1460,10 @@ export function getDistributedEditingLocalUpdatesImportResult( {
 		);
 	}
 
-	if ( expectedPostContentHash !== verifiedPostContentHash ) {
+	if (
+		expectedPostContentHash &&
+		expectedPostContentHash !== verifiedPostContentHash
+	) {
 		return createLocalUpdatesImportBlockedResult(
 			DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.POST_CONTENT_HASH_MISMATCH,
 			{
@@ -2212,6 +2466,14 @@ export function getDistributedEditingAcceptedReviewApprovalProofForRetrySaveRequ
 		normalized.retrySaveReviewApprovalRawContentIncluded
 	) {
 		return null;
+	}
+
+	const proofEnvelope = normalizeReviewApprovalProofEnvelope(
+		normalized.retrySaveReviewApprovalProofEnvelope
+	);
+
+	if ( isOpaqueReviewApprovalProofTokenEnvelope( proofEnvelope ) ) {
+		return proofEnvelope;
 	}
 
 	const serverVersion =
@@ -4255,6 +4517,10 @@ function normalizeRetrySaveReviewApprovalProofFields( sessionState = {} ) {
 		retrySaveReviewApprovalProofReason: normalizeNullableString(
 			sessionState.retrySaveReviewApprovalProofReason
 		),
+		retrySaveReviewApprovalProofEnvelope:
+			normalizeReviewApprovalProofEnvelope(
+				sessionState.retrySaveReviewApprovalProofEnvelope
+			),
 		retrySaveReviewApprovalAccepted:
 			Boolean( sessionState.retrySaveReviewApprovalAccepted ) ||
 			retrySaveReviewApprovalProofStatus ===
@@ -4952,22 +5218,50 @@ function getRetrySaveReviewApprovalProofFieldsFromResponseOrError(
 	responseData = {},
 	currentSessionState = {}
 ) {
-	const approvalContract = normalizeObject(
+	const directApprovalContract = normalizeObject(
 		getFirstDefined(
 			responseOrError.reviewApprovalContract,
 			responseOrError.review_approval_contract,
 			responseOrError.approvalContract,
 			responseOrError.approval_contract,
-			responseOrError.acceptedReviewApprovalProof,
-			responseOrError.accepted_review_approval_proof,
 			responseData.reviewApprovalContract,
 			responseData.review_approval_contract,
 			responseData.approvalContract,
-			responseData.approval_contract,
-			responseData.acceptedReviewApprovalProof,
-			responseData.accepted_review_approval_proof
+			responseData.approval_contract
 		)
 	);
+	const acceptedReviewApprovalProofOrEnvelope =
+		getPreferredReviewApprovalProofOrEnvelope(
+			responseOrError.acceptedReviewApprovalProofEnvelope,
+			responseOrError.accepted_review_approval_proof_envelope,
+			responseOrError.reviewApprovalProofEnvelope,
+			responseOrError.review_approval_proof_envelope,
+			responseData.acceptedReviewApprovalProofEnvelope,
+			responseData.accepted_review_approval_proof_envelope,
+			responseData.reviewApprovalProofEnvelope,
+			responseData.review_approval_proof_envelope,
+			responseOrError.acceptedReviewApprovalProof,
+			responseOrError.accepted_review_approval_proof,
+			responseOrError.reviewApprovalProof,
+			responseOrError.review_approval_proof,
+			responseData.acceptedReviewApprovalProof,
+			responseData.accepted_review_approval_proof,
+			responseData.reviewApprovalProof,
+			responseData.review_approval_proof
+		);
+	const acceptedReviewApprovalProofEnvelope =
+		normalizeReviewApprovalProofEnvelope(
+			acceptedReviewApprovalProofOrEnvelope
+		);
+	const approvalContract = {
+		...getReviewApprovalProofEnvelopeMetadata(
+			acceptedReviewApprovalProofOrEnvelope
+		),
+		...directApprovalContract,
+		...getReviewApprovalProofFromProofOrEnvelope(
+			acceptedReviewApprovalProofOrEnvelope
+		),
+	};
 	const reviewContract = normalizeObject(
 		getFirstDefined(
 			responseOrError.reviewContract,
@@ -5030,6 +5324,8 @@ function getRetrySaveReviewApprovalProofFieldsFromResponseOrError(
 		);
 
 	return normalizeRetrySaveReviewApprovalProofFields( {
+		retrySaveReviewApprovalProofEnvelope:
+			acceptedReviewApprovalProofEnvelope,
 		retrySaveReviewApprovalPostId: getFirstDefined(
 			responseOrError.postId,
 			responseOrError.post_id,

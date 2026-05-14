@@ -8,6 +8,10 @@ export const DISTRIBUTED_EDITING_RECOVERY_REST_BASES = Object.freeze( [
 	'posts',
 	'pages',
 ] );
+const DISTRIBUTED_EDITING_REVIEW_APPROVAL_PROOF_ENVELOPE_TYPE =
+	'field_based_review_approval_proof';
+const DISTRIBUTED_EDITING_OPAQUE_REVIEW_APPROVAL_PROOF_TOKEN_ENVELOPE_TYPE =
+	'opaque_review_approval_proof_token';
 
 /**
  * Returns the current DE-RTC recovery endpoint path for a post.
@@ -380,6 +384,17 @@ function normalizeAcceptedReviewApprovalProofForRetrySaveRequest( proof ) {
 		return null;
 	}
 
+	const normalizedEnvelope =
+		normalizeReviewApprovalProofEnvelopeForRetrySaveRequest( proof );
+
+	if ( normalizedEnvelope ) {
+		return normalizedEnvelope;
+	}
+
+	if ( getReviewApprovalProofEnvelopeType( proof ) ) {
+		return null;
+	}
+
 	const normalized = {
 		type: proof.type,
 		status: proof.status ?? proof.proofStatus ?? proof.proof_status,
@@ -519,6 +534,180 @@ function normalizeAcceptedReviewApprovalProofForRetrySaveRequest( proof ) {
 	}
 
 	return normalized;
+}
+
+function normalizeReviewApprovalProofEnvelopeForRetrySaveRequest(
+	proofOrEnvelope
+) {
+	const envelopeType = getReviewApprovalProofEnvelopeType( proofOrEnvelope );
+
+	if (
+		envelopeType === DISTRIBUTED_EDITING_REVIEW_APPROVAL_PROOF_ENVELOPE_TYPE
+	) {
+		const proof = normalizeAcceptedReviewApprovalProofForRetrySaveRequest(
+			proofOrEnvelope.proof
+		);
+
+		return proof
+			? {
+					proof_envelope_type:
+						DISTRIBUTED_EDITING_REVIEW_APPROVAL_PROOF_ENVELOPE_TYPE,
+					proof,
+			  }
+			: null;
+	}
+
+	if (
+		envelopeType !==
+		DISTRIBUTED_EDITING_OPAQUE_REVIEW_APPROVAL_PROOF_TOKEN_ENVELOPE_TYPE
+	) {
+		return null;
+	}
+
+	if ( containsRawContentEvidence( proofOrEnvelope ) ) {
+		return null;
+	}
+
+	const token = normalizeProofString(
+		getProofField(
+			proofOrEnvelope,
+			'token',
+			'token',
+			getProofField(
+				proofOrEnvelope,
+				'proofToken',
+				'proof_token',
+				getProofField(
+					proofOrEnvelope,
+					'reviewApprovalProofToken',
+					'review_approval_proof_token'
+				)
+			)
+		)
+	);
+
+	if ( ! token ) {
+		return null;
+	}
+
+	const normalizedPost = normalizeProofEnvelopePost(
+		getProofField( proofOrEnvelope, 'post', 'post', {
+			id: getProofField( proofOrEnvelope, 'postId', 'post_id' ),
+			type: getProofField( proofOrEnvelope, 'postType', 'post_type' ),
+		} )
+	);
+	const normalized = {
+		proof_envelope_type:
+			DISTRIBUTED_EDITING_OPAQUE_REVIEW_APPROVAL_PROOF_TOKEN_ENVELOPE_TYPE,
+		token,
+		token_version: normalizeProofPositiveInteger(
+			getProofField( proofOrEnvelope, 'tokenVersion', 'token_version' )
+		),
+		issued_at: normalizeProofPositiveInteger(
+			getProofField( proofOrEnvelope, 'issuedAt', 'issued_at' )
+		),
+		expires_at: normalizeProofPositiveInteger(
+			getProofField( proofOrEnvelope, 'expiresAt', 'expires_at' )
+		),
+		post: normalizedPost,
+	};
+
+	for ( const [ key, value ] of Object.entries( normalized ) ) {
+		if (
+			value === undefined ||
+			value === null ||
+			( typeof value === 'object' &&
+				! Array.isArray( value ) &&
+				Object.keys( value ).length === 0 )
+		) {
+			delete normalized[ key ];
+		}
+	}
+
+	return normalized;
+}
+
+function getReviewApprovalProofEnvelopeType( proofOrEnvelope ) {
+	if ( ! proofOrEnvelope || typeof proofOrEnvelope !== 'object' ) {
+		return null;
+	}
+
+	return normalizeProofString(
+		proofOrEnvelope.proofEnvelopeType ?? proofOrEnvelope.proof_envelope_type
+	);
+}
+
+function normalizeProofEnvelopePost( post ) {
+	if ( ! post || typeof post !== 'object' || Array.isArray( post ) ) {
+		return null;
+	}
+
+	const id = normalizeProofPositiveInteger( post.id );
+	const type = normalizeProofString( post.type );
+
+	if ( ! id && ! type ) {
+		return null;
+	}
+
+	return {
+		...( id ? { id } : {} ),
+		...( type ? { type } : {} ),
+	};
+}
+
+function normalizeProofString( value ) {
+	return typeof value === 'string' && value.length > 0 ? value : undefined;
+}
+
+function containsRawContentEvidence( value ) {
+	if ( Array.isArray( value ) ) {
+		return value.some( containsRawContentEvidence );
+	}
+
+	if ( ! value || typeof value !== 'object' ) {
+		return false;
+	}
+
+	const forbiddenRawContentKeys = new Set( [
+		'rawContent',
+		'raw_content',
+		'postContent',
+		'post_content',
+		'proposedPostContent',
+		'proposed_post_content',
+		'reviewedPostContent',
+		'reviewed_post_content',
+		'candidatePostContent',
+		'candidate_post_content',
+		'blockContent',
+		'block_content',
+		'rawBlockContent',
+		'raw_block_content',
+	] );
+
+	for ( const [ key, nestedValue ] of Object.entries( value ) ) {
+		if ( forbiddenRawContentKeys.has( key ) ) {
+			return true;
+		}
+
+		if (
+			[
+				'rawContentIncluded',
+				'raw_content_included',
+				'exposesRawContent',
+				'exposes_raw_content',
+			].includes( key ) &&
+			Boolean( nestedValue )
+		) {
+			return true;
+		}
+
+		if ( containsRawContentEvidence( nestedValue ) ) {
+			return true;
+		}
+	}
+
+	return false;
 }
 
 function normalizeProofPositiveInteger( value ) {

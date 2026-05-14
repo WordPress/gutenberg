@@ -361,6 +361,145 @@ describe( 'distributed editing REST helpers', () => {
 		} );
 	} );
 
+	it( 'requests retry-save with an opaque review approval proof token envelope', async () => {
+		const proposedPostContent =
+			'<!-- wp:paragraph --><p>Opaque token retry-save content.</p><!-- /wp:paragraph -->';
+		const opaqueTokenEnvelope = {
+			proof_envelope_type: 'opaque_review_approval_proof_token',
+			token: 'de-rtc-review-token.turn-0077',
+			token_version: 1,
+			issued_at: 1893456000,
+			expires_at: 1893456300,
+			post: {
+				id: 42,
+				type: 'post',
+			},
+		};
+
+		apiFetch.setFetchHandler( async ( options ) => {
+			expect( options.path ).toMatch(
+				/^\/wp\/v2\/posts\/42\/distributed-editing\/retry-save/
+			);
+			expect( options.method ).toBe( 'POST' );
+			expect( options.data ).toMatchObject( {
+				client_base_version: '8',
+				accepted_proof_server_version: '8',
+				rebased_from_version: '5',
+				pending_change_count: 1,
+				proposed_post_content: proposedPostContent,
+				accepted_review_approval_proof: opaqueTokenEnvelope,
+			} );
+			expect(
+				options.data.accepted_review_approval_proof.proof
+			).toBeUndefined();
+			expect(
+				options.data.accepted_review_approval_proof.proof_signature
+			).toBeUndefined();
+			expect(
+				options.data.accepted_review_approval_proof.reviewed_block_items
+			).toBeUndefined();
+
+			return {
+				result: 'retry_save_applied',
+				retry_save_accepted: true,
+			};
+		} );
+
+		await expect(
+			__experimentalRequestDistributedEditingRetrySave( {
+				postId: 42,
+				clientBaseVersion: '8',
+				acceptedProofServerVersion: '8',
+				rebasedFromVersion: '5',
+				proposedPostContent,
+				acceptedReviewApprovalProof: opaqueTokenEnvelope,
+			} )
+		).resolves.toEqual( {
+			result: 'retry_save_applied',
+			retry_save_accepted: true,
+		} );
+	} );
+
+	it( 'requests retry-save with a field-based review approval proof envelope', async () => {
+		const proposedPostContent =
+			'<!-- wp:paragraph --><p>Field envelope retry-save content.</p><!-- /wp:paragraph -->';
+		const proposedPostContentHash =
+			'0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef';
+		const candidatePostContentHash =
+			'abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789';
+		const fieldProofEnvelope = {
+			proof_envelope_type: 'field_based_review_approval_proof',
+			proof: {
+				type: 'unfiltered_html_retry_save_review_approval',
+				status: 'approved_by_unfiltered_html_reviewer',
+				postId: 42,
+				postType: 'post',
+				reviewerUserId: 1,
+				reviewerCapability: 'unfiltered_html',
+				reviewScope: 'collaborative_post_content',
+				serverVersion: '8',
+				clientBaseVersion: '8',
+				acceptedProofServerVersion: '8',
+				rebasedFromVersion: '5',
+				proposedPostContentHash,
+				reviewedProposedContentHash: proposedPostContentHash,
+				candidatePostContentHash,
+				reviewedCandidateContentHash: candidatePostContentHash,
+				proofSignature:
+					'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc',
+				issuedAt: '1893456000',
+				expiresAt: '1893456300',
+				siteId: '1',
+				siteUrl: 'http://example.test',
+				rawContentIncluded: false,
+				savesPost: false,
+				mutatesPostContent: false,
+				createsRevision: false,
+				claimsSaved: false,
+			},
+		};
+
+		apiFetch.setFetchHandler( async ( options ) => {
+			expect( options.path ).toMatch(
+				/^\/wp\/v2\/posts\/42\/distributed-editing\/retry-save/
+			);
+			expect(
+				options.data.accepted_review_approval_proof.proof_envelope_type
+			).toBe( 'field_based_review_approval_proof' );
+			expect(
+				options.data.accepted_review_approval_proof.proof
+			).toMatchObject( {
+				post_id: 42,
+				post_type: 'post',
+				server_version: '8',
+				proposed_post_content_hash: proposedPostContentHash,
+				candidate_post_content_hash: candidatePostContentHash,
+				proof_signature:
+					'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc',
+				raw_content_included: false,
+			} );
+
+			return {
+				result: 'retry_save_applied',
+				retry_save_accepted: true,
+			};
+		} );
+
+		await expect(
+			__experimentalRequestDistributedEditingRetrySave( {
+				postId: 42,
+				clientBaseVersion: '8',
+				acceptedProofServerVersion: '8',
+				rebasedFromVersion: '5',
+				proposedPostContent,
+				acceptedReviewApprovalProof: fieldProofEnvelope,
+			} )
+		).resolves.toEqual( {
+			result: 'retry_save_applied',
+			retry_save_accepted: true,
+		} );
+	} );
+
 	it( 'requests retry-save with page routes and default accepted proof fields', async () => {
 		const proposedPostContent =
 			'<!-- wp:paragraph --><p>Retry-save page content.</p><!-- /wp:paragraph -->';
