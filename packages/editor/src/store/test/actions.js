@@ -16,6 +16,7 @@ import * as actions from '../actions';
 import {
 	DISTRIBUTED_EDITING_DISPOSITIONS,
 	DISTRIBUTED_EDITING_FRESH_REVIEW_DECISION_STATUSES,
+	DISTRIBUTED_EDITING_FRESH_REVIEW_RETRY_SAVE_HANDOFF_STATUSES,
 	DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES,
 	DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES,
 	DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS,
@@ -2127,14 +2128,12 @@ describe( 'Post actions', () => {
 								candidatePostContentHash,
 							review_status:
 								DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES.APPROVED_FOR_RETRY_SAVE,
-							review_evidence_type:
-								'kses_block_hash_only_change',
+							review_evidence_type: 'kses_block_hash_only_change',
 							raw_content_included: false,
 							exposes_raw_content: false,
 						},
 					],
-					fresh_review_request_record_id:
-						'fresh-review-request-123',
+					fresh_review_request_record_id: 'fresh-review-request-123',
 					client_base_version: '7',
 					server_version: '12',
 					proposed_post_content_hash: approvedPostContentHash,
@@ -2148,8 +2147,7 @@ describe( 'Post actions', () => {
 					result: 'fresh_review_decision_approved_for_retry_save',
 					fresh_review_decision: 'approved',
 					fresh_review_request_status: 'decision_recorded',
-					fresh_review_request_record_id:
-						'fresh-review-request-123',
+					fresh_review_request_record_id: 'fresh-review-request-123',
 					rest_route: 'post_fresh_review_decision',
 					server_version: '12',
 					client_base_version: '7',
@@ -2205,6 +2203,94 @@ describe( 'Post actions', () => {
 				callsRetrySaveEndpoint: false,
 				claimsSaved: false,
 			} );
+		} );
+
+		it( 'prepares fresh-review retry-save handoff validation without transport or saves', async () => {
+			const registry = setupImportEditor();
+			let apiFetchCallCount = 0;
+
+			apiFetch.setFetchHandler( async () => {
+				apiFetchCallCount++;
+				throw new Error(
+					'Fresh-review retry-save handoff validation must not call apiFetch.'
+				);
+			} );
+			registry
+				.dispatch( editorStore )
+				.setDistributedEditingSessionState( {
+					serverVersion: '12',
+					clientBaseVersion: '7',
+					pendingChangeCount: 1,
+					hasPendingChanges: true,
+					canExportLocalUpdates: true,
+					localUpdatesImportStatus:
+						DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_STATUSES.BLOCKED,
+					localUpdatesImportReason:
+						DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.FRESH_REVIEW_REQUIRED,
+					localUpdatesImportReviewRequestStatus:
+						DISTRIBUTED_EDITING_LOCAL_UPDATES_REVIEW_REQUEST_STATUSES.DECISION_RECORDED,
+					localUpdatesImportFreshReviewRequestRecordId:
+						'fresh-review-request-123',
+					localUpdatesImportFreshReviewRequestAccepted: true,
+					localUpdatesImportFreshReviewRequestRequested: true,
+					localUpdatesImportFreshReviewDecisionStatus:
+						DISTRIBUTED_EDITING_FRESH_REVIEW_DECISION_STATUSES.RECORDED,
+					localUpdatesImportFreshReviewDecisionResult:
+						'fresh_review_decision_approved_for_retry_save',
+					localUpdatesImportFreshReviewDecisionAccepted: true,
+					localUpdatesImportFreshReviewDecisionSubmitted: true,
+					localUpdatesImportFreshReviewDecisionDecision: 'approved',
+					localUpdatesImportFreshReviewDecisionReviewedBlockItemCount: 1,
+				} );
+
+			const result = await registry
+				.dispatch( editorStore )
+				.__experimentalPrepareDistributedEditingFreshReviewRetrySaveHandoffValidation(
+					{
+						result: 'fresh_review_decision_handoff_validated_for_retry_save',
+						fresh_review_retry_save_handoff_accepted: true,
+						raw_content:
+							'<script>do not leak validation raw</script>',
+						proof_signature: 'do-not-leak-validation-proof',
+					}
+				);
+
+			expect( result ).toMatchObject( {
+				status: DISTRIBUTED_EDITING_FRESH_REVIEW_RETRY_SAVE_HANDOFF_STATUSES.ACCEPTED_FOR_RETRY_SAVE,
+				result: 'fresh_review_decision_handoff_validated_for_retry_save',
+				accepted: true,
+				callsFreshReviewValidationEndpoint: false,
+				callsFreshReviewDecisionEndpoint: false,
+				callsRetrySaveEndpoint: false,
+				callsNormalSavePost: false,
+				savesPost: false,
+				dispatchesNotice: false,
+				mutatesEditorContent: false,
+				mutatesPersistedPostContent: false,
+				changesPostLock: false,
+				claimsSaved: false,
+				exposesRawContent: false,
+				exposesProofSignature: false,
+			} );
+			expect( apiFetchCallCount ).toBe( 0 );
+			expect(
+				registry.select( editorStore ).getEditedPostContent()
+			).toBe( 'original content' );
+			expect( registry.select( editorStore ).isPostSavingLocked() ).toBe(
+				false
+			);
+			expect( registry.select( noticesStore ).getNotices() ).toEqual(
+				[]
+			);
+			expect(
+				JSON.stringify(
+					registry
+						.select( editorStore )
+						.getDistributedEditingFreshReviewRetrySaveHandoffState()
+				)
+			).not.toMatch(
+				/do not leak validation raw|do-not-leak-validation-proof/
+			);
 		} );
 	} );
 

@@ -387,6 +387,34 @@ export const DISTRIBUTED_EDITING_FRESH_REVIEW_DECISION_STATUSES = Object.freeze(
 	}
 );
 
+/**
+ * Stable fresh-review retry-save handoff statuses. These describe only the
+ * editor-side validation handoff for a recorded decision; they do not save.
+ */
+export const DISTRIBUTED_EDITING_FRESH_REVIEW_RETRY_SAVE_HANDOFF_STATUSES =
+	Object.freeze( {
+		NONE: 'none',
+		READY: 'ready',
+		VALIDATING: 'validating',
+		ACCEPTED_FOR_RETRY_SAVE: 'accepted_for_retry_save',
+		BLOCKED: 'blocked',
+	} );
+
+/**
+ * Stable fresh-review retry-save handoff blocker reasons.
+ */
+export const DISTRIBUTED_EDITING_FRESH_REVIEW_RETRY_SAVE_HANDOFF_REASONS =
+	Object.freeze( {
+		FRESH_REVIEW_DECISION_NOT_RECORDED:
+			'fresh_review_decision_not_recorded',
+		FRESH_REVIEW_DECISION_REJECTED: 'fresh_review_decision_rejected',
+		STALE_BASE_REJECTED: 'stale_base_rejected',
+		FEATURE_DISABLED: 'feature_disabled',
+		PERMISSION_DENIED: 'permission_denied',
+		ROUTE_MISMATCH: 'route_mismatch',
+		MALFORMED_SYNC_PAYLOAD: 'malformed_sync_payload',
+	} );
+
 const VALID_REASON_CODES = new Set(
 	Object.values( DISTRIBUTED_EDITING_REASON_CODES )
 );
@@ -447,6 +475,12 @@ const VALID_LOCAL_UPDATES_REVIEW_REQUEST_STATUSES = new Set(
 
 const VALID_FRESH_REVIEW_DECISION_STATUSES = new Set(
 	Object.values( DISTRIBUTED_EDITING_FRESH_REVIEW_DECISION_STATUSES )
+);
+
+const VALID_FRESH_REVIEW_RETRY_SAVE_HANDOFF_STATUSES = new Set(
+	Object.values(
+		DISTRIBUTED_EDITING_FRESH_REVIEW_RETRY_SAVE_HANDOFF_STATUSES
+	)
 );
 
 const NOTICE_ID_BY_KIND = Object.freeze( {
@@ -649,6 +683,24 @@ export const DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE = Object.freeze( {
 	localUpdatesImportFreshReviewDecisionExposesRawContent: false,
 	localUpdatesImportFreshReviewDecisionExposesProofSignature: false,
 	localUpdatesImportFreshReviewDecisionExposesReviewerIds: false,
+	localUpdatesImportFreshReviewRetrySaveHandoffStatus:
+		DISTRIBUTED_EDITING_FRESH_REVIEW_RETRY_SAVE_HANDOFF_STATUSES.NONE,
+	localUpdatesImportFreshReviewRetrySaveHandoffReason: null,
+	localUpdatesImportFreshReviewRetrySaveHandoffResult: null,
+	localUpdatesImportFreshReviewRetrySaveHandoffRestRoute: null,
+	localUpdatesImportFreshReviewRetrySaveHandoffReady: false,
+	localUpdatesImportFreshReviewRetrySaveHandoffValidating: false,
+	localUpdatesImportFreshReviewRetrySaveHandoffAccepted: false,
+	localUpdatesImportFreshReviewRetrySaveHandoffCallsNormalSavePost: false,
+	localUpdatesImportFreshReviewRetrySaveHandoffCallsRetrySaveEndpoint: false,
+	localUpdatesImportFreshReviewRetrySaveHandoffDispatchesNotice: false,
+	localUpdatesImportFreshReviewRetrySaveHandoffMutatesEditorContent: false,
+	localUpdatesImportFreshReviewRetrySaveHandoffMutatesPersistedPostContent: false,
+	localUpdatesImportFreshReviewRetrySaveHandoffChangesPostLock: false,
+	localUpdatesImportFreshReviewRetrySaveHandoffClaimsSaved: false,
+	localUpdatesImportFreshReviewRetrySaveHandoffExposesRawContent: false,
+	localUpdatesImportFreshReviewRetrySaveHandoffExposesProofSignature: false,
+	localUpdatesImportFreshReviewRetrySaveHandoffExposesReviewerIds: false,
 	riskyBlockReviewStatus:
 		DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_STATUSES.NONE,
 	riskyBlockReviewReasonCode: null,
@@ -893,13 +945,16 @@ export function normalizeDistributedEditingSessionState( sessionState = {} ) {
 		)
 			? sessionState.localUpdatesImportReviewRequestStatus
 			: DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE.localUpdatesImportReviewRequestStatus;
-	const localUpdatesImportReviewRequestStatus =
-		localUpdatesImportRequiresFreshReview
-			? requestedLocalUpdatesImportReviewRequestStatus ===
-			  DISTRIBUTED_EDITING_LOCAL_UPDATES_REVIEW_REQUEST_STATUSES.NONE
+	let localUpdatesImportReviewRequestStatus =
+		DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE.localUpdatesImportReviewRequestStatus;
+
+	if ( localUpdatesImportRequiresFreshReview ) {
+		localUpdatesImportReviewRequestStatus =
+			requestedLocalUpdatesImportReviewRequestStatus ===
+			DISTRIBUTED_EDITING_LOCAL_UPDATES_REVIEW_REQUEST_STATUSES.NONE
 				? DISTRIBUTED_EDITING_LOCAL_UPDATES_REVIEW_REQUEST_STATUSES.FRESH_REVIEW_REQUIRED
-				: requestedLocalUpdatesImportReviewRequestStatus
-			: DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE.localUpdatesImportReviewRequestStatus;
+				: requestedLocalUpdatesImportReviewRequestStatus;
+	}
 	const localUpdatesImportReviewActionKey =
 		localUpdatesImportRequiresFreshReview &&
 		localUpdatesImportReviewRequestStatus !==
@@ -913,6 +968,10 @@ export function normalizeDistributedEditingSessionState( sessionState = {} ) {
 			localUpdatesImportReviewRequestStatus,
 		}
 	);
+	const freshReviewRetrySaveHandoffFields =
+		normalizeFreshReviewRetrySaveHandoffFields( sessionState, {
+			freshReviewDecisionFields,
+		} );
 	const riskyBlockReviewFields =
 		normalizeRiskyBlockReviewMetadataFields( sessionState );
 	const hasPendingRiskyBlockReviewItems =
@@ -1102,6 +1161,7 @@ export function normalizeDistributedEditingSessionState( sessionState = {} ) {
 			sessionState.localUpdatesImportFreshReviewRequestClaimsSaved
 		),
 		...freshReviewDecisionFields,
+		...freshReviewRetrySaveHandoffFields,
 		...riskyBlockReviewFields,
 		requiresManualConflictResolution,
 		mustOfferLocalCopy,
@@ -1289,6 +1349,184 @@ export function getDistributedEditingFreshReviewDecisionStateForSessionState(
 		exposesProofSignature: false,
 		exposesReviewerIds: false,
 	};
+}
+
+/**
+ * Returns no-save fresh-review retry-save handoff state for a recorded reviewer
+ * decision. This is a validation handoff only; it does not call retry-save or
+ * normal save.
+ *
+ * @param {Object} sessionState DE-RTC session state.
+ *
+ * @return {Object} Fresh-review retry-save handoff state.
+ */
+export function getDistributedEditingFreshReviewRetrySaveHandoffStateForSessionState(
+	sessionState = {}
+) {
+	const normalized = normalizeDistributedEditingSessionState( sessionState );
+
+	return {
+		status: normalized.localUpdatesImportFreshReviewRetrySaveHandoffStatus,
+		reason: normalized.localUpdatesImportFreshReviewRetrySaveHandoffReason,
+		result: normalized.localUpdatesImportFreshReviewRetrySaveHandoffResult,
+		restRoute:
+			normalized.localUpdatesImportFreshReviewRetrySaveHandoffRestRoute,
+		ready: normalized.localUpdatesImportFreshReviewRetrySaveHandoffReady,
+		validating:
+			normalized.localUpdatesImportFreshReviewRetrySaveHandoffValidating,
+		accepted:
+			normalized.localUpdatesImportFreshReviewRetrySaveHandoffAccepted,
+		decisionStatus: normalized.localUpdatesImportFreshReviewDecisionStatus,
+		decisionResult: normalized.localUpdatesImportFreshReviewDecisionResult,
+		decision: normalized.localUpdatesImportFreshReviewDecisionDecision,
+		requestRecordId:
+			normalized.localUpdatesImportFreshReviewRequestRecordId,
+		reviewedBlockItemCount:
+			normalized.localUpdatesImportFreshReviewDecisionReviewedBlockItemCount,
+		canExportLocalUpdates: normalized.canExportLocalUpdates,
+		callsNormalSavePost:
+			normalized.localUpdatesImportFreshReviewRetrySaveHandoffCallsNormalSavePost,
+		callsRetrySaveEndpoint:
+			normalized.localUpdatesImportFreshReviewRetrySaveHandoffCallsRetrySaveEndpoint,
+		dispatchesNotice:
+			normalized.localUpdatesImportFreshReviewRetrySaveHandoffDispatchesNotice,
+		mutatesEditorContent:
+			normalized.localUpdatesImportFreshReviewRetrySaveHandoffMutatesEditorContent,
+		mutatesPersistedPostContent:
+			normalized.localUpdatesImportFreshReviewRetrySaveHandoffMutatesPersistedPostContent,
+		changesPostLock:
+			normalized.localUpdatesImportFreshReviewRetrySaveHandoffChangesPostLock,
+		claimsSaved:
+			normalized.localUpdatesImportFreshReviewRetrySaveHandoffClaimsSaved,
+		exposesRawContent:
+			normalized.localUpdatesImportFreshReviewRetrySaveHandoffExposesRawContent,
+		exposesProofSignature:
+			normalized.localUpdatesImportFreshReviewRetrySaveHandoffExposesProofSignature,
+		exposesReviewerIds:
+			normalized.localUpdatesImportFreshReviewRetrySaveHandoffExposesReviewerIds,
+	};
+}
+
+/**
+ * Returns editor state when a recorded fresh-review approval is staged for a
+ * future retry-save validation consumer. This is a local handoff only.
+ *
+ * @param {Object} currentSessionState Current DE-RTC session state.
+ *
+ * @return {Object} Normalized DE-RTC session state.
+ */
+export function getDistributedEditingSessionStateForFreshReviewRetrySaveHandoffValidation(
+	currentSessionState = {}
+) {
+	const normalized =
+		normalizeDistributedEditingSessionState( currentSessionState );
+	const isApprovedRecordedDecision =
+		normalized.localUpdatesImportFreshReviewDecisionStatus ===
+			DISTRIBUTED_EDITING_FRESH_REVIEW_DECISION_STATUSES.RECORDED &&
+		normalized.localUpdatesImportFreshReviewDecisionAccepted &&
+		normalized.localUpdatesImportFreshReviewDecisionDecision === 'approved';
+
+	if ( ! isApprovedRecordedDecision ) {
+		return normalizeDistributedEditingSessionState( {
+			...normalized,
+			localUpdatesImportFreshReviewRetrySaveHandoffStatus:
+				DISTRIBUTED_EDITING_FRESH_REVIEW_RETRY_SAVE_HANDOFF_STATUSES.BLOCKED,
+			localUpdatesImportFreshReviewRetrySaveHandoffReason:
+				normalized.localUpdatesImportFreshReviewDecisionDecision ===
+				'rejected'
+					? DISTRIBUTED_EDITING_FRESH_REVIEW_RETRY_SAVE_HANDOFF_REASONS.FRESH_REVIEW_DECISION_REJECTED
+					: DISTRIBUTED_EDITING_FRESH_REVIEW_RETRY_SAVE_HANDOFF_REASONS.FRESH_REVIEW_DECISION_NOT_RECORDED,
+			mustOfferLocalCopy: true,
+			canExportLocalUpdates: true,
+		} );
+	}
+
+	return normalizeDistributedEditingSessionState( {
+		...normalized,
+		localUpdatesImportFreshReviewRetrySaveHandoffStatus:
+			DISTRIBUTED_EDITING_FRESH_REVIEW_RETRY_SAVE_HANDOFF_STATUSES.VALIDATING,
+		localUpdatesImportFreshReviewRetrySaveHandoffReason: null,
+		localUpdatesImportFreshReviewRetrySaveHandoffResult: null,
+		localUpdatesImportFreshReviewRetrySaveHandoffRestRoute: null,
+		mustOfferLocalCopy: true,
+		canExportLocalUpdates: true,
+	} );
+}
+
+/**
+ * Returns editor state for a future server validation result for a recorded
+ * fresh-review decision handoff. This consumes a response shape only; it does
+ * not call transport or persist outside the editor store.
+ *
+ * @param {Object} responseOrError     REST response or API error.
+ * @param {Object} currentSessionState Current DE-RTC session state.
+ *
+ * @return {Object} Normalized DE-RTC session state.
+ */
+export function getDistributedEditingSessionStateForFreshReviewRetrySaveHandoffValidationResult(
+	responseOrError = {},
+	currentSessionState = {}
+) {
+	const normalizedCurrent =
+		normalizeDistributedEditingSessionState( currentSessionState );
+	const responseData = getDistributedEditingResponseData( responseOrError );
+	const result = normalizeNullableString(
+		getFirstDefined( responseOrError.result, responseData.result )
+	);
+	const restRoute = normalizeNullableString(
+		getFirstDefined(
+			responseOrError.restRoute,
+			responseOrError.rest_route,
+			responseData.restRoute,
+			responseData.rest_route
+		)
+	);
+	const accepted =
+		responseOrError.freshReviewRetrySaveHandoffAccepted === true ||
+		responseOrError.fresh_review_retry_save_handoff_accepted === true ||
+		responseData.freshReviewRetrySaveHandoffAccepted === true ||
+		responseData.fresh_review_retry_save_handoff_accepted === true ||
+		[
+			'fresh_review_decision_handoff_validated_for_retry_save',
+			'fresh_review_decision_consumption_accepted_for_retry_save',
+		].includes( result );
+
+	if ( accepted ) {
+		return normalizeDistributedEditingSessionState( {
+			...normalizedCurrent,
+			localUpdatesImportFreshReviewRetrySaveHandoffStatus:
+				DISTRIBUTED_EDITING_FRESH_REVIEW_RETRY_SAVE_HANDOFF_STATUSES.ACCEPTED_FOR_RETRY_SAVE,
+			localUpdatesImportFreshReviewRetrySaveHandoffReason: null,
+			localUpdatesImportFreshReviewRetrySaveHandoffResult: result,
+			localUpdatesImportFreshReviewRetrySaveHandoffRestRoute: restRoute,
+			mustOfferLocalCopy: true,
+			canExportLocalUpdates: true,
+		} );
+	}
+
+	const reasonCode = normalizeNullableString(
+		getFirstDefined(
+			responseOrError.code,
+			responseOrError.reasonCode,
+			responseOrError.reason_code,
+			responseData.reasonCode,
+			responseData.reason_code
+		)
+	);
+
+	return normalizeDistributedEditingSessionState( {
+		...normalizedCurrent,
+		localUpdatesImportFreshReviewRetrySaveHandoffStatus:
+			DISTRIBUTED_EDITING_FRESH_REVIEW_RETRY_SAVE_HANDOFF_STATUSES.BLOCKED,
+		localUpdatesImportFreshReviewRetrySaveHandoffReason:
+			getFreshReviewRetrySaveHandoffReasonFromResponse( reasonCode ) ||
+			reasonCode ||
+			result,
+		localUpdatesImportFreshReviewRetrySaveHandoffResult: result,
+		localUpdatesImportFreshReviewRetrySaveHandoffRestRoute: restRoute,
+		mustOfferLocalCopy: true,
+		canExportLocalUpdates: true,
+	} );
 }
 
 /**
@@ -1488,8 +1726,7 @@ export function getDistributedEditingSessionStateForFreshReviewDecisionResult(
 			responseOrError.reviewed_block_item_count,
 			responseData.reviewedBlockItemCount,
 			responseData.reviewed_block_item_count,
-			normalizedCurrent
-				.localUpdatesImportFreshReviewDecisionReviewedBlockItemCount
+			normalizedCurrent.localUpdatesImportFreshReviewDecisionReviewedBlockItemCount
 		)
 	);
 	const accepted =
@@ -1528,8 +1765,7 @@ export function getDistributedEditingSessionStateForFreshReviewDecisionResult(
 			localUpdatesImportFreshReviewDecisionCallsRetrySaveEndpoint: false,
 			localUpdatesImportFreshReviewDecisionDispatchesNotice: false,
 			localUpdatesImportFreshReviewDecisionMutatesEditorContent: false,
-			localUpdatesImportFreshReviewDecisionMutatesPersistedPostContent:
-				false,
+			localUpdatesImportFreshReviewDecisionMutatesPersistedPostContent: false,
 			localUpdatesImportFreshReviewDecisionChangesPostLock: false,
 			localUpdatesImportFreshReviewDecisionClaimsSaved: false,
 			localUpdatesImportFreshReviewDecisionRawContentIncluded: false,
@@ -1638,6 +1874,23 @@ function getDistributedEditingReviewTokenRecoveryReasonFromRetrySave( {
 			DISTRIBUTED_EDITING_OPAQUE_REVIEW_APPROVAL_PROOF_TOKEN_REJECTION_DETAILS.EXPIRED
 	) {
 		return DISTRIBUTED_EDITING_REVIEW_TOKEN_RECOVERY_REASONS.TOKEN_EXPIRED;
+	}
+
+	return null;
+}
+
+function getFreshReviewRetrySaveHandoffReasonFromResponse( reasonCode ) {
+	switch ( reasonCode ) {
+		case DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED:
+			return DISTRIBUTED_EDITING_FRESH_REVIEW_RETRY_SAVE_HANDOFF_REASONS.STALE_BASE_REJECTED;
+		case DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_FEATURE_DISABLED:
+			return DISTRIBUTED_EDITING_FRESH_REVIEW_RETRY_SAVE_HANDOFF_REASONS.FEATURE_DISABLED;
+		case DISTRIBUTED_EDITING_REASON_CODES.REST_CANNOT_EDIT:
+			return DISTRIBUTED_EDITING_FRESH_REVIEW_RETRY_SAVE_HANDOFF_REASONS.PERMISSION_DENIED;
+		case DISTRIBUTED_EDITING_REASON_CODES.REST_POST_INVALID_ID:
+			return DISTRIBUTED_EDITING_FRESH_REVIEW_RETRY_SAVE_HANDOFF_REASONS.ROUTE_MISMATCH;
+		case DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_MALFORMED_SYNC_PAYLOAD:
+			return DISTRIBUTED_EDITING_FRESH_REVIEW_RETRY_SAVE_HANDOFF_REASONS.MALFORMED_SYNC_PAYLOAD;
 	}
 
 	return null;
@@ -2407,7 +2660,7 @@ export function getDistributedEditingLocalUpdatesImportResult( {
  * save, retry-save, mutate editor content, dispatch notices, persist state, or
  * change post locks.
  *
- * @param {Object} responseOrError    REST response or API error.
+ * @param {Object} responseOrError     REST response or API error.
  * @param {Object} currentSessionState Current DE-RTC session state.
  *
  * @return {Object} Normalized DE-RTC session state.
@@ -3237,6 +3490,40 @@ export function getDistributedEditingNoticeDescriptorsForSessionState(
 						normalized.localUpdatesImportFreshReviewDecisionRejectedCount,
 					localUpdatesImportFreshReviewDecisionReviewedBlockItemCount:
 						normalized.localUpdatesImportFreshReviewDecisionReviewedBlockItemCount,
+					localUpdatesImportFreshReviewRetrySaveHandoffStatus:
+						normalized.localUpdatesImportFreshReviewRetrySaveHandoffStatus,
+					localUpdatesImportFreshReviewRetrySaveHandoffReason:
+						normalized.localUpdatesImportFreshReviewRetrySaveHandoffReason,
+					localUpdatesImportFreshReviewRetrySaveHandoffResult:
+						normalized.localUpdatesImportFreshReviewRetrySaveHandoffResult,
+					localUpdatesImportFreshReviewRetrySaveHandoffRestRoute:
+						normalized.localUpdatesImportFreshReviewRetrySaveHandoffRestRoute,
+					localUpdatesImportFreshReviewRetrySaveHandoffReady:
+						normalized.localUpdatesImportFreshReviewRetrySaveHandoffReady,
+					localUpdatesImportFreshReviewRetrySaveHandoffValidating:
+						normalized.localUpdatesImportFreshReviewRetrySaveHandoffValidating,
+					localUpdatesImportFreshReviewRetrySaveHandoffAccepted:
+						normalized.localUpdatesImportFreshReviewRetrySaveHandoffAccepted,
+					localUpdatesImportFreshReviewRetrySaveHandoffCallsNormalSavePost:
+						normalized.localUpdatesImportFreshReviewRetrySaveHandoffCallsNormalSavePost,
+					localUpdatesImportFreshReviewRetrySaveHandoffCallsRetrySaveEndpoint:
+						normalized.localUpdatesImportFreshReviewRetrySaveHandoffCallsRetrySaveEndpoint,
+					localUpdatesImportFreshReviewRetrySaveHandoffDispatchesNotice:
+						normalized.localUpdatesImportFreshReviewRetrySaveHandoffDispatchesNotice,
+					localUpdatesImportFreshReviewRetrySaveHandoffMutatesEditorContent:
+						normalized.localUpdatesImportFreshReviewRetrySaveHandoffMutatesEditorContent,
+					localUpdatesImportFreshReviewRetrySaveHandoffMutatesPersistedPostContent:
+						normalized.localUpdatesImportFreshReviewRetrySaveHandoffMutatesPersistedPostContent,
+					localUpdatesImportFreshReviewRetrySaveHandoffChangesPostLock:
+						normalized.localUpdatesImportFreshReviewRetrySaveHandoffChangesPostLock,
+					localUpdatesImportFreshReviewRetrySaveHandoffClaimsSaved:
+						normalized.localUpdatesImportFreshReviewRetrySaveHandoffClaimsSaved,
+					localUpdatesImportFreshReviewRetrySaveHandoffExposesRawContent:
+						normalized.localUpdatesImportFreshReviewRetrySaveHandoffExposesRawContent,
+					localUpdatesImportFreshReviewRetrySaveHandoffExposesProofSignature:
+						normalized.localUpdatesImportFreshReviewRetrySaveHandoffExposesProofSignature,
+					localUpdatesImportFreshReviewRetrySaveHandoffExposesReviewerIds:
+						normalized.localUpdatesImportFreshReviewRetrySaveHandoffExposesReviewerIds,
 					localUpdatesImportFreshReviewDecisionSavesPost:
 						normalized.localUpdatesImportFreshReviewDecisionSavesPost,
 					localUpdatesImportFreshReviewDecisionCallsNormalSavePost:
@@ -6190,6 +6477,83 @@ function normalizeFreshReviewDecisionFields(
 		localUpdatesImportFreshReviewDecisionExposesRawContent: false,
 		localUpdatesImportFreshReviewDecisionExposesProofSignature: false,
 		localUpdatesImportFreshReviewDecisionExposesReviewerIds: false,
+	};
+}
+
+function normalizeFreshReviewRetrySaveHandoffFields(
+	sessionState = {},
+	{ freshReviewDecisionFields = {} } = {}
+) {
+	const requestedStatus = VALID_FRESH_REVIEW_RETRY_SAVE_HANDOFF_STATUSES.has(
+		sessionState.localUpdatesImportFreshReviewRetrySaveHandoffStatus
+	)
+		? sessionState.localUpdatesImportFreshReviewRetrySaveHandoffStatus
+		: DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE.localUpdatesImportFreshReviewRetrySaveHandoffStatus;
+	const hasRecordedFreshReviewDecision =
+		freshReviewDecisionFields.localUpdatesImportFreshReviewDecisionStatus ===
+			DISTRIBUTED_EDITING_FRESH_REVIEW_DECISION_STATUSES.RECORDED &&
+		Boolean(
+			freshReviewDecisionFields.localUpdatesImportFreshReviewDecisionAccepted
+		);
+	const hasApprovedFreshReviewDecision =
+		hasRecordedFreshReviewDecision &&
+		freshReviewDecisionFields.localUpdatesImportFreshReviewDecisionDecision ===
+			'approved';
+	let handoffStatus =
+		DISTRIBUTED_EDITING_FRESH_REVIEW_RETRY_SAVE_HANDOFF_STATUSES.NONE;
+
+	if ( hasApprovedFreshReviewDecision ) {
+		handoffStatus =
+			requestedStatus ===
+				DISTRIBUTED_EDITING_FRESH_REVIEW_RETRY_SAVE_HANDOFF_STATUSES.ACCEPTED_FOR_RETRY_SAVE ||
+			requestedStatus ===
+				DISTRIBUTED_EDITING_FRESH_REVIEW_RETRY_SAVE_HANDOFF_STATUSES.VALIDATING
+				? requestedStatus
+				: DISTRIBUTED_EDITING_FRESH_REVIEW_RETRY_SAVE_HANDOFF_STATUSES.READY;
+	} else if (
+		requestedStatus ===
+		DISTRIBUTED_EDITING_FRESH_REVIEW_RETRY_SAVE_HANDOFF_STATUSES.BLOCKED
+	) {
+		handoffStatus =
+			DISTRIBUTED_EDITING_FRESH_REVIEW_RETRY_SAVE_HANDOFF_STATUSES.BLOCKED;
+	}
+
+	return {
+		localUpdatesImportFreshReviewRetrySaveHandoffStatus: handoffStatus,
+		localUpdatesImportFreshReviewRetrySaveHandoffReason:
+			handoffStatus ===
+			DISTRIBUTED_EDITING_FRESH_REVIEW_RETRY_SAVE_HANDOFF_STATUSES.BLOCKED
+				? normalizeNullableString(
+						sessionState.localUpdatesImportFreshReviewRetrySaveHandoffReason
+				  )
+				: null,
+		localUpdatesImportFreshReviewRetrySaveHandoffResult:
+			normalizeNullableString(
+				sessionState.localUpdatesImportFreshReviewRetrySaveHandoffResult
+			),
+		localUpdatesImportFreshReviewRetrySaveHandoffRestRoute:
+			normalizeNullableString(
+				sessionState.localUpdatesImportFreshReviewRetrySaveHandoffRestRoute
+			),
+		localUpdatesImportFreshReviewRetrySaveHandoffReady:
+			handoffStatus ===
+			DISTRIBUTED_EDITING_FRESH_REVIEW_RETRY_SAVE_HANDOFF_STATUSES.READY,
+		localUpdatesImportFreshReviewRetrySaveHandoffValidating:
+			handoffStatus ===
+			DISTRIBUTED_EDITING_FRESH_REVIEW_RETRY_SAVE_HANDOFF_STATUSES.VALIDATING,
+		localUpdatesImportFreshReviewRetrySaveHandoffAccepted:
+			handoffStatus ===
+			DISTRIBUTED_EDITING_FRESH_REVIEW_RETRY_SAVE_HANDOFF_STATUSES.ACCEPTED_FOR_RETRY_SAVE,
+		localUpdatesImportFreshReviewRetrySaveHandoffCallsNormalSavePost: false,
+		localUpdatesImportFreshReviewRetrySaveHandoffCallsRetrySaveEndpoint: false,
+		localUpdatesImportFreshReviewRetrySaveHandoffDispatchesNotice: false,
+		localUpdatesImportFreshReviewRetrySaveHandoffMutatesEditorContent: false,
+		localUpdatesImportFreshReviewRetrySaveHandoffMutatesPersistedPostContent: false,
+		localUpdatesImportFreshReviewRetrySaveHandoffChangesPostLock: false,
+		localUpdatesImportFreshReviewRetrySaveHandoffClaimsSaved: false,
+		localUpdatesImportFreshReviewRetrySaveHandoffExposesRawContent: false,
+		localUpdatesImportFreshReviewRetrySaveHandoffExposesProofSignature: false,
+		localUpdatesImportFreshReviewRetrySaveHandoffExposesReviewerIds: false,
 	};
 }
 

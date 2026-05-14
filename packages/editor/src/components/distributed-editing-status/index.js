@@ -13,6 +13,7 @@ import { store as editorStore } from '../../store';
 import {
 	DISTRIBUTED_EDITING_DISPOSITIONS,
 	DISTRIBUTED_EDITING_FRESH_REVIEW_DECISION_STATUSES,
+	DISTRIBUTED_EDITING_FRESH_REVIEW_RETRY_SAVE_HANDOFF_STATUSES,
 	DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES,
 	DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES,
 	DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS,
@@ -1058,6 +1059,7 @@ export function DistributedEditingFreshReviewDecisionPanel( {
 							>
 								<Button
 									__next40pxDefaultSize
+									accessibleWhenDisabled
 									aria-label={ sprintf(
 										/* translators: %s: review item label. */
 										__( 'Approve %s' ),
@@ -1075,6 +1077,7 @@ export function DistributedEditingFreshReviewDecisionPanel( {
 								<span>{ item.reviewStatus }</span>
 								<Button
 									__next40pxDefaultSize
+									accessibleWhenDisabled
 									aria-label={ sprintf(
 										/* translators: %s: review item label. */
 										__( 'Reject %s' ),
@@ -1102,6 +1105,7 @@ export function DistributedEditingFreshReviewDecisionPanel( {
 			) }
 			<Button
 				__next40pxDefaultSize
+				accessibleWhenDisabled
 				className="editor-distributed-editing-status__fresh-review-submit"
 				disabled={
 					! decisionState?.ready ||
@@ -1586,11 +1590,7 @@ function getDistributedEditingStatusSurfaceItem( descriptor ) {
 		case DISTRIBUTED_EDITING_NOTICE_KINDS.LOCAL_UPDATES_IMPORT_BLOCKED:
 			return {
 				...getBaseStatusItem( descriptor ),
-				title:
-					descriptor.localUpdatesImportReviewRequestStatus ===
-					DISTRIBUTED_EDITING_LOCAL_UPDATES_REVIEW_REQUEST_STATUSES.REQUESTED
-						? __( 'Fresh review requested' )
-						: __( 'Fresh review needed' ),
+				title: getLocalUpdatesImportReviewRequestTitle( descriptor ),
 				message:
 					getLocalUpdatesImportReviewRequestMessage( descriptor ),
 				localUpdatesImportStatus: descriptor.localUpdatesImportStatus,
@@ -1617,6 +1617,14 @@ function getDistributedEditingStatusSurfaceItem( descriptor ) {
 					descriptor.localUpdatesImportFreshReviewDecisionRejectedCount,
 				localUpdatesImportFreshReviewDecisionReviewedBlockItemCount:
 					descriptor.localUpdatesImportFreshReviewDecisionReviewedBlockItemCount,
+				localUpdatesImportFreshReviewRetrySaveHandoffStatus:
+					descriptor.localUpdatesImportFreshReviewRetrySaveHandoffStatus,
+				localUpdatesImportFreshReviewRetrySaveHandoffReady:
+					descriptor.localUpdatesImportFreshReviewRetrySaveHandoffReady,
+				localUpdatesImportFreshReviewRetrySaveHandoffValidating:
+					descriptor.localUpdatesImportFreshReviewRetrySaveHandoffValidating,
+				localUpdatesImportFreshReviewRetrySaveHandoffAccepted:
+					descriptor.localUpdatesImportFreshReviewRetrySaveHandoffAccepted,
 			};
 	}
 
@@ -1904,7 +1912,47 @@ function getLocalUpdatesImportBlockedMessage( reason ) {
 	);
 }
 
+function getLocalUpdatesImportReviewRequestTitle( descriptor ) {
+	if (
+		[
+			DISTRIBUTED_EDITING_FRESH_REVIEW_RETRY_SAVE_HANDOFF_STATUSES.VALIDATING,
+			DISTRIBUTED_EDITING_FRESH_REVIEW_RETRY_SAVE_HANDOFF_STATUSES.ACCEPTED_FOR_RETRY_SAVE,
+		].includes(
+			descriptor?.localUpdatesImportFreshReviewRetrySaveHandoffStatus
+		)
+	) {
+		return __( 'Fresh review validation' );
+	}
+
+	if (
+		descriptor?.localUpdatesImportReviewRequestStatus ===
+		DISTRIBUTED_EDITING_LOCAL_UPDATES_REVIEW_REQUEST_STATUSES.REQUESTED
+	) {
+		return __( 'Fresh review requested' );
+	}
+
+	return __( 'Fresh review needed' );
+}
+
 function getLocalUpdatesImportReviewRequestMessage( descriptor ) {
+	if (
+		descriptor?.localUpdatesImportFreshReviewRetrySaveHandoffStatus ===
+		DISTRIBUTED_EDITING_FRESH_REVIEW_RETRY_SAVE_HANDOFF_STATUSES.ACCEPTED_FOR_RETRY_SAVE
+	) {
+		return __(
+			'Fresh review validation is accepted for a future guarded retry save. No retry save or normal save was made, and protected local changes remain exportable.'
+		);
+	}
+
+	if (
+		descriptor?.localUpdatesImportFreshReviewRetrySaveHandoffStatus ===
+		DISTRIBUTED_EDITING_FRESH_REVIEW_RETRY_SAVE_HANDOFF_STATUSES.VALIDATING
+	) {
+		return __(
+			'Fresh review decision is staged for validation before a future guarded retry save. No retry save or normal save was made, and protected local changes remain exportable.'
+		);
+	}
+
 	if (
 		descriptor?.localUpdatesImportReviewRequestStatus ===
 			DISTRIBUTED_EDITING_LOCAL_UPDATES_REVIEW_REQUEST_STATUSES.REQUESTED &&

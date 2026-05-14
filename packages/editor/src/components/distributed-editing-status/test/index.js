@@ -28,6 +28,7 @@ import DistributedEditingStatus, {
 import {
 	DISTRIBUTED_EDITING_DISPOSITIONS,
 	DISTRIBUTED_EDITING_FRESH_REVIEW_DECISION_STATUSES,
+	DISTRIBUTED_EDITING_FRESH_REVIEW_RETRY_SAVE_HANDOFF_STATUSES,
 	DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES,
 	DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES,
 	DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS,
@@ -2612,6 +2613,59 @@ describe( 'DistributedEditingStatusSurface', () => {
 		).not.toBeInTheDocument();
 	} );
 
+	it( 'renders fresh-review retry-save handoff validation without save actions or proof internals', () => {
+		const noticeDescriptors =
+			getDistributedEditingNoticeDescriptorsForSessionState( {
+				pendingChangeCount: 1,
+				canExportLocalUpdates: true,
+				localUpdatesImportStatus:
+					DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_STATUSES.BLOCKED,
+				localUpdatesImportReason:
+					DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.FRESH_REVIEW_REQUIRED,
+				localUpdatesImportReviewRequestStatus:
+					DISTRIBUTED_EDITING_LOCAL_UPDATES_REVIEW_REQUEST_STATUSES.DECISION_RECORDED,
+				localUpdatesImportFreshReviewRequestAccepted: true,
+				localUpdatesImportFreshReviewRequestRequested: true,
+				localUpdatesImportFreshReviewDecisionStatus:
+					DISTRIBUTED_EDITING_FRESH_REVIEW_DECISION_STATUSES.RECORDED,
+				localUpdatesImportFreshReviewDecisionResult:
+					'fresh_review_decision_approved_for_retry_save',
+				localUpdatesImportFreshReviewDecisionAccepted: true,
+				localUpdatesImportFreshReviewDecisionSubmitted: true,
+				localUpdatesImportFreshReviewDecisionDecision: 'approved',
+				localUpdatesImportFreshReviewDecisionReviewedBlockItemCount: 1,
+				localUpdatesImportFreshReviewRetrySaveHandoffStatus:
+					DISTRIBUTED_EDITING_FRESH_REVIEW_RETRY_SAVE_HANDOFF_STATUSES.VALIDATING,
+				localUpdatesImportFreshReviewRetrySaveHandoffValidating: true,
+				localUpdatesImportFreshReviewRetrySaveHandoffExposesRawContent: false,
+				localUpdatesImportFreshReviewRetrySaveHandoffExposesProofSignature: false,
+				localUpdatesImportFreshReviewRetrySaveHandoffExposesReviewerIds: false,
+				rawContent: '<script>fresh-review-handoff-raw</script>',
+				proofSignature: 'fresh-review-handoff-proof',
+				reviewerUserId: 7,
+			} );
+
+		render(
+			<DistributedEditingStatusSurface
+				noticeDescriptors={ noticeDescriptors }
+			/>
+		);
+
+		expect(
+			screen.getByText(
+				'Fresh review decision is staged for validation before a future guarded retry save. No retry save or normal save was made, and protected local changes remain exportable.'
+			)
+		).toBeVisible();
+		expect(
+			screen.queryByText(
+				/fresh-review-handoff-raw|fresh-review-handoff-proof|reviewerUserId|reviewed_block_items/i
+			)
+		).not.toBeInTheDocument();
+		expect(
+			screen.queryByRole( 'button', { name: /save/i } )
+		).not.toBeInTheDocument();
+	} );
+
 	it( 'renders the internal fresh-review decision panel with approve and reject controls', async () => {
 		const user = userEvent.setup();
 		const actions = setupDistributedEditingStatusDispatch();
@@ -2734,8 +2788,7 @@ describe( 'DistributedEditingStatusSurface', () => {
 						blockLabel: 'Ready HTML change',
 						proposedContentHash:
 							'dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd',
-						reviewStatus:
-							'approved_for_retry_save',
+						reviewStatus: 'approved_for_retry_save',
 					},
 				],
 			},

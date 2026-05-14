@@ -41,6 +41,8 @@ import {
 	getDistributedEditingSessionStateForFreshReviewDecisionItemResolution,
 	getDistributedEditingSessionStateForFreshReviewDecisionItems,
 	getDistributedEditingSessionStateForFreshReviewDecisionResult,
+	getDistributedEditingSessionStateForFreshReviewRetrySaveHandoffValidation,
+	getDistributedEditingSessionStateForFreshReviewRetrySaveHandoffValidationResult,
 	getDistributedEditingSessionStateForFreshReviewRequestResult,
 	getDistributedEditingSessionStateForRetrySaveReviewApprovalProofResult,
 	getDistributedEditingSessionStateForRetrySaveRequest,
@@ -1236,8 +1238,8 @@ export const __experimentalSubmitDistributedEditingFreshReviewDecision =
 			DISTRIBUTED_EDITING_RECOVERY_REST_BASE;
 
 		try {
-			const response =
-				await requestDistributedEditingFreshReviewDecision( {
+			const response = await requestDistributedEditingFreshReviewDecision(
+				{
 					postId,
 					restBase,
 					freshReviewRequestRecordId: requestRecordId,
@@ -1255,13 +1257,13 @@ export const __experimentalSubmitDistributedEditingFreshReviewDecision =
 						options.reviewedProposedContentHash ??
 						options.proposedPostContentHash ??
 						currentSessionState.localUpdatesImportVerifiedPostContentHash,
-					candidatePostContentHash:
-						options.candidatePostContentHash,
+					candidatePostContentHash: options.candidatePostContentHash,
 					reviewedCandidateContentHash:
 						options.reviewedCandidateContentHash ??
 						options.candidatePostContentHash,
 					reviewedBlockItems,
-				} );
+				}
+			);
 			const sessionState =
 				getDistributedEditingSessionStateForFreshReviewDecisionResult(
 					response,
@@ -1271,10 +1273,8 @@ export const __experimentalSubmitDistributedEditingFreshReviewDecision =
 			dispatch.setDistributedEditingSessionState( sessionState );
 
 			return {
-				status:
-					sessionState.localUpdatesImportFreshReviewDecisionStatus,
-				result:
-					sessionState.localUpdatesImportFreshReviewDecisionResult,
+				status: sessionState.localUpdatesImportFreshReviewDecisionStatus,
+				result: sessionState.localUpdatesImportFreshReviewDecisionResult,
 				decision:
 					sessionState.localUpdatesImportFreshReviewDecisionDecision,
 				accepted:
@@ -1301,6 +1301,65 @@ export const __experimentalSubmitDistributedEditingFreshReviewDecision =
 			throw error;
 		}
 	};
+
+/**
+ * Stages a recorded fresh-review approval for future retry-save validation.
+ *
+ * This action is intentionally no-transport until the WordPress validation
+ * endpoint contract lands. It records only editor-store handoff state and can
+ * consume an explicit validation response shape supplied by tests or a future
+ * caller; it does not call normal save, retry-save, mutate content, dispatch
+ * notices, persist outside the editor store, expose proof internals, or change
+ * locks.
+ *
+ * @param {Object} [validationResult] Optional future validation response.
+ *
+ * @return {Function} Action thunk.
+ */
+export const __experimentalPrepareDistributedEditingFreshReviewRetrySaveHandoffValidation =
+
+		( validationResult = null ) =>
+		( { select, dispatch } ) => {
+			const currentSessionState =
+				select.getDistributedEditingSessionState?.() || {};
+			const preparedSessionState =
+				getDistributedEditingSessionStateForFreshReviewRetrySaveHandoffValidation(
+					currentSessionState
+				);
+			const sessionState = validationResult
+				? getDistributedEditingSessionStateForFreshReviewRetrySaveHandoffValidationResult(
+						validationResult,
+						preparedSessionState
+				  )
+				: preparedSessionState;
+
+			dispatch.setDistributedEditingSessionState( sessionState );
+
+			return {
+				status: sessionState.localUpdatesImportFreshReviewRetrySaveHandoffStatus,
+				reason: sessionState.localUpdatesImportFreshReviewRetrySaveHandoffReason,
+				result: sessionState.localUpdatesImportFreshReviewRetrySaveHandoffResult,
+				ready: sessionState.localUpdatesImportFreshReviewRetrySaveHandoffReady,
+				validating:
+					sessionState.localUpdatesImportFreshReviewRetrySaveHandoffValidating,
+				accepted:
+					sessionState.localUpdatesImportFreshReviewRetrySaveHandoffAccepted,
+				callsFreshReviewValidationEndpoint: false,
+				callsFreshReviewDecisionEndpoint: false,
+				callsRetrySaveEndpoint: false,
+				callsNormalSavePost: false,
+				savesPost: false,
+				dispatchesNotice: false,
+				mutatesEditorContent: false,
+				mutatesPersistedPostContent: false,
+				changesPostLock: false,
+				claimsSaved: false,
+				exposesRawContent: false,
+				exposesProofSignature: false,
+				exposesReviewerIds: false,
+				sessionState,
+			};
+		};
 
 /**
  * Prepares the retry-submit handoff after a successful local rebase.

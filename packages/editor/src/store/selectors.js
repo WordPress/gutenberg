@@ -33,6 +33,7 @@ import { getTemplateInfo } from '../utils/get-template-info';
 import {
 	DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE,
 	getDistributedEditingFreshReviewDecisionStateForSessionState,
+	getDistributedEditingFreshReviewRetrySaveHandoffStateForSessionState,
 	getDistributedEditingLocalUpdatesImportReviewRequestStateForSessionState,
 	getDistributedEditingNoticeDescriptorsForSessionState,
 	getDistributedEditingRiskyBlockReviewStateForSessionState,
@@ -537,6 +538,19 @@ export function getDistributedEditingLocalUpdatesImportReviewRequestState(
  */
 export function getDistributedEditingFreshReviewDecisionState( state ) {
 	return getDistributedEditingFreshReviewDecisionStateForSessionState(
+		getDistributedEditingSessionState( state )
+	);
+}
+
+/**
+ * Returns the current DE-RTC fresh-review retry-save handoff state.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {Object} Fresh-review retry-save handoff state.
+ */
+export function getDistributedEditingFreshReviewRetrySaveHandoffState( state ) {
+	return getDistributedEditingFreshReviewRetrySaveHandoffStateForSessionState(
 		getDistributedEditingSessionState( state )
 	);
 }
