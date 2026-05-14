@@ -1,9 +1,7 @@
 /**
  * Internal dependencies
  */
-import type { NormalizedRect, Size } from '../../../core/types';
-
-type HandlePosition = 'n' | 's' | 'e' | 'w' | 'nw' | 'ne' | 'sw' | 'se';
+import type { HandlePosition, NormalizedRect, Size } from '../../../core/types';
 
 /**
  * Per-direction transform that anchors the tooltip outward from the

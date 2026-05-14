@@ -159,6 +159,13 @@ export type ViewportAction =
 	| { type: 'RESET_VIEWPORT' };
 
 /**
+ * Direction of a crop resize handle. Eight compass positions: four
+ * corners and four edge midpoints. Used by stencil callbacks and any
+ * overlay that needs to know which handle the user is dragging.
+ */
+export type HandlePosition = 'n' | 's' | 'e' | 'w' | 'nw' | 'ne' | 'sw' | 'se';
+
+/**
  * The contract for a pluggable stencil component.
  * Stencils render the crop area overlay and handle resize interactions.
  */
@@ -176,9 +183,7 @@ export interface StencilProps {
 	 * handle direction is passed for pointer drags only — keyboard-driven
 	 * resizes invoke this without an argument.
 	 */
-	onResizeStart?: (
-		handle?: 'n' | 's' | 'e' | 'w' | 'nw' | 'ne' | 'sw' | 'se'
-	) => void;
+	onResizeStart?: ( handle?: HandlePosition ) => void;
 	/** Callback when a resize drag ends (mouseup after handle drag). */
 	onResizeEnd?: () => void;
 	/** Optional fixed aspect ratio (width / height) in pixel space. */

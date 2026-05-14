@@ -24,6 +24,7 @@ import { __ } from '@wordpress/i18n';
  */
 import type {
 	CropperState,
+	HandlePosition,
 	StencilProps,
 	Size,
 	NormalizedRect,
@@ -338,9 +339,9 @@ function CropperInner(
 	// Direction of the handle the user is currently dragging via pointer.
 	// `null` for keyboard-driven resizes and outside of pointer drags.
 	// Drives the live dimensions tooltip overlay.
-	const [ activeHandle, setActiveHandle ] = useState<
-		'n' | 's' | 'e' | 'w' | 'nw' | 'ne' | 'sw' | 'se' | null
-	>( null );
+	const [ activeHandle, setActiveHandle ] = useState< HandlePosition | null >(
+		null
+	);
 
 	// Use the interaction hook for mouse, touch, and keyboard events.
 	const {
@@ -519,7 +520,7 @@ function CropperInner(
 	}, [] );
 
 	const handleResizeStart = useCallback(
-		( handle?: 'n' | 's' | 'e' | 'w' | 'nw' | 'ne' | 'sw' | 'se' ) => {
+		( handle?: HandlePosition ) => {
 			isResizingRef.current = true;
 			setIsResizing( true );
 			setActiveHandle( handle ?? null );
