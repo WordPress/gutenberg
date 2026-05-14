@@ -57,6 +57,40 @@ Why?
 -   `.Root` has required subparts, signalling an expectation that it must be composed
     -   A non-root component can still have _optional_ sub-parts, like a `Button.Icon`
 
+### When exporting with `Object.assign`
+
+-   Add the primary component's JSDoc description to both the implementation export, and the public `Object.assign` wrapper. Storybook reads the implementation component's JSDoc for the component description, while IDEs can read the latter.
+-   All subcomponents should set their `displayName` to the full public name before the `Object.assign` export:
+
+```ts
+ButtonIcon.displayName = 'Button.Icon';
+
+/**
+ * A versatile button component with multiple variants, tones, and sizes.
+ */
+export const Button = Object.assign( _Button, {
+	/**
+	 * An icon component specifically designed to work well when rendered inside
+	 * a `Button` component.
+	 */
+	Icon: ButtonIcon,
+} );
+```
+
+### In Storybook
+
+-   Include public subcomponents in the component's Storybook `subcomponents` metadata, keying them as the full compound name in dot notation:
+
+```ts
+const meta: Meta< typeof Button > = {
+	title: 'Design System/Components/Button',
+	component: Button,
+	subcomponents: {
+		'Button.Icon': Button.Icon,
+	},
+};
+```
+
 ## `render` Prop and Ref Forwarding
 
 All `@wordpress/ui` components support a `render` prop (via the `ComponentProps` utility type) that lets consumers swap the underlying HTML element. This section codifies the two canonical implementation patterns, the rules for handling `render`, and common anti-patterns to avoid.
@@ -180,6 +214,40 @@ function MyComponent( props, ref ) {
     return <Inner ref={ ref } { ...props } />;
 }
 ```
+
+## Overlay Slot Props
+
+Compound overlay primitives (`Tooltip`, `Popover`, `Select`, `Autocomplete`, etc.) expose their underlying Base UI subcomponents (`Portal`, `Positioner`, …) through **slot props** on `Popup` rather than as flat prop subsets. The corresponding subcomponents are exported alongside `Popup` (e.g. `Tooltip.Portal`, `Tooltip.Positioner`).
+
+### Pattern
+
+For each Base UI subcomponent that we want to expose to consumers:
+
+1. Export a renderable wrapper subcomponent matching the Base UI subcomponent's name (e.g. `Tooltip.Positioner`).
+2. Add an optional slot prop on `Popup` named after the subcomponent (e.g. `positioner`). The prop type accepts a React element of the matching subcomponent: `ReactElement< Omit< MySubcomponentProps, 'children' > >`.
+3. When the slot prop is omitted, `Popup` uses the wrapper subcomponent with default props.
+4. When the slot prop is provided, `Popup` clones the given element and injects the rest of the subtree as `children`. Use the `renderSlotWithChildren` helper to keep this consistent across overlays.
+
+```tsx
+<Tooltip.Popup
+	portal={ <Tooltip.Portal container={ myContainer } /> }
+	positioner={ <Tooltip.Positioner side="right" sideOffset={ 8 } /> }
+>
+	Save
+</Tooltip.Popup>
+```
+
+### Why
+
+-   One mental model across overlays — same prop names, same prop shape, regardless of which primitive is in use.
+-   The wrapper subcomponents are also valid as standalone exports for advanced compositions.
+-   `Popup` does not need to maintain a hand-picked `Pick<>` list of positioner/portal props. The full Base UI surface is reachable through the corresponding subcomponent.
+
+### When to add a new slot prop
+
+Only when there is a concrete consumer that needs to reach a Base UI subcomponent's customization. Do not preemptively expose slots.
+
+High-level wrappers that hide `Popup` (for example `IconButton`, which renders a `Tooltip` internally) should re-expose the same slot props — same name, same shape — to keep the API uniform.
 
 ## CSS Architecture
 

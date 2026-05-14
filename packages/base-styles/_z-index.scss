@@ -9,9 +9,6 @@ $z-layers: (
 	".editor-text-editor__toolbar": 1,
 
 	".components-modal__header": 10,
-	".edit-post-meta-boxes-area.is-loading::before": 1,
-	".edit-post-meta-boxes-area .spinner": 5,
-	".components-popover__close": 5,
 	".edit-post-layout__footer": 30,
 	".interface-interface-skeleton__header": 30,
 	".interface-interface-skeleton__content": 20,
@@ -128,11 +125,6 @@ $z-layers: (
 
 	// Appear under the topbar.
 	".customize-widgets__block-toolbar": 7,
-
-	// Site editor layout
-	".edit-site-layout__canvas-container": 2,
-	".edit-site-layout__sidebar": 1,
-	".edit-site-layout__canvas-container.is-resizing::after": 100,
 
 	// Ensure checkbox + actions don't overlap table header
 	".dataviews-view-table thead": 1,

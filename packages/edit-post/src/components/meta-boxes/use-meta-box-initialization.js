@@ -23,17 +23,21 @@ export const useMetaBoxInitialization = ( enabled ) => {
 		isCollaborationEnabled,
 		hasIncompatibleMetaBoxes,
 	} = useSelect(
-		( select ) => ( {
-			isEnabledAndEditorReady:
-				enabled && select( editorStore ).__unstableIsEditorReady(),
-			isCollaborationEnabled:
-				select( editorStore ).isCollaborationEnabledForCurrentPost(),
-			hasIncompatibleMetaBoxes: enabled
-				? select( editPostStore )
-						.getAllMetaBoxes()
-						.some( ( metaBox ) => ! metaBox.__rtc_compatible )
-				: false,
-		} ),
+		( select ) => {
+			const {
+				__unstableIsEditorReady,
+				isCollaborationEnabledForCurrentPost,
+			} = unlock( select( editorStore ) );
+			return {
+				isEnabledAndEditorReady: enabled && __unstableIsEditorReady(),
+				isCollaborationEnabled: isCollaborationEnabledForCurrentPost(),
+				hasIncompatibleMetaBoxes: enabled
+					? select( editPostStore )
+							.getAllMetaBoxes()
+							.some( ( metaBox ) => ! metaBox.__rtc_compatible )
+					: false,
+			};
+		},
 		[ enabled ]
 	);
 	const { setCollaborationSupported } = unlock( useDispatch( coreStore ) );

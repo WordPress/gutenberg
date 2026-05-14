@@ -33,7 +33,7 @@
 	},
 	"types": "build-types",
 	"devDependencies": {
-		"@types/node": "^20.17.10"
+		"@types/node": "^20.19.39"
 	},
 	"peerDependencies": {
 		"prettier": ">=3"

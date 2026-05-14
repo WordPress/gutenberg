@@ -42,7 +42,11 @@ test.describe( 'Post revisions', () => {
 		await settingsSidebar.getByRole( 'tab', { name: 'Post' } ).click();
 
 		// Click the Revisions button (the button shows the revision count "2").
-		await settingsSidebar.getByRole( 'button', { name: '2' } ).click();
+		await settingsSidebar
+			.getByRole( 'button', {
+				name: 'Open revisions screen: 2 revisions',
+			} )
+			.click();
 
 		// Wait for the revisions mode to be active (Restore button appears).
 		const restoreButton = page.getByRole( 'button', { name: 'Restore' } );
@@ -127,7 +131,10 @@ test.describe( 'Post revisions', () => {
 		} );
 		await settingsSidebar.getByRole( 'tab', { name: 'Post' } ).click();
 		await settingsSidebar
-			.getByRole( 'button', { name: '2', exact: true } )
+			.getByRole( 'button', {
+				name: 'Open revisions screen: 2 revisions',
+				exact: true,
+			} )
 			.click();
 
 		// Wait for the revisions mode to be active.
@@ -214,7 +221,10 @@ test.describe( 'Post revisions', () => {
 		} );
 		await settingsSidebar.getByRole( 'tab', { name: 'Post' } ).click();
 		await settingsSidebar
-			.getByRole( 'button', { name: '2', exact: true } )
+			.getByRole( 'button', {
+				name: 'Open revisions screen: 2 revisions',
+				exact: true,
+			} )
 			.click();
 
 		// Wait for revisions mode.
@@ -249,7 +259,10 @@ test.describe( 'Post revisions', () => {
 		} );
 		await settingsSidebar.getByRole( 'tab', { name: 'Post' } ).click();
 		await settingsSidebar
-			.getByRole( 'button', { name: '2', exact: true } )
+			.getByRole( 'button', {
+				name: 'Open revisions screen: 2 revisions',
+				exact: true,
+			} )
 			.click();
 		await expect(
 			page.getByRole( 'button', { name: 'Restore' } )
@@ -260,6 +273,126 @@ test.describe( 'Post revisions', () => {
 		} );
 		await expect( titleBlock ).toBeVisible();
 		await expect( titleBlock ).not.toHaveClass( /has-warning/ );
+	} );
+} );
+
+test.describe( 'Post revisions slider pagination', () => {
+	test.afterEach( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllPosts();
+	} );
+
+	test( 'should paginate, navigate pages, and diff across page boundaries', async ( {
+		admin,
+		editor,
+		page,
+		requestUtils,
+	} ) => {
+		// Create a post and update it enough times to require pagination.
+		// Page 1 holds the newest 100 revisions, so > 100 total → 2 pages.
+		const post = await requestUtils.rest( {
+			method: 'POST',
+			path: '/wp/v2/posts',
+			data: {
+				title: 'Pagination Test',
+				content: '<!-- wp:paragraph --><p>0</p><!-- /wp:paragraph -->',
+				status: 'draft',
+			},
+		} );
+
+		// Sequential REST calls to enforce ordering (concurrent writes to
+		// the same post race and produce non-monotonic revision content).
+		for ( let i = 1; i <= 105; i++ ) {
+			await requestUtils.rest( {
+				method: 'POST',
+				path: `/wp/v2/posts/${ post.id }`,
+				data: {
+					content: `<!-- wp:paragraph --><p>${ i }</p><!-- /wp:paragraph -->`,
+				},
+			} );
+		}
+
+		await admin.editPost( post.id );
+
+		await editor.openDocumentSettingsSidebar();
+		const settingsSidebar = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+		await settingsSidebar.getByRole( 'tab', { name: 'Post' } ).click();
+
+		// The revisions button is labeled with the count. The editor count
+		// may differ from the REST version-history count by an autosave,
+		// so read it from the rendered button.
+		const revisionsButton = settingsSidebar
+			.getByRole( 'button' )
+			.filter( { hasText: /^\d+$/ } );
+		await expect( revisionsButton ).toBeVisible();
+		const totalRevisions = parseInt(
+			await revisionsButton.textContent(),
+			10
+		);
+		const olderPageSize = totalRevisions - 100;
+
+		await revisionsButton.click();
+		await expect(
+			page.getByRole( 'button', { name: 'Restore' } )
+		).toBeVisible();
+
+		// Page 1 holds the newest 100 revisions. The prev chevron points
+		// at page 2, which holds the remaining older revisions.
+		const prevPageButton = page.getByRole( 'button', {
+			name: `Revisions 1–${ olderPageSize }`,
+		} );
+		const nextPageButton = page.getByRole( 'button', {
+			name: 'No newer revisions',
+		} );
+		await expect( prevPageButton ).toBeEnabled();
+		await expect( nextPageButton ).toBeDisabled();
+
+		// Page 1 holds 100 revisions, so the slider's max is 99.
+		const slider = page.getByRole( 'slider', { name: 'Revision' } );
+		await expect( slider ).toHaveAttribute( 'max', '99' );
+
+		// Slide to the leftmost (oldest revision on page 1). Computing the
+		// previous-revision diff requires fetching the adjacent page.
+		await slider.focus();
+		await page.keyboard.press( 'Home' );
+
+		// Adjacent revision contents differ by exactly 1 (we created them
+		// as sequential integers), so the boundary diff must show N as
+		// added and N-1 as removed inside a modified paragraph.
+		const canvas = page
+			.locator( 'iframe[name="editor-canvas"]' )
+			.contentFrame()
+			.locator( '.is-revision-modified' );
+		await expect( canvas ).toBeVisible();
+		const added = parseInt(
+			await canvas.locator( '.revision-diff-added' ).textContent(),
+			10
+		);
+		const removed = parseInt(
+			await canvas.locator( '.revision-diff-removed' ).textContent(),
+			10
+		);
+		expect( added - removed ).toBe( 1 );
+
+		// Navigate to page 2 via the chevron.
+		await prevPageButton.click();
+
+		// After loading page 2: prev chevron disabled, next chevron enabled.
+		await expect(
+			page.getByRole( 'button', { name: 'No older revisions' } )
+		).toBeDisabled();
+		await expect(
+			page.getByRole( 'button', {
+				name: `Revisions ${ olderPageSize + 1 }–${ totalRevisions }`,
+			} )
+		).toBeEnabled();
+
+		// Slider now reflects page 2's smaller revision count.
+		await expect( slider ).toHaveAttribute(
+			'max',
+			String( olderPageSize - 1 )
+		);
 	} );
 } );
 
@@ -341,7 +474,11 @@ test.describe( 'Template and template part revisions', () => {
 			await settingsSidebar.getByRole( 'tab', { name: tabName } ).click();
 
 			// Click the Revisions button.
-			await settingsSidebar.getByRole( 'button', { name: '2' } ).click();
+			await settingsSidebar
+				.getByRole( 'button', {
+					name: 'Open revisions screen: 2 revisions',
+				} )
+				.click();
 
 			// Wait for the revisions mode to be active.
 			const restoreButton = page.getByRole( 'button', {

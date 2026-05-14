@@ -366,6 +366,19 @@ export default dedupePlugins( [
 		},
 	},
 
+	// Override: Package source files — non-module stylesheets should be
+	// bundled through package stylesheet entry points, not runtime injected.
+	{
+		files: [ 'packages/*/src/**/*.[tj]s?(x)', 'routes/**/*.[tj]s?(x)' ],
+		ignores: [
+			...developmentFiles,
+			'**/*.@(android|ios|native).[tj]s?(x)',
+		],
+		rules: {
+			'@wordpress/no-non-module-stylesheet-imports': 'error',
+		},
+	},
+
 	// Override: Package source files — forbid raw SVG elements.
 	{
 		files: [ 'packages/**/*.js' ],
@@ -554,6 +567,8 @@ export default dedupePlugins( [
 		files: [
 			'bin/**/*.js',
 			'bin/**/*.mjs',
+			'tools/**/*.js',
+			'tools/**/*.mjs',
 			'packages/env/**',
 			'packages/theme/bin/**/*.[tj]s?(x)',
 		],

@@ -114,6 +114,15 @@ module.exports = {
 						],
 					},
 				],
+				'selector-pseudo-class-no-unknown': [
+					true,
+					{
+						ignorePseudoClasses: [
+							// CSS Modules global escape hatch.
+							'global',
+						],
+					},
+				],
 			},
 		},
 	],
