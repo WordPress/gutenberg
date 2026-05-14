@@ -562,6 +562,60 @@ class WP_REST_User_Post_Types_Controller_Gutenberg_Test extends WP_Test_REST_Con
 	}
 
 	/**
+	 * `config.menu_icon` and `config.menu_position` round-trip through the
+	 * REST API and are persisted in the stored config JSON.
+	 */
+	public function test_create_item_with_menu_icon_and_position() {
+		wp_set_current_user( self::$admin_id );
+
+		$request = new WP_REST_Request( 'POST', self::REST_BASE );
+		$request->set_body_params(
+			array(
+				'slug'   => 'recipe',
+				'title'  => 'Recipes',
+				'status' => 'publish',
+				'config' => array(
+					'labels'         => array( 'singular_name' => 'Recipe' ),
+					'public'         => true,
+					'menu_icon'      => 'dashicons-food',
+					'menu_position'  => 25,
+				),
+			)
+		);
+
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+
+		$this->assertSame( 201, $response->get_status() );
+		$this->assertSame( 'dashicons-food', $data['config']['menu_icon'] );
+		$this->assertSame( 25, $data['config']['menu_position'] );
+
+		wp_delete_post( $data['id'], true );
+	}
+
+	/**
+	 * `menu_position` out of the allowed range (1–100) is rejected with a 400.
+	 */
+	public function test_create_item_rejects_out_of_range_menu_position() {
+		wp_set_current_user( self::$admin_id );
+
+		$request = new WP_REST_Request( 'POST', self::REST_BASE );
+		$request->set_body_params(
+			array(
+				'slug'   => 'bad_pos',
+				'title'  => 'Bad Position',
+				'config' => array(
+					'labels'        => array( 'singular_name' => 'Bad' ),
+					'menu_position' => 999,
+				),
+			)
+		);
+
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertSame( 400, $response->get_status() );
+	}
+
+	/**
 	 * `config.taxonomies` is stored inline and round-trips cleanly. There is
 	 * no separate top-level field and no collection-param filter on this
 	 * side — the post-type→taxonomy attachment lives entirely within config.
