@@ -25,16 +25,18 @@ import { store as editorStore } from '../../store';
 /**
  * Renders a panel for publishing a post.
  *
- * @param {Object}              props                        Component props.
- * @param {boolean}             [props.forceIsDirty]         Whether to force the dirty state.
- * @param {()=>void}            props.onClose                Called when the panel requests to close.
- * @param {React.ComponentType} [props.PostPublishExtension] Component rendered after publishing.
- * @param {React.ComponentType} [props.PrePublishExtension]  Component rendered before publishing.
+ * @param {Object}              props                            Component props.
+ * @param {boolean}             [props.forceIsDirty]             Whether to force the dirty state.
+ * @param {boolean}             [props.forcePrePublishExtension] Whether to force the pre-publish extension surface.
+ * @param {()=>void}            props.onClose                    Called when the panel requests to close.
+ * @param {React.ComponentType} [props.PostPublishExtension]     Component rendered after publishing.
+ * @param {React.ComponentType} [props.PrePublishExtension]      Component rendered before publishing.
  *
  * @return {React.JSX.Element} The post publish panel.
  */
 export default function PostPublishPanel( {
 	forceIsDirty,
+	forcePrePublishExtension = false,
 	onClose,
 	PostPublishExtension,
 	PrePublishExtension,
@@ -106,10 +108,23 @@ export default function PostPublishPanel( {
 		const postChanged = currentPostId !== prevPostIdRef.current;
 		prevPostIdRef.current = currentPostId;
 
-		if ( postChanged || ( isPublished && ! isSaving && isDirty ) ) {
+		if (
+			postChanged ||
+			( isPublished &&
+				! isSaving &&
+				isDirty &&
+				! forcePrePublishExtension )
+		) {
 			stableOnClose();
 		}
-	}, [ isPublished, isSaving, isDirty, currentPostId, stableOnClose ] );
+	}, [
+		isPublished,
+		isSaving,
+		isDirty,
+		currentPostId,
+		forcePrePublishExtension,
+		stableOnClose,
+	] );
 
 	function onTogglePublishSidebar() {
 		if ( isPublishSidebarEnabled ) {
@@ -129,6 +144,10 @@ export default function PostPublishPanel( {
 		isPublished || ( isScheduled && isBeingScheduled );
 	const isPrePublish = ! isPublishedOrScheduled && ! isSaving;
 	const isPostPublish = isPublishedOrScheduled && ! isSaving;
+	const shouldRenderPrePublishExtension =
+		isPrePublish || forcePrePublishExtension;
+	const shouldRenderPostPublishExtension =
+		isPostPublish && ! forcePrePublishExtension;
 
 	return (
 		<div
@@ -169,12 +188,12 @@ export default function PostPublishPanel( {
 				) }
 			</div>
 			<div className="editor-post-publish-panel__content">
-				{ isPrePublish && (
+				{ shouldRenderPrePublishExtension && (
 					<PostPublishPanelPrepublish>
 						{ PrePublishExtension && <PrePublishExtension /> }
 					</PostPublishPanelPrepublish>
 				) }
-				{ isPostPublish && (
+				{ shouldRenderPostPublishExtension && (
 					<PostPublishPanelPostpublish focusOnMount>
 						{ PostPublishExtension && <PostPublishExtension /> }
 					</PostPublishPanelPostpublish>

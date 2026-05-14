@@ -14,6 +14,7 @@ import PostPublishPanel from '../post-publish-panel';
 import PluginPrePublishPanel from '../plugin-pre-publish-panel';
 import PluginPostPublishPanel from '../plugin-post-publish-panel';
 import { store as editorStore } from '../../store';
+import { DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS } from '../../store/distributed-editing';
 
 const { Fill, Slot } = createSlotFill( 'ActionsPanel' );
 
@@ -32,8 +33,10 @@ export default function SavePublishPanels( {
 		isPublishable,
 		isDirty,
 		hasOtherEntitiesChanges,
+		forcePrePublishExtension,
 	} = useSelect( ( select ) => {
 		const {
+			getDistributedEditingSavePolicyState,
 			isPublishSidebarOpened,
 			isEditedPostPublishable,
 			isCurrentPostPublished,
@@ -41,12 +44,19 @@ export default function SavePublishPanels( {
 			hasNonPostEntityChanges,
 		} = select( editorStore );
 		const _hasOtherEntitiesChanges = hasNonPostEntityChanges();
+		const distributedEditingSavePolicy =
+			getDistributedEditingSavePolicyState?.() ?? {};
+
 		return {
 			publishSidebarOpened: isPublishSidebarOpened(),
 			isPublishable:
 				! isCurrentPostPublished() && isEditedPostPublishable(),
 			isDirty: _hasOtherEntitiesChanges || isEditedPostDirty(),
 			hasOtherEntitiesChanges: _hasOtherEntitiesChanges,
+			forcePrePublishExtension:
+				distributedEditingSavePolicy.opensPrePublishReview ||
+				distributedEditingSavePolicy.clickAction ===
+					DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.OPEN_PRE_PUBLISH_REVIEW,
 		};
 	}, [] );
 
@@ -63,6 +73,7 @@ export default function SavePublishPanels( {
 			<PostPublishPanel
 				onClose={ closePublishSidebar }
 				forceIsDirty={ forceIsDirtyPublishPanel }
+				forcePrePublishExtension={ forcePrePublishExtension }
 				PrePublishExtension={ PluginPrePublishPanel.Slot }
 				PostPublishExtension={ PluginPostPublishPanel.Slot }
 			/>
