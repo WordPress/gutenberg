@@ -33,8 +33,10 @@ import {
 	DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_STATUSES,
 	DISTRIBUTED_EDITING_SAVE_AUTHORITY_STATES,
 	DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES,
+	DISTRIBUTED_EDITING_SAVE_LOCAL_CHANGES_STATES,
 	DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS,
 	DISTRIBUTED_EDITING_SAVE_POLICY_STATUSES,
+	DISTRIBUTED_EDITING_SAVE_REVIEW_CHECKPOINT_STATES,
 	DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_REASONS,
 	DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_STATUSES,
 	DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES,
@@ -4006,6 +4008,27 @@ describe( 'distributed editing session state', () => {
 			authorityStatusText:
 				'The authoritative WordPress post cannot be updated until risky changes are approved or removed.',
 			canExportLocalUpdates: true,
+			localChangesState:
+				DISTRIBUTED_EDITING_SAVE_LOCAL_CHANGES_STATES.PROTECTED_CHANGES_EXPORTABLE,
+			reviewCheckpointState:
+				DISTRIBUTED_EDITING_SAVE_REVIEW_CHECKPOINT_STATES.REVIEW_REQUIRED,
+			authoritativePostState:
+				DISTRIBUTED_EDITING_SAVE_AUTHORITY_STATES.REVIEW_REQUIRED_BEFORE_UPDATE,
+			saveStateSummaryText:
+				'Protected local changes need review before the authoritative post can update.',
+			stateVocabulary: expect.objectContaining( {
+				localChangesState:
+					DISTRIBUTED_EDITING_SAVE_LOCAL_CHANGES_STATES.PROTECTED_CHANGES_EXPORTABLE,
+				reviewCheckpointState:
+					DISTRIBUTED_EDITING_SAVE_REVIEW_CHECKPOINT_STATES.REVIEW_REQUIRED,
+				authoritativePostState:
+					DISTRIBUTED_EDITING_SAVE_AUTHORITY_STATES.REVIEW_REQUIRED_BEFORE_UPDATE,
+				summaryText:
+					'Protected local changes need review before the authoritative post can update.',
+				descriptorOnly: true,
+				rawContentIncluded: false,
+				exposesRawContent: false,
+			} ),
 			shouldCallNormalSavePost: false,
 			shouldCallRetrySaveEndpoint: false,
 			claimsSaved: false,
@@ -4023,6 +4046,14 @@ describe( 'distributed editing session state', () => {
 			authorityState:
 				DISTRIBUTED_EDITING_SAVE_AUTHORITY_STATES.READY_FOR_GUARDED_UPDATE,
 			authoritativePostUpdated: false,
+			localChangesState:
+				DISTRIBUTED_EDITING_SAVE_LOCAL_CHANGES_STATES.PROTECTED_CHANGES_EXPORTABLE,
+			reviewCheckpointState:
+				DISTRIBUTED_EDITING_SAVE_REVIEW_CHECKPOINT_STATES.REVIEW_ACCEPTED,
+			authoritativePostState:
+				DISTRIBUTED_EDITING_SAVE_AUTHORITY_STATES.READY_FOR_GUARDED_UPDATE,
+			saveStateSummaryText:
+				'Reviewed local changes are ready for guarded update; the authoritative post is not updated yet.',
 			shouldCallNormalSavePost: false,
 			shouldCallRetrySaveEndpoint: false,
 			claimsSaved: false,
@@ -4035,6 +4066,20 @@ describe( 'distributed editing session state', () => {
 			saveButtonAuthorityState:
 				DISTRIBUTED_EDITING_SAVE_AUTHORITY_STATES.READY_FOR_GUARDED_UPDATE,
 			saveButtonAuthoritativePostUpdated: false,
+			saveButtonLocalChangesState:
+				DISTRIBUTED_EDITING_SAVE_LOCAL_CHANGES_STATES.PROTECTED_CHANGES_EXPORTABLE,
+			saveButtonReviewCheckpointState:
+				DISTRIBUTED_EDITING_SAVE_REVIEW_CHECKPOINT_STATES.REVIEW_ACCEPTED,
+			saveButtonAuthoritativePostState:
+				DISTRIBUTED_EDITING_SAVE_AUTHORITY_STATES.READY_FOR_GUARDED_UPDATE,
+			saveButtonStateSummaryText:
+				'Reviewed local changes are ready for guarded update; the authoritative post is not updated yet.',
+			saveButtonStateVocabulary: expect.objectContaining( {
+				localChangesText:
+					'Protected local changes remain exportable from this editor.',
+				reviewCheckpointText:
+					'Review is accepted for the guarded Save path.',
+			} ),
 			blocksNormalSavePost: true,
 			shouldCallNormalSavePost: false,
 			shouldCallRetrySaveEndpoint: false,
@@ -4057,6 +4102,12 @@ describe( 'distributed editing session state', () => {
 			authorityState:
 				DISTRIBUTED_EDITING_SAVE_AUTHORITY_STATES.AWAITING_SERVER_CONFIRMATION,
 			pendingServerConfirmation: true,
+			localChangesState:
+				DISTRIBUTED_EDITING_SAVE_LOCAL_CHANGES_STATES.AWAITING_SERVER_CONFIRMATION,
+			reviewCheckpointState:
+				DISTRIBUTED_EDITING_SAVE_REVIEW_CHECKPOINT_STATES.REVIEW_ACCEPTED,
+			saveStateSummaryText:
+				'Reviewed local changes are waiting for server confirmation before the authoritative post is updated.',
 			claimsSaved: false,
 		} );
 		expect( buttonStates.freshReviewValidating ).toMatchObject( {
@@ -4067,6 +4118,12 @@ describe( 'distributed editing session state', () => {
 			blocksNormalSavePost: true,
 			authorityState:
 				DISTRIBUTED_EDITING_SAVE_AUTHORITY_STATES.REVIEW_VALIDATION_IN_PROGRESS,
+			localChangesState:
+				DISTRIBUTED_EDITING_SAVE_LOCAL_CHANGES_STATES.PROTECTED_CHANGES_EXPORTABLE,
+			reviewCheckpointState:
+				DISTRIBUTED_EDITING_SAVE_REVIEW_CHECKPOINT_STATES.REVIEW_VALIDATING,
+			saveStateSummaryText:
+				'Reviewed local changes are being validated before the authoritative post can update.',
 			claimsSaved: false,
 		} );
 		expect( buttonStates.retrySaveConfirmed ).toMatchObject( {
@@ -4078,6 +4135,12 @@ describe( 'distributed editing session state', () => {
 			authorityState:
 				DISTRIBUTED_EDITING_SAVE_AUTHORITY_STATES.AUTHORITATIVE_UPDATE_CONFIRMED,
 			authoritativePostUpdated: true,
+			localChangesState:
+				DISTRIBUTED_EDITING_SAVE_LOCAL_CHANGES_STATES.AUTHORITATIVE_UPDATE_CONFIRMED,
+			reviewCheckpointState:
+				DISTRIBUTED_EDITING_SAVE_REVIEW_CHECKPOINT_STATES.REVIEW_CONSUMED,
+			saveStateSummaryText:
+				'The authoritative post accepted the Distributed Editing update.',
 			claimsSaved: true,
 		} );
 		expect( buttonStates.refetchRequired ).toMatchObject( {
@@ -4090,6 +4153,12 @@ describe( 'distributed editing session state', () => {
 			blocksNormalSavePost: true,
 			authorityState:
 				DISTRIBUTED_EDITING_SAVE_AUTHORITY_STATES.SERVER_REFRESH_REQUIRED_BEFORE_UPDATE,
+			localChangesState:
+				DISTRIBUTED_EDITING_SAVE_LOCAL_CHANGES_STATES.PROTECTED_CHANGES_EXPORTABLE,
+			reviewCheckpointState:
+				DISTRIBUTED_EDITING_SAVE_REVIEW_CHECKPOINT_STATES.SERVER_REFRESH_REQUIRED,
+			saveStateSummaryText:
+				'Protected local changes need a server refresh before the authoritative post can update.',
 			claimsSaved: false,
 		} );
 		expect( JSON.stringify( buttonStates ) ).not.toContain(

@@ -149,6 +149,11 @@ describe( 'PostSavedState', () => {
 					'Accepted Distributed Editing proof is ready for guarded retry save.',
 				clickAction: 'continue_guarded_retry_save',
 				authorityState: 'ready_for_guarded_update',
+				localChangesState: 'protected_local_changes_exportable',
+				reviewCheckpointState: 'review_accepted',
+				authoritativePostState: 'ready_for_guarded_update',
+				saveStateSummaryText:
+					'Reviewed local changes are ready for guarded update; the authoritative post is not updated yet.',
 				authoritativePostUpdated: false,
 			},
 		} ) );
@@ -181,6 +186,22 @@ describe( 'PostSavedState', () => {
 		expect( button ).toHaveAttribute(
 			'data-distributed-editing-save-button-authority-state',
 			'ready_for_guarded_update'
+		);
+		expect( button ).toHaveAttribute(
+			'data-distributed-editing-save-button-local-changes-state',
+			'protected_local_changes_exportable'
+		);
+		expect( button ).toHaveAttribute(
+			'data-distributed-editing-save-button-review-checkpoint-state',
+			'review_accepted'
+		);
+		expect( button ).toHaveAttribute(
+			'data-distributed-editing-save-button-authoritative-post-state',
+			'ready_for_guarded_update'
+		);
+		expect( button ).toHaveAttribute(
+			'data-distributed-editing-save-button-state-summary',
+			'Reviewed local changes are ready for guarded update; the authoritative post is not updated yet.'
 		);
 		expect( button ).toHaveAttribute(
 			'data-distributed-editing-save-button-authoritative-post-updated',

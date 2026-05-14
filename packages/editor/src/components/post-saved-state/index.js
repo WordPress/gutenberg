@@ -179,6 +179,18 @@ export default function PostSavedState( { forceIsDirty } ) {
 					'data-distributed-editing-save-button-authority-state':
 						distributedEditingSaveButtonState.authorityState ||
 						undefined,
+					'data-distributed-editing-save-button-local-changes-state':
+						distributedEditingSaveButtonState.localChangesState ||
+						undefined,
+					'data-distributed-editing-save-button-review-checkpoint-state':
+						distributedEditingSaveButtonState.reviewCheckpointState ||
+						undefined,
+					'data-distributed-editing-save-button-authoritative-post-state':
+						distributedEditingSaveButtonState.authoritativePostState ||
+						undefined,
+					'data-distributed-editing-save-button-state-summary':
+						distributedEditingSaveButtonState.saveStateSummaryText ||
+						undefined,
 					'data-distributed-editing-save-button-authoritative-post-updated':
 						String( distributedEditingAuthoritativePostUpdated ),
 			  }

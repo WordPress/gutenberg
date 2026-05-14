@@ -291,6 +291,35 @@ export const DISTRIBUTED_EDITING_SAVE_AUTHORITY_STATES = Object.freeze( {
 } );
 
 /**
+ * Stable local-change states for DE-RTC Save semantics. These clarify whether
+ * the editor is carrying protected local work independent of the authoritative
+ * WordPress post.
+ */
+export const DISTRIBUTED_EDITING_SAVE_LOCAL_CHANGES_STATES = Object.freeze( {
+	NO_PROTECTED_CHANGES: 'no_protected_local_changes',
+	PROTECTED_CHANGES: 'protected_local_changes',
+	PROTECTED_CHANGES_EXPORTABLE: 'protected_local_changes_exportable',
+	AWAITING_SERVER_CONFIRMATION:
+		'protected_local_changes_awaiting_server_confirmation',
+	AUTHORITATIVE_UPDATE_CONFIRMED: 'authoritative_update_confirmed',
+} );
+
+/**
+ * Stable review checkpoint states for DE-RTC Save semantics. These separate
+ * review work from both local editor dirtiness and authoritative post updates.
+ */
+export const DISTRIBUTED_EDITING_SAVE_REVIEW_CHECKPOINT_STATES = Object.freeze(
+	{
+		NO_REVIEW_REQUIRED: 'no_review_required',
+		REVIEW_REQUIRED: 'review_required',
+		REVIEW_ACCEPTED: 'review_accepted',
+		REVIEW_VALIDATING: 'review_validating',
+		SERVER_REFRESH_REQUIRED: 'server_refresh_required',
+		REVIEW_CONSUMED: 'review_consumed',
+	}
+);
+
+/**
  * Stable fresh-review pre-save statuses. These are pure placement hints for
  * future Save/pre-publish UI and do not perform the action they describe.
  */
@@ -5496,6 +5525,148 @@ function getDistributedEditingFreshReviewListStatusFromNormalizedState(
 	return DISTRIBUTED_EDITING_FRESH_REVIEW_REVIEW_LIST_STATUSES.NONE;
 }
 
+function getDistributedEditingSaveStateVocabulary( {
+	status,
+	authorityState,
+	authorityStatusText,
+	authoritativePostUpdated = false,
+	pendingServerConfirmation = false,
+	hasProtectedLocalChanges = false,
+	canExportLocalUpdates = false,
+	hasAcceptedButUnconsumed = false,
+	reviewItemCount = 0,
+	pendingReviewItemCount = 0,
+	approvedReviewItemCount = 0,
+	freshReviewPreSaveStatus = null,
+} = {} ) {
+	let localChangesState =
+		DISTRIBUTED_EDITING_SAVE_LOCAL_CHANGES_STATES.NO_PROTECTED_CHANGES;
+	let localChangesText = 'No protected local changes are pending.';
+
+	if ( authoritativePostUpdated ) {
+		localChangesState =
+			DISTRIBUTED_EDITING_SAVE_LOCAL_CHANGES_STATES.AUTHORITATIVE_UPDATE_CONFIRMED;
+		localChangesText =
+			'Protected local changes were accepted by the authoritative post.';
+	} else if ( pendingServerConfirmation ) {
+		localChangesState =
+			DISTRIBUTED_EDITING_SAVE_LOCAL_CHANGES_STATES.AWAITING_SERVER_CONFIRMATION;
+		localChangesText =
+			'Protected local changes are waiting for server confirmation.';
+	} else if ( hasProtectedLocalChanges && canExportLocalUpdates ) {
+		localChangesState =
+			DISTRIBUTED_EDITING_SAVE_LOCAL_CHANGES_STATES.PROTECTED_CHANGES_EXPORTABLE;
+		localChangesText =
+			'Protected local changes remain exportable from this editor.';
+	} else if ( hasProtectedLocalChanges ) {
+		localChangesState =
+			DISTRIBUTED_EDITING_SAVE_LOCAL_CHANGES_STATES.PROTECTED_CHANGES;
+		localChangesText = 'Protected local changes remain in this editor.';
+	}
+
+	let reviewCheckpointState =
+		DISTRIBUTED_EDITING_SAVE_REVIEW_CHECKPOINT_STATES.NO_REVIEW_REQUIRED;
+	let reviewCheckpointText = 'No review checkpoint is blocking Save.';
+
+	if ( authoritativePostUpdated ) {
+		reviewCheckpointState =
+			DISTRIBUTED_EDITING_SAVE_REVIEW_CHECKPOINT_STATES.REVIEW_CONSUMED;
+		reviewCheckpointText =
+			'Review proof was consumed by the authoritative update.';
+	} else if (
+		status ===
+			DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES.FRESH_REVIEW_VALIDATING ||
+		freshReviewPreSaveStatus ===
+			DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_STATUSES.VALIDATING
+	) {
+		reviewCheckpointState =
+			DISTRIBUTED_EDITING_SAVE_REVIEW_CHECKPOINT_STATES.REVIEW_VALIDATING;
+		reviewCheckpointText =
+			'Review proof is being validated before Save can continue.';
+	} else if (
+		status === DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES.REFETCH_REQUIRED ||
+		authorityState ===
+			DISTRIBUTED_EDITING_SAVE_AUTHORITY_STATES.SERVER_REFRESH_REQUIRED_BEFORE_UPDATE
+	) {
+		reviewCheckpointState =
+			DISTRIBUTED_EDITING_SAVE_REVIEW_CHECKPOINT_STATES.SERVER_REFRESH_REQUIRED;
+		reviewCheckpointText =
+			'Server state must be refreshed before review or Save can continue.';
+	} else if (
+		status === DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES.REVIEW_BLOCKED ||
+		pendingReviewItemCount > 0
+	) {
+		reviewCheckpointState =
+			DISTRIBUTED_EDITING_SAVE_REVIEW_CHECKPOINT_STATES.REVIEW_REQUIRED;
+		reviewCheckpointText =
+			'Review is required before the authoritative post can update.';
+	} else if (
+		status ===
+			DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES.ACCEPTED_BUT_UNCONSUMED ||
+		status ===
+			DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES.RETRY_SAVE_IN_PROGRESS ||
+		hasAcceptedButUnconsumed ||
+		approvedReviewItemCount > 0
+	) {
+		reviewCheckpointState =
+			DISTRIBUTED_EDITING_SAVE_REVIEW_CHECKPOINT_STATES.REVIEW_ACCEPTED;
+		reviewCheckpointText = 'Review is accepted for the guarded Save path.';
+	}
+
+	let summaryText = 'Save can update the authoritative post.';
+
+	if ( authoritativePostUpdated ) {
+		summaryText =
+			'The authoritative post accepted the Distributed Editing update.';
+	} else if ( pendingServerConfirmation ) {
+		summaryText =
+			'Reviewed local changes are waiting for server confirmation before the authoritative post is updated.';
+	} else if (
+		reviewCheckpointState ===
+		DISTRIBUTED_EDITING_SAVE_REVIEW_CHECKPOINT_STATES.REVIEW_VALIDATING
+	) {
+		summaryText =
+			'Reviewed local changes are being validated before the authoritative post can update.';
+	} else if (
+		reviewCheckpointState ===
+		DISTRIBUTED_EDITING_SAVE_REVIEW_CHECKPOINT_STATES.SERVER_REFRESH_REQUIRED
+	) {
+		summaryText =
+			'Protected local changes need a server refresh before the authoritative post can update.';
+	} else if (
+		reviewCheckpointState ===
+		DISTRIBUTED_EDITING_SAVE_REVIEW_CHECKPOINT_STATES.REVIEW_REQUIRED
+	) {
+		summaryText =
+			'Protected local changes need review before the authoritative post can update.';
+	} else if (
+		reviewCheckpointState ===
+		DISTRIBUTED_EDITING_SAVE_REVIEW_CHECKPOINT_STATES.REVIEW_ACCEPTED
+	) {
+		summaryText =
+			'Reviewed local changes are ready for guarded update; the authoritative post is not updated yet.';
+	}
+
+	return {
+		localChangesState,
+		reviewCheckpointState,
+		authoritativePostState: authorityState,
+		localChangesText,
+		reviewCheckpointText,
+		authoritativePostText: authorityStatusText,
+		summaryText,
+		reviewItemCount,
+		pendingReviewItemCount,
+		approvedReviewItemCount,
+		descriptorOnly: true,
+		rawContentIncluded: false,
+		exposesRawContent: false,
+		exposesProofInternals: false,
+		exposesReviewerIds: false,
+		exposesSaverIds: false,
+	};
+}
+
 /**
  * Returns the pure DE-RTC Save button semantics descriptor for the current
  * session. The descriptor ranks review, retry-save, refetch, and fresh-review
@@ -5733,6 +5904,20 @@ export function getDistributedEditingSaveButtonStateForSessionState(
 			? DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFETCH_SERVER_STATE
 			: null,
 	].filter( Boolean );
+	const stateVocabulary = getDistributedEditingSaveStateVocabulary( {
+		status,
+		authorityState,
+		authorityStatusText,
+		authoritativePostUpdated,
+		pendingServerConfirmation,
+		hasProtectedLocalChanges,
+		canExportLocalUpdates,
+		hasAcceptedButUnconsumed,
+		reviewItemCount: reviewState.reviewItemCount,
+		pendingReviewItemCount: reviewState.pendingReviewItemCount,
+		approvedReviewItemCount: reviewState.approvedReviewItemCount,
+		freshReviewPreSaveStatus: freshReviewPreSaveState.status,
+	} );
 
 	return {
 		status,
@@ -5753,6 +5938,11 @@ export function getDistributedEditingSaveButtonStateForSessionState(
 		canRefetchServerState,
 		canExportLocalUpdates,
 		hasProtectedLocalChanges,
+		localChangesState: stateVocabulary.localChangesState,
+		reviewCheckpointState: stateVocabulary.reviewCheckpointState,
+		authoritativePostState: stateVocabulary.authoritativePostState,
+		saveStateSummaryText: stateVocabulary.summaryText,
+		stateVocabulary,
 		hasAcceptedButUnconsumed,
 		hasAcceptedReviewApprovalProof,
 		hasAcceptedFreshReviewConsumeValidation,
@@ -5894,6 +6084,11 @@ export function getDistributedEditingSavePolicyStateForSessionState(
 		saveButtonAuthoritativePostUpdated: saveButton.authoritativePostUpdated,
 		saveButtonPendingServerConfirmation:
 			saveButton.pendingServerConfirmation,
+		saveButtonLocalChangesState: saveButton.localChangesState,
+		saveButtonReviewCheckpointState: saveButton.reviewCheckpointState,
+		saveButtonAuthoritativePostState: saveButton.authoritativePostState,
+		saveButtonStateSummaryText: saveButton.saveStateSummaryText,
+		saveButtonStateVocabulary: saveButton.stateVocabulary,
 		saveButtonDisabled: saveButton.disabled,
 		saveButtonBusy: saveButton.busy,
 		saveButtonActionKeys: saveButton.actionKeys,
