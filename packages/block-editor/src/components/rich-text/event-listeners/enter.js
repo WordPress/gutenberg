@@ -2,7 +2,18 @@
  * WordPress dependencies
  */
 import { ENTER } from '@wordpress/keycodes';
-import { insert, remove } from '@wordpress/rich-text';
+import {
+	insert,
+	remove,
+	privateApis as richTextPrivateApis,
+} from '@wordpress/rich-text';
+
+/**
+ * Internal dependencies
+ */
+import { unlock } from '../../../lock-unlock';
+
+const { subscribeSharedListener } = unlock( richTextPrivateApis );
 
 export default ( props ) => ( element ) => {
 	function onKeyDownDeprecated( event ) {
@@ -75,10 +86,14 @@ export default ( props ) => ( element ) => {
 
 	// Attach the listener to the window so parent elements have the chance to
 	// prevent the default behavior.
-	defaultView.addEventListener( 'keydown', onKeyDown );
+	const unsubscribeKeyDown = subscribeSharedListener(
+		defaultView,
+		'keydown',
+		onKeyDown
+	);
 	element.addEventListener( 'keydown', onKeyDownDeprecated );
 	return () => {
-		defaultView.removeEventListener( 'keydown', onKeyDown );
+		unsubscribeKeyDown();
 		element.removeEventListener( 'keydown', onKeyDownDeprecated );
 	};
 };

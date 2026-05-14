@@ -2,7 +2,12 @@
  * WordPress dependencies
  */
 import { pasteHandler } from '@wordpress/blocks';
-import { isEmpty, insert, create } from '@wordpress/rich-text';
+import {
+	isEmpty,
+	insert,
+	create,
+	privateApis as richTextPrivateApis,
+} from '@wordpress/rich-text';
 import { isURL } from '@wordpress/url';
 
 /**
@@ -11,6 +16,9 @@ import { isURL } from '@wordpress/url';
 import { store as blockEditorStore } from '../../../store';
 import { addActiveFormats } from '../utils';
 import { getPasteEventData } from '../../../utils/pasting';
+import { unlock } from '../../../lock-unlock';
+
+const { subscribeSharedListener } = unlock( richTextPrivateApis );
 
 /** @typedef {import('@wordpress/rich-text').RichTextValue} RichTextValue */
 
@@ -141,8 +149,5 @@ export default ( props ) => ( element ) => {
 
 	// Attach the listener to the window so parent elements have the chance to
 	// prevent the default behavior.
-	defaultView.addEventListener( 'paste', _onPaste );
-	return () => {
-		defaultView.removeEventListener( 'paste', _onPaste );
-	};
+	return subscribeSharedListener( defaultView, 'paste', _onPaste );
 };
