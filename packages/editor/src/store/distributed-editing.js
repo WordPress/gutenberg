@@ -291,6 +291,9 @@ export const DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS = Object.freeze( {
 export const DISTRIBUTED_EDITING_LOCAL_UPDATES_EXPORT_FORMAT =
 	'wp/de-rtc-local-updates';
 
+export const DISTRIBUTED_EDITING_REVIEW_APPROVAL_PROOF_ENVELOPE_TYPE =
+	'field_based_review_approval_proof';
+
 /**
  * Stable local-updates import statuses for cross-user handoff payloads.
  */
@@ -908,6 +911,10 @@ export function getDistributedEditingLocalUpdatesExportPayload( {
 } = {} ) {
 	const normalizedSessionState =
 		normalizeDistributedEditingSessionState( sessionState );
+	const acceptedReviewApprovalProof =
+		getDistributedEditingAcceptedReviewApprovalProofForRetrySaveRequest(
+			normalizedSessionState
+		);
 
 	return {
 		version: 1,
@@ -920,9 +927,21 @@ export function getDistributedEditingLocalUpdatesExportPayload( {
 			typeof editedPostContent === 'string' ? editedPostContent : '',
 		pendingChangeCount: normalizedSessionState.pendingChangeCount,
 		acceptedReviewApprovalProof:
-			getDistributedEditingAcceptedReviewApprovalProofForRetrySaveRequest(
-				normalizedSessionState
+			getDistributedEditingReviewApprovalProofEnvelope(
+				acceptedReviewApprovalProof
 			),
+	};
+}
+
+function getDistributedEditingReviewApprovalProofEnvelope( proof ) {
+	if ( ! proof ) {
+		return null;
+	}
+
+	return {
+		proof_envelope_type:
+			DISTRIBUTED_EDITING_REVIEW_APPROVAL_PROOF_ENVELOPE_TYPE,
+		proof,
 	};
 }
 
@@ -1004,7 +1023,9 @@ function getAcceptedReviewApprovalProofFromLocalUpdatesImportPayload(
 		return proofOrEnvelope;
 	}
 
-	if ( envelopeType !== 'field_based_review_approval_proof' ) {
+	if (
+		envelopeType !== DISTRIBUTED_EDITING_REVIEW_APPROVAL_PROOF_ENVELOPE_TYPE
+	) {
 		return {};
 	}
 

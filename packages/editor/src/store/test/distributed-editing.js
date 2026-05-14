@@ -17,6 +17,7 @@ import {
 	DISTRIBUTED_EDITING_NOTICE_IDS,
 	DISTRIBUTED_EDITING_NOTICE_KINDS,
 	DISTRIBUTED_EDITING_REASON_CODES,
+	DISTRIBUTED_EDITING_REVIEW_APPROVAL_PROOF_ENVELOPE_TYPE,
 	DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES,
 	DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_STATUSES,
 	DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS,
@@ -3348,13 +3349,17 @@ describe( 'distributed editing session state', () => {
 		expect( payload.distributedEditingSessionState ).toBeUndefined();
 		expect( payload.pendingChangeCount ).toBe( 1 );
 		expect( payload.acceptedReviewApprovalProof ).toMatchObject( {
-			postId: '44',
-			postType: 'post',
-			serverVersion: '12',
-			rebasedFromVersion: '7',
-			proofSignature,
-			rawContentIncluded: false,
-			exposesRawContent: false,
+			proof_envelope_type:
+				DISTRIBUTED_EDITING_REVIEW_APPROVAL_PROOF_ENVELOPE_TYPE,
+			proof: {
+				postId: '44',
+				postType: 'post',
+				serverVersion: '12',
+				rebasedFromVersion: '7',
+				proofSignature,
+				rawContentIncluded: false,
+				exposesRawContent: false,
+			},
 		} );
 		expect(
 			JSON.stringify( payload.acceptedReviewApprovalProof )
@@ -3445,6 +3450,30 @@ describe( 'distributed editing session state', () => {
 				clientBaseVersion: '12',
 				acceptedProofServerVersion: '12',
 				rebasedFromVersion: '7',
+			},
+		} );
+
+		expect(
+			getDistributedEditingLocalUpdatesImportResult( {
+				payload: {
+					...payload,
+					acceptedReviewApprovalProof:
+						payload.acceptedReviewApprovalProof.proof,
+				},
+				currentPost: {
+					id: 44,
+					type: 'post',
+				},
+				computedPostContentHash: proposedPostContentHash,
+				now: 1893456100,
+			} )
+		).toMatchObject( {
+			status: DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_STATUSES.IMPORTED_FOR_RETRY_SAVE,
+			hasAcceptedReviewApprovalProof: true,
+			acceptedReviewApprovalProof: {
+				postId: '44',
+				postType: 'post',
+				proofSignature,
 			},
 		} );
 	} );
@@ -3564,7 +3593,10 @@ describe( 'distributed editing session state', () => {
 					...validPayload,
 					acceptedReviewApprovalProof: {
 						...validPayload.acceptedReviewApprovalProof,
-						expiresAt: '1893456000',
+						proof: {
+							...validPayload.acceptedReviewApprovalProof.proof,
+							expiresAt: '1893456000',
+						},
 					},
 				},
 				currentPost: {
@@ -3577,6 +3609,28 @@ describe( 'distributed editing session state', () => {
 		).toMatchObject( {
 			status: DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_STATUSES.BLOCKED,
 			reason: DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.EXPIRED_REVIEW_APPROVAL_PROOF,
+			hasPostContent: false,
+			mutatesEditorContent: false,
+		} );
+
+		expect(
+			getDistributedEditingLocalUpdatesImportResult( {
+				payload: {
+					...validPayload,
+					acceptedReviewApprovalProof: {
+						proof_envelope_type: 'unsupported_proof_envelope',
+						proof: validPayload.acceptedReviewApprovalProof.proof,
+					},
+				},
+				currentPost: {
+					id: 44,
+					type: 'post',
+				},
+				computedPostContentHash: proposedPostContentHash,
+			} )
+		).toMatchObject( {
+			status: DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_STATUSES.BLOCKED,
+			reason: DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.MISSING_REVIEW_APPROVAL_PROOF,
 			hasPostContent: false,
 			mutatesEditorContent: false,
 		} );
