@@ -10,6 +10,7 @@
 -   `setEditorIntent` now surfaces mode transitions with a snackbar ('You're suggesting' / 'You're editing' / 'You're viewing') alongside the existing a11y announcement.
 -   Suggestions: introduce a per-attribute conflict check (`hasAttributeConflict`) and a `SuggestionSummary` renderer that replaces the post-`modified_gmt` staleness compare. Adds the `wp/suggestions` architecture doc and updates the `core/editor` data reference to cover the new selectors.
 -   Suggestions: surface Apply / Reject actions in the collaboration sidebar via a shared `useSuggestionDecision` hook. Note headers expose icon-only Apply / Reject buttons, the note body renders the suggestion summary plus the staleness confirmation dialog, and the e2e coverage for block notes and the intent switcher is extended to the new UI.
+-   Suggestions: replace the manual commit-bar with a background auto-save subsystem. Pending overlay edits flush as a `_wp_suggestion` note after a short idle window, and subsequent edits on the same block update the existing note rather than creating a new one — keeping the live block tree free of pending suggestion state.
 
 ## 14.48.1 (2026-06-16)
 
