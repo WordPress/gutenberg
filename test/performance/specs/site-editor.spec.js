@@ -95,14 +95,16 @@ test.describe( 'Site Editor Performance', () => {
 				const canvas = await perfUtils.getCanvas();
 				await canvas.locator( '.wp-block' ).first().waitFor();
 
+				// Capture timing metrics before `stopTracing()`, which
+				// blocks for the trace download/parse and would otherwise
+				// inflate `timeSinceResponseEnd` by seconds.
+				const loadingDurations = await metrics.getLoadingDurations();
+
 				// Stop tracing. Save just one representative sample.
 				await metrics.stopTracing(
 					i === Math.floor( iterations / 2 ) &&
 						'site-editor-first-block'
 				);
-
-				// Get the durations.
-				const loadingDurations = await metrics.getLoadingDurations();
 
 				// Save the results.
 				if ( i > throwaway ) {
