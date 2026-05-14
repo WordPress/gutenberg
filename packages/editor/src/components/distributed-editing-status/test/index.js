@@ -39,8 +39,10 @@ import {
 	DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES,
 	DISTRIBUTED_EDITING_RETRY_SAVE_HANDOFF_STATUSES,
 	DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS,
+	DISTRIBUTED_EDITING_RETRY_SAVE_REVIEW_APPROVAL_PROOF_STATUSES,
 	DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES,
 	DISTRIBUTED_EDITING_UNLOAD_WARNING_REASONS,
+	getDistributedEditingLocalUpdatesExportPayload,
 	getDistributedEditingNoticeDescriptorsForSessionState,
 	getDistributedEditingUnloadWarningStateForSessionState,
 } from '../../../store/distributed-editing';
@@ -155,6 +157,35 @@ afterEach( () => {
 	useDispatch.mockReset();
 	useSelect.mockReset();
 } );
+
+function expectClipboardExportPayload(
+	writeText,
+	{ currentPost, editedPostContent, sessionState }
+) {
+	const payload = JSON.parse( writeText.mock.calls[ 0 ][ 0 ] );
+
+	expect( payload ).toEqual(
+		getDistributedEditingLocalUpdatesExportPayload( {
+			currentPost,
+			editedPostContent,
+			sessionState,
+		} )
+	);
+	expect( payload ).toMatchObject( {
+		version: 1,
+		format: 'wp/de-rtc-local-updates',
+		post: {
+			id: currentPost.id,
+			type: currentPost.type,
+		},
+		postContent: editedPostContent,
+		pendingChangeCount: sessionState.pendingChangeCount,
+	} );
+	expect( payload ).toHaveProperty( 'acceptedReviewApprovalProof' );
+	expect( payload ).not.toHaveProperty( 'distributedEditingSessionState' );
+
+	return payload;
+}
 
 describe( 'getDistributedEditingStatusControlStates', () => {
 	it( 'returns copyable representative internal control states', () => {
@@ -835,6 +866,10 @@ describe( 'DistributedEditingStatus', () => {
 			DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.MISSING_REVIEW_APPROVAL_PROOF,
 			'Import blocked: the protected changes are missing accepted review proof. Nothing was imported, and local changes remain protected.',
 		],
+		[
+			DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.EXTRA_SESSION_STATE_OVEREXPOSED,
+			'Import blocked: this protected-changes payload exposes extra distributed editing session state. Nothing was imported, and local changes remain protected.',
+		],
 	] )(
 		'reports blocked local-updates import for %s without saving',
 		async ( reason, message ) => {
@@ -948,19 +983,17 @@ describe( 'DistributedEditingStatus', () => {
 		);
 
 		expect( writeText ).toHaveBeenCalledTimes( 1 );
-		expect( JSON.parse( writeText.mock.calls[ 0 ][ 0 ] ) ).toMatchObject( {
-			version: 1,
-			format: 'wp/de-rtc-local-updates',
-			post: {
-				id: 43,
-				type: 'post',
-			},
-			postContent:
+		expectClipboardExportPayload( writeText, {
+			currentPost: { id: 43, type: 'post' },
+			editedPostContent:
 				'<!-- wp:paragraph --><p>Saving update</p><!-- /wp:paragraph -->',
-			distributedEditingSessionState: {
+			sessionState: {
 				pendingChangeCount: 1,
-				retrySaveStatus: DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVING,
+				hasPendingChanges: true,
+				isAwaitingServerConfirmation: true,
 				canExportLocalUpdates: true,
+				mustOfferLocalCopy: true,
+				retrySaveStatus: DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVING,
 			},
 		} );
 		expect(
@@ -1068,20 +1101,20 @@ describe( 'DistributedEditingStatus', () => {
 		);
 
 		expect( writeText ).toHaveBeenCalledTimes( 1 );
-		expect( JSON.parse( writeText.mock.calls[ 0 ][ 0 ] ) ).toMatchObject( {
-			post: {
-				id: 44,
-				type: 'post',
-			},
-			postContent:
+		expectClipboardExportPayload( writeText, {
+			currentPost: { id: 44, type: 'post' },
+			editedPostContent:
 				'<!-- wp:paragraph --><p>Blocked update</p><!-- /wp:paragraph -->',
-			distributedEditingSessionState: {
+			sessionState: {
+				pendingChangeCount: 1,
+				hasPendingChanges: true,
+				isAwaitingServerConfirmation: true,
+				canExportLocalUpdates: true,
 				retrySaveStatus: DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVING,
 				retrySaveHandoffStatus:
 					DISTRIBUTED_EDITING_RETRY_SAVE_HANDOFF_STATUSES.RETRY_SAVE_BLOCKED,
 				retrySaveHandoffReason:
 					DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.RETRY_SAVE_IN_PROGRESS,
-				canExportLocalUpdates: true,
 			},
 		} );
 		expect(
@@ -1119,6 +1152,34 @@ describe( 'DistributedEditingStatus', () => {
 				retrySaveHandoffReason:
 					DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.RETRY_SUBMIT_PROOF_NOT_ACCEPTED,
 				retrySaveHandoffBlocksNormalSave: true,
+				retrySaveReviewApprovalAccepted: true,
+				retrySaveReviewApprovalProofStatus:
+					DISTRIBUTED_EDITING_RETRY_SAVE_REVIEW_APPROVAL_PROOF_STATUSES.ACCEPTED_FOR_RETRY_SAVE,
+				retrySaveReviewApprovalPostId: '42',
+				retrySaveReviewApprovalPostType: 'post',
+				retrySaveReviewApprovalReviewerUserId: '7',
+				retrySaveReviewApprovalLowPrivilegedSaverUserId: '5',
+				retrySaveReviewApprovalReviewStatus: 'approved',
+				retrySaveReviewApprovalApprovalStatus: 'approved',
+				retrySaveReviewApprovalReviewAction: 'approve_for_retry_save',
+				retrySaveReviewApprovalApprovalAction: 'carry_review_proof',
+				retrySaveReviewApprovalRequiredCapability: 'unfiltered_html',
+				retrySaveReviewApprovalServerVersion: '12',
+				retrySaveReviewApprovalPreviousServerVersion: '11',
+				retrySaveReviewApprovalRebasedFromVersion: '10',
+				retrySaveReviewApprovalProposedContentHash:
+					'approved-proposed-hash',
+				retrySaveReviewApprovalCandidateContentHash:
+					'approved-candidate-hash',
+				retrySaveReviewApprovalProofSignature: 'signed-proof',
+				retrySaveReviewApprovalIssuedAt: '1893456000',
+				retrySaveReviewApprovalExpiresAt: '1893456300',
+				retrySaveReviewApprovalSiteId: '1',
+				retrySaveReviewApprovalSiteUrl: 'http://example.test',
+				retrySaveReviewApprovalSavesPost: false,
+				retrySaveReviewApprovalMutatesPostContent: false,
+				retrySaveReviewApprovalCreatesRevision: false,
+				retrySaveReviewApprovalClaimsSaved: false,
 			},
 		} );
 
@@ -1131,24 +1192,62 @@ describe( 'DistributedEditingStatus', () => {
 		);
 
 		expect( writeText ).toHaveBeenCalledTimes( 1 );
-		expect( JSON.parse( writeText.mock.calls[ 0 ][ 0 ] ) ).toMatchObject( {
-			version: 1,
-			format: 'wp/de-rtc-local-updates',
-			post: {
-				id: 42,
-				type: 'post',
-			},
-			postContent:
+		const payload = expectClipboardExportPayload( writeText, {
+			currentPost: { id: 42, type: 'post' },
+			editedPostContent:
 				'<!-- wp:paragraph --><p>Local update</p><!-- /wp:paragraph -->',
-			distributedEditingSessionState: {
+			sessionState: {
 				pendingChangeCount: 1,
+				hasPendingChanges: true,
+				canExportLocalUpdates: true,
 				retrySaveHandoffStatus:
 					DISTRIBUTED_EDITING_RETRY_SAVE_HANDOFF_STATUSES.RETRY_SAVE_BLOCKED,
 				retrySaveHandoffReason:
 					DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.RETRY_SUBMIT_PROOF_NOT_ACCEPTED,
-				canExportLocalUpdates: true,
+				retrySaveHandoffBlocksNormalSave: true,
+				retrySaveReviewApprovalAccepted: true,
+				retrySaveReviewApprovalProofStatus:
+					DISTRIBUTED_EDITING_RETRY_SAVE_REVIEW_APPROVAL_PROOF_STATUSES.ACCEPTED_FOR_RETRY_SAVE,
+				retrySaveReviewApprovalPostId: '42',
+				retrySaveReviewApprovalPostType: 'post',
+				retrySaveReviewApprovalReviewerUserId: '7',
+				retrySaveReviewApprovalLowPrivilegedSaverUserId: '5',
+				retrySaveReviewApprovalReviewStatus: 'approved',
+				retrySaveReviewApprovalApprovalStatus: 'approved',
+				retrySaveReviewApprovalReviewAction: 'approve_for_retry_save',
+				retrySaveReviewApprovalApprovalAction: 'carry_review_proof',
+				retrySaveReviewApprovalRequiredCapability: 'unfiltered_html',
+				retrySaveReviewApprovalServerVersion: '12',
+				retrySaveReviewApprovalPreviousServerVersion: '11',
+				retrySaveReviewApprovalRebasedFromVersion: '10',
+				retrySaveReviewApprovalProposedContentHash:
+					'approved-proposed-hash',
+				retrySaveReviewApprovalCandidateContentHash:
+					'approved-candidate-hash',
+				retrySaveReviewApprovalProofSignature: 'signed-proof',
+				retrySaveReviewApprovalIssuedAt: '1893456000',
+				retrySaveReviewApprovalExpiresAt: '1893456300',
+				retrySaveReviewApprovalSiteId: '1',
+				retrySaveReviewApprovalSiteUrl: 'http://example.test',
+				retrySaveReviewApprovalSavesPost: false,
+				retrySaveReviewApprovalMutatesPostContent: false,
+				retrySaveReviewApprovalCreatesRevision: false,
+				retrySaveReviewApprovalClaimsSaved: false,
 			},
 		} );
+		expect( payload.acceptedReviewApprovalProof ).toMatchObject( {
+			postId: '42',
+			postType: 'post',
+			serverVersion: '12',
+			proposedPostContentHash: 'approved-proposed-hash',
+			candidatePostContentHash: 'approved-candidate-hash',
+			proofSignature: 'signed-proof',
+			rawContentIncluded: false,
+			claimsSaved: false,
+		} );
+		expect(
+			JSON.stringify( payload.acceptedReviewApprovalProof )
+		).not.toContain( 'Local update' );
 		expect(
 			actions.__experimentalRefreshDistributedEditingServerStateAfterStaleBase
 		).not.toHaveBeenCalled();
@@ -1295,14 +1394,24 @@ describe( 'DistributedEditingStatus', () => {
 		);
 
 		expect( writeText ).toHaveBeenCalledTimes( 1 );
-		expect( JSON.parse( writeText.mock.calls[ 0 ][ 0 ] ) ).toMatchObject( {
-			post: { id: 45, type: 'post' },
-			distributedEditingSessionState: {
+		expectClipboardExportPayload( writeText, {
+			currentPost: { id: 45, type: 'post' },
+			editedPostContent:
+				'<!-- wp:html --><script>window.localChange = true;</script><!-- /wp:html -->',
+			sessionState: {
 				disposition:
 					DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_UNFILTERED_HTML_REVIEW_REQUIRED,
+				reasonCode:
+					DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_UNFILTERED_HTML_WOULD_CHANGE_CONTENT,
+				pendingChangeCount: 1,
+				hasPendingChanges: true,
+				requiresServerStateRefetch: true,
+				requiresManualConflictResolution: true,
+				canExportLocalUpdates: true,
 				retrySaveStatus:
 					DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_UNFILTERED_HTML_REVIEW_REQUIRED,
-				canExportLocalUpdates: true,
+				retrySaveReason:
+					DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_UNFILTERED_HTML_WOULD_CHANGE_CONTENT,
 			},
 		} );
 		expect(

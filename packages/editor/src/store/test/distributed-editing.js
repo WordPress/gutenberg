@@ -3269,7 +3269,8 @@ describe( 'distributed editing session state', () => {
 			'format',
 			'post',
 			'postContent',
-			'distributedEditingSessionState',
+			'pendingChangeCount',
+			'acceptedReviewApprovalProof',
 		] );
 		expect( payload ).toMatchObject( {
 			version: 1,
@@ -3279,26 +3280,15 @@ describe( 'distributed editing session state', () => {
 				type: 'post',
 			},
 			postContent: editedPostContent,
-			distributedEditingSessionState: {
-				clientBaseVersion: 'server-v4',
-				serverVersion: 'server-v8',
-				clientBaseContent,
-				refetchedServerContent,
-				pendingChangeCount: 2,
-				hasPendingChanges: true,
-				isAwaitingServerConfirmation: true,
-				requiresServerStateRefetch: false,
-				refetchedServerState: true,
-				mustOfferLocalCopy: true,
-				canExportLocalUpdates: true,
-				retrySaveHandoffStatus:
-					DISTRIBUTED_EDITING_RETRY_SAVE_HANDOFF_STATUSES.RETRY_SAVE_BLOCKED,
-				retrySaveHandoffReason:
-					DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.SERVER_STATE_REFETCH_REQUIRED,
-				retrySaveHandoffBlocksNormalSave: true,
-			},
+			pendingChangeCount: 2,
+			acceptedReviewApprovalProof: null,
 		} );
 		expect( Object.keys( payload.post ) ).toEqual( [ 'id', 'type' ] );
+		expect( payload.distributedEditingSessionState ).toBeUndefined();
+		expect( JSON.stringify( payload ) ).not.toContain( clientBaseContent );
+		expect( JSON.stringify( payload ) ).not.toContain(
+			refetchedServerContent
+		);
 	} );
 
 	it( 'imports a signed local-updates payload into retry-save-ready state', () => {
@@ -3355,6 +3345,20 @@ describe( 'distributed editing session state', () => {
 				],
 			},
 		} );
+		expect( payload.distributedEditingSessionState ).toBeUndefined();
+		expect( payload.pendingChangeCount ).toBe( 1 );
+		expect( payload.acceptedReviewApprovalProof ).toMatchObject( {
+			postId: '44',
+			postType: 'post',
+			serverVersion: '12',
+			rebasedFromVersion: '7',
+			proofSignature,
+			rawContentIncluded: false,
+			exposesRawContent: false,
+		} );
+		expect(
+			JSON.stringify( payload.acceptedReviewApprovalProof )
+		).not.toContain( '<script>' );
 		const result = getDistributedEditingLocalUpdatesImportResult( {
 			payload,
 			currentPost: {
@@ -3538,8 +3542,29 @@ describe( 'distributed editing session state', () => {
 				payload: {
 					...validPayload,
 					distributedEditingSessionState: {
-						...validPayload.distributedEditingSessionState,
-						retrySaveReviewApprovalExpiresAt: '1893456000',
+						serverVersion: '12',
+					},
+				},
+				currentPost: {
+					id: 44,
+					type: 'post',
+				},
+				computedPostContentHash: proposedPostContentHash,
+			} )
+		).toMatchObject( {
+			status: DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_STATUSES.BLOCKED,
+			reason: DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.EXTRA_SESSION_STATE_OVEREXPOSED,
+			hasPostContent: false,
+			mutatesEditorContent: false,
+		} );
+
+		expect(
+			getDistributedEditingLocalUpdatesImportResult( {
+				payload: {
+					...validPayload,
+					acceptedReviewApprovalProof: {
+						...validPayload.acceptedReviewApprovalProof,
+						expiresAt: '1893456000',
 					},
 				},
 				currentPost: {

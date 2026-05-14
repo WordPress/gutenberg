@@ -314,6 +314,7 @@ export const DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS = Object.freeze( {
 	POST_CONTENT_HASH_MISMATCH: 'post_content_hash_mismatch',
 	MISSING_REVIEW_APPROVAL_PROOF: 'missing_review_approval_proof',
 	EXPIRED_REVIEW_APPROVAL_PROOF: 'expired_review_approval_proof',
+	EXTRA_SESSION_STATE_OVEREXPOSED: 'extra_session_state_overexposed',
 } );
 
 const VALID_REASON_CODES = new Set(
@@ -905,6 +906,9 @@ export function getDistributedEditingLocalUpdatesExportPayload( {
 	editedPostContent = '',
 	sessionState = {},
 } = {} ) {
+	const normalizedSessionState =
+		normalizeDistributedEditingSessionState( sessionState );
+
 	return {
 		version: 1,
 		format: DISTRIBUTED_EDITING_LOCAL_UPDATES_EXPORT_FORMAT,
@@ -914,9 +918,97 @@ export function getDistributedEditingLocalUpdatesExportPayload( {
 		},
 		postContent:
 			typeof editedPostContent === 'string' ? editedPostContent : '',
-		distributedEditingSessionState:
-			normalizeDistributedEditingSessionState( sessionState ),
+		pendingChangeCount: normalizedSessionState.pendingChangeCount,
+		acceptedReviewApprovalProof:
+			getDistributedEditingAcceptedReviewApprovalProofForRetrySaveRequest(
+				normalizedSessionState
+			),
 	};
+}
+
+function exposesDistributedEditingSessionState( payload ) {
+	return [
+		'distributedEditingSessionState',
+		'distributed_editing_session_state',
+		'sessionState',
+		'session_state',
+		'normalizedSessionState',
+		'normalized_session_state',
+		'editorState',
+		'editor_state',
+	].some( ( key ) => hasOwnProperty( payload, key ) );
+}
+
+function getDistributedEditingSessionStateFromLocalUpdatesImportPayload(
+	payload
+) {
+	const pendingChangeCount = normalizeCount(
+		getFirstDefined(
+			payload.pendingChangeCount,
+			payload.pending_change_count
+		)
+	);
+	const acceptedReviewApprovalProof =
+		getAcceptedReviewApprovalProofFromLocalUpdatesImportPayload( payload );
+
+	if (
+		! acceptedReviewApprovalProof ||
+		Object.keys( acceptedReviewApprovalProof ).length === 0
+	) {
+		return normalizeDistributedEditingSessionState( {
+			pendingChangeCount,
+		} );
+	}
+
+	const proofFields =
+		getRetrySaveReviewApprovalProofFieldsFromResponseOrError(
+			{
+				acceptedReviewApprovalProof,
+			},
+			{},
+			{}
+		);
+
+	return normalizeDistributedEditingSessionState( {
+		pendingChangeCount,
+		serverVersion: proofFields.retrySaveReviewApprovalServerVersion,
+		clientBaseVersion:
+			proofFields.retrySaveReviewApprovalRebasedFromVersion,
+		...proofFields,
+		retrySaveReviewApprovalProofStatus:
+			DISTRIBUTED_EDITING_RETRY_SAVE_REVIEW_APPROVAL_PROOF_STATUSES.ACCEPTED_FOR_RETRY_SAVE,
+		retrySaveReviewApprovalAccepted: true,
+	} );
+}
+
+function getAcceptedReviewApprovalProofFromLocalUpdatesImportPayload(
+	payload
+) {
+	const proofOrEnvelope = normalizeObject(
+		getFirstDefined(
+			payload.acceptedReviewApprovalProof,
+			payload.accepted_review_approval_proof,
+			payload.reviewApprovalProof,
+			payload.review_approval_proof,
+			payload.proof
+		)
+	);
+	const envelopeType = normalizeNullableString(
+		getFirstDefined(
+			proofOrEnvelope.proofEnvelopeType,
+			proofOrEnvelope.proof_envelope_type
+		)
+	);
+
+	if ( ! envelopeType ) {
+		return proofOrEnvelope;
+	}
+
+	if ( envelopeType !== 'field_based_review_approval_proof' ) {
+		return {};
+	}
+
+	return normalizeObject( proofOrEnvelope.proof );
 }
 
 /**
@@ -1018,11 +1110,20 @@ export function getDistributedEditingLocalUpdatesImportResult( {
 		);
 	}
 
-	const payloadSessionState = normalizeObject(
-		normalizedPayload.distributedEditingSessionState
-	);
+	if ( exposesDistributedEditingSessionState( normalizedPayload ) ) {
+		return createLocalUpdatesImportBlockedResult(
+			DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.EXTRA_SESSION_STATE_OVEREXPOSED,
+			{
+				postId: payloadPostId,
+				postType: payloadPostType,
+			}
+		);
+	}
+
 	const importedSessionState =
-		normalizeDistributedEditingSessionState( payloadSessionState );
+		getDistributedEditingSessionStateFromLocalUpdatesImportPayload(
+			normalizedPayload
+		);
 	const acceptedReviewApprovalProof =
 		getDistributedEditingAcceptedReviewApprovalProofForRetrySaveRequest(
 			importedSessionState
@@ -5380,6 +5481,14 @@ function normalizeObject( value ) {
 	return value && typeof value === 'object' && ! Array.isArray( value )
 		? value
 		: {};
+}
+
+function hasOwnProperty( value, key ) {
+	return Boolean(
+		value &&
+			typeof value === 'object' &&
+			Object.prototype.hasOwnProperty.call( value, key )
+	);
 }
 
 function getFirstDefined( ...values ) {

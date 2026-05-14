@@ -27,6 +27,7 @@ import {
 	DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS,
 	DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES,
 	DISTRIBUTED_EDITING_UNLOAD_WARNING_REASONS,
+	getDistributedEditingLocalUpdatesExportPayload,
 	normalizeDistributedEditingSessionState,
 } from '../../store/distributed-editing';
 
@@ -1220,17 +1221,11 @@ async function copyDistributedEditingLocalUpdatesToClipboard( {
 		return null;
 	}
 
-	const payload = {
-		version: 1,
-		format: 'wp/de-rtc-local-updates',
-		post: {
-			id: currentPost?.id ?? null,
-			type: currentPost?.type ?? null,
-		},
-		postContent: editedPostContent ?? '',
-		distributedEditingSessionState:
-			normalizeDistributedEditingSessionState( sessionState ),
-	};
+	const payload = getDistributedEditingLocalUpdatesExportPayload( {
+		currentPost,
+		editedPostContent,
+		sessionState,
+	} );
 	const text = JSON.stringify( payload );
 
 	await clipboard.writeText( text );
@@ -1547,6 +1542,10 @@ function getLocalUpdatesImportBlockedMessage( reason ) {
 		case DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.EXPIRED_REVIEW_APPROVAL_PROOF:
 			return __(
 				'Import blocked: the accepted review proof for these protected changes has expired. Nothing was imported, and local changes remain protected.'
+			);
+		case DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.EXTRA_SESSION_STATE_OVEREXPOSED:
+			return __(
+				'Import blocked: this protected-changes payload exposes extra distributed editing session state. Nothing was imported, and local changes remain protected.'
 			);
 	}
 
