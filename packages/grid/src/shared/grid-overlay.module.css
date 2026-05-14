@@ -1,0 +1,55 @@
+.overlay {
+	position: absolute;
+	inset: 0;
+	display: grid;
+	pointer-events: none;
+	opacity: 0;
+	visibility: hidden;
+	transition:
+		opacity 200ms ease,
+		visibility 0s linear 200ms;
+	background-image:
+		repeating-linear-gradient(135deg, var(--wp-grid-overlay-stripe-color, color-mix(in srgb, var(--wpds-color-bg-surface-info) 15%, transparent))
+		0 6px, transparent 6px 12px);
+}
+
+.overlay.is-active {
+	opacity: 1;
+	visibility: visible;
+	transition:
+		opacity 200ms ease,
+		visibility 0s linear 0s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.overlay {
+		transition: none;
+	}
+}
+
+.column {
+	outline:
+		1px dashed
+		var(--wp-grid-overlay-track-color, var(--wpds-color-stroke-surface-neutral));
+	background-color: var(--wp-grid-overlay-column-fill, color-mix(in srgb, var(--wpds-color-bg-surface-info) 10%, transparent));
+	position: relative;
+}
+
+/*
+ * Dashed row dividers framing every row. A `::after` pseudo-element
+ * tiles two 1px strokes per row (top of the row area and bottom of
+ * the row area, leaving the gap clear between them) and is masked
+ * with a horizontal dash pattern so the strokes render dashed instead
+ * of solid.
+ */
+.has-rows .column::after {
+	content: "";
+	position: absolute;
+	inset: 0;
+	pointer-events: none;
+	background-image: linear-gradient(to bottom, var(--wp-grid-overlay-track-color, var(--wpds-color-stroke-surface-neutral)) 0, var(--wp-grid-overlay-track-color, var(--wpds-color-stroke-surface-neutral)) 1px, transparent 1px, transparent calc(var(--wp-grid-overlay-row-height) - 1px), var(--wp-grid-overlay-track-color, var(--wpds-color-stroke-surface-neutral)) calc(var(--wp-grid-overlay-row-height) - 1px), var(--wp-grid-overlay-track-color, var(--wpds-color-stroke-surface-neutral)) var(--wp-grid-overlay-row-height), transparent var(--wp-grid-overlay-row-height), transparent var(--wp-grid-overlay-row-tile));
+	background-size: 100% var(--wp-grid-overlay-row-tile);
+	background-repeat: repeat;
+	mask-image: repeating-linear-gradient(to right, #000 0 4px, transparent 4px 8px);
+	-webkit-mask-image: repeating-linear-gradient(to right, #000 0 4px, transparent 4px 8px);
+}

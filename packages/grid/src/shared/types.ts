@@ -82,6 +82,46 @@ export interface DragPreviewRenderProps {
 }
 
 /**
+ * Props received by a custom grid overlay component. The overlay
+ * paints behind the tiles in edit mode to visualize the column tracks
+ * and (when `rowHeight` is defined) the row tracks. Receives a
+ * snapshot of the surface's resolved layout parameters so the visual
+ * can reproduce the tracks pixel-accurately without re-deriving them.
+ *
+ * Reused by both `DashboardGrid` and `DashboardLanes`: lanes pass no
+ * `rowHeight` because heights are content-driven.
+ */
+export interface GridOverlayRenderProps {
+	/**
+	 * Number of column tracks in the active surface. In responsive
+	 * mode (`minColumnWidth`), this is the count derived from the
+	 * container width, not the prop value.
+	 */
+	columns: number;
+
+	/**
+	 * Gap between tracks in pixels (`spacing * 4`).
+	 */
+	gapPx: number;
+
+	/**
+	 * Row height in pixels for surfaces with uniform rows. Omitted on
+	 * surfaces with content-driven heights (lanes) or when row height
+	 * is `'auto'`; in those cases the overlay paints columns only.
+	 */
+	rowHeight?: number;
+
+	/**
+	 * Whether the overlay should be visible. Surfaces render the
+	 * overlay even when `false` so the implementation can transition
+	 * opacity in and out; while `false`, the overlay must hide itself
+	 * (and ideally release paint cost via `visibility: hidden` or an
+	 * equivalent).
+	 */
+	isActive: boolean;
+}
+
+/**
  * Props for the internal `<ResizeHandle />` wrapper.
  */
 export interface ResizeHandleProps {

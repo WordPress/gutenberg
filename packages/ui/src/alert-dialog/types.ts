@@ -1,11 +1,9 @@
 import type { AlertDialog as _AlertDialog } from '@base-ui/react/alert-dialog';
-import type { ComponentPropsWithoutRef, ReactElement, ReactNode } from 'react';
+import type { ReactElement, ReactNode } from 'react';
 
 import type { ComponentProps } from '../utils/types';
 
-export type PortalProps = ComponentPropsWithoutRef<
-	typeof _AlertDialog.Portal
->;
+export type PortalProps = ComponentProps< typeof _AlertDialog.Portal >;
 
 /**
  * The return type of `onConfirm`. Return `void` (or nothing) to auto-close

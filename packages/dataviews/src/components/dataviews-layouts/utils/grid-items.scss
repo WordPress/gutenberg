@@ -1,12 +1,10 @@
-@use "@wordpress/base-styles/variables" as *;
-
 .dataviews-view-grid-items {
 	margin-bottom: auto;
 	display: grid;
-	gap: $grid-unit-30;
+	gap: var(--wpds-dimension-gap-xl);
 	grid-template-rows: max-content;
 	grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
-	padding: 0 $grid-unit-30 $grid-unit-30;
+	padding: 0 var(--wpds-dimension-padding-2xl) var(--wpds-dimension-padding-2xl);
 	container-type: inline-size;
 
 	@media not (prefers-reduced-motion) {
@@ -14,10 +12,10 @@
 	}
 
 	&.has-compact-density {
-		gap: $grid-unit-20;
+		gap: var(--wpds-dimension-gap-lg);
 	}
 
 	&.has-comfortable-density {
-		gap: $grid-unit-40;
+		gap: var(--wpds-dimension-gap-2xl);
 	}
 }

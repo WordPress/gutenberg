@@ -2,6 +2,7 @@
 	display: grid-lanes;
 	column-gap: var(--wp-grid-lane-gap, 0);
 	row-gap: var(--wp-grid-lane-gap, 0);
+	position: relative;
 }
 
 /*

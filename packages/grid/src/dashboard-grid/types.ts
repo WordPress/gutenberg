@@ -3,6 +3,7 @@
  */
 import type {
 	DragPreviewRenderProps,
+	GridOverlayRenderProps,
 	ResizeDelta,
 	ResizeHandleRenderProps,
 } from '../shared/types';
@@ -209,6 +210,17 @@ interface BaseDashboardGridProps
 	 * properties documented in the README.
 	 */
 	renderDragPreview?: React.ComponentType< DragPreviewRenderProps >;
+
+	/**
+	 * Override the default edit-mode overlay (diagonal stripes plus
+	 * dashed column and row tracks) with a custom component. The grid
+	 * supplies the resolved column count, gap, and row height; the
+	 * consumer is responsible for the visual.
+	 *
+	 * The overlay only renders when `editMode` is true. When omitted,
+	 * the package's default visual is used.
+	 */
+	renderGridOverlay?: React.ComponentType< GridOverlayRenderProps >;
 }
 
 interface FixedDashboardGridProps extends BaseDashboardGridProps {

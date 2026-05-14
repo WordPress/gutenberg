@@ -6,18 +6,20 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { createRequire } from 'module';
 
 /**
  * Internal dependencies
  */
-import {
+const require = createRequire( import.meta.url );
+const {
 	checkDeps,
 	collectDeps,
 	readPackageJson,
-} from '../packages/scripts/utils/license.js';
+} = require( '@wordpress/scripts/utils/license.js' );
 
 const __dirname = path.dirname( fileURLToPath( import.meta.url ) );
-const ROOT_DIR = path.resolve( __dirname, '..' );
+const ROOT_DIR = path.resolve( __dirname, '../..' );
 
 /*
  * This script checks licenses for production dependencies of packages that are
@@ -35,6 +37,7 @@ const depsMap = new Map();
 const visited = new Set();
 
 // Find all workspace packages with wpScript or wpScriptModuleExports
+
 for ( const dir of fs.readdirSync( packagesDir ) ) {
 	const pkgDir = path.join( packagesDir, dir );
 	const pkgJson = readPackageJson( pkgDir );

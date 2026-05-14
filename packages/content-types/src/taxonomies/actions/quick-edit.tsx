@@ -33,7 +33,8 @@ import {
 } from '../../utils/fields';
 import type { TaxonomyFormData } from '../types';
 import { serializeForSave } from '../utils';
-import { TAXONOMY_ENTITY } from '../../constants';
+import { useMaybeInvalidateContentTypeCache } from '../../utils/use-maybe-invalidate-content-type-cache';
+import { POST_TYPE_ENTITY, TAXONOMY_ENTITY } from '../../constants';
 
 function QuickEditTaxonomyModal( {
 	items,
@@ -66,6 +67,7 @@ function QuickEditTaxonomyModal( {
 	const { saveEntityRecord } = useDispatch( coreStore );
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
+	const maybeInvalidateCache = useMaybeInvalidateContentTypeCache();
 
 	async function onSave() {
 		if ( isSaving || ! isValid ) {
@@ -86,6 +88,11 @@ function QuickEditTaxonomyModal( {
 					data.title.raw
 				),
 				{ type: 'snackbar' }
+			);
+			maybeInvalidateCache(
+				item.config.object_type,
+				data.config.object_type,
+				POST_TYPE_ENTITY
 			);
 			closeModal?.();
 		} catch ( error: any ) {
