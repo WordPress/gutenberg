@@ -1000,6 +1000,18 @@ _Returns_
 
 -   `boolean`: Whether the editor setting enables retry-save handoff.
 
+### isDistributedEditingRiskyBlockReviewEnabled
+
+Returns true when WordPress enabled the Distributed Editing risky-block review Save routing for the current post editor.
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+
+_Returns_
+
+-   `boolean`: Whether the editor setting enables risky-block review.
+
 ### isEditedPostAutosaveable
 
 Returns true if the post can be autosaved, or false otherwise.
@@ -1400,6 +1412,21 @@ _Parameters_
 _Returns_
 
 -   `boolean`: Whether savePost should use the retry-save handoff.
+
+### shouldUseDistributedEditingRiskyBlockReviewForSavePost
+
+Returns true when the current editor should route unresolved risky-block review saves into the Distributed Editing pre-publish review surface.
+
+Explicit test/spike options override the editor setting. Autosave and preview saves stay out of this human review path.
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+-   _options_ `Object`: Save options.
+
+_Returns_
+
+-   `boolean`: Whether savePost should use risky-block review routing.
 
 ### shouldWarnBeforeLeavingDistributedEditingSession
 

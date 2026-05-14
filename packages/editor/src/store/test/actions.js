@@ -148,6 +148,142 @@ describe( 'Post actions', () => {
 		} );
 	} );
 
+	describe( '__experimentalMaybeRouteSavePostToDistributedEditingRiskyBlockReview()', () => {
+		it( 'opens pre-publish review and blocks normal save when the enabled Save policy requires review', async () => {
+			const registry = createRegistryWithStores();
+
+			registry.dispatch( editorStore ).updateEditorSettings( {
+				distributedEditing: {
+					enabled: true,
+				},
+			} );
+			registry
+				.dispatch( editorStore )
+				.setDistributedEditingSessionState( {
+					riskyBlockReviewStatus:
+						DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_STATUSES.REVIEW_REQUIRED,
+					riskyBlockReviewItems: [
+						{
+							id: 'risk-html-added',
+							blockClientId: 'block-risk-html-added',
+							reviewStatus:
+								DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES.PENDING_REVIEW,
+						},
+					],
+					riskyBlockReviewPendingCount: 1,
+					riskyBlockReviewPrePublishPanelRequired: true,
+				} );
+
+			const result = await registry
+				.dispatch( editorStore )
+				.__experimentalMaybeRouteSavePostToDistributedEditingRiskyBlockReview();
+
+			expect( result ).toMatchObject( {
+				status: 'pre_publish_review_opened',
+				reason: 'risky_block_review_required',
+				allowsNormalSaveFallback: false,
+				blocksNormalSavePost: true,
+				opensPrePublishReview: true,
+				opensPublishSidebar: true,
+				callsNormalSavePost: false,
+				callsRetrySaveEndpoint: false,
+				dispatchesNotice: false,
+				mutatesEditorContent: false,
+				changesPostLock: false,
+				claimsSaved: false,
+			} );
+			expect(
+				registry.select( editorStore ).isPublishSidebarOpened()
+			).toBe( true );
+		} );
+
+		it( 'falls back to normal save when Distributed Editing is disabled', async () => {
+			const registry = createRegistryWithStores();
+
+			registry.dispatch( editorStore ).updateEditorSettings( {
+				distributedEditing: {
+					enabled: false,
+				},
+			} );
+			registry
+				.dispatch( editorStore )
+				.setDistributedEditingSessionState( {
+					riskyBlockReviewStatus:
+						DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_STATUSES.REVIEW_REQUIRED,
+					riskyBlockReviewItems: [
+						{
+							id: 'risk-html-added',
+							reviewStatus:
+								DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES.PENDING_REVIEW,
+						},
+					],
+					riskyBlockReviewPendingCount: 1,
+					riskyBlockReviewPrePublishPanelRequired: true,
+				} );
+
+			await expect(
+				registry
+					.dispatch( editorStore )
+					.__experimentalMaybeRouteSavePostToDistributedEditingRiskyBlockReview()
+			).resolves.toMatchObject( {
+				status: 'normal_save_fallback',
+				allowsNormalSaveFallback: true,
+				blocksNormalSavePost: false,
+				opensPrePublishReview: false,
+			} );
+			expect(
+				registry.select( editorStore ).isPublishSidebarOpened()
+			).toBe( false );
+		} );
+
+		it( 'blocks normal save when stale review state requires refetch', async () => {
+			const registry = createRegistryWithStores();
+
+			registry.dispatch( editorStore ).updateEditorSettings( {
+				distributedEditing: {
+					enabled: true,
+				},
+			} );
+			registry
+				.dispatch( editorStore )
+				.setDistributedEditingSessionState( {
+					riskyBlockReviewStatus:
+						DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_STATUSES.STALE_AFTER_REVIEW,
+					riskyBlockReviewItems: [
+						{
+							id: 'risk-html-stale',
+							reviewStatus:
+								DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES.STALE_AFTER_REVIEW,
+						},
+					],
+					riskyBlockReviewRequiresServerStateRefetch: true,
+					riskyBlockReviewCurrentServerVersion: '26',
+					riskyBlockReviewReviewedServerVersion: '25',
+				} );
+
+			await expect(
+				registry
+					.dispatch( editorStore )
+					.__experimentalMaybeRouteSavePostToDistributedEditingRiskyBlockReview()
+			).resolves.toMatchObject( {
+				status: 'risky_block_review_refetch_required',
+				reason: 'risky_block_review_stale',
+				allowsNormalSaveFallback: false,
+				blocksNormalSavePost: true,
+				opensPrePublishReview: false,
+				requiresServerStateRefetch: true,
+				callsNormalSavePost: false,
+				callsRetrySaveEndpoint: false,
+				mutatesEditorContent: false,
+				changesPostLock: false,
+				claimsSaved: false,
+			} );
+			expect(
+				registry.select( editorStore ).isPublishSidebarOpened()
+			).toBe( false );
+		} );
+	} );
+
 	describe( '__experimentalFocusDistributedEditingRiskyBlockReviewItem()', () => {
 		it( 'returns a no-write block focus handoff for a review item', async () => {
 			const registry = createRegistryWithStores();
@@ -2193,6 +2329,170 @@ describe( 'Post actions', () => {
 				retrySaveAccepted: true,
 				canExportLocalUpdates: false,
 			} );
+		} );
+
+		it( 'routes setting-enabled savePost to risky-block review before normal save', async () => {
+			const originalPostContent =
+				'<!-- wp:paragraph --><p>Original.</p><!-- /wp:paragraph -->';
+			const editedPostContent =
+				'<!-- wp:html --><script>risky()</script><!-- /wp:html -->';
+			const post = {
+				id: postId,
+				type: 'post',
+				title: 'bar',
+				content: originalPostContent,
+				status: 'draft',
+			};
+			let apiCalls = 0;
+
+			apiFetch.setFetchHandler( async ( options ) => {
+				apiCalls++;
+				const method = getMethod( options );
+				const { path } = options;
+
+				throw {
+					code: 'unexpected_path',
+					message: `Unexpected path: ${ method } ${ path }`,
+				};
+			} );
+
+			const registry = createRegistryWithStores();
+
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', post );
+			registry.dispatch( editorStore ).setupEditor( post, {
+				content: editedPostContent,
+			} );
+			registry.dispatch( editorStore ).updateEditorSettings( {
+				distributedEditing: {
+					enabled: true,
+				},
+			} );
+			registry
+				.dispatch( editorStore )
+				.setDistributedEditingSessionState( {
+					riskyBlockReviewStatus:
+						DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_STATUSES.REVIEW_REQUIRED,
+					riskyBlockReviewItems: [
+						{
+							id: 'risk-html-added',
+							blockClientId: 'block-risk-html-added',
+							reviewStatus:
+								DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES.PENDING_REVIEW,
+						},
+					],
+					riskyBlockReviewPendingCount: 1,
+					riskyBlockReviewPrePublishPanelRequired: true,
+				} );
+
+			await expect(
+				registry.dispatch( editorStore ).savePost()
+			).resolves.toMatchObject( {
+				status: 'pre_publish_review_opened',
+				allowsNormalSaveFallback: false,
+				blocksNormalSavePost: true,
+				opensPrePublishReview: true,
+				callsNormalSavePost: false,
+				callsRetrySaveEndpoint: false,
+				mutatesEditorContent: false,
+				changesPostLock: false,
+				claimsSaved: false,
+			} );
+
+			expect( apiCalls ).toBe( 0 );
+			expect(
+				registry.select( editorStore ).isPublishSidebarOpened()
+			).toBe( true );
+			expect( registry.select( noticesStore ).getNotices() ).toEqual(
+				[]
+			);
+			expect( registry.select( editorStore ).isEditedPostDirty() ).toBe(
+				true
+			);
+			expect(
+				registry.select( editorStore ).getEditedPostContent()
+			).toBe( editedPostContent );
+		} );
+
+		it( 'lets savePost continue normally when risky-block review routing is setting-disabled', async () => {
+			const post = {
+				id: postId,
+				type: 'post',
+				title: 'bar',
+				content: 'bar',
+				excerpt: 'crackers',
+				status: 'draft',
+			};
+			let normalSaveCalls = 0;
+
+			apiFetch.setFetchHandler( async ( options ) => {
+				const method = getMethod( options );
+				const { path, data } = options;
+
+				if (
+					method === 'PUT' &&
+					path.startsWith( `/wp/v2/posts/${ postId }` )
+				) {
+					normalSaveCalls++;
+					return { ...post, ...data };
+				}
+
+				if (
+					method === 'GET' &&
+					path.startsWith( '/wp/v2/types/post' )
+				) {
+					return {
+						json: () => Promise.resolve( {} ),
+					};
+				}
+
+				throw {
+					code: 'unknown_path',
+					message: `Unknown path: ${ method } ${ path }`,
+				};
+			} );
+
+			const registry = createRegistryWithStores();
+
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', post );
+			registry.dispatch( editorStore ).setupEditor( post, {
+				content: 'new bar',
+			} );
+			registry.dispatch( editorStore ).updateEditorSettings( {
+				distributedEditing: {
+					enabled: false,
+				},
+			} );
+			registry
+				.dispatch( editorStore )
+				.setDistributedEditingSessionState( {
+					riskyBlockReviewStatus:
+						DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_STATUSES.REVIEW_REQUIRED,
+					riskyBlockReviewItems: [
+						{
+							id: 'risk-html-added',
+							reviewStatus:
+								DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES.PENDING_REVIEW,
+						},
+					],
+					riskyBlockReviewPendingCount: 1,
+					riskyBlockReviewPrePublishPanelRequired: true,
+				} );
+
+			await expect(
+				registry.dispatch( editorStore ).savePost()
+			).resolves.toBeUndefined();
+
+			expect( normalSaveCalls ).toBe( 1 );
+			expect(
+				registry.select( editorStore ).isPublishSidebarOpened()
+			).toBe( false );
+			expect( registry.select( editorStore ).isEditedPostDirty() ).toBe(
+				false
+			);
 		} );
 
 		it( 'routes setting-enabled savePost through guarded retry-save after retry-submit save preparation', async () => {

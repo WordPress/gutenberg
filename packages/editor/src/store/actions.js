@@ -400,6 +400,114 @@ export const __experimentalResolveDistributedEditingRiskyBlockReviewItem =
 	};
 
 /**
+ * Routes a normal Save attempt into the risky-block review surface when DE-RTC
+ * policy says unresolved HTML review must happen first. This is the Save-path
+ * handoff only: it does not save, retry-save, call REST, dispatch notices,
+ * mutate editor content, or change post locks.
+ *
+ * @param {Object} [options] Save options.
+ *
+ * @return {Function} Action thunk.
+ */
+export const __experimentalMaybeRouteSavePostToDistributedEditingRiskyBlockReview =
+
+		( options = {} ) =>
+		async ( { select, dispatch } ) => {
+			const savePolicy =
+				select.getDistributedEditingSavePolicyState?.() || {};
+			const shouldUseRiskyBlockReview =
+				select.shouldUseDistributedEditingRiskyBlockReviewForSavePost?.(
+					options
+				);
+
+			if ( ! shouldUseRiskyBlockReview ) {
+				return {
+					status: 'normal_save_fallback',
+					reason: null,
+					policy: savePolicy,
+					allowsNormalSaveFallback: true,
+					blocksNormalSavePost: false,
+					opensPrePublishReview: false,
+					requiresServerStateRefetch: false,
+					callsNormalSavePost: false,
+					callsRetrySaveEndpoint: false,
+					dispatchesNotice: false,
+					mutatesEditorContent: false,
+					mutatesPersistedPostContent: false,
+					changesPostLock: false,
+					claimsSaved: false,
+				};
+			}
+
+			if (
+				savePolicy.clickAction ===
+					DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.REFETCH_SERVER_STATE ||
+				savePolicy.requiresServerStateRefetch
+			) {
+				return {
+					status: 'risky_block_review_refetch_required',
+					reason: savePolicy.reason || 'risky_block_review_stale',
+					policy: savePolicy,
+					allowsNormalSaveFallback: false,
+					blocksNormalSavePost: true,
+					opensPrePublishReview: false,
+					requiresServerStateRefetch: true,
+					callsNormalSavePost: false,
+					callsRetrySaveEndpoint: false,
+					dispatchesNotice: false,
+					mutatesEditorContent: false,
+					mutatesPersistedPostContent: false,
+					changesPostLock: false,
+					claimsSaved: false,
+				};
+			}
+
+			if (
+				savePolicy.opensPrePublishReview ||
+				savePolicy.clickAction ===
+					DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.OPEN_PRE_PUBLISH_REVIEW
+			) {
+				const openResult =
+					await dispatch.__experimentalOpenDistributedEditingRiskyBlockReview();
+
+				return {
+					...openResult,
+					status: openResult.status || 'pre_publish_review_opened',
+					reason: savePolicy.reason || 'risky_block_review_required',
+					policy: savePolicy,
+					allowsNormalSaveFallback: false,
+					blocksNormalSavePost: true,
+					opensPrePublishReview: true,
+					requiresServerStateRefetch: false,
+					callsNormalSavePost: false,
+					callsRetrySaveEndpoint: false,
+					dispatchesNotice: false,
+					mutatesEditorContent: false,
+					mutatesPersistedPostContent: false,
+					changesPostLock: false,
+					claimsSaved: false,
+				};
+			}
+
+			return {
+				status: 'normal_save_fallback',
+				reason: null,
+				policy: savePolicy,
+				allowsNormalSaveFallback: true,
+				blocksNormalSavePost: false,
+				opensPrePublishReview: false,
+				requiresServerStateRefetch: false,
+				callsNormalSavePost: false,
+				callsRetrySaveEndpoint: false,
+				dispatchesNotice: false,
+				mutatesEditorContent: false,
+				mutatesPersistedPostContent: false,
+				changesPostLock: false,
+				claimsSaved: false,
+			};
+		};
+
+/**
  * Requests a Distributed Editing recovery dry run and stores inert status.
  *
  * The action does not save, apply recovery, replace post locks, dispatch
@@ -1090,6 +1198,15 @@ export const savePost =
 	async ( { select, dispatch, registry } ) => {
 		if ( ! select.isEditedPostSaveable() ) {
 			return;
+		}
+
+		const riskyBlockReviewRouting =
+			await dispatch.__experimentalMaybeRouteSavePostToDistributedEditingRiskyBlockReview(
+				options
+			);
+
+		if ( ! riskyBlockReviewRouting.allowsNormalSaveFallback ) {
+			return riskyBlockReviewRouting;
 		}
 
 		const content = select.getEditedPostContent();

@@ -222,11 +222,22 @@ export default compose( [
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
-		const { editPost, savePost } = dispatch( editorStore );
+		const {
+			__experimentalMaybeRouteSavePostToDistributedEditingRiskyBlockReview,
+			editPost,
+			savePost,
+		} = dispatch( editorStore );
 		return {
-			savePostStatus: ( status ) => {
+			savePostStatus: async ( status ) => {
+				const riskyBlockReviewRouting =
+					await __experimentalMaybeRouteSavePostToDistributedEditingRiskyBlockReview();
+
+				if ( ! riskyBlockReviewRouting.allowsNormalSaveFallback ) {
+					return riskyBlockReviewRouting;
+				}
+
 				editPost( { status }, { undoIgnore: true } );
-				savePost();
+				return savePost();
 			},
 		};
 	} ),

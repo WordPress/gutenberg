@@ -301,6 +301,56 @@ export function shouldUseDistributedEditingRetrySaveForSavePost(
 }
 
 /**
+ * Returns true when the current editor should route unresolved risky-block
+ * review saves into the Distributed Editing pre-publish review surface.
+ *
+ * Explicit test/spike options override the editor setting. Autosave and preview
+ * saves stay out of this human review path.
+ *
+ * @param {Object} state   Editor state.
+ * @param {Object} options Save options.
+ * @return {boolean} Whether savePost should use risky-block review routing.
+ */
+export function shouldUseDistributedEditingRiskyBlockReviewForSavePost(
+	state,
+	options = EMPTY_OBJECT
+) {
+	if ( options.isAutosave || options.isPreview ) {
+		return false;
+	}
+
+	if (
+		Object.prototype.hasOwnProperty.call(
+			options,
+			'__experimentalUseDistributedEditingRiskyBlockReview'
+		)
+	) {
+		return Boolean(
+			options.__experimentalUseDistributedEditingRiskyBlockReview
+		);
+	}
+
+	return isDistributedEditingRiskyBlockReviewEnabled( state );
+}
+
+/**
+ * Returns true when WordPress enabled the Distributed Editing risky-block
+ * review Save routing for the current post editor.
+ *
+ * @param {Object} state Editor state.
+ * @return {boolean} Whether the editor setting enables risky-block review.
+ */
+export function isDistributedEditingRiskyBlockReviewEnabled( state ) {
+	const distributedEditingSettings =
+		getEditorSettings( state ).distributedEditing || EMPTY_OBJECT;
+
+	return Boolean(
+		distributedEditingSettings.enabled &&
+			distributedEditingSettings.riskyBlockReview !== false
+	);
+}
+
+/**
  * Returns true when WordPress enabled the Distributed Editing retry-save
  * handoff for the current post editor.
  *
