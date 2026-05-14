@@ -9,6 +9,7 @@ import { getWpCompatOverlaySlot } from '@wordpress/ui';
  * Internal dependencies
  */
 import { WithWpCompatOverlaySlot } from './with-wp-compat-overlay-slot';
+import draggableStyles from '../../../packages/components/src/draggable/style.scss?inline';
 
 /**
  * Cross-document `Draggable` regression coverage: when the
@@ -41,7 +42,17 @@ export const InsideIframeWithCompatSlot = () => {
 	const [ iframeBody, setIframeBody ] = useState( null );
 
 	const updateIframeBody = () => {
-		setIframeBody( iframeRef.current?.contentDocument?.body ?? null );
+		const iframeDoc = iframeRef.current?.contentDocument;
+		if (
+			iframeDoc?.head &&
+			! iframeDoc.getElementById( 'draggable-iframe-styles' )
+		) {
+			const styleEl = iframeDoc.createElement( 'style' );
+			styleEl.id = 'draggable-iframe-styles';
+			styleEl.textContent = draggableStyles;
+			iframeDoc.head.appendChild( styleEl );
+		}
+		setIframeBody( iframeDoc?.body ?? null );
 	};
 
 	useEffect( updateIframeBody, [] );
@@ -60,7 +71,7 @@ export const InsideIframeWithCompatSlot = () => {
 					<code>
 						{ String(
 							typeof window !== 'undefined' &&
-								getWpCompatOverlaySlot() !== null
+								getWpCompatOverlaySlot() !== undefined
 						) }
 					</code>
 				</small>
@@ -69,7 +80,7 @@ export const InsideIframeWithCompatSlot = () => {
 				ref={ iframeRef }
 				title="Draggable iframe coordinate test"
 				onLoad={ updateIframeBody }
-				srcDoc='<!doctype html><html><body style="margin:0;"></body></html>'
+				srcDoc='<!doctype html><html><head></head><body style="margin:0;"></body></html>'
 				style={ {
 					border: '2px dashed #757575',
 					height: 240,
