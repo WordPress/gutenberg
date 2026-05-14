@@ -78,14 +78,14 @@ test.describe( 'Post Editor Performance', () => {
 				// Wait for the editor canvas iframe's first-contentful-paint
 				// entry. This is the moment the browser actually painted the
 				// block tree, without the DOM-probe-vs-paint race or polling
-				// jitter of a `.wp-block` locator wait.
-				await metrics.waitForEditorFirstContentfulPaint();
+				// jitter of a `.wp-block` locator wait. Throws if FCP fires
+				// before any `.wp-block` is in the iframe DOM.
+				const firstBlockTime = await metrics.getFirstBlockTime();
 
 				// Capture timing metrics before `stopTracing()`, which
 				// blocks for the trace download/parse and would otherwise
 				// inflate timings by seconds.
 				const loadingDurations = await metrics.getLoadingDurations();
-				const firstBlockTime = await metrics.getFirstBlockTime();
 
 				// Stop tracing. Save just one representative sample.
 				await metrics.stopTracing(

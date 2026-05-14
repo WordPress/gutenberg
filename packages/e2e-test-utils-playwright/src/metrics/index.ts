@@ -206,82 +206,69 @@ export class Metrics {
 	}
 
 	/**
-	 * Waits until the editor canvas iframe (or the top frame, when the
-	 * canvas is rendered inline) reports a `first-contentful-paint` entry.
-	 * Polls the iframe's `performance.getEntriesByName('first-contentful-paint')`
-	 * via `Page.waitForFunction`, so the wait completes the moment the
-	 * browser stamps FCP — not when the DOM contains a probe element.
+	 * Waits for the editor canvas iframe's first contentful paint and
+	 * returns its time, in milliseconds, from the top frame's response end.
 	 *
-	 * @return Promise resolving once FCP has fired in the editor canvas.
+	 * Event-driven via a `PerformanceObserver` inside the iframe whose
+	 * Promise is awaited directly through `frame.evaluate()` — no polling,
+	 * no DOM probe wait. Throws if FCP fires before any `.wp-block` is in
+	 * the iframe DOM, since the metric would otherwise silently measure a
+	 * paint of something other than the block tree (e.g., a placeholder).
+	 *
+	 * The two frames' clocks are bridged via their absolute `timeOrigin`s.
+	 *
+	 * @return Duration in ms.
 	 */
-	async waitForEditorFirstContentfulPaint(): Promise< void > {
-		await this.page.waitForFunction( () => {
-			const iframe = document.querySelector< HTMLIFrameElement >(
-				'iframe[name="editor-canvas"]'
-			);
-			const target = iframe?.contentWindow ?? window;
-			try {
-				return (
-					target.performance?.getEntriesByName(
-						'first-contentful-paint'
-					).length > 0
-				);
-			} catch {
-				return false;
-			}
-		} );
-	}
-
-	/**
-	 * Returns the time, in milliseconds, from when the navigation response
-	 * finished arriving until the editor canvas first painted contentful
-	 * pixels. Bridges the top frame's and the iframe's clocks via their
-	 * absolute `timeOrigin`s.
-	 *
-	 * Reads the browser's `firstContentfulPaint` paint-timing entry directly
-	 * rather than measuring `performance.now()` after `locator.waitFor()`
-	 * resolves, which removes Playwright's polling jitter and the JS event
-	 * loop delay between paint and the test runner's read.
-	 *
-	 * Falls back to the top frame's FCP when the editor canvas is rendered
-	 * inline (non-iframed).
-	 *
-	 * @return Duration in ms, or null when no paint entry is available.
-	 */
-	async getFirstBlockTime(): Promise< number | null > {
+	async getFirstBlockTime(): Promise< number > {
 		const topResponseEndAbs = await this.page.evaluate( () => {
 			const [ nav ] = performance.getEntriesByType(
 				'navigation'
 			) as PerformanceNavigationTiming[];
-			if ( ! nav ) {
-				return null;
-			}
 			return performance.timeOrigin + nav.responseEnd;
 		} );
-		if ( topResponseEndAbs === null ) {
-			return null;
+
+		const iframeHandle = await this.page.waitForSelector(
+			'iframe[name="editor-canvas"]'
+		);
+		const frame = await iframeHandle.contentFrame();
+		if ( ! frame ) {
+			throw new Error( 'Editor canvas iframe could not be entered.' );
 		}
-
-		const editorFrame = this.page
-			.frames()
-			.find( ( frame ) => frame.name() === 'editor-canvas' );
-		const targetFrame = editorFrame ?? this.page.mainFrame();
-
-		const fcpAbs: number | null = await targetFrame.evaluate( () => {
-			const fcp = (
-				performance.getEntriesByType( 'paint' ) as
-					| PerformancePaintTiming[]
-					| undefined
-			 )?.find( ( entry ) => entry.name === 'first-contentful-paint' );
-			if ( ! fcp ) {
-				return null;
-			}
-			return performance.timeOrigin + fcp.startTime;
-		} );
-		if ( fcpAbs === null ) {
-			return null;
-		}
-
+		const fcpAbs = await frame.evaluate(
+			() =>
+				new Promise< number >( ( resolve, reject ) => {
+					function emit( startTime: number ): void {
+						if ( ! document.querySelector( '.wp-block' ) ) {
+							reject(
+								new Error(
+									'Editor canvas FCP fired before any `.wp-block` was rendered — the metric would no longer measure the block paint moment.'
+								)
+							);
+							return;
+						}
+						resolve( performance.timeOrigin + startTime );
+					}
+					const existing = performance
+						.getEntriesByName( 'first-contentful-paint' )
+						.at( 0 );
+					if ( existing ) {
+						emit( existing.startTime );
+						return;
+					}
+					new PerformanceObserver( ( list, observer ) => {
+						const fcp = list
+							.getEntries()
+							.find(
+								( entry ) =>
+									entry.name === 'first-contentful-paint'
+							);
+						if ( fcp ) {
+							observer.disconnect();
+							emit( fcp.startTime );
+						}
+					} ).observe( { type: 'paint', buffered: true } );
+				} )
+		);
 		return fcpAbs - topResponseEndAbs;
 	}
 
