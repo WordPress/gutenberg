@@ -923,6 +923,12 @@ export function getDistributedEditingLocalUpdatesExportPayload( {
 		getDistributedEditingReviewApprovalProofEnvelope(
 			acceptedReviewApprovalProof
 		);
+	const proofServerVersion =
+		normalizedSessionState.retrySaveReviewApprovalServerVersion ||
+		normalizedSessionState.serverVersion;
+	const proofClientBaseVersion =
+		normalizedSessionState.retrySaveReviewApprovalRebasedFromVersion ||
+		normalizedSessionState.clientBaseVersion;
 
 	return {
 		version: 1,
@@ -934,6 +940,12 @@ export function getDistributedEditingLocalUpdatesExportPayload( {
 		postContent:
 			typeof editedPostContent === 'string' ? editedPostContent : '',
 		pendingChangeCount: normalizedSessionState.pendingChangeCount,
+		...( acceptedReviewApprovalProofEnvelope && proofServerVersion
+			? { serverVersion: proofServerVersion }
+			: {} ),
+		...( acceptedReviewApprovalProofEnvelope && proofClientBaseVersion
+			? { clientBaseVersion: proofClientBaseVersion }
+			: {} ),
 		acceptedReviewApprovalProof: acceptedReviewApprovalProofEnvelope,
 	};
 }

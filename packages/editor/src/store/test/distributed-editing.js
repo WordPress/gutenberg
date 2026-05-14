@@ -3603,8 +3603,12 @@ describe( 'distributed editing session state', () => {
 			'post',
 			'postContent',
 			'pendingChangeCount',
+			'serverVersion',
+			'clientBaseVersion',
 			'acceptedReviewApprovalProof',
 		] );
+		expect( payload.serverVersion ).toBe( '12' );
+		expect( payload.clientBaseVersion ).toBe( '7' );
 		expect( payload.acceptedReviewApprovalProof ).toEqual(
 			opaqueTokenEnvelope
 		);
@@ -3644,6 +3648,8 @@ describe( 'distributed editing session state', () => {
 			retrySaveReviewApprovalAccepted: true,
 			retrySaveReviewApprovalProofSignature: null,
 			retrySaveReviewApprovalReviewedBlockItems: [],
+			serverVersion: '12',
+			clientBaseVersion: '7',
 			localUpdatesImportHasAcceptedReviewApprovalProof: true,
 		} );
 
@@ -3654,9 +3660,6 @@ describe( 'distributed editing session state', () => {
 					postId: 44,
 					restBase: 'posts',
 					proposedPostContent: postContent,
-					clientBaseVersion: '12',
-					acceptedProofServerVersion: '12',
-					rebasedFromVersion: '7',
 				}
 			)
 		).toMatchObject( {
@@ -3665,6 +3668,9 @@ describe( 'distributed editing session state', () => {
 			hasAcceptedReviewApprovalProof: true,
 			acceptedReviewApprovalReviewedBlockItemCount: 0,
 			request: {
+				clientBaseVersion: '12',
+				acceptedProofServerVersion: '12',
+				rebasedFromVersion: '7',
 				acceptedReviewApprovalProof: opaqueTokenEnvelope,
 			},
 		} );
