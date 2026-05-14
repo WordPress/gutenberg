@@ -12,9 +12,12 @@ import {
 } from './hooks/use-post-editor-awareness-state';
 import { lock } from './lock-unlock';
 import { retrySyncConnection } from './sync';
+import {
+	SelectionType,
+	SelectionDirection,
+} from './utils/crdt-user-selections';
 
-export const privateApis = {};
-lock( privateApis, {
+const lockedApis = {
 	useEntityRecordsWithPermissions,
 	RECEIVE_INTERMEDIATE_RESULTS,
 	retrySyncConnection,
@@ -23,4 +26,11 @@ lock( privateApis, {
 	useOnCollaboratorJoin,
 	useOnCollaboratorLeave,
 	useOnPostSave,
-} );
+	SelectionType,
+	SelectionDirection,
+};
+
+export type CoreDataPrivateApis = typeof lockedApis;
+
+export const privateApis = {};
+lock( privateApis, lockedApis );
