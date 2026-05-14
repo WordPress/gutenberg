@@ -4827,6 +4827,10 @@ export function getDistributedEditingFreshReviewPreSaveStateForSessionState(
 		normalized.localUpdatesImportFreshReviewReviewerAuthorityStatus;
 	const requiresFreshReviewDueToAuthority =
 		normalized.localUpdatesImportFreshReviewRequiresFreshReviewDueToAuthority;
+	const hasRetrySaveSavedStateEvidence =
+		hasDistributedEditingRetrySaveSavedStateEvidenceForSessionState(
+			normalized
+		);
 	const reviewListStatus =
 		getDistributedEditingFreshReviewListStatusFromNormalizedState(
 			normalized
@@ -4852,12 +4856,7 @@ export function getDistributedEditingFreshReviewPreSaveStateForSessionState(
 	let clickAction = null;
 	let requiresServerStateRefetch = normalized.requiresServerStateRefetch;
 
-	if (
-		hasProtectedLocalChanges &&
-		hasFreshReviewRequest &&
-		normalized.retrySaveStatus !==
-			DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVED
-	) {
+	if ( hasProtectedLocalChanges && hasFreshReviewRequest ) {
 		if ( requiresFreshReviewDueToAuthority ) {
 			status =
 				DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_STATUSES.REVIEW_REQUIRED;
@@ -4871,10 +4870,11 @@ export function getDistributedEditingFreshReviewPreSaveStateForSessionState(
 			clickAction =
 				DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.OPEN_PRE_PUBLISH_REVIEW;
 		} else if (
-			handoffStatus ===
+			! hasRetrySaveSavedStateEvidence &&
+			( handoffStatus ===
 				DISTRIBUTED_EDITING_FRESH_REVIEW_RETRY_SAVE_HANDOFF_STATUSES.ACCEPTED_FOR_RETRY_SAVE ||
-			normalized.retrySaveFreshReviewConsumeValidationAccepted ||
-			normalized.retrySaveFreshReviewDecisionConsumptionValidated
+				normalized.retrySaveFreshReviewConsumeValidationAccepted ||
+				normalized.retrySaveFreshReviewDecisionConsumptionValidated )
 		) {
 			status =
 				DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_STATUSES.READY_FOR_GUARDED_RETRY_SAVE;
@@ -5757,22 +5757,7 @@ export function getDistributedEditingSaveButtonStateForSessionState(
 	let authoritativePostUpdated = false;
 	let pendingServerConfirmation = false;
 
-	if ( hasRetrySaveSavedStateEvidence ) {
-		status = DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES.RETRY_SAVE_CONFIRMED;
-		reason =
-			DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.RETRY_SAVE_ALREADY_CONFIRMED;
-		source = 'retry_save';
-		label = 'Retry save confirmed';
-		statusText = 'Distributed Editing retry save confirmed.';
-		clickAction = null;
-		disabled = true;
-		claimsSaved = true;
-		authorityState =
-			DISTRIBUTED_EDITING_SAVE_AUTHORITY_STATES.AUTHORITATIVE_UPDATE_CONFIRMED;
-		authorityStatusText =
-			'The authoritative WordPress post has accepted the Distributed Editing retry save.';
-		authoritativePostUpdated = true;
-	} else if (
+	if (
 		normalized.retrySaveStatus ===
 		DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVING
 	) {
@@ -5896,6 +5881,21 @@ export function getDistributedEditingSaveButtonStateForSessionState(
 			DISTRIBUTED_EDITING_SAVE_AUTHORITY_STATES.READY_FOR_GUARDED_UPDATE;
 		authorityStatusText =
 			'Reviewed changes are ready for a guarded update of the authoritative WordPress post.';
+	} else if ( hasRetrySaveSavedStateEvidence ) {
+		status = DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES.RETRY_SAVE_CONFIRMED;
+		reason =
+			DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.RETRY_SAVE_ALREADY_CONFIRMED;
+		source = 'retry_save';
+		label = 'Retry save confirmed';
+		statusText = 'Distributed Editing retry save confirmed.';
+		clickAction = null;
+		disabled = true;
+		claimsSaved = true;
+		authorityState =
+			DISTRIBUTED_EDITING_SAVE_AUTHORITY_STATES.AUTHORITATIVE_UPDATE_CONFIRMED;
+		authorityStatusText =
+			'The authoritative WordPress post has accepted the Distributed Editing retry save.';
+		authoritativePostUpdated = true;
 	}
 
 	const blocksNormalSavePost =

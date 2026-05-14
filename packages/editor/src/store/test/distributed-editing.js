@@ -3916,6 +3916,137 @@ describe( 'distributed editing session state', () => {
 		);
 	} );
 
+	it( 'keeps new protected fresh-review work actionable after retry-save confirmation', () => {
+		const normalized = normalizeDistributedEditingSessionState( {
+			pendingChangeCount: 1,
+			hasPendingChanges: true,
+			mustOfferLocalCopy: true,
+			canExportLocalUpdates: true,
+			localUpdatesImportStatus:
+				DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_STATUSES.BLOCKED,
+			localUpdatesImportReason:
+				DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.FRESH_REVIEW_REQUIRED,
+			localUpdatesImportRequiresFreshReview: true,
+			localUpdatesImportReviewActionKey:
+				DISTRIBUTED_EDITING_NOTICE_ACTIONS.REQUEST_FRESH_REVIEW,
+			localUpdatesImportReviewRequestStatus:
+				DISTRIBUTED_EDITING_LOCAL_UPDATES_REVIEW_REQUEST_STATUSES.DECISION_RECORDED,
+			localUpdatesImportFreshReviewRequestAccepted: true,
+			localUpdatesImportFreshReviewRequestRequested: true,
+			localUpdatesImportFreshReviewDecisionPanelRequired: true,
+			localUpdatesImportFreshReviewDecisionStatus:
+				DISTRIBUTED_EDITING_FRESH_REVIEW_DECISION_STATUSES.RECORDED,
+			localUpdatesImportFreshReviewDecisionAccepted: true,
+			localUpdatesImportFreshReviewDecisionSubmitted: true,
+			localUpdatesImportFreshReviewDecisionDecision: 'approved',
+			localUpdatesImportFreshReviewDecisionReviewedBlockItemCount: 1,
+			localUpdatesImportFreshReviewRetrySaveHandoffStatus:
+				DISTRIBUTED_EDITING_FRESH_REVIEW_RETRY_SAVE_HANDOFF_STATUSES.ACCEPTED_FOR_RETRY_SAVE,
+			localUpdatesImportFreshReviewRetrySaveHandoffAccepted: true,
+			retrySaveFreshReviewConsumeValidationAccepted: true,
+			retrySaveFreshReviewDecisionConsumptionValidated: true,
+			retrySaveFreshReviewReviewedBlockItemCount: 1,
+			retrySaveStatus: DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVED,
+			retrySaveAccepted: true,
+			retrySaveServerVersion: '13',
+			retrySavePreviousServerVersion: '12',
+			retrySaveSavesPost: true,
+			retrySaveMutatesPostContent: true,
+			retrySaveClaimsSaved: true,
+			retrySaveRevisionCreated: true,
+			retrySaveCreatedRevisionIds: [ 301 ],
+		} );
+		const reviewRequest =
+			getDistributedEditingLocalUpdatesImportReviewRequestStateForSessionState(
+				normalized
+			);
+		const preSave =
+			getDistributedEditingFreshReviewPreSaveStateForSessionState(
+				normalized
+			);
+		const saveButton =
+			getDistributedEditingSaveButtonStateForSessionState( normalized );
+		const savePolicy =
+			getDistributedEditingSavePolicyStateForSessionState( normalized );
+		const descriptors =
+			getDistributedEditingNoticeDescriptorsForSessionState( normalized );
+
+		expect(
+			hasDistributedEditingRetrySaveSavedStateEvidenceForSessionState(
+				normalized
+			)
+		).toBe( true );
+		expect( reviewRequest ).toMatchObject( {
+			requiresFreshReview: true,
+			actionKey: DISTRIBUTED_EDITING_NOTICE_ACTIONS.REQUEST_FRESH_REVIEW,
+			canExportLocalUpdates: true,
+			hasProtectedLocalChanges: true,
+			shouldCallNormalSavePost: false,
+			shouldCallRetrySaveEndpoint: false,
+		} );
+		expect( preSave ).toMatchObject( {
+			status: DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_STATUSES.REVIEW_REQUIRED,
+			reason: 'fresh_review_required',
+			placement:
+				DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_PLACEMENTS.PRE_PUBLISH_REVIEW,
+			clickAction:
+				DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.OPEN_PRE_PUBLISH_REVIEW,
+			blocksNormalSavePost: true,
+			opensPrePublishReview: true,
+			canExportLocalUpdates: true,
+		} );
+		expect( saveButton ).toMatchObject( {
+			status: DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES.REVIEW_BLOCKED,
+			reason: 'fresh_review_required',
+			label: 'Review changes',
+			clickAction:
+				DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.OPEN_PRE_PUBLISH_REVIEW,
+			authorityState:
+				DISTRIBUTED_EDITING_SAVE_AUTHORITY_STATES.REVIEW_REQUIRED_BEFORE_UPDATE,
+			authoritativePostUpdated: false,
+			localChangesState:
+				DISTRIBUTED_EDITING_SAVE_LOCAL_CHANGES_STATES.PROTECTED_CHANGES_EXPORTABLE,
+			reviewCheckpointState:
+				DISTRIBUTED_EDITING_SAVE_REVIEW_CHECKPOINT_STATES.REVIEW_REQUIRED,
+			hasRetrySaveSavedStateEvidence: true,
+			hasProtectedLocalChanges: true,
+			blocksNormalSavePost: true,
+			claimsSaved: false,
+		} );
+		expect( savePolicy ).toMatchObject( {
+			status: DISTRIBUTED_EDITING_SAVE_POLICY_STATUSES.REVIEW_REQUIRED,
+			reason: 'fresh_review_required',
+			saveButtonLabel: 'Review changes',
+			clickAction:
+				DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.OPEN_PRE_PUBLISH_REVIEW,
+			blocksNormalSavePost: true,
+			opensPrePublishReview: true,
+			saveButtonAuthoritativePostUpdated: false,
+			saveButtonLocalChangesState:
+				DISTRIBUTED_EDITING_SAVE_LOCAL_CHANGES_STATES.PROTECTED_CHANGES_EXPORTABLE,
+			saveButtonReviewCheckpointState:
+				DISTRIBUTED_EDITING_SAVE_REVIEW_CHECKPOINT_STATES.REVIEW_REQUIRED,
+			claimsSaved: false,
+		} );
+		expect( descriptors ).toEqual(
+			expect.arrayContaining( [
+				expect.objectContaining( {
+					kind: DISTRIBUTED_EDITING_NOTICE_KINDS.LOCAL_UPDATES_IMPORT_BLOCKED,
+					actionKeys: [
+						DISTRIBUTED_EDITING_NOTICE_ACTIONS.REQUEST_FRESH_REVIEW,
+					],
+					freshReviewPreSaveStatus:
+						DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_STATUSES.REVIEW_REQUIRED,
+					freshReviewPreSaveClickAction:
+						DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.OPEN_PRE_PUBLISH_REVIEW,
+					freshReviewPreSaveBlocksNormalSavePost: true,
+					freshReviewPreSaveCanExportLocalUpdates: true,
+					claimsSaved: false,
+				} ),
+			] )
+		);
+	} );
+
 	it( 'describes DE-RTC Save button semantics without content or identity exposure', () => {
 		const rawContentToken = 'save-button-raw-content';
 		const proofToken = 'save-button-proof-signature';
