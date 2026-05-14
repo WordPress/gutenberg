@@ -8,7 +8,12 @@ import clsx from 'clsx';
  */
 import { BaseControl, useBaseControlProps } from '@wordpress/components';
 import { useMergeRefs, useRefEffect } from '@wordpress/compose';
-import { useMemo, useRef, useState } from '@wordpress/element';
+import {
+	useInsertionEffect,
+	useMemo,
+	useRef,
+	useState,
+} from '@wordpress/element';
 import { privateApis as richTextPrivateApis } from '@wordpress/rich-text';
 
 /**
@@ -87,6 +92,7 @@ export default function RichTextControl( {
 		onChange: onRichTextChange,
 		ref: richTextRef,
 		formatTypes,
+		getValue,
 	} = useRichText( {
 		value: attrValue,
 		onChange,
@@ -127,22 +133,78 @@ export default function RichTextControl( {
 	// and InputEvent handlers (e.g. native formatBold) to the contenteditable.
 	// FormatEdit populates these Sets via context; without these listeners the
 	// callbacks would never fire.
-	const eventListenersProps = useRef( {
+	const eventListenersPropsRef = useRef( {
 		keyboardShortcuts,
 		inputEvents,
 	} );
+
+	// Keep `formatTypes`/`getValue`/`onChange` accessible to the input-rule
+	// listener without retearing it down on every value change.
+	const inputRulePropsRef = useRef( {
+		formatTypes,
+		getValue,
+		onChange: onRichTextChange,
+	} );
+	useInsertionEffect( () => {
+		inputRulePropsRef.current = {
+			formatTypes,
+			getValue,
+			onChange: onRichTextChange,
+		};
+	} );
+
 	const eventListenersRef = useRefEffect(
 		( element ) => {
 			if ( ! isSelected ) {
 				return;
 			}
-			const cleanupShortcuts =
-				shortcutsListener( eventListenersProps )( element );
-			const cleanupInputEvents =
-				inputEventsListener( eventListenersProps )( element );
+			const cleanupShortcuts = shortcutsListener(
+				eventListenersPropsRef
+			)( element );
+			const cleanupInputEvents = inputEventsListener(
+				eventListenersPropsRef
+			)( element );
+
+			// Apply format-level input rules (e.g. `core/code`'s
+			// backtick→inline-code transform). Mirrors the format-rule
+			// branch of `block-editor`'s `input-rules.js` listener without
+			// pulling in its block-transform machinery, which doesn't
+			// apply to a standalone field.
+			function onFormatInput( event ) {
+				if (
+					event.inputType !== 'insertText' &&
+					event.type !== 'compositionend'
+				) {
+					return;
+				}
+				const {
+					formatTypes: types,
+					getValue: getCurrentValue,
+					onChange: handleChange,
+				} = inputRulePropsRef.current;
+				const current = getCurrentValue();
+				const transformed = types.reduce(
+					( accumulator, { __unstableInputRule } ) =>
+						__unstableInputRule
+							? __unstableInputRule( accumulator )
+							: accumulator,
+					current
+				);
+				if ( transformed !== current ) {
+					handleChange( {
+						...transformed,
+						activeFormats: current.activeFormats,
+					} );
+				}
+			}
+			element.addEventListener( 'input', onFormatInput );
+			element.addEventListener( 'compositionend', onFormatInput );
+
 			return () => {
 				cleanupShortcuts();
 				cleanupInputEvents();
+				element.removeEventListener( 'input', onFormatInput );
+				element.removeEventListener( 'compositionend', onFormatInput );
 			};
 		},
 		[ isSelected ]
@@ -184,6 +246,7 @@ export default function RichTextControl( {
 					onFocus={ () => setIsSelected( true ) }
 					onBlur={ () => setIsSelected( false ) }
 					contentEditable
+					suppressContentEditableWarning
 					{ ...controlProps }
 				/>
 			</BaseControl>

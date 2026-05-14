@@ -228,4 +228,87 @@ describe( 'RichTextControl', () => {
 			expect( currentOnUse ).not.toHaveBeenCalled();
 		} );
 	} );
+
+	describe( 'format input rules', () => {
+		// `__unstableInputRule` lets a format type transform the value when
+		// the user types (e.g. wrapping a snippet in backticks auto-applies
+		// inline code). The fake format below uppercases any literal "abc"
+		// to make the transform observable from a unit test without standing
+		// up the full `core/code` machinery.
+		beforeAll( () => {
+			registerFormatType( 'core/test-input-rule', {
+				title: 'Test Input Rule',
+				tagName: 'span',
+				className: 'test-input-rule',
+				edit: () => null,
+				__unstableInputRule( value ) {
+					if ( ! value.text.includes( 'abc' ) ) {
+						return value;
+					}
+					return {
+						...value,
+						text: value.text.replace( 'abc', 'ABC' ),
+					};
+				},
+			} );
+		} );
+
+		afterAll( () => {
+			unregisterFormatType( 'core/test-input-rule' );
+		} );
+
+		const flushMicrotasks = () =>
+			act( async () => {
+				await Promise.resolve();
+			} );
+
+		it( 'runs registered format input rules on insertText input events', async () => {
+			const onChange = jest.fn();
+			const { container } = render(
+				<RichTextControl
+					label="Input rule"
+					value="abc"
+					onChange={ onChange }
+				/>
+			);
+			const textbox = getTextbox( container );
+
+			fireEvent.focus( textbox );
+			await flushMicrotasks();
+
+			fireEvent.input( textbox, { inputType: 'insertText' } );
+
+			// `onChange` is called with the transformed HTML string. The
+			// fake input rule above uppercases "abc" → "ABC".
+			expect( onChange ).toHaveBeenCalled();
+			const lastCall =
+				onChange.mock.calls[ onChange.mock.calls.length - 1 ];
+			expect( lastCall[ 0 ] ).toContain( 'ABC' );
+		} );
+
+		it( 'ignores non-text input events', async () => {
+			const onChange = jest.fn();
+			const { container } = render(
+				<RichTextControl
+					label="Input rule ignore"
+					value="abc"
+					onChange={ onChange }
+				/>
+			);
+			const textbox = getTextbox( container );
+
+			fireEvent.focus( textbox );
+			await flushMicrotasks();
+
+			fireEvent.input( textbox, { inputType: 'deleteContentBackward' } );
+
+			// `useRichText`'s own input handler may still fire `onChange`
+			// for the deletion, but the format input-rule branch must not
+			// run on non-text events — so the uppercase "ABC" transform
+			// from the fake rule should never appear.
+			for ( const [ updatedValue ] of onChange.mock.calls ) {
+				expect( updatedValue ).not.toContain( 'ABC' );
+			}
+		} );
+	} );
 } );
