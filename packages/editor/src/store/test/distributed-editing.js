@@ -3298,8 +3298,12 @@ describe( 'distributed editing session state', () => {
 				status: DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES.REVIEW_BLOCKED,
 				source: 'risky_block_review',
 				label: 'Review changes',
+				statusText:
+					'Save opens review before updating the authoritative post.',
 				clickAction:
 					DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.OPEN_PRE_PUBLISH_REVIEW,
+				authorityStatusText:
+					'The authoritative WordPress post cannot be updated until risky changes are approved or removed.',
 				blocksNormalSavePost: true,
 				opensPrePublishReview: true,
 				shouldCallNormalSavePost: false,
@@ -3986,12 +3990,16 @@ describe( 'distributed editing session state', () => {
 			status: DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES.REVIEW_BLOCKED,
 			source: 'fresh_review',
 			label: 'Review changes',
+			statusText:
+				'Save opens review before updating the authoritative post.',
 			clickAction:
 				DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.OPEN_PRE_PUBLISH_REVIEW,
 			blocksNormalSavePost: true,
 			opensPrePublishReview: true,
 			authorityState:
 				DISTRIBUTED_EDITING_SAVE_AUTHORITY_STATES.REVIEW_REQUIRED_BEFORE_UPDATE,
+			authorityStatusText:
+				'The authoritative WordPress post cannot be updated until risky changes are approved or removed.',
 			canExportLocalUpdates: true,
 			shouldCallNormalSavePost: false,
 			shouldCallRetrySaveEndpoint: false,

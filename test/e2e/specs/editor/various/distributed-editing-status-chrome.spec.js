@@ -1398,11 +1398,11 @@ test.describe( 'Distributed Editing status chrome', () => {
 		).toBeHidden();
 		await expect( statusChrome ).toBeVisible();
 		await expect(
-			statusChrome.getByText( 'Retry save requires HTML review' )
+			statusChrome.getByText( 'HTML review required before Save' )
 		).toBeVisible();
 		await expect(
 			statusChrome.getByText(
-				'The server blocked this retry save because the proposed changes could alter unfiltered HTML from another collaborator. Protected local changes are still exportable; export a copy for review by someone with unfiltered HTML permission, or refresh the server version before deciding how to continue.'
+				'Save did not update the authoritative post because these changes may alter unfiltered HTML. Export them for review by someone with unfiltered HTML permission, or refresh the server version before deciding how to continue. Protected local changes remain exportable.'
 			)
 		).toBeVisible();
 		await expect(

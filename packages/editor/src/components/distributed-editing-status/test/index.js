@@ -1429,11 +1429,11 @@ describe( 'DistributedEditingStatus', () => {
 		render( <DistributedEditingStatusChrome /> );
 
 		expect(
-			screen.getByText( 'Retry save requires HTML review' )
+			screen.getByText( 'HTML review required before Save' )
 		).toBeVisible();
 		expect(
 			screen.getByText(
-				'The server blocked this retry save because the proposed changes could alter unfiltered HTML from another collaborator. Protected local changes are still exportable; export a copy for review by someone with unfiltered HTML permission, or refresh the server version before deciding how to continue.'
+				'Save did not update the authoritative post because these changes may alter unfiltered HTML. Export them for review by someone with unfiltered HTML permission, or refresh the server version before deciding how to continue. Protected local changes remain exportable.'
 			)
 		).toBeVisible();
 		expect(
@@ -3582,9 +3582,9 @@ describe( 'DistributedEditingStatusSurface', () => {
 					DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_UNFILTERED_HTML_WOULD_CHANGE_CONTENT,
 				retrySaveStatus:
 					DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_UNFILTERED_HTML_REVIEW_REQUIRED,
-				title: 'Retry save requires HTML review',
+				title: 'HTML review required before Save',
 				message:
-					'The server blocked this retry save because the proposed changes could alter unfiltered HTML from another collaborator. Protected local changes are still exportable; export a copy for review by someone with unfiltered HTML permission, or refresh the server version before deciding how to continue.',
+					'Save did not update the authoritative post because these changes may alter unfiltered HTML. Export them for review by someone with unfiltered HTML permission, or refresh the server version before deciding how to continue. Protected local changes remain exportable.',
 				exportLabel: 'Export changes for review',
 				refetch: true,
 			},

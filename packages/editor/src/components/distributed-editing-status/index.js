@@ -2583,7 +2583,7 @@ function getDistributedEditingStatusControlLabel( key ) {
 		case 'staleBaseRetrySaveTampered':
 			return __( 'Retry save tampered' );
 		case 'staleBaseRetrySaveUnfilteredHtml':
-			return __( 'Retry save requires HTML review' );
+			return __( 'HTML review required before Save' );
 		case 'staleBaseRetrySaveHandoffBlockedProof':
 			return __( 'Retry save proof missing' );
 		case 'staleBaseRetrySaveHandoffRefetch':
@@ -2778,9 +2778,9 @@ function getRetrySaveStatusText( descriptor ) {
 			};
 		case DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_UNFILTERED_HTML_REVIEW_REQUIRED:
 			return {
-				title: __( 'Retry save requires HTML review' ),
+				title: __( 'HTML review required before Save' ),
 				message: __(
-					'The server blocked this retry save because the proposed changes could alter unfiltered HTML from another collaborator. Protected local changes are still exportable; export a copy for review by someone with unfiltered HTML permission, or refresh the server version before deciding how to continue.'
+					'Save did not update the authoritative post because these changes may alter unfiltered HTML. Export them for review by someone with unfiltered HTML permission, or refresh the server version before deciding how to continue. Protected local changes remain exportable.'
 				),
 			};
 		case DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_SYNC_META_TAMPERED:
@@ -2873,9 +2873,9 @@ function getFreshReviewRetrySaveStatusText( descriptor ) {
 			};
 		case DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_UNFILTERED_HTML_REVIEW_REQUIRED:
 			return {
-				title: __( 'Fresh-review retry save needs HTML review' ),
+				title: __( 'Fresh-review Save needs HTML review' ),
 				message: __(
-					'The server still requires HTML review before these changes can be saved. Protected local changes are exportable for a new review, or the server version can be refreshed before deciding how to continue.'
+					'The authoritative post was not updated because the server still requires HTML review. Export a new review handoff, or refresh the server version before deciding how to continue. Protected local changes remain exportable.'
 				),
 			};
 		case DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_SYNC_META_TAMPERED:

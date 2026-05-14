@@ -204,7 +204,7 @@ describe( 'PostSavedState', () => {
 				status: 'review_blocked',
 				label: 'Review changes',
 				statusText:
-					'Review must be resolved before Distributed Editing can save.',
+					'Save opens review before updating the authoritative post.',
 				clickAction: 'open_pre_publish_review',
 				authorityState: 'review_required_before_update',
 				authoritativePostUpdated: false,

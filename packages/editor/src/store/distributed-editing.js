@@ -5685,14 +5685,14 @@ export function getDistributedEditingSaveButtonStateForSessionState(
 				? freshReviewPreSaveState.saveButtonLabel
 				: 'Review changes';
 		statusText =
-			'Review must be resolved before Distributed Editing can save.';
+			'Save opens review before updating the authoritative post.';
 		clickAction =
 			DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.OPEN_PRE_PUBLISH_REVIEW;
 		opensPrePublishReview = true;
 		authorityState =
 			DISTRIBUTED_EDITING_SAVE_AUTHORITY_STATES.REVIEW_REQUIRED_BEFORE_UPDATE;
 		authorityStatusText =
-			'Review is required before the authoritative WordPress post can be updated.';
+			'The authoritative WordPress post cannot be updated until risky changes are approved or removed.';
 	} else if ( hasAcceptedButUnconsumed ) {
 		status =
 			DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES.ACCEPTED_BUT_UNCONSUMED;
