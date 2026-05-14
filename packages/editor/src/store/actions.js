@@ -25,6 +25,7 @@ import { __, sprintf } from '@wordpress/i18n';
  */
 import { localAutosaveSet } from './local-autosave';
 import {
+	__experimentalRequestDistributedEditingFreshReviewDecision as requestDistributedEditingFreshReviewDecision,
 	__experimentalRequestDistributedEditingFreshReviewForImportedLocalUpdates as requestDistributedEditingFreshReviewForImportedLocalUpdates,
 	__experimentalRequestDistributedEditingRecoveryDryRun as requestDistributedEditingRecoveryDryRun,
 	__experimentalRequestDistributedEditingRetrySave as requestDistributedEditingRetrySave,
@@ -39,6 +40,7 @@ import {
 	getDistributedEditingSessionStateForRetrySaveHandoff,
 	getDistributedEditingSessionStateForFreshReviewDecisionItemResolution,
 	getDistributedEditingSessionStateForFreshReviewDecisionItems,
+	getDistributedEditingSessionStateForFreshReviewDecisionResult,
 	getDistributedEditingSessionStateForFreshReviewRequestResult,
 	getDistributedEditingSessionStateForRetrySaveReviewApprovalProofResult,
 	getDistributedEditingSessionStateForRetrySaveRequest,
@@ -47,6 +49,7 @@ import {
 	getDistributedEditingAcceptedReviewApprovalProofForRetrySaveRequest,
 	getDistributedEditingLocalUpdatesImportResult,
 	getDistributedEditingPostContentSha256Hash,
+	getDistributedEditingReviewedBlockItemsForFreshReviewDecision,
 	getDistributedEditingReviewedBlockItemsForRetrySaveReviewApprovalProof,
 	getDistributedEditingSessionStateForRetrySubmitHandoff,
 	getDistributedEditingSessionStateForRetrySubmitProofResult,
@@ -1161,6 +1164,142 @@ export const __experimentalResolveDistributedEditingFreshReviewDecisionItem =
 			claimsSaved: false,
 			sessionState,
 		};
+	};
+
+/**
+ * Submits the requested fresh-review decision to the proof endpoint using only
+ * hash and version evidence. This does not save, retry-save, mutate editor
+ * content, dispatch global notices, or change post locks.
+ *
+ * @param {Object} [options] Decision submission options.
+ *
+ * @return {Function} Action thunk.
+ */
+export const __experimentalSubmitDistributedEditingFreshReviewDecision =
+	( options = {} ) =>
+	async ( { select, dispatch, registry } ) => {
+		const currentSessionState =
+			select.getDistributedEditingSessionState?.() || {};
+		const reviewedBlockItems =
+			options.reviewedBlockItems ??
+			getDistributedEditingReviewedBlockItemsForFreshReviewDecision(
+				currentSessionState
+			);
+		const rejectedCount =
+			currentSessionState.localUpdatesImportFreshReviewDecisionRejectedCount ||
+			0;
+		const decision =
+			options.freshReviewDecision ||
+			options.decision ||
+			( rejectedCount > 0 ? 'rejected' : 'approved' );
+		const requestRecordId =
+			options.freshReviewRequestRecordId ??
+			currentSessionState.localUpdatesImportFreshReviewRequestRecordId;
+
+		if (
+			! currentSessionState.localUpdatesImportFreshReviewDecisionReady ||
+			! requestRecordId
+		) {
+			return {
+				status: 'fresh_review_decision_not_ready',
+				reason: requestRecordId
+					? 'fresh_review_decision_items_not_ready'
+					: 'fresh_review_request_record_missing',
+				callsFreshReviewDecisionEndpoint: false,
+				callsRetrySaveEndpoint: false,
+				callsNormalSavePost: false,
+				savesPost: false,
+				dispatchesNotice: false,
+				mutatesEditorContent: false,
+				mutatesPersistedPostContent: false,
+				changesPostLock: false,
+				claimsSaved: false,
+				sessionState: currentSessionState,
+			};
+		}
+
+		const currentPost = select.getCurrentPost?.() || {};
+		const postType =
+			options.postType ||
+			currentSessionState.localUpdatesImportPostType ||
+			currentPost.type;
+		const postId =
+			options.postId ??
+			currentSessionState.localUpdatesImportPostId ??
+			currentPost.id;
+		const postTypeRecord = postType
+			? registry.select( coreStore ).getPostType( postType )
+			: null;
+		const restBase =
+			options.restBase ||
+			postTypeRecord?.rest_base ||
+			DISTRIBUTED_EDITING_RECOVERY_REST_BASE;
+
+		try {
+			const response =
+				await requestDistributedEditingFreshReviewDecision( {
+					postId,
+					restBase,
+					freshReviewRequestRecordId: requestRecordId,
+					clientBaseVersion:
+						options.clientBaseVersion ??
+						currentSessionState.clientBaseVersion,
+					serverVersion:
+						options.serverVersion ??
+						currentSessionState.serverVersion,
+					freshReviewDecision: decision,
+					proposedPostContentHash:
+						options.proposedPostContentHash ??
+						currentSessionState.localUpdatesImportVerifiedPostContentHash,
+					reviewedProposedContentHash:
+						options.reviewedProposedContentHash ??
+						options.proposedPostContentHash ??
+						currentSessionState.localUpdatesImportVerifiedPostContentHash,
+					candidatePostContentHash:
+						options.candidatePostContentHash,
+					reviewedCandidateContentHash:
+						options.reviewedCandidateContentHash ??
+						options.candidatePostContentHash,
+					reviewedBlockItems,
+				} );
+			const sessionState =
+				getDistributedEditingSessionStateForFreshReviewDecisionResult(
+					response,
+					currentSessionState
+				);
+
+			dispatch.setDistributedEditingSessionState( sessionState );
+
+			return {
+				status:
+					sessionState.localUpdatesImportFreshReviewDecisionStatus,
+				result:
+					sessionState.localUpdatesImportFreshReviewDecisionResult,
+				decision:
+					sessionState.localUpdatesImportFreshReviewDecisionDecision,
+				accepted:
+					sessionState.localUpdatesImportFreshReviewDecisionAccepted,
+				callsFreshReviewDecisionEndpoint: true,
+				callsRetrySaveEndpoint: false,
+				callsNormalSavePost: false,
+				savesPost: false,
+				dispatchesNotice: false,
+				mutatesEditorContent: false,
+				mutatesPersistedPostContent: false,
+				changesPostLock: false,
+				claimsSaved: false,
+				sessionState,
+			};
+		} catch ( error ) {
+			dispatch.setDistributedEditingSessionState(
+				getDistributedEditingSessionStateForFreshReviewDecisionResult(
+					error,
+					currentSessionState
+				)
+			);
+
+			throw error;
+		}
 	};
 
 /**

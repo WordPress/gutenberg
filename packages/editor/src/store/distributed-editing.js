@@ -364,6 +364,7 @@ export const DISTRIBUTED_EDITING_LOCAL_UPDATES_REVIEW_REQUEST_STATUSES =
 		NONE: 'none',
 		FRESH_REVIEW_REQUIRED: 'fresh_review_required',
 		REQUESTED: 'requested',
+		DECISION_RECORDED: 'decision_recorded',
 		STALE_BASE_REJECTED: 'stale_base_rejected',
 		REJECTED_FEATURE_DISABLED: 'rejected_feature_disabled',
 		REJECTED_PERMISSION_DENIED: 'rejected_permission_denied',
@@ -381,6 +382,8 @@ export const DISTRIBUTED_EDITING_FRESH_REVIEW_DECISION_STATUSES = Object.freeze(
 		NONE: 'none',
 		AWAITING_REVIEW: 'awaiting_review',
 		READY: 'ready',
+		RECORDED: 'recorded',
+		REJECTED: 'rejected',
 	}
 );
 
@@ -610,6 +613,7 @@ export const DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE = Object.freeze( {
 	localUpdatesImportFreshReviewRequestResult: null,
 	localUpdatesImportFreshReviewRequestAction: null,
 	localUpdatesImportFreshReviewRequestRestRoute: null,
+	localUpdatesImportFreshReviewRequestRecordId: null,
 	localUpdatesImportFreshReviewRequestAccepted: false,
 	localUpdatesImportFreshReviewRequestRequested: false,
 	localUpdatesImportFreshReviewRequestSavesPost: false,
@@ -618,6 +622,11 @@ export const DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE = Object.freeze( {
 	localUpdatesImportFreshReviewRequestClaimsSaved: false,
 	localUpdatesImportFreshReviewDecisionStatus:
 		DISTRIBUTED_EDITING_FRESH_REVIEW_DECISION_STATUSES.NONE,
+	localUpdatesImportFreshReviewDecisionResult: null,
+	localUpdatesImportFreshReviewDecisionRestRoute: null,
+	localUpdatesImportFreshReviewDecisionAccepted: false,
+	localUpdatesImportFreshReviewDecisionSubmitted: false,
+	localUpdatesImportFreshReviewDecisionDecision: null,
 	localUpdatesImportFreshReviewDecisionReason: null,
 	localUpdatesImportFreshReviewDecisionItems: [],
 	localUpdatesImportFreshReviewDecisionItemCount: 0,
@@ -1063,6 +1072,14 @@ export function normalizeDistributedEditingSessionState( sessionState = {} ) {
 		localUpdatesImportFreshReviewRequestRestRoute: normalizeNullableString(
 			sessionState.localUpdatesImportFreshReviewRequestRestRoute
 		),
+		localUpdatesImportFreshReviewRequestRecordId: normalizeNullableString(
+			getFirstDefined(
+				sessionState.localUpdatesImportFreshReviewRequestRecordId,
+				sessionState.localUpdatesImportFreshReviewRequestRecordID,
+				sessionState.freshReviewRequestRecordId,
+				sessionState.fresh_review_request_record_id
+			)
+		),
 		localUpdatesImportFreshReviewRequestAccepted: Boolean(
 			sessionState.localUpdatesImportFreshReviewRequestAccepted
 		),
@@ -1226,6 +1243,9 @@ export function getDistributedEditingFreshReviewDecisionStateForSessionState(
 
 	return {
 		status: normalized.localUpdatesImportFreshReviewDecisionStatus,
+		result: normalized.localUpdatesImportFreshReviewDecisionResult,
+		restRoute: normalized.localUpdatesImportFreshReviewDecisionRestRoute,
+		decision: normalized.localUpdatesImportFreshReviewDecisionDecision,
 		reason: normalized.localUpdatesImportFreshReviewDecisionReason,
 		requestStatus: normalized.localUpdatesImportReviewRequestStatus,
 		requestResult: normalized.localUpdatesImportFreshReviewRequestResult,
@@ -1233,6 +1253,12 @@ export function getDistributedEditingFreshReviewDecisionStateForSessionState(
 			normalized.localUpdatesImportFreshReviewRequestRestRoute,
 		requested: normalized.localUpdatesImportFreshReviewRequestRequested,
 		accepted: normalized.localUpdatesImportFreshReviewRequestAccepted,
+		requestRecordId:
+			normalized.localUpdatesImportFreshReviewRequestRecordId,
+		decisionAccepted:
+			normalized.localUpdatesImportFreshReviewDecisionAccepted,
+		decisionSubmitted:
+			normalized.localUpdatesImportFreshReviewDecisionSubmitted,
 		panelRequired:
 			normalized.localUpdatesImportFreshReviewDecisionPanelRequired,
 		ready: normalized.localUpdatesImportFreshReviewDecisionReady,
@@ -1368,6 +1394,204 @@ export function getDistributedEditingSessionStateForFreshReviewDecisionItemResol
 		...normalized,
 		localUpdatesImportFreshReviewDecisionItems: reviewItems,
 		localUpdatesImportFreshReviewDecisionPanelRequired: true,
+		mustOfferLocalCopy: true,
+		canExportLocalUpdates: true,
+	} );
+}
+
+/**
+ * Returns editor state for a server-backed fresh-review decision response or
+ * error. The result remains proof-opaque and must not imply a save.
+ *
+ * @param {Object} responseOrError     REST response or API error.
+ * @param {Object} currentSessionState Current DE-RTC session state.
+ *
+ * @return {Object} Normalized DE-RTC session state.
+ */
+export function getDistributedEditingSessionStateForFreshReviewDecisionResult(
+	responseOrError = {},
+	currentSessionState = {}
+) {
+	const normalizedCurrent =
+		normalizeDistributedEditingSessionState( currentSessionState );
+	const responseData = getDistributedEditingResponseData( responseOrError );
+	const result = normalizeNullableString(
+		getFirstDefined( responseOrError.result, responseData.result )
+	);
+	const decision = normalizeNullableString(
+		getFirstDefined(
+			responseOrError.freshReviewDecision,
+			responseOrError.fresh_review_decision,
+			responseData.freshReviewDecision,
+			responseData.fresh_review_decision
+		)
+	);
+	const restRoute = normalizeNullableString(
+		getFirstDefined(
+			responseOrError.restRoute,
+			responseOrError.rest_route,
+			responseData.restRoute,
+			responseData.rest_route
+		)
+	);
+	const requestStatus = normalizeNullableString(
+		getFirstDefined(
+			responseOrError.freshReviewRequestStatus,
+			responseOrError.fresh_review_request_status,
+			responseData.freshReviewRequestStatus,
+			responseData.fresh_review_request_status
+		)
+	);
+	const requestRecordId =
+		normalizeNullableString(
+			getFirstDefined(
+				responseOrError.freshReviewRequestRecordId,
+				responseOrError.fresh_review_request_record_id,
+				responseData.freshReviewRequestRecordId,
+				responseData.fresh_review_request_record_id,
+				responseOrError.freshReviewRequestRecord?.publicRecordId,
+				responseOrError.fresh_review_request_record?.public_record_id,
+				responseData.freshReviewRequestRecord?.publicRecordId,
+				responseData.fresh_review_request_record?.public_record_id
+			)
+		) || normalizedCurrent.localUpdatesImportFreshReviewRequestRecordId;
+	const pendingChangeCount =
+		normalizeCount(
+			getFirstDefined(
+				responseOrError.pendingChangeCount,
+				responseOrError.pending_change_count,
+				responseData.pendingChangeCount,
+				responseData.pending_change_count
+			)
+		) || normalizedCurrent.pendingChangeCount;
+	const serverVersion =
+		normalizeNullableString(
+			getFirstDefined(
+				responseOrError.serverVersion,
+				responseOrError.server_version,
+				responseData.serverVersion,
+				responseData.server_version
+			)
+		) || normalizedCurrent.serverVersion;
+	const clientBaseVersion =
+		normalizeNullableString(
+			getFirstDefined(
+				responseOrError.clientBaseVersion,
+				responseOrError.client_base_version,
+				responseData.clientBaseVersion,
+				responseData.client_base_version
+			)
+		) || normalizedCurrent.clientBaseVersion;
+	const reviewedBlockItemCount = normalizeCount(
+		getFirstDefined(
+			responseOrError.reviewedBlockItemCount,
+			responseOrError.reviewed_block_item_count,
+			responseData.reviewedBlockItemCount,
+			responseData.reviewed_block_item_count,
+			normalizedCurrent
+				.localUpdatesImportFreshReviewDecisionReviewedBlockItemCount
+		)
+	);
+	const accepted =
+		responseOrError.freshReviewDecisionAccepted === true ||
+		responseOrError.fresh_review_decision_accepted === true ||
+		responseData.freshReviewDecisionAccepted === true ||
+		responseData.fresh_review_decision_accepted === true ||
+		result === 'fresh_review_decision_approved_for_retry_save' ||
+		result === 'fresh_review_decision_rejected_for_author_revision' ||
+		result === 'fresh_review_decision_recorded';
+
+	if ( accepted ) {
+		return normalizeDistributedEditingSessionState( {
+			...normalizedCurrent,
+			serverVersion,
+			clientBaseVersion,
+			pendingChangeCount,
+			hasPendingChanges: pendingChangeCount > 0,
+			isAwaitingServerConfirmation: pendingChangeCount > 0,
+			localUpdatesImportReviewRequestStatus:
+				requestStatus ||
+				DISTRIBUTED_EDITING_LOCAL_UPDATES_REVIEW_REQUEST_STATUSES.DECISION_RECORDED,
+			localUpdatesImportFreshReviewRequestRecordId: requestRecordId,
+			localUpdatesImportFreshReviewDecisionStatus:
+				DISTRIBUTED_EDITING_FRESH_REVIEW_DECISION_STATUSES.RECORDED,
+			localUpdatesImportFreshReviewDecisionResult: result,
+			localUpdatesImportFreshReviewDecisionRestRoute:
+				restRoute || 'post_fresh_review_decision',
+			localUpdatesImportFreshReviewDecisionAccepted: true,
+			localUpdatesImportFreshReviewDecisionSubmitted: true,
+			localUpdatesImportFreshReviewDecisionDecision: decision,
+			localUpdatesImportFreshReviewDecisionReviewedBlockItemCount:
+				reviewedBlockItemCount,
+			localUpdatesImportFreshReviewDecisionSavesPost: false,
+			localUpdatesImportFreshReviewDecisionCallsNormalSavePost: false,
+			localUpdatesImportFreshReviewDecisionCallsRetrySaveEndpoint: false,
+			localUpdatesImportFreshReviewDecisionDispatchesNotice: false,
+			localUpdatesImportFreshReviewDecisionMutatesEditorContent: false,
+			localUpdatesImportFreshReviewDecisionMutatesPersistedPostContent:
+				false,
+			localUpdatesImportFreshReviewDecisionChangesPostLock: false,
+			localUpdatesImportFreshReviewDecisionClaimsSaved: false,
+			localUpdatesImportFreshReviewDecisionRawContentIncluded: false,
+			localUpdatesImportFreshReviewDecisionExposesRawContent: false,
+			localUpdatesImportFreshReviewDecisionExposesProofSignature: false,
+			localUpdatesImportFreshReviewDecisionExposesReviewerIds: false,
+			mustOfferLocalCopy: true,
+			canExportLocalUpdates: true,
+		} );
+	}
+
+	const reasonCode = normalizeNullableString(
+		getFirstDefined(
+			responseOrError.code,
+			responseOrError.reasonCode,
+			responseOrError.reason_code,
+			responseData.reasonCode,
+			responseData.reason_code
+		)
+	);
+	const detail = normalizeNullableString(
+		getFirstDefined(
+			responseOrError.detail,
+			responseData.detail,
+			responseOrError.errorDetail,
+			responseData.errorDetail
+		)
+	);
+
+	return normalizeDistributedEditingSessionState( {
+		...normalizedCurrent,
+		disposition:
+			reasonCode ===
+			DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED
+				? DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION
+				: normalizedCurrent.disposition,
+		reasonCode: reasonCode || normalizedCurrent.reasonCode,
+		serverVersion,
+		clientBaseVersion,
+		pendingChangeCount,
+		localUpdatesImportFreshReviewDecisionStatus:
+			DISTRIBUTED_EDITING_FRESH_REVIEW_DECISION_STATUSES.REJECTED,
+		localUpdatesImportFreshReviewDecisionReason:
+			reasonCode || detail || result,
+		localUpdatesImportFreshReviewDecisionResult: result,
+		localUpdatesImportFreshReviewDecisionRestRoute:
+			restRoute || 'post_fresh_review_decision',
+		localUpdatesImportFreshReviewRequestRecordId: requestRecordId,
+		localUpdatesImportFreshReviewDecisionAccepted: false,
+		localUpdatesImportFreshReviewDecisionSubmitted: false,
+		localUpdatesImportFreshReviewDecisionSavesPost: false,
+		localUpdatesImportFreshReviewDecisionCallsNormalSavePost: false,
+		localUpdatesImportFreshReviewDecisionCallsRetrySaveEndpoint: false,
+		localUpdatesImportFreshReviewDecisionDispatchesNotice: false,
+		localUpdatesImportFreshReviewDecisionMutatesEditorContent: false,
+		localUpdatesImportFreshReviewDecisionMutatesPersistedPostContent: false,
+		localUpdatesImportFreshReviewDecisionChangesPostLock: false,
+		localUpdatesImportFreshReviewDecisionClaimsSaved: false,
+		localUpdatesImportFreshReviewDecisionRawContentIncluded: false,
+		localUpdatesImportFreshReviewDecisionExposesRawContent: false,
+		localUpdatesImportFreshReviewDecisionExposesProofSignature: false,
+		localUpdatesImportFreshReviewDecisionExposesReviewerIds: false,
 		mustOfferLocalCopy: true,
 		canExportLocalUpdates: true,
 	} );
@@ -2222,6 +2446,18 @@ export function getDistributedEditingSessionStateForFreshReviewRequestResult(
 			responseData.rest_route
 		)
 	);
+	const requestRecordId = normalizeNullableString(
+		getFirstDefined(
+			responseOrError.freshReviewRequestRecordId,
+			responseOrError.fresh_review_request_record_id,
+			responseData.freshReviewRequestRecordId,
+			responseData.fresh_review_request_record_id,
+			responseOrError.freshReviewRequestRecord?.publicRecordId,
+			responseOrError.fresh_review_request_record?.public_record_id,
+			responseData.freshReviewRequestRecord?.publicRecordId,
+			responseData.fresh_review_request_record?.public_record_id
+		)
+	);
 	const pendingChangeCount =
 		normalizeCount(
 			getFirstDefined(
@@ -2315,6 +2551,7 @@ export function getDistributedEditingSessionStateForFreshReviewRequestResult(
 				requestAction || 'request_admin_review',
 			localUpdatesImportFreshReviewRequestRestRoute:
 				restRoute || 'post_fresh_review_request',
+			localUpdatesImportFreshReviewRequestRecordId: requestRecordId,
 			localUpdatesImportFreshReviewRequestAccepted: true,
 			localUpdatesImportFreshReviewRequestRequested: true,
 			localUpdatesImportHasPostContent: false,
@@ -2383,6 +2620,9 @@ export function getDistributedEditingSessionStateForFreshReviewRequestResult(
 			requestAction || 'request_admin_review',
 		localUpdatesImportFreshReviewRequestRestRoute:
 			restRoute || 'post_fresh_review_request',
+		localUpdatesImportFreshReviewRequestRecordId:
+			requestRecordId ||
+			normalizedCurrent.localUpdatesImportFreshReviewRequestRecordId,
 		localUpdatesImportFreshReviewRequestAccepted: false,
 		localUpdatesImportFreshReviewRequestRequested: false,
 		localUpdatesImportHasPostContent: false,
@@ -2959,6 +3199,8 @@ export function getDistributedEditingNoticeDescriptorsForSessionState(
 						localUpdatesImportReviewRequest.requestAction,
 					localUpdatesImportFreshReviewRequestRestRoute:
 						localUpdatesImportReviewRequest.requestRestRoute,
+					localUpdatesImportFreshReviewRequestRecordId:
+						normalized.localUpdatesImportFreshReviewRequestRecordId,
 					localUpdatesImportFreshReviewRequestSavesPost:
 						localUpdatesImportReviewRequest.requestSavesPost,
 					localUpdatesImportFreshReviewRequestMutatesPostContent:
@@ -2969,6 +3211,16 @@ export function getDistributedEditingNoticeDescriptorsForSessionState(
 						localUpdatesImportReviewRequest.requestClaimsSaved,
 					localUpdatesImportFreshReviewDecisionStatus:
 						normalized.localUpdatesImportFreshReviewDecisionStatus,
+					localUpdatesImportFreshReviewDecisionResult:
+						normalized.localUpdatesImportFreshReviewDecisionResult,
+					localUpdatesImportFreshReviewDecisionRestRoute:
+						normalized.localUpdatesImportFreshReviewDecisionRestRoute,
+					localUpdatesImportFreshReviewDecisionAccepted:
+						normalized.localUpdatesImportFreshReviewDecisionAccepted,
+					localUpdatesImportFreshReviewDecisionSubmitted:
+						normalized.localUpdatesImportFreshReviewDecisionSubmitted,
+					localUpdatesImportFreshReviewDecisionDecision:
+						normalized.localUpdatesImportFreshReviewDecisionDecision,
 					localUpdatesImportFreshReviewDecisionReason:
 						normalized.localUpdatesImportFreshReviewDecisionReason,
 					localUpdatesImportFreshReviewDecisionPanelRequired:
@@ -5808,8 +6060,10 @@ function normalizeFreshReviewDecisionFields(
 ) {
 	const freshReviewRequested =
 		localUpdatesImportRequiresFreshReview &&
-		localUpdatesImportReviewRequestStatus ===
-			DISTRIBUTED_EDITING_LOCAL_UPDATES_REVIEW_REQUEST_STATUSES.REQUESTED;
+		[
+			DISTRIBUTED_EDITING_LOCAL_UPDATES_REVIEW_REQUEST_STATUSES.REQUESTED,
+			DISTRIBUTED_EDITING_LOCAL_UPDATES_REVIEW_REQUEST_STATUSES.DECISION_RECORDED,
+		].includes( localUpdatesImportReviewRequestStatus );
 	const decisionItems = freshReviewRequested
 		? normalizeFreshReviewDecisionItems(
 				getFirstDefined(
@@ -5843,7 +6097,19 @@ function normalizeFreshReviewDecisionFields(
 		DISTRIBUTED_EDITING_FRESH_REVIEW_DECISION_STATUSES.NONE;
 
 	if ( freshReviewRequested ) {
-		if ( decisionReady ) {
+		if (
+			requestedDecisionStatus ===
+			DISTRIBUTED_EDITING_FRESH_REVIEW_DECISION_STATUSES.RECORDED
+		) {
+			decisionStatus =
+				DISTRIBUTED_EDITING_FRESH_REVIEW_DECISION_STATUSES.RECORDED;
+		} else if (
+			requestedDecisionStatus ===
+			DISTRIBUTED_EDITING_FRESH_REVIEW_DECISION_STATUSES.REJECTED
+		) {
+			decisionStatus =
+				DISTRIBUTED_EDITING_FRESH_REVIEW_DECISION_STATUSES.REJECTED;
+		} else if ( decisionReady ) {
 			decisionStatus =
 				DISTRIBUTED_EDITING_FRESH_REVIEW_DECISION_STATUSES.READY;
 		} else if (
@@ -5865,6 +6131,31 @@ function normalizeFreshReviewDecisionFields(
 
 	return {
 		localUpdatesImportFreshReviewDecisionStatus: decisionStatus,
+		localUpdatesImportFreshReviewDecisionResult: freshReviewRequested
+			? normalizeNullableString(
+					sessionState.localUpdatesImportFreshReviewDecisionResult
+			  )
+			: null,
+		localUpdatesImportFreshReviewDecisionRestRoute: freshReviewRequested
+			? normalizeNullableString(
+					sessionState.localUpdatesImportFreshReviewDecisionRestRoute
+			  )
+			: null,
+		localUpdatesImportFreshReviewDecisionAccepted:
+			freshReviewRequested &&
+			Boolean(
+				sessionState.localUpdatesImportFreshReviewDecisionAccepted
+			),
+		localUpdatesImportFreshReviewDecisionSubmitted:
+			freshReviewRequested &&
+			Boolean(
+				sessionState.localUpdatesImportFreshReviewDecisionSubmitted
+			),
+		localUpdatesImportFreshReviewDecisionDecision: freshReviewRequested
+			? normalizeNullableString(
+					sessionState.localUpdatesImportFreshReviewDecisionDecision
+			  )
+			: null,
 		localUpdatesImportFreshReviewDecisionReason: freshReviewRequested
 			? normalizeNullableString(
 					sessionState.localUpdatesImportFreshReviewDecisionReason

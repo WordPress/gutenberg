@@ -2058,6 +2058,154 @@ describe( 'Post actions', () => {
 				)
 			).not.toContain( '<script>do not leak' );
 		} );
+
+		it( 'submits a fresh-review decision to the proof endpoint without saving or raw content', async () => {
+			const registry = setupImportEditor();
+
+			registry
+				.dispatch( editorStore )
+				.setDistributedEditingSessionState( {
+					serverVersion: '12',
+					clientBaseVersion: '7',
+					pendingChangeCount: 1,
+					hasPendingChanges: true,
+					canExportLocalUpdates: true,
+					localUpdatesImportStatus:
+						DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_STATUSES.BLOCKED,
+					localUpdatesImportReason:
+						DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.FRESH_REVIEW_REQUIRED,
+					localUpdatesImportPostId: String( postId ),
+					localUpdatesImportPostType: 'post',
+					localUpdatesImportVerifiedPostContentHash:
+						approvedPostContentHash,
+					localUpdatesImportReviewRequestStatus:
+						DISTRIBUTED_EDITING_LOCAL_UPDATES_REVIEW_REQUEST_STATUSES.REQUESTED,
+					localUpdatesImportFreshReviewRequestRecordId:
+						'fresh-review-request-123',
+					localUpdatesImportFreshReviewRequestAccepted: true,
+					localUpdatesImportFreshReviewRequestRequested: true,
+				} );
+			await registry
+				.dispatch( editorStore )
+				.__experimentalLoadDistributedEditingFreshReviewDecisionItems( [
+					{
+						id: 'fresh-approve',
+						blockLabel: 'Approve HTML change',
+						proposedContentHash: candidatePostContentHash,
+						rawBlockContent: '<script>do not submit raw</script>',
+					},
+				] );
+			await registry
+				.dispatch( editorStore )
+				.__experimentalResolveDistributedEditingFreshReviewDecisionItem(
+					{
+						reviewItemId: 'fresh-approve',
+						decision: 'approved',
+					}
+				);
+
+			let apiCallCount = 0;
+			apiFetch.setFetchHandler( async ( options ) => {
+				apiCallCount++;
+
+				expect( getMethod( options ) ).toBe( 'POST' );
+				expect( options.path ).toContain(
+					'/wp/v2/posts/44/distributed-editing/fresh-review-decision'
+				);
+				expect( options.data ).toEqual( {
+					fresh_review_decision: 'approved',
+					reviewed_block_items: [
+						{
+							id: 'fresh-approve',
+							base_content_hash: null,
+							block_label: 'Approve HTML change',
+							block_path: [],
+							content_review_policy: 'kses',
+							kses_filtered_content_hash: null,
+							proposed_content_hash: candidatePostContentHash,
+							reviewed_proposed_content_hash:
+								candidatePostContentHash,
+							review_status:
+								DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES.APPROVED_FOR_RETRY_SAVE,
+							review_evidence_type:
+								'kses_block_hash_only_change',
+							raw_content_included: false,
+							exposes_raw_content: false,
+						},
+					],
+					fresh_review_request_record_id:
+						'fresh-review-request-123',
+					client_base_version: '7',
+					server_version: '12',
+					proposed_post_content_hash: approvedPostContentHash,
+					reviewed_proposed_content_hash: approvedPostContentHash,
+				} );
+				expect( JSON.stringify( options.data ) ).not.toMatch(
+					/proposed_post_content["':]|raw_post_content|proof_signature|reviewer_user_id|do not submit raw/
+				);
+
+				return {
+					result: 'fresh_review_decision_approved_for_retry_save',
+					fresh_review_decision: 'approved',
+					fresh_review_request_status: 'decision_recorded',
+					fresh_review_request_record_id:
+						'fresh-review-request-123',
+					rest_route: 'post_fresh_review_decision',
+					server_version: '12',
+					client_base_version: '7',
+					pending_change_count: 1,
+					reviewed_block_item_count: 1,
+					fresh_review_decision_accepted: true,
+				};
+			} );
+
+			const result = await registry
+				.dispatch( editorStore )
+				.__experimentalSubmitDistributedEditingFreshReviewDecision();
+
+			expect( result ).toMatchObject( {
+				status: DISTRIBUTED_EDITING_FRESH_REVIEW_DECISION_STATUSES.RECORDED,
+				result: 'fresh_review_decision_approved_for_retry_save',
+				decision: 'approved',
+				accepted: true,
+				callsFreshReviewDecisionEndpoint: true,
+				callsRetrySaveEndpoint: false,
+				callsNormalSavePost: false,
+				savesPost: false,
+				dispatchesNotice: false,
+				mutatesEditorContent: false,
+				mutatesPersistedPostContent: false,
+				changesPostLock: false,
+				claimsSaved: false,
+			} );
+			expect( apiCallCount ).toBe( 1 );
+			expect(
+				registry.select( editorStore ).getEditedPostContent()
+			).toBe( 'original content' );
+			expect( registry.select( editorStore ).isPostSavingLocked() ).toBe(
+				false
+			);
+			expect( registry.select( noticesStore ).getNotices() ).toEqual(
+				[]
+			);
+			expect(
+				registry
+					.select( editorStore )
+					.getDistributedEditingFreshReviewDecisionState()
+			).toMatchObject( {
+				status: DISTRIBUTED_EDITING_FRESH_REVIEW_DECISION_STATUSES.RECORDED,
+				result: 'fresh_review_decision_approved_for_retry_save',
+				decision: 'approved',
+				accepted: true,
+				decisionSubmitted: true,
+				ready: true,
+				reviewedBlockItemCount: 1,
+				savesPost: false,
+				callsNormalSavePost: false,
+				callsRetrySaveEndpoint: false,
+				claimsSaved: false,
+			} );
+		} );
 	} );
 
 	describe( '__experimentalPrepareDistributedEditingRetrySubmitAfterLocalRebase()', () => {

@@ -949,8 +949,10 @@ export function DistributedEditingFreshReviewDecisionPanel( {
 	forceVisible = false,
 } ) {
 	const [ commandStatus, setCommandStatus ] = useState( 'idle' );
-	const { __experimentalResolveDistributedEditingFreshReviewDecisionItem } =
-		useDispatch( editorStore ) || {};
+	const {
+		__experimentalResolveDistributedEditingFreshReviewDecisionItem,
+		__experimentalSubmitDistributedEditingFreshReviewDecision,
+	} = useDispatch( editorStore ) || {};
 	const decisionState = useSelect( ( select ) => {
 		const {
 			getDistributedEditingFreshReviewDecisionState,
@@ -990,6 +992,20 @@ export function DistributedEditingFreshReviewDecisionPanel( {
 			);
 
 		setCommandStatus( 'resolved' );
+		return result;
+	}
+
+	async function submitDecision() {
+		setCommandStatus( 'submitting' );
+
+		const result =
+			await __experimentalSubmitDistributedEditingFreshReviewDecision?.();
+
+		setCommandStatus(
+			result?.accepted || result?.status === 'recorded'
+				? 'submitted'
+				: 'submit-failed'
+		);
 		return result;
 	}
 
@@ -1084,6 +1100,18 @@ export function DistributedEditingFreshReviewDecisionPanel( {
 					) }
 				</p>
 			) }
+			<Button
+				__next40pxDefaultSize
+				className="editor-distributed-editing-status__fresh-review-submit"
+				disabled={
+					! decisionState?.ready ||
+					[ 'running', 'submitting' ].includes( commandStatus )
+				}
+				onClick={ submitDecision }
+				variant="secondary"
+			>
+				{ __( 'Submit decision' ) }
+			</Button>
 			<div
 				aria-live="polite"
 				className="editor-distributed-editing-status__fresh-review-decision-command"
@@ -1440,8 +1468,26 @@ function getFreshReviewDecisionCommandMessage( commandStatus ) {
 		);
 	}
 
+	if ( commandStatus === 'submitting' ) {
+		return __(
+			'Submitting the fresh-review decision without saving or changing editor content.'
+		);
+	}
+
+	if ( commandStatus === 'submitted' ) {
+		return __(
+			'Fresh-review decision recorded for the request. No save was made, and the reviewed-block evidence remained hash-only.'
+		);
+	}
+
+	if ( commandStatus === 'submit-failed' ) {
+		return __(
+			'Fresh-review decision could not be recorded. No save was made, and protected local changes remain exportable.'
+		);
+	}
+
 	return __(
-		'Fresh-review decisions are local until a future proof endpoint is available.'
+		'Fresh-review decisions can be recorded after every hash-only item is approved or rejected.'
 	);
 }
 

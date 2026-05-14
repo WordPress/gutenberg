@@ -8,11 +8,13 @@ import apiFetch from '@wordpress/api-fetch';
  */
 import {
 	__experimentalRequestDistributedEditingRecoveryDryRun,
+	__experimentalRequestDistributedEditingFreshReviewDecision,
 	__experimentalRequestDistributedEditingRetrySave,
 	__experimentalRequestDistributedEditingRetrySaveReviewApprovalProof,
 	__experimentalRequestDistributedEditingRetrySubmitProbe,
 	__experimentalRequestDistributedEditingServerStateRefetch,
 	__experimentalRequestDistributedEditingStaleBaseRejection,
+	getDistributedEditingFreshReviewDecisionEndpointPath,
 	getDistributedEditingRecoveryEndpointPath,
 	getDistributedEditingRetrySaveEndpointPath,
 	getDistributedEditingRetrySaveReviewApprovalEndpointPath,
@@ -72,6 +74,15 @@ describe( 'distributed editing REST helpers', () => {
 				restBase: 'pages',
 			} )
 		).toBe( '/wp/v2/pages/42/distributed-editing/review-approval' );
+	} );
+
+	it( 'builds the current fresh-review decision endpoint path', () => {
+		expect(
+			getDistributedEditingFreshReviewDecisionEndpointPath( {
+				postId: 42,
+				restBase: 'pages',
+			} )
+		).toBe( '/wp/v2/pages/42/distributed-editing/fresh-review-decision' );
 	} );
 
 	it( 'builds the current server-state endpoint path', () => {
@@ -647,6 +658,84 @@ describe( 'distributed editing REST helpers', () => {
 		).resolves.toEqual( {
 			result: 'review_approval_accepted_for_retry_save',
 			review_approval_accepted: true,
+		} );
+	} );
+
+	it( 'requests fresh-review decisions with hash-only evidence', async () => {
+		const proposedHash =
+			'0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef';
+		const reviewedBlockHash =
+			'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb';
+
+		apiFetch.setFetchHandler( async ( options ) => {
+			expect( options.path ).toMatch(
+				/^\/wp\/v2\/pages\/42\/distributed-editing\/fresh-review-decision/
+			);
+			expect( options.method ).toBe( 'POST' );
+			expect( options.data ).toEqual( {
+				fresh_review_decision: 'approved',
+				reviewed_block_items: [
+					{
+						id: 'fresh-review-html',
+						block_name: 'core/html',
+						block_label: 'HTML',
+						change_kind: 'added_block',
+						content_review_policy: 'kses',
+						risk_reason: 'kses_would_remove_script',
+						proposed_content_hash: reviewedBlockHash,
+						reviewed_proposed_content_hash: reviewedBlockHash,
+						review_status: 'approved_for_retry_save',
+						review_evidence_type:
+							'kses_block_hash_only_change',
+						raw_content_included: false,
+						exposes_raw_content: false,
+					},
+				],
+				fresh_review_request_record_id: 'fresh-review-request-123',
+				client_base_version: '7',
+				server_version: '12',
+				proposed_post_content_hash: proposedHash,
+				reviewed_proposed_content_hash: proposedHash,
+			} );
+			expect( options.data.proposed_post_content ).toBeUndefined();
+			expect( options.data.raw_content ).toBeUndefined();
+			expect(
+				options.data.reviewed_block_items[ 0 ].raw_content
+			).toBeUndefined();
+
+			return {
+				result: 'fresh_review_decision_approved_for_retry_save',
+				fresh_review_decision_accepted: true,
+			};
+		} );
+
+		await expect(
+			__experimentalRequestDistributedEditingFreshReviewDecision( {
+				postId: 42,
+				restBase: 'pages',
+				freshReviewRequestRecordId: 'fresh-review-request-123',
+				clientBaseVersion: '7',
+				serverVersion: '12',
+				freshReviewDecision: 'approved',
+				proposedPostContentHash: proposedHash,
+				reviewedBlockItems: [
+					{
+						id: 'fresh-review-html',
+						blockName: 'core/html',
+						blockLabel: 'HTML',
+						changeKind: 'added_block',
+						riskReason: 'kses_would_remove_script',
+						proposedContentHash: reviewedBlockHash,
+						reviewedProposedContentHash: reviewedBlockHash,
+						reviewStatus: 'approved_for_retry_save',
+						rawContent: 'raw-fresh-review-content-must-not-send',
+						rawContentIncluded: true,
+					},
+				],
+			} )
+		).resolves.toEqual( {
+			result: 'fresh_review_decision_approved_for_retry_save',
+			fresh_review_decision_accepted: true,
 		} );
 	} );
 

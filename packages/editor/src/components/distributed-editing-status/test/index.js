@@ -132,6 +132,13 @@ function setupDistributedEditingStatusDispatch() {
 				reviewStatus: 'approved_for_retry_save',
 				decisionReady: false,
 			} ),
+		__experimentalSubmitDistributedEditingFreshReviewDecision: jest
+			.fn()
+			.mockResolvedValue( {
+				status: 'recorded',
+				result: 'fresh_review_decision_approved_for_retry_save',
+				accepted: true,
+			} ),
 		__experimentalRefreshDistributedEditingRetrySubmitProof: jest
 			.fn()
 			.mockResolvedValue( {
@@ -2697,6 +2704,58 @@ describe( 'DistributedEditingStatusSurface', () => {
 		expect(
 			await screen.findByText(
 				'Fresh-review decision recorded locally. No save was made, and the reviewed-block evidence remains hash-only.'
+			)
+		).toBeVisible();
+	} );
+
+	it( 'submits ready fresh-review decisions from the internal panel', async () => {
+		const user = userEvent.setup();
+		const actions = setupDistributedEditingStatusDispatch();
+
+		setupDistributedEditingStatusSelect( {
+			sessionState: {
+				pendingChangeCount: 1,
+				hasPendingChanges: true,
+				canExportLocalUpdates: true,
+				localUpdatesImportStatus:
+					DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_STATUSES.BLOCKED,
+				localUpdatesImportReason:
+					DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.FRESH_REVIEW_REQUIRED,
+				localUpdatesImportReviewRequestStatus:
+					DISTRIBUTED_EDITING_LOCAL_UPDATES_REVIEW_REQUEST_STATUSES.REQUESTED,
+				localUpdatesImportFreshReviewRequestAccepted: true,
+				localUpdatesImportFreshReviewRequestRequested: true,
+				localUpdatesImportFreshReviewDecisionStatus:
+					DISTRIBUTED_EDITING_FRESH_REVIEW_DECISION_STATUSES.READY,
+				localUpdatesImportFreshReviewDecisionPanelRequired: true,
+				localUpdatesImportFreshReviewDecisionItems: [
+					{
+						id: 'fresh-ready',
+						blockLabel: 'Ready HTML change',
+						proposedContentHash:
+							'dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd',
+						reviewStatus:
+							'approved_for_retry_save',
+					},
+				],
+			},
+		} );
+
+		render( <DistributedEditingFreshReviewDecisionPanel /> );
+
+		await user.click(
+			screen.getByRole( 'button', { name: 'Submit decision' } )
+		);
+
+		expect(
+			actions.__experimentalSubmitDistributedEditingFreshReviewDecision
+		).toHaveBeenCalledTimes( 1 );
+		expect(
+			actions.__experimentalSaveDistributedEditingRetryAfterProof
+		).not.toHaveBeenCalled();
+		expect(
+			await screen.findByText(
+				'Fresh-review decision recorded for the request. No save was made, and the reviewed-block evidence remained hash-only.'
 			)
 		).toBeVisible();
 	} );
