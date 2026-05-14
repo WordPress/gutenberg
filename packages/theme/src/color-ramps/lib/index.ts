@@ -3,7 +3,6 @@ import {
 	get,
 	OKLCH,
 	set,
-	type ColorTypes,
 	type PlainColorObject,
 } from 'colorjs.io/fn';
 
@@ -111,7 +110,7 @@ function calculateRamp( {
 		}
 
 		function computeDirection(
-			color: ColorTypes,
+			color: string | PlainColorObject,
 			followDirection: FollowDirection
 		): RampDirection {
 			if ( followDirection === 'main' ) {
@@ -198,8 +197,16 @@ function calculateRamp( {
 	};
 }
 
+/**
+ * Calculate a complete color ramp.
+ *
+ * @param seedArg The seed color for the ramp. May be a `PlainColorObject` or
+ *                an sRGB-parseable string (typically a hex value).
+ * @param config  Ramp configuration defining contrast requirements.
+ * @param options Optional ramp settings.
+ */
 export function buildRamp(
-	seedArg: string,
+	seedArg: string | PlainColorObject,
 	config: RampConfig,
 	{
 		mainDirection,

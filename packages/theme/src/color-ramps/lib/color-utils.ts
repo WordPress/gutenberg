@@ -6,38 +6,40 @@ import {
 	contrastWCAG21,
 	sRGB,
 	OKLCH,
-	type ColorTypes,
+	type PlainColorObject,
 } from 'colorjs.io/fn';
 
 /**
- * Get string representation of a color
- * @param color Color object to stringify
+ * Get string representation of a color.
+ * @param color A `PlainColorObject`, or an sRGB-parseable string (typically a
+ *              hex value, e.g. `#3858e9`).
  * @return String representation
  */
-export function getColorString( color: ColorTypes ): string {
+export function getColorString( color: string | PlainColorObject ): string {
 	ColorSpace.register( sRGB );
 	const rgbRounded = serialize( to( color, sRGB ) );
 	return serialize( rgbRounded, { format: 'hex' } );
 }
 
 /**
- * Get contrast value between two colors
- * @param colorA First color
- * @param colorB Second color
+ * Get contrast value between two colors.
+ * @param colorA First color: a `PlainColorObject`, or an sRGB-parseable string.
+ * @param colorB Second color: a `PlainColorObject`, or an sRGB-parseable string.
  * @return WCAG 2.1 contrast ratio
  */
-export function getContrast( colorA: ColorTypes, colorB: ColorTypes ): number {
-	// `contrastWCAG21` resolves luminance via path traversal on the color
-	// instances themselves, so it does not require any spaces to be
-	// registered.
+export function getContrast(
+	colorA: string | PlainColorObject,
+	colorB: string | PlainColorObject
+): number {
+	ColorSpace.register( sRGB );
 	return contrastWCAG21( colorA, colorB );
 }
 
 /**
  * Make sure that a color is valid in the sRGB gamut and convert it to OKLCH.
- * @param c
+ * @param c A `PlainColorObject`, or an sRGB-parseable string.
  */
-export function clampToGamut( c: ColorTypes ) {
+export function clampToGamut( c: string | PlainColorObject ) {
 	ColorSpace.register( sRGB );
 	// Workaround for upstream toGamut(method:'css') bug.
 	// https://github.com/color-js/color.js/pull/734
