@@ -42,7 +42,7 @@ jobs:
               run: npm run storybook:build
 
             - name: Validate manifest matches design-system-mcp contract
-              run: node packages/design-system-mcp/bin/validate-manifest.mjs
+              run: node packages/design-system-mcp/scripts/validate-manifest.mjs
 
             - name: Build E2E Storybook
               env:
