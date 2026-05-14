@@ -31,7 +31,6 @@ export default function InspectorControlsTabs( {
 	tabs,
 	isSectionBlock,
 	contentClientIds,
-	isBlockStyleStateSelected,
 } ) {
 	const listViewRef = useRef( null );
 	const showIconLabels = useSelect( ( select ) => {
@@ -150,11 +149,6 @@ export default function InspectorControlsTabs( {
 	const hasListViewTab = tabs.some(
 		( tab ) => tab.name === TAB_LIST_VIEW.name
 	);
-	const hasContentTab = tabs.some( ( tab ) => tab.name === TAB_CONTENT.name );
-	const hasSettingsTab = tabs.some(
-		( tab ) => tab.name === TAB_SETTINGS.name
-	);
-	const hasStylesTab = tabs.some( ( tab ) => tab.name === TAB_STYLES.name );
 
 	const switchToListView = ( targetClientId ) => {
 		if ( hasListViewTab ) {
@@ -192,56 +186,30 @@ export default function InspectorControlsTabs( {
 						)
 					) }
 				</Tabs.TabList>
-				{ hasContentTab && (
-					<Tabs.TabPanel
-						tabId={ TAB_CONTENT.name }
-						focusable={ false }
-					>
-						<ContentTab
-							contentClientIds={ contentClientIds }
-							onSwitchToListView={ switchToListView }
-							hasListViewTab={ hasListViewTab }
-						/>
-						<InspectorControls.Slot group="content" />
-					</Tabs.TabPanel>
-				) }
-				{ hasListViewTab && (
-					<Tabs.TabPanel
-						tabId={ TAB_LIST_VIEW.name }
-						focusable={ false }
-					>
-						<InspectorControls.Slot
-							group="list"
-							ref={ listViewRef }
-						/>
-						<ListViewContentPopover listViewRef={ listViewRef } />
-					</Tabs.TabPanel>
-				) }
-				{ hasSettingsTab && (
-					<Tabs.TabPanel
-						tabId={ TAB_SETTINGS.name }
-						focusable={ false }
-					>
-						<SettingsTab showAdvancedControls={ !! blockName } />
-					</Tabs.TabPanel>
-				) }
-				{ hasStylesTab && (
-					<Tabs.TabPanel
-						tabId={ TAB_STYLES.name }
-						focusable={ false }
-					>
-						<StylesTab
-							blockName={ blockName }
-							clientId={ clientId }
-							hasBlockStyles={ hasBlockStyles }
-							isSectionBlock={ isSectionBlock }
-							contentClientIds={ contentClientIds }
-							isBlockStyleStateSelected={
-								isBlockStyleStateSelected
-							}
-						/>
-					</Tabs.TabPanel>
-				) }
+				<Tabs.TabPanel tabId={ TAB_CONTENT.name } focusable={ false }>
+					<ContentTab
+						contentClientIds={ contentClientIds }
+						onSwitchToListView={ switchToListView }
+						hasListViewTab={ hasListViewTab }
+					/>
+					<InspectorControls.Slot group="content" />
+				</Tabs.TabPanel>
+				<Tabs.TabPanel tabId={ TAB_LIST_VIEW.name } focusable={ false }>
+					<InspectorControls.Slot group="list" ref={ listViewRef } />
+					<ListViewContentPopover listViewRef={ listViewRef } />
+				</Tabs.TabPanel>
+				<Tabs.TabPanel tabId={ TAB_SETTINGS.name } focusable={ false }>
+					<SettingsTab showAdvancedControls={ !! blockName } />
+				</Tabs.TabPanel>
+				<Tabs.TabPanel tabId={ TAB_STYLES.name } focusable={ false }>
+					<StylesTab
+						blockName={ blockName }
+						clientId={ clientId }
+						hasBlockStyles={ hasBlockStyles }
+						isSectionBlock={ isSectionBlock }
+						contentClientIds={ contentClientIds }
+					/>
+				</Tabs.TabPanel>
 			</Tabs>
 		</div>
 	);

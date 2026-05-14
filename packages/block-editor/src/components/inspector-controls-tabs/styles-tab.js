@@ -66,15 +66,12 @@ const StylesTab = ( {
 	hasBlockStyles,
 	isSectionBlock,
 	contentClientIds,
-	isBlockStyleStateSelected,
 } ) => {
 	const borderPanelLabel = useBorderPanelLabel( { blockName } );
 
 	return (
 		<>
-			{ ! isBlockStyleStateSelected && hasBlockStyles && (
-				<BlockStyles clientId={ clientId } />
-			) }
+			{ hasBlockStyles && <BlockStyles clientId={ clientId } /> }
 			{ isSectionBlock && (
 				<SectionBlockColorControls
 					blockName={ blockName }
@@ -94,19 +91,15 @@ const StylesTab = ( {
 						label={ __( 'Background image' ) }
 						className="background-block-support-panel__inner-wrapper"
 					/>
-					{ ! isBlockStyleStateSelected && (
-						<InspectorControls.Slot group="filter" />
-					) }
+					<InspectorControls.Slot group="filter" />
 					<InspectorControls.Slot
 						group="typography"
 						label={ __( 'Typography' ) }
 					/>
-					{ ! isBlockStyleStateSelected && (
-						<InspectorControls.Slot
-							group="layout"
-							label={ __( 'Layout' ) }
-						/>
-					) }
+					<InspectorControls.Slot
+						group="layout"
+						label={ __( 'Layout' ) }
+					/>
 					<InspectorControls.Slot
 						group="dimensions"
 						label={ __( 'Dimensions' ) }
@@ -115,10 +108,8 @@ const StylesTab = ( {
 						group="border"
 						label={ borderPanelLabel }
 					/>
-					{ ! isBlockStyleStateSelected && <PositionControls /> }
-					{ ! isBlockStyleStateSelected && (
-						<InspectorControls.Slot group="styles" />
-					) }
+					<PositionControls />
+					<InspectorControls.Slot group="styles" />
 				</>
 			) }
 		</>
