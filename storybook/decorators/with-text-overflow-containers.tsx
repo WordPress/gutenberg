@@ -52,6 +52,15 @@ const scenarios: Scenario[] = [
 		),
 	},
 	{
+		name: 'Fit-content',
+		css: 'width: fit-content',
+		render: ( story ) => (
+			<div style={ { ...constraintOutline, width: 'fit-content' } }>
+				{ story }
+			</div>
+		),
+	},
+	{
 		name: 'Flex child (default)',
 		css: 'Flex parent width: {w}px',
 		render: ( story, w ) => (
