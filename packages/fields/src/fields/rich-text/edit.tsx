@@ -1,6 +1,9 @@
 /**
  * WordPress dependencies
  */
+// @ts-ignore — `@wordpress/block-editor` ships no `.d.ts` files, so the
+// type-declaration build cannot resolve this import even though the package
+// is declared as a dependency.
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import type { DataFormControlProps } from '@wordpress/dataviews';
 
