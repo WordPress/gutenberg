@@ -13,6 +13,7 @@ import {
 	DISTRIBUTED_EDITING_LOCAL_UPDATES_EXPORT_FORMAT,
 	DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS,
 	DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_STATUSES,
+	DISTRIBUTED_EDITING_LOCAL_UPDATES_REVIEW_REQUEST_STATUSES,
 	DISTRIBUTED_EDITING_NOTICE_ACTIONS,
 	DISTRIBUTED_EDITING_NOTICE_IDS,
 	DISTRIBUTED_EDITING_NOTICE_KINDS,
@@ -39,6 +40,7 @@ import {
 	DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE,
 	getDistributedEditingLocalUpdatesExportPayload,
 	getDistributedEditingLocalUpdatesImportResult,
+	getDistributedEditingLocalUpdatesImportReviewRequestStateForSessionState,
 	getDistributedEditingAcceptedReviewApprovalProofForRetrySaveRequest,
 	getDistributedEditingReviewedBlockItemsForRetrySaveReviewApprovalProof,
 	getDistributedEditingRetrySaveFlowStateForSessionState,
@@ -78,6 +80,7 @@ import {
 import { distributedEditingSession } from '../reducer';
 import {
 	canExportDistributedEditingLocalUpdates,
+	getDistributedEditingLocalUpdatesImportReviewRequestState,
 	getDistributedEditingNoticeDescriptors,
 	getDistributedEditingReviewTokenRecoveryState,
 	getDistributedEditingRiskyBlockReviewState,
@@ -300,6 +303,10 @@ describe( 'distributed editing session state', () => {
 			localUpdatesImportHasPostContent: false,
 			localUpdatesImportHasAcceptedReviewApprovalProof: false,
 			localUpdatesImportVerifiedPostContentHash: null,
+			localUpdatesImportReviewRequestStatus:
+				DISTRIBUTED_EDITING_LOCAL_UPDATES_REVIEW_REQUEST_STATUSES.NONE,
+			localUpdatesImportRequiresFreshReview: false,
+			localUpdatesImportReviewActionKey: null,
 			riskyBlockReviewStatus:
 				DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_STATUSES.NONE,
 			riskyBlockReviewReasonCode: null,
@@ -1539,6 +1546,11 @@ describe( 'distributed editing session state', () => {
 				reason: DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.FRESH_REVIEW_REQUIRED,
 				hasPostContent: false,
 				hasAcceptedReviewApprovalProof: false,
+				reviewRequestStatus:
+					DISTRIBUTED_EDITING_LOCAL_UPDATES_REVIEW_REQUEST_STATUSES.FRESH_REVIEW_REQUIRED,
+				requiresFreshReview: true,
+				reviewRequestActionKey:
+					DISTRIBUTED_EDITING_NOTICE_ACTIONS.REQUEST_FRESH_REVIEW,
 				mutatesEditorContent: false,
 				callsRetrySaveEndpoint: false,
 				callsNormalSavePost: false,
@@ -1551,6 +1563,11 @@ describe( 'distributed editing session state', () => {
 						DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_STATUSES.BLOCKED,
 					localUpdatesImportReason:
 						DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.FRESH_REVIEW_REQUIRED,
+					localUpdatesImportReviewRequestStatus:
+						DISTRIBUTED_EDITING_LOCAL_UPDATES_REVIEW_REQUEST_STATUSES.FRESH_REVIEW_REQUIRED,
+					localUpdatesImportRequiresFreshReview: true,
+					localUpdatesImportReviewActionKey:
+						DISTRIBUTED_EDITING_NOTICE_ACTIONS.REQUEST_FRESH_REVIEW,
 				},
 			} );
 		}
@@ -4834,6 +4851,89 @@ describe( 'distributed editing selectors', () => {
 				changesPostLock: false,
 				claimsSaved: false,
 			} )
+		);
+	} );
+
+	it( 'exposes fresh-review import review request state without proof internals or saves', () => {
+		const sessionState = normalizeDistributedEditingSessionState( {
+			localUpdatesImportStatus:
+				DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_STATUSES.BLOCKED,
+			localUpdatesImportReason:
+				DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.FRESH_REVIEW_REQUIRED,
+			localUpdatesImportPostId: '44',
+			localUpdatesImportPostType: 'post',
+			hasPendingChanges: true,
+			canExportLocalUpdates: true,
+		} );
+		const state = {
+			distributedEditingSession: sessionState,
+		};
+
+		const reviewRequestState =
+			getDistributedEditingLocalUpdatesImportReviewRequestStateForSessionState(
+				sessionState
+			);
+
+		expect( reviewRequestState ).toMatchObject( {
+			status: DISTRIBUTED_EDITING_LOCAL_UPDATES_REVIEW_REQUEST_STATUSES.FRESH_REVIEW_REQUIRED,
+			reason: DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.FRESH_REVIEW_REQUIRED,
+			requiresFreshReview: true,
+			actionKey: DISTRIBUTED_EDITING_NOTICE_ACTIONS.REQUEST_FRESH_REVIEW,
+			localUpdatesImportStatus:
+				DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_STATUSES.BLOCKED,
+			localUpdatesImportReason:
+				DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.FRESH_REVIEW_REQUIRED,
+			localUpdatesImportHasPostContent: false,
+			localUpdatesImportHasAcceptedReviewApprovalProof: false,
+			canExportLocalUpdates: true,
+			hasProtectedLocalChanges: true,
+			shouldCallRetrySaveEndpoint: false,
+			shouldCallNormalSavePost: false,
+			dispatchesNotice: false,
+			mutatesEditorContent: false,
+			mutatesPersistedPostContent: false,
+			changesPostLock: false,
+			claimsSaved: false,
+			exposesTokenInternals: false,
+			exposesProofSignature: false,
+			exposesReviewedBlockItems: false,
+			exposesReviewerIds: false,
+			exposesRawContent: false,
+		} );
+		expect(
+			getDistributedEditingLocalUpdatesImportReviewRequestState( state )
+		).toEqual( reviewRequestState );
+		expect(
+			getDistributedEditingNoticeDescriptorsForSessionState(
+				sessionState
+			)
+		).toEqual(
+			expect.arrayContaining( [
+				expect.objectContaining( {
+					kind: DISTRIBUTED_EDITING_NOTICE_KINDS.LOCAL_UPDATES_IMPORT_BLOCKED,
+					status: 'warning',
+					actionKeys: [
+						DISTRIBUTED_EDITING_NOTICE_ACTIONS.REQUEST_FRESH_REVIEW,
+					],
+					localUpdatesImportRequiresFreshReview: true,
+					localUpdatesImportReviewRequestStatus:
+						DISTRIBUTED_EDITING_LOCAL_UPDATES_REVIEW_REQUEST_STATUSES.FRESH_REVIEW_REQUIRED,
+					localUpdatesImportReviewActionKey:
+						DISTRIBUTED_EDITING_NOTICE_ACTIONS.REQUEST_FRESH_REVIEW,
+					shouldCallRetrySaveEndpoint: false,
+					shouldCallNormalSavePost: false,
+					dispatchesNotice: false,
+					mutatesEditorContent: false,
+					mutatesPersistedPostContent: false,
+					changesPostLock: false,
+					claimsSaved: false,
+					exposesTokenInternals: false,
+					exposesProofSignature: false,
+					exposesReviewedBlockItems: false,
+					exposesReviewerIds: false,
+					exposesRawContent: false,
+				} ),
+			] )
 		);
 	} );
 } );

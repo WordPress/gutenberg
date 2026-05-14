@@ -431,6 +431,10 @@ export function shouldRenderDistributedEditingStatus(
 			DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.NONE ||
 		normalized.retrySaveHandoffStatus !==
 			DISTRIBUTED_EDITING_RETRY_SAVE_HANDOFF_STATUSES.NONE ||
+		( normalized.localUpdatesImportStatus ===
+			DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_STATUSES.BLOCKED &&
+			normalized.localUpdatesImportReason ===
+				DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.FRESH_REVIEW_REQUIRED ) ||
 		Boolean( unloadWarningState?.shouldWarn )
 	);
 }
@@ -1139,6 +1143,15 @@ export default function DistributedEditingStatus( {
 						} );
 						return planResult;
 					}
+					case DISTRIBUTED_EDITING_NOTICE_ACTIONS.REQUEST_FRESH_REVIEW: {
+						setActionStatus( {
+							status: 'info',
+							message: __(
+								'Fresh review is required before this handoff can be imported for retry save. No save, server request, or editor content change was made.'
+							),
+						} );
+						return item;
+					}
 				}
 			} catch {
 				setActionStatus( {
@@ -1209,6 +1222,10 @@ function getActionErrorMessage( actionKey ) {
 		case DISTRIBUTED_EDITING_NOTICE_ACTIONS.REBASE_LOCAL_UPDATES:
 			return __(
 				'Local changes could not be retried. They remain protected in this editor session.'
+			);
+		case DISTRIBUTED_EDITING_NOTICE_ACTIONS.REQUEST_FRESH_REVIEW:
+			return __(
+				'Fresh-review request could not be opened. No save or server request was made, and local changes remain protected.'
 			);
 	}
 
@@ -1308,6 +1325,21 @@ function getDistributedEditingStatusSurfaceItem( descriptor ) {
 				reviewTokenRecoveryReason: descriptor.reviewTokenRecoveryReason,
 				reviewTokenRecoveryRequiresFreshReview:
 					descriptor.reviewTokenRecoveryRequiresFreshReview,
+			};
+		case DISTRIBUTED_EDITING_NOTICE_KINDS.LOCAL_UPDATES_IMPORT_BLOCKED:
+			return {
+				...getBaseStatusItem( descriptor ),
+				title: __( 'Fresh review needed' ),
+				message:
+					getLocalUpdatesImportReviewRequestMessage( descriptor ),
+				localUpdatesImportStatus: descriptor.localUpdatesImportStatus,
+				localUpdatesImportReason: descriptor.localUpdatesImportReason,
+				localUpdatesImportRequiresFreshReview:
+					descriptor.localUpdatesImportRequiresFreshReview,
+				localUpdatesImportReviewRequestStatus:
+					descriptor.localUpdatesImportReviewRequestStatus,
+				localUpdatesImportReviewActionKey:
+					descriptor.localUpdatesImportReviewActionKey,
 			};
 	}
 
@@ -1474,6 +1506,8 @@ function getActionLabel( actionKey, item ) {
 			return __( 'Retry local changes' );
 		case DISTRIBUTED_EDITING_NOTICE_ACTIONS.REVIEW_REMOTE_CHANGES:
 			return __( 'Review changes' );
+		case DISTRIBUTED_EDITING_NOTICE_ACTIONS.REQUEST_FRESH_REVIEW:
+			return __( 'Request fresh review' );
 	}
 
 	return null;
@@ -1590,6 +1624,21 @@ function getLocalUpdatesImportBlockedMessage( reason ) {
 
 	return __(
 		'Reviewed changes import was blocked before any local change was applied. Protected local changes remain protected, and no server request was sent.'
+	);
+}
+
+function getLocalUpdatesImportReviewRequestMessage( descriptor ) {
+	if (
+		descriptor?.localUpdatesImportReason ===
+		DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.FRESH_REVIEW_REQUIRED
+	) {
+		return __(
+			'This fresh-review handoff cannot be imported for retry save because it has no usable accepted review proof. Request a new admin review before retry save; nothing was imported, saved, or sent to the server.'
+		);
+	}
+
+	return __(
+		'Reviewed changes import is blocked. Nothing was imported, saved, or sent to the server.'
 	);
 }
 

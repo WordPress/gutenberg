@@ -30,6 +30,7 @@ import {
 	DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES,
 	DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS,
 	DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_STATUSES,
+	DISTRIBUTED_EDITING_LOCAL_UPDATES_REVIEW_REQUEST_STATUSES,
 	DISTRIBUTED_EDITING_NOTICE_ACTIONS,
 	DISTRIBUTED_EDITING_NOTICE_KINDS,
 	DISTRIBUTED_EDITING_REASON_CODES,
@@ -732,6 +733,14 @@ describe( 'shouldRenderDistributedEditingStatus', () => {
 			shouldRenderDistributedEditingStatus( {
 				retrySaveHandoffStatus:
 					DISTRIBUTED_EDITING_RETRY_SAVE_HANDOFF_STATUSES.RETRY_SAVE_BLOCKED,
+			} )
+		).toBe( true );
+		expect(
+			shouldRenderDistributedEditingStatus( {
+				localUpdatesImportStatus:
+					DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_STATUSES.BLOCKED,
+				localUpdatesImportReason:
+					DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.FRESH_REVIEW_REQUIRED,
 			} )
 		).toBe( true );
 		expect(
@@ -2374,6 +2383,56 @@ describe( 'DistributedEditingStatusSurface', () => {
 		).toBeVisible();
 		expect(
 			screen.queryByText( /Admin-reviewed changes were imported/ )
+		).not.toBeInTheDocument();
+	} );
+
+	it( 'renders fresh-review import blockers as no-save review requests', async () => {
+		const user = userEvent.setup();
+		const onAction = jest.fn();
+		const noticeDescriptors =
+			getDistributedEditingNoticeDescriptorsForSessionState( {
+				localUpdatesImportStatus:
+					DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_STATUSES.BLOCKED,
+				localUpdatesImportReason:
+					DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.FRESH_REVIEW_REQUIRED,
+			} );
+
+		render(
+			<DistributedEditingStatusSurface
+				noticeDescriptors={ noticeDescriptors }
+				onAction={ onAction }
+			/>
+		);
+
+		expect( screen.getByText( 'Fresh review needed' ) ).toBeVisible();
+		expect(
+			screen.getByText(
+				'This fresh-review handoff cannot be imported for retry save because it has no usable accepted review proof. Request a new admin review before retry save; nothing was imported, saved, or sent to the server.'
+			)
+		).toBeVisible();
+		expect(
+			screen.queryByText( /proof_signature|reviewer|reviewed block/i )
+		).not.toBeInTheDocument();
+
+		await user.click(
+			screen.getByRole( 'button', {
+				name: 'Request fresh review',
+			} )
+		);
+
+		expect( onAction ).toHaveBeenCalledWith(
+			DISTRIBUTED_EDITING_NOTICE_ACTIONS.REQUEST_FRESH_REVIEW,
+			expect.objectContaining( {
+				kind: DISTRIBUTED_EDITING_NOTICE_KINDS.LOCAL_UPDATES_IMPORT_BLOCKED,
+				localUpdatesImportRequiresFreshReview: true,
+				localUpdatesImportReviewRequestStatus:
+					DISTRIBUTED_EDITING_LOCAL_UPDATES_REVIEW_REQUEST_STATUSES.FRESH_REVIEW_REQUIRED,
+				localUpdatesImportReviewActionKey:
+					DISTRIBUTED_EDITING_NOTICE_ACTIONS.REQUEST_FRESH_REVIEW,
+			} )
+		);
+		expect(
+			screen.queryByRole( 'button', { name: /save/i } )
 		).not.toBeInTheDocument();
 	} );
 

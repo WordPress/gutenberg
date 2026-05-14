@@ -55,6 +55,7 @@ export const DISTRIBUTED_EDITING_NOTICE_KINDS = Object.freeze( {
 	REMOTE_CHANGES_RECEIVED: 'remote-changes-received',
 	PENDING_CHANGES: 'pending-changes',
 	RETRY_SAVE: 'retry-save',
+	LOCAL_UPDATES_IMPORT_BLOCKED: 'local-updates-import-blocked',
 } );
 
 /**
@@ -71,6 +72,8 @@ export const DISTRIBUTED_EDITING_NOTICE_IDS = Object.freeze( {
 		'core/editor/distributed-editing/remote-changes-received',
 	PENDING_CHANGES: 'core/editor/distributed-editing/pending-changes',
 	RETRY_SAVE: 'core/editor/distributed-editing/retry-save',
+	LOCAL_UPDATES_IMPORT_BLOCKED:
+		'core/editor/distributed-editing/local-updates-import-blocked',
 } );
 
 /**
@@ -85,6 +88,7 @@ export const DISTRIBUTED_EDITING_NOTICE_ACTIONS = Object.freeze( {
 	REFRESH_RETRY_SUBMIT_PROOF: 'refresh-retry-submit-proof',
 	REBASE_LOCAL_UPDATES: 'rebase-local-updates',
 	REVIEW_REMOTE_CHANGES: 'review-remote-changes',
+	REQUEST_FRESH_REVIEW: 'request-fresh-review',
 } );
 
 const DISTRIBUTED_EDITING_SYNC_META_SCRIPT_SOURCE = `<script\\b(?=[^>]*\\btype\\s*=\\s*(['"])wp/post-sync-meta\\1)[^>]*>([\\s\\S]*?)<\\/script\\s*>`;
@@ -352,6 +356,15 @@ export const DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS = Object.freeze( {
 	EXTRA_SESSION_STATE_OVEREXPOSED: 'extra_session_state_overexposed',
 } );
 
+/**
+ * Stable no-save review request statuses for blocked local-updates imports.
+ */
+export const DISTRIBUTED_EDITING_LOCAL_UPDATES_REVIEW_REQUEST_STATUSES =
+	Object.freeze( {
+		NONE: 'none',
+		FRESH_REVIEW_REQUIRED: 'fresh_review_required',
+	} );
+
 const VALID_REASON_CODES = new Set(
 	Object.values( DISTRIBUTED_EDITING_REASON_CODES )
 );
@@ -421,6 +434,8 @@ const NOTICE_ID_BY_KIND = Object.freeze( {
 		DISTRIBUTED_EDITING_NOTICE_IDS.PENDING_CHANGES,
 	[ DISTRIBUTED_EDITING_NOTICE_KINDS.RETRY_SAVE ]:
 		DISTRIBUTED_EDITING_NOTICE_IDS.RETRY_SAVE,
+	[ DISTRIBUTED_EDITING_NOTICE_KINDS.LOCAL_UPDATES_IMPORT_BLOCKED ]:
+		DISTRIBUTED_EDITING_NOTICE_IDS.LOCAL_UPDATES_IMPORT_BLOCKED,
 } );
 
 export const DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE = Object.freeze( {
@@ -560,6 +575,10 @@ export const DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE = Object.freeze( {
 	localUpdatesImportHasPostContent: false,
 	localUpdatesImportHasAcceptedReviewApprovalProof: false,
 	localUpdatesImportVerifiedPostContentHash: null,
+	localUpdatesImportReviewRequestStatus:
+		DISTRIBUTED_EDITING_LOCAL_UPDATES_REVIEW_REQUEST_STATUSES.NONE,
+	localUpdatesImportRequiresFreshReview: false,
+	localUpdatesImportReviewActionKey: null,
 	riskyBlockReviewStatus:
 		DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_STATUSES.NONE,
 	riskyBlockReviewReasonCode: null,
@@ -790,6 +809,22 @@ export function normalizeDistributedEditingSessionState( sessionState = {} ) {
 	)
 		? sessionState.localUpdatesImportStatus
 		: DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE.localUpdatesImportStatus;
+	const localUpdatesImportReason = normalizeNullableString(
+		sessionState.localUpdatesImportReason
+	);
+	const localUpdatesImportRequiresFreshReview =
+		localUpdatesImportStatus ===
+			DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_STATUSES.BLOCKED &&
+		localUpdatesImportReason ===
+			DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.FRESH_REVIEW_REQUIRED;
+	const localUpdatesImportReviewRequestStatus =
+		localUpdatesImportRequiresFreshReview
+			? DISTRIBUTED_EDITING_LOCAL_UPDATES_REVIEW_REQUEST_STATUSES.FRESH_REVIEW_REQUIRED
+			: DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE.localUpdatesImportReviewRequestStatus;
+	const localUpdatesImportReviewActionKey =
+		localUpdatesImportRequiresFreshReview
+			? DISTRIBUTED_EDITING_NOTICE_ACTIONS.REQUEST_FRESH_REVIEW
+			: null;
 	const riskyBlockReviewFields =
 		normalizeRiskyBlockReviewMetadataFields( sessionState );
 	const hasPendingRiskyBlockReviewItems =
@@ -918,9 +953,7 @@ export function normalizeDistributedEditingSessionState( sessionState = {} ) {
 		reviewTokenRecoveryReason,
 		reviewTokenRecoveryRequiresFreshReview,
 		localUpdatesImportStatus,
-		localUpdatesImportReason: normalizeNullableString(
-			sessionState.localUpdatesImportReason
-		),
+		localUpdatesImportReason,
 		localUpdatesImportPostId: normalizeNullableString(
 			sessionState.localUpdatesImportPostId
 		),
@@ -936,6 +969,9 @@ export function normalizeDistributedEditingSessionState( sessionState = {} ) {
 		localUpdatesImportVerifiedPostContentHash: normalizeSha256Hash(
 			sessionState.localUpdatesImportVerifiedPostContentHash
 		),
+		localUpdatesImportReviewRequestStatus,
+		localUpdatesImportRequiresFreshReview,
+		localUpdatesImportReviewActionKey,
 		...riskyBlockReviewFields,
 		requiresManualConflictResolution,
 		mustOfferLocalCopy,
@@ -985,6 +1021,62 @@ export function getDistributedEditingReviewTokenRecoveryStateForSessionState(
 		exposesProofSignature: false,
 		exposesReviewedBlockItems: false,
 		exposesReviewerIds: false,
+	};
+}
+
+/**
+ * Returns a pure fresh-review request descriptor for blocked local-updates
+ * imports. This keeps receiving-admin handoffs actionable without reusing stale
+ * proof, saving, calling REST, dispatching notices, mutating content, or
+ * exposing proof internals.
+ *
+ * @param {Object} sessionState DE-RTC session state.
+ *
+ * @return {Object} Local-updates import review request state.
+ */
+export function getDistributedEditingLocalUpdatesImportReviewRequestStateForSessionState(
+	sessionState = {}
+) {
+	const normalized = normalizeDistributedEditingSessionState( sessionState );
+	const requiresFreshReview = Boolean(
+		normalized.localUpdatesImportRequiresFreshReview
+	);
+
+	return {
+		status: normalized.localUpdatesImportReviewRequestStatus,
+		reason: requiresFreshReview
+			? normalized.localUpdatesImportReason
+			: null,
+		requiresFreshReview,
+		actionKey: requiresFreshReview
+			? normalized.localUpdatesImportReviewActionKey
+			: null,
+		localUpdatesImportStatus: normalized.localUpdatesImportStatus,
+		localUpdatesImportReason: normalized.localUpdatesImportReason,
+		localUpdatesImportPostId: normalized.localUpdatesImportPostId,
+		localUpdatesImportPostType: normalized.localUpdatesImportPostType,
+		localUpdatesImportHasPostContent:
+			normalized.localUpdatesImportHasPostContent,
+		localUpdatesImportHasAcceptedReviewApprovalProof:
+			normalized.localUpdatesImportHasAcceptedReviewApprovalProof,
+		canExportLocalUpdates:
+			requiresFreshReview && normalized.canExportLocalUpdates,
+		hasProtectedLocalChanges:
+			normalized.hasPendingChanges ||
+			normalized.mustOfferLocalCopy ||
+			normalized.canExportLocalUpdates,
+		shouldCallRetrySaveEndpoint: false,
+		shouldCallNormalSavePost: false,
+		dispatchesNotice: false,
+		mutatesEditorContent: false,
+		mutatesPersistedPostContent: false,
+		changesPostLock: false,
+		claimsSaved: false,
+		exposesTokenInternals: false,
+		exposesProofSignature: false,
+		exposesReviewedBlockItems: false,
+		exposesReviewerIds: false,
+		exposesRawContent: false,
 	};
 }
 
@@ -2114,6 +2206,10 @@ export function getDistributedEditingNoticeDescriptorsForSessionState(
 	const hasRetrySaveHandoffBlock =
 		normalized.retrySaveHandoffStatus ===
 		DISTRIBUTED_EDITING_RETRY_SAVE_HANDOFF_STATUSES.RETRY_SAVE_BLOCKED;
+	const localUpdatesImportReviewRequest =
+		getDistributedEditingLocalUpdatesImportReviewRequestStateForSessionState(
+			normalized
+		);
 
 	if ( normalized.requiresServerStateAcceptance ) {
 		descriptors.push(
@@ -2236,6 +2332,67 @@ export function getDistributedEditingNoticeDescriptorsForSessionState(
 				extra: getDistributedEditingRetrySaveDescriptorFields(
 					normalized
 				),
+			} )
+		);
+	}
+
+	if ( localUpdatesImportReviewRequest.requiresFreshReview ) {
+		descriptors.push(
+			createNoticeDescriptor( normalized, {
+				kind: DISTRIBUTED_EDITING_NOTICE_KINDS.LOCAL_UPDATES_IMPORT_BLOCKED,
+				status: 'warning',
+				priority: 'blocking',
+				actionKeys: [
+					localUpdatesImportReviewRequest.actionKey,
+				].filter( Boolean ),
+				extra: {
+					localUpdatesImportReviewRequestStatus:
+						localUpdatesImportReviewRequest.status,
+					localUpdatesImportReviewActionKey:
+						localUpdatesImportReviewRequest.actionKey,
+					localUpdatesImportRequiresFreshReview:
+						localUpdatesImportReviewRequest.requiresFreshReview,
+					localUpdatesImportStatus:
+						localUpdatesImportReviewRequest.localUpdatesImportStatus,
+					localUpdatesImportReason:
+						localUpdatesImportReviewRequest.localUpdatesImportReason,
+					localUpdatesImportPostId:
+						localUpdatesImportReviewRequest.localUpdatesImportPostId,
+					localUpdatesImportPostType:
+						localUpdatesImportReviewRequest.localUpdatesImportPostType,
+					localUpdatesImportHasPostContent:
+						localUpdatesImportReviewRequest.localUpdatesImportHasPostContent,
+					localUpdatesImportHasAcceptedReviewApprovalProof:
+						localUpdatesImportReviewRequest.localUpdatesImportHasAcceptedReviewApprovalProof,
+					shouldCallRetrySaveEndpoint:
+						localUpdatesImportReviewRequest.shouldCallRetrySaveEndpoint,
+					shouldCallNormalSavePost:
+						localUpdatesImportReviewRequest.shouldCallNormalSavePost,
+					dispatchesNotice:
+						localUpdatesImportReviewRequest.dispatchesNotice,
+					mutatesEditorContent:
+						localUpdatesImportReviewRequest.mutatesEditorContent,
+					mutatesPersistedPostContent:
+						localUpdatesImportReviewRequest.mutatesPersistedPostContent,
+					changesPostLock:
+						localUpdatesImportReviewRequest.changesPostLock,
+					claimsSaved: localUpdatesImportReviewRequest.claimsSaved,
+					exposesTokenInternals:
+						localUpdatesImportReviewRequest.exposesTokenInternals,
+					exposesProofSignature:
+						localUpdatesImportReviewRequest.exposesProofSignature,
+					exposesReviewedBlockItems:
+						localUpdatesImportReviewRequest.exposesReviewedBlockItems,
+					exposesReviewerIds:
+						localUpdatesImportReviewRequest.exposesReviewerIds,
+					exposesRawContent:
+						localUpdatesImportReviewRequest.exposesRawContent,
+					...( normalized.canExportLocalUpdates
+						? {
+								localUpdatesImportPreservesExportableLocalState: true,
+						  }
+						: {} ),
+				},
 			} )
 		);
 	}
@@ -5914,6 +6071,20 @@ function createLocalUpdatesImportBlockedResult( reason, options = {} ) {
 	const normalizedCurrent = normalizeDistributedEditingSessionState(
 		options.currentSessionState
 	);
+	const sessionState = normalizeDistributedEditingSessionState( {
+		...normalizedCurrent,
+		localUpdatesImportStatus:
+			DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_STATUSES.BLOCKED,
+		localUpdatesImportReason: reason,
+		localUpdatesImportPostId:
+			postId === null || postId === undefined ? null : String( postId ),
+		localUpdatesImportPostType: postType,
+		localUpdatesImportHasPostContent: false,
+		localUpdatesImportHasAcceptedReviewApprovalProof: false,
+		localUpdatesImportVerifiedPostContentHash: verifiedPostContentHash,
+		canExportLocalUpdates: normalizedCurrent.canExportLocalUpdates,
+		mustOfferLocalCopy: normalizedCurrent.mustOfferLocalCopy,
+	} );
 
 	return {
 		status: DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_STATUSES.BLOCKED,
@@ -5923,22 +6094,10 @@ function createLocalUpdatesImportBlockedResult( reason, options = {} ) {
 		acceptedReviewApprovalProof: null,
 		hasAcceptedReviewApprovalProof: false,
 		computedPostContentHash: verifiedPostContentHash,
-		sessionState: normalizeDistributedEditingSessionState( {
-			...normalizedCurrent,
-			localUpdatesImportStatus:
-				DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_STATUSES.BLOCKED,
-			localUpdatesImportReason: reason,
-			localUpdatesImportPostId:
-				postId === null || postId === undefined
-					? null
-					: String( postId ),
-			localUpdatesImportPostType: postType,
-			localUpdatesImportHasPostContent: false,
-			localUpdatesImportHasAcceptedReviewApprovalProof: false,
-			localUpdatesImportVerifiedPostContentHash: verifiedPostContentHash,
-			canExportLocalUpdates: normalizedCurrent.canExportLocalUpdates,
-			mustOfferLocalCopy: normalizedCurrent.mustOfferLocalCopy,
-		} ),
+		reviewRequestStatus: sessionState.localUpdatesImportReviewRequestStatus,
+		requiresFreshReview: sessionState.localUpdatesImportRequiresFreshReview,
+		reviewRequestActionKey: sessionState.localUpdatesImportReviewActionKey,
+		sessionState,
 		mutatesEditorContent: false,
 		callsRetrySaveEndpoint: false,
 		callsNormalSavePost: false,

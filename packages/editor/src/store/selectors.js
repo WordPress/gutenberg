@@ -32,6 +32,7 @@ import { unlock } from '../lock-unlock';
 import { getTemplateInfo } from '../utils/get-template-info';
 import {
 	DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE,
+	getDistributedEditingLocalUpdatesImportReviewRequestStateForSessionState,
 	getDistributedEditingNoticeDescriptorsForSessionState,
 	getDistributedEditingRiskyBlockReviewStateForSessionState,
 	getDistributedEditingReviewTokenRecoveryStateForSessionState,
@@ -507,6 +508,21 @@ export function getDistributedEditingRetrySaveFlowState( state ) {
  */
 export function getDistributedEditingReviewTokenRecoveryState( state ) {
 	return getDistributedEditingReviewTokenRecoveryStateForSessionState(
+		getDistributedEditingSessionState( state )
+	);
+}
+
+/**
+ * Returns the current DE-RTC local-updates import review request state.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {Object} Local-updates import review request state.
+ */
+export function getDistributedEditingLocalUpdatesImportReviewRequestState(
+	state
+) {
+	return getDistributedEditingLocalUpdatesImportReviewRequestStateForSessionState(
 		getDistributedEditingSessionState( state )
 	);
 }
