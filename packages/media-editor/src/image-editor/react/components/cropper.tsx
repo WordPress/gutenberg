@@ -291,9 +291,13 @@ function CropperInner(
 		[ canvasSize, naturalWidth, naturalHeight, state.rotation ]
 	);
 
-	// Per-axis minimum crop size in normalized space, derived from a
-	// pixel-based floor. The crop rect is normalized in the rotated bbox,
-	// so use bbox dims (which swap at 90°/270°) for the conversion.
+	// Per-axis minimum crop size in normalized space, expressing a
+	// pixel floor on the captured source region. cropRect is normalized
+	// in the viewport's snap-rotation bbox; the captured source-pixel
+	// width is `cropRect.width * bbox.width / zoom`, so the normalized
+	// floor scales with `zoom` to keep the source-pixel floor constant.
+	// Without this, SETTLE_CROP zooms in proportional to the shrink and
+	// successive drags can crop arbitrarily small.
 	const minCropSize: Size | undefined = useMemo( () => {
 		if ( naturalWidth <= 0 || naturalHeight <= 0 ) {
 			return undefined;
@@ -305,10 +309,13 @@ function CropperInner(
 			snapRotation
 		);
 		return {
-			width: Math.min( 1, MIN_CROP_PIXELS / bbox.width ),
-			height: Math.min( 1, MIN_CROP_PIXELS / bbox.height ),
+			width: Math.min( 1, ( MIN_CROP_PIXELS * state.zoom ) / bbox.width ),
+			height: Math.min(
+				1,
+				( MIN_CROP_PIXELS * state.zoom ) / bbox.height
+			),
 		};
-	}, [ naturalWidth, naturalHeight, state.rotation ] );
+	}, [ naturalWidth, naturalHeight, state.rotation, state.zoom ] );
 
 	// In fixed-crop mode, auto-size the crop rect only when a fixed aspect
 	// ratio is selected. With "Free" selected, turning freeform handles off
