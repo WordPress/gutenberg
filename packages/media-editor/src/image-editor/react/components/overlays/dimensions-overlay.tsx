@@ -1,40 +1,124 @@
 /**
+ * WordPress dependencies
+ */
+import { useLayoutEffect, useRef, useState } from '@wordpress/element';
+
+/**
  * Internal dependencies
  */
 import type { HandlePosition, NormalizedRect, Size } from '../../../core/types';
 
-/**
- * Per-direction transform that anchors the tooltip outward from the
- * crop rectangle's center, so it never overlaps the image when dragging
- * any handle.
- */
-const ANCHOR_TRANSFORM: Record< HandlePosition, string > = {
-	nw: 'translate(-100%, -100%)',
-	n: 'translate(-50%, -100%)',
-	ne: 'translate(0, -100%)',
-	e: 'translate(0, -50%)',
-	se: 'translate(0, 0)',
-	s: 'translate(-50%, 0)',
-	sw: 'translate(-100%, 0)',
-	w: 'translate(-100%, -50%)',
-};
-
 const HANDLE_GAP_PX = 12;
 
 /**
- * Per-direction translation away from the handle so the tooltip clears
- * the handle dot and its focus ring.
+ * Which side of the handle a tooltip axis sits on. `before` places the
+ * tooltip on the negative side of the handle (above for Y, left for X),
+ * `after` on the positive side, `center` keeps it aligned with the handle.
  */
-const HANDLE_OFFSET: Record< HandlePosition, { x: number; y: number } > = {
-	nw: { x: -HANDLE_GAP_PX, y: -HANDLE_GAP_PX },
-	n: { x: 0, y: -HANDLE_GAP_PX },
-	ne: { x: HANDLE_GAP_PX, y: -HANDLE_GAP_PX },
-	e: { x: HANDLE_GAP_PX, y: 0 },
-	se: { x: HANDLE_GAP_PX, y: HANDLE_GAP_PX },
-	s: { x: 0, y: HANDLE_GAP_PX },
-	sw: { x: -HANDLE_GAP_PX, y: HANDLE_GAP_PX },
-	w: { x: -HANDLE_GAP_PX, y: 0 },
+type AxisSide = 'before' | 'center' | 'after';
+
+interface Anchor {
+	x: AxisSide;
+	y: AxisSide;
+}
+
+const TRANSLATE_PERCENT: Record< AxisSide, string > = {
+	before: '-100%',
+	center: '-50%',
+	after: '0',
 };
+
+const GAP_DIRECTION: Record< AxisSide, number > = {
+	before: -1,
+	center: 0,
+	after: 1,
+};
+
+const OPPOSITE_SIDE: Record< AxisSide, AxisSide > = {
+	before: 'after',
+	center: 'center',
+	after: 'before',
+};
+
+/**
+ * Preferred anchor for a handle, before edge-clipping is considered:
+ * tooltip sits outward from the crop rectangle's center.
+ *
+ * @param handle
+ */
+function preferredAnchor( handle: HandlePosition ): Anchor {
+	let x: AxisSide = 'center';
+	if ( handle.includes( 'w' ) ) {
+		x = 'before';
+	} else if ( handle.includes( 'e' ) ) {
+		x = 'after';
+	}
+
+	let y: AxisSide = 'center';
+	if ( handle.includes( 'n' ) ) {
+		y = 'before';
+	} else if ( handle.includes( 's' ) ) {
+		y = 'after';
+	}
+
+	return { x, y };
+}
+
+/**
+ * Start coordinate of a tooltip placed on the given side of `handlePos`,
+ * accounting for the per-side handle gap and the tooltip's own length.
+ *
+ * @param side
+ * @param handlePos
+ * @param length
+ */
+function sideStart(
+	side: AxisSide,
+	handlePos: number,
+	length: number
+): number {
+	if ( side === 'before' ) {
+		return handlePos - HANDLE_GAP_PX - length;
+	}
+	if ( side === 'after' ) {
+		return handlePos + HANDLE_GAP_PX;
+	}
+	return handlePos - length / 2;
+}
+
+/**
+ * Picks a side that keeps the tooltip inside the container along one
+ * axis, preferring the supplied side and falling back to its opposite,
+ * then center.
+ *
+ * @param preferred
+ * @param handlePos
+ * @param length
+ * @param containerLength
+ */
+function fittingSide(
+	preferred: AxisSide,
+	handlePos: number,
+	length: number,
+	containerLength: number
+): AxisSide {
+	const fits = ( side: AxisSide ) => {
+		const start = sideStart( side, handlePos, length );
+		return start >= 0 && start + length <= containerLength;
+	};
+
+	if ( fits( preferred ) ) {
+		return preferred;
+	}
+	const opposite = OPPOSITE_SIDE[ preferred ];
+	if ( opposite !== preferred && fits( opposite ) ) {
+		return opposite;
+	}
+	if ( preferred !== 'center' && fits( 'center' ) ) {
+		return 'center';
+	}
+	return preferred;
+}
 
 interface DimensionsOverlayProps {
 	/** Crop rectangle in normalized coordinates. */
@@ -74,6 +158,32 @@ export function DimensionsOverlay( {
 	outputWidth,
 	outputHeight,
 }: DimensionsOverlayProps ) {
+	const tooltipRef = useRef< HTMLDivElement >( null );
+	const [ tooltipSize, setTooltipSize ] = useState< Size | null >( null );
+
+	// Measure the rendered tooltip so we can flip its anchor when it
+	// would otherwise be clipped by the cropper's `overflow: hidden`
+	// root. Runs synchronously before paint, so the user never sees
+	// the un-flipped position. Tracks `outputWidth`/`outputHeight`
+	// because they drive the digit count, the only thing that changes
+	// the tooltip's intrinsic size during a drag.
+	useLayoutEffect( () => {
+		if ( ! tooltipRef.current ) {
+			return;
+		}
+		const rect = tooltipRef.current.getBoundingClientRect();
+		setTooltipSize( ( prev ) => {
+			if (
+				prev &&
+				prev.width === rect.width &&
+				prev.height === rect.height
+			) {
+				return prev;
+			}
+			return { width: rect.width, height: rect.height };
+		} );
+	}, [ outputWidth, outputHeight ] );
+
 	if (
 		! activeHandle ||
 		containerSize.width === 0 ||
@@ -105,16 +215,35 @@ export function DimensionsOverlay( {
 		handleY = top + height;
 	}
 
-	const gap = HANDLE_OFFSET[ activeHandle ];
+	const preferred = preferredAnchor( activeHandle );
+	const anchor: Anchor = tooltipSize
+		? {
+				x: fittingSide(
+					preferred.x,
+					handleX,
+					tooltipSize.width,
+					containerSize.width
+				),
+				y: fittingSide(
+					preferred.y,
+					handleY,
+					tooltipSize.height,
+					containerSize.height
+				),
+		  }
+		: preferred;
 
 	return (
 		<div
+			ref={ tooltipRef }
 			className="wp-media-editor-image-editor__dimensions-tooltip"
 			data-testid="cropper-dimensions-tooltip"
 			style={ {
-				left: handleX + gap.x,
-				top: handleY + gap.y,
-				transform: ANCHOR_TRANSFORM[ activeHandle ],
+				left: handleX + GAP_DIRECTION[ anchor.x ] * HANDLE_GAP_PX,
+				top: handleY + GAP_DIRECTION[ anchor.y ] * HANDLE_GAP_PX,
+				transform: `translate(${ TRANSLATE_PERCENT[ anchor.x ] }, ${
+					TRANSLATE_PERCENT[ anchor.y ]
+				})`,
 			} }
 			aria-hidden="true"
 		>
