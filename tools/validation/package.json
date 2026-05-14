@@ -22,7 +22,6 @@
 	"engines": {
 		"node": ">=20.10.0"
 	},
-	"type": "module",
 	"devDependencies": {
 		"@wordpress/scripts": "file:../../packages/scripts",
 		"chalk": "^4.1.1",
@@ -35,7 +34,7 @@
 	},
 	"scripts": {
 		"check-installed-deps": "node ./check-installed-deps.mjs",
-		"check-licenses": "node ./check-licenses.js",
+		"check-licenses": "node ./check-licenses.mjs",
 		"validate-package-lock": "node ./validate-package-lock.js",
 		"validate-tsconfig": "node ./validate-tsconfig.mjs",
 		"check-local-changes": "node ./check-local-changes.js"
