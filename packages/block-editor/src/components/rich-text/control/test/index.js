@@ -50,6 +50,10 @@ describe( 'RichTextControl', () => {
 		expect( textbox ).toHaveAttribute( 'contenteditable', 'true' );
 		// `BaseControl` wires the label's `for` to the control's `id`.
 		expect( label ).toHaveAttribute( 'for', textbox.id );
+		// `<label for>` does not contribute an accessible name to a non-form
+		// element (a `<div role="textbox">`), so the label is also mirrored
+		// onto `aria-label` for assistive tech and test locators.
+		expect( textbox ).toHaveAttribute( 'aria-label', 'Description' );
 	} );
 
 	it( 'visually hides the label when `hideLabelFromVision` is set', () => {

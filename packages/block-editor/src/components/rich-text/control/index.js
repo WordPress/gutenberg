@@ -147,6 +147,7 @@ export default function RichTextControl( {
 					) }
 					role="textbox"
 					aria-multiline={ ! disableLineBreaks }
+					aria-label={ label }
 					ref={ useMergeRefs( [
 						richTextRef,
 						anchorRef,
