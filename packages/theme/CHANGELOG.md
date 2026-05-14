@@ -15,7 +15,7 @@
 
 ### Internal
 
--   Refactor code to avoid side effects with colorspace registration ([77653](https://github.com/WordPress/gutenberg/pull/77653)).
+-   Refactor code to avoid side effects with colorspace registration ([#77653](https://github.com/WordPress/gutenberg/pull/77653)).
 
 ## 0.12.0 (2026-04-29)
 
