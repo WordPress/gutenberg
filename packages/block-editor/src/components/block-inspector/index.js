@@ -25,6 +25,7 @@ import { store as blockEditorStore } from '../../store';
 import BlockStyles from '../block-styles';
 import { ListViewContentPopover } from '../inspector-controls/list-view-content-popover';
 import InspectorControls from '../inspector-controls';
+import { BlockInspectorPreTabsSlot } from './inspector-pre-tabs-slot-fill';
 import { default as InspectorControlsTabs } from '../inspector-controls-tabs';
 import useInspectorControlsTabs from '../inspector-controls-tabs/use-inspector-controls-tabs';
 import InspectorControlsLastItem from '../inspector-controls/last-item';
@@ -60,13 +61,14 @@ function StyleInspectorSlots( {
 				group="typography"
 				label={ __( 'Typography' ) }
 			/>
+			<InspectorControls.Slot group="layout" label={ __( 'Layout' ) } />
 			<InspectorControls.Slot
 				group="dimensions"
 				label={ __( 'Dimensions' ) }
 			/>
 			<InspectorControls.Slot group="border" label={ borderPanelLabel } />
-			<InspectorControls.Slot group="styles" />
 			{ showPositionControls && <PositionControls /> }
+			<InspectorControls.Slot group="styles" />
 			{ showBindingsControls && (
 				<InspectorControls.Slot group="bindings" />
 			) }
@@ -351,6 +353,7 @@ const BlockInspectorSingleBlock = ( {
 			<ViewportVisibilityInfo clientId={ renderedBlockClientId } />
 			<EditContents clientId={ renderedBlockClientId } />
 			<BlockVariationTransforms blockClientId={ renderedBlockClientId } />
+			<BlockInspectorPreTabsSlot />
 			{ hasMultipleTabs && (
 				<>
 					<InspectorControlsTabs

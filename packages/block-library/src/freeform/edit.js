@@ -29,6 +29,7 @@ export default function FreeformEdit( {
 	attributes,
 	setAttributes,
 	clientId,
+	onReplace,
 } ) {
 	const { content } = attributes;
 	const [ isOpen, setOpen ] = useState( false );
@@ -49,7 +50,10 @@ export default function FreeformEdit( {
 			{ canRemove && ! isDeprecationMode && (
 				<BlockControls>
 					<ToolbarGroup>
-						<ConvertToBlocksButton clientId={ clientId } />
+						<ConvertToBlocksButton
+							content={ content }
+							onReplace={ onReplace }
+						/>
 					</ToolbarGroup>
 				</BlockControls>
 			) }
@@ -66,8 +70,8 @@ export default function FreeformEdit( {
 			<div { ...useBlockProps() }>
 				{ isDeprecationMode && canRemove && content && (
 					<MigrationNotice
-						clientId={ clientId }
 						content={ content }
+						onReplace={ onReplace }
 					/>
 				) }
 				{ content ? (

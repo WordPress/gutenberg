@@ -14,10 +14,12 @@
 		{ "path": "../element" },
 		{ "path": "../i18n" },
 		{ "path": "../icons" },
+		{ "path": "../is-shallow-equal" },
 		{ "path": "../notices" },
 		{ "path": "../private-apis" },
 		{ "path": "../route" },
 		{ "path": "../ui" },
-		{ "path": "../url" }
+		{ "path": "../url" },
+		{ "path": "../views" }
 	]
 }

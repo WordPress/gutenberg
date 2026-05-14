@@ -3,7 +3,7 @@
 /**
  * External dependencies
  */
-import { spawn } from 'child_process';
+import { execSync, spawn } from 'child_process';
 import { fileURLToPath } from 'url';
 import path from 'path';
 import fs from 'fs';
@@ -122,8 +122,20 @@ async function dev() {
 	readyMarkerFile.cleanup();
 
 	try {
+		// Step 0: Verify node_modules is in sync with package-lock.json
+		console.log( '🔍 Checking dependencies...' );
+		await exec( 'npm', [
+			'run',
+			'check-installed-deps',
+			'--workspace',
+			'@wordpress/validation-tools',
+			'--silent',
+		] ).catch( () => {
+			throw new Error( 'Run `npm install` to update.' );
+		} );
+
 		// Step 1: Clean packages
-		console.log( '🧹 Cleaning packages...' );
+		console.log( '\n🧹 Cleaning packages...' );
 		await exec( 'npm', [ 'run', 'clean:packages' ], { silent: true } );
 
 		// Step 2: Build workspaces
@@ -134,17 +146,11 @@ async function dev() {
 			{ silent: true }
 		);
 
-		// Step 2.5: Generate worker placeholders
+		// Step 3: Generate worker placeholders
 		// This must happen before TypeScript compilation because some packages
 		// (like vips) have source files that import from generated worker-code.ts
 		await exec( 'node', [
 			'./bin/packages/generate-worker-placeholders.mjs',
-		] );
-
-		// Step 3: Validate TypeScript version
-		console.log( '\n🔍 Validating TypeScript version...' );
-		await exec( 'node', [
-			'./bin/packages/validate-typescript-version.js',
 		] );
 
 		// Step 4: Build TypeScript types
@@ -259,4 +265,60 @@ async function dev() {
 	}
 }
 
+/**
+ * Warn if a webpack process is watching this checkout. A stale webpack
+ * dev server (e.g. left over from a previous setup) can clobber the
+ * non-minified index.js files in build/scripts/ with webpack chunk
+ * format, breaking the editor when SCRIPT_DEBUG is enabled.
+ *
+ * Best-effort and intentionally non-fatal: webpack processes that
+ * happen to be running for an unrelated project shouldn't block
+ * `npm run dev`. Match against this checkout's path (with trailing /)
+ * to avoid false positives on sibling directories.
+ */
+function checkForConflictingProcesses() {
+	try {
+		const ps = execSync( 'ps aux', { encoding: 'utf-8' } );
+		const repoPathPrefix = ROOT_DIR + '/';
+		const webpackLines = ps
+			.split( '\n' )
+			.filter(
+				( line ) =>
+					/webpack/.test( line ) &&
+					! /grep/.test( line ) &&
+					! line.includes( String( process.pid ) ) &&
+					line.includes( repoPathPrefix )
+			);
+
+		if ( webpackLines.length === 0 ) {
+			return;
+		}
+
+		const pids = webpackLines
+			.map( ( line ) => line.trim().split( /\s+/ )[ 1 ] )
+			.filter( Boolean );
+
+		console.warn(
+			`\n⚠️  Found ${ pids.length } webpack process(es) that look like they may be watching this checkout:\n`
+		);
+		for ( const line of webpackLines ) {
+			console.warn( `   ${ line.trim() }` );
+		}
+		console.warn(
+			`\nA stale webpack dev server can overwrite esbuild output in build/scripts/`
+		);
+		console.warn(
+			`with webpack chunk format, breaking the editor when SCRIPT_DEBUG is enabled.`
+		);
+		console.warn(
+			`If things look wrong, kill them with:  kill -9 ${ pids.join(
+				' '
+			) }\n`
+		);
+	} catch {
+		// If ps fails, just continue — this is a best-effort check.
+	}
+}
+
+checkForConflictingProcesses();
 dev();
