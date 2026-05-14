@@ -89,6 +89,30 @@ const SAVE_POLICY = {
 	blocksNormalSavePost: true,
 	opensPrePublishReview: true,
 	requiresServerStateRefetch: false,
+	saveButtonLocalChangesState: 'protected_local_changes_exportable',
+	saveButtonReviewCheckpointState: 'review_required',
+	saveButtonAuthoritativePostState: 'review_required_before_update',
+	saveButtonStateSummaryText:
+		'Protected local changes need review before the authoritative post can update.',
+	saveButtonStateVocabulary: {
+		localChangesState: 'protected_local_changes_exportable',
+		reviewCheckpointState: 'review_required',
+		authoritativePostState: 'review_required_before_update',
+		localChangesText:
+			'Protected local changes remain exportable from this editor.',
+		reviewCheckpointText:
+			'Review is required before the authoritative post can update.',
+		authoritativePostText:
+			'The authoritative WordPress post cannot be updated until risky changes are approved or removed.',
+		summaryText:
+			'Protected local changes need review before the authoritative post can update.',
+		descriptorOnly: true,
+		rawContentIncluded: false,
+		exposesRawContent: false,
+		exposesProofInternals: false,
+		exposesReviewerIds: false,
+		exposesSaverIds: false,
+	},
 	savesPost: false,
 	shouldCallNormalSavePost: false,
 	shouldCallRetrySaveEndpoint: false,
@@ -281,7 +305,42 @@ describe( 'DistributedEditingRiskyBlockReviewPrePublishPanel', () => {
 				'This highlighted block needs HTML review before Save can update the post.'
 			)
 		).toBeVisible();
+		expect(
+			screen.getByText(
+				'Protected local changes remain exportable from this editor.'
+			)
+		).toBeVisible();
+		expect(
+			screen.getByText(
+				'Review is required before the authoritative post can update.'
+			)
+		).toBeVisible();
+		expect(
+			screen.getByText(
+				'The authoritative WordPress post cannot be updated until risky changes are approved or removed.'
+			)
+		).toBeVisible();
 		expect( screen.getByText( 'Custom HTML' ) ).toBeVisible();
+		const panel = screen.getByRole( 'region', {
+			name: 'Distributed Editing HTML review state',
+		} );
+
+		expect( panel ).toHaveAttribute(
+			'data-distributed-editing-save-local-changes-state',
+			'protected_local_changes_exportable'
+		);
+		expect( panel ).toHaveAttribute(
+			'data-distributed-editing-save-review-checkpoint-state',
+			'review_required'
+		);
+		expect( panel ).toHaveAttribute(
+			'data-distributed-editing-save-authoritative-post-state',
+			'review_required_before_update'
+		);
+		expect( panel ).toHaveAttribute(
+			'data-distributed-editing-save-state-summary',
+			'Protected local changes need review before the authoritative post can update.'
+		);
 		expect(
 			screen.queryByText( '<script>secret</script>' )
 		).not.toBeInTheDocument();

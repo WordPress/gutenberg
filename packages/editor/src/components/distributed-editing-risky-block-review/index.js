@@ -336,18 +336,65 @@ export function DistributedEditingRiskyBlockReviewPanel( {
 	const reviewItems = Array.isArray( reviewState.reviewItems )
 		? reviewState.reviewItems
 		: [];
+	const saveVocabulary =
+		getDistributedEditingRiskyBlockReviewSaveVocabulary( savePolicy );
+	const shouldRenderSaveVocabulary = Boolean(
+		saveVocabulary.localChangesText ||
+			saveVocabulary.reviewCheckpointText ||
+			saveVocabulary.authoritativePostText
+	);
 
 	return (
 		<div
+			aria-label={ __( 'Distributed Editing HTML review state' ) }
 			className="editor-distributed-editing-risky-block-review"
 			data-distributed-editing-risky-block-review-panel
+			data-distributed-editing-save-authoritative-post-state={
+				saveVocabulary.authoritativePostState || undefined
+			}
 			data-distributed-editing-save-click-action={
 				savePolicy.clickAction || ''
 			}
+			data-distributed-editing-save-local-changes-state={
+				saveVocabulary.localChangesState || undefined
+			}
+			data-distributed-editing-save-review-checkpoint-state={
+				saveVocabulary.reviewCheckpointState || undefined
+			}
+			data-distributed-editing-save-state-summary={
+				saveVocabulary.summaryText || undefined
+			}
+			role="region"
 		>
 			<p className="editor-distributed-editing-risky-block-review__summary">
 				{ getRiskyBlockReviewSummaryMessage( reviewState ) }
 			</p>
+			{ shouldRenderSaveVocabulary && (
+				<dl
+					aria-label={ __( 'Distributed Editing Save state' ) }
+					className="editor-distributed-editing-risky-block-review__save-vocabulary"
+					data-distributed-editing-risky-block-review-save-vocabulary
+				>
+					{ saveVocabulary.localChangesText && (
+						<div>
+							<dt>{ __( 'Local changes' ) }</dt>
+							<dd>{ saveVocabulary.localChangesText }</dd>
+						</div>
+					) }
+					{ saveVocabulary.reviewCheckpointText && (
+						<div>
+							<dt>{ __( 'Review' ) }</dt>
+							<dd>{ saveVocabulary.reviewCheckpointText }</dd>
+						</div>
+					) }
+					{ saveVocabulary.authoritativePostText && (
+						<div>
+							<dt>{ __( 'Authoritative post' ) }</dt>
+							<dd>{ saveVocabulary.authoritativePostText }</dd>
+						</div>
+					) }
+				</dl>
+			) }
 			<dl className="editor-distributed-editing-risky-block-review__counts">
 				<div>
 					<dt>{ __( 'Pending' ) }</dt>
@@ -375,6 +422,44 @@ export function DistributedEditingRiskyBlockReviewPanel( {
 			</ul>
 		</div>
 	);
+}
+
+function getDistributedEditingRiskyBlockReviewSaveVocabulary(
+	savePolicy = {}
+) {
+	const stateVocabulary =
+		savePolicy.saveButtonStateVocabulary ||
+		savePolicy.saveButton?.stateVocabulary ||
+		savePolicy.stateVocabulary ||
+		{};
+
+	return {
+		localChangesState:
+			savePolicy.saveButtonLocalChangesState ||
+			stateVocabulary.localChangesState ||
+			'',
+		reviewCheckpointState:
+			savePolicy.saveButtonReviewCheckpointState ||
+			stateVocabulary.reviewCheckpointState ||
+			'',
+		authoritativePostState:
+			savePolicy.saveButtonAuthoritativePostState ||
+			stateVocabulary.authoritativePostState ||
+			savePolicy.saveButtonAuthorityState ||
+			savePolicy.authorityState ||
+			'',
+		summaryText:
+			savePolicy.saveButtonStateSummaryText ||
+			stateVocabulary.summaryText ||
+			'',
+		localChangesText: stateVocabulary.localChangesText || '',
+		reviewCheckpointText: stateVocabulary.reviewCheckpointText || '',
+		authoritativePostText:
+			stateVocabulary.authoritativePostText ||
+			savePolicy.saveButtonAuthorityStatusText ||
+			savePolicy.authorityStatusText ||
+			'',
+	};
 }
 
 function DistributedEditingRiskyBlockReviewItem( {
