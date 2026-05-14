@@ -93,6 +93,8 @@ export interface CropperProps {
 	isPlacementActive?: boolean;
 	/** Show the dimming overlay outside the crop area. */
 	showDimming?: boolean;
+	/** Show the live output dimensions tooltip during a resize. */
+	showDimensions?: boolean;
 	/** Minimum zoom level. */
 	minZoom?: number;
 	/** Maximum zoom level. */
@@ -145,6 +147,7 @@ export interface CropperProps {
  * @param root0.showGrid          Grid overlay mode: false | true | 'interactive'.
  * @param root0.isPlacementActive Keep grid visible during external placement activity.
  * @param root0.showDimming       Show dimming overlay outside crop.
+ * @param root0.showDimensions    Show live dimensions tooltip during resize.
  * @param root0.minZoom           Minimum zoom level.
  * @param root0.maxZoom           Maximum zoom level.
  * @param root0.aspectRatio       Fixed aspect ratio (width/height).
@@ -165,6 +168,7 @@ function CropperInner(
 		showGrid = false,
 		isPlacementActive = false,
 		showDimming = true,
+		showDimensions = true,
 		minZoom,
 		maxZoom,
 		aspectRatio,
@@ -498,7 +502,7 @@ function CropperInner(
 	// overlay. Only computed during pointer drags, so the per-frame
 	// state churn during pan/zoom doesn't pay for it.
 	const outputSize = useMemo( () => {
-		if ( ! activeHandle || ! state.image ) {
+		if ( ! showDimensions || ! activeHandle || ! state.image ) {
 			return null;
 		}
 		const region = getSourceRegion( state, {
@@ -506,7 +510,7 @@ function CropperInner(
 			height: state.image.naturalHeight,
 		} );
 		return { width: region.width, height: region.height };
-	}, [ activeHandle, state ] );
+	}, [ showDimensions, activeHandle, state ] );
 
 	/**
 	 * Handle Escape on a resize handle — return focus to the canvas so
