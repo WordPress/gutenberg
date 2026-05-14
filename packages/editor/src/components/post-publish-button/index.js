@@ -116,6 +116,22 @@ export class PostPublishButton extends Component {
 			hasDistributedEditingSaveButtonState
 				? distributedEditingSaveButtonState.statusText
 				: undefined;
+		const distributedEditingSaveButtonDataAttributes =
+			hasDistributedEditingSaveButtonState
+				? {
+						'data-distributed-editing-save-button-status':
+							distributedEditingSaveButtonState.status,
+						'data-distributed-editing-save-button-source':
+							distributedEditingSaveButtonState.source ||
+							undefined,
+						'data-distributed-editing-save-button-click-action':
+							distributedEditingSaveButtonState.clickAction ||
+							undefined,
+						'data-distributed-editing-save-button-reason':
+							distributedEditingSaveButtonState.reason ||
+							undefined,
+				  }
+				: {};
 
 		const isButtonDisabled =
 			isPostSavingLocked ||
@@ -166,6 +182,7 @@ export class PostPublishButton extends Component {
 		};
 
 		const buttonProps = {
+			...distributedEditingSaveButtonDataAttributes,
 			'aria-disabled': isButtonDisabled,
 			className: 'editor-post-publish-button',
 			isBusy:
@@ -178,6 +195,7 @@ export class PostPublishButton extends Component {
 		};
 
 		const toggleProps = {
+			...distributedEditingSaveButtonDataAttributes,
 			'aria-disabled': isToggleDisabled,
 			'aria-expanded': isOpen,
 			className: 'editor-post-publish-panel__toggle',

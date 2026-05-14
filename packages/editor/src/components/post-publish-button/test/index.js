@@ -194,20 +194,105 @@ describe( 'PostPublishButton', () => {
 				isPublishable
 				distributedEditingSaveButtonState={ {
 					status: 'accepted_but_unconsumed',
+					reason: 'fresh_review_accepted_but_unconsumed',
+					source: 'fresh_review',
 					label: 'Submit reviewed changes',
 					statusText:
 						'Accepted Distributed Editing proof is ready for guarded retry save.',
+					clickAction: 'continue_guarded_retry_save',
 				} }
 			/>
 		);
 
-		expect(
-			screen.getByRole( 'button', {
-				name: 'Submit reviewed changes',
-			} )
-		).toHaveAttribute(
+		const button = screen.getByRole( 'button', {
+			name: 'Submit reviewed changes',
+		} );
+		expect( button ).toHaveAttribute(
 			'title',
 			'Accepted Distributed Editing proof is ready for guarded retry save.'
+		);
+		expect( button ).toHaveAttribute(
+			'data-distributed-editing-save-button-status',
+			'accepted_but_unconsumed'
+		);
+		expect( button ).toHaveAttribute(
+			'data-distributed-editing-save-button-source',
+			'fresh_review'
+		);
+		expect( button ).toHaveAttribute(
+			'data-distributed-editing-save-button-click-action',
+			'continue_guarded_retry_save'
+		);
+		expect( button ).toHaveAttribute(
+			'data-distributed-editing-save-button-reason',
+			'fresh_review_accepted_but_unconsumed'
+		);
+	} );
+
+	it( 'should not expose Distributed Editing save descriptor data for the default state', () => {
+		render(
+			<PostPublishButton
+				isSaveable
+				isPublishable
+				distributedEditingSaveButtonState={ {
+					status: 'update_ready',
+					source: 'default',
+					label: 'Update',
+					statusText: 'Ready to update',
+					clickAction: 'continue_save',
+				} }
+			/>
+		);
+
+		const button = screen.getByRole( 'button', {
+			name: 'Submit for Review',
+		} );
+		expect( button ).not.toHaveAttribute(
+			'data-distributed-editing-save-button-status'
+		);
+		expect( button ).not.toHaveAttribute(
+			'data-distributed-editing-save-button-source'
+		);
+		expect( button ).not.toHaveAttribute(
+			'data-distributed-editing-save-button-click-action'
+		);
+		expect( button ).not.toHaveAttribute(
+			'data-distributed-editing-save-button-reason'
+		);
+	} );
+
+	it( 'should expose Distributed Editing save descriptor data on toggle buttons', () => {
+		render(
+			<PostPublishButton
+				isSaveable
+				isPublishable
+				isToggle
+				distributedEditingSaveButtonState={ {
+					status: 'retry_save_confirmed',
+					source: 'retry_save',
+					label: 'Retry save confirmed',
+					statusText: 'Distributed Editing retry save confirmed.',
+					disabled: true,
+				} }
+			/>
+		);
+
+		const button = screen.getByRole( 'button', {
+			name: 'Retry save confirmed',
+		} );
+		expect( button ).toHaveAttribute(
+			'data-distributed-editing-save-button-status',
+			'retry_save_confirmed'
+		);
+		expect( button ).toHaveAttribute(
+			'data-distributed-editing-save-button-source',
+			'retry_save'
+		);
+		expect( button ).not.toHaveAttribute(
+			'data-distributed-editing-save-button-click-action'
+		);
+		expect( button ).not.toHaveAttribute(
+			'data-distributed-editing-save-button-reason'
 		);
 	} );
 
