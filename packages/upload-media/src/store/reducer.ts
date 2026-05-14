@@ -28,6 +28,7 @@ import {
 import {
 	DEFAULT_MAX_CONCURRENT_UPLOADS,
 	DEFAULT_MAX_CONCURRENT_IMAGE_PROCESSING,
+	DEFAULT_RETRY_SETTINGS,
 } from './constants';
 
 const noop = () => {};
@@ -40,6 +41,7 @@ const DEFAULT_STATE: State = {
 		mediaUpload: noop,
 		maxConcurrentUploads: DEFAULT_MAX_CONCURRENT_UPLOADS,
 		maxConcurrentImageProcessing: DEFAULT_MAX_CONCURRENT_IMAGE_PROCESSING,
+		retry: { ...DEFAULT_RETRY_SETTINGS },
 	},
 };
 
