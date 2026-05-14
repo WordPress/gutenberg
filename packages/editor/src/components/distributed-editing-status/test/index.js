@@ -210,9 +210,18 @@ function expectClipboardExportPayload(
 		},
 		postContent: editedPostContent,
 		pendingChangeCount: sessionState.pendingChangeCount,
+		saveAuthority: {
+			state: expect.any( String ),
+			saveButtonStatus: expect.any( String ),
+			pendingServerConfirmation: expect.any( Boolean ),
+			authoritativePostUpdated: expect.any( Boolean ),
+		},
 	} );
 	expect( payload ).toHaveProperty( 'acceptedReviewApprovalProof' );
 	expect( payload ).not.toHaveProperty( 'distributedEditingSessionState' );
+	expect( JSON.stringify( payload.saveAuthority ) ).not.toContain(
+		editedPostContent
+	);
 
 	return payload;
 }

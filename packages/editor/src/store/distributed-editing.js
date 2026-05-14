@@ -2401,6 +2401,9 @@ export function getDistributedEditingLocalUpdatesExportPayload( {
 		getDistributedEditingReviewTokenRecoveryExportPayload(
 			normalizedSessionState
 		);
+	const saveAuthority = getDistributedEditingSaveAuthorityExportPayload(
+		normalizedSessionState
+	);
 
 	return {
 		version: 1,
@@ -2412,6 +2415,7 @@ export function getDistributedEditingLocalUpdatesExportPayload( {
 		postContent:
 			typeof editedPostContent === 'string' ? editedPostContent : '',
 		pendingChangeCount: normalizedSessionState.pendingChangeCount,
+		saveAuthority,
 		...( ( acceptedReviewApprovalProofEnvelope || reviewTokenRecovery ) &&
 		proofServerVersion
 			? { serverVersion: proofServerVersion }
@@ -2422,6 +2426,25 @@ export function getDistributedEditingLocalUpdatesExportPayload( {
 			: {} ),
 		...( reviewTokenRecovery ? { reviewTokenRecovery } : {} ),
 		acceptedReviewApprovalProof: acceptedReviewApprovalProofEnvelope,
+	};
+}
+
+function getDistributedEditingSaveAuthorityExportPayload( sessionState = {} ) {
+	const saveButtonState =
+		getDistributedEditingSaveButtonStateForSessionState( sessionState );
+
+	return {
+		state: saveButtonState.authorityState ?? null,
+		saveButtonStatus: saveButtonState.status ?? null,
+		saveButtonSource: saveButtonState.source ?? null,
+		saveButtonReason: saveButtonState.reason ?? null,
+		saveButtonClickAction: saveButtonState.clickAction ?? null,
+		pendingServerConfirmation: Boolean(
+			saveButtonState.pendingServerConfirmation
+		),
+		authoritativePostUpdated: Boolean(
+			saveButtonState.authoritativePostUpdated
+		),
 	};
 }
 

@@ -5295,6 +5295,7 @@ describe( 'distributed editing session state', () => {
 			'post',
 			'postContent',
 			'pendingChangeCount',
+			'saveAuthority',
 			'acceptedReviewApprovalProof',
 		] );
 		expect( payload ).toMatchObject( {
@@ -5306,6 +5307,12 @@ describe( 'distributed editing session state', () => {
 			},
 			postContent: editedPostContent,
 			pendingChangeCount: 2,
+			saveAuthority: {
+				state: expect.any( String ),
+				saveButtonStatus: expect.any( String ),
+				pendingServerConfirmation: expect.any( Boolean ),
+				authoritativePostUpdated: expect.any( Boolean ),
+			},
 			acceptedReviewApprovalProof: null,
 		} );
 		expect( Object.keys( payload.post ) ).toEqual( [ 'id', 'type' ] );
@@ -5313,6 +5320,56 @@ describe( 'distributed editing session state', () => {
 		expect( JSON.stringify( payload ) ).not.toContain( clientBaseContent );
 		expect( JSON.stringify( payload ) ).not.toContain(
 			refetchedServerContent
+		);
+		expect( JSON.stringify( payload.saveAuthority ) ).not.toContain(
+			editedPostContent
+		);
+	} );
+
+	it( 'exports content-free Save authority diagnostics with protected local updates', () => {
+		const editedPostContent =
+			'<!-- wp:paragraph --><p>Local authority update</p><!-- /wp:paragraph -->';
+		const payload = getDistributedEditingLocalUpdatesExportPayload( {
+			currentPost: {
+				id: 45,
+				type: 'post',
+			},
+			editedPostContent,
+			sessionState: {
+				pendingChangeCount: 1,
+				hasPendingChanges: true,
+				canExportLocalUpdates: true,
+				retrySaveStatus: DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVING,
+				retrySaveHandoffStatus:
+					DISTRIBUTED_EDITING_RETRY_SAVE_HANDOFF_STATUSES.RETRY_SAVE_BLOCKED,
+				retrySaveHandoffReason:
+					DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.RETRY_SAVE_IN_PROGRESS,
+				retrySaveHandoffBlocksNormalSave: true,
+				retrySaveReviewApprovalProofEnvelope: {
+					proofSignature: 'must-not-export-through-save-authority',
+				},
+				retrySaveReviewApprovalReviewerUserId: '7',
+			},
+		} );
+
+		expect( payload.saveAuthority ).toEqual( {
+			state: DISTRIBUTED_EDITING_SAVE_AUTHORITY_STATES.AWAITING_SERVER_CONFIRMATION,
+			saveButtonStatus:
+				DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES.RETRY_SAVE_IN_PROGRESS,
+			saveButtonSource: 'retry_save',
+			saveButtonReason: 'retry_save_in_progress',
+			saveButtonClickAction: null,
+			pendingServerConfirmation: true,
+			authoritativePostUpdated: false,
+		} );
+		expect( JSON.stringify( payload.saveAuthority ) ).not.toContain(
+			'Local authority update'
+		);
+		expect( JSON.stringify( payload.saveAuthority ) ).not.toContain(
+			'must-not-export-through-save-authority'
+		);
+		expect( JSON.stringify( payload.saveAuthority ) ).not.toContain(
+			'"7"'
 		);
 	} );
 
@@ -5560,6 +5617,7 @@ describe( 'distributed editing session state', () => {
 			'post',
 			'postContent',
 			'pendingChangeCount',
+			'saveAuthority',
 			'serverVersion',
 			'clientBaseVersion',
 			'acceptedReviewApprovalProof',
