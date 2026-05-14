@@ -72,14 +72,15 @@
 
 	.components-with-notices-ui {
 		max-width: 255px;
+		min-width: 0;
+
+		.components-notice {
+			max-width: 100%;
+		}
 
 		.components-notice__content {
 			overflow: hidden;
-			word-wrap: break-word;
-		}
-		.components-notice__dismiss {
-			position: absolute;
-			right: 10px;
+			overflow-wrap: break-word;
 		}
 	}
 }

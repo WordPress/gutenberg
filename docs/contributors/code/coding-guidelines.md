@@ -35,6 +35,8 @@ export default function Notice( { children, onRemove } ) {
 }
 ```
 
+When the `actions` prop is set, `Notice` also renders a `.components-notice__actions` element as a sibling of `.components-notice__content` (before the dismiss control).
+
 Components may be assigned with class names that indicate states (for example, an "active" tab or an "opened" panel). These modifiers should be applied as a separate class name, prefixed as an adjective expression by `is-` (`is-active` or `is-opened`). In rare cases, you may encounter variations of the modifier prefix, usually to improve readability (`has-warning`). Because a modifier class name is not contextualized to a specific component, it should always be written in stylesheets as accompanying the component being modified (`.components-panel.is-opened`).
 
 **Example:**

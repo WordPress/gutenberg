@@ -14,7 +14,6 @@ import { useDispatch, useSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import { store as noticesStore } from '../../store';
-import './style.scss';
 
 type InlineNoticesProps = {
 	children?: ReactNode;

@@ -7,15 +7,3 @@
 	margin-top: 10px;
 	float: right;
 }
-
-.list-reusable-blocks-import-form {
-	.components-notice__content {
-		margin: 0;
-	}
-
-	/* Match previous `.components-notice.is-dismissible` scope: only when a dismiss control exists. */
-	.components-notice:has(.components-notice__dismiss) {
-		padding-right: 0;
-		margin: 5px 0;
-	}
-}

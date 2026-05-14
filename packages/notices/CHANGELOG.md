@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   `InlineNotices`: Remove package-level `Notice` style overrides; `Notice` from `@wordpress/components` owns layout and chrome.
+
 ## 5.46.0 (2026-05-14)
 
 ## 5.45.0 (2026-04-29)

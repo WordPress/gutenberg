@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   Import form: remove `Notice` margin and padding overrides.
+
 ## 5.46.0 (2026-05-14)
 
 ## 5.45.0 (2026-04-29)

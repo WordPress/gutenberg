@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   Gallery editor: remove `Notice` positioning overrides that conflicted with the updated `Notice` layout.
+
 ## 9.46.0 (2026-05-14)
 
 ## 9.45.0 (2026-04-29)
