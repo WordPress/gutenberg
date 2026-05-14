@@ -5,6 +5,7 @@
 ### Breaking Changes
 
 -   `Notice`: Remove the `is-dismissible` root class. Use `.components-notice:has(.components-notice__dismiss)` (or select `.components-notice__dismiss`) for styles that should only apply when the dismiss control is present.
+-   `Notice`: Render `.components-notice__actions` as a sibling of `.components-notice__content` (not nested inside it). Update any custom CSS that targeted actions with a descendant selector under `__content` (for example `.components-notice__content .components-notice__actions`) to use `.components-notice__actions` or `.components-notice .components-notice__actions` instead.
 
 ### Enhancements
 
