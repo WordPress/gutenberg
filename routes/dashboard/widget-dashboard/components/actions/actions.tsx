@@ -3,9 +3,8 @@
  */
 import { useCallback, useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { cog } from '@wordpress/icons';
 // eslint-disable-next-line @wordpress/use-recommended-components
-import { AlertDialog, Button, IconButton, Stack } from '@wordpress/ui';
+import { AlertDialog, Button, Stack } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -23,13 +22,13 @@ import type { MoreActionsDropdownItem } from '../more-actions-dropdown';
  * - **Customize** (layout edits): toggles edit mode, surfaces the Add
  *   widgets / Cancel / Done toolbar. Commits the layout staging buffer
  *   on Done.
- * - **Grid settings** (cog icon): opens a side drawer with model, gap,
- *   min column width, and row height. Commits the settings staging
- *   buffer on Save inside the drawer.
+ * - **Layout settings** (more-actions dropdown entry): opens a side
+ *   drawer with model, column behavior, and row height. Commits the
+ *   settings staging buffer on Save inside the drawer.
  *
- * The two flows are mutually exclusive: the cog is disabled while edit
- * mode is on so the settings drawer cannot accumulate changes on top
- * of pending layout edits, and vice versa.
+ * The two flows are mutually exclusive: the Layout settings entry is
+ * disabled while edit mode is on so the settings drawer cannot
+ * accumulate changes on top of pending layout edits, and vice versa.
  *
  * Returns `null` when the dashboard is mounted without `onEditChange`
  * so surfaces that don't expose edit mode can keep `Actions` in their
@@ -105,6 +104,14 @@ export function Actions(): React.ReactNode {
 		},
 	];
 
+	if ( canEditGridSettings ) {
+		moreActionsItems.unshift( {
+			label: __( 'Layout settings' ),
+			onClick: openLayoutSettings,
+			disabled: editMode,
+		} );
+	}
+
 	if ( ! onEditChange ) {
 		return null;
 	}
@@ -158,18 +165,6 @@ export function Actions(): React.ReactNode {
 				>
 					{ __( 'Customize' ) }
 				</Button>
-			) }
-
-			{ canEditGridSettings && (
-				<IconButton
-					icon={ cog }
-					label={ __( 'Layout settings' ) }
-					variant="minimal"
-					tone="brand"
-					size="compact"
-					disabled={ editMode }
-					onClick={ openLayoutSettings }
-				/>
 			) }
 
 			<MoreActionsDropdown items={ moreActionsItems } />

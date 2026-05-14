@@ -68,10 +68,10 @@ interface LayoutSettingsProps {
  * the explicit Cancel/Save buttons is treated as Cancel.
  *
  * Settings and layout-editing are kept as separate flows on the
- * dashboard surface (the cog trigger that opens this drawer is
- * disabled while edit mode is on), so the drawer's commit never
- * publishes layout edits that the user is in the middle of staging
- * through the toolbar.
+ * dashboard surface (the Layout settings entry that opens this
+ * drawer is disabled while edit mode is on), so the drawer's
+ * commit never publishes layout edits that the user is in the
+ * middle of staging through the toolbar.
  *
  * @param props
  * @param props.open         Whether the drawer is visible.
