@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useMemo, useSyncExternalStore } from '@wordpress/element';
+import { useSyncExternalStore } from '@wordpress/element';
 
 type MQLCache = Map< string, MediaQueryList >;
 
@@ -106,12 +106,10 @@ export default function useMediaQuery(
 	query?: string,
 	view: Window = window
 ): boolean {
-	const source = useMemo< MQLSubscriber >( () => {
-		const mediaQueryList = getMediaQueryList( view, query );
-		return mediaQueryList
-			? getSubscriber( mediaQueryList )
-			: EMPTY_SUBSCRIBER;
-	}, [ view, query ] );
+	const mediaQueryList = getMediaQueryList( view, query );
+	const source = mediaQueryList
+		? getSubscriber( mediaQueryList )
+		: EMPTY_SUBSCRIBER;
 
 	return useSyncExternalStore(
 		source.subscribe,
