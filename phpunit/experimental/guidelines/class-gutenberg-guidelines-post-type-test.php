@@ -77,25 +77,28 @@ class Gutenberg_Guidelines_Post_Type_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * The post type maps generated guideline primitive caps back to the core
-	 * post caps used by built-in roles.
+	 * The post type exposes a self-contained, guideline-prefixed capability
+	 * namespace. The CPT-level `read` is remapped to keep Subscribers blocked
+	 * at the post-type door; every other primitive is auto-derived from
+	 * `capability_type = 'guideline'` and granted at runtime via the
+	 * `user_has_cap` synthesis filter.
 	 */
-	public function test_post_type_uses_core_primitive_capabilities() {
+	public function test_post_type_uses_guideline_prefixed_capabilities() {
 		$post_type = get_post_type_object( Gutenberg_Guidelines_Post_Type::POST_TYPE );
 
 		$this->assertNotFalse( $post_type );
-		$this->assertSame( 'edit_posts', $post_type->cap->read );
-		$this->assertSame( 'publish_posts', $post_type->cap->create_posts );
-		$this->assertSame( 'edit_posts', $post_type->cap->edit_posts );
-		$this->assertSame( 'publish_posts', $post_type->cap->publish_posts );
-		$this->assertSame( 'read_private_posts', $post_type->cap->read_private_posts );
-		$this->assertSame( 'edit_private_posts', $post_type->cap->edit_private_posts );
-		$this->assertSame( 'edit_published_posts', $post_type->cap->edit_published_posts );
-		$this->assertSame( 'delete_private_posts', $post_type->cap->delete_private_posts );
-		$this->assertSame( 'delete_published_posts', $post_type->cap->delete_published_posts );
-		$this->assertSame( 'delete_posts', $post_type->cap->delete_posts );
-		$this->assertSame( 'edit_others_posts', $post_type->cap->edit_others_posts );
-		$this->assertSame( 'delete_others_posts', $post_type->cap->delete_others_posts );
+		$this->assertSame( 'read_guidelines', $post_type->cap->read );
+		$this->assertSame( 'edit_guidelines', $post_type->cap->create_posts );
+		$this->assertSame( 'edit_guidelines', $post_type->cap->edit_posts );
+		$this->assertSame( 'publish_guidelines', $post_type->cap->publish_posts );
+		$this->assertSame( 'read_private_guidelines', $post_type->cap->read_private_posts );
+		$this->assertSame( 'edit_private_guidelines', $post_type->cap->edit_private_posts );
+		$this->assertSame( 'edit_published_guidelines', $post_type->cap->edit_published_posts );
+		$this->assertSame( 'delete_private_guidelines', $post_type->cap->delete_private_posts );
+		$this->assertSame( 'delete_published_guidelines', $post_type->cap->delete_published_posts );
+		$this->assertSame( 'delete_guidelines', $post_type->cap->delete_posts );
+		$this->assertSame( 'edit_others_guidelines', $post_type->cap->edit_others_posts );
+		$this->assertSame( 'delete_others_guidelines', $post_type->cap->delete_others_posts );
 	}
 
 	/**
@@ -125,7 +128,7 @@ class Gutenberg_Guidelines_Post_Type_Test extends WP_UnitTestCase {
 	/**
 	 * A post inserted with an explicit type keeps that type.
 	 */
-	public function test_explicit_term_is_preserved() {
+	public function test_save_post_preserves_explicit_term() {
 		wp_set_current_user( self::$admin_id );
 
 		$content_term_id = Gutenberg_Guidelines_Post_Type::get_or_create_term_id(
@@ -157,7 +160,7 @@ class Gutenberg_Guidelines_Post_Type_Test extends WP_UnitTestCase {
 	/**
 	 * Updates to an existing post do not overwrite an already-assigned term.
 	 */
-	public function test_term_is_not_overwritten_on_update() {
+	public function test_save_post_preserves_term_on_update() {
 		wp_set_current_user( self::$admin_id );
 
 		$content_term_id = Gutenberg_Guidelines_Post_Type::get_or_create_term_id(
@@ -193,7 +196,7 @@ class Gutenberg_Guidelines_Post_Type_Test extends WP_UnitTestCase {
 	 * The fallback is skipped for revisions (including autosaves, which are
 	 * stored as revisions).
 	 */
-	public function test_revision_is_ignored() {
+	public function test_save_post_skips_revisions() {
 		wp_set_current_user( self::$admin_id );
 
 		$post_id = wp_insert_post(

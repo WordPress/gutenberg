@@ -15,7 +15,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Gutenberg_Guidelines_REST_Controller extends WP_REST_Posts_Controller {
 
 	/**
-	 * Checks if a given request has access to read guideline posts.
+	 * Gate the guidelines collection on the post-type read capability.
+	 *
+	 * The default `WP_REST_Posts_Controller` allows unauthenticated reads of
+	 * `publish` posts; guidelines store private data and require an
+	 * authenticated user with read access.
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @return true|WP_Error True if the request has read access, WP_Error object otherwise.
@@ -34,11 +38,11 @@ class Gutenberg_Guidelines_REST_Controller extends WP_REST_Posts_Controller {
 	}
 
 	/**
-	 * Checks if a given request has access to read a guideline post.
+	 * Gate per-item reads on the user-specific read capability.
 	 *
-	 * Guidelines are not public content, so every direct item read must pass
-	 * the post-specific read capability before falling through to the standard
-	 * post checks.
+	 * The default treats every `publish` post as universally readable;
+	 * guidelines reach the parent's checks only after `read_post` passes,
+	 * which factors in ownership and status.
 	 *
 	 * @param WP_Post $post Post object.
 	 * @return bool Whether the post can be read.
@@ -49,5 +53,43 @@ class Gutenberg_Guidelines_REST_Controller extends WP_REST_Posts_Controller {
 		}
 
 		return parent::check_read_permission( $post );
+	}
+
+	/**
+	 * Restrict the status surface for callers without publish capability
+	 * to `private`. Administrators retain the parent's full status surface.
+	 *
+	 * @param string       $post_status Requested post status.
+	 * @param WP_Post_Type $post_type   Post type object.
+	 * @return string|WP_Error Status, or WP_Error if not permitted.
+	 */
+	protected function handle_status_param( $post_status, $post_type ) {
+		if ( ! current_user_can( $post_type->cap->publish_posts ) ) {
+			if ( 'private' !== $post_status ) {
+				return new WP_Error(
+					'rest_cannot_publish',
+					__( 'Sorry, you are only allowed to set status to private for guidelines.', 'gutenberg' ),
+					array( 'status' => rest_authorization_required_code() )
+				);
+			}
+			return $post_status;
+		}
+
+		return parent::handle_status_param( $post_status, $post_type );
+	}
+
+	/**
+	 * Default the status to `private` on create when none is supplied
+	 * (the parent would fall back to `draft`). Updates pass through so a
+	 * partial PATCH preserves the existing status.
+	 *
+	 * @param WP_REST_Request $request Request object.
+	 * @return stdClass|WP_Error Prepared post object or error.
+	 */
+	protected function prepare_item_for_database( $request ) {
+		if ( ! isset( $request['id'] ) && null === $request['status'] ) {
+			$request->set_param( 'status', 'private' );
+		}
+		return parent::prepare_item_for_database( $request );
 	}
 }
