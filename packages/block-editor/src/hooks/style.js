@@ -414,19 +414,21 @@ function BlockStyleControls( {
 } ) {
 	const settings = useBlockSettings( name, __unstableParentLayout );
 	const blockEditingMode = useBlockEditingMode();
-	const selectedState = useSelect(
-		( select ) =>
-			unlock( select( blockEditorStore ) ).getSelectedBlockStyleState(
-				clientId
-			),
-		[ clientId ]
-	);
 	const [ showStateOnCanvas, setShowStateOnCanvas ] = useState( true );
-	const globalBlockStyles = useSelect(
-		( select ) =>
-			select( blockEditorStore ).getSettings()[ globalStylesDataKey ]
-				?.blocks?.[ name ],
-		[ name ]
+	const { globalBlockStyles, selectedState } = useSelect(
+		( select ) => {
+			const blockEditorSelect = select( blockEditorStore );
+			return {
+				globalBlockStyles:
+					blockEditorSelect.getSettings()[ globalStylesDataKey ]
+						?.blocks?.[ name ],
+				selectedState:
+					unlock( blockEditorSelect ).getSelectedBlockStyleState(
+						clientId
+					),
+			};
+		},
+		[ clientId, name ]
 	);
 	const globalStateValue = globalBlockStyles?.[ selectedState ];
 	const instanceStateValue = style?.[ selectedState ];

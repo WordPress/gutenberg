@@ -92,6 +92,8 @@ function BlockInspector() {
 		isSectionBlockInSelection,
 		hasBlockStyles,
 		editedContentOnlySection,
+		blockEditingMode,
+		selectedBlockStyleState,
 	} = useSelect( ( select ) => {
 		const {
 			getSelectedBlockClientId,
@@ -102,6 +104,8 @@ function BlockInspector() {
 			isSectionBlock: _isSectionBlock,
 			getEditedContentOnlySection,
 			isWithinEditedContentOnlySection,
+			getBlockEditingMode,
+			getSelectedBlockStyleState,
 		} = unlock( select( blockEditorStore ) );
 		const { getBlockStyles } = select( blocksStore );
 		const _selectedBlockClientId = getSelectedBlockClientId();
@@ -133,6 +137,10 @@ function BlockInspector() {
 			isSectionBlock: _isSectionBlock( _renderedBlockClientId ),
 			hasBlockStyles: _hasBlockStyles,
 			editedContentOnlySection: getEditedContentOnlySection(),
+			blockEditingMode: getBlockEditingMode( _renderedBlockClientId ),
+			selectedBlockStyleState: getSelectedBlockStyleState(
+				_renderedBlockClientId
+			),
 		};
 	}, [] );
 
@@ -268,6 +276,8 @@ function BlockInspector() {
 				contentClientIds={ contentClientIds }
 				hasBlockStyles={ hasBlockStyles }
 				editedContentOnlySection={ editedContentOnlySection }
+				blockEditingMode={ blockEditingMode }
+				selectedBlockStyleState={ selectedBlockStyleState }
 			/>
 		</BlockInspectorSingleBlockWrapper>
 	);
@@ -319,6 +329,8 @@ const BlockInspectorSingleBlock = ( {
 	contentClientIds,
 	hasBlockStyles,
 	editedContentOnlySection,
+	blockEditingMode,
+	selectedBlockStyleState,
 } ) => {
 	const listViewRef = useRef( null );
 	const hasMultipleTabs = availableTabs?.length > 1;
@@ -332,20 +344,6 @@ const BlockInspectorSingleBlock = ( {
 		renderedBlockClientId
 	);
 	const isBlockSynced = blockInformation.isSynced;
-	const { blockEditingMode, selectedBlockStyleState } = useSelect(
-		( select ) => {
-			const blockEditorSelect = select( blockEditorStore );
-			return {
-				blockEditingMode: blockEditorSelect.getBlockEditingMode(
-					renderedBlockClientId
-				),
-				selectedBlockStyleState: unlock(
-					blockEditorSelect
-				).getSelectedBlockStyleState( renderedBlockClientId ),
-			};
-		},
-		[ renderedBlockClientId ]
-	);
 	const { setSelectedBlockStyleState } = unlock(
 		useDispatch( blockEditorStore )
 	);
