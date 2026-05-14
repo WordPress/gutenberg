@@ -7,7 +7,6 @@ jest.mock( 'colorjs.io/fn', () => {
 		__esModule: true,
 		OKLCH,
 		sRGB,
-		HSL: { id: 'hsl' },
 		ColorSpace: {
 			register: jest.fn( ( s: { id: string } ) => {
 				registry[ s.id ] = s;
