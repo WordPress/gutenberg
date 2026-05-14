@@ -13,7 +13,8 @@
 
 .handle:focus-visible {
 	outline: var(--wpds-border-width-focus) solid var(--wpds-color-stroke-focus-brand);
-	outline-offset: 2px;
+	/* @TODO: Replace with a `size` token once that category exists in the theme package. */
+	outline-offset: calc(var(--wpds-dimension-base) * 0.5);
 	border-radius: var(--wpds-border-radius-sm);
 }
 
@@ -26,8 +27,9 @@
  * logical borders so RTL needs no mirroring).
  */
 .handleCorner {
-	width: 24px;
-	height: 24px;
+	/* @TODO: Replace with a `size` token once that category exists in the theme package. */
+	width: calc(var(--wpds-dimension-base) * 6);
+	height: calc(var(--wpds-dimension-base) * 6);
 	cursor: nwse-resize;
 }
 
@@ -36,8 +38,9 @@
 	position: absolute;
 	bottom: var(--widget-resize-handle-visual-inset);
 	inset-inline-end: var(--widget-resize-handle-visual-inset);
-	width: 12px;
-	height: 12px;
+	/* @TODO: Replace with a `size` token once that category exists in the theme package. */
+	width: calc(var(--wpds-dimension-base) * 3);
+	height: calc(var(--wpds-dimension-base) * 3);
 	box-sizing: border-box;
 	border-block-end:
 		var(--wpds-border-width-sm) solid
@@ -73,8 +76,9 @@
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	width: 24px;
-	height: 40px;
+	/* @TODO: Replace with a `size` token once that category exists in the theme package. */
+	width: calc(var(--wpds-dimension-base) * 6);
+	height: calc(var(--wpds-dimension-base) * 10);
 	padding-inline-end: var(--widget-resize-handle-visual-inset);
 	cursor: ew-resize;
 	border: none;
@@ -103,7 +107,8 @@
 .handleHorizontal::after {
 	content: "";
 	width: var(--wpds-border-width-sm);
-	height: 12px;
+	/* @TODO: Replace with a `size` token once that category exists in the theme package. */
+	height: calc(var(--wpds-dimension-base) * 3);
 	background-color: var(--wpds-color-fg-interactive-brand);
 	transform: scale(1);
 	transform-origin: 50% 100%;
