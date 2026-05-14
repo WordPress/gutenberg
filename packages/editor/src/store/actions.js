@@ -2034,6 +2034,17 @@ export const __experimentalSaveDistributedEditingRetryAfterProof =
 					acceptedFreshReviewConsumeValidation,
 				}
 			);
+		const proposedPostContent =
+			options.proposedPostContent ?? select.getEditedPostContent?.();
+		const proposedPostContentHash =
+			options.proposedPostContentHash ??
+			getDistributedEditingRetrySaveProposedContentHashEvidence(
+				currentSessionState,
+				{
+					acceptedReviewApprovalProof,
+					acceptedFreshReviewConsumeValidation,
+				}
+			);
 		const requestArgs = {
 			postId,
 			restBase,
@@ -2049,9 +2060,8 @@ export const __experimentalSaveDistributedEditingRetryAfterProof =
 				currentSessionState.clientBaseVersion,
 			pendingChangeCount:
 				pendingChangeCount ?? savingSessionState.pendingChangeCount,
-			proposedPostContent:
-				options.proposedPostContent ?? select.getEditedPostContent?.(),
-			proposedPostContentHash: options.proposedPostContentHash,
+			proposedPostContent,
+			proposedPostContentHash,
 			acceptedProofSavesPost:
 				options.acceptedProofSavesPost ??
 				currentSessionState.retrySubmitSavesPost,
@@ -2133,6 +2143,37 @@ export const __experimentalSaveDistributedEditingFreshReviewRetrySaveHandoff =
 			acceptedFreshReviewConsumeValidation,
 		} );
 	};
+
+function getDistributedEditingRetrySaveProposedContentHashEvidence(
+	sessionState = {},
+	{
+		acceptedReviewApprovalProof = null,
+		acceptedFreshReviewConsumeValidation = null,
+	} = {}
+) {
+	const reviewApprovalProof =
+		acceptedReviewApprovalProof?.proof ?? acceptedReviewApprovalProof;
+	const freshReviewConsumeValidation =
+		acceptedFreshReviewConsumeValidation?.proof ??
+		acceptedFreshReviewConsumeValidation;
+	const hashCandidates = [
+		reviewApprovalProof?.proposedPostContentHash,
+		reviewApprovalProof?.proposed_post_content_hash,
+		freshReviewConsumeValidation?.proposedPostContentHash,
+		freshReviewConsumeValidation?.proposed_post_content_hash,
+		sessionState.retrySaveReviewApprovalProposedContentHash,
+		sessionState.retrySaveReviewProposedContentHash,
+		sessionState.retrySaveFreshReviewProposedContentHash,
+		sessionState.localUpdatesImportFreshReviewRetrySaveHandoffProposedContentHash,
+		sessionState.localUpdatesImportVerifiedPostContentHash,
+	];
+
+	return hashCandidates.find( isDistributedEditingSha256Hash );
+}
+
+function isDistributedEditingSha256Hash( value ) {
+	return typeof value === 'string' && /^[a-f0-9]{64}$/.test( value );
+}
 
 /**
  * Consults the DE-RTC retry-save policy and performs the guarded retry-save

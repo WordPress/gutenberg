@@ -3382,9 +3382,7 @@ describe( 'Post actions', () => {
 			await expect(
 				registry
 					.dispatch( editorStore )
-					.__experimentalSaveDistributedEditingRetryAfterProof( {
-						proposedPostContentHash,
-					} )
+					.__experimentalSaveDistributedEditingRetryAfterProof()
 			).resolves.toMatchObject( {
 				result: 'retry_save_applied',
 				review_approval_proof_consumed: true,
@@ -3548,9 +3546,7 @@ describe( 'Post actions', () => {
 			await expect(
 				registry
 					.dispatch( editorStore )
-					.__experimentalSaveDistributedEditingRetryAfterProof( {
-						proposedPostContentHash,
-					} )
+					.__experimentalSaveDistributedEditingRetryAfterProof()
 			).resolves.toMatchObject( {
 				result: 'retry_save_applied',
 				fresh_review_decision_consumed: true,
@@ -4861,6 +4857,7 @@ describe( 'Post actions', () => {
 				client_base_version: '12',
 				accepted_proof_server_version: '12',
 				proposed_post_content: editedPostContent,
+				proposed_post_content_hash: proposedPostContentHash,
 				accepted_review_approval_proof: expect.objectContaining( {
 					type: 'unfiltered_html_retry_save_review_approval',
 					proposed_post_content_hash: proposedPostContentHash,
