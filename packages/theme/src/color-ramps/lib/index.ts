@@ -1,10 +1,4 @@
-import {
-	clone,
-	get,
-	OKLCH,
-	set,
-	type PlainColorObject,
-} from 'colorjs.io/fn';
+import { clone, get, OKLCH, set, type PlainColorObject } from 'colorjs.io/fn';
 
 /**
  * Internal dependencies
@@ -197,16 +191,8 @@ function calculateRamp( {
 	};
 }
 
-/**
- * Calculate a complete color ramp.
- *
- * @param seedArg The seed color for the ramp. May be a `PlainColorObject` or
- *                an sRGB-parseable string (typically a hex value).
- * @param config  Ramp configuration defining contrast requirements.
- * @param options Optional ramp settings.
- */
 export function buildRamp(
-	seedArg: string | PlainColorObject,
+	seedArg: string,
 	config: RampConfig,
 	{
 		mainDirection,
