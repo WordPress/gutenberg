@@ -1,7 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { useCallback, useMemo } from '@wordpress/element';
+import {
+	useCallback,
+	useLayoutEffect,
+	useMemo,
+	useRef,
+} from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { parse, __unstableSerializeAndClean } from '@wordpress/blocks';
 
@@ -82,6 +87,10 @@ export default function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 
 		return _blocks;
 	}, [ kind, name, id, editedBlocks, content ] );
+	const blocksRef = useRef( blocks );
+	useLayoutEffect( () => {
+		blocksRef.current = blocks;
+	}, [ blocks ] );
 
 	const onChange = useCallback(
 		( newBlocks, options ) => {
@@ -102,6 +111,7 @@ export default function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 			};
 
 			editEntityRecord( kind, name, id, edits, {
+				baseRecord: { blocks },
 				isCached: false,
 				...rest,
 			} );
@@ -126,11 +136,12 @@ export default function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 			};
 
 			editEntityRecord( kind, name, id, edits, {
+				baseRecord: { blocks: blocksRef.current },
 				isCached: true,
 				...rest,
 			} );
 		},
-		[ kind, name, id, meta, editEntityRecord ]
+		[ kind, name, id, meta, editEntityRecord, blocksRef ]
 	);
 
 	return [ blocks, onInput, onChange ];

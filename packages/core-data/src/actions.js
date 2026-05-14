@@ -462,7 +462,10 @@ export const editEntityRecord =
 				objectId,
 				editsWithMerges,
 				origin,
-				{ isNewUndoLevel }
+				{
+					baseRecord: options.baseRecord,
+					isNewUndoLevel,
+				}
 			);
 		}
 		if ( ! options.undoIgnore ) {
