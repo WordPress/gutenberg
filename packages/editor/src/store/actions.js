@@ -46,6 +46,7 @@ import {
 	getDistributedEditingSessionStateForRetrySubmitSavePreparation,
 	getDistributedEditingRetrySavePolicyForSessionState,
 	DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS,
+	DISTRIBUTED_EDITING_SAVE_POLICY_STATUSES,
 	getDistributedEditingStaleBaseLocalRebaseResult,
 	getDistributedEditingSessionStateForStaleBaseLocalRebasePlan,
 	getDistributedEditingSessionStateForStaleBaseRejectionResult,
@@ -488,6 +489,111 @@ export const __experimentalMaybeRouteSavePostToDistributedEditingRiskyBlockRevie
 					changesPostLock: false,
 					claimsSaved: false,
 				};
+			}
+
+			if (
+				savePolicy.status ===
+					DISTRIBUTED_EDITING_SAVE_POLICY_STATUSES.READY_FOR_REVIEWED_RETRY_SAVE ||
+				savePolicy.clickAction ===
+					DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.CONTINUE_GUARDED_RETRY_SAVE
+			) {
+				const approvedReviewItemCount =
+					savePolicy.approvedReviewItemCount ?? 0;
+
+				if ( approvedReviewItemCount < 1 ) {
+					return {
+						status: 'risky_block_review_no_approved_items',
+						reason: 'risky_block_review_no_approved_items',
+						policy: savePolicy,
+						allowsNormalSaveFallback: false,
+						blocksNormalSavePost: true,
+						opensPrePublishReview: false,
+						requiresServerStateRefetch: false,
+						callsReviewApprovalProofEndpoint: false,
+						callsNormalSavePost: false,
+						callsRetrySaveEndpoint: false,
+						dispatchesNotice: false,
+						mutatesEditorContent: false,
+						mutatesPersistedPostContent: false,
+						changesPostLock: false,
+						claimsSaved: false,
+					};
+				}
+
+				try {
+					const response =
+						await dispatch.__experimentalRefreshDistributedEditingRetrySaveReviewApprovalProof(
+							options
+						);
+					const sessionState =
+						select.getDistributedEditingSessionState?.() || {};
+
+					return {
+						status: sessionState.retrySaveReviewApprovalAccepted
+							? 'review_approval_proof_accepted'
+							: 'review_approval_proof_requested',
+						reason:
+							sessionState.retrySaveReviewApprovalProofReason ||
+							null,
+						policy: savePolicy,
+						response,
+						responseResult: response?.result,
+						allowsNormalSaveFallback: false,
+						blocksNormalSavePost: true,
+						opensPrePublishReview: false,
+						requiresServerStateRefetch: Boolean(
+							sessionState.requiresServerStateRefetch
+						),
+						callsReviewApprovalProofEndpoint: true,
+						reviewApprovalProofAccepted: Boolean(
+							sessionState.retrySaveReviewApprovalAccepted
+						),
+						retrySaveReviewApprovalProofStatus:
+							sessionState.retrySaveReviewApprovalProofStatus,
+						reviewedBlockItemCount:
+							sessionState.retrySaveReviewApprovalReviewedBlockItemCount,
+						callsNormalSavePost: false,
+						callsRetrySaveEndpoint: false,
+						dispatchesNotice: false,
+						mutatesEditorContent: false,
+						mutatesPersistedPostContent: false,
+						changesPostLock: false,
+						claimsSaved: false,
+					};
+				} catch ( error ) {
+					const sessionState =
+						select.getDistributedEditingSessionState?.() || {};
+
+					return {
+						status: 'review_approval_proof_rejected',
+						reason:
+							sessionState.retrySaveReviewApprovalProofReason ||
+							error?.code ||
+							error?.message ||
+							'review_approval_proof_rejected',
+						policy: savePolicy,
+						error,
+						allowsNormalSaveFallback: false,
+						blocksNormalSavePost: true,
+						opensPrePublishReview: false,
+						requiresServerStateRefetch: Boolean(
+							sessionState.requiresServerStateRefetch
+						),
+						callsReviewApprovalProofEndpoint: true,
+						reviewApprovalProofAccepted: false,
+						retrySaveReviewApprovalProofStatus:
+							sessionState.retrySaveReviewApprovalProofStatus,
+						reviewedBlockItemCount:
+							sessionState.retrySaveReviewApprovalReviewedBlockItemCount,
+						callsNormalSavePost: false,
+						callsRetrySaveEndpoint: false,
+						dispatchesNotice: false,
+						mutatesEditorContent: false,
+						mutatesPersistedPostContent: false,
+						changesPostLock: false,
+						claimsSaved: false,
+					};
+				}
 			}
 
 			return {

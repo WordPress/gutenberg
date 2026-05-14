@@ -1786,6 +1786,7 @@ export function getDistributedEditingSavePolicyStateForSessionState(
 		saveButtonLabel = 'Submit reviewed changes';
 		clickAction =
 			DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.CONTINUE_GUARDED_RETRY_SAVE;
+		blocksNormalSavePost = true;
 	}
 
 	return {

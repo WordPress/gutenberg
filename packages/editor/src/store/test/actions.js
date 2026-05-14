@@ -27,6 +27,7 @@ import {
 	DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_REASONS,
 	DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES,
 	DISTRIBUTED_EDITING_RETRY_SAVE_HANDOFF_STATUSES,
+	DISTRIBUTED_EDITING_RETRY_SAVE_REVIEW_APPROVAL_PROOF_STATUSES,
 	DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS,
 	DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES,
 	DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS,
@@ -145,6 +146,182 @@ describe( 'Post actions', () => {
 			expect(
 				registry.select( editorStore ).isPublishSidebarOpened()
 			).toBe( false );
+		} );
+
+		it( 'requests review-approval proof after risky-block review is resolved', async () => {
+			const proposedPostContentHash =
+				'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
+			const candidatePostContentHash =
+				'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb';
+			const approvedBlockHash =
+				'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc';
+			const filteredBlockHash =
+				'dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd';
+			const post = {
+				id: postId,
+				type: 'post',
+				title: 'bar',
+				content: 'bar',
+				status: 'draft',
+			};
+			let apiCalls = 0;
+
+			apiFetch.setFetchHandler( async ( options ) => {
+				const method = getMethod( options );
+				const { path, data } = options;
+
+				apiCalls++;
+				expect( method ).toBe( 'POST' );
+				expect( path ).toMatch(
+					new RegExp(
+						`^/wp/v2/posts/${ postId }/distributed-editing/review-approval`
+					)
+				);
+				expect( data ).toMatchObject( {
+					client_base_version: '12',
+					accepted_proof_server_version: '12',
+					pending_change_count: 2,
+					proposed_post_content_hash: proposedPostContentHash,
+					reviewed_proposed_content_hash: proposedPostContentHash,
+					candidate_post_content_hash: candidatePostContentHash,
+					reviewed_candidate_content_hash: candidatePostContentHash,
+					reviewed_block_items: [
+						{
+							id: 'risk-html-approve',
+							proposed_content_hash: approvedBlockHash,
+							reviewed_proposed_content_hash: approvedBlockHash,
+							kses_filtered_content_hash: filteredBlockHash,
+							review_status: 'approved_for_retry_save',
+							review_evidence_type: 'kses_block_hash_only_change',
+							content_review_policy: 'kses',
+						},
+					],
+				} );
+				expect( data.reviewed_block_items ).toHaveLength( 1 );
+				expect(
+					data.reviewed_block_items[ 0 ].raw_content
+				).toBeUndefined();
+				expect(
+					data.reviewed_block_items[ 0 ].raw_content_included
+				).toBeUndefined();
+				expect( JSON.stringify( data ) ).not.toContain(
+					'<script>unsafe</script>'
+				);
+
+				return {
+					result: 'review_approval_accepted_for_retry_save',
+					review_approval_accepted: true,
+					server_version: '12',
+					previous_server_version: '12',
+					client_base_version: '12',
+					accepted_proof_server_version: '12',
+					pending_change_count: 2,
+					reviewed_block_items: data.reviewed_block_items,
+					reviewed_block_item_count: 1,
+					block_review_status: 'approved_for_retry_save',
+					proposed_post_content_hash: proposedPostContentHash,
+					candidate_post_content_hash: candidatePostContentHash,
+					can_export_local_updates: true,
+					saves_post: false,
+					mutates_post_content: false,
+					creates_revision: false,
+					claims_saved: false,
+				};
+			} );
+
+			const registry = createRegistryWithStores();
+
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', post );
+			registry.dispatch( editorStore ).setupEditor( post, {} );
+			registry.dispatch( editorStore ).updateEditorSettings( {
+				distributedEditing: {
+					enabled: true,
+				},
+			} );
+			registry
+				.dispatch( editorStore )
+				.setDistributedEditingSessionState( {
+					serverVersion: '12',
+					pendingChangeCount: 2,
+					hasPendingChanges: true,
+					canExportLocalUpdates: true,
+					retrySaveReviewProposedContentHash: proposedPostContentHash,
+					retrySaveReviewCandidateContentHash:
+						candidatePostContentHash,
+					riskyBlockReviewStatus:
+						DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_STATUSES.REVIEW_RESOLVED,
+					riskyBlockReviewItems: [
+						{
+							id: 'risk-html-approve',
+							blockClientId: 'block-risk-html-approve',
+							blockName: 'core/html',
+							blockLabel: 'Custom HTML approval',
+							proposedContentHash: approvedBlockHash,
+							ksesFilteredContentHash: filteredBlockHash,
+							reviewStatus:
+								DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES.APPROVED_FOR_RETRY_SAVE,
+							rawContent: '<script>unsafe</script>',
+						},
+						{
+							id: 'risk-html-reject',
+							blockClientId: 'block-risk-html-reject',
+							blockName: 'core/html',
+							blockLabel: 'Custom HTML rejection',
+							proposedContentHash:
+								'eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
+							ksesFilteredContentHash:
+								'ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff',
+							reviewStatus:
+								DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES.REJECTED,
+							rawContent: '<script>unsafe</script>',
+						},
+					],
+					riskyBlockReviewItemCount: 2,
+					riskyBlockReviewPendingCount: 0,
+					riskyBlockReviewApprovedCount: 1,
+					riskyBlockReviewRejectedCount: 1,
+					riskyBlockReviewPrePublishPanelRequired: false,
+					riskyBlockReviewCanExportLocalUpdates: true,
+				} );
+
+			await expect(
+				registry
+					.dispatch( editorStore )
+					.__experimentalMaybeRouteSavePostToDistributedEditingRiskyBlockReview()
+			).resolves.toMatchObject( {
+				status: 'review_approval_proof_accepted',
+				allowsNormalSaveFallback: false,
+				blocksNormalSavePost: true,
+				opensPrePublishReview: false,
+				callsReviewApprovalProofEndpoint: true,
+				reviewApprovalProofAccepted: true,
+				reviewedBlockItemCount: 1,
+				callsNormalSavePost: false,
+				callsRetrySaveEndpoint: false,
+				dispatchesNotice: false,
+				mutatesEditorContent: false,
+				mutatesPersistedPostContent: false,
+				changesPostLock: false,
+				claimsSaved: false,
+			} );
+
+			expect( apiCalls ).toBe( 1 );
+			expect(
+				registry
+					.select( editorStore )
+					.getDistributedEditingSessionState()
+			).toMatchObject( {
+				retrySaveReviewApprovalProofStatus:
+					DISTRIBUTED_EDITING_RETRY_SAVE_REVIEW_APPROVAL_PROOF_STATUSES.ACCEPTED_FOR_RETRY_SAVE,
+				retrySaveReviewApprovalAccepted: true,
+				retrySaveReviewApprovalReviewedBlockItemCount: 1,
+				canExportLocalUpdates: true,
+			} );
+			expect( registry.select( noticesStore ).getNotices() ).toEqual(
+				[]
+			);
 		} );
 	} );
 
@@ -2413,6 +2590,179 @@ describe( 'Post actions', () => {
 			expect(
 				registry.select( editorStore ).getEditedPostContent()
 			).toBe( editedPostContent );
+		} );
+
+		it( 'routes resolved risky-block savePost through review-approval proof before normal save', async () => {
+			const originalPostContent =
+				'<!-- wp:paragraph --><p>Original.</p><!-- /wp:paragraph -->';
+			const editedPostContent =
+				'<!-- wp:html --><script>risky()</script><!-- /wp:html -->';
+			const proposedPostContentHash =
+				'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
+			const candidatePostContentHash =
+				'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb';
+			const approvedBlockHash =
+				'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc';
+			const filteredBlockHash =
+				'dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd';
+			const post = {
+				id: postId,
+				type: 'post',
+				title: 'bar',
+				content: originalPostContent,
+				status: 'draft',
+			};
+			let reviewApprovalCalls = 0;
+			let retrySaveCalls = 0;
+			let normalSaveCalls = 0;
+			let reviewApprovalData = null;
+
+			apiFetch.setFetchHandler( async ( options ) => {
+				const method = getMethod( options );
+				const { path, data } = options;
+
+				if (
+					method === 'POST' &&
+					path.startsWith(
+						`/wp/v2/posts/${ postId }/distributed-editing/review-approval`
+					)
+				) {
+					reviewApprovalCalls++;
+					reviewApprovalData = data;
+
+					return {
+						result: 'review_approval_accepted_for_retry_save',
+						review_approval_accepted: true,
+						server_version: '12',
+						previous_server_version: '12',
+						client_base_version: '12',
+						accepted_proof_server_version: '12',
+						pending_change_count: 2,
+						reviewed_block_items: data.reviewed_block_items,
+						reviewed_block_item_count: 1,
+						block_review_status: 'approved_for_retry_save',
+						proposed_post_content_hash: proposedPostContentHash,
+						candidate_post_content_hash: candidatePostContentHash,
+						can_export_local_updates: true,
+						saves_post: false,
+						mutates_post_content: false,
+						creates_revision: false,
+						claims_saved: false,
+					};
+				}
+
+				if (
+					method === 'POST' &&
+					path.startsWith(
+						`/wp/v2/posts/${ postId }/distributed-editing/retry-save`
+					)
+				) {
+					retrySaveCalls++;
+				}
+
+				if (
+					method === 'PUT' &&
+					path.startsWith( `/wp/v2/posts/${ postId }` )
+				) {
+					normalSaveCalls++;
+				}
+
+				throw {
+					code: 'unexpected_path',
+					message: `Unexpected path: ${ method } ${ path }`,
+				};
+			} );
+
+			const registry = createRegistryWithStores();
+
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', post );
+			registry.dispatch( editorStore ).setupEditor( post, {
+				content: editedPostContent,
+			} );
+			registry.dispatch( editorStore ).updateEditorSettings( {
+				distributedEditing: {
+					enabled: true,
+				},
+			} );
+			registry
+				.dispatch( editorStore )
+				.setDistributedEditingSessionState( {
+					serverVersion: '12',
+					pendingChangeCount: 2,
+					hasPendingChanges: true,
+					canExportLocalUpdates: true,
+					retrySaveReviewProposedContentHash: proposedPostContentHash,
+					retrySaveReviewCandidateContentHash:
+						candidatePostContentHash,
+					riskyBlockReviewStatus:
+						DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_STATUSES.REVIEW_RESOLVED,
+					riskyBlockReviewItems: [
+						{
+							id: 'risk-html-approve',
+							blockClientId: 'block-risk-html-approve',
+							blockName: 'core/html',
+							blockLabel: 'Custom HTML approval',
+							proposedContentHash: approvedBlockHash,
+							ksesFilteredContentHash: filteredBlockHash,
+							reviewStatus:
+								DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES.APPROVED_FOR_RETRY_SAVE,
+							rawContent: editedPostContent,
+						},
+						{
+							id: 'risk-html-reject',
+							blockClientId: 'block-risk-html-reject',
+							blockName: 'core/html',
+							blockLabel: 'Custom HTML rejection',
+							proposedContentHash:
+								'eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
+							ksesFilteredContentHash:
+								'ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff',
+							reviewStatus:
+								DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES.REJECTED,
+							rawContent: editedPostContent,
+						},
+					],
+					riskyBlockReviewItemCount: 2,
+					riskyBlockReviewPendingCount: 0,
+					riskyBlockReviewApprovedCount: 1,
+					riskyBlockReviewRejectedCount: 1,
+					riskyBlockReviewPrePublishPanelRequired: false,
+					riskyBlockReviewCanExportLocalUpdates: true,
+				} );
+
+			await expect(
+				registry.dispatch( editorStore ).savePost()
+			).resolves.toMatchObject( {
+				status: 'review_approval_proof_accepted',
+				allowsNormalSaveFallback: false,
+				blocksNormalSavePost: true,
+				callsReviewApprovalProofEndpoint: true,
+				callsNormalSavePost: false,
+				callsRetrySaveEndpoint: false,
+				claimsSaved: false,
+			} );
+
+			expect( reviewApprovalCalls ).toBe( 1 );
+			expect( reviewApprovalData.reviewed_block_items ).toHaveLength( 1 );
+			expect( retrySaveCalls ).toBe( 0 );
+			expect( normalSaveCalls ).toBe( 0 );
+			expect( registry.select( editorStore ).isEditedPostDirty() ).toBe(
+				true
+			);
+			expect(
+				registry.select( editorStore ).getEditedPostContent()
+			).toBe( editedPostContent );
+			expect(
+				registry
+					.select( editorStore )
+					.getDistributedEditingSessionState()
+			).toMatchObject( {
+				retrySaveReviewApprovalAccepted: true,
+				retrySaveReviewApprovalReviewedBlockItemCount: 1,
+				canExportLocalUpdates: true,
+			} );
 		} );
 
 		it( 'lets savePost continue normally when risky-block review routing is setting-disabled', async () => {

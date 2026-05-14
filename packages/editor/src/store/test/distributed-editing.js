@@ -2024,7 +2024,7 @@ describe( 'distributed editing session state', () => {
 			saveButtonLabel: 'Submit reviewed changes',
 			clickAction:
 				DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.CONTINUE_GUARDED_RETRY_SAVE,
-			blocksNormalSavePost: false,
+			blocksNormalSavePost: true,
 			shouldCallNormalSavePost: false,
 			shouldCallRetrySaveEndpoint: false,
 			claimsSaved: false,
