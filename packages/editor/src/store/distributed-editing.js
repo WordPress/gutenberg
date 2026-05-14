@@ -1443,8 +1443,18 @@ export function getDistributedEditingLocalUpdatesImportReviewRequestStateForSess
 	sessionState = {}
 ) {
 	const normalized = normalizeDistributedEditingSessionState( sessionState );
+	const hasProtectedLocalChanges = Boolean(
+		normalized.hasPendingChanges ||
+			normalized.mustOfferLocalCopy ||
+			normalized.canExportLocalUpdates
+	);
+	const hasConfirmedRetrySaveWithoutProtectedLocalChanges =
+		hasDistributedEditingRetrySaveSavedStateEvidenceForSessionState(
+			normalized
+		) && ! hasProtectedLocalChanges;
 	const requiresFreshReview = Boolean(
-		normalized.localUpdatesImportRequiresFreshReview
+		normalized.localUpdatesImportRequiresFreshReview &&
+			! hasConfirmedRetrySaveWithoutProtectedLocalChanges
 	);
 
 	return {
@@ -1483,10 +1493,7 @@ export function getDistributedEditingLocalUpdatesImportReviewRequestStateForSess
 			normalized.localUpdatesImportHasAcceptedReviewApprovalProof,
 		canExportLocalUpdates:
 			requiresFreshReview && normalized.canExportLocalUpdates,
-		hasProtectedLocalChanges:
-			normalized.hasPendingChanges ||
-			normalized.mustOfferLocalCopy ||
-			normalized.canExportLocalUpdates,
+		hasProtectedLocalChanges,
 		shouldCallRetrySaveEndpoint: false,
 		shouldCallNormalSavePost: false,
 		dispatchesNotice: false,

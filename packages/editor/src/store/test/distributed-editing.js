@@ -3832,6 +3832,90 @@ describe( 'distributed editing session state', () => {
 		);
 	} );
 
+	it( 'suppresses stale fresh-review import actions after retry-save confirmation', () => {
+		const normalized = normalizeDistributedEditingSessionState( {
+			pendingChangeCount: 0,
+			hasPendingChanges: false,
+			mustOfferLocalCopy: false,
+			canExportLocalUpdates: false,
+			localUpdatesImportStatus:
+				DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_STATUSES.BLOCKED,
+			localUpdatesImportReason:
+				DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.FRESH_REVIEW_REQUIRED,
+			localUpdatesImportRequiresFreshReview: true,
+			localUpdatesImportReviewActionKey:
+				DISTRIBUTED_EDITING_NOTICE_ACTIONS.REQUEST_FRESH_REVIEW,
+			localUpdatesImportReviewRequestStatus:
+				DISTRIBUTED_EDITING_LOCAL_UPDATES_REVIEW_REQUEST_STATUSES.DECISION_RECORDED,
+			localUpdatesImportFreshReviewRequestAccepted: true,
+			localUpdatesImportFreshReviewRequestRequested: true,
+			localUpdatesImportFreshReviewDecisionStatus:
+				DISTRIBUTED_EDITING_FRESH_REVIEW_DECISION_STATUSES.RECORDED,
+			localUpdatesImportFreshReviewDecisionAccepted: true,
+			localUpdatesImportFreshReviewDecisionSubmitted: true,
+			localUpdatesImportFreshReviewDecisionDecision: 'approved',
+			localUpdatesImportFreshReviewDecisionReviewedBlockItemCount: 1,
+			localUpdatesImportFreshReviewRetrySaveHandoffStatus:
+				DISTRIBUTED_EDITING_FRESH_REVIEW_RETRY_SAVE_HANDOFF_STATUSES.ACCEPTED_FOR_RETRY_SAVE,
+			localUpdatesImportFreshReviewRetrySaveHandoffAccepted: true,
+			retrySaveFreshReviewConsumeValidationAccepted: true,
+			retrySaveFreshReviewDecisionConsumptionValidated: true,
+			retrySaveFreshReviewReviewedBlockItemCount: 1,
+			retrySaveStatus: DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVED,
+			retrySaveAccepted: true,
+			retrySaveServerVersion: '13',
+			retrySavePreviousServerVersion: '12',
+			retrySaveSavesPost: true,
+			retrySaveMutatesPostContent: true,
+			retrySaveClaimsSaved: true,
+			retrySaveRevisionCreated: true,
+			retrySaveCreatedRevisionIds: [ 301 ],
+		} );
+		const reviewRequest =
+			getDistributedEditingLocalUpdatesImportReviewRequestStateForSessionState(
+				normalized
+			);
+		const descriptors =
+			getDistributedEditingNoticeDescriptorsForSessionState( normalized );
+
+		expect(
+			hasDistributedEditingRetrySaveSavedStateEvidenceForSessionState(
+				normalized
+			)
+		).toBe( true );
+		expect( reviewRequest ).toMatchObject( {
+			requiresFreshReview: false,
+			actionKey: null,
+			canExportLocalUpdates: false,
+			hasProtectedLocalChanges: false,
+			shouldCallNormalSavePost: false,
+			shouldCallRetrySaveEndpoint: false,
+		} );
+		expect( descriptors ).toEqual(
+			expect.arrayContaining( [
+				expect.objectContaining( {
+					kind: DISTRIBUTED_EDITING_NOTICE_KINDS.RETRY_SAVE,
+					status: 'success',
+					retrySaveStatus:
+						DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVED,
+					retrySaveAccepted: true,
+					retrySaveClaimsSaved: true,
+					actionKeys: [],
+				} ),
+			] )
+		);
+		expect( descriptors ).not.toEqual(
+			expect.arrayContaining( [
+				expect.objectContaining( {
+					kind: DISTRIBUTED_EDITING_NOTICE_KINDS.LOCAL_UPDATES_IMPORT_BLOCKED,
+				} ),
+			] )
+		);
+		expect( JSON.stringify( descriptors ) ).not.toContain(
+			DISTRIBUTED_EDITING_NOTICE_ACTIONS.REQUEST_FRESH_REVIEW
+		);
+	} );
+
 	it( 'describes DE-RTC Save button semantics without content or identity exposure', () => {
 		const rawContentToken = 'save-button-raw-content';
 		const proofToken = 'save-button-proof-signature';
