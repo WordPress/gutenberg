@@ -41,6 +41,8 @@ import {
 	getDistributedEditingSessionStateForRetrySaveResult,
 	getDistributedEditingSessionStateForRiskyBlockReviewItemResolution,
 	getDistributedEditingAcceptedReviewApprovalProofForRetrySaveRequest,
+	getDistributedEditingLocalUpdatesImportResult,
+	getDistributedEditingPostContentSha256Hash,
 	getDistributedEditingReviewedBlockItemsForRetrySaveReviewApprovalProof,
 	getDistributedEditingSessionStateForRetrySubmitHandoff,
 	getDistributedEditingSessionStateForRetrySubmitProofResult,
@@ -825,6 +827,57 @@ export const __experimentalRebaseDistributedEditingLocalUpdatesAfterStaleBase =
 		if ( result.hasCandidatePostContent ) {
 			dispatch.editPost(
 				{ content: result.candidatePostContent },
+				{ undoIgnore: true }
+			);
+		}
+
+		dispatch.setDistributedEditingSessionState( result.sessionState );
+
+		return result;
+	};
+
+/**
+ * Imports a protected local-updates handoff payload into this editor session.
+ *
+ * The action validates the exported payload before editing local content. It
+ * does not save, call REST, dispatch notices, persist editor state, or change
+ * post locks. Failed imports record inert blocked status and leave editor
+ * content unchanged.
+ *
+ * @param {Object|string} payloadOrJson Exported local-updates payload or JSON.
+ *
+ * @return {Function} Action thunk.
+ */
+export const __experimentalImportDistributedEditingLocalUpdates =
+	( payloadOrJson ) =>
+	async ( { select, dispatch } ) => {
+		let payload = payloadOrJson;
+
+		if ( typeof payloadOrJson === 'string' ) {
+			try {
+				payload = JSON.parse( payloadOrJson );
+			} catch {
+				payload = null;
+			}
+		}
+
+		const postContent =
+			payload && typeof payload === 'object' ? payload.postContent : null;
+		const computedPostContentHash =
+			typeof postContent === 'string'
+				? await getDistributedEditingPostContentSha256Hash(
+						postContent
+				  )
+				: null;
+		const result = getDistributedEditingLocalUpdatesImportResult( {
+			payload,
+			currentPost: select.getCurrentPost?.() || {},
+			computedPostContentHash,
+		} );
+
+		if ( result.hasPostContent ) {
+			dispatch.editPost(
+				{ content: result.postContent },
 				{ undoIgnore: true }
 			);
 		}

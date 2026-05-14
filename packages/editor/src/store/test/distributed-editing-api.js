@@ -254,9 +254,16 @@ describe( 'distributed editing REST helpers', () => {
 					reviewed_block_items: [
 						{
 							id: 'risk-html-approved',
+							block_client_id: '',
 							block_name: 'core/html',
+							block_label: '',
+							block_path: [],
+							change_kind: '',
+							risk_reason: '',
+							base_content_hash: null,
 							proposed_content_hash: reviewedBlockHash,
 							reviewed_proposed_content_hash: reviewedBlockHash,
+							kses_filtered_content_hash: null,
 							review_status: 'approved_for_retry_save',
 							review_evidence_type: 'kses_block_hash_only_change',
 							content_review_policy: 'kses',

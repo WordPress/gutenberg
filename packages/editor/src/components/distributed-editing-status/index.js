@@ -14,6 +14,7 @@ import {
 	DISTRIBUTED_EDITING_DISPOSITIONS,
 	DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES,
 	DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES,
+	DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_STATUSES,
 	DISTRIBUTED_EDITING_NOTICE_ACTIONS,
 	DISTRIBUTED_EDITING_NOTICE_KINDS,
 	DISTRIBUTED_EDITING_REASON_CODES,
@@ -1162,6 +1163,15 @@ function getBaseStatusItem( descriptor ) {
 }
 
 function getPendingChangesMessage( descriptor ) {
+	if (
+		descriptor.localUpdatesImportStatus ===
+		DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_STATUSES.IMPORTED_FOR_RETRY_SAVE
+	) {
+		return __(
+			'Imported protected local changes are ready for the guarded save path. Save to submit them with the signed review proof; local changes remain exportable until the server confirms.'
+		);
+	}
+
 	if (
 		descriptor.retrySaveStatus ===
 		DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVING

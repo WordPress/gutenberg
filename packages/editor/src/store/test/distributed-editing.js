@@ -11,6 +11,8 @@ import {
 	DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES,
 	DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES,
 	DISTRIBUTED_EDITING_LOCAL_UPDATES_EXPORT_FORMAT,
+	DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS,
+	DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_STATUSES,
 	DISTRIBUTED_EDITING_NOTICE_ACTIONS,
 	DISTRIBUTED_EDITING_NOTICE_IDS,
 	DISTRIBUTED_EDITING_NOTICE_KINDS,
@@ -32,6 +34,7 @@ import {
 	DISTRIBUTED_EDITING_UNLOAD_WARNING_REASONS,
 	DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE,
 	getDistributedEditingLocalUpdatesExportPayload,
+	getDistributedEditingLocalUpdatesImportResult,
 	getDistributedEditingAcceptedReviewApprovalProofForRetrySaveRequest,
 	getDistributedEditingReviewedBlockItemsForRetrySaveReviewApprovalProof,
 	getDistributedEditingRetrySaveFlowStateForSessionState,
@@ -247,6 +250,10 @@ describe( 'distributed editing session state', () => {
 			retrySaveReviewApprovalServerVersion: null,
 			retrySaveReviewApprovalPreviousServerVersion: null,
 			retrySaveReviewApprovalRebasedFromVersion: null,
+			retrySaveReviewApprovalReviewStatus: null,
+			retrySaveReviewApprovalApprovalStatus: null,
+			retrySaveReviewApprovalReviewAction: null,
+			retrySaveReviewApprovalApprovalAction: null,
 			retrySaveReviewApprovalAction: null,
 			retrySaveReviewApprovalRequiredCapability: null,
 			retrySaveReviewApprovalReviewerCapability: null,
@@ -265,10 +272,22 @@ describe( 'distributed editing session state', () => {
 			retrySaveReviewApprovalMismatchedBlockItemFields: [],
 			retrySaveReviewApprovalRawContentIncluded: false,
 			retrySaveReviewApprovalProofSignature: null,
+			retrySaveReviewApprovalIssuedAt: null,
+			retrySaveReviewApprovalExpiresAt: null,
+			retrySaveReviewApprovalSiteId: null,
+			retrySaveReviewApprovalSiteUuid: null,
 			retrySaveReviewApprovalSavesPost: false,
 			retrySaveReviewApprovalMutatesPostContent: false,
 			retrySaveReviewApprovalCreatesRevision: false,
 			retrySaveReviewApprovalClaimsSaved: false,
+			localUpdatesImportStatus:
+				DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_STATUSES.NONE,
+			localUpdatesImportReason: null,
+			localUpdatesImportPostId: null,
+			localUpdatesImportPostType: null,
+			localUpdatesImportHasPostContent: false,
+			localUpdatesImportHasAcceptedReviewApprovalProof: false,
+			localUpdatesImportVerifiedPostContentHash: null,
 			riskyBlockReviewStatus:
 				DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_STATUSES.NONE,
 			riskyBlockReviewReasonCode: null,
@@ -1799,6 +1818,10 @@ describe( 'distributed editing session state', () => {
 					retrySaveReviewApprovalReviewerCapability:
 						'unfiltered_html',
 					retrySaveReviewApprovalScope: 'collaborative_post_content',
+					retrySaveReviewApprovalIssuedAt: '1893456000',
+					retrySaveReviewApprovalExpiresAt: '1893456300',
+					retrySaveReviewApprovalSiteId: '1',
+					retrySaveReviewApprovalSiteUuid: 'de-rtc-site-uuid-example',
 					retrySaveReviewApprovalProposedContentHash:
 						proposedContentHash,
 					retrySaveReviewApprovalCandidateContentHash:
@@ -1838,6 +1861,10 @@ describe( 'distributed editing session state', () => {
 			candidatePostContentHash: candidateContentHash,
 			reviewedCandidateContentHash: candidateContentHash,
 			reviewedBlockItemCount: 1,
+			issuedAt: '1893456000',
+			expiresAt: '1893456300',
+			siteId: '1',
+			siteUuid: 'de-rtc-site-uuid-example',
 			rawContentIncluded: false,
 			exposesRawContent: false,
 			savesPost: false,
@@ -3092,6 +3119,260 @@ describe( 'distributed editing session state', () => {
 			},
 		} );
 		expect( Object.keys( payload.post ) ).toEqual( [ 'id', 'type' ] );
+	} );
+
+	it( 'imports a signed local-updates payload into retry-save-ready state', () => {
+		const postContent =
+			'<!-- wp:html --><script>approved</script><!-- /wp:html -->';
+		const proposedPostContentHash =
+			'7e479a6c51c9e8167f1542af0c730ae0009236c4936876ebbf85bcd7c3ab7dd0';
+		const candidatePostContentHash =
+			'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb';
+		const proofSignature =
+			'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc';
+		const payload = getDistributedEditingLocalUpdatesExportPayload( {
+			currentPost: {
+				id: 44,
+				type: 'post',
+			},
+			editedPostContent: postContent,
+			sessionState: {
+				serverVersion: '12',
+				clientBaseVersion: '7',
+				pendingChangeCount: 1,
+				retrySaveReviewApprovalProofStatus:
+					DISTRIBUTED_EDITING_RETRY_SAVE_REVIEW_APPROVAL_PROOF_STATUSES.ACCEPTED_FOR_RETRY_SAVE,
+				retrySaveReviewApprovalAccepted: true,
+				retrySaveReviewApprovalPostId: '44',
+				retrySaveReviewApprovalPostType: 'post',
+				retrySaveReviewApprovalReviewerUserId: '1',
+				retrySaveReviewApprovalLowPrivilegedSaverUserId: '2',
+				retrySaveReviewApprovalServerVersion: '12',
+				retrySaveReviewApprovalPreviousServerVersion: '11',
+				retrySaveReviewApprovalRebasedFromVersion: '7',
+				retrySaveReviewApprovalReviewerCapability: 'unfiltered_html',
+				retrySaveReviewApprovalScope: 'collaborative_post_content',
+				retrySaveReviewApprovalProposedContentHash:
+					proposedPostContentHash,
+				retrySaveReviewApprovalCandidateContentHash:
+					candidatePostContentHash,
+				retrySaveReviewApprovalCandidateContentHashScope:
+					'low_privileged_saver_candidate',
+				retrySaveReviewApprovalRequiresUnfilteredHtmlSaver: true,
+				retrySaveReviewApprovalProofSignature: proofSignature,
+				retrySaveReviewApprovalIssuedAt: '1893456000',
+				retrySaveReviewApprovalExpiresAt: '1893456300',
+				retrySaveReviewApprovalReviewedBlockItems: [
+					{
+						id: 'risk-html-approved',
+						proposedContentHash: proposedPostContentHash,
+						reviewedProposedContentHash: proposedPostContentHash,
+						reviewStatus: 'approved_for_retry_save',
+						rawContent: '<script>not exported in proof</script>',
+						rawContentIncluded: true,
+					},
+				],
+			},
+		} );
+		const result = getDistributedEditingLocalUpdatesImportResult( {
+			payload,
+			currentPost: {
+				id: 44,
+				type: 'post',
+			},
+			computedPostContentHash: proposedPostContentHash,
+			now: 1893456100,
+		} );
+
+		expect( result ).toMatchObject( {
+			status: DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_STATUSES.IMPORTED_FOR_RETRY_SAVE,
+			reason: null,
+			postContent,
+			hasPostContent: true,
+			hasAcceptedReviewApprovalProof: true,
+			computedPostContentHash: proposedPostContentHash,
+			mutatesEditorContent: true,
+			callsRetrySaveEndpoint: false,
+			callsNormalSavePost: false,
+			dispatchesNotice: false,
+			changesPostLock: false,
+			claimsSaved: false,
+		} );
+		expect( result.acceptedReviewApprovalProof ).toMatchObject( {
+			postId: '44',
+			postType: 'post',
+			serverVersion: '12',
+			rebasedFromVersion: '7',
+			proofSignature,
+			issuedAt: '1893456000',
+			expiresAt: '1893456300',
+			rawContentIncluded: false,
+			savesPost: false,
+			mutatesPostContent: false,
+			createsRevision: false,
+			claimsSaved: false,
+		} );
+		expect(
+			JSON.stringify( result.acceptedReviewApprovalProof )
+		).not.toContain( '<script>' );
+		expect( result.sessionState ).toMatchObject( {
+			localUpdatesImportStatus:
+				DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_STATUSES.IMPORTED_FOR_RETRY_SAVE,
+			localUpdatesImportReason: null,
+			localUpdatesImportHasPostContent: true,
+			localUpdatesImportHasAcceptedReviewApprovalProof: true,
+			localUpdatesImportVerifiedPostContentHash: proposedPostContentHash,
+			retrySubmitProofStatus:
+				DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.ACCEPTED_FOR_FUTURE_SAVE,
+			retrySubmitAccepted: true,
+			retrySubmitSavePathRequired: true,
+			retrySubmitSaveStatus:
+				DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.READY,
+			retrySubmitSaveReady: true,
+			retrySubmitSavesPost: false,
+			retrySubmitMutatesPostContent: false,
+			retrySubmitCreatesRevision: false,
+			retrySubmitClaimsSaved: false,
+			serverVersion: '12',
+			clientBaseVersion: '7',
+			hasPendingChanges: true,
+			canExportLocalUpdates: true,
+			mustOfferLocalCopy: true,
+		} );
+
+		expect(
+			getDistributedEditingRetrySavePolicyForSessionState(
+				result.sessionState,
+				{
+					postId: 44,
+					restBase: 'posts',
+					proposedPostContent: postContent,
+				}
+			)
+		).toMatchObject( {
+			status: DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_STATUSES.READY,
+			canRetrySave: true,
+			hasAcceptedReviewApprovalProof: true,
+			request: {
+				postId: 44,
+				restBase: 'posts',
+				clientBaseVersion: '12',
+				acceptedProofServerVersion: '12',
+				rebasedFromVersion: '7',
+			},
+		} );
+	} );
+
+	it( 'blocks local-updates import for route, proof, hash, and expiry failures', () => {
+		const postContent =
+			'<!-- wp:html --><script>approved</script><!-- /wp:html -->';
+		const proposedPostContentHash =
+			'7e479a6c51c9e8167f1542af0c730ae0009236c4936876ebbf85bcd7c3ab7dd0';
+		const validPayload = getDistributedEditingLocalUpdatesExportPayload( {
+			currentPost: {
+				id: 44,
+				type: 'post',
+			},
+			editedPostContent: postContent,
+			sessionState: {
+				serverVersion: '12',
+				clientBaseVersion: '7',
+				retrySaveReviewApprovalProofStatus:
+					DISTRIBUTED_EDITING_RETRY_SAVE_REVIEW_APPROVAL_PROOF_STATUSES.ACCEPTED_FOR_RETRY_SAVE,
+				retrySaveReviewApprovalAccepted: true,
+				retrySaveReviewApprovalPostId: '44',
+				retrySaveReviewApprovalPostType: 'post',
+				retrySaveReviewApprovalServerVersion: '12',
+				retrySaveReviewApprovalRebasedFromVersion: '7',
+				retrySaveReviewApprovalProposedContentHash:
+					proposedPostContentHash,
+				retrySaveReviewApprovalCandidateContentHash:
+					'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb',
+				retrySaveReviewApprovalProofSignature:
+					'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc',
+			},
+		} );
+
+		expect(
+			getDistributedEditingLocalUpdatesImportResult( {
+				payload: validPayload,
+				currentPost: {
+					id: 45,
+					type: 'post',
+				},
+				computedPostContentHash: proposedPostContentHash,
+			} )
+		).toMatchObject( {
+			status: DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_STATUSES.BLOCKED,
+			reason: DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.POST_ROUTE_MISMATCH,
+			hasPostContent: false,
+			mutatesEditorContent: false,
+		} );
+
+		expect(
+			getDistributedEditingLocalUpdatesImportResult( {
+				payload: getDistributedEditingLocalUpdatesExportPayload( {
+					currentPost: {
+						id: 44,
+						type: 'post',
+					},
+					editedPostContent: postContent,
+					sessionState: {
+						serverVersion: '12',
+					},
+				} ),
+				currentPost: {
+					id: 44,
+					type: 'post',
+				},
+				computedPostContentHash: proposedPostContentHash,
+			} )
+		).toMatchObject( {
+			status: DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_STATUSES.BLOCKED,
+			reason: DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.MISSING_REVIEW_APPROVAL_PROOF,
+			hasPostContent: false,
+			mutatesEditorContent: false,
+		} );
+
+		expect(
+			getDistributedEditingLocalUpdatesImportResult( {
+				payload: validPayload,
+				currentPost: {
+					id: 44,
+					type: 'post',
+				},
+				computedPostContentHash:
+					'dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd',
+			} )
+		).toMatchObject( {
+			status: DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_STATUSES.BLOCKED,
+			reason: DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.POST_CONTENT_HASH_MISMATCH,
+			hasPostContent: false,
+			mutatesEditorContent: false,
+		} );
+
+		expect(
+			getDistributedEditingLocalUpdatesImportResult( {
+				payload: {
+					...validPayload,
+					distributedEditingSessionState: {
+						...validPayload.distributedEditingSessionState,
+						retrySaveReviewApprovalExpiresAt: '1893456000',
+					},
+				},
+				currentPost: {
+					id: 44,
+					type: 'post',
+				},
+				computedPostContentHash: proposedPostContentHash,
+				now: 1893456001,
+			} )
+		).toMatchObject( {
+			status: DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_STATUSES.BLOCKED,
+			reason: DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.EXPIRED_REVIEW_APPROVAL_PROOF,
+			hasPostContent: false,
+			mutatesEditorContent: false,
+		} );
 	} );
 
 	it( 'rebases stale-base local changes from remembered base and refetched server content', () => {

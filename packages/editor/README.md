@@ -316,6 +316,14 @@ Stable local rebase result statuses for stale-base handling.
 
 Undocumented declaration.
 
+### DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS
+
+Stable local-updates import blocker reasons.
+
+### DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_STATUSES
+
+Stable local-updates import statuses for cross-user handoff payloads.
+
 ### DISTRIBUTED_EDITING_NOTICE_ACTIONS
 
 Stable action keys that future UI can map to rendered buttons or menu items.
@@ -597,6 +605,24 @@ _Returns_
 
 -   `Object`: Exportable local-updates payload.
 
+### getDistributedEditingLocalUpdatesImportResult
+
+Validates a local-updates handoff payload before an admin import edits state.
+
+The result is pure data. It does not edit content, save, dispatch notices, call REST, persist editor state, or change post locks.
+
+_Parameters_
+
+-   _args_ `Object`: Import inputs.
+-   _args.payload_ `Object`: Parsed local-updates payload.
+-   _args.currentPost_ `Object`: Current editor post.
+-   _args.computedPostContentHash_ `string`: SHA-256 of payload postContent.
+-   _args.now_ `[number]`: Current Unix timestamp in seconds.
+
+_Returns_
+
+-   `Object`: Import result.
+
 ### getDistributedEditingNoticeDescriptorsForSessionState
 
 Returns stable notice descriptors for the current DE-RTC session state. Descriptors intentionally avoid rendered copy and side effects; future UI can translate the descriptor kind and action keys into notices, toasts, or status indicators.
@@ -608,6 +634,18 @@ _Parameters_
 _Returns_
 
 -   `Array`: Notice descriptors.
+
+### getDistributedEditingPostContentSha256Hash
+
+Computes the SHA-256 hash WordPress uses for DE-RTC post-content evidence.
+
+_Parameters_
+
+-   _postContent_ `string`: Serialized post content.
+
+_Returns_
+
+-   `Promise<string|null>`: Lowercase hex SHA-256 hash, or null if unavailable.
 
 ### getDistributedEditingRecoveryEndpointPath
 

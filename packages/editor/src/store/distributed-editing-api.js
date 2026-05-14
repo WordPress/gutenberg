@@ -383,14 +383,18 @@ function normalizeAcceptedReviewApprovalProofForRetrySaveRequest( proof ) {
 	const normalized = {
 		type: proof.type,
 		status: proof.status ?? proof.proofStatus ?? proof.proof_status,
-		post_id: proof.postId ?? proof.post_id ?? undefined,
+		post_id: normalizeProofPositiveInteger( proof.postId ?? proof.post_id ),
 		post_type: proof.postType ?? proof.post_type ?? undefined,
-		reviewer_user_id:
-			proof.reviewerUserId ?? proof.reviewer_user_id ?? undefined,
-		low_privileged_saver_user_id:
-			proof.lowPrivilegedSaverUserId ??
-			proof.low_privileged_saver_user_id ??
-			undefined,
+		reviewer_user_id: normalizeProofPositiveInteger(
+			proof.reviewerUserId ?? proof.reviewer_user_id
+		),
+		low_privileged_saver_user_id: normalizeProofPositiveIntegerOrNull(
+			getProofField(
+				proof,
+				'lowPrivilegedSaverUserId',
+				'low_privileged_saver_user_id'
+			)
+		),
 		reviewer_capability:
 			proof.reviewerCapability ?? proof.reviewer_capability ?? undefined,
 		review_scope: proof.reviewScope ?? proof.review_scope ?? undefined,
@@ -455,16 +459,28 @@ function normalizeAcceptedReviewApprovalProofForRetrySaveRequest( proof ) {
 			proof.kses_filtered_candidate_content_hash ??
 			undefined,
 		reviewed_block_items: normalizeReviewedBlockItemsForRequest(
-			proof.reviewedBlockItems ?? proof.reviewed_block_items
+			getProofField(
+				proof,
+				'reviewedBlockItems',
+				'reviewed_block_items'
+			),
+			{ preserveSignedShape: true }
 		),
 		reviewed_block_item_count:
 			proof.reviewedBlockItemCount ??
 			proof.reviewed_block_item_count ??
 			undefined,
-		block_review_status:
-			proof.blockReviewStatus ?? proof.block_review_status ?? undefined,
+		block_review_status: getProofField(
+			proof,
+			'blockReviewStatus',
+			'block_review_status'
+		),
 		proof_signature:
 			proof.proofSignature ?? proof.proof_signature ?? undefined,
+		issued_at: proof.issuedAt ?? proof.issued_at ?? undefined,
+		expires_at: proof.expiresAt ?? proof.expires_at ?? undefined,
+		site_id: normalizeProofPositiveInteger( proof.siteId ?? proof.site_id ),
+		site_uuid: proof.siteUuid ?? proof.site_uuid ?? undefined,
 		raw_content_included: false,
 		saves_post: Boolean( proof.savesPost ?? proof.saves_post ),
 		mutates_post_content: Boolean(
@@ -479,8 +495,14 @@ function normalizeAcceptedReviewApprovalProofForRetrySaveRequest( proof ) {
 	for ( const [ key, value ] of Object.entries( normalized ) ) {
 		if (
 			value === undefined ||
-			value === null ||
-			( Array.isArray( value ) && value.length === 0 )
+			( value === null &&
+				! [
+					'low_privileged_saver_user_id',
+					'block_review_status',
+				].includes( key ) ) ||
+			( Array.isArray( value ) &&
+				value.length === 0 &&
+				key !== 'reviewed_block_items' )
 		) {
 			delete normalized[ key ];
 		}
@@ -492,6 +514,34 @@ function normalizeAcceptedReviewApprovalProofForRetrySaveRequest( proof ) {
 	}
 
 	return normalized;
+}
+
+function normalizeProofPositiveInteger( value ) {
+	const number = Number( value );
+
+	return Number.isInteger( number ) && number > 0 ? number : undefined;
+}
+
+function normalizeProofPositiveIntegerOrNull( value ) {
+	if ( value === null ) {
+		return null;
+	}
+
+	return normalizeProofPositiveInteger( value );
+}
+
+function getProofField( object, camelKey, snakeKey, fallback = undefined ) {
+	const hasOwn = Object.prototype.hasOwnProperty;
+
+	if ( hasOwn.call( object, camelKey ) ) {
+		return object[ camelKey ];
+	}
+
+	if ( hasOwn.call( object, snakeKey ) ) {
+		return object[ snakeKey ];
+	}
+
+	return fallback;
 }
 
 /**
@@ -609,17 +659,27 @@ export function __experimentalRequestDistributedEditingRetrySaveReviewApprovalPr
 	} );
 }
 
-function normalizeReviewedBlockItemsForRequest( reviewedBlockItems ) {
+function normalizeReviewedBlockItemsForRequest(
+	reviewedBlockItems,
+	{ preserveSignedShape = false } = {}
+) {
 	if ( ! Array.isArray( reviewedBlockItems ) ) {
 		return [];
 	}
 
 	return reviewedBlockItems
-		.map( ( item ) => normalizeReviewedBlockItemForRequest( item ) )
+		.map( ( item ) =>
+			normalizeReviewedBlockItemForRequest( item, {
+				preserveSignedShape,
+			} )
+		)
 		.filter( ( item ) => item.id );
 }
 
-function normalizeReviewedBlockItemForRequest( item = {} ) {
+function normalizeReviewedBlockItemForRequest(
+	item = {},
+	{ preserveSignedShape = false } = {}
+) {
 	const hasOwn = Object.prototype.hasOwnProperty;
 	const hasBaseContentHash =
 		hasOwn.call( item, 'baseContentHash' ) ||
@@ -627,41 +687,114 @@ function normalizeReviewedBlockItemForRequest( item = {} ) {
 	const hasKsesFilteredContentHash =
 		hasOwn.call( item, 'ksesFilteredContentHash' ) ||
 		hasOwn.call( item, 'kses_filtered_content_hash' );
-	const proposedContentHash =
-		item.proposedContentHash ?? item.proposed_content_hash ?? null;
+	const proposedContentHash = getProofField(
+		item,
+		'proposedContentHash',
+		'proposed_content_hash',
+		null
+	);
 	const reviewedProposedContentHash =
-		item.reviewedProposedContentHash ??
-		item.reviewed_proposed_content_hash ??
-		proposedContentHash;
+		getProofField(
+			item,
+			'reviewedProposedContentHash',
+			'reviewed_proposed_content_hash'
+		) ?? proposedContentHash;
+	const blockPath = getProofField( item, 'blockPath', 'block_path' );
+	const blockClientId = getNormalizedBlockItemStringField(
+		item,
+		'blockClientId',
+		'block_client_id',
+		preserveSignedShape
+	);
+	const blockName = getNormalizedBlockItemStringField(
+		item,
+		'blockName',
+		'block_name',
+		preserveSignedShape
+	);
+	const blockLabel = getNormalizedBlockItemStringField(
+		item,
+		'blockLabel',
+		'block_label',
+		preserveSignedShape
+	);
+	const changeKind = getNormalizedBlockItemStringField(
+		item,
+		'changeKind',
+		'change_kind',
+		preserveSignedShape
+	);
+	const riskReason = getNormalizedBlockItemStringField(
+		item,
+		'riskReason',
+		'risk_reason',
+		preserveSignedShape
+	);
+	let normalizedBlockPath;
+	if ( Array.isArray( blockPath ) ) {
+		normalizedBlockPath = blockPath;
+	} else if ( preserveSignedShape ) {
+		normalizedBlockPath = [];
+	}
+
+	let baseContentHash;
+	if ( preserveSignedShape ) {
+		baseContentHash = getProofField(
+			item,
+			'baseContentHash',
+			'base_content_hash',
+			null
+		);
+	} else if ( hasBaseContentHash ) {
+		baseContentHash = getProofField(
+			item,
+			'baseContentHash',
+			'base_content_hash'
+		);
+	}
+
+	let ksesFilteredContentHash;
+	if ( preserveSignedShape ) {
+		ksesFilteredContentHash = getProofField(
+			item,
+			'ksesFilteredContentHash',
+			'kses_filtered_content_hash',
+			null
+		);
+	} else if ( hasKsesFilteredContentHash ) {
+		ksesFilteredContentHash = getProofField(
+			item,
+			'ksesFilteredContentHash',
+			'kses_filtered_content_hash'
+		);
+	}
 	const normalized = {
 		id: item.id ?? null,
-		block_client_id:
-			item.blockClientId ?? item.block_client_id ?? undefined,
-		block_name: item.blockName ?? item.block_name ?? undefined,
-		block_label: item.blockLabel ?? item.block_label ?? undefined,
-		block_path: Array.isArray( item.blockPath )
-			? item.blockPath
-			: item.block_path,
-		change_kind: item.changeKind ?? item.change_kind ?? undefined,
-		risk_reason: item.riskReason ?? item.risk_reason ?? undefined,
-		base_content_hash: hasBaseContentHash
-			? item.baseContentHash ?? item.base_content_hash
-			: undefined,
+		block_client_id: blockClientId,
+		block_name: blockName,
+		block_label: blockLabel,
+		block_path: normalizedBlockPath,
+		change_kind: changeKind,
+		risk_reason: riskReason,
+		base_content_hash: baseContentHash,
 		proposed_content_hash: proposedContentHash,
 		reviewed_proposed_content_hash: reviewedProposedContentHash,
-		kses_filtered_content_hash: hasKsesFilteredContentHash
-			? item.ksesFilteredContentHash ?? item.kses_filtered_content_hash
-			: undefined,
+		kses_filtered_content_hash: ksesFilteredContentHash,
 		review_status:
-			item.reviewStatus ??
-			item.review_status ??
+			getProofField( item, 'reviewStatus', 'review_status' ) ??
 			'approved_for_retry_save',
 		review_evidence_type:
-			item.reviewEvidenceType ??
-			item.review_evidence_type ??
-			'kses_block_hash_only_change',
+			getProofField(
+				item,
+				'reviewEvidenceType',
+				'review_evidence_type'
+			) ?? 'kses_block_hash_only_change',
 		content_review_policy:
-			item.contentReviewPolicy ?? item.content_review_policy ?? 'kses',
+			getProofField(
+				item,
+				'contentReviewPolicy',
+				'content_review_policy'
+			) ?? 'kses',
 		raw_content_included: false,
 		exposes_raw_content: false,
 	};
@@ -669,7 +802,8 @@ function normalizeReviewedBlockItemForRequest( item = {} ) {
 	for ( const [ key, value ] of Object.entries( normalized ) ) {
 		if (
 			value === undefined ||
-			( value === null &&
+			( ! preserveSignedShape &&
+				value === null &&
 				key !== 'base_content_hash' &&
 				key !== 'kses_filtered_content_hash' )
 		) {
@@ -678,6 +812,17 @@ function normalizeReviewedBlockItemForRequest( item = {} ) {
 	}
 
 	return normalized;
+}
+
+function getNormalizedBlockItemStringField(
+	item,
+	camelKey,
+	snakeKey,
+	preserveSignedShape
+) {
+	const value = getProofField( item, camelKey, snakeKey );
+
+	return preserveSignedShape ? value ?? '' : value;
 }
 
 /**

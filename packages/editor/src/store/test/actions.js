@@ -203,7 +203,7 @@ describe( 'Post actions', () => {
 				).toBeUndefined();
 				expect(
 					data.reviewed_block_items[ 0 ].raw_content_included
-				).toBeUndefined();
+				).toBe( false );
 				expect( JSON.stringify( data ) ).not.toContain(
 					'<script>unsafe</script>'
 				);
