@@ -257,9 +257,6 @@ export function LayoutSettings( {
 							{ isFixedColumns ? (
 								<InputControl
 									label={ __( 'Columns' ) }
-									description={ __(
-										'Number of columns across the dashboard.'
-									) }
 									type="number"
 									min={ 1 }
 									max={ 12 }
