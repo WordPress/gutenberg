@@ -17,6 +17,8 @@ import {
 	DISTRIBUTED_EDITING_DISPOSITIONS,
 	DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES,
 	DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES,
+	DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS,
+	DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_STATUSES,
 	DISTRIBUTED_EDITING_NOTICE_KINDS,
 	DISTRIBUTED_EDITING_REASON_CODES,
 	DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES,
@@ -33,6 +35,7 @@ import {
 	DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS,
 	DISTRIBUTED_EDITING_SAVE_POLICY_STATUSES,
 	DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE,
+	getDistributedEditingLocalUpdatesExportPayload,
 } from '../distributed-editing';
 import { store as editorStore } from '..';
 
@@ -1339,6 +1342,279 @@ describe( 'Post actions', () => {
 				'<!-- wp:paragraph --><p>Local alpha</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Remote beta</p><!-- /wp:paragraph -->'
 			);
 		} );
+	} );
+
+	describe( '__experimentalImportDistributedEditingLocalUpdates()', () => {
+		const approvedPostContent =
+			'<!-- wp:html --><script>approved</script><!-- /wp:html -->';
+		const approvedPostContentHash =
+			'7e479a6c51c9e8167f1542af0c730ae0009236c4936876ebbf85bcd7c3ab7dd0';
+		const mismatchedPostContentHash =
+			'dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd';
+		const candidatePostContentHash =
+			'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb';
+		const proofSignature =
+			'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc';
+		const originalCrypto = globalThis.crypto;
+		const originalTextEncoder = globalThis.TextEncoder;
+
+		beforeEach( () => {
+			const { TextEncoder } = require( 'util' );
+
+			Object.defineProperty( globalThis, 'TextEncoder', {
+				configurable: true,
+				value: originalTextEncoder || TextEncoder,
+			} );
+			Object.defineProperty( globalThis, 'crypto', {
+				configurable: true,
+				value: {
+					subtle: {
+						digest: jest.fn( async ( _algorithm, bytes ) => {
+							const postContent = Buffer.from( bytes ).toString();
+							const hash =
+								postContent === approvedPostContent
+									? approvedPostContentHash
+									: mismatchedPostContentHash;
+
+							return Uint8Array.from(
+								( hash.match( /.{2}/g ) || [] ).map( ( byte ) =>
+									parseInt( byte, 16 )
+								)
+							).buffer;
+						} ),
+					},
+				},
+			} );
+		} );
+
+		afterEach( () => {
+			if ( originalTextEncoder ) {
+				Object.defineProperty( globalThis, 'TextEncoder', {
+					configurable: true,
+					value: originalTextEncoder,
+				} );
+			} else {
+				delete globalThis.TextEncoder;
+			}
+
+			if ( originalCrypto ) {
+				Object.defineProperty( globalThis, 'crypto', {
+					configurable: true,
+					value: originalCrypto,
+				} );
+			} else {
+				delete globalThis.crypto;
+			}
+		} );
+
+		function getValidLocalUpdatesImportPayload( options = {} ) {
+			return getDistributedEditingLocalUpdatesExportPayload( {
+				currentPost: {
+					id: options.postId ?? postId,
+					type: options.postType ?? 'post',
+				},
+				editedPostContent: options.postContent ?? approvedPostContent,
+				sessionState: {
+					serverVersion: '12',
+					clientBaseVersion: '7',
+					pendingChangeCount: 1,
+					retrySaveReviewApprovalProofStatus:
+						DISTRIBUTED_EDITING_RETRY_SAVE_REVIEW_APPROVAL_PROOF_STATUSES.ACCEPTED_FOR_RETRY_SAVE,
+					retrySaveReviewApprovalAccepted: true,
+					retrySaveReviewApprovalPostId: String(
+						options.proofPostId ?? options.postId ?? postId
+					),
+					retrySaveReviewApprovalPostType:
+						options.proofPostType ?? options.postType ?? 'post',
+					retrySaveReviewApprovalServerVersion: '12',
+					retrySaveReviewApprovalRebasedFromVersion: '7',
+					retrySaveReviewApprovalProposedContentHash:
+						options.proposedPostContentHash ??
+						approvedPostContentHash,
+					retrySaveReviewApprovalCandidateContentHash:
+						candidatePostContentHash,
+					retrySaveReviewApprovalProofSignature: proofSignature,
+				},
+			} );
+		}
+
+		function setupImportEditor( initialContent = 'original content' ) {
+			const post = {
+				id: postId,
+				type: 'post',
+				title: 'bar',
+				content: initialContent,
+				status: 'draft',
+			};
+			const registry = createRegistryWithStores();
+
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', post );
+			registry.dispatch( editorStore ).setupEditor( post, {
+				content: initialContent,
+			} );
+
+			return registry;
+		}
+
+		it( 'imports a validated payload into local editor content without saving or transport', async () => {
+			let apiFetchCallCount = 0;
+
+			apiFetch.setFetchHandler( async () => {
+				apiFetchCallCount++;
+				throw new Error(
+					'Local-updates import must not call apiFetch.'
+				);
+			} );
+
+			const registry = setupImportEditor();
+			const result = await registry
+				.dispatch( editorStore )
+				.__experimentalImportDistributedEditingLocalUpdates(
+					JSON.stringify( getValidLocalUpdatesImportPayload() )
+				);
+
+			expect( result ).toMatchObject( {
+				status: DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_STATUSES.IMPORTED_FOR_RETRY_SAVE,
+				hasPostContent: true,
+				mutatesEditorContent: true,
+				callsRetrySaveEndpoint: false,
+				callsNormalSavePost: false,
+				dispatchesNotice: false,
+				changesPostLock: false,
+				claimsSaved: false,
+			} );
+			expect( apiFetchCallCount ).toBe( 0 );
+			expect(
+				registry.select( editorStore ).getEditedPostContent()
+			).toBe( approvedPostContent );
+			expect( registry.select( editorStore ).isPostSavingLocked() ).toBe(
+				false
+			);
+			expect(
+				registry.select( editorStore ).isPostAutosavingLocked()
+			).toBe( false );
+			expect( registry.select( noticesStore ).getNotices() ).toEqual(
+				[]
+			);
+			expect(
+				registry
+					.select( editorStore )
+					.getDistributedEditingSessionState()
+			).toMatchObject( {
+				localUpdatesImportStatus:
+					DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_STATUSES.IMPORTED_FOR_RETRY_SAVE,
+				localUpdatesImportHasPostContent: true,
+				localUpdatesImportHasAcceptedReviewApprovalProof: true,
+				localUpdatesImportVerifiedPostContentHash:
+					approvedPostContentHash,
+				retrySubmitSaveStatus:
+					DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.READY,
+				canExportLocalUpdates: true,
+				mustOfferLocalCopy: true,
+				retrySubmitSavesPost: false,
+				retrySubmitClaimsSaved: false,
+			} );
+		} );
+
+		it.each( [
+			[
+				'malformed payload',
+				'{not-json',
+				DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.MALFORMED_PAYLOAD,
+			],
+			[
+				'hash mismatch',
+				JSON.stringify(
+					getValidLocalUpdatesImportPayload( {
+						postContent:
+							'<!-- wp:html --><script>changed</script><!-- /wp:html -->',
+					} )
+				),
+				DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.POST_CONTENT_HASH_MISMATCH,
+			],
+			[
+				'route mismatch',
+				JSON.stringify(
+					getValidLocalUpdatesImportPayload( {
+						postId: postId + 1,
+					} )
+				),
+				DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.POST_ROUTE_MISMATCH,
+			],
+			[
+				'missing proof',
+				JSON.stringify(
+					getDistributedEditingLocalUpdatesExportPayload( {
+						currentPost: {
+							id: postId,
+							type: 'post',
+						},
+						editedPostContent: approvedPostContent,
+						sessionState: {
+							serverVersion: '12',
+						},
+					} )
+				),
+				DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.MISSING_REVIEW_APPROVAL_PROOF,
+			],
+		] )(
+			'blocks %s before changing editor content',
+			async ( _label, payload, reason ) => {
+				let apiFetchCallCount = 0;
+
+				apiFetch.setFetchHandler( async () => {
+					apiFetchCallCount++;
+					throw new Error(
+						'Blocked local-updates import must not call apiFetch.'
+					);
+				} );
+
+				const registry = setupImportEditor();
+				const result = await registry
+					.dispatch( editorStore )
+					.__experimentalImportDistributedEditingLocalUpdates(
+						payload
+					);
+
+				expect( result ).toMatchObject( {
+					status: DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_STATUSES.BLOCKED,
+					reason,
+					hasPostContent: false,
+					mutatesEditorContent: false,
+					callsRetrySaveEndpoint: false,
+					callsNormalSavePost: false,
+					dispatchesNotice: false,
+					changesPostLock: false,
+					claimsSaved: false,
+				} );
+				expect( apiFetchCallCount ).toBe( 0 );
+				expect(
+					registry.select( editorStore ).getEditedPostContent()
+				).toBe( 'original content' );
+				expect(
+					registry.select( editorStore ).isPostSavingLocked()
+				).toBe( false );
+				expect(
+					registry.select( editorStore ).isPostAutosavingLocked()
+				).toBe( false );
+				expect( registry.select( noticesStore ).getNotices() ).toEqual(
+					[]
+				);
+				expect(
+					registry
+						.select( editorStore )
+						.getDistributedEditingSessionState()
+				).toMatchObject( {
+					localUpdatesImportStatus:
+						DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_STATUSES.BLOCKED,
+					localUpdatesImportReason: reason,
+					localUpdatesImportHasPostContent: false,
+					localUpdatesImportHasAcceptedReviewApprovalProof: false,
+				} );
+			}
+		);
 	} );
 
 	describe( '__experimentalPrepareDistributedEditingRetrySubmitAfterLocalRebase()', () => {

@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { Button, Notice } from '@wordpress/components';
+import { Button, Notice, TextareaControl } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useCallback, useState } from '@wordpress/element';
 import { __, _n, sprintf } from '@wordpress/i18n';
@@ -14,6 +14,7 @@ import {
 	DISTRIBUTED_EDITING_DISPOSITIONS,
 	DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES,
 	DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES,
+	DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS,
 	DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_STATUSES,
 	DISTRIBUTED_EDITING_NOTICE_ACTIONS,
 	DISTRIBUTED_EDITING_NOTICE_KINDS,
@@ -510,6 +511,7 @@ export function DistributedEditingStatusInspector( { onAction, onSelect } ) {
 			<DistributedEditingStatusTestControls onSelect={ onSelect } />
 			<DistributedEditingRecoveryDryRunControls />
 			<DistributedEditingRetrySaveControls />
+			<DistributedEditingLocalUpdatesImportControls forceVisible />
 			<DistributedEditingLocalRebaseStateInspector />
 			<DistributedEditingStatus
 				onAction={ onAction }
@@ -760,6 +762,158 @@ export function DistributedEditingRetrySaveControls( { onResult, onError } ) {
 					<dd>{ normalized.retrySaveReason || __( 'None' ) }</dd>
 				</div>
 			</dl>
+		</div>
+	);
+}
+
+/**
+ * Renders the local protected-updates import workflow.
+ *
+ * The control delegates validation to the editor action before content can
+ * change. It reports only local command status and does not dispatch global
+ * notices, save, call REST, or change post locks.
+ *
+ * @param {Object}   props              Component props.
+ * @param {boolean}  props.forceVisible Whether to show without DE-RTC settings.
+ * @param {Function} props.onResult     Optional success/block observer.
+ * @param {Function} props.onError      Optional failure observer.
+ *
+ * @return {React.ReactNode} Rendered local-updates import controls.
+ */
+export function DistributedEditingLocalUpdatesImportControls( {
+	forceVisible = false,
+	onResult,
+	onError,
+} ) {
+	const [ isOpen, setIsOpen ] = useState( false );
+	const [ payloadText, setPayloadText ] = useState( '' );
+	const [ commandStatus, setCommandStatus ] = useState( 'idle' );
+	const [ importResult, setImportResult ] = useState( null );
+	const { __experimentalImportDistributedEditingLocalUpdates } =
+		useDispatch( editorStore ) || {};
+	const { editorSettings, sessionState } = useSelect( ( select ) => {
+		const { getDistributedEditingSessionState, getEditorSettings } =
+			select( editorStore );
+
+		return {
+			editorSettings: getEditorSettings?.() || {},
+			sessionState: getDistributedEditingSessionState?.() || {},
+		};
+	}, [] );
+	const normalized = normalizeDistributedEditingSessionState( sessionState );
+	const isDistributedEditingEnabled = Boolean(
+		editorSettings?.distributedEditing?.enabled
+	);
+	const importStatus =
+		importResult?.status || normalized.localUpdatesImportStatus;
+	const shouldRender =
+		forceVisible ||
+		isDistributedEditingEnabled ||
+		importStatus !== DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_STATUSES.NONE;
+
+	if ( ! shouldRender ) {
+		return null;
+	}
+
+	const isRunning = commandStatus === 'running';
+	const statusMessage = getLocalUpdatesImportStatusMessage( {
+		commandStatus,
+		importResult,
+		normalized,
+	} );
+
+	async function importLocalUpdates() {
+		setCommandStatus( 'running' );
+
+		try {
+			const result =
+				await __experimentalImportDistributedEditingLocalUpdates?.(
+					payloadText
+				);
+
+			setImportResult( result );
+			onResult?.( result );
+
+			if (
+				result?.status ===
+				DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_STATUSES.IMPORTED_FOR_RETRY_SAVE
+			) {
+				setPayloadText( '' );
+				setCommandStatus( 'succeeded' );
+			} else {
+				setCommandStatus( 'blocked' );
+			}
+
+			return result;
+		} catch ( error ) {
+			setCommandStatus( 'failed' );
+			setImportResult( null );
+			onError?.( error );
+			return null;
+		}
+	}
+
+	return (
+		<div
+			aria-label={ __( 'Distributed editing local updates import' ) }
+			className="editor-distributed-editing-status__local-updates-import"
+			role="group"
+		>
+			{ ! isOpen ? (
+				<Button
+					__next40pxDefaultSize
+					onClick={ () => setIsOpen( true ) }
+					variant="secondary"
+				>
+					{ __( 'Import protected changes' ) }
+				</Button>
+			) : (
+				<>
+					<TextareaControl
+						className="editor-distributed-editing-status__local-updates-import-payload"
+						label={ __( 'Protected changes payload' ) }
+						onChange={ setPayloadText }
+						value={ payloadText }
+					/>
+					<div className="editor-distributed-editing-status__local-updates-import-actions">
+						<Button
+							__next40pxDefaultSize
+							accessibleWhenDisabled
+							disabled={ isRunning }
+							isBusy={ isRunning }
+							onClick={ importLocalUpdates }
+							variant="primary"
+						>
+							{ __( 'Validate and import' ) }
+						</Button>
+						<Button
+							__next40pxDefaultSize
+							accessibleWhenDisabled
+							disabled={ isRunning }
+							onClick={ () => {
+								setIsOpen( false );
+								setPayloadText( '' );
+							} }
+							variant="tertiary"
+						>
+							{ __( 'Cancel' ) }
+						</Button>
+					</div>
+				</>
+			) }
+			{ statusMessage && (
+				<div
+					aria-live="polite"
+					className="editor-distributed-editing-status__local-updates-import-status"
+					data-distributed-editing-local-updates-import-status={
+						importStatus ||
+						DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_STATUSES.NONE
+					}
+					role="status"
+				>
+					{ statusMessage }
+				</div>
+			) }
 		</div>
 	);
 }
@@ -1094,10 +1248,13 @@ async function copyDistributedEditingLocalUpdatesToClipboard( {
  */
 export function DistributedEditingStatusChrome( { onAction } ) {
 	return (
-		<DistributedEditingStatus
-			onAction={ onAction }
-			placement="editor-interface-notices"
-		/>
+		<>
+			<DistributedEditingLocalUpdatesImportControls />
+			<DistributedEditingStatus
+				onAction={ onAction }
+				placement="editor-interface-notices"
+			/>
+		</>
 	);
 }
 
@@ -1316,6 +1473,83 @@ function getExportSuccessMessage( item ) {
 
 	return __(
 		'Protected local changes exported. Keep this copy until the server confirms the update.'
+	);
+}
+
+function getLocalUpdatesImportStatusMessage( {
+	commandStatus,
+	importResult,
+	normalized,
+} ) {
+	if ( commandStatus === 'running' ) {
+		return __( 'Validating protected local changes.' );
+	}
+
+	if ( commandStatus === 'failed' ) {
+		return __(
+			'Import failed. Editor content was not changed, and no server request was sent.'
+		);
+	}
+
+	const status = importResult?.status || normalized.localUpdatesImportStatus;
+	const reason = importResult?.reason || normalized.localUpdatesImportReason;
+
+	if (
+		status ===
+		DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_STATUSES.IMPORTED_FOR_RETRY_SAVE
+	) {
+		return __(
+			'Imported protected local changes and review proof. The editor content changed locally only; no server request was sent.'
+		);
+	}
+
+	if (
+		status === DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_STATUSES.BLOCKED
+	) {
+		return getLocalUpdatesImportBlockedMessage( reason );
+	}
+
+	return null;
+}
+
+function getLocalUpdatesImportBlockedMessage( reason ) {
+	switch ( reason ) {
+		case DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.MALFORMED_PAYLOAD:
+			return __(
+				'Import blocked: the pasted payload is missing or malformed. Editor content was not changed.'
+			);
+		case DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.FORMAT_MISMATCH:
+			return __(
+				'Import blocked: the pasted payload is not a protected local-updates export. Editor content was not changed.'
+			);
+		case DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.POST_ROUTE_MISMATCH:
+			return __(
+				'Import blocked: the payload targets a different post route. Editor content was not changed.'
+			);
+		case DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.MISSING_POST_CONTENT:
+			return __(
+				'Import blocked: the payload does not include protected post content. Editor content was not changed.'
+			);
+		case DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.MISSING_HASH_EVIDENCE:
+			return __(
+				'Import blocked: the payload is missing hash evidence. Editor content was not changed.'
+			);
+		case DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.POST_CONTENT_HASH_MISMATCH:
+			return __(
+				'Import blocked: the post-content hash does not match the approved proof. Editor content was not changed.'
+			);
+		case DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.MISSING_REVIEW_APPROVAL_PROOF:
+			return __(
+				'Import blocked: the payload is missing accepted review proof. Editor content was not changed.'
+			);
+		case DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.EXPIRED_REVIEW_APPROVAL_PROOF:
+			return __(
+				'Import blocked: the accepted review proof has expired. Editor content was not changed.'
+			);
+	}
+
+	return __(
+		'Import blocked. Editor content was not changed, and no server request was sent.'
 	);
 }
 

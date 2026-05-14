@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -28,6 +28,8 @@ import {
 	DISTRIBUTED_EDITING_DISPOSITIONS,
 	DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES,
 	DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES,
+	DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS,
+	DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_STATUSES,
 	DISTRIBUTED_EDITING_NOTICE_ACTIONS,
 	DISTRIBUTED_EDITING_NOTICE_KINDS,
 	DISTRIBUTED_EDITING_REASON_CODES,
@@ -63,6 +65,7 @@ jest.mock( '../../../store', () => ( {
 function setupDistributedEditingStatusSelect( {
 	currentPost = { id: 1, type: 'post' },
 	editedPostContent = '',
+	editorSettings = {},
 	sessionState = {},
 	noticeDescriptors = getDistributedEditingNoticeDescriptorsForSessionState(
 		sessionState
@@ -78,6 +81,7 @@ function setupDistributedEditingStatusSelect( {
 			getDistributedEditingNoticeDescriptors: () => noticeDescriptors,
 			getDistributedEditingUnloadWarningState: () => unloadWarningState,
 			getEditedPostContent: () => editedPostContent,
+			getEditorSettings: () => editorSettings,
 		} ) )
 	);
 }
@@ -123,6 +127,11 @@ function setupDistributedEditingStatusDispatch() {
 			.fn()
 			.mockResolvedValue( {
 				result: 'server_state_refetched',
+			} ),
+		__experimentalImportDistributedEditingLocalUpdates: jest
+			.fn()
+			.mockResolvedValue( {
+				status: DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_STATUSES.IMPORTED_FOR_RETRY_SAVE,
 			} ),
 		resetDistributedEditingSessionState: jest.fn(),
 		setDistributedEditingSessionState: jest.fn(),
@@ -748,6 +757,143 @@ describe( 'DistributedEditingStatus', () => {
 		);
 		expect( screen.getByText( 'Changes pending' ) ).toBeVisible();
 	} );
+
+	it( 'imports pasted protected local updates from production editor chrome without saving', async () => {
+		const user = userEvent.setup();
+		const actions = setupDistributedEditingStatusDispatch();
+		const payloadText = JSON.stringify( {
+			version: 1,
+			format: 'wp/de-rtc-local-updates',
+		} );
+
+		setupDistributedEditingStatusSelect( {
+			editorSettings: {
+				distributedEditing: {
+					enabled: true,
+				},
+			},
+		} );
+		actions.__experimentalImportDistributedEditingLocalUpdates.mockResolvedValue(
+			{
+				status: DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_STATUSES.IMPORTED_FOR_RETRY_SAVE,
+				mutatesEditorContent: true,
+				callsRetrySaveEndpoint: false,
+				callsNormalSavePost: false,
+				dispatchesNotice: false,
+				changesPostLock: false,
+				claimsSaved: false,
+			}
+		);
+
+		render( <DistributedEditingStatusChrome /> );
+
+		await user.click(
+			screen.getByRole( 'button', {
+				name: 'Import protected changes',
+			} )
+		);
+		fireEvent.change(
+			screen.getByRole( 'textbox', {
+				name: 'Protected changes payload',
+			} ),
+			{ target: { value: payloadText } }
+		);
+		await user.click(
+			screen.getByRole( 'button', {
+				name: 'Validate and import',
+			} )
+		);
+
+		expect(
+			actions.__experimentalImportDistributedEditingLocalUpdates
+		).toHaveBeenCalledWith( payloadText );
+		expect(
+			actions.__experimentalSaveDistributedEditingRetryAfterProof
+		).not.toHaveBeenCalled();
+		expect(
+			actions.__experimentalRefreshDistributedEditingServerStateAfterStaleBase
+		).not.toHaveBeenCalled();
+		expect( await screen.findByRole( 'status' ) ).toHaveTextContent(
+			'Imported protected local changes and review proof. The editor content changed locally only; no server request was sent.'
+		);
+	} );
+
+	it.each( [
+		[
+			DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.MALFORMED_PAYLOAD,
+			'Import blocked: the pasted payload is missing or malformed. Editor content was not changed.',
+		],
+		[
+			DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.POST_CONTENT_HASH_MISMATCH,
+			'Import blocked: the post-content hash does not match the approved proof. Editor content was not changed.',
+		],
+		[
+			DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.POST_ROUTE_MISMATCH,
+			'Import blocked: the payload targets a different post route. Editor content was not changed.',
+		],
+		[
+			DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.MISSING_REVIEW_APPROVAL_PROOF,
+			'Import blocked: the payload is missing accepted review proof. Editor content was not changed.',
+		],
+	] )(
+		'reports blocked local-updates import for %s without saving',
+		async ( reason, message ) => {
+			const user = userEvent.setup();
+			const actions = setupDistributedEditingStatusDispatch();
+
+			setupDistributedEditingStatusSelect( {
+				editorSettings: {
+					distributedEditing: {
+						enabled: true,
+					},
+				},
+			} );
+			actions.__experimentalImportDistributedEditingLocalUpdates.mockResolvedValue(
+				{
+					status: DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_STATUSES.BLOCKED,
+					reason,
+					mutatesEditorContent: false,
+					callsRetrySaveEndpoint: false,
+					callsNormalSavePost: false,
+					dispatchesNotice: false,
+					changesPostLock: false,
+					claimsSaved: false,
+				}
+			);
+
+			render( <DistributedEditingStatusChrome /> );
+
+			await user.click(
+				screen.getByRole( 'button', {
+					name: 'Import protected changes',
+				} )
+			);
+			fireEvent.change(
+				screen.getByRole( 'textbox', {
+					name: 'Protected changes payload',
+				} ),
+				{ target: { value: '{"version":1}' } }
+			);
+			await user.click(
+				screen.getByRole( 'button', {
+					name: 'Validate and import',
+				} )
+			);
+
+			expect(
+				actions.__experimentalImportDistributedEditingLocalUpdates
+			).toHaveBeenCalledTimes( 1 );
+			expect(
+				actions.__experimentalSaveDistributedEditingRetryAfterProof
+			).not.toHaveBeenCalled();
+			expect(
+				actions.__experimentalRefreshDistributedEditingServerStateAfterStaleBase
+			).not.toHaveBeenCalled();
+			expect( await screen.findByRole( 'status' ) ).toHaveTextContent(
+				message
+			);
+		}
+	);
 
 	it( 'renders retry-save in-progress feedback from production editor chrome without saving', async () => {
 		const user = userEvent.setup();
