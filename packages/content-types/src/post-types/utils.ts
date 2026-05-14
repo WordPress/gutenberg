@@ -32,6 +32,8 @@ export const BLANK_RECORD: PostTypeFormData = {
 		hierarchical: false,
 		has_archive: false,
 		show_in_rest: true,
+		menu_icon: null,
+		menu_position: null,
 	},
 };
 
@@ -204,6 +206,8 @@ export function toFormData( row: PostTypeRecord ): PostTypeFormData {
 			hierarchical: config.hierarchical ?? false,
 			has_archive: config.has_archive ?? false,
 			show_in_rest: config.show_in_rest ?? true,
+			menu_icon: config.menu_icon ?? null,
+			menu_position: config.menu_position ?? null,
 		},
 	};
 }
@@ -233,6 +237,8 @@ export function serializeForSave( data: PostTypeFormData ) {
 			has_archive: config.has_archive,
 			show_in_rest: config.show_in_rest,
 			...( description !== '' ? { description } : {} ),
+			menu_icon: config.menu_icon,
+			menu_position: config.menu_position,
 		},
 	};
 }

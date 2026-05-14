@@ -68,6 +68,8 @@ export interface StoredConfig {
 	hierarchical?: boolean;
 	has_archive?: boolean;
 	show_in_rest?: boolean;
+	menu_icon?: string | null;
+	menu_position?: number | null;
 }
 
 import type { ContentType } from '../types';
@@ -84,5 +86,7 @@ export interface PostTypeFormData extends ContentType {
 		taxonomies: string[];
 		supports: SupportFeature[];
 		has_archive: boolean;
+		menu_icon: string | null;
+		menu_position: number | null;
 	};
 }

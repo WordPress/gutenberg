@@ -112,10 +112,18 @@ class WP_REST_User_Post_Types_Controller_Gutenberg extends WP_REST_Posts_Control
 			'type'                 => 'object',
 			'additionalProperties' => false,
 			'properties'           => array(
-				'public'       => array( 'type' => 'boolean' ),
-				'hierarchical' => array( 'type' => 'boolean' ),
-				'has_archive'  => array( 'type' => 'boolean' ),
-				'show_in_rest' => array( 'type' => 'boolean' ),
+				'public'        => array( 'type' => 'boolean' ),
+				'hierarchical'  => array( 'type' => 'boolean' ),
+				'has_archive'   => array( 'type' => 'boolean' ),
+				'show_in_rest'  => array( 'type' => 'boolean' ),
+				'menu_icon'     => array(
+					'type'      => array( 'string', 'null' ),
+				),
+				'menu_position' => array(
+					'type'    => array( 'integer', 'null' ),
+					'minimum' => 1,
+					'maximum' => 100,
+				),
 				// Caps payload size; well above any reasonable description.
 				'description'  => array(
 					'type'      => 'string',

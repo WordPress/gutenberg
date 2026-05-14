@@ -250,6 +250,14 @@ function gutenberg_build_user_post_type_args( WP_Post $record ) {
 		$args['description'] = (string) $config['description'];
 	}
 
+	if ( ! empty( $config['menu_icon'] ) ) {
+		$args['menu_icon'] = (string) $config['menu_icon'];
+	}
+
+	if ( isset( $config['menu_position'] ) && is_int( $config['menu_position'] ) ) {
+		$args['menu_position'] = (int) $config['menu_position'];
+	}
+
 	// `taxonomies` here is the inverse of the taxonomy record's `object_type`:
 	// it lists the taxonomies attached to this post type. Only existing
 	// taxonomies are passed through so we never reference unregistered slugs.

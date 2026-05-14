@@ -39,7 +39,9 @@ import {
 	itemsListNavigationField,
 	labelsActionsField,
 	labelsForm,
+	menuIconField,
 	menuNameField,
+	menuPositionField,
 	newItemField,
 	notFoundField,
 	notFoundInTrashField,
@@ -152,6 +154,8 @@ function PostTypePage( {
 				hierarchicalField,
 				hasArchiveField,
 				showInRestField,
+				menuIconField,
+				menuPositionField,
 				statusField,
 				// Labels
 				labelsActionsField,

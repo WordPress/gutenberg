@@ -249,6 +249,46 @@ export const defaultForm: Form = {
 	],
 };
 
+export const menuIconField: Field< PostTypeFormData > = {
+	id: 'menu_icon',
+	label: __( 'Menu icon' ),
+	type: 'text',
+	description: __(
+		'Dashicon slug (e.g. "dashicons-book") or a data: URI for a custom icon shown in the admin menu.'
+	),
+	placeholder: 'dashicons-admin-post',
+	getValue: ( { item } ) => item.config.menu_icon ?? '',
+	setValue: ( { item, value } ) => ( {
+		config: {
+			...item.config,
+			menu_icon: value ? String( value ) : null,
+		},
+	} ),
+	filterBy: false,
+	enableSorting: false,
+};
+
+export const menuPositionField: Field< PostTypeFormData > = {
+	id: 'menu_position',
+	label: __( 'Menu position' ),
+	type: 'integer',
+	description: __(
+		'Position in the admin menu. Common values: 5 (below Posts), 10 (below Media), 20 (below Pages). Leave empty to use the default position.'
+	),
+	getValue: ( { item } ) => item.config.menu_position ?? null,
+	setValue: ( { item, value } ) => ( {
+		config: {
+			...item.config,
+			menu_position:
+				value !== '' && value !== null && value !== undefined
+					? Number( value )
+					: null,
+		},
+	} ),
+	filterBy: false,
+	enableSorting: false,
+};
+
 export const generalForm: Form = {
 	layout: { type: 'regular' },
 	fields: [
@@ -262,6 +302,8 @@ export const generalForm: Form = {
 		'hierarchical',
 		'has_archive',
 		'show_in_rest',
+		'menu_icon',
+		'menu_position',
 		'status',
 	],
 };
