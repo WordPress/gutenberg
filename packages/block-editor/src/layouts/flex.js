@@ -168,7 +168,6 @@ export default {
 						label={ __( 'Wrapping' ) }
 						hasValue={ hasWrapValue }
 						onDeselect={ resetWrap }
-						isShownByDefault
 						panelId={ clientId }
 					>
 						<FlexWrapControl
