@@ -872,6 +872,10 @@ describe( 'DistributedEditingStatus', () => {
 			'Import blocked: the admin-reviewed changes token or proof has expired and is no longer usable. Nothing was imported, and local changes remain protected and exportable.',
 		],
 		[
+			DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.FRESH_REVIEW_REQUIRED,
+			'Import blocked: this reviewed-changes handoff needs a fresh admin review before it can be imported for retry save. Nothing was imported, and local changes remain protected and exportable.',
+		],
+		[
 			DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.EXTRA_SESSION_STATE_OVEREXPOSED,
 			'Import blocked: this reviewed-changes payload exposes extra distributed editing session state. Nothing was imported, and local changes remain protected.',
 		],
@@ -1449,6 +1453,104 @@ describe( 'DistributedEditingStatus', () => {
 		expect(
 			await screen.findByText(
 				'Server version refreshed for HTML review. Protected local changes remain in this editor session and can still be exported before retrying.'
+			)
+		).toBeVisible();
+	} );
+
+	it( 'exports a fresh-review handoff for unavailable reviewed tokens without saving or leaking proof internals', async () => {
+		const user = userEvent.setup();
+		const writeText = jest.fn().mockResolvedValue();
+		const actions = setupDistributedEditingStatusDispatch();
+		const staleToken = 'de-rtc-review-token.must-not-leak';
+		const editedPostContent =
+			'<!-- wp:html --><script>window.localChange = true;</script><!-- /wp:html -->';
+		const sessionState = {
+			disposition:
+				DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_MALFORMED_SYNC_PAYLOAD,
+			reasonCode:
+				DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_MALFORMED_SYNC_PAYLOAD,
+			serverVersion: '12',
+			clientBaseVersion: '7',
+			pendingChangeCount: 1,
+			hasPendingChanges: true,
+			canExportLocalUpdates: true,
+			retrySaveStatus:
+				DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_MALFORMED_SYNC_PAYLOAD,
+			retrySaveReason: 'unknown_retry_save_review_approval_proof_token',
+			retrySaveReviewApprovalProofEnvelope: {
+				proof_envelope_type: 'opaque_review_approval_proof_token',
+				token: staleToken,
+			},
+			retrySaveReviewApprovalReviewerUserId: '7',
+			retrySaveReviewApprovalProofSignature: 'signed-proof',
+			retrySaveReviewApprovalReviewedBlockItems: [
+				{
+					id: 'risk-html-approved',
+					reviewStatus: 'approved_for_retry_save',
+				},
+			],
+		};
+
+		Object.defineProperty( globalThis.navigator, 'clipboard', {
+			value: { writeText },
+			configurable: true,
+		} );
+		setupDistributedEditingStatusSelect( {
+			currentPost: { id: 46, type: 'post' },
+			editedPostContent,
+			sessionState,
+		} );
+
+		render( <DistributedEditingStatusChrome /> );
+
+		expect(
+			screen.getByText( 'Reviewed changes token unavailable' )
+		).toBeVisible();
+		expect(
+			screen.getByText(
+				'The imported reviewed-changes token could not be found in server storage and is no longer usable for retry save. No server save was made. Export a fresh-review handoff for an admin reviewer; protected local changes remain exportable.'
+			)
+		).toBeVisible();
+		expect(
+			screen.queryByRole( 'button', { name: 'Export local changes' } )
+		).not.toBeInTheDocument();
+
+		await user.click(
+			screen.getByRole( 'button', {
+				name: 'Export for fresh review',
+			} )
+		);
+
+		expect( writeText ).toHaveBeenCalledTimes( 1 );
+		const payload = expectClipboardExportPayload( writeText, {
+			currentPost: { id: 46, type: 'post' },
+			editedPostContent,
+			sessionState,
+		} );
+		expect( payload.acceptedReviewApprovalProof ).toBeNull();
+		expect( payload.reviewTokenRecovery ).toMatchObject( {
+			status: 'fresh_review_required',
+			reason: 'token_unavailable',
+			requiresFreshReview: true,
+			canExportLocalUpdates: true,
+			serverVersion: '12',
+			clientBaseVersion: '7',
+		} );
+		expect( JSON.stringify( payload ) ).not.toContain( staleToken );
+		expect( JSON.stringify( payload ) ).not.toContain( 'signed-proof' );
+		expect( JSON.stringify( payload ) ).not.toContain(
+			'reviewedBlockItems'
+		);
+		expect( JSON.stringify( payload ) ).not.toContain( 'reviewerUserId' );
+		expect(
+			actions.__experimentalSaveDistributedEditingRetryAfterProof
+		).not.toHaveBeenCalled();
+		expect(
+			actions.__experimentalRefreshDistributedEditingServerStateAfterStaleBase
+		).not.toHaveBeenCalled();
+		expect(
+			await screen.findByText(
+				'Fresh-review handoff copied. Send it to an admin reviewer; local changes remain protected until a new review proof is issued.'
 			)
 		).toBeVisible();
 	} );
@@ -2469,7 +2571,8 @@ describe( 'DistributedEditingStatusSurface', () => {
 					DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_MALFORMED_SYNC_PAYLOAD,
 				title: 'Reviewed changes token unavailable',
 				message:
-					'The imported reviewed-changes token could not be found in server storage and is no longer usable for retry save. No server save was made. Protected local changes are still exportable; export them for a fresh admin review before trying again.',
+					'The imported reviewed-changes token could not be found in server storage and is no longer usable for retry save. No server save was made. Export a fresh-review handoff for an admin reviewer; protected local changes remain exportable.',
+				exportLabel: 'Export for fresh review',
 			},
 			{
 				disposition:
@@ -2482,7 +2585,8 @@ describe( 'DistributedEditingStatusSurface', () => {
 					DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_SYNC_META_TAMPERED,
 				title: 'Reviewed changes token expired',
 				message:
-					'The imported reviewed-changes token has expired and is no longer usable for retry save. No server save was made. Protected local changes are still exportable; export them for a fresh admin review before trying again.',
+					'The imported reviewed-changes token has expired and is no longer usable for retry save. No server save was made. Export a fresh-review handoff for an admin reviewer; protected local changes remain exportable.',
+				exportLabel: 'Export for fresh review',
 			},
 			{
 				disposition:

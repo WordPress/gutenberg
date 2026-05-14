@@ -18,6 +18,8 @@ import {
 	DISTRIBUTED_EDITING_NOTICE_KINDS,
 	DISTRIBUTED_EDITING_OPAQUE_REVIEW_APPROVAL_PROOF_TOKEN_ENVELOPE_TYPE,
 	DISTRIBUTED_EDITING_REASON_CODES,
+	DISTRIBUTED_EDITING_REVIEW_TOKEN_RECOVERY_REASONS,
+	DISTRIBUTED_EDITING_REVIEW_TOKEN_RECOVERY_STATUSES,
 	DISTRIBUTED_EDITING_REVIEW_APPROVAL_PROOF_ENVELOPE_TYPE,
 	DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES,
 	DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_STATUSES,
@@ -59,6 +61,7 @@ import {
 	getDistributedEditingSessionStateForStaleBaseRejectionResult,
 	getDistributedEditingSessionStateForStaleBaseServerStateRefetchResult,
 	getDistributedEditingNoticeDescriptorsForSessionState,
+	getDistributedEditingReviewTokenRecoveryStateForSessionState,
 	getDistributedEditingUnloadWarningStateForSessionState,
 	hasDistributedEditingRetrySaveSavedStateEvidenceForSessionState,
 	isDistributedEditingConflictDisposition,
@@ -76,6 +79,7 @@ import { distributedEditingSession } from '../reducer';
 import {
 	canExportDistributedEditingLocalUpdates,
 	getDistributedEditingNoticeDescriptors,
+	getDistributedEditingReviewTokenRecoveryState,
 	getDistributedEditingRiskyBlockReviewState,
 	getDistributedEditingRetrySaveFlowState,
 	getDistributedEditingSavePolicyState,
@@ -284,6 +288,10 @@ describe( 'distributed editing session state', () => {
 			retrySaveReviewApprovalMutatesPostContent: false,
 			retrySaveReviewApprovalCreatesRevision: false,
 			retrySaveReviewApprovalClaimsSaved: false,
+			reviewTokenRecoveryStatus:
+				DISTRIBUTED_EDITING_REVIEW_TOKEN_RECOVERY_STATUSES.NONE,
+			reviewTokenRecoveryReason: null,
+			reviewTokenRecoveryRequiresFreshReview: false,
 			localUpdatesImportStatus:
 				DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_STATUSES.NONE,
 			localUpdatesImportReason: null,
@@ -1363,8 +1371,17 @@ describe( 'distributed editing session state', () => {
 				DISTRIBUTED_EDITING_RETRY_SAVE_REVIEW_APPROVAL_PROOF_STATUSES.ACCEPTED_FOR_RETRY_SAVE,
 			retrySaveReviewApprovalAccepted: true,
 			retrySaveReviewApprovalProofEnvelope: opaqueTokenEnvelope,
+			retrySaveReviewApprovalReviewerUserId: 'reviewer-user-7',
 			retrySaveReviewApprovalServerVersion: '12',
 			retrySaveReviewApprovalRebasedFromVersion: '7',
+			retrySaveReviewApprovalReviewedBlockItems: [
+				{
+					id: 'risk-html-approved',
+					reviewStatus: 'approved_for_retry_save',
+				},
+			],
+			retrySaveReviewApprovalProofSignature: 'signed-proof',
+			retrySaveReviewApprovalRawContentIncluded: true,
 		};
 		const cases = [
 			{
@@ -1374,6 +1391,8 @@ describe( 'distributed editing session state', () => {
 				disposition:
 					DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_MALFORMED_SYNC_PAYLOAD,
 				status: DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_MALFORMED_SYNC_PAYLOAD,
+				recoveryReason:
+					DISTRIBUTED_EDITING_REVIEW_TOKEN_RECOVERY_REASONS.TOKEN_UNAVAILABLE,
 			},
 			{
 				label: 'expired token',
@@ -1382,6 +1401,8 @@ describe( 'distributed editing session state', () => {
 				disposition:
 					DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_SYNC_META_TAMPERED,
 				status: DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_SYNC_META_TAMPERED,
+				recoveryReason:
+					DISTRIBUTED_EDITING_REVIEW_TOKEN_RECOVERY_REASONS.TOKEN_EXPIRED,
 			},
 		];
 
@@ -1422,13 +1443,54 @@ describe( 'distributed editing session state', () => {
 					DISTRIBUTED_EDITING_RETRY_SAVE_REVIEW_APPROVAL_PROOF_STATUSES.NONE,
 				retrySaveReviewApprovalAccepted: false,
 				retrySaveReviewApprovalProofEnvelope: null,
+				retrySaveReviewApprovalReviewerUserId: null,
+				retrySaveReviewApprovalReviewedBlockItems: [],
+				retrySaveReviewApprovalProofSignature: null,
+				retrySaveReviewApprovalRawContentIncluded: false,
 				hasPendingChanges: true,
 				isAwaitingServerConfirmation: true,
 				canExportLocalUpdates: true,
 				mustOfferLocalCopy: true,
+				reviewTokenRecoveryStatus:
+					DISTRIBUTED_EDITING_REVIEW_TOKEN_RECOVERY_STATUSES.FRESH_REVIEW_REQUIRED,
+				reviewTokenRecoveryReason: statusCase.recoveryReason,
+				reviewTokenRecoveryRequiresFreshReview: true,
+			} );
+			expect(
+				getDistributedEditingReviewTokenRecoveryStateForSessionState(
+					normalized
+				)
+			).toMatchObject( {
+				status: DISTRIBUTED_EDITING_REVIEW_TOKEN_RECOVERY_STATUSES.FRESH_REVIEW_REQUIRED,
+				reason: statusCase.recoveryReason,
+				requiresFreshReview: true,
+				canExportLocalUpdates: true,
+				actionKey:
+					DISTRIBUTED_EDITING_NOTICE_ACTIONS.EXPORT_LOCAL_UPDATES,
+				shouldCallRetrySaveEndpoint: false,
+				shouldCallNormalSavePost: false,
+				dispatchesNotice: false,
+				mutatesEditorContent: false,
+				mutatesPersistedPostContent: false,
+				changesPostLock: false,
+				claimsSaved: false,
+				exposesTokenInternals: false,
+				exposesProofSignature: false,
+				exposesReviewedBlockItems: false,
+				exposesReviewerIds: false,
 			} );
 			expect( exportPayload.postContent ).toBe( postContent );
 			expect( exportPayload.acceptedReviewApprovalProof ).toBeNull();
+			expect( exportPayload.serverVersion ).toBe( '12' );
+			expect( exportPayload.clientBaseVersion ).toBe( '7' );
+			expect( exportPayload.reviewTokenRecovery ).toEqual( {
+				status: DISTRIBUTED_EDITING_REVIEW_TOKEN_RECOVERY_STATUSES.FRESH_REVIEW_REQUIRED,
+				reason: statusCase.recoveryReason,
+				requiresFreshReview: true,
+				canExportLocalUpdates: true,
+				serverVersion: '12',
+				clientBaseVersion: '7',
+			} );
 			expect( JSON.stringify( exportPayload ) ).not.toContain(
 				opaqueTokenEnvelope.token
 			);
@@ -1436,11 +1498,61 @@ describe( 'distributed editing session state', () => {
 				'proof_signature'
 			);
 			expect( JSON.stringify( exportPayload ) ).not.toContain(
+				'signed-proof'
+			);
+			expect( JSON.stringify( exportPayload ) ).not.toContain(
+				'reviewer-user-7'
+			);
+			expect( JSON.stringify( exportPayload ) ).not.toContain(
 				'reviewed_block_items'
+			);
+			expect( JSON.stringify( exportPayload ) ).not.toContain(
+				'risk-html-approved'
 			);
 			expect( JSON.stringify( normalized ) ).not.toContain(
 				'proof_signature'
 			);
+			expect( JSON.stringify( normalized ) ).not.toContain(
+				'signed-proof'
+			);
+			expect( JSON.stringify( normalized ) ).not.toContain(
+				'reviewer-user-7'
+			);
+			expect( JSON.stringify( normalized ) ).not.toContain(
+				'risk-html-approved'
+			);
+			expect(
+				getDistributedEditingLocalUpdatesImportResult( {
+					payload: exportPayload,
+					currentPost: {
+						id: 44,
+						type: 'post',
+					},
+					currentSessionState: {
+						pendingChangeCount: 1,
+						hasPendingChanges: true,
+						canExportLocalUpdates: true,
+					},
+				} )
+			).toMatchObject( {
+				status: DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_STATUSES.BLOCKED,
+				reason: DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.FRESH_REVIEW_REQUIRED,
+				hasPostContent: false,
+				hasAcceptedReviewApprovalProof: false,
+				mutatesEditorContent: false,
+				callsRetrySaveEndpoint: false,
+				callsNormalSavePost: false,
+				dispatchesNotice: false,
+				changesPostLock: false,
+				claimsSaved: false,
+				sessionState: {
+					canExportLocalUpdates: true,
+					localUpdatesImportStatus:
+						DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_STATUSES.BLOCKED,
+					localUpdatesImportReason:
+						DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.FRESH_REVIEW_REQUIRED,
+				},
+			} );
 		}
 	} );
 
@@ -4689,5 +4801,39 @@ describe( 'distributed editing selectors', () => {
 			shouldWarn: false,
 			reason: null,
 		} );
+	} );
+
+	it( 'selects fresh-review token recovery state without side effects', () => {
+		const state = {
+			distributedEditingSession: normalizeDistributedEditingSessionState(
+				{
+					pendingChangeCount: 1,
+					retrySaveStatus:
+						DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_MALFORMED_SYNC_PAYLOAD,
+					retrySaveReason:
+						'unknown_retry_save_review_approval_proof_token',
+				}
+			),
+		};
+
+		expect(
+			getDistributedEditingReviewTokenRecoveryState( state )
+		).toEqual(
+			expect.objectContaining( {
+				status: DISTRIBUTED_EDITING_REVIEW_TOKEN_RECOVERY_STATUSES.FRESH_REVIEW_REQUIRED,
+				reason: DISTRIBUTED_EDITING_REVIEW_TOKEN_RECOVERY_REASONS.TOKEN_UNAVAILABLE,
+				requiresFreshReview: true,
+				canExportLocalUpdates: true,
+				actionKey:
+					DISTRIBUTED_EDITING_NOTICE_ACTIONS.EXPORT_LOCAL_UPDATES,
+				shouldCallRetrySaveEndpoint: false,
+				shouldCallNormalSavePost: false,
+				dispatchesNotice: false,
+				mutatesEditorContent: false,
+				mutatesPersistedPostContent: false,
+				changesPostLock: false,
+				claimsSaved: false,
+			} )
+		);
 	} );
 } );

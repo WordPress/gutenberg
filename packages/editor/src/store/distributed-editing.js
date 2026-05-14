@@ -304,6 +304,28 @@ const DISTRIBUTED_EDITING_OPAQUE_REVIEW_APPROVAL_PROOF_TOKEN_REJECTION_DETAILS =
 	} );
 
 /**
+ * Stable review-token recovery statuses for failed opaque proof-token handoffs.
+ * These are product communication states only; they do not save, retry, or
+ * inspect the server-side proof behind the token.
+ */
+export const DISTRIBUTED_EDITING_REVIEW_TOKEN_RECOVERY_STATUSES = Object.freeze(
+	{
+		NONE: 'none',
+		FRESH_REVIEW_REQUIRED: 'fresh_review_required',
+	}
+);
+
+/**
+ * Stable review-token recovery reasons for failed opaque proof-token handoffs.
+ */
+export const DISTRIBUTED_EDITING_REVIEW_TOKEN_RECOVERY_REASONS = Object.freeze(
+	{
+		TOKEN_UNAVAILABLE: 'token_unavailable',
+		TOKEN_EXPIRED: 'token_expired',
+	}
+);
+
+/**
  * Stable local-updates import statuses for cross-user handoff payloads.
  */
 export const DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_STATUSES = Object.freeze(
@@ -326,6 +348,7 @@ export const DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS = Object.freeze( {
 	POST_CONTENT_HASH_MISMATCH: 'post_content_hash_mismatch',
 	MISSING_REVIEW_APPROVAL_PROOF: 'missing_review_approval_proof',
 	EXPIRED_REVIEW_APPROVAL_PROOF: 'expired_review_approval_proof',
+	FRESH_REVIEW_REQUIRED: 'fresh_review_required',
 	EXTRA_SESSION_STATE_OVEREXPOSED: 'extra_session_state_overexposed',
 } );
 
@@ -525,6 +548,10 @@ export const DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE = Object.freeze( {
 	retrySaveReviewApprovalMutatesPostContent: false,
 	retrySaveReviewApprovalCreatesRevision: false,
 	retrySaveReviewApprovalClaimsSaved: false,
+	reviewTokenRecoveryStatus:
+		DISTRIBUTED_EDITING_REVIEW_TOKEN_RECOVERY_STATUSES.NONE,
+	reviewTokenRecoveryReason: null,
+	reviewTokenRecoveryRequiresFreshReview: false,
 	localUpdatesImportStatus:
 		DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_STATUSES.NONE,
 	localUpdatesImportReason: null,
@@ -731,6 +758,20 @@ export function normalizeDistributedEditingSessionState( sessionState = {} ) {
 	)
 		? sessionState.retrySaveStatus
 		: DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE.retrySaveStatus;
+	const retrySaveReason = normalizeNullableString(
+		sessionState.retrySaveReason
+	);
+	const reviewTokenRecoveryReason =
+		getDistributedEditingReviewTokenRecoveryReasonFromRetrySave( {
+			retrySaveStatus,
+			retrySaveReason,
+		} );
+	const reviewTokenRecoveryStatus = reviewTokenRecoveryReason
+		? DISTRIBUTED_EDITING_REVIEW_TOKEN_RECOVERY_STATUSES.FRESH_REVIEW_REQUIRED
+		: DISTRIBUTED_EDITING_REVIEW_TOKEN_RECOVERY_STATUSES.NONE;
+	const reviewTokenRecoveryRequiresFreshReview = Boolean(
+		reviewTokenRecoveryReason
+	);
 	const retrySaveAccepted =
 		Boolean( sessionState.retrySaveAccepted ) ||
 		retrySaveStatus === DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVED;
@@ -776,6 +817,7 @@ export function normalizeDistributedEditingSessionState( sessionState = {} ) {
 		( retrySubmitSavePathRequired && hasPendingChanges ) ||
 		( retrySaveStatus === DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVING &&
 			hasPendingChanges ) ||
+		( reviewTokenRecoveryRequiresFreshReview && hasPendingChanges ) ||
 		( retrySaveHandoffBlocksNormalSave && hasPendingChanges ) ||
 		( retrySaveReviewApprovalAccepted && hasPendingChanges ) ||
 		hasPendingRiskyBlockReviewItems ||
@@ -838,9 +880,7 @@ export function normalizeDistributedEditingSessionState( sessionState = {} ) {
 		retrySubmitSavePrepared,
 		retrySubmitSaveReady,
 		retrySaveStatus,
-		retrySaveReason: normalizeNullableString(
-			sessionState.retrySaveReason
-		),
+		retrySaveReason,
 		retrySaveHandoffStatus,
 		retrySaveHandoffReason: normalizeNullableString(
 			sessionState.retrySaveHandoffReason
@@ -874,6 +914,9 @@ export function normalizeDistributedEditingSessionState( sessionState = {} ) {
 			retrySaveReviewApprovalProofStatus,
 			retrySaveReviewApprovalAccepted,
 		} ),
+		reviewTokenRecoveryStatus,
+		reviewTokenRecoveryReason,
+		reviewTokenRecoveryRequiresFreshReview,
 		localUpdatesImportStatus,
 		localUpdatesImportReason: normalizeNullableString(
 			sessionState.localUpdatesImportReason
@@ -898,6 +941,76 @@ export function normalizeDistributedEditingSessionState( sessionState = {} ) {
 		mustOfferLocalCopy,
 		canExportLocalUpdates,
 	};
+}
+
+/**
+ * Returns a pure recovery descriptor for failed opaque reviewed-proof token
+ * handoffs. The descriptor is product communication state only; it does not
+ * inspect token internals, call REST, save, retry, dispatch notices, mutate
+ * content, or change post locks.
+ *
+ * @param {Object} sessionState DE-RTC session state.
+ *
+ * @return {Object} Review token recovery descriptor.
+ */
+export function getDistributedEditingReviewTokenRecoveryStateForSessionState(
+	sessionState = {}
+) {
+	const normalized = normalizeDistributedEditingSessionState( sessionState );
+	const requiresFreshReview =
+		normalized.reviewTokenRecoveryStatus ===
+		DISTRIBUTED_EDITING_REVIEW_TOKEN_RECOVERY_STATUSES.FRESH_REVIEW_REQUIRED;
+
+	return {
+		status: normalized.reviewTokenRecoveryStatus,
+		reason: normalized.reviewTokenRecoveryReason,
+		requiresFreshReview,
+		canExportLocalUpdates:
+			requiresFreshReview && normalized.canExportLocalUpdates,
+		hasProtectedLocalChanges:
+			normalized.hasPendingChanges ||
+			normalized.mustOfferLocalCopy ||
+			normalized.canExportLocalUpdates,
+		actionKey: requiresFreshReview
+			? DISTRIBUTED_EDITING_NOTICE_ACTIONS.EXPORT_LOCAL_UPDATES
+			: null,
+		shouldCallRetrySaveEndpoint: false,
+		shouldCallNormalSavePost: false,
+		dispatchesNotice: false,
+		mutatesEditorContent: false,
+		mutatesPersistedPostContent: false,
+		changesPostLock: false,
+		claimsSaved: false,
+		exposesTokenInternals: false,
+		exposesProofSignature: false,
+		exposesReviewedBlockItems: false,
+		exposesReviewerIds: false,
+	};
+}
+
+function getDistributedEditingReviewTokenRecoveryReasonFromRetrySave( {
+	retrySaveStatus,
+	retrySaveReason,
+} ) {
+	if (
+		retrySaveStatus ===
+			DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_MALFORMED_SYNC_PAYLOAD &&
+		retrySaveReason ===
+			DISTRIBUTED_EDITING_OPAQUE_REVIEW_APPROVAL_PROOF_TOKEN_REJECTION_DETAILS.UNKNOWN
+	) {
+		return DISTRIBUTED_EDITING_REVIEW_TOKEN_RECOVERY_REASONS.TOKEN_UNAVAILABLE;
+	}
+
+	if (
+		retrySaveStatus ===
+			DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_SYNC_META_TAMPERED &&
+		retrySaveReason ===
+			DISTRIBUTED_EDITING_OPAQUE_REVIEW_APPROVAL_PROOF_TOKEN_REJECTION_DETAILS.EXPIRED
+	) {
+		return DISTRIBUTED_EDITING_REVIEW_TOKEN_RECOVERY_REASONS.TOKEN_EXPIRED;
+	}
+
+	return null;
 }
 
 /**
@@ -935,6 +1048,10 @@ export function getDistributedEditingLocalUpdatesExportPayload( {
 	const proofClientBaseVersion =
 		normalizedSessionState.retrySaveReviewApprovalRebasedFromVersion ||
 		normalizedSessionState.clientBaseVersion;
+	const reviewTokenRecovery =
+		getDistributedEditingReviewTokenRecoveryExportPayload(
+			normalizedSessionState
+		);
 
 	return {
 		version: 1,
@@ -946,13 +1063,40 @@ export function getDistributedEditingLocalUpdatesExportPayload( {
 		postContent:
 			typeof editedPostContent === 'string' ? editedPostContent : '',
 		pendingChangeCount: normalizedSessionState.pendingChangeCount,
-		...( acceptedReviewApprovalProofEnvelope && proofServerVersion
+		...( ( acceptedReviewApprovalProofEnvelope || reviewTokenRecovery ) &&
+		proofServerVersion
 			? { serverVersion: proofServerVersion }
 			: {} ),
-		...( acceptedReviewApprovalProofEnvelope && proofClientBaseVersion
+		...( ( acceptedReviewApprovalProofEnvelope || reviewTokenRecovery ) &&
+		proofClientBaseVersion
 			? { clientBaseVersion: proofClientBaseVersion }
 			: {} ),
+		...( reviewTokenRecovery ? { reviewTokenRecovery } : {} ),
 		acceptedReviewApprovalProof: acceptedReviewApprovalProofEnvelope,
+	};
+}
+
+function getDistributedEditingReviewTokenRecoveryExportPayload(
+	sessionState = {}
+) {
+	const recoveryState =
+		getDistributedEditingReviewTokenRecoveryStateForSessionState(
+			sessionState
+		);
+
+	if ( ! recoveryState.requiresFreshReview ) {
+		return null;
+	}
+
+	const normalized = normalizeDistributedEditingSessionState( sessionState );
+
+	return {
+		status: recoveryState.status,
+		reason: recoveryState.reason,
+		requiresFreshReview: true,
+		canExportLocalUpdates: recoveryState.canExportLocalUpdates,
+		serverVersion: normalized.serverVersion,
+		clientBaseVersion: normalized.clientBaseVersion,
 	};
 }
 
@@ -1206,6 +1350,26 @@ function exposesDistributedEditingSessionState( payload ) {
 	].some( ( key ) => hasOwnProperty( payload, key ) );
 }
 
+function isFreshReviewRequiredLocalUpdatesImportPayload( payload ) {
+	const reviewTokenRecovery = normalizeObject(
+		getFirstDefined(
+			payload.reviewTokenRecovery,
+			payload.review_token_recovery
+		)
+	);
+
+	return (
+		reviewTokenRecovery.status ===
+			DISTRIBUTED_EDITING_REVIEW_TOKEN_RECOVERY_STATUSES.FRESH_REVIEW_REQUIRED ||
+		Boolean(
+			getFirstDefined(
+				reviewTokenRecovery.requiresFreshReview,
+				reviewTokenRecovery.requires_fresh_review
+			)
+		)
+	);
+}
+
 function getDistributedEditingSessionStateFromLocalUpdatesImportPayload(
 	payload
 ) {
@@ -1312,6 +1476,7 @@ export async function getDistributedEditingPostContentSha256Hash(
  * @param {Object} args                         Import inputs.
  * @param {Object} args.payload                 Parsed local-updates payload.
  * @param {Object} args.currentPost             Current editor post.
+ * @param {Object} args.currentSessionState     Current DE-RTC session state.
  * @param {string} args.computedPostContentHash SHA-256 of payload postContent.
  * @param {number} [args.now]                   Current Unix timestamp in seconds.
  *
@@ -1320,6 +1485,7 @@ export async function getDistributedEditingPostContentSha256Hash(
 export function getDistributedEditingLocalUpdatesImportResult( {
 	payload = {},
 	currentPost = {},
+	currentSessionState = {},
 	computedPostContentHash = null,
 	now = Date.now() / 1000,
 } = {} ) {
@@ -1330,7 +1496,8 @@ export function getDistributedEditingLocalUpdatesImportResult( {
 		Object.keys( normalizedPayload ).length === 0
 	) {
 		return createLocalUpdatesImportBlockedResult(
-			DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.MALFORMED_PAYLOAD
+			DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.MALFORMED_PAYLOAD,
+			{ currentSessionState }
 		);
 	}
 
@@ -1340,7 +1507,8 @@ export function getDistributedEditingLocalUpdatesImportResult( {
 			DISTRIBUTED_EDITING_LOCAL_UPDATES_EXPORT_FORMAT
 	) {
 		return createLocalUpdatesImportBlockedResult(
-			DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.FORMAT_MISMATCH
+			DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.FORMAT_MISMATCH,
+			{ currentSessionState }
 		);
 	}
 
@@ -1361,6 +1529,7 @@ export function getDistributedEditingLocalUpdatesImportResult( {
 			{
 				postId: payloadPostId,
 				postType: payloadPostType,
+				currentSessionState,
 			}
 		);
 	}
@@ -1371,6 +1540,7 @@ export function getDistributedEditingLocalUpdatesImportResult( {
 			{
 				postId: payloadPostId,
 				postType: payloadPostType,
+				currentSessionState,
 			}
 		);
 	}
@@ -1381,6 +1551,18 @@ export function getDistributedEditingLocalUpdatesImportResult( {
 			{
 				postId: payloadPostId,
 				postType: payloadPostType,
+				currentSessionState,
+			}
+		);
+	}
+
+	if ( isFreshReviewRequiredLocalUpdatesImportPayload( normalizedPayload ) ) {
+		return createLocalUpdatesImportBlockedResult(
+			DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.FRESH_REVIEW_REQUIRED,
+			{
+				postId: payloadPostId,
+				postType: payloadPostType,
+				currentSessionState,
 			}
 		);
 	}
@@ -1410,6 +1592,7 @@ export function getDistributedEditingLocalUpdatesImportResult( {
 			{
 				postId: payloadPostId,
 				postType: payloadPostType,
+				currentSessionState,
 			}
 		);
 	}
@@ -1436,6 +1619,7 @@ export function getDistributedEditingLocalUpdatesImportResult( {
 			{
 				postId: payloadPostId,
 				postType: payloadPostType,
+				currentSessionState,
 			}
 		);
 	}
@@ -1448,6 +1632,7 @@ export function getDistributedEditingLocalUpdatesImportResult( {
 			{
 				postId: payloadPostId,
 				postType: payloadPostType,
+				currentSessionState,
 			}
 		);
 	}
@@ -1474,6 +1659,7 @@ export function getDistributedEditingLocalUpdatesImportResult( {
 			{
 				postId: payloadPostId,
 				postType: payloadPostType,
+				currentSessionState,
 			}
 		);
 	}
@@ -1488,6 +1674,7 @@ export function getDistributedEditingLocalUpdatesImportResult( {
 				postId: payloadPostId,
 				postType: payloadPostType,
 				verifiedPostContentHash,
+				currentSessionState,
 			}
 		);
 	}
@@ -3515,11 +3702,13 @@ export function getDistributedEditingSessionStateForRetrySaveResult(
 						responseData.reasonCode ||
 						responseData.reason_code
 			  );
-	const retrySaveReason =
+	const opaqueReviewApprovalProofTokenRejectionDetail =
 		getOpaqueReviewApprovalProofTokenRejectionDetail(
 			responseOrError,
 			responseData
-		) ||
+		);
+	const retrySaveReason =
+		opaqueReviewApprovalProofTokenRejectionDetail ||
 		reasonCode ||
 		( result === 'retry_save_applied'
 			? DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.RETRY_SAVE_MISSING_SAVED_STATE_EVIDENCE
@@ -3530,20 +3719,23 @@ export function getDistributedEditingSessionStateForRetrySaveResult(
 			responseData
 		);
 	const retrySaveReviewApprovalProofFields =
-		getRetrySaveReviewApprovalProofFieldsFromResponseOrError(
-			responseOrError,
-			responseData,
-			normalizedCurrent
-		);
+		opaqueReviewApprovalProofTokenRejectionDetail
+			? normalizeRetrySaveReviewApprovalProofFields()
+			: getRetrySaveReviewApprovalProofFieldsFromResponseOrError(
+					responseOrError,
+					responseData,
+					normalizedCurrent
+			  );
 	const hasAcceptedReviewApprovalProof = Boolean(
-		responseOrError.reviewApprovalProofAccepted ||
-			responseOrError.review_approval_proof_accepted ||
-			responseOrError.acceptedReviewApprovalProofAvailable ||
-			responseOrError.accepted_review_approval_proof_available ||
-			responseData.reviewApprovalProofAccepted ||
-			responseData.review_approval_proof_accepted ||
-			responseData.acceptedReviewApprovalProofAvailable ||
-			responseData.accepted_review_approval_proof_available
+		! opaqueReviewApprovalProofTokenRejectionDetail &&
+			( responseOrError.reviewApprovalProofAccepted ||
+				responseOrError.review_approval_proof_accepted ||
+				responseOrError.acceptedReviewApprovalProofAvailable ||
+				responseOrError.accepted_review_approval_proof_available ||
+				responseData.reviewApprovalProofAccepted ||
+				responseData.review_approval_proof_accepted ||
+				responseData.acceptedReviewApprovalProofAvailable ||
+				responseData.accepted_review_approval_proof_available )
 	);
 
 	return getDistributedEditingRejectedRetrySaveState( {
@@ -4132,6 +4324,10 @@ function getDistributedEditingRetrySaveDescriptorFields( normalized ) {
 		retrySaveClaimsSaved: normalized.retrySaveClaimsSaved,
 		retrySaveRevisionCreated: normalized.retrySaveRevisionCreated,
 		retrySaveCreatedRevisionIds: normalized.retrySaveCreatedRevisionIds,
+		reviewTokenRecoveryStatus: normalized.reviewTokenRecoveryStatus,
+		reviewTokenRecoveryReason: normalized.reviewTokenRecoveryReason,
+		reviewTokenRecoveryRequiresFreshReview:
+			normalized.reviewTokenRecoveryRequiresFreshReview,
 		...getDistributedEditingRetrySaveReviewMetadataFields( normalized ),
 		...getDistributedEditingRetrySaveReviewApprovalProofFields(
 			normalized
@@ -5715,6 +5911,9 @@ function createLocalUpdatesImportBlockedResult( reason, options = {} ) {
 	const verifiedPostContentHash = normalizeSha256Hash(
 		options.verifiedPostContentHash
 	);
+	const normalizedCurrent = normalizeDistributedEditingSessionState(
+		options.currentSessionState
+	);
 
 	return {
 		status: DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_STATUSES.BLOCKED,
@@ -5725,6 +5924,7 @@ function createLocalUpdatesImportBlockedResult( reason, options = {} ) {
 		hasAcceptedReviewApprovalProof: false,
 		computedPostContentHash: verifiedPostContentHash,
 		sessionState: normalizeDistributedEditingSessionState( {
+			...normalizedCurrent,
 			localUpdatesImportStatus:
 				DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_STATUSES.BLOCKED,
 			localUpdatesImportReason: reason,
@@ -5736,8 +5936,8 @@ function createLocalUpdatesImportBlockedResult( reason, options = {} ) {
 			localUpdatesImportHasPostContent: false,
 			localUpdatesImportHasAcceptedReviewApprovalProof: false,
 			localUpdatesImportVerifiedPostContentHash: verifiedPostContentHash,
-			canExportLocalUpdates: false,
-			mustOfferLocalCopy: false,
+			canExportLocalUpdates: normalizedCurrent.canExportLocalUpdates,
+			mustOfferLocalCopy: normalizedCurrent.mustOfferLocalCopy,
 		} ),
 		mutatesEditorContent: false,
 		callsRetrySaveEndpoint: false,

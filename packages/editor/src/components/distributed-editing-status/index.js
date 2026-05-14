@@ -19,6 +19,7 @@ import {
 	DISTRIBUTED_EDITING_NOTICE_ACTIONS,
 	DISTRIBUTED_EDITING_NOTICE_KINDS,
 	DISTRIBUTED_EDITING_REASON_CODES,
+	DISTRIBUTED_EDITING_REVIEW_TOKEN_RECOVERY_STATUSES,
 	DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_STATUSES,
 	DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES,
 	DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_REASONS,
@@ -1303,6 +1304,10 @@ function getDistributedEditingStatusSurfaceItem( descriptor ) {
 				...getRetrySaveStatusText( descriptor ),
 				retrySaveReviewRequired: descriptor.retrySaveReviewRequired,
 				retrySaveStatus: descriptor.retrySaveStatus,
+				reviewTokenRecoveryStatus: descriptor.reviewTokenRecoveryStatus,
+				reviewTokenRecoveryReason: descriptor.reviewTokenRecoveryReason,
+				reviewTokenRecoveryRequiresFreshReview:
+					descriptor.reviewTokenRecoveryRequiresFreshReview,
 			};
 	}
 
@@ -1450,6 +1455,9 @@ function getActionLabel( actionKey, item ) {
 		case DISTRIBUTED_EDITING_NOTICE_ACTIONS.ACCEPT_SERVER_STATE:
 			return __( 'Accept server version' );
 		case DISTRIBUTED_EDITING_NOTICE_ACTIONS.EXPORT_LOCAL_UPDATES:
+			if ( isRetrySaveFreshReviewRequiredItem( item ) ) {
+				return __( 'Export for fresh review' );
+			}
 			if ( isRetrySaveReviewRequiredItem( item ) ) {
 				return __( 'Export changes for review' );
 			}
@@ -1472,6 +1480,12 @@ function getActionLabel( actionKey, item ) {
 }
 
 function getExportSuccessMessage( item ) {
+	if ( isRetrySaveFreshReviewRequiredItem( item ) ) {
+		return __(
+			'Fresh-review handoff copied. Send it to an admin reviewer; local changes remain protected until a new review proof is issued.'
+		);
+	}
+
 	if ( isRetrySaveReviewRequiredItem( item ) ) {
 		return __(
 			'Protected local changes exported for HTML review. Keep this copy until a user with unfiltered HTML permission can inspect it.'
@@ -1564,6 +1578,10 @@ function getLocalUpdatesImportBlockedMessage( reason ) {
 			return __(
 				'Import blocked: the admin-reviewed changes token or proof has expired and is no longer usable. Nothing was imported, and local changes remain protected and exportable.'
 			);
+		case DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.FRESH_REVIEW_REQUIRED:
+			return __(
+				'Import blocked: this reviewed-changes handoff needs a fresh admin review before it can be imported for retry save. Nothing was imported, and local changes remain protected and exportable.'
+			);
 		case DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.EXTRA_SESSION_STATE_OVEREXPOSED:
 			return __(
 				'Import blocked: this reviewed-changes payload exposes extra distributed editing session state. Nothing was imported, and local changes remain protected.'
@@ -1592,6 +1610,14 @@ function isRetrySaveReviewRequiredItem( item ) {
 		item?.retrySaveReviewRequired ||
 		item?.retrySaveStatus ===
 			DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_UNFILTERED_HTML_REVIEW_REQUIRED
+	);
+}
+
+function isRetrySaveFreshReviewRequiredItem( item ) {
+	return (
+		item?.reviewTokenRecoveryRequiresFreshReview ||
+		item?.reviewTokenRecoveryStatus ===
+			DISTRIBUTED_EDITING_REVIEW_TOKEN_RECOVERY_STATUSES.FRESH_REVIEW_REQUIRED
 	);
 }
 
@@ -1841,7 +1867,7 @@ function getRetrySaveStatusText( descriptor ) {
 				return {
 					title: __( 'Reviewed changes token expired' ),
 					message: __(
-						'The imported reviewed-changes token has expired and is no longer usable for retry save. No server save was made. Protected local changes are still exportable; export them for a fresh admin review before trying again.'
+						'The imported reviewed-changes token has expired and is no longer usable for retry save. No server save was made. Export a fresh-review handoff for an admin reviewer; protected local changes remain exportable.'
 					),
 				};
 			}
@@ -1873,7 +1899,7 @@ function getRetrySaveStatusText( descriptor ) {
 				return {
 					title: __( 'Reviewed changes token unavailable' ),
 					message: __(
-						'The imported reviewed-changes token could not be found in server storage and is no longer usable for retry save. No server save was made. Protected local changes are still exportable; export them for a fresh admin review before trying again.'
+						'The imported reviewed-changes token could not be found in server storage and is no longer usable for retry save. No server save was made. Export a fresh-review handoff for an admin reviewer; protected local changes remain exportable.'
 					),
 				};
 			}

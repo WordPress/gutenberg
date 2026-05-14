@@ -1566,6 +1566,28 @@ describe( 'Post actions', () => {
 				),
 				DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.MISSING_REVIEW_APPROVAL_PROOF,
 			],
+			[
+				'fresh review required handoff',
+				JSON.stringify(
+					getDistributedEditingLocalUpdatesExportPayload( {
+						currentPost: {
+							id: postId,
+							type: 'post',
+						},
+						editedPostContent: approvedPostContent,
+						sessionState: {
+							serverVersion: '12',
+							clientBaseVersion: '7',
+							pendingChangeCount: 1,
+							retrySaveStatus:
+								DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_MALFORMED_SYNC_PAYLOAD,
+							retrySaveReason:
+								'unknown_retry_save_review_approval_proof_token',
+						},
+					} )
+				),
+				DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.FRESH_REVIEW_REQUIRED,
+			],
 		] )(
 			'blocks %s before changing editor content',
 			async ( _label, payload, reason ) => {
@@ -1622,6 +1644,68 @@ describe( 'Post actions', () => {
 				} );
 			}
 		);
+
+		it( 'blocks fresh-review handoff import while preserving existing exportable local state', async () => {
+			const registry = setupImportEditor();
+			const payload = getDistributedEditingLocalUpdatesExportPayload( {
+				currentPost: {
+					id: postId,
+					type: 'post',
+				},
+				editedPostContent: approvedPostContent,
+				sessionState: {
+					serverVersion: '12',
+					clientBaseVersion: '7',
+					pendingChangeCount: 1,
+					retrySaveStatus:
+						DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_MALFORMED_SYNC_PAYLOAD,
+					retrySaveReason:
+						'unknown_retry_save_review_approval_proof_token',
+				},
+			} );
+
+			registry
+				.dispatch( editorStore )
+				.setDistributedEditingSessionState( {
+					pendingChangeCount: 2,
+					hasPendingChanges: true,
+					canExportLocalUpdates: true,
+				} );
+
+			const result = await registry
+				.dispatch( editorStore )
+				.__experimentalImportDistributedEditingLocalUpdates(
+					JSON.stringify( payload )
+				);
+
+			expect( result ).toMatchObject( {
+				status: DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_STATUSES.BLOCKED,
+				reason: DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.FRESH_REVIEW_REQUIRED,
+				hasPostContent: false,
+				mutatesEditorContent: false,
+				callsRetrySaveEndpoint: false,
+				callsNormalSavePost: false,
+				dispatchesNotice: false,
+				changesPostLock: false,
+				claimsSaved: false,
+			} );
+			expect(
+				registry.select( editorStore ).getEditedPostContent()
+			).toBe( 'original content' );
+			expect(
+				registry
+					.select( editorStore )
+					.getDistributedEditingSessionState()
+			).toMatchObject( {
+				pendingChangeCount: 2,
+				hasPendingChanges: true,
+				canExportLocalUpdates: true,
+				localUpdatesImportStatus:
+					DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_STATUSES.BLOCKED,
+				localUpdatesImportReason:
+					DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.FRESH_REVIEW_REQUIRED,
+			} );
+		} );
 	} );
 
 	describe( '__experimentalPrepareDistributedEditingRetrySubmitAfterLocalRebase()', () => {

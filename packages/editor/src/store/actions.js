@@ -872,6 +872,8 @@ export const __experimentalImportDistributedEditingLocalUpdates =
 		const result = getDistributedEditingLocalUpdatesImportResult( {
 			payload,
 			currentPost: select.getCurrentPost?.() || {},
+			currentSessionState:
+				select.getDistributedEditingSessionState?.() || {},
 			computedPostContentHash,
 		} );
 

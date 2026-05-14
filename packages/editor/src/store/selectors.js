@@ -34,6 +34,7 @@ import {
 	DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE,
 	getDistributedEditingNoticeDescriptorsForSessionState,
 	getDistributedEditingRiskyBlockReviewStateForSessionState,
+	getDistributedEditingReviewTokenRecoveryStateForSessionState,
 	getDistributedEditingRetrySaveFlowStateForSessionState,
 	getDistributedEditingSavePolicyStateForSessionState,
 	getDistributedEditingUnloadWarningStateForSessionState,
@@ -492,6 +493,20 @@ export function hasDistributedEditingRetrySaveSavedStateEvidence( state ) {
  */
 export function getDistributedEditingRetrySaveFlowState( state ) {
 	return getDistributedEditingRetrySaveFlowStateForSessionState(
+		getDistributedEditingSessionState( state )
+	);
+}
+
+/**
+ * Returns a side-effect-free DE-RTC review-token recovery descriptor for status
+ * and import/export consumers.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {Object} Review token recovery state.
+ */
+export function getDistributedEditingReviewTokenRecoveryState( state ) {
+	return getDistributedEditingReviewTokenRecoveryStateForSessionState(
 		getDistributedEditingSessionState( state )
 	);
 }
