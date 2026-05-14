@@ -274,6 +274,7 @@ describe( 'distributed editing REST helpers', () => {
 					reviewed_block_item_count: 1,
 					proof_signature:
 						'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc',
+					site_url: 'http://example.test',
 					raw_content_included: false,
 					saves_post: false,
 					mutates_post_content: false,
@@ -336,6 +337,7 @@ describe( 'distributed editing REST helpers', () => {
 					reviewedBlockItemCount: 1,
 					proofSignature:
 						'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc',
+					siteUrl: 'http://example.test',
 					rawContentIncluded: false,
 					savesPost: false,
 					mutatesPostContent: false,

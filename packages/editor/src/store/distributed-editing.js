@@ -505,6 +505,7 @@ export const DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE = Object.freeze( {
 	retrySaveReviewApprovalIssuedAt: null,
 	retrySaveReviewApprovalExpiresAt: null,
 	retrySaveReviewApprovalSiteId: null,
+	retrySaveReviewApprovalSiteUrl: null,
 	retrySaveReviewApprovalSiteUuid: null,
 	retrySaveReviewApprovalSavesPost: false,
 	retrySaveReviewApprovalMutatesPostContent: false,
@@ -2158,6 +2159,7 @@ export function getDistributedEditingAcceptedReviewApprovalProofForRetrySaveRequ
 		issuedAt: normalized.retrySaveReviewApprovalIssuedAt,
 		expiresAt: normalized.retrySaveReviewApprovalExpiresAt,
 		siteId: normalized.retrySaveReviewApprovalSiteId,
+		siteUrl: normalized.retrySaveReviewApprovalSiteUrl,
 		siteUuid: normalized.retrySaveReviewApprovalSiteUuid,
 		rawContentIncluded: false,
 		exposesRawContent: false,
@@ -4217,6 +4219,12 @@ function normalizeRetrySaveReviewApprovalProofFields( sessionState = {} ) {
 				sessionState.retrySaveReviewApprovalSite_id
 			)
 		),
+		retrySaveReviewApprovalSiteUrl: normalizeNullableString(
+			getFirstDefined(
+				sessionState.retrySaveReviewApprovalSiteUrl,
+				sessionState.retrySaveReviewApprovalSite_url
+			)
+		),
 		retrySaveReviewApprovalSiteUuid: normalizeNullableString(
 			getFirstDefined(
 				sessionState.retrySaveReviewApprovalSiteUuid,
@@ -5165,6 +5173,14 @@ function getRetrySaveReviewApprovalProofFieldsFromResponseOrError(
 			responseData.site_id,
 			approvalContract.siteId,
 			approvalContract.site_id
+		),
+		retrySaveReviewApprovalSiteUrl: getFirstDefined(
+			responseOrError.siteUrl,
+			responseOrError.site_url,
+			responseData.siteUrl,
+			responseData.site_url,
+			approvalContract.siteUrl,
+			approvalContract.site_url
 		),
 		retrySaveReviewApprovalSiteUuid: getFirstDefined(
 			responseOrError.siteUuid,

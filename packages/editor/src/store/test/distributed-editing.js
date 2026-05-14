@@ -275,6 +275,7 @@ describe( 'distributed editing session state', () => {
 			retrySaveReviewApprovalIssuedAt: null,
 			retrySaveReviewApprovalExpiresAt: null,
 			retrySaveReviewApprovalSiteId: null,
+			retrySaveReviewApprovalSiteUrl: null,
 			retrySaveReviewApprovalSiteUuid: null,
 			retrySaveReviewApprovalSavesPost: false,
 			retrySaveReviewApprovalMutatesPostContent: false,
@@ -1821,6 +1822,7 @@ describe( 'distributed editing session state', () => {
 					retrySaveReviewApprovalIssuedAt: '1893456000',
 					retrySaveReviewApprovalExpiresAt: '1893456300',
 					retrySaveReviewApprovalSiteId: '1',
+					retrySaveReviewApprovalSiteUrl: 'http://example.test',
 					retrySaveReviewApprovalSiteUuid: 'de-rtc-site-uuid-example',
 					retrySaveReviewApprovalProposedContentHash:
 						proposedContentHash,
@@ -1864,6 +1866,7 @@ describe( 'distributed editing session state', () => {
 			issuedAt: '1893456000',
 			expiresAt: '1893456300',
 			siteId: '1',
+			siteUrl: 'http://example.test',
 			siteUuid: 'de-rtc-site-uuid-example',
 			rawContentIncluded: false,
 			exposesRawContent: false,
@@ -3162,6 +3165,7 @@ describe( 'distributed editing session state', () => {
 				retrySaveReviewApprovalProofSignature: proofSignature,
 				retrySaveReviewApprovalIssuedAt: '1893456000',
 				retrySaveReviewApprovalExpiresAt: '1893456300',
+				retrySaveReviewApprovalSiteUrl: 'http://example.test',
 				retrySaveReviewApprovalReviewedBlockItems: [
 					{
 						id: 'risk-html-approved',
@@ -3206,6 +3210,7 @@ describe( 'distributed editing session state', () => {
 			proofSignature,
 			issuedAt: '1893456000',
 			expiresAt: '1893456300',
+			siteUrl: 'http://example.test',
 			rawContentIncluded: false,
 			savesPost: false,
 			mutatesPostContent: false,

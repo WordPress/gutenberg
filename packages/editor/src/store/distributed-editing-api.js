@@ -480,6 +480,7 @@ function normalizeAcceptedReviewApprovalProofForRetrySaveRequest( proof ) {
 		issued_at: proof.issuedAt ?? proof.issued_at ?? undefined,
 		expires_at: proof.expiresAt ?? proof.expires_at ?? undefined,
 		site_id: normalizeProofPositiveInteger( proof.siteId ?? proof.site_id ),
+		site_url: proof.siteUrl ?? proof.site_url ?? undefined,
 		site_uuid: proof.siteUuid ?? proof.site_uuid ?? undefined,
 		raw_content_included: false,
 		saves_post: Boolean( proof.savesPost ?? proof.saves_post ),
