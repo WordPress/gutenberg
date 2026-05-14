@@ -7,7 +7,7 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { BaseControl, useBaseControlProps } from '@wordpress/components';
-import { useMergeRefs } from '@wordpress/compose';
+import { useMergeRefs, useRefEffect } from '@wordpress/compose';
 import { useMemo, useRef, useState } from '@wordpress/element';
 import { privateApis as richTextPrivateApis } from '@wordpress/rich-text';
 
@@ -18,6 +18,8 @@ import { unlock } from '../../../lock-unlock';
 import { useBlockEditorAutocompleteProps } from '../../autocomplete';
 import { getAllowedFormats } from '../utils';
 import FormatEdit from '../format-edit';
+import shortcutsListener from '../event-listeners/shortcuts';
+import inputEventsListener from '../event-listeners/input-events';
 import { keyboardShortcutContext, inputEventContext } from '../';
 
 const { useRichText } = unlock( richTextPrivateApis );
@@ -121,6 +123,31 @@ export default function RichTextControl( {
 		anchorRef.current?.focus();
 	}
 
+	// Wire registered format keyboard shortcuts (e.g. Cmd+B, Cmd+I, Cmd+K)
+	// and InputEvent handlers (e.g. native formatBold) to the contenteditable.
+	// FormatEdit populates these Sets via context; without these listeners the
+	// callbacks would never fire.
+	const eventListenersProps = useRef( {
+		keyboardShortcuts,
+		inputEvents,
+	} );
+	const eventListenersRef = useRefEffect(
+		( element ) => {
+			if ( ! isSelected ) {
+				return;
+			}
+			const cleanupShortcuts =
+				shortcutsListener( eventListenersProps )( element );
+			const cleanupInputEvents =
+				inputEventsListener( eventListenersProps )( element );
+			return () => {
+				cleanupShortcuts();
+				cleanupInputEvents();
+			};
+		},
+		[ isSelected ]
+	);
+
 	return (
 		<>
 			{ isSelected && (
@@ -152,6 +179,7 @@ export default function RichTextControl( {
 						richTextRef,
 						anchorRef,
 						autocompleteProps.ref,
+						eventListenersRef,
 					] ) }
 					onFocus={ () => setIsSelected( true ) }
 					onBlur={ () => setIsSelected( false ) }
