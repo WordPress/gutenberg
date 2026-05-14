@@ -59,26 +59,48 @@ export class Metrics {
 		this.browser = page.context().browser()!;
 		this.trace = { traceEvents: [] };
 
-		// Emit a User Timing mark inside every iframe the moment its first
-		// contentful paint fires. The mark is captured in saved traces under
-		// the `blink.user_timing` category and renders as a labeled vertical
-		// line in DevTools / speedscope / trace.cafe, making the FCP moment
-		// easy to find when inspecting a trace.
-		void page.addInitScript( () => {
-			if ( window === window.top ) {
+		// Emit a User Timing mark inside each editor-canvas iframe the moment
+		// its first contentful paint fires. The mark is captured in saved
+		// traces under the `blink.user_timing` category and renders as a
+		// labeled vertical line in DevTools / speedscope / trace.cafe.
+		//
+		// `page.addInitScript` doesn't reliably reach blob:-URL iframes (and
+		// Gutenberg's editor canvas is one), so attach inside the frame as
+		// soon as it appears. `performance.mark`'s `startTime` option lets
+		// us stamp the mark at the actual FCP timestamp rather than when
+		// the observer callback runs.
+		page.on( 'frameattached', ( frame ) => {
+			if ( frame.name() !== 'editor-canvas' ) {
 				return;
 			}
-			new PerformanceObserver( ( list ) => {
-				if (
-					list
-						.getEntries()
-						.some(
-							( entry ) => entry.name === 'first-contentful-paint'
-						)
-				) {
-					performance.mark( 'iframe-fcp' );
-				}
-			} ).observe( { type: 'paint', buffered: true } );
+			void frame
+				.evaluate( () => {
+					const emit = ( startTime: number ): void => {
+						performance.mark( 'iframe-fcp', { startTime } );
+					};
+					const existing = performance
+						.getEntriesByName( 'first-contentful-paint' )
+						.at( 0 );
+					if ( existing ) {
+						emit( existing.startTime );
+						return;
+					}
+					new PerformanceObserver( ( list, observer ) => {
+						const fcp = list
+							.getEntries()
+							.find(
+								( entry ) =>
+									entry.name === 'first-contentful-paint'
+							);
+						if ( fcp ) {
+							emit( fcp.startTime );
+							observer.disconnect();
+						}
+					} ).observe( { type: 'paint', buffered: true } );
+				} )
+				.catch( () => {
+					/* frame may detach mid-evaluate; ignore */
+				} );
 		} );
 	}
 
