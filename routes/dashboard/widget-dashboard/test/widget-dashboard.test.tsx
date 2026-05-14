@@ -75,6 +75,7 @@ function Harness( {
 	onLayoutChange?: ( layout: DashboardWidget[] ) => void;
 } ) {
 	const [ layout, setLayout ] = useState( initialLayout );
+	const [ editMode, setEditMode ] = useState( false );
 
 	return (
 		<WidgetDashboard
@@ -85,6 +86,8 @@ function Harness( {
 			} }
 			widgetTypes={ widgetTypes }
 			resolveWidgetModule={ resolveWidgetModule }
+			editMode={ editMode }
+			onEditChange={ setEditMode }
 		/>
 	);
 }
@@ -98,7 +101,7 @@ describe( 'WidgetDashboard', () => {
 		);
 	} );
 
-	it( 'threads setAttributes into onLayoutChange with merged attributes', async () => {
+	it( 'threads setAttributes into onLayoutChange on commit with merged attributes', async () => {
 		const onChange = jest.fn();
 		render( <Harness onLayoutChange={ onChange } /> );
 
@@ -106,6 +109,18 @@ describe( 'WidgetDashboard', () => {
 			name: 'Update',
 		} );
 		await userEvent.click( button );
+
+		// Attribute changes stay in staging until commit.
+		expect( onChange ).not.toHaveBeenCalled();
+		expect( screen.getByTestId( 'greeting' ) ).toHaveTextContent(
+			'updated'
+		);
+
+		// Enter edit mode to surface the Done button, then commit.
+		await userEvent.click(
+			screen.getByRole( 'button', { name: 'Customize' } )
+		);
+		await userEvent.click( screen.getByRole( 'button', { name: 'Done' } ) );
 
 		expect( onChange ).toHaveBeenCalledTimes( 1 );
 		const [ updated ] = onChange.mock.calls[ 0 ];

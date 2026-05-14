@@ -11,6 +11,7 @@
 		{ "path": "../core-data" },
 		{ "path": "../data" },
 		{ "path": "../dataviews" },
+		{ "path": "../date" },
 		{ "path": "../element" },
 		{ "path": "../i18n" },
 		{ "path": "../icons" },

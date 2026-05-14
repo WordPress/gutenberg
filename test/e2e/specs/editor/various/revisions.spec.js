@@ -42,7 +42,11 @@ test.describe( 'Post revisions', () => {
 		await settingsSidebar.getByRole( 'tab', { name: 'Post' } ).click();
 
 		// Click the Revisions button (the button shows the revision count "2").
-		await settingsSidebar.getByRole( 'button', { name: '2' } ).click();
+		await settingsSidebar
+			.getByRole( 'button', {
+				name: 'Open revisions screen: 2 revisions',
+			} )
+			.click();
 
 		// Wait for the revisions mode to be active (Restore button appears).
 		const restoreButton = page.getByRole( 'button', { name: 'Restore' } );
@@ -127,7 +131,10 @@ test.describe( 'Post revisions', () => {
 		} );
 		await settingsSidebar.getByRole( 'tab', { name: 'Post' } ).click();
 		await settingsSidebar
-			.getByRole( 'button', { name: '2', exact: true } )
+			.getByRole( 'button', {
+				name: 'Open revisions screen: 2 revisions',
+				exact: true,
+			} )
 			.click();
 
 		// Wait for the revisions mode to be active.
@@ -214,7 +221,10 @@ test.describe( 'Post revisions', () => {
 		} );
 		await settingsSidebar.getByRole( 'tab', { name: 'Post' } ).click();
 		await settingsSidebar
-			.getByRole( 'button', { name: '2', exact: true } )
+			.getByRole( 'button', {
+				name: 'Open revisions screen: 2 revisions',
+				exact: true,
+			} )
 			.click();
 
 		// Wait for revisions mode.
@@ -249,7 +259,10 @@ test.describe( 'Post revisions', () => {
 		} );
 		await settingsSidebar.getByRole( 'tab', { name: 'Post' } ).click();
 		await settingsSidebar
-			.getByRole( 'button', { name: '2', exact: true } )
+			.getByRole( 'button', {
+				name: 'Open revisions screen: 2 revisions',
+				exact: true,
+			} )
 			.click();
 		await expect(
 			page.getByRole( 'button', { name: 'Restore' } )
@@ -461,7 +474,11 @@ test.describe( 'Template and template part revisions', () => {
 			await settingsSidebar.getByRole( 'tab', { name: tabName } ).click();
 
 			// Click the Revisions button.
-			await settingsSidebar.getByRole( 'button', { name: '2' } ).click();
+			await settingsSidebar
+				.getByRole( 'button', {
+					name: 'Open revisions screen: 2 revisions',
+				} )
+				.click();
 
 			// Wait for the revisions mode to be active.
 			const restoreButton = page.getByRole( 'button', {

@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import apiFetch from '@wordpress/api-fetch';
 import {
 	Button,
 	Flex,
@@ -10,7 +9,7 @@ import {
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
-import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import {
 	createPortal,
@@ -21,7 +20,7 @@ import {
 	useRef,
 	useState,
 } from '@wordpress/element';
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { close, drawerRight, keyboard } from '@wordpress/icons';
 import { isAppleOS, isKeyboardEvent } from '@wordpress/keycodes';
 import { SnackbarNotices, store as noticesStore } from '@wordpress/notices';
@@ -43,30 +42,28 @@ import type { Media } from '../media-editor-provider';
 import MediaPreview from '../media-preview';
 import MediaEditorCanvas from '../media-editor-canvas';
 import MediaEditorToolbar from '../media-editor-toolbar';
-import MediaEditorCropPanel, {
-	resolveAspectRatio,
-} from '../media-editor-crop-panel';
+import MediaEditorCropPanel from '../media-editor-crop-panel';
 import MediaForm from '../media-form';
 import { unlock } from '../../lock-unlock';
 import { getMediaTypeFromMimeType } from '../../utils';
 import { CropperProvider, useCropper } from '../../image-editor';
 import type { AspectRatioPreset } from '../../image-editor/core/constants';
 import { CROP_CONTROL_ATTR } from '../../hooks/use-crop-gesture-handlers';
-import { buildModifiers } from '../media-editor-modal/build-modifiers';
 import MediaEditorKeyboardShortcutsModal from '../media-editor-keyboard-shortcuts-modal';
+import {
+	MEDIA_EDITOR_NOTICES_CONTEXT,
+	useSaveMediaEditor,
+	type MediaEditorSaveResult,
+} from './use-save-media-editor';
+import { useCropOptions } from './use-crop-options';
 
-// Details-tab edits are bundled into transformed `/edit` requests. Core's
-// endpoint only accepts this whitelist.
-const METADATA_EDIT_KEYS = [
-	'title',
-	'caption',
-	'description',
-	'alt_text',
-	'post',
-] as const;
+export type { MediaEditorSaveResult } from './use-save-media-editor';
 
-// Scope save-failure snackbars so they don't leak into the host editor/page.
-const NOTICES_CONTEXT = 'media-editor';
+// Embed query for the attachment's author and parent post. Shared between
+// the `getEntityRecord` read and the matching `invalidateResolution` so the
+// two stay in lockstep.
+const ATTACHMENT_EMBED_QUERY = { _embed: 'author,wp:attached-to' } as const;
+
 const PLACEMENT_CONTROL_IDLE_MS = 300;
 
 const { Tabs } = unlock( componentsPrivateApis );
@@ -75,12 +72,6 @@ interface EditorTab {
 	id: string;
 	title: string;
 	panel: JSX.Element;
-}
-
-export interface MediaEditorSaveResult {
-	id: number;
-	url?: string;
-	media: Media;
 }
 
 export interface MediaEditorFrameProps {
@@ -221,8 +212,6 @@ function HeaderActions( {
 	);
 }
 
-type PendingMetadataEdits = Record< string, unknown > | undefined;
-
 function MediaEditorContent( {
 	fields = [],
 	id,
@@ -239,8 +228,21 @@ function MediaEditorContent( {
 
 	const { media, hasEdits } = useSelect(
 		( select ) => {
-			const { getEditedEntityRecord, hasEditsForEntityRecord } =
-				select( coreStore );
+			const {
+				getEditedEntityRecord,
+				getEntityRecord,
+				hasEditsForEntityRecord,
+			} = select( coreStore );
+			// Trigger an _embed fetch so `_embedded.author` and
+			// `_embedded['wp:attached-to']` land on the record for the Details
+			// fields to read. `getEditedEntityRecord` doesn't formally accept a
+			// query, so we can't embed via that selector directly.
+			getEntityRecord(
+				'postType',
+				'attachment',
+				id,
+				ATTACHMENT_EMBED_QUERY
+			);
 			return {
 				media: getEditedEntityRecord(
 					'postType',
@@ -259,25 +261,16 @@ function MediaEditorContent( {
 
 	const hasChanges = cropper.isDirty || hasEdits;
 
-	const registry = useRegistry();
-	const {
-		clearEntityRecordEdits,
-		editEntityRecord,
-		receiveEntityRecords,
-		saveEditedEntityRecord,
-	} = useDispatch( coreStore );
-	const { createErrorNotice, removeAllNotices } = useDispatch( noticesStore );
+	const { clearEntityRecordEdits, editEntityRecord, invalidateResolution } =
+		useDispatch( coreStore );
+	const { removeAllNotices } = useDispatch( noticesStore );
 
-	const [ isSaving, setIsSaving ] = useState( false );
 	const [ isDiscardDialogOpen, setIsDiscardDialogOpen ] = useState( false );
 	const [ isPlacementActive, setIsPlacementActive ] = useState( false );
 	const [ isCanvasGestureActive, setIsCanvasGestureActive ] =
 		useState( false );
 	const placementControlTimerRef =
 		useRef< ReturnType< typeof setTimeout > >();
-
-	const [ aspectRatioValue, setAspectRatioValue ] = useState( '0' );
-	const [ freeformCrop, setFreeformCrop ] = useState( true );
 
 	const signalPlacementControlInteraction = useCallback( () => {
 		setIsPlacementActive( true );
@@ -301,30 +294,45 @@ function MediaEditorContent( {
 	}, [] );
 
 	useEffect( () => {
-		setAspectRatioValue( '0' );
-		setFreeformCrop( true );
 		setIsPlacementActive( false );
 		setIsCanvasGestureActive( false );
 	}, [ id ] );
 
+	// Bust the cached `_embed` resolution each time the editor mounts (or the
+	// id changes) so embedded data such as the attached post's title or the
+	// author's name reflects any edits made elsewhere since the last open.
+	useEffect( () => {
+		invalidateResolution( 'getEntityRecord', [
+			'postType',
+			'attachment',
+			id,
+			ATTACHMENT_EMBED_QUERY,
+		] );
+	}, [ id, invalidateResolution ] );
+
 	const mediaType = getMediaTypeFromMimeType( media?.mime_type ).type;
 	const isImage = !! media && mediaType === 'image';
-
-	const imageAspectRatio = useMemo( () => {
-		if ( ! isImage ) {
-			return null;
-		}
-		const naturalWidth = Number( media?.media_details?.width );
-		const naturalHeight = Number( media?.media_details?.height );
-		if (
-			Number.isFinite( naturalWidth ) &&
-			Number.isFinite( naturalHeight ) &&
-			naturalHeight > 0
-		) {
-			return naturalWidth / naturalHeight;
-		}
-		return null;
-	}, [ isImage, media ] );
+	const {
+		aspectRatioValue,
+		setAspectRatioValue,
+		aspectRatioOptions,
+		freeformCrop,
+		setFreeformCrop,
+		resolvedAspectRatio,
+		resetCropOptions,
+	} = useCropOptions( {
+		id,
+		isImage,
+		media,
+		aspectRatioPresets,
+	} );
+	const { isSaving, save: saveMediaEditor } = useSaveMediaEditor( {
+		cropper,
+		id,
+		isImage,
+		media,
+		onSaved,
+	} );
 
 	const tabs = useMemo< EditorTab[] >( () => {
 		const detailsTab: EditorTab = {
@@ -361,7 +369,7 @@ function MediaEditorContent( {
 							onPlacementControlInteraction={
 								signalPlacementControlInteraction
 							}
-							aspectRatioPresets={ aspectRatioPresets }
+							aspectRatioOptions={ aspectRatioOptions }
 						/>
 					</Stack>
 				),
@@ -371,8 +379,10 @@ function MediaEditorContent( {
 	}, [
 		isImage,
 		aspectRatioValue,
+		setAspectRatioValue,
 		freeformCrop,
-		aspectRatioPresets,
+		setFreeformCrop,
+		aspectRatioOptions,
 		signalPlacementControlInteraction,
 	] );
 
@@ -381,7 +391,7 @@ function MediaEditorContent( {
 	};
 
 	const discardAndClose = () => {
-		removeAllNotices( 'snackbar', NOTICES_CONTEXT );
+		removeAllNotices( 'snackbar', MEDIA_EDITOR_NOTICES_CONTEXT );
 		clearEntityRecordEdits( 'postType', 'attachment', id );
 		onClose?.();
 	};
@@ -395,103 +405,6 @@ function MediaEditorContent( {
 			return;
 		}
 		discardAndClose();
-	};
-
-	const handleSave = async () => {
-		removeAllNotices( 'snackbar', NOTICES_CONTEXT );
-		setIsSaving( true );
-		try {
-			let saved: Media | null | undefined;
-
-			const modifiers =
-				cropper.isDirty && cropper.state.image
-					? buildModifiers( cropper.state, {
-							width: cropper.state.image.naturalWidth,
-							height: cropper.state.image.naturalHeight,
-					  } )
-					: [];
-
-			if ( modifiers.length > 0 ) {
-				const pendingEdits = registry
-					.select( coreStore )
-					.getEntityRecordNonTransientEdits(
-						'postType',
-						'attachment',
-						id
-					) as PendingMetadataEdits;
-				const metadataEdits: Record< string, unknown > = {};
-				for ( const key of METADATA_EDIT_KEYS ) {
-					if ( pendingEdits && key in pendingEdits ) {
-						metadataEdits[ key ] = pendingEdits[ key ];
-					}
-				}
-
-				saved = ( await apiFetch( {
-					path: `/wp/v2/media/${ id }/edit`,
-					method: 'POST',
-					data: {
-						src: media?.source_url,
-						modifiers,
-						...metadataEdits,
-					},
-				} ) ) as Media;
-
-				if ( saved ) {
-					receiveEntityRecords(
-						'postType',
-						'attachment',
-						saved,
-						undefined,
-						true
-					);
-				}
-			} else {
-				saved = ( await saveEditedEntityRecord(
-					'postType',
-					'attachment',
-					id
-				) ) as Media | undefined;
-			}
-
-			const next = ( saved ?? media ) as Media | null;
-
-			if ( next && next.id !== id ) {
-				clearEntityRecordEdits( 'postType', 'attachment', id );
-			}
-
-			if ( next && next.id ) {
-				if ( next.id === id ) {
-					cropper.reset();
-				}
-				onSaved?.( {
-					id: next.id,
-					url: next.source_url,
-					media: next,
-				} );
-			}
-		} catch ( error ) {
-			const message =
-				error instanceof Error
-					? error.message
-					: ( error as { message?: string } )?.message ??
-					  __( 'An unknown error occurred.' );
-			createErrorNotice(
-				isImage
-					? sprintf(
-							/* translators: %s: Error message. */
-							__( 'Could not save image. %s' ),
-							message
-					  )
-					: sprintf(
-							/* translators: %s: Error message. */
-							__( 'Could not save media. %s' ),
-							message
-					  ),
-				{ type: 'snackbar', context: NOTICES_CONTEXT }
-			);
-		} finally {
-			setIsSaving( false );
-		}
 	};
 
 	const handleKeyDown = ( event: ReactKeyboardEvent< HTMLElement > ) => {
@@ -537,7 +450,7 @@ function MediaEditorContent( {
 	const snackbar = (
 		<SnackbarNotices
 			className={ noticesClassName }
-			context={ NOTICES_CONTEXT }
+			context={ MEDIA_EDITOR_NOTICES_CONTEXT }
 		/>
 	);
 
@@ -570,10 +483,7 @@ function MediaEditorContent( {
 								<div className="media-editor__canvas">
 									{ isImage ? (
 										<MediaEditorCanvas
-											aspectRatio={ resolveAspectRatio(
-												aspectRatioValue,
-												imageAspectRatio
-											) }
+											aspectRatio={ resolvedAspectRatio }
 											freeformCrop={ freeformCrop }
 											focusOnMount
 											isPlacementActive={
@@ -594,10 +504,7 @@ function MediaEditorContent( {
 							footer={
 								isImage ? (
 									<MediaEditorToolbar
-										onReset={ () => {
-											setAspectRatioValue( '0' );
-											setFreeformCrop( true );
-										} }
+										onReset={ resetCropOptions }
 										onPlacementControlInteraction={
 											signalPlacementControlInteraction
 										}
@@ -644,7 +551,7 @@ function MediaEditorContent( {
 				isImage={ isImage }
 				showCloseButton={ showCloseButton }
 				onCancel={ handleRequestClose }
-				onSave={ handleSave }
+				onSave={ saveMediaEditor }
 			/>
 		),
 		onRequestClose: handleRequestClose,
