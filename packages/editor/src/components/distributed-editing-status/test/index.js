@@ -28,6 +28,8 @@ import DistributedEditingStatus, {
 import {
 	DISTRIBUTED_EDITING_DISPOSITIONS,
 	DISTRIBUTED_EDITING_FRESH_REVIEW_DECISION_STATUSES,
+	DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_PLACEMENTS,
+	DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_STATUSES,
 	DISTRIBUTED_EDITING_FRESH_REVIEW_RETRY_SAVE_HANDOFF_STATUSES,
 	DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES,
 	DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES,
@@ -2656,6 +2658,18 @@ describe( 'DistributedEditingStatusSurface', () => {
 				'Fresh review decision is staged for validation before a future guarded retry save. No retry save or normal save was made, and protected local changes remain exportable.'
 			)
 		).toBeVisible();
+		const preSaveStatus = screen.getByTestId(
+			'distributed-editing-pre-save-status'
+		);
+
+		expect( preSaveStatus ).toHaveAttribute(
+			'data-distributed-editing-pre-save-placement',
+			DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_PLACEMENTS.SAVE_BUTTON_STATUS
+		);
+		expect( preSaveStatus ).toHaveAttribute(
+			'data-distributed-editing-pre-save-status',
+			DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_STATUSES.VALIDATING
+		);
 		expect(
 			screen.queryByText(
 				/fresh-review-handoff-raw|fresh-review-handoff-proof|reviewerUserId|reviewed_block_items/i

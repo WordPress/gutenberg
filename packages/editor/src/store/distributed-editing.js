@@ -254,6 +254,33 @@ export const DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS = Object.freeze( {
 } );
 
 /**
+ * Stable fresh-review pre-save statuses. These are pure placement hints for
+ * future Save/pre-publish UI and do not perform the action they describe.
+ */
+export const DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_STATUSES = Object.freeze(
+	{
+		NONE: 'none',
+		REVIEW_REQUIRED: 'review_required',
+		VALIDATION_REQUIRED: 'validation_required',
+		VALIDATING: 'validating',
+		READY_FOR_GUARDED_RETRY_SAVE: 'ready_for_guarded_retry_save',
+		REFETCH_REQUIRED: 'refetch_required',
+		BLOCKED: 'blocked',
+	}
+);
+
+/**
+ * Stable fresh-review pre-save placements for future editor chrome.
+ */
+export const DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_PLACEMENTS =
+	Object.freeze( {
+		NONE: 'none',
+		PRE_PUBLISH_REVIEW: 'pre_publish_review',
+		SAVE_BUTTON_STATUS: 'save_button_status',
+		PRE_SAVE_STATUS: 'pre_save_status',
+	} );
+
+/**
  * Stable retry-save save-flow handoff statuses.
  */
 export const DISTRIBUTED_EDITING_RETRY_SAVE_HANDOFF_STATUSES = Object.freeze( {
@@ -3509,6 +3536,10 @@ export function getDistributedEditingNoticeDescriptorsForSessionState(
 		getDistributedEditingLocalUpdatesImportReviewRequestStateForSessionState(
 			normalized
 		);
+	const freshReviewPreSaveState =
+		getDistributedEditingFreshReviewPreSaveStateForSessionState(
+			normalized
+		);
 
 	if ( normalized.requiresServerStateAcceptance ) {
 		descriptors.push(
@@ -3715,6 +3746,20 @@ export function getDistributedEditingNoticeDescriptorsForSessionState(
 						normalized.localUpdatesImportFreshReviewRetrySaveHandoffValidating,
 					localUpdatesImportFreshReviewRetrySaveHandoffAccepted:
 						normalized.localUpdatesImportFreshReviewRetrySaveHandoffAccepted,
+					freshReviewPreSaveStatus: freshReviewPreSaveState.status,
+					freshReviewPreSaveReason: freshReviewPreSaveState.reason,
+					freshReviewPreSavePlacement:
+						freshReviewPreSaveState.placement,
+					freshReviewPreSaveClickAction:
+						freshReviewPreSaveState.clickAction,
+					freshReviewPreSaveBlocksNormalSavePost:
+						freshReviewPreSaveState.blocksNormalSavePost,
+					freshReviewPreSaveOpensPrePublishReview:
+						freshReviewPreSaveState.opensPrePublishReview,
+					freshReviewPreSaveRequiresServerStateRefetch:
+						freshReviewPreSaveState.requiresServerStateRefetch,
+					freshReviewPreSaveCanExportLocalUpdates:
+						freshReviewPreSaveState.canExportLocalUpdates,
 					localUpdatesImportFreshReviewRetrySaveHandoffCallsNormalSavePost:
 						normalized.localUpdatesImportFreshReviewRetrySaveHandoffCallsNormalSavePost,
 					localUpdatesImportFreshReviewRetrySaveHandoffCallsRetrySaveEndpoint:
@@ -4438,6 +4483,198 @@ export function getDistributedEditingAcceptedFreshReviewConsumeValidationForRetr
 		mutatesPostContent: false,
 		createsRevision: false,
 		claimsSaved: false,
+	};
+}
+
+/**
+ * Returns a fresh-review lifecycle descriptor for future Save/pre-save UI.
+ *
+ * This is only placement and policy evidence. It does not open the
+ * pre-publish sidebar, save, retry-save, dispatch notices, mutate content,
+ * inspect proof internals, or change post locks.
+ *
+ * @param {Object} sessionState DE-RTC session state.
+ *
+ * @return {Object} Fresh-review pre-save state.
+ */
+export function getDistributedEditingFreshReviewPreSaveStateForSessionState(
+	sessionState = {}
+) {
+	const normalized = normalizeDistributedEditingSessionState( sessionState );
+	const hasProtectedLocalChanges = Boolean(
+		normalized.hasPendingChanges ||
+			normalized.mustOfferLocalCopy ||
+			normalized.canExportLocalUpdates
+	);
+	const handoffStatus =
+		normalized.localUpdatesImportFreshReviewRetrySaveHandoffStatus;
+	const handoffReason =
+		normalized.localUpdatesImportFreshReviewRetrySaveHandoffReason;
+	const decisionStatus =
+		normalized.localUpdatesImportFreshReviewDecisionStatus;
+	const hasFreshReviewRequest = Boolean(
+		normalized.localUpdatesImportRequiresFreshReview ||
+			normalized.localUpdatesImportFreshReviewRequestRequested ||
+			normalized.localUpdatesImportFreshReviewRequestAccepted ||
+			normalized.localUpdatesImportFreshReviewDecisionPanelRequired ||
+			decisionStatus !==
+				DISTRIBUTED_EDITING_FRESH_REVIEW_DECISION_STATUSES.NONE ||
+			handoffStatus !==
+				DISTRIBUTED_EDITING_FRESH_REVIEW_RETRY_SAVE_HANDOFF_STATUSES.NONE
+	);
+	let status = DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_STATUSES.NONE;
+	let reason = null;
+	let placement = DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_PLACEMENTS.NONE;
+	let saveButtonLabel = 'Update';
+	let clickAction = null;
+	let requiresServerStateRefetch = false;
+
+	if (
+		hasProtectedLocalChanges &&
+		hasFreshReviewRequest &&
+		normalized.retrySaveStatus !==
+			DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVED
+	) {
+		if (
+			handoffStatus ===
+				DISTRIBUTED_EDITING_FRESH_REVIEW_RETRY_SAVE_HANDOFF_STATUSES.ACCEPTED_FOR_RETRY_SAVE ||
+			normalized.retrySaveFreshReviewConsumeValidationAccepted ||
+			normalized.retrySaveFreshReviewDecisionConsumptionValidated
+		) {
+			status =
+				DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_STATUSES.READY_FOR_GUARDED_RETRY_SAVE;
+			reason = 'fresh_review_accepted_for_retry_save';
+			placement =
+				DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_PLACEMENTS.PRE_SAVE_STATUS;
+			saveButtonLabel = 'Submit reviewed changes';
+			clickAction =
+				DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.CONTINUE_GUARDED_RETRY_SAVE;
+		} else if (
+			handoffStatus ===
+			DISTRIBUTED_EDITING_FRESH_REVIEW_RETRY_SAVE_HANDOFF_STATUSES.VALIDATING
+		) {
+			status =
+				DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_STATUSES.VALIDATING;
+			reason = 'fresh_review_handoff_validating';
+			placement =
+				DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_PLACEMENTS.SAVE_BUTTON_STATUS;
+			saveButtonLabel = 'Validating review';
+		} else if (
+			handoffStatus ===
+			DISTRIBUTED_EDITING_FRESH_REVIEW_RETRY_SAVE_HANDOFF_STATUSES.READY
+		) {
+			status =
+				DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_STATUSES.VALIDATION_REQUIRED;
+			reason = 'fresh_review_handoff_validation_required';
+			placement =
+				DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_PLACEMENTS.PRE_SAVE_STATUS;
+			saveButtonLabel = 'Validate review';
+		} else if (
+			handoffStatus ===
+			DISTRIBUTED_EDITING_FRESH_REVIEW_RETRY_SAVE_HANDOFF_STATUSES.BLOCKED
+		) {
+			if (
+				handoffReason ===
+					DISTRIBUTED_EDITING_FRESH_REVIEW_RETRY_SAVE_HANDOFF_REASONS.STALE_BASE_REJECTED ||
+				normalized.requiresServerStateRefetch
+			) {
+				status =
+					DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_STATUSES.REFETCH_REQUIRED;
+				reason = 'fresh_review_server_state_refetch_required';
+				placement =
+					DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_PLACEMENTS.PRE_SAVE_STATUS;
+				saveButtonLabel = 'Refetch required';
+				clickAction =
+					DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.REFETCH_SERVER_STATE;
+				requiresServerStateRefetch = true;
+			} else {
+				status =
+					DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_STATUSES.BLOCKED;
+				reason = handoffReason || 'fresh_review_handoff_blocked';
+				placement =
+					DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_PLACEMENTS.PRE_PUBLISH_REVIEW;
+				saveButtonLabel = 'Review changes';
+				clickAction =
+					DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.OPEN_PRE_PUBLISH_REVIEW;
+			}
+		} else if (
+			normalized.localUpdatesImportFreshReviewDecisionPanelRequired ||
+			decisionStatus ===
+				DISTRIBUTED_EDITING_FRESH_REVIEW_DECISION_STATUSES.AWAITING_REVIEW ||
+			decisionStatus ===
+				DISTRIBUTED_EDITING_FRESH_REVIEW_DECISION_STATUSES.READY ||
+			normalized.localUpdatesImportRequiresFreshReview
+		) {
+			status =
+				DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_STATUSES.REVIEW_REQUIRED;
+			reason = 'fresh_review_required';
+			placement =
+				DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_PLACEMENTS.PRE_PUBLISH_REVIEW;
+			saveButtonLabel = 'Review changes';
+			clickAction =
+				DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.OPEN_PRE_PUBLISH_REVIEW;
+		}
+	}
+
+	const isActive =
+		status !== DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_STATUSES.NONE;
+
+	return {
+		status,
+		reason,
+		placement,
+		saveButtonLabel,
+		clickAction,
+		blocksNormalSavePost: isActive,
+		opensPrePublishReview:
+			placement ===
+			DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_PLACEMENTS.PRE_PUBLISH_REVIEW,
+		requiresServerStateRefetch,
+		canExportLocalUpdates: isActive && normalized.canExportLocalUpdates,
+		hasProtectedLocalChanges,
+		requestStatus: normalized.localUpdatesImportReviewRequestStatus,
+		requestAccepted:
+			normalized.localUpdatesImportFreshReviewRequestAccepted,
+		requested: normalized.localUpdatesImportFreshReviewRequestRequested,
+		decisionStatus,
+		decision: normalized.localUpdatesImportFreshReviewDecisionDecision,
+		decisionPanelRequired:
+			normalized.localUpdatesImportFreshReviewDecisionPanelRequired,
+		decisionReady: normalized.localUpdatesImportFreshReviewDecisionReady,
+		decisionItemCount:
+			normalized.localUpdatesImportFreshReviewDecisionItemCount,
+		pendingDecisionItemCount:
+			normalized.localUpdatesImportFreshReviewDecisionPendingCount,
+		approvedDecisionItemCount:
+			normalized.localUpdatesImportFreshReviewDecisionApprovedCount,
+		rejectedDecisionItemCount:
+			normalized.localUpdatesImportFreshReviewDecisionRejectedCount,
+		reviewedBlockItemCount:
+			normalized.localUpdatesImportFreshReviewDecisionReviewedBlockItemCount ||
+			normalized.retrySaveFreshReviewReviewedBlockItemCount,
+		handoffStatus,
+		handoffReason,
+		handoffReady:
+			normalized.localUpdatesImportFreshReviewRetrySaveHandoffReady,
+		handoffValidating:
+			normalized.localUpdatesImportFreshReviewRetrySaveHandoffValidating,
+		handoffAccepted:
+			normalized.localUpdatesImportFreshReviewRetrySaveHandoffAccepted,
+		retrySaveStatus: normalized.retrySaveStatus,
+		retrySaveReason: normalized.retrySaveReason,
+		freshReviewConsumed:
+			normalized.retrySaveFreshReviewConsumeValidationAccepted ||
+			normalized.retrySaveFreshReviewDecisionConsumptionValidated,
+		shouldCallNormalSavePost: false,
+		shouldCallRetrySaveEndpoint: false,
+		dispatchesNotice: false,
+		mutatesEditorContent: false,
+		mutatesPersistedPostContent: false,
+		changesPostLock: false,
+		claimsSaved: false,
+		exposesRawContent: false,
+		exposesProofSignature: false,
+		exposesReviewerIds: false,
 	};
 }
 

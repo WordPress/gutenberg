@@ -9,6 +9,8 @@ import deepFreeze from 'deep-freeze';
 import {
 	DISTRIBUTED_EDITING_DISPOSITIONS,
 	DISTRIBUTED_EDITING_FRESH_REVIEW_DECISION_STATUSES,
+	DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_PLACEMENTS,
+	DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_STATUSES,
 	DISTRIBUTED_EDITING_FRESH_REVIEW_RETRY_SAVE_HANDOFF_STATUSES,
 	DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES,
 	DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES,
@@ -42,6 +44,7 @@ import {
 	DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE,
 	getDistributedEditingLocalUpdatesExportPayload,
 	getDistributedEditingFreshReviewDecisionStateForSessionState,
+	getDistributedEditingFreshReviewPreSaveStateForSessionState,
 	getDistributedEditingFreshReviewRetrySaveHandoffStateForSessionState,
 	getDistributedEditingLocalUpdatesImportResult,
 	getDistributedEditingLocalUpdatesImportReviewRequestStateForSessionState,
@@ -93,6 +96,7 @@ import { distributedEditingSession } from '../reducer';
 import {
 	canExportDistributedEditingLocalUpdates,
 	getDistributedEditingFreshReviewDecisionState,
+	getDistributedEditingFreshReviewPreSaveState,
 	getDistributedEditingLocalUpdatesImportReviewRequestState,
 	getDistributedEditingNoticeDescriptors,
 	getDistributedEditingReviewTokenRecoveryState,
@@ -3348,6 +3352,189 @@ describe( 'distributed editing session state', () => {
 			blocksNormalSavePost: false,
 			opensPrePublishReview: false,
 		} );
+	} );
+
+	it( 'exposes fresh-review lifecycle as inert pre-save placement evidence', () => {
+		const rawContentToken = 'fresh-review-pre-save-raw-token';
+		const normalized = normalizeDistributedEditingSessionState( {
+			pendingChangeCount: 1,
+			hasPendingChanges: true,
+			mustOfferLocalCopy: true,
+			canExportLocalUpdates: true,
+			localUpdatesImportStatus:
+				DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_STATUSES.BLOCKED,
+			localUpdatesImportReason:
+				DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.FRESH_REVIEW_REQUIRED,
+			localUpdatesImportRequiresFreshReview: true,
+			localUpdatesImportReviewRequestStatus:
+				DISTRIBUTED_EDITING_LOCAL_UPDATES_REVIEW_REQUEST_STATUSES.REQUESTED,
+			localUpdatesImportFreshReviewRequestAccepted: true,
+			localUpdatesImportFreshReviewRequestRequested: true,
+			localUpdatesImportFreshReviewDecisionPanelRequired: true,
+			localUpdatesImportFreshReviewDecisionItems: [
+				{
+					id: 'fresh-review-pre-save-html',
+					blockClientId: 'client-html',
+					blockName: 'core/html',
+					blockLabel: 'HTML',
+					changeKind: 'modified_block',
+					riskReason: 'kses_would_remove_script',
+					proposedContentHash:
+						'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+					reviewStatus:
+						DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES.PENDING_REVIEW,
+					rawContent: `<script>${ rawContentToken }</script>`,
+					proofSignature: 'fresh-review-pre-save-proof',
+					reviewerId: 7,
+				},
+			],
+		} );
+		const preSaveState =
+			getDistributedEditingFreshReviewPreSaveStateForSessionState(
+				normalized
+			);
+		const selectorState = { distributedEditingSession: normalized };
+		const descriptors =
+			getDistributedEditingNoticeDescriptorsForSessionState( normalized );
+
+		expect( preSaveState ).toMatchObject( {
+			status: DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_STATUSES.REVIEW_REQUIRED,
+			reason: 'fresh_review_required',
+			placement:
+				DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_PLACEMENTS.PRE_PUBLISH_REVIEW,
+			saveButtonLabel: 'Review changes',
+			clickAction:
+				DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.OPEN_PRE_PUBLISH_REVIEW,
+			blocksNormalSavePost: true,
+			opensPrePublishReview: true,
+			requiresServerStateRefetch: false,
+			canExportLocalUpdates: true,
+			hasProtectedLocalChanges: true,
+			requestAccepted: true,
+			requested: true,
+			decisionStatus:
+				DISTRIBUTED_EDITING_FRESH_REVIEW_DECISION_STATUSES.AWAITING_REVIEW,
+			decisionPanelRequired: true,
+			decisionItemCount: 1,
+			pendingDecisionItemCount: 1,
+			shouldCallNormalSavePost: false,
+			shouldCallRetrySaveEndpoint: false,
+			dispatchesNotice: false,
+			mutatesEditorContent: false,
+			mutatesPersistedPostContent: false,
+			changesPostLock: false,
+			claimsSaved: false,
+			exposesRawContent: false,
+			exposesProofSignature: false,
+			exposesReviewerIds: false,
+		} );
+		expect(
+			getDistributedEditingFreshReviewPreSaveState( selectorState )
+		).toEqual( preSaveState );
+		expect( descriptors ).toEqual(
+			expect.arrayContaining( [
+				expect.objectContaining( {
+					kind: DISTRIBUTED_EDITING_NOTICE_KINDS.LOCAL_UPDATES_IMPORT_BLOCKED,
+					freshReviewPreSaveStatus:
+						DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_STATUSES.REVIEW_REQUIRED,
+					freshReviewPreSavePlacement:
+						DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_PLACEMENTS.PRE_PUBLISH_REVIEW,
+					freshReviewPreSaveBlocksNormalSavePost: true,
+					freshReviewPreSaveOpensPrePublishReview: true,
+					freshReviewPreSaveCanExportLocalUpdates: true,
+					shouldCallNormalSavePost: false,
+					shouldCallRetrySaveEndpoint: false,
+					claimsSaved: false,
+					exposesRawContent: false,
+					exposesProofSignature: false,
+					exposesReviewerIds: false,
+				} ),
+			] )
+		);
+		expect( JSON.stringify( preSaveState ) ).not.toContain(
+			rawContentToken
+		);
+		expect( JSON.stringify( descriptors ) ).not.toContain(
+			rawContentToken
+		);
+	} );
+
+	it( 'keeps accepted fresh-review validation ready for guarded retry save without calling save', () => {
+		const normalized = normalizeDistributedEditingSessionState( {
+			pendingChangeCount: 1,
+			hasPendingChanges: true,
+			mustOfferLocalCopy: true,
+			canExportLocalUpdates: true,
+			localUpdatesImportStatus:
+				DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_STATUSES.BLOCKED,
+			localUpdatesImportReason:
+				DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.FRESH_REVIEW_REQUIRED,
+			localUpdatesImportRequiresFreshReview: true,
+			localUpdatesImportReviewRequestStatus:
+				DISTRIBUTED_EDITING_LOCAL_UPDATES_REVIEW_REQUEST_STATUSES.DECISION_RECORDED,
+			localUpdatesImportFreshReviewRequestAccepted: true,
+			localUpdatesImportFreshReviewRequestRequested: true,
+			localUpdatesImportFreshReviewDecisionStatus:
+				DISTRIBUTED_EDITING_FRESH_REVIEW_DECISION_STATUSES.RECORDED,
+			localUpdatesImportFreshReviewDecisionAccepted: true,
+			localUpdatesImportFreshReviewDecisionSubmitted: true,
+			localUpdatesImportFreshReviewDecisionDecision: 'approved',
+			localUpdatesImportFreshReviewDecisionReviewedBlockItemCount: 1,
+			localUpdatesImportFreshReviewRetrySaveHandoffStatus:
+				DISTRIBUTED_EDITING_FRESH_REVIEW_RETRY_SAVE_HANDOFF_STATUSES.ACCEPTED_FOR_RETRY_SAVE,
+			localUpdatesImportFreshReviewRetrySaveHandoffAccepted: true,
+			retrySaveFreshReviewConsumeValidationAccepted: true,
+			retrySaveFreshReviewDecisionConsumptionValidated: true,
+			retrySaveFreshReviewReviewedBlockItemCount: 1,
+		} );
+		const preSaveState =
+			getDistributedEditingFreshReviewPreSaveStateForSessionState(
+				normalized
+			);
+		const descriptors =
+			getDistributedEditingNoticeDescriptorsForSessionState( normalized );
+
+		expect( preSaveState ).toMatchObject( {
+			status: DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_STATUSES.READY_FOR_GUARDED_RETRY_SAVE,
+			reason: 'fresh_review_accepted_for_retry_save',
+			placement:
+				DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_PLACEMENTS.PRE_SAVE_STATUS,
+			saveButtonLabel: 'Submit reviewed changes',
+			clickAction:
+				DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.CONTINUE_GUARDED_RETRY_SAVE,
+			blocksNormalSavePost: true,
+			opensPrePublishReview: false,
+			canExportLocalUpdates: true,
+			reviewedBlockItemCount: 1,
+			handoffAccepted: true,
+			freshReviewConsumed: true,
+			shouldCallNormalSavePost: false,
+			shouldCallRetrySaveEndpoint: false,
+			dispatchesNotice: false,
+			mutatesEditorContent: false,
+			mutatesPersistedPostContent: false,
+			changesPostLock: false,
+			claimsSaved: false,
+		} );
+		expect( descriptors ).toEqual(
+			expect.arrayContaining( [
+				expect.objectContaining( {
+					kind: DISTRIBUTED_EDITING_NOTICE_KINDS.LOCAL_UPDATES_IMPORT_BLOCKED,
+					freshReviewPreSaveStatus:
+						DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_STATUSES.READY_FOR_GUARDED_RETRY_SAVE,
+					freshReviewPreSavePlacement:
+						DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_PLACEMENTS.PRE_SAVE_STATUS,
+					freshReviewPreSaveClickAction:
+						DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.CONTINUE_GUARDED_RETRY_SAVE,
+					freshReviewPreSaveBlocksNormalSavePost: true,
+					freshReviewPreSaveOpensPrePublishReview: false,
+					freshReviewPreSaveCanExportLocalUpdates: true,
+					shouldCallNormalSavePost: false,
+					shouldCallRetrySaveEndpoint: false,
+					claimsSaved: false,
+				} ),
+			] )
+		);
 	} );
 
 	it( 'records risky block review resolution and stale-after-review without save side effects', () => {

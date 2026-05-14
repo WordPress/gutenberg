@@ -1171,16 +1171,30 @@ export function DistributedEditingStatusSurface( {
 			role="region"
 		>
 			{ statusItems.map( ( item ) => (
-				<Notice
-					className="editor-distributed-editing-status__notice"
-					isDismissible={ false }
+				<div
 					key={ item.id }
-					status={ item.status }
-					actions={ getNoticeActions( item, onAction ) }
+					data-testid={
+						item.freshReviewPreSaveStatus
+							? 'distributed-editing-pre-save-status'
+							: undefined
+					}
+					data-distributed-editing-pre-save-placement={
+						item.freshReviewPreSavePlacement || undefined
+					}
+					data-distributed-editing-pre-save-status={
+						item.freshReviewPreSaveStatus || undefined
+					}
 				>
-					<strong>{ item.title }</strong>
-					<div>{ item.message }</div>
-				</Notice>
+					<Notice
+						className="editor-distributed-editing-status__notice"
+						isDismissible={ false }
+						status={ item.status }
+						actions={ getNoticeActions( item, onAction ) }
+					>
+						<strong>{ item.title }</strong>
+						<div>{ item.message }</div>
+					</Notice>
+				</div>
 			) ) }
 			{ unloadWarningMessage && (
 				<div className="editor-distributed-editing-status__unload-warning">
@@ -1635,6 +1649,9 @@ function getDistributedEditingStatusSurfaceItem( descriptor ) {
 					descriptor.localUpdatesImportFreshReviewRetrySaveHandoffValidating,
 				localUpdatesImportFreshReviewRetrySaveHandoffAccepted:
 					descriptor.localUpdatesImportFreshReviewRetrySaveHandoffAccepted,
+				freshReviewPreSaveStatus: descriptor.freshReviewPreSaveStatus,
+				freshReviewPreSavePlacement:
+					descriptor.freshReviewPreSavePlacement,
 			};
 	}
 
