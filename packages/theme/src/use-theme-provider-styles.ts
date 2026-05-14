@@ -94,7 +94,6 @@ const legacyWpComponentsOverridesCSS: Entry[] = [
 ];
 
 function customRgbFormat( color: PlainColorObject ): string {
-	ensureColorSpacesRegistered();
 	const rgb = to( color, sRGB );
 	return rgb.coords
 		.map( ( n ) => Math.round( ( n ?? 0 ) * 255 ) )
