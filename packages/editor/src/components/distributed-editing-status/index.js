@@ -1543,6 +1543,18 @@ function getRetrySaveStatusText( descriptor ) {
 				),
 			};
 		case DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_PERMISSION_DENIED:
+			if (
+				descriptor.reasonCode ===
+				DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_REVIEW_APPROVAL_REQUIRES_UNFILTERED_HTML
+			) {
+				return {
+					title: __( 'Retry save needs HTML permission' ),
+					message: __(
+						'The HTML review proof was accepted, but this account cannot perform the final HTML-capable save. Protected local changes and the hash-only review proof remain exportable for someone with unfiltered HTML permission.'
+					),
+				};
+			}
+
 			return {
 				title: __( 'Retry save permission changed' ),
 				message: __(

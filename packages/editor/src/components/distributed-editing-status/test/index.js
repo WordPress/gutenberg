@@ -2101,6 +2101,17 @@ describe( 'DistributedEditingStatusSurface', () => {
 			},
 			{
 				disposition:
+					DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_PERMISSION_DENIED,
+				reasonCode:
+					DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_REVIEW_APPROVAL_REQUIRES_UNFILTERED_HTML,
+				retrySaveStatus:
+					DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_PERMISSION_DENIED,
+				title: 'Retry save needs HTML permission',
+				message:
+					'The HTML review proof was accepted, but this account cannot perform the final HTML-capable save. Protected local changes and the hash-only review proof remain exportable for someone with unfiltered HTML permission.',
+			},
+			{
+				disposition:
 					DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_FEATURE_DISABLED,
 				reasonCode:
 					DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_FEATURE_DISABLED,

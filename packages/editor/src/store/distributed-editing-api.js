@@ -420,6 +420,14 @@ function normalizeAcceptedReviewApprovalProofForRetrySaveRequest( proof ) {
 			proof.candidatePostContentHash ??
 			proof.candidate_post_content_hash ??
 			undefined,
+		candidate_post_content_hash_scope:
+			proof.candidatePostContentHashScope ??
+			proof.candidate_post_content_hash_scope ??
+			undefined,
+		requires_unfiltered_html_saver: Boolean(
+			proof.requiresUnfilteredHtmlSaver ??
+				proof.requires_unfiltered_html_saver
+		),
 		kses_filtered_proposed_content_hash:
 			proof.ksesFilteredProposedContentHash ??
 			proof.kses_filtered_proposed_content_hash ??

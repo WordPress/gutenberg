@@ -425,6 +425,7 @@ export const DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE = Object.freeze( {
 	retrySaveReviewEscalationRequired: false,
 	retrySaveReviewEscalationReason: null,
 	retrySaveReviewRequiresUnfilteredHtml: false,
+	retrySaveRequiresUnfilteredHtmlSaver: false,
 	retrySaveReviewUnfilteredHtmlAllowed: false,
 	retrySaveReviewAuthorshipRequired: false,
 	retrySaveReviewContentCapabilityRequired: false,
@@ -451,6 +452,8 @@ export const DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE = Object.freeze( {
 	retrySaveReviewApprovalScope: null,
 	retrySaveReviewApprovalProposedContentHash: null,
 	retrySaveReviewApprovalCandidateContentHash: null,
+	retrySaveReviewApprovalCandidateContentHashScope: null,
+	retrySaveReviewApprovalRequiresUnfilteredHtmlSaver: false,
 	retrySaveReviewApprovalExpectedProposedContentHash: null,
 	retrySaveReviewApprovalExpectedCandidateContentHash: null,
 	retrySaveReviewApprovalHashMismatch: false,
@@ -1809,6 +1812,10 @@ export function getDistributedEditingAcceptedReviewApprovalProofForRetrySaveRequ
 		reviewedProposedContentHash: proposedPostContentHash,
 		candidatePostContentHash,
 		reviewedCandidateContentHash: candidatePostContentHash,
+		candidatePostContentHashScope:
+			normalized.retrySaveReviewApprovalCandidateContentHashScope,
+		requiresUnfilteredHtmlSaver:
+			normalized.retrySaveReviewApprovalRequiresUnfilteredHtmlSaver,
 		reviewedBlockItems,
 		reviewedBlockItemCount: reviewedBlockItems.length,
 		blockReviewStatus: normalized.retrySaveReviewApprovalBlockReviewStatus,
@@ -2746,6 +2753,22 @@ export function getDistributedEditingSessionStateForRetrySaveResult(
 			responseOrError,
 			responseData
 		);
+	const retrySaveReviewApprovalProofFields =
+		getRetrySaveReviewApprovalProofFieldsFromResponseOrError(
+			responseOrError,
+			responseData,
+			normalizedCurrent
+		);
+	const hasAcceptedReviewApprovalProof = Boolean(
+		responseOrError.reviewApprovalProofAccepted ||
+			responseOrError.review_approval_proof_accepted ||
+			responseOrError.acceptedReviewApprovalProofAvailable ||
+			responseOrError.accepted_review_approval_proof_available ||
+			responseData.reviewApprovalProofAccepted ||
+			responseData.review_approval_proof_accepted ||
+			responseData.acceptedReviewApprovalProofAvailable ||
+			responseData.accepted_review_approval_proof_available
+	);
 
 	return getDistributedEditingRejectedRetrySaveState( {
 		normalizedCurrent,
@@ -2759,6 +2782,8 @@ export function getDistributedEditingSessionStateForRetrySaveResult(
 		previousServerVersion,
 		retrySaveFlags,
 		retrySaveReviewMetadata,
+		retrySaveReviewApprovalProofFields,
+		hasAcceptedReviewApprovalProof,
 	} );
 }
 
@@ -3296,11 +3321,18 @@ function getDistributedEditingRetrySaveDescriptorFields( normalized ) {
 	const retrySaveReviewRequired =
 		normalized.retrySaveStatus ===
 		DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_UNFILTERED_HTML_REVIEW_REQUIRED;
+	const retrySaveRequiresUnfilteredHtmlSaver =
+		normalized.retrySaveRequiresUnfilteredHtmlSaver ||
+		( normalized.retrySaveStatus ===
+			DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_PERMISSION_DENIED &&
+			normalized.reasonCode ===
+				DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_REVIEW_APPROVAL_REQUIRES_UNFILTERED_HTML );
 
 	return {
 		retrySaveStatus: normalized.retrySaveStatus,
 		retrySaveReason: normalized.retrySaveReason,
 		retrySaveReviewRequired,
+		retrySaveRequiresUnfilteredHtmlSaver,
 		retrySaveHandoffStatus: normalized.retrySaveHandoffStatus,
 		retrySaveHandoffReason: normalized.retrySaveHandoffReason,
 		retrySaveHandoffAllowsNormalSaveFallback:
@@ -3343,6 +3375,8 @@ function getDistributedEditingRetrySaveReviewMetadataFields( normalized ) {
 			normalized.retrySaveReviewEscalationReason,
 		retrySaveReviewRequiresUnfilteredHtml:
 			normalized.retrySaveReviewRequiresUnfilteredHtml,
+		retrySaveRequiresUnfilteredHtmlSaver:
+			normalized.retrySaveRequiresUnfilteredHtmlSaver,
 		retrySaveReviewUnfilteredHtmlAllowed:
 			normalized.retrySaveReviewUnfilteredHtmlAllowed,
 		retrySaveReviewAuthorshipRequired:
@@ -3395,6 +3429,10 @@ function getDistributedEditingRetrySaveReviewApprovalProofFields( normalized ) {
 			normalized.retrySaveReviewApprovalProposedContentHash,
 		retrySaveReviewApprovalCandidateContentHash:
 			normalized.retrySaveReviewApprovalCandidateContentHash,
+		retrySaveReviewApprovalCandidateContentHashScope:
+			normalized.retrySaveReviewApprovalCandidateContentHashScope,
+		retrySaveReviewApprovalRequiresUnfilteredHtmlSaver:
+			normalized.retrySaveReviewApprovalRequiresUnfilteredHtmlSaver,
 		retrySaveReviewApprovalExpectedProposedContentHash:
 			normalized.retrySaveReviewApprovalExpectedProposedContentHash,
 		retrySaveReviewApprovalExpectedCandidateContentHash:
@@ -3446,12 +3484,19 @@ function getDistributedEditingRejectedRetrySaveState( {
 	previousServerVersion,
 	retrySaveFlags,
 	retrySaveReviewMetadata = {},
+	retrySaveReviewApprovalProofFields = {},
+	hasAcceptedReviewApprovalProof = false,
 } ) {
 	let disposition = normalizedCurrent.disposition;
 	let retrySaveStatus = DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.NONE;
 	let requiresServerStateRefetch = false;
 	let requiresManualConflictResolution =
 		normalizedCurrent.requiresManualConflictResolution;
+	const shouldPreserveRetrySubmitProof =
+		reasonCode ===
+			DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_UNFILTERED_HTML_WOULD_CHANGE_CONTENT ||
+		reasonCode ===
+			DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_REVIEW_APPROVAL_REQUIRES_UNFILTERED_HTML;
 
 	switch ( reasonCode ) {
 		case DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED:
@@ -3470,6 +3515,13 @@ function getDistributedEditingRejectedRetrySaveState( {
 			break;
 
 		case DISTRIBUTED_EDITING_REASON_CODES.REST_CANNOT_EDIT:
+			disposition =
+				DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_PERMISSION_DENIED;
+			retrySaveStatus =
+				DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_PERMISSION_DENIED;
+			break;
+
+		case DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_REVIEW_APPROVAL_REQUIRES_UNFILTERED_HTML:
 			disposition =
 				DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_PERMISSION_DENIED;
 			retrySaveStatus =
@@ -3527,19 +3579,29 @@ function getDistributedEditingRejectedRetrySaveState( {
 		refetchedServerState: false,
 		canAttemptLocalRebase: false,
 		readyToRetrySubmit: false,
-		retrySubmitProofStatus:
-			DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.NONE,
-		retrySubmitAccepted: false,
-		retrySubmitSavePathRequired: false,
-		retrySubmitSaveStatus:
-			DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.BLOCKED,
+		retrySubmitProofStatus: shouldPreserveRetrySubmitProof
+			? normalizedCurrent.retrySubmitProofStatus
+			: DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.NONE,
+		retrySubmitAccepted: shouldPreserveRetrySubmitProof
+			? normalizedCurrent.retrySubmitAccepted
+			: false,
+		retrySubmitSavePathRequired: shouldPreserveRetrySubmitProof
+			? normalizedCurrent.retrySubmitSavePathRequired
+			: false,
+		retrySubmitSaveStatus: shouldPreserveRetrySubmitProof
+			? normalizedCurrent.retrySubmitSaveStatus
+			: DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.BLOCKED,
 		retrySubmitSaveReason:
 			reasonCode ===
 			DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED
 				? DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_REASONS.STALE_BASE_REJECTED
 				: normalizedCurrent.retrySubmitSaveReason,
-		retrySubmitSavePrepared: false,
-		retrySubmitSaveReady: false,
+		retrySubmitSavePrepared: shouldPreserveRetrySubmitProof
+			? normalizedCurrent.retrySubmitSavePrepared
+			: false,
+		retrySubmitSaveReady: shouldPreserveRetrySubmitProof
+			? normalizedCurrent.retrySubmitSaveReady
+			: false,
 		retrySaveStatus,
 		retrySaveReason: reasonCode || result,
 		retrySaveAccepted: false,
@@ -3547,6 +3609,19 @@ function getDistributedEditingRejectedRetrySaveState( {
 		retrySavePreviousServerVersion: previousServerVersion,
 		...retrySaveFlags,
 		...retrySaveReviewMetadata,
+		...retrySaveReviewApprovalProofFields,
+		...( hasAcceptedReviewApprovalProof
+			? {
+					retrySaveReviewApprovalProofStatus:
+						DISTRIBUTED_EDITING_RETRY_SAVE_REVIEW_APPROVAL_PROOF_STATUSES.ACCEPTED_FOR_RETRY_SAVE,
+					retrySaveReviewApprovalProofReason: null,
+					retrySaveReviewApprovalAccepted: true,
+			  }
+			: {} ),
+		retrySaveRequiresUnfilteredHtmlSaver:
+			reasonCode ===
+				DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_REVIEW_APPROVAL_REQUIRES_UNFILTERED_HTML ||
+			retrySaveReviewMetadata.retrySaveRequiresUnfilteredHtmlSaver,
 		requiresManualConflictResolution,
 		mustOfferLocalCopy: normalizeCount( pendingChangeCount ) > 0,
 		canExportLocalUpdates:
@@ -3599,6 +3674,9 @@ function normalizeRetrySaveReviewMetadataFields( sessionState = {} ) {
 		retrySaveReviewEscalationReason,
 		retrySaveReviewRequiresUnfilteredHtml: Boolean(
 			sessionState.retrySaveReviewRequiresUnfilteredHtml
+		),
+		retrySaveRequiresUnfilteredHtmlSaver: Boolean(
+			sessionState.retrySaveRequiresUnfilteredHtmlSaver
 		),
 		retrySaveReviewUnfilteredHtmlAllowed: Boolean(
 			sessionState.retrySaveReviewUnfilteredHtmlAllowed
@@ -3683,6 +3761,13 @@ function normalizeRetrySaveReviewApprovalProofFields( sessionState = {} ) {
 		),
 		retrySaveReviewApprovalCandidateContentHash: normalizeNullableString(
 			sessionState.retrySaveReviewApprovalCandidateContentHash
+		),
+		retrySaveReviewApprovalCandidateContentHashScope:
+			normalizeNullableString(
+				sessionState.retrySaveReviewApprovalCandidateContentHashScope
+			),
+		retrySaveReviewApprovalRequiresUnfilteredHtmlSaver: Boolean(
+			sessionState.retrySaveReviewApprovalRequiresUnfilteredHtmlSaver
 		),
 		retrySaveReviewApprovalExpectedProposedContentHash:
 			normalizeNullableString(
@@ -4164,6 +4249,12 @@ function getRetrySaveReviewMetadataFromResponseOrError(
 			responseData.requires_unfiltered_html,
 			permissionContract.unfiltered_html_review_required
 		),
+		retrySaveRequiresUnfilteredHtmlSaver: getFirstDefined(
+			responseOrError.requiresUnfilteredHtmlSaver,
+			responseOrError.requires_unfiltered_html_saver,
+			responseData.requiresUnfilteredHtmlSaver,
+			responseData.requires_unfiltered_html_saver
+		),
 		retrySaveReviewUnfilteredHtmlAllowed: getFirstDefined(
 			responseOrError.unfilteredHtmlAllowed,
 			responseOrError.unfiltered_html_allowed,
@@ -4285,10 +4376,14 @@ function getRetrySaveReviewApprovalProofFieldsFromResponseOrError(
 			responseOrError.review_approval_contract,
 			responseOrError.approvalContract,
 			responseOrError.approval_contract,
+			responseOrError.acceptedReviewApprovalProof,
+			responseOrError.accepted_review_approval_proof,
 			responseData.reviewApprovalContract,
 			responseData.review_approval_contract,
 			responseData.approvalContract,
-			responseData.approval_contract
+			responseData.approval_contract,
+			responseData.acceptedReviewApprovalProof,
+			responseData.accepted_review_approval_proof
 		)
 	);
 	const reviewContract = normalizeObject(
@@ -4436,6 +4531,22 @@ function getRetrySaveReviewApprovalProofFieldsFromResponseOrError(
 			reviewContract.candidateContentHash,
 			reviewContract.candidate_content_hash,
 			currentSessionState.retrySaveReviewCandidateContentHash
+		),
+		retrySaveReviewApprovalCandidateContentHashScope: getFirstDefined(
+			responseOrError.candidatePostContentHashScope,
+			responseOrError.candidate_post_content_hash_scope,
+			responseData.candidatePostContentHashScope,
+			responseData.candidate_post_content_hash_scope,
+			approvalContract.candidatePostContentHashScope,
+			approvalContract.candidate_post_content_hash_scope
+		),
+		retrySaveReviewApprovalRequiresUnfilteredHtmlSaver: getFirstDefined(
+			responseOrError.requiresUnfilteredHtmlSaver,
+			responseOrError.requires_unfiltered_html_saver,
+			responseData.requiresUnfilteredHtmlSaver,
+			responseData.requires_unfiltered_html_saver,
+			approvalContract.requiresUnfilteredHtmlSaver,
+			approvalContract.requires_unfiltered_html_saver
 		),
 		retrySaveReviewApprovalExpectedProposedContentHash: getFirstDefined(
 			responseOrError.expectedProposedPostContentHash,

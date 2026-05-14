@@ -221,6 +221,7 @@ describe( 'distributed editing session state', () => {
 			retrySaveReviewEscalationRequired: false,
 			retrySaveReviewEscalationReason: null,
 			retrySaveReviewRequiresUnfilteredHtml: false,
+			retrySaveRequiresUnfilteredHtmlSaver: false,
 			retrySaveReviewUnfilteredHtmlAllowed: false,
 			retrySaveReviewAuthorshipRequired: false,
 			retrySaveReviewContentCapabilityRequired: false,
@@ -247,6 +248,8 @@ describe( 'distributed editing session state', () => {
 			retrySaveReviewApprovalScope: null,
 			retrySaveReviewApprovalProposedContentHash: null,
 			retrySaveReviewApprovalCandidateContentHash: null,
+			retrySaveReviewApprovalCandidateContentHashScope: null,
+			retrySaveReviewApprovalRequiresUnfilteredHtmlSaver: false,
 			retrySaveReviewApprovalExpectedProposedContentHash: null,
 			retrySaveReviewApprovalExpectedCandidateContentHash: null,
 			retrySaveReviewApprovalHashMismatch: false,
@@ -1483,6 +1486,175 @@ describe( 'distributed editing session state', () => {
 				} ),
 			] )
 		);
+	} );
+
+	it( 'normalizes accepted review proof that still needs an unfiltered HTML saver', () => {
+		const proposedContentHash =
+			'5555555555555555555555555555555555555555555555555555555555555555';
+		const candidateContentHash =
+			'6666666666666666666666666666666666666666666666666666666666666666';
+		const reviewedBlockHash =
+			'7777777777777777777777777777777777777777777777777777777777777777';
+		const normalized = getDistributedEditingSessionStateForRetrySaveResult(
+			{
+				code: DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_REVIEW_APPROVAL_REQUIRES_UNFILTERED_HTML,
+				data: {
+					reason_code:
+						DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_REVIEW_APPROVAL_REQUIRES_UNFILTERED_HTML,
+					detail: 'retry_save_review_approval_requires_unfiltered_html_saver',
+					pending_change_count: 1,
+					server_version: '12',
+					review_approval_proof_accepted: true,
+					review_approval_proof_consumed: false,
+					accepted_review_approval_proof_available: true,
+					reviewed_block_item_count: 1,
+					requires_unfiltered_html: true,
+					requires_unfiltered_html_saver: true,
+					unfiltered_html_allowed: false,
+					review_status: 'approved_by_unfiltered_html_reviewer',
+					approval_status: 'approved_for_retry_save',
+					review_action: 'request_unfiltered_html_reviewer',
+					approval_action: 'retry_save_with_unfiltered_html_saver',
+					review_required_capability: 'unfiltered_html',
+					reviewer_capability: 'unfiltered_html',
+					review_scope: 'collaborative_post_content',
+					raw_content_included: false,
+					can_export_local_updates: true,
+					saves_post: false,
+					mutates_post_content: false,
+					creates_revision: false,
+					claims_saved: false,
+					accepted_review_approval_proof: {
+						type: 'unfiltered_html_retry_save_review_approval',
+						status: 'approved_by_unfiltered_html_reviewer',
+						reviewer_capability: 'unfiltered_html',
+						review_scope: 'collaborative_post_content',
+						review_status: 'approved_by_unfiltered_html_reviewer',
+						approval_status: 'approved_for_retry_save',
+						review_action: 'request_unfiltered_html_reviewer',
+						approval_action:
+							'retry_save_with_unfiltered_html_saver',
+						review_required_capability: 'unfiltered_html',
+						server_version: '12',
+						proposed_post_content_hash: proposedContentHash,
+						reviewed_proposed_content_hash: proposedContentHash,
+						candidate_post_content_hash: candidateContentHash,
+						reviewed_candidate_content_hash: candidateContentHash,
+						candidate_post_content_hash_scope:
+							'low_privileged_saver_candidate',
+						requires_unfiltered_html_saver: true,
+						reviewed_block_items: [
+							{
+								id: 'risk-html-approved',
+								block_name: 'core/html',
+								change_kind: 'added_block',
+								risk_reason: 'kses_would_remove_script',
+								proposed_content_hash: reviewedBlockHash,
+								reviewed_proposed_content_hash:
+									reviewedBlockHash,
+								review_status: 'approved_for_retry_save',
+								review_evidence_type:
+									'kses_block_hash_only_change',
+								content_review_policy: 'kses',
+								raw_content_included: false,
+							},
+						],
+						reviewed_block_item_count: 1,
+						block_review_status: 'approved_for_retry_save',
+						raw_content_included: false,
+						saves_post: false,
+						mutates_post_content: false,
+						creates_revision: false,
+						claims_saved: false,
+					},
+				},
+			},
+			{
+				serverVersion: '12',
+				pendingChangeCount: 1,
+				hasPendingChanges: true,
+				retrySubmitProofStatus:
+					DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.ACCEPTED_FOR_FUTURE_SAVE,
+				retrySubmitAccepted: true,
+				retrySubmitSavePathRequired: true,
+				retrySubmitSaveStatus:
+					DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.READY,
+				retrySubmitSavePrepared: true,
+				retrySubmitSaveReady: true,
+			}
+		);
+		const notices =
+			getDistributedEditingNoticeDescriptorsForSessionState( normalized );
+		const retrySaveDescriptor = notices.find(
+			( descriptor ) =>
+				descriptor.kind === DISTRIBUTED_EDITING_NOTICE_KINDS.RETRY_SAVE
+		);
+
+		expect( normalized ).toMatchObject( {
+			disposition:
+				DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_PERMISSION_DENIED,
+			reasonCode:
+				DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_REVIEW_APPROVAL_REQUIRES_UNFILTERED_HTML,
+			pendingChangeCount: 1,
+			hasPendingChanges: true,
+			isAwaitingServerConfirmation: true,
+			requiresServerStateRefetch: false,
+			requiresManualConflictResolution: false,
+			retrySubmitProofStatus:
+				DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.ACCEPTED_FOR_FUTURE_SAVE,
+			retrySubmitAccepted: true,
+			retrySubmitSavePathRequired: true,
+			retrySubmitSaveStatus:
+				DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.READY,
+			retrySubmitSavePrepared: true,
+			retrySubmitSaveReady: true,
+			retrySaveStatus:
+				DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_PERMISSION_DENIED,
+			retrySaveReason:
+				DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_REVIEW_APPROVAL_REQUIRES_UNFILTERED_HTML,
+			retrySaveAccepted: false,
+			retrySaveSavesPost: false,
+			retrySaveMutatesPostContent: false,
+			retrySaveClaimsSaved: false,
+			retrySaveReviewStatus: 'approved_by_unfiltered_html_reviewer',
+			retrySaveReviewAction: 'request_unfiltered_html_reviewer',
+			retrySaveReviewRequiredCapability: 'unfiltered_html',
+			retrySaveReviewerCapability: 'unfiltered_html',
+			retrySaveReviewScope: 'collaborative_post_content',
+			retrySaveReviewRequiresUnfilteredHtml: true,
+			retrySaveRequiresUnfilteredHtmlSaver: true,
+			retrySaveReviewUnfilteredHtmlAllowed: false,
+			retrySaveReviewApprovalProofStatus:
+				DISTRIBUTED_EDITING_RETRY_SAVE_REVIEW_APPROVAL_PROOF_STATUSES.ACCEPTED_FOR_RETRY_SAVE,
+			retrySaveReviewApprovalAccepted: true,
+			retrySaveReviewApprovalAction:
+				'retry_save_with_unfiltered_html_saver',
+			retrySaveReviewApprovalRequiredCapability: 'unfiltered_html',
+			retrySaveReviewApprovalReviewerCapability: 'unfiltered_html',
+			retrySaveReviewApprovalScope: 'collaborative_post_content',
+			retrySaveReviewApprovalProposedContentHash: proposedContentHash,
+			retrySaveReviewApprovalCandidateContentHash: candidateContentHash,
+			retrySaveReviewApprovalCandidateContentHashScope:
+				'low_privileged_saver_candidate',
+			retrySaveReviewApprovalRequiresUnfilteredHtmlSaver: true,
+			retrySaveReviewApprovalReviewedBlockItemCount: 1,
+			retrySaveReviewApprovalBlockReviewStatus: 'approved_for_retry_save',
+			retrySaveReviewApprovalRawContentIncluded: false,
+			mustOfferLocalCopy: true,
+			canExportLocalUpdates: true,
+		} );
+		expect( retrySaveDescriptor ).toMatchObject( {
+			retrySaveStatus:
+				DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_PERMISSION_DENIED,
+			retrySaveRequiresUnfilteredHtmlSaver: true,
+			retrySaveReviewApprovalAccepted: true,
+			retrySaveReviewApprovalReviewedBlockItemCount: 1,
+			retrySaveReviewApprovalRequiresUnfilteredHtmlSaver: true,
+			actionKeys: [
+				DISTRIBUTED_EDITING_NOTICE_ACTIONS.EXPORT_LOCAL_UPDATES,
+			],
+		} );
+		expect( JSON.stringify( normalized ) ).not.toContain( '<iframe' );
 	} );
 
 	it( 'normalizes accepted retry-save review approval proof without saving', () => {
