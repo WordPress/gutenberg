@@ -47,13 +47,6 @@
 		margin-block-start: calc(-1 * var(--wp-ui-card-padding));
 	}
 
-	/* Restore the padding gap between the FullBleed and any subsequent
-	 * siblings (e.g. Card.Title) inside the header.
-	 */
-	.header > .fullbleed:first-child:not(:last-child) {
-		margin-block-end: var(--wp-ui-card-padding);
-	}
-
 	/* When FullBleed is the only child of Content and Content is the first
 	 * child of the card, extend FullBleed flush to the card's top edge.
 	 */
