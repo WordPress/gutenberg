@@ -60,7 +60,11 @@ module.exports = {
 	},
 	overrides: [
 		{
-			files: [ '**/*.module.{css,scss}' ],
+			files: [
+				'**/*.module.{css,scss}',
+				// Can be removed when all `routes/` stylesheets are converted to CSS modules.
+				'routes/**/*.{css,scss}',
+			],
 			rules: {
 				'function-no-unknown': [
 					true,
