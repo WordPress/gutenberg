@@ -554,8 +554,35 @@ async function bundlePackage( packageName, options = {} ) {
 			? `${ scriptGlobal }.${ camelCase( packageName ) }`
 			: undefined;
 
+		// esbuild's IIFE output exposes each export as a non-configurable
+		// getter (`Object.defineProperty(ns, k, { get: () => binding })`) to
+		// preserve ESM live-binding semantics across hoisting. Once the IIFE
+		// has finished the bindings are stable, but consumers still pay a
+		// getter call on every access — about 2× slower than a data property
+		// in V8, and across the editor mount that's hundreds of thousands of
+		// reads from every hook and selector.
+		//
+		// Bundle a synthetic CJS entrypoint that spreads the real entry's
+		// exports into a plain object. Esbuild evaluates the spread inside
+		// the IIFE, so what's assigned to `globalName` is a plain object with
+		// data properties from the start. For `wpScriptDefaultExport`
+		// packages, the synthetic also unwraps the namespace so `globalName`
+		// IS the default value (replacing the previous post-hoc unwrap).
+		//
+		// `bin/packages/build-vendors.mjs` uses the same `stdin` trick to
+		// build the react-dom global.
+		const entrySpec = JSON.stringify( entryPoint );
+		const stdinContents = packageJson.wpScriptDefaultExport
+			? `module.exports = require(${ entrySpec }).default;`
+			: `module.exports = { ...require(${ entrySpec }) };`;
+
 		const baseConfig = {
-			entryPoints: [ entryPoint ],
+			stdin: {
+				contents: stdinContents,
+				resolveDir: packageDir,
+				sourcefile: 'index.js',
+				loader: 'js',
+			},
 			bundle: true,
 			sourcemap: true,
 			format: 'iife',
@@ -563,37 +590,6 @@ async function bundlePackage( packageName, options = {} ) {
 			platform: 'browser',
 			globalName,
 		};
-
-		// Compose the footer in pieces:
-		//   1. If the package has a default export, unwrap the namespace so
-		//      `globalName` IS the default value.
-		//   2. For every package that exposes a global namespace, replace
-		//      esbuild's getter-based re-exports with direct data properties.
-		//      esbuild emits each export as `Object.defineProperty(ns, k,
-		//      { get: () => binding })` to preserve ESM live-binding semantics
-		//      across hoisting; consumers then pay a getter call on every
-		//      property access. Across the editor mount that's hundreds of
-		//      thousands of getter invocations (every hook, every selector).
-		//      Once the IIFE has finished, the bindings are stable, so we can
-		//      read each getter once and replace it with a plain data
-		//      property — same value, ~2x cheaper per access in V8.
-		const footerParts = [];
-		if ( packageJson.wpScriptDefaultExport && globalName ) {
-			footerParts.push(
-				`if (typeof ${ globalName } === 'object' && ${ globalName }.default) { ${ globalName } = ${ globalName }.default; }`
-			);
-		}
-		if ( globalName ) {
-			// esbuild marks the getters non-configurable, so we can't rewrite
-			// them in place; replacing the whole namespace with a shallow
-			// copy is the simplest way to materialize each value once.
-			footerParts.push(
-				`if(${ globalName }&&typeof ${ globalName }==='object'){${ globalName }=Object.assign({},${ globalName });}`
-			);
-		}
-		if ( footerParts.length ) {
-			baseConfig.footer = { js: footerParts.join( '' ) };
-		}
 
 		const baseBundlePlugins = [
 			momentTimezoneAliasPlugin(),
