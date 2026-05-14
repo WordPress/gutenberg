@@ -32,7 +32,7 @@ import type {
 import type { UseCropperStateReturn } from '../hooks/use-cropper-state';
 import { getImageFit, getRotatedBBox } from '../../core/camera';
 import { getImageCropBounds } from '../../core/containment';
-import { MIN_CROP_PIXELS, MIN_ZOOM } from '../../core/constants';
+import { MIN_CROP_PIXELS } from '../../core/constants';
 import { useInteraction } from '../hooks/use-interaction';
 import { useTransformStyle } from '../hooks/use-transform-style';
 import { useAriaAnnouncer } from '../hooks/use-aria-announcer';
@@ -183,8 +183,7 @@ function CropperInner(
 	}: CropperProps,
 	ref: React.ForwardedRef< HTMLDivElement >
 ) {
-	const { state, setImage, setCropRect, settleCrop, setZoomAtPoint } =
-		controller;
+	const { state, setImage, setCropRect, settleCrop } = controller;
 	const {
 		viewport: viewportState,
 		setViewportPan,
@@ -345,10 +344,7 @@ function CropperInner(
 	}, [ freeformCrop, aspectRatio, visualSize, setCropRect, state.cropRect ] );
 
 	// In freeform mode, when aspectRatio changes, reshape the crop to the
-	// largest inscribed rect of the new ratio. Reset zoom and pan so the
-	// inscribed rect has the full image to work with — without this, a
-	// prior SETTLE_CROP could leave the viewport too zoomed-in for the
-	// new ratio to satisfy the source-pixel floor.
+	// largest inscribed rect of the new ratio.
 	const prevAspectRatioRef = useRef( aspectRatio );
 	useEffect( () => {
 		if ( prevAspectRatioRef.current === aspectRatio ) {
@@ -365,9 +361,8 @@ function CropperInner(
 		) {
 			return;
 		}
-		setZoomAtPoint( MIN_ZOOM, { x: 0, y: 0 } );
 		setCropRect( computeInscribedRect( aspectRatio, visualSize ) );
-	}, [ aspectRatio, freeformCrop, visualSize, setCropRect, setZoomAtPoint ] );
+	}, [ aspectRatio, freeformCrop, visualSize, setCropRect ] );
 
 	// Compute the crop handle bounds from the actual image footprint.
 	// Depends on the full state object because getImageCropBounds reads
