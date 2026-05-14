@@ -489,7 +489,6 @@ export default function ColorPanel( {
 		// decoded hex values. Two palette entries can share the same hex but
 		// carry different slugs (e.g. var:preset|color|dark-background and
 		// values would conflate them and incorrectly force the link color to
-		// values would conflate them and incorrectly force the link color to
 		// follow the text color even when the user deliberately chose a
 		// different palette slot.
 		//
