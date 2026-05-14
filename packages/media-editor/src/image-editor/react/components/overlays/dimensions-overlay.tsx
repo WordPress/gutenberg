@@ -117,7 +117,21 @@ function fittingSide(
 	if ( preferred !== 'center' && fits( 'center' ) ) {
 		return 'center';
 	}
-	return preferred;
+	// None of the candidates fully fit — pick the one that pushes the
+	// least past the container edge. Without this, the chain falls back
+	// to `preferred`, which is the off-canvas side that triggered the
+	// flip in the first place, so the tooltip ends up clipped.
+	const overflow = ( side: AxisSide ) => {
+		const start = sideStart( side, handlePos, length );
+		return (
+			Math.max( 0, -start ) +
+			Math.max( 0, start + length - containerLength )
+		);
+	};
+	const candidates: AxisSide[] = [ preferred, opposite, 'center' ];
+	return candidates.reduce( ( best, side ) =>
+		overflow( side ) < overflow( best ) ? side : best
+	);
 }
 
 interface DimensionsOverlayProps {
