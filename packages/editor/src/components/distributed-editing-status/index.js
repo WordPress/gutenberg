@@ -12,6 +12,7 @@ import { __, _n, sprintf } from '@wordpress/i18n';
 import { store as editorStore } from '../../store';
 import {
 	DISTRIBUTED_EDITING_DISPOSITIONS,
+	DISTRIBUTED_EDITING_FRESH_REVIEW_DECISION_STATUSES,
 	DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES,
 	DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES,
 	DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS,
@@ -29,6 +30,7 @@ import {
 	DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS,
 	DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES,
 	DISTRIBUTED_EDITING_UNLOAD_WARNING_REASONS,
+	getDistributedEditingFreshReviewDecisionStateForSessionState,
 	getDistributedEditingLocalUpdatesExportPayload,
 	normalizeDistributedEditingSessionState,
 } from '../../store/distributed-editing';
@@ -525,6 +527,7 @@ export function DistributedEditingStatusInspector( { onAction, onSelect } ) {
 			<DistributedEditingRecoveryDryRunControls />
 			<DistributedEditingRetrySaveControls />
 			<DistributedEditingLocalUpdatesImportControls forceVisible />
+			<DistributedEditingFreshReviewDecisionPanel />
 			<DistributedEditingLocalRebaseStateInspector />
 			<DistributedEditingStatus
 				onAction={ onAction }
@@ -932,6 +935,170 @@ export function DistributedEditingLocalUpdatesImportControls( {
 }
 
 /**
+ * Renders the internal fresh-review decision panel for requested review
+ * handoffs. It records only hash-evidence approve/reject decisions in local
+ * editor state and never saves, submits proof, dispatches notices, or changes
+ * post locks.
+ *
+ * @param {Object}  props              Component props.
+ * @param {boolean} props.forceVisible Whether to show without requested state.
+ *
+ * @return {React.ReactNode} Rendered decision panel.
+ */
+export function DistributedEditingFreshReviewDecisionPanel( {
+	forceVisible = false,
+} ) {
+	const [ commandStatus, setCommandStatus ] = useState( 'idle' );
+	const { __experimentalResolveDistributedEditingFreshReviewDecisionItem } =
+		useDispatch( editorStore ) || {};
+	const decisionState = useSelect( ( select ) => {
+		const {
+			getDistributedEditingFreshReviewDecisionState,
+			getDistributedEditingSessionState,
+		} = select( editorStore );
+		const sessionState = getDistributedEditingSessionState?.() || {};
+
+		return (
+			getDistributedEditingFreshReviewDecisionState?.() ||
+			getDistributedEditingFreshReviewDecisionStateForSessionState(
+				sessionState
+			)
+		);
+	}, [] );
+	const shouldRender =
+		forceVisible ||
+		decisionState?.panelRequired ||
+		decisionState?.requestStatus ===
+			DISTRIBUTED_EDITING_LOCAL_UPDATES_REVIEW_REQUEST_STATUSES.REQUESTED ||
+		decisionState?.reviewItemCount > 0;
+
+	if ( ! shouldRender ) {
+		return null;
+	}
+
+	async function resolveDecision( reviewItem, decision ) {
+		setCommandStatus( 'running' );
+
+		const result =
+			await __experimentalResolveDistributedEditingFreshReviewDecisionItem?.(
+				{
+					reviewItemId: reviewItem.id,
+					decision,
+					rejectionReason:
+						decision === 'rejected' ? 'reviewer_rejected' : null,
+				}
+			);
+
+		setCommandStatus( 'resolved' );
+		return result;
+	}
+
+	return (
+		<div
+			aria-label={ __( 'Distributed editing fresh review decisions' ) }
+			className="editor-distributed-editing-status__fresh-review-decisions"
+			role="group"
+		>
+			<strong>{ __( 'Fresh review decisions' ) }</strong>
+			<dl className="editor-distributed-editing-status__fresh-review-decision-state">
+				<div>
+					<dt>{ __( 'Decision status' ) }</dt>
+					<dd>{ decisionState?.status }</dd>
+				</div>
+				<div>
+					<dt>{ __( 'Decision readiness' ) }</dt>
+					<dd>
+						{ decisionState?.ready
+							? __( 'Ready' )
+							: __( 'Awaiting review' ) }
+					</dd>
+				</div>
+				<div>
+					<dt>{ __( 'Reviewed items' ) }</dt>
+					<dd>
+						{ sprintf(
+							/* translators: 1: approved review item count, 2: rejected review item count, 3: pending review item count. */
+							__( '%1$d approved, %2$d rejected, %3$d pending' ),
+							decisionState?.approvedReviewItemCount || 0,
+							decisionState?.rejectedReviewItemCount || 0,
+							decisionState?.pendingReviewItemCount || 0
+						) }
+					</dd>
+				</div>
+			</dl>
+			{ decisionState?.reviewItemCount > 0 ? (
+				<ul className="editor-distributed-editing-status__fresh-review-decision-items">
+					{ decisionState.reviewItems.map( ( item ) => {
+						const label =
+							item.blockLabel ||
+							item.blockName ||
+							item.id ||
+							__( 'Review item' );
+
+						return (
+							<li
+								className="editor-distributed-editing-status__fresh-review-decision-item"
+								key={ item.id }
+							>
+								<Button
+									__next40pxDefaultSize
+									aria-label={ sprintf(
+										/* translators: %s: review item label. */
+										__( 'Approve %s' ),
+										label
+									) }
+									disabled={ commandStatus === 'running' }
+									onClick={ () =>
+										resolveDecision( item, 'approved' )
+									}
+									variant="primary"
+								>
+									{ __( 'Approve' ) }
+								</Button>
+								<span>{ label }</span>
+								<span>{ item.reviewStatus }</span>
+								<Button
+									__next40pxDefaultSize
+									aria-label={ sprintf(
+										/* translators: %s: review item label. */
+										__( 'Reject %s' ),
+										label
+									) }
+									disabled={ commandStatus === 'running' }
+									isDestructive
+									onClick={ () =>
+										resolveDecision( item, 'rejected' )
+									}
+									variant="tertiary"
+								>
+									{ __( 'Reject' ) }
+								</Button>
+							</li>
+						);
+					} ) }
+				</ul>
+			) : (
+				<p>
+					{ __(
+						'No hash-only block decisions are available for this requested review yet.'
+					) }
+				</p>
+			) }
+			<div
+				aria-live="polite"
+				className="editor-distributed-editing-status__fresh-review-decision-command"
+				data-distributed-editing-fresh-review-decision-status={
+					commandStatus
+				}
+				role="status"
+			>
+				{ getFreshReviewDecisionCommandMessage( commandStatus ) }
+			</div>
+		</div>
+	);
+}
+
+/**
  * Renders an inert DE-RTC status surface from pure selector output.
  *
  * @param {Object}   props                    Component props.
@@ -1260,6 +1427,24 @@ function getFreshReviewRequestActionMessage( requestResult ) {
 	);
 }
 
+function getFreshReviewDecisionCommandMessage( commandStatus ) {
+	if ( commandStatus === 'running' ) {
+		return __(
+			'Recording the fresh-review decision locally without saving or submitting proof.'
+		);
+	}
+
+	if ( commandStatus === 'resolved' ) {
+		return __(
+			'Fresh-review decision recorded locally. No save was made, and the reviewed-block evidence remains hash-only.'
+		);
+	}
+
+	return __(
+		'Fresh-review decisions are local until a future proof endpoint is available.'
+	);
+}
+
 async function copyDistributedEditingLocalUpdatesToClipboard( {
 	currentPost,
 	editedPostContent,
@@ -1370,6 +1555,22 @@ function getDistributedEditingStatusSurfaceItem( descriptor ) {
 					descriptor.localUpdatesImportReviewRequestStatus,
 				localUpdatesImportReviewActionKey:
 					descriptor.localUpdatesImportReviewActionKey,
+				localUpdatesImportFreshReviewDecisionStatus:
+					descriptor.localUpdatesImportFreshReviewDecisionStatus,
+				localUpdatesImportFreshReviewDecisionPanelRequired:
+					descriptor.localUpdatesImportFreshReviewDecisionPanelRequired,
+				localUpdatesImportFreshReviewDecisionReady:
+					descriptor.localUpdatesImportFreshReviewDecisionReady,
+				localUpdatesImportFreshReviewDecisionItemCount:
+					descriptor.localUpdatesImportFreshReviewDecisionItemCount,
+				localUpdatesImportFreshReviewDecisionPendingCount:
+					descriptor.localUpdatesImportFreshReviewDecisionPendingCount,
+				localUpdatesImportFreshReviewDecisionApprovedCount:
+					descriptor.localUpdatesImportFreshReviewDecisionApprovedCount,
+				localUpdatesImportFreshReviewDecisionRejectedCount:
+					descriptor.localUpdatesImportFreshReviewDecisionRejectedCount,
+				localUpdatesImportFreshReviewDecisionReviewedBlockItemCount:
+					descriptor.localUpdatesImportFreshReviewDecisionReviewedBlockItemCount,
 			};
 	}
 
@@ -1658,6 +1859,27 @@ function getLocalUpdatesImportBlockedMessage( reason ) {
 }
 
 function getLocalUpdatesImportReviewRequestMessage( descriptor ) {
+	if (
+		descriptor?.localUpdatesImportReviewRequestStatus ===
+			DISTRIBUTED_EDITING_LOCAL_UPDATES_REVIEW_REQUEST_STATUSES.REQUESTED &&
+		descriptor?.localUpdatesImportFreshReviewDecisionStatus ===
+			DISTRIBUTED_EDITING_FRESH_REVIEW_DECISION_STATUSES.READY
+	) {
+		return __(
+			'Fresh review decisions are ready for a future proof handoff. No retry save or normal save was made; protected local changes remain exportable until that proof path exists.'
+		);
+	}
+
+	if (
+		descriptor?.localUpdatesImportReviewRequestStatus ===
+			DISTRIBUTED_EDITING_LOCAL_UPDATES_REVIEW_REQUEST_STATUSES.REQUESTED &&
+		descriptor?.localUpdatesImportFreshReviewDecisionPanelRequired
+	) {
+		return __(
+			'Fresh review request was accepted. A reviewer can approve or reject the hash-only block decisions in the internal review panel; no retry save or normal save was made.'
+		);
+	}
+
 	if (
 		descriptor?.localUpdatesImportReviewRequestStatus ===
 		DISTRIBUTED_EDITING_LOCAL_UPDATES_REVIEW_REQUEST_STATUSES.REQUESTED

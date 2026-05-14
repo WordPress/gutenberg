@@ -37,6 +37,8 @@ import {
 import {
 	getDistributedEditingSessionStateForRecoveryDryRunResult,
 	getDistributedEditingSessionStateForRetrySaveHandoff,
+	getDistributedEditingSessionStateForFreshReviewDecisionItemResolution,
+	getDistributedEditingSessionStateForFreshReviewDecisionItems,
 	getDistributedEditingSessionStateForFreshReviewRequestResult,
 	getDistributedEditingSessionStateForRetrySaveReviewApprovalProofResult,
 	getDistributedEditingSessionStateForRetrySaveRequest,
@@ -50,6 +52,7 @@ import {
 	getDistributedEditingSessionStateForRetrySubmitProofResult,
 	getDistributedEditingSessionStateForRetrySubmitSavePreparation,
 	getDistributedEditingRetrySavePolicyForSessionState,
+	DISTRIBUTED_EDITING_LOCAL_UPDATES_REVIEW_REQUEST_STATUSES,
 	DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS,
 	DISTRIBUTED_EDITING_SAVE_POLICY_STATUSES,
 	getDistributedEditingStaleBaseLocalRebaseResult,
@@ -1006,6 +1009,159 @@ export function __experimentalRequestDistributedEditingFreshReviewForImportedLoc
 		}
 	};
 }
+
+/**
+ * Loads hash-only reviewed-block evidence for an accepted fresh-review request.
+ * This prepares only local reviewer decision state; it does not submit proof,
+ * save, retry-save, dispatch notices, mutate content, or change post locks.
+ *
+ * @param {Array|Object} reviewItemsOrOptions Review items or options object.
+ * @param {Object}       [options]            Optional decision options.
+ *
+ * @return {Function} Action thunk.
+ */
+export const __experimentalLoadDistributedEditingFreshReviewDecisionItems =
+	( reviewItemsOrOptions = [], options = {} ) =>
+	( { select, dispatch } ) => {
+		const currentSessionState =
+			select.getDistributedEditingSessionState?.() || {};
+		const requestStatus =
+			currentSessionState.localUpdatesImportReviewRequestStatus;
+
+		if (
+			! currentSessionState.localUpdatesImportRequiresFreshReview ||
+			requestStatus !==
+				DISTRIBUTED_EDITING_LOCAL_UPDATES_REVIEW_REQUEST_STATUSES.REQUESTED
+		) {
+			return {
+				status: 'fresh_review_decision_not_ready',
+				reason: 'fresh_review_request_not_requested',
+				loadsDecisionItems: false,
+				savesPost: false,
+				callsNormalSavePost: false,
+				callsRetrySaveEndpoint: false,
+				dispatchesNotice: false,
+				mutatesEditorContent: false,
+				mutatesPersistedPostContent: false,
+				changesPostLock: false,
+				claimsSaved: false,
+				sessionState: currentSessionState,
+			};
+		}
+
+		const decision = Array.isArray( reviewItemsOrOptions )
+			? { ...options, reviewItems: reviewItemsOrOptions }
+			: { ...reviewItemsOrOptions };
+		const sessionState =
+			getDistributedEditingSessionStateForFreshReviewDecisionItems(
+				currentSessionState,
+				decision
+			);
+
+		dispatch.setDistributedEditingSessionState( sessionState );
+
+		return {
+			status: sessionState.localUpdatesImportFreshReviewDecisionStatus,
+			reason: sessionState.localUpdatesImportFreshReviewDecisionReason,
+			loadsDecisionItems: true,
+			reviewItemCount:
+				sessionState.localUpdatesImportFreshReviewDecisionItemCount,
+			pendingReviewItemCount:
+				sessionState.localUpdatesImportFreshReviewDecisionPendingCount,
+			approvedReviewItemCount:
+				sessionState.localUpdatesImportFreshReviewDecisionApprovedCount,
+			rejectedReviewItemCount:
+				sessionState.localUpdatesImportFreshReviewDecisionRejectedCount,
+			decisionReady:
+				sessionState.localUpdatesImportFreshReviewDecisionReady,
+			savesPost: false,
+			callsNormalSavePost: false,
+			callsRetrySaveEndpoint: false,
+			dispatchesNotice: false,
+			mutatesEditorContent: false,
+			mutatesPersistedPostContent: false,
+			changesPostLock: false,
+			claimsSaved: false,
+			sessionState,
+		};
+	};
+
+/**
+ * Records one fresh-review approve/reject decision as local, hash-only editor
+ * state. This does not save, submit proof, call REST, mutate content, or change
+ * post locks.
+ *
+ * @param {Object} resolution Review decision data.
+ *
+ * @return {Function} Action thunk.
+ */
+export const __experimentalResolveDistributedEditingFreshReviewDecisionItem =
+	( resolution = {} ) =>
+	( { select, dispatch } ) => {
+		const reviewItemId = resolution.reviewItemId || resolution.id;
+		const currentSessionState =
+			select.getDistributedEditingSessionState?.() || {};
+		const currentItems = Array.isArray(
+			currentSessionState.localUpdatesImportFreshReviewDecisionItems
+		)
+			? currentSessionState.localUpdatesImportFreshReviewDecisionItems
+			: [];
+		const currentItem = currentItems.find(
+			( item ) => item.id === reviewItemId
+		);
+
+		if ( ! currentItem ) {
+			return {
+				status: 'fresh_review_decision_item_not_found',
+				reviewItemId,
+				decision: resolution.decision || 'approved',
+				savesPost: false,
+				callsNormalSavePost: false,
+				callsRetrySaveEndpoint: false,
+				dispatchesNotice: false,
+				mutatesEditorContent: false,
+				mutatesPersistedPostContent: false,
+				changesPostLock: false,
+				claimsSaved: false,
+			};
+		}
+
+		const sessionState =
+			getDistributedEditingSessionStateForFreshReviewDecisionItemResolution(
+				currentSessionState,
+				resolution
+			);
+		const resolvedItem =
+			sessionState.localUpdatesImportFreshReviewDecisionItems.find(
+				( item ) => item.id === reviewItemId
+			);
+
+		dispatch.setDistributedEditingSessionState( sessionState );
+
+		return {
+			status: 'fresh_review_decision_item_resolved',
+			reviewItemId,
+			decision: resolution.decision || 'approved',
+			reviewStatus: resolvedItem?.reviewStatus,
+			pendingReviewItemCount:
+				sessionState.localUpdatesImportFreshReviewDecisionPendingCount,
+			approvedReviewItemCount:
+				sessionState.localUpdatesImportFreshReviewDecisionApprovedCount,
+			rejectedReviewItemCount:
+				sessionState.localUpdatesImportFreshReviewDecisionRejectedCount,
+			decisionReady:
+				sessionState.localUpdatesImportFreshReviewDecisionReady,
+			savesPost: false,
+			callsNormalSavePost: false,
+			callsRetrySaveEndpoint: false,
+			dispatchesNotice: false,
+			mutatesEditorContent: false,
+			mutatesPersistedPostContent: false,
+			changesPostLock: false,
+			claimsSaved: false,
+			sessionState,
+		};
+	};
 
 /**
  * Prepares the retry-submit handoff after a successful local rebase.

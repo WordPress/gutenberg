@@ -14,6 +14,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
  */
 import DistributedEditingStatus, {
 	DistributedEditingLocalRebaseStateInspector,
+	DistributedEditingFreshReviewDecisionPanel,
 	DistributedEditingRetrySaveControls,
 	DistributedEditingStatusChrome,
 	DistributedEditingStatusInspector,
@@ -26,6 +27,7 @@ import DistributedEditingStatus, {
 } from '../';
 import {
 	DISTRIBUTED_EDITING_DISPOSITIONS,
+	DISTRIBUTED_EDITING_FRESH_REVIEW_DECISION_STATUSES,
 	DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES,
 	DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES,
 	DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS,
@@ -122,6 +124,13 @@ function setupDistributedEditingStatusDispatch() {
 				result: 'fresh_review_request_accepted_for_admin_review',
 				accepted: true,
 				requested: true,
+			} ),
+		__experimentalResolveDistributedEditingFreshReviewDecisionItem: jest
+			.fn()
+			.mockResolvedValue( {
+				status: 'fresh_review_decision_item_resolved',
+				reviewStatus: 'approved_for_retry_save',
+				decisionReady: false,
 			} ),
 		__experimentalRefreshDistributedEditingRetrySubmitProof: jest
 			.fn()
@@ -2540,6 +2549,156 @@ describe( 'DistributedEditingStatusSurface', () => {
 				/proof_signature|reviewer_user_id|reviewed_block_items/i
 			)
 		).not.toBeInTheDocument();
+	} );
+
+	it( 'renders requested fresh-review decision readiness without raw descriptor content', () => {
+		const noticeDescriptors =
+			getDistributedEditingNoticeDescriptorsForSessionState( {
+				pendingChangeCount: 1,
+				canExportLocalUpdates: true,
+				localUpdatesImportStatus:
+					DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_STATUSES.BLOCKED,
+				localUpdatesImportReason:
+					DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.FRESH_REVIEW_REQUIRED,
+				localUpdatesImportReviewRequestStatus:
+					DISTRIBUTED_EDITING_LOCAL_UPDATES_REVIEW_REQUEST_STATUSES.REQUESTED,
+				localUpdatesImportFreshReviewRequestAccepted: true,
+				localUpdatesImportFreshReviewRequestRequested: true,
+				localUpdatesImportFreshReviewRequestResult:
+					'fresh_review_request_accepted_for_admin_review',
+				localUpdatesImportFreshReviewDecisionStatus:
+					DISTRIBUTED_EDITING_FRESH_REVIEW_DECISION_STATUSES.AWAITING_REVIEW,
+				localUpdatesImportFreshReviewDecisionPanelRequired: true,
+				localUpdatesImportFreshReviewDecisionItems: [
+					{
+						id: 'fresh-risk-html',
+						blockLabel: 'Custom HTML change',
+						proposedContentHash:
+							'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+						rawBlockContent:
+							'<script>fresh-review-raw-content</script>',
+						proofSignature: 'fresh-review-proof-signature',
+						reviewerId: 7,
+					},
+				],
+			} );
+
+		render(
+			<DistributedEditingStatusSurface
+				noticeDescriptors={ noticeDescriptors }
+			/>
+		);
+
+		expect( screen.getByText( 'Fresh review requested' ) ).toBeVisible();
+		expect(
+			screen.getByText(
+				'Fresh review request was accepted. A reviewer can approve or reject the hash-only block decisions in the internal review panel; no retry save or normal save was made.'
+			)
+		).toBeVisible();
+		expect(
+			screen.queryByText(
+				/fresh-review-raw-content|fresh-review-proof-signature|reviewerId|reviewed_block_items/i
+			)
+		).not.toBeInTheDocument();
+		expect(
+			screen.queryByRole( 'button', { name: /save/i } )
+		).not.toBeInTheDocument();
+	} );
+
+	it( 'renders the internal fresh-review decision panel with approve and reject controls', async () => {
+		const user = userEvent.setup();
+		const actions = setupDistributedEditingStatusDispatch();
+
+		setupDistributedEditingStatusSelect( {
+			sessionState: {
+				pendingChangeCount: 1,
+				hasPendingChanges: true,
+				canExportLocalUpdates: true,
+				localUpdatesImportStatus:
+					DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_STATUSES.BLOCKED,
+				localUpdatesImportReason:
+					DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.FRESH_REVIEW_REQUIRED,
+				localUpdatesImportReviewRequestStatus:
+					DISTRIBUTED_EDITING_LOCAL_UPDATES_REVIEW_REQUEST_STATUSES.REQUESTED,
+				localUpdatesImportFreshReviewRequestAccepted: true,
+				localUpdatesImportFreshReviewRequestRequested: true,
+				localUpdatesImportFreshReviewDecisionStatus:
+					DISTRIBUTED_EDITING_FRESH_REVIEW_DECISION_STATUSES.AWAITING_REVIEW,
+				localUpdatesImportFreshReviewDecisionPanelRequired: true,
+				localUpdatesImportFreshReviewDecisionItems: [
+					{
+						id: 'fresh-approve',
+						blockLabel: 'Approve HTML change',
+						proposedContentHash:
+							'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb',
+						rawBlockContent:
+							'<script>fresh-approve-raw-content</script>',
+					},
+					{
+						id: 'fresh-reject',
+						blockLabel: 'Reject HTML change',
+						proposedContentHash:
+							'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc',
+						rawBlockContent:
+							'<script>fresh-reject-raw-content</script>',
+					},
+				],
+			},
+		} );
+
+		render( <DistributedEditingFreshReviewDecisionPanel /> );
+
+		expect(
+			screen.getByRole( 'group', {
+				name: 'Distributed editing fresh review decisions',
+			} )
+		).toBeVisible();
+		expect( screen.getByText( 'Fresh review decisions' ) ).toBeVisible();
+		expect( screen.getByText( 'Awaiting review' ) ).toBeVisible();
+		expect( screen.getByText( 'Approve HTML change' ) ).toBeVisible();
+		expect( screen.getByText( 'Reject HTML change' ) ).toBeVisible();
+
+		await user.click(
+			screen.getByRole( 'button', {
+				name: 'Approve Approve HTML change',
+			} )
+		);
+		await user.click(
+			screen.getByRole( 'button', {
+				name: 'Reject Reject HTML change',
+			} )
+		);
+
+		expect(
+			actions.__experimentalResolveDistributedEditingFreshReviewDecisionItem
+		).toHaveBeenCalledWith( {
+			reviewItemId: 'fresh-approve',
+			decision: 'approved',
+			rejectionReason: null,
+		} );
+		expect(
+			actions.__experimentalResolveDistributedEditingFreshReviewDecisionItem
+		).toHaveBeenCalledWith( {
+			reviewItemId: 'fresh-reject',
+			decision: 'rejected',
+			rejectionReason: 'reviewer_rejected',
+		} );
+		expect(
+			actions.__experimentalSaveDistributedEditingRetryAfterProof
+		).not.toHaveBeenCalled();
+		expect(
+			actions.__experimentalRequestDistributedEditingFreshReviewForImportedLocalUpdates
+		).not.toHaveBeenCalled();
+		expect(
+			screen.queryByText(
+				/fresh-approve-raw-content|fresh-reject-raw-content/i
+			)
+		).not.toBeInTheDocument();
+		expect(
+			await screen.findByText(
+				'Fresh-review decision recorded locally. No save was made, and the reviewed-block evidence remains hash-only.'
+			)
+		).toBeVisible();
 	} );
 
 	it( 'renders retry-submit save readiness without claiming completion', () => {

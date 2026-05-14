@@ -15,6 +15,7 @@ import { store as preferencesStore } from '@wordpress/preferences';
 import * as actions from '../actions';
 import {
 	DISTRIBUTED_EDITING_DISPOSITIONS,
+	DISTRIBUTED_EDITING_FRESH_REVIEW_DECISION_STATUSES,
 	DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES,
 	DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES,
 	DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS,
@@ -1920,6 +1921,142 @@ describe( 'Post actions', () => {
 				canExportLocalUpdates: true,
 				mustOfferLocalCopy: true,
 			} );
+		} );
+
+		it( 'records requested fresh-review approve and reject decisions without saving or transport', async () => {
+			const registry = setupImportEditor();
+			let apiFetchCallCount = 0;
+
+			apiFetch.setFetchHandler( async () => {
+				apiFetchCallCount++;
+				throw new Error(
+					'Fresh-review decision actions must not call apiFetch.'
+				);
+			} );
+			registry
+				.dispatch( editorStore )
+				.setDistributedEditingSessionState( {
+					pendingChangeCount: 1,
+					hasPendingChanges: true,
+					canExportLocalUpdates: true,
+					localUpdatesImportStatus:
+						DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_STATUSES.BLOCKED,
+					localUpdatesImportReason:
+						DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.FRESH_REVIEW_REQUIRED,
+					localUpdatesImportReviewRequestStatus:
+						DISTRIBUTED_EDITING_LOCAL_UPDATES_REVIEW_REQUEST_STATUSES.REQUESTED,
+					localUpdatesImportFreshReviewRequestAccepted: true,
+					localUpdatesImportFreshReviewRequestRequested: true,
+				} );
+
+			const loadResult = await registry
+				.dispatch( editorStore )
+				.__experimentalLoadDistributedEditingFreshReviewDecisionItems( [
+					{
+						id: 'fresh-approve',
+						blockLabel: 'Approve HTML change',
+						proposedContentHash: approvedPostContentHash,
+						rawBlockContent: '<script>do not leak</script>',
+					},
+					{
+						id: 'fresh-reject',
+						blockLabel: 'Reject HTML change',
+						proposedContentHash: candidatePostContentHash,
+						rawBlockContent:
+							'<script>do not leak rejected</script>',
+					},
+				] );
+			const approveResult = await registry
+				.dispatch( editorStore )
+				.__experimentalResolveDistributedEditingFreshReviewDecisionItem(
+					{
+						reviewItemId: 'fresh-approve',
+						decision: 'approved',
+					}
+				);
+			const rejectResult = await registry
+				.dispatch( editorStore )
+				.__experimentalResolveDistributedEditingFreshReviewDecisionItem(
+					{
+						reviewItemId: 'fresh-reject',
+						decision: 'rejected',
+						rejectionReason: 'unsafe_script_change',
+					}
+				);
+
+			expect( loadResult ).toMatchObject( {
+				status: DISTRIBUTED_EDITING_FRESH_REVIEW_DECISION_STATUSES.AWAITING_REVIEW,
+				loadsDecisionItems: true,
+				reviewItemCount: 2,
+				pendingReviewItemCount: 2,
+				savesPost: false,
+				callsNormalSavePost: false,
+				callsRetrySaveEndpoint: false,
+				dispatchesNotice: false,
+				mutatesEditorContent: false,
+				changesPostLock: false,
+				claimsSaved: false,
+			} );
+			expect( approveResult ).toMatchObject( {
+				status: 'fresh_review_decision_item_resolved',
+				reviewItemId: 'fresh-approve',
+				reviewStatus:
+					DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES.APPROVED_FOR_RETRY_SAVE,
+				decisionReady: false,
+				savesPost: false,
+				callsNormalSavePost: false,
+				callsRetrySaveEndpoint: false,
+				mutatesEditorContent: false,
+				changesPostLock: false,
+				claimsSaved: false,
+			} );
+			expect( rejectResult ).toMatchObject( {
+				status: 'fresh_review_decision_item_resolved',
+				reviewItemId: 'fresh-reject',
+				reviewStatus:
+					DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES.REJECTED,
+				pendingReviewItemCount: 0,
+				approvedReviewItemCount: 1,
+				rejectedReviewItemCount: 1,
+				decisionReady: true,
+				savesPost: false,
+				callsNormalSavePost: false,
+				callsRetrySaveEndpoint: false,
+				dispatchesNotice: false,
+				mutatesEditorContent: false,
+				changesPostLock: false,
+				claimsSaved: false,
+			} );
+			expect( apiFetchCallCount ).toBe( 0 );
+			expect(
+				registry.select( editorStore ).getEditedPostContent()
+			).toBe( 'original content' );
+			expect( registry.select( editorStore ).isPostSavingLocked() ).toBe(
+				false
+			);
+			expect( registry.select( noticesStore ).getNotices() ).toEqual(
+				[]
+			);
+			expect(
+				registry
+					.select( editorStore )
+					.getDistributedEditingFreshReviewDecisionState()
+			).toMatchObject( {
+				status: DISTRIBUTED_EDITING_FRESH_REVIEW_DECISION_STATUSES.READY,
+				ready: true,
+				reviewedBlockItemCount: 2,
+				savesPost: false,
+				callsNormalSavePost: false,
+				callsRetrySaveEndpoint: false,
+				claimsSaved: false,
+			} );
+			expect(
+				JSON.stringify(
+					registry
+						.select( editorStore )
+						.getDistributedEditingFreshReviewDecisionState()
+				)
+			).not.toContain( '<script>do not leak' );
 		} );
 	} );
 

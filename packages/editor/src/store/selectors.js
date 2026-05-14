@@ -32,6 +32,7 @@ import { unlock } from '../lock-unlock';
 import { getTemplateInfo } from '../utils/get-template-info';
 import {
 	DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE,
+	getDistributedEditingFreshReviewDecisionStateForSessionState,
 	getDistributedEditingLocalUpdatesImportReviewRequestStateForSessionState,
 	getDistributedEditingNoticeDescriptorsForSessionState,
 	getDistributedEditingRiskyBlockReviewStateForSessionState,
@@ -523,6 +524,19 @@ export function getDistributedEditingLocalUpdatesImportReviewRequestState(
 	state
 ) {
 	return getDistributedEditingLocalUpdatesImportReviewRequestStateForSessionState(
+		getDistributedEditingSessionState( state )
+	);
+}
+
+/**
+ * Returns the current DE-RTC fresh-review decision state.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {Object} Fresh-review decision state.
+ */
+export function getDistributedEditingFreshReviewDecisionState( state ) {
+	return getDistributedEditingFreshReviewDecisionStateForSessionState(
 		getDistributedEditingSessionState( state )
 	);
 }

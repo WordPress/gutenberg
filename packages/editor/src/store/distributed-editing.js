@@ -372,6 +372,18 @@ export const DISTRIBUTED_EDITING_LOCAL_UPDATES_REVIEW_REQUEST_STATUSES =
 		REJECTED_MALFORMED_SYNC_PAYLOAD: 'rejected_malformed_sync_payload',
 	} );
 
+/**
+ * Stable local fresh-review decision statuses for requested imports. These are
+ * proof-opaque editor states only; they do not save or submit proof.
+ */
+export const DISTRIBUTED_EDITING_FRESH_REVIEW_DECISION_STATUSES = Object.freeze(
+	{
+		NONE: 'none',
+		AWAITING_REVIEW: 'awaiting_review',
+		READY: 'ready',
+	}
+);
+
 const VALID_REASON_CODES = new Set(
 	Object.values( DISTRIBUTED_EDITING_REASON_CODES )
 );
@@ -428,6 +440,10 @@ const VALID_LOCAL_UPDATES_IMPORT_STATUSES = new Set(
 
 const VALID_LOCAL_UPDATES_REVIEW_REQUEST_STATUSES = new Set(
 	Object.values( DISTRIBUTED_EDITING_LOCAL_UPDATES_REVIEW_REQUEST_STATUSES )
+);
+
+const VALID_FRESH_REVIEW_DECISION_STATUSES = new Set(
+	Object.values( DISTRIBUTED_EDITING_FRESH_REVIEW_DECISION_STATUSES )
 );
 
 const NOTICE_ID_BY_KIND = Object.freeze( {
@@ -600,6 +616,30 @@ export const DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE = Object.freeze( {
 	localUpdatesImportFreshReviewRequestMutatesPostContent: false,
 	localUpdatesImportFreshReviewRequestCreatesRevision: false,
 	localUpdatesImportFreshReviewRequestClaimsSaved: false,
+	localUpdatesImportFreshReviewDecisionStatus:
+		DISTRIBUTED_EDITING_FRESH_REVIEW_DECISION_STATUSES.NONE,
+	localUpdatesImportFreshReviewDecisionReason: null,
+	localUpdatesImportFreshReviewDecisionItems: [],
+	localUpdatesImportFreshReviewDecisionItemCount: 0,
+	localUpdatesImportFreshReviewDecisionPendingCount: 0,
+	localUpdatesImportFreshReviewDecisionApprovedCount: 0,
+	localUpdatesImportFreshReviewDecisionRejectedCount: 0,
+	localUpdatesImportFreshReviewDecisionPanelRequired: false,
+	localUpdatesImportFreshReviewDecisionReady: false,
+	localUpdatesImportFreshReviewDecisionReviewedBlockItems: [],
+	localUpdatesImportFreshReviewDecisionReviewedBlockItemCount: 0,
+	localUpdatesImportFreshReviewDecisionSavesPost: false,
+	localUpdatesImportFreshReviewDecisionCallsNormalSavePost: false,
+	localUpdatesImportFreshReviewDecisionCallsRetrySaveEndpoint: false,
+	localUpdatesImportFreshReviewDecisionDispatchesNotice: false,
+	localUpdatesImportFreshReviewDecisionMutatesEditorContent: false,
+	localUpdatesImportFreshReviewDecisionMutatesPersistedPostContent: false,
+	localUpdatesImportFreshReviewDecisionChangesPostLock: false,
+	localUpdatesImportFreshReviewDecisionClaimsSaved: false,
+	localUpdatesImportFreshReviewDecisionRawContentIncluded: false,
+	localUpdatesImportFreshReviewDecisionExposesRawContent: false,
+	localUpdatesImportFreshReviewDecisionExposesProofSignature: false,
+	localUpdatesImportFreshReviewDecisionExposesReviewerIds: false,
 	riskyBlockReviewStatus:
 		DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_STATUSES.NONE,
 	riskyBlockReviewReasonCode: null,
@@ -857,6 +897,13 @@ export function normalizeDistributedEditingSessionState( sessionState = {} ) {
 			DISTRIBUTED_EDITING_LOCAL_UPDATES_REVIEW_REQUEST_STATUSES.REQUESTED
 			? DISTRIBUTED_EDITING_NOTICE_ACTIONS.REQUEST_FRESH_REVIEW
 			: null;
+	const freshReviewDecisionFields = normalizeFreshReviewDecisionFields(
+		sessionState,
+		{
+			localUpdatesImportRequiresFreshReview,
+			localUpdatesImportReviewRequestStatus,
+		}
+	);
 	const riskyBlockReviewFields =
 		normalizeRiskyBlockReviewMetadataFields( sessionState );
 	const hasPendingRiskyBlockReviewItems =
@@ -1037,6 +1084,7 @@ export function normalizeDistributedEditingSessionState( sessionState = {} ) {
 		localUpdatesImportFreshReviewRequestClaimsSaved: Boolean(
 			sessionState.localUpdatesImportFreshReviewRequestClaimsSaved
 		),
+		...freshReviewDecisionFields,
 		...riskyBlockReviewFields,
 		requiresManualConflictResolution,
 		mustOfferLocalCopy,
@@ -1160,6 +1208,190 @@ export function getDistributedEditingLocalUpdatesImportReviewRequestStateForSess
 		exposesReviewerIds: false,
 		exposesRawContent: false,
 	};
+}
+
+/**
+ * Returns proof-opaque fresh-review decision state for internal reviewer
+ * panels and status surfaces. It may expose hash-only reviewed-block evidence,
+ * but it must not expose raw content, proof signatures, or reviewer identity.
+ *
+ * @param {Object} sessionState DE-RTC session state.
+ *
+ * @return {Object} Fresh-review decision state.
+ */
+export function getDistributedEditingFreshReviewDecisionStateForSessionState(
+	sessionState = {}
+) {
+	const normalized = normalizeDistributedEditingSessionState( sessionState );
+
+	return {
+		status: normalized.localUpdatesImportFreshReviewDecisionStatus,
+		reason: normalized.localUpdatesImportFreshReviewDecisionReason,
+		requestStatus: normalized.localUpdatesImportReviewRequestStatus,
+		requestResult: normalized.localUpdatesImportFreshReviewRequestResult,
+		requestRestRoute:
+			normalized.localUpdatesImportFreshReviewRequestRestRoute,
+		requested: normalized.localUpdatesImportFreshReviewRequestRequested,
+		accepted: normalized.localUpdatesImportFreshReviewRequestAccepted,
+		panelRequired:
+			normalized.localUpdatesImportFreshReviewDecisionPanelRequired,
+		ready: normalized.localUpdatesImportFreshReviewDecisionReady,
+		reviewItems: normalized.localUpdatesImportFreshReviewDecisionItems,
+		reviewItemCount:
+			normalized.localUpdatesImportFreshReviewDecisionItemCount,
+		pendingReviewItemCount:
+			normalized.localUpdatesImportFreshReviewDecisionPendingCount,
+		approvedReviewItemCount:
+			normalized.localUpdatesImportFreshReviewDecisionApprovedCount,
+		rejectedReviewItemCount:
+			normalized.localUpdatesImportFreshReviewDecisionRejectedCount,
+		reviewedBlockItems:
+			normalized.localUpdatesImportFreshReviewDecisionReviewedBlockItems,
+		reviewedBlockItemCount:
+			normalized.localUpdatesImportFreshReviewDecisionReviewedBlockItemCount,
+		canExportLocalUpdates: normalized.canExportLocalUpdates,
+		savesPost: false,
+		callsNormalSavePost: false,
+		callsRetrySaveEndpoint: false,
+		dispatchesNotice: false,
+		mutatesEditorContent: false,
+		mutatesPersistedPostContent: false,
+		changesPostLock: false,
+		claimsSaved: false,
+		rawContentIncluded: false,
+		exposesRawContent: false,
+		exposesProofSignature: false,
+		exposesReviewerIds: false,
+	};
+}
+
+/**
+ * Returns editor state after loading hash-only reviewed-block evidence for a
+ * requested fresh review. This only prepares an internal decision panel.
+ *
+ * @param {Object} currentSessionState Current DE-RTC session state.
+ * @param {Object} decision            Decision evidence inputs.
+ *
+ * @return {Object} Normalized DE-RTC session state.
+ */
+export function getDistributedEditingSessionStateForFreshReviewDecisionItems(
+	currentSessionState = {},
+	decision = {}
+) {
+	const normalized =
+		normalizeDistributedEditingSessionState( currentSessionState );
+
+	if (
+		! normalized.localUpdatesImportRequiresFreshReview ||
+		normalized.localUpdatesImportReviewRequestStatus !==
+			DISTRIBUTED_EDITING_LOCAL_UPDATES_REVIEW_REQUEST_STATUSES.REQUESTED
+	) {
+		return normalized;
+	}
+
+	return normalizeDistributedEditingSessionState( {
+		...normalized,
+		localUpdatesImportFreshReviewDecisionStatus:
+			DISTRIBUTED_EDITING_FRESH_REVIEW_DECISION_STATUSES.AWAITING_REVIEW,
+		localUpdatesImportFreshReviewDecisionReason: normalizeNullableString(
+			decision.reason
+		),
+		localUpdatesImportFreshReviewDecisionItems:
+			decision.reviewItems ||
+			decision.reviewedBlockItems ||
+			decision.items ||
+			[],
+		localUpdatesImportFreshReviewDecisionPanelRequired: true,
+		mustOfferLocalCopy: true,
+		canExportLocalUpdates: true,
+	} );
+}
+
+/**
+ * Returns editor state after one fresh-review decision is approved or rejected.
+ * The state remains proof-opaque and no-write.
+ *
+ * @param {Object} currentSessionState Current DE-RTC session state.
+ * @param {Object} resolution          Review decision data.
+ *
+ * @return {Object} Normalized DE-RTC session state.
+ */
+export function getDistributedEditingSessionStateForFreshReviewDecisionItemResolution(
+	currentSessionState = {},
+	resolution = {}
+) {
+	const normalized =
+		normalizeDistributedEditingSessionState( currentSessionState );
+	const reviewItemId = normalizeNullableString(
+		resolution.reviewItemId || resolution.id
+	);
+
+	if (
+		! normalized.localUpdatesImportRequiresFreshReview ||
+		normalized.localUpdatesImportReviewRequestStatus !==
+			DISTRIBUTED_EDITING_LOCAL_UPDATES_REVIEW_REQUEST_STATUSES.REQUESTED ||
+		! reviewItemId
+	) {
+		return normalized;
+	}
+
+	const reviewItems =
+		normalized.localUpdatesImportFreshReviewDecisionItems.map( ( item ) => {
+			if ( item.id !== reviewItemId ) {
+				return item;
+			}
+
+			const reviewStatus =
+				resolution.decision === 'rejected'
+					? DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES.REJECTED
+					: DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES.APPROVED_FOR_RETRY_SAVE;
+
+			return normalizeFreshReviewDecisionItem( {
+				...item,
+				reviewStatus,
+				reviewedProposedContentHash:
+					resolution.reviewedProposedContentHash ||
+					resolution.reviewed_proposed_content_hash ||
+					item.reviewedProposedContentHash ||
+					item.proposedContentHash,
+				rejectionReason:
+					reviewStatus ===
+					DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES.REJECTED
+						? resolution.rejectionReason ||
+						  resolution.rejection_reason ||
+						  'reviewer_rejected'
+						: null,
+			} );
+		} );
+
+	return normalizeDistributedEditingSessionState( {
+		...normalized,
+		localUpdatesImportFreshReviewDecisionItems: reviewItems,
+		localUpdatesImportFreshReviewDecisionPanelRequired: true,
+		mustOfferLocalCopy: true,
+		canExportLocalUpdates: true,
+	} );
+}
+
+/**
+ * Builds hash-only reviewed-block decision evidence for a future fresh-review
+ * proof endpoint. It does not include raw content or reviewer identity.
+ *
+ * @param {Object} sessionState Current DE-RTC session state.
+ * @param {Object} [options]    Optional explicit source items.
+ *
+ * @return {Array} Hash-only reviewed block decision items.
+ */
+export function getDistributedEditingReviewedBlockItemsForFreshReviewDecision(
+	sessionState = {},
+	options = {}
+) {
+	const sourceItems = Array.isArray( options.reviewedBlockItems )
+		? normalizeFreshReviewDecisionItems( options.reviewedBlockItems )
+		: normalizeDistributedEditingSessionState( sessionState )
+				.localUpdatesImportFreshReviewDecisionItems;
+
+	return getFreshReviewDecisionReviewedBlockItemsFromItems( sourceItems );
 }
 
 function getDistributedEditingReviewTokenRecoveryReasonFromRetrySave( {
@@ -2735,6 +2967,48 @@ export function getDistributedEditingNoticeDescriptorsForSessionState(
 						localUpdatesImportReviewRequest.requestCreatesRevision,
 					localUpdatesImportFreshReviewRequestClaimsSaved:
 						localUpdatesImportReviewRequest.requestClaimsSaved,
+					localUpdatesImportFreshReviewDecisionStatus:
+						normalized.localUpdatesImportFreshReviewDecisionStatus,
+					localUpdatesImportFreshReviewDecisionReason:
+						normalized.localUpdatesImportFreshReviewDecisionReason,
+					localUpdatesImportFreshReviewDecisionPanelRequired:
+						normalized.localUpdatesImportFreshReviewDecisionPanelRequired,
+					localUpdatesImportFreshReviewDecisionReady:
+						normalized.localUpdatesImportFreshReviewDecisionReady,
+					localUpdatesImportFreshReviewDecisionItemCount:
+						normalized.localUpdatesImportFreshReviewDecisionItemCount,
+					localUpdatesImportFreshReviewDecisionPendingCount:
+						normalized.localUpdatesImportFreshReviewDecisionPendingCount,
+					localUpdatesImportFreshReviewDecisionApprovedCount:
+						normalized.localUpdatesImportFreshReviewDecisionApprovedCount,
+					localUpdatesImportFreshReviewDecisionRejectedCount:
+						normalized.localUpdatesImportFreshReviewDecisionRejectedCount,
+					localUpdatesImportFreshReviewDecisionReviewedBlockItemCount:
+						normalized.localUpdatesImportFreshReviewDecisionReviewedBlockItemCount,
+					localUpdatesImportFreshReviewDecisionSavesPost:
+						normalized.localUpdatesImportFreshReviewDecisionSavesPost,
+					localUpdatesImportFreshReviewDecisionCallsNormalSavePost:
+						normalized.localUpdatesImportFreshReviewDecisionCallsNormalSavePost,
+					localUpdatesImportFreshReviewDecisionCallsRetrySaveEndpoint:
+						normalized.localUpdatesImportFreshReviewDecisionCallsRetrySaveEndpoint,
+					localUpdatesImportFreshReviewDecisionDispatchesNotice:
+						normalized.localUpdatesImportFreshReviewDecisionDispatchesNotice,
+					localUpdatesImportFreshReviewDecisionMutatesEditorContent:
+						normalized.localUpdatesImportFreshReviewDecisionMutatesEditorContent,
+					localUpdatesImportFreshReviewDecisionMutatesPersistedPostContent:
+						normalized.localUpdatesImportFreshReviewDecisionMutatesPersistedPostContent,
+					localUpdatesImportFreshReviewDecisionChangesPostLock:
+						normalized.localUpdatesImportFreshReviewDecisionChangesPostLock,
+					localUpdatesImportFreshReviewDecisionClaimsSaved:
+						normalized.localUpdatesImportFreshReviewDecisionClaimsSaved,
+					localUpdatesImportFreshReviewDecisionRawContentIncluded:
+						normalized.localUpdatesImportFreshReviewDecisionRawContentIncluded,
+					localUpdatesImportFreshReviewDecisionExposesRawContent:
+						normalized.localUpdatesImportFreshReviewDecisionExposesRawContent,
+					localUpdatesImportFreshReviewDecisionExposesProofSignature:
+						normalized.localUpdatesImportFreshReviewDecisionExposesProofSignature,
+					localUpdatesImportFreshReviewDecisionExposesReviewerIds:
+						normalized.localUpdatesImportFreshReviewDecisionExposesReviewerIds,
 					localUpdatesImportRequiresFreshReview:
 						localUpdatesImportReviewRequest.requiresFreshReview,
 					localUpdatesImportStatus:
@@ -5523,6 +5797,224 @@ function normalizeRetrySaveReviewApprovalReviewedBlockItem( item = {} ) {
 		rawContentIncluded: false,
 		exposesRawContent: false,
 	};
+}
+
+function normalizeFreshReviewDecisionFields(
+	sessionState = {},
+	{
+		localUpdatesImportRequiresFreshReview = false,
+		localUpdatesImportReviewRequestStatus = DISTRIBUTED_EDITING_LOCAL_UPDATES_REVIEW_REQUEST_STATUSES.NONE,
+	} = {}
+) {
+	const freshReviewRequested =
+		localUpdatesImportRequiresFreshReview &&
+		localUpdatesImportReviewRequestStatus ===
+			DISTRIBUTED_EDITING_LOCAL_UPDATES_REVIEW_REQUEST_STATUSES.REQUESTED;
+	const decisionItems = freshReviewRequested
+		? normalizeFreshReviewDecisionItems(
+				getFirstDefined(
+					sessionState.localUpdatesImportFreshReviewDecisionItems,
+					sessionState.freshReviewDecisionItems
+				)
+		  )
+		: [];
+	const pendingDecisionCount = countRiskyBlockReviewItemsByStatus(
+		decisionItems,
+		DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES.PENDING_REVIEW
+	);
+	const approvedDecisionCount = countRiskyBlockReviewItemsByStatus(
+		decisionItems,
+		DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES.APPROVED_FOR_RETRY_SAVE
+	);
+	const rejectedDecisionCount = countRiskyBlockReviewItemsByStatus(
+		decisionItems,
+		DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES.REJECTED
+	);
+	const decisionReady =
+		freshReviewRequested &&
+		decisionItems.length > 0 &&
+		pendingDecisionCount === 0;
+	const requestedDecisionStatus = VALID_FRESH_REVIEW_DECISION_STATUSES.has(
+		sessionState.localUpdatesImportFreshReviewDecisionStatus
+	)
+		? sessionState.localUpdatesImportFreshReviewDecisionStatus
+		: DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE.localUpdatesImportFreshReviewDecisionStatus;
+	let decisionStatus =
+		DISTRIBUTED_EDITING_FRESH_REVIEW_DECISION_STATUSES.NONE;
+
+	if ( freshReviewRequested ) {
+		if ( decisionReady ) {
+			decisionStatus =
+				DISTRIBUTED_EDITING_FRESH_REVIEW_DECISION_STATUSES.READY;
+		} else if (
+			decisionItems.length > 0 ||
+			Boolean(
+				sessionState.localUpdatesImportFreshReviewDecisionPanelRequired
+			) ||
+			requestedDecisionStatus !==
+				DISTRIBUTED_EDITING_FRESH_REVIEW_DECISION_STATUSES.NONE
+		) {
+			decisionStatus =
+				DISTRIBUTED_EDITING_FRESH_REVIEW_DECISION_STATUSES.AWAITING_REVIEW;
+		}
+	}
+
+	const reviewedBlockItems = decisionReady
+		? getFreshReviewDecisionReviewedBlockItemsFromItems( decisionItems )
+		: [];
+
+	return {
+		localUpdatesImportFreshReviewDecisionStatus: decisionStatus,
+		localUpdatesImportFreshReviewDecisionReason: freshReviewRequested
+			? normalizeNullableString(
+					sessionState.localUpdatesImportFreshReviewDecisionReason
+			  )
+			: null,
+		localUpdatesImportFreshReviewDecisionItems: decisionItems,
+		localUpdatesImportFreshReviewDecisionItemCount: decisionItems.length,
+		localUpdatesImportFreshReviewDecisionPendingCount: pendingDecisionCount,
+		localUpdatesImportFreshReviewDecisionApprovedCount:
+			approvedDecisionCount,
+		localUpdatesImportFreshReviewDecisionRejectedCount:
+			rejectedDecisionCount,
+		localUpdatesImportFreshReviewDecisionPanelRequired:
+			freshReviewRequested &&
+			( decisionItems.length > 0 ||
+				decisionStatus ===
+					DISTRIBUTED_EDITING_FRESH_REVIEW_DECISION_STATUSES.AWAITING_REVIEW ),
+		localUpdatesImportFreshReviewDecisionReady: decisionReady,
+		localUpdatesImportFreshReviewDecisionReviewedBlockItems:
+			reviewedBlockItems,
+		localUpdatesImportFreshReviewDecisionReviewedBlockItemCount:
+			reviewedBlockItems.length,
+		localUpdatesImportFreshReviewDecisionSavesPost: false,
+		localUpdatesImportFreshReviewDecisionCallsNormalSavePost: false,
+		localUpdatesImportFreshReviewDecisionCallsRetrySaveEndpoint: false,
+		localUpdatesImportFreshReviewDecisionDispatchesNotice: false,
+		localUpdatesImportFreshReviewDecisionMutatesEditorContent: false,
+		localUpdatesImportFreshReviewDecisionMutatesPersistedPostContent: false,
+		localUpdatesImportFreshReviewDecisionChangesPostLock: false,
+		localUpdatesImportFreshReviewDecisionClaimsSaved: false,
+		localUpdatesImportFreshReviewDecisionRawContentIncluded: false,
+		localUpdatesImportFreshReviewDecisionExposesRawContent: false,
+		localUpdatesImportFreshReviewDecisionExposesProofSignature: false,
+		localUpdatesImportFreshReviewDecisionExposesReviewerIds: false,
+	};
+}
+
+function normalizeFreshReviewDecisionItems( value ) {
+	if ( ! Array.isArray( value ) ) {
+		return [];
+	}
+
+	return value
+		.map( ( item ) => normalizeFreshReviewDecisionItem( item ) )
+		.filter( ( item ) => item.id !== null );
+}
+
+function normalizeFreshReviewDecisionItem( item = {} ) {
+	const proposedContentHash = normalizeNullableString(
+		getFirstDefined( item.proposedContentHash, item.proposed_content_hash )
+	);
+	const reviewStatus = [
+		DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES.PENDING_REVIEW,
+		DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES.APPROVED_FOR_RETRY_SAVE,
+		DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES.REJECTED,
+	].includes( getFirstDefined( item.reviewStatus, item.review_status ) )
+		? getFirstDefined( item.reviewStatus, item.review_status )
+		: DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES.PENDING_REVIEW;
+
+	return {
+		id: normalizeNullableString( item.id ),
+		blockClientId: normalizeNullableString(
+			getFirstDefined( item.blockClientId, item.block_client_id )
+		),
+		blockName: normalizeNullableString(
+			getFirstDefined( item.blockName, item.block_name )
+		),
+		blockLabel: normalizeNullableString(
+			getFirstDefined( item.blockLabel, item.block_label )
+		),
+		blockPath: normalizeBlockPath(
+			getFirstDefined( item.blockPath, item.block_path )
+		),
+		changeKind: normalizeNullableString(
+			getFirstDefined( item.changeKind, item.change_kind )
+		),
+		riskReason: normalizeNullableString(
+			getFirstDefined( item.riskReason, item.risk_reason )
+		),
+		baseContentHash: normalizeNullableString(
+			getFirstDefined( item.baseContentHash, item.base_content_hash )
+		),
+		proposedContentHash,
+		reviewedProposedContentHash:
+			normalizeNullableString(
+				getFirstDefined(
+					item.reviewedProposedContentHash,
+					item.reviewed_proposed_content_hash
+				)
+			) || proposedContentHash,
+		ksesFilteredContentHash: normalizeNullableString(
+			getFirstDefined(
+				item.ksesFilteredContentHash,
+				item.kses_filtered_content_hash
+			)
+		),
+		reviewStatus,
+		reviewEvidenceType:
+			normalizeNullableString(
+				getFirstDefined(
+					item.reviewEvidenceType,
+					item.review_evidence_type
+				)
+			) || 'kses_block_hash_only_change',
+		contentReviewPolicy:
+			normalizeNullableString(
+				getFirstDefined(
+					item.contentReviewPolicy,
+					item.content_review_policy
+				)
+			) || 'kses',
+		rejectionReason: normalizeNullableString(
+			getFirstDefined( item.rejectionReason, item.rejection_reason )
+		),
+		rawContentIncluded: false,
+		exposesRawContent: false,
+		exposesProofSignature: false,
+		exposesReviewerIds: false,
+	};
+}
+
+function getFreshReviewDecisionReviewedBlockItemsFromItems( decisionItems ) {
+	return decisionItems
+		.filter( ( item ) =>
+			[
+				DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES.APPROVED_FOR_RETRY_SAVE,
+				DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES.REJECTED,
+			].includes( item.reviewStatus )
+		)
+		.map( ( item ) => ( {
+			id: item.id,
+			blockClientId: item.blockClientId,
+			blockName: item.blockName,
+			blockLabel: item.blockLabel,
+			blockPath: item.blockPath,
+			changeKind: item.changeKind,
+			riskReason: item.riskReason,
+			baseContentHash: item.baseContentHash,
+			proposedContentHash: item.proposedContentHash,
+			reviewedProposedContentHash:
+				item.reviewedProposedContentHash || item.proposedContentHash,
+			ksesFilteredContentHash: item.ksesFilteredContentHash,
+			reviewStatus: item.reviewStatus,
+			reviewEvidenceType:
+				item.reviewEvidenceType || 'kses_block_hash_only_change',
+			contentReviewPolicy: item.contentReviewPolicy || 'kses',
+			rejectionReason: item.rejectionReason,
+			rawContentIncluded: false,
+			exposesRawContent: false,
+		} ) );
 }
 
 function normalizeRiskyBlockReviewMetadataFields( sessionState = {} ) {
