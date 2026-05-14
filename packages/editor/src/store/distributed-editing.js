@@ -914,6 +914,7 @@ export const DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE = Object.freeze( {
 		DISTRIBUTED_EDITING_LOCAL_UPDATES_REVIEW_REQUEST_STATUSES.NONE,
 	localUpdatesImportReviewRequestReason: null,
 	localUpdatesImportRequiresFreshReview: false,
+	localUpdatesImportActionTranscriptReport: null,
 	localUpdatesImportReviewActionKey: null,
 	localUpdatesImportFreshReviewRequestResult: null,
 	localUpdatesImportFreshReviewRequestAction: null,
@@ -1428,6 +1429,12 @@ export function normalizeDistributedEditingSessionState( sessionState = {} ) {
 			DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_STATUSES.BLOCKED &&
 		localUpdatesImportReason ===
 			DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.FRESH_REVIEW_REQUIRED;
+	const localUpdatesImportActionTranscriptReport =
+		localUpdatesImportRequiresFreshReview
+			? normalizeDistributedEditingLocalUpdatesImportActionTranscriptReport(
+					sessionState.localUpdatesImportActionTranscriptReport
+			  )
+			: null;
 	const requestedLocalUpdatesImportReviewRequestStatus =
 		VALID_LOCAL_UPDATES_REVIEW_REQUEST_STATUSES.has(
 			sessionState.localUpdatesImportReviewRequestStatus
@@ -1614,6 +1621,7 @@ export function normalizeDistributedEditingSessionState( sessionState = {} ) {
 			sessionState.localUpdatesImportReviewRequestReason
 		),
 		localUpdatesImportRequiresFreshReview,
+		localUpdatesImportActionTranscriptReport,
 		localUpdatesImportReviewActionKey,
 		localUpdatesImportFreshReviewRequestResult: normalizeNullableString(
 			sessionState.localUpdatesImportFreshReviewRequestResult
@@ -1892,6 +1900,68 @@ export function getDistributedEditingActionTranscriptSupportReportForSessionStat
 	};
 }
 
+function getDistributedEditingLocalUpdatesImportActionTranscriptReportFromPayload(
+	payload = {}
+) {
+	const actionTranscriptSource = normalizeObject(
+		getFirstDefined(
+			payload.actionTranscriptSummary,
+			payload.action_transcript_summary,
+			payload.actionTranscriptReport,
+			payload.action_transcript_report,
+			payload.actionTranscript,
+			payload.action_transcript
+		)
+	);
+	const actionTranscriptItems = getFirstDefined(
+		actionTranscriptSource.items,
+		actionTranscriptSource.actionTranscriptItems,
+		actionTranscriptSource.action_transcript_items,
+		actionTranscriptSource.timelineItems,
+		actionTranscriptSource.timeline_items,
+		payload.actionTranscriptItems,
+		payload.action_transcript_items
+	);
+
+	if ( ! Array.isArray( actionTranscriptItems ) ) {
+		return null;
+	}
+
+	const actionTranscriptDroppedItemCount = getFirstDefined(
+		actionTranscriptSource.droppedItemCount,
+		actionTranscriptSource.dropped_item_count,
+		actionTranscriptSource.actionTranscriptDroppedItemCount,
+		actionTranscriptSource.action_transcript_dropped_item_count,
+		payload.actionTranscriptDroppedItemCount,
+		payload.action_transcript_dropped_item_count,
+		0
+	);
+	const report =
+		getDistributedEditingActionTranscriptSupportReportForSessionState( {
+			actionTranscriptItems,
+			actionTranscriptDroppedItemCount,
+		} );
+
+	return report.available ? report : null;
+}
+
+function normalizeDistributedEditingLocalUpdatesImportActionTranscriptReport(
+	report
+) {
+	if ( ! report || typeof report !== 'object' ) {
+		return null;
+	}
+
+	const normalized =
+		getDistributedEditingLocalUpdatesImportActionTranscriptReportFromPayload(
+			{
+				actionTranscriptReport: report,
+			}
+		);
+
+	return normalized?.available ? normalized : null;
+}
+
 /**
  * Returns a pure recovery descriptor for failed opaque reviewed-proof token
  * handoffs. The descriptor is product communication state only; it does not
@@ -1964,6 +2034,9 @@ export function getDistributedEditingLocalUpdatesImportReviewRequestStateForSess
 		normalized.localUpdatesImportRequiresFreshReview &&
 			! hasConfirmedRetrySaveWithoutProtectedLocalChanges
 	);
+	const actionTranscriptReport = requiresFreshReview
+		? normalized.localUpdatesImportActionTranscriptReport
+		: null;
 
 	return {
 		status: normalized.localUpdatesImportReviewRequestStatus,
@@ -1999,6 +2072,12 @@ export function getDistributedEditingLocalUpdatesImportReviewRequestStateForSess
 			normalized.localUpdatesImportHasPostContent,
 		localUpdatesImportHasAcceptedReviewApprovalProof:
 			normalized.localUpdatesImportHasAcceptedReviewApprovalProof,
+		actionTranscriptReport,
+		hasActionTranscriptReport: Boolean( actionTranscriptReport?.available ),
+		canShowActionTranscriptReport: Boolean(
+			actionTranscriptReport?.available &&
+				actionTranscriptReport.canShareWithSupport
+		),
 		canExportLocalUpdates:
 			requiresFreshReview && normalized.canExportLocalUpdates,
 		hasProtectedLocalChanges,
@@ -3512,6 +3591,10 @@ export function getDistributedEditingLocalUpdatesImportResult( {
 					normalizedPayload.pending_change_count
 				),
 				verifiedPostContentHash: computedPostContentHash,
+				localUpdatesImportActionTranscriptReport:
+					getDistributedEditingLocalUpdatesImportActionTranscriptReportFromPayload(
+						normalizedPayload
+					),
 				currentSessionState,
 			}
 		);
@@ -4643,6 +4726,12 @@ export function getDistributedEditingNoticeDescriptorsForSessionState(
 						localUpdatesImportReviewRequest.localUpdatesImportHasPostContent,
 					localUpdatesImportHasAcceptedReviewApprovalProof:
 						localUpdatesImportReviewRequest.localUpdatesImportHasAcceptedReviewApprovalProof,
+					localUpdatesImportActionTranscriptReport:
+						localUpdatesImportReviewRequest.actionTranscriptReport,
+					localUpdatesImportHasActionTranscriptReport:
+						localUpdatesImportReviewRequest.hasActionTranscriptReport,
+					localUpdatesImportCanShowActionTranscriptReport:
+						localUpdatesImportReviewRequest.canShowActionTranscriptReport,
 					shouldCallRetrySaveEndpoint:
 						localUpdatesImportReviewRequest.shouldCallRetrySaveEndpoint,
 					shouldCallNormalSavePost:
@@ -11200,6 +11289,10 @@ function createLocalUpdatesImportBlockedResult( reason, options = {} ) {
 	const verifiedPostContentHash = normalizeSha256Hash(
 		options.verifiedPostContentHash
 	);
+	const actionTranscriptReport =
+		normalizeDistributedEditingLocalUpdatesImportActionTranscriptReport(
+			options.localUpdatesImportActionTranscriptReport
+		);
 	const normalizedCurrent = normalizeDistributedEditingSessionState(
 		options.currentSessionState
 	);
@@ -11235,6 +11328,7 @@ function createLocalUpdatesImportBlockedResult( reason, options = {} ) {
 		localUpdatesImportHasPostContent: false,
 		localUpdatesImportHasAcceptedReviewApprovalProof: false,
 		localUpdatesImportVerifiedPostContentHash: verifiedPostContentHash,
+		localUpdatesImportActionTranscriptReport: actionTranscriptReport,
 		canExportLocalUpdates: normalizedCurrent.canExportLocalUpdates,
 		mustOfferLocalCopy: normalizedCurrent.mustOfferLocalCopy,
 	} );
@@ -11250,6 +11344,11 @@ function createLocalUpdatesImportBlockedResult( reason, options = {} ) {
 		reviewRequestStatus: sessionState.localUpdatesImportReviewRequestStatus,
 		requiresFreshReview: sessionState.localUpdatesImportRequiresFreshReview,
 		reviewRequestActionKey: sessionState.localUpdatesImportReviewActionKey,
+		actionTranscriptReport:
+			sessionState.localUpdatesImportActionTranscriptReport,
+		hasActionTranscriptReport: Boolean(
+			sessionState.localUpdatesImportActionTranscriptReport?.available
+		),
 		sessionState,
 		mutatesEditorContent: false,
 		callsRetrySaveEndpoint: false,

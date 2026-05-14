@@ -1363,6 +1363,86 @@ describe( 'DistributedEditingStatus', () => {
 		}
 	);
 
+	it( 'shows fresh-review import action transcript reports without exposing raw payload details', async () => {
+		const user = userEvent.setup();
+		const actions = setupDistributedEditingStatusDispatch();
+
+		setupDistributedEditingStatusSelect( {
+			editorSettings: {
+				distributedEditing: {
+					enabled: true,
+				},
+			},
+		} );
+		actions.__experimentalImportDistributedEditingLocalUpdates.mockResolvedValue(
+			{
+				status: DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_STATUSES.BLOCKED,
+				reason: DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.FRESH_REVIEW_REQUIRED,
+				actionTranscriptReport: {
+					available: true,
+					canShareWithSupport: true,
+					chronologyText:
+						'Fresh-review guarded save confirmation was recorded; use save-authority evidence to confirm persistence.',
+					summaryText:
+						'Recorded 4 redacted transcript events; 2 unsafe entries were dropped.',
+					requiresSaveAuthorityForPersistence: true,
+					callsSave: false,
+					claimsSaved: false,
+				},
+				mutatesEditorContent: false,
+				callsRetrySaveEndpoint: false,
+				callsNormalSavePost: false,
+				dispatchesNotice: false,
+				changesPostLock: false,
+				claimsSaved: false,
+			}
+		);
+
+		render( <DistributedEditingStatusChrome /> );
+
+		await user.click(
+			screen.getByRole( 'button', {
+				name: 'Import reviewed changes',
+			} )
+		);
+		fireEvent.change(
+			screen.getByRole( 'textbox', {
+				name: 'Reviewed changes payload',
+			} ),
+			{
+				target: {
+					value: JSON.stringify( {
+						proofSignature: 'turn0146-hidden-proof',
+						reviewerId: 'turn0146-reviewer-id',
+						postContent: '<script>turn0146 raw content</script>',
+					} ),
+				},
+			}
+		);
+		await user.click(
+			screen.getByRole( 'button', {
+				name: 'Validate review proof and import',
+			} )
+		);
+
+		const status = await screen.findByRole( 'status' );
+		expect( status ).toHaveTextContent(
+			'Import blocked: this reviewed-changes handoff needs a fresh admin review before it can be imported for retry save. Nothing was imported, and local changes remain protected and exportable.'
+		);
+		expect( status ).toHaveTextContent(
+			'Fresh-review guarded save confirmation was recorded; use save-authority evidence to confirm persistence. Recorded 4 redacted transcript events; 2 unsafe entries were dropped.'
+		);
+		expect( status ).toHaveTextContent(
+			'This transcript is diagnostic only; save authority evidence is still required before treating these changes as saved.'
+		);
+		expect(
+			actions.__experimentalSaveDistributedEditingRetryAfterProof
+		).not.toHaveBeenCalled();
+		expect( status ).not.toHaveTextContent(
+			/turn0146-hidden-proof|turn0146-reviewer-id|turn0146 raw content|proofSignature|reviewerId|postContent/
+		);
+	} );
+
 	it( 'renders retry-save in-progress feedback from production editor chrome without saving', async () => {
 		const user = userEvent.setup();
 		const writeText = jest.fn().mockResolvedValue();

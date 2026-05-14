@@ -845,6 +845,11 @@ export function DistributedEditingLocalUpdatesImportControls( {
 		importResult,
 		normalized,
 	} );
+	const actionTranscriptReportMessage =
+		getLocalUpdatesImportActionTranscriptReportMessage(
+			importResult?.actionTranscriptReport ||
+				normalized.localUpdatesImportActionTranscriptReport
+		);
 
 	async function importLocalUpdates() {
 		setCommandStatus( 'running' );
@@ -936,6 +941,14 @@ export function DistributedEditingLocalUpdatesImportControls( {
 					role="status"
 				>
 					{ statusMessage }
+					{ actionTranscriptReportMessage && (
+						<>
+							{ ' ' }
+							<span className="editor-distributed-editing-status__local-updates-import-report">
+								{ actionTranscriptReportMessage }
+							</span>
+						</>
+					) }
 				</div>
 			) }
 		</div>
@@ -1917,6 +1930,12 @@ function getDistributedEditingStatusSurfaceItem( descriptor ) {
 					descriptor.localUpdatesImportFreshReviewRetrySaveHandoffValidating,
 				localUpdatesImportFreshReviewRetrySaveHandoffAccepted:
 					descriptor.localUpdatesImportFreshReviewRetrySaveHandoffAccepted,
+				localUpdatesImportActionTranscriptReport:
+					descriptor.localUpdatesImportActionTranscriptReport,
+				localUpdatesImportHasActionTranscriptReport:
+					descriptor.localUpdatesImportHasActionTranscriptReport,
+				localUpdatesImportCanShowActionTranscriptReport:
+					descriptor.localUpdatesImportCanShowActionTranscriptReport,
 				freshReviewPreSaveStatus: descriptor.freshReviewPreSaveStatus,
 				freshReviewPreSaveReason: descriptor.freshReviewPreSaveReason,
 				freshReviewPreSavePlacement:
@@ -2489,6 +2508,22 @@ function getFreshReviewReviewItemCountMessage( descriptor ) {
 	return __(
 		'Risky block evidence remains redacted until the review surface opens.'
 	);
+}
+
+function getLocalUpdatesImportActionTranscriptReportMessage( report ) {
+	if ( ! report?.available || ! report.canShareWithSupport ) {
+		return null;
+	}
+
+	return [
+		report.chronologyText,
+		report.summaryText,
+		__(
+			'This transcript is diagnostic only; save authority evidence is still required before treating these changes as saved.'
+		),
+	]
+		.filter( Boolean )
+		.join( ' ' );
 }
 
 function getLocalUpdatesImportStatusMessage( {

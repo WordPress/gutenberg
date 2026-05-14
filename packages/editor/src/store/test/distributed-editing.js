@@ -6136,6 +6136,162 @@ describe( 'distributed editing session state', () => {
 		);
 	} );
 
+	it( 'carries redacted action transcript reports into fresh-review import recovery state', () => {
+		const postContent =
+			'<!-- wp:html --><script>needs review</script><!-- /wp:html -->';
+		const postContentHash =
+			'7e479a6c51c9e8167f1542af0c730ae0009236c4936876ebbf85bcd7c3ab7dd0';
+		const unsafeMarker = 'turn0146-fresh-review-import-hidden-proof';
+		const payload = {
+			version: 1,
+			format: DISTRIBUTED_EDITING_LOCAL_UPDATES_EXPORT_FORMAT,
+			post: {
+				id: 44,
+				type: 'post',
+			},
+			postContent,
+			serverVersion: '12',
+			clientBaseVersion: '7',
+			pendingChangeCount: 1,
+			proposedPostContentHash: postContentHash,
+			acceptedReviewApprovalProof: null,
+			actionTranscriptSummary: {
+				status: 'available',
+				items: [
+					{
+						eventType:
+							DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.FRESH_REVIEW_REQUESTED,
+					},
+					{
+						eventType:
+							DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.FRESH_REVIEW_DECISION_SUBMITTED,
+					},
+					{
+						eventType:
+							DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.FRESH_REVIEW_CONSUME_VALIDATED,
+					},
+					{
+						eventType:
+							DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.FRESH_REVIEW_RETRY_SAVE_CONFIRMED,
+					},
+				],
+				droppedItemCount: 2,
+			},
+			actionTranscriptReport: {
+				headline: unsafeMarker,
+				chronologyText: postContent,
+				timelineItems: [
+					{
+						eventType:
+							DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.FRESH_REVIEW_RETRY_SAVE_CONFIRMED,
+						label: 'turn0146-fresh-review-import-reviewer-id',
+					},
+				],
+			},
+			reviewTokenRecovery: {
+				status: DISTRIBUTED_EDITING_REVIEW_TOKEN_RECOVERY_STATUSES.FRESH_REVIEW_REQUIRED,
+				reason: DISTRIBUTED_EDITING_REVIEW_TOKEN_RECOVERY_REASONS.TOKEN_UNAVAILABLE,
+				requiresFreshReview: true,
+				canExportLocalUpdates: true,
+				serverVersion: '12',
+				clientBaseVersion: '7',
+			},
+		};
+
+		const result = getDistributedEditingLocalUpdatesImportResult( {
+			payload,
+			currentPost: {
+				id: 44,
+				type: 'post',
+			},
+			currentSessionState: {
+				pendingChangeCount: 1,
+				hasPendingChanges: true,
+				canExportLocalUpdates: true,
+			},
+			computedPostContentHash: postContentHash,
+		} );
+		const reviewRequestState =
+			getDistributedEditingLocalUpdatesImportReviewRequestStateForSessionState(
+				result.sessionState
+			);
+		const descriptor =
+			getDistributedEditingNoticeDescriptorsForSessionState(
+				result.sessionState
+			).find(
+				( item ) =>
+					item.kind ===
+					DISTRIBUTED_EDITING_NOTICE_KINDS.LOCAL_UPDATES_IMPORT_BLOCKED
+			);
+
+		expect( result ).toMatchObject( {
+			status: DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_STATUSES.BLOCKED,
+			reason: DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.FRESH_REVIEW_REQUIRED,
+			hasPostContent: false,
+			hasActionTranscriptReport: true,
+			actionTranscriptReport: {
+				status: 'available',
+				available: true,
+				chronologyStatus: 'fresh_review_guarded_save_confirmed',
+				timelineItemCount: 4,
+				droppedItemCount: 2,
+				canShareWithSupport: true,
+				requiresSaveAuthorityForPersistence: true,
+				callsSave: false,
+				savesPost: false,
+				claimsSaved: false,
+			},
+			sessionState: {
+				localUpdatesImportStatus:
+					DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_STATUSES.BLOCKED,
+				localUpdatesImportReason:
+					DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.FRESH_REVIEW_REQUIRED,
+				localUpdatesImportActionTranscriptReport: {
+					available: true,
+					chronologyStatus: 'fresh_review_guarded_save_confirmed',
+					timelineItemCount: 4,
+					droppedItemCount: 2,
+				},
+				localUpdatesImportHasPostContent: false,
+			},
+			mutatesEditorContent: false,
+			callsRetrySaveEndpoint: false,
+			callsNormalSavePost: false,
+			dispatchesNotice: false,
+			changesPostLock: false,
+			claimsSaved: false,
+		} );
+		expect( reviewRequestState ).toMatchObject( {
+			requiresFreshReview: true,
+			hasActionTranscriptReport: true,
+			canShowActionTranscriptReport: true,
+			actionTranscriptReport: {
+				available: true,
+				chronologyStatus: 'fresh_review_guarded_save_confirmed',
+				requiresSaveAuthorityForPersistence: true,
+			},
+			shouldCallRetrySaveEndpoint: false,
+			shouldCallNormalSavePost: false,
+			mutatesEditorContent: false,
+			claimsSaved: false,
+		} );
+		expect( descriptor ).toMatchObject( {
+			kind: DISTRIBUTED_EDITING_NOTICE_KINDS.LOCAL_UPDATES_IMPORT_BLOCKED,
+			localUpdatesImportHasActionTranscriptReport: true,
+			localUpdatesImportCanShowActionTranscriptReport: true,
+			localUpdatesImportActionTranscriptReport: {
+				available: true,
+				chronologyStatus: 'fresh_review_guarded_save_confirmed',
+				requiresSaveAuthorityForPersistence: true,
+			},
+		} );
+		expect(
+			JSON.stringify( { result, reviewRequestState, descriptor } )
+		).not.toMatch(
+			/turn0146-fresh-review-import-hidden-proof|turn0146-fresh-review-import-reviewer-id|<script>|proofSignature|reviewerId/
+		);
+	} );
+
 	it( 'imports a signed local-updates payload into retry-save-ready state', () => {
 		const postContent =
 			'<!-- wp:html --><script>approved</script><!-- /wp:html -->';
