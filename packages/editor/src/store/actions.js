@@ -60,6 +60,7 @@ import {
 	getDistributedEditingSessionStateForRetrySubmitSavePreparation,
 	getDistributedEditingRetrySavePolicyForSessionState,
 	DISTRIBUTED_EDITING_LOCAL_UPDATES_REVIEW_REQUEST_STATUSES,
+	DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES,
 	DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS,
 	DISTRIBUTED_EDITING_SAVE_POLICY_STATUSES,
 	getDistributedEditingStaleBaseLocalRebaseResult,
@@ -480,6 +481,31 @@ export const __experimentalMaybeRouteSavePostToDistributedEditingRiskyBlockRevie
 			}
 
 			if (
+				savePolicy.saveButtonStatus ===
+				DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES.FRESH_REVIEW_VALIDATING
+			) {
+				return {
+					status: 'fresh_review_validation_in_progress',
+					reason:
+						savePolicy.reason ||
+						savePolicy.saveButtonReason ||
+						'fresh_review_handoff_validating',
+					policy: savePolicy,
+					allowsNormalSaveFallback: false,
+					blocksNormalSavePost: true,
+					opensPrePublishReview: false,
+					requiresServerStateRefetch: false,
+					callsNormalSavePost: false,
+					callsRetrySaveEndpoint: false,
+					dispatchesNotice: false,
+					mutatesEditorContent: false,
+					mutatesPersistedPostContent: false,
+					changesPostLock: false,
+					claimsSaved: false,
+				};
+			}
+
+			if (
 				savePolicy.opensPrePublishReview ||
 				savePolicy.clickAction ===
 					DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.OPEN_PRE_PUBLISH_REVIEW
@@ -514,6 +540,35 @@ export const __experimentalMaybeRouteSavePostToDistributedEditingRiskyBlockRevie
 			) {
 				const approvedReviewItemCount =
 					savePolicy.approvedReviewItemCount ?? 0;
+				const shouldRequestReviewApprovalProof =
+					savePolicy.saveButtonSource === 'risky_block_review' ||
+					approvedReviewItemCount > 0;
+
+				if ( ! shouldRequestReviewApprovalProof ) {
+					return {
+						status: 'guarded_retry_save_policy_deferred',
+						reason:
+							savePolicy.reason ||
+							savePolicy.saveButtonReason ||
+							null,
+						policy: savePolicy,
+						allowsNormalSaveFallback: true,
+						continuesToRetrySavePolicy: true,
+						blocksNormalSavePost: Boolean(
+							savePolicy.blocksNormalSavePost
+						),
+						opensPrePublishReview: false,
+						requiresServerStateRefetch: false,
+						callsReviewApprovalProofEndpoint: false,
+						callsNormalSavePost: false,
+						callsRetrySaveEndpoint: false,
+						dispatchesNotice: false,
+						mutatesEditorContent: false,
+						mutatesPersistedPostContent: false,
+						changesPostLock: false,
+						claimsSaved: false,
+					};
+				}
 
 				if ( approvedReviewItemCount < 1 ) {
 					return {

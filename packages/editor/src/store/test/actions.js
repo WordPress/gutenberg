@@ -36,6 +36,7 @@ import {
 	DISTRIBUTED_EDITING_RETRY_SAVE_REVIEW_APPROVAL_PROOF_STATUSES,
 	DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS,
 	DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES,
+	DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES,
 	DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS,
 	DISTRIBUTED_EDITING_SAVE_POLICY_STATUSES,
 	DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE,
@@ -4688,6 +4689,198 @@ describe( 'Post actions', () => {
 			} );
 		} );
 
+		it( 'routes accepted fresh-review Save semantics to retry-save without review-proof fallback', async () => {
+			const originalPostContent =
+				'<!-- wp:paragraph --><p>Fresh review original.</p><!-- /wp:paragraph -->';
+			const editedPostContent =
+				'<!-- wp:paragraph --><p>Fresh review accepted.</p><!-- /wp:paragraph -->';
+			const proposedPostContentHash =
+				'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
+			const candidatePostContentHash =
+				'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb';
+			const post = {
+				id: postId,
+				type: 'post',
+				title: 'bar',
+				content: originalPostContent,
+				status: 'draft',
+			};
+			let retrySaveCalls = 0;
+			let reviewApprovalCalls = 0;
+			let normalSaveCalls = 0;
+			let retrySaveRequestData = null;
+
+			apiFetch.setFetchHandler( async ( options ) => {
+				const method = getMethod( options );
+				const { path, data } = options;
+
+				if (
+					method === 'POST' &&
+					path.startsWith(
+						`/wp/v2/posts/${ postId }/distributed-editing/retry-save`
+					)
+				) {
+					retrySaveCalls++;
+					retrySaveRequestData = data;
+
+					return {
+						result: 'retry_save_applied',
+						retry_save_accepted: true,
+						previous_server_version: '12',
+						server_version: '13',
+						pending_change_count: 1,
+						saves_post: true,
+						mutates_post_content: true,
+						creates_revision: true,
+						claims_saved: true,
+						fresh_review_decision_consumed: true,
+					};
+				}
+
+				if (
+					method === 'POST' &&
+					path.startsWith(
+						`/wp/v2/posts/${ postId }/distributed-editing/review-approval`
+					)
+				) {
+					reviewApprovalCalls++;
+				}
+
+				if (
+					method === 'PUT' &&
+					path.startsWith( `/wp/v2/posts/${ postId }` )
+				) {
+					normalSaveCalls++;
+				}
+
+				throw {
+					code: 'unknown_path',
+					message: `Unknown path: ${ method } ${ path }`,
+				};
+			} );
+
+			const registry = createRegistryWithStores();
+
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', post );
+			registry.dispatch( editorStore ).setupEditor( post, {
+				content: editedPostContent,
+			} );
+			registry.dispatch( editorStore ).updateEditorSettings( {
+				distributedEditing: {
+					enabled: true,
+					retrySaveHandoff: true,
+					riskyBlockReview: true,
+				},
+			} );
+			registry
+				.dispatch( editorStore )
+				.setDistributedEditingSessionState( {
+					clientBaseVersion: '7',
+					serverVersion: '12',
+					pendingChangeCount: 1,
+					hasPendingChanges: true,
+					retrySubmitProofStatus:
+						DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.ACCEPTED_FOR_FUTURE_SAVE,
+					retrySubmitAccepted: true,
+					retrySubmitSavePathRequired: true,
+					retrySubmitSaveStatus:
+						DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.READY,
+					retrySubmitSaveReady: true,
+					localUpdatesImportStatus:
+						DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_STATUSES.BLOCKED,
+					localUpdatesImportReason:
+						DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.FRESH_REVIEW_REQUIRED,
+					localUpdatesImportReviewRequestStatus:
+						DISTRIBUTED_EDITING_LOCAL_UPDATES_REVIEW_REQUEST_STATUSES.DECISION_RECORDED,
+					localUpdatesImportFreshReviewRequestRecordId:
+						'fresh-review-request-123',
+					localUpdatesImportFreshReviewDecisionStatus:
+						DISTRIBUTED_EDITING_FRESH_REVIEW_DECISION_STATUSES.RECORDED,
+					localUpdatesImportFreshReviewDecisionAccepted: true,
+					localUpdatesImportFreshReviewDecisionSubmitted: true,
+					localUpdatesImportFreshReviewDecisionDecision: 'approved',
+					localUpdatesImportFreshReviewRetrySaveHandoffStatus:
+						DISTRIBUTED_EDITING_FRESH_REVIEW_RETRY_SAVE_HANDOFF_STATUSES.ACCEPTED_FOR_RETRY_SAVE,
+					localUpdatesImportFreshReviewRetrySaveHandoffAccepted: true,
+					localUpdatesImportFreshReviewRetrySaveHandoffServerVersion:
+						'12',
+					localUpdatesImportFreshReviewRetrySaveHandoffProposedContentHash:
+						proposedPostContentHash,
+					localUpdatesImportFreshReviewRetrySaveHandoffCandidateContentHash:
+						candidatePostContentHash,
+					retrySaveFreshReviewConsumeValidationAccepted: true,
+					retrySaveFreshReviewDecisionConsumptionValidated: true,
+					retrySaveFreshReviewDecisionEligibleForRetrySave: true,
+					retrySaveFreshReviewRequestRecordId:
+						'fresh-review-request-123',
+					retrySaveFreshReviewServerVersion: '12',
+					retrySaveFreshReviewProposedContentHash:
+						proposedPostContentHash,
+					retrySaveFreshReviewCandidateContentHash:
+						candidatePostContentHash,
+					retrySaveFreshReviewHashEvidenceStatus: 'accepted',
+					canExportLocalUpdates: true,
+				} );
+
+			expect(
+				registry
+					.select( editorStore )
+					.getDistributedEditingSavePolicyState()
+			).toMatchObject( {
+				status: DISTRIBUTED_EDITING_SAVE_POLICY_STATUSES.READY_FOR_REVIEWED_RETRY_SAVE,
+				saveButtonStatus:
+					DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES.ACCEPTED_BUT_UNCONSUMED,
+				saveButtonSource: 'fresh_review',
+				blocksNormalSavePost: true,
+			} );
+
+			await expect(
+				registry.dispatch( editorStore ).savePost()
+			).resolves.toMatchObject( {
+				status: 'retry_save_submitted',
+				callsRetrySaveAction: true,
+				callsNormalSavePost: false,
+			} );
+
+			expect( retrySaveCalls ).toBe( 1 );
+			expect( reviewApprovalCalls ).toBe( 0 );
+			expect( normalSaveCalls ).toBe( 0 );
+			expect( retrySaveRequestData ).toMatchObject( {
+				client_base_version: '12',
+				accepted_proof_server_version: '12',
+				proposed_post_content: editedPostContent,
+				accepted_fresh_review_decision: {
+					fresh_review_request_record_id: 'fresh-review-request-123',
+					server_version: '12',
+					proposed_post_content_hash: proposedPostContentHash,
+					candidate_post_content_hash: candidatePostContentHash,
+					raw_content_included: false,
+					exposes_raw_content: false,
+					exposes_reviewer_ids: false,
+					claims_saved: false,
+				},
+			} );
+			expect(
+				retrySaveRequestData.accepted_fresh_review_decision
+					.reviewer_user_id
+			).toBeUndefined();
+			expect(
+				retrySaveRequestData.accepted_fresh_review_decision.raw_content
+			).toBeUndefined();
+			expect(
+				registry
+					.select( editorStore )
+					.getDistributedEditingSaveButtonState()
+			).toMatchObject( {
+				status: DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES.RETRY_SAVE_CONFIRMED,
+				claimsSaved: true,
+				exposesRawContent: false,
+				exposesReviewerIds: false,
+			} );
+		} );
+
 		it( 'uses normal savePost when settings disable the retry-save handoff even after save preparation', async () => {
 			const post = {
 				id: postId,
@@ -5031,6 +5224,112 @@ describe( 'Post actions', () => {
 				retrySaveHandoffReason:
 					DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.RETRY_SAVE_IN_PROGRESS,
 				retrySaveHandoffBlocksNormalSave: true,
+			} );
+		} );
+
+		it( 'blocks savePost while fresh-review validation is in flight without normal fallback', async () => {
+			const post = {
+				id: postId,
+				type: 'post',
+				title: 'bar',
+				content: 'bar',
+				status: 'draft',
+			};
+			let apiCalls = 0;
+
+			apiFetch.setFetchHandler( async ( options ) => {
+				apiCalls++;
+				const method = getMethod( options );
+				const { path } = options;
+
+				throw {
+					code: 'unexpected_path',
+					message: `Unexpected path: ${ method } ${ path }`,
+				};
+			} );
+
+			const registry = createRegistryWithStores();
+
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', post );
+			registry.dispatch( editorStore ).setupEditor( post, {
+				content: 'new bar',
+			} );
+			registry.dispatch( editorStore ).updateEditorSettings( {
+				distributedEditing: {
+					enabled: true,
+					retrySaveHandoff: true,
+					riskyBlockReview: true,
+				},
+			} );
+			registry
+				.dispatch( editorStore )
+				.setDistributedEditingSessionState( {
+					pendingChangeCount: 1,
+					hasPendingChanges: true,
+					mustOfferLocalCopy: true,
+					canExportLocalUpdates: true,
+					localUpdatesImportStatus:
+						DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_STATUSES.BLOCKED,
+					localUpdatesImportReason:
+						DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.FRESH_REVIEW_REQUIRED,
+					localUpdatesImportReviewRequestStatus:
+						DISTRIBUTED_EDITING_LOCAL_UPDATES_REVIEW_REQUEST_STATUSES.DECISION_RECORDED,
+					localUpdatesImportFreshReviewRequestAccepted: true,
+					localUpdatesImportFreshReviewRequestRequested: true,
+					localUpdatesImportFreshReviewDecisionStatus:
+						DISTRIBUTED_EDITING_FRESH_REVIEW_DECISION_STATUSES.RECORDED,
+					localUpdatesImportFreshReviewDecisionAccepted: true,
+					localUpdatesImportFreshReviewDecisionSubmitted: true,
+					localUpdatesImportFreshReviewDecisionDecision: 'approved',
+					localUpdatesImportFreshReviewRetrySaveHandoffStatus:
+						DISTRIBUTED_EDITING_FRESH_REVIEW_RETRY_SAVE_HANDOFF_STATUSES.VALIDATING,
+					localUpdatesImportFreshReviewRetrySaveHandoffValidating: true,
+				} );
+
+			expect(
+				registry
+					.select( editorStore )
+					.getDistributedEditingSaveButtonState()
+			).toMatchObject( {
+				status: DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES.FRESH_REVIEW_VALIDATING,
+				label: 'Validating review',
+				disabled: true,
+				busy: true,
+				blocksNormalSavePost: true,
+			} );
+
+			await expect(
+				registry.dispatch( editorStore ).savePost()
+			).resolves.toMatchObject( {
+				status: 'fresh_review_validation_in_progress',
+				reason: 'fresh_review_handoff_validating',
+				allowsNormalSaveFallback: false,
+				blocksNormalSavePost: true,
+				callsNormalSavePost: false,
+				callsRetrySaveEndpoint: false,
+				claimsSaved: false,
+			} );
+
+			expect( apiCalls ).toBe( 0 );
+			expect( registry.select( noticesStore ).getNotices() ).toEqual(
+				[]
+			);
+			expect( registry.select( editorStore ).isEditedPostDirty() ).toBe(
+				true
+			);
+			expect(
+				registry
+					.select( editorStore )
+					.getDistributedEditingSessionState()
+			).toMatchObject( {
+				hasPendingChanges: true,
+				mustOfferLocalCopy: true,
+				canExportLocalUpdates: true,
+				localUpdatesImportFreshReviewRetrySaveHandoffStatus:
+					DISTRIBUTED_EDITING_FRESH_REVIEW_RETRY_SAVE_HANDOFF_STATUSES.VALIDATING,
+				retrySaveStatus: DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.NONE,
 			} );
 		} );
 

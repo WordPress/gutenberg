@@ -245,6 +245,8 @@ export const DISTRIBUTED_EDITING_SAVE_POLICY_STATUSES = Object.freeze( {
 	REVIEW_REQUIRED: 'review_required',
 	READY_FOR_REVIEWED_RETRY_SAVE: 'ready_for_reviewed_retry_save',
 	REFETCH_REQUIRED: 'refetch_required',
+	IN_FLIGHT: 'in_flight',
+	RETRY_SAVE_CONFIRMED: 'retry_save_confirmed',
 } );
 
 /**
@@ -255,6 +257,21 @@ export const DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS = Object.freeze( {
 	OPEN_PRE_PUBLISH_REVIEW: 'open_pre_publish_review',
 	CONTINUE_GUARDED_RETRY_SAVE: 'continue_guarded_retry_save',
 	REFETCH_SERVER_STATE: 'refetch_server_state',
+} );
+
+/**
+ * Stable Save button semantic states for DE-RTC sessions. These are copy and
+ * policy descriptors only; they do not call REST, save, dispatch notices,
+ * persist editor state, or change post locks.
+ */
+export const DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES = Object.freeze( {
+	UPDATE_READY: 'update_ready',
+	REVIEW_BLOCKED: 'review_blocked',
+	ACCEPTED_BUT_UNCONSUMED: 'accepted_but_unconsumed',
+	RETRY_SAVE_IN_PROGRESS: 'retry_save_in_progress',
+	FRESH_REVIEW_VALIDATING: 'fresh_review_validating',
+	RETRY_SAVE_CONFIRMED: 'retry_save_confirmed',
+	REFETCH_REQUIRED: 'refetch_required',
 } );
 
 /**
@@ -5441,6 +5458,264 @@ function getDistributedEditingFreshReviewListStatusFromNormalizedState(
 }
 
 /**
+ * Returns the pure DE-RTC Save button semantics descriptor for the current
+ * session. The descriptor ranks review, retry-save, refetch, and fresh-review
+ * handoff state so UI can describe what the next Save click means without
+ * reading raw content, proof internals, or reviewer identity.
+ *
+ * @param {Object} sessionState DE-RTC session state.
+ *
+ * @return {Object} Save button semantics descriptor.
+ */
+export function getDistributedEditingSaveButtonStateForSessionState(
+	sessionState = {}
+) {
+	const normalized = normalizeDistributedEditingSessionState( sessionState );
+	const reviewState =
+		getDistributedEditingRiskyBlockReviewStateForSessionState( normalized );
+	const freshReviewPreSaveState =
+		getDistributedEditingFreshReviewPreSaveStateForSessionState(
+			normalized
+		);
+	const hasProtectedLocalChanges = Boolean(
+		normalized.hasPendingChanges ||
+			normalized.mustOfferLocalCopy ||
+			normalized.canExportLocalUpdates
+	);
+	const hasRetrySaveSavedStateEvidence =
+		hasDistributedEditingRetrySaveSavedStateEvidenceForSessionState(
+			normalized
+		);
+	const hasAcceptedReviewApprovalProof = Boolean(
+		getDistributedEditingAcceptedReviewApprovalProofForRetrySaveRequest(
+			normalized
+		)
+	);
+	const hasAcceptedFreshReviewConsumeValidation = Boolean(
+		getDistributedEditingAcceptedFreshReviewConsumeValidationForRetrySaveRequest(
+			normalized
+		)
+	);
+	const hasAcceptedRetrySubmitProof =
+		normalized.retrySubmitProofStatus ===
+			DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.ACCEPTED_FOR_FUTURE_SAVE &&
+		normalized.retrySubmitAccepted &&
+		normalized.retrySubmitSavePathRequired &&
+		! normalized.retrySubmitSavesPost &&
+		! normalized.retrySubmitMutatesPostContent &&
+		! normalized.retrySubmitCreatesRevision &&
+		! normalized.retrySubmitClaimsSaved;
+	const hasRetrySavePreparation =
+		normalized.retrySubmitSaveStatus ===
+			DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.READY &&
+		normalized.retrySubmitSaveReady;
+	const hasRiskyReviewReadyForProof =
+		reviewState.status ===
+			DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_STATUSES.REVIEW_RESOLVED ||
+		reviewState.approvedReviewItemCount > 0;
+	const hasAcceptedButUnconsumed =
+		! hasRetrySaveSavedStateEvidence &&
+		( hasAcceptedFreshReviewConsumeValidation ||
+			freshReviewPreSaveState.status ===
+				DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_STATUSES.READY_FOR_GUARDED_RETRY_SAVE ||
+			hasAcceptedReviewApprovalProof ||
+			hasRiskyReviewReadyForProof ||
+			( hasAcceptedRetrySubmitProof && hasRetrySavePreparation ) );
+	let status = DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES.UPDATE_READY;
+	let reason = null;
+	let source = 'default';
+	let label = 'Update';
+	let statusText = 'Ready to update';
+	let clickAction = DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.CONTINUE_SAVE;
+	let disabled = false;
+	let busy = false;
+	let opensPrePublishReview = false;
+	let requiresServerStateRefetch = false;
+	let canRefetchServerState = false;
+	let claimsSaved = false;
+
+	if ( hasRetrySaveSavedStateEvidence ) {
+		status = DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES.RETRY_SAVE_CONFIRMED;
+		reason =
+			DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.RETRY_SAVE_ALREADY_CONFIRMED;
+		source = 'retry_save';
+		label = 'Retry save confirmed';
+		statusText = 'Distributed Editing retry save confirmed.';
+		clickAction = null;
+		disabled = true;
+		claimsSaved = true;
+	} else if (
+		normalized.retrySaveStatus ===
+		DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVING
+	) {
+		status =
+			DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES.RETRY_SAVE_IN_PROGRESS;
+		reason =
+			DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.RETRY_SAVE_IN_PROGRESS;
+		source = 'retry_save';
+		label = 'Saving reviewed changes';
+		statusText =
+			'Distributed Editing retry save is waiting for server confirmation.';
+		clickAction = null;
+		disabled = true;
+		busy = true;
+	} else if (
+		freshReviewPreSaveState.status ===
+		DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_STATUSES.VALIDATING
+	) {
+		status =
+			DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES.FRESH_REVIEW_VALIDATING;
+		reason =
+			freshReviewPreSaveState.reason || 'fresh_review_handoff_validating';
+		source = 'fresh_review';
+		label = 'Validating review';
+		statusText =
+			'Fresh-review validation is in progress before guarded save.';
+		clickAction = null;
+		disabled = true;
+		busy = true;
+	} else if (
+		reviewState.requiresServerStateRefetch ||
+		freshReviewPreSaveState.requiresServerStateRefetch ||
+		normalized.requiresServerStateRefetch
+	) {
+		status = DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES.REFETCH_REQUIRED;
+		if ( reviewState.requiresServerStateRefetch ) {
+			reason = 'risky_block_review_stale';
+			source = 'risky_block_review';
+		} else if ( freshReviewPreSaveState.requiresServerStateRefetch ) {
+			reason =
+				freshReviewPreSaveState.reason ||
+				DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.SERVER_STATE_REFETCH_REQUIRED;
+			source = 'fresh_review';
+		} else {
+			reason =
+				DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.SERVER_STATE_REFETCH_REQUIRED;
+			source = 'retry_save';
+		}
+		label = 'Refetch required';
+		statusText =
+			'Server state must be refetched before Distributed Editing can save.';
+		clickAction =
+			DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.REFETCH_SERVER_STATE;
+		requiresServerStateRefetch = true;
+		canRefetchServerState = true;
+	} else if (
+		reviewState.hasPendingReviewItems ||
+		freshReviewPreSaveState.opensPrePublishReview ||
+		freshReviewPreSaveState.status ===
+			DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_STATUSES.REVIEW_REQUIRED ||
+		freshReviewPreSaveState.status ===
+			DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_STATUSES.BLOCKED
+	) {
+		status = DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES.REVIEW_BLOCKED;
+		if ( reviewState.hasPendingReviewItems ) {
+			reason = 'risky_block_review_required';
+			source = 'risky_block_review';
+		} else {
+			reason = freshReviewPreSaveState.reason || 'fresh_review_required';
+			source = 'fresh_review';
+		}
+		label =
+			freshReviewPreSaveState.saveButtonLabel &&
+			freshReviewPreSaveState.saveButtonLabel !== 'Update'
+				? freshReviewPreSaveState.saveButtonLabel
+				: 'Review changes';
+		statusText =
+			'Review must be resolved before Distributed Editing can save.';
+		clickAction =
+			DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.OPEN_PRE_PUBLISH_REVIEW;
+		opensPrePublishReview = true;
+	} else if ( hasAcceptedButUnconsumed ) {
+		status =
+			DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES.ACCEPTED_BUT_UNCONSUMED;
+		if ( hasAcceptedFreshReviewConsumeValidation ) {
+			reason = 'fresh_review_accepted_but_unconsumed';
+			source = 'fresh_review';
+		} else if ( hasAcceptedReviewApprovalProof ) {
+			reason = 'review_approval_accepted_but_unconsumed';
+			source = 'review_approval';
+		} else if ( hasRiskyReviewReadyForProof ) {
+			reason = 'risky_block_review_ready_for_review_approval';
+			source = 'risky_block_review';
+		} else {
+			reason = 'accepted_retry_submit_proof_unconsumed';
+			source = 'retry_submit';
+		}
+		label = 'Submit reviewed changes';
+		statusText =
+			'Accepted Distributed Editing proof is ready for guarded retry save.';
+		clickAction =
+			DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.CONTINUE_GUARDED_RETRY_SAVE;
+	}
+
+	const blocksNormalSavePost =
+		status !== DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES.UPDATE_READY;
+	const canExportLocalUpdates =
+		Boolean( normalized.canExportLocalUpdates ) &&
+		( hasProtectedLocalChanges || blocksNormalSavePost );
+	const actionKeys = [
+		canExportLocalUpdates
+			? DISTRIBUTED_EDITING_NOTICE_ACTIONS.EXPORT_LOCAL_UPDATES
+			: null,
+		canRefetchServerState
+			? DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFETCH_SERVER_STATE
+			: null,
+	].filter( Boolean );
+
+	return {
+		status,
+		reason,
+		source,
+		label,
+		statusText,
+		clickAction,
+		disabled,
+		busy,
+		blocksNormalSavePost,
+		opensPrePublishReview,
+		requiresServerStateRefetch,
+		canRefetchServerState,
+		canExportLocalUpdates,
+		hasProtectedLocalChanges,
+		hasAcceptedButUnconsumed,
+		hasAcceptedReviewApprovalProof,
+		hasAcceptedFreshReviewConsumeValidation,
+		hasAcceptedRetrySubmitProof,
+		hasRetrySavePreparation,
+		hasRetrySaveSavedStateEvidence,
+		reviewItemCount: reviewState.reviewItemCount,
+		pendingReviewItemCount: reviewState.pendingReviewItemCount,
+		approvedReviewItemCount: reviewState.approvedReviewItemCount,
+		rejectedReviewItemCount: reviewState.rejectedReviewItemCount,
+		freshReviewPreSaveStatus: freshReviewPreSaveState.status,
+		freshReviewPreSaveReason: freshReviewPreSaveState.reason,
+		freshReviewPreSavePlacement: freshReviewPreSaveState.placement,
+		freshReviewHandoffStatus: freshReviewPreSaveState.handoffStatus,
+		freshReviewHandoffReason: freshReviewPreSaveState.handoffReason,
+		actionKeys,
+		descriptorOnly: true,
+		savesPost: false,
+		shouldCallNormalSavePost: false,
+		shouldCallRetrySaveEndpoint: false,
+		callsRestEndpoint: false,
+		callsNormalSavePost: false,
+		callsRetrySaveEndpoint: false,
+		dispatchesNotice: false,
+		mutatesEditorContent: false,
+		mutatesPersistedPostContent: false,
+		changesPostLock: false,
+		claimsSaved,
+		rawContentIncluded: false,
+		exposesRawContent: false,
+		exposesProofSignature: false,
+		exposesProofInternals: false,
+		exposesReviewerIds: false,
+		exposesSaverIds: false,
+	};
+}
+
+/**
  * Returns the DE-RTC Save policy state for risky-block review handoff.
  *
  * This is only policy data. It does not open the pre-publish sidebar, save,
@@ -5457,6 +5732,8 @@ export function getDistributedEditingSavePolicyStateForSessionState(
 		getDistributedEditingRiskyBlockReviewStateForSessionState(
 			sessionState
 		);
+	const saveButton =
+		getDistributedEditingSaveButtonStateForSessionState( sessionState );
 	let status = DISTRIBUTED_EDITING_SAVE_POLICY_STATUSES.UPDATE_READY;
 	let reason = null;
 	let saveButtonLabel = 'Update';
@@ -5465,32 +5742,58 @@ export function getDistributedEditingSavePolicyStateForSessionState(
 	let opensPrePublishReview = false;
 	let requiresServerStateRefetch = false;
 
-	if ( reviewState.requiresServerStateRefetch ) {
+	if (
+		saveButton.status ===
+		DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES.REFETCH_REQUIRED
+	) {
 		status = DISTRIBUTED_EDITING_SAVE_POLICY_STATUSES.REFETCH_REQUIRED;
-		reason = 'risky_block_review_stale';
-		saveButtonLabel = 'Refetch required';
+		reason = saveButton.reason;
+		saveButtonLabel = saveButton.label;
 		clickAction =
 			DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.REFETCH_SERVER_STATE;
 		blocksNormalSavePost = true;
 		requiresServerStateRefetch = true;
-	} else if ( reviewState.hasPendingReviewItems ) {
+	} else if (
+		saveButton.status ===
+		DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES.REVIEW_BLOCKED
+	) {
 		status = DISTRIBUTED_EDITING_SAVE_POLICY_STATUSES.REVIEW_REQUIRED;
-		reason = 'risky_block_review_required';
-		saveButtonLabel = 'Review changes';
+		reason = saveButton.reason;
+		saveButtonLabel = saveButton.label;
 		clickAction =
 			DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.OPEN_PRE_PUBLISH_REVIEW;
 		blocksNormalSavePost = true;
 		opensPrePublishReview = true;
 	} else if (
-		reviewState.status ===
-			DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_STATUSES.REVIEW_RESOLVED ||
-		reviewState.approvedReviewItemCount > 0
+		saveButton.status ===
+		DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES.ACCEPTED_BUT_UNCONSUMED
 	) {
 		status =
 			DISTRIBUTED_EDITING_SAVE_POLICY_STATUSES.READY_FOR_REVIEWED_RETRY_SAVE;
-		saveButtonLabel = 'Submit reviewed changes';
+		reason = saveButton.reason;
+		saveButtonLabel = saveButton.label;
 		clickAction =
 			DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.CONTINUE_GUARDED_RETRY_SAVE;
+		blocksNormalSavePost = true;
+	} else if (
+		saveButton.status ===
+			DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES.RETRY_SAVE_IN_PROGRESS ||
+		saveButton.status ===
+			DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES.FRESH_REVIEW_VALIDATING
+	) {
+		status = DISTRIBUTED_EDITING_SAVE_POLICY_STATUSES.IN_FLIGHT;
+		reason = saveButton.reason;
+		saveButtonLabel = saveButton.label;
+		clickAction = saveButton.clickAction;
+		blocksNormalSavePost = true;
+	} else if (
+		saveButton.status ===
+		DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES.RETRY_SAVE_CONFIRMED
+	) {
+		status = DISTRIBUTED_EDITING_SAVE_POLICY_STATUSES.RETRY_SAVE_CONFIRMED;
+		reason = saveButton.reason;
+		saveButtonLabel = saveButton.label;
+		clickAction = saveButton.clickAction;
 		blocksNormalSavePost = true;
 	}
 
@@ -5506,6 +5809,15 @@ export function getDistributedEditingSavePolicyStateForSessionState(
 		pendingReviewItemCount: reviewState.pendingReviewItemCount,
 		approvedReviewItemCount: reviewState.approvedReviewItemCount,
 		rejectedReviewItemCount: reviewState.rejectedReviewItemCount,
+		saveButton,
+		saveButtonStatus: saveButton.status,
+		saveButtonReason: saveButton.reason,
+		saveButtonSource: saveButton.source,
+		saveButtonStatusText: saveButton.statusText,
+		saveButtonDisabled: saveButton.disabled,
+		saveButtonBusy: saveButton.busy,
+		saveButtonActionKeys: saveButton.actionKeys,
+		canExportLocalUpdates: saveButton.canExportLocalUpdates,
 		savesPost: false,
 		shouldCallNormalSavePost: false,
 		shouldCallRetrySaveEndpoint: false,

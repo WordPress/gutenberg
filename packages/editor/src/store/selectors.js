@@ -40,6 +40,7 @@ import {
 	getDistributedEditingLocalUpdatesImportReviewRequestStateForSessionState,
 	getDistributedEditingNoticeDescriptorsForSessionState,
 	getDistributedEditingRiskyBlockReviewStateForSessionState,
+	getDistributedEditingSaveButtonStateForSessionState,
 	getDistributedEditingReviewTokenRecoveryStateForSessionState,
 	getDistributedEditingRetrySaveFlowStateForSessionState,
 	getDistributedEditingSavePolicyStateForSessionState,
@@ -609,6 +610,19 @@ export function getDistributedEditingFreshReviewLifecycleState( state ) {
  */
 export function getDistributedEditingRiskyBlockReviewState( state ) {
 	return getDistributedEditingRiskyBlockReviewStateForSessionState(
+		getDistributedEditingSessionState( state )
+	);
+}
+
+/**
+ * Returns the current DE-RTC Save button semantics descriptor.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {Object} Save button state.
+ */
+export function getDistributedEditingSaveButtonState( state ) {
+	return getDistributedEditingSaveButtonStateForSessionState(
 		getDistributedEditingSessionState( state )
 	);
 }
