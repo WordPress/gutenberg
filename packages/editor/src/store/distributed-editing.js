@@ -297,6 +297,12 @@ export const DISTRIBUTED_EDITING_REVIEW_APPROVAL_PROOF_ENVELOPE_TYPE =
 export const DISTRIBUTED_EDITING_OPAQUE_REVIEW_APPROVAL_PROOF_TOKEN_ENVELOPE_TYPE =
 	'opaque_review_approval_proof_token';
 
+const DISTRIBUTED_EDITING_OPAQUE_REVIEW_APPROVAL_PROOF_TOKEN_REJECTION_DETAILS =
+	Object.freeze( {
+		UNKNOWN: 'unknown_retry_save_review_approval_proof_token',
+		EXPIRED: 'retry_save_review_approval_proof_token_expired',
+	} );
+
 /**
  * Stable local-updates import statuses for cross-user handoff payloads.
  */
@@ -3509,6 +3515,15 @@ export function getDistributedEditingSessionStateForRetrySaveResult(
 						responseData.reasonCode ||
 						responseData.reason_code
 			  );
+	const retrySaveReason =
+		getOpaqueReviewApprovalProofTokenRejectionDetail(
+			responseOrError,
+			responseData
+		) ||
+		reasonCode ||
+		( result === 'retry_save_applied'
+			? DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.RETRY_SAVE_MISSING_SAVED_STATE_EVIDENCE
+			: result );
 	const retrySaveReviewMetadata =
 		getRetrySaveReviewMetadataFromResponseOrError(
 			responseOrError,
@@ -3538,6 +3553,7 @@ export function getDistributedEditingSessionStateForRetrySaveResult(
 			result === 'retry_save_applied'
 				? DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.RETRY_SAVE_MISSING_SAVED_STATE_EVIDENCE
 				: result,
+		retrySaveReason,
 		pendingChangeCount: rejectedPendingChangeCount,
 		serverVersion,
 		previousServerVersion,
@@ -4281,6 +4297,7 @@ function getDistributedEditingRejectedRetrySaveState( {
 	retrySaveReviewMetadata = {},
 	retrySaveReviewApprovalProofFields = {},
 	hasAcceptedReviewApprovalProof = false,
+	retrySaveReason = null,
 } ) {
 	let disposition = normalizedCurrent.disposition;
 	let retrySaveStatus = DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.NONE;
@@ -4398,7 +4415,7 @@ function getDistributedEditingRejectedRetrySaveState( {
 			? normalizedCurrent.retrySubmitSaveReady
 			: false,
 		retrySaveStatus,
-		retrySaveReason: reasonCode || result,
+		retrySaveReason: retrySaveReason || reasonCode || result,
 		retrySaveAccepted: false,
 		retrySaveServerVersion: serverVersion,
 		retrySavePreviousServerVersion: previousServerVersion,
@@ -5223,6 +5240,26 @@ function getRetrySaveReviewMetadataFromResponseOrError(
 			responseData.recovery_actions
 		),
 	} );
+}
+
+function getOpaqueReviewApprovalProofTokenRejectionDetail(
+	responseOrError = {},
+	responseData = {}
+) {
+	const detail = normalizeNullableString(
+		getFirstDefined(
+			responseOrError.detail,
+			responseData.detail,
+			responseOrError.errorDetail,
+			responseData.errorDetail
+		)
+	);
+
+	return Object.values(
+		DISTRIBUTED_EDITING_OPAQUE_REVIEW_APPROVAL_PROOF_TOKEN_REJECTION_DETAILS
+	).includes( detail )
+		? detail
+		: null;
 }
 
 function getRetrySaveReviewApprovalProofFieldsFromResponseOrError(

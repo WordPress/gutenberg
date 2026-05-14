@@ -31,6 +31,12 @@ import {
 	normalizeDistributedEditingSessionState,
 } from '../../store/distributed-editing';
 
+const DISTRIBUTED_EDITING_OPAQUE_REVIEW_APPROVAL_PROOF_TOKEN_REJECTION_DETAILS =
+	Object.freeze( {
+		UNKNOWN: 'unknown_retry_save_review_approval_proof_token',
+		EXPIRED: 'retry_save_review_approval_proof_token_expired',
+	} );
+
 const DISTRIBUTED_EDITING_STATUS_CONTROL_STATE_DEFINITIONS = Object.freeze( {
 	idle: Object.freeze( {} ),
 	pendingLocalChanges: Object.freeze( {
@@ -1556,7 +1562,7 @@ function getLocalUpdatesImportBlockedMessage( reason ) {
 			);
 		case DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.EXPIRED_REVIEW_APPROVAL_PROOF:
 			return __(
-				'Import blocked: the accepted admin review proof for these protected changes has expired. Nothing was imported, and local changes remain protected.'
+				'Import blocked: the admin-reviewed changes token or proof has expired and is no longer usable. Nothing was imported, and local changes remain protected and exportable.'
 			);
 		case DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.EXTRA_SESSION_STATE_OVEREXPOSED:
 			return __(
@@ -1829,6 +1835,17 @@ function getRetrySaveStatusText( descriptor ) {
 				),
 			};
 		case DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_SYNC_META_TAMPERED:
+			if (
+				isExpiredOpaqueReviewApprovalProofTokenRetrySave( descriptor )
+			) {
+				return {
+					title: __( 'Reviewed changes token expired' ),
+					message: __(
+						'The imported reviewed-changes token has expired and is no longer usable for retry save. No server save was made. Protected local changes are still exportable; export them for a fresh admin review before trying again.'
+					),
+				};
+			}
+
 			return {
 				title: __( 'Retry save proof rejected' ),
 				message: __(
@@ -1850,6 +1867,17 @@ function getRetrySaveStatusText( descriptor ) {
 				),
 			};
 		case DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_MALFORMED_SYNC_PAYLOAD:
+			if (
+				isUnknownOpaqueReviewApprovalProofTokenRetrySave( descriptor )
+			) {
+				return {
+					title: __( 'Reviewed changes token unavailable' ),
+					message: __(
+						'The imported reviewed-changes token could not be found in server storage and is no longer usable for retry save. No server save was made. Protected local changes are still exportable; export them for a fresh admin review before trying again.'
+					),
+				};
+			}
+
 			return {
 				title: __( 'Retry save payload rejected' ),
 				message: __(
@@ -1864,6 +1892,20 @@ function getRetrySaveStatusText( descriptor ) {
 			'Retry save returned an unrecognized state. Protected local changes remain exportable until the server confirms a save.'
 		),
 	};
+}
+
+function isExpiredOpaqueReviewApprovalProofTokenRetrySave( descriptor ) {
+	return (
+		descriptor.retrySaveReason ===
+		DISTRIBUTED_EDITING_OPAQUE_REVIEW_APPROVAL_PROOF_TOKEN_REJECTION_DETAILS.EXPIRED
+	);
+}
+
+function isUnknownOpaqueReviewApprovalProofTokenRetrySave( descriptor ) {
+	return (
+		descriptor.retrySaveReason ===
+		DISTRIBUTED_EDITING_OPAQUE_REVIEW_APPROVAL_PROOF_TOKEN_REJECTION_DETAILS.UNKNOWN
+	);
 }
 
 function getRetrySaveConfirmedMessage( descriptor ) {

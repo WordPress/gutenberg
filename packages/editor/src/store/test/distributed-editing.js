@@ -1331,6 +1331,119 @@ describe( 'distributed editing session state', () => {
 		} );
 	} );
 
+	it( 'communicates opaque token retry-save expiry and unknown-token failures without reconstructing proof', () => {
+		const postContent =
+			'<!-- wp:html --><script>still-protected</script><!-- /wp:html -->';
+		const opaqueTokenEnvelope = {
+			proof_envelope_type:
+				DISTRIBUTED_EDITING_OPAQUE_REVIEW_APPROVAL_PROOF_TOKEN_ENVELOPE_TYPE,
+			token: 'de-rtc-review-token.expiring-copy',
+			token_version: 1,
+			issued_at: 1893456000,
+			expires_at: 1893456300,
+			post: {
+				id: 44,
+				type: 'post',
+			},
+		};
+		const currentSessionState = {
+			serverVersion: '12',
+			clientBaseVersion: '7',
+			pendingChangeCount: 1,
+			hasPendingChanges: true,
+			canExportLocalUpdates: true,
+			retrySubmitProofStatus:
+				DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.ACCEPTED_FOR_FUTURE_SAVE,
+			retrySubmitAccepted: true,
+			retrySubmitSavePathRequired: true,
+			retrySubmitSaveStatus:
+				DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.READY,
+			retrySubmitSaveReady: true,
+			retrySaveReviewApprovalProofStatus:
+				DISTRIBUTED_EDITING_RETRY_SAVE_REVIEW_APPROVAL_PROOF_STATUSES.ACCEPTED_FOR_RETRY_SAVE,
+			retrySaveReviewApprovalAccepted: true,
+			retrySaveReviewApprovalProofEnvelope: opaqueTokenEnvelope,
+			retrySaveReviewApprovalServerVersion: '12',
+			retrySaveReviewApprovalRebasedFromVersion: '7',
+		};
+		const cases = [
+			{
+				label: 'unknown token',
+				code: DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_MALFORMED_SYNC_PAYLOAD,
+				detail: 'unknown_retry_save_review_approval_proof_token',
+				disposition:
+					DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_MALFORMED_SYNC_PAYLOAD,
+				status: DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_MALFORMED_SYNC_PAYLOAD,
+			},
+			{
+				label: 'expired token',
+				code: DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_SYNC_META_TAMPERED,
+				detail: 'retry_save_review_approval_proof_token_expired',
+				disposition:
+					DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_SYNC_META_TAMPERED,
+				status: DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_SYNC_META_TAMPERED,
+			},
+		];
+
+		for ( const statusCase of cases ) {
+			const normalized =
+				getDistributedEditingSessionStateForRetrySaveResult(
+					{
+						code: statusCase.code,
+						data: {
+							reason_code: statusCase.code,
+							detail: statusCase.detail,
+							pending_change_count: 1,
+							review_approval_proof_format:
+								DISTRIBUTED_EDITING_OPAQUE_REVIEW_APPROVAL_PROOF_TOKEN_ENVELOPE_TYPE,
+							review_approval_proof_requires_new_review: true,
+							can_export_local_updates: true,
+						},
+					},
+					currentSessionState
+				);
+			const exportPayload =
+				getDistributedEditingLocalUpdatesExportPayload( {
+					currentPost: {
+						id: 44,
+						type: 'post',
+					},
+					editedPostContent: postContent,
+					sessionState: normalized,
+				} );
+
+			expect( normalized ).toMatchObject( {
+				disposition: statusCase.disposition,
+				reasonCode: statusCase.code,
+				retrySaveStatus: statusCase.status,
+				retrySaveReason: statusCase.detail,
+				retrySaveAccepted: false,
+				retrySaveReviewApprovalProofStatus:
+					DISTRIBUTED_EDITING_RETRY_SAVE_REVIEW_APPROVAL_PROOF_STATUSES.NONE,
+				retrySaveReviewApprovalAccepted: false,
+				retrySaveReviewApprovalProofEnvelope: null,
+				hasPendingChanges: true,
+				isAwaitingServerConfirmation: true,
+				canExportLocalUpdates: true,
+				mustOfferLocalCopy: true,
+			} );
+			expect( exportPayload.postContent ).toBe( postContent );
+			expect( exportPayload.acceptedReviewApprovalProof ).toBeNull();
+			expect( JSON.stringify( exportPayload ) ).not.toContain(
+				opaqueTokenEnvelope.token
+			);
+			expect( JSON.stringify( exportPayload ) ).not.toContain(
+				'proof_signature'
+			);
+			expect( JSON.stringify( exportPayload ) ).not.toContain(
+				'reviewed_block_items'
+			);
+			expect( JSON.stringify( normalized ) ).not.toContain(
+				'proof_signature'
+			);
+		}
+	} );
+
 	it( 'normalizes retry-save unfiltered HTML review rejections as exportable manual review', () => {
 		const rawContentToken = 'raw-review-content-must-not-leak';
 		const proposedContentHash =
@@ -3673,6 +3786,26 @@ describe( 'distributed editing session state', () => {
 				rebasedFromVersion: '7',
 				acceptedReviewApprovalProof: opaqueTokenEnvelope,
 			},
+		} );
+
+		expect(
+			getDistributedEditingLocalUpdatesImportResult( {
+				payload,
+				currentPost: {
+					id: 44,
+					type: 'post',
+				},
+				computedPostContentHash: proposedPostContentHash,
+				now: 1893456301,
+			} )
+		).toMatchObject( {
+			status: DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_STATUSES.BLOCKED,
+			reason: DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.EXPIRED_REVIEW_APPROVAL_PROOF,
+			hasPostContent: false,
+			hasAcceptedReviewApprovalProof: false,
+			mutatesEditorContent: false,
+			callsRetrySaveEndpoint: false,
+			claimsSaved: false,
 		} );
 	} );
 

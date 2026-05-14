@@ -868,6 +868,10 @@ describe( 'DistributedEditingStatus', () => {
 			'Import blocked: this admin review handoff is missing accepted review proof. Nothing was imported, and local changes remain protected.',
 		],
 		[
+			DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.EXPIRED_REVIEW_APPROVAL_PROOF,
+			'Import blocked: the admin-reviewed changes token or proof has expired and is no longer usable. Nothing was imported, and local changes remain protected and exportable.',
+		],
+		[
 			DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.EXTRA_SESSION_STATE_OVEREXPOSED,
 			'Import blocked: this reviewed-changes payload exposes extra distributed editing session state. Nothing was imported, and local changes remain protected.',
 		],
@@ -2456,6 +2460,32 @@ describe( 'DistributedEditingStatusSurface', () => {
 			},
 			{
 				disposition:
+					DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_MALFORMED_SYNC_PAYLOAD,
+				reasonCode:
+					DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_MALFORMED_SYNC_PAYLOAD,
+				retrySaveReason:
+					'unknown_retry_save_review_approval_proof_token',
+				retrySaveStatus:
+					DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_MALFORMED_SYNC_PAYLOAD,
+				title: 'Reviewed changes token unavailable',
+				message:
+					'The imported reviewed-changes token could not be found in server storage and is no longer usable for retry save. No server save was made. Protected local changes are still exportable; export them for a fresh admin review before trying again.',
+			},
+			{
+				disposition:
+					DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_SYNC_META_TAMPERED,
+				reasonCode:
+					DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_SYNC_META_TAMPERED,
+				retrySaveReason:
+					'retry_save_review_approval_proof_token_expired',
+				retrySaveStatus:
+					DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_SYNC_META_TAMPERED,
+				title: 'Reviewed changes token expired',
+				message:
+					'The imported reviewed-changes token has expired and is no longer usable for retry save. No server save was made. Protected local changes are still exportable; export them for a fresh admin review before trying again.',
+			},
+			{
+				disposition:
 					DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_UNFILTERED_HTML_REVIEW_REQUIRED,
 				reasonCode:
 					DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_UNFILTERED_HTML_WOULD_CHANGE_CONTENT,
@@ -2478,7 +2508,8 @@ describe( 'DistributedEditingStatusSurface', () => {
 						pendingChangeCount: 1,
 						canExportLocalUpdates: true,
 						retrySaveStatus: statusCase.retrySaveStatus,
-						retrySaveReason: statusCase.reasonCode,
+						retrySaveReason:
+							statusCase.retrySaveReason || statusCase.reasonCode,
 					}
 				) }
 				onAction={ onAction }
