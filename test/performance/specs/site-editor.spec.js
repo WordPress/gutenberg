@@ -103,21 +103,18 @@ test.describe( 'Site Editor Performance', () => {
 
 				// Get the durations.
 				const loadingDurations = await metrics.getLoadingDurations();
-				const firstBlockTime = await metrics.getFirstBlockTime();
 
 				// Save the results.
 				if ( i > throwaway ) {
 					Object.entries( loadingDurations ).forEach(
 						( [ metric, duration ] ) => {
 							if ( metric === 'timeSinceResponseEnd' ) {
-								return;
+								results.firstBlock.push( duration );
+							} else {
+								results[ metric ].push( duration );
 							}
-							results[ metric ].push( duration );
 						}
 					);
-					if ( firstBlockTime !== null ) {
-						results.firstBlock.push( firstBlockTime );
-					}
 
 					const serverTiming = await metrics.getServerTiming();
 

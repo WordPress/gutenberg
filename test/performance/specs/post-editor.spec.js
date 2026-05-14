@@ -67,7 +67,6 @@ test.describe( 'Post Editor Performance', () => {
 		for ( let i = 1; i <= iterations; i++ ) {
 			test( `Run the test (${ i } of ${ iterations })`, async ( {
 				admin,
-				perfUtils,
 				metrics,
 			} ) => {
 				// Start tracing before navigating so the page load is captured.
@@ -75,10 +74,11 @@ test.describe( 'Post Editor Performance', () => {
 
 				// Open the test draft.
 				await admin.editPost( draftId );
-				const canvas = await perfUtils.getCanvas();
 
-				// Wait for the first block.
-				await canvas.locator( '.wp-block' ).first().waitFor();
+				// Wait for the editor canvas to paint contentful pixels —
+				// bounds the metric on the browser's actual FCP, not a
+				// DOM-probe + polling race.
+				await metrics.waitForEditorFirstContentfulPaint();
 
 				// Stop tracing. Save just one representative sample.
 				await metrics.stopTracing(

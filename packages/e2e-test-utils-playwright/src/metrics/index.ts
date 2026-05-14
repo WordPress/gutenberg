@@ -162,15 +162,41 @@ export class Metrics {
 	}
 
 	/**
+	 * Waits until the editor canvas iframe (or the top frame, when the
+	 * canvas is rendered inline) reports a `first-contentful-paint` entry.
+	 * Polls the iframe's `performance.getEntriesByName('first-contentful-paint')`
+	 * via `Page.waitForFunction`, so the wait completes the moment the
+	 * browser stamps FCP — not when the DOM contains a probe element.
+	 *
+	 * @return Promise resolving once FCP has fired in the editor canvas.
+	 */
+	async waitForEditorFirstContentfulPaint(): Promise< void > {
+		await this.page.waitForFunction( () => {
+			const iframe = document.querySelector< HTMLIFrameElement >(
+				'iframe[name="editor-canvas"]'
+			);
+			const target = iframe?.contentWindow ?? window;
+			try {
+				return (
+					target.performance?.getEntriesByName(
+						'first-contentful-paint'
+					).length > 0
+				);
+			} catch {
+				return false;
+			}
+		} );
+	}
+
+	/**
 	 * Returns the time, in milliseconds, from when the navigation response
 	 * finished arriving until the editor canvas first painted contentful
 	 * pixels. Bridges the top frame's and the iframe's clocks via their
 	 * absolute `timeOrigin`s.
 	 *
 	 * Reads the browser's `firstContentfulPaint` paint-timing entry directly
-	 * rather than measuring `performance.now()` after `locator.waitFor()`
-	 * resolves, which removes Playwright's polling jitter and the JS event
-	 * loop delay between paint and the test runner's read.
+	 * rather than measuring `performance.now()` after a DOM-probe wait,
+	 * which removes Playwright's polling jitter and any DOM-vs-paint race.
 	 *
 	 * Falls back to the top frame's FCP when the editor canvas is rendered
 	 * inline (non-iframed).
