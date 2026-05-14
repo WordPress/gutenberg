@@ -1,24 +1,30 @@
-import { ColorSpace } from 'colorjs.io/fn';
+import { ColorSpace, HSL, OKLCH, sRGB } from 'colorjs.io/fn';
+
+const REQUIRED_COLOR_SPACES = [ sRGB, HSL, OKLCH ];
 
 /**
- * Ensures that the given color spaces are registered with `colorjs.io`.
+ * Ensures the color spaces required by this package are registered with
+ * `colorjs.io`.
  *
  * The procedural `colorjs.io/fn` API does not ship with any color spaces
- * registered by default and relies on `ColorSpace.registry` for parsing color
- * strings (e.g. `parse`, `to` with a string input) and for some internal
- * conversion lookups (e.g. `toGamut` with `method: 'css'`). Each call site
- * should pass the color spaces it explicitly references.
+ * registered by default. Our code references color spaces by their imported
+ * object (e.g. `to( color, OKLCH )`), which does not require registration.
+ * Registration is only needed for:
  *
- * Two non-obvious cases worth knowing when registering color spaces for use
- * with procedural API conversions:
- * - `parse` (and therefore `to(string, ...)`) requires `sRGB` to be registered
- * - `toGamut(..., { method: 'css' })` requires `OKLCH` to be registered
- *    regardless of the target gamut.
+ * - Parsing color strings (e.g. `parse`, `to` with a string input). `sRGB`
+ *   owns the hex and keyword parsers, `HSL` owns `hsl(...)`, `OKLCH` owns
+ *   `oklch(...)`.
+ * - `toGamut(..., { method: 'css' })`, which internally resolves `OKLCH` via
+ *   the registry regardless of the target gamut. This is a quirk of
+ *   `colorjs.io` (the function uses `ColorSpace.get('oklch')` instead of
+ *   referencing the imported `OKLCH` object) and should be reported upstream.
  *
- * @param spaces The color spaces to ensure are registered.
+ * Since the set of spaces we need to support is package-wide rather than
+ * per-call-site, this function takes no arguments and always registers the
+ * same set.
  */
-export function ensureColorSpacesRegistered( ...spaces: ColorSpace[] ) {
-	for ( const space of spaces ) {
+export function ensureColorSpacesRegistered() {
+	for ( const space of REQUIRED_COLOR_SPACES ) {
 		if ( ! ColorSpace.registry[ space.id ] ) {
 			ColorSpace.register( space );
 		}

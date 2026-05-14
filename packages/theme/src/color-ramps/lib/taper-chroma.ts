@@ -41,9 +41,7 @@ export function taperChroma(
 	lTarget: number, // [0..1]
 	options: TaperChromaOptions = {}
 ): { l: number; c: number } | PlainColorObject {
-	// `toGamut` with `method: 'css'` internally resolves OKLCH via the
-	// registry, regardless of the target gamut.
-	ensureColorSpacesRegistered( OKLCH );
+	ensureColorSpacesRegistered();
 
 	const gamut = options.gamut ?? sRGB;
 	const alpha = options.alpha ?? 0.65; // 0.7-0.8 works well for accent surface

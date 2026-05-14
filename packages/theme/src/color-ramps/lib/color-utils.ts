@@ -5,7 +5,6 @@ import {
 	contrastWCAG21,
 	sRGB,
 	OKLCH,
-	HSL,
 	type ColorTypes,
 } from 'colorjs.io/fn';
 
@@ -20,7 +19,7 @@ import { ensureColorSpacesRegistered } from './register-color-spaces';
  * @return String representation
  */
 export function getColorString( color: ColorTypes ): string {
-	ensureColorSpacesRegistered( sRGB );
+	ensureColorSpacesRegistered();
 	const rgbRounded = serialize( to( color, sRGB ) );
 	return serialize( rgbRounded, { format: 'hex' } );
 }
@@ -43,11 +42,7 @@ export function getContrast( colorA: ColorTypes, colorB: ColorTypes ): number {
  * @param c
  */
 export function clampToGamut( c: ColorTypes ) {
-	// `toGamut` with `method: 'css'` internally resolves OKLCH via the
-	// registry, regardless of the target gamut. HSL is registered so callers
-	// can pass `hsl(...)` strings; sRGB additionally owns the hex and
-	// keyword parsers used by `parse()`.
-	ensureColorSpacesRegistered( sRGB, OKLCH, HSL );
+	ensureColorSpacesRegistered();
 	// map into sRGB using CSS OKLCH method
 	return to( toGamut( c, { space: sRGB, method: 'css' } ), OKLCH );
 }

@@ -22,9 +22,7 @@ function adminColorVar(): string {
 }
 
 function getOKLCHValues( hex: string ) {
-	// `to(string, ...)` calls `parse()` internally, which requires sRGB to be
-	// registered (it owns the keyword and hex format parsers).
-	ensureColorSpacesRegistered( sRGB, OKLCH );
+	ensureColorSpacesRegistered();
 	const color = to( hex, OKLCH );
 	const l = get( color, [ OKLCH, 'l' ] );
 	const c = get( color, [ OKLCH, 'c' ] );

@@ -30,7 +30,7 @@ const colorJsonPath = path.join( __dirname, '../../tokens/color.json' );
 const HEX_ROUNDING_PRECISION = 3;
 
 const transformColorStringToDTCGValue = ( color: string ) => {
-	ensureColorSpacesRegistered( sRGB );
+	ensureColorSpacesRegistered();
 	const parsed = to( color, sRGB );
 
 	return {
