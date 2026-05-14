@@ -13,6 +13,7 @@ import { useState, useMemo } from '@wordpress/element';
  */
 import { DashboardLanes } from '..';
 import type { DashboardLanesLayoutItem } from '../types';
+import type { GridOverlayRenderProps } from '../../shared/types';
 
 const meta: Meta< typeof DashboardLanes > = {
 	title: 'Grid/DashboardLanes',
@@ -81,7 +82,9 @@ const bgTokens: Record< Tone, string > = {
 };
 
 const fgTokens: Record< Tone, string > = {
-	brand: 'var(--wpds-color-fg-content-info)',
+	// `brand` has no dedicated fg-content token in the design system,
+	// so neutral content reads safely against the brand surface tint.
+	brand: 'var(--wpds-color-fg-content-neutral)',
 	info: 'var(--wpds-color-fg-content-info)',
 	success: 'var(--wpds-color-fg-content-success)',
 	warning: 'var(--wpds-color-fg-content-warning)',
@@ -258,6 +261,18 @@ export const Spanning: Story = {
  * Edit mode: drag to reorder, resize from the bottom-right corner
  * (horizontal only — heights are content-driven). Drop commits the
  * new layout via `onChangeLayout`.
+ *
+ * While `editMode` is on, `<DashboardLanes />` paints its default
+ * overlay behind the tiles to mark the lane tracks: diagonal stripes
+ * plus a dashed outline and subtle fill on each column. Lanes paint
+ * columns only — there are no row dividers because heights are
+ * content-driven.
+ *
+ * Theme the default look in place via CSS custom properties
+ * (`--wp-grid-overlay-stripe-color`, `--wp-grid-overlay-track-color`,
+ * `--wp-grid-overlay-column-fill`), or replace the visual wholesale
+ * by passing `renderGridOverlay`. See the `Custom Grid Overlay`
+ * story below for a full override example.
  */
 export const EditMode: Story = {
 	args: {
@@ -326,6 +341,159 @@ export const EditMode: Story = {
 				{ ...args }
 				layout={ layout }
 				onChangeLayout={ onChangeLayout }
+			>
+				{ tileElements }
+			</DashboardLanes>
+		);
+	},
+};
+
+/**
+ * Example custom overlay supplied to `<DashboardLanes />` through the
+ * `renderGridOverlay` prop. Receives `{ columns, gapPx, isActive }`
+ * from the surface (no `rowHeight` because lane heights are
+ * content-driven). The custom must honor `isActive` for the same
+ * cross-fade behavior as the default; the surface always mounts the
+ * overlay.
+ *
+ * @param props          Render props supplied by the surface.
+ * @param props.columns  Number of lane tracks to mirror.
+ * @param props.gapPx    Gap between lanes in pixels.
+ * @param props.isActive Whether the overlay should be visible.
+ */
+function NumberedLanesOverlay( {
+	columns,
+	gapPx,
+	isActive,
+}: GridOverlayRenderProps ) {
+	return (
+		<div
+			aria-hidden
+			style={ {
+				position: 'absolute',
+				inset: 0,
+				display: 'grid',
+				gridTemplateColumns: `repeat(${ columns }, minmax(0, 1fr))`,
+				gap: gapPx,
+				pointerEvents: 'none',
+				opacity: isActive ? 1 : 0,
+				visibility: isActive ? 'visible' : 'hidden',
+				transition: isActive
+					? 'opacity 200ms ease, visibility 0s linear 0s'
+					: 'opacity 200ms ease, visibility 0s linear 200ms',
+				backgroundImage: `repeating-linear-gradient(135deg, color-mix(in srgb, var(--wpds-color-bg-surface-info) 24%, transparent) 0 6px, transparent 6px 12px)`,
+			} }
+		>
+			{ Array.from( { length: columns } ).map( ( _, i ) => (
+				<div
+					key={ i }
+					style={ {
+						outline:
+							'1px dashed var(--wpds-color-stroke-surface-info)',
+						backgroundColor:
+							'color-mix(in srgb, var(--wpds-color-bg-surface-info) 10%, transparent)',
+						position: 'relative',
+					} }
+				>
+					<span
+						style={ {
+							position: 'absolute',
+							top: 4,
+							insetInlineStart: 4,
+							fontSize: 10,
+							padding: '1px 6px',
+							borderRadius: 2,
+							background: 'var(--wpds-color-bg-surface-info)',
+							color: 'var(--wpds-color-fg-content-info)',
+							fontFamily:
+								'var(--wpds-typography-font-family-mono)',
+						} }
+					>
+						{ i + 1 }
+					</span>
+				</div>
+			) ) }
+		</div>
+	);
+}
+
+/**
+ * Replaces the surface's default edit-mode overlay with a custom
+ * visual through the `renderGridOverlay` prop. The same contract as
+ * `<DashboardGrid />`'s override path, with `rowHeight` omitted from
+ * the render props because lanes are content-driven vertically.
+ *
+ * Pass `renderGridOverlay={ () => null }` to suppress the overlay
+ * entirely while keeping `editMode` interactions on.
+ */
+export const CustomGridOverlayStory: Story = {
+	name: 'Custom Grid Overlay',
+	args: {
+		columns: 4,
+		spacing: 2,
+		editMode: true,
+	},
+	render: function CustomGridOverlayRender( args ) {
+		const initial: ( DashboardLanesLayoutItem & {
+			tone: Tone;
+			height: number;
+			label: string;
+		} )[] = [
+			{ key: 'a', tone: 'brand', height: 140, label: '140px' },
+			{ key: 'b', tone: 'info', height: 200, label: '200px' },
+			{
+				key: 'wide',
+				width: 2,
+				tone: 'success',
+				height: 120,
+				label: 'span 2',
+			},
+			{ key: 'c', tone: 'warning', height: 180, label: '180px' },
+			{ key: 'd', tone: 'error', height: 100, label: '100px' },
+			{ key: 'e', tone: 'neutral', height: 220, label: '220px' },
+		];
+
+		const [ tiles, setTiles ] = useState( initial );
+
+		const layout: DashboardLanesLayoutItem[] = tiles.map(
+			( { tone: _tone, height: _height, label: _label, ...item } ) => item
+		);
+
+		const onChangeLayout = ( next: DashboardLanesLayoutItem[] ) => {
+			setTiles(
+				next.map( ( item ) => {
+					const existing = tiles.find( ( t ) => t.key === item.key );
+					return {
+						...item,
+						tone: existing?.tone ?? 'neutral',
+						height: existing?.height ?? 100,
+						label: existing?.label ?? item.key,
+					};
+				} )
+			);
+		};
+
+		const tileElements = useMemo(
+			() =>
+				tiles.map( ( tile, i ) => (
+					<Tile
+						key={ tile.key }
+						tone={ tile.tone }
+						height={ tile.height }
+						index={ i + 1 }
+					>
+						{ tile.label }
+					</Tile>
+				) ),
+			[ tiles ]
+		);
+
+		return (
+			<DashboardLanes
+				{ ...args }
+				layout={ layout }
+				onChangeLayout={ onChangeLayout }
+				renderGridOverlay={ NumberedLanesOverlay }
 			>
 				{ tileElements }
 			</DashboardLanes>

@@ -19,6 +19,13 @@ test.use( {
 	},
 } );
 
+async function openStylesTabIfAvailable( editorSettings ) {
+	const stylesTab = editorSettings.getByRole( 'tab', { name: 'Styles' } );
+	if ( await stylesTab.count() ) {
+		await stylesTab.click();
+	}
+}
+
 test.describe( 'Cover', () => {
 	test.beforeEach( async ( { admin } ) => {
 		await admin.createNewPost();
@@ -134,7 +141,7 @@ test.describe( 'Cover', () => {
 			const editorSettings = page.getByRole( 'region', {
 				name: 'Editor settings',
 			} );
-			await editorSettings.getByRole( 'tab', { name: 'Styles' } ).click();
+			await openStylesTabIfAvailable( editorSettings );
 			await editorSettings
 				.getByRole( 'button', { name: 'Overlay' } )
 				.click();
@@ -231,13 +238,12 @@ test.describe( 'Cover', () => {
 			.getByRole( 'link', { name: 'Cover' } )
 			.click();
 
-		// In the Block Editor Settings panel, click on the Styles subpanel.
+		// In the Block Editor Settings panel, click on the Styles subpanel if
+		// the selected block has more than one inspector tab.
 		const coverBlockEditorSettings = page.getByRole( 'region', {
 			name: 'Editor settings',
 		} );
-		await coverBlockEditorSettings
-			.getByRole( 'tab', { name: 'Styles' } )
-			.click();
+		await openStylesTabIfAvailable( coverBlockEditorSettings );
 
 		// Ensure there the default value for the minimum height of cover is undefined.
 		await expect(
@@ -457,7 +463,7 @@ test.describe( 'Cover', () => {
 		const editorSettings = page.getByRole( 'region', {
 			name: 'Editor settings',
 		} );
-		await editorSettings.getByRole( 'tab', { name: 'Styles' } ).click();
+		await openStylesTabIfAvailable( editorSettings );
 
 		const opacitySlider = editorSettings.getByRole( 'slider', {
 			name: 'Overlay opacity',
@@ -500,7 +506,7 @@ test.describe( 'Cover', () => {
 		const editorSettings = page.getByRole( 'region', {
 			name: 'Editor settings',
 		} );
-		await editorSettings.getByRole( 'tab', { name: 'Styles' } ).click();
+		await openStylesTabIfAvailable( editorSettings );
 
 		const opacitySlider = editorSettings.getByRole( 'slider', {
 			name: 'Overlay opacity',

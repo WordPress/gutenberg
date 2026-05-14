@@ -1,6 +1,3 @@
-@use "sass:math";
-@use "@wordpress/base-styles/colors" as *;
-@use "@wordpress/base-styles/variables" as *;
 @use "@wordpress/base-styles/z-index" as *;
 @use "../utils/grid-items.scss" as *;
 
@@ -8,11 +5,11 @@
 	// When grouped, the density class is on the parent Composite,
 	// and the gap is on child .dataviews-view-grid-items elements.
 	&.has-compact-density .dataviews-view-grid-items {
-		gap: $grid-unit-20;
+		gap: var(--wpds-dimension-gap-lg);
 	}
 
 	&.has-comfortable-density .dataviews-view-grid-items {
-		gap: $grid-unit-40;
+		gap: var(--wpds-dimension-gap-2xl);
 	}
 
 	.dataviews-view-picker-grid__card {
@@ -21,11 +18,11 @@
 		position: relative;
 
 		.dataviews-view-picker-grid__title-actions {
-			padding: $grid-unit-10 0 $grid-unit-05;
+			padding: var(--wpds-dimension-padding-sm) 0 var(--wpds-dimension-padding-xs);
 		}
 
 		.dataviews-view-picker-grid__title-field {
-			min-height: $grid-unit-30; // Preserve layout when there is no ellipsis button
+			min-height: calc(var(--wpds-dimension-base) * 6); // TODO: use size token when available. Preserve layout when there is no ellipsis button
 			overflow: hidden;
 			align-content: center;
 			text-align: start;
@@ -38,18 +35,16 @@
 
 		&.is-selected {
 			.dataviews-view-picker-grid__fields .dataviews-view-picker-grid__field .dataviews-view-picker-grid__field-value {
-				color: $gray-900;
+				color: var(--wpds-color-fg-content-neutral);
 			}
 		}
-		&.is-selected .dataviews-view-picker-grid__media::after,
-		.dataviews-view-picker-grid__media:focus::after {
-			background-color: rgba(var(--wp-admin-theme-color--rgb), 0.08);
-		}
 		&.is-selected .dataviews-view-picker-grid__media::after {
-			box-shadow: inset 0 0 0 $border-width var(--wp-admin-theme-color);
+			box-shadow:
+				inset 0 0 0 var(--wpds-border-width-xs) var(--wpds-color-stroke-interactive-brand),
+				inset 0 0 0 var(--wpds-border-width-sm) var(--wpds-color-bg-surface-neutral-strong);
 		}
 		.dataviews-view-picker-grid__media:focus::after {
-			box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+			box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wpds-color-stroke-focus-brand);
 		}
 	}
 
@@ -61,13 +56,13 @@
 		}
 
 		[data-active-item="true"] {
-			outline: 2px solid var(--wp-admin-theme-color);
+			outline: 2px solid var(--wpds-color-stroke-focus-brand);
 		}
 	}
 
 	.dataviews-selection-checkbox {
 		// Always show the checkbox in picker mode.
-		top: $grid-unit-10 !important;
+		top: var(--wpds-dimension-padding-sm) !important;
 
 		input {
 			// When the dataview is used as a picker, ensure the checkbox can't be clicked on.
@@ -80,8 +75,8 @@
 		width: 100%;
 		aspect-ratio: 1/1;
 		min-height: 0;
-		background-color: $white;
-		border-radius: $radius-medium;
+		background-color: var(--wpds-color-bg-surface-neutral-strong);
+		border-radius: var(--wpds-border-radius-md);
 		position: relative;
 
 		img {
@@ -97,8 +92,8 @@
 			left: 0;
 			width: 100%;
 			height: 100%;
-			box-shadow: inset 0 0 0 $border-width rgba(0, 0, 0, 0.1);
-			border-radius: $grid-unit-05;
+			box-shadow: inset 0 0 0 var(--wpds-border-width-xs) rgba(0, 0, 0, 0.1);
+			border-radius: var(--wpds-border-radius-md);
 			pointer-events: none;
 		}
 	}
@@ -109,22 +104,22 @@
 		line-height: 16px;
 
 		&:not(:empty) {
-			padding: 0 0 $grid-unit-15;
+			padding: 0 0 var(--wpds-dimension-padding-md);
 		}
 
 		.dataviews-view-picker-grid__field-value:not(:empty) {
-			min-height: $grid-unit-30;
-			line-height: $grid-unit-05 * 5;
-			padding-top: math.div($grid-unit-05, 2);
+			min-height: calc(var(--wpds-dimension-base) * 6); // TODO: use size token when available
+			line-height: var(--wpds-typography-line-height-sm);
+			padding-top: calc(var(--wpds-dimension-base) / 2);
 		}
 
 		.dataviews-view-picker-grid__field {
-			min-height: $grid-unit-30;
+			min-height: calc(var(--wpds-dimension-base) * 6); // TODO: use size token when available
 			align-items: center;
 
 			.dataviews-view-picker-grid__field-name {
 				width: 35%;
-				color: $gray-700;
+				color: var(--wpds-color-fg-content-neutral-weak);
 				overflow: hidden;
 				text-overflow: ellipsis;
 				white-space: nowrap;
@@ -145,7 +140,7 @@
 
 	.dataviews-view-picker-grid__badge-fields {
 		&:not(:empty) {
-			padding-bottom: $grid-unit-15;
+			padding-bottom: var(--wpds-dimension-padding-md);
 		}
 	}
 }
@@ -158,19 +153,19 @@
 .dataviews-view-picker-grid__card .dataviews-selection-checkbox {
 	position: absolute;
 	top: -9999em;
-	left: $grid-unit-10;
+	left: var(--wpds-dimension-padding-sm);
 	z-index: z-index(".dataviews-view-grid__card .dataviews-selection-checkbox");
 
 	@media (hover: none) {
 		// Show checkboxes on devices that do not support hover.
-		top: $grid-unit-10;
+		top: var(--wpds-dimension-padding-sm);
 	}
 }
 
 .dataviews-view-picker-grid__card:hover .dataviews-selection-checkbox,
 .dataviews-view-picker-grid__card:focus-within .dataviews-selection-checkbox,
 .dataviews-view-picker-grid__card.is-selected .dataviews-selection-checkbox {
-	top: $grid-unit-10;
+	top: var(--wpds-dimension-padding-sm);
 }
 
 .dataviews-view-picker-grid__media--clickable {
@@ -178,9 +173,9 @@
 }
 
 .dataviews-view-picker-grid-group__header {
-	font-size: $font-size-large;
-	font-weight: $font-weight-medium;
-	color: $gray-900;
-	margin: 0 0 $grid-unit-10 0;
-	padding: 0 $grid-unit-60;
+	font-size: var(--wpds-typography-font-size-lg);
+	font-weight: var(--wpds-typography-font-weight-medium);
+	color: var(--wpds-color-fg-content-neutral);
+	margin: 0 0 var(--wpds-dimension-gap-sm) 0;
+	padding: 0 calc(var(--wpds-dimension-base) * 12);
 }

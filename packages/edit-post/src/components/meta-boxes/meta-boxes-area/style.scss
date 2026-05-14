@@ -1,6 +1,5 @@
 @use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/base-styles/variables" as *;
-@use "@wordpress/base-styles/z-index" as *;
 
 .edit-post-meta-boxes-area {
 	position: relative;
@@ -64,6 +63,7 @@
 		width: 44px;
 	}
 
+	// Block interaction with meta boxes while they are being saved.
 	&.is-loading::before {
 		position: absolute;
 		top: 0;
@@ -72,14 +72,14 @@
 		bottom: 0;
 		content: "";
 		background: transparent;
-		z-index: z-index(".edit-post-meta-boxes-area.is-loading::before");
+		z-index: 1;
 	}
 
-	.components-spinner {
+	.edit-post-meta-boxes-area__spinner {
 		position: absolute;
 		top: 10px;
 		right: 20px;
-		z-index: z-index(".edit-post-meta-boxes-area .spinner");
+		z-index: 2; // Stack above the .is-loading::before overlay.
 	}
 
 	// Hide disabled meta boxes using CSS so that we don't interfere with plugins

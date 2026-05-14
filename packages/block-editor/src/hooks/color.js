@@ -33,6 +33,11 @@ import {
 } from '../components/global-styles/color-panel';
 import BlockColorContrastChecker from './contrast-checker';
 import { store as blockEditorStore } from '../store';
+import {
+	getStyleForState,
+	setStyleForState,
+	useBlockStyleState,
+} from './block-style-state';
 
 export const COLOR_SUPPORT_KEY = 'color';
 
@@ -269,6 +274,7 @@ export function ColorEdit( {
 	label,
 	defaultControls,
 } ) {
+	const selectedState = useBlockStyleState();
 	const isEnabled = useHasColorPanel( settings );
 
 	const { style, textColor, backgroundColor, gradient } = useSelect(
@@ -292,18 +298,39 @@ export function ColorEdit( {
 		},
 		[ clientId, isEnabled ]
 	);
+
+	const isStateSelected = selectedState !== 'default';
+
 	const value = useMemo( () => {
+		if ( isStateSelected ) {
+			return getStyleForState( style, selectedState );
+		}
 		return attributesToStyle( {
 			style,
 			textColor,
 			backgroundColor,
 			gradient,
 		} );
-	}, [ style, textColor, backgroundColor, gradient ] );
+	}, [
+		isStateSelected,
+		selectedState,
+		style,
+		textColor,
+		backgroundColor,
+		gradient,
+	] );
 
-	const onChange = ( newStyle ) => {
-		setAttributes( styleToAttributes( newStyle ) );
-	};
+	const onChange = isStateSelected
+		? ( newStyle ) => {
+				setAttributes( {
+					style: setStyleForState( style, selectedState, newStyle ),
+				} );
+		  }
+		: ( newStyle ) => {
+				setAttributes( styleToAttributes( newStyle ) );
+		  };
+
+	const Wrapper = asWrapper || ColorInspectorControl;
 
 	if ( ! isEnabled ) {
 		return null;
@@ -317,6 +344,7 @@ export function ColorEdit( {
 		  ] );
 
 	const enableContrastChecking =
+		! isStateSelected &&
 		Platform.OS === 'web' &&
 		! value?.color?.gradient &&
 		( settings?.color?.text || settings?.color?.link ) &&
@@ -328,9 +356,6 @@ export function ColorEdit( {
 				COLOR_SUPPORT_KEY,
 				'enableContrastChecker',
 			] );
-
-	// Use provided wrapper or default to ColorInspectorControl
-	const Wrapper = asWrapper || ColorInspectorControl;
 
 	return (
 		<StylesColorPanel
