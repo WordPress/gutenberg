@@ -76,6 +76,8 @@ import {
 	getNotificationArgumentsForTrashFail,
 } from './utils/notice-builder';
 import { unlock } from '../lock-unlock';
+
+const distributedEditingFreshReviewImportContentVault = new Map();
 /**
  * Returns an action generator used in signalling that editor has initialized with
  * the specified post object and editor settings.
@@ -1126,6 +1128,12 @@ export const __experimentalImportDistributedEditingLocalUpdates =
 				select.getDistributedEditingSessionState?.() || {},
 			computedPostContentHash,
 		} );
+		updateDistributedEditingFreshReviewImportContentVault( {
+			currentPost: select.getCurrentPost?.() || {},
+			result,
+			postContent,
+			postContentHash: computedPostContentHash,
+		} );
 
 		if ( result.hasPostContent ) {
 			dispatch.editPost(
@@ -2035,7 +2043,14 @@ export const __experimentalSaveDistributedEditingRetryAfterProof =
 				}
 			);
 		const proposedPostContent =
-			options.proposedPostContent ?? select.getEditedPostContent?.();
+			options.proposedPostContent ??
+			getDistributedEditingFreshReviewImportedPostContentForRetrySave( {
+				postId,
+				postType,
+				sessionState: currentSessionState,
+				acceptedFreshReviewConsumeValidation,
+			} ) ??
+			select.getEditedPostContent?.();
 		const proposedPostContentHash =
 			options.proposedPostContentHash ??
 			getDistributedEditingRetrySaveProposedContentHashEvidence(
@@ -2083,6 +2098,10 @@ export const __experimentalSaveDistributedEditingRetryAfterProof =
 		try {
 			const response =
 				await requestDistributedEditingRetrySave( requestArgs );
+			const shouldApplyProposedPostContent =
+				response?.result === 'retry_save_applied' &&
+				typeof proposedPostContent === 'string' &&
+				select.getEditedPostContent?.() !== proposedPostContent;
 
 			dispatch.setDistributedEditingSessionState(
 				getDistributedEditingSessionStateForRetrySaveResult(
@@ -2090,6 +2109,18 @@ export const __experimentalSaveDistributedEditingRetryAfterProof =
 					savingSessionState
 				)
 			);
+			if ( shouldApplyProposedPostContent ) {
+				dispatch.editPost(
+					{ content: proposedPostContent },
+					{ undoIgnore: true }
+				);
+			}
+			if ( response?.result === 'retry_save_applied' ) {
+				deleteDistributedEditingFreshReviewImportContentVaultEntry( {
+					postId,
+					postType,
+				} );
+			}
 
 			return response;
 		} catch ( error ) {
@@ -2175,6 +2206,109 @@ function isDistributedEditingSha256Hash( value ) {
 	return typeof value === 'string' && /^[a-f0-9]{64}$/.test( value );
 }
 
+function updateDistributedEditingFreshReviewImportContentVault( {
+	currentPost = {},
+	result = {},
+	postContent,
+	postContentHash,
+} = {} ) {
+	const key = getDistributedEditingFreshReviewImportContentVaultKey( {
+		postId: currentPost.id,
+		postType: currentPost.type,
+	} );
+
+	if ( ! key ) {
+		return;
+	}
+
+	if (
+		result.status === 'blocked' &&
+		result.reason === 'fresh_review_required' &&
+		typeof postContent === 'string' &&
+		isDistributedEditingSha256Hash( postContentHash ) &&
+		result.sessionState?.localUpdatesImportVerifiedPostContentHash ===
+			postContentHash
+	) {
+		distributedEditingFreshReviewImportContentVault.set( key, {
+			postContent,
+			postContentHash,
+		} );
+		return;
+	}
+
+	distributedEditingFreshReviewImportContentVault.delete( key );
+}
+
+function getDistributedEditingFreshReviewImportedPostContentForRetrySave( {
+	postId,
+	postType,
+	sessionState = {},
+	acceptedFreshReviewConsumeValidation = null,
+} = {} ) {
+	const key = getDistributedEditingFreshReviewImportContentVaultKey( {
+		postId,
+		postType,
+	} );
+
+	if ( ! key ) {
+		return null;
+	}
+
+	const entry = distributedEditingFreshReviewImportContentVault.get( key );
+
+	if ( ! entry ) {
+		return null;
+	}
+
+	const acceptedValidation =
+		acceptedFreshReviewConsumeValidation ??
+		getDistributedEditingAcceptedFreshReviewConsumeValidationForRetrySaveRequest(
+			sessionState
+		);
+	const expectedPostContentHash =
+		getDistributedEditingRetrySaveProposedContentHashEvidence(
+			sessionState,
+			{
+				acceptedFreshReviewConsumeValidation: acceptedValidation,
+			}
+		);
+
+	if (
+		! acceptedValidation ||
+		! expectedPostContentHash ||
+		entry.postContentHash !== expectedPostContentHash
+	) {
+		return null;
+	}
+
+	return entry.postContent;
+}
+
+function deleteDistributedEditingFreshReviewImportContentVaultEntry( {
+	postId,
+	postType,
+} = {} ) {
+	const key = getDistributedEditingFreshReviewImportContentVaultKey( {
+		postId,
+		postType,
+	} );
+
+	if ( key ) {
+		distributedEditingFreshReviewImportContentVault.delete( key );
+	}
+}
+
+function getDistributedEditingFreshReviewImportContentVaultKey( {
+	postId,
+	postType,
+} = {} ) {
+	if ( postId === undefined || postId === null || ! postType ) {
+		return null;
+	}
+
+	return `${ postType }:${ postId }`;
+}
+
 /**
  * Consults the DE-RTC retry-save policy and performs the guarded retry-save
  * handoff only when the policy is ready.
@@ -2204,7 +2338,13 @@ export const __experimentalMaybeSavePostWithDistributedEditingRetryPolicy =
 		const currentSessionState =
 			select.getDistributedEditingSessionState?.() || {};
 		const proposedPostContent =
-			options.proposedPostContent ?? select.getEditedPostContent?.();
+			options.proposedPostContent ??
+			getDistributedEditingFreshReviewImportedPostContentForRetrySave( {
+				postId,
+				postType,
+				sessionState: currentSessionState,
+			} ) ??
+			select.getEditedPostContent?.();
 		const policy = getDistributedEditingRetrySavePolicyForSessionState(
 			currentSessionState,
 			{
@@ -2340,7 +2480,6 @@ export const savePost =
 				await dispatch.__experimentalMaybeSavePostWithDistributedEditingRetryPolicy(
 					{
 						...options,
-						proposedPostContent: content,
 					}
 				);
 

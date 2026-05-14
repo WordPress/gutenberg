@@ -2058,6 +2058,180 @@ describe( 'Post actions', () => {
 			} );
 		} );
 
+		it( 'routes imported fresh-review Save through retry-save with vaulted content after consume validation', async () => {
+			const receiverContent =
+				'<!-- wp:paragraph --><p>Receiving admin draft.</p><!-- /wp:paragraph -->';
+			const registry = setupImportEditor( 'server original' );
+			const payload = getDistributedEditingLocalUpdatesExportPayload( {
+				currentPost: {
+					id: postId,
+					type: 'post',
+				},
+				editedPostContent: approvedPostContent,
+				sessionState: {
+					serverVersion: '12',
+					clientBaseVersion: '7',
+					pendingChangeCount: 1,
+					retrySaveStatus:
+						DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_MALFORMED_SYNC_PAYLOAD,
+					retrySaveReason:
+						'unknown_retry_save_review_approval_proof_token',
+				},
+			} );
+			let retrySaveCalls = 0;
+			let normalSaveCalls = 0;
+			let retrySaveRequestData = null;
+
+			registry.dispatch( editorStore ).editPost( {
+				content: receiverContent,
+			} );
+			registry.dispatch( editorStore ).updateEditorSettings( {
+				distributedEditing: {
+					enabled: true,
+					retrySaveHandoff: true,
+				},
+			} );
+			registry
+				.dispatch( editorStore )
+				.setDistributedEditingSessionState( {
+					pendingChangeCount: 1,
+					hasPendingChanges: true,
+					isAwaitingServerConfirmation: true,
+					canExportLocalUpdates: true,
+					mustOfferLocalCopy: true,
+				} );
+
+			const importResult = await registry
+				.dispatch( editorStore )
+				.__experimentalImportDistributedEditingLocalUpdates(
+					JSON.stringify( payload )
+				);
+			const importedSessionState = registry
+				.select( editorStore )
+				.getDistributedEditingSessionState();
+
+			expect( importResult ).toMatchObject( {
+				status: DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_STATUSES.BLOCKED,
+				reason: DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.FRESH_REVIEW_REQUIRED,
+				hasPostContent: false,
+				mutatesEditorContent: false,
+			} );
+			expect(
+				registry.select( editorStore ).getEditedPostContent()
+			).toBe( receiverContent );
+
+			registry
+				.dispatch( editorStore )
+				.setDistributedEditingSessionState( {
+					...importedSessionState,
+					localUpdatesImportReviewRequestStatus:
+						DISTRIBUTED_EDITING_LOCAL_UPDATES_REVIEW_REQUEST_STATUSES.DECISION_RECORDED,
+					localUpdatesImportFreshReviewRequestRecordId:
+						'fresh-review-request-123',
+					localUpdatesImportFreshReviewRequestAccepted: true,
+					localUpdatesImportFreshReviewRequestRequested: true,
+					localUpdatesImportFreshReviewDecisionStatus:
+						DISTRIBUTED_EDITING_FRESH_REVIEW_DECISION_STATUSES.RECORDED,
+					localUpdatesImportFreshReviewDecisionResult:
+						'fresh_review_decision_approved_for_retry_save',
+					localUpdatesImportFreshReviewDecisionAccepted: true,
+					localUpdatesImportFreshReviewDecisionSubmitted: true,
+					localUpdatesImportFreshReviewDecisionDecision: 'approved',
+					localUpdatesImportFreshReviewRetrySaveHandoffStatus:
+						DISTRIBUTED_EDITING_FRESH_REVIEW_RETRY_SAVE_HANDOFF_STATUSES.ACCEPTED_FOR_RETRY_SAVE,
+					localUpdatesImportFreshReviewRetrySaveHandoffAccepted: true,
+					localUpdatesImportFreshReviewRetrySaveHandoffServerVersion:
+						'12',
+					localUpdatesImportFreshReviewRetrySaveHandoffProposedContentHash:
+						approvedPostContentHash,
+					localUpdatesImportFreshReviewRetrySaveHandoffCandidateContentHash:
+						candidatePostContentHash,
+					retrySaveFreshReviewConsumeValidationAccepted: true,
+					retrySaveFreshReviewDecisionConsumptionValidated: true,
+					retrySaveFreshReviewDecisionEligibleForRetrySave: true,
+					retrySaveFreshReviewRequestRecordId:
+						'fresh-review-request-123',
+					retrySaveFreshReviewServerVersion: '12',
+					retrySaveFreshReviewProposedContentHash:
+						approvedPostContentHash,
+					retrySaveFreshReviewCandidateContentHash:
+						candidatePostContentHash,
+					retrySaveFreshReviewHashEvidenceStatus: 'accepted',
+				} );
+
+			apiFetch.setFetchHandler( async ( options ) => {
+				const method = getMethod( options );
+				const { path, data } = options;
+
+				if (
+					method === 'POST' &&
+					path.startsWith(
+						`/wp/v2/posts/${ postId }/distributed-editing/retry-save`
+					)
+				) {
+					retrySaveCalls++;
+					retrySaveRequestData = data;
+
+					return {
+						result: 'retry_save_applied',
+						retry_save_accepted: true,
+						previous_server_version: '12',
+						server_version: '13',
+						pending_change_count: 0,
+						saves_post: true,
+						mutates_post_content: true,
+						creates_revision: true,
+						claims_saved: true,
+						fresh_review_decision_consumed: true,
+						fresh_review_request_record_id:
+							'fresh-review-request-123',
+					};
+				}
+
+				if (
+					method === 'PUT' &&
+					path.startsWith( `/wp/v2/posts/${ postId }` )
+				) {
+					normalSaveCalls++;
+				}
+
+				throw {
+					code: 'unknown_path',
+					message: `Unknown path: ${ method } ${ path }`,
+				};
+			} );
+
+			await expect(
+				registry.dispatch( editorStore ).savePost()
+			).resolves.toMatchObject( {
+				status: 'retry_save_submitted',
+				callsRetrySaveAction: true,
+				callsNormalSavePost: false,
+			} );
+
+			expect( retrySaveCalls ).toBe( 1 );
+			expect( normalSaveCalls ).toBe( 0 );
+			expect( retrySaveRequestData ).toMatchObject( {
+				client_base_version: '12',
+				accepted_proof_server_version: '12',
+				proposed_post_content: approvedPostContent,
+				proposed_post_content_hash: approvedPostContentHash,
+				accepted_fresh_review_decision: {
+					fresh_review_request_record_id: 'fresh-review-request-123',
+					server_version: '12',
+					proposed_post_content_hash: approvedPostContentHash,
+					candidate_post_content_hash: candidatePostContentHash,
+					raw_content_included: false,
+					exposes_raw_content: false,
+					exposes_reviewer_ids: false,
+					claims_saved: false,
+				},
+			} );
+			expect(
+				registry.select( editorStore ).getEditedPostContent()
+			).toBe( approvedPostContent );
+		} );
+
 		it( 'requests fresh admin review for imported local updates using hash-only page route evidence', async () => {
 			const registry = setupImportEditor( 'original content', {
 				postType: 'page',
@@ -5230,6 +5404,7 @@ describe( 'Post actions', () => {
 				client_base_version: '12',
 				accepted_proof_server_version: '12',
 				proposed_post_content: editedPostContent,
+				proposed_post_content_hash: proposedPostContentHash,
 				accepted_fresh_review_decision: {
 					fresh_review_request_record_id: 'fresh-review-request-123',
 					server_version: '12',
