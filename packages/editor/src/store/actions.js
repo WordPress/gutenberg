@@ -49,6 +49,7 @@ import {
 	getDistributedEditingSessionStateForRetrySaveRequest,
 	getDistributedEditingSessionStateForRetrySaveResult,
 	getDistributedEditingSessionStateForRiskyBlockReviewItemResolution,
+	getDistributedEditingAcceptedFreshReviewConsumeValidationForRetrySaveRequest,
 	getDistributedEditingAcceptedReviewApprovalProofForRetrySaveRequest,
 	getDistributedEditingLocalUpdatesImportResult,
 	getDistributedEditingPostContentSha256Hash,
@@ -1314,19 +1315,20 @@ export const __experimentalSubmitDistributedEditingFreshReviewDecision =
  * locks.
  *
  * @param {Object} [validationResult] Optional future validation response.
+ * @param {Object} [options]          Optional hash/version evidence.
  *
  * @return {Function} Action thunk.
  */
 export const __experimentalPrepareDistributedEditingFreshReviewRetrySaveHandoffValidation =
-
-		( validationResult = null ) =>
-		( { select, dispatch } ) => {
-			const currentSessionState =
-				select.getDistributedEditingSessionState?.() || {};
-			const preparedSessionState =
-				getDistributedEditingSessionStateForFreshReviewRetrySaveHandoffValidation(
-					currentSessionState
-				);
+	( validationResult = null, options = {} ) =>
+	( { select, dispatch } ) => {
+		const currentSessionState =
+			select.getDistributedEditingSessionState?.() || {};
+		const preparedSessionState =
+			getDistributedEditingSessionStateForFreshReviewRetrySaveHandoffValidation(
+				currentSessionState,
+				options
+			);
 			const sessionState = validationResult
 				? getDistributedEditingSessionStateForFreshReviewRetrySaveHandoffValidationResult(
 						validationResult,
@@ -1777,12 +1779,18 @@ export const __experimentalSaveDistributedEditingRetryAfterProof =
 			getDistributedEditingAcceptedReviewApprovalProofForRetrySaveRequest(
 				currentSessionState
 			);
+		const acceptedFreshReviewConsumeValidation =
+			options.acceptedFreshReviewConsumeValidation ??
+			getDistributedEditingAcceptedFreshReviewConsumeValidationForRetrySaveRequest(
+				currentSessionState
+			);
 		const savingSessionState =
 			getDistributedEditingSessionStateForRetrySaveRequest(
 				currentSessionState,
 				{
 					pendingChangeCount,
 					acceptedReviewApprovalProof,
+					acceptedFreshReviewConsumeValidation,
 				}
 			);
 		const requestArgs = {
@@ -1816,6 +1824,7 @@ export const __experimentalSaveDistributedEditingRetryAfterProof =
 				options.acceptedProofClaimsSaved ??
 				currentSessionState.retrySubmitClaimsSaved,
 			acceptedReviewApprovalProof,
+			acceptedFreshReviewConsumeValidation,
 		};
 
 		dispatch.setDistributedEditingSessionState( savingSessionState );
@@ -1929,6 +1938,9 @@ export const __experimentalMaybeSavePostWithDistributedEditingRetryPolicy =
 					acceptedReviewApprovalProof:
 						options.acceptedReviewApprovalProof ??
 						policy.request.acceptedReviewApprovalProof,
+					acceptedFreshReviewConsumeValidation:
+						options.acceptedFreshReviewConsumeValidation ??
+						policy.request.acceptedFreshReviewConsumeValidation,
 				}
 			);
 		const sessionState = select.getDistributedEditingSessionState?.() || {};

@@ -522,6 +522,107 @@ describe( 'distributed editing REST helpers', () => {
 		} );
 	} );
 
+	it( 'requests retry-save with accepted fresh-review consume validation evidence', async () => {
+		const proposedPostContent =
+			'<!-- wp:paragraph --><p>Fresh-review validated retry-save content.</p><!-- /wp:paragraph -->';
+		const proposedHash =
+			'0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef';
+		const candidateHash =
+			'abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789';
+
+		apiFetch.setFetchHandler( async ( options ) => {
+			expect( options.path ).toMatch(
+				/^\/wp\/v2\/posts\/42\/distributed-editing\/retry-save/
+			);
+			expect( options.method ).toBe( 'POST' );
+			expect( options.data ).toMatchObject( {
+				client_base_version: '12',
+				accepted_proof_server_version: '12',
+				rebased_from_version: '7',
+				pending_change_count: 1,
+				proposed_post_content: proposedPostContent,
+				proposed_post_content_hash: proposedHash,
+				accepted_fresh_review_consume_validation: {
+					type: 'fresh_review_decision_consumption_validation',
+					status: 'eligible_for_retry_save_handoff',
+					result: 'fresh_review_decision_eligible_for_retry_save_handoff',
+					rest_route: 'post_fresh_review_consume',
+					fresh_review_request_record_id: 'fresh-review-request-123',
+					fresh_review_request_status: 'decision_recorded',
+					fresh_review_decision_status: 'approved',
+					client_base_version: '7',
+					server_version: '12',
+					proposed_post_content_hash: proposedHash,
+					reviewed_proposed_content_hash: proposedHash,
+					candidate_post_content_hash: candidateHash,
+					reviewed_candidate_content_hash: candidateHash,
+					reviewed_block_item_count: 1,
+					hash_evidence_status: 'accepted',
+					fresh_review_decision_consumption_validated: true,
+					fresh_review_decision_eligible_for_retry_save: true,
+					raw_content_included: false,
+					exposes_raw_content: false,
+					exposes_reviewer_ids: false,
+					saves_post: false,
+					mutates_post_content: false,
+					creates_revision: false,
+					claims_saved: false,
+				},
+			} );
+			expect(
+				options.data.accepted_fresh_review_consume_validation
+					.raw_content
+			).toBeUndefined();
+			expect(
+				options.data.accepted_fresh_review_consume_validation
+					.reviewer_user_id
+			).toBeUndefined();
+			expect(
+				options.data.accepted_fresh_review_consume_validation
+					.proof_signature
+			).toBeUndefined();
+
+			return {
+				result: 'retry_save_applied',
+				retry_save_accepted: true,
+			};
+		} );
+
+		await expect(
+			__experimentalRequestDistributedEditingRetrySave( {
+				postId: 42,
+				clientBaseVersion: '12',
+				acceptedProofServerVersion: '12',
+				rebasedFromVersion: '7',
+				proposedPostContent,
+				proposedPostContentHash: proposedHash,
+				acceptedFreshReviewConsumeValidation: {
+					type: 'fresh_review_decision_consumption_validation',
+					status: 'eligible_for_retry_save_handoff',
+					result: 'fresh_review_decision_eligible_for_retry_save_handoff',
+					restRoute: 'post_fresh_review_consume',
+					freshReviewRequestRecordId: 'fresh-review-request-123',
+					freshReviewRequestStatus: 'decision_recorded',
+					freshReviewDecisionStatus: 'approved',
+					clientBaseVersion: '7',
+					serverVersion: '12',
+					proposedPostContentHash: proposedHash,
+					candidatePostContentHash: candidateHash,
+					reviewedBlockItemCount: 1,
+					hashEvidenceStatus: 'accepted',
+					freshReviewDecisionConsumptionValidated: true,
+					freshReviewDecisionEligibleForRetrySave: true,
+					rawContentIncluded: false,
+					reviewerUserId: 9,
+					proofSignature: 'must-not-send-proof-signature',
+				},
+			} )
+		).resolves.toEqual( {
+			result: 'retry_save_applied',
+			retry_save_accepted: true,
+		} );
+	} );
+
 	it( 'requests retry-save with page routes and default accepted proof fields', async () => {
 		const proposedPostContent =
 			'<!-- wp:paragraph --><p>Retry-save page content.</p><!-- /wp:paragraph -->';

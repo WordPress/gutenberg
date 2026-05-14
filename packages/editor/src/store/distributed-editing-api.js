@@ -387,6 +387,7 @@ export function __experimentalRequestDistributedEditingRetrySubmitProbe( {
  * @param {boolean} [args.acceptedProofCreatesRevision=false]    Whether accepted proof claimed revision creation.
  * @param {boolean} [args.acceptedProofClaimsSaved=false]        Whether accepted proof claimed saved state.
  * @param {Object}  [args.acceptedReviewApprovalProof]           Hash-only review approval proof.
+ * @param {Object}  [args.acceptedFreshReviewConsumeValidation]  Hash-only fresh-review consume validation evidence.
  *
  * @return {Promise<Object>} REST response or error.
  */
@@ -404,6 +405,7 @@ export function __experimentalRequestDistributedEditingRetrySave( {
 	acceptedProofCreatesRevision = false,
 	acceptedProofClaimsSaved = false,
 	acceptedReviewApprovalProof,
+	acceptedFreshReviewConsumeValidation,
 } = {} ) {
 	const data = {
 		client_base_version: clientBaseVersion,
@@ -433,6 +435,16 @@ export function __experimentalRequestDistributedEditingRetrySave( {
 		data.accepted_review_approval_proof = normalizedReviewApprovalProof;
 	}
 
+	const normalizedFreshReviewConsumeValidation =
+		normalizeAcceptedFreshReviewConsumeValidationForRetrySaveRequest(
+			acceptedFreshReviewConsumeValidation
+		);
+
+	if ( normalizedFreshReviewConsumeValidation ) {
+		data.accepted_fresh_review_consume_validation =
+			normalizedFreshReviewConsumeValidation;
+	}
+
 	return apiFetch( {
 		path: getDistributedEditingRetrySaveEndpointPath( {
 			postId,
@@ -441,6 +453,129 @@ export function __experimentalRequestDistributedEditingRetrySave( {
 		method: 'POST',
 		data,
 	} );
+}
+
+function normalizeAcceptedFreshReviewConsumeValidationForRetrySaveRequest(
+	validation
+) {
+	if (
+		! validation ||
+		typeof validation !== 'object' ||
+		Array.isArray( validation ) ||
+		containsRawContentEvidence( validation )
+	) {
+		return null;
+	}
+
+	const proposedPostContentHash =
+		validation.proposedPostContentHash ??
+		validation.proposed_post_content_hash;
+	const candidatePostContentHash =
+		validation.candidatePostContentHash ??
+		validation.candidate_post_content_hash;
+	const consumptionValidated = Boolean(
+		validation.freshReviewDecisionConsumptionValidated ??
+			validation.fresh_review_decision_consumption_validated ??
+			validation.validated ??
+			validation.accepted
+	);
+	const eligibleForRetrySave = Boolean(
+		validation.freshReviewDecisionEligibleForRetrySave ??
+			validation.fresh_review_decision_eligible_for_retry_save ??
+			validation.eligibleForRetrySave ??
+			validation.accepted
+	);
+	const normalized = {
+		type:
+			validation.type ??
+			validation.validationType ??
+			validation.validation_type ??
+			'fresh_review_decision_consumption_validation',
+		status:
+			validation.status ??
+			validation.validationStatus ??
+			validation.validation_status ??
+			'eligible_for_retry_save_handoff',
+		result: validation.result,
+		rest_route: validation.restRoute ?? validation.rest_route,
+		fresh_review_request_record_id:
+			validation.freshReviewRequestRecordId ??
+			validation.fresh_review_request_record_id ??
+			validation.requestRecordId ??
+			validation.request_record_id,
+		fresh_review_request_status:
+			validation.freshReviewRequestStatus ??
+			validation.fresh_review_request_status,
+		fresh_review_decision_status:
+			validation.freshReviewDecisionStatus ??
+			validation.fresh_review_decision_status,
+		client_base_version:
+			validation.clientBaseVersion ??
+			validation.client_base_version ??
+			undefined,
+		server_version:
+			validation.serverVersion ?? validation.server_version ?? undefined,
+		proposed_post_content_hash: proposedPostContentHash,
+		reviewed_proposed_content_hash:
+			validation.reviewedProposedContentHash ??
+			validation.reviewed_proposed_content_hash ??
+			proposedPostContentHash,
+		candidate_post_content_hash: candidatePostContentHash,
+		reviewed_candidate_content_hash:
+			validation.reviewedCandidateContentHash ??
+			validation.reviewed_candidate_content_hash ??
+			candidatePostContentHash,
+		reviewed_block_item_count:
+			normalizeProofNonNegativeInteger(
+				validation.reviewedBlockItemCount ??
+					validation.reviewed_block_item_count
+			) ?? undefined,
+		hash_evidence_status:
+			validation.hashEvidenceStatus ??
+			validation.hash_evidence_status ??
+			undefined,
+		fresh_review_decision_consumption_validated: consumptionValidated,
+		fresh_review_decision_eligible_for_retry_save: eligibleForRetrySave,
+		raw_content_included: false,
+		exposes_raw_content: false,
+		exposes_reviewer_ids: false,
+		saves_post: Boolean( validation.savesPost ?? validation.saves_post ),
+		mutates_post_content: Boolean(
+			validation.mutatesPostContent ?? validation.mutates_post_content
+		),
+		creates_revision: Boolean(
+			validation.createsRevision ?? validation.creates_revision
+		),
+		claims_saved: Boolean(
+			validation.claimsSaved ?? validation.claims_saved
+		),
+	};
+
+	for ( const [ key, value ] of Object.entries( normalized ) ) {
+		if (
+			value === undefined ||
+			value === null ||
+			( value === '' &&
+				! [
+					'candidate_post_content_hash',
+					'reviewed_candidate_content_hash',
+				].includes( key ) )
+		) {
+			delete normalized[ key ];
+		}
+	}
+
+	if (
+		! normalized.fresh_review_request_record_id ||
+		! normalized.client_base_version ||
+		! normalized.server_version ||
+		! normalized.proposed_post_content_hash ||
+		! normalized.fresh_review_decision_consumption_validated
+	) {
+		return null;
+	}
+
+	return normalized;
 }
 
 function normalizeAcceptedReviewApprovalProofForRetrySaveRequest( proof ) {
@@ -786,6 +921,12 @@ function normalizeProofPositiveIntegerOrNull( value ) {
 	}
 
 	return normalizeProofPositiveInteger( value );
+}
+
+function normalizeProofNonNegativeInteger( value ) {
+	const number = Number( value );
+
+	return Number.isInteger( number ) && number >= 0 ? number : undefined;
 }
 
 function getProofField( object, camelKey, snakeKey, fallback = undefined ) {

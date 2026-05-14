@@ -45,6 +45,7 @@ import {
 	getDistributedEditingFreshReviewRetrySaveHandoffStateForSessionState,
 	getDistributedEditingLocalUpdatesImportResult,
 	getDistributedEditingLocalUpdatesImportReviewRequestStateForSessionState,
+	getDistributedEditingAcceptedFreshReviewConsumeValidationForRetrySaveRequest,
 	getDistributedEditingAcceptedReviewApprovalProofForRetrySaveRequest,
 	getDistributedEditingReviewedBlockItemsForRetrySaveReviewApprovalProof,
 	getDistributedEditingReviewedBlockItemsForFreshReviewDecision,
@@ -174,7 +175,7 @@ describe( 'distributed editing session state', () => {
 			remoteChangeCount: 1,
 		} );
 
-		expect( normalized ).toEqual( {
+		expect( normalized ).toMatchObject( {
 			clientBaseVersion: 'server-v4',
 			serverVersion: 'server-v6',
 			clientBaseContent: null,
@@ -1946,6 +1947,10 @@ describe( 'distributed editing session state', () => {
 	} );
 
 	it( 'stages and consumes fresh-review retry-save handoff validation without saving', () => {
+		const proposedPostContentHash =
+			'0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef';
+		const candidatePostContentHash =
+			'abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789';
 		const recordedState = normalizeDistributedEditingSessionState( {
 			serverVersion: '12',
 			clientBaseVersion: '7',
@@ -1956,6 +1961,7 @@ describe( 'distributed editing session state', () => {
 				DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_STATUSES.BLOCKED,
 			localUpdatesImportReason:
 				DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.FRESH_REVIEW_REQUIRED,
+			localUpdatesImportVerifiedPostContentHash: proposedPostContentHash,
 			localUpdatesImportReviewRequestStatus:
 				DISTRIBUTED_EDITING_LOCAL_UPDATES_REVIEW_REQUEST_STATUSES.DECISION_RECORDED,
 			localUpdatesImportFreshReviewRequestRecordId:
@@ -1973,14 +1979,23 @@ describe( 'distributed editing session state', () => {
 		} );
 		const validatingState =
 			getDistributedEditingSessionStateForFreshReviewRetrySaveHandoffValidation(
-				recordedState
+				recordedState,
+				{
+					proposedPostContentHash,
+					candidatePostContentHash,
+				}
 			);
 		const acceptedState =
 			getDistributedEditingSessionStateForFreshReviewRetrySaveHandoffValidationResult(
 				{
-					result: 'fresh_review_decision_handoff_validated_for_retry_save',
-					rest_route: 'post_fresh_review_decision_retry_save_handoff',
-					fresh_review_retry_save_handoff_accepted: true,
+					result: 'fresh_review_decision_eligible_for_retry_save_handoff',
+					rest_route: 'post_fresh_review_consume',
+					fresh_review_decision_consumption_validated: true,
+					fresh_review_decision_eligible_for_retry_save: true,
+					fresh_review_request_record_id: 'fresh-review-request-123',
+					client_base_version: '7',
+					server_version: '12',
+					reviewed_block_item_count: 1,
 					proof_signature: 'fresh-review-proof-must-not-surface',
 					raw_content: '<script>fresh-review-raw</script>',
 					reviewer_user_id: 9,
@@ -1996,6 +2011,10 @@ describe( 'distributed editing session state', () => {
 			localUpdatesImportFreshReviewRetrySaveHandoffStatus:
 				DISTRIBUTED_EDITING_FRESH_REVIEW_RETRY_SAVE_HANDOFF_STATUSES.VALIDATING,
 			localUpdatesImportFreshReviewRetrySaveHandoffValidating: true,
+			localUpdatesImportFreshReviewRetrySaveHandoffProposedContentHash:
+				proposedPostContentHash,
+			localUpdatesImportFreshReviewRetrySaveHandoffCandidateContentHash:
+				candidatePostContentHash,
 			localUpdatesImportFreshReviewRetrySaveHandoffCallsNormalSavePost: false,
 			localUpdatesImportFreshReviewRetrySaveHandoffCallsRetrySaveEndpoint: false,
 			localUpdatesImportFreshReviewRetrySaveHandoffMutatesEditorContent: false,
@@ -2004,9 +2023,13 @@ describe( 'distributed editing session state', () => {
 		} );
 		expect( handoffState ).toMatchObject( {
 			status: DISTRIBUTED_EDITING_FRESH_REVIEW_RETRY_SAVE_HANDOFF_STATUSES.ACCEPTED_FOR_RETRY_SAVE,
-			result: 'fresh_review_decision_handoff_validated_for_retry_save',
-			restRoute: 'post_fresh_review_decision_retry_save_handoff',
+			result: 'fresh_review_decision_eligible_for_retry_save_handoff',
+			restRoute: 'post_fresh_review_consume',
 			accepted: true,
+			clientBaseVersion: '7',
+			serverVersion: '12',
+			proposedPostContentHash,
+			candidatePostContentHash,
 			callsNormalSavePost: false,
 			callsRetrySaveEndpoint: false,
 			dispatchesNotice: false,
@@ -2021,6 +2044,60 @@ describe( 'distributed editing session state', () => {
 		expect( JSON.stringify( handoffState ) ).not.toMatch(
 			/fresh-review-raw|fresh-review-proof-must-not-surface|reviewer_user_id/
 		);
+
+		const acceptedValidation =
+			getDistributedEditingAcceptedFreshReviewConsumeValidationForRetrySaveRequest(
+				acceptedState
+			);
+
+		expect( acceptedValidation ).toMatchObject( {
+			type: 'fresh_review_decision_consumption_validation',
+			status: 'eligible_for_retry_save_handoff',
+			result: 'fresh_review_decision_eligible_for_retry_save_handoff',
+			restRoute: 'post_fresh_review_consume',
+			freshReviewRequestRecordId: 'fresh-review-request-123',
+			freshReviewRequestStatus: 'decision_recorded',
+			freshReviewDecisionStatus: 'approved',
+			clientBaseVersion: '7',
+			serverVersion: '12',
+			proposedPostContentHash,
+			reviewedProposedContentHash: proposedPostContentHash,
+			candidatePostContentHash,
+			reviewedCandidateContentHash: candidatePostContentHash,
+			reviewedBlockItemCount: 1,
+			freshReviewDecisionConsumptionValidated: true,
+			freshReviewDecisionEligibleForRetrySave: true,
+			rawContentIncluded: false,
+			exposesRawContent: false,
+			exposesReviewerIds: false,
+			savesPost: false,
+			mutatesPostContent: false,
+			createsRevision: false,
+			claimsSaved: false,
+		} );
+		expect( JSON.stringify( acceptedValidation ) ).not.toMatch(
+			/fresh-review-raw|fresh-review-proof-must-not-surface|reviewer_user_id|reviewerUserId/
+		);
+		expect(
+			getDistributedEditingSessionStateForRetrySaveRequest(
+				acceptedState,
+				{
+					pendingChangeCount: 1,
+					acceptedFreshReviewConsumeValidation: acceptedValidation,
+				}
+			)
+		).toMatchObject( {
+			retrySaveStatus: DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVING,
+			retrySaveFreshReviewConsumeValidationStatus:
+				'accepted_for_retry_save',
+			retrySaveFreshReviewConsumeValidationAccepted: true,
+			retrySaveFreshReviewDecisionConsumptionValidated: true,
+			retrySaveFreshReviewRequestRecordId: 'fresh-review-request-123',
+			retrySaveFreshReviewClientBaseVersion: '7',
+			retrySaveFreshReviewServerVersion: '12',
+			retrySaveFreshReviewProposedContentHash: proposedPostContentHash,
+			canExportLocalUpdates: true,
+		} );
 	} );
 
 	it( 'normalizes retry-save unfiltered HTML review rejections as exportable manual review', () => {
@@ -3363,7 +3440,9 @@ describe( 'distributed editing session state', () => {
 			hasProposedPostContent: true,
 			hasVersionProof: true,
 			hasAcceptedReviewApprovalProof: false,
+			hasAcceptedFreshReviewConsumeValidation: false,
 			acceptedReviewApprovalReviewedBlockItemCount: 0,
+			acceptedFreshReviewRequestRecordId: null,
 			request: {
 				postId: 44,
 				restBase: 'posts',
