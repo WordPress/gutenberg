@@ -599,10 +599,10 @@ function createPayloadRoom(
 }
 
 function getUpdatePayloadSizeDelta(
-	room: SyncPayload[ 'rooms' ][ number ],
+	existingUpdateCount: number,
 	update: SyncUpdate
 ): number {
-	const commaSize = room.updates.length === 0 ? 0 : 1;
+	const commaSize = existingUpdateCount === 0 ? 0 : 1;
 	return commaSize + getJsonByteLength( update );
 }
 
@@ -627,12 +627,10 @@ function buildPayloadForRequest( selectedRoomStates: RoomState[] ): {
 		roomsInRequest.push( state );
 	}
 
-	const pendingUpdates = new Map< string, SyncUpdate[] >();
-	const sentUpdateCounts = new Map< string, number >();
-	for ( const state of roomsInRequest ) {
-		pendingUpdates.set( state.room, state.updateQueue.peek() );
-		sentUpdateCounts.set( state.room, 0 );
-	}
+	const pendingUpdates = roomsInRequest.map( ( state ) =>
+		state.updateQueue.peek()
+	);
+	const sentUpdateCounts = roomsInRequest.map( () => 0 );
 
 	let payloadSize = getJsonByteLength( payload );
 	let addedUpdate = true;
@@ -640,30 +638,31 @@ function buildPayloadForRequest( selectedRoomStates: RoomState[] ): {
 	while ( addedUpdate ) {
 		addedUpdate = false;
 
-		for ( const room of payload.rooms ) {
-			const updates = pendingUpdates.get( room.room ) ?? [];
-			const sentCount = sentUpdateCounts.get( room.room ) ?? 0;
-			const update = updates[ sentCount ];
+		for ( let i = 0; i < roomsInRequest.length; i++ ) {
+			const update = pendingUpdates[ i ][ sentUpdateCounts[ i ] ];
 
 			if ( ! update ) {
 				continue;
 			}
 
-			const sizeDelta = getUpdatePayloadSizeDelta( room, update );
+			const sizeDelta = getUpdatePayloadSizeDelta(
+				sentUpdateCounts[ i ],
+				update
+			);
 			if ( payloadSize + sizeDelta > syncRequestBodySizeLimit ) {
 				continue;
 			}
 
-			room.updates.push( update );
-			sentUpdateCounts.set( room.room, sentCount + 1 );
+			sentUpdateCounts[ i ]++;
 			payloadSize += sizeDelta;
 			addedUpdate = true;
 		}
 	}
 
-	for ( const [ index, state ] of roomsInRequest.entries() ) {
-		const sentCount = sentUpdateCounts.get( state.room ) ?? 0;
-		payload.rooms[ index ].updates = state.updateQueue.take( sentCount );
+	for ( let i = 0; i < roomsInRequest.length; i++ ) {
+		payload.rooms[ i ].updates = roomsInRequest[ i ].updateQueue.take(
+			sentUpdateCounts[ i ]
+		);
 	}
 
 	return { payload, roomsInRequest };
