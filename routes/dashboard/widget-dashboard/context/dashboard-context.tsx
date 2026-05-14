@@ -93,6 +93,13 @@ interface InternalDashboardContextValue {
 	canEditGridSettings: boolean;
 
 	/**
+	 * Restores the staging copy of `gridSettings` to the package's
+	 * built-in defaults. Does not touch the committed slice; the user
+	 * must `commit` to publish the reset, or `cancel` to discard it.
+	 */
+	resetGridSettings: () => void;
+
+	/**
 	 * Publishes staged slices that differ from their committed
 	 * counterparts, then exits edit mode. Best-effort atomic: no
 	 * rollback if a callback throws.
@@ -272,6 +279,10 @@ export function WidgetDashboardProvider( {
 		onEditChange?.( false );
 	}, [ committedLayout, committedGridSettings, onEditChange ] );
 
+	const resetGridSettings = useCallback( () => {
+		setStagingGridSettings( DEFAULT_GRID );
+	}, [] );
+
 	useEffect( () => {
 		if ( stagingLayout.length === 0 ) {
 			onEditChange?.( true );
@@ -294,6 +305,7 @@ export function WidgetDashboardProvider( {
 			gridSettings: stagingGridSettings,
 			onGridSettingsChange: setStagingGridSettings,
 			canEditGridSettings,
+			resetGridSettings,
 			commit,
 			cancel,
 			hasUncommittedChanges,
@@ -307,6 +319,7 @@ export function WidgetDashboardProvider( {
 			onLayoutReset,
 			stagingGridSettings,
 			canEditGridSettings,
+			resetGridSettings,
 			commit,
 			cancel,
 			hasUncommittedChanges,

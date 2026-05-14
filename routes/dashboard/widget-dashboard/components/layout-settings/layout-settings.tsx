@@ -63,9 +63,11 @@ interface LayoutSettingsProps {
  * design-system concern (theme / density / viewport tokens) and
  * should not be configurable per dashboard.
  *
- * Save commits the staging buffer; Cancel reverts it. Closing the
- * drawer through the X icon, an Escape press, or any path other than
- * the explicit Cancel/Save buttons is treated as Cancel.
+ * Save commits the staging buffer; Cancel reverts it; Reset
+ * restores the package's built-in defaults in staging (still
+ * subject to Save/Cancel). Closing the drawer through the X icon,
+ * an Escape press, or any path other than the explicit Cancel/Save
+ * buttons is treated as Cancel.
  *
  * Settings and layout-editing are kept as separate flows on the
  * dashboard surface (the Layout settings entry that opens this
@@ -88,6 +90,7 @@ export function LayoutSettings( {
 		onLayoutChange,
 		commit,
 		cancel: cancelStaging,
+		resetGridSettings,
 		hasUncommittedChanges,
 	} = useDashboardInternalContext();
 
@@ -312,6 +315,15 @@ export function LayoutSettings( {
 				</Drawer.Content>
 
 				<Drawer.Footer>
+					<Button
+						variant="minimal"
+						tone="neutral"
+						size="compact"
+						onClick={ resetGridSettings }
+						style={ { marginInlineEnd: 'auto' } }
+					>
+						{ __( 'Reset' ) }
+					</Button>
 					<Button
 						variant="minimal"
 						tone="brand"
