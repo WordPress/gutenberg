@@ -541,9 +541,13 @@ export const __experimentalMaybeRouteSavePostToDistributedEditingRiskyBlockRevie
 			) {
 				const approvedReviewItemCount =
 					savePolicy.approvedReviewItemCount ?? 0;
+				const hasAcceptedReviewApprovalProof = Boolean(
+					savePolicy.saveButton?.hasAcceptedReviewApprovalProof
+				);
 				const shouldRequestReviewApprovalProof =
-					savePolicy.saveButtonSource === 'risky_block_review' ||
-					approvedReviewItemCount > 0;
+					! hasAcceptedReviewApprovalProof &&
+					( savePolicy.saveButtonSource === 'risky_block_review' ||
+						approvedReviewItemCount > 0 );
 
 				if ( ! shouldRequestReviewApprovalProof ) {
 					return {

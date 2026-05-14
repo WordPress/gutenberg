@@ -6987,6 +6987,8 @@ export function getDistributedEditingSessionStateForRetrySaveResult(
 			retrySavePreviousServerVersion: previousServerVersion,
 			...retrySaveFlags,
 			...normalizeRetrySaveReviewMetadataFields(),
+			...normalizeRetrySaveReviewApprovalProofFields(),
+			...normalizeRiskyBlockReviewMetadataFields(),
 			...retrySaveFreshReviewConsumeValidationFields,
 			requiresManualConflictResolution: false,
 			mustOfferLocalCopy: false,

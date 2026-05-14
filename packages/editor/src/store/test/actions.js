@@ -36,9 +36,12 @@ import {
 	DISTRIBUTED_EDITING_RETRY_SAVE_REVIEW_APPROVAL_PROOF_STATUSES,
 	DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS,
 	DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES,
+	DISTRIBUTED_EDITING_SAVE_AUTHORITY_STATES,
 	DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES,
+	DISTRIBUTED_EDITING_SAVE_LOCAL_CHANGES_STATES,
 	DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS,
 	DISTRIBUTED_EDITING_SAVE_POLICY_STATUSES,
+	DISTRIBUTED_EDITING_SAVE_REVIEW_CHECKPOINT_STATES,
 	DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE,
 	getDistributedEditingLocalUpdatesExportPayload,
 } from '../distributed-editing';
@@ -4663,6 +4666,7 @@ describe( 'Post actions', () => {
 			let retrySaveCalls = 0;
 			let normalSaveCalls = 0;
 			let reviewApprovalData = null;
+			let retrySaveRequestData = null;
 
 			apiFetch.setFetchHandler( async ( options ) => {
 				const method = getMethod( options );
@@ -4705,6 +4709,20 @@ describe( 'Post actions', () => {
 					)
 				) {
 					retrySaveCalls++;
+					retrySaveRequestData = data;
+
+					return {
+						result: 'retry_save_applied',
+						retry_save_accepted: true,
+						previous_server_version: '12',
+						server_version: '13',
+						pending_change_count: 0,
+						saves_post: true,
+						mutates_post_content: true,
+						creates_revision: true,
+						claims_saved: true,
+						review_approval_proof_consumed: true,
+					};
 				}
 
 				if (
@@ -4736,6 +4754,7 @@ describe( 'Post actions', () => {
 			registry
 				.dispatch( editorStore )
 				.setDistributedEditingSessionState( {
+					clientBaseVersion: '12',
 					serverVersion: '12',
 					pendingChangeCount: 2,
 					hasPendingChanges: true,
@@ -4809,6 +4828,61 @@ describe( 'Post actions', () => {
 				retrySaveReviewApprovalAccepted: true,
 				retrySaveReviewApprovalReviewedBlockItemCount: 1,
 				canExportLocalUpdates: true,
+			} );
+			expect(
+				registry
+					.select( editorStore )
+					.getDistributedEditingSavePolicyState()
+			).toMatchObject( {
+				saveButtonStatus:
+					DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES.ACCEPTED_BUT_UNCONSUMED,
+				saveButtonSource: 'review_approval',
+				saveButtonLocalChangesState:
+					DISTRIBUTED_EDITING_SAVE_LOCAL_CHANGES_STATES.PROTECTED_CHANGES_EXPORTABLE,
+				saveButtonReviewCheckpointState:
+					DISTRIBUTED_EDITING_SAVE_REVIEW_CHECKPOINT_STATES.REVIEW_ACCEPTED,
+				saveButtonAuthoritativePostState:
+					DISTRIBUTED_EDITING_SAVE_AUTHORITY_STATES.READY_FOR_GUARDED_UPDATE,
+				saveButtonAuthoritativePostUpdated: false,
+			} );
+
+			await expect(
+				registry.dispatch( editorStore ).savePost()
+			).resolves.toMatchObject( {
+				status: 'retry_save_submitted',
+				callsRetrySaveAction: true,
+				callsNormalSavePost: false,
+			} );
+
+			expect( reviewApprovalCalls ).toBe( 1 );
+			expect( retrySaveCalls ).toBe( 1 );
+			expect( normalSaveCalls ).toBe( 0 );
+			expect( retrySaveRequestData ).toMatchObject( {
+				client_base_version: '12',
+				accepted_proof_server_version: '12',
+				proposed_post_content: editedPostContent,
+				accepted_review_approval_proof: expect.objectContaining( {
+					type: 'unfiltered_html_retry_save_review_approval',
+					proposed_post_content_hash: proposedPostContentHash,
+					candidate_post_content_hash: candidatePostContentHash,
+					raw_content_included: false,
+					claims_saved: false,
+				} ),
+			} );
+			expect(
+				registry
+					.select( editorStore )
+					.getDistributedEditingSessionState()
+			).toMatchObject( {
+				retrySaveStatus: DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVED,
+				retrySaveAccepted: true,
+				retrySaveReviewApprovalProofStatus:
+					DISTRIBUTED_EDITING_RETRY_SAVE_REVIEW_APPROVAL_PROOF_STATUSES.NONE,
+				retrySaveReviewApprovalAccepted: false,
+				riskyBlockReviewStatus:
+					DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_STATUSES.NONE,
+				riskyBlockReviewItemCount: 0,
+				canExportLocalUpdates: false,
 			} );
 		} );
 
