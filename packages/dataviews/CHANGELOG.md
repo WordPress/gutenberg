@@ -20,6 +20,8 @@
 
 - DataViews: Migrate styles from `@wordpress/base-styles` SCSS variables to `@wordpress/theme` CSS custom properties (design tokens) where possible. [#75204](https://github.com/WordPress/gutenberg/pull/75204)
 
+## 14.3.0 (2026-05-14)
+
 ## 14.2.0 (2026-04-29)
 
 ### Enhancements
