@@ -403,7 +403,7 @@ async function runPerformanceTests( branches, options ) {
 
 		logAtIndent( 3, 'Installing dependencies and building' );
 		await runShellScript(
-			`bash -c "source $HOME/.nvm/nvm.sh && nvm install && npm ci && npm run build -- --skip-types"`,
+			`bash -c "source $HOME/.nvm/nvm.sh && nvm install && npm ci && (npm run build -- --skip-types || npm run build)"`,
 			buildDir
 		);
 
