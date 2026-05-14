@@ -383,11 +383,27 @@ function normalizeAcceptedReviewApprovalProofForRetrySaveRequest( proof ) {
 	const normalized = {
 		type: proof.type,
 		status: proof.status ?? proof.proofStatus ?? proof.proof_status,
+		post_id: proof.postId ?? proof.post_id ?? undefined,
+		post_type: proof.postType ?? proof.post_type ?? undefined,
 		reviewer_user_id:
 			proof.reviewerUserId ?? proof.reviewer_user_id ?? undefined,
+		low_privileged_saver_user_id:
+			proof.lowPrivilegedSaverUserId ??
+			proof.low_privileged_saver_user_id ??
+			undefined,
 		reviewer_capability:
 			proof.reviewerCapability ?? proof.reviewer_capability ?? undefined,
 		review_scope: proof.reviewScope ?? proof.review_scope ?? undefined,
+		review_status: proof.reviewStatus ?? proof.review_status ?? undefined,
+		approval_status:
+			proof.approvalStatus ?? proof.approval_status ?? undefined,
+		review_action: proof.reviewAction ?? proof.review_action ?? undefined,
+		approval_action:
+			proof.approvalAction ?? proof.approval_action ?? undefined,
+		review_required_capability:
+			proof.reviewRequiredCapability ??
+			proof.review_required_capability ??
+			undefined,
 		server_version:
 			proof.serverVersion ?? proof.server_version ?? undefined,
 		previous_server_version:
@@ -400,6 +416,8 @@ function normalizeAcceptedReviewApprovalProofForRetrySaveRequest( proof ) {
 			proof.acceptedProofServerVersion ??
 			proof.accepted_proof_server_version ??
 			undefined,
+		rebased_from_version:
+			proof.rebasedFromVersion ?? proof.rebased_from_version ?? undefined,
 		proposed_post_content_hash:
 			proof.proposedPostContentHash ??
 			proof.proposed_post_content_hash ??
@@ -445,6 +463,8 @@ function normalizeAcceptedReviewApprovalProofForRetrySaveRequest( proof ) {
 			undefined,
 		block_review_status:
 			proof.blockReviewStatus ?? proof.block_review_status ?? undefined,
+		proof_signature:
+			proof.proofSignature ?? proof.proof_signature ?? undefined,
 		raw_content_included: false,
 		saves_post: Boolean( proof.savesPost ?? proof.saves_post ),
 		mutates_post_content: Boolean(
@@ -600,6 +620,13 @@ function normalizeReviewedBlockItemsForRequest( reviewedBlockItems ) {
 }
 
 function normalizeReviewedBlockItemForRequest( item = {} ) {
+	const hasOwn = Object.prototype.hasOwnProperty;
+	const hasBaseContentHash =
+		hasOwn.call( item, 'baseContentHash' ) ||
+		hasOwn.call( item, 'base_content_hash' );
+	const hasKsesFilteredContentHash =
+		hasOwn.call( item, 'ksesFilteredContentHash' ) ||
+		hasOwn.call( item, 'kses_filtered_content_hash' );
 	const proposedContentHash =
 		item.proposedContentHash ?? item.proposed_content_hash ?? null;
 	const reviewedProposedContentHash =
@@ -617,14 +644,14 @@ function normalizeReviewedBlockItemForRequest( item = {} ) {
 			: item.block_path,
 		change_kind: item.changeKind ?? item.change_kind ?? undefined,
 		risk_reason: item.riskReason ?? item.risk_reason ?? undefined,
-		base_content_hash:
-			item.baseContentHash ?? item.base_content_hash ?? undefined,
+		base_content_hash: hasBaseContentHash
+			? item.baseContentHash ?? item.base_content_hash
+			: undefined,
 		proposed_content_hash: proposedContentHash,
 		reviewed_proposed_content_hash: reviewedProposedContentHash,
-		kses_filtered_content_hash:
-			item.ksesFilteredContentHash ??
-			item.kses_filtered_content_hash ??
-			undefined,
+		kses_filtered_content_hash: hasKsesFilteredContentHash
+			? item.ksesFilteredContentHash ?? item.kses_filtered_content_hash
+			: undefined,
 		review_status:
 			item.reviewStatus ??
 			item.review_status ??
@@ -635,10 +662,17 @@ function normalizeReviewedBlockItemForRequest( item = {} ) {
 			'kses_block_hash_only_change',
 		content_review_policy:
 			item.contentReviewPolicy ?? item.content_review_policy ?? 'kses',
+		raw_content_included: false,
+		exposes_raw_content: false,
 	};
 
 	for ( const [ key, value ] of Object.entries( normalized ) ) {
-		if ( value === undefined || value === null ) {
+		if (
+			value === undefined ||
+			( value === null &&
+				key !== 'base_content_hash' &&
+				key !== 'kses_filtered_content_hash' )
+		) {
 			delete normalized[ key ];
 		}
 	}

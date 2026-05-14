@@ -444,8 +444,13 @@ export const DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE = Object.freeze( {
 		DISTRIBUTED_EDITING_RETRY_SAVE_REVIEW_APPROVAL_PROOF_STATUSES.NONE,
 	retrySaveReviewApprovalProofReason: null,
 	retrySaveReviewApprovalAccepted: false,
+	retrySaveReviewApprovalPostId: null,
+	retrySaveReviewApprovalPostType: null,
+	retrySaveReviewApprovalReviewerUserId: null,
+	retrySaveReviewApprovalLowPrivilegedSaverUserId: null,
 	retrySaveReviewApprovalServerVersion: null,
 	retrySaveReviewApprovalPreviousServerVersion: null,
+	retrySaveReviewApprovalRebasedFromVersion: null,
 	retrySaveReviewApprovalAction: null,
 	retrySaveReviewApprovalRequiredCapability: null,
 	retrySaveReviewApprovalReviewerCapability: null,
@@ -463,6 +468,7 @@ export const DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE = Object.freeze( {
 	retrySaveReviewApprovalUnapprovedBlockItemIds: [],
 	retrySaveReviewApprovalMismatchedBlockItemFields: [],
 	retrySaveReviewApprovalRawContentIncluded: false,
+	retrySaveReviewApprovalProofSignature: null,
 	retrySaveReviewApprovalSavesPost: false,
 	retrySaveReviewApprovalMutatesPostContent: false,
 	retrySaveReviewApprovalCreatesRevision: false,
@@ -1797,6 +1803,11 @@ export function getDistributedEditingAcceptedReviewApprovalProofForRetrySaveRequ
 	return {
 		type: 'unfiltered_html_retry_save_review_approval',
 		status: 'approved_by_unfiltered_html_reviewer',
+		postId: normalized.retrySaveReviewApprovalPostId,
+		postType: normalized.retrySaveReviewApprovalPostType,
+		reviewerUserId: normalized.retrySaveReviewApprovalReviewerUserId,
+		lowPrivilegedSaverUserId:
+			normalized.retrySaveReviewApprovalLowPrivilegedSaverUserId,
 		reviewerCapability:
 			normalized.retrySaveReviewApprovalReviewerCapability ||
 			'unfiltered_html',
@@ -1806,6 +1817,8 @@ export function getDistributedEditingAcceptedReviewApprovalProofForRetrySaveRequ
 		serverVersion,
 		previousServerVersion:
 			normalized.retrySaveReviewApprovalPreviousServerVersion,
+		rebasedFromVersion:
+			normalized.retrySaveReviewApprovalRebasedFromVersion,
 		clientBaseVersion: serverVersion,
 		acceptedProofServerVersion: serverVersion,
 		proposedPostContentHash,
@@ -1819,6 +1832,7 @@ export function getDistributedEditingAcceptedReviewApprovalProofForRetrySaveRequ
 		reviewedBlockItems,
 		reviewedBlockItemCount: reviewedBlockItems.length,
 		blockReviewStatus: normalized.retrySaveReviewApprovalBlockReviewStatus,
+		proofSignature: normalized.retrySaveReviewApprovalProofSignature,
 		rawContentIncluded: false,
 		exposesRawContent: false,
 		savesPost: normalized.retrySaveReviewApprovalSavesPost,
@@ -3415,10 +3429,19 @@ function getDistributedEditingRetrySaveReviewApprovalProofFields( normalized ) {
 			normalized.retrySaveReviewApprovalProofReason,
 		retrySaveReviewApprovalAccepted:
 			normalized.retrySaveReviewApprovalAccepted,
+		retrySaveReviewApprovalPostId: normalized.retrySaveReviewApprovalPostId,
+		retrySaveReviewApprovalPostType:
+			normalized.retrySaveReviewApprovalPostType,
+		retrySaveReviewApprovalReviewerUserId:
+			normalized.retrySaveReviewApprovalReviewerUserId,
+		retrySaveReviewApprovalLowPrivilegedSaverUserId:
+			normalized.retrySaveReviewApprovalLowPrivilegedSaverUserId,
 		retrySaveReviewApprovalServerVersion:
 			normalized.retrySaveReviewApprovalServerVersion,
 		retrySaveReviewApprovalPreviousServerVersion:
 			normalized.retrySaveReviewApprovalPreviousServerVersion,
+		retrySaveReviewApprovalRebasedFromVersion:
+			normalized.retrySaveReviewApprovalRebasedFromVersion,
 		retrySaveReviewApprovalAction: normalized.retrySaveReviewApprovalAction,
 		retrySaveReviewApprovalRequiredCapability:
 			normalized.retrySaveReviewApprovalRequiredCapability,
@@ -3451,6 +3474,8 @@ function getDistributedEditingRetrySaveReviewApprovalProofFields( normalized ) {
 			normalized.retrySaveReviewApprovalMismatchedBlockItemFields,
 		retrySaveReviewApprovalRawContentIncluded:
 			normalized.retrySaveReviewApprovalRawContentIncluded,
+		retrySaveReviewApprovalProofSignature:
+			normalized.retrySaveReviewApprovalProofSignature,
 		retrySaveReviewApprovalSavesPost:
 			normalized.retrySaveReviewApprovalSavesPost,
 		retrySaveReviewApprovalMutatesPostContent:
@@ -3738,11 +3763,27 @@ function normalizeRetrySaveReviewApprovalProofFields( sessionState = {} ) {
 			Boolean( sessionState.retrySaveReviewApprovalAccepted ) ||
 			retrySaveReviewApprovalProofStatus ===
 				DISTRIBUTED_EDITING_RETRY_SAVE_REVIEW_APPROVAL_PROOF_STATUSES.ACCEPTED_FOR_RETRY_SAVE,
+		retrySaveReviewApprovalPostId: normalizeNullableString(
+			sessionState.retrySaveReviewApprovalPostId
+		),
+		retrySaveReviewApprovalPostType: normalizeNullableString(
+			sessionState.retrySaveReviewApprovalPostType
+		),
+		retrySaveReviewApprovalReviewerUserId: normalizeNullableString(
+			sessionState.retrySaveReviewApprovalReviewerUserId
+		),
+		retrySaveReviewApprovalLowPrivilegedSaverUserId:
+			normalizeNullableString(
+				sessionState.retrySaveReviewApprovalLowPrivilegedSaverUserId
+			),
 		retrySaveReviewApprovalServerVersion: normalizeNullableString(
 			sessionState.retrySaveReviewApprovalServerVersion
 		),
 		retrySaveReviewApprovalPreviousServerVersion: normalizeNullableString(
 			sessionState.retrySaveReviewApprovalPreviousServerVersion
+		),
+		retrySaveReviewApprovalRebasedFromVersion: normalizeNullableString(
+			sessionState.retrySaveReviewApprovalRebasedFromVersion
 		),
 		retrySaveReviewApprovalAction: normalizeNullableString(
 			sessionState.retrySaveReviewApprovalAction
@@ -3802,6 +3843,9 @@ function normalizeRetrySaveReviewApprovalProofFields( sessionState = {} ) {
 		),
 		retrySaveReviewApprovalRawContentIncluded: Boolean(
 			sessionState.retrySaveReviewApprovalRawContentIncluded
+		),
+		retrySaveReviewApprovalProofSignature: normalizeNullableString(
+			sessionState.retrySaveReviewApprovalProofSignature
 		),
 		retrySaveReviewApprovalSavesPost: Boolean(
 			sessionState.retrySaveReviewApprovalSavesPost
@@ -4448,6 +4492,38 @@ function getRetrySaveReviewApprovalProofFieldsFromResponseOrError(
 		);
 
 	return normalizeRetrySaveReviewApprovalProofFields( {
+		retrySaveReviewApprovalPostId: getFirstDefined(
+			responseOrError.postId,
+			responseOrError.post_id,
+			responseData.postId,
+			responseData.post_id,
+			approvalContract.postId,
+			approvalContract.post_id
+		),
+		retrySaveReviewApprovalPostType: getFirstDefined(
+			responseOrError.postType,
+			responseOrError.post_type,
+			responseData.postType,
+			responseData.post_type,
+			approvalContract.postType,
+			approvalContract.post_type
+		),
+		retrySaveReviewApprovalReviewerUserId: getFirstDefined(
+			responseOrError.reviewerUserId,
+			responseOrError.reviewer_user_id,
+			responseData.reviewerUserId,
+			responseData.reviewer_user_id,
+			approvalContract.reviewerUserId,
+			approvalContract.reviewer_user_id
+		),
+		retrySaveReviewApprovalLowPrivilegedSaverUserId: getFirstDefined(
+			responseOrError.lowPrivilegedSaverUserId,
+			responseOrError.low_privileged_saver_user_id,
+			responseData.lowPrivilegedSaverUserId,
+			responseData.low_privileged_saver_user_id,
+			approvalContract.lowPrivilegedSaverUserId,
+			approvalContract.low_privileged_saver_user_id
+		),
 		retrySaveReviewApprovalAction: getFirstDefined(
 			responseOrError.approvalAction,
 			responseOrError.approval_action,
@@ -4548,6 +4624,14 @@ function getRetrySaveReviewApprovalProofFieldsFromResponseOrError(
 			approvalContract.requiresUnfilteredHtmlSaver,
 			approvalContract.requires_unfiltered_html_saver
 		),
+		retrySaveReviewApprovalRebasedFromVersion: getFirstDefined(
+			responseOrError.rebasedFromVersion,
+			responseOrError.rebased_from_version,
+			responseData.rebasedFromVersion,
+			responseData.rebased_from_version,
+			approvalContract.rebasedFromVersion,
+			approvalContract.rebased_from_version
+		),
 		retrySaveReviewApprovalExpectedProposedContentHash: getFirstDefined(
 			responseOrError.expectedProposedPostContentHash,
 			responseOrError.expected_proposed_post_content_hash,
@@ -4623,6 +4707,14 @@ function getRetrySaveReviewApprovalProofFieldsFromResponseOrError(
 			responseData.raw_content_included,
 			approvalContract.rawContentIncluded,
 			approvalContract.raw_content_included
+		),
+		retrySaveReviewApprovalProofSignature: getFirstDefined(
+			responseOrError.proofSignature,
+			responseOrError.proof_signature,
+			responseData.proofSignature,
+			responseData.proof_signature,
+			approvalContract.proofSignature,
+			approvalContract.proof_signature
 		),
 		retrySaveReviewApprovalSavesPost: approvalSavesPost,
 		retrySaveReviewApprovalMutatesPostContent: approvalMutatesPostContent,

@@ -235,16 +235,22 @@ describe( 'distributed editing REST helpers', () => {
 				accepted_review_approval_proof: {
 					type: 'unfiltered_html_retry_save_review_approval',
 					status: 'approved_by_unfiltered_html_reviewer',
+					post_id: 42,
+					post_type: 'post',
+					reviewer_user_id: 1,
+					low_privileged_saver_user_id: 7,
 					reviewer_capability: 'unfiltered_html',
 					review_scope: 'collaborative_post_content',
 					server_version: '8',
 					previous_server_version: '7',
 					client_base_version: '8',
 					accepted_proof_server_version: '8',
+					rebased_from_version: '5',
 					proposed_post_content_hash: proposedPostContentHash,
 					reviewed_proposed_content_hash: proposedPostContentHash,
 					candidate_post_content_hash: candidatePostContentHash,
 					reviewed_candidate_content_hash: candidatePostContentHash,
+					requires_unfiltered_html_saver: false,
 					reviewed_block_items: [
 						{
 							id: 'risk-html-approved',
@@ -254,9 +260,13 @@ describe( 'distributed editing REST helpers', () => {
 							review_status: 'approved_for_retry_save',
 							review_evidence_type: 'kses_block_hash_only_change',
 							content_review_policy: 'kses',
+							raw_content_included: false,
+							exposes_raw_content: false,
 						},
 					],
 					reviewed_block_item_count: 1,
+					proof_signature:
+						'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc',
 					raw_content_included: false,
 					saves_post: false,
 					mutates_post_content: false,
@@ -291,12 +301,17 @@ describe( 'distributed editing REST helpers', () => {
 				acceptedReviewApprovalProof: {
 					type: 'unfiltered_html_retry_save_review_approval',
 					status: 'approved_by_unfiltered_html_reviewer',
+					postId: 42,
+					postType: 'post',
+					reviewerUserId: 1,
+					lowPrivilegedSaverUserId: 7,
 					reviewerCapability: 'unfiltered_html',
 					reviewScope: 'collaborative_post_content',
 					serverVersion: '8',
 					previousServerVersion: '7',
 					clientBaseVersion: '8',
 					acceptedProofServerVersion: '8',
+					rebasedFromVersion: '5',
 					proposedPostContentHash,
 					reviewedProposedContentHash: proposedPostContentHash,
 					candidatePostContentHash,
@@ -312,6 +327,8 @@ describe( 'distributed editing REST helpers', () => {
 						},
 					],
 					reviewedBlockItemCount: 1,
+					proofSignature:
+						'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc',
 					rawContentIncluded: false,
 					savesPost: false,
 					mutatesPostContent: false,
@@ -415,6 +432,8 @@ describe( 'distributed editing REST helpers', () => {
 						review_status: 'approved_for_retry_save',
 						review_evidence_type: 'kses_block_hash_only_change',
 						content_review_policy: 'kses',
+						raw_content_included: false,
+						exposes_raw_content: false,
 					},
 				],
 			} );
@@ -425,7 +444,7 @@ describe( 'distributed editing REST helpers', () => {
 			).toBeUndefined();
 			expect(
 				options.data.reviewed_block_items[ 0 ].raw_content_included
-			).toBeUndefined();
+			).toBe( false );
 
 			return {
 				result: 'review_approval_accepted_for_retry_save',
