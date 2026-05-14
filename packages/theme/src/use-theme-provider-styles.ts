@@ -3,6 +3,7 @@
  */
 import type { CSSProperties } from 'react';
 import {
+	ColorSpace,
 	clone,
 	set,
 	to,
@@ -20,7 +21,6 @@ import { useMemo, useContext } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { ensureColorSpacesRegistered } from './color-ramps/lib/register-color-spaces';
 import { ThemeContext } from './context';
 import colorTokens from './prebuilt/ts/color-tokens';
 import {
@@ -101,7 +101,7 @@ function customRgbFormat( color: PlainColorObject ): string {
 }
 
 function legacyWpAdminThemeOverridesCSS( accent: string ): Entry[] {
-	ensureColorSpacesRegistered();
+	ColorSpace.register( sRGB );
 	const parsedAccent = to( accent, HSL );
 	const parsedL = parsedAccent.coords[ 2 ] ?? 0;
 

@@ -1,4 +1,5 @@
 import {
+	ColorSpace,
 	to,
 	toGamut,
 	serialize,
@@ -9,17 +10,12 @@ import {
 } from 'colorjs.io/fn';
 
 /**
- * Internal dependencies
- */
-import { ensureColorSpacesRegistered } from './register-color-spaces';
-
-/**
  * Get string representation of a color
  * @param color Color object to stringify
  * @return String representation
  */
 export function getColorString( color: ColorTypes ): string {
-	ensureColorSpacesRegistered();
+	ColorSpace.register( sRGB );
 	const rgbRounded = serialize( to( color, sRGB ) );
 	return serialize( rgbRounded, { format: 'hex' } );
 }
@@ -42,7 +38,9 @@ export function getContrast( colorA: ColorTypes, colorB: ColorTypes ): number {
  * @param c
  */
 export function clampToGamut( c: ColorTypes ) {
-	ensureColorSpacesRegistered();
-	// map into sRGB using CSS OKLCH method
+	ColorSpace.register( sRGB );
+	// Workaround for upstream toGamut(method:'css') bug.
+	// https://github.com/color-js/color.js/pull/734
+	ColorSpace.register( OKLCH );
 	return to( toGamut( c, { space: sRGB, method: 'css' } ), OKLCH );
 }
