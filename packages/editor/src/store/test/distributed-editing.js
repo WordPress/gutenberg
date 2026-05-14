@@ -32,6 +32,7 @@ import {
 	DISTRIBUTED_EDITING_UNLOAD_WARNING_REASONS,
 	DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE,
 	getDistributedEditingLocalUpdatesExportPayload,
+	getDistributedEditingAcceptedReviewApprovalProofForRetrySaveRequest,
 	getDistributedEditingReviewedBlockItemsForRetrySaveReviewApprovalProof,
 	getDistributedEditingRetrySaveFlowStateForSessionState,
 	getDistributedEditingRetrySavePolicyForSessionState,
@@ -1587,6 +1588,82 @@ describe( 'distributed editing session state', () => {
 		);
 	} );
 
+	it( 'builds hash-only accepted review approval proof for retry-save requests', () => {
+		const proposedContentHash =
+			'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
+		const candidateContentHash =
+			'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb';
+		const reviewedBlockHash =
+			'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc';
+		const proof =
+			getDistributedEditingAcceptedReviewApprovalProofForRetrySaveRequest(
+				{
+					serverVersion: '12',
+					retrySaveReviewApprovalProofStatus:
+						DISTRIBUTED_EDITING_RETRY_SAVE_REVIEW_APPROVAL_PROOF_STATUSES.ACCEPTED_FOR_RETRY_SAVE,
+					retrySaveReviewApprovalAccepted: true,
+					retrySaveReviewApprovalServerVersion: '12',
+					retrySaveReviewApprovalPreviousServerVersion: '11',
+					retrySaveReviewApprovalReviewerCapability:
+						'unfiltered_html',
+					retrySaveReviewApprovalScope: 'collaborative_post_content',
+					retrySaveReviewApprovalProposedContentHash:
+						proposedContentHash,
+					retrySaveReviewApprovalCandidateContentHash:
+						candidateContentHash,
+					retrySaveReviewApprovalReviewedBlockItems: [
+						{
+							id: 'risk-html-approved',
+							blockClientId: 'block-1',
+							blockName: 'core/html',
+							proposedContentHash: reviewedBlockHash,
+							reviewedProposedContentHash: reviewedBlockHash,
+							reviewStatus: 'approved_for_retry_save',
+							rawContent: '<script>must not leave JS</script>',
+							rawContentIncluded: true,
+						},
+						{
+							id: 'risk-html-rejected',
+							proposedContentHash:
+								'dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd',
+							reviewStatus: 'rejected',
+						},
+					],
+				}
+			);
+
+		expect( proof ).toMatchObject( {
+			type: 'unfiltered_html_retry_save_review_approval',
+			status: 'approved_by_unfiltered_html_reviewer',
+			reviewerCapability: 'unfiltered_html',
+			reviewScope: 'collaborative_post_content',
+			serverVersion: '12',
+			previousServerVersion: '11',
+			clientBaseVersion: '12',
+			acceptedProofServerVersion: '12',
+			proposedPostContentHash: proposedContentHash,
+			reviewedProposedContentHash: proposedContentHash,
+			candidatePostContentHash: candidateContentHash,
+			reviewedCandidateContentHash: candidateContentHash,
+			reviewedBlockItemCount: 1,
+			rawContentIncluded: false,
+			exposesRawContent: false,
+			savesPost: false,
+			mutatesPostContent: false,
+			createsRevision: false,
+			claimsSaved: false,
+		} );
+		expect( proof.reviewedBlockItems ).toEqual( [
+			expect.objectContaining( {
+				id: 'risk-html-approved',
+				reviewStatus: 'approved_for_retry_save',
+				rawContentIncluded: false,
+				exposesRawContent: false,
+			} ),
+		] );
+		expect( JSON.stringify( proof ) ).not.toContain( 'must not leave JS' );
+	} );
+
 	it( 'normalizes retry-save review approval rejections while preserving local changes', () => {
 		const stale =
 			getDistributedEditingSessionStateForRetrySaveReviewApprovalProofResult(
@@ -2126,6 +2203,8 @@ describe( 'distributed editing session state', () => {
 			hasPostRoute: true,
 			hasProposedPostContent: true,
 			hasVersionProof: true,
+			hasAcceptedReviewApprovalProof: false,
+			acceptedReviewApprovalReviewedBlockItemCount: 0,
 			request: {
 				postId: 44,
 				restBase: 'posts',

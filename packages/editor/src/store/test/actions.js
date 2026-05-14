@@ -1877,6 +1877,136 @@ describe( 'Post actions', () => {
 			} );
 		} );
 
+		it( 'passes accepted review approval proof into retry-save requests', async () => {
+			const proposedPostContent =
+				'<!-- wp:html --><script>approved</script><!-- /wp:html -->';
+			const proposedPostContentHash =
+				'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
+			const candidatePostContentHash =
+				'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb';
+			const reviewedBlockHash =
+				'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc';
+			const post = {
+				id: postId,
+				type: 'post',
+				title: 'bar',
+				content: proposedPostContent,
+				status: 'draft',
+			};
+
+			apiFetch.setFetchHandler( async ( options ) => {
+				expect( options.data ).toMatchObject( {
+					client_base_version: '12',
+					accepted_proof_server_version: '12',
+					rebased_from_version: '9',
+					pending_change_count: 1,
+					proposed_post_content: proposedPostContent,
+					proposed_post_content_hash: proposedPostContentHash,
+					accepted_review_approval_proof: {
+						type: 'unfiltered_html_retry_save_review_approval',
+						status: 'approved_by_unfiltered_html_reviewer',
+						reviewer_capability: 'unfiltered_html',
+						review_scope: 'collaborative_post_content',
+						server_version: '12',
+						previous_server_version: '11',
+						client_base_version: '12',
+						accepted_proof_server_version: '12',
+						proposed_post_content_hash: proposedPostContentHash,
+						reviewed_proposed_content_hash: proposedPostContentHash,
+						candidate_post_content_hash: candidatePostContentHash,
+						reviewed_candidate_content_hash:
+							candidatePostContentHash,
+						reviewed_block_item_count: 1,
+						raw_content_included: false,
+						saves_post: false,
+						mutates_post_content: false,
+						creates_revision: false,
+						claims_saved: false,
+					},
+				} );
+				expect(
+					options.data.accepted_review_approval_proof
+						.reviewed_block_items
+				).toEqual( [
+					expect.objectContaining( {
+						id: 'risk-html-approved',
+						proposed_content_hash: reviewedBlockHash,
+						review_status: 'approved_for_retry_save',
+					} ),
+				] );
+
+				return {
+					result: 'retry_save_applied',
+					retry_save_accepted: true,
+					previous_server_version: '12',
+					server_version: '13',
+					saves_post: true,
+					mutates_post_content: true,
+					creates_revision: true,
+					claims_saved: true,
+					review_approval_proof_consumed: true,
+					reviewed_block_item_count: 1,
+				};
+			} );
+
+			const registry = createRegistryWithStores();
+
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', post );
+			registry.dispatch( editorStore ).setupEditor( post, {
+				content: post.content,
+			} );
+			registry
+				.dispatch( editorStore )
+				.setDistributedEditingSessionState( {
+					clientBaseVersion: '9',
+					serverVersion: '12',
+					pendingChangeCount: 1,
+					retrySubmitProofStatus:
+						DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.ACCEPTED_FOR_FUTURE_SAVE,
+					retrySubmitAccepted: true,
+					retrySubmitSavePathRequired: true,
+					retrySubmitSaveStatus:
+						DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.READY,
+					retrySubmitSaveReady: true,
+					retrySaveReviewApprovalProofStatus:
+						DISTRIBUTED_EDITING_RETRY_SAVE_REVIEW_APPROVAL_PROOF_STATUSES.ACCEPTED_FOR_RETRY_SAVE,
+					retrySaveReviewApprovalAccepted: true,
+					retrySaveReviewApprovalServerVersion: '12',
+					retrySaveReviewApprovalPreviousServerVersion: '11',
+					retrySaveReviewApprovalReviewerCapability:
+						'unfiltered_html',
+					retrySaveReviewApprovalScope: 'collaborative_post_content',
+					retrySaveReviewApprovalProposedContentHash:
+						proposedPostContentHash,
+					retrySaveReviewApprovalCandidateContentHash:
+						candidatePostContentHash,
+					retrySaveReviewApprovalReviewedBlockItems: [
+						{
+							id: 'risk-html-approved',
+							blockName: 'core/html',
+							proposedContentHash: reviewedBlockHash,
+							reviewedProposedContentHash: reviewedBlockHash,
+							reviewStatus: 'approved_for_retry_save',
+						},
+					],
+					canExportLocalUpdates: true,
+				} );
+
+			await expect(
+				registry
+					.dispatch( editorStore )
+					.__experimentalSaveDistributedEditingRetryAfterProof( {
+						proposedPostContentHash,
+					} )
+			).resolves.toMatchObject( {
+				result: 'retry_save_applied',
+				review_approval_proof_consumed: true,
+				reviewed_block_item_count: 1,
+			} );
+		} );
+
 		it( 'builds retry-save requests from edited page content and default proof fields', async () => {
 			const originalPostContent =
 				'<!-- wp:paragraph --><p>Original page.</p><!-- /wp:paragraph -->';

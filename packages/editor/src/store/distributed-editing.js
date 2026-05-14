@@ -1449,6 +1449,10 @@ export function getDistributedEditingRetrySaveFlowStateForSessionState(
 		hasDistributedEditingRetrySaveSavedStateEvidenceForSessionState(
 			normalized
 		);
+	const acceptedReviewApprovalProof =
+		getDistributedEditingAcceptedReviewApprovalProofForRetrySaveRequest(
+			normalized
+		);
 
 	return {
 		hasProtectedLocalChanges,
@@ -1457,6 +1461,9 @@ export function getDistributedEditingRetrySaveFlowStateForSessionState(
 		hasRetrySubmitHandoff,
 		hasAcceptedRetrySubmitProof,
 		hasRetrySavePreparation,
+		hasAcceptedReviewApprovalProof: Boolean( acceptedReviewApprovalProof ),
+		acceptedReviewApprovalReviewedBlockItemCount:
+			acceptedReviewApprovalProof?.reviewedBlockItemCount ?? 0,
 		hasRetrySaveSavedStateEvidence,
 		canClaimSaved: hasRetrySaveSavedStateEvidence,
 		claimsSaved: hasRetrySaveSavedStateEvidence,
@@ -1733,6 +1740,86 @@ export function getDistributedEditingReviewedBlockItemsForRetrySaveReviewApprova
 				contentReviewPolicy: item.contentReviewPolicy || 'kses',
 			} )
 		);
+}
+
+/**
+ * Builds the accepted review-approval proof object for guarded retry-save.
+ *
+ * This projection is hash-only. It does not include raw post content, raw block
+ * content, or rejected/pending review items.
+ *
+ * @param {Object} sessionState Current DE-RTC session state.
+ *
+ * @return {Object|null} Accepted review-approval proof for retry-save.
+ */
+export function getDistributedEditingAcceptedReviewApprovalProofForRetrySaveRequest(
+	sessionState = {}
+) {
+	const normalized = normalizeDistributedEditingSessionState( sessionState );
+
+	if (
+		! normalized.retrySaveReviewApprovalAccepted ||
+		normalized.retrySaveReviewApprovalProofStatus !==
+			DISTRIBUTED_EDITING_RETRY_SAVE_REVIEW_APPROVAL_PROOF_STATUSES.ACCEPTED_FOR_RETRY_SAVE ||
+		normalized.retrySaveReviewApprovalRawContentIncluded
+	) {
+		return null;
+	}
+
+	const serverVersion =
+		normalized.retrySaveReviewApprovalServerVersion ||
+		normalized.serverVersion;
+	const proposedPostContentHash =
+		normalized.retrySaveReviewApprovalProposedContentHash ||
+		normalized.retrySaveReviewProposedContentHash;
+	const candidatePostContentHash =
+		normalized.retrySaveReviewApprovalCandidateContentHash ||
+		normalized.retrySaveReviewCandidateContentHash;
+
+	if (
+		! serverVersion ||
+		! proposedPostContentHash ||
+		! candidatePostContentHash
+	) {
+		return null;
+	}
+
+	const reviewedBlockItems =
+		normalized.retrySaveReviewApprovalReviewedBlockItems.filter(
+			( item ) =>
+				item.reviewStatus ===
+				DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES.APPROVED_FOR_RETRY_SAVE
+		);
+
+	return {
+		type: 'unfiltered_html_retry_save_review_approval',
+		status: 'approved_by_unfiltered_html_reviewer',
+		reviewerCapability:
+			normalized.retrySaveReviewApprovalReviewerCapability ||
+			'unfiltered_html',
+		reviewScope:
+			normalized.retrySaveReviewApprovalScope ||
+			'collaborative_post_content',
+		serverVersion,
+		previousServerVersion:
+			normalized.retrySaveReviewApprovalPreviousServerVersion,
+		clientBaseVersion: serverVersion,
+		acceptedProofServerVersion: serverVersion,
+		proposedPostContentHash,
+		reviewedProposedContentHash: proposedPostContentHash,
+		candidatePostContentHash,
+		reviewedCandidateContentHash: candidatePostContentHash,
+		reviewedBlockItems,
+		reviewedBlockItemCount: reviewedBlockItems.length,
+		blockReviewStatus: normalized.retrySaveReviewApprovalBlockReviewStatus,
+		rawContentIncluded: false,
+		exposesRawContent: false,
+		savesPost: normalized.retrySaveReviewApprovalSavesPost,
+		mutatesPostContent:
+			normalized.retrySaveReviewApprovalMutatesPostContent,
+		createsRevision: normalized.retrySaveReviewApprovalCreatesRevision,
+		claimsSaved: normalized.retrySaveReviewApprovalClaimsSaved,
+	};
 }
 
 /**
@@ -2949,6 +3036,10 @@ export function getDistributedEditingRetrySavePolicyForSessionState(
 		hasDistributedEditingRetrySaveSavedStateEvidenceForSessionState(
 			normalized
 		);
+	const acceptedReviewApprovalProof =
+		getDistributedEditingAcceptedReviewApprovalProofForRetrySaveRequest(
+			normalized
+		);
 	let reason = null;
 
 	if (
@@ -3037,6 +3128,9 @@ export function getDistributedEditingRetrySavePolicyForSessionState(
 				acceptedProofServerVersion &&
 				rebasedFromVersion
 		),
+		hasAcceptedReviewApprovalProof: Boolean( acceptedReviewApprovalProof ),
+		acceptedReviewApprovalReviewedBlockItemCount:
+			acceptedReviewApprovalProof?.reviewedBlockItemCount ?? 0,
 		request: canRetrySave
 			? {
 					postId,
@@ -3045,6 +3139,9 @@ export function getDistributedEditingRetrySavePolicyForSessionState(
 					acceptedProofServerVersion,
 					rebasedFromVersion,
 					pendingChangeCount,
+					...( acceptedReviewApprovalProof
+						? { acceptedReviewApprovalProof }
+						: {} ),
 			  }
 			: null,
 	};

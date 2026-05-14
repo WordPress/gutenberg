@@ -211,6 +211,10 @@ describe( 'distributed editing REST helpers', () => {
 			'<!-- wp:paragraph --><p>Retry-save proposed content.</p><!-- /wp:paragraph -->';
 		const proposedPostContentHash =
 			'0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef';
+		const candidatePostContentHash =
+			'abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789';
+		const reviewedBlockHash =
+			'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb';
 
 		apiFetch.setFetchHandler( async ( options ) => {
 			expect( options.path ).toMatch(
@@ -228,8 +232,42 @@ describe( 'distributed editing REST helpers', () => {
 				accepted_proof_mutates_post_content: false,
 				accepted_proof_creates_revision: false,
 				accepted_proof_claims_saved: false,
+				accepted_review_approval_proof: {
+					type: 'unfiltered_html_retry_save_review_approval',
+					status: 'approved_by_unfiltered_html_reviewer',
+					reviewer_capability: 'unfiltered_html',
+					review_scope: 'collaborative_post_content',
+					server_version: '8',
+					previous_server_version: '7',
+					client_base_version: '8',
+					accepted_proof_server_version: '8',
+					proposed_post_content_hash: proposedPostContentHash,
+					reviewed_proposed_content_hash: proposedPostContentHash,
+					candidate_post_content_hash: candidatePostContentHash,
+					reviewed_candidate_content_hash: candidatePostContentHash,
+					reviewed_block_items: [
+						{
+							id: 'risk-html-approved',
+							block_name: 'core/html',
+							proposed_content_hash: reviewedBlockHash,
+							reviewed_proposed_content_hash: reviewedBlockHash,
+							review_status: 'approved_for_retry_save',
+							review_evidence_type: 'kses_block_hash_only_change',
+							content_review_policy: 'kses',
+						},
+					],
+					reviewed_block_item_count: 1,
+					raw_content_included: false,
+					saves_post: false,
+					mutates_post_content: false,
+					creates_revision: false,
+					claims_saved: false,
+				},
 			} );
 			expect( options.data.mode ).toBeUndefined();
+			expect(
+				JSON.stringify( options.data.accepted_review_approval_proof )
+			).not.toContain( 'raw-review-content-must-not-send' );
 
 			return {
 				result: 'retry_save_applied',
@@ -250,6 +288,36 @@ describe( 'distributed editing REST helpers', () => {
 				pendingChangeCount: 2,
 				proposedPostContent,
 				proposedPostContentHash,
+				acceptedReviewApprovalProof: {
+					type: 'unfiltered_html_retry_save_review_approval',
+					status: 'approved_by_unfiltered_html_reviewer',
+					reviewerCapability: 'unfiltered_html',
+					reviewScope: 'collaborative_post_content',
+					serverVersion: '8',
+					previousServerVersion: '7',
+					clientBaseVersion: '8',
+					acceptedProofServerVersion: '8',
+					proposedPostContentHash,
+					reviewedProposedContentHash: proposedPostContentHash,
+					candidatePostContentHash,
+					reviewedCandidateContentHash: candidatePostContentHash,
+					reviewedBlockItems: [
+						{
+							id: 'risk-html-approved',
+							blockName: 'core/html',
+							proposedContentHash: reviewedBlockHash,
+							reviewedProposedContentHash: reviewedBlockHash,
+							reviewStatus: 'approved_for_retry_save',
+							rawContent: 'raw-review-content-must-not-send',
+						},
+					],
+					reviewedBlockItemCount: 1,
+					rawContentIncluded: false,
+					savesPost: false,
+					mutatesPostContent: false,
+					createsRevision: false,
+					claimsSaved: false,
+				},
 			} )
 		).resolves.toEqual( {
 			result: 'retry_save_applied',

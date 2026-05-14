@@ -40,6 +40,7 @@ import {
 	getDistributedEditingSessionStateForRetrySaveRequest,
 	getDistributedEditingSessionStateForRetrySaveResult,
 	getDistributedEditingSessionStateForRiskyBlockReviewItemResolution,
+	getDistributedEditingAcceptedReviewApprovalProofForRetrySaveRequest,
 	getDistributedEditingReviewedBlockItemsForRetrySaveReviewApprovalProof,
 	getDistributedEditingSessionStateForRetrySubmitHandoff,
 	getDistributedEditingSessionStateForRetrySubmitProofResult,
@@ -1145,6 +1146,11 @@ export const __experimentalSaveDistributedEditingRetryAfterProof =
 			acceptedProofClaimsSaved:
 				options.acceptedProofClaimsSaved ??
 				currentSessionState.retrySubmitClaimsSaved,
+			acceptedReviewApprovalProof:
+				options.acceptedReviewApprovalProof ??
+				getDistributedEditingAcceptedReviewApprovalProofForRetrySaveRequest(
+					currentSessionState
+				),
 		};
 
 		dispatch.setDistributedEditingSessionState( savingSessionState );
@@ -1255,6 +1261,9 @@ export const __experimentalMaybeSavePostWithDistributedEditingRetryPolicy =
 					acceptedProofCreatesRevision:
 						options.acceptedProofCreatesRevision,
 					acceptedProofClaimsSaved: options.acceptedProofClaimsSaved,
+					acceptedReviewApprovalProof:
+						options.acceptedReviewApprovalProof ??
+						policy.request.acceptedReviewApprovalProof,
 				}
 			);
 		const sessionState = select.getDistributedEditingSessionState?.() || {};

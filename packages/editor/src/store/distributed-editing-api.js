@@ -318,6 +318,7 @@ export function __experimentalRequestDistributedEditingRetrySubmitProbe( {
  * @param {boolean} [args.acceptedProofMutatesPostContent=false] Whether accepted proof claimed content mutation.
  * @param {boolean} [args.acceptedProofCreatesRevision=false]    Whether accepted proof claimed revision creation.
  * @param {boolean} [args.acceptedProofClaimsSaved=false]        Whether accepted proof claimed saved state.
+ * @param {Object}  [args.acceptedReviewApprovalProof]           Hash-only review approval proof.
  *
  * @return {Promise<Object>} REST response or error.
  */
@@ -334,6 +335,7 @@ export function __experimentalRequestDistributedEditingRetrySave( {
 	acceptedProofMutatesPostContent = false,
 	acceptedProofCreatesRevision = false,
 	acceptedProofClaimsSaved = false,
+	acceptedReviewApprovalProof,
 } = {} ) {
 	const data = {
 		client_base_version: clientBaseVersion,
@@ -354,6 +356,15 @@ export function __experimentalRequestDistributedEditingRetrySave( {
 		data.proposed_post_content_hash = proposedPostContentHash;
 	}
 
+	const normalizedReviewApprovalProof =
+		normalizeAcceptedReviewApprovalProofForRetrySaveRequest(
+			acceptedReviewApprovalProof
+		);
+
+	if ( normalizedReviewApprovalProof ) {
+		data.accepted_review_approval_proof = normalizedReviewApprovalProof;
+	}
+
 	return apiFetch( {
 		path: getDistributedEditingRetrySaveEndpointPath( {
 			postId,
@@ -362,6 +373,97 @@ export function __experimentalRequestDistributedEditingRetrySave( {
 		method: 'POST',
 		data,
 	} );
+}
+
+function normalizeAcceptedReviewApprovalProofForRetrySaveRequest( proof ) {
+	if ( ! proof || typeof proof !== 'object' ) {
+		return null;
+	}
+
+	const normalized = {
+		type: proof.type,
+		status: proof.status ?? proof.proofStatus ?? proof.proof_status,
+		reviewer_user_id:
+			proof.reviewerUserId ?? proof.reviewer_user_id ?? undefined,
+		reviewer_capability:
+			proof.reviewerCapability ?? proof.reviewer_capability ?? undefined,
+		review_scope: proof.reviewScope ?? proof.review_scope ?? undefined,
+		server_version:
+			proof.serverVersion ?? proof.server_version ?? undefined,
+		previous_server_version:
+			proof.previousServerVersion ??
+			proof.previous_server_version ??
+			undefined,
+		client_base_version:
+			proof.clientBaseVersion ?? proof.client_base_version ?? undefined,
+		accepted_proof_server_version:
+			proof.acceptedProofServerVersion ??
+			proof.accepted_proof_server_version ??
+			undefined,
+		proposed_post_content_hash:
+			proof.proposedPostContentHash ??
+			proof.proposed_post_content_hash ??
+			undefined,
+		reviewed_proposed_content_hash:
+			proof.reviewedProposedContentHash ??
+			proof.reviewed_proposed_content_hash ??
+			proof.proposedPostContentHash ??
+			proof.proposed_post_content_hash ??
+			undefined,
+		candidate_post_content_hash:
+			proof.candidatePostContentHash ??
+			proof.candidate_post_content_hash ??
+			undefined,
+		reviewed_candidate_content_hash:
+			proof.reviewedCandidateContentHash ??
+			proof.reviewed_candidate_content_hash ??
+			proof.candidatePostContentHash ??
+			proof.candidate_post_content_hash ??
+			undefined,
+		kses_filtered_proposed_content_hash:
+			proof.ksesFilteredProposedContentHash ??
+			proof.kses_filtered_proposed_content_hash ??
+			undefined,
+		kses_filtered_candidate_content_hash:
+			proof.ksesFilteredCandidateContentHash ??
+			proof.kses_filtered_candidate_content_hash ??
+			undefined,
+		reviewed_block_items: normalizeReviewedBlockItemsForRequest(
+			proof.reviewedBlockItems ?? proof.reviewed_block_items
+		),
+		reviewed_block_item_count:
+			proof.reviewedBlockItemCount ??
+			proof.reviewed_block_item_count ??
+			undefined,
+		block_review_status:
+			proof.blockReviewStatus ?? proof.block_review_status ?? undefined,
+		raw_content_included: false,
+		saves_post: Boolean( proof.savesPost ?? proof.saves_post ),
+		mutates_post_content: Boolean(
+			proof.mutatesPostContent ?? proof.mutates_post_content
+		),
+		creates_revision: Boolean(
+			proof.createsRevision ?? proof.creates_revision
+		),
+		claims_saved: Boolean( proof.claimsSaved ?? proof.claims_saved ),
+	};
+
+	for ( const [ key, value ] of Object.entries( normalized ) ) {
+		if (
+			value === undefined ||
+			value === null ||
+			( Array.isArray( value ) && value.length === 0 )
+		) {
+			delete normalized[ key ];
+		}
+	}
+
+	if ( normalized.reviewed_block_items ) {
+		normalized.reviewed_block_item_count =
+			normalized.reviewed_block_items.length;
+	}
+
+	return normalized;
 }
 
 /**

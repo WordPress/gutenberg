@@ -566,6 +566,20 @@ getDerivedStateFromError is used to render a fallback UI after an error has been
 
 > **Deprecated** since 5.3, use `wp.blockEditor.getColorObjectByColorValue` instead.
 
+### getDistributedEditingAcceptedReviewApprovalProofForRetrySaveRequest
+
+Builds the accepted review-approval proof object for guarded retry-save.
+
+This projection is hash-only. It does not include raw post content, raw block content, or rejected/pending review items.
+
+_Parameters_
+
+-   _sessionState_ `Object`: Current DE-RTC session state.
+
+_Returns_
+
+-   `Object|null`: Accepted review-approval proof for retry-save.
+
 ### getDistributedEditingLocalUpdatesExportPayload
 
 Returns the stable JSON payload for exporting protected local DE-RTC edits.
