@@ -161,7 +161,14 @@ describe( 'RichTextControl', () => {
 
 		async function blurTextbox( textbox ) {
 			fireEvent.blur( textbox );
-			await flushMicrotasks();
+			// `RichTextControl` defers deselection on blur via a 0ms
+			// `setTimeout` so a portal-rendered popover (e.g., the
+			// inline link UI) can claim focus before `FormatEdit`
+			// unmounts. Flush that timer so the test sees the
+			// deselected state.
+			await act( async () => {
+				await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
+			} );
 		}
 
 		// Dispatch a `primary+b` keydown — on non-Apple platforms (jsdom's
@@ -226,6 +233,42 @@ describe( 'RichTextControl', () => {
 
 			dispatchPrimaryB( textbox );
 			expect( currentOnUse ).not.toHaveBeenCalled();
+		} );
+
+		it( 'keeps dispatching shortcuts when focus moves to a `.components-popover`', async () => {
+			const { container } = render(
+				<>
+					<RichTextControl
+						label="Shortcut popover"
+						value=""
+						onChange={ () => {} }
+					/>
+					{ /* Stand-in for the inline link UI popover, which
+					   portals into `document.body` with this class. */ }
+					<div className="components-popover">
+						<button type="button">Inside popover</button>
+					</div>
+				</>
+			);
+			const textbox = getTextbox( container );
+			const popoverButton = screen.getByRole( 'button', {
+				name: 'Inside popover',
+			} );
+
+			await focusTextbox( textbox );
+			// Manually focus the popover-internal button before firing
+			// the textbox blur so `document.activeElement` is the
+			// popover descendant by the time the deferred check runs.
+			popoverButton.focus();
+			fireEvent.blur( textbox );
+			await act( async () => {
+				await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
+			} );
+
+			// `FormatEdit` should stay mounted, so the shortcut still
+			// fires on a subsequent keydown delivered to the textbox.
+			dispatchPrimaryB( textbox );
+			expect( currentOnUse ).toHaveBeenCalledTimes( 1 );
 		} );
 	} );
 

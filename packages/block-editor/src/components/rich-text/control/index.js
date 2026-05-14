@@ -9,6 +9,7 @@ import clsx from 'clsx';
 import { BaseControl, useBaseControlProps } from '@wordpress/components';
 import { useMergeRefs, useRefEffect } from '@wordpress/compose';
 import {
+	useEffect,
 	useInsertionEffect,
 	useMemo,
 	useRef,
@@ -81,6 +82,13 @@ export default function RichTextControl( {
 	const anchorRef = useRef();
 	const inputEvents = useRef( new Set() );
 	const keyboardShortcuts = useRef( new Set() );
+
+	// When the textbox blurs, defer flipping `isSelected` to `false` so a
+	// portal-rendered popover (e.g., the inline link UI opened via Cmd+K)
+	// can claim focus without `FormatEdit` — and therefore the popover
+	// itself — unmounting underneath it.
+	const blurDeselectTimeoutRef = useRef( undefined );
+	useEffect( () => () => clearTimeout( blurDeselectTimeoutRef.current ), [] );
 
 	const adjustedAllowedFormats = getAllowedFormats( {
 		allowedFormats,
@@ -243,8 +251,29 @@ export default function RichTextControl( {
 						autocompleteProps.ref,
 						eventListenersRef,
 					] ) }
-					onFocus={ () => setIsSelected( true ) }
-					onBlur={ () => setIsSelected( false ) }
+					onFocus={ () => {
+						clearTimeout( blurDeselectTimeoutRef.current );
+						setIsSelected( true );
+					} }
+					onBlur={ ( event ) => {
+						clearTimeout( blurDeselectTimeoutRef.current );
+						const ownerDocument = event.currentTarget.ownerDocument;
+						blurDeselectTimeoutRef.current = setTimeout( () => {
+							// Stay selected if focus moved to a popover
+							// triggered by a format type (e.g., the inline
+							// link UI). Popovers from `@wordpress/components`
+							// portal out of the React tree and carry the
+							// `.components-popover` class.
+							const active = ownerDocument.activeElement;
+							if (
+								active &&
+								active.closest( '.components-popover' )
+							) {
+								return;
+							}
+							setIsSelected( false );
+						}, 0 );
+					} }
 					contentEditable
 					suppressContentEditableWarning
 					{ ...controlProps }
