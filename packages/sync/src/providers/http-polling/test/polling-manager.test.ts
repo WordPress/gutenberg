@@ -50,6 +50,9 @@ jest.mock( '../config', () => ( {
 	// stay well under this cap.
 	MAX_ROOMS_PER_REQUEST: 10,
 	MAX_SYNC_REQUEST_BODY_SIZE_IN_BYTES: 1000,
+	// Keep the dynamic-shrink floor below MAX so the halving logic in the
+	// 413 retry path has room to actually halve.
+	MIN_SYNC_REQUEST_BODY_SIZE_IN_BYTES: 100,
 } ) );
 
 jest.mock( '../utils', () => ( {

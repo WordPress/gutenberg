@@ -7,6 +7,10 @@ import { SECOND_USER } from './fixtures/collaboration-utils';
 const EXTRA_POST_COUNT = 40;
 const LARGE_FIELD_SIZE = 450 * 1024;
 const MAX_SYNC_BODY_SIZE = 16 * 1024 * 1024;
+
+// One room per extra post record, plus the baseline rooms the editor always
+// registers when opening a post (the primary post plus its collection rooms,
+// e.g. root/comment).
 const EXPECTED_ROOMS = EXTRA_POST_COUNT + 4;
 
 function isSyncUpdateRequest( url: string ): boolean {
