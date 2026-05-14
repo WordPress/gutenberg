@@ -202,18 +202,20 @@ function CropperInner(
 
 	const handleCropAreaFocus = useCallback(
 		( event: React.FocusEvent< HTMLDivElement > ) => {
-			if ( event.target === event.currentTarget ) {
+			const target = event.target as HTMLElement;
+			if ( target === event.currentTarget ) {
 				setIsCropAreaFocused( true );
-				// Show the outline only when focus arrived via keyboard
-				// navigation. relatedTarget is null for pointer-initiated and
-				// cross-window focus, so it reliably excludes those cases
-				// without needing a separate ref or flag.
-				if (
-					event.relatedTarget !== null &&
-					event.currentTarget.matches( ':focus-visible' )
-				) {
-					setIsFocusVisible( true );
-				}
+			}
+			// Show the outline only when focus arrived via keyboard
+			// navigation. relatedTarget is null for pointer-initiated and
+			// cross-window focus, so it reliably excludes those cases
+			// without needing a separate ref or flag. Applies to focus
+			// arriving on the canvas itself or on a descendant handle.
+			if (
+				event.relatedTarget !== null &&
+				target.matches( ':focus-visible' )
+			) {
+				setIsFocusVisible( true );
 			}
 		},
 		[]
@@ -223,6 +225,15 @@ function CropperInner(
 		( event: React.FocusEvent< HTMLDivElement > ) => {
 			if ( event.target === event.currentTarget ) {
 				setIsCropAreaFocused( false );
+			}
+			// Reset keyboard-active styling only when focus leaves the
+			// cropper entirely. Moves between the canvas and a handle (or
+			// between handles) keep the keyboard-active state intact.
+			if (
+				! event.currentTarget.contains(
+					event.relatedTarget as Node | null
+				)
+			) {
 				setIsFocusVisible( false );
 			}
 		},
@@ -351,27 +362,31 @@ function CropperInner(
 	// Compose focus-visibility tracking into the canvas event handlers.
 	// Kept as a spread rather than explicit props to avoid triggering
 	// jsx-a11y/no-noninteractive-element-interactions on role="group".
+	//
+	// The pointer/key tracking lives in the capture phase so it runs
+	// before any child handler — handles call stopPropagation in their
+	// own onPointerDown / onKeyDown, which would otherwise prevent the
+	// keyboard-active state from updating when the user interacts with
+	// a handle directly.
 	const canvasHandlers = {
 		...handlers,
-		onPointerDown: ( event: React.PointerEvent< HTMLDivElement > ) => {
-			handlers.onPointerDown?.( event );
-			// Called after handlers so it lands last in the React batch —
-			// el.focus() inside the handler fires onFocus, which may
-			// otherwise set isFocusVisible back to true.
+		onPointerDownCapture: () => {
 			setIsFocusVisible( false );
 		},
-		onKeyDown: ( event: React.KeyboardEvent< HTMLDivElement > ) => {
-			// Guard against keydowns bubbling up from child handles
-			// (e.g. Tab between handles, unhandled keys). Modifier-only
-			// keypresses are excluded — they precede another key rather
-			// than indicating deliberate keyboard interaction on their own.
+		onKeyDownCapture: ( event: React.KeyboardEvent< HTMLDivElement > ) => {
+			// Modifier-only keypresses precede another key rather than
+			// indicating deliberate keyboard interaction on their own.
 			if (
-				event.target === event.currentTarget &&
 				! [ 'Shift', 'Control', 'Alt', 'Meta' ].includes( event.key )
 			) {
 				setIsFocusVisible( true );
 			}
-			handlers.onKeyDown?.( event );
+		},
+		onPointerDown: ( event: React.PointerEvent< HTMLDivElement > ) => {
+			handlers.onPointerDown?.( event );
+			// Re-assert false after handlers run — el.focus() inside the
+			// handler fires onFocus, which may otherwise set it back to true.
+			setIsFocusVisible( false );
 		},
 	};
 
@@ -622,10 +637,12 @@ function CropperInner(
 						'wp-media-editor-image-editor__canvas--show-grid',
 					settling &&
 						'wp-media-editor-image-editor__canvas--settling',
-					// Show the keyboard focus outline only when the canvas
-					// itself (not a child handle) has keyboard focus.
+					// Marks the cropper as in keyboard-interaction mode.
+					// CSS uses :focus on the canvas to show the stencil
+					// outline and :focus on a handle to show its ring,
+					// so the class applies whenever any cropper element
+					// has keyboard focus.
 					isFocusVisible &&
-						isCropAreaFocused &&
 						'wp-media-editor-image-editor__canvas--focus-visible'
 				) }
 				tabIndex={ 0 }

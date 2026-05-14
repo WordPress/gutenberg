@@ -176,6 +176,46 @@ describe( 'Cropper', () => {
 		);
 	} );
 
+	it( 'clears the keyboard-active class when a pointer drag starts on a handle', async () => {
+		render(
+			<Cropper
+				src="test.jpg"
+				controller={ createController() }
+				showDimming={ false }
+				freeformCrop
+				focusOnMount
+			/>
+		);
+
+		const canvas = screen.getByRole( 'group', { name: 'Crop area' } );
+		const handle = await screen.findByRole( 'button', {
+			name: 'Resize top-left corner',
+		} );
+		const focusVisibleClass =
+			'wp-media-editor-image-editor__canvas--focus-visible';
+
+		// Simulate keyboard resize on a handle — the canvas should pick up
+		// the keyboard-active class via the capture-phase keydown listener.
+		act( () => {
+			handle.focus();
+		} );
+		fireEvent.keyDown( handle, { key: 'ArrowRight' } );
+		expect( canvas ).toHaveClass( focusVisibleClass );
+
+		// Switching to the mouse on the same handle must drop the
+		// keyboard-active state, even though the handle's pointerdown
+		// handler calls stopPropagation.
+		fireEvent.pointerDown( handle, {
+			button: 0,
+			clientX: 100,
+			clientY: 100,
+			pointerId: 1,
+		} );
+		expect( canvas ).not.toHaveClass( focusVisibleClass );
+
+		fireEvent.pointerUp( handle, { pointerId: 1 } );
+	} );
+
 	it( 'returns focus to the crop area on Escape from a resize handle', async () => {
 		render(
 			<Cropper

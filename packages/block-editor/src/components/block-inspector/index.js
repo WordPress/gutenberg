@@ -25,6 +25,7 @@ import { store as blockEditorStore } from '../../store';
 import BlockStyles from '../block-styles';
 import { ListViewContentPopover } from '../inspector-controls/list-view-content-popover';
 import InspectorControls from '../inspector-controls';
+import { BlockInspectorPreTabsSlot } from './inspector-pre-tabs-slot-fill';
 import { default as InspectorControlsTabs } from '../inspector-controls-tabs';
 import useInspectorControlsTabs from '../inspector-controls-tabs/use-inspector-controls-tabs';
 import InspectorControlsLastItem from '../inspector-controls/last-item';
@@ -352,6 +353,7 @@ const BlockInspectorSingleBlock = ( {
 			<ViewportVisibilityInfo clientId={ renderedBlockClientId } />
 			<EditContents clientId={ renderedBlockClientId } />
 			<BlockVariationTransforms blockClientId={ renderedBlockClientId } />
+			<BlockInspectorPreTabsSlot />
 			{ hasMultipleTabs && (
 				<>
 					<InspectorControlsTabs
