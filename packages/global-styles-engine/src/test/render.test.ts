@@ -661,7 +661,7 @@ describe( 'global styles renderer', () => {
 				styleOptions
 			);
 			expect( withVariations ).toEqual(
-				':root :where(.is-style-foo.wp-image.wp-image-spacing){padding-top: 2px;}:root :where(.is-style-foo.wp-image.wp-image-border-color){border-color: blue;}:root :where(.is-style-foo.wp-image){color: blue;}'
+				':root :where(.wp-image-spacing.is-style-foo){padding-top: 2px;}:root :where(.wp-image-border-color.is-style-foo){border-color: blue;}:root :where(.is-style-foo.wp-image){color: blue;}'
 			);
 		} );
 
@@ -868,9 +868,15 @@ describe( 'global styles renderer', () => {
 									color: {
 										text: 'green',
 									},
+									dimensions: {
+										width: '10rem',
+									},
 									':hover': {
 										color: {
 											text: 'yellow',
+										},
+										dimensions: {
+											width: '20rem',
 										},
 									},
 								},
@@ -882,9 +888,15 @@ describe( 'global styles renderer', () => {
 
 			const blockSelectors = {
 				'core/button': {
-					selector: '.wp-block-button',
+					selector: '.wp-block-button .wp-block-button__link',
+					featureSelectors: {
+						dimensions: {
+							root: '.wp-block-button',
+							width: '.wp-block-button',
+						},
+					},
 					styleVariationSelectors: {
-						foo: '.is-style-foo.wp-block-button',
+						foo: '.wp-block-button.is-style-foo .wp-block-button__link',
 					},
 				},
 			};
@@ -908,7 +920,7 @@ describe( 'global styles renderer', () => {
 			);
 
 			expect( result ).toEqual(
-				':root :where(.is-style-foo.wp-block-button){color: green;}:root :where(.is-style-foo.wp-block-button:hover){color: yellow;}'
+				':root :where(.wp-block-button.is-style-foo){width: 10rem;}:root :where(.wp-block-button.is-style-foo .wp-block-button__link){color: green;}:root :where(.wp-block-button.is-style-foo:hover){width: 20rem;}:root :where(.wp-block-button.is-style-foo .wp-block-button__link:hover){color: yellow;}'
 			);
 		} );
 

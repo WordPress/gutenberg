@@ -306,6 +306,40 @@ export function getBlockStyleVariationSelector(
 }
 
 /**
+ * Generates the selector for a block style variation feature selector.
+ *
+ * Feature selectors can target a different element than the block root
+ * selector. Apply the variation class directly to the selector that receives
+ * the declarations instead of deriving it from the block root selector.
+ *
+ * @param variation       Name for the variation.
+ * @param featureSelector CSS selector for the feature.
+ *
+ * @return CSS selector for the block style variation feature.
+ */
+export function getBlockStyleVariationFeatureSelector(
+	variation: string,
+	featureSelector: string
+) {
+	const variationClass = `.is-style-${ variation }`;
+	const selectorParts = featureSelector.split( ',' ).map( ( selector ) => {
+		const trimmedSelector = selector.trim();
+		const prefix = `${ variationClass } `;
+
+		if ( trimmedSelector.startsWith( prefix ) ) {
+			return trimmedSelector.slice( prefix.length );
+		}
+
+		return trimmedSelector;
+	} );
+
+	return getBlockStyleVariationSelector(
+		variation,
+		selectorParts.join( ',' )
+	);
+}
+
+/**
  * Resolves ref values in theme JSON.
  *
  * @param ruleValue A block style value that may contain a reference to a theme.json value.

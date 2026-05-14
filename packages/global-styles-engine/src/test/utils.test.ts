@@ -8,6 +8,7 @@
  */
 import type { GlobalStylesConfig } from '../types';
 import {
+	getBlockStyleVariationFeatureSelector,
 	getBlockStyleVariationSelector,
 	getValueFromVariable,
 	getPresetVariableFromValue,
@@ -340,6 +341,26 @@ describe( 'editor utils', () => {
 				).toBe( expected );
 			}
 		);
+	} );
+
+	describe( 'getBlockStyleVariationFeatureSelector', () => {
+		it( 'adds the variation class to the feature selector target', () => {
+			expect(
+				getBlockStyleVariationFeatureSelector(
+					'outline',
+					'.wp-block-button'
+				)
+			).toBe( '.wp-block-button.is-style-outline' );
+		} );
+
+		it( 'removes an outer variation scope before adding the variation class', () => {
+			expect(
+				getBlockStyleVariationFeatureSelector(
+					'outline--3',
+					'.is-style-outline--3 .wp-block-button'
+				)
+			).toBe( '.wp-block-button.is-style-outline--3' );
+		} );
 	} );
 
 	describe( 'scopeFeatureSelectors', () => {

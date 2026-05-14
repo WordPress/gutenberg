@@ -36,6 +36,48 @@ export function getRelativeRootSelector( rootSelector ) {
 }
 
 /**
+ * Builds a scoped selector from a block selector and optional suffix.
+ *
+ * If the block selector targets a descendant, the descendant portion is scoped
+ * under the provided base selector. Otherwise the base selector itself is used.
+ *
+ * @param {string} baseSelector  The block-instance scoping selector.
+ * @param {string} blockSelector The block or feature selector from block metadata.
+ * @param {string} suffix        Optional selector suffix, e.g. ":hover".
+ * @return {string} The scoped CSS selector.
+ */
+export function buildScopedBlockSelector(
+	baseSelector,
+	blockSelector,
+	suffix = ''
+) {
+	if ( typeof blockSelector !== 'string' || ! blockSelector ) {
+		return `${ baseSelector }${ suffix }`;
+	}
+
+	const selectors = blockSelector
+		.split( ',' )
+		.filter( ( selector ) => selector.trim() );
+
+	if ( ! selectors.length ) {
+		return `${ baseSelector }${ suffix }`;
+	}
+
+	return selectors
+		.map( ( selector ) => {
+			const relativeSelector = getRelativeRootSelector( selector );
+			if ( relativeSelector ) {
+				return scopeSelector(
+					baseSelector,
+					`${ relativeSelector }${ suffix }`
+				);
+			}
+			return `${ baseSelector }${ suffix }`;
+		} )
+		.join( ', ' );
+}
+
+/**
  * Builds the scoped CSS selector for a block state (e.g. :hover, :focus).
  *
  * Uses the block's `selectors.root` to determine which element the state
@@ -51,13 +93,7 @@ export function getRelativeRootSelector( rootSelector ) {
  */
 export function buildStateSelector( baseSelector, name, state ) {
 	const rootSelector = getBlockType( name )?.selectors?.root;
-	if ( rootSelector ) {
-		const relativeSelector = getRelativeRootSelector( rootSelector );
-		if ( relativeSelector ) {
-			return scopeSelector( baseSelector, relativeSelector + state );
-		}
-	}
-	return `${ baseSelector }${ state }`;
+	return buildScopedBlockSelector( baseSelector, rootSelector, state );
 }
 
 /**
@@ -75,11 +111,8 @@ export function buildStateSelector( baseSelector, name, state ) {
  */
 export function buildCanvasStateSelector( clientId, name ) {
 	const rootSelector = getBlockType( name )?.selectors?.root;
-	if ( rootSelector ) {
-		const relativeSelector = getRelativeRootSelector( rootSelector );
-		if ( relativeSelector ) {
-			return `[data-block="${ clientId }"] ${ relativeSelector }`;
-		}
-	}
-	return `[data-block="${ clientId }"]`;
+	return buildScopedBlockSelector(
+		`[data-block="${ clientId }"]`,
+		rootSelector
+	);
 }
