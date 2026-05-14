@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { getAssociatedGuide, isTipVisible, areTipsEnabled } from '../selectors';
 
 describe( 'selectors', () => {
