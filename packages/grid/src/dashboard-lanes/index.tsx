@@ -37,6 +37,7 @@ import {
  */
 import { LanesItem } from './lanes-item';
 import { useLanePlacement } from './use-lane-placement';
+import { GridOverlay } from '../shared/grid-overlay';
 import type { DashboardLanesLayoutItem, DashboardLanesProps } from './types';
 import type { ResizeDelta } from '../shared/types';
 import styles from './lanes.module.css';
@@ -97,6 +98,7 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 			onPreviewLayout,
 			renderResizeHandle,
 			renderDragPreview,
+			renderGridOverlay,
 			...divProps
 		} = props;
 
@@ -421,6 +423,25 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 				</div>
 			) : null;
 
+		// Edit-mode background visual. Lanes are content-driven
+		// vertically, so the overlay only mirrors columns; the default
+		// can be replaced wholesale via `renderGridOverlay`. Rendered
+		// unconditionally so the overlay can cross-fade on edit-mode
+		// toggles; `isActive` drives the opacity transition inside the
+		// overlay. Memoized so drag/resize re-renders skip
+		// reconciliation while inputs are stable.
+		const Overlay = renderGridOverlay ?? GridOverlay;
+		const gridOverlay = useMemo(
+			() => (
+				<Overlay
+					columns={ effectiveColumns }
+					gapPx={ gapPx }
+					isActive={ editMode }
+				/>
+			),
+			[ Overlay, editMode, effectiveColumns, gapPx ]
+		);
+
 		return (
 			<DndContext
 				sensors={ sensors }
@@ -458,6 +479,7 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 							} as React.CSSProperties
 						}
 					>
+						{ gridOverlay }
 						{ items.map( ( id ) => {
 							const child = childrenMap.get( id );
 							if ( ! child ) {

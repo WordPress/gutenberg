@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { createRef } from '@wordpress/element';
 import * as Card from '../../card';
@@ -176,6 +176,65 @@ describe( 'CollapsibleCard', () => {
 					expanded: false,
 				} )
 			).toBeVisible();
+		} );
+	} );
+
+	describe( 'header wrapper', () => {
+		it( 'does not contribute a heading to the document outline by default', () => {
+			render(
+				<CollapsibleCard.Root>
+					<CollapsibleCard.Header>
+						<Card.Title>Title</Card.Title>
+					</CollapsibleCard.Header>
+				</CollapsibleCard.Root>
+			);
+
+			expect(
+				screen.queryByRole( 'heading', { name: 'Title' } )
+			).not.toBeInTheDocument();
+			expect(
+				screen.getByRole( 'button', { name: 'Title' } )
+			).toBeVisible();
+		} );
+
+		it( 'wraps the trigger in a heading via `render`', () => {
+			render(
+				<CollapsibleCard.Root>
+					<CollapsibleCard.Header render={ <h2 /> }>
+						<Card.Title>Title</Card.Title>
+					</CollapsibleCard.Header>
+				</CollapsibleCard.Root>
+			);
+
+			const heading = screen.getByRole( 'heading', {
+				level: 2,
+				name: 'Title',
+			} );
+			expect( heading ).toBeVisible();
+			expect(
+				within( heading ).getByRole( 'button', { name: 'Title' } )
+			).toBeVisible();
+		} );
+
+		it( 'forwards `className` and other props to the outer wrapper', () => {
+			render(
+				<CollapsibleCard.Root>
+					<CollapsibleCard.Header
+						className="custom-header"
+						data-testid="header"
+					>
+						<Card.Title>Title</Card.Title>
+					</CollapsibleCard.Header>
+				</CollapsibleCard.Root>
+			);
+
+			const wrapper = screen.getByTestId( 'header' );
+			expect( wrapper ).toHaveClass( 'custom-header' );
+			// The forwarded attributes land on the outer wrapper, not the
+			// inner button trigger.
+			expect(
+				within( wrapper ).getByRole( 'button', { name: 'Title' } )
+			).not.toHaveAttribute( 'data-testid' );
 		} );
 	} );
 

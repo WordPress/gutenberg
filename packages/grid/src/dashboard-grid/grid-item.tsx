@@ -72,7 +72,13 @@ export function GridItem( {
 	// frame that follows a column step never renders the overlay
 	// at the pre-step offset.
 	const lastResizeDeltaRef = useRef< ResizeDelta | null >( null );
-	const { attributes, listeners, setNodeRef, isDragging } = useSortable( {
+	const {
+		attributes,
+		listeners,
+		setNodeRef,
+		setActivatorNodeRef,
+		isDragging,
+	} = useSortable( {
 		id: item.key,
 		disabled,
 	} );
@@ -197,12 +203,7 @@ export function GridItem( {
 	) : null;
 
 	return (
-		<div
-			ref={ mergedRef }
-			className={ itemClassName }
-			style={ style }
-			{ ...attributes }
-		>
+		<div ref={ mergedRef } className={ itemClassName } style={ style }>
 			{ actionableArea ? (
 				<div
 					style={ { display: 'contents' } }
@@ -213,17 +214,21 @@ export function GridItem( {
 			) : null }
 
 			<div
+				ref={ setActivatorNodeRef }
+				{ ...attributes }
 				{ ...listeners }
 				style={ {
 					height: '100%',
-					// Cursor lives on the listener wrapper rather
-					// than the outer tile so `actionableArea`
-					// children render their own cursor (e.g.
-					// `pointer` on buttons) instead of inheriting
-					// the grid's `grab`. Setting `undefined`
-					// during an active gesture leaves the property
-					// off the DOM so the document-level cursor
-					// lock from the resize handle takes over.
+					// Keyboard activation needs `attributes` (tabIndex)
+					// and `listeners` (onKeyDown) on the same focused
+					// node; `setActivatorNodeRef` points dnd-kit's
+					// keyboard sensor here, the outer keeps `setNodeRef`
+					// for measurement.
+					//
+					// Cursor lives on this wrapper so `actionableArea`
+					// children (mounted outside it) keep their own;
+					// `undefined` during a gesture defers to the resize
+					// handle's document cursor lock.
 					cursor: getItemCursor( disabled, interacting ),
 				} }
 			>

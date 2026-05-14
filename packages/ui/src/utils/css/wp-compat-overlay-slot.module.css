@@ -1,0 +1,46 @@
+/*
+ * WP compat overlay slot — body-level positioned container that hosts
+ * `@wordpress/ui` overlays so they reliably stack in mixed-library
+ * compositions. The `data-wp-compat-overlay-slot` attribute is the
+ * architectural identifier (see `getWpCompatOverlaySlot()`); `.slot` is
+ * the styling vehicle.
+ *
+ * Authored unlayered — outside `@layer wp-ui-*` — so the slot's z-index
+ * and positioning win against any `@layer`-scoped rule. CSS cascade
+ * layers always lose to unlayered styles, so unlayering is the ceiling.
+ *
+ * Why each declaration is what it is:
+ *
+ * - `z-index: 1000000003` — sits in a reserved billion-scale band above
+ *   the legacy z-index map in `packages/base-styles/_z-index.scss`.
+ *
+ * - `position: fixed` — load-bearing for two reasons. (1) `z-index` is
+ *   ignored on `position: static`. (2) A non-static position makes the
+ *   slot a containing block for absolute-positioned descendants;
+ *   floating-ui writes physical viewport-relative `top` / `left` onto
+ *   the floating element, so the containing block must sit at viewport
+ *   `(0, 0)`. `position: fixed` (with `top: 0; left: 0`) pins it there
+ *   regardless of scroll; `position: relative` would anchor at body's
+ *   flow position and silently break popover positioning.
+ *
+ * - `top: 0; left: 0` — physical, not logical. `inset-inline-start: 0`
+ *   would resolve to `right: 0` in RTL, anchoring the (zero-width) slot
+ *   at the viewport's top-right corner; an absolute child with
+ *   `left: 200px` would then resolve off the right edge of the screen.
+ *   Same hazard for `inset-block-start` under vertical writing modes.
+ *
+ * - `isolation: isolate` — redundant once `position: fixed` and
+ *   `z-index` are set (the slot is already a stacking context). Kept as
+ *   an explicit declaration of intent.
+ *
+ * The slot has zero content size, so it never intercepts pointer events.
+ */
+
+.slot {
+	position: fixed;
+	top: 0;
+	/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Physical anchoring required so floating-ui's viewport-relative coordinates resolve correctly; see file header. */
+	left: 0;
+	z-index: 1000000003;
+	isolation: isolate;
+}

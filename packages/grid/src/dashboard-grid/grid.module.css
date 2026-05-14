@@ -1,5 +1,6 @@
 .grid {
 	display: grid;
+	position: relative;
 }
 
 /*
