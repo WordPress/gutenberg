@@ -231,7 +231,7 @@ export function LayoutSettings( {
 				</Drawer.Header>
 
 				<Drawer.Content>
-					<Stack direction="column" gap="md">
+					<Stack direction="column" gap="lg">
 						<SelectControl
 							label={ __( 'Layout model' ) }
 							description={ __(
