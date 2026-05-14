@@ -13,8 +13,11 @@ const DESIGN_TOKENS_URL =
 	process.env.DESIGN_TOKENS_URL ||
 	'https://raw.githubusercontent.com/WordPress/gutenberg/refs/heads/trunk/packages/theme/docs/tokens.md';
 
-let cachedComponents: Record< string, ManifestComponent > | null = null;
-let cachedTokens: string | null = null;
+// In-flight or resolved promises are cached so that concurrent callers
+// share a single fetch, rather than each kicking off their own request.
+let cachedComponents: Promise< Record< string, ManifestComponent > > | null =
+	null;
+let cachedTokens: Promise< string > | null = null;
 
 /**
  * Clear cached data. Intended for testing.
@@ -30,33 +33,39 @@ export function resetCache(): void {
  *
  * @return The filtered components record.
  */
-async function fetchComponents(): Promise<
-	Record< string, ManifestComponent >
-> {
-	if ( cachedComponents ) {
-		return cachedComponents;
+function fetchComponents(): Promise< Record< string, ManifestComponent > > {
+	if ( ! cachedComponents ) {
+		cachedComponents = ( async () => {
+			let manifest: {
+				v: number;
+				components: Record< string, ManifestComponent >;
+			};
+			try {
+				const response = await fetch( COMPONENTS_MANIFEST_URL );
+				if ( ! response.ok ) {
+					throw new Error(
+						`Failed to fetch components manifest: ${ response.status } ${ response.statusText }`
+					);
+				}
+				manifest = await response.json();
+			} catch ( error ) {
+				cachedComponents = null;
+				throw error;
+			}
+
+			const filtered: Record< string, ManifestComponent > = {};
+			for ( const [ key, component ] of Object.entries(
+				manifest.components
+			) ) {
+				if ( packageNameFromPath( component.path ) ) {
+					filtered[ key ] = component;
+				}
+			}
+
+			return filtered;
+		} )();
 	}
 
-	const response = await fetch( COMPONENTS_MANIFEST_URL );
-	if ( ! response.ok ) {
-		throw new Error(
-			`Failed to fetch components manifest: ${ response.status } ${ response.statusText }`
-		);
-	}
-
-	const manifest: {
-		v: number;
-		components: Record< string, ManifestComponent >;
-	} = await response.json();
-
-	const filtered: Record< string, ManifestComponent > = {};
-	for ( const [ key, component ] of Object.entries( manifest.components ) ) {
-		if ( packageNameFromPath( component.path ) ) {
-			filtered[ key ] = component;
-		}
-	}
-
-	cachedComponents = filtered;
 	return cachedComponents;
 }
 
@@ -90,15 +99,23 @@ export async function getComponentDetail(
  */
 export async function getDesignTokens(): Promise< { content: string } > {
 	if ( ! cachedTokens ) {
-		const response = await fetch( DESIGN_TOKENS_URL );
-		if ( ! response.ok ) {
-			throw new Error(
-				`Failed to fetch design tokens: ${ response.status } ${ response.statusText }`
-			);
-		}
+		cachedTokens = ( async () => {
+			try {
+				const response = await fetch( DESIGN_TOKENS_URL );
+				if ( ! response.ok ) {
+					throw new Error(
+						`Failed to fetch design tokens: ${ response.status } ${ response.statusText }`
+					);
+				}
 
-		cachedTokens = await response.text();
+				return await response.text();
+			} catch ( error ) {
+				cachedTokens = null;
+				throw error;
+			}
+		} )();
 	}
 
-	return { content: cachedTokens };
+	const content = await cachedTokens;
+	return { content };
 }

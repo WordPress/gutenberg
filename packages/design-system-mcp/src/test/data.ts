@@ -86,6 +86,49 @@ describe( 'data', () => {
 				'Failed to fetch components manifest'
 			);
 		} );
+
+		it( 'should deduplicate concurrent in-flight requests', async () => {
+			mockFetchResponses( {
+				[ MANIFEST_URL ]: { ok: true, body: manifestFixture },
+			} );
+
+			await Promise.all( [
+				getComponents(),
+				getComponents(),
+				getComponentDetail( 'Button' ),
+			] );
+
+			expect( globalThis.fetch ).toHaveBeenCalledTimes( 1 );
+		} );
+
+		it( 'should evict failed fetches so the next call can retry', async () => {
+			let callCount = 0;
+			globalThis.fetch = jest.fn( () => {
+				callCount += 1;
+				if ( callCount === 1 ) {
+					return Promise.resolve( {
+						ok: false,
+						status: 500,
+						statusText: 'Internal Server Error',
+						json: () => Promise.resolve( null ),
+					} as Response );
+				}
+				return Promise.resolve( {
+					ok: true,
+					status: 200,
+					statusText: 'OK',
+					json: () => Promise.resolve( manifestFixture ),
+				} as Response );
+			} );
+
+			await expect( getComponents() ).rejects.toThrow(
+				'Failed to fetch components manifest'
+			);
+
+			const result = await getComponents();
+			expect( result.length ).toBeGreaterThan( 0 );
+			expect( globalThis.fetch ).toHaveBeenCalledTimes( 2 );
+		} );
 	} );
 
 	describe( 'getComponentDetail', () => {
@@ -170,6 +213,45 @@ describe( 'data', () => {
 			await expect( getDesignTokens() ).rejects.toThrow(
 				'Failed to fetch design tokens'
 			);
+		} );
+
+		it( 'should deduplicate concurrent in-flight requests', async () => {
+			mockFetchResponses( {
+				[ TOKENS_URL ]: { ok: true, body: '# Tokens' },
+			} );
+
+			await Promise.all( [ getDesignTokens(), getDesignTokens() ] );
+
+			expect( globalThis.fetch ).toHaveBeenCalledTimes( 1 );
+		} );
+
+		it( 'should evict failed fetches so the next call can retry', async () => {
+			let callCount = 0;
+			globalThis.fetch = jest.fn( () => {
+				callCount += 1;
+				if ( callCount === 1 ) {
+					return Promise.resolve( {
+						ok: false,
+						status: 500,
+						statusText: 'Internal Server Error',
+						text: () => Promise.resolve( '' ),
+					} as Response );
+				}
+				return Promise.resolve( {
+					ok: true,
+					status: 200,
+					statusText: 'OK',
+					text: () => Promise.resolve( '# Tokens' ),
+				} as Response );
+			} );
+
+			await expect( getDesignTokens() ).rejects.toThrow(
+				'Failed to fetch design tokens'
+			);
+
+			const result = await getDesignTokens();
+			expect( result ).toEqual( { content: '# Tokens' } );
+			expect( globalThis.fetch ).toHaveBeenCalledTimes( 2 );
 		} );
 	} );
 } );

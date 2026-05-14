@@ -14,19 +14,24 @@ const inputSchema = z.object( {
 		),
 } );
 
-export async function handler( { name }: z.infer< typeof inputSchema > ) {
-	const names = Array.isArray( name ) ? name : [ name ];
+export async function handler( {
+	name: nameOrNames,
+}: z.infer< typeof inputSchema > ) {
+	const names = Array.isArray( nameOrNames ) ? nameOrNames : [ nameOrNames ];
 	const sections: string[] = [];
 	const missing: string[] = [];
 
-	for ( const componentName of names ) {
-		const detail = await getComponentDetail( componentName );
-		if ( detail ) {
-			sections.push( formatComponentDetail( detail ) );
-		} else {
-			missing.push( componentName );
-		}
-	}
+	await Promise.all(
+		names.map( ( name ) => getComponentDetail( name ) )
+	).then( ( details ) => {
+		details.forEach( ( detail, index ) => {
+			if ( detail ) {
+				sections.push( formatComponentDetail( detail ) );
+			} else {
+				missing.push( names[ index ] );
+			}
+		} );
+	} );
 
 	if ( sections.length === 0 ) {
 		const list = missing.map( ( n ) => `"${ n }"` ).join( ', ' );
