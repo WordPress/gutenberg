@@ -162,6 +162,59 @@ export class Metrics {
 	}
 
 	/**
+	 * Returns the time, in milliseconds, from when the navigation response
+	 * finished arriving until the editor canvas first painted contentful
+	 * pixels. Bridges the top frame's and the iframe's clocks via their
+	 * absolute `timeOrigin`s.
+	 *
+	 * Reads the browser's `firstContentfulPaint` paint-timing entry directly
+	 * rather than measuring `performance.now()` after `locator.waitFor()`
+	 * resolves, which removes Playwright's polling jitter and the JS event
+	 * loop delay between paint and the test runner's read.
+	 *
+	 * Falls back to the top frame's FCP when the editor canvas is rendered
+	 * inline (non-iframed).
+	 *
+	 * @return Duration in ms, or null when no paint entry is available.
+	 */
+	async getFirstBlockTime(): Promise< number | null > {
+		const topResponseEndAbs = await this.page.evaluate( () => {
+			const [ nav ] = performance.getEntriesByType(
+				'navigation'
+			) as PerformanceNavigationTiming[];
+			if ( ! nav ) {
+				return null;
+			}
+			return performance.timeOrigin + nav.responseEnd;
+		} );
+		if ( topResponseEndAbs === null ) {
+			return null;
+		}
+
+		const editorFrame = this.page
+			.frames()
+			.find( ( frame ) => frame.name() === 'editor-canvas' );
+		const targetFrame = editorFrame ?? this.page.mainFrame();
+
+		const fcpAbs: number | null = await targetFrame.evaluate( () => {
+			const fcp = (
+				performance.getEntriesByType( 'paint' ) as
+					| PerformancePaintTiming[]
+					| undefined
+			 )?.find( ( entry ) => entry.name === 'first-contentful-paint' );
+			if ( ! fcp ) {
+				return null;
+			}
+			return performance.timeOrigin + fcp.startTime;
+		} );
+		if ( fcpAbs === null ) {
+			return null;
+		}
+
+		return fcpAbs - topResponseEndAbs;
+	}
+
+	/**
 	 * Returns the loading durations using the Navigation Timing API. All the
 	 * durations exclude the server response time.
 	 *
