@@ -23,9 +23,12 @@ import blockAutocompleter from '../../autocompleters/block';
  */
 const EMPTY_ARRAY = [];
 
-function useCompleters( { completers = EMPTY_ARRAY } ) {
+function useCompleters( { completers = EMPTY_ARRAY, isEnabled = true } ) {
 	const { name } = useBlockEditContext();
 	return useMemo( () => {
+		if ( ! isEnabled ) {
+			return EMPTY_ARRAY;
+		}
 		let filteredCompleters = [ ...completers ];
 
 		if (
@@ -51,7 +54,7 @@ function useCompleters( { completers = EMPTY_ARRAY } ) {
 		}
 
 		return filteredCompleters;
-	}, [ completers, name ] );
+	}, [ completers, name, isEnabled ] );
 }
 
 export function useBlockEditorAutocompleteProps( props ) {

@@ -184,6 +184,13 @@ export type UseAutocompleteProps = {
 	 * `Autocomplete`'s `Popover`.
 	 */
 	contentRef: ContentRef;
+	/**
+	 * Whether the autocompleter should be active. Defaults to `true`. When
+	 * `false`, the heavy bits — match scanning, keydown listener attachment,
+	 * popover state — are skipped while the hook still returns a stable ref so
+	 * the host can attach it unconditionally.
+	 */
+	isEnabled?: boolean;
 };
 
 export type AutocompleteState = {

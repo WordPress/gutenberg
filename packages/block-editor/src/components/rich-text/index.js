@@ -371,6 +371,7 @@ export function RichTextWrapper(
 		completers: autocompleters,
 		record: value,
 		onChange,
+		isEnabled: isSelected,
 	} );
 
 	useMarkPersistent( { html: adjustedValue, value } );

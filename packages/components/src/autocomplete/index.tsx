@@ -101,6 +101,7 @@ export function useAutocomplete( {
 	onReplace,
 	completers,
 	contentRef,
+	isEnabled = true,
 }: UseAutocompleteProps ) {
 	const instanceId = useInstanceId( AUTOCOMPLETE_HOOK_REFERENCE );
 	const [ state, dispatch ] = useReducer( autocompleteReducer, initialState );
@@ -241,13 +242,19 @@ export function useAutocomplete( {
 	// but this is a preemptive performance improvement, since the autocompleter
 	// is a potential bottleneck for the editor type metric.
 	const textContent = useMemo( () => {
+		if ( ! isEnabled ) {
+			return '';
+		}
 		if ( isCollapsed( record ) ) {
 			return getTextContent( slice( record, 0 ) );
 		}
 		return '';
-	}, [ record ] );
+	}, [ record, isEnabled ] );
 
 	useEffect( () => {
+		if ( ! isEnabled ) {
+			return;
+		}
 		const isTextChange = record.text !== prevRecordTextRef.current;
 		prevRecordTextRef.current = record.text;
 
@@ -302,7 +309,7 @@ export function useAutocomplete( {
 		dispatch( { type: 'MATCH', completer, query } );
 		// We want to avoid introducing unexpected side effects.
 		// See https://github.com/WordPress/gutenberg/pull/41820
-	}, [ textContent ] );
+	}, [ textContent, isEnabled ] );
 
 	const { key: selectedKey = '' } = filteredOptions[ selectedIndex ] || {};
 	const { className } = autocompleter || {};
@@ -376,6 +383,7 @@ export function useLastDifferentValue(
 }
 
 export function useAutocompleteProps( options: UseAutocompleteProps ) {
+	const { isEnabled = true } = options;
 	const ref = useRef< HTMLElement >( null );
 	const onKeyDownRef =
 		useRef< ( event: KeyboardEvent ) => void >( undefined );
@@ -389,19 +397,25 @@ export function useAutocompleteProps( options: UseAutocompleteProps ) {
 
 	const mergedRefs = useMergeRefs( [
 		ref,
-		useRefEffect( ( element: HTMLElement ) => {
-			function _onKeyDown( event: KeyboardEvent ) {
-				onKeyDownRef.current?.( event );
-			}
-			element.addEventListener( 'keydown', _onKeyDown );
-			return () => {
-				element.removeEventListener( 'keydown', _onKeyDown );
-			};
-		}, [] ),
+		useRefEffect(
+			( element: HTMLElement ) => {
+				if ( ! isEnabled ) {
+					return;
+				}
+				function _onKeyDown( event: KeyboardEvent ) {
+					onKeyDownRef.current?.( event );
+				}
+				element.addEventListener( 'keydown', _onKeyDown );
+				return () => {
+					element.removeEventListener( 'keydown', _onKeyDown );
+				};
+			},
+			[ isEnabled ]
+		),
 	] );
 
 	// We only want to show the popover if the user has typed something.
-	const didUserInput = record.text !== previousRecord?.text;
+	const didUserInput = isEnabled && record.text !== previousRecord?.text;
 
 	if ( ! didUserInput ) {
 		return { ref: mergedRefs };
