@@ -14,6 +14,7 @@ import { store as preferencesStore } from '@wordpress/preferences';
 
 import * as actions from '../actions';
 import {
+	DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES,
 	DISTRIBUTED_EDITING_DISPOSITIONS,
 	DISTRIBUTED_EDITING_FRESH_REVIEW_DECISION_STATUSES,
 	DISTRIBUTED_EDITING_FRESH_REVIEW_RETRY_SAVE_HANDOFF_STATUSES,
@@ -95,6 +96,91 @@ const getMethod = ( options ) =>
 	options.headers?.[ 'X-HTTP-Method-Override' ] || options.method || 'GET';
 
 describe( 'Post actions', () => {
+	describe( '__experimentalAppendDistributedEditingActionTranscriptEvent()', () => {
+		it( 'appends content-free lifecycle events without retaining unsafe entries', async () => {
+			const registry = createRegistryWithStores();
+			const dispatch = registry.dispatch( editorStore );
+
+			let result =
+				await dispatch.__experimentalAppendDistributedEditingActionTranscriptEvent(
+					{
+						eventType:
+							DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.LOCAL_EDITOR_ACTION,
+					}
+				);
+
+			expect( result ).toMatchObject( {
+				appended: true,
+				droppedItemCount: 0,
+				callsRest: false,
+				callsSave: false,
+				mutatesEditorContent: false,
+				changesPostLock: false,
+				claimsSaved: false,
+			} );
+
+			result =
+				await dispatch.__experimentalAppendDistributedEditingActionTranscriptEvent(
+					{
+						eventType:
+							DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.REMOTE_CHANGE_RECEIVED,
+						rawContent:
+							'<!-- wp:paragraph --><p>Hidden transcript content</p><!-- /wp:paragraph -->',
+					}
+				);
+
+			expect( result ).toMatchObject( {
+				appended: false,
+				droppedItemCount: 1,
+				callsRest: false,
+				callsSave: false,
+				claimsSaved: false,
+			} );
+
+			result =
+				await dispatch.__experimentalAppendDistributedEditingActionTranscriptEvent(
+					{
+						eventType:
+							DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.SAVE_STATE_CHANGED,
+						reasonCode:
+							DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+					}
+				);
+
+			const sessionState = registry
+				.select( editorStore )
+				.getDistributedEditingSessionState();
+
+			expect( result ).toMatchObject( {
+				appended: true,
+				droppedItemCount: 1,
+				callsRest: false,
+				callsSave: false,
+				mutatesEditorContent: false,
+				changesPostLock: false,
+				claimsSaved: false,
+			} );
+			expect( sessionState ).toMatchObject( {
+				actionTranscriptItemCount: 2,
+				actionTranscriptDroppedItemCount: 1,
+				actionTranscriptLatestEventType:
+					DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.SAVE_STATE_CHANGED,
+				actionTranscriptEntriesRedacted: true,
+				actionTranscriptExposesRawContent: false,
+				actionTranscriptExposesProofInternals: false,
+				actionTranscriptExposesActorIds: false,
+				actionTranscriptCallsSave: false,
+				actionTranscriptClaimsSaved: false,
+			} );
+			expect( sessionState.actionTranscriptItems[ 1 ].reasonCode ).toBe(
+				DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED
+			);
+			expect(
+				JSON.stringify( sessionState.actionTranscriptItems )
+			).not.toMatch( /Hidden transcript content|rawContent/ );
+		} );
+	} );
+
 	describe( '__experimentalOpenDistributedEditingRiskyBlockReview()', () => {
 		it( 'opens the pre-publish sidebar when risky-block policy requires review', async () => {
 			const registry = createRegistryWithStores();

@@ -59,6 +59,7 @@ import {
 	getDistributedEditingSessionStateForRetrySubmitProofResult,
 	getDistributedEditingSessionStateForRetrySubmitSavePreparation,
 	getDistributedEditingRetrySavePolicyForSessionState,
+	getDistributedEditingSessionStateWithActionTranscriptEvent,
 	DISTRIBUTED_EDITING_LOCAL_UPDATES_REVIEW_REQUEST_STATUSES,
 	DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_STATUSES,
 	DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES,
@@ -241,6 +242,43 @@ export function resetDistributedEditingSessionState() {
 		type: 'RESET_DISTRIBUTED_EDITING_SESSION_STATE',
 	};
 }
+
+/**
+ * Appends one support-safe Distributed Editing action transcript event. This is
+ * an explicit lifecycle handoff, not broad Redux middleware capture.
+ *
+ * @param {Object} transcriptEvent Candidate transcript event.
+ *
+ * @return {Function} Action thunk.
+ */
+export const __experimentalAppendDistributedEditingActionTranscriptEvent =
+	( transcriptEvent = {} ) =>
+	( { select, dispatch } ) => {
+		const sessionState = select.getDistributedEditingSessionState?.() || {};
+		const acceptedEventState =
+			getDistributedEditingSessionStateWithActionTranscriptEvent(
+				{},
+				transcriptEvent
+			);
+		const nextSessionState =
+			getDistributedEditingSessionStateWithActionTranscriptEvent(
+				sessionState,
+				transcriptEvent
+			);
+
+		dispatch.setDistributedEditingSessionState( nextSessionState );
+
+		return {
+			sessionState: nextSessionState,
+			appended: acceptedEventState.actionTranscriptItemCount > 0,
+			droppedItemCount: nextSessionState.actionTranscriptDroppedItemCount,
+			callsRest: false,
+			callsSave: false,
+			mutatesEditorContent: false,
+			changesPostLock: false,
+			claimsSaved: false,
+		};
+	};
 
 /**
  * Opens the pre-publish review surface when DE-RTC risky-block policy requires

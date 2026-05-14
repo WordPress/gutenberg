@@ -82,6 +82,7 @@ import {
 	getDistributedEditingSessionStateForRetrySaveRequest,
 	getDistributedEditingSessionStateForRetrySaveReviewApprovalProofResult,
 	getDistributedEditingSessionStateForRetrySaveResult,
+	getDistributedEditingSessionStateWithActionTranscriptEvent,
 	getDistributedEditingSessionStateForRetrySubmitHandoff,
 	getDistributedEditingSessionStateForRetrySubmitProofResult,
 	getDistributedEditingSessionStateForRetrySubmitSavePreparation,
@@ -286,6 +287,57 @@ describe( 'distributed editing session state', () => {
 				actionTranscriptClaimsSaved: false,
 			} )
 		);
+	} );
+
+	it( 'appends content-free action transcript events without retaining unsafe entries', () => {
+		let sessionState =
+			getDistributedEditingSessionStateWithActionTranscriptEvent(
+				{},
+				{
+					eventType:
+						DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.LOCAL_EDITOR_ACTION,
+				}
+			);
+
+		sessionState =
+			getDistributedEditingSessionStateWithActionTranscriptEvent(
+				sessionState,
+				{
+					eventType:
+						DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.REMOTE_CHANGE_RECEIVED,
+					postContent:
+						'<!-- wp:paragraph --><p>Do not retain me</p><!-- /wp:paragraph -->',
+				}
+			);
+		sessionState =
+			getDistributedEditingSessionStateWithActionTranscriptEvent(
+				sessionState,
+				{
+					eventType:
+						DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.SERVER_STATE_REFETCHED,
+					reasonCode:
+						DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+				}
+			);
+
+		expect( sessionState ).toMatchObject( {
+			actionTranscriptItemCount: 2,
+			actionTranscriptDroppedItemCount: 1,
+			actionTranscriptLatestEventType:
+				DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.SERVER_STATE_REFETCHED,
+			actionTranscriptHasLocalEvents: true,
+			actionTranscriptHasServerEvents: true,
+			actionTranscriptEntriesRedacted: true,
+			actionTranscriptExposesRawContent: false,
+			actionTranscriptCallsSave: false,
+			actionTranscriptClaimsSaved: false,
+		} );
+		expect( sessionState.actionTranscriptItems[ 1 ].reasonCode ).toBe(
+			DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED
+		);
+		expect(
+			JSON.stringify( sessionState.actionTranscriptItems )
+		).not.toMatch( /Do not retain me|postContent/ );
 	} );
 
 	it( 'normalizes pending state from runner-compatible conflict terms', () => {

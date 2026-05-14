@@ -1133,12 +1133,15 @@ function normalizeDistributedEditingActionTranscriptFields(
 		.slice( -MAX_DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_ITEMS );
 	const latestItem =
 		actionTranscriptItems[ actionTranscriptItems.length - 1 ] || null;
+	const droppedItemCount =
+		normalizeCount( sessionState.actionTranscriptDroppedItemCount ) +
+		rawItems.length -
+		actionTranscriptItems.length;
 
 	return {
 		actionTranscriptItems,
 		actionTranscriptItemCount: actionTranscriptItems.length,
-		actionTranscriptDroppedItemCount:
-			rawItems.length - actionTranscriptItems.length,
+		actionTranscriptDroppedItemCount: droppedItemCount,
 		actionTranscriptLatestEventType: latestItem?.eventType || null,
 		actionTranscriptLatestEventSource: latestItem?.source || null,
 		actionTranscriptHasLocalEvents: actionTranscriptItems.some(
@@ -1163,6 +1166,41 @@ function normalizeDistributedEditingActionTranscriptFields(
 		actionTranscriptChangesPostLock: false,
 		actionTranscriptClaimsSaved: false,
 	};
+}
+
+/**
+ * Returns session state with one content-free action transcript event appended.
+ * Unsafe events are counted as dropped and are not retained.
+ *
+ * @param {Object} sessionState    DE-RTC session state.
+ * @param {Object} transcriptEvent Candidate transcript event.
+ *
+ * @return {Object} Session state with the transcript event applied.
+ */
+export function getDistributedEditingSessionStateWithActionTranscriptEvent(
+	sessionState = {},
+	transcriptEvent = {}
+) {
+	const normalized = normalizeDistributedEditingSessionState( sessionState );
+	const eventState = normalizeDistributedEditingSessionState( {
+		actionTranscriptItems: [ transcriptEvent ],
+	} );
+
+	if ( eventState.actionTranscriptItemCount < 1 ) {
+		return normalizeDistributedEditingSessionState( {
+			...normalized,
+			actionTranscriptDroppedItemCount:
+				normalized.actionTranscriptDroppedItemCount + 1,
+		} );
+	}
+
+	return normalizeDistributedEditingSessionState( {
+		...normalized,
+		actionTranscriptItems: [
+			...normalized.actionTranscriptItems,
+			eventState.actionTranscriptItems[ 0 ],
+		],
+	} );
 }
 
 /**
