@@ -814,26 +814,26 @@ describe( 'DistributedEditingStatus', () => {
 			actions.__experimentalRefreshDistributedEditingServerStateAfterStaleBase
 		).not.toHaveBeenCalled();
 		expect( await screen.findByRole( 'status' ) ).toHaveTextContent(
-			'Imported protected local changes and review proof. The editor content changed locally only; no server request was sent.'
+			'Protected changes were imported into this editor only, with route, hash, and signed proof checks passing. They remain protected until a guarded save is confirmed; no server request was sent.'
 		);
 	} );
 
 	it.each( [
 		[
 			DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.MALFORMED_PAYLOAD,
-			'Import blocked: the pasted payload is missing or malformed. Editor content was not changed.',
+			'Import blocked: the pasted protected-changes payload is missing or malformed. Nothing was imported, and local changes remain protected.',
 		],
 		[
 			DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.POST_CONTENT_HASH_MISMATCH,
-			'Import blocked: the post-content hash does not match the approved proof. Editor content was not changed.',
+			'Import blocked: the protected post-content hash does not match the approved proof. Nothing was imported, and local changes remain protected.',
 		],
 		[
 			DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.POST_ROUTE_MISMATCH,
-			'Import blocked: the payload targets a different post route. Editor content was not changed.',
+			'Import blocked: the protected changes target a different post route. Nothing was imported, and local changes remain protected.',
 		],
 		[
 			DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.MISSING_REVIEW_APPROVAL_PROOF,
-			'Import blocked: the payload is missing accepted review proof. Editor content was not changed.',
+			'Import blocked: the protected changes are missing accepted review proof. Nothing was imported, and local changes remain protected.',
 		],
 	] )(
 		'reports blocked local-updates import for %s without saving',
@@ -2101,6 +2101,30 @@ describe( 'DistributedEditingStatusSurface', () => {
 		expect(
 			screen.getByText(
 				'Retry submit accepted the rebased changes for a future save. Local changes are still awaiting confirmation.'
+			)
+		).toBeVisible();
+		expect( screen.queryByText( /saved/i ) ).not.toBeInTheDocument();
+	} );
+
+	it( 'renders imported protected changes as local guarded-save readiness', () => {
+		const noticeDescriptors =
+			getDistributedEditingNoticeDescriptorsForSessionState( {
+				pendingChangeCount: 1,
+				localUpdatesImportStatus:
+					DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_STATUSES.IMPORTED_FOR_RETRY_SAVE,
+				canExportLocalUpdates: true,
+			} );
+
+		render(
+			<DistributedEditingStatusSurface
+				noticeDescriptors={ noticeDescriptors }
+			/>
+		);
+
+		expect( screen.getByText( 'Changes pending' ) ).toBeVisible();
+		expect(
+			screen.getByText(
+				'Protected changes were imported locally with signed review proof and are ready for the guarded save path. They remain protected and exportable until the server confirms that path.'
 			)
 		).toBeVisible();
 		expect( screen.queryByText( /saved/i ) ).not.toBeInTheDocument();

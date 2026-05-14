@@ -1325,7 +1325,7 @@ function getPendingChangesMessage( descriptor ) {
 		DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_STATUSES.IMPORTED_FOR_RETRY_SAVE
 	) {
 		return __(
-			'Imported protected local changes are ready for the guarded save path. Save to submit them with the signed review proof; local changes remain exportable until the server confirms.'
+			'Protected changes were imported locally with signed review proof and are ready for the guarded save path. They remain protected and exportable until the server confirms that path.'
 		);
 	}
 
@@ -1482,12 +1482,14 @@ function getLocalUpdatesImportStatusMessage( {
 	normalized,
 } ) {
 	if ( commandStatus === 'running' ) {
-		return __( 'Validating protected local changes.' );
+		return __(
+			'Checking the protected changes payload, post route, content hash, and signed review proof.'
+		);
 	}
 
 	if ( commandStatus === 'failed' ) {
 		return __(
-			'Import failed. Editor content was not changed, and no server request was sent.'
+			'Import failed before any local change was applied. Protected local changes remain protected, and no server request was sent.'
 		);
 	}
 
@@ -1499,7 +1501,7 @@ function getLocalUpdatesImportStatusMessage( {
 		DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_STATUSES.IMPORTED_FOR_RETRY_SAVE
 	) {
 		return __(
-			'Imported protected local changes and review proof. The editor content changed locally only; no server request was sent.'
+			'Protected changes were imported into this editor only, with route, hash, and signed proof checks passing. They remain protected until a guarded save is confirmed; no server request was sent.'
 		);
 	}
 
@@ -1516,40 +1518,40 @@ function getLocalUpdatesImportBlockedMessage( reason ) {
 	switch ( reason ) {
 		case DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.MALFORMED_PAYLOAD:
 			return __(
-				'Import blocked: the pasted payload is missing or malformed. Editor content was not changed.'
+				'Import blocked: the pasted protected-changes payload is missing or malformed. Nothing was imported, and local changes remain protected.'
 			);
 		case DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.FORMAT_MISMATCH:
 			return __(
-				'Import blocked: the pasted payload is not a protected local-updates export. Editor content was not changed.'
+				'Import blocked: the pasted payload is not a protected local-updates export. Nothing was imported, and local changes remain protected.'
 			);
 		case DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.POST_ROUTE_MISMATCH:
 			return __(
-				'Import blocked: the payload targets a different post route. Editor content was not changed.'
+				'Import blocked: the protected changes target a different post route. Nothing was imported, and local changes remain protected.'
 			);
 		case DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.MISSING_POST_CONTENT:
 			return __(
-				'Import blocked: the payload does not include protected post content. Editor content was not changed.'
+				'Import blocked: the payload does not include protected post content. Nothing was imported, and local changes remain protected.'
 			);
 		case DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.MISSING_HASH_EVIDENCE:
 			return __(
-				'Import blocked: the payload is missing hash evidence. Editor content was not changed.'
+				'Import blocked: the protected changes are missing content hash evidence. Nothing was imported, and local changes remain protected.'
 			);
 		case DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.POST_CONTENT_HASH_MISMATCH:
 			return __(
-				'Import blocked: the post-content hash does not match the approved proof. Editor content was not changed.'
+				'Import blocked: the protected post-content hash does not match the approved proof. Nothing was imported, and local changes remain protected.'
 			);
 		case DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.MISSING_REVIEW_APPROVAL_PROOF:
 			return __(
-				'Import blocked: the payload is missing accepted review proof. Editor content was not changed.'
+				'Import blocked: the protected changes are missing accepted review proof. Nothing was imported, and local changes remain protected.'
 			);
 		case DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.EXPIRED_REVIEW_APPROVAL_PROOF:
 			return __(
-				'Import blocked: the accepted review proof has expired. Editor content was not changed.'
+				'Import blocked: the accepted review proof for these protected changes has expired. Nothing was imported, and local changes remain protected.'
 			);
 	}
 
 	return __(
-		'Import blocked. Editor content was not changed, and no server request was sent.'
+		'Import blocked before any local change was applied. Protected local changes remain protected, and no server request was sent.'
 	);
 }
 
