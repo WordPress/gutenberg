@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Set `data-wp-dashboard-grid-resizing` on the `DashboardGrid` root
+    element while any tile resize gesture is active, so consumers can
+    adjust styles when the pointer may still hover tiles ([#78234](https://github.com/WordPress/gutenberg/pull/78234)).
+
 ### New Features
 
 -   Initial release. Ships two layout components:

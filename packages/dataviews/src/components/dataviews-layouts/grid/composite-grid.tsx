@@ -236,7 +236,7 @@ const GridItem = forwardRef< HTMLDivElement, GridItemProps< any > >(
 					</div>
 				) }
 				{ showTitle && (
-					<div className="dataviews-view-grid__title">
+					<div className="dataviews-view-grid__title-actions">
 						<ItemClickWrapper
 							item={ item }
 							isItemClickable={ isItemClickable }

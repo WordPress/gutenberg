@@ -4,16 +4,22 @@
  * External dependencies
  */
 import glob from 'glob';
-import { dirname, basename } from 'path';
+import { fileURLToPath } from 'url';
+import { dirname, basename, resolve } from 'path';
 import JSONC from 'jsonc-parser';
 import { readFileSync } from 'fs';
 
 let hasErrors = false;
 
-const rootTsconfigJson = JSON.parse( readFileSync( 'tsconfig.json', 'utf8' ) );
+const __dirname = dirname( fileURLToPath( import.meta.url ) );
+const repoRoot = resolve( __dirname, '../..' );
+
+const rootTsconfigJson = JSONC.parse(
+	readFileSync( resolve( repoRoot, 'tsconfig.json' ), 'utf8' )
+);
 
 const packagesWithTypes = glob
-	.sync( 'packages/*/tsconfig.json' )
+	.sync( 'packages/*/tsconfig.json', { cwd: repoRoot } )
 	.map( ( tsconfigPath ) => basename( dirname( tsconfigPath ) ) );
 
 for ( const packageName of packagesWithTypes ) {
@@ -31,7 +37,10 @@ for ( const packageName of packagesWithTypes ) {
 	let packageJson;
 	try {
 		packageJson = JSON.parse(
-			readFileSync( `packages/${ packageName }/package.json`, 'utf8' )
+			readFileSync(
+				resolve( repoRoot, `packages/${ packageName }/package.json` ),
+				'utf8'
+			)
 		);
 	} catch ( e ) {
 		console.error(
@@ -40,9 +49,13 @@ for ( const packageName of packagesWithTypes ) {
 		throw e;
 	}
 
-	const tsconfigs = glob.sync( `packages/${ packageName }/tsconfig*.json` );
+	const tsconfigs = glob.sync( `packages/${ packageName }/tsconfig*.json`, {
+		cwd: repoRoot,
+	} );
 	const references = tsconfigs.flatMap(
-		( path ) => JSONC.parse( readFileSync( path, 'utf8' ) ).references ?? []
+		( p ) =>
+			JSONC.parse( readFileSync( resolve( repoRoot, p ), 'utf8' ) )
+				.references ?? []
 	);
 
 	if ( packageJson.dependencies ) {

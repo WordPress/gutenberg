@@ -50,17 +50,17 @@ export function SyncConnectionErrorModal() {
 
 	const { connectionStatus, isCollaborationEnabled, postType } = useSelect(
 		( selectFn ) => {
-			const currentPostType =
-				selectFn( editorStore ).getCurrentPostType();
+			const { getSyncConnectionStatus, getPostType } = unlock(
+				selectFn( coreDataStore )
+			);
+			const { getCurrentPostType, isCollaborationEnabledForCurrentPost } =
+				unlock( selectFn( editorStore ) );
+			const currentPostType = getCurrentPostType();
 			return {
-				connectionStatus:
-					selectFn( coreDataStore ).getSyncConnectionStatus() || null,
-				isCollaborationEnabled:
-					selectFn(
-						editorStore
-					).isCollaborationEnabledForCurrentPost(),
+				connectionStatus: getSyncConnectionStatus() || null,
+				isCollaborationEnabled: isCollaborationEnabledForCurrentPost(),
 				postType: currentPostType
-					? selectFn( coreDataStore ).getPostType( currentPostType )
+					? getPostType( currentPostType )
 					: null,
 			};
 		},

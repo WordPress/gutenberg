@@ -532,6 +532,9 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 						{ ...divProps }
 						ref={ mergedGridRef }
 						className={ clsx( styles.grid, className ) }
+						data-wp-dashboard-grid-resizing={
+							isResizing || undefined
+						}
 						style={ {
 							...style,
 							gridTemplateColumns: `repeat(${ effectiveColumns }, minmax(0, 1fr))`,

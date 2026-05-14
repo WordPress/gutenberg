@@ -21,6 +21,11 @@ import { TEXT_ALIGN_SUPPORT_KEY } from './text-align';
 import { FIT_TEXT_SUPPORT_KEY } from './fit-text';
 import { cleanEmptyObject } from './utils';
 import { store as blockEditorStore } from '../store';
+import {
+	getStyleForState,
+	setStyleForState,
+	useBlockStyleState,
+} from './block-style-state';
 
 function omit( object, keys ) {
 	return Object.fromEntries(
@@ -117,6 +122,7 @@ function TypographyInspectorControl( { children, resetAllFilter } ) {
 }
 
 export function TypographyPanel( { clientId, name, setAttributes, settings } ) {
+	const selectedState = useBlockStyleState();
 	const isEnabled = useHasTypographyPanel( settings );
 
 	const { style, fontFamily, fontSize, fitText } = useSelect(
@@ -140,23 +146,35 @@ export function TypographyPanel( { clientId, name, setAttributes, settings } ) {
 		},
 		[ clientId, isEnabled ]
 	);
-	const value = useMemo(
-		() => attributesToStyle( { style, fontFamily, fontSize } ),
-		[ style, fontSize, fontFamily ]
-	);
 
-	const onChange = ( newStyle ) => {
-		const newAttributes = styleToAttributes( newStyle );
+	const isStateSelected = selectedState !== 'default';
 
-		// If setting a font size and fitText is currently enabled, disable it
-		const hasFontSize =
-			newAttributes.fontSize || newAttributes.style?.typography?.fontSize;
-		if ( hasFontSize && fitText ) {
-			newAttributes.fitText = undefined;
+	const value = useMemo( () => {
+		if ( isStateSelected ) {
+			return getStyleForState( style, selectedState );
 		}
+		return attributesToStyle( { style, fontFamily, fontSize } );
+	}, [ isStateSelected, selectedState, style, fontSize, fontFamily ] );
 
-		setAttributes( newAttributes );
-	};
+	const onChange = isStateSelected
+		? ( newStyle ) => {
+				setAttributes( {
+					style: setStyleForState( style, selectedState, newStyle ),
+				} );
+		  }
+		: ( newStyle ) => {
+				const newAttributes = styleToAttributes( newStyle );
+
+				// If setting a font size and fitText is currently enabled, disable it.
+				const hasFontSize =
+					newAttributes.fontSize ||
+					newAttributes.style?.typography?.fontSize;
+				if ( hasFontSize && fitText ) {
+					newAttributes.fitText = undefined;
+				}
+
+				setAttributes( newAttributes );
+		  };
 
 	if ( ! isEnabled ) {
 		return null;

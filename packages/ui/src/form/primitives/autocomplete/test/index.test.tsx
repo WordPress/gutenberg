@@ -159,4 +159,45 @@ describe( 'Autocomplete', () => {
 			);
 		} );
 	} );
+
+	describe( 'positioner', () => {
+		it( 'should render the custom positioner element wrapping the popup content', async () => {
+			const user = userEvent.setup();
+
+			render(
+				<Autocomplete.Root items={ ITEMS }>
+					<Autocomplete.Input placeholder="Search" />
+					<Autocomplete.Popup
+						positioner={
+							<Autocomplete.Positioner data-testid="custom-positioner" />
+						}
+					>
+						<Autocomplete.List>
+							<Autocomplete.ListBody>
+								<Autocomplete.Collection>
+									{ ( item ) => (
+										<Autocomplete.Item
+											key={ item.id }
+											value={ item }
+										>
+											{ item.value }
+										</Autocomplete.Item>
+									) }
+								</Autocomplete.Collection>
+							</Autocomplete.ListBody>
+						</Autocomplete.List>
+					</Autocomplete.Popup>
+				</Autocomplete.Root>
+			);
+
+			await user.type( screen.getByRole( 'combobox' ), 'Item 1' );
+
+			const item = await screen.findByRole( 'option', {
+				name: 'Item 1',
+			} );
+			const positioner = screen.getByTestId( 'custom-positioner' );
+
+			expect( positioner ).toContainElement( item );
+		} );
+	} );
 } );

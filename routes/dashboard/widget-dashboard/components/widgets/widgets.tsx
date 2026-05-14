@@ -12,6 +12,7 @@ import type {
 	DashboardGridLayoutItem,
 	DashboardLanesLayoutItem,
 	DragPreviewRenderProps,
+	ResizeHandleRenderProps,
 } from '@wordpress/grid';
 
 /**
@@ -19,6 +20,7 @@ import type {
  */
 import { useDashboardInternalContext } from '../../context/dashboard-context';
 import { WidgetChrome } from '../widget-chrome';
+import { WidgetResizeHandle } from './widget-resize-handle';
 import styles from './widgets.module.css';
 import type {
 	DashboardWidget,
@@ -140,61 +142,60 @@ export const Widgets = forwardRef< HTMLDivElement, WidgetsProps >(
 			[]
 		);
 
-		const isFixedColumns = gridSettings.columns !== undefined;
+		const sharedRenderProps = {
+			editMode,
+			renderDragPreview,
+			renderResizeHandle:
+				WidgetResizeHandle as React.ComponentType< ResizeHandleRenderProps >,
+		};
 
-		let surface;
-		if ( isMasonry && isFixedColumns ) {
-			surface = (
-				<DashboardLanes
-					layout={ gridLayout as DashboardLanesLayoutItem[] }
-					columns={ gridSettings.columns }
-					flowTolerance={ gridSettings.flowTolerance }
-					editMode={ editMode }
-					onChangeLayout={ handleMasonryChange }
-					renderDragPreview={ renderDragPreview }
-				>
-					{ children }
-				</DashboardLanes>
-			);
-		} else if ( isMasonry ) {
-			surface = (
-				<DashboardLanes
-					layout={ gridLayout as DashboardLanesLayoutItem[] }
-					minColumnWidth={ gridSettings.minColumnWidth }
-					flowTolerance={ gridSettings.flowTolerance }
-					editMode={ editMode }
-					onChangeLayout={ handleMasonryChange }
-					renderDragPreview={ renderDragPreview }
-				>
-					{ children }
-				</DashboardLanes>
-			);
-		} else if ( isFixedColumns ) {
-			surface = (
-				<DashboardGrid
-					layout={ gridLayout as DashboardGridLayoutItem[] }
-					columns={ gridSettings.columns }
-					rowHeight={ gridSettings.rowHeight }
-					editMode={ editMode }
-					onChangeLayout={ handleGridChange }
-					renderDragPreview={ renderDragPreview }
-				>
-					{ children }
-				</DashboardGrid>
-			);
+		let surface: React.ReactNode;
+		if ( isMasonry ) {
+			surface =
+				gridSettings.columns !== undefined ? (
+					<DashboardLanes
+						layout={ gridLayout as DashboardLanesLayoutItem[] }
+						columns={ gridSettings.columns }
+						flowTolerance={ gridSettings.flowTolerance }
+						onChangeLayout={ handleMasonryChange }
+						{ ...sharedRenderProps }
+					>
+						{ children }
+					</DashboardLanes>
+				) : (
+					<DashboardLanes
+						layout={ gridLayout as DashboardLanesLayoutItem[] }
+						minColumnWidth={ gridSettings.minColumnWidth }
+						flowTolerance={ gridSettings.flowTolerance }
+						onChangeLayout={ handleMasonryChange }
+						{ ...sharedRenderProps }
+					>
+						{ children }
+					</DashboardLanes>
+				);
 		} else {
-			surface = (
-				<DashboardGrid
-					layout={ gridLayout as DashboardGridLayoutItem[] }
-					minColumnWidth={ gridSettings.minColumnWidth }
-					rowHeight={ gridSettings.rowHeight }
-					editMode={ editMode }
-					onChangeLayout={ handleGridChange }
-					renderDragPreview={ renderDragPreview }
-				>
-					{ children }
-				</DashboardGrid>
-			);
+			surface =
+				gridSettings.columns !== undefined ? (
+					<DashboardGrid
+						layout={ gridLayout as DashboardGridLayoutItem[] }
+						columns={ gridSettings.columns }
+						rowHeight={ gridSettings.rowHeight }
+						onChangeLayout={ handleGridChange }
+						{ ...sharedRenderProps }
+					>
+						{ children }
+					</DashboardGrid>
+				) : (
+					<DashboardGrid
+						layout={ gridLayout as DashboardGridLayoutItem[] }
+						minColumnWidth={ gridSettings.minColumnWidth }
+						rowHeight={ gridSettings.rowHeight }
+						onChangeLayout={ handleGridChange }
+						{ ...sharedRenderProps }
+					>
+						{ children }
+					</DashboardGrid>
+				);
 		}
 
 		return (
