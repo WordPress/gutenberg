@@ -7,12 +7,7 @@ import type { ConnectionStatus } from '@wordpress/sync';
 /**
  * Internal dependencies
  */
-import {
-	getDefaultTemplateId,
-	getEntityRecord,
-	type EntityDependency,
-	type State,
-} from './selectors';
+import { getDefaultTemplateId, getEntityRecord, type State } from './selectors';
 import { STORE_NAME } from './name';
 import { unlock } from './lock-unlock';
 import { getSyncManager } from './sync';
@@ -384,20 +379,4 @@ export function getSyncConnectionStatus(
 	}
 
 	return coalesced;
-}
-
-/**
- * Returns the registered dependents for a source entity, or `undefined`
- * when none are declared. See `registerEntityDependency`.
- *
- * @param state Store state.
- * @param kind  Source entity kind.
- * @param name  Source entity name.
- */
-export function getEntityDependencies(
-	state: State,
-	kind: string,
-	name: string
-): EntityDependency[] | undefined {
-	return state.entityDependencies?.[ `${ kind }/${ name }` ];
 }

@@ -9,15 +9,6 @@ jest.mock( '@wordpress/api-fetch' );
  * Internal dependencies
  */
 import {
-	createRegistry,
-	createReduxStore,
-	combineReducers,
-} from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
-import {
 	editEntityRecord,
 	clearEntityRecordEdits,
 	saveEntityRecord,
@@ -29,11 +20,6 @@ import {
 	__experimentalBatch,
 } from '../actions';
 import { getSyncManager } from '../sync';
-import { STORE_NAME } from '../name';
-import { entityDependencies as entityDependenciesReducer } from '../reducer';
-import { registerEntityDependency } from '../private-actions';
-import { getEntityDependencies } from '../private-selectors';
-import { unlock } from '../lock-unlock';
 
 jest.mock( '../batch', () => {
 	const { createBatch } = jest.requireActual( '../batch' );
@@ -1181,29 +1167,21 @@ describe( '__experimentalBatch', () => {
 describe( 'entity dependencies', () => {
 	const SOURCE = { kind: 'postType', name: 'wp_user_taxonomy' };
 	const TARGET = { kind: 'root', name: 'taxonomy' };
-	const configs = [ { ...SOURCE, baseURL: '/wp/v2/user-taxonomies' } ];
 
 	function buildStubs( {
 		dependents = [],
 		cachedResolvers = {},
 		persistedRecord,
 	} ) {
-		const registry = createRegistry();
-		const store = createReduxStore( STORE_NAME, {
-			reducer: combineReducers( {
-				entityDependencies: entityDependenciesReducer,
-			} ),
-			actions: { registerEntityDependency },
-		} );
-		unlock( store ).registerPrivateSelectors( { getEntityDependencies } );
-		registry.register( store );
-		for ( const { target, shouldInvalidate } of dependents ) {
-			registry
-				.dispatch( STORE_NAME )
-				.registerEntityDependency( SOURCE, target, {
-					shouldInvalidate,
-				} );
-		}
+		// The walker reads `entityConfig.invalidates`, so the test injects
+		// the dependency declarations onto the resolved entity config.
+		const configs = [
+			{
+				...SOURCE,
+				baseURL: '/wp/v2/user-taxonomies',
+				invalidates: dependents,
+			},
+		];
 		const dispatch = Object.assign( jest.fn(), {
 			receiveEntityRecords: jest.fn(),
 			invalidateResolution: jest.fn(),
@@ -1217,7 +1195,7 @@ describe( 'entity dependencies', () => {
 		const resolveSelect = {
 			getEntitiesConfig: jest.fn( () => configs ),
 		};
-		return { dispatch, select, resolveSelect, registry };
+		return { dispatch, select, resolveSelect };
 	}
 
 	beforeEach( () => {
@@ -1235,14 +1213,14 @@ describe( 'entity dependencies', () => {
 				[ [ 'root', 'postType' ], { status: 'finished' } ],
 			] ),
 		};
-		const { dispatch, select, resolveSelect, registry } = buildStubs( {
+		const { dispatch, select, resolveSelect } = buildStubs( {
 			dependents: [ { target: TARGET } ],
 			cachedResolvers,
 		} );
 		apiFetch.mockImplementation( () => next );
 
 		await saveEntityRecord( SOURCE.kind, SOURCE.name, { title: 'Genres' } )(
-			{ select, dispatch, resolveSelect, registry }
+			{ select, dispatch, resolveSelect }
 		);
 
 		expect( dispatch.invalidateResolution ).toHaveBeenCalledWith(
@@ -1264,7 +1242,7 @@ describe( 'entity dependencies', () => {
 				[ [ 'root', 'taxonomy' ], { status: 'finished' } ],
 			] ),
 		};
-		const { dispatch, select, resolveSelect, registry } = buildStubs( {
+		const { dispatch, select, resolveSelect } = buildStubs( {
 			dependents: [
 				{
 					target: TARGET,
@@ -1281,7 +1259,7 @@ describe( 'entity dependencies', () => {
 		await saveEntityRecord( SOURCE.kind, SOURCE.name, {
 			id: 5,
 			config: { object_type: [ 'post' ] },
-		} )( { select, dispatch, resolveSelect, registry } );
+		} )( { select, dispatch, resolveSelect } );
 
 		expect( dispatch.invalidateResolution ).not.toHaveBeenCalled();
 	} );
@@ -1294,7 +1272,7 @@ describe( 'entity dependencies', () => {
 			] ),
 		};
 		const shouldInvalidate = jest.fn( () => true );
-		const { dispatch, select, resolveSelect, registry } = buildStubs( {
+		const { dispatch, select, resolveSelect } = buildStubs( {
 			dependents: [ { target: TARGET, shouldInvalidate } ],
 			cachedResolvers,
 		} );
@@ -1302,7 +1280,7 @@ describe( 'entity dependencies', () => {
 
 		await saveEntityRecord( SOURCE.kind, SOURCE.name, {
 			config: { object_type: [ 'post' ] },
-		} )( { select, dispatch, resolveSelect, registry } );
+		} )( { select, dispatch, resolveSelect } );
 
 		expect( shouldInvalidate ).toHaveBeenCalledWith( undefined, next );
 	} );
@@ -1317,7 +1295,7 @@ describe( 'entity dependencies', () => {
 				[ [ 'root', 'taxonomy', 'genre' ], { status: 'finished' } ],
 			] ),
 		};
-		const { dispatch, select, resolveSelect, registry } = buildStubs( {
+		const { dispatch, select, resolveSelect } = buildStubs( {
 			dependents: [ { target: TARGET } ],
 			cachedResolvers,
 			persistedRecord: prev,
@@ -1328,7 +1306,7 @@ describe( 'entity dependencies', () => {
 			SOURCE.kind,
 			SOURCE.name,
 			5
-		)( { dispatch, select, resolveSelect, registry } );
+		)( { dispatch, select, resolveSelect } );
 
 		// Both single-record and list caches are walked, so a slug
 		// rename / delete invalidates a cached getEntityRecord too.
@@ -1353,7 +1331,7 @@ describe( 'entity dependencies', () => {
 			] ),
 			getTaxonomy: new Map( [ [ [ 'genre' ], { status: 'finished' } ] ] ),
 		};
-		const { dispatch, select, resolveSelect, registry } = buildStubs( {
+		const { dispatch, select, resolveSelect } = buildStubs( {
 			dependents: [ { target: TARGET } ],
 			cachedResolvers,
 		} );
@@ -1368,7 +1346,6 @@ describe( 'entity dependencies', () => {
 			select,
 			dispatch,
 			resolveSelect,
-			registry,
 		} );
 
 		expect( dispatch.invalidateResolution ).toHaveBeenCalledWith(
@@ -1408,7 +1385,7 @@ describe( 'entity dependencies', () => {
 				[ [ { per_page: -1 } ], { status: 'finished' } ],
 			] ),
 		};
-		const { dispatch, select, resolveSelect, registry } = buildStubs( {
+		const { dispatch, select, resolveSelect } = buildStubs( {
 			dependents: [
 				{
 					target: TARGET,
@@ -1426,7 +1403,7 @@ describe( 'entity dependencies', () => {
 		apiFetch.mockImplementation( () => next );
 
 		await saveEntityRecord( SOURCE.kind, SOURCE.name, { title: 'Genres' } )(
-			{ select, dispatch, resolveSelect, registry }
+			{ select, dispatch, resolveSelect }
 		);
 
 		// Only the matching `genre` record entries invalidate.

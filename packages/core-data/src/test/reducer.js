@@ -8,11 +8,11 @@ import deepFreeze from 'deep-freeze';
  */
 import {
 	entities,
+	entitiesConfig,
 	embedPreviews,
 	userPermissions,
 	autosaves,
 	currentUser,
-	entityDependencies,
 } from '../reducer';
 
 describe( 'entities', () => {
@@ -533,50 +533,57 @@ describe( 'currentUser', () => {
 	} );
 } );
 
-describe( 'entityDependencies', () => {
-	const source = { kind: 'postType', name: 'wp_user_taxonomy' };
-	const target = { kind: 'root', name: 'taxonomy' };
+describe( 'entitiesConfig — UPDATE_ENTITY_CONFIG', () => {
+	const baseEntity = {
+		kind: 'postType',
+		name: 'wp_user_taxonomy',
+		baseURL: '/wp/v2/user-taxonomies',
+	};
 
-	it( 'replaces an existing entry when re-registered (same source, same target)', () => {
-		const first = () => true;
-		const second = () => false;
-		const after = entityDependencies(
-			entityDependencies( deepFreeze( {} ), {
-				type: 'REGISTER_ENTITY_DEPENDENCY',
-				source,
-				target,
-				shouldInvalidate: first,
-			} ),
-			{
-				type: 'REGISTER_ENTITY_DEPENDENCY',
-				source,
-				target,
-				shouldInvalidate: second,
-			}
-		);
-		expect( after[ 'postType/wp_user_taxonomy' ] ).toHaveLength( 1 );
-		expect(
-			after[ 'postType/wp_user_taxonomy' ][ 0 ].shouldInvalidate
-		).toBe( second );
+	it( 'merges fields onto a matching entity', () => {
+		const invalidates = [ { target: { kind: 'root', name: 'taxonomy' } } ];
+		const after = entitiesConfig( deepFreeze( [ baseEntity ] ), {
+			type: 'UPDATE_ENTITY_CONFIG',
+			kind: 'postType',
+			name: 'wp_user_taxonomy',
+			fields: { invalidates },
+		} );
+		expect( after[ 0 ] ).toEqual( {
+			...baseEntity,
+			invalidates,
+		} );
 	} );
 
-	it( 'appends a different target under the same source', () => {
-		const otherTarget = { kind: 'postType', name: 'wp_user_post_type' };
-		const after = entityDependencies(
-			entityDependencies( deepFreeze( {} ), {
-				type: 'REGISTER_ENTITY_DEPENDENCY',
-				source,
-				target,
+	it( 'replaces the previous field value on re-registration', () => {
+		const first = [ { target: { kind: 'root', name: 'taxonomy' } } ];
+		const second = [
+			{ target: { kind: 'postType', name: 'wp_user_post_type' } },
+		];
+		const after = entitiesConfig(
+			entitiesConfig( deepFreeze( [ baseEntity ] ), {
+				type: 'UPDATE_ENTITY_CONFIG',
+				kind: 'postType',
+				name: 'wp_user_taxonomy',
+				fields: { invalidates: first },
 			} ),
 			{
-				type: 'REGISTER_ENTITY_DEPENDENCY',
-				source,
-				target: otherTarget,
+				type: 'UPDATE_ENTITY_CONFIG',
+				kind: 'postType',
+				name: 'wp_user_taxonomy',
+				fields: { invalidates: second },
 			}
 		);
-		expect( after[ 'postType/wp_user_taxonomy' ] ).toHaveLength( 2 );
-		expect( after[ 'postType/wp_user_taxonomy' ][ 1 ].target ).toEqual(
-			otherTarget
-		);
+		expect( after[ 0 ].invalidates ).toBe( second );
+	} );
+
+	it( 'returns the same state reference when no entity matches', () => {
+		const state = deepFreeze( [ baseEntity ] );
+		const after = entitiesConfig( state, {
+			type: 'UPDATE_ENTITY_CONFIG',
+			kind: 'postType',
+			name: 'not_loaded_yet',
+			fields: { invalidates: [] },
+		} );
+		expect( after ).toBe( state );
 	} );
 } );

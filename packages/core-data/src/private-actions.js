@@ -222,46 +222,48 @@ export function setSyncConnectionStatus( kind, name, key, status ) {
 }
 
 /**
- * Registers that successful saves/deletes on `source` invalidate cached
- * reads of `target`. Use when one entity's REST output is derived from
- * another's records.
+ * Patches the loaded entity config for `(kind, name)` by shallow-merging
+ * `fields` onto the existing entry.
  *
- * `shouldInvalidate( prev, next )` returns:
- *   - `false` — skip
- *   - `true` — invalidate all cached entries for `target` (default)
- *   - `{ records: [ key, … ] }` — invalidate only the listed single-record
- *     caches; list caches always invalidate broadly.
+ * The currently consumed field is `invalidates`, which declares that
+ * successful saves/deletes on this entity should invalidate cached reads
+ * of one or more target entities. Each entry:
+ *
+ *     {
+ *         target: { kind, name },
+ *         shouldInvalidate?: ( prev, next ) =>
+ *             | false                          // skip
+ *             | true                           // invalidate all caches for target
+ *             | { records: [ key, … ] }        // invalidate only those single-record caches
+ *     }
  *
  * `prev` / `next` are `undefined` on create / delete respectively.
  *
  * @example
  * ```js
- * registerEntityDependency(
- *     { kind: 'postType', name: 'wp_user_taxonomy' },
- *     { kind: 'root', name: 'taxonomy' },
- *     {
- *         shouldInvalidate: ( prev, next ) => {
- *             // Skip when nothing observable to the target changed.
- *             if ( prev?.status === next?.status ) {
- *                 return false;
- *             }
- *             return { records: [ ( next ?? prev ).slug ] };
+ * updateEntityConfig( 'postType', 'wp_user_taxonomy', {
+ *     invalidates: [
+ *         {
+ *             target: { kind: 'root', name: 'taxonomy' },
+ *             shouldInvalidate: ( prev, next ) =>
+ *                 prev?.count !== next?.count,
  *         },
- *     }
- * );
+ *     ],
+ * } );
  * ```
  *
- * @param {{ kind: string, name: string }} source    Mutated entity.
- * @param {{ kind: string, name: string }} target    Entity whose cache to invalidate.
- * @param {Object}                         [options] `shouldInvalidate( prev, next )` per the contract above.
- *
- * @return {Object} Action object.
+ * @param {string} kind   Entity kind.
+ * @param {string} name   Entity name.
+ * @param {Object} fields Fields to shallow-merge onto the entity config.
  */
-export function registerEntityDependency( source, target, options = {} ) {
-	return {
-		type: 'REGISTER_ENTITY_DEPENDENCY',
-		source,
-		target,
-		shouldInvalidate: options.shouldInvalidate,
+export const updateEntityConfig =
+	( kind, name, fields ) =>
+	async ( { dispatch, resolveSelect } ) => {
+		await resolveSelect.getEntitiesConfig( kind );
+		dispatch( {
+			type: 'UPDATE_ENTITY_CONFIG',
+			kind,
+			name,
+			fields,
+		} );
 	};
-}

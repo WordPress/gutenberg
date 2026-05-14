@@ -25,7 +25,6 @@ import {
 	getSyncManager,
 } from './sync';
 import logEntityDeprecation from './utils/log-entity-deprecation';
-import { unlock } from './lock-unlock';
 
 function addTitleToAutoDraft( record ) {
 	return record.status === 'auto-draft' ? { ...record, title: '' } : record;
@@ -33,40 +32,29 @@ function addTitleToAutoDraft( record ) {
 
 /**
  * Walks the `getEntityRecord` and `getEntityRecords` resolver caches for
- * each registered dependent of `(kind, name)` and invalidates matching
- * entries. Called after successful `saveEntityRecord` / `deleteEntityRecord`.
+ * each `invalidates` entry declared on the source entity config and
+ * invalidates matching entries. Called after a successful
+ * `saveEntityRecord` / `deleteEntityRecord`.
  *
  * @param {Object}  args
- * @param {string}  args.kind     Source entity kind.
- * @param {string}  args.name     Source entity name.
- * @param {?Object} args.prev     Record before the mutation, or `undefined` on create.
- * @param {?Object} args.next     Record after the mutation, or `undefined` on delete.
- * @param {Object}  args.registry Thunk `registry` — used to read the private `getEntityDependencies` selector.
- * @param {Object}  args.select   Thunk `select` (public selectors of this store).
- * @param {Object}  args.dispatch Thunk `dispatch` (provides `invalidateResolution`).
+ * @param {Array}   args.invalidates Entries from `entityConfig.invalidates`.
+ * @param {?Object} args.prev        Record before the mutation, or `undefined` on create.
+ * @param {?Object} args.next        Record after the mutation, or `undefined` on delete.
+ * @param {Object}  args.select      Thunk `select` (public selectors of this store).
+ * @param {Object}  args.dispatch    Thunk `dispatch` (provides `invalidateResolution`).
  */
 function applyEntityDependencies( {
-	kind,
-	name,
+	invalidates,
 	prev,
 	next,
-	registry,
 	select,
 	dispatch,
 } ) {
-	let dependents;
-	try {
-		dependents = unlock(
-			registry.select( STORE_NAME )
-		).getEntityDependencies( kind, name );
-	} catch {
-		return;
-	}
-	if ( ! dependents?.length ) {
+	if ( ! invalidates?.length ) {
 		return;
 	}
 	const cachedResolvers = select?.getCachedResolvers?.() ?? {};
-	for ( const { target, shouldInvalidate } of dependents ) {
+	for ( const { target, shouldInvalidate } of invalidates ) {
 		const result = shouldInvalidate ? shouldInvalidate( prev, next ) : true;
 		if ( ! result ) {
 			continue;
@@ -386,7 +374,7 @@ export const deleteEntityRecord =
 		query,
 		{ __unstableFetch = apiFetch, throwOnError = false } = {}
 	) =>
-	async ( { dispatch, select, resolveSelect, registry } ) => {
+	async ( { dispatch, select, resolveSelect } ) => {
 		logEntityDeprecation( kind, name, 'deleteEntityRecord' );
 		const configs = await resolveSelect.getEntitiesConfig( kind );
 		const entityConfig = configs.find(
@@ -445,11 +433,9 @@ export const deleteEntityRecord =
 				await dispatch( removeItems( kind, name, recordId, true ) );
 
 				applyEntityDependencies( {
-					kind,
-					name,
+					invalidates: entityConfig.invalidates,
 					prev,
 					next: undefined,
-					registry,
 					select,
 					dispatch,
 				} );
@@ -707,7 +693,7 @@ export const __unstableCreateUndoLevel =
  */
 export const saveEntityRecord =
 	( kind, name, record, options = {} ) =>
-	async ( { select, resolveSelect, dispatch, registry } ) => {
+	async ( { select, resolveSelect, dispatch } ) => {
 		const {
 			isAutosave = false,
 			__unstableFetch = apiFetch,
@@ -900,11 +886,9 @@ export const saveEntityRecord =
 						edits
 					);
 					applyEntityDependencies( {
-						kind,
-						name,
+						invalidates: entityConfig.invalidates,
 						prev: isNewRecord ? undefined : persistedRecord,
 						next: updatedRecord,
-						registry,
 						select,
 						dispatch,
 					} );

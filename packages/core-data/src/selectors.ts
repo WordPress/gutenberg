@@ -55,9 +55,14 @@ export interface State {
 	syncConnectionStatuses?: Record< string, ConnectionStatus >;
 	collaborationSupported: boolean;
 	viewConfigs: Record< string, Record< string, any > >;
-	entityDependencies: Record< string, EntityDependency[] >;
 }
 
+/**
+ * One entry in an entity config's `invalidates` array — declares that
+ * successful saves/deletes on this entity should invalidate cached reads
+ * of `target`. `shouldInvalidate` gates the work and (optionally) narrows
+ * invalidation to specific single-record caches.
+ */
 export interface EntityDependency {
 	target: { kind: string; name: string };
 	shouldInvalidate?: (

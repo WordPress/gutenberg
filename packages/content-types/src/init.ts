@@ -28,64 +28,70 @@ function setsDiffer(
  * derived from the `wp_user_taxonomy` / `wp_user_post_type` CPTs at PHP
  * `init` priority 20, and the two CPTs cross-reference each other.
  */
-export function init() {
-	// wp_user_taxonomy → registered taxonomies list. Invalidate only the
-	// individual `root/taxonomy` record matching the source slug; the list
-	// resolver is invalidated broadly by the dispatcher.
-	unlock( dispatch( coreStore ) ).registerEntityDependency(
-		{ kind: 'postType', name: TAXONOMY_ENTITY },
-		{ kind: 'root', name: 'taxonomy' },
-		{
-			shouldInvalidate: (
-				prev: { slug?: string } | undefined,
-				next: { slug?: string } | undefined
-			) => {
-				const slug = next?.slug ?? prev?.slug;
-				return slug ? { records: [ slug ] } : true;
-			},
-		}
-	);
-	// wp_user_taxonomy → user post types.
-	// `object_type` is a top-level REST field; the form's
-	// `config.object_type` is a client-side reshape.
-	unlock( dispatch( coreStore ) ).registerEntityDependency(
-		{ kind: 'postType', name: TAXONOMY_ENTITY },
-		{ kind: 'postType', name: POST_TYPE_ENTITY },
-		{
-			shouldInvalidate: (
-				prev: { object_type?: string[] } | undefined,
-				next: { object_type?: string[] } | undefined
-			) => setsDiffer( prev?.object_type, next?.object_type ),
-		}
-	);
-	// wp_user_post_type → registered post types list. Targeted by slug, same
-	// shape as the taxonomy coupling above.
-	unlock( dispatch( coreStore ) ).registerEntityDependency(
-		{ kind: 'postType', name: POST_TYPE_ENTITY },
-		{ kind: 'root', name: 'postType' },
-		{
-			shouldInvalidate: (
-				prev: { slug?: string } | undefined,
-				next: { slug?: string } | undefined
-			) => {
-				const slug = next?.slug ?? prev?.slug;
-				return slug ? { records: [ slug ] } : true;
-			},
-		}
-	);
-	// wp_user_post_type → user taxonomies.
-	unlock( dispatch( coreStore ) ).registerEntityDependency(
-		{ kind: 'postType', name: POST_TYPE_ENTITY },
-		{ kind: 'postType', name: TAXONOMY_ENTITY },
-		{
-			shouldInvalidate: (
-				prev: { config?: { taxonomies?: string[] } } | undefined,
-				next: { config?: { taxonomies?: string[] } } | undefined
-			) =>
-				setsDiffer(
-					prev?.config?.taxonomies,
-					next?.config?.taxonomies
-				),
-		}
-	);
+export async function init() {
+	const { updateEntityConfig } = unlock( dispatch( coreStore ) );
+
+	await Promise.all( [
+		// wp_user_taxonomy invalidates:
+		//   - root/taxonomy: targeted by slug; the singular `getTaxonomy(slug)`
+		//     resolver is invalidated by key, and the list resolver
+		//     (`getTaxonomies`) broadly.
+		//   - postType/wp_user_post_type: when `object_type` changes the set of
+		//     post types this taxonomy applies to.
+		updateEntityConfig( 'postType', TAXONOMY_ENTITY, {
+			invalidates: [
+				{
+					target: { kind: 'root', name: 'taxonomy' },
+					shouldInvalidate: (
+						prev: { slug?: string } | undefined,
+						next: { slug?: string } | undefined
+					) => {
+						const slug = next?.slug ?? prev?.slug;
+						return slug ? { records: [ slug ] } : true;
+					},
+				},
+				{
+					target: { kind: 'postType', name: POST_TYPE_ENTITY },
+					// `object_type` is a top-level REST field; the form's
+					// `config.object_type` is a client-side reshape.
+					shouldInvalidate: (
+						prev: { object_type?: string[] } | undefined,
+						next: { object_type?: string[] } | undefined
+					) => setsDiffer( prev?.object_type, next?.object_type ),
+				},
+			],
+		} ),
+
+		// wp_user_post_type invalidates:
+		//   - root/postType: targeted by slug, same shape as the taxonomy
+		//     coupling above.
+		//   - postType/wp_user_taxonomy: when `config.taxonomies` changes.
+		updateEntityConfig( 'postType', POST_TYPE_ENTITY, {
+			invalidates: [
+				{
+					target: { kind: 'root', name: 'postType' },
+					shouldInvalidate: (
+						prev: { slug?: string } | undefined,
+						next: { slug?: string } | undefined
+					) => {
+						const slug = next?.slug ?? prev?.slug;
+						return slug ? { records: [ slug ] } : true;
+					},
+				},
+				{
+					target: { kind: 'postType', name: TAXONOMY_ENTITY },
+					shouldInvalidate: (
+						prev:
+							| { config?: { taxonomies?: string[] } }
+							| undefined,
+						next: { config?: { taxonomies?: string[] } } | undefined
+					) =>
+						setsDiffer(
+							prev?.config?.taxonomies,
+							next?.config?.taxonomies
+						),
+				},
+			],
+		} ),
+	] );
 }
