@@ -16,7 +16,7 @@ import deprecated from '@wordpress/deprecated';
  */
 import { getNestedValue, setNestedValue } from './utils';
 import { receiveItems, removeItems, receiveQueriedItems } from './queried-data';
-import { DEFAULT_ENTITY_KEY } from './entities';
+import { DEFAULT_ENTITY_KEY, getMethodName } from './entities';
 import { createBatch } from './batch';
 import { STORE_NAME } from './name';
 import {
@@ -25,9 +25,104 @@ import {
 	getSyncManager,
 } from './sync';
 import logEntityDeprecation from './utils/log-entity-deprecation';
+import { unlock } from './lock-unlock';
 
 function addTitleToAutoDraft( record ) {
 	return record.status === 'auto-draft' ? { ...record, title: '' } : record;
+}
+
+/**
+ * Walks the `getEntityRecord` and `getEntityRecords` resolver caches for
+ * each registered dependent of `(kind, name)` and invalidates matching
+ * entries. Called after successful `saveEntityRecord` / `deleteEntityRecord`.
+ *
+ * @param {Object}  args
+ * @param {string}  args.kind     Source entity kind.
+ * @param {string}  args.name     Source entity name.
+ * @param {?Object} args.prev     Record before the mutation, or `undefined` on create.
+ * @param {?Object} args.next     Record after the mutation, or `undefined` on delete.
+ * @param {Object}  args.registry Thunk `registry` — used to read the private `getEntityDependencies` selector.
+ * @param {Object}  args.select   Thunk `select` (public selectors of this store).
+ * @param {Object}  args.dispatch Thunk `dispatch` (provides `invalidateResolution`).
+ */
+function applyEntityDependencies( {
+	kind,
+	name,
+	prev,
+	next,
+	registry,
+	select,
+	dispatch,
+} ) {
+	let dependents;
+	try {
+		dependents = unlock(
+			registry.select( STORE_NAME )
+		).getEntityDependencies( kind, name );
+	} catch {
+		return;
+	}
+	if ( ! dependents?.length ) {
+		return;
+	}
+	const cachedResolvers = select?.getCachedResolvers?.() ?? {};
+	for ( const { target, shouldInvalidate } of dependents ) {
+		const result = shouldInvalidate ? shouldInvalidate( prev, next ) : true;
+		if ( ! result ) {
+			continue;
+		}
+		// `result` is either `true` (invalidate everything for the target)
+		// or `{ records: [ key, … ] }` (invalidate only those single-record
+		// caches; list caches always invalidate broadly because query-arg
+		// matching is entity-specific).
+		const targetedKeys =
+			result !== true && Array.isArray( result.records )
+				? new Set( result.records )
+				: null;
+		const targetConfig = select?.getEntityConfig?.(
+			target.kind,
+			target.name
+		);
+		const singularName = getMethodName( target.kind, target.name );
+		const pluralName =
+			targetConfig?.plural &&
+			getMethodName( target.kind, targetConfig.plural );
+		// Generic getEntityRecord — entries are keyed by [kind, name, key, …],
+		// so we can target by record key.
+		cachedResolvers.getEntityRecord?.forEach( ( _value, args ) => {
+			if ( args[ 0 ] !== target.kind || args[ 1 ] !== target.name ) {
+				return;
+			}
+			if ( targetedKeys && ! targetedKeys.has( args[ 2 ] ) ) {
+				return;
+			}
+			dispatch.invalidateResolution( 'getEntityRecord', args );
+		} );
+		// Generic getEntityRecords — list resolver, args are [kind, name,
+		// query]. Always invalidate broadly.
+		cachedResolvers.getEntityRecords?.forEach( ( _value, args ) => {
+			if ( args[ 0 ] === target.kind && args[ 1 ] === target.name ) {
+				dispatch.invalidateResolution( 'getEntityRecords', args );
+			}
+		} );
+		// Singular shorthand (e.g., getPostType, getTaxonomy) — args are
+		// [key]. Target by key when caller asked for targeted invalidation.
+		if ( singularName ) {
+			cachedResolvers[ singularName ]?.forEach( ( _value, args ) => {
+				if ( targetedKeys && ! targetedKeys.has( args[ 0 ] ) ) {
+					return;
+				}
+				dispatch.invalidateResolution( singularName, args );
+			} );
+		}
+		// Plural shorthand (e.g., getPostTypes, getTaxonomies) — list
+		// resolver. Always invalidate broadly.
+		if ( pluralName ) {
+			cachedResolvers[ pluralName ]?.forEach( ( _value, args ) => {
+				dispatch.invalidateResolution( pluralName, args );
+			} );
+		}
+	}
 }
 
 /**
@@ -291,7 +386,7 @@ export const deleteEntityRecord =
 		query,
 		{ __unstableFetch = apiFetch, throwOnError = false } = {}
 	) =>
-	async ( { dispatch, resolveSelect } ) => {
+	async ( { dispatch, select, resolveSelect, registry } ) => {
 		logEntityDeprecation( kind, name, 'deleteEntityRecord' );
 		const configs = await resolveSelect.getEntitiesConfig( kind );
 		const entityConfig = configs.find(
@@ -302,6 +397,10 @@ export const deleteEntityRecord =
 		if ( ! entityConfig ) {
 			return;
 		}
+
+		// Captured before the DELETE so registered entity-dependency
+		// predicates can compare prev/next on the source record.
+		const prev = select?.getRawEntityRecord?.( kind, name, recordId );
 
 		const lock = await dispatch.__unstableAcquireStoreLock(
 			STORE_NAME,
@@ -344,6 +443,16 @@ export const deleteEntityRecord =
 				} );
 
 				await dispatch( removeItems( kind, name, recordId, true ) );
+
+				applyEntityDependencies( {
+					kind,
+					name,
+					prev,
+					next: undefined,
+					registry,
+					select,
+					dispatch,
+				} );
 
 				if ( entityConfig.syncConfig ) {
 					const objectType = `${ kind }/${ name }`;
@@ -598,7 +707,7 @@ export const __unstableCreateUndoLevel =
  */
 export const saveEntityRecord =
 	( kind, name, record, options = {} ) =>
-	async ( { select, resolveSelect, dispatch } ) => {
+	async ( { select, resolveSelect, dispatch, registry } ) => {
 		const {
 			isAutosave = false,
 			__unstableFetch = apiFetch,
@@ -790,6 +899,15 @@ export const saveEntityRecord =
 						true,
 						edits
 					);
+					applyEntityDependencies( {
+						kind,
+						name,
+						prev: isNewRecord ? undefined : persistedRecord,
+						next: updatedRecord,
+						registry,
+						select,
+						dispatch,
+					} );
 					if ( entityConfig.syncConfig ) {
 						// Use an untracked origin so that the save
 						// response does not create undo levels.

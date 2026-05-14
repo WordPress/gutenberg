@@ -12,6 +12,7 @@ import {
 	userPermissions,
 	autosaves,
 	currentUser,
+	entityDependencies,
 } from '../reducer';
 
 describe( 'entities', () => {
@@ -529,5 +530,53 @@ describe( 'currentUser', () => {
 		);
 
 		expect( state ).toEqual( currentUserData );
+	} );
+} );
+
+describe( 'entityDependencies', () => {
+	const source = { kind: 'postType', name: 'wp_user_taxonomy' };
+	const target = { kind: 'root', name: 'taxonomy' };
+
+	it( 'replaces an existing entry when re-registered (same source, same target)', () => {
+		const first = () => true;
+		const second = () => false;
+		const after = entityDependencies(
+			entityDependencies( deepFreeze( {} ), {
+				type: 'REGISTER_ENTITY_DEPENDENCY',
+				source,
+				target,
+				shouldInvalidate: first,
+			} ),
+			{
+				type: 'REGISTER_ENTITY_DEPENDENCY',
+				source,
+				target,
+				shouldInvalidate: second,
+			}
+		);
+		expect( after[ 'postType/wp_user_taxonomy' ] ).toHaveLength( 1 );
+		expect(
+			after[ 'postType/wp_user_taxonomy' ][ 0 ].shouldInvalidate
+		).toBe( second );
+	} );
+
+	it( 'appends a different target under the same source', () => {
+		const otherTarget = { kind: 'postType', name: 'wp_user_post_type' };
+		const after = entityDependencies(
+			entityDependencies( deepFreeze( {} ), {
+				type: 'REGISTER_ENTITY_DEPENDENCY',
+				source,
+				target,
+			} ),
+			{
+				type: 'REGISTER_ENTITY_DEPENDENCY',
+				source,
+				target: otherTarget,
+			}
+		);
+		expect( after[ 'postType/wp_user_taxonomy' ] ).toHaveLength( 2 );
+		expect( after[ 'postType/wp_user_taxonomy' ][ 1 ].target ).toEqual(
+			otherTarget
+		);
 	} );
 } );

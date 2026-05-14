@@ -36,7 +36,12 @@
 			"options-connectors",
 			"guidelines",
 			"experiments",
-			"content-types",
+			{
+				"id": "content-types",
+				"init": [
+					"@wordpress/content-types"
+				]
+			},
 			"dashboard"
 		]
 	},

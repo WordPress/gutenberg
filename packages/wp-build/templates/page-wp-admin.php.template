@@ -154,12 +154,14 @@ function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_enqueue_scripts( $hook_suf
 		wp_register_script( '{{PAGE_SLUG}}-wp-admin-prerequisites', '', $asset['dependencies'], $asset['version'], true );
 
 		// Add inline script to initialize the app using initSinglePage (no menuItems)
+		$init_modules = {{INIT_MODULES_JSON}};
 		wp_add_inline_script(
 			'{{PAGE_SLUG}}-wp-admin-prerequisites',
 			sprintf(
-				'import("@wordpress/boot").then(mod => mod.initSinglePage({mountId: "%s", routes: %s}));',
+				'import("@wordpress/boot").then(mod => mod.initSinglePage({mountId: "%s", routes: %s, initModules: %s}));',
 				'{{PAGE_SLUG}}-wp-admin-app',
-				wp_json_encode( $routes, JSON_HEX_TAG | JSON_UNESCAPED_SLASHES )
+				wp_json_encode( $routes, JSON_HEX_TAG | JSON_UNESCAPED_SLASHES ),
+				wp_json_encode( $init_modules, JSON_HEX_TAG | JSON_UNESCAPED_SLASHES )
 			)
 		);
 
@@ -179,6 +181,9 @@ function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_enqueue_scripts( $hook_suf
 				'id'     => '@wordpress/boot',
 			),
 		);
+
+		// Add init modules as static dependencies
+{{INIT_MODULES_PHP_ARRAY}}
 
 		// Add all registered routes as dependencies
 		foreach ( $routes as $route ) {

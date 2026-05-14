@@ -55,6 +55,15 @@ export interface State {
 	syncConnectionStatuses?: Record< string, ConnectionStatus >;
 	collaborationSupported: boolean;
 	viewConfigs: Record< string, Record< string, any > >;
+	entityDependencies: Record< string, EntityDependency[] >;
+}
+
+export interface EntityDependency {
+	target: { kind: string; name: string };
+	shouldInvalidate?: (
+		prev: unknown,
+		next: unknown
+	) => boolean | { records: EntityRecordKey[] };
 }
 
 type EntityRecordKey = string | number;

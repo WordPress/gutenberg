@@ -16,8 +16,7 @@ import { Stack, Text } from '@wordpress/ui';
  */
 import type { PostTypeFormData } from '../types';
 import type { CoreDataError } from '../../types';
-import { useMaybeInvalidateContentTypeCache } from '../../utils/use-maybe-invalidate-content-type-cache';
-import { POST_TYPE_ENTITY, TAXONOMY_ENTITY } from '../../constants';
+import { POST_TYPE_ENTITY } from '../../constants';
 
 function DeletePostTypeModal( {
 	items,
@@ -32,7 +31,6 @@ function DeletePostTypeModal( {
 	const { deleteEntityRecord } = useDispatch( coreStore );
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
-	const maybeInvalidateCache = useMaybeInvalidateContentTypeCache();
 
 	async function onDelete() {
 		if ( isDeleting ) {
@@ -122,10 +120,6 @@ function DeletePostTypeModal( {
 			}
 			createErrorNotice( errorMessage, { type: 'snackbar' } );
 		}
-		const deletedRefs = itemsToDelete
-			.filter( ( _, i ) => promiseResult[ i ].status === 'fulfilled' )
-			.flatMap( ( item ) => item.config.taxonomies );
-		maybeInvalidateCache( deletedRefs, [], TAXONOMY_ENTITY );
 		onActionPerformed?.( itemsToDelete );
 		setIsDeleting( false );
 		closeModal?.();

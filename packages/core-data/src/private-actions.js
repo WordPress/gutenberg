@@ -220,3 +220,48 @@ export function setSyncConnectionStatus( kind, name, key, status ) {
 		status,
 	};
 }
+
+/**
+ * Registers that successful saves/deletes on `source` invalidate cached
+ * reads of `target`. Use when one entity's REST output is derived from
+ * another's records.
+ *
+ * `shouldInvalidate( prev, next )` returns:
+ *   - `false` — skip
+ *   - `true` — invalidate all cached entries for `target` (default)
+ *   - `{ records: [ key, … ] }` — invalidate only the listed single-record
+ *     caches; list caches always invalidate broadly.
+ *
+ * `prev` / `next` are `undefined` on create / delete respectively.
+ *
+ * @example
+ * ```js
+ * registerEntityDependency(
+ *     { kind: 'postType', name: 'wp_user_taxonomy' },
+ *     { kind: 'root', name: 'taxonomy' },
+ *     {
+ *         shouldInvalidate: ( prev, next ) => {
+ *             // Skip when nothing observable to the target changed.
+ *             if ( prev?.status === next?.status ) {
+ *                 return false;
+ *             }
+ *             return { records: [ ( next ?? prev ).slug ] };
+ *         },
+ *     }
+ * );
+ * ```
+ *
+ * @param {{ kind: string, name: string }} source    Mutated entity.
+ * @param {{ kind: string, name: string }} target    Entity whose cache to invalidate.
+ * @param {Object}                         [options] `shouldInvalidate( prev, next )` per the contract above.
+ *
+ * @return {Object} Action object.
+ */
+export function registerEntityDependency( source, target, options = {} ) {
+	return {
+		type: 'REGISTER_ENTITY_DEPENDENCY',
+		source,
+		target,
+		shouldInvalidate: options.shouldInvalidate,
+	};
+}

@@ -9,6 +9,15 @@ jest.mock( '@wordpress/api-fetch' );
  * Internal dependencies
  */
 import {
+	createRegistry,
+	createReduxStore,
+	combineReducers,
+} from '@wordpress/data';
+
+/**
+ * Internal dependencies
+ */
+import {
 	editEntityRecord,
 	clearEntityRecordEdits,
 	saveEntityRecord,
@@ -20,6 +29,11 @@ import {
 	__experimentalBatch,
 } from '../actions';
 import { getSyncManager } from '../sync';
+import { STORE_NAME } from '../name';
+import { entityDependencies as entityDependenciesReducer } from '../reducer';
+import { registerEntityDependency } from '../private-actions';
+import { getEntityDependencies } from '../private-selectors';
+import { unlock } from '../lock-unlock';
 
 jest.mock( '../batch', () => {
 	const { createBatch } = jest.requireActual( '../batch' );
@@ -1161,5 +1175,285 @@ describe( '__experimentalBatch', () => {
 			{ id: 123, updated: true },
 			{ id: 123, deleted: true },
 		] );
+	} );
+} );
+
+describe( 'entity dependencies', () => {
+	const SOURCE = { kind: 'postType', name: 'wp_user_taxonomy' };
+	const TARGET = { kind: 'root', name: 'taxonomy' };
+	const configs = [ { ...SOURCE, baseURL: '/wp/v2/user-taxonomies' } ];
+
+	function buildStubs( {
+		dependents = [],
+		cachedResolvers = {},
+		persistedRecord,
+	} ) {
+		const registry = createRegistry();
+		const store = createReduxStore( STORE_NAME, {
+			reducer: combineReducers( {
+				entityDependencies: entityDependenciesReducer,
+			} ),
+			actions: { registerEntityDependency },
+		} );
+		unlock( store ).registerPrivateSelectors( { getEntityDependencies } );
+		registry.register( store );
+		for ( const { target, shouldInvalidate } of dependents ) {
+			registry
+				.dispatch( STORE_NAME )
+				.registerEntityDependency( SOURCE, target, {
+					shouldInvalidate,
+				} );
+		}
+		const dispatch = Object.assign( jest.fn(), {
+			receiveEntityRecords: jest.fn(),
+			invalidateResolution: jest.fn(),
+			__unstableAcquireStoreLock: jest.fn(),
+			__unstableReleaseStoreLock: jest.fn(),
+		} );
+		const select = {
+			getRawEntityRecord: () => persistedRecord,
+			getCachedResolvers: () => cachedResolvers,
+		};
+		const resolveSelect = {
+			getEntitiesConfig: jest.fn( () => configs ),
+		};
+		return { dispatch, select, resolveSelect, registry };
+	}
+
+	beforeEach( () => {
+		apiFetch.mockReset();
+	} );
+
+	it( 'invalidates dependent resolver entries after a successful save', async () => {
+		const next = { id: 5, slug: 'genre', title: { raw: 'Genres' } };
+		const cachedResolvers = {
+			getEntityRecords: new Map( [
+				[
+					[ 'root', 'taxonomy', { per_page: -1 } ],
+					{ status: 'finished' },
+				],
+				[ [ 'root', 'postType' ], { status: 'finished' } ],
+			] ),
+		};
+		const { dispatch, select, resolveSelect, registry } = buildStubs( {
+			dependents: [ { target: TARGET } ],
+			cachedResolvers,
+		} );
+		apiFetch.mockImplementation( () => next );
+
+		await saveEntityRecord( SOURCE.kind, SOURCE.name, { title: 'Genres' } )(
+			{ select, dispatch, resolveSelect, registry }
+		);
+
+		expect( dispatch.invalidateResolution ).toHaveBeenCalledWith(
+			'getEntityRecords',
+			[ 'root', 'taxonomy', { per_page: -1 } ]
+		);
+		// Non-matching target args are not invalidated.
+		expect( dispatch.invalidateResolution ).not.toHaveBeenCalledWith(
+			'getEntityRecords',
+			[ 'root', 'postType' ]
+		);
+	} );
+
+	it( 'skips invalidation when shouldInvalidate returns false', async () => {
+		const prev = { id: 5, config: { object_type: [ 'post' ] } };
+		const next = { id: 5, config: { object_type: [ 'post' ] } };
+		const cachedResolvers = {
+			getEntityRecords: new Map( [
+				[ [ 'root', 'taxonomy' ], { status: 'finished' } ],
+			] ),
+		};
+		const { dispatch, select, resolveSelect, registry } = buildStubs( {
+			dependents: [
+				{
+					target: TARGET,
+					shouldInvalidate: ( p, n ) =>
+						p?.config?.object_type?.[ 0 ] !==
+						n?.config?.object_type?.[ 0 ],
+				},
+			],
+			cachedResolvers,
+			persistedRecord: prev,
+		} );
+		apiFetch.mockImplementation( () => next );
+
+		await saveEntityRecord( SOURCE.kind, SOURCE.name, {
+			id: 5,
+			config: { object_type: [ 'post' ] },
+		} )( { select, dispatch, resolveSelect, registry } );
+
+		expect( dispatch.invalidateResolution ).not.toHaveBeenCalled();
+	} );
+
+	it( 'passes undefined prev to predicates on create', async () => {
+		const next = { id: 9, config: { object_type: [ 'post' ] } };
+		const cachedResolvers = {
+			getEntityRecords: new Map( [
+				[ [ 'root', 'taxonomy' ], { status: 'finished' } ],
+			] ),
+		};
+		const shouldInvalidate = jest.fn( () => true );
+		const { dispatch, select, resolveSelect, registry } = buildStubs( {
+			dependents: [ { target: TARGET, shouldInvalidate } ],
+			cachedResolvers,
+		} );
+		apiFetch.mockImplementation( () => next );
+
+		await saveEntityRecord( SOURCE.kind, SOURCE.name, {
+			config: { object_type: [ 'post' ] },
+		} )( { select, dispatch, resolveSelect, registry } );
+
+		expect( shouldInvalidate ).toHaveBeenCalledWith( undefined, next );
+	} );
+
+	it( 'invalidates dependent resolver entries after a successful delete', async () => {
+		const prev = { id: 5, slug: 'genre' };
+		const cachedResolvers = {
+			getEntityRecords: new Map( [
+				[ [ 'root', 'taxonomy' ], { status: 'finished' } ],
+			] ),
+			getEntityRecord: new Map( [
+				[ [ 'root', 'taxonomy', 'genre' ], { status: 'finished' } ],
+			] ),
+		};
+		const { dispatch, select, resolveSelect, registry } = buildStubs( {
+			dependents: [ { target: TARGET } ],
+			cachedResolvers,
+			persistedRecord: prev,
+		} );
+		apiFetch.mockImplementation( () => true );
+
+		await deleteEntityRecord(
+			SOURCE.kind,
+			SOURCE.name,
+			5
+		)( { dispatch, select, resolveSelect, registry } );
+
+		// Both single-record and list caches are walked, so a slug
+		// rename / delete invalidates a cached getEntityRecord too.
+		expect( dispatch.invalidateResolution ).toHaveBeenCalledWith(
+			'getEntityRecords',
+			[ 'root', 'taxonomy' ]
+		);
+		expect( dispatch.invalidateResolution ).toHaveBeenCalledWith(
+			'getEntityRecord',
+			[ 'root', 'taxonomy', 'genre' ]
+		);
+	} );
+
+	it( 'invalidates shorthand resolvers (getTaxonomies / getPostTypes)', async () => {
+		// `getTaxonomies` is a shorthand resolver registered under its own
+		// name (built from kind+plural), so it lives in a separate cache
+		// bucket from `getEntityRecords`. Both need to be walked.
+		const cachedResolvers = {
+			getTaxonomies: new Map( [
+				[ [ { per_page: -1 } ], { status: 'finished' } ],
+				[ [], { status: 'finished' } ],
+			] ),
+			getTaxonomy: new Map( [ [ [ 'genre' ], { status: 'finished' } ] ] ),
+		};
+		const { dispatch, select, resolveSelect, registry } = buildStubs( {
+			dependents: [ { target: TARGET } ],
+			cachedResolvers,
+		} );
+		// Stub the config lookup so the plural name resolves.
+		select.getEntityConfig = ( kind, name ) =>
+			kind === 'root' && name === 'taxonomy'
+				? { plural: 'taxonomies' }
+				: undefined;
+		apiFetch.mockImplementation( () => ( { id: 1 } ) );
+
+		await saveEntityRecord( SOURCE.kind, SOURCE.name, { title: 'x' } )( {
+			select,
+			dispatch,
+			resolveSelect,
+			registry,
+		} );
+
+		expect( dispatch.invalidateResolution ).toHaveBeenCalledWith(
+			'getTaxonomies',
+			[ { per_page: -1 } ]
+		);
+		expect( dispatch.invalidateResolution ).toHaveBeenCalledWith(
+			'getTaxonomies',
+			[]
+		);
+		expect( dispatch.invalidateResolution ).toHaveBeenCalledWith(
+			'getTaxonomy',
+			[ 'genre' ]
+		);
+	} );
+
+	it( 'invalidates only matching single records when shouldInvalidate returns { records: [...] }', async () => {
+		// Only the matching slug ('genre') in `getEntityRecord` and the
+		// singular shorthand `getTaxonomy` should be invalidated. The
+		// unrelated `getEntityRecord([…, 'category'])` and `getTaxonomy([
+		// 'category' ])` entries stay. Lists (`getEntityRecords`,
+		// `getTaxonomies`) always invalidate broadly.
+		const next = { id: 5, slug: 'genre' };
+		const cachedResolvers = {
+			getEntityRecord: new Map( [
+				[ [ 'root', 'taxonomy', 'genre' ], { status: 'finished' } ],
+				[ [ 'root', 'taxonomy', 'category' ], { status: 'finished' } ],
+			] ),
+			getEntityRecords: new Map( [
+				[ [ 'root', 'taxonomy' ], { status: 'finished' } ],
+			] ),
+			getTaxonomy: new Map( [
+				[ [ 'genre' ], { status: 'finished' } ],
+				[ [ 'category' ], { status: 'finished' } ],
+			] ),
+			getTaxonomies: new Map( [
+				[ [ { per_page: -1 } ], { status: 'finished' } ],
+			] ),
+		};
+		const { dispatch, select, resolveSelect, registry } = buildStubs( {
+			dependents: [
+				{
+					target: TARGET,
+					shouldInvalidate: ( _prev, n ) => ( {
+						records: [ n.slug ],
+					} ),
+				},
+			],
+			cachedResolvers,
+		} );
+		select.getEntityConfig = ( kind, name ) =>
+			kind === 'root' && name === 'taxonomy'
+				? { plural: 'taxonomies' }
+				: undefined;
+		apiFetch.mockImplementation( () => next );
+
+		await saveEntityRecord( SOURCE.kind, SOURCE.name, { title: 'Genres' } )(
+			{ select, dispatch, resolveSelect, registry }
+		);
+
+		// Only the matching `genre` record entries invalidate.
+		expect( dispatch.invalidateResolution ).toHaveBeenCalledWith(
+			'getEntityRecord',
+			[ 'root', 'taxonomy', 'genre' ]
+		);
+		expect( dispatch.invalidateResolution ).not.toHaveBeenCalledWith(
+			'getEntityRecord',
+			[ 'root', 'taxonomy', 'category' ]
+		);
+		expect( dispatch.invalidateResolution ).toHaveBeenCalledWith(
+			'getTaxonomy',
+			[ 'genre' ]
+		);
+		expect( dispatch.invalidateResolution ).not.toHaveBeenCalledWith(
+			'getTaxonomy',
+			[ 'category' ]
+		);
+		// Lists always invalidate broadly.
+		expect( dispatch.invalidateResolution ).toHaveBeenCalledWith(
+			'getEntityRecords',
+			[ 'root', 'taxonomy' ]
+		);
+		expect( dispatch.invalidateResolution ).toHaveBeenCalledWith(
+			'getTaxonomies',
+			[ { per_page: -1 } ]
+		);
 	} );
 } );

@@ -219,7 +219,7 @@ export function serializeForSave( data: TaxonomyFormData ) {
 
 export function usePublicPostTypes() {
 	const postTypes = useSelect(
-		( select ) => select( coreStore ).getPostTypes( { per_page: -1 } ),
+		( select ) => select( coreStore ).getPostTypes(),
 		[]
 	);
 	return useMemo( () => {

@@ -11,3 +11,5 @@ export {
 	TAXONOMY_ENTITY,
 	NEW_ID,
 } from './constants';
+
+export { init } from './init';

@@ -64,13 +64,7 @@ import {
 } from '../utils/fields';
 import type { PostTypeFormData, PostTypeRecord } from './types';
 import { BLANK_RECORD, serializeForSave, toFormData } from './utils';
-import { useMaybeInvalidateContentTypeCache } from '../utils/use-maybe-invalidate-content-type-cache';
-import {
-	NEW_ID,
-	POST_TYPE_ENTITY,
-	POST_TYPES_PATH,
-	TAXONOMY_ENTITY,
-} from '../constants';
+import { NEW_ID, POST_TYPE_ENTITY, POST_TYPES_PATH } from '../constants';
 
 type PostTypePageProps = {
 	isAddMode: boolean;
@@ -227,7 +221,6 @@ function PostTypePage( {
 	const { saveEntityRecord } = useDispatch( coreStore );
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
-	const maybeInvalidateCache = useMaybeInvalidateContentTypeCache();
 
 	async function onSave() {
 		if ( isSaving || ! isValid ) {
@@ -253,11 +246,6 @@ function PostTypePage( {
 						data.title.raw
 				  );
 			createSuccessNotice( successMessage, { type: 'snackbar' } );
-			maybeInvalidateCache(
-				initialData.config.taxonomies,
-				data.config.taxonomies,
-				TAXONOMY_ENTITY
-			);
 			if ( saved?.id !== undefined ) {
 				onSaved?.( { ...data, id: saved.id } );
 			}

@@ -63,13 +63,20 @@ export async function init( {
 export async function initSinglePage( {
 	mountId,
 	routes,
+	initModules,
 }: {
 	mountId: string;
 	routes?: Route[];
+	initModules?: string[];
 } ) {
 	( routes ?? [] ).forEach( ( route ) => {
 		dispatch( store ).registerRoute( route );
 	} );
+
+	for ( const moduleId of initModules ?? [] ) {
+		const module = await import( moduleId );
+		await module.init();
+	}
 
 	// Render the app without sidebar
 	const rootElement = document.getElementById( mountId );

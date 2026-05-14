@@ -740,6 +740,43 @@ export function viewConfigs( state = {}, action ) {
 	return state;
 }
 
+/**
+ * Reducer tracking declared cross-entity dependencies, keyed by
+ * `${ kind }/${ name }` of the source entity. Each entry is an array of
+ * dependents — successful saves/deletes on the source entity invalidate
+ * matching resolver caches on each dependent (optionally gated by a
+ * `shouldInvalidate( prev, next )` predicate).
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function entityDependencies( state = {}, action ) {
+	if ( action.type !== 'REGISTER_ENTITY_DEPENDENCY' ) {
+		return state;
+	}
+	const sourceKey = `${ action.source.kind }/${ action.source.name }`;
+	const next = {
+		target: action.target,
+		shouldInvalidate: action.shouldInvalidate,
+	};
+	// Idempotent: re-registering the same (source, target) replaces the
+	// existing entry. Protects HMR, double-loaded bundles, and re-mounted
+	// routes from accumulating duplicate dependents.
+	const existing = state[ sourceKey ] ?? [];
+	const index = existing.findIndex(
+		( dep ) =>
+			dep.target.kind === action.target.kind &&
+			dep.target.name === action.target.name
+	);
+	const updated =
+		index === -1
+			? [ ...existing, next ]
+			: existing.map( ( dep, i ) => ( i === index ? next : dep ) );
+	return { ...state, [ sourceKey ]: updated };
+}
+
 export default combineReducers( {
 	users,
 	currentTheme,
@@ -749,6 +786,7 @@ export default combineReducers( {
 	themeBaseGlobalStyles,
 	themeGlobalStyleRevisions,
 	entities,
+	entityDependencies,
 	editsReference,
 	undoManager,
 	embedPreviews,
