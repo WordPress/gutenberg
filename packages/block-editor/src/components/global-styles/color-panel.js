@@ -19,7 +19,7 @@ import {
 	Button,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
-import { useCallback, useMemo, useRef } from '@wordpress/element';
+import { useMemo, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { getValueFromVariable } from '@wordpress/global-styles-engine';
 import { reset as resetIcon } from '@wordpress/icons';
@@ -562,34 +562,31 @@ export default function ColorPanel( {
 		},
 	];
 
-	const resetAllFilter = useCallback(
-		( previousValue ) => {
-			return {
-				...previousValue,
-				color: undefined,
-				elements: {
-					...previousValue?.elements,
-					link: {
-						...previousValue?.elements?.link,
+	const resetAllFilter = ( previousValue ) => {
+		return {
+			...previousValue,
+			color: undefined,
+			elements: {
+				...previousValue?.elements,
+				link: {
+					...previousValue?.elements?.link,
+					color: undefined,
+					':hover': {
 						color: undefined,
-						':hover': {
+					},
+				},
+				...elements.reduce( ( acc, element ) => {
+					return {
+						...acc,
+						[ element.name ]: {
+							...previousValue?.elements?.[ element.name ],
 							color: undefined,
 						},
-					},
-					...elements.reduce( ( acc, element ) => {
-						return {
-							...acc,
-							[ element.name ]: {
-								...previousValue?.elements?.[ element.name ],
-								color: undefined,
-							},
-						};
-					}, {} ),
-				},
-			};
-		},
-		[ elements ]
-	);
+					};
+				}, {} ),
+			},
+		};
+	};
 
 	const items = [
 		showTextPanel && {
