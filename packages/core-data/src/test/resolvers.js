@@ -21,6 +21,7 @@ import {
 	getEntityRecord,
 	getEntityRecords,
 	getEmbedPreview,
+	getEntitiesConfig,
 	canUser,
 	getAutosaves,
 	getCurrentUser,
@@ -933,6 +934,63 @@ describe( 'taxonomy pagination', () => {
 	} );
 } );
 
+describe( 'getEntitiesConfig', () => {
+	beforeEach( async () => {
+		triggerFetch.mockReset();
+	} );
+
+	it( 'caches root site permissions from the entity config request', async () => {
+		const dispatch = Object.assign( jest.fn(), {
+			addEntities: jest.fn(),
+			receiveUserPermissions: jest.fn(),
+			finishResolutions: jest.fn(),
+		} );
+
+		triggerFetch.mockResolvedValueOnce( {
+			json: () =>
+				Promise.resolve( {
+					schema: {
+						properties: {
+							title: { title: 'Title' },
+							description: { title: 'Description' },
+						},
+					},
+				} ),
+			headers: new Map( [ [ 'allow', 'GET, POST, PUT' ] ] ),
+		} );
+
+		await getEntitiesConfig( 'root' )( { dispatch } );
+
+		expect( triggerFetch ).toHaveBeenCalledWith( {
+			path: '/wp/v2/settings',
+			method: 'OPTIONS',
+			parse: false,
+		} );
+		expect( dispatch.addEntities ).toHaveBeenCalledWith(
+			expect.arrayContaining( [
+				expect.not.objectContaining( {
+					__unstablePermissions: expect.anything(),
+				} ),
+			] )
+		);
+		expect( dispatch.receiveUserPermissions ).toHaveBeenCalledWith(
+			expect.objectContaining( {
+				'create/root/site': true,
+				'read/root/site': true,
+				'update/root/site': true,
+				'delete/root/site': false,
+			} )
+		);
+		expect( dispatch.finishResolutions ).toHaveBeenCalledWith(
+			'canUser',
+			expect.arrayContaining( [
+				[ 'create', { kind: 'root', name: 'site' } ],
+				[ 'read', { kind: 'root', name: 'site' } ],
+			] )
+		);
+	} );
+} );
+
 describe( 'getEmbedPreview', () => {
 	const SUCCESSFUL_EMBED_RESPONSE = { data: '<p>some html</p>' };
 	const UNEMBEDDABLE_RESPONSE = false;
@@ -1261,6 +1319,31 @@ describe( 'canUser', () => {
 				'read/postType/wp_block': true,
 			} )
 		);
+	} );
+
+	it( 'does not request permissions already cached while loading entity config', async () => {
+		registry = {
+			...registry,
+			select: () => ( {
+				hasStartedResolution: () => false,
+				canUser: () => true,
+			} ),
+		};
+		resolveSelect.getEntitiesConfig.mockResolvedValueOnce( [
+			{
+				name: 'site',
+				kind: 'root',
+				baseURL: '/wp/v2/settings',
+			},
+		] );
+
+		await canUser( 'read', { kind: 'root', name: 'site' } )( {
+			dispatch,
+			registry,
+			resolveSelect,
+		} );
+
+		expect( triggerFetch ).not.toHaveBeenCalled();
 	} );
 
 	it( 'retrieves all permissions even when ID is not given', async () => {

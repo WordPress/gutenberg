@@ -22,6 +22,7 @@ import {
 	getPostChangesFromCRDTDoc,
 	POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
 } from './utils/crdt';
+import { getUserPermissionsFromAllowHeader } from './utils';
 
 export const DEFAULT_ENTITY_KEY = 'id';
 const POST_RAW_ATTRIBUTES = [ 'title', 'excerpt', 'content' ];
@@ -507,10 +508,15 @@ async function loadSiteEntity() {
 		meta: {},
 	};
 
-	const site = await apiFetch( {
+	const response = await apiFetch( {
 		path: entity.baseURL,
 		method: 'OPTIONS',
+		parse: false,
 	} );
+	const site = await response.json();
+	const permissions = getUserPermissionsFromAllowHeader(
+		response.headers?.get( 'allow' )
+	);
 
 	const labels = {};
 	Object.entries( site?.schema?.properties ?? {} ).forEach(
@@ -522,7 +528,9 @@ async function loadSiteEntity() {
 		}
 	);
 
-	return [ { ...entity, meta: { labels } } ];
+	return [
+		{ ...entity, meta: { labels }, __unstablePermissions: permissions },
+	];
 }
 
 /**

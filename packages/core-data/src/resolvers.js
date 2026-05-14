@@ -672,7 +672,8 @@ export const canUser =
 			throw new Error( `'${ requestedAction }' is not a valid action.` );
 		}
 
-		const { hasStartedResolution } = registry.select( STORE_NAME );
+		const coreSelect = registry.select( STORE_NAME );
+		const { hasStartedResolution } = coreSelect;
 
 		// Prevent resolving the same resource twice.
 		for ( const relatedAction of ALLOWED_RESOURCE_ACTIONS ) {
@@ -703,6 +704,12 @@ export const canUser =
 					config.name === resource.name &&
 					config.kind === resource.kind
 			);
+			if (
+				coreSelect.canUser?.( requestedAction, resource, id ) !==
+				undefined
+			) {
+				return;
+			}
 			if ( ! entityConfig ) {
 				return;
 			}
@@ -1306,7 +1313,32 @@ export const getEntitiesConfig =
 				return;
 			}
 
-			dispatch.addEntities( configs );
+			const canUserResolutionsArgs = [];
+			const receiveUserPermissionArgs = {};
+			const entityConfigs = configs.map(
+				( { __unstablePermissions, ...config } ) => {
+					if ( __unstablePermissions ) {
+						for ( const action of ALLOWED_RESOURCE_ACTIONS ) {
+							const resource = {
+								kind: config.kind,
+								name: config.name,
+							};
+							canUserResolutionsArgs.push( [ action, resource ] );
+							receiveUserPermissionArgs[
+								getUserPermissionCacheKey( action, resource )
+							] = __unstablePermissions[ action ];
+						}
+					}
+					return config;
+				}
+			);
+
+			dispatch.addEntities( entityConfigs );
+
+			if ( canUserResolutionsArgs.length > 0 ) {
+				dispatch.receiveUserPermissions( receiveUserPermissionArgs );
+				dispatch.finishResolutions( 'canUser', canUserResolutionsArgs );
+			}
 		} catch {
 			// Do nothing if the request comes back with an API error.
 		}
