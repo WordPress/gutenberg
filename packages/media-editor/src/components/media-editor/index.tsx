@@ -42,9 +42,7 @@ import type { Media } from '../media-editor-provider';
 import MediaPreview from '../media-preview';
 import MediaEditorCanvas from '../media-editor-canvas';
 import MediaEditorToolbar from '../media-editor-toolbar';
-import MediaEditorCropPanel, {
-	resolveAspectRatio,
-} from '../media-editor-crop-panel';
+import MediaEditorCropPanel from '../media-editor-crop-panel';
 import MediaForm from '../media-form';
 import { unlock } from '../../lock-unlock';
 import { getMediaTypeFromMimeType } from '../../utils';
@@ -57,6 +55,7 @@ import {
 	useSaveMediaEditor,
 	type MediaEditorSaveResult,
 } from './use-save-media-editor';
+import { useCropOptions } from './use-crop-options';
 
 export type { MediaEditorSaveResult } from './use-save-media-editor';
 
@@ -273,9 +272,6 @@ function MediaEditorContent( {
 	const placementControlTimerRef =
 		useRef< ReturnType< typeof setTimeout > >();
 
-	const [ aspectRatioValue, setAspectRatioValue ] = useState( '0' );
-	const [ freeformCrop, setFreeformCrop ] = useState( true );
-
 	const signalPlacementControlInteraction = useCallback( () => {
 		setIsPlacementActive( true );
 		clearTimeout( placementControlTimerRef.current );
@@ -298,8 +294,6 @@ function MediaEditorContent( {
 	}, [] );
 
 	useEffect( () => {
-		setAspectRatioValue( '0' );
-		setFreeformCrop( true );
 		setIsPlacementActive( false );
 		setIsCanvasGestureActive( false );
 	}, [ id ] );
@@ -318,6 +312,20 @@ function MediaEditorContent( {
 
 	const mediaType = getMediaTypeFromMimeType( media?.mime_type ).type;
 	const isImage = !! media && mediaType === 'image';
+	const {
+		aspectRatioValue,
+		setAspectRatioValue,
+		aspectRatioOptions,
+		freeformCrop,
+		setFreeformCrop,
+		resolvedAspectRatio,
+		resetCropOptions,
+	} = useCropOptions( {
+		id,
+		isImage,
+		media,
+		aspectRatioPresets,
+	} );
 	const { isSaving, save: saveMediaEditor } = useSaveMediaEditor( {
 		cropper,
 		id,
@@ -325,22 +333,6 @@ function MediaEditorContent( {
 		media,
 		onSaved,
 	} );
-
-	const imageAspectRatio = useMemo( () => {
-		if ( ! isImage ) {
-			return null;
-		}
-		const naturalWidth = Number( media?.media_details?.width );
-		const naturalHeight = Number( media?.media_details?.height );
-		if (
-			Number.isFinite( naturalWidth ) &&
-			Number.isFinite( naturalHeight ) &&
-			naturalHeight > 0
-		) {
-			return naturalWidth / naturalHeight;
-		}
-		return null;
-	}, [ isImage, media ] );
 
 	const tabs = useMemo< EditorTab[] >( () => {
 		const detailsTab: EditorTab = {
@@ -377,7 +369,7 @@ function MediaEditorContent( {
 							onPlacementControlInteraction={
 								signalPlacementControlInteraction
 							}
-							aspectRatioPresets={ aspectRatioPresets }
+							aspectRatioOptions={ aspectRatioOptions }
 						/>
 					</Stack>
 				),
@@ -387,8 +379,10 @@ function MediaEditorContent( {
 	}, [
 		isImage,
 		aspectRatioValue,
+		setAspectRatioValue,
 		freeformCrop,
-		aspectRatioPresets,
+		setFreeformCrop,
+		aspectRatioOptions,
 		signalPlacementControlInteraction,
 	] );
 
@@ -489,10 +483,7 @@ function MediaEditorContent( {
 								<div className="media-editor__canvas">
 									{ isImage ? (
 										<MediaEditorCanvas
-											aspectRatio={ resolveAspectRatio(
-												aspectRatioValue,
-												imageAspectRatio
-											) }
+											aspectRatio={ resolvedAspectRatio }
 											freeformCrop={ freeformCrop }
 											focusOnMount
 											isPlacementActive={
@@ -513,10 +504,7 @@ function MediaEditorContent( {
 							footer={
 								isImage ? (
 									<MediaEditorToolbar
-										onReset={ () => {
-											setAspectRatioValue( '0' );
-											setFreeformCrop( true );
-										} }
+										onReset={ resetCropOptions }
 										onPlacementControlInteraction={
 											signalPlacementControlInteraction
 										}
