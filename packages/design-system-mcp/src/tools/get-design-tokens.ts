@@ -23,7 +23,7 @@ export function register( server: McpServer ): void {
 				content: [
 					{
 						type: 'text',
-						text: tokens.content,
+						text: tokens,
 					},
 				],
 			};
