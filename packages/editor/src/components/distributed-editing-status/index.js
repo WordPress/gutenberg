@@ -1836,6 +1836,20 @@ function getFreshReviewComparisonPreviewShellMessage( previewShell ) {
 	);
 }
 
+function getFreshReviewComparisonPreviewShellSupportReportMessage(
+	supportReport
+) {
+	if ( supportReport?.available && supportReport.canShareWithSupport ) {
+		return __(
+			'Support report available: renderer registration and review controls are not present yet. It records item identity, boundary policy, and requirement keys only; no raw content, hashes, proof details, or user identity are included.'
+		);
+	}
+
+	return __(
+		'No shareable support report is available for the comparison preview shell.'
+	);
+}
+
 function getFreshReviewComparePlanEvidenceLabel( available ) {
 	return available ? __( 'Available' ) : __( 'Unavailable' );
 }
@@ -2193,6 +2207,8 @@ function DistributedEditingFreshReviewComparePlanStatus() {
 	const comparePlan = reviewItem?.compareAction?.comparePlan;
 	const comparisonSelectionHandoff = comparePlan?.comparisonSelectionHandoff;
 	const comparisonPreviewShell = comparePlan?.comparisonPreviewShell;
+	const comparisonPreviewShellSupportReport =
+		comparisonPreviewShell?.supportReport;
 
 	if ( ! comparePlan ) {
 		return null;
@@ -2236,6 +2252,41 @@ function DistributedEditingFreshReviewComparePlanStatus() {
 			data-distributed-editing-fresh-review-comparison-preview-shell-calls-save={ formatDataBoolean(
 				comparisonPreviewShell?.callsSave
 			) }
+			data-distributed-editing-fresh-review-comparison-preview-shell-report-calls-rest={ formatDataBoolean(
+				comparisonPreviewShellSupportReport?.callsRestEndpoint
+			) }
+			data-distributed-editing-fresh-review-comparison-preview-shell-report-calls-save={ formatDataBoolean(
+				comparisonPreviewShellSupportReport?.callsSave
+			) }
+			data-distributed-editing-fresh-review-comparison-preview-shell-report-computes-diff={ formatDataBoolean(
+				comparisonPreviewShellSupportReport?.computesDiff
+			) }
+			data-distributed-editing-fresh-review-comparison-preview-shell-report-export-ready={ formatDataBoolean(
+				comparisonPreviewShellSupportReport?.supportExportReady
+			) }
+			data-distributed-editing-fresh-review-comparison-preview-shell-report-hash-values={ formatDataBoolean(
+				comparisonPreviewShellSupportReport?.exposesHashValues
+			) }
+			data-distributed-editing-fresh-review-comparison-preview-shell-report-missing-renderer-pieces={
+				comparisonPreviewShellSupportReport?.missingFutureRendererPieceCount ===
+				undefined
+					? undefined
+					: String(
+							comparisonPreviewShellSupportReport.missingFutureRendererPieceCount
+					  )
+			}
+			data-distributed-editing-fresh-review-comparison-preview-shell-report-raw-content={ formatDataBoolean(
+				comparisonPreviewShellSupportReport?.exposesRawContent
+			) }
+			data-distributed-editing-fresh-review-comparison-preview-shell-report-renders-preview={ formatDataBoolean(
+				comparisonPreviewShellSupportReport?.rendersPreview
+			) }
+			data-distributed-editing-fresh-review-comparison-preview-shell-report-shareable={ formatDataBoolean(
+				comparisonPreviewShellSupportReport?.canShareWithSupport
+			) }
+			data-distributed-editing-fresh-review-comparison-preview-shell-report-status={
+				comparisonPreviewShellSupportReport?.status || undefined
+			}
 			data-distributed-editing-fresh-review-comparison-preview-shell-computes-diff={ formatDataBoolean(
 				comparisonPreviewShell?.computesDiff
 			) }
@@ -2294,6 +2345,13 @@ function DistributedEditingFreshReviewComparePlanStatus() {
 					) }
 				</p>
 			) }
+			{ comparisonPreviewShellSupportReport && (
+				<p>
+					{ getFreshReviewComparisonPreviewShellSupportReportMessage(
+						comparisonPreviewShellSupportReport
+					) }
+				</p>
+			) }
 			<dl className="editor-distributed-editing-status__fresh-review-compare-plan-evidence">
 				<div>
 					<dt>{ __( 'Base hash evidence' ) }</dt>
@@ -2336,6 +2394,16 @@ function DistributedEditingFreshReviewComparePlanStatus() {
 							{ comparisonPreviewShell.renderable
 								? __( 'Available' )
 								: __( 'Disabled' ) }
+						</dd>
+					</div>
+				) }
+				{ comparisonPreviewShellSupportReport && (
+					<div>
+						<dt>{ __( 'Preview shell support report' ) }</dt>
+						<dd>
+							{ comparisonPreviewShellSupportReport.canShareWithSupport
+								? __( 'Available' )
+								: __( 'Unavailable' ) }
 						</dd>
 					</div>
 				) }

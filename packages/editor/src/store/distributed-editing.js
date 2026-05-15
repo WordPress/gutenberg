@@ -2176,19 +2176,37 @@ function createDistributedEditingFreshReviewComparisonPreviewShellDescriptor(
 		comparisonInputShape?.optionalInputsAvailable
 	);
 	const normalizedReason = normalizeNullableString( reason );
-
-	return {
+	const renderRequirementKeys = [
+		'base_serialized_block_content',
+		'proposed_serialized_block_content',
+		'boundary_safe_diff_renderer',
+		'human_review_controls',
+	];
+	const optionalRenderRequirementKeys = [
+		'reviewed_serialized_block_content',
+	];
+	const boundaryKinds = comparisonInputShape?.boundaryKinds || [
+		'serialized_block',
+		'html_token',
+		'json_token',
+		'unicode_scalar',
+		'rich_text_attribute',
+	];
+	const itemIdentity = {
+		itemId: normalizeNullableString( item.id ),
+		blockClientId: normalizeNullableString( item.blockClientId ),
+		blockName: normalizeNullableString( item.blockName ),
+		blockLabel: normalizeNullableString( item.blockLabel ),
+		changeKind: normalizeNullableString( item.changeKind ),
+	};
+	const previewShell = {
 		status: 'disabled_until_renderer_turn',
 		reason: normalizedReason || 'comparison_renderer_not_enabled',
 		schemaVersion: 1,
 		shellKind: 'fresh_review_side_by_side_preview_shell',
 		previewMode: 'side_by_side_block_review',
 		rendererStatus: 'not_registered',
-		itemId: normalizeNullableString( item.id ),
-		blockClientId: normalizeNullableString( item.blockClientId ),
-		blockName: normalizeNullableString( item.blockName ),
-		blockLabel: normalizeNullableString( item.blockLabel ),
-		changeKind: normalizeNullableString( item.changeKind ),
+		...itemIdentity,
 		inputKind:
 			comparisonInputShape?.inputKind ||
 			'fresh_review_serialized_block_comparison_inputs',
@@ -2202,23 +2220,12 @@ function createDistributedEditingFreshReviewComparisonPreviewShellDescriptor(
 		optionalInputRoles: comparisonInputShape?.optionalInputRoles || [
 			'reviewed',
 		],
-		renderRequirementKeys: [
-			'base_serialized_block_content',
-			'proposed_serialized_block_content',
-			'boundary_safe_diff_renderer',
-			'human_review_controls',
-		],
-		optionalRenderRequirementKeys: [ 'reviewed_serialized_block_content' ],
+		renderRequirementKeys,
+		optionalRenderRequirementKeys,
 		boundaryPolicy:
 			comparisonInputShape?.boundaryPolicy ||
 			'serialized_block_hash_only',
-		boundaryKinds: comparisonInputShape?.boundaryKinds || [
-			'serialized_block',
-			'html_token',
-			'json_token',
-			'unicode_scalar',
-			'rich_text_attribute',
-		],
+		boundaryKinds,
 		requiredInputsAvailable,
 		optionalInputsAvailable,
 		readyForFutureComparisonSelection: Boolean(
@@ -2242,6 +2249,112 @@ function createDistributedEditingFreshReviewComparisonPreviewShellDescriptor(
 		exposesTokenMaterial: false,
 		exposesUserIdentity: false,
 		exposesReviewerIds: false,
+		rendersPreview: false,
+		rendersDiff: false,
+		computesDiff: false,
+		opensComparison: false,
+		opensPanel: false,
+		derivesPatch: false,
+		callsRestEndpoint: false,
+		callsSave: false,
+		callsNormalSavePost: false,
+		callsRetrySaveEndpoint: false,
+		dispatchesNotice: false,
+		savesPost: false,
+		mutatesEditorContent: false,
+		mutatesPersistedPostContent: false,
+		selectsBlock: false,
+		selectsReviewItem: false,
+		marksSelected: false,
+		movesFocus: false,
+		createsRevision: false,
+		changesPostLock: false,
+		claimsSaved: false,
+	};
+
+	return {
+		...previewShell,
+		supportReport:
+			createDistributedEditingFreshReviewComparisonPreviewShellSupportReportDescriptor(
+				previewShell
+			),
+		hasSupportReport: true,
+		canShowSupportReport: true,
+	};
+}
+
+function createDistributedEditingFreshReviewComparisonPreviewShellSupportReportDescriptor(
+	previewShell
+) {
+	const itemIdentity = {
+		itemId: normalizeNullableString( previewShell.itemId ),
+		blockClientId: normalizeNullableString( previewShell.blockClientId ),
+		blockName: normalizeNullableString( previewShell.blockName ),
+		blockLabel: normalizeNullableString( previewShell.blockLabel ),
+		changeKind: normalizeNullableString( previewShell.changeKind ),
+	};
+	const availableItemIdentityFields = Object.keys( itemIdentity ).filter(
+		( key ) => itemIdentity[ key ] !== null
+	);
+	const missingFutureRendererPieceKeys = [
+		'boundary_safe_diff_renderer',
+		'human_review_controls',
+	];
+
+	return {
+		status: 'available',
+		available: true,
+		schemaVersion: 1,
+		reportKind: 'fresh_review_comparison_preview_shell_support_report',
+		headline: 'Fresh-review comparison preview shell support report',
+		summaryText:
+			'Preview shell is disabled until a renderer turn registers boundary-safe diff rendering and review controls.',
+		shellStatus: previewShell.status,
+		shellReason: previewShell.reason,
+		shellKind: previewShell.shellKind,
+		previewMode: previewShell.previewMode,
+		rendererStatus: previewShell.rendererStatus,
+		itemIdentity,
+		availableItemIdentityFields,
+		itemIdentityFieldCount: availableItemIdentityFields.length,
+		requiredInputRoles: previewShell.requiredInputRoles || [],
+		optionalInputRoles: previewShell.optionalInputRoles || [],
+		requiredInputsAvailable: Boolean(
+			previewShell.requiredInputsAvailable
+		),
+		optionalInputsAvailable: Boolean(
+			previewShell.optionalInputsAvailable
+		),
+		renderRequirementKeys: previewShell.renderRequirementKeys || [],
+		optionalRenderRequirementKeys:
+			previewShell.optionalRenderRequirementKeys || [],
+		missingFutureRendererPieceKeys,
+		missingFutureRendererPieceCount: missingFutureRendererPieceKeys.length,
+		boundaryPolicy: previewShell.boundaryPolicy,
+		boundaryKinds: previewShell.boundaryKinds || [],
+		boundaryKindCount: previewShell.boundaryKinds?.length || 0,
+		canShareWithSupport: true,
+		supportExportReady: true,
+		supportBundleSafe: true,
+		supportDiagnosticsOnly: true,
+		requiresFutureRenderer: true,
+		requiresExplicitRendererTurn: true,
+		canOpenComparisonPreviewShell: Boolean(
+			previewShell.canOpenComparisonPreviewShell
+		),
+		renderable: Boolean( previewShell.renderable ),
+		descriptorOnly: true,
+		redacted: true,
+		hashValuesRedacted: true,
+		sourceFieldNamesOnly: false,
+		rawContentIncluded: false,
+		exposesHashValues: false,
+		exposesRawContent: false,
+		exposesProofSignature: false,
+		exposesTokenMaterial: false,
+		exposesUserIdentity: false,
+		exposesReviewerIds: false,
+		exposesActorIds: false,
 		rendersPreview: false,
 		rendersDiff: false,
 		computesDiff: false,
