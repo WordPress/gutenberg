@@ -252,6 +252,8 @@
 		font-weight: $font-weight-regular;
 		color: $components-color-accent;
 		text-decoration: underline;
+		text-underline-offset: 0.2em;
+		text-decoration-thickness: from-font;
 
 		@media not (prefers-reduced-motion) {
 			transition-property: border, background, color;

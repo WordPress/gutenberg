@@ -32,7 +32,7 @@ graph TD
         restrictPanZoom["restrictPanZoom()\nbuilds camera → inverse → clamp"]
         restrictCropRect["restrictCropRect()"]
         getMinZoomForCover["getMinZoomForCover()"]
-        getCropBounds["getCropBounds()"]
+        getImageCropBounds["getImageCropBounds()"]
     end
 
     subgraph Rendering["Render Path"]

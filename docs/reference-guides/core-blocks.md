@@ -418,7 +418,7 @@ Create a link that always points to the homepage of the site. Usually not necess
 -	**Category:** design
 -	**Parent:** core/navigation
 -	**Supports:** anchor, interactivity (clientNavigation), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
--	**Attributes:** label
+-	**Attributes:** description, label, opensInNewTab
 
 ## Custom HTML
 

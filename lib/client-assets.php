@@ -87,24 +87,15 @@ function gutenberg_override_translation_file( $file, $handle ) {
 add_filter( 'load_script_translation_file', 'gutenberg_override_translation_file', 10, 2 );
 
 /**
- * Handle special case dependencies for wp-block-library that depend on runtime conditions.
- *
- * This adds the 'editor' dependency conditionally based on experiments and classic block requirements.
- * All other script registrations are handled by the auto-generated build/scripts.php file.
+ * Adds the 'editor' dependency to wp-block-library, required by the Classic block.
  *
  * @param WP_Scripts $scripts WP_Scripts instance.
  */
 function gutenberg_register_block_library_script_special_case( $scripts ) {
 	$handle = 'wp-block-library';
 	$script = $scripts->query( $handle, 'registered' );
-	if (
-		! gutenberg_is_experiment_enabled( 'gutenberg-no-tinymce' ) ||
-		! empty( $_GET['requiresTinymce'] ) ||
-		gutenberg_post_being_edited_requires_classic_block()
-	) {
-		if ( ! in_array( 'editor', $script->deps, true ) ) {
-			$script->deps[] = 'editor';
-		}
+	if ( ! in_array( 'editor', $script->deps, true ) ) {
+		$script->deps[] = 'editor';
 	}
 }
 add_action( 'wp_default_scripts', 'gutenberg_register_block_library_script_special_case', 11 );

@@ -6,9 +6,19 @@ import { Button } from '../index';
 const meta: Meta< typeof Button > = {
 	title: 'Design System/Components/Button',
 	component: Button,
+	subcomponents: {
+		'Button.Icon': Button.Icon,
+	},
 	argTypes: {
 		'aria-pressed': {
 			control: { type: 'boolean' },
+		},
+	},
+	parameters: {
+		componentStatus: {
+			status: 'use-with-caution',
+			whereUsed: 'global',
+			notes: 'Not yet recommended for use alongside components from `@wordpress/components`, pending review of style consistency with `@wordpress/components` and text overflow behavior. See [WordPress/gutenberg#76135](https://github.com/WordPress/gutenberg/issues/76135).',
 		},
 	},
 };

@@ -4,7 +4,7 @@
 const path = require( 'path' );
 const fs = require( 'fs/promises' );
 const os = require( 'os' );
-const { v4: uuid } = require( 'uuid' );
+const { randomUUID } = require( 'crypto' );
 
 /**
  * WordPress dependencies
@@ -29,7 +29,7 @@ async function createTempImage() {
 	const tmpDirectory = await fs.mkdtemp(
 		path.join( os.tmpdir(), 'gutenberg-test-image-' )
 	);
-	const tmpFileName = path.join( tmpDirectory, uuid() + '.png' );
+	const tmpFileName = path.join( tmpDirectory, randomUUID() + '.png' );
 	await fs.copyFile( TEST_IMAGE_FILE_PATH, tmpFileName );
 	return tmpFileName;
 }

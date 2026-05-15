@@ -24,6 +24,7 @@ import {
 	getViewportModalClientIds,
 	isSectionBlock,
 	getParentSectionBlock,
+	getSelectedBlockStyleState,
 } from '../private-selectors';
 import { getBlockEditingMode } from '../selectors';
 import { deviceTypeKey } from '../private-keys';
@@ -69,6 +70,54 @@ describe( 'private selectors', () => {
 				'123456',
 				'78910',
 			] );
+		} );
+	} );
+
+	describe( 'getSelectedBlockStyleState', () => {
+		it( 'returns default when the block has no selected state', () => {
+			const state = {};
+
+			expect( getSelectedBlockStyleState( state, 'client-1' ) ).toBe(
+				'default'
+			);
+		} );
+
+		it( 'returns the selected state for the block', () => {
+			const state = {
+				selectedBlockStyleState: {
+					clientId: 'client-1',
+					value: ':hover',
+				},
+			};
+
+			expect( getSelectedBlockStyleState( state, 'client-1' ) ).toBe(
+				':hover'
+			);
+		} );
+
+		it( 'returns default when the selected state has no value', () => {
+			const state = {
+				selectedBlockStyleState: {
+					clientId: 'client-1',
+				},
+			};
+
+			expect( getSelectedBlockStyleState( state, 'client-1' ) ).toBe(
+				'default'
+			);
+		} );
+
+		it( 'returns default when another block has the selected state', () => {
+			const state = {
+				selectedBlockStyleState: {
+					clientId: 'client-2',
+					value: ':hover',
+				},
+			};
+
+			expect( getSelectedBlockStyleState( state, 'client-1' ) ).toBe(
+				'default'
+			);
 		} );
 	} );
 

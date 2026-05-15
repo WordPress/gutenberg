@@ -121,7 +121,6 @@ function UnforwardedModal(
 	const onRequestCloseRef =
 		useRef< ModalProps[ 'onRequestClose' ] >( undefined );
 	useEffect( () => {
-		// eslint-disable-next-line react-compiler/react-compiler -- false positive, see https://github.com/facebook/react/issues/29196
 		onRequestCloseRef.current = onRequestClose;
 	}, [ onRequestClose ] );
 
@@ -169,8 +168,7 @@ function UnforwardedModal(
 		};
 	}, [ bodyOpenClassName ] );
 
-	const { closeModal, frameRef, frameStyle, overlayClassname } =
-		useModalExitAnimation();
+	const { closeModal, frameRef, overlayClassname } = useModalExitAnimation();
 
 	// Calls the isContentScrollable callback when the Modal children container resizes.
 	useLayoutEffect( () => {
@@ -260,10 +258,7 @@ function UnforwardedModal(
 						sizeClass,
 						className
 					) }
-					style={ {
-						...frameStyle,
-						...style,
-					} }
+					style={ style }
 					ref={ useMergeRefs( [
 						frameRef,
 						constrainedTabbingRef,

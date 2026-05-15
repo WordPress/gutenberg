@@ -1253,6 +1253,12 @@ export const isEditorPanelOpened = createRegistrySelector(
 /**
  * A block selection object.
  *
+ * This type is duplicated to avoid creating circular dependencies.
+ *
+ * @see {import("@wordpress/block-editor/src/store/actions").WPBlockSelection}
+ * @see {import("@wordpress/block-editor/src/store/selectors").WPBlockSelection}
+ * @see {import("@wordpress/core-data/src/types").WPBlockSelection}
+ *
  * @typedef {Object} WPBlockSelection
  *
  * @property {string} clientId     A block client ID.
@@ -1879,27 +1885,3 @@ export const getPostTypeLabel = createRegistrySelector(
 export function isPublishSidebarOpened( state ) {
 	return state.publishSidebarActive;
 }
-
-/**
- * Returns whether the collaboration is enabled for the current post.
- *
- * @return {boolean} Whether collaboration is enabled.
- */
-export const isCollaborationEnabledForCurrentPost = createRegistrySelector(
-	( select ) => ( state ) => {
-		// Return early, if collaboration is not supported.
-		if ( ! unlock( select( coreStore ) ).isCollaborationSupported() ) {
-			return false;
-		}
-
-		const currentPostType = getCurrentPostType( state );
-		const entityConfig = select( coreStore ).getEntityConfig(
-			'postType',
-			currentPostType
-		);
-
-		return Boolean(
-			entityConfig?.syncConfig && window._wpCollaborationEnabled
-		);
-	}
-);
