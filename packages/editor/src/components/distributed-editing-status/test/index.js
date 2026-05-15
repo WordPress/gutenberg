@@ -1577,6 +1577,10 @@ describe( 'DistributedEditingStatus', () => {
 			'true'
 		);
 		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-other-editor-cue-tone',
+			'current'
+		);
+		expect( presence ).toHaveAttribute(
 			'data-distributed-editing-presence-other-editor-cue-exposes-private-fields',
 			'false'
 		);
@@ -1587,6 +1591,19 @@ describe( 'DistributedEditingStatus', () => {
 		expect( presence ).toHaveAttribute(
 			'data-distributed-editing-presence-other-editor-cue-changes-post-lock',
 			'false'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-other-editor-cue-blocks-editing',
+			'false'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-other-editor-cue-treats-delayed-as-error',
+			'false'
+		);
+		expect(
+			screen.getByText( '2 other editors are active now.' )
+		).toHaveClass(
+			'editor-distributed-editing-status__presence-other-editor-cue--current'
 		);
 		const rowList = screen.getByRole( 'list', {
 			name: 'Visible editors',
@@ -1670,6 +1687,107 @@ describe( 'DistributedEditingStatus', () => {
 		expect(
 			screen.queryByText( /userId|anchor|selection/i )
 		).not.toBeInTheDocument();
+		expect(
+			actions.__experimentalSaveDistributedEditingRetryAfterProof
+		).not.toHaveBeenCalled();
+	} );
+
+	it( 'shows delayed remote presence as distinct but non-blocking in the enabled shell', () => {
+		const actions = setupDistributedEditingStatusDispatch();
+		setupDistributedEditingStatusSelect( {
+			editorSettings: {
+				distributedEditing: {
+					enabled: true,
+				},
+			},
+			sessionState: {
+				presenceRosterEntries: [
+					{
+						key: 'presence-sam',
+						displayName: 'Sam',
+						freshness: 'recent',
+					},
+				],
+				presenceRosterTotalKnownCount: 1,
+			},
+		} );
+
+		render( <DistributedEditingStatusChrome /> );
+
+		const presence = screen.getByRole( 'group', {
+			name: 'Distributed editing presence',
+		} );
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-status',
+			'recent'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-summary-current-count',
+			'0'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-summary-delayed-count',
+			'1'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-summary-remote-delayed-count',
+			'1'
+		);
+		expect(
+			screen.getByText(
+				'Sam was here recently. Presence may be delayed.'
+			)
+		).toBeVisible();
+		expect(
+			screen.getByText( '1 other editor may be delayed.' )
+		).toBeVisible();
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-other-editor-cue',
+			'1 other editor may be delayed.'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-other-editor-cue-tone',
+			'delayed'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-other-editor-cue-blocks-editing',
+			'false'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-other-editor-cue-treats-delayed-as-error',
+			'false'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-other-editor-cue-calls-save',
+			'false'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-other-editor-cue-changes-post-lock',
+			'false'
+		);
+		expect(
+			screen.getByText( '1 other editor may be delayed.' )
+		).toHaveClass(
+			'editor-distributed-editing-status__presence-other-editor-cue--delayed'
+		);
+		const row = screen.getByRole( 'listitem', {
+			name: 'Sam, Presence may be delayed',
+		} );
+		expect( row ).toHaveClass(
+			'editor-distributed-editing-status__presence-roster-item--delayed'
+		);
+		expect( row ).toHaveAttribute(
+			'data-distributed-editing-presence-row-current',
+			'false'
+		);
+		expect( row ).toHaveAttribute(
+			'data-distributed-editing-presence-row-status-tone',
+			'delayed'
+		);
+		expect( row ).toHaveAttribute(
+			'data-distributed-editing-presence-row-exposes-selection',
+			'false'
+		);
 		expect(
 			actions.__experimentalSaveDistributedEditingRetryAfterProof
 		).not.toHaveBeenCalled();
