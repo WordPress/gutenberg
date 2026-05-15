@@ -37,6 +37,7 @@ import { BlockStatesControl } from '../../hooks/states';
 import ContentTab from '../inspector-controls-tabs/content-tab';
 import ViewportVisibilityInfo from '../block-visibility/viewport-visibility-info';
 import { unlock } from '../../lock-unlock';
+import { isDefaultBlockStyleState } from '../../hooks/block-style-state';
 
 function StyleInspectorSlots( {
 	blockName,
@@ -236,9 +237,9 @@ function BlockInspector() {
 		useBlockInspectorAnimationSettings( blockType );
 
 	const hasSelectedBlocks = selectedBlockCount > 1;
-	const isBlockStyleStateSelected =
-		selectedBlockStyleState.viewport !== 'default' ||
-		selectedBlockStyleState.pseudo !== 'default';
+	const isBlockStyleStateSelected = ! isDefaultBlockStyleState(
+		selectedBlockStyleState
+	);
 
 	if ( hasSelectedBlocks && ! isSectionBlockInSelection ) {
 		return (

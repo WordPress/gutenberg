@@ -194,8 +194,6 @@ export function BackgroundImagePanel( {
 		[ clientId, name ]
 	);
 
-	const isStateSelected = ! isDefaultBlockStyleState( selectedState );
-
 	const backgroundGradientSupported = hasBackgroundSupport(
 		name,
 		'gradient'
@@ -221,6 +219,8 @@ export function BackgroundImagePanel( {
 	) {
 		return null;
 	}
+
+	const isStateSelected = ! isDefaultBlockStyleState( selectedState );
 
 	const onChange = isStateSelected
 		? ( newStyle ) => {

@@ -77,10 +77,7 @@ function DimensionsInspectorControl( { children, resetAllFilter } ) {
 export function DimensionsPanel( { clientId, name, setAttributes, settings } ) {
 	const selectedState = useBlockStyleState();
 	const isStateSelected = ! isDefaultBlockStyleState( selectedState );
-	const isEnabled = useHasDimensionsPanel(
-		settings,
-		isStateSelected ? selectedState : 'default'
-	);
+	const isEnabled = useHasDimensionsPanel( settings, selectedState );
 	const style = useSelect(
 		( select ) => {
 			// Early return to avoid subscription when disabled
@@ -138,7 +135,7 @@ export function DimensionsPanel( { clientId, name, setAttributes, settings } ) {
 				value={ value }
 				onChange={ onChange }
 				defaultControls={ defaultControls }
-				styleState={ isStateSelected ? selectedState : 'default' }
+				styleState={ selectedState }
 				onVisualize={
 					isStateSelected ? undefined : setVisualizedProperty
 				}
