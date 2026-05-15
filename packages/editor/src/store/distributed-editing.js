@@ -2271,20 +2271,115 @@ function createDistributedEditingFreshReviewComparisonPreviewShellDescriptor(
 		changesPostLock: false,
 		claimsSaved: false,
 	};
+	const rendererReadiness =
+		createDistributedEditingFreshReviewComparisonRendererReadinessDescriptor(
+			previewShell
+		);
 
 	return {
 		...previewShell,
+		rendererReadiness,
+		hasRendererReadiness: true,
+		canShowRendererReadiness: true,
 		supportReport:
 			createDistributedEditingFreshReviewComparisonPreviewShellSupportReportDescriptor(
-				previewShell
+				previewShell,
+				rendererReadiness
 			),
 		hasSupportReport: true,
 		canShowSupportReport: true,
 	};
 }
 
-function createDistributedEditingFreshReviewComparisonPreviewShellSupportReportDescriptor(
+function createDistributedEditingFreshReviewComparisonRendererReadinessDescriptor(
 	previewShell
+) {
+	const requiredRendererCapabilityKeys = [
+		'boundary_safe_diff_renderer',
+		'human_review_controls',
+	];
+
+	return {
+		status: 'disabled_until_renderer_capabilities_registered',
+		reason: 'comparison_renderer_capabilities_not_registered',
+		available: true,
+		schemaVersion: 1,
+		registryEntryKind: 'fresh_review_comparison_renderer_readiness',
+		registryEntryStatus: 'disabled',
+		registryEntryEnabled: false,
+		registryEntryDisabledReason:
+			'comparison_renderer_capabilities_not_registered',
+		rendererId: 'fresh_review_side_by_side_block_comparison_renderer',
+		rendererRegistryScope: 'editor_fresh_review_comparison_preview_shell',
+		shellStatus: previewShell.status,
+		shellReason: previewShell.reason,
+		shellKind: previewShell.shellKind,
+		previewMode: previewShell.previewMode,
+		rendererStatus: previewShell.rendererStatus || 'not_registered',
+		registrationStatus: 'not_registered',
+		capabilityRegistrationStatus: 'missing_required_capabilities',
+		requiredRendererCapabilityKeys,
+		requiredRendererCapabilityCount: requiredRendererCapabilityKeys.length,
+		registeredRendererCapabilityKeys: [],
+		registeredRendererCapabilityCount: 0,
+		missingRendererCapabilityKeys: requiredRendererCapabilityKeys,
+		missingRendererCapabilityCount: requiredRendererCapabilityKeys.length,
+		optionalRendererCapabilityKeys: [],
+		optionalRendererCapabilityCount: 0,
+		satisfiedRendererCapabilityKeys: [],
+		satisfiedRendererCapabilityCount: 0,
+		rendererRegistrationRequired: true,
+		requiresBoundarySafeDiffRenderer: true,
+		requiresHumanReviewControls: true,
+		disabledByDefault: true,
+		requiresFutureRenderer: true,
+		requiresExplicitRendererTurn: true,
+		canRegisterRenderer: false,
+		registersRenderer: false,
+		hasRegisteredRenderer: false,
+		activatesRenderer: false,
+		canMakePreviewShellRenderable: false,
+		renderable: false,
+		descriptorOnly: true,
+		statusOnly: true,
+		redacted: true,
+		hashValuesRedacted: true,
+		sourceFieldNamesOnly: false,
+		rawContentIncluded: false,
+		exposesHashValues: false,
+		exposesRawContent: false,
+		exposesProofSignature: false,
+		exposesTokenMaterial: false,
+		exposesUserIdentity: false,
+		exposesReviewerIds: false,
+		exposesActorIds: false,
+		rendersPreview: false,
+		rendersDiff: false,
+		computesDiff: false,
+		opensComparison: false,
+		opensPanel: false,
+		derivesPatch: false,
+		callsRestEndpoint: false,
+		callsSave: false,
+		callsNormalSavePost: false,
+		callsRetrySaveEndpoint: false,
+		dispatchesNotice: false,
+		savesPost: false,
+		mutatesEditorContent: false,
+		mutatesPersistedPostContent: false,
+		selectsBlock: false,
+		selectsReviewItem: false,
+		marksSelected: false,
+		movesFocus: false,
+		createsRevision: false,
+		changesPostLock: false,
+		claimsSaved: false,
+	};
+}
+
+function createDistributedEditingFreshReviewComparisonPreviewShellSupportReportDescriptor(
+	previewShell,
+	rendererReadiness = null
 ) {
 	const itemIdentity = {
 		itemId: normalizeNullableString( previewShell.itemId ),
@@ -2330,6 +2425,19 @@ function createDistributedEditingFreshReviewComparisonPreviewShellSupportReportD
 			previewShell.optionalRenderRequirementKeys || [],
 		missingFutureRendererPieceKeys,
 		missingFutureRendererPieceCount: missingFutureRendererPieceKeys.length,
+		rendererReadinessStatus: rendererReadiness?.status || null,
+		rendererReadinessRegistrationStatus:
+			rendererReadiness?.registrationStatus || null,
+		rendererReadinessCapabilityStatus:
+			rendererReadiness?.capabilityRegistrationStatus || null,
+		missingRendererCapabilityKeys:
+			rendererReadiness?.missingRendererCapabilityKeys || [],
+		missingRendererCapabilityCount:
+			rendererReadiness?.missingRendererCapabilityCount || 0,
+		rendererReadinessRegistersRenderer: Boolean(
+			rendererReadiness?.registersRenderer
+		),
+		rendererReadinessRenderable: Boolean( rendererReadiness?.renderable ),
 		boundaryPolicy: previewShell.boundaryPolicy,
 		boundaryKinds: previewShell.boundaryKinds || [],
 		boundaryKindCount: previewShell.boundaryKinds?.length || 0,

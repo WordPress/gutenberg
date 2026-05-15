@@ -1448,6 +1448,54 @@ describe( 'DistributedEditingStatus', () => {
 			'data-distributed-editing-fresh-review-comparison-preview-shell-report-calls-save',
 			'false'
 		);
+		expect( comparePlan ).toHaveAttribute(
+			'data-distributed-editing-fresh-review-comparison-renderer-readiness-status',
+			'disabled_until_renderer_capabilities_registered'
+		);
+		expect( comparePlan ).toHaveAttribute(
+			'data-distributed-editing-fresh-review-comparison-renderer-readiness-registration-status',
+			'not_registered'
+		);
+		expect( comparePlan ).toHaveAttribute(
+			'data-distributed-editing-fresh-review-comparison-renderer-readiness-capability-status',
+			'missing_required_capabilities'
+		);
+		expect( comparePlan ).toHaveAttribute(
+			'data-distributed-editing-fresh-review-comparison-renderer-readiness-missing-capabilities',
+			'2'
+		);
+		expect( comparePlan ).toHaveAttribute(
+			'data-distributed-editing-fresh-review-comparison-renderer-readiness-registers-renderer',
+			'false'
+		);
+		expect( comparePlan ).toHaveAttribute(
+			'data-distributed-editing-fresh-review-comparison-renderer-readiness-has-registered-renderer',
+			'false'
+		);
+		expect( comparePlan ).toHaveAttribute(
+			'data-distributed-editing-fresh-review-comparison-renderer-readiness-renderable',
+			'false'
+		);
+		expect( comparePlan ).toHaveAttribute(
+			'data-distributed-editing-fresh-review-comparison-renderer-readiness-renders-preview',
+			'false'
+		);
+		expect( comparePlan ).toHaveAttribute(
+			'data-distributed-editing-fresh-review-comparison-renderer-readiness-computes-diff',
+			'false'
+		);
+		expect( comparePlan ).toHaveAttribute(
+			'data-distributed-editing-fresh-review-comparison-renderer-readiness-opens-panel',
+			'false'
+		);
+		expect( comparePlan ).toHaveAttribute(
+			'data-distributed-editing-fresh-review-comparison-renderer-readiness-calls-rest',
+			'false'
+		);
+		expect( comparePlan ).toHaveAttribute(
+			'data-distributed-editing-fresh-review-comparison-renderer-readiness-calls-save',
+			'false'
+		);
 		expect( comparePlan ).toHaveTextContent( 'Compare plan ready' );
 		expect( comparePlan ).toHaveTextContent(
 			'A future comparison can use base and proposed hash evidence for this review item.'
@@ -1474,6 +1522,12 @@ describe( 'DistributedEditingStatus', () => {
 			'It records item identity, boundary policy, and requirement keys only; no raw content, hashes, proof details, or user identity are included.'
 		);
 		expect( comparePlan ).toHaveTextContent(
+			'Renderer readiness: boundary-safe diff rendering and review controls must be registered before this preview shell can render.'
+		);
+		expect( comparePlan ).toHaveTextContent(
+			'No renderer is registered, no preview opens, no diff is computed, and no save was made.'
+		);
+		expect( comparePlan ).toHaveTextContent(
 			/Base hash evidence\s*Available/
 		);
 		expect( comparePlan ).toHaveTextContent(
@@ -1488,6 +1542,9 @@ describe( 'DistributedEditingStatus', () => {
 		expect( comparePlan ).toHaveTextContent( /Preview shell\s*Disabled/ );
 		expect( comparePlan ).toHaveTextContent(
 			/Preview shell support report\s*Available/
+		);
+		expect( comparePlan ).toHaveTextContent(
+			/Renderer readiness\s*Not registered/
 		);
 		expect( comparePlan ).not.toHaveTextContent(
 			/aaaaaaaaaaaaaaaa|bbbbbbbbbbbbbbbb|fresh-review-chrome-compare-plan-raw|script/i

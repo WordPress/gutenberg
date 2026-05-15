@@ -1850,6 +1850,21 @@ function getFreshReviewComparisonPreviewShellSupportReportMessage(
 	);
 }
 
+function getFreshReviewComparisonRendererReadinessMessage( rendererReadiness ) {
+	if (
+		rendererReadiness?.status ===
+		'disabled_until_renderer_capabilities_registered'
+	) {
+		return __(
+			'Renderer readiness: boundary-safe diff rendering and review controls must be registered before this preview shell can render. No renderer is registered, no preview opens, no diff is computed, and no save was made.'
+		);
+	}
+
+	return __(
+		'Renderer readiness is unavailable. No renderer is registered, no preview opens, no diff is computed, and no save was made.'
+	);
+}
+
 function getFreshReviewComparePlanEvidenceLabel( available ) {
 	return available ? __( 'Available' ) : __( 'Unavailable' );
 }
@@ -2209,6 +2224,8 @@ function DistributedEditingFreshReviewComparePlanStatus() {
 	const comparisonPreviewShell = comparePlan?.comparisonPreviewShell;
 	const comparisonPreviewShellSupportReport =
 		comparisonPreviewShell?.supportReport;
+	const comparisonRendererReadiness =
+		comparisonPreviewShell?.rendererReadiness;
 
 	if ( ! comparePlan ) {
 		return null;
@@ -2287,6 +2304,48 @@ function DistributedEditingFreshReviewComparePlanStatus() {
 			data-distributed-editing-fresh-review-comparison-preview-shell-report-status={
 				comparisonPreviewShellSupportReport?.status || undefined
 			}
+			data-distributed-editing-fresh-review-comparison-renderer-readiness-calls-rest={ formatDataBoolean(
+				comparisonRendererReadiness?.callsRestEndpoint
+			) }
+			data-distributed-editing-fresh-review-comparison-renderer-readiness-calls-save={ formatDataBoolean(
+				comparisonRendererReadiness?.callsSave
+			) }
+			data-distributed-editing-fresh-review-comparison-renderer-readiness-capability-status={
+				comparisonRendererReadiness?.capabilityRegistrationStatus ||
+				undefined
+			}
+			data-distributed-editing-fresh-review-comparison-renderer-readiness-computes-diff={ formatDataBoolean(
+				comparisonRendererReadiness?.computesDiff
+			) }
+			data-distributed-editing-fresh-review-comparison-renderer-readiness-has-registered-renderer={ formatDataBoolean(
+				comparisonRendererReadiness?.hasRegisteredRenderer
+			) }
+			data-distributed-editing-fresh-review-comparison-renderer-readiness-missing-capabilities={
+				comparisonRendererReadiness?.missingRendererCapabilityCount ===
+				undefined
+					? undefined
+					: String(
+							comparisonRendererReadiness.missingRendererCapabilityCount
+					  )
+			}
+			data-distributed-editing-fresh-review-comparison-renderer-readiness-opens-panel={ formatDataBoolean(
+				comparisonRendererReadiness?.opensPanel
+			) }
+			data-distributed-editing-fresh-review-comparison-renderer-readiness-registers-renderer={ formatDataBoolean(
+				comparisonRendererReadiness?.registersRenderer
+			) }
+			data-distributed-editing-fresh-review-comparison-renderer-readiness-registration-status={
+				comparisonRendererReadiness?.registrationStatus || undefined
+			}
+			data-distributed-editing-fresh-review-comparison-renderer-readiness-renderable={ formatDataBoolean(
+				comparisonRendererReadiness?.renderable
+			) }
+			data-distributed-editing-fresh-review-comparison-renderer-readiness-renders-preview={ formatDataBoolean(
+				comparisonRendererReadiness?.rendersPreview
+			) }
+			data-distributed-editing-fresh-review-comparison-renderer-readiness-status={
+				comparisonRendererReadiness?.status || undefined
+			}
 			data-distributed-editing-fresh-review-comparison-preview-shell-computes-diff={ formatDataBoolean(
 				comparisonPreviewShell?.computesDiff
 			) }
@@ -2352,6 +2411,13 @@ function DistributedEditingFreshReviewComparePlanStatus() {
 					) }
 				</p>
 			) }
+			{ comparisonRendererReadiness && (
+				<p>
+					{ getFreshReviewComparisonRendererReadinessMessage(
+						comparisonRendererReadiness
+					) }
+				</p>
+			) }
 			<dl className="editor-distributed-editing-status__fresh-review-compare-plan-evidence">
 				<div>
 					<dt>{ __( 'Base hash evidence' ) }</dt>
@@ -2404,6 +2470,16 @@ function DistributedEditingFreshReviewComparePlanStatus() {
 							{ comparisonPreviewShellSupportReport.canShareWithSupport
 								? __( 'Available' )
 								: __( 'Unavailable' ) }
+						</dd>
+					</div>
+				) }
+				{ comparisonRendererReadiness && (
+					<div>
+						<dt>{ __( 'Renderer readiness' ) }</dt>
+						<dd>
+							{ comparisonRendererReadiness.hasRegisteredRenderer
+								? __( 'Registered' )
+								: __( 'Not registered' ) }
 						</dd>
 					</div>
 				) }
