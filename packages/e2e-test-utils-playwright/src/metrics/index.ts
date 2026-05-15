@@ -228,6 +228,14 @@ export class Metrics {
 				'disabled-by-default-devtools.timeline.stack',
 				'disabled-by-default-v8.cpu_profiler',
 				'v8.execute',
+				// Extra categories to investigate idle gaps on the main thread
+				// (e.g. long `RunMicrotasks` events with no JS frames inside):
+				// surface IPC traffic, compositor commits and detailed V8
+				// compile events that would otherwise be invisible.
+				'disabled-by-default-ipc.flow',
+				'disabled-by-default-cc.debug',
+				'disabled-by-default-v8.compile',
+				'mojom',
 			],
 			...options,
 		} );
