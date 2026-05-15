@@ -211,7 +211,7 @@ export interface Settings {
 	gifConvert?: boolean;
 	// Output format for GIF-to-video conversion.
 	// Accepts 'video/mp4' or 'video/webm'. Default is 'video/mp4'.
-	videoOutputFormat?: string;
+	videoOutputFormat?: 'video/mp4' | 'video/webm';
 }
 
 // Matches the Attachment type from the media-utils package.

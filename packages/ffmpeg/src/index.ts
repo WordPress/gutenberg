@@ -152,90 +152,89 @@ export async function convertGifToVideo(
 		// Write input file to FFmpeg's in-memory filesystem.
 		core.FS.writeFile( inputFileName, new Uint8Array( buffer ) );
 
-		// Build FFmpeg arguments.
-		const args: string[] = [ '-nostdin', '-y', '-i', inputFileName ];
-
-		// Video codec selection.
-		if ( isWebm ) {
-			args.push( '-c:v', 'libvpx-vp9' );
-			// VP9 quality settings.
-			args.push( '-crf', '31', '-b:v', '0' );
-		} else {
-			args.push( '-c:v', 'libx264' );
-			// H.264 encoding preset — 'fast' balances speed and quality.
-			// 'veryfast' has been reported to cause crashes in WASM builds.
-			args.push( '-preset', 'fast' );
-		}
-
-		// Common settings.
-		// Cap framerate at 24fps to reduce file size.
-		args.push( '-r', '24' );
-		// Use yuv420p for maximum compatibility.
-		args.push( '-pix_fmt', 'yuv420p' );
-
-		// Scale filter: pad to even dimensions (required by most codecs)
-		// and optionally scale down if exceeding maxDimensions.
-		if ( maxDimensions ) {
-			args.push(
-				'-vf',
-				`scale='min(${ padToEven(
-					maxDimensions
-				) },trunc(iw/2)*2)':'min(${ padToEven(
-					maxDimensions
-				) },trunc(ih/2)*2)':flags=lanczos`
-			);
-		} else {
-			// Just ensure even dimensions.
-			args.push( '-vf', "scale='trunc(iw/2)*2':'trunc(ih/2)*2'" );
-		}
-
-		// MP4-specific: move metadata to the beginning for streaming.
-		if ( ! isWebm ) {
-			args.push( '-movflags', '+faststart' );
-		}
-
-		// Remove audio (GIFs don't have audio).
-		args.push( '-an' );
-
-		args.push( outputFileName );
-
-		// Run FFmpeg.
-		core.setTimeout( -1 );
-		core.exec( ...args );
-
-		// Read output file.
-		const output = core.FS.readFile( outputFileName );
-
-		if ( ! output || output.length === 0 ) {
-			throw new Error( 'FFmpeg produced empty output' );
-		}
-
-		// Slice the buffer to extract only the relevant bytes.
-		// Uint8Array.buffer may include data outside the view's range.
-		const result = output.buffer.slice(
-			output.byteOffset,
-			output.byteOffset + output.byteLength
-		) as ArrayBuffer;
-
-		// Clean up temporary files.
 		try {
-			core.FS.unlink( inputFileName );
-			core.FS.unlink( outputFileName );
-		} catch {
-			// Ignore cleanup errors.
+			// Build FFmpeg arguments.
+			const args: string[] = [ '-nostdin', '-y', '-i', inputFileName ];
+
+			// Video codec selection.
+			if ( isWebm ) {
+				args.push( '-c:v', 'libvpx-vp9' );
+				// VP9 quality settings.
+				args.push( '-crf', '31', '-b:v', '0' );
+			} else {
+				args.push( '-c:v', 'libx264' );
+				// H.264 encoding preset — 'fast' balances speed and quality.
+				// 'veryfast' has been reported to cause crashes in WASM builds.
+				args.push( '-preset', 'fast' );
+			}
+
+			// Common settings.
+			// Cap framerate at 24fps to reduce file size.
+			args.push( '-r', '24' );
+			// Use yuv420p for maximum compatibility.
+			args.push( '-pix_fmt', 'yuv420p' );
+
+			// Scale filter: pad to even dimensions (required by most codecs)
+			// and optionally scale down if exceeding maxDimensions.
+			if ( maxDimensions ) {
+				args.push(
+					'-vf',
+					`scale='min(${ padToEven(
+						maxDimensions
+					) },trunc(iw/2)*2)':'min(${ padToEven(
+						maxDimensions
+					) },trunc(ih/2)*2)':flags=lanczos`
+				);
+			} else {
+				// Just ensure even dimensions.
+				args.push( '-vf', "scale='trunc(iw/2)*2':'trunc(ih/2)*2'" );
+			}
+
+			// MP4-specific: move metadata to the beginning for streaming.
+			if ( ! isWebm ) {
+				args.push( '-movflags', '+faststart' );
+			}
+
+			// Remove audio (GIFs don't have audio).
+			args.push( '-an' );
+
+			args.push( outputFileName );
+
+			// Run FFmpeg.
+			core.setTimeout( -1 );
+			core.exec( ...args );
+
+			// Read output file.
+			const output = core.FS.readFile( outputFileName );
+
+			if ( ! output || output.length === 0 ) {
+				throw new Error( 'FFmpeg produced empty output' );
+			}
+
+			// Slice the buffer to extract only the relevant bytes.
+			// Uint8Array.buffer may include data outside the view's range.
+			return output.buffer.slice(
+				output.byteOffset,
+				output.byteOffset + output.byteLength
+			) as ArrayBuffer;
+		} finally {
+			// Always clean up MEMFS and reset core state so a failed run
+			// (e.g. empty output) doesn't leave stale files or state for
+			// the next operation that picks up the shared core instance.
+			try {
+				core.FS.unlink( inputFileName );
+			} catch {
+				// Ignore cleanup errors.
+			}
+			try {
+				core.FS.unlink( outputFileName );
+			} catch {
+				// Ignore cleanup errors.
+			}
+			core.reset();
 		}
-
-		core.reset();
-
-		return result;
 	} finally {
 		inProgressOperations.delete( id );
 		releaseLock!();
 	}
 }
-
-// Re-export with ffmpeg prefix for worker module compatibility.
-export {
-	convertGifToVideo as ffmpegConvertGifToVideo,
-	cancelOperations as ffmpegCancelOperations,
-};
