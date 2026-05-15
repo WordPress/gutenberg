@@ -335,11 +335,18 @@ describe( 'PostPublishButton', () => {
 			'data-distributed-editing-save-control-journey-mutates-persisted-post-content',
 			'false'
 		);
-		const cue = screen.getByText( 'Save is available' );
-		expect( cue ).toBeVisible();
+		const cueLabel = screen.getByText( 'Save is available' );
+		const cue = screen.getByLabelText(
+			'Use Save when you are ready for WordPress to update this post.'
+		);
+		expect( cueLabel ).toBeVisible();
 		expect( cue ).toHaveAttribute(
 			'data-distributed-editing-save-control-journey-visual-cue',
 			'true'
+		);
+		expect( cue ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-compact-affordance',
+			'available'
 		);
 		expect( cue ).toHaveAttribute(
 			'data-distributed-editing-save-control-journey-step',
@@ -355,6 +362,10 @@ describe( 'PostPublishButton', () => {
 		);
 		expect( cue ).toHaveAttribute(
 			'title',
+			'Use Save when you are ready for WordPress to update this post.'
+		);
+		expect( cue ).toHaveAttribute(
+			'aria-label',
 			'Use Save when you are ready for WordPress to update this post.'
 		);
 		expect( cue ).toHaveAttribute(
@@ -439,14 +450,25 @@ describe( 'PostPublishButton', () => {
 			'data-distributed-editing-save-control-journey-claims-saved-without-evidence',
 			'false'
 		);
-		const cue = screen.getByText( 'Save opens review' );
-		expect( cue ).toBeVisible();
+		const cueLabel = screen.getByText( 'Save opens review' );
+		const cue = screen.getByLabelText(
+			'Review highlighted changes before WordPress updates the post.'
+		);
+		expect( cueLabel ).toBeVisible();
 		expect( cue ).toHaveAttribute(
 			'data-distributed-editing-save-control-journey-visual-cue',
 			'true'
 		);
 		expect( cue ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-compact-affordance',
+			'available'
+		);
+		expect( cue ).toHaveAttribute(
 			'title',
+			'Review highlighted changes before WordPress updates the post.'
+		);
+		expect( cue ).toHaveAttribute(
+			'aria-label',
 			'Review highlighted changes before WordPress updates the post.'
 		);
 		expect( cue ).toHaveAttribute(

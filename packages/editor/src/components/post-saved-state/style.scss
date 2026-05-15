@@ -1,3 +1,4 @@
+@use "@wordpress/base-styles/breakpoints" as *;
 @use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/base-styles/mixins" as *;
 @use "@wordpress/base-styles/variables" as *;
@@ -49,6 +50,7 @@
 	box-sizing: border-box;
 	color: $gray-700;
 	display: inline-flex;
+	flex-shrink: 1;
 	font-size: $default-font-size;
 	line-height: $default-line-height;
 	margin-left: $grid-unit-05;
@@ -60,7 +62,50 @@
 	white-space: nowrap;
 }
 
+.editor-distributed-editing-save-journey-cue__label {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
 .editor-distributed-editing-save-journey-cue[data-distributed-editing-save-control-journey-step="ready_to_edit"] {
 	border-left-color: $gray-300;
 	color: $gray-600;
+}
+
+@media screen and (max-width: #{ ($break-small) }) {
+	.editor-distributed-editing-save-journey-cue {
+		border: $border-width solid var(--wp-admin-theme-color);
+		border-radius: $radius-small;
+		justify-content: center;
+		max-width: $button-size-small;
+		min-width: $button-size-small;
+		padding: 0;
+		width: $button-size-small;
+
+		&::before {
+			background: currentColor;
+			border-radius: $radius-round;
+			content: "";
+			display: block;
+			height: $grid-unit;
+			width: $grid-unit;
+		}
+	}
+
+	.editor-distributed-editing-save-journey-cue__label {
+		clip: rect(1px, 1px, 1px, 1px);
+		clip-path: inset(50%);
+		height: 1px;
+		margin: -1px;
+		overflow: hidden;
+		padding: 0;
+		position: absolute;
+		width: 1px;
+		word-wrap: normal !important;
+	}
+
+	.editor-distributed-editing-save-journey-cue[data-distributed-editing-save-control-journey-step="ready_to_edit"] {
+		border-color: $gray-300;
+	}
 }

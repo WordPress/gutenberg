@@ -49,17 +49,24 @@ export default function DistributedEditingSaveJourneyCue( {
 			{ ...getDistributedEditingSaveJourneyDataAttributes(
 				saveJourneyState
 			) }
+			aria-label={ saveJourneyState.summary }
 			className={ clsx(
 				'editor-distributed-editing-save-journey-cue',
 				className
 			) }
+			data-distributed-editing-save-control-journey-compact-affordance="available"
 			data-distributed-editing-save-control-journey-visual-cue="true"
 			data-distributed-editing-save-control-journey-title={
 				saveJourneyState.title
 			}
 			title={ saveJourneyState.summary }
 		>
-			{ saveJourneyState.title }
+			<span
+				aria-hidden="true"
+				className="editor-distributed-editing-save-journey-cue__label"
+			>
+				{ saveJourneyState.title }
+			</span>
 		</span>
 	);
 }
