@@ -5,6 +5,7 @@
 ### Enhancements
 
 -   `get_component_details` now optionally accepts an array of component names so multiple components can be fetched in a single call. ([#78185](https://github.com/WordPress/gutenberg/pull/78185))
+-   Data is now cached for at most one hour, rather than depending on agent session lifetime ([#78311](https://github.com/WordPress/gutenberg/pull/78311)).
 
 ## 0.3.0 (2026-05-14)
 

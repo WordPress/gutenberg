@@ -13,60 +13,95 @@ const DESIGN_TOKENS_URL =
 	process.env.DESIGN_TOKENS_URL ||
 	'https://raw.githubusercontent.com/WordPress/gutenberg/refs/heads/trunk/packages/theme/docs/tokens.md';
 
-// In-flight or resolved promises are cached so that concurrent callers
-// share a single fetch, rather than each kicking off their own request.
-let cachedComponents: Promise< Record< string, ManifestComponent > > | null =
-	null;
-let cachedTokens: Promise< string > | null = null;
+const HOUR_IN_MS = 60 * 60 * 1000;
+
+type CachedFetcher< T > = ( () => Promise< T > ) & { reset: () => void };
 
 /**
- * Clear cached data. Intended for testing.
+ * Wrap an async fetcher so that successful results are cached for `ttlMs`
+ * milliseconds. Concurrent callers share a single in-flight promise, and
+ * failed fetches are evicted immediately so the next call can retry.
+ *
+ * The returned function exposes a `reset()` method that clears its own
+ * cache, allowing callers to compose a higher-level reset without the
+ * wrapper needing to know about a shared registry.
+ *
+ * @param fetcher - The async function whose result should be cached.
+ * @param ttlMs   - Cache lifetime in milliseconds. Defaults to one hour.
+ * @return A function returning the cached (or freshly fetched) promise.
  */
-export function resetCache(): void {
-	cachedComponents = null;
-	cachedTokens = null;
+function withTTL< T >(
+	fetcher: () => Promise< T >,
+	ttlMs: number = HOUR_IN_MS
+): CachedFetcher< T > {
+	let cached: Promise< T > | null = null;
+	let expiresAt = 0;
+
+	return Object.assign(
+		() => {
+			if ( ! cached || Date.now() > expiresAt ) {
+				cached = ( async () => {
+					try {
+						return await fetcher();
+					} catch ( error ) {
+						cached = null;
+						expiresAt = 0;
+						throw error;
+					}
+				} )();
+				expiresAt = Date.now() + ttlMs;
+			}
+			return cached;
+		},
+		{
+			reset: () => {
+				cached = null;
+				expiresAt = 0;
+			},
+		}
+	);
 }
 
-/**
- * Fetch and cache the components from the Storybook manifest, filtered to only
- * components from allowed packages.
- *
- * @return The filtered components record.
- */
-function fetchComponents(): Promise< Record< string, ManifestComponent > > {
-	if ( ! cachedComponents ) {
-		cachedComponents = ( async () => {
-			let manifest: {
-				v: number;
-				components: Record< string, ManifestComponent >;
-			};
-			try {
-				const response = await fetch( COMPONENTS_MANIFEST_URL );
-				if ( ! response.ok ) {
-					throw new Error(
-						`Failed to fetch components manifest: ${ response.status } ${ response.statusText }`
-					);
-				}
-				manifest = await response.json();
-			} catch ( error ) {
-				cachedComponents = null;
-				throw error;
-			}
-
-			const filtered: Record< string, ManifestComponent > = {};
-			for ( const [ key, component ] of Object.entries(
-				manifest.components
-			) ) {
-				if ( packageNameFromPath( component.path ) ) {
-					filtered[ key ] = component;
-				}
-			}
-
-			return filtered;
-		} )();
+const fetchComponents = withTTL( async () => {
+	const response = await fetch( COMPONENTS_MANIFEST_URL );
+	if ( ! response.ok ) {
+		throw new Error(
+			`Failed to fetch components manifest: ${ response.status } ${ response.statusText }`
+		);
 	}
 
-	return cachedComponents;
+	const manifest: {
+		v: number;
+		components: Record< string, ManifestComponent >;
+	} = await response.json();
+
+	const filtered: Record< string, ManifestComponent > = {};
+	for ( const [ key, component ] of Object.entries( manifest.components ) ) {
+		if ( packageNameFromPath( component.path ) ) {
+			filtered[ key ] = component;
+		}
+	}
+
+	return filtered;
+} );
+
+const fetchTokens = withTTL( async () => {
+	const response = await fetch( DESIGN_TOKENS_URL );
+	if ( ! response.ok ) {
+		throw new Error(
+			`Failed to fetch design tokens: ${ response.status } ${ response.statusText }`
+		);
+	}
+
+	return response.text();
+} );
+
+/**
+ * Clear all cached data. Intended for testing.
+ */
+export function resetCache(): void {
+	fetchComponents.reset();
+	fetchTokens.reset();
 }
 
 /**
@@ -98,24 +133,6 @@ export async function getComponentDetail(
  * @return The tokens markdown content.
  */
 export async function getDesignTokens(): Promise< { content: string } > {
-	if ( ! cachedTokens ) {
-		cachedTokens = ( async () => {
-			try {
-				const response = await fetch( DESIGN_TOKENS_URL );
-				if ( ! response.ok ) {
-					throw new Error(
-						`Failed to fetch design tokens: ${ response.status } ${ response.statusText }`
-					);
-				}
-
-				return await response.text();
-			} catch ( error ) {
-				cachedTokens = null;
-				throw error;
-			}
-		} )();
-	}
-
-	const content = await cachedTokens;
+	const content = await fetchTokens();
 	return { content };
 }
