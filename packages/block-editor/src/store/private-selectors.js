@@ -1053,18 +1053,23 @@ export function getRequestedInspectorTab( state ) {
 	return state.requestedInspectorTab;
 }
 
+const DEFAULT_BLOCK_STYLE_STATE = {
+	viewport: 'default',
+	pseudo: 'default',
+};
+
 /**
- * Returns the selected pseudo-state for a block's style controls.
+ * Returns the selected style state for a block's style controls.
  *
  * @param {Object} state    Global application state.
  * @param {string} clientId The block client ID.
  *
- * @return {string} The selected block style state.
+ * @return {Object} The selected block style state.
  */
 export function getSelectedBlockStyleState( state, clientId ) {
 	if ( state.selectedBlockStyleState?.clientId !== clientId ) {
-		return 'default';
+		return DEFAULT_BLOCK_STYLE_STATE;
 	}
 
-	return state.selectedBlockStyleState.value ?? 'default';
+	return state.selectedBlockStyleState.value ?? DEFAULT_BLOCK_STYLE_STATE;
 }

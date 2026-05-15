@@ -5823,54 +5823,113 @@ describe( 'state', () => {
 			expect( state ).toBeUndefined();
 		} );
 
-		it( 'stores a selected state for a block', () => {
+		it( 'stores a selected viewport state for a block', () => {
 			const state = selectedBlockStyleState( undefined, {
 				type: 'SET_SELECTED_BLOCK_STYLE_STATE',
 				clientId: 'client-1',
-				value: ':hover',
+				value: { viewport: 'mobile' },
 			} );
 
 			expect( state ).toEqual( {
 				clientId: 'client-1',
-				value: ':hover',
+				value: {
+					viewport: 'mobile',
+					pseudo: 'default',
+				},
+			} );
+		} );
+
+		it( 'stores a selected pseudo state for a block', () => {
+			const state = selectedBlockStyleState( undefined, {
+				type: 'SET_SELECTED_BLOCK_STYLE_STATE',
+				clientId: 'client-1',
+				value: { pseudo: ':hover' },
+			} );
+
+			expect( state ).toEqual( {
+				clientId: 'client-1',
+				value: {
+					viewport: 'default',
+					pseudo: ':hover',
+				},
+			} );
+		} );
+
+		it( 'updates only the selected state type for the same block', () => {
+			const state = selectedBlockStyleState(
+				{
+					clientId: 'client-1',
+					value: { viewport: 'mobile', pseudo: 'default' },
+				},
+				{
+					type: 'SET_SELECTED_BLOCK_STYLE_STATE',
+					clientId: 'client-1',
+					value: { pseudo: ':hover' },
+				}
+			);
+
+			expect( state ).toEqual( {
+				clientId: 'client-1',
+				value: {
+					viewport: 'mobile',
+					pseudo: ':hover',
+				},
 			} );
 		} );
 
 		it( 'replaces the selected state when another block is selected', () => {
 			const state = selectedBlockStyleState(
-				{ clientId: 'client-1', value: ':hover' },
+				{
+					clientId: 'client-1',
+					value: { viewport: 'mobile', pseudo: ':hover' },
+				},
 				{
 					type: 'SET_SELECTED_BLOCK_STYLE_STATE',
 					clientId: 'client-2',
-					value: ':focus',
+					value: { pseudo: ':focus' },
 				}
 			);
 
 			expect( state ).toEqual( {
 				clientId: 'client-2',
-				value: ':focus',
+				value: {
+					viewport: 'default',
+					pseudo: ':focus',
+				},
 			} );
 		} );
 
-		it( 'removes the selected state when default is selected', () => {
+		it( 'stores explicit defaults when both state types are default', () => {
 			const state = selectedBlockStyleState(
-				{ clientId: 'client-1', value: ':hover' },
+				{
+					clientId: 'client-1',
+					value: { viewport: 'mobile', pseudo: ':hover' },
+				},
 				{
 					type: 'SET_SELECTED_BLOCK_STYLE_STATE',
 					clientId: 'client-1',
-					value: 'default',
+					value: { viewport: 'default', pseudo: 'default' },
 				}
 			);
 
-			expect( state ).toBeUndefined();
+			expect( state ).toEqual( {
+				clientId: 'client-1',
+				value: {
+					viewport: 'default',
+					pseudo: 'default',
+				},
+			} );
 		} );
 
 		it( 'clears the selected state when clientId is missing', () => {
 			const state = selectedBlockStyleState(
-				{ clientId: 'client-1', value: ':hover' },
+				{
+					clientId: 'client-1',
+					value: { viewport: 'default', pseudo: ':hover' },
+				},
 				{
 					type: 'SET_SELECTED_BLOCK_STYLE_STATE',
-					value: ':focus',
+					value: { pseudo: ':focus' },
 				}
 			);
 
@@ -5879,7 +5938,10 @@ describe( 'state', () => {
 
 		it( 'clears the selected state when value is missing', () => {
 			const state = selectedBlockStyleState(
-				{ clientId: 'client-1', value: ':hover' },
+				{
+					clientId: 'client-1',
+					value: { viewport: 'default', pseudo: ':hover' },
+				},
 				{
 					type: 'SET_SELECTED_BLOCK_STYLE_STATE',
 					clientId: 'client-1',
@@ -5890,7 +5952,10 @@ describe( 'state', () => {
 		} );
 
 		it( 'keeps the selected state when the same block is selected', () => {
-			const originalState = { clientId: 'client-1', value: ':hover' };
+			const originalState = {
+				clientId: 'client-1',
+				value: { viewport: 'default', pseudo: ':hover' },
+			};
 			const state = selectedBlockStyleState( originalState, {
 				type: 'SELECT_BLOCK',
 				clientId: 'client-1',
@@ -5901,7 +5966,10 @@ describe( 'state', () => {
 
 		it( 'clears the selected state when another block is selected', () => {
 			const state = selectedBlockStyleState(
-				{ clientId: 'client-1', value: ':hover' },
+				{
+					clientId: 'client-1',
+					value: { viewport: 'default', pseudo: ':hover' },
+				},
 				{
 					type: 'SELECT_BLOCK',
 					clientId: 'client-2',
@@ -5912,7 +5980,10 @@ describe( 'state', () => {
 		} );
 
 		it( 'keeps the selected state for selection changes in the same block', () => {
-			const originalState = { clientId: 'client-1', value: ':hover' };
+			const originalState = {
+				clientId: 'client-1',
+				value: { viewport: 'default', pseudo: ':hover' },
+			};
 			const state = selectedBlockStyleState( originalState, {
 				type: 'SELECTION_CHANGE',
 				clientId: 'client-1',
@@ -5923,7 +5994,10 @@ describe( 'state', () => {
 
 		it( 'clears the selected state for selection changes in another block', () => {
 			const state = selectedBlockStyleState(
-				{ clientId: 'client-1', value: ':hover' },
+				{
+					clientId: 'client-1',
+					value: { viewport: 'default', pseudo: ':hover' },
+				},
 				{
 					type: 'SELECTION_CHANGE',
 					clientId: 'client-2',
@@ -5934,7 +6008,10 @@ describe( 'state', () => {
 		} );
 
 		it( 'keeps the selected state when selection resets to the same block', () => {
-			const originalState = { clientId: 'client-1', value: ':hover' };
+			const originalState = {
+				clientId: 'client-1',
+				value: { viewport: 'default', pseudo: ':hover' },
+			};
 			const state = selectedBlockStyleState( originalState, {
 				type: 'RESET_SELECTION',
 				selectionStart: { clientId: 'client-1' },
@@ -5945,7 +6022,10 @@ describe( 'state', () => {
 
 		it( 'clears the selected state when selection resets to another block', () => {
 			const state = selectedBlockStyleState(
-				{ clientId: 'client-1', value: ':hover' },
+				{
+					clientId: 'client-1',
+					value: { viewport: 'default', pseudo: ':hover' },
+				},
 				{
 					type: 'RESET_SELECTION',
 					selectionStart: { clientId: 'client-2' },
@@ -5957,7 +6037,10 @@ describe( 'state', () => {
 
 		it( 'clears the selected state when the selection is cleared', () => {
 			const state = selectedBlockStyleState(
-				{ clientId: 'client-1', value: ':hover' },
+				{
+					clientId: 'client-1',
+					value: { viewport: 'default', pseudo: ':hover' },
+				},
 				{
 					type: 'CLEAR_SELECTED_BLOCK',
 				}
@@ -5968,7 +6051,10 @@ describe( 'state', () => {
 
 		it( 'clears the selected state when multiple blocks are selected', () => {
 			const state = selectedBlockStyleState(
-				{ clientId: 'client-1', value: ':hover' },
+				{
+					clientId: 'client-1',
+					value: { viewport: 'default', pseudo: ':hover' },
+				},
 				{
 					type: 'MULTI_SELECT',
 				}
@@ -5979,7 +6065,10 @@ describe( 'state', () => {
 
 		it( 'clears the selected state when the block is removed', () => {
 			const state = selectedBlockStyleState(
-				{ clientId: 'client-1', value: ':hover' },
+				{
+					clientId: 'client-1',
+					value: { viewport: 'default', pseudo: ':hover' },
+				},
 				{
 					type: 'REMOVE_BLOCKS',
 					clientIds: [ 'client-1' ],
@@ -5991,7 +6080,10 @@ describe( 'state', () => {
 
 		it( 'clears the selected state when the block is replaced', () => {
 			const state = selectedBlockStyleState(
-				{ clientId: 'client-2', value: ':focus' },
+				{
+					clientId: 'client-2',
+					value: { viewport: 'default', pseudo: ':focus' },
+				},
 				{
 					type: 'REPLACE_BLOCKS',
 					clientIds: [ 'client-2' ],
@@ -6003,7 +6095,10 @@ describe( 'state', () => {
 
 		it( 'clears the selected state when the block is missing after reset', () => {
 			const state = selectedBlockStyleState(
-				{ clientId: 'client-1', value: ':hover' },
+				{
+					clientId: 'client-1',
+					value: { viewport: 'default', pseudo: ':hover' },
+				},
 				{
 					type: 'RESET_BLOCKS',
 					blocks: [
@@ -6019,7 +6114,10 @@ describe( 'state', () => {
 		} );
 
 		it( 'keeps the selected state when the block exists after reset', () => {
-			const originalState = { clientId: 'client-2', value: ':focus' };
+			const originalState = {
+				clientId: 'client-2',
+				value: { viewport: 'default', pseudo: ':focus' },
+			};
 			const state = selectedBlockStyleState( originalState, {
 				type: 'RESET_BLOCKS',
 				blocks: [

@@ -531,10 +531,10 @@ export function clearRequestedInspectorTab() {
 }
 
 /**
- * Sets the selected pseudo-state for a block's style controls.
+ * Sets the selected style state for a block's style controls.
  *
  * @param {string} clientId The block client ID.
- * @param {string} value    The selected state value.
+ * @param {Object} value    The selected state value.
  *
  * @return {Object} Action object.
  */

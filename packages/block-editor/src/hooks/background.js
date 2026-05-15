@@ -25,6 +25,7 @@ import {
 import { globalStylesDataKey } from '../store/private-keys';
 import {
 	getStyleForState,
+	isDefaultBlockStyleState,
 	setStyleForState,
 	useBlockStyleState,
 } from './block-style-state';
@@ -193,7 +194,7 @@ export function BackgroundImagePanel( {
 		[ clientId, name ]
 	);
 
-	const isStateSelected = selectedState !== 'default';
+	const isStateSelected = ! isDefaultBlockStyleState( selectedState );
 
 	const backgroundGradientSupported = hasBackgroundSupport(
 		name,

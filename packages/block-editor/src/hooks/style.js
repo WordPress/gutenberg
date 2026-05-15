@@ -40,7 +40,12 @@ import {
 	useStyleOverride,
 	useBlockSettings,
 } from './utils';
-import { BlockStyleStateProvider } from './block-style-state';
+import {
+	BlockStyleStateProvider,
+	getStyleForState,
+	hasPseudoBlockStyleState,
+	isDefaultBlockStyleState,
+} from './block-style-state';
 import { BlockStateBadges, VALID_BLOCK_PSEUDO_STATES } from './states';
 import { buildStateSelector, buildCanvasStateSelector } from './state-utils';
 import { BlockInspectorPreTabsFill } from '../components/block-inspector/inspector-pre-tabs-slot-fill';
@@ -430,9 +435,12 @@ function BlockStyleControls( {
 		},
 		[ clientId, name ]
 	);
-	const isPseudoSelectorState = selectedState?.startsWith( ':' );
-	const globalStateValue = globalBlockStyles?.[ selectedState ];
-	const instanceStateValue = style?.[ selectedState ];
+	const isPseudoSelectorState = hasPseudoBlockStyleState( selectedState );
+	const globalStateValue = getStyleForState(
+		globalBlockStyles,
+		selectedState
+	);
+	const instanceStateValue = getStyleForState( style, selectedState );
 
 	// Inject state styles onto the editor canvas so the selected state is
 	// visible while editing. Scoped to this block instance via data-block so
@@ -492,7 +500,7 @@ function BlockStyleControls( {
 
 	return (
 		<>
-			{ selectedState !== 'default' && (
+			{ ! isDefaultBlockStyleState( selectedState ) && (
 				<BlockInspectorPreTabsFill>
 					<Spacer paddingX={ 4 } paddingY={ 2 }>
 						{ isPseudoSelectorState && (

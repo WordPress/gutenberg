@@ -2276,7 +2276,7 @@ export function requestedInspectorTab( state = null, action ) {
 }
 
 /**
- * Reducer tracking the selected pseudo-state for block style controls.
+ * Reducer tracking the selected style state for block style controls.
  *
  * @param {Object} state  Current state.
  * @param {Object} action Dispatched action.
@@ -2286,17 +2286,20 @@ export function requestedInspectorTab( state = null, action ) {
 export function selectedBlockStyleState( state = undefined, action ) {
 	switch ( action.type ) {
 		case 'SET_SELECTED_BLOCK_STYLE_STATE': {
-			if (
-				! action.clientId ||
-				! action.value ||
-				action.value === 'default'
-			) {
+			if ( ! action.clientId || ! action.value ) {
 				return undefined;
 			}
+			const previousValue =
+				state?.clientId === action.clientId ? state.value : {};
 
 			return {
 				clientId: action.clientId,
-				value: action.value,
+				value: {
+					viewport: 'default',
+					pseudo: 'default',
+					...previousValue,
+					...action.value,
+				},
 			};
 		}
 

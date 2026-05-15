@@ -146,11 +146,11 @@ describe( 'private actions', () => {
 	describe( 'setSelectedBlockStyleState', () => {
 		it( 'returns the SET_SELECTED_BLOCK_STYLE_STATE action', () => {
 			expect(
-				setSelectedBlockStyleState( 'client-1', ':hover' )
+				setSelectedBlockStyleState( 'client-1', { pseudo: ':hover' } )
 			).toEqual( {
 				type: 'SET_SELECTED_BLOCK_STYLE_STATE',
 				clientId: 'client-1',
-				value: ':hover',
+				value: { pseudo: ':hover' },
 			} );
 		} );
 	} );

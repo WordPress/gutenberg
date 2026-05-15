@@ -77,22 +77,24 @@ describe( 'private selectors', () => {
 		it( 'returns default when the block has no selected state', () => {
 			const state = {};
 
-			expect( getSelectedBlockStyleState( state, 'client-1' ) ).toBe(
-				'default'
-			);
+			expect( getSelectedBlockStyleState( state, 'client-1' ) ).toEqual( {
+				viewport: 'default',
+				pseudo: 'default',
+			} );
 		} );
 
 		it( 'returns the selected state for the block', () => {
 			const state = {
 				selectedBlockStyleState: {
 					clientId: 'client-1',
-					value: ':hover',
+					value: { viewport: 'mobile', pseudo: ':hover' },
 				},
 			};
 
-			expect( getSelectedBlockStyleState( state, 'client-1' ) ).toBe(
-				':hover'
-			);
+			expect( getSelectedBlockStyleState( state, 'client-1' ) ).toEqual( {
+				viewport: 'mobile',
+				pseudo: ':hover',
+			} );
 		} );
 
 		it( 'returns default when the selected state has no value', () => {
@@ -102,22 +104,24 @@ describe( 'private selectors', () => {
 				},
 			};
 
-			expect( getSelectedBlockStyleState( state, 'client-1' ) ).toBe(
-				'default'
-			);
+			expect( getSelectedBlockStyleState( state, 'client-1' ) ).toEqual( {
+				viewport: 'default',
+				pseudo: 'default',
+			} );
 		} );
 
 		it( 'returns default when another block has the selected state', () => {
 			const state = {
 				selectedBlockStyleState: {
 					clientId: 'client-2',
-					value: ':hover',
+					value: { viewport: 'default', pseudo: ':hover' },
 				},
 			};
 
-			expect( getSelectedBlockStyleState( state, 'client-1' ) ).toBe(
-				'default'
-			);
+			expect( getSelectedBlockStyleState( state, 'client-1' ) ).toEqual( {
+				viewport: 'default',
+				pseudo: 'default',
+			} );
 		} );
 	} );
 

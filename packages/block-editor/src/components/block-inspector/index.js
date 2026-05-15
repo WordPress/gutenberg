@@ -236,7 +236,9 @@ function BlockInspector() {
 		useBlockInspectorAnimationSettings( blockType );
 
 	const hasSelectedBlocks = selectedBlockCount > 1;
-	const isBlockStyleStateSelected = selectedBlockStyleState !== 'default';
+	const isBlockStyleStateSelected =
+		selectedBlockStyleState.viewport !== 'default' ||
+		selectedBlockStyleState.pseudo !== 'default';
 
 	if ( hasSelectedBlocks && ! isSectionBlockInSelection ) {
 		return (
