@@ -430,6 +430,7 @@ function BlockStyleControls( {
 		},
 		[ clientId, name ]
 	);
+	const isPseudoSelectorState = selectedState?.startsWith( ':' );
 	const globalStateValue = globalBlockStyles?.[ selectedState ];
 	const instanceStateValue = style?.[ selectedState ];
 
@@ -438,7 +439,7 @@ function BlockStyleControls( {
 	// other blocks of the same type are not affected. Must be called before
 	// any early returns because it is a hook.
 	const canvasStateCSS = useMemo( () => {
-		if ( ! showStateOnCanvas || selectedState === 'default' ) {
+		if ( ! showStateOnCanvas || ! isPseudoSelectorState ) {
 			return undefined;
 		}
 		let stateValue;
@@ -460,7 +461,7 @@ function BlockStyleControls( {
 		return getStateStylesCSS( stateValue, selector );
 	}, [
 		showStateOnCanvas,
-		selectedState,
+		isPseudoSelectorState,
 		globalStateValue,
 		instanceStateValue,
 		clientId,
@@ -494,11 +495,13 @@ function BlockStyleControls( {
 			{ selectedState !== 'default' && (
 				<BlockInspectorPreTabsFill>
 					<Spacer paddingX={ 4 } paddingY={ 2 }>
-						<ToggleControl
-							label={ __( 'Show state on canvas' ) }
-							checked={ showStateOnCanvas }
-							onChange={ setShowStateOnCanvas }
-						/>
+						{ isPseudoSelectorState && (
+							<ToggleControl
+								label={ __( 'Show state on canvas' ) }
+								checked={ showStateOnCanvas }
+								onChange={ setShowStateOnCanvas }
+							/>
+						) }
 						<BlockStateBadges
 							name={ name }
 							value={ selectedState }
