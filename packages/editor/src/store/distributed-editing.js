@@ -2907,6 +2907,11 @@ export function getDistributedEditingPresenceRosterStateForSessionState(
 	).length;
 	const remoteDelayedVisibleCount =
 		remoteEntries.length - remoteCurrentVisibleCount;
+	const otherEditorActivityCue =
+		getDistributedEditingPresenceRosterOtherEditorActivityCue( {
+			remoteCurrentVisibleCount,
+			remoteDelayedVisibleCount,
+		} );
 	const countSummary = getDistributedEditingPresenceRosterCountSummary( {
 		currentVisibleCount,
 		delayedVisibleCount,
@@ -2969,6 +2974,7 @@ export function getDistributedEditingPresenceRosterStateForSessionState(
 			summary,
 			countSummary,
 			refreshHint,
+			otherEditorActivityCue,
 			assistiveSummary:
 				normalized.presenceRosterStatus ===
 					DISTRIBUTED_EDITING_PRESENCE_ROSTER_STATUSES.EMPTY ||
@@ -2993,6 +2999,25 @@ export function getDistributedEditingPresenceRosterStateForSessionState(
 		changesPostLock: false,
 		claimsSaved: false,
 	};
+}
+
+function getDistributedEditingPresenceRosterOtherEditorActivityCue( {
+	remoteCurrentVisibleCount,
+	remoteDelayedVisibleCount,
+} ) {
+	if ( remoteCurrentVisibleCount > 0 ) {
+		return `${ remoteCurrentVisibleCount } other editor${
+			remoteCurrentVisibleCount === 1 ? '' : 's'
+		} ${ remoteCurrentVisibleCount === 1 ? 'is' : 'are' } active now.`;
+	}
+
+	if ( remoteDelayedVisibleCount > 0 ) {
+		return `${ remoteDelayedVisibleCount } other editor${
+			remoteDelayedVisibleCount === 1 ? '' : 's'
+		} may be delayed.`;
+	}
+
+	return '';
 }
 
 function getDistributedEditingPresenceRosterSummary( {

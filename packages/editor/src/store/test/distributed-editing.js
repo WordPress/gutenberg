@@ -747,6 +747,7 @@ describe( 'distributed editing session state', () => {
 				summary: 'No other editors shown.',
 				countSummary: 'Editor activity has not been shown yet.',
 				refreshHint: 'Use Refresh editing list to check again.',
+				otherEditorActivityCue: '',
 			},
 		} );
 		expect( activeRoster ).toMatchObject( {
@@ -766,6 +767,7 @@ describe( 'distributed editing session state', () => {
 				summary: 'Mira and Another editor are also editing this post.',
 				countSummary:
 					'2 editors are active now. Some editor activity is hidden by roster limits or privacy settings.',
+				otherEditorActivityCue: '2 other editors are active now.',
 			},
 		} );
 		expect( mixedRoster ).toMatchObject( {
@@ -797,6 +799,9 @@ describe( 'distributed editing session state', () => {
 		expect( staleRoster.copy.countSummary ).toBe(
 			'1 editor may be delayed.'
 		);
+		expect( staleRoster.copy.otherEditorActivityCue ).toBe(
+			'1 other editor may be delayed.'
+		);
 		expect( expiredOnlyRoster ).toMatchObject( {
 			status: DISTRIBUTED_EDITING_PRESENCE_ROSTER_STATUSES.RECENT,
 			visibleCount: 0,
@@ -823,6 +828,7 @@ describe( 'distributed editing session state', () => {
 			delayedVisibleCount: 0,
 			copy: {
 				countSummary: '1 editor is active now.',
+				otherEditorActivityCue: '1 other editor is active now.',
 			},
 		} );
 		expect( storageRoster.entries[ 0 ].freshness ).toBe( 'current' );

@@ -1556,7 +1556,38 @@ describe( 'DistributedEditingStatus', () => {
 				'Mira and Another editor are also editing this post.'
 			)
 		).toBeVisible();
+		expect(
+			screen.getByText( '2 other editors are active now.' )
+		).toBeVisible();
 		expect( screen.getByText( '2 editors are active now.' ) ).toBeVisible();
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-other-editor-cue',
+			'2 other editors are active now.'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-other-editor-cue-visible',
+			'true'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-other-editor-cue-claims-absence',
+			'false'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-other-editor-cue-content-free',
+			'true'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-other-editor-cue-exposes-private-fields',
+			'false'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-other-editor-cue-calls-save',
+			'false'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-other-editor-cue-changes-post-lock',
+			'false'
+		);
 		const rowList = screen.getByRole( 'list', {
 			name: 'Visible editors',
 		} );

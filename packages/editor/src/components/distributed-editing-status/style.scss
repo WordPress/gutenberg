@@ -9,6 +9,14 @@
 	padding: 0;
 }
 
+.editor-distributed-editing-status__presence-other-editor-cue {
+	background: #f0f6fc;
+	border-left: 3px solid var(--wp-admin-theme-color, #2271b1);
+	font-weight: 500;
+	margin-top: $grid-unit-10;
+	padding: $grid-unit-05 $grid-unit-10;
+}
+
 .editor-distributed-editing-status__enabled-shell-human-loop {
 	border-left: 3px solid var(--wp-admin-theme-color, #2271b1);
 	display: grid;

@@ -3208,6 +3208,17 @@ function DistributedEditingPresenceRoster( {
 			data-distributed-editing-presence-refresh-hint-visible={ formatDataBoolean(
 				Boolean( rosterState.copy.refreshHint )
 			) }
+			data-distributed-editing-presence-other-editor-cue={
+				rosterState.copy.otherEditorActivityCue
+			}
+			data-distributed-editing-presence-other-editor-cue-calls-save="false"
+			data-distributed-editing-presence-other-editor-cue-changes-post-lock="false"
+			data-distributed-editing-presence-other-editor-cue-content-free="true"
+			data-distributed-editing-presence-other-editor-cue-exposes-private-fields="false"
+			data-distributed-editing-presence-other-editor-cue-claims-absence="false"
+			data-distributed-editing-presence-other-editor-cue-visible={ formatDataBoolean(
+				Boolean( rosterState.copy.otherEditorActivityCue )
+			) }
 			data-distributed-editing-presence-summary-expired-count={
 				rosterState.expiredCount
 			}
@@ -3245,6 +3256,17 @@ function DistributedEditingPresenceRoster( {
 					}
 				>
 					{ rosterState.copy.refreshHint }
+				</div>
+			) }
+			{ rosterState.copy.otherEditorActivityCue && (
+				<div
+					aria-live="polite"
+					className="editor-distributed-editing-status__presence-other-editor-cue"
+					data-distributed-editing-presence-other-editor-cue-copy={
+						rosterState.copy.otherEditorActivityCue
+					}
+				>
+					{ rosterState.copy.otherEditorActivityCue }
 				</div>
 			) }
 			<div
