@@ -9,7 +9,7 @@ import { getWpCompatOverlaySlot } from '@wordpress/ui';
  * Internal dependencies
  */
 import { WithWpCompatOverlaySlot } from './with-wp-compat-overlay-slot';
-import draggableStyles from '../../../packages/components/src/draggable/style.scss?inline';
+import componentsStyles from '../../package-styles/components-ltr.lazy.scss?inline';
 
 export default {
 	title: 'Playground/Draggable cross-document fallback',
@@ -29,11 +29,11 @@ export const InsideIframeWithCompatSlot = () => {
 		const iframeDoc = iframeRef.current?.contentDocument;
 		if (
 			iframeDoc?.head &&
-			! iframeDoc.getElementById( 'draggable-iframe-styles' )
+			! iframeDoc.getElementById( 'components-iframe-styles' )
 		) {
 			const styleEl = iframeDoc.createElement( 'style' );
-			styleEl.id = 'draggable-iframe-styles';
-			styleEl.textContent = draggableStyles;
+			styleEl.id = 'components-iframe-styles';
+			styleEl.textContent = componentsStyles;
 			iframeDoc.head.appendChild( styleEl );
 		}
 		setIframeBody( iframeDoc?.body ?? null );
