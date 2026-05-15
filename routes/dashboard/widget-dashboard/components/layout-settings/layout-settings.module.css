@@ -1,0 +1,74 @@
+.modelFieldset {
+	border: 0;
+	padding: 0;
+	margin: 0;
+	min-inline-size: 0;
+}
+
+.modelLegend {
+	font-size: var(--wpds-typography-font-size-sm);
+	font-weight: var(--wpds-typography-font-weight-medium);
+	color: var(--wpds-color-fg-content-neutral);
+	margin-bottom: var(--wpds-dimension-gap-sm);
+}
+
+.modelOptions {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: var(--wpds-dimension-gap-md);
+}
+
+.modelOption {
+	appearance: none;
+	background: transparent;
+	color: inherit;
+	font: inherit;
+	cursor: pointer;
+	display: flex;
+	flex-direction: column;
+	align-items: stretch;
+	gap: var(--wpds-dimension-gap-sm);
+	padding: var(--wpds-dimension-padding-md);
+	border: 1px solid var(--wpds-color-stroke-surface-neutral);
+	border-radius: var(--wpds-border-radius-md);
+	text-align: center;
+	transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.modelOption:hover {
+	border-color: var(--wpds-color-stroke-surface-neutral-strong);
+}
+
+.modelOption:focus-visible {
+	outline: var(--wpds-border-width-focus) solid var(--wpds-color-stroke-focus-brand);
+	outline-offset: 2px;
+}
+
+.modelOptionSelected,
+.modelOptionSelected:hover {
+	border-color: var(--wpds-color-stroke-interactive-brand);
+	background-color: color-mix(in srgb, var(--wpds-color-bg-surface-brand) 6%, transparent);
+}
+
+.modelThumbnail {
+	display: block;
+	inline-size: 100%;
+	block-size: auto;
+	color: var(--wpds-color-fg-content-neutral-weak);
+}
+
+.modelOptionSelected .modelThumbnail {
+	color: var(--wpds-color-fg-interactive-brand);
+}
+
+.modelLabel {
+	font-size: var(--wpds-typography-font-size-sm);
+	font-weight: var(--wpds-typography-font-weight-medium);
+	color: var(--wpds-color-fg-content-neutral);
+}
+
+.modelHelp {
+	margin: var(--wpds-dimension-gap-sm) 0 0;
+	color: var(--wpds-color-fg-content-neutral-weak);
+	font-size: var(--wpds-typography-font-size-sm);
+}
