@@ -548,6 +548,8 @@ describe( 'PostPublishButton', () => {
 					title: 'Save opens review',
 					summary:
 						'Review highlighted changes before WordPress updates the post.',
+					actionHint: 'Review before update',
+					requiresActionBeforeSave: true,
 					statusChromeSummary:
 						'Protected local changes need review before the authoritative post can update.',
 					statusChromeAuthorityState: 'review_required_before_update',
@@ -563,7 +565,7 @@ describe( 'PostPublishButton', () => {
 		} );
 		expect( button ).toHaveAttribute(
 			'title',
-			'Review highlighted changes before WordPress updates the post. Protected local changes need review before the authoritative post can update.'
+			'Review before update. Review highlighted changes before WordPress updates the post. Protected local changes need review before the authoritative post can update.'
 		);
 		expect( button ).toHaveAttribute(
 			'data-distributed-editing-save-button-status',
@@ -578,6 +580,14 @@ describe( 'PostPublishButton', () => {
 			'review_changes'
 		);
 		expect( button ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-action-hint',
+			'Review before update'
+		);
+		expect( button ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-action-required',
+			'true'
+		);
+		expect( button ).toHaveAttribute(
 			'data-distributed-editing-save-control-journey-calls-normal-save',
 			'false'
 		);
@@ -590,10 +600,12 @@ describe( 'PostPublishButton', () => {
 			'false'
 		);
 		const cueLabel = screen.getByText( 'Save opens review' );
+		const cueActionHint = screen.getByText( 'Review before update' );
 		const cue = screen.getByLabelText(
-			'Review highlighted changes before WordPress updates the post. Protected local changes need review before the authoritative post can update.'
+			'Review before update. Review highlighted changes before WordPress updates the post. Protected local changes need review before the authoritative post can update.'
 		);
 		expect( cueLabel ).toBeVisible();
+		expect( cueActionHint ).toBeVisible();
 		expect( cue ).toHaveAttribute(
 			'data-distributed-editing-save-control-journey-visual-cue',
 			'true'
@@ -604,11 +616,19 @@ describe( 'PostPublishButton', () => {
 		);
 		expect( cue ).toHaveAttribute(
 			'title',
-			'Review highlighted changes before WordPress updates the post. Protected local changes need review before the authoritative post can update.'
+			'Review before update. Review highlighted changes before WordPress updates the post. Protected local changes need review before the authoritative post can update.'
 		);
 		expect( cue ).toHaveAttribute(
 			'aria-label',
-			'Review highlighted changes before WordPress updates the post. Protected local changes need review before the authoritative post can update.'
+			'Review before update. Review highlighted changes before WordPress updates the post. Protected local changes need review before the authoritative post can update.'
+		);
+		expect( cue ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-action-hint',
+			'Review before update'
+		);
+		expect( cue ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-action-required',
+			'true'
 		);
 		expect( cue ).toHaveAttribute(
 			'data-distributed-editing-save-control-journey-status-summary',

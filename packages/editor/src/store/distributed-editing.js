@@ -10681,6 +10681,8 @@ function getDistributedEditingSaveJourneyActionHintForStep( step ) {
 	switch ( step ) {
 		case DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.GET_LATEST_POST:
 			return 'Get latest first';
+		case DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.REVIEW_CHANGES:
+			return 'Review before update';
 	}
 
 	return null;
