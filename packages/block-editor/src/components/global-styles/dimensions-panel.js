@@ -231,6 +231,7 @@ export default function DimensionsPanel( {
 	// Special case because the layout controls are not part of the dimensions panel
 	// in global styles but not in block inspector.
 	includeLayoutControls = false,
+	showChildLayoutControls = true,
 } ) {
 	const { dimensions, spacing } = settings;
 
@@ -490,7 +491,8 @@ export default function DimensionsPanel( {
 	const hasAspectRatioValue = () => !! value?.dimensions?.aspectRatio;
 
 	// Child Layout
-	const showChildLayoutControl = hasChildLayout( settings );
+	const showChildLayoutControl =
+		showChildLayoutControls && hasChildLayout( settings );
 	const childLayout = inheritedValue?.layout;
 
 	const setChildLayout = ( newChildLayout ) => {

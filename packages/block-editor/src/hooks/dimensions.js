@@ -134,6 +134,7 @@ export function DimensionsPanel( { clientId, name, setAttributes, settings } ) {
 				value={ value }
 				onChange={ onChange }
 				defaultControls={ defaultControls }
+				showChildLayoutControls={ ! isStateSelected }
 				onVisualize={
 					isStateSelected ? undefined : setVisualizedProperty
 				}
