@@ -59,7 +59,7 @@ export function OnThisDayView( {
 	post,
 	isResolving,
 	hasAnyPosts,
-	effect = 'vintage',
+	effect = 'dim-blur',
 }: OnThisDayViewProps ): React.ReactNode {
 	if ( isResolving ) {
 		return (
