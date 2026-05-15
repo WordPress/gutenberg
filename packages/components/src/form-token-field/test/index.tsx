@@ -1977,14 +1977,18 @@ describe( 'FormTokenField', () => {
 			const input = screen.getByRole( 'combobox' );
 
 			// Type 'hello ', lowercase, fails validation.
-			// The space should not be preventDefault'd. After
-			// onInputChangeHandler rejoins, the trailing separator is dropped
-			// (the failed segment stays so the user can fix it in place).
+			// The space should be typed into the input (not prevented), and
+			// the trailing space should be preserved by the rejoin so the
+			// user can keep typing past the failed-validation space.
 			await user.type( input, 'hello ' );
 			expect( onChangeSpy ).not.toHaveBeenCalled();
-			expect( input ).toHaveValue( 'hello' );
+			expect( input ).toHaveValue( 'hello ' );
 
-			// Clear and type 'Hello ' — capital letter, passes validation.
+			// User can keep typing past the failed-validation space.
+			await user.type( input, 'w' );
+			expect( input ).toHaveValue( 'hello w' );
+
+			// Clear and type 'Hello ', capital letter, passes validation.
 			// The space should be prevented, and a token should be created.
 			await user.clear( input );
 			await user.type( input, 'Hello ' );
@@ -2018,7 +2022,7 @@ describe( 'FormTokenField', () => {
 			expect( onChangeSpy ).toHaveBeenCalledWith( [ 'Apple', 'Cherry' ] );
 			expectTokensToBeInTheDocument( [ 'Apple', 'Cherry' ] );
 			expectTokensNotToBeInTheDocument( [ 'banana' ] );
-			expect( input ).toHaveValue( 'banana' );
+			expect( input ).toHaveValue( 'banana,' );
 		} );
 
 		it( 'should leave all segments in the input when none pass validation on paste', async () => {
@@ -2041,7 +2045,7 @@ describe( 'FormTokenField', () => {
 			await user.paste( 'apple,banana,cherry,' );
 
 			expect( onChangeSpy ).not.toHaveBeenCalled();
-			expect( input ).toHaveValue( 'apple,banana,cherry' );
+			expect( input ).toHaveValue( 'apple,banana,cherry,' );
 		} );
 
 		it( 'should commit a trailing valid segment and leave only failed segments in the input when pasting without a trailing separator', async () => {

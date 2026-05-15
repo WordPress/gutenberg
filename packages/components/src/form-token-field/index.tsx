@@ -347,10 +347,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 
 			if ( hasFailures ) {
 				// Derive rejected segments from `addedTokens` so this stays
-				// in sync with `addNewTokens`'s filter chain. Rejoin with `,`
-				// unconditionally: comma is a valid separator in both
-				// `tokenizeOnSpace` and the default mode, so this avoids
-				// rewriting the user's original separators.
+				// in sync with `addNewTokens`'s filter chain.
 				const rejected = items.filter( ( token ) => {
 					const transformed = saveTransform( token );
 					if ( ! transformed ) {
@@ -364,7 +361,22 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 					}
 					return ! __experimentalValidateInput( transformed );
 				} );
-				const remaining = rejected.join( ',' );
+
+				// Reuse the separator the user actually used (the last one
+				// in `text`) so we don't rewrite their input: comma-separated
+				// paste under `tokenizeOnSpace` stays comma-separated, and
+				// typed space under `tokenizeOnSpace` stays a space. Falls
+				// back to the mode-appropriate separator only when no
+				// separator characters are present in `text`.
+				const usedSeparators = text.match( /[ ,\t]/g );
+				const separatorChar =
+					usedSeparators?.[ usedSeparators.length - 1 ] ??
+					( tokenizeOnSpace ? ' ' : ',' );
+				// Preserve a trailing separator when the input ended with
+				// one, so the user can keep typing past a failed-validation
+				// space without their separator disappearing.
+				const trailing = tokenValue === '' ? separatorChar : '';
+				const remaining = rejected.join( separatorChar ) + trailing;
 				setIncompleteTokenValue( remaining );
 				onInputChange( remaining );
 				return;
@@ -548,7 +560,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 	 * return does not guarantee the token was added: `addNewTokens` may
 	 * still drop it as a duplicate or after `saveTransform` returns empty.
 	 */
-	function addNewToken( token: string ): boolean {
+	function addNewToken( token: string ) {
 		if ( ! __experimentalValidateInput( token ) ) {
 			speak( messages.__experimentalInvalid, 'assertive' );
 			return false;
