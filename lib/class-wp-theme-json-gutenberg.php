@@ -3420,11 +3420,11 @@ class WP_Theme_JSON_Gutenberg {
 		// If there are style variations, generate the declarations for them, including any feature selectors the block may have.
 		// Responsive nodes (those with a media_query) do not process variations — variation responsive
 		// CSS is handled by the variation's own responsive nodes or the existing variation loop.
-		$style_variation_declarations            = array();
-		$style_variation_custom_css              = array();
-		$style_variation_responsive_css          = array();
-		$style_variation_responsive_pseudo_css   = array();
-		$style_variation_layout_metadata         = array();
+		$style_variation_declarations          = array();
+		$style_variation_custom_css            = array();
+		$style_variation_responsive_css        = array();
+		$style_variation_responsive_pseudo_css = array();
+		$style_variation_layout_metadata       = array();
 		if ( ! $media_query && ! empty( $block_metadata['variations'] ) ) {
 			foreach ( $block_metadata['variations'] as $style_variation ) {
 				$style_variation_node = _wp_array_get( $this->theme_json, $style_variation['path'], array() );

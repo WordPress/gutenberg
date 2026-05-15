@@ -5090,7 +5090,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 										'dimensions' => array(
 											'width' => '30rem',
 										),
-										':hover'    => array(
+										':hover'     => array(
 											'dimensions' => array(
 												'width' => '40rem',
 											),
