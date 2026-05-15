@@ -3,6 +3,8 @@
  * Tests for the Guidelines Post Type registration and type-term behavior.
  *
  * @package gutenberg
+ *
+ * @group guidelines
  */
 class Gutenberg_Guidelines_Post_Type_Test extends WP_UnitTestCase {
 

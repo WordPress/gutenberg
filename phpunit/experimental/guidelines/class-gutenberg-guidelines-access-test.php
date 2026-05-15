@@ -8,6 +8,8 @@
  * surfaces at the shortest possible path through the stack.
  *
  * @package gutenberg
+ *
+ * @group guidelines
  */
 class Gutenberg_Guidelines_Access_Test extends WP_UnitTestCase {
 

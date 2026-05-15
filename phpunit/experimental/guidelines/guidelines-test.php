@@ -8,6 +8,8 @@
  * direct unit and end-to-end through wp_set_object_terms()).
  *
  * @package gutenberg
+ *
+ * @group guidelines
  */
 class Guidelines_Test extends WP_UnitTestCase {
 

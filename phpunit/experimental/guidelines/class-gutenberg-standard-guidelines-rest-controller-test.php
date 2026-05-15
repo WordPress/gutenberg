@@ -3,6 +3,8 @@
  * Tests for the standard Guidelines REST API collection.
  *
  * @package gutenberg
+ *
+ * @group guidelines
  */
 class Gutenberg_Standard_Guidelines_REST_Controller_Test extends WP_UnitTestCase {
 

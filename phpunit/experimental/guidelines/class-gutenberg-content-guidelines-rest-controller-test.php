@@ -3,6 +3,8 @@
  * Tests for the Content Guidelines REST API Controller (singleton).
  *
  * @package gutenberg
+ *
+ * @group guidelines
  */
 class Gutenberg_Content_Guidelines_REST_Controller_Test extends WP_Test_REST_Post_Type_Controller_Testcase {
 
