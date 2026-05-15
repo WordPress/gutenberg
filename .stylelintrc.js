@@ -1,3 +1,8 @@
+// CSS stepped value math functions from Baseline 2024 that Stylelint
+// (and its SCSS-aware `function-no-unknown` variant) doesn't yet
+// recognize. Can likely be dropped on a future Stylelint upgrade.
+const CSS_BASELINE_2024_FUNCTIONS = [ 'round', 'rem', 'mod' ];
+
 /** @type {import('stylelint').Config} */
 module.exports = {
 	extends: '@wordpress/stylelint-config/scss-stylistic',
@@ -68,16 +73,7 @@ module.exports = {
 			rules: {
 				'function-no-unknown': [
 					true,
-					{
-						ignoreFunctions: [
-							// CSS stepped value math functions in Baseline 2024.
-							// This rule exception can likely be removed when
-							// updating to a more recent version of Stylelint.
-							'round',
-							'rem',
-							'mod',
-						],
-					},
+					{ ignoreFunctions: CSS_BASELINE_2024_FUNCTIONS },
 				],
 				'declaration-property-max-values': {
 					// Prevents left/right values with shorthand property names (unclear for RTL)
@@ -130,6 +126,23 @@ module.exports = {
 						ignorePseudoClasses: [
 							// CSS Modules global escape hatch.
 							'global',
+						],
+					},
+				],
+			},
+		},
+		{
+			// SCSS modules use the Sass-aware `function-no-unknown` variant.
+			files: [ '**/*.module.scss', 'routes/**/*.scss' ],
+			rules: {
+				'function-no-unknown': null,
+				'scss/function-no-unknown': [
+					true,
+					{
+						ignoreFunctions: [
+							...CSS_BASELINE_2024_FUNCTIONS,
+							// Sass helpers from `@wordpress/base-styles`.
+							'z-index',
 						],
 					},
 				],

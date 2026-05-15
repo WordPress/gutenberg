@@ -14,11 +14,17 @@ import { getWpCompatOverlaySlot } from '@wordpress/ui';
  * Internal dependencies
  */
 import type { DraggableProps } from './types';
+import styles from './style.module.scss';
 
-const dragImageClass = 'components-draggable__invisible-drag-image';
-const cloneWrapperClass = 'components-draggable__clone';
+// The hardcoded legacy class names are preserved alongside the
+// CSS-module hashed ones for backwards compatibility.
+const dragImageClasses = [
+	styles.invisibleDragImage,
+	'components-draggable__invisible-drag-image',
+];
+const cloneWrapperClasses = [ styles.clone, 'components-draggable__clone' ];
+const bodyClasses = [ styles.isDragging, 'is-dragging-components-draggable' ];
 const clonePadding = 0;
-const bodyClass = 'is-dragging-components-draggable';
 
 /**
  * `Draggable` is a Component that provides a way to set up a cross-browser
@@ -124,12 +130,12 @@ export function Draggable( {
 		// right after. event.dataTransfer.setDragImage is not supported yet in
 		// IE, we need to check for its existence first.
 		if ( 'function' === typeof event.dataTransfer.setDragImage ) {
-			dragImage.classList.add( dragImageClass );
+			dragImage.classList.add( ...dragImageClasses );
 			ownerDocument.body.appendChild( dragImage );
 			event.dataTransfer.setDragImage( dragImage, 0, 0 );
 		}
 
-		cloneWrapper.classList.add( cloneWrapperClass );
+		cloneWrapper.classList.add( ...cloneWrapperClasses );
 
 		if ( cloneClassname ) {
 			cloneWrapper.classList.add( cloneClassname );
@@ -218,7 +224,7 @@ export function Draggable( {
 		ownerDocument.addEventListener( 'dragover', throttledDragOver );
 
 		// Update cursor to 'grabbing', document wide.
-		ownerDocument.body.classList.add( bodyClass );
+		ownerDocument.body.classList.add( ...bodyClasses );
 
 		if ( onDragStart ) {
 			onDragStart( event );
@@ -235,7 +241,7 @@ export function Draggable( {
 			}
 
 			// Reset cursor.
-			ownerDocument.body.classList.remove( bodyClass );
+			ownerDocument.body.classList.remove( ...bodyClasses );
 
 			ownerDocument.removeEventListener( 'dragover', throttledDragOver );
 		};

@@ -1,0 +1,23 @@
+@use "@wordpress/base-styles/z-index" as *;
+
+.invisibleDragImage {
+	position: fixed;
+	inset-inline-start: -1000px;
+	height: 50px;
+	width: 50px;
+}
+
+.clone {
+	position: fixed;
+	padding: 0; // Should match clonePadding variable.
+	background: transparent;
+	pointer-events: none;
+	// Stacking fallback for when the clone is not routed into the
+	// `@wordpress/ui` compat overlay slot.
+	z-index: z-index(".components-draggable__clone");
+}
+
+:global(body).isDragging {
+	cursor: move; /* Fallback for IE/Edge < 14 */
+	cursor: grabbing !important;
+}
