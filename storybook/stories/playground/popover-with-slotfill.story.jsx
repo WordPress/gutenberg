@@ -8,10 +8,6 @@ import { Popover } from '@wordpress/ui';
 export default {
 	title: 'Playground/Popover with SlotFill',
 	component: Popover.Root,
-	parameters: {
-		sourceLink:
-			'storybook/stories/playground/popover-with-slotfill.story.jsx',
-	},
 };
 
 // Renders an iframe and portals `children` into its body once `load` fires.

@@ -15,10 +15,6 @@ export default {
 	title: 'Playground/Debug fixtures/Draggable cross-document fallback',
 	component: Draggable,
 	decorators: [ WithWpCompatOverlaySlot ],
-	parameters: {
-		sourceLink:
-			'storybook/stories/playground/draggable-cross-document-fallback.story.jsx',
-	},
 };
 
 export const InsideIframeWithCompatSlot = () => {
