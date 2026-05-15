@@ -23,7 +23,9 @@ const dragImageClasses = [
 	'components-draggable__invisible-drag-image',
 ];
 const cloneWrapperClasses = [ styles.clone, 'components-draggable__clone' ];
-const bodyClasses = [ styles.isDragging, 'is-dragging-components-draggable' ];
+// Body-level signal shared with external code (e.g. block-editor keyboard
+// drag), so it stays as a plain global class rather than module-scoped.
+const bodyClass = 'is-dragging-components-draggable';
 const clonePadding = 0;
 
 /**
@@ -222,7 +224,7 @@ export function Draggable( {
 		ownerDocument.addEventListener( 'dragover', throttledDragOver );
 
 		// Update cursor to 'grabbing', document wide.
-		ownerDocument.body.classList.add( ...bodyClasses );
+		ownerDocument.body.classList.add( bodyClass );
 
 		if ( onDragStart ) {
 			onDragStart( event );
@@ -239,7 +241,7 @@ export function Draggable( {
 			}
 
 			// Reset cursor.
-			ownerDocument.body.classList.remove( ...bodyClasses );
+			ownerDocument.body.classList.remove( bodyClass );
 
 			ownerDocument.removeEventListener( 'dragover', throttledDragOver );
 		};
