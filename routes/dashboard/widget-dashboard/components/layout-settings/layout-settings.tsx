@@ -89,7 +89,7 @@ const fields: Field< WidgetGridSettings >[] = [
 	{
 		id: 'model',
 		type: 'text',
-		Edit: 'select',
+		Edit: 'toggleGroup',
 		label: __( 'Layout model' ),
 		description: __(
 			'Standard grid uses explicit widths and heights. Masonry packs items by content height.'
@@ -119,7 +119,7 @@ const fields: Field< WidgetGridSettings >[] = [
 		setValue: ( { value } ) => ( {
 			rowHeight: value ? ROW_HEIGHT_AUTO : DEFAULT_ROW_HEIGHT,
 		} ),
-		isDisabled: ( { item } ) => isMasonry( item ),
+		isVisible: ( item ) => ! isMasonry( item ),
 	},
 	{
 		id: 'rowHeight',
