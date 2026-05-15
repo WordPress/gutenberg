@@ -279,9 +279,10 @@ export function AddReactionButton( { onToggleReaction } ) {
 			contentClassName="editor-collab-sidebar-panel__add-reaction-popover"
 			renderToggle={ ( { isOpen, onToggle } ) => (
 				<Button
-					size="compact"
+					size="small"
 					className="editor-collab-sidebar-panel__add-reaction-button"
 					icon={ smileyIcon }
+					iconSize={ 20 }
 					label={ __( 'Add reaction' ) }
 					aria-expanded={ isOpen }
 					onClick={ onToggle }
