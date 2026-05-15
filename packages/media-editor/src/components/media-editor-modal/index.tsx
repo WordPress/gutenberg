@@ -100,9 +100,7 @@ export function MediaEditorModal( {
 						title={ __( 'Edit media' ) }
 						size="fill"
 						isDismissible={ false }
-						shouldCloseOnClickOutside={
-							shouldCloseOnClickOutside
-						}
+						shouldCloseOnClickOutside={ shouldCloseOnClickOutside }
 						onKeyDown={ onKeyDown }
 						onRequestClose={ onRequestClose }
 						headerActions={ headerActions }
