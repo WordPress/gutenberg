@@ -3,7 +3,7 @@
  */
 import { Button } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	DataForm,
 	useFormValidity,
@@ -34,14 +34,20 @@ const duplicateForm: Form = {
 	fields: [ 'plural_name', 'singular_name', 'slug' ],
 };
 
-function buildCopySlug( slug: string ): string {
+function buildCopySlug( slug: string, takenSlugs: Set< string > ): string {
 	const match = slug.match( /^(.*?)(\d+)$/ );
 	const base = match ? match[ 1 ] : slug;
-	const nextNumber = String( match ? parseInt( match[ 2 ], 10 ) + 1 : 2 );
-	return `${ base.slice(
-		0,
-		SLUG_MAX_LENGTH - nextNumber.length
-	) }${ nextNumber }`;
+	let num = match ? parseInt( match[ 2 ], 10 ) + 1 : 2;
+	let candidate: string;
+	do {
+		const nextNumber = String( num );
+		candidate = `${ base.slice(
+			0,
+			SLUG_MAX_LENGTH - nextNumber.length
+		) }${ nextNumber }`;
+		num++;
+	} while ( takenSlugs.has( candidate ) );
+	return candidate;
 }
 
 function DuplicatePostTypeModal( {
@@ -54,6 +60,19 @@ function DuplicatePostTypeModal( {
 	onActionPerformed?: ( items: PostTypeFormData[] ) => void;
 } ) {
 	const source = items[ 0 ];
+	const takenSlugs = useSelect( ( select ) => {
+		const postTypes = select( coreStore ).getPostTypes() ?? [];
+		const drafts =
+			select( coreStore ).getEntityRecords(
+				'postType',
+				POST_TYPE_ENTITY,
+				{ status: 'draft', per_page: -1, _fields: 'id,slug' }
+			) ?? [];
+		return new Set< string >( [
+			...postTypes.map( ( pt: any ) => pt.slug ),
+			...drafts.map( ( d: any ) => d.slug ),
+		] );
+	}, [] );
 	const [ data, setData ] = useState< PostTypeFormData >( () => ( {
 		...source,
 		id: undefined,
@@ -65,7 +84,7 @@ function DuplicatePostTypeModal( {
 				source.title.raw
 			),
 		},
-		slug: buildCopySlug( source.slug ),
+		slug: buildCopySlug( source.slug, takenSlugs ),
 	} ) );
 	const [ isDuplicating, setIsDuplicating ] = useState( false );
 	const slugField = useSlugField( undefined, data.slug );
