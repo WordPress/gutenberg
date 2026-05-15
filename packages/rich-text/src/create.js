@@ -12,15 +12,12 @@ import { mergePair } from './concat';
 import { OBJECT_REPLACEMENT_CHARACTER, ZWNBSP } from './special-characters';
 import { toHTMLString } from './to-html-string';
 import { getTextContent } from './get-text-content';
+import { defineFormatsAccessor, createValueShell } from './format-ranges';
 
 /** @typedef {import('./types').RichTextValue} RichTextValue */
 
 function createEmptyValue() {
-	return {
-		formats: [],
-		replacements: [],
-		text: '',
-	};
+	return createValueShell();
 }
 
 function toFormat( { tagName, attributes } ) {
@@ -178,6 +175,9 @@ export class RichTextData {
 	get formats() {
 		return this.#value.formats;
 	}
+	get _formats() {
+		return this.#value._formats;
+	}
 	get replacements() {
 		return this.#value.replacements;
 	}
@@ -241,19 +241,19 @@ export function create( {
 	__unstableIsEditableTree: isEditableTree,
 } = {} ) {
 	if ( html instanceof RichTextData ) {
-		return {
+		return defineFormatsAccessor( {
 			text: html.text,
-			formats: html.formats,
+			_formats: new Map( html._formats ),
 			replacements: html.replacements,
-		};
+		} );
 	}
 
 	if ( typeof text === 'string' && text.length > 0 ) {
-		return {
-			formats: Array( text.length ),
+		return defineFormatsAccessor( {
+			_formats: new Map(),
 			replacements: Array( text.length ),
 			text,
-		};
+		} );
 	}
 
 	if ( typeof html === 'string' && html.length > 0 ) {
@@ -498,9 +498,8 @@ function createFromElement( { element, range, isEditableTree } ) {
 			const text = removeReservedCharacters( node.nodeValue );
 			range = filterRange( node, range, removeReservedCharacters );
 			accumulateSelection( accumulator, node, range, { text } );
-			// Create a sparse array of the same length as `text`, in which
-			// formats can be added.
-			accumulator.formats.length += text.length;
+			// Extend `replacements` to match the new text length; ranges in
+			// `_formats` are explicit and need no per-character allocation.
 			accumulator.replacements.length += text.length;
 			accumulator.text += text;
 			continue;
@@ -513,7 +512,7 @@ function createFromElement( { element, range, isEditableTree } ) {
 				node.hasAttribute( 'data-rich-text-comment' ) )
 		) {
 			const value = {
-				formats: [ , ],
+				_formats: new Map(),
 				replacements: [
 					{
 						type: '#comment',
@@ -550,7 +549,7 @@ function createFromElement( { element, range, isEditableTree } ) {
 
 		if ( tagName === 'script' ) {
 			const value = {
-				formats: [ , ],
+				_formats: new Map(),
 				replacements: [
 					{
 						type: tagName,
@@ -585,7 +584,7 @@ function createFromElement( { element, range, isEditableTree } ) {
 			delete format.formatType;
 			accumulateSelection( accumulator, node, range, createEmptyValue() );
 			mergePair( accumulator, {
-				formats: [ , ],
+				_formats: new Map(),
 				replacements: [
 					{
 						...format,
@@ -620,37 +619,22 @@ function createFromElement( { element, range, isEditableTree } ) {
 		} else if ( value.text.length === 0 ) {
 			if ( format.attributes ) {
 				mergePair( accumulator, {
-					formats: [ , ],
+					_formats: new Map(),
 					replacements: [ format ],
 					text: OBJECT_REPLACEMENT_CHARACTER,
 				} );
 			}
 		} else {
-			// Indices should share a reference to the same formats array.
-			// Only create a new reference if `formats` changes.
-			function mergeFormats( formats ) {
-				if ( mergeFormats.formats === formats ) {
-					return mergeFormats.newFormats;
-				}
-
-				const newFormats = formats
-					? [ format, ...formats ]
-					: [ format ];
-
-				mergeFormats.formats = formats;
-				mergeFormats.newFormats = newFormats;
-
-				return newFormats;
-			}
-
-			// Since the formats parameter can be `undefined`, preset
-			// `mergeFormats` with a new reference.
-			mergeFormats.newFormats = [ format ];
-
-			mergePair( accumulator, {
-				...value,
-				formats: Array.from( value.formats, mergeFormats ),
-			} );
+			// Record this format's range first, then merge the child value's
+			// ranges (which `mergePair` will offset by the current text
+			// length). Map insertion order is preserved, so outer formats
+			// appear before inner ones in iteration order.
+			const start = accumulator.text.length;
+			accumulator._formats.set( format, [
+				start,
+				start + value.text.length,
+			] );
+			mergePair( accumulator, value );
 		}
 	}
 

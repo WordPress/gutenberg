@@ -5,15 +5,32 @@ import { renderToString } from '@wordpress/element';
 import { createBlock } from '@wordpress/blocks';
 
 export function addActiveFormats( value, activeFormats ) {
-	if ( activeFormats?.length ) {
-		let index = value.formats.length;
+	if ( ! activeFormats?.length ) {
+		return;
+	}
 
-		while ( index-- ) {
-			value.formats[ index ] = [
-				...activeFormats,
-				...( value.formats[ index ] || [] ),
-			];
+	// Migrate writes from the deprecated `formats` sparse array to the
+	// canonical `_formats` Map. Prepend each active format as a range
+	// covering the whole value so it appears outermost at every position.
+	if ( value._formats instanceof Map ) {
+		const length = value.text.length;
+		const merged = new Map();
+		for ( const format of activeFormats ) {
+			merged.set( format, [ 0, length ] );
 		}
+		for ( const [ format, range ] of value._formats ) {
+			merged.set( format, range );
+		}
+		value._formats = merged;
+		return;
+	}
+
+	let index = value.formats.length;
+	while ( index-- ) {
+		value.formats[ index ] = [
+			...activeFormats,
+			...( value.formats[ index ] || [] ),
+		];
 	}
 }
 

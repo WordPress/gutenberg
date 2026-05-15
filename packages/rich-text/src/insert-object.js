@@ -22,7 +22,7 @@ import { OBJECT_REPLACEMENT_CHARACTER } from './special-characters';
  */
 export function insertObject( value, formatToInsert, startIndex, endIndex ) {
 	const valueToInsert = {
-		formats: [ , ],
+		_formats: new Map(),
 		replacements: [ formatToInsert ],
 		text: OBJECT_REPLACEMENT_CHARACTER,
 	};

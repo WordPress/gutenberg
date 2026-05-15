@@ -269,8 +269,13 @@ export function richTextOffsetToHtmlIndex(
 	const markerValue = create( { text: marker } );
 	// The marker must inherit the formatting at the insertion point so that
 	// toHTMLString does not split surrounding tags (e.g. <strong>) around it.
-	if ( value.formats[ richTextOffset ] ) {
-		markerValue.formats[ 0 ] = value.formats[ richTextOffset ];
+	// Use an assignment rather than indexed mutation so the rich-text setter
+	// rebuilds the canonical `_formats` Map from the new array.
+	const formatsAtOffset = value.formats[ richTextOffset ];
+	if ( formatsAtOffset ) {
+		const next = markerValue.formats.slice();
+		next[ 0 ] = formatsAtOffset;
+		markerValue.formats = next;
 	}
 
 	const withMarker = insert(

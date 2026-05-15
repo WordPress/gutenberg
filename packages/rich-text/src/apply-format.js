@@ -3,6 +3,11 @@
  */
 
 import { normaliseFormats } from './normalise-formats';
+import {
+	defineFormatsAccessor,
+	mapFromFormats,
+	materializeFormats,
+} from './format-ranges';
 
 /** @typedef {import('./types').RichTextValue} RichTextValue */
 /** @typedef {import('./types').RichTextFormat} RichTextFormat */
@@ -31,8 +36,15 @@ export function applyFormat(
 	startIndex = value.start,
 	endIndex = value.end
 ) {
-	const { formats, activeFormats } = value;
-	const newFormats = formats.slice();
+	const { activeFormats } = value;
+	const sourceFormats = value._formats || mapFromFormats( value.formats );
+	// Materialise the sparse `formats` view from `_formats`. The depth-based
+	// nesting algorithm below operates on the materialised array, then we
+	// rebuild a fresh `_formats` Map at the end. This keeps `_formats` as the
+	// canonical storage while letting us reuse the well-tested per-position
+	// logic for inserting at the correct nesting depth.
+	const materialised = materializeFormats( sourceFormats, value.text.length );
+	const newFormats = materialised.slice();
 
 	// The selection is collapsed.
 	if ( startIndex === endIndex ) {
@@ -97,17 +109,20 @@ export function applyFormat(
 		}
 	}
 
-	return normaliseFormats( {
-		...value,
-		formats: newFormats,
-		// Always revise active formats. This serves as a placeholder for new
-		// inputs with the format so new input appears with the format applied,
-		// and ensures a format of the same type uses the latest values.
-		activeFormats: [
-			...( activeFormats?.filter(
-				( { type } ) => type !== format.type
-			) || [] ),
-			format,
-		],
-	} );
+	return normaliseFormats(
+		defineFormatsAccessor( {
+			...value,
+			_formats: mapFromFormats( newFormats ),
+			// Always revise active formats. This serves as a placeholder for
+			// new inputs with the format so new input appears with the format
+			// applied, and ensures a format of the same type uses the latest
+			// values.
+			activeFormats: [
+				...( activeFormats?.filter(
+					( { type } ) => type !== format.type
+				) || [] ),
+				format,
+			],
+		} )
+	);
 }

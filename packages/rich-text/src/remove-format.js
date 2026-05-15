@@ -2,7 +2,13 @@
  * Internal dependencies
  */
 
+import { isFormatEqual } from './is-format-equal';
 import { normaliseFormats } from './normalise-formats';
+import {
+	defineFormatsAccessor,
+	mapFromFormats,
+	materializeFormats,
+} from './format-ranges';
 
 /** @typedef {import('./types').RichTextValue} RichTextValue */
 
@@ -24,8 +30,10 @@ export function removeFormat(
 	startIndex = value.start,
 	endIndex = value.end
 ) {
-	const { formats, activeFormats } = value;
-	const newFormats = formats.slice();
+	const { activeFormats } = value;
+	const sourceFormats = value._formats || mapFromFormats( value.formats );
+	const materialised = materializeFormats( sourceFormats, value.text.length );
+	const newFormats = materialised.slice();
 
 	// If the selection is collapsed, expand start and end to the edges of the
 	// format.
@@ -35,9 +43,13 @@ export function removeFormat(
 		);
 
 		if ( format ) {
+			// Expand across all adjacent same-type formats. Use structural
+			// equality (not reference) because `_formats` may split a single
+			// logical range across multiple Map entries when nesting depth
+			// changes, materialising into different references at each depth.
 			while (
-				newFormats[ startIndex ]?.find(
-					( newFormat ) => newFormat === format
+				newFormats[ startIndex ]?.find( ( newFormat ) =>
+					isFormatEqual( newFormat, format )
 				)
 			) {
 				filterFormats( newFormats, startIndex, formatType );
@@ -47,8 +59,8 @@ export function removeFormat(
 			endIndex++;
 
 			while (
-				newFormats[ endIndex ]?.find(
-					( newFormat ) => newFormat === format
+				newFormats[ endIndex ]?.find( ( newFormat ) =>
+					isFormatEqual( newFormat, format )
 				)
 			) {
 				filterFormats( newFormats, endIndex, formatType );
@@ -63,12 +75,15 @@ export function removeFormat(
 		}
 	}
 
-	return normaliseFormats( {
-		...value,
-		formats: newFormats,
-		activeFormats:
-			activeFormats?.filter( ( { type } ) => type !== formatType ) || [],
-	} );
+	return normaliseFormats(
+		defineFormatsAccessor( {
+			...value,
+			_formats: mapFromFormats( newFormats ),
+			activeFormats:
+				activeFormats?.filter( ( { type } ) => type !== formatType ) ||
+				[],
+		} )
+	);
 }
 
 function filterFormats( formats, index, formatType ) {

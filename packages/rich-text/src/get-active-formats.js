@@ -5,6 +5,7 @@
  * Internal dependencies
  */
 import { isFormatEqual } from './is-format-equal';
+import { mapFromFormats, materializeFormats } from './format-ranges';
 
 /**
  * Gets the all format objects at the start of the selection.
@@ -16,17 +17,24 @@ import { isFormatEqual } from './is-format-equal';
  * @return {RichTextFormatList} Active format objects.
  */
 export function getActiveFormats( value, EMPTY_ACTIVE_FORMATS = [] ) {
-	const { formats, start, end, activeFormats } = value;
+	const { start, end, activeFormats } = value;
 	if ( start === undefined ) {
 		return EMPTY_ACTIVE_FORMATS;
 	}
 
-	if ( start === end ) {
+	if ( start === end && activeFormats ) {
 		// For a collapsed caret, it is possible to override the active formats.
-		if ( activeFormats ) {
-			return activeFormats;
-		}
+		return activeFormats;
+	}
 
+	// Materialise the sparse-array view to reuse the well-tested per-position
+	// "intersection by isFormatEqual" semantics — `_formats` ranges that
+	// split a same-type span across nesting boundaries would otherwise be
+	// missed by a Map-only scan.
+	const formatsMap = value._formats || mapFromFormats( value.formats );
+	const formats = materializeFormats( formatsMap, value.text.length );
+
+	if ( start === end ) {
 		const formatsBefore = formats[ start - 1 ] || EMPTY_ACTIVE_FORMATS;
 		const formatsAfter = formats[ start ] || EMPTY_ACTIVE_FORMATS;
 
@@ -40,14 +48,14 @@ export function getActiveFormats( value, EMPTY_ACTIVE_FORMATS = [] ) {
 		return formatsAfter;
 	}
 
-	// If there's no formats at the start index, there are not active formats.
+	// If there's no formats at the start index, there are no active formats.
 	if ( ! formats[ start ] ) {
 		return EMPTY_ACTIVE_FORMATS;
 	}
 
 	const selectedFormats = formats.slice( start, end );
 
-	// Clone the formats so we're not mutating the live value.
+	// Clone so we're not mutating the live value.
 	const _activeFormats = [ ...selectedFormats[ 0 ] ];
 	let i = selectedFormats.length;
 
