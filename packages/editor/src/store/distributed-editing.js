@@ -4211,6 +4211,10 @@ export function getDistributedEditingLocalUpdatesExportPayload( {
 		getDistributedEditingActionTranscriptSupportReportForSessionState(
 			normalizedSessionState
 		);
+	const rendererCapabilitySupportSummary =
+		getDistributedEditingRendererCapabilitySupportExportPayload(
+			normalizedSessionState
+		);
 
 	return {
 		version: 1,
@@ -4225,6 +4229,9 @@ export function getDistributedEditingLocalUpdatesExportPayload( {
 		saveAuthority,
 		actionTranscriptSummary,
 		actionTranscriptReport,
+		...( rendererCapabilitySupportSummary
+			? { rendererCapabilitySupportSummary }
+			: {} ),
 		...( ( acceptedReviewApprovalProofEnvelope || reviewTokenRecovery ) &&
 		proofServerVersion
 			? { serverVersion: proofServerVersion }
@@ -4235,6 +4242,30 @@ export function getDistributedEditingLocalUpdatesExportPayload( {
 			: {} ),
 		...( reviewTokenRecovery ? { reviewTokenRecovery } : {} ),
 		acceptedReviewApprovalProof: acceptedReviewApprovalProofEnvelope,
+	};
+}
+
+function getDistributedEditingRendererCapabilitySupportExportPayload(
+	sessionState = {}
+) {
+	const prePublishState =
+		getDistributedEditingFreshReviewPrePublishStateForSessionState(
+			sessionState
+		);
+	const summary = prePublishState.rendererCapabilitySupportSummary;
+
+	if (
+		! summary?.available ||
+		! summary.canShareWithSupport ||
+		! summary.supportExportReady
+	) {
+		return null;
+	}
+
+	return {
+		...summary,
+		exportPayloadSummary: true,
+		localUpdatesExportReady: true,
 	};
 }
 

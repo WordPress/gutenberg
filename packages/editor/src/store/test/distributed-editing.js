@@ -6930,6 +6930,149 @@ describe( 'distributed editing session state', () => {
 		);
 	} );
 
+	it( 'exports renderer capability support summaries with protected fresh-review local updates', () => {
+		const editedPostContent =
+			'<!-- wp:paragraph --><p>Local renderer support export update</p><!-- /wp:paragraph -->';
+		const rawContentToken =
+			'fresh-review-renderer-support-export-raw-token';
+		const requestedState =
+			getDistributedEditingSessionStateForFreshReviewDecisionItems(
+				{
+					pendingChangeCount: 2,
+					hasPendingChanges: true,
+					mustOfferLocalCopy: true,
+					canExportLocalUpdates: true,
+					localUpdatesImportStatus:
+						DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_STATUSES.BLOCKED,
+					localUpdatesImportReason:
+						DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.FRESH_REVIEW_REQUIRED,
+					localUpdatesImportReviewRequestStatus:
+						DISTRIBUTED_EDITING_LOCAL_UPDATES_REVIEW_REQUEST_STATUSES.REQUESTED,
+					localUpdatesImportFreshReviewRequestAccepted: true,
+					localUpdatesImportFreshReviewRequestRequested: true,
+				},
+				{
+					reviewItems: [
+						{
+							id: 'fresh-review-renderer-support-export-html',
+							blockClientId: 'client-html-export',
+							blockName: 'core/html',
+							blockLabel: 'HTML support export',
+							blockPath: [ 0 ],
+							changeKind: 'modified_block',
+							riskReason: 'kses_would_remove_script',
+							baseContentHash:
+								'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+							proposedContentHash:
+								'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb',
+							rawContent: `<script>${ rawContentToken }</script>`,
+							proofSignature:
+								'fresh-review-renderer-support-export-proof',
+							reviewerId: 'fresh-review-renderer-reviewer-id',
+						},
+						{
+							id: 'fresh-review-renderer-support-export-embed',
+							blockClientId: 'client-embed-export',
+							blockName: 'core/embed',
+							blockLabel: 'Embed support export',
+							blockPath: [ 1 ],
+							changeKind: 'added_block',
+							riskReason: 'kses_would_change_attribute',
+							baseContentHash:
+								'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc',
+							proposedContentHash:
+								'dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd',
+							rawContent: `<div>${ rawContentToken }</div>`,
+						},
+					],
+				}
+			);
+		const payload = getDistributedEditingLocalUpdatesExportPayload( {
+			currentPost: {
+				id: 47,
+				type: 'post',
+			},
+			editedPostContent,
+			sessionState: requestedState,
+		} );
+
+		expect( payload.rendererCapabilitySupportSummary ).toMatchObject( {
+			status: 'available',
+			available: true,
+			summaryKind:
+				'fresh_review_comparison_renderer_capability_support_summary',
+			resolutionCount: 2,
+			candidateMapCount: 2,
+			missingRequiredCapabilitiesCount: 2,
+			partialRequiredCapabilitiesCount: 0,
+			completeButDisabledCount: 0,
+			unknownCandidateRendererCapabilityCount: 0,
+			candidateRendererCapabilityKeyCount: 0,
+			aggregateOnly: true,
+			resolverOnly: true,
+			descriptorOnly: true,
+			statusOnly: true,
+			redacted: true,
+			hashValuesRedacted: true,
+			candidateMapsStored: false,
+			unknownCandidateKeyNamesIncluded: false,
+			rendererCodeIncluded: false,
+			rawContentIncluded: false,
+			exposesHashValues: false,
+			exposesRawContent: false,
+			exposesProofSignature: false,
+			exposesTokenMaterial: false,
+			exposesUserIdentity: false,
+			exposesReviewerIds: false,
+			exposesActorIds: false,
+			canShareWithSupport: true,
+			supportExportReady: true,
+			supportBundleSafe: true,
+			supportDiagnosticsOnly: true,
+			exportPayloadSummary: true,
+			localUpdatesExportReady: true,
+			registersRenderer: false,
+			hasRegisteredRenderer: false,
+			activatesRenderer: false,
+			renderable: false,
+			rendersPreview: false,
+			rendersDiff: false,
+			computesDiff: false,
+			opensComparison: false,
+			opensPanel: false,
+			callsRestEndpoint: false,
+			callsSave: false,
+			callsNormalSavePost: false,
+			callsRetrySaveEndpoint: false,
+			dispatchesNotice: false,
+			savesPost: false,
+			mutatesEditorContent: false,
+			mutatesPersistedPostContent: false,
+			selectsBlock: false,
+			selectsReviewItem: false,
+			marksSelected: false,
+			movesFocus: false,
+			createsRevision: false,
+			changesPostLock: false,
+			claimsSaved: false,
+		} );
+		expect(
+			payload.rendererCapabilitySupportSummary
+				.requiredRendererCapabilityKeys
+		).toEqual( [ 'boundary_safe_diff_renderer', 'human_review_controls' ] );
+		expect( payload.postContent ).toBe( editedPostContent );
+		expect( payload.distributedEditingSessionState ).toBeUndefined();
+		expect( payload.sessionState ).toBeUndefined();
+		expect(
+			JSON.stringify( payload.rendererCapabilitySupportSummary )
+		).not.toMatch(
+			/fresh-review-renderer-support-export-raw-token|fresh-review-renderer-support-export-proof|fresh-review-renderer-reviewer-id|client-html-export|client-embed-export/
+		);
+		expect( JSON.stringify( payload.saveAuthority ) ).not.toContain(
+			editedPostContent
+		);
+	} );
+
 	it( 'carries redacted action transcript reports into fresh-review import recovery state', () => {
 		const postContent =
 			'<!-- wp:html --><script>needs review</script><!-- /wp:html -->';
