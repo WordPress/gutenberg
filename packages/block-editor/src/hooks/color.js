@@ -31,7 +31,7 @@ import {
 	useHasColorPanel,
 	default as StylesColorPanel,
 } from '../components/global-styles/color-panel';
-import { extractColorSlug } from '../utils/color-values';
+import { extractColorSlug, extractPresetSlug } from '../utils/color-values';
 import BlockColorContrastChecker from './contrast-checker';
 import { store as blockEditorStore } from '../store';
 import {
@@ -201,9 +201,7 @@ function styleToAttributes( style ) {
 	const backgroundColorValue = style?.color?.background;
 	const backgroundColorSlug = extractColorSlug( backgroundColorValue );
 	const gradientValue = style?.color?.gradient;
-	const gradientSlug = gradientValue?.startsWith( 'var:preset|gradient|' )
-		? gradientValue.substring( 'var:preset|gradient|'.length )
-		: undefined;
+	const gradientSlug = extractPresetSlug( gradientValue, 'gradient' );
 	const updatedStyle = { ...style };
 	updatedStyle.color = {
 		...updatedStyle.color,
