@@ -7,10 +7,12 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { forwardRef, useCallback, useMemo } from '@wordpress/element';
-import { DashboardGrid } from '@wordpress/grid';
+import { DashboardGrid, DashboardLanes } from '@wordpress/grid';
 import type {
 	DashboardGridLayoutItem,
+	DashboardLanesLayoutItem,
 	DragPreviewRenderProps,
+	ResizeHandleRenderProps,
 } from '@wordpress/grid';
 
 /**
@@ -20,12 +22,26 @@ import { useDashboardInternalContext } from '../../context/dashboard-context';
 import { WidgetChrome } from '../widget-chrome';
 import { WidgetResizeHandle } from './widget-resize-handle';
 import styles from './widgets.module.css';
-import type { DashboardWidget, WidgetName } from '../../types';
+import type {
+	DashboardWidget,
+	GridTilePlacement,
+	MasonryTilePlacement,
+	WidgetName,
+} from '../../types';
 
 function toGridLayout( widgets: DashboardWidget[] ): DashboardGridLayoutItem[] {
 	return widgets.map( ( w ) => ( {
 		key: w.uuid,
-		...w.placement,
+		...( w.placement as GridTilePlacement | undefined ),
+	} ) );
+}
+
+function toMasonryLayout(
+	widgets: DashboardWidget[]
+): DashboardLanesLayoutItem[] {
+	return widgets.map( ( w ) => ( {
+		key: w.uuid,
+		...( w.placement as MasonryTilePlacement | undefined ),
 	} ) );
 }
 
@@ -49,24 +65,60 @@ function applyGridChange(
 	} );
 }
 
+function applyMasonryChange(
+	widgets: DashboardWidget[],
+	masonryLayout: DashboardLanesLayoutItem[]
+): DashboardWidget[] {
+	return masonryLayout.map( ( { key, ...placement } ) => {
+		const existing = widgets.find( ( w ) => w.uuid === key );
+		if ( ! existing ) {
+			return {
+				uuid: key,
+				type: '' as WidgetName,
+				placement,
+			};
+		}
+		return {
+			...existing,
+			placement,
+		};
+	} );
+}
+
 export interface WidgetsProps {
 	className?: string;
 }
 
 /**
  * Iterates `layout`, delegates each entry to `WidgetDashboard.WidgetChrome`, and
- * feeds the resulting tree into `@wordpress/grid`.
+ * feeds the resulting tree into the active `@wordpress/grid` surface (2D grid
+ * or masonry, picked from `gridSettings.model`).
  */
 export const Widgets = forwardRef< HTMLDivElement, WidgetsProps >(
 	function Widgets( { className }, ref ) {
 		const { layout, onLayoutChange, editMode, gridSettings } =
 			useDashboardInternalContext();
 
-		const gridLayout = useMemo( () => toGridLayout( layout ), [ layout ] );
+		const isMasonry = gridSettings.model === 'masonry';
 
-		const handleLayoutChange = useCallback(
+		const gridLayout = useMemo(
+			() =>
+				isMasonry ? toMasonryLayout( layout ) : toGridLayout( layout ),
+			[ layout, isMasonry ]
+		);
+
+		const handleGridChange = useCallback(
 			( newGridLayout: DashboardGridLayoutItem[] ) => {
 				onLayoutChange( applyGridChange( layout, newGridLayout ) );
+			},
+			[ layout, onLayoutChange ]
+		);
+
+		const handleMasonryChange = useCallback(
+			( newMasonryLayout: DashboardLanesLayoutItem[] ) => {
+				onLayoutChange(
+					applyMasonryChange( layout, newMasonryLayout )
+				);
 			},
 			[ layout, onLayoutChange ]
 		);
@@ -90,33 +142,65 @@ export const Widgets = forwardRef< HTMLDivElement, WidgetsProps >(
 			[]
 		);
 
-		const sharedProps = {
-			layout: gridLayout,
-			spacing: gridSettings.spacing,
-			rowHeight: gridSettings.rowHeight,
+		const sharedRenderProps = {
 			editMode,
-			onChangeLayout: handleLayoutChange,
 			renderDragPreview,
-			renderResizeHandle: WidgetResizeHandle,
+			renderResizeHandle:
+				WidgetResizeHandle as React.ComponentType< ResizeHandleRenderProps >,
 		};
 
-		return (
-			<div ref={ ref } className={ clsx( styles.grid, className ) }>
-				{ gridSettings.columns !== undefined ? (
-					<DashboardGrid
-						{ ...sharedProps }
+		let surface: React.ReactNode;
+		if ( isMasonry ) {
+			surface =
+				gridSettings.columns !== undefined ? (
+					<DashboardLanes
+						layout={ gridLayout as DashboardLanesLayoutItem[] }
 						columns={ gridSettings.columns }
+						flowTolerance={ gridSettings.flowTolerance }
+						onChangeLayout={ handleMasonryChange }
+						{ ...sharedRenderProps }
+					>
+						{ children }
+					</DashboardLanes>
+				) : (
+					<DashboardLanes
+						layout={ gridLayout as DashboardLanesLayoutItem[] }
+						minColumnWidth={ gridSettings.minColumnWidth }
+						flowTolerance={ gridSettings.flowTolerance }
+						onChangeLayout={ handleMasonryChange }
+						{ ...sharedRenderProps }
+					>
+						{ children }
+					</DashboardLanes>
+				);
+		} else {
+			surface =
+				gridSettings.columns !== undefined ? (
+					<DashboardGrid
+						layout={ gridLayout as DashboardGridLayoutItem[] }
+						columns={ gridSettings.columns }
+						rowHeight={ gridSettings.rowHeight }
+						onChangeLayout={ handleGridChange }
+						{ ...sharedRenderProps }
 					>
 						{ children }
 					</DashboardGrid>
 				) : (
 					<DashboardGrid
-						{ ...sharedProps }
+						layout={ gridLayout as DashboardGridLayoutItem[] }
 						minColumnWidth={ gridSettings.minColumnWidth }
+						rowHeight={ gridSettings.rowHeight }
+						onChangeLayout={ handleGridChange }
+						{ ...sharedRenderProps }
 					>
 						{ children }
 					</DashboardGrid>
-				) }
+				);
+		}
+
+		return (
+			<div ref={ ref } className={ clsx( styles.grid, className ) }>
+				{ surface }
 			</div>
 		);
 	}

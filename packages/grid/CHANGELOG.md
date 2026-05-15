@@ -33,6 +33,15 @@
     `--wp-grid-placeholder-outline-color`,
     `--wp-grid-placeholder-radius`).
 
+### Breaking changes
+
+-   Remove the `spacing` prop from `DashboardGrid` and `DashboardLanes`.
+    The gap between tiles is now owned by the design-system gap token
+    (`--wpds-dimension-gap-md`) applied in CSS; override via theme or
+    density rather than per instance. `GridOverlayRenderProps` no
+    longer exposes `spacing` or `gapPx`; the overlay inherits the same
+    gap token. The `DashboardGridSpacing` type export is removed.
+
 ### Internal
 
 -   Organize the package source under `dashboard-grid/`,

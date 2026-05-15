@@ -16,6 +16,7 @@
 -   `TabPanel`: Fix tab indicator animation while switching tabs ([#77812](https://github.com/WordPress/gutenberg/pull/77812)).
 -   `ColorPicker`: Fix issue where clearing the hex input entirely doesn't reset the selected color to black ([#77912](https://github.com/WordPress/gutenberg/pull/77912)).
 -   `ExternalLink`: Fix focus outline rendered in wp-admin ([#77935](https://github.com/WordPress/gutenberg/pull/77935)).
+-   `FormTokenField`: Correct `preventDefault` handling for `__experimentalValidateInput` and validate pasted delimiter-separated tokens ([#77181](https://github.com/WordPress/gutenberg/pull/77181)).
 -   `ColorPalette`: Fix duplicate-key warnings and incorrect selected swatch behavior when multiple palette entries share the same color value ([#78004](https://github.com/WordPress/gutenberg/pull/78004)).
 
 ### Internal
