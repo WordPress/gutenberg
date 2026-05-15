@@ -34,11 +34,9 @@ const meta: Meta< typeof Draggable > = {
 		controls: { expanded: true },
 		docs: {
 			source: { code: '' },
-			// Render each story in its own iframe on the autodocs page.
-			// The drag clone uses `position: fixed`, which would otherwise
-			// resolve against Storybook's docs-page wrappers (they create
-			// containing blocks via `transform`) instead of the viewport,
-			// pinning the clone in the wrong place.
+			// Render each story in its own iframe — Storybook's docs-page
+			// wrappers create transform-based containing blocks that break
+			// the drag clone's `position: fixed` resolution.
 			story: { inline: false, height: '250px' },
 		},
 		componentStatus: {
@@ -127,13 +125,6 @@ Default.args = {};
  * document's body instead of the element's parent, which is useful when an
  * ancestor's stacking context (e.g. its `z-index`) would otherwise place the
  * clone behind other content.
- *
- * Note: in WordPress environments and any host that opts into the
- * `@wordpress/ui` compat overlay slot, the clone always lives in the slot
- * (which is itself body-level), so this prop is a no-op in the same-document
- * case. It still applies for cross-document drags (e.g. drag inside an iframe
- * while the slot is in the parent), where the clone falls back to the
- * legacy placement.
  */
 export const AppendElementToOwnerDocument: StoryFn< typeof Draggable > =
 	DefaultTemplate.bind( {} );

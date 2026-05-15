@@ -486,10 +486,8 @@ test.describe( 'Draggable block', () => {
 		await expect( chip ).toBeVisible();
 
 		// The chip should live inside the body-level
-		// `[data-wp-compat-overlay-slot]` from `@wordpress/ui`. The slot
-		// creates an isolated stacking context with a high `z-index`, which
-		// is what keeps the chip above any `@wordpress/components`
-		// overlays (popovers, tooltips, ...) opened mid-drag.
+		// `[data-wp-compat-overlay-slot]` — that's what keeps it above
+		// any `@wordpress/components` overlays opened mid-drag.
 		await expect( chip ).toHaveCount( 1 );
 		const chipIsInsideCompatSlot = await chip.evaluate(
 			( el ) => el.closest( '[data-wp-compat-overlay-slot]' ) !== null

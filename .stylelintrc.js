@@ -1,6 +1,4 @@
-// CSS stepped value math functions from Baseline 2024 that Stylelint
-// (and its SCSS-aware `function-no-unknown` variant) doesn't yet
-// recognize. Can likely be dropped on a future Stylelint upgrade.
+// CSS Baseline 2024 stepped-value functions not yet recognized by Stylelint.
 const CSS_BASELINE_2024_FUNCTIONS = [ 'round', 'rem', 'mod' ];
 
 /** @type {import('stylelint').Config} */

@@ -106,11 +106,9 @@ export function Draggable( {
 	 */
 	function start( event: DragEvent ) {
 		const { ownerDocument } = event.target as HTMLElement;
-		// When enabled, the compat overlay slot takes precedence over
-		// the legacy placement modes — but only when it lives in the
-		// same document as the dragged element, so the clone's
-		// viewport-relative geometry resolves in a single coordinate
-		// space.
+		// Only use the slot when it lives in the same document as the
+		// dragged element, so the clone's viewport-relative coordinates
+		// resolve in one coordinate space.
 		const slot = getWpCompatOverlaySlot();
 		const compatSlot = slot?.ownerDocument === ownerDocument ? slot : null;
 
