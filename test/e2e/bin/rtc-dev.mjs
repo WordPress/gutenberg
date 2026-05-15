@@ -235,7 +235,7 @@ async function runWebSocketsMode() {
 
 	process.stdout.write(
 		'\nRTC ready on WebSockets. Open two windows at http://localhost:8888/wp-admin and edit the same post.\n' +
-			'Press Ctrl+C to stop the WebSocket server. The plugin stays active until you run `npm run config:rtc:http`.\n\n'
+			'Press Ctrl+C to stop the WebSocket server. The plugin stays active until you run `npm run rtc:http`.\n\n'
 	);
 
 	const [ code ] = await once( server, 'exit' );
