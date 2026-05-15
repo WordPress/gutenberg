@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import clsx from 'clsx';
-
-/**
  * WordPress dependencies
  */
 import { __experimentalNumberControl as NumberControl } from '@wordpress/components';
@@ -25,7 +20,7 @@ import type {
 	WidgetGridModel,
 	WidgetGridSettings,
 } from '../../types';
-import styles from './layout-settings.module.css';
+import { LayoutModelEdit } from './layout-model-edit';
 
 const DEFAULT_FIXED_COLUMNS = 6;
 const DEFAULT_MIN_COLUMN_WIDTH = 350;
@@ -51,93 +46,6 @@ function getRowHeight(
 
 function isAutoRowHeight( item: WidgetGridSettings ): boolean {
 	return getRowHeight( item ) === ROW_HEIGHT_AUTO;
-}
-
-function GridThumbnail() {
-	return (
-		<svg
-			className={ styles.modelThumbnail }
-			viewBox="0 0 40 24"
-			fill="currentColor"
-			aria-hidden="true"
-		>
-			<rect x="2" y="1.25" width="11" height="10" rx="1.5" />
-			<rect x="14.5" y="1.25" width="11" height="10" rx="1.5" />
-			<rect x="27" y="1.25" width="11" height="10" rx="1.5" />
-			<rect x="2" y="12.75" width="11" height="10" rx="1.5" />
-			<rect x="14.5" y="12.75" width="11" height="10" rx="1.5" />
-			<rect x="27" y="12.75" width="11" height="10" rx="1.5" />
-		</svg>
-	);
-}
-
-function MasonryThumbnail() {
-	return (
-		<svg
-			className={ styles.modelThumbnail }
-			viewBox="0 0 40 24"
-			fill="currentColor"
-			aria-hidden="true"
-		>
-			<rect x="2" y="0.75" width="11" height="13" rx="1.5" />
-			<rect x="2" y="15.25" width="11" height="8" rx="1.5" />
-			<rect x="14.5" y="0.75" width="11" height="8" rx="1.5" />
-			<rect x="14.5" y="10.25" width="11" height="13" rx="1.5" />
-			<rect x="27" y="0.75" width="11" height="10" rx="1.5" />
-			<rect x="27" y="12.25" width="11" height="11" rx="1.5" />
-		</svg>
-	);
-}
-
-function ModelThumbnail( { model }: { model: string } ) {
-	return model === 'masonry' ? <MasonryThumbnail /> : <GridThumbnail />;
-}
-
-function LayoutModelEdit( {
-	data,
-	field,
-	onChange,
-}: DataFormControlProps< WidgetGridSettings > ) {
-	const currentValue = field.getValue( { item: data } );
-	const elements = field.elements ?? [];
-
-	return (
-		<fieldset className={ styles.modelFieldset }>
-			<legend className={ styles.modelLegend }>{ field.label }</legend>
-			<div className={ styles.modelOptions } role="radiogroup">
-				{ elements.map( ( option ) => {
-					const isSelected = currentValue === option.value;
-					return (
-						<button
-							key={ String( option.value ) }
-							type="button"
-							role="radio"
-							aria-checked={ isSelected }
-							className={ clsx( styles.modelOption, {
-								[ styles.modelOptionSelected ]: isSelected,
-							} ) }
-							onClick={ () =>
-								onChange(
-									field.setValue( {
-										item: data,
-										value: option.value,
-									} )
-								)
-							}
-						>
-							<ModelThumbnail model={ String( option.value ) } />
-							<span className={ styles.modelLabel }>
-								{ option.label }
-							</span>
-						</button>
-					);
-				} ) }
-			</div>
-			{ field.description && (
-				<p className={ styles.modelHelp }>{ field.description }</p>
-			) }
-		</fieldset>
-	);
 }
 
 function StepperIntegerEdit( {
@@ -253,6 +161,7 @@ const fields: Field< WidgetGridSettings >[] = [
 		type: 'integer',
 		Edit: StepperIntegerEdit,
 		label: __( 'Row height (px)' ),
+		description: __( 'Height of each row in the standard grid.' ),
 		isValid: { min: 100 },
 		getValue: ( { item } ) => {
 			const rh = getRowHeight( item );

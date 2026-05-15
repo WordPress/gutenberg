@@ -1,0 +1,43 @@
+.option {
+	appearance: none;
+	background: transparent;
+	color: inherit;
+	font: inherit;
+	cursor: var(--wpds-cursor-control);
+	display: flex;
+	flex: 1;
+	flex-direction: column;
+	align-items: stretch;
+	gap: var(--wpds-dimension-gap-sm);
+	padding: var(--wpds-dimension-padding-md);
+	border: 1px solid var(--wpds-color-stroke-surface-neutral);
+	border-radius: var(--wpds-border-radius-md);
+	text-align: center;
+	transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.option:hover {
+	border-color: var(--wpds-color-stroke-surface-neutral-strong);
+}
+
+.option:focus-visible {
+	outline: var(--wpds-border-width-focus) solid var(--wpds-color-stroke-focus-brand);
+	outline-offset: 2px;
+}
+
+.optionSelected,
+.optionSelected:hover {
+	border-color: var(--wpds-color-stroke-interactive-brand);
+	background-color: color-mix(in srgb, var(--wpds-color-bg-surface-brand) 6%, transparent);
+}
+
+.thumbnail {
+	display: block;
+	inline-size: 100%;
+	block-size: auto;
+	color: var(--wpds-color-fg-content-neutral-weak);
+}
+
+.optionSelected .thumbnail {
+	color: var(--wpds-color-fg-interactive-brand);
+}
