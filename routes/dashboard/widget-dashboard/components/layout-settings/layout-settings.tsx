@@ -139,7 +139,7 @@ const fields: Field< WidgetGridSettings >[] = [
 		description: __(
 			'Minimum width of each column. The number of columns adapts to the container width.'
 		),
-		isValid: { min: 200 },
+		isValid: { min: 48, max: 1024 },
 		isVisible: ( item ) => ! isFixedColumns( item ),
 	},
 	{
