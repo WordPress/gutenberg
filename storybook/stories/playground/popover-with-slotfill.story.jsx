@@ -10,22 +10,6 @@ import { SlotFillProvider, Slot } from '@wordpress/components';
 import * as Popover from '../../../packages/ui/src/popover';
 import { GenericIframe } from '../../../packages/ui/src/popover/stories/utils';
 
-/**
- * Cross-iframe `@wordpress/ui` `Popover` whose popup renders in the parent
- * document via `SlotFillProvider` + `Slot` from `@wordpress/components`.
- * Mirrors the legacy Popover's `WithSlotOutsideIframe` pattern: the `Slot`
- * exposes a parent-document element, and its forwarded ref is passed to
- * `Popover.Portal`'s `container` prop (via `Popover.Popup`'s `portal` prop).
- *
- * Lives in the cross-library playground rather than `@wordpress/ui`'s own
- * Popover stories so the `@wordpress/ui` package doesn't depend on
- * `@wordpress/components` — keeping the package graph one-directional
- * (`components` → `ui`, never the reverse) and avoiding a TypeScript
- * project-reference cycle.
- *
- * Authored as `.jsx` to match the convention in
- * `storybook/stories/playground/`.
- */
 export default {
 	title: 'Playground/Popover with SlotFill',
 	component: Popover.Root,

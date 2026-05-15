@@ -11,22 +11,6 @@ import { getWpCompatOverlaySlot } from '@wordpress/ui';
 import { WithWpCompatOverlaySlot } from './with-wp-compat-overlay-slot';
 import draggableStyles from '../../../packages/components/src/draggable/style.scss?inline';
 
-/**
- * Cross-document `Draggable` regression coverage: when the
- * `@wordpress/ui` compat overlay slot is enabled but lives in a different
- * document than the dragged element (slot in the parent document, drag
- * happens inside an iframe), `Draggable` falls back to its legacy
- * placement instead of routing the clone into the slot. This keeps the
- * clone's viewport-relative geometry in a single coordinate space.
- *
- * Lives in `storybook/stories/playground/` rather than next to the other
- * `Draggable` stories because the slot opt-in is a window-level flag
- * that's process-wide across the Storybook preview iframe. Co-locating
- * this story with `Default` / `AppendElementToOwnerDocument` would leak
- * the opt-in into those sibling stories on the shared autodocs page,
- * silently changing their placement behavior. Living in its own file
- * here keeps the leak blast-radius to this single story page.
- */
 export default {
 	title: 'Playground/Draggable cross-document fallback',
 	component: Draggable,
