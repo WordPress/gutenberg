@@ -2454,6 +2454,31 @@ describe( 'DistributedEditingStatus', () => {
 				'data-distributed-editing-presence-heartbeat-command-status',
 				'sent'
 			);
+
+			await act( async () => {
+				jest.advanceTimersByTime( 1000 );
+				await Promise.resolve();
+				await Promise.resolve();
+			} );
+
+			expect(
+				actions.__experimentalRefreshDistributedEditingPresenceSnapshot
+			).toHaveBeenCalledTimes( 1 );
+			expect( presence ).toHaveAttribute(
+				'data-distributed-editing-presence-refresh-command-status',
+				'refreshed'
+			);
+			expect(
+				actions.__experimentalSaveDistributedEditingRetryAfterProof
+			).not.toHaveBeenCalled();
+			expect( presence ).toHaveAttribute(
+				'data-distributed-editing-presence-startup-heartbeat-runtime-status',
+				'sent'
+			);
+			expect( presence ).toHaveAttribute(
+				'data-distributed-editing-presence-heartbeat-command-status',
+				'sent'
+			);
 			expect(
 				screen.queryByText(
 					/session_key|rawSessionKey|userId|cursor|selection/i
@@ -3979,6 +4004,20 @@ describe( 'DistributedEditingStatus', () => {
 				'data-distributed-editing-presence-startup-heartbeat-runtime-status',
 				'sent'
 			);
+
+			await act( async () => {
+				jest.advanceTimersByTime( 1000 );
+				await Promise.resolve();
+				await Promise.resolve();
+			} );
+
+			expect(
+				actions.__experimentalRefreshDistributedEditingPresenceSnapshot
+			).toHaveBeenCalledTimes( 1 );
+			expect( presence ).toHaveAttribute(
+				'data-distributed-editing-presence-refresh-command-status',
+				'refreshed'
+			);
 			expect( presence ).toHaveAttribute(
 				'data-distributed-editing-presence-startup-heartbeat-runtime-timer-active',
 				'false'
@@ -3995,6 +4034,111 @@ describe( 'DistributedEditingStatus', () => {
 					/session_key|rawSessionKey|userId|cursor|selection/i
 				)
 			).not.toBeInTheDocument();
+		} finally {
+			unmount();
+			jest.clearAllTimers();
+			jest.useRealTimers();
+		}
+	} );
+
+	it( 'uses editor settings to start presence automatically without manual buttons', async () => {
+		jest.useFakeTimers();
+
+		const actions = setupDistributedEditingStatusDispatch();
+		setupDistributedEditingStatusSelect( {
+			editorSettings: {
+				distributedEditing: {
+					enabled: true,
+					presenceStorageReadiness: {
+						status: 'ready',
+						tableExists: true,
+						schemaCurrent: true,
+						expectedStartupHeartbeatStatus: 'sent',
+						setupRequired: false,
+						diagnosticOnly: true,
+						contentFree: true,
+						callsSave: false,
+						changesPostLock: false,
+						claimsAbsence: false,
+						claimsSaved: false,
+						correctnessIndependentOfTransport: true,
+						transportRequiredForCorrectness: false,
+					},
+					presenceStartupPolicy: {
+						allowAutomaticInitialHeartbeat: true,
+						allowSlowAutomaticInitialHeartbeat: true,
+						hostProfile: 'cheap_shared_host',
+						selectedInitialHeartbeatDelaySeconds: 3,
+						cheapHostInitialHeartbeatDelaySeconds: 3,
+						minimumInitialHeartbeatDelaySeconds: 3,
+					},
+					presenceRepeatedRefreshRuntime: {
+						explicitOptIn: true,
+						hostProfile: 'cheap_shared_host',
+						standardPollingIntervalSeconds: 30,
+						cheapHostPollingIntervalSeconds: 120,
+						heartbeatIntervalSeconds: 120,
+					},
+				},
+			},
+			sessionState: {
+				presenceRosterStatus: 'empty',
+			},
+		} );
+
+		const { unmount } = render( <DistributedEditingStatusChrome /> );
+
+		try {
+			const presence = screen.getByRole( 'group', {
+				name: 'Distributed editing presence',
+			} );
+
+			await act( async () => {
+				await Promise.resolve();
+			} );
+
+			expect( presence ).toHaveAttribute(
+				'data-distributed-editing-presence-startup-heartbeat-runtime-status',
+				'scheduled'
+			);
+			expect( presence ).toHaveAttribute(
+				'data-distributed-editing-presence-repeated-refresh-scheduler-status',
+				'scheduled'
+			);
+			expect( presence ).toHaveAttribute(
+				'data-distributed-editing-presence-repeated-refresh-scheduler-delay-ms',
+				'120000'
+			);
+
+			await act( async () => {
+				jest.advanceTimersByTime( 3000 );
+				await Promise.resolve();
+				await Promise.resolve();
+			} );
+
+			expect(
+				actions.__experimentalSendDistributedEditingPresenceHeartbeat
+			).toHaveBeenCalledTimes( 1 );
+			expect(
+				actions.__experimentalRefreshDistributedEditingPresenceSnapshot
+			).not.toHaveBeenCalled();
+
+			await act( async () => {
+				jest.advanceTimersByTime( 1000 );
+				await Promise.resolve();
+				await Promise.resolve();
+			} );
+
+			expect(
+				actions.__experimentalRefreshDistributedEditingPresenceSnapshot
+			).toHaveBeenCalledTimes( 1 );
+			expect( presence ).toHaveAttribute(
+				'data-distributed-editing-presence-refresh-command-status',
+				'refreshed'
+			);
+			expect(
+				actions.__experimentalSaveDistributedEditingRetryAfterProof
+			).not.toHaveBeenCalled();
 		} finally {
 			unmount();
 			jest.clearAllTimers();

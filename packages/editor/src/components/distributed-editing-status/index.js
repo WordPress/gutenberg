@@ -58,6 +58,7 @@ const DISTRIBUTED_EDITING_OPAQUE_REVIEW_APPROVAL_PROOF_TOKEN_REJECTION_DETAILS =
 	} );
 
 const distributedEditingStartupHeartbeatRuntimeKeys = new Set();
+const DISTRIBUTED_EDITING_STARTUP_SNAPSHOT_DELAY_MS = 1000;
 
 const DISTRIBUTED_EDITING_STATUS_CONTROL_STATE_DEFINITIONS = Object.freeze( {
 	idle: Object.freeze( {} ),
@@ -2412,9 +2413,16 @@ export function DistributedEditingEnabledShell( {
 					initialPresenceRoster={
 						editorSettings.distributedEditing?.initialPresenceRoster
 					}
+					presenceRepeatedRefreshRuntime={
+						editorSettings.distributedEditing
+							?.presenceRepeatedRefreshRuntime
+					}
 					presenceStorageReadiness={
 						editorSettings.distributedEditing
 							?.presenceStorageReadiness
+					}
+					presenceStartupPolicy={
+						editorSettings.distributedEditing?.presenceStartupPolicy
 					}
 					sessionState={ sessionState }
 				/>
@@ -2425,7 +2433,9 @@ export function DistributedEditingEnabledShell( {
 
 function DistributedEditingPresenceRoster( {
 	initialPresenceRoster,
+	presenceRepeatedRefreshRuntime,
 	presenceStorageReadiness,
+	presenceStartupPolicy,
 	sessionState = {},
 } ) {
 	const distributedEditingDispatch = useDispatch( editorStore ) || {};
@@ -2462,6 +2472,8 @@ function DistributedEditingPresenceRoster( {
 	const repeatedRefreshSchedulerTokenRef = useRef( null );
 	const startupHeartbeatRuntimeKeyRef = useRef( null );
 	const startupHeartbeatRuntimeSentRef = useRef( false );
+	const startupSnapshotRuntimeKeyRef = useRef( null );
+	const startupSnapshotRuntimeSentRef = useRef( false );
 	const handleOpenPresenceStorageSetup = useCallback( () => {
 		setPresenceStorageSetupNavigationStatus( 'settings_opened' );
 	}, [] );
@@ -2546,18 +2558,35 @@ function DistributedEditingPresenceRoster( {
 			}
 		}
 	}, [ __experimentalRefreshDistributedEditingPresenceStorageReadiness ] );
+	const effectiveSessionState = {
+		...( presenceRepeatedRefreshRuntime &&
+		! sessionState.distributedEditingPresenceRepeatedRefreshRuntime
+			? {
+					distributedEditingPresenceRepeatedRefreshRuntime:
+						presenceRepeatedRefreshRuntime,
+			  }
+			: {} ),
+		...( presenceStartupPolicy &&
+		! sessionState.distributedEditingPresenceStartupPolicy
+			? {
+					distributedEditingPresenceStartupPolicy:
+						presenceStartupPolicy,
+			  }
+			: {} ),
+		...sessionState,
+	};
 	const sessionPresenceStatus =
-		sessionState.presenceRosterStatus ||
+		effectiveSessionState.presenceRosterStatus ||
 		DISTRIBUTED_EDITING_PRESENCE_ROSTER_STATUSES.HIDDEN;
 	const presenceHeartbeatStatus =
-		sessionState.presenceHeartbeatStatus ||
+		effectiveSessionState.presenceHeartbeatStatus ||
 		DISTRIBUTED_EDITING_PRESENCE_HEARTBEAT_STATUSES.NONE;
 	const hasSessionPresence =
-		sessionState.presenceRosterEntries?.length > 0 ||
+		effectiveSessionState.presenceRosterEntries?.length > 0 ||
 		sessionPresenceStatus !==
 			DISTRIBUTED_EDITING_PRESENCE_ROSTER_STATUSES.HIDDEN;
 	const rosterInput = hasSessionPresence
-		? sessionState
+		? effectiveSessionState
 		: {
 				distributedEditingPresenceRoster: initialPresenceRoster,
 				presenceRosterStatus:
@@ -2567,15 +2596,15 @@ function DistributedEditingPresenceRoster( {
 		getDistributedEditingPresenceRosterStateForSessionState( rosterInput );
 	const repeatedRefreshState =
 		getDistributedEditingPresenceRepeatedRefreshRuntimeStateForSessionState(
-			sessionState
+			effectiveSessionState
 		);
 	const startupPolicyState =
 		getDistributedEditingPresenceStartupPolicyStateForSessionState(
-			sessionState
+			effectiveSessionState
 		);
 	const activePresenceStorageReadiness =
 		presenceStorageReadinessRecheckResult ||
-		sessionState.presenceStorageReadinessRecheckResult ||
+		effectiveSessionState.presenceStorageReadinessRecheckResult ||
 		presenceStorageReadiness;
 	const presenceStorageReadinessState = getPresenceStorageReadinessState(
 		activePresenceStorageReadiness
@@ -2618,6 +2647,10 @@ function DistributedEditingPresenceRoster( {
 			'function';
 	const shouldRunStartupHeartbeatRuntime =
 		startupHeartbeatPolicyAllowsRuntime && storageReadyForStartupHeartbeat;
+	const shouldRunStartupSnapshotRuntime =
+		shouldRunStartupHeartbeatRuntime &&
+		typeof __experimentalRefreshDistributedEditingPresenceSnapshot ===
+			'function';
 	const startupHeartbeatRuntimeState =
 		getPresenceStartupHeartbeatRuntimeState( {
 			delayMs: startupHeartbeatDelayMs,
@@ -2679,6 +2712,8 @@ function DistributedEditingPresenceRoster( {
 		) {
 			startupHeartbeatRuntimeKeyRef.current = null;
 			startupHeartbeatRuntimeSentRef.current = false;
+			startupSnapshotRuntimeKeyRef.current = null;
+			startupSnapshotRuntimeSentRef.current = false;
 			setStartupHeartbeatRuntimeStatus( 'paused' );
 			return;
 		}
@@ -2686,6 +2721,8 @@ function DistributedEditingPresenceRoster( {
 		if ( ! shouldRunStartupHeartbeatRuntime ) {
 			startupHeartbeatRuntimeKeyRef.current = null;
 			startupHeartbeatRuntimeSentRef.current = false;
+			startupSnapshotRuntimeKeyRef.current = null;
+			startupSnapshotRuntimeSentRef.current = false;
 			setStartupHeartbeatRuntimeStatus( 'idle' );
 			return;
 		}
@@ -2756,6 +2793,71 @@ function DistributedEditingPresenceRoster( {
 		__experimentalSendDistributedEditingPresenceHeartbeat,
 		shouldRunStartupHeartbeatRuntime,
 		startupHeartbeatDelayMs,
+		startupPolicyState.hostProfile,
+		startupPolicyState.serverContact,
+		startupPolicyState.status,
+	] );
+
+	useEffect( () => {
+		if (
+			! shouldRunStartupSnapshotRuntime ||
+			startupHeartbeatRuntimeStatus !== 'sent'
+		) {
+			if ( ! shouldRunStartupSnapshotRuntime ) {
+				startupSnapshotRuntimeKeyRef.current = null;
+				startupSnapshotRuntimeSentRef.current = false;
+			}
+			return;
+		}
+
+		const runtimeKey = [
+			startupPolicyState.status,
+			startupPolicyState.hostProfile,
+			startupPolicyState.serverContact,
+			startupHeartbeatDelayMs,
+			'startup-snapshot',
+		].join( ':' );
+
+		if ( startupSnapshotRuntimeKeyRef.current !== runtimeKey ) {
+			startupSnapshotRuntimeKeyRef.current = runtimeKey;
+			startupSnapshotRuntimeSentRef.current = false;
+		}
+
+		if ( startupSnapshotRuntimeSentRef.current ) {
+			return;
+		}
+
+		let isCancelled = false;
+		startupSnapshotRuntimeSentRef.current = true;
+		const timeoutId = globalThis.setTimeout( () => {
+			if ( isCancelled ) {
+				return;
+			}
+
+			setCommandStatus( 'refreshing' );
+
+			__experimentalRefreshDistributedEditingPresenceSnapshot()
+				.then( () => {
+					if ( ! isCancelled ) {
+						setCommandStatus( 'refreshed' );
+					}
+				} )
+				.catch( () => {
+					if ( ! isCancelled ) {
+						setCommandStatus( 'failed' );
+					}
+				} );
+		}, DISTRIBUTED_EDITING_STARTUP_SNAPSHOT_DELAY_MS );
+
+		return () => {
+			isCancelled = true;
+			globalThis.clearTimeout( timeoutId );
+		};
+	}, [
+		__experimentalRefreshDistributedEditingPresenceSnapshot,
+		shouldRunStartupSnapshotRuntime,
+		startupHeartbeatDelayMs,
+		startupHeartbeatRuntimeStatus,
 		startupPolicyState.hostProfile,
 		startupPolicyState.serverContact,
 		startupPolicyState.status,

@@ -60,9 +60,12 @@ import {
 	getDistributedEditingAcceptedFreshReviewConsumeValidationForRetrySaveRequest,
 	getDistributedEditingAcceptedReviewApprovalProofForRetrySaveRequest,
 	getDistributedEditingLocalUpdatesImportResult,
+	getDistributedEditingComparablePostContent,
+	getDistributedEditingPostContentFromResponse,
 	getDistributedEditingPostContentSha256Hash,
 	getDistributedEditingReviewedBlockItemsForFreshReviewDecision,
 	getDistributedEditingReviewedBlockItemsForRetrySaveReviewApprovalProof,
+	getDistributedEditingServerVersionFromResponse,
 	getDistributedEditingSessionStateForRetrySubmitHandoff,
 	getDistributedEditingSessionStateForRetrySubmitProofResult,
 	getDistributedEditingSessionStateForRetrySubmitSavePreparation,
@@ -3013,6 +3016,210 @@ export const __experimentalMaybeSavePostWithDistributedEditingRetryPolicy =
 	};
 
 /**
+ * Blocks DE-RTC normal-save fallback when the authoritative post changed after
+ * this editor loaded its base content.
+ *
+ * This is a guard in front of ordinary WordPress persistence. It may read the
+ * latest server post representation, but it must not save, retry-save, mutate
+ * persisted post content, create revisions, or change post locks.
+ *
+ * @param {Object} [options] Save options.
+ *
+ * @return {Function} Action thunk.
+ */
+export const __experimentalGuardDistributedEditingNormalSaveFreshness =
+	( options = {} ) =>
+	async ( { select, dispatch, registry } ) => {
+		if (
+			options.isAutosave ||
+			options.isPreview ||
+			options.__experimentalSkipDistributedEditingSaveFreshnessGuard ||
+			! select.shouldUseDistributedEditingRetrySaveForSavePost?.(
+				options
+			)
+		) {
+			return getDistributedEditingNormalSaveFreshnessGuardAllowedResult( {
+				callsServerStateRefetchEndpoint: false,
+				reason: null,
+			} );
+		}
+
+		const currentPost = select.getCurrentPost?.() || {};
+		const postType = options.postType || currentPost.type;
+		const postId = options.postId ?? currentPost.id;
+		const postTypeRecord = postType
+			? registry.select( coreStore ).getPostType( postType )
+			: null;
+		const restBase =
+			options.restBase ||
+			postTypeRecord?.rest_base ||
+			DISTRIBUTED_EDITING_RECOVERY_REST_BASE;
+		const currentSessionState =
+			select.getDistributedEditingSessionState?.() || {};
+		const clientBaseContent = getDistributedEditingComparablePostContent(
+			getDistributedEditingPostRawContent( currentPost )
+		);
+
+		if (
+			! select.isEditedPostDirty?.() ||
+			typeof clientBaseContent !== 'string'
+		) {
+			return getDistributedEditingNormalSaveFreshnessGuardAllowedResult( {
+				callsServerStateRefetchEndpoint: false,
+				reason: null,
+			} );
+		}
+
+		try {
+			const response = await requestDistributedEditingServerStateRefetch(
+				{
+					postId,
+					restBase,
+				}
+			);
+			const serverContent =
+				getDistributedEditingPostContentFromResponse( response );
+
+			if (
+				typeof serverContent !== 'string' ||
+				serverContent === clientBaseContent
+			) {
+				return getDistributedEditingNormalSaveFreshnessGuardAllowedResult(
+					{
+						callsServerStateRefetchEndpoint: true,
+						reason: null,
+					}
+				);
+			}
+
+			const blockedSessionState =
+				getDistributedEditingSessionStateForStaleBaseRejectionResult( {
+					clientBaseVersion:
+						currentSessionState.clientBaseVersion ||
+						currentSessionState.serverVersion,
+					serverVersion:
+						getDistributedEditingServerVersionFromResponse(
+							response
+						) || currentSessionState.serverVersion,
+					clientBaseContent,
+					pendingChangeCount:
+						currentSessionState.pendingChangeCount || 1,
+					remoteChangeCount:
+						currentSessionState.remoteChangeCount || 1,
+					canAttemptLocalRebase: false,
+				} );
+
+			dispatch.setDistributedEditingSessionState(
+				getDistributedEditingSessionStateWithActionTranscriptEvent(
+					blockedSessionState,
+					{
+						eventType:
+							DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.REMOTE_CHANGE_RECEIVED,
+						reasonCode:
+							DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+					}
+				)
+			);
+
+			return {
+				status: 'distributed_editing_normal_save_blocked_stale_server',
+				reason: DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+				allowsNormalSaveFallback: false,
+				blocksNormalSavePost: true,
+				callsServerStateRefetchEndpoint: true,
+				callsNormalSavePost: false,
+				callsRetrySaveEndpoint: false,
+				dispatchesNotice: false,
+				mutatesEditorContent: false,
+				mutatesPersistedPostContent: false,
+				changesPostLock: false,
+				claimsSaved: false,
+				canExportLocalUpdates: true,
+				requiresServerStateRefetch: true,
+			};
+		} catch ( error ) {
+			const blockedSessionState =
+				getDistributedEditingSessionStateForStaleBaseRejectionResult( {
+					clientBaseVersion:
+						currentSessionState.clientBaseVersion ||
+						currentSessionState.serverVersion,
+					serverVersion: currentSessionState.serverVersion,
+					clientBaseContent,
+					pendingChangeCount:
+						currentSessionState.pendingChangeCount || 1,
+					remoteChangeCount:
+						currentSessionState.remoteChangeCount || 1,
+					canAttemptLocalRebase: false,
+				} );
+
+			dispatch.setDistributedEditingSessionState(
+				getDistributedEditingSessionStateWithActionTranscriptEvent(
+					blockedSessionState,
+					{
+						eventType:
+							DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.REMOTE_CHANGE_RECEIVED,
+						reasonCode:
+							error?.code ||
+							DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+					}
+				)
+			);
+
+			return {
+				status: 'distributed_editing_normal_save_blocked_freshness_unknown',
+				reason:
+					error?.code ||
+					DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+				error,
+				allowsNormalSaveFallback: false,
+				blocksNormalSavePost: true,
+				callsServerStateRefetchEndpoint: true,
+				callsNormalSavePost: false,
+				callsRetrySaveEndpoint: false,
+				dispatchesNotice: false,
+				mutatesEditorContent: false,
+				mutatesPersistedPostContent: false,
+				changesPostLock: false,
+				claimsSaved: false,
+				canExportLocalUpdates: true,
+				requiresServerStateRefetch: true,
+			};
+		}
+	};
+
+function getDistributedEditingNormalSaveFreshnessGuardAllowedResult( {
+	callsServerStateRefetchEndpoint,
+	reason,
+} ) {
+	return {
+		status: 'normal_save_fallback',
+		reason,
+		allowsNormalSaveFallback: true,
+		blocksNormalSavePost: false,
+		callsServerStateRefetchEndpoint,
+		callsNormalSavePost: false,
+		callsRetrySaveEndpoint: false,
+		dispatchesNotice: false,
+		mutatesEditorContent: false,
+		mutatesPersistedPostContent: false,
+		changesPostLock: false,
+		claimsSaved: false,
+	};
+}
+
+function getDistributedEditingPostRawContent( post ) {
+	if ( typeof post?.content === 'string' ) {
+		return post.content;
+	}
+
+	if ( typeof post?.content?.raw === 'string' ) {
+		return post.content.raw;
+	}
+
+	return null;
+}
+
+/**
  * Returns an action object used in signalling that attributes of the post have
  * been edited.
  *
@@ -3072,6 +3279,17 @@ export const savePost =
 
 			if ( ! retrySaveHandoff.allowsNormalSaveFallback ) {
 				return retrySaveHandoff;
+			}
+
+			const freshnessGuard =
+				await dispatch.__experimentalGuardDistributedEditingNormalSaveFreshness(
+					{
+						...options,
+					}
+				);
+
+			if ( ! freshnessGuard.allowsNormalSaveFallback ) {
+				return freshnessGuard;
 			}
 		}
 

@@ -6397,6 +6397,19 @@ describe( 'Post actions', () => {
 
 				if (
 					method === 'GET' &&
+					path.startsWith( `/wp/v2/posts/${ postId }` ) &&
+					path.includes( 'context=edit' )
+				) {
+					return {
+						...post,
+						content: {
+							raw: post.content,
+						},
+					};
+				}
+
+				if (
+					method === 'GET' &&
 					path.startsWith( '/wp/v2/types/post' )
 				) {
 					return {
@@ -6450,6 +6463,203 @@ describe( 'Post actions', () => {
 			expect( registry.select( editorStore ).isEditedPostDirty() ).toBe(
 				false
 			);
+		} );
+
+		it( 'checks server freshness before setting-enabled normal save fallback and allows unchanged content', async () => {
+			const originalPostContent =
+				'<!-- wp:paragraph --><p>Original freshness.</p><!-- /wp:paragraph -->';
+			const editedPostContent =
+				'<!-- wp:paragraph --><p>Local freshness.</p><!-- /wp:paragraph -->';
+			const post = {
+				id: postId,
+				type: 'post',
+				title: 'bar',
+				content: originalPostContent,
+				status: 'draft',
+			};
+			let serverStateRefetchCalls = 0;
+			let normalSaveCalls = 0;
+
+			apiFetch.setFetchHandler( async ( options ) => {
+				const method = getMethod( options );
+				const { path, data } = options;
+
+				if (
+					method === 'GET' &&
+					path.startsWith( `/wp/v2/posts/${ postId }` ) &&
+					path.includes( 'context=edit' )
+				) {
+					serverStateRefetchCalls++;
+					return {
+						...post,
+						content: {
+							raw: originalPostContent,
+						},
+						modified_gmt: '2026-05-15T00:00:00',
+					};
+				}
+
+				if (
+					method === 'PUT' &&
+					path.startsWith( `/wp/v2/posts/${ postId }` )
+				) {
+					normalSaveCalls++;
+					return { ...post, ...data };
+				}
+
+				if (
+					method === 'GET' &&
+					path.startsWith( '/wp/v2/types/post' )
+				) {
+					return {
+						json: () => Promise.resolve( {} ),
+					};
+				}
+
+				throw {
+					code: 'unknown_path',
+					message: `Unknown path: ${ method } ${ path }`,
+				};
+			} );
+
+			const registry = createRegistryWithStores();
+
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', post );
+			registry.dispatch( editorStore ).setupEditor( post, {
+				content: editedPostContent,
+			} );
+			registry.dispatch( editorStore ).updateEditorSettings( {
+				distributedEditing: {
+					enabled: true,
+					retrySaveHandoff: true,
+				},
+			} );
+
+			await expect(
+				registry.dispatch( editorStore ).savePost()
+			).resolves.toBeUndefined();
+
+			expect( serverStateRefetchCalls ).toBe( 1 );
+			expect( normalSaveCalls ).toBe( 1 );
+			expect( registry.select( editorStore ).isEditedPostDirty() ).toBe(
+				false
+			);
+			expect(
+				registry
+					.select( editorStore )
+					.getDistributedEditingSessionState()
+					.requiresServerStateRefetch
+			).toBe( false );
+		} );
+
+		it( 'blocks setting-enabled normal save fallback when the server post changed', async () => {
+			const originalPostContent =
+				'<!-- wp:paragraph --><p>Original freshness stale.</p><!-- /wp:paragraph -->';
+			const editedPostContent =
+				'<!-- wp:paragraph --><p>Local freshness stale.</p><!-- /wp:paragraph -->';
+			const remotePostContent =
+				'<!-- wp:paragraph --><p>Remote freshness stale.</p><!-- /wp:paragraph -->';
+			const post = {
+				id: postId,
+				type: 'post',
+				title: 'bar',
+				content: originalPostContent,
+				status: 'draft',
+			};
+			let serverStateRefetchCalls = 0;
+			let normalSaveCalls = 0;
+
+			apiFetch.setFetchHandler( async ( options ) => {
+				const method = getMethod( options );
+				const { path } = options;
+
+				if (
+					method === 'GET' &&
+					path.startsWith( `/wp/v2/posts/${ postId }` ) &&
+					path.includes( 'context=edit' )
+				) {
+					serverStateRefetchCalls++;
+					return {
+						...post,
+						content: {
+							raw: remotePostContent,
+						},
+						modified_gmt: '2026-05-15T00:01:00',
+					};
+				}
+
+				if (
+					method === 'PUT' &&
+					path.startsWith( `/wp/v2/posts/${ postId }` )
+				) {
+					normalSaveCalls++;
+				}
+
+				throw {
+					code: 'unexpected_path',
+					message: `Unexpected path: ${ method } ${ path }`,
+				};
+			} );
+
+			const registry = createRegistryWithStores();
+
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', post );
+			registry.dispatch( editorStore ).setupEditor( post, {
+				content: editedPostContent,
+			} );
+			registry.dispatch( editorStore ).updateEditorSettings( {
+				distributedEditing: {
+					enabled: true,
+					retrySaveHandoff: true,
+				},
+			} );
+
+			await expect(
+				registry.dispatch( editorStore ).savePost()
+			).resolves.toMatchObject( {
+				status: 'distributed_editing_normal_save_blocked_stale_server',
+				reason: 'stale_base_version_rejected',
+				allowsNormalSaveFallback: false,
+				blocksNormalSavePost: true,
+				callsServerStateRefetchEndpoint: true,
+				callsNormalSavePost: false,
+				callsRetrySaveEndpoint: false,
+				mutatesPersistedPostContent: false,
+				changesPostLock: false,
+				claimsSaved: false,
+				canExportLocalUpdates: true,
+				requiresServerStateRefetch: true,
+			} );
+
+			expect( serverStateRefetchCalls ).toBe( 1 );
+			expect( normalSaveCalls ).toBe( 0 );
+			expect( registry.select( editorStore ).isEditedPostDirty() ).toBe(
+				true
+			);
+			expect(
+				registry.select( editorStore ).getEditedPostContent()
+			).toBe( editedPostContent );
+			expect(
+				registry
+					.select( editorStore )
+					.getDistributedEditingSessionState()
+			).toMatchObject( {
+				disposition: 'rejected_stale_base_version',
+				reasonCode: 'stale_base_version_rejected',
+				clientBaseContent: originalPostContent,
+				pendingChangeCount: 1,
+				remoteChangeCount: 1,
+				requiresServerStateRefetch: true,
+				canExportLocalUpdates: true,
+				actionTranscriptLatestEventType:
+					DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.REMOTE_CHANGE_RECEIVED,
+				actionTranscriptCallsSave: false,
+				actionTranscriptClaimsSaved: false,
+			} );
 		} );
 
 		it( 'routes setting-enabled savePost through guarded retry-save after retry-submit save preparation', async () => {
@@ -7439,6 +7649,7 @@ describe( 'Post actions', () => {
 
 			await registry.dispatch( editorStore ).savePost( {
 				__experimentalUseDistributedEditingRetrySave: true,
+				__experimentalSkipDistributedEditingSaveFreshnessGuard: true,
 			} );
 
 			expect( retrySaveCalls ).toBe( 0 );

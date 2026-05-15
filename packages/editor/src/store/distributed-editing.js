@@ -15669,7 +15669,9 @@ function getDistributedEditingResponseData( responseOrError ) {
 		: {};
 }
 
-function getDistributedEditingServerVersionFromResponse( responseOrError ) {
+export function getDistributedEditingServerVersionFromResponse(
+	responseOrError
+) {
 	const responseData = getDistributedEditingResponseData( responseOrError );
 	const distributedEditingData =
 		responseOrError?.distributed_editing ||
@@ -15697,11 +15699,17 @@ function getDistributedEditingServerVersionFromResponse( responseOrError ) {
 	);
 }
 
-function getDistributedEditingPostContentFromResponse( responseOrError ) {
+export function getDistributedEditingPostContentFromResponse(
+	responseOrError
+) {
 	const rawPostContent =
 		getDistributedEditingRawPostContentFromResponse( responseOrError );
 
 	return stripDistributedEditingSyncMetaFromPostContent( rawPostContent );
+}
+
+export function getDistributedEditingComparablePostContent( postContent ) {
+	return stripDistributedEditingSyncMetaFromPostContent( postContent );
 }
 
 function getDistributedEditingRawPostContentFromResponse( responseOrError ) {
