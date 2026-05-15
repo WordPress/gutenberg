@@ -43,15 +43,24 @@ async function getFFmpegCore(): Promise< FFmpegCore > {
 		return await ffmpegPromise;
 	}
 
+	// @ffmpeg/core 0.12.x ignores a user-supplied `locateFile`: during
+	// initialization it unconditionally overwrites `Module.locateFile` with
+	// its own implementation that reads the WASM (and worker) URL from a
+	// base64-encoded JSON fragment on `mainScriptUrlOrBlob`. So the inlined
+	// WASM must be handed over that way instead.
+	//
+	// The WASM is inlined as a base64 data URL at build time. Decode it once
+	// into a Blob URL so the (potentially large) payload isn't re-encoded
+	// through btoa, then advertise that URL via the fragment.
+	const wasmBlobUrl = URL.createObjectURL(
+		await ( await fetch( FFmpegCoreWasm ) ).blob()
+	);
+	const coreConfig = btoa(
+		JSON.stringify( { wasmURL: wasmBlobUrl, workerURL: '' } )
+	);
+
 	const promise = createFFmpegCore( {
-		locateFile: ( fileName: string ) => {
-			// WASM file is inlined as a base64 data URL at build time,
-			// eliminating the need for separate file downloads.
-			if ( fileName.endsWith( '.wasm' ) ) {
-				return FFmpegCoreWasm;
-			}
-			return fileName;
-		},
+		mainScriptUrlOrBlob: `ffmpeg-core.js#${ coreConfig }`,
 		// Suppress Emscripten console output.
 		print: () => {},
 		printErr: () => {},
