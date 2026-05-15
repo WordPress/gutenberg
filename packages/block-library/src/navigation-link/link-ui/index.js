@@ -9,7 +9,14 @@ import {
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { LinkControl, useBlockEditingMode } from '@wordpress/block-editor';
+import {
+	LinkControl,
+	useBlockEditingMode,
+	store as blockEditorStore,
+	BlockIcon,
+} from '@wordpress/block-editor';
+import { createBlock, store as blocksStore } from '@wordpress/blocks';
+import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	useMemo,
 	useState,
@@ -97,11 +104,13 @@ function UnforwardedLinkUI( props, ref ) {
 	const [ initialSearchValue, setInitialSearchValue ] = useState( '' );
 	// Tracks the live search input between renders without causing re-renders.
 	const searchInputValueRef = useRef( '' );
+	const [ searchInputValue, setSearchInputValue ] = useState( '' );
 	// Call this instead of setting searchInputValueRef.current and
 	// setInitialSearchValue separately, to keep both in sync.
 	const updateSearchValue = ( value ) => {
 		searchInputValueRef.current = value;
 		setInitialSearchValue( value );
+		setSearchInputValue( value );
 	};
 	const linkControlWrapperRef = useRef();
 	const addPageButtonRef = useRef();
@@ -175,6 +184,55 @@ function UnforwardedLinkUI( props, ref ) {
 	}, [ shouldFocusPane ] );
 
 	const blockEditingMode = useBlockEditingMode();
+	const { rootClientId, insertableNavigationBlocks } = useSelect(
+		( select ) => {
+			const { getBlockRootClientId, canInsertBlockType } =
+				select( blockEditorStore );
+			const root = getBlockRootClientId( props.clientId );
+
+			// Get every registered block type that can live inside this navigation.
+			// Exclude navigation-link and navigation-submenu — those are already
+			// handled by LinkControl's own search suggestions.
+			const EXCLUDED = new Set( [
+				'core/navigation-link',
+				'core/navigation-submenu',
+			] );
+			const insertable = select( blocksStore )
+				.getBlockTypes()
+				.filter(
+					( blockType ) =>
+						! EXCLUDED.has( blockType.name ) &&
+						canInsertBlockType( blockType.name, root )
+				);
+
+			return {
+				rootClientId: root,
+				insertableNavigationBlocks: insertable,
+			};
+		},
+		[ props.clientId ]
+	);
+
+	// Filter insertable blocks by the live search input.
+	// Empty query > no results (avoids flooding the UI before the user types).
+	const matchingBlocks = useMemo( () => {
+		const query = searchInputValue.trim().toLowerCase();
+		if ( ! query ) {
+			return [];
+		}
+		return insertableNavigationBlocks.filter( ( blockType ) => {
+			const title = blockType.title.toLowerCase();
+			const keywords = ( blockType.keywords ?? [] ).map( ( k ) =>
+				k.toLowerCase()
+			);
+			return (
+				title.includes( query ) ||
+				keywords.some( ( kw ) => kw.includes( query ) )
+			);
+		} );
+	}, [ searchInputValue, insertableNavigationBlocks ] );
+
+	const { insertBlock } = useDispatch( blockEditorStore );
 
 	return (
 		<Popover
@@ -214,6 +272,7 @@ function UnforwardedLinkUI( props, ref ) {
 							// Observe the input value so we can pass the value to the page creator
 							// and restore it on back button click
 							searchInputValueRef.current = value;
+							setSearchInputValue( value );
 						} }
 						inputValue={ initialSearchValue }
 						onRemove={ props.onRemove }
@@ -243,6 +302,21 @@ function UnforwardedLinkUI( props, ref ) {
 									canAddBlock={
 										blockEditingMode === 'default'
 									}
+									matchingBlocks={ matchingBlocks }
+									onInsertBlock={ ( blockType ) => {
+										const newBlock = createBlock(
+											blockType.name
+										);
+										insertBlock(
+											newBlock,
+											undefined,
+											rootClientId
+										);
+										if ( props.onBlockInsert ) {
+											props.onBlockInsert( newBlock );
+										}
+										props.onClose?.();
+									} }
 								/>
 							);
 						} }
@@ -292,16 +366,31 @@ const LinkUITools = ( {
 	setAddingPage,
 	canAddPage,
 	canAddBlock,
+	matchingBlocks = [],
+	onInsertBlock,
 } ) => {
 	const blockInserterAriaRole = 'listbox';
 
 	// Don't render anything if neither button should be shown
-	if ( ! canAddPage && ! canAddBlock ) {
+	if ( ! canAddPage && ! canAddBlock && matchingBlocks.length === 0 ) {
 		return null;
 	}
 
 	return (
 		<VStack spacing={ 0 } className="link-ui-tools">
+			{ matchingBlocks.map( ( blockType ) => (
+				<Button
+					__next40pxDefaultSize
+					key={ blockType.name }
+					icon={ <BlockIcon icon={ blockType.icon } /> }
+					onClick={ ( e ) => {
+						e.preventDefault();
+						onInsertBlock( blockType );
+					} }
+				>
+					{ __( 'Add' ) } { blockType.title } { __( 'Block' ) }
+				</Button>
+			) ) }
 			{ canAddPage && (
 				<Button
 					__next40pxDefaultSize
