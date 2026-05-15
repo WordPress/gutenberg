@@ -6,7 +6,7 @@ import { SlotFillProvider, Slot } from '@wordpress/components';
 import { Popover } from '@wordpress/ui';
 
 export default {
-	title: 'Playground/Popover with SlotFill',
+	title: 'Playground/Debug fixtures/Popover with SlotFill',
 	component: Popover.Root,
 };
 
