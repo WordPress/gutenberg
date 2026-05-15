@@ -1,7 +1,7 @@
 .lanes {
 	display: grid-lanes;
-	column-gap: var(--wp-grid-lane-gap, 0);
-	row-gap: var(--wp-grid-lane-gap, 0);
+	column-gap: var(--wpds-dimension-gap-md);
+	row-gap: var(--wpds-dimension-gap-md);
 	position: relative;
 }
 

@@ -665,30 +665,21 @@ export function prepareItem( id: QueueItemId ) {
 		);
 		const isHeic = HEIC_MIME_TYPES.includes( file.type );
 
-		// For images that can be processed by vips, check if we need to scale down based on threshold.
+		// For images that can be processed by vips, upload the original and
+		// let generateThumbnails() handle threshold scaling as a sideload.
+		//
+		// Uploading the original (rather than a pre-scaled copy) preserves
+		// the un-suffixed basename in attachment.filename, so sub-size
+		// names are derived from the original — matching WordPress core's
+		// wp_create_image_subsizes() naming convention where only the
+		// scaled-down full-size copy carries the `-scaled` suffix and the
+		// original is kept alongside it as `original_image`.
+		//
+		// Main-file format conversion is handled server-side via the
+		// image_editor_output_format filter during create_item.
+		// The response carries image_output_format so generateThumbnails
+		// can transcode sub-sizes to the same target format.
 		if ( isImage && isVipsSupported ) {
-			const { bigImageSizeThreshold } = settings;
-
-			// If a threshold is set, add a resize operation to scale down large images.
-			// This matches WordPress core's behavior in wp_create_image_subsizes().
-			if ( bigImageSizeThreshold ) {
-				operations.push( [
-					OperationType.ResizeCrop,
-					{
-						resize: {
-							width: bigImageSizeThreshold,
-							height: bigImageSizeThreshold,
-						},
-						isThresholdResize: true,
-					},
-				] );
-			}
-
-			// Main-file format conversion is handled server-side via the
-			// image_editor_output_format filter during create_item.
-			// The response carries image_output_format so generateThumbnails
-			// can transcode sub-sizes to the same target format.
-
 			operations.push(
 				OperationType.Upload,
 				OperationType.ThumbnailGeneration,

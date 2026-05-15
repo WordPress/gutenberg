@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Export `getWpCompatOverlaySlot()` so consumers can route their own portals into the compat overlay slot ([#78183](https://github.com/WordPress/gutenberg/pull/78183)).
+
+## 0.13.0 (2026-05-14)
+
 ### Breaking Changes
 
 -   `InputControl`: Narrow the TypeScript type of the `label` prop to plain strings ([#77860](https://github.com/WordPress/gutenberg/pull/77860)).

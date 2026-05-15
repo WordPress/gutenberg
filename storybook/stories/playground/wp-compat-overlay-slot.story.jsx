@@ -16,7 +16,7 @@ import { WithWpCompatOverlaySlot } from './with-wp-compat-overlay-slot';
  * components-side overlay, via the `@wordpress/ui` compat overlay slot.
  */
 export default {
-	title: 'Playground/WP Compat Overlay Slot',
+	title: 'Playground/Debug fixtures/WP Compat Overlay Slot',
 	decorators: [ WithWpCompatOverlaySlot ],
 };
 

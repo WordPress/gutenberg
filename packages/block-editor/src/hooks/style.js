@@ -41,17 +41,14 @@ import {
 	useBlockSettings,
 } from './utils';
 import { BlockStyleStateProvider } from './block-style-state';
-import {
-	BlockStateBadges,
-	BlockStatesControl,
-	VALID_BLOCK_PSEUDO_STATES,
-} from './states';
+import { BlockStateBadges, VALID_BLOCK_PSEUDO_STATES } from './states';
 import { buildStateSelector, buildCanvasStateSelector } from './state-utils';
 import { BlockInspectorPreTabsFill } from '../components/block-inspector/inspector-pre-tabs-slot-fill';
 import { scopeSelector } from '../components/global-styles/utils';
 import { useBlockEditingMode } from '../components/block-editing-mode';
 import { store as blockEditorStore } from '../store';
 import { globalStylesDataKey } from '../store/private-keys';
+import { unlock } from '../lock-unlock';
 
 const BORDER_SIDES = [ 'Top', 'Right', 'Bottom', 'Left' ];
 
@@ -417,13 +414,21 @@ function BlockStyleControls( {
 } ) {
 	const settings = useBlockSettings( name, __unstableParentLayout );
 	const blockEditingMode = useBlockEditingMode();
-	const [ selectedState, setSelectedState ] = useState( 'default' );
 	const [ showStateOnCanvas, setShowStateOnCanvas ] = useState( true );
-	const globalBlockStyles = useSelect(
-		( select ) =>
-			select( blockEditorStore ).getSettings()[ globalStylesDataKey ]
-				?.blocks?.[ name ],
-		[ name ]
+	const { globalBlockStyles, selectedState } = useSelect(
+		( select ) => {
+			const blockEditorSelect = select( blockEditorStore );
+			return {
+				globalBlockStyles:
+					blockEditorSelect.getSettings()[ globalStylesDataKey ]
+						?.blocks?.[ name ],
+				selectedState:
+					unlock( blockEditorSelect ).getSelectedBlockStyleState(
+						clientId
+					),
+			};
+		},
+		[ clientId, name ]
 	);
 	const globalStateValue = globalBlockStyles?.[ selectedState ];
 	const instanceStateValue = style?.[ selectedState ];
@@ -486,11 +491,6 @@ function BlockStyleControls( {
 
 	return (
 		<>
-			<BlockStatesControl
-				name={ name }
-				value={ selectedState }
-				onChange={ setSelectedState }
-			/>
 			{ selectedState !== 'default' && (
 				<BlockInspectorPreTabsFill>
 					<Spacer paddingX={ 4 } paddingY={ 2 }>

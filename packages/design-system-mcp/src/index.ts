@@ -1,6 +1,8 @@
 import { McpServer } from '@modelcontextprotocol/server';
 import { registerTools } from './tools/index';
 
+export { parseComponents, parseComponentDetail } from './parse-components';
+
 export function createServer() {
 	const server = new McpServer( {
 		name: 'WordPress Design System',

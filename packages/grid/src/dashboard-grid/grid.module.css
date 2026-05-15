@@ -1,5 +1,6 @@
 .grid {
 	display: grid;
+	gap: var(--wpds-dimension-gap-md);
 	position: relative;
 }
 
