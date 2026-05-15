@@ -18,6 +18,14 @@
 	z-index: z-index(".components-draggable__clone");
 }
 
+// The slot already supplies an isolated stacking context, so the
+// fallback `z-index` would only bias intra-slot ordering against
+// other slot residents (e.g. `@wordpress/ui` portals). Let DOM
+// order decide instead.
+.clone.is-in-compat-slot {
+	z-index: auto;
+}
+
 // Keep this selector global so external code that toggles the same
 // body class (e.g. block-editor keyboard drag) gets the same cursor.
 :global(body.is-dragging-components-draggable) {
