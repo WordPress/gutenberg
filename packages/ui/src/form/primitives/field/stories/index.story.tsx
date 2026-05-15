@@ -7,11 +7,11 @@ const meta: Meta< typeof Field.Root > = {
 	title: 'Design System/Components/Form/Primitives/Field',
 	component: Field.Root,
 	subcomponents: {
-		Item: Field.Item,
-		Label: Field.Label,
-		Control: Field.Control,
-		Description: Field.Description,
-		Details: Field.Details,
+		'Field.Item': Field.Item,
+		'Field.Label': Field.Label,
+		'Field.Control': Field.Control,
+		'Field.Description': Field.Description,
+		'Field.Details': Field.Details,
 	},
 	parameters: {
 		componentStatus: {

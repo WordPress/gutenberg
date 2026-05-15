@@ -1,15 +1,21 @@
 import { Tooltip as _Tooltip } from '@base-ui/react/tooltip';
 import { forwardRef } from '@wordpress/element';
 import type { PortalProps } from './types';
+import { getWpCompatOverlaySlot } from '../utils/wp-compat-overlay-slot';
 
 /**
- * Root element that portals `Tooltip` floating content. Pass to
- * `Tooltip.Popup`'s `portal` prop. When `portal` is omitted, `Tooltip.Popup`
- * uses this component with default props.
+ * Used to apply custom portal behavior to `Tooltip`'s floating content.
+ * Defaults the `container` prop to the `@wordpress/ui` compat overlay slot.
  */
 const Portal = forwardRef< HTMLDivElement, PortalProps >(
-	function TooltipPortal( props, ref ) {
-		return <_Tooltip.Portal ref={ ref } { ...props } />;
+	function TooltipPortal( { container, ...restProps }, ref ) {
+		return (
+			<_Tooltip.Portal
+				container={ container ?? getWpCompatOverlaySlot() }
+				{ ...restProps }
+				ref={ ref }
+			/>
+		);
 	}
 );
 

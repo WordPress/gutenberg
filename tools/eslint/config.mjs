@@ -567,6 +567,9 @@ export default dedupePlugins( [
 		files: [
 			'bin/**/*.js',
 			'bin/**/*.mjs',
+			'tools/**/*.js',
+			'tools/**/*.mjs',
+			'tools/**/*.cjs',
 			'packages/env/**',
 			'packages/theme/bin/**/*.[tj]s?(x)',
 		],

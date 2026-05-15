@@ -1,7 +1,9 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createRef } from '@wordpress/element';
+import type { ReactNode } from 'react';
 import * as Tooltip from '../index';
+import { useEnableWpCompatOverlaySlot } from '../../utils/use-enable-wp-compat-overlay-slot';
 import type { ProviderProps } from '../types';
 
 // Test wrapper that sets delay={0} to avoid real-time delays in tests.
@@ -151,4 +153,119 @@ describe( 'Tooltip', () => {
 			);
 		} );
 	} );
+
+	// The slot is identified by a data attribute (cross-tooling marker, no
+	// user-facing role/text), so direct DOM queries are appropriate here —
+	// Testing Library's role/text accessors don't apply.
+	/* eslint-disable testing-library/no-node-access */
+	describe( 'wp compat overlay slot', () => {
+		const SLOT_SELECTOR = '[data-wp-compat-overlay-slot]';
+
+		// Wrapper that exercises the public opt-in path
+		// (`useEnableWpCompatOverlaySlot`), so the integration tests
+		// reflect how a real consumer would activate the slot rather
+		// than poking at the internal flag directly.
+		function WithSlotEnabled( { children }: { children: ReactNode } ) {
+			useEnableWpCompatOverlaySlot();
+			return <>{ children }</>;
+		}
+
+		afterEach( () => {
+			// Tear down anything the hook left behind so the next test
+			// starts from the dormant baseline. The hook is intentionally
+			// one-way at runtime; tests need to reset it explicitly.
+			delete ( window as { __wpUiCompatOverlaySlotEnabled?: boolean } )
+				.__wpUiCompatOverlaySlotEnabled;
+			document
+				.querySelectorAll( SLOT_SELECTOR )
+				.forEach( ( el ) => el.remove() );
+		} );
+
+		it( 'portals the popup into the slot when the consumer opts in', async () => {
+			const user = userEvent.setup();
+
+			render(
+				<WithSlotEnabled>
+					<TestProvider>
+						<Tooltip.Root>
+							<Tooltip.Trigger>Hover me</Tooltip.Trigger>
+							<Tooltip.Popup>Tooltip content</Tooltip.Popup>
+						</Tooltip.Root>
+					</TestProvider>
+				</WithSlotEnabled>
+			);
+
+			await user.hover(
+				screen.getByRole( 'button', { name: 'Hover me' } )
+			);
+
+			const content = await screen.findByText( 'Tooltip content' );
+			expect( content ).toBeVisible();
+
+			const slot = document.querySelector( SLOT_SELECTOR );
+			expect( slot ).not.toBeNull();
+			expect( slot ).toContainElement( content );
+		} );
+
+		it( 'does not create a slot when the consumer has not opted in (dormant default)', async () => {
+			const user = userEvent.setup();
+
+			render(
+				<TestProvider>
+					<Tooltip.Root>
+						<Tooltip.Trigger>Hover me</Tooltip.Trigger>
+						<Tooltip.Popup>Tooltip content</Tooltip.Popup>
+					</Tooltip.Root>
+				</TestProvider>
+			);
+
+			await user.hover(
+				screen.getByRole( 'button', { name: 'Hover me' } )
+			);
+
+			const content = await screen.findByText( 'Tooltip content' );
+			expect( content ).toBeVisible();
+
+			expect( document.querySelector( SLOT_SELECTOR ) ).toBeNull();
+		} );
+
+		it( 'lets a caller-supplied portal container override the slot', async () => {
+			const user = userEvent.setup();
+			const containerRef = createRef< HTMLDivElement >();
+
+			render(
+				<WithSlotEnabled>
+					<TestProvider>
+						<Tooltip.Root>
+							<Tooltip.Trigger>Hover me</Tooltip.Trigger>
+							<div
+								ref={ containerRef }
+								data-testid="custom-container"
+							/>
+							<Tooltip.Popup
+								portal={
+									<Tooltip.Portal
+										container={ containerRef }
+									/>
+								}
+							>
+								Tooltip content
+							</Tooltip.Popup>
+						</Tooltip.Root>
+					</TestProvider>
+				</WithSlotEnabled>
+			);
+
+			await user.hover(
+				screen.getByRole( 'button', { name: 'Hover me' } )
+			);
+
+			const content = await screen.findByText( 'Tooltip content' );
+			expect( content ).toBeVisible();
+			expect( screen.getByTestId( 'custom-container' ) ).toContainElement(
+				content
+			);
+		} );
+	} );
+	/* eslint-enable testing-library/no-node-access */
 } );

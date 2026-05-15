@@ -60,7 +60,11 @@ module.exports = {
 	},
 	overrides: [
 		{
-			files: [ '**/*.module.{css,scss}' ],
+			files: [
+				'**/*.module.{css,scss}',
+				// Can be removed when all `routes/` stylesheets are converted to CSS modules.
+				'routes/**/*.{css,scss}',
+			],
 			rules: {
 				'function-no-unknown': [
 					true,
@@ -90,6 +94,8 @@ module.exports = {
 					{
 						ignore: [
 							// Doesn't affect RTL styles
+							'border-bottom',
+							'border-top',
 							'width',
 							'min-width',
 							'max-width',
@@ -98,8 +104,12 @@ module.exports = {
 							'max-height',
 							'margin-top',
 							'margin-bottom',
+							'overflow-x',
+							'overflow-y',
 							'padding-top',
 							'padding-bottom',
+							'scroll-margin-top',
+							'scroll-margin-bottom',
 							'top',
 							'bottom',
 						],
@@ -111,6 +121,15 @@ module.exports = {
 						ignoreProperties: [
 							// https://github.com/css-modules/css-modules/blob/master/docs/composition.md
 							'composes',
+						],
+					},
+				],
+				'selector-pseudo-class-no-unknown': [
+					true,
+					{
+						ignorePseudoClasses: [
+							// CSS Modules global escape hatch.
+							'global',
 						],
 					},
 				],
