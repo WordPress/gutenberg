@@ -1,7 +1,13 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react-vite';
+import { fn } from 'storybook/test';
+
+/**
+ * WordPress dependencies
+ */
+import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -9,24 +15,20 @@ import type { Meta, StoryFn } from '@storybook/react';
 import { RadioGroup } from '..';
 import { Radio } from '../radio';
 
-/**
- * WordPress dependencies
- */
-import { useState } from '@wordpress/element';
-
 const meta: Meta< typeof RadioGroup > = {
-	title: 'Components (Deprecated)/RadioGroup',
+	title: 'Components/Deprecated/RadioGroup',
 	id: 'components-radiogroup',
 	component: RadioGroup,
-	// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 	subcomponents: { Radio },
 	argTypes: {
 		onChange: { control: false },
 		children: { control: false },
 		checked: { control: { type: 'text' } },
 	},
+	args: {
+		onChange: fn(),
+	},
 	parameters: {
-		actions: { argTypesRegex: '^on.*' },
 		controls: { expanded: true },
 		docs: {
 			canvas: { sourceState: 'shown' },

@@ -3,7 +3,7 @@
  */
 import { Button } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { chevronRightSmall, Icon } from '@wordpress/icons';
 import { useRef } from '@wordpress/element';
 
@@ -38,7 +38,9 @@ function BlockBreadcrumb( { rootLabelText } ) {
 			hasSelection: !! getSelectionStart().clientId,
 		};
 	}, [] );
-	const rootLabel = rootLabelText || __( 'Document' );
+
+	// translators: Default label for the Document in the Block Breadcrumb.
+	const rootLabel = rootLabelText || _x( 'Document', 'noun, breadcrumb' );
 
 	// We don't care about this specific ref, but this is a way
 	// to get a ref within the editor canvas so we can focus it later.
@@ -101,6 +103,7 @@ function BlockBreadcrumb( { rootLabelText } ) {
 						<BlockTitle
 							clientId={ parentClientId }
 							maximumLength={ 35 }
+							context="breadcrumb"
 						/>
 					</Button>
 					<Icon
@@ -114,7 +117,11 @@ function BlockBreadcrumb( { rootLabelText } ) {
 					className="block-editor-block-breadcrumb__current"
 					aria-current="true"
 				>
-					<BlockTitle clientId={ clientId } maximumLength={ 35 } />
+					<BlockTitle
+						clientId={ clientId }
+						maximumLength={ 35 }
+						context="breadcrumb"
+					/>
 				</li>
 			) }
 		</ul>

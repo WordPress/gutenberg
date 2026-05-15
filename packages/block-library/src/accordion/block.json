@@ -4,10 +4,10 @@
 	"name": "core/accordion",
 	"title": "Accordion",
 	"category": "design",
-	"description": "Displays a group of accordion headers and associated expandable content.",
+	"description": "Displays a foldable layout that groups content in collapsible sections.",
 	"example": {},
-	"__experimental": true,
 	"supports": {
+		"anchor": true,
 		"html": false,
 		"align": [ "wide", "full" ],
 		"background": {
@@ -19,7 +19,7 @@
 		},
 		"color": {
 			"background": true,
-			"gradient": true
+			"gradients": true
 		},
 		"__experimentalBorder": {
 			"color": true,
@@ -40,7 +40,23 @@
 		},
 		"shadow": true,
 		"layout": true,
-		"interactivity": true
+		"ariaLabel": true,
+		"interactivity": true,
+		"typography": {
+			"fontSize": true,
+			"lineHeight": true,
+			"__experimentalFontFamily": true,
+			"__experimentalFontWeight": true,
+			"__experimentalFontStyle": true,
+			"__experimentalTextTransform": true,
+			"__experimentalTextDecoration": true,
+			"__experimentalLetterSpacing": true,
+			"__experimentalDefaultControls": {
+				"fontSize": true
+			}
+		},
+		"contentRole": true,
+		"listView": true
 	},
 	"attributes": {
 		"iconPosition": {
@@ -55,15 +71,20 @@
 			"type": "boolean",
 			"default": false
 		},
-		"allowedBlocks": {
+		"headingLevel": {
+			"type": "number",
+			"default": 3
+		},
+		"levelOptions": {
 			"type": "array"
 		}
 	},
 	"providesContext": {
 		"core/accordion-icon-position": "iconPosition",
-		"core/accordion-show-icon": "showIcon"
+		"core/accordion-show-icon": "showIcon",
+		"core/accordion-heading-level": "headingLevel"
 	},
-	"allowedBlocks": [ "core/accordion-content" ],
+	"allowedBlocks": [ "core/accordion-item" ],
 	"textdomain": "default",
-	"style": "wp-block-accordion"
+	"viewScriptModule": "@wordpress/block-library/accordion/view"
 }

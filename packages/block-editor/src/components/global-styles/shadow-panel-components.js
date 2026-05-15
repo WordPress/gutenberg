@@ -136,7 +136,7 @@ export function ShadowPopover( { shadow, onShadowChange, settings } ) {
 }
 
 function renderShadowToggle( shadow, onShadowChange ) {
-	return ( { onToggle, isOpen } ) => {
+	return function ShadowToggle( { onToggle, isOpen } ) {
 		const shadowButtonRef = useRef( undefined );
 
 		const toggleProps = {

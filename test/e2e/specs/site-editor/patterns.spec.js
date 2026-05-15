@@ -19,12 +19,12 @@ test.describe( 'Patterns', () => {
 		await requestUtils.deleteAllBlocks();
 	} );
 
-	test.afterAll( async ( { requestUtils } ) => {
-		await requestUtils.activateTheme( 'twentytwentyone' );
-	} );
-
 	test.afterEach( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllBlocks();
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
 
 	test( 'create a new pattern', async ( {
@@ -155,7 +155,10 @@ test.describe( 'Patterns', () => {
 		await searchBox.fill( 'footer' );
 		await expect( patterns.item ).toHaveCount( 2 );
 		expect(
-			await patterns.item.getByRole( 'button' ).allInnerTexts()
+			await patterns.item
+				.getByRole( 'button' )
+				// eslint-disable-next-line playwright/prefer-web-first-assertions -- toHaveText doesn't support expect.arrayContaining
+				.allInnerTexts()
 		).toEqual(
 			expect.arrayContaining( [ 'Unsynced footer', 'Synced footer' ] )
 		);
@@ -180,7 +183,10 @@ test.describe( 'Patterns', () => {
 		await page.getByRole( 'option', { name: /^Not synced/ } ).click();
 		await expect( patterns.item ).toHaveCount( 2 );
 		expect(
-			await patterns.item.getByRole( 'button' ).allInnerTexts()
+			await patterns.item
+				.getByRole( 'button' )
+				// eslint-disable-next-line playwright/prefer-web-first-assertions -- toHaveText doesn't support expect.arrayContaining
+				.allInnerTexts()
 		).toEqual(
 			expect.arrayContaining( [ 'Unsynced header', 'Unsynced footer' ] )
 		);
@@ -188,6 +194,63 @@ test.describe( 'Patterns', () => {
 		await searchBox.fill( 'footer' );
 		await expect( patterns.item ).toHaveCount( 1 );
 		await expect( patterns.item ).toContainText( 'Unsynced footer' );
+	} );
+
+	test( 'sort patterns', async ( {
+		admin,
+		requestUtils,
+		patterns,
+		page,
+	} ) => {
+		await Promise.all( [
+			requestUtils.createBlock( {
+				title: 'Animal',
+				status: 'publish',
+				content: `<!-- wp:paragraph -->\n<p>Animal</p>\n<!-- /wp:paragraph -->`,
+				wp_pattern_category: [],
+			} ),
+			requestUtils.createBlock( {
+				title: 'Berry',
+				status: 'publish',
+				content: `<!-- wp:paragraph -->\n<p>Berry</p>\n<!-- /wp:paragraph -->`,
+				wp_pattern_category: [],
+			} ),
+			requestUtils.createBlock( {
+				title: 'Starter',
+				status: 'publish',
+				content: `<!-- wp:paragraph -->\n<p>Starter</p>\n<!-- /wp:paragraph -->`,
+				wp_pattern_category: [],
+			} ),
+		] );
+
+		await admin.visitSiteEditor( { postType: 'wp_block' } );
+		await expect( patterns.item ).toHaveCount( 3 );
+
+		// Open view options and switch to descending sort.
+		await page.getByRole( 'button', { name: 'View options' } ).click();
+		await page.getByRole( 'radio', { name: 'Sort descending' } ).click();
+
+		// Close the view options.
+		await page.keyboard.press( 'Escape' );
+
+		await expect( patterns.itemTitle ).toHaveText( [
+			'Starter',
+			'Berry',
+			'Animal',
+		] );
+
+		// Open view options and switch back to ascending sort.
+		await page.getByRole( 'button', { name: 'View options' } ).click();
+		await page.getByRole( 'radio', { name: 'Sort ascending' } ).click();
+
+		// Close the view options.
+		await page.keyboard.press( 'Escape' );
+
+		await expect( patterns.itemTitle ).toHaveText( [
+			'Animal',
+			'Berry',
+			'Starter',
+		] );
 	} );
 } );
 
@@ -199,12 +262,15 @@ class Patterns {
 		this.#page = page;
 
 		this.content = this.#page.getByRole( 'region', {
-			name: 'Patterns content',
+			name: 'All patterns',
 		} );
 		this.navigation = this.#page.getByRole( 'region', {
 			name: 'Navigation',
 		} );
 		this.itemsList = this.content.locator( '.dataviews-view-grid' );
 		this.item = this.itemsList.locator( '.dataviews-view-grid__card' );
+		this.itemTitle = this.itemsList.locator(
+			'.dataviews-view-grid__title-field'
+		);
 	}
 }

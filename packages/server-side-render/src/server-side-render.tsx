@@ -170,10 +170,18 @@ interface ServerSideRenderWithPostIdProps
  * }
  * ```
  *
- * @param props              Component props.
- * @param props.urlQueryArgs Additional query arguments to append to the request URL.
+ * @param {Object}   props                                    Component props.
+ * @param {string}   props.block                              The identifier of the block to be serverside rendered.
+ * @param {Object}   props.attributes                         The block attributes to be sent to the server for rendering.
+ * @param {string}   [props.className]                        Additional classes to apply to the wrapper element.
+ * @param {string}   [props.httpMethod='GET']                 The HTTP method to use ('GET' or 'POST'). Default is 'GET'
+ * @param {Object}   [props.urlQueryArgs]                     Additional query arguments to append to the request URL.
+ * @param {boolean}  [props.skipBlockSupportAttributes=false] Whether to remove block support attributes before sending.
+ * @param {Function} [props.EmptyResponsePlaceholder]         Component rendered when the API response is empty.
+ * @param {Function} [props.ErrorResponsePlaceholder]         Component rendered when the API response is an error.
+ * @param {Function} [props.LoadingResponsePlaceholder]       Component rendered while the API request is loading.
  *
- * @return The rendered server-side content.
+ * @return {React.JSX.Element} The rendered server-side content.
  */
 export function ServerSideRenderWithPostId( {
 	urlQueryArgs = EMPTY_OBJECT,

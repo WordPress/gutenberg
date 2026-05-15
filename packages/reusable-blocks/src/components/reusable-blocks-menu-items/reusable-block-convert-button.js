@@ -31,7 +31,7 @@ import { store } from '../../store';
  * @param {string[]} props.clientIds    Client ids of selected blocks.
  * @param {string}   props.rootClientId ID of the currently selected top-level block.
  * @param {()=>void} props.onClose      Callback to close the menu.
- * @return {import('react').ComponentType} The menu control or null.
+ * @return {React.ComponentType} The menu control or null.
  */
 export default function ReusableBlockConvertButton( {
 	clientIds,
@@ -170,14 +170,12 @@ export default function ReusableBlockConvertButton( {
 						<VStack spacing="5">
 							<TextControl
 								__next40pxDefaultSize
-								__nextHasNoMarginBottom
 								label={ __( 'Name' ) }
 								value={ title }
 								onChange={ setTitle }
 								placeholder={ __( 'My pattern' ) }
 							/>
 							<ToggleControl
-								__nextHasNoMarginBottom
 								label={ _x( 'Synced', 'pattern (singular)' ) }
 								help={ __(
 									'Sync this pattern across multiple locations.'

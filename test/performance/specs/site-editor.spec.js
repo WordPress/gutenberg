@@ -1,4 +1,4 @@
-/* eslint-disable playwright/no-conditional-in-test, playwright/expect-expect */
+/* eslint-disable playwright/expect-expect */
 
 /**
  * WordPress dependencies
@@ -70,6 +70,15 @@ test.describe( 'Site Editor Performance', () => {
 			} );
 
 			draftId = page.id;
+
+			// Set preferences via REST so that welcomeGuide is reliably
+			// persisted before the timed iterations start.
+			await requestUtils.setPreferences( 'core/edit-site', {
+				welcomeGuide: false,
+				welcomeGuideStyles: false,
+				welcomeGuidePage: false,
+				welcomeGuideTemplate: false,
+			} );
 		} );
 
 		const samples = 10;
@@ -81,19 +90,30 @@ test.describe( 'Site Editor Performance', () => {
 				perfUtils,
 				metrics,
 			} ) => {
+				// Start tracing before navigating so the page load is captured.
+				await metrics.startTracing();
+
 				// Go to the test draft.
-				await admin.visitSiteEditor( {
-					postId: draftId,
-					postType: 'page',
-					canvas: 'edit',
-				} );
+				await admin.page.goto(
+					'wp-admin/site-editor.php?postId=' +
+						draftId +
+						'&postType=page&canvas=edit'
+				);
 
 				// Wait for the first block.
 				const canvas = await perfUtils.getCanvas();
 				await canvas.locator( '.wp-block' ).first().waitFor();
 
-				// Get the durations.
+				// Capture timing metrics before `stopTracing()`, which
+				// blocks for the trace download/parse and would otherwise
+				// inflate `timeSinceResponseEnd` by seconds.
 				const loadingDurations = await metrics.getLoadingDurations();
+
+				// Stop tracing. Save just one representative sample.
+				await metrics.stopTracing(
+					i === Math.floor( iterations / 2 ) &&
+						'site-editor-first-block'
+				);
 
 				// Save the results.
 				if ( i > throwaway ) {
@@ -183,7 +203,7 @@ test.describe( 'Site Editor Performance', () => {
 			} );
 
 			// Stop tracing.
-			await metrics.stopTracing();
+			await metrics.stopTracing( 'site-editor-type' );
 
 			// Get the durations.
 			const [ keyDownEvents, keyPressEvents, keyUpEvents ] =
@@ -219,28 +239,28 @@ test.describe( 'Site Editor Performance', () => {
 					path: '/wp_template',
 				} );
 
-				// The Templates index page has changed, so we need to know which UI is in use in the branch.
-				// We do so by checking the presence of the dataviews component.
-				// If it's there, switch to the list layout before running the test.
-				// See https://github.com/WordPress/gutenberg/pull/59792
-				const isDataViewsUI = await page
-					.getByRole( 'button', { name: 'Layout' } )
-					.isVisible();
-				if ( isDataViewsUI ) {
-					await page
-						.getByRole( 'button', { name: 'Layout' } )
-						.click();
-					await page
-						.getByRole( 'menuitemradio' )
-						.filter( { has: page.getByText( 'List' ) } )
-						.click();
-				}
+				// Switch to the list layout before running the test.
+				await page.getByRole( 'button', { name: 'Layout' } ).click();
+				await page
+					.getByRole( 'menuitemradio' )
+					.filter( { has: page.getByText( 'List' ) } )
+					.click();
+
+				// Wait for the grid to be really visible.
+				await page.getByRole( 'grid' ).waitFor();
+
+				// List view shows the editor canvas, wait for it to be ready so
+				// that the loading doesn't contaminate the navigation test.
+				await admin.waitForSiteEditor();
 
 				await metrics.startTracing();
 				await page
-					.getByText( 'Single Posts', { exact: true } )
-					.click( { force: true } );
-				await metrics.stopTracing();
+					.getByRole( 'button', { name: 'Single Posts' } )
+					.click();
+				// Stop tracing. Save just one representative sample.
+				await metrics.stopTracing(
+					i === Math.floor( iterations / 2 ) && 'site-editor-navigate'
+				);
 
 				// Get the durations.
 				const [ mouseClickEvents ] = metrics.getClickEventDurations();
@@ -289,11 +309,7 @@ test.describe( 'Site Editor Performance', () => {
 			for ( let i = 1; i <= samples; i++ ) {
 				// We want to start from a fresh state each time, without
 				// queries or patterns already cached.
-				await admin.visitSiteEditor( {
-					postId: 'twentytwentyfour//home',
-					postType: 'wp_template',
-					canvas: 'edit',
-				} );
+				await admin.visitSiteEditor( { canvas: 'edit' } );
 				await editor.openDocumentSettingsSidebar();
 
 				/*
@@ -307,7 +323,6 @@ test.describe( 'Site Editor Performance', () => {
 				 * If there is a Replace template button (old UI), click it, otherwise, click the "transform into" button.
 				 * Once the performance tests are updated to compare compatible versions this code can be removed.
 				 */
-				// eslint-disable-next-line no-restricted-syntax
 				const isActionsButtonVisible = await page
 					.locator(
 						'.edit-site-template-card__actions button[aria-label="Actions"]'
@@ -455,4 +470,4 @@ test.describe( 'Site Editor Performance', () => {
 	} );
 } );
 
-/* eslint-enable playwright/no-conditional-in-test, playwright/expect-expect */
+/* eslint-enable playwright/expect-expect */

@@ -8,9 +8,6 @@
 	"keywords": [ "description" ],
 	"textdomain": "default",
 	"attributes": {
-		"textAlign": {
-			"type": "string"
-		},
 		"level": {
 			"type": "number",
 			"default": 0
@@ -23,10 +20,15 @@
 	"example": {
 		"viewportWidth": 350,
 		"attributes": {
-			"textAlign": "center"
+			"style": {
+				"typography": {
+					"textAlign": "center"
+				}
+			}
 		}
 	},
 	"supports": {
+		"anchor": true,
 		"align": [ "wide", "full" ],
 		"html": false,
 		"color": {
@@ -36,6 +38,7 @@
 				"text": true
 			}
 		},
+		"contentRole": true,
 		"spacing": {
 			"margin": true,
 			"padding": true,
@@ -47,6 +50,7 @@
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
+			"textAlign": true,
 			"__experimentalFontFamily": true,
 			"__experimentalTextTransform": true,
 			"__experimentalTextDecoration": true,

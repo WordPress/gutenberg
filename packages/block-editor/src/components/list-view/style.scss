@@ -1,3 +1,8 @@
+@use "@wordpress/base-styles/animations" as *;
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/colors" as *;
+
 .block-editor-list-view-tree {
 	width: 100%;
 	border-collapse: collapse;
@@ -412,6 +417,7 @@
 		color: $white;
 	}
 
+	.block-editor-list-view-block-select-button__block-visibility,
 	.block-editor-list-view-block-select-button__lock,
 	.block-editor-list-view-block-select-button__sticky {
 		line-height: 0;
@@ -463,7 +469,7 @@ $block-navigation-max-indent: 8;
 .block-editor-list-view__expander {
 	height: $icon-size;
 	width: $icon-size;
-	cursor: pointer;
+	cursor: var(--wpds-cursor-control);
 }
 
 .block-editor-list-view-leaf[aria-level] .block-editor-list-view__expander {

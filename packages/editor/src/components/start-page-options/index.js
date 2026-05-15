@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { Flex, FlexItem, Modal, ToggleControl } from '@wordpress/components';
+import { Flex, FlexItem, Modal, CheckboxControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useState, useMemo, useEffect } from '@wordpress/element';
 import {
@@ -17,7 +17,11 @@ import { store as interfaceStore } from '@wordpress/interface';
 /**
  * Internal dependencies
  */
-import { TEMPLATE_POST_TYPE } from '../../store/constants';
+import {
+	ATTACHMENT_POST_TYPE,
+	TEMPLATE_POST_TYPE,
+	TEMPLATE_PART_POST_TYPE,
+} from '../../store/constants';
 import { store as editorStore } from '../../store';
 
 export function useStartPatterns() {
@@ -119,16 +123,14 @@ function StartPageOptionsModal( { onClose } ) {
 			</div>
 			<Flex
 				className="editor-start-page-options__modal__actions"
-				justify="flex-end"
+				justify="flex-start"
 				expanded={ false }
 			>
 				<FlexItem>
-					<ToggleControl
-						__nextHasNoMarginBottom
+					<CheckboxControl
 						checked={ showStartPatterns }
-						label={ __( 'Show starter patterns' ) }
-						help={ __(
-							'Shows starter patterns when creating a new page.'
+						label={ __(
+							'Always show starter patterns for new pages'
 						) }
 						onChange={ ( newValue ) => {
 							setShowStartPatterns( newValue );
@@ -150,11 +152,14 @@ export default function StartPageOptions() {
 			'core',
 			'enableChoosePatternModal'
 		);
+		const currentPostType = getCurrentPostType();
 		return {
 			postId: getCurrentPostId(),
 			enabled:
 				choosePatternModalEnabled &&
-				TEMPLATE_POST_TYPE !== getCurrentPostType(),
+				ATTACHMENT_POST_TYPE !== currentPostType &&
+				TEMPLATE_POST_TYPE !== currentPostType &&
+				TEMPLATE_PART_POST_TYPE !== currentPostType,
 		};
 	}, [] );
 

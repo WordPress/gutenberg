@@ -63,9 +63,9 @@ const mediaUploadMiddleware: APIFetchMiddleware = ( options, next ) => {
 	};
 
 	return next( { ...options, parse: false } )
-		.catch( ( response ) => {
+		.catch( ( response: Response ) => {
 			// `response` could actually be an error thrown by `defaultFetchHandler`.
-			if ( ! response.headers ) {
+			if ( ! ( response instanceof globalThis.Response ) ) {
 				return Promise.reject( response );
 			}
 
@@ -92,7 +92,7 @@ const mediaUploadMiddleware: APIFetchMiddleware = ( options, next ) => {
 			}
 			return parseAndThrowError( response, options.parse );
 		} )
-		.then( ( response ) =>
+		.then( ( response: Response ) =>
 			parseResponseAndNormalizeError( response, options.parse )
 		);
 };

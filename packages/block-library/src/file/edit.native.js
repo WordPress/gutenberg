@@ -39,7 +39,7 @@ import {
 	button,
 	external,
 	link,
-	warning,
+	cautionFilled,
 } from '@wordpress/icons';
 import { Component } from '@wordpress/element';
 import { __, _x } from '@wordpress/i18n';
@@ -477,7 +477,7 @@ export class FileEdit extends Component {
 									{ isUploadFailed && (
 										<View style={ styles.errorContainer }>
 											<Icon
-												icon={ warning }
+												icon={ cautionFilled }
 												style={ errorIconStyle }
 											/>
 											<PlainText

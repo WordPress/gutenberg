@@ -10,10 +10,10 @@ import { cloneBlock } from '@wordpress/blocks';
 import { useEffect, useState, forwardRef, useMemo } from '@wordpress/element';
 import {
 	Composite,
-	VisuallyHidden,
 	Tooltip,
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
+import { VisuallyHidden, Text } from '@wordpress/ui';
 import { useInstanceId } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { Icon, symbol } from '@wordpress/icons';
@@ -154,9 +154,13 @@ function BlockPattern( {
 											/>
 										</div>
 									) }
-									<div className="block-editor-block-patterns-list__item-title">
+									<Text
+										render={ <div /> }
+										className="block-editor-block-patterns-list__item-title"
+										variant="body-sm"
+									>
 										{ pattern.title }
-									</div>
+									</Text>
 								</HStack>
 							) }
 

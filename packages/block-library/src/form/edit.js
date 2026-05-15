@@ -108,7 +108,6 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 						isShownByDefault
 					>
 						<SelectControl
-							__nextHasNoMarginBottom
 							__next40pxDefaultSize
 							label={ __( 'Submissions method' ) }
 							options={ [
@@ -151,7 +150,6 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 							isShownByDefault
 						>
 							<TextControl
-								__nextHasNoMarginBottom
 								__next40pxDefaultSize
 								autoComplete="off"
 								label={ __( 'Email for form submissions' ) }
@@ -177,7 +175,6 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 				<InspectorControls group="advanced">
 					<SelectControl
 						__next40pxDefaultSize
-						__nextHasNoMarginBottom
 						label={ __( 'Method' ) }
 						options={ [
 							{ label: 'Get', value: 'get' },
@@ -193,7 +190,6 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 					/>
 					<TextControl
 						__next40pxDefaultSize
-						__nextHasNoMarginBottom
 						autoComplete="off"
 						label={ __( 'Form action' ) }
 						value={ action }

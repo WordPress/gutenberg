@@ -14,6 +14,12 @@ test.describe( 'Block Toolbar', () => {
 		await admin.createNewPost();
 	} );
 
+	test.afterEach( async ( { requestUtils } ) => {
+		// Reset preferences via REST so a mid-test failure doesn't leak
+		// the fixed-toolbar setting (or any other pref) to other tests.
+		await requestUtils.resetPreferences();
+	} );
+
 	test.describe( 'Contextual Toolbar', () => {
 		test( 'should not scroll page', async ( { page, pageUtils } ) => {
 			while (
@@ -65,6 +71,7 @@ test.describe( 'Block Toolbar', () => {
 				page.getByRole( 'button', { name: 'Paragraph', exact: true } )
 			).toBeFocused();
 			// // Navigate to Align Text
+			await page.keyboard.press( 'ArrowRight' );
 			await page.keyboard.press( 'ArrowRight' );
 			await expect(
 				page.getByRole( 'button', { name: 'Align text', exact: true } )
@@ -140,7 +147,7 @@ test.describe( 'Block Toolbar', () => {
 		await expect(
 			page
 				.getByRole( 'toolbar', { name: 'Block Tools' } )
-				.getByRole( 'button', { name: 'Paragraph' } )
+				.getByRole( 'button', { name: 'Paragraph', exact: true } )
 		).toBeFocused();
 	} );
 
@@ -152,8 +159,6 @@ test.describe( 'Block Toolbar', () => {
 		page,
 		pageUtils,
 	} ) => {
-		/* eslint-disable playwright/expect-expect */
-		/* eslint-disable playwright/no-wait-for-timeout */
 		// Set the fixed toolbar
 		await editor.setIsFixedToolbar( true );
 		// Insert a block with a lot of tool buttons
@@ -181,11 +186,7 @@ test.describe( 'Block Toolbar', () => {
 
 		await BlockToolbarUtils.testScrollable( blockToolbar, blockButton );
 
-		// Test cleanup
-		await editor.setIsFixedToolbar( false );
 		await pageUtils.setBrowserViewport( 'large' );
-		/* eslint-enable playwright/expect-expect */
-		/* eslint-enable playwright/no-wait-for-timeout */
 	} );
 
 	test( 'Tab order of the block toolbar aligns with visual order', async ( {
@@ -251,8 +252,6 @@ test.describe( 'Block Toolbar', () => {
 		// check focus is on the block
 		await BlockToolbarUtils.expectLabelToHaveFocus( 'Block: Paragraph' );
 
-		// Test cleanup
-		await editor.setIsFixedToolbar( false );
 		await pageUtils.setBrowserViewport( 'large' );
 	} );
 

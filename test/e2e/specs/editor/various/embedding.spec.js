@@ -87,7 +87,7 @@ test.describe( 'Embedding content', () => {
 			'https://twitter.com/notnownikki': MOCK_EMBED_RICH_SUCCESS_RESPONSE,
 			'https://twitter.com/wooyaygutenberg123454312':
 				MOCK_CANT_EMBED_RESPONSE,
-			'https://wordpress.org/gutenberg/handbook/':
+			'https://wordpress.org/gutenberg/handbook':
 				MOCK_BAD_WORDPRESS_RESPONSE,
 			'https://twitter.com/thatbunty': MOCK_BAD_EMBED_PROVIDER_RESPONSE,
 			'https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/':
@@ -117,7 +117,7 @@ test.describe( 'Embedding content', () => {
 		).toHaveValue( 'https://twitter.com/wooyaygutenberg123454312' );
 
 		await embedUtils.insertEmbed(
-			'https://wordpress.org/gutenberg/handbook/'
+			'https://wordpress.org/gutenberg/handbook'
 		);
 		await expect(
 			currentEmbedBlock.getByRole( 'textbox', { name: 'Embed URL' } ),
@@ -202,7 +202,7 @@ test.describe( 'Embedding content', () => {
 
 		await expect(
 			editor.canvas.getByRole( 'document', {
-				name: 'Block: Twitter',
+				name: 'Block: X',
 			} )
 		).toBeVisible();
 	} );
@@ -235,7 +235,7 @@ test.describe( 'Embedding content', () => {
 		await embedBlock.getByRole( 'button', { name: 'Try again' } ).click();
 		await expect(
 			editor.canvas.getByRole( 'document', {
-				name: 'Block: Twitter',
+				name: 'Block: X',
 			} )
 		).toBeVisible();
 	} );
@@ -255,6 +255,36 @@ test.describe( 'Embedding content', () => {
 		await expect(
 			editor.canvas.getByRole( 'document', { name: 'Block: Embed' } )
 		).toBeVisible();
+	} );
+
+	test( 'should undo URL submit and preview-driven upgrade in a single step', async ( {
+		editor,
+		embedUtils,
+		pageUtils,
+	} ) => {
+		await embedUtils.interceptRequests( {
+			'https://www.youtube.com/watch?v=lXMskKTw3Bc':
+				MOCK_EMBED_VIDEO_SUCCESS_RESPONSE,
+		} );
+
+		await embedUtils.insertEmbed(
+			'https://www.youtube.com/watch?v=lXMskKTw3Bc'
+		);
+
+		// Wait for the block to upgrade to the YouTube variant.
+		await expect(
+			editor.canvas.getByRole( 'document', {
+				name: 'Block: YouTube Embed',
+			} )
+		).toBeVisible();
+
+		await pageUtils.pressKeys( 'primary+z' );
+
+		await expect(
+			editor.canvas
+				.getByRole( 'document', { name: 'Block: Embed' } )
+				.getByRole( 'textbox', { name: 'Embed URL' } )
+		).toHaveValue( 'https://www.youtube.com/watch?v=lXMskKTw3Bc' );
 	} );
 } );
 

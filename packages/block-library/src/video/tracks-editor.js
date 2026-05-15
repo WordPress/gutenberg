@@ -34,7 +34,7 @@ import { getFilename } from '@wordpress/url';
  */
 import { unlock } from '../lock-unlock';
 
-const { Badge } = unlock( componentsPrivateApis );
+const { Badge: WCBadge } = unlock( componentsPrivateApis );
 
 const ALLOWED_TYPES = [ 'text/vtt' ];
 
@@ -65,7 +65,7 @@ function TrackList( { tracks, onEditPress } ) {
 			>
 				<span>{ track.label }</span>
 				<HStack justify="flex-end">
-					{ track.default && <Badge>{ __( 'Default' ) }</Badge> }
+					{ track.default && <WCBadge>{ __( 'Default' ) }</WCBadge> }
 					<Button
 						__next40pxDefaultSize
 						variant="tertiary"
@@ -121,7 +121,6 @@ function SingleTrackEditor( {
 			<Grid columns={ 2 } gap={ 4 }>
 				<TextControl
 					__next40pxDefaultSize
-					__nextHasNoMarginBottom
 					onChange={ ( newLabel ) =>
 						setTrackState( ( prevTrackState ) => ( {
 							...prevTrackState,
@@ -134,7 +133,6 @@ function SingleTrackEditor( {
 				/>
 				<TextControl
 					__next40pxDefaultSize
-					__nextHasNoMarginBottom
 					onChange={ ( newSrcLang ) =>
 						setTrackState( ( prevTrackState ) => ( {
 							...prevTrackState,
@@ -149,7 +147,6 @@ function SingleTrackEditor( {
 			<VStack spacing="4">
 				<SelectControl
 					__next40pxDefaultSize
-					__nextHasNoMarginBottom
 					className="block-library-video-tracks-editor__single-track-editor-kind-select"
 					options={ KIND_OPTIONS }
 					value={ kind }
@@ -163,7 +160,6 @@ function SingleTrackEditor( {
 				/>
 				<ToggleControl
 					__next40pxDefaultSize
-					__nextHasNoMarginBottom
 					label={ __( 'Set as default track' ) }
 					checked={ isDefaultTrack }
 					disabled={ ! allowSettingDefault }

@@ -21,7 +21,8 @@ import { UploadError } from './upload-error';
 
 declare global {
 	interface Window {
-		__experimentalMediaProcessing?: boolean;
+		__clientSideMediaProcessing?: boolean;
+		__heicUploadSupport?: boolean;
 	}
 }
 
@@ -82,7 +83,7 @@ export function uploadMedia( {
 	const filesSet: Array< Partial< Attachment > | null > = [];
 	const setAndUpdateFiles = ( index: number, value: Attachment | null ) => {
 		// For client-side media processing, this is handled by the upload-media package.
-		if ( ! window.__experimentalMediaProcessing ) {
+		if ( ! window.__clientSideMediaProcessing ) {
 			if ( filesSet[ index ]?.url ) {
 				revokeBlobURL( filesSet[ index ].url );
 			}
@@ -123,7 +124,7 @@ export function uploadMedia( {
 		validFiles.push( mediaFile );
 
 		// For client-side media processing, this is handled by the upload-media package.
-		if ( ! window.__experimentalMediaProcessing ) {
+		if ( ! window.__clientSideMediaProcessing ) {
 			// Set temporary URL to create placeholder media file, this is replaced
 			// with final file from media gallery when upload is `done` below.
 			filesSet.push( { url: createBlobURL( mediaFile ) } );

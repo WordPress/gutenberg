@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react-vite';
 
 /**
  * WordPress dependencies
@@ -14,6 +14,7 @@ import { useState } from '@wordpress/element';
 import TextControl from '..';
 
 const meta: Meta< typeof TextControl > = {
+	tags: [ 'manifest' ],
 	component: TextControl,
 	title: 'Components/Selection & Input/Common/TextControl',
 	id: 'components-textcontrol',
@@ -28,6 +29,11 @@ const meta: Meta< typeof TextControl > = {
 			expanded: true,
 		},
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+			notes: 'Prefer `InputControl` when placing buttons or icons in the prefix/suffix slots.',
+		},
 	},
 };
 export default meta;
@@ -40,6 +46,7 @@ const DefaultTemplate: StoryFn< typeof TextControl > = ( {
 
 	return (
 		<TextControl
+			__next40pxDefaultSize
 			{ ...args }
 			value={ value }
 			onChange={ ( v ) => {
@@ -54,7 +61,6 @@ export const Default: StoryFn< typeof TextControl > = DefaultTemplate.bind(
 	{}
 );
 Default.args = {
-	__nextHasNoMarginBottom: true,
 	__next40pxDefaultSize: true,
 	placeholder: 'Placeholder',
 };

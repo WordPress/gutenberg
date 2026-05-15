@@ -1,23 +1,27 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "../utils/theme-variables" as *;
+
 .components-validated-control {
 	// For components based on InputBase
-	&:has(:is(input, select):user-invalid)
+	&:has(:is(input, select):invalid[data-validity-visible])
 	.components-input-control__backdrop {
-		--wp-components-color-accent: $alert-red;
+		--wp-components-color-accent: #{$alert-red};
 		border-color: $alert-red;
 	}
 
 	// For TextControl, TextareaControl
-	:is(textarea, input[type="text"]):user-invalid {
-		--wp-admin-theme-color: $alert-red;
-		--wp-components-color-accent: $alert-red;
+	:is(textarea, input[type="text"]):invalid[data-validity-visible] {
+		--wp-admin-theme-color: #{$alert-red};
+		--wp-components-color-accent: #{$alert-red};
 		border-color: $alert-red;
 	}
 
 	// For ComboboxControl
 	.components-combobox-control__suggestions-container:has(
-	input:user-invalid
+	input:invalid[data-validity-visible]
 ):not(:has([aria-expanded="true"])) {
-		border-color: $alert-red;
+		--wp-components-color-accent: #{$alert-red};
 	}
 }
 
@@ -25,14 +29,20 @@
 	position: relative;
 
 	// For CustomSelectControl
-	&:has(select:user-invalid) .components-input-control__backdrop {
-		--wp-components-color-accent: $alert-red;
+	&:has(select:invalid[data-validity-visible]) .components-input-control__backdrop {
+		--wp-components-color-accent: #{$alert-red};
 		border-color: $alert-red;
 	}
 
 	// For ToggleGroupControl
-	&:has(input[type="radio"]:invalid) {
-		--wp-components-color-accent: $alert-red;
+	&:has(input[type="radio"]:invalid[data-validity-visible]) {
+		--wp-components-color-accent: #{$alert-red};
+	}
+
+	// For FormTokenField
+	&:has(input:invalid[data-validity-visible]) .components-form-token-field__input-container:not(:has([aria-expanded="true"])) {
+		--wp-components-color-accent: #{$alert-red};
+		border-color: $alert-red;
 	}
 }
 
@@ -51,7 +61,7 @@
 	gap: 4px;
 	margin: 8px 0 0;
 	font-family: $font-family-body;
-	font-size: 0.75rem;
+	font-size: $font-size-small;
 	line-height: 16px; // matches the icon size
 	color: $components-color-gray-700;
 	animation:

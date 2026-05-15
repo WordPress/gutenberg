@@ -1,7 +1,9 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react-vite';
+import { fn } from 'storybook/test';
+
 /**
  * WordPress dependencies
  */
@@ -19,7 +21,6 @@ const meta: Meta< typeof InputControl > = {
 	title: 'Components/Selection & Input/Common/InputControl',
 	id: 'components-inputcontrol',
 	component: InputControl,
-	// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 	subcomponents: { InputControlPrefixWrapper, InputControlSuffixWrapper },
 	argTypes: {
 		__unstableInputWidth: { control: { type: 'text' } },
@@ -30,17 +31,26 @@ const meta: Meta< typeof InputControl > = {
 		type: { control: { type: 'text' } },
 		value: { control: { disable: true } },
 	},
-	tags: [ 'status-experimental' ],
+	tags: [ 'status-experimental', 'manifest' ],
+	args: {
+		onChange: fn(),
+		onValidate: fn(),
+		onKeyDown: fn(),
+	},
 	parameters: {
-		actions: { argTypesRegex: '^on.*' },
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+			notes: 'Will be superseded by `InputControl` in `@wordpress/ui`, but continue using for now.',
+		},
 	},
 };
 export default meta;
 
 const Template: StoryFn< typeof InputControl > = ( args ) => (
-	<InputControl { ...args } />
+	<InputControl __next40pxDefaultSize { ...args } />
 );
 
 export const Default = Template.bind( {} );
@@ -118,6 +128,7 @@ export const ShowPassword: StoryFn< typeof InputControl > = ( args ) => {
 	const [ visible, setVisible ] = useState( false );
 	return (
 		<InputControl
+			__next40pxDefaultSize
 			type={ visible ? 'text' : 'password' }
 			suffix={
 				<InputControlSuffixWrapper variant="control">

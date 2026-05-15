@@ -88,7 +88,7 @@ There are some common use cases for dynamic blocks:
 
 A block can define dynamic rendering in two main ways:
 
-1. Using the `render_callback` argument that can be passed to the [`register_block_type()`](https://developer.wordpress.org/block-editor/getting-started/fundamentals/registration-of-a-block/#registration-of-the-block-with-php-server-side) function.
+1. Using the `render_callback` argument that can be passed to the [`register_block_type()`](https://developer.wordpress.org/block-editor/getting-started/fundamentals/registration-of-a-block/#registration-of-the-block-with-php-server-side) function. This is needed for [PHP-only blocks](/docs/getting-started/fundamentals/registration-of-a-block.md#php-only-blocks-with-auto-registration).
 2. Using a separate PHP file usually named `render.php`. This file's path should be defined using the [`render`](https://developer.wordpress.org/block-editor/getting-started/fundamentals/block-json/#files-for-the-blocks-behavior-output-or-style) property in the `block.json` file.
 
 Both of these methods receive the following data:

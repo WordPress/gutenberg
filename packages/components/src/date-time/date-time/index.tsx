@@ -11,8 +11,8 @@ import { forwardRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { default as DatePicker } from '../date';
-import { default as TimePicker } from '../time';
+import { default as DatePicker } from '../date-picker';
+import { default as TimePicker } from '../time-picker';
 import type { DateTimePickerProps } from '../types';
 import { Wrapper } from './styles';
 
@@ -78,5 +78,6 @@ function UnforwardedDateTimePicker(
  * ```
  */
 export const DateTimePicker = forwardRef( UnforwardedDateTimePicker );
+DateTimePicker.displayName = 'DateTimePicker';
 
 export default DateTimePicker;

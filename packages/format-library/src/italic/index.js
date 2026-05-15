@@ -7,16 +7,8 @@ import {
 	RichTextToolbarButton,
 	RichTextShortcut,
 	__unstableRichTextInputEvent,
-	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { formatItalic } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
-import { unlock } from '../lock-unlock';
-
-const { essentialFormatKey } = unlock( blockEditorPrivateApis );
 
 const name = 'core/italic';
 const title = __( 'Italic' );
@@ -26,8 +18,7 @@ export const italic = {
 	title,
 	tagName: 'em',
 	className: null,
-	[ essentialFormatKey ]: true,
-	edit( { isActive, value, onChange, onFocus } ) {
+	edit( { isActive, value, onChange, onFocus, isVisible = true } ) {
 		function onToggle() {
 			onChange( toggleFormat( value, { type: name, title } ) );
 		}
@@ -44,15 +35,17 @@ export const italic = {
 					character="i"
 					onUse={ onToggle }
 				/>
-				<RichTextToolbarButton
-					name="italic"
-					icon={ formatItalic }
-					title={ title }
-					onClick={ onClick }
-					isActive={ isActive }
-					shortcutType="primary"
-					shortcutCharacter="i"
-				/>
+				{ isVisible && (
+					<RichTextToolbarButton
+						name="italic"
+						icon={ formatItalic }
+						title={ title }
+						onClick={ onClick }
+						isActive={ isActive }
+						shortcutType="primary"
+						shortcutCharacter="i"
+					/>
+				) }
 				<__unstableRichTextInputEvent
 					inputType="formatItalic"
 					onInput={ onToggle }

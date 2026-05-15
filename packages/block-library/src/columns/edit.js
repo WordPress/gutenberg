@@ -162,7 +162,6 @@ function ColumnInspectorControls( {
 			{ canInsertColumnBlock && (
 				<VStack spacing={ 4 } style={ { gridColumn: '1 / -1' } }>
 					<RangeControl
-						__nextHasNoMarginBottom
 						__next40pxDefaultSize
 						label={ __( 'Columns' ) }
 						value={ count }
@@ -192,7 +191,6 @@ function ColumnInspectorControls( {
 				}
 			>
 				<ToggleControl
-					__nextHasNoMarginBottom
 					label={ __( 'Stack on mobile' ) }
 					checked={ isStackedOnMobile }
 					onChange={ () =>
