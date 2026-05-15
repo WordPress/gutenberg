@@ -139,7 +139,14 @@ const form: Form = {
 };
 
 interface LayoutSettingsProps {
+	/**
+	 * Whether the drawer is visible.
+	 */
 	open: boolean;
+
+	/**
+	 * Callback to toggle the drawer.
+	 */
 	onOpenChange: ( open: boolean ) => void;
 }
 
@@ -166,9 +173,8 @@ interface LayoutSettingsProps {
  * commit never publishes layout edits that the user is in the
  * middle of staging through the toolbar.
  *
- * @param props
- * @param props.open         Whether the drawer is visible.
- * @param props.onOpenChange Toggle controller from the trigger.
+ * @param {LayoutSettingsProps} props Layout settings props.
+ * @return {React.ReactNode} The layout settings component.
  */
 export function LayoutSettings( {
 	open,
