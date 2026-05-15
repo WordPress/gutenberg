@@ -2253,23 +2253,35 @@ function getDistributedEditingEnabledShellTitle( shellState ) {
 	return __( 'Distributed Editing: Ready' );
 }
 
+function getDistributedEditingEnabledShellProtectionLine( shellState ) {
+	if ( shellState.localProtection === 'protected' ) {
+		return __( 'Local changes are protected.' );
+	}
+
+	if ( shellState.humanLoopStepState.confirmedByWordPress ) {
+		return __( 'New edits will stay protected.' );
+	}
+
+	return __( 'Local work stays protected.' );
+}
+
 function getDistributedEditingEnabledShellSaveLine( shellState ) {
 	switch ( shellState.humanLoopStep ) {
 		case DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.GET_LATEST_POST:
-			return __( 'Get latest post before saving.' );
+			return __( 'Get the latest post before Save.' );
 		case DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.REVIEW_CHANGES:
-			return __( 'Review changes before saving.' );
+			return __( 'Review changes before Save.' );
 		case DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.READY_TO_SAVE:
-			return __( 'Ready to Save.' );
+			return __( 'Ready for WordPress Save.' );
 		case DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.WAITING_FOR_WORDPRESS:
-			return __( 'Waiting for WordPress.' );
+			return __( 'Waiting for WordPress confirmation.' );
 		case DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.SAVE_CONFIRMED:
-			return __( 'Saved by WordPress.' );
+			return __( 'WordPress confirmed Save.' );
 		case DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.LOCAL_CHANGES_PROTECTED:
-			return __( 'Keep this tab open until WordPress confirms.' );
+			return __( 'Save checks WordPress before updating.' );
 	}
 
-	return __( 'Save updates WordPress when ready.' );
+	return __( 'Save checks WordPress before updating.' );
 }
 
 /**
@@ -2307,6 +2319,8 @@ export function DistributedEditingEnabledShell( {
 			? 'degraded'
 			: shellState.localProtection;
 	const shellTitle = getDistributedEditingEnabledShellTitle( shellState );
+	const protectionLine =
+		getDistributedEditingEnabledShellProtectionLine( shellState );
 	const saveLine = getDistributedEditingEnabledShellSaveLine( shellState );
 
 	return (
@@ -2350,7 +2364,7 @@ export function DistributedEditingEnabledShell( {
 						{ shellTitle }
 					</strong>
 					<span className="editor-distributed-editing-status__enabled-shell-protection">
-						{ __( 'Local changes are protected.' ) }
+						{ protectionLine }
 					</span>
 				</div>
 				<div
@@ -2687,6 +2701,7 @@ function DistributedEditingPresenceRoster( {
 	const shouldShowPresenceStorageReadiness =
 		presenceStorageSetupAffordanceState.visible ||
 		presenceStorageReadinessRecheckState.visible;
+	const shouldShowPresenceActions = shouldShowPresenceFreshnessIndicator;
 	const hasOtherEditorActivityCue = Boolean(
 		rosterState.copy.otherEditorActivityCue
 	);
@@ -3413,6 +3428,10 @@ function DistributedEditingPresenceRoster( {
 			data-distributed-editing-presence-other-editor-cue-visible={ formatDataBoolean(
 				Boolean( rosterState.copy.otherEditorActivityCue )
 			) }
+			data-distributed-editing-presence-actions-visible={ formatDataBoolean(
+				shouldShowPresenceActions
+			) }
+			data-distributed-editing-presence-label={ rosterState.copy.label }
 			data-distributed-editing-presence-summary-expired-count={
 				rosterState.expiredCount
 			}
@@ -3433,9 +3452,6 @@ function DistributedEditingPresenceRoster( {
 			}
 			role="group"
 		>
-			<strong className="editor-distributed-editing-status__presence-roster-label">
-				{ rosterState.copy.label }
-			</strong>
 			<div
 				aria-live="polite"
 				className={ presenceSummaryClassName }
@@ -3566,28 +3582,30 @@ function DistributedEditingPresenceRoster( {
 					) }
 				</div>
 			) }
-			<div className="editor-distributed-editing-status__presence-actions">
-				<Button
-					variant="secondary"
-					onClick={ handleRefreshPresence }
-					isBusy={ commandStatus === 'refreshing' }
-					accessibleWhenDisabled
-					disabled={ commandStatus === 'refreshing' }
-					__next40pxDefaultSize
-				>
-					{ __( 'Refresh editing list' ) }
-				</Button>
-				<Button
-					variant="secondary"
-					onClick={ handleSendPresenceHeartbeat }
-					isBusy={ heartbeatCommandStatus === 'sending' }
-					accessibleWhenDisabled
-					disabled={ heartbeatCommandStatus === 'sending' }
-					__next40pxDefaultSize
-				>
-					{ __( 'Update my presence' ) }
-				</Button>
-			</div>
+			{ shouldShowPresenceActions && (
+				<div className="editor-distributed-editing-status__presence-actions">
+					<Button
+						variant="tertiary"
+						onClick={ handleRefreshPresence }
+						isBusy={ commandStatus === 'refreshing' }
+						accessibleWhenDisabled
+						disabled={ commandStatus === 'refreshing' }
+						__next40pxDefaultSize
+					>
+						{ __( 'Refresh editing list' ) }
+					</Button>
+					<Button
+						variant="tertiary"
+						onClick={ handleSendPresenceHeartbeat }
+						isBusy={ heartbeatCommandStatus === 'sending' }
+						accessibleWhenDisabled
+						disabled={ heartbeatCommandStatus === 'sending' }
+						__next40pxDefaultSize
+					>
+						{ __( 'Update my presence' ) }
+					</Button>
+				</div>
+			) }
 			{ commandStatus !== 'idle' && (
 				<div role="status">
 					{ getPresenceRefreshCommandStatusText( commandStatus ) }

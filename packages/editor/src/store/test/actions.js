@@ -6554,7 +6554,7 @@ describe( 'Post actions', () => {
 			).toBe( false );
 		} );
 
-		it( 'blocks setting-enabled normal save fallback when the server post changed', async () => {
+		it( 'blocks setting-enabled normal save fallback when the server post changed with a merge conflict', async () => {
 			const originalPostContent =
 				'<!-- wp:paragraph --><p>Original freshness stale.</p><!-- /wp:paragraph -->';
 			const editedPostContent =
@@ -6621,7 +6621,7 @@ describe( 'Post actions', () => {
 			await expect(
 				registry.dispatch( editorStore ).savePost()
 			).resolves.toMatchObject( {
-				status: 'distributed_editing_normal_save_blocked_stale_server',
+				status: 'distributed_editing_normal_save_blocked_merge_conflict',
 				reason: 'stale_base_version_rejected',
 				allowsNormalSaveFallback: false,
 				blocksNormalSavePost: true,
@@ -6632,7 +6632,11 @@ describe( 'Post actions', () => {
 				changesPostLock: false,
 				claimsSaved: false,
 				canExportLocalUpdates: true,
-				requiresServerStateRefetch: true,
+				requiresServerStateRefetch: false,
+				localRebaseResultStatus:
+					DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.MANUAL_CONFLICT_REQUIRED,
+				localRebaseResultReason: 'same_block_changed',
+				requiresManualConflictResolution: true,
 			} );
 
 			expect( serverStateRefetchCalls ).toBe( 1 );
@@ -6653,10 +6657,188 @@ describe( 'Post actions', () => {
 				clientBaseContent: originalPostContent,
 				pendingChangeCount: 1,
 				remoteChangeCount: 1,
-				requiresServerStateRefetch: true,
+				requiresServerStateRefetch: false,
+				refetchedServerState: true,
+				localRebaseResultStatus:
+					DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.MANUAL_CONFLICT_REQUIRED,
+				localRebaseResultReason: 'same_block_changed',
+				requiresManualConflictResolution: true,
 				canExportLocalUpdates: true,
 				actionTranscriptLatestEventType:
 					DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.REMOTE_CHANGE_RECEIVED,
+				actionTranscriptCallsSave: false,
+				actionTranscriptClaimsSaved: false,
+			} );
+		} );
+
+		it( 'auto-merges non-conflicting stale server changes through retry-save', async () => {
+			const originalPostContent =
+				'<!-- wp:paragraph --><p>Original alpha.</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Original beta.</p><!-- /wp:paragraph -->';
+			const originalPostContentWithSyncMeta = `${ originalPostContent }<script type="wp/post-sync-meta" data-sync-meta-format="diff-match-patch">{"version":"4"}</script>`;
+			const editedPostContent =
+				'<!-- wp:paragraph --><p>Local alpha.</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Original beta.</p><!-- /wp:paragraph -->';
+			const remotePostContent =
+				'<!-- wp:paragraph --><p>Original alpha.</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Remote beta.</p><!-- /wp:paragraph -->';
+			const mergedPostContent =
+				'<!-- wp:paragraph --><p>Local alpha.</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Remote beta.</p><!-- /wp:paragraph -->';
+			const post = {
+				id: postId,
+				type: 'post',
+				title: 'bar',
+				content: originalPostContentWithSyncMeta,
+				status: 'draft',
+			};
+			let serverStateRefetchCalls = 0;
+			let retrySubmitCalls = 0;
+			let retrySaveCalls = 0;
+			let normalSaveCalls = 0;
+			let retrySubmitRequestData = null;
+			let retrySaveRequestData = null;
+
+			apiFetch.setFetchHandler( async ( options ) => {
+				const method = getMethod( options );
+				const { path, data } = options;
+
+				if (
+					method === 'GET' &&
+					path.startsWith( `/wp/v2/posts/${ postId }` ) &&
+					path.includes( 'context=edit' )
+				) {
+					serverStateRefetchCalls++;
+					return {
+						...post,
+						content: {
+							raw: remotePostContent,
+						},
+						distributed_editing: {
+							server_version: '7',
+						},
+					};
+				}
+
+				if (
+					method === 'POST' &&
+					path.startsWith(
+						`/wp/v2/posts/${ postId }/distributed-editing/retry-submit`
+					)
+				) {
+					retrySubmitCalls++;
+					retrySubmitRequestData = data;
+
+					return {
+						result: 'retry_submit_accepted_for_future_save',
+						retry_submit_accepted: true,
+						client_base_version: '7',
+						server_version: '7',
+						rebased_from_version: '4',
+						save_path_required: true,
+						saves_post: false,
+						mutates_post_content: false,
+						creates_revision: false,
+						claims_saved: false,
+					};
+				}
+
+				if (
+					method === 'POST' &&
+					path.startsWith(
+						`/wp/v2/posts/${ postId }/distributed-editing/retry-save`
+					)
+				) {
+					retrySaveCalls++;
+					retrySaveRequestData = data;
+
+					return {
+						result: 'retry_save_applied',
+						retry_save_accepted: true,
+						previous_server_version: '7',
+						server_version: '8',
+						pending_change_count: 1,
+						saves_post: true,
+						mutates_post_content: true,
+						creates_revision: true,
+						claims_saved: true,
+					};
+				}
+
+				if (
+					method === 'PUT' &&
+					path.startsWith( `/wp/v2/posts/${ postId }` )
+				) {
+					normalSaveCalls++;
+				}
+
+				throw {
+					code: 'unexpected_path',
+					message: `Unexpected path: ${ method } ${ path }`,
+				};
+			} );
+
+			const registry = createRegistryWithStores();
+
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', post );
+			registry.dispatch( editorStore ).setupEditor( post, {
+				content: editedPostContent,
+			} );
+			registry.dispatch( editorStore ).updateEditorSettings( {
+				distributedEditing: {
+					enabled: true,
+					retrySaveHandoff: true,
+				},
+			} );
+
+			await expect(
+				registry.dispatch( editorStore ).savePost()
+			).resolves.toMatchObject( {
+				status: 'distributed_editing_normal_save_auto_merged_retry_save_submitted',
+				autoMergedLocalChanges: true,
+				mergedBlockCount: 2,
+				allowsNormalSaveFallback: false,
+				callsServerStateRefetchEndpoint: true,
+				callsRetrySubmitEndpoint: true,
+				callsRetrySaveEndpoint: true,
+				callsNormalSavePost: false,
+				mutatesEditorContent: true,
+				changesPostLock: false,
+				claimsSaved: true,
+			} );
+
+			expect( serverStateRefetchCalls ).toBe( 1 );
+			expect( retrySubmitCalls ).toBe( 1 );
+			expect( retrySaveCalls ).toBe( 1 );
+			expect( normalSaveCalls ).toBe( 0 );
+			expect( retrySubmitRequestData ).toMatchObject( {
+				client_base_version: '7',
+				rebased_from_version: '4',
+				pending_change_count: 1,
+			} );
+			expect( retrySubmitRequestData.content ).toBeUndefined();
+			expect( retrySaveRequestData ).toMatchObject( {
+				client_base_version: '7',
+				accepted_proof_server_version: '7',
+				rebased_from_version: '4',
+				pending_change_count: 1,
+				proposed_post_content: mergedPostContent,
+				accepted_proof_saves_post: false,
+				accepted_proof_mutates_post_content: false,
+				accepted_proof_creates_revision: false,
+				accepted_proof_claims_saved: false,
+			} );
+			expect(
+				registry.select( editorStore ).getEditedPostContent()
+			).toBe( mergedPostContent );
+			expect(
+				registry
+					.select( editorStore )
+					.getDistributedEditingSessionState()
+			).toMatchObject( {
+				retrySaveStatus: DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVED,
+				retrySaveAccepted: true,
+				canExportLocalUpdates: false,
+				actionTranscriptLatestEventType:
+					DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.SAVE_CONFIRMED,
 				actionTranscriptCallsSave: false,
 				actionTranscriptClaimsSaved: false,
 			} );

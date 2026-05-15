@@ -1206,10 +1206,10 @@ describe( 'DistributedEditingStatus', () => {
 			within( shell ).getByText( 'Distributed Editing: Ready' )
 		).toBeVisible();
 		expect(
-			screen.getByText( 'Local changes are protected.' )
+			screen.getByText( 'Local work stays protected.' )
 		).toBeVisible();
 		expect(
-			screen.getByText( 'Save updates WordPress when ready.' )
+			screen.getByText( 'Save checks WordPress before updating.' )
 		).toBeVisible();
 		expect(
 			screen.queryByText( 'Distributed Editing enabled' )
@@ -1274,7 +1274,7 @@ describe( 'DistributedEditingStatus', () => {
 			'data-distributed-editing-human-loop-claims-saved-without-evidence',
 			'false'
 		);
-		expect( screen.getByText( 'Editing now' ) ).toBeVisible();
+		expect( screen.queryByText( 'Editing now' ) ).not.toBeInTheDocument();
 		expect( screen.getByText( 'No other editors shown.' ) ).toBeVisible();
 		expect(
 			screen.queryByText( 'Editor activity has not been shown yet.' )
@@ -1330,6 +1330,24 @@ describe( 'DistributedEditingStatus', () => {
 			'data-distributed-editing-presence-refresh-hint',
 			'Use Refresh editing list to check again.'
 		);
+		expect(
+			screen.getByRole( 'group', {
+				name: 'Distributed editing presence',
+			} )
+		).toHaveAttribute(
+			'data-distributed-editing-presence-actions-visible',
+			'false'
+		);
+		expect(
+			screen.queryByRole( 'button', {
+				name: 'Refresh editing list',
+			} )
+		).not.toBeInTheDocument();
+		expect(
+			screen.queryByRole( 'button', {
+				name: 'Update my presence',
+			} )
+		).not.toBeInTheDocument();
 		expect(
 			screen.queryByRole( 'region', {
 				name: 'Distributed editing status',
@@ -1403,7 +1421,7 @@ describe( 'DistributedEditingStatus', () => {
 				'WordPress accepted this Distributed Editing Save. You can keep editing; WordPress will protect any new local changes.'
 			)
 		).not.toBeInTheDocument();
-		expect( screen.getByText( 'Saved by WordPress.' ) ).toBeVisible();
+		expect( screen.getByText( 'WordPress confirmed Save.' ) ).toBeVisible();
 		// eslint-disable-next-line testing-library/no-node-access
 		const saveJourney = shell.querySelector(
 			'[data-distributed-editing-save-journey-status]'
@@ -3338,7 +3356,7 @@ describe( 'DistributedEditingStatus', () => {
 				},
 			},
 			sessionState: {
-				presenceRosterStatus: 'empty',
+				presenceRosterStatus: 'degraded',
 			},
 		} );
 
@@ -3350,6 +3368,10 @@ describe( 'DistributedEditingStatus', () => {
 		expect( presence ).toHaveAttribute(
 			'data-distributed-editing-presence-refresh-command-status',
 			'idle'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-actions-visible',
+			'true'
 		);
 
 		await user.click(
@@ -3382,6 +3404,7 @@ describe( 'DistributedEditingStatus', () => {
 				},
 			},
 			sessionState: {
+				isConnectionDegraded: true,
 				presenceRosterEntries: [
 					{
 						key: 'presence-local-heartbeat-current-tab',
@@ -3390,6 +3413,7 @@ describe( 'DistributedEditingStatus', () => {
 						freshness: 'current',
 					},
 				],
+				presenceRosterStatus: 'degraded',
 				presenceHeartbeatStatus: 'sent',
 				presenceHeartbeatCallsRestEndpoint: true,
 				presenceHeartbeatRecordsPresenceHeartbeat: true,
@@ -3459,8 +3483,12 @@ describe( 'DistributedEditingStatus', () => {
 			'data-distributed-editing-presence-visible-count',
 			'1'
 		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-actions-visible',
+			'true'
+		);
 		expect( presence ).toHaveTextContent(
-			'You are visible in this editing session.'
+			'Presence may be delayed. Save checks still use WordPress.'
 		);
 		expect(
 			screen.getByRole( 'listitem', {
@@ -4109,6 +4137,20 @@ describe( 'DistributedEditingStatus', () => {
 				'data-distributed-editing-presence-repeated-refresh-scheduler-delay-ms',
 				'120000'
 			);
+			expect( presence ).toHaveAttribute(
+				'data-distributed-editing-presence-actions-visible',
+				'false'
+			);
+			expect(
+				screen.queryByRole( 'button', {
+					name: 'Refresh editing list',
+				} )
+			).not.toBeInTheDocument();
+			expect(
+				screen.queryByRole( 'button', {
+					name: 'Update my presence',
+				} )
+			).not.toBeInTheDocument();
 
 			await act( async () => {
 				jest.advanceTimersByTime( 3000 );
@@ -4136,6 +4178,20 @@ describe( 'DistributedEditingStatus', () => {
 				'data-distributed-editing-presence-refresh-command-status',
 				'refreshed'
 			);
+			expect( presence ).toHaveAttribute(
+				'data-distributed-editing-presence-actions-visible',
+				'false'
+			);
+			expect(
+				screen.queryByRole( 'button', {
+					name: 'Refresh editing list',
+				} )
+			).not.toBeInTheDocument();
+			expect(
+				screen.queryByRole( 'button', {
+					name: 'Update my presence',
+				} )
+			).not.toBeInTheDocument();
 			expect(
 				actions.__experimentalSaveDistributedEditingRetryAfterProof
 			).not.toHaveBeenCalled();
@@ -5563,7 +5619,7 @@ describe( 'DistributedEditingStatus', () => {
 			)
 		).not.toBeInTheDocument();
 		expect(
-			screen.getByText( 'Keep this tab open until WordPress confirms.' )
+			screen.getByText( 'Save checks WordPress before updating.' )
 		).toBeVisible();
 		expect( screen.getByText( 'Changes pending' ) ).toBeVisible();
 	} );
@@ -5636,7 +5692,7 @@ describe( 'DistributedEditingStatus', () => {
 			)
 		).not.toBeInTheDocument();
 		expect(
-			screen.getByText( 'Review changes before saving.' )
+			screen.getByText( 'Review changes before Save.' )
 		).toBeVisible();
 		// eslint-disable-next-line testing-library/no-node-access
 		const saveJourney = shell.querySelector(
