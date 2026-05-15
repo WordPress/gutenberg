@@ -111,6 +111,16 @@ const fields: Field< WidgetGridSettings >[] = [
 		isValid: { min: 1, max: 12 },
 	},
 	{
+		id: 'minColumnWidth',
+		type: 'integer',
+		Edit: StepperIntegerEdit,
+		label: __( 'Min column width (px)' ),
+		description: __(
+			'Per-tile width floor. When the container is too narrow to fit the target column count at this width, the grid reduces the count to keep tiles legible.'
+		),
+		isValid: { min: 48, max: 600 },
+	},
+	{
 		id: 'autoRowHeight',
 		type: 'boolean',
 		Edit: 'toggle',
@@ -139,7 +149,13 @@ const fields: Field< WidgetGridSettings >[] = [
 
 const form: Form = {
 	layout: { type: 'regular', labelPosition: 'top' },
-	fields: [ 'model', 'columns', 'autoRowHeight', 'rowHeight' ],
+	fields: [
+		'model',
+		'columns',
+		'minColumnWidth',
+		'autoRowHeight',
+		'rowHeight',
+	],
 };
 
 interface LayoutSettingsProps {

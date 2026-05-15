@@ -32,11 +32,13 @@ import type {
  * shape passes through untouched and missing fields fall back to whatever
  * defaults the grid model itself supplies.
  *
- * The per-tile width floor is enforced by the dashboard engine at render
- * time (see `widgets.tsx`), not stored in user-facing settings.
+ * `widgets.tsx` also applies a hard-coded floor when `minColumnWidth`
+ * resolves to `undefined`, to keep legibility intact for stored settings
+ * that predate the layered model.
  */
 const DEFAULT_GRID: WidgetGridSettings = {
 	columns: 6,
+	minColumnWidth: 350,
 	rowHeight: 200,
 };
 
