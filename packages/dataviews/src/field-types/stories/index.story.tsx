@@ -571,26 +571,25 @@ const fields: Field< DataType >[] = [
 	},
 	{
 		id: 'integerWithSteppers',
-		label: 'Integer with Steppers',
+		label: 'Integer (with steppers)',
 		type: 'integer',
 		description:
-			'Integer field with custom +/- spin buttons and step of 1.',
-		isValid: { min: 1, max: 12 },
+			'Integer field with custom +/- spin buttons and step of 3.',
 		Edit: {
 			control: 'integer',
 			spinControls: 'custom',
-			step: 1,
+			step: 3,
 		},
 	},
 	{
 		id: 'numberWithPrefix',
 		label: 'Number with Prefix',
 		type: 'number',
-		description: 'Number field with dollar sign prefix and step of 0.01.',
+		description: 'Number field with dollar sign prefix and step of 0.1.',
 		Edit: {
 			control: 'number',
 			prefix: DollarPrefix,
-			step: 0.01,
+			step: 0.1,
 		},
 	},
 ];

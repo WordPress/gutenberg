@@ -246,6 +246,42 @@ describe( 'DataForm component', () => {
 			).toBeInTheDocument();
 		} );
 
+		it( 'should increment by `step` when the custom spin button is clicked', async () => {
+			const onChange = jest.fn();
+			const fieldsWithSteppers = [
+				...fields,
+				{
+					id: 'columns',
+					label: 'Columns',
+					type: 'integer' as const,
+					Edit: {
+						control: 'integer' as const,
+						spinControls: 'custom' as const,
+						step: 3,
+					},
+				},
+			];
+			const formWithSteppers = {
+				...form,
+				fields: [ ...form.fields, 'columns' ],
+			};
+			render(
+				<Dataform
+					onChange={ onChange }
+					fields={ fieldsWithSteppers }
+					form={ formWithSteppers }
+					data={ { ...data, columns: 6 } }
+				/>
+			);
+
+			const user = userEvent.setup();
+			await user.click(
+				screen.getByRole( 'button', { name: 'Increment' } )
+			);
+
+			expect( onChange ).toHaveBeenLastCalledWith( { columns: 9 } );
+		} );
+
 		it( 'should override the decimals-derived step on number fields when `step` is provided', () => {
 			const fieldsWithStep = [
 				...fields,
