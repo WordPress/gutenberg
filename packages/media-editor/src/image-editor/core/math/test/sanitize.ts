@@ -1,7 +1,12 @@
 /**
  * Internal dependencies
  */
-import { safeBoundedNumber, sanitizeCropperState } from '../sanitize';
+import {
+	isValidSize,
+	safeBoundedNumber,
+	sanitizeCropperState,
+	sanitizeRect,
+} from '../sanitize';
 import { DEFAULT_STATE } from '../../constants';
 import type { CropperState } from '../../types';
 
@@ -22,8 +27,8 @@ describe( 'safeBoundedNumber', () => {
 	} );
 
 	it( 'returns the fallback for finite values beyond the safe magnitude', () => {
-		// MAX_VALUE / MIN_VALUE are technically finite but cause overflow
-		// when multiplied through trig and matrix code.
+		// MAX_VALUE is technically finite but multiplying it through trig
+		// and matrix code overflows to Infinity.
 		expect( safeBoundedNumber( Number.MAX_VALUE, 1 ) ).toBe( 1 );
 		expect( safeBoundedNumber( -Number.MAX_VALUE, 1 ) ).toBe( 1 );
 		expect( safeBoundedNumber( 1e10, 1 ) ).toBe( 1 );
@@ -32,6 +37,67 @@ describe( 'safeBoundedNumber', () => {
 	it( 'accepts values right at the safe magnitude boundary', () => {
 		expect( safeBoundedNumber( 1e6, 0 ) ).toBe( 1e6 );
 		expect( safeBoundedNumber( -1e6, 0 ) ).toBe( -1e6 );
+	} );
+
+	it( 'accepts sub-normal values (sub-normal protection lives elsewhere)', () => {
+		// Sub-normals don't overflow on their own; they only cause trouble
+		// when used as divisors. That guard lives in sanitizeCropperState's
+		// zoom check, not here.
+		expect( safeBoundedNumber( Number.MIN_VALUE, 0 ) ).toBe(
+			Number.MIN_VALUE
+		);
+	} );
+} );
+
+describe( 'isValidSize', () => {
+	it( 'returns true for finite, positive, in-range sizes', () => {
+		expect( isValidSize( { width: 100, height: 100 } ) ).toBe( true );
+		expect( isValidSize( { width: 1, height: 1 } ) ).toBe( true );
+		expect( isValidSize( { width: 1e6, height: 1e6 } ) ).toBe( true );
+	} );
+
+	it( 'returns false for zero or negative dimensions', () => {
+		expect( isValidSize( { width: 0, height: 100 } ) ).toBe( false );
+		expect( isValidSize( { width: 100, height: 0 } ) ).toBe( false );
+		expect( isValidSize( { width: -1, height: 100 } ) ).toBe( false );
+	} );
+
+	it( 'returns false for non-finite dimensions', () => {
+		expect( isValidSize( { width: Number.NaN, height: 100 } ) ).toBe(
+			false
+		);
+		expect(
+			isValidSize( {
+				width: Number.POSITIVE_INFINITY,
+				height: 100,
+			} )
+		).toBe( false );
+	} );
+
+	it( 'returns false for dimensions beyond the safe magnitude', () => {
+		expect( isValidSize( { width: Number.MAX_VALUE, height: 100 } ) ).toBe(
+			false
+		);
+		expect( isValidSize( { width: 1e10, height: 100 } ) ).toBe( false );
+	} );
+} );
+
+describe( 'sanitizeRect', () => {
+	it( 'replaces non-finite fields with 0', () => {
+		expect(
+			sanitizeRect( {
+				x: Number.NaN,
+				y: 0.1,
+				width: Number.POSITIVE_INFINITY,
+				height: 0.5,
+			} )
+		).toEqual( { x: 0, y: 0.1, width: 0, height: 0.5 } );
+	} );
+
+	it( 'leaves a clean rect unchanged', () => {
+		expect(
+			sanitizeRect( { x: 0.1, y: 0.2, width: 0.5, height: 0.3 } )
+		).toEqual( { x: 0.1, y: 0.2, width: 0.5, height: 0.3 } );
 	} );
 } );
 
@@ -126,5 +192,19 @@ describe( 'sanitizeCropperState', () => {
 		expect( out.basePan ).toEqual( { x: 0, y: 0 } );
 		expect( out.baseZoom ).toBe( 1 );
 		expect( out.baseRotation ).toBe( 0 );
+	} );
+
+	it( 'leaves state.image untouched (caller passes imageSize separately)', () => {
+		// The math layer never reads state.image — image dimensions arrive as
+		// a separate `imageSize` argument. Cloning state.image on every call
+		// would break the reducer's reference-equality short-circuit.
+		const image = {
+			src: 'test.jpg',
+			naturalWidth: 1600,
+			naturalHeight: 900,
+		};
+		const state = makeBaseState( { image } );
+		const out = sanitizeCropperState( state );
+		expect( out.image ).toBe( image );
 	} );
 } );

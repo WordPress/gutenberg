@@ -8,7 +8,7 @@ import { mat2d, vec2 } from 'gl-matrix';
  */
 import type { CropperState, Size } from './types';
 import { createCamera, getRotatedBBox, getVisibleBounds } from './camera';
-import { sanitizeCropperState } from './math/sanitize';
+import { isValidSize, sanitizeCropperState } from './math/sanitize';
 
 /**
  * The selected image region in source-pixel coordinates.
@@ -52,19 +52,22 @@ export function getSourceRegion(
 	state: CropperState,
 	imageSize: Size
 ): SourceRegion {
-	if ( imageSize.width === 0 || imageSize.height === 0 ) {
+	// Sanitize before the zero-size short-circuit so the early return
+	// doesn't leak raw non-finite state.rotation/state.zoom/state.flip
+	// out through the metadata fields.
+	const safeState = sanitizeCropperState( state );
+
+	if ( ! isValidSize( imageSize ) ) {
 		return {
 			x: 0,
 			y: 0,
 			width: 0,
 			height: 0,
-			rotation: state.rotation,
-			flip: { ...state.flip },
-			zoom: state.zoom,
+			rotation: safeState.rotation,
+			flip: { ...safeState.flip },
+			zoom: safeState.zoom,
 		};
 	}
-
-	const safeState = sanitizeCropperState( state );
 
 	// Use a synthetic 1:1 container so the camera maps normalized coords
 	// to a known pixel space. The container size cancels out.
@@ -156,7 +159,7 @@ export function getSourceRegionPercent(
 	state: CropperState,
 	imageSize: Size
 ): SourceRegionPercent {
-	if ( imageSize.width === 0 || imageSize.height === 0 ) {
+	if ( ! isValidSize( imageSize ) ) {
 		return { x: 0, y: 0, width: 0, height: 0 };
 	}
 	const region = getSourceRegion( state, imageSize );

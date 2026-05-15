@@ -604,6 +604,10 @@ describe( 'getRotatedBBox — non-finite input regression', () => {
 		[ '±Infinity height', 100, Number.POSITIVE_INFINITY, 30 ],
 		[ 'NaN rotation', 100, 100, Number.NaN ],
 		[ '-Infinity rotation', 100, 100, Number.NEGATIVE_INFINITY ],
+		// MAX_VALUE is finite but degreesToRadians( MAX_VALUE ) overflows
+		// to Infinity, then Math.cos/sin return NaN. The magnitude bound
+		// in `safeBoundedNumber` catches this before the trig.
+		[ 'MAX_VALUE rotation', 100, 100, Number.MAX_VALUE ],
 	] )( 'returns {0, 0} for %s', ( _label, w, h, rot ) => {
 		expect( getRotatedBBox( w, h, rot ) ).toEqual( {
 			width: 0,
@@ -628,14 +632,20 @@ describe( 'getImageFit — non-finite input regression', () => {
 		expect( Number.isFinite( out.visualSize.height ) ).toBe( true );
 	} );
 
-	it( 'returns finite sizes when rotation magnitude overflows', () => {
-		// MAX_VALUE rotation would otherwise overflow
-		// Math.round(rotation/90)*90 and cascade NaN into the fit math.
-		const out = getImageFit( CONTAINER, IMAGE, Number.MAX_VALUE );
-		expect( Number.isFinite( out.elementSize.width ) ).toBe( true );
-		expect( Number.isFinite( out.elementSize.height ) ).toBe( true );
-		expect( Number.isFinite( out.visualSize.width ) ).toBe( true );
-		expect( Number.isFinite( out.visualSize.height ) ).toBe( true );
+	it( 'returns zero sizes when containerSize has a non-finite dimension', () => {
+		const out = getImageFit( { width: Number.NaN, height: 600 }, IMAGE, 0 );
+		expect( out.elementSize ).toEqual( { width: 0, height: 0 } );
+		expect( out.visualSize ).toEqual( { width: 0, height: 0 } );
+	} );
+
+	it( 'returns zero sizes when imageSize has a non-finite dimension', () => {
+		const out = getImageFit(
+			CONTAINER,
+			{ width: Number.POSITIVE_INFINITY, height: 900 },
+			0
+		);
+		expect( out.elementSize ).toEqual( { width: 0, height: 0 } );
+		expect( out.visualSize ).toEqual( { width: 0, height: 0 } );
 	} );
 } );
 
@@ -646,6 +656,15 @@ describe( 'createCamera — non-finite input regression', () => {
 		for ( let i = 0; i < 6; i++ ) {
 			expect( Number.isFinite( m[ i ] ) ).toBe( true );
 		}
+	} );
+
+	it( 'returns identity matrix when imageSize has non-finite dimensions', () => {
+		const m = createCamera( makeState(), CONTAINER, {
+			width: Number.NaN,
+			height: 900,
+		} );
+		// mat2d.create() returns [1, 0, 0, 1, 0, 0] (identity).
+		expect( Array.from( m ) ).toEqual( [ 1, 0, 0, 1, 0, 0 ] );
 	} );
 } );
 
@@ -660,6 +679,14 @@ describe( 'createExportCamera — non-finite input regression', () => {
 		for ( let i = 0; i < 6; i++ ) {
 			expect( Number.isFinite( m[ i ] ) ).toBe( true );
 		}
+	} );
+
+	it( 'returns identity matrix when outputSize has non-finite dimensions', () => {
+		const m = createExportCamera( makeState(), IMAGE, {
+			width: Number.POSITIVE_INFINITY,
+			height: 400,
+		} );
+		expect( Array.from( m ) ).toEqual( [ 1, 0, 0, 1, 0, 0 ] );
 	} );
 } );
 
@@ -684,6 +711,20 @@ describe( 'restrictCropRect — non-finite input regression', () => {
 		expect( Number.isFinite( out.width ) ).toBe( true );
 		expect( Number.isFinite( out.height ) ).toBe( true );
 	} );
+
+	it( 'sanitizes cropRect fields on the no-resize (fit-through) path', () => {
+		// When the crop already fits (t >= 1 - EPSILON) the function used to
+		// return the raw cropRect, letting non-finite fields slip through.
+		const hostileRect = {
+			x: Number.NaN,
+			y: 0.1,
+			width: 0.3,
+			height: 0.3,
+		};
+		const out = restrictCropRect( hostileRect, 10, 0, 16 / 9 );
+		expect( Number.isFinite( out.x ) ).toBe( true );
+		expect( out.x ).toBe( 0 );
+	} );
 } );
 
 describe( 'restrictPanZoom — non-finite input regression', () => {
@@ -701,6 +742,21 @@ describe( 'restrictPanZoom — non-finite input regression', () => {
 		const out = restrictPanZoom( state, IMAGE, cropRect );
 		expect( Number.isFinite( out.zoom ) ).toBe( true );
 		expect( out.zoom ).toBeGreaterThanOrEqual( 1 );
+	} );
+
+	it( 'sanitizes the cropRect argument before feeding it into the math', () => {
+		// A NaN cropRect.width would drive getMinZoomForCover to NaN via
+		// Math.max(1, NaN, NaN), and that NaN would be returned as zoom.
+		const hostileRect = {
+			x: 0.1,
+			y: 0.1,
+			width: Number.NaN,
+			height: 0.5,
+		};
+		const out = restrictPanZoom( makeState(), IMAGE, hostileRect );
+		expect( Number.isFinite( out.zoom ) ).toBe( true );
+		expect( Number.isFinite( out.pan.x ) ).toBe( true );
+		expect( Number.isFinite( out.pan.y ) ).toBe( true );
 	} );
 } );
 
@@ -729,5 +785,18 @@ describe( 'getSourceRegion — non-finite input regression', () => {
 		expect( Number.isFinite( out.y ) ).toBe( true );
 		expect( Number.isFinite( out.width ) ).toBe( true );
 		expect( Number.isFinite( out.height ) ).toBe( true );
+	} );
+
+	it( 'returns finite metadata on the zero-size early-return path', () => {
+		// When imageSize is zero/invalid, the function returns a zero region
+		// plus rotation/flip/zoom metadata. Hostile state must not leak NaN
+		// out through those metadata fields.
+		const out = getSourceRegion( HOSTILE_STATE, {
+			width: 0,
+			height: 0,
+		} );
+		expect( Number.isFinite( out.rotation ) ).toBe( true );
+		expect( Number.isFinite( out.zoom ) ).toBe( true );
+		expect( out.zoom ).toBeGreaterThanOrEqual( 1 );
 	} );
 } );

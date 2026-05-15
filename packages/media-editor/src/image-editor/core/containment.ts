@@ -8,7 +8,12 @@ import { mat2d, vec2 } from 'gl-matrix';
  */
 import type { CropperState, NormalizedRect, Size } from './types';
 import { degreesToRadians } from './math/rotation';
-import { safeBoundedNumber, sanitizeCropperState } from './math/sanitize';
+import {
+	isValidSize,
+	safeBoundedNumber,
+	sanitizeCropperState,
+	sanitizeRect,
+} from './math/sanitize';
 import { createCamera, getRotatedBBox, getVisibleBounds } from './camera';
 
 /** Floating-point epsilon for "close enough to equal" comparisons. */
@@ -110,12 +115,7 @@ export function getImageCropBounds(
 	elementSize: Size,
 	visualSize: Size
 ): { minX: number; minY: number; maxX: number; maxY: number } {
-	if (
-		elementSize.width === 0 ||
-		elementSize.height === 0 ||
-		visualSize.width === 0 ||
-		visualSize.height === 0
-	) {
+	if ( ! isValidSize( elementSize ) || ! isValidSize( visualSize ) ) {
 		return { minX: 0, minY: 0, maxX: 1, maxY: 1 };
 	}
 
@@ -196,6 +196,7 @@ export function restrictCropRect(
 	// Guard against non-finite inputs. The reducer normalizes these, but
 	// programmatic callers or deserialized state could still send NaN/±Infinity
 	// through here, where it would silently propagate into the crop rect.
+	const safeRect = sanitizeRect( cropRect );
 	const zoomCandidate = safeBoundedNumber( zoom, 1 );
 	const safeZoom = zoomCandidate >= Number.EPSILON ? zoomCandidate : 1;
 	const safeRotation = safeBoundedNumber( rotation, 0 );
@@ -209,8 +210,8 @@ export function restrictCropRect(
 		aspectRatio
 	);
 	const { absC, absS } = getVisualDimensions( safeRotation, aspectRatio );
-	const W = safeBoundedNumber( cropRect.width, 0 );
-	const H = safeBoundedNumber( cropRect.height, 0 );
+	const W = safeRect.width;
+	const H = safeRect.height;
 
 	// Crop full-extents in pixel-proportional space, projected to image-local frame.
 	const cropWPx = W * visualW;
@@ -231,13 +232,14 @@ export function restrictCropRect(
 	}
 	if ( t >= 1 - EPSILON ) {
 		// Crop fits at the current zoom — no size change needed.
-		// Position is handled by restrictPanZoom, not here.
-		return cropRect;
+		// Return the sanitized rect (not the raw arg) so non-finite fields
+		// don't slip through this path. Position is handled by restrictPanZoom.
+		return safeRect;
 	}
 	const newW = W * t;
 	const newH = H * t;
-	const centerX = safeBoundedNumber( cropRect.x, 0 ) + W / 2;
-	const centerY = safeBoundedNumber( cropRect.y, 0 ) + H / 2;
+	const centerX = safeRect.x + W / 2;
+	const centerY = safeRect.y + H / 2;
 	let newX = centerX - newW / 2;
 	let newY = centerY - newH / 2;
 	newX = Math.max( 0, Math.min( newX, 1 - newW ) );
@@ -291,6 +293,7 @@ export function restrictPanZoom(
 	//    mapping it through the camera's linear part back to screen space,
 	//    then dividing by the visual bounds.
 	const safeState = sanitizeCropperState( state );
+	const safeCropRect = sanitizeRect( cropRect );
 	const aspectRatio =
 		imageSize.width > 0 && imageSize.height > 0
 			? imageSize.width / imageSize.height
@@ -298,7 +301,7 @@ export function restrictPanZoom(
 	const minZoom = getMinZoomForCover(
 		safeState.rotation,
 		aspectRatio,
-		cropRect
+		safeCropRect
 	);
 	const zoom = Math.max( safeState.zoom, minZoom );
 
@@ -331,24 +334,24 @@ export function restrictPanZoom(
 	// Stencil corners in screen space (axis-aligned rect within visual bounds).
 	const stencilCorners: [ number, number ][] = [
 		[
-			visibleBounds.left + cropRect.x * visibleBounds.width,
-			visibleBounds.top + cropRect.y * visibleBounds.height,
+			visibleBounds.left + safeCropRect.x * visibleBounds.width,
+			visibleBounds.top + safeCropRect.y * visibleBounds.height,
 		],
 		[
 			visibleBounds.left +
-				( cropRect.x + cropRect.width ) * visibleBounds.width,
-			visibleBounds.top + cropRect.y * visibleBounds.height,
+				( safeCropRect.x + safeCropRect.width ) * visibleBounds.width,
+			visibleBounds.top + safeCropRect.y * visibleBounds.height,
 		],
 		[
 			visibleBounds.left +
-				( cropRect.x + cropRect.width ) * visibleBounds.width,
+				( safeCropRect.x + safeCropRect.width ) * visibleBounds.width,
 			visibleBounds.top +
-				( cropRect.y + cropRect.height ) * visibleBounds.height,
+				( safeCropRect.y + safeCropRect.height ) * visibleBounds.height,
 		],
 		[
-			visibleBounds.left + cropRect.x * visibleBounds.width,
+			visibleBounds.left + safeCropRect.x * visibleBounds.width,
 			visibleBounds.top +
-				( cropRect.y + cropRect.height ) * visibleBounds.height,
+				( safeCropRect.y + safeCropRect.height ) * visibleBounds.height,
 		],
 	];
 
