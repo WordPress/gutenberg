@@ -298,16 +298,6 @@
 			"count": 1
 		}
 	},
-	"packages/block-editor/src/layouts/constrained.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/layouts/grid.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
 	"packages/block-library/src/breadcrumbs/edit.js": {
 		"react-hooks/refs": {
 			"count": 2
@@ -334,11 +324,6 @@
 	"packages/block-library/src/cover/edit/index.js": {
 		"react-hooks/refs": {
 			"count": 2
-		}
-	},
-	"packages/block-library/src/cover/edit/inspector-controls.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
 		}
 	},
 	"packages/block-library/src/embed/embed-placeholder.js": {

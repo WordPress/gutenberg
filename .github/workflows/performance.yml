@@ -103,6 +103,16 @@ jobs:
                   name: performance-results
                   path: ${{ env.WP_ARTIFACTS_PATH }}/*.performance-results*.json
 
+            - name: Archive performance traces
+              if: always()
+              uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+              with:
+                  name: performance-traces
+                  path: |
+                      ${{ env.WP_ARTIFACTS_PATH }}/traces
+                      ${{ env.WP_ARTIFACTS_PATH }}/build
+                  if-no-files-found: ignore
+
             - name: Publish performance results
               if: github.event_name == 'push'
               env:

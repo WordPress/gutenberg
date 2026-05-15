@@ -44,15 +44,15 @@ describe( 'getWpCompatOverlaySlot', () => {
 	} );
 
 	describe( 'explicit opt-in via internal flag', () => {
-		it( 'returns null when no gate is open', () => {
-			expect( getWpCompatOverlaySlot() ).toBeNull();
+		it( 'returns undefined when no gate is open', () => {
+			expect( getWpCompatOverlaySlot() ).toBeUndefined();
 			expect( findSlots() ).toHaveLength( 0 );
 		} );
 
-		it( 'returns null when the flag is explicitly false', () => {
+		it( 'returns undefined when the flag is explicitly false', () => {
 			internalWindow.__wpUiCompatOverlaySlotEnabled = false;
 
-			expect( getWpCompatOverlaySlot() ).toBeNull();
+			expect( getWpCompatOverlaySlot() ).toBeUndefined();
 			expect( findSlots() ).toHaveLength( 0 );
 		} );
 
@@ -62,11 +62,11 @@ describe( 'getWpCompatOverlaySlot', () => {
 			[ 'null', null ],
 			[ 'undefined', undefined ],
 		] )(
-			'returns null when the flag is %s (strict-equality gate)',
+			'returns undefined when the flag is %s (strict-equality gate)',
 			( _label, value ) => {
 				internalWindow.__wpUiCompatOverlaySlotEnabled = value;
 
-				expect( getWpCompatOverlaySlot() ).toBeNull();
+				expect( getWpCompatOverlaySlot() ).toBeUndefined();
 				expect( findSlots() ).toHaveLength( 0 );
 			}
 		);
@@ -76,7 +76,7 @@ describe( 'getWpCompatOverlaySlot', () => {
 
 			const slot = getWpCompatOverlaySlot();
 
-			expect( slot ).not.toBeNull();
+			expect( slot ).toBeDefined();
 			expect( slot ).toBeInstanceOf( HTMLDivElement );
 			expect( slot?.parentElement ).toBe( document.body );
 			expect(
@@ -92,7 +92,7 @@ describe( 'getWpCompatOverlaySlot', () => {
 
 			const slot = getWpCompatOverlaySlot();
 
-			expect( slot ).not.toBeNull();
+			expect( slot ).toBeDefined();
 			expect( findSlots() ).toHaveLength( 1 );
 		} );
 
@@ -106,7 +106,7 @@ describe( 'getWpCompatOverlaySlot', () => {
 			( _label, value ) => {
 				wpEnvWindow.wp = { components: value };
 
-				expect( getWpCompatOverlaySlot() ).toBeNull();
+				expect( getWpCompatOverlaySlot() ).toBeUndefined();
 				expect( findSlots() ).toHaveLength( 0 );
 			}
 		);
@@ -116,12 +116,12 @@ describe( 'getWpCompatOverlaySlot', () => {
 			// guard. This test pins that behavior.
 			wpEnvWindow.wp = { components: null };
 
-			expect( getWpCompatOverlaySlot() ).toBeNull();
+			expect( getWpCompatOverlaySlot() ).toBeUndefined();
 			expect( findSlots() ).toHaveLength( 0 );
 		} );
 
 		it( 'does not auto-enable when window.wp itself is missing', () => {
-			expect( getWpCompatOverlaySlot() ).toBeNull();
+			expect( getWpCompatOverlaySlot() ).toBeUndefined();
 			expect( findSlots() ).toHaveLength( 0 );
 		} );
 
@@ -131,7 +131,7 @@ describe( 'getWpCompatOverlaySlot', () => {
 				internalWindow.__wpUiCompatOverlaySlotEnabled
 			).toBeUndefined();
 
-			expect( getWpCompatOverlaySlot() ).not.toBeNull();
+			expect( getWpCompatOverlaySlot() ).toBeDefined();
 		} );
 
 		// The cross-origin `window.top` throw path (where `.wp` access
@@ -156,7 +156,7 @@ describe( 'getWpCompatOverlaySlot', () => {
 			const second = getWpCompatOverlaySlot();
 			const third = getWpCompatOverlaySlot();
 
-			expect( first ).not.toBeNull();
+			expect( first ).toBeDefined();
 			expect( second ).toBe( first );
 			expect( third ).toBe( first );
 			expect( findSlots() ).toHaveLength( 1 );
@@ -164,14 +164,14 @@ describe( 'getWpCompatOverlaySlot', () => {
 
 		it( 'creates a fresh element when the previous one was removed from the DOM, and re-caches it', () => {
 			const first = getWpCompatOverlaySlot();
-			expect( first ).not.toBeNull();
+			expect( first ).toBeDefined();
 
 			first?.remove();
 			expect( findSlots() ).toHaveLength( 0 );
 
 			const second = getWpCompatOverlaySlot();
 
-			expect( second ).not.toBeNull();
+			expect( second ).toBeDefined();
 			expect( second ).not.toBe( first );
 			expect( second?.isConnected ).toBe( true );
 			expect( findSlots() ).toHaveLength( 1 );
@@ -183,13 +183,13 @@ describe( 'getWpCompatOverlaySlot', () => {
 			expect( findSlots() ).toHaveLength( 1 );
 		} );
 
-		it( 'returns null after the gate is closed, even if a slot was previously created', () => {
+		it( 'returns undefined after the gate is closed, even if a slot was previously created', () => {
 			const slot = getWpCompatOverlaySlot();
-			expect( slot ).not.toBeNull();
+			expect( slot ).toBeDefined();
 
 			delete internalWindow.__wpUiCompatOverlaySlotEnabled;
 
-			expect( getWpCompatOverlaySlot() ).toBeNull();
+			expect( getWpCompatOverlaySlot() ).toBeUndefined();
 		} );
 
 		it( 'invalidates the cache and detaches the stale slot when the cached element belongs to a different document', () => {
@@ -204,7 +204,7 @@ describe( 'getWpCompatOverlaySlot', () => {
 			// while staying `isConnected` to that foreign document — the
 			// exact shape the cleanup branch was written to handle.
 			const first = getWpCompatOverlaySlot();
-			expect( first ).not.toBeNull();
+			expect( first ).toBeDefined();
 
 			const foreignDocument = new DOMParser().parseFromString(
 				'<!DOCTYPE html><html><body></body></html>',
@@ -219,7 +219,7 @@ describe( 'getWpCompatOverlaySlot', () => {
 
 			const second = getWpCompatOverlaySlot();
 
-			expect( second ).not.toBeNull();
+			expect( second ).toBeDefined();
 			expect( second ).not.toBe( first );
 			expect( second?.ownerDocument ).toBe( document );
 			expect( second?.parentElement ).toBe( document.body );
@@ -267,7 +267,7 @@ describe( 'getWpCompatOverlaySlot', () => {
 			internalWindow.__wpUiCompatOverlaySlotEnabled = true;
 		} );
 
-		it( 'returns null without throwing when document.body is missing', () => {
+		it( 'returns undefined without throwing when document.body is missing', () => {
 			const realBody = document.body;
 			const bodyDescriptor = Object.getOwnPropertyDescriptor(
 				Document.prototype,
@@ -281,7 +281,7 @@ describe( 'getWpCompatOverlaySlot', () => {
 
 			try {
 				expect( () => getWpCompatOverlaySlot() ).not.toThrow();
-				expect( getWpCompatOverlaySlot() ).toBeNull();
+				expect( getWpCompatOverlaySlot() ).toBeUndefined();
 			} finally {
 				if ( bodyDescriptor ) {
 					Object.defineProperty( document, 'body', bodyDescriptor );

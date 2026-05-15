@@ -95,9 +95,10 @@ function createSlot( ownerDocument: Document ): HTMLDivElement {
 
 /**
  * Returns the body-level compat overlay slot element when the runtime
- * opts in, lazily creating it on first call. Returns `null` otherwise,
- * leaving the underlying overlay primitives' default portal container
- * in effect.
+ * opts in, lazily creating it on first call. Returns `undefined`
+ * otherwise, leaving the underlying overlay primitives' default portal
+ * container in effect — so the return value can be forwarded straight
+ * to a `container` prop.
  *
  * Two opt-in paths:
  *
@@ -116,9 +117,9 @@ function createSlot( ownerDocument: Document ): HTMLDivElement {
  * the same document this call adopts it rather than appending a
  * duplicate.
  */
-export function getWpCompatOverlaySlot(): HTMLDivElement | null {
+export function getWpCompatOverlaySlot(): HTMLDivElement | undefined {
 	if ( typeof window === 'undefined' ) {
-		return null;
+		return undefined;
 	}
 
 	if (
@@ -126,7 +127,7 @@ export function getWpCompatOverlaySlot(): HTMLDivElement | null {
 		( window as CompatOverlaySlotInternalWindow )
 			.__wpUiCompatOverlaySlotEnabled !== true
 	) {
-		return null;
+		return undefined;
 	}
 
 	const ownerDocument = resolveOwnerDocument();
@@ -134,7 +135,7 @@ export function getWpCompatOverlaySlot(): HTMLDivElement | null {
 	// parsed (e.g. a `<script>` in `<head>`). Bail rather than throw in
 	// `createSlot`; callers fall through to the default portal container.
 	if ( ! ownerDocument || ! ownerDocument.body ) {
-		return null;
+		return undefined;
 	}
 
 	if (

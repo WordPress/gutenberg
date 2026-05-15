@@ -1102,7 +1102,33 @@ export default function Image( {
 									height:
 										pixelSize.height + resizeDelta.height,
 							  }
-							: { width, height } ),
+							: ( () => {
+									const style = {};
+									if ( width === 'auto' ) {
+										style.width = 'auto';
+									} else if (
+										width !== undefined &&
+										width !== null
+									) {
+										style.width =
+											typeof width === 'number'
+												? `${ width }px`
+												: width;
+									}
+									if (
+										height === 'auto' ||
+										height === undefined ||
+										height === null
+									) {
+										style.height = 'auto';
+									} else {
+										style.height =
+											typeof height === 'number'
+												? `${ height }px`
+												: height;
+									}
+									return style;
+							  } )() ),
 						objectFit: scale,
 						objectPosition:
 							focalPoint && scale

@@ -411,6 +411,7 @@ function gutenberg_build_user_taxonomy_args( WP_Post $record ) {
 		'show_tagcloud',
 		'show_in_quick_edit',
 		'show_admin_column',
+		'sort',
 	);
 	foreach ( $bool_keys as $key ) {
 		if ( array_key_exists( $key, $config ) ) {
@@ -418,6 +419,13 @@ function gutenberg_build_user_taxonomy_args( WP_Post $record ) {
 		}
 	}
 	$args['show_in_rest'] = isset( $config['show_in_rest'] ) ? (bool) $config['show_in_rest'] : true;
+
+	if ( isset( $config['default_term']['name'] ) ) {
+		$default_term_name = sanitize_text_field( (string) $config['default_term']['name'] );
+		if ( '' !== $default_term_name ) {
+			$args['default_term'] = array( 'name' => $default_term_name );
+		}
+	}
 
 	return array( $slug, $object_type, $args );
 }
