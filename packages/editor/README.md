@@ -1159,6 +1159,18 @@ _Returns_
 
 -   `Object`: Save button semantics descriptor.
 
+### getDistributedEditingSaveJourneyStateForSessionState
+
+Returns the current M0 Save journey descriptor for real editor Save controls. This is copy and state only; the descriptor does not perform the Save action or change Save routing.
+
+_Parameters_
+
+-   _sessionState_ `Object`: DE-RTC session state.
+
+_Returns_
+
+-   `Object`: Save journey descriptor.
+
 ### getDistributedEditingSavePolicyStateForSessionState
 
 Returns the DE-RTC Save policy state for risky-block review handoff.

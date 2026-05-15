@@ -10629,6 +10629,99 @@ export function getDistributedEditingHumanLoopStepStateForSessionState(
 	};
 }
 
+function getDistributedEditingSaveJourneyCopyForStep( step ) {
+	switch ( step ) {
+		case DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.LOCAL_CHANGES_PROTECTED:
+			return {
+				title: 'Save keeps changes protected',
+				summary:
+					'You can keep editing. If you use Save, keep this tab open until WordPress confirms the update.',
+			};
+		case DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.GET_LATEST_POST:
+			return {
+				title: 'Save needs the latest post',
+				summary:
+					'Get the latest post before Save updates WordPress; local changes stay protected.',
+			};
+		case DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.REVIEW_CHANGES:
+			return {
+				title: 'Save opens review',
+				summary:
+					'Review highlighted changes before WordPress updates the post.',
+			};
+		case DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.READY_TO_SAVE:
+			return {
+				title: 'Save is ready',
+				summary:
+					'Save will send reviewed changes to WordPress for a guarded update.',
+			};
+		case DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.WAITING_FOR_WORDPRESS:
+			return {
+				title: 'Save is waiting for WordPress',
+				summary:
+					'Keep this tab open until WordPress confirms whether the post was updated.',
+			};
+		case DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.SAVE_CONFIRMED:
+			return {
+				title: 'Save confirmed by WordPress',
+				summary: 'WordPress accepted this Distributed Editing Save.',
+			};
+	}
+
+	return {
+		title: 'Save is available',
+		summary:
+			'Use Save when you are ready for WordPress to update this post.',
+	};
+}
+
+/**
+ * Returns the current M0 Save journey descriptor for real editor Save controls.
+ * This is copy and state only; the descriptor does not perform the Save action
+ * or change Save routing.
+ *
+ * @param {Object} sessionState DE-RTC session state.
+ *
+ * @return {Object} Save journey descriptor.
+ */
+export function getDistributedEditingSaveJourneyStateForSessionState(
+	sessionState = {}
+) {
+	const humanLoopStep =
+		getDistributedEditingHumanLoopStepStateForSessionState( sessionState );
+	const copy = getDistributedEditingSaveJourneyCopyForStep(
+		humanLoopStep.step
+	);
+
+	return {
+		step: humanLoopStep.step,
+		action: humanLoopStep.action,
+		title: copy.title,
+		summary: copy.summary,
+		saveButtonStatus: humanLoopStep.saveButtonStatus,
+		saveButtonReason: humanLoopStep.saveButtonReason,
+		saveButtonLabel: humanLoopStep.saveButtonLabel,
+		saveButtonDisabled: humanLoopStep.saveButtonDisabled,
+		saveButtonBusy: humanLoopStep.saveButtonBusy,
+		saveButtonBlocksNormalSavePost:
+			humanLoopStep.saveButtonBlocksNormalSavePost,
+		confirmedByWordPress: humanLoopStep.confirmedByWordPress,
+		descriptorOnly: true,
+		callsRestEndpoint: false,
+		callsNormalSavePost: false,
+		callsRetrySaveEndpoint: false,
+		dispatchesNotice: false,
+		mutatesEditorContent: false,
+		mutatesPersistedPostContent: false,
+		changesPostLock: false,
+		claimsSavedWithoutEvidence: false,
+		exposesRawContent: false,
+		exposesProofInternals: false,
+		exposesReviewerIds: false,
+		exposesSaverIds: false,
+	};
+}
+
 /**
  * Returns the DE-RTC Save policy state for risky-block review handoff.
  *

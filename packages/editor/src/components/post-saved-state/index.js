@@ -53,6 +53,7 @@ export default function PostSavedState( { forceIsDirty } ) {
 		postStatusHasChanged,
 		postType,
 		distributedEditingSaveButtonState,
+		distributedEditingSaveJourneyState,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -68,6 +69,7 @@ export default function PostSavedState( { forceIsDirty } ) {
 				getEditedPostAttribute,
 				getPostEdits,
 				getDistributedEditingSaveButtonState,
+				getDistributedEditingSaveJourneyState,
 			} = select( editorStore );
 			const { get } = select( preferencesStore );
 			return {
@@ -87,6 +89,8 @@ export default function PostSavedState( { forceIsDirty } ) {
 				postType: select( editorStore ).getCurrentPostType(),
 				distributedEditingSaveButtonState:
 					getDistributedEditingSaveButtonState?.(),
+				distributedEditingSaveJourneyState:
+					getDistributedEditingSaveJourneyState?.(),
 			};
 		},
 		[ forceIsDirty ]
@@ -164,6 +168,9 @@ export default function PostSavedState( { forceIsDirty } ) {
 		hasDistributedEditingSaveButtonState &&
 			distributedEditingSaveButtonState.authoritativePostUpdated
 	);
+	const hasDistributedEditingSaveJourneyState = Boolean(
+		distributedEditingSaveJourneyState?.shouldExposeInSaveControls
+	);
 	const distributedEditingSaveButtonDataAttributes =
 		hasDistributedEditingSaveButtonState
 			? {
@@ -195,6 +202,39 @@ export default function PostSavedState( { forceIsDirty } ) {
 						String( distributedEditingAuthoritativePostUpdated ),
 			  }
 			: {};
+	const distributedEditingSaveJourneyDataAttributes =
+		hasDistributedEditingSaveJourneyState
+			? {
+					'data-distributed-editing-save-control-journey-step':
+						distributedEditingSaveJourneyState.step,
+					'data-distributed-editing-save-control-journey-action':
+						distributedEditingSaveJourneyState.action,
+					'data-distributed-editing-save-control-journey-descriptor-only':
+						'true',
+					'data-distributed-editing-save-control-journey-calls-normal-save':
+						'false',
+					'data-distributed-editing-save-control-journey-calls-rest':
+						'false',
+					'data-distributed-editing-save-control-journey-calls-retry-save':
+						'false',
+					'data-distributed-editing-save-control-journey-changes-post-lock':
+						'false',
+					'data-distributed-editing-save-control-journey-claims-saved-without-evidence':
+						String(
+							Boolean(
+								distributedEditingSaveJourneyState.claimsSavedWithoutEvidence
+							)
+						),
+					'data-distributed-editing-save-control-journey-exposes-proof-internals':
+						'false',
+					'data-distributed-editing-save-control-journey-exposes-raw-content':
+						'false',
+					'data-distributed-editing-save-control-journey-mutates-editor-content':
+						'false',
+					'data-distributed-editing-save-control-journey-mutates-persisted-post-content':
+						'false',
+			  }
+			: {};
 	const isSaved = forceSavedMessage || ( ! isNew && ! isDirty );
 	const isSavedState = hasDistributedEditingSaveButtonState
 		? distributedEditingSaveButtonBusy ||
@@ -203,6 +243,12 @@ export default function PostSavedState( { forceIsDirty } ) {
 	const isDisabled = hasDistributedEditingSaveButtonState
 		? distributedEditingSaveButtonDisabled || ! isSaveable || isSavingLocked
 		: isSaving || isSaved || ! isSaveable || isSavingLocked;
+	let buttonTitle;
+	if ( hasDistributedEditingSaveJourneyState ) {
+		buttonTitle = distributedEditingSaveJourneyState.summary;
+	} else if ( hasDistributedEditingSaveButtonState ) {
+		buttonTitle = distributedEditingSaveButtonState.statusText;
+	}
 	let text;
 
 	if ( hasDistributedEditingSaveButtonState ) {
@@ -236,6 +282,7 @@ export default function PostSavedState( { forceIsDirty } ) {
 	return (
 		<Button
 			{ ...distributedEditingSaveButtonDataAttributes }
+			{ ...distributedEditingSaveJourneyDataAttributes }
 			className={
 				isSaveable || isSaving || hasDistributedEditingSaveButtonState
 					? clsx( {
@@ -265,11 +312,7 @@ export default function PostSavedState( { forceIsDirty } ) {
 			icon={ isLargeViewport ? undefined : cloudUpload }
 			label={ text || label }
 			aria-disabled={ isDisabled }
-			title={
-				hasDistributedEditingSaveButtonState
-					? distributedEditingSaveButtonState.statusText
-					: undefined
-			}
+			title={ buttonTitle }
 		>
 			{ isSavedState && (
 				<Icon

@@ -45,6 +45,7 @@ import {
 	getDistributedEditingPresenceStartupPolicyStateForSessionState,
 	getDistributedEditingRiskyBlockReviewStateForSessionState,
 	getDistributedEditingSaveButtonStateForSessionState,
+	getDistributedEditingSaveJourneyStateForSessionState,
 	getDistributedEditingReviewTokenRecoveryStateForSessionState,
 	getDistributedEditingRetrySaveFlowStateForSessionState,
 	getDistributedEditingSavePolicyStateForSessionState,
@@ -683,6 +684,30 @@ export function getDistributedEditingSaveButtonState( state ) {
 	return getDistributedEditingSaveButtonStateForSessionState(
 		getDistributedEditingSessionState( state )
 	);
+}
+
+/**
+ * Returns the current DE-RTC Save journey descriptor for real editor Save
+ * controls.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {Object} Save journey state.
+ */
+export function getDistributedEditingSaveJourneyState( state ) {
+	const distributedEditingSettings =
+		getEditorSettings( state ).distributedEditing || EMPTY_OBJECT;
+	const saveJourney = getDistributedEditingSaveJourneyStateForSessionState(
+		getDistributedEditingSessionState( state )
+	);
+
+	return {
+		...saveJourney,
+		enabled: Boolean( distributedEditingSettings.enabled ),
+		shouldExposeInSaveControls: Boolean(
+			distributedEditingSettings.enabled
+		),
+	};
 }
 
 /**

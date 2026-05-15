@@ -478,6 +478,18 @@ _Returns_
 
 -   `Object`: Save button state.
 
+### getDistributedEditingSaveJourneyState
+
+Returns the current DE-RTC Save journey descriptor for real editor Save controls.
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+
+_Returns_
+
+-   `Object`: Save journey state.
+
 ### getDistributedEditingSavePolicyState
 
 Returns the current DE-RTC Save policy state for human review handoff.

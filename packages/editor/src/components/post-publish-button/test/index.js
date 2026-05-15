@@ -260,6 +260,151 @@ describe( 'PostPublishButton', () => {
 		);
 	} );
 
+	it( 'should expose Distributed Editing Save journey data on the real publish Save control without changing the click path', async () => {
+		const user = userEvent.setup();
+		const savePostStatus = jest.fn();
+		render(
+			<PostPublishButton
+				isSaveable
+				isPublishable
+				savePostStatus={ savePostStatus }
+				distributedEditingSaveJourneyState={ {
+					shouldExposeInSaveControls: true,
+					step: 'ready_to_edit',
+					action: 'edit',
+					summary:
+						'Use Save when you are ready for WordPress to update this post.',
+					claimsSavedWithoutEvidence: false,
+				} }
+			/>
+		);
+
+		const button = screen.getByRole( 'button', {
+			name: 'Submit for Review',
+		} );
+		expect( button ).toHaveAttribute(
+			'title',
+			'Use Save when you are ready for WordPress to update this post.'
+		);
+		expect( button ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-step',
+			'ready_to_edit'
+		);
+		expect( button ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-action',
+			'edit'
+		);
+		expect( button ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-descriptor-only',
+			'true'
+		);
+		expect( button ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-calls-normal-save',
+			'false'
+		);
+		expect( button ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-calls-rest',
+			'false'
+		);
+		expect( button ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-calls-retry-save',
+			'false'
+		);
+		expect( button ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-changes-post-lock',
+			'false'
+		);
+		expect( button ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-claims-saved-without-evidence',
+			'false'
+		);
+		expect( button ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-exposes-proof-internals',
+			'false'
+		);
+		expect( button ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-exposes-raw-content',
+			'false'
+		);
+		expect( button ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-mutates-editor-content',
+			'false'
+		);
+		expect( button ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-mutates-persisted-post-content',
+			'false'
+		);
+
+		await user.click( button );
+
+		expect( savePostStatus ).toHaveBeenCalledWith( 'pending' );
+	} );
+
+	it( 'should prefer Save journey title text while keeping the active Distributed Editing label', () => {
+		render(
+			<PostPublishButton
+				isSaveable
+				isPublishable
+				distributedEditingSaveButtonState={ {
+					status: 'review_blocked',
+					reason: 'fresh_review_required',
+					source: 'fresh_review',
+					label: 'Review changes',
+					statusText:
+						'Save opens review before updating the authoritative post.',
+					clickAction: 'open_pre_publish_review',
+					authorityState: 'review_required_before_update',
+					localChangesState: 'protected_local_changes_exportable',
+					reviewCheckpointState: 'review_required',
+					authoritativePostState: 'review_required_before_update',
+					saveStateSummaryText:
+						'Protected local changes need review before the authoritative post can update.',
+					authoritativePostUpdated: false,
+				} }
+				distributedEditingSaveJourneyState={ {
+					shouldExposeInSaveControls: true,
+					step: 'review_changes',
+					action: 'review_changes',
+					summary:
+						'Review highlighted changes before WordPress updates the post.',
+					claimsSavedWithoutEvidence: false,
+				} }
+			/>
+		);
+
+		const button = screen.getByRole( 'button', {
+			name: 'Review changes',
+		} );
+		expect( button ).toHaveAttribute(
+			'title',
+			'Review highlighted changes before WordPress updates the post.'
+		);
+		expect( button ).toHaveAttribute(
+			'data-distributed-editing-save-button-status',
+			'review_blocked'
+		);
+		expect( button ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-step',
+			'review_changes'
+		);
+		expect( button ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-action',
+			'review_changes'
+		);
+		expect( button ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-calls-normal-save',
+			'false'
+		);
+		expect( button ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-calls-retry-save',
+			'false'
+		);
+		expect( button ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-claims-saved-without-evidence',
+			'false'
+		);
+	} );
+
 	it( 'should not expose Distributed Editing save descriptor data for the default state', () => {
 		render(
 			<PostPublishButton
@@ -307,8 +452,7 @@ describe( 'PostPublishButton', () => {
 					authorityState: 'authoritative_update_confirmed',
 					localChangesState: 'authoritative_update_confirmed',
 					reviewCheckpointState: 'review_consumed',
-					authoritativePostState:
-						'authoritative_update_confirmed',
+					authoritativePostState: 'authoritative_update_confirmed',
 					saveStateSummaryText:
 						'The authoritative post accepted the Distributed Editing update.',
 					authoritativePostUpdated: true,

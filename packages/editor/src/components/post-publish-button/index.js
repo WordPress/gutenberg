@@ -99,6 +99,7 @@ export class PostPublishButton extends Component {
 			postStatus,
 			postStatusHasChanged,
 			distributedEditingSaveButtonState,
+			distributedEditingSaveJourneyState,
 		} = this.props;
 		const hasDistributedEditingSaveButtonState = Boolean(
 			distributedEditingSaveButtonState?.status &&
@@ -116,6 +117,9 @@ export class PostPublishButton extends Component {
 			hasDistributedEditingSaveButtonState
 				? distributedEditingSaveButtonState.statusText
 				: undefined;
+		const hasDistributedEditingSaveJourneyState = Boolean(
+			distributedEditingSaveJourneyState?.shouldExposeInSaveControls
+		);
 		const distributedEditingSaveButtonDataAttributes =
 			hasDistributedEditingSaveButtonState
 				? {
@@ -153,6 +157,43 @@ export class PostPublishButton extends Component {
 							),
 				  }
 				: {};
+		const distributedEditingSaveJourneyDataAttributes =
+			hasDistributedEditingSaveJourneyState
+				? {
+						'data-distributed-editing-save-control-journey-step':
+							distributedEditingSaveJourneyState.step,
+						'data-distributed-editing-save-control-journey-action':
+							distributedEditingSaveJourneyState.action,
+						'data-distributed-editing-save-control-journey-descriptor-only':
+							'true',
+						'data-distributed-editing-save-control-journey-calls-normal-save':
+							'false',
+						'data-distributed-editing-save-control-journey-calls-rest':
+							'false',
+						'data-distributed-editing-save-control-journey-calls-retry-save':
+							'false',
+						'data-distributed-editing-save-control-journey-changes-post-lock':
+							'false',
+						'data-distributed-editing-save-control-journey-claims-saved-without-evidence':
+							String(
+								Boolean(
+									distributedEditingSaveJourneyState.claimsSavedWithoutEvidence
+								)
+							),
+						'data-distributed-editing-save-control-journey-exposes-proof-internals':
+							'false',
+						'data-distributed-editing-save-control-journey-exposes-raw-content':
+							'false',
+						'data-distributed-editing-save-control-journey-mutates-editor-content':
+							'false',
+						'data-distributed-editing-save-control-journey-mutates-persisted-post-content':
+							'false',
+				  }
+				: {};
+		const distributedEditingSaveControlTitle =
+			hasDistributedEditingSaveJourneyState
+				? distributedEditingSaveJourneyState.summary
+				: distributedEditingSaveButtonStatusText;
 
 		const isButtonDisabled =
 			isPostSavingLocked ||
@@ -204,6 +245,7 @@ export class PostPublishButton extends Component {
 
 		const buttonProps = {
 			...distributedEditingSaveButtonDataAttributes,
+			...distributedEditingSaveJourneyDataAttributes,
 			'aria-disabled': isButtonDisabled,
 			className: 'editor-post-publish-button',
 			isBusy:
@@ -212,11 +254,12 @@ export class PostPublishButton extends Component {
 			variant: 'primary',
 			onClick: this.createOnClick( onClickButton ),
 			'aria-haspopup': hasNonPostEntityChanges ? 'dialog' : undefined,
-			title: distributedEditingSaveButtonStatusText,
+			title: distributedEditingSaveControlTitle,
 		};
 
 		const toggleProps = {
 			...distributedEditingSaveButtonDataAttributes,
+			...distributedEditingSaveJourneyDataAttributes,
 			'aria-disabled': isToggleDisabled,
 			'aria-expanded': isOpen,
 			className: 'editor-post-publish-panel__toggle',
@@ -226,7 +269,7 @@ export class PostPublishButton extends Component {
 			size: 'compact',
 			onClick: this.createOnClick( onClickToggle ),
 			'aria-haspopup': hasNonPostEntityChanges ? 'dialog' : undefined,
-			title: distributedEditingSaveButtonStatusText,
+			title: distributedEditingSaveControlTitle,
 		};
 		const componentProps = isToggle ? toggleProps : buttonProps;
 		return (
@@ -269,6 +312,7 @@ export default compose( [
 			getEditedPostAttribute,
 			getPostEdits,
 			getDistributedEditingSaveButtonState,
+			getDistributedEditingSaveJourneyState,
 		} = select( editorStore );
 		return {
 			isSaving: isSavingPost(),
@@ -289,6 +333,8 @@ export default compose( [
 			isSavingNonPostEntityChanges: isSavingNonPostEntityChanges(),
 			distributedEditingSaveButtonState:
 				getDistributedEditingSaveButtonState?.(),
+			distributedEditingSaveJourneyState:
+				getDistributedEditingSaveJourneyState?.(),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {

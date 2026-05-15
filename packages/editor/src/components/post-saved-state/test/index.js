@@ -209,6 +209,88 @@ describe( 'PostSavedState', () => {
 		);
 	} );
 
+	it( 'should expose Distributed Editing Save journey data on the real draft Save control without changing the click path', async () => {
+		const user = userEvent.setup();
+		useSelect.mockImplementation( () => ( {
+			isDirty: true,
+			isNew: false,
+			isSaveable: true,
+			isSaving: false,
+			postStatus: 'draft',
+			distributedEditingSaveJourneyState: {
+				shouldExposeInSaveControls: true,
+				step: 'ready_to_edit',
+				action: 'edit',
+				summary:
+					'Use Save when you are ready for WordPress to update this post.',
+				claimsSavedWithoutEvidence: false,
+			},
+		} ) );
+
+		render( <PostSavedState /> );
+
+		const button = screen.getByRole( 'button', { name: 'Save draft' } );
+		expect( button ).toHaveAttribute(
+			'title',
+			'Use Save when you are ready for WordPress to update this post.'
+		);
+		expect( button ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-step',
+			'ready_to_edit'
+		);
+		expect( button ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-action',
+			'edit'
+		);
+		expect( button ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-descriptor-only',
+			'true'
+		);
+		expect( button ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-calls-normal-save',
+			'false'
+		);
+		expect( button ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-calls-rest',
+			'false'
+		);
+		expect( button ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-calls-retry-save',
+			'false'
+		);
+		expect( button ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-changes-post-lock',
+			'false'
+		);
+		expect( button ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-claims-saved-without-evidence',
+			'false'
+		);
+		expect( button ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-exposes-proof-internals',
+			'false'
+		);
+		expect( button ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-exposes-raw-content',
+			'false'
+		);
+		expect( button ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-mutates-editor-content',
+			'false'
+		);
+		expect( button ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-mutates-persisted-post-content',
+			'false'
+		);
+
+		await user.click( button );
+
+		expect(
+			mockMaybeHandleDistributedEditingSaveButtonClick
+		).toHaveBeenCalled();
+		expect( mockSavePost ).toHaveBeenCalled();
+	} );
+
 	it( 'should let Distributed Editing block normal draft save fallback', async () => {
 		const user = userEvent.setup();
 		mockMaybeHandleDistributedEditingSaveButtonClick.mockResolvedValue( {

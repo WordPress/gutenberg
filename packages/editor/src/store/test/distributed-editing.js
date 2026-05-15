@@ -69,6 +69,7 @@ import {
 	getDistributedEditingFreshReviewPrePublishStateForSessionState,
 	getDistributedEditingFreshReviewRetrySaveHandoffStateForSessionState,
 	getDistributedEditingHumanLoopStepStateForSessionState,
+	getDistributedEditingSaveJourneyStateForSessionState,
 	getDistributedEditingLocalUpdatesImportResult,
 	getDistributedEditingLocalUpdatesImportReviewRequestStateForSessionState,
 	getDistributedEditingAcceptedFreshReviewConsumeValidationForRetrySaveRequest,
@@ -142,6 +143,7 @@ import {
 	getDistributedEditingRiskyBlockReviewState,
 	getDistributedEditingRetrySaveFlowState,
 	getDistributedEditingSaveButtonState,
+	getDistributedEditingSaveJourneyState,
 	getDistributedEditingSavePolicyState,
 	getDistributedEditingSessionDisposition,
 	getDistributedEditingSessionReasonCode,
@@ -7425,6 +7427,214 @@ describe( 'distributed editing session state', () => {
 				exposesSaverIds: false,
 			} );
 		}
+	} );
+
+	it( 'summarizes the M0 Save journey for real Save controls without side effects or private data', () => {
+		const rawContentToken = 'save-journey-raw-post-content';
+		const proofToken = 'save-journey-proof-signature';
+		const reviewState = normalizeDistributedEditingSessionState( {
+			pendingChangeCount: 1,
+			hasPendingChanges: true,
+			canExportLocalUpdates: true,
+			riskyBlockReviewStatus:
+				DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_STATUSES.REVIEW_REQUIRED,
+			riskyBlockReviewHasPendingItems: true,
+			riskyBlockReviewItemCount: 1,
+			riskyBlockReviewPendingCount: 1,
+			rawPostContent: rawContentToken,
+			proofSignature: proofToken,
+		} );
+		const waitingState = normalizeDistributedEditingSessionState( {
+			pendingChangeCount: 1,
+			hasPendingChanges: true,
+			canExportLocalUpdates: true,
+			retrySaveStatus: DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVING,
+			rawPostContent: rawContentToken,
+			proofSignature: proofToken,
+		} );
+		const confirmedState =
+			getDistributedEditingSessionStateForRetrySaveResult(
+				{
+					result: 'retry_save_applied',
+					retry_save_accepted: true,
+					previous_server_version: '12',
+					server_version: '13',
+					saves_post: true,
+					mutates_post_content: true,
+					creates_revision: true,
+					claims_saved: true,
+					raw_post_content: rawContentToken,
+					proof_signature: proofToken,
+				},
+				{
+					pendingChangeCount: 1,
+					hasPendingChanges: true,
+					canExportLocalUpdates: true,
+				}
+			);
+		const cases = [
+			{
+				sessionState: {},
+				step: DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.READY_TO_EDIT,
+				action: 'edit',
+				title: 'Save is available',
+				summary: 'ready for WordPress',
+				saveButtonLabel: 'Update',
+			},
+			{
+				sessionState: {
+					pendingChangeCount: 1,
+					hasPendingChanges: true,
+					canExportLocalUpdates: true,
+				},
+				step: DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.LOCAL_CHANGES_PROTECTED,
+				action: 'wait_or_export',
+				title: 'Save keeps changes protected',
+				summary: 'keep this tab open',
+				saveButtonLabel: 'Update',
+			},
+			{
+				sessionState: {
+					pendingChangeCount: 1,
+					hasPendingChanges: true,
+					canExportLocalUpdates: true,
+					requiresServerStateRefetch: true,
+				},
+				step: DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.GET_LATEST_POST,
+				action: 'get_latest_post',
+				title: 'Save needs the latest post',
+				summary: 'local changes stay protected',
+				saveButtonLabel: 'Refetch required',
+				saveButtonBlocksNormalSavePost: true,
+			},
+			{
+				sessionState: reviewState,
+				step: DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.REVIEW_CHANGES,
+				action: 'review_changes',
+				title: 'Save opens review',
+				summary: 'Review highlighted changes',
+				saveButtonLabel: 'Review changes',
+				saveButtonBlocksNormalSavePost: true,
+			},
+			{
+				sessionState: {
+					pendingChangeCount: 1,
+					hasPendingChanges: true,
+					canExportLocalUpdates: true,
+					retrySubmitProofStatus:
+						DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.ACCEPTED_FOR_FUTURE_SAVE,
+					retrySubmitAccepted: true,
+					retrySubmitSavePathRequired: true,
+					retrySubmitSaveStatus:
+						DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.READY,
+					retrySubmitSaveReady: true,
+				},
+				step: DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.READY_TO_SAVE,
+				action: 'save',
+				title: 'Save is ready',
+				summary: 'guarded update',
+				saveButtonLabel: 'Submit reviewed changes',
+				saveButtonBlocksNormalSavePost: true,
+			},
+			{
+				sessionState: waitingState,
+				step: DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.WAITING_FOR_WORDPRESS,
+				action: 'keep_tab_open',
+				title: 'Save is waiting for WordPress',
+				summary: 'Keep this tab open',
+				saveButtonLabel: 'Saving reviewed changes',
+				saveButtonDisabled: true,
+				saveButtonBusy: true,
+				saveButtonBlocksNormalSavePost: true,
+			},
+			{
+				sessionState: confirmedState,
+				step: DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.SAVE_CONFIRMED,
+				action: 'none',
+				title: 'Save confirmed by WordPress',
+				summary: 'WordPress accepted',
+				saveButtonLabel: 'Save confirmed',
+				saveButtonDisabled: true,
+				saveButtonBlocksNormalSavePost: true,
+				confirmedByWordPress: true,
+			},
+		];
+
+		for ( const currentCase of cases ) {
+			const journeyState =
+				getDistributedEditingSaveJourneyStateForSessionState(
+					currentCase.sessionState
+				);
+
+			expect( journeyState ).toMatchObject( {
+				step: currentCase.step,
+				action: currentCase.action,
+				title: currentCase.title,
+				summary: expect.stringContaining( currentCase.summary ),
+				saveButtonLabel: currentCase.saveButtonLabel,
+				saveButtonDisabled: Boolean( currentCase.saveButtonDisabled ),
+				saveButtonBusy: Boolean( currentCase.saveButtonBusy ),
+				saveButtonBlocksNormalSavePost: Boolean(
+					currentCase.saveButtonBlocksNormalSavePost
+				),
+				confirmedByWordPress: Boolean(
+					currentCase.confirmedByWordPress
+				),
+				descriptorOnly: true,
+				callsRestEndpoint: false,
+				callsNormalSavePost: false,
+				callsRetrySaveEndpoint: false,
+				dispatchesNotice: false,
+				mutatesEditorContent: false,
+				mutatesPersistedPostContent: false,
+				changesPostLock: false,
+				claimsSavedWithoutEvidence: false,
+				exposesRawContent: false,
+				exposesProofInternals: false,
+				exposesReviewerIds: false,
+				exposesSaverIds: false,
+			} );
+			expect( JSON.stringify( journeyState ) ).not.toContain(
+				rawContentToken
+			);
+			expect( JSON.stringify( journeyState ) ).not.toContain(
+				proofToken
+			);
+		}
+
+		expect(
+			getDistributedEditingSaveJourneyState( {
+				editorSettings: {
+					distributedEditing: {
+						enabled: true,
+					},
+				},
+				distributedEditingSession: reviewState,
+			} )
+		).toMatchObject( {
+			enabled: true,
+			shouldExposeInSaveControls: true,
+			step: DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.REVIEW_CHANGES,
+			action: 'review_changes',
+			title: 'Save opens review',
+		} );
+
+		expect(
+			getDistributedEditingSaveJourneyState( {
+				editorSettings: {
+					distributedEditing: {
+						enabled: false,
+					},
+				},
+				distributedEditingSession: reviewState,
+			} )
+		).toMatchObject( {
+			enabled: false,
+			shouldExposeInSaveControls: false,
+			step: DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.REVIEW_CHANGES,
+			action: 'review_changes',
+			title: 'Save opens review',
+		} );
 	} );
 
 	it( 'normalizes consumed fresh-review lifecycle evidence without exposing private data', () => {
