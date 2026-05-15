@@ -21,6 +21,12 @@
     `--wp-grid-resize-preview-outline-style` CSS custom properties for
     the drag-placeholder outline (default `dashed`) and resize-preview
     border (default `solid`).
+-   Animate drag preview `box-shadow` from resting `sm` to `lg` (same
+    motion tokens as scale) and apply static `lg` when reduced motion
+    is requested, on the `.drag-preview-frame` wrapper (both surfaces).
+    On drop, compose `@dnd-kit/core`'s default `DragOverlay` animation
+    with a frame exit transition (scale + shadow back to resting) so
+    release does not snap.
 -   Set `data-wp-dashboard-grid-resizing` on the `DashboardGrid` root
     element while any tile resize gesture is active, so consumers can
     adjust styles when the pointer may still hover tiles ([#78234](https://github.com/WordPress/gutenberg/pull/78234)).

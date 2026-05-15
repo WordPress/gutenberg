@@ -49,7 +49,12 @@ import { resolveFillWidths } from './resolve-fill-widths';
 import type { DashboardGridLayoutItem, DashboardGridProps } from './types';
 import type { ResizeSnapSize } from '../shared/resize-snap';
 import type { ResizeDelta } from '../shared/types';
+import { createDashboardDragDropAnimation } from '../shared/drag-overlay-drop-animation';
 import styles from './grid.module.css';
+
+const dashboardDragDropAnimation = createDashboardDragDropAnimation(
+	styles.dragPreviewFrameExiting
+);
 
 // Fallback gap in pixels for math that runs before the computed gap
 // can be read from the DOM. Matches the `'xl'` step the surface
@@ -549,7 +554,10 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 		const DragPreview = renderDragPreview;
 		const dragOverlayContent =
 			activeId && activeClone ? (
-				<div className={ styles[ 'drag-preview-frame' ] }>
+				<div
+					className={ styles[ 'drag-preview-frame' ] }
+					data-wp-dashboard-drag-preview-frame
+				>
 					{ DragPreview ? (
 						<DragPreview itemId={ activeId }>
 							{ activeClone }
@@ -700,7 +708,9 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 						) ) }
 					</div>
 				</SortableContext>
-				<DragOverlay>{ dragOverlayContent }</DragOverlay>
+				<DragOverlay dropAnimation={ dashboardDragDropAnimation }>
+					{ dragOverlayContent }
+				</DragOverlay>
 			</DndContext>
 		);
 	}

@@ -7,21 +7,56 @@
 /*
  * Functional frame for the drag-preview clone inside `<DragOverlay>`.
  * Always applied, including when the consumer passes a
- * `renderDragPreview` wrapper. Owns the lift cue (`scale`), the
- * pointer feedback (`cursor`), and the pointer pass-through during
- * the gesture. Visual chrome (shadow, radius, padding) belongs to
- * the consumer, either on the children passed to <DashboardGrid />
+ * `renderDragPreview` wrapper. Owns the lift cue (`scale` with motion
+ * tokens), drag elevation (`box-shadow` animating from resting `sm` to
+ * `lg`), matching `border-radius` so the shadow follows the card shape,
+ * the pointer feedback (`cursor`), and the pointer pass-through during
+ * the gesture. Further visual chrome (padding, inner surfaces) belongs
+ * to the consumer, either on the children passed to <DashboardGrid />
  * or via `renderDragPreview`.
  */
 .drag-preview-frame {
 	height: 100%;
-	transform: scale(var(--wp-grid-drag-preview-scale, 1.05));
+	border-radius: var(--wpds-border-radius-lg);
 	cursor: grabbing;
 	pointer-events: none;
+	box-shadow: var(--wpds-elevation-lg);
+	transform: scale(var(--wp-grid-drag-preview-scale, 1.05));
+
+	@media not (prefers-reduced-motion: reduce) {
+		@starting-style {
+			box-shadow: var(--wpds-elevation-sm);
+			transform: scale(1);
+		}
+
+		transition:
+			transform var(--wpds-motion-duration-sm) var(--wpds-motion-easing-balanced),
+			box-shadow var(--wpds-motion-duration-sm) var(--wpds-motion-easing-balanced);
+	}
+}
+
+/*
+ * Applied by @dnd-kit `DragOverlay` drop side-effects while the
+ * default overlay transform runs; duration matches
+ * `createDashboardDragDropAnimation` (200ms / md token).
+ */
+.drag-preview-frame.dragPreviewFrameExiting {
+	transform: scale(1);
+	box-shadow: var(--wpds-elevation-sm);
+	transition:
+		transform var(--wpds-motion-duration-md) var(--wpds-motion-easing-balanced),
+		box-shadow var(--wpds-motion-duration-md) var(--wpds-motion-easing-balanced);
 }
 
 @media (prefers-reduced-motion: reduce) {
 	.drag-preview-frame {
+		box-shadow: var(--wpds-elevation-lg);
 		transform: none;
+		transition: none;
+	}
+
+	.drag-preview-frame.dragPreviewFrameExiting {
+		box-shadow: var(--wpds-elevation-sm);
+		transition: none;
 	}
 }

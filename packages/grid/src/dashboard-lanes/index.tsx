@@ -50,7 +50,12 @@ import { useItemExitAnimation } from '../shared/use-item-exit-animation';
 import type { DashboardLanesLayoutItem, DashboardLanesProps } from './types';
 import type { ResizeSnapSize } from '../shared/resize-snap';
 import type { ResizeDelta } from '../shared/types';
+import { createDashboardDragDropAnimation } from '../shared/drag-overlay-drop-animation';
 import styles from './lanes.module.css';
+
+const dashboardDragDropAnimation = createDashboardDragDropAnimation(
+	styles.dragPreviewFrameExiting
+);
 
 // Fallback gap in pixels for math that runs before the computed gap
 // can be read from the DOM. Matches the `'xl'` step the surface
@@ -473,7 +478,10 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 		const DragPreview = renderDragPreview;
 		const dragOverlayContent =
 			activeId && activeClone ? (
-				<div className={ styles[ 'drag-preview-frame' ] }>
+				<div
+					className={ styles[ 'drag-preview-frame' ] }
+					data-wp-dashboard-drag-preview-frame
+				>
 					{ DragPreview ? (
 						<DragPreview itemId={ activeId }>
 							{ activeClone }
@@ -615,7 +623,9 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 						) ) }
 					</div>
 				</SortableContext>
-				<DragOverlay>{ dragOverlayContent }</DragOverlay>
+				<DragOverlay dropAnimation={ dashboardDragDropAnimation }>
+					{ dragOverlayContent }
+				</DragOverlay>
 			</DndContext>
 		);
 	}
