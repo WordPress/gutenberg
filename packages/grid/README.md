@@ -175,10 +175,10 @@ display order independently of array position.
 When `editMode` is true:
 
 - Items become draggable (powered by `@dnd-kit`). The original tile
-  stays in place as a dashed placeholder while a clone follows the
+  stays in place as an outlined placeholder while a clone follows the
   cursor through `<DragOverlay>`.
-- A resize handle appears on the bottom-right of each item. A
-  dashed outline previews the target size as the cursor moves.
+- A resize handle appears on the bottom-right of each item. An
+  outline previews the target size as the cursor moves.
 - While any tile is dragging or resizing, `actionableArea` content
   on every tile is set `inert` so hovers on other tiles can't steal
   the gesture.
@@ -474,8 +474,9 @@ root itself via `style`). All values fall back to sensible defaults.
 |----------|---------|------------|
 | `--wp-grid-drag-preview-scale` | `1.05` | Lift scale of the drag-preview functional frame. Set to `1` to disable the lift. |
 | `--wp-grid-placeholder-opacity` | `0.4` | Opacity of the placeholder tile (the original item while a drag is in flight). |
-| `--wp-grid-placeholder-outline-color` | `var(--wpds-color-stroke-interactive-brand)` | Dashed outline color of the placeholder and of the resize-preview overlay. |
-| `--wp-grid-placeholder-radius` | `0` | Border radius of the placeholder, used to match the consumer's tile shape so the dashed outline traces the right silhouette. |
+| `--wp-grid-placeholder-outline-style` | `solid` | Outline or border style of the placeholder and of the resize-preview overlay (for example `dashed` or `dotted`). |
+| `--wp-grid-placeholder-outline-color` | `var(--wpds-color-stroke-interactive-brand)` | Outline color of the placeholder and of the resize-preview overlay. |
+| `--wp-grid-placeholder-radius` | `0` | Border radius of the placeholder, used to match the consumer's tile shape so the outline traces the right silhouette. |
 
 ---
 
