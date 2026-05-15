@@ -1,4 +1,12 @@
 // Styles for the experimental admin bar in editor.
+//
+// The `admin-color-*` blocks below declare new CSS custom properties
+// (`--wp-admin--admin-bar--*` / `--wp-admin--admin-menu--*`) whose per-scheme
+// values are taken verbatim from WordPress Core's admin color schemes.
+//
+// These CSS custom properties should be removed by migrating the underlying
+// components to DS tokens and ThemeProvider, which would handle theming
+// natively without these targeted overrides.
 
 body.has-admin-bar-in-editor {
 	&.admin-color-fresh {
