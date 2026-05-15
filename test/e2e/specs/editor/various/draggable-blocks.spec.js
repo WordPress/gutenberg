@@ -454,6 +454,48 @@ test.describe( 'Draggable block', () => {
 		}
 	} );
 
+	test( 'renders the drag chip inside the wp compat overlay slot', async ( {
+		editor,
+		page,
+	} ) => {
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '1' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '2' );
+
+		await editor.canvas
+			.locator( 'role=document[name="Block: Paragraph"i] >> text=2' )
+			.focus();
+		await editor.showBlockToolbar();
+
+		const dragHandle = page.locator(
+			'role=toolbar[name="Block tools"i] >> role=button[name="Drag"i][include-hidden]'
+		);
+		await dragHandle.hover();
+		await page.mouse.down();
+
+		const firstParagraph = editor.canvas.locator(
+			'role=document[name="Block: Paragraph"i] >> text=1'
+		);
+		const firstParagraphBound = await firstParagraph.boundingBox();
+		await dragTo( page, firstParagraphBound.x, firstParagraphBound.y );
+
+		const chip = page.locator(
+			'data-testid=block-draggable-chip >> visible=true'
+		);
+		await expect( chip ).toBeVisible();
+
+		// The chip should live inside the body-level
+		// `[data-wp-compat-overlay-slot]` — that's what keeps it above
+		// any `@wordpress/components` overlays opened mid-drag.
+		const chipIsInsideCompatSlot = await chip.evaluate(
+			( el ) => el.closest( '[data-wp-compat-overlay-slot]' ) !== null
+		);
+		expect( chipIsInsideCompatSlot ).toBe( true );
+
+		await page.mouse.up();
+	} );
+
 	test( 'can directly drag an image', async ( { page, editor } ) => {
 		await editor.insertBlock( { name: 'core/image' } );
 		await editor.insertBlock( {
