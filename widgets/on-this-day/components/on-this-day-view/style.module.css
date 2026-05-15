@@ -38,21 +38,50 @@
 	border-start-end-radius: var(--wpds-border-radius-lg);
 }
 
+/*
+ * Pin foreground tokens to their "on dark" variants when an image
+ * background is present. `--_gcd-heading-color: inherit` is the same
+ * escape hatch the UI package itself uses (e.g. `collapsible-card`) to
+ * let headings adopt the surrounding color instead of the default
+ * `--wpds-color-fg-content-neutral`. The Link in the title already
+ * renders as `unstyled`, so it inherits the same color.
+ */
 .with-image .header {
-	background-color: color-mix(in srgb, var(--wpds-color-bg-surface-neutral-strong) 70%, transparent);
-	backdrop-filter: blur(2px);
+	--_gcd-heading-color: inherit;
+
+	color: var(--wpds-color-fg-interactive-neutral-strong);
+	text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
 }
 
 .with-image::before {
 	content: "";
 	position: absolute;
 	inset: 0;
-	z-index: -1;
+	z-index: -2;
 	background-image: var(--on-this-day-bg-image);
 	background-position: center;
 	background-size: cover;
 	filter: var(--on-this-day-bg-filter, none);
 	transition: filter var(--wpds-motion-duration-lg) var(--wpds-motion-easing-expressive);
+}
+
+/*
+ * Readability scrim built from `--wpds-color-bg-interactive-neutral-strong`
+ * (the dark neutral that pairs with `fg-interactive-neutral-strong` above).
+ * Anchored to the top, where the header text lives, and faded out below
+ * so it does not flatten the rest of the image. Stays on hover so
+ * revealing the image at full fidelity never sacrifices legibility.
+ */
+.with-image::after {
+	--_on-this-day-scrim-strong: color-mix(in srgb, var(--wpds-color-bg-interactive-neutral-strong) 75%, transparent);
+	--_on-this-day-scrim-mid: color-mix(in srgb, var(--wpds-color-bg-interactive-neutral-strong) 35%, transparent);
+
+	content: "";
+	position: absolute;
+	inset: 0;
+	z-index: -1;
+	pointer-events: none;
+	background: linear-gradient(to bottom, var(--_on-this-day-scrim-strong) 0%, var(--_on-this-day-scrim-mid) 45%, transparent 75%);
 }
 
 .with-image:hover::before,
