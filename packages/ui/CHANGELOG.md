@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Export `getWpCompatOverlaySlot()` so consumers can route their own portals into the compat overlay slot. Returns the body-level `[data-wp-compat-overlay-slot]` element when the runtime opts in, lazily creating it on first call, and `undefined` otherwise ([#78183](https://github.com/WordPress/gutenberg/pull/78183)).
+
 ## 0.13.0 (2026-05-14)
 
 ### Breaking Changes
@@ -41,7 +45,6 @@
 -   `CollapsibleCard.Header`: Pass `render={ <h2 /> }` (or any of `<h1>`–`<h6>`) to wrap the trigger in a heading and contribute to the document outline, following the W3C APG accordion pattern (heading wraps button) ([#77962](https://github.com/WordPress/gutenberg/pull/77962)).
 -   `Select`: Add a `Select.Positioner` subcomponent and a `positioner` slot prop on `Select.Popup` to customize the popup placement, mirroring the existing `portal` slot pattern ([#78168](https://github.com/WordPress/gutenberg/pull/78168)).
 -   `Autocomplete`: Add an `Autocomplete.Positioner` subcomponent and a `positioner` slot prop on `Autocomplete.Popup` to customize the popup placement, mirroring the existing `portal` slot pattern ([#78168](https://github.com/WordPress/gutenberg/pull/78168)).
--   Export `getWpCompatOverlaySlot()` so consumers can route their own portals into the compat overlay slot. Returns the body-level `[data-wp-compat-overlay-slot]` element when the runtime opts in, lazily creating it on first call, and `undefined` otherwise ([#78183](https://github.com/WordPress/gutenberg/pull/78183)).
 
 ### Internal
 
