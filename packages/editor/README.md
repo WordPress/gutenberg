@@ -710,6 +710,20 @@ _Returns_
 
 -   `Object`: Content-free action transcript support summary.
 
+### getDistributedEditingFreshReviewComparisonRendererCapabilityResolution
+
+Resolves future fresh-review comparison renderer capabilities without registering, activating, or rendering a comparison renderer.
+
+_Parameters_
+
+-   _options_ `Object`: Resolver options.
+-   _options.candidateRendererCapabilityMap_ `Object`: Candidate capability map.
+-   _options.requiredRendererCapabilityKeys_ `Array`: Required capability keys.
+
+_Returns_
+
+-   `Object`: Content-free renderer capability resolution.
+
 ### getDistributedEditingFreshReviewConsumeEndpointPath
 
 Returns the current DE-RTC fresh-review decision consumption endpoint path for a post.

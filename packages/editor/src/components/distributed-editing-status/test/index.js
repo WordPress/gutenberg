@@ -1461,6 +1461,46 @@ describe( 'DistributedEditingStatus', () => {
 			'missing_required_capabilities'
 		);
 		expect( comparePlan ).toHaveAttribute(
+			'data-distributed-editing-fresh-review-comparison-renderer-capability-resolution-status',
+			'missing_required_capabilities'
+		);
+		expect( comparePlan ).toHaveAttribute(
+			'data-distributed-editing-fresh-review-comparison-renderer-capability-resolution-reason',
+			'missing_all_required_capabilities'
+		);
+		expect( comparePlan ).toHaveAttribute(
+			'data-distributed-editing-fresh-review-comparison-renderer-capability-resolution-present-capabilities',
+			'0'
+		);
+		expect( comparePlan ).toHaveAttribute(
+			'data-distributed-editing-fresh-review-comparison-renderer-capability-resolution-missing-capabilities',
+			'2'
+		);
+		expect( comparePlan ).toHaveAttribute(
+			'data-distributed-editing-fresh-review-comparison-renderer-capability-resolution-unknown-candidates',
+			'0'
+		);
+		expect( comparePlan ).toHaveAttribute(
+			'data-distributed-editing-fresh-review-comparison-renderer-capability-resolution-complete',
+			'false'
+		);
+		expect( comparePlan ).toHaveAttribute(
+			'data-distributed-editing-fresh-review-comparison-renderer-capability-resolution-resolver-only',
+			'true'
+		);
+		expect( comparePlan ).toHaveAttribute(
+			'data-distributed-editing-fresh-review-comparison-renderer-capability-resolution-candidate-map-stored',
+			'false'
+		);
+		expect( comparePlan ).toHaveAttribute(
+			'data-distributed-editing-fresh-review-comparison-renderer-capability-resolution-registers-renderer',
+			'false'
+		);
+		expect( comparePlan ).toHaveAttribute(
+			'data-distributed-editing-fresh-review-comparison-renderer-capability-resolution-renderable',
+			'false'
+		);
+		expect( comparePlan ).toHaveAttribute(
 			'data-distributed-editing-fresh-review-comparison-renderer-readiness-missing-capabilities',
 			'2'
 		);
@@ -1528,6 +1568,12 @@ describe( 'DistributedEditingStatus', () => {
 			'No renderer is registered, no preview opens, no diff is computed, and no save was made.'
 		);
 		expect( comparePlan ).toHaveTextContent(
+			'Capability resolver: no required renderer capabilities are present in the candidate map.'
+		);
+		expect( comparePlan ).toHaveTextContent(
+			'This only classifies readiness; no renderer is registered, no preview opens, no diff is computed, and no save was made.'
+		);
+		expect( comparePlan ).toHaveTextContent(
 			/Base hash evidence\s*Available/
 		);
 		expect( comparePlan ).toHaveTextContent(
@@ -1545,6 +1591,9 @@ describe( 'DistributedEditingStatus', () => {
 		);
 		expect( comparePlan ).toHaveTextContent(
 			/Renderer readiness\s*Not registered/
+		);
+		expect( comparePlan ).toHaveTextContent(
+			/Capability resolver\s*Missing/
 		);
 		expect( comparePlan ).not.toHaveTextContent(
 			/aaaaaaaaaaaaaaaa|bbbbbbbbbbbbbbbb|fresh-review-chrome-compare-plan-raw|script/i

@@ -55,6 +55,7 @@ import {
 	getDistributedEditingActionTranscriptSupportSummaryForSessionState,
 	getDistributedEditingLocalUpdatesExportPayload,
 	getDistributedEditingFreshReviewDecisionStateForSessionState,
+	getDistributedEditingFreshReviewComparisonRendererCapabilityResolution,
 	getDistributedEditingFreshReviewLifecycleStateForSessionState,
 	getDistributedEditingFreshReviewPreSaveStateForSessionState,
 	getDistributedEditingFreshReviewPrePublishStateForSessionState,
@@ -3841,6 +3842,114 @@ describe( 'distributed editing session state', () => {
 		);
 	} );
 
+	it( 'classifies fresh-review comparison renderer capability maps without registration side effects', () => {
+		// This helper name contains "Renderer", but it is not Testing Library render.
+		// eslint-disable-next-line testing-library/render-result-naming-convention
+		const resolveCapabilityMap =
+			getDistributedEditingFreshReviewComparisonRendererCapabilityResolution;
+		const missingCapabilityResolution = resolveCapabilityMap();
+		const partialCapabilityResolution = resolveCapabilityMap( {
+			candidateRendererCapabilityMap: {
+				boundary_safe_diff_renderer: true,
+				caller_supplied_renderer_name: true,
+			},
+		} );
+		const completeCapabilityResolution = resolveCapabilityMap( {
+			candidateRendererCapabilityMap: {
+				boundary_safe_diff_renderer: true,
+				human_review_controls: true,
+			},
+		} );
+
+		expect( missingCapabilityResolution ).toMatchObject( {
+			status: 'missing_required_capabilities',
+			reason: 'missing_all_required_capabilities',
+			resolverKind:
+				'fresh_review_comparison_renderer_capability_resolver',
+			requiredRendererCapabilityKeys: [
+				'boundary_safe_diff_renderer',
+				'human_review_controls',
+			],
+			presentRendererCapabilityKeys: [],
+			presentRendererCapabilityCount: 0,
+			missingRendererCapabilityKeys: [
+				'boundary_safe_diff_renderer',
+				'human_review_controls',
+			],
+			missingRendererCapabilityCount: 2,
+			candidateRendererCapabilityKeyCount: 0,
+			unknownCandidateRendererCapabilityCount: 0,
+			allRequiredRendererCapabilitiesPresent: false,
+			rendererCapabilitiesComplete: false,
+			completeButDisabled: false,
+			candidateMapAccepted: true,
+			candidateMapStored: false,
+			resolverOnly: true,
+			registersRenderer: false,
+			hasRegisteredRenderer: false,
+			activatesRenderer: false,
+			renderable: false,
+			rendersPreview: false,
+			computesDiff: false,
+			opensPanel: false,
+			callsRestEndpoint: false,
+			callsSave: false,
+			mutatesEditorContent: false,
+			changesPostLock: false,
+			claimsSaved: false,
+		} );
+		expect( partialCapabilityResolution ).toMatchObject( {
+			status: 'partial_required_capabilities',
+			reason: 'missing_some_required_capabilities',
+			presentRendererCapabilityKeys: [ 'boundary_safe_diff_renderer' ],
+			presentRendererCapabilityCount: 1,
+			missingRendererCapabilityKeys: [ 'human_review_controls' ],
+			missingRendererCapabilityCount: 1,
+			candidateRendererCapabilityKeyCount: 2,
+			unknownCandidateRendererCapabilityCount: 1,
+			allRequiredRendererCapabilitiesPresent: false,
+			rendererCapabilitiesComplete: false,
+			candidateMapStored: false,
+			registersRenderer: false,
+			renderable: false,
+			rendersPreview: false,
+			computesDiff: false,
+			callsSave: false,
+		} );
+		expect( JSON.stringify( partialCapabilityResolution ) ).not.toContain(
+			'caller_supplied_renderer_name'
+		);
+		expect( completeCapabilityResolution ).toMatchObject( {
+			status: 'complete_but_disabled',
+			reason: 'renderer_disabled_until_explicit_renderer_turn',
+			presentRendererCapabilityKeys: [
+				'boundary_safe_diff_renderer',
+				'human_review_controls',
+			],
+			presentRendererCapabilityCount: 2,
+			missingRendererCapabilityKeys: [],
+			missingRendererCapabilityCount: 0,
+			candidateRendererCapabilityKeyCount: 2,
+			unknownCandidateRendererCapabilityCount: 0,
+			allRequiredRendererCapabilitiesPresent: true,
+			rendererCapabilitiesComplete: true,
+			completeButDisabled: true,
+			rendererDisabledAfterResolution: true,
+			canMakePreviewShellRenderable: false,
+			registersRenderer: false,
+			hasRegisteredRenderer: false,
+			activatesRenderer: false,
+			renderable: false,
+			rendersPreview: false,
+			computesDiff: false,
+			callsRestEndpoint: false,
+			callsSave: false,
+			savesPost: false,
+			mutatesPersistedPostContent: false,
+			claimsSaved: false,
+		} );
+	} );
+
 	it( 'exposes fresh-review pre-publish items and local decision action descriptors only', () => {
 		const rawContentToken = 'fresh-review-pre-publish-raw-token';
 		const approvedHash =
@@ -4262,6 +4371,8 @@ describe( 'distributed editing session state', () => {
 							registrationStatus: 'not_registered',
 							capabilityRegistrationStatus:
 								'missing_required_capabilities',
+							capabilityRegistrationReason:
+								'missing_all_required_capabilities',
 							requiredRendererCapabilityKeys: [
 								'boundary_safe_diff_renderer',
 								'human_review_controls',
@@ -4269,11 +4380,47 @@ describe( 'distributed editing session state', () => {
 							requiredRendererCapabilityCount: 2,
 							registeredRendererCapabilityKeys: [],
 							registeredRendererCapabilityCount: 0,
+							presentRendererCapabilityKeys: [],
+							presentRendererCapabilityCount: 0,
 							missingRendererCapabilityKeys: [
 								'boundary_safe_diff_renderer',
 								'human_review_controls',
 							],
 							missingRendererCapabilityCount: 2,
+							candidateRendererCapabilityKeyCount: 0,
+							unknownCandidateRendererCapabilityCount: 0,
+							allRequiredRendererCapabilitiesPresent: false,
+							rendererCapabilitiesComplete: false,
+							completeButDisabled: false,
+							capabilityResolution: expect.objectContaining( {
+								status: 'missing_required_capabilities',
+								reason: 'missing_all_required_capabilities',
+								resolverKind:
+									'fresh_review_comparison_renderer_capability_resolver',
+								presentRendererCapabilityKeys: [],
+								presentRendererCapabilityCount: 0,
+								missingRendererCapabilityKeys: [
+									'boundary_safe_diff_renderer',
+									'human_review_controls',
+								],
+								missingRendererCapabilityCount: 2,
+								candidateRendererCapabilityKeyCount: 0,
+								unknownCandidateRendererCapabilityCount: 0,
+								allRequiredRendererCapabilitiesPresent: false,
+								rendererCapabilitiesComplete: false,
+								completeButDisabled: false,
+								candidateMapAccepted: true,
+								candidateMapStored: false,
+								resolverOnly: true,
+								registersRenderer: false,
+								renderable: false,
+								rendersPreview: false,
+								computesDiff: false,
+								callsRestEndpoint: false,
+								callsSave: false,
+							} ),
+							hasCapabilityResolution: true,
+							canShowCapabilityResolution: true,
 							optionalRendererCapabilityKeys: [],
 							optionalRendererCapabilityCount: 0,
 							satisfiedRendererCapabilityKeys: [],
@@ -4380,11 +4527,20 @@ describe( 'distributed editing session state', () => {
 								'not_registered',
 							rendererReadinessCapabilityStatus:
 								'missing_required_capabilities',
+							rendererCapabilityResolutionStatus:
+								'missing_required_capabilities',
+							rendererCapabilityResolutionReason:
+								'missing_all_required_capabilities',
+							presentRendererCapabilityKeys: [],
+							presentRendererCapabilityCount: 0,
 							missingRendererCapabilityKeys: [
 								'boundary_safe_diff_renderer',
 								'human_review_controls',
 							],
 							missingRendererCapabilityCount: 2,
+							unknownCandidateRendererCapabilityCount: 0,
+							rendererCapabilitiesComplete: false,
+							rendererCapabilityResolutionResolverOnly: true,
 							rendererReadinessRegistersRenderer: false,
 							rendererReadinessRenderable: false,
 							boundaryPolicy: 'serialized_block_hash_only',

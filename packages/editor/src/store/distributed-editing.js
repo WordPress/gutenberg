@@ -2273,7 +2273,13 @@ function createDistributedEditingFreshReviewComparisonPreviewShellDescriptor(
 	};
 	const rendererReadiness =
 		createDistributedEditingFreshReviewComparisonRendererReadinessDescriptor(
-			previewShell
+			previewShell,
+			{
+				candidateRendererCapabilityMap:
+					item.rendererCapabilityCandidateMap ||
+					item.renderer_capability_candidate_map ||
+					{},
+			}
 		);
 
 	return {
@@ -2291,13 +2297,134 @@ function createDistributedEditingFreshReviewComparisonPreviewShellDescriptor(
 	};
 }
 
+const DISTRIBUTED_EDITING_FRESH_REVIEW_COMPARISON_REQUIRED_RENDERER_CAPABILITY_KEYS =
+	[ 'boundary_safe_diff_renderer', 'human_review_controls' ];
+
+/**
+ * Resolves future fresh-review comparison renderer capabilities without
+ * registering, activating, or rendering a comparison renderer.
+ *
+ * @param {Object} options                                Resolver options.
+ * @param {Object} options.candidateRendererCapabilityMap Candidate capability map.
+ * @param {Array}  options.requiredRendererCapabilityKeys Required capability keys.
+ *
+ * @return {Object} Content-free renderer capability resolution.
+ */
+export function getDistributedEditingFreshReviewComparisonRendererCapabilityResolution( {
+	candidateRendererCapabilityMap = {},
+	requiredRendererCapabilityKeys = DISTRIBUTED_EDITING_FRESH_REVIEW_COMPARISON_REQUIRED_RENDERER_CAPABILITY_KEYS,
+} = {} ) {
+	const candidateMap =
+		candidateRendererCapabilityMap &&
+		typeof candidateRendererCapabilityMap === 'object' &&
+		! Array.isArray( candidateRendererCapabilityMap )
+			? candidateRendererCapabilityMap
+			: {};
+	const requiredKeys = Array.isArray( requiredRendererCapabilityKeys )
+		? requiredRendererCapabilityKeys.filter( Boolean )
+		: DISTRIBUTED_EDITING_FRESH_REVIEW_COMPARISON_REQUIRED_RENDERER_CAPABILITY_KEYS;
+	const candidateCapabilityKeys = Object.keys( candidateMap ).filter(
+		( key ) => Boolean( candidateMap[ key ] )
+	);
+	const presentRendererCapabilityKeys = requiredKeys.filter( ( key ) =>
+		Boolean( candidateMap[ key ] )
+	);
+	const missingRendererCapabilityKeys = requiredKeys.filter(
+		( key ) => ! Boolean( candidateMap[ key ] )
+	);
+	const unknownCandidateRendererCapabilityCount =
+		candidateCapabilityKeys.filter(
+			( key ) => ! requiredKeys.includes( key )
+		).length;
+	const allRequiredRendererCapabilitiesPresent =
+		requiredKeys.length > 0 && missingRendererCapabilityKeys.length === 0;
+	let status = 'missing_required_capabilities';
+	let reason = 'missing_all_required_capabilities';
+
+	if ( allRequiredRendererCapabilitiesPresent ) {
+		status = 'complete_but_disabled';
+		reason = 'renderer_disabled_until_explicit_renderer_turn';
+	} else if ( presentRendererCapabilityKeys.length > 0 ) {
+		status = 'partial_required_capabilities';
+		reason = 'missing_some_required_capabilities';
+	}
+
+	return {
+		status,
+		reason,
+		available: true,
+		schemaVersion: 1,
+		resolverKind: 'fresh_review_comparison_renderer_capability_resolver',
+		requiredRendererCapabilityKeys: requiredKeys,
+		requiredRendererCapabilityCount: requiredKeys.length,
+		presentRendererCapabilityKeys,
+		presentRendererCapabilityCount: presentRendererCapabilityKeys.length,
+		missingRendererCapabilityKeys,
+		missingRendererCapabilityCount: missingRendererCapabilityKeys.length,
+		candidateRendererCapabilityKeyCount: candidateCapabilityKeys.length,
+		unknownCandidateRendererCapabilityCount,
+		allRequiredRendererCapabilitiesPresent,
+		rendererCapabilitiesComplete: allRequiredRendererCapabilitiesPresent,
+		completeButDisabled: allRequiredRendererCapabilitiesPresent,
+		candidateMapAccepted: true,
+		candidateMapStored: false,
+		rendererDisabledAfterResolution: true,
+		canRegisterRenderer: false,
+		registersRenderer: false,
+		hasRegisteredRenderer: false,
+		activatesRenderer: false,
+		canMakePreviewShellRenderable: false,
+		renderable: false,
+		resolverOnly: true,
+		descriptorOnly: true,
+		statusOnly: true,
+		redacted: true,
+		hashValuesRedacted: true,
+		sourceFieldNamesOnly: false,
+		rawContentIncluded: false,
+		exposesHashValues: false,
+		exposesRawContent: false,
+		exposesProofSignature: false,
+		exposesTokenMaterial: false,
+		exposesUserIdentity: false,
+		exposesReviewerIds: false,
+		exposesActorIds: false,
+		rendersPreview: false,
+		rendersDiff: false,
+		computesDiff: false,
+		opensComparison: false,
+		opensPanel: false,
+		derivesPatch: false,
+		callsRestEndpoint: false,
+		callsSave: false,
+		callsNormalSavePost: false,
+		callsRetrySaveEndpoint: false,
+		dispatchesNotice: false,
+		savesPost: false,
+		mutatesEditorContent: false,
+		mutatesPersistedPostContent: false,
+		selectsBlock: false,
+		selectsReviewItem: false,
+		marksSelected: false,
+		movesFocus: false,
+		createsRevision: false,
+		changesPostLock: false,
+		claimsSaved: false,
+	};
+}
+
 function createDistributedEditingFreshReviewComparisonRendererReadinessDescriptor(
-	previewShell
+	previewShell,
+	{ candidateRendererCapabilityMap = {} } = {}
 ) {
-	const requiredRendererCapabilityKeys = [
-		'boundary_safe_diff_renderer',
-		'human_review_controls',
-	];
+	const capabilityResolution =
+		getDistributedEditingFreshReviewComparisonRendererCapabilityResolution(
+			{
+				candidateRendererCapabilityMap,
+			}
+		);
+	const requiredRendererCapabilityKeys =
+		capabilityResolution.requiredRendererCapabilityKeys;
 
 	return {
 		status: 'disabled_until_renderer_capabilities_registered',
@@ -2317,13 +2444,33 @@ function createDistributedEditingFreshReviewComparisonRendererReadinessDescripto
 		previewMode: previewShell.previewMode,
 		rendererStatus: previewShell.rendererStatus || 'not_registered',
 		registrationStatus: 'not_registered',
-		capabilityRegistrationStatus: 'missing_required_capabilities',
+		capabilityRegistrationStatus: capabilityResolution.status,
+		capabilityRegistrationReason: capabilityResolution.reason,
 		requiredRendererCapabilityKeys,
-		requiredRendererCapabilityCount: requiredRendererCapabilityKeys.length,
+		requiredRendererCapabilityCount:
+			capabilityResolution.requiredRendererCapabilityCount,
 		registeredRendererCapabilityKeys: [],
 		registeredRendererCapabilityCount: 0,
-		missingRendererCapabilityKeys: requiredRendererCapabilityKeys,
-		missingRendererCapabilityCount: requiredRendererCapabilityKeys.length,
+		presentRendererCapabilityKeys:
+			capabilityResolution.presentRendererCapabilityKeys,
+		presentRendererCapabilityCount:
+			capabilityResolution.presentRendererCapabilityCount,
+		missingRendererCapabilityKeys:
+			capabilityResolution.missingRendererCapabilityKeys,
+		missingRendererCapabilityCount:
+			capabilityResolution.missingRendererCapabilityCount,
+		candidateRendererCapabilityKeyCount:
+			capabilityResolution.candidateRendererCapabilityKeyCount,
+		unknownCandidateRendererCapabilityCount:
+			capabilityResolution.unknownCandidateRendererCapabilityCount,
+		allRequiredRendererCapabilitiesPresent:
+			capabilityResolution.allRequiredRendererCapabilitiesPresent,
+		rendererCapabilitiesComplete:
+			capabilityResolution.rendererCapabilitiesComplete,
+		completeButDisabled: capabilityResolution.completeButDisabled,
+		capabilityResolution,
+		hasCapabilityResolution: true,
+		canShowCapabilityResolution: true,
 		optionalRendererCapabilityKeys: [],
 		optionalRendererCapabilityCount: 0,
 		satisfiedRendererCapabilityKeys: [],
@@ -2430,10 +2577,26 @@ function createDistributedEditingFreshReviewComparisonPreviewShellSupportReportD
 			rendererReadiness?.registrationStatus || null,
 		rendererReadinessCapabilityStatus:
 			rendererReadiness?.capabilityRegistrationStatus || null,
+		rendererCapabilityResolutionStatus:
+			rendererReadiness?.capabilityResolution?.status || null,
+		rendererCapabilityResolutionReason:
+			rendererReadiness?.capabilityResolution?.reason || null,
+		presentRendererCapabilityKeys:
+			rendererReadiness?.presentRendererCapabilityKeys || [],
+		presentRendererCapabilityCount:
+			rendererReadiness?.presentRendererCapabilityCount || 0,
 		missingRendererCapabilityKeys:
 			rendererReadiness?.missingRendererCapabilityKeys || [],
 		missingRendererCapabilityCount:
 			rendererReadiness?.missingRendererCapabilityCount || 0,
+		unknownCandidateRendererCapabilityCount:
+			rendererReadiness?.unknownCandidateRendererCapabilityCount || 0,
+		rendererCapabilitiesComplete: Boolean(
+			rendererReadiness?.rendererCapabilitiesComplete
+		),
+		rendererCapabilityResolutionResolverOnly: Boolean(
+			rendererReadiness?.capabilityResolution?.resolverOnly
+		),
 		rendererReadinessRegistersRenderer: Boolean(
 			rendererReadiness?.registersRenderer
 		),
