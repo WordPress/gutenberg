@@ -31,8 +31,13 @@ import type {
  * `gridSettings` entirely; if `gridSettings` is provided, the consumer's
  * shape passes through untouched and missing fields fall back to whatever
  * defaults the grid model itself supplies.
+ *
+ * `columns` is the user-facing target (drawer-editable). `minColumnWidth`
+ * is an implicit floor that protects tile legibility on narrow containers
+ * and is not exposed in the layout settings drawer.
  */
 const DEFAULT_GRID: WidgetGridSettings = {
+	columns: 6,
 	minColumnWidth: 350,
 	rowHeight: 200,
 };

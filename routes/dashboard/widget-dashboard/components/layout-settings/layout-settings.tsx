@@ -122,17 +122,6 @@ export function LayoutSettings( {
 		]
 	);
 
-	const handleMinColumnWidthChange = useCallback(
-		( raw: unknown ) => {
-			const next = parsePositiveInt( raw );
-			onGridSettingsChange( {
-				...gridSettings,
-				minColumnWidth: next,
-			} as WidgetGridSettings );
-		},
-		[ gridSettings, onGridSettingsChange ]
-	);
-
 	const handleColumnsChange = useCallback(
 		( raw: unknown ) => {
 			const next = parsePositiveInt( raw );
@@ -140,25 +129,6 @@ export function LayoutSettings( {
 				...gridSettings,
 				columns: next,
 			} as WidgetGridSettings );
-		},
-		[ gridSettings, onGridSettingsChange ]
-	);
-
-	const handleColumnsModeChange = useCallback(
-		( useFixedColumns: boolean ) => {
-			if ( useFixedColumns ) {
-				onGridSettingsChange( {
-					...gridSettings,
-					columns: gridSettings.columns ?? 6,
-					minColumnWidth: undefined,
-				} as WidgetGridSettings );
-			} else {
-				onGridSettingsChange( {
-					...gridSettings,
-					columns: undefined,
-					minColumnWidth: gridSettings.minColumnWidth ?? 350,
-				} as WidgetGridSettings );
-			}
 		},
 		[ gridSettings, onGridSettingsChange ]
 	);
@@ -193,7 +163,6 @@ export function LayoutSettings( {
 				>
 		   ).rowHeight;
 	const isRowHeightAuto = rowHeight === ROW_HEIGHT_AUTO;
-	const isFixedColumns = gridSettings.columns !== undefined;
 
 	const modelItem = MODEL_ITEMS.find(
 		( item ) => item.value === currentModel
@@ -251,35 +220,17 @@ export function LayoutSettings( {
 							} }
 						/>
 
-						<Stack direction="column" gap="xs">
-							<ToggleControl
-								label={ __( 'Fixed column count' ) }
-								checked={ isFixedColumns }
-								onChange={ handleColumnsModeChange }
-							/>
-							{ isFixedColumns ? (
-								<InputControl
-									label={ __( 'Columns' ) }
-									type="number"
-									min={ 1 }
-									max={ 12 }
-									value={ gridSettings.columns ?? '' }
-									onValueChange={ handleColumnsChange }
-								/>
-							) : (
-								<InputControl
-									label={ __( 'Min column width (px)' ) }
-									description={ __(
-										'Minimum width of each column. The number of columns adapts to the container width.'
-									) }
-									type="number"
-									min={ 200 }
-									step={ 10 }
-									value={ gridSettings.minColumnWidth ?? '' }
-									onValueChange={ handleMinColumnWidthChange }
-								/>
+						<InputControl
+							label={ __( 'Columns' ) }
+							description={ __(
+								'Target column count. On narrow containers the grid reduces the count to keep tiles legible.'
 							) }
-						</Stack>
+							type="number"
+							min={ 1 }
+							max={ 12 }
+							value={ gridSettings.columns ?? '' }
+							onValueChange={ handleColumnsChange }
+						/>
 
 						<Stack direction="column" gap="xs">
 							<ToggleControl

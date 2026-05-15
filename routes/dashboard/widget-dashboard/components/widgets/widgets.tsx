@@ -149,54 +149,29 @@ export const Widgets = forwardRef< HTMLDivElement, WidgetsProps >(
 				WidgetResizeHandle as React.ComponentType< ResizeHandleRenderProps >,
 		};
 
-		let surface: React.ReactNode;
-		if ( isMasonry ) {
-			surface =
-				gridSettings.columns !== undefined ? (
-					<DashboardLanes
-						layout={ gridLayout as DashboardLanesLayoutItem[] }
-						columns={ gridSettings.columns }
-						flowTolerance={ gridSettings.flowTolerance }
-						onChangeLayout={ handleMasonryChange }
-						{ ...sharedRenderProps }
-					>
-						{ children }
-					</DashboardLanes>
-				) : (
-					<DashboardLanes
-						layout={ gridLayout as DashboardLanesLayoutItem[] }
-						minColumnWidth={ gridSettings.minColumnWidth }
-						flowTolerance={ gridSettings.flowTolerance }
-						onChangeLayout={ handleMasonryChange }
-						{ ...sharedRenderProps }
-					>
-						{ children }
-					</DashboardLanes>
-				);
-		} else {
-			surface =
-				gridSettings.columns !== undefined ? (
-					<DashboardGrid
-						layout={ gridLayout as DashboardGridLayoutItem[] }
-						columns={ gridSettings.columns }
-						rowHeight={ gridSettings.rowHeight }
-						onChangeLayout={ handleGridChange }
-						{ ...sharedRenderProps }
-					>
-						{ children }
-					</DashboardGrid>
-				) : (
-					<DashboardGrid
-						layout={ gridLayout as DashboardGridLayoutItem[] }
-						minColumnWidth={ gridSettings.minColumnWidth }
-						rowHeight={ gridSettings.rowHeight }
-						onChangeLayout={ handleGridChange }
-						{ ...sharedRenderProps }
-					>
-						{ children }
-					</DashboardGrid>
-				);
-		}
+		const surface: React.ReactNode = isMasonry ? (
+			<DashboardLanes
+				layout={ gridLayout as DashboardLanesLayoutItem[] }
+				columns={ gridSettings.columns }
+				minColumnWidth={ gridSettings.minColumnWidth }
+				flowTolerance={ gridSettings.flowTolerance }
+				onChangeLayout={ handleMasonryChange }
+				{ ...sharedRenderProps }
+			>
+				{ children }
+			</DashboardLanes>
+		) : (
+			<DashboardGrid
+				layout={ gridLayout as DashboardGridLayoutItem[] }
+				columns={ gridSettings.columns }
+				minColumnWidth={ gridSettings.minColumnWidth }
+				rowHeight={ gridSettings.rowHeight }
+				onChangeLayout={ handleGridChange }
+				{ ...sharedRenderProps }
+			>
+				{ children }
+			</DashboardGrid>
+		);
 
 		return (
 			<div ref={ ref } className={ clsx( styles.grid, className ) }>
