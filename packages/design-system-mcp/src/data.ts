@@ -49,8 +49,10 @@ function withTTL< T >(
 						throw error;
 					}
 				} )();
+
 				expiresAt = Date.now() + ttlMs;
 			}
+
 			return cached;
 		},
 		{
