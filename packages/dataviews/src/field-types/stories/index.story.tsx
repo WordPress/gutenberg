@@ -139,6 +139,8 @@ type DataType = {
 	ratingWithIcon?: string;
 	percentageWithSuffix?: string;
 	priceWithBoth?: string;
+	integerWithSteppers?: number;
+	numberWithPrefix?: number;
 };
 
 const data: DataType[] = [
@@ -181,6 +183,8 @@ const data: DataType[] = [
 		ratingWithIcon: '4.5',
 		percentageWithSuffix: '85',
 		priceWithBoth: '199.99',
+		integerWithSteppers: 6,
+		numberWithPrefix: 25.99,
 	},
 ];
 
@@ -563,6 +567,30 @@ const fields: Field< DataType >[] = [
 			control: 'text',
 			prefix: DollarPrefix,
 			suffix: USDSuffix,
+		},
+	},
+	{
+		id: 'integerWithSteppers',
+		label: 'Integer with Steppers',
+		type: 'integer',
+		description:
+			'Integer field with custom +/- spin buttons and step of 1.',
+		isValid: { min: 1, max: 12 },
+		Edit: {
+			control: 'integer',
+			spinControls: 'custom',
+			step: 1,
+		},
+	},
+	{
+		id: 'numberWithPrefix',
+		label: 'Number with Prefix',
+		type: 'number',
+		description: 'Number field with dollar sign prefix and step of 0.01.',
+		Edit: {
+			control: 'number',
+			prefix: DollarPrefix,
+			step: 0.01,
 		},
 	},
 ];

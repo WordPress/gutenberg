@@ -6,6 +6,7 @@
 
 - DataViews: Refresh filter chip styling to align with `Button`. [#75204](https://github.com/WordPress/gutenberg/pull/75204)
 - DataForms: Increase the minimum width of the panel layout popover from 256px to 320px so option labels have more room. [#75204](https://github.com/WordPress/gutenberg/pull/75204)
+- DataForm: Specialize `EditConfig` for `integer` and `number` fields, adding declarative `step`, `spinControls`, `prefix`, and `suffix` options.
 
 ### Bug Fixes
 

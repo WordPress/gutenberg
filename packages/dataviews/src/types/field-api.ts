@@ -168,10 +168,73 @@ export type EditConfigDatetime = {
 };
 
 /**
- * Edit configuration for other control types (excluding 'text', 'textarea', and 'datetime').
+ * Edit configuration for integer controls.
+ */
+export type EditConfigInteger = {
+	control: 'integer';
+	/**
+	 * Amount by which the value is changed when incrementing/decrementing.
+	 *
+	 * When omitted, defaults to `1`.
+	 */
+	step?: number;
+	/**
+	 * The type of spin controls to display.
+	 *
+	 * - 'none' - Do not show spin controls.
+	 * - 'native' - Use the browser's native HTML input controls (default).
+	 * - 'custom' - Use plus and minus icon buttons.
+	 */
+	spinControls?: 'none' | 'native' | 'custom';
+	/**
+	 * Prefix component to display before the input.
+	 */
+	prefix?: React.ComponentType;
+	/**
+	 * Suffix component to display after the input.
+	 */
+	suffix?: React.ComponentType;
+};
+
+/**
+ * Edit configuration for number controls.
+ */
+export type EditConfigNumber = {
+	control: 'number';
+	/**
+	 * Amount by which the value is changed when incrementing/decrementing.
+	 *
+	 * When omitted, the step is derived from `format.decimals` (e.g. `0.01`
+	 * for two decimals); when neither is provided, it defaults to `1`.
+	 */
+	step?: number;
+	/**
+	 * The type of spin controls to display.
+	 *
+	 * - 'none' - Do not show spin controls.
+	 * - 'native' - Use the browser's native HTML input controls (default).
+	 * - 'custom' - Use plus and minus icon buttons.
+	 */
+	spinControls?: 'none' | 'native' | 'custom';
+	/**
+	 * Prefix component to display before the input.
+	 */
+	prefix?: React.ComponentType;
+	/**
+	 * Suffix component to display after the input.
+	 */
+	suffix?: React.ComponentType;
+};
+
+/**
+ * Edit configuration for other control types (excluding 'text', 'textarea',
+ * 'datetime', 'integer', and 'number').
  */
 export type EditConfigGeneric = {
-	control: Exclude< FieldTypeName, 'text' | 'textarea' | 'datetime' >;
+	control: Exclude<
+		FieldTypeName,
+		'text' | 'textarea' | 'datetime' | 'integer' | 'number'
+	>;
 };
 
 /**
@@ -182,6 +245,8 @@ export type EditConfig =
 	| EditConfigTextarea
 	| EditConfigText
 	| EditConfigDatetime
+	| EditConfigInteger
+	| EditConfigNumber
 	| EditConfigGeneric;
 
 export type Field< Item > = {
@@ -480,6 +545,8 @@ export type DataFormControlProps< Item > = {
 		suffix?: React.ComponentType;
 		rows?: number;
 		compact?: boolean;
+		step?: number;
+		spinControls?: 'none' | 'native' | 'custom';
 	};
 };
 

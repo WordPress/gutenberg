@@ -7,7 +7,7 @@ import {
 	__experimentalNumberControl as NumberControl,
 	privateApis,
 } from '@wordpress/components';
-import { useCallback } from '@wordpress/element';
+import { createElement, useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -91,9 +91,11 @@ export default function ValidatedNumber< Item >( {
 	markWhenOptional,
 	operator,
 	validity,
+	config,
 }: DataFormControlProps< Item > ) {
+	const { step: stepFromConfig, spinControls, prefix, suffix } = config ?? {};
 	const decimals = ( field.format as FormatNumber )?.decimals ?? 0;
-	const step = Math.pow( 10, Math.abs( decimals ) * -1 );
+	const step = stepFromConfig ?? Math.pow( 10, Math.abs( decimals ) * -1 );
 	const { label, description, getValue, setValue, isValid } = field;
 	const value = getValue( { item: data } ) ?? '';
 	const disabled = field.isDisabled( { item: data, field } );
@@ -160,6 +162,9 @@ export default function ValidatedNumber< Item >( {
 			__next40pxDefaultSize
 			hideLabelFromVision={ hideLabelFromVision }
 			step={ step }
+			spinControls={ spinControls }
+			prefix={ prefix ? createElement( prefix ) : undefined }
+			suffix={ suffix ? createElement( suffix ) : undefined }
 			min={ isValid.min ? isValid.min.constraint : undefined }
 			max={ isValid.max ? isValid.max.constraint : undefined }
 			disabled={ disabled }

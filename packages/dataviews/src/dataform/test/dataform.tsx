@@ -180,6 +180,105 @@ describe( 'DataForm component', () => {
 			expect( priceInput ).toHaveValue( 3.75 );
 		} );
 
+		it( 'should honor `step` from the integer Edit config', () => {
+			const fieldsWithStep = [
+				...fields,
+				{
+					id: 'columns',
+					label: 'Columns',
+					type: 'integer' as const,
+					Edit: {
+						control: 'integer' as const,
+						step: 5,
+					},
+				},
+			];
+			const formWithStep = {
+				...form,
+				fields: [ ...form.fields, 'columns' ],
+			};
+			render(
+				<Dataform
+					onChange={ noop }
+					fields={ fieldsWithStep }
+					form={ formWithStep }
+					data={ { ...data, columns: 10 } }
+				/>
+			);
+
+			const columnsInput = screen.getByRole( 'spinbutton', {
+				name: /columns/i,
+			} );
+			expect( columnsInput ).toHaveAttribute( 'step', '5' );
+		} );
+
+		it( 'should render custom spin controls for integer Edit config', () => {
+			const fieldsWithSteppers = [
+				...fields,
+				{
+					id: 'columns',
+					label: 'Columns',
+					type: 'integer' as const,
+					Edit: {
+						control: 'integer' as const,
+						spinControls: 'custom' as const,
+					},
+				},
+			];
+			const formWithSteppers = {
+				...form,
+				fields: [ ...form.fields, 'columns' ],
+			};
+			render(
+				<Dataform
+					onChange={ noop }
+					fields={ fieldsWithSteppers }
+					form={ formWithSteppers }
+					data={ { ...data, columns: 6 } }
+				/>
+			);
+
+			expect(
+				screen.getByRole( 'button', { name: 'Increment' } )
+			).toBeInTheDocument();
+			expect(
+				screen.getByRole( 'button', { name: 'Decrement' } )
+			).toBeInTheDocument();
+		} );
+
+		it( 'should override the decimals-derived step on number fields when `step` is provided', () => {
+			const fieldsWithStep = [
+				...fields,
+				{
+					id: 'price',
+					label: 'Price',
+					type: 'number' as const,
+					format: { decimals: 2 },
+					Edit: {
+						control: 'number' as const,
+						step: 0.5,
+					},
+				},
+			];
+			const formWithStep = {
+				...form,
+				fields: [ ...form.fields, 'price' ],
+			};
+			render(
+				<Dataform
+					onChange={ noop }
+					fields={ fieldsWithStep }
+					form={ formWithStep }
+					data={ { ...data, price: 1.5 } }
+				/>
+			);
+
+			const priceInput = screen.getByRole( 'spinbutton', {
+				name: /price/i,
+			} );
+			expect( priceInput ).toHaveAttribute( 'step', '0.5' );
+		} );
+
 		it( 'should render combined fields correctly', async () => {
 			const formWithCombinedFields = {
 				fields: [
