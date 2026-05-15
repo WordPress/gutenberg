@@ -39,6 +39,7 @@
 		var(--wpds-border-width-sm) dashed
 		var(--wp-grid-placeholder-outline-color, var(--wpds-color-stroke-interactive-brand));
 	background: transparent;
+	border-radius: var(--wp-grid-placeholder-radius, 0);
 }
 
 @media (forced-colors: active) {
