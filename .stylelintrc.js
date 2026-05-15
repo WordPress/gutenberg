@@ -130,7 +130,7 @@ module.exports = {
 			},
 		},
 		{
-			// SCSS modules use the Sass-aware `function-no-unknown` variant.
+			// SCSS-only: use the Sass-aware `function-no-unknown` variant.
 			files: [ '**/*.module.scss', 'routes/**/*.scss' ],
 			rules: {
 				'function-no-unknown': null,

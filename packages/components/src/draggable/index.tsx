@@ -136,6 +136,8 @@ export function Draggable( {
 		// IE, we need to check for its existence first.
 		if ( 'function' === typeof event.dataTransfer.setDragImage ) {
 			dragImage.classList.add( ...dragImageClasses );
+			// Stays at the document body — invisible, so the slot's stacking
+			// guarantees aren't needed here.
 			ownerDocument.body.appendChild( dragImage );
 			event.dataTransfer.setDragImage( dragImage, 0, 0 );
 		}
