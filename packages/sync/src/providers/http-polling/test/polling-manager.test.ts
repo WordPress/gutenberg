@@ -9,7 +9,7 @@ import {
 	it,
 	jest,
 } from '@jest/globals';
-import { type SyncResponse } from '../types';
+import { type SyncPayload, type SyncResponse } from '../types';
 
 // Mock all external dependencies before imports.
 jest.mock( 'yjs', () => ( {
@@ -49,6 +49,10 @@ jest.mock( '../config', () => ( {
 	// registered rooms. Existing tests register at most 2 rooms and
 	// stay well under this cap.
 	MAX_ROOMS_PER_REQUEST: 10,
+	MAX_SYNC_REQUEST_BODY_SIZE_IN_BYTES: 1000,
+	// Keep the dynamic-shrink floor below MAX so the halving logic in the
+	// 413 retry path has room to actually halve.
+	MIN_SYNC_REQUEST_BODY_SIZE_IN_BYTES: 100,
 } ) );
 
 jest.mock( '../utils', () => ( {
@@ -124,6 +128,25 @@ const syncResponse = {
 		},
 	],
 };
+
+function countOutgoingUpdates( payload: {
+	rooms: Array< { updates: unknown[] } >;
+} ): number {
+	return payload.rooms.reduce(
+		( total, room ) => total + room.updates.length,
+		0
+	);
+}
+
+function getPayloadSize( payload: unknown ): number {
+	return JSON.stringify( payload ).length;
+}
+
+function getServerAwareness(
+	room: string
+): SyncResponse[ 'rooms' ][ number ][ 'awareness' ] {
+	return room === 'room-0' ? { 1: {}, 2: {} } : {};
+}
 
 describe( 'polling-manager', () => {
 	let pollingManager: PollingManager;
@@ -811,6 +834,136 @@ describe( 'polling-manager', () => {
 	} );
 
 	describe( 'error recovery', () => {
+		it( 'splits outgoing updates so a poll stays within the request body budget', async () => {
+			mockPostSyncUpdate.mockImplementation(
+				async ( payload: SyncPayload ): Promise< SyncResponse > => ( {
+					rooms: payload.rooms.map( ( room ) => ( {
+						room: room.room,
+						end_cursor: 1,
+						awareness: getServerAwareness( room.room ),
+						updates: [],
+					} ) ),
+				} )
+			);
+
+			const docs: ReturnType< typeof createMockDoc >[] = [];
+
+			for ( let i = 0; i < 10; i++ ) {
+				const doc = createMockDoc( i + 1 );
+				docs.push( doc );
+				pollingManager.registerRoom( {
+					room: `room-${ i }`,
+					doc,
+					awareness: createMockAwareness(),
+					log: jest.fn(),
+					onStatusChange: jest.fn(),
+					onSync: jest.fn(),
+				} );
+			}
+
+			// First poll includes the primary room and detects a collaborator,
+			// which resumes all queues.
+			await jest.advanceTimersByTimeAsync( 0 );
+
+			docs.forEach( ( doc ) => {
+				getOnDocUpdate( doc )( new Uint8Array( 8 ), 'user' );
+			} );
+
+			await jest.advanceTimersByTimeAsync( 1000 );
+
+			const secondCallPayload = mockPostSyncUpdate.mock
+				.calls[ 1 ][ 0 ] as {
+				rooms: Array< { updates: unknown[] } >;
+			};
+
+			expect( getPayloadSize( secondCallPayload ) ).toBeLessThanOrEqual(
+				1000
+			);
+			expect( countOutgoingUpdates( secondCallPayload ) ).toBeGreaterThan(
+				0
+			);
+
+			await jest.advanceTimersByTimeAsync( 1000 );
+
+			const thirdCallPayload = mockPostSyncUpdate.mock
+				.calls[ 2 ][ 0 ] as {
+				rooms: Array< { updates: unknown[] } >;
+			};
+
+			expect( getPayloadSize( thirdCallPayload ) ).toBeLessThanOrEqual(
+				1000
+			);
+			expect( countOutgoingUpdates( thirdCallPayload ) ).toBeGreaterThan(
+				0
+			);
+		} );
+
+		it( 'restores exact outgoing updates after a request-body-too-large response', async () => {
+			const responseWithCollaborator = {
+				rooms: [
+					{
+						room: 'test-room',
+						end_cursor: 1,
+						awareness: { 1: {}, 2: {} },
+						updates: [],
+					},
+				],
+			};
+			mockPostSyncUpdate.mockResolvedValueOnce(
+				responseWithCollaborator
+			);
+
+			const doc = createMockDoc( 1 );
+			pollingManager.registerRoom( {
+				room: 'test-room',
+				doc,
+				awareness: createMockAwareness(),
+				log: jest.fn(),
+				onStatusChange: jest.fn(),
+				onSync: jest.fn(),
+			} );
+
+			await jest.advanceTimersByTimeAsync( 0 );
+
+			getOnDocUpdate( doc )( new Uint8Array( [ 1, 2, 3 ] ), 'user' );
+
+			mockPostSyncUpdate.mockRejectedValueOnce( {
+				code: 'rest_sync_body_too_large',
+				message: 'Request body is too large.',
+				data: { status: 413 },
+			} );
+			await jest.advanceTimersByTimeAsync( 1000 );
+
+			const failedPayload = mockPostSyncUpdate.mock.calls[ 1 ][ 0 ] as {
+				rooms: Array< {
+					updates: Array< { type: string } >;
+				} >;
+			};
+			const failedUpdateTypes = failedPayload.rooms[ 0 ].updates.map(
+				( update ) => update.type
+			);
+
+			mockPostSyncUpdate.mockResolvedValueOnce(
+				responseWithCollaborator
+			);
+			await jest.advanceTimersByTimeAsync( 1000 );
+
+			const retryPayload = mockPostSyncUpdate.mock.calls[ 2 ][ 0 ] as {
+				rooms: Array< {
+					updates: Array< { type: string } >;
+				} >;
+			};
+
+			expect(
+				retryPayload.rooms[ 0 ].updates.map( ( update ) => update.type )
+			).toEqual( failedUpdateTypes );
+			expect(
+				retryPayload.rooms[ 0 ].updates.some(
+					( update ) => update.type === 'compaction'
+				)
+			).toBe( false );
+		} );
+
 		it( 'replaces queued updates with a compaction after a poll error', async () => {
 			// First poll: succeed with collaborators to resume the queue.
 			const responseWithCollaborator = {

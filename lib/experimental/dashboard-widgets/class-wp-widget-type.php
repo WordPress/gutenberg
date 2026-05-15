@@ -23,7 +23,7 @@ if ( ! class_exists( 'WP_Widget_Type' ) ) {
 	class WP_Widget_Type {
 
 		/**
-		 * Widget type key. Namespaced identifier, e.g. `wordpress/hello-world`.
+		 * Widget type key. Namespaced identifier, e.g. `core/hello-world`.
 		 *
 		 * @var string
 		 */

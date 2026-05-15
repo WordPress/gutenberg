@@ -8,16 +8,30 @@ import type { DragEvent } from 'react';
  */
 import { throttle } from '@wordpress/compose';
 import { useEffect, useRef } from '@wordpress/element';
+import { getWpCompatOverlaySlot } from '@wordpress/ui';
 
 /**
  * Internal dependencies
  */
 import type { DraggableProps } from './types';
+import styles from './style.module.scss';
 
-const dragImageClass = 'components-draggable__invisible-drag-image';
-const cloneWrapperClass = 'components-draggable__clone';
-const clonePadding = 0;
+// The hardcoded legacy class names are preserved alongside the
+// CSS-module hashed ones for backwards compatibility. `filter(Boolean)`
+// keeps Jest's CSS-module mock (which returns `undefined`) from leaking
+// a literal "undefined" class.
+const dragImageClasses = [
+	styles[ 'invisible-drag-image' ],
+	'components-draggable__invisible-drag-image',
+].filter( Boolean );
+const cloneWrapperClasses = [
+	styles.clone,
+	'components-draggable__clone',
+].filter( Boolean );
+// Body-level signal shared with external code (e.g. block-editor keyboard
+// drag), so it stays as a plain global class rather than module-scoped.
 const bodyClass = 'is-dragging-components-draggable';
+const clonePadding = 0;
 
 /**
  * `Draggable` is a Component that provides a way to set up a cross-browser
@@ -99,6 +113,11 @@ export function Draggable( {
 	 */
 	function start( event: DragEvent ) {
 		const { ownerDocument } = event.target as HTMLElement;
+		// Only use the slot when it lives in the same document as the
+		// dragged element, so the clone's viewport-relative coordinates
+		// resolve in one coordinate space.
+		const slot = getWpCompatOverlaySlot();
+		const compatSlot = slot?.ownerDocument === ownerDocument ? slot : null;
 
 		event.dataTransfer.setData(
 			transferDataType,
@@ -116,12 +135,14 @@ export function Draggable( {
 		// right after. event.dataTransfer.setDragImage is not supported yet in
 		// IE, we need to check for its existence first.
 		if ( 'function' === typeof event.dataTransfer.setDragImage ) {
-			dragImage.classList.add( dragImageClass );
+			dragImage.classList.add( ...dragImageClasses );
+			// Stays at the document body — invisible, so the slot's stacking
+			// guarantees aren't needed here.
 			ownerDocument.body.appendChild( dragImage );
 			event.dataTransfer.setDragImage( dragImage, 0, 0 );
 		}
 
-		cloneWrapper.classList.add( cloneWrapperClass );
+		cloneWrapper.classList.add( ...cloneWrapperClasses );
 
 		if ( cloneClassname ) {
 			cloneWrapper.classList.add( cloneClassname );
@@ -141,8 +162,7 @@ export function Draggable( {
 			clonedDragComponent.innerHTML = dragComponentRef.current.innerHTML;
 			cloneWrapper.appendChild( clonedDragComponent );
 
-			// Inject the cloneWrapper into the DOM.
-			ownerDocument.body.appendChild( cloneWrapper );
+			( compatSlot ?? ownerDocument.body ).appendChild( cloneWrapper );
 		} else {
 			const element = ownerDocument.getElementById(
 				elementId
@@ -173,8 +193,9 @@ export function Draggable( {
 
 			cloneWrapper.appendChild( clone );
 
-			// Inject the cloneWrapper into the DOM.
-			if ( appendToOwnerDocument ) {
+			if ( compatSlot ) {
+				compatSlot.appendChild( cloneWrapper );
+			} else if ( appendToOwnerDocument ) {
 				ownerDocument.body.appendChild( cloneWrapper );
 			} else {
 				elementWrapper?.appendChild( cloneWrapper );

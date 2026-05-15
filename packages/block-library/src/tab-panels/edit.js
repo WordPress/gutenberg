@@ -7,6 +7,7 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -14,7 +15,15 @@ import { useSelect } from '@wordpress/data';
 import AddTabToolbarControl from '../tab-panel/add-tab-toolbar-control';
 import RemoveTabToolbarControl from '../tab-panel/remove-tab-toolbar-control';
 
-const TAB_PANELS_TEMPLATE = [ [ 'core/tab-panel', {} ] ];
+/**
+ * Initial template applied only when the block is first inserted (i.e. when
+ * inner blocks are empty). templateLock is false, so this is never applied to
+ * existing blocks that already have tab panels saved.
+ */
+const TAB_PANELS_TEMPLATE = [
+	[ 'core/tab-panel', { label: __( 'Tab' ) } ],
+	[ 'core/tab-panel', { label: __( 'Tab' ) } ],
+];
 
 export default function Edit( { clientId } ) {
 	const blockProps = useBlockProps();

@@ -9,11 +9,9 @@ import clsx from 'clsx';
 import {
 	Button,
 	Icon,
-	__experimentalText as WCText,
-	__experimentalVStack as VStack,
-	__experimentalHStack as HStack,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
+import { Text, Stack } from '@wordpress/ui';
 import { useDispatch, useSelect } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
 import { __, sprintf, isRTL } from '@wordpress/i18n';
@@ -81,6 +79,7 @@ function OptionalParentSelectButton( { children, onClick } ) {
  * @param {string}        [props.parentClientId]        The parent clientId, if this card is for a parent block.
  * @param {string}        [props.isChild]               Whether the block card is for a child block, in which case, indent the block using an arrow.
  * @param {string}        [props.clientId]              Whether the block card is for a child block, in which case, indent the block using an arrow.
+ * @param {Element}       [props.controls]              Controls rendered beside the block title.
  * @param {Element}       [props.children]              Children.
  * @return {Element}                        Block card component.
  */
@@ -96,6 +95,7 @@ function BlockCard( {
 	isChild,
 	children,
 	clientId,
+	controls,
 } ) {
 	if ( blockType ) {
 		deprecated( '`blockType` property in `BlockCard component`', {
@@ -150,66 +150,73 @@ function BlockCard( {
 				className
 			) }
 		>
-			<VStack>
-				<HStack justify="flex-start" spacing={ 0 }>
-					{ parentBlockClientId && (
-						<Button
-							onClick={ () => selectBlock( parentBlockClientId ) }
-							label={
-								parentBlockName
-									? sprintf(
-											/* translators: %s: The name of the parent block. */
-											__( 'Go to "%s" block' ),
-											getBlockType( parentBlockName )
-												?.title
-									  )
-									: __( 'Go to parent block' )
+			<Stack direction="column" gap="sm">
+				<Stack direction="row" align="center" justify="space-between">
+					<Stack direction="row" align="center" justify="flex-start">
+						{ parentBlockClientId && (
+							<Button
+								onClick={ () =>
+									selectBlock( parentBlockClientId )
+								}
+								label={
+									parentBlockName
+										? sprintf(
+												/* translators: %s: The name of the parent block. */
+												__( 'Go to "%s" block' ),
+												getBlockType( parentBlockName )
+													?.title
+										  )
+										: __( 'Go to parent block' )
+								}
+								style={
+									// TODO: This style override is also used in ToolsPanelHeader.
+									// It should be supported out-of-the-box by Button.
+									{ minWidth: 24, padding: 0 }
+								}
+								icon={ isRTL() ? chevronRight : chevronLeft }
+								size="small"
+							/>
+						) }
+						{ isChild && (
+							<span className="block-editor-block-card__child-indicator-icon">
+								<Icon
+									icon={ isRTL() ? arrowLeft : arrowRight }
+								/>
+							</span>
+						) }
+						<OptionalParentSelectButton
+							onClick={
+								parentClientId
+									? () => {
+											selectBlock( parentClientId );
+									  }
+									: undefined
 							}
-							style={
-								// TODO: This style override is also used in ToolsPanelHeader.
-								// It should be supported out-of-the-box by Button.
-								{ minWidth: 24, padding: 0 }
-							}
-							icon={ isRTL() ? chevronRight : chevronLeft }
-							size="small"
-						/>
-					) }
-					{ isChild && (
-						<span className="block-editor-block-card__child-indicator-icon">
-							<Icon icon={ isRTL() ? arrowLeft : arrowRight } />
-						</span>
-					) }
-					<OptionalParentSelectButton
-						onClick={
-							parentClientId
-								? () => {
-										selectBlock( parentClientId );
-								  }
-								: undefined
-						}
-					>
-						<BlockIcon icon={ icon } showColors />
-						<VStack spacing={ 1 }>
-							<TitleElement className="block-editor-block-card__title">
-								<span className="block-editor-block-card__name">
-									{ !! name?.length ? name : title }
-								</span>
-								{ ! parentClientId &&
-									! isChild &&
-									!! name?.length && (
-										<WCBadge>{ title }</WCBadge>
-									) }
-							</TitleElement>
-							{ children }
-						</VStack>
-					</OptionalParentSelectButton>
-				</HStack>
+						>
+							<BlockIcon icon={ icon } showColors />
+							<Stack direction="column" gap="xs">
+								<TitleElement className="block-editor-block-card__title">
+									<span className="block-editor-block-card__name">
+										{ !! name?.length ? name : title }
+									</span>
+									{ ! parentClientId &&
+										! isChild &&
+										!! name?.length && (
+											<WCBadge>{ title }</WCBadge>
+										) }
+								</TitleElement>
+								{ children }
+							</Stack>
+						</OptionalParentSelectButton>
+					</Stack>
+					{ controls }
+				</Stack>
 				{ ! parentClientId && ! isChild && description && (
-					<WCText className="block-editor-block-card__description">
+					<Text className="block-editor-block-card__description">
 						{ description }
-					</WCText>
+					</Text>
 				) }
-			</VStack>
+			</Stack>
 		</div>
 	);
 }

@@ -32,7 +32,7 @@ import { setImmutably } from '../../utils/object';
 
 const AXIAL_SIDES = [ 'horizontal', 'vertical' ];
 
-export function useHasDimensionsPanel( settings ) {
+export function useHasDimensionsPanel( settings, styleState = 'default' ) {
 	return (
 		Platform.OS === 'web' &&
 		( hasContentSize( settings ) ||
@@ -45,7 +45,7 @@ export function useHasDimensionsPanel( settings ) {
 			hasMinWidth( settings ) ||
 			hasWidth( settings ) ||
 			hasAspectRatio( settings ) ||
-			hasChildLayout( settings ) )
+			hasChildLayout( settings, styleState ) )
 	);
 }
 
@@ -89,7 +89,11 @@ function hasAspectRatio( settings ) {
 	return settings?.dimensions?.aspectRatio;
 }
 
-function hasChildLayout( settings ) {
+function hasChildLayout( settings, styleState = 'default' ) {
+	if ( styleState !== 'default' ) {
+		return false;
+	}
+
 	const {
 		type: parentLayoutType = 'default',
 		default: { type: defaultParentLayoutType = 'default' } = {},
@@ -231,6 +235,7 @@ export default function DimensionsPanel( {
 	// Special case because the layout controls are not part of the dimensions panel
 	// in global styles but not in block inspector.
 	includeLayoutControls = false,
+	styleState = 'default',
 } ) {
 	const { dimensions, spacing } = settings;
 
@@ -490,7 +495,7 @@ export default function DimensionsPanel( {
 	const hasAspectRatioValue = () => !! value?.dimensions?.aspectRatio;
 
 	// Child Layout
-	const showChildLayoutControl = hasChildLayout( settings );
+	const showChildLayoutControl = hasChildLayout( settings, styleState );
 	const childLayout = inheritedValue?.layout;
 
 	const setChildLayout = ( newChildLayout ) => {

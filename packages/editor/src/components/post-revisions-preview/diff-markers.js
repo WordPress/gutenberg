@@ -15,6 +15,7 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
+import { Tooltip } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -97,15 +98,17 @@ function DiffMarkerButton( { clientId, status, subscribe } ) {
 	}
 
 	return (
-		<button
-			className={ `revision-diff-marker is-${ status }` }
-			style={ {
-				top: `${ position.top }%`,
-				height: `${ Math.max( position.height, 0.5 ) }%`,
-			} }
-			onClick={ () => blockRef.current?.focus() }
-			aria-label={ STATUS_LABELS[ status ] }
-		/>
+		<Tooltip text={ STATUS_LABELS[ status ] }>
+			<button
+				className={ `revision-diff-marker is-${ status }` }
+				style={ {
+					top: `${ position.top }%`,
+					height: `${ Math.max( position.height, 0.5 ) }%`,
+				} }
+				onClick={ () => blockRef.current?.focus() }
+				aria-label={ STATUS_LABELS[ status ] }
+			/>
+		</Tooltip>
 	);
 }
 
