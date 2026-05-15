@@ -652,6 +652,117 @@ describe( 'PostPublishButton', () => {
 		);
 	} );
 
+	it( 'should show the guarded update action hint without requiring pre-Save action', async () => {
+		const user = userEvent.setup();
+		const savePostStatus = jest.fn();
+		render(
+			<PostPublishButton
+				isSaveable
+				isPublishable
+				savePostStatus={ savePostStatus }
+				distributedEditingSaveButtonState={ {
+					status: 'accepted_but_unconsumed',
+					reason: 'fresh_review_accepted_but_unconsumed',
+					source: 'fresh_review',
+					label: 'Submit reviewed changes',
+					statusText:
+						'Accepted Distributed Editing proof is ready for guarded retry save.',
+					clickAction: 'continue_guarded_retry_save',
+					authorityState: 'ready_for_guarded_update',
+					localChangesState: 'protected_local_changes_exportable',
+					reviewCheckpointState: 'review_accepted',
+					authoritativePostState: 'ready_for_guarded_update',
+					saveStateSummaryText:
+						'Reviewed local changes are ready for guarded update; the authoritative post is not updated yet.',
+					authoritativePostUpdated: false,
+				} }
+				distributedEditingSaveJourneyState={ {
+					shouldExposeInSaveControls: true,
+					step: 'ready_to_save',
+					action: 'save',
+					title: 'Save is ready',
+					summary:
+						'Save will send reviewed changes to WordPress for a guarded update.',
+					actionHint: 'Send guarded update',
+					requiresActionBeforeSave: false,
+					statusChromeSummary:
+						'Reviewed local changes are ready for guarded update; the authoritative post is not updated yet.',
+					statusChromeAuthorityState: 'ready_for_guarded_update',
+					statusChromeAuthorityText:
+						'Reviewed changes are ready for a guarded update of the authoritative WordPress post.',
+					claimsSavedWithoutEvidence: false,
+				} }
+			/>
+		);
+
+		const button = screen.getByRole( 'button', {
+			name: 'Submit reviewed changes',
+		} );
+		expect( button ).toHaveAttribute(
+			'title',
+			'Send guarded update. Save will send reviewed changes to WordPress for a guarded update. Reviewed local changes are ready for guarded update; the authoritative post is not updated yet.'
+		);
+		expect( button ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-step',
+			'ready_to_save'
+		);
+		expect( button ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-action',
+			'save'
+		);
+		expect( button ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-action-hint',
+			'Send guarded update'
+		);
+		expect( button ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-action-required',
+			'false'
+		);
+		expect( button ).toHaveAttribute(
+			'data-distributed-editing-save-button-status',
+			'accepted_but_unconsumed'
+		);
+		expect( button ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-claims-saved-without-evidence',
+			'false'
+		);
+		const cueLabel = screen.getByText( 'Save is ready' );
+		const cueActionHint = screen.getByText( 'Send guarded update' );
+		const cue = screen.getByLabelText(
+			'Send guarded update. Save will send reviewed changes to WordPress for a guarded update. Reviewed local changes are ready for guarded update; the authoritative post is not updated yet.'
+		);
+		expect( cueLabel ).toBeVisible();
+		expect( cueActionHint ).toBeVisible();
+		expect( cue ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-visual-cue',
+			'true'
+		);
+		expect( cue ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-action-hint',
+			'Send guarded update'
+		);
+		expect( cue ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-action-required',
+			'false'
+		);
+		expect( cue ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-authority-state',
+			'ready_for_guarded_update'
+		);
+		expect( cue ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-calls-normal-save',
+			'false'
+		);
+		expect( cue ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-calls-retry-save',
+			'false'
+		);
+
+		await user.click( button );
+
+		expect( savePostStatus ).toHaveBeenCalledWith( 'pending' );
+	} );
+
 	it( 'should not expose Distributed Editing save descriptor data for the default state', () => {
 		render(
 			<PostPublishButton

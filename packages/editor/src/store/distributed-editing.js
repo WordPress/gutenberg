@@ -10683,9 +10683,20 @@ function getDistributedEditingSaveJourneyActionHintForStep( step ) {
 			return 'Get latest first';
 		case DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.REVIEW_CHANGES:
 			return 'Review before update';
+		case DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.READY_TO_SAVE:
+			return 'Send guarded update';
 	}
 
 	return null;
+}
+
+function getDistributedEditingSaveJourneyRequiresActionBeforeSaveForStep(
+	step
+) {
+	return [
+		DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.GET_LATEST_POST,
+		DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.REVIEW_CHANGES,
+	].includes( step );
 }
 
 /**
@@ -10715,7 +10726,10 @@ export function getDistributedEditingSaveJourneyStateForSessionState(
 		title: copy.title,
 		summary: copy.summary,
 		actionHint,
-		requiresActionBeforeSave: Boolean( actionHint ),
+		requiresActionBeforeSave:
+			getDistributedEditingSaveJourneyRequiresActionBeforeSaveForStep(
+				humanLoopStep.step
+			),
 		saveButtonStatus: humanLoopStep.saveButtonStatus,
 		saveButtonReason: humanLoopStep.saveButtonReason,
 		saveButtonLabel: humanLoopStep.saveButtonLabel,

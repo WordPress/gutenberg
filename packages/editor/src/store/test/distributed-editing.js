@@ -7541,7 +7541,7 @@ describe( 'distributed editing session state', () => {
 				action: 'save',
 				title: 'Save is ready',
 				summary: 'guarded update',
-				actionHint: null,
+				actionHint: 'Send guarded update',
 				requiresActionBeforeSave: false,
 				saveButtonLabel: 'Submit reviewed changes',
 				saveButtonBlocksNormalSavePost: true,
