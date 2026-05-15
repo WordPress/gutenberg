@@ -57,6 +57,13 @@ import { unlock } from '../lock-unlock';
 
 const BORDER_SIDES = [ 'Top', 'Right', 'Bottom', 'Left' ];
 
+// Keep in sync with WP_Theme_JSON_Gutenberg::RESPONSIVE_BREAKPOINTS and
+// packages/global-styles-engine/src/core/render.tsx.
+const RESPONSIVE_BREAKPOINTS = {
+	mobile: '@media (width <= 480px)',
+	tablet: '@media (480px < width <= 782px)',
+};
+
 const styleSupportKeys = [
 	...TYPOGRAPHY_SUPPORT_KEYS,
 	BORDER_SUPPORT_KEY,
@@ -151,6 +158,114 @@ export function getStateStylesCSS( stateStyles, selector ) {
 		: undefined;
 
 	return [ importantCSS, fallbackCSS ].filter( Boolean ).join( '\n' );
+}
+
+/**
+ * Returns a style object with nested state/element keys removed.
+ *
+ * Viewport state objects can contain root declarations alongside nested
+ * `elements` and pseudo-state styles. Only root declarations should be passed
+ * to the style engine for the viewport root selector.
+ *
+ * @param {Object}   stateStyles Style object for a selected state.
+ * @param {string[]} nestedKeys  Keys to remove from the root style object.
+ * @return {Object|undefined} Root-only style object.
+ */
+function getRootStateStyles( stateStyles, nestedKeys ) {
+	if ( ! stateStyles ) {
+		return stateStyles;
+	}
+
+	const rootStyles = { ...stateStyles };
+	nestedKeys.forEach( ( key ) => {
+		delete rootStyles[ key ];
+	} );
+	return rootStyles;
+}
+
+/**
+ * Generates CSS rules for supported pseudo-state styles.
+ *
+ * @param {Object} style        Block style object containing pseudo-state styles.
+ * @param {string} name         Block name.
+ * @param {string} baseSelector Base selector used to scope generated CSS.
+ * @return {string[]} Generated CSS rule strings.
+ */
+function getPseudoStateCSSRules( style, name, baseSelector ) {
+	const validPseudoStates = VALID_BLOCK_PSEUDO_STATES[ name ];
+	if ( ! validPseudoStates ) {
+		return [];
+	}
+
+	const cssRules = [];
+	validPseudoStates.forEach( ( state ) => {
+		const stateStyles = style?.[ state ];
+		if ( stateStyles ) {
+			const selector = buildStateSelector( baseSelector, name, state );
+			const css = getStateStylesCSS( stateStyles, selector );
+			if ( css ) {
+				cssRules.push( css );
+			}
+		}
+	} );
+	return cssRules;
+}
+
+/**
+ * Generates CSS rules for responsive block instance style states.
+ *
+ * Each responsive state can contain root styles, element styles, and nested
+ * pseudo-state styles. Generated rules are wrapped in the matching breakpoint
+ * media query.
+ *
+ * @param {Object} style        Block style object containing responsive states.
+ * @param {string} name         Block name.
+ * @param {string} baseSelector Base selector used to scope generated CSS.
+ * @return {string[]} Generated CSS rule strings.
+ */
+export function getResponsiveStateCSSRules( style, name, baseSelector ) {
+	const cssRules = [];
+	const validPseudoStates = VALID_BLOCK_PSEUDO_STATES[ name ] ?? [];
+	const nestedStateKeys = [ 'elements', ...validPseudoStates ];
+
+	Object.entries( RESPONSIVE_BREAKPOINTS ).forEach(
+		( [ viewport, mediaQuery ] ) => {
+			const viewportStyles = style?.[ viewport ];
+			if ( ! viewportStyles ) {
+				return;
+			}
+
+			const viewportCSSRules = [];
+			const rootCSS = getStateStylesCSS(
+				getRootStateStyles( viewportStyles, nestedStateKeys ),
+				baseSelector
+			);
+			if ( rootCSS ) {
+				viewportCSSRules.push( rootCSS );
+			}
+
+			const elementCSS = getElementCSSRules(
+				viewportStyles.elements,
+				name,
+				baseSelector
+			);
+			if ( elementCSS ) {
+				viewportCSSRules.push( elementCSS );
+			}
+
+			viewportCSSRules.push(
+				...getPseudoStateCSSRules( viewportStyles, name, baseSelector )
+			);
+
+			if ( viewportCSSRules.length ) {
+				cssRules.push(
+					`${ mediaQuery }{${ viewportCSSRules.join( '' ) }}`
+				);
+			}
+		}
+	);
+
+	return cssRules;
 }
 
 /**
@@ -650,24 +765,13 @@ function useBlockProps( { name, style } ) {
 			cssRules.push( elementCSS );
 		}
 
-		// Generate per-instance pseudo-state CSS (e.g., :hover, :focus).
-		const validStates = VALID_BLOCK_PSEUDO_STATES[ name ];
-		if ( validStates ) {
-			validStates.forEach( ( state ) => {
-				const stateStyles = style?.[ state ];
-				if ( stateStyles ) {
-					const selector = buildStateSelector(
-						baseElementSelector,
-						name,
-						state
-					);
-					const css = getStateStylesCSS( stateStyles, selector );
-					if ( css ) {
-						cssRules.push( css );
-					}
-				}
-			} );
-		}
+		cssRules.push(
+			...getPseudoStateCSSRules( style, name, baseElementSelector )
+		);
+
+		cssRules.push(
+			...getResponsiveStateCSSRules( style, name, baseElementSelector )
+		);
 
 		return cssRules.length > 0 ? cssRules.join( '' ) : undefined;
 	}, [ baseElementSelector, blockElementStyles, name, style ] );

@@ -3,6 +3,7 @@
  */
 import _style, {
 	getInlineStyles,
+	getResponsiveStateCSSRules,
 	getStateStylesCSS,
 	omitStyle,
 } from '../style';
@@ -199,6 +200,62 @@ describe( 'getStateStylesCSS', () => {
 		).toBe(
 			'.wp-block-test:hover { border-top-color: #0000ff !important; }\n.wp-block-test:hover { border-top-style: solid; }'
 		);
+	} );
+} );
+
+describe( 'getResponsiveStateCSSRules', () => {
+	it( 'generates media-query scoped root styles for viewport states', () => {
+		expect(
+			getResponsiveStateCSSRules(
+				{
+					mobile: {
+						color: { text: 'red' },
+					},
+				},
+				'core/paragraph',
+				'.wp-elements-1'
+			)
+		).toEqual( [
+			'@media (width <= 480px){.wp-elements-1 { color: red !important; }}',
+		] );
+	} );
+
+	it( 'generates media-query scoped pseudo styles for viewport states', () => {
+		expect(
+			getResponsiveStateCSSRules(
+				{
+					mobile: {
+						':hover': {
+							color: { background: 'black' },
+						},
+					},
+				},
+				'core/button',
+				'.wp-elements-1'
+			)
+		).toEqual( [
+			'@media (width <= 480px){.wp-elements-1:hover { background-color: black !important; }}',
+		] );
+	} );
+
+	it( 'generates media-query scoped element styles for viewport states', () => {
+		expect(
+			getResponsiveStateCSSRules(
+				{
+					mobile: {
+						elements: {
+							link: {
+								color: { text: 'blue' },
+							},
+						},
+					},
+				},
+				'core/paragraph',
+				'.wp-elements-1'
+			)
+		).toEqual( [
+			'@media (width <= 480px){.wp-elements-1 a:where(:not(.wp-element-button)) { color: blue; }}',
+		] );
 	} );
 } );
 
