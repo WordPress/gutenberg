@@ -24,7 +24,7 @@ import { Notes } from './notes';
 import { store as editorStore } from '../../store';
 import { AddNoteMenuItem } from './add-note-menu-item';
 import { NoteAvatarIndicator } from './note-indicator-toolbar';
-import { useGlobalStyles } from '../global-styles';
+import { useGlobalStylesContext } from '../global-styles-provider';
 import { useNoteThreads, useEnableFloatingSidebar } from './hooks';
 import { getNoteIdsFromMetadata, pickPrimaryNote } from './utils';
 import PostTypeSupportCheck from '../post-type-support-check';
@@ -143,7 +143,7 @@ function NotesSidebar( { postId } ) {
 	);
 
 	// Get the global styles to set the background color of the sidebar.
-	const { merged: GlobalStyles } = useGlobalStyles();
+	const { merged: GlobalStyles } = useGlobalStylesContext();
 	const backgroundColor = GlobalStyles?.styles?.color?.background;
 
 	// Surface one thread for the avatar indicator.
