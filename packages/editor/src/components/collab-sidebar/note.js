@@ -22,7 +22,9 @@ import { moreVertical, published } from '@wordpress/icons';
  */
 import { NoteCard } from './note-card';
 import { NoteForm } from './note-form';
-import SuggestionActions from './suggestion-actions';
+import SuggestionActions, {
+	SuggestionActionButtons,
+} from './suggestion-actions';
 import { unlock } from '../../lock-unlock';
 
 const { Menu } = unlock( componentsPrivateApis );
@@ -195,9 +197,13 @@ export function Note( {
 		);
 	}
 
-	const actions = isSelected ? (
+	const showActions = isSelected || hasSuggestionPayload;
+	const actions = showActions ? (
 		<>
-			{ canResolve && onResolve && (
+			{ hasSuggestionPayload && (
+				<SuggestionActionButtons thread={ note } />
+			) }
+			{ isSelected && canResolve && onResolve && (
 				<Button
 					label={ _x( 'Resolve', 'Mark note as resolved' ) }
 					size="small"

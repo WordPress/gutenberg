@@ -9,6 +9,7 @@
 -   REST: allow post editors to accept or reject suggestion notes on their posts without requiring the `moderate_comments` capability. Tightens the `comments` controller for `type=note` so non-author editors can only update the suggestion lifecycle (`status` and `_wp_suggestion_status`), and rejects suggestion payloads larger than 64 KB before they reach the database.
 -   `setEditorIntent` now surfaces mode transitions with a snackbar ('You're suggesting' / 'You're editing' / 'You're viewing') alongside the existing a11y announcement.
 -   Suggestions: introduce a per-attribute conflict check (`hasAttributeConflict`) and a `SuggestionSummary` renderer that replaces the post-`modified_gmt` staleness compare. Adds the `wp/suggestions` architecture doc and updates the `core/editor` data reference to cover the new selectors.
+-   Suggestions: surface Apply / Reject actions in the collaboration sidebar via a shared `useSuggestionDecision` hook. Note headers expose icon-only Apply / Reject buttons, the note body renders the suggestion summary plus the staleness confirmation dialog, and the e2e coverage for block notes and the intent switcher is extended to the new UI.
 
 ## 14.48.1 (2026-06-16)
 
