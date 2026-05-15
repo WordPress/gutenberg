@@ -1,7 +1,7 @@
 .option {
 	flex: 1;
 	padding: var(--wpds-dimension-padding-md);
-	border: 1px solid var(--wpds-color-stroke-surface-neutral);
+	border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
 	border-radius: var(--wpds-border-radius-md);
 	background: transparent;
 	color: inherit;

@@ -7,6 +7,7 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import type { DataFormControlProps } from '@wordpress/dataviews';
+import { useCallback } from '@wordpress/element';
 /* eslint-disable @wordpress/use-recommended-components */
 import { Button, Fieldset, Stack, Text } from '@wordpress/ui';
 /* eslint-enable @wordpress/use-recommended-components */
@@ -52,15 +53,22 @@ export function LayoutModelEditField( {
 	field,
 	onChange,
 }: DataFormControlProps< WidgetGridSettings > ): React.ReactNode {
-	const currentValue = field.getValue( { item: data } );
-	const elements = field.elements ?? [];
+	const { getValue, setValue, elements = [] } = field;
+	const value = getValue( { item: data } );
+	const disabled = field.isDisabled( { item: data, field } );
+
+	const onSelect = useCallback(
+		( nextValue: string | number | undefined ) =>
+			onChange( setValue( { item: data, value: nextValue } ) ),
+		[ data, onChange, setValue ]
+	);
 
 	return (
 		<Fieldset.Root>
 			<Fieldset.Legend>{ field.label }</Fieldset.Legend>
 			<Stack direction="row" gap="md" role="radiogroup">
 				{ elements.map( ( option ) => {
-					const isSelected = currentValue === option.value;
+					const isSelected = value === option.value;
 
 					return (
 						<Button
@@ -68,17 +76,11 @@ export function LayoutModelEditField( {
 							variant="unstyled"
 							role="radio"
 							aria-checked={ isSelected }
+							disabled={ disabled }
 							className={ clsx( styles.option, {
 								[ styles.optionSelected ]: isSelected,
 							} ) }
-							onClick={ () =>
-								onChange(
-									field.setValue( {
-										item: data,
-										value: option.value,
-									} )
-								)
-							}
+							onClick={ () => onSelect( option.value ) }
 						>
 							<Stack direction="column" gap="sm" align="stretch">
 								<ModelThumbnail
