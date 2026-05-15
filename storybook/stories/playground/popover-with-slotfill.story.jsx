@@ -1,14 +1,9 @@
 /**
  * WordPress dependencies
  */
-import { useRef, useState } from '@wordpress/element';
+import { createPortal, useState } from '@wordpress/element';
 import { SlotFillProvider, Slot } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
-import * as Popover from '../../../packages/ui/src/popover';
-import { GenericIframe } from '../../../packages/ui/src/popover/stories/utils';
+import { Popover } from '@wordpress/ui';
 
 export default {
 	title: 'Playground/Popover with SlotFill',
@@ -19,12 +14,34 @@ export default {
 	},
 };
 
+// Renders an iframe and portals `children` into its body once `load` fires.
+// Gating the portal on `load` avoids a Firefox-only React portal bug — see
+// https://github.com/facebook/react/issues/22847#issuecomment-991394558.
+function IframePortal( { children, iframeRef, ...iframeProps } ) {
+	const [ bodyNode, setBodyNode ] = useState( null );
+	return (
+		<iframe
+			title="Iframe"
+			{ ...iframeProps }
+			ref={ iframeRef }
+			srcDoc="<!doctype html><html><body></body></html>"
+			onLoad={ ( event ) => {
+				setBodyNode(
+					event.currentTarget.contentDocument?.body ?? null
+				);
+			} }
+		>
+			{ bodyNode && createPortal( children, bodyNode ) }
+		</iframe>
+	);
+}
+
 export const CrossIframeWithSlotFill = {
 	name: 'Cross-Iframe (SlotFill)',
 	args: { defaultOpen: true },
 	argTypes: { defaultOpen: { control: false } },
 	render: function Render( { children: _children, ...args } ) {
-		const slotRef = useRef( null );
+		const [ slotNode, setSlotNode ] = useState( null );
 		const [ iframeBoundary, setIframeBoundary ] = useState( null );
 
 		return (
@@ -32,10 +49,10 @@ export const CrossIframeWithSlotFill = {
 				<Slot
 					name="popover-container"
 					bubblesVirtually
-					ref={ slotRef }
+					ref={ setSlotNode }
 				/>
-				<GenericIframe
-					ref={ setIframeBoundary }
+				<IframePortal
+					iframeRef={ setIframeBoundary }
 					style={ {
 						width: '100%',
 						height: 400,
@@ -62,7 +79,9 @@ export const CrossIframeWithSlotFill = {
 								</Popover.Trigger>
 								<Popover.Popup
 									portal={
-										<Popover.Portal container={ slotRef } />
+										<Popover.Portal
+											container={ slotNode ?? undefined }
+										/>
 									}
 									positioner={
 										<Popover.Positioner
@@ -90,7 +109,7 @@ export const CrossIframeWithSlotFill = {
 							</Popover.Root>
 						</div>
 					</div>
-				</GenericIframe>
+				</IframePortal>
 			</SlotFillProvider>
 		);
 	},
