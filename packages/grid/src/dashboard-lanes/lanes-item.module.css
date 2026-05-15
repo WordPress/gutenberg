@@ -10,7 +10,7 @@
 /*
  * During drag, the original item acts as a placeholder in its lane
  * while `<DragOverlay>` renders a clone that follows the cursor.
- * Fading the placeholder and outlining it with a dashed border makes
+ * Fading the placeholder and outlining it makes
  * the destination visible without any scaling or translation on the
  * original element.
  */
@@ -18,7 +18,8 @@
 	opacity: var(--wp-grid-placeholder-opacity, 0.4);
 	pointer-events: none;
 	outline:
-		var(--wpds-border-width-sm) dashed
+		var(--wpds-border-width-sm)
+		var(--wp-grid-placeholder-outline-style, dashed)
 		var(--wp-grid-placeholder-outline-color, var(--wpds-color-stroke-interactive-brand));
 	border-radius: var(--wp-grid-placeholder-radius, 0);
 }
@@ -36,7 +37,8 @@
 	pointer-events: none;
 	z-index: 1;
 	border:
-		var(--wpds-border-width-sm) dashed
+		var(--wpds-border-width-sm)
+		var(--wp-grid-resize-preview-outline-style, solid)
 		var(--wp-grid-placeholder-outline-color, var(--wpds-color-stroke-interactive-brand));
 	background: transparent;
 }

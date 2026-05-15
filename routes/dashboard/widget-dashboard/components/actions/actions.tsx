@@ -109,6 +109,7 @@ export function Actions(): React.ReactNode {
 			label: __( 'Layout settings' ),
 			onClick: openLayoutSettings,
 			disabled: editMode,
+			disabledTooltip: __( 'Disabled while editing widgets' ),
 		} );
 	}
 
