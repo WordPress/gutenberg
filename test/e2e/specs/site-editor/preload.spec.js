@@ -3,47 +3,124 @@
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
+function recordRequests( page ) {
+	const requests = [];
+	function onRequest( request ) {
+		if ( request.resourceType() !== 'fetch' ) {
+			return;
+		}
+		const urlObject = new URL( request.url() );
+		const restRoute =
+			urlObject.searchParams.get( 'rest_route' ) ??
+			urlObject.pathname.replace( /^\/wp-json/, '' );
+		// `_locale` is added uniformly to every apiFetch call and
+		// carries no signal here.
+		urlObject.searchParams.delete( '_locale' );
+		const query = urlObject.searchParams.toString();
+		requests.push(
+			`${ request.method() } ${ restRoute }${
+				query ? `?${ query }` : ''
+			}`
+		);
+	}
+
+	page.on( 'request', onRequest );
+	return {
+		requests,
+		stop: () => page.off( 'request', onRequest ),
+	};
+}
+
 test.describe( 'Preload', () => {
+	let pageId;
+
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'emptytheme' );
 		await requestUtils.resetPreferences();
+		const pg = await requestUtils.createPage( {
+			content:
+				'<!-- wp:heading -->\n<h2 class="wp-block-heading">Hello</h2>\n<!-- /wp:heading -->',
+			status: 'publish',
+		} );
+		pageId = pg.id;
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllPages();
 		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
 
-	test( 'Should make no requests before the iframe is loaded', async ( {
+	test( 'Site editor root should fetch a known set of routes during startup', async ( {
 		page,
 		admin,
 	} ) => {
-		const requests = [];
-
-		function onRequest( request ) {
-			if (
-				request.resourceType() === 'document' &&
-				request.url().startsWith( 'blob:' )
-			) {
-				// Stop recording when the iframe is initialized.
-				page.off( 'request', onRequest );
-			} else if ( request.resourceType() === 'fetch' ) {
-				const urlObject = new URL( request.url() );
-				const restRoute =
-					urlObject.searchParams.get( 'rest_route' ) ??
-					urlObject.pathname.replace( /^\/wp-json/, '' );
-				requests.push( restRoute );
-			}
-		}
-
-		page.on( 'request', onRequest );
+		const { requests, stop } = recordRequests( page );
 
 		await admin.visitSiteEditor();
+		await page
+			.frameLocator( 'iframe[name="editor-canvas"]' )
+			.locator( '[data-block]' )
+			.first()
+			.waitFor();
+		// eslint-disable-next-line playwright/no-networkidle
+		await page.waitForLoadState( 'networkidle' );
+		stop();
 
+		// `POST /wp/v2/users/me` (preferences persistence) occasionally
+		// fires twice within the captured window; the duplicate count
+		// isn't stable across runs, so this assertion deduplicates.
 		// To do: these should all be removed or preloaded.
-		expect( requests ).toEqual( [
-			// Seems to be coming from `enableComplementaryArea`.
-			'/wp/v2/users/me',
-			'/wp/v2/settings',
-		] );
+		expect( Array.from( new Set( requests ) ).sort() ).toEqual(
+			[
+				'GET /wp/v2/posts?context=edit&offset=0&order=desc&orderby=date&per_page=10&ignore_sticky=false',
+				'GET /wp/v2/taxonomies?context=view',
+				'GET /wp/v2/template-parts/emptytheme//header?context=edit',
+				'GET /wp/v2/wp_pattern_category?context=view&per_page=100&_fields=id%2Cname%2Cdescription%2Cslug',
+				'OPTIONS /wp/v2/settings',
+				'POST /wp/v2/users/me',
+			].sort()
+		);
+	} );
+
+	test( 'Editing a page should fetch a known set of routes during startup', async ( {
+		page,
+		admin,
+	} ) => {
+		const { requests, stop } = recordRequests( page );
+
+		await admin.visitAdminPage(
+			'site-editor.php',
+			`p=%2Fpage&postId=${ pageId }&canvas=edit`
+		);
+		await page
+			.frameLocator( 'iframe[name="editor-canvas"]' )
+			.getByRole( 'document', { name: 'Block: Heading' } )
+			.filter( { hasText: 'Hello' } )
+			.waitFor();
+		// eslint-disable-next-line playwright/no-networkidle
+		await page.waitForLoadState( 'networkidle' );
+		stop();
+
+		// `POST /wp/v2/users/me` (preferences persistence) occasionally
+		// fires twice within the captured window; the duplicate count
+		// isn't stable across runs, so this assertion deduplicates.
+		// To do: these should all be removed or preloaded.
+		expect( Array.from( new Set( requests ) ).sort() ).toEqual(
+			[
+				`GET /wp/v2/comments?context=edit&post=${ pageId }&type=note&status=all&per_page=100`,
+				`GET /wp/v2/pages/${ pageId }/autosaves?context=edit`,
+				'GET /wp/v2/taxonomies?context=edit&per_page=100',
+				'GET /wp/v2/taxonomies?context=view',
+				'GET /wp/v2/templates/lookup?slug=front-page',
+				'GET /wp/v2/types/page?context=edit',
+				'GET /wp/v2/users/1?context=view&_fields=id%2Cname',
+				'GET /wp/v2/users/me',
+				'GET /wp/v2/view-config?kind=postType&name=page',
+				'GET /wp/v2/wp_pattern_category?context=view&per_page=100&_fields=id%2Cname%2Cdescription%2Cslug',
+				'OPTIONS /wp/v2/settings',
+				'OPTIONS /wp/v2/templates',
+				'POST /wp/v2/users/me',
+			].sort()
+		);
 	} );
 } );

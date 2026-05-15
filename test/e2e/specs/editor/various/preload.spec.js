@@ -3,40 +3,56 @@
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
+function recordRequests( page ) {
+	const requests = [];
+	function onRequest( request ) {
+		if ( request.resourceType() !== 'fetch' ) {
+			return;
+		}
+		const urlObject = new URL( request.url() );
+		const restRoute =
+			urlObject.searchParams.get( 'rest_route' ) ??
+			urlObject.pathname.replace( /^\/wp-json/, '' );
+		// `_locale` is added uniformly to every apiFetch call and
+		// carries no signal here.
+		urlObject.searchParams.delete( '_locale' );
+		const query = urlObject.searchParams.toString();
+		requests.push(
+			`${ request.method() } ${ restRoute }${
+				query ? `?${ query }` : ''
+			}`
+		);
+	}
+
+	page.on( 'request', onRequest );
+	return {
+		requests,
+		stop: () => page.off( 'request', onRequest ),
+	};
+}
+
 test.describe( 'Preload', () => {
+	let postId;
+
+	test.beforeAll( async ( { requestUtils } ) => {
+		const post = await requestUtils.createPost( {
+			content:
+				'<!-- wp:heading -->\n<h2 class="wp-block-heading">Hello</h2>\n<!-- /wp:heading -->',
+			status: 'draft',
+		} );
+		postId = post.id;
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllPosts();
+	} );
+
 	test( 'Should fetch a known set of routes during startup', async ( {
 		page,
 		admin,
 		editor,
-		requestUtils,
 	} ) => {
-		const { id: postId } = await requestUtils.createPost( {
-			content: '<!-- wp:paragraph --><p>Hello</p><!-- /wp:paragraph -->',
-			status: 'draft',
-		} );
-
-		const requests = [];
-
-		function onRequest( request ) {
-			if ( request.resourceType() !== 'fetch' ) {
-				return;
-			}
-			const urlObject = new URL( request.url() );
-			const restRoute =
-				urlObject.searchParams.get( 'rest_route' ) ??
-				urlObject.pathname.replace( /^\/wp-json/, '' );
-			// `_locale` is added uniformly to every apiFetch call and
-			// carries no signal here.
-			urlObject.searchParams.delete( '_locale' );
-			const query = urlObject.searchParams.toString();
-			requests.push(
-				`${ request.method() } ${ restRoute }${
-					query ? `?${ query }` : ''
-				}`
-			);
-		}
-
-		page.on( 'request', onRequest );
+		const { requests, stop } = recordRequests( page );
 
 		await admin.editPost( postId );
 		// Ensure the document sidebar is open — its default state isn't
@@ -46,8 +62,8 @@ test.describe( 'Preload', () => {
 		await editor.openDocumentSettingsSidebar();
 		await page
 			.frameLocator( 'iframe[name="editor-canvas"]' )
-			.locator( '[data-block]' )
-			.first()
+			.getByRole( 'document', { name: 'Block: Heading' } )
+			.filter( { hasText: 'Hello' } )
 			.waitFor();
 		// This spec is explicitly testing network behaviour, so waiting for
 		// the network to settle (rather than a UI marker) is the right
@@ -55,11 +71,11 @@ test.describe( 'Preload', () => {
 		// resolver duplicates have all been observed before we assert.
 		// eslint-disable-next-line playwright/no-networkidle
 		await page.waitForLoadState( 'networkidle' );
-		page.off( 'request', onRequest );
+		stop();
 
-		// Some routes may be requested more than once across the captured
-		// window because of resolver races; the duplicate counts are not
-		// stable across runs, so this assertion deduplicates.
+		// `POST /wp/v2/users/me` (preferences persistence) occasionally
+		// fires twice within the captured window; the duplicate count
+		// isn't stable across runs, so this assertion deduplicates.
 		// To do: these should all be removed or preloaded.
 		expect( Array.from( new Set( requests ) ).sort() ).toEqual(
 			[
