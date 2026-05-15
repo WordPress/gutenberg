@@ -81,8 +81,8 @@ function _gutenberg_connectors_print_filesystem_credentials_modal(): void {
  *
  * @access private
  *
- * @param array $data Existing script module data.
- * @return array Script module data with the filesystem flag added.
+ * @param array<string, mixed> $data Existing script module data.
+ * @return array<string, mixed> Script module data with the filesystem flag added.
  */
 function _gutenberg_connectors_add_filesystem_data_to_script_module_data( array $data ): array {
 	require_once ABSPATH . 'wp-admin/includes/file.php';
