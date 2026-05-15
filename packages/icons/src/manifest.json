@@ -1485,11 +1485,6 @@
 		"filePath": "library/site-logo.svg"
 	},
 	{
-		"slug": "smiley",
-		"label": "Smiley",
-		"filePath": "library/smiley.svg"
-	},
-	{
 		"slug": "square",
 		"label": "Square",
 		"filePath": "library/square.svg"
