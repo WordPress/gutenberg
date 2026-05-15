@@ -8,7 +8,7 @@ import clsx from 'clsx';
  */
 import { addFilter } from '@wordpress/hooks';
 import { getBlockSupport } from '@wordpress/blocks';
-import { useMemo, useCallback } from '@wordpress/element';
+import { useMemo, Platform, useCallback } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 
 /**
@@ -31,15 +31,9 @@ import {
 	useHasColorPanel,
 	default as StylesColorPanel,
 } from '../components/global-styles/color-panel';
-import { extractPresetSlug } from '../utils/color-values';
 import BlockColorContrastChecker from './contrast-checker';
+import PseudoStateContrastChecker from './pseudo-state-contrast-checker';
 import { store as blockEditorStore } from '../store';
-import {
-	getStyleForState,
-	isDefaultBlockStyleState,
-	setStyleForState,
-	useBlockStyleState,
-} from './block-style-state';
 
 export const COLOR_SUPPORT_KEY = 'color';
 
@@ -55,6 +49,10 @@ const hasColorSupport = ( blockNameOrType ) => {
 };
 
 const hasLinkColorSupport = ( blockType ) => {
+	if ( Platform.OS !== 'web' ) {
+		return false;
+	}
+
 	const colorSupport = getBlockSupport( blockType, COLOR_SUPPORT_KEY );
 
 	return (
@@ -66,7 +64,6 @@ const hasLinkColorSupport = ( blockType ) => {
 
 const hasGradientSupport = ( blockNameOrType ) => {
 	const colorSupport = getBlockSupport( blockNameOrType, COLOR_SUPPORT_KEY );
-
 	return (
 		colorSupport !== null &&
 		typeof colorSupport === 'object' &&
@@ -76,13 +73,11 @@ const hasGradientSupport = ( blockNameOrType ) => {
 
 const hasBackgroundColorSupport = ( blockType ) => {
 	const colorSupport = getBlockSupport( blockType, COLOR_SUPPORT_KEY );
-
 	return colorSupport && colorSupport.background !== false;
 };
 
 const hasTextColorSupport = ( blockType ) => {
 	const colorSupport = getBlockSupport( blockType, COLOR_SUPPORT_KEY );
-
 	return colorSupport && colorSupport.text !== false;
 };
 
@@ -194,14 +189,22 @@ export function addSaveProps( props, blockNameOrType, attributes ) {
 
 function styleToAttributes( style ) {
 	const textColorValue = style?.color?.text;
-	const textColorSlug = extractPresetSlug( textColorValue, 'color' );
+	const textColorSlug = textColorValue?.startsWith( 'var:preset|color|' )
+		? textColorValue.substring( 'var:preset|color|'.length )
+		: undefined;
+
 	const backgroundColorValue = style?.color?.background;
-	const backgroundColorSlug = extractPresetSlug(
-		backgroundColorValue,
-		'color'
-	);
+	const backgroundColorSlug = backgroundColorValue?.startsWith(
+		'var:preset|color|'
+	)
+		? backgroundColorValue.substring( 'var:preset|color|'.length )
+		: undefined;
+
 	const gradientValue = style?.color?.gradient;
-	const gradientSlug = extractPresetSlug( gradientValue, 'gradient' );
+	const gradientSlug = gradientValue?.startsWith( 'var:preset|gradient|' )
+		? gradientValue.substring( 'var:preset|gradient|'.length )
+		: undefined;
+
 	const updatedStyle = { ...style };
 	updatedStyle.color = {
 		...updatedStyle.color,
@@ -258,6 +261,24 @@ function ColorInspectorControl( { children, resetAllFilter } ) {
 	);
 }
 
+/**
+ * @typedef {'default'|':hover'|':focus'|':focus-visible'|':active'} PseudoState
+ */
+
+/**
+ * Renders the color inspector controls for a block, including per-pseudo-state
+ * contrast checking when an interactive state panel is active.
+ *
+ * @param {Object}            props
+ * @param {string}            props.clientId            Block client ID.
+ * @param {string}            props.name                Block name.
+ * @param {Function}          props.setAttributes       Block setAttributes.
+ * @param {Object}            props.settings            Color settings passed from block support.
+ * @param {React.ElementType} [props.asWrapper]         Optional custom wrapper.
+ * @param {string}            [props.label]             Panel label.
+ * @param {Object}            [props.defaultControls]   Which controls are open by default.
+ * @param {PseudoState}       [props.activePseudoState] Active interactive state, e.g. ':hover'.
+ */
 export function ColorEdit( {
 	clientId,
 	name,
@@ -266,10 +287,9 @@ export function ColorEdit( {
 	asWrapper,
 	label,
 	defaultControls,
+	activePseudoState,
 } ) {
-	const selectedState = useBlockStyleState();
 	const isEnabled = useHasColorPanel( settings );
-
 	const { style, textColor, backgroundColor, gradient } = useSelect(
 		( select ) => {
 			// Early return to avoid subscription when disabled
@@ -292,38 +312,18 @@ export function ColorEdit( {
 		[ clientId, isEnabled ]
 	);
 
-	const isStateSelected = ! isDefaultBlockStyleState( selectedState );
-
 	const value = useMemo( () => {
-		if ( isStateSelected ) {
-			return getStyleForState( style, selectedState );
-		}
 		return attributesToStyle( {
 			style,
 			textColor,
 			backgroundColor,
 			gradient,
 		} );
-	}, [
-		isStateSelected,
-		selectedState,
-		style,
-		textColor,
-		backgroundColor,
-		gradient,
-	] );
+	}, [ style, textColor, backgroundColor, gradient ] );
 
-	const onChange = isStateSelected
-		? ( newStyle ) => {
-				setAttributes( {
-					style: setStyleForState( style, selectedState, newStyle ),
-				} );
-		  }
-		: ( newStyle ) => {
-				setAttributes( styleToAttributes( newStyle ) );
-		  };
-
-	const Wrapper = asWrapper || ColorInspectorControl;
+	const onChange = ( newStyle ) => {
+		setAttributes( styleToAttributes( newStyle ) );
+	};
 
 	if ( ! isEnabled ) {
 		return null;
@@ -336,18 +336,27 @@ export function ColorEdit( {
 				'__experimentalDefaultControls',
 		  ] );
 
+	const contrastCheckerBlockSupportEnabled =
+		false !==
+		getBlockSupport( name, [ COLOR_SUPPORT_KEY, 'enableContrastChecker' ] );
+
+	/**
+	 * Whether the user is currently viewing a pseudo-state panel (e.g. ':hover')
+	 * rather than the default state. The sentinel string 'default' is treated as
+	 * no active state to keep the API simple for callers.
+	 */
+	const isEditingPseudoState =
+		activePseudoState && activePseudoState !== 'default';
+
+	// Determine whether to show contrast checking at all.
 	const enableContrastChecking =
-		! isStateSelected &&
+		Platform.OS === 'web' &&
 		! value?.color?.gradient &&
 		( settings?.color?.text || settings?.color?.link ) &&
-		// Contrast checking is enabled by default.
-		// Deactivating it requires `enableContrastChecker` to have
-		// an explicit value of `false`.
-		false !==
-			getBlockSupport( name, [
-				COLOR_SUPPORT_KEY,
-				'enableContrastChecker',
-			] );
+		contrastCheckerBlockSupportEnabled;
+
+	// Use provided wrapper or default to ColorInspectorControl.
+	const Wrapper = asWrapper || ColorInspectorControl;
 
 	return (
 		<StylesColorPanel
@@ -358,19 +367,36 @@ export function ColorEdit( {
 			onChange={ onChange }
 			defaultControls={ defaultControls }
 			label={ label }
-			enableContrastChecker={
-				false !==
-				getBlockSupport( name, [
-					COLOR_SUPPORT_KEY,
-					'enableContrastChecker',
-				] )
-			}
+			enableContrastChecker={ contrastCheckerBlockSupportEnabled }
 		>
 			{ enableContrastChecking && (
-				<BlockColorContrastChecker
-					clientId={ clientId }
-					name={ name }
-				/>
+				<>
+					{ /*
+					 * For pseudo-state panels, use the attribute-based checker.
+					 * For the default-state panel (or no active state), use the
+					 * existing DOM-based checker.
+					 *
+					 * This also fixes the "false hover warning" described in #78305:
+					 * when the user is on the default panel and physically hovers the
+					 * canvas element, the DOM checker would previously read hover-state
+					 * computed styles and emit spurious warnings.  By gating the
+					 * DOM-based checker on `!isEditingPseudoState` and having it only
+					 * fire when no pseudo-state is active, we guarantee it always sees
+					 * the resting-state colors.
+					 */ }
+					{ isEditingPseudoState ? (
+						<PseudoStateContrastChecker
+							clientId={ clientId }
+							name={ name }
+							activePseudoState={ activePseudoState }
+						/>
+					) : (
+						<BlockColorContrastChecker
+							clientId={ clientId }
+							name={ name }
+						/>
+					) }
+				</>
 			) }
 		</StylesColorPanel>
 	);
