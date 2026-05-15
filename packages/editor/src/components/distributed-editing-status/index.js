@@ -1824,6 +1824,18 @@ function getFreshReviewComparisonReadinessMessage( comparisonHandoff ) {
 	);
 }
 
+function getFreshReviewComparisonPreviewShellMessage( previewShell ) {
+	if ( previewShell?.status === 'disabled_until_renderer_turn' ) {
+		return __(
+			'A future preview shell would need base and proposed block content, a boundary-safe diff renderer, and review controls. The shell is disabled; no preview is rendered, no diff is computed, no panel opens, and no save was made.'
+		);
+	}
+
+	return __(
+		'The comparison preview shell is not available. No preview is rendered, no diff is computed, no panel opens, and no save was made.'
+	);
+}
+
 function getFreshReviewComparePlanEvidenceLabel( available ) {
 	return available ? __( 'Available' ) : __( 'Unavailable' );
 }
@@ -2180,6 +2192,7 @@ function DistributedEditingFreshReviewComparePlanStatus() {
 	);
 	const comparePlan = reviewItem?.compareAction?.comparePlan;
 	const comparisonSelectionHandoff = comparePlan?.comparisonSelectionHandoff;
+	const comparisonPreviewShell = comparePlan?.comparisonPreviewShell;
 
 	if ( ! comparePlan ) {
 		return null;
@@ -2217,6 +2230,36 @@ function DistributedEditingFreshReviewComparePlanStatus() {
 			data-distributed-editing-fresh-review-comparison-readiness-status={
 				comparisonSelectionHandoff?.status || undefined
 			}
+			data-distributed-editing-fresh-review-comparison-preview-shell-calls-rest={ formatDataBoolean(
+				comparisonPreviewShell?.callsRestEndpoint
+			) }
+			data-distributed-editing-fresh-review-comparison-preview-shell-calls-save={ formatDataBoolean(
+				comparisonPreviewShell?.callsSave
+			) }
+			data-distributed-editing-fresh-review-comparison-preview-shell-computes-diff={ formatDataBoolean(
+				comparisonPreviewShell?.computesDiff
+			) }
+			data-distributed-editing-fresh-review-comparison-preview-shell-moves-focus={ formatDataBoolean(
+				comparisonPreviewShell?.movesFocus
+			) }
+			data-distributed-editing-fresh-review-comparison-preview-shell-opens-comparison={ formatDataBoolean(
+				comparisonPreviewShell?.opensComparison
+			) }
+			data-distributed-editing-fresh-review-comparison-preview-shell-opens-panel={ formatDataBoolean(
+				comparisonPreviewShell?.opensPanel
+			) }
+			data-distributed-editing-fresh-review-comparison-preview-shell-renderable={ formatDataBoolean(
+				comparisonPreviewShell?.renderable
+			) }
+			data-distributed-editing-fresh-review-comparison-preview-shell-renders-preview={ formatDataBoolean(
+				comparisonPreviewShell?.rendersPreview
+			) }
+			data-distributed-editing-fresh-review-comparison-preview-shell-selects-block={ formatDataBoolean(
+				comparisonPreviewShell?.selectsBlock
+			) }
+			data-distributed-editing-fresh-review-comparison-preview-shell-status={
+				comparisonPreviewShell?.status || undefined
+			}
 			data-distributed-editing-fresh-review-compare-plan-opens-comparison={ formatDataBoolean(
 				comparePlan.opensComparison
 			) }
@@ -2241,6 +2284,13 @@ function DistributedEditingFreshReviewComparePlanStatus() {
 				<p>
 					{ getFreshReviewComparisonReadinessMessage(
 						comparisonSelectionHandoff
+					) }
+				</p>
+			) }
+			{ comparisonPreviewShell && (
+				<p>
+					{ getFreshReviewComparisonPreviewShellMessage(
+						comparisonPreviewShell
 					) }
 				</p>
 			) }
@@ -2276,6 +2326,16 @@ function DistributedEditingFreshReviewComparePlanStatus() {
 							{ getFreshReviewComparePlanEvidenceLabel(
 								comparisonSelectionHandoff.canSelectForFutureComparison
 							) }
+						</dd>
+					</div>
+				) }
+				{ comparisonPreviewShell && (
+					<div>
+						<dt>{ __( 'Preview shell' ) }</dt>
+						<dd>
+							{ comparisonPreviewShell.renderable
+								? __( 'Available' )
+								: __( 'Disabled' ) }
 						</dd>
 					</div>
 				) }

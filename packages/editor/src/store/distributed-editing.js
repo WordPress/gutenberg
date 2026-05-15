@@ -2099,6 +2099,15 @@ function createDistributedEditingFreshReviewComparePlanDescriptor(
 				comparisonInputShape,
 			}
 		);
+	const comparisonPreviewShell =
+		createDistributedEditingFreshReviewComparisonPreviewShellDescriptor(
+			item,
+			{
+				reason,
+				comparisonInputShape,
+				comparisonSelectionHandoff,
+			}
+		);
 
 	return {
 		status: enabled ? 'ready' : 'unavailable',
@@ -2115,12 +2124,16 @@ function createDistributedEditingFreshReviewComparePlanDescriptor(
 		hasReviewedProposedContentHash,
 		comparisonInputShape,
 		comparisonSelectionHandoff,
+		comparisonPreviewShell,
 		usesBaseContentHash: hasBaseContentHash,
 		usesProposedContentHash: hasProposedContentHash,
 		usesReviewedProposedContentHash: hasReviewedProposedContentHash,
 		supportsComparisonSelectionHandoff: true,
+		supportsComparisonPreviewShell: true,
 		canSelectForFutureComparison:
 			comparisonSelectionHandoff.canSelectForFutureComparison,
+		canOpenComparisonPreviewShell:
+			comparisonPreviewShell.canOpenComparisonPreviewShell,
 		requiresFutureComparisonSurface: true,
 		descriptorOnly: true,
 		hashValuesRedacted: true,
@@ -2145,6 +2158,111 @@ function createDistributedEditingFreshReviewComparePlanDescriptor(
 		exposesTokenMaterial: false,
 		exposesUserIdentity: false,
 		exposesReviewerIds: false,
+	};
+}
+
+function createDistributedEditingFreshReviewComparisonPreviewShellDescriptor(
+	item,
+	{
+		reason = null,
+		comparisonInputShape = null,
+		comparisonSelectionHandoff = null,
+	} = {}
+) {
+	const requiredInputsAvailable = Boolean(
+		comparisonInputShape?.requiredInputsAvailable
+	);
+	const optionalInputsAvailable = Boolean(
+		comparisonInputShape?.optionalInputsAvailable
+	);
+	const normalizedReason = normalizeNullableString( reason );
+
+	return {
+		status: 'disabled_until_renderer_turn',
+		reason: normalizedReason || 'comparison_renderer_not_enabled',
+		schemaVersion: 1,
+		shellKind: 'fresh_review_side_by_side_preview_shell',
+		previewMode: 'side_by_side_block_review',
+		rendererStatus: 'not_registered',
+		itemId: normalizeNullableString( item.id ),
+		blockClientId: normalizeNullableString( item.blockClientId ),
+		blockName: normalizeNullableString( item.blockName ),
+		blockLabel: normalizeNullableString( item.blockLabel ),
+		changeKind: normalizeNullableString( item.changeKind ),
+		inputKind:
+			comparisonInputShape?.inputKind ||
+			'fresh_review_serialized_block_comparison_inputs',
+		selectionHandoffKind:
+			comparisonSelectionHandoff?.handoffKind ||
+			'fresh_review_comparison_selection_readiness',
+		requiredInputRoles: comparisonInputShape?.requiredInputRoles || [
+			'base',
+			'proposed',
+		],
+		optionalInputRoles: comparisonInputShape?.optionalInputRoles || [
+			'reviewed',
+		],
+		renderRequirementKeys: [
+			'base_serialized_block_content',
+			'proposed_serialized_block_content',
+			'boundary_safe_diff_renderer',
+			'human_review_controls',
+		],
+		optionalRenderRequirementKeys: [ 'reviewed_serialized_block_content' ],
+		boundaryPolicy:
+			comparisonInputShape?.boundaryPolicy ||
+			'serialized_block_hash_only',
+		boundaryKinds: comparisonInputShape?.boundaryKinds || [
+			'serialized_block',
+			'html_token',
+			'json_token',
+			'unicode_scalar',
+			'rich_text_attribute',
+		],
+		requiredInputsAvailable,
+		optionalInputsAvailable,
+		readyForFutureComparisonSelection: Boolean(
+			comparisonSelectionHandoff?.readyForFutureComparisonSelection
+		),
+		disabledByDefault: true,
+		requiresFutureRenderer: true,
+		requiresExplicitRendererTurn: true,
+		canOpenComparisonPreviewShell: false,
+		renderable: false,
+		previewShellOnly: true,
+		descriptorOnly: true,
+		statusOnly: true,
+		redacted: true,
+		hashValuesRedacted: true,
+		sourceFieldNamesOnly: true,
+		rawContentIncluded: false,
+		exposesHashValues: false,
+		exposesRawContent: false,
+		exposesProofSignature: false,
+		exposesTokenMaterial: false,
+		exposesUserIdentity: false,
+		exposesReviewerIds: false,
+		rendersPreview: false,
+		rendersDiff: false,
+		computesDiff: false,
+		opensComparison: false,
+		opensPanel: false,
+		derivesPatch: false,
+		callsRestEndpoint: false,
+		callsSave: false,
+		callsNormalSavePost: false,
+		callsRetrySaveEndpoint: false,
+		dispatchesNotice: false,
+		savesPost: false,
+		mutatesEditorContent: false,
+		mutatesPersistedPostContent: false,
+		selectsBlock: false,
+		selectsReviewItem: false,
+		marksSelected: false,
+		movesFocus: false,
+		createsRevision: false,
+		changesPostLock: false,
+		claimsSaved: false,
 	};
 }
 

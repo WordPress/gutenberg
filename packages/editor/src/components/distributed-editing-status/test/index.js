@@ -1368,6 +1368,46 @@ describe( 'DistributedEditingStatus', () => {
 			'data-distributed-editing-fresh-review-comparison-readiness-opens-comparison',
 			'false'
 		);
+		expect( comparePlan ).toHaveAttribute(
+			'data-distributed-editing-fresh-review-comparison-preview-shell-status',
+			'disabled_until_renderer_turn'
+		);
+		expect( comparePlan ).toHaveAttribute(
+			'data-distributed-editing-fresh-review-comparison-preview-shell-renderable',
+			'false'
+		);
+		expect( comparePlan ).toHaveAttribute(
+			'data-distributed-editing-fresh-review-comparison-preview-shell-renders-preview',
+			'false'
+		);
+		expect( comparePlan ).toHaveAttribute(
+			'data-distributed-editing-fresh-review-comparison-preview-shell-computes-diff',
+			'false'
+		);
+		expect( comparePlan ).toHaveAttribute(
+			'data-distributed-editing-fresh-review-comparison-preview-shell-opens-panel',
+			'false'
+		);
+		expect( comparePlan ).toHaveAttribute(
+			'data-distributed-editing-fresh-review-comparison-preview-shell-opens-comparison',
+			'false'
+		);
+		expect( comparePlan ).toHaveAttribute(
+			'data-distributed-editing-fresh-review-comparison-preview-shell-selects-block',
+			'false'
+		);
+		expect( comparePlan ).toHaveAttribute(
+			'data-distributed-editing-fresh-review-comparison-preview-shell-moves-focus',
+			'false'
+		);
+		expect( comparePlan ).toHaveAttribute(
+			'data-distributed-editing-fresh-review-comparison-preview-shell-calls-rest',
+			'false'
+		);
+		expect( comparePlan ).toHaveAttribute(
+			'data-distributed-editing-fresh-review-comparison-preview-shell-calls-save',
+			'false'
+		);
 		expect( comparePlan ).toHaveTextContent( 'Compare plan ready' );
 		expect( comparePlan ).toHaveTextContent(
 			'A future comparison can use base and proposed hash evidence for this review item.'
@@ -1382,6 +1422,12 @@ describe( 'DistributedEditingStatus', () => {
 			'No block is selected, no focus moves, no panel opens, and no save was made.'
 		);
 		expect( comparePlan ).toHaveTextContent(
+			'A future preview shell would need base and proposed block content, a boundary-safe diff renderer, and review controls.'
+		);
+		expect( comparePlan ).toHaveTextContent(
+			'The shell is disabled; no preview is rendered, no diff is computed, no panel opens, and no save was made.'
+		);
+		expect( comparePlan ).toHaveTextContent(
 			/Base hash evidence\s*Available/
 		);
 		expect( comparePlan ).toHaveTextContent(
@@ -1393,6 +1439,7 @@ describe( 'DistributedEditingStatus', () => {
 		expect( comparePlan ).toHaveTextContent(
 			/Comparison readiness\s*Available/
 		);
+		expect( comparePlan ).toHaveTextContent( /Preview shell\s*Disabled/ );
 		expect( comparePlan ).not.toHaveTextContent(
 			/aaaaaaaaaaaaaaaa|bbbbbbbbbbbbbbbb|fresh-review-chrome-compare-plan-raw|script/i
 		);
