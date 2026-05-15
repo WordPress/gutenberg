@@ -48,6 +48,12 @@ import styles from './grid.module.css';
 // effect overwrites this with the actual computed value.
 const FALLBACK_GAP_PX = 12;
 
+// Default column cap when no explicit `columns` or `minColumnWidth` is
+// supplied. Layered semantics: `columns` acts as a cap and
+// `minColumnWidth` as a per-tile floor; if neither is set we still
+// need a finite count to render against.
+const DEFAULT_COLUMNS = 6;
+
 // Reorder is driven by `temporaryLayout` + CSS Grid, not by dnd-kit
 // transforms. Hoist the no-op strategy outside the component so its
 // reference is stable across renders — passing a fresh `() => null`
@@ -91,7 +97,7 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 	function DashboardGrid( props, ref ) {
 		const {
 			layout,
-			columns = 6,
+			columns,
 			children,
 			className,
 			style,
@@ -172,14 +178,15 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 		}, [] );
 		const effectiveColumns = useMemo( () => {
 			if ( ! minColumnWidth ) {
-				return columns;
+				return columns ?? DEFAULT_COLUMNS;
 			}
 
 			const totalWidthPerColumn = minColumnWidth + gapPx;
-			const maxColumns = Math.floor(
-				( containerWidth + gapPx ) / totalWidthPerColumn
+			const maxFit = Math.max(
+				1,
+				Math.floor( ( containerWidth + gapPx ) / totalWidthPerColumn )
 			);
-			return Math.max( 1, maxColumns );
+			return columns !== undefined ? Math.min( columns, maxFit ) : maxFit;
 		}, [ minColumnWidth, gapPx, containerWidth, columns ] );
 		const columnWidth =
 			( containerWidth - ( effectiveColumns - 1 ) * gapPx ) /
