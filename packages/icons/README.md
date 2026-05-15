@@ -26,6 +26,45 @@ import { Icon, check } from '@wordpress/icons';
 | ------ | --------- | ------- | ----------------------- |
 | `size` | `integer` | `24`    | Size of icon in pixels. |
 
+## PHP Usage
+
+The same icon library is available in PHP via the `wp_icon()` function. It renders inline SVG, producing equivalent output to the React component.
+
+```php
+// Basic usage — renders an inline SVG with aria-hidden="true".
+echo wp_icon( 'plus' );
+
+// With options.
+echo wp_icon( 'plus', array(
+    'size'  => 18,
+    'class' => 'my-button-icon',
+    'label' => 'Add item',
+) );
+
+// Direct echo helper (mirrors the WordPress get_* / the_* convention).
+the_wp_icon( 'arrow-down' );
+```
+
+### Parameters
+
+| Name           | Type         | Default | Description                                                                                                                                 |
+| -------------- | ------------ | ------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| `size`         | `int`        | `24`    | Width and height in pixels.                                                                                                                 |
+| `class`        | `string`     | `''`    | Additional CSS class names, appended to the default `wp-icon` class.                                                                        |
+| `label`        | `string`     | `''`    | Accessible label. When provided, the SVG gets `role="img"` and `aria-label`. When omitted, the SVG gets `aria-hidden="true"`.               |
+| `stroke_width` | `float|null` | `null`  | Stroke width attribute. Reserved for future stroke-based icons; currently passed through but has no visible effect on the existing fill icons. |
+
+### How it works
+
+At build time, `npm run build` in the icons package generates `packages/icons/build-php/icons-data.php` — a PHP array mapping every icon slug to its viewBox and inner SVG content. The `wp_icon()` function loads this file once (static-cached) and composes an inline `<svg>` string on each call. No filesystem I/O per call, no parsing, no DOM mutation.
+
+### Running PHP tests
+
+```bash
+npm run wp-env start
+vendor/bin/phpunit phpunit/class-wp-icon-test.php
+```
+
 ## Docs & Examples
 
 You can browse the icons docs and examples at [https://wordpress.github.io/gutenberg/?path=/docs/icons-icon--default](https://wordpress.github.io/gutenberg/?path=/docs/icons-icon--default)
