@@ -6,9 +6,7 @@ import { DataForm } from '@wordpress/dataviews';
 import type { DataFormControlProps, Field, Form } from '@wordpress/dataviews';
 import { useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-/* eslint-disable @wordpress/use-recommended-components */
-import { Button, Drawer } from '@wordpress/ui';
-/* eslint-enable @wordpress/use-recommended-components */
+import { Button, Drawer } from '@wordpress/ui'; // eslint-disable-line @wordpress/use-recommended-components
 
 /**
  * Internal dependencies
@@ -20,7 +18,7 @@ import type {
 	WidgetGridModel,
 	WidgetGridSettings,
 } from '../../types';
-import { LayoutModelEdit } from './layout-model-edit';
+import { LayoutModelEditField } from './layout-model-edit-field';
 
 const DEFAULT_FIXED_COLUMNS = 6;
 const DEFAULT_MIN_COLUMN_WIDTH = 350;
@@ -91,7 +89,7 @@ const fields: Field< WidgetGridSettings >[] = [
 	{
 		id: 'model',
 		type: 'text',
-		Edit: LayoutModelEdit,
+		Edit: LayoutModelEditField,
 		label: __( 'Layout model' ),
 		description: __(
 			'Grid keeps every tile the same height. Masonry lets tiles flow at their own height.'

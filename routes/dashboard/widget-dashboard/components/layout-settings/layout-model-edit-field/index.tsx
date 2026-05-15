@@ -47,7 +47,7 @@ function ModelThumbnail( {
  * @param props.onChange Commits an edit to the form's staging buffer.
  * @return The model picker.
  */
-export function LayoutModelEdit( {
+export function LayoutModelEditField( {
 	data,
 	field,
 	onChange,
