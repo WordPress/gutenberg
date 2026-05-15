@@ -1,18 +1,7 @@
 /**
- * External dependencies
- */
-import type { ComponentType, ReactNode } from 'react';
-
-/**
  * WordPress dependencies
  */
-import {
-	RawHTML,
-	useEffect,
-	useState,
-	useRef,
-	useMemo,
-} from '@wordpress/element';
+import { RawHTML, useEffect, useState, useMemo } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { Placeholder, Spinner } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
@@ -34,7 +23,7 @@ interface ErrorPlaceholderProps extends PlaceholderProps {
 }
 
 interface LoadingPlaceholderProps {
-	children?: ReactNode;
+	children?: React.ReactNode;
 }
 
 function DefaultEmptyResponsePlaceholder( { className }: PlaceholderProps ) {
@@ -52,7 +41,7 @@ function DefaultErrorResponsePlaceholder( {
 	const errorMessage = sprintf(
 		// translators: %s: error message describing the problem
 		__( 'Error loading block: %s' ),
-		message || 'Unknown error'
+		message || __( 'Unknown error' )
 	);
 	return <Placeholder className={ className }>{ errorMessage }</Placeholder>;
 }
@@ -94,13 +83,13 @@ function DefaultLoadingResponsePlaceholder( {
 
 interface ServerSideRenderProps extends UseServerSideRenderArgs {
 	className?: string;
-	EmptyResponsePlaceholder?: ComponentType< PlaceholderProps >;
-	ErrorResponsePlaceholder?: ComponentType< ErrorPlaceholderProps >;
-	LoadingResponsePlaceholder?: ComponentType< LoadingPlaceholderProps >;
+	EmptyResponsePlaceholder?: React.ComponentType< PlaceholderProps >;
+	ErrorResponsePlaceholder?: React.ComponentType< ErrorPlaceholderProps >;
+	LoadingResponsePlaceholder?: React.ComponentType< LoadingPlaceholderProps >;
 }
 
 export function ServerSideRender( props: ServerSideRenderProps ) {
-	const prevContentRef = useRef( '' );
+	const [ prevContent, setPrevContent ] = useState( '' );
 	const {
 		className,
 		EmptyResponsePlaceholder = DefaultEmptyResponsePlaceholder,
@@ -114,17 +103,15 @@ export function ServerSideRender( props: ServerSideRenderProps ) {
 	// Store the previous successful HTML response to show while loading.
 	useEffect( () => {
 		if ( content ) {
-			prevContentRef.current = content;
+			setPrevContent( content );
 		}
 	}, [ content ] );
 
 	if ( status === 'loading' ) {
 		return (
 			<LoadingResponsePlaceholder { ...props }>
-				{ !! prevContentRef.current && (
-					<RawHTML className={ className }>
-						{ prevContentRef.current }
-					</RawHTML>
+				{ !! prevContent && (
+					<RawHTML className={ className }>{ prevContent }</RawHTML>
 				) }
 			</LoadingResponsePlaceholder>
 		);
@@ -170,18 +157,9 @@ interface ServerSideRenderWithPostIdProps
  * }
  * ```
  *
- * @param {Object}   props                                    Component props.
- * @param {string}   props.block                              The identifier of the block to be serverside rendered.
- * @param {Object}   props.attributes                         The block attributes to be sent to the server for rendering.
- * @param {string}   [props.className]                        Additional classes to apply to the wrapper element.
- * @param {string}   [props.httpMethod='GET']                 The HTTP method to use ('GET' or 'POST'). Default is 'GET'
- * @param {Object}   [props.urlQueryArgs]                     Additional query arguments to append to the request URL.
- * @param {boolean}  [props.skipBlockSupportAttributes=false] Whether to remove block support attributes before sending.
- * @param {Function} [props.EmptyResponsePlaceholder]         Component rendered when the API response is empty.
- * @param {Function} [props.ErrorResponsePlaceholder]         Component rendered when the API response is an error.
- * @param {Function} [props.LoadingResponsePlaceholder]       Component rendered while the API request is loading.
- *
- * @return {React.JSX.Element} The rendered server-side content.
+ * @param props              Component props.
+ * @param props.urlQueryArgs Additional query arguments to append to the request URL.
+ * @return The rendered server-side content.
  */
 export function ServerSideRenderWithPostId( {
 	urlQueryArgs = EMPTY_OBJECT,

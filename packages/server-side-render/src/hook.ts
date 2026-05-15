@@ -6,7 +6,6 @@ import { useEffect, useState, useRef } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 
-// @ts-expect-error __experimentalSanitizeBlockAttributes is not typed
 import { __experimentalSanitizeBlockAttributes } from '@wordpress/blocks';
 
 export function rendererPath(
@@ -22,7 +21,9 @@ export function rendererPath(
 }
 
 export function removeBlockSupportAttributes(
-	attributes: Record< string, unknown >
+	attributes: Record< string, unknown > & {
+		style?: Record< string, unknown >;
+	}
 ): Record< string, unknown > {
 	const {
 		backgroundColor,
@@ -43,7 +44,7 @@ export function removeBlockSupportAttributes(
 		spacing,
 		typography,
 		...restStyles
-	} = ( attributes?.style as Record< string, unknown > ) || {};
+	} = attributes?.style || {};
 
 	return {
 		...restAttributes,
@@ -173,15 +174,21 @@ export function useServerSideRender(
 								content: res ? res.rendered : '',
 							} );
 						} )
-						.catch( ( error: Error ) => {
+						.catch( ( error: unknown ) => {
 							// The request was aborted, do not update the response.
-							if ( error.name === 'AbortError' ) {
+							if (
+								error instanceof Error &&
+								error.name === 'AbortError'
+							) {
 								return;
 							}
 
 							setResponse( {
 								status: 'error',
-								error: error.message,
+								error:
+									error instanceof Error
+										? error.message
+										: String( error ),
 							} );
 						} )
 						.finally( () => {
