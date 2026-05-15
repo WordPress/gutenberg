@@ -1,4 +1,4 @@
-import { HSL } from 'colorjs.io/fn';
+import { serialize, to, HSL, sRGB } from 'colorjs.io/fn';
 import { buildRamp } from '../lib';
 import { getColorString } from '../lib/color-utils';
 import { BG_RAMP_CONFIG, ACCENT_RAMP_CONFIG } from '../lib/ramp-configs';
@@ -12,16 +12,25 @@ describe( 'buildRamps', () => {
 	it( 'background ramp snapshots', () => {
 		// Generate a set of HSL colors across a broad perceivable range to test
 		// support for building ramps with various combinations of lightness,
-		// saturation, and hue. Convert to hex strings to mirror real-world
-		// consumer usage (`ThemeProvider` is initialized with a hex value).
+		// saturation, and hue. Convert to a serialized string format to mirror
+		// real-world consumer usage.
 		const allBgColors: string[] = lStops.flatMap( ( l ) =>
 			sStops.flatMap( ( s ) =>
 				hStops.map( ( h ) =>
-					getColorString( {
-						space: HSL,
-						coords: [ h, s, l ] as [ number, number, number ],
-						alpha: 1,
-					} )
+					serialize(
+						to(
+							{
+								space: HSL,
+								coords: [ h, s, l ] as [
+									number,
+									number,
+									number,
+								],
+								alpha: 1,
+							},
+							sRGB
+						)
+					)
 				)
 			)
 		);
