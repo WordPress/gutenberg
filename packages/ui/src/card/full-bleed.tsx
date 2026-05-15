@@ -9,14 +9,13 @@ import type { FullBleedProps } from './types';
  *
  * Additional edge-bumping behavior based on placement:
  *
- * - As the **first child** of `Card.Header`, it extends flush to the card's
- *   top edge — ideal for hero images. Siblings that follow (e.g. `Card.Title`)
- *   keep normal spacing below the bleed area.
  * - As the **only child** of `Card.Content`, it extends flush to the card's
- *   top edge when `Content` is the first **direct** child of `Card.Root`, and
- *   to the bottom edge when it is the last direct `Header`/`Content` section.
- *   (`CollapsibleCard` wraps content in a panel, so top-edge bumping does not
- *   apply there — the header/content gap stays intact.)
+ *   top edge when `Content` is the first card section, and to the bottom edge
+ *   when it is the last.
+ *
+ *   Note: inside `CollapsibleCard`, the panel that holds `Content` is a
+ *   separate wrapper, so the top-edge bump does not apply — the gap between
+ *   the trigger and the panel is preserved by design.
  *
  * With `CollapsibleCard`, place full-bleed media in `CollapsibleCard.Content`,
  * not the header.
