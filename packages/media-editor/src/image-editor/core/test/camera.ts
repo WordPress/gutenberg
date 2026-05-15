@@ -5,6 +5,7 @@ import {
 	getVisibleBounds,
 	createExportCamera,
 	getImageFit,
+	getRotatedBBox,
 } from '../camera';
 import {
 	restrictPanZoom,
@@ -578,5 +579,155 @@ describe( 'getImageCropBounds', () => {
 		expect( bounds.maxX ).toBeGreaterThan( 1.3 );
 		expect( bounds.minY ).toBeLessThan( -0.3 );
 		expect( bounds.maxY ).toBeGreaterThan( 1.3 );
+	} );
+} );
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Non-finite input regressions.
+//
+// The reducer normalizes rotation/zoom/pan on every action, so these paths
+// aren't user-reachable today. But programmatic callers and deserialized
+// state could still feed corrupted values, which used to silently propagate
+// NaN/Infinity into the crop rect, camera matrix, or REST /edit payload.
+// These tests pin the defense-in-depth guards in place.
+// ─────────────────────────────────────────────────────────────────────────────
+
+const HOSTILE_STATE: CropperState = makeState( {
+	pan: { x: Number.NaN, y: Number.NEGATIVE_INFINITY },
+	zoom: Number.POSITIVE_INFINITY,
+	rotation: Number.NaN,
+} );
+
+describe( 'getRotatedBBox — non-finite input regression', () => {
+	it.each( [
+		[ 'NaN width', Number.NaN, 100, 30 ],
+		[ '±Infinity height', 100, Number.POSITIVE_INFINITY, 30 ],
+		[ 'NaN rotation', 100, 100, Number.NaN ],
+		[ '-Infinity rotation', 100, 100, Number.NEGATIVE_INFINITY ],
+	] )( 'returns {0, 0} for %s', ( _label, w, h, rot ) => {
+		expect( getRotatedBBox( w, h, rot ) ).toEqual( {
+			width: 0,
+			height: 0,
+		} );
+	} );
+
+	it( 'still returns correct dimensions for normal inputs', () => {
+		// Sanity check that the guard doesn't break the happy path.
+		const out = getRotatedBBox( 200, 100, 90 );
+		expect( out.width ).toBeCloseTo( 100, 5 );
+		expect( out.height ).toBeCloseTo( 200, 5 );
+	} );
+} );
+
+describe( 'getImageFit — non-finite input regression', () => {
+	it( 'returns finite sizes when rotation is NaN (treated as 0)', () => {
+		const out = getImageFit( CONTAINER, IMAGE, Number.NaN );
+		expect( Number.isFinite( out.elementSize.width ) ).toBe( true );
+		expect( Number.isFinite( out.elementSize.height ) ).toBe( true );
+		expect( Number.isFinite( out.visualSize.width ) ).toBe( true );
+		expect( Number.isFinite( out.visualSize.height ) ).toBe( true );
+	} );
+
+	it( 'returns finite sizes when rotation magnitude overflows', () => {
+		// MAX_VALUE rotation would otherwise overflow
+		// Math.round(rotation/90)*90 and cascade NaN into the fit math.
+		const out = getImageFit( CONTAINER, IMAGE, Number.MAX_VALUE );
+		expect( Number.isFinite( out.elementSize.width ) ).toBe( true );
+		expect( Number.isFinite( out.elementSize.height ) ).toBe( true );
+		expect( Number.isFinite( out.visualSize.width ) ).toBe( true );
+		expect( Number.isFinite( out.visualSize.height ) ).toBe( true );
+	} );
+} );
+
+describe( 'createCamera — non-finite input regression', () => {
+	it( 'returns a matrix with all finite entries even for hostile state', () => {
+		const m = createCamera( HOSTILE_STATE, CONTAINER, IMAGE );
+		expect( m ).toHaveLength( 6 );
+		for ( let i = 0; i < 6; i++ ) {
+			expect( Number.isFinite( m[ i ] ) ).toBe( true );
+		}
+	} );
+} );
+
+describe( 'createExportCamera — non-finite input regression', () => {
+	it( 'returns a matrix with all finite entries even for hostile state', () => {
+		// This is the matrix passed to ctx.setTransform → ctx.drawImage at
+		// export time, so NaN here would corrupt the saved file.
+		const m = createExportCamera( HOSTILE_STATE, IMAGE, {
+			width: 600,
+			height: 400,
+		} );
+		for ( let i = 0; i < 6; i++ ) {
+			expect( Number.isFinite( m[ i ] ) ).toBe( true );
+		}
+	} );
+} );
+
+describe( 'restrictCropRect — non-finite input regression', () => {
+	const cropRect = { x: 0.1, y: 0.1, width: 0.5, height: 0.5 };
+
+	it.each( [
+		[ 'NaN zoom', cropRect, Number.NaN, 0, 16 / 9 ],
+		[ '-Infinity rotation', cropRect, 1, Number.NEGATIVE_INFINITY, 16 / 9 ],
+		[ 'NaN aspectRatio', cropRect, 1, 0, Number.NaN ],
+		[
+			'MAX_VALUE zoom (overflow guard)',
+			cropRect,
+			Number.MAX_VALUE,
+			0,
+			16 / 9,
+		],
+	] )( 'returns a finite rect for %s', ( _label, rect, z, r, a ) => {
+		const out = restrictCropRect( rect, z, r, a );
+		expect( Number.isFinite( out.x ) ).toBe( true );
+		expect( Number.isFinite( out.y ) ).toBe( true );
+		expect( Number.isFinite( out.width ) ).toBe( true );
+		expect( Number.isFinite( out.height ) ).toBe( true );
+	} );
+} );
+
+describe( 'restrictPanZoom — non-finite input regression', () => {
+	const cropRect = { x: 0.1, y: 0.1, width: 0.5, height: 0.5 };
+
+	it( 'returns finite pan and zoom for hostile state', () => {
+		const out = restrictPanZoom( HOSTILE_STATE, IMAGE, cropRect );
+		expect( Number.isFinite( out.zoom ) ).toBe( true );
+		expect( Number.isFinite( out.pan.x ) ).toBe( true );
+		expect( Number.isFinite( out.pan.y ) ).toBe( true );
+	} );
+
+	it( 'returns finite pan and zoom when only state.zoom is corrupted', () => {
+		const state = makeState( { zoom: Number.NaN } );
+		const out = restrictPanZoom( state, IMAGE, cropRect );
+		expect( Number.isFinite( out.zoom ) ).toBe( true );
+		expect( out.zoom ).toBeGreaterThanOrEqual( 1 );
+	} );
+} );
+
+describe( 'getImageCropBounds — non-finite input regression', () => {
+	it( 'returns finite bounds for hostile state', () => {
+		const out = getImageCropBounds(
+			HOSTILE_STATE,
+			{ width: 800, height: 450 },
+			{ width: 800, height: 450 }
+		);
+		expect( Number.isFinite( out.minX ) ).toBe( true );
+		expect( Number.isFinite( out.minY ) ).toBe( true );
+		expect( Number.isFinite( out.maxX ) ).toBe( true );
+		expect( Number.isFinite( out.maxY ) ).toBe( true );
+		expect( out.minX ).toBeLessThanOrEqual( out.maxX );
+		expect( out.minY ).toBeLessThanOrEqual( out.maxY );
+	} );
+} );
+
+describe( 'getSourceRegion — non-finite input regression', () => {
+	it( 'returns a finite source region for hostile state', () => {
+		// getSourceRegion feeds the REST /edit endpoint, so NaN here would
+		// reach the server.
+		const out = getSourceRegion( HOSTILE_STATE, IMAGE );
+		expect( Number.isFinite( out.x ) ).toBe( true );
+		expect( Number.isFinite( out.y ) ).toBe( true );
+		expect( Number.isFinite( out.width ) ).toBe( true );
+		expect( Number.isFinite( out.height ) ).toBe( true );
 	} );
 } );

@@ -8,6 +8,7 @@ import { mat2d, vec2 } from 'gl-matrix';
  */
 import type { CropperState, NormalizedRect, Size } from './types';
 import { degreesToRadians } from './math/rotation';
+import { safeBoundedNumber, sanitizeCropperState } from './math/sanitize';
 import { createCamera, getRotatedBBox, getVisibleBounds } from './camera';
 
 /** Floating-point epsilon for "close enough to equal" comparisons. */
@@ -118,16 +119,18 @@ export function getImageCropBounds(
 		return { minX: 0, minY: 0, maxX: 1, maxY: 1 };
 	}
 
+	const safeState = sanitizeCropperState( state );
+
 	// Build the same CSS matrix as use-transform-style: flip * rotate * zoom.
 	// Flip is outside rotation so it acts in viewport axes (see createCamera).
-	const tx = state.pan.x * visualSize.width;
-	const ty = state.pan.y * visualSize.height;
-	const rad = degreesToRadians( state.rotation );
+	const tx = safeState.pan.x * visualSize.width;
+	const ty = safeState.pan.y * visualSize.height;
+	const rad = degreesToRadians( safeState.rotation );
 	const cos = Math.cos( rad );
 	const sin = Math.sin( rad );
-	const sx = state.flip.horizontal ? -1 : 1;
-	const sy = state.flip.vertical ? -1 : 1;
-	const z = state.zoom;
+	const sx = safeState.flip.horizontal ? -1 : 1;
+	const sy = safeState.flip.vertical ? -1 : 1;
+	const z = safeState.zoom;
 	const ma = sx * cos * z;
 	const mb = sy * sin * z;
 	const mc = -sx * sin * z;
@@ -190,17 +193,24 @@ export function restrictCropRect(
 	rotation: number,
 	imageAspectRatio: number
 ): NormalizedRect {
-	const aspectRatio = Math.max( imageAspectRatio, Number.EPSILON );
+	// Guard against non-finite inputs. The reducer normalizes these, but
+	// programmatic callers or deserialized state could still send NaN/±Infinity
+	// through here, where it would silently propagate into the crop rect.
+	const zoomCandidate = safeBoundedNumber( zoom, 1 );
+	const safeZoom = zoomCandidate >= Number.EPSILON ? zoomCandidate : 1;
+	const safeRotation = safeBoundedNumber( rotation, 0 );
+	const safeAspect = safeBoundedNumber( imageAspectRatio, 1 );
+	const aspectRatio = Math.max( safeAspect, Number.EPSILON );
 	// Crop rect lives in the SNAP-rotation visual bbox (matching the stencil
 	// layout); projection into the image-local frame uses the TRUE rotation.
-	const snapRotation = Math.round( rotation / 90 ) * 90;
+	const snapRotation = Math.round( safeRotation / 90 ) * 90;
 	const { visualW, visualH } = getVisualDimensions(
 		snapRotation,
 		aspectRatio
 	);
-	const { absC, absS } = getVisualDimensions( rotation, aspectRatio );
-	const W = cropRect.width;
-	const H = cropRect.height;
+	const { absC, absS } = getVisualDimensions( safeRotation, aspectRatio );
+	const W = safeBoundedNumber( cropRect.width, 0 );
+	const H = safeBoundedNumber( cropRect.height, 0 );
 
 	// Crop full-extents in pixel-proportional space, projected to image-local frame.
 	const cropWPx = W * visualW;
@@ -209,8 +219,8 @@ export function restrictCropRect(
 	const spanBeta = cropWPx * absS + cropHPx * absC;
 
 	// Image full-extents at zoom z: (aspectRatio*z, z).
-	const limitAlpha = aspectRatio * zoom;
-	const limitBeta = zoom;
+	const limitAlpha = aspectRatio * safeZoom;
+	const limitBeta = safeZoom;
 
 	let t = 1;
 	if ( spanAlpha > 0 ) {
@@ -226,8 +236,8 @@ export function restrictCropRect(
 	}
 	const newW = W * t;
 	const newH = H * t;
-	const centerX = cropRect.x + W / 2;
-	const centerY = cropRect.y + H / 2;
+	const centerX = safeBoundedNumber( cropRect.x, 0 ) + W / 2;
+	const centerY = safeBoundedNumber( cropRect.y, 0 ) + H / 2;
 	let newX = centerX - newW / 2;
 	let newY = centerY - newH / 2;
 	newX = Math.max( 0, Math.min( newX, 1 - newW ) );
@@ -280,15 +290,20 @@ export function restrictPanZoom(
 	// 6. Convert the world-space correction to a pan-field correction by
 	//    mapping it through the camera's linear part back to screen space,
 	//    then dividing by the visual bounds.
+	const safeState = sanitizeCropperState( state );
 	const aspectRatio =
 		imageSize.width > 0 && imageSize.height > 0
 			? imageSize.width / imageSize.height
 			: 1;
-	const minZoom = getMinZoomForCover( state.rotation, aspectRatio, cropRect );
-	const zoom = Math.max( state.zoom, minZoom );
+	const minZoom = getMinZoomForCover(
+		safeState.rotation,
+		aspectRatio,
+		cropRect
+	);
+	const zoom = Math.max( safeState.zoom, minZoom );
 
 	// Step 2: build camera with candidate pan and corrected zoom.
-	const candidateState = { ...state, zoom };
+	const candidateState = { ...safeState, zoom };
 	const camera = createCamera(
 		candidateState,
 		CANONICAL_CONTAINER,
@@ -300,7 +315,7 @@ export function restrictPanZoom(
 	// nearest 90° rotation (matching `getImageFit`), so it's stable
 	// through fine rotation. CSS zoom only affects the <img> element,
 	// not the stencil.
-	const snapRotation = Math.round( state.rotation / 90 ) * 90;
+	const snapRotation = Math.round( safeState.rotation / 90 ) * 90;
 	const baseCamera = createCamera(
 		{
 			...candidateState,
@@ -371,7 +386,7 @@ export function restrictPanZoom(
 		minWy >= -EPSILON &&
 		maxWy <= 1 + EPSILON
 	) {
-		return { pan: state.pan, zoom };
+		return { pan: safeState.pan, zoom };
 	}
 
 	// Compute world-space correction needed.
@@ -410,10 +425,10 @@ export function restrictPanZoom(
 	// The correction is subtractive: a positive world shift (dw > 0) means
 	// the image needs to move opposite to pan direction, so pan decreases.
 	const newPanX =
-		state.pan.x -
+		safeState.pan.x -
 		( visibleBounds.width > 0 ? dsx / visibleBounds.width : 0 );
 	const newPanY =
-		state.pan.y -
+		safeState.pan.y -
 		( visibleBounds.height > 0 ? dsy / visibleBounds.height : 0 );
 
 	return {

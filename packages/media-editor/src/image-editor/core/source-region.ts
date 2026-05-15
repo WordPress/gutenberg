@@ -8,6 +8,7 @@ import { mat2d, vec2 } from 'gl-matrix';
  */
 import type { CropperState, Size } from './types';
 import { createCamera, getRotatedBBox, getVisibleBounds } from './camera';
+import { sanitizeCropperState } from './math/sanitize';
 
 /**
  * The selected image region in source-pixel coordinates.
@@ -63,10 +64,12 @@ export function getSourceRegion(
 		};
 	}
 
+	const safeState = sanitizeCropperState( state );
+
 	// Use a synthetic 1:1 container so the camera maps normalized coords
 	// to a known pixel space. The container size cancels out.
 	const syntheticContainer: Size = { width: 1000, height: 1000 };
-	const camera = createCamera( state, syntheticContainer, imageSize );
+	const camera = createCamera( safeState, syntheticContainer, imageSize );
 
 	// Inverse camera maps screen pixels back to normalized [0,1] world coords.
 	const inv = mat2d.create();
@@ -76,13 +79,13 @@ export function getSourceRegion(
 	// (zoom=1, no pan) to locate the visual bounds, then place the
 	// crop rect within them.
 	const baseCamera = createCamera(
-		{ ...state, pan: { x: 0, y: 0 }, zoom: 1 },
+		{ ...safeState, pan: { x: 0, y: 0 }, zoom: 1 },
 		syntheticContainer,
 		imageSize
 	);
 	const visibleBounds = getVisibleBounds( baseCamera );
 
-	const cropRect = state.cropRect;
+	const cropRect = safeState.cropRect;
 	const cropCenterScreenX =
 		visibleBounds.left +
 		( cropRect.x + cropRect.width / 2 ) * visibleBounds.width;
@@ -100,23 +103,23 @@ export function getSourceRegion(
 
 	// Crop rect size in the snap-rotation visual space, divided by zoom
 	// for source-pixel dimensions. Matches the stencil's reference frame.
-	const snapRotation = Math.round( state.rotation / 90 ) * 90;
+	const snapRotation = Math.round( safeState.rotation / 90 ) * 90;
 	const { width: rotW, height: rotH } = getRotatedBBox(
 		imageSize.width,
 		imageSize.height,
 		snapRotation
 	);
-	const sourceW = ( cropRect.width * rotW ) / state.zoom;
-	const sourceH = ( cropRect.height * rotH ) / state.zoom;
+	const sourceW = ( cropRect.width * rotW ) / safeState.zoom;
+	const sourceH = ( cropRect.height * rotH ) / safeState.zoom;
 
 	return {
 		x: srcCenter[ 0 ] * imageSize.width - sourceW / 2,
 		y: srcCenter[ 1 ] * imageSize.height - sourceH / 2,
 		width: sourceW,
 		height: sourceH,
-		rotation: state.rotation,
-		flip: { ...state.flip },
-		zoom: state.zoom,
+		rotation: safeState.rotation,
+		flip: { ...safeState.flip },
+		zoom: safeState.zoom,
 	};
 }
 
