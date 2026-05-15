@@ -1,8 +1,6 @@
-import {
-	privateApis as coreDataPrivateApis,
-	SelectionType,
-} from '@wordpress/core-data';
+import { privateApis as coreDataPrivateApis } from '@wordpress/core-data';
 import type {
+	CoreDataPrivateApis,
 	ResolvedSelection,
 	PostEditorAwarenessState as ActiveCollaborator,
 } from '@wordpress/core-data';
@@ -19,6 +17,10 @@ import type { SelectionRect } from './cursor-dom-utils';
 
 const { useActiveCollaborators, useResolvedSelection } =
 	unlock( coreDataPrivateApis );
+const { SelectionType } = unlock( coreDataPrivateApis ) as Pick<
+	CoreDataPrivateApis,
+	'SelectionType'
+>;
 
 export type { SelectionRect };
 
@@ -106,6 +108,7 @@ export function useRenderCursors(
 			let start: ResolvedSelection = {
 				richTextOffset: null,
 				localClientId: null,
+				attributeKey: null,
 			};
 			let end: ResolvedSelection | undefined;
 

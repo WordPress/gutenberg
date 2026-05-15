@@ -8,13 +8,17 @@ import clsx from 'clsx';
  */
 import { forwardRef, useCallback, useMemo } from '@wordpress/element';
 import { DashboardGrid } from '@wordpress/grid';
-import type { DashboardGridLayoutItem } from '@wordpress/grid';
+import type {
+	DashboardGridLayoutItem,
+	DragPreviewRenderProps,
+} from '@wordpress/grid';
 
 /**
  * Internal dependencies
  */
 import { useDashboardInternalContext } from '../../context/dashboard-context';
 import { WidgetChrome } from '../widget-chrome';
+import { WidgetResizeHandle } from './widget-resize-handle';
 import styles from './widgets.module.css';
 import type { DashboardWidget, WidgetName } from '../../types';
 
@@ -68,12 +72,23 @@ export const Widgets = forwardRef< HTMLDivElement, WidgetsProps >(
 		);
 
 		const children = layout.map( ( widget, index ) => (
-			<WidgetChrome
+			<div
 				key={ widget.uuid }
-				widget={ widget }
-				index={ index }
-			/>
+				className={ clsx( styles.tile, {
+					[ styles.tileEditMode ]: editMode,
+				} ) }
+				tabIndex={ editMode ? 0 : undefined }
+			>
+				<WidgetChrome widget={ widget } index={ index } />
+			</div>
 		) );
+
+		const renderDragPreview = useCallback(
+			( { children: clone }: DragPreviewRenderProps ) => (
+				<div className={ styles.dragPreview }>{ clone }</div>
+			),
+			[]
+		);
 
 		const sharedProps = {
 			layout: gridLayout,
@@ -81,6 +96,8 @@ export const Widgets = forwardRef< HTMLDivElement, WidgetsProps >(
 			rowHeight: gridSettings.rowHeight,
 			editMode,
 			onChangeLayout: handleLayoutChange,
+			renderDragPreview,
+			renderResizeHandle: WidgetResizeHandle,
 		};
 
 		return (

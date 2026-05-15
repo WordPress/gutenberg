@@ -32,6 +32,8 @@ const RESULTS_FILE_SUFFIX = '.performance-results.json';
  * @property {string=}  wpVersion   The WordPress version to be used as the base install for testing.
  */
 
+const perfStartTime = performance.now();
+
 /**
  * A logging helper for printing steps and their substeps.
  *
@@ -40,9 +42,21 @@ const RESULTS_FILE_SUFFIX = '.performance-results.json';
  * @param {...any} args   Rest of the arguments to pass to console.log.
  */
 function logAtIndent( indent, msg, ...args ) {
+	const elapsed = performance.now() - perfStartTime;
+	const totalSeconds = Math.floor( elapsed / 100 ) / 10;
+	const minutes = Math.floor( totalSeconds / 60 );
+	const seconds = ( totalSeconds % 60 ).toFixed( 1 ).padStart( 4, '0' );
+	const timestamp = `[${ String( minutes ).padStart(
+		2,
+		'0'
+	) }:${ seconds }]`;
+
 	const prefix = indent === 0 ? '▶ ' : '> ';
 	const newline = indent === 0 ? '\n' : '';
-	return log( newline + '    '.repeat( indent ) + prefix + msg, ...args );
+	return log(
+		newline + timestamp + ' ' + '    '.repeat( indent ) + prefix + msg,
+		...args
+	);
 }
 
 /**
@@ -153,11 +167,13 @@ function printStats( m, s ) {
 /**
  * Runs the performance tests on the current branch.
  *
- * @param {string} testSuite     Name of the tests set.
- * @param {string} testRunnerDir Path to the performance tests' clone.
- * @param {string} runKey        Unique identifier for the test run.
+ * @param {string}  testSuite     Name of the tests set.
+ * @param {string}  testRunnerDir Path to the performance tests' clone.
+ * @param {string}  runKey        Unique identifier for the test run.
+ * @param {boolean} saveTraces    Whether the test runner should save Chromium
+ *                                traces as artifacts (only the head branch).
  */
-async function runTestSuite( testSuite, testRunnerDir, runKey ) {
+async function runTestSuite( testSuite, testRunnerDir, runKey, saveTraces ) {
 	await runShellScript(
 		`npm run test:performance -- ${ testSuite }`,
 		testRunnerDir,
@@ -166,6 +182,9 @@ async function runTestSuite( testSuite, testRunnerDir, runKey ) {
 			PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1',
 			WP_ARTIFACTS_PATH: ARTIFACTS_PATH,
 			RESULTS_ID: runKey,
+			// Suppress trace writes on comparison branches so they don't
+			// overwrite the head branch's traces in the shared artifacts dir.
+			WP_PERF_NO_TRACE: saveTraces ? '' : '1',
 		}
 	);
 }
@@ -341,7 +360,7 @@ async function runPerformanceTests( branches, options ) {
 
 	logAtIndent( 2, 'Installing dependencies and building' );
 	await runShellScript(
-		`bash -c "source $HOME/.nvm/nvm.sh && nvm install && npm ci && npx playwright install chromium --with-deps && npm run build"`,
+		`bash -c "source $HOME/.nvm/nvm.sh && nvm install && npm ci && npx playwright install chromium --with-deps"`,
 		testRunnerDir
 	);
 
@@ -384,7 +403,7 @@ async function runPerformanceTests( branches, options ) {
 
 		logAtIndent( 3, 'Installing dependencies and building' );
 		await runShellScript(
-			`bash -c "source $HOME/.nvm/nvm.sh && nvm install && npm ci && npm run build"`,
+			`bash -c "source $HOME/.nvm/nvm.sh && nvm install && npm ci && (npm run build -- --skip-types || npm run build)"`,
 			buildDir
 		);
 
@@ -462,32 +481,61 @@ async function runPerformanceTests( branches, options ) {
 
 	const wpEnvPath = path.join( testRunnerDir, 'node_modules/.bin/wp-env' );
 
-	for ( const testSuite of testSuites ) {
-		for ( let i = 1; i <= TEST_ROUNDS; i++ ) {
+	for ( let i = 1; i <= TEST_ROUNDS; i++ ) {
+		for ( const [ branchIdx, branch ] of branches.entries() ) {
 			logAtIndent(
 				1,
 				// prettier-ignore
-				`Suite: ${ formats.success( testSuite ) } (round ${ i } of ${ TEST_ROUNDS })`
+				`Branch: ${ formats.success( branch ) } (round ${ i } of ${ TEST_ROUNDS })`
 			);
 
-			for ( const branch of branches ) {
-				logAtIndent( 2, 'Branch:', formats.success( branch ) );
+			const sanitizedBranchName = sanitizeBranchName( branch );
+			// @ts-ignore
+			const envDir = branchDirs[ branch ];
 
-				const sanitizedBranchName = sanitizeBranchName( branch );
+			logAtIndent( 2, 'Starting environment' );
+			await runShellScript( `${ wpEnvPath } start`, envDir );
+
+			for ( const testSuite of testSuites ) {
+				logAtIndent( 2, `Suite: ${ formats.success( testSuite ) }` );
+
 				const runKey = `${ testSuite }_${ sanitizedBranchName }_round-${ i }`;
-				// @ts-ignore
-				const envDir = branchDirs[ branch ];
-
-				logAtIndent( 3, 'Starting environment' );
-				await runShellScript( `${ wpEnvPath } start`, envDir );
 
 				logAtIndent( 3, 'Running tests' );
-				await runTestSuite( testSuite, testRunnerDir, runKey );
-
-				logAtIndent( 3, 'Stopping environment' );
-				await runShellScript( `${ wpEnvPath } stop`, envDir );
+				await runTestSuite(
+					testSuite,
+					testRunnerDir,
+					runKey,
+					branchIdx === 0
+				);
 			}
+
+			logAtIndent( 2, 'Stopping environment' );
+			await runShellScript( `${ wpEnvPath } stop`, envDir );
 		}
+	}
+
+	// Copy the head branch's script source maps next to the traces so the
+	// artifact is self-contained: downloaders can run
+	// `bin/resolve-trace-source-maps.js` directly without checking out the
+	// repo or running `npm run build`.
+	const headBranch = branches[ 0 ];
+	// @ts-ignore
+	const headBuildScriptsDir = path.join(
+		// @ts-ignore
+		branchDirs[ headBranch ],
+		'plugin',
+		'build',
+		'scripts'
+	);
+	if ( fs.existsSync( headBuildScriptsDir ) ) {
+		const destScriptsDir = path.join( ARTIFACTS_PATH, 'build', 'scripts' );
+		fs.mkdirSync( destScriptsDir, { recursive: true } );
+		fs.cpSync( headBuildScriptsDir, destScriptsDir, {
+			recursive: true,
+			filter: ( src ) =>
+				fs.statSync( src ).isDirectory() || src.endsWith( '.map' ),
+		} );
 	}
 
 	logAtIndent( 0, 'Calculating results' );

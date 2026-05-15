@@ -31,7 +31,12 @@ test.describe( 'Post publish panel', () => {
 		await expect( cancelButton ).toBeEnabled();
 		await cancelButton.click();
 
-		// Test focus is moved back to the Publish panel toggle button.
+		// Wait for the close transition before checking focus return.
+		await expect( publishPanelToggleButton ).toHaveAttribute(
+			'aria-expanded',
+			'false'
+		);
+
 		await expect( publishPanelToggleButton ).toBeFocused();
 	} );
 
@@ -115,5 +120,28 @@ test.describe( 'Post publish panel', () => {
 				name: 'Always show pre-publish checks.',
 			} )
 		).toBeFocused();
+	} );
+
+	test( 'should auto-collapse the publish panel after publishing when the user makes an edit', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.canvas
+			.getByRole( 'textbox', { name: 'Add title' } )
+			.fill( 'Test Post' );
+		await editor.publishPost();
+
+		const prePublishChecksToggle = page.getByRole( 'checkbox', {
+			name: 'Always show pre-publish checks.',
+		} );
+		await expect( prePublishChecksToggle ).toBeVisible();
+
+		// Make an edit after publishing.
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Edit after publish' },
+		} );
+
+		await expect( prePublishChecksToggle ).toBeHidden();
 	} );
 } );

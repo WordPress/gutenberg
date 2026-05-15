@@ -69,6 +69,65 @@ interface MockBlockEditorOverrides {
 	getSelectionEnd?: jest.Mock;
 }
 
+type SeededRandom = {
+	bool: ( probability?: number ) => boolean;
+	int: ( maxExclusive: number ) => number;
+	intBetween: ( minInclusive: number, maxInclusive: number ) => number;
+	pick: < T >( values: readonly T[] ) => T;
+};
+
+/* eslint-disable no-bitwise */
+function createSeededRandom( seed: number ): SeededRandom {
+	let state = seed >>> 0;
+
+	if ( state === 0 ) {
+		state = 0x9e3779b9;
+	}
+
+	function nextUint32(): number {
+		state += 0x6d2b79f5;
+		let value = state;
+		value = Math.imul( value ^ ( value >>> 15 ), value | 1 );
+		value ^= value + Math.imul( value ^ ( value >>> 7 ), value | 61 );
+		return ( value ^ ( value >>> 14 ) ) >>> 0;
+	}
+
+	function next(): number {
+		return nextUint32() / 0x100000000;
+	}
+
+	function int( maxExclusive: number ): number {
+		if ( maxExclusive <= 0 ) {
+			return 0;
+		}
+
+		return Math.floor( next() * maxExclusive );
+	}
+
+	return {
+		bool( probability = 0.5 ) {
+			return next() < probability;
+		},
+		int,
+		intBetween( minInclusive, maxInclusive ) {
+			return minInclusive + int( maxInclusive - minInclusive + 1 );
+		},
+		pick< T >( values: readonly T[] ): T {
+			if ( values.length === 0 ) {
+				throw new Error( 'Cannot pick from an empty array.' );
+			}
+
+			return values[ int( values.length ) ];
+		},
+	};
+}
+/* eslint-enable no-bitwise */
+
+const NESTED_SELECTION_SEEDS = Array.from(
+	{ length: 8 },
+	( _value, index ) => 1401 + index
+);
+
 /**
  * Mock the block-editor store selectors returned by `select( blockEditorStore )`.
  *
@@ -168,6 +227,66 @@ function createTestDocWithBlocks( blocks?: Y.Map< any >[] ) {
 	}
 
 	return ydoc;
+}
+
+type NestedTextTarget = {
+	label: string;
+	text: Y.Text;
+};
+
+function createNestedAttributeBlock(
+	clientId: string,
+	seed: number
+): {
+	block: Y.Map< any >;
+	targets: NestedTextTarget[];
+} {
+	const block = new Y.Map();
+	block.set( 'clientId', clientId );
+	block.set( 'name', 'test/nested-rich-text' );
+
+	const attrs = new Y.Map();
+	const hero = new Y.Map();
+	const headline = new Y.Text( `Headline ${ seed } alpha beta` );
+	const caption = new Y.Text( `Caption ${ seed } gamma delta` );
+	hero.set( 'headline', headline );
+	hero.set( 'caption', caption );
+
+	const cards = new Y.Array();
+	const card0 = new Y.Map();
+	const card0Title = new Y.Text( `Card ${ seed } title one` );
+	const card0Body = new Y.Text( `Card ${ seed } body one two` );
+	const card0Meta = new Y.Map();
+	const card0Caption = new Y.Text( `Meta ${ seed } caption` );
+	card0.set( 'title', card0Title );
+	card0.set( 'body', card0Body );
+	card0Meta.set( 'caption', card0Caption );
+	card0.set( 'meta', card0Meta );
+
+	const card1 = new Y.Map();
+	const card1Title = new Y.Text( `Card ${ seed } title two` );
+	const card1Body = new Y.Text( `Card ${ seed } body three four` );
+	card1.set( 'title', card1Title );
+	card1.set( 'body', card1Body );
+	cards.push( [ card0, card1 ] );
+
+	attrs.set( 'hero', hero );
+	attrs.set( 'cards', cards );
+	block.set( 'attributes', attrs );
+	block.set( 'innerBlocks', new Y.Array() );
+
+	return {
+		block,
+		targets: [
+			{ label: 'hero.headline', text: headline },
+			{ label: 'hero.caption', text: caption },
+			{ label: 'cards.0.title', text: card0Title },
+			{ label: 'cards.0.body', text: card0Body },
+			{ label: 'cards.0.meta.caption', text: card0Caption },
+			{ label: 'cards.1.title', text: card1Title },
+			{ label: 'cards.1.body', text: card1Body },
+		],
+	};
 }
 
 describe( 'PostEditorAwareness', () => {
@@ -528,6 +647,7 @@ describe( 'PostEditorAwareness', () => {
 				cursorPosition: {
 					relativePosition,
 					absoluteOffset: 5,
+					attributeKey: 'content',
 				},
 			};
 
@@ -536,6 +656,7 @@ describe( 'PostEditorAwareness', () => {
 
 			expect( result.richTextOffset ).toBe( 5 );
 			expect( result.localClientId ).toBe( 'block-1' );
+			expect( result.attributeKey ).toBe( 'content' );
 		} );
 
 		test( 'should resolve WholeBlock selection to block client ID', () => {
@@ -568,6 +689,58 @@ describe( 'PostEditorAwareness', () => {
 
 			expect( result.richTextOffset ).toBeNull();
 			expect( result.localClientId ).toBe( 'block-1' );
+			expect( result.attributeKey ).toBeNull();
+		} );
+
+		test( 'should return null attributeKey for SelectionType.None', () => {
+			const awareness = new PostEditorAwareness(
+				doc,
+				'postType',
+				'post',
+				123
+			);
+
+			const result = awareness.convertSelectionStateToAbsolute( {
+				type: SelectionType.None,
+			} );
+
+			expect( result.attributeKey ).toBeNull();
+		} );
+
+		test( 'should pass through nested attributeKey for a cursor selection', () => {
+			const awareness = new PostEditorAwareness(
+				doc,
+				'postType',
+				'post',
+				123
+			);
+
+			const documentMap = doc.getMap( CRDT_RECORD_MAP_KEY );
+			const blocks = documentMap.get( 'blocks' ) as Y.Array<
+				Y.Map< any >
+			>;
+			const block = blocks.get( 0 );
+			const attrs = block.get( 'attributes' ) as Y.Map< Y.Text >;
+			const yText = attrs.get( 'content' );
+
+			const relativePosition = Y.createRelativePositionFromTypeIndex(
+				yText as Y.Text,
+				3
+			);
+
+			const selection: SelectionCursor = {
+				type: SelectionType.Cursor,
+				cursorPosition: {
+					relativePosition,
+					absoluteOffset: 3,
+					attributeKey: 'body.0.cells.0.content',
+				},
+			};
+
+			const result =
+				awareness.convertSelectionStateToAbsolute( selection );
+
+			expect( result.attributeKey ).toBe( 'body.0.cells.0.content' );
 		} );
 	} );
 
@@ -999,6 +1172,76 @@ describe( 'PostEditorAwareness', () => {
 
 			nestedDoc.destroy();
 		} );
+	} );
+
+	describe( 'convertSelectionStateToAbsolute with nested rich-text attributes', () => {
+		test.each( NESTED_SELECTION_SEEDS )(
+			'resolves fuzzed nested rich-text cursor (seed %i)',
+			( seed ) => {
+				const rng = createSeededRandom( seed );
+				const { block, targets } = createNestedAttributeBlock(
+					'yjs-nested-attrs',
+					seed
+				);
+				const nestedDoc = createTestDocWithBlocks( [ block ] );
+
+				mockBlockEditorStore( {
+					blocks: [
+						{
+							clientId: 'local-nested-attrs',
+							innerBlocks: [],
+						},
+					],
+				} );
+
+				const target = rng.pick( targets );
+				const initialOffset = rng.intBetween(
+					1,
+					Math.max( 1, target.text.length - 1 )
+				);
+				const relativePosition = Y.createRelativePositionFromTypeIndex(
+					target.text,
+					initialOffset
+				);
+				let expectedOffset = initialOffset;
+
+				if ( rng.bool() ) {
+					const prefix = `p${ seed % 97 } `;
+					target.text.insert( 0, prefix );
+					expectedOffset += prefix.length;
+				} else {
+					const deleteLength = Math.min(
+						initialOffset,
+						rng.intBetween( 1, 3 )
+					);
+					target.text.delete( 0, deleteLength );
+					expectedOffset -= deleteLength;
+				}
+
+				const awareness = new PostEditorAwareness(
+					nestedDoc,
+					'postType',
+					'post',
+					123
+				);
+
+				const selection: SelectionCursor = {
+					type: SelectionType.Cursor,
+					cursorPosition: {
+						relativePosition,
+						absoluteOffset: initialOffset,
+					},
+				};
+
+				const result =
+					awareness.convertSelectionStateToAbsolute( selection );
+
+				expect( result.richTextOffset ).toBe( expectedOffset );
+				expect( result.localClientId ).toBe( 'local-nested-attrs' );
+
+				nestedDoc.destroy();
+			}
+		);
 	} );
 
 	describe( 'template mode (core/post-content handling)', () => {
