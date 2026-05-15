@@ -133,7 +133,7 @@
 		"lint": "concurrently \"npm run lint:lockfile\" \"npm run lint:tsconfig\" \"npm run lint:js\" \"npm run lint:pkg-json\" \"npm run lint:css\"",
 		"lint:css": "wp-scripts lint-style \"**/*.scss\" \"**/*.module.css\"",
 		"lint:css:fix": "npm run lint:css -- --fix",
-		"lint:js": "node ./tools/eslint/lint-js.cjs",
+		"lint:js": "node ./tools/eslint/lint-js.cjs --concurrency=auto",
 		"lint:js:fix": "npm run lint:js -- --fix",
 		"lint:js:prune-suppressions": "npm run lint:js -- --prune-suppressions",
 		"lint:lockfile": "npm run --workspace @wordpress/validation-tools validate-package-lock --",
