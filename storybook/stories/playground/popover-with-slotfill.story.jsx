@@ -33,7 +33,6 @@ function IframePortal( { children, iframeRef, ...iframeProps } ) {
 }
 
 export const CrossIframeWithSlotFill = {
-	name: 'Cross-Iframe (SlotFill)',
 	args: { defaultOpen: true },
 	argTypes: { defaultOpen: { control: false } },
 	render: function Render( { children: _children, ...args } ) {

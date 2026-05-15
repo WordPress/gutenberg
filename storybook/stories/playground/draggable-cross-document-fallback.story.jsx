@@ -119,4 +119,3 @@ export const InsideIframeWithCompatSlot = () => {
 		</div>
 	);
 };
-InsideIframeWithCompatSlot.storyName = 'Inside iframe (compat slot fallback)';
