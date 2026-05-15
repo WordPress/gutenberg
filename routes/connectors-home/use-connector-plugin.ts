@@ -37,25 +37,35 @@ interface WpUpdates {
 	installPlugin: ( args: { slug: string } ) => void;
 }
 
+type JQueryHandler = (
+	event: unknown,
+	response:
+		| WpUpdatesInstallPluginResponse
+		| WpUpdatesInstallPluginErrorResponse
+) => void;
+
 interface WpUpdatesGlobal {
 	wp?: {
 		updates?: WpUpdates;
 	};
 	jQuery?: ( target: Document ) => {
-		one: (
-			event: string,
-			handler: (
-				event: unknown,
-				response:
-					| WpUpdatesInstallPluginResponse
-					| WpUpdatesInstallPluginErrorResponse
-			) => void
-		) => unknown;
-		off: ( event: string, handler: unknown ) => unknown;
+		on: ( event: string, handler: JQueryHandler ) => unknown;
+		off: ( event: string, handler: JQueryHandler ) => unknown;
 	};
 }
 
-function installPluginViaWpUpdates( slug: string ): Promise< void > {
+/**
+ * Outcome of an install routed through `wp.updates.installPlugin()`.
+ *
+ * `canceled` is a normal control-flow result (the user closed the
+ * filesystem credentials modal), not an error. Genuine install
+ * failures reject the promise instead.
+ */
+type WpUpdatesInstallOutcome = 'installed' | 'canceled';
+
+function installPluginViaWpUpdates(
+	slug: string
+): Promise< WpUpdatesInstallOutcome > {
 	return new Promise( ( resolve, reject ) => {
 		const w = window as unknown as WpUpdatesGlobal;
 		const jq = w.jQuery;
@@ -65,26 +75,27 @@ function installPluginViaWpUpdates( slug: string ): Promise< void > {
 			return;
 		}
 
-		const onSuccess = (
-			_event: unknown,
-			response:
-				| WpUpdatesInstallPluginResponse
-				| WpUpdatesInstallPluginErrorResponse
-		) => {
+		// Handlers are registered with on()/off() (not one()) and filtered
+		// by slug. With one(), a concurrent install of a *different* plugin
+		// firing first would consume the one-shot handler and leave this
+		// promise pending forever. on() + explicit cleanup() only tears
+		// down once the matching slug's event arrives.
+		const cleanup = () => {
+			jq( document ).off( 'wp-plugin-install-success', onSuccess );
+			jq( document ).off( 'wp-plugin-install-error', onError );
+			jq( document ).off( 'credential-modal-cancel', onCancel );
+		};
+
+		const onSuccess: JQueryHandler = ( _event, response ) => {
 			if (
 				( response as WpUpdatesInstallPluginResponse ).slug !== slug
 			) {
 				return;
 			}
 			cleanup();
-			resolve();
+			resolve( 'installed' );
 		};
-		const onError = (
-			_event: unknown,
-			response:
-				| WpUpdatesInstallPluginResponse
-				| WpUpdatesInstallPluginErrorResponse
-		) => {
+		const onError: JQueryHandler = ( _event, response ) => {
 			if (
 				( response as WpUpdatesInstallPluginErrorResponse ).slug !==
 				slug
@@ -97,19 +108,14 @@ function installPluginViaWpUpdates( slug: string ): Promise< void > {
 				new Error( errResponse.errorMessage ?? 'Install failed.' )
 			);
 		};
-		const onCancel = () => {
+		const onCancel: JQueryHandler = () => {
 			cleanup();
-			reject( new Error( 'Filesystem credentials request canceled.' ) );
-		};
-		const cleanup = () => {
-			jq( document ).off( 'wp-plugin-install-success', onSuccess );
-			jq( document ).off( 'wp-plugin-install-error', onError );
-			jq( document ).off( 'credential-modal-cancel', onCancel );
+			resolve( 'canceled' );
 		};
 
-		jq( document ).one( 'wp-plugin-install-success', onSuccess );
-		jq( document ).one( 'wp-plugin-install-error', onError );
-		jq( document ).one( 'credential-modal-cancel', onCancel );
+		jq( document ).on( 'wp-plugin-install-success', onSuccess );
+		jq( document ).on( 'wp-plugin-install-error', onError );
+		jq( document ).on( 'credential-modal-cancel', onCancel );
 
 		updates.installPlugin( { slug } );
 	} );
@@ -269,7 +275,11 @@ export function useConnectorPlugin( {
 				// stored. Route through wp.updates.installPlugin() so the
 				// standard "Connection Information" modal handles credential
 				// entry, then activate via REST.
-				await installPluginViaWpUpdates( pluginSlug );
+				const outcome = await installPluginViaWpUpdates( pluginSlug );
+				if ( outcome === 'canceled' ) {
+					// User closed the credentials modal; abort silently.
+					return;
+				}
 				if ( pluginBasename ) {
 					await saveEntityRecord(
 						'root',
@@ -307,13 +317,7 @@ export function useConnectorPlugin( {
 					type: 'snackbar',
 				}
 			);
-		} catch ( error ) {
-			// A user-initiated cancel of the filesystem credentials dialog
-			// should silently abort the install without a snackbar.
-			const message = error instanceof Error ? error.message : '';
-			if ( message === 'Filesystem credentials request canceled.' ) {
-				return;
-			}
+		} catch {
 			createErrorNotice(
 				sprintf(
 					/* translators: %s: Name of the connector (e.g. "OpenAI"). */
