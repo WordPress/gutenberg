@@ -3,33 +3,10 @@
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
-function recordRequests( page ) {
-	const requests = [];
-	function onRequest( request ) {
-		if ( request.resourceType() !== 'fetch' ) {
-			return;
-		}
-		const urlObject = new URL( request.url() );
-		const restRoute =
-			urlObject.searchParams.get( 'rest_route' ) ??
-			urlObject.pathname.replace( /^\/wp-json/, '' );
-		// `_locale` is added uniformly to every apiFetch call and
-		// carries no signal here.
-		urlObject.searchParams.delete( '_locale' );
-		const query = urlObject.searchParams.toString();
-		requests.push(
-			`${ request.method() } ${ restRoute }${
-				query ? `?${ query }` : ''
-			}`
-		);
-	}
-
-	page.on( 'request', onRequest );
-	return {
-		requests,
-		stop: () => page.off( 'request', onRequest ),
-	};
-}
+/**
+ * Internal dependencies
+ */
+const { recordRequests } = require( './record-requests' );
 
 test.describe( 'Preload', () => {
 	let postId;
