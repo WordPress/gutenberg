@@ -42,6 +42,12 @@ import type { DashboardGridLayoutItem, DashboardGridProps } from './types';
 import type { ResizeDelta } from '../shared/types';
 import styles from './grid.module.css';
 
+// Fallback gap in pixels for math that runs before the computed gap
+// can be read from the DOM. Matches the `'md'` step the surface
+// resolves to in CSS (`--wpds-dimension-gap-md`); the next layout
+// effect overwrites this with the actual computed value.
+const FALLBACK_GAP_PX = 12;
+
 // Reorder is driven by `temporaryLayout` + CSS Grid, not by dnd-kit
 // transforms. Hoist the no-op strategy outside the component so its
 // reference is stable across renders — passing a fresh `() => null`
@@ -89,7 +95,6 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 			children,
 			className,
 			style,
-			spacing = 2,
 			rowHeight = 'auto',
 			minColumnWidth,
 			editMode = false,
@@ -134,6 +139,7 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 
 		const rootRef = useRef< HTMLDivElement >( null );
 		const [ containerWidth, setContainerWidth ] = useState( 0 );
+		const [ gapPx, setGapPx ] = useState( FALLBACK_GAP_PX );
 		const resizeObserverRef = useResizeObserver(
 			( [ { contentRect } ] ) => {
 				setContainerWidth( contentRect.width );
@@ -146,16 +152,24 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 		] );
 
 		// Measure before paint to avoid a single-column flash in
-		// responsive mode; `useResizeObserver` delivers async.
+		// responsive mode; `useResizeObserver` delivers async. The
+		// computed `column-gap` is read from the resolved CSS so the
+		// math tracks the design-system token under any density.
 		useLayoutEffect( () => {
-			if ( rootRef.current ) {
-				const { width } = rootRef.current.getBoundingClientRect();
-				if ( width > 0 ) {
-					setContainerWidth( width );
-				}
+			if ( ! rootRef.current ) {
+				return;
+			}
+			const { width } = rootRef.current.getBoundingClientRect();
+			if ( width > 0 ) {
+				setContainerWidth( width );
+			}
+			const parsed = Number.parseFloat(
+				window.getComputedStyle( rootRef.current ).columnGap
+			);
+			if ( Number.isFinite( parsed ) && parsed > 0 ) {
+				setGapPx( parsed );
 			}
 		}, [] );
-		const gapPx = spacing * 4;
 		const effectiveColumns = useMemo( () => {
 			if ( ! minColumnWidth ) {
 				return columns;
@@ -492,12 +506,11 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 			() => (
 				<Overlay
 					columns={ effectiveColumns }
-					gapPx={ gapPx }
 					rowHeight={ overlayRowHeight }
 					isActive={ editMode }
 				/>
 			),
-			[ Overlay, editMode, effectiveColumns, gapPx, overlayRowHeight ]
+			[ Overlay, editMode, effectiveColumns, overlayRowHeight ]
 		);
 
 		return (
@@ -526,7 +539,6 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 							...style,
 							gridTemplateColumns: `repeat(${ effectiveColumns }, minmax(0, 1fr))`,
 							gridAutoRows: rowHeight,
-							gap: gapPx,
 						} }
 					>
 						{ gridOverlay }
