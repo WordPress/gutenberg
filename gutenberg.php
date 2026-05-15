@@ -71,4 +71,5 @@ function gutenberg_pre_init() {
 	}
 
 	require_once __DIR__ . '/lib/load.php';
+	require_once __DIR__ . '/lib/dev-hmr.php';
 }

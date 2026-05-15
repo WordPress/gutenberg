@@ -377,6 +377,7 @@
 					{
 						"docs/contributors/code/getting-started-with-code-contribution.md": []
 					},
+					{ "docs/contributors/code/fast-refresh.md": [] },
 					{ "docs/contributors/code/git-workflow.md": [] },
 					{ "docs/contributors/code/coding-guidelines.md": [] },
 					{

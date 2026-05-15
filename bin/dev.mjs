@@ -175,6 +175,14 @@ async function dev() {
 		console.log( '\n📦 Building vendor files...' );
 		await exec( 'node', [ './bin/packages/build-vendors.mjs' ] );
 
+		const hmrEnabled = process.env.GUTENBERG_HMR !== '0';
+
+		if ( hmrEnabled ) {
+			// Step 6.5: Build HMR runtime (react-refresh for browser)
+			console.log( '\n🔥 Building HMR runtime...' );
+			await exec( 'node', [ './bin/hmr/build-runtime.mjs' ] );
+		}
+
 		const setupTime = Date.now() - startTime;
 		console.log(
 			`\n✅ Initial build completed! (${ Math.round(
@@ -185,7 +193,13 @@ async function dev() {
 		// Step 7: Start watch mode with both TypeScript and package builds
 		console.log( '👀 Starting watch mode...\n' );
 		console.log( '   - TypeScript compiler watching for type changes' );
-		console.log( '   - Package builder watching for source changes\n' );
+		console.log( '   - Package builder watching for source changes' );
+		if ( hmrEnabled ) {
+			console.log(
+				'   - Fast-refresh SSE server on :35729 (set GUTENBERG_HMR=0 to disable)'
+			);
+		}
+		console.log( '' );
 
 		// Start TypeScript watch
 		const tscWatch = execAsync( 'tsgo', [
@@ -201,14 +215,34 @@ async function dev() {
 			cwd: ROOT_DIR,
 			stdio: [ 'inherit', 'pipe', 'inherit' ],
 			shell: true,
-			env: { ...process.env, NODE_ENV: 'development' },
+			env: {
+				...process.env,
+				NODE_ENV: 'development',
+				WP_BUILD_HMR: hmrEnabled ? '1' : '0',
+			},
 		} );
+
+		// Start the HMR live-reload SSE server alongside wp-build so users
+		// only have to run one command. If port 35729 is already taken
+		// (e.g. someone already ran `npm run dev:live` in another terminal),
+		// live-reload exits early — that's fine, dev keeps going without it.
+		// Set GUTENBERG_HMR=0 to opt out entirely.
+		const liveReload = hmrEnabled
+			? spawn( 'node', [ './bin/live-reload.mjs' ], {
+					cwd: ROOT_DIR,
+					stdio: 'inherit',
+					env: process.env,
+			  } )
+			: null;
 
 		// Handle process termination
 		const cleanup = () => {
 			console.log( '\n\n👋 Stopping watch mode...' );
 			tscWatch.kill();
 			buildWatch.kill();
+			if ( liveReload ) {
+				liveReload.kill();
+			}
 			readyMarkerFile.cleanup();
 			process.exit( 0 );
 		};
