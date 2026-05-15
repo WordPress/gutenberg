@@ -7565,7 +7565,7 @@ describe( 'distributed editing session state', () => {
 				action: 'none',
 				title: 'Save confirmed by WordPress',
 				summary: 'WordPress accepted',
-				actionHint: null,
+				actionHint: 'WordPress confirmed',
 				requiresActionBeforeSave: false,
 				saveButtonLabel: 'Save confirmed',
 				saveButtonDisabled: true,

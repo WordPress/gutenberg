@@ -1000,4 +1000,127 @@ describe( 'PostPublishButton', () => {
 
 		expect( savePostStatus ).not.toHaveBeenCalled();
 	} );
+
+	it( 'should show the confirmed action hint without obscuring saved-state evidence', async () => {
+		const user = userEvent.setup();
+		const savePostStatus = jest.fn();
+		render(
+			<PostPublishButton
+				isSaveable
+				isPublishable
+				savePostStatus={ savePostStatus }
+				distributedEditingSaveButtonState={ {
+					status: 'retry_save_confirmed',
+					source: 'retry_save',
+					label: 'Save confirmed',
+					statusText: 'Distributed Editing Save confirmed.',
+					disabled: true,
+					authorityState: 'authoritative_update_confirmed',
+					localChangesState: 'authoritative_update_confirmed',
+					reviewCheckpointState: 'review_consumed',
+					authoritativePostState: 'authoritative_update_confirmed',
+					saveStateSummaryText:
+						'The authoritative post accepted the Distributed Editing update.',
+					authoritativePostUpdated: true,
+				} }
+				distributedEditingSaveJourneyState={ {
+					shouldExposeInSaveControls: true,
+					step: 'save_confirmed',
+					action: 'none',
+					title: 'Save confirmed by WordPress',
+					summary:
+						'WordPress accepted this Distributed Editing Save.',
+					actionHint: 'WordPress confirmed',
+					requiresActionBeforeSave: false,
+					statusChromeSummary:
+						'The authoritative post accepted the Distributed Editing update.',
+					statusChromeAuthorityState:
+						'authoritative_update_confirmed',
+					statusChromeAuthorityText:
+						'The authoritative WordPress post has accepted the Distributed Editing Save.',
+					claimsSavedWithoutEvidence: false,
+				} }
+			/>
+		);
+
+		const button = screen.getByRole( 'button', {
+			name: 'Save confirmed',
+		} );
+		expect( button ).toHaveAttribute( 'aria-disabled', 'true' );
+		expect( button ).toHaveAttribute(
+			'title',
+			'WordPress confirmed. WordPress accepted this Distributed Editing Save. The authoritative post accepted the Distributed Editing update.'
+		);
+		expect( button ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-step',
+			'save_confirmed'
+		);
+		expect( button ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-action',
+			'none'
+		);
+		expect( button ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-action-hint',
+			'WordPress confirmed'
+		);
+		expect( button ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-action-required',
+			'false'
+		);
+		expect( button ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-authority-state',
+			'authoritative_update_confirmed'
+		);
+		expect( button ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-claims-saved-without-evidence',
+			'false'
+		);
+		expect( button ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-calls-normal-save',
+			'false'
+		);
+		expect( button ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-calls-retry-save',
+			'false'
+		);
+		expect( button ).toHaveAttribute(
+			'data-distributed-editing-save-button-authoritative-post-updated',
+			'true'
+		);
+		const cueLabel = screen.getByText( 'Save confirmed by WordPress' );
+		const cueActionHint = screen.getByText( 'WordPress confirmed' );
+		const cue = screen.getByLabelText(
+			'WordPress confirmed. WordPress accepted this Distributed Editing Save. The authoritative post accepted the Distributed Editing update.'
+		);
+		expect( cueLabel ).toBeVisible();
+		expect( cueActionHint ).toBeVisible();
+		expect( cue ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-visual-cue',
+			'true'
+		);
+		expect( cue ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-action-hint',
+			'WordPress confirmed'
+		);
+		expect( cue ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-action-required',
+			'false'
+		);
+		expect( cue ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-authority-state',
+			'authoritative_update_confirmed'
+		);
+		expect( cue ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-calls-normal-save',
+			'false'
+		);
+		expect( cue ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-calls-retry-save',
+			'false'
+		);
+
+		await user.click( button );
+
+		expect( savePostStatus ).not.toHaveBeenCalled();
+	} );
 } );

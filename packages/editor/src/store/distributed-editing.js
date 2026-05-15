@@ -10687,6 +10687,8 @@ function getDistributedEditingSaveJourneyActionHintForStep( step ) {
 			return 'Send guarded update';
 		case DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.WAITING_FOR_WORDPRESS:
 			return 'Keep tab open';
+		case DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.SAVE_CONFIRMED:
+			return 'WordPress confirmed';
 	}
 
 	return null;
