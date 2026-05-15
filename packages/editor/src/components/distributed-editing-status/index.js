@@ -2041,7 +2041,6 @@ function getDistributedEditingEnabledShellState( sessionState ) {
 			normalized.isAwaitingServerConfirmation ||
 			normalized.pendingChangeCount > 0
 	);
-
 	if ( isConnectionDegraded ) {
 		return {
 			serverContact: 'degraded',
@@ -2082,6 +2081,28 @@ function getDistributedEditingEnabledShellState( sessionState ) {
 			saveJourneySummary: saveJourneyCopy.summary,
 			message: __(
 				'Local changes are protected and remain exportable while WordPress waits for server confirmation.'
+			),
+		};
+	}
+
+	if ( humanLoopStepState.confirmedByWordPress ) {
+		return {
+			serverContact: 'nominal',
+			localProtection: 'idle',
+			saveState: savePolicyState.status,
+			saveAction: savePolicyState.clickAction || 'none',
+			authorityState: savePolicyState.saveButtonAuthorityState,
+			saveStateSummaryText: savePolicyState.saveButtonStateSummaryText,
+			authorityStatusText: savePolicyState.saveButtonAuthorityStatusText,
+			humanLoopStepState,
+			humanLoopStep: humanLoopStepState.step,
+			humanLoopAction: humanLoopStepState.action,
+			humanLoopTitle: humanLoopStepCopy.title,
+			humanLoopSummary: humanLoopStepCopy.summary,
+			saveJourneyTitle: saveJourneyCopy.title,
+			saveJourneySummary: saveJourneyCopy.summary,
+			message: __(
+				'WordPress accepted this Distributed Editing Save. You can keep editing; WordPress will protect any new local changes.'
 			),
 		};
 	}
