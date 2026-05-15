@@ -184,34 +184,42 @@ function UnforwardedLinkUI( props, ref ) {
 	}, [ shouldFocusPane ] );
 
 	const blockEditingMode = useBlockEditingMode();
-	const { rootClientId, insertableNavigationBlocks } = useSelect(
-		( select ) => {
-			const { getBlockRootClientId, canInsertBlockType } =
-				select( blockEditorStore );
-			const root = getBlockRootClientId( props.clientId );
+	const EXCLUDED = new Set( [
+		'core/navigation-link',
+		'core/navigation-submenu',
+	] );
+	const { rootClientId, insertableNavigationBlocks, insertionIndex } =
+		useSelect(
+			( select ) => {
+				const {
+					getBlockRootClientId,
+					canInsertBlockType,
+					getBlockIndex,
+				} = select( blockEditorStore );
+				const root = getBlockRootClientId( props.clientId );
 
-			// Get every registered block type that can live inside this navigation.
-			// Exclude navigation-link and navigation-submenu — those are already
-			// handled by LinkControl's own search suggestions.
-			const EXCLUDED = new Set( [
-				'core/navigation-link',
-				'core/navigation-submenu',
-			] );
-			const insertable = select( blocksStore )
-				.getBlockTypes()
-				.filter(
-					( blockType ) =>
-						! EXCLUDED.has( blockType.name ) &&
-						canInsertBlockType( blockType.name, root )
-				);
+				const index = getBlockIndex( props.clientId );
+				// Get every registered block type that can live inside this navigation.
+				// Exclude navigation-link and navigation-submenu — those are already
+				// handled by LinkControl's own search suggestions.
+				const insertable = root
+					? select( blocksStore )
+							.getBlockTypes()
+							.filter(
+								( blockType ) =>
+									! EXCLUDED.has( blockType.name ) &&
+									canInsertBlockType( blockType.name, root )
+							)
+					: [];
 
-			return {
-				rootClientId: root,
-				insertableNavigationBlocks: insertable,
-			};
-		},
-		[ props.clientId ]
-	);
+				return {
+					rootClientId: root,
+					insertableNavigationBlocks: insertable,
+					insertionIndex: index + 1,
+				};
+			},
+			[ props.clientId ]
+		);
 
 	// Filter insertable blocks by the live search input.
 	// Empty query > no results (avoids flooding the UI before the user types).
@@ -309,7 +317,7 @@ function UnforwardedLinkUI( props, ref ) {
 										);
 										insertBlock(
 											newBlock,
-											undefined,
+											insertionIndex,
 											rootClientId
 										);
 										if ( props.onBlockInsert ) {
@@ -378,19 +386,21 @@ const LinkUITools = ( {
 
 	return (
 		<VStack spacing={ 0 } className="link-ui-tools">
-			{ matchingBlocks.map( ( blockType ) => (
-				<Button
-					__next40pxDefaultSize
-					key={ blockType.name }
-					icon={ <BlockIcon icon={ blockType.icon } /> }
-					onClick={ ( e ) => {
-						e.preventDefault();
-						onInsertBlock( blockType );
-					} }
-				>
-					{ __( 'Add' ) } { blockType.title } { __( 'Block' ) }
-				</Button>
-			) ) }
+			{ canAddBlock &&
+				matchingBlocks.map( ( blockType ) => (
+					<Button
+						__next40pxDefaultSize
+						key={ blockType.name }
+						icon={ <BlockIcon icon={ blockType.icon } /> }
+						onClick={ ( e ) => {
+							e.preventDefault();
+							onInsertBlock( blockType );
+						} }
+						aria-haspopup={ blockInserterAriaRole }
+					>
+						{ __( 'Add' ) } { blockType.title } { __( 'Block' ) }
+					</Button>
+				) ) }
 			{ canAddPage && (
 				<Button
 					__next40pxDefaultSize
