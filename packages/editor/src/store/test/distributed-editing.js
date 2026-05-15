@@ -16,6 +16,7 @@ import {
 	DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_STATUSES,
 	DISTRIBUTED_EDITING_FRESH_REVIEW_REVIEW_LIST_STATUSES,
 	DISTRIBUTED_EDITING_FRESH_REVIEW_RETRY_SAVE_HANDOFF_STATUSES,
+	DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS,
 	DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES,
 	DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES,
 	DISTRIBUTED_EDITING_LOCAL_UPDATES_EXPORT_FORMAT,
@@ -67,6 +68,7 @@ import {
 	getDistributedEditingFreshReviewPreSaveStateForSessionState,
 	getDistributedEditingFreshReviewPrePublishStateForSessionState,
 	getDistributedEditingFreshReviewRetrySaveHandoffStateForSessionState,
+	getDistributedEditingHumanLoopStepStateForSessionState,
 	getDistributedEditingLocalUpdatesImportResult,
 	getDistributedEditingLocalUpdatesImportReviewRequestStateForSessionState,
 	getDistributedEditingAcceptedFreshReviewConsumeValidationForRetrySaveRequest,
@@ -7280,6 +7282,128 @@ describe( 'distributed editing session state', () => {
 		expect( JSON.stringify( buttonStates ) ).not.toMatch(
 			/reviewerId|reviewer_user_id|proofSignature/
 		);
+	} );
+
+	it( 'summarizes the M0 human loop step without side effects or private data', () => {
+		const confirmedState =
+			getDistributedEditingSessionStateForRetrySaveResult(
+				{
+					result: 'retry_save_applied',
+					retry_save_accepted: true,
+					previous_server_version: '12',
+					server_version: '13',
+					saves_post: true,
+					mutates_post_content: true,
+					creates_revision: true,
+					claims_saved: true,
+				},
+				{
+					pendingChangeCount: 1,
+					hasPendingChanges: true,
+					canExportLocalUpdates: true,
+				}
+			);
+		const cases = [
+			{
+				sessionState: {},
+				step: DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.READY_TO_EDIT,
+				action: 'edit',
+			},
+			{
+				sessionState: {
+					pendingChangeCount: 1,
+					hasPendingChanges: true,
+					canExportLocalUpdates: true,
+				},
+				step: DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.LOCAL_CHANGES_PROTECTED,
+				action: 'wait_or_export',
+			},
+			{
+				sessionState: {
+					pendingChangeCount: 1,
+					hasPendingChanges: true,
+					canExportLocalUpdates: true,
+					requiresServerStateRefetch: true,
+				},
+				step: DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.GET_LATEST_POST,
+				action: 'get_latest_post',
+			},
+			{
+				sessionState: {
+					pendingChangeCount: 1,
+					hasPendingChanges: true,
+					canExportLocalUpdates: true,
+					riskyBlockReviewStatus:
+						DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_STATUSES.REVIEW_REQUIRED,
+					riskyBlockReviewHasPendingItems: true,
+					riskyBlockReviewItemCount: 1,
+					riskyBlockReviewPendingCount: 1,
+				},
+				step: DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.REVIEW_CHANGES,
+				action: 'review_changes',
+			},
+			{
+				sessionState: {
+					pendingChangeCount: 1,
+					hasPendingChanges: true,
+					canExportLocalUpdates: true,
+					retrySubmitProofStatus:
+						DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.ACCEPTED_FOR_FUTURE_SAVE,
+					retrySubmitAccepted: true,
+					retrySubmitSavePathRequired: true,
+					retrySubmitSaveStatus:
+						DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.READY,
+					retrySubmitSaveReady: true,
+				},
+				step: DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.READY_TO_SAVE,
+				action: 'save',
+			},
+			{
+				sessionState: {
+					pendingChangeCount: 1,
+					hasPendingChanges: true,
+					canExportLocalUpdates: true,
+					retrySaveStatus:
+						DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVING,
+				},
+				step: DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.WAITING_FOR_WORDPRESS,
+				action: 'keep_tab_open',
+			},
+			{
+				sessionState: confirmedState,
+				step: DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.SAVE_CONFIRMED,
+				action: 'none',
+				confirmedByWordPress: true,
+			},
+		];
+
+		for ( const currentCase of cases ) {
+			const stepState =
+				getDistributedEditingHumanLoopStepStateForSessionState(
+					currentCase.sessionState
+				);
+
+			expect( stepState ).toMatchObject( {
+				step: currentCase.step,
+				action: currentCase.action,
+				confirmedByWordPress: Boolean(
+					currentCase.confirmedByWordPress
+				),
+				descriptorOnly: true,
+				callsRestEndpoint: false,
+				callsNormalSavePost: false,
+				callsRetrySaveEndpoint: false,
+				dispatchesNotice: false,
+				mutatesEditorContent: false,
+				mutatesPersistedPostContent: false,
+				changesPostLock: false,
+				claimsSavedWithoutEvidence: false,
+				exposesRawContent: false,
+				exposesProofInternals: false,
+				exposesReviewerIds: false,
+				exposesSaverIds: false,
+			} );
+		}
 	} );
 
 	it( 'normalizes consumed fresh-review lifecycle evidence without exposing private data', () => {

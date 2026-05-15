@@ -430,6 +430,21 @@ export const DISTRIBUTED_EDITING_SAVE_REVIEW_CHECKPOINT_STATES = Object.freeze(
 );
 
 /**
+ * Stable M0 human-loop steps for the enabled editor shell. These are
+ * communication descriptors only; they do not save, fetch, submit proof,
+ * mutate content, or change post locks.
+ */
+export const DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS = Object.freeze( {
+	READY_TO_EDIT: 'ready_to_edit',
+	LOCAL_CHANGES_PROTECTED: 'local_changes_protected',
+	GET_LATEST_POST: 'get_latest_post',
+	REVIEW_CHANGES: 'review_changes',
+	READY_TO_SAVE: 'ready_to_save',
+	WAITING_FOR_WORDPRESS: 'waiting_for_wordpress',
+	SAVE_CONFIRMED: 'save_confirmed',
+} );
+
+/**
  * Stable fresh-review pre-save statuses. These are pure placement hints for
  * future Save/pre-publish UI and do not perform the action they describe.
  */
@@ -10508,6 +10523,101 @@ export function getDistributedEditingSaveButtonStateForSessionState(
 		rawContentIncluded: false,
 		exposesRawContent: false,
 		exposesProofSignature: false,
+		exposesProofInternals: false,
+		exposesReviewerIds: false,
+		exposesSaverIds: false,
+	};
+}
+
+/**
+ * Returns the current M0 human-loop step for the normal enabled editor shell.
+ * This condenses the DE-RTC Save/review/recovery vocabulary into one
+ * human-facing next step without exposing proof internals or performing the
+ * action it names.
+ *
+ * @param {Object} sessionState DE-RTC session state.
+ *
+ * @return {Object} Human-loop step descriptor.
+ */
+export function getDistributedEditingHumanLoopStepStateForSessionState(
+	sessionState = {}
+) {
+	const normalized = normalizeDistributedEditingSessionState( sessionState );
+	const saveButton =
+		getDistributedEditingSaveButtonStateForSessionState( normalized );
+	const hasProtectedLocalChanges = Boolean(
+		saveButton.hasProtectedLocalChanges ||
+			normalized.hasPendingChanges ||
+			normalized.mustOfferLocalCopy ||
+			normalized.canExportLocalUpdates ||
+			normalized.isAwaitingServerConfirmation ||
+			normalized.pendingChangeCount > 0
+	);
+	const confirmedByWordPress =
+		saveButton.status ===
+			DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES.RETRY_SAVE_CONFIRMED &&
+		saveButton.hasRetrySaveSavedStateEvidence &&
+		saveButton.authoritativePostUpdated;
+	let step = DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.READY_TO_EDIT;
+	let action = 'edit';
+
+	if ( confirmedByWordPress ) {
+		step = DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.SAVE_CONFIRMED;
+		action = 'none';
+	} else if (
+		saveButton.status ===
+			DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES.RETRY_SAVE_IN_PROGRESS ||
+		saveButton.status ===
+			DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES.FRESH_REVIEW_VALIDATING
+	) {
+		step = DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.WAITING_FOR_WORDPRESS;
+		action = 'keep_tab_open';
+	} else if (
+		saveButton.status ===
+		DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES.REFETCH_REQUIRED
+	) {
+		step = DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.GET_LATEST_POST;
+		action = 'get_latest_post';
+	} else if (
+		saveButton.status ===
+		DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES.REVIEW_BLOCKED
+	) {
+		step = DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.REVIEW_CHANGES;
+		action = 'review_changes';
+	} else if (
+		saveButton.status ===
+		DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES.ACCEPTED_BUT_UNCONSUMED
+	) {
+		step = DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.READY_TO_SAVE;
+		action = 'save';
+	} else if ( hasProtectedLocalChanges ) {
+		step = DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.LOCAL_CHANGES_PROTECTED;
+		action = 'wait_or_export';
+	}
+
+	return {
+		step,
+		action,
+		saveButtonStatus: saveButton.status,
+		saveButtonReason: saveButton.reason,
+		saveAuthorityState: saveButton.authorityState,
+		savePolicyAction: saveButton.clickAction,
+		hasProtectedLocalChanges,
+		requiresServerStateRefetch: saveButton.requiresServerStateRefetch,
+		requiresReview: saveButton.opensPrePublishReview,
+		hasAcceptedButUnconsumed: saveButton.hasAcceptedButUnconsumed,
+		pendingServerConfirmation: saveButton.pendingServerConfirmation,
+		confirmedByWordPress,
+		descriptorOnly: true,
+		callsRestEndpoint: false,
+		callsNormalSavePost: false,
+		callsRetrySaveEndpoint: false,
+		dispatchesNotice: false,
+		mutatesEditorContent: false,
+		mutatesPersistedPostContent: false,
+		changesPostLock: false,
+		claimsSavedWithoutEvidence: false,
+		exposesRawContent: false,
 		exposesProofInternals: false,
 		exposesReviewerIds: false,
 		exposesSaverIds: false,

@@ -17,6 +17,7 @@ import {
 	DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_PLACEMENTS,
 	DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_STATUSES,
 	DISTRIBUTED_EDITING_FRESH_REVIEW_RETRY_SAVE_HANDOFF_STATUSES,
+	DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS,
 	DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES,
 	DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES,
 	DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS,
@@ -40,6 +41,7 @@ import {
 	DISTRIBUTED_EDITING_UNLOAD_WARNING_REASONS,
 	getDistributedEditingFreshReviewDecisionStateForSessionState,
 	getDistributedEditingFreshReviewPreSaveStateForSessionState,
+	getDistributedEditingHumanLoopStepStateForSessionState,
 	getDistributedEditingLocalUpdatesExportPayload,
 	getDistributedEditingPresenceRepeatedRefreshRuntimeStateForSessionState,
 	getDistributedEditingPresenceRosterStateForSessionState,
@@ -2021,6 +2023,10 @@ function getDistributedEditingEnabledShellState( sessionState ) {
 	const normalized = normalizeDistributedEditingSessionState( sessionState );
 	const savePolicyState =
 		getDistributedEditingSavePolicyStateForSessionState( normalized );
+	const humanLoopStepState =
+		getDistributedEditingHumanLoopStepStateForSessionState( normalized );
+	const humanLoopStepCopy =
+		getDistributedEditingHumanLoopStepCopy( humanLoopStepState );
 	const isConnectionDegraded = Boolean(
 		normalized.isConnectionDegraded ||
 			normalized.disposition ===
@@ -2043,6 +2049,11 @@ function getDistributedEditingEnabledShellState( sessionState ) {
 			authorityState: savePolicyState.saveButtonAuthorityState,
 			saveStateSummaryText: savePolicyState.saveButtonStateSummaryText,
 			authorityStatusText: savePolicyState.saveButtonAuthorityStatusText,
+			humanLoopStepState,
+			humanLoopStep: humanLoopStepState.step,
+			humanLoopAction: humanLoopStepState.action,
+			humanLoopTitle: humanLoopStepCopy.title,
+			humanLoopSummary: humanLoopStepCopy.summary,
 			message: __(
 				'Updates may be delayed. Local changes remain protected and exportable.'
 			),
@@ -2058,6 +2069,11 @@ function getDistributedEditingEnabledShellState( sessionState ) {
 			authorityState: savePolicyState.saveButtonAuthorityState,
 			saveStateSummaryText: savePolicyState.saveButtonStateSummaryText,
 			authorityStatusText: savePolicyState.saveButtonAuthorityStatusText,
+			humanLoopStepState,
+			humanLoopStep: humanLoopStepState.step,
+			humanLoopAction: humanLoopStepState.action,
+			humanLoopTitle: humanLoopStepCopy.title,
+			humanLoopSummary: humanLoopStepCopy.summary,
 			message: __(
 				'Local changes are protected and remain exportable while WordPress waits for server confirmation.'
 			),
@@ -2072,8 +2088,67 @@ function getDistributedEditingEnabledShellState( sessionState ) {
 		authorityState: savePolicyState.saveButtonAuthorityState,
 		saveStateSummaryText: savePolicyState.saveButtonStateSummaryText,
 		authorityStatusText: savePolicyState.saveButtonAuthorityStatusText,
+		humanLoopStepState,
+		humanLoopStep: humanLoopStepState.step,
+		humanLoopAction: humanLoopStepState.action,
+		humanLoopTitle: humanLoopStepCopy.title,
+		humanLoopSummary: humanLoopStepCopy.summary,
 		message: __(
 			'WordPress will protect local changes and show sync status here when review, refresh, or server confirmation is needed.'
+		),
+	};
+}
+
+function getDistributedEditingHumanLoopStepCopy( humanLoopStepState ) {
+	switch ( humanLoopStepState.step ) {
+		case DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.LOCAL_CHANGES_PROTECTED:
+			return {
+				title: __( 'Local changes protected' ),
+				summary: __(
+					'Keep editing. If server confirmation is delayed, export this session before closing the tab.'
+				),
+			};
+		case DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.GET_LATEST_POST:
+			return {
+				title: __( 'Get latest post' ),
+				summary: __(
+					'The server changed. Get the latest post before Save updates WordPress; local changes stay protected.'
+				),
+			};
+		case DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.REVIEW_CHANGES:
+			return {
+				title: __( 'Review changes' ),
+				summary: __(
+					'Save will open review before WordPress updates the post.'
+				),
+			};
+		case DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.READY_TO_SAVE:
+			return {
+				title: __( 'Ready to Save' ),
+				summary: __(
+					'Reviewed changes are ready. Use Save to ask WordPress to update the post.'
+				),
+			};
+		case DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.WAITING_FOR_WORDPRESS:
+			return {
+				title: __( 'Waiting for WordPress' ),
+				summary: __(
+					'Keep this tab open until WordPress confirms whether the post was updated.'
+				),
+			};
+		case DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.SAVE_CONFIRMED:
+			return {
+				title: __( 'Saved by WordPress' ),
+				summary: __(
+					'WordPress accepted the Distributed Editing Save. No protected local changes remain pending for this save.'
+				),
+			};
+	}
+
+	return {
+		title: __( 'Ready to edit' ),
+		summary: __(
+			'Edit normally. Distributed Editing will step in if review, refresh, or server confirmation is needed.'
 		),
 	};
 }
@@ -2124,6 +2199,12 @@ export function DistributedEditingEnabledShell( {
 			data-distributed-editing-server-contact={ shellState.serverContact }
 			data-distributed-editing-shell="enabled"
 			data-distributed-editing-shell-placement={ placement }
+			data-distributed-editing-human-loop-action={
+				shellState.humanLoopAction
+			}
+			data-distributed-editing-human-loop-step={
+				shellState.humanLoopStep
+			}
 			role="region"
 		>
 			<Notice
@@ -2140,6 +2221,31 @@ export function DistributedEditingEnabledShell( {
 				<div className="editor-distributed-editing-status__enabled-shell-authority-state">
 					<strong>{ __( 'WordPress post' ) }</strong>
 					<div>{ shellState.authorityStatusText }</div>
+				</div>
+				<div
+					className="editor-distributed-editing-status__enabled-shell-human-loop"
+					data-distributed-editing-human-loop-calls-normal-save="false"
+					data-distributed-editing-human-loop-calls-rest="false"
+					data-distributed-editing-human-loop-calls-retry-save="false"
+					data-distributed-editing-human-loop-changes-post-lock="false"
+					data-distributed-editing-human-loop-claims-saved-without-evidence={ formatDataBoolean(
+						shellState.humanLoopStepState.claimsSavedWithoutEvidence
+					) }
+					data-distributed-editing-human-loop-confirmed-by-wordpress={ formatDataBoolean(
+						shellState.humanLoopStepState.confirmedByWordPress
+					) }
+					data-distributed-editing-human-loop-descriptor-only="true"
+					data-distributed-editing-human-loop-exposes-proof-internals="false"
+					data-distributed-editing-human-loop-exposes-raw-content="false"
+					data-distributed-editing-human-loop-mutates-editor-content="false"
+					data-distributed-editing-human-loop-mutates-persisted-post-content="false"
+					data-distributed-editing-human-loop-step-status={
+						shellState.humanLoopStep
+					}
+				>
+					<strong>{ __( 'Current step' ) }</strong>
+					<div>{ shellState.humanLoopTitle }</div>
+					<div>{ shellState.humanLoopSummary }</div>
 				</div>
 				<DistributedEditingPresenceRoster
 					initialPresenceRoster={

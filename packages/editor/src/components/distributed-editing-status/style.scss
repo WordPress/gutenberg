@@ -9,6 +9,14 @@
 	padding: 0;
 }
 
+.editor-distributed-editing-status__enabled-shell-human-loop {
+	border-left: 3px solid var(--wp-admin-theme-color, #2271b1);
+	display: grid;
+	gap: 2px;
+	margin-top: $grid-unit-10;
+	padding-left: $grid-unit-10;
+}
+
 .editor-distributed-editing-status__presence-roster-item {
 	align-items: center;
 	background: $white;

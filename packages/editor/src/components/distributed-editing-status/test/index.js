@@ -1194,6 +1194,14 @@ describe( 'DistributedEditingStatus', () => {
 			'data-distributed-editing-authority-state',
 			'ready_to_update_authoritative_post'
 		);
+		expect( shell ).toHaveAttribute(
+			'data-distributed-editing-human-loop-step',
+			'ready_to_edit'
+		);
+		expect( shell ).toHaveAttribute(
+			'data-distributed-editing-human-loop-action',
+			'edit'
+		);
 		expect(
 			within( shell ).getByText( 'Distributed Editing enabled' )
 		).toBeVisible();
@@ -1212,6 +1220,33 @@ describe( 'DistributedEditingStatus', () => {
 				'Save can update the authoritative WordPress post.'
 			)
 		).toBeVisible();
+		expect( screen.getByText( 'Current step' ) ).toBeVisible();
+		expect( screen.getByText( 'Ready to edit' ) ).toBeVisible();
+		expect(
+			screen.getByText(
+				'Edit normally. Distributed Editing will step in if review, refresh, or server confirmation is needed.'
+			)
+		).toBeVisible();
+		const humanLoop = screen
+			.getByText( 'Current step' )
+			// eslint-disable-next-line testing-library/no-node-access
+			.closest( '[data-distributed-editing-human-loop-step-status]' );
+		expect( humanLoop ).toHaveAttribute(
+			'data-distributed-editing-human-loop-descriptor-only',
+			'true'
+		);
+		expect( humanLoop ).toHaveAttribute(
+			'data-distributed-editing-human-loop-calls-normal-save',
+			'false'
+		);
+		expect( humanLoop ).toHaveAttribute(
+			'data-distributed-editing-human-loop-calls-retry-save',
+			'false'
+		);
+		expect( humanLoop ).toHaveAttribute(
+			'data-distributed-editing-human-loop-claims-saved-without-evidence',
+			'false'
+		);
 		expect( screen.getByText( 'Editing now' ) ).toBeVisible();
 		expect( screen.getByText( 'No other editors shown.' ) ).toBeVisible();
 		expect(
@@ -5051,6 +5086,11 @@ describe( 'DistributedEditingStatus', () => {
 				'Updates may be delayed. Local changes remain protected and exportable.'
 			)
 		).toBeVisible();
+		expect( shell ).toHaveAttribute(
+			'data-distributed-editing-human-loop-step',
+			'local_changes_protected'
+		);
+		expect( screen.getByText( 'Local changes protected' ) ).toBeVisible();
 		expect( screen.getByText( 'Changes pending' ) ).toBeVisible();
 	} );
 
@@ -5092,6 +5132,14 @@ describe( 'DistributedEditingStatus', () => {
 			'data-distributed-editing-authority-state',
 			'review_required_before_update'
 		);
+		expect( shell ).toHaveAttribute(
+			'data-distributed-editing-human-loop-step',
+			'review_changes'
+		);
+		expect( shell ).toHaveAttribute(
+			'data-distributed-editing-human-loop-action',
+			'review_changes'
+		);
 		expect(
 			screen.getByText(
 				'Protected local changes need review before the authoritative post can update.'
@@ -5100,6 +5148,12 @@ describe( 'DistributedEditingStatus', () => {
 		expect(
 			screen.getByText(
 				'The authoritative WordPress post cannot be updated until risky changes are approved or removed.'
+			)
+		).toBeVisible();
+		expect( screen.getByText( 'Review changes' ) ).toBeVisible();
+		expect(
+			screen.getByText(
+				'Save will open review before WordPress updates the post.'
 			)
 		).toBeVisible();
 	} );

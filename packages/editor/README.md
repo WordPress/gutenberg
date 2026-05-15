@@ -340,6 +340,10 @@ Stable fresh-review retry-save handoff statuses. These describe only the editor-
 
 Stable fresh-review review-list statuses for future pre-publish UI.
 
+### DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS
+
+Stable M0 human-loop steps for the enabled editor shell. These are communication descriptors only; they do not save, fetch, submit proof, mutate content, or change post locks.
+
 ### DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES
 
 Stable no-write planning statuses for stale-base local rebase preparation.
@@ -869,6 +873,18 @@ _Parameters_
 _Returns_
 
 -   `Object`: Fresh-review retry-save handoff state.
+
+### getDistributedEditingHumanLoopStepStateForSessionState
+
+Returns the current M0 human-loop step for the normal enabled editor shell. This condenses the DE-RTC Save/review/recovery vocabulary into one human-facing next step without exposing proof internals or performing the action it names.
+
+_Parameters_
+
+-   _sessionState_ `Object`: DE-RTC session state.
+
+_Returns_
+
+-   `Object`: Human-loop step descriptor.
 
 ### getDistributedEditingLocalUpdatesExportPayload
 
