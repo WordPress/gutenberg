@@ -144,8 +144,6 @@ export function Draggable( {
 
 		cloneWrapper.classList.add( ...cloneWrapperClasses );
 
-		// Marks the in-slot case so the fallback `z-index` is skipped
-		// (see `style.module.scss`).
 		const inSlotClass = styles[ 'is-in-compat-slot' ];
 		if ( compatSlot && inSlotClass ) {
 			cloneWrapper.classList.add( inSlotClass );
