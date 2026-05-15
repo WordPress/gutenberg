@@ -8,14 +8,16 @@ import clsx from 'clsx';
  */
 import { BaseControl } from '@wordpress/components';
 import type { DataFormControlProps } from '@wordpress/dataviews';
-import { Stack, Text } from '@wordpress/ui';
+/* eslint-disable @wordpress/use-recommended-components */
+import { Button, Stack, Text } from '@wordpress/ui';
+/* eslint-enable @wordpress/use-recommended-components */
 
 /**
  * Internal dependencies
  */
 import type { WidgetGridSettings } from '../../../types';
-import { GridThumbnail } from './grid-thumbnail';
-import { MasonryThumbnail } from './masonry-thumbnail';
+import { GridThumbnail } from './thumbnail-grid';
+import { MasonryThumbnail } from './thumbnail-masonry';
 import styles from './style.module.css';
 
 function ModelThumbnail( {
@@ -65,10 +67,11 @@ export function LayoutModelEdit( {
 			>
 				{ elements.map( ( option ) => {
 					const isSelected = currentValue === option.value;
+
 					return (
-						<button
+						<Button
 							key={ String( option.value ) }
-							type="button"
+							variant="unstyled"
 							role="radio"
 							aria-checked={ isSelected }
 							className={ clsx( styles.option, {
@@ -88,7 +91,7 @@ export function LayoutModelEdit( {
 								className={ styles.thumbnail }
 							/>
 							<Text>{ option.label }</Text>
-						</button>
+						</Button>
 					);
 				} ) }
 			</Stack>

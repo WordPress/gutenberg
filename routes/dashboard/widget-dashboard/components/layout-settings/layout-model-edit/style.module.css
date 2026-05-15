@@ -1,9 +1,4 @@
 .option {
-	appearance: none;
-	background: transparent;
-	color: inherit;
-	font: inherit;
-	cursor: var(--wpds-cursor-control);
 	display: flex;
 	flex: 1;
 	flex-direction: column;
@@ -12,17 +7,15 @@
 	padding: var(--wpds-dimension-padding-md);
 	border: 1px solid var(--wpds-color-stroke-surface-neutral);
 	border-radius: var(--wpds-border-radius-md);
+	background: transparent;
+	color: inherit;
+	cursor: var(--wpds-cursor-control);
 	text-align: center;
 	transition: border-color 0.15s ease, background-color 0.15s ease;
 }
 
 .option:hover {
 	border-color: var(--wpds-color-stroke-surface-neutral-strong);
-}
-
-.option:focus-visible {
-	outline: var(--wpds-border-width-focus) solid var(--wpds-color-stroke-focus-brand);
-	outline-offset: 2px;
 }
 
 .optionSelected,
