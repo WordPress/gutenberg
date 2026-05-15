@@ -70,7 +70,7 @@ class Gutenberg_Guidelines_Access_Test extends WP_UnitTestCase {
 	 * Insert a guideline post owned by the named role.
 	 */
 	private function make_post( $owner_role, $status ) {
-		return wp_insert_post(
+		return self::factory()->post->create(
 			array(
 				'post_type'    => Gutenberg_Guidelines_Post_Type::POST_TYPE,
 				'post_status'  => $status,

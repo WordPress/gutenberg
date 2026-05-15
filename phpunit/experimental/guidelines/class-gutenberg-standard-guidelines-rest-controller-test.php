@@ -80,7 +80,7 @@ class Gutenberg_Standard_Guidelines_REST_Controller_Test extends WP_UnitTestCase
 	 * @return int Inserted guideline post ID.
 	 */
 	private function create_guideline( string $owner_role, string $status ): int {
-		$post_id = wp_insert_post(
+		return self::factory()->post->create(
 			array(
 				'post_type'    => Gutenberg_Guidelines_Post_Type::POST_TYPE,
 				'post_status'  => $status,
@@ -89,11 +89,6 @@ class Gutenberg_Standard_Guidelines_REST_Controller_Test extends WP_UnitTestCase
 				'post_author'  => self::$users[ $owner_role ],
 			)
 		);
-
-		$this->assertIsInt( $post_id );
-		$this->assertGreaterThan( 0, $post_id );
-
-		return $post_id;
 	}
 
 	/**
@@ -143,6 +138,38 @@ class Gutenberg_Standard_Guidelines_REST_Controller_Test extends WP_UnitTestCase
 		$terms = wp_get_object_terms( $data['id'], Gutenberg_Guidelines_Post_Type::TAXONOMY, array( 'fields' => 'slugs' ) );
 
 		$this->assertSame( array( 'artifact' ), $terms );
+	}
+
+	/**
+	 * A POST that explicitly supplies a `wp_guideline_type` term keeps that
+	 * term; the `artifact` fallback only applies when no term is given.
+	 */
+	public function test_create_guideline_preserves_explicit_type(): void {
+		$memory_term_id = self::factory()->term->create(
+			array(
+				'taxonomy' => Gutenberg_Guidelines_Post_Type::TAXONOMY,
+				'name'     => 'Memory',
+				'slug'     => 'memory',
+			)
+		);
+
+		$this->switch_to_user_role( 'administrator' );
+
+		$request = new WP_REST_Request( 'POST', self::REST_BASE );
+		$request->set_param( 'status', 'private' );
+		$request->set_param( 'title', 'Typed guideline' );
+		$request->set_param( Gutenberg_Guidelines_Post_Type::TAXONOMY, array( $memory_term_id ) );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertSame( 201, $response->get_status() );
+
+		$terms = wp_get_object_terms(
+			$response->get_data()['id'],
+			Gutenberg_Guidelines_Post_Type::TAXONOMY,
+			array( 'fields' => 'slugs' )
+		);
+
+		$this->assertSame( array( 'memory' ), $terms );
 	}
 
 	/**

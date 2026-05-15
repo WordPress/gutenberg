@@ -106,16 +106,13 @@ class Gutenberg_Guidelines_Post_Type_Test extends WP_UnitTestCase {
 	 * the save_post hook (replacement for default_term).
 	 */
 	public function test_save_post_assigns_artifact_fallback() {
-		$post_id = wp_insert_post(
+		$post_id = self::factory()->post->create(
 			array(
 				'post_type'   => Gutenberg_Guidelines_Post_Type::POST_TYPE,
 				'post_status' => 'draft',
 				'post_title'  => 'No-type guideline',
 			)
 		);
-
-		$this->assertIsInt( $post_id );
-		$this->assertGreaterThan( 0, $post_id );
 
 		$terms = wp_get_object_terms( $post_id, Gutenberg_Guidelines_Post_Type::TAXONOMY );
 		$this->assertCount( 1, $terms );
@@ -131,13 +128,13 @@ class Gutenberg_Guidelines_Post_Type_Test extends WP_UnitTestCase {
 	public function test_save_post_preserves_explicit_term() {
 		wp_set_current_user( self::$admin_id );
 
-		$inserted = wp_insert_term(
-			'Content',
-			Gutenberg_Guidelines_Post_Type::TAXONOMY,
-			array( 'slug' => Gutenberg_Guidelines_Post_Type::TERM_CONTENT )
+		$content_term_id = self::factory()->term->create(
+			array(
+				'taxonomy' => Gutenberg_Guidelines_Post_Type::TAXONOMY,
+				'name'     => 'Content',
+				'slug'     => Gutenberg_Guidelines_Post_Type::TERM_CONTENT,
+			)
 		);
-		$this->assertNotWPError( $inserted );
-		$content_term_id = (int) $inserted['term_id'];
 
 		$post_id = wp_insert_post(
 			array(
@@ -165,13 +162,13 @@ class Gutenberg_Guidelines_Post_Type_Test extends WP_UnitTestCase {
 	public function test_save_post_preserves_term_on_update() {
 		wp_set_current_user( self::$admin_id );
 
-		$inserted = wp_insert_term(
-			'Content',
-			Gutenberg_Guidelines_Post_Type::TAXONOMY,
-			array( 'slug' => Gutenberg_Guidelines_Post_Type::TERM_CONTENT )
+		$content_term_id = self::factory()->term->create(
+			array(
+				'taxonomy' => Gutenberg_Guidelines_Post_Type::TAXONOMY,
+				'name'     => 'Content',
+				'slug'     => Gutenberg_Guidelines_Post_Type::TERM_CONTENT,
+			)
 		);
-		$this->assertNotWPError( $inserted );
-		$content_term_id = (int) $inserted['term_id'];
 
 		$post_id = wp_insert_post(
 			array(
@@ -204,7 +201,7 @@ class Gutenberg_Guidelines_Post_Type_Test extends WP_UnitTestCase {
 	public function test_save_post_skips_revisions() {
 		wp_set_current_user( self::$admin_id );
 
-		$post_id = wp_insert_post(
+		$post_id = self::factory()->post->create(
 			array(
 				'post_type'   => Gutenberg_Guidelines_Post_Type::POST_TYPE,
 				'post_status' => 'draft',

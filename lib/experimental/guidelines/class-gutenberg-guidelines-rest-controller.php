@@ -102,6 +102,9 @@ class Gutenberg_Guidelines_REST_Controller extends WP_REST_Posts_Controller {
 	 * (the parent would fall back to `draft`). Updates pass through so a
 	 * partial PATCH preserves the existing status.
 	 *
+	 * `wp_guideline_type` is optional on create. When omitted, the post
+	 * falls back to the default guideline taxonomy term `artifact`.
+	 *
 	 * @param WP_REST_Request $request Request object.
 	 * @return stdClass|WP_Error Prepared post object or error.
 	 */

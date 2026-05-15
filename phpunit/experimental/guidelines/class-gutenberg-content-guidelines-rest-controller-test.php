@@ -443,14 +443,15 @@ class Gutenberg_Content_Guidelines_REST_Controller_Test extends WP_Test_REST_Pos
 	 * @return int Post ID.
 	 */
 	private function create_artifact_post() {
-		$inserted         = wp_insert_term(
-			'Artifact',
-			Gutenberg_Guidelines_Post_Type::TAXONOMY,
-			array( 'slug' => 'artifact' )
+		$artifact_term_id = self::factory()->term->create(
+			array(
+				'taxonomy' => Gutenberg_Guidelines_Post_Type::TAXONOMY,
+				'name'     => 'Artifact',
+				'slug'     => 'artifact',
+			)
 		);
-		$artifact_term_id = is_wp_error( $inserted ) ? (int) $inserted->get_error_data()['term_id'] : (int) $inserted['term_id'];
 
-		$post_id = wp_insert_post(
+		$post_id = self::factory()->post->create(
 			array(
 				'post_type'   => Gutenberg_Guidelines_Post_Type::POST_TYPE,
 				'post_status' => 'draft',
