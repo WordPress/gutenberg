@@ -119,7 +119,7 @@ const embeddedContentSchema = {
 	},
 };
 
-const excludedElements = [ '#text', 'br' ];
+const excludedElements = [ '#text', 'br', 'wbr' ];
 
 // Wire up children for each text-level wrapper.
 // - Recursion is needed (e.g. strong > em > strong; not strong > strong).
