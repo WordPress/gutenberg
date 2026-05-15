@@ -703,6 +703,9 @@ function LinkControl( {
 							hideLabelFromVision={ ! showTextControl }
 							isEntity={ isEntity }
 							customValidity={ customValidity }
+							tabs={ tabs }
+							showTabs={ showTabs }
+							tabClassName="block-editor-tab-control__field"
 							suffix={
 								<SearchSuffixControl
 									isEntity={ isEntity }
