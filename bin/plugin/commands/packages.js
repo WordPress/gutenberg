@@ -459,12 +459,34 @@ async function publishPackagesToNpm( {
 			);
 		}
 
+		// Retry the push so a transient network/auth blip between a successful
+		// publish and a failed push doesn't leave npm-published versions
+		// without their tags on origin. The push is idempotent: tags already
+		// present on origin (same SHA) are a no-op.
 		log( '>> Pushing version commit and tags to remote.' );
-		await SimpleGit( gitWorkingDirectoryPath ).push(
-			'origin',
-			npmReleaseBranch,
-			[ '--follow-tags' ]
-		);
+		const maxPushAttempts = 3;
+		for ( let attempt = 1; ; attempt++ ) {
+			try {
+				await SimpleGit( gitWorkingDirectoryPath ).push(
+					'origin',
+					npmReleaseBranch,
+					[ '--follow-tags' ]
+				);
+				break;
+			} catch ( err ) {
+				if ( attempt >= maxPushAttempts ) {
+					throw err;
+				}
+				log(
+					`>> Push failed (attempt ${ attempt }/${ maxPushAttempts }), retrying in ${
+						attempt * 5
+					}s…`
+				);
+				await new Promise( ( resolve ) =>
+					setTimeout( resolve, attempt * 5000 )
+				);
+			}
+		}
 	}
 
 	const afterCommitHash = await SimpleGit( gitWorkingDirectoryPath ).revparse(
