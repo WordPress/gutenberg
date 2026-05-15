@@ -7,7 +7,11 @@
 	color: inherit;
 	cursor: var(--wpds-cursor-control);
 	text-align: center;
-	transition: border-color 0.15s ease, background-color 0.15s ease;
+	transition:
+		border-color var(--wpds-motion-duration-sm)
+			var(--wpds-motion-easing-subtle),
+		background-color var(--wpds-motion-duration-sm)
+			var(--wpds-motion-easing-subtle);
 }
 
 .option:hover {
