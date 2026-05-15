@@ -131,11 +131,13 @@ class Gutenberg_Guidelines_Post_Type_Test extends WP_UnitTestCase {
 	public function test_save_post_preserves_explicit_term() {
 		wp_set_current_user( self::$admin_id );
 
-		$content_term_id = Gutenberg_Guidelines_Post_Type::get_or_create_term_id(
-			Gutenberg_Guidelines_Post_Type::TERM_CONTENT,
-			'Content'
+		$inserted = wp_insert_term(
+			'Content',
+			Gutenberg_Guidelines_Post_Type::TAXONOMY,
+			array( 'slug' => Gutenberg_Guidelines_Post_Type::TERM_CONTENT )
 		);
-		$this->assertIsInt( $content_term_id );
+		$this->assertNotWPError( $inserted );
+		$content_term_id = (int) $inserted['term_id'];
 
 		$post_id = wp_insert_post(
 			array(
@@ -163,10 +165,13 @@ class Gutenberg_Guidelines_Post_Type_Test extends WP_UnitTestCase {
 	public function test_save_post_preserves_term_on_update() {
 		wp_set_current_user( self::$admin_id );
 
-		$content_term_id = Gutenberg_Guidelines_Post_Type::get_or_create_term_id(
-			Gutenberg_Guidelines_Post_Type::TERM_CONTENT,
-			'Content'
+		$inserted = wp_insert_term(
+			'Content',
+			Gutenberg_Guidelines_Post_Type::TAXONOMY,
+			array( 'slug' => Gutenberg_Guidelines_Post_Type::TERM_CONTENT )
 		);
+		$this->assertNotWPError( $inserted );
+		$content_term_id = (int) $inserted['term_id'];
 
 		$post_id = wp_insert_post(
 			array(

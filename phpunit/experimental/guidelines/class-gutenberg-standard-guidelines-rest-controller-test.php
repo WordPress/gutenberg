@@ -77,10 +77,10 @@ class Gutenberg_Standard_Guidelines_REST_Controller_Test extends WP_UnitTestCase
 	 *
 	 * @param string $owner_role Role key from the self::$users fixture map.
 	 * @param string $status     Post status for the guideline fixture.
-	 * @return int Inserted guideline post ID, or 0 on failure.
+	 * @return int Inserted guideline post ID.
 	 */
 	private function create_guideline( string $owner_role, string $status ): int {
-		return wp_insert_post(
+		$post_id = wp_insert_post(
 			array(
 				'post_type'    => Gutenberg_Guidelines_Post_Type::POST_TYPE,
 				'post_status'  => $status,
@@ -89,6 +89,11 @@ class Gutenberg_Standard_Guidelines_REST_Controller_Test extends WP_UnitTestCase
 				'post_author'  => self::$users[ $owner_role ],
 			)
 		);
+
+		$this->assertIsInt( $post_id );
+		$this->assertGreaterThan( 0, $post_id );
+
+		return $post_id;
 	}
 
 	/**
