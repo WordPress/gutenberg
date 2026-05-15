@@ -211,4 +211,32 @@ describe( 'Select', () => {
 			);
 		} );
 	} );
+
+	describe( 'positioner', () => {
+		it( 'should render the custom positioner element wrapping the popup content', async () => {
+			const user = userEvent.setup();
+
+			render(
+				<Select.Root>
+					<Select.Trigger />
+					<Select.Popup
+						positioner={
+							<Select.Positioner data-testid="custom-positioner" />
+						}
+					>
+						<Select.Item value="Item 1">Item 1</Select.Item>
+					</Select.Popup>
+				</Select.Root>
+			);
+
+			await user.click( screen.getByRole( 'combobox' ) );
+
+			const item = await screen.findByRole( 'option', {
+				name: 'Item 1',
+			} );
+			const positioner = screen.getByTestId( 'custom-positioner' );
+
+			expect( positioner ).toContainElement( item );
+		} );
+	} );
 } );

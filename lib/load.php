@@ -205,6 +205,7 @@ require __DIR__ . '/block-supports/aria-label.php';
 require __DIR__ . '/block-supports/anchor.php';
 require __DIR__ . '/block-supports/block-visibility.php';
 require __DIR__ . '/block-supports/custom-css.php';
+require __DIR__ . '/block-supports/states.php';
 
 // Client-side media processing.
 require_once __DIR__ . '/media/load.php';

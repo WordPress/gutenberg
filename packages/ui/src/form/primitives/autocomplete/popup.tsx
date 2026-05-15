@@ -8,35 +8,31 @@ import {
 import { unlock } from '../../../lock-unlock';
 import { renderSlotWithChildren } from '../../../utils/render-slot-with-children';
 import itemPopupStyles from '../../../utils/css/item-popup.module.css';
-import resetStyles from '../../../utils/css/resets.module.css';
-import styles from './style.module.css';
 import { Portal } from './portal';
+import { Positioner } from './positioner';
 import type { AutocompletePopupProps } from './types';
-import { ITEM_POPUP_POSITIONER_PROPS } from '../constants';
 
 const ThemeProvider: typeof ThemeProviderType =
 	unlock( themePrivateApis ).ThemeProvider;
 
 export const Popup = forwardRef< HTMLDivElement, AutocompletePopupProps >(
-	function Popup( { className, portal, ...restProps }, ref ) {
-		const portalChildren = (
-			<_Autocomplete.Positioner
-				{ ...ITEM_POPUP_POSITIONER_PROPS }
-				className={ clsx(
-					resetStyles[ 'box-sizing' ],
-					styles.positioner
-				) }
-			>
-				<ThemeProvider>
-					<_Autocomplete.Popup
-						ref={ ref }
-						className={ clsx( itemPopupStyles.popup, className ) }
-						{ ...restProps }
-					/>
-				</ThemeProvider>
-			</_Autocomplete.Positioner>
+	function Popup( { className, portal, positioner, ...restProps }, ref ) {
+		const popupContent = (
+			<ThemeProvider>
+				<_Autocomplete.Popup
+					ref={ ref }
+					className={ clsx( itemPopupStyles.popup, className ) }
+					{ ...restProps }
+				/>
+			</ThemeProvider>
 		);
 
-		return renderSlotWithChildren( portal, <Portal />, portalChildren );
+		const positionedPopup = renderSlotWithChildren(
+			positioner,
+			<Positioner />,
+			popupContent
+		);
+
+		return renderSlotWithChildren( portal, <Portal />, positionedPopup );
 	}
 );

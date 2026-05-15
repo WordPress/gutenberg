@@ -288,7 +288,7 @@ export function RectangleStencil( {
 			el.addEventListener( 'pointerup', onEnd );
 			el.addEventListener( 'lostpointercapture', onEnd );
 
-			onResizeStart?.();
+			onResizeStart?.( handle );
 			// Cancel any pending keyboard settle so it can't fire onResizeEnd
 			// mid-drag if the user switches from keyboard to pointer within
 			// the settle window.
@@ -392,7 +392,7 @@ export function RectangleStencil( {
 
 			if ( ! keyboardResizeActiveRef.current ) {
 				keyboardResizeActiveRef.current = true;
-				onResizeStart?.();
+				onResizeStart?.( handle );
 			}
 
 			const scheduleKeyboardResizeEnd = () => {

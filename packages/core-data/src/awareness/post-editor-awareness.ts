@@ -28,9 +28,9 @@ import {
 	areSelectionsStatesEqual,
 	getSelectionState,
 	SelectionType,
+	SelectionDirection,
 } from '../utils/crdt-user-selections';
 
-import { SelectionDirection } from '../types';
 import type {
 	ResolvedSelection,
 	SelectionState,
