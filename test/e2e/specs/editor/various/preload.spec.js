@@ -8,7 +8,13 @@ test.describe( 'Preload', () => {
 		page,
 		admin,
 		editor,
+		requestUtils,
 	} ) => {
+		const { id: postId } = await requestUtils.createPost( {
+			content: '<!-- wp:paragraph --><p>Hello</p><!-- /wp:paragraph -->',
+			status: 'draft',
+		} );
+
 		const requests = [];
 
 		function onRequest( request ) {
@@ -19,14 +25,20 @@ test.describe( 'Preload', () => {
 			const restRoute =
 				urlObject.searchParams.get( 'rest_route' ) ??
 				urlObject.pathname.replace( /^\/wp-json/, '' );
-			requests.push( `${ request.method() } ${ restRoute }` );
+			// `_locale` is added uniformly to every apiFetch call and
+			// carries no signal here.
+			urlObject.searchParams.delete( '_locale' );
+			const query = urlObject.searchParams.toString();
+			requests.push(
+				`${ request.method() } ${ restRoute }${
+					query ? `?${ query }` : ''
+				}`
+			);
 		}
 
 		page.on( 'request', onRequest );
 
-		await admin.createNewPost( {
-			content: '<!-- wp:paragraph --><p>Hello</p><!-- /wp:paragraph -->',
-		} );
+		await admin.editPost( postId );
 		// Ensure the document sidebar is open — its default state isn't
 		// stable across environments (CI vs. local). Several of the routes
 		// asserted below are fired by panels inside the sidebar (post
@@ -45,20 +57,21 @@ test.describe( 'Preload', () => {
 		await page.waitForLoadState( 'networkidle' );
 		page.off( 'request', onRequest );
 
-		// Some routes are requested more than once across the captured
-		// window because of resolver races (e.g. `GET /wp/v2/templates/lookup`,
-		// `POST /wp/v2/users/me`); the duplicate counts are not stable
-		// across runs, so this assertion deduplicates.
+		// Some routes may be requested more than once across the captured
+		// window because of resolver races; the duplicate counts are not
+		// stable across runs, so this assertion deduplicates.
 		// To do: these should all be removed or preloaded.
 		expect( Array.from( new Set( requests ) ).sort() ).toEqual(
 			[
-				'GET /wp/v2/comments',
-				'GET /wp/v2/taxonomies',
-				'GET /wp/v2/templates/lookup',
-				'GET /wp/v2/users/1',
-				'GET /wp/v2/wp_pattern_category',
+				`GET /wp/v2/comments?context=edit&post=${ postId }&type=note&status=all&per_page=100`,
+				'GET /wp/v2/taxonomies?context=edit&per_page=100',
+				'GET /wp/v2/taxonomies?context=view',
+				'GET /wp/v2/templates/lookup?slug=single-post',
+				'GET /wp/v2/users/1?context=view&_fields=id%2Cname',
+				'GET /wp/v2/wp_pattern_category?context=view&per_page=100&_fields=id%2Cname%2Cdescription%2Cslug',
 				'OPTIONS /wp/v2/posts',
 				'OPTIONS /wp/v2/settings',
+				`POST /wp/v2/posts/${ postId }`,
 				'POST /wp-sync/v1/updates',
 				'POST /wp/v2/users/me',
 			].sort()
