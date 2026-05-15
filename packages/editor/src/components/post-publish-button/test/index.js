@@ -275,6 +275,12 @@ describe( 'PostPublishButton', () => {
 					title: 'Save is available',
 					summary:
 						'Use Save when you are ready for WordPress to update this post.',
+					statusChromeSummary:
+						'Save can update the authoritative WordPress post.',
+					statusChromeAuthorityState:
+						'ready_to_update_authoritative_post',
+					statusChromeAuthorityText:
+						'Save can update the authoritative WordPress post.',
 					claimsSavedWithoutEvidence: false,
 				} }
 			/>
@@ -285,7 +291,7 @@ describe( 'PostPublishButton', () => {
 		} );
 		expect( button ).toHaveAttribute(
 			'title',
-			'Use Save when you are ready for WordPress to update this post.'
+			'Use Save when you are ready for WordPress to update this post. Save can update the authoritative WordPress post.'
 		);
 		expect( button ).toHaveAttribute(
 			'data-distributed-editing-save-control-journey-step',
@@ -337,7 +343,7 @@ describe( 'PostPublishButton', () => {
 		);
 		const cueLabel = screen.getByText( 'Save is available' );
 		const cue = screen.getByLabelText(
-			'Use Save when you are ready for WordPress to update this post.'
+			'Use Save when you are ready for WordPress to update this post. Save can update the authoritative WordPress post.'
 		);
 		expect( cueLabel ).toBeVisible();
 		expect( cue ).toHaveAttribute(
@@ -362,11 +368,23 @@ describe( 'PostPublishButton', () => {
 		);
 		expect( cue ).toHaveAttribute(
 			'title',
-			'Use Save when you are ready for WordPress to update this post.'
+			'Use Save when you are ready for WordPress to update this post. Save can update the authoritative WordPress post.'
 		);
 		expect( cue ).toHaveAttribute(
 			'aria-label',
-			'Use Save when you are ready for WordPress to update this post.'
+			'Use Save when you are ready for WordPress to update this post. Save can update the authoritative WordPress post.'
+		);
+		expect( cue ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-status-summary',
+			'Save can update the authoritative WordPress post.'
+		);
+		expect( cue ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-authority-state',
+			'ready_to_update_authoritative_post'
+		);
+		expect( cue ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-authority-summary',
+			'Save can update the authoritative WordPress post.'
 		);
 		expect( cue ).toHaveAttribute(
 			'data-distributed-editing-save-control-journey-calls-normal-save',
@@ -414,6 +432,11 @@ describe( 'PostPublishButton', () => {
 					title: 'Save opens review',
 					summary:
 						'Review highlighted changes before WordPress updates the post.',
+					statusChromeSummary:
+						'Protected local changes need review before the authoritative post can update.',
+					statusChromeAuthorityState: 'review_required_before_update',
+					statusChromeAuthorityText:
+						'The authoritative WordPress post cannot be updated until risky changes are approved or removed.',
 					claimsSavedWithoutEvidence: false,
 				} }
 			/>
@@ -424,7 +447,7 @@ describe( 'PostPublishButton', () => {
 		} );
 		expect( button ).toHaveAttribute(
 			'title',
-			'Review highlighted changes before WordPress updates the post.'
+			'Review highlighted changes before WordPress updates the post. Protected local changes need review before the authoritative post can update.'
 		);
 		expect( button ).toHaveAttribute(
 			'data-distributed-editing-save-button-status',
@@ -452,7 +475,7 @@ describe( 'PostPublishButton', () => {
 		);
 		const cueLabel = screen.getByText( 'Save opens review' );
 		const cue = screen.getByLabelText(
-			'Review highlighted changes before WordPress updates the post.'
+			'Review highlighted changes before WordPress updates the post. Protected local changes need review before the authoritative post can update.'
 		);
 		expect( cueLabel ).toBeVisible();
 		expect( cue ).toHaveAttribute(
@@ -465,11 +488,23 @@ describe( 'PostPublishButton', () => {
 		);
 		expect( cue ).toHaveAttribute(
 			'title',
-			'Review highlighted changes before WordPress updates the post.'
+			'Review highlighted changes before WordPress updates the post. Protected local changes need review before the authoritative post can update.'
 		);
 		expect( cue ).toHaveAttribute(
 			'aria-label',
-			'Review highlighted changes before WordPress updates the post.'
+			'Review highlighted changes before WordPress updates the post. Protected local changes need review before the authoritative post can update.'
+		);
+		expect( cue ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-status-summary',
+			'Protected local changes need review before the authoritative post can update.'
+		);
+		expect( cue ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-authority-state',
+			'review_required_before_update'
+		);
+		expect( cue ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-authority-summary',
+			'The authoritative WordPress post cannot be updated until risky changes are approved or removed.'
 		);
 		expect( cue ).toHaveAttribute(
 			'data-distributed-editing-save-control-journey-step',

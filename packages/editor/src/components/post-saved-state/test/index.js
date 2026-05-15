@@ -223,6 +223,12 @@ describe( 'PostSavedState', () => {
 				action: 'edit',
 				summary:
 					'Use Save when you are ready for WordPress to update this post.',
+				statusChromeSummary:
+					'Save can update the authoritative WordPress post.',
+				statusChromeAuthorityState:
+					'ready_to_update_authoritative_post',
+				statusChromeAuthorityText:
+					'Save can update the authoritative WordPress post.',
 				claimsSavedWithoutEvidence: false,
 			},
 		} ) );
@@ -232,7 +238,7 @@ describe( 'PostSavedState', () => {
 		const button = screen.getByRole( 'button', { name: 'Save draft' } );
 		expect( button ).toHaveAttribute(
 			'title',
-			'Use Save when you are ready for WordPress to update this post.'
+			'Use Save when you are ready for WordPress to update this post. Save can update the authoritative WordPress post.'
 		);
 		expect( button ).toHaveAttribute(
 			'data-distributed-editing-save-control-journey-step',
@@ -241,6 +247,18 @@ describe( 'PostSavedState', () => {
 		expect( button ).toHaveAttribute(
 			'data-distributed-editing-save-control-journey-action',
 			'edit'
+		);
+		expect( button ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-status-summary',
+			'Save can update the authoritative WordPress post.'
+		);
+		expect( button ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-authority-state',
+			'ready_to_update_authoritative_post'
+		);
+		expect( button ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-authority-summary',
+			'Save can update the authoritative WordPress post.'
 		);
 		expect( button ).toHaveAttribute(
 			'data-distributed-editing-save-control-journey-descriptor-only',

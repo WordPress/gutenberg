@@ -24,7 +24,10 @@ import { store as preferencesStore } from '@wordpress/preferences';
 import { STATUS_OPTIONS } from '../../components/post-status';
 import { store as editorStore } from '../../store';
 import { ATTACHMENT_POST_TYPE } from '../../store/constants';
-import { getDistributedEditingSaveJourneyDataAttributes } from '../distributed-editing-save-journey-cue';
+import {
+	getDistributedEditingSaveJourneyDataAttributes,
+	getDistributedEditingSaveJourneyTitle,
+} from '../distributed-editing-save-journey-cue';
 
 /**
  * Component showing whether the post is saved or not and providing save
@@ -217,7 +220,9 @@ export default function PostSavedState( { forceIsDirty } ) {
 		: isSaving || isSaved || ! isSaveable || isSavingLocked;
 	let buttonTitle;
 	if ( hasDistributedEditingSaveJourneyState ) {
-		buttonTitle = distributedEditingSaveJourneyState.summary;
+		buttonTitle = getDistributedEditingSaveJourneyTitle(
+			distributedEditingSaveJourneyState
+		);
 	} else if ( hasDistributedEditingSaveButtonState ) {
 		buttonTitle = distributedEditingSaveButtonState.statusText;
 	}

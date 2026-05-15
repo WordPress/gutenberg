@@ -1243,6 +1243,18 @@ describe( 'DistributedEditingStatus', () => {
 			'ready_to_edit'
 		);
 		expect( saveJourney ).toHaveAttribute(
+			'data-distributed-editing-save-journey-status-summary',
+			'Save can update the authoritative WordPress post.'
+		);
+		expect( saveJourney ).toHaveAttribute(
+			'data-distributed-editing-save-journey-authority-state',
+			'ready_to_update_authoritative_post'
+		);
+		expect( saveJourney ).toHaveAttribute(
+			'data-distributed-editing-save-journey-authority-summary',
+			'Save can update the authoritative WordPress post.'
+		);
+		expect( saveJourney ).toHaveAttribute(
 			'data-distributed-editing-save-journey-descriptor-only',
 			'true'
 		);
@@ -5192,6 +5204,26 @@ describe( 'DistributedEditingStatus', () => {
 				'Review highlighted changes before WordPress updates the post.'
 			)
 		).toBeVisible();
+		const saveJourney = screen
+			.getByText( 'Save' )
+			// eslint-disable-next-line testing-library/no-node-access
+			.closest( '[data-distributed-editing-save-journey-status]' );
+		expect( saveJourney ).toHaveAttribute(
+			'data-distributed-editing-save-journey-status',
+			'review_changes'
+		);
+		expect( saveJourney ).toHaveAttribute(
+			'data-distributed-editing-save-journey-status-summary',
+			'Protected local changes need review before the authoritative post can update.'
+		);
+		expect( saveJourney ).toHaveAttribute(
+			'data-distributed-editing-save-journey-authority-state',
+			'review_required_before_update'
+		);
+		expect( saveJourney ).toHaveAttribute(
+			'data-distributed-editing-save-journey-authority-summary',
+			'The authoritative WordPress post cannot be updated until risky changes are approved or removed.'
+		);
 	} );
 
 	it( 'imports pasted protected local updates from production editor chrome without saving', async () => {

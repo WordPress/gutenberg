@@ -13,6 +13,7 @@ import PublishButtonLabel from './label';
 import { store as editorStore } from '../../store';
 import DistributedEditingSaveJourneyCue, {
 	getDistributedEditingSaveJourneyDataAttributes,
+	getDistributedEditingSaveJourneyTitle,
 } from '../distributed-editing-save-journey-cue';
 
 const noop = () => {};
@@ -166,7 +167,9 @@ export class PostPublishButton extends Component {
 			);
 		const distributedEditingSaveControlTitle =
 			hasDistributedEditingSaveJourneyState
-				? distributedEditingSaveJourneyState.summary
+				? getDistributedEditingSaveJourneyTitle(
+						distributedEditingSaveJourneyState
+				  )
 				: distributedEditingSaveButtonStatusText;
 
 		const isButtonDisabled =

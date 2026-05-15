@@ -15,6 +15,10 @@ export function getDistributedEditingSaveJourneyDataAttributes(
 			saveJourneyState.step,
 		'data-distributed-editing-save-control-journey-action':
 			saveJourneyState.action,
+		'data-distributed-editing-save-control-journey-authority-state':
+			saveJourneyState.statusChromeAuthorityState,
+		'data-distributed-editing-save-control-journey-authority-summary':
+			saveJourneyState.statusChromeAuthorityText,
 		'data-distributed-editing-save-control-journey-descriptor-only': 'true',
 		'data-distributed-editing-save-control-journey-calls-normal-save':
 			'false',
@@ -33,7 +37,24 @@ export function getDistributedEditingSaveJourneyDataAttributes(
 			'false',
 		'data-distributed-editing-save-control-journey-mutates-persisted-post-content':
 			'false',
+		'data-distributed-editing-save-control-journey-status-summary':
+			saveJourneyState.statusChromeSummary,
 	};
+}
+
+export function getDistributedEditingSaveJourneyTitle( saveJourneyState ) {
+	if ( ! saveJourneyState?.shouldExposeInSaveControls ) {
+		return undefined;
+	}
+
+	const summary = saveJourneyState.summary || '';
+	const statusSummary = saveJourneyState.statusChromeSummary || '';
+
+	if ( ! summary || ! statusSummary || summary.includes( statusSummary ) ) {
+		return summary || statusSummary || undefined;
+	}
+
+	return `${ summary } ${ statusSummary }`;
 }
 
 export default function DistributedEditingSaveJourneyCue( {
@@ -44,12 +65,15 @@ export default function DistributedEditingSaveJourneyCue( {
 		return null;
 	}
 
+	const saveJourneyTitle =
+		getDistributedEditingSaveJourneyTitle( saveJourneyState );
+
 	return (
 		<span
 			{ ...getDistributedEditingSaveJourneyDataAttributes(
 				saveJourneyState
 			) }
-			aria-label={ saveJourneyState.summary }
+			aria-label={ saveJourneyTitle }
 			className={ clsx(
 				'editor-distributed-editing-save-journey-cue',
 				className
@@ -59,7 +83,7 @@ export default function DistributedEditingSaveJourneyCue( {
 			data-distributed-editing-save-control-journey-title={
 				saveJourneyState.title
 			}
-			title={ saveJourneyState.summary }
+			title={ saveJourneyTitle }
 		>
 			<span
 				aria-hidden="true"

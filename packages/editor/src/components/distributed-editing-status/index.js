@@ -2288,6 +2288,12 @@ export function DistributedEditingEnabledShell( {
 					data-distributed-editing-save-journey-calls-rest="false"
 					data-distributed-editing-save-journey-calls-retry-save="false"
 					data-distributed-editing-save-journey-changes-post-lock="false"
+					data-distributed-editing-save-journey-authority-state={
+						shellState.authorityState
+					}
+					data-distributed-editing-save-journey-authority-summary={
+						shellState.authorityStatusText
+					}
 					data-distributed-editing-save-journey-claims-saved-without-evidence={ formatDataBoolean(
 						shellState.humanLoopStepState.claimsSavedWithoutEvidence
 					) }
@@ -2298,6 +2304,9 @@ export function DistributedEditingEnabledShell( {
 					data-distributed-editing-save-journey-mutates-persisted-post-content="false"
 					data-distributed-editing-save-journey-status={
 						shellState.humanLoopStep
+					}
+					data-distributed-editing-save-journey-status-summary={
+						shellState.saveStateSummaryText
 					}
 				>
 					<strong>{ __( 'Save' ) }</strong>

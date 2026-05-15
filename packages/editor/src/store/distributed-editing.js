@@ -10162,7 +10162,7 @@ function getDistributedEditingSaveStateVocabulary( {
 		reviewCheckpointText = 'Review is accepted for the guarded Save path.';
 	}
 
-	let summaryText = 'Save can update the authoritative post.';
+	let summaryText = 'Save can update the authoritative WordPress post.';
 
 	if ( authoritativePostUpdated ) {
 		summaryText =
@@ -10605,6 +10605,8 @@ export function getDistributedEditingHumanLoopStepStateForSessionState(
 		saveButtonDisabled: saveButton.disabled,
 		saveButtonBusy: saveButton.busy,
 		saveButtonBlocksNormalSavePost: saveButton.blocksNormalSavePost,
+		saveButtonStateSummaryText: saveButton.saveStateSummaryText,
+		saveButtonAuthorityStatusText: saveButton.authorityStatusText,
 		saveAuthorityState: saveButton.authorityState,
 		savePolicyAction: saveButton.clickAction,
 		hasProtectedLocalChanges,
@@ -10703,6 +10705,9 @@ export function getDistributedEditingSaveJourneyStateForSessionState(
 		saveButtonLabel: humanLoopStep.saveButtonLabel,
 		saveButtonDisabled: humanLoopStep.saveButtonDisabled,
 		saveButtonBusy: humanLoopStep.saveButtonBusy,
+		statusChromeSummary: humanLoopStep.saveButtonStateSummaryText,
+		statusChromeAuthorityState: humanLoopStep.saveAuthorityState,
+		statusChromeAuthorityText: humanLoopStep.saveButtonAuthorityStatusText,
 		saveButtonBlocksNormalSavePost:
 			humanLoopStep.saveButtonBlocksNormalSavePost,
 		confirmedByWordPress: humanLoopStep.confirmedByWordPress,

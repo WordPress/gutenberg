@@ -7574,6 +7574,9 @@ describe( 'distributed editing session state', () => {
 				saveButtonLabel: currentCase.saveButtonLabel,
 				saveButtonDisabled: Boolean( currentCase.saveButtonDisabled ),
 				saveButtonBusy: Boolean( currentCase.saveButtonBusy ),
+				statusChromeSummary: expect.any( String ),
+				statusChromeAuthorityState: expect.any( String ),
+				statusChromeAuthorityText: expect.any( String ),
 				saveButtonBlocksNormalSavePost: Boolean(
 					currentCase.saveButtonBlocksNormalSavePost
 				),
@@ -7617,6 +7620,12 @@ describe( 'distributed editing session state', () => {
 			step: DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.REVIEW_CHANGES,
 			action: 'review_changes',
 			title: 'Save opens review',
+			statusChromeSummary:
+				'Protected local changes need review before the authoritative post can update.',
+			statusChromeAuthorityState:
+				DISTRIBUTED_EDITING_SAVE_AUTHORITY_STATES.REVIEW_REQUIRED_BEFORE_UPDATE,
+			statusChromeAuthorityText:
+				'The authoritative WordPress post cannot be updated until risky changes are approved or removed.',
 		} );
 
 		expect(
