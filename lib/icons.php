@@ -1,6 +1,6 @@
 <?php
 /**
- * Icon rendering helper functions for WordPress 7.0.
+ * Icon rendering helper functions.
  *
  * @package gutenberg
  */
@@ -9,18 +9,15 @@ if ( ! function_exists( 'wp_icon' ) ) {
 	/**
 	 * Returns the SVG markup for a registered icon.
 	 *
-	 * @since 7.0.0
-	 *
 	 * @param string $name The icon slug (e.g. 'plus', 'arrow-down').
 	 * @param array  $args {
 	 *     Optional. Arguments for the icon.
 	 *
-	 *     @type int        $size         Width and height in pixels. Default 24.
-	 *     @type string     $class        Additional CSS class names.
-	 *     @type string     $label        Accessible label. If provided, the SVG gets
-	 *                                    role="img" and aria-label. If omitted, the SVG
-	 *                                    gets aria-hidden="true".
-	 *     @type float|null $stroke_width Stroke width. Reserved for future stroke-based icons.
+	 *     @type int    $size  Width and height in pixels. Default 24.
+	 *     @type string $class Additional CSS class names.
+	 *     @type string $label Accessible label. If provided, the SVG gets
+	 *                         role="img" and aria-label. If omitted, the SVG
+	 *                         gets aria-hidden="true".
 	 * }
 	 * @return string SVG markup for the icon, or empty string if not found.
 	 */
@@ -44,10 +41,9 @@ if ( ! function_exists( 'wp_icon' ) ) {
 		$icon = $icons_data[ $name ];
 
 		$defaults = array(
-			'size'         => 24,
-			'class'        => '',
-			'label'        => '',
-			'stroke_width' => null,
+			'size'  => 24,
+			'class' => '',
+			'label' => '',
 		);
 
 		$args = wp_parse_args( $args, $defaults );
@@ -74,10 +70,6 @@ if ( ! function_exists( 'wp_icon' ) ) {
 			$attrs .= ' aria-hidden="true"';
 		}
 
-		if ( null !== $args['stroke_width'] ) {
-			$attrs .= sprintf( ' stroke-width="%s"', esc_attr( (string) $args['stroke_width'] ) );
-		}
-
 		return sprintf( '<svg %s>%s</svg>', $attrs, $icon['content'] );
 	}
 }
@@ -85,8 +77,6 @@ if ( ! function_exists( 'wp_icon' ) ) {
 if ( ! function_exists( 'the_wp_icon' ) ) {
 	/**
 	 * Echoes the SVG markup for a registered icon.
-	 *
-	 * @since 7.0.0
 	 *
 	 * @param string $name The icon slug (e.g. 'plus', 'arrow-down').
 	 * @param array  $args Optional. Arguments for the icon. See wp_icon() for details.

@@ -53,11 +53,6 @@ class WP_Icon_Test extends WP_UnitTestCase {
 		$this->assertStringNotContainsString( 'aria-label', $output );
 	}
 
-	public function test_wp_icon_stroke_width() {
-		$output = wp_icon( 'plus', array( 'stroke_width' => 1.5 ) );
-		$this->assertStringContainsString( 'stroke-width="1.5"', $output );
-	}
-
 	public function test_wp_icon_contains_svg_content() {
 		$output = wp_icon( 'plus' );
 		$this->assertStringContainsString( '<path ', $output );

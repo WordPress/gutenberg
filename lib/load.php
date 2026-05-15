@@ -87,6 +87,7 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require_once __DIR__ . '/class-wp-rest-edit-site-export-controller-gutenberg.php';
 	require_once __DIR__ . '/class-wp-icons-registry-gutenberg.php';
 	require_once __DIR__ . '/class-wp-rest-icons-controller-gutenberg.php';
+	require_once __DIR__ . '/icons.php';
 	require_once __DIR__ . '/rest-api.php';
 
 	// Experimental autosaves controller override for real-time collaboration.
@@ -121,7 +122,6 @@ require __DIR__ . '/compat/wordpress-7.0/command-palette.php';
 require __DIR__ . '/compat/wordpress-7.0/meta-box-rtc-compat.php';
 require __DIR__ . '/compat/wordpress-7.0/script-modules.php';
 require __DIR__ . '/compat/wordpress-7.0/fonts.php';
-require __DIR__ . '/compat/wordpress-7.0/icons.php';
 
 if ( class_exists( '\WordPress\AiClient\AiClient' ) ) {
 	require __DIR__ . '/compat/wordpress-7.0/class-wp-connector-registry.php';

@@ -26,7 +26,7 @@ import { Icon, check } from '@wordpress/icons';
 | ------ | --------- | ------- | ----------------------- |
 | `size` | `integer` | `24`    | Size of icon in pixels. |
 
-## PHP Usage
+## PHP usage
 
 The same icon library is available in PHP via the `wp_icon()` function. It renders inline SVG, producing equivalent output to the React component.
 
@@ -47,12 +47,11 @@ the_wp_icon( 'arrow-down' );
 
 ### Parameters
 
-| Name           | Type         | Default | Description                                                                                                                                 |
-| -------------- | ------------ | ------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
-| `size`         | `int`        | `24`    | Width and height in pixels.                                                                                                                 |
-| `class`        | `string`     | `''`    | Additional CSS class names, appended to the default `wp-icon` class.                                                                        |
-| `label`        | `string`     | `''`    | Accessible label. When provided, the SVG gets `role="img"` and `aria-label`. When omitted, the SVG gets `aria-hidden="true"`.               |
-| `stroke_width` | `float|null` | `null`  | Stroke width attribute. Reserved for future stroke-based icons; currently passed through but has no visible effect on the existing fill icons. |
+| Name    | Type     | Default | Description                                                                                                                   |
+| ------- | -------- | ------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| `size`  | `int`    | `24`    | Width and height in pixels.                                                                                                   |
+| `class` | `string` | `''`    | Additional CSS class names, appended to the default `wp-icon` class.                                                          |
+| `label` | `string` | `''`    | Accessible label. When provided, the SVG gets `role="img"` and `aria-label`. When omitted, the SVG gets `aria-hidden="true"`. |
 
 ### How it works
 
@@ -62,10 +61,11 @@ At build time, `npm run build` in the icons package generates `packages/icons/bu
 
 ```bash
 npm run wp-env start
+npm run build -- --include=icons
 vendor/bin/phpunit phpunit/class-wp-icon-test.php
 ```
 
-## Docs & Examples
+## Docs & examples
 
 You can browse the icons docs and examples at [https://wordpress.github.io/gutenberg/?path=/docs/icons-icon--default](https://wordpress.github.io/gutenberg/?path=/docs/icons-icon--default)
 
