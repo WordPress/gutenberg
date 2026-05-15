@@ -48,10 +48,12 @@ export function isSafeNumber( value: number ): boolean {
 }
 
 /**
- * Returns `true` when both dimensions are finite, strictly positive, and
- * within the safe magnitude range. Use this to short-circuit math that
- * would otherwise divide by zero, produce `Infinity` from large dims, or
- * propagate `NaN`.
+ * Returns `true` when both dimensions are finite and within the safe
+ * range `[Number.EPSILON, MAX_SAFE_MAGNITUDE]`. The lower bound matters
+ * because sub-normal dimensions (e.g. `Number.MIN_VALUE`) pass `> 0` but
+ * make `container / dim` overflow to `Infinity` downstream in
+ * `getImageFit` / `createCamera`. Use this to short-circuit math that
+ * would otherwise produce non-finite output.
  *
  * @param size The size to check.
  * @return Whether `size` is safe to use in math.
@@ -60,8 +62,8 @@ export function isValidSize( size: Size ): boolean {
 	return (
 		Number.isFinite( size.width ) &&
 		Number.isFinite( size.height ) &&
-		size.width > 0 &&
-		size.height > 0 &&
+		size.width >= Number.EPSILON &&
+		size.height >= Number.EPSILON &&
 		size.width <= MAX_SAFE_MAGNITUDE &&
 		size.height <= MAX_SAFE_MAGNITUDE
 	);
@@ -93,39 +95,64 @@ export function sanitizeRect( rect: NormalizedRect ): NormalizedRect {
 }
 
 /**
- * Returns a copy of `state` with any non-finite numeric fields replaced by
- * safe defaults. The reducer already normalizes these on every action, so
- * downstream math layers can call this as defense-in-depth without changing
- * behavior under normal flows.
+ * Returns a copy of `state` with the cropper-math numeric fields replaced
+ * by safe defaults. Covers `pan`, `zoom`, `rotation`, the matching base
+ * pose, and `cropRect`. The `state.image` numeric fields (naturalWidth /
+ * naturalHeight) are intentionally NOT sanitized — image dimensions reach
+ * the math layer as a separate `imageSize` argument, and cloning the
+ * image object here would break the reducer's reference-equality
+ * short-circuit.
+ *
+ * Returns the same `state` reference when no field needed substitution
+ * so callers in hot paths (every pointermove via `restrictPanZoom`) can
+ * keep their reference-equality optimizations. Sub-object references
+ * (`pan`, `basePan`, `cropRect`) are also preserved when their fields
+ * are individually clean.
  *
  * @param state The cropper state to sanitize.
- * @return A cropper state with all numeric fields finite.
+ * @return A cropper state with the math-relevant numeric fields finite.
  */
 export function sanitizeCropperState( state: CropperState ): CropperState {
-	const zoom = safeBoundedNumber( state.zoom, 1 );
-	const baseZoom = safeBoundedNumber( state.baseZoom, 1 );
+	const panX = safeBoundedNumber( state.pan.x, 0 );
+	const panY = safeBoundedNumber( state.pan.y, 0 );
+	const basePanX = safeBoundedNumber( state.basePan.x, 0 );
+	const basePanY = safeBoundedNumber( state.basePan.y, 0 );
+	const rotation = safeBoundedNumber( state.rotation, 0 );
+	const baseRotation = safeBoundedNumber( state.baseRotation, 0 );
+	const rawZoom = safeBoundedNumber( state.zoom, 1 );
 	// Zoom must be strictly positive AND large enough that 1/zoom doesn't
 	// overflow. Sub-normals (e.g. Number.MIN_VALUE) pass `> 0` but make
 	// division explode, so guard against them with Number.EPSILON.
-	// Note: `state.image` is intentionally not cloned here. The math layer
-	// receives image dimensions as a separate `imageSize` argument, so the
-	// `state.image` numeric fields don't feed into any math we need to defend.
-	// Sanitizing them would force a new image object every call and break
-	// reference-equality optimizations the reducer relies on.
+	const zoom = rawZoom >= Number.EPSILON ? rawZoom : 1;
+	const rawBaseZoom = safeBoundedNumber( state.baseZoom, 1 );
+	const baseZoom = rawBaseZoom >= Number.EPSILON ? rawBaseZoom : 1;
+	const cropRect = sanitizeRect( state.cropRect );
+
+	const panUnchanged = panX === state.pan.x && panY === state.pan.y;
+	const basePanUnchanged =
+		basePanX === state.basePan.x && basePanY === state.basePan.y;
+
+	if (
+		panUnchanged &&
+		basePanUnchanged &&
+		zoom === state.zoom &&
+		baseZoom === state.baseZoom &&
+		rotation === state.rotation &&
+		baseRotation === state.baseRotation &&
+		cropRect === state.cropRect
+	) {
+		return state;
+	}
 	return {
 		...state,
-		pan: {
-			x: safeBoundedNumber( state.pan.x, 0 ),
-			y: safeBoundedNumber( state.pan.y, 0 ),
-		},
-		zoom: zoom >= Number.EPSILON ? zoom : 1,
-		rotation: safeBoundedNumber( state.rotation, 0 ),
-		basePan: {
-			x: safeBoundedNumber( state.basePan.x, 0 ),
-			y: safeBoundedNumber( state.basePan.y, 0 ),
-		},
-		baseZoom: baseZoom >= Number.EPSILON ? baseZoom : 1,
-		baseRotation: safeBoundedNumber( state.baseRotation, 0 ),
-		cropRect: sanitizeRect( state.cropRect ),
+		pan: panUnchanged ? state.pan : { x: panX, y: panY },
+		zoom,
+		rotation,
+		basePan: basePanUnchanged
+			? state.basePan
+			: { x: basePanX, y: basePanY },
+		baseZoom,
+		baseRotation,
+		cropRect,
 	};
 }

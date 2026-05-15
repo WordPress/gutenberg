@@ -294,10 +294,12 @@ export function restrictPanZoom(
 	//    then dividing by the visual bounds.
 	const safeState = sanitizeCropperState( state );
 	const safeCropRect = sanitizeRect( cropRect );
-	const aspectRatio =
-		imageSize.width > 0 && imageSize.height > 0
-			? imageSize.width / imageSize.height
-			: 1;
+	// Use `isValidSize` rather than a bare `> 0` check so Infinity dims
+	// don't drive `Infinity / Infinity = NaN` into `getMinZoomForCover`
+	// and leak as `zoom: NaN` through the no-correction early return.
+	const aspectRatio = isValidSize( imageSize )
+		? imageSize.width / imageSize.height
+		: 1;
 	const minZoom = getMinZoomForCover(
 		safeState.rotation,
 		aspectRatio,

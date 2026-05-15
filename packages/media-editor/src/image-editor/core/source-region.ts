@@ -53,8 +53,9 @@ export function getSourceRegion(
 	imageSize: Size
 ): SourceRegion {
 	// Sanitize before the zero-size short-circuit so the early return
-	// doesn't leak raw non-finite state.rotation/state.zoom/state.flip
-	// out through the metadata fields.
+	// doesn't leak raw non-finite state.rotation or state.zoom out
+	// through the metadata fields. (state.flip is boolean and isn't
+	// at risk of NaN propagation.)
 	const safeState = sanitizeCropperState( state );
 
 	if ( ! isValidSize( imageSize ) ) {

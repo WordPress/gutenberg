@@ -13,6 +13,7 @@ import {
 	getImageCropBounds,
 } from '../containment';
 import { getSourceRegion, getSourceRegionPercent } from '../source-region';
+import { computeTransformStyle } from '../transform-style';
 import { DEFAULT_STATE } from '../constants';
 import type { CropperState, Size } from '../types';
 
@@ -606,7 +607,7 @@ describe( 'getRotatedBBox — non-finite input regression', () => {
 		[ '-Infinity rotation', 100, 100, Number.NEGATIVE_INFINITY ],
 		// MAX_VALUE is finite but degreesToRadians( MAX_VALUE ) overflows
 		// to Infinity, then Math.cos/sin return NaN. The magnitude bound
-		// in `safeBoundedNumber` catches this before the trig.
+		// in `isSafeNumber` catches this before the trig.
 		[ 'MAX_VALUE rotation', 100, 100, Number.MAX_VALUE ],
 	] )( 'returns {0, 0} for %s', ( _label, w, h, rot ) => {
 		expect( getRotatedBBox( w, h, rot ) ).toEqual( {
@@ -757,6 +758,31 @@ describe( 'restrictPanZoom — non-finite input regression', () => {
 		expect( Number.isFinite( out.zoom ) ).toBe( true );
 		expect( Number.isFinite( out.pan.x ) ).toBe( true );
 		expect( Number.isFinite( out.pan.y ) ).toBe( true );
+	} );
+
+	it( 'returns finite zoom when imageSize is Infinity (aspectRatio NaN guard)', () => {
+		// Infinity / Infinity = NaN, which used to leak as `zoom: NaN`
+		// through the no-correction early return.
+		const rect = { x: 0.1, y: 0.1, width: 0.5, height: 0.5 };
+		const out = restrictPanZoom(
+			makeState(),
+			{ width: Infinity, height: Infinity },
+			rect
+		);
+		expect( Number.isFinite( out.zoom ) ).toBe( true );
+		expect( Number.isFinite( out.pan.x ) ).toBe( true );
+		expect( Number.isFinite( out.pan.y ) ).toBe( true );
+	} );
+} );
+
+describe( 'computeTransformStyle — non-finite input regression', () => {
+	it( 'produces a finite matrix string for hostile state', () => {
+		// CSS preview path must agree with createCamera under hostile state
+		// (both should produce safe output, not divergent NaN vs finite).
+		const out = computeTransformStyle( HOSTILE_STATE, IMAGE );
+		expect( out ).toMatch( /^matrix\(/ );
+		expect( out ).not.toMatch( /NaN/ );
+		expect( out ).not.toMatch( /Infinity/ );
 	} );
 } );
 

@@ -80,6 +80,17 @@ describe( 'isValidSize', () => {
 		);
 		expect( isValidSize( { width: 1e10, height: 100 } ) ).toBe( false );
 	} );
+
+	it( 'returns false for sub-normal dimensions (overflow when divided into)', () => {
+		// Number.MIN_VALUE passes `> 0` but `container / MIN_VALUE`
+		// overflows to Infinity downstream in getImageFit / createCamera.
+		expect( isValidSize( { width: Number.MIN_VALUE, height: 100 } ) ).toBe(
+			false
+		);
+		expect( isValidSize( { width: 100, height: Number.MIN_VALUE } ) ).toBe(
+			false
+		);
+	} );
 } );
 
 describe( 'sanitizeRect', () => {
@@ -192,6 +203,29 @@ describe( 'sanitizeCropperState', () => {
 		expect( out.basePan ).toEqual( { x: 0, y: 0 } );
 		expect( out.baseZoom ).toBe( 1 );
 		expect( out.baseRotation ).toBe( 0 );
+	} );
+
+	it( 'returns the same reference when no field needs substitution', () => {
+		// Called once per pointermove (via restrictPanZoom + createCamera),
+		// so the no-change fast path matters. Clean state → same reference,
+		// no per-frame GC churn.
+		const state = makeBaseState( {
+			pan: { x: 0.1, y: -0.05 },
+			zoom: 1.5,
+			rotation: 30,
+		} );
+		expect( sanitizeCropperState( state ) ).toBe( state );
+	} );
+
+	it( 'preserves sub-object references when only some fields change', () => {
+		// If pan is clean but zoom is corrupted, pan should keep its
+		// reference even though the parent state must be a new object.
+		const pan = { x: 0.1, y: -0.05 };
+		const state = makeBaseState( { pan, zoom: Number.NaN } );
+		const out = sanitizeCropperState( state );
+		expect( out ).not.toBe( state );
+		expect( out.pan ).toBe( pan );
+		expect( out.zoom ).toBe( 1 );
 	} );
 
 	it( 'leaves state.image untouched (caller passes imageSize separately)', () => {

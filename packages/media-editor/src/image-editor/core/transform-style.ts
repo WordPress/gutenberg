@@ -3,6 +3,7 @@
  */
 import type { CropperState, Size } from './types';
 import { degreesToRadians } from './math/rotation';
+import { sanitizeCropperState } from './math/sanitize';
 
 /**
  * Computes a CSS matrix() transform string from the cropper state.
@@ -25,14 +26,18 @@ export function computeTransformStyle(
 	state: CropperState,
 	imageSize: Size
 ): string {
-	const translateX = state.pan.x * imageSize.width;
-	const translateY = state.pan.y * imageSize.height;
-	const rad = degreesToRadians( state.rotation );
+	// Sanitize so hostile state can't produce `matrix(NaN, NaN, ...)` here
+	// while the parallel `createCamera` path returns a finite matrix. Both
+	// paths must agree under defense-in-depth conditions.
+	const safeState = sanitizeCropperState( state );
+	const translateX = safeState.pan.x * imageSize.width;
+	const translateY = safeState.pan.y * imageSize.height;
+	const rad = degreesToRadians( safeState.rotation );
 	const cos = Math.cos( rad );
 	const sin = Math.sin( rad );
-	const sx = state.flip.horizontal ? -1 : 1;
-	const sy = state.flip.vertical ? -1 : 1;
-	const z = state.zoom;
+	const sx = safeState.flip.horizontal ? -1 : 1;
+	const sy = safeState.flip.vertical ? -1 : 1;
+	const z = safeState.zoom;
 
 	// Combined: translate(tx,ty) * scale(sx,sy) * rotate(r) * scale(z)
 	const a = sx * cos * z;
