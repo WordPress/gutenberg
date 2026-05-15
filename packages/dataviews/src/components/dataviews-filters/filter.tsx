@@ -12,7 +12,7 @@ import {
 	FlexItem,
 	SelectControl,
 	Tooltip,
-	Icon,
+	Icon as WCIcon,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { useMemo, useRef } from '@wordpress/element';
@@ -341,7 +341,7 @@ export default function Filter( {
 									}
 								} }
 							>
-								<Icon icon={ closeSmall } />
+								<WCIcon icon={ closeSmall } />
 							</button>
 						</Tooltip>
 					) }

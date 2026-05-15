@@ -7,7 +7,7 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { Icon } from '@wordpress/components';
+import { Icon as WCIcon } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { wordpress } from '@wordpress/icons';
 import { store as coreDataStore } from '@wordpress/core-data';
@@ -34,7 +34,7 @@ function SiteIcon( { className } ) {
 			src={ siteIconUrl }
 		/>
 	) : (
-		<Icon
+		<WCIcon
 			className="edit-site-site-icon__icon"
 			icon={ wordpress }
 			size={ 48 }

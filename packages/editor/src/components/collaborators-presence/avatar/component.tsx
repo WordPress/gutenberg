@@ -10,7 +10,7 @@ extend( [ a11yPlugin ] );
 /**
  * WordPress dependencies
  */
-import { Icon, Tooltip } from '@wordpress/components';
+import { Icon as WCIcon, Tooltip } from '@wordpress/components';
 import { useMemo } from '@wordpress/element';
 
 /**
@@ -104,7 +104,7 @@ function Avatar( {
 			</span>
 			{ dimmed && !! statusIndicator && (
 				<span className="editor-avatar__status-indicator">
-					<Icon icon={ statusIndicator } />
+					<WCIcon icon={ statusIndicator } />
 				</span>
 			) }
 			{ showBadge && (

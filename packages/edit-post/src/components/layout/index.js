@@ -38,7 +38,7 @@ import { addQueryArgs } from '@wordpress/url';
 import { decodeEntities } from '@wordpress/html-entities';
 import { store as coreStore } from '@wordpress/core-data';
 import {
-	Icon,
+	Icon as WCIcon,
 	SlotFillProvider,
 	Tooltip,
 	__unstableUseNavigateRegions as useNavigateRegions,
@@ -321,7 +321,7 @@ function MetaBoxesMain( { isLegacy } ) {
 			{ ...( ! isShort && bindDragGesture( persistIsOpen ) ) }
 		>
 			{ paneLabel }
-			<Icon icon={ isOpen ? chevronUp : chevronDown } />
+			<WCIcon icon={ isOpen ? chevronUp : chevronDown } />
 		</button>
 	);
 

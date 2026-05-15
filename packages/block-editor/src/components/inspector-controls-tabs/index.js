@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import {
-	Icon,
+	Icon as WCIcon,
 	Tooltip,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
@@ -180,7 +180,7 @@ export default function InspectorControlsTabs( {
 									tabId={ tab.name }
 									aria-label={ tab.title }
 								>
-									<Icon icon={ tab.icon } />
+									<WCIcon icon={ tab.icon } />
 								</Tabs.Tab>
 							</Tooltip>
 						)
