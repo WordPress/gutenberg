@@ -1,0 +1,92 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+
+// Green "bracket" styling applied to any block with a pending suggestion
+// overlay while the editor is in Suggest mode. Drawn with an outline so it
+// layers above block content without affecting layout. Matches Docs' review
+// affordance: the block is visibly edited without hiding its normal UI.
+$suggestion-color: #007017;
+
+.block-editor-block-list__block.is-suggestion-pending {
+	position: relative;
+	outline: 2px solid $suggestion-color;
+	outline-offset: 2px;
+	border-radius: $radius-small;
+
+	&::before,
+	&::after {
+		content: "";
+		position: absolute;
+		width: $grid-unit-10;
+		height: $grid-unit-10;
+		border: 2px solid $suggestion-color;
+		pointer-events: none;
+	}
+
+	&::before {
+		top: -$grid-unit-05;
+		left: -$grid-unit-05;
+		border-right: 0;
+		border-bottom: 0;
+	}
+
+	&::after {
+		bottom: -$grid-unit-05;
+		right: -$grid-unit-05;
+		border-left: 0;
+		border-top: 0;
+	}
+}
+
+.editor-collab-sidebar-panel__suggestion-summary {
+	em {
+		font-style: italic;
+		color: $gray-700;
+	}
+}
+
+// Inline diff colors for the suggestion preview. Pulled from the design
+// system fallbacks so the rendering still degrades gracefully on themes
+// without `--wp-admin-theme-color` defined.
+.editor-collab-sidebar-panel__suggestion-text-diff {
+	del {
+		color: var(--wp-block-synced-color, #cc1818);
+		text-decoration: line-through;
+	}
+
+	ins {
+		color: var(--wp-admin-theme-color, #007017);
+		text-decoration: underline;
+	}
+}
+
+// Inline accept/reject buttons live in the note header, right-aligned next
+// to the author info. Force both icons to render at the same box so the
+// checkmark (a thin glyph) visually matches the close glyph next to it,
+// and thicken the check stroke so it reads at a similar visual weight to
+// the denser close glyph.
+.editor-collab-sidebar-panel__suggestion-header-actions {
+	margin-left: auto;
+
+	.components-button.has-icon {
+		width: $grid-unit-40;
+		height: $grid-unit-40;
+		min-width: $grid-unit-40;
+		padding: 0;
+
+		svg {
+			width: $grid-unit-40;
+			height: $grid-unit-40;
+		}
+
+		// The check path in @wordpress/icons is drawn with a lighter weight
+		// than the close glyph, so pair the filled path with a 1px stroke to
+		// lift it to the same visual density.
+		&[aria-label="Accept suggestion"] svg path {
+			stroke: currentColor;
+			stroke-width: 1;
+			stroke-linecap: round;
+			stroke-linejoin: round;
+		}
+	}
+}

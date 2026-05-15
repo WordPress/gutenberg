@@ -4,6 +4,7 @@
 import {
 	operationsFromOverlay,
 	applyOperations,
+	hasAttributeConflict,
 	parseSuggestionPayload,
 	payloadByteLength,
 	PAYLOAD_MAX_BYTES,
@@ -145,6 +146,105 @@ describe( 'payloadByteLength', () => {
 	it( 'exposes a numeric size cap', () => {
 		expect( PAYLOAD_MAX_BYTES ).toBeGreaterThan( 0 );
 		expect( typeof PAYLOAD_MAX_BYTES ).toBe( 'number' );
+	} );
+} );
+
+describe( 'hasAttributeConflict', () => {
+	const CONTENT_OP = {
+		type: 'attribute-set',
+		attribute: 'content',
+		before: 'Hello',
+		after: 'Hi',
+	};
+
+	it( 'returns false when the targeted attribute still matches the baseline', () => {
+		expect(
+			hasAttributeConflict( { content: 'Hello', level: 2 }, [
+				CONTENT_OP,
+			] )
+		).toBe( false );
+	} );
+
+	it( 'returns true when the targeted attribute has diverged', () => {
+		expect(
+			hasAttributeConflict( { content: 'Hola' }, [ CONTENT_OP ] )
+		).toBe( true );
+	} );
+
+	it( 'ignores unrelated attribute changes on the block', () => {
+		// Post modified bumps often because an unrelated attribute (or another
+		// block entirely) changed — those should never count as a conflict
+		// for this suggestion.
+		expect(
+			hasAttributeConflict(
+				{ content: 'Hello', level: 3, align: 'center' },
+				[ CONTENT_OP ]
+			)
+		).toBe( false );
+	} );
+
+	it( 'deep-compares object-valued attributes', () => {
+		const op = {
+			type: 'attribute-set',
+			attribute: 'style',
+			before: { typography: { fontSize: '16px' } },
+			after: { typography: { fontSize: '20px' } },
+		};
+		expect(
+			hasAttributeConflict(
+				{ style: { typography: { fontSize: '16px' } } },
+				[ op ]
+			)
+		).toBe( false );
+		expect(
+			hasAttributeConflict(
+				{ style: { typography: { fontSize: '18px' } } },
+				[ op ]
+			)
+		).toBe( true );
+	} );
+
+	it( 'treats a null baseline as equal to a missing current attribute', () => {
+		const op = {
+			type: 'attribute-set',
+			attribute: 'url',
+			before: null,
+			after: 'https://x.test',
+		};
+		expect( hasAttributeConflict( {}, [ op ] ) ).toBe( false );
+		expect(
+			hasAttributeConflict( { url: 'https://other.test' }, [ op ] )
+		).toBe( true );
+	} );
+
+	it( 'returns false for malformed input', () => {
+		expect( hasAttributeConflict( {}, undefined ) ).toBe( false );
+		expect( hasAttributeConflict( {}, [] ) ).toBe( false );
+	} );
+
+	it( 'compares string baselines against wrapper-object live values via toString', () => {
+		// Regression: rich-text attributes are stored on a block as
+		// `RichTextData` instances but serialize into the suggestion payload
+		// as plain strings. Without a string-vs-wrapper fallback,
+		// `hasAttributeConflict` flagged every content suggestion as stale
+		// because `typeof string` !== `typeof object`, which short-circuited
+		// the apply flow into a never-visible "Apply anyway" dialog.
+		const wrapper = {
+			toString() {
+				return 'Hello';
+			},
+		};
+		const wrapperOther = {
+			toString() {
+				return 'Hola';
+			},
+		};
+		expect(
+			hasAttributeConflict( { content: wrapper }, [ CONTENT_OP ] )
+		).toBe( false );
+		expect(
+			hasAttributeConflict( { content: wrapperOther }, [ CONTENT_OP ] )
+		).toBe( true );
 	} );
 } );
 

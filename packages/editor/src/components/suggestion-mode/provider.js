@@ -13,6 +13,10 @@ import { __ } from '@wordpress/i18n';
  */
 import { EDITOR_STORE_NAME } from './constants';
 import { useSuggestionOverlay } from './overlay-context';
+import {
+	addNoteIdToMetadata,
+	getNoteIdsFromMetadata,
+} from '../collab-sidebar/utils';
 
 /**
  * @typedef {Object} SuggestionOperation
@@ -112,7 +116,9 @@ function isAttributeEqual( a, b ) {
 	// suggestion payload) and the other is a wrapper object (typically a
 	// `RichTextData` instance from the live block-editor store). Compare
 	// their string representations so the same logical content reads as
-	// equal across the serialization boundary.
+	// equal across the serialization boundary — otherwise `hasAttributeConflict`
+	// flags every content suggestion as stale and the apply flow short-
+	// circuits to a never-visible "stale" dialog.
 	const aIsObject = typeof a === 'object';
 	const bIsObject = typeof b === 'object';
 	if ( aIsObject !== bIsObject ) {
@@ -179,6 +185,37 @@ export function applyOperations( currentAttributes, operations ) {
 }
 
 /**
+ * Report whether applying the suggestion's operations over the block's
+ * current attributes would overwrite concurrent changes made by someone
+ * else. A suggestion is considered conflicting only when the baseline
+ * captured at suggest-time differs from the attribute's current value —
+ * simply reopening the post after any auto-save doesn't qualify.
+ *
+ * @param {Object}                currentAttributes Block's current attributes.
+ * @param {SuggestionOperation[]} operations        Operations from the payload.
+ * @return {boolean} True if at least one targeted attribute has diverged.
+ */
+export function hasAttributeConflict( currentAttributes, operations ) {
+	if ( ! Array.isArray( operations ) ) {
+		return false;
+	}
+	for ( const op of operations ) {
+		if ( op.type !== 'attribute-set' ) {
+			continue;
+		}
+		if (
+			! isAttributeEqual(
+				op.before ?? null,
+				currentAttributes?.[ op.attribute ] ?? null
+			)
+		) {
+			return true;
+		}
+	}
+	return false;
+}
+
+/**
  * Parse a `_wp_suggestion` meta value into a typed payload.
  *
  * @param {string|undefined} raw The raw JSON string from comment meta.
@@ -239,8 +276,10 @@ export function useSuggestionsProvider() {
 	const { saveEntityRecord } = useDispatch( coreStore );
 	const { createNotice } = useDispatch( noticesStore );
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
-	const { getBlockAttributes: selectBlockAttributes } =
-		useSelect( blockEditorStore );
+	const {
+		getBlockAttributes: selectBlockAttributes,
+		getClientIdsWithDescendants: selectClientIdsWithDescendants,
+	} = useSelect( blockEditorStore );
 	const { requestInterceptorBypass, clearOverlay } = useSuggestionOverlay();
 
 	const createSuggestion = useCallback(
@@ -288,23 +327,21 @@ export function useSuggestionsProvider() {
 				);
 
 				if ( savedRecord?.id ) {
-					// Merge into existing metadata rather than replacing so
-					// other fields like bindings, name, and block identifiers
-					// are preserved.
+					// Append to the noteId array so a fresh suggestion on a
+					// block whose previous note(s) have been applied or
+					// rejected coexists with them rather than overwriting
+					// the link. Other metadata fields like bindings and name
+					// are preserved by `addNoteIdToMetadata`.
 					const existingMeta =
 						selectBlockAttributes( clientId )?.metadata ?? {};
 					updateBlockAttributes( clientId, {
-						metadata: {
-							...existingMeta,
-							noteId: savedRecord.id,
-						},
+						metadata: addNoteIdToMetadata(
+							existingMeta,
+							savedRecord.id
+						),
 					} );
 				}
 
-				createNotice( 'success', __( 'Suggestion submitted.' ), {
-					type: 'snackbar',
-					isDismissible: true,
-				} );
 				return savedRecord;
 			} catch ( error ) {
 				createNotice(
@@ -335,7 +372,12 @@ export function useSuggestionsProvider() {
 	 *                                           suggestion (`_wp_suggestion`
 	 *                                           meta).
 	 * @param {string}            args.clientId  Block client id of the apply
-	 *                                           target.
+	 *                                           target. May be undefined if
+	 *                                           the acting user opened the
+	 *                                           post fresh and the metadata
+	 *                                           linkage was never persisted —
+	 *                                           the apply path then scans the
+	 *                                           live tree by `metadata.noteId`.
 	 * @param {SuggestionPayload} args.payload   Parsed payload (from
 	 *                                           `parseSuggestionPayload`).
 	 * @return {Promise<void>}
@@ -350,21 +392,42 @@ export function useSuggestionsProvider() {
 				return;
 			}
 
-			if (
-				payload.baseRevision &&
-				postModified &&
-				payload.baseRevision !== postModified
-			) {
+			// `thread.blockClientId` is derived by matching `metadata.noteId`
+			// on blocks currently in the editor. If the Suggest author never
+			// auto-saved the post after the comment was created — or the
+			// author reloaded before the save landed — the metadata linkage
+			// won't exist yet and the caller will pass `clientId: undefined`.
+			// Fall back to scanning the live block tree for a block whose
+			// `metadata.noteId` includes the comment id (the field is an
+			// array post-#75147 to support multiple notes per block, so use
+			// the shared normalization helper instead of strict equality).
+			let targetClientId = clientId;
+			if ( ! targetClientId ) {
+				const liveIds = selectClientIdsWithDescendants?.() ?? [];
+				const commentIdKey = String( commentId );
+				for ( const id of liveIds ) {
+					const ids = getNoteIdsFromMetadata(
+						selectBlockAttributes( id )?.metadata
+					);
+					if ( ids.some( ( n ) => String( n ) === commentIdKey ) ) {
+						targetClientId = id;
+						break;
+					}
+				}
+			}
+
+			if ( ! targetClientId ) {
 				createNotice(
-					'warning',
+					'error',
 					__(
-						'Post content has changed since this suggestion. Review carefully.'
+						'Could not find the block this suggestion applies to.'
 					),
 					{ type: 'snackbar', isDismissible: true }
 				);
+				return;
 			}
 
-			const currentAttributes = selectBlockAttributes( clientId );
+			const currentAttributes = selectBlockAttributes( targetClientId );
 			const newAttributes = applyOperations(
 				currentAttributes,
 				payload.operations
@@ -400,9 +463,9 @@ export function useSuggestionsProvider() {
 				// so any subsequent user edit captures a fresh baseline
 				// from the post-apply attributes. Outside Suggest mode the
 				// interceptor isn't running and these calls are no-ops.
-				requestInterceptorBypass( clientId );
-				clearOverlay( clientId );
-				updateBlockAttributes( clientId, newAttributes );
+				requestInterceptorBypass( targetClientId );
+				clearOverlay( targetClientId );
+				updateBlockAttributes( targetClientId, newAttributes );
 
 				await saveEntityRecord(
 					'root',
@@ -422,8 +485,8 @@ export function useSuggestionsProvider() {
 			} catch ( error ) {
 				// Roll back the block change so the UI isn't left in a
 				// half-applied state if the server rejected the update.
-				requestInterceptorBypass( clientId );
-				updateBlockAttributes( clientId, rollbackPayload );
+				requestInterceptorBypass( targetClientId );
+				updateBlockAttributes( targetClientId, rollbackPayload );
 				createNotice(
 					'error',
 					error?.message || __( 'Failed to save suggestion status.' ),
@@ -432,10 +495,10 @@ export function useSuggestionsProvider() {
 			}
 		},
 		[
-			postModified,
 			saveEntityRecord,
 			updateBlockAttributes,
 			selectBlockAttributes,
+			selectClientIdsWithDescendants,
 			createNotice,
 			requestInterceptorBypass,
 			clearOverlay,
@@ -481,7 +544,11 @@ export function useSuggestionsProvider() {
 		[ saveEntityRecord, createNotice ]
 	);
 
-	return { createSuggestion, applySuggestion, rejectSuggestion };
+	return {
+		createSuggestion,
+		applySuggestion,
+		rejectSuggestion,
+	};
 }
 
 export { SCHEMA_VERSION, PAYLOAD_MAX_BYTES, payloadByteLength };

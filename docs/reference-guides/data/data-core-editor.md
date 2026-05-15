@@ -1517,7 +1517,9 @@ Sets the current editor intent.
 
 The intent represents the user's editing purpose: directly editing content (`edit`), suggesting changes that the author can apply or reject (`suggest`), or viewing the post in a read-only mode (`view`). It is orthogonal to the `editorMode` preference (visual vs. code).
 
-The value persists via the preferences store so the intent survives reloads. Unknown intents are silently rejected (no dispatch, no announcement) to keep typos or stale values from corrupting the preference; valid values are listed in `EDITOR_INTENTS`.
+The intent is _session-scoped_ — held in the editor reducer (not the preferences store), so reloading the editor always returns to `edit`. Persisting suggest/view across reloads surprises users who don't realize they left the editor in a non-default state.
+
+Unknown intents are silently rejected (no dispatch, no announcement) so typos from a bookmarklet, browser extension, or third-party plugin can't poison the editor state; valid values are listed in `EDITOR_INTENTS`.
 
 _Parameters_
 

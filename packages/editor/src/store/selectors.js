@@ -1409,11 +1409,9 @@ export const getEditorMode = createRegistrySelector(
  *
  * @return {string} The current editor intent. One of `edit`, `suggest`, `view`.
  */
-export const getEditorIntent = createRegistrySelector(
-	( select ) => () =>
-		select( preferencesStore ).get( 'core', 'editorIntent' ) ??
-		EDITOR_INTENT_EDIT
-);
+export function getEditorIntent( state ) {
+	return state.editorIntent ?? EDITOR_INTENT_EDIT;
+}
 
 /*
  * Backward compatibility

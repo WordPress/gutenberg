@@ -181,13 +181,7 @@ function TextDiff( { before, after } ) {
 			{ segments.map( ( seg, i ) => {
 				if ( seg.type === 'delete' ) {
 					return (
-						<del
-							key={ i }
-							style={ {
-								color: 'var(--wp-block-synced-color, #cc1818)',
-								textDecoration: 'line-through',
-							} }
-						>
+						<del key={ i }>
 							<VisuallyHidden>
 								{ __( 'Deleted:' ) }
 							</VisuallyHidden>
@@ -197,13 +191,7 @@ function TextDiff( { before, after } ) {
 				}
 				if ( seg.type === 'insert' ) {
 					return (
-						<ins
-							key={ i }
-							style={ {
-								color: 'var(--wp-admin-theme-color, #007017)',
-								textDecoration: 'underline',
-							} }
-						>
+						<ins key={ i }>
 							<VisuallyHidden>
 								{ __( 'Inserted:' ) }
 							</VisuallyHidden>
