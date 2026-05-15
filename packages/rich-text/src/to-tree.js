@@ -105,20 +105,61 @@ function fromFormat( {
 }
 
 /**
- * Checks if both arrays of formats up until a certain index are equal.
+ * Build a flat list of format ranges from a sparse `formats` array. Each
+ * range records the format object, its `start` index, and its `end` index.
+ * Adjacent positions whose `formats` arrays share the same reference at the
+ * same depth are merged into one range; a position where the reference
+ * changes (or disappears) closes the existing range and may open a new one.
  *
- * @param {Array}  a     Array of formats to compare.
- * @param {Array}  b     Array of formats to compare.
- * @param {number} index Index to check until.
+ * The ranges are returned in the order they open, which is the order
+ * `toTree` needs to emit elements (outermost format first). An array (rather
+ * than a Map) keeps every range distinct even when the same format reference
+ * is reused across non-adjacent ranges.
+ *
+ * @param {Array} formats Sparse array of format arrays.
+ *
+ * @return {Array<{format: Object, start: number, end: number}>} Ranges in open order.
  */
-function isEqualUntil( a, b, index ) {
-	do {
-		if ( a[ index ] !== b[ index ] ) {
-			return false;
-		}
-	} while ( index-- );
+function buildFormatRanges( formats ) {
+	const ranges = [];
+	const openStack = []; // Array of indices into `ranges` in open order.
 
-	return true;
+	for ( let i = 0; i < formats.length; i++ ) {
+		const list = formats[ i ] || [];
+
+		// Find the divergence point: how many leading formats still match
+		// what is currently open.
+		let diverge = 0;
+		while (
+			diverge < openStack.length &&
+			diverge < list.length &&
+			ranges[ openStack[ diverge ] ].format === list[ diverge ]
+		) {
+			diverge++;
+		}
+
+		// Close ranges deeper than the divergence point.
+		while ( openStack.length > diverge ) {
+			ranges[ openStack.pop() ].end = i;
+		}
+
+		// Open new ranges from the divergence point onwards.
+		for ( let j = diverge; j < list.length; j++ ) {
+			openStack.push( ranges.length );
+			ranges.push( {
+				format: list[ j ],
+				start: i,
+				end: formats.length,
+			} );
+		}
+	}
+
+	// Close anything still open at the end.
+	while ( openStack.length > 0 ) {
+		ranges[ openStack.pop() ].end = formats.length;
+	}
+
+	return ranges;
 }
 
 export function toTree( {
@@ -126,224 +167,239 @@ export function toTree( {
 	preserveWhiteSpace,
 	createEmpty,
 	append,
-	getLastChild,
 	getParent,
-	isText,
-	getText,
-	remove,
-	appendText,
 	onStartIndex,
 	onEndIndex,
 	isEditableTree,
 	placeholder,
 } ) {
 	const { formats, replacements, text, start, end } = value;
-	const formatsLength = formats.length + 1;
-	const tree = createEmpty();
+	// Derive a flat list of format ranges from the sparse `formats` array.
+	// This is the source of truth for `toTree`: ranges are opened/closed in
+	// order, sliced text is appended between them.
+	const ranges = buildFormatRanges( formats );
 	const activeFormats = getActiveFormats( value );
 	const deepestActiveFormat = activeFormats[ activeFormats.length - 1 ];
 
-	let lastCharacterFormats;
-	let lastCharacter;
+	const tree = createEmpty();
+	let pointer = tree;
+	let index = 0;
+	const closeAt = [];
 
-	append( tree, '' );
-
-	for ( let i = 0; i < formatsLength; i++ ) {
-		const character = text.charAt( i );
-		const shouldInsertPadding =
-			isEditableTree &&
-			// Pad the line if the line is empty.
-			( ! lastCharacter ||
-				// Pad the line if the previous character is a line break, otherwise
-				// the line break won't be visible.
-				lastCharacter === '\n' );
-
-		const characterFormats = formats[ i ];
-		let pointer = getLastChild( tree );
-
-		if ( characterFormats ) {
-			characterFormats.forEach( ( format, formatIndex ) => {
-				if (
-					pointer &&
-					lastCharacterFormats &&
-					// Reuse the last element if all formats remain the same.
-					isEqualUntil(
-						characterFormats,
-						lastCharacterFormats,
-						formatIndex
-					)
-				) {
-					pointer = getLastChild( pointer );
-					return;
-				}
-
-				const { type, tagName, attributes, unregisteredAttributes } =
-					format;
-
-				const boundaryClass =
-					isEditableTree && format === deepestActiveFormat;
-
-				const parent = getParent( pointer );
-				const newNode = append(
-					parent,
-					fromFormat( {
-						type,
-						tagName,
-						attributes,
-						unregisteredAttributes,
-						boundaryClass,
-						isEditableTree,
-					} )
-				);
-
-				if ( isText( pointer ) && getText( pointer ).length === 0 ) {
-					remove( pointer );
-				}
-
-				pointer = append( newNode, '' );
-			} );
+	function emitSelectionAt( node, _start, _end, isInline ) {
+		if ( ! isEditableTree ) {
+			return;
 		}
 
-		// If there is selection at 0, handle it before characters are inserted.
-		if ( i === 0 ) {
-			if ( onStartIndex && start === 0 ) {
-				onStartIndex( tree, pointer );
-			}
-
-			if ( onEndIndex && end === 0 ) {
-				onEndIndex( tree, pointer );
-			}
+		if ( onStartIndex && start >= _start && start <= _end ) {
+			onStartIndex( tree, node, isInline ? [ start - _start ] : [] );
 		}
 
-		if ( character === OBJECT_REPLACEMENT_CHARACTER ) {
-			const replacement = replacements[ i ];
-			if ( ! replacement ) {
-				continue;
-			}
-			const { type, attributes, innerHTML } = replacement;
-			const formatType = getFormatType( type );
+		if ( onEndIndex && end >= _start && end <= _end ) {
+			onEndIndex( tree, node, isInline ? [ end - _start ] : [] );
+		}
+	}
 
-			if ( isEditableTree && type === '#comment' ) {
-				pointer = append( getParent( pointer ), {
-					type: 'span',
-					attributes: {
-						contenteditable: 'false',
-						'data-rich-text-comment':
-							attributes[ 'data-rich-text-comment' ],
-					},
-				} );
-				append(
-					append( pointer, { type: 'span' } ),
-					attributes[ 'data-rich-text-comment' ].trim()
-				);
-			} else if ( ! isEditableTree && type === 'script' ) {
-				pointer = append(
-					getParent( pointer ),
-					fromFormat( {
-						type: 'script',
-						isEditableTree,
-					} )
-				);
-				append( pointer, {
-					html: decodeURIComponent(
-						attributes[ 'data-rich-text-script' ]
-					),
-				} );
-			} else if ( formatType?.contentEditable === false ) {
-				if ( innerHTML || isEditableTree ) {
-					pointer = getParent( pointer );
-					// For non editable formats, render the stored inner HTML.
-					if ( isEditableTree ) {
-						const attrs = {
-							contenteditable: 'false',
-							'data-rich-text-bogus': true,
-						};
-						if ( start === i && end === i + 1 ) {
-							attrs[ 'data-rich-text-format-boundary' ] = true;
-						}
-						pointer = append( pointer, {
-							type: 'span',
-							attributes: attrs,
-						} );
-						// Some browsers like Safari and Firefox have issues placing
-						// the caret after a non-editable element when it's at the
-						// end of the field, so help them a little by providing a
-						// text element. Similar to `insertPadding` above.
-						if ( isEditableTree && i + 1 === text.length ) {
-							append( getParent( pointer ), ZWNBSP );
-						}
-					}
-					pointer = append(
-						pointer,
-						fromFormat( {
-							...replacement,
-							isEditableTree,
-						} )
-					);
-					if ( innerHTML ) {
-						append( pointer, {
-							html: innerHTML,
-						} );
-					}
-				}
-			} else {
-				pointer = append(
-					getParent( pointer ),
-					fromFormat( {
-						...replacement,
-						object: true,
-						isEditableTree,
-					} )
-				);
+	function appendChunk( chunk, _start, _end ) {
+		// A run of plain text becomes a single text node.
+		if (
+			typeof chunk === 'string' &&
+			chunk !== OBJECT_REPLACEMENT_CHARACTER &&
+			chunk !== '\n'
+		) {
+			const node = append( pointer, chunk );
+			emitSelectionAt( node, _start, _end, true );
+			return;
+		}
+
+		if ( chunk === '\n' ) {
+			if ( preserveWhiteSpace ) {
+				const node = append( pointer, '\n' );
+				emitSelectionAt( node, _start, _end, true );
+				return;
 			}
-			// Ensure pointer is text node.
-			pointer = append( getParent( pointer ), '' );
-		} else if ( ! preserveWhiteSpace && character === '\n' ) {
-			pointer = append( getParent( pointer ), {
+
+			const node = append( pointer, {
 				type: 'br',
 				attributes: isEditableTree
-					? {
-							'data-rich-text-line-break': 'true',
-					  }
+					? { 'data-rich-text-line-break': 'true' }
 					: undefined,
 				object: true,
 			} );
-			// Ensure pointer is text node.
-			pointer = append( getParent( pointer ), '' );
-		} else if ( ! isText( pointer ) ) {
-			pointer = append( getParent( pointer ), character );
-		} else {
-			appendText( pointer, character );
+			emitSelectionAt( node, _start, _end, false );
+			return;
 		}
 
-		if ( onStartIndex && start === i + 1 ) {
-			onStartIndex( tree, pointer );
+		// OBJECT_REPLACEMENT_CHARACTER — driven by `replacements[ _start ]`.
+		const replacement = replacements[ _start ];
+		if ( ! replacement ) {
+			return;
 		}
 
-		if ( onEndIndex && end === i + 1 ) {
-			onEndIndex( tree, pointer );
+		if ( isEditableTree && replacement.type === '#comment' ) {
+			const commentSpan = append( pointer, {
+				type: 'span',
+				attributes: {
+					contenteditable: 'false',
+					'data-rich-text-comment':
+						replacement.attributes[ 'data-rich-text-comment' ],
+				},
+			} );
+			append(
+				append( commentSpan, { type: 'span' } ),
+				replacement.attributes[ 'data-rich-text-comment' ].trim()
+			);
+			emitSelectionAt( commentSpan, _start, _end, false );
+			return;
 		}
 
-		if ( shouldInsertPadding && i === text.length ) {
-			append( getParent( pointer ), ZWNBSP );
+		if ( ! isEditableTree && replacement.type === 'script' ) {
+			const scriptNode = append(
+				pointer,
+				fromFormat( { type: 'script', isEditableTree } )
+			);
+			append( scriptNode, {
+				html: decodeURIComponent(
+					replacement.attributes[ 'data-rich-text-script' ]
+				),
+			} );
+			return;
+		}
 
-			// We CANNOT use CSS to add a placeholder with pseudo elements on
-			// the main block wrappers because that could clash with theme CSS.
-			if ( placeholder && text.length === 0 ) {
-				append( getParent( pointer ), {
-					type: 'span',
-					attributes: {
-						'data-rich-text-placeholder': placeholder,
-						// Necessary to prevent the placeholder from catching
-						// selection and being editable.
-						style: 'pointer-events:none;user-select:none;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;',
-					},
-				} );
+		const formatType = getFormatType( replacement.type );
+
+		if ( formatType?.contentEditable === false ) {
+			const { innerHTML } = replacement;
+
+			if ( ! innerHTML && ! isEditableTree ) {
+				return;
+			}
+
+			let host = pointer;
+
+			if ( isEditableTree ) {
+				const attrs = {
+					contenteditable: 'false',
+					'data-rich-text-bogus': true,
+				};
+				if ( start === _start && end === _end ) {
+					attrs[ 'data-rich-text-format-boundary' ] = true;
+				}
+				host = append( pointer, { type: 'span', attributes: attrs } );
+
+				// Safari/Firefox have trouble placing the caret after a non
+				// editable element at the very end of the field. Append a
+				// ZWNBSP so the caret has somewhere to land.
+				if ( _end === text.length ) {
+					append( pointer, ZWNBSP );
+				}
+			}
+
+			const formatNode = append(
+				host,
+				fromFormat( { ...replacement, isEditableTree } )
+			);
+
+			if ( innerHTML ) {
+				append( formatNode, { html: innerHTML } );
+			}
+
+			emitSelectionAt( host, _start, _end, false );
+			return;
+		}
+
+		// Regular object replacement (e.g. <img>).
+		const objectNode = append(
+			pointer,
+			fromFormat( { ...replacement, object: true, isEditableTree } )
+		);
+		emitSelectionAt( objectNode, _start, _end, false );
+	}
+
+	function appendText( _start, _end ) {
+		if ( _start >= _end ) {
+			return;
+		}
+
+		const slice = text.slice( _start, _end );
+		let buffer = '';
+		let bufferStart = _start;
+		let i = 0;
+
+		for ( ; i < slice.length; i++ ) {
+			const ch = slice[ i ];
+			if ( ch === '\n' || ch === OBJECT_REPLACEMENT_CHARACTER ) {
+				if ( buffer ) {
+					appendChunk( buffer, bufferStart, _start + i );
+					buffer = '';
+				}
+				appendChunk( ch, _start + i, _start + i + 1 );
+				bufferStart = _start + i + 1;
+			} else {
+				buffer += ch;
 			}
 		}
 
-		lastCharacterFormats = characterFormats;
-		lastCharacter = character;
+		if ( buffer ) {
+			appendChunk( buffer, bufferStart, _start + i );
+		}
+	}
+
+	function fillTo( untilIndex ) {
+		// Close any formats whose end has been reached.
+		while (
+			closeAt.length > 0 &&
+			untilIndex >= closeAt[ closeAt.length - 1 ]
+		) {
+			const endIndex = closeAt.pop();
+			appendText( index, endIndex );
+			pointer = getParent( pointer );
+			index = endIndex;
+		}
+
+		appendText( index, untilIndex );
+		index = untilIndex;
+	}
+
+	for ( const { format, start: formatStart, end: formatEnd } of ranges ) {
+		fillTo( formatStart );
+
+		const boundaryClass = isEditableTree && format === deepestActiveFormat;
+		pointer = append(
+			pointer,
+			fromFormat( { ...format, boundaryClass, isEditableTree } )
+		);
+		closeAt.push( formatEnd );
+	}
+
+	fillTo( text.length );
+
+	if ( ! isEditableTree ) {
+		return tree;
+	}
+
+	const padding = append( pointer, ZWNBSP );
+
+	// When the selection sits at the very end (and no chunk has claimed it),
+	// pin it to the trailing padding.
+	if ( text.length === 0 ) {
+		if ( onStartIndex && start === 0 ) {
+			onStartIndex( tree, padding, [ 0 ] );
+		}
+		if ( onEndIndex && end === 0 ) {
+			onEndIndex( tree, padding, [ 0 ] );
+		}
+	}
+
+	if ( placeholder && text.length === 0 ) {
+		append( pointer, {
+			type: 'span',
+			attributes: {
+				'data-rich-text-placeholder': placeholder,
+				// Prevent the placeholder from catching selection.
+				style: 'pointer-events:none;user-select:none;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;',
+			},
+		} );
 	}
 
 	return tree;

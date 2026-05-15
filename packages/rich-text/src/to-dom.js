@@ -114,28 +114,8 @@ function append( element, child ) {
 	return element.appendChild( child );
 }
 
-function appendText( node, text ) {
-	node.appendData( text );
-}
-
-function getLastChild( { lastChild } ) {
-	return lastChild;
-}
-
 function getParent( { parentNode } ) {
 	return parentNode;
-}
-
-function isText( node ) {
-	return node.nodeType === node.TEXT_NODE;
-}
-
-function getText( { nodeValue } ) {
-	return nodeValue;
-}
-
-function remove( node ) {
-	return node.parentNode.removeChild( node );
 }
 
 export function toDom( {
@@ -171,21 +151,12 @@ export function toDom( {
 		value,
 		createEmpty,
 		append,
-		getLastChild,
 		getParent,
-		isText,
-		getText,
-		remove,
-		appendText,
-		onStartIndex( body, pointer ) {
-			startPath = createPathToNode( pointer, body, [
-				pointer.nodeValue.length,
-			] );
+		onStartIndex( body, node, offset ) {
+			startPath = createPathToNode( node, body, offset );
 		},
-		onEndIndex( body, pointer ) {
-			endPath = createPathToNode( pointer, body, [
-				pointer.nodeValue.length,
-			] );
+		onEndIndex( body, node, offset ) {
+			endPath = createPathToNode( node, body, offset );
 		},
 		isEditableTree,
 		placeholder,

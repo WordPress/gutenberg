@@ -105,6 +105,33 @@ describe( 'create', () => {
 		expect( value.formats[ 0 ] ).not.toBe( value.formats[ 1 ] );
 	} );
 
+	it( 'should expose a lazy _formats Map view without breaking equality', () => {
+		const value = create( { html: '<em>te<strong>st</strong></em>' } );
+
+		// The Map is exposed for callers that want a range-based view.
+		expect( value._formats ).toBeInstanceOf( Map );
+		const map = value._formats;
+		expect( Array.from( map.values() ) ).toEqual( [
+			[ 0, 4 ],
+			[ 2, 4 ],
+		] );
+
+		// It is non-enumerable so it doesn't leak into deep equality, spread,
+		// or `Object.keys`.
+		expect( Object.keys( value ) ).toEqual( [
+			'formats',
+			'replacements',
+			'text',
+		] );
+		expect( '_formats' in { ...value } ).toBe( false );
+
+		// It is recomputed each access, so mutations to `formats` are
+		// reflected immediately rather than returning a stale snapshot.
+		expect( value._formats.size ).toBe( 2 );
+		value.formats = [ , , , , ];
+		expect( value._formats.size ).toBe( 0 );
+	} );
+
 	describe( 'collapseWhiteSpace', () => {
 		function fromHTML( html ) {
 			const element = createElement( document, html );

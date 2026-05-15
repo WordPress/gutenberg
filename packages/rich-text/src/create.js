@@ -15,12 +15,65 @@ import { getTextContent } from './get-text-content';
 
 /** @typedef {import('./types').RichTextValue} RichTextValue */
 
+/**
+ * Build a Map representation of the formats sparse array. Keys are format
+ * references, values are `[start, end]` tuples. When the same format
+ * reference appears in non-adjacent runs, only the earliest-and-latest span
+ * is retained — this is a lossy summary intended for callers that just need
+ * a quick at-a-glance view; `toTree` always re-derives ranges locally for
+ * exact rendering.
+ *
+ * @param {Array} formats Sparse array of format arrays.
+ *
+ * @return {Map} Map from format reference to `[start, end]` tuple.
+ */
+function buildFormatsMap( formats ) {
+	const map = new Map();
+	for ( let i = 0; i < formats.length; i++ ) {
+		const list = formats[ i ];
+		if ( ! list ) {
+			continue;
+		}
+		for ( const format of list ) {
+			const existing = map.get( format );
+			if ( existing ) {
+				existing[ 1 ] = i + 1;
+			} else {
+				map.set( format, [ i, i + 1 ] );
+			}
+		}
+	}
+	return map;
+}
+
+/**
+ * Attach a lazy `_formats` Map view to a rich text value. The Map is
+ * recomputed each time it is accessed, so consumers see the current state
+ * of `formats` even after operations like `applyFormat` have mutated it.
+ * The property is non-enumerable so spread and `Object.keys` ignore it, and
+ * configurable so it can be re-defined on derived values.
+ *
+ * @param {Object} value Rich text value to attach the getter to.
+ *
+ * @return {Object} The same value, with `_formats` defined.
+ */
+function defineFormatsView( value ) {
+	Object.defineProperty( value, '_formats', {
+		get() {
+			return buildFormatsMap( this.formats );
+		},
+		enumerable: false,
+		configurable: true,
+	} );
+	return value;
+}
+
 function createEmptyValue() {
-	return {
+	return defineFormatsView( {
 		formats: [],
 		replacements: [],
 		text: '',
-	};
+	} );
 }
 
 function toFormat( { tagName, attributes } ) {
@@ -241,19 +294,19 @@ export function create( {
 	__unstableIsEditableTree: isEditableTree,
 } = {} ) {
 	if ( html instanceof RichTextData ) {
-		return {
+		return defineFormatsView( {
 			text: html.text,
 			formats: html.formats,
 			replacements: html.replacements,
-		};
+		} );
 	}
 
 	if ( typeof text === 'string' && text.length > 0 ) {
-		return {
+		return defineFormatsView( {
 			formats: Array( text.length ),
 			replacements: Array( text.length ),
 			text,
-		};
+		} );
 	}
 
 	if ( typeof html === 'string' && html.length > 0 ) {

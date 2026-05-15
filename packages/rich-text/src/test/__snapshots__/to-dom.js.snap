@@ -7,7 +7,7 @@ exports[`recordToDom should create a value with formatting 1`] = `
   >
     test
   </em>
-  
+  ﻿
 </body>
 `;
 
@@ -18,7 +18,7 @@ exports[`recordToDom should create a value with formatting for split tags 1`] = 
   >
     test
   </em>
-  
+  ﻿
 </body>
 `;
 
@@ -30,17 +30,16 @@ exports[`recordToDom should create a value with formatting with attributes 1`] =
   >
     test
   </a>
-  
+  ﻿
 </body>
 `;
 
 exports[`recordToDom should create a value with image object 1`] = `
 <body>
-  
   <img
     src=""
   />
-  
+  ﻿
 </body>
 `;
 
@@ -49,26 +48,24 @@ exports[`recordToDom should create a value with image object and formatting 1`] 
   <em
     data-rich-text-format-boundary="true"
   >
-    
     <img
       src=""
     />
-    
   </em>
-  
+  ﻿
 </body>
 `;
 
 exports[`recordToDom should create a value with image object and text after 1`] = `
 <body>
   <em>
-    
     <img
       src=""
     />
     te
   </em>
   st
+  ﻿
 </body>
 `;
 
@@ -80,9 +77,8 @@ exports[`recordToDom should create a value with image object and text before 1`]
     <img
       src=""
     />
-    
   </em>
-  
+  ﻿
 </body>
 `;
 
@@ -95,47 +91,44 @@ exports[`recordToDom should create a value with nested formatting 1`] = `
       test
     </strong>
   </em>
-  
+  ﻿
 </body>
 `;
 
 exports[`recordToDom should create a value without formatting 1`] = `
 <body>
   test
+  ﻿
 </body>
 `;
 
 exports[`recordToDom should create an empty value 1`] = `
 <body>
-  
   ﻿
 </body>
 `;
 
 exports[`recordToDom should create an empty value from empty tags 1`] = `
 <body>
-  
   ﻿
 </body>
 `;
 
 exports[`recordToDom should disarm on* attribute 1`] = `
 <body>
-  
   <img
     data-disable-rich-text-onerror="alert('1')"
   />
-  
+  ﻿
 </body>
 `;
 
 exports[`recordToDom should disarm script 1`] = `
 <body>
-  
   <script
     data-rich-text-script="alert(%221%22)"
   />
-  
+  ﻿
 </body>
 `;
 
@@ -146,17 +139,15 @@ exports[`recordToDom should filter format boundary attributes 1`] = `
   >
     test
   </strong>
-  
+  ﻿
 </body>
 `;
 
 exports[`recordToDom should handle br 1`] = `
 <body>
-  
   <br
     data-rich-text-line-break="true"
   />
-  
   ﻿
 </body>
 `;
@@ -166,13 +157,10 @@ exports[`recordToDom should handle br with formatting 1`] = `
   <em
     data-rich-text-format-boundary="true"
   >
-    
     <br
       data-rich-text-line-break="true"
     />
-    
   </em>
-  
   ﻿
 </body>
 `;
@@ -184,6 +172,7 @@ exports[`recordToDom should handle br with text 1`] = `
     data-rich-text-line-break="true"
   />
   st
+  ﻿
 </body>
 `;
 
@@ -193,11 +182,11 @@ exports[`recordToDom should handle double br 1`] = `
   <br
     data-rich-text-line-break="true"
   />
-  
   <br
     data-rich-text-line-break="true"
   />
   b
+  ﻿
 </body>
 `;
 
@@ -207,17 +196,18 @@ exports[`recordToDom should handle selection before br 1`] = `
   <br
     data-rich-text-line-break="true"
   />
-  
   <br
     data-rich-text-line-break="true"
   />
   b
+  ﻿
 </body>
 `;
 
 exports[`recordToDom should ignore manually added object replacement character 1`] = `
 <body>
   test
+  ﻿
 </body>
 `;
 
@@ -228,7 +218,7 @@ exports[`recordToDom should ignore manually added object replacement character w
   >
     hi
   </em>
-  
+  ﻿
 </body>
 `;
 
@@ -246,7 +236,7 @@ exports[`recordToDom should not error with overlapping formats (1) 1`] = `
       2
     </strong>
   </a>
-  
+  ﻿
 </body>
 `;
 
@@ -268,13 +258,12 @@ exports[`recordToDom should not error with overlapping formats (2) 1`] = `
       2
     </a>
   </strong>
-  
+  ﻿
 </body>
 `;
 
 exports[`recordToDom should preserve comments 1`] = `
 <body>
-  
   <span
     contenteditable="false"
     data-rich-text-comment="comment"
@@ -283,13 +272,14 @@ exports[`recordToDom should preserve comments 1`] = `
       comment
     </span>
   </span>
-  
+  ﻿
 </body>
 `;
 
 exports[`recordToDom should preserve emoji 1`] = `
 <body>
   🍒
+  ﻿
 </body>
 `;
 
@@ -300,13 +290,12 @@ exports[`recordToDom should preserve emoji in formatting 1`] = `
   >
     🍒
   </em>
-  
+  ﻿
 </body>
 `;
 
 exports[`recordToDom should preserve funky comments 1`] = `
 <body>
-  
   <span
     contenteditable="false"
     data-rich-text-comment="/funky"
@@ -315,35 +304,20 @@ exports[`recordToDom should preserve funky comments 1`] = `
       /funky
     </span>
   </span>
-  
+  ﻿
 </body>
 `;
 
 exports[`recordToDom should preserve non breaking space 1`] = `
 <body>
   test  test
+  ﻿
 </body>
 `;
 
 exports[`recordToDom should remove padding 1`] = `
 <body>
-  
   ﻿
-</body>
-`;
-
-exports[`recordToDom should unwrap element with data-rich-text-bogus attribute 1`] = `
-<body>
-  test
-</body>
-`;
-
-exports[`recordToDom should unwrap nested data-rich-text-bogus elements 1`] = `
-<body>
-  <strong>
-    te
-  </strong>
-  st
 </body>
 `;
 
@@ -353,6 +327,23 @@ exports[`recordToDom should unwrap data-rich-text-bogus element but preserve chi
   <em>
     world
   </em>
-  
+  ﻿
+</body>
+`;
+
+exports[`recordToDom should unwrap element with data-rich-text-bogus attribute 1`] = `
+<body>
+  test
+  ﻿
+</body>
+`;
+
+exports[`recordToDom should unwrap nested data-rich-text-bogus elements 1`] = `
+<body>
+  <strong>
+    te
+  </strong>
+  st
+  ﻿
 </body>
 `;
