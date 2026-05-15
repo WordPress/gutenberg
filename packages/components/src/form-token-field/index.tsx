@@ -516,9 +516,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 		}
 	}
 
-	function addCurrentToken( {
-		preventDefaultOnFailedValidation = true,
-	} = {} ): boolean {
+	function addCurrentToken( { preventDefaultOnFailedValidation = true } = {} ) {
 		let preventDefault = false;
 		const selectedSuggestion = getSelectedSuggestion();
 
