@@ -22,6 +22,7 @@ import type {
 } from '../../types';
 
 const DEFAULT_FIXED_COLUMNS = 6;
+const DEFAULT_MIN_COLUMN_WIDTH = 350;
 const DEFAULT_ROW_HEIGHT = 200;
 const ROW_HEIGHT_AUTO = 'auto' as const;
 
@@ -106,19 +107,42 @@ const fields: Field< WidgetGridSettings >[] = [
 		Edit: StepperIntegerEdit,
 		label: __( 'Columns' ),
 		description: __(
-			'Target column count. On narrow containers the grid reduces the count to keep tiles legible.'
+			'How many columns to show when the dashboard has enough space.'
 		),
 		isValid: { min: 1, max: 12 },
+	},
+	{
+		id: 'adaptiveColumns',
+		type: 'boolean',
+		Edit: 'toggle',
+		label: __( 'Adjust on narrow screens' ),
+		description: __(
+			'Show fewer columns when the dashboard gets too narrow to keep tiles readable.'
+		),
+		getValue: ( { item } ) => item.minColumnWidth !== 0,
+		setValue: ( { item, value } ) => {
+			if ( ! value ) {
+				return { minColumnWidth: 0 };
+			}
+			const previous = item.minColumnWidth;
+			return {
+				minColumnWidth:
+					previous && previous > 0
+						? previous
+						: DEFAULT_MIN_COLUMN_WIDTH,
+			};
+		},
 	},
 	{
 		id: 'minColumnWidth',
 		type: 'integer',
 		Edit: StepperIntegerEdit,
-		label: __( 'Min column width (px)' ),
+		label: __( 'Minimum tile width' ),
 		description: __(
-			'Per-tile width floor. When the container is too narrow to fit the target column count at this width, the grid reduces the count to keep tiles legible.'
+			'The smallest tile width before a column is removed.'
 		),
 		isValid: { min: 48, max: 600 },
+		isVisible: ( item ) => item.minColumnWidth !== 0,
 	},
 	{
 		id: 'autoRowHeight',
@@ -152,6 +176,7 @@ const form: Form = {
 	fields: [
 		'model',
 		'columns',
+		'adaptiveColumns',
 		'minColumnWidth',
 		'autoRowHeight',
 		'rowHeight',
