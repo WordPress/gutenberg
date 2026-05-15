@@ -189,9 +189,7 @@ describe( 'data', () => {
 
 			const result = await getDesignTokens();
 
-			expect( result ).toEqual( {
-				content: '# Tokens\n\n| token | value |',
-			} );
+			expect( result ).toBe( '# Tokens\n\n| token | value |' );
 		} );
 
 		it( 'should cache tokens across calls', async () => {
@@ -250,7 +248,7 @@ describe( 'data', () => {
 			);
 
 			const result = await getDesignTokens();
-			expect( result ).toEqual( { content: '# Tokens' } );
+			expect( result ).toBe( '# Tokens' );
 			expect( globalThis.fetch ).toHaveBeenCalledTimes( 2 );
 		} );
 	} );

@@ -134,7 +134,6 @@ export async function getComponentDetail(
  *
  * @return The tokens markdown content.
  */
-export async function getDesignTokens(): Promise< { content: string } > {
-	const content = await fetchTokens();
-	return { content };
+export function getDesignTokens(): Promise< string > {
+	return fetchTokens();
 }
