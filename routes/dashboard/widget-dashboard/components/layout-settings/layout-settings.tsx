@@ -1,8 +1,9 @@
 /**
  * WordPress dependencies
  */
+import { __experimentalNumberControl as NumberControl } from '@wordpress/components';
 import { DataForm } from '@wordpress/dataviews';
-import type { Field, Form } from '@wordpress/dataviews';
+import type { DataFormControlProps, Field, Form } from '@wordpress/dataviews';
 import { useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 /* eslint-disable @wordpress/use-recommended-components */
@@ -50,6 +51,45 @@ function isAutoRowHeight( item: WidgetGridSettings ): boolean {
 	return getRowHeight( item ) === ROW_HEIGHT_AUTO;
 }
 
+function StepperIntegerEdit( {
+	data,
+	field,
+	onChange,
+}: DataFormControlProps< WidgetGridSettings > ) {
+	const { label, description, getValue, setValue, isValid } = field;
+	const value = getValue( { item: data } );
+	const disabled = field.isDisabled( { item: data, field } );
+	const min =
+		typeof isValid.min?.constraint === 'number'
+			? isValid.min.constraint
+			: undefined;
+	const max =
+		typeof isValid.max?.constraint === 'number'
+			? isValid.max.constraint
+			: undefined;
+
+	return (
+		<NumberControl
+			__next40pxDefaultSize
+			label={ label }
+			help={ description }
+			value={ value ?? '' }
+			min={ min }
+			max={ max }
+			step={ 1 }
+			spinControls="custom"
+			disabled={ disabled }
+			onChange={ ( next ) => {
+				const parsed =
+					next === '' || next === undefined
+						? undefined
+						: Number( next );
+				onChange( setValue( { item: data, value: parsed } ) );
+			} }
+		/>
+	);
+}
+
 const fields: Field< WidgetGridSettings >[] = [
 	{
 		id: 'model',
@@ -86,6 +126,7 @@ const fields: Field< WidgetGridSettings >[] = [
 	{
 		id: 'columns',
 		type: 'integer',
+		Edit: StepperIntegerEdit,
 		label: __( 'Columns' ),
 		isValid: { min: 1, max: 12 },
 		isVisible: ( item ) => isFixedColumns( item ),
@@ -93,6 +134,7 @@ const fields: Field< WidgetGridSettings >[] = [
 	{
 		id: 'minColumnWidth',
 		type: 'integer',
+		Edit: StepperIntegerEdit,
 		label: __( 'Min column width (px)' ),
 		description: __(
 			'Minimum width of each column. The number of columns adapts to the container width.'
@@ -114,6 +156,7 @@ const fields: Field< WidgetGridSettings >[] = [
 	{
 		id: 'rowHeight',
 		type: 'integer',
+		Edit: StepperIntegerEdit,
 		label: __( 'Row height (px)' ),
 		description: __( 'Height of each row in the standard grid.' ),
 		isValid: { min: 100 },
