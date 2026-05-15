@@ -5,7 +5,7 @@ import { __, sprintf, _n } from '@wordpress/i18n';
 import { Button, Dropdown } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
 import { smiley as smileyIcon } from '@wordpress/icons';
-import { useState, useCallback } from '@wordpress/element';
+import { useMemo, useState, useCallback } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 
@@ -13,8 +13,7 @@ import { addQueryArgs } from '@wordpress/url';
  * Internal dependencies
  */
 import ReactionEmojiPicker, {
-	getEmojiBySlug,
-	getLabelBySlug,
+	buildEmojiBySlugMap,
 	useReactionEmojis,
 } from './reaction-emoji-picker';
 
@@ -236,6 +235,10 @@ export default function ReactionDisplay( {
 	onToggleReaction,
 } ) {
 	const emojis = useReactionEmojis();
+	const emojiBySlug = useMemo(
+		() => buildEmojiBySlugMap( emojis ),
+		[ emojis ]
+	);
 	const reactedSlugs = getReactedSlugs( reactions );
 
 	if ( reactedSlugs.length === 0 ) {
@@ -247,6 +250,7 @@ export default function ReactionDisplay( {
 			{ reactedSlugs.map( ( slug ) => {
 				const count = getReactionCount( reactions, slug );
 				const isActive = hasUserReacted( reactions, slug );
+				const entry = emojiBySlug.get( slug );
 
 				return (
 					<ReactionButton
@@ -255,8 +259,8 @@ export default function ReactionDisplay( {
 						slug={ slug }
 						count={ count }
 						isActive={ isActive }
-						emoji={ getEmojiBySlug( slug, emojis ) }
-						emojiLabel={ getLabelBySlug( slug, emojis ) }
+						emoji={ entry?.emoji ?? slug }
+						emojiLabel={ entry?.label ?? slug }
 						onToggleReaction={ onToggleReaction }
 					/>
 				);

@@ -87,25 +87,13 @@ export function useReactionEmojis() {
  */
 
 /**
- * Get the emoji character for a given reaction slug.
+ * Build a Map keyed by slug for O(1) emoji and label lookups.
  *
- * @param {string} slug   The reaction slug.
- * @param {Array}  emojis Optional emoji list to search.
- * @return {string} The emoji character, or the slug if not found.
+ * @param {Array} emojis The emoji list to index.
+ * @return {Map} Map from slug to `{ emoji, label, value }` entry.
  */
-export function getEmojiBySlug( slug, emojis = REACTION_EMOJIS ) {
-	return emojis.find( ( r ) => r.value === slug )?.emoji ?? slug;
-}
-
-/**
- * Get the label for a given reaction slug.
- *
- * @param {string} slug   The reaction slug.
- * @param {Array}  emojis Optional emoji list to search.
- * @return {string} The label, or the slug if not found.
- */
-export function getLabelBySlug( slug, emojis = REACTION_EMOJIS ) {
-	return emojis.find( ( r ) => r.value === slug )?.label ?? slug;
+export function buildEmojiBySlugMap( emojis = REACTION_EMOJIS ) {
+	return new Map( emojis.map( ( entry ) => [ entry.value, entry ] ) );
 }
 
 /**
