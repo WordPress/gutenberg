@@ -4,6 +4,15 @@
 	--wp-grid-placeholder-radius: var(--wpds-border-radius-lg);
 }
 
+/*
+ * Rounded drag shadow: `@wordpress/grid` keeps the overlay frame
+ * radius-agnostic; match tile / Card radius here (frame exposes
+ * `data-wp-dashboard-drag-preview-frame`).
+ */
+.grid :global([data-wp-dashboard-drag-preview-frame]) {
+	border-radius: var(--wpds-border-radius-lg);
+}
+
 .tile {
 	height: 100%;
 	border-radius: var(--wpds-border-radius-lg);

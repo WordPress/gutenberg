@@ -27,15 +27,13 @@
  * Always applied, including when the consumer passes a
  * `renderDragPreview` wrapper. Owns the lift cue (`scale` with motion
  * tokens), drag elevation (`box-shadow` animating from resting `sm` to
- * `lg`), matching `border-radius` so the shadow follows the card shape,
- * the pointer feedback (`cursor`), and the pointer pass-through during
+ * `lg`), the pointer feedback (`cursor`), and the pointer pass-through during
  * the gesture. Further visual chrome (padding, inner surfaces) belongs
  * to the consumer, either on the children passed to <DashboardLanes />
  * or via `renderDragPreview`.
  */
 .drag-preview-frame {
 	height: 100%;
-	border-radius: var(--wpds-border-radius-lg);
 	cursor: grabbing;
 	pointer-events: none;
 	box-shadow: var(--wpds-elevation-lg);
