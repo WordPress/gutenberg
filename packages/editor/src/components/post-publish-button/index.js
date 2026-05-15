@@ -11,6 +11,9 @@ import { compose } from '@wordpress/compose';
  */
 import PublishButtonLabel from './label';
 import { store as editorStore } from '../../store';
+import DistributedEditingSaveJourneyCue, {
+	getDistributedEditingSaveJourneyDataAttributes,
+} from '../distributed-editing-save-journey-cue';
 
 const noop = () => {};
 
@@ -158,38 +161,9 @@ export class PostPublishButton extends Component {
 				  }
 				: {};
 		const distributedEditingSaveJourneyDataAttributes =
-			hasDistributedEditingSaveJourneyState
-				? {
-						'data-distributed-editing-save-control-journey-step':
-							distributedEditingSaveJourneyState.step,
-						'data-distributed-editing-save-control-journey-action':
-							distributedEditingSaveJourneyState.action,
-						'data-distributed-editing-save-control-journey-descriptor-only':
-							'true',
-						'data-distributed-editing-save-control-journey-calls-normal-save':
-							'false',
-						'data-distributed-editing-save-control-journey-calls-rest':
-							'false',
-						'data-distributed-editing-save-control-journey-calls-retry-save':
-							'false',
-						'data-distributed-editing-save-control-journey-changes-post-lock':
-							'false',
-						'data-distributed-editing-save-control-journey-claims-saved-without-evidence':
-							String(
-								Boolean(
-									distributedEditingSaveJourneyState.claimsSavedWithoutEvidence
-								)
-							),
-						'data-distributed-editing-save-control-journey-exposes-proof-internals':
-							'false',
-						'data-distributed-editing-save-control-journey-exposes-raw-content':
-							'false',
-						'data-distributed-editing-save-control-journey-mutates-editor-content':
-							'false',
-						'data-distributed-editing-save-control-journey-mutates-persisted-post-content':
-							'false',
-				  }
-				: {};
+			getDistributedEditingSaveJourneyDataAttributes(
+				distributedEditingSaveJourneyState
+			);
 		const distributedEditingSaveControlTitle =
 			hasDistributedEditingSaveJourneyState
 				? distributedEditingSaveJourneyState.summary
@@ -285,6 +259,10 @@ export class PostPublishButton extends Component {
 						}
 					/>
 				</Button>
+				<DistributedEditingSaveJourneyCue
+					className="editor-post-publish-button__distributed-editing-save-journey-cue"
+					saveJourneyState={ distributedEditingSaveJourneyState }
+				/>
 			</>
 		);
 	}

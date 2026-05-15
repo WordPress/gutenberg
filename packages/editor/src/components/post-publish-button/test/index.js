@@ -272,6 +272,7 @@ describe( 'PostPublishButton', () => {
 					shouldExposeInSaveControls: true,
 					step: 'ready_to_edit',
 					action: 'edit',
+					title: 'Save is available',
 					summary:
 						'Use Save when you are ready for WordPress to update this post.',
 					claimsSavedWithoutEvidence: false,
@@ -334,6 +335,40 @@ describe( 'PostPublishButton', () => {
 			'data-distributed-editing-save-control-journey-mutates-persisted-post-content',
 			'false'
 		);
+		const cue = screen.getByText( 'Save is available' );
+		expect( cue ).toBeVisible();
+		expect( cue ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-visual-cue',
+			'true'
+		);
+		expect( cue ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-step',
+			'ready_to_edit'
+		);
+		expect( cue ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-action',
+			'edit'
+		);
+		expect( cue ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-title',
+			'Save is available'
+		);
+		expect( cue ).toHaveAttribute(
+			'title',
+			'Use Save when you are ready for WordPress to update this post.'
+		);
+		expect( cue ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-calls-normal-save',
+			'false'
+		);
+		expect( cue ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-calls-retry-save',
+			'false'
+		);
+		expect( cue ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-mutates-editor-content',
+			'false'
+		);
 
 		await user.click( button );
 
@@ -365,6 +400,7 @@ describe( 'PostPublishButton', () => {
 					shouldExposeInSaveControls: true,
 					step: 'review_changes',
 					action: 'review_changes',
+					title: 'Save opens review',
 					summary:
 						'Review highlighted changes before WordPress updates the post.',
 					claimsSavedWithoutEvidence: false,
@@ -401,6 +437,24 @@ describe( 'PostPublishButton', () => {
 		);
 		expect( button ).toHaveAttribute(
 			'data-distributed-editing-save-control-journey-claims-saved-without-evidence',
+			'false'
+		);
+		const cue = screen.getByText( 'Save opens review' );
+		expect( cue ).toBeVisible();
+		expect( cue ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-visual-cue',
+			'true'
+		);
+		expect( cue ).toHaveAttribute(
+			'title',
+			'Review highlighted changes before WordPress updates the post.'
+		);
+		expect( cue ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-step',
+			'review_changes'
+		);
+		expect( cue ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-calls-normal-save',
 			'false'
 		);
 	} );

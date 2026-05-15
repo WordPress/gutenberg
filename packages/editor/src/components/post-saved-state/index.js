@@ -24,6 +24,7 @@ import { store as preferencesStore } from '@wordpress/preferences';
 import { STATUS_OPTIONS } from '../../components/post-status';
 import { store as editorStore } from '../../store';
 import { ATTACHMENT_POST_TYPE } from '../../store/constants';
+import { getDistributedEditingSaveJourneyDataAttributes } from '../distributed-editing-save-journey-cue';
 
 /**
  * Component showing whether the post is saved or not and providing save
@@ -203,38 +204,9 @@ export default function PostSavedState( { forceIsDirty } ) {
 			  }
 			: {};
 	const distributedEditingSaveJourneyDataAttributes =
-		hasDistributedEditingSaveJourneyState
-			? {
-					'data-distributed-editing-save-control-journey-step':
-						distributedEditingSaveJourneyState.step,
-					'data-distributed-editing-save-control-journey-action':
-						distributedEditingSaveJourneyState.action,
-					'data-distributed-editing-save-control-journey-descriptor-only':
-						'true',
-					'data-distributed-editing-save-control-journey-calls-normal-save':
-						'false',
-					'data-distributed-editing-save-control-journey-calls-rest':
-						'false',
-					'data-distributed-editing-save-control-journey-calls-retry-save':
-						'false',
-					'data-distributed-editing-save-control-journey-changes-post-lock':
-						'false',
-					'data-distributed-editing-save-control-journey-claims-saved-without-evidence':
-						String(
-							Boolean(
-								distributedEditingSaveJourneyState.claimsSavedWithoutEvidence
-							)
-						),
-					'data-distributed-editing-save-control-journey-exposes-proof-internals':
-						'false',
-					'data-distributed-editing-save-control-journey-exposes-raw-content':
-						'false',
-					'data-distributed-editing-save-control-journey-mutates-editor-content':
-						'false',
-					'data-distributed-editing-save-control-journey-mutates-persisted-post-content':
-						'false',
-			  }
-			: {};
+		getDistributedEditingSaveJourneyDataAttributes(
+			distributedEditingSaveJourneyState
+		);
 	const isSaved = forceSavedMessage || ( ! isNew && ! isDirty );
 	const isSavedState = hasDistributedEditingSaveButtonState
 		? distributedEditingSaveButtonBusy ||
