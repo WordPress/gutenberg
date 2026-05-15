@@ -8,6 +8,7 @@ import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
  */
 import {
 	getRelativeRootSelector,
+	buildScopedBlockSelector,
 	buildRootStyleStateSelector,
 	buildPseudoStyleStateSelector,
 } from '../state-utils';
@@ -103,5 +104,17 @@ describe( 'state selector builders', () => {
 		expect(
 			buildPseudoStyleStateSelector( BASE, 'test/unknown', ':hover' )
 		).toBe( `${ BASE }:hover` );
+	} );
+
+	it( 'does not split selector lists on commas inside pseudo-class arguments', () => {
+		expect(
+			buildScopedBlockSelector(
+				BASE,
+				'.wp-block-navigation :is(.current-menu-item, .current-menu-ancestor)',
+				':hover'
+			)
+		).toBe(
+			`${ BASE } :is(.current-menu-item, .current-menu-ancestor):hover`
+		);
 	} );
 } );

@@ -24,6 +24,7 @@ export { getBlockSelector } from './core/selectors';
 export { getTypographyFontSizeValue } from './utils/typography';
 export { getDimensionPresetCssVar } from './utils/dimensions';
 export {
+	splitSelectorList,
 	getValueFromVariable,
 	getPresetVariableFromValue,
 	getResolvedValue,
