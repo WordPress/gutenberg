@@ -1,6 +1,53 @@
 @use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/base-styles/variables" as *;
 
+.editor-distributed-editing-status__enabled-shell {
+	margin: $grid-unit-10 0;
+}
+
+.editor-distributed-editing-status__enabled-shell-panel {
+	background: $white;
+	border: 1px solid $gray-300;
+	border-left: 3px solid var(--wp-admin-theme-color, #2271b1);
+	border-radius: $radius-small;
+	display: grid;
+	gap: $grid-unit-10;
+	padding: $grid-unit-15;
+}
+
+.editor-distributed-editing-status__enabled-shell-panel--degraded {
+	border-left-color: #dba617;
+}
+
+.editor-distributed-editing-status__enabled-shell-header {
+	align-items: baseline;
+	display: flex;
+	flex-wrap: wrap;
+	gap: $grid-unit-05 $grid-unit-15;
+}
+
+.editor-distributed-editing-status__enabled-shell-title {
+	font-weight: 600;
+}
+
+.editor-distributed-editing-status__enabled-shell-protection,
+.editor-distributed-editing-status__enabled-shell-save-state,
+.editor-distributed-editing-status__presence-roster-summary {
+	color: $gray-700;
+}
+
+.editor-distributed-editing-status__enabled-shell-authority-state:empty,
+.editor-distributed-editing-status__enabled-shell-human-loop:empty {
+	display: none;
+}
+
+.editor-distributed-editing-status__presence-roster {
+	border-top: 1px solid $gray-200;
+	display: grid;
+	gap: $grid-unit-05;
+	padding-top: $grid-unit-10;
+}
+
 .editor-distributed-editing-status__presence-roster-list {
 	display: grid;
 	gap: $grid-unit-05;
@@ -11,7 +58,6 @@
 
 .editor-distributed-editing-status__presence-other-editor-cue {
 	font-weight: 500;
-	margin-top: $grid-unit-10;
 	padding: $grid-unit-05 $grid-unit-10;
 }
 
@@ -25,11 +71,28 @@
 	border-left: 3px solid #dba617;
 }
 
-.editor-distributed-editing-status__enabled-shell-human-loop {
+.editor-distributed-editing-status__enabled-shell-human-loop:not(:empty) {
 	border-left: 3px solid var(--wp-admin-theme-color, #2271b1);
 	display: grid;
 	gap: 2px;
 	margin-top: $grid-unit-10;
+	padding-left: $grid-unit-10;
+}
+
+.editor-distributed-editing-status__presence-actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: $grid-unit-05;
+	margin-top: $grid-unit-05;
+}
+
+.editor-distributed-editing-status__presence-freshness-indicator,
+.editor-distributed-editing-status__presence-startup-policy,
+.editor-distributed-editing-status__presence-storage-readiness {
+	border-left: 3px solid #dba617;
+	display: grid;
+	gap: 2px;
+	margin-top: $grid-unit-05;
 	padding-left: $grid-unit-10;
 }
 

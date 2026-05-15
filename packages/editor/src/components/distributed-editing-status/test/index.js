@@ -1203,41 +1203,29 @@ describe( 'DistributedEditingStatus', () => {
 			'edit'
 		);
 		expect(
-			within( shell ).getByText( 'Distributed Editing enabled' )
+			within( shell ).getByText( 'Distributed Editing: Ready' )
 		).toBeVisible();
 		expect(
-			screen.getByText(
-				'WordPress will protect local changes and show sync status here when review, refresh, or server confirmation is needed.'
-			)
+			screen.getByText( 'Local changes are protected.' )
 		).toBeVisible();
-		expect( screen.getByText( 'Save' ) ).toBeVisible();
-		expect( screen.getByText( 'Save is available' ) ).toBeVisible();
 		expect(
-			screen.getByText(
-				'Use Save when you are ready for WordPress to update this post.'
-			)
+			screen.getByText( 'Save updates WordPress when ready.' )
 		).toBeVisible();
-		expect( screen.getByText( 'WordPress post' ) ).toBeVisible();
 		expect(
-			screen.getByText(
-				'Save can update the authoritative WordPress post.'
-			)
-		).toBeVisible();
-		expect( screen.getByText( 'Current step' ) ).toBeVisible();
-		expect( screen.getByText( 'Ready to edit' ) ).toBeVisible();
+			screen.queryByText( 'Distributed Editing enabled' )
+		).not.toBeInTheDocument();
 		expect(
-			screen.getByText(
-				'Edit normally. Distributed Editing will step in if review, refresh, or server confirmation is needed.'
-			)
-		).toBeVisible();
-		const humanLoop = screen
-			.getByText( 'Current step' )
-			// eslint-disable-next-line testing-library/no-node-access
-			.closest( '[data-distributed-editing-human-loop-step-status]' );
-		const saveJourney = screen
-			.getByText( 'Save' )
-			// eslint-disable-next-line testing-library/no-node-access
-			.closest( '[data-distributed-editing-save-journey-status]' );
+			screen.queryByText( 'Save is available' )
+		).not.toBeInTheDocument();
+		expect( screen.queryByText( 'Current step' ) ).not.toBeInTheDocument();
+		// eslint-disable-next-line testing-library/no-node-access
+		const humanLoop = shell.querySelector(
+			'[data-distributed-editing-human-loop-step-status]'
+		);
+		// eslint-disable-next-line testing-library/no-node-access
+		const saveJourney = shell.querySelector(
+			'[data-distributed-editing-save-journey-status]'
+		);
 		expect( saveJourney ).toHaveAttribute(
 			'data-distributed-editing-save-journey-status',
 			'ready_to_edit'
@@ -1289,11 +1277,11 @@ describe( 'DistributedEditingStatus', () => {
 		expect( screen.getByText( 'Editing now' ) ).toBeVisible();
 		expect( screen.getByText( 'No other editors shown.' ) ).toBeVisible();
 		expect(
-			screen.getByText( 'Editor activity has not been shown yet.' )
-		).toBeVisible();
+			screen.queryByText( 'Editor activity has not been shown yet.' )
+		).not.toBeInTheDocument();
 		expect(
-			screen.getByText( 'Use Refresh editing list to check again.' )
-		).toBeVisible();
+			screen.queryByText( 'Use Refresh editing list to check again.' )
+		).not.toBeInTheDocument();
 		expect(
 			screen.getByRole( 'group', {
 				name: 'Distributed editing presence',
@@ -1332,7 +1320,7 @@ describe( 'DistributedEditingStatus', () => {
 			} )
 		).toHaveAttribute(
 			'data-distributed-editing-presence-refresh-hint-visible',
-			'true'
+			'false'
 		);
 		expect(
 			screen.getByRole( 'group', {
@@ -1403,9 +1391,7 @@ describe( 'DistributedEditingStatus', () => {
 			'none'
 		);
 		expect(
-			screen.getByText(
-				'WordPress accepted this Distributed Editing Save. You can keep editing; WordPress will protect any new local changes.'
-			)
+			screen.getByText( 'Distributed Editing: Saved' )
 		).toBeVisible();
 		expect(
 			screen.queryByText(
@@ -1413,22 +1399,19 @@ describe( 'DistributedEditingStatus', () => {
 			)
 		).not.toBeInTheDocument();
 		expect(
-			screen.getByText( 'Save confirmed by WordPress' )
-		).toBeVisible();
-		expect( screen.getByText( 'Saved by WordPress' ) ).toBeVisible();
-		expect(
-			screen.getByText(
-				'WordPress accepted the Distributed Editing Save. No protected local changes remain pending for this save.'
+			screen.queryByText(
+				'WordPress accepted this Distributed Editing Save. You can keep editing; WordPress will protect any new local changes.'
 			)
-		).toBeVisible();
-		const saveJourney = screen
-			.getByText( 'Save' )
-			// eslint-disable-next-line testing-library/no-node-access
-			.closest( '[data-distributed-editing-save-journey-status]' );
-		const humanLoop = screen
-			.getByText( 'Current step' )
-			// eslint-disable-next-line testing-library/no-node-access
-			.closest( '[data-distributed-editing-human-loop-step-status]' );
+		).not.toBeInTheDocument();
+		expect( screen.getByText( 'Saved by WordPress.' ) ).toBeVisible();
+		// eslint-disable-next-line testing-library/no-node-access
+		const saveJourney = shell.querySelector(
+			'[data-distributed-editing-save-journey-status]'
+		);
+		// eslint-disable-next-line testing-library/no-node-access
+		const humanLoop = shell.querySelector(
+			'[data-distributed-editing-human-loop-step-status]'
+		);
 		expect( saveJourney ).toHaveAttribute(
 			'data-distributed-editing-save-journey-status',
 			'save_confirmed'
@@ -1552,14 +1535,16 @@ describe( 'DistributedEditingStatus', () => {
 			'false'
 		);
 		expect(
-			screen.getByText(
+			screen.queryByText(
 				'Mira and Another editor are also editing this post.'
 			)
-		).toBeVisible();
+		).not.toBeInTheDocument();
 		expect(
 			screen.getByText( '2 other editors are active now.' )
 		).toBeVisible();
-		expect( screen.getByText( '2 editors are active now.' ) ).toBeVisible();
+		expect(
+			screen.queryByText( '2 editors are active now.' )
+		).not.toBeInTheDocument();
 		expect( presence ).toHaveAttribute(
 			'data-distributed-editing-presence-other-editor-cue',
 			'2 other editors are active now.'
@@ -1734,10 +1719,10 @@ describe( 'DistributedEditingStatus', () => {
 			'1'
 		);
 		expect(
-			screen.getByText(
+			screen.queryByText(
 				'Sam was here recently. Presence may be delayed.'
 			)
-		).toBeVisible();
+		).not.toBeInTheDocument();
 		expect(
 			screen.getByText( '1 other editor may be delayed.' )
 		).toBeVisible();
@@ -2421,18 +2406,18 @@ describe( 'DistributedEditingStatus', () => {
 				'ready'
 			);
 			expect(
-				screen.getAllByText( 'Presence startup scheduled' )
-			).toHaveLength( 2 );
+				screen.queryByText( 'Presence startup scheduled' )
+			).not.toBeInTheDocument();
 			expect(
-				screen.getByText(
+				screen.queryByText(
 					'Presence storage is ready and the startup update is waiting on its configured delay. Saves do not depend on presence.'
 				)
-			).toBeVisible();
+			).not.toBeInTheDocument();
 			expect(
-				screen.getByText(
+				screen.queryByText(
 					'Initial presence will update after about 2 seconds.'
 				)
-			).toBeVisible();
+			).not.toBeInTheDocument();
 			expect(
 				actions.__experimentalRefreshDistributedEditingPresenceStorageReadiness
 			).toHaveBeenCalledTimes( 1 );
@@ -2660,9 +2645,12 @@ describe( 'DistributedEditingStatus', () => {
 			'true'
 		);
 		expect(
-			screen.getByText(
+			screen.queryByText(
 				'2 editors are active now; 1 editor may be delayed. Some editor activity is hidden by roster limits or privacy settings.'
 			)
+		).not.toBeInTheDocument();
+		expect(
+			screen.getByText( '2 other editors are active now.' )
 		).toBeVisible();
 		const rowList = screen.getByRole( 'list', {
 			name: 'Visible editors',
@@ -2835,13 +2823,16 @@ describe( 'DistributedEditingStatus', () => {
 			'data-distributed-editing-presence-summary-hidden-count',
 			'1'
 		);
-		expect( presence ).toHaveTextContent(
+		expect( presence ).not.toHaveTextContent(
 			'Your presence may be delayed. You have this post open in another tab. Mira is also editing this post. Sam was here recently. Presence may be delayed.'
 		);
 		expect(
-			screen.getByText(
+			screen.queryByText(
 				'2 editors are active now; 2 editors may be delayed. Some editor activity is hidden by roster limits or privacy settings.'
 			)
+		).not.toBeInTheDocument();
+		expect(
+			screen.getByText( '1 other editor is active now.' )
 		).toBeVisible();
 
 		const rows = within(
@@ -2999,13 +2990,16 @@ describe( 'DistributedEditingStatus', () => {
 			'data-distributed-editing-presence-summary-expired-count',
 			'2'
 		);
-		expect( presence ).toHaveTextContent(
+		expect( presence ).not.toHaveTextContent(
 			'You are visible in this editing session. You have this post open in another tab. Mira and Another editor are also editing this post. Sam and Another editor were here recently. Presence may be delayed.'
 		);
 		expect(
-			screen.getByText(
+			screen.queryByText(
 				'4 editors are active now; 2 editors may be delayed. Some editor activity expired before this refresh.'
 			)
+		).not.toBeInTheDocument();
+		expect(
+			screen.getByText( '2 other editors are active now.' )
 		).toBeVisible();
 
 		const rows = within(
@@ -3170,13 +3164,16 @@ describe( 'DistributedEditingStatus', () => {
 			'data-distributed-editing-presence-summary-expired-count',
 			'2'
 		);
-		expect( presence ).toHaveTextContent(
+		expect( presence ).not.toHaveTextContent(
 			'You are visible in this editing session. You have this post open in another tab. Mira, Quinn, and 2 others are also editing this post. Sam, Priya, and 1 other were here recently. Presence may be delayed.'
 		);
 		expect(
-			screen.getByText(
+			screen.queryByText(
 				'6 editors are active now; 3 editors may be delayed. Some editor activity is hidden by roster limits or privacy settings. Some editor activity expired before this refresh.'
 			)
+		).not.toBeInTheDocument();
+		expect(
+			screen.getByText( '4 other editors are active now.' )
 		).toBeVisible();
 
 		const rows = within(
@@ -3262,11 +3259,13 @@ describe( 'DistributedEditingStatus', () => {
 			'false'
 		);
 		expect(
-			screen.getByText(
+			screen.queryByText(
 				'Mira was here recently. Presence may be delayed.'
 			)
+		).not.toBeInTheDocument();
+		expect(
+			screen.getByText( '1 other editor may be delayed.' )
 		).toBeVisible();
-		expect( screen.getByText( '1 editor may be delayed.' ) ).toBeVisible();
 		const rows = within(
 			screen.getByRole( 'list', { name: 'Visible editors' } )
 		).getAllByRole( 'listitem' );
@@ -3832,16 +3831,20 @@ describe( 'DistributedEditingStatus', () => {
 			'data-distributed-editing-presence-startup-policy-claims-saved',
 			'false'
 		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-startup-policy-visible',
+			'false'
+		);
 		expect(
-			screen.getByText(
+			screen.queryByText(
 				'Initial presence may start automatically after about 120 seconds on cheap hosts.'
 			)
-		).toBeVisible();
+		).not.toBeInTheDocument();
 		expect(
-			screen.getByText(
+			screen.queryByText(
 				'Initial presence will update after about 120 seconds.'
 			)
-		).toBeVisible();
+		).not.toBeInTheDocument();
 		expect(
 			actions.__experimentalSendDistributedEditingPresenceHeartbeat
 		).not.toHaveBeenCalled();
@@ -4067,10 +4070,12 @@ describe( 'DistributedEditingStatus', () => {
 				'data-distributed-editing-presence-freshness-indicator-claims-absence',
 				'false'
 			);
-			expect( screen.getByText( 'Presence connected' ) ).toBeVisible();
 			expect(
-				screen.getByText( 'Editing list updates about every second.' )
-			).toBeVisible();
+				screen.queryByText( 'Presence connected' )
+			).not.toBeInTheDocument();
+			expect(
+				screen.queryByText( 'Editing list updates about every second.' )
+			).not.toBeInTheDocument();
 			expect( presence ).toHaveAttribute(
 				'data-distributed-editing-presence-repeated-refresh-scheduler-calls-save',
 				'false'
@@ -4501,7 +4506,7 @@ describe( 'DistributedEditingStatus', () => {
 			expect( presence ).toHaveTextContent(
 				'Editor activity was seen before this refresh. Presence may be delayed.'
 			);
-			expect( presence ).toHaveTextContent(
+			expect( presence ).not.toHaveTextContent(
 				'Some editor activity expired before this refresh.'
 			);
 			expect( presence ).not.toHaveTextContent(
@@ -4576,7 +4581,7 @@ describe( 'DistributedEditingStatus', () => {
 			expect( presence ).toHaveTextContent(
 				'You are visible in this editing session.'
 			);
-			expect( presence ).toHaveTextContent(
+			expect( presence ).not.toHaveTextContent(
 				'1 editor is active now. Some editor activity expired before this refresh.'
 			);
 			expect( presence ).not.toHaveTextContent(
@@ -5391,22 +5396,30 @@ describe( 'DistributedEditingStatus', () => {
 			'protected'
 		);
 		expect(
-			screen.getByText(
+			screen.queryByText(
 				'Updates may be delayed. Local changes remain protected and exportable.'
 			)
+		).not.toBeInTheDocument();
+		expect(
+			screen.getByText( 'Distributed Editing: Delayed' )
 		).toBeVisible();
 		expect( shell ).toHaveAttribute(
 			'data-distributed-editing-human-loop-step',
 			'local_changes_protected'
 		);
-		expect( screen.getByText( 'Local changes protected' ) ).toBeVisible();
 		expect(
-			screen.getByText( 'Save keeps changes protected' )
-		).toBeVisible();
+			screen.queryByText( 'Local changes protected' )
+		).not.toBeInTheDocument();
 		expect(
-			screen.getByText(
+			screen.queryByText( 'Save keeps changes protected' )
+		).not.toBeInTheDocument();
+		expect(
+			screen.queryByText(
 				'You can keep editing. If you use Save, keep this tab open until WordPress confirms the update.'
 			)
+		).not.toBeInTheDocument();
+		expect(
+			screen.getByText( 'Keep this tab open until WordPress confirms.' )
 		).toBeVisible();
 		expect( screen.getByText( 'Changes pending' ) ).toBeVisible();
 	} );
@@ -5458,26 +5471,33 @@ describe( 'DistributedEditingStatus', () => {
 			'review_changes'
 		);
 		expect(
-			screen.getByText(
+			screen.queryByText(
 				'The authoritative WordPress post cannot be updated until risky changes are approved or removed.'
 			)
-		).toBeVisible();
-		expect( screen.getByText( 'Review changes' ) ).toBeVisible();
-		expect( screen.getByText( 'Save opens review' ) ).toBeVisible();
+		).not.toBeInTheDocument();
 		expect(
-			screen.getByText(
+			screen.queryByText( 'Review changes' )
+		).not.toBeInTheDocument();
+		expect(
+			screen.queryByText( 'Save opens review' )
+		).not.toBeInTheDocument();
+		expect(
+			screen.queryByText(
 				'Save will open review before WordPress updates the post.'
 			)
-		).toBeVisible();
+		).not.toBeInTheDocument();
 		expect(
-			screen.getByText(
+			screen.queryByText(
 				'Review highlighted changes before WordPress updates the post.'
 			)
+		).not.toBeInTheDocument();
+		expect(
+			screen.getByText( 'Review changes before saving.' )
 		).toBeVisible();
-		const saveJourney = screen
-			.getByText( 'Save' )
-			// eslint-disable-next-line testing-library/no-node-access
-			.closest( '[data-distributed-editing-save-journey-status]' );
+		// eslint-disable-next-line testing-library/no-node-access
+		const saveJourney = shell.querySelector(
+			'[data-distributed-editing-save-journey-status]'
+		);
 		expect( saveJourney ).toHaveAttribute(
 			'data-distributed-editing-save-journey-status',
 			'review_changes'

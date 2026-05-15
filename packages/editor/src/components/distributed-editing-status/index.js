@@ -2236,6 +2236,41 @@ function getDistributedEditingHumanLoopSaveJourneyCopy( humanLoopStepState ) {
 	};
 }
 
+function getDistributedEditingEnabledShellTitle( shellState ) {
+	if ( shellState.serverContact === 'degraded' ) {
+		return __( 'Distributed Editing: Delayed' );
+	}
+
+	if ( shellState.humanLoopStepState.confirmedByWordPress ) {
+		return __( 'Distributed Editing: Saved' );
+	}
+
+	if ( shellState.localProtection === 'protected' ) {
+		return __( 'Distributed Editing: Protecting changes' );
+	}
+
+	return __( 'Distributed Editing: Ready' );
+}
+
+function getDistributedEditingEnabledShellSaveLine( shellState ) {
+	switch ( shellState.humanLoopStep ) {
+		case DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.GET_LATEST_POST:
+			return __( 'Get latest post before saving.' );
+		case DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.REVIEW_CHANGES:
+			return __( 'Review changes before saving.' );
+		case DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.READY_TO_SAVE:
+			return __( 'Ready to Save.' );
+		case DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.WAITING_FOR_WORDPRESS:
+			return __( 'Waiting for WordPress.' );
+		case DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.SAVE_CONFIRMED:
+			return __( 'Saved by WordPress.' );
+		case DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.LOCAL_CHANGES_PROTECTED:
+			return __( 'Keep this tab open until WordPress confirms.' );
+	}
+
+	return __( 'Save updates WordPress when ready.' );
+}
+
 /**
  * Renders the always-visible DE-RTC enabled shell in editor chrome.
  *
@@ -2266,6 +2301,12 @@ export function DistributedEditingEnabledShell( {
 	}
 
 	const shellState = getDistributedEditingEnabledShellState( sessionState );
+	const shellTone =
+		shellState.serverContact === 'degraded'
+			? 'degraded'
+			: shellState.localProtection;
+	const shellTitle = getDistributedEditingEnabledShellTitle( shellState );
+	const saveLine = getDistributedEditingEnabledShellSaveLine( shellState );
 
 	return (
 		<div
@@ -2296,13 +2337,21 @@ export function DistributedEditingEnabledShell( {
 			}
 			role="region"
 		>
-			<Notice
-				status="info"
-				isDismissible={ false }
-				spokenMessage={ __( 'Distributed Editing enabled' ) }
+			<div
+				aria-live="polite"
+				className={ [
+					'editor-distributed-editing-status__enabled-shell-panel',
+					`editor-distributed-editing-status__enabled-shell-panel--${ shellTone }`,
+				].join( ' ' ) }
 			>
-				<strong>{ __( 'Distributed Editing enabled' ) }</strong>
-				<div>{ shellState.message }</div>
+				<div className="editor-distributed-editing-status__enabled-shell-header">
+					<strong className="editor-distributed-editing-status__enabled-shell-title">
+						{ shellTitle }
+					</strong>
+					<span className="editor-distributed-editing-status__enabled-shell-protection">
+						{ __( 'Local changes are protected.' ) }
+					</span>
+				</div>
 				<div
 					className="editor-distributed-editing-status__enabled-shell-save-state"
 					data-distributed-editing-save-journey-calls-normal-save="false"
@@ -2330,14 +2379,14 @@ export function DistributedEditingEnabledShell( {
 						shellState.saveStateSummaryText
 					}
 				>
-					<strong>{ __( 'Save' ) }</strong>
-					<div>{ shellState.saveJourneyTitle }</div>
-					<div>{ shellState.saveJourneySummary }</div>
+					{ saveLine }
 				</div>
-				<div className="editor-distributed-editing-status__enabled-shell-authority-state">
-					<strong>{ __( 'WordPress post' ) }</strong>
-					<div>{ shellState.authorityStatusText }</div>
-				</div>
+				<div
+					className="editor-distributed-editing-status__enabled-shell-authority-state"
+					data-distributed-editing-authority-status-summary={
+						shellState.authorityStatusText
+					}
+				/>
 				<div
 					className="editor-distributed-editing-status__enabled-shell-human-loop"
 					data-distributed-editing-human-loop-calls-normal-save="false"
@@ -2358,11 +2407,7 @@ export function DistributedEditingEnabledShell( {
 					data-distributed-editing-human-loop-step-status={
 						shellState.humanLoopStep
 					}
-				>
-					<strong>{ __( 'Current step' ) }</strong>
-					<div>{ shellState.humanLoopTitle }</div>
-					<div>{ shellState.humanLoopSummary }</div>
-				</div>
+				/>
 				<DistributedEditingPresenceRoster
 					initialPresenceRoster={
 						editorSettings.distributedEditing?.initialPresenceRoster
@@ -2373,7 +2418,7 @@ export function DistributedEditingEnabledShell( {
 					}
 					sessionState={ sessionState }
 				/>
-			</Notice>
+			</div>
 		</div>
 	);
 }
@@ -2592,6 +2637,39 @@ function DistributedEditingPresenceRoster( {
 		rosterState,
 		startupHeartbeatRuntimeState,
 	} );
+	const shouldShowPresenceFreshnessIndicator =
+		presenceFreshnessIndicator.tone === 'warning' ||
+		[ 'paused', 'delayed', 'degraded' ].includes(
+			presenceFreshnessIndicator.state
+		);
+	const shouldShowPresenceRefreshHint =
+		shouldShowPresenceFreshnessIndicator &&
+		Boolean( rosterState.copy.refreshHint );
+	const shouldShowPresenceStartupPolicy =
+		startupPolicyState.serverContact === 'degraded' ||
+		[ 'failed', 'degraded', 'paused' ].includes(
+			startupHeartbeatRuntimeState.status
+		) ||
+		startupHeartbeatRuntimeState.blockedByStorageReadiness;
+	const shouldShowPresenceStorageReadiness =
+		presenceStorageSetupAffordanceState.visible ||
+		presenceStorageReadinessRecheckState.visible;
+	const hasOtherEditorActivityCue = Boolean(
+		rosterState.copy.otherEditorActivityCue
+	);
+	const presenceSummaryText =
+		( hasOtherEditorActivityCue &&
+			rosterState.copy.otherEditorActivityCue ) ||
+		rosterState.copy.summary;
+	const presenceSummaryClassName = [
+		'editor-distributed-editing-status__presence-roster-summary',
+		hasOtherEditorActivityCue &&
+			'editor-distributed-editing-status__presence-other-editor-cue',
+		hasOtherEditorActivityCue &&
+			`editor-distributed-editing-status__presence-other-editor-cue--${ rosterState.copy.otherEditorActivityCueTone }`,
+	]
+		.filter( Boolean )
+		.join( ' ' );
 
 	useEffect( () => {
 		if (
@@ -2853,6 +2931,9 @@ function DistributedEditingPresenceRoster( {
 			data-distributed-editing-presence-freshness-indicator-tone={
 				presenceFreshnessIndicator.tone
 			}
+			data-distributed-editing-presence-freshness-indicator-visible={ formatDataBoolean(
+				shouldShowPresenceFreshnessIndicator
+			) }
 			data-distributed-editing-presence-heartbeat-calls-rest={ formatDataBoolean(
 				sessionState.presenceHeartbeatCallsRestEndpoint
 			) }
@@ -3018,6 +3099,9 @@ function DistributedEditingPresenceRoster( {
 			data-distributed-editing-presence-startup-policy-status={
 				startupPolicyState.status
 			}
+			data-distributed-editing-presence-startup-policy-visible={ formatDataBoolean(
+				shouldShowPresenceStartupPolicy
+			) }
 			data-distributed-editing-presence-startup-policy-writes-presence-now={ formatDataBoolean(
 				startupPolicyState.writesPresenceNow
 			) }
@@ -3110,6 +3194,9 @@ function DistributedEditingPresenceRoster( {
 			) }
 			data-distributed-editing-presence-storage-readiness-transport-required-for-correctness={ formatDataBoolean(
 				presenceStorageReadinessState.transportRequiredForCorrectness
+			) }
+			data-distributed-editing-presence-storage-readiness-visible={ formatDataBoolean(
+				shouldShowPresenceStorageReadiness
 			) }
 			data-distributed-editing-presence-storage-readiness-recheck-available={ formatDataBoolean(
 				presenceStorageReadinessRecheckState.available
@@ -3206,7 +3293,7 @@ function DistributedEditingPresenceRoster( {
 				rosterState.copy.refreshHint
 			}
 			data-distributed-editing-presence-refresh-hint-visible={ formatDataBoolean(
-				Boolean( rosterState.copy.refreshHint )
+				shouldShowPresenceRefreshHint
 			) }
 			data-distributed-editing-presence-other-editor-cue={
 				rosterState.copy.otherEditorActivityCue
@@ -3244,16 +3331,20 @@ function DistributedEditingPresenceRoster( {
 			}
 			role="group"
 		>
-			<strong>{ rosterState.copy.label }</strong>
-			<div>{ rosterState.copy.summary }</div>
+			<strong className="editor-distributed-editing-status__presence-roster-label">
+				{ rosterState.copy.label }
+			</strong>
 			<div
 				aria-live="polite"
-				className="editor-distributed-editing-status__presence-roster-summary"
+				className={ presenceSummaryClassName }
+				data-distributed-editing-presence-other-editor-cue-copy={
+					rosterState.copy.otherEditorActivityCue
+				}
 				data-distributed-editing-presence-summary-visible="true"
 			>
-				{ rosterState.copy.countSummary }
+				{ presenceSummaryText }
 			</div>
-			{ rosterState.copy.refreshHint && (
+			{ shouldShowPresenceRefreshHint && (
 				<div
 					className="editor-distributed-editing-status__presence-refresh-hint"
 					data-distributed-editing-presence-refresh-hint-copy={
@@ -3263,129 +3354,138 @@ function DistributedEditingPresenceRoster( {
 					{ rosterState.copy.refreshHint }
 				</div>
 			) }
-			{ rosterState.copy.otherEditorActivityCue && (
+			{ shouldShowPresenceFreshnessIndicator && (
 				<div
 					aria-live="polite"
-					className={ [
-						'editor-distributed-editing-status__presence-other-editor-cue',
-						`editor-distributed-editing-status__presence-other-editor-cue--${ rosterState.copy.otherEditorActivityCueTone }`,
-					].join( ' ' ) }
-					data-distributed-editing-presence-other-editor-cue-copy={
-						rosterState.copy.otherEditorActivityCue
-					}
+					className="editor-distributed-editing-status__presence-freshness-indicator"
+					data-distributed-editing-presence-freshness-indicator-visible="true"
 				>
-					{ rosterState.copy.otherEditorActivityCue }
+					<strong>{ presenceFreshnessIndicator.label }</strong>
+					<div>{ presenceFreshnessIndicator.summary }</div>
 				</div>
 			) }
-			<div
-				aria-live="polite"
-				className="editor-distributed-editing-status__presence-freshness-indicator"
-				data-distributed-editing-presence-freshness-indicator-visible="true"
-			>
-				<strong>{ presenceFreshnessIndicator.label }</strong>
-				<div>{ presenceFreshnessIndicator.summary }</div>
-			</div>
-			<div
-				className="editor-distributed-editing-status__presence-startup-policy"
-				data-distributed-editing-presence-startup-policy-visible="true"
-			>
-				<strong>{ startupPolicyState.copy.label }</strong>
-				<div>{ startupPolicyState.copy.summary }</div>
+			{ shouldShowPresenceStartupPolicy && (
 				<div
-					aria-live="polite"
-					className="editor-distributed-editing-status__presence-startup-heartbeat-runtime"
-					data-distributed-editing-presence-startup-heartbeat-runtime-visible="true"
+					className="editor-distributed-editing-status__presence-startup-policy"
+					data-distributed-editing-presence-startup-policy-visible="true"
 				>
-					<strong>{ startupHeartbeatRuntimeState.copy.label }</strong>
-					<div>{ startupHeartbeatRuntimeState.copy.summary }</div>
-				</div>
-			</div>
-			<div
-				className="editor-distributed-editing-status__presence-storage-readiness"
-				data-distributed-editing-presence-storage-readiness-visible="true"
-			>
-				<strong>{ presenceStorageReadinessState.copy.label }</strong>
-				<div>{ presenceStorageReadinessState.copy.summary }</div>
-				{ presenceStorageSetupAffordanceState.visible && (
-					<div
-						className="editor-distributed-editing-status__presence-storage-setup-affordance"
-						data-distributed-editing-presence-storage-setup-affordance-panel-visible="true"
-					>
-						<strong>
-							{ presenceStorageSetupAffordanceState.copy.label }
-						</strong>
-						<div>
-							{ presenceStorageSetupAffordanceState.copy.summary }
-						</div>
-						<Button
-							variant="secondary"
-							href={
-								presenceStorageSetupAffordanceState.settingsHref
-							}
-							onClick={ handleOpenPresenceStorageSetup }
-							rel="noreferrer"
-							target="_blank"
-							__next40pxDefaultSize
-						>
-							{ __( 'Open Writing settings' ) }
-						</Button>
-						<Button
-							variant="secondary"
-							onClick={ handleRecheckPresenceStorageReadiness }
-							type="button"
-							isBusy={
-								presenceStorageReadinessRecheckState.status ===
-								'checking'
-							}
-							accessibleWhenDisabled
-							disabled={
-								presenceStorageReadinessRecheckState.status ===
-								'checking'
-							}
-							__next40pxDefaultSize
-						>
-							{ __( 'Check setup status' ) }
-						</Button>
-					</div>
-				) }
-				{ presenceStorageReadinessRecheckState.visible && (
+					<strong>{ startupPolicyState.copy.label }</strong>
+					<div>{ startupPolicyState.copy.summary }</div>
 					<div
 						aria-live="polite"
-						className="editor-distributed-editing-status__presence-storage-readiness-recheck"
-						role="status"
+						className="editor-distributed-editing-status__presence-startup-heartbeat-runtime"
+						data-distributed-editing-presence-startup-heartbeat-runtime-visible="true"
 					>
 						<strong>
-							{ presenceStorageReadinessRecheckState.copy.label }
+							{ startupHeartbeatRuntimeState.copy.label }
 						</strong>
-						<div>
-							{
-								presenceStorageReadinessRecheckState.copy
-									.summary
-							}
-						</div>
+						<div>{ startupHeartbeatRuntimeState.copy.summary }</div>
 					</div>
-				) }
+				</div>
+			) }
+			{ shouldShowPresenceStorageReadiness && (
+				<div
+					className="editor-distributed-editing-status__presence-storage-readiness"
+					data-distributed-editing-presence-storage-readiness-visible="true"
+				>
+					<strong>
+						{ presenceStorageReadinessState.copy.label }
+					</strong>
+					<div>{ presenceStorageReadinessState.copy.summary }</div>
+					{ presenceStorageSetupAffordanceState.visible && (
+						<div
+							className="editor-distributed-editing-status__presence-storage-setup-affordance"
+							data-distributed-editing-presence-storage-setup-affordance-panel-visible="true"
+						>
+							<strong>
+								{
+									presenceStorageSetupAffordanceState.copy
+										.label
+								}
+							</strong>
+							<div>
+								{
+									presenceStorageSetupAffordanceState.copy
+										.summary
+								}
+							</div>
+							<Button
+								variant="secondary"
+								href={
+									presenceStorageSetupAffordanceState.settingsHref
+								}
+								onClick={ handleOpenPresenceStorageSetup }
+								rel="noreferrer"
+								target="_blank"
+								__next40pxDefaultSize
+							>
+								{ __( 'Open Writing settings' ) }
+							</Button>
+							<Button
+								variant="secondary"
+								onClick={
+									handleRecheckPresenceStorageReadiness
+								}
+								type="button"
+								isBusy={
+									presenceStorageReadinessRecheckState.status ===
+									'checking'
+								}
+								accessibleWhenDisabled
+								disabled={
+									presenceStorageReadinessRecheckState.status ===
+									'checking'
+								}
+								__next40pxDefaultSize
+							>
+								{ __( 'Check setup status' ) }
+							</Button>
+						</div>
+					) }
+					{ presenceStorageReadinessRecheckState.visible && (
+						<div
+							aria-live="polite"
+							className="editor-distributed-editing-status__presence-storage-readiness-recheck"
+							role="status"
+						>
+							<strong>
+								{
+									presenceStorageReadinessRecheckState.copy
+										.label
+								}
+							</strong>
+							<div>
+								{
+									presenceStorageReadinessRecheckState.copy
+										.summary
+								}
+							</div>
+						</div>
+					) }
+				</div>
+			) }
+			<div className="editor-distributed-editing-status__presence-actions">
+				<Button
+					variant="secondary"
+					onClick={ handleRefreshPresence }
+					isBusy={ commandStatus === 'refreshing' }
+					accessibleWhenDisabled
+					disabled={ commandStatus === 'refreshing' }
+					__next40pxDefaultSize
+				>
+					{ __( 'Refresh editing list' ) }
+				</Button>
+				<Button
+					variant="secondary"
+					onClick={ handleSendPresenceHeartbeat }
+					isBusy={ heartbeatCommandStatus === 'sending' }
+					accessibleWhenDisabled
+					disabled={ heartbeatCommandStatus === 'sending' }
+					__next40pxDefaultSize
+				>
+					{ __( 'Update my presence' ) }
+				</Button>
 			</div>
-			<Button
-				variant="secondary"
-				onClick={ handleRefreshPresence }
-				isBusy={ commandStatus === 'refreshing' }
-				accessibleWhenDisabled
-				disabled={ commandStatus === 'refreshing' }
-				__next40pxDefaultSize
-			>
-				{ __( 'Refresh editing list' ) }
-			</Button>
-			<Button
-				variant="secondary"
-				onClick={ handleSendPresenceHeartbeat }
-				isBusy={ heartbeatCommandStatus === 'sending' }
-				accessibleWhenDisabled
-				disabled={ heartbeatCommandStatus === 'sending' }
-				__next40pxDefaultSize
-			>
-				{ __( 'Update my presence' ) }
-			</Button>
 			{ commandStatus !== 'idle' && (
 				<div role="status">
 					{ getPresenceRefreshCommandStatusText( commandStatus ) }
