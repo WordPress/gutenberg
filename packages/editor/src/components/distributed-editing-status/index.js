@@ -1794,6 +1794,28 @@ function getFreshReviewDecisionCommandMessage( commandStatus ) {
 	);
 }
 
+function getFreshReviewComparePlanTitle( comparePlan ) {
+	return comparePlan?.status === 'ready'
+		? __( 'Compare plan ready' )
+		: __( 'Compare plan unavailable' );
+}
+
+function getFreshReviewComparePlanMessage( comparePlan ) {
+	if ( comparePlan?.status === 'ready' ) {
+		return __(
+			'A future comparison can use base and proposed hash evidence for this review item. No comparison is open, no content is shown, and no save was made.'
+		);
+	}
+
+	return __(
+		'This review item is missing hash evidence for a future comparison. No comparison is open, no content is shown, and no save was made.'
+	);
+}
+
+function getFreshReviewComparePlanEvidenceLabel( available ) {
+	return available ? __( 'Available' ) : __( 'Unavailable' );
+}
+
 async function copyDistributedEditingLocalUpdatesToClipboard( {
 	currentPost,
 	editedPostContent,
@@ -1961,6 +1983,7 @@ export function DistributedEditingStatusChrome( { onAction } ) {
 			/>
 			<DistributedEditingFreshReviewJumpInspectionStatus />
 			<DistributedEditingFreshReviewCompareInspectionStatus />
+			<DistributedEditingFreshReviewComparePlanStatus />
 		</>
 	);
 }
@@ -2121,6 +2144,94 @@ function DistributedEditingFreshReviewCompareInspectionStatus() {
 			>
 				{ getFreshReviewDecisionCommandMessage( commandStatus ) }
 			</div>
+		</div>
+	);
+}
+
+function DistributedEditingFreshReviewComparePlanStatus() {
+	const decisionState = useSelect( ( select ) => {
+		const {
+			getDistributedEditingFreshReviewDecisionState,
+			getDistributedEditingSessionState,
+		} = select( editorStore );
+		const sessionState = getDistributedEditingSessionState?.() || {};
+
+		return (
+			getDistributedEditingFreshReviewDecisionState?.() ||
+			getDistributedEditingFreshReviewDecisionStateForSessionState(
+				sessionState
+			)
+		);
+	}, [] );
+	const reviewItem = decisionState?.reviewItems?.find(
+		( item ) => item.compareAction?.comparePlan
+	);
+	const comparePlan = reviewItem?.compareAction?.comparePlan;
+
+	if ( ! comparePlan ) {
+		return null;
+	}
+
+	return (
+		<div
+			aria-label={ __( 'Distributed editing fresh review compare plan' ) }
+			className="editor-distributed-editing-status__fresh-review-compare-plan"
+			data-distributed-editing-fresh-review-compare-plan
+			data-distributed-editing-fresh-review-compare-plan-base-hash-evidence={ formatDataBoolean(
+				comparePlan.hasBaseContentHash
+			) }
+			data-distributed-editing-fresh-review-compare-plan-calls-rest={ formatDataBoolean(
+				comparePlan.callsRestEndpoint
+			) }
+			data-distributed-editing-fresh-review-compare-plan-calls-save={ formatDataBoolean(
+				comparePlan.callsSave
+			) }
+			data-distributed-editing-fresh-review-compare-plan-opens-comparison={ formatDataBoolean(
+				comparePlan.opensComparison
+			) }
+			data-distributed-editing-fresh-review-compare-plan-placement="editor-interface-notices"
+			data-distributed-editing-fresh-review-compare-plan-proposed-hash-evidence={ formatDataBoolean(
+				comparePlan.hasProposedContentHash
+			) }
+			data-distributed-editing-fresh-review-compare-plan-renders-diff={ formatDataBoolean(
+				comparePlan.rendersDiff
+			) }
+			data-distributed-editing-fresh-review-compare-plan-review-hash-evidence={ formatDataBoolean(
+				comparePlan.hasReviewedProposedContentHash
+			) }
+			data-distributed-editing-fresh-review-compare-plan-status={
+				comparePlan.status
+			}
+			role="group"
+		>
+			<strong>{ getFreshReviewComparePlanTitle( comparePlan ) }</strong>
+			<p>{ getFreshReviewComparePlanMessage( comparePlan ) }</p>
+			<dl className="editor-distributed-editing-status__fresh-review-compare-plan-evidence">
+				<div>
+					<dt>{ __( 'Base hash evidence' ) }</dt>
+					<dd>
+						{ getFreshReviewComparePlanEvidenceLabel(
+							comparePlan.hasBaseContentHash
+						) }
+					</dd>
+				</div>
+				<div>
+					<dt>{ __( 'Proposed hash evidence' ) }</dt>
+					<dd>
+						{ getFreshReviewComparePlanEvidenceLabel(
+							comparePlan.hasProposedContentHash
+						) }
+					</dd>
+				</div>
+				<div>
+					<dt>{ __( 'Reviewed hash evidence' ) }</dt>
+					<dd>
+						{ getFreshReviewComparePlanEvidenceLabel(
+							comparePlan.hasReviewedProposedContentHash
+						) }
+					</dd>
+				</div>
+			</dl>
 		</div>
 	);
 }

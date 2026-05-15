@@ -2055,11 +2055,71 @@ function getDistributedEditingFreshReviewItemAffordanceFields( item ) {
 	return {
 		supportsJumpToBlock: true,
 		supportsCompare: true,
+		supportsComparePlan: true,
 		canJumpToBlock: jumpToBlockAction.enabled,
 		canCompare: compareAction.enabled,
+		canShowComparePlan: Boolean( compareAction.comparePlan ),
 		jumpToBlockAction,
 		compareAction,
 		affordanceActionDescriptors: [ jumpToBlockAction, compareAction ],
+	};
+}
+
+function createDistributedEditingFreshReviewComparePlanDescriptor(
+	item,
+	{ enabled = true, reason = null } = {}
+) {
+	const hasBaseContentHash = Boolean( item.baseContentHash );
+	const hasProposedContentHash = Boolean( item.proposedContentHash );
+	const hasReviewedProposedContentHash = Boolean(
+		item.reviewedProposedContentHash
+	);
+	const hashEvidenceFields = [
+		hasBaseContentHash ? 'baseContentHash' : null,
+		hasProposedContentHash ? 'proposedContentHash' : null,
+		hasReviewedProposedContentHash ? 'reviewedProposedContentHash' : null,
+	].filter( Boolean );
+
+	return {
+		status: enabled ? 'ready' : 'unavailable',
+		reason: normalizeNullableString( reason ),
+		itemId: normalizeNullableString( item.id ),
+		blockClientId: normalizeNullableString( item.blockClientId ),
+		blockName: normalizeNullableString( item.blockName ),
+		blockLabel: normalizeNullableString( item.blockLabel ),
+		changeKind: normalizeNullableString( item.changeKind ),
+		evidenceType: 'hash_only_serialized_block_compare_plan',
+		hashEvidenceFields,
+		hasBaseContentHash,
+		hasProposedContentHash,
+		hasReviewedProposedContentHash,
+		usesBaseContentHash: hasBaseContentHash,
+		usesProposedContentHash: hasProposedContentHash,
+		usesReviewedProposedContentHash: hasReviewedProposedContentHash,
+		requiresFutureComparisonSurface: true,
+		descriptorOnly: true,
+		hashValuesRedacted: true,
+		exposesHashValues: false,
+		rendersDiff: false,
+		opensComparison: false,
+		callsRestEndpoint: false,
+		callsSave: false,
+		callsNormalSavePost: false,
+		callsRetrySaveEndpoint: false,
+		dispatchesNotice: false,
+		savesPost: false,
+		mutatesEditorContent: false,
+		mutatesPersistedPostContent: false,
+		selectsBlock: false,
+		movesFocus: false,
+		createsRevision: false,
+		changesPostLock: false,
+		claimsSaved: false,
+		exposesRawContent: false,
+		exposesProofSignature: false,
+		exposesTokenMaterial: false,
+		exposesUserIdentity: false,
+		exposesReviewerIds: false,
 	};
 }
 
@@ -2090,6 +2150,15 @@ function createDistributedEditingFreshReviewItemAffordanceDescriptor(
 			: 'compare-evidence-unavailable';
 	}
 
+	const comparePlan =
+		actionKey ===
+		DISTRIBUTED_EDITING_NOTICE_ACTIONS.COMPARE_FRESH_REVIEW_ITEM
+			? createDistributedEditingFreshReviewComparePlanDescriptor( item, {
+					enabled,
+					reason,
+			  } )
+			: null;
+
 	return {
 		actionKey,
 		enabled: Boolean( enabled ),
@@ -2116,6 +2185,7 @@ function createDistributedEditingFreshReviewItemAffordanceDescriptor(
 		commandStatusPlacement: reportsCommandStatus
 			? 'fresh_review_decision_panel'
 			: null,
+		comparePlan,
 		callsRestEndpoint: false,
 		callsSave: false,
 		callsNormalSavePost: false,
@@ -6188,8 +6258,10 @@ function getDistributedEditingFreshReviewPrePublishReviewItems(
 			isRejected,
 			supportsJumpToBlock: item.supportsJumpToBlock,
 			supportsCompare: item.supportsCompare,
+			supportsComparePlan: item.supportsComparePlan,
 			canJumpToBlock: item.canJumpToBlock,
 			canCompare: item.canCompare,
+			canShowComparePlan: item.canShowComparePlan,
 			canApprove: canRecordLocalDecisions && ! isApprovedForRetrySave,
 			canReject: canRecordLocalDecisions && ! isRejected,
 			approveAction,

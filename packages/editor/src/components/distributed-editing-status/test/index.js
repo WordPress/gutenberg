@@ -1271,6 +1271,112 @@ describe( 'DistributedEditingStatus', () => {
 		).not.toBeInTheDocument();
 	} );
 
+	it( 'describes the fresh-review compare plan without opening a comparison', () => {
+		const actions = setupDistributedEditingStatusDispatch();
+
+		setupDistributedEditingStatusSelect( {
+			sessionState: {
+				pendingChangeCount: 1,
+				hasPendingChanges: true,
+				canExportLocalUpdates: true,
+				localUpdatesImportStatus:
+					DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_STATUSES.BLOCKED,
+				localUpdatesImportReason:
+					DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.FRESH_REVIEW_REQUIRED,
+				localUpdatesImportReviewRequestStatus:
+					DISTRIBUTED_EDITING_LOCAL_UPDATES_REVIEW_REQUEST_STATUSES.REQUESTED,
+				localUpdatesImportFreshReviewRequestAccepted: true,
+				localUpdatesImportFreshReviewRequestRequested: true,
+				localUpdatesImportFreshReviewDecisionStatus:
+					DISTRIBUTED_EDITING_FRESH_REVIEW_DECISION_STATUSES.AWAITING_REVIEW,
+				localUpdatesImportFreshReviewDecisionPanelRequired: true,
+				localUpdatesImportFreshReviewDecisionItems: [
+					{
+						id: 'fresh-review-chrome-compare-plan',
+						blockClientId:
+							'fresh-review-chrome-compare-plan-client',
+						blockLabel: 'Chrome compare plan HTML change',
+						baseContentHash:
+							'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+						proposedContentHash:
+							'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb',
+						rawBlockContent:
+							'<script>fresh-review-chrome-compare-plan-raw</script>',
+					},
+				],
+			},
+		} );
+
+		render( <DistributedEditingStatusChrome /> );
+
+		const comparePlan = screen.getByRole( 'group', {
+			name: 'Distributed editing fresh review compare plan',
+		} );
+		expect( comparePlan ).toHaveAttribute(
+			'data-distributed-editing-fresh-review-compare-plan-status',
+			'ready'
+		);
+		expect( comparePlan ).toHaveAttribute(
+			'data-distributed-editing-fresh-review-compare-plan-base-hash-evidence',
+			'true'
+		);
+		expect( comparePlan ).toHaveAttribute(
+			'data-distributed-editing-fresh-review-compare-plan-proposed-hash-evidence',
+			'true'
+		);
+		expect( comparePlan ).toHaveAttribute(
+			'data-distributed-editing-fresh-review-compare-plan-review-hash-evidence',
+			'true'
+		);
+		expect( comparePlan ).toHaveAttribute(
+			'data-distributed-editing-fresh-review-compare-plan-renders-diff',
+			'false'
+		);
+		expect( comparePlan ).toHaveAttribute(
+			'data-distributed-editing-fresh-review-compare-plan-opens-comparison',
+			'false'
+		);
+		expect( comparePlan ).toHaveAttribute(
+			'data-distributed-editing-fresh-review-compare-plan-calls-rest',
+			'false'
+		);
+		expect( comparePlan ).toHaveAttribute(
+			'data-distributed-editing-fresh-review-compare-plan-calls-save',
+			'false'
+		);
+		expect( comparePlan ).toHaveTextContent( 'Compare plan ready' );
+		expect( comparePlan ).toHaveTextContent(
+			'A future comparison can use base and proposed hash evidence for this review item.'
+		);
+		expect( comparePlan ).toHaveTextContent(
+			'No comparison is open, no content is shown, and no save was made.'
+		);
+		expect( comparePlan ).toHaveTextContent(
+			/Base hash evidence\s*Available/
+		);
+		expect( comparePlan ).toHaveTextContent(
+			/Proposed hash evidence\s*Available/
+		);
+		expect( comparePlan ).toHaveTextContent(
+			/Reviewed hash evidence\s*Available/
+		);
+		expect( comparePlan ).not.toHaveTextContent(
+			/aaaaaaaaaaaaaaaa|bbbbbbbbbbbbbbbb|fresh-review-chrome-compare-plan-raw|script/i
+		);
+		expect(
+			actions.__experimentalResolveDistributedEditingFreshReviewDecisionItem
+		).not.toHaveBeenCalled();
+		expect(
+			actions.__experimentalSubmitDistributedEditingFreshReviewDecision
+		).not.toHaveBeenCalled();
+		expect(
+			actions.__experimentalSaveDistributedEditingRetryAfterProof
+		).not.toHaveBeenCalled();
+		expect(
+			actions.__experimentalRequestDistributedEditingFreshReviewForImportedLocalUpdates
+		).not.toHaveBeenCalled();
+	} );
+
 	it( 'updates the enabled editor shell for protected degraded state', () => {
 		setupDistributedEditingStatusSelect( {
 			editorSettings: {
