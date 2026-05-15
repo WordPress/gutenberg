@@ -2942,6 +2942,12 @@ export function getDistributedEditingPresenceRosterStateForSessionState(
 		summary = 'Presence may be delayed. Save checks still use WordPress.';
 	}
 
+	const refreshHint =
+		summary === 'No other editors shown.' &&
+		countSummary === 'Editor activity has not been shown yet.'
+			? 'Use Refresh editing list to check again.'
+			: '';
+
 	return {
 		status: normalized.presenceRosterStatus,
 		freshness: normalized.presenceRosterFreshness,
@@ -2962,6 +2968,7 @@ export function getDistributedEditingPresenceRosterStateForSessionState(
 			label: 'Editing now',
 			summary,
 			countSummary,
+			refreshHint,
 			assistiveSummary:
 				normalized.presenceRosterStatus ===
 					DISTRIBUTED_EDITING_PRESENCE_ROSTER_STATUSES.EMPTY ||

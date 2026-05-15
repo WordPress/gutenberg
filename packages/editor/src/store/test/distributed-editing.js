@@ -746,6 +746,7 @@ describe( 'distributed editing session state', () => {
 				label: 'Editing now',
 				summary: 'No other editors shown.',
 				countSummary: 'Editor activity has not been shown yet.',
+				refreshHint: 'Use Refresh editing list to check again.',
 			},
 		} );
 		expect( activeRoster ).toMatchObject( {

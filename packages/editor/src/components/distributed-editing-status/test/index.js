@@ -1292,6 +1292,9 @@ describe( 'DistributedEditingStatus', () => {
 			screen.getByText( 'Editor activity has not been shown yet.' )
 		).toBeVisible();
 		expect(
+			screen.getByText( 'Use Refresh editing list to check again.' )
+		).toBeVisible();
+		expect(
 			screen.getByRole( 'group', {
 				name: 'Distributed editing presence',
 			} )
@@ -1322,6 +1325,22 @@ describe( 'DistributedEditingStatus', () => {
 		).toHaveAttribute(
 			'data-distributed-editing-presence-summary-claims-absence',
 			'false'
+		);
+		expect(
+			screen.getByRole( 'group', {
+				name: 'Distributed editing presence',
+			} )
+		).toHaveAttribute(
+			'data-distributed-editing-presence-refresh-hint-visible',
+			'true'
+		);
+		expect(
+			screen.getByRole( 'group', {
+				name: 'Distributed editing presence',
+			} )
+		).toHaveAttribute(
+			'data-distributed-editing-presence-refresh-hint',
+			'Use Refresh editing list to check again.'
 		);
 		expect(
 			screen.queryByRole( 'region', {

@@ -3202,6 +3202,12 @@ function DistributedEditingPresenceRoster( {
 			data-distributed-editing-presence-summary-hidden-count={
 				rosterState.hiddenCount
 			}
+			data-distributed-editing-presence-refresh-hint={
+				rosterState.copy.refreshHint
+			}
+			data-distributed-editing-presence-refresh-hint-visible={ formatDataBoolean(
+				Boolean( rosterState.copy.refreshHint )
+			) }
 			data-distributed-editing-presence-summary-expired-count={
 				rosterState.expiredCount
 			}
@@ -3231,6 +3237,16 @@ function DistributedEditingPresenceRoster( {
 			>
 				{ rosterState.copy.countSummary }
 			</div>
+			{ rosterState.copy.refreshHint && (
+				<div
+					className="editor-distributed-editing-status__presence-refresh-hint"
+					data-distributed-editing-presence-refresh-hint-copy={
+						rosterState.copy.refreshHint
+					}
+				>
+					{ rosterState.copy.refreshHint }
+				</div>
+			) }
 			<div
 				aria-live="polite"
 				className="editor-distributed-editing-status__presence-freshness-indicator"
