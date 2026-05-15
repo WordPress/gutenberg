@@ -27,6 +27,11 @@ export default meta;
 
 type Story = StoryObj< typeof Combobox.Root >;
 
+const inputWrapperStyle = {
+	padding:
+		'var(--wpds-dimension-padding-sm) var(--wpds-dimension-padding-sm) var(--wpds-dimension-padding-xs)',
+};
+
 export const Default: Story = {
 	args: {
 		defaultValue: ITEMS[ 0 ],
@@ -35,7 +40,7 @@ export const Default: Story = {
 			<>
 				<Combobox.Trigger />
 				<Combobox.Popup>
-					<div style={ { padding: '8px 8px 4px' } }>
+					<div style={ inputWrapperStyle }>
 						<Combobox.Input placeholder="Search" />
 					</div>
 					<Combobox.Empty>No results found.</Combobox.Empty>
@@ -67,7 +72,7 @@ export const Compact: Story = {
 			<>
 				<Combobox.Trigger size="compact" />
 				<Combobox.Popup>
-					<div style={ { padding: '8px 8px 4px' } }>
+					<div style={ inputWrapperStyle }>
 						<Combobox.Input placeholder="Search" />
 					</div>
 					<Combobox.Empty>No results found.</Combobox.Empty>
@@ -168,7 +173,7 @@ export const Creatable: Story = {
 			>
 				<Combobox.Trigger />
 				<Combobox.Popup>
-					<div style={ { padding: '8px 8px 4px' } }>
+					<div style={ inputWrapperStyle }>
 						<Combobox.Input placeholder="Search" />
 					</div>
 					<Combobox.Empty>No results found.</Combobox.Empty>
@@ -230,7 +235,7 @@ export const AsyncItems: Story = {
 			>
 				<Combobox.Trigger />
 				<Combobox.Popup>
-					<div style={ { padding: '8px 8px 4px' } }>
+					<div style={ inputWrapperStyle }>
 						<Combobox.Input placeholder="Search" />
 					</div>
 					<Combobox.Empty>No results found.</Combobox.Empty>
@@ -289,7 +294,7 @@ export const WithCustomTriggerAndItem: Story = {
 					) }
 				</Combobox.Trigger>
 				<Combobox.Popup>
-					<div style={ { padding: '8px 8px 4px' } }>
+					<div style={ inputWrapperStyle }>
 						<Combobox.Input placeholder="Search" />
 					</div>
 					<Combobox.List>
