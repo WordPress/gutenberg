@@ -19,6 +19,100 @@ interface UseConnectorPluginOptions {
 	isActivated?: boolean;
 	keySource?: ApiKeySource;
 	initialIsConnected?: boolean;
+	requiresFilesystemCredentials?: boolean;
+}
+
+interface WpUpdatesInstallPluginResponse {
+	slug: string;
+	plugin?: string;
+}
+
+interface WpUpdatesInstallPluginErrorResponse {
+	slug: string;
+	errorCode?: string;
+	errorMessage?: string;
+}
+
+interface WpUpdates {
+	installPlugin: ( args: { slug: string } ) => void;
+}
+
+interface WpUpdatesGlobal {
+	wp?: {
+		updates?: WpUpdates;
+	};
+	jQuery?: ( target: Document ) => {
+		one: (
+			event: string,
+			handler: (
+				event: unknown,
+				response:
+					| WpUpdatesInstallPluginResponse
+					| WpUpdatesInstallPluginErrorResponse
+			) => void
+		) => unknown;
+		off: ( event: string, handler: unknown ) => unknown;
+	};
+}
+
+function installPluginViaWpUpdates( slug: string ): Promise< void > {
+	return new Promise( ( resolve, reject ) => {
+		const w = window as unknown as WpUpdatesGlobal;
+		const jq = w.jQuery;
+		const updates = w.wp?.updates;
+		if ( ! jq || ! updates?.installPlugin ) {
+			reject( new Error( 'wp.updates.installPlugin is not available.' ) );
+			return;
+		}
+
+		const onSuccess = (
+			_event: unknown,
+			response:
+				| WpUpdatesInstallPluginResponse
+				| WpUpdatesInstallPluginErrorResponse
+		) => {
+			if (
+				( response as WpUpdatesInstallPluginResponse ).slug !== slug
+			) {
+				return;
+			}
+			cleanup();
+			resolve();
+		};
+		const onError = (
+			_event: unknown,
+			response:
+				| WpUpdatesInstallPluginResponse
+				| WpUpdatesInstallPluginErrorResponse
+		) => {
+			if (
+				( response as WpUpdatesInstallPluginErrorResponse ).slug !==
+				slug
+			) {
+				return;
+			}
+			cleanup();
+			const errResponse = response as WpUpdatesInstallPluginErrorResponse;
+			reject(
+				new Error( errResponse.errorMessage ?? 'Install failed.' )
+			);
+		};
+		const onCancel = () => {
+			cleanup();
+			reject( new Error( 'Filesystem credentials request canceled.' ) );
+		};
+		const cleanup = () => {
+			jq( document ).off( 'wp-plugin-install-success', onSuccess );
+			jq( document ).off( 'wp-plugin-install-error', onError );
+			jq( document ).off( 'credential-modal-cancel', onCancel );
+		};
+
+		jq( document ).one( 'wp-plugin-install-success', onSuccess );
+		jq( document ).one( 'wp-plugin-install-error', onError );
+		jq( document ).one( 'credential-modal-cancel', onCancel );
+
+		updates.installPlugin( { slug } );
+	} );
 }
 
 interface UseConnectorPluginReturn {
@@ -45,6 +139,7 @@ export function useConnectorPlugin( {
 	isActivated,
 	keySource = 'none',
 	initialIsConnected = false,
+	requiresFilesystemCredentials = false,
 }: UseConnectorPluginOptions ): UseConnectorPluginReturn {
 	const [ isExpanded, setIsExpanded ] = useState( false );
 	const [ isBusy, setIsBusy ] = useState( false );
@@ -168,12 +263,35 @@ export function useConnectorPlugin( {
 		}
 		setIsBusy( true );
 		try {
-			await saveEntityRecord(
-				'root',
-				'plugin',
-				{ slug: pluginSlug, status: 'active' },
-				{ throwOnError: true }
-			);
+			if ( requiresFilesystemCredentials ) {
+				// The REST plugin endpoint rejects installs up front when
+				// FS_METHOD is not 'direct' and credentials have not been
+				// stored. Route through wp.updates.installPlugin() so the
+				// standard "Connection Information" modal handles credential
+				// entry, then activate via REST.
+				await installPluginViaWpUpdates( pluginSlug );
+				if ( pluginBasename ) {
+					await saveEntityRecord(
+						'root',
+						'plugin',
+						{ plugin: pluginBasename, status: 'active' },
+						{ throwOnError: true }
+					);
+				}
+				// Refresh plugin entity so derived state reflects install.
+				invalidateResolution( 'getEntityRecord', [
+					'root',
+					'plugin',
+					pluginBasename,
+				] );
+			} else {
+				await saveEntityRecord(
+					'root',
+					'plugin',
+					{ slug: pluginSlug, status: 'active' },
+					{ throwOnError: true }
+				);
+			}
 			setPluginStatusOverride( 'active' );
 			// Re-fetch settings since the new plugin may register new settings.
 			invalidateResolution( 'getEntityRecord', [ 'root', 'site' ] );
@@ -189,7 +307,13 @@ export function useConnectorPlugin( {
 					type: 'snackbar',
 				}
 			);
-		} catch {
+		} catch ( error ) {
+			// A user-initiated cancel of the filesystem credentials dialog
+			// should silently abort the install without a snackbar.
+			const message = error instanceof Error ? error.message : '';
+			if ( message === 'Filesystem credentials request canceled.' ) {
+				return;
+			}
 			createErrorNotice(
 				sprintf(
 					/* translators: %s: Name of the connector (e.g. "OpenAI"). */
