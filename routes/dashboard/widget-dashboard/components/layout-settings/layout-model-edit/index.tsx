@@ -6,10 +6,9 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { BaseControl } from '@wordpress/components';
 import type { DataFormControlProps } from '@wordpress/dataviews';
 /* eslint-disable @wordpress/use-recommended-components */
-import { Button, Stack, Text } from '@wordpress/ui';
+import { Button, Fieldset, Stack, Text } from '@wordpress/ui';
 /* eslint-enable @wordpress/use-recommended-components */
 
 /**
@@ -57,14 +56,9 @@ export function LayoutModelEdit( {
 	const elements = field.elements ?? [];
 
 	return (
-		<BaseControl help={ field.description }>
-			<BaseControl.VisualLabel>{ field.label }</BaseControl.VisualLabel>
-			<Stack
-				direction="row"
-				gap="md"
-				role="radiogroup"
-				aria-label={ field.label }
-			>
+		<Fieldset.Root>
+			<Fieldset.Legend>{ field.label }</Fieldset.Legend>
+			<Stack direction="row" gap="md" role="radiogroup">
 				{ elements.map( ( option ) => {
 					const isSelected = currentValue === option.value;
 
@@ -86,15 +80,22 @@ export function LayoutModelEdit( {
 								)
 							}
 						>
-							<ModelThumbnail
-								model={ String( option.value ) }
-								className={ styles.thumbnail }
-							/>
-							<Text>{ option.label }</Text>
+							<Stack direction="column" gap="sm" align="stretch">
+								<ModelThumbnail
+									model={ String( option.value ) }
+									className={ styles.thumbnail }
+								/>
+								<Text>{ option.label }</Text>
+							</Stack>
 						</Button>
 					);
 				} ) }
 			</Stack>
-		</BaseControl>
+			{ typeof field.description === 'string' && (
+				<Fieldset.Description>
+					{ field.description }
+				</Fieldset.Description>
+			) }
+		</Fieldset.Root>
 	);
 }

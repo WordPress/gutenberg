@@ -1,9 +1,5 @@
 .option {
-	display: flex;
 	flex: 1;
-	flex-direction: column;
-	align-items: stretch;
-	gap: var(--wpds-dimension-gap-sm);
 	padding: var(--wpds-dimension-padding-md);
 	border: 1px solid var(--wpds-color-stroke-surface-neutral);
 	border-radius: var(--wpds-border-radius-md);
