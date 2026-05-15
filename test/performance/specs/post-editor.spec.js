@@ -55,10 +55,21 @@ test.describe( 'Post Editor Performance', () => {
 	test.describe( 'Loading', () => {
 		let draftId = null;
 
-		test( 'Setup the test post', async ( { admin, perfUtils } ) => {
+		test( 'Setup the test post', async ( {
+			admin,
+			requestUtils,
+			perfUtils,
+		} ) => {
 			await admin.createNewPost();
 			await perfUtils.loadBlocksForLargePost();
 			draftId = await perfUtils.saveDraft();
+
+			// Set preferences via REST so that welcomeGuide and fullscreenMode
+			// are reliably persisted before the timed iterations start.
+			await requestUtils.setPreferences( 'core/edit-post', {
+				welcomeGuide: false,
+				fullscreenMode: false,
+			} );
 		} );
 
 		const samples = 10;
@@ -74,10 +85,12 @@ test.describe( 'Post Editor Performance', () => {
 				await metrics.startTracing();
 
 				// Open the test draft.
-				await admin.editPost( draftId );
-				const canvas = await perfUtils.getCanvas();
+				await admin.page.goto(
+					'wp-admin/post.php?post=' + draftId + '&action=edit'
+				);
 
 				// Wait for the first block.
+				const canvas = await perfUtils.getCanvas();
 				await canvas.locator( '.wp-block' ).first().waitFor();
 
 				// Capture timing metrics before `stopTracing()`, which
