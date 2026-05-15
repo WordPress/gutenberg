@@ -2079,6 +2079,17 @@ function createDistributedEditingFreshReviewComparePlanDescriptor(
 		hasProposedContentHash ? 'proposedContentHash' : null,
 		hasReviewedProposedContentHash ? 'reviewedProposedContentHash' : null,
 	].filter( Boolean );
+	const comparisonInputShape =
+		createDistributedEditingFreshReviewComparisonInputShapeDescriptor(
+			item,
+			{
+				enabled,
+				reason,
+				hasBaseContentHash,
+				hasProposedContentHash,
+				hasReviewedProposedContentHash,
+			}
+		);
 
 	return {
 		status: enabled ? 'ready' : 'unavailable',
@@ -2093,6 +2104,7 @@ function createDistributedEditingFreshReviewComparePlanDescriptor(
 		hasBaseContentHash,
 		hasProposedContentHash,
 		hasReviewedProposedContentHash,
+		comparisonInputShape,
 		usesBaseContentHash: hasBaseContentHash,
 		usesProposedContentHash: hasProposedContentHash,
 		usesReviewedProposedContentHash: hasReviewedProposedContentHash,
@@ -2120,6 +2132,122 @@ function createDistributedEditingFreshReviewComparePlanDescriptor(
 		exposesTokenMaterial: false,
 		exposesUserIdentity: false,
 		exposesReviewerIds: false,
+	};
+}
+
+function createDistributedEditingFreshReviewComparisonInputShapeDescriptor(
+	item,
+	{
+		enabled = true,
+		reason = null,
+		hasBaseContentHash = false,
+		hasProposedContentHash = false,
+		hasReviewedProposedContentHash = false,
+	} = {}
+) {
+	const inputSlots = [
+		createDistributedEditingFreshReviewComparisonInputSlotDescriptor( {
+			role: 'base',
+			sourceField: 'baseContentHash',
+			required: true,
+			available: hasBaseContentHash,
+		} ),
+		createDistributedEditingFreshReviewComparisonInputSlotDescriptor( {
+			role: 'proposed',
+			sourceField: 'proposedContentHash',
+			required: true,
+			available: hasProposedContentHash,
+		} ),
+		createDistributedEditingFreshReviewComparisonInputSlotDescriptor( {
+			role: 'reviewed',
+			sourceField: 'reviewedProposedContentHash',
+			required: false,
+			available: hasReviewedProposedContentHash,
+		} ),
+	];
+	const availableInputRoles = inputSlots
+		.filter( ( slot ) => slot.available )
+		.map( ( slot ) => slot.role );
+	const requiredInputRoles = inputSlots
+		.filter( ( slot ) => slot.required )
+		.map( ( slot ) => slot.role );
+	const optionalInputRoles = inputSlots
+		.filter( ( slot ) => ! slot.required )
+		.map( ( slot ) => slot.role );
+
+	return {
+		status: enabled ? 'ready' : 'unavailable',
+		reason: normalizeNullableString( reason ),
+		schemaVersion: 1,
+		inputKind: 'fresh_review_serialized_block_comparison_inputs',
+		comparisonMode: 'side_by_side_block_review',
+		itemId: normalizeNullableString( item.id ),
+		blockClientId: normalizeNullableString( item.blockClientId ),
+		blockName: normalizeNullableString( item.blockName ),
+		blockLabel: normalizeNullableString( item.blockLabel ),
+		changeKind: normalizeNullableString( item.changeKind ),
+		inputSlots,
+		availableInputRoles,
+		requiredInputRoles,
+		optionalInputRoles,
+		requiredInputsAvailable: hasBaseContentHash && hasProposedContentHash,
+		optionalInputsAvailable: hasReviewedProposedContentHash,
+		boundaryPolicy: 'serialized_block_hash_only',
+		boundaryKinds: [
+			'serialized_block',
+			'html_token',
+			'json_token',
+			'unicode_scalar',
+			'rich_text_attribute',
+		],
+		usesSerializedBlockBoundaries: true,
+		usesHashEvidenceOnly: true,
+		descriptorOnly: true,
+		redacted: true,
+		hashValuesRedacted: true,
+		sourceFieldNamesOnly: true,
+		rawContentIncluded: false,
+		exposesHashValues: false,
+		exposesRawContent: false,
+		exposesProofSignature: false,
+		exposesTokenMaterial: false,
+		exposesUserIdentity: false,
+		exposesReviewerIds: false,
+		rendersDiff: false,
+		opensComparison: false,
+		derivesPatch: false,
+		callsRestEndpoint: false,
+		callsSave: false,
+		callsNormalSavePost: false,
+		callsRetrySaveEndpoint: false,
+		dispatchesNotice: false,
+		savesPost: false,
+		mutatesEditorContent: false,
+		mutatesPersistedPostContent: false,
+		selectsBlock: false,
+		movesFocus: false,
+		createsRevision: false,
+		changesPostLock: false,
+		claimsSaved: false,
+	};
+}
+
+function createDistributedEditingFreshReviewComparisonInputSlotDescriptor( {
+	role,
+	sourceField,
+	required = false,
+	available = false,
+} ) {
+	return {
+		role,
+		sourceField,
+		required: Boolean( required ),
+		available: Boolean( available ),
+		evidenceType: 'hash_field_reference',
+		hashValueRedacted: true,
+		rawContentIncluded: false,
+		exposesHashValue: false,
+		exposesRawContent: false,
 	};
 }
 
