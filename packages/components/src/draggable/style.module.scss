@@ -13,17 +13,13 @@
 	padding: 0; // Should match clonePadding variable.
 	background: transparent;
 	pointer-events: none;
-	// Stacking fallback for when the clone is not routed into the
-	// `@wordpress/ui` compat overlay slot.
-	z-index: z-index(".components-draggable__clone");
 }
 
-// The slot already supplies an isolated stacking context, so the
-// fallback `z-index` would only bias intra-slot ordering against
-// other slot residents (e.g. `@wordpress/ui` portals). Let DOM
-// order decide instead.
-.clone.is-in-compat-slot {
-	z-index: auto;
+// Apply the stacking fallback only outside the `@wordpress/ui` compat
+// overlay slot — inside it, the slot's isolated stacking context
+// already handles ordering.
+.clone:not(.is-in-compat-slot) {
+	z-index: z-index(".components-draggable__clone");
 }
 
 // Keep this selector global so external code that toggles the same
