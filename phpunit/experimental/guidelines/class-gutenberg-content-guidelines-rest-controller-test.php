@@ -46,24 +46,6 @@ class Gutenberg_Content_Guidelines_REST_Controller_Test extends WP_Test_REST_Pos
 	}
 
 	/**
-	 * Clean up after each test.
-	 */
-	public function tear_down() {
-		$posts = get_posts(
-			array(
-				'post_type'      => Gutenberg_Guidelines_Post_Type::POST_TYPE,
-				'post_status'    => array( 'publish', 'draft' ),
-				'posts_per_page' => -1,
-			)
-		);
-		foreach ( $posts as $post ) {
-			wp_delete_post( $post->ID, true );
-		}
-
-		parent::tear_down();
-	}
-
-	/**
 	 * Helper: create a guidelines post via the REST API.
 	 *
 	 * @param array $args Optional request params to merge.

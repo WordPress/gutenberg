@@ -40,25 +40,6 @@ class Gutenberg_Guidelines_Access_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Clean up guideline posts after each test so per-post matrix tests
-	 * don't leak state into each other.
-	 */
-	public function tear_down() {
-		$posts = get_posts(
-			array(
-				'post_type'      => Gutenberg_Guidelines_Post_Type::POST_TYPE,
-				'post_status'    => array( 'private', 'publish' ),
-				'posts_per_page' => -1,
-			)
-		);
-		foreach ( $posts as $post ) {
-			wp_delete_post( $post->ID, true );
-		}
-
-		parent::tear_down();
-	}
-
-	/**
 	 * Returns a fresh WP_User for the named role so tests don't share
 	 * mutable user state.
 	 */
@@ -67,15 +48,20 @@ class Gutenberg_Guidelines_Access_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Insert a guideline post owned by the named role.
+	 * Creates a guideline fixture owned by the named role and saved with the
+	 * given post status.
+	 *
+	 * @param string $owner_role Role key from the self::$users fixture map.
+	 * @param string $status     Post status for the guideline fixture.
+	 * @return int Inserted guideline post ID.
 	 */
-	private function make_post( $owner_role, $status ) {
+	private function create_guideline( string $owner_role, string $status ): int {
 		return self::factory()->post->create(
 			array(
 				'post_type'    => Gutenberg_Guidelines_Post_Type::POST_TYPE,
 				'post_status'  => $status,
-				'post_title'   => "access test {$owner_role} {$status}",
-				'post_content' => 'body',
+				'post_title'   => "{$status} guideline owned by {$owner_role}",
+				'post_content' => "Guideline fixture content for {$owner_role} with {$status} status.",
 				'post_author'  => self::$users[ $owner_role ],
 			)
 		);
@@ -158,47 +144,39 @@ class Gutenberg_Guidelines_Access_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Subscriber per-post `read_post`, `edit_post`, and `delete_post`
-	 * checks fail regardless of the row's owner or status.
-	 */
-	public function test_subscriber_per_post_caps() {
-		$subscriber = $this->user( 'subscriber' );
-		$post_id    = $this->make_post( 'administrator', 'publish' );
-
-		$this->assertFalse( $subscriber->has_cap( 'read_post', $post_id ) );
-		$this->assertFalse( $subscriber->has_cap( 'edit_post', $post_id ) );
-		$this->assertFalse( $subscriber->has_cap( 'delete_post', $post_id ) );
-	}
-
-	/**
-	 * Per-post access policy for Editor, Author, and Contributor:
+	 * Per-post access policy across every role:
 	 *
-	 * - own private rows: full read, edit, and delete
-	 * - own publish rows: read only — edit and delete require Administrator
-	 * - others' private rows: invisible (no read, edit, or delete)
-	 * - others' publish rows: read only
+	 * - Administrator: full read, edit, and delete on every row.
+	 * - Editor / Author / Contributor:
+	 *   - own private rows: full read, edit, and delete
+	 *   - own publish rows: read only — edit and delete require Administrator
+	 *   - others' private rows: invisible
+	 *   - others' publish rows: read only
+	 * - Subscriber: blocked on every per-post check.
 	 *
-	 * @dataProvider data_per_post_caps
+	 * @dataProvider data_per_post_caps_by_role
 	 */
-	public function test_contributor_plus_per_post_caps( $role, $cap, $ownership, $status, $expected ) {
-		$owner_role = 'self' === $ownership ? $role : 'administrator';
-		$post_id    = $this->make_post( $owner_role, $status );
+	public function test_per_post_caps_per_role( $role, $cap, $ownership, $status, $expected ) {
+		$owner_role = 'self' === $ownership
+			? $role
+			: ( 'administrator' === $role ? 'contributor' : 'administrator' );
+		$post_id    = $this->create_guideline( $owner_role, $status );
 
 		$result = $this->user( $role )->has_cap( $cap, $post_id );
 
-		if ( $expected ) {
-			$this->assertTrue( $result, "{$role}.{$cap}({$ownership} {$status}) should be allowed" );
-		} else {
-			$this->assertFalse( $result, "{$role}.{$cap}({$ownership} {$status}) should be denied" );
-		}
+		$this->assertSame(
+			$expected,
+			$result,
+			"{$role}.{$cap}({$ownership} {$status}) should be " . ( $expected ? 'allowed' : 'denied' )
+		);
 	}
 
 	/**
 	 * @return array Rows keyed `{role}.{cap}({ownership} {status})` so test
 	 *               failures point at the exact combination.
 	 */
-	public function data_per_post_caps() {
-		$matrix = array(
+	public function data_per_post_caps_by_role() {
+		$contributor_plus_rules = array(
 			// Own private: full CRUD.
 			array( 'edit_post', 'self', 'private', true ),
 			array( 'delete_post', 'self', 'private', true ),
@@ -220,9 +198,29 @@ class Gutenberg_Guidelines_Access_Test extends WP_UnitTestCase {
 			array( 'read_post', 'other', 'publish', true ),
 		);
 
+		$expand = static function ( bool $expected ): array {
+			$rows = array();
+			foreach ( array( 'self', 'other' ) as $ownership ) {
+				foreach ( array( 'private', 'publish' ) as $status ) {
+					foreach ( array( 'read_post', 'edit_post', 'delete_post' ) as $cap ) {
+						$rows[] = array( $cap, $ownership, $status, $expected );
+					}
+				}
+			}
+			return $rows;
+		};
+
+		$rules_by_role = array(
+			'administrator' => $expand( true ),
+			'editor'        => $contributor_plus_rules,
+			'author'        => $contributor_plus_rules,
+			'contributor'   => $contributor_plus_rules,
+			'subscriber'    => $expand( false ),
+		);
+
 		$cases = array();
-		foreach ( array( 'editor', 'author', 'contributor' ) as $role ) {
-			foreach ( $matrix as $row ) {
+		foreach ( $rules_by_role as $role => $rules ) {
+			foreach ( $rules as $row ) {
 				list( $cap, $ownership, $status, $expected )       = $row;
 				$cases[ "{$role}.{$cap}({$ownership} {$status})" ] = array( $role, $cap, $ownership, $status, $expected );
 			}
@@ -231,23 +229,69 @@ class Gutenberg_Guidelines_Access_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Administrator passes every per-post check regardless of the row's
-	 * owner or status.
+	 * Taxonomy capability policy:
+	 *
+	 * - `manage_terms` / `delete_terms` — Administrator only.
+	 * - `edit_terms` / `assign_terms` — Contributor and above, so agent flows
+	 *   can introduce new type slugs (e.g. `memory`) and attach them to
+	 *   guideline posts.
+	 * - Subscribers hold none of these.
+	 *
+	 * @dataProvider data_taxonomy_caps_by_role
 	 */
-	public function test_administrator_per_post_caps() {
-		$admin = $this->user( 'administrator' );
+	public function test_taxonomy_caps_per_role( $role, $cap_key, $expected ) {
+		$taxonomy  = get_taxonomy( Gutenberg_Guidelines_Post_Type::TAXONOMY );
+		$primitive = $taxonomy->cap->{$cap_key};
 
-		foreach ( array( 'private', 'publish' ) as $status ) {
-			foreach ( array( 'administrator', 'contributor' ) as $owner_role ) {
-				$post_id = $this->make_post( $owner_role, $status );
+		$this->assertSame(
+			$expected,
+			$this->user( $role )->has_cap( $primitive ),
+			"{$role}.{$cap_key} (resolves to {$primitive}) should be " . ( $expected ? 'allowed' : 'denied' )
+		);
+	}
 
-				foreach ( array( 'edit_post', 'delete_post', 'read_post' ) as $cap ) {
-					$this->assertTrue(
-						$admin->has_cap( $cap, $post_id ),
-						"Administrator should have {$cap} on {$owner_role}'s {$status} row"
-					);
-				}
+	/**
+	 * @return array Rows keyed `{role}.{cap_key}` so test failures point at
+	 *               the exact combination. Each row is [role, cap_key, expected].
+	 */
+	public function data_taxonomy_caps_by_role() {
+		$matrix = array(
+			'manage_terms' => array(
+				'administrator' => true,
+				'editor'        => false,
+				'author'        => false,
+				'contributor'   => false,
+				'subscriber'    => false,
+			),
+			'edit_terms'   => array(
+				'administrator' => true,
+				'editor'        => true,
+				'author'        => true,
+				'contributor'   => true,
+				'subscriber'    => false,
+			),
+			'delete_terms' => array(
+				'administrator' => true,
+				'editor'        => false,
+				'author'        => false,
+				'contributor'   => false,
+				'subscriber'    => false,
+			),
+			'assign_terms' => array(
+				'administrator' => true,
+				'editor'        => true,
+				'author'        => true,
+				'contributor'   => true,
+				'subscriber'    => false,
+			),
+		);
+
+		$cases = array();
+		foreach ( $matrix as $cap_key => $role_map ) {
+			foreach ( $role_map as $role => $expected ) {
+				$cases[ "{$role}.{$cap_key}" ] = array( $role, $cap_key, $expected );
 			}
 		}
+		return $cases;
 	}
 }

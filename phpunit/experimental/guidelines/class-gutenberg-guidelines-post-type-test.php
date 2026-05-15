@@ -12,12 +12,18 @@ class Gutenberg_Guidelines_Post_Type_Test extends WP_UnitTestCase {
 	protected static $admin_id;
 
 	/**
+	 * @var int Contributor user ID.
+	 */
+	protected static $contributor_id;
+
+	/**
 	 * Set up class fixtures.
 	 *
 	 * @param WP_UnitTest_Factory $factory Factory instance.
 	 */
 	public static function wpSetUpBeforeClass( WP_UnitTest_Factory $factory ) {
-		self::$admin_id = $factory->user->create( array( 'role' => 'administrator' ) );
+		self::$admin_id       = $factory->user->create( array( 'role' => 'administrator' ) );
+		self::$contributor_id = $factory->user->create( array( 'role' => 'contributor' ) );
 	}
 
 	/**
@@ -25,36 +31,7 @@ class Gutenberg_Guidelines_Post_Type_Test extends WP_UnitTestCase {
 	 */
 	public static function wpTearDownAfterClass() {
 		self::delete_user( self::$admin_id );
-	}
-
-	/**
-	 * Clean up guidelines posts and taxonomy terms after each test.
-	 */
-	public function tear_down() {
-		$posts = get_posts(
-			array(
-				'post_type'      => Gutenberg_Guidelines_Post_Type::POST_TYPE,
-				'post_status'    => array( 'publish', 'draft' ),
-				'posts_per_page' => -1,
-			)
-		);
-		foreach ( $posts as $post ) {
-			wp_delete_post( $post->ID, true );
-		}
-
-		$terms = get_terms(
-			array(
-				'taxonomy'   => Gutenberg_Guidelines_Post_Type::TAXONOMY,
-				'hide_empty' => false,
-			)
-		);
-		if ( ! is_wp_error( $terms ) ) {
-			foreach ( $terms as $term ) {
-				wp_delete_term( $term->term_id, Gutenberg_Guidelines_Post_Type::TAXONOMY );
-			}
-		}
-
-		parent::tear_down();
+		self::delete_user( self::$contributor_id );
 	}
 
 	/**
@@ -136,7 +113,7 @@ class Gutenberg_Guidelines_Post_Type_Test extends WP_UnitTestCase {
 			)
 		);
 
-		$post_id = wp_insert_post(
+		$post_id = self::factory()->post->create(
 			array(
 				'post_type'   => Gutenberg_Guidelines_Post_Type::POST_TYPE,
 				'post_status' => 'draft',
@@ -144,16 +121,49 @@ class Gutenberg_Guidelines_Post_Type_Test extends WP_UnitTestCase {
 				'tax_input'   => array(
 					Gutenberg_Guidelines_Post_Type::TAXONOMY => array( $content_term_id ),
 				),
-			),
-			true
+			)
 		);
-
-		$this->assertIsInt( $post_id );
-		$this->assertNotWPError( $post_id );
 
 		$terms = wp_get_object_terms( $post_id, Gutenberg_Guidelines_Post_Type::TAXONOMY, array( 'fields' => 'slugs' ) );
 
 		$this->assertSame( array( Gutenberg_Guidelines_Post_Type::TERM_CONTENT ), $terms );
+	}
+
+	/**
+	 * End-to-end check for the agent flow the cap relaxation enables: a
+	 * Contributor creates a new `wp_guideline_type` term and attaches a
+	 * private guideline to it in the same session. The post must end up
+	 * tagged with the new term instead of the `artifact` fallback.
+	 */
+	public function test_save_post_preserves_new_term_for_contributor() {
+		wp_set_current_user( self::$contributor_id );
+
+		$memory_term_id = self::factory()->term->create(
+			array(
+				'taxonomy' => Gutenberg_Guidelines_Post_Type::TAXONOMY,
+				'name'     => 'Memory',
+				'slug'     => 'memory',
+			)
+		);
+
+		$post_id = self::factory()->post->create(
+			array(
+				'post_type'   => Gutenberg_Guidelines_Post_Type::POST_TYPE,
+				'post_status' => 'private',
+				'post_title'  => 'Contributor memory',
+				'post_author' => self::$contributor_id,
+				'tax_input'   => array(
+					Gutenberg_Guidelines_Post_Type::TAXONOMY => array( $memory_term_id ),
+				),
+			)
+		);
+
+		$terms = wp_get_object_terms(
+			$post_id,
+			Gutenberg_Guidelines_Post_Type::TAXONOMY,
+			array( 'fields' => 'slugs' )
+		);
+		$this->assertSame( array( 'memory' ), $terms );
 	}
 
 	/**
@@ -170,7 +180,7 @@ class Gutenberg_Guidelines_Post_Type_Test extends WP_UnitTestCase {
 			)
 		);
 
-		$post_id = wp_insert_post(
+		$post_id = self::factory()->post->create(
 			array(
 				'post_type'   => Gutenberg_Guidelines_Post_Type::POST_TYPE,
 				'post_status' => 'draft',
@@ -178,8 +188,7 @@ class Gutenberg_Guidelines_Post_Type_Test extends WP_UnitTestCase {
 				'tax_input'   => array(
 					Gutenberg_Guidelines_Post_Type::TAXONOMY => array( $content_term_id ),
 				),
-			),
-			true
+			)
 		);
 
 		wp_update_post(

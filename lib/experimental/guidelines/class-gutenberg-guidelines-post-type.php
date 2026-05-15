@@ -167,7 +167,7 @@ class Gutenberg_Guidelines_Post_Type {
 				),
 				'capabilities'       => array(
 					'manage_terms' => 'manage_options',
-					'edit_terms'   => 'manage_options',
+					'edit_terms'   => 'edit_guidelines',
 					'delete_terms' => 'manage_options',
 					'assign_terms' => 'edit_guidelines',
 				),

@@ -42,36 +42,6 @@ class Gutenberg_Standard_Guidelines_REST_Controller_Test extends WP_UnitTestCase
 	}
 
 	/**
-	 * Clean up guidelines posts and taxonomy terms after each test.
-	 */
-	public function tear_down(): void {
-		$posts = get_posts(
-			array(
-				'post_type'      => Gutenberg_Guidelines_Post_Type::POST_TYPE,
-				'post_status'    => 'any',
-				'posts_per_page' => -1,
-			)
-		);
-		foreach ( $posts as $post ) {
-			wp_delete_post( $post->ID, true );
-		}
-
-		$terms = get_terms(
-			array(
-				'taxonomy'   => Gutenberg_Guidelines_Post_Type::TAXONOMY,
-				'hide_empty' => false,
-			)
-		);
-		if ( ! is_wp_error( $terms ) ) {
-			foreach ( $terms as $term ) {
-				wp_delete_term( $term->term_id, Gutenberg_Guidelines_Post_Type::TAXONOMY );
-			}
-		}
-
-		parent::tear_down();
-	}
-
-	/**
 	 * Creates a guideline fixture owned by the named role and saved with the
 	 * given post status.
 	 *
