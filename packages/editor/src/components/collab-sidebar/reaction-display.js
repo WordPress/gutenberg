@@ -270,7 +270,8 @@ export default function ReactionDisplay( {
  * dropdown (the 5-emoji quick row).
  *
  * @param {Object}   props                  Component props.
- * @param {boolean}  props.disabled         Whether the button is disabled.
+ * @param {boolean}  props.disabled         Whether the button is disabled
+ *                                          (e.g. on a resolved note thread).
  * @param {Function} props.onToggleReaction Callback to toggle a reaction.
  */
 export function AddReactionButton( { disabled = false, onToggleReaction } ) {
