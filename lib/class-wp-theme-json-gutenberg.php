@@ -787,7 +787,7 @@ class WP_Theme_JSON_Gutenberg {
 					$feature_declarations = static::update_button_width_declarations( $feature_declarations, $settings );
 
 					foreach ( $feature_declarations as $feature_selector => $declarations ) {
-						$target_selector = is_array( $style_variation )
+						$target_selector   = is_array( $style_variation )
 							? static::get_block_style_variation_feature_selector( $style_variation, $feature_selector )
 							: $feature_selector;
 						$combined_selector = static::append_to_selector( $target_selector, $pseudo_selector );
