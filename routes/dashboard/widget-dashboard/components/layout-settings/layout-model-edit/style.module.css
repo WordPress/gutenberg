@@ -8,10 +8,8 @@
 	cursor: var(--wpds-cursor-control);
 	text-align: center;
 	transition:
-		border-color var(--wpds-motion-duration-sm)
-			var(--wpds-motion-easing-subtle),
-		background-color var(--wpds-motion-duration-sm)
-			var(--wpds-motion-easing-subtle);
+		border-color var(--wpds-motion-duration-sm) var(--wpds-motion-easing-subtle),
+		background-color var(--wpds-motion-duration-sm) var(--wpds-motion-easing-subtle);
 }
 
 .option:hover {
