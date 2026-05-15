@@ -2,9 +2,9 @@
 
 ## Overview
 
-Suggestions extend the Notes feature (block-level comments) to support proposed content changes. A reviewer switches to **Suggest** intent, edits a block, and the change is captured as a versioned suggestion payload stored on a note comment. The post author can then **Apply** (merge the change) or **Reject** (dismiss it) from the notes sidebar.
+Suggestions extend the Notes feature (block-level comments) to support proposed content changes. A reviewer switches to **Suggest** intent and edits a block; the change is captured as a versioned suggestion payload on a note comment, auto-saved in the background after a short idle window. The post author then **Accepts** (merges the change) or **Rejects** (dismisses it) from the notes sidebar.
 
-The feature is designed around a swappable provider interface so the storage backend can evolve from comment-meta (v1, current) to Yjs `AttributionManager` (v2, future) without changing the UI or apply/reject logic.
+The feature is designed around a swappable provider interface so the storage backend can evolve from comment-meta (v1, current) to Yjs `AttributionManager` (v2, future) without changing the UI or accept/reject logic.
 
 ## End-to-end lifecycle
 
@@ -14,21 +14,22 @@ sequenceDiagram
     participant U as Reviewer
     participant B as Block
     participant O as Overlay store
+    participant AS as AutoSave (debounced)
     participant P as SuggestionsProvider
     participant R as REST (/wp/v2/comments)
     participant A as Post author
 
     U->>B: Switch to Suggest intent, edit block
-    B->>O: setAttributes → overlay (store baseline on first edit)
+    B->>O: setAttributes → overlay (capture baseline on first edit)
     Note right of O: Block-editor store is NEVER written
-    U->>B: Click "Submit suggestion"
-    B->>P: createSuggestion({ clientId, operations })
-    P->>R: POST note + _wp_suggestion meta
+    O->>AS: Overlay changed (debounce ~1.5s)
+    AS->>P: createSuggestion or updateSuggestion
+    P->>R: POST / PUT note + _wp_suggestion meta
     R-->>P: Saved comment
-    P->>B: updateBlockAttributes(metadata.noteId)
+    P->>B: updateBlockAttributes(metadata.noteId) (on create)
 
     A->>A: Open notes sidebar
-    A->>P: Apply (or Reject)
+    A->>P: Accept (or Reject)
     alt baseRevision stale
         P-->>A: Confirm dialog ("Apply anyway?")
     end
@@ -56,7 +57,13 @@ When the intent is `suggest`, an `editor.BlockEdit` filter (`withSuggestionOverl
 2. **Diversion** — `setAttributes` writes to a React-context-backed overlay (`SuggestionOverlayProvider`) keyed by `clientId`, not the block-editor store.
 3. **Merge for render** — the block receives `{ ...realAttributes, ...overlayAttributes }` so the user sees their in-progress change live.
 
-Because the store is never touched, autosave, undo/redo, and RTC sync stay at the real baseline. On commit, the overlay is serialized into a suggestion payload and sent to the server as comment meta; on discard, the overlay is cleared.
+A companion `editor.BlockListBlock` filter tags each block that has a pending overlay with an `is-suggestion-pending` class, which renders the green bracket/outline treatment so edited blocks are discoverable without relying on the selected-block toolbar.
+
+Because the store is never touched, autosave, undo/redo, and RTC sync stay at the real baseline.
+
+### Auto-save
+
+There is no manual "Submit" step — `SuggestionAutoSave` watches the overlay and, after ~1.5 s of idle time on a given block, persists the current operations as a note comment. The overlay entry tracks the resulting `commentId` and a fingerprint of the last synced operations, so subsequent edits update the same note rather than creating new ones. If an edit is undone back to baseline the auto-saver trashes the note instead.
 
 ### Store interceptor
 
@@ -90,8 +97,9 @@ The Suggest-mode subsystem lives in `packages/editor/src/components/suggestion-m
 | `with-suggestion-overlay.js`| `editor.BlockEdit` HOC that diverts `setAttributes` into the overlay. |
 | `store-interceptor.js`      | Snapshot/diff/revert subscriber for store-level mutations; multi-peer accept logic. |
 | `provider.js`               | `useSuggestionsProvider` — the `createSuggestion` / `applySuggestion` / `rejectSuggestion` API. Owns `operationsFromOverlay`, `applyOperations`, `parseSuggestionPayload`, and the wrapper-aware equality check. |
-| `suggestion-diff.js`        | Sidebar diff preview (word-level for text attributes, label fallback otherwise). |
-| `commit-bar.js`             | "Submit suggestion" toolbar shown while editing in Suggest intent. |
+| `suggestion-diff.js`        | Inline diff preview rendered in a comment thread (word-level for text attributes, label fallback otherwise). |
+| `suggestion-summary.js`     | Compact sidebar summary ("Add: …", "Delete: …", "Format: …") used in collapsed thread lists. |
+| `auto-save.js`              | Debounced background persistence of pending overlays as note comments (replaces the explicit "Submit" affordance from earlier phases). |
 
 REST/PHP surface lives in `lib/compat/wordpress-6.9/`:
 
@@ -145,25 +153,29 @@ When bumping the version, add a migration step in `parseSuggestionPayload` that 
 
 ```
 useSuggestionsProvider() → {
-  createSuggestion({ clientId, blockName, operations }) → Promise<comment>
-  applySuggestion({ commentId, clientId, payload })     → Promise<void>
-  rejectSuggestion({ commentId })                       → Promise<void>
+  createSuggestion({ clientId, blockName, operations })  → Promise<comment>
+  updateSuggestion({ commentId, blockName, operations }) → Promise<comment>
+  deleteSuggestion({ commentId })                        → Promise<void>
+  applySuggestion({ commentId, clientId, payload })      → Promise<void>
+  rejectSuggestion({ commentId })                        → Promise<void>
 }
 ```
 
-The current implementation (`provider.js`) uses comment meta. A future Yjs-backed implementation would read from `AttributionManager` and write changes through the CRDT document, exposing the same three methods.
+The current implementation (`provider.js`) uses comment meta. A future Yjs-backed implementation would read from `AttributionManager` and write changes through the CRDT document, exposing the same methods.
 
-## Apply / Reject
+## Accept / Reject
 
-- **Apply**: runs `applyOperations(currentAttributes, payload.operations)` to produce new attributes, dispatches `updateBlockAttributes`, marks the note as resolved with `_wp_suggestion_status = 'applied'`.
+- **Accept**: runs `applyOperations(currentAttributes, payload.operations)` to produce new attributes, dispatches `updateBlockAttributes`, marks the note as resolved with `_wp_suggestion_status = 'applied'`.
 - **Reject**: marks the note as resolved with `_wp_suggestion_status = 'rejected'`. No content change.
-- **Staleness**: if `baseRevision` differs from the current `post_modified_gmt`, a warning snackbar is shown but apply is not blocked (conservative approach — the user reviews and decides).
+- **Conflict detection**: accept-time staleness is checked at the attribute level, not the post level. `hasAttributeConflict(currentAttributes, operations)` compares each operation's captured `before` to the block's current value; only a real divergence on a targeted attribute prompts the "apply anyway" confirmation. Post-level `baseRevision` is still stamped into the payload for provenance, but does not drive the prompt — every auto-save bumps `post_modified_gmt`, so a post-level compare would flag nearly every suggestion as stale.
 
-## Diff Preview
+## Review UI
 
-The `SuggestionDiff` component renders operations in the notes sidebar:
-- **Text attributes**: word-level LCS diff with green underlined insertions and red strikethrough deletions.
-- **Non-text attributes**: `attribute: before → after` label.
+In the notes sidebar, a suggestion thread renders:
+
+- **`SuggestionSummary`** — a Docs-style "Add: …", "Delete: …", "Format: …" summary derived from the operations.
+- **Accept / Reject icon buttons** — checkmark and close icons that trigger the provider's apply/reject flows.
+- **`SuggestionDiff`** (still available) — the full word-level diff preview for when a more detailed view is needed.
 
 ## Yjs v2 Migration Path
 
@@ -189,5 +201,6 @@ These are non-obvious quirks reviewers should keep in mind when reading the code
 
 - **Structural suggestions** (block insert, remove, move) are not yet supported. The `operations` array is designed to accept `block-insert-after` and `block-remove` types in the future.
 - **Inline text selections** are not anchored — suggestions apply to the entire attribute, not a sub-range. Fragment-level suggestions depend on inline annotation infrastructure tracked separately.
-- **Permissions**: the Gutenberg REST comment controller overrides `update_item_permissions_check` so users with `edit_post` on the parent can update note comments (and their suggestion meta). This lets post editors apply or reject suggestions authored by other users. The `_wp_suggestion` and `_wp_suggestion_status` meta `auth_callback`s follow the same pattern.
+- **Permissions**: the Gutenberg REST comment controller overrides `update_item_permissions_check` so users with `edit_post` on the parent can update note comments — **but only for suggestion-lifecycle fields** (`status` limited to `approved`/`hold`, plus `meta._wp_suggestion_status`). Any other field in the update body falls back to core's `edit_comment` check, preventing post editors from rewriting another user's note content. The `_wp_suggestion` and `_wp_suggestion_status` meta `auth_callback`s follow the same `edit_post`-on-parent pattern.
+- **Payload size**: `_wp_suggestion` meta is capped at 64 KB via a `sanitize_callback`. Requests exceeding that limit are truncated to prevent arbitrarily large JSON blobs from flooding comment meta storage.
 - **Rich-text format fidelity**: the word-level diff operates on the serialized HTML string, which may produce noisy diffs when formatting (bold, links) changes. Progressive enhancement planned.

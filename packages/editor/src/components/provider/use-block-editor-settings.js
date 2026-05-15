@@ -163,9 +163,11 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			} = select( coreStore );
 			const { get } = select( preferencesStore );
 			const { getBlockTypes } = select( blocksStore );
-			const { getDeviceType, isRevisionsMode: _isRevisionsMode } = unlock(
-				select( editorStore )
-			);
+			const {
+				getDeviceType,
+				isRevisionsMode: _isRevisionsMode,
+				getEditorIntent,
+			} = unlock( select( editorStore ) );
 			const { getBlocksByName, getBlockAttributes } =
 				select( blockEditorStore );
 			const siteSettings = canUser( 'read', {
@@ -209,7 +211,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 					get( 'core', 'fixedToolbar' ) || ! isLargeViewport,
 				hiddenBlockTypes: get( 'core', 'hiddenBlockTypes' ),
 				isDistractionFree: get( 'core', 'distractionFree' ),
-				isViewIntent: get( 'core', 'editorIntent' ) === 'view',
+				isViewIntent: getEditorIntent() === 'view',
 				keepCaretInsideBlock: get( 'core', 'keepCaretInsideBlock' ),
 				hasUploadPermissions:
 					canUser( 'create', {

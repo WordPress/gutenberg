@@ -7,7 +7,7 @@ import { render, screen, act, fireEvent } from '@testing-library/react';
  * WordPress dependencies
  */
 import { createRegistry, RegistryProvider } from '@wordpress/data';
-import { store as preferencesStore } from '@wordpress/preferences';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -23,9 +23,12 @@ import { store as editorStore } from '../../../store';
 
 function renderWithProviders( ui, { intent = 'edit' } = {} ) {
 	const registry = createRegistry();
-	registry.register( preferencesStore );
+	// `setEditorIntent` dispatches a snackbar via the notices store when
+	// the intent actually changes, so the store needs to be registered even
+	// in tests that only care about the overlay HOC.
+	registry.register( noticesStore );
 	registry.register( editorStore );
-	registry.dispatch( preferencesStore ).set( 'core', 'editorIntent', intent );
+	registry.dispatch( editorStore ).setEditorIntent( intent );
 
 	const wrapper = ( { children } ) => (
 		<RegistryProvider value={ registry }>

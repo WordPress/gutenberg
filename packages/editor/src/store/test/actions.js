@@ -619,13 +619,13 @@ describe( 'Editor actions', () => {
 			);
 		} );
 
-		it( 'persists to the preferences store', () => {
+		it( 'does not write to the preferences store (session-scoped only)', () => {
 			registry.dispatch( editorStore ).setEditorIntent( 'view' );
 			expect(
 				registry
 					.select( preferencesStore )
 					.get( 'core', 'editorIntent' )
-			).toEqual( 'view' );
+			).toBeUndefined();
 		} );
 	} );
 

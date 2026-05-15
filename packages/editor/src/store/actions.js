@@ -1078,33 +1078,54 @@ export const switchEditorMode =
  * (`suggest`), or viewing the post in a read-only mode (`view`). It is
  * orthogonal to the `editorMode` preference (visual vs. code).
  *
- * The value persists via the preferences store so the intent survives
- * reloads. Unknown intents are silently rejected (no dispatch, no
- * announcement) to keep typos or stale values from corrupting the
- * preference; valid values are listed in `EDITOR_INTENTS`.
+ * The intent is *session-scoped* — held in the editor reducer (not the
+ * preferences store), so reloading the editor always returns to `edit`.
+ * Persisting suggest/view across reloads surprises users who don't realize
+ * they left the editor in a non-default state.
+ *
+ * Unknown intents are silently rejected (no dispatch, no announcement) so
+ * typos from a bookmarklet, browser extension, or third-party plugin can't
+ * poison the editor state; valid values are listed in `EDITOR_INTENTS`.
  *
  * @param {'edit'|'suggest'|'view'} intent The editor intent to set.
  */
 export const setEditorIntent =
 	( intent ) =>
-	( { registry } ) => {
-		// Reject unknown intents instead of throwing so a typo from a
-		// bookmarklet, browser extension, or third-party plugin can't poison
-		// the persisted preference.
+	( { select, dispatch, registry } ) => {
 		if ( ! EDITOR_INTENTS.includes( intent ) ) {
 			return;
 		}
 
-		registry
-			.dispatch( preferencesStore )
-			.set( 'core', 'editorIntent', intent );
+		const previousIntent = select.getEditorIntent();
 
+		dispatch( { type: 'SET_EDITOR_INTENT', intent } );
+
+		// Skip the snackbar/announcement on the initial set (when there is no
+		// previous intent, e.g. during editor boot) so the user isn't greeted
+		// with a mode notice they didn't trigger.
+		if ( previousIntent === intent || previousIntent === undefined ) {
+			return;
+		}
+
+		let label;
 		if ( intent === EDITOR_INTENT_EDIT ) {
-			speak( __( 'Edit mode selected' ), 'assertive' );
+			label = __( "You're editing" );
 		} else if ( intent === EDITOR_INTENT_SUGGEST ) {
-			speak( __( 'Suggest mode selected' ), 'assertive' );
+			label = __( "You're suggesting" );
 		} else if ( intent === EDITOR_INTENT_VIEW ) {
-			speak( __( 'View mode selected' ), 'assertive' );
+			label = __( "You're viewing" );
+		}
+
+		if ( label ) {
+			speak( label, 'assertive' );
+			// Reuse the same notice id across mode changes so rapid keyboard
+			// cycling doesn't pile up multiple snackbars — the new notice
+			// replaces the old one.
+			registry.dispatch( noticesStore ).createNotice( 'info', label, {
+				id: 'editor-intent-mode',
+				type: 'snackbar',
+				isDismissible: true,
+			} );
 		}
 	};
 

@@ -13,9 +13,14 @@ export {
 	useSuggestionsProvider,
 	operationsFromOverlay,
 	applyOperations,
+	hasAttributeConflict,
 	parseSuggestionPayload,
 	payloadByteLength,
 	PAYLOAD_MAX_BYTES,
 	SCHEMA_VERSION,
 } from './provider';
 export { default as SuggestionDiff, wordDiff } from './suggestion-diff';
+export {
+	default as SuggestionSummary,
+	summarizeOperations,
+} from './suggestion-summary';

@@ -488,6 +488,26 @@ export function selectedNote( state = {}, action ) {
 	return state;
 }
 
+/**
+ * Reducer returning the current editor intent (`edit`, `suggest`, `view`).
+ * The intent is intentionally session-scoped: it lives in the editor
+ * store, not in the preferences store, so reloading the editor always
+ * returns to the default `edit` intent. Persisting suggest/view across
+ * reloads is undesirable — it surprises the user and is the wrong default
+ * for most sessions.
+ *
+ * @param {'edit'|'suggest'|'view'} state  Current state.
+ * @param {Object}                  action Dispatched action.
+ * @return {'edit'|'suggest'|'view'} Updated state.
+ */
+export function editorIntent( state = 'edit', action ) {
+	switch ( action.type ) {
+		case 'SET_EDITOR_INTENT':
+			return action.intent;
+	}
+	return state;
+}
+
 export default combineReducers( {
 	postId,
 	postType,
@@ -513,5 +533,6 @@ export default combineReducers( {
 	revisionPage,
 	showRevisionDiff,
 	selectedNote,
+	editorIntent,
 	dataviews: dataviewsReducer,
 } );

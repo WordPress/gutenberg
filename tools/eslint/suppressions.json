@@ -1915,5 +1915,10 @@
 		"react-hooks/refs": {
 			"count": 2
 		}
+	},
+	"packages/editor/src/components/suggestion-mode/suggestion-summary.js": {
+		"@wordpress/use-recommended-components": {
+			"count": 1
+		}
 	}
 }

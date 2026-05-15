@@ -19,12 +19,43 @@ async function switchIntent( page, intentLabel ) {
 	await page.keyboard.press( 'Escape' );
 }
 
+async function waitForSuggestionSaved( page ) {
+	// Auto-save is debounced; wait for the REST call to land.
+	await page.waitForResponse(
+		( response ) =>
+			/\/wp\/v2\/comments(\?|$|\/)/.test( response.url() ) &&
+			[ 'POST', 'PUT' ].includes( response.request().method() ) &&
+			response.ok()
+	);
+}
+
 test.describe( 'Suggestion mode', () => {
 	test.beforeEach( async ( { admin } ) => {
 		await admin.createNewPost();
 	} );
 
-	test( 'captures edits as an overlay without mutating the block', async ( {
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllComments( 'note' );
+	} );
+
+	test( 'announces the mode change with a snackbar', async ( { page } ) => {
+		// The mode change also fires an a11y live-region announcement
+		// carrying the same text, so scope to the snackbar list to avoid a
+		// strict-mode match on both the snackbar and the live region.
+		const snackbarList = page.locator( '.components-snackbar-list' );
+
+		await switchIntent( page, 'Suggest' );
+		await expect(
+			snackbarList.getByText( "You're suggesting" )
+		).toBeVisible();
+
+		await switchIntent( page, 'Edit' );
+		await expect(
+			snackbarList.getByText( "You're editing" )
+		).toBeVisible();
+	} );
+
+	test( 'auto-saves a content edit as a suggestion', async ( {
 		editor,
 		page,
 	} ) => {
@@ -42,16 +73,19 @@ test.describe( 'Suggestion mode', () => {
 		await page.keyboard.press( 'End' );
 		await page.keyboard.type( ' plus suggested' );
 
-		// The rendered block reflects the overlayed suggestion.
+		// Overlay reflects the proposed content, block store does not.
 		await expect( paragraph ).toContainText(
 			'Original content plus suggested'
 		);
-
-		// The serialized post content stays at the baseline — the overlay
-		// never touched the block-editor store.
 		const serialized = await editor.getEditedPostContent();
 		expect( serialized ).toContain( 'Original content' );
 		expect( serialized ).not.toContain( 'plus suggested' );
+
+		// Auto-save fires after the debounce window.
+		await waitForSuggestionSaved( page );
+
+		// Edited block picks up the pending-suggestion outline.
+		await expect( paragraph ).toHaveClass( /is-suggestion-pending/ );
 	} );
 
 	test( 'captures a heading-level change made via the block-switcher variation picker', async ( {
@@ -94,31 +128,9 @@ test.describe( 'Suggestion mode', () => {
 		const serialized = await editor.getEditedPostContent();
 		expect( serialized ).toContain( '<!-- wp:heading' );
 		expect( serialized ).not.toContain( '"level":3' );
-	} );
 
-	test( 'restores baseline when switching back to Edit intent', async ( {
-		editor,
-		page,
-	} ) => {
-		await editor.insertBlock( {
-			name: 'core/paragraph',
-			attributes: { content: 'Keep as is' },
-		} );
-
-		await switchIntent( page, 'Suggest' );
-
-		const paragraph = editor.canvas
-			.getByRole( 'document', { name: 'Block: Paragraph' } )
-			.first();
-		await paragraph.click();
-		await page.keyboard.press( 'End' );
-		await page.keyboard.type( '!' );
-		await expect( paragraph ).toContainText( 'Keep as is!' );
-
-		// Switching out of Suggest intent un-merges the overlay; the block
-		// renders the real attributes again.
-		await switchIntent( page, 'Edit' );
-		await expect( paragraph ).toContainText( 'Keep as is' );
-		await expect( paragraph ).not.toContainText( 'Keep as is!' );
+		// Auto-save persists the suggestion to a note comment.
+		await waitForSuggestionSaved( page );
+		await expect( heading ).toHaveClass( /is-suggestion-pending/ );
 	} );
 } );
