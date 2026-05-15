@@ -2,7 +2,8 @@
 
 .invisibleDragImage {
 	position: fixed;
-	inset-inline-start: -1000px;
+	/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Offscreen drag-image stand-in; flipping with writing direction has no benefit. */
+	left: -1000px;
 	height: 50px;
 	width: 50px;
 }
