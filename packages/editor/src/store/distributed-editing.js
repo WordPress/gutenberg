@@ -10685,6 +10685,8 @@ function getDistributedEditingSaveJourneyActionHintForStep( step ) {
 			return 'Review before update';
 		case DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.READY_TO_SAVE:
 			return 'Send guarded update';
+		case DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.WAITING_FOR_WORDPRESS:
+			return 'Keep tab open';
 	}
 
 	return null;

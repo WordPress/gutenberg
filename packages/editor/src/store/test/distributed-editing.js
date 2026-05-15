@@ -7552,7 +7552,7 @@ describe( 'distributed editing session state', () => {
 				action: 'keep_tab_open',
 				title: 'Save is waiting for WordPress',
 				summary: 'Keep this tab open',
-				actionHint: null,
+				actionHint: 'Keep tab open',
 				requiresActionBeforeSave: false,
 				saveButtonLabel: 'Saving reviewed changes',
 				saveButtonDisabled: true,

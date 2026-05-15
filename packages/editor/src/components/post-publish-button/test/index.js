@@ -890,4 +890,114 @@ describe( 'PostPublishButton', () => {
 
 		expect( savePostStatus ).not.toHaveBeenCalled();
 	} );
+
+	it( 'should show the waiting action hint without claiming the guarded update is saved', async () => {
+		const user = userEvent.setup();
+		const savePostStatus = jest.fn();
+		render(
+			<PostPublishButton
+				isSaveable
+				isPublishable
+				savePostStatus={ savePostStatus }
+				distributedEditingSaveButtonState={ {
+					status: 'retry_save_in_progress',
+					source: 'retry_save',
+					label: 'Saving reviewed changes',
+					statusText:
+						'Distributed Editing Save is waiting for WordPress confirmation.',
+					disabled: true,
+					busy: true,
+					authorityState: 'awaiting_server_confirmation',
+					localChangesState:
+						'protected_local_changes_awaiting_server_confirmation',
+					reviewCheckpointState: 'review_accepted',
+					authoritativePostState: 'awaiting_server_confirmation',
+					saveStateSummaryText:
+						'Reviewed local changes are waiting for server confirmation before the authoritative post is updated.',
+					authoritativePostUpdated: false,
+				} }
+				distributedEditingSaveJourneyState={ {
+					shouldExposeInSaveControls: true,
+					step: 'waiting_for_wordpress',
+					action: 'keep_tab_open',
+					title: 'Save is waiting for WordPress',
+					summary:
+						'Keep this tab open until WordPress confirms whether the post was updated.',
+					actionHint: 'Keep tab open',
+					requiresActionBeforeSave: false,
+					statusChromeSummary:
+						'Reviewed local changes are waiting for server confirmation before the authoritative post is updated.',
+					statusChromeAuthorityState: 'awaiting_server_confirmation',
+					statusChromeAuthorityText:
+						'The authoritative WordPress post has not confirmed these protected changes yet.',
+					claimsSavedWithoutEvidence: false,
+				} }
+			/>
+		);
+
+		const button = screen.getByRole( 'button', {
+			name: 'Saving reviewed changes',
+		} );
+		expect( button ).toHaveAttribute( 'aria-disabled', 'true' );
+		expect( button ).toHaveClass( 'is-busy' );
+		expect( button ).toHaveAttribute(
+			'title',
+			'Keep tab open. Keep this tab open until WordPress confirms whether the post was updated. Reviewed local changes are waiting for server confirmation before the authoritative post is updated.'
+		);
+		expect( button ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-step',
+			'waiting_for_wordpress'
+		);
+		expect( button ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-action',
+			'keep_tab_open'
+		);
+		expect( button ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-action-hint',
+			'Keep tab open'
+		);
+		expect( button ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-action-required',
+			'false'
+		);
+		expect( button ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-claims-saved-without-evidence',
+			'false'
+		);
+		const cueLabel = screen.getByText( 'Save is waiting for WordPress' );
+		const cueActionHint = screen.getByText( 'Keep tab open' );
+		const cue = screen.getByLabelText(
+			'Keep tab open. Keep this tab open until WordPress confirms whether the post was updated. Reviewed local changes are waiting for server confirmation before the authoritative post is updated.'
+		);
+		expect( cueLabel ).toBeVisible();
+		expect( cueActionHint ).toBeVisible();
+		expect( cue ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-visual-cue',
+			'true'
+		);
+		expect( cue ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-action-hint',
+			'Keep tab open'
+		);
+		expect( cue ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-action-required',
+			'false'
+		);
+		expect( cue ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-authority-state',
+			'awaiting_server_confirmation'
+		);
+		expect( cue ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-calls-normal-save',
+			'false'
+		);
+		expect( cue ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-calls-retry-save',
+			'false'
+		);
+
+		await user.click( button );
+
+		expect( savePostStatus ).not.toHaveBeenCalled();
+	} );
 } );
