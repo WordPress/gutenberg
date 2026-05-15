@@ -12,7 +12,7 @@ import { WithWpCompatOverlaySlot } from './with-wp-compat-overlay-slot';
 import componentsStyles from '../../package-styles/components-ltr.lazy.scss?inline';
 
 export default {
-	title: 'Playground/Draggable cross-document fallback',
+	title: 'Playground/Debug fixtures/Draggable cross-document fallback',
 	component: Draggable,
 	decorators: [ WithWpCompatOverlaySlot ],
 	parameters: {
