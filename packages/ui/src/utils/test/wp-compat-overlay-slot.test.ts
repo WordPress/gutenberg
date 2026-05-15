@@ -4,25 +4,12 @@ import {
 	__resetWpCompatOverlaySlotCacheForTests,
 } from '../wp-compat-overlay-slot';
 
-/**
- * Typed accessor for the internal opt-in flag the helper reads. The flag
- * is intentionally undeclared on the global `Window` interface — the
- * public API is `useEnableWpCompatOverlaySlot()` (tested separately) — so
- * tests that exercise the gating mechanism directly stay behind this
- * cast, mirroring how the helper itself reads the flag.
- */
+// Typed accessors mirroring the helper's local casts: the flag and the
+// `wp` global are both intentionally undeclared on `Window` so the
+// package's published types don't leak augmentations.
 const internalWindow = window as unknown as {
 	__wpUiCompatOverlaySlotEnabled?: unknown;
 };
-
-/**
- * Typed accessor for the WordPress runtime global the auto-detect heuristic
- * reads. Mirrors the helper's local `WpEnvironmentWindow` cast pattern (kept
- * off the global `Window` interface to avoid leaking a `Window.wp`
- * augmentation into downstream TS consumers via the package's published
- * types). Tests use this accessor to plant / observe the runtime shape the
- * heuristic inspects.
- */
 const wpEnvWindow = window as unknown as {
 	wp?: { components?: unknown };
 };
@@ -112,8 +99,7 @@ describe( 'getWpCompatOverlaySlot', () => {
 		);
 
 		it( 'does not auto-enable when window.wp.components is null', () => {
-			// `typeof null === 'object'` so the check needs an explicit null
-			// guard. This test pins that behavior.
+			// `typeof null === 'object'` — pins the explicit null guard.
 			wpEnvWindow.wp = { components: null };
 
 			expect( getWpCompatOverlaySlot() ).toBeUndefined();
@@ -134,15 +120,10 @@ describe( 'getWpCompatOverlaySlot', () => {
 			expect( getWpCompatOverlaySlot() ).toBeDefined();
 		} );
 
-		// The cross-origin `window.top` throw path (where `.wp` access
-		// throws because the top window is in another origin) isn't unit-
-		// tested: jsdom defines `window.top` as a non-configurable, non-
-		// writable getter, so neither `Object.defineProperty` nor
-		// `jest.spyOn(window, 'top', 'get')` nor `jest.replaceProperty`
-		// can simulate the throw. The helper's `try/catch` is readable in
-		// place and the same-origin happy path (`window.top === window` in
-		// jsdom, exercised by every other auto-detect test in this suite)
-		// covers the no-throw branch. Real cross-origin embeddings are
+		// The cross-origin `window.top` throw path isn't unit-tested:
+		// jsdom's `window.top` is a non-configurable, non-writable getter,
+		// so the throw can't be simulated. Same-origin happy path is
+		// covered by every other auto-detect test; cross-origin is
 		// validated via manual smoke testing.
 	} );
 
@@ -176,8 +157,7 @@ describe( 'getWpCompatOverlaySlot', () => {
 			expect( second?.isConnected ).toBe( true );
 			expect( findSlots() ).toHaveLength( 1 );
 
-			// The recreated element should now be cached: a third call must
-			// return it directly without creating a third slot.
+			// A third call returns the cached recreated slot directly.
 			const third = getWpCompatOverlaySlot();
 			expect( third ).toBe( second );
 			expect( findSlots() ).toHaveLength( 1 );
@@ -193,16 +173,10 @@ describe( 'getWpCompatOverlaySlot', () => {
 		} );
 
 		it( 'invalidates the cache and detaches the stale slot when the cached element belongs to a different document', () => {
-			// Drives the `cachedSlot.ownerDocument !== ownerDocument` branch
-			// and the subsequent `if ( cachedSlot?.isConnected )
-			// cachedSlot.remove();` cleanup. Triggered in real environments
-			// by a runtime-detected switch in the owning document (e.g. a
-			// jsdom test teardown that tears down the realm, or a host
-			// swapping the active document). Simulated here by moving the
-			// cached slot into a foreign parsed document so its
-			// `ownerDocument` differs from the helper's local `document`
-			// while staying `isConnected` to that foreign document — the
-			// exact shape the cleanup branch was written to handle.
+			// Exercises the foreign-document cleanup branch by moving the
+			// cached slot into a parsed foreign document, so it stays
+			// `isConnected` but `ownerDocument` differs from the helper's
+			// local `document`.
 			const first = getWpCompatOverlaySlot();
 			expect( first ).toBeDefined();
 
@@ -235,9 +209,8 @@ describe( 'getWpCompatOverlaySlot', () => {
 		} );
 
 		it( 'adopts a pre-existing slot element rather than appending a duplicate', () => {
-			// Simulate a second `@wordpress/ui` package instance having
-			// already created the slot before this instance's call. The
-			// module-level `cachedSlot` is null, but the DOM has the slot.
+			// Simulates a second `@wordpress/ui` instance creating the slot
+			// first: `cachedSlot` is null but the slot already exists in the DOM.
 			const preExisting = document.createElement( 'div' );
 			preExisting.setAttribute( WP_COMPAT_OVERLAY_SLOT_ATTRIBUTE, '' );
 			document.body.appendChild( preExisting );
@@ -286,9 +259,7 @@ describe( 'getWpCompatOverlaySlot', () => {
 				if ( bodyDescriptor ) {
 					Object.defineProperty( document, 'body', bodyDescriptor );
 				} else {
-					// jsdom typically defines `body` on Document.prototype; if
-					// it isn't present, fall back to deleting the override so
-					// `document.body` resolves to the live element again.
+					// Fallback if `body` wasn't on Document.prototype.
 					delete ( document as unknown as { body: unknown } ).body;
 				}
 				expect( document.body ).toBe( realBody );
