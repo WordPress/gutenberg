@@ -1,7 +1,14 @@
 /**
  * External dependencies
  */
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import {
+	act,
+	fireEvent,
+	render,
+	screen,
+	waitFor,
+	within,
+} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -42,6 +49,9 @@ import {
 	DISTRIBUTED_EDITING_LOCAL_UPDATES_REVIEW_REQUEST_STATUSES,
 	DISTRIBUTED_EDITING_NOTICE_ACTIONS,
 	DISTRIBUTED_EDITING_NOTICE_KINDS,
+	DISTRIBUTED_EDITING_PRESENCE_REPEATED_REFRESH_CONNECTION_STATES,
+	DISTRIBUTED_EDITING_PRESENCE_REPEATED_REFRESH_RUNTIME_STATUSES,
+	DISTRIBUTED_EDITING_PRESENCE_STARTUP_POLICY_STATUSES,
 	DISTRIBUTED_EDITING_REASON_CODES,
 	DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_STATUSES,
 	DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES,
@@ -53,6 +63,8 @@ import {
 	DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES,
 	DISTRIBUTED_EDITING_UNLOAD_WARNING_REASONS,
 	getDistributedEditingLocalUpdatesExportPayload,
+	getDistributedEditingSessionStateForPresenceHeartbeatResult,
+	getDistributedEditingSessionStateForPresenceSnapshotRefreshResult,
 	getDistributedEditingNoticeDescriptorsForSessionState,
 	getDistributedEditingUnloadWarningStateForSessionState,
 } from '../../../store/distributed-editing';
@@ -104,6 +116,47 @@ function setupDistributedEditingStatusDispatch() {
 			.fn()
 			.mockResolvedValue( {
 				result: 'candidate_update_valid',
+			} ),
+		__experimentalRefreshDistributedEditingPresenceSnapshot: jest
+			.fn()
+			.mockResolvedValue( {
+				result: 'presence_roster_snapshot',
+			} ),
+		__experimentalRefreshDistributedEditingPresenceStorageReadiness: jest
+			.fn()
+			.mockResolvedValue( {
+				result: 'presence_storage_ready',
+				status: 'ready',
+				tableExists: true,
+				schemaCurrent: true,
+				expectedStartupHeartbeatStatus: 'sent',
+				setupRequired: false,
+				setupAction: 'call_wp_de_rtc_install_presence_table',
+				diagnosticOnly: true,
+				contentFree: true,
+				installsPresenceTable: false,
+				automaticPerRequestInstall: false,
+				writesPresence: false,
+				recordsPresenceHeartbeat: false,
+				startsPolling: false,
+				callsSave: false,
+				mutatesPostContent: false,
+				mutatesPersistedPostContent: false,
+				createsRevision: false,
+				changesPostLock: false,
+				claimsAbsence: false,
+				claimsSaved: false,
+				exposesRawContent: false,
+				exposesUserIds: false,
+				exposesCursorOffset: false,
+				exposesSelection: false,
+				correctnessIndependentOfTransport: true,
+				transportRequiredForCorrectness: false,
+			} ),
+		__experimentalSendDistributedEditingPresenceHeartbeat: jest
+			.fn()
+			.mockResolvedValue( {
+				result: 'presence_heartbeat_recorded',
 			} ),
 		__experimentalSaveDistributedEditingRetryAfterProof: jest
 			.fn()
@@ -870,11 +923,50 @@ describe( 'DistributedEditingStatus', () => {
 			'data-distributed-editing-transcript-redacted',
 			'true'
 		);
+		expect( transcriptItem ).toHaveAttribute(
+			'data-distributed-editing-transcript-support-report',
+			'true'
+		);
+		expect( transcriptItem ).toHaveAttribute(
+			'data-distributed-editing-transcript-support-shareable',
+			'true'
+		);
+		expect( transcriptItem ).toHaveAttribute(
+			'data-distributed-editing-transcript-support-save-authority-required',
+			'true'
+		);
 		expect(
 			screen.getByText(
 				'Remote editing activity was recorded for review without exposing post content.'
 			)
 		).toBeVisible();
+		expect(
+			screen.getByText(
+				'Distributed Editing activity was recorded; no fresh-review chronology is complete. Recorded 1 redacted transcript event; 1 unsafe entry was dropped. This transcript is diagnostic only; save authority evidence is still required before treating these changes as saved.'
+			)
+		).toBeVisible();
+		const timeline = screen.getByRole( 'list', {
+			name: 'Distributed editing transcript timeline',
+		} );
+		expect( timeline ).toHaveAttribute(
+			'data-distributed-editing-transcript-timeline-count',
+			'1'
+		);
+		expect(
+			screen.getByText( 'Remote editing activity recorded' )
+		).toBeVisible();
+		expect(
+			screen.getByText( 'Remote editing activity recorded' )
+		).toHaveAttribute(
+			'data-distributed-editing-transcript-timeline-event-type',
+			DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.REMOTE_CHANGE_RECEIVED
+		);
+		expect(
+			screen.getByText( 'Remote editing activity recorded' )
+		).toHaveAttribute(
+			'data-distributed-editing-transcript-timeline-redacted',
+			'true'
+		);
 		expect( status ).not.toHaveTextContent( 'Hidden draft' );
 	} );
 
@@ -1032,7 +1124,7 @@ describe( 'DistributedEditingStatus', () => {
 		);
 		expect(
 			screen.getByText(
-				'WordPress confirmed the fresh-review guarded save and kept the activity record content-free.'
+				'WordPress confirmed the fresh-review Save and kept the activity record content-free.'
 			)
 		).toBeVisible();
 		expect(
@@ -1103,7 +1195,7 @@ describe( 'DistributedEditingStatus', () => {
 			'ready_to_update_authoritative_post'
 		);
 		expect(
-			screen.getByText( 'Distributed Editing enabled' )
+			within( shell ).getByText( 'Distributed Editing enabled' )
 		).toBeVisible();
 		expect(
 			screen.getByText(
@@ -1120,11 +1212,3234 @@ describe( 'DistributedEditingStatus', () => {
 				'Save can update the authoritative WordPress post.'
 			)
 		).toBeVisible();
+		expect( screen.getByText( 'Editing now' ) ).toBeVisible();
+		expect( screen.getByText( 'No other editors shown.' ) ).toBeVisible();
+		expect(
+			screen.getByText( 'Editor activity has not been shown yet.' )
+		).toBeVisible();
+		expect(
+			screen.getByRole( 'group', {
+				name: 'Distributed editing presence',
+			} )
+		).toHaveAttribute(
+			'data-distributed-editing-presence-claims-absence',
+			'false'
+		);
+		expect(
+			screen.getByRole( 'group', {
+				name: 'Distributed editing presence',
+			} )
+		).toHaveAttribute(
+			'data-distributed-editing-presence-summary-current-count',
+			'0'
+		);
+		expect(
+			screen.getByRole( 'group', {
+				name: 'Distributed editing presence',
+			} )
+		).toHaveAttribute(
+			'data-distributed-editing-presence-summary-delayed-count',
+			'0'
+		);
+		expect(
+			screen.getByRole( 'group', {
+				name: 'Distributed editing presence',
+			} )
+		).toHaveAttribute(
+			'data-distributed-editing-presence-summary-claims-absence',
+			'false'
+		);
 		expect(
 			screen.queryByRole( 'region', {
 				name: 'Distributed editing status',
 			} )
 		).not.toBeInTheDocument();
+	} );
+
+	it( 'shows a latency-tolerant presence roster in the enabled editor shell', () => {
+		const actions = setupDistributedEditingStatusDispatch();
+		setupDistributedEditingStatusSelect( {
+			editorSettings: {
+				distributedEditing: {
+					enabled: true,
+				},
+			},
+			sessionState: {
+				presenceRosterEntries: [
+					{
+						key: 'presence-mira',
+						displayName: 'Mira',
+						freshness: 'current',
+					},
+					{
+						key: 'presence-hidden',
+						identityVisibility: 'anonymous',
+						freshness: 'current',
+						userId: 42,
+						selection: { anchor: 9 },
+					},
+				],
+				presenceRosterTotalKnownCount: 2,
+			},
+		} );
+
+		render( <DistributedEditingStatusChrome /> );
+
+		const presence = screen.getByRole( 'group', {
+			name: 'Distributed editing presence',
+		} );
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-status',
+			'active'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-visible-count',
+			'2'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-summary-current-count',
+			'2'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-summary-delayed-count',
+			'0'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-summary-calls-save',
+			'false'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-summary-changes-post-lock',
+			'false'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-summary-exposes-private-fields',
+			'false'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-row-visual-treatment',
+			'subtle-status-stripe'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-row-visual-treatment-accessible',
+			'true'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-row-visual-treatment-color-only',
+			'false'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-row-visual-treatment-layout-stable',
+			'true'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-calls-rest',
+			'false'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-calls-save',
+			'false'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-mutates-editor-content',
+			'false'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-changes-post-lock',
+			'false'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-claims-saved',
+			'false'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-exposes-selection',
+			'false'
+		);
+		expect(
+			screen.getByText(
+				'Mira and Another editor are also editing this post.'
+			)
+		).toBeVisible();
+		expect( screen.getByText( '2 editors are active now.' ) ).toBeVisible();
+		const rowList = screen.getByRole( 'list', {
+			name: 'Visible editors',
+		} );
+		const rows = within( rowList ).getAllByRole( 'listitem' );
+
+		expect( rowList ).toHaveAttribute(
+			'data-distributed-editing-presence-row-treatment-list',
+			'compact-status-badges'
+		);
+		expect( rowList ).toHaveAttribute(
+			'data-distributed-editing-presence-row-visual-treatment-list',
+			'subtle-status-stripe'
+		);
+		expect( rows ).toHaveLength( 2 );
+		expect( rows[ 0 ] ).toHaveClass(
+			'editor-distributed-editing-status__presence-roster-item--current'
+		);
+		expect( rows[ 0 ] ).toHaveAttribute(
+			'data-distributed-editing-presence-row-treatment',
+			'compact-status-badge'
+		);
+		expect( rows[ 0 ] ).toHaveAttribute(
+			'data-distributed-editing-presence-row-visual-treatment',
+			'subtle-status-stripe'
+		);
+		expect( rows[ 0 ] ).toHaveAttribute(
+			'data-distributed-editing-presence-row-current',
+			'true'
+		);
+		expect( rows[ 0 ] ).toHaveAttribute(
+			'data-distributed-editing-presence-row-status-tone',
+			'current'
+		);
+		expect( rows[ 0 ] ).toHaveAttribute(
+			'data-distributed-editing-presence-row-status-affordance',
+			'dot-and-label'
+		);
+		expect( rows[ 0 ] ).toHaveAttribute(
+			'data-distributed-editing-presence-row-has-avatar-initial',
+			'true'
+		);
+		expect( rows[ 0 ] ).toHaveAttribute(
+			'data-distributed-editing-presence-row-has-status-affordance',
+			'true'
+		);
+		expect( rows[ 0 ] ).toHaveAttribute(
+			'data-distributed-editing-presence-row-relationship',
+			'other_user'
+		);
+		expect( rows[ 0 ] ).toHaveAttribute(
+			'data-distributed-editing-presence-row-visual-treatment-color-only',
+			'false'
+		);
+		expect( rows[ 0 ] ).toHaveAttribute(
+			'data-distributed-editing-presence-row-visual-treatment-layout-stable',
+			'true'
+		);
+		expect( rows[ 0 ] ).toHaveAttribute(
+			'data-distributed-editing-presence-row-freshness',
+			'current'
+		);
+		expect( rows[ 0 ] ).toHaveAttribute(
+			'data-distributed-editing-presence-row-exposes-private-fields',
+			'false'
+		);
+		expect( rows[ 0 ] ).toHaveAttribute(
+			'aria-label',
+			'Mira, Editing now'
+		);
+		expect( rows[ 1 ] ).toHaveAttribute(
+			'aria-label',
+			'Another editor, Editing now'
+		);
+		expect( rows[ 1 ] ).toHaveAttribute(
+			'data-distributed-editing-presence-row-relationship',
+			'other_user'
+		);
+		expect( screen.getByText( 'Mira' ) ).toBeVisible();
+		expect( screen.getAllByText( 'Another editor' ) ).toHaveLength( 1 );
+		expect(
+			screen.queryByText( /userId|anchor|selection/i )
+		).not.toBeInTheDocument();
+		expect(
+			actions.__experimentalSaveDistributedEditingRetryAfterProof
+		).not.toHaveBeenCalled();
+	} );
+
+	it( 'shows presence storage readiness without installing storage or weakening save safety', () => {
+		const actions = setupDistributedEditingStatusDispatch();
+		setupDistributedEditingStatusSelect( {
+			editorSettings: {
+				distributedEditing: {
+					enabled: true,
+					presenceStorageReadiness: {
+						status: 'setup_required',
+						tableExists: false,
+						schemaCurrent: false,
+						expectedStartupHeartbeatStatus: 'degraded',
+						setupRequired: true,
+						setupAction: 'call_wp_de_rtc_install_presence_table',
+						automaticPerRequestInstall: false,
+						installsPresenceTable: false,
+						diagnosticOnly: true,
+						contentFree: true,
+						callsSave: false,
+						changesPostLock: false,
+						claimsAbsence: false,
+						claimsSaved: false,
+						exposesRawContent: false,
+						exposesUserIds: false,
+						exposesCursorOffset: false,
+						exposesSelection: false,
+						correctnessIndependentOfTransport: true,
+						transportRequiredForCorrectness: false,
+					},
+				},
+			},
+			sessionState: {
+				presenceRosterStatus: 'empty',
+			},
+		} );
+
+		render( <DistributedEditingStatusChrome /> );
+
+		const presence = screen.getByRole( 'group', {
+			name: 'Distributed editing presence',
+		} );
+
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-storage-readiness-status',
+			'setup_required'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-storage-readiness-table-ready',
+			'false'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-storage-readiness-schema-current',
+			'false'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-storage-readiness-expected-startup-heartbeat',
+			'degraded'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-storage-readiness-setup-required',
+			'true'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-storage-readiness-setup-action',
+			'call_wp_de_rtc_install_presence_table'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-storage-readiness-diagnostic-only',
+			'true'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-storage-readiness-content-free',
+			'true'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-storage-readiness-installs-table',
+			'false'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-storage-readiness-automatic-install',
+			'false'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-storage-readiness-calls-save',
+			'false'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-storage-readiness-changes-post-lock',
+			'false'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-storage-readiness-claims-absence',
+			'false'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-storage-readiness-claims-saved',
+			'false'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-storage-readiness-exposes-private-fields',
+			'false'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-storage-readiness-exposes-raw-content',
+			'false'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-storage-readiness-correctness-independent',
+			'true'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-storage-readiness-transport-required-for-correctness',
+			'false'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-storage-setup-affordance-visible',
+			'true'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-storage-setup-affordance-status',
+			'setup_required'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-storage-setup-affordance-href',
+			'options-writing.php#wp_de_rtc_enabled'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-storage-setup-affordance-opens-settings-new-tab',
+			'true'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-storage-setup-affordance-navigates-to-writing-settings',
+			'true'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-storage-setup-affordance-settings-opened',
+			'false'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-storage-setup-affordance-reload-prompt-visible',
+			'false'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-storage-setup-affordance-reload-action-available',
+			'false'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-storage-setup-affordance-reload-requires-protected-local-changes',
+			'true'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-storage-setup-affordance-refresh-instruction-visible',
+			'true'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-storage-setup-affordance-runs-setup-from-editor',
+			'false'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-storage-setup-affordance-reloads-editor-now',
+			'false'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-storage-setup-affordance-calls-save',
+			'false'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-storage-setup-affordance-changes-post-lock',
+			'false'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-storage-setup-affordance-mutates-editor-content',
+			'false'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-storage-setup-affordance-mutates-persisted-post-content',
+			'false'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-storage-setup-affordance-exposes-raw-content',
+			'false'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-storage-setup-affordance-exposes-private-fields',
+			'false'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-storage-setup-affordance-correctness-independent',
+			'true'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-storage-readiness-recheck-status',
+			'idle'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-storage-readiness-recheck-available',
+			'true'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-storage-readiness-recheck-calls-rest-on-click',
+			'true'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-storage-readiness-recheck-installs-table',
+			'false'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-storage-readiness-recheck-records-heartbeat',
+			'false'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-storage-readiness-recheck-calls-save',
+			'false'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-storage-readiness-recheck-mutates-editor-content',
+			'false'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-storage-readiness-recheck-changes-post-lock',
+			'false'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-freshness-indicator-state',
+			'degraded'
+		);
+		expect(
+			screen.getByText( 'Presence storage setup needed' )
+		).toBeVisible();
+		expect(
+			screen.getByText(
+				'Presence storage is not set up yet. Automatic startup presence may be delayed until setup is run deliberately.'
+			)
+		).toBeVisible();
+		expect(
+			screen.getByText( 'Presence live updates degraded' )
+		).toBeVisible();
+		expect(
+			screen.getByText(
+				'Presence storage is not ready. Editing can continue; saves do not depend on presence.'
+			)
+		).toBeVisible();
+		expect(
+			screen.getByText( 'Presence setup in Writing settings' )
+		).toBeVisible();
+		expect(
+			screen.getByText(
+				'Open Writing settings to run the deliberate presence storage setup. After setup completes, check status here or reload this editor after protecting local changes.'
+			)
+		).toBeVisible();
+		expect(
+			screen.getByRole( 'link', {
+				name: 'Open Writing settings',
+			} )
+		).toHaveAttribute( 'href', 'options-writing.php#wp_de_rtc_enabled' );
+		expect(
+			screen.getByRole( 'link', {
+				name: 'Open Writing settings',
+			} )
+		).toHaveAttribute( 'target', '_blank' );
+		expect(
+			screen.getByRole( 'link', {
+				name: 'Open Writing settings',
+			} )
+		).toHaveAttribute( 'rel', 'noreferrer' );
+		expect(
+			screen.getByRole( 'button', {
+				name: 'Check setup status',
+			} )
+		).toBeVisible();
+		expect(
+			actions.__experimentalRefreshDistributedEditingPresenceStorageReadiness
+		).not.toHaveBeenCalled();
+		expect(
+			actions.__experimentalSendDistributedEditingPresenceHeartbeat
+		).not.toHaveBeenCalled();
+		expect(
+			actions.__experimentalSaveDistributedEditingRetryAfterProof
+		).not.toHaveBeenCalled();
+		expect(
+			screen.queryByText( /post_content|userId|cursor|selection/i )
+		).not.toBeInTheDocument();
+	} );
+
+	it( 'shows a local reload prompt after opening Writing settings for presence setup', () => {
+		const actions = setupDistributedEditingStatusDispatch();
+		setupDistributedEditingStatusSelect( {
+			editorSettings: {
+				distributedEditing: {
+					enabled: true,
+					presenceStorageReadiness: {
+						status: 'setup_required',
+						tableExists: false,
+						schemaCurrent: false,
+						expectedStartupHeartbeatStatus: 'degraded',
+						setupRequired: true,
+						setupAction: 'call_wp_de_rtc_install_presence_table',
+						diagnosticOnly: true,
+						contentFree: true,
+						callsSave: false,
+						changesPostLock: false,
+						claimsAbsence: false,
+						claimsSaved: false,
+						correctnessIndependentOfTransport: true,
+						transportRequiredForCorrectness: false,
+					},
+				},
+			},
+			sessionState: {
+				presenceRosterStatus: 'empty',
+			},
+		} );
+
+		render( <DistributedEditingStatusChrome /> );
+
+		const presence = screen.getByRole( 'group', {
+			name: 'Distributed editing presence',
+		} );
+		const settingsLink = screen.getByRole( 'link', {
+			name: 'Open Writing settings',
+		} );
+
+		fireEvent.click( settingsLink );
+
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-storage-setup-affordance-status',
+			'settings_opened_reload_recommended'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-storage-setup-affordance-settings-opened',
+			'true'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-storage-setup-affordance-reload-prompt-visible',
+			'true'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-storage-setup-affordance-reload-action-available',
+			'false'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-storage-setup-affordance-reloads-editor-now',
+			'false'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-storage-setup-affordance-runs-setup-from-editor',
+			'false'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-storage-setup-affordance-calls-save',
+			'false'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-storage-setup-affordance-mutates-editor-content',
+			'false'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-storage-setup-affordance-mutates-persisted-post-content',
+			'false'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-storage-setup-affordance-changes-post-lock',
+			'false'
+		);
+		expect(
+			screen.getByText( 'Check after setup finishes' )
+		).toBeVisible();
+		expect(
+			screen.getByText(
+				'When setup completes in Writing settings, check setup status here. If local changes are sensitive, reload only after protecting them.'
+			)
+		).toBeVisible();
+		expect(
+			actions.__experimentalRefreshDistributedEditingPresenceStorageReadiness
+		).not.toHaveBeenCalled();
+		expect(
+			actions.__experimentalRefreshDistributedEditingPresenceSnapshot
+		).not.toHaveBeenCalled();
+		expect(
+			actions.__experimentalSendDistributedEditingPresenceHeartbeat
+		).not.toHaveBeenCalled();
+		expect(
+			actions.__experimentalSaveDistributedEditingRetryAfterProof
+		).not.toHaveBeenCalled();
+		expect(
+			screen.queryByText( /post_content|userId|cursor|selection/i )
+		).not.toBeInTheDocument();
+	} );
+
+	it( 'can re-check presence storage readiness after setup without saving or writing presence', async () => {
+		const user = userEvent.setup();
+		const actions = setupDistributedEditingStatusDispatch();
+		setupDistributedEditingStatusSelect( {
+			editorSettings: {
+				distributedEditing: {
+					enabled: true,
+					presenceStorageReadiness: {
+						status: 'setup_required',
+						tableExists: false,
+						schemaCurrent: false,
+						expectedStartupHeartbeatStatus: 'degraded',
+						setupRequired: true,
+						setupAction: 'call_wp_de_rtc_install_presence_table',
+						diagnosticOnly: true,
+						contentFree: true,
+						callsSave: false,
+						changesPostLock: false,
+						claimsAbsence: false,
+						claimsSaved: false,
+						correctnessIndependentOfTransport: true,
+						transportRequiredForCorrectness: false,
+					},
+				},
+			},
+			sessionState: {
+				presenceRosterStatus: 'empty',
+			},
+		} );
+
+		render( <DistributedEditingStatusChrome /> );
+
+		const presence = screen.getByRole( 'group', {
+			name: 'Distributed editing presence',
+		} );
+
+		await user.click(
+			screen.getByRole( 'button', {
+				name: 'Check setup status',
+			} )
+		);
+
+		await waitFor( () =>
+			expect( presence ).toHaveAttribute(
+				'data-distributed-editing-presence-storage-readiness-status',
+				'ready'
+			)
+		);
+
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-storage-readiness-table-ready',
+			'true'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-storage-readiness-schema-current',
+			'true'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-storage-readiness-recheck-status',
+			'ready'
+		);
+
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-storage-readiness-recheck-calls-rest-on-click',
+			'false'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-storage-readiness-recheck-installs-table',
+			'false'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-storage-readiness-recheck-records-heartbeat',
+			'false'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-storage-readiness-recheck-writes-presence',
+			'false'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-storage-readiness-recheck-starts-polling',
+			'false'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-storage-readiness-recheck-calls-save',
+			'false'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-storage-readiness-recheck-mutates-editor-content',
+			'false'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-storage-readiness-recheck-changes-post-lock',
+			'false'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-storage-setup-affordance-visible',
+			'false'
+		);
+		expect(
+			actions.__experimentalRefreshDistributedEditingPresenceStorageReadiness
+		).toHaveBeenCalledTimes( 1 );
+		expect(
+			actions.__experimentalRefreshDistributedEditingPresenceSnapshot
+		).not.toHaveBeenCalled();
+		expect(
+			actions.__experimentalSendDistributedEditingPresenceHeartbeat
+		).not.toHaveBeenCalled();
+		expect(
+			actions.__experimentalSaveDistributedEditingRetryAfterProof
+		).not.toHaveBeenCalled();
+		expect( screen.getByText( 'Presence setup confirmed' ) ).toBeVisible();
+		expect(
+			screen.getByText(
+				'Presence storage is ready in this editor. Startup presence can proceed when enabled.'
+			)
+		).toBeVisible();
+		expect(
+			screen.queryByText( /post_content|userId|cursor|selection/i )
+		).not.toBeInTheDocument();
+	} );
+
+	it( 'schedules the startup heartbeat after readiness re-check confirms storage', async () => {
+		jest.useFakeTimers();
+
+		const actions = setupDistributedEditingStatusDispatch();
+		setupDistributedEditingStatusSelect( {
+			editorSettings: {
+				distributedEditing: {
+					enabled: true,
+					presenceStorageReadiness: {
+						status: 'setup_required',
+						tableExists: false,
+						schemaCurrent: false,
+						expectedStartupHeartbeatStatus: 'degraded',
+						setupRequired: true,
+						setupAction: 'call_wp_de_rtc_install_presence_table',
+						diagnosticOnly: true,
+						contentFree: true,
+						callsSave: false,
+						changesPostLock: false,
+						claimsAbsence: false,
+						claimsSaved: false,
+						correctnessIndependentOfTransport: true,
+						transportRequiredForCorrectness: false,
+					},
+				},
+			},
+			sessionState: {
+				presenceRosterStatus: 'empty',
+				presenceStartupPolicyStatus:
+					DISTRIBUTED_EDITING_PRESENCE_STARTUP_POLICY_STATUSES.SLOW_AUTOMATIC_HEARTBEAT_ALLOWED,
+				presenceStartupPolicyReason: 'cheap_host_slow_startup_allowed',
+				presenceStartupPolicyRequiresExplicitEnablement: true,
+				presenceStartupPolicyMaySendInitialHeartbeatAutomatically: true,
+				presenceStartupPolicySlowAutomaticHeartbeatAllowed: true,
+				presenceStartupPolicyHostProfile: 'cheap_shared_host',
+				presenceStartupPolicyServerContact: 'nominal',
+				presenceStartupPolicySelectedInitialHeartbeatDelaySeconds: 2,
+				presenceStartupPolicyCallsHeartbeatEndpointNow: false,
+				presenceStartupPolicyWritesPresenceNow: false,
+				presenceStartupPolicyStartsPollingNow: false,
+				presenceStartupPolicyStartsTimerNow: false,
+				presenceStartupPolicyCallsSave: false,
+				presenceStartupPolicyChangesPostLock: false,
+				presenceStartupPolicyClaimsAbsence: false,
+				presenceStartupPolicyClaimsSaved: false,
+				presenceStartupPolicyExposesRawContent: false,
+				presenceStartupPolicyRawSessionKeyIncluded: false,
+			},
+		} );
+
+		const { unmount } = render( <DistributedEditingStatusChrome /> );
+
+		try {
+			const presence = screen.getByRole( 'group', {
+				name: 'Distributed editing presence',
+			} );
+
+			await waitFor( () =>
+				expect( presence ).toHaveAttribute(
+					'data-distributed-editing-presence-startup-heartbeat-runtime-status',
+					'degraded_storage_setup_required'
+				)
+			);
+
+			fireEvent.click(
+				screen.getByRole( 'button', {
+					name: 'Check setup status',
+				} )
+			);
+
+			await waitFor( () =>
+				expect( presence ).toHaveAttribute(
+					'data-distributed-editing-presence-storage-readiness-status',
+					'ready'
+				)
+			);
+
+			expect( presence ).toHaveAttribute(
+				'data-distributed-editing-presence-startup-heartbeat-runtime-status',
+				'scheduled'
+			);
+
+			expect( presence ).toHaveAttribute(
+				'data-distributed-editing-presence-startup-heartbeat-runtime-delay-ms',
+				'2000'
+			);
+			expect( presence ).toHaveAttribute(
+				'data-distributed-editing-presence-startup-heartbeat-runtime-storage-ready',
+				'true'
+			);
+			expect( presence ).toHaveAttribute(
+				'data-distributed-editing-presence-startup-heartbeat-runtime-blocked-by-storage-readiness',
+				'false'
+			);
+			expect( presence ).toHaveAttribute(
+				'data-distributed-editing-presence-startup-heartbeat-runtime-timer-active',
+				'true'
+			);
+			expect( presence ).toHaveAttribute(
+				'data-distributed-editing-presence-startup-heartbeat-runtime-calls-presence-read-endpoint',
+				'false'
+			);
+			expect( presence ).toHaveAttribute(
+				'data-distributed-editing-presence-startup-heartbeat-runtime-starts-polling',
+				'false'
+			);
+			expect( presence ).toHaveAttribute(
+				'data-distributed-editing-presence-startup-heartbeat-runtime-calls-save',
+				'false'
+			);
+			expect( presence ).toHaveAttribute(
+				'data-distributed-editing-presence-startup-heartbeat-runtime-changes-post-lock',
+				'false'
+			);
+			expect( presence ).toHaveAttribute(
+				'data-distributed-editing-presence-freshness-indicator-state',
+				'ready'
+			);
+			expect(
+				screen.getAllByText( 'Presence startup scheduled' )
+			).toHaveLength( 2 );
+			expect(
+				screen.getByText(
+					'Presence storage is ready and the startup update is waiting on its configured delay. Saves do not depend on presence.'
+				)
+			).toBeVisible();
+			expect(
+				screen.getByText(
+					'Initial presence will update after about 2 seconds.'
+				)
+			).toBeVisible();
+			expect(
+				actions.__experimentalRefreshDistributedEditingPresenceStorageReadiness
+			).toHaveBeenCalledTimes( 1 );
+			expect(
+				actions.__experimentalSendDistributedEditingPresenceHeartbeat
+			).not.toHaveBeenCalled();
+			expect(
+				actions.__experimentalRefreshDistributedEditingPresenceSnapshot
+			).not.toHaveBeenCalled();
+			expect(
+				actions.__experimentalSaveDistributedEditingRetryAfterProof
+			).not.toHaveBeenCalled();
+
+			await act( async () => {
+				jest.advanceTimersByTime( 2000 );
+				await Promise.resolve();
+				await Promise.resolve();
+			} );
+
+			expect(
+				actions.__experimentalSendDistributedEditingPresenceHeartbeat
+			).toHaveBeenCalledTimes( 1 );
+			expect(
+				actions.__experimentalRefreshDistributedEditingPresenceSnapshot
+			).not.toHaveBeenCalled();
+			expect(
+				actions.__experimentalSaveDistributedEditingRetryAfterProof
+			).not.toHaveBeenCalled();
+			expect( presence ).toHaveAttribute(
+				'data-distributed-editing-presence-startup-heartbeat-runtime-status',
+				'sent'
+			);
+			expect( presence ).toHaveAttribute(
+				'data-distributed-editing-presence-heartbeat-command-status',
+				'sent'
+			);
+			expect(
+				screen.queryByText(
+					/session_key|rawSessionKey|userId|cursor|selection/i
+				)
+			).not.toBeInTheDocument();
+		} finally {
+			unmount();
+			jest.clearAllTimers();
+			jest.useRealTimers();
+		}
+	} );
+
+	it( 'keeps automatic startup presence degraded until storage setup is ready', async () => {
+		jest.useFakeTimers();
+
+		const actions = setupDistributedEditingStatusDispatch();
+		setupDistributedEditingStatusSelect( {
+			editorSettings: {
+				distributedEditing: {
+					enabled: true,
+					presenceStorageReadiness: {
+						status: 'setup_required',
+						tableExists: false,
+						schemaCurrent: false,
+						expectedStartupHeartbeatStatus: 'degraded',
+						setupRequired: true,
+						setupAction: 'call_wp_de_rtc_install_presence_table',
+						diagnosticOnly: true,
+						contentFree: true,
+						callsSave: false,
+						changesPostLock: false,
+						claimsAbsence: false,
+						claimsSaved: false,
+						correctnessIndependentOfTransport: true,
+						transportRequiredForCorrectness: false,
+					},
+				},
+			},
+			sessionState: {
+				presenceRosterStatus: 'empty',
+				presenceStartupPolicyStatus:
+					DISTRIBUTED_EDITING_PRESENCE_STARTUP_POLICY_STATUSES.SLOW_AUTOMATIC_HEARTBEAT_ALLOWED,
+				presenceStartupPolicyReason: 'cheap_host_slow_startup_allowed',
+				presenceStartupPolicyMaySendInitialHeartbeatAutomatically: true,
+				presenceStartupPolicySlowAutomaticHeartbeatAllowed: true,
+				presenceStartupPolicyHostProfile: 'cheap_shared_host',
+				presenceStartupPolicyServerContact: 'nominal',
+				presenceStartupPolicySelectedInitialHeartbeatDelaySeconds: 1,
+				presenceStartupPolicyCallsHeartbeatEndpointNow: false,
+				presenceStartupPolicyWritesPresenceNow: false,
+				presenceStartupPolicyStartsPollingNow: false,
+				presenceStartupPolicyStartsTimerNow: false,
+				presenceStartupPolicyCallsSave: false,
+				presenceStartupPolicyChangesPostLock: false,
+				presenceStartupPolicyClaimsAbsence: false,
+				presenceStartupPolicyClaimsSaved: false,
+				presenceStartupPolicyExposesRawContent: false,
+				presenceStartupPolicyRawSessionKeyIncluded: false,
+			},
+		} );
+
+		const { unmount } = render( <DistributedEditingStatusChrome /> );
+
+		try {
+			const presence = screen.getByRole( 'group', {
+				name: 'Distributed editing presence',
+			} );
+
+			await waitFor( () =>
+				expect( presence ).toHaveAttribute(
+					'data-distributed-editing-presence-startup-heartbeat-runtime-status',
+					'degraded_storage_setup_required'
+				)
+			);
+			expect( presence ).toHaveAttribute(
+				'data-distributed-editing-presence-startup-heartbeat-runtime-blocked-by-storage-readiness',
+				'true'
+			);
+			expect( presence ).toHaveAttribute(
+				'data-distributed-editing-presence-startup-heartbeat-runtime-can-retry-after-install',
+				'true'
+			);
+			expect( presence ).toHaveAttribute(
+				'data-distributed-editing-presence-startup-heartbeat-runtime-storage-ready',
+				'false'
+			);
+			expect( presence ).toHaveAttribute(
+				'data-distributed-editing-presence-startup-heartbeat-runtime-timer-active',
+				'false'
+			);
+			expect( presence ).toHaveAttribute(
+				'data-distributed-editing-presence-startup-heartbeat-runtime-calls-heartbeat-endpoint',
+				'false'
+			);
+			expect( presence ).toHaveAttribute(
+				'data-distributed-editing-presence-startup-heartbeat-runtime-writes-presence',
+				'false'
+			);
+			expect( presence ).toHaveAttribute(
+				'data-distributed-editing-presence-freshness-indicator-state',
+				'degraded'
+			);
+			expect(
+				screen.getByText( 'Presence startup delayed' )
+			).toBeVisible();
+			expect(
+				screen.getByText(
+					'Presence storage setup is required before automatic startup presence can begin.'
+				)
+			).toBeVisible();
+
+			await act( async () => {
+				jest.advanceTimersByTime( 1000 );
+				await Promise.resolve();
+			} );
+
+			expect(
+				actions.__experimentalSendDistributedEditingPresenceHeartbeat
+			).not.toHaveBeenCalled();
+			expect(
+				actions.__experimentalRefreshDistributedEditingPresenceSnapshot
+			).not.toHaveBeenCalled();
+			expect(
+				actions.__experimentalSaveDistributedEditingRetryAfterProof
+			).not.toHaveBeenCalled();
+		} finally {
+			unmount();
+			jest.clearAllTimers();
+			jest.useRealTimers();
+		}
+	} );
+
+	it( 'summarizes current and delayed editor counts without stronger claims', () => {
+		const actions = setupDistributedEditingStatusDispatch();
+		setupDistributedEditingStatusSelect( {
+			editorSettings: {
+				distributedEditing: {
+					enabled: true,
+				},
+			},
+			sessionState: {
+				presenceRosterEntries: [
+					{
+						key: 'presence-mira',
+						displayName: 'Mira',
+						freshness: 'current',
+					},
+					{
+						key: 'presence-hidden',
+						identityVisibility: 'anonymous',
+						freshness: 'current',
+						userId: 42,
+						selection: { anchor: 9 },
+					},
+					{
+						key: 'presence-sam',
+						displayName: 'Sam',
+						freshness: 'recent',
+					},
+				],
+				presenceRosterHiddenCount: 1,
+				presenceRosterTotalKnownCount: 4,
+			},
+		} );
+
+		render( <DistributedEditingStatusChrome /> );
+
+		const presence = screen.getByRole( 'group', {
+			name: 'Distributed editing presence',
+		} );
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-summary-current-count',
+			'2'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-summary-delayed-count',
+			'1'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-summary-hidden-count',
+			'1'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-summary-claims-absence',
+			'false'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-summary-correctness-independent',
+			'true'
+		);
+		expect(
+			screen.getByText(
+				'2 editors are active now; 1 editor may be delayed. Some editor activity is hidden by roster limits or privacy settings.'
+			)
+		).toBeVisible();
+		const rowList = screen.getByRole( 'list', {
+			name: 'Visible editors',
+		} );
+		const rows = within( rowList ).getAllByRole( 'listitem' );
+
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-row-treatment',
+			'compact-status-badges'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-row-treatment-accessible',
+			'true'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-row-treatment-calls-save',
+			'false'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-row-treatment-changes-post-lock',
+			'false'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-row-treatment-exposes-private-fields',
+			'false'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-row-visual-treatment',
+			'subtle-status-stripe'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-row-visual-treatment-color-only',
+			'false'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-row-visual-treatment-content-free',
+			'true'
+		);
+		expect( rows ).toHaveLength( 3 );
+		expect( rows[ 0 ] ).toHaveAttribute(
+			'data-distributed-editing-presence-row-current',
+			'true'
+		);
+		expect( rows[ 0 ] ).toHaveClass(
+			'editor-distributed-editing-status__presence-roster-item--current'
+		);
+		expect( rows[ 1 ] ).toHaveAttribute(
+			'data-distributed-editing-presence-row-current',
+			'true'
+		);
+		expect( rows[ 2 ] ).toHaveAttribute(
+			'data-distributed-editing-presence-row-current',
+			'false'
+		);
+		expect( rows[ 2 ] ).toHaveClass(
+			'editor-distributed-editing-status__presence-roster-item--delayed'
+		);
+		expect( rows[ 2 ] ).toHaveAttribute(
+			'data-distributed-editing-presence-row-freshness',
+			'delayed'
+		);
+		expect( rows[ 2 ] ).toHaveAttribute(
+			'data-distributed-editing-presence-row-status-tone',
+			'delayed'
+		);
+		expect( rows[ 2 ] ).toHaveAttribute(
+			'data-distributed-editing-presence-row-status-affordance',
+			'dot-and-label'
+		);
+		expect( rows[ 2 ] ).toHaveAttribute(
+			'data-distributed-editing-presence-row-visual-treatment',
+			'subtle-status-stripe'
+		);
+		expect( rows[ 2 ] ).toHaveAttribute(
+			'data-distributed-editing-presence-row-visual-treatment-color-only',
+			'false'
+		);
+		expect( rows[ 2 ] ).toHaveAttribute(
+			'aria-label',
+			'Sam, Presence may be delayed'
+		);
+		expect(
+			screen.queryByText( /userId|anchor|selection/i )
+		).not.toBeInTheDocument();
+		expect(
+			actions.__experimentalSaveDistributedEditingRetryAfterProof
+		).not.toHaveBeenCalled();
+	} );
+
+	it( 'summarizes mixed local, duplicate-tab, current remote, and delayed remote rows', () => {
+		const actions = setupDistributedEditingStatusDispatch();
+		setupDistributedEditingStatusSelect( {
+			editorSettings: {
+				distributedEditing: {
+					enabled: true,
+				},
+			},
+			sessionState: {
+				presenceRosterEntries: [
+					{
+						key: 'presence-local-heartbeat-current-tab',
+						identityVisibility: 'self',
+						relationship: 'current_user_current_tab',
+						freshness: 'recent',
+					},
+					{
+						key: 'presence-same-user-other-tab',
+						identityVisibility: 'self',
+						relationship: 'same_user_other_tab',
+						freshness: 'current',
+					},
+					{
+						key: 'presence-mira',
+						displayName: 'Mira',
+						identityVisibility: 'named',
+						relationship: 'other_user',
+						freshness: 'current',
+					},
+					{
+						key: 'presence-sam',
+						displayName: 'Sam',
+						identityVisibility: 'named',
+						relationship: 'other_user',
+						freshness: 'recent',
+					},
+				],
+				presenceRosterHiddenCount: 1,
+				presenceRosterTotalKnownCount: 5,
+			},
+		} );
+
+		render( <DistributedEditingStatusChrome /> );
+
+		const presence = screen.getByRole( 'group', {
+			name: 'Distributed editing presence',
+		} );
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-status',
+			'recent'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-visible-count',
+			'4'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-summary-current-count',
+			'2'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-summary-delayed-count',
+			'2'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-summary-local-current-tab-visible',
+			'true'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-summary-same-user-other-tab-visible',
+			'true'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-summary-remote-current-count',
+			'1'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-summary-remote-delayed-count',
+			'1'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-summary-hidden-count',
+			'1'
+		);
+		expect( presence ).toHaveTextContent(
+			'Your presence may be delayed. You have this post open in another tab. Mira is also editing this post. Sam was here recently. Presence may be delayed.'
+		);
+		expect(
+			screen.getByText(
+				'2 editors are active now; 2 editors may be delayed. Some editor activity is hidden by roster limits or privacy settings.'
+			)
+		).toBeVisible();
+
+		const rows = within(
+			screen.getByRole( 'list', { name: 'Visible editors' } )
+		).getAllByRole( 'listitem' );
+
+		expect( rows ).toHaveLength( 4 );
+		expect( rows[ 0 ] ).toHaveAttribute(
+			'data-distributed-editing-presence-row-current',
+			'false'
+		);
+		expect( rows[ 0 ] ).toHaveAttribute(
+			'data-distributed-editing-presence-row-relationship',
+			'current_user_current_tab'
+		);
+		expect( rows[ 0 ] ).toHaveAttribute(
+			'aria-label',
+			'This tab, Presence may be delayed'
+		);
+		expect( rows[ 1 ] ).toHaveAttribute(
+			'data-distributed-editing-presence-row-current',
+			'true'
+		);
+		expect( rows[ 1 ] ).toHaveAttribute(
+			'data-distributed-editing-presence-row-relationship',
+			'same_user_other_tab'
+		);
+		expect( rows[ 1 ] ).toHaveAttribute(
+			'aria-label',
+			'Another tab, Editing now'
+		);
+		expect( rows[ 2 ] ).toHaveAttribute(
+			'data-distributed-editing-presence-row-current',
+			'true'
+		);
+		expect( rows[ 2 ] ).toHaveAttribute(
+			'data-distributed-editing-presence-row-relationship',
+			'other_user'
+		);
+		expect( rows[ 2 ] ).toHaveAttribute(
+			'aria-label',
+			'Mira, Editing now'
+		);
+		expect( rows[ 3 ] ).toHaveAttribute(
+			'data-distributed-editing-presence-row-current',
+			'false'
+		);
+		expect( rows[ 3 ] ).toHaveAttribute(
+			'data-distributed-editing-presence-row-relationship',
+			'other_user'
+		);
+		expect( rows[ 3 ] ).toHaveAttribute(
+			'aria-label',
+			'Sam, Presence may be delayed'
+		);
+		expect(
+			screen.queryByText(
+				/session_key|rawSessionKey|userId|cursor|selection/i
+			)
+		).not.toBeInTheDocument();
+		expect(
+			actions.__experimentalRefreshDistributedEditingPresenceSnapshot
+		).not.toHaveBeenCalled();
+		expect(
+			actions.__experimentalSaveDistributedEditingRetryAfterProof
+		).not.toHaveBeenCalled();
+	} );
+
+	it( 'renders sustained remote freshness and anonymous labels without exposing hidden names', () => {
+		const actions = setupDistributedEditingStatusDispatch();
+		setupDistributedEditingStatusSelect( {
+			editorSettings: {
+				distributedEditing: {
+					enabled: true,
+				},
+			},
+			sessionState: {
+				presenceRosterEntries: [
+					{
+						key: 'presence-local-heartbeat-current-tab',
+						identityVisibility: 'self',
+						relationship: 'current_user_current_tab',
+						freshness: 'current',
+					},
+					{
+						key: 'presence-same-user-other-tab',
+						identityVisibility: 'self',
+						relationship: 'same_user_other_tab',
+						freshness: 'current',
+					},
+					{
+						key: 'presence-mira',
+						displayName: 'Mira',
+						identityVisibility: 'named',
+						relationship: 'other_user',
+						freshness: 'current',
+					},
+					{
+						key: 'presence-anonymous-current',
+						displayName: 'Hidden Current Name',
+						identityVisibility: 'anonymous',
+						relationship: 'other_user',
+						freshness: 'current',
+					},
+					{
+						key: 'presence-sam',
+						displayName: 'Sam',
+						identityVisibility: 'named',
+						relationship: 'other_user',
+						freshness: 'recent',
+					},
+					{
+						key: 'presence-anonymous-delayed',
+						displayName: 'Hidden Delayed Name',
+						identityVisibility: 'anonymous',
+						relationship: 'other_user',
+						freshness: 'recent',
+					},
+				],
+				presenceRosterExpiredCount: 2,
+				presenceRosterTotalKnownCount: 8,
+			},
+		} );
+
+		render( <DistributedEditingStatusChrome /> );
+
+		const presence = screen.getByRole( 'group', {
+			name: 'Distributed editing presence',
+		} );
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-status',
+			'recent'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-visible-count',
+			'6'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-summary-current-count',
+			'4'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-summary-delayed-count',
+			'2'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-summary-remote-current-count',
+			'2'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-summary-remote-delayed-count',
+			'2'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-summary-expired-count',
+			'2'
+		);
+		expect( presence ).toHaveTextContent(
+			'You are visible in this editing session. You have this post open in another tab. Mira and Another editor are also editing this post. Sam and Another editor were here recently. Presence may be delayed.'
+		);
+		expect(
+			screen.getByText(
+				'4 editors are active now; 2 editors may be delayed. Some editor activity expired before this refresh.'
+			)
+		).toBeVisible();
+
+		const rows = within(
+			screen.getByRole( 'list', { name: 'Visible editors' } )
+		).getAllByRole( 'listitem' );
+
+		expect( rows ).toHaveLength( 6 );
+		expect( rows[ 0 ] ).toHaveAttribute(
+			'aria-label',
+			'This tab, Editing now'
+		);
+		expect( rows[ 0 ] ).toHaveAttribute(
+			'data-distributed-editing-presence-row-relationship',
+			'current_user_current_tab'
+		);
+		expect( rows[ 1 ] ).toHaveAttribute(
+			'aria-label',
+			'Another tab, Editing now'
+		);
+		expect( rows[ 1 ] ).toHaveAttribute(
+			'data-distributed-editing-presence-row-relationship',
+			'same_user_other_tab'
+		);
+		expect( rows[ 2 ] ).toHaveAttribute(
+			'aria-label',
+			'Mira, Editing now'
+		);
+		expect( rows[ 3 ] ).toHaveAttribute(
+			'aria-label',
+			'Another editor, Editing now'
+		);
+		expect( rows[ 4 ] ).toHaveAttribute(
+			'aria-label',
+			'Sam, Presence may be delayed'
+		);
+		expect( rows[ 5 ] ).toHaveAttribute(
+			'aria-label',
+			'Another editor, Presence may be delayed'
+		);
+		expect( screen.getAllByText( 'Another editor' ) ).toHaveLength( 2 );
+		expect(
+			screen.queryByText(
+				/Hidden Current Name|Hidden Delayed Name|session_key|rawSessionKey|userId|cursor|selection/i
+			)
+		).not.toBeInTheDocument();
+		expect(
+			actions.__experimentalRefreshDistributedEditingPresenceSnapshot
+		).not.toHaveBeenCalled();
+		expect(
+			actions.__experimentalSaveDistributedEditingRetryAfterProof
+		).not.toHaveBeenCalled();
+	} );
+
+	it( 'renders high-count roster summaries with hidden aggregate activity', () => {
+		const actions = setupDistributedEditingStatusDispatch();
+		setupDistributedEditingStatusSelect( {
+			editorSettings: {
+				distributedEditing: {
+					enabled: true,
+				},
+			},
+			sessionState: {
+				presenceRosterEntries: [
+					{
+						key: 'presence-local-heartbeat-current-tab',
+						identityVisibility: 'self',
+						relationship: 'current_user_current_tab',
+						freshness: 'current',
+					},
+					{
+						key: 'presence-same-user-other-tab',
+						identityVisibility: 'self',
+						relationship: 'same_user_other_tab',
+						freshness: 'current',
+					},
+					{
+						key: 'presence-mira',
+						displayName: 'Mira',
+						identityVisibility: 'named',
+						relationship: 'other_user',
+						freshness: 'current',
+					},
+					{
+						key: 'presence-quinn',
+						displayName: 'Quinn',
+						identityVisibility: 'named',
+						relationship: 'other_user',
+						freshness: 'current',
+					},
+					{
+						key: 'presence-anonymous-current',
+						displayName: 'Hidden High Count Current',
+						identityVisibility: 'anonymous',
+						relationship: 'other_user',
+						freshness: 'current',
+					},
+					{
+						key: 'presence-theo',
+						displayName: 'Theo',
+						identityVisibility: 'named',
+						relationship: 'other_user',
+						freshness: 'current',
+					},
+					{
+						key: 'presence-sam',
+						displayName: 'Sam',
+						identityVisibility: 'named',
+						relationship: 'other_user',
+						freshness: 'recent',
+					},
+					{
+						key: 'presence-priya',
+						displayName: 'Priya',
+						identityVisibility: 'named',
+						relationship: 'other_user',
+						freshness: 'recent',
+					},
+					{
+						key: 'presence-anonymous-delayed',
+						displayName: 'Hidden High Count Delayed',
+						identityVisibility: 'anonymous',
+						relationship: 'other_user',
+						freshness: 'recent',
+					},
+				],
+				presenceRosterHiddenCount: 4,
+				presenceRosterExpiredCount: 2,
+				presenceRosterTotalKnownCount: 15,
+			},
+		} );
+
+		render( <DistributedEditingStatusChrome /> );
+
+		const presence = screen.getByRole( 'group', {
+			name: 'Distributed editing presence',
+		} );
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-visible-count',
+			'9'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-summary-current-count',
+			'6'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-summary-delayed-count',
+			'3'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-summary-remote-current-count',
+			'4'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-summary-remote-delayed-count',
+			'3'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-summary-hidden-count',
+			'4'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-summary-expired-count',
+			'2'
+		);
+		expect( presence ).toHaveTextContent(
+			'You are visible in this editing session. You have this post open in another tab. Mira, Quinn, and 2 others are also editing this post. Sam, Priya, and 1 other were here recently. Presence may be delayed.'
+		);
+		expect(
+			screen.getByText(
+				'6 editors are active now; 3 editors may be delayed. Some editor activity is hidden by roster limits or privacy settings. Some editor activity expired before this refresh.'
+			)
+		).toBeVisible();
+
+		const rows = within(
+			screen.getByRole( 'list', { name: 'Visible editors' } )
+		).getAllByRole( 'listitem' );
+
+		expect( rows ).toHaveLength( 9 );
+		expect( rows[ 4 ] ).toHaveAttribute(
+			'aria-label',
+			'Another editor, Editing now'
+		);
+		expect( rows[ 8 ] ).toHaveAttribute(
+			'aria-label',
+			'Another editor, Presence may be delayed'
+		);
+		expect(
+			screen.queryByText(
+				/Hidden High Count|session_key|rawSessionKey|userId|cursor|selection/i
+			)
+		).not.toBeInTheDocument();
+		expect(
+			actions.__experimentalRefreshDistributedEditingPresenceSnapshot
+		).not.toHaveBeenCalled();
+		expect(
+			actions.__experimentalSaveDistributedEditingRetryAfterProof
+		).not.toHaveBeenCalled();
+	} );
+
+	it( 'hydrates the enabled editor shell from initial WordPress presence settings', () => {
+		const actions = setupDistributedEditingStatusDispatch();
+		setupDistributedEditingStatusSelect( {
+			editorSettings: {
+				distributedEditing: {
+					enabled: true,
+					initialPresenceRoster: {
+						status: 'recent',
+						freshness: 'recent',
+						serverContact: 'nominal',
+						visibleCount: 1,
+						totalKnownCount: 1,
+						hiddenCount: 0,
+						claimsAbsence: false,
+						entries: [
+							{
+								key: 'presence-wp-lock-mira',
+								displayName: 'Mira',
+								identityVisibility: 'named',
+								relationship: 'other_user',
+								freshness: 'recent',
+								source: 'wordpress_post_lock_snapshot',
+								userId: 42,
+								selection: { anchor: 9 },
+							},
+						],
+					},
+				},
+			},
+		} );
+
+		render( <DistributedEditingStatusChrome /> );
+
+		const presence = screen.getByRole( 'group', {
+			name: 'Distributed editing presence',
+		} );
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-status',
+			'recent'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-visible-count',
+			'1'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-summary-current-count',
+			'0'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-summary-delayed-count',
+			'1'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-claims-absence',
+			'false'
+		);
+		expect(
+			screen.getByText(
+				'Mira was here recently. Presence may be delayed.'
+			)
+		).toBeVisible();
+		expect( screen.getByText( '1 editor may be delayed.' ) ).toBeVisible();
+		const rows = within(
+			screen.getByRole( 'list', { name: 'Visible editors' } )
+		).getAllByRole( 'listitem' );
+
+		expect( rows ).toHaveLength( 1 );
+		expect( rows[ 0 ] ).toHaveAttribute(
+			'data-distributed-editing-presence-row-current',
+			'false'
+		);
+		expect( rows[ 0 ] ).toHaveAttribute(
+			'data-distributed-editing-presence-row-freshness',
+			'delayed'
+		);
+		expect( screen.getByText( 'Mira' ) ).toBeVisible();
+		expect(
+			screen.queryByText( /userId|anchor|selection/i )
+		).not.toBeInTheDocument();
+		expect(
+			actions.__experimentalSaveDistributedEditingRetryAfterProof
+		).not.toHaveBeenCalled();
+	} );
+
+	it( 'refreshes the presence roster on explicit user command with local feedback', async () => {
+		const user = userEvent.setup();
+		const actions = setupDistributedEditingStatusDispatch();
+		setupDistributedEditingStatusSelect( {
+			editorSettings: {
+				distributedEditing: {
+					enabled: true,
+					presenceStorageReadiness: {
+						status: 'ready',
+						tableExists: true,
+						schemaCurrent: true,
+						expectedStartupHeartbeatStatus: 'sent',
+						setupRequired: false,
+						diagnosticOnly: true,
+						contentFree: true,
+						callsSave: false,
+						changesPostLock: false,
+						claimsAbsence: false,
+						claimsSaved: false,
+						correctnessIndependentOfTransport: true,
+						transportRequiredForCorrectness: false,
+					},
+				},
+			},
+			sessionState: {
+				presenceRosterStatus: 'empty',
+			},
+		} );
+
+		render( <DistributedEditingStatusChrome /> );
+
+		const presence = screen.getByRole( 'group', {
+			name: 'Distributed editing presence',
+		} );
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-refresh-command-status',
+			'idle'
+		);
+
+		await user.click(
+			screen.getByRole( 'button', {
+				name: 'Refresh editing list',
+			} )
+		);
+
+		expect(
+			actions.__experimentalRefreshDistributedEditingPresenceSnapshot
+		).toHaveBeenCalledTimes( 1 );
+		expect( await screen.findByRole( 'status' ) ).toHaveTextContent(
+			'Editing list refreshed.'
+		);
+		expect(
+			actions.__experimentalSaveDistributedEditingRetryAfterProof
+		).not.toHaveBeenCalled();
+		expect(
+			screen.queryByText( /userId|anchor|selection/i )
+		).not.toBeInTheDocument();
+	} );
+
+	it( 'sends a one-shot presence heartbeat from production chrome with local feedback', async () => {
+		const user = userEvent.setup();
+		const actions = setupDistributedEditingStatusDispatch();
+		setupDistributedEditingStatusSelect( {
+			editorSettings: {
+				distributedEditing: {
+					enabled: true,
+				},
+			},
+			sessionState: {
+				presenceRosterEntries: [
+					{
+						key: 'presence-local-heartbeat-current-tab',
+						identityVisibility: 'self',
+						relationship: 'current_user_current_tab',
+						freshness: 'current',
+					},
+				],
+				presenceHeartbeatStatus: 'sent',
+				presenceHeartbeatCallsRestEndpoint: true,
+				presenceHeartbeatRecordsPresenceHeartbeat: true,
+				presenceHeartbeatWritesPresence: true,
+				presenceHeartbeatCallsSave: false,
+				presenceHeartbeatMutatesEditorContent: false,
+				presenceHeartbeatChangesPostLock: false,
+				presenceHeartbeatClaimsSaved: false,
+				presenceHeartbeatRawSessionKeyIncluded: false,
+				presenceHeartbeatMarksLocalEditorCurrent: true,
+				presenceHeartbeatMarksLocalEditorDelayed: false,
+				presenceHeartbeatLocalRosterEntryVisible: true,
+				presenceHeartbeatLocalRosterEntryFreshness: 'current',
+			},
+		} );
+
+		render( <DistributedEditingStatusChrome /> );
+
+		const presence = screen.getByRole( 'group', {
+			name: 'Distributed editing presence',
+		} );
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-heartbeat-status',
+			'sent'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-heartbeat-command-status',
+			'idle'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-heartbeat-calls-rest',
+			'true'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-heartbeat-records-heartbeat',
+			'true'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-heartbeat-calls-save',
+			'false'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-heartbeat-changes-post-lock',
+			'false'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-heartbeat-claims-saved',
+			'false'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-heartbeat-raw-session-key',
+			'false'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-heartbeat-marks-local-editor-current',
+			'true'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-heartbeat-local-roster-entry-visible',
+			'true'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-heartbeat-local-roster-entry-freshness',
+			'current'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-visible-count',
+			'1'
+		);
+		expect( presence ).toHaveTextContent(
+			'You are visible in this editing session.'
+		);
+		expect(
+			screen.getByRole( 'listitem', {
+				name: 'This tab, Editing now',
+			} )
+		).toBeVisible();
+
+		await user.click(
+			screen.getByRole( 'button', {
+				name: 'Update my presence',
+			} )
+		);
+
+		expect(
+			actions.__experimentalSendDistributedEditingPresenceHeartbeat
+		).toHaveBeenCalledTimes( 1 );
+		expect( await screen.findByText( 'Presence updated.' ) ).toBeVisible();
+		expect(
+			actions.__experimentalRefreshDistributedEditingPresenceSnapshot
+		).not.toHaveBeenCalled();
+		expect(
+			actions.__experimentalSaveDistributedEditingRetryAfterProof
+		).not.toHaveBeenCalled();
+		expect(
+			screen.queryByText( /session_key|rawSessionKey|userId|anchor/i )
+		).not.toBeInTheDocument();
+	} );
+
+	it( 'downgrades the local heartbeat row when presence updates are delayed', () => {
+		const actions = setupDistributedEditingStatusDispatch();
+		setupDistributedEditingStatusSelect( {
+			editorSettings: {
+				distributedEditing: {
+					enabled: true,
+				},
+			},
+			sessionState: {
+				presenceRosterEntries: [
+					{
+						key: 'presence-local-heartbeat-current-tab',
+						identityVisibility: 'self',
+						relationship: 'current_user_current_tab',
+						freshness: 'recent',
+					},
+				],
+				presenceHeartbeatStatus: 'storage_unavailable',
+				presenceHeartbeatCallsRestEndpoint: true,
+				presenceHeartbeatRecordsPresenceHeartbeat: false,
+				presenceHeartbeatWritesPresence: false,
+				presenceHeartbeatCallsSave: false,
+				presenceHeartbeatMutatesEditorContent: false,
+				presenceHeartbeatChangesPostLock: false,
+				presenceHeartbeatClaimsSaved: false,
+				presenceHeartbeatRawSessionKeyIncluded: false,
+				presenceHeartbeatMarksLocalEditorCurrent: false,
+				presenceHeartbeatMarksLocalEditorDelayed: true,
+				presenceHeartbeatLocalRosterEntryVisible: true,
+				presenceHeartbeatLocalRosterEntryFreshness: 'recent',
+			},
+		} );
+
+		render( <DistributedEditingStatusChrome /> );
+
+		const presence = screen.getByRole( 'group', {
+			name: 'Distributed editing presence',
+		} );
+
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-status',
+			'recent'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-summary-current-count',
+			'0'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-summary-delayed-count',
+			'1'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-heartbeat-marks-local-editor-current',
+			'false'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-heartbeat-marks-local-editor-delayed',
+			'true'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-heartbeat-local-roster-entry-freshness',
+			'recent'
+		);
+		expect( presence ).toHaveTextContent( 'Your presence may be delayed.' );
+		expect(
+			screen.getByRole( 'listitem', {
+				name: 'This tab, Presence may be delayed',
+			} )
+		).toBeVisible();
+		expect(
+			actions.__experimentalRefreshDistributedEditingPresenceSnapshot
+		).not.toHaveBeenCalled();
+		expect(
+			actions.__experimentalSaveDistributedEditingRetryAfterProof
+		).not.toHaveBeenCalled();
+		expect(
+			screen.queryByText(
+				/session_key|rawSessionKey|userId|cursor|selection/i
+			)
+		).not.toBeInTheDocument();
+	} );
+
+	it( 'exposes repeated presence cadence runtime status without starting commands', () => {
+		const actions = setupDistributedEditingStatusDispatch();
+		setupDistributedEditingStatusSelect( {
+			editorSettings: {
+				distributedEditing: {
+					enabled: true,
+				},
+			},
+			sessionState: {
+				presenceRosterStatus: 'empty',
+				presenceRepeatedRefreshRuntimeStatus:
+					DISTRIBUTED_EDITING_PRESENCE_REPEATED_REFRESH_RUNTIME_STATUSES.PAUSED_DEGRADED_TRANSPORT,
+				presenceRepeatedRefreshLocalConnectionState:
+					DISTRIBUTED_EDITING_PRESENCE_REPEATED_REFRESH_CONNECTION_STATES.DEGRADED,
+				presenceRepeatedRefreshExplicitOptIn: true,
+				presenceRepeatedRefreshRuntimeEnabledByDefault: false,
+				presenceRepeatedRefreshSelectedIntervalSeconds: 120,
+				presenceRepeatedRefreshSelectedHeartbeatIntervalSeconds: 120,
+				presenceRepeatedRefreshServerContact: 'degraded',
+				presenceRepeatedRefreshSchedulesNextRefresh: false,
+				presenceRepeatedRefreshSchedulesNextHeartbeat: false,
+				presenceRepeatedRefreshCallsPresenceReadEndpointNow: false,
+				presenceRepeatedRefreshCallsHeartbeatEndpointNow: false,
+				presenceRepeatedRefreshStartsPollingImmediately: false,
+				presenceRepeatedRefreshCallsSave: false,
+				presenceRepeatedRefreshChangesPostLock: false,
+				presenceRepeatedRefreshClaimsSaved: false,
+				presenceRepeatedRefreshExposesRawContent: false,
+				presenceRepeatedRefreshRawSessionKeyIncluded: false,
+			},
+		} );
+
+		render( <DistributedEditingStatusChrome /> );
+
+		const presence = screen.getByRole( 'group', {
+			name: 'Distributed editing presence',
+		} );
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-repeated-refresh-status',
+			DISTRIBUTED_EDITING_PRESENCE_REPEATED_REFRESH_RUNTIME_STATUSES.PAUSED_DEGRADED_TRANSPORT
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-repeated-refresh-local-connection-state',
+			DISTRIBUTED_EDITING_PRESENCE_REPEATED_REFRESH_CONNECTION_STATES.DEGRADED
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-repeated-refresh-explicit-opt-in',
+			'true'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-repeated-refresh-runtime-enabled-by-default',
+			'false'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-repeated-refresh-selected-interval',
+			'120'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-repeated-refresh-selected-heartbeat-interval',
+			'120'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-repeated-refresh-schedules-next-refresh',
+			'false'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-repeated-refresh-schedules-next-heartbeat',
+			'false'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-repeated-refresh-calls-rest-now',
+			'false'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-repeated-refresh-calls-heartbeat-now',
+			'false'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-repeated-refresh-starts-polling',
+			'false'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-repeated-refresh-calls-save',
+			'false'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-repeated-refresh-changes-post-lock',
+			'false'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-repeated-refresh-claims-saved',
+			'false'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-repeated-refresh-exposes-raw-content',
+			'false'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-repeated-refresh-raw-session-key',
+			'false'
+		);
+		expect(
+			actions.__experimentalRefreshDistributedEditingPresenceSnapshot
+		).not.toHaveBeenCalled();
+		expect(
+			actions.__experimentalSendDistributedEditingPresenceHeartbeat
+		).not.toHaveBeenCalled();
+		expect(
+			actions.__experimentalSaveDistributedEditingRetryAfterProof
+		).not.toHaveBeenCalled();
+		expect(
+			screen.queryByText(
+				/session_key|rawSessionKey|userId|cursor|selection/i
+			)
+		).not.toBeInTheDocument();
+	} );
+
+	it( 'exposes initial presence startup policy and schedules the bounded startup heartbeat runtime', async () => {
+		const actions = setupDistributedEditingStatusDispatch();
+		setupDistributedEditingStatusSelect( {
+			editorSettings: {
+				distributedEditing: {
+					enabled: true,
+					presenceStorageReadiness: {
+						status: 'ready',
+						tableExists: true,
+						schemaCurrent: true,
+						expectedStartupHeartbeatStatus: 'sent',
+						setupRequired: false,
+						diagnosticOnly: true,
+						contentFree: true,
+						callsSave: false,
+						changesPostLock: false,
+						claimsAbsence: false,
+						claimsSaved: false,
+						correctnessIndependentOfTransport: true,
+						transportRequiredForCorrectness: false,
+					},
+				},
+			},
+			sessionState: {
+				presenceRosterStatus: 'empty',
+				presenceStartupPolicyStatus:
+					DISTRIBUTED_EDITING_PRESENCE_STARTUP_POLICY_STATUSES.SLOW_AUTOMATIC_HEARTBEAT_ALLOWED,
+				presenceStartupPolicyReason: 'cheap_host_slow_startup_allowed',
+				presenceStartupPolicyRequiresExplicitEnablement: true,
+				presenceStartupPolicyMaySendInitialHeartbeatAutomatically: true,
+				presenceStartupPolicySlowAutomaticHeartbeatAllowed: true,
+				presenceStartupPolicyHostProfile: 'cheap_shared_host',
+				presenceStartupPolicyServerContact: 'nominal',
+				presenceStartupPolicySelectedInitialHeartbeatDelaySeconds: 120,
+				presenceStartupPolicyCallsHeartbeatEndpointNow: false,
+				presenceStartupPolicyWritesPresenceNow: false,
+				presenceStartupPolicyStartsPollingNow: false,
+				presenceStartupPolicyStartsTimerNow: false,
+				presenceStartupPolicyCallsSave: false,
+				presenceStartupPolicyChangesPostLock: false,
+				presenceStartupPolicyClaimsAbsence: false,
+				presenceStartupPolicyClaimsSaved: false,
+				presenceStartupPolicyExposesRawContent: false,
+				presenceStartupPolicyRawSessionKeyIncluded: false,
+			},
+		} );
+
+		render( <DistributedEditingStatusChrome /> );
+
+		const presence = screen.getByRole( 'group', {
+			name: 'Distributed editing presence',
+		} );
+
+		await waitFor( () =>
+			expect( presence ).toHaveAttribute(
+				'data-distributed-editing-presence-startup-heartbeat-runtime-status',
+				'scheduled'
+			)
+		);
+
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-startup-policy-status',
+			DISTRIBUTED_EDITING_PRESENCE_STARTUP_POLICY_STATUSES.SLOW_AUTOMATIC_HEARTBEAT_ALLOWED
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-startup-policy-reason',
+			'cheap_host_slow_startup_allowed'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-startup-policy-host-profile',
+			'cheap_shared_host'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-startup-policy-selected-delay',
+			'120'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-startup-policy-may-auto-heartbeat',
+			'true'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-startup-policy-slow-auto-heartbeat',
+			'true'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-startup-policy-calls-heartbeat-now',
+			'false'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-startup-policy-writes-presence-now',
+			'false'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-startup-policy-starts-polling-now',
+			'false'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-startup-policy-starts-timer-now',
+			'false'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-startup-heartbeat-runtime-delay-ms',
+			'120000'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-startup-heartbeat-runtime-timer-active',
+			'true'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-startup-heartbeat-runtime-storage-ready',
+			'true'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-startup-heartbeat-runtime-blocked-by-storage-readiness',
+			'false'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-startup-heartbeat-runtime-calls-heartbeat-endpoint',
+			'true'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-startup-heartbeat-runtime-calls-presence-read-endpoint',
+			'false'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-startup-heartbeat-runtime-starts-polling',
+			'false'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-startup-heartbeat-runtime-calls-save',
+			'false'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-startup-heartbeat-runtime-changes-post-lock',
+			'false'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-startup-heartbeat-runtime-mutates-editor-content',
+			'false'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-startup-heartbeat-runtime-claims-saved',
+			'false'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-startup-heartbeat-runtime-exposes-raw-content',
+			'false'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-startup-heartbeat-runtime-raw-session-key',
+			'false'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-startup-heartbeat-runtime-correctness-independent',
+			'true'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-startup-policy-calls-save',
+			'false'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-startup-policy-changes-post-lock',
+			'false'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-startup-policy-claims-saved',
+			'false'
+		);
+		expect(
+			screen.getByText(
+				'Initial presence may start automatically after about 120 seconds on cheap hosts.'
+			)
+		).toBeVisible();
+		expect(
+			screen.getByText(
+				'Initial presence will update after about 120 seconds.'
+			)
+		).toBeVisible();
+		expect(
+			actions.__experimentalSendDistributedEditingPresenceHeartbeat
+		).not.toHaveBeenCalled();
+		expect(
+			actions.__experimentalRefreshDistributedEditingPresenceSnapshot
+		).not.toHaveBeenCalled();
+		expect(
+			actions.__experimentalSaveDistributedEditingRetryAfterProof
+		).not.toHaveBeenCalled();
+	} );
+
+	it( 'runs the startup heartbeat once after the selected delay without polling or saving', async () => {
+		jest.useFakeTimers();
+
+		const actions = setupDistributedEditingStatusDispatch();
+		setupDistributedEditingStatusSelect( {
+			editorSettings: {
+				distributedEditing: {
+					enabled: true,
+					presenceStorageReadiness: {
+						status: 'ready',
+						tableExists: true,
+						schemaCurrent: true,
+						expectedStartupHeartbeatStatus: 'sent',
+						setupRequired: false,
+						diagnosticOnly: true,
+						contentFree: true,
+						callsSave: false,
+						changesPostLock: false,
+						claimsAbsence: false,
+						claimsSaved: false,
+						correctnessIndependentOfTransport: true,
+						transportRequiredForCorrectness: false,
+					},
+				},
+			},
+			sessionState: {
+				presenceRosterStatus: 'empty',
+				presenceStartupPolicyStatus:
+					DISTRIBUTED_EDITING_PRESENCE_STARTUP_POLICY_STATUSES.SLOW_AUTOMATIC_HEARTBEAT_ALLOWED,
+				presenceStartupPolicyReason: 'cheap_host_slow_startup_allowed',
+				presenceStartupPolicyRequiresExplicitEnablement: true,
+				presenceStartupPolicyMaySendInitialHeartbeatAutomatically: true,
+				presenceStartupPolicySlowAutomaticHeartbeatAllowed: true,
+				presenceStartupPolicyHostProfile: 'cheap_shared_host',
+				presenceStartupPolicyServerContact: 'nominal',
+				presenceStartupPolicySelectedInitialHeartbeatDelaySeconds: 1,
+				presenceStartupPolicyCallsHeartbeatEndpointNow: false,
+				presenceStartupPolicyWritesPresenceNow: false,
+				presenceStartupPolicyStartsPollingNow: false,
+				presenceStartupPolicyStartsTimerNow: false,
+				presenceStartupPolicyCallsSave: false,
+				presenceStartupPolicyChangesPostLock: false,
+				presenceStartupPolicyClaimsAbsence: false,
+				presenceStartupPolicyClaimsSaved: false,
+				presenceStartupPolicyExposesRawContent: false,
+				presenceStartupPolicyRawSessionKeyIncluded: false,
+			},
+		} );
+
+		const { unmount } = render( <DistributedEditingStatusChrome /> );
+
+		try {
+			const presence = screen.getByRole( 'group', {
+				name: 'Distributed editing presence',
+			} );
+
+			await act( async () => {
+				await Promise.resolve();
+			} );
+
+			expect( presence ).toHaveAttribute(
+				'data-distributed-editing-presence-startup-heartbeat-runtime-status',
+				'scheduled'
+			);
+			expect( presence ).toHaveAttribute(
+				'data-distributed-editing-presence-startup-heartbeat-runtime-delay-ms',
+				'1000'
+			);
+			expect( presence ).toHaveAttribute(
+				'data-distributed-editing-presence-startup-heartbeat-runtime-timer-active',
+				'true'
+			);
+			expect( presence ).toHaveAttribute(
+				'data-distributed-editing-presence-startup-heartbeat-runtime-storage-ready',
+				'true'
+			);
+			expect( presence ).toHaveAttribute(
+				'data-distributed-editing-presence-startup-heartbeat-runtime-blocked-by-storage-readiness',
+				'false'
+			);
+			expect( presence ).toHaveAttribute(
+				'data-distributed-editing-presence-startup-heartbeat-runtime-calls-presence-read-endpoint',
+				'false'
+			);
+			expect( presence ).toHaveAttribute(
+				'data-distributed-editing-presence-startup-heartbeat-runtime-starts-polling',
+				'false'
+			);
+			expect( presence ).toHaveAttribute(
+				'data-distributed-editing-presence-startup-heartbeat-runtime-calls-save',
+				'false'
+			);
+			expect( presence ).toHaveAttribute(
+				'data-distributed-editing-presence-startup-heartbeat-runtime-changes-post-lock',
+				'false'
+			);
+			expect( presence ).toHaveAttribute(
+				'data-distributed-editing-presence-startup-heartbeat-runtime-mutates-editor-content',
+				'false'
+			);
+			expect(
+				actions.__experimentalSendDistributedEditingPresenceHeartbeat
+			).not.toHaveBeenCalled();
+			expect(
+				actions.__experimentalRefreshDistributedEditingPresenceSnapshot
+			).not.toHaveBeenCalled();
+
+			await act( async () => {
+				jest.advanceTimersByTime( 1000 );
+				await Promise.resolve();
+				await Promise.resolve();
+			} );
+
+			expect(
+				actions.__experimentalSendDistributedEditingPresenceHeartbeat
+			).toHaveBeenCalledTimes( 1 );
+			expect(
+				actions.__experimentalRefreshDistributedEditingPresenceSnapshot
+			).not.toHaveBeenCalled();
+			expect( presence ).toHaveAttribute(
+				'data-distributed-editing-presence-startup-heartbeat-runtime-status',
+				'sent'
+			);
+			expect( presence ).toHaveAttribute(
+				'data-distributed-editing-presence-startup-heartbeat-runtime-timer-active',
+				'false'
+			);
+			expect( presence ).toHaveAttribute(
+				'data-distributed-editing-presence-heartbeat-command-status',
+				'sent'
+			);
+			expect(
+				actions.__experimentalSaveDistributedEditingRetryAfterProof
+			).not.toHaveBeenCalled();
+			expect(
+				screen.queryByText(
+					/session_key|rawSessionKey|userId|cursor|selection/i
+				)
+			).not.toBeInTheDocument();
+		} finally {
+			unmount();
+			jest.clearAllTimers();
+			jest.useRealTimers();
+		}
+	} );
+
+	it( 'runs an explicitly opted-in repeated presence cadence with fake timers', async () => {
+		jest.useFakeTimers();
+
+		const actions = setupDistributedEditingStatusDispatch();
+		setupDistributedEditingStatusSelect( {
+			editorSettings: {
+				distributedEditing: {
+					enabled: true,
+				},
+			},
+			sessionState: {
+				presenceRosterStatus: 'empty',
+				presenceRepeatedRefreshRuntimeStatus:
+					DISTRIBUTED_EDITING_PRESENCE_REPEATED_REFRESH_RUNTIME_STATUSES.SCHEDULED,
+				presenceRepeatedRefreshLocalConnectionState:
+					DISTRIBUTED_EDITING_PRESENCE_REPEATED_REFRESH_CONNECTION_STATES.CONNECTED,
+				presenceRepeatedRefreshExplicitOptIn: true,
+				presenceRepeatedRefreshRuntimeEnabledByDefault: false,
+				presenceRepeatedRefreshSelectedIntervalSeconds: 1,
+				presenceRepeatedRefreshSelectedHeartbeatIntervalSeconds: 1,
+				presenceRepeatedRefreshSchedulesNextRefresh: true,
+				presenceRepeatedRefreshSchedulesNextHeartbeat: true,
+				presenceRepeatedRefreshCallsPresenceReadEndpointNow: false,
+				presenceRepeatedRefreshCallsHeartbeatEndpointNow: false,
+				presenceRepeatedRefreshStartsPollingImmediately: false,
+				presenceRepeatedRefreshCallsSave: false,
+				presenceRepeatedRefreshChangesPostLock: false,
+				presenceRepeatedRefreshClaimsSaved: false,
+				presenceRepeatedRefreshExposesRawContent: false,
+				presenceRepeatedRefreshRawSessionKeyIncluded: false,
+			},
+		} );
+
+		const { unmount } = render( <DistributedEditingStatusChrome /> );
+
+		try {
+			const presence = screen.getByRole( 'group', {
+				name: 'Distributed editing presence',
+			} );
+
+			await act( async () => {
+				await Promise.resolve();
+			} );
+
+			expect( presence ).toHaveAttribute(
+				'data-distributed-editing-presence-repeated-refresh-scheduler-status',
+				'scheduled'
+			);
+			expect( presence ).toHaveAttribute(
+				'data-distributed-editing-presence-repeated-refresh-scheduler-delay-ms',
+				'1000'
+			);
+			expect( presence ).toHaveAttribute(
+				'data-distributed-editing-presence-repeated-refresh-scheduler-timer-active',
+				'true'
+			);
+			expect( presence ).toHaveAttribute(
+				'data-distributed-editing-presence-freshness-indicator-state',
+				'connected'
+			);
+			expect( presence ).toHaveAttribute(
+				'data-distributed-editing-presence-freshness-indicator-correctness-independent',
+				'true'
+			);
+			expect( presence ).toHaveAttribute(
+				'data-distributed-editing-presence-freshness-indicator-claims-absence',
+				'false'
+			);
+			expect( screen.getByText( 'Presence connected' ) ).toBeVisible();
+			expect(
+				screen.getByText( 'Editing list updates about every second.' )
+			).toBeVisible();
+			expect( presence ).toHaveAttribute(
+				'data-distributed-editing-presence-repeated-refresh-scheduler-calls-save',
+				'false'
+			);
+			expect( presence ).toHaveAttribute(
+				'data-distributed-editing-presence-repeated-refresh-scheduler-changes-post-lock',
+				'false'
+			);
+			expect( presence ).toHaveAttribute(
+				'data-distributed-editing-presence-repeated-refresh-scheduler-mutates-editor-content',
+				'false'
+			);
+			expect(
+				actions.__experimentalRefreshDistributedEditingPresenceSnapshot
+			).not.toHaveBeenCalled();
+			expect(
+				actions.__experimentalSendDistributedEditingPresenceHeartbeat
+			).not.toHaveBeenCalled();
+
+			await act( async () => {
+				jest.advanceTimersByTime( 1000 );
+				await Promise.resolve();
+				await Promise.resolve();
+			} );
+
+			expect(
+				actions.__experimentalRefreshDistributedEditingPresenceSnapshot
+			).toHaveBeenCalled();
+			expect(
+				actions.__experimentalSendDistributedEditingPresenceHeartbeat
+			).toHaveBeenCalled();
+			expect( presence ).toHaveAttribute(
+				'data-distributed-editing-presence-repeated-refresh-scheduler-tick-count',
+				'1'
+			);
+			expect( presence ).toHaveAttribute(
+				'data-distributed-editing-presence-refresh-command-status',
+				'refreshed'
+			);
+			expect( presence ).toHaveAttribute(
+				'data-distributed-editing-presence-heartbeat-command-status',
+				'sent'
+			);
+			expect(
+				actions.__experimentalSaveDistributedEditingRetryAfterProof
+			).not.toHaveBeenCalled();
+			expect(
+				screen.queryByText(
+					/session_key|rawSessionKey|userId|cursor|selection/i
+				)
+			).not.toBeInTheDocument();
+		} finally {
+			unmount();
+			jest.clearAllTimers();
+			jest.useRealTimers();
+		}
+	} );
+
+	it( 'shows delayed presence freshness when repeated heartbeat degrades', async () => {
+		jest.useFakeTimers();
+
+		const actions = setupDistributedEditingStatusDispatch();
+		actions.__experimentalSendDistributedEditingPresenceHeartbeat.mockRejectedValue(
+			{
+				code: DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_PRESENCE_STORAGE_UNAVAILABLE,
+			}
+		);
+		setupDistributedEditingStatusSelect( {
+			editorSettings: {
+				distributedEditing: {
+					enabled: true,
+				},
+			},
+			sessionState: {
+				presenceRosterStatus: 'empty',
+				presenceRepeatedRefreshRuntimeStatus:
+					DISTRIBUTED_EDITING_PRESENCE_REPEATED_REFRESH_RUNTIME_STATUSES.SCHEDULED,
+				presenceRepeatedRefreshLocalConnectionState:
+					DISTRIBUTED_EDITING_PRESENCE_REPEATED_REFRESH_CONNECTION_STATES.CONNECTED,
+				presenceRepeatedRefreshExplicitOptIn: true,
+				presenceRepeatedRefreshRuntimeEnabledByDefault: false,
+				presenceRepeatedRefreshSelectedIntervalSeconds: 1,
+				presenceRepeatedRefreshSelectedHeartbeatIntervalSeconds: 1,
+				presenceRepeatedRefreshSchedulesNextRefresh: true,
+				presenceRepeatedRefreshSchedulesNextHeartbeat: true,
+				presenceRepeatedRefreshCallsSave: false,
+				presenceRepeatedRefreshChangesPostLock: false,
+				presenceRepeatedRefreshClaimsSaved: false,
+				presenceRepeatedRefreshExposesRawContent: false,
+				presenceRepeatedRefreshRawSessionKeyIncluded: false,
+			},
+		} );
+
+		const { unmount } = render( <DistributedEditingStatusChrome /> );
+
+		try {
+			const presence = screen.getByRole( 'group', {
+				name: 'Distributed editing presence',
+			} );
+
+			await waitFor( () =>
+				expect( presence ).toHaveAttribute(
+					'data-distributed-editing-presence-repeated-refresh-scheduler-status',
+					'scheduled'
+				)
+			);
+
+			await act( async () => {
+				jest.advanceTimersByTime( 1000 );
+				await Promise.resolve();
+				await Promise.resolve();
+			} );
+
+			await waitFor( () =>
+				expect( presence ).toHaveAttribute(
+					'data-distributed-editing-presence-heartbeat-command-status',
+					'degraded'
+				)
+			);
+			expect( presence ).toHaveAttribute(
+				'data-distributed-editing-presence-freshness-indicator-state',
+				'delayed'
+			);
+			expect( presence ).toHaveAttribute(
+				'data-distributed-editing-presence-freshness-indicator-calls-save',
+				'false'
+			);
+			expect( presence ).toHaveAttribute(
+				'data-distributed-editing-presence-freshness-indicator-changes-post-lock',
+				'false'
+			);
+			expect(
+				screen.getByText( 'Presence may be delayed' )
+			).toBeVisible();
+			expect(
+				screen.getByText(
+					'Editing can continue. The editing list may update late.'
+				)
+			).toBeVisible();
+			expect(
+				actions.__experimentalSaveDistributedEditingRetryAfterProof
+			).not.toHaveBeenCalled();
+			expect(
+				screen.queryByText(
+					/session_key|rawSessionKey|userId|cursor|selection/i
+				)
+			).not.toBeInTheDocument();
+		} finally {
+			unmount();
+			jest.clearAllTimers();
+			jest.useRealTimers();
+		}
+	} );
+
+	it( 'keeps the local roster row visible as delayed when repeated heartbeat storage disappears', async () => {
+		jest.useFakeTimers();
+
+		let sessionState = {
+			presenceRosterEntries: [
+				{
+					key: 'presence-local-heartbeat-current-tab',
+					identityVisibility: 'self',
+					relationship: 'current_user_current_tab',
+					freshness: 'current',
+				},
+			],
+			presenceRepeatedRefreshRuntimeStatus:
+				DISTRIBUTED_EDITING_PRESENCE_REPEATED_REFRESH_RUNTIME_STATUSES.SCHEDULED,
+			presenceRepeatedRefreshLocalConnectionState:
+				DISTRIBUTED_EDITING_PRESENCE_REPEATED_REFRESH_CONNECTION_STATES.CONNECTED,
+			presenceRepeatedRefreshExplicitOptIn: true,
+			presenceRepeatedRefreshRuntimeEnabledByDefault: false,
+			presenceRepeatedRefreshSelectedIntervalSeconds: 1,
+			presenceRepeatedRefreshSelectedHeartbeatIntervalSeconds: 1,
+			presenceRepeatedRefreshSchedulesNextRefresh: true,
+			presenceRepeatedRefreshSchedulesNextHeartbeat: true,
+			presenceRepeatedRefreshCallsSave: false,
+			presenceRepeatedRefreshChangesPostLock: false,
+			presenceRepeatedRefreshClaimsSaved: false,
+			presenceRepeatedRefreshExposesRawContent: false,
+			presenceRepeatedRefreshRawSessionKeyIncluded: false,
+		};
+		const actions = setupDistributedEditingStatusDispatch();
+		const error = {
+			code: DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_PRESENCE_STORAGE_UNAVAILABLE,
+			message: 'Presence storage is unavailable.',
+			data: {
+				result: 'presence_storage_unavailable',
+				status: 503,
+				records_presence_heartbeat: false,
+				writes_presence: false,
+			},
+		};
+
+		actions.__experimentalSendDistributedEditingPresenceHeartbeat.mockImplementation(
+			async () => {
+				sessionState =
+					getDistributedEditingSessionStateForPresenceHeartbeatResult(
+						error,
+						sessionState
+					);
+				throw error;
+			}
+		);
+		useSelect.mockImplementation( ( mapSelect ) =>
+			mapSelect( () => ( {
+				getCurrentPost: () => ( { id: 1, type: 'post' } ),
+				getDistributedEditingSessionState: () => sessionState,
+				getDistributedEditingNoticeDescriptors: () =>
+					getDistributedEditingNoticeDescriptorsForSessionState(
+						sessionState
+					),
+				getDistributedEditingUnloadWarningState: () =>
+					getDistributedEditingUnloadWarningStateForSessionState(
+						sessionState
+					),
+				getEditedPostContent: () => '',
+				getEditorSettings: () => ( {
+					distributedEditing: {
+						enabled: true,
+					},
+				} ),
+			} ) )
+		);
+
+		const { rerender, unmount } = render(
+			<DistributedEditingStatusChrome />
+		);
+
+		try {
+			const presence = screen.getByRole( 'group', {
+				name: 'Distributed editing presence',
+			} );
+
+			await waitFor( () =>
+				expect( presence ).toHaveAttribute(
+					'data-distributed-editing-presence-repeated-refresh-scheduler-status',
+					'scheduled'
+				)
+			);
+
+			await act( async () => {
+				jest.advanceTimersByTime( 1000 );
+				await Promise.resolve();
+				await Promise.resolve();
+			} );
+
+			await waitFor( () =>
+				expect( presence ).toHaveAttribute(
+					'data-distributed-editing-presence-heartbeat-command-status',
+					'degraded'
+				)
+			);
+			rerender( <DistributedEditingStatusChrome /> );
+			expect( sessionState ).toMatchObject( {
+				presenceHeartbeatMarksLocalEditorCurrent: false,
+				presenceHeartbeatMarksLocalEditorDelayed: true,
+				presenceHeartbeatLocalRosterEntryVisible: true,
+				presenceHeartbeatLocalRosterEntryFreshness: 'recent',
+				presenceRosterStatus: 'recent',
+				presenceRosterVisibleCount: 1,
+				presenceRosterEntries: [
+					{
+						relationship: 'current_user_current_tab',
+						freshness: 'recent',
+					},
+				],
+			} );
+			expect( presence ).toHaveTextContent(
+				'Your presence may be delayed.'
+			);
+			expect(
+				screen.getAllByText( 'Presence may be delayed' )[ 0 ]
+			).toBeVisible();
+			expect(
+				actions.__experimentalSaveDistributedEditingRetryAfterProof
+			).not.toHaveBeenCalled();
+			expect(
+				screen.queryByText(
+					/session_key|rawSessionKey|userId|cursor|selection/i
+				)
+			).not.toBeInTheDocument();
+		} finally {
+			unmount();
+			jest.clearAllTimers();
+			jest.useRealTimers();
+		}
+	} );
+
+	it( 'surfaces expired-only roster evidence during a repeated presence refresh and separates the later heartbeat confirmation', async () => {
+		jest.useFakeTimers();
+
+		let releaseHeartbeat;
+		let sessionState = {
+			presenceRosterStatus: 'empty',
+			presenceRepeatedRefreshRuntimeStatus:
+				DISTRIBUTED_EDITING_PRESENCE_REPEATED_REFRESH_RUNTIME_STATUSES.SCHEDULED,
+			presenceRepeatedRefreshLocalConnectionState:
+				DISTRIBUTED_EDITING_PRESENCE_REPEATED_REFRESH_CONNECTION_STATES.CONNECTED,
+			presenceRepeatedRefreshExplicitOptIn: true,
+			presenceRepeatedRefreshRuntimeEnabledByDefault: false,
+			presenceRepeatedRefreshSelectedIntervalSeconds: 1,
+			presenceRepeatedRefreshSelectedHeartbeatIntervalSeconds: 1,
+			presenceRepeatedRefreshSchedulesNextRefresh: true,
+			presenceRepeatedRefreshSchedulesNextHeartbeat: true,
+			presenceRepeatedRefreshCallsSave: false,
+			presenceRepeatedRefreshChangesPostLock: false,
+			presenceRepeatedRefreshClaimsSaved: false,
+			presenceRepeatedRefreshExposesRawContent: false,
+			presenceRepeatedRefreshRawSessionKeyIncluded: false,
+		};
+		const actions = setupDistributedEditingStatusDispatch();
+		const expiredOnlySnapshot = {
+			result: 'presence_roster_snapshot',
+			presenceRoster: {
+				status: 'recent',
+				freshness: 'recent',
+				serverContact: 'nominal',
+				visibleCount: 0,
+				totalKnownCount: 2,
+				hiddenCount: 0,
+				expiredCount: 2,
+				source: 'de_rtc_presence_storage',
+				storageBacked: true,
+				entries: [],
+			},
+			presenceReadContract: {
+				cheapHostPollingGuidance: {
+					repeatedClientRefreshEnabledNow: false,
+				},
+			},
+		};
+
+		actions.__experimentalRefreshDistributedEditingPresenceSnapshot.mockImplementation(
+			async () => {
+				sessionState =
+					getDistributedEditingSessionStateForPresenceSnapshotRefreshResult(
+						expiredOnlySnapshot,
+						sessionState
+					);
+
+				return expiredOnlySnapshot;
+			}
+		);
+		actions.__experimentalSendDistributedEditingPresenceHeartbeat.mockImplementation(
+			() =>
+				new Promise( ( resolve ) => {
+					releaseHeartbeat = () => {
+						const response = {
+							result: 'presence_heartbeat_recorded',
+						};
+
+						sessionState =
+							getDistributedEditingSessionStateForPresenceHeartbeatResult(
+								response,
+								sessionState
+							);
+						resolve( response );
+					};
+				} )
+		);
+		useSelect.mockImplementation( ( mapSelect ) =>
+			mapSelect( () => ( {
+				getCurrentPost: () => ( { id: 1, type: 'post' } ),
+				getDistributedEditingSessionState: () => sessionState,
+				getDistributedEditingNoticeDescriptors: () =>
+					getDistributedEditingNoticeDescriptorsForSessionState(
+						sessionState
+					),
+				getDistributedEditingUnloadWarningState: () =>
+					getDistributedEditingUnloadWarningStateForSessionState(
+						sessionState
+					),
+				getEditedPostContent: () => '',
+				getEditorSettings: () => ( {
+					distributedEditing: {
+						enabled: true,
+					},
+				} ),
+			} ) )
+		);
+
+		const { rerender, unmount } = render(
+			<DistributedEditingStatusChrome />
+		);
+
+		try {
+			const presence = screen.getByRole( 'group', {
+				name: 'Distributed editing presence',
+			} );
+
+			await waitFor( () =>
+				expect( presence ).toHaveAttribute(
+					'data-distributed-editing-presence-repeated-refresh-scheduler-status',
+					'scheduled'
+				)
+			);
+
+			await act( async () => {
+				jest.advanceTimersByTime( 1000 );
+				await Promise.resolve();
+				await Promise.resolve();
+			} );
+			rerender( <DistributedEditingStatusChrome /> );
+
+			await waitFor( () =>
+				expect( presence ).toHaveAttribute(
+					'data-distributed-editing-presence-refresh-command-status',
+					'refreshed'
+				)
+			);
+			expect( presence ).toHaveAttribute(
+				'data-distributed-editing-presence-heartbeat-command-status',
+				'sending'
+			);
+			expect( presence ).toHaveAttribute(
+				'data-distributed-editing-presence-status',
+				'recent'
+			);
+			expect( presence ).toHaveAttribute(
+				'data-distributed-editing-presence-visible-count',
+				'0'
+			);
+			expect( presence ).toHaveAttribute(
+				'data-distributed-editing-presence-summary-expired-count',
+				'2'
+			);
+			expect( presence ).toHaveTextContent(
+				'Editor activity was seen before this refresh. Presence may be delayed.'
+			);
+			expect( presence ).toHaveTextContent(
+				'Some editor activity expired before this refresh.'
+			);
+			expect( presence ).not.toHaveTextContent(
+				'No other editors shown.'
+			);
+			expect( presence ).toHaveAttribute(
+				'data-distributed-editing-presence-claims-absence',
+				'false'
+			);
+			expect( presence ).toHaveAttribute(
+				'data-distributed-editing-presence-repeated-refresh-scheduler-calls-save',
+				'false'
+			);
+			expect( presence ).toHaveAttribute(
+				'data-distributed-editing-presence-repeated-refresh-scheduler-changes-post-lock',
+				'false'
+			);
+			expect(
+				actions.__experimentalSaveDistributedEditingRetryAfterProof
+			).not.toHaveBeenCalled();
+			expect(
+				screen.queryByText(
+					/session_key|rawSessionKey|userId|cursor|selection/i
+				)
+			).not.toBeInTheDocument();
+
+			await act( async () => {
+				releaseHeartbeat();
+				await Promise.resolve();
+				await Promise.resolve();
+			} );
+			rerender( <DistributedEditingStatusChrome /> );
+
+			await waitFor( () =>
+				expect( presence ).toHaveAttribute(
+					'data-distributed-editing-presence-heartbeat-command-status',
+					'sent'
+				)
+			);
+			expect( sessionState ).toMatchObject( {
+				presenceHeartbeatMarksLocalEditorCurrent: true,
+				presenceHeartbeatMarksLocalEditorDelayed: false,
+				presenceHeartbeatLocalRosterEntryVisible: true,
+				presenceHeartbeatLocalRosterEntryFreshness: 'current',
+				presenceRosterStatus: 'active',
+				presenceRosterVisibleCount: 1,
+				presenceRosterTotalKnownCount: 3,
+				presenceRosterExpiredCount: 2,
+				presenceRosterEntries: [
+					{
+						relationship: 'current_user_current_tab',
+						freshness: 'current',
+					},
+				],
+			} );
+			expect( presence ).toHaveAttribute(
+				'data-distributed-editing-presence-status',
+				'active'
+			);
+			expect( presence ).toHaveAttribute(
+				'data-distributed-editing-presence-visible-count',
+				'1'
+			);
+			expect( presence ).toHaveAttribute(
+				'data-distributed-editing-presence-summary-current-count',
+				'1'
+			);
+			expect( presence ).toHaveAttribute(
+				'data-distributed-editing-presence-summary-expired-count',
+				'2'
+			);
+			expect( presence ).toHaveTextContent(
+				'You are visible in this editing session.'
+			);
+			expect( presence ).toHaveTextContent(
+				'1 editor is active now. Some editor activity expired before this refresh.'
+			);
+			expect( presence ).not.toHaveTextContent(
+				'Expired Repeated Browser'
+			);
+			expect( presence ).not.toHaveTextContent(
+				'No other editors shown.'
+			);
+		} finally {
+			unmount();
+			jest.clearAllTimers();
+			jest.useRealTimers();
+		}
+	} );
+
+	it( 'cancels a scheduled repeated presence cadence after transport degrades', async () => {
+		jest.useFakeTimers();
+
+		const actions = setupDistributedEditingStatusDispatch();
+		const editorSettings = {
+			distributedEditing: {
+				enabled: true,
+			},
+		};
+		let sessionState = {
+			presenceRosterStatus: 'empty',
+			presenceRepeatedRefreshRuntimeStatus:
+				DISTRIBUTED_EDITING_PRESENCE_REPEATED_REFRESH_RUNTIME_STATUSES.SCHEDULED,
+			presenceRepeatedRefreshLocalConnectionState:
+				DISTRIBUTED_EDITING_PRESENCE_REPEATED_REFRESH_CONNECTION_STATES.CONNECTED,
+			presenceRepeatedRefreshExplicitOptIn: true,
+			presenceRepeatedRefreshRuntimeEnabledByDefault: false,
+			presenceRepeatedRefreshSelectedIntervalSeconds: 1,
+			presenceRepeatedRefreshSelectedHeartbeatIntervalSeconds: 1,
+			presenceRepeatedRefreshSchedulesNextRefresh: true,
+			presenceRepeatedRefreshSchedulesNextHeartbeat: true,
+			presenceRepeatedRefreshCallsSave: false,
+			presenceRepeatedRefreshChangesPostLock: false,
+			presenceRepeatedRefreshClaimsSaved: false,
+			presenceRepeatedRefreshExposesRawContent: false,
+			presenceRepeatedRefreshRawSessionKeyIncluded: false,
+		};
+
+		useSelect.mockImplementation( ( mapSelect ) =>
+			mapSelect( () => ( {
+				getCurrentPost: () => ( { id: 1, type: 'post' } ),
+				getDistributedEditingSessionState: () => sessionState,
+				getDistributedEditingNoticeDescriptors: () =>
+					getDistributedEditingNoticeDescriptorsForSessionState(
+						sessionState
+					),
+				getDistributedEditingUnloadWarningState: () =>
+					getDistributedEditingUnloadWarningStateForSessionState(
+						sessionState
+					),
+				getEditedPostContent: () => '',
+				getEditorSettings: () => editorSettings,
+			} ) )
+		);
+
+		const { rerender, unmount } = render(
+			<DistributedEditingStatusChrome />
+		);
+
+		try {
+			const presence = screen.getByRole( 'group', {
+				name: 'Distributed editing presence',
+			} );
+
+			await waitFor( () =>
+				expect( presence ).toHaveAttribute(
+					'data-distributed-editing-presence-repeated-refresh-scheduler-status',
+					'scheduled'
+				)
+			);
+
+			sessionState = {
+				...sessionState,
+				presenceRepeatedRefreshRuntimeStatus:
+					DISTRIBUTED_EDITING_PRESENCE_REPEATED_REFRESH_RUNTIME_STATUSES.PAUSED_DEGRADED_TRANSPORT,
+				presenceRepeatedRefreshLocalConnectionState:
+					DISTRIBUTED_EDITING_PRESENCE_REPEATED_REFRESH_CONNECTION_STATES.DEGRADED,
+				presenceRepeatedRefreshServerContact: 'degraded',
+				presenceRepeatedRefreshSchedulesNextRefresh: false,
+				presenceRepeatedRefreshSchedulesNextHeartbeat: false,
+			};
+			rerender( <DistributedEditingStatusChrome /> );
+
+			await waitFor( () =>
+				expect( presence ).toHaveAttribute(
+					'data-distributed-editing-presence-repeated-refresh-scheduler-status',
+					'paused'
+				)
+			);
+
+			await act( async () => {
+				jest.advanceTimersByTime( 1000 );
+				await Promise.resolve();
+				await Promise.resolve();
+			} );
+
+			expect(
+				actions.__experimentalRefreshDistributedEditingPresenceSnapshot
+			).not.toHaveBeenCalled();
+			expect(
+				actions.__experimentalSendDistributedEditingPresenceHeartbeat
+			).not.toHaveBeenCalled();
+			expect( presence ).toHaveAttribute(
+				'data-distributed-editing-presence-repeated-refresh-scheduler-tick-count',
+				'0'
+			);
+			expect( presence ).toHaveAttribute(
+				'data-distributed-editing-presence-freshness-indicator-state',
+				'paused'
+			);
+			expect(
+				actions.__experimentalSaveDistributedEditingRetryAfterProof
+			).not.toHaveBeenCalled();
+		} finally {
+			unmount();
+			jest.clearAllTimers();
+			jest.useRealTimers();
+		}
+	} );
+
+	it( 'does not run the repeated presence cadence while transport is degraded', async () => {
+		jest.useFakeTimers();
+
+		const actions = setupDistributedEditingStatusDispatch();
+		setupDistributedEditingStatusSelect( {
+			editorSettings: {
+				distributedEditing: {
+					enabled: true,
+				},
+			},
+			sessionState: {
+				presenceRosterStatus: 'empty',
+				presenceRepeatedRefreshRuntimeStatus:
+					DISTRIBUTED_EDITING_PRESENCE_REPEATED_REFRESH_RUNTIME_STATUSES.PAUSED_DEGRADED_TRANSPORT,
+				presenceRepeatedRefreshLocalConnectionState:
+					DISTRIBUTED_EDITING_PRESENCE_REPEATED_REFRESH_CONNECTION_STATES.DEGRADED,
+				presenceRepeatedRefreshExplicitOptIn: true,
+				presenceRepeatedRefreshServerContact: 'degraded',
+				presenceRepeatedRefreshSelectedIntervalSeconds: 1,
+				presenceRepeatedRefreshSelectedHeartbeatIntervalSeconds: 1,
+				presenceRepeatedRefreshSchedulesNextRefresh: false,
+				presenceRepeatedRefreshSchedulesNextHeartbeat: false,
+			},
+		} );
+
+		const { unmount } = render( <DistributedEditingStatusChrome /> );
+
+		try {
+			const presence = screen.getByRole( 'group', {
+				name: 'Distributed editing presence',
+			} );
+
+			await waitFor( () =>
+				expect( presence ).toHaveAttribute(
+					'data-distributed-editing-presence-repeated-refresh-scheduler-status',
+					'paused'
+				)
+			);
+			expect( presence ).toHaveAttribute(
+				'data-distributed-editing-presence-repeated-refresh-scheduler-timer-active',
+				'false'
+			);
+			expect( presence ).toHaveAttribute(
+				'data-distributed-editing-presence-freshness-indicator-state',
+				'paused'
+			);
+			expect( presence ).toHaveAttribute(
+				'data-distributed-editing-presence-freshness-indicator-claims-saved',
+				'false'
+			);
+			expect(
+				screen.getByText( 'Presence updates paused' )
+			).toBeVisible();
+			expect(
+				screen.getByText(
+					'Server contact is degraded. Editing can continue; saves do not depend on presence.'
+				)
+			).toBeVisible();
+
+			await act( async () => {
+				jest.advanceTimersByTime( 5000 );
+				await Promise.resolve();
+			} );
+
+			expect(
+				actions.__experimentalRefreshDistributedEditingPresenceSnapshot
+			).not.toHaveBeenCalled();
+			expect(
+				actions.__experimentalSendDistributedEditingPresenceHeartbeat
+			).not.toHaveBeenCalled();
+			expect( presence ).toHaveAttribute(
+				'data-distributed-editing-presence-repeated-refresh-scheduler-tick-count',
+				'0'
+			);
+			expect(
+				actions.__experimentalSaveDistributedEditingRetryAfterProof
+			).not.toHaveBeenCalled();
+		} finally {
+			unmount();
+			jest.clearAllTimers();
+			jest.useRealTimers();
+		}
 	} );
 
 	it( 'reports fresh-review jump inspection status from production chrome without saving', async () => {
@@ -1223,13 +4538,17 @@ describe( 'DistributedEditingStatus', () => {
 					{
 						id: 'fresh-review-chrome-compare',
 						blockClientId: 'fresh-review-chrome-compare-client',
-						blockLabel: 'Chrome compare HTML change',
+						blockName: 'core/paragraph',
+						blockLabel: 'Chrome compare paragraph change',
 						baseContentHash:
 							'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
 						proposedContentHash:
 							'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb',
-						rawBlockContent:
-							'<script>fresh-review-chrome-compare-raw</script>',
+						baseSerializedBlock:
+							'<!-- wp:paragraph --><p>Original chrome comparison text.</p><!-- /wp:paragraph -->',
+						proposedSerializedBlock:
+							'<!-- wp:paragraph --><p>Updated chrome comparison text.</p><!-- /wp:paragraph -->',
+						privacyClass: 'synthetic-content',
 					},
 				],
 			},
@@ -1245,15 +4564,48 @@ describe( 'DistributedEditingStatus', () => {
 
 		await user.click(
 			screen.getByRole( 'button', {
-				name: 'Inspect compare evidence for Chrome compare HTML change',
+				name: 'Inspect compare evidence for Chrome compare paragraph change',
 			} )
 		);
 
 		expect(
 			screen.getByText(
-				'Compare evidence checked. The editor found hash evidence for this review item; no comparison was opened, no content changed, and no save was made.'
+				'Read-only comparison opened. The editor shows safe base and proposed block text below; no content changed, no save was made, and no server request was sent.'
 			)
 		).toBeVisible();
+		const comparisonSurface = screen.getByRole( 'group', {
+			name: 'Distributed editing fresh review comparison for Chrome compare paragraph change',
+		} );
+		expect( comparisonSurface ).toHaveAttribute(
+			'data-distributed-editing-fresh-review-comparison-surface-status',
+			'open'
+		);
+		expect( comparisonSurface ).toHaveAttribute(
+			'data-distributed-editing-fresh-review-comparison-surface-mode',
+			'read_only_side_by_side_block_review'
+		);
+		expect( comparisonSurface ).toHaveAttribute(
+			'data-distributed-editing-fresh-review-comparison-surface-read-only',
+			'true'
+		);
+		expect( comparisonSurface ).toHaveAttribute(
+			'data-distributed-editing-fresh-review-comparison-surface-calls-rest',
+			'false'
+		);
+		expect( comparisonSurface ).toHaveAttribute(
+			'data-distributed-editing-fresh-review-comparison-surface-calls-save',
+			'false'
+		);
+		expect( comparisonSurface ).toHaveAttribute(
+			'data-distributed-editing-fresh-review-comparison-surface-mutates-editor-content',
+			'false'
+		);
+		expect( comparisonSurface ).toHaveTextContent(
+			'Original chrome comparison text.'
+		);
+		expect( comparisonSurface ).toHaveTextContent(
+			'Updated chrome comparison text.'
+		);
 		expect(
 			actions.__experimentalResolveDistributedEditingFreshReviewDecisionItem
 		).not.toHaveBeenCalled();
@@ -1809,7 +5161,7 @@ describe( 'DistributedEditingStatus', () => {
 			actions.__experimentalRefreshDistributedEditingServerStateAfterStaleBase
 		).not.toHaveBeenCalled();
 		expect( await screen.findByRole( 'status' ) ).toHaveTextContent(
-			'Admin-reviewed changes were imported into this editor only, with route, hash, and signed review proof checks passing. They remain protected until guarded save is confirmed; no server request was sent.'
+			'Admin-reviewed changes were imported into this editor only, with route, hash, and signed review proof checks passing. They remain protected until WordPress confirms Save; no server request was sent.'
 		);
 	} );
 
@@ -1836,7 +5188,7 @@ describe( 'DistributedEditingStatus', () => {
 		],
 		[
 			DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.FRESH_REVIEW_REQUIRED,
-			'Import blocked: this reviewed-changes handoff needs a fresh admin review before it can be imported for retry save. Nothing was imported, and local changes remain protected and exportable.',
+			'Import blocked: this reviewed-changes handoff needs a fresh admin review before it can be imported for Save. Nothing was imported, and local changes remain protected and exportable.',
 		],
 		[
 			DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.EXTRA_SESSION_STATE_OVEREXPOSED,
@@ -1921,7 +5273,7 @@ describe( 'DistributedEditingStatus', () => {
 					available: true,
 					canShareWithSupport: true,
 					chronologyText:
-						'Fresh-review guarded save confirmation was recorded; use save-authority evidence to confirm persistence.',
+						'Fresh-review Save confirmation was recorded; use WordPress save-authority evidence to confirm persistence.',
 					summaryText:
 						'Recorded 4 redacted transcript events; 2 unsafe entries were dropped.',
 					requiresSaveAuthorityForPersistence: true,
@@ -1966,10 +5318,10 @@ describe( 'DistributedEditingStatus', () => {
 
 		const status = await screen.findByRole( 'status' );
 		expect( status ).toHaveTextContent(
-			'Import blocked: this reviewed-changes handoff needs a fresh admin review before it can be imported for retry save. Nothing was imported, and local changes remain protected and exportable.'
+			'Import blocked: this reviewed-changes handoff needs a fresh admin review before it can be imported for Save. Nothing was imported, and local changes remain protected and exportable.'
 		);
 		expect( status ).toHaveTextContent(
-			'Fresh-review guarded save confirmation was recorded; use save-authority evidence to confirm persistence. Recorded 4 redacted transcript events; 2 unsafe entries were dropped.'
+			'Fresh-review Save confirmation was recorded; use WordPress save-authority evidence to confirm persistence. Recorded 4 redacted transcript events; 2 unsafe entries were dropped.'
 		);
 		expect( status ).toHaveTextContent(
 			'This transcript is diagnostic only; save authority evidence is still required before treating these changes as saved.'
@@ -2015,16 +5367,16 @@ describe( 'DistributedEditingStatus', () => {
 			'data-distributed-editing-placement',
 			'editor-interface-notices'
 		);
-		expect( screen.getByText( 'Retry save in progress' ) ).toBeVisible();
+		expect( screen.getByText( 'Saving to WordPress' ) ).toBeVisible();
 		expect(
 			screen.getByText(
-				'The editor is sending rebased changes through the guarded retry-save path. Keep this tab open; protected local changes remain exportable until the server confirms the save.'
+				'The editor is sending the prepared changes to WordPress. Keep this tab open; protected local changes remain exportable until WordPress confirms the save.'
 			)
 		).toBeVisible();
 		expect( screen.getByText( 'Changes pending' ) ).toBeVisible();
 		expect(
 			screen.getByText(
-				'The guarded retry save is waiting for server confirmation. Protected local changes remain pending and exportable until confirmation.'
+				'Save is waiting for WordPress confirmation. Protected local changes remain pending and exportable until confirmation.'
 			)
 		).toBeVisible();
 
@@ -2087,10 +5439,10 @@ describe( 'DistributedEditingStatus', () => {
 			'data-distributed-editing-placement',
 			'editor-interface-notices'
 		);
-		expect( screen.getByText( 'Retry save confirmed' ) ).toBeVisible();
+		expect( screen.getByText( 'Save confirmed' ) ).toBeVisible();
 		expect(
 			screen.getByText(
-				'Server confirmed the guarded retry-save, advanced the sync version from 7 to 8, and recorded 1 revision. Protected local changes are no longer pending for this save.'
+				'WordPress saved the prepared changes, advanced the sync version from 7 to 8, and recorded 1 revision. Protected local changes are no longer pending for this save.'
 			)
 		).toBeVisible();
 		expect(
@@ -2100,7 +5452,7 @@ describe( 'DistributedEditingStatus', () => {
 		).not.toBeInTheDocument();
 		expect(
 			screen.queryByRole( 'button', {
-				name: 'Refresh server version',
+				name: 'Get latest post',
 			} )
 		).not.toBeInTheDocument();
 		expect(
@@ -2137,12 +5489,10 @@ describe( 'DistributedEditingStatus', () => {
 
 		render( <DistributedEditingStatusChrome /> );
 
-		expect(
-			screen.getByText( 'Retry save already in progress' )
-		).toBeVisible();
+		expect( screen.getByText( 'Save already in progress' ) ).toBeVisible();
 		expect(
 			screen.getByText(
-				'A retry save is already waiting for server confirmation. Protected local changes remain exportable; keep this tab open until it finishes.'
+				'Save is already waiting for WordPress confirmation. Protected local changes remain exportable; keep this tab open until it finishes.'
 			)
 		).toBeVisible();
 
@@ -2375,7 +5725,7 @@ describe( 'DistributedEditingStatus', () => {
 
 		await user.click(
 			screen.getByRole( 'button', {
-				name: 'Refresh server version',
+				name: 'Get latest post',
 			} )
 		);
 
@@ -2387,7 +5737,7 @@ describe( 'DistributedEditingStatus', () => {
 		).not.toHaveBeenCalled();
 		expect(
 			await screen.findByText(
-				'Server version refreshed for review. Protected local changes remain in this editor session and can still be exported before retrying.'
+				'Latest post loaded. Protected local changes remain in this editor session and can still be exported before retrying.'
 			)
 		).toBeVisible();
 	} );
@@ -2429,7 +5779,7 @@ describe( 'DistributedEditingStatus', () => {
 		).toBeVisible();
 		expect(
 			screen.getByText(
-				'Save did not update the authoritative post because these changes may alter unfiltered HTML. Export them for review by someone with unfiltered HTML permission, or refresh the server version before deciding how to continue. Protected local changes remain exportable.'
+				'Save did not update the authoritative post because these changes may alter unfiltered HTML. Export them for review by someone with unfiltered HTML permission, or get the latest post before deciding how to continue. Protected local changes remain exportable.'
 			)
 		).toBeVisible();
 		expect(
@@ -2439,7 +5789,7 @@ describe( 'DistributedEditingStatus', () => {
 			screen.getByRole( 'button', { name: 'Export changes for review' } )
 		).toBeVisible();
 		expect(
-			screen.getByRole( 'button', { name: 'Refresh server version' } )
+			screen.getByRole( 'button', { name: 'Get latest post' } )
 		).toBeVisible();
 
 		await user.click(
@@ -2477,7 +5827,7 @@ describe( 'DistributedEditingStatus', () => {
 
 		await user.click(
 			screen.getByRole( 'button', {
-				name: 'Refresh server version',
+				name: 'Get latest post',
 			} )
 		);
 
@@ -2495,7 +5845,7 @@ describe( 'DistributedEditingStatus', () => {
 		).not.toHaveBeenCalled();
 		expect(
 			await screen.findByText(
-				'Server version refreshed for HTML review. Protected local changes remain in this editor session and can still be exported before retrying.'
+				'Latest post loaded for HTML review. Protected local changes remain in this editor session and can still be exported before retrying.'
 			)
 		).toBeVisible();
 	} );
@@ -2551,7 +5901,7 @@ describe( 'DistributedEditingStatus', () => {
 		).toBeVisible();
 		expect(
 			screen.getByText(
-				'The imported reviewed-changes token could not be found in server storage and is no longer usable for retry save. No server save was made. Export a fresh-review handoff for an admin reviewer; protected local changes remain exportable.'
+				'The imported reviewed-changes token could not be found in server storage and is no longer usable for Save. No server save was made. Export a fresh-review handoff for an admin reviewer; protected local changes remain exportable.'
 			)
 		).toBeVisible();
 		expect(
@@ -2623,7 +5973,7 @@ describe( 'DistributedEditingStatus', () => {
 
 		await user.click(
 			screen.getByRole( 'button', {
-				name: 'Refresh server version',
+				name: 'Get latest post',
 			} )
 		);
 
@@ -2644,7 +5994,7 @@ describe( 'DistributedEditingStatus', () => {
 		);
 		expect(
 			screen.getByText(
-				'Server version could not be refreshed. Protected local changes remain in this editor session and can still be exported; keep this tab open before trying again.'
+				'Latest post could not be loaded. Protected local changes remain in this editor session and can still be exported; keep this tab open before trying again.'
 			)
 		).toBeVisible();
 	} );
@@ -2679,7 +6029,7 @@ describe( 'DistributedEditingStatus', () => {
 			'editor-interface-notices'
 		);
 		expect(
-			screen.getByText( 'Retry save needs server refresh' )
+			screen.getByText( 'Save needs the latest post' )
 		).toBeVisible();
 		expect(
 			screen.getByRole( 'button', {
@@ -2689,7 +6039,7 @@ describe( 'DistributedEditingStatus', () => {
 
 		await user.click(
 			screen.getByRole( 'button', {
-				name: 'Refresh server version',
+				name: 'Get latest post',
 			} )
 		);
 
@@ -2715,7 +6065,7 @@ describe( 'DistributedEditingStatus', () => {
 		);
 		expect(
 			screen.getByText(
-				'Server version refreshed for review. Protected local changes remain in this editor session and can still be exported before retrying.'
+				'Latest post loaded. Protected local changes remain in this editor session and can still be exported before retrying.'
 			)
 		).toBeVisible();
 	} );
@@ -2754,7 +6104,7 @@ describe( 'DistributedEditingStatus', () => {
 
 		await user.click(
 			screen.getByRole( 'button', {
-				name: 'Retry local changes',
+				name: 'Apply local changes',
 			} )
 		);
 
@@ -2768,7 +6118,9 @@ describe( 'DistributedEditingStatus', () => {
 			actions.__experimentalSaveDistributedEditingRetryAfterProof
 		).not.toHaveBeenCalled();
 		expect(
-			await screen.findByText( 'Local rebase readiness refreshed.' )
+			await screen.findByText(
+				'Checked whether local changes can be applied.'
+			)
 		).toBeVisible();
 	} );
 
@@ -2800,7 +6152,7 @@ describe( 'DistributedEditingStatus', () => {
 
 		await user.click(
 			screen.getByRole( 'button', {
-				name: 'Retry local changes',
+				name: 'Apply local changes',
 			} )
 		);
 
@@ -2815,7 +6167,7 @@ describe( 'DistributedEditingStatus', () => {
 		).not.toHaveBeenCalled();
 		expect(
 			await screen.findByText(
-				'Local changes retried over the refreshed server version.'
+				'Local changes applied to the latest post.'
 			)
 		).toBeVisible();
 	} );
@@ -2850,7 +6202,7 @@ describe( 'DistributedEditingStatus', () => {
 
 		await user.click(
 			screen.getByRole( 'button', {
-				name: 'Prepare retry submit',
+				name: 'Stage local changes',
 			} )
 		);
 
@@ -2865,7 +6217,7 @@ describe( 'DistributedEditingStatus', () => {
 		).not.toHaveBeenCalled();
 		expect(
 			await screen.findByText(
-				'Retry submit prepared. Request server proof when ready.'
+				'Local changes staged. Check save safety before saving.'
 			)
 		).toBeVisible();
 	} );
@@ -2902,7 +6254,7 @@ describe( 'DistributedEditingStatus', () => {
 
 		await user.click(
 			screen.getByRole( 'button', {
-				name: 'Refresh retry proof',
+				name: 'Check save safety',
 			} )
 		);
 
@@ -2920,7 +6272,7 @@ describe( 'DistributedEditingStatus', () => {
 		).not.toHaveBeenCalled();
 		expect(
 			await screen.findByText(
-				'Retry submit proof refreshed. Save again to continue through the guarded retry path.'
+				'Save safety checked. Use Save to continue.'
 			)
 		).toBeVisible();
 	} );
@@ -2944,7 +6296,7 @@ describe( 'DistributedEditingStatus', () => {
 
 		await user.click(
 			screen.getByRole( 'button', {
-				name: 'Prepare guarded save',
+				name: 'Prepare Save',
 			} )
 		);
 
@@ -2962,7 +6314,7 @@ describe( 'DistributedEditingStatus', () => {
 		).not.toHaveBeenCalled();
 		expect(
 			await screen.findByText(
-				'Guarded save path prepared. Save again to submit through the retry path.'
+				'Save prepared. Use Save to send these changes to WordPress.'
 			)
 		).toBeVisible();
 	} );
@@ -3134,13 +6486,13 @@ describe( 'DistributedEditingStatusSurface', () => {
 			/>
 		);
 
-		expect( screen.getByText( 'Server version available' ) ).toBeVisible();
+		expect( screen.getByText( 'Latest post available' ) ).toBeVisible();
 		expect(
-			screen.getByText( 'Accept the server version before continuing.' )
+			screen.getByText( 'Accept the latest post before continuing.' )
 		).toBeVisible();
 		expect(
 			screen.queryByRole( 'button', {
-				name: 'Accept server version',
+				name: 'Accept latest post',
 			} )
 		).not.toBeInTheDocument();
 		expect(
@@ -3177,16 +6529,18 @@ describe( 'DistributedEditingStatusSurface', () => {
 			/>
 		);
 
-		expect( screen.getByText( 'Local rebase ready' ) ).toBeVisible();
+		expect(
+			screen.getByText( 'Ready to apply local changes' )
+		).toBeVisible();
 		expect(
 			screen.getByText(
-				'Local changes can be rebased over the refreshed server version.'
+				'Local changes can be applied to the latest post before saving.'
 			)
 		).toBeVisible();
 
 		await user.click(
 			screen.getByRole( 'button', {
-				name: 'Refresh server version',
+				name: 'Get latest post',
 			} )
 		);
 
@@ -3198,7 +6552,7 @@ describe( 'DistributedEditingStatusSurface', () => {
 		);
 		expect(
 			screen.getByRole( 'button', {
-				name: 'Retry local changes',
+				name: 'Apply local changes',
 			} )
 		).toBeVisible();
 		expect(
@@ -3232,17 +6586,15 @@ describe( 'DistributedEditingStatusSurface', () => {
 			/>
 		);
 
-		expect(
-			screen.getByText( 'Local rebase inputs missing' )
-		).toBeVisible();
+		expect( screen.getByText( 'Latest post data missing' ) ).toBeVisible();
 		expect(
 			screen.getByText(
-				'Retain both the client base and refreshed server version before retrying local changes.'
+				'Keep both the starting post and latest post available before applying local changes.'
 			)
 		).toBeVisible();
 		expect(
 			screen.queryByRole( 'button', {
-				name: 'Retry local changes',
+				name: 'Apply local changes',
 			} )
 		).not.toBeInTheDocument();
 	} );
@@ -3275,10 +6627,10 @@ describe( 'DistributedEditingStatusSurface', () => {
 			/>
 		);
 
-		expect( screen.getByText( 'Local changes rebased' ) ).toBeVisible();
+		expect( screen.getByText( 'Local changes ready' ) ).toBeVisible();
 		expect(
 			screen.getByText(
-				'Local changes were merged with the server version and are ready for the next submit.'
+				'Local changes were applied to the latest post and are ready for the next Save check.'
 			)
 		).toBeVisible();
 		expect( screen.queryByText( /wp:paragraph/ ) ).not.toBeInTheDocument();
@@ -3313,12 +6665,26 @@ describe( 'DistributedEditingStatusSurface', () => {
 			/>
 		);
 
-		expect( screen.getByText( 'Local rebase needs review' ) ).toBeVisible();
+		expect( screen.getByText( 'Local changes need review' ) ).toBeVisible();
 		expect(
 			screen.getByText(
-				'Blocks were reordered while local edits were pending. Review the local and server versions before continuing.'
+				'Blocks were reordered while local edits were pending. Review the local changes and the latest post before continuing.'
 			)
 		).toBeVisible();
+		expect( screen.getByText( 'Next step:' ) ).toBeVisible();
+		expect(
+			screen.getByText(
+				'Export local changes, then compare them with the latest post before continuing.'
+			)
+		).toBeVisible();
+		const reorderStatusItem = screen
+			.getByText( 'Local changes need review' )
+			// eslint-disable-next-line testing-library/no-node-access
+			.closest( '[data-distributed-editing-next-step]' );
+		expect( reorderStatusItem ).toHaveAttribute(
+			'data-distributed-editing-next-step',
+			'export_for_manual_conflict_review'
+		);
 		expect( screen.queryByText( /wp:paragraph/ ) ).not.toBeInTheDocument();
 	} );
 
@@ -3347,12 +6713,26 @@ describe( 'DistributedEditingStatusSurface', () => {
 			/>
 		);
 
-		expect( screen.getByText( 'Local rebase blocked' ) ).toBeVisible();
+		expect( screen.getByText( 'Local changes blocked' ) ).toBeVisible();
 		expect(
 			screen.getByText(
 				'The content is not represented by whole serialized blocks and needs manual review.'
 			)
 		).toBeVisible();
+		expect( screen.getByText( 'Next step:' ) ).toBeVisible();
+		expect(
+			screen.getByText(
+				'Export local changes, then compare them with the latest post before continuing.'
+			)
+		).toBeVisible();
+		const freeformStatusItem = screen
+			.getByText( 'Local changes blocked' )
+			// eslint-disable-next-line testing-library/no-node-access
+			.closest( '[data-distributed-editing-next-step]' );
+		expect( freeformStatusItem ).toHaveAttribute(
+			'data-distributed-editing-next-step',
+			'export_for_manual_conflict_review'
+		);
 	} );
 
 	it( 'renders prepared retry-submit handoff status without claiming a save', () => {
@@ -3383,10 +6763,10 @@ describe( 'DistributedEditingStatusSurface', () => {
 			/>
 		);
 
-		expect( screen.getByText( 'Retry submit prepared' ) ).toBeVisible();
+		expect( screen.getByText( 'Local changes staged' ) ).toBeVisible();
 		expect(
 			screen.getByText(
-				'Local changes are staged for the future retry path. No save has been sent yet.'
+				'Local changes are staged for the next Save check. WordPress has not saved them yet.'
 			)
 		).toBeVisible();
 	} );
@@ -3414,7 +6794,7 @@ describe( 'DistributedEditingStatusSurface', () => {
 		expect( screen.getByText( 'Changes pending' ) ).toBeVisible();
 		expect(
 			screen.getByText(
-				'Retry submit accepted the rebased changes for a future save. Local changes are still awaiting confirmation.'
+				'WordPress accepted the save check. Local changes are still awaiting final Save confirmation.'
 			)
 		).toBeVisible();
 		expect(
@@ -3443,7 +6823,7 @@ describe( 'DistributedEditingStatusSurface', () => {
 		expect( screen.getByText( 'Changes pending' ) ).toBeVisible();
 		expect(
 			screen.getByText(
-				'Admin-reviewed changes were imported locally with signed review proof and are ready for guarded save. They remain protected and exportable until the server confirms that path.'
+				'Admin-reviewed changes were imported locally with signed review proof and are ready for WordPress Save. They remain protected and exportable until WordPress confirms the update.'
 			)
 		).toBeVisible();
 		expect( screen.queryByText( /saved/i ) ).not.toBeInTheDocument();
@@ -3468,7 +6848,7 @@ describe( 'DistributedEditingStatusSurface', () => {
 		expect( screen.getByText( 'Changes pending' ) ).toBeVisible();
 		expect(
 			screen.getByText(
-				'Protected recovery changes were imported locally and are ready for guarded save. They remain protected and exportable until the server confirms that path.'
+				'Protected recovery changes were imported locally and are ready for WordPress Save. They remain protected and exportable until WordPress confirms the update.'
 			)
 		).toBeVisible();
 		expect(
@@ -3497,7 +6877,7 @@ describe( 'DistributedEditingStatusSurface', () => {
 		expect( screen.getByText( 'Fresh review needed' ) ).toBeVisible();
 		expect(
 			screen.getByText(
-				'This fresh-review handoff cannot be imported for retry save because it has no usable accepted review proof. Request a new admin review before retry save; nothing was imported, saved, or sent to the server.'
+				'This fresh-review handoff cannot be imported for Save because it has no usable accepted review proof. Request a new admin review before saving; nothing was imported, saved, or sent to the server.'
 			)
 		).toBeVisible();
 		expect(
@@ -3582,12 +6962,12 @@ describe( 'DistributedEditingStatusSurface', () => {
 		expect( screen.getByText( 'Fresh review required' ) ).toBeVisible();
 		expect(
 			screen.getByText(
-				'Protected changes need hash-only admin review before Save can continue. Risky block evidence remains redacted until the review surface opens. No normal save or retry save has run; protected local changes remain exportable.'
+				'Protected changes need hash-only admin review before Save can continue. Risky block evidence remains redacted until the review surface opens. No normal Save has run; protected local changes remain exportable.'
 			)
 		).toBeVisible();
 		expect(
 			screen.getByText(
-				'Fresh-review guarded save confirmation was recorded; use save-authority evidence to confirm persistence. Recorded 4 redacted transcript events; 2 unsafe entries were dropped. This transcript is diagnostic only; save authority evidence is still required before treating these changes as saved.'
+				'Fresh-review Save confirmation was recorded; use WordPress save-authority evidence to confirm persistence. Recorded 4 redacted transcript events; 2 unsafe entries were dropped. This transcript is diagnostic only; save authority evidence is still required before treating these changes as saved.'
 			)
 		).toBeVisible();
 		const preSaveStatus = screen.getByTestId(
@@ -3695,7 +7075,7 @@ describe( 'DistributedEditingStatusSurface', () => {
 		expect( screen.getByText( 'Fresh review required' ) ).toBeVisible();
 		expect(
 			screen.getByText(
-				'Protected changes need hash-only admin review before Save can continue. 1 risky block is represented only by redacted review evidence. No normal save or retry save has run; protected local changes remain exportable.'
+				'Protected changes need hash-only admin review before Save can continue. 1 risky block is represented only by redacted review evidence. No normal Save has run; protected local changes remain exportable.'
 			)
 		).toBeVisible();
 		const preSaveStatus = screen.getByTestId(
@@ -3759,7 +7139,7 @@ describe( 'DistributedEditingStatusSurface', () => {
 
 		expect(
 			screen.getByText(
-				'The editor is validating hash-only fresh-review proof before any guarded retry save. No normal save has run; keep protected local changes exportable until validation finishes.'
+				'The editor is validating hash-only fresh-review proof before WordPress updates the post. No normal Save has run; keep protected local changes exportable until validation finishes.'
 			)
 		).toBeVisible();
 		const preSaveStatus = screen.getByTestId(
@@ -3835,7 +7215,7 @@ describe( 'DistributedEditingStatusSurface', () => {
 		).toBeVisible();
 		expect(
 			screen.getByText(
-				'Reviewed changes are ready for server validation before guarded retry save. Save should continue only through fresh-review validation; no normal save fallback has run, and protected local changes remain exportable.'
+				'Reviewed changes need WordPress validation before Save can continue. Save should continue only after fresh-review validation; no normal Save fallback has run, and protected local changes remain exportable.'
 			)
 		).toBeVisible();
 		const preSaveStatus = screen.getByTestId(
@@ -3903,11 +7283,11 @@ describe( 'DistributedEditingStatusSurface', () => {
 		);
 
 		expect(
-			screen.getByText( 'Fresh-review retry save confirmed' )
+			screen.getByText( 'Fresh-review Save confirmed' )
 		).toBeVisible();
 		expect(
 			screen.getByText(
-				'Server confirmed the fresh-review retry-save, advanced the sync version from 12 to 13, and recorded 1 revision. Protected local changes are no longer pending for this save.'
+				'WordPress confirmed fresh-review Save, advanced the sync version from 12 to 13, and recorded 1 revision. Protected local changes are no longer pending for this save.'
 			)
 		).toBeVisible();
 		expect(
@@ -3927,9 +7307,9 @@ describe( 'DistributedEditingStatusSurface', () => {
 					DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
 				retrySaveStatus:
 					DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.STALE_BASE_REJECTED,
-				title: 'Fresh-review retry save stale',
+				title: 'Fresh-review Save needs the latest post',
 				message:
-					'The server changed after fresh review was validated. Protected local changes are still exportable; refresh the server version before trying again.',
+					'The server changed after fresh review was validated. Protected local changes are still exportable; get the latest post before trying again.',
 				refetch: true,
 			},
 			{
@@ -3938,7 +7318,7 @@ describe( 'DistributedEditingStatusSurface', () => {
 				reasonCode: DISTRIBUTED_EDITING_REASON_CODES.REST_CANNOT_EDIT,
 				retrySaveStatus:
 					DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_PERMISSION_DENIED,
-				title: 'Fresh-review retry save needs permission',
+				title: 'Fresh-review Save needs permission',
 				message:
 					'Permission changed before the reviewed changes could be saved. Protected local changes are still exportable for another fresh review or a later retry.',
 			},
@@ -3949,7 +7329,7 @@ describe( 'DistributedEditingStatusSurface', () => {
 					DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_FEATURE_DISABLED,
 				retrySaveStatus:
 					DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_FEATURE_DISABLED,
-				title: 'Fresh-review retry save disabled',
+				title: 'Fresh-review Save disabled',
 				message:
 					'Distributed Editing was disabled before the reviewed changes could be saved. Protected local changes are still exportable for a later retry.',
 			},
@@ -3960,9 +7340,24 @@ describe( 'DistributedEditingStatusSurface', () => {
 					DISTRIBUTED_EDITING_REASON_CODES.REST_POST_INVALID_ID,
 				retrySaveStatus:
 					DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_ROUTE_MISMATCH,
-				title: 'Fresh-review retry save route changed',
+				title: 'Fresh-review Save route changed',
 				message:
-					'The reviewed retry-save request targeted a different editor route. Protected local changes are still exportable; reload only after exporting them.',
+					'The reviewed Save request targeted a different editor route. Protected local changes are still exportable; reload only after exporting them.',
+			},
+			{
+				disposition:
+					DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_UNFILTERED_HTML_REVIEW_REQUIRED,
+				reasonCode:
+					DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_UNFILTERED_HTML_WOULD_CHANGE_CONTENT,
+				retrySaveStatus:
+					DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_UNFILTERED_HTML_REVIEW_REQUIRED,
+				title: 'Fresh-review Save needs HTML review',
+				message:
+					'The authoritative post was not updated because the server still requires HTML review. Export a new review handoff, or get the latest post before deciding how to continue. Protected local changes remain exportable.',
+				nextStep:
+					'Export a new review handoff for someone with unfiltered HTML permission.',
+				nextStepAction: 'export_fresh_review_for_html_review',
+				refetch: true,
 			},
 			{
 				disposition:
@@ -3971,9 +7366,9 @@ describe( 'DistributedEditingStatusSurface', () => {
 					DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_SYNC_META_TAMPERED,
 				retrySaveStatus:
 					DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_SYNC_META_TAMPERED,
-				title: 'Fresh-review retry save proof rejected',
+				title: 'Fresh-review Save proof rejected',
 				message:
-					'The server rejected the reviewed retry-save proof before saving. Protected local changes are still exportable for a new review; no normal save fallback was used.',
+					'WordPress rejected the reviewed Save proof before saving. Protected local changes are still exportable for a new review; no normal save fallback was used.',
 			},
 			{
 				disposition:
@@ -3982,9 +7377,9 @@ describe( 'DistributedEditingStatusSurface', () => {
 					DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_MALFORMED_SYNC_PAYLOAD,
 				retrySaveStatus:
 					DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_MALFORMED_SYNC_PAYLOAD,
-				title: 'Fresh-review retry save payload rejected',
+				title: 'Fresh-review Save payload rejected',
 				message:
-					'The reviewed retry-save payload was incomplete or malformed. Protected local changes are still exportable for a new review before trying again.',
+					'The reviewed Save payload was incomplete or malformed. Protected local changes are still exportable for a new review before trying again.',
 			},
 		];
 		const onAction = jest.fn();
@@ -4048,10 +7443,24 @@ describe( 'DistributedEditingStatusSurface', () => {
 			).not.toBeInTheDocument();
 		}
 
+		for ( const statusCase of cases.filter( ( item ) => item.nextStep ) ) {
+			rerender( renderStatus( statusCase ) );
+			expect( screen.getByText( 'Next step:' ) ).toBeVisible();
+			expect( screen.getByText( statusCase.nextStep ) ).toBeVisible();
+			const freshReviewStatusItem = screen
+				.getByText( statusCase.title )
+				// eslint-disable-next-line testing-library/no-node-access
+				.closest( '[data-distributed-editing-next-step]' );
+			expect( freshReviewStatusItem ).toHaveAttribute(
+				'data-distributed-editing-next-step',
+				statusCase.nextStepAction
+			);
+		}
+
 		rerender( renderStatus( cases[ 0 ] ) );
 		expect(
 			screen.getAllByRole( 'button', {
-				name: 'Refresh server version',
+				name: 'Get latest post',
 			} ).length
 		).toBeGreaterThan( 0 );
 	} );
@@ -4101,7 +7510,7 @@ describe( 'DistributedEditingStatusSurface', () => {
 		).toBeVisible();
 		expect(
 			screen.getByText(
-				'This fresh-review decision was already used by a server retry save. Protected local changes remain exportable; request a new fresh review or refresh the server version before continuing.'
+				'This fresh-review decision was already used by WordPress Save. Protected local changes remain exportable; request a new fresh review or get the latest post before continuing.'
 			)
 		).toBeVisible();
 
@@ -4137,7 +7546,7 @@ describe( 'DistributedEditingStatusSurface', () => {
 		).toBeVisible();
 		expect(
 			screen.getByRole( 'button', {
-				name: 'Refresh server version',
+				name: 'Get latest post',
 			} )
 		).toBeVisible();
 		expect(
@@ -4202,13 +7611,17 @@ describe( 'DistributedEditingStatusSurface', () => {
 					{
 						id: 'fresh-approve',
 						blockClientId: 'fresh-approve-client',
-						blockLabel: 'Approve HTML change',
+						blockName: 'core/paragraph',
+						blockLabel: 'Approve paragraph change',
 						baseContentHash:
 							'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
 						proposedContentHash:
 							'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb',
-						rawBlockContent:
-							'<script>fresh-approve-raw-content</script>',
+						baseSerializedBlock:
+							'<!-- wp:paragraph --><p>Base review paragraph.</p><!-- /wp:paragraph -->',
+						proposedSerializedBlock:
+							'<!-- wp:paragraph --><p>Approved review paragraph.</p><!-- /wp:paragraph -->',
+						privacyClass: 'synthetic-content',
 					},
 					{
 						id: 'fresh-reject',
@@ -4235,15 +7648,15 @@ describe( 'DistributedEditingStatusSurface', () => {
 		expect( screen.getByText( 'Fresh review decisions' ) ).toBeVisible();
 		expect(
 			screen.getByText(
-				'Fresh-review guarded save confirmation was recorded; use save-authority evidence to confirm persistence. Recorded 4 redacted transcript events; 2 unsafe entries were dropped. This transcript is diagnostic only; save authority evidence is still required before treating these changes as saved.'
+				'Fresh-review Save confirmation was recorded; use WordPress save-authority evidence to confirm persistence. Recorded 4 redacted transcript events; 2 unsafe entries were dropped. This transcript is diagnostic only; save authority evidence is still required before treating these changes as saved.'
 			)
 		).toBeVisible();
 		expect( screen.getByText( 'Awaiting review' ) ).toBeVisible();
-		expect( screen.getByText( 'Approve HTML change' ) ).toBeVisible();
+		expect( screen.getByText( 'Approve paragraph change' ) ).toBeVisible();
 		expect( screen.getByText( 'Reject HTML change' ) ).toBeVisible();
 		expect(
 			screen.getAllByText(
-				'Activity context: Fresh-review guarded save confirmed; 4 redacted transcript events, 2 unsafe entries dropped. Diagnostic only; save-authority evidence is still required.'
+				'Activity context: Fresh-review Save confirmed; 4 redacted transcript events, 2 unsafe entries dropped. Diagnostic only; save-authority evidence is still required.'
 			)
 		).toHaveLength( 2 );
 		expect( screen.getAllByText( 'Jump target identified.' ) ).toHaveLength(
@@ -4251,11 +7664,19 @@ describe( 'DistributedEditingStatusSurface', () => {
 		);
 		expect(
 			screen.getAllByText( 'Compare evidence available.' )
-		).toHaveLength( 2 );
+		).toHaveLength( 1 );
+		expect(
+			screen.getAllByText( 'Read-only comparison available.' )
+		).toHaveLength( 1 );
+		expect(
+			screen.getAllByText(
+				'Read-only comparison unavailable for this review item.'
+			)
+		).toHaveLength( 1 );
 
 		await user.click(
 			screen.getByRole( 'button', {
-				name: 'Inspect jump target for Approve HTML change',
+				name: 'Inspect jump target for Approve paragraph change',
 			} )
 		);
 
@@ -4270,7 +7691,7 @@ describe( 'DistributedEditingStatusSurface', () => {
 
 		await user.click(
 			screen.getByRole( 'button', {
-				name: 'Inspect compare evidence for Approve HTML change',
+				name: 'Inspect compare evidence for Approve paragraph change',
 			} )
 		);
 
@@ -4279,13 +7700,29 @@ describe( 'DistributedEditingStatusSurface', () => {
 		).not.toHaveBeenCalled();
 		expect(
 			screen.getByText(
-				'Compare evidence checked. The editor found hash evidence for this review item; no comparison was opened, no content changed, and no save was made.'
+				'Read-only comparison opened. The editor shows safe base and proposed block text below; no content changed, no save was made, and no server request was sent.'
 			)
 		).toBeVisible();
+		expect(
+			screen.getByRole( 'group', {
+				name: 'Distributed editing fresh review comparison for Approve paragraph change',
+			} )
+		).toHaveAttribute(
+			'data-distributed-editing-fresh-review-comparison-surface-read-only',
+			'true'
+		);
+		expect( screen.getByText( /Base review paragraph/ ) ).toBeVisible();
+		expect( screen.getByText( /Approved review paragraph/ ) ).toBeVisible();
 
 		await user.click(
 			screen.getByRole( 'button', {
-				name: 'Approve Approve HTML change',
+				name: 'Back to review',
+			} )
+		);
+
+		await user.click(
+			screen.getByRole( 'button', {
+				name: 'Approve Approve paragraph change',
 			} )
 		);
 		await user.click(
@@ -4523,7 +7960,7 @@ describe( 'DistributedEditingStatusSurface', () => {
 		expect( screen.getByText( 'Changes pending' ) ).toBeVisible();
 		expect(
 			screen.getByText(
-				'Retry submit is ready for the guarded save path. Local changes remain pending until that save finishes.'
+				'Save is prepared for WordPress. Local changes remain pending until Save finishes.'
 			)
 		).toBeVisible();
 		expect( screen.queryByText( /saved/i ) ).not.toBeInTheDocument();
@@ -4549,10 +7986,10 @@ describe( 'DistributedEditingStatusSurface', () => {
 			/>
 		);
 
-		expect( screen.getByText( 'Retry save in progress' ) ).toBeVisible();
+		expect( screen.getByText( 'Saving to WordPress' ) ).toBeVisible();
 		expect(
 			screen.getByText(
-				'The editor is sending rebased changes through the guarded retry-save path. Keep this tab open; protected local changes remain exportable until the server confirms the save.'
+				'The editor is sending the prepared changes to WordPress. Keep this tab open; protected local changes remain exportable until WordPress confirms the save.'
 			)
 		).toBeVisible();
 
@@ -4562,10 +7999,10 @@ describe( 'DistributedEditingStatusSurface', () => {
 			/>
 		);
 
-		expect( screen.getByText( 'Retry save confirmed' ) ).toBeVisible();
+		expect( screen.getByText( 'Save confirmed' ) ).toBeVisible();
 		expect(
 			screen.getByText(
-				'Server confirmed the guarded retry-save. Protected local changes are no longer pending for this save.'
+				'WordPress saved the prepared changes. Protected local changes are no longer pending for this save.'
 			)
 		).toBeVisible();
 	} );
@@ -4605,10 +8042,12 @@ describe( 'DistributedEditingStatusSurface', () => {
 			/>
 		);
 
-		expect( screen.getAllByText( 'Retry save stale' ) ).toHaveLength( 2 );
+		expect(
+			screen.getAllByText( 'Save needs the latest post' )
+		).toHaveLength( 2 );
 		expect(
 			screen.getAllByText(
-				'The server changed again before this retry save finished. Protected local changes are still exportable; refresh the server version before trying again.'
+				'The post changed again before Save finished. Protected local changes are still exportable; get the latest post before trying again.'
 			)
 		).toHaveLength( 2 );
 
@@ -4618,10 +8057,10 @@ describe( 'DistributedEditingStatusSurface', () => {
 			/>
 		);
 
-		expect( screen.getByText( 'Retry save proof rejected' ) ).toBeVisible();
+		expect( screen.getByText( 'Save proof rejected' ) ).toBeVisible();
 		expect(
 			screen.getByText(
-				'The server rejected the retry-save proof because the sync metadata or proof flags changed unexpectedly. Protected local changes are still exportable; export them before continuing.'
+				'WordPress rejected the Save proof because the sync metadata or proof flags changed unexpectedly. Protected local changes are still exportable; export them before continuing.'
 			)
 		).toBeVisible();
 	} );
@@ -4634,9 +8073,9 @@ describe( 'DistributedEditingStatusSurface', () => {
 				reasonCode: DISTRIBUTED_EDITING_REASON_CODES.REST_CANNOT_EDIT,
 				retrySaveStatus:
 					DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_PERMISSION_DENIED,
-				title: 'Retry save permission changed',
+				title: 'Save permission changed',
 				message:
-					'Editing permission changed before the retry save finished. Protected local changes are still exportable; ask for access before retrying.',
+					'Editing permission changed before Save finished. Protected local changes are still exportable; ask for access before trying again.',
 			},
 			{
 				disposition:
@@ -4645,7 +8084,7 @@ describe( 'DistributedEditingStatusSurface', () => {
 					DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_REVIEW_APPROVAL_REQUIRES_UNFILTERED_HTML,
 				retrySaveStatus:
 					DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_PERMISSION_DENIED,
-				title: 'Retry save needs HTML permission',
+				title: 'Save needs HTML permission',
 				message:
 					'The HTML review proof was accepted, but this account cannot perform the final HTML-capable save. Protected local changes and the hash-only review proof remain exportable for someone with unfiltered HTML permission.',
 			},
@@ -4656,9 +8095,9 @@ describe( 'DistributedEditingStatusSurface', () => {
 					DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_FEATURE_DISABLED,
 				retrySaveStatus:
 					DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_FEATURE_DISABLED,
-				title: 'Retry save disabled',
+				title: 'Save disabled',
 				message:
-					'Distributed Editing was disabled before the retry save finished. Protected local changes are still exportable; retry after Distributed Editing is enabled.',
+					'Distributed Editing was disabled before Save finished. Protected local changes are still exportable; try again after Distributed Editing is enabled.',
 			},
 			{
 				disposition:
@@ -4667,9 +8106,9 @@ describe( 'DistributedEditingStatusSurface', () => {
 					DISTRIBUTED_EDITING_REASON_CODES.REST_POST_INVALID_ID,
 				retrySaveStatus:
 					DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_ROUTE_MISMATCH,
-				title: 'Retry save route changed',
+				title: 'Save route changed',
 				message:
-					'The retry-save request targeted a different editor route. Protected local changes are still exportable; reload the editor only after exporting them.',
+					'The Save request targeted a different editor route. Protected local changes are still exportable; reload the editor only after exporting them.',
 			},
 			{
 				disposition:
@@ -4678,9 +8117,9 @@ describe( 'DistributedEditingStatusSurface', () => {
 					DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_MALFORMED_SYNC_PAYLOAD,
 				retrySaveStatus:
 					DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_MALFORMED_SYNC_PAYLOAD,
-				title: 'Retry save payload rejected',
+				title: 'Save payload rejected',
 				message:
-					'The retry-save payload was incomplete or malformed. Protected local changes are still exportable; export them before trying again.',
+					'The Save payload was incomplete or malformed. Protected local changes are still exportable; export them before trying again.',
 			},
 			{
 				disposition:
@@ -4693,7 +8132,7 @@ describe( 'DistributedEditingStatusSurface', () => {
 					DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_MALFORMED_SYNC_PAYLOAD,
 				title: 'Reviewed changes token unavailable',
 				message:
-					'The imported reviewed-changes token could not be found in server storage and is no longer usable for retry save. No server save was made. Export a fresh-review handoff for an admin reviewer; protected local changes remain exportable.',
+					'The imported reviewed-changes token could not be found in server storage and is no longer usable for Save. No server save was made. Export a fresh-review handoff for an admin reviewer; protected local changes remain exportable.',
 				exportLabel: 'Export for fresh review',
 			},
 			{
@@ -4707,7 +8146,7 @@ describe( 'DistributedEditingStatusSurface', () => {
 					DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_SYNC_META_TAMPERED,
 				title: 'Reviewed changes token expired',
 				message:
-					'The imported reviewed-changes token has expired and is no longer usable for retry save. No server save was made. Export a fresh-review handoff for an admin reviewer; protected local changes remain exportable.',
+					'The imported reviewed-changes token has expired and is no longer usable for Save. No server save was made. Export a fresh-review handoff for an admin reviewer; protected local changes remain exportable.',
 				exportLabel: 'Export for fresh review',
 			},
 			{
@@ -4719,8 +8158,11 @@ describe( 'DistributedEditingStatusSurface', () => {
 					DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_UNFILTERED_HTML_REVIEW_REQUIRED,
 				title: 'HTML review required before Save',
 				message:
-					'Save did not update the authoritative post because these changes may alter unfiltered HTML. Export them for review by someone with unfiltered HTML permission, or refresh the server version before deciding how to continue. Protected local changes remain exportable.',
+					'Save did not update the authoritative post because these changes may alter unfiltered HTML. Export them for review by someone with unfiltered HTML permission, or get the latest post before deciding how to continue. Protected local changes remain exportable.',
 				exportLabel: 'Export changes for review',
+				nextStep:
+					'Export changes for review by someone with unfiltered HTML permission.',
+				nextStepAction: 'export_for_html_review',
 				refetch: true,
 			},
 		];
@@ -4755,44 +8197,69 @@ describe( 'DistributedEditingStatusSurface', () => {
 			).toBeVisible();
 		}
 
+		for ( const statusCase of cases.filter( ( item ) => item.nextStep ) ) {
+			rerender( renderStatus( statusCase ) );
+			expect( screen.getByText( 'Next step:' ) ).toBeVisible();
+			expect( screen.getByText( statusCase.nextStep ) ).toBeVisible();
+			const retrySaveReviewStatusItem = screen
+				.getByText( statusCase.title )
+				// eslint-disable-next-line testing-library/no-node-access
+				.closest( '[data-distributed-editing-next-step]' );
+			expect( retrySaveReviewStatusItem ).toHaveAttribute(
+				'data-distributed-editing-next-step',
+				statusCase.nextStepAction
+			);
+		}
+
 		rerender(
 			renderStatus( cases.find( ( statusCase ) => statusCase.refetch ) )
 		);
-		expect( screen.getByText( 'Refresh server version' ) ).toBeVisible();
+		expect( screen.getByText( 'Get latest post' ) ).toBeVisible();
 	} );
 
 	it( 'renders blocked retry-save handoff copy and actions', () => {
 		const cases = [
 			{
 				reason: DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.RETRY_SUBMIT_PROOF_NOT_ACCEPTED,
-				title: 'Retry save needs accepted proof',
+				title: 'Save needs accepted proof',
 				message:
-					'The editor could not verify accepted retry-save proof for this save. Protected local changes are still exportable; retry after the proof is ready.',
+					'The editor could not verify accepted Save proof for this save. Protected local changes are still exportable; try again after the proof is ready.',
+				nextStep:
+					'Try Save again after WordPress accepts the Save proof.',
+				nextStepAction: 'wait_for_save_proof',
 			},
 			{
 				reason: DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.SERVER_STATE_REFETCH_REQUIRED,
-				title: 'Retry save needs server refresh',
+				title: 'Save needs the latest post',
 				message:
-					'The server state must be refreshed before retry-save can continue. Protected local changes are still exportable; refreshing only fetches server state and does not save over local changes.',
+					'The latest post must be loaded before Save can continue. Protected local changes are still exportable; loading the latest post does not save over local changes.',
+				nextStep: 'Get the latest post before trying Save again.',
+				nextStepAction: 'get_latest_post',
 				refetch: true,
 			},
 			{
 				reason: DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.MISSING_POST_ROUTE,
-				title: 'Retry save route unavailable',
+				title: 'Save route unavailable',
 				message:
-					'The editor could not identify the route for retry-save. Protected local changes are still exportable; reload the editor only after exporting them.',
+					'The editor could not identify the route for Save. Protected local changes are still exportable; reload the editor only after exporting them.',
+				nextStep: 'Export local changes, then reload the editor.',
+				nextStepAction: 'export_then_reload',
 			},
 			{
 				reason: DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.MISSING_PROPOSED_CONTENT,
-				title: 'Retry save content unavailable',
+				title: 'Save content unavailable',
 				message:
-					'The editor could not read the proposed post content for retry-save. Protected local changes are still exportable; export them before trying again.',
+					'The editor could not read the proposed post content for Save. Protected local changes are still exportable; export them before trying again.',
+				nextStep: 'Export local changes, then try Save again.',
+				nextStepAction: 'export_then_save',
 			},
 			{
 				reason: DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.RETRY_SAVE_IN_PROGRESS,
-				title: 'Retry save already in progress',
+				title: 'Save already in progress',
 				message:
-					'A retry save is already waiting for server confirmation. Protected local changes remain exportable; keep this tab open until it finishes.',
+					'Save is already waiting for WordPress confirmation. Protected local changes remain exportable; keep this tab open until it finishes.',
+				nextStep: 'Keep this tab open until WordPress confirms Save.',
+				nextStepAction: 'keep_tab_open',
 				retrySaveStatus: DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVING,
 			},
 		];
@@ -4823,11 +8290,21 @@ describe( 'DistributedEditingStatusSurface', () => {
 			rerender( renderStatus( statusCase ) );
 			expect( screen.getByText( statusCase.title ) ).toBeVisible();
 			expect( screen.getByText( statusCase.message ) ).toBeVisible();
+			expect( screen.getByText( 'Next step:' ) ).toBeVisible();
+			expect( screen.getByText( statusCase.nextStep ) ).toBeVisible();
+			const blockedHandoffStatusItem = screen
+				.getByText( statusCase.title )
+				// eslint-disable-next-line testing-library/no-node-access
+				.closest( '[data-distributed-editing-next-step]' );
+			expect( blockedHandoffStatusItem ).toHaveAttribute(
+				'data-distributed-editing-next-step',
+				statusCase.nextStepAction
+			);
 			expect( screen.getByText( 'Export local changes' ) ).toBeVisible();
 		}
 
 		rerender( renderStatus( cases[ 1 ] ) );
-		expect( screen.getByText( 'Refresh server version' ) ).toBeVisible();
+		expect( screen.getByText( 'Get latest post' ) ).toBeVisible();
 	} );
 
 	it( 'renders stale retry-submit proof after prepared handoff', () => {
@@ -4853,10 +8330,10 @@ describe( 'DistributedEditingStatusSurface', () => {
 			/>
 		);
 
-		expect( screen.getByText( 'Retry submit stale' ) ).toBeVisible();
+		expect( screen.getByText( 'Save check is stale' ) ).toBeVisible();
 		expect(
 			screen.getByText(
-				'The server changed after retry submit was prepared. Protected local changes remain exportable; refresh the server version before continuing.'
+				'The post changed after Save was checked. Protected local changes remain exportable; get the latest post before continuing.'
 			)
 		).toBeVisible();
 	} );

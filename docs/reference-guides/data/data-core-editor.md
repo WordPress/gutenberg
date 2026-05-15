@@ -394,6 +394,42 @@ _Returns_
 
 -   `Array`: Notice descriptors.
 
+### getDistributedEditingPresenceRepeatedRefreshRuntimeState
+
+Returns inert repeated presence cadence runtime state for the current post.
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+
+_Returns_
+
+-   `Object`: Repeated presence cadence runtime state.
+
+### getDistributedEditingPresenceRosterState
+
+Returns inert editor-presence roster state for the current post.
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+
+_Returns_
+
+-   `Object`: Presence roster state.
+
+### getDistributedEditingPresenceStartupPolicyState
+
+Returns inert initial-presence startup policy state for the current post.
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+
+_Returns_
+
+-   `Object`: Initial-presence startup policy state.
+
 ### getDistributedEditingRetrySaveFlowState
 
 Returns a side-effect-free DE-RTC retry-save flow summary for status or demo consumers.

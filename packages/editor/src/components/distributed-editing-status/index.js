@@ -3,7 +3,7 @@
  */
 import { Button, Notice, TextareaControl } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useCallback, useState } from '@wordpress/element';
+import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
 import { __, _n, sprintf } from '@wordpress/i18n';
 
 /**
@@ -24,6 +24,10 @@ import {
 	DISTRIBUTED_EDITING_LOCAL_UPDATES_REVIEW_REQUEST_STATUSES,
 	DISTRIBUTED_EDITING_NOTICE_ACTIONS,
 	DISTRIBUTED_EDITING_NOTICE_KINDS,
+	DISTRIBUTED_EDITING_PRESENCE_HEARTBEAT_STATUSES,
+	DISTRIBUTED_EDITING_PRESENCE_REPEATED_REFRESH_RUNTIME_STATUSES,
+	DISTRIBUTED_EDITING_PRESENCE_ROSTER_STATUSES,
+	DISTRIBUTED_EDITING_PRESENCE_STARTUP_POLICY_STATUSES,
 	DISTRIBUTED_EDITING_REASON_CODES,
 	DISTRIBUTED_EDITING_REVIEW_TOKEN_RECOVERY_STATUSES,
 	DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_STATUSES,
@@ -37,6 +41,9 @@ import {
 	getDistributedEditingFreshReviewDecisionStateForSessionState,
 	getDistributedEditingFreshReviewPreSaveStateForSessionState,
 	getDistributedEditingLocalUpdatesExportPayload,
+	getDistributedEditingPresenceRepeatedRefreshRuntimeStateForSessionState,
+	getDistributedEditingPresenceRosterStateForSessionState,
+	getDistributedEditingPresenceStartupPolicyStateForSessionState,
 	getDistributedEditingSavePolicyStateForSessionState,
 	normalizeDistributedEditingSessionState,
 } from '../../store/distributed-editing';
@@ -47,6 +54,8 @@ const DISTRIBUTED_EDITING_OPAQUE_REVIEW_APPROVAL_PROOF_TOKEN_REJECTION_DETAILS =
 		UNKNOWN: 'unknown_retry_save_review_approval_proof_token',
 		EXPIRED: 'retry_save_review_approval_proof_token_expired',
 	} );
+
+const distributedEditingStartupHeartbeatRuntimeKeys = new Set();
 
 const DISTRIBUTED_EDITING_STATUS_CONTROL_STATE_DEFINITIONS = Object.freeze( {
 	idle: Object.freeze( {} ),
@@ -970,6 +979,8 @@ export function DistributedEditingFreshReviewDecisionPanel( {
 	forceVisible = false,
 } ) {
 	const [ commandStatus, setCommandStatus ] = useState( 'idle' );
+	const [ selectedComparisonItemId, setSelectedComparisonItemId ] =
+		useState( null );
 	const {
 		__experimentalResolveDistributedEditingFreshReviewDecisionItem,
 		__experimentalSubmitDistributedEditingFreshReviewDecision,
@@ -1035,12 +1046,21 @@ export function DistributedEditingFreshReviewDecisionPanel( {
 
 	function inspectCompareEvidence( reviewItem ) {
 		const compareAction = reviewItem?.compareAction;
+		const comparisonSurface = compareAction?.comparisonSurface;
+
+		if ( comparisonSurface?.canOpenComparisonSurface ) {
+			setSelectedComparisonItemId( reviewItem.id );
+			setCommandStatus( 'comparison-surface-open' );
+			return compareAction;
+		}
+
 		const nextCommandStatus =
 			compareAction?.commandStatus ||
 			( compareAction?.enabled
 				? 'compare-evidence-available'
 				: 'compare-evidence-unavailable' );
 
+		setSelectedComparisonItemId( null );
 		setCommandStatus( nextCommandStatus );
 		return compareAction;
 	}
@@ -1058,6 +1078,10 @@ export function DistributedEditingFreshReviewDecisionPanel( {
 		);
 		return result;
 	}
+	const selectedComparisonItem =
+		decisionState?.reviewItems?.find(
+			( item ) => item.id === selectedComparisonItemId
+		) || null;
 
 	return (
 		<div
@@ -1207,7 +1231,7 @@ export function DistributedEditingFreshReviewDecisionPanel( {
 										}
 										variant="tertiary"
 									>
-										{ __( 'Compare evidence' ) }
+										{ __( 'Compare' ) }
 									</Button>
 								) }
 								<Button
@@ -1238,6 +1262,13 @@ export function DistributedEditingFreshReviewDecisionPanel( {
 					) }
 				</p>
 			) }
+			<DistributedEditingFreshReviewComparisonSurface
+				onBack={ () => {
+					setSelectedComparisonItemId( null );
+					setCommandStatus( 'comparison-surface-closed' );
+				} }
+				reviewItem={ selectedComparisonItem }
+			/>
 			<Button
 				__next40pxDefaultSize
 				accessibleWhenDisabled
@@ -1386,10 +1417,14 @@ export function DistributedEditingStatusSurface( {
 			{ statusItems.map( ( item ) => {
 				const freshReviewAuthorityStatus =
 					getFreshReviewAuthorityStatusProps( item );
+				const nextStepMessage = item.nextStepMessage;
 				const actionTranscriptReportMessage =
 					getActionTranscriptSupportReportMessage(
-						item.localUpdatesImportActionTranscriptReport
+						item.actionTranscriptSupportReport ||
+							item.localUpdatesImportActionTranscriptReport
 					);
+				const actionTranscriptSupportReport =
+					item.actionTranscriptSupportReport;
 
 				return (
 					<div
@@ -1436,6 +1471,18 @@ export function DistributedEditingStatusSurface( {
 						data-distributed-editing-transcript-redacted={ formatDataBoolean(
 							item.actionTranscriptEntriesRedacted
 						) }
+						data-distributed-editing-transcript-support-report={ formatDataBoolean(
+							actionTranscriptSupportReport?.available
+						) }
+						data-distributed-editing-transcript-support-shareable={ formatDataBoolean(
+							actionTranscriptSupportReport?.canShareWithSupport
+						) }
+						data-distributed-editing-transcript-support-save-authority-required={ formatDataBoolean(
+							actionTranscriptSupportReport?.requiresSaveAuthorityForPersistence
+						) }
+						data-distributed-editing-next-step={
+							item.nextStepAction || undefined
+						}
 					>
 						<Notice
 							className="editor-distributed-editing-status__notice"
@@ -1445,11 +1492,20 @@ export function DistributedEditingStatusSurface( {
 						>
 							<strong>{ item.title }</strong>
 							<div>{ item.message }</div>
+							{ nextStepMessage && (
+								<div className="editor-distributed-editing-status__next-step">
+									<strong>{ __( 'Next step:' ) }</strong>{ ' ' }
+									{ nextStepMessage }
+								</div>
+							) }
 							{ actionTranscriptReportMessage && (
 								<div className="editor-distributed-editing-status__support-report">
 									{ actionTranscriptReportMessage }
 								</div>
 							) }
+							<ActionTranscriptSupportTimeline
+								report={ actionTranscriptSupportReport }
+							/>
 							<FreshReviewAuthorityStatus
 								status={ freshReviewAuthorityStatus }
 							/>
@@ -1562,7 +1618,7 @@ export default function DistributedEditingStatus( {
 						setActionStatus( {
 							status: 'info',
 							message: __(
-								'Retry submit prepared. Request server proof when ready.'
+								'Local changes staged. Check save safety before saving.'
 							),
 						} );
 						return prepareResult;
@@ -1573,7 +1629,7 @@ export default function DistributedEditingStatus( {
 						setActionStatus( {
 							status: 'info',
 							message: __(
-								'Guarded save path prepared. Save again to submit through the retry path.'
+								'Save prepared. Use Save to send these changes to WordPress.'
 							),
 						} );
 						return prepareSaveResult;
@@ -1584,7 +1640,7 @@ export default function DistributedEditingStatus( {
 						setActionStatus( {
 							status: 'info',
 							message: __(
-								'Retry submit proof refreshed. Save again to continue through the guarded retry path.'
+								'Save safety checked. Use Save to continue.'
 							),
 						} );
 						return proofResult;
@@ -1605,7 +1661,7 @@ export default function DistributedEditingStatus( {
 							setActionStatus( {
 								status: 'info',
 								message: __(
-									'Local changes retried over the refreshed server version.'
+									'Local changes applied to the latest post.'
 								),
 							} );
 							return rebaseResult;
@@ -1615,7 +1671,9 @@ export default function DistributedEditingStatus( {
 							await __experimentalPlanDistributedEditingLocalRebaseAfterStaleBase?.();
 						setActionStatus( {
 							status: 'info',
-							message: __( 'Local rebase readiness refreshed.' ),
+							message: __(
+								'Checked whether local changes can be applied.'
+							),
 						} );
 						return planResult;
 					}
@@ -1693,23 +1751,23 @@ function getActionErrorMessage( actionKey ) {
 			);
 		case DISTRIBUTED_EDITING_NOTICE_ACTIONS.PREPARE_RETRY_SUBMIT:
 			return __(
-				'Retry submit could not be prepared. Local changes remain protected.'
+				'Local changes could not be staged. They remain protected.'
 			);
 		case DISTRIBUTED_EDITING_NOTICE_ACTIONS.PREPARE_RETRY_SUBMIT_SAVE:
 			return __(
-				'Guarded save path could not be prepared. Local changes remain protected.'
+				'Save could not be prepared. Local changes remain protected.'
 			);
 		case DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFRESH_RETRY_SUBMIT_PROOF:
 			return __(
-				'Retry submit proof could not be refreshed. Local changes remain protected.'
+				'Save safety could not be checked. Local changes remain protected.'
 			);
 		case DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFETCH_SERVER_STATE:
 			return __(
-				'Server version could not be refreshed. Protected local changes remain in this editor session and can still be exported; keep this tab open before trying again.'
+				'Latest post could not be loaded. Protected local changes remain in this editor session and can still be exported; keep this tab open before trying again.'
 			);
 		case DISTRIBUTED_EDITING_NOTICE_ACTIONS.REBASE_LOCAL_UPDATES:
 			return __(
-				'Local changes could not be retried. They remain protected in this editor session.'
+				'Local changes could not be applied to the latest post. They remain protected in this editor session.'
 			);
 		case DISTRIBUTED_EDITING_NOTICE_ACTIONS.REQUEST_FRESH_REVIEW:
 			return __(
@@ -1789,6 +1847,18 @@ function getFreshReviewDecisionCommandMessage( commandStatus ) {
 		);
 	}
 
+	if ( commandStatus === 'comparison-surface-open' ) {
+		return __(
+			'Read-only comparison opened. The editor shows safe base and proposed block text below; no content changed, no save was made, and no server request was sent.'
+		);
+	}
+
+	if ( commandStatus === 'comparison-surface-closed' ) {
+		return __(
+			'Read-only comparison closed. The fresh-review decision remains local and no save was made.'
+		);
+	}
+
 	return __(
 		'Fresh-review decisions can be recorded after every hash-only item is approved or rejected.'
 	);
@@ -1801,6 +1871,12 @@ function getFreshReviewComparePlanTitle( comparePlan ) {
 }
 
 function getFreshReviewComparePlanMessage( comparePlan ) {
+	if ( comparePlan?.comparisonSurface?.canOpenComparisonSurface ) {
+		return __(
+			'A read-only comparison is available for this safe block item. It shows base and proposed text locally without saving, calling the server, or changing editor content.'
+		);
+	}
+
 	if ( comparePlan?.status === 'ready' ) {
 		return __(
 			'A future comparison can use base and proposed hash evidence for this review item. No comparison is open, no content is shown, and no save was made.'
@@ -2050,7 +2126,11 @@ export function DistributedEditingEnabledShell( {
 			data-distributed-editing-shell-placement={ placement }
 			role="region"
 		>
-			<Notice status="info" isDismissible={ false }>
+			<Notice
+				status="info"
+				isDismissible={ false }
+				spokenMessage={ __( 'Distributed Editing enabled' ) }
+			>
 				<strong>{ __( 'Distributed Editing enabled' ) }</strong>
 				<div>{ shellState.message }</div>
 				<div className="editor-distributed-editing-status__enabled-shell-save-state">
@@ -2061,9 +2141,1629 @@ export function DistributedEditingEnabledShell( {
 					<strong>{ __( 'WordPress post' ) }</strong>
 					<div>{ shellState.authorityStatusText }</div>
 				</div>
+				<DistributedEditingPresenceRoster
+					initialPresenceRoster={
+						editorSettings.distributedEditing?.initialPresenceRoster
+					}
+					presenceStorageReadiness={
+						editorSettings.distributedEditing
+							?.presenceStorageReadiness
+					}
+					sessionState={ sessionState }
+				/>
 			</Notice>
 		</div>
 	);
+}
+
+function DistributedEditingPresenceRoster( {
+	initialPresenceRoster,
+	presenceStorageReadiness,
+	sessionState = {},
+} ) {
+	const distributedEditingDispatch = useDispatch( editorStore ) || {};
+	const {
+		__experimentalRefreshDistributedEditingPresenceSnapshot,
+		__experimentalRefreshDistributedEditingPresenceStorageReadiness,
+		__experimentalSendDistributedEditingPresenceHeartbeat,
+	} = distributedEditingDispatch;
+	const [ commandStatus, setCommandStatus ] = useState( 'idle' );
+	const [ heartbeatCommandStatus, setHeartbeatCommandStatus ] =
+		useState( 'idle' );
+	const [
+		repeatedRefreshSchedulerStatus,
+		setRepeatedRefreshSchedulerStatus,
+	] = useState( 'idle' );
+	const [
+		repeatedRefreshSchedulerTickCount,
+		setRepeatedRefreshSchedulerTickCount,
+	] = useState( 0 );
+	const [ startupHeartbeatRuntimeStatus, setStartupHeartbeatRuntimeStatus ] =
+		useState( 'idle' );
+	const [
+		presenceStorageSetupNavigationStatus,
+		setPresenceStorageSetupNavigationStatus,
+	] = useState( 'idle' );
+	const [
+		presenceStorageReadinessRecheckStatus,
+		setPresenceStorageReadinessRecheckStatus,
+	] = useState( 'idle' );
+	const [
+		presenceStorageReadinessRecheckResult,
+		setPresenceStorageReadinessRecheckResult,
+	] = useState( null );
+	const repeatedRefreshSchedulerTokenRef = useRef( null );
+	const startupHeartbeatRuntimeKeyRef = useRef( null );
+	const startupHeartbeatRuntimeSentRef = useRef( false );
+	const handleOpenPresenceStorageSetup = useCallback( () => {
+		setPresenceStorageSetupNavigationStatus( 'settings_opened' );
+	}, [] );
+	const handleRefreshPresence = useCallback( async () => {
+		if ( ! __experimentalRefreshDistributedEditingPresenceSnapshot ) {
+			setCommandStatus( 'failed' );
+			return;
+		}
+
+		setCommandStatus( 'refreshing' );
+
+		try {
+			await __experimentalRefreshDistributedEditingPresenceSnapshot();
+			setCommandStatus( 'refreshed' );
+		} catch {
+			setCommandStatus( 'failed' );
+		}
+	}, [ __experimentalRefreshDistributedEditingPresenceSnapshot ] );
+	const handleSendPresenceHeartbeat = useCallback( async () => {
+		if ( ! __experimentalSendDistributedEditingPresenceHeartbeat ) {
+			setHeartbeatCommandStatus( 'failed' );
+			return;
+		}
+
+		setHeartbeatCommandStatus( 'sending' );
+
+		try {
+			await __experimentalSendDistributedEditingPresenceHeartbeat();
+			setHeartbeatCommandStatus( 'sent' );
+		} catch ( error ) {
+			setHeartbeatCommandStatus(
+				error?.code ===
+					DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_PRESENCE_STORAGE_UNAVAILABLE
+					? 'degraded'
+					: 'failed'
+			);
+		}
+	}, [ __experimentalSendDistributedEditingPresenceHeartbeat ] );
+	const handleRecheckPresenceStorageReadiness = useCallback( async () => {
+		if (
+			! __experimentalRefreshDistributedEditingPresenceStorageReadiness
+		) {
+			setPresenceStorageReadinessRecheckStatus( 'failed' );
+			return;
+		}
+
+		setPresenceStorageReadinessRecheckStatus( 'checking' );
+
+		try {
+			const response =
+				await __experimentalRefreshDistributedEditingPresenceStorageReadiness();
+			const nextStatus = [
+				'ready',
+				'setup_required',
+				'upgrade_required',
+			].includes( response?.status )
+				? response.status
+				: 'checked';
+
+			setPresenceStorageReadinessRecheckResult( response );
+			setPresenceStorageReadinessRecheckStatus( nextStatus );
+		} catch ( error ) {
+			if (
+				error?.code ===
+				DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_FEATURE_DISABLED
+			) {
+				setPresenceStorageReadinessRecheckStatus( 'feature_disabled' );
+			} else if (
+				error?.code ===
+					DISTRIBUTED_EDITING_REASON_CODES.REST_CANNOT_EDIT ||
+				error?.code === 'rest_cannot_edit'
+			) {
+				setPresenceStorageReadinessRecheckStatus( 'permission_denied' );
+			} else if (
+				error?.code ===
+					DISTRIBUTED_EDITING_REASON_CODES.REST_POST_INVALID_ID ||
+				error?.code === 'rest_post_invalid_id'
+			) {
+				setPresenceStorageReadinessRecheckStatus( 'route_mismatch' );
+			} else {
+				setPresenceStorageReadinessRecheckStatus( 'failed' );
+			}
+		}
+	}, [ __experimentalRefreshDistributedEditingPresenceStorageReadiness ] );
+	const sessionPresenceStatus =
+		sessionState.presenceRosterStatus ||
+		DISTRIBUTED_EDITING_PRESENCE_ROSTER_STATUSES.HIDDEN;
+	const presenceHeartbeatStatus =
+		sessionState.presenceHeartbeatStatus ||
+		DISTRIBUTED_EDITING_PRESENCE_HEARTBEAT_STATUSES.NONE;
+	const hasSessionPresence =
+		sessionState.presenceRosterEntries?.length > 0 ||
+		sessionPresenceStatus !==
+			DISTRIBUTED_EDITING_PRESENCE_ROSTER_STATUSES.HIDDEN;
+	const rosterInput = hasSessionPresence
+		? sessionState
+		: {
+				distributedEditingPresenceRoster: initialPresenceRoster,
+				presenceRosterStatus:
+					DISTRIBUTED_EDITING_PRESENCE_ROSTER_STATUSES.EMPTY,
+		  };
+	const rosterState =
+		getDistributedEditingPresenceRosterStateForSessionState( rosterInput );
+	const repeatedRefreshState =
+		getDistributedEditingPresenceRepeatedRefreshRuntimeStateForSessionState(
+			sessionState
+		);
+	const startupPolicyState =
+		getDistributedEditingPresenceStartupPolicyStateForSessionState(
+			sessionState
+		);
+	const activePresenceStorageReadiness =
+		presenceStorageReadinessRecheckResult ||
+		sessionState.presenceStorageReadinessRecheckResult ||
+		presenceStorageReadiness;
+	const presenceStorageReadinessState = getPresenceStorageReadinessState(
+		activePresenceStorageReadiness
+	);
+	const presenceStorageSetupAffordanceState =
+		getPresenceStorageSetupAffordanceState(
+			presenceStorageReadinessState,
+			presenceStorageSetupNavigationStatus
+		);
+	const presenceStorageReadinessRecheckState =
+		getPresenceStorageReadinessRecheckState(
+			presenceStorageReadinessRecheckStatus,
+			presenceStorageSetupAffordanceState
+		);
+	const repeatedRefreshDelayMs =
+		getPresenceRepeatedRefreshDelayMs( repeatedRefreshState );
+	const startupHeartbeatDelayMs =
+		getPresenceStartupHeartbeatDelayMs( startupPolicyState );
+	const storageReadyForStartupHeartbeat =
+		presenceStorageReadinessState.status === 'ready' &&
+		presenceStorageReadinessState.tableExists &&
+		presenceStorageReadinessState.schemaCurrent;
+	const shouldRunRepeatedRefreshScheduler =
+		repeatedRefreshState.status ===
+			DISTRIBUTED_EDITING_PRESENCE_REPEATED_REFRESH_RUNTIME_STATUSES.SCHEDULED &&
+		repeatedRefreshState.explicitOptIn &&
+		repeatedRefreshState.schedulesNextRefresh &&
+		repeatedRefreshDelayMs !== null &&
+		typeof __experimentalRefreshDistributedEditingPresenceSnapshot ===
+			'function';
+	const startupHeartbeatPolicyAllowsRuntime =
+		[
+			DISTRIBUTED_EDITING_PRESENCE_STARTUP_POLICY_STATUSES.AUTOMATIC_HEARTBEAT_ALLOWED,
+			DISTRIBUTED_EDITING_PRESENCE_STARTUP_POLICY_STATUSES.SLOW_AUTOMATIC_HEARTBEAT_ALLOWED,
+		].includes( startupPolicyState.status ) &&
+		startupPolicyState.maySendInitialHeartbeatAutomatically &&
+		startupHeartbeatDelayMs !== null &&
+		startupPolicyState.serverContact !== 'degraded' &&
+		typeof __experimentalSendDistributedEditingPresenceHeartbeat ===
+			'function';
+	const shouldRunStartupHeartbeatRuntime =
+		startupHeartbeatPolicyAllowsRuntime && storageReadyForStartupHeartbeat;
+	const startupHeartbeatRuntimeState =
+		getPresenceStartupHeartbeatRuntimeState( {
+			delayMs: startupHeartbeatDelayMs,
+			startupHeartbeatPolicyAllowsRuntime,
+			storageReadyForStartupHeartbeat,
+			shouldRunStartupHeartbeatRuntime,
+			status: startupHeartbeatRuntimeStatus,
+			startupPolicyState,
+		} );
+	const presenceFreshnessIndicator = getPresenceFreshnessIndicator( {
+		commandStatus,
+		heartbeatCommandStatus,
+		presenceStorageReadinessState,
+		repeatedRefreshDelayMs,
+		repeatedRefreshSchedulerStatus,
+		repeatedRefreshState,
+		rosterState,
+		startupHeartbeatRuntimeState,
+	} );
+
+	useEffect( () => {
+		if (
+			startupPolicyState.status ===
+				DISTRIBUTED_EDITING_PRESENCE_STARTUP_POLICY_STATUSES.PAUSED_DEGRADED_TRANSPORT ||
+			startupPolicyState.serverContact === 'degraded'
+		) {
+			startupHeartbeatRuntimeKeyRef.current = null;
+			startupHeartbeatRuntimeSentRef.current = false;
+			setStartupHeartbeatRuntimeStatus( 'paused' );
+			return;
+		}
+
+		if ( ! shouldRunStartupHeartbeatRuntime ) {
+			startupHeartbeatRuntimeKeyRef.current = null;
+			startupHeartbeatRuntimeSentRef.current = false;
+			setStartupHeartbeatRuntimeStatus( 'idle' );
+			return;
+		}
+
+		const runtimeKey = [
+			startupPolicyState.status,
+			startupPolicyState.hostProfile,
+			startupPolicyState.serverContact,
+			startupHeartbeatDelayMs,
+		].join( ':' );
+
+		if ( startupHeartbeatRuntimeKeyRef.current !== runtimeKey ) {
+			startupHeartbeatRuntimeKeyRef.current = runtimeKey;
+			startupHeartbeatRuntimeSentRef.current = false;
+		}
+
+		let isCancelled = false;
+		const timeoutId = globalThis.setTimeout( async () => {
+			if ( isCancelled ) {
+				return;
+			}
+
+			if ( startupHeartbeatRuntimeSentRef.current ) {
+				return;
+			}
+
+			if (
+				distributedEditingStartupHeartbeatRuntimeKeys.has( runtimeKey )
+			) {
+				return;
+			}
+
+			distributedEditingStartupHeartbeatRuntimeKeys.add( runtimeKey );
+			startupHeartbeatRuntimeSentRef.current = true;
+			setStartupHeartbeatRuntimeStatus( 'sending' );
+			setHeartbeatCommandStatus( 'sending' );
+
+			try {
+				await __experimentalSendDistributedEditingPresenceHeartbeat();
+
+				if ( ! isCancelled ) {
+					setHeartbeatCommandStatus( 'sent' );
+					setStartupHeartbeatRuntimeStatus( 'sent' );
+				}
+			} catch ( error ) {
+				const didDegrade =
+					error?.code ===
+					DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_PRESENCE_STORAGE_UNAVAILABLE;
+
+				if ( ! isCancelled ) {
+					setHeartbeatCommandStatus(
+						didDegrade ? 'degraded' : 'failed'
+					);
+					setStartupHeartbeatRuntimeStatus(
+						didDegrade ? 'degraded' : 'failed'
+					);
+				}
+			}
+		}, startupHeartbeatDelayMs );
+
+		setStartupHeartbeatRuntimeStatus( 'scheduled' );
+
+		return () => {
+			isCancelled = true;
+			globalThis.clearTimeout( timeoutId );
+		};
+	}, [
+		__experimentalSendDistributedEditingPresenceHeartbeat,
+		shouldRunStartupHeartbeatRuntime,
+		startupHeartbeatDelayMs,
+		startupPolicyState.hostProfile,
+		startupPolicyState.serverContact,
+		startupPolicyState.status,
+	] );
+
+	useEffect( () => {
+		if (
+			repeatedRefreshState.status ===
+			DISTRIBUTED_EDITING_PRESENCE_REPEATED_REFRESH_RUNTIME_STATUSES.PAUSED_DEGRADED_TRANSPORT
+		) {
+			repeatedRefreshSchedulerTokenRef.current = null;
+			setRepeatedRefreshSchedulerStatus( 'paused' );
+			return;
+		}
+
+		if ( ! shouldRunRepeatedRefreshScheduler ) {
+			repeatedRefreshSchedulerTokenRef.current = null;
+			setRepeatedRefreshSchedulerStatus( 'idle' );
+			return;
+		}
+
+		let isCancelled = false;
+		const schedulerToken = {};
+		repeatedRefreshSchedulerTokenRef.current = schedulerToken;
+		const timeoutId = globalThis.setTimeout( async () => {
+			if ( isCancelled ) {
+				return;
+			}
+
+			if ( repeatedRefreshSchedulerTokenRef.current !== schedulerToken ) {
+				return;
+			}
+
+			let didFail = false;
+			let didDegrade = false;
+
+			setRepeatedRefreshSchedulerStatus( 'running' );
+			setCommandStatus( 'refreshing' );
+
+			try {
+				await __experimentalRefreshDistributedEditingPresenceSnapshot();
+
+				if ( ! isCancelled ) {
+					setCommandStatus( 'refreshed' );
+				}
+			} catch {
+				didFail = true;
+
+				if ( ! isCancelled ) {
+					setCommandStatus( 'failed' );
+				}
+			}
+
+			if (
+				! isCancelled &&
+				repeatedRefreshSchedulerTokenRef.current === schedulerToken &&
+				repeatedRefreshState.schedulesNextHeartbeat
+			) {
+				if (
+					typeof __experimentalSendDistributedEditingPresenceHeartbeat !==
+					'function'
+				) {
+					didFail = true;
+					setHeartbeatCommandStatus( 'failed' );
+				} else {
+					setHeartbeatCommandStatus( 'sending' );
+
+					try {
+						await __experimentalSendDistributedEditingPresenceHeartbeat();
+
+						if ( ! isCancelled ) {
+							setHeartbeatCommandStatus( 'sent' );
+						}
+					} catch ( error ) {
+						didDegrade =
+							error?.code ===
+							DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_PRESENCE_STORAGE_UNAVAILABLE;
+
+						if ( ! isCancelled ) {
+							setHeartbeatCommandStatus(
+								didDegrade ? 'degraded' : 'failed'
+							);
+						}
+
+						if ( ! didDegrade ) {
+							didFail = true;
+						}
+					}
+				}
+			}
+
+			if (
+				! isCancelled &&
+				repeatedRefreshSchedulerTokenRef.current === schedulerToken
+			) {
+				let nextSchedulerStatus = 'completed';
+
+				if ( didFail ) {
+					nextSchedulerStatus = 'failed';
+				} else if ( didDegrade ) {
+					nextSchedulerStatus = 'degraded';
+				}
+
+				setRepeatedRefreshSchedulerTickCount(
+					( tickCount ) => tickCount + 1
+				);
+				setRepeatedRefreshSchedulerStatus( nextSchedulerStatus );
+			}
+		}, repeatedRefreshDelayMs );
+
+		setRepeatedRefreshSchedulerStatus( 'scheduled' );
+
+		return () => {
+			isCancelled = true;
+			if ( repeatedRefreshSchedulerTokenRef.current === schedulerToken ) {
+				repeatedRefreshSchedulerTokenRef.current = null;
+			}
+			globalThis.clearTimeout( timeoutId );
+		};
+	}, [
+		__experimentalRefreshDistributedEditingPresenceSnapshot,
+		__experimentalSendDistributedEditingPresenceHeartbeat,
+		repeatedRefreshDelayMs,
+		repeatedRefreshSchedulerTickCount,
+		repeatedRefreshState.schedulesNextHeartbeat,
+		repeatedRefreshState.status,
+		shouldRunRepeatedRefreshScheduler,
+	] );
+
+	return (
+		<div
+			aria-label={ __( 'Distributed editing presence' ) }
+			className="editor-distributed-editing-status__presence-roster"
+			data-distributed-editing-presence-blocks-publish={ formatDataBoolean(
+				rosterState.blocksPublish
+			) }
+			data-distributed-editing-presence-calls-rest={ formatDataBoolean(
+				rosterState.callsRestEndpoint
+			) }
+			data-distributed-editing-presence-calls-save={ formatDataBoolean(
+				rosterState.callsSave
+			) }
+			data-distributed-editing-presence-changes-post-lock={ formatDataBoolean(
+				rosterState.changesPostLock
+			) }
+			data-distributed-editing-presence-claims-absence={ formatDataBoolean(
+				rosterState.claimsAbsence
+			) }
+			data-distributed-editing-presence-claims-saved={ formatDataBoolean(
+				rosterState.claimsSaved
+			) }
+			data-distributed-editing-presence-exposes-cursor={ formatDataBoolean(
+				rosterState.exposesCursorOffset
+			) }
+			data-distributed-editing-presence-exposes-raw-content={ formatDataBoolean(
+				rosterState.exposesRawContent
+			) }
+			data-distributed-editing-presence-exposes-selection={ formatDataBoolean(
+				rosterState.exposesSelection
+			) }
+			data-distributed-editing-presence-freshness={
+				rosterState.freshness
+			}
+			data-distributed-editing-presence-freshness-indicator-calls-save="false"
+			data-distributed-editing-presence-freshness-indicator-changes-post-lock="false"
+			data-distributed-editing-presence-freshness-indicator-claims-absence="false"
+			data-distributed-editing-presence-freshness-indicator-claims-saved="false"
+			data-distributed-editing-presence-freshness-indicator-correctness-independent="true"
+			data-distributed-editing-presence-freshness-indicator-exposes-private-fields="false"
+			data-distributed-editing-presence-freshness-indicator-state={
+				presenceFreshnessIndicator.state
+			}
+			data-distributed-editing-presence-freshness-indicator-tone={
+				presenceFreshnessIndicator.tone
+			}
+			data-distributed-editing-presence-heartbeat-calls-rest={ formatDataBoolean(
+				sessionState.presenceHeartbeatCallsRestEndpoint
+			) }
+			data-distributed-editing-presence-heartbeat-calls-save={ formatDataBoolean(
+				sessionState.presenceHeartbeatCallsSave
+			) }
+			data-distributed-editing-presence-heartbeat-changes-post-lock={ formatDataBoolean(
+				sessionState.presenceHeartbeatChangesPostLock
+			) }
+			data-distributed-editing-presence-heartbeat-claims-saved={ formatDataBoolean(
+				sessionState.presenceHeartbeatClaimsSaved
+			) }
+			data-distributed-editing-presence-heartbeat-command-status={
+				heartbeatCommandStatus
+			}
+			data-distributed-editing-presence-heartbeat-mutates-editor-content={ formatDataBoolean(
+				sessionState.presenceHeartbeatMutatesEditorContent
+			) }
+			data-distributed-editing-presence-heartbeat-raw-session-key={ formatDataBoolean(
+				sessionState.presenceHeartbeatRawSessionKeyIncluded
+			) }
+			data-distributed-editing-presence-heartbeat-local-roster-entry-visible={ formatDataBoolean(
+				sessionState.presenceHeartbeatLocalRosterEntryVisible
+			) }
+			data-distributed-editing-presence-heartbeat-marks-local-editor-current={ formatDataBoolean(
+				sessionState.presenceHeartbeatMarksLocalEditorCurrent
+			) }
+			data-distributed-editing-presence-heartbeat-marks-local-editor-delayed={ formatDataBoolean(
+				sessionState.presenceHeartbeatMarksLocalEditorDelayed
+			) }
+			data-distributed-editing-presence-heartbeat-local-roster-entry-freshness={
+				sessionState.presenceHeartbeatLocalRosterEntryFreshness || ''
+			}
+			data-distributed-editing-presence-heartbeat-records-heartbeat={ formatDataBoolean(
+				sessionState.presenceHeartbeatRecordsPresenceHeartbeat
+			) }
+			data-distributed-editing-presence-heartbeat-status={
+				presenceHeartbeatStatus
+			}
+			data-distributed-editing-presence-refresh-command-status={
+				commandStatus
+			}
+			data-distributed-editing-presence-repeated-refresh-calls-heartbeat-now={ formatDataBoolean(
+				repeatedRefreshState.callsHeartbeatEndpointNow
+			) }
+			data-distributed-editing-presence-repeated-refresh-calls-rest-now={ formatDataBoolean(
+				repeatedRefreshState.callsPresenceReadEndpointNow
+			) }
+			data-distributed-editing-presence-repeated-refresh-calls-save={ formatDataBoolean(
+				repeatedRefreshState.callsSave
+			) }
+			data-distributed-editing-presence-repeated-refresh-changes-post-lock={ formatDataBoolean(
+				repeatedRefreshState.changesPostLock
+			) }
+			data-distributed-editing-presence-repeated-refresh-claims-absence={ formatDataBoolean(
+				repeatedRefreshState.claimsAbsence
+			) }
+			data-distributed-editing-presence-repeated-refresh-claims-saved={ formatDataBoolean(
+				repeatedRefreshState.claimsSaved
+			) }
+			data-distributed-editing-presence-repeated-refresh-scheduler-calls-save="false"
+			data-distributed-editing-presence-repeated-refresh-scheduler-changes-post-lock="false"
+			data-distributed-editing-presence-repeated-refresh-scheduler-delay-ms={
+				repeatedRefreshDelayMs ?? ''
+			}
+			data-distributed-editing-presence-repeated-refresh-scheduler-mutates-editor-content="false"
+			data-distributed-editing-presence-repeated-refresh-scheduler-status={
+				repeatedRefreshSchedulerStatus
+			}
+			data-distributed-editing-presence-repeated-refresh-scheduler-tick-count={
+				repeatedRefreshSchedulerTickCount
+			}
+			data-distributed-editing-presence-repeated-refresh-scheduler-timer-active={ formatDataBoolean(
+				shouldRunRepeatedRefreshScheduler
+			) }
+			data-distributed-editing-presence-repeated-refresh-correctness-independent={ formatDataBoolean(
+				repeatedRefreshState.correctnessIndependentOfTransport
+			) }
+			data-distributed-editing-presence-repeated-refresh-explicit-opt-in={ formatDataBoolean(
+				repeatedRefreshState.explicitOptIn
+			) }
+			data-distributed-editing-presence-repeated-refresh-exposes-raw-content={ formatDataBoolean(
+				repeatedRefreshState.exposesRawContent
+			) }
+			data-distributed-editing-presence-repeated-refresh-local-connection-state={
+				repeatedRefreshState.localConnectionState
+			}
+			data-distributed-editing-presence-repeated-refresh-raw-session-key={ formatDataBoolean(
+				repeatedRefreshState.rawSessionKeyIncluded
+			) }
+			data-distributed-editing-presence-repeated-refresh-runtime-enabled-by-default={ formatDataBoolean(
+				repeatedRefreshState.runtimeEnabledByDefault
+			) }
+			data-distributed-editing-presence-repeated-refresh-schedules-next-heartbeat={ formatDataBoolean(
+				repeatedRefreshState.schedulesNextHeartbeat
+			) }
+			data-distributed-editing-presence-repeated-refresh-schedules-next-refresh={ formatDataBoolean(
+				repeatedRefreshState.schedulesNextRefresh
+			) }
+			data-distributed-editing-presence-repeated-refresh-selected-heartbeat-interval={
+				repeatedRefreshState.selectedHeartbeatIntervalSeconds ?? ''
+			}
+			data-distributed-editing-presence-repeated-refresh-selected-interval={
+				repeatedRefreshState.selectedIntervalSeconds ?? ''
+			}
+			data-distributed-editing-presence-repeated-refresh-starts-polling={ formatDataBoolean(
+				repeatedRefreshState.startsPollingImmediately
+			) }
+			data-distributed-editing-presence-repeated-refresh-status={
+				repeatedRefreshState.status
+			}
+			data-distributed-editing-presence-startup-policy-calls-heartbeat-now={ formatDataBoolean(
+				startupPolicyState.callsHeartbeatEndpointNow
+			) }
+			data-distributed-editing-presence-startup-policy-calls-save={ formatDataBoolean(
+				startupPolicyState.callsSave
+			) }
+			data-distributed-editing-presence-startup-policy-changes-post-lock={ formatDataBoolean(
+				startupPolicyState.changesPostLock
+			) }
+			data-distributed-editing-presence-startup-policy-claims-absence={ formatDataBoolean(
+				startupPolicyState.claimsAbsence
+			) }
+			data-distributed-editing-presence-startup-policy-claims-saved={ formatDataBoolean(
+				startupPolicyState.claimsSaved
+			) }
+			data-distributed-editing-presence-startup-policy-correctness-independent={ formatDataBoolean(
+				startupPolicyState.correctnessIndependentOfTransport
+			) }
+			data-distributed-editing-presence-startup-policy-exposes-raw-content={ formatDataBoolean(
+				startupPolicyState.exposesRawContent
+			) }
+			data-distributed-editing-presence-startup-policy-host-profile={
+				startupPolicyState.hostProfile ?? ''
+			}
+			data-distributed-editing-presence-startup-policy-may-auto-heartbeat={ formatDataBoolean(
+				startupPolicyState.maySendInitialHeartbeatAutomatically
+			) }
+			data-distributed-editing-presence-startup-policy-raw-session-key={ formatDataBoolean(
+				startupPolicyState.rawSessionKeyIncluded
+			) }
+			data-distributed-editing-presence-startup-policy-reason={
+				startupPolicyState.reason
+			}
+			data-distributed-editing-presence-startup-policy-requires-explicit-enablement={ formatDataBoolean(
+				startupPolicyState.requiresExplicitEnablement
+			) }
+			data-distributed-editing-presence-startup-policy-selected-delay={
+				startupPolicyState.selectedInitialHeartbeatDelaySeconds ?? ''
+			}
+			data-distributed-editing-presence-startup-policy-server-contact={
+				startupPolicyState.serverContact
+			}
+			data-distributed-editing-presence-startup-policy-slow-auto-heartbeat={ formatDataBoolean(
+				startupPolicyState.slowAutomaticHeartbeatAllowed
+			) }
+			data-distributed-editing-presence-startup-policy-starts-polling-now={ formatDataBoolean(
+				startupPolicyState.startsPollingNow
+			) }
+			data-distributed-editing-presence-startup-policy-starts-timer-now={ formatDataBoolean(
+				startupPolicyState.startsTimerNow
+			) }
+			data-distributed-editing-presence-startup-policy-status={
+				startupPolicyState.status
+			}
+			data-distributed-editing-presence-startup-policy-writes-presence-now={ formatDataBoolean(
+				startupPolicyState.writesPresenceNow
+			) }
+			data-distributed-editing-presence-startup-heartbeat-runtime-calls-heartbeat-endpoint={ formatDataBoolean(
+				startupHeartbeatRuntimeState.callsHeartbeatEndpoint
+			) }
+			data-distributed-editing-presence-startup-heartbeat-runtime-calls-presence-read-endpoint="false"
+			data-distributed-editing-presence-startup-heartbeat-runtime-calls-save="false"
+			data-distributed-editing-presence-startup-heartbeat-runtime-changes-post-lock="false"
+			data-distributed-editing-presence-startup-heartbeat-runtime-claims-absence="false"
+			data-distributed-editing-presence-startup-heartbeat-runtime-claims-saved="false"
+			data-distributed-editing-presence-startup-heartbeat-runtime-blocked-by-storage-readiness={ formatDataBoolean(
+				startupHeartbeatRuntimeState.blockedByStorageReadiness
+			) }
+			data-distributed-editing-presence-startup-heartbeat-runtime-can-retry-after-install={ formatDataBoolean(
+				startupHeartbeatRuntimeState.canRetryAfterInstall
+			) }
+			data-distributed-editing-presence-startup-heartbeat-runtime-correctness-independent="true"
+			data-distributed-editing-presence-startup-heartbeat-runtime-delay-ms={
+				startupHeartbeatRuntimeState.delayMs ?? ''
+			}
+			data-distributed-editing-presence-startup-heartbeat-runtime-exposes-raw-content="false"
+			data-distributed-editing-presence-startup-heartbeat-runtime-mutates-editor-content="false"
+			data-distributed-editing-presence-startup-heartbeat-runtime-mutates-persisted-post-content="false"
+			data-distributed-editing-presence-startup-heartbeat-runtime-raw-session-key="false"
+			data-distributed-editing-presence-startup-heartbeat-runtime-starts-polling="false"
+			data-distributed-editing-presence-startup-heartbeat-runtime-status={
+				startupHeartbeatRuntimeState.status
+			}
+			data-distributed-editing-presence-startup-heartbeat-runtime-storage-ready={ formatDataBoolean(
+				startupHeartbeatRuntimeState.storageTableReady
+			) }
+			data-distributed-editing-presence-startup-heartbeat-runtime-timer-active={ formatDataBoolean(
+				startupHeartbeatRuntimeState.timerActive
+			) }
+			data-distributed-editing-presence-startup-heartbeat-runtime-transport-required-for-correctness="false"
+			data-distributed-editing-presence-startup-heartbeat-runtime-writes-presence={ formatDataBoolean(
+				startupHeartbeatRuntimeState.writesPresence
+			) }
+			data-distributed-editing-presence-storage-readiness-automatic-install={ formatDataBoolean(
+				presenceStorageReadinessState.automaticPerRequestInstall
+			) }
+			data-distributed-editing-presence-storage-readiness-calls-save={ formatDataBoolean(
+				presenceStorageReadinessState.callsSave
+			) }
+			data-distributed-editing-presence-storage-readiness-changes-post-lock={ formatDataBoolean(
+				presenceStorageReadinessState.changesPostLock
+			) }
+			data-distributed-editing-presence-storage-readiness-claims-absence={ formatDataBoolean(
+				presenceStorageReadinessState.claimsAbsence
+			) }
+			data-distributed-editing-presence-storage-readiness-claims-saved={ formatDataBoolean(
+				presenceStorageReadinessState.claimsSaved
+			) }
+			data-distributed-editing-presence-storage-readiness-content-free={ formatDataBoolean(
+				presenceStorageReadinessState.contentFree
+			) }
+			data-distributed-editing-presence-storage-readiness-correctness-independent={ formatDataBoolean(
+				presenceStorageReadinessState.correctnessIndependentOfTransport
+			) }
+			data-distributed-editing-presence-storage-readiness-diagnostic-only={ formatDataBoolean(
+				presenceStorageReadinessState.diagnosticOnly
+			) }
+			data-distributed-editing-presence-storage-readiness-expected-startup-heartbeat={
+				presenceStorageReadinessState.expectedStartupHeartbeatStatus
+			}
+			data-distributed-editing-presence-storage-readiness-exposes-private-fields={ formatDataBoolean(
+				presenceStorageReadinessState.exposesPrivateFields
+			) }
+			data-distributed-editing-presence-storage-readiness-exposes-raw-content={ formatDataBoolean(
+				presenceStorageReadinessState.exposesRawContent
+			) }
+			data-distributed-editing-presence-storage-readiness-installs-table={ formatDataBoolean(
+				presenceStorageReadinessState.installsPresenceTable
+			) }
+			data-distributed-editing-presence-storage-readiness-schema-current={ formatDataBoolean(
+				presenceStorageReadinessState.schemaCurrent
+			) }
+			data-distributed-editing-presence-storage-readiness-setup-action={
+				presenceStorageReadinessState.setupAction
+			}
+			data-distributed-editing-presence-storage-readiness-setup-required={ formatDataBoolean(
+				presenceStorageReadinessState.setupRequired
+			) }
+			data-distributed-editing-presence-storage-readiness-status={
+				presenceStorageReadinessState.status
+			}
+			data-distributed-editing-presence-storage-readiness-table-ready={ formatDataBoolean(
+				presenceStorageReadinessState.tableExists
+			) }
+			data-distributed-editing-presence-storage-readiness-transport-required-for-correctness={ formatDataBoolean(
+				presenceStorageReadinessState.transportRequiredForCorrectness
+			) }
+			data-distributed-editing-presence-storage-readiness-recheck-available={ formatDataBoolean(
+				presenceStorageReadinessRecheckState.available
+			) }
+			data-distributed-editing-presence-storage-readiness-recheck-calls-rest-on-click={ formatDataBoolean(
+				presenceStorageReadinessRecheckState.callsRestOnClick
+			) }
+			data-distributed-editing-presence-storage-readiness-recheck-calls-save="false"
+			data-distributed-editing-presence-storage-readiness-recheck-changes-post-lock="false"
+			data-distributed-editing-presence-storage-readiness-recheck-claims-absence="false"
+			data-distributed-editing-presence-storage-readiness-recheck-claims-saved="false"
+			data-distributed-editing-presence-storage-readiness-recheck-content-free="true"
+			data-distributed-editing-presence-storage-readiness-recheck-correctness-independent="true"
+			data-distributed-editing-presence-storage-readiness-recheck-exposes-private-fields="false"
+			data-distributed-editing-presence-storage-readiness-recheck-exposes-raw-content="false"
+			data-distributed-editing-presence-storage-readiness-recheck-installs-table="false"
+			data-distributed-editing-presence-storage-readiness-recheck-mutates-editor-content="false"
+			data-distributed-editing-presence-storage-readiness-recheck-mutates-persisted-post-content="false"
+			data-distributed-editing-presence-storage-readiness-recheck-records-heartbeat="false"
+			data-distributed-editing-presence-storage-readiness-recheck-starts-polling="false"
+			data-distributed-editing-presence-storage-readiness-recheck-status={
+				presenceStorageReadinessRecheckState.status
+			}
+			data-distributed-editing-presence-storage-readiness-recheck-writes-presence="false"
+			data-distributed-editing-presence-storage-setup-affordance-calls-save="false"
+			data-distributed-editing-presence-storage-setup-affordance-changes-post-lock="false"
+			data-distributed-editing-presence-storage-setup-affordance-correctness-independent="true"
+			data-distributed-editing-presence-storage-setup-affordance-exposes-private-fields="false"
+			data-distributed-editing-presence-storage-setup-affordance-exposes-raw-content="false"
+			data-distributed-editing-presence-storage-setup-affordance-href={
+				presenceStorageSetupAffordanceState.settingsHref
+			}
+			data-distributed-editing-presence-storage-setup-affordance-opens-settings-new-tab={ formatDataBoolean(
+				presenceStorageSetupAffordanceState.opensSettingsInNewTab
+			) }
+			data-distributed-editing-presence-storage-setup-affordance-mutates-editor-content="false"
+			data-distributed-editing-presence-storage-setup-affordance-mutates-persisted-post-content="false"
+			data-distributed-editing-presence-storage-setup-affordance-navigates-to-writing-settings={ formatDataBoolean(
+				presenceStorageSetupAffordanceState.navigatesToWritingSettings
+			) }
+			data-distributed-editing-presence-storage-setup-affordance-reload-action-available="false"
+			data-distributed-editing-presence-storage-setup-affordance-reload-prompt-visible={ formatDataBoolean(
+				presenceStorageSetupAffordanceState.reloadPromptVisible
+			) }
+			data-distributed-editing-presence-storage-setup-affordance-reload-requires-protected-local-changes={ formatDataBoolean(
+				presenceStorageSetupAffordanceState.reloadRequiresProtectedLocalChanges
+			) }
+			data-distributed-editing-presence-storage-setup-affordance-refresh-instruction-visible={ formatDataBoolean(
+				presenceStorageSetupAffordanceState.refreshInstructionVisible
+			) }
+			data-distributed-editing-presence-storage-setup-affordance-reloads-editor-now="false"
+			data-distributed-editing-presence-storage-setup-affordance-runs-setup-from-editor="false"
+			data-distributed-editing-presence-storage-setup-affordance-settings-opened={ formatDataBoolean(
+				presenceStorageSetupAffordanceState.settingsOpened
+			) }
+			data-distributed-editing-presence-storage-setup-affordance-status={
+				presenceStorageSetupAffordanceState.status
+			}
+			data-distributed-editing-presence-storage-setup-affordance-visible={ formatDataBoolean(
+				presenceStorageSetupAffordanceState.visible
+			) }
+			data-distributed-editing-presence-row-treatment="compact-status-badges"
+			data-distributed-editing-presence-row-treatment-accessible="true"
+			data-distributed-editing-presence-row-treatment-calls-save="false"
+			data-distributed-editing-presence-row-treatment-changes-post-lock="false"
+			data-distributed-editing-presence-row-treatment-claims-absence="false"
+			data-distributed-editing-presence-row-treatment-correctness-independent="true"
+			data-distributed-editing-presence-row-treatment-exposes-private-fields="false"
+			data-distributed-editing-presence-row-visual-treatment="subtle-status-stripe"
+			data-distributed-editing-presence-row-visual-treatment-accessible="true"
+			data-distributed-editing-presence-row-visual-treatment-color-only="false"
+			data-distributed-editing-presence-row-visual-treatment-content-free="true"
+			data-distributed-editing-presence-row-visual-treatment-layout-stable="true"
+			data-distributed-editing-presence-mutates-editor-content={ formatDataBoolean(
+				rosterState.mutatesEditorContent
+			) }
+			data-distributed-editing-presence-status={ rosterState.status }
+			data-distributed-editing-presence-summary-calls-save="false"
+			data-distributed-editing-presence-summary-changes-post-lock="false"
+			data-distributed-editing-presence-summary-claims-absence="false"
+			data-distributed-editing-presence-summary-claims-saved="false"
+			data-distributed-editing-presence-summary-correctness-independent="true"
+			data-distributed-editing-presence-summary-current-count={
+				rosterState.currentVisibleCount
+			}
+			data-distributed-editing-presence-summary-delayed-count={
+				rosterState.delayedVisibleCount
+			}
+			data-distributed-editing-presence-summary-exposes-private-fields="false"
+			data-distributed-editing-presence-summary-hidden-count={
+				rosterState.hiddenCount
+			}
+			data-distributed-editing-presence-summary-expired-count={
+				rosterState.expiredCount
+			}
+			data-distributed-editing-presence-summary-local-current-tab-visible={ formatDataBoolean(
+				rosterState.localCurrentTabVisible
+			) }
+			data-distributed-editing-presence-summary-remote-current-count={
+				rosterState.remoteCurrentVisibleCount
+			}
+			data-distributed-editing-presence-summary-remote-delayed-count={
+				rosterState.remoteDelayedVisibleCount
+			}
+			data-distributed-editing-presence-summary-same-user-other-tab-visible={ formatDataBoolean(
+				rosterState.sameUserOtherTabVisible
+			) }
+			data-distributed-editing-presence-visible-count={
+				rosterState.visibleCount
+			}
+			role="group"
+		>
+			<strong>{ rosterState.copy.label }</strong>
+			<div>{ rosterState.copy.summary }</div>
+			<div
+				aria-live="polite"
+				className="editor-distributed-editing-status__presence-roster-summary"
+				data-distributed-editing-presence-summary-visible="true"
+			>
+				{ rosterState.copy.countSummary }
+			</div>
+			<div
+				aria-live="polite"
+				className="editor-distributed-editing-status__presence-freshness-indicator"
+				data-distributed-editing-presence-freshness-indicator-visible="true"
+			>
+				<strong>{ presenceFreshnessIndicator.label }</strong>
+				<div>{ presenceFreshnessIndicator.summary }</div>
+			</div>
+			<div
+				className="editor-distributed-editing-status__presence-startup-policy"
+				data-distributed-editing-presence-startup-policy-visible="true"
+			>
+				<strong>{ startupPolicyState.copy.label }</strong>
+				<div>{ startupPolicyState.copy.summary }</div>
+				<div
+					aria-live="polite"
+					className="editor-distributed-editing-status__presence-startup-heartbeat-runtime"
+					data-distributed-editing-presence-startup-heartbeat-runtime-visible="true"
+				>
+					<strong>{ startupHeartbeatRuntimeState.copy.label }</strong>
+					<div>{ startupHeartbeatRuntimeState.copy.summary }</div>
+				</div>
+			</div>
+			<div
+				className="editor-distributed-editing-status__presence-storage-readiness"
+				data-distributed-editing-presence-storage-readiness-visible="true"
+			>
+				<strong>{ presenceStorageReadinessState.copy.label }</strong>
+				<div>{ presenceStorageReadinessState.copy.summary }</div>
+				{ presenceStorageSetupAffordanceState.visible && (
+					<div
+						className="editor-distributed-editing-status__presence-storage-setup-affordance"
+						data-distributed-editing-presence-storage-setup-affordance-panel-visible="true"
+					>
+						<strong>
+							{ presenceStorageSetupAffordanceState.copy.label }
+						</strong>
+						<div>
+							{ presenceStorageSetupAffordanceState.copy.summary }
+						</div>
+						<Button
+							variant="secondary"
+							href={
+								presenceStorageSetupAffordanceState.settingsHref
+							}
+							onClick={ handleOpenPresenceStorageSetup }
+							rel="noreferrer"
+							target="_blank"
+							__next40pxDefaultSize
+						>
+							{ __( 'Open Writing settings' ) }
+						</Button>
+						<Button
+							variant="secondary"
+							onClick={ handleRecheckPresenceStorageReadiness }
+							type="button"
+							isBusy={
+								presenceStorageReadinessRecheckState.status ===
+								'checking'
+							}
+							accessibleWhenDisabled
+							disabled={
+								presenceStorageReadinessRecheckState.status ===
+								'checking'
+							}
+							__next40pxDefaultSize
+						>
+							{ __( 'Check setup status' ) }
+						</Button>
+					</div>
+				) }
+				{ presenceStorageReadinessRecheckState.visible && (
+					<div
+						aria-live="polite"
+						className="editor-distributed-editing-status__presence-storage-readiness-recheck"
+						role="status"
+					>
+						<strong>
+							{ presenceStorageReadinessRecheckState.copy.label }
+						</strong>
+						<div>
+							{
+								presenceStorageReadinessRecheckState.copy
+									.summary
+							}
+						</div>
+					</div>
+				) }
+			</div>
+			<Button
+				variant="secondary"
+				onClick={ handleRefreshPresence }
+				isBusy={ commandStatus === 'refreshing' }
+				accessibleWhenDisabled
+				disabled={ commandStatus === 'refreshing' }
+				__next40pxDefaultSize
+			>
+				{ __( 'Refresh editing list' ) }
+			</Button>
+			<Button
+				variant="secondary"
+				onClick={ handleSendPresenceHeartbeat }
+				isBusy={ heartbeatCommandStatus === 'sending' }
+				accessibleWhenDisabled
+				disabled={ heartbeatCommandStatus === 'sending' }
+				__next40pxDefaultSize
+			>
+				{ __( 'Update my presence' ) }
+			</Button>
+			{ commandStatus !== 'idle' && (
+				<div role="status">
+					{ getPresenceRefreshCommandStatusText( commandStatus ) }
+				</div>
+			) }
+			{ heartbeatCommandStatus !== 'idle' && (
+				<div role="status">
+					{ getPresenceHeartbeatCommandStatusText(
+						heartbeatCommandStatus
+					) }
+				</div>
+			) }
+			{ rosterState.visibleCount > 0 && (
+				<ul
+					aria-label={ __( 'Visible editors' ) }
+					className="editor-distributed-editing-status__presence-roster-list"
+					data-distributed-editing-presence-row-treatment-list="compact-status-badges"
+					data-distributed-editing-presence-row-visual-treatment-list="subtle-status-stripe"
+				>
+					{ rosterState.entries.map( ( entry ) => {
+						const displayName =
+							getPresenceRosterEntryDisplayName( entry );
+						const statusLabel =
+							getPresenceRosterEntryStatusLabel( entry );
+						const statusTone =
+							getPresenceRosterEntryStatusTone( entry );
+						const rowClassName = [
+							'editor-distributed-editing-status__presence-roster-item',
+							`editor-distributed-editing-status__presence-roster-item--${ statusTone }`,
+						].join( ' ' );
+						const avatarClassName = [
+							'editor-distributed-editing-status__presence-roster-avatar',
+							`editor-distributed-editing-status__presence-roster-avatar--${ statusTone }`,
+						].join( ' ' );
+						const badgeClassName = [
+							'editor-distributed-editing-status__presence-roster-badge',
+							`editor-distributed-editing-status__presence-roster-badge--${ statusTone }`,
+						].join( ' ' );
+
+						return (
+							<li
+								aria-label={ sprintf(
+									/* translators: 1: editor display name, 2: presence status. */
+									__( '%1$s, %2$s' ),
+									displayName,
+									statusLabel
+								) }
+								className={ rowClassName }
+								data-distributed-editing-presence-row-current={ formatDataBoolean(
+									isPresenceRosterEntryCurrent( entry )
+								) }
+								data-distributed-editing-presence-row-exposes-cursor="false"
+								data-distributed-editing-presence-row-exposes-private-fields="false"
+								data-distributed-editing-presence-row-exposes-raw-content="false"
+								data-distributed-editing-presence-row-exposes-selection="false"
+								data-distributed-editing-presence-row-freshness={
+									statusTone
+								}
+								data-distributed-editing-presence-row-has-avatar-initial="true"
+								data-distributed-editing-presence-row-has-status-affordance="true"
+								data-distributed-editing-presence-row-relationship={ getPresenceRosterEntryRelationship(
+									entry
+								) }
+								data-distributed-editing-presence-row-status-affordance="dot-and-label"
+								data-distributed-editing-presence-row-status-tone={
+									statusTone
+								}
+								data-distributed-editing-presence-row-treatment="compact-status-badge"
+								data-distributed-editing-presence-row-visual-treatment="subtle-status-stripe"
+								data-distributed-editing-presence-row-visual-treatment-color-only="false"
+								data-distributed-editing-presence-row-visual-treatment-layout-stable="true"
+								key={ entry.key }
+							>
+								<span
+									aria-hidden="true"
+									className={ avatarClassName }
+								>
+									{ getPresenceRosterEntryAvatarText(
+										entry
+									) }
+								</span>
+								<span className="editor-distributed-editing-status__presence-roster-entry">
+									<span className="editor-distributed-editing-status__presence-roster-name">
+										{ displayName }
+									</span>
+									<span className={ badgeClassName }>
+										{ statusLabel }
+									</span>
+								</span>
+							</li>
+						);
+					} ) }
+				</ul>
+			) }
+		</div>
+	);
+}
+
+function getPresenceStorageReadinessState( readiness = {} ) {
+	const status = [
+		'ready',
+		'setup_required',
+		'upgrade_required',
+		'feature_disabled',
+	].includes( readiness?.status )
+		? readiness.status
+		: 'unknown';
+	const tableExists = Boolean( readiness?.tableExists );
+	const schemaCurrent = Boolean( readiness?.schemaCurrent );
+	const setupRequired = Boolean( readiness?.setupRequired );
+	const expectedStartupHeartbeatStatus =
+		readiness?.expectedStartupHeartbeatStatus || 'unknown';
+	let label = __( 'Presence storage status' );
+	let summary = __(
+		'Presence storage readiness has not been reported yet. Editing can continue.'
+	);
+
+	if ( status === 'ready' ) {
+		label = __( 'Presence storage ready' );
+		summary = __(
+			'Presence storage is ready. Startup presence can record liveness without extra setup.'
+		);
+	} else if ( status === 'setup_required' ) {
+		label = __( 'Presence storage setup needed' );
+		summary = __(
+			'Presence storage is not set up yet. Automatic startup presence may be delayed until setup is run deliberately.'
+		);
+	} else if ( status === 'upgrade_required' ) {
+		label = __( 'Presence storage update needed' );
+		summary = __(
+			'Presence storage exists but needs a deliberate setup check before startup presence can be treated as ready.'
+		);
+	} else if ( status === 'feature_disabled' ) {
+		label = __( 'Presence storage idle' );
+		summary = __(
+			'Presence storage waits while Distributed Editing is disabled.'
+		);
+	}
+
+	return {
+		status,
+		tableExists,
+		schemaCurrent,
+		expectedStartupHeartbeatStatus,
+		setupRequired,
+		setupAction:
+			readiness?.setupAction || 'call_wp_de_rtc_install_presence_table',
+		automaticPerRequestInstall: Boolean(
+			readiness?.automaticPerRequestInstall
+		),
+		callsSave: Boolean( readiness?.callsSave ),
+		changesPostLock: Boolean( readiness?.changesPostLock ),
+		claimsAbsence: Boolean( readiness?.claimsAbsence ),
+		claimsSaved: Boolean( readiness?.claimsSaved ),
+		contentFree: readiness?.contentFree !== false,
+		correctnessIndependentOfTransport:
+			readiness?.correctnessIndependentOfTransport !== false,
+		diagnosticOnly: readiness?.diagnosticOnly !== false,
+		exposesPrivateFields: Boolean(
+			readiness?.exposesUserIds ||
+				readiness?.exposesLogins ||
+				readiness?.exposesEmail ||
+				readiness?.exposesCursorOffset ||
+				readiness?.exposesSelection
+		),
+		exposesRawContent: Boolean( readiness?.exposesRawContent ),
+		installsPresenceTable: Boolean( readiness?.installsPresenceTable ),
+		transportRequiredForCorrectness: Boolean(
+			readiness?.transportRequiredForCorrectness
+		),
+		copy: {
+			label,
+			summary,
+		},
+	};
+}
+
+function getPresenceStorageSetupAffordanceState(
+	readinessState,
+	navigationStatus = 'idle'
+) {
+	const visible = [ 'setup_required', 'upgrade_required' ].includes(
+		readinessState.status
+	);
+	const settingsOpened = visible && navigationStatus === 'settings_opened';
+	const settingsHref = 'options-writing.php#wp_de_rtc_enabled';
+	let label = __( 'Presence setup in Writing settings' );
+	let summary = __(
+		'Open Writing settings to run the deliberate presence storage setup. After setup completes, check status here or reload this editor after protecting local changes.'
+	);
+
+	if ( readinessState.status === 'upgrade_required' ) {
+		label = __( 'Presence storage update in Writing settings' );
+		summary = __(
+			'Open Writing settings to run the deliberate presence storage setup check. After setup completes, check status here or reload this editor after protecting local changes.'
+		);
+	}
+
+	if ( settingsOpened ) {
+		label = __( 'Check after setup finishes' );
+		summary = __(
+			'When setup completes in Writing settings, check setup status here. If local changes are sensitive, reload only after protecting them.'
+		);
+	}
+
+	let status = 'hidden';
+
+	if ( settingsOpened ) {
+		status = 'settings_opened_reload_recommended';
+	} else if ( visible ) {
+		status = readinessState.status;
+	}
+
+	return {
+		status,
+		visible,
+		settingsHref,
+		settingsOpened,
+		opensSettingsInNewTab: visible,
+		navigatesToWritingSettings: visible,
+		refreshInstructionVisible: visible,
+		reloadPromptVisible: settingsOpened,
+		reloadRequiresProtectedLocalChanges: visible,
+		copy: {
+			label,
+			summary,
+		},
+	};
+}
+
+function getPresenceStorageReadinessRecheckState(
+	status = 'idle',
+	setupAffordanceState = {}
+) {
+	const available = Boolean( setupAffordanceState.visible );
+	let label = __( 'Presence setup status' );
+	let summary = __(
+		'Presence storage setup status has not been checked again in this editor.'
+	);
+
+	if ( status === 'checking' ) {
+		label = __( 'Checking presence setup' );
+		summary = __(
+			'Checking whether presence storage setup completed. This does not save, write presence, or change the post.'
+		);
+	} else if ( status === 'ready' ) {
+		label = __( 'Presence setup confirmed' );
+		summary = __(
+			'Presence storage is ready in this editor. Startup presence can proceed when enabled.'
+		);
+	} else if ( status === 'setup_required' ) {
+		label = __( 'Presence setup still needed' );
+		summary = __(
+			'Presence storage still needs setup. Editing can continue; saves do not depend on presence.'
+		);
+	} else if ( status === 'upgrade_required' ) {
+		label = __( 'Presence storage update still needed' );
+		summary = __(
+			'Presence storage still needs an update. Editing can continue; saves do not depend on presence.'
+		);
+	} else if ( status === 'feature_disabled' ) {
+		label = __( 'Distributed Editing disabled' );
+		summary = __(
+			'The setup status check could not continue because Distributed Editing is disabled for this post.'
+		);
+	} else if ( status === 'permission_denied' ) {
+		label = __( 'Setup status unavailable' );
+		summary = __(
+			'The setup status check could not continue because editing permission changed.'
+		);
+	} else if ( status === 'route_mismatch' ) {
+		label = __( 'Setup status route mismatch' );
+		summary = __(
+			'The setup status check targeted a different post route. Local editing state is unchanged.'
+		);
+	} else if ( status === 'failed' || status === 'checked' ) {
+		label = __( 'Setup status check failed' );
+		summary = __(
+			'The setup status check did not return a usable readiness state. Local editing state is unchanged.'
+		);
+	}
+
+	return {
+		status,
+		available,
+		visible: status !== 'idle',
+		callsRestOnClick: available,
+		copy: {
+			label,
+			summary,
+		},
+	};
+}
+
+function getPresenceFreshnessIndicator( {
+	commandStatus,
+	heartbeatCommandStatus,
+	presenceStorageReadinessState,
+	repeatedRefreshDelayMs,
+	repeatedRefreshSchedulerStatus,
+	repeatedRefreshState,
+	rosterState,
+	startupHeartbeatRuntimeState,
+} ) {
+	if (
+		repeatedRefreshState.status ===
+			DISTRIBUTED_EDITING_PRESENCE_REPEATED_REFRESH_RUNTIME_STATUSES.PAUSED_DEGRADED_TRANSPORT ||
+		repeatedRefreshSchedulerStatus === 'paused'
+	) {
+		return {
+			state: 'paused',
+			tone: 'warning',
+			label: __( 'Presence updates paused' ),
+			summary: __(
+				'Server contact is degraded. Editing can continue; saves do not depend on presence.'
+			),
+		};
+	}
+
+	if (
+		presenceStorageReadinessState.status === 'setup_required' ||
+		presenceStorageReadinessState.status === 'upgrade_required'
+	) {
+		return {
+			state: 'degraded',
+			tone: 'warning',
+			label: __( 'Presence live updates degraded' ),
+			summary: __(
+				'Presence storage is not ready. Editing can continue; saves do not depend on presence.'
+			),
+		};
+	}
+
+	if (
+		repeatedRefreshSchedulerStatus === 'degraded' ||
+		repeatedRefreshSchedulerStatus === 'failed' ||
+		heartbeatCommandStatus === 'degraded' ||
+		heartbeatCommandStatus === 'failed' ||
+		commandStatus === 'failed' ||
+		rosterState.status === 'degraded' ||
+		rosterState.freshness === 'stale'
+	) {
+		return {
+			state: 'delayed',
+			tone: 'warning',
+			label: __( 'Presence may be delayed' ),
+			summary: __(
+				'Editing can continue. The editing list may update late.'
+			),
+		};
+	}
+
+	if (
+		repeatedRefreshState.status ===
+			DISTRIBUTED_EDITING_PRESENCE_REPEATED_REFRESH_RUNTIME_STATUSES.SCHEDULED &&
+		repeatedRefreshState.explicitOptIn
+	) {
+		const intervalSummary = getPresenceRefreshIntervalSummary(
+			repeatedRefreshDelayMs
+		);
+
+		return {
+			state: 'connected',
+			tone: 'success',
+			label: __( 'Presence connected' ),
+			summary: intervalSummary
+				? sprintf(
+						/* translators: %s: human-readable repeated presence refresh interval. */
+						__( 'Editing list updates %s.' ),
+						intervalSummary
+				  )
+				: __( 'Editing list updates in the background.' ),
+		};
+	}
+
+	if (
+		presenceStorageReadinessState.status === 'ready' &&
+		startupHeartbeatRuntimeState.status === 'sent'
+	) {
+		return {
+			state: 'ready',
+			tone: 'success',
+			label: __( 'Presence ready' ),
+			summary: __(
+				'Your startup presence was recorded. Editing can continue if later updates are delayed.'
+			),
+		};
+	}
+
+	if (
+		presenceStorageReadinessState.status === 'ready' &&
+		startupHeartbeatRuntimeState.status === 'scheduled'
+	) {
+		return {
+			state: 'ready',
+			tone: 'info',
+			label: __( 'Presence startup scheduled' ),
+			summary: __(
+				'Presence storage is ready and the startup update is waiting on its configured delay. Saves do not depend on presence.'
+			),
+		};
+	}
+
+	if ( presenceStorageReadinessState.status === 'ready' ) {
+		return {
+			state: 'ready',
+			tone: 'success',
+			label: __( 'Presence ready' ),
+			summary: __(
+				'Presence storage is ready. Automatic presence can begin when enabled.'
+			),
+		};
+	}
+
+	if ( rosterState.freshness === 'recent' ) {
+		return {
+			state: 'delayed',
+			tone: 'warning',
+			label: __( 'Presence may be delayed' ),
+			summary: __(
+				'Editing can continue. The editing list may update late.'
+			),
+		};
+	}
+
+	return {
+		state: 'manual',
+		tone: 'info',
+		label: __( 'Presence updates on request' ),
+		summary: __(
+			'Use Refresh editing list to check again. Editing can continue.'
+		),
+	};
+}
+
+function getPresenceRepeatedRefreshDelayMs( repeatedRefreshState ) {
+	const selectedIntervalSeconds =
+		repeatedRefreshState.selectedIntervalSeconds;
+
+	return Number.isInteger( selectedIntervalSeconds ) &&
+		selectedIntervalSeconds > 0
+		? selectedIntervalSeconds * 1000
+		: null;
+}
+
+function getPresenceStartupHeartbeatDelayMs( startupPolicyState ) {
+	const selectedDelaySeconds =
+		startupPolicyState.selectedInitialHeartbeatDelaySeconds;
+
+	return Number.isInteger( selectedDelaySeconds ) && selectedDelaySeconds > 0
+		? selectedDelaySeconds * 1000
+		: null;
+}
+
+function getPresenceStartupHeartbeatRuntimeState( {
+	delayMs,
+	startupHeartbeatPolicyAllowsRuntime,
+	storageReadyForStartupHeartbeat,
+	shouldRunStartupHeartbeatRuntime,
+	startupPolicyState,
+	status,
+} ) {
+	const blockedByStorageReadiness =
+		startupHeartbeatPolicyAllowsRuntime &&
+		! storageReadyForStartupHeartbeat;
+	const effectiveStatus = blockedByStorageReadiness
+		? 'degraded_storage_setup_required'
+		: status;
+	const timerActive = effectiveStatus === 'scheduled';
+	const didAttemptHeartbeat = [
+		'scheduled',
+		'sending',
+		'sent',
+		'degraded',
+		'failed',
+	].includes( effectiveStatus );
+	let label = __( 'Presence startup heartbeat' );
+	let summary = __( 'Initial presence updates manually.' );
+
+	if (
+		startupPolicyState.status ===
+		DISTRIBUTED_EDITING_PRESENCE_STARTUP_POLICY_STATUSES.PAUSED_DEGRADED_TRANSPORT
+	) {
+		summary = __(
+			'Initial presence waits while server contact is degraded.'
+		);
+	} else if ( blockedByStorageReadiness ) {
+		label = __( 'Presence startup delayed' );
+		summary = __(
+			'Presence storage setup is required before automatic startup presence can begin.'
+		);
+	} else if ( effectiveStatus === 'scheduled' && delayMs ) {
+		label = __( 'Presence startup scheduled' );
+		summary =
+			delayMs === 1000
+				? __( 'Initial presence will update after about a second.' )
+				: sprintf(
+						/* translators: %d: initial presence heartbeat delay in seconds. */
+						__(
+							'Initial presence will update after about %d seconds.'
+						),
+						delayMs / 1000
+				  );
+	} else if ( effectiveStatus === 'sending' ) {
+		summary = __( 'Initial presence is updating.' );
+	} else if ( effectiveStatus === 'sent' ) {
+		summary = __(
+			'Initial presence updated. Editing can continue if later updates are delayed.'
+		);
+	} else if ( effectiveStatus === 'degraded' ) {
+		summary = __(
+			'Initial presence update was delayed. Editing can continue.'
+		);
+	} else if ( effectiveStatus === 'failed' ) {
+		summary = __( 'Initial presence update failed. Editing can continue.' );
+	} else if ( shouldRunStartupHeartbeatRuntime && delayMs ) {
+		summary = __( 'Initial presence is waiting for its startup timer.' );
+	}
+
+	if ( effectiveStatus === 'paused' ) {
+		label = __( 'Presence startup paused' );
+	}
+
+	return {
+		status: effectiveStatus,
+		timerActive,
+		delayMs,
+		blockedByStorageReadiness,
+		canRetryAfterInstall: blockedByStorageReadiness,
+		storageTableReady: storageReadyForStartupHeartbeat,
+		callsHeartbeatEndpoint: didAttemptHeartbeat,
+		writesPresence:
+			didAttemptHeartbeat &&
+			effectiveStatus !== 'degraded' &&
+			effectiveStatus !== 'failed',
+		copy: {
+			label,
+			summary,
+		},
+	};
+}
+
+function getPresenceRefreshIntervalSummary( repeatedRefreshDelayMs ) {
+	if (
+		! Number.isInteger( repeatedRefreshDelayMs ) ||
+		repeatedRefreshDelayMs <= 0
+	) {
+		return null;
+	}
+
+	const intervalSeconds = repeatedRefreshDelayMs / 1000;
+
+	if ( ! Number.isInteger( intervalSeconds ) || intervalSeconds <= 0 ) {
+		return null;
+	}
+
+	if ( intervalSeconds === 1 ) {
+		return __( 'about every second' );
+	}
+
+	return sprintf(
+		/* translators: %d: repeated presence refresh interval in seconds. */
+		__( 'about every %d seconds' ),
+		intervalSeconds
+	);
+}
+
+function getPresenceRefreshCommandStatusText( commandStatus ) {
+	if ( commandStatus === 'refreshing' ) {
+		return __( 'Refreshing editing list.' );
+	}
+
+	if ( commandStatus === 'refreshed' ) {
+		return __( 'Editing list refreshed.' );
+	}
+
+	return __( 'Editing list refresh failed. Presence may be delayed.' );
+}
+
+function getPresenceHeartbeatCommandStatusText( commandStatus ) {
+	if ( commandStatus === 'sending' ) {
+		return __( 'Updating presence.' );
+	}
+
+	if ( commandStatus === 'sent' ) {
+		return __( 'Presence updated.' );
+	}
+
+	if ( commandStatus === 'degraded' ) {
+		return __( 'Presence update delayed. Editing can continue.' );
+	}
+
+	return __( 'Presence update failed. Editing can continue.' );
+}
+
+function getPresenceRosterEntryDisplayName( entry ) {
+	if ( entry.relationship === 'current_user_current_tab' ) {
+		return __( 'This tab' );
+	}
+
+	if ( entry.relationship === 'same_user_other_tab' ) {
+		return __( 'Another tab' );
+	}
+
+	if ( entry.identityVisibility === 'anonymous' ) {
+		return __( 'Another editor' );
+	}
+
+	return entry.displayName || __( 'Another editor' );
+}
+
+function getPresenceRosterEntryRelationship( entry ) {
+	if (
+		entry.relationship === 'current_user_current_tab' ||
+		entry.relationship === 'same_user_other_tab' ||
+		entry.relationship === 'other_user'
+	) {
+		return entry.relationship;
+	}
+
+	return 'other_user';
+}
+
+function isPresenceRosterEntryCurrent( entry ) {
+	return entry.freshness === 'current' || entry.freshness === 'active';
+}
+
+function getPresenceRosterEntryStatusLabel( entry ) {
+	return isPresenceRosterEntryCurrent( entry )
+		? __( 'Editing now' )
+		: __( 'Presence may be delayed' );
+}
+
+function getPresenceRosterEntryStatusTone( entry ) {
+	return isPresenceRosterEntryCurrent( entry ) ? 'current' : 'delayed';
+}
+
+function getPresenceRosterEntryAvatarText( entry ) {
+	if ( entry.identityVisibility === 'anonymous' ) {
+		return __( 'A' );
+	}
+
+	const displayName = getPresenceRosterEntryDisplayName( entry );
+	const initial = displayName.trim().charAt( 0 ).toUpperCase();
+
+	return initial || __( 'A' );
 }
 
 /**
@@ -2171,6 +3871,8 @@ function DistributedEditingFreshReviewJumpInspectionStatus() {
 
 function DistributedEditingFreshReviewCompareInspectionStatus() {
 	const [ commandStatus, setCommandStatus ] = useState( 'idle' );
+	const [ selectedComparisonItemId, setSelectedComparisonItemId ] =
+		useState( null );
 	const decisionState = useSelect( ( select ) => {
 		const {
 			getDistributedEditingFreshReviewDecisionState,
@@ -2201,15 +3903,28 @@ function DistributedEditingFreshReviewCompareInspectionStatus() {
 
 	function inspectCompareEvidence() {
 		const compareAction = reviewItem.compareAction;
+		const comparisonSurface = compareAction?.comparisonSurface;
+
+		if ( comparisonSurface?.canOpenComparisonSurface ) {
+			setSelectedComparisonItemId( reviewItem.id );
+			setCommandStatus( 'comparison-surface-open' );
+			return compareAction;
+		}
+
 		const nextCommandStatus =
 			compareAction?.commandStatus ||
 			( compareAction?.enabled
 				? 'compare-evidence-available'
 				: 'compare-evidence-unavailable' );
 
+		setSelectedComparisonItemId( null );
 		setCommandStatus( nextCommandStatus );
 		return compareAction;
 	}
+	const selectedComparisonItem =
+		decisionState?.reviewItems?.find(
+			( item ) => item.id === selectedComparisonItemId
+		) || null;
 
 	return (
 		<div
@@ -2234,7 +3949,7 @@ function DistributedEditingFreshReviewCompareInspectionStatus() {
 				onClick={ inspectCompareEvidence }
 				variant="tertiary"
 			>
-				{ __( 'Compare evidence' ) }
+				{ __( 'Compare' ) }
 			</Button>
 			<div
 				aria-live="polite"
@@ -2246,6 +3961,105 @@ function DistributedEditingFreshReviewCompareInspectionStatus() {
 			>
 				{ getFreshReviewDecisionCommandMessage( commandStatus ) }
 			</div>
+			<DistributedEditingFreshReviewComparisonSurface
+				onBack={ () => {
+					setSelectedComparisonItemId( null );
+					setCommandStatus( 'comparison-surface-closed' );
+				} }
+				reviewItem={ selectedComparisonItem }
+			/>
+		</div>
+	);
+}
+
+function DistributedEditingFreshReviewComparisonSurface( {
+	reviewItem = null,
+	onBack,
+} ) {
+	const comparisonSurface = reviewItem?.compareAction?.comparisonSurface;
+	const label =
+		reviewItem?.blockLabel ||
+		reviewItem?.blockName ||
+		reviewItem?.id ||
+		__( 'Review item' );
+
+	if ( ! comparisonSurface?.canOpenComparisonSurface ) {
+		return null;
+	}
+
+	return (
+		<div
+			aria-label={ sprintf(
+				/* translators: %s: review item label. */
+				__( 'Distributed editing fresh review comparison for %s' ),
+				label
+			) }
+			className="editor-distributed-editing-status__fresh-review-comparison-surface"
+			data-distributed-editing-fresh-review-comparison-surface
+			data-distributed-editing-fresh-review-comparison-surface-calls-rest={ formatDataBoolean(
+				comparisonSurface.callsRestEndpoint
+			) }
+			data-distributed-editing-fresh-review-comparison-surface-calls-save={ formatDataBoolean(
+				comparisonSurface.callsSave
+			) }
+			data-distributed-editing-fresh-review-comparison-surface-changes-post-lock={ formatDataBoolean(
+				comparisonSurface.changesPostLock
+			) }
+			data-distributed-editing-fresh-review-comparison-surface-claims-saved={ formatDataBoolean(
+				comparisonSurface.claimsSaved
+			) }
+			data-distributed-editing-fresh-review-comparison-surface-derives-patch={ formatDataBoolean(
+				comparisonSurface.derivesPatch
+			) }
+			data-distributed-editing-fresh-review-comparison-surface-item-id={
+				comparisonSurface.itemId || undefined
+			}
+			data-distributed-editing-fresh-review-comparison-surface-mode={
+				comparisonSurface.mode || undefined
+			}
+			data-distributed-editing-fresh-review-comparison-surface-mutates-editor-content={ formatDataBoolean(
+				comparisonSurface.mutatesEditorContent
+			) }
+			data-distributed-editing-fresh-review-comparison-surface-mutates-persisted-post-content={ formatDataBoolean(
+				comparisonSurface.mutatesPersistedPostContent
+			) }
+			data-distributed-editing-fresh-review-comparison-surface-read-only={ formatDataBoolean(
+				comparisonSurface.readOnly
+			) }
+			data-distributed-editing-fresh-review-comparison-surface-renders-diff={ formatDataBoolean(
+				comparisonSurface.rendersDiff
+			) }
+			data-distributed-editing-fresh-review-comparison-surface-safe-serialized-blocks={ formatDataBoolean(
+				comparisonSurface.safeSerializedBlocksAvailable
+			) }
+			data-distributed-editing-fresh-review-comparison-surface-status="open"
+			role="group"
+		>
+			<strong>{ __( 'Read-only comparison' ) }</strong>
+			<p>
+				{ __(
+					'Review the base and proposed block text. This comparison is local and read-only; it does not save, call the server, change editor content, or change post locks.'
+				) }
+			</p>
+			<div className="editor-distributed-editing-status__fresh-review-comparison-columns">
+				<section>
+					<strong>{ __( 'Base version' ) }</strong>
+					<pre>{ comparisonSurface.baseText }</pre>
+				</section>
+				<section>
+					<strong>{ __( 'Proposed version' ) }</strong>
+					<pre>{ comparisonSurface.proposedText }</pre>
+				</section>
+			</div>
+			{ onBack && (
+				<Button
+					__next40pxDefaultSize
+					onClick={ onBack }
+					variant="tertiary"
+				>
+					{ __( 'Back to review' ) }
+				</Button>
+			) }
 		</div>
 	);
 }
@@ -2271,6 +4085,7 @@ function DistributedEditingFreshReviewComparePlanStatus() {
 	const comparePlan = reviewItem?.compareAction?.comparePlan;
 	const comparisonSelectionHandoff = comparePlan?.comparisonSelectionHandoff;
 	const comparisonPreviewShell = comparePlan?.comparisonPreviewShell;
+	const comparisonSurface = comparePlan?.comparisonSurface;
 	const comparisonPreviewShellSupportReport =
 		comparisonPreviewShell?.supportReport;
 	const comparisonRendererCapabilitySupportSummary =
@@ -2315,6 +4130,18 @@ function DistributedEditingFreshReviewComparePlanStatus() {
 			) }
 			data-distributed-editing-fresh-review-comparison-readiness-status={
 				comparisonSelectionHandoff?.status || undefined
+			}
+			data-distributed-editing-fresh-review-comparison-surface-available={ formatDataBoolean(
+				comparisonSurface?.canOpenComparisonSurface
+			) }
+			data-distributed-editing-fresh-review-comparison-surface-read-only={ formatDataBoolean(
+				comparisonSurface?.readOnly
+			) }
+			data-distributed-editing-fresh-review-comparison-surface-reason={
+				comparisonSurface?.reason || undefined
+			}
+			data-distributed-editing-fresh-review-comparison-surface-status={
+				comparisonSurface?.status || undefined
 			}
 			data-distributed-editing-fresh-review-comparison-preview-shell-calls-rest={ formatDataBoolean(
 				comparisonPreviewShell?.callsRestEndpoint
@@ -2689,8 +4516,8 @@ function getDistributedEditingStatusSurfaceItem( descriptor ) {
 		case DISTRIBUTED_EDITING_NOTICE_KINDS.SERVER_STATE_ACCEPTANCE_REQUIRED:
 			return {
 				...getBaseStatusItem( descriptor ),
-				title: __( 'Server version available' ),
-				message: __( 'Accept the server version before continuing.' ),
+				title: __( 'Latest post available' ),
+				message: __( 'Accept the latest post before continuing.' ),
 			};
 		case DISTRIBUTED_EDITING_NOTICE_KINDS.STALE_BASE_REJECTED:
 			return {
@@ -2842,6 +4669,8 @@ function getDistributedEditingStatusSurfaceItem( descriptor ) {
 					descriptor.actionTranscriptLatestEventSource,
 				actionTranscriptEntriesRedacted:
 					descriptor.actionTranscriptEntriesRedacted,
+				actionTranscriptSupportReport:
+					descriptor.actionTranscriptSupportReport,
 			};
 	}
 
@@ -2882,12 +4711,12 @@ function getPendingChangesMessage( descriptor ) {
 	) {
 		if ( descriptor.localUpdatesImportHasAcceptedReviewApprovalProof ) {
 			return __(
-				'Admin-reviewed changes were imported locally with signed review proof and are ready for guarded save. They remain protected and exportable until the server confirms that path.'
+				'Admin-reviewed changes were imported locally with signed review proof and are ready for WordPress Save. They remain protected and exportable until WordPress confirms the update.'
 			);
 		}
 
 		return __(
-			'Protected recovery changes were imported locally and are ready for guarded save. They remain protected and exportable until the server confirms that path.'
+			'Protected recovery changes were imported locally and are ready for WordPress Save. They remain protected and exportable until WordPress confirms the update.'
 		);
 	}
 
@@ -2896,7 +4725,7 @@ function getPendingChangesMessage( descriptor ) {
 		DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVING
 	) {
 		return __(
-			'The guarded retry save is waiting for server confirmation. Protected local changes remain pending and exportable until confirmation.'
+			'Save is waiting for WordPress confirmation. Protected local changes remain pending and exportable until confirmation.'
 		);
 	}
 
@@ -2905,7 +4734,7 @@ function getPendingChangesMessage( descriptor ) {
 		DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.READY
 	) {
 		return __(
-			'Retry submit is ready for the guarded save path. Local changes remain pending until that save finishes.'
+			'Save is prepared for WordPress. Local changes remain pending until Save finishes.'
 		);
 	}
 
@@ -2914,7 +4743,7 @@ function getPendingChangesMessage( descriptor ) {
 		DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.ACCEPTED_FOR_FUTURE_SAVE
 	) {
 		return __(
-			'Retry submit accepted the rebased changes for a future save. Local changes are still awaiting confirmation.'
+			'WordPress accepted the save check. Local changes are still awaiting final Save confirmation.'
 		);
 	}
 
@@ -2965,15 +4794,31 @@ function getActionTranscriptMessage( descriptor ) {
 			);
 		case DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.SERVER_STATE_REFETCHED:
 			return __(
-				'WordPress refreshed server state and kept the activity record content-free.'
+				'WordPress loaded the latest post and kept the activity record content-free.'
+			);
+		case DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.LOCAL_CHANGES_APPLIED:
+			return __(
+				'The editor applied local changes to the latest post and kept the activity record content-free.'
+			);
+		case DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.LOCAL_CHANGES_STAGED:
+			return __(
+				'The editor staged local changes for a Save safety check and kept the activity record content-free.'
 			);
 		case DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.RETRY_SUBMIT_PROOF_REFRESHED:
 			return __(
-				'WordPress refreshed retry proof and kept the activity record content-free.'
+				'WordPress checked Save safety and kept the activity record content-free.'
+			);
+		case DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.SAVE_PREPARED:
+			return __(
+				'The editor prepared Save for WordPress confirmation and kept the activity record content-free.'
 			);
 		case DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.SAVE_STATE_CHANGED:
 			return __(
-				'The editor Save state changed and the activity record stayed content-free.'
+				'The editor started Save and kept the activity record content-free.'
+			);
+		case DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.SAVE_CONFIRMED:
+			return __(
+				'WordPress confirmed Save and kept the activity record content-free.'
 			);
 		case DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.REVIEW_REQUIRED:
 			return __(
@@ -2993,7 +4838,7 @@ function getActionTranscriptMessage( descriptor ) {
 			);
 		case DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.FRESH_REVIEW_RETRY_SAVE_CONFIRMED:
 			return __(
-				'WordPress confirmed the fresh-review guarded save and kept the activity record content-free.'
+				'WordPress confirmed the fresh-review Save and kept the activity record content-free.'
 			);
 	}
 
@@ -3064,7 +4909,7 @@ function getNoticeActions( item, onAction ) {
 function getActionLabel( actionKey, item ) {
 	switch ( actionKey ) {
 		case DISTRIBUTED_EDITING_NOTICE_ACTIONS.ACCEPT_SERVER_STATE:
-			return __( 'Accept server version' );
+			return __( 'Accept latest post' );
 		case DISTRIBUTED_EDITING_NOTICE_ACTIONS.EXPORT_LOCAL_UPDATES:
 			if ( isRetrySaveFreshReviewRetrySaveRejectedItem( item ) ) {
 				return __( 'Export for fresh review' );
@@ -3077,15 +4922,15 @@ function getActionLabel( actionKey, item ) {
 			}
 			return __( 'Export local changes' );
 		case DISTRIBUTED_EDITING_NOTICE_ACTIONS.PREPARE_RETRY_SUBMIT:
-			return __( 'Prepare retry submit' );
+			return __( 'Stage local changes' );
 		case DISTRIBUTED_EDITING_NOTICE_ACTIONS.PREPARE_RETRY_SUBMIT_SAVE:
-			return __( 'Prepare guarded save' );
+			return __( 'Prepare Save' );
 		case DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFRESH_RETRY_SUBMIT_PROOF:
-			return __( 'Refresh retry proof' );
+			return __( 'Check save safety' );
 		case DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFETCH_SERVER_STATE:
-			return __( 'Refresh server version' );
+			return __( 'Get latest post' );
 		case DISTRIBUTED_EDITING_NOTICE_ACTIONS.REBASE_LOCAL_UPDATES:
-			return __( 'Retry local changes' );
+			return __( 'Apply local changes' );
 		case DISTRIBUTED_EDITING_NOTICE_ACTIONS.REVIEW_REMOTE_CHANGES:
 			return __( 'Review changes' );
 		case DISTRIBUTED_EDITING_NOTICE_ACTIONS.REQUEST_FRESH_REVIEW:
@@ -3098,7 +4943,7 @@ function getActionLabel( actionKey, item ) {
 function getExportSuccessMessage( item ) {
 	if ( isRetrySaveFreshReviewRetrySaveRejectedItem( item ) ) {
 		return __(
-			'Fresh-review handoff copied. Keep this copy until the server version is refreshed or a new review can be completed.'
+			'Fresh-review handoff copied. Keep this copy until the latest post is loaded or a new review can be completed.'
 		);
 	}
 
@@ -3258,7 +5103,7 @@ function getFreshReviewPreSaveStatusLabel( status ) {
 		case DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_STATUSES.VALIDATING:
 			return __( 'Validating review' );
 		case DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_STATUSES.READY_FOR_GUARDED_RETRY_SAVE:
-			return __( 'Ready for guarded save' );
+			return __( 'Ready for WordPress Save' );
 		case DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_STATUSES.REFETCH_REQUIRED:
 			return __( 'Server refresh required' );
 		case DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_STATUSES.BLOCKED:
@@ -3276,10 +5121,10 @@ function getFreshReviewLifecycleStatusLabel( status ) {
 		case 'retry_save_consumed':
 		case 'consumed':
 		case 'retry_save_consumed_for_post':
-			return __( 'Consumed by retry save' );
+			return __( 'Used by WordPress Save' );
 		case 'accepted':
 		case 'accepted_for_retry_save':
-			return __( 'Accepted for retry save' );
+			return __( 'Accepted for WordPress Save' );
 		case 'blocked':
 			return __( 'Blocked' );
 		case 'review_required':
@@ -3301,7 +5146,7 @@ function getFreshReviewPreSaveStatusText( descriptor ) {
 				message: sprintf(
 					/* translators: %s: review item count sentence. */
 					__(
-						'Protected changes need hash-only admin review before Save can continue. %s No normal save or retry save has run; protected local changes remain exportable.'
+						'Protected changes need hash-only admin review before Save can continue. %s No normal Save has run; protected local changes remain exportable.'
 					),
 					getFreshReviewReviewItemCountMessage( descriptor )
 				),
@@ -3310,28 +5155,28 @@ function getFreshReviewPreSaveStatusText( descriptor ) {
 			return {
 				title: __( 'Fresh review validation required' ),
 				message: __(
-					'Reviewed changes are ready for server validation before guarded retry save. Save should continue only through fresh-review validation; no normal save fallback has run, and protected local changes remain exportable.'
+					'Reviewed changes need WordPress validation before Save can continue. Save should continue only after fresh-review validation; no normal Save fallback has run, and protected local changes remain exportable.'
 				),
 			};
 		case DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_STATUSES.VALIDATING:
 			return {
 				title: __( 'Fresh review validating' ),
 				message: __(
-					'The editor is validating hash-only fresh-review proof before any guarded retry save. No normal save has run; keep protected local changes exportable until validation finishes.'
+					'The editor is validating hash-only fresh-review proof before WordPress updates the post. No normal Save has run; keep protected local changes exportable until validation finishes.'
 				),
 			};
 		case DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_STATUSES.READY_FOR_GUARDED_RETRY_SAVE:
 			return {
-				title: __( 'Fresh review ready for guarded save' ),
+				title: __( 'Fresh review ready for WordPress Save' ),
 				message: __(
-					'Hash-only fresh review proof is accepted for a future guarded retry save. Save may continue only through that guarded path; no normal save fallback has run, and protected local changes remain exportable until server confirmation.'
+					'Hash-only fresh review proof is accepted for WordPress Save. Save may continue only through the reviewed WordPress path; no normal Save fallback has run, and protected local changes remain exportable until WordPress confirms the update.'
 				),
 			};
 		case DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_STATUSES.REFETCH_REQUIRED:
 			return {
 				title: __( 'Fresh review needs server refresh' ),
 				message: __(
-					'The server version must be refreshed before fresh review can continue. Refreshing only fetches server state; it does not save over protected local changes, which remain exportable.'
+					'The latest post must be loaded before fresh review can continue. Loading it only fetches server state; it does not save over protected local changes, which remain exportable.'
 				),
 			};
 		case DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_STATUSES.BLOCKED:
@@ -3343,7 +5188,7 @@ function getFreshReviewPreSaveStatusText( descriptor ) {
 				return {
 					title: __( 'Fresh review already used' ),
 					message: __(
-						'This fresh-review decision was already consumed by a retry save. Request a new fresh review or refresh the server version before continuing; protected local changes remain exportable.'
+						'This fresh-review decision was already used by WordPress Save. Request a new fresh review or get the latest post before continuing; protected local changes remain exportable.'
 					),
 				};
 			}
@@ -3351,7 +5196,7 @@ function getFreshReviewPreSaveStatusText( descriptor ) {
 			return {
 				title: __( 'Fresh review blocked' ),
 				message: __(
-					'Fresh review cannot continue from the current proof state. Request a new review or refresh the server version before continuing; protected local changes remain exportable.'
+					'Fresh review cannot continue from the current proof state. Request a new review or get the latest post before continuing; protected local changes remain exportable.'
 				),
 			};
 	}
@@ -3376,6 +5221,41 @@ function getFreshReviewReviewItemCountMessage( descriptor ) {
 
 	return __(
 		'Risky block evidence remains redacted until the review surface opens.'
+	);
+}
+
+function ActionTranscriptSupportTimeline( { report } ) {
+	if (
+		! report?.available ||
+		! report.canShareWithSupport ||
+		! Array.isArray( report.timelineItems ) ||
+		report.timelineItems.length === 0
+	) {
+		return null;
+	}
+
+	return (
+		<ol
+			aria-label={ __( 'Distributed editing transcript timeline' ) }
+			className="editor-distributed-editing-status__support-report-timeline"
+			data-distributed-editing-transcript-timeline-count={
+				report.timelineItems.length
+			}
+		>
+			{ report.timelineItems.map( ( item ) => (
+				<li
+					key={ `${ item.sequence }-${ item.eventType }` }
+					data-distributed-editing-transcript-timeline-event-type={
+						item.eventType || undefined
+					}
+					data-distributed-editing-transcript-timeline-redacted={ formatDataBoolean(
+						item.redacted
+					) }
+				>
+					{ item.label }
+				</li>
+			) ) }
+		</ol>
 	);
 }
 
@@ -3459,6 +5339,18 @@ function getFreshReviewDecisionItemAffordanceMessages( item ) {
 		} );
 	}
 
+	if ( item?.compareAction?.comparisonSurface ) {
+		messages.push( {
+			key: 'read-only-comparison',
+			message: item.compareAction.comparisonSurface
+				.canOpenComparisonSurface
+				? __( 'Read-only comparison available.' )
+				: __(
+						'Read-only comparison unavailable for this review item.'
+				  ),
+		} );
+	}
+
 	return messages;
 }
 
@@ -3491,12 +5383,12 @@ function getLocalUpdatesImportStatusMessage( {
 	) {
 		if ( hasAcceptedReviewApprovalProof ) {
 			return __(
-				'Admin-reviewed changes were imported into this editor only, with route, hash, and signed review proof checks passing. They remain protected until guarded save is confirmed; no server request was sent.'
+				'Admin-reviewed changes were imported into this editor only, with route, hash, and signed review proof checks passing. They remain protected until WordPress confirms Save; no server request was sent.'
 			);
 		}
 
 		return __(
-			'Protected recovery changes were imported into this editor only, with route and hash checks passing. They remain protected until guarded save is confirmed; no server request was sent.'
+			'Protected recovery changes were imported into this editor only, with route and hash checks passing. They remain protected until WordPress confirms Save; no server request was sent.'
 		);
 	}
 
@@ -3545,7 +5437,7 @@ function getLocalUpdatesImportBlockedMessage( reason ) {
 			);
 		case DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.FRESH_REVIEW_REQUIRED:
 			return __(
-				'Import blocked: this reviewed-changes handoff needs a fresh admin review before it can be imported for retry save. Nothing was imported, and local changes remain protected and exportable.'
+				'Import blocked: this reviewed-changes handoff needs a fresh admin review before it can be imported for Save. Nothing was imported, and local changes remain protected and exportable.'
 			);
 		case DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.EXTRA_SESSION_STATE_OVEREXPOSED:
 			return __(
@@ -3600,7 +5492,7 @@ function getLocalUpdatesImportReviewRequestMessage( descriptor ) {
 		DISTRIBUTED_EDITING_FRESH_REVIEW_RETRY_SAVE_HANDOFF_STATUSES.ACCEPTED_FOR_RETRY_SAVE
 	) {
 		return __(
-			'Fresh review validation is accepted for a future guarded retry save. No retry save or normal save was made, and protected local changes remain exportable.'
+			'Fresh review validation is accepted for WordPress Save. No Save was made, and protected local changes remain exportable.'
 		);
 	}
 
@@ -3609,7 +5501,7 @@ function getLocalUpdatesImportReviewRequestMessage( descriptor ) {
 		DISTRIBUTED_EDITING_FRESH_REVIEW_RETRY_SAVE_HANDOFF_STATUSES.VALIDATING
 	) {
 		return __(
-			'Fresh review decision is staged for validation before a future guarded retry save. No retry save or normal save was made, and protected local changes remain exportable.'
+			'Fresh review decision is staged for WordPress validation before Save can continue. No Save was made, and protected local changes remain exportable.'
 		);
 	}
 
@@ -3620,7 +5512,7 @@ function getLocalUpdatesImportReviewRequestMessage( descriptor ) {
 			DISTRIBUTED_EDITING_FRESH_REVIEW_DECISION_STATUSES.READY
 	) {
 		return __(
-			'Fresh review decisions are ready for a future proof handoff. No retry save or normal save was made; protected local changes remain exportable until that proof path exists.'
+			'Fresh review decisions are ready for a future Save check. No Save was made; protected local changes remain exportable until that proof path exists.'
 		);
 	}
 
@@ -3630,7 +5522,7 @@ function getLocalUpdatesImportReviewRequestMessage( descriptor ) {
 		descriptor?.localUpdatesImportFreshReviewDecisionPanelRequired
 	) {
 		return __(
-			'Fresh review request was accepted. A reviewer can approve or reject the hash-only block decisions in the internal review panel; no retry save or normal save was made.'
+			'Fresh review request was accepted. A reviewer can approve or reject the hash-only block decisions in the internal review panel; no Save was made.'
 		);
 	}
 
@@ -3639,7 +5531,7 @@ function getLocalUpdatesImportReviewRequestMessage( descriptor ) {
 		DISTRIBUTED_EDITING_LOCAL_UPDATES_REVIEW_REQUEST_STATUSES.REQUESTED
 	) {
 		return __(
-			'Fresh review request was accepted for admin review. No retry save or normal save was made; protected local changes remain exportable until review returns.'
+			'Fresh review request was accepted for admin review. No Save was made; protected local changes remain exportable until review returns.'
 		);
 	}
 
@@ -3663,7 +5555,7 @@ function getLocalUpdatesImportReviewRequestMessage( descriptor ) {
 		DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.FRESH_REVIEW_REQUIRED
 	) {
 		return __(
-			'This fresh-review handoff cannot be imported for retry save because it has no usable accepted review proof. Request a new admin review before retry save; nothing was imported, saved, or sent to the server.'
+			'This fresh-review handoff cannot be imported for Save because it has no usable accepted review proof. Request a new admin review before saving; nothing was imported, saved, or sent to the server.'
 		);
 	}
 
@@ -3675,18 +5567,18 @@ function getLocalUpdatesImportReviewRequestMessage( descriptor ) {
 function getRefetchSuccessMessage( item ) {
 	if ( isRetrySaveFreshReviewRetrySaveItem( item ) ) {
 		return __(
-			'Server version refreshed for fresh-review retry save. Protected local changes remain in this editor session and can still be exported before retrying.'
+			'Latest post loaded for fresh-review Save. Protected local changes remain in this editor session and can still be exported before retrying.'
 		);
 	}
 
 	if ( isRetrySaveReviewRequiredItem( item ) ) {
 		return __(
-			'Server version refreshed for HTML review. Protected local changes remain in this editor session and can still be exported before retrying.'
+			'Latest post loaded for HTML review. Protected local changes remain in this editor session and can still be exported before retrying.'
 		);
 	}
 
 	return __(
-		'Server version refreshed for review. Protected local changes remain in this editor session and can still be exported before retrying.'
+		'Latest post loaded. Protected local changes remain in this editor session and can still be exported before retrying.'
 	);
 }
 
@@ -3758,29 +5650,29 @@ function getDistributedEditingStatusControlLabel( key ) {
 		case 'staleBaseRetryProofStale':
 			return __( 'Retry proof stale' );
 		case 'staleBaseRetrySaveReady':
-			return __( 'Retry save ready' );
+			return __( 'Save ready' );
 		case 'staleBaseRetrySaveBlockedPermission':
-			return __( 'Retry save blocked' );
+			return __( 'Save blocked' );
 		case 'staleBaseRetrySaveSaving':
-			return __( 'Retry save saving' );
+			return __( 'Saving' );
 		case 'staleBaseRetrySaveSaved':
-			return __( 'Retry save saved' );
+			return __( 'Save confirmed' );
 		case 'staleBaseRetrySaveStale':
-			return __( 'Retry save stale' );
+			return __( 'Save needs latest post' );
 		case 'staleBaseRetrySaveTampered':
-			return __( 'Retry save tampered' );
+			return __( 'Save proof changed' );
 		case 'staleBaseRetrySaveUnfilteredHtml':
 			return __( 'HTML review required before Save' );
 		case 'staleBaseRetrySaveHandoffBlockedProof':
-			return __( 'Retry save proof missing' );
+			return __( 'Save proof missing' );
 		case 'staleBaseRetrySaveHandoffRefetch':
-			return __( 'Retry save needs refresh' );
+			return __( 'Save needs latest post' );
 		case 'staleBaseRetrySaveHandoffMissingRoute':
-			return __( 'Retry save route missing' );
+			return __( 'Save route missing' );
 		case 'staleBaseRetrySaveHandoffMissingContent':
-			return __( 'Retry save content missing' );
+			return __( 'Save content missing' );
 		case 'staleBaseRetrySaveHandoffInProgress':
-			return __( 'Retry save already running' );
+			return __( 'Save already running' );
 		case 'manualResolution':
 			return __( 'Manual resolution' );
 	}
@@ -3810,15 +5702,85 @@ function normalizeCount( value ) {
 	return Number.isInteger( count ) && count > 0 ? count : 0;
 }
 
+function getNextStepDescriptor( nextStepAction ) {
+	switch ( nextStepAction ) {
+		case 'export_for_manual_conflict_review':
+			return {
+				nextStepAction,
+				nextStepMessage: __(
+					'Export local changes, then compare them with the latest post before continuing.'
+				),
+			};
+		case 'export_for_html_review':
+			return {
+				nextStepAction,
+				nextStepMessage: __(
+					'Export changes for review by someone with unfiltered HTML permission.'
+				),
+			};
+		case 'export_fresh_review_for_html_review':
+			return {
+				nextStepAction,
+				nextStepMessage: __(
+					'Export a new review handoff for someone with unfiltered HTML permission.'
+				),
+			};
+		case 'wait_for_save_proof':
+			return {
+				nextStepAction,
+				nextStepMessage: __(
+					'Try Save again after WordPress accepts the Save proof.'
+				),
+			};
+		case 'get_latest_post':
+			return {
+				nextStepAction,
+				nextStepMessage: __(
+					'Get the latest post before trying Save again.'
+				),
+			};
+		case 'export_then_reload':
+			return {
+				nextStepAction,
+				nextStepMessage: __(
+					'Export local changes, then reload the editor.'
+				),
+			};
+		case 'export_then_save':
+			return {
+				nextStepAction,
+				nextStepMessage: __(
+					'Export local changes, then try Save again.'
+				),
+			};
+		case 'keep_tab_open':
+			return {
+				nextStepAction,
+				nextStepMessage: __(
+					'Keep this tab open until WordPress confirms Save.'
+				),
+			};
+		case 'export_before_continuing':
+			return {
+				nextStepAction,
+				nextStepMessage: __(
+					'Export local changes before continuing.'
+				),
+			};
+	}
+
+	return {};
+}
+
 function getStaleBaseStatusText( descriptor ) {
 	if (
 		descriptor.retrySaveStatus ===
 		DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.STALE_BASE_REJECTED
 	) {
 		return {
-			title: __( 'Retry save stale' ),
+			title: __( 'Save needs the latest post' ),
 			message: __(
-				'The server changed again before this retry save finished. Protected local changes are still exportable; refresh the server version before trying again.'
+				'The post changed again before Save finished. Protected local changes are still exportable; get the latest post before trying again.'
 			),
 		};
 	}
@@ -3828,9 +5790,9 @@ function getStaleBaseStatusText( descriptor ) {
 		DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.STALE_BASE_REJECTED
 	) {
 		return {
-			title: __( 'Retry submit stale' ),
+			title: __( 'Save check is stale' ),
 			message: __(
-				'The server changed after retry submit was prepared. Protected local changes remain exportable; refresh the server version before continuing.'
+				'The post changed after Save was checked. Protected local changes remain exportable; get the latest post before continuing.'
 			),
 		};
 	}
@@ -3840,9 +5802,9 @@ function getStaleBaseStatusText( descriptor ) {
 		DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_STATUSES.PREPARED
 	) {
 		return {
-			title: __( 'Retry submit prepared' ),
+			title: __( 'Local changes staged' ),
 			message: __(
-				'Local changes are staged for the future retry path. No save has been sent yet.'
+				'Local changes are staged for the next Save check. WordPress has not saved them yet.'
 			),
 		};
 	}
@@ -3850,26 +5812,28 @@ function getStaleBaseStatusText( descriptor ) {
 	switch ( descriptor.localRebaseResultStatus ) {
 		case DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.REBASED:
 			return {
-				title: __( 'Local changes rebased' ),
+				title: __( 'Local changes ready' ),
 				message: __(
-					'Local changes were merged with the server version and are ready for the next submit.'
+					'Local changes were applied to the latest post and are ready for the next Save check.'
 				),
 			};
 		case DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.MANUAL_CONFLICT_REQUIRED:
 			return {
-				title: __( 'Local rebase needs review' ),
+				title: __( 'Local changes need review' ),
 				message: getManualLocalRebaseConflictMessage( descriptor ),
+				...getNextStepDescriptor( 'export_for_manual_conflict_review' ),
 			};
 		case DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.UNSAFE_CONTENT_BOUNDARY:
 			return {
-				title: __( 'Local rebase blocked' ),
+				title: __( 'Local changes blocked' ),
 				message: getUnsafeLocalRebaseBoundaryMessage( descriptor ),
+				...getNextStepDescriptor( 'export_for_manual_conflict_review' ),
 			};
 		case DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.BLOCKED_NEEDS_READY_PLAN:
 			return {
-				title: __( 'Local rebase not ready' ),
+				title: __( 'Local changes not ready' ),
 				message: __(
-					'Refresh and prepare the server version before retrying local changes.'
+					'Get the latest post before applying local changes.'
 				),
 			};
 	}
@@ -3880,9 +5844,9 @@ function getStaleBaseStatusText( descriptor ) {
 		descriptor.hasLocalRebaseInputs === false
 	) {
 		return {
-			title: __( 'Local rebase inputs missing' ),
+			title: __( 'Latest post data missing' ),
 			message: __(
-				'Retain both the client base and refreshed server version before retrying local changes.'
+				'Keep both the starting post and latest post available before applying local changes.'
 			),
 		};
 	}
@@ -3893,17 +5857,17 @@ function getStaleBaseStatusText( descriptor ) {
 		descriptor.hasLocalRebaseInputs
 	) {
 		return {
-			title: __( 'Local rebase ready' ),
+			title: __( 'Ready to apply local changes' ),
 			message: __(
-				'Local changes can be rebased over the refreshed server version.'
+				'Local changes can be applied to the latest post before saving.'
 			),
 		};
 	}
 
 	return {
-		title: __( 'Server version changed' ),
+		title: __( 'Post changed on the server' ),
 		message: __(
-			'Refresh the server version before retrying local changes. Protected local changes remain in this editor session and can be exported before leaving.'
+			'Get the latest post before applying your local changes. Protected local changes remain in this editor session and can be exported before leaving.'
 		),
 	};
 }
@@ -3927,21 +5891,21 @@ function getRetrySaveStatusText( descriptor ) {
 	switch ( descriptor.retrySaveStatus ) {
 		case DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVING:
 			return {
-				title: __( 'Retry save in progress' ),
+				title: __( 'Saving to WordPress' ),
 				message: __(
-					'The editor is sending rebased changes through the guarded retry-save path. Keep this tab open; protected local changes remain exportable until the server confirms the save.'
+					'The editor is sending the prepared changes to WordPress. Keep this tab open; protected local changes remain exportable until WordPress confirms the save.'
 				),
 			};
 		case DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVED:
 			return {
-				title: __( 'Retry save confirmed' ),
+				title: __( 'Save confirmed' ),
 				message: getRetrySaveConfirmedMessage( descriptor ),
 			};
 		case DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.STALE_BASE_REJECTED:
 			return {
-				title: __( 'Retry save stale' ),
+				title: __( 'Save needs the latest post' ),
 				message: __(
-					'The server changed again before this retry save finished. Protected local changes are still exportable; refresh the server version before trying again.'
+					'The post changed again before Save finished. Protected local changes are still exportable; get the latest post before trying again.'
 				),
 			};
 		case DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_PERMISSION_DENIED:
@@ -3950,7 +5914,7 @@ function getRetrySaveStatusText( descriptor ) {
 				DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_REVIEW_APPROVAL_REQUIRES_UNFILTERED_HTML
 			) {
 				return {
-					title: __( 'Retry save needs HTML permission' ),
+					title: __( 'Save needs HTML permission' ),
 					message: __(
 						'The HTML review proof was accepted, but this account cannot perform the final HTML-capable save. Protected local changes and the hash-only review proof remain exportable for someone with unfiltered HTML permission.'
 					),
@@ -3958,17 +5922,18 @@ function getRetrySaveStatusText( descriptor ) {
 			}
 
 			return {
-				title: __( 'Retry save permission changed' ),
+				title: __( 'Save permission changed' ),
 				message: __(
-					'Editing permission changed before the retry save finished. Protected local changes are still exportable; ask for access before retrying.'
+					'Editing permission changed before Save finished. Protected local changes are still exportable; ask for access before trying again.'
 				),
 			};
 		case DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_UNFILTERED_HTML_REVIEW_REQUIRED:
 			return {
 				title: __( 'HTML review required before Save' ),
 				message: __(
-					'Save did not update the authoritative post because these changes may alter unfiltered HTML. Export them for review by someone with unfiltered HTML permission, or refresh the server version before deciding how to continue. Protected local changes remain exportable.'
+					'Save did not update the authoritative post because these changes may alter unfiltered HTML. Export them for review by someone with unfiltered HTML permission, or get the latest post before deciding how to continue. Protected local changes remain exportable.'
 				),
+				...getNextStepDescriptor( 'export_for_html_review' ),
 			};
 		case DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_SYNC_META_TAMPERED:
 			if (
@@ -3977,29 +5942,29 @@ function getRetrySaveStatusText( descriptor ) {
 				return {
 					title: __( 'Reviewed changes token expired' ),
 					message: __(
-						'The imported reviewed-changes token has expired and is no longer usable for retry save. No server save was made. Export a fresh-review handoff for an admin reviewer; protected local changes remain exportable.'
+						'The imported reviewed-changes token has expired and is no longer usable for Save. No server save was made. Export a fresh-review handoff for an admin reviewer; protected local changes remain exportable.'
 					),
 				};
 			}
 
 			return {
-				title: __( 'Retry save proof rejected' ),
+				title: __( 'Save proof rejected' ),
 				message: __(
-					'The server rejected the retry-save proof because the sync metadata or proof flags changed unexpectedly. Protected local changes are still exportable; export them before continuing.'
+					'WordPress rejected the Save proof because the sync metadata or proof flags changed unexpectedly. Protected local changes are still exportable; export them before continuing.'
 				),
 			};
 		case DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_FEATURE_DISABLED:
 			return {
-				title: __( 'Retry save disabled' ),
+				title: __( 'Save disabled' ),
 				message: __(
-					'Distributed Editing was disabled before the retry save finished. Protected local changes are still exportable; retry after Distributed Editing is enabled.'
+					'Distributed Editing was disabled before Save finished. Protected local changes are still exportable; try again after Distributed Editing is enabled.'
 				),
 			};
 		case DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_ROUTE_MISMATCH:
 			return {
-				title: __( 'Retry save route changed' ),
+				title: __( 'Save route changed' ),
 				message: __(
-					'The retry-save request targeted a different editor route. Protected local changes are still exportable; reload the editor only after exporting them.'
+					'The Save request targeted a different editor route. Protected local changes are still exportable; reload the editor only after exporting them.'
 				),
 			};
 		case DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_MALFORMED_SYNC_PAYLOAD:
@@ -4009,23 +5974,23 @@ function getRetrySaveStatusText( descriptor ) {
 				return {
 					title: __( 'Reviewed changes token unavailable' ),
 					message: __(
-						'The imported reviewed-changes token could not be found in server storage and is no longer usable for retry save. No server save was made. Export a fresh-review handoff for an admin reviewer; protected local changes remain exportable.'
+						'The imported reviewed-changes token could not be found in server storage and is no longer usable for Save. No server save was made. Export a fresh-review handoff for an admin reviewer; protected local changes remain exportable.'
 					),
 				};
 			}
 
 			return {
-				title: __( 'Retry save payload rejected' ),
+				title: __( 'Save payload rejected' ),
 				message: __(
-					'The retry-save payload was incomplete or malformed. Protected local changes are still exportable; export them before trying again.'
+					'The Save payload was incomplete or malformed. Protected local changes are still exportable; export them before trying again.'
 				),
 			};
 	}
 
 	return {
-		title: __( 'Retry save unavailable' ),
+		title: __( 'Save unavailable' ),
 		message: __(
-			'Retry save returned an unrecognized state. Protected local changes remain exportable until the server confirms a save.'
+			'WordPress returned an unrecognized Save state. Protected local changes remain exportable until the server confirms a save.'
 		),
 	};
 }
@@ -4034,26 +5999,26 @@ function getFreshReviewRetrySaveStatusText( descriptor ) {
 	switch ( descriptor.retrySaveStatus ) {
 		case DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVING:
 			return {
-				title: __( 'Fresh-review retry save in progress' ),
+				title: __( 'Fresh-review Save in progress' ),
 				message: __(
-					'The editor is sending reviewed local changes through the guarded retry-save path. Keep this tab open; protected local changes remain exportable until the server confirms the save.'
+					'The editor is sending reviewed local changes to WordPress. Keep this tab open; protected local changes remain exportable until WordPress confirms Save.'
 				),
 			};
 		case DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVED:
 			return {
-				title: __( 'Fresh-review retry save confirmed' ),
+				title: __( 'Fresh-review Save confirmed' ),
 				message: getFreshReviewRetrySaveConfirmedMessage( descriptor ),
 			};
 		case DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.STALE_BASE_REJECTED:
 			return {
-				title: __( 'Fresh-review retry save stale' ),
+				title: __( 'Fresh-review Save needs the latest post' ),
 				message: __(
-					'The server changed after fresh review was validated. Protected local changes are still exportable; refresh the server version before trying again.'
+					'The server changed after fresh review was validated. Protected local changes are still exportable; get the latest post before trying again.'
 				),
 			};
 		case DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_PERMISSION_DENIED:
 			return {
-				title: __( 'Fresh-review retry save needs permission' ),
+				title: __( 'Fresh-review Save needs permission' ),
 				message: __(
 					'Permission changed before the reviewed changes could be saved. Protected local changes are still exportable for another fresh review or a later retry.'
 				),
@@ -4062,7 +6027,10 @@ function getFreshReviewRetrySaveStatusText( descriptor ) {
 			return {
 				title: __( 'Fresh-review Save needs HTML review' ),
 				message: __(
-					'The authoritative post was not updated because the server still requires HTML review. Export a new review handoff, or refresh the server version before deciding how to continue. Protected local changes remain exportable.'
+					'The authoritative post was not updated because the server still requires HTML review. Export a new review handoff, or get the latest post before deciding how to continue. Protected local changes remain exportable.'
+				),
+				...getNextStepDescriptor(
+					'export_fresh_review_for_html_review'
 				),
 			};
 		case DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_SYNC_META_TAMPERED:
@@ -4070,36 +6038,36 @@ function getFreshReviewRetrySaveStatusText( descriptor ) {
 				return {
 					title: __( 'Fresh-review decision already consumed' ),
 					message: __(
-						'This fresh-review decision was already used by a server retry save. Protected local changes remain exportable; request a new fresh review or refresh the server version before continuing.'
+						'This fresh-review decision was already used by WordPress Save. Protected local changes remain exportable; request a new fresh review or get the latest post before continuing.'
 					),
 				};
 			}
 
 			return {
-				title: __( 'Fresh-review retry save proof rejected' ),
+				title: __( 'Fresh-review Save proof rejected' ),
 				message: __(
-					'The server rejected the reviewed retry-save proof before saving. Protected local changes are still exportable for a new review; no normal save fallback was used.'
+					'WordPress rejected the reviewed Save proof before saving. Protected local changes are still exportable for a new review; no normal save fallback was used.'
 				),
 			};
 		case DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_FEATURE_DISABLED:
 			return {
-				title: __( 'Fresh-review retry save disabled' ),
+				title: __( 'Fresh-review Save disabled' ),
 				message: __(
 					'Distributed Editing was disabled before the reviewed changes could be saved. Protected local changes are still exportable for a later retry.'
 				),
 			};
 		case DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_ROUTE_MISMATCH:
 			return {
-				title: __( 'Fresh-review retry save route changed' ),
+				title: __( 'Fresh-review Save route changed' ),
 				message: __(
-					'The reviewed retry-save request targeted a different editor route. Protected local changes are still exportable; reload only after exporting them.'
+					'The reviewed Save request targeted a different editor route. Protected local changes are still exportable; reload only after exporting them.'
 				),
 			};
 		case DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_MALFORMED_SYNC_PAYLOAD:
 			return {
-				title: __( 'Fresh-review retry save payload rejected' ),
+				title: __( 'Fresh-review Save payload rejected' ),
 				message: __(
-					'The reviewed retry-save payload was incomplete or malformed. Protected local changes are still exportable for a new review before trying again.'
+					'The reviewed Save payload was incomplete or malformed. Protected local changes are still exportable for a new review before trying again.'
 				),
 			};
 	}
@@ -4134,8 +6102,8 @@ function getRetrySaveConfirmedMessage( descriptor ) {
 		return sprintf(
 			/* translators: 1: previous sync version, 2: saved sync version, 3: number of revisions. */
 			_n(
-				'Server confirmed the guarded retry-save, advanced the sync version from %1$s to %2$s, and recorded %3$d revision. Protected local changes are no longer pending for this save.',
-				'Server confirmed the guarded retry-save, advanced the sync version from %1$s to %2$s, and recorded %3$d revisions. Protected local changes are no longer pending for this save.',
+				'WordPress saved the prepared changes, advanced the sync version from %1$s to %2$s, and recorded %3$d revision. Protected local changes are no longer pending for this save.',
+				'WordPress saved the prepared changes, advanced the sync version from %1$s to %2$s, and recorded %3$d revisions. Protected local changes are no longer pending for this save.',
 				revisionCount
 			),
 			previousServerVersion,
@@ -4148,7 +6116,7 @@ function getRetrySaveConfirmedMessage( descriptor ) {
 		return sprintf(
 			/* translators: 1: previous sync version, 2: saved sync version. */
 			__(
-				'Server confirmed the guarded retry-save and advanced the sync version from %1$s to %2$s. Protected local changes are no longer pending for this save.'
+				'WordPress saved the prepared changes and advanced the sync version from %1$s to %2$s. Protected local changes are no longer pending for this save.'
 			),
 			previousServerVersion,
 			serverVersion
@@ -4159,8 +6127,8 @@ function getRetrySaveConfirmedMessage( descriptor ) {
 		return sprintf(
 			/* translators: 1: saved sync version, 2: number of revisions. */
 			_n(
-				'Server confirmed the guarded retry-save at sync version %1$s and recorded %2$d revision. Protected local changes are no longer pending for this save.',
-				'Server confirmed the guarded retry-save at sync version %1$s and recorded %2$d revisions. Protected local changes are no longer pending for this save.',
+				'WordPress saved the prepared changes at sync version %1$s and recorded %2$d revision. Protected local changes are no longer pending for this save.',
+				'WordPress saved the prepared changes at sync version %1$s and recorded %2$d revisions. Protected local changes are no longer pending for this save.',
 				revisionCount
 			),
 			serverVersion,
@@ -4172,7 +6140,7 @@ function getRetrySaveConfirmedMessage( descriptor ) {
 		return sprintf(
 			/* translators: %s: saved sync version. */
 			__(
-				'Server confirmed the guarded retry-save at sync version %s. Protected local changes are no longer pending for this save.'
+				'WordPress saved the prepared changes at sync version %s. Protected local changes are no longer pending for this save.'
 			),
 			serverVersion
 		);
@@ -4182,8 +6150,8 @@ function getRetrySaveConfirmedMessage( descriptor ) {
 		return sprintf(
 			/* translators: %d: number of revisions. */
 			_n(
-				'Server confirmed the guarded retry-save and recorded %d revision. Protected local changes are no longer pending for this save.',
-				'Server confirmed the guarded retry-save and recorded %d revisions. Protected local changes are no longer pending for this save.',
+				'WordPress saved the prepared changes and recorded %d revision. Protected local changes are no longer pending for this save.',
+				'WordPress saved the prepared changes and recorded %d revisions. Protected local changes are no longer pending for this save.',
 				revisionCount
 			),
 			revisionCount
@@ -4191,7 +6159,7 @@ function getRetrySaveConfirmedMessage( descriptor ) {
 	}
 
 	return __(
-		'Server confirmed the guarded retry-save. Protected local changes are no longer pending for this save.'
+		'WordPress saved the prepared changes. Protected local changes are no longer pending for this save.'
 	);
 }
 
@@ -4208,8 +6176,8 @@ function getFreshReviewRetrySaveConfirmedMessage( descriptor ) {
 		return sprintf(
 			/* translators: 1: previous sync version, 2: saved sync version, 3: number of revisions. */
 			_n(
-				'Server confirmed the fresh-review retry-save, advanced the sync version from %1$s to %2$s, and recorded %3$d revision. Protected local changes are no longer pending for this save.',
-				'Server confirmed the fresh-review retry-save, advanced the sync version from %1$s to %2$s, and recorded %3$d revisions. Protected local changes are no longer pending for this save.',
+				'WordPress confirmed fresh-review Save, advanced the sync version from %1$s to %2$s, and recorded %3$d revision. Protected local changes are no longer pending for this save.',
+				'WordPress confirmed fresh-review Save, advanced the sync version from %1$s to %2$s, and recorded %3$d revisions. Protected local changes are no longer pending for this save.',
 				revisionCount
 			),
 			previousServerVersion,
@@ -4222,7 +6190,7 @@ function getFreshReviewRetrySaveConfirmedMessage( descriptor ) {
 		return sprintf(
 			/* translators: 1: previous sync version, 2: saved sync version. */
 			__(
-				'Server confirmed the fresh-review retry-save and advanced the sync version from %1$s to %2$s. Protected local changes are no longer pending for this save.'
+				'WordPress confirmed fresh-review Save and advanced the sync version from %1$s to %2$s. Protected local changes are no longer pending for this save.'
 			),
 			previousServerVersion,
 			serverVersion
@@ -4233,14 +6201,14 @@ function getFreshReviewRetrySaveConfirmedMessage( descriptor ) {
 		return sprintf(
 			/* translators: %s: saved sync version. */
 			__(
-				'Server confirmed the fresh-review retry-save at sync version %s. Protected local changes are no longer pending for this save.'
+				'WordPress confirmed fresh-review Save at sync version %s. Protected local changes are no longer pending for this save.'
 			),
 			serverVersion
 		);
 	}
 
 	return __(
-		'Server confirmed the fresh-review retry-save. Protected local changes are no longer pending for this save.'
+		'WordPress confirmed fresh-review Save. Protected local changes are no longer pending for this save.'
 	);
 }
 
@@ -4298,46 +6266,52 @@ function getRetrySaveHandoffBlockedText( descriptor ) {
 		case DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.RETRY_SUBMIT_SAVE_NOT_READY:
 		case DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.MISSING_VERSION_PROOF:
 			return {
-				title: __( 'Retry save needs accepted proof' ),
+				title: __( 'Save needs accepted proof' ),
 				message: __(
-					'The editor could not verify accepted retry-save proof for this save. Protected local changes are still exportable; retry after the proof is ready.'
+					'The editor could not verify accepted Save proof for this save. Protected local changes are still exportable; try again after the proof is ready.'
 				),
+				...getNextStepDescriptor( 'wait_for_save_proof' ),
 			};
 		case DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.SERVER_STATE_REFETCH_REQUIRED:
 			return {
-				title: __( 'Retry save needs server refresh' ),
+				title: __( 'Save needs the latest post' ),
 				message: __(
-					'The server state must be refreshed before retry-save can continue. Protected local changes are still exportable; refreshing only fetches server state and does not save over local changes.'
+					'The latest post must be loaded before Save can continue. Protected local changes are still exportable; loading the latest post does not save over local changes.'
 				),
+				...getNextStepDescriptor( 'get_latest_post' ),
 			};
 		case DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.MISSING_POST_ROUTE:
 			return {
-				title: __( 'Retry save route unavailable' ),
+				title: __( 'Save route unavailable' ),
 				message: __(
-					'The editor could not identify the route for retry-save. Protected local changes are still exportable; reload the editor only after exporting them.'
+					'The editor could not identify the route for Save. Protected local changes are still exportable; reload the editor only after exporting them.'
 				),
+				...getNextStepDescriptor( 'export_then_reload' ),
 			};
 		case DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.MISSING_PROPOSED_CONTENT:
 			return {
-				title: __( 'Retry save content unavailable' ),
+				title: __( 'Save content unavailable' ),
 				message: __(
-					'The editor could not read the proposed post content for retry-save. Protected local changes are still exportable; export them before trying again.'
+					'The editor could not read the proposed post content for Save. Protected local changes are still exportable; export them before trying again.'
 				),
+				...getNextStepDescriptor( 'export_then_save' ),
 			};
 		case DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.RETRY_SAVE_IN_PROGRESS:
 			return {
-				title: __( 'Retry save already in progress' ),
+				title: __( 'Save already in progress' ),
 				message: __(
-					'A retry save is already waiting for server confirmation. Protected local changes remain exportable; keep this tab open until it finishes.'
+					'Save is already waiting for WordPress confirmation. Protected local changes remain exportable; keep this tab open until it finishes.'
 				),
+				...getNextStepDescriptor( 'keep_tab_open' ),
 			};
 	}
 
 	return {
-		title: __( 'Retry save blocked' ),
+		title: __( 'Save blocked' ),
 		message: __(
-			'The editor blocked retry-save before normal save could run. Protected local changes are still exportable; export them before continuing.'
+			'The editor blocked Save before normal save could run. Protected local changes are still exportable; export them before continuing.'
 		),
+		...getNextStepDescriptor( 'export_before_continuing' ),
 	};
 }
 
@@ -4345,23 +6319,25 @@ function getManualLocalRebaseConflictMessage( descriptor ) {
 	switch ( descriptor.localRebaseResultReason ) {
 		case 'block_inserted':
 			return __(
-				'Blocks were inserted in more than one version. Review the local and server versions before continuing.'
+				'Blocks were inserted in more than one place. Review the local changes and the latest post before continuing.'
 			);
 		case 'block_deleted':
 			return __(
-				'Blocks were deleted in more than one version. Review the local and server versions before continuing.'
+				'Blocks were deleted in more than one place. Review the local changes and the latest post before continuing.'
 			);
 		case 'block_reordered':
 			return __(
-				'Blocks were reordered while local edits were pending. Review the local and server versions before continuing.'
+				'Blocks were reordered while local edits were pending. Review the local changes and the latest post before continuing.'
 			);
 		case 'same_block_changed':
 			return __(
-				'Local and server changes touched the same block. Review both versions before continuing.'
+				'Local changes and the latest post touched the same block. Review both before continuing.'
 			);
 	}
 
-	return __( 'Local and server changes could not be merged automatically.' );
+	return __(
+		'Local changes and the latest post could not be merged automatically.'
+	);
 }
 
 function getUnsafeLocalRebaseBoundaryMessage( descriptor ) {

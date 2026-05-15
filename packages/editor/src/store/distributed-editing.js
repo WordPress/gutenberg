@@ -18,6 +18,7 @@ export const DISTRIBUTED_EDITING_REASON_CODES = Object.freeze( {
 	DE_RTC_REVIEW_APPROVAL_HASH_MISMATCH:
 		'de_rtc_review_approval_hash_mismatch',
 	DE_RTC_FEATURE_DISABLED: 'de_rtc_feature_disabled',
+	DE_RTC_PRESENCE_STORAGE_UNAVAILABLE: 'de_rtc_presence_storage_unavailable',
 	REST_CANNOT_EDIT: 'rest_cannot_edit',
 	REST_POST_INVALID_ID: 'rest_post_invalid_id',
 } );
@@ -109,8 +110,12 @@ export const DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES = Object.freeze(
 		LOCAL_EDITOR_ACTION: 'local_editor_action',
 		REMOTE_CHANGE_RECEIVED: 'remote_change_received',
 		SERVER_STATE_REFETCHED: 'server_state_refetched',
+		LOCAL_CHANGES_APPLIED: 'local_changes_applied',
+		LOCAL_CHANGES_STAGED: 'local_changes_staged',
 		RETRY_SUBMIT_PROOF_REFRESHED: 'retry_submit_proof_refreshed',
+		SAVE_PREPARED: 'save_prepared',
 		SAVE_STATE_CHANGED: 'save_state_changed',
+		SAVE_CONFIRMED: 'save_confirmed',
 		REVIEW_REQUIRED: 'review_required',
 		FRESH_REVIEW_REQUESTED: 'fresh_review_requested',
 		FRESH_REVIEW_DECISION_SUBMITTED: 'fresh_review_decision_submitted',
@@ -126,10 +131,18 @@ const DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_DEFINITIONS = Object.freeze( {
 		Object.freeze( { source: 'remote' } ),
 	[ DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.SERVER_STATE_REFETCHED ]:
 		Object.freeze( { source: 'server' } ),
+	[ DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.LOCAL_CHANGES_APPLIED ]:
+		Object.freeze( { source: 'editor' } ),
+	[ DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.LOCAL_CHANGES_STAGED ]:
+		Object.freeze( { source: 'editor' } ),
 	[ DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.RETRY_SUBMIT_PROOF_REFRESHED ]:
 		Object.freeze( { source: 'server' } ),
+	[ DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.SAVE_PREPARED ]:
+		Object.freeze( { source: 'editor' } ),
 	[ DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.SAVE_STATE_CHANGED ]:
 		Object.freeze( { source: 'editor' } ),
+	[ DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.SAVE_CONFIRMED ]:
+		Object.freeze( { source: 'server' } ),
 	[ DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.REVIEW_REQUIRED ]:
 		Object.freeze( { source: 'review' } ),
 	[ DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.FRESH_REVIEW_REQUESTED ]:
@@ -148,11 +161,19 @@ const DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_SUPPORT_LABELS = Object.freeze( {
 	[ DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.REMOTE_CHANGE_RECEIVED ]:
 		'Remote editing activity recorded',
 	[ DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.SERVER_STATE_REFETCHED ]:
-		'Server state refetched',
+		'Latest post loaded',
+	[ DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.LOCAL_CHANGES_APPLIED ]:
+		'Local changes applied',
+	[ DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.LOCAL_CHANGES_STAGED ]:
+		'Local changes staged',
 	[ DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.RETRY_SUBMIT_PROOF_REFRESHED ]:
-		'Retry proof refreshed',
+		'Save safety checked',
+	[ DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.SAVE_PREPARED ]:
+		'Save prepared',
 	[ DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.SAVE_STATE_CHANGED ]:
-		'Save-state changed',
+		'Save started',
+	[ DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.SAVE_CONFIRMED ]:
+		'WordPress confirmed Save',
 	[ DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.REVIEW_REQUIRED ]:
 		'Review required',
 	[ DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.FRESH_REVIEW_REQUESTED ]:
@@ -162,7 +183,7 @@ const DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_SUPPORT_LABELS = Object.freeze( {
 	[ DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.FRESH_REVIEW_CONSUME_VALIDATED ]:
 		'Fresh-review handoff validated',
 	[ DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.FRESH_REVIEW_RETRY_SAVE_CONFIRMED ]:
-		'Fresh-review guarded save confirmed',
+		'Fresh-review Save confirmed',
 } );
 
 const DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_SUPPORT_CHRONOLOGY_TEXT =
@@ -170,14 +191,16 @@ const DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_SUPPORT_CHRONOLOGY_TEXT =
 		none: 'No Distributed Editing activity transcript entries are available.',
 		activity_recorded:
 			'Distributed Editing activity was recorded; no fresh-review chronology is complete.',
+		guarded_save_confirmed:
+			'WordPress Save confirmation was recorded; use save-authority evidence to confirm persistence.',
 		fresh_review_requested:
 			'Fresh review was requested for protected local updates.',
 		fresh_review_decision_submitted:
-			'Fresh-review decision was submitted; guarded save still needs validation and server authority.',
+			'Fresh-review decision was submitted; Save still needs validation and WordPress authority.',
 		fresh_review_handoff_validated:
-			'Fresh-review handoff was validated; retry-save still requires server confirmation.',
+			'Fresh-review handoff was validated; Save still requires WordPress confirmation.',
 		fresh_review_guarded_save_confirmed:
-			'Fresh-review guarded save confirmation was recorded; use save-authority evidence to confirm persistence.',
+			'Fresh-review Save confirmation was recorded; use WordPress save-authority evidence to confirm persistence.',
 	} );
 
 const MAX_DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_ITEMS = 10;
@@ -633,6 +656,105 @@ export const DISTRIBUTED_EDITING_FRESH_REVIEW_RETRY_SAVE_HANDOFF_REASONS =
 		MALFORMED_SYNC_PAYLOAD: 'malformed_sync_payload',
 	} );
 
+export const DISTRIBUTED_EDITING_PRESENCE_ROSTER_STATUSES = Object.freeze( {
+	HIDDEN: 'hidden',
+	EMPTY: 'empty',
+	ACTIVE: 'active',
+	RECENT: 'recent',
+	STALE: 'stale',
+	DEGRADED: 'degraded',
+} );
+
+const VALID_DISTRIBUTED_EDITING_PRESENCE_ROSTER_STATUSES = new Set(
+	Object.values( DISTRIBUTED_EDITING_PRESENCE_ROSTER_STATUSES )
+);
+
+export const DISTRIBUTED_EDITING_PRESENCE_REFRESH_STATUSES = Object.freeze( {
+	NONE: 'none',
+	REFRESHED: 'refreshed',
+	FEATURE_DISABLED: 'feature_disabled',
+	PERMISSION_DENIED: 'permission_denied',
+	ROUTE_MISMATCH: 'route_mismatch',
+	FAILED: 'failed',
+} );
+
+const VALID_DISTRIBUTED_EDITING_PRESENCE_REFRESH_STATUSES = new Set(
+	Object.values( DISTRIBUTED_EDITING_PRESENCE_REFRESH_STATUSES )
+);
+
+export const DISTRIBUTED_EDITING_PRESENCE_HEARTBEAT_STATUSES = Object.freeze( {
+	NONE: 'none',
+	SENT: 'sent',
+	STORAGE_UNAVAILABLE: 'storage_unavailable',
+	FEATURE_DISABLED: 'feature_disabled',
+	PERMISSION_DENIED: 'permission_denied',
+	ROUTE_MISMATCH: 'route_mismatch',
+	FAILED: 'failed',
+} );
+
+const VALID_DISTRIBUTED_EDITING_PRESENCE_HEARTBEAT_STATUSES = new Set(
+	Object.values( DISTRIBUTED_EDITING_PRESENCE_HEARTBEAT_STATUSES )
+);
+
+export const DISTRIBUTED_EDITING_PRESENCE_STORAGE_READINESS_RECHECK_STATUSES =
+	Object.freeze( {
+		NONE: 'none',
+		READY: 'ready',
+		SETUP_REQUIRED: 'setup_required',
+		UPGRADE_REQUIRED: 'upgrade_required',
+		FEATURE_DISABLED: 'feature_disabled',
+		PERMISSION_DENIED: 'permission_denied',
+		ROUTE_MISMATCH: 'route_mismatch',
+		FAILED: 'failed',
+	} );
+
+const VALID_DISTRIBUTED_EDITING_PRESENCE_STORAGE_READINESS_RECHECK_STATUSES =
+	new Set(
+		Object.values(
+			DISTRIBUTED_EDITING_PRESENCE_STORAGE_READINESS_RECHECK_STATUSES
+		)
+	);
+
+export const DISTRIBUTED_EDITING_PRESENCE_REPEATED_REFRESH_RUNTIME_STATUSES =
+	Object.freeze( {
+		DISABLED_BY_DEFAULT: 'disabled_by_default',
+		SCHEDULED: 'scheduled',
+		PAUSED_DEGRADED_TRANSPORT: 'paused_degraded_transport',
+	} );
+
+const VALID_DISTRIBUTED_EDITING_PRESENCE_REPEATED_REFRESH_RUNTIME_STATUSES =
+	new Set(
+		Object.values(
+			DISTRIBUTED_EDITING_PRESENCE_REPEATED_REFRESH_RUNTIME_STATUSES
+		)
+	);
+
+export const DISTRIBUTED_EDITING_PRESENCE_REPEATED_REFRESH_CONNECTION_STATES =
+	Object.freeze( {
+		DISABLED: 'disabled',
+		CONNECTED: 'connected',
+		DEGRADED: 'degraded',
+	} );
+
+const VALID_DISTRIBUTED_EDITING_PRESENCE_REPEATED_REFRESH_CONNECTION_STATES =
+	new Set(
+		Object.values(
+			DISTRIBUTED_EDITING_PRESENCE_REPEATED_REFRESH_CONNECTION_STATES
+		)
+	);
+
+export const DISTRIBUTED_EDITING_PRESENCE_STARTUP_POLICY_STATUSES =
+	Object.freeze( {
+		MANUAL_REQUIRED: 'manual_required',
+		AUTOMATIC_HEARTBEAT_ALLOWED: 'automatic_heartbeat_allowed',
+		SLOW_AUTOMATIC_HEARTBEAT_ALLOWED: 'slow_automatic_heartbeat_allowed',
+		PAUSED_DEGRADED_TRANSPORT: 'paused_degraded_transport',
+	} );
+
+const VALID_DISTRIBUTED_EDITING_PRESENCE_STARTUP_POLICY_STATUSES = new Set(
+	Object.values( DISTRIBUTED_EDITING_PRESENCE_STARTUP_POLICY_STATUSES )
+);
+
 const VALID_REASON_CODES = new Set(
 	Object.values( DISTRIBUTED_EDITING_REASON_CODES )
 );
@@ -763,6 +885,167 @@ export const DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE = Object.freeze( {
 	actionTranscriptMutatesEditorContent: false,
 	actionTranscriptChangesPostLock: false,
 	actionTranscriptClaimsSaved: false,
+	presenceRosterStatus: DISTRIBUTED_EDITING_PRESENCE_ROSTER_STATUSES.HIDDEN,
+	presenceRosterEntries: [],
+	presenceRosterFreshness: 'unknown',
+	presenceRosterServerContact: 'nominal',
+	presenceRosterVisibleCount: 0,
+	presenceRosterTotalKnownCount: 0,
+	presenceRosterHiddenCount: 0,
+	presenceRosterExpiredCount: 0,
+	presenceRosterExpiredEvidenceCarriedForward: false,
+	presenceRosterRefreshStatus:
+		DISTRIBUTED_EDITING_PRESENCE_REFRESH_STATUSES.NONE,
+	presenceRosterRefreshReason: null,
+	presenceRosterRefreshResult: null,
+	presenceRosterRefreshRequested: false,
+	presenceRosterRefreshSucceeded: false,
+	presenceRosterRefreshFailed: false,
+	presenceRosterRefreshCallsRestEndpoint: false,
+	presenceRosterRefreshCallsSave: false,
+	presenceRosterRefreshMutatesEditorContent: false,
+	presenceRosterRefreshMutatesPersistedPostContent: false,
+	presenceRosterRefreshChangesPostLock: false,
+	presenceRosterRefreshRecordsPresenceHeartbeat: false,
+	presenceRosterRefreshEnablesRepeatedClientRefresh: false,
+	presenceRosterRefreshClaimsSaved: false,
+	presenceRosterRefreshExposesRawContent: false,
+	presenceRosterRefreshExposesUserIds: false,
+	presenceRosterRefreshExposesCursorOffset: false,
+	presenceRosterRefreshExposesSelection: false,
+	presenceRosterReadContractSource: null,
+	presenceRosterReadContractRoute: null,
+	presenceRosterReadSuggestedPollingIntervalSeconds: null,
+	presenceRosterReadCheapHostPollingIntervalSeconds: null,
+	presenceRosterReadRepeatedClientRefreshEnabled: false,
+	presenceHeartbeatStatus:
+		DISTRIBUTED_EDITING_PRESENCE_HEARTBEAT_STATUSES.NONE,
+	presenceHeartbeatReason: null,
+	presenceHeartbeatResult: null,
+	presenceHeartbeatRequested: false,
+	presenceHeartbeatSucceeded: false,
+	presenceHeartbeatFailed: false,
+	presenceHeartbeatCallsRestEndpoint: false,
+	presenceHeartbeatRecordsPresenceHeartbeat: false,
+	presenceHeartbeatWritesPresence: false,
+	presenceHeartbeatCallsSave: false,
+	presenceHeartbeatMutatesEditorContent: false,
+	presenceHeartbeatMutatesPersistedPostContent: false,
+	presenceHeartbeatChangesPostLock: false,
+	presenceHeartbeatClaimsSaved: false,
+	presenceHeartbeatEnablesRepeatedClientRefresh: false,
+	presenceHeartbeatRuntimePollingEnabled: false,
+	presenceHeartbeatExposesRawContent: false,
+	presenceHeartbeatExposesUserIds: false,
+	presenceHeartbeatExposesCursorOffset: false,
+	presenceHeartbeatExposesSelection: false,
+	presenceHeartbeatRawSessionKeyIncluded: false,
+	presenceHeartbeatMarksLocalEditorCurrent: false,
+	presenceHeartbeatMarksLocalEditorDelayed: false,
+	presenceHeartbeatLocalRosterEntryVisible: false,
+	presenceHeartbeatLocalRosterEntryFreshness: null,
+	presenceHeartbeatRepeatedRefreshOptional: true,
+	presenceHeartbeatSuggestedIntervalSeconds: null,
+	presenceHeartbeatCheapHostIntervalSeconds: null,
+	presenceStorageReadinessRecheckStatus:
+		DISTRIBUTED_EDITING_PRESENCE_STORAGE_READINESS_RECHECK_STATUSES.NONE,
+	presenceStorageReadinessRecheckReason: null,
+	presenceStorageReadinessRecheckResult: null,
+	presenceStorageReadinessRecheckRequested: false,
+	presenceStorageReadinessRecheckSucceeded: false,
+	presenceStorageReadinessRecheckFailed: false,
+	presenceStorageReadinessRecheckCallsRestEndpoint: false,
+	presenceStorageReadinessRecheckInstallsPresenceTable: false,
+	presenceStorageReadinessRecheckRecordsPresenceHeartbeat: false,
+	presenceStorageReadinessRecheckWritesPresence: false,
+	presenceStorageReadinessRecheckStartsPolling: false,
+	presenceStorageReadinessRecheckCallsSave: false,
+	presenceStorageReadinessRecheckMutatesEditorContent: false,
+	presenceStorageReadinessRecheckMutatesPersistedPostContent: false,
+	presenceStorageReadinessRecheckChangesPostLock: false,
+	presenceStorageReadinessRecheckClaimsAbsence: false,
+	presenceStorageReadinessRecheckClaimsSaved: false,
+	presenceStorageReadinessRecheckContentFree: true,
+	presenceStorageReadinessRecheckExposesRawContent: false,
+	presenceStorageReadinessRecheckExposesUserIds: false,
+	presenceStorageReadinessRecheckExposesCursorOffset: false,
+	presenceStorageReadinessRecheckExposesSelection: false,
+	presenceStorageReadinessRecheckCorrectnessIndependentOfTransport: true,
+	presenceStorageReadinessRecheckTransportRequiredForCorrectness: false,
+	presenceRepeatedRefreshRuntimeStatus:
+		DISTRIBUTED_EDITING_PRESENCE_REPEATED_REFRESH_RUNTIME_STATUSES.DISABLED_BY_DEFAULT,
+	presenceRepeatedRefreshLocalConnectionState:
+		DISTRIBUTED_EDITING_PRESENCE_REPEATED_REFRESH_CONNECTION_STATES.DISABLED,
+	presenceRepeatedRefreshRequiresExplicitOptIn: true,
+	presenceRepeatedRefreshRuntimeEnabledByDefault: false,
+	presenceRepeatedRefreshExplicitOptIn: false,
+	presenceRepeatedRefreshHostProfile: null,
+	presenceRepeatedRefreshServerContact: 'nominal',
+	presenceRepeatedRefreshSelectedIntervalSeconds: null,
+	presenceRepeatedRefreshSelectedHeartbeatIntervalSeconds: null,
+	presenceRepeatedRefreshStandardIntervalSeconds: null,
+	presenceRepeatedRefreshCheapHostIntervalSeconds: null,
+	presenceRepeatedRefreshMinimumIntervalSeconds: null,
+	presenceRepeatedRefreshSchedulesNextRefresh: false,
+	presenceRepeatedRefreshSchedulesNextHeartbeat: false,
+	presenceRepeatedRefreshCallsPresenceReadEndpointNow: false,
+	presenceRepeatedRefreshCallsHeartbeatEndpointNow: false,
+	presenceRepeatedRefreshRecordsPresenceHeartbeatNow: false,
+	presenceRepeatedRefreshWritesHeartbeatNow: false,
+	presenceRepeatedRefreshStartsPollingImmediately: false,
+	presenceRepeatedRefreshPausesOnDegradedTransport: true,
+	presenceRepeatedRefreshExposesLocalConnectionState: true,
+	presenceRepeatedRefreshOptional: true,
+	presenceRepeatedRefreshCorrectnessIndependentOfTransport: true,
+	presenceRepeatedRefreshTransportRequiredForCorrectness: false,
+	presenceRepeatedRefreshDispatchesNotice: false,
+	presenceRepeatedRefreshCallsSave: false,
+	presenceRepeatedRefreshMutatesEditorContent: false,
+	presenceRepeatedRefreshMutatesPersistedPostContent: false,
+	presenceRepeatedRefreshChangesPostLock: false,
+	presenceRepeatedRefreshClaimsAbsence: false,
+	presenceRepeatedRefreshClaimsSaved: false,
+	presenceRepeatedRefreshExposesRawContent: false,
+	presenceRepeatedRefreshExposesUserIds: false,
+	presenceRepeatedRefreshExposesLogins: false,
+	presenceRepeatedRefreshExposesEmail: false,
+	presenceRepeatedRefreshExposesCursorOffset: false,
+	presenceRepeatedRefreshExposesSelection: false,
+	presenceRepeatedRefreshRawSessionKeyIncluded: false,
+	presenceStartupPolicyStatus:
+		DISTRIBUTED_EDITING_PRESENCE_STARTUP_POLICY_STATUSES.MANUAL_REQUIRED,
+	presenceStartupPolicyReason: 'manual_startup_required',
+	presenceStartupPolicyRequiresExplicitEnablement: true,
+	presenceStartupPolicyMaySendInitialHeartbeatAutomatically: false,
+	presenceStartupPolicySlowAutomaticHeartbeatAllowed: false,
+	presenceStartupPolicyManualHeartbeatAvailable: true,
+	presenceStartupPolicyHostProfile: null,
+	presenceStartupPolicyServerContact: 'nominal',
+	presenceStartupPolicySelectedInitialHeartbeatDelaySeconds: null,
+	presenceStartupPolicyStandardInitialHeartbeatDelaySeconds: null,
+	presenceStartupPolicyCheapHostInitialHeartbeatDelaySeconds: null,
+	presenceStartupPolicyMinimumInitialHeartbeatDelaySeconds: null,
+	presenceStartupPolicyCallsHeartbeatEndpointNow: false,
+	presenceStartupPolicyRecordsPresenceHeartbeatNow: false,
+	presenceStartupPolicyWritesPresenceNow: false,
+	presenceStartupPolicyStartsPollingNow: false,
+	presenceStartupPolicyStartsTimerNow: false,
+	presenceStartupPolicyDispatchesNotice: false,
+	presenceStartupPolicyCallsSave: false,
+	presenceStartupPolicyMutatesEditorContent: false,
+	presenceStartupPolicyMutatesPersistedPostContent: false,
+	presenceStartupPolicyChangesPostLock: false,
+	presenceStartupPolicyClaimsAbsence: false,
+	presenceStartupPolicyClaimsSaved: false,
+	presenceStartupPolicyExposesRawContent: false,
+	presenceStartupPolicyExposesUserIds: false,
+	presenceStartupPolicyExposesLogins: false,
+	presenceStartupPolicyExposesEmail: false,
+	presenceStartupPolicyExposesCursorOffset: false,
+	presenceStartupPolicyExposesSelection: false,
+	presenceStartupPolicyRawSessionKeyIncluded: false,
+	presenceStartupPolicyCorrectnessIndependentOfTransport: true,
+	presenceStartupPolicyTransportRequiredForCorrectness: false,
 	requiresServerStateAcceptance: false,
 	requiresServerStateRefetch: false,
 	refetchedServerState: false,
@@ -1529,6 +1812,18 @@ export function normalizeDistributedEditingSessionState( sessionState = {} ) {
 		remoteChangeCount,
 		hasRemoteChanges,
 		...normalizeDistributedEditingActionTranscriptFields( sessionState ),
+		...normalizeDistributedEditingPresenceRosterFields( sessionState ),
+		...normalizeDistributedEditingPresenceRefreshFields( sessionState ),
+		...normalizeDistributedEditingPresenceHeartbeatFields( sessionState ),
+		...normalizeDistributedEditingPresenceRepeatedRefreshRuntimeFields(
+			sessionState
+		),
+		...normalizeDistributedEditingPresenceStartupPolicyFields(
+			sessionState
+		),
+		...normalizeDistributedEditingPresenceStorageReadinessRecheckFields(
+			sessionState
+		),
 		requiresServerStateAcceptance,
 		requiresServerStateRefetch,
 		refetchedServerState,
@@ -1710,6 +2005,2166 @@ export function getDistributedEditingActionTranscriptStateForSessionState(
 	};
 }
 
+function normalizeDistributedEditingPresenceRosterEntry( entry, index ) {
+	const source = normalizeObject( entry );
+	const displayName =
+		normalizeNullableString(
+			getFirstDefined(
+				source.displayName,
+				source.display_name,
+				source.name
+			)
+		) || null;
+	const requestedIdentityVisibility = getFirstDefined(
+		source.identityVisibility,
+		source.identity_visibility
+	);
+	let identityVisibility = 'anonymous';
+
+	if (
+		[ 'named', 'anonymous', 'self' ].includes( requestedIdentityVisibility )
+	) {
+		identityVisibility = requestedIdentityVisibility;
+	} else if ( displayName ) {
+		identityVisibility = 'named';
+	}
+	const relationship = [
+		'other_user',
+		'same_user_other_tab',
+		'current_user_current_tab',
+	].includes( source.relationship )
+		? source.relationship
+		: 'other_user';
+	const requestedFreshness =
+		source.freshness === 'active' ? 'current' : source.freshness;
+	const freshness = [ 'current', 'recent', 'stale', 'unknown' ].includes(
+		requestedFreshness
+	)
+		? requestedFreshness
+		: 'unknown';
+
+	return {
+		key:
+			normalizeNullableString( source.key ) ||
+			`presence-editor-${ index + 1 }`,
+		displayName,
+		avatarUrl: normalizeNullableString(
+			getFirstDefined( source.avatarUrl, source.avatar_url )
+		),
+		identityVisibility,
+		relationship,
+		activity: normalizeNullableString( source.activity ) || 'editing_post',
+		freshness,
+		location: { scope: 'post' },
+		exposesUserId: false,
+		exposesCursorOffset: false,
+		exposesSelection: false,
+		exposesRawContent: false,
+	};
+}
+
+function normalizeDistributedEditingPresenceRosterFields( sessionState = {} ) {
+	let explicitEntries = [];
+
+	if ( Array.isArray( sessionState.presenceRosterEntries ) ) {
+		explicitEntries = sessionState.presenceRosterEntries;
+	} else if (
+		Array.isArray( sessionState.distributedEditingPresenceRoster?.entries )
+	) {
+		explicitEntries = sessionState.distributedEditingPresenceRoster.entries;
+	}
+	const entries = explicitEntries
+		.map( ( entry, index ) =>
+			normalizeDistributedEditingPresenceRosterEntry( entry, index )
+		)
+		.filter( ( entry ) => entry.key );
+	const remoteChangeCount = normalizeCount( sessionState.remoteChangeCount );
+	const hasDerivedRemoteActivity = Boolean(
+		sessionState.hasRemoteChanges ||
+			remoteChangeCount > 0 ||
+			sessionState.actionTranscriptHasRemoteEvents
+	);
+	const derivedEntries =
+		entries.length === 0 && hasDerivedRemoteActivity
+			? [
+					normalizeDistributedEditingPresenceRosterEntry(
+						{
+							key: 'presence-remote-activity',
+							identityVisibility: 'anonymous',
+							freshness: sessionState.isConnectionDegraded
+								? 'stale'
+								: 'recent',
+						},
+						0
+					),
+			  ]
+			: [];
+	const rosterEntries = entries.length > 0 ? entries : derivedEntries;
+	const explicitStatus = getFirstDefined(
+		sessionState.presenceRosterStatus,
+		sessionState.distributedEditingPresenceRoster?.status
+	);
+	let status = VALID_DISTRIBUTED_EDITING_PRESENCE_ROSTER_STATUSES.has(
+		explicitStatus
+	)
+		? explicitStatus
+		: DISTRIBUTED_EDITING_PRESENCE_ROSTER_STATUSES.HIDDEN;
+
+	if ( sessionState.isConnectionDegraded && rosterEntries.length > 0 ) {
+		status = DISTRIBUTED_EDITING_PRESENCE_ROSTER_STATUSES.DEGRADED;
+	} else if (
+		rosterEntries.some( ( entry ) => entry.freshness === 'stale' )
+	) {
+		status = DISTRIBUTED_EDITING_PRESENCE_ROSTER_STATUSES.STALE;
+	} else if (
+		rosterEntries.some( ( entry ) => entry.freshness === 'recent' )
+	) {
+		status = DISTRIBUTED_EDITING_PRESENCE_ROSTER_STATUSES.RECENT;
+	} else if ( rosterEntries.length > 0 ) {
+		status = DISTRIBUTED_EDITING_PRESENCE_ROSTER_STATUSES.ACTIVE;
+	} else if (
+		explicitStatus === DISTRIBUTED_EDITING_PRESENCE_ROSTER_STATUSES.EMPTY
+	) {
+		status = DISTRIBUTED_EDITING_PRESENCE_ROSTER_STATUSES.EMPTY;
+	}
+
+	let presenceRosterFreshness = 'unknown';
+
+	if ( status === DISTRIBUTED_EDITING_PRESENCE_ROSTER_STATUSES.ACTIVE ) {
+		presenceRosterFreshness = 'current';
+	} else if (
+		status === DISTRIBUTED_EDITING_PRESENCE_ROSTER_STATUSES.RECENT
+	) {
+		presenceRosterFreshness = 'recent';
+	} else if (
+		status === DISTRIBUTED_EDITING_PRESENCE_ROSTER_STATUSES.STALE ||
+		status === DISTRIBUTED_EDITING_PRESENCE_ROSTER_STATUSES.DEGRADED
+	) {
+		presenceRosterFreshness = 'stale';
+	}
+
+	return {
+		presenceRosterStatus: status,
+		presenceRosterEntries: rosterEntries,
+		presenceRosterFreshness,
+		presenceRosterServerContact: sessionState.isConnectionDegraded
+			? 'degraded'
+			: 'nominal',
+		presenceRosterVisibleCount: rosterEntries.length,
+		presenceRosterTotalKnownCount: normalizeCountWithFallback(
+			getFirstDefined(
+				sessionState.presenceRosterTotalKnownCount,
+				sessionState.distributedEditingPresenceRoster?.totalKnownCount
+			),
+			rosterEntries.length
+		),
+		presenceRosterHiddenCount: normalizeCount(
+			getFirstDefined(
+				sessionState.presenceRosterHiddenCount,
+				sessionState.distributedEditingPresenceRoster?.hiddenCount
+			)
+		),
+		presenceRosterExpiredCount: normalizeCount(
+			getFirstDefined(
+				sessionState.presenceRosterExpiredCount,
+				sessionState.distributedEditingPresenceRoster?.expiredCount,
+				sessionState.distributedEditingPresenceRoster?.expired_count
+			)
+		),
+		presenceRosterExpiredEvidenceCarriedForward: Boolean(
+			getFirstDefined(
+				sessionState.presenceRosterExpiredEvidenceCarriedForward,
+				sessionState.distributedEditingPresenceRoster
+					?.expiredEvidenceCarriedForward
+			)
+		),
+	};
+}
+
+function normalizeDistributedEditingPresenceRefreshFields( sessionState = {} ) {
+	const requestedStatus = getFirstDefined(
+		sessionState.presenceRosterRefreshStatus,
+		sessionState.distributedEditingPresenceRefresh?.status
+	);
+	const status = VALID_DISTRIBUTED_EDITING_PRESENCE_REFRESH_STATUSES.has(
+		requestedStatus
+	)
+		? requestedStatus
+		: DISTRIBUTED_EDITING_PRESENCE_REFRESH_STATUSES.NONE;
+
+	return {
+		presenceRosterRefreshStatus: status,
+		presenceRosterRefreshReason: normalizeNullableString(
+			getFirstDefined(
+				sessionState.presenceRosterRefreshReason,
+				sessionState.distributedEditingPresenceRefresh?.reason
+			)
+		),
+		presenceRosterRefreshResult: normalizeNullableString(
+			getFirstDefined(
+				sessionState.presenceRosterRefreshResult,
+				sessionState.distributedEditingPresenceRefresh?.result
+			)
+		),
+		presenceRosterRefreshRequested: Boolean(
+			getFirstDefined(
+				sessionState.presenceRosterRefreshRequested,
+				sessionState.distributedEditingPresenceRefresh?.requested
+			)
+		),
+		presenceRosterRefreshSucceeded:
+			status === DISTRIBUTED_EDITING_PRESENCE_REFRESH_STATUSES.REFRESHED,
+		presenceRosterRefreshFailed: [
+			DISTRIBUTED_EDITING_PRESENCE_REFRESH_STATUSES.FEATURE_DISABLED,
+			DISTRIBUTED_EDITING_PRESENCE_REFRESH_STATUSES.PERMISSION_DENIED,
+			DISTRIBUTED_EDITING_PRESENCE_REFRESH_STATUSES.ROUTE_MISMATCH,
+			DISTRIBUTED_EDITING_PRESENCE_REFRESH_STATUSES.FAILED,
+		].includes( status ),
+		presenceRosterRefreshCallsRestEndpoint: Boolean(
+			sessionState.presenceRosterRefreshCallsRestEndpoint
+		),
+		presenceRosterRefreshCallsSave: Boolean(
+			sessionState.presenceRosterRefreshCallsSave
+		),
+		presenceRosterRefreshMutatesEditorContent: Boolean(
+			sessionState.presenceRosterRefreshMutatesEditorContent
+		),
+		presenceRosterRefreshMutatesPersistedPostContent: Boolean(
+			sessionState.presenceRosterRefreshMutatesPersistedPostContent
+		),
+		presenceRosterRefreshChangesPostLock: Boolean(
+			sessionState.presenceRosterRefreshChangesPostLock
+		),
+		presenceRosterRefreshRecordsPresenceHeartbeat: Boolean(
+			sessionState.presenceRosterRefreshRecordsPresenceHeartbeat
+		),
+		presenceRosterRefreshEnablesRepeatedClientRefresh: Boolean(
+			sessionState.presenceRosterRefreshEnablesRepeatedClientRefresh
+		),
+		presenceRosterRefreshClaimsSaved: Boolean(
+			sessionState.presenceRosterRefreshClaimsSaved
+		),
+		presenceRosterRefreshExposesRawContent: Boolean(
+			sessionState.presenceRosterRefreshExposesRawContent
+		),
+		presenceRosterRefreshExposesUserIds: Boolean(
+			sessionState.presenceRosterRefreshExposesUserIds
+		),
+		presenceRosterRefreshExposesCursorOffset: Boolean(
+			sessionState.presenceRosterRefreshExposesCursorOffset
+		),
+		presenceRosterRefreshExposesSelection: Boolean(
+			sessionState.presenceRosterRefreshExposesSelection
+		),
+		presenceRosterReadContractSource: normalizeNullableString(
+			sessionState.presenceRosterReadContractSource
+		),
+		presenceRosterReadContractRoute: normalizeNullableString(
+			sessionState.presenceRosterReadContractRoute
+		),
+		presenceRosterReadSuggestedPollingIntervalSeconds:
+			normalizeNullableInteger(
+				sessionState.presenceRosterReadSuggestedPollingIntervalSeconds
+			),
+		presenceRosterReadCheapHostPollingIntervalSeconds:
+			normalizeNullableInteger(
+				sessionState.presenceRosterReadCheapHostPollingIntervalSeconds
+			),
+		presenceRosterReadRepeatedClientRefreshEnabled: Boolean(
+			sessionState.presenceRosterReadRepeatedClientRefreshEnabled
+		),
+	};
+}
+
+function normalizeDistributedEditingPresenceHeartbeatFields(
+	sessionState = {}
+) {
+	const requestedStatus = getFirstDefined(
+		sessionState.presenceHeartbeatStatus,
+		sessionState.distributedEditingPresenceHeartbeat?.status
+	);
+	const status = VALID_DISTRIBUTED_EDITING_PRESENCE_HEARTBEAT_STATUSES.has(
+		requestedStatus
+	)
+		? requestedStatus
+		: DISTRIBUTED_EDITING_PRESENCE_HEARTBEAT_STATUSES.NONE;
+
+	return {
+		presenceHeartbeatStatus: status,
+		presenceHeartbeatReason: normalizeNullableString(
+			getFirstDefined(
+				sessionState.presenceHeartbeatReason,
+				sessionState.distributedEditingPresenceHeartbeat?.reason
+			)
+		),
+		presenceHeartbeatResult: normalizeNullableString(
+			getFirstDefined(
+				sessionState.presenceHeartbeatResult,
+				sessionState.distributedEditingPresenceHeartbeat?.result
+			)
+		),
+		presenceHeartbeatRequested: Boolean(
+			getFirstDefined(
+				sessionState.presenceHeartbeatRequested,
+				sessionState.distributedEditingPresenceHeartbeat?.requested
+			)
+		),
+		presenceHeartbeatSucceeded:
+			status === DISTRIBUTED_EDITING_PRESENCE_HEARTBEAT_STATUSES.SENT,
+		presenceHeartbeatFailed: [
+			DISTRIBUTED_EDITING_PRESENCE_HEARTBEAT_STATUSES.STORAGE_UNAVAILABLE,
+			DISTRIBUTED_EDITING_PRESENCE_HEARTBEAT_STATUSES.FEATURE_DISABLED,
+			DISTRIBUTED_EDITING_PRESENCE_HEARTBEAT_STATUSES.PERMISSION_DENIED,
+			DISTRIBUTED_EDITING_PRESENCE_HEARTBEAT_STATUSES.ROUTE_MISMATCH,
+			DISTRIBUTED_EDITING_PRESENCE_HEARTBEAT_STATUSES.FAILED,
+		].includes( status ),
+		presenceHeartbeatCallsRestEndpoint: Boolean(
+			sessionState.presenceHeartbeatCallsRestEndpoint
+		),
+		presenceHeartbeatRecordsPresenceHeartbeat: Boolean(
+			sessionState.presenceHeartbeatRecordsPresenceHeartbeat
+		),
+		presenceHeartbeatWritesPresence: Boolean(
+			sessionState.presenceHeartbeatWritesPresence
+		),
+		presenceHeartbeatCallsSave: Boolean(
+			sessionState.presenceHeartbeatCallsSave
+		),
+		presenceHeartbeatMutatesEditorContent: Boolean(
+			sessionState.presenceHeartbeatMutatesEditorContent
+		),
+		presenceHeartbeatMutatesPersistedPostContent: Boolean(
+			sessionState.presenceHeartbeatMutatesPersistedPostContent
+		),
+		presenceHeartbeatChangesPostLock: Boolean(
+			sessionState.presenceHeartbeatChangesPostLock
+		),
+		presenceHeartbeatClaimsSaved: Boolean(
+			sessionState.presenceHeartbeatClaimsSaved
+		),
+		presenceHeartbeatEnablesRepeatedClientRefresh: Boolean(
+			sessionState.presenceHeartbeatEnablesRepeatedClientRefresh
+		),
+		presenceHeartbeatRuntimePollingEnabled: Boolean(
+			sessionState.presenceHeartbeatRuntimePollingEnabled
+		),
+		presenceHeartbeatExposesRawContent: Boolean(
+			sessionState.presenceHeartbeatExposesRawContent
+		),
+		presenceHeartbeatExposesUserIds: Boolean(
+			sessionState.presenceHeartbeatExposesUserIds
+		),
+		presenceHeartbeatExposesCursorOffset: Boolean(
+			sessionState.presenceHeartbeatExposesCursorOffset
+		),
+		presenceHeartbeatExposesSelection: Boolean(
+			sessionState.presenceHeartbeatExposesSelection
+		),
+		presenceHeartbeatRawSessionKeyIncluded: Boolean(
+			sessionState.presenceHeartbeatRawSessionKeyIncluded
+		),
+		presenceHeartbeatMarksLocalEditorCurrent: Boolean(
+			sessionState.presenceHeartbeatMarksLocalEditorCurrent
+		),
+		presenceHeartbeatMarksLocalEditorDelayed: Boolean(
+			sessionState.presenceHeartbeatMarksLocalEditorDelayed
+		),
+		presenceHeartbeatLocalRosterEntryVisible: Boolean(
+			sessionState.presenceHeartbeatLocalRosterEntryVisible
+		),
+		presenceHeartbeatLocalRosterEntryFreshness: normalizeNullableString(
+			sessionState.presenceHeartbeatLocalRosterEntryFreshness
+		),
+		presenceHeartbeatRepeatedRefreshOptional: Boolean(
+			getFirstDefined(
+				sessionState.presenceHeartbeatRepeatedRefreshOptional,
+				sessionState.distributedEditingPresenceHeartbeat
+					?.repeatedRefreshOptional,
+				true
+			)
+		),
+		presenceHeartbeatSuggestedIntervalSeconds: normalizeNullableInteger(
+			getFirstDefined(
+				sessionState.presenceHeartbeatSuggestedIntervalSeconds,
+				sessionState.distributedEditingPresenceHeartbeat
+					?.suggestedIntervalSeconds
+			)
+		),
+		presenceHeartbeatCheapHostIntervalSeconds: normalizeNullableInteger(
+			getFirstDefined(
+				sessionState.presenceHeartbeatCheapHostIntervalSeconds,
+				sessionState.distributedEditingPresenceHeartbeat
+					?.cheapHostIntervalSeconds
+			)
+		),
+	};
+}
+
+function normalizeDistributedEditingPresenceStorageReadinessRecheckFields(
+	sessionState = {}
+) {
+	const readiness = normalizeObject(
+		sessionState.presenceStorageReadinessRecheckResult
+	);
+	const requestedStatus = getFirstDefined(
+		sessionState.presenceStorageReadinessRecheckStatus,
+		readiness.status
+	);
+	const status =
+		VALID_DISTRIBUTED_EDITING_PRESENCE_STORAGE_READINESS_RECHECK_STATUSES.has(
+			requestedStatus
+		)
+			? requestedStatus
+			: DISTRIBUTED_EDITING_PRESENCE_STORAGE_READINESS_RECHECK_STATUSES.NONE;
+	const failed = [
+		DISTRIBUTED_EDITING_PRESENCE_STORAGE_READINESS_RECHECK_STATUSES.FEATURE_DISABLED,
+		DISTRIBUTED_EDITING_PRESENCE_STORAGE_READINESS_RECHECK_STATUSES.PERMISSION_DENIED,
+		DISTRIBUTED_EDITING_PRESENCE_STORAGE_READINESS_RECHECK_STATUSES.ROUTE_MISMATCH,
+		DISTRIBUTED_EDITING_PRESENCE_STORAGE_READINESS_RECHECK_STATUSES.FAILED,
+	].includes( status );
+	const succeeded = [
+		DISTRIBUTED_EDITING_PRESENCE_STORAGE_READINESS_RECHECK_STATUSES.READY,
+		DISTRIBUTED_EDITING_PRESENCE_STORAGE_READINESS_RECHECK_STATUSES.SETUP_REQUIRED,
+		DISTRIBUTED_EDITING_PRESENCE_STORAGE_READINESS_RECHECK_STATUSES.UPGRADE_REQUIRED,
+	].includes( status );
+
+	return {
+		presenceStorageReadinessRecheckStatus: status,
+		presenceStorageReadinessRecheckReason: normalizeNullableString(
+			sessionState.presenceStorageReadinessRecheckReason
+		),
+		presenceStorageReadinessRecheckResult:
+			Object.keys( readiness ).length > 0 ? readiness : null,
+		presenceStorageReadinessRecheckRequested: Boolean(
+			sessionState.presenceStorageReadinessRecheckRequested
+		),
+		presenceStorageReadinessRecheckSucceeded: succeeded,
+		presenceStorageReadinessRecheckFailed: failed,
+		presenceStorageReadinessRecheckCallsRestEndpoint: Boolean(
+			sessionState.presenceStorageReadinessRecheckCallsRestEndpoint
+		),
+		presenceStorageReadinessRecheckInstallsPresenceTable: Boolean(
+			sessionState.presenceStorageReadinessRecheckInstallsPresenceTable
+		),
+		presenceStorageReadinessRecheckRecordsPresenceHeartbeat: Boolean(
+			sessionState.presenceStorageReadinessRecheckRecordsPresenceHeartbeat
+		),
+		presenceStorageReadinessRecheckWritesPresence: Boolean(
+			sessionState.presenceStorageReadinessRecheckWritesPresence
+		),
+		presenceStorageReadinessRecheckStartsPolling: Boolean(
+			sessionState.presenceStorageReadinessRecheckStartsPolling
+		),
+		presenceStorageReadinessRecheckCallsSave: Boolean(
+			sessionState.presenceStorageReadinessRecheckCallsSave
+		),
+		presenceStorageReadinessRecheckMutatesEditorContent: Boolean(
+			sessionState.presenceStorageReadinessRecheckMutatesEditorContent
+		),
+		presenceStorageReadinessRecheckMutatesPersistedPostContent: Boolean(
+			sessionState.presenceStorageReadinessRecheckMutatesPersistedPostContent
+		),
+		presenceStorageReadinessRecheckChangesPostLock: Boolean(
+			sessionState.presenceStorageReadinessRecheckChangesPostLock
+		),
+		presenceStorageReadinessRecheckClaimsAbsence: Boolean(
+			sessionState.presenceStorageReadinessRecheckClaimsAbsence
+		),
+		presenceStorageReadinessRecheckClaimsSaved: Boolean(
+			sessionState.presenceStorageReadinessRecheckClaimsSaved
+		),
+		presenceStorageReadinessRecheckContentFree:
+			sessionState.presenceStorageReadinessRecheckContentFree !== false,
+		presenceStorageReadinessRecheckExposesRawContent: Boolean(
+			sessionState.presenceStorageReadinessRecheckExposesRawContent
+		),
+		presenceStorageReadinessRecheckExposesUserIds: Boolean(
+			sessionState.presenceStorageReadinessRecheckExposesUserIds
+		),
+		presenceStorageReadinessRecheckExposesCursorOffset: Boolean(
+			sessionState.presenceStorageReadinessRecheckExposesCursorOffset
+		),
+		presenceStorageReadinessRecheckExposesSelection: Boolean(
+			sessionState.presenceStorageReadinessRecheckExposesSelection
+		),
+		presenceStorageReadinessRecheckCorrectnessIndependentOfTransport:
+			sessionState.presenceStorageReadinessRecheckCorrectnessIndependentOfTransport !==
+			false,
+		presenceStorageReadinessRecheckTransportRequiredForCorrectness: Boolean(
+			sessionState.presenceStorageReadinessRecheckTransportRequiredForCorrectness
+		),
+	};
+}
+
+function normalizeDistributedEditingPresenceRepeatedRefreshRuntimeFields(
+	sessionState = {}
+) {
+	const runtimeConfig = normalizeObject(
+		sessionState.distributedEditingPresenceRepeatedRefreshRuntime
+	);
+	const hostProfile = normalizeNullableString(
+		getFirstDefined(
+			runtimeConfig.hostProfile,
+			runtimeConfig.host_profile,
+			sessionState.presenceRepeatedRefreshHostProfile
+		)
+	);
+	const explicitOptIn = Boolean(
+		getFirstDefined(
+			runtimeConfig.explicitOptIn,
+			runtimeConfig.explicit_opt_in,
+			sessionState.presenceRepeatedRefreshExplicitOptIn
+		)
+	);
+	const requestedServerContact = normalizeNullableString(
+		getFirstDefined(
+			runtimeConfig.serverContact,
+			runtimeConfig.server_contact,
+			sessionState.presenceRepeatedRefreshServerContact
+		)
+	);
+	const degradedTransport = Boolean(
+		getFirstDefined(
+			runtimeConfig.degradedTransport,
+			runtimeConfig.degraded_transport,
+			sessionState.presenceRepeatedRefreshDegradedTransport,
+			requestedServerContact === 'degraded' ||
+				requestedServerContact === 'offline' ||
+				sessionState.isConnectionDegraded
+		)
+	);
+	const serverContact = degradedTransport ? 'degraded' : 'nominal';
+	const standardIntervalSeconds = normalizeNullableInteger(
+		getFirstDefined(
+			runtimeConfig.standardIntervalSeconds,
+			runtimeConfig.standardPollingIntervalSeconds,
+			runtimeConfig.standard_polling_interval_seconds,
+			sessionState.presenceRepeatedRefreshStandardIntervalSeconds,
+			sessionState.presenceRosterReadSuggestedPollingIntervalSeconds
+		)
+	);
+	const cheapHostIntervalSeconds = normalizeNullableInteger(
+		getFirstDefined(
+			runtimeConfig.cheapHostIntervalSeconds,
+			runtimeConfig.cheapHostPollingIntervalSeconds,
+			runtimeConfig.cheap_host_polling_interval_seconds,
+			sessionState.presenceRepeatedRefreshCheapHostIntervalSeconds,
+			sessionState.presenceRosterReadCheapHostPollingIntervalSeconds,
+			sessionState.presenceHeartbeatCheapHostIntervalSeconds
+		)
+	);
+	const minimumIntervalSeconds = normalizeNullableInteger(
+		getFirstDefined(
+			runtimeConfig.minimumIntervalSeconds,
+			runtimeConfig.minimumPollingIntervalSeconds,
+			runtimeConfig.minimum_polling_interval_seconds,
+			sessionState.presenceRepeatedRefreshMinimumIntervalSeconds
+		)
+	);
+	const fallbackRefreshIntervalSeconds =
+		hostProfile === 'cheap_shared_host'
+			? cheapHostIntervalSeconds || standardIntervalSeconds
+			: standardIntervalSeconds || cheapHostIntervalSeconds;
+	const selectedIntervalSeconds =
+		normalizeNullableInteger(
+			getFirstDefined(
+				runtimeConfig.selectedIntervalSeconds,
+				runtimeConfig.selectedRefreshIntervalSeconds,
+				runtimeConfig.selected_refresh_interval_seconds,
+				sessionState.presenceRepeatedRefreshSelectedIntervalSeconds
+			)
+		) || fallbackRefreshIntervalSeconds;
+	const selectedHeartbeatIntervalSeconds =
+		normalizeNullableInteger(
+			getFirstDefined(
+				runtimeConfig.selectedHeartbeatIntervalSeconds,
+				runtimeConfig.selected_heartbeat_interval_seconds,
+				runtimeConfig.heartbeatIntervalSeconds,
+				runtimeConfig.heartbeat_interval_seconds,
+				sessionState.presenceRepeatedRefreshSelectedHeartbeatIntervalSeconds,
+				sessionState.presenceHeartbeatSuggestedIntervalSeconds
+			)
+		) || selectedIntervalSeconds;
+	const requestedStatus = getFirstDefined(
+		runtimeConfig.status,
+		sessionState.presenceRepeatedRefreshRuntimeStatus
+	);
+	let status =
+		VALID_DISTRIBUTED_EDITING_PRESENCE_REPEATED_REFRESH_RUNTIME_STATUSES.has(
+			requestedStatus
+		)
+			? requestedStatus
+			: DISTRIBUTED_EDITING_PRESENCE_REPEATED_REFRESH_RUNTIME_STATUSES.DISABLED_BY_DEFAULT;
+
+	if ( ! explicitOptIn ) {
+		status =
+			DISTRIBUTED_EDITING_PRESENCE_REPEATED_REFRESH_RUNTIME_STATUSES.DISABLED_BY_DEFAULT;
+	} else if ( degradedTransport ) {
+		status =
+			DISTRIBUTED_EDITING_PRESENCE_REPEATED_REFRESH_RUNTIME_STATUSES.PAUSED_DEGRADED_TRANSPORT;
+	} else {
+		status =
+			DISTRIBUTED_EDITING_PRESENCE_REPEATED_REFRESH_RUNTIME_STATUSES.SCHEDULED;
+	}
+
+	const requestedConnectionState = getFirstDefined(
+		runtimeConfig.localConnectionState,
+		runtimeConfig.local_connection_state,
+		sessionState.presenceRepeatedRefreshLocalConnectionState
+	);
+	let localConnectionState =
+		VALID_DISTRIBUTED_EDITING_PRESENCE_REPEATED_REFRESH_CONNECTION_STATES.has(
+			requestedConnectionState
+		)
+			? requestedConnectionState
+			: DISTRIBUTED_EDITING_PRESENCE_REPEATED_REFRESH_CONNECTION_STATES.DISABLED;
+
+	if ( ! explicitOptIn ) {
+		localConnectionState =
+			DISTRIBUTED_EDITING_PRESENCE_REPEATED_REFRESH_CONNECTION_STATES.DISABLED;
+	} else if ( degradedTransport ) {
+		localConnectionState =
+			DISTRIBUTED_EDITING_PRESENCE_REPEATED_REFRESH_CONNECTION_STATES.DEGRADED;
+	} else {
+		localConnectionState =
+			DISTRIBUTED_EDITING_PRESENCE_REPEATED_REFRESH_CONNECTION_STATES.CONNECTED;
+	}
+
+	const schedulesNextRefresh =
+		explicitOptIn &&
+		! degradedTransport &&
+		status ===
+			DISTRIBUTED_EDITING_PRESENCE_REPEATED_REFRESH_RUNTIME_STATUSES.SCHEDULED;
+	const schedulesNextHeartbeat =
+		schedulesNextRefresh && selectedHeartbeatIntervalSeconds !== null;
+
+	return {
+		presenceRepeatedRefreshRuntimeStatus: status,
+		presenceRepeatedRefreshLocalConnectionState: localConnectionState,
+		presenceRepeatedRefreshRequiresExplicitOptIn: true,
+		presenceRepeatedRefreshRuntimeEnabledByDefault: false,
+		presenceRepeatedRefreshExplicitOptIn: explicitOptIn,
+		presenceRepeatedRefreshHostProfile: hostProfile,
+		presenceRepeatedRefreshServerContact: serverContact,
+		presenceRepeatedRefreshSelectedIntervalSeconds: selectedIntervalSeconds,
+		presenceRepeatedRefreshSelectedHeartbeatIntervalSeconds:
+			selectedHeartbeatIntervalSeconds,
+		presenceRepeatedRefreshStandardIntervalSeconds: standardIntervalSeconds,
+		presenceRepeatedRefreshCheapHostIntervalSeconds:
+			cheapHostIntervalSeconds,
+		presenceRepeatedRefreshMinimumIntervalSeconds: minimumIntervalSeconds,
+		presenceRepeatedRefreshSchedulesNextRefresh: schedulesNextRefresh,
+		presenceRepeatedRefreshSchedulesNextHeartbeat: schedulesNextHeartbeat,
+		presenceRepeatedRefreshCallsPresenceReadEndpointNow: false,
+		presenceRepeatedRefreshCallsHeartbeatEndpointNow: false,
+		presenceRepeatedRefreshRecordsPresenceHeartbeatNow: false,
+		presenceRepeatedRefreshWritesHeartbeatNow: false,
+		presenceRepeatedRefreshStartsPollingImmediately: false,
+		presenceRepeatedRefreshPausesOnDegradedTransport: true,
+		presenceRepeatedRefreshExposesLocalConnectionState: true,
+		presenceRepeatedRefreshOptional: true,
+		presenceRepeatedRefreshCorrectnessIndependentOfTransport: true,
+		presenceRepeatedRefreshTransportRequiredForCorrectness: false,
+		presenceRepeatedRefreshDispatchesNotice: false,
+		presenceRepeatedRefreshCallsSave: false,
+		presenceRepeatedRefreshMutatesEditorContent: false,
+		presenceRepeatedRefreshMutatesPersistedPostContent: false,
+		presenceRepeatedRefreshChangesPostLock: false,
+		presenceRepeatedRefreshClaimsAbsence: false,
+		presenceRepeatedRefreshClaimsSaved: false,
+		presenceRepeatedRefreshExposesRawContent: false,
+		presenceRepeatedRefreshExposesUserIds: false,
+		presenceRepeatedRefreshExposesLogins: false,
+		presenceRepeatedRefreshExposesEmail: false,
+		presenceRepeatedRefreshExposesCursorOffset: false,
+		presenceRepeatedRefreshExposesSelection: false,
+		presenceRepeatedRefreshRawSessionKeyIncluded: false,
+	};
+}
+
+function normalizeDistributedEditingPresenceStartupPolicyFields(
+	sessionState = {}
+) {
+	const policyConfig = normalizeObject(
+		sessionState.distributedEditingPresenceStartupPolicy
+	);
+	const repeatedRefreshFields =
+		normalizeDistributedEditingPresenceRepeatedRefreshRuntimeFields(
+			sessionState
+		);
+	const hostProfile = normalizeNullableString(
+		getFirstDefined(
+			policyConfig.hostProfile,
+			policyConfig.host_profile,
+			sessionState.presenceStartupPolicyHostProfile,
+			repeatedRefreshFields.presenceRepeatedRefreshHostProfile
+		)
+	);
+	const requestedServerContact = normalizeNullableString(
+		getFirstDefined(
+			policyConfig.serverContact,
+			policyConfig.server_contact,
+			sessionState.presenceStartupPolicyServerContact,
+			repeatedRefreshFields.presenceRepeatedRefreshServerContact
+		)
+	);
+	const degradedTransport = Boolean(
+		getFirstDefined(
+			policyConfig.degradedTransport,
+			policyConfig.degraded_transport,
+			sessionState.presenceStartupPolicyDegradedTransport,
+			requestedServerContact === 'degraded' ||
+				requestedServerContact === 'offline' ||
+				sessionState.isConnectionDegraded
+		)
+	);
+	const serverContact = degradedTransport ? 'degraded' : 'nominal';
+	const allowAutomaticInitialHeartbeat = Boolean(
+		getFirstDefined(
+			policyConfig.allowAutomaticInitialHeartbeat,
+			policyConfig.allow_automatic_initial_heartbeat,
+			policyConfig.automaticInitialHeartbeatAllowed,
+			sessionState.presenceStartupPolicyMaySendInitialHeartbeatAutomatically
+		)
+	);
+	const allowSlowAutomaticInitialHeartbeat = Boolean(
+		getFirstDefined(
+			policyConfig.allowSlowAutomaticInitialHeartbeat,
+			policyConfig.allow_slow_automatic_initial_heartbeat,
+			policyConfig.slowAutomaticHeartbeatAllowed,
+			sessionState.presenceStartupPolicySlowAutomaticHeartbeatAllowed
+		)
+	);
+	const standardInitialHeartbeatDelaySeconds = normalizeNullableInteger(
+		getFirstDefined(
+			policyConfig.standardInitialHeartbeatDelaySeconds,
+			policyConfig.standard_initial_heartbeat_delay_seconds,
+			sessionState.presenceStartupPolicyStandardInitialHeartbeatDelaySeconds,
+			repeatedRefreshFields.presenceRepeatedRefreshStandardIntervalSeconds
+		)
+	);
+	const cheapHostInitialHeartbeatDelaySeconds = normalizeNullableInteger(
+		getFirstDefined(
+			policyConfig.cheapHostInitialHeartbeatDelaySeconds,
+			policyConfig.cheap_host_initial_heartbeat_delay_seconds,
+			sessionState.presenceStartupPolicyCheapHostInitialHeartbeatDelaySeconds,
+			repeatedRefreshFields.presenceRepeatedRefreshCheapHostIntervalSeconds
+		)
+	);
+	const minimumInitialHeartbeatDelaySeconds = normalizeNullableInteger(
+		getFirstDefined(
+			policyConfig.minimumInitialHeartbeatDelaySeconds,
+			policyConfig.minimum_initial_heartbeat_delay_seconds,
+			sessionState.presenceStartupPolicyMinimumInitialHeartbeatDelaySeconds,
+			repeatedRefreshFields.presenceRepeatedRefreshMinimumIntervalSeconds
+		)
+	);
+	const requestedSelectedInitialHeartbeatDelaySeconds =
+		normalizeNullableInteger(
+			getFirstDefined(
+				policyConfig.selectedInitialHeartbeatDelaySeconds,
+				policyConfig.selected_initial_heartbeat_delay_seconds,
+				sessionState.presenceStartupPolicySelectedInitialHeartbeatDelaySeconds
+			)
+		);
+	const requestedStatus = getFirstDefined(
+		policyConfig.status,
+		sessionState.presenceStartupPolicyStatus
+	);
+	let status = VALID_DISTRIBUTED_EDITING_PRESENCE_STARTUP_POLICY_STATUSES.has(
+		requestedStatus
+	)
+		? requestedStatus
+		: DISTRIBUTED_EDITING_PRESENCE_STARTUP_POLICY_STATUSES.MANUAL_REQUIRED;
+	let reason = 'manual_startup_required';
+	let selectedInitialHeartbeatDelaySeconds = null;
+	let maySendInitialHeartbeatAutomatically = false;
+	let slowAutomaticHeartbeatAllowed = false;
+
+	if ( degradedTransport ) {
+		status =
+			DISTRIBUTED_EDITING_PRESENCE_STARTUP_POLICY_STATUSES.PAUSED_DEGRADED_TRANSPORT;
+		reason = 'transport_degraded';
+	} else if ( hostProfile === 'cheap_shared_host' ) {
+		if (
+			allowAutomaticInitialHeartbeat &&
+			allowSlowAutomaticInitialHeartbeat
+		) {
+			status =
+				DISTRIBUTED_EDITING_PRESENCE_STARTUP_POLICY_STATUSES.SLOW_AUTOMATIC_HEARTBEAT_ALLOWED;
+			reason = 'cheap_host_slow_startup_allowed';
+			selectedInitialHeartbeatDelaySeconds = Math.max(
+				requestedSelectedInitialHeartbeatDelaySeconds || 0,
+				cheapHostInitialHeartbeatDelaySeconds || 0,
+				minimumInitialHeartbeatDelaySeconds || 0
+			);
+			maySendInitialHeartbeatAutomatically = true;
+			slowAutomaticHeartbeatAllowed = true;
+		} else {
+			status =
+				DISTRIBUTED_EDITING_PRESENCE_STARTUP_POLICY_STATUSES.MANUAL_REQUIRED;
+			reason = 'cheap_host_requires_slow_startup';
+		}
+	} else if ( allowAutomaticInitialHeartbeat ) {
+		status =
+			DISTRIBUTED_EDITING_PRESENCE_STARTUP_POLICY_STATUSES.AUTOMATIC_HEARTBEAT_ALLOWED;
+		reason = 'automatic_startup_explicitly_allowed';
+		selectedInitialHeartbeatDelaySeconds = Math.max(
+			requestedSelectedInitialHeartbeatDelaySeconds || 0,
+			standardInitialHeartbeatDelaySeconds || 0,
+			minimumInitialHeartbeatDelaySeconds || 0
+		);
+		maySendInitialHeartbeatAutomatically = true;
+	} else {
+		status =
+			DISTRIBUTED_EDITING_PRESENCE_STARTUP_POLICY_STATUSES.MANUAL_REQUIRED;
+	}
+
+	if ( selectedInitialHeartbeatDelaySeconds === 0 ) {
+		selectedInitialHeartbeatDelaySeconds = null;
+	}
+
+	return {
+		presenceStartupPolicyStatus: status,
+		presenceStartupPolicyReason: reason,
+		presenceStartupPolicyRequiresExplicitEnablement: true,
+		presenceStartupPolicyMaySendInitialHeartbeatAutomatically:
+			maySendInitialHeartbeatAutomatically,
+		presenceStartupPolicySlowAutomaticHeartbeatAllowed:
+			slowAutomaticHeartbeatAllowed,
+		presenceStartupPolicyManualHeartbeatAvailable: true,
+		presenceStartupPolicyHostProfile: hostProfile,
+		presenceStartupPolicyServerContact: serverContact,
+		presenceStartupPolicySelectedInitialHeartbeatDelaySeconds:
+			selectedInitialHeartbeatDelaySeconds,
+		presenceStartupPolicyStandardInitialHeartbeatDelaySeconds:
+			standardInitialHeartbeatDelaySeconds,
+		presenceStartupPolicyCheapHostInitialHeartbeatDelaySeconds:
+			cheapHostInitialHeartbeatDelaySeconds,
+		presenceStartupPolicyMinimumInitialHeartbeatDelaySeconds:
+			minimumInitialHeartbeatDelaySeconds,
+		presenceStartupPolicyCallsHeartbeatEndpointNow: false,
+		presenceStartupPolicyRecordsPresenceHeartbeatNow: false,
+		presenceStartupPolicyWritesPresenceNow: false,
+		presenceStartupPolicyStartsPollingNow: false,
+		presenceStartupPolicyStartsTimerNow: false,
+		presenceStartupPolicyDispatchesNotice: false,
+		presenceStartupPolicyCallsSave: false,
+		presenceStartupPolicyMutatesEditorContent: false,
+		presenceStartupPolicyMutatesPersistedPostContent: false,
+		presenceStartupPolicyChangesPostLock: false,
+		presenceStartupPolicyClaimsAbsence: false,
+		presenceStartupPolicyClaimsSaved: false,
+		presenceStartupPolicyExposesRawContent: false,
+		presenceStartupPolicyExposesUserIds: false,
+		presenceStartupPolicyExposesLogins: false,
+		presenceStartupPolicyExposesEmail: false,
+		presenceStartupPolicyExposesCursorOffset: false,
+		presenceStartupPolicyExposesSelection: false,
+		presenceStartupPolicyRawSessionKeyIncluded: false,
+		presenceStartupPolicyCorrectnessIndependentOfTransport: true,
+		presenceStartupPolicyTransportRequiredForCorrectness: false,
+	};
+}
+
+export function getDistributedEditingPresenceRosterStateForSessionState(
+	sessionState = {}
+) {
+	const normalized = normalizeDistributedEditingSessionState( sessionState );
+	const entries = normalized.presenceRosterEntries;
+	const currentVisibleCount = entries.filter(
+		isDistributedEditingPresenceRosterEntryCurrent
+	).length;
+	const delayedVisibleCount = entries.length - currentVisibleCount;
+	const localCurrentTabVisible = entries.some(
+		isDistributedEditingLocalHeartbeatRosterEntry
+	);
+	const sameUserOtherTabVisible = entries.some(
+		isDistributedEditingSameUserOtherTabRosterEntry
+	);
+	const remoteEntries = entries.filter(
+		( entry ) =>
+			! isDistributedEditingLocalHeartbeatRosterEntry( entry ) &&
+			! isDistributedEditingSameUserOtherTabRosterEntry( entry )
+	);
+	const remoteCurrentVisibleCount = remoteEntries.filter(
+		isDistributedEditingPresenceRosterEntryCurrent
+	).length;
+	const remoteDelayedVisibleCount =
+		remoteEntries.length - remoteCurrentVisibleCount;
+	const countSummary = getDistributedEditingPresenceRosterCountSummary( {
+		currentVisibleCount,
+		delayedVisibleCount,
+		hiddenCount: normalized.presenceRosterHiddenCount,
+		expiredCount: normalized.presenceRosterExpiredCount,
+	} );
+	const remoteCurrentNames = remoteEntries
+		.filter( isDistributedEditingPresenceRosterEntryCurrent )
+		.map( getDistributedEditingPresenceRosterVisibleName )
+		.filter( Boolean );
+	const remoteDelayedNames = remoteEntries
+		.filter(
+			( entry ) =>
+				! isDistributedEditingPresenceRosterEntryCurrent( entry )
+		)
+		.map( getDistributedEditingPresenceRosterVisibleName )
+		.filter( Boolean );
+	let summary = getDistributedEditingPresenceRosterSummary( {
+		entries,
+		status: normalized.presenceRosterStatus,
+		expiredCount: normalized.presenceRosterExpiredCount,
+		localCurrentTabVisible,
+		sameUserOtherTabVisible,
+		remoteCurrentNames,
+		remoteDelayedNames,
+	} );
+
+	if (
+		normalized.presenceRosterStatus ===
+			DISTRIBUTED_EDITING_PRESENCE_ROSTER_STATUSES.DEGRADED &&
+		entries.length > 0
+	) {
+		summary = 'Presence may be delayed. Save checks still use WordPress.';
+	}
+
+	return {
+		status: normalized.presenceRosterStatus,
+		freshness: normalized.presenceRosterFreshness,
+		serverContact: normalized.presenceRosterServerContact,
+		visibleCount: normalized.presenceRosterVisibleCount,
+		currentVisibleCount,
+		delayedVisibleCount,
+		localCurrentTabVisible,
+		sameUserOtherTabVisible,
+		remoteVisibleCount: remoteEntries.length,
+		remoteCurrentVisibleCount,
+		remoteDelayedVisibleCount,
+		totalKnownCount: normalized.presenceRosterTotalKnownCount,
+		hiddenCount: normalized.presenceRosterHiddenCount,
+		expiredCount: normalized.presenceRosterExpiredCount,
+		entries,
+		copy: {
+			label: 'Editing now',
+			summary,
+			countSummary,
+			assistiveSummary:
+				normalized.presenceRosterStatus ===
+					DISTRIBUTED_EDITING_PRESENCE_ROSTER_STATUSES.EMPTY ||
+				summary.includes( 'Presence may be delayed.' )
+					? summary
+					: `${ summary } Presence may be delayed.`,
+		},
+		descriptorOnly: true,
+		exposesRawContent: false,
+		exposesSelection: false,
+		exposesCursorOffset: false,
+		exposesUserIds: false,
+		claimsAbsence: false,
+		blocksPublish: false,
+		callsRestEndpoint: false,
+		callsSave: false,
+		callsNormalSavePost: false,
+		callsRetrySaveEndpoint: false,
+		dispatchesNotice: false,
+		mutatesEditorContent: false,
+		mutatesPersistedPostContent: false,
+		changesPostLock: false,
+		claimsSaved: false,
+	};
+}
+
+function getDistributedEditingPresenceRosterSummary( {
+	entries,
+	status,
+	expiredCount,
+	localCurrentTabVisible,
+	sameUserOtherTabVisible,
+	remoteCurrentNames,
+	remoteDelayedNames,
+} ) {
+	const clauses = [];
+
+	if ( entries.length === 0 ) {
+		if (
+			status === DISTRIBUTED_EDITING_PRESENCE_ROSTER_STATUSES.DEGRADED
+		) {
+			return 'Presence may be delayed. Save checks still use WordPress.';
+		}
+
+		if ( expiredCount > 0 ) {
+			return 'Editor activity was seen before this refresh. Presence may be delayed.';
+		}
+
+		return 'No other editors shown.';
+	}
+
+	if ( localCurrentTabVisible ) {
+		const localEntry = entries.find(
+			isDistributedEditingLocalHeartbeatRosterEntry
+		);
+		clauses.push(
+			isDistributedEditingPresenceRosterEntryCurrent( localEntry )
+				? 'You are visible in this editing session.'
+				: 'Your presence may be delayed.'
+		);
+	}
+
+	if ( sameUserOtherTabVisible ) {
+		clauses.push( 'You have this post open in another tab.' );
+	}
+
+	if ( remoteCurrentNames.length > 0 ) {
+		clauses.push(
+			getDistributedEditingPresenceRosterActiveNamesSummary(
+				remoteCurrentNames
+			)
+		);
+	}
+
+	if ( remoteDelayedNames.length > 0 ) {
+		clauses.push(
+			getDistributedEditingPresenceRosterDelayedNamesSummary(
+				remoteDelayedNames
+			)
+		);
+	}
+
+	return clauses.join( ' ' ) || 'No other editors shown.';
+}
+
+function getDistributedEditingPresenceRosterActiveNamesSummary( names ) {
+	if ( names.length === 1 ) {
+		return `${ names[ 0 ] } is also editing this post.`;
+	}
+
+	if ( names.length === 2 ) {
+		return `${ names[ 0 ] } and ${ names[ 1 ] } are also editing this post.`;
+	}
+
+	return `${ names[ 0 ] }, ${
+		names[ 1 ]
+	}, and ${ getDistributedEditingPresenceRosterOthersLabel(
+		names.length - 2
+	) } are also editing this post.`;
+}
+
+function getDistributedEditingPresenceRosterDelayedNamesSummary( names ) {
+	if ( names.length === 1 ) {
+		return `${ names[ 0 ] } was here recently. Presence may be delayed.`;
+	}
+
+	if ( names.length === 2 ) {
+		return `${ names[ 0 ] } and ${ names[ 1 ] } were here recently. Presence may be delayed.`;
+	}
+
+	return `${ names[ 0 ] }, ${
+		names[ 1 ]
+	}, and ${ getDistributedEditingPresenceRosterOthersLabel(
+		names.length - 2
+	) } were here recently. Presence may be delayed.`;
+}
+
+function getDistributedEditingPresenceRosterOthersLabel( count ) {
+	return `${ count } other${ count === 1 ? '' : 's' }`;
+}
+
+function getDistributedEditingPresenceRosterCountSummary( {
+	currentVisibleCount,
+	delayedVisibleCount,
+	hiddenCount,
+	expiredCount,
+} ) {
+	const currentLabel = `${ currentVisibleCount } editor${
+		currentVisibleCount === 1 ? '' : 's'
+	} ${ currentVisibleCount === 1 ? 'is' : 'are' } active now`;
+	const delayedLabel = `${ delayedVisibleCount } editor${
+		delayedVisibleCount === 1 ? '' : 's'
+	} may be delayed`;
+	const expiredLabel =
+		expiredCount > 0
+			? 'Some editor activity expired before this refresh.'
+			: '';
+	const hiddenLabel =
+		hiddenCount > 0
+			? 'Some editor activity is hidden by roster limits or privacy settings.'
+			: '';
+
+	if ( currentVisibleCount > 0 && delayedVisibleCount > 0 ) {
+		return [
+			`${ currentLabel }; ${ delayedLabel }.`,
+			hiddenLabel,
+			expiredLabel,
+		]
+			.filter( Boolean )
+			.join( ' ' );
+	}
+
+	if ( currentVisibleCount > 0 ) {
+		return [ `${ currentLabel }.`, hiddenLabel, expiredLabel ]
+			.filter( Boolean )
+			.join( ' ' );
+	}
+
+	if ( delayedVisibleCount > 0 ) {
+		return [ `${ delayedLabel }.`, hiddenLabel, expiredLabel ]
+			.filter( Boolean )
+			.join( ' ' );
+	}
+
+	if ( hiddenCount > 0 ) {
+		return hiddenLabel;
+	}
+
+	if ( expiredCount > 0 ) {
+		return 'Some editor activity expired before this refresh.';
+	}
+
+	return 'Editor activity has not been shown yet.';
+}
+
+function isDistributedEditingPresenceRosterEntryCurrent( entry ) {
+	return entry?.freshness === 'current' || entry?.freshness === 'active';
+}
+
+function getDistributedEditingPresenceRosterVisibleName( entry ) {
+	if (
+		entry.relationship === 'same_user_other_tab' ||
+		entry.relationship === 'current_user_current_tab'
+	) {
+		return 'You';
+	}
+
+	if ( entry.identityVisibility === 'anonymous' ) {
+		return 'Another editor';
+	}
+
+	return entry.displayName || 'Another editor';
+}
+
+function isDistributedEditingLocalHeartbeatRosterEntry( entry ) {
+	return entry.relationship === 'current_user_current_tab';
+}
+
+function isDistributedEditingSameUserOtherTabRosterEntry( entry ) {
+	return entry.relationship === 'same_user_other_tab';
+}
+
+export function getDistributedEditingPresenceRepeatedRefreshRuntimeStateForSessionState(
+	sessionState = {}
+) {
+	const normalized = normalizeDistributedEditingSessionState( sessionState );
+	const selectedInterval =
+		normalized.presenceRepeatedRefreshSelectedIntervalSeconds;
+	let summary = 'Presence updates are off.';
+
+	if (
+		normalized.presenceRepeatedRefreshRuntimeStatus ===
+		DISTRIBUTED_EDITING_PRESENCE_REPEATED_REFRESH_RUNTIME_STATUSES.SCHEDULED
+	) {
+		summary = selectedInterval
+			? `Presence updates are scheduled about every ${ selectedInterval } seconds.`
+			: 'Presence updates are scheduled.';
+	} else if (
+		normalized.presenceRepeatedRefreshRuntimeStatus ===
+		DISTRIBUTED_EDITING_PRESENCE_REPEATED_REFRESH_RUNTIME_STATUSES.PAUSED_DEGRADED_TRANSPORT
+	) {
+		summary =
+			'Presence updates are paused while the connection is degraded.';
+	}
+
+	return {
+		status: normalized.presenceRepeatedRefreshRuntimeStatus,
+		localConnectionState:
+			normalized.presenceRepeatedRefreshLocalConnectionState,
+		requiresExplicitOptIn:
+			normalized.presenceRepeatedRefreshRequiresExplicitOptIn,
+		runtimeEnabledByDefault:
+			normalized.presenceRepeatedRefreshRuntimeEnabledByDefault,
+		explicitOptIn: normalized.presenceRepeatedRefreshExplicitOptIn,
+		hostProfile: normalized.presenceRepeatedRefreshHostProfile,
+		serverContact: normalized.presenceRepeatedRefreshServerContact,
+		selectedIntervalSeconds:
+			normalized.presenceRepeatedRefreshSelectedIntervalSeconds,
+		selectedHeartbeatIntervalSeconds:
+			normalized.presenceRepeatedRefreshSelectedHeartbeatIntervalSeconds,
+		standardIntervalSeconds:
+			normalized.presenceRepeatedRefreshStandardIntervalSeconds,
+		cheapHostIntervalSeconds:
+			normalized.presenceRepeatedRefreshCheapHostIntervalSeconds,
+		minimumIntervalSeconds:
+			normalized.presenceRepeatedRefreshMinimumIntervalSeconds,
+		schedulesNextRefresh:
+			normalized.presenceRepeatedRefreshSchedulesNextRefresh,
+		schedulesNextHeartbeat:
+			normalized.presenceRepeatedRefreshSchedulesNextHeartbeat,
+		pausesOnDegradedTransport:
+			normalized.presenceRepeatedRefreshPausesOnDegradedTransport,
+		exposesLocalConnectionState:
+			normalized.presenceRepeatedRefreshExposesLocalConnectionState,
+		copy: {
+			label: 'Presence updates',
+			summary,
+		},
+		descriptorOnly: true,
+		callsPresenceReadEndpointNow:
+			normalized.presenceRepeatedRefreshCallsPresenceReadEndpointNow,
+		callsHeartbeatEndpointNow:
+			normalized.presenceRepeatedRefreshCallsHeartbeatEndpointNow,
+		recordsPresenceHeartbeatNow:
+			normalized.presenceRepeatedRefreshRecordsPresenceHeartbeatNow,
+		writesHeartbeatNow:
+			normalized.presenceRepeatedRefreshWritesHeartbeatNow,
+		startsPollingImmediately:
+			normalized.presenceRepeatedRefreshStartsPollingImmediately,
+		repeatedRefreshOptional: normalized.presenceRepeatedRefreshOptional,
+		correctnessIndependentOfTransport:
+			normalized.presenceRepeatedRefreshCorrectnessIndependentOfTransport,
+		transportRequiredForCorrectness:
+			normalized.presenceRepeatedRefreshTransportRequiredForCorrectness,
+		dispatchesNotice: normalized.presenceRepeatedRefreshDispatchesNotice,
+		callsSave: normalized.presenceRepeatedRefreshCallsSave,
+		mutatesEditorContent:
+			normalized.presenceRepeatedRefreshMutatesEditorContent,
+		mutatesPersistedPostContent:
+			normalized.presenceRepeatedRefreshMutatesPersistedPostContent,
+		changesPostLock: normalized.presenceRepeatedRefreshChangesPostLock,
+		claimsAbsence: normalized.presenceRepeatedRefreshClaimsAbsence,
+		claimsSaved: normalized.presenceRepeatedRefreshClaimsSaved,
+		exposesRawContent: normalized.presenceRepeatedRefreshExposesRawContent,
+		exposesUserIds: normalized.presenceRepeatedRefreshExposesUserIds,
+		exposesLogins: normalized.presenceRepeatedRefreshExposesLogins,
+		exposesEmail: normalized.presenceRepeatedRefreshExposesEmail,
+		exposesCursorOffset:
+			normalized.presenceRepeatedRefreshExposesCursorOffset,
+		exposesSelection: normalized.presenceRepeatedRefreshExposesSelection,
+		rawSessionKeyIncluded:
+			normalized.presenceRepeatedRefreshRawSessionKeyIncluded,
+	};
+}
+
+export function getDistributedEditingPresenceStartupPolicyStateForSessionState(
+	sessionState = {}
+) {
+	const normalized = normalizeDistributedEditingSessionState( sessionState );
+	const selectedDelay =
+		normalized.presenceStartupPolicySelectedInitialHeartbeatDelaySeconds;
+	let summary = 'Presence startup waits for a manual update.';
+
+	if (
+		normalized.presenceStartupPolicyStatus ===
+		DISTRIBUTED_EDITING_PRESENCE_STARTUP_POLICY_STATUSES.AUTOMATIC_HEARTBEAT_ALLOWED
+	) {
+		summary = selectedDelay
+			? `Initial presence may start automatically after about ${ selectedDelay } seconds.`
+			: 'Initial presence may start automatically.';
+	} else if (
+		normalized.presenceStartupPolicyStatus ===
+		DISTRIBUTED_EDITING_PRESENCE_STARTUP_POLICY_STATUSES.SLOW_AUTOMATIC_HEARTBEAT_ALLOWED
+	) {
+		summary = selectedDelay
+			? `Initial presence may start automatically after about ${ selectedDelay } seconds on cheap hosts.`
+			: 'Initial presence may start automatically at the cheap-host cadence.';
+	} else if (
+		normalized.presenceStartupPolicyStatus ===
+		DISTRIBUTED_EDITING_PRESENCE_STARTUP_POLICY_STATUSES.PAUSED_DEGRADED_TRANSPORT
+	) {
+		summary = 'Presence startup waits while server contact is degraded.';
+	}
+
+	return {
+		status: normalized.presenceStartupPolicyStatus,
+		reason: normalized.presenceStartupPolicyReason,
+		requiresExplicitEnablement:
+			normalized.presenceStartupPolicyRequiresExplicitEnablement,
+		maySendInitialHeartbeatAutomatically:
+			normalized.presenceStartupPolicyMaySendInitialHeartbeatAutomatically,
+		slowAutomaticHeartbeatAllowed:
+			normalized.presenceStartupPolicySlowAutomaticHeartbeatAllowed,
+		manualHeartbeatAvailable:
+			normalized.presenceStartupPolicyManualHeartbeatAvailable,
+		hostProfile: normalized.presenceStartupPolicyHostProfile,
+		serverContact: normalized.presenceStartupPolicyServerContact,
+		selectedInitialHeartbeatDelaySeconds:
+			normalized.presenceStartupPolicySelectedInitialHeartbeatDelaySeconds,
+		standardInitialHeartbeatDelaySeconds:
+			normalized.presenceStartupPolicyStandardInitialHeartbeatDelaySeconds,
+		cheapHostInitialHeartbeatDelaySeconds:
+			normalized.presenceStartupPolicyCheapHostInitialHeartbeatDelaySeconds,
+		minimumInitialHeartbeatDelaySeconds:
+			normalized.presenceStartupPolicyMinimumInitialHeartbeatDelaySeconds,
+		copy: {
+			label: 'Presence startup',
+			summary,
+		},
+		descriptorOnly: true,
+		callsHeartbeatEndpointNow:
+			normalized.presenceStartupPolicyCallsHeartbeatEndpointNow,
+		recordsPresenceHeartbeatNow:
+			normalized.presenceStartupPolicyRecordsPresenceHeartbeatNow,
+		writesPresenceNow: normalized.presenceStartupPolicyWritesPresenceNow,
+		startsPollingNow: normalized.presenceStartupPolicyStartsPollingNow,
+		startsTimerNow: normalized.presenceStartupPolicyStartsTimerNow,
+		dispatchesNotice: normalized.presenceStartupPolicyDispatchesNotice,
+		callsSave: normalized.presenceStartupPolicyCallsSave,
+		mutatesEditorContent:
+			normalized.presenceStartupPolicyMutatesEditorContent,
+		mutatesPersistedPostContent:
+			normalized.presenceStartupPolicyMutatesPersistedPostContent,
+		changesPostLock: normalized.presenceStartupPolicyChangesPostLock,
+		claimsAbsence: normalized.presenceStartupPolicyClaimsAbsence,
+		claimsSaved: normalized.presenceStartupPolicyClaimsSaved,
+		exposesRawContent: normalized.presenceStartupPolicyExposesRawContent,
+		exposesUserIds: normalized.presenceStartupPolicyExposesUserIds,
+		exposesLogins: normalized.presenceStartupPolicyExposesLogins,
+		exposesEmail: normalized.presenceStartupPolicyExposesEmail,
+		exposesCursorOffset:
+			normalized.presenceStartupPolicyExposesCursorOffset,
+		exposesSelection: normalized.presenceStartupPolicyExposesSelection,
+		rawSessionKeyIncluded:
+			normalized.presenceStartupPolicyRawSessionKeyIncluded,
+		correctnessIndependentOfTransport:
+			normalized.presenceStartupPolicyCorrectnessIndependentOfTransport,
+		transportRequiredForCorrectness:
+			normalized.presenceStartupPolicyTransportRequiredForCorrectness,
+	};
+}
+
+/**
+ * Applies a local initial-presence startup policy configuration. This is an
+ * inert policy handoff only: no timers, REST calls, heartbeat writes, saves,
+ * editor-content mutation, or post-lock changes happen here.
+ *
+ * @param {Object} policyConfig        Startup policy configuration.
+ * @param {Object} currentSessionState Existing DE-RTC session state.
+ *
+ * @return {Object} Normalized DE-RTC session state.
+ */
+export function getDistributedEditingSessionStateForPresenceStartupPolicyConfig(
+	policyConfig = {},
+	currentSessionState = {}
+) {
+	return normalizeDistributedEditingSessionState( {
+		...currentSessionState,
+		distributedEditingPresenceStartupPolicy: policyConfig,
+	} );
+}
+
+/**
+ * Applies a local repeated presence cadence runtime configuration. This is an
+ * inert state handoff only: no timers, REST calls, heartbeat writes, saves,
+ * editor-content mutation, or post-lock changes happen here.
+ *
+ * @param {Object} runtimeConfig       Runtime cadence configuration.
+ * @param {Object} currentSessionState Existing DE-RTC session state.
+ *
+ * @return {Object} Normalized DE-RTC session state.
+ */
+export function getDistributedEditingSessionStateForPresenceRepeatedRefreshRuntimeConfig(
+	runtimeConfig = {},
+	currentSessionState = {}
+) {
+	return normalizeDistributedEditingSessionState( {
+		...currentSessionState,
+		distributedEditingPresenceRepeatedRefreshRuntime: runtimeConfig,
+	} );
+}
+
+/**
+ * Normalizes a one-shot WordPress presence snapshot response into DE-RTC
+ * editor state. The result updates only local presence descriptors; it does
+ * not save, mutate editor content, start polling, or change post locks.
+ *
+ * @param {Object} responseOrError     REST response or API error.
+ * @param {Object} currentSessionState Existing DE-RTC session state.
+ *
+ * @return {Object} Normalized DE-RTC session state.
+ */
+export function getDistributedEditingSessionStateForPresenceSnapshotRefreshResult(
+	responseOrError = {},
+	currentSessionState = {}
+) {
+	const responseData = getDistributedEditingResponseData( responseOrError );
+	const result = normalizeNullableString(
+		getFirstDefined( responseOrError.result, responseData.result )
+	);
+	const errorCode = normalizeNullableString(
+		getFirstDefined(
+			responseOrError.code,
+			responseOrError.reasonCode,
+			responseOrError.reason_code,
+			responseData.code,
+			responseData.reasonCode,
+			responseData.reason_code
+		)
+	);
+	const detail = normalizeNullableString(
+		getFirstDefined(
+			responseOrError.detail,
+			responseData.detail,
+			responseOrError.message
+		)
+	);
+	const roster = normalizeObject(
+		getFirstDefined(
+			responseOrError.presenceRoster,
+			responseOrError.presence_roster,
+			responseData.presenceRoster,
+			responseData.presence_roster
+		)
+	);
+	const readContract = normalizeObject(
+		getFirstDefined(
+			responseOrError.presenceReadContract,
+			responseOrError.presence_read_contract,
+			responseData.presenceReadContract,
+			responseData.presence_read_contract
+		)
+	);
+	const pollingGuidance = normalizeObject(
+		getFirstDefined(
+			readContract.cheapHostPollingGuidance,
+			readContract.cheap_host_polling_guidance
+		)
+	);
+	const refreshed =
+		result === 'presence_roster_snapshot' &&
+		( Array.isArray( roster.entries ) || roster.status );
+	const currentRosterFields =
+		normalizeDistributedEditingPresenceRosterFields( currentSessionState );
+	const rosterEntries = Array.isArray( roster.entries ) ? roster.entries : [];
+	const normalizedIncomingRosterEntries = rosterEntries.map(
+		( entry, index ) =>
+			normalizeDistributedEditingPresenceRosterEntry( entry, index )
+	);
+	const rosterHiddenCount = normalizeCount(
+		getFirstDefined( roster.hiddenCount, roster.hidden_count )
+	);
+	const rosterExpiredCount = normalizeCount(
+		getFirstDefined( roster.expiredCount, roster.expired_count )
+	);
+	const hasIncomingCurrentTabRosterEntry =
+		normalizedIncomingRosterEntries.some(
+			isDistributedEditingLocalHeartbeatRosterEntry
+		);
+	const hasIncomingSameUserOtherTabRosterEntry =
+		normalizedIncomingRosterEntries.some(
+			isDistributedEditingSameUserOtherTabRosterEntry
+		);
+	const shouldCarryForwardExpiredRosterEvidence =
+		refreshed &&
+		( hasIncomingCurrentTabRosterEntry ||
+			hasIncomingSameUserOtherTabRosterEntry ) &&
+		currentRosterFields.presenceRosterExpiredCount > rosterExpiredCount &&
+		! currentRosterFields.presenceRosterExpiredEvidenceCarriedForward;
+	const nextRosterExpiredCount = shouldCarryForwardExpiredRosterEvidence
+		? currentRosterFields.presenceRosterExpiredCount
+		: rosterExpiredCount;
+	const preservedLocalHeartbeatEntries =
+		currentRosterFields.presenceRosterEntries
+			.filter( isDistributedEditingLocalHeartbeatRosterEntry )
+			.map( ( entry ) => ( {
+				...entry,
+				freshness: 'recent',
+			} ) );
+	const shouldPreserveLocalHeartbeatEntry =
+		refreshed &&
+		rosterEntries.length === 0 &&
+		preservedLocalHeartbeatEntries.length > 0;
+	const shouldMergeLocalHeartbeatEntryWithIncomingRoster =
+		refreshed &&
+		rosterEntries.length > 0 &&
+		! hasIncomingCurrentTabRosterEntry &&
+		hasIncomingSameUserOtherTabRosterEntry &&
+		preservedLocalHeartbeatEntries.length > 0;
+	const effectiveRosterEntries =
+		shouldMergeLocalHeartbeatEntryWithIncomingRoster
+			? [ ...preservedLocalHeartbeatEntries, ...rosterEntries ]
+			: rosterEntries;
+	let refreshStatus = DISTRIBUTED_EDITING_PRESENCE_REFRESH_STATUSES.FAILED;
+
+	if ( refreshed ) {
+		refreshStatus = DISTRIBUTED_EDITING_PRESENCE_REFRESH_STATUSES.REFRESHED;
+	} else if (
+		errorCode === DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_FEATURE_DISABLED
+	) {
+		refreshStatus =
+			DISTRIBUTED_EDITING_PRESENCE_REFRESH_STATUSES.FEATURE_DISABLED;
+	} else if ( errorCode === 'rest_cannot_edit' ) {
+		refreshStatus =
+			DISTRIBUTED_EDITING_PRESENCE_REFRESH_STATUSES.PERMISSION_DENIED;
+	} else if ( errorCode === 'rest_post_invalid_id' ) {
+		refreshStatus =
+			DISTRIBUTED_EDITING_PRESENCE_REFRESH_STATUSES.ROUTE_MISMATCH;
+	}
+
+	const nextState = {
+		...currentSessionState,
+		presenceRosterRefreshStatus: refreshStatus,
+		presenceRosterRefreshReason: errorCode || detail || result,
+		presenceRosterRefreshResult: result,
+		presenceRosterRefreshRequested: true,
+		presenceRosterRefreshCallsRestEndpoint: true,
+		presenceRosterRefreshCallsSave: false,
+		presenceRosterRefreshMutatesEditorContent: false,
+		presenceRosterRefreshMutatesPersistedPostContent: false,
+		presenceRosterRefreshChangesPostLock: false,
+		presenceRosterRefreshRecordsPresenceHeartbeat: false,
+		presenceRosterRefreshEnablesRepeatedClientRefresh: Boolean(
+			getFirstDefined(
+				responseOrError.enablesRepeatedClientRefresh,
+				responseOrError.enables_repeated_client_refresh,
+				responseData.enablesRepeatedClientRefresh,
+				responseData.enables_repeated_client_refresh,
+				readContract.enablesRepeatedClientRefresh,
+				readContract.enables_repeated_client_refresh,
+				pollingGuidance.repeatedClientRefreshEnabledNow,
+				pollingGuidance.repeated_client_refresh_enabled_now
+			)
+		),
+		presenceRosterRefreshClaimsSaved: false,
+		presenceRosterRefreshExposesRawContent: false,
+		presenceRosterRefreshExposesUserIds: false,
+		presenceRosterRefreshExposesCursorOffset: false,
+		presenceRosterRefreshExposesSelection: false,
+		presenceRosterExpiredEvidenceCarriedForward:
+			shouldCarryForwardExpiredRosterEvidence,
+		presenceRosterReadContractSource: normalizeNullableString(
+			getFirstDefined( readContract.source, readContract.contractSource )
+		),
+		presenceRosterReadContractRoute: normalizeNullableString(
+			getFirstDefined( readContract.route, readContract.restRoute )
+		),
+		presenceRosterReadSuggestedPollingIntervalSeconds:
+			normalizeNullableInteger(
+				getFirstDefined(
+					pollingGuidance.suggestedPollingIntervalSeconds,
+					pollingGuidance.suggested_polling_interval_seconds
+				)
+			),
+		presenceRosterReadCheapHostPollingIntervalSeconds:
+			normalizeNullableInteger(
+				getFirstDefined(
+					pollingGuidance.cheapHostPollingIntervalSeconds,
+					pollingGuidance.cheap_host_polling_interval_seconds
+				)
+			),
+		presenceRosterReadRepeatedClientRefreshEnabled: Boolean(
+			getFirstDefined(
+				readContract.enablesRepeatedClientRefresh,
+				readContract.enables_repeated_client_refresh,
+				pollingGuidance.repeatedClientRefreshEnabledNow,
+				pollingGuidance.repeated_client_refresh_enabled_now
+			)
+		),
+	};
+
+	if ( refreshed ) {
+		if ( shouldPreserveLocalHeartbeatEntry ) {
+			nextState.presenceRosterStatus =
+				DISTRIBUTED_EDITING_PRESENCE_ROSTER_STATUSES.RECENT;
+			nextState.presenceRosterEntries = preservedLocalHeartbeatEntries;
+			nextState.presenceRosterTotalKnownCount = Math.max(
+				normalizeCount(
+					getFirstDefined(
+						roster.totalKnownCount,
+						roster.total_known_count
+					)
+				),
+				preservedLocalHeartbeatEntries.length +
+					rosterHiddenCount +
+					nextRosterExpiredCount
+			);
+			nextState.presenceRosterHiddenCount = rosterHiddenCount;
+			nextState.presenceRosterExpiredCount = nextRosterExpiredCount;
+		} else {
+			nextState.presenceRosterStatus = roster.status;
+			nextState.presenceRosterEntries = effectiveRosterEntries;
+			nextState.presenceRosterTotalKnownCount = Math.max(
+				normalizeCount(
+					getFirstDefined(
+						roster.totalKnownCount,
+						roster.total_known_count
+					)
+				),
+				effectiveRosterEntries.length +
+					rosterHiddenCount +
+					nextRosterExpiredCount
+			);
+			nextState.presenceRosterHiddenCount = rosterHiddenCount;
+			nextState.presenceRosterExpiredCount = nextRosterExpiredCount;
+		}
+	}
+
+	return normalizeDistributedEditingSessionState( nextState );
+}
+
+/**
+ * Normalizes a content-free WordPress presence storage readiness re-check into
+ * DE-RTC editor state. The result updates only local readiness descriptors; it
+ * does not install storage, write presence, save, mutate editor content, start
+ * polling, expose private fields, or change post locks.
+ *
+ * @param {Object} responseOrError     REST response or API error.
+ * @param {Object} currentSessionState Existing DE-RTC session state.
+ *
+ * @return {Object} Normalized DE-RTC session state.
+ */
+export function getDistributedEditingSessionStateForPresenceStorageReadinessRecheckResult(
+	responseOrError = {},
+	currentSessionState = {}
+) {
+	const responseData = getDistributedEditingResponseData( responseOrError );
+	const result = normalizeNullableString(
+		getFirstDefined( responseOrError.result, responseData.result )
+	);
+	const errorCode = normalizeNullableString(
+		getFirstDefined(
+			responseOrError.code,
+			responseOrError.reasonCode,
+			responseOrError.reason_code,
+			responseData.code,
+			responseData.reasonCode,
+			responseData.reason_code
+		)
+	);
+	const detail = normalizeNullableString(
+		getFirstDefined(
+			responseOrError.detail,
+			responseData.detail,
+			responseOrError.message
+		)
+	);
+	const readinessStatus = normalizeNullableString(
+		getFirstDefined(
+			responseOrError.status,
+			responseOrError.readinessStatus,
+			responseOrError.readiness_status,
+			typeof responseData.status === 'string'
+				? responseData.status
+				: undefined,
+			responseData.readinessStatus,
+			responseData.readiness_status
+		)
+	);
+	const recheckStatus =
+		getDistributedEditingPresenceStorageReadinessRecheckStatusForResult( {
+			readinessStatus,
+			errorCode,
+		} );
+	const successfulReadiness = [
+		DISTRIBUTED_EDITING_PRESENCE_STORAGE_READINESS_RECHECK_STATUSES.READY,
+		DISTRIBUTED_EDITING_PRESENCE_STORAGE_READINESS_RECHECK_STATUSES.SETUP_REQUIRED,
+		DISTRIBUTED_EDITING_PRESENCE_STORAGE_READINESS_RECHECK_STATUSES.UPGRADE_REQUIRED,
+	].includes( recheckStatus );
+	const readiness = successfulReadiness
+		? {
+				result,
+				status: recheckStatus,
+				tableExists: Boolean(
+					getFirstDefined(
+						responseOrError.tableExists,
+						responseOrError.table_exists,
+						responseData.tableExists,
+						responseData.table_exists
+					)
+				),
+				schemaCurrent: Boolean(
+					getFirstDefined(
+						responseOrError.schemaCurrent,
+						responseOrError.schema_current,
+						responseData.schemaCurrent,
+						responseData.schema_current
+					)
+				),
+				expectedStartupHeartbeatStatus: normalizeNullableString(
+					getFirstDefined(
+						responseOrError.expectedStartupHeartbeatStatus,
+						responseOrError.expected_startup_heartbeat_status,
+						responseData.expectedStartupHeartbeatStatus,
+						responseData.expected_startup_heartbeat_status
+					)
+				),
+				setupRequired: Boolean(
+					getFirstDefined(
+						responseOrError.setupRequired,
+						responseOrError.setup_required,
+						responseData.setupRequired,
+						responseData.setup_required
+					)
+				),
+				setupAction: normalizeNullableString(
+					getFirstDefined(
+						responseOrError.setupAction,
+						responseOrError.setup_action,
+						responseData.setupAction,
+						responseData.setup_action
+					)
+				),
+				diagnosticOnly:
+					getFirstDefined(
+						responseOrError.diagnosticOnly,
+						responseOrError.diagnostic_only,
+						responseData.diagnosticOnly,
+						responseData.diagnostic_only
+					) !== false,
+				contentFree:
+					getFirstDefined(
+						responseOrError.contentFree,
+						responseOrError.content_free,
+						responseData.contentFree,
+						responseData.content_free
+					) !== false,
+				installsPresenceTable: Boolean(
+					getFirstDefined(
+						responseOrError.installsPresenceTable,
+						responseOrError.installs_presence_table,
+						responseData.installsPresenceTable,
+						responseData.installs_presence_table
+					)
+				),
+				automaticPerRequestInstall: Boolean(
+					getFirstDefined(
+						responseOrError.automaticPerRequestInstall,
+						responseOrError.automatic_per_request_install,
+						responseData.automaticPerRequestInstall,
+						responseData.automatic_per_request_install
+					)
+				),
+				writesPresence: Boolean(
+					getFirstDefined(
+						responseOrError.writesPresence,
+						responseOrError.writes_presence,
+						responseData.writesPresence,
+						responseData.writes_presence
+					)
+				),
+				recordsPresenceHeartbeat: Boolean(
+					getFirstDefined(
+						responseOrError.recordsPresenceHeartbeat,
+						responseOrError.records_presence_heartbeat,
+						responseData.recordsPresenceHeartbeat,
+						responseData.records_presence_heartbeat
+					)
+				),
+				startsPolling: Boolean(
+					getFirstDefined(
+						responseOrError.startsPolling,
+						responseOrError.starts_polling,
+						responseData.startsPolling,
+						responseData.starts_polling
+					)
+				),
+				callsSave: Boolean(
+					getFirstDefined(
+						responseOrError.callsSave,
+						responseOrError.calls_save,
+						responseData.callsSave,
+						responseData.calls_save
+					)
+				),
+				mutatesEditorContent: false,
+				mutatesPostContent: Boolean(
+					getFirstDefined(
+						responseOrError.mutatesPostContent,
+						responseOrError.mutates_post_content,
+						responseData.mutatesPostContent,
+						responseData.mutates_post_content
+					)
+				),
+				mutatesPersistedPostContent: Boolean(
+					getFirstDefined(
+						responseOrError.mutatesPersistedPostContent,
+						responseOrError.mutates_persisted_post_content,
+						responseData.mutatesPersistedPostContent,
+						responseData.mutates_persisted_post_content
+					)
+				),
+				createsRevision: Boolean(
+					getFirstDefined(
+						responseOrError.createsRevision,
+						responseOrError.creates_revision,
+						responseData.createsRevision,
+						responseData.creates_revision
+					)
+				),
+				changesPostLock: Boolean(
+					getFirstDefined(
+						responseOrError.changesPostLock,
+						responseOrError.changes_post_lock,
+						responseData.changesPostLock,
+						responseData.changes_post_lock
+					)
+				),
+				claimsAbsence: Boolean(
+					getFirstDefined(
+						responseOrError.claimsAbsence,
+						responseOrError.claims_absence,
+						responseData.claimsAbsence,
+						responseData.claims_absence
+					)
+				),
+				claimsSaved: Boolean(
+					getFirstDefined(
+						responseOrError.claimsSaved,
+						responseOrError.claims_saved,
+						responseData.claimsSaved,
+						responseData.claims_saved
+					)
+				),
+				exposesRawContent: Boolean(
+					getFirstDefined(
+						responseOrError.exposesRawContent,
+						responseOrError.exposes_raw_content,
+						responseData.exposesRawContent,
+						responseData.exposes_raw_content
+					)
+				),
+				exposesUserIds: Boolean(
+					getFirstDefined(
+						responseOrError.exposesUserIds,
+						responseOrError.exposes_user_ids,
+						responseData.exposesUserIds,
+						responseData.exposes_user_ids
+					)
+				),
+				exposesCursorOffset: Boolean(
+					getFirstDefined(
+						responseOrError.exposesCursorOffset,
+						responseOrError.exposes_cursor_offset,
+						responseData.exposesCursorOffset,
+						responseData.exposes_cursor_offset
+					)
+				),
+				exposesSelection: Boolean(
+					getFirstDefined(
+						responseOrError.exposesSelection,
+						responseOrError.exposes_selection,
+						responseData.exposesSelection,
+						responseData.exposes_selection
+					)
+				),
+				correctnessIndependentOfTransport:
+					getFirstDefined(
+						responseOrError.correctnessIndependentOfTransport,
+						responseOrError.correctness_independent_of_transport,
+						responseData.correctnessIndependentOfTransport,
+						responseData.correctness_independent_of_transport
+					) !== false,
+				transportRequiredForCorrectness: Boolean(
+					getFirstDefined(
+						responseOrError.transportRequiredForCorrectness,
+						responseOrError.transport_required_for_correctness,
+						responseData.transportRequiredForCorrectness,
+						responseData.transport_required_for_correctness
+					)
+				),
+		  }
+		: null;
+	const nextState = {
+		...currentSessionState,
+		presenceStorageReadinessRecheckStatus: recheckStatus,
+		presenceStorageReadinessRecheckReason:
+			errorCode || detail || readinessStatus || result,
+		presenceStorageReadinessRecheckResult: readiness,
+		presenceStorageReadinessRecheckRequested: true,
+		presenceStorageReadinessRecheckCallsRestEndpoint: true,
+		presenceStorageReadinessRecheckInstallsPresenceTable: false,
+		presenceStorageReadinessRecheckRecordsPresenceHeartbeat: false,
+		presenceStorageReadinessRecheckWritesPresence: false,
+		presenceStorageReadinessRecheckStartsPolling: false,
+		presenceStorageReadinessRecheckCallsSave: false,
+		presenceStorageReadinessRecheckMutatesEditorContent: false,
+		presenceStorageReadinessRecheckMutatesPersistedPostContent: false,
+		presenceStorageReadinessRecheckChangesPostLock: false,
+		presenceStorageReadinessRecheckClaimsAbsence: false,
+		presenceStorageReadinessRecheckClaimsSaved: false,
+		presenceStorageReadinessRecheckContentFree: true,
+		presenceStorageReadinessRecheckExposesRawContent: false,
+		presenceStorageReadinessRecheckExposesUserIds: false,
+		presenceStorageReadinessRecheckExposesCursorOffset: false,
+		presenceStorageReadinessRecheckExposesSelection: false,
+		presenceStorageReadinessRecheckCorrectnessIndependentOfTransport: true,
+		presenceStorageReadinessRecheckTransportRequiredForCorrectness: false,
+	};
+
+	return normalizeDistributedEditingSessionState( nextState );
+}
+
+/**
+ * Normalizes a one-shot WordPress presence heartbeat response into DE-RTC
+ * editor state. The result updates only local heartbeat descriptors; it does
+ * not save, mutate editor content, start polling, expose private fields, or
+ * change post locks.
+ *
+ * @param {Object} responseOrError     REST response, local gate result, or API error.
+ * @param {Object} currentSessionState Existing DE-RTC session state.
+ *
+ * @return {Object} Normalized DE-RTC session state.
+ */
+export function getDistributedEditingSessionStateForPresenceHeartbeatResult(
+	responseOrError = {},
+	currentSessionState = {}
+) {
+	const responseData = getDistributedEditingResponseData( responseOrError );
+	const result = normalizeNullableString(
+		getFirstDefined( responseOrError.result, responseData.result )
+	);
+	const errorCode = normalizeNullableString(
+		getFirstDefined(
+			responseOrError.code,
+			responseOrError.reasonCode,
+			responseOrError.reason_code,
+			responseData.code,
+			responseData.reasonCode,
+			responseData.reason_code
+		)
+	);
+	const detail = normalizeNullableString(
+		getFirstDefined(
+			responseOrError.detail,
+			responseData.detail,
+			responseOrError.message
+		)
+	);
+	const status = getDistributedEditingPresenceHeartbeatStatusForResult( {
+		result,
+		errorCode,
+	} );
+	const heartbeatRecorded =
+		status === DISTRIBUTED_EDITING_PRESENCE_HEARTBEAT_STATUSES.SENT;
+	const currentRosterFields =
+		normalizeDistributedEditingPresenceRosterFields( currentSessionState );
+	const hasExistingLocalRosterEntry =
+		currentRosterFields.presenceRosterEntries.some(
+			isDistributedEditingLocalHeartbeatRosterEntry
+		);
+	const shouldAddLocalRosterEntry =
+		heartbeatRecorded &&
+		currentRosterFields.presenceRosterEntries.length === 0;
+	const shouldRefreshExistingLocalRosterEntry =
+		heartbeatRecorded && hasExistingLocalRosterEntry;
+	const shouldDowngradeLocalRosterEntry =
+		! heartbeatRecorded && hasExistingLocalRosterEntry;
+	const localRosterEntry = {
+		key: 'presence-local-heartbeat-current-tab',
+		displayName: null,
+		identityVisibility: 'self',
+		relationship: 'current_user_current_tab',
+		activity: 'editing_post',
+		freshness: 'current',
+		source: 'local_heartbeat_confirmation',
+		exposesUserId: false,
+		exposesCursorOffset: false,
+		exposesSelection: false,
+		exposesRawContent: false,
+	};
+	const refreshedExistingRosterEntries =
+		shouldRefreshExistingLocalRosterEntry || shouldDowngradeLocalRosterEntry
+			? currentRosterFields.presenceRosterEntries.map( ( entry ) =>
+					isDistributedEditingLocalHeartbeatRosterEntry( entry )
+						? {
+								...entry,
+								freshness: heartbeatRecorded
+									? 'current'
+									: 'recent',
+						  }
+						: entry
+			  )
+			: null;
+	const nextRosterEntries = shouldAddLocalRosterEntry
+		? [ localRosterEntry ]
+		: refreshedExistingRosterEntries;
+	const shouldUpdateRosterCounts = Boolean( nextRosterEntries );
+	const nextRosterHiddenCount = currentRosterFields.presenceRosterHiddenCount;
+	const nextRosterExpiredCount =
+		currentRosterFields.presenceRosterExpiredCount;
+	const nextRosterTotalKnownCount = shouldUpdateRosterCounts
+		? Math.max(
+				currentRosterFields.presenceRosterTotalKnownCount,
+				nextRosterEntries.length +
+					nextRosterHiddenCount +
+					nextRosterExpiredCount
+		  )
+		: null;
+	const localRosterEntryVisible = Boolean(
+		shouldAddLocalRosterEntry ||
+			shouldRefreshExistingLocalRosterEntry ||
+			shouldDowngradeLocalRosterEntry
+	);
+	let localRosterEntryFreshness = null;
+	if ( localRosterEntryVisible ) {
+		localRosterEntryFreshness = heartbeatRecorded ? 'current' : 'recent';
+	}
+	const nextState = {
+		...currentSessionState,
+		...( nextRosterEntries
+			? {
+					presenceRosterEntries: nextRosterEntries,
+					presenceRosterVisibleCount: nextRosterEntries.length,
+					presenceRosterTotalKnownCount: nextRosterTotalKnownCount,
+					presenceRosterHiddenCount: nextRosterHiddenCount,
+					presenceRosterExpiredCount: nextRosterExpiredCount,
+			  }
+			: {} ),
+		presenceHeartbeatStatus: status,
+		presenceHeartbeatReason: errorCode || detail || result,
+		presenceHeartbeatResult: result,
+		presenceHeartbeatRequested: true,
+		presenceHeartbeatCallsRestEndpoint: Boolean(
+			getFirstDefined(
+				responseOrError.callsRestEndpoint,
+				responseOrError.calls_rest_endpoint,
+				responseData.callsRestEndpoint,
+				responseData.calls_rest_endpoint,
+				true
+			)
+		),
+		presenceHeartbeatRecordsPresenceHeartbeat: Boolean(
+			getFirstDefined(
+				responseOrError.recordsPresenceHeartbeat,
+				responseOrError.records_presence_heartbeat,
+				responseData.recordsPresenceHeartbeat,
+				responseData.records_presence_heartbeat,
+				heartbeatRecorded
+			)
+		),
+		presenceHeartbeatWritesPresence: Boolean(
+			getFirstDefined(
+				responseOrError.writesPresence,
+				responseOrError.writes_presence,
+				responseData.writesPresence,
+				responseData.writes_presence,
+				heartbeatRecorded
+			)
+		),
+		presenceHeartbeatCallsSave: false,
+		presenceHeartbeatMutatesEditorContent: false,
+		presenceHeartbeatMutatesPersistedPostContent: false,
+		presenceHeartbeatChangesPostLock: false,
+		presenceHeartbeatClaimsSaved: false,
+		presenceHeartbeatEnablesRepeatedClientRefresh: false,
+		presenceHeartbeatRuntimePollingEnabled: false,
+		presenceHeartbeatExposesRawContent: false,
+		presenceHeartbeatExposesUserIds: false,
+		presenceHeartbeatExposesCursorOffset: false,
+		presenceHeartbeatExposesSelection: false,
+		presenceHeartbeatRawSessionKeyIncluded: false,
+		presenceHeartbeatMarksLocalEditorCurrent: heartbeatRecorded,
+		presenceHeartbeatMarksLocalEditorDelayed:
+			shouldDowngradeLocalRosterEntry,
+		presenceHeartbeatLocalRosterEntryVisible: localRosterEntryVisible,
+		presenceHeartbeatLocalRosterEntryFreshness: localRosterEntryFreshness,
+		presenceHeartbeatRepeatedRefreshOptional: Boolean(
+			getFirstDefined(
+				responseOrError.repeatedRefreshOptional,
+				responseOrError.repeated_refresh_optional,
+				responseData.repeatedRefreshOptional,
+				responseData.repeated_refresh_optional,
+				true
+			)
+		),
+		presenceHeartbeatSuggestedIntervalSeconds: normalizeNullableInteger(
+			getFirstDefined(
+				responseOrError.heartbeatIntervalSeconds,
+				responseOrError.heartbeat_interval_seconds,
+				responseData.heartbeatIntervalSeconds,
+				responseData.heartbeat_interval_seconds,
+				responseData.suggestedPollingIntervalSeconds,
+				responseData.suggested_polling_interval_seconds
+			)
+		),
+		presenceHeartbeatCheapHostIntervalSeconds: normalizeNullableInteger(
+			getFirstDefined(
+				responseOrError.cheapHostPollingIntervalSeconds,
+				responseOrError.cheap_host_polling_interval_seconds,
+				responseData.cheapHostPollingIntervalSeconds,
+				responseData.cheap_host_polling_interval_seconds
+			)
+		),
+	};
+
+	return normalizeDistributedEditingSessionState( nextState );
+}
+
+function getDistributedEditingPresenceHeartbeatStatusForResult( {
+	result,
+	errorCode,
+} ) {
+	if ( result === 'presence_heartbeat_recorded' ) {
+		return DISTRIBUTED_EDITING_PRESENCE_HEARTBEAT_STATUSES.SENT;
+	}
+
+	if (
+		errorCode ===
+			DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_PRESENCE_STORAGE_UNAVAILABLE ||
+		result === 'presence_storage_unavailable'
+	) {
+		return DISTRIBUTED_EDITING_PRESENCE_HEARTBEAT_STATUSES.STORAGE_UNAVAILABLE;
+	}
+
+	if (
+		errorCode === DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_FEATURE_DISABLED
+	) {
+		return DISTRIBUTED_EDITING_PRESENCE_HEARTBEAT_STATUSES.FEATURE_DISABLED;
+	}
+
+	if (
+		errorCode === DISTRIBUTED_EDITING_REASON_CODES.REST_CANNOT_EDIT ||
+		errorCode === 'rest_cannot_edit'
+	) {
+		return DISTRIBUTED_EDITING_PRESENCE_HEARTBEAT_STATUSES.PERMISSION_DENIED;
+	}
+
+	if (
+		errorCode === DISTRIBUTED_EDITING_REASON_CODES.REST_POST_INVALID_ID ||
+		errorCode === 'rest_post_invalid_id'
+	) {
+		return DISTRIBUTED_EDITING_PRESENCE_HEARTBEAT_STATUSES.ROUTE_MISMATCH;
+	}
+
+	return DISTRIBUTED_EDITING_PRESENCE_HEARTBEAT_STATUSES.FAILED;
+}
+
+function getDistributedEditingPresenceStorageReadinessRecheckStatusForResult( {
+	readinessStatus,
+	errorCode,
+} ) {
+	if ( readinessStatus === 'ready' ) {
+		return DISTRIBUTED_EDITING_PRESENCE_STORAGE_READINESS_RECHECK_STATUSES.READY;
+	}
+
+	if ( readinessStatus === 'setup_required' ) {
+		return DISTRIBUTED_EDITING_PRESENCE_STORAGE_READINESS_RECHECK_STATUSES.SETUP_REQUIRED;
+	}
+
+	if ( readinessStatus === 'upgrade_required' ) {
+		return DISTRIBUTED_EDITING_PRESENCE_STORAGE_READINESS_RECHECK_STATUSES.UPGRADE_REQUIRED;
+	}
+
+	if (
+		readinessStatus === 'feature_disabled' ||
+		errorCode === DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_FEATURE_DISABLED
+	) {
+		return DISTRIBUTED_EDITING_PRESENCE_STORAGE_READINESS_RECHECK_STATUSES.FEATURE_DISABLED;
+	}
+
+	if (
+		errorCode === DISTRIBUTED_EDITING_REASON_CODES.REST_CANNOT_EDIT ||
+		errorCode === 'rest_cannot_edit'
+	) {
+		return DISTRIBUTED_EDITING_PRESENCE_STORAGE_READINESS_RECHECK_STATUSES.PERMISSION_DENIED;
+	}
+
+	if (
+		errorCode === DISTRIBUTED_EDITING_REASON_CODES.REST_POST_INVALID_ID ||
+		errorCode === 'rest_post_invalid_id'
+	) {
+		return DISTRIBUTED_EDITING_PRESENCE_STORAGE_READINESS_RECHECK_STATUSES.ROUTE_MISMATCH;
+	}
+
+	return DISTRIBUTED_EDITING_PRESENCE_STORAGE_READINESS_RECHECK_STATUSES.FAILED;
+}
+
 /**
  * Returns a support-export summary for the current DE-RTC action transcript.
  * The summary deliberately keeps chronology to stable event names, sources,
@@ -1790,6 +4245,13 @@ function getDistributedEditingActionTranscriptSupportChronologyStatus(
 
 	if ( summary.hasFreshReviewRetrySaveConfirmation ) {
 		return 'fresh_review_guarded_save_confirmed';
+	}
+
+	if (
+		summary.latestEventType ===
+		DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.SAVE_CONFIRMED
+	) {
+		return 'guarded_save_confirmed';
 	}
 
 	if ( summary.hasFreshReviewConsumeValidation ) {
@@ -2037,18 +4499,24 @@ function getDistributedEditingFreshReviewItemAffordanceFields( item ) {
 						: 'missing_block_target',
 			}
 		);
+	const comparisonSurface =
+		createDistributedEditingFreshReviewReadOnlyComparisonSurfaceDescriptor(
+			item
+		);
 	const compareAction =
 		createDistributedEditingFreshReviewItemAffordanceDescriptor(
 			DISTRIBUTED_EDITING_NOTICE_ACTIONS.COMPARE_FRESH_REVIEW_ITEM,
 			item,
 			{
 				enabled: Boolean(
-					item.baseContentHash && item.proposedContentHash
+					( item.baseContentHash && item.proposedContentHash ) ||
+						comparisonSurface.canOpenComparisonSurface
 				),
 				reason:
 					item.baseContentHash && item.proposedContentHash
 						? null
-						: 'missing_hash_evidence',
+						: comparisonSurface.reason || 'missing_hash_evidence',
+				comparisonSurface,
 			}
 		);
 
@@ -2108,6 +4576,10 @@ function createDistributedEditingFreshReviewComparePlanDescriptor(
 				comparisonSelectionHandoff,
 			}
 		);
+	const comparisonSurface =
+		createDistributedEditingFreshReviewReadOnlyComparisonSurfaceDescriptor(
+			item
+		);
 
 	return {
 		status: enabled ? 'ready' : 'unavailable',
@@ -2125,21 +4597,26 @@ function createDistributedEditingFreshReviewComparePlanDescriptor(
 		comparisonInputShape,
 		comparisonSelectionHandoff,
 		comparisonPreviewShell,
+		comparisonSurface,
 		usesBaseContentHash: hasBaseContentHash,
 		usesProposedContentHash: hasProposedContentHash,
 		usesReviewedProposedContentHash: hasReviewedProposedContentHash,
 		supportsComparisonSelectionHandoff: true,
 		supportsComparisonPreviewShell: true,
+		supportsReadOnlyComparisonSurface: true,
 		canSelectForFutureComparison:
 			comparisonSelectionHandoff.canSelectForFutureComparison,
 		canOpenComparisonPreviewShell:
 			comparisonPreviewShell.canOpenComparisonPreviewShell,
-		requiresFutureComparisonSurface: true,
-		descriptorOnly: true,
+		canOpenReadOnlyComparisonSurface:
+			comparisonSurface.canOpenComparisonSurface,
+		requiresFutureComparisonSurface:
+			! comparisonSurface.canOpenComparisonSurface,
+		descriptorOnly: ! comparisonSurface.canOpenComparisonSurface,
 		hashValuesRedacted: true,
 		exposesHashValues: false,
 		rendersDiff: false,
-		opensComparison: false,
+		opensComparison: comparisonSurface.canOpenComparisonSurface,
 		callsRestEndpoint: false,
 		callsSave: false,
 		callsNormalSavePost: false,
@@ -2153,6 +4630,137 @@ function createDistributedEditingFreshReviewComparePlanDescriptor(
 		createsRevision: false,
 		changesPostLock: false,
 		claimsSaved: false,
+		exposesRawContent: false,
+		exposesProofSignature: false,
+		exposesTokenMaterial: false,
+		exposesUserIdentity: false,
+		exposesReviewerIds: false,
+	};
+}
+
+function createDistributedEditingFreshReviewReadOnlyComparisonSurfaceDescriptor(
+	item = {}
+) {
+	const source = normalizeObject(
+		getFirstDefined(
+			item.readOnlyComparison,
+			item.read_only_comparison,
+			item.comparisonSurface,
+			item.comparison_surface
+		)
+	);
+	const contentKind =
+		normalizeNullableString(
+			getFirstDefined(
+				source.contentKind,
+				source.content_kind,
+				item.comparisonContentKind,
+				item.comparison_content_kind
+			)
+		) || 'safe_serialized_block';
+	const privacyClass = normalizeNullableString(
+		getFirstDefined(
+			source.privacyClass,
+			source.privacy_class,
+			item.privacyClass,
+			item.privacy_class
+		)
+	);
+	const baseText = normalizeNullableContentString(
+		getFirstDefined(
+			source.baseText,
+			source.base_text,
+			source.baseSerializedBlock,
+			source.base_serialized_block,
+			item.comparisonBaseText,
+			item.comparison_base_text,
+			item.baseSerializedBlock,
+			item.base_serialized_block
+		)
+	);
+	const proposedText = normalizeNullableContentString(
+		getFirstDefined(
+			source.proposedText,
+			source.proposed_text,
+			source.proposedSerializedBlock,
+			source.proposed_serialized_block,
+			item.comparisonProposedText,
+			item.comparison_proposed_text,
+			item.proposedSerializedBlock,
+			item.proposed_serialized_block
+		)
+	);
+	const safeForDisplay = Boolean(
+		getFirstDefined(
+			source.safeForDisplay,
+			source.safe_for_display,
+			item.comparisonSafeForDisplay,
+			item.comparison_safe_for_display,
+			item.safeComparisonContent,
+			item.safe_comparison_content,
+			privacyClass === 'synthetic-content'
+		)
+	);
+	const supportedContentKind = [
+		'plain_text_serialized_block',
+		'safe_plain_text',
+		'safe_serialized_block',
+		'synthetic_safe_serialized_block',
+	].includes( contentKind );
+	const hasComparisonText = baseText !== null && proposedText !== null;
+	const canOpenComparisonSurface = Boolean(
+		safeForDisplay && supportedContentKind && hasComparisonText
+	);
+	let reason = null;
+
+	if ( ! canOpenComparisonSurface ) {
+		reason =
+			! supportedContentKind || ! safeForDisplay
+				? 'unsupported_comparison_boundary'
+				: 'missing_comparison_content';
+	}
+
+	return {
+		status: canOpenComparisonSurface ? 'ready' : 'unavailable',
+		reason,
+		schemaVersion: 1,
+		surfaceKind: 'fresh_review_read_only_comparison_surface',
+		mode: 'read_only_side_by_side_block_review',
+		itemId: normalizeNullableString( item.id ),
+		blockClientId: normalizeNullableString( item.blockClientId ),
+		blockName: normalizeNullableString( item.blockName ),
+		blockLabel: normalizeNullableString( item.blockLabel ),
+		changeKind: normalizeNullableString( item.changeKind ),
+		contentKind,
+		privacyClass,
+		baseLabel: 'Base version',
+		proposedLabel: 'Proposed version',
+		baseText: canOpenComparisonSurface ? baseText : null,
+		proposedText: canOpenComparisonSurface ? proposedText : null,
+		baseTextAvailable: canOpenComparisonSurface,
+		proposedTextAvailable: canOpenComparisonSurface,
+		safeForDisplay,
+		safeSerializedBlocksAvailable: canOpenComparisonSurface,
+		canOpenComparisonSurface,
+		readOnly: true,
+		renderable: canOpenComparisonSurface,
+		rendersDiff: false,
+		derivesPatch: false,
+		callsRestEndpoint: false,
+		callsSave: false,
+		callsNormalSavePost: false,
+		callsRetrySaveEndpoint: false,
+		dispatchesNotice: false,
+		savesPost: false,
+		mutatesEditorContent: false,
+		mutatesPersistedPostContent: false,
+		selectsBlock: false,
+		movesFocus: false,
+		createsRevision: false,
+		changesPostLock: false,
+		claimsSaved: false,
+		rawContentIncluded: false,
+		exposesHashValues: false,
 		exposesRawContent: false,
 		exposesProofSignature: false,
 		exposesTokenMaterial: false,
@@ -3045,7 +5653,7 @@ function createDistributedEditingFreshReviewComparisonInputSlotDescriptor( {
 function createDistributedEditingFreshReviewItemAffordanceDescriptor(
 	actionKey,
 	item,
-	{ enabled = true, reason = null } = {}
+	{ enabled = true, reason = null, comparisonSurface = null } = {}
 ) {
 	const reportsCommandStatus = [
 		DISTRIBUTED_EDITING_NOTICE_ACTIONS.JUMP_TO_FRESH_REVIEW_ITEM,
@@ -3077,6 +5685,17 @@ function createDistributedEditingFreshReviewItemAffordanceDescriptor(
 					reason,
 			  } )
 			: null;
+	const readOnlyComparisonSurface =
+		actionKey ===
+		DISTRIBUTED_EDITING_NOTICE_ACTIONS.COMPARE_FRESH_REVIEW_ITEM
+			? comparisonSurface ||
+			  createDistributedEditingFreshReviewReadOnlyComparisonSurfaceDescriptor(
+					item
+			  )
+			: null;
+	const canOpenReadOnlyComparisonSurface = Boolean(
+		readOnlyComparisonSurface?.canOpenComparisonSurface
+	);
 
 	return {
 		actionKey,
@@ -3098,13 +5717,19 @@ function createDistributedEditingFreshReviewItemAffordanceDescriptor(
 		reason: normalizeNullableString( reason ),
 		placement:
 			DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_PLACEMENTS.PRE_PUBLISH_REVIEW,
-		descriptorOnly: true,
+		descriptorOnly:
+			actionKey ===
+			DISTRIBUTED_EDITING_NOTICE_ACTIONS.COMPARE_FRESH_REVIEW_ITEM
+				? ! canOpenReadOnlyComparisonSurface
+				: true,
 		reportsCommandStatus,
 		commandStatus,
 		commandStatusPlacement: reportsCommandStatus
 			? 'fresh_review_decision_panel'
 			: null,
 		comparePlan,
+		comparisonSurface: readOnlyComparisonSurface,
+		canOpenReadOnlyComparisonSurface,
 		callsRestEndpoint: false,
 		callsSave: false,
 		callsNormalSavePost: false,
@@ -3115,7 +5740,7 @@ function createDistributedEditingFreshReviewItemAffordanceDescriptor(
 		mutatesPersistedPostContent: false,
 		selectsBlock: false,
 		movesFocus: false,
-		opensComparison: false,
+		opensComparison: canOpenReadOnlyComparisonSurface,
 		createsRevision: false,
 		changesPostLock: false,
 		claimsSaved: false,
@@ -6015,6 +8640,11 @@ export function getDistributedEditingNoticeDescriptorsForSessionState(
 	}
 
 	if ( actionTranscriptState.status === 'available' ) {
+		const actionTranscriptSupportReport =
+			getDistributedEditingActionTranscriptSupportReportForSessionState(
+				normalized
+			);
+
 		descriptors.push(
 			createNoticeDescriptor( normalized, {
 				kind: DISTRIBUTED_EDITING_NOTICE_KINDS.ACTION_TRANSCRIPT,
@@ -6053,6 +8683,7 @@ export function getDistributedEditingNoticeDescriptorsForSessionState(
 						actionTranscriptState.changesPostLock,
 					actionTranscriptClaimsSaved:
 						actionTranscriptState.claimsSaved,
+					actionTranscriptSupportReport,
 				},
 			} )
 		);
@@ -7664,7 +10295,7 @@ export function getDistributedEditingSaveButtonStateForSessionState(
 		source = 'retry_save';
 		label = 'Saving reviewed changes';
 		statusText =
-			'Distributed Editing retry save is waiting for server confirmation.';
+			'Distributed Editing Save is waiting for WordPress confirmation.';
 		clickAction = null;
 		disabled = true;
 		busy = true;
@@ -7684,7 +10315,7 @@ export function getDistributedEditingSaveButtonStateForSessionState(
 		source = 'fresh_review';
 		label = 'Validating review';
 		statusText =
-			'Fresh-review validation is in progress before guarded save.';
+			'Fresh-review validation is in progress before WordPress updates the post.';
 		clickAction = null;
 		disabled = true;
 		busy = true;
@@ -7713,7 +10344,7 @@ export function getDistributedEditingSaveButtonStateForSessionState(
 		}
 		label = 'Refetch required';
 		statusText =
-			'Server state must be refetched before Distributed Editing can save.';
+			'The latest post must be loaded before Distributed Editing can save.';
 		clickAction =
 			DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.REFETCH_SERVER_STATE;
 		requiresServerStateRefetch = true;
@@ -7770,7 +10401,7 @@ export function getDistributedEditingSaveButtonStateForSessionState(
 		}
 		label = 'Submit reviewed changes';
 		statusText =
-			'Accepted Distributed Editing proof is ready for guarded retry save.';
+			'Accepted Distributed Editing proof is ready for WordPress Save.';
 		clickAction =
 			DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.CONTINUE_GUARDED_RETRY_SAVE;
 		authorityState =
@@ -7782,15 +10413,15 @@ export function getDistributedEditingSaveButtonStateForSessionState(
 		reason =
 			DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.RETRY_SAVE_ALREADY_CONFIRMED;
 		source = 'retry_save';
-		label = 'Retry save confirmed';
-		statusText = 'Distributed Editing retry save confirmed.';
+		label = 'Save confirmed';
+		statusText = 'Distributed Editing Save confirmed.';
 		clickAction = null;
 		disabled = true;
 		claimsSaved = true;
 		authorityState =
 			DISTRIBUTED_EDITING_SAVE_AUTHORITY_STATES.AUTHORITATIVE_UPDATE_CONFIRMED;
 		authorityStatusText =
-			'The authoritative WordPress post has accepted the Distributed Editing retry save.';
+			'The authoritative WordPress post has accepted the Distributed Editing Save.';
 		authoritativePostUpdated = true;
 	}
 
@@ -11185,6 +13816,10 @@ function normalizeFreshReviewDecisionItem( item = {} ) {
 	].includes( getFirstDefined( item.reviewStatus, item.review_status ) )
 		? getFirstDefined( item.reviewStatus, item.review_status )
 		: DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES.PENDING_REVIEW;
+	const readOnlyComparison =
+		createDistributedEditingFreshReviewReadOnlyComparisonSurfaceDescriptor(
+			item
+		);
 
 	return {
 		id: normalizeNullableString( item.id ),
@@ -11238,6 +13873,7 @@ function normalizeFreshReviewDecisionItem( item = {} ) {
 					item.content_review_policy
 				)
 			) || 'kses',
+		readOnlyComparison,
 		rejectionReason: normalizeNullableString(
 			getFirstDefined( item.rejectionReason, item.rejection_reason )
 		),

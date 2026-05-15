@@ -184,6 +184,69 @@ export function getDistributedEditingFreshReviewConsumeEndpointPath( {
 }
 
 /**
+ * Returns the current DE-RTC presence snapshot endpoint path for a post.
+ *
+ * @param {Object} args                    Endpoint args.
+ * @param {number} args.postId             Post ID.
+ * @param {string} [args.restBase='posts'] REST base for the edited post type.
+ *
+ * @return {string} REST path.
+ */
+export function getDistributedEditingPresenceEndpointPath( {
+	postId,
+	restBase = DISTRIBUTED_EDITING_RECOVERY_REST_BASE,
+} = {} ) {
+	return getDistributedEditingEndpointPath( {
+		postId,
+		restBase,
+		operation: 'presence',
+		errorSubject: 'presence',
+	} );
+}
+
+/**
+ * Returns the current DE-RTC presence heartbeat endpoint path for a post.
+ *
+ * @param {Object} args                    Endpoint args.
+ * @param {number} args.postId             Post ID.
+ * @param {string} [args.restBase='posts'] REST base for the edited post type.
+ *
+ * @return {string} REST path.
+ */
+export function getDistributedEditingPresenceHeartbeatEndpointPath( {
+	postId,
+	restBase = DISTRIBUTED_EDITING_RECOVERY_REST_BASE,
+} = {} ) {
+	return getDistributedEditingEndpointPath( {
+		postId,
+		restBase,
+		operation: 'presence/heartbeat',
+		errorSubject: 'presence heartbeat',
+	} );
+}
+
+/**
+ * Returns the current DE-RTC presence storage readiness endpoint path for a post.
+ *
+ * @param {Object} args                    Endpoint args.
+ * @param {number} args.postId             Post ID.
+ * @param {string} [args.restBase='posts'] REST base for the edited post type.
+ *
+ * @return {string} REST path.
+ */
+export function getDistributedEditingPresenceStorageReadinessEndpointPath( {
+	postId,
+	restBase = DISTRIBUTED_EDITING_RECOVERY_REST_BASE,
+} = {} ) {
+	return getDistributedEditingEndpointPath( {
+		postId,
+		restBase,
+		operation: 'presence/storage-readiness',
+		errorSubject: 'presence storage readiness',
+	} );
+}
+
+/**
  * Returns the current edited post endpoint path for DE-RTC server-state reads.
  *
  * @param {Object} args                    Endpoint args.
@@ -266,6 +329,102 @@ export function __experimentalRequestDistributedEditingRecoveryDryRun( {
 		path: getDistributedEditingRecoveryEndpointPath( { postId, restBase } ),
 		method: 'POST',
 		data,
+	} );
+}
+
+/**
+ * Requests a read-only Distributed Editing presence snapshot.
+ *
+ * This helper performs one explicit GET. It does not start polling, write
+ * heartbeats, save, mutate editor content, or change post locks.
+ *
+ * @param {Object} args                    Request args.
+ * @param {number} args.postId             Post ID.
+ * @param {string} [args.restBase='posts'] REST base for the edited post type.
+ * @param {string} [args.sessionKey]       Opaque local session key for this tab.
+ *
+ * @return {Promise<Object>} REST response.
+ */
+export function __experimentalRequestDistributedEditingPresenceSnapshot( {
+	postId,
+	restBase = DISTRIBUTED_EDITING_RECOVERY_REST_BASE,
+	sessionKey,
+} = {} ) {
+	const basePath = getDistributedEditingPresenceEndpointPath( {
+		postId,
+		restBase,
+	} );
+	const trimmedSessionKey =
+		typeof sessionKey === 'string' ? sessionKey.trim() : '';
+
+	return apiFetch( {
+		path: trimmedSessionKey
+			? `${ basePath }?session_key=${ encodeURIComponent(
+					trimmedSessionKey
+			  ) }`
+			: basePath,
+		method: 'GET',
+	} );
+}
+
+/**
+ * Sends a one-shot Distributed Editing presence heartbeat.
+ *
+ * This helper posts only an opaque tab/session key. It does not include raw
+ * content, cursor data, selection data, save data, or post-lock data.
+ *
+ * @param {Object} args                    Request args.
+ * @param {number} args.postId             Post ID.
+ * @param {string} [args.restBase='posts'] REST base for the edited post type.
+ * @param {string} args.sessionKey         Opaque local session key.
+ *
+ * @return {Promise<Object>} REST response.
+ */
+export function __experimentalRequestDistributedEditingPresenceHeartbeat( {
+	postId,
+	restBase = DISTRIBUTED_EDITING_RECOVERY_REST_BASE,
+	sessionKey,
+} = {} ) {
+	if ( typeof sessionKey !== 'string' || sessionKey.trim() === '' ) {
+		throw new TypeError(
+			'Distributed Editing presence heartbeat requests require an opaque session key.'
+		);
+	}
+
+	return apiFetch( {
+		path: getDistributedEditingPresenceHeartbeatEndpointPath( {
+			postId,
+			restBase,
+		} ),
+		method: 'POST',
+		data: {
+			session_key: sessionKey,
+		},
+	} );
+}
+
+/**
+ * Re-checks the content-free Distributed Editing presence storage readiness
+ * fact. This helper performs one explicit GET. It does not install storage,
+ * write presence, save, mutate editor content, start polling, or change post
+ * locks.
+ *
+ * @param {Object} args                    Request args.
+ * @param {number} args.postId             Post ID.
+ * @param {string} [args.restBase='posts'] REST base for the edited post type.
+ *
+ * @return {Promise<Object>} REST response.
+ */
+export function __experimentalRequestDistributedEditingPresenceStorageReadiness( {
+	postId,
+	restBase = DISTRIBUTED_EDITING_RECOVERY_REST_BASE,
+} = {} ) {
+	return apiFetch( {
+		path: getDistributedEditingPresenceStorageReadinessEndpointPath( {
+			postId,
+			restBase,
+		} ),
+		method: 'GET',
 	} );
 }
 

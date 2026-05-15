@@ -380,6 +380,34 @@ Stable DE-RTC notice kinds. These are integration points for future UI and notic
 
 Undocumented declaration.
 
+### DISTRIBUTED_EDITING_PRESENCE_HEARTBEAT_STATUSES
+
+Undocumented declaration.
+
+### DISTRIBUTED_EDITING_PRESENCE_REFRESH_STATUSES
+
+Undocumented declaration.
+
+### DISTRIBUTED_EDITING_PRESENCE_REPEATED_REFRESH_CONNECTION_STATES
+
+Undocumented declaration.
+
+### DISTRIBUTED_EDITING_PRESENCE_REPEATED_REFRESH_RUNTIME_STATUSES
+
+Undocumented declaration.
+
+### DISTRIBUTED_EDITING_PRESENCE_ROSTER_STATUSES
+
+Undocumented declaration.
+
+### DISTRIBUTED_EDITING_PRESENCE_STARTUP_POLICY_STATUSES
+
+Undocumented declaration.
+
+### DISTRIBUTED_EDITING_PRESENCE_STORAGE_READINESS_RECHECK_STATUSES
+
+Undocumented declaration.
+
 ### DISTRIBUTED_EDITING_REASON_CODES
 
 Stable DE-RTC reason codes shared with the root model runner and WordPress authority layer.
@@ -914,6 +942,60 @@ _Returns_
 
 -   `Promise<string|null>`: Lowercase hex SHA-256 hash, or null if unavailable.
 
+### getDistributedEditingPresenceEndpointPath
+
+Returns the current DE-RTC presence snapshot endpoint path for a post.
+
+_Parameters_
+
+-   _args_ `Object`: Endpoint args.
+-   _args.postId_ `number`: Post ID.
+-   _args.restBase_ `[string]`: REST base for the edited post type.
+
+_Returns_
+
+-   `string`: REST path.
+
+### getDistributedEditingPresenceHeartbeatEndpointPath
+
+Returns the current DE-RTC presence heartbeat endpoint path for a post.
+
+_Parameters_
+
+-   _args_ `Object`: Endpoint args.
+-   _args.postId_ `number`: Post ID.
+-   _args.restBase_ `[string]`: REST base for the edited post type.
+
+_Returns_
+
+-   `string`: REST path.
+
+### getDistributedEditingPresenceRepeatedRefreshRuntimeStateForSessionState
+
+Undocumented declaration.
+
+### getDistributedEditingPresenceRosterStateForSessionState
+
+Undocumented declaration.
+
+### getDistributedEditingPresenceStartupPolicyStateForSessionState
+
+Undocumented declaration.
+
+### getDistributedEditingPresenceStorageReadinessEndpointPath
+
+Returns the current DE-RTC presence storage readiness endpoint path for a post.
+
+_Parameters_
+
+-   _args_ `Object`: Endpoint args.
+-   _args.postId_ `number`: Post ID.
+-   _args.restBase_ `[string]`: REST base for the edited post type.
+
+_Returns_
+
+-   `string`: REST path.
+
 ### getDistributedEditingRecoveryEndpointPath
 
 Returns the current DE-RTC recovery endpoint path for a post.
@@ -1190,6 +1272,71 @@ _Parameters_
 
 -   _responseOrError_ `Object`: WordPress KSES classification response or error.
 -   _currentSessionState_ `Object`: Current DE-RTC session state.
+
+_Returns_
+
+-   `Object`: Normalized DE-RTC session state.
+
+### getDistributedEditingSessionStateForPresenceHeartbeatResult
+
+Normalizes a one-shot WordPress presence heartbeat response into DE-RTC editor state. The result updates only local heartbeat descriptors; it does not save, mutate editor content, start polling, expose private fields, or change post locks.
+
+_Parameters_
+
+-   _responseOrError_ `Object`: REST response, local gate result, or API error.
+-   _currentSessionState_ `Object`: Existing DE-RTC session state.
+
+_Returns_
+
+-   `Object`: Normalized DE-RTC session state.
+
+### getDistributedEditingSessionStateForPresenceRepeatedRefreshRuntimeConfig
+
+Applies a local repeated presence cadence runtime configuration. This is an inert state handoff only: no timers, REST calls, heartbeat writes, saves, editor-content mutation, or post-lock changes happen here.
+
+_Parameters_
+
+-   _runtimeConfig_ `Object`: Runtime cadence configuration.
+-   _currentSessionState_ `Object`: Existing DE-RTC session state.
+
+_Returns_
+
+-   `Object`: Normalized DE-RTC session state.
+
+### getDistributedEditingSessionStateForPresenceSnapshotRefreshResult
+
+Normalizes a one-shot WordPress presence snapshot response into DE-RTC editor state. The result updates only local presence descriptors; it does not save, mutate editor content, start polling, or change post locks.
+
+_Parameters_
+
+-   _responseOrError_ `Object`: REST response or API error.
+-   _currentSessionState_ `Object`: Existing DE-RTC session state.
+
+_Returns_
+
+-   `Object`: Normalized DE-RTC session state.
+
+### getDistributedEditingSessionStateForPresenceStartupPolicyConfig
+
+Applies a local initial-presence startup policy configuration. This is an inert policy handoff only: no timers, REST calls, heartbeat writes, saves, editor-content mutation, or post-lock changes happen here.
+
+_Parameters_
+
+-   _policyConfig_ `Object`: Startup policy configuration.
+-   _currentSessionState_ `Object`: Existing DE-RTC session state.
+
+_Returns_
+
+-   `Object`: Normalized DE-RTC session state.
+
+### getDistributedEditingSessionStateForPresenceStorageReadinessRecheckResult
+
+Normalizes a content-free WordPress presence storage readiness re-check into DE-RTC editor state. The result updates only local readiness descriptors; it does not install storage, write presence, save, mutate editor content, start polling, expose private fields, or change post locks.
+
+_Parameters_
+
+-   _responseOrError_ `Object`: REST response or API error.
+-   _currentSessionState_ `Object`: Existing DE-RTC session state.
 
 _Returns_
 

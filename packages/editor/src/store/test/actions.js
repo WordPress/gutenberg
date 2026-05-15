@@ -25,6 +25,13 @@ import {
 	DISTRIBUTED_EDITING_LOCAL_UPDATES_REVIEW_REQUEST_STATUSES,
 	DISTRIBUTED_EDITING_NOTICE_ACTIONS,
 	DISTRIBUTED_EDITING_NOTICE_KINDS,
+	DISTRIBUTED_EDITING_PRESENCE_HEARTBEAT_STATUSES,
+	DISTRIBUTED_EDITING_PRESENCE_REFRESH_STATUSES,
+	DISTRIBUTED_EDITING_PRESENCE_REPEATED_REFRESH_CONNECTION_STATES,
+	DISTRIBUTED_EDITING_PRESENCE_REPEATED_REFRESH_RUNTIME_STATUSES,
+	DISTRIBUTED_EDITING_PRESENCE_STORAGE_READINESS_RECHECK_STATUSES,
+	DISTRIBUTED_EDITING_PRESENCE_ROSTER_STATUSES,
+	DISTRIBUTED_EDITING_PRESENCE_STARTUP_POLICY_STATUSES,
 	DISTRIBUTED_EDITING_REASON_CODES,
 	DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES,
 	DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_STATUSES,
@@ -178,6 +185,1069 @@ describe( 'Post actions', () => {
 			expect(
 				JSON.stringify( sessionState.actionTranscriptItems )
 			).not.toMatch( /Hidden transcript content|rawContent/ );
+		} );
+	} );
+
+	describe( '__experimentalRefreshDistributedEditingPresenceSnapshot()', () => {
+		it( 'reads WordPress presence once and stores a sanitized roster without save side effects', async () => {
+			const post = {
+				id: postId,
+				type: 'post',
+				title: 'Presence post',
+				content:
+					'<!-- wp:paragraph --><p>Presence.</p><!-- /wp:paragraph -->',
+				status: 'draft',
+			};
+			let presenceCalls = 0;
+			let normalSaveCalls = 0;
+			let presenceRequestPath;
+
+			apiFetch.setFetchHandler( async ( options ) => {
+				const method = getMethod( options );
+				const { path } = options;
+
+				if (
+					method === 'GET' &&
+					path.startsWith(
+						`/wp/v2/posts/${ postId }/distributed-editing/presence`
+					)
+				) {
+					presenceCalls++;
+					presenceRequestPath = path;
+
+					return {
+						result: 'presence_roster_snapshot',
+						rest_route: 'post_presence_roster',
+						presence_roster: {
+							status: 'recent',
+							freshness: 'recent',
+							visibleCount: 1,
+							totalKnownCount: 1,
+							claimsAbsence: false,
+							entries: [
+								{
+									key: 'presence-mira',
+									displayName: 'Mira',
+									identityVisibility: 'named',
+									relationship: 'other_user',
+									freshness: 'recent',
+									userId: 42,
+									selection: { anchor: 9 },
+									rawContent: 'hidden',
+								},
+							],
+						},
+						presence_read_contract: {
+							source: 'de_rtc_presence_read_snapshot',
+							route: `/wp/v2/posts/${ postId }/distributed-editing/presence`,
+							cheap_host_polling_guidance: {
+								suggested_polling_interval_seconds: 30,
+								cheap_host_polling_interval_seconds: 120,
+								repeated_client_refresh_enabled_now: false,
+							},
+						},
+						read_only: true,
+						calls_save: false,
+						saves_post: false,
+						mutates_post_content: false,
+						changes_post_lock: false,
+						records_presence_heartbeat: false,
+						enables_repeated_client_refresh: false,
+						claims_saved: false,
+					};
+				}
+
+				if (
+					method === 'PUT' &&
+					path.startsWith( `/wp/v2/posts/${ postId }` )
+				) {
+					normalSaveCalls++;
+				}
+
+				throw {
+					code: 'unexpected_path',
+					message: `Unexpected path: ${ method } ${ path }`,
+				};
+			} );
+
+			const registry = createRegistryWithStores();
+
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', post );
+			registry.dispatch( editorStore ).setupEditor( post );
+
+			await expect(
+				registry
+					.dispatch( editorStore )
+					.__experimentalRefreshDistributedEditingPresenceSnapshot( {
+						sessionKey: 'turn-0198-current-tab',
+					} )
+			).resolves.toMatchObject( {
+				result: 'presence_roster_snapshot',
+				read_only: true,
+				records_presence_heartbeat: false,
+				enables_repeated_client_refresh: false,
+			} );
+
+			const sessionState = registry
+				.select( editorStore )
+				.getDistributedEditingSessionState();
+			const presenceState = registry
+				.select( editorStore )
+				.getDistributedEditingPresenceRosterState();
+
+			expect( presenceCalls ).toBe( 1 );
+			const presenceRequestUrl = new URL(
+				presenceRequestPath,
+				'https://example.test'
+			);
+			expect( presenceRequestUrl.pathname ).toBe(
+				`/wp/v2/posts/${ postId }/distributed-editing/presence`
+			);
+			expect( presenceRequestUrl.searchParams.get( 'session_key' ) ).toBe(
+				'turn-0198-current-tab'
+			);
+			expect( normalSaveCalls ).toBe( 0 );
+			expect( sessionState ).toMatchObject( {
+				presenceRosterStatus:
+					DISTRIBUTED_EDITING_PRESENCE_ROSTER_STATUSES.RECENT,
+				presenceRosterVisibleCount: 1,
+				presenceRosterRefreshStatus:
+					DISTRIBUTED_EDITING_PRESENCE_REFRESH_STATUSES.REFRESHED,
+				presenceRosterRefreshRequested: true,
+				presenceRosterRefreshSucceeded: true,
+				presenceRosterRefreshCallsRestEndpoint: true,
+				presenceRosterRefreshCallsSave: false,
+				presenceRosterRefreshMutatesEditorContent: false,
+				presenceRosterRefreshChangesPostLock: false,
+				presenceRosterRefreshRecordsPresenceHeartbeat: false,
+				presenceRosterRefreshEnablesRepeatedClientRefresh: false,
+				presenceRosterRefreshClaimsSaved: false,
+				presenceRosterReadContractSource:
+					'de_rtc_presence_read_snapshot',
+				presenceRosterReadSuggestedPollingIntervalSeconds: 30,
+				presenceRosterReadCheapHostPollingIntervalSeconds: 120,
+				presenceRosterReadRepeatedClientRefreshEnabled: false,
+			} );
+			expect( presenceState ).toMatchObject( {
+				status: DISTRIBUTED_EDITING_PRESENCE_ROSTER_STATUSES.RECENT,
+				visibleCount: 1,
+				copy: {
+					summary: 'Mira was here recently. Presence may be delayed.',
+				},
+				callsRestEndpoint: false,
+				callsSave: false,
+				changesPostLock: false,
+				claimsSaved: false,
+				exposesRawContent: false,
+				exposesSelection: false,
+				exposesUserIds: false,
+			} );
+			expect( JSON.stringify( sessionState ) ).not.toMatch(
+				/userId|rawContent|anchor/
+			);
+			expect( registry.select( noticesStore ).getNotices() ).toEqual(
+				[]
+			);
+			expect( registry.select( editorStore ).isEditedPostDirty() ).toBe(
+				false
+			);
+		} );
+
+		it( 'records presence refresh gate failures without clearing protected local state', async () => {
+			const post = {
+				id: postId,
+				type: 'post',
+				title: 'Presence disabled post',
+				content:
+					'<!-- wp:paragraph --><p>Presence disabled.</p><!-- /wp:paragraph -->',
+				status: 'draft',
+			};
+
+			apiFetch.setFetchHandler( async ( options ) => {
+				expect( getMethod( options ) ).toBe( 'GET' );
+				expect( options.path ).toMatch(
+					new RegExp(
+						`^/wp/v2/posts/${ postId }/distributed-editing/presence`
+					)
+				);
+
+				throw {
+					code: DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_FEATURE_DISABLED,
+					message: 'Distributed Editing is not enabled.',
+					data: {
+						status: 403,
+						detail: 'feature_disabled_for_post',
+					},
+				};
+			} );
+
+			const registry = createRegistryWithStores();
+
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', post );
+			registry.dispatch( editorStore ).setupEditor( post );
+			registry
+				.dispatch( editorStore )
+				.setDistributedEditingSessionState( {
+					pendingChangeCount: 1,
+					hasPendingChanges: true,
+					canExportLocalUpdates: true,
+					presenceRosterEntries: [
+						{
+							key: 'presence-existing',
+							displayName: 'Mira',
+							freshness: 'recent',
+						},
+					],
+				} );
+
+			await expect(
+				registry
+					.dispatch( editorStore )
+					.__experimentalRefreshDistributedEditingPresenceSnapshot()
+			).rejects.toMatchObject( {
+				code: DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_FEATURE_DISABLED,
+			} );
+
+			expect(
+				registry
+					.select( editorStore )
+					.getDistributedEditingSessionState()
+			).toMatchObject( {
+				pendingChangeCount: 1,
+				hasPendingChanges: true,
+				canExportLocalUpdates: true,
+				presenceRosterVisibleCount: 1,
+				presenceRosterRefreshStatus:
+					DISTRIBUTED_EDITING_PRESENCE_REFRESH_STATUSES.FEATURE_DISABLED,
+				presenceRosterRefreshRequested: true,
+				presenceRosterRefreshFailed: true,
+				presenceRosterRefreshCallsRestEndpoint: true,
+				presenceRosterRefreshCallsSave: false,
+				presenceRosterRefreshMutatesEditorContent: false,
+				presenceRosterRefreshChangesPostLock: false,
+				presenceRosterRefreshClaimsSaved: false,
+			} );
+			expect( registry.select( noticesStore ).getNotices() ).toEqual(
+				[]
+			);
+			expect( registry.select( editorStore ).isEditedPostDirty() ).toBe(
+				false
+			);
+		} );
+	} );
+
+	describe( '__experimentalRefreshDistributedEditingPresenceStorageReadiness()', () => {
+		it( 're-checks WordPress presence storage readiness once without write side effects', async () => {
+			const post = {
+				id: postId,
+				type: 'post',
+				title: 'Presence storage readiness post',
+				content:
+					'<!-- wp:paragraph --><p>Presence storage readiness.</p><!-- /wp:paragraph -->',
+				status: 'draft',
+			};
+			let readinessCalls = 0;
+			let normalSaveCalls = 0;
+
+			apiFetch.setFetchHandler( async ( options ) => {
+				const method = getMethod( options );
+				const { path } = options;
+
+				if (
+					method === 'GET' &&
+					path.startsWith(
+						`/wp/v2/posts/${ postId }/distributed-editing/presence/storage-readiness`
+					)
+				) {
+					readinessCalls++;
+
+					return {
+						result: 'presence_storage_ready',
+						rest_route: 'post_presence_storage_readiness',
+						status: 'ready',
+						tableExists: true,
+						schemaCurrent: true,
+						expectedStartupHeartbeatStatus: 'sent',
+						setupRequired: false,
+						setupAction: 'call_wp_de_rtc_install_presence_table',
+						diagnosticOnly: true,
+						contentFree: true,
+						installsPresenceTable: false,
+						automaticPerRequestInstall: false,
+						writesPresence: false,
+						recordsPresenceHeartbeat: false,
+						startsPolling: false,
+						callsSave: false,
+						mutatesPostContent: false,
+						mutatesPersistedPostContent: false,
+						createsRevision: false,
+						changesPostLock: false,
+						claimsAbsence: false,
+						claimsSaved: false,
+						exposesRawContent: false,
+						exposesUserIds: false,
+						exposesCursorOffset: false,
+						exposesSelection: false,
+						correctnessIndependentOfTransport: true,
+						transportRequiredForCorrectness: false,
+					};
+				}
+
+				if (
+					method === 'PUT' &&
+					path.startsWith( `/wp/v2/posts/${ postId }` )
+				) {
+					normalSaveCalls++;
+				}
+
+				throw {
+					code: 'unexpected_path',
+					message: `Unexpected path: ${ method } ${ path }`,
+				};
+			} );
+
+			const registry = createRegistryWithStores();
+
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', post );
+			registry.dispatch( editorStore ).setupEditor( post );
+
+			await expect(
+				registry
+					.dispatch( editorStore )
+					.__experimentalRefreshDistributedEditingPresenceStorageReadiness()
+			).resolves.toMatchObject( {
+				result: 'presence_storage_ready',
+				status: 'ready',
+				contentFree: true,
+				installsPresenceTable: false,
+				recordsPresenceHeartbeat: false,
+			} );
+
+			const sessionState = registry
+				.select( editorStore )
+				.getDistributedEditingSessionState();
+
+			expect( readinessCalls ).toBe( 1 );
+			expect( normalSaveCalls ).toBe( 0 );
+			expect( sessionState ).toMatchObject( {
+				presenceStorageReadinessRecheckStatus:
+					DISTRIBUTED_EDITING_PRESENCE_STORAGE_READINESS_RECHECK_STATUSES.READY,
+				presenceStorageReadinessRecheckRequested: true,
+				presenceStorageReadinessRecheckSucceeded: true,
+				presenceStorageReadinessRecheckCallsRestEndpoint: true,
+				presenceStorageReadinessRecheckInstallsPresenceTable: false,
+				presenceStorageReadinessRecheckRecordsPresenceHeartbeat: false,
+				presenceStorageReadinessRecheckWritesPresence: false,
+				presenceStorageReadinessRecheckStartsPolling: false,
+				presenceStorageReadinessRecheckCallsSave: false,
+				presenceStorageReadinessRecheckMutatesEditorContent: false,
+				presenceStorageReadinessRecheckChangesPostLock: false,
+				presenceStorageReadinessRecheckClaimsAbsence: false,
+				presenceStorageReadinessRecheckClaimsSaved: false,
+				presenceStorageReadinessRecheckContentFree: true,
+				presenceStorageReadinessRecheckExposesRawContent: false,
+				presenceStorageReadinessRecheckExposesUserIds: false,
+				presenceStorageReadinessRecheckExposesCursorOffset: false,
+				presenceStorageReadinessRecheckExposesSelection: false,
+				presenceStorageReadinessRecheckCorrectnessIndependentOfTransport: true,
+				presenceStorageReadinessRecheckResult: {
+					status: 'ready',
+					tableExists: true,
+					schemaCurrent: true,
+					expectedStartupHeartbeatStatus: 'sent',
+					setupRequired: false,
+				},
+			} );
+			expect( registry.select( noticesStore ).getNotices() ).toEqual(
+				[]
+			);
+			expect( registry.select( editorStore ).isEditedPostDirty() ).toBe(
+				false
+			);
+		} );
+
+		it( 'records readiness re-check gate failures without clearing protected local state', async () => {
+			const post = {
+				id: postId,
+				type: 'post',
+				title: 'Presence storage readiness disabled post',
+				content:
+					'<!-- wp:paragraph --><p>Presence storage disabled.</p><!-- /wp:paragraph -->',
+				status: 'draft',
+			};
+
+			apiFetch.setFetchHandler( async ( options ) => {
+				expect( getMethod( options ) ).toBe( 'GET' );
+				expect( options.path ).toMatch(
+					new RegExp(
+						`^/wp/v2/posts/${ postId }/distributed-editing/presence/storage-readiness`
+					)
+				);
+
+				throw {
+					code: DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_FEATURE_DISABLED,
+					message: 'Distributed Editing is not enabled.',
+					data: {
+						status: 403,
+						detail: 'feature_disabled_for_post',
+					},
+				};
+			} );
+
+			const registry = createRegistryWithStores();
+
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', post );
+			registry.dispatch( editorStore ).setupEditor( post );
+			registry
+				.dispatch( editorStore )
+				.setDistributedEditingSessionState( {
+					pendingChangeCount: 1,
+					hasPendingChanges: true,
+					canExportLocalUpdates: true,
+				} );
+
+			await expect(
+				registry
+					.dispatch( editorStore )
+					.__experimentalRefreshDistributedEditingPresenceStorageReadiness()
+			).rejects.toMatchObject( {
+				code: DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_FEATURE_DISABLED,
+			} );
+
+			expect(
+				registry
+					.select( editorStore )
+					.getDistributedEditingSessionState()
+			).toMatchObject( {
+				pendingChangeCount: 1,
+				hasPendingChanges: true,
+				canExportLocalUpdates: true,
+				presenceStorageReadinessRecheckStatus:
+					DISTRIBUTED_EDITING_PRESENCE_STORAGE_READINESS_RECHECK_STATUSES.FEATURE_DISABLED,
+				presenceStorageReadinessRecheckRequested: true,
+				presenceStorageReadinessRecheckFailed: true,
+				presenceStorageReadinessRecheckCallsRestEndpoint: true,
+				presenceStorageReadinessRecheckCallsSave: false,
+				presenceStorageReadinessRecheckMutatesEditorContent: false,
+				presenceStorageReadinessRecheckChangesPostLock: false,
+				presenceStorageReadinessRecheckClaimsSaved: false,
+				presenceStorageReadinessRecheckContentFree: true,
+			} );
+			expect( registry.select( noticesStore ).getNotices() ).toEqual(
+				[]
+			);
+			expect( registry.select( editorStore ).isEditedPostDirty() ).toBe(
+				false
+			);
+		} );
+	} );
+
+	describe( '__experimentalConfigureDistributedEditingPresenceRepeatedRefreshRuntime()', () => {
+		it( 'keeps repeated presence cadence disabled by default without network or save side effects', async () => {
+			const post = {
+				id: postId,
+				type: 'post',
+				title: 'Presence cadence default-off post',
+				content:
+					'<!-- wp:paragraph --><p>Presence cadence.</p><!-- /wp:paragraph -->',
+				status: 'draft',
+			};
+			const registry = createRegistryWithStores();
+			let apiCalled = false;
+
+			apiFetch.setFetchHandler( async () => {
+				apiCalled = true;
+				throw {
+					code: 'unexpected_path',
+				};
+			} );
+
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', post );
+			registry.dispatch( editorStore ).setupEditor( post );
+
+			const result = await registry
+				.dispatch( editorStore )
+				.__experimentalConfigureDistributedEditingPresenceRepeatedRefreshRuntime(
+					{
+						hostProfile: 'cheap_shared_host',
+						standardPollingIntervalSeconds: 30,
+						cheapHostPollingIntervalSeconds: 120,
+						heartbeatIntervalSeconds: 120,
+					}
+				);
+
+			expect( result ).toMatchObject( {
+				status: DISTRIBUTED_EDITING_PRESENCE_REPEATED_REFRESH_RUNTIME_STATUSES.DISABLED_BY_DEFAULT,
+				localConnectionState:
+					DISTRIBUTED_EDITING_PRESENCE_REPEATED_REFRESH_CONNECTION_STATES.DISABLED,
+				selectedIntervalSeconds: 120,
+				selectedHeartbeatIntervalSeconds: 120,
+				schedulesNextRefresh: false,
+				schedulesNextHeartbeat: false,
+				callsPresenceReadEndpointNow: false,
+				callsHeartbeatEndpointNow: false,
+				recordsPresenceHeartbeatNow: false,
+				writesHeartbeatNow: false,
+				startsPollingImmediately: false,
+				dispatchesNotice: false,
+				callsSave: false,
+				mutatesEditorContent: false,
+				mutatesPersistedPostContent: false,
+				changesPostLock: false,
+				claimsAbsence: false,
+				claimsSaved: false,
+				exposesRawContent: false,
+				rawSessionKeyIncluded: false,
+			} );
+			expect( apiCalled ).toBe( false );
+			expect(
+				registry
+					.select( editorStore )
+					.getDistributedEditingSessionState()
+			).toMatchObject( {
+				presenceRepeatedRefreshRuntimeStatus:
+					DISTRIBUTED_EDITING_PRESENCE_REPEATED_REFRESH_RUNTIME_STATUSES.DISABLED_BY_DEFAULT,
+				presenceRepeatedRefreshRuntimeEnabledByDefault: false,
+				presenceRepeatedRefreshExplicitOptIn: false,
+				presenceRepeatedRefreshSchedulesNextRefresh: false,
+				presenceRepeatedRefreshCallsPresenceReadEndpointNow: false,
+				presenceRepeatedRefreshCallsSave: false,
+				presenceRepeatedRefreshChangesPostLock: false,
+				presenceRepeatedRefreshClaimsSaved: false,
+			} );
+			expect( registry.select( noticesStore ).getNotices() ).toEqual(
+				[]
+			);
+			expect( registry.select( editorStore ).isEditedPostDirty() ).toBe(
+				false
+			);
+		} );
+
+		it( 'records an explicit cheap-host cadence as scheduled without starting timers', async () => {
+			const post = {
+				id: postId,
+				type: 'post',
+				title: 'Presence cadence opt-in post',
+				content:
+					'<!-- wp:paragraph --><p>Presence cadence opt in.</p><!-- /wp:paragraph -->',
+				status: 'draft',
+			};
+			const registry = createRegistryWithStores();
+			let apiCalled = false;
+
+			apiFetch.setFetchHandler( async () => {
+				apiCalled = true;
+				throw {
+					code: 'unexpected_path',
+				};
+			} );
+
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', post );
+			registry.dispatch( editorStore ).setupEditor( post );
+			registry
+				.dispatch( editorStore )
+				.setDistributedEditingSessionState( {
+					pendingChangeCount: 1,
+					canExportLocalUpdates: true,
+				} );
+
+			const result = await registry
+				.dispatch( editorStore )
+				.__experimentalConfigureDistributedEditingPresenceRepeatedRefreshRuntime(
+					{
+						explicitOptIn: true,
+						hostProfile: 'cheap_shared_host',
+						standardPollingIntervalSeconds: 30,
+						cheapHostPollingIntervalSeconds: 120,
+						minimumPollingIntervalSeconds: 60,
+						heartbeatIntervalSeconds: 120,
+					}
+				);
+
+			expect( result ).toMatchObject( {
+				status: DISTRIBUTED_EDITING_PRESENCE_REPEATED_REFRESH_RUNTIME_STATUSES.SCHEDULED,
+				localConnectionState:
+					DISTRIBUTED_EDITING_PRESENCE_REPEATED_REFRESH_CONNECTION_STATES.CONNECTED,
+				selectedIntervalSeconds: 120,
+				selectedHeartbeatIntervalSeconds: 120,
+				schedulesNextRefresh: true,
+				schedulesNextHeartbeat: true,
+				callsPresenceReadEndpointNow: false,
+				callsHeartbeatEndpointNow: false,
+				recordsPresenceHeartbeatNow: false,
+				writesHeartbeatNow: false,
+				startsPollingImmediately: false,
+				callsSave: false,
+				changesPostLock: false,
+				claimsSaved: false,
+			} );
+			expect( result.sessionState ).toMatchObject( {
+				pendingChangeCount: 1,
+				canExportLocalUpdates: true,
+			} );
+			expect( apiCalled ).toBe( false );
+			expect( registry.select( noticesStore ).getNotices() ).toEqual(
+				[]
+			);
+			expect( registry.select( editorStore ).isEditedPostDirty() ).toBe(
+				false
+			);
+		} );
+
+		it( 'records degraded transport as a paused cadence state', async () => {
+			const post = {
+				id: postId,
+				type: 'post',
+				title: 'Presence cadence degraded post',
+				content:
+					'<!-- wp:paragraph --><p>Presence cadence degraded.</p><!-- /wp:paragraph -->',
+				status: 'draft',
+			};
+			const registry = createRegistryWithStores();
+
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', post );
+			registry.dispatch( editorStore ).setupEditor( post );
+
+			const result = await registry
+				.dispatch( editorStore )
+				.__experimentalConfigureDistributedEditingPresenceRepeatedRefreshRuntime(
+					{
+						explicitOptIn: true,
+						serverContact: 'degraded',
+						standardPollingIntervalSeconds: 30,
+						heartbeatIntervalSeconds: 120,
+					}
+				);
+
+			expect( result ).toMatchObject( {
+				status: DISTRIBUTED_EDITING_PRESENCE_REPEATED_REFRESH_RUNTIME_STATUSES.PAUSED_DEGRADED_TRANSPORT,
+				localConnectionState:
+					DISTRIBUTED_EDITING_PRESENCE_REPEATED_REFRESH_CONNECTION_STATES.DEGRADED,
+				selectedIntervalSeconds: 30,
+				selectedHeartbeatIntervalSeconds: 120,
+				schedulesNextRefresh: false,
+				schedulesNextHeartbeat: false,
+				callsPresenceReadEndpointNow: false,
+				callsHeartbeatEndpointNow: false,
+				startsPollingImmediately: false,
+				callsSave: false,
+				changesPostLock: false,
+				claimsSaved: false,
+			} );
+			expect( registry.select( noticesStore ).getNotices() ).toEqual(
+				[]
+			);
+			expect( registry.select( editorStore ).isEditedPostDirty() ).toBe(
+				false
+			);
+		} );
+	} );
+
+	describe( '__experimentalConfigureDistributedEditingPresenceStartupPolicy()', () => {
+		it( 'records slow cheap-host startup policy without endpoint, save, or lock side effects', async () => {
+			const post = {
+				id: postId,
+				type: 'post',
+				title: 'Presence startup policy post',
+				content:
+					'<!-- wp:paragraph --><p>Presence startup policy.</p><!-- /wp:paragraph -->',
+				status: 'draft',
+			};
+			const registry = createRegistryWithStores();
+			let apiCalled = false;
+
+			apiFetch.setFetchHandler( async () => {
+				apiCalled = true;
+				throw {
+					code: 'unexpected_path',
+				};
+			} );
+
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', post );
+			registry.dispatch( editorStore ).setupEditor( post );
+
+			const result = await registry
+				.dispatch( editorStore )
+				.__experimentalConfigureDistributedEditingPresenceStartupPolicy(
+					{
+						allowAutomaticInitialHeartbeat: true,
+						allowSlowAutomaticInitialHeartbeat: true,
+						hostProfile: 'cheap_shared_host',
+						standardInitialHeartbeatDelaySeconds: 10,
+						cheapHostInitialHeartbeatDelaySeconds: 120,
+						minimumInitialHeartbeatDelaySeconds: 60,
+					}
+				);
+
+			expect( result ).toMatchObject( {
+				status: DISTRIBUTED_EDITING_PRESENCE_STARTUP_POLICY_STATUSES.SLOW_AUTOMATIC_HEARTBEAT_ALLOWED,
+				reason: 'cheap_host_slow_startup_allowed',
+				maySendInitialHeartbeatAutomatically: true,
+				slowAutomaticHeartbeatAllowed: true,
+				selectedInitialHeartbeatDelaySeconds: 120,
+				callsHeartbeatEndpointNow: false,
+				recordsPresenceHeartbeatNow: false,
+				writesPresenceNow: false,
+				startsPollingNow: false,
+				startsTimerNow: false,
+				dispatchesNotice: false,
+				callsSave: false,
+				mutatesEditorContent: false,
+				mutatesPersistedPostContent: false,
+				changesPostLock: false,
+				claimsAbsence: false,
+				claimsSaved: false,
+				exposesRawContent: false,
+				rawSessionKeyIncluded: false,
+			} );
+			expect( apiCalled ).toBe( false );
+			expect(
+				registry
+					.select( editorStore )
+					.getDistributedEditingSessionState()
+			).toMatchObject( {
+				presenceStartupPolicyStatus:
+					DISTRIBUTED_EDITING_PRESENCE_STARTUP_POLICY_STATUSES.SLOW_AUTOMATIC_HEARTBEAT_ALLOWED,
+				presenceStartupPolicySelectedInitialHeartbeatDelaySeconds: 120,
+				presenceStartupPolicyCallsHeartbeatEndpointNow: false,
+				presenceStartupPolicyStartsTimerNow: false,
+				presenceStartupPolicyCallsSave: false,
+				presenceStartupPolicyChangesPostLock: false,
+				presenceStartupPolicyClaimsSaved: false,
+			} );
+			expect( registry.select( noticesStore ).getNotices() ).toEqual(
+				[]
+			);
+			expect( registry.select( editorStore ).isEditedPostDirty() ).toBe(
+				false
+			);
+		} );
+	} );
+
+	describe( '__experimentalSendDistributedEditingPresenceHeartbeat()', () => {
+		it( 'sends one gated heartbeat and stores local status without save side effects', async () => {
+			const post = {
+				id: postId,
+				type: 'post',
+				title: 'Presence heartbeat post',
+				content:
+					'<!-- wp:paragraph --><p>Presence heartbeat.</p><!-- /wp:paragraph -->',
+				status: 'draft',
+			};
+			let heartbeatCalls = 0;
+			let normalSaveCalls = 0;
+			let heartbeatRequestData;
+
+			apiFetch.setFetchHandler( async ( options ) => {
+				const method = getMethod( options );
+				const { path, data } = options;
+
+				if (
+					method === 'POST' &&
+					path.startsWith(
+						`/wp/v2/posts/${ postId }/distributed-editing/presence/heartbeat`
+					)
+				) {
+					heartbeatCalls++;
+					heartbeatRequestData = data;
+
+					return {
+						result: 'presence_heartbeat_recorded',
+						rest_route: 'post_presence_heartbeat',
+						writes_presence: true,
+						records_presence_heartbeat: true,
+						heartbeat_interval_seconds: 30,
+						calls_save: false,
+						mutates_post_content: false,
+						changes_post_lock: false,
+						claims_saved: false,
+					};
+				}
+
+				if (
+					method === 'PUT' &&
+					path.startsWith( `/wp/v2/posts/${ postId }` )
+				) {
+					normalSaveCalls++;
+				}
+
+				throw {
+					code: 'unexpected_path',
+					message: `Unexpected path: ${ method } ${ path }`,
+				};
+			} );
+
+			const registry = createRegistryWithStores();
+
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', post );
+			registry.dispatch( editorStore ).setupEditor( post );
+			registry.dispatch( editorStore ).updateEditorSettings( {
+				distributedEditing: {
+					enabled: true,
+				},
+			} );
+
+			await expect(
+				registry
+					.dispatch( editorStore )
+					.__experimentalSendDistributedEditingPresenceHeartbeat( {
+						sessionKey: 'turn-0173-session',
+					} )
+			).resolves.toMatchObject( {
+				result: 'presence_heartbeat_recorded',
+				writes_presence: true,
+				records_presence_heartbeat: true,
+			} );
+
+			expect( heartbeatCalls ).toBe( 1 );
+			expect( heartbeatRequestData ).toEqual( {
+				session_key: 'turn-0173-session',
+			} );
+			expect( heartbeatRequestData ).not.toHaveProperty(
+				'proposed_post_content'
+			);
+			expect( heartbeatRequestData ).not.toHaveProperty(
+				'cursor_offset'
+			);
+			expect( heartbeatRequestData ).not.toHaveProperty( 'selection' );
+			expect( normalSaveCalls ).toBe( 0 );
+			expect(
+				registry
+					.select( editorStore )
+					.getDistributedEditingSessionState()
+			).toMatchObject( {
+				presenceHeartbeatStatus:
+					DISTRIBUTED_EDITING_PRESENCE_HEARTBEAT_STATUSES.SENT,
+				presenceHeartbeatRequested: true,
+				presenceHeartbeatSucceeded: true,
+				presenceHeartbeatCallsRestEndpoint: true,
+				presenceHeartbeatRecordsPresenceHeartbeat: true,
+				presenceHeartbeatWritesPresence: true,
+				presenceHeartbeatCallsSave: false,
+				presenceHeartbeatMutatesEditorContent: false,
+				presenceHeartbeatChangesPostLock: false,
+				presenceHeartbeatClaimsSaved: false,
+				presenceHeartbeatRawSessionKeyIncluded: false,
+				presenceHeartbeatMarksLocalEditorCurrent: true,
+				presenceHeartbeatMarksLocalEditorDelayed: false,
+				presenceHeartbeatLocalRosterEntryVisible: true,
+				presenceHeartbeatLocalRosterEntryFreshness: 'current',
+				presenceHeartbeatSuggestedIntervalSeconds: 30,
+				presenceRosterStatus: 'active',
+				presenceRosterVisibleCount: 1,
+				presenceRosterEntries: [
+					{
+						key: 'presence-local-heartbeat-current-tab',
+						relationship: 'current_user_current_tab',
+						identityVisibility: 'self',
+						freshness: 'current',
+						exposesRawContent: false,
+						exposesSelection: false,
+						exposesCursorOffset: false,
+						exposesUserId: false,
+					},
+				],
+			} );
+			expect( registry.select( noticesStore ).getNotices() ).toEqual(
+				[]
+			);
+			expect( registry.select( editorStore ).isEditedPostDirty() ).toBe(
+				false
+			);
+		} );
+
+		it( 'skips the REST call when Distributed Editing is disabled for the editor', async () => {
+			const post = {
+				id: postId,
+				type: 'post',
+				title: 'Presence heartbeat disabled post',
+				content:
+					'<!-- wp:paragraph --><p>Presence disabled.</p><!-- /wp:paragraph -->',
+				status: 'draft',
+			};
+			let apiCalled = false;
+			const registry = createRegistryWithStores();
+
+			apiFetch.setFetchHandler( async () => {
+				apiCalled = true;
+				throw {
+					code: 'unexpected_path',
+				};
+			} );
+
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', post );
+			registry.dispatch( editorStore ).setupEditor( post );
+			registry.dispatch( editorStore ).updateEditorSettings( {
+				distributedEditing: {
+					enabled: false,
+				},
+			} );
+
+			await expect(
+				registry
+					.dispatch( editorStore )
+					.__experimentalSendDistributedEditingPresenceHeartbeat( {
+						sessionKey: 'turn-0173-session',
+					} )
+			).resolves.toMatchObject( {
+				code: DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_FEATURE_DISABLED,
+				calls_rest_endpoint: false,
+			} );
+
+			expect( apiCalled ).toBe( false );
+			expect(
+				registry
+					.select( editorStore )
+					.getDistributedEditingSessionState()
+			).toMatchObject( {
+				presenceHeartbeatStatus:
+					DISTRIBUTED_EDITING_PRESENCE_HEARTBEAT_STATUSES.FEATURE_DISABLED,
+				presenceHeartbeatRequested: true,
+				presenceHeartbeatFailed: true,
+				presenceHeartbeatCallsRestEndpoint: false,
+				presenceHeartbeatRecordsPresenceHeartbeat: false,
+				presenceHeartbeatWritesPresence: false,
+				presenceHeartbeatCallsSave: false,
+				presenceHeartbeatChangesPostLock: false,
+				presenceHeartbeatClaimsSaved: false,
+			} );
+			expect( registry.select( noticesStore ).getNotices() ).toEqual(
+				[]
+			);
+			expect( registry.select( editorStore ).isEditedPostDirty() ).toBe(
+				false
+			);
+		} );
+
+		it( 'records heartbeat degradation without clearing protected local state', async () => {
+			const post = {
+				id: postId,
+				type: 'post',
+				title: 'Presence heartbeat degraded post',
+				content:
+					'<!-- wp:paragraph --><p>Presence degraded.</p><!-- /wp:paragraph -->',
+				status: 'draft',
+			};
+			const registry = createRegistryWithStores();
+
+			apiFetch.setFetchHandler( async ( options ) => {
+				expect( getMethod( options ) ).toBe( 'POST' );
+				expect( options.path ).toMatch(
+					new RegExp(
+						`/wp/v2/posts/${ postId }/distributed-editing/presence/heartbeat`
+					)
+				);
+
+				throw {
+					code: DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_PRESENCE_STORAGE_UNAVAILABLE,
+					message: 'Presence storage is unavailable.',
+					data: {
+						status: 503,
+						result: 'presence_storage_unavailable',
+						records_presence_heartbeat: false,
+						writes_presence: false,
+					},
+				};
+			} );
+
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', post );
+			registry.dispatch( editorStore ).setupEditor( post );
+			registry.dispatch( editorStore ).updateEditorSettings( {
+				distributedEditing: {
+					enabled: true,
+				},
+			} );
+			registry
+				.dispatch( editorStore )
+				.setDistributedEditingSessionState( {
+					pendingChangeCount: 1,
+					hasPendingChanges: true,
+					canExportLocalUpdates: true,
+					presenceRosterEntries: [
+						{
+							key: 'presence-local-heartbeat-current-tab',
+							identityVisibility: 'self',
+							relationship: 'current_user_current_tab',
+							freshness: 'current',
+						},
+					],
+				} );
+
+			await expect(
+				registry
+					.dispatch( editorStore )
+					.__experimentalSendDistributedEditingPresenceHeartbeat( {
+						sessionKey: 'turn-0173-session',
+					} )
+			).rejects.toMatchObject( {
+				code: DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_PRESENCE_STORAGE_UNAVAILABLE,
+			} );
+
+			expect(
+				registry
+					.select( editorStore )
+					.getDistributedEditingSessionState()
+			).toMatchObject( {
+				pendingChangeCount: 1,
+				hasPendingChanges: true,
+				canExportLocalUpdates: true,
+				presenceHeartbeatStatus:
+					DISTRIBUTED_EDITING_PRESENCE_HEARTBEAT_STATUSES.STORAGE_UNAVAILABLE,
+				presenceHeartbeatRequested: true,
+				presenceHeartbeatFailed: true,
+				presenceHeartbeatCallsRestEndpoint: true,
+				presenceHeartbeatRecordsPresenceHeartbeat: false,
+				presenceHeartbeatWritesPresence: false,
+				presenceHeartbeatCallsSave: false,
+				presenceHeartbeatMutatesEditorContent: false,
+				presenceHeartbeatChangesPostLock: false,
+				presenceHeartbeatClaimsSaved: false,
+				presenceHeartbeatMarksLocalEditorCurrent: false,
+				presenceHeartbeatMarksLocalEditorDelayed: true,
+				presenceHeartbeatLocalRosterEntryVisible: true,
+				presenceHeartbeatLocalRosterEntryFreshness: 'recent',
+				presenceRosterStatus: 'recent',
+				presenceRosterVisibleCount: 1,
+				presenceRosterEntries: [
+					{
+						key: 'presence-local-heartbeat-current-tab',
+						relationship: 'current_user_current_tab',
+						freshness: 'recent',
+						exposesRawContent: false,
+						exposesSelection: false,
+						exposesCursorOffset: false,
+						exposesUserId: false,
+					},
+				],
+			} );
+			expect( registry.select( noticesStore ).getNotices() ).toEqual(
+				[]
+			);
+			expect( registry.select( editorStore ).isEditedPostDirty() ).toBe(
+				false
+			);
 		} );
 	} );
 
@@ -1631,6 +2701,12 @@ describe( 'Post actions', () => {
 				canAttemptLocalRebase: false,
 				readyToRetrySubmit: true,
 				requiresManualConflictResolution: false,
+				actionTranscriptItemCount: 1,
+				actionTranscriptLatestEventType:
+					DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.LOCAL_CHANGES_APPLIED,
+				actionTranscriptEntriesRedacted: true,
+				actionTranscriptCallsSave: false,
+				actionTranscriptClaimsSaved: false,
 			} );
 		} );
 
@@ -3130,6 +4206,12 @@ describe( 'Post actions', () => {
 					retrySubmitHandoffStatus:
 						DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_STATUSES.PREPARED,
 					retrySubmitPrepared: true,
+					actionTranscriptItemCount: 1,
+					actionTranscriptLatestEventType:
+						DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.LOCAL_CHANGES_STAGED,
+					actionTranscriptEntriesRedacted: true,
+					actionTranscriptCallsSave: false,
+					actionTranscriptClaimsSaved: false,
 				},
 			} );
 			expect(
@@ -3145,6 +4227,12 @@ describe( 'Post actions', () => {
 					DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_STATUSES.PREPARED,
 				retrySubmitHandoffReason: null,
 				retrySubmitPrepared: true,
+				actionTranscriptItemCount: 1,
+				actionTranscriptLatestEventType:
+					DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.LOCAL_CHANGES_STAGED,
+				actionTranscriptEntriesRedacted: true,
+				actionTranscriptCallsSave: false,
+				actionTranscriptClaimsSaved: false,
 			} );
 		} );
 
@@ -3444,6 +4532,12 @@ describe( 'Post actions', () => {
 					retrySubmitSavePrepared: true,
 					retrySubmitSaveReady: true,
 					canExportLocalUpdates: true,
+					actionTranscriptItemCount: 1,
+					actionTranscriptLatestEventType:
+						DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.SAVE_PREPARED,
+					actionTranscriptEntriesRedacted: true,
+					actionTranscriptCallsSave: false,
+					actionTranscriptClaimsSaved: false,
 				},
 			} );
 			expect(
@@ -3611,7 +4705,7 @@ describe( 'Post actions', () => {
 				canExportLocalUpdates: false,
 				actionTranscriptItemCount: 2,
 				actionTranscriptLatestEventType:
-					DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.SAVE_STATE_CHANGED,
+					DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.SAVE_CONFIRMED,
 				actionTranscriptEntriesRedacted: true,
 				actionTranscriptCallsSave: false,
 				actionTranscriptClaimsSaved: false,

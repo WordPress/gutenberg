@@ -26,6 +26,12 @@ import {
 	DISTRIBUTED_EDITING_NOTICE_IDS,
 	DISTRIBUTED_EDITING_NOTICE_KINDS,
 	DISTRIBUTED_EDITING_OPAQUE_REVIEW_APPROVAL_PROOF_TOKEN_ENVELOPE_TYPE,
+	DISTRIBUTED_EDITING_PRESENCE_HEARTBEAT_STATUSES,
+	DISTRIBUTED_EDITING_PRESENCE_REFRESH_STATUSES,
+	DISTRIBUTED_EDITING_PRESENCE_REPEATED_REFRESH_CONNECTION_STATES,
+	DISTRIBUTED_EDITING_PRESENCE_REPEATED_REFRESH_RUNTIME_STATUSES,
+	DISTRIBUTED_EDITING_PRESENCE_ROSTER_STATUSES,
+	DISTRIBUTED_EDITING_PRESENCE_STARTUP_POLICY_STATUSES,
 	DISTRIBUTED_EDITING_REASON_CODES,
 	DISTRIBUTED_EDITING_REVIEW_TOKEN_RECOVERY_REASONS,
 	DISTRIBUTED_EDITING_REVIEW_TOKEN_RECOVERY_STATUSES,
@@ -74,6 +80,10 @@ import {
 	getDistributedEditingSavePolicyStateForSessionState,
 	getDistributedEditingStaleBaseLocalRebaseResult,
 	getDistributedEditingSessionStateForKsesRiskyBlockReviewClassificationResult,
+	getDistributedEditingSessionStateForPresenceHeartbeatResult,
+	getDistributedEditingSessionStateForPresenceRepeatedRefreshRuntimeConfig,
+	getDistributedEditingSessionStateForPresenceStartupPolicyConfig,
+	getDistributedEditingSessionStateForPresenceSnapshotRefreshResult,
 	getDistributedEditingSessionStateForRiskyBlockReviewItemResolution,
 	getDistributedEditingSessionStateForFreshReviewDecisionItemResolution,
 	getDistributedEditingSessionStateForFreshReviewDecisionItems,
@@ -96,6 +106,9 @@ import {
 	getDistributedEditingSessionStateForStaleBaseRejectionResult,
 	getDistributedEditingSessionStateForStaleBaseServerStateRefetchResult,
 	getDistributedEditingNoticeDescriptorsForSessionState,
+	getDistributedEditingPresenceRepeatedRefreshRuntimeStateForSessionState,
+	getDistributedEditingPresenceRosterStateForSessionState,
+	getDistributedEditingPresenceStartupPolicyStateForSessionState,
 	getDistributedEditingReviewTokenRecoveryStateForSessionState,
 	getDistributedEditingUnloadWarningStateForSessionState,
 	hasDistributedEditingRetrySaveSavedStateEvidenceForSessionState,
@@ -120,6 +133,9 @@ import {
 	getDistributedEditingFreshReviewPrePublishState,
 	getDistributedEditingLocalUpdatesImportReviewRequestState,
 	getDistributedEditingNoticeDescriptors,
+	getDistributedEditingPresenceRepeatedRefreshRuntimeState,
+	getDistributedEditingPresenceRosterState,
+	getDistributedEditingPresenceStartupPolicyState,
 	getDistributedEditingReviewTokenRecoveryState,
 	getDistributedEditingRiskyBlockReviewState,
 	getDistributedEditingRetrySaveFlowState,
@@ -412,8 +428,8 @@ describe( 'distributed editing session state', () => {
 				'Recorded 4 redacted transcript events; 2 unsafe entries were dropped.',
 			chronologyStatus: 'fresh_review_guarded_save_confirmed',
 			chronologyText:
-				'Fresh-review guarded save confirmation was recorded; use save-authority evidence to confirm persistence.',
-			latestEventLabel: 'Fresh-review guarded save confirmed',
+				'Fresh-review Save confirmation was recorded; use WordPress save-authority evidence to confirm persistence.',
+			latestEventLabel: 'Fresh-review Save confirmed',
 			timelineItemCount: 4,
 			droppedItemCount: 2,
 			canShareWithSupport: true,
@@ -457,12 +473,124 @@ describe( 'distributed editing session state', () => {
 			expect.objectContaining( {
 				eventType:
 					DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.FRESH_REVIEW_RETRY_SAVE_CONFIRMED,
-				label: 'Fresh-review guarded save confirmed',
+				label: 'Fresh-review Save confirmed',
 				redacted: true,
 			} ),
 		] );
 		expect( JSON.stringify( report ) ).not.toMatch(
 			/Do not expose support report content|turn0145-hidden-proof|rawContent|proofSignature/
+		);
+	} );
+
+	it( 'formats board-demo action transcript chronology without content or authority claims', () => {
+		const report =
+			getDistributedEditingActionTranscriptSupportReportForSessionState( {
+				actionTranscriptItems: [
+					{
+						eventType:
+							DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.SERVER_STATE_REFETCHED,
+					},
+					{
+						eventType:
+							DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.LOCAL_CHANGES_APPLIED,
+					},
+					{
+						eventType:
+							DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.LOCAL_CHANGES_STAGED,
+					},
+					{
+						eventType:
+							DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.RETRY_SUBMIT_PROOF_REFRESHED,
+					},
+					{
+						eventType:
+							DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.SAVE_PREPARED,
+					},
+					{
+						eventType:
+							DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.SAVE_STATE_CHANGED,
+					},
+					{
+						eventType:
+							DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.SAVE_CONFIRMED,
+					},
+					{
+						eventType:
+							DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.LOCAL_EDITOR_ACTION,
+						rawContent:
+							'<!-- wp:paragraph --><p>Hidden local edit</p><!-- /wp:paragraph -->',
+					},
+					{
+						eventType:
+							DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.SAVE_CONFIRMED,
+						proofSignature: 'turn0212-hidden-proof',
+					},
+				],
+			} );
+
+		expect( report ).toMatchObject( {
+			status: 'available',
+			available: true,
+			chronologyStatus: 'guarded_save_confirmed',
+			chronologyText:
+				'WordPress Save confirmation was recorded; use save-authority evidence to confirm persistence.',
+			latestEventLabel: 'WordPress confirmed Save',
+			timelineItemCount: 7,
+			droppedItemCount: 2,
+			canShareWithSupport: true,
+			requiresSaveAuthorityForPersistence: true,
+			entriesRedacted: true,
+			exposesRawContent: false,
+			exposesProofInternals: false,
+			callsSave: false,
+			claimsSaved: false,
+		} );
+		expect( report.timelineItems ).toEqual( [
+			expect.objectContaining( {
+				eventType:
+					DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.SERVER_STATE_REFETCHED,
+				label: 'Latest post loaded',
+				redacted: true,
+			} ),
+			expect.objectContaining( {
+				eventType:
+					DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.LOCAL_CHANGES_APPLIED,
+				label: 'Local changes applied',
+				redacted: true,
+			} ),
+			expect.objectContaining( {
+				eventType:
+					DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.LOCAL_CHANGES_STAGED,
+				label: 'Local changes staged',
+				redacted: true,
+			} ),
+			expect.objectContaining( {
+				eventType:
+					DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.RETRY_SUBMIT_PROOF_REFRESHED,
+				label: 'Save safety checked',
+				redacted: true,
+			} ),
+			expect.objectContaining( {
+				eventType:
+					DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.SAVE_PREPARED,
+				label: 'Save prepared',
+				redacted: true,
+			} ),
+			expect.objectContaining( {
+				eventType:
+					DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.SAVE_STATE_CHANGED,
+				label: 'Save started',
+				redacted: true,
+			} ),
+			expect.objectContaining( {
+				eventType:
+					DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.SAVE_CONFIRMED,
+				label: 'WordPress confirmed Save',
+				redacted: true,
+			} ),
+		] );
+		expect( JSON.stringify( report ) ).not.toMatch(
+			/Hidden local edit|turn0212-hidden-proof|rawContent|proofSignature/
 		);
 	} );
 
@@ -523,6 +651,1541 @@ describe( 'distributed editing session state', () => {
 		expect(
 			JSON.stringify( sessionState.actionTranscriptItems )
 		).not.toMatch( /Do not retain me|postContent/ );
+	} );
+
+	it( 'summarizes editor presence without false absence or side effects', () => {
+		const emptyRoster =
+			getDistributedEditingPresenceRosterStateForSessionState( {} );
+		const activeRoster =
+			getDistributedEditingPresenceRosterStateForSessionState( {
+				presenceRosterEntries: [
+					{
+						key: 'presence-mira',
+						displayName: 'Mira',
+						freshness: 'current',
+					},
+					{
+						key: 'presence-anonymous',
+						identityVisibility: 'anonymous',
+						freshness: 'current',
+						userId: 42,
+						selection: { anchor: 4 },
+					},
+				],
+				presenceRosterTotalKnownCount: 3,
+				presenceRosterHiddenCount: 1,
+			} );
+		const staleRoster =
+			getDistributedEditingPresenceRosterStateForSessionState( {
+				presenceRosterEntries: [
+					{
+						key: 'presence-sam',
+						displayName: 'Sam',
+						freshness: 'recent',
+					},
+				],
+			} );
+		const expiredOnlyRoster =
+			getDistributedEditingPresenceRosterStateForSessionState( {
+				presenceRosterStatus:
+					DISTRIBUTED_EDITING_PRESENCE_ROSTER_STATUSES.RECENT,
+				presenceRosterEntries: [],
+				presenceRosterExpiredCount: 2,
+				presenceRosterTotalKnownCount: 2,
+			} );
+		const mixedRoster =
+			getDistributedEditingPresenceRosterStateForSessionState( {
+				presenceRosterEntries: [
+					{
+						key: 'presence-mira',
+						displayName: 'Mira',
+						freshness: 'current',
+					},
+					{
+						key: 'presence-anonymous',
+						identityVisibility: 'anonymous',
+						freshness: 'current',
+					},
+					{
+						key: 'presence-sam',
+						displayName: 'Sam',
+						freshness: 'recent',
+					},
+				],
+				presenceRosterHiddenCount: 1,
+				presenceRosterExpiredCount: 1,
+				presenceRosterTotalKnownCount: 5,
+			} );
+		const storageRoster =
+			getDistributedEditingPresenceRosterStateForSessionState( {
+				presenceRosterEntries: [
+					{
+						key: 'presence-storage-mira',
+						displayName: 'Mira',
+						freshness: 'active',
+					},
+				],
+			} );
+
+		expect( emptyRoster ).toMatchObject( {
+			status: DISTRIBUTED_EDITING_PRESENCE_ROSTER_STATUSES.HIDDEN,
+			visibleCount: 0,
+			currentVisibleCount: 0,
+			delayedVisibleCount: 0,
+			claimsAbsence: false,
+			callsRestEndpoint: false,
+			callsSave: false,
+			mutatesEditorContent: false,
+			changesPostLock: false,
+			claimsSaved: false,
+			copy: {
+				label: 'Editing now',
+				summary: 'No other editors shown.',
+				countSummary: 'Editor activity has not been shown yet.',
+			},
+		} );
+		expect( activeRoster ).toMatchObject( {
+			status: DISTRIBUTED_EDITING_PRESENCE_ROSTER_STATUSES.ACTIVE,
+			freshness: 'current',
+			visibleCount: 2,
+			currentVisibleCount: 2,
+			delayedVisibleCount: 0,
+			totalKnownCount: 3,
+			hiddenCount: 1,
+			exposesRawContent: false,
+			exposesSelection: false,
+			exposesCursorOffset: false,
+			exposesUserIds: false,
+			blocksPublish: false,
+			copy: {
+				summary: 'Mira and Another editor are also editing this post.',
+				countSummary:
+					'2 editors are active now. Some editor activity is hidden by roster limits or privacy settings.',
+			},
+		} );
+		expect( mixedRoster ).toMatchObject( {
+			currentVisibleCount: 2,
+			delayedVisibleCount: 1,
+			hiddenCount: 1,
+			expiredCount: 1,
+			totalKnownCount: 5,
+			copy: {
+				countSummary:
+					'2 editors are active now; 1 editor may be delayed. Some editor activity is hidden by roster limits or privacy settings. Some editor activity expired before this refresh.',
+			},
+			claimsAbsence: false,
+			callsSave: false,
+			changesPostLock: false,
+			claimsSaved: false,
+		} );
+		expect( activeRoster.entries[ 1 ] ).toMatchObject( {
+			identityVisibility: 'anonymous',
+			exposesUserId: false,
+			exposesSelection: false,
+			exposesCursorOffset: false,
+		} );
+		expect( JSON.stringify( activeRoster ) ).not.toContain( 'userId' );
+		expect( JSON.stringify( activeRoster ) ).not.toContain( 'anchor' );
+		expect( staleRoster.copy.summary ).toBe(
+			'Sam was here recently. Presence may be delayed.'
+		);
+		expect( staleRoster.copy.countSummary ).toBe(
+			'1 editor may be delayed.'
+		);
+		expect( expiredOnlyRoster ).toMatchObject( {
+			status: DISTRIBUTED_EDITING_PRESENCE_ROSTER_STATUSES.RECENT,
+			visibleCount: 0,
+			currentVisibleCount: 0,
+			delayedVisibleCount: 0,
+			totalKnownCount: 2,
+			expiredCount: 2,
+			copy: {
+				summary:
+					'Editor activity was seen before this refresh. Presence may be delayed.',
+				countSummary:
+					'Some editor activity expired before this refresh.',
+				assistiveSummary:
+					'Editor activity was seen before this refresh. Presence may be delayed.',
+			},
+			claimsAbsence: false,
+			callsSave: false,
+			changesPostLock: false,
+			claimsSaved: false,
+		} );
+		expect( storageRoster ).toMatchObject( {
+			status: DISTRIBUTED_EDITING_PRESENCE_ROSTER_STATUSES.ACTIVE,
+			currentVisibleCount: 1,
+			delayedVisibleCount: 0,
+			copy: {
+				countSummary: '1 editor is active now.',
+			},
+		} );
+		expect( storageRoster.entries[ 0 ].freshness ).toBe( 'current' );
+	} );
+
+	it( 'normalizes explicit presence snapshot refreshes without unsafe fields or write claims', () => {
+		const normalized =
+			getDistributedEditingSessionStateForPresenceSnapshotRefreshResult(
+				{
+					result: 'presence_roster_snapshot',
+					rest_route: 'post_presence_roster',
+					presence_roster: {
+						status: 'recent',
+						freshness: 'recent',
+						entries: [
+							{
+								key: 'presence-mira',
+								displayName: 'Mira',
+								freshness: 'recent',
+								userId: 42,
+								selection: { anchor: 4 },
+								rawContent: 'hidden',
+							},
+						],
+						totalKnownCount: 3,
+						expiredCount: 2,
+					},
+					presence_read_contract: {
+						source: 'de_rtc_presence_read_snapshot',
+						route: '/wp/v2/posts/42/distributed-editing/presence',
+						cheap_host_polling_guidance: {
+							suggested_polling_interval_seconds: 30,
+							cheap_host_polling_interval_seconds: 120,
+							repeated_client_refresh_enabled_now: false,
+						},
+					},
+					enables_repeated_client_refresh: false,
+				},
+				{
+					pendingChangeCount: 1,
+					canExportLocalUpdates: true,
+				}
+			);
+		const roster =
+			getDistributedEditingPresenceRosterStateForSessionState(
+				normalized
+			);
+
+		expect( normalized ).toMatchObject( {
+			pendingChangeCount: 1,
+			canExportLocalUpdates: true,
+			presenceRosterStatus:
+				DISTRIBUTED_EDITING_PRESENCE_ROSTER_STATUSES.RECENT,
+			presenceRosterVisibleCount: 1,
+			presenceRosterTotalKnownCount: 3,
+			presenceRosterExpiredCount: 2,
+			presenceRosterRefreshStatus:
+				DISTRIBUTED_EDITING_PRESENCE_REFRESH_STATUSES.REFRESHED,
+			presenceRosterRefreshRequested: true,
+			presenceRosterRefreshSucceeded: true,
+			presenceRosterRefreshCallsRestEndpoint: true,
+			presenceRosterRefreshCallsSave: false,
+			presenceRosterRefreshMutatesEditorContent: false,
+			presenceRosterRefreshMutatesPersistedPostContent: false,
+			presenceRosterRefreshChangesPostLock: false,
+			presenceRosterRefreshRecordsPresenceHeartbeat: false,
+			presenceRosterRefreshEnablesRepeatedClientRefresh: false,
+			presenceRosterRefreshClaimsSaved: false,
+			presenceRosterRefreshExposesRawContent: false,
+			presenceRosterRefreshExposesUserIds: false,
+			presenceRosterRefreshExposesCursorOffset: false,
+			presenceRosterRefreshExposesSelection: false,
+			presenceRosterReadContractSource: 'de_rtc_presence_read_snapshot',
+			presenceRosterReadSuggestedPollingIntervalSeconds: 30,
+			presenceRosterReadCheapHostPollingIntervalSeconds: 120,
+			presenceRosterReadRepeatedClientRefreshEnabled: false,
+		} );
+		expect( roster.copy.summary ).toBe(
+			'Mira was here recently. Presence may be delayed.'
+		);
+		expect( JSON.stringify( normalized ) ).not.toMatch(
+			/userId|rawContent|anchor/
+		);
+	} );
+
+	it( 'keeps the current roster and protected changes after presence refresh gate failures', () => {
+		const normalized =
+			getDistributedEditingSessionStateForPresenceSnapshotRefreshResult(
+				{
+					code: DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_FEATURE_DISABLED,
+					message: 'Distributed Editing is disabled.',
+					data: {
+						detail: 'feature_disabled_for_post',
+					},
+				},
+				{
+					pendingChangeCount: 1,
+					canExportLocalUpdates: true,
+					presenceRosterEntries: [
+						{
+							key: 'presence-existing',
+							displayName: 'Mira',
+							freshness: 'recent',
+						},
+					],
+				}
+			);
+
+		expect( normalized ).toMatchObject( {
+			pendingChangeCount: 1,
+			hasPendingChanges: true,
+			canExportLocalUpdates: true,
+			presenceRosterVisibleCount: 1,
+			presenceRosterRefreshStatus:
+				DISTRIBUTED_EDITING_PRESENCE_REFRESH_STATUSES.FEATURE_DISABLED,
+			presenceRosterRefreshReason:
+				DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_FEATURE_DISABLED,
+			presenceRosterRefreshRequested: true,
+			presenceRosterRefreshFailed: true,
+			presenceRosterRefreshCallsRestEndpoint: true,
+			presenceRosterRefreshCallsSave: false,
+			presenceRosterRefreshMutatesEditorContent: false,
+			presenceRosterRefreshChangesPostLock: false,
+			presenceRosterRefreshClaimsSaved: false,
+		} );
+	} );
+
+	it( 'normalizes presence heartbeat success as a content-free local status', () => {
+		const normalized =
+			getDistributedEditingSessionStateForPresenceHeartbeatResult(
+				{
+					result: 'presence_heartbeat_recorded',
+					rest_route: 'post_presence_heartbeat',
+					writes_presence: true,
+					records_presence_heartbeat: true,
+					heartbeat_interval_seconds: 30,
+					calls_save: true,
+					mutates_post_content: true,
+					changes_post_lock: true,
+					claims_saved: true,
+					raw_session_key_included: true,
+					rawContent: 'hidden',
+					userId: 42,
+				},
+				{
+					pendingChangeCount: 1,
+					canExportLocalUpdates: true,
+				}
+			);
+
+		expect( normalized ).toMatchObject( {
+			pendingChangeCount: 1,
+			hasPendingChanges: true,
+			canExportLocalUpdates: true,
+			presenceHeartbeatStatus:
+				DISTRIBUTED_EDITING_PRESENCE_HEARTBEAT_STATUSES.SENT,
+			presenceHeartbeatResult: 'presence_heartbeat_recorded',
+			presenceHeartbeatRequested: true,
+			presenceHeartbeatSucceeded: true,
+			presenceHeartbeatCallsRestEndpoint: true,
+			presenceHeartbeatRecordsPresenceHeartbeat: true,
+			presenceHeartbeatWritesPresence: true,
+			presenceHeartbeatCallsSave: false,
+			presenceHeartbeatMutatesEditorContent: false,
+			presenceHeartbeatMutatesPersistedPostContent: false,
+			presenceHeartbeatChangesPostLock: false,
+			presenceHeartbeatClaimsSaved: false,
+			presenceHeartbeatEnablesRepeatedClientRefresh: false,
+			presenceHeartbeatRuntimePollingEnabled: false,
+			presenceHeartbeatExposesRawContent: false,
+			presenceHeartbeatExposesUserIds: false,
+			presenceHeartbeatExposesCursorOffset: false,
+			presenceHeartbeatExposesSelection: false,
+			presenceHeartbeatRawSessionKeyIncluded: false,
+			presenceHeartbeatMarksLocalEditorCurrent: true,
+			presenceHeartbeatMarksLocalEditorDelayed: false,
+			presenceHeartbeatLocalRosterEntryVisible: true,
+			presenceHeartbeatLocalRosterEntryFreshness: 'current',
+			presenceHeartbeatRepeatedRefreshOptional: true,
+			presenceHeartbeatSuggestedIntervalSeconds: 30,
+			presenceRosterStatus:
+				DISTRIBUTED_EDITING_PRESENCE_ROSTER_STATUSES.ACTIVE,
+			presenceRosterFreshness: 'current',
+			presenceRosterVisibleCount: 1,
+			presenceRosterEntries: [
+				{
+					key: 'presence-local-heartbeat-current-tab',
+					displayName: null,
+					identityVisibility: 'self',
+					relationship: 'current_user_current_tab',
+					freshness: 'current',
+					exposesUserId: false,
+					exposesCursorOffset: false,
+					exposesSelection: false,
+					exposesRawContent: false,
+				},
+			],
+		} );
+		expect( JSON.stringify( normalized ) ).not.toMatch(
+			/rawContent|userId|raw_session_key/
+		);
+	} );
+
+	it( 'keeps expired roster evidence visible when a local heartbeat follows an expired-only snapshot', () => {
+		const expiredOnlySnapshot =
+			getDistributedEditingSessionStateForPresenceSnapshotRefreshResult(
+				{
+					result: 'presence_roster_snapshot',
+					presenceRoster: {
+						status: 'recent',
+						freshness: 'recent',
+						entries: [],
+						visibleCount: 0,
+						totalKnownCount: 2,
+						hiddenCount: 0,
+						expiredCount: 2,
+					},
+				},
+				{
+					presenceRosterStatus: 'empty',
+				}
+			);
+		const normalized =
+			getDistributedEditingSessionStateForPresenceHeartbeatResult(
+				{
+					result: 'presence_heartbeat_recorded',
+					writes_presence: true,
+					records_presence_heartbeat: true,
+				},
+				expiredOnlySnapshot
+			);
+		const rosterState =
+			getDistributedEditingPresenceRosterStateForSessionState(
+				normalized
+			);
+
+		expect( normalized ).toMatchObject( {
+			presenceHeartbeatStatus:
+				DISTRIBUTED_EDITING_PRESENCE_HEARTBEAT_STATUSES.SENT,
+			presenceHeartbeatMarksLocalEditorCurrent: true,
+			presenceHeartbeatLocalRosterEntryVisible: true,
+			presenceRosterStatus:
+				DISTRIBUTED_EDITING_PRESENCE_ROSTER_STATUSES.ACTIVE,
+			presenceRosterVisibleCount: 1,
+			presenceRosterTotalKnownCount: 3,
+			presenceRosterExpiredCount: 2,
+			presenceRosterEntries: [
+				{
+					relationship: 'current_user_current_tab',
+					freshness: 'current',
+				},
+			],
+		} );
+		expect( rosterState ).toMatchObject( {
+			status: DISTRIBUTED_EDITING_PRESENCE_ROSTER_STATUSES.ACTIVE,
+			currentVisibleCount: 1,
+			expiredCount: 2,
+			totalKnownCount: 3,
+			copy: {
+				summary: 'You are visible in this editing session.',
+				countSummary:
+					'1 editor is active now. Some editor activity expired before this refresh.',
+			},
+			claimsAbsence: false,
+			callsSave: false,
+			changesPostLock: false,
+			claimsSaved: false,
+		} );
+		expect( JSON.stringify( rosterState ) ).not.toMatch(
+			/Expired Repeated Browser|userId|raw_session_key|selection|cursor/
+		);
+	} );
+
+	it( 'reconciles a storage-backed current-tab snapshot after local heartbeat without duplicating presence', () => {
+		const currentSessionSnapshot = {
+			result: 'presence_roster_snapshot',
+			presenceRoster: {
+				status: 'active',
+				freshness: 'current',
+				entries: [
+					{
+						key: 'de-rtc-presence-current-session',
+						displayName: 'Admin User',
+						identityVisibility: 'self',
+						relationship: 'current_user_current_tab',
+						freshness: 'current',
+						source: 'de_rtc_presence_storage',
+						rawSessionKeyIncluded: true,
+						userId: 1,
+					},
+				],
+				visibleCount: 1,
+				totalKnownCount: 1,
+				hiddenCount: 0,
+				expiredCount: 0,
+			},
+		};
+		const heartbeatConfirmedState =
+			getDistributedEditingSessionStateForPresenceHeartbeatResult(
+				{
+					result: 'presence_heartbeat_recorded',
+				},
+				{
+					presenceRosterEntries: [],
+					presenceRosterExpiredCount: 2,
+					presenceRosterTotalKnownCount: 2,
+				}
+			);
+		const reconciled =
+			getDistributedEditingSessionStateForPresenceSnapshotRefreshResult(
+				currentSessionSnapshot,
+				heartbeatConfirmedState
+			);
+		const rosterState =
+			getDistributedEditingPresenceRosterStateForSessionState(
+				reconciled
+			);
+		const nextCleanSnapshot =
+			getDistributedEditingSessionStateForPresenceSnapshotRefreshResult(
+				currentSessionSnapshot,
+				reconciled
+			);
+
+		expect( reconciled ).toMatchObject( {
+			presenceRosterRefreshStatus:
+				DISTRIBUTED_EDITING_PRESENCE_REFRESH_STATUSES.REFRESHED,
+			presenceRosterStatus:
+				DISTRIBUTED_EDITING_PRESENCE_ROSTER_STATUSES.ACTIVE,
+			presenceRosterVisibleCount: 1,
+			presenceRosterTotalKnownCount: 3,
+			presenceRosterExpiredCount: 2,
+			presenceRosterExpiredEvidenceCarriedForward: true,
+			presenceRosterEntries: [
+				{
+					key: 'de-rtc-presence-current-session',
+					relationship: 'current_user_current_tab',
+					freshness: 'current',
+					exposesUserId: false,
+					exposesCursorOffset: false,
+					exposesSelection: false,
+					exposesRawContent: false,
+				},
+			],
+			presenceRosterRefreshCallsSave: false,
+			presenceRosterRefreshMutatesEditorContent: false,
+			presenceRosterRefreshChangesPostLock: false,
+			presenceRosterRefreshClaimsSaved: false,
+		} );
+		expect( rosterState ).toMatchObject( {
+			currentVisibleCount: 1,
+			delayedVisibleCount: 0,
+			expiredCount: 2,
+			totalKnownCount: 3,
+			copy: {
+				summary: 'You are visible in this editing session.',
+				countSummary:
+					'1 editor is active now. Some editor activity expired before this refresh.',
+			},
+			claimsAbsence: false,
+			callsSave: false,
+			changesPostLock: false,
+			claimsSaved: false,
+		} );
+		expect(
+			reconciled.presenceRosterEntries.filter(
+				( entry ) => entry.relationship === 'current_user_current_tab'
+			)
+		).toHaveLength( 1 );
+		expect( nextCleanSnapshot ).toMatchObject( {
+			presenceRosterVisibleCount: 1,
+			presenceRosterTotalKnownCount: 1,
+			presenceRosterExpiredCount: 0,
+			presenceRosterExpiredEvidenceCarriedForward: false,
+		} );
+		expect( JSON.stringify( reconciled ) ).not.toMatch(
+			/rawSessionKey|raw_session_key|userId|selection|cursor/
+		);
+	} );
+
+	it( 'keeps same-user other-tab storage rows distinct from the local current tab', () => {
+		const heartbeatConfirmedState =
+			getDistributedEditingSessionStateForPresenceHeartbeatResult(
+				{
+					result: 'presence_heartbeat_recorded',
+				},
+				{
+					presenceRosterEntries: [],
+					presenceRosterExpiredCount: 2,
+					presenceRosterTotalKnownCount: 2,
+				}
+			);
+		const sameUserSnapshot = {
+			result: 'presence_roster_snapshot',
+			presenceRoster: {
+				status: 'active',
+				freshness: 'current',
+				entries: [
+					{
+						key: 'de-rtc-presence-admin-other-tab',
+						displayName: 'Admin User',
+						identityVisibility: 'self',
+						relationship: 'same_user_other_tab',
+						freshness: 'current',
+						rawSessionKeyIncluded: true,
+						userId: 1,
+					},
+					{
+						key: 'de-rtc-presence-remote-editor',
+						displayName: 'Sustained Remote Editor',
+						identityVisibility: 'named',
+						relationship: 'other_user',
+						freshness: 'current',
+						rawSessionKeyIncluded: true,
+						userId: 2,
+					},
+				],
+				visibleCount: 2,
+				totalKnownCount: 2,
+				hiddenCount: 0,
+				expiredCount: 0,
+			},
+		};
+		const refreshed =
+			getDistributedEditingSessionStateForPresenceSnapshotRefreshResult(
+				sameUserSnapshot,
+				heartbeatConfirmedState
+			);
+		const heartbeatRefreshed =
+			getDistributedEditingSessionStateForPresenceHeartbeatResult(
+				{
+					result: 'presence_heartbeat_recorded',
+				},
+				refreshed
+			);
+		const rosterState =
+			getDistributedEditingPresenceRosterStateForSessionState(
+				heartbeatRefreshed
+			);
+
+		expect( refreshed ).toMatchObject( {
+			presenceRosterRefreshStatus:
+				DISTRIBUTED_EDITING_PRESENCE_REFRESH_STATUSES.REFRESHED,
+			presenceRosterVisibleCount: 3,
+			presenceRosterTotalKnownCount: 5,
+			presenceRosterExpiredCount: 2,
+			presenceRosterExpiredEvidenceCarriedForward: true,
+			presenceRosterEntries: [
+				{
+					relationship: 'current_user_current_tab',
+					freshness: 'recent',
+				},
+				{
+					relationship: 'same_user_other_tab',
+					freshness: 'current',
+					exposesUserId: false,
+					exposesCursorOffset: false,
+					exposesSelection: false,
+					exposesRawContent: false,
+				},
+				{
+					displayName: 'Sustained Remote Editor',
+					relationship: 'other_user',
+					freshness: 'current',
+					exposesUserId: false,
+					exposesCursorOffset: false,
+					exposesSelection: false,
+					exposesRawContent: false,
+				},
+			],
+		} );
+		expect( heartbeatRefreshed ).toMatchObject( {
+			presenceHeartbeatStatus:
+				DISTRIBUTED_EDITING_PRESENCE_HEARTBEAT_STATUSES.SENT,
+			presenceHeartbeatLocalRosterEntryVisible: true,
+			presenceHeartbeatLocalRosterEntryFreshness: 'current',
+			presenceRosterStatus:
+				DISTRIBUTED_EDITING_PRESENCE_ROSTER_STATUSES.ACTIVE,
+			presenceRosterVisibleCount: 3,
+			presenceRosterTotalKnownCount: 5,
+			presenceRosterExpiredCount: 2,
+			presenceRosterEntries: [
+				{
+					relationship: 'current_user_current_tab',
+					freshness: 'current',
+				},
+				{
+					relationship: 'same_user_other_tab',
+					freshness: 'current',
+				},
+				{
+					relationship: 'other_user',
+					freshness: 'current',
+				},
+			],
+			presenceRosterRefreshCallsSave: false,
+			presenceRosterRefreshMutatesEditorContent: false,
+			presenceRosterRefreshChangesPostLock: false,
+			presenceRosterRefreshClaimsSaved: false,
+			presenceHeartbeatCallsSave: false,
+			presenceHeartbeatChangesPostLock: false,
+			presenceHeartbeatClaimsSaved: false,
+		} );
+		expect( rosterState ).toMatchObject( {
+			currentVisibleCount: 3,
+			delayedVisibleCount: 0,
+			localCurrentTabVisible: true,
+			sameUserOtherTabVisible: true,
+			remoteCurrentVisibleCount: 1,
+			remoteDelayedVisibleCount: 0,
+			expiredCount: 2,
+			totalKnownCount: 5,
+			copy: {
+				summary:
+					'You are visible in this editing session. You have this post open in another tab. Sustained Remote Editor is also editing this post.',
+				countSummary:
+					'3 editors are active now. Some editor activity expired before this refresh.',
+			},
+			claimsAbsence: false,
+			callsSave: false,
+			changesPostLock: false,
+			claimsSaved: false,
+		} );
+		expect(
+			heartbeatRefreshed.presenceRosterEntries.filter(
+				( entry ) => entry.relationship === 'current_user_current_tab'
+			)
+		).toHaveLength( 1 );
+		expect(
+			heartbeatRefreshed.presenceRosterEntries.filter(
+				( entry ) => entry.relationship === 'same_user_other_tab'
+			)
+		).toHaveLength( 1 );
+		expect( JSON.stringify( heartbeatRefreshed ) ).not.toMatch(
+			/rawSessionKey|raw_session_key|userId|selection|cursor/
+		);
+	} );
+
+	it( 'preserves an existing presence roster when heartbeat success confirms only local freshness', () => {
+		const normalized =
+			getDistributedEditingSessionStateForPresenceHeartbeatResult(
+				{
+					result: 'presence_heartbeat_recorded',
+					writes_presence: true,
+					records_presence_heartbeat: true,
+				},
+				{
+					presenceRosterEntries: [
+						{
+							key: 'presence-other-editor',
+							displayName: 'Mira Presence',
+							identityVisibility: 'named',
+							relationship: 'other_user',
+							freshness: 'current',
+						},
+					],
+				}
+			);
+
+		expect( normalized ).toMatchObject( {
+			presenceHeartbeatStatus:
+				DISTRIBUTED_EDITING_PRESENCE_HEARTBEAT_STATUSES.SENT,
+			presenceHeartbeatMarksLocalEditorCurrent: true,
+			presenceHeartbeatMarksLocalEditorDelayed: false,
+			presenceHeartbeatLocalRosterEntryVisible: false,
+			presenceHeartbeatLocalRosterEntryFreshness: null,
+			presenceRosterVisibleCount: 1,
+			presenceRosterEntries: [
+				{
+					key: 'presence-other-editor',
+					displayName: 'Mira Presence',
+					relationship: 'other_user',
+					freshness: 'current',
+				},
+			],
+		} );
+	} );
+
+	it( 'downgrades the local heartbeat roster entry when a later heartbeat degrades', () => {
+		const normalized =
+			getDistributedEditingSessionStateForPresenceHeartbeatResult(
+				{
+					code: DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_PRESENCE_STORAGE_UNAVAILABLE,
+					message: 'Presence storage is unavailable.',
+					data: {
+						result: 'presence_storage_unavailable',
+						status: 503,
+						calls_rest_endpoint: true,
+						records_presence_heartbeat: false,
+						writes_presence: false,
+					},
+				},
+				{
+					presenceRosterEntries: [
+						{
+							key: 'presence-local-heartbeat-current-tab',
+							identityVisibility: 'self',
+							relationship: 'current_user_current_tab',
+							freshness: 'current',
+						},
+					],
+				}
+			);
+		const rosterState =
+			getDistributedEditingPresenceRosterStateForSessionState(
+				normalized
+			);
+
+		expect( normalized ).toMatchObject( {
+			presenceHeartbeatStatus:
+				DISTRIBUTED_EDITING_PRESENCE_HEARTBEAT_STATUSES.STORAGE_UNAVAILABLE,
+			presenceHeartbeatRequested: true,
+			presenceHeartbeatFailed: true,
+			presenceHeartbeatMarksLocalEditorCurrent: false,
+			presenceHeartbeatMarksLocalEditorDelayed: true,
+			presenceHeartbeatLocalRosterEntryVisible: true,
+			presenceHeartbeatLocalRosterEntryFreshness: 'recent',
+			presenceRosterStatus:
+				DISTRIBUTED_EDITING_PRESENCE_ROSTER_STATUSES.RECENT,
+			presenceRosterFreshness: 'recent',
+			presenceRosterVisibleCount: 1,
+			presenceRosterEntries: [
+				{
+					key: 'presence-local-heartbeat-current-tab',
+					relationship: 'current_user_current_tab',
+					freshness: 'recent',
+					exposesUserId: false,
+					exposesCursorOffset: false,
+					exposesSelection: false,
+					exposesRawContent: false,
+				},
+			],
+			presenceHeartbeatCallsSave: false,
+			presenceHeartbeatChangesPostLock: false,
+			presenceHeartbeatClaimsSaved: false,
+		} );
+		expect( rosterState ).toMatchObject( {
+			status: DISTRIBUTED_EDITING_PRESENCE_ROSTER_STATUSES.RECENT,
+			currentVisibleCount: 0,
+			delayedVisibleCount: 1,
+			copy: {
+				summary: 'Your presence may be delayed.',
+				countSummary: '1 editor may be delayed.',
+			},
+			claimsAbsence: false,
+			callsRestEndpoint: false,
+			callsSave: false,
+			changesPostLock: false,
+			claimsSaved: false,
+		} );
+		expect( JSON.stringify( normalized ) ).not.toMatch(
+			/rawContent|userId|raw_session_key/
+		);
+	} );
+
+	it( 'keeps a same-user other-tab roster distinct after local heartbeat success', () => {
+		const normalized =
+			getDistributedEditingSessionStateForPresenceHeartbeatResult(
+				{
+					result: 'presence_heartbeat_recorded',
+					heartbeatIntervalSeconds: 30,
+				},
+				{
+					presenceRosterEntries: [
+						{
+							key: 'presence-same-user-other-tab',
+							identityVisibility: 'self',
+							relationship: 'same_user_other_tab',
+							freshness: 'current',
+						},
+					],
+				}
+			);
+		const rosterState =
+			getDistributedEditingPresenceRosterStateForSessionState(
+				normalized
+			);
+
+		expect( normalized ).toMatchObject( {
+			presenceHeartbeatStatus:
+				DISTRIBUTED_EDITING_PRESENCE_HEARTBEAT_STATUSES.SENT,
+			presenceHeartbeatMarksLocalEditorCurrent: true,
+			presenceHeartbeatMarksLocalEditorDelayed: false,
+			presenceHeartbeatLocalRosterEntryVisible: false,
+			presenceHeartbeatLocalRosterEntryFreshness: null,
+			presenceRosterVisibleCount: 1,
+			presenceRosterEntries: [
+				{
+					key: 'presence-same-user-other-tab',
+					relationship: 'same_user_other_tab',
+					freshness: 'current',
+					exposesUserId: false,
+					exposesCursorOffset: false,
+					exposesSelection: false,
+					exposesRawContent: false,
+				},
+			],
+		} );
+		expect( rosterState ).toMatchObject( {
+			status: DISTRIBUTED_EDITING_PRESENCE_ROSTER_STATUSES.ACTIVE,
+			currentVisibleCount: 1,
+			delayedVisibleCount: 0,
+			copy: {
+				summary: 'You have this post open in another tab.',
+				countSummary: '1 editor is active now.',
+			},
+			claimsAbsence: false,
+			callsRestEndpoint: false,
+			callsSave: false,
+			changesPostLock: false,
+			claimsSaved: false,
+		} );
+		expect(
+			normalized.presenceRosterEntries.some(
+				( entry ) => entry.relationship === 'current_user_current_tab'
+			)
+		).toBe( false );
+	} );
+
+	it( 'summarizes mixed local, duplicate-tab, current remote, and delayed remote roster rows', () => {
+		const rosterState =
+			getDistributedEditingPresenceRosterStateForSessionState( {
+				presenceRosterEntries: [
+					{
+						key: 'presence-local-heartbeat-current-tab',
+						identityVisibility: 'self',
+						relationship: 'current_user_current_tab',
+						freshness: 'recent',
+					},
+					{
+						key: 'presence-same-user-other-tab',
+						identityVisibility: 'self',
+						relationship: 'same_user_other_tab',
+						freshness: 'current',
+					},
+					{
+						key: 'presence-mira',
+						displayName: 'Mira',
+						identityVisibility: 'named',
+						relationship: 'other_user',
+						freshness: 'current',
+					},
+					{
+						key: 'presence-sam',
+						displayName: 'Sam',
+						identityVisibility: 'named',
+						relationship: 'other_user',
+						freshness: 'recent',
+					},
+				],
+				presenceRosterHiddenCount: 1,
+				presenceRosterExpiredCount: 1,
+				presenceRosterTotalKnownCount: 5,
+			} );
+
+		expect( rosterState ).toMatchObject( {
+			status: DISTRIBUTED_EDITING_PRESENCE_ROSTER_STATUSES.RECENT,
+			visibleCount: 4,
+			currentVisibleCount: 2,
+			delayedVisibleCount: 2,
+			localCurrentTabVisible: true,
+			sameUserOtherTabVisible: true,
+			remoteVisibleCount: 2,
+			remoteCurrentVisibleCount: 1,
+			remoteDelayedVisibleCount: 1,
+			hiddenCount: 1,
+			expiredCount: 1,
+			totalKnownCount: 5,
+			copy: {
+				summary:
+					'Your presence may be delayed. You have this post open in another tab. Mira is also editing this post. Sam was here recently. Presence may be delayed.',
+				countSummary:
+					'2 editors are active now; 2 editors may be delayed. Some editor activity is hidden by roster limits or privacy settings. Some editor activity expired before this refresh.',
+			},
+			claimsAbsence: false,
+			callsRestEndpoint: false,
+			callsSave: false,
+			changesPostLock: false,
+			claimsSaved: false,
+		} );
+		expect( JSON.stringify( rosterState ) ).not.toMatch(
+			/rawContent|userId|raw_session_key|selection|cursor/
+		);
+	} );
+
+	it( 'keeps remote freshness and anonymous labels distinct under sustained presence cadence', () => {
+		const rosterState =
+			getDistributedEditingPresenceRosterStateForSessionState( {
+				presenceRosterEntries: [
+					{
+						key: 'presence-local-heartbeat-current-tab',
+						identityVisibility: 'self',
+						relationship: 'current_user_current_tab',
+						freshness: 'current',
+					},
+					{
+						key: 'presence-same-user-other-tab',
+						identityVisibility: 'self',
+						relationship: 'same_user_other_tab',
+						freshness: 'current',
+					},
+					{
+						key: 'presence-mira',
+						displayName: 'Mira',
+						identityVisibility: 'named',
+						relationship: 'other_user',
+						freshness: 'current',
+					},
+					{
+						key: 'presence-anonymous-current',
+						identityVisibility: 'anonymous',
+						relationship: 'other_user',
+						freshness: 'current',
+					},
+					{
+						key: 'presence-sam',
+						displayName: 'Sam',
+						identityVisibility: 'named',
+						relationship: 'other_user',
+						freshness: 'recent',
+					},
+					{
+						key: 'presence-anonymous-delayed',
+						identityVisibility: 'anonymous',
+						relationship: 'other_user',
+						freshness: 'recent',
+					},
+				],
+				presenceRosterExpiredCount: 2,
+				presenceRosterTotalKnownCount: 8,
+			} );
+
+		expect( rosterState ).toMatchObject( {
+			status: DISTRIBUTED_EDITING_PRESENCE_ROSTER_STATUSES.RECENT,
+			visibleCount: 6,
+			currentVisibleCount: 4,
+			delayedVisibleCount: 2,
+			localCurrentTabVisible: true,
+			sameUserOtherTabVisible: true,
+			remoteVisibleCount: 4,
+			remoteCurrentVisibleCount: 2,
+			remoteDelayedVisibleCount: 2,
+			expiredCount: 2,
+			totalKnownCount: 8,
+			copy: {
+				summary:
+					'You are visible in this editing session. You have this post open in another tab. Mira and Another editor are also editing this post. Sam and Another editor were here recently. Presence may be delayed.',
+				countSummary:
+					'4 editors are active now; 2 editors may be delayed. Some editor activity expired before this refresh.',
+			},
+			claimsAbsence: false,
+			callsRestEndpoint: false,
+			callsSave: false,
+			mutatesEditorContent: false,
+			changesPostLock: false,
+			claimsSaved: false,
+		} );
+		expect( rosterState.entries[ 3 ] ).toMatchObject( {
+			key: 'presence-anonymous-current',
+			identityVisibility: 'anonymous',
+			freshness: 'current',
+			exposesUserId: false,
+			exposesSelection: false,
+			exposesCursorOffset: false,
+		} );
+		expect( rosterState.entries[ 5 ] ).toMatchObject( {
+			key: 'presence-anonymous-delayed',
+			identityVisibility: 'anonymous',
+			freshness: 'recent',
+			exposesUserId: false,
+			exposesSelection: false,
+			exposesCursorOffset: false,
+		} );
+		expect( JSON.stringify( rosterState ) ).not.toMatch(
+			/rawContent|userId|raw_session_key|selection|cursor/
+		);
+	} );
+
+	it( 'summarizes high-count remote rows with hidden and expired aggregate evidence', () => {
+		const rosterState =
+			getDistributedEditingPresenceRosterStateForSessionState( {
+				presenceRosterEntries: [
+					{
+						key: 'presence-local-heartbeat-current-tab',
+						identityVisibility: 'self',
+						relationship: 'current_user_current_tab',
+						freshness: 'current',
+					},
+					{
+						key: 'presence-same-user-other-tab',
+						identityVisibility: 'self',
+						relationship: 'same_user_other_tab',
+						freshness: 'current',
+					},
+					{
+						key: 'presence-mira',
+						displayName: 'Mira',
+						identityVisibility: 'named',
+						relationship: 'other_user',
+						freshness: 'current',
+					},
+					{
+						key: 'presence-quinn',
+						displayName: 'Quinn',
+						identityVisibility: 'named',
+						relationship: 'other_user',
+						freshness: 'current',
+					},
+					{
+						key: 'presence-anonymous-current',
+						identityVisibility: 'anonymous',
+						relationship: 'other_user',
+						freshness: 'current',
+					},
+					{
+						key: 'presence-theo',
+						displayName: 'Theo',
+						identityVisibility: 'named',
+						relationship: 'other_user',
+						freshness: 'current',
+					},
+					{
+						key: 'presence-sam',
+						displayName: 'Sam',
+						identityVisibility: 'named',
+						relationship: 'other_user',
+						freshness: 'recent',
+					},
+					{
+						key: 'presence-priya',
+						displayName: 'Priya',
+						identityVisibility: 'named',
+						relationship: 'other_user',
+						freshness: 'recent',
+					},
+					{
+						key: 'presence-anonymous-delayed',
+						identityVisibility: 'anonymous',
+						relationship: 'other_user',
+						freshness: 'recent',
+					},
+				],
+				presenceRosterHiddenCount: 4,
+				presenceRosterExpiredCount: 2,
+				presenceRosterTotalKnownCount: 15,
+			} );
+
+		expect( rosterState ).toMatchObject( {
+			status: DISTRIBUTED_EDITING_PRESENCE_ROSTER_STATUSES.RECENT,
+			visibleCount: 9,
+			currentVisibleCount: 6,
+			delayedVisibleCount: 3,
+			localCurrentTabVisible: true,
+			sameUserOtherTabVisible: true,
+			remoteVisibleCount: 7,
+			remoteCurrentVisibleCount: 4,
+			remoteDelayedVisibleCount: 3,
+			hiddenCount: 4,
+			expiredCount: 2,
+			totalKnownCount: 15,
+			copy: {
+				summary:
+					'You are visible in this editing session. You have this post open in another tab. Mira, Quinn, and 2 others are also editing this post. Sam, Priya, and 1 other were here recently. Presence may be delayed.',
+				countSummary:
+					'6 editors are active now; 3 editors may be delayed. Some editor activity is hidden by roster limits or privacy settings. Some editor activity expired before this refresh.',
+			},
+			claimsAbsence: false,
+			callsRestEndpoint: false,
+			callsSave: false,
+			mutatesEditorContent: false,
+			changesPostLock: false,
+			claimsSaved: false,
+		} );
+		expect( JSON.stringify( rosterState ) ).not.toMatch(
+			/rawContent|userId|raw_session_key|selection|cursor|Hidden High Count/
+		);
+	} );
+
+	it( 'preserves a local heartbeat row as delayed when an empty snapshot arrives first', () => {
+		const normalized =
+			getDistributedEditingSessionStateForPresenceSnapshotRefreshResult(
+				{
+					result: 'presence_roster_snapshot',
+					presenceRoster: {
+						status: 'empty',
+						freshness: 'unknown',
+						entries: [],
+						visibleCount: 0,
+						totalKnownCount: 0,
+						hiddenCount: 0,
+					},
+				},
+				{
+					presenceRosterEntries: [
+						{
+							key: 'presence-local-heartbeat-current-tab',
+							identityVisibility: 'self',
+							relationship: 'current_user_current_tab',
+							freshness: 'current',
+						},
+					],
+				}
+			);
+		const rosterState =
+			getDistributedEditingPresenceRosterStateForSessionState(
+				normalized
+			);
+
+		expect( normalized ).toMatchObject( {
+			presenceRosterRefreshStatus:
+				DISTRIBUTED_EDITING_PRESENCE_REFRESH_STATUSES.REFRESHED,
+			presenceRosterStatus:
+				DISTRIBUTED_EDITING_PRESENCE_ROSTER_STATUSES.RECENT,
+			presenceRosterVisibleCount: 1,
+			presenceRosterEntries: [
+				{
+					key: 'presence-local-heartbeat-current-tab',
+					relationship: 'current_user_current_tab',
+					freshness: 'recent',
+					exposesUserId: false,
+					exposesCursorOffset: false,
+					exposesSelection: false,
+					exposesRawContent: false,
+				},
+			],
+			presenceRosterRefreshCallsSave: false,
+			presenceRosterRefreshMutatesEditorContent: false,
+			presenceRosterRefreshChangesPostLock: false,
+			presenceRosterRefreshClaimsSaved: false,
+		} );
+		expect( rosterState ).toMatchObject( {
+			status: DISTRIBUTED_EDITING_PRESENCE_ROSTER_STATUSES.RECENT,
+			currentVisibleCount: 0,
+			delayedVisibleCount: 1,
+			copy: {
+				summary: 'Your presence may be delayed.',
+				countSummary: '1 editor may be delayed.',
+			},
+			claimsAbsence: false,
+			callsSave: false,
+			changesPostLock: false,
+			claimsSaved: false,
+		} );
+	} );
+
+	it( 'keeps protected local changes when presence heartbeat storage is unavailable', () => {
+		const normalized =
+			getDistributedEditingSessionStateForPresenceHeartbeatResult(
+				{
+					code: DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_PRESENCE_STORAGE_UNAVAILABLE,
+					message: 'Presence storage is unavailable.',
+					data: {
+						result: 'presence_storage_unavailable',
+						status: 503,
+						calls_rest_endpoint: true,
+						records_presence_heartbeat: false,
+						writes_presence: false,
+					},
+				},
+				{
+					pendingChangeCount: 1,
+					canExportLocalUpdates: true,
+					presenceRosterEntries: [
+						{
+							key: 'presence-existing',
+							displayName: 'Mira',
+							freshness: 'recent',
+						},
+					],
+				}
+			);
+
+		expect( normalized ).toMatchObject( {
+			pendingChangeCount: 1,
+			hasPendingChanges: true,
+			canExportLocalUpdates: true,
+			presenceRosterVisibleCount: 1,
+			presenceHeartbeatStatus:
+				DISTRIBUTED_EDITING_PRESENCE_HEARTBEAT_STATUSES.STORAGE_UNAVAILABLE,
+			presenceHeartbeatReason:
+				DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_PRESENCE_STORAGE_UNAVAILABLE,
+			presenceHeartbeatRequested: true,
+			presenceHeartbeatFailed: true,
+			presenceHeartbeatCallsRestEndpoint: true,
+			presenceHeartbeatRecordsPresenceHeartbeat: false,
+			presenceHeartbeatWritesPresence: false,
+			presenceHeartbeatCallsSave: false,
+			presenceHeartbeatMutatesEditorContent: false,
+			presenceHeartbeatChangesPostLock: false,
+			presenceHeartbeatClaimsSaved: false,
+			presenceHeartbeatRepeatedRefreshOptional: true,
+		} );
+	} );
+
+	it( 'keeps repeated presence cadence disabled by default with no runtime side effects', () => {
+		const normalized = normalizeDistributedEditingSessionState( {
+			distributedEditingPresenceRepeatedRefreshRuntime: {
+				explicitOptIn: false,
+				hostProfile: 'cheap_shared_host',
+				standardPollingIntervalSeconds: 30,
+				cheapHostPollingIntervalSeconds: 120,
+				heartbeatIntervalSeconds: 120,
+				callsPresenceReadEndpointNow: true,
+				callsHeartbeatEndpointNow: true,
+				writesHeartbeatNow: true,
+				startsPollingImmediately: true,
+				callsSave: true,
+				changesPostLock: true,
+				claimsSaved: true,
+				rawSessionKeyIncluded: true,
+			},
+		} );
+		const runtimeState =
+			getDistributedEditingPresenceRepeatedRefreshRuntimeStateForSessionState(
+				normalized
+			);
+
+		expect( runtimeState ).toMatchObject( {
+			status: DISTRIBUTED_EDITING_PRESENCE_REPEATED_REFRESH_RUNTIME_STATUSES.DISABLED_BY_DEFAULT,
+			localConnectionState:
+				DISTRIBUTED_EDITING_PRESENCE_REPEATED_REFRESH_CONNECTION_STATES.DISABLED,
+			requiresExplicitOptIn: true,
+			runtimeEnabledByDefault: false,
+			explicitOptIn: false,
+			hostProfile: 'cheap_shared_host',
+			selectedIntervalSeconds: 120,
+			selectedHeartbeatIntervalSeconds: 120,
+			schedulesNextRefresh: false,
+			schedulesNextHeartbeat: false,
+			callsPresenceReadEndpointNow: false,
+			callsHeartbeatEndpointNow: false,
+			recordsPresenceHeartbeatNow: false,
+			writesHeartbeatNow: false,
+			startsPollingImmediately: false,
+			repeatedRefreshOptional: true,
+			correctnessIndependentOfTransport: true,
+			transportRequiredForCorrectness: false,
+			dispatchesNotice: false,
+			callsSave: false,
+			mutatesEditorContent: false,
+			mutatesPersistedPostContent: false,
+			changesPostLock: false,
+			claimsAbsence: false,
+			claimsSaved: false,
+			exposesRawContent: false,
+			rawSessionKeyIncluded: false,
+			copy: {
+				label: 'Presence updates',
+				summary: 'Presence updates are off.',
+			},
+		} );
+	} );
+
+	it( 'records an explicit cheap-host repeated presence cadence as inert scheduled state', () => {
+		const sessionState =
+			getDistributedEditingSessionStateForPresenceRepeatedRefreshRuntimeConfig(
+				{
+					explicitOptIn: true,
+					hostProfile: 'cheap_shared_host',
+					standardPollingIntervalSeconds: 30,
+					cheapHostPollingIntervalSeconds: 120,
+					minimumPollingIntervalSeconds: 60,
+					heartbeatIntervalSeconds: 120,
+				},
+				{
+					pendingChangeCount: 1,
+					canExportLocalUpdates: true,
+				}
+			);
+		const runtimeState =
+			getDistributedEditingPresenceRepeatedRefreshRuntimeStateForSessionState(
+				sessionState
+			);
+
+		expect( sessionState ).toMatchObject( {
+			pendingChangeCount: 1,
+			canExportLocalUpdates: true,
+			presenceRepeatedRefreshRuntimeStatus:
+				DISTRIBUTED_EDITING_PRESENCE_REPEATED_REFRESH_RUNTIME_STATUSES.SCHEDULED,
+			presenceRepeatedRefreshLocalConnectionState:
+				DISTRIBUTED_EDITING_PRESENCE_REPEATED_REFRESH_CONNECTION_STATES.CONNECTED,
+			presenceRepeatedRefreshExplicitOptIn: true,
+			presenceRepeatedRefreshRuntimeEnabledByDefault: false,
+			presenceRepeatedRefreshSelectedIntervalSeconds: 120,
+			presenceRepeatedRefreshSelectedHeartbeatIntervalSeconds: 120,
+			presenceRepeatedRefreshStandardIntervalSeconds: 30,
+			presenceRepeatedRefreshCheapHostIntervalSeconds: 120,
+			presenceRepeatedRefreshMinimumIntervalSeconds: 60,
+			presenceRepeatedRefreshSchedulesNextRefresh: true,
+			presenceRepeatedRefreshSchedulesNextHeartbeat: true,
+			presenceRepeatedRefreshCallsPresenceReadEndpointNow: false,
+			presenceRepeatedRefreshCallsHeartbeatEndpointNow: false,
+			presenceRepeatedRefreshStartsPollingImmediately: false,
+			presenceRepeatedRefreshCallsSave: false,
+			presenceRepeatedRefreshChangesPostLock: false,
+			presenceRepeatedRefreshClaimsSaved: false,
+		} );
+		expect( runtimeState.copy.summary ).toBe(
+			'Presence updates are scheduled about every 120 seconds.'
+		);
+	} );
+
+	it( 'pauses repeated presence cadence while transport is degraded', () => {
+		const sessionState =
+			getDistributedEditingSessionStateForPresenceRepeatedRefreshRuntimeConfig(
+				{
+					explicitOptIn: true,
+					serverContact: 'degraded',
+					standardPollingIntervalSeconds: 30,
+					cheapHostPollingIntervalSeconds: 120,
+					heartbeatIntervalSeconds: 120,
+				}
+			);
+		const runtimeState =
+			getDistributedEditingPresenceRepeatedRefreshRuntimeStateForSessionState(
+				sessionState
+			);
+
+		expect( runtimeState ).toMatchObject( {
+			status: DISTRIBUTED_EDITING_PRESENCE_REPEATED_REFRESH_RUNTIME_STATUSES.PAUSED_DEGRADED_TRANSPORT,
+			localConnectionState:
+				DISTRIBUTED_EDITING_PRESENCE_REPEATED_REFRESH_CONNECTION_STATES.DEGRADED,
+			serverContact: 'degraded',
+			selectedIntervalSeconds: 30,
+			selectedHeartbeatIntervalSeconds: 120,
+			schedulesNextRefresh: false,
+			schedulesNextHeartbeat: false,
+			pausesOnDegradedTransport: true,
+			callsPresenceReadEndpointNow: false,
+			callsHeartbeatEndpointNow: false,
+			startsPollingImmediately: false,
+			callsSave: false,
+			changesPostLock: false,
+			claimsSaved: false,
+			copy: {
+				summary:
+					'Presence updates are paused while the connection is degraded.',
+			},
+		} );
+	} );
+
+	it( 'keeps initial presence startup manual by default without immediate side effects', () => {
+		const normalized = normalizeDistributedEditingSessionState( {
+			distributedEditingPresenceStartupPolicy: {
+				allowAutomaticInitialHeartbeat: false,
+				hostProfile: 'cheap_shared_host',
+				standardInitialHeartbeatDelaySeconds: 10,
+				cheapHostInitialHeartbeatDelaySeconds: 120,
+				minimumInitialHeartbeatDelaySeconds: 60,
+				callsHeartbeatEndpointNow: true,
+				writesPresenceNow: true,
+				startsPollingNow: true,
+				startsTimerNow: true,
+				callsSave: true,
+				changesPostLock: true,
+				claimsSaved: true,
+				rawSessionKeyIncluded: true,
+			},
+		} );
+		const startupPolicy =
+			getDistributedEditingPresenceStartupPolicyStateForSessionState(
+				normalized
+			);
+
+		expect( startupPolicy ).toMatchObject( {
+			status: DISTRIBUTED_EDITING_PRESENCE_STARTUP_POLICY_STATUSES.MANUAL_REQUIRED,
+			reason: 'cheap_host_requires_slow_startup',
+			requiresExplicitEnablement: true,
+			maySendInitialHeartbeatAutomatically: false,
+			slowAutomaticHeartbeatAllowed: false,
+			manualHeartbeatAvailable: true,
+			hostProfile: 'cheap_shared_host',
+			selectedInitialHeartbeatDelaySeconds: null,
+			callsHeartbeatEndpointNow: false,
+			recordsPresenceHeartbeatNow: false,
+			writesPresenceNow: false,
+			startsPollingNow: false,
+			startsTimerNow: false,
+			dispatchesNotice: false,
+			callsSave: false,
+			mutatesEditorContent: false,
+			mutatesPersistedPostContent: false,
+			changesPostLock: false,
+			claimsAbsence: false,
+			claimsSaved: false,
+			exposesRawContent: false,
+			rawSessionKeyIncluded: false,
+			correctnessIndependentOfTransport: true,
+			transportRequiredForCorrectness: false,
+			copy: {
+				label: 'Presence startup',
+				summary: 'Presence startup waits for a manual update.',
+			},
+		} );
+	} );
+
+	it( 'allows slow automatic initial presence only when cheap-host startup is explicit', () => {
+		const sessionState =
+			getDistributedEditingSessionStateForPresenceStartupPolicyConfig(
+				{
+					allowAutomaticInitialHeartbeat: true,
+					allowSlowAutomaticInitialHeartbeat: true,
+					hostProfile: 'cheap_shared_host',
+					standardInitialHeartbeatDelaySeconds: 10,
+					cheapHostInitialHeartbeatDelaySeconds: 120,
+					minimumInitialHeartbeatDelaySeconds: 60,
+				},
+				{
+					pendingChangeCount: 1,
+					canExportLocalUpdates: true,
+				}
+			);
+		const startupPolicy =
+			getDistributedEditingPresenceStartupPolicyStateForSessionState(
+				sessionState
+			);
+
+		expect( sessionState ).toMatchObject( {
+			pendingChangeCount: 1,
+			canExportLocalUpdates: true,
+			presenceStartupPolicyStatus:
+				DISTRIBUTED_EDITING_PRESENCE_STARTUP_POLICY_STATUSES.SLOW_AUTOMATIC_HEARTBEAT_ALLOWED,
+			presenceStartupPolicyReason: 'cheap_host_slow_startup_allowed',
+			presenceStartupPolicyMaySendInitialHeartbeatAutomatically: true,
+			presenceStartupPolicySlowAutomaticHeartbeatAllowed: true,
+			presenceStartupPolicySelectedInitialHeartbeatDelaySeconds: 120,
+			presenceStartupPolicyCallsHeartbeatEndpointNow: false,
+			presenceStartupPolicyWritesPresenceNow: false,
+			presenceStartupPolicyStartsPollingNow: false,
+			presenceStartupPolicyStartsTimerNow: false,
+			presenceStartupPolicyCallsSave: false,
+			presenceStartupPolicyChangesPostLock: false,
+			presenceStartupPolicyClaimsSaved: false,
+		} );
+		expect( startupPolicy.copy.summary ).toBe(
+			'Initial presence may start automatically after about 120 seconds on cheap hosts.'
+		);
+	} );
+
+	it( 'pauses initial presence startup policy while transport is degraded', () => {
+		const sessionState =
+			getDistributedEditingSessionStateForPresenceStartupPolicyConfig( {
+				allowAutomaticInitialHeartbeat: true,
+				serverContact: 'degraded',
+				standardInitialHeartbeatDelaySeconds: 10,
+			} );
+		const startupPolicy =
+			getDistributedEditingPresenceStartupPolicyStateForSessionState(
+				sessionState
+			);
+
+		expect( startupPolicy ).toMatchObject( {
+			status: DISTRIBUTED_EDITING_PRESENCE_STARTUP_POLICY_STATUSES.PAUSED_DEGRADED_TRANSPORT,
+			reason: 'transport_degraded',
+			serverContact: 'degraded',
+			maySendInitialHeartbeatAutomatically: false,
+			selectedInitialHeartbeatDelaySeconds: null,
+			callsHeartbeatEndpointNow: false,
+			writesPresenceNow: false,
+			startsPollingNow: false,
+			startsTimerNow: false,
+			callsSave: false,
+			changesPostLock: false,
+			claimsSaved: false,
+			copy: {
+				summary:
+					'Presence startup waits while server contact is degraded.',
+			},
+		} );
 	} );
 
 	it( 'normalizes pending state from runner-compatible conflict terms', () => {
@@ -2103,6 +3766,104 @@ describe( 'distributed editing session state', () => {
 		expect( descriptorJson ).not.toContain( 'reviewerId' );
 		expect( descriptorJson ).not.toContain( 'reviewedBlockItems' );
 		expect( descriptorJson ).not.toContain( 'fresh-risk-html' );
+	} );
+
+	it( 'opens safe fresh-review comparison state without exposing raw review content', () => {
+		const baseSerializedBlock =
+			'<!-- wp:paragraph --><p>Original board-safe paragraph.</p><!-- /wp:paragraph -->';
+		const proposedSerializedBlock =
+			'<!-- wp:paragraph --><p>Updated board-safe paragraph.</p><!-- /wp:paragraph -->';
+		const requestedState =
+			getDistributedEditingSessionStateForFreshReviewDecisionItems(
+				{
+					pendingChangeCount: 1,
+					hasPendingChanges: true,
+					canExportLocalUpdates: true,
+					localUpdatesImportStatus:
+						DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_STATUSES.BLOCKED,
+					localUpdatesImportReason:
+						DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.FRESH_REVIEW_REQUIRED,
+					localUpdatesImportReviewRequestStatus:
+						DISTRIBUTED_EDITING_LOCAL_UPDATES_REVIEW_REQUEST_STATUSES.REQUESTED,
+					localUpdatesImportFreshReviewRequestAccepted: true,
+					localUpdatesImportFreshReviewRequestRequested: true,
+				},
+				{
+					reviewItems: [
+						{
+							id: 'fresh-safe-paragraph',
+							blockClientId: 'fresh-safe-paragraph-client',
+							blockName: 'core/paragraph',
+							blockLabel: 'Safe paragraph change',
+							baseContentHash:
+								'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+							proposedContentHash:
+								'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb',
+							baseSerializedBlock,
+							proposedSerializedBlock,
+							privacyClass: 'synthetic-content',
+						},
+					],
+				}
+			);
+		const decisionState =
+			getDistributedEditingFreshReviewDecisionStateForSessionState(
+				requestedState
+			);
+		const reviewItem = decisionState.reviewItems[ 0 ];
+
+		expect( reviewItem ).toMatchObject( {
+			id: 'fresh-safe-paragraph',
+			canCompare: true,
+			compareAction: expect.objectContaining( {
+				actionKey:
+					DISTRIBUTED_EDITING_NOTICE_ACTIONS.COMPARE_FRESH_REVIEW_ITEM,
+				canOpenReadOnlyComparisonSurface: true,
+				callsRestEndpoint: false,
+				callsSave: false,
+				callsRetrySaveEndpoint: false,
+				callsNormalSavePost: false,
+				dispatchesNotice: false,
+				mutatesEditorContent: false,
+				mutatesPersistedPostContent: false,
+				selectsBlock: false,
+				movesFocus: false,
+				opensComparison: true,
+				claimsSaved: false,
+				exposesRawContent: false,
+				comparisonSurface: expect.objectContaining( {
+					status: 'ready',
+					mode: 'read_only_side_by_side_block_review',
+					itemId: 'fresh-safe-paragraph',
+					baseText: baseSerializedBlock,
+					proposedText: proposedSerializedBlock,
+					canOpenComparisonSurface: true,
+					readOnly: true,
+					renderable: true,
+					rendersDiff: false,
+					derivesPatch: false,
+					callsRestEndpoint: false,
+					callsSave: false,
+					mutatesEditorContent: false,
+					mutatesPersistedPostContent: false,
+					changesPostLock: false,
+					claimsSaved: false,
+					rawContentIncluded: false,
+					exposesRawContent: false,
+				} ),
+				comparePlan: expect.objectContaining( {
+					canOpenReadOnlyComparisonSurface: true,
+					opensComparison: true,
+					callsRestEndpoint: false,
+					callsSave: false,
+					mutatesEditorContent: false,
+					mutatesPersistedPostContent: false,
+					claimsSaved: false,
+				} ),
+			} ),
+			rawContentIncluded: false,
+			exposesRawContent: false,
+		} );
 	} );
 
 	it( 'records fresh-review approve and reject decisions as hash-only local evidence', () => {
@@ -5479,7 +7240,7 @@ describe( 'distributed editing session state', () => {
 		} );
 		expect( buttonStates.retrySaveConfirmed ).toMatchObject( {
 			status: DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES.RETRY_SAVE_CONFIRMED,
-			label: 'Retry save confirmed',
+			label: 'Save confirmed',
 			disabled: true,
 			blocksNormalSavePost: true,
 			hasRetrySaveSavedStateEvidence: true,
@@ -6909,7 +8670,7 @@ describe( 'distributed editing session state', () => {
 			status: 'available',
 			available: true,
 			chronologyStatus: 'fresh_review_guarded_save_confirmed',
-			latestEventLabel: 'Fresh-review guarded save confirmed',
+			latestEventLabel: 'Fresh-review Save confirmed',
 			timelineItemCount: 4,
 			droppedItemCount: 3,
 			canShareWithSupport: true,
@@ -8398,6 +10159,106 @@ describe( 'distributed editing selectors', () => {
 		} );
 	} );
 
+	it( 'selects presence roster state without transport side effects', () => {
+		const state = {
+			distributedEditingSession: normalizeDistributedEditingSessionState(
+				{
+					presenceRosterEntries: [
+						{
+							key: 'presence-other-tab',
+							relationship: 'same_user_other_tab',
+							freshness: 'current',
+						},
+					],
+				}
+			),
+		};
+
+		expect(
+			getDistributedEditingPresenceRosterState( state )
+		).toMatchObject( {
+			status: DISTRIBUTED_EDITING_PRESENCE_ROSTER_STATUSES.ACTIVE,
+			copy: {
+				summary: 'You have this post open in another tab.',
+			},
+			callsRestEndpoint: false,
+			callsSave: false,
+			mutatesEditorContent: false,
+			changesPostLock: false,
+			claimsSaved: false,
+		} );
+	} );
+
+	it( 'selects repeated presence cadence runtime state without transport side effects', () => {
+		const state = {
+			distributedEditingSession: normalizeDistributedEditingSessionState(
+				{
+					distributedEditingPresenceRepeatedRefreshRuntime: {
+						explicitOptIn: true,
+						hostProfile: 'cheap_shared_host',
+						standardPollingIntervalSeconds: 30,
+						cheapHostPollingIntervalSeconds: 120,
+						heartbeatIntervalSeconds: 120,
+					},
+				}
+			),
+		};
+
+		expect(
+			getDistributedEditingPresenceRepeatedRefreshRuntimeState( state )
+		).toMatchObject( {
+			status: DISTRIBUTED_EDITING_PRESENCE_REPEATED_REFRESH_RUNTIME_STATUSES.SCHEDULED,
+			localConnectionState:
+				DISTRIBUTED_EDITING_PRESENCE_REPEATED_REFRESH_CONNECTION_STATES.CONNECTED,
+			selectedIntervalSeconds: 120,
+			selectedHeartbeatIntervalSeconds: 120,
+			schedulesNextRefresh: true,
+			schedulesNextHeartbeat: true,
+			callsPresenceReadEndpointNow: false,
+			callsHeartbeatEndpointNow: false,
+			startsPollingImmediately: false,
+			callsSave: false,
+			mutatesEditorContent: false,
+			changesPostLock: false,
+			claimsSaved: false,
+		} );
+	} );
+
+	it( 'selects initial presence startup policy state without transport side effects', () => {
+		const state = {
+			distributedEditingSession: normalizeDistributedEditingSessionState(
+				{
+					distributedEditingPresenceStartupPolicy: {
+						allowAutomaticInitialHeartbeat: true,
+						allowSlowAutomaticInitialHeartbeat: true,
+						hostProfile: 'cheap_shared_host',
+						standardInitialHeartbeatDelaySeconds: 10,
+						cheapHostInitialHeartbeatDelaySeconds: 120,
+						minimumInitialHeartbeatDelaySeconds: 60,
+					},
+				}
+			),
+		};
+
+		expect(
+			getDistributedEditingPresenceStartupPolicyState( state )
+		).toMatchObject( {
+			status: DISTRIBUTED_EDITING_PRESENCE_STARTUP_POLICY_STATUSES.SLOW_AUTOMATIC_HEARTBEAT_ALLOWED,
+			reason: 'cheap_host_slow_startup_allowed',
+			maySendInitialHeartbeatAutomatically: true,
+			slowAutomaticHeartbeatAllowed: true,
+			selectedInitialHeartbeatDelaySeconds: 120,
+			callsHeartbeatEndpointNow: false,
+			writesPresenceNow: false,
+			startsPollingNow: false,
+			startsTimerNow: false,
+			callsSave: false,
+			mutatesEditorContent: false,
+			changesPostLock: false,
+			claimsSaved: false,
+		} );
+	} );
+
 	it( 'selects conflict and copy/export requirements from session state', () => {
 		const state = {
 			distributedEditingSession: normalizeDistributedEditingSessionState(
@@ -8785,7 +10646,7 @@ describe( 'distributed editing selectors', () => {
 				actionTranscriptReportContext: expect.objectContaining( {
 					available: true,
 					chronologyStatus: 'fresh_review_guarded_save_confirmed',
-					latestEventLabel: 'Fresh-review guarded save confirmed',
+					latestEventLabel: 'Fresh-review Save confirmed',
 					timelineItemCount: 4,
 					droppedItemCount: 2,
 					canShareWithSupport: true,

@@ -1,0 +1,109 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+
+.editor-distributed-editing-status__presence-roster-list {
+	display: grid;
+	gap: $grid-unit-05;
+	list-style: none;
+	margin: $grid-unit-10 0 0;
+	padding: 0;
+}
+
+.editor-distributed-editing-status__presence-roster-item {
+	align-items: center;
+	background: $white;
+	border: 1px solid $gray-300;
+	border-left: 3px solid $gray-700;
+	border-radius: $radius-small;
+	display: flex;
+	gap: $grid-unit-10;
+	margin: 0;
+	min-height: $grid-unit-50;
+	padding: $grid-unit-05 $grid-unit-10;
+}
+
+.editor-distributed-editing-status__presence-roster-item--current {
+	background: #f0f6fc;
+	border-left-color: var(--wp-admin-theme-color, #2271b1);
+}
+
+.editor-distributed-editing-status__presence-roster-item--delayed {
+	background: #fcf9e8;
+	border-left-color: #dba617;
+}
+
+.editor-distributed-editing-status__presence-roster-avatar {
+	align-items: center;
+	background: $gray-700;
+	border-radius: 50%;
+	color: $white;
+	display: inline-flex;
+	flex: 0 0 $grid-unit-30;
+	font-size: 11px;
+	font-weight: 600;
+	height: $grid-unit-30;
+	justify-content: center;
+	line-height: 1;
+	width: $grid-unit-30;
+}
+
+.editor-distributed-editing-status__presence-roster-avatar--current {
+	background: var(--wp-admin-theme-color, #2271b1);
+}
+
+.editor-distributed-editing-status__presence-roster-avatar--delayed {
+	background: #996800;
+}
+
+.editor-distributed-editing-status__presence-roster-entry {
+	align-items: baseline;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0 $grid-unit-10;
+	min-width: 0;
+}
+
+.editor-distributed-editing-status__presence-roster-name {
+	font-weight: 500;
+	overflow-wrap: anywhere;
+}
+
+.editor-distributed-editing-status__presence-roster-badge {
+	align-items: center;
+	color: $gray-700;
+	display: inline-flex;
+	font-size: $helptext-font-size;
+	gap: $grid-unit-05;
+}
+
+.editor-distributed-editing-status__presence-roster-badge::before {
+	background: currentColor;
+	border-radius: 50%;
+	content: "";
+	display: inline-block;
+	flex: 0 0 0.5em;
+	height: 0.5em;
+	width: 0.5em;
+}
+
+.editor-distributed-editing-status__presence-roster-badge--current {
+	color: var(--wp-admin-theme-color, #2271b1);
+}
+
+.editor-distributed-editing-status__presence-roster-badge--delayed {
+	color: #996800;
+}
+
+.editor-distributed-editing-status__presence-storage-setup-affordance {
+	background: #f0f6fc;
+	border: 1px solid #72aee6;
+	border-radius: $radius-small;
+	display: grid;
+	gap: $grid-unit-05;
+	margin-top: $grid-unit-10;
+	padding: $grid-unit-10;
+}
+
+.editor-distributed-editing-status__next-step {
+	margin-top: $grid-unit-05;
+}

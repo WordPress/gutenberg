@@ -28,6 +28,9 @@ import {
 	__experimentalRequestDistributedEditingFreshReviewDecision as requestDistributedEditingFreshReviewDecision,
 	__experimentalRequestDistributedEditingFreshReviewForImportedLocalUpdates as requestDistributedEditingFreshReviewForImportedLocalUpdates,
 	__experimentalRequestDistributedEditingFreshReviewRetrySaveHandoffValidation as requestDistributedEditingFreshReviewRetrySaveHandoffValidation,
+	__experimentalRequestDistributedEditingPresenceHeartbeat as requestDistributedEditingPresenceHeartbeat,
+	__experimentalRequestDistributedEditingPresenceSnapshot as requestDistributedEditingPresenceSnapshot,
+	__experimentalRequestDistributedEditingPresenceStorageReadiness as requestDistributedEditingPresenceStorageReadiness,
 	__experimentalRequestDistributedEditingRecoveryDryRun as requestDistributedEditingRecoveryDryRun,
 	__experimentalRequestDistributedEditingRetrySave as requestDistributedEditingRetrySave,
 	__experimentalRequestDistributedEditingRetrySaveReviewApprovalProof as requestDistributedEditingRetrySaveReviewApprovalProof,
@@ -45,6 +48,11 @@ import {
 	getDistributedEditingSessionStateForFreshReviewRetrySaveHandoffValidation,
 	getDistributedEditingSessionStateForFreshReviewRetrySaveHandoffValidationResult,
 	getDistributedEditingSessionStateForFreshReviewRequestResult,
+	getDistributedEditingSessionStateForPresenceHeartbeatResult,
+	getDistributedEditingSessionStateForPresenceRepeatedRefreshRuntimeConfig,
+	getDistributedEditingSessionStateForPresenceStorageReadinessRecheckResult,
+	getDistributedEditingSessionStateForPresenceStartupPolicyConfig,
+	getDistributedEditingSessionStateForPresenceSnapshotRefreshResult,
 	getDistributedEditingSessionStateForRetrySaveReviewApprovalProofResult,
 	getDistributedEditingSessionStateForRetrySaveRequest,
 	getDistributedEditingSessionStateForRetrySaveResult,
@@ -61,11 +69,13 @@ import {
 	getDistributedEditingRetrySavePolicyForSessionState,
 	getDistributedEditingSessionStateWithActionTranscriptEvent,
 	DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES,
+	DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES,
 	DISTRIBUTED_EDITING_LOCAL_UPDATES_REVIEW_REQUEST_STATUSES,
 	DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_STATUSES,
 	DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES,
 	DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS,
 	DISTRIBUTED_EDITING_SAVE_POLICY_STATUSES,
+	DISTRIBUTED_EDITING_REASON_CODES,
 	getDistributedEditingStaleBaseLocalRebaseResult,
 	getDistributedEditingSessionStateForStaleBaseLocalRebasePlan,
 	getDistributedEditingSessionStateForStaleBaseRejectionResult,
@@ -80,6 +90,22 @@ import {
 import { unlock } from '../lock-unlock';
 
 const distributedEditingFreshReviewImportContentVault = new Map();
+let distributedEditingPresenceSessionKey;
+
+function getDistributedEditingPresenceSessionKey() {
+	if ( ! distributedEditingPresenceSessionKey ) {
+		const randomUuid = globalThis.crypto?.randomUUID;
+		distributedEditingPresenceSessionKey =
+			typeof randomUuid === 'function'
+				? randomUuid.call( globalThis.crypto )
+				: `de-rtc-presence-${ Date.now() }-${ Math.random()
+						.toString( 36 )
+						.slice( 2 ) }`;
+	}
+
+	return distributedEditingPresenceSessionKey;
+}
+
 /**
  * Returns an action generator used in signalling that editor has initialized with
  * the specified post object and editor settings.
@@ -983,6 +1009,297 @@ export const __experimentalRefreshDistributedEditingRecoveryDryRun =
 	};
 
 /**
+ * Requests a read-only Distributed Editing presence snapshot and stores local
+ * roster descriptors. The action is explicit and one-shot: it does not start
+ * polling, write heartbeats, save, mutate editor content, dispatch global
+ * notices, persist editor state, or change post locks.
+ *
+ * @param {Object} [options] Request options.
+ *
+ * @return {Function} Action thunk.
+ */
+export const __experimentalRefreshDistributedEditingPresenceSnapshot =
+	( options = {} ) =>
+	async ( { select, dispatch, registry } ) => {
+		const currentPost = select.getCurrentPost?.() || {};
+		const postType = options.postType || currentPost.type;
+		const postId = options.postId ?? currentPost.id;
+		const postTypeRecord = postType
+			? registry.select( coreStore ).getPostType( postType )
+			: null;
+		const restBase =
+			options.restBase ||
+			postTypeRecord?.rest_base ||
+			DISTRIBUTED_EDITING_RECOVERY_REST_BASE;
+		const currentSessionState =
+			select.getDistributedEditingSessionState?.() || {};
+
+		try {
+			const response = await requestDistributedEditingPresenceSnapshot( {
+				postId,
+				restBase,
+				sessionKey:
+					options.sessionKey ||
+					getDistributedEditingPresenceSessionKey(),
+			} );
+
+			dispatch.setDistributedEditingSessionState(
+				getDistributedEditingSessionStateForPresenceSnapshotRefreshResult(
+					response,
+					currentSessionState
+				)
+			);
+
+			return response;
+		} catch ( error ) {
+			dispatch.setDistributedEditingSessionState(
+				getDistributedEditingSessionStateForPresenceSnapshotRefreshResult(
+					error,
+					currentSessionState
+				)
+			);
+
+			throw error;
+		}
+	};
+
+/**
+ * Re-checks read-only Distributed Editing presence storage readiness and stores
+ * only local descriptors. The action is explicit and one-shot: it does not
+ * install storage, write presence, start polling, save, mutate editor content,
+ * dispatch global notices, persist editor state, or change post locks.
+ *
+ * @param {Object} [options] Request options.
+ *
+ * @return {Function} Action thunk.
+ */
+export const __experimentalRefreshDistributedEditingPresenceStorageReadiness =
+	( options = {} ) =>
+	async ( { select, dispatch, registry } ) => {
+		const currentPost = select.getCurrentPost?.() || {};
+		const postType = options.postType || currentPost.type;
+		const postId = options.postId ?? currentPost.id;
+		const postTypeRecord = postType
+			? registry.select( coreStore ).getPostType( postType )
+			: null;
+		const restBase =
+			options.restBase ||
+			postTypeRecord?.rest_base ||
+			DISTRIBUTED_EDITING_RECOVERY_REST_BASE;
+		const currentSessionState =
+			select.getDistributedEditingSessionState?.() || {};
+
+		try {
+			const response =
+				await requestDistributedEditingPresenceStorageReadiness( {
+					postId,
+					restBase,
+				} );
+
+			dispatch.setDistributedEditingSessionState(
+				getDistributedEditingSessionStateForPresenceStorageReadinessRecheckResult(
+					response,
+					currentSessionState
+				)
+			);
+
+			return response;
+		} catch ( error ) {
+			dispatch.setDistributedEditingSessionState(
+				getDistributedEditingSessionStateForPresenceStorageReadinessRecheckResult(
+					error,
+					currentSessionState
+				)
+			);
+
+			throw error;
+		}
+	};
+
+/**
+ * Sends a one-shot Distributed Editing presence heartbeat and stores local
+ * command status. The action is gated by the editor's Distributed Editing
+ * setting and does not start polling, save, mutate editor content, dispatch
+ * global notices, persist editor state, or change post locks.
+ *
+ * @param {Object} [options] Request options.
+ *
+ * @return {Function} Action thunk.
+ */
+export const __experimentalSendDistributedEditingPresenceHeartbeat =
+	( options = {} ) =>
+	async ( { select, dispatch, registry } ) => {
+		const currentPost = select.getCurrentPost?.() || {};
+		const postType = options.postType || currentPost.type;
+		const postId = options.postId ?? currentPost.id;
+		const postTypeRecord = postType
+			? registry.select( coreStore ).getPostType( postType )
+			: null;
+		const restBase =
+			options.restBase ||
+			postTypeRecord?.rest_base ||
+			DISTRIBUTED_EDITING_RECOVERY_REST_BASE;
+		const currentSessionState =
+			select.getDistributedEditingSessionState?.() || {};
+		const editorSettings = select.getEditorSettings?.() || {};
+		const distributedEditingEnabled =
+			options.distributedEditingEnabled ??
+			editorSettings.distributedEditing?.enabled;
+
+		if ( ! distributedEditingEnabled ) {
+			const response = {
+				code: DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_FEATURE_DISABLED,
+				detail: 'feature_disabled_for_post',
+				result: 'presence_heartbeat_skipped',
+				calls_rest_endpoint: false,
+			};
+
+			dispatch.setDistributedEditingSessionState(
+				getDistributedEditingSessionStateForPresenceHeartbeatResult(
+					response,
+					currentSessionState
+				)
+			);
+
+			return response;
+		}
+
+		try {
+			const response = await requestDistributedEditingPresenceHeartbeat( {
+				postId,
+				restBase,
+				sessionKey:
+					options.sessionKey ||
+					getDistributedEditingPresenceSessionKey(),
+			} );
+
+			dispatch.setDistributedEditingSessionState(
+				getDistributedEditingSessionStateForPresenceHeartbeatResult(
+					response,
+					currentSessionState
+				)
+			);
+
+			return response;
+		} catch ( error ) {
+			dispatch.setDistributedEditingSessionState(
+				getDistributedEditingSessionStateForPresenceHeartbeatResult(
+					error,
+					currentSessionState
+				)
+			);
+
+			throw error;
+		}
+	};
+
+/**
+ * Stores a local repeated presence cadence runtime configuration.
+ *
+ * This action is an inert state handoff only. It does not start timers, call
+ * REST, write heartbeats, save, mutate editor content, dispatch notices,
+ * persist editor state, or change post locks.
+ *
+ * @param {Object} [runtimeConfig] Runtime cadence configuration.
+ *
+ * @return {Function} Action thunk.
+ */
+export const __experimentalConfigureDistributedEditingPresenceRepeatedRefreshRuntime =
+
+		( runtimeConfig = {} ) =>
+		( { select, dispatch } ) => {
+			const currentSessionState =
+				select.getDistributedEditingSessionState?.() || {};
+			const sessionState =
+				getDistributedEditingSessionStateForPresenceRepeatedRefreshRuntimeConfig(
+					runtimeConfig,
+					currentSessionState
+				);
+
+			dispatch.setDistributedEditingSessionState( sessionState );
+
+			return {
+				status: sessionState.presenceRepeatedRefreshRuntimeStatus,
+				localConnectionState:
+					sessionState.presenceRepeatedRefreshLocalConnectionState,
+				selectedIntervalSeconds:
+					sessionState.presenceRepeatedRefreshSelectedIntervalSeconds,
+				selectedHeartbeatIntervalSeconds:
+					sessionState.presenceRepeatedRefreshSelectedHeartbeatIntervalSeconds,
+				schedulesNextRefresh:
+					sessionState.presenceRepeatedRefreshSchedulesNextRefresh,
+				schedulesNextHeartbeat:
+					sessionState.presenceRepeatedRefreshSchedulesNextHeartbeat,
+				callsPresenceReadEndpointNow: false,
+				callsHeartbeatEndpointNow: false,
+				recordsPresenceHeartbeatNow: false,
+				writesHeartbeatNow: false,
+				startsPollingImmediately: false,
+				dispatchesNotice: false,
+				callsSave: false,
+				mutatesEditorContent: false,
+				mutatesPersistedPostContent: false,
+				changesPostLock: false,
+				claimsAbsence: false,
+				claimsSaved: false,
+				exposesRawContent: false,
+				rawSessionKeyIncluded: false,
+				sessionState,
+			};
+		};
+
+/**
+ * Stores a local initial-presence startup policy configuration.
+ *
+ * This action is an inert state handoff only. It does not start timers, call
+ * REST, write heartbeats, save, mutate editor content, dispatch notices,
+ * persist editor state, or change post locks.
+ *
+ * @param {Object} [policyConfig] Startup policy configuration.
+ *
+ * @return {Function} Action thunk.
+ */
+export const __experimentalConfigureDistributedEditingPresenceStartupPolicy =
+	( policyConfig = {} ) =>
+	( { select, dispatch } ) => {
+		const currentSessionState =
+			select.getDistributedEditingSessionState?.() || {};
+		const sessionState =
+			getDistributedEditingSessionStateForPresenceStartupPolicyConfig(
+				policyConfig,
+				currentSessionState
+			);
+
+		dispatch.setDistributedEditingSessionState( sessionState );
+
+		return {
+			status: sessionState.presenceStartupPolicyStatus,
+			reason: sessionState.presenceStartupPolicyReason,
+			maySendInitialHeartbeatAutomatically:
+				sessionState.presenceStartupPolicyMaySendInitialHeartbeatAutomatically,
+			slowAutomaticHeartbeatAllowed:
+				sessionState.presenceStartupPolicySlowAutomaticHeartbeatAllowed,
+			selectedInitialHeartbeatDelaySeconds:
+				sessionState.presenceStartupPolicySelectedInitialHeartbeatDelaySeconds,
+			callsHeartbeatEndpointNow: false,
+			recordsPresenceHeartbeatNow: false,
+			writesPresenceNow: false,
+			startsPollingNow: false,
+			startsTimerNow: false,
+			dispatchesNotice: false,
+			callsSave: false,
+			mutatesEditorContent: false,
+			mutatesPersistedPostContent: false,
+			changesPostLock: false,
+			claimsAbsence: false,
+			claimsSaved: false,
+			exposesRawContent: false,
+			rawSessionKeyIncluded: false,
+			sessionState,
+		};
+	};
+
+/**
  * Requests a Distributed Editing stale-base rejection contract and stores state.
  *
  * The action does not save, apply recovery, refetch, rebase, retry, dispatch
@@ -1155,9 +1472,24 @@ export const __experimentalRebaseDistributedEditingLocalUpdatesAfterStaleBase =
 			);
 		}
 
-		dispatch.setDistributedEditingSessionState( result.sessionState );
+		const nextSessionState =
+			result.status ===
+			DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.REBASED
+				? getDistributedEditingSessionStateWithActionTranscriptEvent(
+						result.sessionState,
+						{
+							eventType:
+								DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.LOCAL_CHANGES_APPLIED,
+						}
+				  )
+				: result.sessionState;
 
-		return result;
+		dispatch.setDistributedEditingSessionState( nextSessionState );
+
+		return {
+			...result,
+			sessionState: nextSessionState,
+		};
 	};
 
 /**
@@ -1927,20 +2259,29 @@ export const __experimentalPrepareDistributedEditingRetrySubmitAfterLocalRebase 
 				getDistributedEditingSessionStateForRetrySubmitHandoff(
 					currentSessionState
 				);
+			const nextSessionState = sessionState.retrySubmitPrepared
+				? getDistributedEditingSessionStateWithActionTranscriptEvent(
+						sessionState,
+						{
+							eventType:
+								DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.LOCAL_CHANGES_STAGED,
+						}
+				  )
+				: sessionState;
 
-			dispatch.setDistributedEditingSessionState( sessionState );
+			dispatch.setDistributedEditingSessionState( nextSessionState );
 
 			return {
-				status: sessionState.retrySubmitHandoffStatus,
-				reason: sessionState.retrySubmitHandoffReason,
+				status: nextSessionState.retrySubmitHandoffStatus,
+				reason: nextSessionState.retrySubmitHandoffReason,
 				consumesReadyToRetrySubmit:
 					Boolean( currentSessionState.readyToRetrySubmit ) &&
-					sessionState.retrySubmitPrepared,
+					nextSessionState.retrySubmitPrepared,
 				submitsToServer: false,
 				savesPost: false,
 				mutatesPersistedPostContent: false,
 				claimsSaved: false,
-				sessionState,
+				sessionState: nextSessionState,
 			};
 		};
 	};
@@ -2050,20 +2391,29 @@ export const __experimentalPrepareDistributedEditingRetrySubmitSaveAfterProof =
 			getDistributedEditingSessionStateForRetrySubmitSavePreparation(
 				currentSessionState
 			);
+		const nextSessionState = sessionState.retrySubmitSaveReady
+			? getDistributedEditingSessionStateWithActionTranscriptEvent(
+					sessionState,
+					{
+						eventType:
+							DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.SAVE_PREPARED,
+					}
+			  )
+			: sessionState;
 
-		dispatch.setDistributedEditingSessionState( sessionState );
+		dispatch.setDistributedEditingSessionState( nextSessionState );
 
 		return {
-			status: sessionState.retrySubmitSaveStatus,
-			reason: sessionState.retrySubmitSaveReason,
+			status: nextSessionState.retrySubmitSaveStatus,
+			reason: nextSessionState.retrySubmitSaveReason,
 			consumesAcceptedProof:
 				Boolean( currentSessionState.retrySubmitAccepted ) &&
-				sessionState.retrySubmitSaveReady,
+				nextSessionState.retrySubmitSaveReady,
 			submitsToServer: false,
 			savesPost: false,
 			mutatesPersistedPostContent: false,
 			claimsSaved: false,
-			sessionState,
+			sessionState: nextSessionState,
 		};
 	};
 
@@ -2306,7 +2656,9 @@ export const __experimentalSaveDistributedEditingRetryAfterProof =
 					retrySaveResultSessionState,
 					{
 						eventType:
-							DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.SAVE_STATE_CHANGED,
+							response?.result === 'retry_save_applied'
+								? DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.SAVE_CONFIRMED
+								: DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.SAVE_STATE_CHANGED,
 						reasonCode: retrySaveResultSessionState.retrySaveReason,
 					}
 				);

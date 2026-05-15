@@ -10,6 +10,9 @@ import {
 	__experimentalRequestDistributedEditingRecoveryDryRun,
 	__experimentalRequestDistributedEditingFreshReviewDecision,
 	__experimentalRequestDistributedEditingFreshReviewRetrySaveHandoffValidation,
+	__experimentalRequestDistributedEditingPresenceHeartbeat,
+	__experimentalRequestDistributedEditingPresenceSnapshot,
+	__experimentalRequestDistributedEditingPresenceStorageReadiness,
 	__experimentalRequestDistributedEditingRetrySave,
 	__experimentalRequestDistributedEditingRetrySaveReviewApprovalProof,
 	__experimentalRequestDistributedEditingRetrySubmitProbe,
@@ -17,6 +20,9 @@ import {
 	__experimentalRequestDistributedEditingStaleBaseRejection,
 	getDistributedEditingFreshReviewConsumeEndpointPath,
 	getDistributedEditingFreshReviewDecisionEndpointPath,
+	getDistributedEditingPresenceHeartbeatEndpointPath,
+	getDistributedEditingPresenceEndpointPath,
+	getDistributedEditingPresenceStorageReadinessEndpointPath,
 	getDistributedEditingRecoveryEndpointPath,
 	getDistributedEditingRetrySaveEndpointPath,
 	getDistributedEditingRetrySaveReviewApprovalEndpointPath,
@@ -105,6 +111,35 @@ describe( 'distributed editing REST helpers', () => {
 		).toBe( '/wp/v2/pages/42' );
 	} );
 
+	it( 'builds the current presence snapshot endpoint path', () => {
+		expect(
+			getDistributedEditingPresenceEndpointPath( {
+				postId: 42,
+				restBase: 'pages',
+			} )
+		).toBe( '/wp/v2/pages/42/distributed-editing/presence' );
+	} );
+
+	it( 'builds the current presence heartbeat endpoint path', () => {
+		expect(
+			getDistributedEditingPresenceHeartbeatEndpointPath( {
+				postId: 42,
+				restBase: 'pages',
+			} )
+		).toBe( '/wp/v2/pages/42/distributed-editing/presence/heartbeat' );
+	} );
+
+	it( 'builds the current presence storage readiness endpoint path', () => {
+		expect(
+			getDistributedEditingPresenceStorageReadinessEndpointPath( {
+				postId: 42,
+				restBase: 'pages',
+			} )
+		).toBe(
+			'/wp/v2/pages/42/distributed-editing/presence/storage-readiness'
+		);
+	} );
+
 	it( 'rejects unsupported REST bases until WordPress exposes them', () => {
 		expect( () =>
 			getDistributedEditingRecoveryEndpointPath( {
@@ -144,6 +179,173 @@ describe( 'distributed editing REST helpers', () => {
 			mode: 'dry_run',
 			result: 'candidate_update_valid',
 		} );
+	} );
+
+	it( 'requests a presence snapshot without write data or polling', async () => {
+		apiFetch.setFetchHandler( async ( options ) => {
+			expect( options.path ).toMatch(
+				/^\/wp\/v2\/pages\/42\/distributed-editing\/presence/
+			);
+			expect( options.method ).toBe( 'GET' );
+			expect( options.data ).toBeUndefined();
+
+			return {
+				result: 'presence_roster_snapshot',
+				rest_route: 'post_presence_roster',
+				presence_roster: {
+					status: 'recent',
+					entries: [
+						{
+							key: 'presence-mira',
+							displayName: 'Mira',
+							freshness: 'recent',
+						},
+					],
+				},
+				read_only: true,
+				records_presence_heartbeat: false,
+				enables_repeated_client_refresh: false,
+			};
+		} );
+
+		await expect(
+			__experimentalRequestDistributedEditingPresenceSnapshot( {
+				postId: 42,
+				restBase: 'pages',
+			} )
+		).resolves.toEqual(
+			expect.objectContaining( {
+				result: 'presence_roster_snapshot',
+				read_only: true,
+				records_presence_heartbeat: false,
+				enables_repeated_client_refresh: false,
+			} )
+		);
+	} );
+
+	it( 'requests a presence snapshot with only the opaque current session key in the query string', async () => {
+		apiFetch.setFetchHandler( async ( options ) => {
+			const url = new URL( options.path, 'https://example.test' );
+			expect( url.pathname ).toBe(
+				'/wp/v2/pages/42/distributed-editing/presence'
+			);
+			expect( url.searchParams.get( 'session_key' ) ).toBe(
+				'turn-0198-current-tab'
+			);
+			expect( options.method ).toBe( 'GET' );
+			expect( options.data ).toBeUndefined();
+
+			return {
+				result: 'presence_roster_snapshot',
+				rest_route: 'post_presence_roster',
+				accepts_current_session_key: true,
+				current_session_key_compared_by_hash: true,
+				raw_session_key_included: false,
+			};
+		} );
+
+		await expect(
+			__experimentalRequestDistributedEditingPresenceSnapshot( {
+				postId: 42,
+				restBase: 'pages',
+				sessionKey: 'turn-0198-current-tab',
+			} )
+		).resolves.toEqual(
+			expect.objectContaining( {
+				result: 'presence_roster_snapshot',
+				accepts_current_session_key: true,
+				current_session_key_compared_by_hash: true,
+				raw_session_key_included: false,
+			} )
+		);
+	} );
+
+	it( 'sends a presence heartbeat without content, cursor, selection, or save data', async () => {
+		apiFetch.setFetchHandler( async ( options ) => {
+			expect( options.path ).toMatch(
+				/^\/wp\/v2\/pages\/42\/distributed-editing\/presence\/heartbeat/
+			);
+			expect( options.method ).toBe( 'POST' );
+			expect( options.data ).toEqual( {
+				session_key: 'turn-0173-session',
+			} );
+			expect( options.data ).not.toHaveProperty(
+				'proposed_post_content'
+			);
+			expect( options.data ).not.toHaveProperty( 'cursor_offset' );
+			expect( options.data ).not.toHaveProperty( 'selection' );
+
+			return {
+				result: 'presence_heartbeat_recorded',
+				rest_route: 'post_presence_heartbeat',
+				writes_presence: true,
+				records_presence_heartbeat: true,
+				calls_save: false,
+				mutates_post_content: false,
+				changes_post_lock: false,
+				claims_saved: false,
+			};
+		} );
+
+		await expect(
+			__experimentalRequestDistributedEditingPresenceHeartbeat( {
+				postId: 42,
+				restBase: 'pages',
+				sessionKey: 'turn-0173-session',
+			} )
+		).resolves.toEqual(
+			expect.objectContaining( {
+				result: 'presence_heartbeat_recorded',
+				writes_presence: true,
+				records_presence_heartbeat: true,
+				calls_save: false,
+			} )
+		);
+	} );
+
+	it( 're-checks presence storage readiness without write data or polling', async () => {
+		apiFetch.setFetchHandler( async ( options ) => {
+			expect( options.path ).toMatch(
+				/^\/wp\/v2\/pages\/42\/distributed-editing\/presence\/storage-readiness/
+			);
+			expect( options.method ).toBe( 'GET' );
+			expect( options.data ).toBeUndefined();
+
+			return {
+				result: 'presence_storage_ready',
+				rest_route: 'post_presence_storage_readiness',
+				status: 'ready',
+				tableExists: true,
+				schemaCurrent: true,
+				setupRequired: false,
+				contentFree: true,
+				diagnosticOnly: true,
+				installsPresenceTable: false,
+				recordsPresenceHeartbeat: false,
+				writesPresence: false,
+				startsPolling: false,
+				callsSave: false,
+				mutatesPostContent: false,
+				changesPostLock: false,
+				claimsSaved: false,
+			};
+		} );
+
+		await expect(
+			__experimentalRequestDistributedEditingPresenceStorageReadiness( {
+				postId: 42,
+				restBase: 'pages',
+			} )
+		).resolves.toEqual(
+			expect.objectContaining( {
+				result: 'presence_storage_ready',
+				status: 'ready',
+				contentFree: true,
+				installsPresenceTable: false,
+				recordsPresenceHeartbeat: false,
+				callsSave: false,
+			} )
+		);
 	} );
 
 	it( 'requests stale-base rejection without exposing save or retry behavior', async () => {

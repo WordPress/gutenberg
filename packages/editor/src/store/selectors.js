@@ -40,6 +40,9 @@ import {
 	getDistributedEditingFreshReviewRetrySaveHandoffStateForSessionState,
 	getDistributedEditingLocalUpdatesImportReviewRequestStateForSessionState,
 	getDistributedEditingNoticeDescriptorsForSessionState,
+	getDistributedEditingPresenceRepeatedRefreshRuntimeStateForSessionState,
+	getDistributedEditingPresenceRosterStateForSessionState,
+	getDistributedEditingPresenceStartupPolicyStateForSessionState,
 	getDistributedEditingRiskyBlockReviewStateForSessionState,
 	getDistributedEditingSaveButtonStateForSessionState,
 	getDistributedEditingReviewTokenRecoveryStateForSessionState,
@@ -473,6 +476,47 @@ export function getDistributedEditingNoticeDescriptors( state ) {
  */
 export function getDistributedEditingActionTranscriptState( state ) {
 	return getDistributedEditingActionTranscriptStateForSessionState(
+		getDistributedEditingSessionState( state )
+	);
+}
+
+/**
+ * Returns inert editor-presence roster state for the current post.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {Object} Presence roster state.
+ */
+export function getDistributedEditingPresenceRosterState( state ) {
+	return getDistributedEditingPresenceRosterStateForSessionState(
+		getDistributedEditingSessionState( state )
+	);
+}
+
+/**
+ * Returns inert repeated presence cadence runtime state for the current post.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {Object} Repeated presence cadence runtime state.
+ */
+export function getDistributedEditingPresenceRepeatedRefreshRuntimeState(
+	state
+) {
+	return getDistributedEditingPresenceRepeatedRefreshRuntimeStateForSessionState(
+		getDistributedEditingSessionState( state )
+	);
+}
+
+/**
+ * Returns inert initial-presence startup policy state for the current post.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {Object} Initial-presence startup policy state.
+ */
+export function getDistributedEditingPresenceStartupPolicyState( state ) {
+	return getDistributedEditingPresenceStartupPolicyStateForSessionState(
 		getDistributedEditingSessionState( state )
 	);
 }
