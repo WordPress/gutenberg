@@ -21,7 +21,7 @@ import styles from './style.module.scss';
 // keeps Jest's CSS-module mock (which returns `undefined`) from leaking
 // a literal "undefined" class.
 const dragImageClasses = [
-	styles.invisibleDragImage,
+	styles[ 'invisible-drag-image' ],
 	'components-draggable__invisible-drag-image',
 ].filter( Boolean );
 const cloneWrapperClasses = [

@@ -1,6 +1,6 @@
 @use "@wordpress/base-styles/z-index" as *;
 
-.invisibleDragImage {
+.invisible-drag-image {
 	position: fixed;
 	/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Offscreen drag-image stand-in; flipping with writing direction has no benefit. */
 	left: -1000px;
