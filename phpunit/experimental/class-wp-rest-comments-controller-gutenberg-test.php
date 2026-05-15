@@ -1,6 +1,27 @@
 <?php
 /**
- * Unit tests covering WP_Test_REST_Comments_Controller_Gutenberg functionality.
+ * Tests for the Gutenberg REST comment controller subclass that backs block
+ * notes and suggestions.
+ *
+ * Coverage areas:
+ *   - **Permissions**: that post editors can create/read/update note comments
+ *     under the `edit_post` shortcut; that suggestion-lifecycle updates
+ *     (`status`, `meta._wp_suggestion_status`) are accepted while attempts
+ *     to rewrite content/author/date fall back to the core `edit_comment`
+ *     check; that contributors and subscribers are gated as expected.
+ *   - **Suggestion meta round-trip**: that `_wp_suggestion` and
+ *     `_wp_suggestion_status` survive create + read + update, and that the
+ *     payload-size cap (`GUTENBERG_SUGGESTION_PAYLOAD_MAX_BYTES`) is
+ *     enforced with a 413 before the meta sanitize_callback can silently
+ *     truncate the JSON.
+ *   - **Note vs. regular comment divergence**: that `note`-typed comments
+ *     follow the new permission model while plain `comment`-type traffic
+ *     stays on core's defaults.
+ *   - **Meta registration setup**: every test re-registers
+ *     `gutenberg_register_block_comment_metadata()` because
+ *     `WP_UnitTestCase_Base` wipes `$wp_meta_keys` between tests; without
+ *     this hook REST sees `_wp_suggestion` as unregistered and silently
+ *     no-ops on writes, masking real failures.
  *
  * @package Gutenberg
  */
@@ -56,6 +77,20 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 		self::delete_user( self::$contributor_id );
 		self::delete_user( self::$subscriber_id );
 		self::delete_user( self::$author_id );
+	}
+
+	/**
+	 * Re-register the note/suggestion comment meta before each test.
+	 *
+	 * `WP_UnitTestCase_Base::tear_down()` wipes the global `$wp_meta_keys`
+	 * registry between tests, but `gutenberg_register_block_comment_metadata`
+	 * only fires once on `init`. Without this hook, REST writes to
+	 * `_wp_suggestion` (and friends) silently no-op for any test after the
+	 * first because the meta isn't recognized as a registered REST field.
+	 */
+	public function set_up() {
+		parent::set_up();
+		gutenberg_register_block_comment_metadata();
 	}
 
 	/**
@@ -454,5 +489,386 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 			'resolved' => array( 'resolved' ),
 			'reopen'   => array( 'reopen' ),
 		);
+	}
+
+	/**
+	 * Test that a suggestion payload can be stored and retrieved via meta.
+	 */
+	public function test_create_note_with_suggestion_meta() {
+		wp_set_current_user( self::$editor_id );
+		$post_id = self::factory()->post->create( array( 'post_author' => self::$editor_id ) );
+
+		$payload = wp_json_encode(
+			array(
+				'schemaVersion' => 1,
+				'blockName'     => 'core/paragraph',
+				'baseRevision'  => '2026-04-15T00:00:00',
+				'operations'    => array(
+					array(
+						'type'      => 'attribute-set',
+						'attribute' => 'content',
+						'before'    => 'Hello',
+						'after'     => 'Hello world',
+					),
+				),
+			)
+		);
+
+		$params = array(
+			'post'    => $post_id,
+			'content' => '',
+			'type'    => 'note',
+			'author'  => self::$editor_id,
+			'meta'    => array(
+				'_wp_suggestion' => $payload,
+			),
+		);
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+		$request->add_header( 'Content-Type', 'application/json' );
+		$request->set_body( wp_json_encode( $params ) );
+
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertSame( 201, $response->get_status() );
+
+		$data       = $response->get_data();
+		$comment_id = $data['id'] ?? null;
+		$this->assertIsInt( $comment_id );
+
+		// Bypass REST schema variability across WP versions and check the
+		// stored meta directly. The sanitize_callback is in scope of this
+		// test; the REST layer assembles schemas at runtime in a way that
+		// isn't always available in the experimental phpunit harness.
+		$stored = get_comment_meta( $comment_id, '_wp_suggestion', true );
+		$this->assertNotEmpty( $stored, 'Suggestion meta should round-trip into storage.' );
+		$decoded = json_decode( $stored, true );
+		$this->assertSame( 'core/paragraph', $decoded['blockName'] ?? null );
+		$this->assertSame( 1, $decoded['schemaVersion'] ?? null );
+		$this->assertCount( 1, $decoded['operations'] ?? array() );
+	}
+
+	/**
+	 * Test that an editor can update a note they did not author (edit_post check).
+	 */
+	public function test_editor_can_update_note_on_own_post() {
+		wp_set_current_user( self::$admin_id );
+		$post_id = self::factory()->post->create( array( 'post_author' => self::$editor_id ) );
+
+		// Admin creates a note on editor's post.
+		$comment_id = self::factory()->comment->create(
+			array(
+				'comment_post_ID'  => $post_id,
+				'comment_type'     => 'note',
+				'comment_approved' => 1,
+				'user_id'          => self::$admin_id,
+				'comment_content'  => 'suggestion note',
+			)
+		);
+
+		// Editor (post author) updates the note they did not author.
+		wp_set_current_user( self::$editor_id );
+
+		$request = new WP_REST_Request( 'PUT', '/wp/v2/comments/' . $comment_id );
+		$request->add_header( 'Content-Type', 'application/json' );
+		$request->set_body(
+			wp_json_encode(
+				array(
+					'status' => 'approved',
+					'meta'   => array(
+						'_wp_suggestion_status' => 'applied',
+					),
+				)
+			)
+		);
+
+		$response = rest_get_server()->dispatch( $request );
+		// The suggestion-lifecycle override passed because the editor owns
+		// the parent post; the update succeeds with a 200 status.
+		$this->assertSame( 200, $response->get_status() );
+	}
+
+	/**
+	 * Test that a subscriber cannot update a note on someone else's post.
+	 */
+	public function test_subscriber_cannot_update_note() {
+		wp_set_current_user( self::$editor_id );
+		$post_id = self::factory()->post->create( array( 'post_author' => self::$editor_id ) );
+
+		$comment_id = self::factory()->comment->create(
+			array(
+				'comment_post_ID' => $post_id,
+				'comment_type'    => 'note',
+				'user_id'         => self::$editor_id,
+				'comment_content' => 'a suggestion',
+			)
+		);
+
+		// Subscriber tries to update the note.
+		wp_set_current_user( self::$subscriber_id );
+
+		$request = new WP_REST_Request( 'PUT', '/wp/v2/comments/' . $comment_id );
+		$request->add_header( 'Content-Type', 'application/json' );
+		$request->set_body(
+			wp_json_encode(
+				array(
+					'meta' => array(
+						'_wp_suggestion_status' => 'rejected',
+					),
+				)
+			)
+		);
+
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertErrorResponse( 'rest_cannot_edit', $response, 403 );
+	}
+
+	/**
+	 * Test that _wp_suggestion_status does not persist invalid enum values.
+	 */
+	public function test_suggestion_status_ignores_invalid_value() {
+		wp_set_current_user( self::$editor_id );
+		$post_id = self::factory()->post->create( array( 'post_author' => self::$editor_id ) );
+
+		$comment_id = self::factory()->comment->create(
+			array(
+				'comment_post_ID'  => $post_id,
+				'comment_type'     => 'note',
+				'comment_approved' => 1,
+				'user_id'          => self::$editor_id,
+			)
+		);
+
+		// First set a valid value.
+		update_comment_meta( $comment_id, '_wp_suggestion_status', 'pending' );
+
+		$request = new WP_REST_Request( 'PUT', '/wp/v2/comments/' . $comment_id );
+		$request->add_header( 'Content-Type', 'application/json' );
+		$request->set_body(
+			wp_json_encode(
+				array(
+					'meta' => array(
+						'_wp_suggestion_status' => 'invalid_value',
+					),
+				)
+			)
+		);
+
+		rest_get_server()->dispatch( $request );
+		// Even if the request succeeds, the invalid value should not
+		// overwrite the existing valid value.
+		$stored = get_comment_meta( $comment_id, '_wp_suggestion_status', true );
+		$this->assertSame( 'pending', $stored );
+	}
+
+	/**
+	 * Test that a subscriber cannot apply a suggestion even if the request
+	 * only touches the suggestion-lifecycle fields.
+	 */
+	public function test_subscriber_cannot_apply_suggestion() {
+		wp_set_current_user( self::$editor_id );
+		$post_id = self::factory()->post->create( array( 'post_author' => self::$editor_id ) );
+
+		$comment_id = self::factory()->comment->create(
+			array(
+				'comment_post_ID'  => $post_id,
+				'comment_type'     => 'note',
+				'comment_approved' => 1,
+				'user_id'          => self::$editor_id,
+				'comment_content'  => '',
+			)
+		);
+
+		wp_set_current_user( self::$subscriber_id );
+
+		$request = new WP_REST_Request( 'PUT', '/wp/v2/comments/' . $comment_id );
+		$request->add_header( 'Content-Type', 'application/json' );
+		$request->set_body(
+			wp_json_encode(
+				array(
+					'status' => 'approved',
+					'meta'   => array(
+						'_wp_suggestion_status' => 'applied',
+					),
+				)
+			)
+		);
+
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertErrorResponse( 'rest_cannot_edit', $response, 403 );
+	}
+
+	/**
+	 * Test that creating a note with an oversized suggestion payload is
+	 * rejected with a clear 413 error rather than silently truncated.
+	 */
+	public function test_create_rejects_oversized_suggestion_payload() {
+		wp_set_current_user( self::$editor_id );
+		$post_id = self::factory()->post->create( array( 'post_author' => self::$editor_id ) );
+
+		$oversized = str_repeat( 'a', GUTENBERG_SUGGESTION_PAYLOAD_MAX_BYTES + 1 );
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+		$request->add_header( 'Content-Type', 'application/json' );
+		$request->set_body(
+			wp_json_encode(
+				array(
+					'post'    => $post_id,
+					'content' => '',
+					'type'    => 'note',
+					'meta'    => array(
+						'_wp_suggestion' => $oversized,
+					),
+				)
+			)
+		);
+
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertErrorResponse( 'rest_suggestion_too_large', $response, 413 );
+	}
+
+	/**
+	 * Test that updating a note with an oversized suggestion payload is
+	 * rejected with a clear 413 error.
+	 */
+	public function test_update_rejects_oversized_suggestion_payload() {
+		wp_set_current_user( self::$editor_id );
+		$post_id = self::factory()->post->create( array( 'post_author' => self::$editor_id ) );
+
+		$comment_id = self::factory()->comment->create(
+			array(
+				'comment_post_ID'  => $post_id,
+				'comment_type'     => 'note',
+				'comment_approved' => 1,
+				'user_id'          => self::$editor_id,
+				'comment_content'  => 'a suggestion',
+			)
+		);
+
+		$oversized = str_repeat( 'a', GUTENBERG_SUGGESTION_PAYLOAD_MAX_BYTES + 1 );
+
+		$request = new WP_REST_Request( 'PUT', '/wp/v2/comments/' . $comment_id );
+		$request->add_header( 'Content-Type', 'application/json' );
+		$request->set_body(
+			wp_json_encode(
+				array(
+					'meta' => array(
+						'_wp_suggestion' => $oversized,
+					),
+				)
+			)
+		);
+
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertErrorResponse( 'rest_suggestion_too_large', $response, 413 );
+	}
+
+	/**
+	 * Test that the sanitize_callback rejects rather than truncates an
+	 * oversized payload reaching the meta layer through a non-REST path.
+	 * Truncating mid-string would corrupt the JSON.
+	 */
+	public function test_sanitize_callback_rejects_oversized_value() {
+		$post_id    = self::factory()->post->create();
+		$comment_id = self::factory()->comment->create(
+			array(
+				'comment_post_ID' => $post_id,
+				'comment_type'    => 'note',
+			)
+		);
+
+		$oversized = str_repeat( 'a', GUTENBERG_SUGGESTION_PAYLOAD_MAX_BYTES + 1 );
+		update_comment_meta( $comment_id, '_wp_suggestion', $oversized );
+
+		$stored = get_comment_meta( $comment_id, '_wp_suggestion', true );
+		$this->assertSame( '', $stored, 'Oversized payload should be rejected, not truncated.' );
+	}
+
+	/**
+	 * Test that `is_suggestion_lifecycle_update` correctly rejects
+	 * request bodies that touch fields outside the suggestion-lifecycle
+	 * allowlist. We assert against the private helper via a request
+	 * probe rather than through the full REST dispatch because actual
+	 * permission behavior for `edit_comment` on a foreign note on a
+	 * post the current user authored is governed by core's
+	 * `map_meta_cap` for `edit_comment` (which delegates to `edit_post`
+	 * on the comment's parent post) — outside the scope of this override.
+	 */
+	public function test_lifecycle_update_rejects_non_allowlisted_fields() {
+		$cases = array(
+			'content field blocks shortcut'        => array(
+				'body'     => array(
+					'status'  => 'approved',
+					'content' => 'rewritten',
+				),
+				'expected' => false,
+			),
+			'only id/status/meta passes shortcut'  => array(
+				'body'     => array(
+					'status' => 'approved',
+					'meta'   => array(
+						'_wp_suggestion_status' => 'applied',
+					),
+				),
+				'expected' => true,
+			),
+			'non-approved status blocks shortcut'  => array(
+				'body'     => array(
+					'status' => 'spam',
+				),
+				'expected' => false,
+			),
+			'non-allowlisted meta blocks shortcut' => array(
+				'body'     => array(
+					'meta' => array(
+						'_wp_note_status' => 'resolved',
+					),
+				),
+				'expected' => false,
+			),
+		);
+
+		foreach ( $cases as $label => $case ) {
+			$request = new WP_REST_Request( 'PUT', '/wp/v2/comments/1' );
+			$request->add_header( 'Content-Type', 'application/json' );
+			$request->set_body( wp_json_encode( $case['body'] ) );
+
+			$reflection = new ReflectionMethod(
+				'Gutenberg_REST_Comment_Suggestions_Controller',
+				'is_suggestion_lifecycle_update'
+			);
+			$reflection->setAccessible( true );
+
+			$this->assertSame(
+				$case['expected'],
+				$reflection->invoke( null, $request ),
+				"Lifecycle shortcut expectation mismatched for: {$label}"
+			);
+		}
+	}
+
+	/**
+	 * Test that the lifecycle helper also accepts form-encoded request
+	 * bodies, not only JSON. Custom integrations may issue updates with
+	 * `application/x-www-form-urlencoded` and should benefit from the
+	 * same `edit_post` shortcut as the JSON path.
+	 */
+	public function test_lifecycle_update_accepts_form_encoded_bodies() {
+		$request = new WP_REST_Request( 'PUT', '/wp/v2/comments/1' );
+		$request->add_header( 'Content-Type', 'application/x-www-form-urlencoded' );
+		$request->set_body_params(
+			array(
+				'status' => 'approved',
+				'meta'   => array(
+					'_wp_suggestion_status' => 'applied',
+				),
+			)
+		);
+
+		$reflection = new ReflectionMethod(
+			'Gutenberg_REST_Comment_Suggestions_Controller',
+			'is_suggestion_lifecycle_update'
+		);
+		$reflection->setAccessible( true );
+		$this->assertTrue( $reflection->invoke( null, $request ) );
 	}
 }
