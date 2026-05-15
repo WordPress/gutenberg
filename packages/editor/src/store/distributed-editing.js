@@ -2413,6 +2413,166 @@ export function getDistributedEditingFreshReviewComparisonRendererCapabilityReso
 	};
 }
 
+/**
+ * Summarizes fresh-review comparison renderer capability resolution for
+ * support/export diagnostics without retaining candidate maps or unknown keys.
+ *
+ * @param {Object} options                                 Summary options.
+ * @param {Array}  options.candidateRendererCapabilityMaps Candidate maps.
+ * @param {Array}  options.capabilityResolutions           Existing resolutions.
+ *
+ * @return {Object} Redacted renderer capability support summary.
+ */
+export function getDistributedEditingFreshReviewComparisonRendererCapabilitySupportSummary( {
+	candidateRendererCapabilityMaps = [],
+	capabilityResolutions = [],
+} = {} ) {
+	const resolutions = [
+		...( Array.isArray( capabilityResolutions )
+			? capabilityResolutions.filter( Boolean )
+			: [] ),
+		...( Array.isArray( candidateRendererCapabilityMaps )
+			? candidateRendererCapabilityMaps.map(
+					( candidateRendererCapabilityMap ) =>
+						getDistributedEditingFreshReviewComparisonRendererCapabilityResolution(
+							{
+								candidateRendererCapabilityMap,
+							}
+						)
+			  )
+			: [] ),
+	];
+	const summary = resolutions.reduce(
+		( counts, resolution ) => {
+			const status = normalizeNullableString( resolution?.status );
+
+			if ( status === 'missing_required_capabilities' ) {
+				counts.missingRequiredCapabilitiesCount += 1;
+			} else if ( status === 'partial_required_capabilities' ) {
+				counts.partialRequiredCapabilitiesCount += 1;
+			} else if ( status === 'complete_but_disabled' ) {
+				counts.completeButDisabledCount += 1;
+			} else {
+				counts.unavailableResolutionCount += 1;
+			}
+
+			counts.presentRendererCapabilityCount += normalizeCount(
+				resolution?.presentRendererCapabilityCount
+			);
+			counts.missingRendererCapabilityCount += normalizeCount(
+				resolution?.missingRendererCapabilityCount
+			);
+			counts.unknownCandidateRendererCapabilityCount += normalizeCount(
+				resolution?.unknownCandidateRendererCapabilityCount
+			);
+			counts.candidateRendererCapabilityKeyCount += normalizeCount(
+				resolution?.candidateRendererCapabilityKeyCount
+			);
+
+			return counts;
+		},
+		{
+			missingRequiredCapabilitiesCount: 0,
+			partialRequiredCapabilitiesCount: 0,
+			completeButDisabledCount: 0,
+			unavailableResolutionCount: 0,
+			presentRendererCapabilityCount: 0,
+			missingRendererCapabilityCount: 0,
+			unknownCandidateRendererCapabilityCount: 0,
+			candidateRendererCapabilityKeyCount: 0,
+		}
+	);
+	const resolutionCount = resolutions.length;
+
+	return {
+		status: resolutionCount > 0 ? 'available' : 'none',
+		available: resolutionCount > 0,
+		schemaVersion: 1,
+		summaryKind:
+			'fresh_review_comparison_renderer_capability_support_summary',
+		headline: 'Fresh-review renderer capability support summary',
+		summaryText:
+			resolutionCount > 0
+				? 'Renderer capability classifications are summarized for support without candidate maps, unknown key names, raw content, hash values, proof details, tokens, identities, or renderer code.'
+				: 'No renderer capability classifications are available for support.',
+		requiredRendererCapabilityKeys:
+			DISTRIBUTED_EDITING_FRESH_REVIEW_COMPARISON_REQUIRED_RENDERER_CAPABILITY_KEYS,
+		requiredRendererCapabilityCount:
+			DISTRIBUTED_EDITING_FRESH_REVIEW_COMPARISON_REQUIRED_RENDERER_CAPABILITY_KEYS.length,
+		resolutionCount,
+		candidateMapCount: resolutionCount,
+		missingRequiredCapabilitiesCount:
+			summary.missingRequiredCapabilitiesCount,
+		partialRequiredCapabilitiesCount:
+			summary.partialRequiredCapabilitiesCount,
+		completeButDisabledCount: summary.completeButDisabledCount,
+		unavailableResolutionCount: summary.unavailableResolutionCount,
+		presentRendererCapabilityCount: summary.presentRendererCapabilityCount,
+		missingRendererCapabilityCount: summary.missingRendererCapabilityCount,
+		unknownCandidateRendererCapabilityCount:
+			summary.unknownCandidateRendererCapabilityCount,
+		candidateRendererCapabilityKeyCount:
+			summary.candidateRendererCapabilityKeyCount,
+		hasMissingRequiredCapabilities:
+			summary.missingRequiredCapabilitiesCount > 0,
+		hasPartialRequiredCapabilities:
+			summary.partialRequiredCapabilitiesCount > 0,
+		hasCompleteButDisabledCapabilities:
+			summary.completeButDisabledCount > 0,
+		allCompleteButDisabled:
+			resolutionCount > 0 &&
+			summary.completeButDisabledCount === resolutionCount,
+		aggregateOnly: true,
+		resolverOnly: true,
+		descriptorOnly: true,
+		statusOnly: true,
+		redacted: true,
+		hashValuesRedacted: true,
+		candidateMapsStored: false,
+		unknownCandidateKeyNamesIncluded: false,
+		rendererCodeIncluded: false,
+		rawContentIncluded: false,
+		exposesHashValues: false,
+		exposesRawContent: false,
+		exposesProofSignature: false,
+		exposesTokenMaterial: false,
+		exposesUserIdentity: false,
+		exposesReviewerIds: false,
+		exposesActorIds: false,
+		canShareWithSupport: true,
+		supportExportReady: true,
+		supportBundleSafe: true,
+		supportDiagnosticsOnly: true,
+		requiresFutureRenderer: true,
+		requiresExplicitRendererTurn: true,
+		registersRenderer: false,
+		hasRegisteredRenderer: false,
+		activatesRenderer: false,
+		renderable: false,
+		rendersPreview: false,
+		rendersDiff: false,
+		computesDiff: false,
+		opensComparison: false,
+		opensPanel: false,
+		derivesPatch: false,
+		callsRestEndpoint: false,
+		callsSave: false,
+		callsNormalSavePost: false,
+		callsRetrySaveEndpoint: false,
+		dispatchesNotice: false,
+		savesPost: false,
+		mutatesEditorContent: false,
+		mutatesPersistedPostContent: false,
+		selectsBlock: false,
+		selectsReviewItem: false,
+		marksSelected: false,
+		movesFocus: false,
+		createsRevision: false,
+		changesPostLock: false,
+		claimsSaved: false,
+	};
+}
+
 function createDistributedEditingFreshReviewComparisonRendererReadinessDescriptor(
 	previewShell,
 	{ candidateRendererCapabilityMap = {} } = {}
@@ -2542,6 +2702,14 @@ function createDistributedEditingFreshReviewComparisonPreviewShellSupportReportD
 		'boundary_safe_diff_renderer',
 		'human_review_controls',
 	];
+	const rendererCapabilitySupportSummary =
+		getDistributedEditingFreshReviewComparisonRendererCapabilitySupportSummary(
+			{
+				capabilityResolutions: rendererReadiness?.capabilityResolution
+					? [ rendererReadiness.capabilityResolution ]
+					: [],
+			}
+		);
 
 	return {
 		status: 'available',
@@ -2597,6 +2765,34 @@ function createDistributedEditingFreshReviewComparisonPreviewShellSupportReportD
 		rendererCapabilityResolutionResolverOnly: Boolean(
 			rendererReadiness?.capabilityResolution?.resolverOnly
 		),
+		rendererCapabilitySupportSummary,
+		hasRendererCapabilitySupportSummary: Boolean(
+			rendererCapabilitySupportSummary.available
+		),
+		canShowRendererCapabilitySupportSummary: Boolean(
+			rendererCapabilitySupportSummary.available &&
+				rendererCapabilitySupportSummary.canShareWithSupport
+		),
+		rendererCapabilitySupportSummaryStatus:
+			rendererCapabilitySupportSummary.status,
+		rendererCapabilitySupportSummaryResolutionCount:
+			rendererCapabilitySupportSummary.resolutionCount,
+		rendererCapabilitySupportSummaryMissingCount:
+			rendererCapabilitySupportSummary.missingRequiredCapabilitiesCount,
+		rendererCapabilitySupportSummaryPartialCount:
+			rendererCapabilitySupportSummary.partialRequiredCapabilitiesCount,
+		rendererCapabilitySupportSummaryCompleteButDisabledCount:
+			rendererCapabilitySupportSummary.completeButDisabledCount,
+		rendererCapabilitySupportSummaryUnknownCandidateCount:
+			rendererCapabilitySupportSummary.unknownCandidateRendererCapabilityCount,
+		rendererCapabilitySupportSummaryCandidateMapsStored:
+			rendererCapabilitySupportSummary.candidateMapsStored,
+		rendererCapabilitySupportSummaryUnknownNamesIncluded:
+			rendererCapabilitySupportSummary.unknownCandidateKeyNamesIncluded,
+		rendererCapabilitySupportSummaryRendererCodeIncluded:
+			rendererCapabilitySupportSummary.rendererCodeIncluded,
+		rendererCapabilitySupportSummaryResolverOnly:
+			rendererCapabilitySupportSummary.resolverOnly,
 		rendererReadinessRegistersRenderer: Boolean(
 			rendererReadiness?.registersRenderer
 		),
@@ -6770,6 +6966,19 @@ export function getDistributedEditingFreshReviewPrePublishStateForSessionState(
 			canRecordLocalDecisions,
 		}
 	);
+	const rendererCapabilitySupportSummary =
+		getDistributedEditingFreshReviewComparisonRendererCapabilitySupportSummary(
+			{
+				capabilityResolutions: reviewItems
+					.map(
+						( item ) =>
+							item.compareAction?.comparePlan
+								?.comparisonPreviewShell?.rendererReadiness
+								?.capabilityResolution
+					)
+					.filter( Boolean ),
+			}
+		);
 	const canSubmitReviewDecision =
 		canRecordLocalDecisions &&
 		decisionState.ready &&
@@ -6870,6 +7079,14 @@ export function getDistributedEditingFreshReviewPrePublishStateForSessionState(
 		canRecordLocalDecisions,
 		canSubmitReviewDecision,
 		reviewItems,
+		rendererCapabilitySupportSummary,
+		hasRendererCapabilitySupportSummary: Boolean(
+			rendererCapabilitySupportSummary.available
+		),
+		canShowRendererCapabilitySupportSummary: Boolean(
+			rendererCapabilitySupportSummary.available &&
+				rendererCapabilitySupportSummary.canShareWithSupport
+		),
 		reviewItemCount: decisionState.reviewItemCount,
 		pendingReviewItemCount: decisionState.pendingReviewItemCount,
 		approvedReviewItemCount: decisionState.approvedReviewItemCount,

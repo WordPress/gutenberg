@@ -724,6 +724,20 @@ _Returns_
 
 -   `Object`: Content-free renderer capability resolution.
 
+### getDistributedEditingFreshReviewComparisonRendererCapabilitySupportSummary
+
+Summarizes fresh-review comparison renderer capability resolution for support/export diagnostics without retaining candidate maps or unknown keys.
+
+_Parameters_
+
+-   _options_ `Object`: Summary options.
+-   _options.candidateRendererCapabilityMaps_ `Array`: Candidate maps.
+-   _options.capabilityResolutions_ `Array`: Existing resolutions.
+
+_Returns_
+
+-   `Object`: Redacted renderer capability support summary.
+
 ### getDistributedEditingFreshReviewConsumeEndpointPath
 
 Returns the current DE-RTC fresh-review decision consumption endpoint path for a post.

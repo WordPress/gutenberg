@@ -56,6 +56,7 @@ import {
 	getDistributedEditingLocalUpdatesExportPayload,
 	getDistributedEditingFreshReviewDecisionStateForSessionState,
 	getDistributedEditingFreshReviewComparisonRendererCapabilityResolution,
+	getDistributedEditingFreshReviewComparisonRendererCapabilitySupportSummary,
 	getDistributedEditingFreshReviewLifecycleStateForSessionState,
 	getDistributedEditingFreshReviewPreSaveStateForSessionState,
 	getDistributedEditingFreshReviewPrePublishStateForSessionState,
@@ -3950,6 +3951,85 @@ describe( 'distributed editing session state', () => {
 		} );
 	} );
 
+	it( 'summarizes fresh-review comparison renderer capability classifications for support without retaining candidate maps', () => {
+		const unsafeUnknownCapabilityKey = 'caller_supplied_renderer_name';
+		// This helper name contains "Renderer", but it is not a Testing Library render helper.
+		// eslint-disable-next-line testing-library/render-result-naming-convention
+		const summarizeCapabilityMaps =
+			getDistributedEditingFreshReviewComparisonRendererCapabilitySupportSummary;
+		const supportSummary = summarizeCapabilityMaps( {
+			candidateRendererCapabilityMaps: [
+				{},
+				{
+					boundary_safe_diff_renderer: true,
+					[ unsafeUnknownCapabilityKey ]: true,
+				},
+				{
+					boundary_safe_diff_renderer: true,
+					human_review_controls: true,
+				},
+			],
+		} );
+
+		expect( supportSummary ).toMatchObject( {
+			status: 'available',
+			available: true,
+			schemaVersion: 1,
+			summaryKind:
+				'fresh_review_comparison_renderer_capability_support_summary',
+			resolutionCount: 3,
+			candidateMapCount: 3,
+			missingRequiredCapabilitiesCount: 1,
+			partialRequiredCapabilitiesCount: 1,
+			completeButDisabledCount: 1,
+			unavailableResolutionCount: 0,
+			presentRendererCapabilityCount: 3,
+			missingRendererCapabilityCount: 3,
+			unknownCandidateRendererCapabilityCount: 1,
+			candidateRendererCapabilityKeyCount: 4,
+			hasMissingRequiredCapabilities: true,
+			hasPartialRequiredCapabilities: true,
+			hasCompleteButDisabledCapabilities: true,
+			allCompleteButDisabled: false,
+			aggregateOnly: true,
+			resolverOnly: true,
+			descriptorOnly: true,
+			statusOnly: true,
+			redacted: true,
+			hashValuesRedacted: true,
+			candidateMapsStored: false,
+			unknownCandidateKeyNamesIncluded: false,
+			rendererCodeIncluded: false,
+			rawContentIncluded: false,
+			exposesHashValues: false,
+			exposesRawContent: false,
+			exposesProofSignature: false,
+			exposesTokenMaterial: false,
+			exposesUserIdentity: false,
+			exposesReviewerIds: false,
+			exposesActorIds: false,
+			canShareWithSupport: true,
+			supportExportReady: true,
+			supportBundleSafe: true,
+			supportDiagnosticsOnly: true,
+			registersRenderer: false,
+			hasRegisteredRenderer: false,
+			activatesRenderer: false,
+			renderable: false,
+			rendersPreview: false,
+			computesDiff: false,
+			opensPanel: false,
+			callsRestEndpoint: false,
+			callsSave: false,
+			mutatesEditorContent: false,
+			changesPostLock: false,
+			claimsSaved: false,
+		} );
+		expect( JSON.stringify( supportSummary ) ).not.toContain(
+			unsafeUnknownCapabilityKey
+		);
+	} );
+
 	it( 'exposes fresh-review pre-publish items and local decision action descriptors only', () => {
 		const rawContentToken = 'fresh-review-pre-publish-raw-token';
 		const approvedHash =
@@ -4063,6 +4143,33 @@ describe( 'distributed editing session state', () => {
 			pendingReviewItemCount: 2,
 			hasPendingReviewItems: true,
 			allReviewItemsResolved: false,
+			rendererCapabilitySupportSummary: expect.objectContaining( {
+				status: 'available',
+				summaryKind:
+					'fresh_review_comparison_renderer_capability_support_summary',
+				resolutionCount: 2,
+				candidateMapCount: 2,
+				missingRequiredCapabilitiesCount: 2,
+				partialRequiredCapabilitiesCount: 0,
+				completeButDisabledCount: 0,
+				unknownCandidateRendererCapabilityCount: 0,
+				candidateMapsStored: false,
+				unknownCandidateKeyNamesIncluded: false,
+				rendererCodeIncluded: false,
+				resolverOnly: true,
+				canShareWithSupport: true,
+				supportExportReady: true,
+				rawContentIncluded: false,
+				exposesHashValues: false,
+				exposesRawContent: false,
+				registersRenderer: false,
+				renderable: false,
+				callsRestEndpoint: false,
+				callsSave: false,
+				claimsSaved: false,
+			} ),
+			hasRendererCapabilitySupportSummary: true,
+			canShowRendererCapabilitySupportSummary: true,
 			saveAction: expect.objectContaining( {
 				actionKey:
 					DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.OPEN_PRE_PUBLISH_REVIEW,
@@ -4541,6 +4648,44 @@ describe( 'distributed editing session state', () => {
 							unknownCandidateRendererCapabilityCount: 0,
 							rendererCapabilitiesComplete: false,
 							rendererCapabilityResolutionResolverOnly: true,
+							rendererCapabilitySupportSummary:
+								expect.objectContaining( {
+									status: 'available',
+									summaryKind:
+										'fresh_review_comparison_renderer_capability_support_summary',
+									resolutionCount: 1,
+									candidateMapCount: 1,
+									missingRequiredCapabilitiesCount: 1,
+									partialRequiredCapabilitiesCount: 0,
+									completeButDisabledCount: 0,
+									unknownCandidateRendererCapabilityCount: 0,
+									candidateMapsStored: false,
+									unknownCandidateKeyNamesIncluded: false,
+									rendererCodeIncluded: false,
+									resolverOnly: true,
+									canShareWithSupport: true,
+									supportExportReady: true,
+									rawContentIncluded: false,
+									exposesHashValues: false,
+									exposesRawContent: false,
+									registersRenderer: false,
+									renderable: false,
+									callsRestEndpoint: false,
+									callsSave: false,
+									claimsSaved: false,
+								} ),
+							hasRendererCapabilitySupportSummary: true,
+							canShowRendererCapabilitySupportSummary: true,
+							rendererCapabilitySupportSummaryStatus: 'available',
+							rendererCapabilitySupportSummaryResolutionCount: 1,
+							rendererCapabilitySupportSummaryMissingCount: 1,
+							rendererCapabilitySupportSummaryPartialCount: 0,
+							rendererCapabilitySupportSummaryCompleteButDisabledCount: 0,
+							rendererCapabilitySupportSummaryUnknownCandidateCount: 0,
+							rendererCapabilitySupportSummaryCandidateMapsStored: false,
+							rendererCapabilitySupportSummaryUnknownNamesIncluded: false,
+							rendererCapabilitySupportSummaryRendererCodeIncluded: false,
+							rendererCapabilitySupportSummaryResolverOnly: true,
 							rendererReadinessRegistersRenderer: false,
 							rendererReadinessRenderable: false,
 							boundaryPolicy: 'serialized_block_hash_only',

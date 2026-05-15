@@ -1501,6 +1501,54 @@ describe( 'DistributedEditingStatus', () => {
 			'false'
 		);
 		expect( comparePlan ).toHaveAttribute(
+			'data-distributed-editing-fresh-review-comparison-renderer-capability-support-summary-status',
+			'available'
+		);
+		expect( comparePlan ).toHaveAttribute(
+			'data-distributed-editing-fresh-review-comparison-renderer-capability-support-summary-resolution-count',
+			'1'
+		);
+		expect( comparePlan ).toHaveAttribute(
+			'data-distributed-editing-fresh-review-comparison-renderer-capability-support-summary-missing-count',
+			'1'
+		);
+		expect( comparePlan ).toHaveAttribute(
+			'data-distributed-editing-fresh-review-comparison-renderer-capability-support-summary-partial-count',
+			'0'
+		);
+		expect( comparePlan ).toHaveAttribute(
+			'data-distributed-editing-fresh-review-comparison-renderer-capability-support-summary-complete-count',
+			'0'
+		);
+		expect( comparePlan ).toHaveAttribute(
+			'data-distributed-editing-fresh-review-comparison-renderer-capability-support-summary-unknown-candidates',
+			'0'
+		);
+		expect( comparePlan ).toHaveAttribute(
+			'data-distributed-editing-fresh-review-comparison-renderer-capability-support-summary-candidate-maps-stored',
+			'false'
+		);
+		expect( comparePlan ).toHaveAttribute(
+			'data-distributed-editing-fresh-review-comparison-renderer-capability-support-summary-unknown-names',
+			'false'
+		);
+		expect( comparePlan ).toHaveAttribute(
+			'data-distributed-editing-fresh-review-comparison-renderer-capability-support-summary-renderer-code',
+			'false'
+		);
+		expect( comparePlan ).toHaveAttribute(
+			'data-distributed-editing-fresh-review-comparison-renderer-capability-support-summary-resolver-only',
+			'true'
+		);
+		expect( comparePlan ).toHaveAttribute(
+			'data-distributed-editing-fresh-review-comparison-renderer-capability-support-summary-raw-content',
+			'false'
+		);
+		expect( comparePlan ).toHaveAttribute(
+			'data-distributed-editing-fresh-review-comparison-renderer-capability-support-summary-renderable',
+			'false'
+		);
+		expect( comparePlan ).toHaveAttribute(
 			'data-distributed-editing-fresh-review-comparison-renderer-readiness-missing-capabilities',
 			'2'
 		);
@@ -1574,6 +1622,9 @@ describe( 'DistributedEditingStatus', () => {
 			'This only classifies readiness; no renderer is registered, no preview opens, no diff is computed, and no save was made.'
 		);
 		expect( comparePlan ).toHaveTextContent(
+			'Capability support summary: renderer capability classifications are aggregated for support without candidate maps, unknown key names, raw content, hashes, proof details, tokens, identities, or renderer code.'
+		);
+		expect( comparePlan ).toHaveTextContent(
 			/Base hash evidence\s*Available/
 		);
 		expect( comparePlan ).toHaveTextContent(
@@ -1594,6 +1645,9 @@ describe( 'DistributedEditingStatus', () => {
 		);
 		expect( comparePlan ).toHaveTextContent(
 			/Capability resolver\s*Missing/
+		);
+		expect( comparePlan ).toHaveTextContent(
+			/Capability support summary\s*Shareable/
 		);
 		expect( comparePlan ).not.toHaveTextContent(
 			/aaaaaaaaaaaaaaaa|bbbbbbbbbbbbbbbb|fresh-review-chrome-compare-plan-raw|script/i

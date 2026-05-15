@@ -1900,6 +1900,20 @@ function getFreshReviewComparisonRendererCapabilityResolutionLabel(
 	}
 }
 
+function getFreshReviewComparisonRendererCapabilitySupportSummaryMessage(
+	supportSummary
+) {
+	if ( supportSummary?.available && supportSummary.canShareWithSupport ) {
+		return __(
+			'Capability support summary: renderer capability classifications are aggregated for support without candidate maps, unknown key names, raw content, hashes, proof details, tokens, identities, or renderer code. No renderer is registered, no preview opens, no diff is computed, and no save was made.'
+		);
+	}
+
+	return __(
+		'No renderer capability support summary is available. No renderer is registered, no preview opens, no diff is computed, and no save was made.'
+	);
+}
+
 function getFreshReviewComparePlanEvidenceLabel( available ) {
 	return available ? __( 'Available' ) : __( 'Unavailable' );
 }
@@ -2259,6 +2273,8 @@ function DistributedEditingFreshReviewComparePlanStatus() {
 	const comparisonPreviewShell = comparePlan?.comparisonPreviewShell;
 	const comparisonPreviewShellSupportReport =
 		comparisonPreviewShell?.supportReport;
+	const comparisonRendererCapabilitySupportSummary =
+		comparisonPreviewShellSupportReport?.rendererCapabilitySupportSummary;
 	const comparisonRendererReadiness =
 		comparisonPreviewShell?.rendererReadiness;
 	const comparisonRendererCapabilityResolution =
@@ -2396,6 +2412,70 @@ function DistributedEditingFreshReviewComparePlanStatus() {
 							comparisonRendererCapabilityResolution.unknownCandidateRendererCapabilityCount
 					  )
 			}
+			data-distributed-editing-fresh-review-comparison-renderer-capability-support-summary-candidate-maps-stored={ formatDataBoolean(
+				comparisonRendererCapabilitySupportSummary?.candidateMapsStored
+			) }
+			data-distributed-editing-fresh-review-comparison-renderer-capability-support-summary-complete={ formatDataBoolean(
+				comparisonRendererCapabilitySupportSummary?.hasCompleteButDisabledCapabilities
+			) }
+			data-distributed-editing-fresh-review-comparison-renderer-capability-support-summary-complete-count={
+				comparisonRendererCapabilitySupportSummary?.completeButDisabledCount ===
+				undefined
+					? undefined
+					: String(
+							comparisonRendererCapabilitySupportSummary.completeButDisabledCount
+					  )
+			}
+			data-distributed-editing-fresh-review-comparison-renderer-capability-support-summary-missing-count={
+				comparisonRendererCapabilitySupportSummary?.missingRequiredCapabilitiesCount ===
+				undefined
+					? undefined
+					: String(
+							comparisonRendererCapabilitySupportSummary.missingRequiredCapabilitiesCount
+					  )
+			}
+			data-distributed-editing-fresh-review-comparison-renderer-capability-support-summary-partial-count={
+				comparisonRendererCapabilitySupportSummary?.partialRequiredCapabilitiesCount ===
+				undefined
+					? undefined
+					: String(
+							comparisonRendererCapabilitySupportSummary.partialRequiredCapabilitiesCount
+					  )
+			}
+			data-distributed-editing-fresh-review-comparison-renderer-capability-support-summary-raw-content={ formatDataBoolean(
+				comparisonRendererCapabilitySupportSummary?.exposesRawContent
+			) }
+			data-distributed-editing-fresh-review-comparison-renderer-capability-support-summary-renderable={ formatDataBoolean(
+				comparisonRendererCapabilitySupportSummary?.renderable
+			) }
+			data-distributed-editing-fresh-review-comparison-renderer-capability-support-summary-renderer-code={ formatDataBoolean(
+				comparisonRendererCapabilitySupportSummary?.rendererCodeIncluded
+			) }
+			data-distributed-editing-fresh-review-comparison-renderer-capability-support-summary-resolution-count={
+				comparisonRendererCapabilitySupportSummary?.resolutionCount ===
+				undefined
+					? undefined
+					: String(
+							comparisonRendererCapabilitySupportSummary.resolutionCount
+					  )
+			}
+			data-distributed-editing-fresh-review-comparison-renderer-capability-support-summary-resolver-only={ formatDataBoolean(
+				comparisonRendererCapabilitySupportSummary?.resolverOnly
+			) }
+			data-distributed-editing-fresh-review-comparison-renderer-capability-support-summary-status={
+				comparisonRendererCapabilitySupportSummary?.status || undefined
+			}
+			data-distributed-editing-fresh-review-comparison-renderer-capability-support-summary-unknown-candidates={
+				comparisonRendererCapabilitySupportSummary?.unknownCandidateRendererCapabilityCount ===
+				undefined
+					? undefined
+					: String(
+							comparisonRendererCapabilitySupportSummary.unknownCandidateRendererCapabilityCount
+					  )
+			}
+			data-distributed-editing-fresh-review-comparison-renderer-capability-support-summary-unknown-names={ formatDataBoolean(
+				comparisonRendererCapabilitySupportSummary?.unknownCandidateKeyNamesIncluded
+			) }
 			data-distributed-editing-fresh-review-comparison-renderer-readiness-computes-diff={ formatDataBoolean(
 				comparisonRendererReadiness?.computesDiff
 			) }
@@ -2507,6 +2587,13 @@ function DistributedEditingFreshReviewComparePlanStatus() {
 					) }
 				</p>
 			) }
+			{ comparisonRendererCapabilitySupportSummary && (
+				<p>
+					{ getFreshReviewComparisonRendererCapabilitySupportSummaryMessage(
+						comparisonRendererCapabilitySupportSummary
+					) }
+				</p>
+			) }
 			<dl className="editor-distributed-editing-status__fresh-review-compare-plan-evidence">
 				<div>
 					<dt>{ __( 'Base hash evidence' ) }</dt>
@@ -2579,6 +2666,16 @@ function DistributedEditingFreshReviewComparePlanStatus() {
 							{ getFreshReviewComparisonRendererCapabilityResolutionLabel(
 								comparisonRendererCapabilityResolution
 							) }
+						</dd>
+					</div>
+				) }
+				{ comparisonRendererCapabilitySupportSummary && (
+					<div>
+						<dt>{ __( 'Capability support summary' ) }</dt>
+						<dd>
+							{ comparisonRendererCapabilitySupportSummary.canShareWithSupport
+								? __( 'Shareable' )
+								: __( 'Unavailable' ) }
 						</dd>
 					</div>
 				) }
