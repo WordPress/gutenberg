@@ -1166,6 +1166,11 @@ export function transcodeGifItem(
 				},
 			} );
 		} catch ( error ) {
+			// Surface the real cause to the console so failures are
+			// debuggable; the user-facing notification is intentionally
+			// generic.
+			// eslint-disable-next-line no-console
+			console.error( '[ffmpeg] GIF→video conversion failed:', error );
 			dispatch.cancelItem(
 				id,
 				new UploadError( {
