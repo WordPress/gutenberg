@@ -37,6 +37,61 @@ describe( 'getRelativeRootSelector', () => {
 	} );
 } );
 
+describe( 'buildScopedBlockSelector', () => {
+	const BASE = '.wp-elements-abc123';
+
+	it( 'scopes a suffix to the descendant element from a block selector', () => {
+		expect(
+			buildScopedBlockSelector(
+				BASE,
+				'.wp-block-button .wp-block-button__link',
+				':hover'
+			)
+		).toBe( `${ BASE } .wp-block-button__link:hover` );
+	} );
+
+	it( 'works for :focus and :active states', () => {
+		expect(
+			buildScopedBlockSelector(
+				BASE,
+				'.wp-block-button .wp-block-button__link',
+				':focus'
+			)
+		).toBe( `${ BASE } .wp-block-button__link:focus` );
+		expect(
+			buildScopedBlockSelector(
+				BASE,
+				'.wp-block-button .wp-block-button__link',
+				':active'
+			)
+		).toBe( `${ BASE } .wp-block-button__link:active` );
+	} );
+
+	it( 'falls back to appending the suffix to the base selector when there is no descendant', () => {
+		expect(
+			buildScopedBlockSelector( BASE, '.wp-block-button', ':hover' )
+		).toBe( `${ BASE }:hover` );
+	} );
+
+	it( 'falls back to appending the suffix to the base selector when the block selector is missing', () => {
+		expect( buildScopedBlockSelector( BASE, undefined, ':hover' ) ).toBe(
+			`${ BASE }:hover`
+		);
+	} );
+
+	it( 'does not split selector lists on commas inside pseudo-class arguments', () => {
+		expect(
+			buildScopedBlockSelector(
+				BASE,
+				'.wp-block-navigation :is(.current-menu-item, .current-menu-ancestor)',
+				':hover'
+			)
+		).toBe(
+			`${ BASE } :is(.current-menu-item, .current-menu-ancestor):hover`
+		);
+	} );
+} );
+
 describe( 'state selector builders', () => {
 	const BASE = '.wp-elements-abc123';
 
@@ -104,17 +159,5 @@ describe( 'state selector builders', () => {
 		expect(
 			buildPseudoStyleStateSelector( BASE, 'test/unknown', ':hover' )
 		).toBe( `${ BASE }:hover` );
-	} );
-
-	it( 'does not split selector lists on commas inside pseudo-class arguments', () => {
-		expect(
-			buildScopedBlockSelector(
-				BASE,
-				'.wp-block-navigation :is(.current-menu-item, .current-menu-ancestor)',
-				':hover'
-			)
-		).toBe(
-			`${ BASE } :is(.current-menu-item, .current-menu-ancestor):hover`
-		);
 	} );
 } );

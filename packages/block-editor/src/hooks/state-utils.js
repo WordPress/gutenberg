@@ -83,7 +83,6 @@ export function buildScopedBlockSelector(
 		} )
 		.join( ', ' );
 }
-
 /**
  * Builds the scoped selector for root block style state styles.
  *
