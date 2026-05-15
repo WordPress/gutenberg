@@ -59,6 +59,39 @@ export const Default: Story = {
 	},
 };
 
+export const Compact: Story = {
+	args: {
+		defaultValue: ITEMS[ 0 ],
+		items: ITEMS,
+		children: (
+			<>
+				<Combobox.Trigger size="compact" />
+				<Combobox.Popup>
+					<div style={ { padding: '8px 8px 4px' } }>
+						<Combobox.Input placeholder="Search" />
+					</div>
+					<Combobox.Empty>No results found.</Combobox.Empty>
+					<Combobox.List>
+						<Combobox.ListBody>
+							<Combobox.Collection>
+								{ ( item: FixtureItem ) => (
+									<Combobox.Item
+										key={ item.id }
+										value={ item }
+										size="compact"
+									>
+										{ item.value }
+									</Combobox.Item>
+								) }
+							</Combobox.Collection>
+						</Combobox.ListBody>
+					</Combobox.List>
+				</Combobox.Popup>
+			</>
+		),
+	},
+};
+
 /**
  * For certain multiple select use cases, it may be better to design a custom
  * selection state UI, rather than using a chip-based selection state UI like `SearchableChipSelect`.

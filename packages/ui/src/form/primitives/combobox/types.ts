@@ -2,6 +2,9 @@ import type { Combobox as _Combobox } from '@base-ui/react/combobox';
 import type { ComponentPropsWithoutRef, ReactElement } from 'react';
 
 import type { ComponentProps } from '../../../utils/types';
+import type { InputLayoutProps } from '../input-layout/types';
+
+type ComboboxSize = Exclude< InputLayoutProps[ 'size' ], 'small' >;
 
 export type ComboboxChipsProps = ComponentProps< typeof _Combobox.Chips > & {
 	children?: React.ReactNode;
@@ -35,6 +38,12 @@ export type ComboboxInputProps = Omit<
 
 export type ComboboxItemProps = ComponentProps< typeof _Combobox.Item > & {
 	children?: React.ReactNode;
+	/**
+	 * The size of the item.
+	 *
+	 * @default 'default'
+	 */
+	size?: ComboboxSize;
 	/**
 	 * The variant of the item.
 	 *
@@ -82,6 +91,12 @@ export type ComboboxTriggerProps = ComponentProps<
 	typeof _Combobox.Trigger
 > & {
 	children?: _Combobox.Value.Props[ 'children' ];
+	/**
+	 * The size of the trigger.
+	 *
+	 * @default 'default'
+	 */
+	size?: ComboboxSize;
 };
 
 export type ComboboxValueProps = {
