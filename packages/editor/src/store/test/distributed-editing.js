@@ -7308,6 +7308,7 @@ describe( 'distributed editing session state', () => {
 				sessionState: {},
 				step: DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.READY_TO_EDIT,
 				action: 'edit',
+				saveButtonLabel: 'Update',
 			},
 			{
 				sessionState: {
@@ -7317,6 +7318,7 @@ describe( 'distributed editing session state', () => {
 				},
 				step: DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.LOCAL_CHANGES_PROTECTED,
 				action: 'wait_or_export',
+				saveButtonLabel: 'Update',
 			},
 			{
 				sessionState: {
@@ -7327,6 +7329,8 @@ describe( 'distributed editing session state', () => {
 				},
 				step: DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.GET_LATEST_POST,
 				action: 'get_latest_post',
+				saveButtonLabel: 'Refetch required',
+				saveButtonBlocksNormalSavePost: true,
 			},
 			{
 				sessionState: {
@@ -7341,6 +7345,8 @@ describe( 'distributed editing session state', () => {
 				},
 				step: DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.REVIEW_CHANGES,
 				action: 'review_changes',
+				saveButtonLabel: 'Review changes',
+				saveButtonBlocksNormalSavePost: true,
 			},
 			{
 				sessionState: {
@@ -7357,6 +7363,8 @@ describe( 'distributed editing session state', () => {
 				},
 				step: DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.READY_TO_SAVE,
 				action: 'save',
+				saveButtonLabel: 'Submit reviewed changes',
+				saveButtonBlocksNormalSavePost: true,
 			},
 			{
 				sessionState: {
@@ -7368,12 +7376,19 @@ describe( 'distributed editing session state', () => {
 				},
 				step: DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.WAITING_FOR_WORDPRESS,
 				action: 'keep_tab_open',
+				saveButtonLabel: 'Saving reviewed changes',
+				saveButtonDisabled: true,
+				saveButtonBusy: true,
+				saveButtonBlocksNormalSavePost: true,
 			},
 			{
 				sessionState: confirmedState,
 				step: DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.SAVE_CONFIRMED,
 				action: 'none',
 				confirmedByWordPress: true,
+				saveButtonLabel: 'Save confirmed',
+				saveButtonDisabled: true,
+				saveButtonBlocksNormalSavePost: true,
 			},
 		];
 
@@ -7386,6 +7401,12 @@ describe( 'distributed editing session state', () => {
 			expect( stepState ).toMatchObject( {
 				step: currentCase.step,
 				action: currentCase.action,
+				saveButtonLabel: currentCase.saveButtonLabel,
+				saveButtonDisabled: Boolean( currentCase.saveButtonDisabled ),
+				saveButtonBusy: Boolean( currentCase.saveButtonBusy ),
+				saveButtonBlocksNormalSavePost: Boolean(
+					currentCase.saveButtonBlocksNormalSavePost
+				),
 				confirmedByWordPress: Boolean(
 					currentCase.confirmedByWordPress
 				),

@@ -2027,6 +2027,8 @@ function getDistributedEditingEnabledShellState( sessionState ) {
 		getDistributedEditingHumanLoopStepStateForSessionState( normalized );
 	const humanLoopStepCopy =
 		getDistributedEditingHumanLoopStepCopy( humanLoopStepState );
+	const saveJourneyCopy =
+		getDistributedEditingHumanLoopSaveJourneyCopy( humanLoopStepState );
 	const isConnectionDegraded = Boolean(
 		normalized.isConnectionDegraded ||
 			normalized.disposition ===
@@ -2054,6 +2056,8 @@ function getDistributedEditingEnabledShellState( sessionState ) {
 			humanLoopAction: humanLoopStepState.action,
 			humanLoopTitle: humanLoopStepCopy.title,
 			humanLoopSummary: humanLoopStepCopy.summary,
+			saveJourneyTitle: saveJourneyCopy.title,
+			saveJourneySummary: saveJourneyCopy.summary,
 			message: __(
 				'Updates may be delayed. Local changes remain protected and exportable.'
 			),
@@ -2074,6 +2078,8 @@ function getDistributedEditingEnabledShellState( sessionState ) {
 			humanLoopAction: humanLoopStepState.action,
 			humanLoopTitle: humanLoopStepCopy.title,
 			humanLoopSummary: humanLoopStepCopy.summary,
+			saveJourneyTitle: saveJourneyCopy.title,
+			saveJourneySummary: saveJourneyCopy.summary,
 			message: __(
 				'Local changes are protected and remain exportable while WordPress waits for server confirmation.'
 			),
@@ -2093,6 +2099,8 @@ function getDistributedEditingEnabledShellState( sessionState ) {
 		humanLoopAction: humanLoopStepState.action,
 		humanLoopTitle: humanLoopStepCopy.title,
 		humanLoopSummary: humanLoopStepCopy.summary,
+		saveJourneyTitle: saveJourneyCopy.title,
+		saveJourneySummary: saveJourneyCopy.summary,
 		message: __(
 			'WordPress will protect local changes and show sync status here when review, refresh, or server confirmation is needed.'
 		),
@@ -2153,6 +2161,60 @@ function getDistributedEditingHumanLoopStepCopy( humanLoopStepState ) {
 	};
 }
 
+function getDistributedEditingHumanLoopSaveJourneyCopy( humanLoopStepState ) {
+	switch ( humanLoopStepState.step ) {
+		case DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.LOCAL_CHANGES_PROTECTED:
+			return {
+				title: __( 'Save keeps changes protected' ),
+				summary: __(
+					'You can keep editing. If you use Save, keep this tab open until WordPress confirms the update.'
+				),
+			};
+		case DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.GET_LATEST_POST:
+			return {
+				title: __( 'Save needs the latest post' ),
+				summary: __(
+					'Get the latest post before Save updates WordPress; local changes stay protected.'
+				),
+			};
+		case DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.REVIEW_CHANGES:
+			return {
+				title: __( 'Save opens review' ),
+				summary: __(
+					'Review highlighted changes before WordPress updates the post.'
+				),
+			};
+		case DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.READY_TO_SAVE:
+			return {
+				title: __( 'Save is ready' ),
+				summary: __(
+					'Save will send reviewed changes to WordPress for a guarded update.'
+				),
+			};
+		case DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.WAITING_FOR_WORDPRESS:
+			return {
+				title: __( 'Save is waiting for WordPress' ),
+				summary: __(
+					'Keep this tab open until WordPress confirms whether the post was updated.'
+				),
+			};
+		case DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.SAVE_CONFIRMED:
+			return {
+				title: __( 'Save confirmed by WordPress' ),
+				summary: __(
+					'WordPress accepted this Distributed Editing Save.'
+				),
+			};
+	}
+
+	return {
+		title: __( 'Save is available' ),
+		summary: __(
+			'Use Save when you are ready for WordPress to update this post.'
+		),
+	};
+}
+
 /**
  * Renders the always-visible DE-RTC enabled shell in editor chrome.
  *
@@ -2195,6 +2257,12 @@ export function DistributedEditingEnabledShell( {
 				shellState.localProtection
 			}
 			data-distributed-editing-save-action={ shellState.saveAction }
+			data-distributed-editing-save-journey-action={
+				shellState.humanLoopAction
+			}
+			data-distributed-editing-save-journey-step={
+				shellState.humanLoopStep
+			}
 			data-distributed-editing-save-state={ shellState.saveState }
 			data-distributed-editing-server-contact={ shellState.serverContact }
 			data-distributed-editing-shell="enabled"
@@ -2214,9 +2282,27 @@ export function DistributedEditingEnabledShell( {
 			>
 				<strong>{ __( 'Distributed Editing enabled' ) }</strong>
 				<div>{ shellState.message }</div>
-				<div className="editor-distributed-editing-status__enabled-shell-save-state">
-					<strong>{ __( 'Save state' ) }</strong>
-					<div>{ shellState.saveStateSummaryText }</div>
+				<div
+					className="editor-distributed-editing-status__enabled-shell-save-state"
+					data-distributed-editing-save-journey-calls-normal-save="false"
+					data-distributed-editing-save-journey-calls-rest="false"
+					data-distributed-editing-save-journey-calls-retry-save="false"
+					data-distributed-editing-save-journey-changes-post-lock="false"
+					data-distributed-editing-save-journey-claims-saved-without-evidence={ formatDataBoolean(
+						shellState.humanLoopStepState.claimsSavedWithoutEvidence
+					) }
+					data-distributed-editing-save-journey-descriptor-only="true"
+					data-distributed-editing-save-journey-exposes-proof-internals="false"
+					data-distributed-editing-save-journey-exposes-raw-content="false"
+					data-distributed-editing-save-journey-mutates-editor-content="false"
+					data-distributed-editing-save-journey-mutates-persisted-post-content="false"
+					data-distributed-editing-save-journey-status={
+						shellState.humanLoopStep
+					}
+				>
+					<strong>{ __( 'Save' ) }</strong>
+					<div>{ shellState.saveJourneyTitle }</div>
+					<div>{ shellState.saveJourneySummary }</div>
 				</div>
 				<div className="editor-distributed-editing-status__enabled-shell-authority-state">
 					<strong>{ __( 'WordPress post' ) }</strong>

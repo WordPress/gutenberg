@@ -1210,9 +1210,12 @@ describe( 'DistributedEditingStatus', () => {
 				'WordPress will protect local changes and show sync status here when review, refresh, or server confirmation is needed.'
 			)
 		).toBeVisible();
-		expect( screen.getByText( 'Save state' ) ).toBeVisible();
+		expect( screen.getByText( 'Save' ) ).toBeVisible();
+		expect( screen.getByText( 'Save is available' ) ).toBeVisible();
 		expect(
-			screen.getByText( 'Save can update the authoritative post.' )
+			screen.getByText(
+				'Use Save when you are ready for WordPress to update this post.'
+			)
 		).toBeVisible();
 		expect( screen.getByText( 'WordPress post' ) ).toBeVisible();
 		expect(
@@ -1231,6 +1234,30 @@ describe( 'DistributedEditingStatus', () => {
 			.getByText( 'Current step' )
 			// eslint-disable-next-line testing-library/no-node-access
 			.closest( '[data-distributed-editing-human-loop-step-status]' );
+		const saveJourney = screen
+			.getByText( 'Save' )
+			// eslint-disable-next-line testing-library/no-node-access
+			.closest( '[data-distributed-editing-save-journey-status]' );
+		expect( saveJourney ).toHaveAttribute(
+			'data-distributed-editing-save-journey-status',
+			'ready_to_edit'
+		);
+		expect( saveJourney ).toHaveAttribute(
+			'data-distributed-editing-save-journey-descriptor-only',
+			'true'
+		);
+		expect( saveJourney ).toHaveAttribute(
+			'data-distributed-editing-save-journey-calls-normal-save',
+			'false'
+		);
+		expect( saveJourney ).toHaveAttribute(
+			'data-distributed-editing-save-journey-calls-retry-save',
+			'false'
+		);
+		expect( saveJourney ).toHaveAttribute(
+			'data-distributed-editing-save-journey-claims-saved-without-evidence',
+			'false'
+		);
 		expect( humanLoop ).toHaveAttribute(
 			'data-distributed-editing-human-loop-descriptor-only',
 			'true'
@@ -5091,6 +5118,14 @@ describe( 'DistributedEditingStatus', () => {
 			'local_changes_protected'
 		);
 		expect( screen.getByText( 'Local changes protected' ) ).toBeVisible();
+		expect(
+			screen.getByText( 'Save keeps changes protected' )
+		).toBeVisible();
+		expect(
+			screen.getByText(
+				'You can keep editing. If you use Save, keep this tab open until WordPress confirms the update.'
+			)
+		).toBeVisible();
 		expect( screen.getByText( 'Changes pending' ) ).toBeVisible();
 	} );
 
@@ -5142,18 +5177,19 @@ describe( 'DistributedEditingStatus', () => {
 		);
 		expect(
 			screen.getByText(
-				'Protected local changes need review before the authoritative post can update.'
-			)
-		).toBeVisible();
-		expect(
-			screen.getByText(
 				'The authoritative WordPress post cannot be updated until risky changes are approved or removed.'
 			)
 		).toBeVisible();
 		expect( screen.getByText( 'Review changes' ) ).toBeVisible();
+		expect( screen.getByText( 'Save opens review' ) ).toBeVisible();
 		expect(
 			screen.getByText(
 				'Save will open review before WordPress updates the post.'
+			)
+		).toBeVisible();
+		expect(
+			screen.getByText(
+				'Review highlighted changes before WordPress updates the post.'
 			)
 		).toBeVisible();
 	} );
