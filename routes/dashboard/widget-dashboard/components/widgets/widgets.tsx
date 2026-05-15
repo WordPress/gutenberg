@@ -29,6 +29,13 @@ import type {
 	WidgetName,
 } from '../../types';
 
+// Floor applied as `minColumnWidth` on every surface render. Acts as a
+// safety net for stored settings that predate the layered model (where
+// `minColumnWidth` was XOR with `columns` and could be persisted as
+// `undefined`), and keeps tiles legible on narrow viewports without
+// requiring the consumer to wire the floor up themselves.
+const DASHBOARD_MIN_COLUMN_WIDTH = 350;
+
 function toGridLayout( widgets: DashboardWidget[] ): DashboardGridLayoutItem[] {
 	return widgets.map( ( w ) => ( {
 		key: w.uuid,
@@ -149,11 +156,14 @@ export const Widgets = forwardRef< HTMLDivElement, WidgetsProps >(
 				WidgetResizeHandle as React.ComponentType< ResizeHandleRenderProps >,
 		};
 
+		const minColumnWidth =
+			gridSettings.minColumnWidth ?? DASHBOARD_MIN_COLUMN_WIDTH;
+
 		const surface: React.ReactNode = isMasonry ? (
 			<DashboardLanes
 				layout={ gridLayout as DashboardLanesLayoutItem[] }
 				columns={ gridSettings.columns }
-				minColumnWidth={ gridSettings.minColumnWidth }
+				minColumnWidth={ minColumnWidth }
 				flowTolerance={ gridSettings.flowTolerance }
 				onChangeLayout={ handleMasonryChange }
 				{ ...sharedRenderProps }
@@ -164,7 +174,7 @@ export const Widgets = forwardRef< HTMLDivElement, WidgetsProps >(
 			<DashboardGrid
 				layout={ gridLayout as DashboardGridLayoutItem[] }
 				columns={ gridSettings.columns }
-				minColumnWidth={ gridSettings.minColumnWidth }
+				minColumnWidth={ minColumnWidth }
 				rowHeight={ gridSettings.rowHeight }
 				onChangeLayout={ handleGridChange }
 				{ ...sharedRenderProps }

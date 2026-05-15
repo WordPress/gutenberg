@@ -32,13 +32,11 @@ import type {
  * shape passes through untouched and missing fields fall back to whatever
  * defaults the grid model itself supplies.
  *
- * `columns` is the user-facing target (drawer-editable). `minColumnWidth`
- * is an implicit floor that protects tile legibility on narrow containers
- * and is not exposed in the layout settings drawer.
+ * The per-tile width floor is enforced by the dashboard engine at render
+ * time (see `widgets.tsx`), not stored in user-facing settings.
  */
 const DEFAULT_GRID: WidgetGridSettings = {
 	columns: 6,
-	minColumnWidth: 350,
 	rowHeight: 200,
 };
 
