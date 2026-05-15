@@ -26,6 +26,7 @@ import { getDefaultBlockName } from '@wordpress/blocks';
  */
 import BlockListBlock from './block';
 import BlockListAppender from '../block-list-appender';
+import DefaultBlockAppender from '../inner-blocks/default-block-appender';
 import { useInBetweenInserter } from './use-in-between-inserter';
 import { store as blockEditorStore } from '../../store';
 import { LayoutProvider, defaultLayout } from './layout';
@@ -297,6 +298,9 @@ function Items( {
 					tagName={ __experimentalAppenderTagName }
 					rootClientId={ rootClientId }
 					CustomAppender={ CustomAppender }
+					isDefaultAppender={
+						CustomAppender === DefaultBlockAppender
+					}
 				/>
 			) }
 		</LayoutProvider>

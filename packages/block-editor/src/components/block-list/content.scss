@@ -362,13 +362,17 @@ _::-webkit-full-page-media, _:future, :root [data-has-multi-selection="true"] .b
 	}
 }
 
-.block-editor-block-list__block:not(.is-selected):not(.has-child-selected) .block-editor-default-block-appender {
+.block-editor-block-list__block:not(.is-selected):not(.has-child-selected) .block-list-appender:not(.is-default-appender) .block-editor-default-block-appender {
 	display: none;
 
 	.block-editor-inserter__toggle {
 		opacity: 0;
 		transform: scale(0);
 	}
+}
+
+.block-editor-block-list__block .block-list-appender.is-default-appender .block-editor-default-block-appender {
+	height: fit-content;
 }
 
 .block-editor-block-list__block .block-editor-block-list__block-html-textarea {

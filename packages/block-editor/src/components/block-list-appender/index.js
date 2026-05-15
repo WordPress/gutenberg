@@ -44,6 +44,7 @@ export default function BlockListAppender( {
 	CustomAppender,
 	className,
 	tagName: TagName = 'div',
+	isDefaultAppender,
 } ) {
 	const isDragOver = useSelect(
 		( select ) => {
@@ -78,6 +79,7 @@ export default function BlockListAppender( {
 			tabIndex={ -1 }
 			className={ clsx( 'block-list-appender wp-block', className, {
 				'is-drag-over': isDragOver,
+				'is-default-appender': isDefaultAppender,
 			} ) }
 			// Needed in case the whole editor is content editable (for multi
 			// selection). It fixes an edge case where ArrowDown and ArrowRight
