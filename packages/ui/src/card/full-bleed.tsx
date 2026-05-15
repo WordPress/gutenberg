@@ -18,6 +18,9 @@ import type { FullBleedProps } from './types';
  *   (`CollapsibleCard` wraps content in a panel, so top-edge bumping does not
  *   apply there — the header/content gap stays intact.)
  *
+ * With `CollapsibleCard`, place full-bleed media in `CollapsibleCard.Content`,
+ * not the header.
+ *
  * Must be used as a direct child of `Card.Content` or `Card.Header`.
  */
 export const FullBleed = forwardRef< HTMLDivElement, FullBleedProps >(
