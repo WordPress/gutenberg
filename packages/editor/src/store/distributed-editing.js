@@ -2068,15 +2068,26 @@ function createDistributedEditingFreshReviewItemAffordanceDescriptor(
 	item,
 	{ enabled = true, reason = null } = {}
 ) {
-	const reportsCommandStatus =
-		actionKey ===
-		DISTRIBUTED_EDITING_NOTICE_ACTIONS.JUMP_TO_FRESH_REVIEW_ITEM;
+	const reportsCommandStatus = [
+		DISTRIBUTED_EDITING_NOTICE_ACTIONS.JUMP_TO_FRESH_REVIEW_ITEM,
+		DISTRIBUTED_EDITING_NOTICE_ACTIONS.COMPARE_FRESH_REVIEW_ITEM,
+	].includes( actionKey );
 	let commandStatus = null;
 
-	if ( reportsCommandStatus ) {
+	if (
+		actionKey ===
+		DISTRIBUTED_EDITING_NOTICE_ACTIONS.JUMP_TO_FRESH_REVIEW_ITEM
+	) {
 		commandStatus = enabled
 			? 'jump-target-available'
 			: 'jump-target-unavailable';
+	} else if (
+		actionKey ===
+		DISTRIBUTED_EDITING_NOTICE_ACTIONS.COMPARE_FRESH_REVIEW_ITEM
+	) {
+		commandStatus = enabled
+			? 'compare-evidence-available'
+			: 'compare-evidence-unavailable';
 	}
 
 	return {

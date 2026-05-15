@@ -1033,6 +1033,18 @@ export function DistributedEditingFreshReviewDecisionPanel( {
 		return jumpAction;
 	}
 
+	function inspectCompareEvidence( reviewItem ) {
+		const compareAction = reviewItem?.compareAction;
+		const nextCommandStatus =
+			compareAction?.commandStatus ||
+			( compareAction?.enabled
+				? 'compare-evidence-available'
+				: 'compare-evidence-unavailable' );
+
+		setCommandStatus( nextCommandStatus );
+		return compareAction;
+	}
+
 	async function submitDecision() {
 		setCommandStatus( 'submitting' );
 
@@ -1168,6 +1180,34 @@ export function DistributedEditingFreshReviewDecisionPanel( {
 										variant="tertiary"
 									>
 										{ __( 'Jump target' ) }
+									</Button>
+								) }
+								{ item.compareAction?.reportsCommandStatus && (
+									<Button
+										__next40pxDefaultSize
+										accessibleWhenDisabled
+										aria-label={ sprintf(
+											/* translators: %s: review item label. */
+											__(
+												'Inspect compare evidence for %s'
+											),
+											label
+										) }
+										className="editor-distributed-editing-status__fresh-review-decision-item-affordance-command"
+										data-distributed-editing-fresh-review-item-affordance-command="compare"
+										disabled={
+											! item.compareAction.enabled ||
+											[
+												'running',
+												'submitting',
+											].includes( commandStatus )
+										}
+										onClick={ () =>
+											inspectCompareEvidence( item )
+										}
+										variant="tertiary"
+									>
+										{ __( 'Compare evidence' ) }
 									</Button>
 								) }
 								<Button
@@ -1737,6 +1777,18 @@ function getFreshReviewDecisionCommandMessage( commandStatus ) {
 		);
 	}
 
+	if ( commandStatus === 'compare-evidence-available' ) {
+		return __(
+			'Compare evidence checked. The editor found hash evidence for this review item; no comparison was opened, no content changed, and no save was made.'
+		);
+	}
+
+	if ( commandStatus === 'compare-evidence-unavailable' ) {
+		return __(
+			'Compare evidence checked. This review item does not have hash evidence yet; no comparison was opened, no content changed, and no save was made.'
+		);
+	}
+
 	return __(
 		'Fresh-review decisions can be recorded after every hash-only item is approved or rejected.'
 	);
@@ -1908,6 +1960,7 @@ export function DistributedEditingStatusChrome( { onAction } ) {
 				placement="editor-interface-notices"
 			/>
 			<DistributedEditingFreshReviewJumpInspectionStatus />
+			<DistributedEditingFreshReviewCompareInspectionStatus />
 		</>
 	);
 }
@@ -1981,6 +2034,87 @@ function DistributedEditingFreshReviewJumpInspectionStatus() {
 				aria-live="polite"
 				className="editor-distributed-editing-status__fresh-review-jump-inspection-command"
 				data-distributed-editing-fresh-review-jump-inspection-status={
+					commandStatus
+				}
+				role="status"
+			>
+				{ getFreshReviewDecisionCommandMessage( commandStatus ) }
+			</div>
+		</div>
+	);
+}
+
+function DistributedEditingFreshReviewCompareInspectionStatus() {
+	const [ commandStatus, setCommandStatus ] = useState( 'idle' );
+	const decisionState = useSelect( ( select ) => {
+		const {
+			getDistributedEditingFreshReviewDecisionState,
+			getDistributedEditingSessionState,
+		} = select( editorStore );
+		const sessionState = getDistributedEditingSessionState?.() || {};
+
+		return (
+			getDistributedEditingFreshReviewDecisionState?.() ||
+			getDistributedEditingFreshReviewDecisionStateForSessionState(
+				sessionState
+			)
+		);
+	}, [] );
+	const reviewItem = decisionState?.reviewItems?.find(
+		( item ) => item.compareAction?.reportsCommandStatus
+	);
+
+	if ( ! reviewItem ) {
+		return null;
+	}
+
+	const label =
+		reviewItem.blockLabel ||
+		reviewItem.blockName ||
+		reviewItem.id ||
+		__( 'Review item' );
+
+	function inspectCompareEvidence() {
+		const compareAction = reviewItem.compareAction;
+		const nextCommandStatus =
+			compareAction?.commandStatus ||
+			( compareAction?.enabled
+				? 'compare-evidence-available'
+				: 'compare-evidence-unavailable' );
+
+		setCommandStatus( nextCommandStatus );
+		return compareAction;
+	}
+
+	return (
+		<div
+			aria-label={ __(
+				'Distributed editing fresh review compare status'
+			) }
+			className="editor-distributed-editing-status__fresh-review-compare-inspection"
+			data-distributed-editing-fresh-review-compare-inspection
+			data-distributed-editing-fresh-review-compare-inspection-placement="editor-interface-notices"
+			role="group"
+		>
+			<Button
+				__next40pxDefaultSize
+				accessibleWhenDisabled
+				aria-label={ sprintf(
+					/* translators: %s: review item label. */
+					__( 'Inspect compare evidence for %s' ),
+					label
+				) }
+				data-distributed-editing-fresh-review-item-affordance-command="compare"
+				disabled={ ! reviewItem.compareAction?.enabled }
+				onClick={ inspectCompareEvidence }
+				variant="tertiary"
+			>
+				{ __( 'Compare evidence' ) }
+			</Button>
+			<div
+				aria-live="polite"
+				className="editor-distributed-editing-status__fresh-review-compare-inspection-command"
+				data-distributed-editing-fresh-review-compare-inspection-status={
 					commandStatus
 				}
 				role="status"
