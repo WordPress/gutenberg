@@ -68,8 +68,8 @@ async function generateIconsDataPHP() {
 
 		entries.push(
 			`${ key } => array(
-		'viewBox'  => '${ escapePHPString( viewBox ) }',
-		'content'  => '${ escapePHPString( content ) }',
+		'viewBox' => '${ escapePHPString( viewBox ) }',
+		'content' => '${ escapePHPString( content ) }',
 	),`
 		);
 	}
