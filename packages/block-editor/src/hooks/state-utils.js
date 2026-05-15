@@ -1,9 +1,4 @@
 /**
- * WordPress dependencies
- */
-import { getBlockType } from '@wordpress/blocks';
-
-/**
  * Internal dependencies
  */
 import { scopeSelector } from '../components/global-styles/utils';
@@ -75,44 +70,4 @@ export function buildScopedBlockSelector(
 			return `${ baseSelector }${ suffix }`;
 		} )
 		.join( ', ' );
-}
-
-/**
- * Builds the scoped CSS selector for a block state (e.g. :hover, :focus).
- *
- * Uses the block's `selectors.root` to determine which element the state
- * pseudo-class should apply to. If `selectors.root` describes a descendant
- * element (e.g. ".wp-block-button .wp-block-button__link"), the relative
- * portion (".wp-block-button__link") is scoped under `baseSelector`. If no
- * descendant is present, falls back to appending the state to `baseSelector`.
- *
- * @param {string} baseSelector The block-instance scoping class selector.
- * @param {string} name         The block name, used to look up selectors.
- * @param {string} state        The pseudo-class string, e.g. ":hover".
- * @return {string} The fully-scoped CSS selector for this state.
- */
-export function buildStateSelector( baseSelector, name, state ) {
-	const rootSelector = getBlockType( name )?.selectors?.root;
-	return buildScopedBlockSelector( baseSelector, rootSelector, state );
-}
-
-/**
- * Builds the CSS selector used to preview a state on the editor canvas,
- * scoped to a specific block instance via its `data-block` attribute.
- *
- * For blocks whose `selectors.root` targets a descendant element
- * (e.g. ".wp-block-button .wp-block-button__link"), the selector targets
- * that descendant inside the block wrapper. Otherwise it targets the wrapper
- * itself.
- *
- * @param {string} clientId The block's clientId.
- * @param {string} name     The block name, used to look up selectors.
- * @return {string} CSS selector scoped to this block instance.
- */
-export function buildCanvasStateSelector( clientId, name ) {
-	const rootSelector = getBlockType( name )?.selectors?.root;
-	return buildScopedBlockSelector(
-		`[data-block="${ clientId }"]`,
-		rootSelector
-	);
 }
