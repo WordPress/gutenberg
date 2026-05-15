@@ -156,6 +156,100 @@ class Gutenberg_REST_Comment_Controller_6_9 extends WP_REST_Comments_Controller 
 		return true;
 	}
 
+	/**
+	 * Checks if a given request has access to update a comment.
+	 *
+	 * Extends core's check so that users who can `edit_post` on the parent
+	 * post are also allowed to update note-type comments — but only for
+	 * suggestion-lifecycle fields (status and `_wp_suggestion_status` meta).
+	 * This unblocks the suggestion workflow where a post editor applies or
+	 * rejects a suggestion authored by someone else, without granting them
+	 * the ability to rewrite the note's content, reassign authorship, or
+	 * otherwise modify another user's comment.
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return true|WP_Error True if the request has access, WP_Error otherwise.
+	 */
+	public function update_item_permissions_check( $request ) {
+		$comment = $this->get_comment( $request['id'] );
+		if ( is_wp_error( $comment ) ) {
+			return $comment;
+		}
+
+		// For note comments, allow users who can edit the parent post to
+		// update suggestion-lifecycle fields only.
+		if (
+			'note' === $comment->comment_type &&
+			self::is_suggestion_lifecycle_update( $request )
+		) {
+			$post = get_post( $comment->comment_post_ID );
+			if ( $post && current_user_can( 'edit_post', $post->ID ) ) {
+				return true;
+			}
+		}
+
+		// Fall back to core's default check (moderate_comments or edit_comment).
+		return parent::update_item_permissions_check( $request );
+	}
+
+	/**
+	 * Determines whether a note-update request touches only the fields used
+	 * by the suggestion apply/reject lifecycle.
+	 *
+	 * Allowed fields:
+	 *  - `status` (limited to `approved` or `hold`)
+	 *  - `meta._wp_suggestion_status`
+	 *
+	 * Any other field present in the request body disqualifies the request
+	 * from the `edit_post` shortcut, forcing it through core's edit_comment
+	 * check instead.
+	 *
+	 * @param WP_REST_Request $request
+	 * @return bool
+	 */
+	private static function is_suggestion_lifecycle_update( $request ) {
+		// Accept either a JSON body (the block editor client) or a form-
+		// encoded body (custom integrations / curl scripts). Either way the
+		// shortcut is gated by the same allowlist below — query/URL params
+		// are intentionally excluded so the body is the source of truth for
+		// what's being written.
+		$params = $request->get_json_params();
+		if ( ! is_array( $params ) ) {
+			$params = $request->get_body_params();
+		}
+		if ( ! is_array( $params ) || empty( $params ) ) {
+			return false;
+		}
+
+		$allowed_keys = array( 'id', 'status', 'meta' );
+		foreach ( array_keys( $params ) as $key ) {
+			if ( ! in_array( $key, $allowed_keys, true ) ) {
+				return false;
+			}
+		}
+
+		if (
+			isset( $params['status'] ) &&
+			! in_array( $params['status'], array( 'approved', 'hold' ), true )
+		) {
+			return false;
+		}
+
+		if ( isset( $params['meta'] ) ) {
+			if ( ! is_array( $params['meta'] ) ) {
+				return false;
+			}
+			$allowed_meta = array( '_wp_suggestion_status' );
+			foreach ( array_keys( $params['meta'] ) as $meta_key ) {
+				if ( ! in_array( $meta_key, $allowed_meta, true ) ) {
+					return false;
+				}
+			}
+		}
+
+		return true;
+	}
+
 	public function create_item_permissions_check( $request ) {
 		$is_note = ! empty( $request['type'] ) && 'note' === $request['type'];
 
@@ -297,6 +391,55 @@ class Gutenberg_REST_Comment_Controller_6_9 extends WP_REST_Comments_Controller 
 	}
 
 	/**
+	 * Validates that an incoming request's `_wp_suggestion` meta is within the
+	 * allowed byte budget. Truncating arbitrary JSON corrupts the payload, so
+	 * we reject before any storage happens.
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return true|WP_Error True if no payload or within bounds, WP_Error otherwise.
+	 */
+	protected static function validate_suggestion_payload_size( $request ) {
+		$meta = $request['meta'] ?? null;
+		if ( ! is_array( $meta ) || ! isset( $meta['_wp_suggestion'] ) ) {
+			return true;
+		}
+		$value = $meta['_wp_suggestion'];
+		if ( ! is_string( $value ) ) {
+			return true;
+		}
+		if ( strlen( $value ) > GUTENBERG_SUGGESTION_PAYLOAD_MAX_BYTES ) {
+			return new WP_Error(
+				'rest_suggestion_too_large',
+				sprintf(
+					/* translators: %d: maximum allowed byte length. */
+					__( 'Suggestion payload exceeds the %d-byte limit.', 'gutenberg' ),
+					GUTENBERG_SUGGESTION_PAYLOAD_MAX_BYTES
+				),
+				array( 'status' => 413 )
+			);
+		}
+		return true;
+	}
+
+	/**
+	 * Updates a comment.
+	 *
+	 * Wraps core's update path with a pre-flight size check on the suggestion
+	 * payload so oversized values are rejected with a clean 413 instead of
+	 * silently dropped by the meta sanitize_callback.
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return WP_REST_Response|WP_Error
+	 */
+	public function update_item( $request ) {
+		$size_check = self::validate_suggestion_payload_size( $request );
+		if ( is_wp_error( $size_check ) ) {
+			return $size_check;
+		}
+		return parent::update_item( $request );
+	}
+
+	/**
 	 * Creates a comment.
 	 *
 	 * @since 4.7.0
@@ -323,6 +466,14 @@ class Gutenberg_REST_Comment_Controller_6_9 extends WP_REST_Comments_Controller 
 				__( 'Cannot create a comment with that type.', 'gutenberg' ),
 				array( 'status' => 400 )
 			);
+		}
+
+		// Reject oversized suggestion payloads with a 413 so the client knows.
+		// Without this, the meta sanitize_callback would silently reject the
+		// value and the suggestion would disappear server-side.
+		$size_check = self::validate_suggestion_payload_size( $request );
+		if ( is_wp_error( $size_check ) ) {
+			return $size_check;
 		}
 
 		$prepared_comment = $this->prepare_item_for_database( $request );
@@ -655,5 +806,6 @@ add_action(
 	function () {
 		$controller = new Gutenberg_REST_Comment_Controller_6_9();
 		$controller->register_routes();
-	}
+	},
+	11
 );
