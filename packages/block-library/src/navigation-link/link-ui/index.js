@@ -8,7 +8,7 @@ import {
 	VisuallyHidden,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import {
 	LinkControl,
 	useBlockEditingMode,
@@ -76,6 +76,11 @@ export function getSuggestionsQuery( type, kind ) {
 			};
 	}
 }
+
+const EXCLUDED = new Set( [
+	'core/navigation-link',
+	'core/navigation-submenu',
+] );
 
 function UnforwardedLinkUI( props, ref ) {
 	const { label, url, opensInNewTab, type, kind, id } = props.link;
@@ -184,51 +189,45 @@ function UnforwardedLinkUI( props, ref ) {
 	}, [ shouldFocusPane ] );
 
 	const blockEditingMode = useBlockEditingMode();
-	const EXCLUDED = new Set( [
-		'core/navigation-link',
-		'core/navigation-submenu',
-	] );
-	const { rootClientId, insertableNavigationBlocks, insertionIndex } =
+	const { rootClientId, insertionIndex, allBlockTypes, canInsertBlockType } =
 		useSelect(
 			( select ) => {
 				const {
 					getBlockRootClientId,
-					canInsertBlockType,
 					getBlockIndex,
+					canInsertBlockType: _canInsert,
 				} = select( blockEditorStore );
 				const root = getBlockRootClientId( props.clientId );
 
-				const index = getBlockIndex( props.clientId );
-				// Get every registered block type that can live inside this navigation.
-				// Exclude navigation-link and navigation-submenu — those are already
-				// handled by LinkControl's own search suggestions.
-				const insertable = root
-					? select( blocksStore )
-							.getBlockTypes()
-							.filter(
-								( blockType ) =>
-									! EXCLUDED.has( blockType.name ) &&
-									canInsertBlockType( blockType.name, root )
-							)
-					: [];
-
 				return {
 					rootClientId: root,
-					insertableNavigationBlocks: insertable,
-					insertionIndex: index + 1,
+					insertionIndex: getBlockIndex( props.clientId ) + 1,
+					allBlockTypes: root
+						? select( blocksStore ).getBlockTypes()
+						: [],
+					canInsertBlockType: _canInsert,
 				};
 			},
 			[ props.clientId ]
 		);
 
-	// Filter insertable blocks by the live search input.
+	// Filter insertable blocks by both capabilities AND the live search input in one pass.
 	// Empty query > no results (avoids flooding the UI before the user types).
 	const matchingBlocks = useMemo( () => {
 		const query = searchInputValue.trim().toLowerCase();
-		if ( ! query ) {
+
+		if ( ! query || ! rootClientId ) {
 			return [];
 		}
-		return insertableNavigationBlocks.filter( ( blockType ) => {
+
+		return allBlockTypes.filter( ( blockType ) => {
+			if ( EXCLUDED.has( blockType.name ) ) {
+				return false;
+			}
+			if ( ! canInsertBlockType( blockType.name, rootClientId ) ) {
+				return false;
+			}
+
 			const title = blockType.title.toLowerCase();
 			const keywords = ( blockType.keywords ?? [] ).map( ( k ) =>
 				k.toLowerCase()
@@ -238,7 +237,7 @@ function UnforwardedLinkUI( props, ref ) {
 				keywords.some( ( kw ) => kw.includes( query ) )
 			);
 		} );
-	}, [ searchInputValue, insertableNavigationBlocks ] );
+	}, [ searchInputValue, allBlockTypes, canInsertBlockType, rootClientId ] );
 
 	const { insertBlock } = useDispatch( blockEditorStore );
 
@@ -396,9 +395,12 @@ const LinkUITools = ( {
 							e.preventDefault();
 							onInsertBlock( blockType );
 						} }
-						aria-haspopup={ blockInserterAriaRole }
 					>
-						{ __( 'Add' ) } { blockType.title } { __( 'Block' ) }
+						{ sprintf(
+							/* translators: %s: Block title (e.g., "Site Logo") */
+							__( 'Add %s Block' ),
+							blockType.title
+						) }
 					</Button>
 				) ) }
 			{ canAddPage && (
