@@ -5,13 +5,12 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { useInstanceId } from '@wordpress/compose';
 import { useEffect, useCallback } from '@wordpress/element';
 import {
-	BlockControls,
 	InspectorControls,
 	useBlockProps,
 	store as blockEditorStore,
 	useInnerBlocksProps,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
-import { SelectControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
 
@@ -19,10 +18,13 @@ import { store as coreStore } from '@wordpress/core-data';
  * Internal dependencies
  */
 import EnhancedPaginationControl from './inspector-controls/enhanced-pagination-control';
+import { unlock } from '../../lock-unlock';
 import QueryInspectorControls from './inspector-controls';
 import EnhancedPaginationModal from './enhanced-pagination-modal';
 import { getQueryContextFromTemplate } from '../utils';
 import QueryToolbar from './query-toolbar';
+
+const { HTMLElementControl } = unlock( blockEditorPrivateApis );
 
 const DEFAULTS_POSTS_PER_PAGE = 3;
 
@@ -33,11 +35,11 @@ export default function QueryContent( {
 	clientId,
 	context,
 	name,
+	isSelected,
 } ) {
 	const {
 		queryId,
 		query,
-		displayLayout,
 		enhancedPagination,
 		tagName: TagName = 'div',
 		query: { inherit } = {},
@@ -85,8 +87,11 @@ export default function QueryContent( {
 	// because updates are batched after the render and changes in different query properties
 	// would cause to override previous wanted changes.
 	const updateQuery = useCallback(
-		( newQuery ) => setAttributes( { query: { ...query, ...newQuery } } ),
-		[ query, setAttributes ]
+		( newQuery ) =>
+			setAttributes( ( prevAttributes ) => ( {
+				query: { ...prevAttributes.query, ...newQuery },
+			} ) ),
+		[ setAttributes ]
 	);
 	useEffect( () => {
 		const newQuery = {};
@@ -97,21 +102,15 @@ export default function QueryContent( {
 		} else if ( ! query.perPage && postsPerPage ) {
 			newQuery.perPage = postsPerPage;
 		}
-		// We need to reset the `inherit` value if in a singular template, as queries
-		// are not inherited when in singular content (e.g. post, page, 404, blank).
-		if ( isSingular && query.inherit ) {
-			newQuery.inherit = false;
-		}
+
 		if ( !! Object.keys( newQuery ).length ) {
 			__unstableMarkNextChangeAsNotPersistent();
 			updateQuery( newQuery );
 		}
 	}, [
 		query.perPage,
-		query.inherit,
-		postsPerPage,
 		inherit,
-		isSingular,
+		postsPerPage,
 		__unstableMarkNextChangeAsNotPersistent,
 		updateQuery,
 	] );
@@ -128,24 +127,16 @@ export default function QueryContent( {
 		__unstableMarkNextChangeAsNotPersistent,
 		setAttributes,
 	] );
-	const updateDisplayLayout = ( newDisplayLayout ) =>
-		setAttributes( {
-			displayLayout: { ...displayLayout, ...newDisplayLayout },
-		} );
-	const htmlElementMessages = {
-		main: __(
-			'The <main> element should be used for the primary content of your document only.'
-		),
-		section: __(
-			"The <section> element should represent a standalone portion of the document that can't be better represented by another element."
-		),
-		aside: __(
-			"The <aside> element should represent a portion of a document whose content is only indirectly related to the document's main content."
-		),
-	};
 
 	return (
 		<>
+			{ isSelected && (
+				<QueryToolbar
+					clientId={ clientId }
+					attributes={ attributes }
+					hasInnerBlocks
+				/>
+			) }
 			<EnhancedPaginationModal
 				attributes={ attributes }
 				setAttributes={ setAttributes }
@@ -156,31 +147,24 @@ export default function QueryContent( {
 					name={ name }
 					attributes={ attributes }
 					setQuery={ updateQuery }
-					setDisplayLayout={ updateDisplayLayout }
 					setAttributes={ setAttributes }
 					clientId={ clientId }
 					isSingular={ isSingular }
 				/>
 			</InspectorControls>
-			<BlockControls>
-				<QueryToolbar attributes={ attributes } clientId={ clientId } />
-			</BlockControls>
 			<InspectorControls group="advanced">
-				<SelectControl
-					__nextHasNoMarginBottom
-					__next40pxDefaultSize
-					label={ __( 'HTML element' ) }
+				<HTMLElementControl
+					tagName={ TagName }
+					onChange={ ( value ) =>
+						setAttributes( { tagName: value } )
+					}
+					clientId={ clientId }
 					options={ [
 						{ label: __( 'Default (<div>)' ), value: 'div' },
 						{ label: '<main>', value: 'main' },
 						{ label: '<section>', value: 'section' },
 						{ label: '<aside>', value: 'aside' },
 					] }
-					value={ TagName }
-					onChange={ ( value ) =>
-						setAttributes( { tagName: value } )
-					}
-					help={ htmlElementMessages[ TagName ] }
 				/>
 				<EnhancedPaginationControl
 					enhancedPagination={ enhancedPagination }

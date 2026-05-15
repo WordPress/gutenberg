@@ -6,12 +6,17 @@ import { render, screen } from '@testing-library/react';
 /**
  * Internal dependencies
  */
-import Badge from '..';
+import _Badge from '..';
+
+const testid = 'my-badge';
+const Badge = ( props: React.ComponentProps< typeof _Badge > ) => (
+	<_Badge data-testid={ testid } { ...props } />
+);
 
 describe( 'Badge', () => {
 	it( 'should render correctly with default props', () => {
 		render( <Badge>Code is Poetry</Badge> );
-		const badge = screen.getByText( 'Code is Poetry' );
+		const badge = screen.getByTestId( testid );
 		expect( badge ).toBeInTheDocument();
 		expect( badge.tagName ).toBe( 'SPAN' );
 		expect( badge ).toHaveClass( 'components-badge' );
@@ -19,14 +24,14 @@ describe( 'Badge', () => {
 
 	it( 'should render as per its intent and contain an icon', () => {
 		render( <Badge intent="error">Code is Poetry</Badge> );
-		const badge = screen.getByText( 'Code is Poetry' );
+		const badge = screen.getByTestId( testid );
 		expect( badge ).toHaveClass( 'components-badge', 'is-error' );
 		expect( badge ).toHaveClass( 'has-icon' );
 	} );
 
 	it( 'should combine custom className with default class', () => {
 		render( <Badge className="custom-class">Code is Poetry</Badge> );
-		const badge = screen.getByText( 'Code is Poetry' );
+		const badge = screen.getByTestId( testid );
 		expect( badge ).toHaveClass( 'components-badge' );
 		expect( badge ).toHaveClass( 'custom-class' );
 	} );

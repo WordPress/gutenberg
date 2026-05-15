@@ -156,17 +156,6 @@ async function main() {
 	fs.writeFileSync( nodePath.join( __dirname, 'issueContent.md' ), content );
 }
 
-/**
- * Checks if the first date is after the second date.
- *
- * @param {string} date1 - The first date.
- * @param {string} date2 - The second date.
- * @return {boolean} - Returns true if the first date is after the second date, false otherwise.
- */
-function isAfter( date1, date2 ) {
-	return new Date( date1 ) > new Date( date2 );
-}
-
 function validateDate( sinceArg ) {
 	const sinceDate = new Date( sinceArg );
 	const maxPreviousDate = new Date();
@@ -441,7 +430,6 @@ async function fetchCommit( sha ) {
 	} );
 }
 
-// eslint-disable-next-line no-unused-vars
 async function getPullRequestDataForCommit( commitSha ) {
 	const pullRequests = await octokitRequest(
 		'GET /repos/{owner}/{repo}/commits/{commit_sha}/pulls',

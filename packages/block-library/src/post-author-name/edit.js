@@ -1,27 +1,33 @@
 /**
- * External dependencies
- */
-import clsx from 'clsx';
-
-/**
  * WordPress dependencies
  */
-import {
-	AlignmentControl,
-	BlockControls,
-	InspectorControls,
-	useBlockProps,
-} from '@wordpress/block-editor';
+import { useBlockProps, InspectorControls } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
-import { PanelBody, ToggleControl } from '@wordpress/components';
+import {
+	ToggleControl,
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
+} from '@wordpress/components';
 
-function PostAuthorNameEdit( {
-	context: { postType, postId },
-	attributes: { textAlign, isLink, linkTarget },
-	setAttributes,
-} ) {
+/**
+ * Internal dependencies
+ */
+import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+
+/**
+ * Internal dependencies
+ */
+import useDeprecatedTextAlign from '../utils/deprecated-text-align-attributes';
+
+function PostAuthorNameEdit( props ) {
+	useDeprecatedTextAlign( props );
+	const {
+		attributes: { isLink, linkTarget },
+		setAttributes,
+		context: { postType, postId },
+	} = props;
 	const { authorName, supportsAuthor } = useSelect(
 		( select ) => {
 			const { getEditedEntityRecord, getUser, getPostType } =
@@ -41,11 +47,7 @@ function PostAuthorNameEdit( {
 		[ postType, postId ]
 	);
 
-	const blockProps = useBlockProps( {
-		className: clsx( {
-			[ `has-text-align-${ textAlign }` ]: textAlign,
-		} ),
-	} );
+	const blockProps = useBlockProps();
 
 	const displayName = authorName?.name || __( 'Author Name' );
 
@@ -61,48 +63,67 @@ function PostAuthorNameEdit( {
 		displayName
 	);
 
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+
 	return (
 		<>
-			<BlockControls group="block">
-				<AlignmentControl
-					value={ textAlign }
-					onChange={ ( nextAlign ) => {
-						setAttributes( { textAlign: nextAlign } );
-					} }
-				/>
-			</BlockControls>
 			<InspectorControls>
-				<PanelBody title={ __( 'Settings' ) }>
-					<ToggleControl
-						__nextHasNoMarginBottom
+				<ToolsPanel
+					label={ __( 'Settings' ) }
+					resetAll={ () => {
+						setAttributes( {
+							isLink: false,
+							linkTarget: '_self',
+						} );
+					} }
+					dropdownMenuProps={ dropdownMenuProps }
+				>
+					<ToolsPanelItem
 						label={ __( 'Link to author archive' ) }
-						onChange={ () => setAttributes( { isLink: ! isLink } ) }
-						checked={ isLink }
-					/>
-					{ isLink && (
+						isShownByDefault
+						hasValue={ () => isLink }
+						onDeselect={ () => setAttributes( { isLink: false } ) }
+					>
 						<ToggleControl
-							__nextHasNoMarginBottom
-							label={ __( 'Open in new tab' ) }
-							onChange={ ( value ) =>
-								setAttributes( {
-									linkTarget: value ? '_blank' : '_self',
-								} )
+							label={ __( 'Link to author archive' ) }
+							onChange={ () =>
+								setAttributes( { isLink: ! isLink } )
 							}
-							checked={ linkTarget === '_blank' }
+							checked={ isLink }
 						/>
+					</ToolsPanelItem>
+					{ isLink && (
+						<ToolsPanelItem
+							label={ __( 'Open in new tab' ) }
+							isShownByDefault
+							hasValue={ () => linkTarget !== '_self' }
+							onDeselect={ () =>
+								setAttributes( { linkTarget: '_self' } )
+							}
+						>
+							<ToggleControl
+								label={ __( 'Open in new tab' ) }
+								onChange={ ( value ) =>
+									setAttributes( {
+										linkTarget: value ? '_blank' : '_self',
+									} )
+								}
+								checked={ linkTarget === '_blank' }
+							/>
+						</ToolsPanelItem>
 					) }
-				</PanelBody>
+				</ToolsPanel>
 			</InspectorControls>
 			<div { ...blockProps }>
-				{ supportsAuthor
-					? displayAuthor
-					: sprintf(
+				{ ! supportsAuthor && postType !== undefined
+					? sprintf(
 							// translators: %s: Name of the post type e.g: "post".
 							__(
 								'This post type (%s) does not support the author.'
 							),
 							postType
-					  ) }
+					  )
+					: displayAuthor }
 			</div>
 		</>
 	);

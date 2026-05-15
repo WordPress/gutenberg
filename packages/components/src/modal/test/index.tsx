@@ -398,7 +398,8 @@ describe( 'Modal', () => {
 			const [ isAShown, setIsAShown ] = useState( false );
 			const [ isA1Shown, setIsA1Shown ] = useState( false );
 			const [ isBShown, setIsBShown ] = useState( false );
-			const [ isClassOverriden, setIsClassOverriden ] = useState( false );
+			const [ isClassOverridden, setIsClassOverridden ] =
+				useState( false );
 			useEffect( () => {
 				const toggles: ( e: KeyboardEvent ) => void = ( {
 					key,
@@ -414,7 +415,7 @@ describe( 'Modal', () => {
 						return setIsBShown( ( v ) => ! v );
 					}
 					if ( key === 'c' ) {
-						return setIsClassOverriden( ( v ) => ! v );
+						return setIsClassOverridden( ( v ) => ! v );
 					}
 				};
 				document.addEventListener( 'keydown', toggles );
@@ -426,7 +427,7 @@ describe( 'Modal', () => {
 					{ isAShown && (
 						<Modal
 							bodyOpenClassName={
-								isClassOverriden ? overrideClass : 'is-A-open'
+								isClassOverridden ? overrideClass : 'is-A-open'
 							}
 							onRequestClose={ () => setIsAShown( false ) }
 						>
@@ -446,7 +447,7 @@ describe( 'Modal', () => {
 					{ isBShown && (
 						<Modal
 							bodyOpenClassName={
-								isClassOverriden ? overrideClass : 'is-B-open'
+								isClassOverridden ? overrideClass : 'is-B-open'
 							}
 							onRequestClose={ () => setIsBShown( false ) }
 						>

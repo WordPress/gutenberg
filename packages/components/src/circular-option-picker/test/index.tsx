@@ -57,6 +57,7 @@ describe( 'CircularOptionPicker', () => {
 
 			expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
 			expect( screen.queryByRole( 'option' ) ).not.toBeInTheDocument();
+			expect( screen.getByRole( 'group' ) ).toBeInTheDocument();
 			expect( screen.getByRole( 'button' ) ).toBeInTheDocument();
 		} );
 	} );

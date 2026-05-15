@@ -20,7 +20,7 @@ The filename is the Core PR number.
 
 For example, if your Core PR number is `1234` and is slated to be part of the WordPress 6.9 release, the filename will be `1234.md`, and will be placed in the `/backport-changelog/6.9` directory.
 
-The content of the markdown file should be the Github URL of the Core PR, followed by a list of Gutenberg PR Github URLs whose changes are backported in the Core PR.
+The content of the markdown file should be the GitHub URL of the Core PR, followed by a list of Gutenberg PR GitHub URLs whose changes are backported in the Core PR.
 
 A single Core PR may contain changes from one or multiple Gutenberg PRs.
 
@@ -51,7 +51,7 @@ For the backport changelog, Gutenberg uses individual files as opposed to a sing
 
 Some Gutenberg PRs may be flagged as needing a core backport PR when they don't, for example when the PR contains minor comment changes, or the changes already exist in Core.
 
-For individual PRs, there are two Github labels that can be used to exclude a PR from the backport changelog CI check:
+For individual PRs, there are two GitHub labels that can be used to exclude a PR from the backport changelog CI check:
 
 - `Backport from WordPress Core` - Indicates that the PR is a backport from WordPress Core and doesn't need a Core PR.
 - `No Core Sync Required` - Indicates that any changes do not need to be synced to WordPress Core.

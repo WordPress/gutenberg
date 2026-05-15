@@ -31,8 +31,14 @@ import {
 	useHasColorPanel,
 	default as StylesColorPanel,
 } from '../components/global-styles/color-panel';
+import { extractColorSlug } from '../utils/color-values';
 import BlockColorContrastChecker from './contrast-checker';
 import { store as blockEditorStore } from '../store';
+import {
+	getStyleForState,
+	setStyleForState,
+	useBlockStyleState,
+} from './block-style-state';
 
 export const COLOR_SUPPORT_KEY = 'color';
 
@@ -191,15 +197,9 @@ export function addSaveProps( props, blockNameOrType, attributes ) {
 
 function styleToAttributes( style ) {
 	const textColorValue = style?.color?.text;
-	const textColorSlug = textColorValue?.startsWith( 'var:preset|color|' )
-		? textColorValue.substring( 'var:preset|color|'.length )
-		: undefined;
+	const textColorSlug = extractColorSlug( textColorValue );
 	const backgroundColorValue = style?.color?.background;
-	const backgroundColorSlug = backgroundColorValue?.startsWith(
-		'var:preset|color|'
-	)
-		? backgroundColorValue.substring( 'var:preset|color|'.length )
-		: undefined;
+	const backgroundColorSlug = extractColorSlug( backgroundColorValue );
 	const gradientValue = style?.color?.gradient;
 	const gradientSlug = gradientValue?.startsWith( 'var:preset|gradient|' )
 		? gradientValue.substring( 'var:preset|gradient|'.length )
@@ -260,40 +260,86 @@ function ColorInspectorControl( { children, resetAllFilter } ) {
 	);
 }
 
-export function ColorEdit( { clientId, name, setAttributes, settings } ) {
+export function ColorEdit( {
+	clientId,
+	name,
+	setAttributes,
+	settings,
+	asWrapper,
+	label,
+	defaultControls,
+} ) {
+	const selectedState = useBlockStyleState();
 	const isEnabled = useHasColorPanel( settings );
-	function selector( select ) {
-		const { style, textColor, backgroundColor, gradient } =
-			select( blockEditorStore ).getBlockAttributes( clientId ) || {};
-		return { style, textColor, backgroundColor, gradient };
-	}
+
 	const { style, textColor, backgroundColor, gradient } = useSelect(
-		selector,
-		[ clientId ]
+		( select ) => {
+			// Early return to avoid subscription when disabled
+			if ( ! isEnabled ) {
+				return {};
+			}
+			const {
+				style: _style,
+				textColor: _textColor,
+				backgroundColor: _backgroundColor,
+				gradient: _gradient,
+			} = select( blockEditorStore ).getBlockAttributes( clientId ) || {};
+			return {
+				style: _style,
+				textColor: _textColor,
+				backgroundColor: _backgroundColor,
+				gradient: _gradient,
+			};
+		},
+		[ clientId, isEnabled ]
 	);
+
+	const isStateSelected = selectedState !== 'default';
+
 	const value = useMemo( () => {
+		if ( isStateSelected ) {
+			return getStyleForState( style, selectedState );
+		}
 		return attributesToStyle( {
 			style,
 			textColor,
 			backgroundColor,
 			gradient,
 		} );
-	}, [ style, textColor, backgroundColor, gradient ] );
+	}, [
+		isStateSelected,
+		selectedState,
+		style,
+		textColor,
+		backgroundColor,
+		gradient,
+	] );
 
-	const onChange = ( newStyle ) => {
-		setAttributes( styleToAttributes( newStyle ) );
-	};
+	const onChange = isStateSelected
+		? ( newStyle ) => {
+				setAttributes( {
+					style: setStyleForState( style, selectedState, newStyle ),
+				} );
+		  }
+		: ( newStyle ) => {
+				setAttributes( styleToAttributes( newStyle ) );
+		  };
+
+	const Wrapper = asWrapper || ColorInspectorControl;
 
 	if ( ! isEnabled ) {
 		return null;
 	}
 
-	const defaultControls = getBlockSupport( name, [
-		COLOR_SUPPORT_KEY,
-		'__experimentalDefaultControls',
-	] );
+	defaultControls = defaultControls
+		? defaultControls
+		: getBlockSupport( name, [
+				COLOR_SUPPORT_KEY,
+				'__experimentalDefaultControls',
+		  ] );
 
 	const enableContrastChecking =
+		! isStateSelected &&
 		Platform.OS === 'web' &&
 		! value?.color?.gradient &&
 		( settings?.color?.text || settings?.color?.link ) &&
@@ -308,12 +354,13 @@ export function ColorEdit( { clientId, name, setAttributes, settings } ) {
 
 	return (
 		<StylesColorPanel
-			as={ ColorInspectorControl }
+			as={ Wrapper }
 			panelId={ clientId }
 			settings={ settings }
 			value={ value }
 			onChange={ onChange }
 			defaultControls={ defaultControls }
+			label={ label }
 			enableContrastChecker={
 				false !==
 				getBlockSupport( name, [
@@ -323,7 +370,10 @@ export function ColorEdit( { clientId, name, setAttributes, settings } ) {
 			}
 		>
 			{ enableContrastChecking && (
-				<BlockColorContrastChecker clientId={ clientId } />
+				<BlockColorContrastChecker
+					clientId={ clientId }
+					name={ name }
+				/>
 			) }
 		</StylesColorPanel>
 	);

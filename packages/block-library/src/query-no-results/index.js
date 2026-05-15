@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { __ } from '@wordpress/i18n';
 import { loop as icon } from '@wordpress/icons';
 
 /**
@@ -18,6 +19,16 @@ export const settings = {
 	icon,
 	edit,
 	save,
+	example: {
+		innerBlocks: [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: __( 'No posts were found.' ),
+				},
+			},
+		],
+	},
 };
 
 export const init = () => initBlock( { name, metadata, settings } );

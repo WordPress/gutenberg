@@ -8,7 +8,9 @@ import { useCallback, useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import CircularOptionPicker from '../circular-option-picker';
+import CircularOptionPicker, {
+	getComputeCircularOptionPickerCommonProps,
+} from '../circular-option-picker';
 import CustomGradientPicker from '../custom-gradient-picker';
 import { VStack } from '../v-stack';
 import { ColorHeading } from '../color-palette/styles';
@@ -128,37 +130,17 @@ function Component( props: PickerProps< any > ) {
 		<SingleOrigin { ...additionalProps } />
 	);
 
-	let metaProps:
-		| { asButtons: false; loop?: boolean; 'aria-label': string }
-		| { asButtons: false; loop?: boolean; 'aria-labelledby': string }
-		| { asButtons: true };
-
-	if ( asButtons ) {
-		metaProps = { asButtons: true };
-	} else {
-		const _metaProps: { asButtons: false; loop?: boolean } = {
-			asButtons: false,
-			loop,
-		};
-
-		if ( ariaLabel ) {
-			metaProps = { ..._metaProps, 'aria-label': ariaLabel };
-		} else if ( ariaLabelledby ) {
-			metaProps = {
-				..._metaProps,
-				'aria-labelledby': ariaLabelledby,
-			};
-		} else {
-			metaProps = {
-				..._metaProps,
-				'aria-label': __( 'Custom color picker.' ),
-			};
-		}
-	}
+	const { metaProps, labelProps } = getComputeCircularOptionPickerCommonProps(
+		asButtons,
+		loop,
+		ariaLabel,
+		ariaLabelledby
+	);
 
 	return (
 		<CircularOptionPicker
 			{ ...metaProps }
+			{ ...labelProps }
 			actions={ actions }
 			options={ options }
 		/>

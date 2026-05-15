@@ -42,7 +42,7 @@ function useDeleteNavigationMenu() {
 					type: 'snackbar',
 				}
 			);
-			history.navivate( '/navigation' );
+			history.navigate( '/navigation' );
 		} catch ( error ) {
 			createErrorNotice(
 				sprintf(

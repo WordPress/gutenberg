@@ -1,0 +1,101 @@
+{
+	"id": 95,
+	"date": "2025-11-06T05:13:54",
+	"date_gmt": "2025-11-06T05:13:54",
+	"guid": {
+		"rendered": "http://localhost:8888/wp-content/uploads/2025/11/gutenberg-v22-0-0.zip",
+		"raw": "http://localhost:8888/wp-content/uploads/2025/11/gutenberg-v22-0-0.zip"
+	},
+	"modified": "2025-11-06T05:13:54",
+	"modified_gmt": "2025-11-06T05:13:54",
+	"slug": "gutenberg-v22-0-0",
+	"status": "inherit",
+	"type": "attachment",
+	"link": "http://localhost:8888/gutenberg-v22-0-0/",
+	"title": {
+		"raw": "gutenberg-v22-0-0",
+		"rendered": "gutenberg-v22-0-0"
+	},
+	"author": 1,
+	"featured_media": 0,
+	"comment_status": "open",
+	"ping_status": "closed",
+	"template": "",
+	"meta": [],
+	"permalink_template": "http://localhost:8888/?attachment_id=95",
+	"generated_slug": "gutenberg-v22-0-0",
+	"class_list": [
+		"post-95",
+		"attachment",
+		"type-attachment",
+		"status-inherit",
+		"hentry"
+	],
+	"description": {
+		"raw": "",
+		"rendered": "<p class=\"attachment\"><a href='http://localhost:8888/wp-content/uploads/2025/11/gutenberg-v22-0-0.zip'>gutenberg-v22-0-0</a></p>\n"
+	},
+	"caption": {
+		"raw": "",
+		"rendered": "<p>gutenberg-v22-0-0</p>\n"
+	},
+	"alt_text": "",
+	"media_type": "file",
+	"mime_type": "application/zip",
+	"media_details": {
+		"filesize": 19988723,
+		"sizes": {}
+	},
+	"post": null,
+	"source_url": "http://localhost:8888/wp-content/uploads/2025/11/gutenberg-v22-0-0.zip",
+	"missing_image_sizes": [],
+	"_links": {
+		"self": [
+			{
+				"href": "http://localhost:8888/wp-json/wp/v2/media/95",
+				"targetHints": {
+					"allow": [ "GET", "POST", "PUT", "PATCH", "DELETE" ]
+				}
+			}
+		],
+		"collection": [
+			{
+				"href": "http://localhost:8888/wp-json/wp/v2/media"
+			}
+		],
+		"about": [
+			{
+				"href": "http://localhost:8888/wp-json/wp/v2/types/attachment"
+			}
+		],
+		"author": [
+			{
+				"embeddable": true,
+				"href": "http://localhost:8888/wp-json/wp/v2/users/1"
+			}
+		],
+		"replies": [
+			{
+				"embeddable": true,
+				"href": "http://localhost:8888/wp-json/wp/v2/comments?post=95"
+			}
+		],
+		"wp:action-unfiltered-html": [
+			{
+				"href": "http://localhost:8888/wp-json/wp/v2/media/95"
+			}
+		],
+		"wp:action-assign-author": [
+			{
+				"href": "http://localhost:8888/wp-json/wp/v2/media/95"
+			}
+		],
+		"curies": [
+			{
+				"name": "wp",
+				"href": "https://api.w.org/{rel}",
+				"templated": true
+			}
+		]
+	}
+}

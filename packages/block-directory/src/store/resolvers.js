@@ -35,5 +35,7 @@ export const getDownloadableBlocks =
 			);
 
 			dispatch( receiveDownloadableBlocks( blocks, filterValue ) );
-		} catch {}
+		} catch {
+			dispatch( receiveDownloadableBlocks( [], filterValue ) );
+		}
 	};

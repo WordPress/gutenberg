@@ -152,7 +152,7 @@ describe( 'useMergeRefs', () => {
 
 		rerender( <MergedRefs count={ 2 } /> );
 
-		// After a second render with a dependency change, expect the inital
+		// After a second render with a dependency change, expect the initial
 		// callback function to be called with null and the new callback
 		// function to be called with the original node. Note that for callback
 		// one no dependencies have changed.
@@ -235,7 +235,7 @@ describe( 'useMergeRefs', () => {
 
 		rerender( <MergedRefs tagName="button" count={ 1 } /> );
 
-		// After a third render with a dependency change, expect the inital
+		// After a third render with a dependency change, expect the initial
 		// callback function to be called with null and the new callback
 		// function to be called with the new element. Note that for callback
 		// one no dependencies have changed.

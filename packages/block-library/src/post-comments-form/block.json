@@ -6,13 +6,9 @@
 	"category": "theme",
 	"description": "Display a post's comments form.",
 	"textdomain": "default",
-	"attributes": {
-		"textAlign": {
-			"type": "string"
-		}
-	},
 	"usesContext": [ "postId", "postType" ],
 	"supports": {
+		"anchor": true,
 		"html": false,
 		"color": {
 			"gradients": true,
@@ -30,6 +26,7 @@
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
+			"textAlign": true,
 			"__experimentalFontStyle": true,
 			"__experimentalFontWeight": true,
 			"__experimentalLetterSpacing": true,
@@ -56,5 +53,14 @@
 		"wp-block-post-comments-form",
 		"wp-block-buttons",
 		"wp-block-button"
-	]
+	],
+	"example": {
+		"attributes": {
+			"style": {
+				"typography": {
+					"textAlign": "center"
+				}
+			}
+		}
+	}
 }

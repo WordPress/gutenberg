@@ -10,12 +10,16 @@ import {
 	Warning,
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
-import { PanelBody } from '@wordpress/components';
+import {
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
+} from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import { CommentsPaginationArrowControls } from './comments-pagination-arrow-controls';
+import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 const TEMPLATE = [
 	[ 'core/comments-pagination-previous' ],
@@ -45,6 +49,7 @@ export default function QueryPaginationEdit( {
 	}, [] );
 
 	const blockProps = useBlockProps();
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		template: TEMPLATE,
 	} );
@@ -73,14 +78,29 @@ export default function QueryPaginationEdit( {
 		<>
 			{ hasNextPreviousBlocks && (
 				<InspectorControls>
-					<PanelBody title={ __( 'Settings' ) }>
-						<CommentsPaginationArrowControls
-							value={ paginationArrow }
-							onChange={ ( value ) => {
-								setAttributes( { paginationArrow: value } );
-							} }
-						/>
-					</PanelBody>
+					<ToolsPanel
+						label={ __( 'Settings' ) }
+						dropdownMenuProps={ dropdownMenuProps }
+						resetAll={ () =>
+							setAttributes( { paginationArrow: 'none' } )
+						}
+					>
+						<ToolsPanelItem
+							label={ __( 'Arrow' ) }
+							hasValue={ () => paginationArrow !== 'none' }
+							onDeselect={ () =>
+								setAttributes( { paginationArrow: 'none' } )
+							}
+							isShownByDefault
+						>
+							<CommentsPaginationArrowControls
+								value={ paginationArrow }
+								onChange={ ( value ) => {
+									setAttributes( { paginationArrow: value } );
+								} }
+							/>
+						</ToolsPanelItem>
+					</ToolsPanel>
 				</InspectorControls>
 			) }
 			<div { ...innerBlocksProps } />

@@ -1,8 +1,8 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
-import { fn } from '@storybook/test';
+import type { Meta, StoryFn } from '@storybook/react-vite';
+import { fn } from 'storybook/test';
 
 /**
  * WordPress dependencies
@@ -15,7 +15,6 @@ import { useState } from '@wordpress/element';
  */
 import { Tabs } from '..';
 import { Slot, Fill, Provider as SlotFillProvider } from '../../slot-fill';
-import DropdownMenu from '../../dropdown-menu';
 import Button from '../../button';
 import Tooltip from '../../tooltip';
 import Icon from '../../icon';
@@ -25,20 +24,21 @@ const meta: Meta< typeof Tabs > = {
 	id: 'components-tabs',
 	component: Tabs,
 	subcomponents: {
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		'Tabs.TabList': Tabs.TabList,
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		'Tabs.Tab': Tabs.Tab,
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		'Tabs.TabPanel': Tabs.TabPanel,
 		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		'Tabs.Context': Tabs.Context,
 	},
 	tags: [ 'status-private' ],
 	parameters: {
-		actions: { argTypesRegex: '^on.*' },
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+			notes: 'When building for the Gutenberg repo, use this component instead of `TabPanel`. Otherwise, continue using `TabPanel`. Both will be superseded by `Tabs` in `@wordpress/ui`, but continue using these for now.',
+		},
 	},
 	args: {
 		onActiveTabIdChange: fn(),
@@ -70,7 +70,9 @@ const Template: StoryFn< typeof Tabs > = ( props ) => {
 					Instead, the [Tab] key will move focus to the first
 					focusable element within the panel.
 				</p>
-				<Button variant="primary">I&apos;m a button!</Button>
+				<Button __next40pxDefaultSize variant="primary">
+					I&apos;m a button!
+				</Button>
 			</Tabs.TabPanel>
 		</Tabs>
 	);
@@ -123,6 +125,7 @@ export const SizeAndOverflowPlayground: StoryFn< typeof Tabs > = ( props ) => {
 				</ul>
 			</div>
 			<Button
+				__next40pxDefaultSize
 				style={ { marginBottom: '1rem' } }
 				variant="primary"
 				onClick={ () => setFullWidth( ! fullWidth ) }
@@ -337,6 +340,7 @@ const CloseButtonTemplate: StoryFn< typeof Tabs > = ( props ) => {
 								<Tabs.Tab tabId="tab3">Tab 3</Tabs.Tab>
 							</Tabs.TabList>
 							<Button
+								__next40pxDefaultSize
 								variant="tertiary"
 								style={ {
 									marginLeft: 'auto',
@@ -359,7 +363,11 @@ const CloseButtonTemplate: StoryFn< typeof Tabs > = ( props ) => {
 					</Tabs>
 				</div>
 			) : (
-				<Button variant="tertiary" onClick={ () => setIsOpen( true ) }>
+				<Button
+					__next40pxDefaultSize
+					variant="tertiary"
+					onClick={ () => setIsOpen( true ) }
+				>
 					Open Tabs
 				</Button>
 			) }
@@ -367,133 +375,3 @@ const CloseButtonTemplate: StoryFn< typeof Tabs > = ( props ) => {
 	);
 };
 export const InsertCustomElements = CloseButtonTemplate.bind( {} );
-
-const ControlledModeTemplate: StoryFn< typeof Tabs > = ( props ) => {
-	const [ selectedTabId, setSelectedTabId ] = useState<
-		string | undefined | null
-	>( props.selectedTabId );
-
-	return (
-		<>
-			<Tabs
-				{ ...props }
-				selectedTabId={ selectedTabId }
-				onSelect={ ( selectedId ) => {
-					setSelectedTabId( selectedId );
-					props.onSelect?.( selectedId );
-				} }
-			>
-				<Tabs.TabList>
-					<Tabs.Tab tabId="tab1">Tab 1</Tabs.Tab>
-
-					<Tabs.Tab tabId="tab2">Tab 2</Tabs.Tab>
-
-					<Tabs.Tab tabId="tab3">Tab 3</Tabs.Tab>
-				</Tabs.TabList>
-				<Tabs.TabPanel tabId="tab1">
-					<p>Selected tab: Tab 1</p>
-				</Tabs.TabPanel>
-				<Tabs.TabPanel tabId="tab2">
-					<p>Selected tab: Tab 2</p>
-				</Tabs.TabPanel>
-				<Tabs.TabPanel tabId="tab3">
-					<p>Selected tab: Tab 3</p>
-				</Tabs.TabPanel>
-			</Tabs>
-			<div style={ { marginTop: '200px' } }>
-				<p>Select a tab:</p>
-				<DropdownMenu
-					controls={ [
-						{
-							onClick: () => setSelectedTabId( 'tab1' ),
-							title: 'Tab 1',
-							isActive: selectedTabId === 'tab1',
-						},
-						{
-							onClick: () => setSelectedTabId( 'tab2' ),
-							title: 'Tab 2',
-							isActive: selectedTabId === 'tab2',
-						},
-						{
-							onClick: () => setSelectedTabId( 'tab3' ),
-							title: 'Tab 3',
-							isActive: selectedTabId === 'tab3',
-						},
-					] }
-					label="Choose a tab. The power is yours."
-				/>
-			</div>
-		</>
-	);
-};
-
-export const ControlledMode = ControlledModeTemplate.bind( {} );
-ControlledMode.args = {
-	selectedTabId: 'tab3',
-};
-
-const TabBecomesDisabledTemplate: StoryFn< typeof Tabs > = ( props ) => {
-	const [ disableTab2, setDisableTab2 ] = useState( false );
-
-	return (
-		<>
-			<Button
-				variant="primary"
-				onClick={ () => setDisableTab2( ! disableTab2 ) }
-			>
-				{ disableTab2 ? 'Enable' : 'Disable' } Tab 2
-			</Button>
-			<Tabs { ...props }>
-				<Tabs.TabList>
-					<Tabs.Tab tabId="tab1">Tab 1</Tabs.Tab>
-					<Tabs.Tab tabId="tab2" disabled={ disableTab2 }>
-						Tab 2
-					</Tabs.Tab>
-					<Tabs.Tab tabId="tab3">Tab 3</Tabs.Tab>
-				</Tabs.TabList>
-				<Tabs.TabPanel tabId="tab1">
-					<p>Selected tab: Tab 1</p>
-				</Tabs.TabPanel>
-				<Tabs.TabPanel tabId="tab2">
-					<p>Selected tab: Tab 2</p>
-				</Tabs.TabPanel>
-				<Tabs.TabPanel tabId="tab3">
-					<p>Selected tab: Tab 3</p>
-				</Tabs.TabPanel>
-			</Tabs>
-		</>
-	);
-};
-export const TabBecomesDisabled = TabBecomesDisabledTemplate.bind( {} );
-
-const TabGetsRemovedTemplate: StoryFn< typeof Tabs > = ( props ) => {
-	const [ removeTab1, setRemoveTab1 ] = useState( false );
-
-	return (
-		<>
-			<Button
-				variant="primary"
-				onClick={ () => setRemoveTab1( ! removeTab1 ) }
-			>
-				{ removeTab1 ? 'Restore' : 'Remove' } Tab 1
-			</Button>
-			<Tabs { ...props }>
-				<Tabs.TabList>
-					{ ! removeTab1 && <Tabs.Tab tabId="tab1">Tab 1</Tabs.Tab> }
-					<Tabs.Tab tabId="tab2">Tab 2</Tabs.Tab>
-					<Tabs.Tab tabId="tab3">Tab 3</Tabs.Tab>
-				</Tabs.TabList>
-				<Tabs.TabPanel tabId="tab1">
-					<p>Selected tab: Tab 1</p>
-				</Tabs.TabPanel>
-				<Tabs.TabPanel tabId="tab2">
-					<p>Selected tab: Tab 2</p>
-				</Tabs.TabPanel>
-				<Tabs.TabPanel tabId="tab3">
-					<p>Selected tab: Tab 3</p>
-				</Tabs.TabPanel>
-			</Tabs>
-		</>
-	);
-};
-export const TabGetsRemoved = TabGetsRemovedTemplate.bind( {} );

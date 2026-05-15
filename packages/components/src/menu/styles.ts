@@ -8,24 +8,14 @@ import styled from '@emotion/styled';
 /**
  * Internal dependencies
  */
-import { COLORS, font, rtl, CONFIG } from '../utils';
+import { COLORS, font, rtl, CONFIG, DROPDOWN_MOTION_CSS } from '../utils';
 import { space } from '../utils/space';
 import Icon from '../icon';
 import { Truncate } from '../truncate';
-import type { MenuContext } from './types';
-
-const ANIMATION_PARAMS = {
-	SCALE_AMOUNT_OUTER: 0.82,
-	SCALE_AMOUNT_CONTENT: 0.9,
-	DURATION: {
-		IN: '400ms',
-		OUT: '200ms',
-	},
-	EASING: 'cubic-bezier(0.33, 0, 0, 1)',
-};
+import type { ContextProps } from './types';
 
 const CONTENT_WRAPPER_PADDING = space( 1 );
-const ITEM_PADDING_BLOCK = space( 2 );
+const ITEM_PADDING_BLOCK = space( 1 );
 const ITEM_PADDING_INLINE = space( 3 );
 
 // TODO:
@@ -42,65 +32,17 @@ const TOOLBAR_VARIANT_BOX_SHADOW = `0 0 0 ${ CONFIG.borderWidth } ${ TOOLBAR_VAR
 
 const GRID_TEMPLATE_COLS = 'minmax( 0, max-content ) 1fr';
 
-export const MenuPopoverOuterWrapper = styled.div<
-	Pick< MenuContext, 'variant' >
->`
-	position: relative;
-
-	background-color: ${ COLORS.ui.background };
-	border-radius: ${ CONFIG.radiusMedium };
-	${ ( props ) => css`
-		box-shadow: ${ props.variant === 'toolbar'
-			? TOOLBAR_VARIANT_BOX_SHADOW
-			: DEFAULT_BOX_SHADOW };
-	` }
-
-	overflow: hidden;
-
-	/* Open/close animation (outer wrapper) */
-	@media not ( prefers-reduced-motion ) {
-		transition-property: transform, opacity;
-		transition-timing-function: ${ ANIMATION_PARAMS.EASING };
-		transition-duration: ${ ANIMATION_PARAMS.DURATION.IN };
-		will-change: transform, opacity;
-
-		/* Regardless of the side, fade in and out. */
-		opacity: 0;
-		&:has( [data-enter] ) {
-			opacity: 1;
-		}
-
-		&:has( [data-leave] ) {
-			transition-duration: ${ ANIMATION_PARAMS.DURATION.OUT };
-		}
-
-		/* For menus opening on top and bottom side, animate the scale Y too. */
-		&:has( [data-side='bottom'] ),
-		&:has( [data-side='top'] ) {
-			transform: scaleY( ${ ANIMATION_PARAMS.SCALE_AMOUNT_OUTER } );
-		}
-		&:has( [data-side='bottom'] ) {
-			transform-origin: top;
-		}
-		&:has( [data-side='top'] ) {
-			transform-origin: bottom;
-		}
-		&:has( [data-enter][data-side='bottom'] ),
-		&:has( [data-enter][data-side='top'] ),
-		/* Do not animate the scaleY when closing the menu */
-		&:has( [data-leave][data-side='bottom'] ),
-		&:has( [data-leave][data-side='top'] ) {
-			transform: scaleY( 1 );
-		}
-	}
-`;
-
-export const MenuPopoverInnerWrapper = styled.div`
+export const Menu = styled( Ariakit.Menu )`
 	position: relative;
 	/* Same as popover component */
 	/* TODO: is there a way to read the sass variable? */
 	z-index: 1000000;
 
+	/* Only visible in Windows High Contrast mode */
+	outline: 2px solid transparent !important;
+`;
+
+export const MenuSurface = styled.div< Pick< ContextProps, 'variant' > >`
 	display: grid;
 	grid-template-columns: ${ GRID_TEMPLATE_COLS };
 	grid-template-rows: auto;
@@ -115,44 +57,77 @@ export const MenuPopoverInnerWrapper = styled.div`
 	overscroll-behavior: contain;
 	overflow: auto;
 
-	/* Only visible in Windows High Contrast mode */
-	outline: 2px solid transparent !important;
+	background-color: ${ COLORS.ui.background };
+	border-radius: ${ CONFIG.radiusMedium };
+	${ ( props ) => css`
+		box-shadow: ${ props.variant === 'toolbar'
+			? TOOLBAR_VARIANT_BOX_SHADOW
+			: DEFAULT_BOX_SHADOW };
+	` }
+`;
 
-	/* Open/close animation (inner content wrapper) */
+/**
+ * Outer wrapper for menu motion. `Menu.Popover` uses Ariakit’s `render` prop so
+ * this element wraps the inner surface that receives all merged menu props
+ * (ref, role, `data-*`, children). Transitions mirror the pre-refactor `Menu`
+ * styles from `trunk`, driven by `data-enter` / `data-side` on the inner
+ * surface via `:has(> …)`.
+ */
+export const MenuMotionRoot = styled.div`
 	@media not ( prefers-reduced-motion ) {
-		transition: inherit;
-		transform-origin: inherit;
+		transition-property: transform, opacity;
+		transition-duration: ${ DROPDOWN_MOTION_CSS.SLIDE_DURATION },
+			${ DROPDOWN_MOTION_CSS.FADE_DURATION };
+		transition-timing-function: ${ DROPDOWN_MOTION_CSS.SLIDE_EASING },
+			${ DROPDOWN_MOTION_CSS.FADE_EASING };
+		will-change: transform, opacity;
 
-		/*
-		 * For menus opening on top and bottom side, animate the scale Y too.
-		 * The content scales at a different rate than the outer container:
-		 * - first, counter the outer scale factor by doing "1 / scaleAmountOuter"
-		 * - then, apply the content scale factor.
-		 */
-		&[data-side='bottom'],
-		&[data-side='top'] {
-			transform: scaleY(
-				calc(
-					1 / ${ ANIMATION_PARAMS.SCALE_AMOUNT_OUTER } *
-						${ ANIMATION_PARAMS.SCALE_AMOUNT_CONTENT }
-				)
-			);
-		}
-		&[data-enter][data-side='bottom'],
-		&[data-enter][data-side='top'],
-		/* Do not animate the scaleY when closing the menu */
-		&[data-leave][data-side='bottom'],
-		&[data-leave][data-side='top'] {
-			transform: scaleY( 1 );
+		&:not( :has( > ${ MenuSurface }[data-submenu] ) ) {
+			/* Regardless of the side, fade in and out. */
+			opacity: 0;
+			&:has( > ${ MenuSurface }[data-enter] ) {
+				opacity: 1;
+			}
+
+			/* Slide in the direction the menu is opening. */
+			&:has( > ${ MenuSurface }[data-side='bottom'] ) {
+				transform: translateY(
+					-${ DROPDOWN_MOTION_CSS.SLIDE_DISTANCE }
+				);
+			}
+			&:has( > ${ MenuSurface }[data-side='top'] ) {
+				transform: translateY(
+					${ DROPDOWN_MOTION_CSS.SLIDE_DISTANCE }
+				);
+			}
+			&:has( > ${ MenuSurface }[data-side='left'] ) {
+				transform: translateX(
+					${ DROPDOWN_MOTION_CSS.SLIDE_DISTANCE }
+				);
+			}
+			&:has( > ${ MenuSurface }[data-side='right'] ) {
+				transform: translateX(
+					-${ DROPDOWN_MOTION_CSS.SLIDE_DISTANCE }
+				);
+			}
+			&:has( > ${ MenuSurface }[data-enter][data-side='bottom'] ),
+			&:has( > ${ MenuSurface }[data-enter][data-side='top'] ) {
+				transform: translateY( 0 );
+			}
+			&:has( > ${ MenuSurface }[data-enter][data-side='left'] ),
+			&:has( > ${ MenuSurface }[data-enter][data-side='right'] ) {
+				transform: translateX( 0 );
+			}
 		}
 	}
 `;
 
 const baseItem = css`
 	all: unset;
+	cursor: pointer;
 
 	position: relative;
-	min-height: ${ space( 10 ) };
+	min-height: ${ space( 8 ) };
 	box-sizing: border-box;
 
 	/* Occupy the width of all grid columns (ie. full width) */
@@ -193,7 +168,6 @@ const baseItem = css`
 
 	&[aria-disabled='true'] {
 		color: ${ COLORS.ui.textDisabled };
-		cursor: not-allowed;
 	}
 
 	/* Active item (including hover) */
@@ -219,7 +193,7 @@ const baseItem = css`
 	}
 
 	/* When the item is the trigger of an open submenu */
-	${ MenuPopoverInnerWrapper }:not(:focus) &:not(:focus)[aria-expanded="true"] {
+	${ Menu }:not(:focus) &:not(:focus)[aria-expanded="true"] {
 		background-color: ${ LIGHT_BACKGROUND_COLOR };
 		color: ${ COLORS.theme.foreground };
 	}
@@ -229,15 +203,15 @@ const baseItem = css`
 	}
 `;
 
-export const MenuItem = styled( Ariakit.MenuItem )`
+export const Item = styled( Ariakit.MenuItem )`
 	${ baseItem };
 `;
 
-export const MenuCheckboxItem = styled( Ariakit.MenuItemCheckbox )`
+export const CheckboxItem = styled( Ariakit.MenuItemCheckbox )`
 	${ baseItem };
 `;
 
-export const MenuRadioItem = styled( Ariakit.MenuItemRadio )`
+export const RadioItem = styled( Ariakit.MenuItemRadio )`
 	${ baseItem };
 `;
 
@@ -249,14 +223,14 @@ export const ItemPrefixWrapper = styled.span`
 	 * Even when the item is not checked, occupy the same screen space to avoid
 	 * the space collapside when no items are checked.
 	 */
-	${ MenuCheckboxItem } > &,
-	${ MenuRadioItem } > & {
+	${ CheckboxItem } > &,
+	${ RadioItem } > & {
 		/* Same width as the check icons */
 		min-width: ${ space( 6 ) };
 	}
 
-	${ MenuCheckboxItem } > &,
-	${ MenuRadioItem } > &,
+	${ CheckboxItem } > &,
+	${ RadioItem } > &,
 	&:not( :empty ) {
 		margin-inline-end: ${ space( 2 ) };
 	}
@@ -278,7 +252,7 @@ export const ItemPrefixWrapper = styled.span`
 	}
 `;
 
-export const MenuItemContentWrapper = styled.div`
+export const ItemContentWrapper = styled.div`
 	/*
 	 * Always occupy the second column, since the first column
 	 * is taken by the prefix wrapper (when displayed).
@@ -293,7 +267,7 @@ export const MenuItemContentWrapper = styled.div`
 	pointer-events: none;
 `;
 
-export const MenuItemChildrenWrapper = styled.div`
+export const ItemChildrenWrapper = styled.div`
 	flex: 1;
 
 	display: inline-flex;
@@ -317,19 +291,19 @@ export const ItemSuffixWrapper = styled.span`
 	 * When the parent menu item is active, except when it's a non-focused/hovered
 	 * submenu trigger (in that case, color should not be inherited)
 	 */
-	[data-active-item]:not( [data-focus-visible] ) *:not(${ MenuPopoverInnerWrapper }) &,
+	[data-active-item]:not( [data-focus-visible] ) *:not(${ Menu }) &,
 	/* When the parent menu item is disabled */
-	[aria-disabled='true'] *:not(${ MenuPopoverInnerWrapper }) & {
+	[aria-disabled='true'] *:not(${ Menu }) & {
 		color: inherit;
 	}
 `;
 
-export const MenuGroup = styled( Ariakit.MenuGroup )`
+export const Group = styled( Ariakit.MenuGroup )`
 	/* Ignore this element when calculating the layout. Useful for subgrid */
 	display: contents;
 `;
 
-export const MenuGroupLabel = styled( Ariakit.MenuGroupLabel )`
+export const GroupLabel = styled( Ariakit.MenuGroupLabel )`
 	/* Occupy the width of all grid columns (ie. full width) */
 	grid-column: 1 / -1;
 
@@ -338,8 +312,8 @@ export const MenuGroupLabel = styled( Ariakit.MenuGroupLabel )`
 	padding-inline: ${ ITEM_PADDING_INLINE };
 `;
 
-export const MenuSeparator = styled( Ariakit.MenuSeparator )<
-	Pick< MenuContext, 'variant' >
+export const Separator = styled( Ariakit.MenuSeparator )<
+	Pick< ContextProps, 'variant' >
 >`
 	/* Occupy the width of all grid columns (ie. full width) */
 	grid-column: 1 / -1;
@@ -370,22 +344,20 @@ export const SubmenuChevronIcon = styled( Icon )`
 	) };
 `;
 
-export const MenuItemLabel = styled( Truncate )`
+export const ItemLabel = styled( Truncate )`
 	font-size: ${ font( 'default.fontSize' ) };
 	line-height: 20px;
 	color: inherit;
 `;
 
-export const MenuItemHelpText = styled( Truncate )`
+export const ItemHelpText = styled( Truncate )`
 	font-size: ${ font( 'helpText.fontSize' ) };
 	line-height: 16px;
 	color: ${ LIGHTER_TEXT_COLOR };
 	overflow-wrap: anywhere;
 
-	[data-active-item]:not( [data-focus-visible] )
-		*:not( ${ MenuPopoverInnerWrapper } )
-		&,
-	[aria-disabled='true'] *:not( ${ MenuPopoverInnerWrapper } ) & {
+	[data-active-item]:not( [data-focus-visible] ) *:not( ${ Menu } ) &,
+	[aria-disabled='true'] *:not( ${ Menu } ) & {
 		color: inherit;
 	}
 `;

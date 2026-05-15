@@ -416,7 +416,7 @@ describe( 'PaletteEdit', () => {
 			/>
 		);
 
-		await click( screen.getByLabelText( 'Color: Primary' ) );
+		await click( screen.getByLabelText( 'Primary' ) );
 		const hexInput = screen.getByRole( 'textbox', {
 			name: 'Hex color',
 		} );

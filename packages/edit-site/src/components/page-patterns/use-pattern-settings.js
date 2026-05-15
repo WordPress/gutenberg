@@ -4,6 +4,9 @@
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
+import { privateApis as editorPrivateApis } from '@wordpress/editor';
+import { generateGlobalStyles } from '@wordpress/global-styles-engine';
 
 /**
  * Internal dependencies
@@ -12,7 +15,18 @@ import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
 import { filterOutDuplicatesByName } from './utils';
 
+const { useGlobalStyles } = unlock( editorPrivateApis );
+const { globalStylesDataKey } = unlock( blockEditorPrivateApis );
+
 export default function usePatternSettings() {
+	/*
+	 * Generate global styles directly because block previews use a separate
+	 * ExperimentalBlockEditorProvider and can't access GlobalStylesRenderer's output.
+	 * Reading config from useGlobalStyles and generating CSS directly keeps us in sync.
+	 * See: https://github.com/WordPress/gutenberg/issues/73350
+	 */
+	const { merged: mergedConfig } = useGlobalStyles();
+
 	const storedSettings = useSelect( ( select ) => {
 		const { getSettings } = unlock( select( editSiteStore ) );
 		return getSettings();
@@ -36,16 +50,40 @@ export default function usePatternSettings() {
 		[ settingsBlockPatterns, restBlockPatterns ]
 	);
 
+	const [ globalStyles, globalSettings ] = useMemo( () => {
+		return generateGlobalStyles( mergedConfig, [], {
+			disableRootPadding: false,
+		} );
+	}, [ mergedConfig ] );
+
 	const settings = useMemo( () => {
-		const { __experimentalAdditionalBlockPatterns, ...restStoredSettings } =
-			storedSettings;
+		const {
+			__experimentalAdditionalBlockPatterns,
+			styles,
+			__experimentalFeatures,
+			...restStoredSettings
+		} = storedSettings;
+
+		// Preserve non-global styles from settings.styles (e.g., editor styles from add_editor_style)
+		const nonGlobalStyles = ( styles ?? [] ).filter(
+			( style ) => ! style.isGlobalStyles
+		);
 
 		return {
 			...restStoredSettings,
+			styles: [ ...nonGlobalStyles, ...globalStyles ],
+			__experimentalFeatures: globalSettings,
+			[ globalStylesDataKey ]: mergedConfig.styles ?? {},
 			__experimentalBlockPatterns: blockPatterns,
 			isPreviewMode: true,
 		};
-	}, [ storedSettings, blockPatterns ] );
+	}, [
+		storedSettings,
+		blockPatterns,
+		globalStyles,
+		globalSettings,
+		mergedConfig,
+	] );
 
 	return settings;
 }

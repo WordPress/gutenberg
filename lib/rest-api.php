@@ -26,7 +26,7 @@ function gutenberg_override_global_styles_endpoint( array $args ): array {
 
 	return $args;
 }
-add_filter( 'register_wp_global_styles_post_type_args', 'gutenberg_override_global_styles_endpoint', 10, 2 );
+add_filter( 'register_wp_global_styles_post_type_args', 'gutenberg_override_global_styles_endpoint' );
 
 /**
  * Registers the Edit Site Export REST API routes.
@@ -36,3 +36,12 @@ function gutenberg_register_edit_site_export_controller_endpoints() {
 	$edit_site_export_controller->register_routes();
 }
 add_action( 'rest_api_init', 'gutenberg_register_edit_site_export_controller_endpoints' );
+
+/**
+ * Registers the Icons Registry REST API routes.
+ */
+function gutenberg_register_icon_controller_endpoints() {
+	$icons_controller = new WP_REST_Icons_Controller_Gutenberg();
+	$icons_controller->register_routes();
+}
+add_action( 'rest_api_init', 'gutenberg_register_icon_controller_endpoints' );

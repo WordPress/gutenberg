@@ -270,7 +270,7 @@ For each user feature we should also add a importance categorization label  to i
 ## 1.95.0
 
 -   [*] Fix crash when trying to convert to regular blocks an undefined/deleted reusable block [#50475]
--   [**] Tapping on nested text blocks gets focus directly instead of having to tap multiple times depeding on the nesting levels. [#50108]
+-   [**] Tapping on nested text blocks gets focus directly instead of having to tap multiple times depending on the nesting levels. [#50108]
 -   [*] Use host app namespace in reusable block message [#50478]
 -   [**] Configuring a link to open in a new tab no longer results in a partial loss of edit history (undo and redo) [#50460]
 
@@ -344,11 +344,11 @@ For each user feature we should also add a importance categorization label  to i
 ## 1.86.0
 
 -   [**] Upgrade React Native to 0.69.4 [#43485]
--   [**] Prevent error message from unneccesarily firing when uploading to Gallery block [#46175]
+-   [**] Prevent error message from unnecessarily firing when uploading to Gallery block [#46175]
 
 ## 1.85.1
 
--   [**] Prevent error message from unneccesarily firing when uploading to Gallery block [#46175]
+-   [**] Prevent error message from unnecessarily firing when uploading to Gallery block [#46175]
 
 ## 1.85.0
 
@@ -967,7 +967,7 @@ For each user feature we should also add a importance categorization label  to i
 -   New block: Latest Posts
 -   Fix Quote block's left border not being visible in Dark Mode
 -   Added Starter Page Templates: when you create a new page, we now show you a few templates to get started more quickly.
--   Fix crash when pasting HTML content with embeded images on paragraphs
+-   Fix crash when pasting HTML content with embedded images on paragraphs
 
 ## 1.23.0
 
@@ -977,7 +977,7 @@ For each user feature we should also add a importance categorization label  to i
 -   New block: Button
 -   Add scroll support inside block picker and block settings
 -   [Android] Fix issue preventing correct placeholder image from displaying during image upload
--   [iOS] Fix diplay of large numbers on ordered lists
+-   [iOS] Fix display of large numbers on ordered lists
 -   Fix issue where adding emojis to the post title add strong HTML elements to the title of the post
 -   [iOS] Fix issue where alignment of paragraph blocks was not always being respected when splitting the paragraph or reading the post's html content.
 -   We’ve introduced a new toolbar that floats above the block you’re editing, which makes navigating your blocks easier — especially complex ones.

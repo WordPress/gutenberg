@@ -50,9 +50,7 @@ describe( 'ColorPalette', () => {
 			/>
 		);
 
-		expect(
-			screen.getAllByRole( 'option', { name: /^Color:/ } )
-		).toHaveLength( 3 );
+		expect( screen.getAllByRole( 'option' ) ).toHaveLength( 3 );
 	} );
 
 	it( 'should call onClick on an active button with undefined', async () => {
@@ -67,9 +65,7 @@ describe( 'ColorPalette', () => {
 			/>
 		);
 
-		await user.click(
-			screen.getByRole( 'option', { name: /^Color:/, selected: true } )
-		);
+		await user.click( screen.getByRole( 'option', { selected: true } ) );
 
 		expect( onChange ).toHaveBeenCalledTimes( 1 );
 		expect( onChange ).toHaveBeenCalledWith( undefined );
@@ -91,14 +87,17 @@ describe( 'ColorPalette', () => {
 		// (i.e. a button representing a color that is not the current color)
 		await user.click(
 			screen.getAllByRole( 'option', {
-				name: /^Color:/,
 				selected: false,
 			} )[ 0 ]
 		);
 
 		// Expect the green color to have been selected
 		expect( onChange ).toHaveBeenCalledTimes( 1 );
-		expect( onChange ).toHaveBeenCalledWith( EXAMPLE_COLORS[ 1 ].color, 1 );
+		expect( onChange ).toHaveBeenCalledWith(
+			EXAMPLE_COLORS[ 1 ].color,
+			1,
+			undefined
+		);
 	} );
 
 	it( 'should call onClick with undefined, when the clearButton onClick is triggered', async () => {
@@ -230,7 +229,6 @@ describe( 'ColorPalette', () => {
 		// Click the first unpressed button
 		await user.click(
 			screen.getAllByRole( 'option', {
-				name: /^Color:/,
 				selected: false,
 			} )[ 0 ]
 		);
@@ -264,8 +262,155 @@ describe( 'ColorPalette', () => {
 		expect( screen.queryByText( colorCode ) ).not.toBeInTheDocument();
 		expect(
 			screen.getByRole( 'button', {
-				name: /^Custom color picker.$/,
+				name: /^Custom color picker$/,
 			} )
 		).toBeInTheDocument();
+	} );
+
+	describe( 'duplicate colors in palette', () => {
+		const DUPLICATE_COLOR_PALETTE = [
+			{ name: 'Dark Background', slug: 'dark-background', color: '#000' },
+			{ name: 'Dark Text', slug: 'dark-text', color: '#000' },
+		];
+
+		it( 'should render all swatches even when two entries share the same color value', () => {
+			render(
+				<ColorPalette
+					colors={ DUPLICATE_COLOR_PALETTE }
+					value={ undefined }
+					onChange={ jest.fn() }
+				/>
+			);
+
+			expect( screen.getAllByRole( 'option' ) ).toHaveLength( 2 );
+		} );
+
+		it( 'should select by slug when selectedSlug is provided, marking only the matching entry', () => {
+			render(
+				<ColorPalette
+					colors={ DUPLICATE_COLOR_PALETTE }
+					value="#000"
+					selectedSlug="dark-text"
+					onChange={ jest.fn() }
+				/>
+			);
+
+			const options = screen.getAllByRole( 'option' );
+			// "dark-background" is index 0, "dark-text" is index 1.
+			// With selectedSlug="dark-text", only the second swatch should be selected.
+			expect( options[ 0 ] ).toHaveAttribute( 'aria-selected', 'false' );
+			expect( options[ 1 ] ).toHaveAttribute( 'aria-selected', 'true' );
+		} );
+
+		it( 'should fall back to color-value selection and mark all matching duplicates when no selectedSlug is provided', () => {
+			render(
+				<ColorPalette
+					colors={ DUPLICATE_COLOR_PALETTE }
+					value="#000"
+					onChange={ jest.fn() }
+				/>
+			);
+
+			const options = screen.getAllByRole( 'option' );
+			// Both entries share the same color value, so both appear selected
+			// when no slug-specific selection is provided.
+			expect( options[ 0 ] ).toHaveAttribute( 'aria-selected', 'true' );
+			expect( options[ 1 ] ).toHaveAttribute( 'aria-selected', 'true' );
+		} );
+
+		it( 'should treat an empty-string selectedSlug as no slug and fall back to color-value selection', () => {
+			render(
+				<ColorPalette
+					colors={ DUPLICATE_COLOR_PALETTE }
+					value="#000"
+					selectedSlug=""
+					onChange={ jest.fn() }
+				/>
+			);
+
+			const options = screen.getAllByRole( 'option' );
+			expect( options[ 0 ] ).toHaveAttribute( 'aria-selected', 'true' );
+			expect( options[ 1 ] ).toHaveAttribute( 'aria-selected', 'true' );
+		} );
+
+		it( 'should display the slug-matched entry name in the custom color button label', () => {
+			render(
+				<ColorPalette
+					colors={ DUPLICATE_COLOR_PALETTE }
+					value="#000"
+					selectedSlug="dark-text"
+					onChange={ jest.fn() }
+				/>
+			);
+
+			expect(
+				screen.getByRole( 'button', {
+					name: 'Custom color picker. The currently selected color is called "Dark Text" and has a value of "#000".',
+				} )
+			).toBeInTheDocument();
+		} );
+
+		it( 'should pass slug as third argument to onChange when a swatch is clicked', async () => {
+			const user = userEvent.setup();
+			const onChange = jest.fn();
+
+			render(
+				<ColorPalette
+					colors={ DUPLICATE_COLOR_PALETTE }
+					value={ undefined }
+					onChange={ onChange }
+				/>
+			);
+
+			const options = screen.getAllByRole( 'option' );
+			await user.click( options[ 1 ] );
+			// Second entry: color=#000, index=1, slug='dark-text'
+			expect( onChange ).toHaveBeenCalledWith( '#000', 1, 'dark-text' );
+		} );
+
+		it( 'should clear the selection when the selected swatch is clicked', async () => {
+			const user = userEvent.setup();
+			const onChange = jest.fn();
+
+			render(
+				<ColorPalette
+					colors={ DUPLICATE_COLOR_PALETTE }
+					value="#000"
+					selectedSlug="dark-background"
+					onChange={ onChange }
+				/>
+			);
+
+			// Click the selected swatch — should call onChange with undefined.
+			await user.click(
+				screen.getByRole( 'option', { selected: true } )
+			);
+			expect( onChange ).toHaveBeenCalledWith( undefined );
+		} );
+
+		it( 'should handle mixed palettes with some entries having slugs and others not', () => {
+			const MIXED_PALETTE = [
+				{ name: 'Brand White', slug: 'brand-white', color: '#fff' },
+				{ name: 'Plain White', color: '#fff' },
+				{ name: 'Brand Black', slug: 'brand-black', color: '#000' },
+			];
+
+			render(
+				<ColorPalette
+					colors={ MIXED_PALETTE }
+					value="#fff"
+					selectedSlug="brand-white"
+					onChange={ jest.fn() }
+				/>
+			);
+
+			const options = screen.getAllByRole( 'option' );
+			// Only the entry with slug="brand-white" should be selected.
+			// The unslugged "Plain White" entry should NOT be selected, even though
+			// its color matches the value prop.
+			expect( options[ 0 ] ).toHaveAttribute( 'aria-selected', 'true' );
+			expect( options[ 1 ] ).toHaveAttribute( 'aria-selected', 'false' );
+			expect( options[ 2 ] ).toHaveAttribute( 'aria-selected', 'false' );
+		} );
 	} );
 } );

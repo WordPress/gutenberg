@@ -1,16 +1,20 @@
 /**
+ * External dependencies
+ */
+import clsx from 'clsx';
+
+/**
  * WordPress dependencies
  */
-import { useRef } from '@wordpress/element';
 import { __, _x } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
 import {
 	FormFileUpload,
 	NavigableMenu,
 	MenuItem,
-	ToolbarButton,
 	Dropdown,
 	withFilters,
+	ToolbarButton,
 } from '@wordpress/components';
 import { useSelect, withDispatch } from '@wordpress/data';
 import { DOWN } from '@wordpress/keycodes';
@@ -22,6 +26,7 @@ import {
 import { compose } from '@wordpress/compose';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { store as noticesStore } from '@wordpress/notices';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -30,6 +35,7 @@ import MediaUpload from '../media-upload';
 import MediaUploadCheck from '../media-upload/check';
 import LinkControl from '../link-control';
 import { store as blockEditorStore } from '../../store';
+import { getComputedAcceptAttribute } from '../media-placeholder/utils';
 
 const noop = () => {};
 let uniqueId = 0;
@@ -54,11 +60,30 @@ const MediaReplaceFlow = ( {
 	multiple = false,
 	addToGallery,
 	handleUpload = true,
+	variant,
 	popoverProps,
+	renderToggle,
+	className,
 } ) => {
-	const { getSettings } = useSelect( blockEditorStore );
-	const editMediaButtonRef = useRef();
+	const { mediaUpload, allowedMimeTypes } = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		const settings = getSettings();
+		return {
+			mediaUpload: settings.mediaUpload,
+			allowedMimeTypes: settings.allowedMimeTypes,
+		};
+	}, [] );
 	const errorNoticeID = `block-editor/media-replace-flow/error-notice/${ ++uniqueId }`;
+
+	const computedAccept = useMemo(
+		() =>
+			getComputedAcceptAttribute(
+				allowedTypes,
+				allowedMimeTypes,
+				accept
+			),
+		[ allowedTypes, allowedMimeTypes, accept ]
+	);
 
 	const onUploadError = ( message ) => {
 		const safeMessage = stripHTML( message );
@@ -99,7 +124,7 @@ const MediaReplaceFlow = ( {
 			return onSelect( files );
 		}
 		onFilesUpload( files );
-		getSettings().mediaUpload( {
+		mediaUpload( {
 			allowedTypes,
 			filesList: files,
 			onFileChange: ( [ media ] ) => {
@@ -129,21 +154,40 @@ const MediaReplaceFlow = ( {
 
 	const gallery = multiple && onlyAllowsImages();
 
+	const mergedPopoverProps = {
+		...popoverProps,
+		variant,
+	};
+
 	return (
 		<Dropdown
-			popoverProps={ popoverProps }
-			contentClassName="block-editor-media-replace-flow__options"
-			renderToggle={ ( { isOpen, onToggle } ) => (
-				<ToolbarButton
-					ref={ editMediaButtonRef }
-					aria-expanded={ isOpen }
-					aria-haspopup="true"
-					onClick={ onToggle }
-					onKeyDown={ openOnArrowDown }
-				>
-					{ name }
-				</ToolbarButton>
+			popoverProps={ mergedPopoverProps }
+			className={ className }
+			contentClassName={ clsx(
+				'block-editor-media-replace-flow__options',
+				variant && `is-variant-${ variant }`
 			) }
+			renderToggle={ ( { isOpen, onToggle } ) => {
+				if ( renderToggle ) {
+					return renderToggle( {
+						'aria-expanded': isOpen,
+						'aria-haspopup': 'true',
+						onClick: onToggle,
+						onKeyDown: openOnArrowDown,
+						children: name,
+					} );
+				}
+				return (
+					<ToolbarButton
+						aria-expanded={ isOpen }
+						aria-haspopup="true"
+						onClick={ onToggle }
+						onKeyDown={ openOnArrowDown }
+					>
+						{ name }
+					</ToolbarButton>
+				);
+			} }
 			renderContent={ ( { onClose } ) => (
 				<>
 					<NavigableMenu className="block-editor-media-replace-flow__media-upload-menu">
@@ -170,7 +214,7 @@ const MediaReplaceFlow = ( {
 								onChange={ ( event ) => {
 									uploadFiles( event, onClose );
 								} }
-								accept={ accept }
+								accept={ computedAccept }
 								multiple={ !! multiple }
 								render={ ( { openFileDialog } ) => {
 									return (
@@ -195,6 +239,9 @@ const MediaReplaceFlow = ( {
 								{ __( 'Use featured image' ) }
 							</MenuItem>
 						) }
+						{ typeof children === 'function'
+							? children( { onClose } )
+							: children }
 						{ mediaURL && onReset && (
 							<MenuItem
 								onClick={ () => {
@@ -205,12 +252,8 @@ const MediaReplaceFlow = ( {
 								{ __( 'Reset' ) }
 							</MenuItem>
 						) }
-						{ typeof children === 'function'
-							? children( { onClose } )
-							: children }
 					</NavigableMenu>
 					{ onSelectURL && (
-						// eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
 						<form className="block-editor-media-flow__url-input">
 							<span className="block-editor-media-replace-flow__image-url-label">
 								{ __( 'Current media URL:' ) }
@@ -222,8 +265,10 @@ const MediaReplaceFlow = ( {
 								showSuggestions={ false }
 								onChange={ ( { url } ) => {
 									onSelectURL( url );
-									editMediaButtonRef.current.focus();
 								} }
+								searchInputPlaceholder={ __(
+									'Paste or type URL'
+								) }
 							/>
 						</form>
 					) }

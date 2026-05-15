@@ -36,7 +36,7 @@ const { ExperimentalBlockCanvas: BlockCanvas } = unlock(
 	blockEditorPrivateApis
 );
 
-// Polyfill for String.prototype.replaceAll until CI is runnig Node 15 or higher.
+// Polyfill for String.prototype.replaceAll until CI is running Node 15 or higher.
 if ( ! String.prototype.replaceAll ) {
 	String.prototype.replaceAll = function ( str, newStr ) {
 		// If a regex pattern

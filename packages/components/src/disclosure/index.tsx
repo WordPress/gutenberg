@@ -40,4 +40,5 @@ const UnforwardedDisclosureContent = (
 };
 
 export const DisclosureContent = forwardRef( UnforwardedDisclosureContent );
+DisclosureContent.displayName = 'DisclosureContent';
 export default DisclosureContent;

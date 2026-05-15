@@ -9,6 +9,14 @@
 	"textdomain": "default",
 	"attributes": {
 		"label": {
+			"type": "string",
+			"role": "content"
+		},
+		"opensInNewTab": {
+			"type": "boolean",
+			"default": false
+		},
+		"description": {
 			"type": "string"
 		}
 	},
@@ -22,6 +30,7 @@
 		"style"
 	],
 	"supports": {
+		"anchor": true,
 		"reusable": false,
 		"html": false,
 		"typography": {

@@ -6,7 +6,13 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { useEffect, useRef, useState } from '@wordpress/element';
+import {
+	memo,
+	useCallback,
+	useEffect,
+	useRef,
+	useState,
+} from '@wordpress/element';
 import {
 	InspectorControls,
 	BlockControls,
@@ -16,8 +22,9 @@ import {
 	useBlockProps,
 	__experimentalUseColorProps as useColorProps,
 	__experimentalUseBorderProps as useBorderProps,
+	useBlockEditingMode,
 } from '@wordpress/block-editor';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import {
 	Button,
 	Placeholder,
@@ -84,8 +91,8 @@ const cellAriaLabel = {
 };
 
 const placeholder = {
-	head: __( 'Header label' ),
-	foot: __( 'Footer label' ),
+	head: _x( 'Header label', 'table header' ),
+	foot: _x( 'Footer label', 'table footer' ),
 };
 
 function TSection( { name, ...props } ) {
@@ -106,6 +113,7 @@ function TableEdit( {
 
 	const colorProps = useColorProps( attributes );
 	const borderProps = useBorderProps( attributes );
+	const blockEditingMode = useBlockEditingMode();
 
 	const tableRef = useRef();
 	const [ hasTableCreated, setHasTableCreated ] = useState( false );
@@ -159,22 +167,25 @@ function TableEdit( {
 	 *
 	 * @param {Array} content A RichText content value.
 	 */
-	function onChange( content ) {
-		if ( ! selectedCell ) {
-			return;
-		}
+	const onChange = useCallback(
+		function ( content ) {
+			if ( ! selectedCell ) {
+				return;
+			}
 
-		setAttributes(
-			updateSelectedCell(
-				attributes,
-				selectedCell,
-				( cellAttributes ) => ( {
-					...cellAttributes,
-					content,
-				} )
-			)
-		);
-	}
+			setAttributes( ( currentAttributes ) =>
+				updateSelectedCell(
+					currentAttributes,
+					selectedCell,
+					( cellAttributes ) => ( {
+						...cellAttributes,
+						content,
+					} )
+				)
+			);
+		},
+		[ selectedCell, setAttributes ]
+	);
 
 	/**
 	 * Align text within the a column.
@@ -405,47 +416,32 @@ function TableEdit( {
 		<TSection name={ name } key={ name }>
 			{ attributes[ name ].map( ( { cells }, rowIndex ) => (
 				<tr key={ rowIndex }>
-					{ cells.map(
-						(
-							{
-								content,
-								tag: CellTag,
-								scope,
-								align,
-								colspan,
-								rowspan,
-							},
-							columnIndex
-						) => (
-							<CellTag
+					{ cells.map( ( cellProps, columnIndex ) => {
+						const isSelected =
+							selectedCell?.sectionName === name &&
+							selectedCell?.rowIndex === rowIndex &&
+							selectedCell?.columnIndex === columnIndex;
+
+						// Important - the Cell component is memoized to improve typing performance.
+						// ensure all props passed have stable references.
+						return (
+							<Cell
 								key={ columnIndex }
-								scope={ CellTag === 'th' ? scope : undefined }
-								colSpan={ colspan }
-								rowSpan={ rowspan }
-								className={ clsx(
-									{
-										[ `has-text-align-${ align }` ]: align,
-									},
-									'wp-block-table__cell-content'
-								) }
-							>
-								<RichText
-									value={ content }
-									onChange={ onChange }
-									onFocus={ () => {
-										setSelectedCell( {
-											sectionName: name,
-											rowIndex,
-											columnIndex,
-											type: 'cell',
-										} );
-									} }
-									aria-label={ cellAriaLabel[ name ] }
-									placeholder={ placeholder[ name ] }
-								/>
-							</CellTag>
-						)
-					) }
+								name={ name }
+								rowIndex={ rowIndex }
+								columnIndex={ columnIndex }
+								onChange={
+									// Only pass the `onChange` handler to the selectedCell.
+									// Cell components are memoized, so it's best to avoid
+									// passing in a value that will cause all cells to re-render
+									// whenever it changes.
+									isSelected ? onChange : undefined
+								}
+								setSelectedCell={ setSelectedCell }
+								{ ...cellProps }
+							/>
+						);
+					} ) }
 				</tr>
 			) ) }
 		</TSection>
@@ -455,7 +451,7 @@ function TableEdit( {
 
 	return (
 		<figure { ...useBlockProps( { ref: tableRef } ) }>
-			{ ! isEmpty && (
+			{ ! isEmpty && blockEditingMode === 'default' && (
 				<>
 					<BlockControls group="block">
 						<AlignmentControl
@@ -497,7 +493,6 @@ function TableEdit( {
 						isShownByDefault
 					>
 						<ToggleControl
-							__nextHasNoMarginBottom
 							label={ __( 'Fixed width table cells' ) }
 							checked={ !! hasFixedLayout }
 							onChange={ onChangeFixedLayout }
@@ -514,7 +509,6 @@ function TableEdit( {
 								isShownByDefault
 							>
 								<ToggleControl
-									__nextHasNoMarginBottom
 									label={ __( 'Header section' ) }
 									checked={ !! ( head && head.length ) }
 									onChange={ onToggleHeaderSection }
@@ -529,7 +523,6 @@ function TableEdit( {
 								isShownByDefault
 							>
 								<ToggleControl
-									__nextHasNoMarginBottom
 									label={ __( 'Footer section' ) }
 									checked={ !! ( foot && foot.length ) }
 									onChange={ onToggleFooterSection }
@@ -570,7 +563,6 @@ function TableEdit( {
 						onSubmit={ onCreateTable }
 					>
 						<TextControl
-							__nextHasNoMarginBottom
 							__next40pxDefaultSize
 							type="number"
 							label={ __( 'Column count' ) }
@@ -580,7 +572,6 @@ function TableEdit( {
 							className="blocks-table__placeholder-input"
 						/>
 						<TextControl
-							__nextHasNoMarginBottom
 							__next40pxDefaultSize
 							type="number"
 							label={ __( 'Row count' ) }
@@ -605,11 +596,57 @@ function TableEdit( {
 					isSelected={ isSingleSelected }
 					insertBlocksAfter={ insertBlocksAfter }
 					label={ __( 'Table caption text' ) }
-					showToolbarButton={ isSingleSelected }
+					showToolbarButton={
+						isSingleSelected && blockEditingMode === 'default'
+					}
 				/>
 			) }
 		</figure>
 	);
 }
+
+const Cell = memo( function ( {
+	tag: CellTag,
+	name,
+	scope,
+	colspan,
+	rowspan,
+	rowIndex,
+	columnIndex,
+	align,
+	content,
+	onChange,
+	setSelectedCell,
+} ) {
+	return (
+		<CellTag
+			scope={ CellTag === 'th' ? scope : undefined }
+			colSpan={ colspan }
+			rowSpan={ rowspan }
+			className={ clsx(
+				{
+					[ `has-text-align-${ align }` ]: align,
+				},
+				'wp-block-table__cell-content'
+			) }
+		>
+			<RichText
+				identifier={ `${ name }.${ rowIndex }.cells.${ columnIndex }.content` }
+				value={ content }
+				onChange={ onChange }
+				onFocus={ () => {
+					setSelectedCell( {
+						sectionName: name,
+						rowIndex,
+						columnIndex,
+						type: 'cell',
+					} );
+				} }
+				aria-label={ cellAriaLabel[ name ] }
+				placeholder={ placeholder[ name ] }
+			/>
+		</CellTag>
+	);
+} );
 
 export default TableEdit;

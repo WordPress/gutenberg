@@ -45,7 +45,7 @@ describe( 'removeFormat', () => {
 		expect( getSparseArrayLength( result.formats ) ).toBe( 3 );
 	} );
 
-	it( 'should remove format for collased selection', () => {
+	it( 'should remove format for collapsed selection', () => {
 		const record = {
 			formats: [
 				,

@@ -2,48 +2,46 @@
  * WordPress dependencies
  */
 import { useRefEffect } from '@wordpress/compose';
-import { useDispatch } from '@wordpress/data';
 
-/**
- * Internal dependencies
- */
-import { store as blockEditorStore } from '../../../store';
-
-/*
- * Adds `is-hovered` class when the block is hovered and in navigation or
- * outline mode.
- */
-export function useIsHovered( { clientId } ) {
-	const { hoverBlock } = useDispatch( blockEditorStore );
-
-	function listener( event ) {
-		if ( event.defaultPrevented ) {
-			return;
-		}
-
-		const action = event.type === 'mouseover' ? 'add' : 'remove';
-
-		event.preventDefault();
-		event.currentTarget.classList[ action ]( 'is-hovered' );
-
-		if ( action === 'add' ) {
-			hoverBlock( clientId );
-		} else {
-			hoverBlock( null );
-		}
+function listener( event ) {
+	if ( event.defaultPrevented ) {
+		return;
 	}
 
-	return useRefEffect( ( node ) => {
-		node.addEventListener( 'mouseout', listener );
-		node.addEventListener( 'mouseover', listener );
+	event.preventDefault();
+	event.currentTarget.classList.toggle(
+		'is-hovered',
+		event.type === 'mouseover'
+	);
+}
 
-		return () => {
-			node.removeEventListener( 'mouseout', listener );
-			node.removeEventListener( 'mouseover', listener );
+/**
+ * Adds `is-hovered` class when the block is hovered and in navigation or
+ * outline mode.
+ *
+ * @param {Object}  options                  Options object.
+ * @param {boolean} [options.isEnabled=true] Whether to enable hover detection.
+ *
+ * @return {Function} Ref callback.
+ */
+export function useIsHovered( { isEnabled = true } = {} ) {
+	return useRefEffect(
+		( node ) => {
+			if ( ! isEnabled ) {
+				return;
+			}
 
-			// Remove class in case it lingers.
-			node.classList.remove( 'is-hovered' );
-			hoverBlock( null );
-		};
-	}, [] );
+			node.addEventListener( 'mouseout', listener );
+			node.addEventListener( 'mouseover', listener );
+
+			return () => {
+				node.removeEventListener( 'mouseout', listener );
+				node.removeEventListener( 'mouseover', listener );
+
+				// Remove class in case it lingers.
+				node.classList.remove( 'is-hovered' );
+			};
+		},
+		[ isEnabled ]
+	);
 }

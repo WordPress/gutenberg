@@ -2,7 +2,7 @@
  * External dependencies
  */
 import type { Page } from '@playwright/test';
-import * as lighthouse from 'lighthouse/core/index.cjs';
+import lighthouse from 'lighthouse/core/index.cjs';
 
 type LighthouseConstructorProps = {
 	page: Page;

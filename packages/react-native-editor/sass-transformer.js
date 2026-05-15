@@ -29,17 +29,11 @@
 
 // TODO: create a new npm package with this transformer, or extend 'react-native-sass-transformer'
 
-/**
- * External dependencies
- */
 const fs = require( 'fs' );
 const path = require( 'path' );
 
-// eslint-disable-next-line import/no-extraneous-dependencies
 const sass = require( 'sass' );
-// eslint-disable-next-line import/no-extraneous-dependencies
 const css2rn = require( 'css-to-react-native-transform' ).default;
-// eslint-disable-next-line import/no-extraneous-dependencies
 const upstreamTransformer = require( '@react-native/metro-babel-transformer' );
 
 // TODO: need to find a way to pass the include paths and the default asset files via some config.
@@ -70,14 +64,14 @@ function findVariant( name, extensions, includePaths, projectRoot ) {
 		}
 
 		// Try to find the file iterating through the extensions, in order.
-		const foundExtention = extensions.find( ( extension ) => {
+		const foundExtension = extensions.find( ( extension ) => {
 			const fname = includePath + '/' + name + extension;
 			const partialfname = includePath + '/_' + name + extension;
 			return fs.existsSync( fname ) || fs.existsSync( partialfname );
 		} );
 
-		if ( foundExtention ) {
-			return includePath + '/' + name + foundExtention;
+		if ( foundExtension ) {
+			return includePath + '/' + name + foundExtension;
 		}
 	}
 

@@ -76,9 +76,7 @@ test.describe( 'Comments', () => {
 		}
 
 		// Visit the post that was just published.
-		await page.click(
-			'role=region[name="Editor publish"] >> role=link[name="View Post"i]'
-		);
+		await page.goto( `/?p=${ postId }` );
 
 		// We check that there is a previous comments page link.
 		await expect(
@@ -130,9 +128,7 @@ test.describe( 'Comments', () => {
 		}
 
 		// Visit the post that was just published.
-		await page.click(
-			'role=region[name="Editor publish"] >> role=link[name="View Post"i]'
-		);
+		await page.goto( `/?p=${ postId }` );
 
 		// We check that there are no comments page link.
 		await expect(
@@ -195,9 +191,7 @@ test.describe( 'Comments', () => {
 		} );
 
 		// Visit the post that was just published.
-		await page.click(
-			'role=region[name="Editor publish"] >> role=link[name="View Post"i]'
-		);
+		await page.goto( `/?p=${ postId }` );
 
 		// Check that the Comment Template block (an inner block) is rendered.
 		await expect(
@@ -226,9 +220,7 @@ test.describe( 'Comments', () => {
 		} );
 
 		// Visit the post that was just published.
-		await page.click(
-			'role=region[name="Editor publish"] >> role=link[name="View Post"i]'
-		);
+		await page.goto( `/?p=${ postId }` );
 
 		// Check that the Comment Template block (an inner block) is NOT rendered.
 		await expect(
@@ -283,7 +275,6 @@ test.describe( 'Post Comments', () => {
 		admin,
 		editor,
 		requestUtils,
-		commentsBlockUtils,
 	} ) => {
 		// Create a post with the old "Post Comments" block.
 		const { id: postId } = await requestUtils.createPost( {
@@ -296,13 +287,7 @@ test.describe( 'Post Comments', () => {
 		} );
 
 		// Go to the post editor.
-		await admin.visitAdminPage(
-			'/post.php',
-			`post=${ postId }&action=edit`
-		);
-
-		// Hide welcome guide.
-		await commentsBlockUtils.hideWelcomeGuide();
+		await admin.editPost( postId );
 
 		// Check that the Post Comments block has been replaced with Comments.
 		await expect(
@@ -377,22 +362,5 @@ class CommentsBlockUtils {
 		await this.page.click( '#Update' );
 
 		return previousValue;
-	}
-
-	async hideWelcomeGuide() {
-		await this.page.evaluate( async () => {
-			const isWelcomeGuideActive = window.wp.data
-				.select( 'core/edit-post' )
-				.isFeatureActive( 'welcomeGuide' );
-
-			if ( isWelcomeGuideActive ) {
-				window.wp.data
-					.dispatch( 'core/edit-post' )
-					.toggleFeature( 'welcomeGuide' );
-			}
-		} );
-
-		await this.page.reload();
-		await this.page.waitForSelector( '.edit-post-layout' );
 	}
 }

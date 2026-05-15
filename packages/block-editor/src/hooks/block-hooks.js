@@ -197,7 +197,6 @@ function BlockHooksControlPure( {
 
 								return (
 									<ToggleControl
-										__nextHasNoMarginBottom
 										checked={ checked }
 										key={ block.title }
 										label={ block.title }

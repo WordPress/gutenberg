@@ -54,7 +54,7 @@ Node.prototype.contains = function ( node ) {
  * Copy of insertBefore function from jsdom-jscore, WRONG_DOCUMENT_ERR exception
  * disabled.
  *
- * @param {Object} newChild The node to be insterted.
+ * @param {Object} newChild The node to be inserted.
  * @param {Object} refChild The node before which newChild is inserted.
  * @return {Object} the newly inserted child node
  *

@@ -48,7 +48,9 @@ function UnforwardedToggleGroupControlAsButtonGroup(
 	const { value, defaultValue } =
 		useComputeControlledOrUncontrolledValue( valueProp );
 
-	const [ selectedValue, setSelectedValue ] = useControlledValue( {
+	const [ selectedValue, setSelectedValue ] = useControlledValue<
+		typeof value
+	>( {
 		defaultValue,
 		value,
 		onChange,
@@ -81,6 +83,7 @@ function UnforwardedToggleGroupControlAsButtonGroup(
 				{ ...otherProps }
 				ref={ forwardedRef }
 				role="group"
+				id={ baseId }
 			>
 				{ children }
 			</View>
@@ -91,3 +94,4 @@ function UnforwardedToggleGroupControlAsButtonGroup(
 export const ToggleGroupControlAsButtonGroup = forwardRef(
 	UnforwardedToggleGroupControlAsButtonGroup
 );
+ToggleGroupControlAsButtonGroup.displayName = 'ToggleGroupControlAsButtonGroup';

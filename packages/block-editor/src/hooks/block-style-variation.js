@@ -3,16 +3,12 @@
  */
 import { getBlockTypes, store as blocksStore } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
-import { useContext, useMemo } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
+import { toStyles, getBlockSelectors } from '@wordpress/global-styles-engine';
 
 /**
  * Internal dependencies
  */
-import {
-	GlobalStylesContext,
-	toStyles,
-	getBlockSelectors,
-} from '../components/global-styles';
 import { usePrivateStyleOverride } from './utils';
 import { getValueFromObjectPath } from '../utils/object';
 import { store as blockEditorStore } from '../store';
@@ -44,7 +40,7 @@ function getVariationMatches( className ) {
  *
  * @return {string|null} The name of the first registered variation.
  */
-function getVariationNameFromClass( className, registeredStyles = [] ) {
+export function getVariationNameFromClass( className, registeredStyles = [] ) {
 	// The global flag affects how capturing groups work in JS. So the regex
 	// below will only return full CSS classes not just the variation name.
 	const matches = getVariationMatches( className );
@@ -75,12 +71,11 @@ function OverrideStyles( { override } ) {
  *
  * @param {Object} props        Props.
  * @param {Object} props.config A global styles object, containing settings and styles.
- * @return {JSX.Element|undefined} An array of new block variation overrides.
+ * @return {React.JSX.Element}  An array of new block variation overrides.
  */
-export function __unstableBlockStyleVariationOverridesWithConfig( { config } ) {
-	const { getBlockStyles, overrides } = useSelect(
+export function BlockStyleVariationOverridesWithConfig( { config } ) {
+	const { overrides } = useSelect(
 		( select ) => ( {
-			getBlockStyles: select( blocksStore ).getBlockStyles,
 			overrides: unlock( select( blockEditorStore ) ).getStyleOverrides(),
 		} ),
 		[]
@@ -127,7 +122,6 @@ export function __unstableBlockStyleVariationOverridesWithConfig( { config } ) {
 					};
 					const blockSelectors = getBlockSelectors(
 						getBlockTypes(),
-						getBlockStyles,
 						override.clientId
 					);
 					const hasBlockGapSupport = false;
@@ -166,10 +160,10 @@ export function __unstableBlockStyleVariationOverridesWithConfig( { config } ) {
 			}
 		}
 		return newOverrides;
-	}, [ config, overrides, getBlockStyles, getBlockName ] );
+	}, [ config, overrides, getBlockName ] );
 
 	if ( ! overridesWithConfig || ! overridesWithConfig.length ) {
-		return;
+		return null;
 	}
 
 	return (
@@ -253,10 +247,6 @@ export function getVariationStylesWithRefValues(
 }
 
 function useBlockStyleVariation( name, variation, clientId ) {
-	// Prefer global styles data in GlobalStylesContext, which are available
-	// if in the site editor. Otherwise fall back to whatever is in the
-	// editor settings and available in the post editor.
-	const { merged: mergedConfig } = useContext( GlobalStylesContext );
 	const { globalSettings, globalStyles } = useSelect( ( select ) => {
 		const settings = select( blockEditorStore ).getSettings();
 		return {
@@ -268,15 +258,15 @@ function useBlockStyleVariation( name, variation, clientId ) {
 	return useMemo( () => {
 		const variationStyles = getVariationStylesWithRefValues(
 			{
-				settings: mergedConfig?.settings ?? globalSettings,
-				styles: mergedConfig?.styles ?? globalStyles,
+				settings: globalSettings,
+				styles: globalStyles,
 			},
 			name,
 			variation
 		);
 
 		return {
-			settings: mergedConfig?.settings ?? globalSettings,
+			settings: globalSettings,
 			// The variation style data is all that is needed to generate
 			// the styles for the current application to a block. The variation
 			// name is updated to match the instance specific class name.
@@ -290,14 +280,7 @@ function useBlockStyleVariation( name, variation, clientId ) {
 				},
 			},
 		};
-	}, [
-		mergedConfig,
-		globalSettings,
-		globalStyles,
-		variation,
-		clientId,
-		name,
-	] );
+	}, [ globalSettings, globalStyles, variation, clientId, name ] );
 }
 
 // Rather than leveraging `useInstanceId` here, the `clientId` is used.
@@ -322,11 +305,7 @@ function useBlockProps( { name, className, clientId } ) {
 		}
 
 		const variationConfig = { settings, styles };
-		const blockSelectors = getBlockSelectors(
-			getBlockTypes(),
-			getBlockStyles,
-			clientId
-		);
+		const blockSelectors = getBlockSelectors( getBlockTypes(), clientId );
 		const hasBlockGapSupport = false;
 		const hasFallbackGapSupport = true;
 		const disableLayoutStyles = true;
@@ -349,7 +328,7 @@ function useBlockProps( { name, className, clientId } ) {
 				variationStyles: true,
 			}
 		);
-	}, [ variation, settings, styles, getBlockStyles, clientId ] );
+	}, [ variation, settings, styles, clientId ] );
 
 	usePrivateStyleOverride( {
 		id: `variation-${ clientId }`,

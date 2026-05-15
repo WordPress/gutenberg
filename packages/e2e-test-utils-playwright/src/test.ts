@@ -1,10 +1,12 @@
+// Playwright fixtures use `use()` which is not a React hook.
+
 /**
  * External dependencies
  */
 import * as path from 'path';
 import { test as base, expect, chromium } from '@playwright/test';
 import type { ConsoleMessage } from '@playwright/test';
-import * as getPort from 'get-port';
+import getPort from 'get-port';
 
 /**
  * Internal dependencies
@@ -153,14 +155,14 @@ const test = base.extend<
 			await page.evaluate( () => {
 				window.localStorage.clear();
 			} );
-		} catch ( error ) {
+		} catch {
 			// noop.
 		}
 
 		await page.close();
 	},
-	pageUtils: async ( { page }, use ) => {
-		await use( new PageUtils( { page } ) );
+	pageUtils: async ( { page, browserName }, use ) => {
+		await use( new PageUtils( { page, browserName } ) );
 	},
 	requestUtils: [
 		async ( {}, use, workerInfo ) => {

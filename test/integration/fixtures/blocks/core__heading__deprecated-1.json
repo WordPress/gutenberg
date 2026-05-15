@@ -5,7 +5,11 @@
 		"attributes": {
 			"content": "A picture is worth a thousand words, or so the saying goes",
 			"level": 3,
-			"textAlign": "right"
+			"style": {
+				"typography": {
+					"textAlign": "right"
+				}
+			}
 		},
 		"innerBlocks": []
 	}

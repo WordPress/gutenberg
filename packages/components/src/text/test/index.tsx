@@ -25,7 +25,7 @@ describe( 'Text', () => {
 			</Text>
 		);
 		expect( screen.getByRole( 'heading' ) ).toHaveStyle( {
-			color: 'rgb( 255, 255, 255 )',
+			color: COLORS.white,
 		} );
 	} );
 
@@ -69,7 +69,7 @@ describe( 'Text', () => {
 			</Text>
 		);
 		expect( screen.getByRole( 'heading' ) ).toHaveStyle( {
-			color: COLORS.gray[ 700 ],
+			color: COLORS.theme.gray[ 700 ],
 		} );
 	} );
 

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 
 /**
  * WordPress dependencies
@@ -33,9 +33,13 @@ const AVAILABLE_PLACEMENTS: PopoverProps[ 'placement' ][] = [
 ];
 
 const meta: Meta< typeof Popover > = {
+	tags: [ 'manifest' ],
 	title: 'Components/Overlays/Popover',
 	id: 'components-popover',
 	component: Popover,
+	subcomponents: {
+		'Popover.Slot': Popover.Slot,
+	},
 	argTypes: {
 		anchor: { control: false },
 		anchorRef: { control: false },
@@ -52,6 +56,10 @@ const meta: Meta< typeof Popover > = {
 	},
 	parameters: {
 		controls: { expanded: true },
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+		},
 	},
 };
 
@@ -86,10 +94,13 @@ export const Default: StoryObj< typeof Popover > = {
 	decorators: [
 		( Story ) => {
 			const [ isVisible, setIsVisible ] = useState( false );
-			const toggleVisible = () => {
+			const buttonRef = useRef< HTMLButtonElement >( undefined );
+			const toggleVisible = ( event: React.MouseEvent ) => {
+				if ( buttonRef.current && event.target !== buttonRef.current ) {
+					return;
+				}
 				setIsVisible( ( state ) => ! state );
 			};
-			const buttonRef = useRef< HTMLButtonElement | undefined >();
 			useEffect( () => {
 				buttonRef.current?.scrollIntoView?.( {
 					block: 'center',
@@ -108,6 +119,7 @@ export const Default: StoryObj< typeof Popover > = {
 					} }
 				>
 					<Button
+						__next40pxDefaultSize
 						variant="secondary"
 						onClick={ toggleVisible }
 						ref={ buttonRef }
@@ -203,6 +215,7 @@ export const DynamicHeight: StoryObj< typeof Popover > = {
 				<div style={ { padding: '20px' } }>
 					<div>
 						<Button
+							__next40pxDefaultSize
 							variant="primary"
 							onClick={ increase }
 							style={ {
@@ -212,7 +225,11 @@ export const DynamicHeight: StoryObj< typeof Popover > = {
 							Increase Size
 						</Button>
 
-						<Button variant="primary" onClick={ decrease }>
+						<Button
+							__next40pxDefaultSize
+							variant="primary"
+							onClick={ decrease }
+						>
 							Decrease Size
 						</Button>
 					</div>
@@ -253,5 +270,80 @@ export const WithSlotOutsideIframe: StoryObj< typeof Popover > = {
 	),
 	args: {
 		...Default.args,
+	},
+};
+
+export const WithCloseHandlers: StoryObj< typeof Popover > = {
+	render: function WithCloseHandlersStory( args ) {
+		const [ isVisible, setIsVisible ] = useState( false );
+		const buttonRef = useRef< HTMLButtonElement >( null );
+
+		const toggleVisible = ( event: React.MouseEvent ) => {
+			if ( buttonRef.current && event.target !== buttonRef.current ) {
+				return;
+			}
+			setIsVisible( ( prev ) => ! prev );
+		};
+
+		const handleClose = () => {
+			args.onClose?.();
+			setIsVisible( false );
+		};
+
+		const handleFocusOutside = ( e: React.SyntheticEvent ) => {
+			args.onFocusOutside?.( e );
+			setIsVisible( false );
+		};
+
+		useEffect( () => {
+			buttonRef.current?.scrollIntoView( {
+				block: 'center',
+				inline: 'center',
+			} );
+		}, [] );
+
+		return (
+			<div
+				style={ {
+					width: '300vw',
+					height: '300vh',
+					display: 'flex',
+					alignItems: 'center',
+					justifyContent: 'center',
+				} }
+			>
+				<Button
+					__next40pxDefaultSize
+					variant="secondary"
+					onClick={ toggleVisible }
+					ref={ buttonRef }
+				>
+					Toggle Popover
+					{ isVisible && (
+						<Popover
+							{ ...args }
+							onClose={ handleClose }
+							onFocusOutside={ handleFocusOutside }
+						>
+							{ args.children }
+						</Popover>
+					) }
+				</Button>
+			</div>
+		);
+	},
+	args: {
+		...Default.args,
+		focusOnMount: true,
+		children: (
+			<div style={ { width: '280px', whiteSpace: 'normal' } }>
+				<p>
+					Clicking outside triggers the onFocusOutside callback prop.
+				</p>
+				<p>
+					Pressing the Escape key triggers the onClose callback prop.
+				</p>
+			</div>
+		),
 	},
 };

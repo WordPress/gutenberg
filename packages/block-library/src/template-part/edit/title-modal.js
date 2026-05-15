@@ -39,7 +39,6 @@ export default function TitleModal( { areaLabel, onClose, onSubmit } ) {
 						value={ title }
 						onChange={ setTitle }
 						placeholder={ __( 'Custom Template Part' ) }
-						__nextHasNoMarginBottom
 						__next40pxDefaultSize
 					/>
 					<HStack justify="right">
