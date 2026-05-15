@@ -27,7 +27,14 @@ export type RichTextFormatList = Array< RichTextFormat >;
 export type RichTextValue = {
 	text: string;
 	formats: Array< RichTextFormatList >;
-	_formats: Map< RichTextFormat, [ number, number ] >;
+	/**
+	 * Canonical storage for format ranges, keyed by format object reference
+	 * and mapped to `[start, end]` half-open intervals. Optional so callers
+	 * can still construct a `RichTextValue` from a `formats` array literal;
+	 * functions that need the Map will derive it via `mapFromFormats` when
+	 * absent.
+	 */
+	_formats?: Map< RichTextFormat, [ number, number ] >;
 	replacements: Array< RichTextFormat >;
 	start: number;
 	end: number;
