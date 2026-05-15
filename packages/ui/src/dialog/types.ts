@@ -1,11 +1,11 @@
 import type { Dialog as _Dialog } from '@base-ui/react/dialog';
-import type { ComponentPropsWithoutRef, ReactElement, ReactNode } from 'react';
+import type { ReactElement, ReactNode } from 'react';
 
 import type { Button } from '../button';
 import type { IconButton } from '../icon-button';
 import type { ComponentProps } from '../utils/types';
 
-export type PortalProps = ComponentPropsWithoutRef< typeof _Dialog.Portal >;
+export type PortalProps = ComponentProps< typeof _Dialog.Portal >;
 
 export interface RootProps
 	extends Pick<

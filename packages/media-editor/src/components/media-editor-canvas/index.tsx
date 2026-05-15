@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import { useCallback } from '@wordpress/element';
+
+/**
  * Internal dependencies
  */
 import { useMediaEditorContext } from '../media-editor-provider';
@@ -46,6 +51,16 @@ export default function MediaEditorCanvas( {
 	const { media } = useMediaEditorContext();
 	const controller = useCropper();
 
+	const handleGestureStart = useCallback( () => {
+		onGestureStart?.();
+		controller.commitHistory();
+	}, [ controller, onGestureStart ] );
+
+	const handleGestureEnd = useCallback( () => {
+		controller.commitHistory();
+		onGestureEnd?.();
+	}, [ controller, onGestureEnd ] );
+
 	const mediaUrl = media?.source_url;
 	const mediaType = getMediaTypeFromMimeType( media?.mime_type );
 
@@ -66,14 +81,8 @@ export default function MediaEditorCanvas( {
 				// Flush on gesture start so any pending sidebar interaction
 				// (e.g. zoom slider debounce) is committed as its own undo
 				// step before the canvas gesture begins.
-				onGestureStart={ () => {
-					onGestureStart?.();
-					controller.commitHistory();
-				} }
-				onGestureEnd={ () => {
-					controller.commitHistory();
-					onGestureEnd?.();
-				} }
+				onGestureStart={ handleGestureStart }
+				onGestureEnd={ handleGestureEnd }
 			/>
 		</div>
 	);

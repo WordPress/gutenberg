@@ -73,6 +73,7 @@ function gutenberg_register_user_post_type_cpt() {
 			'has_archive'           => false,
 			'rewrite'               => false,
 			'query_var'             => false,
+			'_builtin'              => true, /* internal use only. don't use this when registering your own post type. */
 		)
 	);
 }

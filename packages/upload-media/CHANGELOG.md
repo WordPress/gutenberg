@@ -6,6 +6,12 @@
 
 - UltraHDR (ISO 21496-1 gain map) JPEGs are now detected and resized via libvips's native `uhdrload`/`uhdrsave` pipeline. The standalone `open-ultrahdr` and `open-ultrahdr-wasm` dependencies have been removed; gain maps are preserved automatically through the existing resize step ([#74873](https://github.com/WordPress/gutenberg/pull/74873)).
 
+## 0.31.0 (2026-05-14)
+
+### Bug Fix
+
+- Fix `-scaled` suffix propagating to every sub-size filename when an image exceeds `big_image_size_threshold`. Threshold scaling now runs as a sideload after the original is uploaded, so sub-sizes inherit the un-suffixed basename — matching WordPress core's `wp_create_image_subsizes()` naming.
+
 ## 0.30.0 (2026-04-29)
 
 ### Enhancement

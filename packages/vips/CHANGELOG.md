@@ -8,6 +8,8 @@
 - Preserve UltraHDR gain maps through `resizeImage`: libvips's `uhdrload`/`uhdrsave` priority is leveraged automatically, the save path keeps `icc|gainmap` metadata, and positional crop now also crops the attached gain map ([#74873](https://github.com/WordPress/gutenberg/pull/74873)).
 - Bump `wasm-vips` to `^0.0.17` for native UltraHDR support ([#74873](https://github.com/WordPress/gutenberg/pull/74873)).
 
+## 1.6.0 (2026-05-14)
+
 ## 1.5.0 (2026-04-29)
 
 ## 1.4.0 (2026-04-15)

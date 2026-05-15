@@ -1,10 +1,9 @@
 /**
  * WordPress dependencies
  */
-import { store as blockEditorStore, Warning } from '@wordpress/block-editor';
+import { Warning } from '@wordpress/block-editor';
 import { Button } from '@wordpress/components';
-import { useDispatch } from '@wordpress/data';
-import { createBlock, rawHandler, serialize } from '@wordpress/blocks';
+import { createBlock, rawHandler } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -16,32 +15,17 @@ import { __ } from '@wordpress/i18n';
  * and offers two migration actions - a primary "Convert to blocks", and a
  * secondary "Convert to Custom HTML".
  *
- * @param {Object} props
- * @param {string} props.clientId Client ID of the Classic block.
- * @param {string} props.content  Raw HTML content of the Classic block.
+ * @param {Object}   props
+ * @param {string}   props.content   Raw HTML content of the Classic block.
+ * @param {Function} props.onReplace Replace the current block with the given blocks.
  */
-export default function MigrationNotice( { clientId, content } ) {
-	const { replaceBlocks } = useDispatch( blockEditorStore );
-
-	const convertToBlocks = () => {
-		replaceBlocks(
-			clientId,
-			rawHandler( {
-				HTML: serialize( createBlock( 'core/freeform', { content } ) ),
-			} )
-		);
-	};
-
-	const convertToHtmlBlock = () => {
-		replaceBlocks( clientId, createBlock( 'core/html', { content } ) );
-	};
-
+export default function MigrationNotice( { content, onReplace } ) {
 	const actions = [
 		<Button
 			__next40pxDefaultSize
 			key="convert-to-blocks"
 			variant="primary"
-			onClick={ convertToBlocks }
+			onClick={ () => onReplace( rawHandler( { HTML: content } ) ) }
 		>
 			{ __( 'Convert to blocks' ) }
 		</Button>,
@@ -49,7 +33,9 @@ export default function MigrationNotice( { clientId, content } ) {
 			__next40pxDefaultSize
 			key="convert-to-html"
 			variant="secondary"
-			onClick={ convertToHtmlBlock }
+			onClick={ () =>
+				onReplace( createBlock( 'core/html', { content } ) )
+			}
 		>
 			{ __( 'Convert to HTML' ) }
 		</Button>,

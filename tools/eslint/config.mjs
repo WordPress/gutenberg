@@ -193,6 +193,7 @@ export default dedupePlugins( [
 			'**/build-wp/**',
 			'**/node_modules/**',
 			'packages/block-serialization-spec-parser/parser.js',
+			'packages/global-styles-ui/src/font-library/lib/**',
 			'packages/icons/src/library/*.tsx',
 			'packages/react-native-editor/bundle/**',
 			'packages/vips/src/worker-code.ts',
@@ -564,12 +565,7 @@ export default dedupePlugins( [
 
 	// Override: CLI/bin/env files — allow console.
 	{
-		files: [
-			'bin/**/*.js',
-			'bin/**/*.mjs',
-			'packages/env/**',
-			'packages/theme/bin/**/*.[tj]s?(x)',
-		],
+		files: [ '**/{bin,scripts,tools}/**', 'packages/env/**' ],
 		rules: {
 			'no-console': 'off',
 		},
