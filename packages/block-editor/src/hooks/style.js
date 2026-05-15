@@ -12,6 +12,7 @@ import { useSelect } from '@wordpress/data';
 import { mergeGlobalStyles } from '@wordpress/global-styles-engine';
 import {
 	getBlockSupport,
+	getBlockType,
 	hasBlockSupport,
 	__EXPERIMENTAL_ELEMENTS as ELEMENTS,
 } from '@wordpress/blocks';
@@ -42,7 +43,7 @@ import {
 } from './utils';
 import { BlockStyleStateProvider } from './block-style-state';
 import { BlockStateBadges, VALID_BLOCK_PSEUDO_STATES } from './states';
-import { buildStateSelector, buildCanvasStateSelector } from './state-utils';
+import { buildScopedBlockSelector } from './state-utils';
 import { BlockInspectorPreTabsFill } from '../components/block-inspector/inspector-pre-tabs-slot-fill';
 import { scopeSelector } from '../components/global-styles/utils';
 import { useBlockEditingMode } from '../components/block-editing-mode';
@@ -146,6 +147,118 @@ export function getStateStylesCSS( stateStyles, selector ) {
 		: undefined;
 
 	return [ importantCSS, fallbackCSS ].filter( Boolean ).join( '\n' );
+}
+
+function isPlainObject( value ) {
+	return !! value && typeof value === 'object' && ! Array.isArray( value );
+}
+
+function mergeStyleObjects( target = {}, source = {} ) {
+	const merged = { ...target };
+
+	Object.entries( source ).forEach( ( [ key, value ] ) => {
+		merged[ key ] =
+			isPlainObject( value ) && isPlainObject( merged[ key ] )
+				? mergeStyleObjects( merged[ key ], value )
+				: value;
+	} );
+
+	return merged;
+}
+
+function addStyleGroup( groups, selector, style ) {
+	const key = selector || '';
+	const existing = groups.get( key ) || { selector, style: {} };
+
+	groups.set( key, {
+		selector,
+		style: mergeStyleObjects( existing.style, style ),
+	} );
+}
+
+function getStateStyleGroups( stateStyles, name ) {
+	const blockSelectors = getBlockType( name )?.selectors || {};
+	const groups = new Map();
+
+	Object.entries( stateStyles || {} ).forEach(
+		( [ feature, featureStyles ] ) => {
+			const featureSelectors = blockSelectors[ feature ];
+
+			if ( typeof featureSelectors === 'string' ) {
+				addStyleGroup( groups, featureSelectors, {
+					[ feature ]: featureStyles,
+				} );
+				return;
+			}
+
+			if (
+				isPlainObject( featureSelectors ) &&
+				isPlainObject( featureStyles )
+			) {
+				const remainingStyles = { ...featureStyles };
+
+				Object.entries( featureSelectors ).forEach(
+					( [ subfeature, subfeatureSelector ] ) => {
+						if (
+							subfeature === 'root' ||
+							typeof subfeatureSelector !== 'string' ||
+							! Object.hasOwn( featureStyles, subfeature )
+						) {
+							return;
+						}
+
+						addStyleGroup( groups, subfeatureSelector, {
+							[ feature ]: {
+								[ subfeature ]: featureStyles[ subfeature ],
+							},
+						} );
+						delete remainingStyles[ subfeature ];
+					}
+				);
+
+				if ( Object.keys( remainingStyles ).length ) {
+					addStyleGroup(
+						groups,
+						featureSelectors.root || blockSelectors.root,
+						{
+							[ feature ]: remainingStyles,
+						}
+					);
+				}
+				return;
+			}
+
+			addStyleGroup( groups, blockSelectors.root, {
+				[ feature ]: featureStyles,
+			} );
+		}
+	);
+
+	return Array.from( groups.values() );
+}
+
+/**
+ * Generates CSS for block instance state styles, honoring feature selectors.
+ *
+ * @param {Object}  stateStyles          State style object.
+ * @param {Object}  options              Generation options.
+ * @param {string}  options.name         Block name.
+ * @param {string}  options.baseSelector Block-instance scoping selector.
+ * @param {string=} options.state        Optional pseudo-state, e.g. ":hover".
+ * @return {string|undefined} Generated stylesheet.
+ */
+export function getBlockStateStylesCSS( stateStyles, options ) {
+	const { name, baseSelector, state = '' } = options;
+	const rules = getStateStyleGroups( stateStyles, name )
+		.map( ( { selector: blockSelector, style } ) =>
+			getStateStylesCSS(
+				style,
+				buildScopedBlockSelector( baseSelector, blockSelector, state )
+			)
+		)
+		.filter( Boolean );
+
+	return rules.length ? rules.join( '\n' ) : undefined;
 }
 
 /**
@@ -456,8 +569,10 @@ function BlockStyleControls( {
 			return undefined;
 		}
 
-		const selector = buildCanvasStateSelector( clientId, name );
-		return getStateStylesCSS( stateValue, selector );
+		return getBlockStateStylesCSS( stateValue, {
+			name,
+			baseSelector: `[data-block="${ clientId }"]`,
+		} );
 	}, [
 		showStateOnCanvas,
 		selectedState,
@@ -645,12 +760,11 @@ function useBlockProps( { name, style } ) {
 			validStates.forEach( ( state ) => {
 				const stateStyles = style?.[ state ];
 				if ( stateStyles ) {
-					const selector = buildStateSelector(
-						baseElementSelector,
+					const css = getBlockStateStylesCSS( stateStyles, {
 						name,
-						state
-					);
-					const css = getStateStylesCSS( stateStyles, selector );
+						baseSelector: baseElementSelector,
+						state,
+					} );
 					if ( css ) {
 						cssRules.push( css );
 					}

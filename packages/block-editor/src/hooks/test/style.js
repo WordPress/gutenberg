@@ -1,7 +1,13 @@
 /**
+ * WordPress dependencies
+ */
+import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
+
+/**
  * Internal dependencies
  */
 import _style, {
+	getBlockStateStylesCSS,
 	getInlineStyles,
 	getStateStylesCSS,
 	omitStyle,
@@ -198,6 +204,65 @@ describe( 'getStateStylesCSS', () => {
 			)
 		).toBe(
 			'.wp-block-test:hover { border-top-color: #0000ff !important; }\n.wp-block-test:hover { border-top-style: solid; }'
+		);
+	} );
+} );
+
+describe( 'getBlockStateStylesCSS', () => {
+	beforeEach( () => {
+		registerBlockType( 'test/state-button', {
+			apiVersion: 3,
+			title: 'State Button',
+			category: 'text',
+			attributes: {},
+			edit: () => null,
+			save: () => null,
+			selectors: {
+				root: '.wp-block-button .wp-block-button__link',
+				dimensions: {
+					root: '.wp-block-button',
+					width: '.wp-block-button',
+				},
+			},
+		} );
+	} );
+
+	afterEach( () => {
+		unregisterBlockType( 'test/state-button' );
+	} );
+
+	it( 'routes state styles through feature selectors', () => {
+		expect(
+			getBlockStateStylesCSS(
+				{
+					color: { background: '#ff00d0' },
+					dimensions: { width: '50%' },
+				},
+				{
+					name: 'test/state-button',
+					baseSelector: '.wp-elements-abc123',
+					state: ':hover',
+				}
+			)
+		).toBe(
+			'.wp-elements-abc123 .wp-block-button__link:hover { background-color: #ff00d0 !important; }\n.wp-elements-abc123:hover { width: 50% !important; }'
+		);
+	} );
+
+	it( 'routes canvas preview styles through feature selectors without the pseudo state', () => {
+		expect(
+			getBlockStateStylesCSS(
+				{
+					color: { background: '#ff00d0' },
+					dimensions: { width: '50%' },
+				},
+				{
+					name: 'test/state-button',
+					baseSelector: '[data-block="client-id"]',
+				}
+			)
+		).toBe(
+			'[data-block="client-id"] .wp-block-button__link { background-color: #ff00d0 !important; }\n[data-block="client-id"] { width: 50% !important; }'
 		);
 	} );
 } );

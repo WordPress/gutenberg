@@ -87,6 +87,185 @@ function gutenberg_get_state_declarations_with_fallback_border_styles( $declarat
 }
 
 /**
+ * Adds a style fragment to a selector-keyed state style group.
+ *
+ * @param array       $groups   Selector-keyed style groups.
+ * @param string|null $selector Block or feature selector.
+ * @param array       $style    Style fragment.
+ */
+function gutenberg_add_state_style_group( &$groups, $selector, $style ) {
+	$key = is_string( $selector ) ? $selector : '';
+
+	if ( ! isset( $groups[ $key ] ) ) {
+		$groups[ $key ] = array(
+			'selector' => $selector,
+			'style'    => array(),
+		);
+	}
+
+	$groups[ $key ]['style'] = array_replace_recursive( $groups[ $key ]['style'], $style );
+}
+
+/**
+ * Splits a state style object into groups based on block feature selectors.
+ *
+ * @param array $state_style     State style object.
+ * @param array $block_selectors Block selectors metadata.
+ * @return array[] Selector/style groups.
+ */
+function gutenberg_get_state_style_groups( $state_style, $block_selectors ) {
+	$groups = array();
+
+	foreach ( $state_style as $feature => $feature_styles ) {
+		$feature_selectors = $block_selectors[ $feature ] ?? null;
+
+		if ( is_string( $feature_selectors ) ) {
+			gutenberg_add_state_style_group(
+				$groups,
+				$feature_selectors,
+				array( $feature => $feature_styles )
+			);
+			continue;
+		}
+
+		if ( is_array( $feature_selectors ) && is_array( $feature_styles ) ) {
+			$remaining_styles = $feature_styles;
+
+			foreach ( $feature_selectors as $subfeature => $subfeature_selector ) {
+				if (
+					'root' === $subfeature ||
+					! is_string( $subfeature_selector ) ||
+					! array_key_exists( $subfeature, $feature_styles )
+				) {
+					continue;
+				}
+
+				gutenberg_add_state_style_group(
+					$groups,
+					$subfeature_selector,
+					array(
+						$feature => array(
+							$subfeature => $feature_styles[ $subfeature ],
+						),
+					)
+				);
+				unset( $remaining_styles[ $subfeature ] );
+			}
+
+			if ( array() !== $remaining_styles ) {
+				gutenberg_add_state_style_group(
+					$groups,
+					$feature_selectors['root'] ?? ( $block_selectors['root'] ?? null ),
+					array( $feature => $remaining_styles )
+				);
+			}
+			continue;
+		}
+
+		gutenberg_add_state_style_group(
+			$groups,
+			$block_selectors['root'] ?? null,
+			array( $feature => $feature_styles )
+		);
+	}
+
+	return array_values( $groups );
+}
+
+/**
+ * Builds compiled state style rules, preserving the selector each rule targets.
+ *
+ * @param array         $state_styles Map of state to style array.
+ * @param WP_Block_Type $block_type   Block type.
+ * @return array[] State style rules.
+ */
+function gutenberg_get_block_state_style_rules( $state_styles, $block_type ) {
+	$css_rules       = array();
+	$block_selectors = isset( $block_type->selectors ) && is_array( $block_type->selectors )
+		? $block_type->selectors
+		: array();
+
+	foreach ( $state_styles as $state => $state_style ) {
+		if ( empty( $state_style ) || ! is_array( $state_style ) ) {
+			continue;
+		}
+
+		foreach ( gutenberg_get_state_style_groups( $state_style, $block_selectors ) as $group ) {
+			$compiled = gutenberg_style_engine_get_styles(
+				gutenberg_normalize_state_style_for_css_output( $group['style'] )
+			);
+
+			if ( ! empty( $compiled['declarations'] ) ) {
+				$css_rules[] = array(
+					'state'        => $state,
+					'selector'     => $group['selector'],
+					'declarations' => $compiled['declarations'],
+				);
+			}
+		}
+	}
+
+	return $css_rules;
+}
+
+/**
+ * Returns a unique class for a set of state style rules.
+ *
+ * @param string $block_name Block name.
+ * @param array  $css_rules  State style rules.
+ * @return string Unique class name.
+ */
+function gutenberg_get_block_state_unique_class( $block_name, $css_rules ) {
+	return 'wp-states-' . substr(
+		md5(
+			wp_json_encode(
+				array(
+					'blockName' => $block_name,
+					'rules'     => $css_rules,
+				)
+			)
+		),
+		0,
+		8
+	);
+}
+
+/**
+ * Builds a scoped selector from a block selector and optional pseudo-state.
+ *
+ * @param string      $base_selector  Block-instance scoping selector.
+ * @param string|null $block_selector Block or feature selector from metadata.
+ * @param string      $state          Pseudo-state selector.
+ * @return string Scoped selector.
+ */
+function gutenberg_build_state_selector( $base_selector, $block_selector, $state ) {
+	if ( ! is_string( $block_selector ) || '' === trim( $block_selector ) ) {
+		return $base_selector . $state;
+	}
+
+	$selectors        = explode( ',', $block_selector );
+	$scoped_selectors = array();
+
+	foreach ( $selectors as $selector ) {
+		$selector = trim( $selector );
+		if ( '' === $selector ) {
+			continue;
+		}
+
+		if ( preg_match( '/^[^ >+~]+[ >+~](.*)$/', $selector, $matches ) ) {
+			$scoped_selectors[] = $base_selector . ' ' . trim( $matches[1] ) . $state;
+			continue;
+		}
+
+		$scoped_selectors[] = $base_selector . $state;
+	}
+
+	return empty( $scoped_selectors )
+		? $base_selector . $state
+		: implode( ', ', $scoped_selectors );
+}
+
+/**
  * Renders per-instance pseudo-state styles on the frontend for blocks with
  * configured pseudo-state support.
  *
@@ -110,30 +289,24 @@ function gutenberg_render_block_states_support( $block_content, $block ) {
 		return $block_content;
 	}
 
-	$style     = $block['attrs']['style'] ?? array();
-	$css_rules = array();
+	$style = $block['attrs']['style'] ?? array();
 
+	$state_styles = array();
 	foreach ( $supported_states as $state ) {
 		if ( empty( $style[ $state ] ) || ! is_array( $style[ $state ] ) ) {
 			continue;
 		}
 
-		$compiled = wp_style_engine_get_styles(
-			gutenberg_normalize_state_style_for_css_output( $style[ $state ] )
-		);
-		if ( ! empty( $compiled['declarations'] ) ) {
-			$css_rules[] = array(
-				'state'        => $state,
-				'declarations' => $compiled['declarations'],
-			);
-		}
+		$state_styles[ $state ] = $style[ $state ];
 	}
+
+	$css_rules = gutenberg_get_block_state_style_rules( $state_styles, $block_type );
 
 	if ( empty( $css_rules ) ) {
 		return $block_content;
 	}
 
-	$unique_class = 'wp-states-' . substr( md5( wp_json_encode( $css_rules ) ), 0, 8 );
+	$unique_class = gutenberg_get_block_state_unique_class( $block_name, $css_rules );
 
 	/*
 	 * Register each pseudo-state's CSS rules with the block-supports style engine store.
@@ -166,8 +339,13 @@ function gutenberg_render_block_states_support( $block_content, $block ) {
 		'border-bottom-style',
 		'border-left-style',
 		'background',
+		'aspect-ratio',
 		'font-size',
 		'font-family',
+		'height',
+		'min-height',
+		'min-width',
+		'width',
 	);
 
 	$style_rules = array();
@@ -180,7 +358,11 @@ function gutenberg_render_block_states_support( $block_content, $block ) {
 		}
 		$declarations  = gutenberg_get_state_declarations_with_fallback_border_styles( $declarations );
 		$style_rules[] = array(
-			'selector'     => ".$unique_class{$rule['state']}",
+			'selector'     => gutenberg_build_state_selector(
+				".$unique_class",
+				$rule['selector'],
+				$rule['state']
+			),
 			'declarations' => $declarations,
 		);
 	}
@@ -193,26 +375,8 @@ function gutenberg_render_block_states_support( $block_content, $block ) {
 		)
 	);
 
-	// Add the unique class to the interactive element so that pseudo-state
-	// selectors like `.$unique_class:hover` match directly without needing a descendant.
-	// If the block declares selectors.root with a descendant (e.g. the button
-	// block's ".wp-block-button .wp-block-button__link"), we extract the last
-	// class and walk to that element. Otherwise we fall back to the wrapper.
-	$root_selector = $block_type->selectors['root'] ?? null;
-	$target_class  = null;
-	if ( $root_selector && preg_match( '/\.([a-zA-Z0-9_-]+)\s*$/', $root_selector, $matches ) ) {
-		$target_class = $matches[1];
-	}
-
 	$processor = new WP_HTML_Tag_Processor( $block_content );
-	if ( $target_class ) {
-		while ( $processor->next_tag() ) {
-			if ( $processor->has_class( $target_class ) ) {
-				$processor->add_class( $unique_class );
-				break;
-			}
-		}
-	} elseif ( $processor->next_tag() ) {
+	if ( $processor->next_tag() ) {
 		$processor->add_class( $unique_class );
 	}
 	return $processor->get_updated_html();
