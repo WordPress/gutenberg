@@ -25,7 +25,7 @@ class Gutenberg_Standard_Guidelines_REST_Controller_Test extends WP_UnitTestCase
 	 *
 	 * @param WP_UnitTest_Factory $factory Factory instance.
 	 */
-	public static function wpSetUpBeforeClass( WP_UnitTest_Factory $factory ) {
+	public static function wpSetUpBeforeClass( WP_UnitTest_Factory $factory ): void {
 		foreach ( array( 'administrator', 'editor', 'author', 'contributor', 'subscriber' ) as $role ) {
 			self::$users[ $role ] = $factory->user->create( array( 'role' => $role ) );
 		}
@@ -34,7 +34,7 @@ class Gutenberg_Standard_Guidelines_REST_Controller_Test extends WP_UnitTestCase
 	/**
 	 * Clean up class fixtures.
 	 */
-	public static function wpTearDownAfterClass() {
+	public static function wpTearDownAfterClass(): void {
 		foreach ( self::$users as $user_id ) {
 			self::delete_user( $user_id );
 		}
@@ -44,7 +44,7 @@ class Gutenberg_Standard_Guidelines_REST_Controller_Test extends WP_UnitTestCase
 	/**
 	 * Clean up guidelines posts and taxonomy terms after each test.
 	 */
-	public function tear_down() {
+	public function tear_down(): void {
 		$posts = get_posts(
 			array(
 				'post_type'      => Gutenberg_Guidelines_Post_Type::POST_TYPE,
@@ -72,48 +72,39 @@ class Gutenberg_Standard_Guidelines_REST_Controller_Test extends WP_UnitTestCase
 	}
 
 	/**
-	 * Dispatch a create request to the collection as the administrator.
+	 * Creates a guideline fixture owned by the named role and saved with the
+	 * given post status.
 	 *
-	 * @param array $args Optional request params merged over the defaults.
-	 * @return WP_REST_Response
+	 * @param string $owner_role Role key from the self::$users fixture map.
+	 * @param string $status     Post status for the guideline fixture.
+	 * @return int Inserted guideline post ID, or 0 on failure.
 	 */
-	private function create_guideline( array $args = array() ): WP_REST_Response {
-		wp_set_current_user( self::$users['administrator'] );
-
-		$defaults = array(
-			'status'  => 'draft',
-			'title'   => 'Guideline',
-			'content' => 'Guideline content.',
-			'excerpt' => 'Guideline excerpt.',
-		);
-
-		$request = new WP_REST_Request( 'POST', self::REST_BASE );
-		foreach ( array_merge( $defaults, $args ) as $key => $value ) {
-			$request->set_param( $key, $value );
-		}
-
-		return rest_get_server()->dispatch( $request );
-	}
-
-	/**
-	 * Insert a guideline post owned by the named role.
-	 */
-	private function make_post( $owner_role, $status ) {
+	private function create_guideline( string $owner_role, string $status ): int {
 		return wp_insert_post(
 			array(
 				'post_type'    => Gutenberg_Guidelines_Post_Type::POST_TYPE,
 				'post_status'  => $status,
-				'post_title'   => "endpoint test {$owner_role} {$status}",
-				'post_content' => 'body',
+				'post_title'   => "{$status} guideline owned by {$owner_role}",
+				'post_content' => "Guideline fixture content for {$owner_role} with {$status} status.",
 				'post_author'  => self::$users[ $owner_role ],
 			)
 		);
 	}
 
 	/**
+	 * Switches the current user to a fixture user with the named role.
+	 *
+	 * @param string $role Role key from the self::$users fixture map.
+	 * @return void
+	 */
+	private function switch_to_user_role( string $role ): void {
+		wp_set_current_user( self::$users[ $role ] );
+	}
+
+	/**
 	 * The standard collection and single-item routes are registered.
 	 */
-	public function test_register_routes() {
+	public function test_register_routes(): void {
 		$routes = rest_get_server()->get_routes();
 
 		$this->assertArrayHasKey( self::REST_BASE, $routes, 'Collection route not registered.' );
@@ -124,8 +115,15 @@ class Gutenberg_Standard_Guidelines_REST_Controller_Test extends WP_UnitTestCase
 	 * A POST to the collection creates the guideline and the save_post
 	 * hook assigns the `artifact` fallback type term.
 	 */
-	public function test_create_guideline() {
-		$response = $this->create_guideline( array( 'status' => 'publish' ) );
+	public function test_create_guideline(): void {
+		$this->switch_to_user_role( 'administrator' );
+
+		$request = new WP_REST_Request( 'POST', self::REST_BASE );
+		$request->set_param( 'status', 'publish' );
+		$request->set_param( 'title', 'Guideline' );
+		$request->set_param( 'content', 'Guideline content.' );
+		$request->set_param( 'excerpt', 'Guideline excerpt.' );
+		$response = rest_get_server()->dispatch( $request );
 
 		$this->assertSame( 201, $response->get_status() );
 
@@ -143,11 +141,13 @@ class Gutenberg_Standard_Guidelines_REST_Controller_Test extends WP_UnitTestCase
 	}
 
 	/**
-	 * The collection route returns guidelines created via the same route.
+	 * The collection route returns matching guidelines and totals.
 	 */
-	public function test_get_items_lists_guidelines() {
-		$first_response  = $this->create_guideline( array( 'title' => 'First guideline' ) );
-		$second_response = $this->create_guideline( array( 'title' => 'Second guideline' ) );
+	public function test_get_items_lists_guidelines(): void {
+		$first_post_id  = $this->create_guideline( 'administrator', 'draft' );
+		$second_post_id = $this->create_guideline( 'administrator', 'draft' );
+
+		$this->switch_to_user_role( 'administrator' );
 
 		$request = new WP_REST_Request( 'GET', self::REST_BASE );
 		$request->set_param( 'status', 'draft' );
@@ -155,17 +155,42 @@ class Gutenberg_Standard_Guidelines_REST_Controller_Test extends WP_UnitTestCase
 
 		$this->assertSame( 200, $response->get_status() );
 
-		$ids = wp_list_pluck( $response->get_data(), 'id' );
+		$ids     = wp_list_pluck( $response->get_data(), 'id' );
+		$headers = $response->get_headers();
 
-		$this->assertContains( $first_response->get_data()['id'], $ids );
-		$this->assertContains( $second_response->get_data()['id'], $ids );
+		$this->assertContains( $first_post_id, $ids );
+		$this->assertContains( $second_post_id, $ids );
+		$this->assertSame( 2, (int) $headers['X-WP-Total'] );
+	}
+
+	/**
+	 * Collection totals are scoped to the private rows readable by the caller.
+	 */
+	public function test_get_items_private_totals_are_scoped_to_current_user(): void {
+		$own_private_post_id   = $this->create_guideline( 'contributor', 'private' );
+		$other_private_post_id = $this->create_guideline( 'author', 'private' );
+
+		$this->switch_to_user_role( 'contributor' );
+
+		$request = new WP_REST_Request( 'GET', self::REST_BASE );
+		$request->set_param( 'status', 'private' );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertSame( 200, $response->get_status() );
+
+		$ids     = wp_list_pluck( $response->get_data(), 'id' );
+		$headers = $response->get_headers();
+
+		$this->assertContains( $own_private_post_id, $ids );
+		$this->assertNotContains( $other_private_post_id, $ids );
+		$this->assertSame( 1, (int) $headers['X-WP-Total'] );
 	}
 
 	/**
 	 * Anonymous reads of the collection are rejected with `rest_forbidden`.
 	 */
-	public function test_get_items_blocks_anonymous() {
-		$this->create_guideline( array( 'status' => 'publish' ) );
+	public function test_get_items_blocks_anonymous(): void {
+		$this->create_guideline( 'administrator', 'publish' );
 
 		wp_set_current_user( 0 );
 
@@ -180,9 +205,8 @@ class Gutenberg_Standard_Guidelines_REST_Controller_Test extends WP_UnitTestCase
 	 * Anonymous reads of a single item are rejected with `rest_forbidden`,
 	 * even when the row is `publish`.
 	 */
-	public function test_get_item_blocks_anonymous() {
-		$create_response = $this->create_guideline( array( 'status' => 'publish' ) );
-		$post_id         = $create_response->get_data()['id'];
+	public function test_get_item_blocks_anonymous(): void {
+		$post_id = $this->create_guideline( 'administrator', 'publish' );
 
 		wp_set_current_user( 0 );
 
@@ -196,11 +220,10 @@ class Gutenberg_Standard_Guidelines_REST_Controller_Test extends WP_UnitTestCase
 	/**
 	 * An authenticated reader cannot fetch another user's private row.
 	 */
-	public function test_get_item_blocks_others_private() {
-		$create_response = $this->create_guideline( array( 'status' => 'private' ) );
-		$post_id         = $create_response->get_data()['id'];
+	public function test_get_item_blocks_others_private(): void {
+		$post_id = $this->create_guideline( 'administrator', 'private' );
 
-		wp_set_current_user( self::$users['author'] );
+		$this->switch_to_user_role( 'author' );
 
 		$request  = new WP_REST_Request( 'GET', self::REST_BASE . '/' . $post_id );
 		$response = rest_get_server()->dispatch( $request );
@@ -213,9 +236,10 @@ class Gutenberg_Standard_Guidelines_REST_Controller_Test extends WP_UnitTestCase
 	 * A PATCH to the item route updates title and content without
 	 * changing the row's taxonomy assignment.
 	 */
-	public function test_update_guideline() {
-		$create_response = $this->create_guideline();
-		$post_id         = $create_response->get_data()['id'];
+	public function test_update_guideline(): void {
+		$post_id = $this->create_guideline( 'administrator', 'draft' );
+
+		$this->switch_to_user_role( 'administrator' );
 
 		$request = new WP_REST_Request( 'PATCH', self::REST_BASE . '/' . $post_id );
 		$request->set_param( 'title', 'Updated guideline' );
@@ -237,9 +261,10 @@ class Gutenberg_Standard_Guidelines_REST_Controller_Test extends WP_UnitTestCase
 	/**
 	 * A DELETE with `force=true` removes the row entirely.
 	 */
-	public function test_delete_guideline() {
-		$create_response = $this->create_guideline();
-		$post_id         = $create_response->get_data()['id'];
+	public function test_delete_guideline(): void {
+		$post_id = $this->create_guideline( 'administrator', 'draft' );
+
+		$this->switch_to_user_role( 'administrator' );
 
 		$request = new WP_REST_Request( 'DELETE', self::REST_BASE . '/' . $post_id );
 		$request->set_param( 'force', true );
@@ -256,8 +281,13 @@ class Gutenberg_Standard_Guidelines_REST_Controller_Test extends WP_UnitTestCase
 	 *
 	 * @dataProvider data_create_enforces_status_policy
 	 */
-	public function test_create_enforces_status_policy( $role, $requested_status, $expected_status, $expected_error ) {
-		wp_set_current_user( self::$users[ $role ] );
+	public function test_create_enforces_status_policy(
+		string $role,
+		?string $requested_status,
+		?string $expected_status,
+		?string $expected_error
+	): void {
+		$this->switch_to_user_role( $role );
 
 		$request = new WP_REST_Request( 'POST', self::REST_BASE );
 		if ( null !== $requested_status ) {
@@ -280,7 +310,7 @@ class Gutenberg_Standard_Guidelines_REST_Controller_Test extends WP_UnitTestCase
 	/**
 	 * @return array Rows: [role, requested_status, expected_status, expected_error].
 	 */
-	public function data_create_enforces_status_policy() {
+	public function data_create_enforces_status_policy(): array {
 		return array(
 			// Status omitted: controller defaults to `private`.
 			'contributor + omitted'   => array( 'contributor', null, 'private', null ),
@@ -308,9 +338,14 @@ class Gutenberg_Standard_Guidelines_REST_Controller_Test extends WP_UnitTestCase
 	 *
 	 * @dataProvider data_update_enforces_per_post_permission
 	 */
-	public function test_update_enforces_per_post_permission( $role, $owner_role, $status, $expected_error ) {
-		$post_id = $this->make_post( $owner_role, $status );
-		wp_set_current_user( self::$users[ $role ] );
+	public function test_update_enforces_per_post_permission(
+		string $role,
+		string $owner_role,
+		string $status,
+		?string $expected_error
+	): void {
+		$post_id = $this->create_guideline( $owner_role, $status );
+		$this->switch_to_user_role( $role );
 
 		$request = new WP_REST_Request( 'PATCH', self::REST_BASE . '/' . $post_id );
 		$request->set_param( 'title', "{$role} updating {$owner_role}'s {$status}" );
@@ -328,7 +363,7 @@ class Gutenberg_Standard_Guidelines_REST_Controller_Test extends WP_UnitTestCase
 	/**
 	 * @return array Rows: [role, owner_role, status, expected_error].
 	 */
-	public function data_update_enforces_per_post_permission() {
+	public function data_update_enforces_per_post_permission(): array {
 		return array(
 			'contributor + own private'    => array( 'contributor', 'contributor', 'private', null ),
 			'contributor + others private' => array( 'contributor', 'administrator', 'private', 'rest_cannot_edit' ),
@@ -342,9 +377,14 @@ class Gutenberg_Standard_Guidelines_REST_Controller_Test extends WP_UnitTestCase
 	 *
 	 * @dataProvider data_delete_enforces_per_post_permission
 	 */
-	public function test_delete_enforces_per_post_permission( $role, $owner_role, $status, $expected_error ) {
-		$post_id = $this->make_post( $owner_role, $status );
-		wp_set_current_user( self::$users[ $role ] );
+	public function test_delete_enforces_per_post_permission(
+		string $role,
+		string $owner_role,
+		string $status,
+		?string $expected_error
+	): void {
+		$post_id = $this->create_guideline( $owner_role, $status );
+		$this->switch_to_user_role( $role );
 
 		$request = new WP_REST_Request( 'DELETE', self::REST_BASE . '/' . $post_id );
 		$request->set_param( 'force', true );
@@ -364,7 +404,7 @@ class Gutenberg_Standard_Guidelines_REST_Controller_Test extends WP_UnitTestCase
 	/**
 	 * @return array Rows: [role, owner_role, status, expected_error].
 	 */
-	public function data_delete_enforces_per_post_permission() {
+	public function data_delete_enforces_per_post_permission(): array {
 		return array(
 			'contributor + own private'    => array( 'contributor', 'contributor', 'private', null ),
 			'contributor + others private' => array( 'contributor', 'administrator', 'private', 'rest_cannot_delete' ),

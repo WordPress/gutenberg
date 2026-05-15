@@ -38,6 +38,25 @@ class Gutenberg_Guidelines_REST_Controller extends WP_REST_Posts_Controller {
 	}
 
 	/**
+	 * Scope collection queries to rows readable by the current user.
+	 *
+	 * The parent controller filters unreadable posts after the query runs, but
+	 * collection totals and pagination headers are based on the unfiltered
+	 * query. Setting `perm` lets WP_Query apply private-post visibility before
+	 * totals are calculated.
+	 *
+	 * @param array                $prepared_args Prepared WP_Query arguments.
+	 * @param WP_REST_Request|null $request       Full details about the request.
+	 * @return array Updated WP_Query arguments.
+	 */
+	protected function prepare_items_query( $prepared_args = array(), $request = null ) {
+		$query_args         = parent::prepare_items_query( $prepared_args, $request );
+		$query_args['perm'] = 'readable';
+
+		return $query_args;
+	}
+
+	/**
 	 * Gate per-item reads on the user-specific read capability.
 	 *
 	 * The default treats every `publish` post as universally readable;
