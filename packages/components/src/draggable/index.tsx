@@ -17,12 +17,17 @@ import type { DraggableProps } from './types';
 import styles from './style.module.scss';
 
 // The hardcoded legacy class names are preserved alongside the
-// CSS-module hashed ones for backwards compatibility.
+// CSS-module hashed ones for backwards compatibility. `filter(Boolean)`
+// keeps Jest's CSS-module mock (which returns `undefined`) from leaking
+// a literal "undefined" class.
 const dragImageClasses = [
 	styles.invisibleDragImage,
 	'components-draggable__invisible-drag-image',
-];
-const cloneWrapperClasses = [ styles.clone, 'components-draggable__clone' ];
+].filter( Boolean );
+const cloneWrapperClasses = [
+	styles.clone,
+	'components-draggable__clone',
+].filter( Boolean );
 // Body-level signal shared with external code (e.g. block-editor keyboard
 // drag), so it stays as a plain global class rather than module-scoped.
 const bodyClass = 'is-dragging-components-draggable';
