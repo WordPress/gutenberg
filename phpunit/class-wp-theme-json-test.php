@@ -5086,6 +5086,19 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 											'background' => 'red',
 										),
 									),
+									'tablet'     => array(
+										'dimensions' => array(
+											'width' => '30rem',
+										),
+										':hover'    => array(
+											'dimensions' => array(
+												'width' => '40rem',
+											),
+											'color'      => array(
+												'background' => 'blue',
+											),
+										),
+									),
 								),
 							),
 						),
@@ -5103,7 +5116,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				'scope'                          => '.is-style-outline--3',
 			)
 		);
-		$expected      = ':root :where(.wp-block-button.is-style-outline--3){width: 10rem;}:root :where(.wp-block-button.is-style-outline--3:hover){width: 20rem;}:root :where(.wp-block-button.is-style-outline--3 .wp-block-button__link:hover){background-color: red;}';
+		$expected      = ':root :where(.wp-block-button.is-style-outline--3){width: 10rem;}@media (480px < width <= 782px){:root :where(.wp-block-button.is-style-outline--3){width: 30rem;}}:root :where(.wp-block-button.is-style-outline--3:hover){width: 20rem;}:root :where(.wp-block-button.is-style-outline--3 .wp-block-button__link:hover){background-color: red;}@media (480px < width <= 782px){:root :where(.wp-block-button.is-style-outline--3:hover){width: 40rem;}}@media (480px < width <= 782px){:root :where(.wp-block-button.is-style-outline--3 .wp-block-button__link:hover){background-color: blue;}}';
 
 		unregister_block_style( 'core/button', 'outline--3' );
 

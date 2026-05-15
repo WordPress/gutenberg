@@ -924,7 +924,7 @@ describe( 'global styles renderer', () => {
 			);
 		} );
 
-		it( 'outputs variation pseudo styles after variation responsive base styles', () => {
+		it( 'outputs variation responsive pseudo styles after default pseudo styles', () => {
 			const tree = {
 				styles: {
 					blocks: {
@@ -934,18 +934,30 @@ describe( 'global styles renderer', () => {
 									color: {
 										text: 'green',
 									},
+									dimensions: {
+										width: '10rem',
+									},
 									':hover': {
 										color: {
 											text: 'blue',
 										},
+										dimensions: {
+											width: '20rem',
+										},
 									},
-									mobile: {
+									tablet: {
 										color: {
 											text: 'red',
+										},
+										dimensions: {
+											width: '30rem',
 										},
 										':hover': {
 											color: {
 												text: 'orange',
+											},
+											dimensions: {
+												width: '40rem',
 											},
 										},
 									},
@@ -958,9 +970,15 @@ describe( 'global styles renderer', () => {
 
 			const blockSelectors = {
 				'core/button': {
-					selector: '.wp-block-button',
+					selector: '.wp-block-button .wp-block-button__link',
+					featureSelectors: {
+						dimensions: {
+							root: '.wp-block-button',
+							width: '.wp-block-button',
+						},
+					},
 					styleVariationSelectors: {
-						foo: '.is-style-foo.wp-block-button',
+						foo: '.wp-block-button.is-style-foo .wp-block-button__link',
 					},
 				},
 			};
@@ -979,7 +997,7 @@ describe( 'global styles renderer', () => {
 			);
 
 			expect( result ).toEqual(
-				':root :where(.is-style-foo.wp-block-button){color: green;}@media (width <= 480px){:root :where(.is-style-foo.wp-block-button){color: red;}}:root :where(.is-style-foo.wp-block-button:hover){color: blue;}@media (width <= 480px){:root :where(.is-style-foo.wp-block-button:hover){color: orange;}}'
+				':root :where(.wp-block-button.is-style-foo){width: 10rem;}:root :where(.wp-block-button.is-style-foo .wp-block-button__link){color: green;}@media (480px < width <= 782px){:root :where(.wp-block-button.is-style-foo){width: 30rem;}:root :where(.wp-block-button.is-style-foo .wp-block-button__link){color: red;}}:root :where(.wp-block-button.is-style-foo:hover){width: 20rem;}:root :where(.wp-block-button.is-style-foo .wp-block-button__link:hover){color: blue;}@media (480px < width <= 782px){:root :where(.wp-block-button.is-style-foo:hover){width: 40rem;}:root :where(.wp-block-button.is-style-foo .wp-block-button__link:hover){color: orange;}}'
 			);
 		} );
 

@@ -3420,10 +3420,11 @@ class WP_Theme_JSON_Gutenberg {
 		// If there are style variations, generate the declarations for them, including any feature selectors the block may have.
 		// Responsive nodes (those with a media_query) do not process variations — variation responsive
 		// CSS is handled by the variation's own responsive nodes or the existing variation loop.
-		$style_variation_declarations    = array();
-		$style_variation_custom_css      = array();
-		$style_variation_responsive_css  = array();
-		$style_variation_layout_metadata = array();
+		$style_variation_declarations            = array();
+		$style_variation_custom_css              = array();
+		$style_variation_responsive_css          = array();
+		$style_variation_responsive_pseudo_css   = array();
+		$style_variation_layout_metadata         = array();
 		if ( ! $media_query && ! empty( $block_metadata['variations'] ) ) {
 			foreach ( $block_metadata['variations'] as $style_variation ) {
 				$style_variation_node = _wp_array_get( $this->theme_json, $style_variation['path'], array() );
@@ -3471,7 +3472,8 @@ class WP_Theme_JSON_Gutenberg {
 
 				// Store responsive breakpoint CSS for the style variation.
 				// This includes both base properties and feature-level selectors.
-				$variation_responsive_css = '';
+				$variation_responsive_css        = '';
+				$variation_responsive_pseudo_css = '';
 
 				foreach ( array_keys( static::RESPONSIVE_BREAKPOINTS ) as $breakpoint ) {
 					if ( ! isset( $style_variation_node[ $breakpoint ] ) ) {
@@ -3503,8 +3505,8 @@ class WP_Theme_JSON_Gutenberg {
 						if ( empty( $pseudo_declarations ) ) {
 							continue;
 						}
-						$pseudo_ruleset            = static::to_ruleset( ':root :where(' . $pseudo_selector . ')', $pseudo_declarations );
-						$variation_responsive_css .= $breakpoint_media . '{' . $pseudo_ruleset . '}';
+						$pseudo_ruleset                   = static::to_ruleset( ':root :where(' . $pseudo_selector . ')', $pseudo_declarations );
+						$variation_responsive_pseudo_css .= $breakpoint_media . '{' . $pseudo_ruleset . '}';
 					}
 
 					// Process custom CSS for this breakpoint.
@@ -3557,8 +3559,8 @@ class WP_Theme_JSON_Gutenberg {
 										continue;
 									}
 
-									$pseudo_selector_ruleset   = static::to_ruleset( ':root :where(' . static::append_to_selector( $variation_element_selector, $pseudo_selector ) . ')', $pseudo_declarations );
-									$variation_responsive_css .= $breakpoint_media . '{' . $pseudo_selector_ruleset . '}';
+									$pseudo_selector_ruleset          = static::to_ruleset( ':root :where(' . static::append_to_selector( $variation_element_selector, $pseudo_selector ) . ')', $pseudo_declarations );
+									$variation_responsive_pseudo_css .= $breakpoint_media . '{' . $pseudo_selector_ruleset . '}';
 								}
 							}
 						}
@@ -3567,6 +3569,9 @@ class WP_Theme_JSON_Gutenberg {
 
 				if ( ! empty( $variation_responsive_css ) ) {
 					$style_variation_responsive_css[ $style_variation['selector'] ] = $variation_responsive_css;
+				}
+				if ( ! empty( $variation_responsive_pseudo_css ) ) {
+					$style_variation_responsive_pseudo_css[ $style_variation['selector'] ] = $variation_responsive_pseudo_css;
 				}
 			}
 		}
@@ -3736,6 +3741,13 @@ class WP_Theme_JSON_Gutenberg {
 			if ( isset( $style_variation_responsive_css[ $style_variation_selector ] ) ) {
 				$block_rules .= $style_variation_responsive_css[ $style_variation_selector ];
 			}
+		}
+		/*
+		 * Responsive pseudo styles must be output after default pseudo styles
+		 * so viewport state styles win in the cascade.
+		 */
+		foreach ( $style_variation_responsive_pseudo_css as $responsive_pseudo_css ) {
+			$block_rules .= $responsive_pseudo_css;
 		}
 
 		// Compute selector for block custom CSS.
