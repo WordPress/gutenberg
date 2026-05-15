@@ -302,6 +302,10 @@ describe( 'PostPublishButton', () => {
 			'edit'
 		);
 		expect( button ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-action-required',
+			'false'
+		);
+		expect( button ).toHaveAttribute(
 			'data-distributed-editing-save-control-journey-descriptor-only',
 			'true'
 		);
@@ -363,6 +367,10 @@ describe( 'PostPublishButton', () => {
 			'edit'
 		);
 		expect( cue ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-action-required',
+			'false'
+		);
+		expect( cue ).toHaveAttribute(
 			'data-distributed-editing-save-control-journey-title',
 			'Save is available'
 		);
@@ -396,6 +404,114 @@ describe( 'PostPublishButton', () => {
 		);
 		expect( cue ).toHaveAttribute(
 			'data-distributed-editing-save-control-journey-mutates-editor-content',
+			'false'
+		);
+
+		await user.click( button );
+
+		expect( savePostStatus ).toHaveBeenCalledWith( 'pending' );
+	} );
+
+	it( 'should show the refetch action hint on the Save journey cue without changing the click path', async () => {
+		const user = userEvent.setup();
+		const savePostStatus = jest.fn();
+		render(
+			<PostPublishButton
+				isSaveable
+				isPublishable
+				savePostStatus={ savePostStatus }
+				distributedEditingSaveButtonState={ {
+					status: 'refetch_required',
+					source: 'retry_save',
+					label: 'Refetch required',
+					statusText:
+						'The latest post must be loaded before Distributed Editing can save.',
+					clickAction: 'refetch_server_state',
+					authorityState: 'server_refresh_required_before_update',
+					localChangesState: 'protected_local_changes_exportable',
+					reviewCheckpointState: 'server_refresh_required',
+					authoritativePostState:
+						'server_refresh_required_before_update',
+					saveStateSummaryText:
+						'Protected local changes need a server refresh before the authoritative post can update.',
+					authoritativePostUpdated: false,
+				} }
+				distributedEditingSaveJourneyState={ {
+					shouldExposeInSaveControls: true,
+					step: 'get_latest_post',
+					action: 'get_latest_post',
+					title: 'Save needs the latest post',
+					summary:
+						'Get the latest post before Save updates WordPress; local changes stay protected.',
+					actionHint: 'Get latest first',
+					requiresActionBeforeSave: true,
+					statusChromeSummary:
+						'Protected local changes need a server refresh before the authoritative post can update.',
+					statusChromeAuthorityState:
+						'server_refresh_required_before_update',
+					statusChromeAuthorityText:
+						'Server state must be refreshed before the authoritative WordPress post can be updated.',
+					claimsSavedWithoutEvidence: false,
+				} }
+			/>
+		);
+
+		const button = screen.getByRole( 'button', {
+			name: 'Refetch required',
+		} );
+		expect( button ).toHaveAttribute(
+			'title',
+			'Get latest first. Get the latest post before Save updates WordPress; local changes stay protected. Protected local changes need a server refresh before the authoritative post can update.'
+		);
+		expect( button ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-step',
+			'get_latest_post'
+		);
+		expect( button ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-action',
+			'get_latest_post'
+		);
+		expect( button ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-action-hint',
+			'Get latest first'
+		);
+		expect( button ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-action-required',
+			'true'
+		);
+		expect( button ).toHaveAttribute(
+			'data-distributed-editing-save-button-status',
+			'refetch_required'
+		);
+		const cueLabel = screen.getByText( 'Save needs the latest post' );
+		const cueActionHint = screen.getByText( 'Get latest first' );
+		const cue = screen.getByLabelText(
+			'Get latest first. Get the latest post before Save updates WordPress; local changes stay protected. Protected local changes need a server refresh before the authoritative post can update.'
+		);
+		expect( cueLabel ).toBeVisible();
+		expect( cueActionHint ).toBeVisible();
+		expect( cue ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-visual-cue',
+			'true'
+		);
+		expect( cue ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-action-hint',
+			'Get latest first'
+		);
+		expect( cue ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-action-required',
+			'true'
+		);
+		expect( cue ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-status-summary',
+			'Protected local changes need a server refresh before the authoritative post can update.'
+		);
+		expect( cue ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-calls-normal-save',
+			'false'
+		);
+		expect( cue ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-calls-retry-save',
 			'false'
 		);
 

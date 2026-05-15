@@ -10677,6 +10677,15 @@ function getDistributedEditingSaveJourneyCopyForStep( step ) {
 	};
 }
 
+function getDistributedEditingSaveJourneyActionHintForStep( step ) {
+	switch ( step ) {
+		case DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.GET_LATEST_POST:
+			return 'Get latest first';
+	}
+
+	return null;
+}
+
 /**
  * Returns the current M0 Save journey descriptor for real editor Save controls.
  * This is copy and state only; the descriptor does not perform the Save action
@@ -10694,12 +10703,17 @@ export function getDistributedEditingSaveJourneyStateForSessionState(
 	const copy = getDistributedEditingSaveJourneyCopyForStep(
 		humanLoopStep.step
 	);
+	const actionHint = getDistributedEditingSaveJourneyActionHintForStep(
+		humanLoopStep.step
+	);
 
 	return {
 		step: humanLoopStep.step,
 		action: humanLoopStep.action,
 		title: copy.title,
 		summary: copy.summary,
+		actionHint,
+		requiresActionBeforeSave: Boolean( actionHint ),
 		saveButtonStatus: humanLoopStep.saveButtonStatus,
 		saveButtonReason: humanLoopStep.saveButtonReason,
 		saveButtonLabel: humanLoopStep.saveButtonLabel,

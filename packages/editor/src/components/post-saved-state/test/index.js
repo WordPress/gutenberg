@@ -249,6 +249,10 @@ describe( 'PostSavedState', () => {
 			'edit'
 		);
 		expect( button ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-action-required',
+			'false'
+		);
+		expect( button ).toHaveAttribute(
 			'data-distributed-editing-save-control-journey-status-summary',
 			'Save can update the authoritative WordPress post.'
 		);

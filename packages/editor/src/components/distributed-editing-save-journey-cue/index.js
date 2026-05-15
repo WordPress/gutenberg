@@ -15,6 +15,11 @@ export function getDistributedEditingSaveJourneyDataAttributes(
 			saveJourneyState.step,
 		'data-distributed-editing-save-control-journey-action':
 			saveJourneyState.action,
+		'data-distributed-editing-save-control-journey-action-hint':
+			saveJourneyState.actionHint || undefined,
+		'data-distributed-editing-save-control-journey-action-required': String(
+			Boolean( saveJourneyState.requiresActionBeforeSave )
+		),
 		'data-distributed-editing-save-control-journey-authority-state':
 			saveJourneyState.statusChromeAuthorityState,
 		'data-distributed-editing-save-control-journey-authority-summary':
@@ -49,12 +54,26 @@ export function getDistributedEditingSaveJourneyTitle( saveJourneyState ) {
 
 	const summary = saveJourneyState.summary || '';
 	const statusSummary = saveJourneyState.statusChromeSummary || '';
+	const actionHint = saveJourneyState.actionHint || '';
+	const titleParts = [];
 
-	if ( ! summary || ! statusSummary || summary.includes( statusSummary ) ) {
-		return summary || statusSummary || undefined;
+	if (
+		actionHint &&
+		! summary.includes( actionHint ) &&
+		! statusSummary.includes( actionHint )
+	) {
+		titleParts.push( `${ actionHint }.` );
 	}
 
-	return `${ summary } ${ statusSummary }`;
+	if ( summary ) {
+		titleParts.push( summary );
+	}
+
+	if ( statusSummary && ! summary.includes( statusSummary ) ) {
+		titleParts.push( statusSummary );
+	}
+
+	return titleParts.join( ' ' ) || undefined;
 }
 
 export default function DistributedEditingSaveJourneyCue( {
@@ -91,6 +110,14 @@ export default function DistributedEditingSaveJourneyCue( {
 			>
 				{ saveJourneyState.title }
 			</span>
+			{ saveJourneyState.actionHint && (
+				<span
+					aria-hidden="true"
+					className="editor-distributed-editing-save-journey-cue__action-hint"
+				>
+					{ saveJourneyState.actionHint }
+				</span>
+			) }
 		</span>
 	);
 }

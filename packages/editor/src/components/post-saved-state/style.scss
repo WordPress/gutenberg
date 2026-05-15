@@ -52,14 +52,30 @@
 	display: inline-flex;
 	flex-shrink: 1;
 	font-size: $default-font-size;
+	gap: $grid-unit-05;
 	line-height: $default-line-height;
 	margin-left: $grid-unit-05;
-	max-width: 184px;
+	max-width: 232px;
 	min-height: $button-size-small;
 	overflow: hidden;
 	padding: 0 $grid-unit-10;
 	text-overflow: ellipsis;
 	white-space: nowrap;
+}
+
+.editor-distributed-editing-save-journey-cue__action-hint {
+	color: $gray-900;
+	flex: 0 1 auto;
+	font-weight: 500;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+
+	&::before {
+		color: $gray-400;
+		content: "\00b7";
+		margin-right: $grid-unit-05;
+	}
 }
 
 .editor-distributed-editing-save-journey-cue__label {
@@ -103,6 +119,10 @@
 		position: absolute;
 		width: 1px;
 		word-wrap: normal !important;
+	}
+
+	.editor-distributed-editing-save-journey-cue__action-hint {
+		display: none;
 	}
 
 	.editor-distributed-editing-save-journey-cue[data-distributed-editing-save-control-journey-step="ready_to_edit"] {
