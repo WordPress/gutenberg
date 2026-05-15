@@ -7,6 +7,7 @@ test.describe( 'Preload', () => {
 	test( 'Should fetch a known set of routes during startup', async ( {
 		page,
 		admin,
+		editor,
 	} ) => {
 		const requests = [];
 
@@ -26,6 +27,11 @@ test.describe( 'Preload', () => {
 		await admin.createNewPost( {
 			content: '<!-- wp:paragraph --><p>Hello</p><!-- /wp:paragraph -->',
 		} );
+		// Ensure the document sidebar is open — its default state isn't
+		// stable across environments (CI vs. local). Several of the routes
+		// asserted below are fired by panels inside the sidebar (post
+		// author, post actions).
+		await editor.openDocumentSettingsSidebar();
 		await page
 			.frameLocator( 'iframe[name="editor-canvas"]' )
 			.locator( '[data-block]' )
