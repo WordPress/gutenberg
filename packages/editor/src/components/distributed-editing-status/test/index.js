@@ -1344,12 +1344,42 @@ describe( 'DistributedEditingStatus', () => {
 			'data-distributed-editing-fresh-review-compare-plan-calls-save',
 			'false'
 		);
+		expect( comparePlan ).toHaveAttribute(
+			'data-distributed-editing-fresh-review-comparison-readiness-status',
+			'ready_to_select'
+		);
+		expect( comparePlan ).toHaveAttribute(
+			'data-distributed-editing-fresh-review-comparison-readiness-can-select',
+			'true'
+		);
+		expect( comparePlan ).toHaveAttribute(
+			'data-distributed-editing-fresh-review-comparison-readiness-selects-block',
+			'false'
+		);
+		expect( comparePlan ).toHaveAttribute(
+			'data-distributed-editing-fresh-review-comparison-readiness-moves-focus',
+			'false'
+		);
+		expect( comparePlan ).toHaveAttribute(
+			'data-distributed-editing-fresh-review-comparison-readiness-opens-panel',
+			'false'
+		);
+		expect( comparePlan ).toHaveAttribute(
+			'data-distributed-editing-fresh-review-comparison-readiness-opens-comparison',
+			'false'
+		);
 		expect( comparePlan ).toHaveTextContent( 'Compare plan ready' );
 		expect( comparePlan ).toHaveTextContent(
 			'A future comparison can use base and proposed hash evidence for this review item.'
 		);
 		expect( comparePlan ).toHaveTextContent(
 			'No comparison is open, no content is shown, and no save was made.'
+		);
+		expect( comparePlan ).toHaveTextContent(
+			'This review item is ready for a future side-by-side comparison surface.'
+		);
+		expect( comparePlan ).toHaveTextContent(
+			'No block is selected, no focus moves, no panel opens, and no save was made.'
 		);
 		expect( comparePlan ).toHaveTextContent(
 			/Base hash evidence\s*Available/
@@ -1359,6 +1389,9 @@ describe( 'DistributedEditingStatus', () => {
 		);
 		expect( comparePlan ).toHaveTextContent(
 			/Reviewed hash evidence\s*Available/
+		);
+		expect( comparePlan ).toHaveTextContent(
+			/Comparison readiness\s*Available/
 		);
 		expect( comparePlan ).not.toHaveTextContent(
 			/aaaaaaaaaaaaaaaa|bbbbbbbbbbbbbbbb|fresh-review-chrome-compare-plan-raw|script/i

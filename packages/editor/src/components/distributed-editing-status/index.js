@@ -1812,6 +1812,18 @@ function getFreshReviewComparePlanMessage( comparePlan ) {
 	);
 }
 
+function getFreshReviewComparisonReadinessMessage( comparisonHandoff ) {
+	if ( comparisonHandoff?.canSelectForFutureComparison ) {
+		return __(
+			'This review item is ready for a future side-by-side comparison surface. No block is selected, no focus moves, no panel opens, and no save was made.'
+		);
+	}
+
+	return __(
+		'This review item is not ready for a future side-by-side comparison surface. No block is selected, no focus moves, no panel opens, and no save was made.'
+	);
+}
+
 function getFreshReviewComparePlanEvidenceLabel( available ) {
 	return available ? __( 'Available' ) : __( 'Unavailable' );
 }
@@ -2167,6 +2179,7 @@ function DistributedEditingFreshReviewComparePlanStatus() {
 		( item ) => item.compareAction?.comparePlan
 	);
 	const comparePlan = reviewItem?.compareAction?.comparePlan;
+	const comparisonSelectionHandoff = comparePlan?.comparisonSelectionHandoff;
 
 	if ( ! comparePlan ) {
 		return null;
@@ -2186,6 +2199,24 @@ function DistributedEditingFreshReviewComparePlanStatus() {
 			data-distributed-editing-fresh-review-compare-plan-calls-save={ formatDataBoolean(
 				comparePlan.callsSave
 			) }
+			data-distributed-editing-fresh-review-comparison-readiness-can-select={ formatDataBoolean(
+				comparisonSelectionHandoff?.canSelectForFutureComparison
+			) }
+			data-distributed-editing-fresh-review-comparison-readiness-moves-focus={ formatDataBoolean(
+				comparisonSelectionHandoff?.movesFocus
+			) }
+			data-distributed-editing-fresh-review-comparison-readiness-opens-comparison={ formatDataBoolean(
+				comparisonSelectionHandoff?.opensComparison
+			) }
+			data-distributed-editing-fresh-review-comparison-readiness-opens-panel={ formatDataBoolean(
+				comparisonSelectionHandoff?.opensPanel
+			) }
+			data-distributed-editing-fresh-review-comparison-readiness-selects-block={ formatDataBoolean(
+				comparisonSelectionHandoff?.selectsBlock
+			) }
+			data-distributed-editing-fresh-review-comparison-readiness-status={
+				comparisonSelectionHandoff?.status || undefined
+			}
 			data-distributed-editing-fresh-review-compare-plan-opens-comparison={ formatDataBoolean(
 				comparePlan.opensComparison
 			) }
@@ -2206,6 +2237,13 @@ function DistributedEditingFreshReviewComparePlanStatus() {
 		>
 			<strong>{ getFreshReviewComparePlanTitle( comparePlan ) }</strong>
 			<p>{ getFreshReviewComparePlanMessage( comparePlan ) }</p>
+			{ comparisonSelectionHandoff && (
+				<p>
+					{ getFreshReviewComparisonReadinessMessage(
+						comparisonSelectionHandoff
+					) }
+				</p>
+			) }
 			<dl className="editor-distributed-editing-status__fresh-review-compare-plan-evidence">
 				<div>
 					<dt>{ __( 'Base hash evidence' ) }</dt>
@@ -2231,6 +2269,16 @@ function DistributedEditingFreshReviewComparePlanStatus() {
 						) }
 					</dd>
 				</div>
+				{ comparisonSelectionHandoff && (
+					<div>
+						<dt>{ __( 'Comparison readiness' ) }</dt>
+						<dd>
+							{ getFreshReviewComparePlanEvidenceLabel(
+								comparisonSelectionHandoff.canSelectForFutureComparison
+							) }
+						</dd>
+					</div>
+				) }
 			</dl>
 		</div>
 	);

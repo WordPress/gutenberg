@@ -2090,6 +2090,15 @@ function createDistributedEditingFreshReviewComparePlanDescriptor(
 				hasReviewedProposedContentHash,
 			}
 		);
+	const comparisonSelectionHandoff =
+		createDistributedEditingFreshReviewComparisonSelectionHandoffDescriptor(
+			item,
+			{
+				enabled,
+				reason,
+				comparisonInputShape,
+			}
+		);
 
 	return {
 		status: enabled ? 'ready' : 'unavailable',
@@ -2105,9 +2114,13 @@ function createDistributedEditingFreshReviewComparePlanDescriptor(
 		hasProposedContentHash,
 		hasReviewedProposedContentHash,
 		comparisonInputShape,
+		comparisonSelectionHandoff,
 		usesBaseContentHash: hasBaseContentHash,
 		usesProposedContentHash: hasProposedContentHash,
 		usesReviewedProposedContentHash: hasReviewedProposedContentHash,
+		supportsComparisonSelectionHandoff: true,
+		canSelectForFutureComparison:
+			comparisonSelectionHandoff.canSelectForFutureComparison,
 		requiresFutureComparisonSurface: true,
 		descriptorOnly: true,
 		hashValuesRedacted: true,
@@ -2132,6 +2145,86 @@ function createDistributedEditingFreshReviewComparePlanDescriptor(
 		exposesTokenMaterial: false,
 		exposesUserIdentity: false,
 		exposesReviewerIds: false,
+	};
+}
+
+function createDistributedEditingFreshReviewComparisonSelectionHandoffDescriptor(
+	item,
+	{ enabled = true, reason = null, comparisonInputShape = null } = {}
+) {
+	const requiredInputsAvailable = Boolean(
+		comparisonInputShape?.requiredInputsAvailable
+	);
+	const optionalInputsAvailable = Boolean(
+		comparisonInputShape?.optionalInputsAvailable
+	);
+	const canSelectForFutureComparison = Boolean(
+		enabled && requiredInputsAvailable
+	);
+	const normalizedReason = normalizeNullableString( reason );
+
+	return {
+		status: canSelectForFutureComparison ? 'ready_to_select' : 'not_ready',
+		reason: canSelectForFutureComparison
+			? null
+			: normalizedReason || 'missing_required_comparison_inputs',
+		schemaVersion: 1,
+		handoffKind: 'fresh_review_comparison_selection_readiness',
+		selectionTarget: 'fresh_review_review_item',
+		comparisonMode:
+			comparisonInputShape?.comparisonMode || 'side_by_side_block_review',
+		inputKind:
+			comparisonInputShape?.inputKind ||
+			'fresh_review_serialized_block_comparison_inputs',
+		itemId: normalizeNullableString( item.id ),
+		blockClientId: normalizeNullableString( item.blockClientId ),
+		blockName: normalizeNullableString( item.blockName ),
+		blockLabel: normalizeNullableString( item.blockLabel ),
+		changeKind: normalizeNullableString( item.changeKind ),
+		requiredInputRoles: comparisonInputShape?.requiredInputRoles || [
+			'base',
+			'proposed',
+		],
+		optionalInputRoles: comparisonInputShape?.optionalInputRoles || [
+			'reviewed',
+		],
+		requiredInputsAvailable,
+		optionalInputsAvailable,
+		canSelectForFutureComparison,
+		readyForFutureComparisonSelection: canSelectForFutureComparison,
+		futureSelectionOnly: true,
+		requiresUserCommandBeforeSelection: true,
+		descriptorOnly: true,
+		statusOnly: true,
+		redacted: true,
+		hashValuesRedacted: true,
+		sourceFieldNamesOnly: true,
+		rawContentIncluded: false,
+		exposesHashValues: false,
+		exposesRawContent: false,
+		exposesProofSignature: false,
+		exposesTokenMaterial: false,
+		exposesUserIdentity: false,
+		exposesReviewerIds: false,
+		rendersDiff: false,
+		opensComparison: false,
+		opensPanel: false,
+		derivesPatch: false,
+		callsRestEndpoint: false,
+		callsSave: false,
+		callsNormalSavePost: false,
+		callsRetrySaveEndpoint: false,
+		dispatchesNotice: false,
+		savesPost: false,
+		mutatesEditorContent: false,
+		mutatesPersistedPostContent: false,
+		selectsBlock: false,
+		selectsReviewItem: false,
+		marksSelected: false,
+		movesFocus: false,
+		createsRevision: false,
+		changesPostLock: false,
+		claimsSaved: false,
 	};
 }
 
