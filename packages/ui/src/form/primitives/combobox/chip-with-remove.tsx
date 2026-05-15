@@ -17,7 +17,10 @@ import styles from './style.module.css';
 export const ChipWithRemove = forwardRef<
 	HTMLDivElement,
 	ComboboxChipWithRemoveProps
->( function Clear( { className, children, prefix, ...restProps }, ref ) {
+>( function ChipWithRemove(
+	{ className, children, prefix, ...restProps },
+	ref
+) {
 	return (
 		<_Combobox.Chip
 			ref={ ref }
