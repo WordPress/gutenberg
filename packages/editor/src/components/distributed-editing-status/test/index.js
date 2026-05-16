@@ -7307,6 +7307,86 @@ describe( 'DistributedEditingStatus', () => {
 		).toBeVisible();
 	} );
 
+	it( 'guides a checked conflict choice through guarded save preparation without saving', async () => {
+		const user = userEvent.setup();
+		const actions = setupDistributedEditingStatusDispatch();
+
+		setupDistributedEditingStatusSelect( {
+			sessionState: {
+				pendingChangeCount: 1,
+				hasPendingChanges: true,
+				canExportLocalUpdates: true,
+				retrySubmitProofStatus:
+					DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.ACCEPTED_FOR_FUTURE_SAVE,
+				retrySubmitAccepted: true,
+				retrySubmitSavePathRequired: true,
+				staleBaseConflictResolutionStatus:
+					DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_STATUSES.LATEST_WORDPRESS_SELECTED,
+				staleBaseConflictResolutionChoice:
+					DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_CHOICES.LATEST_WORDPRESS,
+				staleBaseConflictResolutionRequiresFreshProof: false,
+			},
+		} );
+
+		render( <DistributedEditingStatusChrome /> );
+
+		const statusRegion = screen.getByRole( 'region', {
+			name: 'Distributed editing status',
+		} );
+		// eslint-disable-next-line testing-library/no-node-access
+		const statusItem = statusRegion.querySelector(
+			'[data-distributed-editing-conflict-proof-accepted="true"]'
+		);
+
+		expect( statusItem ).toHaveAttribute(
+			'data-distributed-editing-conflict-proof-continuation',
+			'prepare_guarded_save'
+		);
+		expect( statusItem ).toHaveAttribute(
+			'data-distributed-editing-conflict-authoritative-post-updated',
+			'false'
+		);
+		expect( statusItem ).toHaveAttribute(
+			'data-distributed-editing-next-step',
+			'prepare_guarded_save'
+		);
+		expect( screen.getByText( 'Conflict choice checked' ) ).toBeVisible();
+		expect(
+			screen.getByText(
+				'WordPress checked this conflict choice. Prepare Save before updating the post; the WordPress post has not changed yet.'
+			)
+		).toBeVisible();
+		expect(
+			screen.getByText(
+				'Prepare Save, then use Save to send the guarded update.'
+			)
+		).toBeVisible();
+
+		await user.click(
+			screen.getByRole( 'button', {
+				name: 'Prepare Save',
+			} )
+		);
+
+		expect(
+			actions.__experimentalPrepareDistributedEditingRetrySubmitSaveAfterProof
+		).toHaveBeenCalledTimes( 1 );
+		expect(
+			actions.__experimentalSaveDistributedEditingRetryAfterProof
+		).not.toHaveBeenCalled();
+		expect(
+			actions.__experimentalRefreshDistributedEditingRetrySubmitProof
+		).not.toHaveBeenCalled();
+		expect(
+			actions.__experimentalRefreshDistributedEditingServerStateAfterStaleBase
+		).not.toHaveBeenCalled();
+		expect(
+			await screen.findByText(
+				'Save prepared. Use Save to send these changes to WordPress.'
+			)
+		).toBeVisible();
+	} );
+
 	it( 'requests fresh review from production editor chrome without saving or mutating content', async () => {
 		const user = userEvent.setup();
 		const actions = setupDistributedEditingStatusDispatch();

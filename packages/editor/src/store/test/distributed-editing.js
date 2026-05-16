@@ -10062,6 +10062,14 @@ describe( 'distributed editing session state', () => {
 		);
 		const editorSavePolicy =
 			getDistributedEditingSavePolicyStateForSessionState( sessionState );
+		const pendingDescriptor =
+			getDistributedEditingNoticeDescriptorsForSessionState(
+				sessionState
+			).find(
+				( descriptor ) =>
+					descriptor.kind ===
+					DISTRIBUTED_EDITING_NOTICE_KINDS.PENDING_CHANGES
+			);
 
 		expect( sessionState ).toMatchObject( {
 			disposition: DISTRIBUTED_EDITING_DISPOSITIONS.IDLE,
@@ -10104,6 +10112,21 @@ describe( 'distributed editing session state', () => {
 			shouldCallNormalSavePost: false,
 			shouldCallRetrySaveEndpoint: false,
 			claimsSaved: false,
+		} );
+		expect( pendingDescriptor ).toMatchObject( {
+			actionKeys: [
+				DISTRIBUTED_EDITING_NOTICE_ACTIONS.PREPARE_RETRY_SUBMIT_SAVE,
+			],
+			staleBaseConflictResolutionStatus:
+				DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_STATUSES.LOCAL_VERSION_SELECTED,
+			staleBaseConflictResolutionChoice:
+				DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_CHOICES.LOCAL,
+			staleBaseConflictResolutionRequiresFreshProof: false,
+			conflictResolutionProofAccepted: true,
+			conflictResolutionNeedsSavePreparation: true,
+			conflictResolutionAuthoritativePostUpdated: false,
+			retrySubmitSaveStatus:
+				DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.NONE,
 		} );
 	} );
 

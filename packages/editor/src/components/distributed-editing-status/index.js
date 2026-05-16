@@ -1490,6 +1490,16 @@ export function DistributedEditingStatusSurface( {
 						data-distributed-editing-transcript-support-save-authority-required={ formatDataBoolean(
 							actionTranscriptSupportReport?.requiresSaveAuthorityForPersistence
 						) }
+						data-distributed-editing-conflict-proof-accepted={ formatDataBoolean(
+							item.conflictResolutionProofAccepted
+						) }
+						data-distributed-editing-conflict-proof-continuation={
+							item.conflictResolutionContinuationAction ||
+							undefined
+						}
+						data-distributed-editing-conflict-authoritative-post-updated={ formatDataBoolean(
+							item.conflictResolutionAuthoritativePostUpdated
+						) }
 						data-distributed-editing-next-step={
 							item.nextStepAction || undefined
 						}
@@ -5474,8 +5484,13 @@ function getDistributedEditingStatusSurfaceItem( descriptor ) {
 		case DISTRIBUTED_EDITING_NOTICE_KINDS.PENDING_CHANGES:
 			return {
 				...getBaseStatusItem( descriptor ),
-				title: __( 'Changes pending' ),
-				message: getPendingChangesMessage( descriptor ),
+				...getPendingChangesStatusText( descriptor ),
+				conflictResolutionProofAccepted:
+					descriptor.conflictResolutionProofAccepted,
+				conflictResolutionNeedsSavePreparation:
+					descriptor.conflictResolutionNeedsSavePreparation,
+				conflictResolutionAuthoritativePostUpdated:
+					descriptor.conflictResolutionAuthoritativePostUpdated,
 			};
 		case DISTRIBUTED_EDITING_NOTICE_KINDS.RETRY_SAVE:
 			return {
@@ -5661,6 +5676,12 @@ function getPendingChangesMessage( descriptor ) {
 		descriptor.retrySubmitSaveStatus ===
 		DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.READY
 	) {
+		if ( isConflictResolutionProofAccepted( descriptor ) ) {
+			return __(
+				'Save is prepared for this conflict choice. Use Save to update WordPress; local changes remain pending until WordPress confirms.'
+			);
+		}
+
 		return __(
 			'Save is prepared for WordPress. Local changes remain pending until Save finishes.'
 		);
@@ -5670,6 +5691,12 @@ function getPendingChangesMessage( descriptor ) {
 		descriptor.retrySubmitProofStatus ===
 		DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.ACCEPTED_FOR_FUTURE_SAVE
 	) {
+		if ( isConflictResolutionProofAccepted( descriptor ) ) {
+			return __(
+				'WordPress checked this conflict choice. Prepare Save before updating the post; the WordPress post has not changed yet.'
+			);
+		}
+
 		return __(
 			'WordPress accepted the save check. Local changes are still awaiting final Save confirmation.'
 		);
@@ -5690,6 +5717,51 @@ function getPendingChangesMessage( descriptor ) {
 	}
 
 	return __( 'Local changes are awaiting confirmation.' );
+}
+
+function getPendingChangesStatusText( descriptor ) {
+	if ( isConflictResolutionProofAccepted( descriptor ) ) {
+		const savePrepared =
+			descriptor.retrySubmitSaveStatus ===
+			DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.READY;
+
+		return {
+			title: savePrepared
+				? __( 'Save prepared' )
+				: __( 'Conflict choice checked' ),
+			message: getPendingChangesMessage( descriptor ),
+			nextStepAction: savePrepared
+				? 'save_guarded_update'
+				: 'prepare_guarded_save',
+			nextStepMessage: savePrepared
+				? __( 'Use Save to send the guarded update to WordPress.' )
+				: __(
+						'Prepare Save, then use Save to send the guarded update.'
+				  ),
+			conflictResolutionContinuationAction: savePrepared
+				? 'save_guarded_update'
+				: 'prepare_guarded_save',
+		};
+	}
+
+	return {
+		title: __( 'Changes pending' ),
+		message: getPendingChangesMessage( descriptor ),
+	};
+}
+
+function isConflictResolutionProofAccepted( descriptor ) {
+	return Boolean(
+		descriptor?.conflictResolutionProofAccepted ||
+			( descriptor?.retrySubmitProofStatus ===
+				DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.ACCEPTED_FOR_FUTURE_SAVE &&
+				descriptor?.retrySubmitAccepted &&
+				[
+					DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_CHOICES.LOCAL,
+					DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_CHOICES.LATEST_WORDPRESS,
+				].includes( descriptor?.staleBaseConflictResolutionChoice ) &&
+				! descriptor?.staleBaseConflictResolutionRequiresFreshProof )
+	);
 }
 
 function getRemoteChangesMessage( descriptor ) {

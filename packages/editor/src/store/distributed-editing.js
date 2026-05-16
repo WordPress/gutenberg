@@ -12525,6 +12525,22 @@ function getDistributedEditingLocalRebaseDescriptorFields( normalized ) {
 }
 
 function getDistributedEditingRetrySubmitProofDescriptorFields( normalized ) {
+	const hasConflictResolutionChoice = [
+		DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_CHOICES.LOCAL,
+		DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_CHOICES.LATEST_WORDPRESS,
+	].includes( normalized.staleBaseConflictResolutionChoice );
+	const conflictResolutionProofAccepted =
+		normalized.retrySubmitProofStatus ===
+			DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.ACCEPTED_FOR_FUTURE_SAVE &&
+		normalized.retrySubmitAccepted &&
+		hasConflictResolutionChoice &&
+		! normalized.staleBaseConflictResolutionRequiresFreshProof;
+	const conflictResolutionNeedsSavePreparation =
+		conflictResolutionProofAccepted &&
+		! normalized.retrySubmitSavePrepared &&
+		normalized.retrySubmitSaveStatus !==
+			DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.READY;
+
 	return {
 		retrySubmitProofStatus: normalized.retrySubmitProofStatus,
 		retrySubmitProofReason: normalized.retrySubmitProofReason,
@@ -12538,6 +12554,18 @@ function getDistributedEditingRetrySubmitProofDescriptorFields( normalized ) {
 		retrySubmitSaveReason: normalized.retrySubmitSaveReason,
 		retrySubmitSavePrepared: normalized.retrySubmitSavePrepared,
 		retrySubmitSaveReady: normalized.retrySubmitSaveReady,
+		staleBaseConflictResolutionStatus:
+			normalized.staleBaseConflictResolutionStatus,
+		staleBaseConflictResolutionChoice:
+			normalized.staleBaseConflictResolutionChoice,
+		staleBaseConflictResolutionRequiresFreshProof:
+			normalized.staleBaseConflictResolutionRequiresFreshProof,
+		conflictResolutionProofAccepted,
+		conflictResolutionNeedsSavePreparation,
+		conflictResolutionAuthoritativePostUpdated:
+			hasDistributedEditingRetrySaveSavedStateEvidenceForSessionState(
+				normalized
+			),
 		localUpdatesImportStatus: normalized.localUpdatesImportStatus,
 		localUpdatesImportReason: normalized.localUpdatesImportReason,
 		localUpdatesImportHasPostContent:
