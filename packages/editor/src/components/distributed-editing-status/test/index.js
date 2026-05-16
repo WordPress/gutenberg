@@ -1928,7 +1928,7 @@ describe( 'DistributedEditingStatus', () => {
 		).not.toHaveBeenCalled();
 	} );
 
-	it( 'checks a selected structural choice with WordPress without saving or leaving manual review', async () => {
+	it( 'checks a selected structural choice and enables guarded Save without saving or leaving manual review', async () => {
 		const user = userEvent.setup();
 		const actions = setupDistributedEditingStatusDispatch();
 		const latestWordPressContent =
@@ -1993,12 +1993,15 @@ describe( 'DistributedEditingStatus', () => {
 
 		await user.click(
 			within( summary ).getByRole( 'button', {
-				name: 'Check choice',
+				name: 'Enable Save',
 			} )
 		);
 
 		expect(
 			actions.__experimentalRefreshDistributedEditingRetrySubmitProof
+		).toHaveBeenCalledTimes( 1 );
+		expect(
+			actions.__experimentalPrepareDistributedEditingRetrySubmitSaveAfterProof
 		).toHaveBeenCalledTimes( 1 );
 		if (
 			actions.__experimentalRefreshDistributedEditingRetrySubmitProof.mock
@@ -2034,7 +2037,9 @@ describe( 'DistributedEditingStatus', () => {
 				retrySubmitAccepted: true,
 				retrySubmitSavePathRequired: true,
 				retrySubmitSaveStatus:
-					DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.NONE,
+					DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.READY,
+				retrySubmitSavePrepared: true,
+				retrySubmitSaveReady: true,
 				retrySaveStatus: DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.NONE,
 				retrySaveAccepted: false,
 				retrySaveClaimsSaved: false,
@@ -2042,7 +2047,7 @@ describe( 'DistributedEditingStatus', () => {
 		);
 		expect(
 			screen.getByText(
-				'WordPress checked this structure. Make Save available before updating the post.'
+				'Save is ready for this structure. WordPress has not updated the post.'
 			)
 		).toBeVisible();
 		expect(

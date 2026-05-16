@@ -2734,6 +2734,9 @@ describe( 'Post actions', () => {
 			expect(
 				registry.select( editorStore ).getEditedPostContent()
 			).toBe( firstAcceptedPostContent );
+			expect( registry.select( editorStore ).isEditedPostDirty() ).toBe(
+				false
+			);
 			expect(
 				registry
 					.select( editorStore )
@@ -7757,6 +7760,9 @@ describe( 'Post actions', () => {
 			expect(
 				registry.select( editorStore ).getEditedPostContent()
 			).toBe( firstAcceptedPostContent );
+			expect( registry.select( editorStore ).isEditedPostDirty() ).toBe(
+				false
+			);
 			expect(
 				registry
 					.select( editorStore )
@@ -10217,6 +10223,48 @@ describe( 'Post actions', () => {
 	} );
 
 	describe( 'autosave()', () => {
+		it( 'skips a queued server autosave when the post is already clean', async () => {
+			const post = {
+				id: postId,
+				type: 'post',
+				title: 'bar',
+				content: 'bar',
+				excerpt: 'crackers',
+				status: 'publish',
+			};
+			const registry = createRegistryWithStores();
+			let apiCalls = 0;
+
+			apiFetch.setFetchHandler( async ( options ) => {
+				apiCalls++;
+
+				throw {
+					code: 'unexpected_path',
+					message: `Unexpected path: ${ getMethod( options ) } ${
+						options.path
+					}`,
+				};
+			} );
+
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', post );
+			registry.dispatch( editorStore ).setupEditor( post );
+
+			expect( registry.select( editorStore ).isEditedPostDirty() ).toBe(
+				false
+			);
+
+			await expect(
+				registry.dispatch( editorStore ).autosave()
+			).resolves.toMatchObject( {
+				status: 'autosave_skipped_clean_post',
+				callsNormalSavePost: false,
+				claimsSaved: false,
+			} );
+			expect( apiCalls ).toBe( 0 );
+		} );
+
 		it( 'autosaves a modified post', async () => {
 			const post = {
 				id: postId,

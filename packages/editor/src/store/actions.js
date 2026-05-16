@@ -302,13 +302,13 @@ function applyDistributedEditingStructuralNoopSaveConfirmation( {
 			}
 		);
 
-	dispatch.setDistributedEditingSessionState( nextSessionState );
 	applyDistributedEditingConfirmedPostContent( {
 		dispatch,
 		registry,
 		select,
 		postContent: structuralNoopSaveCandidate.comparablePostContent,
 	} );
+	dispatch.setDistributedEditingSessionState( nextSessionState );
 
 	return {
 		status: 'structural_choice_already_authoritative_from_save_click',
@@ -3460,21 +3460,19 @@ function applyDistributedEditingConfirmedPostContent( {
 	const comparablePostContent =
 		getDistributedEditingComparablePostContent( postContent );
 	const applyPostContent = () => {
-		if ( select.getEditedPostContent?.() !== comparablePostContent ) {
-			const parsedBlocks = parse( comparablePostContent );
+		const parsedBlocks = parse( comparablePostContent );
 
-			if ( parsedBlocks.length || ! comparablePostContent ) {
-				dispatch.resetEditorBlocks( parsedBlocks, {
-					__unstableShouldCreateUndoLevel: false,
-				} );
-			}
-			dispatch.editPost(
-				{ content: comparablePostContent },
-				{
-					undoIgnore: true,
-				}
-			);
+		if ( parsedBlocks.length || ! comparablePostContent ) {
+			dispatch.resetEditorBlocks( parsedBlocks, {
+				__unstableShouldCreateUndoLevel: false,
+			} );
 		}
+		dispatch.editPost(
+			{ content: comparablePostContent },
+			{
+				undoIgnore: true,
+			}
+		);
 	};
 
 	applyPostContent();
@@ -4666,6 +4664,13 @@ export const autosave =
 			const excerpt = select.getEditedPostAttribute( 'excerpt' );
 			localAutosaveSet( post.id, isPostNew, title, content, excerpt );
 		} else {
+			if ( select.isEditedPostDirty?.() === false ) {
+				return {
+					status: 'autosave_skipped_clean_post',
+					callsNormalSavePost: false,
+					claimsSaved: false,
+				};
+			}
 			await dispatch.savePost( { isAutosave: true, ...options } );
 		}
 	};
