@@ -2981,6 +2981,12 @@ function DistributedEditingPresenceRoster( {
 	const [ commandStatus, setCommandStatus ] = useState( 'idle' );
 	const [ heartbeatCommandStatus, setHeartbeatCommandStatus ] =
 		useState( 'idle' );
+	const [ presenceRefreshUserInitiated, setPresenceRefreshUserInitiated ] =
+		useState( false );
+	const [
+		presenceHeartbeatUserInitiated,
+		setPresenceHeartbeatUserInitiated,
+	] = useState( false );
 	const [
 		repeatedRefreshSchedulerStatus,
 		setRepeatedRefreshSchedulerStatus,
@@ -3012,6 +3018,8 @@ function DistributedEditingPresenceRoster( {
 		setPresenceStorageSetupNavigationStatus( 'settings_opened' );
 	}, [] );
 	const handleRefreshPresence = useCallback( async () => {
+		setPresenceRefreshUserInitiated( true );
+
 		if ( ! __experimentalRefreshDistributedEditingPresenceSnapshot ) {
 			setCommandStatus( 'failed' );
 			return;
@@ -3027,6 +3035,8 @@ function DistributedEditingPresenceRoster( {
 		}
 	}, [ __experimentalRefreshDistributedEditingPresenceSnapshot ] );
 	const handleSendPresenceHeartbeat = useCallback( async () => {
+		setPresenceHeartbeatUserInitiated( true );
+
 		if ( ! __experimentalSendDistributedEditingPresenceHeartbeat ) {
 			setHeartbeatCommandStatus( 'failed' );
 			return;
@@ -3243,6 +3253,13 @@ function DistributedEditingPresenceRoster( {
 		__( 'Presence: %s' ),
 		presenceSummaryText
 	);
+	const shouldShowPresenceRefreshCommandStatus =
+		commandStatus !== 'idle' &&
+		( presenceRefreshUserInitiated || commandStatus === 'failed' );
+	const shouldShowPresenceHeartbeatCommandStatus =
+		heartbeatCommandStatus !== 'idle' &&
+		( presenceHeartbeatUserInitiated ||
+			[ 'degraded', 'failed' ].includes( heartbeatCommandStatus ) );
 
 	useEffect( () => {
 		if (
@@ -3297,6 +3314,7 @@ function DistributedEditingPresenceRoster( {
 
 			distributedEditingStartupHeartbeatRuntimeKeys.add( runtimeKey );
 			startupHeartbeatRuntimeSentRef.current = true;
+			setPresenceHeartbeatUserInitiated( false );
 			setStartupHeartbeatRuntimeStatus( 'sending' );
 			setHeartbeatCommandStatus( 'sending' );
 
@@ -3374,6 +3392,7 @@ function DistributedEditingPresenceRoster( {
 				return;
 			}
 
+			setPresenceRefreshUserInitiated( false );
 			setCommandStatus( 'refreshing' );
 
 			__experimentalRefreshDistributedEditingPresenceSnapshot()
@@ -3434,6 +3453,7 @@ function DistributedEditingPresenceRoster( {
 			let didFail = false;
 			let didDegrade = false;
 
+			setPresenceRefreshUserInitiated( false );
 			setRepeatedRefreshSchedulerStatus( 'running' );
 			setCommandStatus( 'refreshing' );
 
@@ -3463,6 +3483,7 @@ function DistributedEditingPresenceRoster( {
 					didFail = true;
 					setHeartbeatCommandStatus( 'failed' );
 				} else {
+					setPresenceHeartbeatUserInitiated( false );
 					setHeartbeatCommandStatus( 'sending' );
 
 					try {
@@ -4135,12 +4156,12 @@ function DistributedEditingPresenceRoster( {
 					</Button>
 				</div>
 			) }
-			{ commandStatus !== 'idle' && (
+			{ shouldShowPresenceRefreshCommandStatus && (
 				<div role="status">
 					{ getPresenceRefreshCommandStatusText( commandStatus ) }
 				</div>
 			) }
-			{ heartbeatCommandStatus !== 'idle' && (
+			{ shouldShowPresenceHeartbeatCommandStatus && (
 				<div role="status">
 					{ getPresenceHeartbeatCommandStatusText(
 						heartbeatCommandStatus

@@ -4483,6 +4483,12 @@ describe( 'DistributedEditingStatus', () => {
 				'sent'
 			);
 			expect(
+				screen.queryByText( 'Editing list refreshed.' )
+			).not.toBeInTheDocument();
+			expect(
+				screen.queryByText( 'Presence updated.' )
+			).not.toBeInTheDocument();
+			expect(
 				actions.__experimentalSaveDistributedEditingRetryAfterProof
 			).not.toHaveBeenCalled();
 			expect(
@@ -4569,6 +4575,12 @@ describe( 'DistributedEditingStatus', () => {
 				'data-distributed-editing-presence-actions-visible',
 				'false'
 			);
+			expect(
+				screen.queryByText( 'Editing list refreshed.' )
+			).not.toBeInTheDocument();
+			expect(
+				screen.queryByText( 'Presence updated.' )
+			).not.toBeInTheDocument();
 			expect(
 				screen.queryByRole( 'button', {
 					name: 'Refresh editing list',
