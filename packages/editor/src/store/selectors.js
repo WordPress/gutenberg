@@ -1139,6 +1139,30 @@ export const isEditedPostAutosaveable = createRegistrySelector(
 			return false;
 		}
 
+		const distributedEditingSettings =
+			getEditorSettings( state )?.distributedEditing || EMPTY_OBJECT;
+		if (
+			distributedEditingSettings.enabled &&
+			distributedEditingSettings.retrySaveHandoff !== false
+		) {
+			const distributedEditingSession =
+				getDistributedEditingSessionState( state );
+			const distributedEditingSavePolicy =
+				getDistributedEditingSavePolicyStateForSessionState(
+					distributedEditingSession
+				);
+
+			if (
+				distributedEditingSavePolicy.blocksNormalSavePost ||
+				distributedEditingSession.hasPendingChanges ||
+				distributedEditingSession.isAwaitingServerConfirmation ||
+				distributedEditingSession.canExportLocalUpdates ||
+				distributedEditingSession.mustOfferLocalCopy
+			) {
+				return false;
+			}
+		}
+
 		const postType = getCurrentPostType( state );
 		const postTypeObject = select( coreStore ).getPostType( postType );
 

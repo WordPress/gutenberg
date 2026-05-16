@@ -50,6 +50,8 @@ import {
 	DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS,
 	DISTRIBUTED_EDITING_SAVE_POLICY_STATUSES,
 	DISTRIBUTED_EDITING_SAVE_REVIEW_CHECKPOINT_STATES,
+	DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_CHOICES,
+	DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_STATUSES,
 	DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE,
 	getDistributedEditingLocalUpdatesExportPayload,
 } from '../distributed-editing';
@@ -2611,6 +2613,168 @@ describe( 'Post actions', () => {
 				actionTranscriptCallsSave: false,
 				actionTranscriptClaimsSaved: false,
 				canExportLocalUpdates: true,
+			} );
+			expect( registry.select( noticesStore ).getNotices() ).toEqual(
+				[]
+			);
+		} );
+
+		it( 'confirms a prepared latest-WordPress structural choice from a Save button click without writing again', async () => {
+			const basePostContent =
+				'<!-- wp:paragraph --><p>Base structural alpha.</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Base structural beta.</p><!-- /wp:paragraph -->';
+			const firstAcceptedPostContent =
+				'<!-- wp:paragraph --><p>Base structural alpha.</p><!-- /wp:paragraph -->';
+			const post = {
+				id: postId,
+				type: 'post',
+				title: 'bar',
+				content: `${ basePostContent }<script type="wp/post-sync-meta" data-sync-meta-format="diff-match-patch">{"version":"4"}</script>`,
+				status: 'draft',
+			};
+			const registry = createRegistryWithStores();
+			let apiCalls = 0;
+
+			apiFetch.setFetchHandler( async () => {
+				apiCalls++;
+				throw new Error(
+					'Prepared latest-WordPress structural Save confirmation should not call REST.'
+				);
+			} );
+
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', post );
+			registry.dispatch( editorStore ).setupEditor( post, {
+				content: firstAcceptedPostContent,
+			} );
+			registry.dispatch( editorStore ).updateEditorSettings( {
+				distributedEditing: {
+					enabled: true,
+					retrySaveHandoff: true,
+					riskyBlockReview: true,
+				},
+			} );
+			registry
+				.dispatch( editorStore )
+				.setDistributedEditingSessionState( {
+					disposition:
+						DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+					reasonCode:
+						DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+					clientBaseVersion: '4',
+					serverVersion: '5',
+					clientBaseContent: basePostContent,
+					refetchedServerContent: firstAcceptedPostContent,
+					pendingChangeCount: 1,
+					remoteChangeCount: 1,
+					refetchedServerState: true,
+					requiresServerStateRefetch: false,
+					hasPendingChanges: true,
+					isAwaitingServerConfirmation: true,
+					canExportLocalUpdates: true,
+					mustOfferLocalCopy: true,
+					localRebaseResultStatus:
+						DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.MANUAL_CONFLICT_REQUIRED,
+					localRebaseResultReason: 'block_deleted',
+					requiresManualConflictResolution: true,
+					staleBaseConflictResolutionStatus:
+						DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_STATUSES.LATEST_WORDPRESS_SELECTED,
+					staleBaseConflictResolutionChoice:
+						DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_CHOICES.LATEST_WORDPRESS,
+					staleBaseConflictResolutionRequiresFreshProof: false,
+					retrySubmitProofStatus:
+						DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.ACCEPTED_FOR_FUTURE_SAVE,
+					retrySubmitAccepted: true,
+					retrySubmitSavePathRequired: true,
+					retrySubmitSavesPost: false,
+					retrySubmitMutatesPostContent: false,
+					retrySubmitCreatesRevision: false,
+					retrySubmitClaimsSaved: false,
+					retrySubmitSaveStatus:
+						DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.READY,
+					retrySubmitSavePrepared: true,
+					retrySubmitSaveReady: true,
+				} );
+
+			expect(
+				registry
+					.select( editorStore )
+					.getDistributedEditingSavePolicyState()
+			).toMatchObject( {
+				status: DISTRIBUTED_EDITING_SAVE_POLICY_STATUSES.READY_FOR_REVIEWED_RETRY_SAVE,
+				clickAction:
+					DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.CONTINUE_GUARDED_RETRY_SAVE,
+				blocksNormalSavePost: true,
+				shouldCallRetrySaveEndpoint: false,
+				claimsSaved: false,
+			} );
+
+			await expect(
+				registry
+					.dispatch( editorStore )
+					.__experimentalMaybeHandleDistributedEditingSaveButtonClick()
+			).resolves.toMatchObject( {
+				status: 'structural_choice_already_authoritative_from_save_click',
+				reason: 'structural_choice_already_authoritative',
+				allowsNormalSaveFallback: false,
+				blocksNormalSavePost: true,
+				callsServerStateRefetchEndpoint: false,
+				callsRetrySubmitEndpoint: false,
+				callsNormalSavePost: false,
+				callsRetrySaveEndpoint: false,
+				mutatesEditorContent: false,
+				mutatesPersistedPostContent: false,
+				changesPostLock: false,
+				createsRevision: false,
+				claimsSaved: false,
+				authoritativePostAlreadyCurrent: true,
+			} );
+
+			expect( apiCalls ).toBe( 0 );
+			expect(
+				registry.select( editorStore ).getEditedPostContent()
+			).toBe( firstAcceptedPostContent );
+			expect(
+				registry
+					.select( editorStore )
+					.getDistributedEditingSessionState()
+			).toMatchObject( {
+				disposition: DISTRIBUTED_EDITING_DISPOSITIONS.IDLE,
+				clientBaseVersion: '5',
+				serverVersion: '5',
+				pendingChangeCount: 0,
+				hasPendingChanges: false,
+				isAwaitingServerConfirmation: false,
+				canExportLocalUpdates: false,
+				mustOfferLocalCopy: false,
+				requiresManualConflictResolution: false,
+				localRebaseResultStatus:
+					DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.NONE,
+				localRebaseResultReason: null,
+				staleBaseConflictResolutionStatus:
+					DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_STATUSES.NONE,
+				staleBaseConflictResolutionChoice: null,
+				retrySubmitProofStatus:
+					DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.NONE,
+				retrySubmitAccepted: false,
+				retrySubmitSaveStatus:
+					DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.NONE,
+				retrySubmitSaveReady: false,
+				retrySaveStatus: DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.NONE,
+				retrySaveClaimsSaved: false,
+				actionTranscriptLatestEventType:
+					DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.SAVE_STATE_CHANGED,
+				actionTranscriptCallsSave: false,
+				actionTranscriptClaimsSaved: false,
+			} );
+			expect(
+				registry
+					.select( editorStore )
+					.getDistributedEditingSavePolicyState()
+			).toMatchObject( {
+				status: DISTRIBUTED_EDITING_SAVE_POLICY_STATUSES.UPDATE_READY,
+				blocksNormalSavePost: false,
+				claimsSaved: false,
 			} );
 			expect( registry.select( noticesStore ).getNotices() ).toEqual(
 				[]
@@ -7496,6 +7660,134 @@ describe( 'Post actions', () => {
 				retrySaveAccepted: true,
 				canExportLocalUpdates: false,
 			} );
+		} );
+
+		it( 'confirms an already-authoritative latest-WordPress structural choice in retry-save policy without writing', async () => {
+			const basePostContent =
+				'<!-- wp:paragraph -->\n<p>Two editor deletion alpha.</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:paragraph -->\n<p>Two editor deletion beta.</p>\n<!-- /wp:paragraph -->';
+			const firstAcceptedPostContent =
+				'<!-- wp:paragraph -->\n<p>Two editor deletion alpha.</p>\n<!-- /wp:paragraph -->';
+			const post = {
+				id: postId,
+				type: 'post',
+				title: 'bar',
+				content: `${ basePostContent }<script type="wp/post-sync-meta" data-sync-meta-format="diff-match-patch">{"version":"4"}</script>`,
+				status: 'draft',
+			};
+			const registry = createRegistryWithStores();
+			let apiCalls = 0;
+
+			apiFetch.setFetchHandler( async ( options ) => {
+				apiCalls++;
+				const method = getMethod( options );
+				const { path } = options;
+
+				throw {
+					code: 'unexpected_path',
+					message: `Unexpected path: ${ method } ${ path }`,
+				};
+			} );
+
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', post );
+			registry.dispatch( editorStore ).setupEditor( post, {
+				content: firstAcceptedPostContent,
+			} );
+			registry
+				.dispatch( editorStore )
+				.setDistributedEditingSessionState( {
+					disposition:
+						DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+					reasonCode:
+						DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+					clientBaseVersion: '4',
+					serverVersion: '5',
+					clientBaseContent: basePostContent,
+					refetchedServerContent: firstAcceptedPostContent,
+					pendingChangeCount: 1,
+					remoteChangeCount: 1,
+					refetchedServerState: true,
+					requiresServerStateRefetch: false,
+					hasPendingChanges: true,
+					isAwaitingServerConfirmation: true,
+					canExportLocalUpdates: true,
+					mustOfferLocalCopy: true,
+					localRebasePlanStatus:
+						DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES.READY,
+					localRebaseResultStatus:
+						DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.MANUAL_CONFLICT_REQUIRED,
+					localRebaseResultReason: 'block_deleted',
+					requiresManualConflictResolution: true,
+					staleBaseConflictResolutionStatus:
+						DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_STATUSES.LATEST_WORDPRESS_SELECTED,
+					staleBaseConflictResolutionChoice:
+						DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_CHOICES.LATEST_WORDPRESS,
+					staleBaseConflictResolutionRequiresFreshProof: false,
+					retrySubmitProofStatus:
+						DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.ACCEPTED_FOR_FUTURE_SAVE,
+					retrySubmitAccepted: true,
+					retrySubmitSavePathRequired: true,
+					retrySubmitSavesPost: false,
+					retrySubmitMutatesPostContent: false,
+					retrySubmitCreatesRevision: false,
+					retrySubmitClaimsSaved: false,
+					retrySubmitSaveStatus:
+						DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.READY,
+					retrySubmitSavePrepared: true,
+					retrySubmitSaveReady: true,
+				} );
+
+			await expect(
+				registry.dispatch( editorStore ).savePost( {
+					__experimentalUseDistributedEditingRetrySave: true,
+					__experimentalAllowDistributedEditingStructuralNoopSave: true,
+				} )
+			).resolves.toMatchObject( {
+				status: 'structural_choice_already_authoritative_from_save_click',
+				reason: 'structural_choice_already_authoritative',
+				callsRetrySaveAction: false,
+				callsNormalSavePost: false,
+				callsRetrySaveEndpoint: false,
+				createsRevision: false,
+				claimsSaved: false,
+			} );
+
+			expect( apiCalls ).toBe( 0 );
+			expect(
+				registry.select( editorStore ).getEditedPostContent()
+			).toBe( firstAcceptedPostContent );
+			expect(
+				registry
+					.select( editorStore )
+					.getDistributedEditingSessionState()
+			).toMatchObject( {
+				disposition: DISTRIBUTED_EDITING_DISPOSITIONS.IDLE,
+				clientBaseVersion: '5',
+				serverVersion: '5',
+				pendingChangeCount: 0,
+				hasPendingChanges: false,
+				isAwaitingServerConfirmation: false,
+				canExportLocalUpdates: false,
+				mustOfferLocalCopy: false,
+				requiresManualConflictResolution: false,
+				localRebaseResultStatus:
+					DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.NONE,
+				retrySubmitProofStatus:
+					DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.NONE,
+				retrySubmitAccepted: false,
+				retrySubmitSaveStatus:
+					DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.NONE,
+				retrySaveStatus: DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.NONE,
+				retrySaveClaimsSaved: false,
+				actionTranscriptLatestEventType:
+					DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.SAVE_STATE_CHANGED,
+				actionTranscriptCallsSave: false,
+				actionTranscriptClaimsSaved: false,
+			} );
+			expect( registry.select( noticesStore ).getNotices() ).toEqual(
+				[]
+			);
 		} );
 
 		it( 'routes a prepared same-block conflict choice through guarded retry-save on setting-enabled savePost', async () => {

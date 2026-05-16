@@ -24,6 +24,11 @@ export class AutosaveMonitor extends Component {
 	}
 
 	componentDidUpdate( prevProps ) {
+		if ( this.props.isDistributedEditingAutosaveBlocked ) {
+			this.needsAutosave = false;
+			return;
+		}
+
 		if ( this.props.disableIntervalChecks ) {
 			if ( this.props.editsReference !== prevProps.editsReference ) {
 				this.props.autosave();
@@ -62,6 +67,12 @@ export class AutosaveMonitor extends Component {
 	}
 
 	autosaveTimerHandler() {
+		if ( this.props.isDistributedEditingAutosaveBlocked ) {
+			this.needsAutosave = false;
+			this.setAutosaveTimer( 1000 );
+			return;
+		}
+
 		if ( ! this.props.isAutosaveable ) {
 			this.setAutosaveTimer( 1000 );
 			return;
@@ -111,16 +122,30 @@ export default compose( [
 			isEditedPostDirty,
 			isEditedPostAutosaveable,
 			isAutosavingPost,
+			getDistributedEditingSavePolicyState,
+			getDistributedEditingSessionState,
 			getEditorSettings,
 		} = select( editorStore );
 
 		const { interval = getEditorSettings().autosaveInterval } = ownProps;
+		const distributedEditingSession =
+			getDistributedEditingSessionState?.() ?? {};
+		const distributedEditingSavePolicy =
+			getDistributedEditingSavePolicyState?.() ?? {};
+		const isDistributedEditingAutosaveBlocked = Boolean(
+			distributedEditingSavePolicy.blocksNormalSavePost ||
+				distributedEditingSession.hasPendingChanges ||
+				distributedEditingSession.isAwaitingServerConfirmation ||
+				distributedEditingSession.canExportLocalUpdates ||
+				distributedEditingSession.mustOfferLocalCopy
+		);
 
 		return {
 			editsReference: getReferenceByDistinctEdits(),
 			isDirty: isEditedPostDirty(),
 			isAutosaveable: isEditedPostAutosaveable(),
 			isAutosaving: isAutosavingPost(),
+			isDistributedEditingAutosaveBlocked,
 			interval,
 		};
 	} ),

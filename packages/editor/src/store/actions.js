@@ -71,16 +71,25 @@ import {
 	getDistributedEditingSessionStateForRetrySubmitSavePreparation,
 	getDistributedEditingRetrySavePolicyForSessionState,
 	getDistributedEditingSessionStateWithActionTranscriptEvent,
+	normalizeDistributedEditingSessionState,
 	DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES,
+	DISTRIBUTED_EDITING_DISPOSITIONS,
 	DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES,
 	DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES,
 	DISTRIBUTED_EDITING_LOCAL_UPDATES_REVIEW_REQUEST_STATUSES,
 	DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_STATUSES,
+	DISTRIBUTED_EDITING_RETRY_SAVE_HANDOFF_STATUSES,
+	DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES,
+	DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_STATUSES,
+	DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES,
+	DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES,
 	DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES,
 	DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS,
 	DISTRIBUTED_EDITING_SAVE_POLICY_STATUSES,
 	DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS,
 	DISTRIBUTED_EDITING_REASON_CODES,
+	DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_CHOICES,
+	DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_STATUSES,
 	getDistributedEditingStaleBaseLocalRebaseResult,
 	getDistributedEditingSessionStateForStaleBaseLocalRebasePlan,
 	getDistributedEditingSessionStateForStaleBaseRejectionResult,
@@ -97,6 +106,14 @@ import { unlock } from '../lock-unlock';
 const distributedEditingFreshReviewImportContentVault = new Map();
 let distributedEditingPresenceSessionKey;
 
+const DISTRIBUTED_EDITING_STRUCTURAL_NOOP_SAVE_REASONS = new Set( [
+	'block_deleted',
+	'block_inserted',
+	'block_reordered',
+] );
+const DISTRIBUTED_EDITING_STRUCTURAL_NOOP_SAVE_REASON =
+	'structural_choice_already_authoritative';
+
 function getDistributedEditingPresenceSessionKey() {
 	if ( ! distributedEditingPresenceSessionKey ) {
 		const randomUuid = globalThis.crypto?.randomUUID;
@@ -109,6 +126,211 @@ function getDistributedEditingPresenceSessionKey() {
 	}
 
 	return distributedEditingPresenceSessionKey;
+}
+
+function getDistributedEditingNormalizedSerializedBlockContent( postContent ) {
+	const comparablePostContent =
+		getDistributedEditingComparablePostContent( postContent );
+
+	try {
+		return __unstableSerializeAndClean( parse( comparablePostContent ) );
+	} catch {
+		return comparablePostContent;
+	}
+}
+
+function getDistributedEditingStructuralNoopSaveCandidate( {
+	editedPostContent,
+	sessionState,
+} = {} ) {
+	const normalized = normalizeDistributedEditingSessionState( sessionState );
+
+	if (
+		normalized.localRebaseResultStatus !==
+			DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.MANUAL_CONFLICT_REQUIRED ||
+		! DISTRIBUTED_EDITING_STRUCTURAL_NOOP_SAVE_REASONS.has(
+			normalized.localRebaseResultReason
+		) ||
+		normalized.staleBaseConflictResolutionChoice !==
+			DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_CHOICES.LATEST_WORDPRESS ||
+		normalized.retrySubmitProofStatus !==
+			DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.ACCEPTED_FOR_FUTURE_SAVE ||
+		normalized.retrySubmitAccepted !== true ||
+		normalized.retrySubmitSavePathRequired !== true ||
+		normalized.retrySubmitSaveStatus !==
+			DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.READY ||
+		normalized.retrySubmitSaveReady !== true ||
+		typeof normalized.refetchedServerContent !== 'string'
+	) {
+		return null;
+	}
+
+	const comparableRefetchedServerContent =
+		getDistributedEditingComparablePostContent(
+			normalized.refetchedServerContent
+		);
+	const normalizedRefetchedServerContent =
+		getDistributedEditingNormalizedSerializedBlockContent(
+			comparableRefetchedServerContent
+		);
+
+	if (
+		typeof editedPostContent === 'string' &&
+		getDistributedEditingNormalizedSerializedBlockContent(
+			editedPostContent
+		) !== normalizedRefetchedServerContent
+	) {
+		return null;
+	}
+
+	return {
+		comparablePostContent: comparableRefetchedServerContent,
+		serverVersion:
+			normalized.serverVersion || normalized.clientBaseVersion || null,
+	};
+}
+
+function getDistributedEditingSessionStateForStructuralNoopSaveConfirmation(
+	sessionState,
+	{ comparablePostContent, serverVersion } = {}
+) {
+	const normalized = normalizeDistributedEditingSessionState( sessionState );
+
+	return normalizeDistributedEditingSessionState( {
+		...normalized,
+		disposition: DISTRIBUTED_EDITING_DISPOSITIONS.IDLE,
+		reasonCode: null,
+		clientBaseVersion: serverVersion,
+		serverVersion,
+		clientBaseContent: comparablePostContent ?? null,
+		refetchedServerContent: comparablePostContent ?? null,
+		pendingChangeCount: 0,
+		hasPendingChanges: false,
+		isAwaitingServerConfirmation: false,
+		remoteChangeCount: 0,
+		hasRemoteChanges: false,
+		requiresServerStateAcceptance: false,
+		requiresServerStateRefetch: false,
+		refetchedServerState: false,
+		canAttemptLocalRebase: false,
+		localRebasePlanStatus:
+			DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES.NONE,
+		localRebaseResultStatus:
+			DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.NONE,
+		localRebaseResultReason: null,
+		staleBaseConflictResolutionStatus:
+			DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_STATUSES.NONE,
+		staleBaseConflictResolutionChoice: null,
+		staleBaseConflictResolutionRequiresFreshProof: false,
+		staleBaseConflictResolutionCallsRest: false,
+		staleBaseConflictResolutionCallsSave: false,
+		staleBaseConflictResolutionMutatesEditorContent: false,
+		staleBaseConflictResolutionMutatesPersistedPostContent: false,
+		staleBaseConflictResolutionCreatesRevision: false,
+		staleBaseConflictResolutionChangesPostLock: false,
+		staleBaseConflictResolutionClaimsSaved: false,
+		requiresManualConflictResolution: false,
+		readyToRetrySubmit: false,
+		retrySubmitHandoffStatus:
+			DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_STATUSES.NONE,
+		retrySubmitHandoffReason: null,
+		retrySubmitPrepared: false,
+		retrySubmitProofStatus:
+			DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.NONE,
+		retrySubmitProofReason: null,
+		retrySubmitAccepted: false,
+		retrySubmitSavePathRequired: false,
+		retrySubmitSavesPost: false,
+		retrySubmitMutatesPostContent: false,
+		retrySubmitCreatesRevision: false,
+		retrySubmitClaimsSaved: false,
+		retrySubmitSaveStatus:
+			DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.NONE,
+		retrySubmitSaveReason: null,
+		retrySubmitSavePrepared: false,
+		retrySubmitSaveReady: false,
+		retrySaveStatus: DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.NONE,
+		retrySaveReason: null,
+		retrySaveHandoffStatus:
+			DISTRIBUTED_EDITING_RETRY_SAVE_HANDOFF_STATUSES.NONE,
+		retrySaveHandoffReason: null,
+		retrySaveHandoffAllowsNormalSaveFallback: false,
+		retrySaveHandoffBlocksNormalSave: false,
+		retrySaveAccepted: false,
+		retrySaveServerVersion: null,
+		retrySavePreviousServerVersion: null,
+		retrySaveSavesPost: false,
+		retrySaveMutatesPostContent: false,
+		retrySaveCreatesRevision: false,
+		retrySaveClaimsSaved: false,
+		retrySaveRevisionCreated: false,
+		retrySaveCreatedRevisionIds: [],
+		retrySaveConfirmedMergedEdits: false,
+		retrySaveServerMerged: false,
+		retrySaveServerMergeApplied: false,
+		retrySaveServerMergeStatus: null,
+		retrySaveServerMergeStrategy: null,
+		retrySaveServerMergeBaseVersion: null,
+		retrySaveServerMergeServerVersion: null,
+		retrySaveServerMergeBlockCount: 0,
+		retrySaveServerMergeServerChangedIndexes: [],
+		retrySaveServerMergeLocalChangedIndexes: [],
+		retrySaveServerMergeMergedStrippedContentHash: null,
+		mustOfferLocalCopy: false,
+		canExportLocalUpdates: false,
+	} );
+}
+
+function applyDistributedEditingStructuralNoopSaveConfirmation( {
+	dispatch,
+	registry,
+	select,
+	policy = null,
+	sessionState,
+	structuralNoopSaveCandidate,
+} ) {
+	const nextSessionState =
+		getDistributedEditingSessionStateWithActionTranscriptEvent(
+			getDistributedEditingSessionStateForStructuralNoopSaveConfirmation(
+				sessionState,
+				structuralNoopSaveCandidate
+			),
+			{
+				eventType:
+					DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.SAVE_STATE_CHANGED,
+				reasonCode: null,
+			}
+		);
+
+	dispatch.setDistributedEditingSessionState( nextSessionState );
+	applyDistributedEditingConfirmedPostContent( {
+		dispatch,
+		registry,
+		select,
+		postContent: structuralNoopSaveCandidate.comparablePostContent,
+	} );
+
+	return {
+		status: 'structural_choice_already_authoritative_from_save_click',
+		reason: DISTRIBUTED_EDITING_STRUCTURAL_NOOP_SAVE_REASON,
+		policy,
+		allowsNormalSaveFallback: false,
+		blocksNormalSavePost: true,
+		opensPrePublishReview: false,
+		requiresServerStateRefetch: false,
+		callsServerStateRefetchEndpoint: false,
+		callsRetrySubmitEndpoint: false,
+		callsNormalSavePost: false,
+		callsRetrySaveEndpoint: false,
+		callsRetrySaveAction: false,
+		dispatchesNotice: false,
+		mutatesEditorContent: false,
+		mutatesPersistedPostContent: false,
+		changesPostLock: false,
+		createsRevision: false,
+		claimsSaved: false,
+		authoritativePostAlreadyCurrent: true,
+	};
 }
 
 /**
@@ -808,7 +1030,7 @@ export const __experimentalMaybeRouteSavePostToDistributedEditingRiskyBlockRevie
  */
 export const __experimentalMaybeHandleDistributedEditingSaveButtonClick =
 	( options = {} ) =>
-	async ( { select, dispatch } ) => {
+	async ( { select, dispatch, registry } ) => {
 		const savePolicy =
 			select.getDistributedEditingSavePolicyState?.() || {};
 		const initialSessionState =
@@ -1201,6 +1423,30 @@ export const __experimentalMaybeHandleDistributedEditingSaveButtonClick =
 
 		if (
 			savePolicy.clickAction ===
+			DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.CONTINUE_GUARDED_RETRY_SAVE
+		) {
+			const currentSessionState =
+				select.getDistributedEditingSessionState?.() || {};
+			const structuralNoopSaveCandidate =
+				getDistributedEditingStructuralNoopSaveCandidate( {
+					editedPostContent: select.getEditedPostContent?.(),
+					sessionState: currentSessionState,
+				} );
+
+			if ( structuralNoopSaveCandidate ) {
+				return applyDistributedEditingStructuralNoopSaveConfirmation( {
+					dispatch,
+					registry,
+					select,
+					policy: savePolicy,
+					sessionState: currentSessionState,
+					structuralNoopSaveCandidate,
+				} );
+			}
+		}
+
+		if (
+			savePolicy.clickAction ===
 				DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.CONTINUE_GUARDED_RETRY_SAVE &&
 			savePolicy.saveButtonReason ===
 				'accepted_retry_submit_proof_needs_save_preparation'
@@ -1243,7 +1489,10 @@ export const __experimentalMaybeHandleDistributedEditingSaveButtonClick =
 		) {
 			const retrySaveResult =
 				await dispatch.__experimentalMaybeSavePostWithDistributedEditingRetryPolicy(
-					options
+					{
+						...options,
+						__experimentalAllowDistributedEditingStructuralNoopSave: true,
+					}
 				);
 			const allowsNormalSaveFallback = Boolean(
 				retrySaveResult.allowsNormalSaveFallback &&
@@ -3056,8 +3305,7 @@ export const __experimentalSaveDistributedEditingRetryAfterProof =
 				getDistributedEditingSessionStateWithActionTranscriptEvent(
 					{
 						...retrySaveResultSessionState,
-						...( typeof confirmedComparablePostContent ===
-							'string'
+						...( typeof confirmedComparablePostContent === 'string'
 							? {
 									clientBaseVersion:
 										retrySaveResultSessionState.retrySaveServerVersion ||
@@ -3244,14 +3492,12 @@ function applyDistributedEditingConfirmedPostContent( {
 				  }
 				: comparablePostContent;
 
-		registry.dispatch( coreStore ).receiveEntityRecords(
-			'postType',
-			postType,
-			{
+		registry
+			.dispatch( coreStore )
+			.receiveEntityRecords( 'postType', postType, {
 				...currentPost,
 				content: nextContent,
-			}
-		);
+			} );
 	}
 }
 
@@ -3511,6 +3757,24 @@ export const __experimentalMaybeSavePostWithDistributedEditingRetryPolicy =
 				sessionState: currentSessionState,
 			} ) ??
 			select.getEditedPostContent?.();
+		const structuralNoopSaveCandidate =
+			options.isAutosave !== true && options.local !== true
+				? getDistributedEditingStructuralNoopSaveCandidate( {
+						editedPostContent: proposedPostContent,
+						sessionState: currentSessionState,
+				  } )
+				: null;
+
+		if ( structuralNoopSaveCandidate ) {
+			return applyDistributedEditingStructuralNoopSaveConfirmation( {
+				dispatch,
+				registry,
+				select,
+				sessionState: currentSessionState,
+				structuralNoopSaveCandidate,
+			} );
+		}
+
 		const policy = getDistributedEditingRetrySavePolicyForSessionState(
 			currentSessionState,
 			{
@@ -4107,6 +4371,7 @@ export const savePost =
 				await dispatch.__experimentalMaybeSavePostWithDistributedEditingRetryPolicy(
 					{
 						...options,
+						proposedPostContent: content,
 					}
 				);
 

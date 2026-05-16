@@ -1549,6 +1549,43 @@ describe( 'selectors', () => {
 			expect( isEditedPostAutosaveable( state ) ).toBe( true );
 		} );
 
+		it( 'should return false when Distributed Editing protects pending changes from ordinary autosave', () => {
+			const state = {
+				editor: {
+					present: {
+						edits: {
+							content: () => 'new-content',
+						},
+					},
+				},
+				currentPost: {
+					title: 'foo',
+					excerpt: 'foo',
+				},
+				editorSettings: {
+					distributedEditing: {
+						enabled: true,
+						retrySaveHandoff: true,
+					},
+				},
+				distributedEditingSession: {
+					hasPendingChanges: true,
+					isAwaitingServerConfirmation: true,
+					canExportLocalUpdates: true,
+					mustOfferLocalCopy: true,
+				},
+				saving: {},
+				getCurrentUser() {},
+				hasFetchedAutosaves() {
+					return true;
+				},
+				getAutosave() {},
+				postAutosavingLock: {},
+			};
+
+			expect( isEditedPostAutosaveable( state ) ).toBe( false );
+		} );
+
 		it( 'should return true if title or excerpt have changed', () => {
 			const fields = [ 'title', 'excerpt' ];
 

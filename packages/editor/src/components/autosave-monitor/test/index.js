@@ -194,4 +194,39 @@ describe( 'AutosaveMonitor', () => {
 			1000
 		);
 	} );
+
+	it( 'should discard queued autosave work while Distributed Editing protects local changes', () => {
+		const autosave = jest.fn();
+		const editsReference = [];
+		const { rerender } = render(
+			<AutosaveMonitor isDirty isAutosaveable autosave={ autosave } />
+		);
+
+		rerender(
+			<AutosaveMonitor
+				isDirty
+				isAutosaveable
+				isDistributedEditingAutosaveBlocked
+				autosave={ autosave }
+				editsReference={ editsReference }
+			/>
+		);
+
+		jest.runOnlyPendingTimers();
+
+		expect( autosave ).not.toHaveBeenCalled();
+
+		rerender(
+			<AutosaveMonitor
+				isDirty
+				isAutosaveable
+				autosave={ autosave }
+				editsReference={ editsReference }
+			/>
+		);
+
+		jest.runOnlyPendingTimers();
+
+		expect( autosave ).not.toHaveBeenCalled();
+	} );
 } );
