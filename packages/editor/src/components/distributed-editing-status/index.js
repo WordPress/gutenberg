@@ -1944,7 +1944,7 @@ export default function DistributedEditingStatus( {
 						setActionStatus( {
 							status: 'info',
 							message: __(
-								'Local changes staged for a Save check. WordPress has not saved them yet.'
+								'Changes are ready for WordPress to check. Nothing has been saved yet.'
 							),
 						} );
 						return prepareResult;
@@ -1971,7 +1971,7 @@ export default function DistributedEditingStatus( {
 											'WordPress checked this choice. Prepare Save before updating the post.'
 									  )
 									: __(
-											'Save safety checked. Use Save to continue.'
+											'WordPress checked these changes. Prepare Save before updating the post.'
 									  ),
 						} );
 						return proofResult;
@@ -5698,7 +5698,7 @@ function getPendingChangesMessage( descriptor ) {
 		}
 
 		return __(
-			'WordPress accepted the save check. Local changes are still awaiting final Save confirmation.'
+			'WordPress checked these changes. Prepare Save before updating the post; local changes remain pending.'
 		);
 	}
 
@@ -5922,11 +5922,11 @@ function getActionLabel( actionKey, item ) {
 			}
 			return __( 'Export local changes' );
 		case DISTRIBUTED_EDITING_NOTICE_ACTIONS.PREPARE_RETRY_SUBMIT:
-			return __( 'Stage local changes' );
+			return __( 'Prepare changes' );
 		case DISTRIBUTED_EDITING_NOTICE_ACTIONS.PREPARE_RETRY_SUBMIT_SAVE:
 			return __( 'Prepare Save' );
 		case DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFRESH_RETRY_SUBMIT_PROOF:
-			return __( 'Check save safety' );
+			return __( 'Check with WordPress' );
 		case DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFETCH_SERVER_STATE:
 			return __( 'Get latest post' );
 		case DISTRIBUTED_EDITING_NOTICE_ACTIONS.REBASE_LOCAL_UPDATES:
@@ -6512,7 +6512,7 @@ function getLocalUpdatesImportReviewRequestMessage( descriptor ) {
 			DISTRIBUTED_EDITING_FRESH_REVIEW_DECISION_STATUSES.READY
 	) {
 		return __(
-			'Fresh review decisions are ready for a future Save check. No Save was made; protected local changes remain exportable until that proof path exists.'
+			'Fresh review decisions are ready for a future WordPress check. No Save was made; protected local changes remain exportable until that proof path exists.'
 		);
 	}
 
@@ -6790,9 +6790,9 @@ function getStaleBaseStatusText( descriptor ) {
 		DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.STALE_BASE_REJECTED
 	) {
 		return {
-			title: __( 'Save check is stale' ),
+			title: __( 'WordPress check is stale' ),
 			message: __(
-				'The post changed after Save was checked. Protected local changes remain exportable; get the latest post before continuing.'
+				'The post changed after WordPress checked these changes. Protected local changes remain exportable; get the latest post before continuing.'
 			),
 		};
 	}
@@ -6802,9 +6802,9 @@ function getStaleBaseStatusText( descriptor ) {
 		DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_STATUSES.PREPARED
 	) {
 		return {
-			title: __( 'Ready for Save check' ),
+			title: __( 'Ready for WordPress check' ),
 			message: __(
-				'Local changes are staged against the latest post. Try Save again so WordPress can check freshness before updating the post.'
+				'Local changes are prepared against the latest post. Check with WordPress before preparing Save; nothing has been saved yet.'
 			),
 		};
 	}
@@ -6814,7 +6814,7 @@ function getStaleBaseStatusText( descriptor ) {
 			return {
 				title: __( 'Local changes applied' ),
 				message: __(
-					'The latest post is loaded and local changes were applied in this editor. Stage them for a Save check before WordPress updates the post.'
+					'The latest post is loaded and local changes were applied in this editor. Prepare these changes for a WordPress check before updating the post.'
 				),
 			};
 		case DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.MANUAL_CONFLICT_REQUIRED:
@@ -6867,7 +6867,7 @@ function getStaleBaseStatusText( descriptor ) {
 	return {
 		title: __( 'Post changed on the server' ),
 		message: __(
-			'Get latest post first. Then this editor will say whether local changes can be applied, need comparison, or are ready for another Save check.'
+			'Get latest post first. Then this editor will say whether local changes can be applied, need comparison, or are ready for WordPress to check.'
 		),
 	};
 }

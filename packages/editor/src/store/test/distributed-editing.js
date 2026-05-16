@@ -567,13 +567,13 @@ describe( 'distributed editing session state', () => {
 			expect.objectContaining( {
 				eventType:
 					DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.LOCAL_CHANGES_STAGED,
-				label: 'Local changes staged',
+				label: 'Changes ready for check',
 				redacted: true,
 			} ),
 			expect.objectContaining( {
 				eventType:
 					DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.RETRY_SUBMIT_PROOF_REFRESHED,
-				label: 'Save safety checked',
+				label: 'WordPress checked changes',
 				redacted: true,
 			} ),
 			expect.objectContaining( {

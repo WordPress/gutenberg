@@ -7190,7 +7190,7 @@ describe( 'DistributedEditingStatus', () => {
 
 		await user.click(
 			screen.getByRole( 'button', {
-				name: 'Stage local changes',
+				name: 'Prepare changes',
 			} )
 		);
 
@@ -7205,7 +7205,7 @@ describe( 'DistributedEditingStatus', () => {
 		).not.toHaveBeenCalled();
 		expect(
 			await screen.findByText(
-				'Local changes staged for a Save check. WordPress has not saved them yet.'
+				'Changes are ready for WordPress to check. Nothing has been saved yet.'
 			)
 		).toBeVisible();
 	} );
@@ -7242,7 +7242,7 @@ describe( 'DistributedEditingStatus', () => {
 
 		await user.click(
 			screen.getByRole( 'button', {
-				name: 'Check save safety',
+				name: 'Check with WordPress',
 			} )
 		);
 
@@ -7260,7 +7260,7 @@ describe( 'DistributedEditingStatus', () => {
 		).not.toHaveBeenCalled();
 		expect(
 			await screen.findByText(
-				'Save safety checked. Use Save to continue.'
+				'WordPress checked these changes. Prepare Save before updating the post.'
 			)
 		).toBeVisible();
 	} );
@@ -7696,7 +7696,7 @@ describe( 'DistributedEditingStatusSurface', () => {
 		expect( screen.getByText( 'Local changes applied' ) ).toBeVisible();
 		expect(
 			screen.getByText(
-				'The latest post is loaded and local changes were applied in this editor. Stage them for a Save check before WordPress updates the post.'
+				'The latest post is loaded and local changes were applied in this editor. Prepare these changes for a WordPress check before updating the post.'
 			)
 		).toBeVisible();
 		expect( screen.queryByText( /wp:paragraph/ ) ).not.toBeInTheDocument();
@@ -7831,10 +7831,10 @@ describe( 'DistributedEditingStatusSurface', () => {
 			/>
 		);
 
-		expect( screen.getByText( 'Ready for Save check' ) ).toBeVisible();
+		expect( screen.getByText( 'Ready for WordPress check' ) ).toBeVisible();
 		expect(
 			screen.getByText(
-				'Local changes are staged against the latest post. Try Save again so WordPress can check freshness before updating the post.'
+				'Local changes are prepared against the latest post. Check with WordPress before preparing Save; nothing has been saved yet.'
 			)
 		).toBeVisible();
 	} );
@@ -7862,7 +7862,7 @@ describe( 'DistributedEditingStatusSurface', () => {
 		expect( screen.getByText( 'Changes pending' ) ).toBeVisible();
 		expect(
 			screen.getByText(
-				'WordPress accepted the save check. Local changes are still awaiting final Save confirmation.'
+				'WordPress checked these changes. Prepare Save before updating the post; local changes remain pending.'
 			)
 		).toBeVisible();
 		expect(
@@ -9398,10 +9398,10 @@ describe( 'DistributedEditingStatusSurface', () => {
 			/>
 		);
 
-		expect( screen.getByText( 'Save check is stale' ) ).toBeVisible();
+		expect( screen.getByText( 'WordPress check is stale' ) ).toBeVisible();
 		expect(
 			screen.getByText(
-				'The post changed after Save was checked. Protected local changes remain exportable; get the latest post before continuing.'
+				'The post changed after WordPress checked these changes. Protected local changes remain exportable; get the latest post before continuing.'
 			)
 		).toBeVisible();
 	} );
