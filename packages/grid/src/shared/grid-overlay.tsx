@@ -4,6 +4,11 @@
 import clsx from 'clsx';
 
 /**
+ * WordPress dependencies
+ */
+import { useEffect, useState } from '@wordpress/element';
+
+/**
  * Internal dependencies
  */
 import type { GridOverlayRenderProps } from './types';
@@ -18,8 +23,10 @@ import styles from './grid-overlay.module.css';
  * by passing a `renderGridOverlay` to either surface; themed in place
  * via the CSS custom properties documented in the package README.
  *
- * Cross-fades in and out on `isActive` toggles via a CSS opacity
- * transition; while inactive, `visibility: hidden` releases paint cost.
+ * Reveals with a diagonal alpha wave from the top-left corner when
+ * `isActive` becomes true (motion design tokens for duration and
+ * easing). Fades out on deactivate; while inactive, `visibility:
+ * hidden` releases paint cost.
  *
  * The overlay inherits its gap from the same design-system gap token
  * the surfaces use, so columns and row markers stay pixel-aligned
@@ -43,6 +50,14 @@ export function GridOverlay( {
 }: GridOverlayRenderProps ) {
 	const showRows =
 		typeof rowHeight === 'number' && typeof rows === 'number' && rows > 0;
+	// Bump the key when edit mode activates so CSS animations restart on
+	// each enter (the overlay stays mounted across toggles).
+	const [ waveKey, setWaveKey ] = useState( 0 );
+	useEffect( () => {
+		if ( isActive ) {
+			setWaveKey( ( key ) => key + 1 );
+		}
+	}, [ isActive ] );
 	const style: React.CSSProperties = {
 		gridTemplateColumns: `repeat(${ columns }, minmax(0, 1fr))`,
 		...( showRows
@@ -54,18 +69,37 @@ export function GridOverlay( {
 
 	return (
 		<div
+			key={ waveKey }
 			aria-hidden
 			className={ clsx(
 				styles.overlay,
-				isActive && styles[ 'is-active' ]
+				isActive && styles[ 'is-active' ],
+				showRows && styles[ 'has-rows' ]
 			) }
 			style={ style }
 		>
 			{ Array.from( { length: columns }, ( _column, columnIndex ) => (
-				<div key={ columnIndex } className={ styles.column }>
+				<div
+					key={ columnIndex }
+					className={ styles.column }
+					style={
+						{
+							'--wp-grid-overlay-column-index': columnIndex,
+							'--wp-grid-overlay-row-index': 0,
+						} as React.CSSProperties
+					}
+				>
 					{ showRows &&
 						Array.from( { length: rows }, ( _row, rowIndex ) => (
-							<div key={ rowIndex } className={ styles.row } />
+							<div
+								key={ rowIndex }
+								className={ styles.row }
+								style={
+									{
+										'--wp-grid-overlay-row-index': rowIndex,
+									} as React.CSSProperties
+								}
+							/>
 						) ) }
 				</div>
 			) ) }
