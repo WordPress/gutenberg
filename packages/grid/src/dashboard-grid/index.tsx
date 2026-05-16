@@ -154,10 +154,12 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 
 		const rootRef = useRef< HTMLDivElement >( null );
 		const [ containerWidth, setContainerWidth ] = useState( 0 );
+		const [ containerHeight, setContainerHeight ] = useState( 0 );
 		const [ gapPx, setGapPx ] = useState( FALLBACK_GAP_PX );
 		const resizeObserverRef = useResizeObserver(
 			( [ { contentRect } ] ) => {
 				setContainerWidth( contentRect.width );
+				setContainerHeight( contentRect.height );
 			}
 		);
 		const mergedGridRef = useMergeRefs( [
@@ -174,9 +176,12 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 			if ( ! rootRef.current ) {
 				return;
 			}
-			const { width } = rootRef.current.getBoundingClientRect();
+			const { width, height } = rootRef.current.getBoundingClientRect();
 			if ( width > 0 ) {
 				setContainerWidth( width );
+			}
+			if ( height > 0 ) {
+				setContainerHeight( height );
 			}
 			const parsed = Number.parseFloat(
 				window.getComputedStyle( rootRef.current ).columnGap
@@ -520,12 +525,11 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 				</div>
 			) : null;
 
-		// Edit-mode background visual. Default paints diagonal stripes
-		// and dashed track guides; a consumer can replace it via
-		// `renderGridOverlay` while reusing the resolved column count,
-		// gap, and row height. `'auto'` collapses to `undefined` for
-		// the overlay so it falls back to columns-only (row dividers
-		// have no anchor when the row height is content-driven).
+		// Edit-mode background visual. Default paints row-marker tiles
+		// per column; a consumer can replace it via `renderGridOverlay`
+		// while reusing the resolved column count, row height, and row
+		// count. `'auto'` collapses to `undefined` for the overlay so
+		// row markers are omitted when the row height is content-driven.
 		// Rendered unconditionally so the overlay can cross-fade on
 		// edit-mode toggles; `isActive` drives the opacity transition
 		// inside the overlay. Memoized so drag/resize re-renders skip
@@ -533,15 +537,32 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 		const Overlay = renderGridOverlay ?? GridOverlay;
 		const overlayRowHeight =
 			typeof rowHeight === 'number' ? rowHeight : undefined;
+		const overlayRows = useMemo( () => {
+			if ( overlayRowHeight === undefined || containerHeight <= 0 ) {
+				return undefined;
+			}
+			const rowTile = overlayRowHeight + gapPx;
+			return Math.max(
+				1,
+				Math.floor( ( containerHeight + gapPx ) / rowTile )
+			);
+		}, [ overlayRowHeight, containerHeight, gapPx ] );
 		const gridOverlay = useMemo(
 			() => (
 				<Overlay
 					columns={ effectiveColumns }
 					rowHeight={ overlayRowHeight }
+					rows={ overlayRows }
 					isActive={ editMode }
 				/>
 			),
-			[ Overlay, editMode, effectiveColumns, overlayRowHeight ]
+			[
+				Overlay,
+				editMode,
+				effectiveColumns,
+				overlayRowHeight,
+				overlayRows,
+			]
 		);
 
 		return (
