@@ -1419,7 +1419,7 @@ describe( 'DistributedEditingStatus', () => {
 			'false'
 		);
 		expect(
-			within( summary ).getByText( 'Compare block structure' )
+			within( summary ).getByText( 'Choose block structure' )
 		).toBeVisible();
 		expect(
 			within( summary ).getByText(
@@ -9628,9 +9628,7 @@ describe( 'DistributedEditingStatusSurface', () => {
 			/>
 		);
 
-		expect(
-			screen.getByText( 'Compare conflicting changes' )
-		).toBeVisible();
+		expect( screen.getByText( 'Choose block structure' ) ).toBeVisible();
 		expect(
 			screen.getByText(
 				'Blocks moved while you were editing. Choose which structure to keep before saving.'
@@ -9639,25 +9637,25 @@ describe( 'DistributedEditingStatusSurface', () => {
 		expect( screen.getByText( 'Next step:' ) ).toBeVisible();
 		expect(
 			screen.getByText(
-				'Compare the local changes with the latest post before choosing what to keep.'
+				'Choose latest or local structure below before saving.'
 			)
 		).toBeVisible();
 		expect(
 			screen.getByText(
-				'Save now: Compare changes before Save can update the post.'
+				'Save is paused until you choose a block structure.'
 			)
 		).toBeVisible();
 		const reorderStatusItem = screen
-			.getByText( 'Compare conflicting changes' )
+			.getByText( 'Choose block structure' )
 			// eslint-disable-next-line testing-library/no-node-access
 			.closest( '[data-distributed-editing-next-step]' );
 		expect( reorderStatusItem ).toHaveAttribute(
 			'data-distributed-editing-next-step',
-			'export_for_manual_conflict_review'
+			'choose_structural_version'
 		);
 		expect( reorderStatusItem ).toHaveAttribute(
 			'data-distributed-editing-save-now-action',
-			'compare_conflicting_changes'
+			'choose_block_structure'
 		);
 		expect( screen.queryByText( /wp:paragraph/ ) ).not.toBeInTheDocument();
 	} );

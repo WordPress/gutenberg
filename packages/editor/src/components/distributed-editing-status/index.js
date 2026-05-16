@@ -2873,7 +2873,7 @@ function DistributedEditingStructuralConflictSummary( {
 			role="region"
 		>
 			<div className="editor-distributed-editing-status__conflict-comparison-header">
-				<strong>{ __( 'Compare block structure' ) }</strong>
+				<strong>{ __( 'Choose block structure' ) }</strong>
 				<p>{ getStructuralConflictMessage( summary ) }</p>
 			</div>
 			<ul
@@ -8714,6 +8714,13 @@ function getNextStepDescriptor( nextStepAction ) {
 					'Compare the local changes with the latest post before choosing what to keep.'
 				),
 			};
+		case 'choose_structural_version':
+			return {
+				nextStepAction,
+				nextStepMessage: __(
+					'Choose latest or local structure below before saving.'
+				),
+			};
 		case 'export_for_html_review':
 			return {
 				nextStepAction,
@@ -8782,6 +8789,20 @@ function getStaleBaseStatusText( descriptor ) {
 			message: __(
 				'WordPress did not save the conflicting update. Your local changes are protected in this editor. Compare the local and WordPress versions below, then choose which one to keep.'
 			),
+		};
+	}
+
+	if ( isStructuralManualLocalRebaseConflict( descriptor ) ) {
+		const remoteReviewContextMessage =
+			getRemoteReviewContextMessage( descriptor );
+		const saveNowContext = getSaveNowContext( descriptor );
+
+		return {
+			title: __( 'Choose block structure' ),
+			message: getManualLocalRebaseConflictMessage( descriptor ),
+			remoteReviewContextMessage,
+			...saveNowContext,
+			...getNextStepDescriptor( 'choose_structural_version' ),
 		};
 	}
 
@@ -8909,6 +8930,17 @@ function getStaleBaseStatusText( descriptor ) {
 }
 
 function getSaveNowContext( descriptor ) {
+	if ( isStructuralManualLocalRebaseConflict( descriptor ) ) {
+		return {
+			saveNowContextAction: 'choose_block_structure',
+			saveNowContextMessage: __(
+				'Save is paused until you choose a block structure.'
+			),
+			saveNowContextStep:
+				DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.LOCAL_CHANGES_PROTECTED,
+		};
+	}
+
 	if (
 		descriptor?.requiresManualConflictResolution ||
 		descriptor?.localRebaseResultStatus ===
@@ -8980,6 +9012,16 @@ function isSameBlockManualLocalRebaseConflict( descriptor ) {
 		descriptor?.localRebaseResultStatus ===
 			DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.MANUAL_CONFLICT_REQUIRED &&
 		DISTRIBUTED_EDITING_SAME_BLOCK_CONFLICT_REASONS.has(
+			descriptor?.localRebaseResultReason
+		)
+	);
+}
+
+function isStructuralManualLocalRebaseConflict( descriptor ) {
+	return (
+		descriptor?.localRebaseResultStatus ===
+			DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.MANUAL_CONFLICT_REQUIRED &&
+		DISTRIBUTED_EDITING_STRUCTURAL_CONFLICT_REASONS.has(
 			descriptor?.localRebaseResultReason
 		)
 	);
