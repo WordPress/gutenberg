@@ -557,9 +557,17 @@ export const __experimentalMaybeRouteSavePostToDistributedEditingRiskyBlockRevie
 					DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.REFETCH_SERVER_STATE ||
 				savePolicy.requiresServerStateRefetch
 			) {
+				const isRiskyBlockReviewRefetch =
+					savePolicy.saveButtonSource === 'risky_block_review' ||
+					savePolicy.reason === 'risky_block_review_stale';
+
 				return {
-					status: 'risky_block_review_refetch_required',
-					reason: savePolicy.reason || 'risky_block_review_stale',
+					status: isRiskyBlockReviewRefetch
+						? 'risky_block_review_refetch_required'
+						: 'distributed_editing_refetch_required',
+					reason:
+						savePolicy.reason ||
+						DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.SERVER_STATE_REFETCH_REQUIRED,
 					policy: savePolicy,
 					allowsNormalSaveFallback: false,
 					blocksNormalSavePost: true,

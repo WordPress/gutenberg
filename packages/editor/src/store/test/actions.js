@@ -6341,7 +6341,7 @@ describe( 'Post actions', () => {
 			await expect(
 				registry.dispatch( editorStore ).savePost()
 			).resolves.toMatchObject( {
-				status: 'risky_block_review_refetch_required',
+				status: 'distributed_editing_refetch_required',
 				reason: DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.SERVER_STATE_REFETCH_REQUIRED,
 				allowsNormalSaveFallback: false,
 				blocksNormalSavePost: true,

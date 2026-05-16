@@ -8309,7 +8309,7 @@ describe( 'distributed editing session state', () => {
 		expect( saveButton ).toMatchObject( {
 			status: DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES.REFETCH_REQUIRED,
 			reason: DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.SERVER_STATE_REFETCH_REQUIRED,
-			source: 'fresh_review',
+			source: 'retry_save',
 			label: 'Refetch required',
 			statusText:
 				'The latest post must be loaded before Distributed Editing can save.',
@@ -8350,7 +8350,7 @@ describe( 'distributed editing session state', () => {
 			shouldCallRetrySaveEndpoint: false,
 			saveButtonStatus:
 				DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES.REFETCH_REQUIRED,
-			saveButtonSource: 'fresh_review',
+			saveButtonSource: 'retry_save',
 			saveButtonActionKeys: [
 				DISTRIBUTED_EDITING_NOTICE_ACTIONS.EXPORT_LOCAL_UPDATES,
 				DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFETCH_SERVER_STATE,

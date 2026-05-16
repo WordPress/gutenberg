@@ -10366,6 +10366,10 @@ export function getDistributedEditingSaveButtonStateForSessionState(
 		getDistributedEditingFreshReviewPreSaveStateForSessionState(
 			normalized
 		);
+	const freshReviewPreSaveRequiresServerStateRefetch =
+		freshReviewPreSaveState.status !==
+			DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_STATUSES.NONE &&
+		freshReviewPreSaveState.requiresServerStateRefetch;
 	const hasProtectedLocalChanges = Boolean(
 		normalized.hasPendingChanges ||
 			normalized.mustOfferLocalCopy ||
@@ -10472,14 +10476,14 @@ export function getDistributedEditingSaveButtonStateForSessionState(
 			'Review proof is being validated before the authoritative WordPress post can be updated.';
 	} else if (
 		reviewState.requiresServerStateRefetch ||
-		freshReviewPreSaveState.requiresServerStateRefetch ||
+		freshReviewPreSaveRequiresServerStateRefetch ||
 		normalized.requiresServerStateRefetch
 	) {
 		status = DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES.REFETCH_REQUIRED;
 		if ( reviewState.requiresServerStateRefetch ) {
 			reason = 'risky_block_review_stale';
 			source = 'risky_block_review';
-		} else if ( freshReviewPreSaveState.requiresServerStateRefetch ) {
+		} else if ( freshReviewPreSaveRequiresServerStateRefetch ) {
 			reason =
 				freshReviewPreSaveState.reason ||
 				DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.SERVER_STATE_REFETCH_REQUIRED;
