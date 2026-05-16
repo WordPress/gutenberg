@@ -7652,7 +7652,7 @@ describe( 'distributed editing session state', () => {
 				},
 				step: DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.READY_TO_SAVE,
 				action: 'save',
-				saveButtonLabel: 'Submit reviewed changes',
+				saveButtonLabel: 'Save',
 				saveButtonBlocksNormalSavePost: true,
 			},
 			{
@@ -7947,7 +7947,7 @@ describe( 'distributed editing session state', () => {
 				summary: 'guarded update',
 				actionHint: 'Send guarded update',
 				requiresActionBeforeSave: false,
-				saveButtonLabel: 'Submit reviewed changes',
+				saveButtonLabel: 'Save',
 				saveButtonBlocksNormalSavePost: true,
 			},
 			{

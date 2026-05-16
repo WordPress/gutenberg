@@ -215,11 +215,11 @@ describe( 'PostPublishButton', () => {
 				isPublishable
 				distributedEditingSaveButtonState={ {
 					status: 'accepted_but_unconsumed',
-					reason: 'fresh_review_accepted_but_unconsumed',
-					source: 'fresh_review',
-					label: 'Submit reviewed changes',
+					reason: 'accepted_retry_submit_proof_unconsumed',
+					source: 'retry_submit',
+					label: 'Save',
 					statusText:
-						'Accepted Distributed Editing proof is ready for guarded retry save.',
+						'Accepted Distributed Editing proof is ready for WordPress Save.',
 					clickAction: 'continue_guarded_retry_save',
 					authorityState: 'ready_for_guarded_update',
 					localChangesState: 'protected_local_changes_exportable',
@@ -233,11 +233,11 @@ describe( 'PostPublishButton', () => {
 		);
 
 		const button = screen.getByRole( 'button', {
-			name: 'Submit reviewed changes',
+			name: 'Save',
 		} );
 		expect( button ).toHaveAttribute(
 			'title',
-			'Accepted Distributed Editing proof is ready for guarded retry save.'
+			'Accepted Distributed Editing proof is ready for WordPress Save.'
 		);
 		expect( button ).toHaveAttribute(
 			'data-distributed-editing-save-button-status',
@@ -245,7 +245,7 @@ describe( 'PostPublishButton', () => {
 		);
 		expect( button ).toHaveAttribute(
 			'data-distributed-editing-save-button-source',
-			'fresh_review'
+			'retry_submit'
 		);
 		expect( button ).toHaveAttribute(
 			'data-distributed-editing-save-button-click-action',
@@ -253,7 +253,7 @@ describe( 'PostPublishButton', () => {
 		);
 		expect( button ).toHaveAttribute(
 			'data-distributed-editing-save-button-reason',
-			'fresh_review_accepted_but_unconsumed'
+			'accepted_retry_submit_proof_unconsumed'
 		);
 		expect( button ).toHaveAttribute(
 			'data-distributed-editing-save-button-authority-state',
@@ -833,11 +833,11 @@ describe( 'PostPublishButton', () => {
 				savePostStatus={ savePostStatus }
 				distributedEditingSaveButtonState={ {
 					status: 'accepted_but_unconsumed',
-					reason: 'fresh_review_accepted_but_unconsumed',
-					source: 'fresh_review',
-					label: 'Submit reviewed changes',
+					reason: 'accepted_retry_submit_proof_unconsumed',
+					source: 'retry_submit',
+					label: 'Save',
 					statusText:
-						'Accepted Distributed Editing proof is ready for guarded retry save.',
+						'Accepted Distributed Editing proof is ready for WordPress Save.',
 					clickAction: 'continue_guarded_retry_save',
 					authorityState: 'ready_for_guarded_update',
 					localChangesState: 'protected_local_changes_exportable',
@@ -867,7 +867,7 @@ describe( 'PostPublishButton', () => {
 		);
 
 		const button = screen.getByRole( 'button', {
-			name: 'Submit reviewed changes',
+			name: 'Save',
 		} );
 		expect( button ).toHaveAttribute(
 			'title',

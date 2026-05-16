@@ -10369,8 +10369,7 @@ function getDistributedEditingSaveStateVocabulary( {
 	let summaryText = 'Save can update the authoritative WordPress post.';
 
 	if ( authoritativePostUpdated ) {
-		summaryText =
-			'Ready for new edits.';
+		summaryText = 'Ready for new edits.';
 	} else if ( pendingServerConfirmation ) {
 		summaryText =
 			'Reviewed local changes are waiting for server confirmation before the authoritative post is updated.';
@@ -10699,9 +10698,13 @@ export function getDistributedEditingSaveButtonStateForSessionState(
 			reason = 'accepted_retry_submit_proof_unconsumed';
 			source = 'retry_submit';
 		}
-		label = hasAcceptedRetrySubmitProofAwaitingSavePreparation
-			? 'Prepare Save'
-			: 'Submit reviewed changes';
+		if ( hasAcceptedRetrySubmitProofAwaitingSavePreparation ) {
+			label = 'Prepare Save';
+		} else if ( source === 'retry_submit' && hasAcceptedRetrySubmitProof ) {
+			label = 'Save';
+		} else {
+			label = 'Submit reviewed changes';
+		}
 		statusText = hasAcceptedRetrySubmitProofAwaitingSavePreparation
 			? 'Accepted Distributed Editing proof needs Save preparation before WordPress can update the post.'
 			: 'Accepted Distributed Editing proof is ready for WordPress Save.';
