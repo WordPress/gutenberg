@@ -299,7 +299,7 @@ function _gutenberg_connectors_add_filesystem_data_to_script_module_data( array 
 	$stored = request_filesystem_credentials( self_admin_url() );
 	ob_end_clean();
 
-	$data['filesystemCredentialsRequired'] = ! $stored;
+	$data['filesystemCredentialsRequired'] = false === $stored;
 	return $data;
 }
 add_filter( 'script_module_data_options-connectors-wp-admin', '_gutenberg_connectors_add_filesystem_data_to_script_module_data' );
