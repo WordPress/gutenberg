@@ -472,6 +472,20 @@
 	gap: $grid-unit-05;
 }
 
+.editor-distributed-editing-status__structural-conflict-choice-actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: $grid-unit-05;
+}
+
+.editor-distributed-editing-status__structural-conflict-choice-status {
+	background: $gray-100;
+	border-left: 3px solid $gray-700;
+	color: $gray-900;
+	font-size: 12px;
+	padding: $grid-unit-05 $grid-unit-10;
+}
+
 .editor-distributed-editing-status__structural-conflict-preview {
 	background: $white;
 	border: 1px solid $gray-400;

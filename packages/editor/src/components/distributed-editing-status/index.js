@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { Button, Notice, TextareaControl } from '@wordpress/components';
+import { parse } from '@wordpress/blocks';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
 import { __, _n, sprintf } from '@wordpress/i18n';
@@ -1951,6 +1952,10 @@ function getDistributedEditingStructuralConflictSummary(
 		),
 		serverBlockCount,
 		serverCountDelta: serverBlockCount - baseBlockCount,
+		resolutionChoice: normalized.staleBaseConflictResolutionChoice,
+		resolutionRequiresFreshProof:
+			normalized.staleBaseConflictResolutionRequiresFreshProof,
+		resolutionStatus: normalized.staleBaseConflictResolutionStatus,
 		snapshots,
 	};
 }
@@ -2587,8 +2592,15 @@ function DistributedEditingSameBlockConflictComparison( {
 	);
 }
 
-function DistributedEditingStructuralConflictSummary( { onAction, summary } ) {
+function DistributedEditingStructuralConflictSummary( {
+	onAction,
+	onApplyStructuralChoice,
+	onUndoStructuralChoice,
+	structuralChoiceState,
+	summary,
+} ) {
 	const [ previewSnapshotId, setPreviewSnapshotId ] = useState( null );
+	const [ appliedSnapshotId, setAppliedSnapshotId ] = useState( null );
 
 	if ( ! summary ) {
 		return null;
@@ -2606,6 +2618,38 @@ function DistributedEditingStructuralConflictSummary( { onAction, summary } ) {
 	const previewStatus = previewSnapshot
 		? `previewing_${ previewSnapshot.id }`
 		: 'inactive';
+	const sessionChoiceSnapshotId =
+		summary.resolutionChoice ===
+		DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_CHOICES.LATEST_WORDPRESS
+			? 'server'
+			: summary.resolutionChoice ===
+			  DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_CHOICES.LOCAL
+			? 'local'
+			: null;
+	const selectedChoiceSnapshotId =
+		appliedSnapshotId ?? sessionChoiceSnapshotId;
+	const structuralChoiceStatus = selectedChoiceSnapshotId
+		? `selected_${ selectedChoiceSnapshotId }`
+		: 'none';
+	const structuralChoiceUndoAvailable = Boolean(
+		structuralChoiceState?.undoAvailable
+	);
+	const applyStructuralChoice = ( choice, snapshotId ) => {
+		const result = onApplyStructuralChoice?.( choice );
+
+		if ( result ) {
+			setAppliedSnapshotId( snapshotId );
+			setPreviewSnapshotId( snapshotId );
+		}
+	};
+	const undoStructuralChoice = () => {
+		const result = onUndoStructuralChoice?.();
+
+		if ( result ) {
+			setAppliedSnapshotId( 'local' );
+			setPreviewSnapshotId( 'local' );
+		}
+	};
 
 	return (
 		<div
@@ -2634,6 +2678,27 @@ function DistributedEditingStructuralConflictSummary( { onAction, summary } ) {
 			data-distributed-editing-structural-conflict-server-count-delta={
 				summary.serverCountDelta
 			}
+			data-distributed-editing-structural-choice-calls-rest="false"
+			data-distributed-editing-structural-choice-calls-save="false"
+			data-distributed-editing-structural-choice-changes-post-lock="false"
+			data-distributed-editing-structural-choice-claims-saved="false"
+			data-distributed-editing-structural-choice-creates-revision="false"
+			data-distributed-editing-structural-choice-mutates-editor-content={ formatDataBoolean(
+				selectedChoiceSnapshotId === 'server'
+			) }
+			data-distributed-editing-structural-choice-mutates-persisted-content="false"
+			data-distributed-editing-structural-choice-requires-fresh-proof={ formatDataBoolean(
+				Boolean( selectedChoiceSnapshotId )
+			) }
+			data-distributed-editing-structural-choice-selected={
+				selectedChoiceSnapshotId ?? 'none'
+			}
+			data-distributed-editing-structural-choice-status={
+				structuralChoiceStatus
+			}
+			data-distributed-editing-structural-choice-undo-available={ formatDataBoolean(
+				structuralChoiceUndoAvailable
+			) }
 			data-distributed-editing-structural-preview-calls-rest="false"
 			data-distributed-editing-structural-preview-calls-save="false"
 			data-distributed-editing-structural-preview-changes-post-lock="false"
@@ -2814,6 +2879,90 @@ function DistributedEditingStructuralConflictSummary( { onAction, summary } ) {
 					</ol>
 				</div>
 			) }
+			<div className="editor-distributed-editing-status__structural-conflict-choice-actions">
+				<Button
+					__next40pxDefaultSize
+					aria-pressed={ selectedChoiceSnapshotId === 'server' }
+					data-distributed-editing-structural-choice-action="use_latest_wordpress"
+					data-distributed-editing-structural-choice-action-does-not-save="true"
+					title={ __(
+						'Use the latest WordPress block structure in this editor. This does not save until WordPress checks the choice and Save confirms.'
+					) }
+					variant={
+						selectedChoiceSnapshotId === 'server'
+							? 'primary'
+							: 'secondary'
+					}
+					onClick={ () =>
+						applyStructuralChoice(
+							DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_CHOICES.LATEST_WORDPRESS,
+							'server'
+						)
+					}
+				>
+					{ __( 'Use latest structure in editor' ) }
+				</Button>
+				<Button
+					__next40pxDefaultSize
+					aria-pressed={ selectedChoiceSnapshotId === 'local' }
+					data-distributed-editing-structural-choice-action="keep_local_editor"
+					data-distributed-editing-structural-choice-action-does-not-save="true"
+					title={ __(
+						'Keep the local block structure in this editor. This does not save until WordPress checks the choice and Save confirms.'
+					) }
+					variant={
+						selectedChoiceSnapshotId === 'local'
+							? 'primary'
+							: 'secondary'
+					}
+					onClick={ () =>
+						applyStructuralChoice(
+							DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_CHOICES.LOCAL,
+							'local'
+						)
+					}
+				>
+					{ __( 'Keep local structure' ) }
+				</Button>
+				{ structuralChoiceUndoAvailable && (
+					<Button
+						__next40pxDefaultSize
+						data-distributed-editing-structural-choice-action="undo_structural_choice"
+						data-distributed-editing-structural-choice-action-does-not-save="true"
+						title={ __(
+							'Restore the local block structure from before this choice. This does not save the post.'
+						) }
+						variant="tertiary"
+						onClick={ undoStructuralChoice }
+					>
+						{ __( 'Undo structure choice' ) }
+					</Button>
+				) }
+			</div>
+			{ selectedChoiceSnapshotId && (
+				<div
+					className="editor-distributed-editing-status__structural-conflict-choice-status"
+					data-distributed-editing-structural-choice-status-message={
+						structuralChoiceStatus
+					}
+					role="status"
+				>
+					{ selectedChoiceSnapshotId === 'server'
+						? __(
+								'Latest WordPress structure is now in this editor. Save is still paused until WordPress checks this choice.'
+						  )
+						: __(
+								'Local structure is selected in this editor. Save is still paused until WordPress checks this choice.'
+						  ) }
+					{ structuralChoiceUndoAvailable && (
+						<span>
+							{ __(
+								' Undo restores the local structure from before this choice.'
+							) }
+						</span>
+					) }
+				</div>
+			) }
 			<div className="editor-distributed-editing-status__conflict-comparison-actions editor-distributed-editing-status__conflict-comparison-actions--prepared">
 				<Button
 					__next40pxDefaultSize
@@ -2860,6 +3009,8 @@ export default function DistributedEditingStatus( {
 	placement = 'selector-backed-status',
 } ) {
 	const [ actionStatus, setActionStatus ] = useState( null );
+	const [ structuralChoiceUndoContent, setStructuralChoiceUndoContent ] =
+		useState( null );
 	const {
 		currentPost,
 		editedPostContent,
@@ -2892,6 +3043,7 @@ export default function DistributedEditingStatus( {
 		__experimentalRefreshDistributedEditingRetrySubmitProof,
 		__experimentalRefreshDistributedEditingServerStateAfterStaleBase,
 		editPost,
+		resetEditorBlocks,
 		setDistributedEditingSessionState,
 	} = useDispatch( editorStore ) || {};
 	const handleAction = useCallback(
@@ -3142,6 +3294,183 @@ export default function DistributedEditingStatus( {
 			),
 		[ handleSelectConflictVersion ]
 	);
+	const setStructuralChoiceSessionState = useCallback(
+		( { choice, mutatesEditorContent, normalized } ) => {
+			const isLatestChoice =
+				choice ===
+				DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_CHOICES.LATEST_WORDPRESS;
+			const resolutionStatus = isLatestChoice
+				? DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_STATUSES.LATEST_WORDPRESS_SELECTED
+				: DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_STATUSES.LOCAL_VERSION_SELECTED;
+			const nextSessionState = normalizeDistributedEditingSessionState( {
+				...normalized,
+				canExportLocalUpdates: true,
+				requiresManualConflictResolution: true,
+				staleBaseConflictResolutionStatus: resolutionStatus,
+				staleBaseConflictResolutionChoice: choice,
+				staleBaseConflictResolutionRequiresFreshProof: true,
+				staleBaseConflictResolutionCallsRest: false,
+				staleBaseConflictResolutionCallsSave: false,
+				staleBaseConflictResolutionMutatesEditorContent:
+					mutatesEditorContent,
+				staleBaseConflictResolutionMutatesPersistedPostContent: false,
+				staleBaseConflictResolutionCreatesRevision: false,
+				staleBaseConflictResolutionChangesPostLock: false,
+				staleBaseConflictResolutionClaimsSaved: false,
+				readyToRetrySubmit: false,
+				retrySubmitHandoffStatus:
+					DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_STATUSES.NONE,
+				retrySubmitPrepared: false,
+				retrySubmitProofStatus:
+					DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.NONE,
+				retrySubmitAccepted: false,
+				retrySubmitSavePathRequired: false,
+				retrySubmitSaveStatus:
+					DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.NONE,
+				retrySubmitSavePrepared: false,
+				retrySubmitSaveReady: false,
+				retrySaveStatus: DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.NONE,
+				retrySaveAccepted: false,
+				retrySaveClaimsSaved: false,
+			} );
+
+			setDistributedEditingSessionState?.( nextSessionState );
+
+			return nextSessionState;
+		},
+		[ setDistributedEditingSessionState ]
+	);
+	const handleSelectStructuralChoice = useCallback(
+		( choice ) => {
+			const normalized =
+				normalizeDistributedEditingSessionState( sessionState );
+			const isLatestChoice =
+				choice ===
+				DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_CHOICES.LATEST_WORDPRESS;
+			const isLocalChoice =
+				choice ===
+				DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_CHOICES.LOCAL;
+
+			if (
+				! DISTRIBUTED_EDITING_STRUCTURAL_CONFLICT_REASONS.has(
+					normalized.localRebaseResultReason
+				) ||
+				normalized.localRebaseResultStatus !==
+					DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.MANUAL_CONFLICT_REQUIRED ||
+				( isLatestChoice &&
+					typeof normalized.refetchedServerContent !== 'string' ) ||
+				( ! isLatestChoice && ! isLocalChoice )
+			) {
+				setActionStatus( {
+					status: 'warning',
+					message: __(
+						'This structural choice is not available. Protected local changes remain exportable.'
+					),
+				} );
+				return null;
+			}
+
+			let mutatesEditorContent = false;
+			const applyContentToEditor = ( content ) => {
+				const parsedBlocks = parse( content );
+
+				if ( parsedBlocks.length || ! content ) {
+					resetEditorBlocks?.( parsedBlocks, {
+						__unstableShouldCreateUndoLevel: false,
+					} );
+				}
+
+				editPost?.( { content }, { undoIgnore: true } );
+			};
+
+			if ( isLatestChoice ) {
+				if ( editedPostContent !== normalized.refetchedServerContent ) {
+					setStructuralChoiceUndoContent( editedPostContent );
+					applyContentToEditor( normalized.refetchedServerContent );
+					mutatesEditorContent = true;
+				}
+			} else if ( typeof structuralChoiceUndoContent === 'string' ) {
+				applyContentToEditor( structuralChoiceUndoContent );
+				setStructuralChoiceUndoContent( null );
+				mutatesEditorContent = true;
+			}
+
+			const nextSessionState = setStructuralChoiceSessionState( {
+				choice,
+				mutatesEditorContent,
+				normalized,
+			} );
+
+			setActionStatus( {
+				status: 'info',
+				message: isLatestChoice
+					? __(
+							'Latest WordPress structure is now in this editor. Save is still paused until WordPress checks this choice.'
+					  )
+					: __(
+							'Local structure is selected in this editor. Save is still paused until WordPress checks this choice.'
+					  ),
+			} );
+
+			return nextSessionState;
+		},
+		[
+			editPost,
+			editedPostContent,
+			resetEditorBlocks,
+			sessionState,
+			setStructuralChoiceSessionState,
+			structuralChoiceUndoContent,
+		]
+	);
+	const handleUndoStructuralChoice = useCallback( () => {
+		if ( typeof structuralChoiceUndoContent !== 'string' ) {
+			setActionStatus( {
+				status: 'warning',
+				message: __(
+					'No structural choice can be undone. Protected local changes remain exportable.'
+				),
+			} );
+			return null;
+		}
+
+		const normalized = normalizeDistributedEditingSessionState(
+			sessionState
+		);
+
+		const parsedBlocks = parse( structuralChoiceUndoContent );
+
+		if ( parsedBlocks.length || ! structuralChoiceUndoContent ) {
+			resetEditorBlocks?.( parsedBlocks, {
+				__unstableShouldCreateUndoLevel: false,
+			} );
+		}
+
+		editPost?.( { content: structuralChoiceUndoContent }, { undoIgnore: true } );
+		setStructuralChoiceUndoContent( null );
+
+		const nextSessionState = setStructuralChoiceSessionState( {
+			choice:
+				DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_CHOICES.LOCAL,
+			mutatesEditorContent: true,
+			normalized,
+		} );
+
+		setActionStatus( {
+			status: 'info',
+			message: __(
+				'Restored the local structure in this editor. Save is still paused until WordPress checks this choice.'
+			),
+		} );
+
+		return nextSessionState;
+	}, [
+		editPost,
+		resetEditorBlocks,
+		sessionState,
+		setStructuralChoiceSessionState,
+		structuralChoiceUndoContent,
+	] );
 
 	if (
 		! shouldRenderDistributedEditingStatus(
@@ -3193,6 +3522,12 @@ export default function DistributedEditingStatus( {
 			/>
 			<DistributedEditingStructuralConflictSummary
 				onAction={ handleAction }
+				onApplyStructuralChoice={ handleSelectStructuralChoice }
+				onUndoStructuralChoice={ handleUndoStructuralChoice }
+				structuralChoiceState={ {
+					undoAvailable:
+						typeof structuralChoiceUndoContent === 'string',
+				} }
 				summary={ structuralConflictSummary }
 			/>
 		</>

@@ -222,6 +222,7 @@ function setupDistributedEditingStatusDispatch() {
 				status: DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_STATUSES.IMPORTED_FOR_RETRY_SAVE,
 			} ),
 		editPost: jest.fn(),
+		resetEditorBlocks: jest.fn(),
 		resetDistributedEditingSessionState: jest.fn(),
 		setDistributedEditingSessionState: jest.fn(),
 	};
@@ -1581,6 +1582,160 @@ describe( 'DistributedEditingStatus', () => {
 			} )
 		).not.toBeInTheDocument();
 		expect( actions.editPost ).not.toHaveBeenCalled();
+		expect(
+			actions.__experimentalRefreshDistributedEditingServerStateAfterStaleBase
+		).not.toHaveBeenCalled();
+		expect(
+			actions.__experimentalSaveDistributedEditingRetryAfterProof
+		).not.toHaveBeenCalled();
+	} );
+
+	it( 'applies and undoes a structural latest-WordPress choice without saving', async () => {
+		const user = userEvent.setup();
+		const actions = setupDistributedEditingStatusDispatch();
+		const localContent =
+			'<!-- wp:paragraph --><p>Local keeps beta.</p><!-- /wp:paragraph -->';
+		const latestWordPressContent =
+			'<!-- wp:paragraph --><p>Base alpha.</p><!-- /wp:paragraph -->';
+
+		setupDistributedEditingStatusSelect( {
+			editedPostContent: localContent,
+			sessionState: {
+				disposition:
+					DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+				reasonCode:
+					DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+				pendingChangeCount: 1,
+				remoteChangeCount: 1,
+				requiresServerStateRefetch: false,
+				refetchedServerState: true,
+				canExportLocalUpdates: true,
+				localRebasePlanStatus:
+					DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES.READY,
+				localRebaseResultStatus:
+					DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.MANUAL_CONFLICT_REQUIRED,
+				localRebaseResultReason: 'block_deleted',
+				requiresManualConflictResolution: true,
+				clientBaseContent:
+					'<!-- wp:paragraph --><p>Base alpha.</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Base beta.</p><!-- /wp:paragraph -->',
+				refetchedServerContent: latestWordPressContent,
+			},
+		} );
+
+		render( <DistributedEditingStatus /> );
+
+		const summary = screen.getByRole( 'region', {
+			name: 'Distributed editing structural conflict summary',
+		} );
+
+		await user.click(
+			within( summary ).getByRole( 'button', {
+				name: 'Use latest structure in editor',
+			} )
+		);
+
+		expect( summary ).toHaveAttribute(
+			'data-distributed-editing-structural-choice-selected',
+			'server'
+		);
+		expect( summary ).toHaveAttribute(
+			'data-distributed-editing-structural-choice-status',
+			'selected_server'
+		);
+		expect( summary ).toHaveAttribute(
+			'data-distributed-editing-structural-choice-calls-rest',
+			'false'
+		);
+		expect( summary ).toHaveAttribute(
+			'data-distributed-editing-structural-choice-calls-save',
+			'false'
+		);
+		expect( summary ).toHaveAttribute(
+			'data-distributed-editing-structural-choice-mutates-editor-content',
+			'true'
+		);
+		expect( summary ).toHaveAttribute(
+			'data-distributed-editing-structural-choice-mutates-persisted-content',
+			'false'
+		);
+		expect( summary ).toHaveAttribute(
+			'data-distributed-editing-structural-choice-undo-available',
+			'true'
+		);
+		expect( actions.editPost ).toHaveBeenCalledWith(
+			{ content: latestWordPressContent },
+			{ undoIgnore: true }
+		);
+		expect(
+			actions.setDistributedEditingSessionState
+		).toHaveBeenLastCalledWith(
+			expect.objectContaining( {
+				requiresManualConflictResolution: true,
+				readyToRetrySubmit: false,
+				retrySubmitHandoffStatus:
+					DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_STATUSES.NONE,
+				retrySubmitProofStatus:
+					DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.NONE,
+				retrySaveStatus: DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.NONE,
+				staleBaseConflictResolutionStatus:
+					DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_STATUSES.LATEST_WORDPRESS_SELECTED,
+				staleBaseConflictResolutionChoice:
+					DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_CHOICES.LATEST_WORDPRESS,
+				staleBaseConflictResolutionRequiresFreshProof: true,
+				staleBaseConflictResolutionCallsRest: false,
+				staleBaseConflictResolutionCallsSave: false,
+				staleBaseConflictResolutionMutatesEditorContent: true,
+				staleBaseConflictResolutionMutatesPersistedPostContent: false,
+				staleBaseConflictResolutionCreatesRevision: false,
+				staleBaseConflictResolutionChangesPostLock: false,
+				staleBaseConflictResolutionClaimsSaved: false,
+			} )
+		);
+		expect(
+			screen.getAllByText(
+				'Latest WordPress structure is now in this editor. Save is still paused until WordPress checks this choice.'
+			).length
+		).toBeGreaterThan( 0 );
+
+		await user.click(
+			within( summary ).getByRole( 'button', {
+				name: 'Undo structure choice',
+			} )
+		);
+
+		expect( summary ).toHaveAttribute(
+			'data-distributed-editing-structural-choice-selected',
+			'local'
+		);
+		expect( summary ).toHaveAttribute(
+			'data-distributed-editing-structural-choice-status',
+			'selected_local'
+		);
+		expect( summary ).toHaveAttribute(
+			'data-distributed-editing-structural-choice-undo-available',
+			'false'
+		);
+		expect( actions.editPost ).toHaveBeenLastCalledWith(
+			{ content: localContent },
+			{ undoIgnore: true }
+		);
+		expect(
+			actions.setDistributedEditingSessionState
+		).toHaveBeenLastCalledWith(
+			expect.objectContaining( {
+				staleBaseConflictResolutionStatus:
+					DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_STATUSES.LOCAL_VERSION_SELECTED,
+				staleBaseConflictResolutionChoice:
+					DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_CHOICES.LOCAL,
+				staleBaseConflictResolutionRequiresFreshProof: true,
+				staleBaseConflictResolutionCallsRest: false,
+				staleBaseConflictResolutionCallsSave: false,
+				staleBaseConflictResolutionMutatesPersistedPostContent: false,
+				staleBaseConflictResolutionCreatesRevision: false,
+				staleBaseConflictResolutionChangesPostLock: false,
+				staleBaseConflictResolutionClaimsSaved: false,
+			} )
+		);
 		expect(
 			actions.__experimentalRefreshDistributedEditingServerStateAfterStaleBase
 		).not.toHaveBeenCalled();
