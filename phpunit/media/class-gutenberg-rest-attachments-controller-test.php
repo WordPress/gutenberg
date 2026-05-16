@@ -37,6 +37,58 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 	}
 
 	/**
+	 * Uploads an image attachment through the REST API.
+	 *
+	 * @param string $filename Upload filename.
+	 * @param string $fixture  Test fixture path.
+	 * @return int Attachment ID.
+	 */
+	private function upload_image_attachment( $filename = 'lineage-test.jpg', $fixture = '/images/canola.jpg' ) {
+		$request = new WP_REST_Request( 'POST', '/wp/v2/media' );
+		$request->set_header( 'Content-Type', 'image/jpeg' );
+		$request->set_header( 'Content-Disposition', "attachment; filename={$filename}" );
+		$request->set_body( file_get_contents( DIR_TESTDATA . $fixture ) );
+
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertSame( 201, $response->get_status() );
+
+		return $response->get_data()['id'];
+	}
+
+	/**
+	 * Crops an image attachment through the REST edit endpoint.
+	 *
+	 * @param int   $attachment_id Source attachment ID.
+	 * @param array $extra_params  Optional request params.
+	 * @return WP_REST_Response REST response.
+	 */
+	private function crop_attachment( $attachment_id, array $extra_params = array() ) {
+		$request = new WP_REST_Request( 'POST', "/wp/v2/media/{$attachment_id}/edit" );
+		$request->set_param( 'src', wp_get_attachment_url( $attachment_id ) );
+		$request->set_param(
+			'modifiers',
+			array(
+				array(
+					'type' => 'crop',
+					'args' => array(
+						'left'   => 10,
+						'top'    => 10,
+						'width'  => 80,
+						'height' => 80,
+					),
+				),
+			)
+		);
+
+		foreach ( $extra_params as $key => $value ) {
+			$request->set_param( $key, $value );
+		}
+
+		return rest_get_server()->dispatch( $request );
+	}
+
+	/**
 	 * @covers ::register_routes
 	 */
 	public function test_register_routes() {
@@ -205,6 +257,17 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 		$this->assertArrayHasKey( 'image_meta', $data['media_details'] );
 	}
 
+	/**
+	 * @covers ::create_item
+	 */
+	public function test_create_item_does_not_store_lineage_meta() {
+		wp_set_current_user( self::$admin_id );
+
+		$attachment_id = $this->upload_image_attachment( 'lineage-upload-only.jpg' );
+
+		$this->assertFalse( metadata_exists( 'post', $attachment_id, '_source_attachment_id' ) );
+	}
+
 	public function test_prepare_item() {
 		$this->markTestSkipped( 'No need to implement' );
 	}
@@ -234,6 +297,87 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 		$this->assertNotEmpty( $data['missing_image_sizes'] );
 		$this->assertArrayHasKey( 'filename', $data );
 		$this->assertArrayHasKey( 'filesize', $data );
+	}
+
+	/**
+	 * @covers ::edit_media_item
+	 * @covers ::wp_get_original_attachment_id
+	 */
+	public function test_edit_media_item_stores_lineage_meta_from_original_attachment() {
+		wp_set_current_user( self::$admin_id );
+
+		$attachment_id = $this->upload_image_attachment( 'lineage-original.jpg' );
+		$response      = $this->crop_attachment( $attachment_id );
+		$data          = $response->get_data();
+
+		$this->assertSame( 201, $response->get_status() );
+		$this->assertNotSame( $attachment_id, $data['id'] );
+		$this->assertSame( (string) $attachment_id, get_post_meta( $data['id'], '_source_attachment_id', true ) );
+
+		$metadata = wp_get_attachment_metadata( $data['id'], true );
+		$this->assertSame( $attachment_id, $metadata['parent_image']['attachment_id'] );
+		$this->assertSame( $attachment_id, wp_get_original_attachment_id( $data['id'] ) );
+		$this->assertSame( $attachment_id, wp_get_original_attachment_id( $attachment_id ) );
+	}
+
+	/**
+	 * @covers ::edit_media_item
+	 * @covers ::wp_get_original_attachment_id
+	 */
+	public function test_edit_media_item_propagates_root_lineage_meta_from_derivative_attachment() {
+		wp_set_current_user( self::$admin_id );
+
+		$original_id      = $this->upload_image_attachment( 'lineage-root.jpg' );
+		$first_response   = $this->crop_attachment( $original_id );
+		$first_crop_id    = $first_response->get_data()['id'];
+		$second_response  = $this->crop_attachment( $first_crop_id );
+		$second_crop_id   = $second_response->get_data()['id'];
+		$second_crop_meta = wp_get_attachment_metadata( $second_crop_id, true );
+
+		$this->assertSame( 201, $first_response->get_status() );
+		$this->assertSame( 201, $second_response->get_status() );
+		$this->assertSame( (string) $original_id, get_post_meta( $first_crop_id, '_source_attachment_id', true ) );
+		$this->assertSame( (string) $original_id, get_post_meta( $second_crop_id, '_source_attachment_id', true ) );
+		$this->assertSame( $first_crop_id, $second_crop_meta['parent_image']['attachment_id'] );
+		$this->assertSame( $original_id, wp_get_original_attachment_id( $second_crop_id ) );
+	}
+
+	/**
+	 * @covers ::edit_media_item
+	 * @covers ::wp_get_original_attachment_id
+	 */
+	public function test_edit_media_item_falls_back_to_source_when_lineage_meta_is_missing_or_malformed() {
+		wp_set_current_user( self::$admin_id );
+
+		$attachment_id = $this->upload_image_attachment( 'lineage-malformed.jpg' );
+
+		$this->assertSame( $attachment_id, wp_get_original_attachment_id( $attachment_id ) );
+
+		update_post_meta( $attachment_id, '_source_attachment_id', 'not-an-id' );
+
+		$response   = $this->crop_attachment( $attachment_id );
+		$cropped_id = $response->get_data()['id'];
+
+		$this->assertSame( 201, $response->get_status() );
+		$this->assertSame( (string) $attachment_id, get_post_meta( $cropped_id, '_source_attachment_id', true ) );
+
+		update_post_meta( $attachment_id, '_source_attachment_id', 0 );
+
+		$response_zero   = $this->crop_attachment( $attachment_id );
+		$cropped_zero_id = $response_zero->get_data()['id'];
+
+		$this->assertSame( 201, $response_zero->get_status() );
+		$this->assertSame( (string) $attachment_id, get_post_meta( $cropped_zero_id, '_source_attachment_id', true ) );
+	}
+
+	/**
+	 * @covers ::wp_get_original_attachment_id
+	 */
+	public function test_wp_get_original_attachment_id_returns_false_for_invalid_or_non_attachment_posts() {
+		$post_id = self::factory()->post->create();
+
+		$this->assertFalse( wp_get_original_attachment_id( 0 ) );
+		$this->assertFalse( wp_get_original_attachment_id( $post_id ) );
 	}
 
 	/**
