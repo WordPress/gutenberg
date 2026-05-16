@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, screen } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -1261,6 +1261,8 @@ describe( 'PostPublishButton', () => {
 					authoritativePostState: 'authoritative_update_confirmed',
 					saveStateSummaryText: 'Ready for new edits.',
 					authoritativePostUpdated: true,
+					hasRetrySaveSavedStateEvidence: true,
+					hasProtectedLocalChanges: false,
 				} }
 				distributedEditingSaveJourneyState={ {
 					shouldExposeInSaveControls: true,
@@ -1297,7 +1299,7 @@ describe( 'PostPublishButton', () => {
 			'none'
 		);
 		expect( button ).not.toHaveAttribute(
-			'data-distributed-editing-save-control-journey-action-hint',
+			'data-distributed-editing-save-control-journey-action-hint'
 		);
 		expect( button ).toHaveAttribute(
 			'data-distributed-editing-save-control-journey-action-required',
@@ -1323,6 +1325,18 @@ describe( 'PostPublishButton', () => {
 			'data-distributed-editing-save-button-authoritative-post-updated',
 			'true'
 		);
+		expect( button ).toHaveAttribute(
+			'data-distributed-editing-confirmed-save-button-evidence-retained',
+			'true'
+		);
+		expect( button ).toHaveAttribute(
+			'data-distributed-editing-confirmed-save-button-quieted',
+			'false'
+		);
+		expect( button ).toHaveAttribute(
+			'data-distributed-editing-confirmed-save-button-original-status',
+			'retry_save_confirmed'
+		);
 		const cueLabel = screen.getByText( 'Saved' );
 		const cue = screen.getByLabelText(
 			'WordPress confirmed the update. Ready for new edits.'
@@ -1336,7 +1350,7 @@ describe( 'PostPublishButton', () => {
 			'true'
 		);
 		expect( cue ).not.toHaveAttribute(
-			'data-distributed-editing-save-control-journey-action-hint',
+			'data-distributed-editing-save-control-journey-action-hint'
 		);
 		expect( cue ).toHaveAttribute(
 			'data-distributed-editing-save-control-journey-action-required',
@@ -1358,5 +1372,103 @@ describe( 'PostPublishButton', () => {
 		await user.click( button );
 
 		expect( savePostStatus ).not.toHaveBeenCalled();
+	} );
+
+	it( 'should quiet an idle confirmed Distributed Editing Save button back to ordinary Save controls while retaining evidence', async () => {
+		const previousHoldMs =
+			globalThis.__experimentalDistributedEditingConfirmedSaveButtonHoldMs;
+		globalThis.__experimentalDistributedEditingConfirmedSaveButtonHoldMs = 1000;
+		jest.useFakeTimers();
+
+		try {
+			render(
+				<PostPublishButton
+					isSaveable
+					isPublishable
+					distributedEditingSaveButtonState={ {
+						status: 'retry_save_confirmed',
+						reason: 'retry_save_already_confirmed',
+						source: 'retry_save',
+						label: 'Save confirmed',
+						statusText: 'Distributed Editing Save confirmed.',
+						disabled: true,
+						authorityState: 'authoritative_update_confirmed',
+						localChangesState: 'authoritative_update_confirmed',
+						reviewCheckpointState: 'review_consumed',
+						authoritativePostState:
+							'authoritative_update_confirmed',
+						saveStateSummaryText: 'Ready for new edits.',
+						authoritativePostUpdated: true,
+						hasRetrySaveSavedStateEvidence: true,
+						hasProtectedLocalChanges: false,
+					} }
+					distributedEditingSaveJourneyState={ {
+						shouldExposeInSaveControls: true,
+						step: 'save_confirmed',
+						action: 'none',
+						title: 'Saved',
+						summary: 'WordPress confirmed the update.',
+						actionHint: null,
+						requiresActionBeforeSave: false,
+						statusChromeSummary: 'Ready for new edits.',
+						statusChromeAuthorityState:
+							'authoritative_update_confirmed',
+						statusChromeAuthorityText:
+							'The authoritative WordPress post has accepted the Distributed Editing Save.',
+						claimsSavedWithoutEvidence: false,
+					} }
+				/>
+			);
+
+			expect(
+				screen.getByRole( 'button', { name: 'Save confirmed' } )
+			).toHaveAttribute(
+				'data-distributed-editing-confirmed-save-button-quieted',
+				'false'
+			);
+
+			await act( async () => {
+				jest.advanceTimersByTime( 1000 );
+			} );
+
+			const quietedButton = screen.getByRole( 'button', {
+				name: 'Submit for Review',
+			} );
+			expect( quietedButton ).toHaveAttribute( 'aria-disabled', 'false' );
+			expect( quietedButton ).not.toHaveAttribute(
+				'data-distributed-editing-save-button-status'
+			);
+			expect( quietedButton ).toHaveAttribute(
+				'data-distributed-editing-confirmed-save-button-evidence-retained',
+				'true'
+			);
+			expect( quietedButton ).toHaveAttribute(
+				'data-distributed-editing-confirmed-save-button-quieted',
+				'true'
+			);
+			expect( quietedButton ).toHaveAttribute(
+				'data-distributed-editing-confirmed-save-button-original-status',
+				'retry_save_confirmed'
+			);
+			expect( quietedButton ).toHaveAttribute(
+				'data-distributed-editing-save-control-journey-step',
+				'ready_to_edit'
+			);
+			expect( quietedButton ).toHaveAttribute(
+				'title',
+				'Use Save when you are ready for WordPress to update this post. Save can update the authoritative WordPress post.'
+			);
+			expect( screen.queryByText( 'Saved' ) ).not.toBeInTheDocument();
+			expect( screen.getByText( 'Save is available' ) ).toBeVisible();
+		} finally {
+			jest.useRealTimers();
+
+			if ( previousHoldMs === undefined ) {
+				delete globalThis.__experimentalDistributedEditingConfirmedSaveButtonHoldMs;
+			} else {
+				globalThis.__experimentalDistributedEditingConfirmedSaveButtonHoldMs =
+					previousHoldMs;
+			}
+		}
 	} );
 } );

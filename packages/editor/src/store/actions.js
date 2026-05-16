@@ -819,9 +819,19 @@ export const __experimentalMaybeHandleDistributedEditingSaveButtonClick =
 			);
 		const shouldUseRetrySave =
 			select.shouldUseDistributedEditingRetrySaveForSavePost?.( options );
+		const shouldAllowConfirmedSaveNormalFallback = Boolean(
+			options.__experimentalAllowDistributedEditingConfirmedSaveNormalFallback &&
+				savePolicy.status ===
+					DISTRIBUTED_EDITING_SAVE_POLICY_STATUSES.RETRY_SAVE_CONFIRMED &&
+				savePolicy.saveButton?.hasRetrySaveSavedStateEvidence &&
+				savePolicy.saveButton?.authoritativePostUpdated &&
+				! savePolicy.saveButton?.hasProtectedLocalChanges &&
+				! savePolicy.saveButton?.pendingServerConfirmation
+		);
 		const shouldHandleDistributedEditingClick =
 			( shouldUseRiskyBlockReview || shouldUseRetrySave ) &&
-			Boolean( savePolicy.blocksNormalSavePost );
+			Boolean( savePolicy.blocksNormalSavePost ) &&
+			! shouldAllowConfirmedSaveNormalFallback;
 
 		if (
 			! shouldHandleDistributedEditingClick &&

@@ -2926,6 +2926,83 @@ describe( 'Post actions', () => {
 				claimsSaved: false,
 			} );
 		} );
+
+		it( 'allows an explicitly quieted confirmed Save button to fall back to ordinary Save routing when no local DE-RTC work is protected', async () => {
+			const post = {
+				id: postId,
+				type: 'post',
+				title: 'bar',
+				content: 'bar',
+				status: 'draft',
+			};
+			let apiCalls = 0;
+			apiFetch.setFetchHandler( () => {
+				apiCalls++;
+				return {};
+			} );
+
+			const registry = createRegistryWithStores();
+
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', post );
+			registry.dispatch( editorStore ).setupEditor( post );
+			registry.dispatch( editorStore ).updateEditorSettings( {
+				distributedEditing: {
+					enabled: true,
+					retrySaveHandoff: true,
+					riskyBlockReview: true,
+				},
+			} );
+			registry
+				.dispatch( editorStore )
+				.setDistributedEditingSessionState( {
+					retrySaveStatus:
+						DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVED,
+					retrySaveAccepted: true,
+					retrySaveServerVersion: '92',
+					retrySavePreviousServerVersion: '91',
+					retrySaveSavesPost: true,
+					retrySaveMutatesPostContent: true,
+					retrySaveCreatesRevision: true,
+					retrySaveClaimsSaved: true,
+					retrySaveRevisionCreated: true,
+					hasPendingChanges: false,
+					canExportLocalUpdates: false,
+				} );
+
+			await expect(
+				registry
+					.dispatch( editorStore )
+					.__experimentalMaybeHandleDistributedEditingSaveButtonClick()
+			).resolves.toMatchObject( {
+				status: 'distributed_editing_save_button_blocked',
+				reason: DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.RETRY_SAVE_ALREADY_CONFIRMED,
+				allowsNormalSaveFallback: false,
+				blocksNormalSavePost: true,
+				claimsSaved: true,
+			} );
+
+			await expect(
+				registry
+					.dispatch( editorStore )
+					.__experimentalMaybeHandleDistributedEditingSaveButtonClick(
+						{
+							__experimentalAllowDistributedEditingConfirmedSaveNormalFallback: true,
+						}
+					)
+			).resolves.toMatchObject( {
+				status: 'normal_save_fallback',
+				allowsNormalSaveFallback: true,
+				blocksNormalSavePost: false,
+				callsServerStateRefetchEndpoint: false,
+				callsNormalSavePost: false,
+				callsRetrySaveEndpoint: false,
+				claimsSaved: false,
+			} );
+
+			expect( apiCalls ).toBe( 0 );
+		} );
 	} );
 
 	describe( '__experimentalFocusDistributedEditingRiskyBlockReviewItem()', () => {

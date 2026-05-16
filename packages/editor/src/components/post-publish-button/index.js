@@ -19,6 +19,75 @@ import DistributedEditingSaveJourneyCue, {
 const noop = () => {};
 const DISTRIBUTED_EDITING_OPEN_PRE_PUBLISH_REVIEW_ACTION =
 	'open_pre_publish_review';
+const DISTRIBUTED_EDITING_CONFIRMED_SAVE_BUTTON_STATUS = 'retry_save_confirmed';
+const DISTRIBUTED_EDITING_CONFIRMED_SAVE_BUTTON_HOLD_MS = 7000;
+const DISTRIBUTED_EDITING_QUIETED_CONFIRMED_SAVE_JOURNEY_STATE = Object.freeze(
+	{
+		shouldExposeInSaveControls: true,
+		step: 'ready_to_edit',
+		action: 'edit',
+		title: 'Save is available',
+		summary:
+			'Use Save when you are ready for WordPress to update this post.',
+		statusChromeSummary:
+			'Save can update the authoritative WordPress post.',
+		statusChromeAuthorityState: 'ready_to_update_authoritative_post',
+		statusChromeAuthorityText:
+			'Save can update the authoritative WordPress post.',
+		claimsSavedWithoutEvidence: false,
+	}
+);
+
+function getDistributedEditingConfirmedSaveButtonHoldMs() {
+	const holdMs =
+		globalThis.__experimentalDistributedEditingConfirmedSaveButtonHoldMs;
+
+	if (
+		typeof holdMs === 'number' &&
+		Number.isFinite( holdMs ) &&
+		holdMs >= 0
+	) {
+		return holdMs;
+	}
+
+	return DISTRIBUTED_EDITING_CONFIRMED_SAVE_BUTTON_HOLD_MS;
+}
+
+function isQuietableDistributedEditingConfirmedSaveButtonState(
+	saveButtonState
+) {
+	return Boolean(
+		saveButtonState?.status ===
+			DISTRIBUTED_EDITING_CONFIRMED_SAVE_BUTTON_STATUS &&
+			saveButtonState.hasRetrySaveSavedStateEvidence &&
+			saveButtonState.authoritativePostUpdated &&
+			! saveButtonState.hasProtectedLocalChanges &&
+			! saveButtonState.pendingServerConfirmation
+	);
+}
+
+function getQuietableDistributedEditingConfirmedSaveButtonKey(
+	saveButtonState
+) {
+	if (
+		! isQuietableDistributedEditingConfirmedSaveButtonState(
+			saveButtonState
+		)
+	) {
+		return null;
+	}
+
+	return [
+		saveButtonState.status,
+		saveButtonState.reason || '',
+		saveButtonState.source || '',
+		saveButtonState.authorityState || '',
+		saveButtonState.localChangesState || '',
+		saveButtonState.reviewCheckpointState || '',
+		saveButtonState.authoritativePostState || '',
+		saveButtonState.saveStateSummaryText || '',
+	].join( ':' );
+}
 
 export class PostPublishButton extends Component {
 	constructor( props ) {
@@ -27,10 +96,78 @@ export class PostPublishButton extends Component {
 		this.createOnClick = this.createOnClick.bind( this );
 		this.closeEntitiesSavedStates =
 			this.closeEntitiesSavedStates.bind( this );
+		this.updateDistributedEditingConfirmedSaveButtonTimer =
+			this.updateDistributedEditingConfirmedSaveButtonTimer.bind( this );
 
 		this.state = {
 			entitiesSavedStatesCallback: false,
+			distributedEditingConfirmedSaveButtonKey: null,
+			isDistributedEditingConfirmedSaveButtonQuieted: false,
 		};
+	}
+
+	componentDidMount() {
+		this.updateDistributedEditingConfirmedSaveButtonTimer();
+	}
+
+	componentDidUpdate() {
+		this.updateDistributedEditingConfirmedSaveButtonTimer();
+	}
+
+	componentWillUnmount() {
+		clearTimeout( this.distributedEditingConfirmedSaveButtonTimer );
+	}
+
+	updateDistributedEditingConfirmedSaveButtonTimer() {
+		const nextConfirmedSaveButtonKey =
+			getQuietableDistributedEditingConfirmedSaveButtonKey(
+				this.props.distributedEditingSaveButtonState
+			);
+		const {
+			distributedEditingConfirmedSaveButtonKey:
+				currentConfirmedSaveButtonKey,
+			isDistributedEditingConfirmedSaveButtonQuieted,
+		} = this.state;
+
+		if ( ! nextConfirmedSaveButtonKey ) {
+			clearTimeout( this.distributedEditingConfirmedSaveButtonTimer );
+
+			if (
+				currentConfirmedSaveButtonKey ||
+				isDistributedEditingConfirmedSaveButtonQuieted
+			) {
+				this.setState( {
+					distributedEditingConfirmedSaveButtonKey: null,
+					isDistributedEditingConfirmedSaveButtonQuieted: false,
+				} );
+			}
+
+			return;
+		}
+
+		if ( nextConfirmedSaveButtonKey === currentConfirmedSaveButtonKey ) {
+			return;
+		}
+
+		clearTimeout( this.distributedEditingConfirmedSaveButtonTimer );
+		this.setState( {
+			distributedEditingConfirmedSaveButtonKey:
+				nextConfirmedSaveButtonKey,
+			isDistributedEditingConfirmedSaveButtonQuieted: false,
+		} );
+		this.distributedEditingConfirmedSaveButtonTimer = setTimeout( () => {
+			if (
+				getQuietableDistributedEditingConfirmedSaveButtonKey(
+					this.props.distributedEditingSaveButtonState
+				) !== nextConfirmedSaveButtonKey
+			) {
+				return;
+			}
+
+			this.setState( {
+				isDistributedEditingConfirmedSaveButtonQuieted: true,
+			} );
+		}, getDistributedEditingConfirmedSaveButtonHoldMs() );
 	}
 
 	createOnClick( callback ) {
@@ -130,76 +267,106 @@ export class PostPublishButton extends Component {
 			distributedEditingSaveButtonState,
 			distributedEditingSaveJourneyState,
 		} = this.props;
+		const isQuietableDistributedEditingConfirmedSaveButton =
+			isQuietableDistributedEditingConfirmedSaveButtonState(
+				distributedEditingSaveButtonState
+			);
+		const isDistributedEditingConfirmedSaveButtonQuieted = Boolean(
+			isQuietableDistributedEditingConfirmedSaveButton &&
+				this.state.isDistributedEditingConfirmedSaveButtonQuieted
+		);
+		const visibleDistributedEditingSaveButtonState =
+			isDistributedEditingConfirmedSaveButtonQuieted
+				? undefined
+				: distributedEditingSaveButtonState;
+		const visibleDistributedEditingSaveJourneyState =
+			isDistributedEditingConfirmedSaveButtonQuieted
+				? DISTRIBUTED_EDITING_QUIETED_CONFIRMED_SAVE_JOURNEY_STATE
+				: distributedEditingSaveJourneyState;
 		const hasDistributedEditingSaveButtonState = Boolean(
-			distributedEditingSaveButtonState?.status &&
-				distributedEditingSaveButtonState.status !== 'update_ready'
+			visibleDistributedEditingSaveButtonState?.status &&
+				visibleDistributedEditingSaveButtonState.status !==
+					'update_ready'
 		);
 		const shouldRouteDistributedEditingToggleClick = Boolean(
 			hasDistributedEditingSaveButtonState &&
-				distributedEditingSaveButtonState.clickAction &&
-				distributedEditingSaveButtonState.clickAction !==
+				visibleDistributedEditingSaveButtonState.clickAction &&
+				visibleDistributedEditingSaveButtonState.clickAction !==
 					DISTRIBUTED_EDITING_OPEN_PRE_PUBLISH_REVIEW_ACTION
 		);
 		const distributedEditingSaveButtonDisabled = Boolean(
 			hasDistributedEditingSaveButtonState &&
-				distributedEditingSaveButtonState.disabled
+				visibleDistributedEditingSaveButtonState.disabled
 		);
 		const distributedEditingSaveButtonBusy = Boolean(
 			hasDistributedEditingSaveButtonState &&
-				distributedEditingSaveButtonState.busy
+				visibleDistributedEditingSaveButtonState.busy
 		);
 		const distributedEditingSaveButtonStatusText =
 			hasDistributedEditingSaveButtonState
-				? distributedEditingSaveButtonState.statusText
+				? visibleDistributedEditingSaveButtonState.statusText
 				: undefined;
 		const hasDistributedEditingSaveJourneyState = Boolean(
-			distributedEditingSaveJourneyState?.shouldExposeInSaveControls
+			visibleDistributedEditingSaveJourneyState?.shouldExposeInSaveControls
 		);
 		const distributedEditingSaveButtonDataAttributes =
 			hasDistributedEditingSaveButtonState
 				? {
 						'data-distributed-editing-save-button-status':
-							distributedEditingSaveButtonState.status,
+							visibleDistributedEditingSaveButtonState.status,
 						'data-distributed-editing-save-button-source':
-							distributedEditingSaveButtonState.source ||
+							visibleDistributedEditingSaveButtonState.source ||
 							undefined,
 						'data-distributed-editing-save-button-click-action':
-							distributedEditingSaveButtonState.clickAction ||
+							visibleDistributedEditingSaveButtonState.clickAction ||
 							undefined,
 						'data-distributed-editing-save-button-reason':
-							distributedEditingSaveButtonState.reason ||
+							visibleDistributedEditingSaveButtonState.reason ||
 							undefined,
 						'data-distributed-editing-save-button-authority-state':
-							distributedEditingSaveButtonState.authorityState ||
+							visibleDistributedEditingSaveButtonState.authorityState ||
 							undefined,
 						'data-distributed-editing-save-button-local-changes-state':
-							distributedEditingSaveButtonState.localChangesState ||
+							visibleDistributedEditingSaveButtonState.localChangesState ||
 							undefined,
 						'data-distributed-editing-save-button-review-checkpoint-state':
-							distributedEditingSaveButtonState.reviewCheckpointState ||
+							visibleDistributedEditingSaveButtonState.reviewCheckpointState ||
 							undefined,
 						'data-distributed-editing-save-button-authoritative-post-state':
-							distributedEditingSaveButtonState.authoritativePostState ||
+							visibleDistributedEditingSaveButtonState.authoritativePostState ||
 							undefined,
 						'data-distributed-editing-save-button-state-summary':
-							distributedEditingSaveButtonState.saveStateSummaryText ||
+							visibleDistributedEditingSaveButtonState.saveStateSummaryText ||
 							undefined,
 						'data-distributed-editing-save-button-authoritative-post-updated':
 							String(
 								Boolean(
-									distributedEditingSaveButtonState.authoritativePostUpdated
+									visibleDistributedEditingSaveButtonState.authoritativePostUpdated
 								)
 							),
 				  }
 				: {};
+		const distributedEditingConfirmedSaveButtonDataAttributes =
+			isQuietableDistributedEditingConfirmedSaveButton
+				? {
+						'data-distributed-editing-confirmed-save-button-evidence-retained':
+							'true',
+						'data-distributed-editing-confirmed-save-button-quieted':
+							String(
+								isDistributedEditingConfirmedSaveButtonQuieted
+							),
+						'data-distributed-editing-confirmed-save-button-original-status':
+							distributedEditingSaveButtonState.status,
+				  }
+				: {};
 		const distributedEditingSaveJourneyDataAttributes =
 			getDistributedEditingSaveJourneyDataAttributes(
-				distributedEditingSaveJourneyState
+				visibleDistributedEditingSaveJourneyState
 			);
 		const distributedEditingSaveControlTitle =
 			hasDistributedEditingSaveJourneyState
 				? getDistributedEditingSaveJourneyTitle(
-						distributedEditingSaveJourneyState
+						visibleDistributedEditingSaveJourneyState
 				  )
 				: distributedEditingSaveButtonStatusText;
 
@@ -232,6 +399,19 @@ export class PostPublishButton extends Component {
 			if ( isButtonDisabled ) {
 				return;
 			}
+			const distributedEditingClickOptions =
+				isDistributedEditingConfirmedSaveButtonQuieted
+					? {
+							__experimentalAllowDistributedEditingConfirmedSaveNormalFallback: true,
+					  }
+					: undefined;
+
+			if ( distributedEditingClickOptions ) {
+				onSubmit( distributedEditingClickOptions );
+				savePostStatus( publishStatus, distributedEditingClickOptions );
+				return;
+			}
+
 			onSubmit();
 			savePostStatus( publishStatus );
 		};
@@ -250,6 +430,7 @@ export class PostPublishButton extends Component {
 
 		const buttonProps = {
 			...distributedEditingSaveButtonDataAttributes,
+			...distributedEditingConfirmedSaveButtonDataAttributes,
 			...distributedEditingSaveJourneyDataAttributes,
 			'aria-disabled': isButtonDisabled,
 			className: 'editor-post-publish-button',
@@ -264,6 +445,7 @@ export class PostPublishButton extends Component {
 
 		const toggleProps = {
 			...distributedEditingSaveButtonDataAttributes,
+			...distributedEditingConfirmedSaveButtonDataAttributes,
 			...distributedEditingSaveJourneyDataAttributes,
 			'aria-disabled': isToggleDisabled,
 			'aria-expanded': isOpen,
@@ -286,13 +468,15 @@ export class PostPublishButton extends Component {
 				>
 					<PublishButtonLabel
 						distributedEditingSaveButtonState={
-							distributedEditingSaveButtonState
+							visibleDistributedEditingSaveButtonState
 						}
 					/>
 				</Button>
 				<DistributedEditingSaveJourneyCue
 					className="editor-post-publish-button__distributed-editing-save-journey-cue"
-					saveJourneyState={ distributedEditingSaveJourneyState }
+					saveJourneyState={
+						visibleDistributedEditingSaveJourneyState
+					}
 				/>
 			</>
 		);
@@ -354,9 +538,11 @@ export default compose( [
 			savePost,
 		} = dispatch( editorStore );
 		return {
-			savePostStatus: async ( status ) => {
+			savePostStatus: async ( status, options = {} ) => {
 				const saveButtonClickRouting =
-					await __experimentalMaybeHandleDistributedEditingSaveButtonClick();
+					await __experimentalMaybeHandleDistributedEditingSaveButtonClick(
+						options
+					);
 
 				if ( ! saveButtonClickRouting.allowsNormalSaveFallback ) {
 					return saveButtonClickRouting;
