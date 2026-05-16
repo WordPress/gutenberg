@@ -3045,9 +3045,27 @@ export const __experimentalSaveDistributedEditingRetryAfterProof =
 						} );
 				}
 			}
+			const confirmedComparablePostContent =
+				retrySaveConfirmedResponse &&
+				typeof appliedPostContent === 'string'
+					? getDistributedEditingComparablePostContent(
+							appliedPostContent
+					  )
+					: null;
 			let nextSessionState =
 				getDistributedEditingSessionStateWithActionTranscriptEvent(
-					retrySaveResultSessionState,
+					{
+						...retrySaveResultSessionState,
+						...( typeof confirmedComparablePostContent ===
+							'string'
+							? {
+									clientBaseVersion:
+										retrySaveResultSessionState.retrySaveServerVersion ||
+										retrySaveResultSessionState.serverVersion,
+									clientBaseContent: null,
+							  }
+							: {} ),
+					},
 					{
 						eventType: retrySaveConfirmedResponse
 							? DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.SAVE_CONFIRMED
@@ -3085,6 +3103,7 @@ export const __experimentalSaveDistributedEditingRetryAfterProof =
 			) {
 				applyDistributedEditingConfirmedPostContent( {
 					dispatch,
+					registry,
 					select,
 					postContent: appliedPostContent,
 				} );
@@ -3186,6 +3205,7 @@ export const __experimentalSaveDistributedEditingRetryAfterProof =
 
 function applyDistributedEditingConfirmedPostContent( {
 	dispatch,
+	registry,
 	select,
 	postContent,
 } ) {
@@ -3210,6 +3230,29 @@ function applyDistributedEditingConfirmedPostContent( {
 	};
 
 	applyPostContent();
+	const currentPost = select.getCurrentPost?.() || {};
+	const postType = currentPost.type;
+	const postId = currentPost.id;
+
+	if ( postType && postId && typeof comparablePostContent === 'string' ) {
+		const currentContent = currentPost.content;
+		const nextContent =
+			currentContent && typeof currentContent === 'object'
+				? {
+						...currentContent,
+						raw: comparablePostContent,
+				  }
+				: comparablePostContent;
+
+		registry.dispatch( coreStore ).receiveEntityRecords(
+			'postType',
+			postType,
+			{
+				...currentPost,
+				content: nextContent,
+			}
+		);
+	}
 }
 
 function isDistributedEditingRetrySaveAppliedResponse( response = {} ) {

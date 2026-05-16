@@ -5731,12 +5731,19 @@ describe( 'Post actions', () => {
 				registry.select( editorStore ).getEditedPostContent()
 			).toBe( proposedPostContent );
 			expect(
+				registry.select( editorStore ).getCurrentPost()
+			).toMatchObject( {
+				content: proposedPostContent,
+			} );
+			expect(
 				registry
 					.select( editorStore )
 					.getDistributedEditingSessionState()
 			).toMatchObject( {
 				disposition: DISTRIBUTED_EDITING_DISPOSITIONS.IDLE,
 				reasonCode: null,
+				clientBaseVersion: '8',
+				clientBaseContent: null,
 				pendingChangeCount: 0,
 				hasPendingChanges: false,
 				isAwaitingServerConfirmation: false,
