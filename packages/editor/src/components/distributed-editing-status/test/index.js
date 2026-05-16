@@ -1426,31 +1426,76 @@ describe( 'DistributedEditingStatus', () => {
 				'Blocks were deleted in more than one place. Compare the starting post, latest WordPress version, and your local editor before choosing what to keep.'
 			)
 		).toBeVisible();
-		expect( within( summary ).getByText( 'Starting post' ) ).toBeVisible();
+		expect( summary ).toHaveAttribute(
+			'data-distributed-editing-structural-details-open',
+			'false'
+		);
+		const cueList = within( summary ).getByLabelText(
+			'Distributed editing structural change summary'
+		);
+		expect( cueList ).toBeVisible();
+		expect( within( cueList ).getByText( 'Starting post' ) ).toBeVisible();
 		expect(
-			within( summary ).getByText( 'Latest from WordPress' )
+			within( cueList ).getByText( 'Latest from WordPress' )
 		).toBeVisible();
 		expect(
-			within( summary ).getByText( 'Your local editor' )
+			within( cueList ).getByText( 'Your local editor' )
 		).toBeVisible();
 		expect(
-			within( summary ).getAllByText( 'Base alpha.' )
+			within( cueList ).getByText( 'Original structure' )
+		).toBeVisible();
+		expect(
+			within( cueList ).getAllByText( 'Deletes 1 block' )
+		).toHaveLength( 2 );
+		const detailsToggle = within( summary ).getByRole( 'button', {
+			name: 'Show block details',
+		} );
+		expect( detailsToggle ).toBeVisible();
+		expect( detailsToggle ).toHaveAttribute( 'aria-expanded', 'false' );
+		// eslint-disable-next-line testing-library/no-node-access
+		const detailsPanel = summary.querySelector(
+			'[data-distributed-editing-structural-details-panel="true"]'
+		);
+		expect( detailsPanel ).not.toBeVisible();
+		expect(
+			within( detailsPanel ).getAllByText( 'Base alpha.' )
 		).toHaveLength( 2 );
 		expect(
-			within( summary ).getByText( 'Base beta.' )
-		).toBeVisible();
+			within( detailsPanel ).getByText( 'Base beta.' )
+		).not.toBeVisible();
 		expect(
-			within( summary ).getByText( 'Local keeps beta.' )
-		).toBeVisible();
+			within( detailsPanel ).getByText( 'Local keeps beta.' )
+		).not.toBeVisible();
+
+		fireEvent.click( detailsToggle );
+
+		expect( summary ).toHaveAttribute(
+			'data-distributed-editing-structural-details-open',
+			'true'
+		);
 		expect(
-			within( summary ).getByText( 'Original structure' )
-		).toBeVisible();
+			within( summary ).getByRole( 'button', {
+				name: 'Hide block details',
+			} )
+		).toHaveAttribute( 'aria-expanded', 'true' );
+		expect( detailsPanel ).toBeVisible();
 		expect(
-			within( summary ).getAllByText( 'Deletes 1 block' )
+			within( detailsPanel ).getAllByText( 'Base alpha.' )
 		).toHaveLength( 2 );
-		expect( within( summary ).getByText( 'Blocks deleted' ) ).toBeVisible();
 		expect(
-			within( summary ).getAllByText( '-1 block' )
+			within( detailsPanel ).getByText( 'Base beta.' )
+		).toBeVisible();
+		expect(
+			within( detailsPanel ).getByText( 'Local keeps beta.' )
+		).toBeVisible();
+		expect(
+			within( detailsPanel ).getAllByText( 'Deletes 1 block' )
+		).toHaveLength( 2 );
+		expect(
+			within( detailsPanel ).getByText( 'Blocks deleted' )
+		).toBeVisible();
+		expect(
+			within( detailsPanel ).getAllByText( '-1 block' )
 		).toHaveLength( 2 );
 		expect(
 			within( summary ).getByRole( 'button', {
@@ -1503,25 +1548,29 @@ describe( 'DistributedEditingStatus', () => {
 			name: 'Distributed editing structural conflict summary',
 		} );
 
+		const insertedCueList = within( insertedSummary ).getByLabelText(
+			'Distributed editing structural change summary'
+		);
+
 		expect(
-			within( insertedSummary ).getAllByText( 'Adds 1 block' )
+			within( insertedCueList ).getAllByText( 'Adds 1 block' )
 		).toHaveLength( 2 );
 
 		// eslint-disable-next-line testing-library/no-node-access
-		const insertedColumns = insertedSummary.querySelectorAll(
-			'[data-distributed-editing-structural-conflict-row-change-kind]'
+		const insertedCues = insertedSummary.querySelectorAll(
+			'[data-distributed-editing-structural-cue-change-kind]'
 		);
 		expect(
-			Array.from( insertedColumns ).map( ( column ) =>
-				column.getAttribute(
-					'data-distributed-editing-structural-conflict-row-change-kind'
+			Array.from( insertedCues ).map( ( cue ) =>
+				cue.getAttribute(
+					'data-distributed-editing-structural-cue-change-kind'
 				)
 			)
 		).toEqual( [ 'base', 'blocks_added', 'blocks_added' ] );
 		expect(
-			Array.from( insertedColumns ).map( ( column ) =>
-				column.getAttribute(
-					'data-distributed-editing-structural-conflict-row-count-delta'
+			Array.from( insertedCues ).map( ( cue ) =>
+				cue.getAttribute(
+					'data-distributed-editing-structural-cue-count-delta'
 				)
 			)
 		).toEqual( [ '0', '1', '1' ] );
@@ -1560,25 +1609,29 @@ describe( 'DistributedEditingStatus', () => {
 			name: 'Distributed editing structural conflict summary',
 		} );
 
+		const reorderedCueList = within( reorderedSummary ).getByLabelText(
+			'Distributed editing structural change summary'
+		);
+
 		expect(
-			within( reorderedSummary ).getAllByText( 'Reordered' )
+			within( reorderedCueList ).getAllByText( 'Reordered' )
 		).toHaveLength( 2 );
 
 		// eslint-disable-next-line testing-library/no-node-access
-		const reorderedColumns = reorderedSummary.querySelectorAll(
-			'[data-distributed-editing-structural-conflict-row-change-kind]'
+		const reorderedCues = reorderedSummary.querySelectorAll(
+			'[data-distributed-editing-structural-cue-change-kind]'
 		);
 		expect(
-			Array.from( reorderedColumns ).map( ( column ) =>
-				column.getAttribute(
-					'data-distributed-editing-structural-conflict-row-change-kind'
+			Array.from( reorderedCues ).map( ( cue ) =>
+				cue.getAttribute(
+					'data-distributed-editing-structural-cue-change-kind'
 				)
 			)
 		).toEqual( [ 'base', 'blocks_reordered', 'blocks_reordered' ] );
 		expect(
-			Array.from( reorderedColumns ).map( ( column ) =>
-				column.getAttribute(
-					'data-distributed-editing-structural-conflict-row-count-delta'
+			Array.from( reorderedCues ).map( ( cue ) =>
+				cue.getAttribute(
+					'data-distributed-editing-structural-cue-count-delta'
 				)
 			)
 		).toEqual( [ '0', '0', '0' ] );

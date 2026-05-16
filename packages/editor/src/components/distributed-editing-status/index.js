@@ -4,7 +4,13 @@
 import { Button, Notice, TextareaControl } from '@wordpress/components';
 import { parse } from '@wordpress/blocks';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
+import {
+	useCallback,
+	useEffect,
+	useId,
+	useRef,
+	useState,
+} from '@wordpress/element';
 import { __, _n, sprintf } from '@wordpress/i18n';
 
 /**
@@ -2697,6 +2703,9 @@ function DistributedEditingStructuralConflictSummary( {
 } ) {
 	const [ previewSnapshotId, setPreviewSnapshotId ] = useState( null );
 	const [ appliedSnapshotId, setAppliedSnapshotId ] = useState( null );
+	const [ areStructureDetailsOpen, setAreStructureDetailsOpen ] =
+		useState( false );
+	const structuralDetailsId = useId();
 
 	if ( ! summary ) {
 		return null;
@@ -2805,6 +2814,10 @@ function DistributedEditingStructuralConflictSummary( {
 			data-distributed-editing-structural-conflict-server-count-delta={
 				summary.serverCountDelta
 			}
+			data-distributed-editing-structural-details-calls-save="false"
+			data-distributed-editing-structural-details-open={ formatDataBoolean(
+				areStructureDetailsOpen
+			) }
 			data-distributed-editing-structural-choice-calls-rest="false"
 			data-distributed-editing-structural-choice-calls-save="false"
 			data-distributed-editing-structural-choice-changes-post-lock="false"
@@ -2863,85 +2876,147 @@ function DistributedEditingStructuralConflictSummary( {
 				<strong>{ __( 'Compare block structure' ) }</strong>
 				<p>{ getStructuralConflictMessage( summary ) }</p>
 			</div>
-			<div className="editor-distributed-editing-status__structural-conflict-grid">
+			<ul
+				aria-label={ __(
+					'Distributed editing structural change summary'
+				) }
+				className="editor-distributed-editing-status__structural-conflict-cues"
+				data-distributed-editing-structural-cue-list="true"
+			>
 				{ summary.snapshots.map( ( snapshot ) => (
-					<div
-						className="editor-distributed-editing-status__structural-conflict-column"
-						data-distributed-editing-structural-conflict-row={
-							snapshot.id
-						}
-						data-distributed-editing-structural-conflict-row-block-count={
+					<li
+						className="editor-distributed-editing-status__structural-conflict-cue"
+						data-distributed-editing-structural-cue={ snapshot.id }
+						data-distributed-editing-structural-cue-block-count={
 							snapshot.blockCount
 						}
-						data-distributed-editing-structural-conflict-row-change-kind={
+						data-distributed-editing-structural-cue-change-kind={
 							snapshot.changeCue.kind
 						}
-						data-distributed-editing-structural-conflict-row-count-delta={
+						data-distributed-editing-structural-cue-count-delta={
 							snapshot.changeCue.countDelta
 						}
 						key={ snapshot.id }
 					>
-						<div className="editor-distributed-editing-status__structural-conflict-column-header">
-							<strong>{ snapshot.label }</strong>
-							<span>
-								{ getStructuralConflictBlockCountLabel(
-									snapshot.blockCount
-								) }
-							</span>
-						</div>
-						<span className="editor-distributed-editing-status__structural-conflict-change-cue">
-							{ snapshot.changeCue.label }
+						<span className="editor-distributed-editing-status__structural-conflict-cue-version">
+							{ snapshot.label }
 						</span>
-						<ul className="editor-distributed-editing-status__structural-conflict-samples">
-							{ snapshot.sampleTexts.map( ( text, index ) => (
-								<li
-									data-distributed-editing-structural-conflict-sample={
-										snapshot.id
-									}
-									key={ `${ snapshot.id }-${ index }` }
-								>
-									{ text }
-								</li>
-							) ) }
-							{ snapshot.overflowCount > 0 && (
-								<li className="editor-distributed-editing-status__structural-conflict-overflow">
-									{ sprintf(
-										/* translators: %d: number of additional blocks not shown in the compact structural summary. */
-										_n(
-											'%d more block not shown',
-											'%d more blocks not shown',
-											snapshot.overflowCount
-										),
-										snapshot.overflowCount
-									) }
-								</li>
+						<strong className="editor-distributed-editing-status__structural-conflict-cue-change">
+							{ snapshot.changeCue.label }
+						</strong>
+						<span className="editor-distributed-editing-status__structural-conflict-cue-count">
+							{ getStructuralConflictBlockCountLabel(
+								snapshot.blockCount
 							) }
-						</ul>
-					</div>
+						</span>
+					</li>
 				) ) }
+			</ul>
+			<Button
+				__next40pxDefaultSize
+				aria-controls={ structuralDetailsId }
+				aria-expanded={ areStructureDetailsOpen }
+				className="editor-distributed-editing-status__structural-conflict-details-toggle"
+				data-distributed-editing-structural-details-toggle="true"
+				data-distributed-editing-structural-details-toggle-calls-save="false"
+				onClick={ () =>
+					setAreStructureDetailsOpen(
+						( isCurrentlyOpen ) => ! isCurrentlyOpen
+					)
+				}
+				type="button"
+				variant="tertiary"
+			>
+				{ areStructureDetailsOpen
+					? __( 'Hide block details' )
+					: __( 'Show block details' ) }
+			</Button>
+			<div
+				className="editor-distributed-editing-status__structural-conflict-details"
+				data-distributed-editing-structural-details-panel="true"
+				hidden={ ! areStructureDetailsOpen }
+				id={ structuralDetailsId }
+			>
+				<div className="editor-distributed-editing-status__structural-conflict-grid">
+					{ summary.snapshots.map( ( snapshot ) => (
+						<div
+							className="editor-distributed-editing-status__structural-conflict-column"
+							data-distributed-editing-structural-conflict-row={
+								snapshot.id
+							}
+							data-distributed-editing-structural-conflict-row-block-count={
+								snapshot.blockCount
+							}
+							data-distributed-editing-structural-conflict-row-change-kind={
+								snapshot.changeCue.kind
+							}
+							data-distributed-editing-structural-conflict-row-count-delta={
+								snapshot.changeCue.countDelta
+							}
+							key={ snapshot.id }
+						>
+							<div className="editor-distributed-editing-status__structural-conflict-column-header">
+								<strong>{ snapshot.label }</strong>
+								<span>
+									{ getStructuralConflictBlockCountLabel(
+										snapshot.blockCount
+									) }
+								</span>
+							</div>
+							<span className="editor-distributed-editing-status__structural-conflict-change-cue">
+								{ snapshot.changeCue.label }
+							</span>
+							<ul className="editor-distributed-editing-status__structural-conflict-samples">
+								{ snapshot.sampleTexts.map( ( text, index ) => (
+									<li
+										data-distributed-editing-structural-conflict-sample={
+											snapshot.id
+										}
+										key={ `${ snapshot.id }-${ index }` }
+									>
+										{ text }
+									</li>
+								) ) }
+								{ snapshot.overflowCount > 0 && (
+									<li className="editor-distributed-editing-status__structural-conflict-overflow">
+										{ sprintf(
+											/* translators: %d: number of additional blocks not shown in the compact structural summary. */
+											_n(
+												'%d more block not shown',
+												'%d more blocks not shown',
+												snapshot.overflowCount
+											),
+											snapshot.overflowCount
+										) }
+									</li>
+								) }
+							</ul>
+						</div>
+					) ) }
+				</div>
+				<dl className="editor-distributed-editing-status__structural-conflict-counts">
+					<div>
+						<dt>{ __( 'Latest WordPress count change' ) }</dt>
+						<dd>
+							{ getStructuralConflictCountDeltaLabel(
+								summary.serverCountDelta
+							) }
+						</dd>
+					</div>
+					<div>
+						<dt>{ __( 'Local editor count change' ) }</dt>
+						<dd>
+							{ getStructuralConflictCountDeltaLabel(
+								summary.localCountDelta
+							) }
+						</dd>
+					</div>
+					<div>
+						<dt>{ __( 'Reason' ) }</dt>
+						<dd>{ summary.reasonLabel }</dd>
+					</div>
+				</dl>
 			</div>
-			<dl className="editor-distributed-editing-status__structural-conflict-counts">
-				<div>
-					<dt>{ __( 'Latest WordPress count change' ) }</dt>
-					<dd>
-						{ getStructuralConflictCountDeltaLabel(
-							summary.serverCountDelta
-						) }
-					</dd>
-				</div>
-				<div>
-					<dt>{ __( 'Local editor count change' ) }</dt>
-					<dd>
-						{ getStructuralConflictCountDeltaLabel(
-							summary.localCountDelta
-						) }
-					</dd>
-				</div>
-				<div>
-					<dt>{ __( 'Reason' ) }</dt>
-					<dd>{ summary.reasonLabel }</dd>
-				</div>
-			</dl>
 			<div className="editor-distributed-editing-status__structural-conflict-preview-actions">
 				<Button
 					__next40pxDefaultSize
