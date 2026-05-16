@@ -2001,6 +2001,7 @@ function DistributedEditingSameBlockConflictComparison( {
 		: __(
 				'This editor and WordPress changed the same block. Choose the local version or the latest WordPress version before trying Save again.'
 		  );
+	const showGuide = ! isPreparedComparisonCompact;
 	const visibleGuideSteps = isPreparedComparisonCompact ? [] : guideSteps;
 	const comparisonActionsLayout = isPreparedComparisonCompact
 		? 'prepared_recovery_inline'
@@ -2073,6 +2074,9 @@ function DistributedEditingSameBlockConflictComparison( {
 			) }
 			data-distributed-editing-conflict-comparison-guide-steps-visible={ formatDataBoolean(
 				! isPreparedComparisonCompact
+			) }
+			data-distributed-editing-conflict-comparison-guide-visible={ formatDataBoolean(
+				showGuide
 			) }
 			data-distributed-editing-conflict-comparison-header-mode={
 				isPreparedComparisonCompact
@@ -2151,48 +2155,36 @@ function DistributedEditingSameBlockConflictComparison( {
 				<strong>{ comparisonHeaderTitle }</strong>
 				<p>{ comparisonHeaderMessage }</p>
 			</div>
-			<div
-				aria-live="polite"
-				className="editor-distributed-editing-status__conflict-comparison-guide"
-				data-distributed-editing-conflict-resolution-guide={
-					guide.status
-				}
-			>
-				<strong>{ guide.title }</strong>
-				<p>{ guide.message }</p>
-				{ visibleGuideSteps.length > 0 && (
-					<ol className="editor-distributed-editing-status__conflict-comparison-steps">
-						{ visibleGuideSteps.map( ( step ) => (
-							<li
-								className="editor-distributed-editing-status__conflict-comparison-step"
-								data-distributed-editing-conflict-resolution-step={
-									step.id
-								}
-								data-distributed-editing-conflict-resolution-step-current={ formatDataBoolean(
-									step.isCurrent
-								) }
-								key={ step.id }
-							>
-								{ step.label }
-							</li>
-						) ) }
-					</ol>
-				) }
-				{ comparison.saveReady && (
-					<div
-						className="editor-distributed-editing-status__conflict-comparison-save-cue"
-						data-distributed-editing-conflict-resolution-save-cue="ready"
-						role="status"
-					>
-						<strong>{ __( 'Editor Save is ready' ) }</strong>
-						<span>
-							{ __(
-								'Use the editor Save button to send this guarded update. This conflict choice has not changed the WordPress post yet.'
-							) }
-						</span>
-					</div>
-				) }
-			</div>
+			{ showGuide && (
+				<div
+					aria-live="polite"
+					className="editor-distributed-editing-status__conflict-comparison-guide"
+					data-distributed-editing-conflict-resolution-guide={
+						guide.status
+					}
+				>
+					<strong>{ guide.title }</strong>
+					<p>{ guide.message }</p>
+					{ visibleGuideSteps.length > 0 && (
+						<ol className="editor-distributed-editing-status__conflict-comparison-steps">
+							{ visibleGuideSteps.map( ( step ) => (
+								<li
+									className="editor-distributed-editing-status__conflict-comparison-step"
+									data-distributed-editing-conflict-resolution-step={
+										step.id
+									}
+									data-distributed-editing-conflict-resolution-step-current={ formatDataBoolean(
+										step.isCurrent
+									) }
+									key={ step.id }
+								>
+									{ step.label }
+								</li>
+							) ) }
+						</ol>
+					) }
+				</div>
+			) }
 			<div
 				className={
 					isPreparedComparisonCompact

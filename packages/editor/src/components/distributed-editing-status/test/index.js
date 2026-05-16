@@ -1030,6 +1030,10 @@ describe( 'DistributedEditingStatus', () => {
 			'true'
 		);
 		expect( comparison ).toHaveAttribute(
+			'data-distributed-editing-conflict-comparison-guide-visible',
+			'true'
+		);
+		expect( comparison ).toHaveAttribute(
 			'data-distributed-editing-conflict-comparison-choice-control-mode',
 			'choose_between_versions'
 		);
@@ -1600,6 +1604,10 @@ describe( 'DistributedEditingStatus', () => {
 			'false'
 		);
 		expect( comparison ).toHaveAttribute(
+			'data-distributed-editing-conflict-comparison-guide-visible',
+			'false'
+		);
+		expect( comparison ).toHaveAttribute(
 			'data-distributed-editing-conflict-comparison-prepared-compact',
 			'true'
 		);
@@ -1654,18 +1662,23 @@ describe( 'DistributedEditingStatus', () => {
 				'This editor and WordPress changed the same block. Choose the local version or the latest WordPress version before trying Save again.'
 			)
 		).not.toBeInTheDocument();
-		expect( screen.getByText( 'Save is prepared' ) ).toBeVisible();
+		expect( screen.getByText( 'Save prepared' ) ).toBeVisible();
 		expect(
-			screen.getByText(
+			screen.queryByText(
 				'Use the editor Save button to update WordPress. Local changes remain pending until WordPress confirms.'
 			)
-		).toBeVisible();
-		expect( screen.getByText( 'Editor Save is ready' ) ).toBeVisible();
+		).not.toBeInTheDocument();
 		expect(
-			screen.getByText(
+			within( comparison ).queryByText( 'Save is prepared' )
+		).not.toBeInTheDocument();
+		expect(
+			within( comparison ).queryByText( 'Editor Save is ready' )
+		).not.toBeInTheDocument();
+		expect(
+			within( comparison ).queryByText(
 				'Use the editor Save button to send this guarded update. This conflict choice has not changed the WordPress post yet.'
 			)
-		).toBeVisible();
+		).not.toBeInTheDocument();
 		expect(
 			within( comparison ).queryByRole( 'button', {
 				name: 'Prepare Save',
