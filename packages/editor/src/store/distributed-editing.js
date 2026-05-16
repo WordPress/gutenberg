@@ -16526,6 +16526,18 @@ function getSerializedBlockLocalRebaseCandidate( {
 		};
 	}
 
+	const edgeInsertionCandidate = getSerializedBlockEdgeInsertionRebaseCandidate(
+		{
+			baseBlocks,
+			serverBlocks,
+			localBlocks,
+		}
+	);
+
+	if ( edgeInsertionCandidate ) {
+		return edgeInsertionCandidate;
+	}
+
 	if (
 		baseBlocks.blocks.length !== serverBlocks.blocks.length ||
 		baseBlocks.blocks.length !== localBlocks.blocks.length
@@ -16587,6 +16599,106 @@ function getSerializedBlockLocalRebaseCandidate( {
 		candidatePostContent: mergedBlocks.join( mergedBlockSeparator ),
 		mergedBlockCount: mergedBlocks.length,
 	};
+}
+
+function getSerializedBlockEdgeInsertionRebaseCandidate( {
+	baseBlocks,
+	serverBlocks,
+	localBlocks,
+} ) {
+	const serverInserted =
+		serverBlocks.blocks.length > baseBlocks.blocks.length &&
+		localBlocks.blocks.length === baseBlocks.blocks.length;
+	const localInserted =
+		localBlocks.blocks.length > baseBlocks.blocks.length &&
+		serverBlocks.blocks.length === baseBlocks.blocks.length;
+
+	if ( ! serverInserted && ! localInserted ) {
+		return null;
+	}
+
+	const insertingBlocks = serverInserted ? serverBlocks : localBlocks;
+	const stableBlocks = serverInserted ? localBlocks : serverBlocks;
+	const insertion = getSerializedBlockEdgeInsertion(
+		baseBlocks.blocks,
+		insertingBlocks.blocks
+	);
+
+	if ( ! insertion ) {
+		return null;
+	}
+
+	if (
+		isPureSerializedBlockReorder(
+			baseBlocks.blocks,
+			stableBlocks.blocks
+		)
+	) {
+		return {
+			status: 'manual_conflict_required',
+			reason: 'block_reordered',
+		};
+	}
+
+	const mergedBlocks = [];
+
+	if ( insertion.position === 'prepend' ) {
+		mergedBlocks.push( ...insertion.blocks );
+	}
+
+	for ( let index = 0; index < baseBlocks.blocks.length; index++ ) {
+		const baseBlock = baseBlocks.blocks[ index ];
+		const stableBlock = stableBlocks.blocks[ index ];
+
+		mergedBlocks.push( stableBlock !== baseBlock ? stableBlock : baseBlock );
+	}
+
+	if ( insertion.position === 'append' ) {
+		mergedBlocks.push( ...insertion.blocks );
+	}
+
+	const mergedBlockSeparator = getSerializedBlockMergeSeparator(
+		baseBlocks,
+		serverBlocks,
+		localBlocks
+	);
+
+	return {
+		status: 'rebased',
+		candidatePostContent: mergedBlocks.join( mergedBlockSeparator ),
+		mergedBlockCount: mergedBlocks.length,
+	};
+}
+
+function getSerializedBlockEdgeInsertion( baseBlocks, candidateBlocks ) {
+	if ( candidateBlocks.length <= baseBlocks.length ) {
+		return null;
+	}
+
+	const insertedCount = candidateBlocks.length - baseBlocks.length;
+	const matchesPrefix = baseBlocks.every(
+		( block, index ) => block === candidateBlocks[ index ]
+	);
+
+	if ( matchesPrefix ) {
+		return {
+			position: 'append',
+			blocks: candidateBlocks.slice( baseBlocks.length ),
+		};
+	}
+
+	const matchesSuffix = baseBlocks.every(
+		( block, index ) => block === candidateBlocks[ index + insertedCount ]
+	);
+
+	if ( matchesSuffix ) {
+		return {
+			position: 'prepend',
+			blocks: candidateBlocks.slice( 0, insertedCount ),
+		};
+	}
+
+	return null;
 }
 
 function getSerializedBlockMergeSeparator(
