@@ -16628,6 +16628,13 @@ function getSerializedBlockEdgeInsertionRebaseCandidate( {
 		return null;
 	}
 
+	if ( insertion.position === 'ambiguous' ) {
+		return {
+			status: 'manual_conflict_required',
+			reason: 'block_inserted',
+		};
+	}
+
 	if (
 		isPureSerializedBlockReorder(
 			baseBlocks.blocks,
@@ -16679,6 +16686,16 @@ function getSerializedBlockEdgeInsertion( baseBlocks, candidateBlocks ) {
 	const matchesPrefix = baseBlocks.every(
 		( block, index ) => block === candidateBlocks[ index ]
 	);
+	const matchesSuffix = baseBlocks.every(
+		( block, index ) => block === candidateBlocks[ index + insertedCount ]
+	);
+
+	if ( matchesPrefix && matchesSuffix ) {
+		return {
+			position: 'ambiguous',
+			blocks: [],
+		};
+	}
 
 	if ( matchesPrefix ) {
 		return {
@@ -16686,10 +16703,6 @@ function getSerializedBlockEdgeInsertion( baseBlocks, candidateBlocks ) {
 			blocks: candidateBlocks.slice( baseBlocks.length ),
 		};
 	}
-
-	const matchesSuffix = baseBlocks.every(
-		( block, index ) => block === candidateBlocks[ index + insertedCount ]
-	);
 
 	if ( matchesSuffix ) {
 		return {

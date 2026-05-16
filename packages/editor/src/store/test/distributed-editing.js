@@ -2960,6 +2960,33 @@ describe( 'distributed editing session state', () => {
 		} );
 	} );
 
+	it( 'keeps ambiguous edge insertions as manual conflicts when repeated blocks hide insertion direction', () => {
+		const repeatedBlock =
+			'<!-- wp:paragraph --><p>Repeated</p><!-- /wp:paragraph -->';
+		const baseContent = repeatedBlock + repeatedBlock;
+		const serverContent =
+			repeatedBlock +
+			'<!-- wp:paragraph --><p>Remote repeated edit</p><!-- /wp:paragraph -->';
+		const localContent = repeatedBlock + repeatedBlock + repeatedBlock;
+		const result = getDistributedEditingStaleBaseLocalRebaseResult( {
+			currentSessionState: getReadyStaleBaseLocalRebaseSessionState(),
+			clientBaseContent: baseContent,
+			serverContent,
+			localContent,
+		} );
+
+		expect( result ).toMatchObject( {
+			status: DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.MANUAL_CONFLICT_REQUIRED,
+			reason: 'block_inserted',
+			hasCandidatePostContent: false,
+			readyToRetrySubmit: false,
+			requiresManualConflictResolution: true,
+			sessionState: {
+				localRebaseResultReason: 'block_inserted',
+			},
+		} );
+	} );
+
 	it( 'rebases one-sided serialized block deletion', () => {
 		const baseContent =
 			'<!-- wp:paragraph --><p>Alpha</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Beta</p><!-- /wp:paragraph -->';
