@@ -2291,6 +2291,11 @@ function DistributedEditingSameBlockConflictComparison( {
 					{ comparison.canRequestFreshProof && (
 						<Button
 							__next40pxDefaultSize
+							data-distributed-editing-conflict-action="check_choice"
+							data-distributed-editing-conflict-action-does-not-save="true"
+							title={ __(
+								'Ask WordPress to check this choice. This does not save the post.'
+							) }
 							variant="secondary"
 							onClick={ () =>
 								onRequestFreshProof?.( actionItem )
@@ -2302,6 +2307,11 @@ function DistributedEditingSameBlockConflictComparison( {
 					{ comparison.canPrepareSave && (
 						<Button
 							__next40pxDefaultSize
+							data-distributed-editing-conflict-action="prepare_save"
+							data-distributed-editing-conflict-action-does-not-save="true"
+							title={ __(
+								'Prepare this checked choice for the editor Save button. This does not save the post.'
+							) }
 							variant="primary"
 							onClick={ () => onPrepareSave?.( actionItem ) }
 						>

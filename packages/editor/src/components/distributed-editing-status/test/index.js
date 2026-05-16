@@ -1414,17 +1414,24 @@ describe( 'DistributedEditingStatus', () => {
 			} )
 		).toHaveAttribute( 'aria-pressed', 'false' );
 		expect( screen.getByText( 'Selected' ) ).toBeVisible();
-		expect(
-			within( comparison ).getByRole( 'button', {
-				name: 'Check this choice',
-			} )
-		).toBeVisible();
-
-		await user.click(
-			within( comparison ).getByRole( 'button', {
-				name: 'Check this choice',
-			} )
+		const checkChoiceButton = within( comparison ).getByRole( 'button', {
+			name: 'Check this choice',
+		} );
+		expect( checkChoiceButton ).toBeVisible();
+		expect( checkChoiceButton ).toHaveAttribute(
+			'data-distributed-editing-conflict-action',
+			'check_choice'
 		);
+		expect( checkChoiceButton ).toHaveAttribute(
+			'data-distributed-editing-conflict-action-does-not-save',
+			'true'
+		);
+		expect( checkChoiceButton ).toHaveAttribute(
+			'title',
+			'Ask WordPress to check this choice. This does not save the post.'
+		);
+
+		await user.click( checkChoiceButton );
 
 		expect(
 			actions.__experimentalRefreshDistributedEditingRetrySubmitProof
@@ -1523,12 +1530,23 @@ describe( 'DistributedEditingStatus', () => {
 				name: 'Check this choice',
 			} )
 		).not.toBeInTheDocument();
-
-		await user.click(
-			within( comparison ).getByRole( 'button', {
-				name: 'Prepare Save',
-			} )
+		const prepareSaveButton = within( comparison ).getByRole( 'button', {
+			name: 'Prepare Save',
+		} );
+		expect( prepareSaveButton ).toHaveAttribute(
+			'data-distributed-editing-conflict-action',
+			'prepare_save'
 		);
+		expect( prepareSaveButton ).toHaveAttribute(
+			'data-distributed-editing-conflict-action-does-not-save',
+			'true'
+		);
+		expect( prepareSaveButton ).toHaveAttribute(
+			'title',
+			'Prepare this checked choice for the editor Save button. This does not save the post.'
+		);
+
+		await user.click( prepareSaveButton );
 
 		expect(
 			actions.__experimentalPrepareDistributedEditingRetrySubmitSaveAfterProof
