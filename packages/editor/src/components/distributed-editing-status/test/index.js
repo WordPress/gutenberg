@@ -1583,6 +1583,75 @@ describe( 'DistributedEditingStatus', () => {
 		).not.toBeInTheDocument();
 	} );
 
+	it( 'hides stale same-block conflict comparison after WordPress confirms Save', () => {
+		setupDistributedEditingStatusDispatch();
+
+		setupDistributedEditingStatusSelect( {
+			currentPost: { id: 42, type: 'post' },
+			editedPostContent:
+				'<!-- wp:paragraph --><p>Saved conflict choice.</p><!-- /wp:paragraph -->',
+			sessionState: {
+				disposition: DISTRIBUTED_EDITING_DISPOSITIONS.IDLE,
+				reasonCode: null,
+				pendingChangeCount: 0,
+				hasPendingChanges: false,
+				canExportLocalUpdates: false,
+				localRebaseResultStatus:
+					DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.MANUAL_CONFLICT_REQUIRED,
+				localRebaseResultReason: 'same_block_changed',
+				staleBaseConflictResolutionStatus:
+					DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_STATUSES.LOCAL_VERSION_SELECTED,
+				staleBaseConflictResolutionChoice:
+					DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_CHOICES.LOCAL,
+				staleBaseConflictResolutionRequiresFreshProof: false,
+				retrySubmitProofStatus:
+					DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.ACCEPTED_FOR_FUTURE_SAVE,
+				retrySubmitAccepted: true,
+				retrySubmitSavePathRequired: true,
+				retrySubmitSaveStatus:
+					DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.READY,
+				retrySubmitSavePrepared: true,
+				retrySubmitSaveReady: true,
+				retrySaveStatus: DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVED,
+				retrySaveAccepted: true,
+				retrySaveServerVersion: '8',
+				retrySavePreviousServerVersion: '7',
+				retrySaveSavesPost: true,
+				retrySaveMutatesPostContent: true,
+				retrySaveCreatesRevision: true,
+				retrySaveClaimsSaved: true,
+				retrySaveRevisionCreated: true,
+				clientBaseContent:
+					'<!-- wp:paragraph --><p>Base stale comparison evidence.</p><!-- /wp:paragraph -->',
+				refetchedServerContent:
+					'<!-- wp:paragraph --><p>Server stale comparison evidence.</p><!-- /wp:paragraph -->',
+			},
+		} );
+
+		render( <DistributedEditingStatus /> );
+
+		expect(
+			screen.queryByRole( 'region', {
+				name: 'Distributed editing conflict comparison',
+			} )
+		).not.toBeInTheDocument();
+		expect( screen.queryByText( 'Compare changes' ) ).not.toBeInTheDocument();
+		expect(
+			screen.queryByText( 'Editor Save is ready' )
+		).not.toBeInTheDocument();
+		expect(
+			screen.queryByText(
+				'Use the editor Save button to send this guarded update. This conflict choice has not changed the WordPress post yet.'
+			)
+		).not.toBeInTheDocument();
+		expect( screen.getByText( 'Save confirmed' ) ).toBeVisible();
+		expect(
+			screen.getByText(
+				'WordPress saved the prepared changes, advanced the sync version from 7 to 8, and recorded 1 revision. Protected local changes are no longer pending for this save.'
+			)
+		).toBeVisible();
+	} );
+
 	it( 'mounts a content-free action transcript status entry', () => {
 		setupDistributedEditingStatusSelect( {
 			sessionState: {

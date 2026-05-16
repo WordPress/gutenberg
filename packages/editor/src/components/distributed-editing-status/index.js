@@ -1582,6 +1582,16 @@ function getDistributedEditingSameBlockConflictComparison(
 	editedPostContent
 ) {
 	const normalized = normalizeDistributedEditingSessionState( sessionState );
+	const hasConfirmedRetrySave =
+		normalized.retrySaveStatus ===
+			DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVED &&
+		normalized.retrySaveAccepted &&
+		normalized.retrySaveClaimsSaved;
+
+	if ( hasConfirmedRetrySave ) {
+		return null;
+	}
+
 	const isSameBlockConflictReason =
 		DISTRIBUTED_EDITING_SAME_BLOCK_CONFLICT_REASONS.has(
 			normalized.localRebaseResultReason
