@@ -10370,7 +10370,7 @@ function getDistributedEditingSaveStateVocabulary( {
 
 	if ( authoritativePostUpdated ) {
 		summaryText =
-			'The authoritative post accepted the Distributed Editing update.';
+			'Ready for new edits.';
 	} else if ( pendingServerConfirmation ) {
 		summaryText =
 			'Reviewed local changes are waiting for server confirmation before the authoritative post is updated.';
@@ -11042,8 +11042,8 @@ function getDistributedEditingSaveJourneyCopyForStep( step, action ) {
 			};
 		case DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.SAVE_CONFIRMED:
 			return {
-				title: 'Save confirmed by WordPress',
-				summary: 'WordPress accepted this Distributed Editing Save.',
+				title: 'Saved',
+				summary: 'WordPress confirmed the update.',
 			};
 	}
 
@@ -11087,7 +11087,7 @@ function getDistributedEditingSaveJourneyActionHintForStep( step, action ) {
 		case DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.WAITING_FOR_WORDPRESS:
 			return 'Keep tab open';
 		case DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.SAVE_CONFIRMED:
-			return 'WordPress confirmed';
+			return null;
 	}
 
 	return null;

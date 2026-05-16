@@ -2238,10 +2238,17 @@ describe( 'DistributedEditingStatus', () => {
 				'WordPress accepted this Distributed Editing Save. You can keep editing; WordPress will protect any new local changes.'
 			)
 		).not.toBeInTheDocument();
-		expect( screen.getByText( 'WordPress confirmed Save.' ) ).toBeVisible();
+		expect( screen.getByText( 'Ready for new edits.' ) ).toBeVisible();
+		expect(
+			screen.queryByText( 'WordPress confirmed Save.' )
+		).not.toBeInTheDocument();
 		// eslint-disable-next-line testing-library/no-node-access
 		const saveJourney = shell.querySelector(
 			'[data-distributed-editing-save-journey-status]'
+		);
+		// eslint-disable-next-line testing-library/no-node-access
+		const saveSummaryItem = shell.querySelector(
+			'[data-distributed-editing-enabled-shell-summary-item="save"]'
 		);
 		// eslint-disable-next-line testing-library/no-node-access
 		const humanLoop = shell.querySelector(
@@ -2251,9 +2258,13 @@ describe( 'DistributedEditingStatus', () => {
 			'data-distributed-editing-save-journey-status',
 			'save_confirmed'
 		);
+		expect( saveSummaryItem ).toHaveAttribute(
+			'data-distributed-editing-enabled-shell-summary-item-visible',
+			'false'
+		);
 		expect( saveJourney ).toHaveAttribute(
 			'data-distributed-editing-save-journey-status-summary',
-			'The authoritative post accepted the Distributed Editing update.'
+			'Ready for new edits.'
 		);
 		expect( saveJourney ).toHaveAttribute(
 			'data-distributed-editing-save-journey-claims-saved-without-evidence',

@@ -7387,8 +7387,7 @@ describe( 'distributed editing session state', () => {
 				DISTRIBUTED_EDITING_SAVE_LOCAL_CHANGES_STATES.AUTHORITATIVE_UPDATE_CONFIRMED,
 			reviewCheckpointState:
 				DISTRIBUTED_EDITING_SAVE_REVIEW_CHECKPOINT_STATES.REVIEW_CONSUMED,
-			saveStateSummaryText:
-				'The authoritative post accepted the Distributed Editing update.',
+			saveStateSummaryText: 'Ready for new edits.',
 			claimsSaved: true,
 		} );
 		expect( buttonStates.refetchRequired ).toMatchObject( {
@@ -7968,9 +7967,9 @@ describe( 'distributed editing session state', () => {
 				sessionState: confirmedState,
 				step: DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.SAVE_CONFIRMED,
 				action: 'none',
-				title: 'Save confirmed by WordPress',
-				summary: 'WordPress accepted',
-				actionHint: 'WordPress confirmed',
+				title: 'Saved',
+				summary: 'WordPress confirmed',
+				actionHint: null,
 				requiresActionBeforeSave: false,
 				saveButtonLabel: 'Save confirmed',
 				saveButtonDisabled: true,

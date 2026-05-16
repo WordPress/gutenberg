@@ -2921,10 +2921,8 @@ function getDistributedEditingHumanLoopSaveJourneyCopy( humanLoopStepState ) {
 			};
 		case DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.SAVE_CONFIRMED:
 			return {
-				title: __( 'Save confirmed by WordPress' ),
-				summary: __(
-					'WordPress accepted this Distributed Editing Save.'
-				),
+				title: __( 'Saved' ),
+				summary: __( 'WordPress confirmed the update.' ),
 			};
 	}
 
@@ -2958,7 +2956,7 @@ function getDistributedEditingEnabledShellProtectionLine( shellState ) {
 	}
 
 	if ( shellState.humanLoopStepState.confirmedByWordPress ) {
-		return __( 'WordPress confirmed the update.' );
+		return __( 'Ready for new edits.' );
 	}
 
 	return __( 'Other editors in this post appear below.' );
@@ -2975,7 +2973,7 @@ function getDistributedEditingEnabledShellSaveLine( shellState ) {
 		case DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.WAITING_FOR_WORDPRESS:
 			return __( 'Waiting for WordPress confirmation.' );
 		case DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.SAVE_CONFIRMED:
-			return __( 'WordPress confirmed Save.' );
+			return '';
 		case DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.LOCAL_CHANGES_PROTECTED:
 			return __( 'Save checks WordPress before updating.' );
 	}

@@ -1259,21 +1259,18 @@ describe( 'PostPublishButton', () => {
 					localChangesState: 'authoritative_update_confirmed',
 					reviewCheckpointState: 'review_consumed',
 					authoritativePostState: 'authoritative_update_confirmed',
-					saveStateSummaryText:
-						'The authoritative post accepted the Distributed Editing update.',
+					saveStateSummaryText: 'Ready for new edits.',
 					authoritativePostUpdated: true,
 				} }
 				distributedEditingSaveJourneyState={ {
 					shouldExposeInSaveControls: true,
 					step: 'save_confirmed',
 					action: 'none',
-					title: 'Save confirmed by WordPress',
-					summary:
-						'WordPress accepted this Distributed Editing Save.',
-					actionHint: 'WordPress confirmed',
+					title: 'Saved',
+					summary: 'WordPress confirmed the update.',
+					actionHint: null,
 					requiresActionBeforeSave: false,
-					statusChromeSummary:
-						'The authoritative post accepted the Distributed Editing update.',
+					statusChromeSummary: 'Ready for new edits.',
 					statusChromeAuthorityState:
 						'authoritative_update_confirmed',
 					statusChromeAuthorityText:
@@ -1289,7 +1286,7 @@ describe( 'PostPublishButton', () => {
 		expect( button ).toHaveAttribute( 'aria-disabled', 'true' );
 		expect( button ).toHaveAttribute(
 			'title',
-			'WordPress confirmed. WordPress accepted this Distributed Editing Save. The authoritative post accepted the Distributed Editing update.'
+			'WordPress confirmed the update. Ready for new edits.'
 		);
 		expect( button ).toHaveAttribute(
 			'data-distributed-editing-save-control-journey-step',
@@ -1299,9 +1296,8 @@ describe( 'PostPublishButton', () => {
 			'data-distributed-editing-save-control-journey-action',
 			'none'
 		);
-		expect( button ).toHaveAttribute(
+		expect( button ).not.toHaveAttribute(
 			'data-distributed-editing-save-control-journey-action-hint',
-			'WordPress confirmed'
 		);
 		expect( button ).toHaveAttribute(
 			'data-distributed-editing-save-control-journey-action-required',
@@ -1327,20 +1323,20 @@ describe( 'PostPublishButton', () => {
 			'data-distributed-editing-save-button-authoritative-post-updated',
 			'true'
 		);
-		const cueLabel = screen.getByText( 'Save confirmed by WordPress' );
-		const cueActionHint = screen.getByText( 'WordPress confirmed' );
+		const cueLabel = screen.getByText( 'Saved' );
 		const cue = screen.getByLabelText(
-			'WordPress confirmed. WordPress accepted this Distributed Editing Save. The authoritative post accepted the Distributed Editing update.'
+			'WordPress confirmed the update. Ready for new edits.'
 		);
 		expect( cueLabel ).toBeVisible();
-		expect( cueActionHint ).toBeVisible();
+		expect(
+			screen.queryByText( 'WordPress confirmed' )
+		).not.toBeInTheDocument();
 		expect( cue ).toHaveAttribute(
 			'data-distributed-editing-save-control-journey-visual-cue',
 			'true'
 		);
-		expect( cue ).toHaveAttribute(
+		expect( cue ).not.toHaveAttribute(
 			'data-distributed-editing-save-control-journey-action-hint',
-			'WordPress confirmed'
 		);
 		expect( cue ).toHaveAttribute(
 			'data-distributed-editing-save-control-journey-action-required',
