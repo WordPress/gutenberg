@@ -258,6 +258,44 @@
 	margin: 0;
 }
 
+.editor-distributed-editing-status__conflict-comparison-guide {
+	background: #f6f7f7;
+	border: 1px solid $gray-300;
+	border-radius: $radius-small;
+	display: grid;
+	gap: $grid-unit-05;
+	padding: $grid-unit-10;
+}
+
+.editor-distributed-editing-status__conflict-comparison-guide p {
+	margin: 0;
+}
+
+.editor-distributed-editing-status__conflict-comparison-steps {
+	display: grid;
+	gap: $grid-unit-05;
+	grid-template-columns: repeat(auto-fit, minmax(min(100%, 8rem), 1fr));
+	list-style: none;
+	margin: $grid-unit-05 0 0;
+	padding: 0;
+}
+
+.editor-distributed-editing-status__conflict-comparison-step {
+	background: $white;
+	border: 1px solid $gray-300;
+	border-radius: $radius-small;
+	color: $gray-700;
+	font-size: 12px;
+	padding: $grid-unit-05 $grid-unit-10;
+	text-align: center;
+}
+
+.editor-distributed-editing-status__conflict-comparison-step[data-distributed-editing-conflict-resolution-step-current="true"] {
+	border-color: #dba617;
+	color: $gray-900;
+	font-weight: 600;
+}
+
 .editor-distributed-editing-status__conflict-comparison-grid {
 	display: grid;
 	gap: $grid-unit-10;

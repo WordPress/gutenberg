@@ -1737,6 +1737,73 @@ function getConflictComparisonRows( text ) {
 	return Math.min( 8, Math.max( 3, text.split( '\n' ).length ) );
 }
 
+function getConflictComparisonGuide( comparison ) {
+	const isLocalChoice =
+		comparison.resolutionChoice ===
+		DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_CHOICES.LOCAL;
+	const isLatestWordPressChoice =
+		comparison.resolutionChoice ===
+		DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_CHOICES.LATEST_WORDPRESS;
+	const isProofAccepted =
+		comparison.retrySubmitProofStatus ===
+		DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.ACCEPTED_FOR_FUTURE_SAVE;
+
+	if ( isProofAccepted ) {
+		return {
+			status: 'choice_checked',
+			currentStep: 'save',
+			title: __( 'WordPress checked this choice' ),
+			message: __(
+				'Use Save to send the guarded update. WordPress has not changed the post yet.'
+			),
+		};
+	}
+
+	if ( isLocalChoice || isLatestWordPressChoice ) {
+		return {
+			status: isLocalChoice
+				? 'local_version_selected'
+				: 'latest_wordpress_selected',
+			currentStep: 'check',
+			title: isLocalChoice
+				? __( 'Your local version is selected' )
+				: __( 'Latest WordPress version is selected' ),
+			message: __(
+				'Check this choice with WordPress before using Save. The WordPress post has not changed yet.'
+			),
+		};
+	}
+
+	return {
+		status: 'choose_version',
+		currentStep: 'choose',
+		title: __( 'Choose a version to keep' ),
+		message: __(
+			'WordPress is waiting because this editor and the saved post changed the same block. Choosing here does not save yet.'
+		),
+	};
+}
+
+function getConflictComparisonGuideSteps( currentStep ) {
+	return [
+		{
+			id: 'choose',
+			label: __( 'Choose version' ),
+			isCurrent: currentStep === 'choose',
+		},
+		{
+			id: 'check',
+			label: __( 'Check choice' ),
+			isCurrent: currentStep === 'check',
+		},
+		{
+			id: 'save',
+			label: __( 'Save after check' ),
+			isCurrent: currentStep === 'save',
+		},
+	];
+}
+
 function DistributedEditingSameBlockConflictComparison( {
 	comparison,
 	onAction,
@@ -1754,6 +1821,14 @@ function DistributedEditingSameBlockConflictComparison( {
 		localRebaseResultReason: comparison.reason,
 		nextStepAction: 'export_for_manual_conflict_review',
 	};
+	const guide = getConflictComparisonGuide( comparison );
+	const guideSteps = getConflictComparisonGuideSteps( guide.currentStep );
+	const isLocalChoiceSelected =
+		comparison.resolutionChoice ===
+		DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_CHOICES.LOCAL;
+	const isLatestWordPressChoiceSelected =
+		comparison.resolutionChoice ===
+		DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_CHOICES.LATEST_WORDPRESS;
 
 	return (
 		<div
@@ -1799,6 +1874,9 @@ function DistributedEditingSameBlockConflictComparison( {
 			data-distributed-editing-conflict-resolution-proof-status={
 				comparison.retrySubmitProofStatus
 			}
+			data-distributed-editing-conflict-resolution-guide-status={
+				guide.status
+			}
 			role="region"
 		>
 			<div className="editor-distributed-editing-status__conflict-comparison-header">
@@ -1808,6 +1886,32 @@ function DistributedEditingSameBlockConflictComparison( {
 						'This editor and WordPress changed the same block. Choose the local version or the latest WordPress version before trying Save again.'
 					) }
 				</p>
+			</div>
+			<div
+				aria-live="polite"
+				className="editor-distributed-editing-status__conflict-comparison-guide"
+				data-distributed-editing-conflict-resolution-guide={
+					guide.status
+				}
+			>
+				<strong>{ guide.title }</strong>
+				<p>{ guide.message }</p>
+				<ol className="editor-distributed-editing-status__conflict-comparison-steps">
+					{ guideSteps.map( ( step ) => (
+						<li
+							className="editor-distributed-editing-status__conflict-comparison-step"
+							data-distributed-editing-conflict-resolution-step={
+								step.id
+							}
+							data-distributed-editing-conflict-resolution-step-current={ formatDataBoolean(
+								step.isCurrent
+							) }
+							key={ step.id }
+						>
+							{ step.label }
+						</li>
+					) ) }
+				</ol>
 			</div>
 			<div className="editor-distributed-editing-status__conflict-comparison-grid">
 				{ comparison.rows.map( ( row ) => (
@@ -1832,6 +1936,10 @@ function DistributedEditingSameBlockConflictComparison( {
 				<div className="editor-distributed-editing-status__conflict-comparison-action-group editor-distributed-editing-status__conflict-comparison-action-group--choices">
 					<Button
 						__next40pxDefaultSize
+						aria-pressed={ isLocalChoiceSelected }
+						data-distributed-editing-conflict-choice-selected={ formatDataBoolean(
+							isLocalChoiceSelected
+						) }
 						variant="secondary"
 						onClick={ onSelectLocalVersion }
 					>
@@ -1839,6 +1947,10 @@ function DistributedEditingSameBlockConflictComparison( {
 					</Button>
 					<Button
 						__next40pxDefaultSize
+						aria-pressed={ isLatestWordPressChoiceSelected }
+						data-distributed-editing-conflict-choice-selected={ formatDataBoolean(
+							isLatestWordPressChoiceSelected
+						) }
 						variant="secondary"
 						onClick={ onSelectLatestWordPressVersion }
 					>

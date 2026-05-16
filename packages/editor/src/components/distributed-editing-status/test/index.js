@@ -935,6 +935,17 @@ describe( 'DistributedEditingStatus', () => {
 			)
 		).toBeVisible();
 		expect(
+			screen.getByText( 'Choose a version to keep' )
+		).toBeVisible();
+		expect(
+			screen.getByText(
+				'WordPress is waiting because this editor and the saved post changed the same block. Choosing here does not save yet.'
+			)
+		).toBeVisible();
+		expect( screen.getByText( 'Choose version' ) ).toBeVisible();
+		expect( screen.getByText( 'Check choice' ) ).toBeVisible();
+		expect( screen.getByText( 'Save after check' ) ).toBeVisible();
+		expect(
 			within( status ).getByRole( 'button', {
 				name: 'Get latest post',
 			} )
@@ -1011,6 +1022,10 @@ describe( 'DistributedEditingStatus', () => {
 			'data-distributed-editing-conflict-comparison-has-local',
 			'true'
 		);
+		expect( comparison ).toHaveAttribute(
+			'data-distributed-editing-conflict-resolution-guide-status',
+			'choose_version'
+		);
 		expect( screen.getByLabelText( 'Base version' ) ).toHaveValue(
 			'Base paragraph edit & seed.'
 		);
@@ -1022,6 +1037,16 @@ describe( 'DistributedEditingStatus', () => {
 		);
 		expect( comparison ).not.toHaveTextContent( '<p>' );
 		expect( comparison ).not.toHaveTextContent( '<!-- wp:paragraph' );
+		expect(
+			within( comparison ).getByRole( 'button', {
+				name: 'Keep your local version',
+			} )
+		).toHaveAttribute( 'aria-pressed', 'false' );
+		expect(
+			within( comparison ).getByRole( 'button', {
+				name: 'Use latest from WordPress',
+			} )
+		).toHaveAttribute( 'aria-pressed', 'false' );
 		expect(
 			within( comparison ).getByRole( 'button', {
 				name: 'Keep your local version',
@@ -1286,6 +1311,28 @@ describe( 'DistributedEditingStatus', () => {
 			'data-distributed-editing-conflict-resolution-proof-ready',
 			'true'
 		);
+		expect( comparison ).toHaveAttribute(
+			'data-distributed-editing-conflict-resolution-guide-status',
+			'local_version_selected'
+		);
+		expect(
+			screen.getByText( 'Your local version is selected' )
+		).toBeVisible();
+		expect(
+			screen.getByText(
+				'Check this choice with WordPress before using Save. The WordPress post has not changed yet.'
+			)
+		).toBeVisible();
+		expect(
+			within( comparison ).getByRole( 'button', {
+				name: 'Keep your local version',
+			} )
+		).toHaveAttribute( 'aria-pressed', 'true' );
+		expect(
+			within( comparison ).getByRole( 'button', {
+				name: 'Use latest from WordPress',
+			} )
+		).toHaveAttribute( 'aria-pressed', 'false' );
 		expect(
 			within( comparison ).getByRole( 'button', {
 				name: 'Check this choice',
