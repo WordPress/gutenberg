@@ -7274,7 +7274,7 @@ describe( 'distributed editing session state', () => {
 		} );
 		expect( buttonStates.refetchRequired ).toMatchObject( {
 			status: DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES.REFETCH_REQUIRED,
-			label: 'Refetch required',
+			label: 'Get latest post',
 			clickAction:
 				DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.REFETCH_SERVER_STATE,
 			requiresServerStateRefetch: true,
@@ -7344,7 +7344,7 @@ describe( 'distributed editing session state', () => {
 				},
 				step: DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.GET_LATEST_POST,
 				action: 'get_latest_post',
-				saveButtonLabel: 'Refetch required',
+				saveButtonLabel: 'Get latest post',
 				saveButtonBlocksNormalSavePost: true,
 			},
 			{
@@ -7523,7 +7523,7 @@ describe( 'distributed editing session state', () => {
 				summary: 'local changes stay protected',
 				actionHint: 'Get latest first',
 				requiresActionBeforeSave: true,
-				saveButtonLabel: 'Refetch required',
+				saveButtonLabel: 'Get latest post',
 				saveButtonBlocksNormalSavePost: true,
 			},
 			{
@@ -8310,7 +8310,7 @@ describe( 'distributed editing session state', () => {
 			status: DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES.REFETCH_REQUIRED,
 			reason: DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.SERVER_STATE_REFETCH_REQUIRED,
 			source: 'retry_save',
-			label: 'Refetch required',
+			label: 'Get latest post',
 			statusText:
 				'The latest post must be loaded before Distributed Editing can save.',
 			clickAction:
@@ -8341,7 +8341,7 @@ describe( 'distributed editing session state', () => {
 		expect( editorSavePolicy ).toMatchObject( {
 			status: DISTRIBUTED_EDITING_SAVE_POLICY_STATUSES.REFETCH_REQUIRED,
 			reason: DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.SERVER_STATE_REFETCH_REQUIRED,
-			saveButtonLabel: 'Refetch required',
+			saveButtonLabel: 'Get latest post',
 			clickAction:
 				DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.REFETCH_SERVER_STATE,
 			requiresServerStateRefetch: true,

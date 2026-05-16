@@ -9554,7 +9554,7 @@ export function getDistributedEditingFreshReviewPreSaveStateForSessionState(
 				reason = 'fresh_review_server_state_refetch_required';
 				placement =
 					DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_PLACEMENTS.PRE_SAVE_STATUS;
-				saveButtonLabel = 'Refetch required';
+				saveButtonLabel = 'Get latest post';
 				clickAction =
 					DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.REFETCH_SERVER_STATE;
 				requiresServerStateRefetch = true;
@@ -10493,7 +10493,7 @@ export function getDistributedEditingSaveButtonStateForSessionState(
 				DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.SERVER_STATE_REFETCH_REQUIRED;
 			source = 'retry_save';
 		}
-		label = 'Refetch required';
+		label = 'Get latest post';
 		statusText =
 			'The latest post must be loaded before Distributed Editing can save.';
 		clickAction =
@@ -11175,7 +11175,7 @@ export function getDistributedEditingSessionStateForStaleRiskyBlockReview(
 		),
 		riskyBlockReviewPendingCount: 0,
 		riskyBlockReviewPrePublishPanelRequired: false,
-		riskyBlockReviewSaveButtonLabel: 'Refetch required',
+		riskyBlockReviewSaveButtonLabel: 'Get latest post',
 		riskyBlockReviewSaveClickAction:
 			DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.REFETCH_SERVER_STATE,
 		riskyBlockReviewCanExportLocalUpdates: true,
@@ -14416,7 +14416,7 @@ function normalizeRiskyBlockReviewMetadataFields( sessionState = {} ) {
 		DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.CONTINUE_SAVE;
 
 	if ( riskyBlockReviewRequiresServerStateRefetch ) {
-		riskyBlockReviewSaveButtonLabel = 'Refetch required';
+		riskyBlockReviewSaveButtonLabel = 'Get latest post';
 		riskyBlockReviewSaveClickAction =
 			DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.REFETCH_SERVER_STATE;
 	} else if ( riskyBlockReviewHasPendingItems ) {

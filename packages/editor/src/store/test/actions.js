@@ -6328,7 +6328,7 @@ describe( 'Post actions', () => {
 					.getDistributedEditingSaveButtonState()
 			).toMatchObject( {
 				status: DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES.REFETCH_REQUIRED,
-				label: 'Refetch required',
+				label: 'Get latest post',
 				clickAction:
 					DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.REFETCH_SERVER_STATE,
 				requiresServerStateRefetch: true,

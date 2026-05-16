@@ -423,7 +423,7 @@ describe( 'PostPublishButton', () => {
 				distributedEditingSaveButtonState={ {
 					status: 'refetch_required',
 					source: 'retry_save',
-					label: 'Refetch required',
+					label: 'Get latest post',
 					statusText:
 						'The latest post must be loaded before Distributed Editing can save.',
 					clickAction: 'refetch_server_state',
@@ -457,7 +457,7 @@ describe( 'PostPublishButton', () => {
 		);
 
 		const button = screen.getByRole( 'button', {
-			name: 'Refetch required',
+			name: 'Get latest post',
 		} );
 		expect( button ).toHaveAttribute(
 			'title',
