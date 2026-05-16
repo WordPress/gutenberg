@@ -8272,6 +8272,14 @@ describe( 'distributed editing session state', () => {
 				}
 			);
 		const state = { distributedEditingSession: handoffState };
+		const saveButton =
+			getDistributedEditingSaveButtonStateForSessionState(
+				handoffState
+			);
+		const editorSavePolicy =
+			getDistributedEditingSavePolicyStateForSessionState(
+				handoffState
+			);
 
 		expect( staleAgainState ).toMatchObject( {
 			disposition:
@@ -8298,6 +8306,60 @@ describe( 'distributed editing session state', () => {
 			hasPreparedSavePath: false,
 			request: null,
 		} );
+		expect( saveButton ).toMatchObject( {
+			status: DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES.REFETCH_REQUIRED,
+			reason: DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.SERVER_STATE_REFETCH_REQUIRED,
+			source: 'fresh_review',
+			label: 'Refetch required',
+			statusText:
+				'The latest post must be loaded before Distributed Editing can save.',
+			clickAction:
+				DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.REFETCH_SERVER_STATE,
+			requiresServerStateRefetch: true,
+			canRefetchServerState: true,
+			blocksNormalSavePost: true,
+			authorityState:
+				DISTRIBUTED_EDITING_SAVE_AUTHORITY_STATES.SERVER_REFRESH_REQUIRED_BEFORE_UPDATE,
+			localChangesState:
+				DISTRIBUTED_EDITING_SAVE_LOCAL_CHANGES_STATES.PROTECTED_CHANGES_EXPORTABLE,
+			reviewCheckpointState:
+				DISTRIBUTED_EDITING_SAVE_REVIEW_CHECKPOINT_STATES.SERVER_REFRESH_REQUIRED,
+			authoritativePostState:
+				DISTRIBUTED_EDITING_SAVE_AUTHORITY_STATES.SERVER_REFRESH_REQUIRED_BEFORE_UPDATE,
+			saveStateSummaryText:
+				'Protected local changes need a server refresh before the authoritative post can update.',
+			actionKeys: [
+				DISTRIBUTED_EDITING_NOTICE_ACTIONS.EXPORT_LOCAL_UPDATES,
+				DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFETCH_SERVER_STATE,
+			],
+			shouldCallNormalSavePost: false,
+			shouldCallRetrySaveEndpoint: false,
+			callsNormalSavePost: false,
+			callsRetrySaveEndpoint: false,
+			claimsSaved: false,
+		} );
+		expect( editorSavePolicy ).toMatchObject( {
+			status: DISTRIBUTED_EDITING_SAVE_POLICY_STATUSES.REFETCH_REQUIRED,
+			reason: DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.SERVER_STATE_REFETCH_REQUIRED,
+			saveButtonLabel: 'Refetch required',
+			clickAction:
+				DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.REFETCH_SERVER_STATE,
+			requiresServerStateRefetch: true,
+			blocksNormalSavePost: true,
+			shouldCallNormalSavePost: false,
+			shouldCallRetrySaveEndpoint: false,
+			saveButtonStatus:
+				DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES.REFETCH_REQUIRED,
+			saveButtonSource: 'fresh_review',
+			saveButtonActionKeys: [
+				DISTRIBUTED_EDITING_NOTICE_ACTIONS.EXPORT_LOCAL_UPDATES,
+				DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFETCH_SERVER_STATE,
+			],
+			claimsSaved: false,
+		} );
+		expect( getDistributedEditingSaveButtonState( state ) ).toEqual(
+			saveButton
+		);
 		expect( requiresDistributedEditingServerStateAcceptance( state ) ).toBe(
 			false
 		);
