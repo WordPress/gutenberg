@@ -50,11 +50,13 @@ import {
 	getDistributedEditingFreshReviewPreSaveStateForSessionState,
 	getDistributedEditingHumanLoopStepStateForSessionState,
 	getDistributedEditingLocalUpdatesExportPayload,
+	getDistributedEditingPostContentSha256Hash,
 	getDistributedEditingPresenceRepeatedRefreshRuntimeStateForSessionState,
 	getDistributedEditingPresenceRosterStateForSessionState,
 	getDistributedEditingPresenceStartupPolicyStateForSessionState,
 	getDistributedEditingSavePolicyStateForSessionState,
 	getDistributedEditingSaveJourneyStateForSessionState,
+	getDistributedEditingSessionStateForRetrySubmitProofResult,
 	normalizeDistributedEditingSessionState,
 } from '../../store/distributed-editing';
 import PluginPrePublishPanel from '../plugin-pre-publish-panel';
@@ -1902,10 +1904,24 @@ function getDistributedEditingStructuralConflictSummary(
 		normalized.localRebaseResultStatus ===
 			DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.MANUAL_CONFLICT_REQUIRED &&
 		isStructuralConflictReason;
+	const hasConflictResolutionChoice = [
+		DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_CHOICES.LOCAL,
+		DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_CHOICES.LATEST_WORDPRESS,
+	].includes( normalized.staleBaseConflictResolutionChoice );
+	const isRetrySubmitProofAccepted =
+		normalized.retrySubmitProofStatus ===
+			DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.ACCEPTED_FOR_FUTURE_SAVE &&
+		normalized.retrySubmitAccepted &&
+		! normalized.staleBaseConflictResolutionRequiresFreshProof;
+	const isCheckedStructuralConflictChoice =
+		isStructuralConflictReason &&
+		hasConflictResolutionChoice &&
+		isRetrySubmitProofAccepted;
 
 	if (
 		hasConfirmedRetrySave ||
-		! isManualStructuralConflict ||
+		( ! isManualStructuralConflict &&
+			! isCheckedStructuralConflictChoice ) ||
 		typeof normalized.clientBaseContent !== 'string' ||
 		typeof normalized.refetchedServerContent !== 'string' ||
 		typeof editedPostContent !== 'string'
@@ -1951,6 +1967,10 @@ function getDistributedEditingStructuralConflictSummary(
 			normalized.localRebaseResultReason
 		),
 		retrySubmitProofStatus: normalized.retrySubmitProofStatus,
+		retrySubmitSavePathRequired:
+			normalized.retrySubmitSavePathRequired,
+		retrySubmitSavePrepared: normalized.retrySubmitSavePrepared,
+		retrySubmitSaveReady: normalized.retrySubmitSaveReady,
 		retrySubmitSaveStatus: normalized.retrySubmitSaveStatus,
 		serverBlockCount,
 		serverCountDelta: serverBlockCount - baseBlockCount,
@@ -2639,12 +2659,28 @@ function DistributedEditingStructuralConflictSummary( {
 	const structuralChoiceProofAccepted =
 		summary.retrySubmitProofStatus ===
 		DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.ACCEPTED_FOR_FUTURE_SAVE;
+	const structuralChoiceSaveReady =
+		structuralChoiceProofAccepted &&
+		summary.retrySubmitSaveStatus ===
+			DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.READY &&
+		summary.retrySubmitSavePrepared &&
+		summary.retrySubmitSaveReady;
+	const structuralChoiceCanPrepareSave = Boolean(
+		selectedChoiceSnapshotId &&
+			structuralChoiceProofAccepted &&
+			summary.retrySubmitSavePathRequired &&
+			! structuralChoiceSaveReady
+	);
 	const structuralChoiceRequiresFreshProof = Boolean(
 		selectedChoiceSnapshotId &&
 			summary.resolutionRequiresFreshProof &&
 			! structuralChoiceProofAccepted
 	);
-	const structuralChoiceNextStep = structuralChoiceProofAccepted
+	const structuralChoiceNextStep = structuralChoiceSaveReady
+		? 'save_guarded_update'
+		: structuralChoiceCanPrepareSave
+		? 'prepare_structural_save'
+		: structuralChoiceProofAccepted
 		? 'structural_choice_checked'
 		: structuralChoiceRequiresFreshProof
 		? 'check_structural_choice'
@@ -2716,6 +2752,12 @@ function DistributedEditingStructuralConflictSummary( {
 			data-distributed-editing-structural-choice-save-status={
 				summary.retrySubmitSaveStatus
 			}
+			data-distributed-editing-structural-choice-prepare-save-ready={ formatDataBoolean(
+				structuralChoiceCanPrepareSave
+			) }
+			data-distributed-editing-structural-choice-save-ready={ formatDataBoolean(
+				structuralChoiceSaveReady
+			) }
 			data-distributed-editing-structural-choice-next-step={
 				structuralChoiceNextStep
 			}
@@ -2989,6 +3031,29 @@ function DistributedEditingStructuralConflictSummary( {
 						{ __( 'Check structure with WordPress' ) }
 					</Button>
 				) }
+				{ structuralChoiceCanPrepareSave && (
+					<Button
+						__next40pxDefaultSize
+						data-distributed-editing-structural-choice-action="prepare_structural_save"
+						data-distributed-editing-structural-choice-action-does-not-save="true"
+						title={ __(
+							'Prepare this checked structure for the editor Save button. This does not save the post.'
+						) }
+						type="button"
+						variant="primary"
+						onClick={ () =>
+							onAction?.(
+								DISTRIBUTED_EDITING_NOTICE_ACTIONS.PREPARE_RETRY_SUBMIT_SAVE,
+								{
+									...actionItem,
+									nextStepAction: 'prepare_structural_save',
+								}
+							)
+						}
+					>
+						{ __( 'Prepare structural Save' ) }
+					</Button>
+				) }
 			</div>
 			{ selectedChoiceSnapshotId && (
 				<div
@@ -2998,9 +3063,13 @@ function DistributedEditingStructuralConflictSummary( {
 					}
 					role="status"
 				>
-					{ structuralChoiceProofAccepted
+					{ structuralChoiceSaveReady
 						? __(
-								'WordPress checked this structure. Save is still paused until structural Save preparation is available.'
+								'Structural Save is prepared. This checked structure is protected; WordPress has not updated the post.'
+						  )
+						: structuralChoiceProofAccepted
+						? __(
+								'WordPress checked this structure. Prepare Save before updating the post.'
 						  )
 						: selectedChoiceSnapshotId === 'server'
 						? __(
@@ -3147,19 +3216,96 @@ export default function DistributedEditingStatus( {
 					case DISTRIBUTED_EDITING_NOTICE_ACTIONS.PREPARE_RETRY_SUBMIT_SAVE: {
 						const prepareSaveResult =
 							await __experimentalPrepareDistributedEditingRetrySubmitSaveAfterProof?.();
+						const isStructuralConflictPrepare =
+							item?.id === 'structural-conflict-summary';
+
+						if (
+							isStructuralConflictPrepare &&
+							( prepareSaveResult?.status ===
+								DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.READY ||
+								prepareSaveResult?.sessionState
+									?.retrySubmitSaveReady === true )
+						) {
+							const preparedState =
+								normalizeDistributedEditingSessionState(
+									prepareSaveResult?.sessionState || {
+										...sessionState,
+										retrySubmitSaveStatus:
+											DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.READY,
+										retrySubmitSaveReason: null,
+										retrySubmitSavePrepared: true,
+										retrySubmitSaveReady: true,
+									}
+								);
+
+							setDistributedEditingSessionState?.(
+								normalizeDistributedEditingSessionState( {
+									...preparedState,
+									clientBaseContent:
+										preparedState.clientBaseContent ??
+										sessionState.clientBaseContent,
+									disposition:
+										DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+									hasPendingChanges: true,
+									isAwaitingServerConfirmation: true,
+									localRebaseResultReason:
+										preparedState.localRebaseResultReason ??
+										sessionState.localRebaseResultReason,
+									localRebaseResultStatus:
+										preparedState.localRebaseResultStatus ??
+										sessionState.localRebaseResultStatus,
+									reasonCode:
+										DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+									refetchedServerContent:
+										preparedState.refetchedServerContent ??
+										sessionState.refetchedServerContent,
+									requiresManualConflictResolution: true,
+									staleBaseConflictResolutionChoice:
+										preparedState.staleBaseConflictResolutionChoice ??
+										sessionState.staleBaseConflictResolutionChoice,
+									staleBaseConflictResolutionRequiresFreshProof:
+										false,
+									staleBaseConflictResolutionStatus:
+										preparedState.staleBaseConflictResolutionStatus ??
+										sessionState.staleBaseConflictResolutionStatus,
+									retrySubmitSaveStatus:
+										DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.READY,
+									retrySubmitSaveReason: null,
+									retrySubmitSavePrepared: true,
+									retrySubmitSaveReady: true,
+									canExportLocalUpdates: true,
+								} )
+							);
+						}
+
 						setActionStatus( {
 							status: 'info',
-							message: __(
-								'Save prepared. Use Save to send these changes to WordPress.'
-							),
+							message: isStructuralConflictPrepare
+								? __(
+										'Structural Save prepared. WordPress has not updated the post.'
+								  )
+								: __(
+										'Save prepared. Use Save to send these changes to WordPress.'
+								  ),
 						} );
 						return prepareSaveResult;
 					}
 					case DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFRESH_RETRY_SUBMIT_PROOF: {
-						const proofResult =
-							await __experimentalRefreshDistributedEditingRetrySubmitProof?.();
 						const isStructuralConflictProof =
 							item?.id === 'structural-conflict-summary';
+						const proposedPostContentHash =
+							isStructuralConflictProof
+								? await getDistributedEditingPostContentSha256Hash(
+										editedPostContent
+								  )
+								: null;
+						const proofResult =
+							await __experimentalRefreshDistributedEditingRetrySubmitProof?.(
+								isStructuralConflictProof &&
+									proposedPostContentHash
+									? { proposedPostContentHash }
+									: undefined
+							);
 
 						if (
 							isStructuralConflictProof &&
@@ -3169,7 +3315,8 @@ export default function DistributedEditingStatus( {
 								proofResult?.retry_submit_accepted === true )
 						) {
 							const normalized =
-								normalizeDistributedEditingSessionState(
+								getDistributedEditingSessionStateForRetrySubmitProofResult(
+									proofResult,
 									sessionState
 								);
 
@@ -3204,7 +3351,7 @@ export default function DistributedEditingStatus( {
 							status: 'info',
 							message: isStructuralConflictProof
 								? __(
-										'WordPress checked this structure. Save is still paused until structural Save preparation is available.'
+										'WordPress checked this structure. Prepare Save before updating the post.'
 								  )
 								: item?.id === 'same-block-conflict-comparison'
 								? __(

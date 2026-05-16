@@ -1749,6 +1749,17 @@ describe( 'DistributedEditingStatus', () => {
 		const actions = setupDistributedEditingStatusDispatch();
 		const latestWordPressContent =
 			'<!-- wp:paragraph --><p>Base alpha.</p><!-- /wp:paragraph -->';
+		actions.__experimentalRefreshDistributedEditingRetrySubmitProof.mockResolvedValueOnce(
+			{
+				result: 'retry_submit_accepted_for_future_save',
+				retry_submit_accepted: true,
+				client_base_version: '5',
+				server_version: '5',
+				rebased_from_version: '4',
+				pending_change_count: 1,
+				save_path_required: true,
+			}
+		);
 
 		setupDistributedEditingStatusSelect( {
 			editedPostContent: latestWordPressContent,
@@ -1805,6 +1816,19 @@ describe( 'DistributedEditingStatus', () => {
 		expect(
 			actions.__experimentalRefreshDistributedEditingRetrySubmitProof
 		).toHaveBeenCalledTimes( 1 );
+		if (
+			actions.__experimentalRefreshDistributedEditingRetrySubmitProof.mock
+				.calls[ 0 ][ 0 ]
+		) {
+			expect(
+				actions.__experimentalRefreshDistributedEditingRetrySubmitProof
+			).toHaveBeenCalledWith(
+				expect.objectContaining( {
+					proposedPostContentHash:
+						expect.stringMatching( /^[0-9a-f]{64}$/ ),
+				} )
+			);
+		}
 		expect(
 			actions.setDistributedEditingSessionState
 		).toHaveBeenLastCalledWith(
@@ -1819,9 +1843,12 @@ describe( 'DistributedEditingStatus', () => {
 				staleBaseConflictResolutionChoice:
 					DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_CHOICES.LATEST_WORDPRESS,
 				staleBaseConflictResolutionRequiresFreshProof: false,
+				clientBaseVersion: '4',
+				serverVersion: '5',
 				retrySubmitProofStatus:
 					DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.ACCEPTED_FOR_FUTURE_SAVE,
 				retrySubmitAccepted: true,
+				retrySubmitSavePathRequired: true,
 				retrySubmitSaveStatus:
 					DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.NONE,
 				retrySaveStatus: DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.NONE,
@@ -1831,7 +1858,7 @@ describe( 'DistributedEditingStatus', () => {
 		);
 		expect(
 			screen.getByText(
-				'WordPress checked this structure. Save is still paused until structural Save preparation is available.'
+				'WordPress checked this structure. Prepare Save before updating the post.'
 			)
 		).toBeVisible();
 		expect(
@@ -1839,6 +1866,128 @@ describe( 'DistributedEditingStatus', () => {
 				name: 'Prepare Save',
 			} )
 		).not.toBeInTheDocument();
+		expect(
+			actions.__experimentalSaveDistributedEditingRetryAfterProof
+		).not.toHaveBeenCalled();
+	} );
+
+	it( 'prepares a checked structural choice for guarded Save without saving', async () => {
+		const user = userEvent.setup();
+		const actions = setupDistributedEditingStatusDispatch();
+		const latestWordPressContent =
+			'<!-- wp:paragraph --><p>Base alpha.</p><!-- /wp:paragraph -->';
+
+		setupDistributedEditingStatusSelect( {
+			editedPostContent: latestWordPressContent,
+			sessionState: {
+				disposition:
+					DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+				reasonCode:
+					DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+				clientBaseVersion: '4',
+				serverVersion: '5',
+				pendingChangeCount: 1,
+				remoteChangeCount: 1,
+				requiresServerStateRefetch: false,
+				refetchedServerState: true,
+				canExportLocalUpdates: true,
+				localRebasePlanStatus:
+					DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES.READY,
+				localRebaseResultStatus:
+					DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.MANUAL_CONFLICT_REQUIRED,
+				localRebaseResultReason: 'block_deleted',
+				requiresManualConflictResolution: true,
+				staleBaseConflictResolutionStatus:
+					DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_STATUSES.LATEST_WORDPRESS_SELECTED,
+				staleBaseConflictResolutionChoice:
+					DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_CHOICES.LATEST_WORDPRESS,
+				staleBaseConflictResolutionRequiresFreshProof: false,
+				retrySubmitProofStatus:
+					DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.ACCEPTED_FOR_FUTURE_SAVE,
+				retrySubmitAccepted: true,
+				retrySubmitSavePathRequired: true,
+				retrySubmitSaveStatus:
+					DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.NONE,
+				retrySaveStatus: DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.NONE,
+				clientBaseContent:
+					'<!-- wp:paragraph --><p>Base alpha.</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Base beta.</p><!-- /wp:paragraph -->',
+				refetchedServerContent: latestWordPressContent,
+			},
+		} );
+
+		render( <DistributedEditingStatus /> );
+
+		const summary = screen.getByRole( 'region', {
+			name: 'Distributed editing structural conflict summary',
+		} );
+
+		expect( summary ).toHaveAttribute(
+			'data-distributed-editing-structural-choice-next-step',
+			'prepare_structural_save'
+		);
+		expect( summary ).toHaveAttribute(
+			'data-distributed-editing-structural-choice-prepare-save-ready',
+			'true'
+		);
+		expect( summary ).toHaveAttribute(
+			'data-distributed-editing-structural-choice-save-ready',
+			'false'
+		);
+
+		const prepareButton = within( summary ).getByRole( 'button', {
+			name: 'Prepare structural Save',
+		} );
+
+		expect( prepareButton ).toHaveAttribute(
+			'data-distributed-editing-structural-choice-action',
+			'prepare_structural_save'
+		);
+		expect( prepareButton ).toHaveAttribute(
+			'data-distributed-editing-structural-choice-action-does-not-save',
+			'true'
+		);
+		expect( prepareButton ).toHaveAttribute( 'type', 'button' );
+
+		await user.click( prepareButton );
+
+		expect(
+			actions.__experimentalPrepareDistributedEditingRetrySubmitSaveAfterProof
+		).toHaveBeenCalledTimes( 1 );
+		expect(
+			actions.setDistributedEditingSessionState
+		).toHaveBeenLastCalledWith(
+			expect.objectContaining( {
+				disposition:
+					DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+				reasonCode:
+					DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+				hasPendingChanges: true,
+				isAwaitingServerConfirmation: true,
+				requiresManualConflictResolution: true,
+				localRebaseResultStatus:
+					DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.MANUAL_CONFLICT_REQUIRED,
+				localRebaseResultReason: 'block_deleted',
+				staleBaseConflictResolutionStatus:
+					DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_STATUSES.LATEST_WORDPRESS_SELECTED,
+				staleBaseConflictResolutionChoice:
+					DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_CHOICES.LATEST_WORDPRESS,
+				staleBaseConflictResolutionRequiresFreshProof: false,
+				retrySubmitProofStatus:
+					DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.ACCEPTED_FOR_FUTURE_SAVE,
+				retrySubmitAccepted: true,
+				retrySubmitSavePathRequired: true,
+				retrySubmitSaveStatus:
+					DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.READY,
+				retrySubmitSavePrepared: true,
+				retrySubmitSaveReady: true,
+				retrySaveStatus: DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.NONE,
+			} )
+		);
+		expect(
+			screen.getByText(
+				'Structural Save prepared. WordPress has not updated the post.'
+			)
+		).toBeVisible();
 		expect(
 			actions.__experimentalSaveDistributedEditingRetryAfterProof
 		).not.toHaveBeenCalled();
