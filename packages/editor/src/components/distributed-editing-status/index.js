@@ -67,6 +67,7 @@ const DISTRIBUTED_EDITING_OPAQUE_REVIEW_APPROVAL_PROOF_TOKEN_REJECTION_DETAILS =
 const distributedEditingStartupHeartbeatRuntimeKeys = new Set();
 const DISTRIBUTED_EDITING_STARTUP_SNAPSHOT_DELAY_MS = 1000;
 const DISTRIBUTED_EDITING_CONFIRMED_SAVE_SHELL_HOLD_MS = 4000;
+const DISTRIBUTED_EDITING_CONFIRMED_SAVE_STATUS_HOLD_MS = 7000;
 const DISTRIBUTED_EDITING_SAME_BLOCK_CONFLICT_REASONS = new Set( [
 	'same_block_changed',
 	'same_serialized_block_changed',
@@ -1411,9 +1412,47 @@ export function DistributedEditingStatusSurface( {
 } ) {
 	const statusItems =
 		getDistributedEditingStatusSurfaceItems( noticeDescriptors );
+	const confirmedSaveStatusItems = statusItems.filter(
+		isConfirmedRetrySaveStatusItem
+	);
+	const confirmedSaveStatusItemIdsKey = confirmedSaveStatusItems
+		.map( ( item ) => item.id )
+		.join( '|' );
+	const confirmedSaveStatusItemsKey = confirmedSaveStatusItems
+		.map(
+			( item ) =>
+				`${ item.id }:${ item.title }:${ item.message }:${ item.retrySaveStatus }`
+		)
+		.join( '|' );
+	const confirmedSaveStatusHoldMs =
+		getDistributedEditingConfirmedSaveStatusHoldMs();
+	const [ quietedConfirmedSaveStatusIds, setQuietedConfirmedSaveStatusIds ] =
+		useState( [] );
 	const unloadWarningMessage =
 		getDistributedEditingUnloadWarningMessage( unloadWarningState );
 	const actionStatusMessage = actionStatus?.message;
+
+	useEffect( () => {
+		if ( ! confirmedSaveStatusItemsKey ) {
+			setQuietedConfirmedSaveStatusIds( [] );
+			return;
+		}
+
+		setQuietedConfirmedSaveStatusIds( [] );
+		const timeoutId = setTimeout( () => {
+			setQuietedConfirmedSaveStatusIds(
+				confirmedSaveStatusItemIdsKey.split( '|' ).filter( Boolean )
+			);
+		}, confirmedSaveStatusHoldMs );
+
+		return () => {
+			clearTimeout( timeoutId );
+		};
+	}, [
+		confirmedSaveStatusHoldMs,
+		confirmedSaveStatusItemIdsKey,
+		confirmedSaveStatusItemsKey,
+	] );
 
 	if (
 		! statusItems.length &&
@@ -1441,6 +1480,11 @@ export function DistributedEditingStatusSurface( {
 					);
 				const actionTranscriptSupportReport =
 					item.actionTranscriptSupportReport;
+				const isConfirmedSaveStatus =
+					isConfirmedRetrySaveStatusItem( item );
+				const isQuietedConfirmedSaveStatus =
+					isConfirmedSaveStatus &&
+					quietedConfirmedSaveStatusIds.includes( item.id );
 
 				return (
 					<div
@@ -1506,6 +1550,16 @@ export function DistributedEditingStatusSurface( {
 						data-distributed-editing-conflict-authoritative-post-updated={ formatDataBoolean(
 							item.conflictResolutionAuthoritativePostUpdated
 						) }
+						data-distributed-editing-confirmed-save-status-evidence-retained={
+							isConfirmedSaveStatus ? 'true' : undefined
+						}
+						data-distributed-editing-confirmed-save-status-quieted={
+							isConfirmedSaveStatus
+								? formatDataBoolean(
+										isQuietedConfirmedSaveStatus
+								  )
+								: undefined
+						}
 						data-distributed-editing-next-step={
 							item.nextStepAction || undefined
 						}
@@ -1529,7 +1583,26 @@ export function DistributedEditingStatusSurface( {
 							actions={ getNoticeActions( item, onAction ) }
 						>
 							<strong>{ item.title }</strong>
-							<div>{ item.message }</div>
+							{ isQuietedConfirmedSaveStatus ? (
+								<>
+									<div>
+										{ getQuietedConfirmedSaveStatusMessage(
+											item
+										) }
+									</div>
+									<details
+										className="editor-distributed-editing-status__confirmed-save-details"
+										data-distributed-editing-confirmed-save-status-details="retained"
+									>
+										<summary>
+											{ __( 'Show Save evidence' ) }
+										</summary>
+										<div>{ item.message }</div>
+									</details>
+								</>
+							) : (
+								<div>{ item.message }</div>
+							) }
 							{ nextStepMessage && (
 								<div className="editor-distributed-editing-status__next-step">
 									<strong>{ __( 'Next step:' ) }</strong>{ ' ' }
@@ -2854,6 +2927,21 @@ function getDistributedEditingConfirmedSaveShellHoldMs() {
 	}
 
 	return DISTRIBUTED_EDITING_CONFIRMED_SAVE_SHELL_HOLD_MS;
+}
+
+function getDistributedEditingConfirmedSaveStatusHoldMs() {
+	const holdMs =
+		globalThis.__experimentalDistributedEditingConfirmedSaveStatusHoldMs;
+
+	if (
+		typeof holdMs === 'number' &&
+		Number.isFinite( holdMs ) &&
+		holdMs >= 0
+	) {
+		return holdMs;
+	}
+
+	return DISTRIBUTED_EDITING_CONFIRMED_SAVE_STATUS_HOLD_MS;
 }
 
 function getDistributedEditingQuietedConfirmedSaveShellState( shellState ) {
@@ -6105,6 +6193,25 @@ function getFreshReviewStatusItemTestId( item, freshReviewAuthorityStatus ) {
 	}
 
 	return undefined;
+}
+
+function isConfirmedRetrySaveStatusItem( item ) {
+	return (
+		item?.kind === DISTRIBUTED_EDITING_NOTICE_KINDS.RETRY_SAVE &&
+		item?.retrySaveStatus === DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVED
+	);
+}
+
+function getQuietedConfirmedSaveStatusMessage( item ) {
+	if ( isRetrySaveFreshReviewRetrySaveItem( item ) ) {
+		return __(
+			'WordPress confirmed the reviewed update. Open details for version and revision evidence.'
+		);
+	}
+
+	return __(
+		'WordPress confirmed the update. Open details for version and revision evidence.'
+	);
 }
 
 function getPendingChangesMessage( descriptor ) {

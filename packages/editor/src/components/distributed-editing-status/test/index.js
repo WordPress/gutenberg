@@ -6970,51 +6970,117 @@ describe( 'DistributedEditingStatus', () => {
 		).toBeVisible();
 	} );
 
-	it( 'renders already-confirmed retry-save state from production editor chrome without recovery actions', () => {
-		setupDistributedEditingStatusSelect( {
-			sessionState: {
-				retrySaveStatus: DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVED,
-				retrySaveAccepted: true,
-				retrySaveServerVersion: '8',
-				retrySavePreviousServerVersion: '7',
-				retrySaveSavesPost: true,
-				retrySaveMutatesPostContent: true,
-				retrySaveCreatesRevision: true,
-				retrySaveClaimsSaved: true,
-				retrySaveRevisionCreated: true,
-				retrySaveCreatedRevisionIds: [ 7002 ],
-			},
-		} );
+	it( 'renders already-confirmed retry-save state from production editor chrome without recovery actions and then quiets evidence', () => {
+		const originalConfirmedSaveStatusHoldMs =
+			globalThis.__experimentalDistributedEditingConfirmedSaveStatusHoldMs;
+		globalThis.__experimentalDistributedEditingConfirmedSaveStatusHoldMs = 1000;
+		jest.useFakeTimers();
 
-		render( <DistributedEditingStatusChrome /> );
+		try {
+			setupDistributedEditingStatusSelect( {
+				sessionState: {
+					retrySaveStatus:
+						DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVED,
+					retrySaveAccepted: true,
+					retrySaveServerVersion: '8',
+					retrySavePreviousServerVersion: '7',
+					retrySaveSavesPost: true,
+					retrySaveMutatesPostContent: true,
+					retrySaveCreatesRevision: true,
+					retrySaveClaimsSaved: true,
+					retrySaveRevisionCreated: true,
+					retrySaveCreatedRevisionIds: [ 7002 ],
+				},
+			} );
 
-		expect(
-			screen.getByRole( 'region', {
-				name: 'Distributed editing status',
-			} )
-		).toHaveAttribute(
-			'data-distributed-editing-placement',
-			'editor-interface-notices'
-		);
-		expect( screen.getByText( 'Save confirmed' ) ).toBeVisible();
-		expect(
-			screen.getByText(
-				'WordPress saved the prepared changes, advanced the sync version from 7 to 8, and recorded 1 revision. Protected local changes are no longer pending for this save.'
-			)
-		).toBeVisible();
-		expect(
-			screen.queryByRole( 'button', {
-				name: 'Export local changes',
-			} )
-		).not.toBeInTheDocument();
-		expect(
-			screen.queryByRole( 'button', {
-				name: 'Get latest post',
-			} )
-		).not.toBeInTheDocument();
-		expect(
-			screen.queryByText( 'Changes pending' )
-		).not.toBeInTheDocument();
+			render( <DistributedEditingStatusChrome /> );
+
+			expect(
+				screen.getByRole( 'region', {
+					name: 'Distributed editing status',
+				} )
+			).toHaveAttribute(
+				'data-distributed-editing-placement',
+				'editor-interface-notices'
+			);
+			expect( screen.getByText( 'Save confirmed' ) ).toBeVisible();
+			expect(
+				screen.getByText(
+					'WordPress saved the prepared changes, advanced the sync version from 7 to 8, and recorded 1 revision. Protected local changes are no longer pending for this save.'
+				)
+			).toBeVisible();
+			// eslint-disable-next-line testing-library/no-node-access
+			const confirmedStatusItem = screen
+				.getByText( 'Save confirmed' )
+				.closest(
+					'[data-distributed-editing-confirmed-save-status-evidence-retained]'
+				);
+			expect( confirmedStatusItem ).toHaveAttribute(
+				'data-distributed-editing-confirmed-save-status-evidence-retained',
+				'true'
+			);
+			expect( confirmedStatusItem ).toHaveAttribute(
+				'data-distributed-editing-confirmed-save-status-quieted',
+				'false'
+			);
+			expect(
+				screen.queryByText(
+					'WordPress confirmed the update. Open details for version and revision evidence.'
+				)
+			).not.toBeInTheDocument();
+			expect(
+				screen.queryByRole( 'button', {
+					name: 'Export local changes',
+				} )
+			).not.toBeInTheDocument();
+			expect(
+				screen.queryByRole( 'button', {
+					name: 'Get latest post',
+				} )
+			).not.toBeInTheDocument();
+			expect(
+				screen.queryByText( 'Changes pending' )
+			).not.toBeInTheDocument();
+
+			act( () => {
+				jest.advanceTimersByTime( 1000 );
+			} );
+
+			expect( confirmedStatusItem ).toHaveAttribute(
+				'data-distributed-editing-confirmed-save-status-evidence-retained',
+				'true'
+			);
+			expect( confirmedStatusItem ).toHaveAttribute(
+				'data-distributed-editing-confirmed-save-status-quieted',
+				'true'
+			);
+			expect( screen.getByText( 'Save confirmed' ) ).toBeVisible();
+			expect(
+				screen.getByText(
+					'WordPress confirmed the update. Open details for version and revision evidence.'
+				)
+			).toBeVisible();
+			expect( screen.getByText( 'Show Save evidence' ) ).toBeVisible();
+			// eslint-disable-next-line testing-library/no-node-access
+			const evidenceDetails = confirmedStatusItem.querySelector(
+				'[data-distributed-editing-confirmed-save-status-details="retained"]'
+			);
+			expect( evidenceDetails ).not.toHaveAttribute( 'open' );
+			expect(
+				screen.getByText(
+					'WordPress saved the prepared changes, advanced the sync version from 7 to 8, and recorded 1 revision. Protected local changes are no longer pending for this save.'
+				)
+			).toBeInTheDocument();
+		} finally {
+			jest.useRealTimers();
+
+			if ( originalConfirmedSaveStatusHoldMs === undefined ) {
+				delete globalThis.__experimentalDistributedEditingConfirmedSaveStatusHoldMs;
+			} else {
+				globalThis.__experimentalDistributedEditingConfirmedSaveStatusHoldMs =
+					originalConfirmedSaveStatusHoldMs;
+			}
+		}
 	} );
 
 	it( 'renders blocked retry-save in-progress handoff feedback from production editor chrome without saving', async () => {
