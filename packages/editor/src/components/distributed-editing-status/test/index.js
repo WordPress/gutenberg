@@ -1022,6 +1022,14 @@ describe( 'DistributedEditingStatus', () => {
 			'true'
 		);
 		expect( comparison ).toHaveAttribute(
+			'data-distributed-editing-conflict-comparison-header-mode',
+			'compare_versions'
+		);
+		expect( comparison ).toHaveAttribute(
+			'data-distributed-editing-conflict-comparison-guide-steps-visible',
+			'true'
+		);
+		expect( comparison ).toHaveAttribute(
 			'data-distributed-editing-conflict-comparison-choice-control-mode',
 			'choose_between_versions'
 		);
@@ -1549,11 +1557,6 @@ describe( 'DistributedEditingStatus', () => {
 		const comparison = screen.getByRole( 'region', {
 			name: 'Distributed editing conflict comparison',
 		} );
-		// eslint-disable-next-line testing-library/no-node-access
-		const saveStep = comparison.querySelector(
-			'[data-distributed-editing-conflict-resolution-step="save"]'
-		);
-
 		expect( comparison ).toHaveAttribute(
 			'data-distributed-editing-conflict-resolution-guide-status',
 			'save_prepared'
@@ -1575,6 +1578,14 @@ describe( 'DistributedEditingStatus', () => {
 			'save_guarded_update'
 		);
 		expect( comparison ).toHaveAttribute(
+			'data-distributed-editing-conflict-comparison-header-mode',
+			'selected_version_ready_to_save'
+		);
+		expect( comparison ).toHaveAttribute(
+			'data-distributed-editing-conflict-comparison-guide-steps-visible',
+			'false'
+		);
+		expect( comparison ).toHaveAttribute(
 			'data-distributed-editing-conflict-comparison-prepared-compact',
 			'true'
 		);
@@ -1594,10 +1605,33 @@ describe( 'DistributedEditingStatus', () => {
 			'data-distributed-editing-conflict-comparison-visible-row-count',
 			'1'
 		);
-		expect( saveStep ).toHaveAttribute(
-			'data-distributed-editing-conflict-resolution-step-current',
-			'true'
-		);
+		expect(
+			within( comparison ).queryByText( 'Choose version' )
+		).not.toBeInTheDocument();
+		expect(
+			within( comparison ).queryByText( 'Check choice' )
+		).not.toBeInTheDocument();
+		expect(
+			within( comparison ).queryByText( 'Use Save' )
+		).not.toBeInTheDocument();
+		expect(
+			within( comparison ).getByText(
+				'Selected version is ready to Save'
+			)
+		).toBeVisible();
+		expect(
+			within( comparison ).getByText(
+				'The selected version is shown below. Use Save to update WordPress, or change to the other version before saving.'
+			)
+		).toBeVisible();
+		expect(
+			within( comparison ).queryByText( 'Compare changes' )
+		).not.toBeInTheDocument();
+		expect(
+			within( comparison ).queryByText(
+				'This editor and WordPress changed the same block. Choose the local version or the latest WordPress version before trying Save again.'
+			)
+		).not.toBeInTheDocument();
 		expect( screen.getByText( 'Save is prepared' ) ).toBeVisible();
 		expect(
 			screen.getByText(

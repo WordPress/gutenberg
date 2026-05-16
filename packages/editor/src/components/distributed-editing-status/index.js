@@ -1991,6 +1991,17 @@ function DistributedEditingSameBlockConflictComparison( {
 	const visibleRows = isPreparedComparisonCompact
 		? comparison.rows.filter( ( row ) => row.id === selectedRowId )
 		: comparison.rows;
+	const comparisonHeaderTitle = isPreparedComparisonCompact
+		? __( 'Selected version is ready to Save' )
+		: __( 'Compare changes' );
+	const comparisonHeaderMessage = isPreparedComparisonCompact
+		? __(
+				'The selected version is shown below. Use Save to update WordPress, or change to the other version before saving.'
+		  )
+		: __(
+				'This editor and WordPress changed the same block. Choose the local version or the latest WordPress version before trying Save again.'
+		  );
+	const visibleGuideSteps = isPreparedComparisonCompact ? [] : guideSteps;
 	const conflictChoiceActions = isPreparedComparisonCompact
 		? [
 				isLocalChoiceSelected
@@ -2051,6 +2062,14 @@ function DistributedEditingSameBlockConflictComparison( {
 			data-distributed-editing-conflict-comparison-has-server={ formatDataBoolean(
 				comparison.hasServerContent
 			) }
+			data-distributed-editing-conflict-comparison-guide-steps-visible={ formatDataBoolean(
+				! isPreparedComparisonCompact
+			) }
+			data-distributed-editing-conflict-comparison-header-mode={
+				isPreparedComparisonCompact
+					? 'selected_version_ready_to_save'
+					: 'compare_versions'
+			}
 			data-distributed-editing-conflict-comparison-choice-control-mode={
 				isPreparedComparisonCompact
 					? 'change_only'
@@ -2114,12 +2133,8 @@ function DistributedEditingSameBlockConflictComparison( {
 			role="region"
 		>
 			<div className="editor-distributed-editing-status__conflict-comparison-header">
-				<strong>{ __( 'Compare changes' ) }</strong>
-				<p>
-					{ __(
-						'This editor and WordPress changed the same block. Choose the local version or the latest WordPress version before trying Save again.'
-					) }
-				</p>
+				<strong>{ comparisonHeaderTitle }</strong>
+				<p>{ comparisonHeaderMessage }</p>
 			</div>
 			<div
 				aria-live="polite"
@@ -2130,22 +2145,24 @@ function DistributedEditingSameBlockConflictComparison( {
 			>
 				<strong>{ guide.title }</strong>
 				<p>{ guide.message }</p>
-				<ol className="editor-distributed-editing-status__conflict-comparison-steps">
-					{ guideSteps.map( ( step ) => (
-						<li
-							className="editor-distributed-editing-status__conflict-comparison-step"
-							data-distributed-editing-conflict-resolution-step={
-								step.id
-							}
-							data-distributed-editing-conflict-resolution-step-current={ formatDataBoolean(
-								step.isCurrent
-							) }
-							key={ step.id }
-						>
-							{ step.label }
-						</li>
-					) ) }
-				</ol>
+				{ visibleGuideSteps.length > 0 && (
+					<ol className="editor-distributed-editing-status__conflict-comparison-steps">
+						{ visibleGuideSteps.map( ( step ) => (
+							<li
+								className="editor-distributed-editing-status__conflict-comparison-step"
+								data-distributed-editing-conflict-resolution-step={
+									step.id
+								}
+								data-distributed-editing-conflict-resolution-step-current={ formatDataBoolean(
+									step.isCurrent
+								) }
+								key={ step.id }
+							>
+								{ step.label }
+							</li>
+						) ) }
+					</ol>
+				) }
 				{ comparison.saveReady && (
 					<div
 						className="editor-distributed-editing-status__conflict-comparison-save-cue"
