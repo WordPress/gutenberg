@@ -1041,6 +1041,7 @@ describe( 'DistributedEditingStatus', () => {
 			'data-distributed-editing-conflict-resolution-next-step',
 			'choose_conflict_version'
 		);
+		expect( screen.queryByText( 'Selected' ) ).not.toBeInTheDocument();
 		expect( screen.getByLabelText( 'Base version' ) ).toHaveValue(
 			'Base paragraph edit & seed.'
 		);
@@ -1350,6 +1351,7 @@ describe( 'DistributedEditingStatus', () => {
 				name: 'Use latest from WordPress',
 			} )
 		).toHaveAttribute( 'aria-pressed', 'false' );
+		expect( screen.getByText( 'Selected' ) ).toBeVisible();
 		expect(
 			within( comparison ).getByRole( 'button', {
 				name: 'Check this choice',
@@ -7009,12 +7011,11 @@ describe( 'DistributedEditingStatus', () => {
 					'WordPress saved the prepared changes, advanced the sync version from 7 to 8, and recorded 1 revision. Protected local changes are no longer pending for this save.'
 				)
 			).toBeVisible();
+			const confirmedSaveText = screen.getByText( 'Save confirmed' );
 			// eslint-disable-next-line testing-library/no-node-access
-			const confirmedStatusItem = screen
-				.getByText( 'Save confirmed' )
-				.closest(
-					'[data-distributed-editing-confirmed-save-status-evidence-retained]'
-				);
+			const confirmedStatusItem = confirmedSaveText.closest(
+				'[data-distributed-editing-confirmed-save-status-evidence-retained]'
+			);
 			expect( confirmedStatusItem ).toHaveAttribute(
 				'data-distributed-editing-confirmed-save-status-evidence-retained',
 				'true'

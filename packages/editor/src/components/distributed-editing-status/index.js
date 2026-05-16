@@ -1745,13 +1745,19 @@ function getDistributedEditingSameBlockConflictComparison(
 		Boolean( normalized.staleBaseConflictResolutionChoice ) &&
 		isRetrySubmitProofAccepted &&
 		! savePrepared;
-	const nextStepAction = savePrepared
-		? 'save_guarded_update'
-		: canPrepareSave
-		? 'prepare_guarded_save'
-		: canRequestFreshProof
-		? 'check_conflict_choice'
-		: 'choose_conflict_version';
+	let nextStepAction = 'choose_conflict_version';
+
+	if ( canRequestFreshProof ) {
+		nextStepAction = 'check_conflict_choice';
+	}
+
+	if ( canPrepareSave ) {
+		nextStepAction = 'prepare_guarded_save';
+	}
+
+	if ( savePrepared ) {
+		nextStepAction = 'save_guarded_update';
+	}
 
 	return {
 		blockIndex: comparedBlocks.blockIndex,
@@ -1971,6 +1977,13 @@ function DistributedEditingSameBlockConflictComparison( {
 	const isLatestWordPressChoiceSelected =
 		comparison.resolutionChoice ===
 		DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_CHOICES.LATEST_WORDPRESS;
+	let selectedRowId = null;
+
+	if ( isLocalChoiceSelected ) {
+		selectedRowId = 'local';
+	} else if ( isLatestWordPressChoiceSelected ) {
+		selectedRowId = 'server';
+	}
 
 	return (
 		<div
@@ -2085,23 +2098,38 @@ function DistributedEditingSameBlockConflictComparison( {
 				) }
 			</div>
 			<div className="editor-distributed-editing-status__conflict-comparison-grid">
-				{ comparison.rows.map( ( row ) => (
-					<div
-						className="editor-distributed-editing-status__conflict-comparison-row"
-						key={ row.id }
-					>
-						<span className="editor-distributed-editing-status__conflict-comparison-label">
-							{ row.label }
-						</span>
-						<textarea
-							aria-label={ row.label }
-							className="editor-distributed-editing-status__conflict-comparison-text"
-							readOnly
-							rows={ getConflictComparisonRows( row.text ) }
-							value={ row.text }
-						/>
-					</div>
-				) ) }
+				{ comparison.rows.map( ( row ) => {
+					const isSelectedRow = row.id === selectedRowId;
+
+					return (
+						<div
+							className="editor-distributed-editing-status__conflict-comparison-row"
+							data-distributed-editing-conflict-comparison-row={
+								row.id
+							}
+							data-distributed-editing-conflict-comparison-row-selected={ formatDataBoolean(
+								isSelectedRow
+							) }
+							key={ row.id }
+						>
+							<span className="editor-distributed-editing-status__conflict-comparison-label">
+								{ row.label }
+								{ isSelectedRow && (
+									<span className="editor-distributed-editing-status__conflict-comparison-selected-badge">
+										{ __( 'Selected' ) }
+									</span>
+								) }
+							</span>
+							<textarea
+								aria-label={ row.label }
+								className="editor-distributed-editing-status__conflict-comparison-text"
+								readOnly
+								rows={ getConflictComparisonRows( row.text ) }
+								value={ row.text }
+							/>
+						</div>
+					);
+				} ) }
 			</div>
 			<div className="editor-distributed-editing-status__conflict-comparison-actions">
 				<div className="editor-distributed-editing-status__conflict-comparison-action-group editor-distributed-editing-status__conflict-comparison-action-group--choices">
@@ -2111,7 +2139,9 @@ function DistributedEditingSameBlockConflictComparison( {
 						data-distributed-editing-conflict-choice-selected={ formatDataBoolean(
 							isLocalChoiceSelected
 						) }
-						variant="secondary"
+						variant={
+							isLocalChoiceSelected ? 'primary' : 'secondary'
+						}
 						onClick={ onSelectLocalVersion }
 					>
 						{ __( 'Keep your local version' ) }
@@ -2122,7 +2152,11 @@ function DistributedEditingSameBlockConflictComparison( {
 						data-distributed-editing-conflict-choice-selected={ formatDataBoolean(
 							isLatestWordPressChoiceSelected
 						) }
-						variant="secondary"
+						variant={
+							isLatestWordPressChoiceSelected
+								? 'primary'
+								: 'secondary'
+						}
 						onClick={ onSelectLatestWordPressVersion }
 					>
 						{ __( 'Use latest from WordPress' ) }
@@ -3182,10 +3216,6 @@ export function DistributedEditingEnabledShell( {
 		};
 	}, [] );
 
-	if ( ! editorSettings?.distributedEditing?.enabled ) {
-		return null;
-	}
-
 	const rawShellState =
 		getDistributedEditingEnabledShellState( sessionState );
 	const isConfirmedSaveShell =
@@ -3221,6 +3251,10 @@ export function DistributedEditingEnabledShell( {
 		confirmedSaveShellKey,
 		isConfirmedSaveShell,
 	] );
+
+	if ( ! editorSettings?.distributedEditing?.enabled ) {
+		return null;
+	}
 
 	const shellState =
 		isConfirmedSaveShell && isConfirmedSaveShellQuieted
