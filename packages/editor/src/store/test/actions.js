@@ -6028,6 +6028,175 @@ describe( 'Post actions', () => {
 			} );
 		} );
 
+		it( 'routes a prepared same-block conflict choice through guarded retry-save on setting-enabled savePost', async () => {
+			const originalPostContent =
+				'<!-- wp:paragraph --><p>Original conflict base.</p><!-- /wp:paragraph -->';
+			const chosenPostContent =
+				'<!-- wp:paragraph --><p>Chosen latest WordPress conflict text.</p><!-- /wp:paragraph -->';
+			const proposedPostContentHash =
+				'1212121212121212121212121212121212121212121212121212121212121212';
+			const post = {
+				id: postId,
+				type: 'post',
+				title: 'bar',
+				content: originalPostContent,
+				status: 'draft',
+			};
+			let retrySaveCalls = 0;
+			let normalSaveCalls = 0;
+			let serverStateRefetchCalls = 0;
+			let retrySaveRequestData = null;
+
+			apiFetch.setFetchHandler( async ( options ) => {
+				const method = getMethod( options );
+				const { data } = options;
+				const path = options.path ?? '';
+
+				if (
+					method === 'POST' &&
+					path.startsWith(
+						`/wp/v2/posts/${ postId }/distributed-editing/retry-save`
+					)
+				) {
+					retrySaveCalls++;
+					retrySaveRequestData = data;
+
+					return {
+						result: 'retry_save_applied',
+						retry_save_accepted: true,
+						previous_server_version: '7',
+						server_version: '8',
+						pending_change_count: 0,
+						saves_post: true,
+						mutates_post_content: true,
+						creates_revision: true,
+						claims_saved: true,
+						revision_created: true,
+						created_revision_ids: [ 7008 ],
+					};
+				}
+
+				if (
+					method === 'GET' &&
+					path === `/wp/v2/posts/${ postId }?context=edit`
+				) {
+					serverStateRefetchCalls++;
+
+					return post;
+				}
+
+				if (
+					( method === 'POST' || method === 'PUT' ) &&
+					path.startsWith( `/wp/v2/posts/${ postId }` )
+				) {
+					normalSaveCalls++;
+				}
+
+				throw {
+					code: 'unknown_path',
+					message: `Unknown path: ${ method } ${ path }`,
+				};
+			} );
+
+			const registry = createRegistryWithStores();
+
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', post );
+			registry.dispatch( editorStore ).setupEditor( post, {
+				content: chosenPostContent,
+			} );
+			registry.dispatch( editorStore ).updateEditorSettings( {
+				distributedEditing: {
+					enabled: true,
+					retrySaveHandoff: true,
+				},
+			} );
+			registry
+				.dispatch( editorStore )
+				.setDistributedEditingSessionState( {
+					clientBaseVersion: '4',
+					serverVersion: '7',
+					pendingChangeCount: 1,
+					hasPendingChanges: true,
+					canExportLocalUpdates: true,
+					refetchedServerState: true,
+					staleBaseConflictResolutionStatus:
+						'latest_wordpress_selected',
+					staleBaseConflictResolutionChoice: 'latest_wordpress',
+					staleBaseConflictResolutionRequiresFreshProof: false,
+					requiresManualConflictResolution: false,
+					retrySubmitProofStatus:
+						DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.ACCEPTED_FOR_FUTURE_SAVE,
+					retrySubmitAccepted: true,
+					retrySubmitSavePathRequired: true,
+					retrySubmitSavesPost: false,
+					retrySubmitMutatesPostContent: false,
+					retrySubmitCreatesRevision: false,
+					retrySubmitClaimsSaved: false,
+					retrySubmitSaveStatus:
+						DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.READY,
+					retrySubmitSaveReady: true,
+					retrySubmitSavePrepared: true,
+				} );
+
+			await expect(
+				registry.dispatch( editorStore ).savePost( {
+					proposedPostContentHash,
+				} )
+			).resolves.toMatchObject( {
+				status: 'retry_save_submitted',
+				callsRetrySaveAction: true,
+				callsNormalSavePost: false,
+				claimsSaved: true,
+				sessionState: {
+					retrySaveStatus:
+						DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVED,
+					retrySaveAccepted: true,
+					retrySaveServerVersion: '8',
+					retrySavePreviousServerVersion: '7',
+					retrySaveSavesPost: true,
+					retrySaveMutatesPostContent: true,
+					retrySaveCreatesRevision: true,
+					retrySaveClaimsSaved: true,
+					retrySaveRevisionCreated: true,
+					retrySaveCreatedRevisionIds: [ 7008 ],
+					canExportLocalUpdates: false,
+					hasPendingChanges: false,
+				},
+			} );
+
+			expect( retrySaveCalls ).toBe( 1 );
+			expect( normalSaveCalls ).toBe( 0 );
+			expect( serverStateRefetchCalls ).toBe( 0 );
+			expect( retrySaveRequestData ).toEqual( {
+				client_base_version: '7',
+				accepted_proof_server_version: '7',
+				rebased_from_version: '4',
+				pending_change_count: 1,
+				proposed_post_content: chosenPostContent,
+				accepted_proof_saves_post: false,
+				accepted_proof_mutates_post_content: false,
+				accepted_proof_creates_revision: false,
+				accepted_proof_claims_saved: false,
+				proposed_post_content_hash: proposedPostContentHash,
+			} );
+			expect(
+				registry
+					.select( editorStore )
+					.getDistributedEditingSessionState()
+			).toMatchObject( {
+				retrySaveStatus: DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVED,
+				retrySaveAccepted: true,
+				retrySaveServerVersion: '8',
+				retrySaveRevisionCreated: true,
+				retrySaveCreatedRevisionIds: [ 7008 ],
+				canExportLocalUpdates: false,
+				hasPendingChanges: false,
+				staleBaseConflictResolutionChoice: 'latest_wordpress',
+			} );
+		} );
+
 		it( 'routes setting-enabled savePost to risky-block review before normal save', async () => {
 			const originalPostContent =
 				'<!-- wp:paragraph --><p>Original.</p><!-- /wp:paragraph -->';
