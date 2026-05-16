@@ -1934,28 +1934,68 @@ function getConflictComparisonGuide( comparison ) {
 }
 
 function getConflictComparisonGuideSteps( currentStep ) {
-	return [
+	const steps = [
 		{
 			id: 'choose',
 			label: __( 'Choose version' ),
-			isCurrent: currentStep === 'choose',
 		},
 		{
 			id: 'check',
 			label: __( 'Check choice' ),
-			isCurrent: currentStep === 'check',
 		},
 		{
 			id: 'prepare',
 			label: __( 'Prepare Save' ),
-			isCurrent: currentStep === 'prepare',
 		},
 		{
 			id: 'save',
 			label: __( 'Use Save' ),
-			isCurrent: currentStep === 'save',
 		},
 	];
+	const currentIndex = Math.max(
+		0,
+		steps.findIndex( ( step ) => step.id === currentStep )
+	);
+
+	return steps.map( ( step, index ) => {
+		let status = 'upcoming';
+
+		if ( index < currentIndex ) {
+			status = 'complete';
+		} else if ( index === currentIndex ) {
+			status = 'current';
+		}
+
+		return {
+			...step,
+			isCurrent: status === 'current',
+			status,
+		};
+	} );
+}
+
+function getConflictComparisonGuideStepAriaLabel( step ) {
+	if ( step.status === 'complete' ) {
+		return sprintf(
+			/* translators: %s: conflict resolution step label. */
+			__( '%s, complete' ),
+			step.label
+		);
+	}
+
+	if ( step.status === 'current' ) {
+		return sprintf(
+			/* translators: %s: conflict resolution step label. */
+			__( '%s, current step' ),
+			step.label
+		);
+	}
+
+	return sprintf(
+		/* translators: %s: conflict resolution step label. */
+		__( '%s, upcoming' ),
+		step.label
+	);
 }
 
 function DistributedEditingSameBlockConflictComparison( {
@@ -2188,6 +2228,12 @@ function DistributedEditingSameBlockConflictComparison( {
 						<ol className="editor-distributed-editing-status__conflict-comparison-steps">
 							{ visibleGuideSteps.map( ( step ) => (
 								<li
+									aria-current={
+										step.isCurrent ? 'step' : undefined
+									}
+									aria-label={ getConflictComparisonGuideStepAriaLabel(
+										step
+									) }
 									className="editor-distributed-editing-status__conflict-comparison-step"
 									data-distributed-editing-conflict-resolution-step={
 										step.id
@@ -2195,6 +2241,9 @@ function DistributedEditingSameBlockConflictComparison( {
 									data-distributed-editing-conflict-resolution-step-current={ formatDataBoolean(
 										step.isCurrent
 									) }
+									data-distributed-editing-conflict-resolution-step-status={
+										step.status
+									}
 									key={ step.id }
 								>
 									{ step.label }

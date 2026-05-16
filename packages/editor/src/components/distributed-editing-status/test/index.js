@@ -944,6 +944,22 @@ describe( 'DistributedEditingStatus', () => {
 		expect( screen.getByText( 'Check choice' ) ).toBeVisible();
 		expect( screen.getByText( 'Prepare Save' ) ).toBeVisible();
 		expect( screen.getByText( 'Use Save' ) ).toBeVisible();
+		expect( screen.getByText( 'Choose version' ) ).toHaveAttribute(
+			'aria-current',
+			'step'
+		);
+		expect( screen.getByText( 'Choose version' ) ).toHaveAttribute(
+			'aria-label',
+			'Choose version, current step'
+		);
+		expect( screen.getByText( 'Choose version' ) ).toHaveAttribute(
+			'data-distributed-editing-conflict-resolution-step-status',
+			'current'
+		);
+		expect( screen.getByText( 'Check choice' ) ).toHaveAttribute(
+			'data-distributed-editing-conflict-resolution-step-status',
+			'upcoming'
+		);
 		expect(
 			within( status ).getByRole( 'button', {
 				name: 'Get latest post',
@@ -1403,6 +1419,22 @@ describe( 'DistributedEditingStatus', () => {
 		).toBeVisible();
 		expect( screen.getByText( 'Prepare Save' ) ).toBeVisible();
 		expect( screen.getByText( 'Use Save' ) ).toBeVisible();
+		expect( screen.getByText( 'Choose version' ) ).toHaveAttribute(
+			'data-distributed-editing-conflict-resolution-step-status',
+			'complete'
+		);
+		expect( screen.getByText( 'Choose version' ) ).toHaveAttribute(
+			'aria-label',
+			'Choose version, complete'
+		);
+		expect( screen.getByText( 'Check choice' ) ).toHaveAttribute(
+			'aria-current',
+			'step'
+		);
+		expect( screen.getByText( 'Check choice' ) ).toHaveAttribute(
+			'data-distributed-editing-conflict-resolution-step-status',
+			'current'
+		);
 		expect(
 			within( comparison ).getByRole( 'button', {
 				name: 'Keep your local version',
@@ -1525,6 +1557,31 @@ describe( 'DistributedEditingStatus', () => {
 				'Prepare Save before using the editor Save button. WordPress has not changed the post yet.'
 			)
 		).toBeVisible();
+		expect( screen.getByText( 'Choose version' ) ).toHaveAttribute(
+			'data-distributed-editing-conflict-resolution-step-status',
+			'complete'
+		);
+		expect( screen.getByText( 'Check choice' ) ).toHaveAttribute(
+			'data-distributed-editing-conflict-resolution-step-status',
+			'complete'
+		);
+		const prepareSaveStep = within( comparison )
+			.getAllByText( 'Prepare Save' )
+			.find(
+				( element ) =>
+					element.getAttribute(
+						'data-distributed-editing-conflict-resolution-step'
+					) === 'prepare'
+			);
+		expect( prepareSaveStep ).toHaveAttribute( 'aria-current', 'step' );
+		expect( prepareSaveStep ).toHaveAttribute(
+			'aria-label',
+			'Prepare Save, current step'
+		);
+		expect( screen.getByText( 'Use Save' ) ).toHaveAttribute(
+			'data-distributed-editing-conflict-resolution-step-status',
+			'upcoming'
+		);
 		expect(
 			within( comparison ).queryByRole( 'button', {
 				name: 'Check this choice',

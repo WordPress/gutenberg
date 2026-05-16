@@ -291,9 +291,16 @@
 }
 
 .editor-distributed-editing-status__conflict-comparison-step[data-distributed-editing-conflict-resolution-step-current="true"] {
+	background: #fcf9e8;
 	border-color: #dba617;
 	color: $gray-900;
 	font-weight: 600;
+}
+
+.editor-distributed-editing-status__conflict-comparison-step[data-distributed-editing-conflict-resolution-step-status="complete"] {
+	background: #f0f6fc;
+	border-color: #72aee6;
+	color: #135e96;
 }
 
 .editor-distributed-editing-status__conflict-comparison-grid {
