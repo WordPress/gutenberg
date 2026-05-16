@@ -216,7 +216,7 @@ export default function PostSavedState( { forceIsDirty } ) {
 		  distributedEditingAuthoritativePostUpdated
 		: isSaving || isSaved;
 	const isDisabled = hasDistributedEditingSaveButtonState
-		? distributedEditingSaveButtonDisabled || ! isSaveable || isSavingLocked
+		? distributedEditingSaveButtonDisabled
 		: isSaving || isSaved || ! isSaveable || isSavingLocked;
 	let buttonTitle;
 	if ( hasDistributedEditingSaveJourneyState ) {

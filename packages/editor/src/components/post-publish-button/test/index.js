@@ -41,6 +41,27 @@ describe( 'PostPublishButton', () => {
 			).toHaveAttribute( 'aria-disabled', 'true' );
 		} );
 
+		it( 'should remain clickable if Distributed Editing owns the save action', () => {
+			render(
+				<PostPublishButton
+					isPublishable
+					isSaveable={ false }
+					distributedEditingSaveButtonState={ {
+						status: 'workflow_action_required',
+						source: 'stale_base_recovery',
+						label: 'Apply local changes',
+						statusText:
+							'Apply protected local changes before Save can update the post.',
+						clickAction: 'apply_local_changes',
+					} }
+				/>
+			);
+
+			expect(
+				screen.getByRole( 'button', { name: 'Apply local changes' } )
+			).toHaveAttribute( 'aria-disabled', 'false' );
+		} );
+
 		it( 'should be true if post saving is locked', () => {
 			render(
 				<PostPublishButton

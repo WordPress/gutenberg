@@ -172,22 +172,24 @@ export class PostPublishButton extends Component {
 				  )
 				: distributedEditingSaveButtonStatusText;
 
-		const isButtonDisabled =
-			isPostSavingLocked ||
-			distributedEditingSaveButtonDisabled ||
-			( ( isSaving ||
-				! isSaveable ||
-				( ! isPublishable && ! forceIsDirty ) ) &&
-				( ! hasNonPostEntityChanges || isSavingNonPostEntityChanges ) );
+		const isButtonDisabled = hasDistributedEditingSaveButtonState
+			? distributedEditingSaveButtonDisabled
+			: isPostSavingLocked ||
+			  ( ( isSaving ||
+					! isSaveable ||
+					( ! isPublishable && ! forceIsDirty ) ) &&
+					( ! hasNonPostEntityChanges ||
+						isSavingNonPostEntityChanges ) );
 
-		const isToggleDisabled =
-			isPostSavingLocked ||
-			distributedEditingSaveButtonDisabled ||
-			( ( isPublished ||
-				isSaving ||
-				! isSaveable ||
-				( ! isPublishable && ! forceIsDirty ) ) &&
-				( ! hasNonPostEntityChanges || isSavingNonPostEntityChanges ) );
+		const isToggleDisabled = hasDistributedEditingSaveButtonState
+			? distributedEditingSaveButtonDisabled
+			: isPostSavingLocked ||
+			  ( ( isPublished ||
+					isSaving ||
+					! isSaveable ||
+					( ! isPublishable && ! forceIsDirty ) ) &&
+					( ! hasNonPostEntityChanges ||
+						isSavingNonPostEntityChanges ) );
 
 		// If the new status has not changed explicitly, we derive it from
 		// other factors, like having a publish action, etc.. We need to preserve

@@ -137,7 +137,7 @@ describe( 'PostSavedState', () => {
 		useSelect.mockImplementation( () => ( {
 			isDirty: true,
 			isNew: false,
-			isSaveable: true,
+			isSaveable: false,
 			isSaving: false,
 			postStatus: 'draft',
 			distributedEditingSaveButtonState: {
@@ -416,6 +416,7 @@ describe( 'PostSavedState', () => {
 			'data-distributed-editing-save-control-journey-action-required',
 			'true'
 		);
+		expect( button ).toHaveAttribute( 'aria-disabled', 'false' );
 
 		await user.click( button );
 
