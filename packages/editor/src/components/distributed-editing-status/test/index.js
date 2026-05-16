@@ -880,6 +880,183 @@ describe( 'DistributedEditingStatus', () => {
 		).toBeVisible();
 	} );
 
+	it( 'renders a read-only same-block conflict comparison from safe text excerpts', () => {
+		setupDistributedEditingStatusDispatch();
+		setupDistributedEditingStatusSelect( {
+			editedPostContent:
+				'<!-- wp:paragraph --><p>Local paragraph edit &amp; draft.</p><!-- /wp:paragraph -->',
+			sessionState: {
+				disposition:
+					DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+				reasonCode:
+					DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+				pendingChangeCount: 1,
+				remoteChangeCount: 1,
+				requiresServerStateRefetch: false,
+				refetchedServerState: true,
+				canExportLocalUpdates: true,
+				localRebasePlanStatus:
+					DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES.READY,
+				localRebaseResultStatus:
+					DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.MANUAL_CONFLICT_REQUIRED,
+				localRebaseResultReason: 'same_block_changed',
+				requiresManualConflictResolution: true,
+				clientBaseContent:
+					'<!-- wp:paragraph --><p>Base paragraph edit &amp; seed.</p><!-- /wp:paragraph -->',
+				refetchedServerContent:
+					'<!-- wp:paragraph --><p>Server paragraph edit &amp; update.</p><!-- /wp:paragraph -->',
+			},
+		} );
+
+		render( <DistributedEditingStatus /> );
+
+		const comparison = screen.getByRole( 'region', {
+			name: 'Distributed editing conflict comparison',
+		} );
+
+		expect( comparison ).toHaveAttribute(
+			'data-distributed-editing-conflict-comparison',
+			'same-block'
+		);
+		expect( comparison ).toHaveAttribute(
+			'data-distributed-editing-conflict-comparison-read-only',
+			'true'
+		);
+		expect( comparison ).toHaveAttribute(
+			'data-distributed-editing-conflict-comparison-calls-rest',
+			'false'
+		);
+		expect( comparison ).toHaveAttribute(
+			'data-distributed-editing-conflict-comparison-calls-save',
+			'false'
+		);
+		expect( comparison ).toHaveAttribute(
+			'data-distributed-editing-conflict-comparison-mutates-editor-content',
+			'false'
+		);
+		expect( comparison ).toHaveAttribute(
+			'data-distributed-editing-conflict-comparison-has-base',
+			'true'
+		);
+		expect( comparison ).toHaveAttribute(
+			'data-distributed-editing-conflict-comparison-has-server',
+			'true'
+		);
+		expect( comparison ).toHaveAttribute(
+			'data-distributed-editing-conflict-comparison-has-local',
+			'true'
+		);
+		expect( screen.getByLabelText( 'Base version' ) ).toHaveValue(
+			'Base paragraph edit & seed.'
+		);
+		expect( screen.getByLabelText( 'Latest from WordPress' ) ).toHaveValue(
+			'Server paragraph edit & update.'
+		);
+		expect( screen.getByLabelText( 'Your local version' ) ).toHaveValue(
+			'Local paragraph edit & draft.'
+		);
+		expect( comparison ).not.toHaveTextContent( '<p>' );
+		expect( comparison ).not.toHaveTextContent( '<!-- wp:paragraph' );
+		expect(
+			within( comparison ).getByRole( 'button', {
+				name: 'Keep editing locally',
+			} )
+		).toBeVisible();
+		expect(
+			within( comparison ).getByRole( 'button', {
+				name: 'Export for review',
+			} )
+		).toBeVisible();
+		expect(
+			within( comparison ).getByRole( 'button', {
+				name: 'Get latest post',
+			} )
+		).toBeVisible();
+	} );
+
+	it( 'keeps same-block conflict actions explicit without saving by default', async () => {
+		const user = userEvent.setup();
+		const actions = setupDistributedEditingStatusDispatch();
+		const writeText = jest.fn().mockResolvedValue();
+
+		Object.defineProperty( globalThis.navigator, 'clipboard', {
+			configurable: true,
+			value: { writeText },
+		} );
+
+		setupDistributedEditingStatusSelect( {
+			currentPost: { id: 42, type: 'post' },
+			editedPostContent:
+				'<!-- wp:paragraph --><p>Local same block change.</p><!-- /wp:paragraph -->',
+			sessionState: {
+				disposition:
+					DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+				reasonCode:
+					DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+				pendingChangeCount: 1,
+				remoteChangeCount: 1,
+				requiresServerStateRefetch: false,
+				refetchedServerState: true,
+				canExportLocalUpdates: true,
+				localRebasePlanStatus:
+					DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES.READY,
+				localRebaseResultStatus:
+					DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.MANUAL_CONFLICT_REQUIRED,
+				localRebaseResultReason: 'same_block_changed',
+				requiresManualConflictResolution: true,
+				clientBaseContent:
+					'<!-- wp:paragraph --><p>Base same block change.</p><!-- /wp:paragraph -->',
+				refetchedServerContent:
+					'<!-- wp:paragraph --><p>Server same block change.</p><!-- /wp:paragraph -->',
+			},
+		} );
+
+		render( <DistributedEditingStatus /> );
+
+		const comparison = screen.getByRole( 'region', {
+			name: 'Distributed editing conflict comparison',
+		} );
+
+		await user.click(
+			within( comparison ).getByRole( 'button', {
+				name: 'Keep editing locally',
+			} )
+		);
+
+		expect(
+			screen.getByText(
+				'Continuing locally. Save is still paused until this conflict is resolved or exported.'
+			)
+		).toBeVisible();
+		expect( writeText ).not.toHaveBeenCalled();
+		expect(
+			actions.__experimentalRefreshDistributedEditingServerStateAfterStaleBase
+		).not.toHaveBeenCalled();
+
+		await user.click(
+			within( comparison ).getByRole( 'button', {
+				name: 'Export for review',
+			} )
+		);
+
+		await waitFor( () => expect( writeText ).toHaveBeenCalledTimes( 1 ) );
+		expect(
+			actions.__experimentalRefreshDistributedEditingServerStateAfterStaleBase
+		).not.toHaveBeenCalled();
+
+		await user.click(
+			within( comparison ).getByRole( 'button', {
+				name: 'Get latest post',
+			} )
+		);
+
+		await waitFor( () =>
+			expect(
+				actions.__experimentalRefreshDistributedEditingServerStateAfterStaleBase
+			).toHaveBeenCalledTimes( 1 )
+		);
+	} );
+
 	it( 'mounts a content-free action transcript status entry', () => {
 		setupDistributedEditingStatusSelect( {
 			sessionState: {

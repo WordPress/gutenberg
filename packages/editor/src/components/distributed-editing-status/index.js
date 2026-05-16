@@ -59,6 +59,11 @@ const DISTRIBUTED_EDITING_OPAQUE_REVIEW_APPROVAL_PROOF_TOKEN_REJECTION_DETAILS =
 
 const distributedEditingStartupHeartbeatRuntimeKeys = new Set();
 const DISTRIBUTED_EDITING_STARTUP_SNAPSHOT_DELAY_MS = 1000;
+const DISTRIBUTED_EDITING_SAME_BLOCK_CONFLICT_REASONS = new Set( [
+	'same_block_changed',
+	'same_serialized_block_changed',
+] );
+const DISTRIBUTED_EDITING_EMPTY_CONFLICT_TEXT = __( 'No visible text.' );
 
 const DISTRIBUTED_EDITING_STATUS_CONTROL_STATE_DEFINITIONS = Object.freeze( {
 	idle: Object.freeze( {} ),
@@ -1537,6 +1542,261 @@ export function DistributedEditingStatusSurface( {
 	);
 }
 
+function getDistributedEditingSameBlockConflictComparison(
+	sessionState,
+	editedPostContent
+) {
+	const normalized = normalizeDistributedEditingSessionState( sessionState );
+
+	if (
+		normalized.disposition !==
+			DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION ||
+		normalized.localRebaseResultStatus !==
+			DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.MANUAL_CONFLICT_REQUIRED ||
+		! DISTRIBUTED_EDITING_SAME_BLOCK_CONFLICT_REASONS.has(
+			normalized.localRebaseResultReason
+		) ||
+		typeof normalized.clientBaseContent !== 'string' ||
+		typeof normalized.refetchedServerContent !== 'string' ||
+		typeof editedPostContent !== 'string'
+	) {
+		return null;
+	}
+
+	if (
+		! normalized.clientBaseContent &&
+		! normalized.refetchedServerContent &&
+		! editedPostContent
+	) {
+		return null;
+	}
+
+	const comparedBlocks = getComparedSerializedBlockConflict(
+		normalized.clientBaseContent,
+		normalized.refetchedServerContent,
+		editedPostContent
+	);
+	const rows = [
+		{
+			id: 'base',
+			label: __( 'Base version' ),
+			text: getVisibleConflictText( comparedBlocks.base ),
+		},
+		{
+			id: 'server',
+			label: __( 'Latest from WordPress' ),
+			text: getVisibleConflictText( comparedBlocks.server ),
+		},
+		{
+			id: 'local',
+			label: __( 'Your local version' ),
+			text: getVisibleConflictText( comparedBlocks.local ),
+		},
+	];
+
+	return {
+		blockIndex: comparedBlocks.blockIndex,
+		hasBaseContent:
+			rows[ 0 ].text !== DISTRIBUTED_EDITING_EMPTY_CONFLICT_TEXT,
+		hasServerContent:
+			rows[ 1 ].text !== DISTRIBUTED_EDITING_EMPTY_CONFLICT_TEXT,
+		hasLocalContent:
+			rows[ 2 ].text !== DISTRIBUTED_EDITING_EMPTY_CONFLICT_TEXT,
+		reason: normalized.localRebaseResultReason,
+		rows,
+	};
+}
+
+function getComparedSerializedBlockConflict(
+	baseContent,
+	serverContent,
+	localContent
+) {
+	const baseBlocks = getSerializedBlockChunks( baseContent );
+	const serverBlocks = getSerializedBlockChunks( serverContent );
+	const localBlocks = getSerializedBlockChunks( localContent );
+	const blockCount = Math.max(
+		baseBlocks.length,
+		serverBlocks.length,
+		localBlocks.length
+	);
+
+	for ( let index = 0; index < blockCount; index++ ) {
+		const baseBlock = baseBlocks[ index ] || '';
+		const serverBlock = serverBlocks[ index ] || '';
+		const localBlock = localBlocks[ index ] || '';
+
+		if (
+			baseBlock &&
+			serverBlock &&
+			localBlock &&
+			serverBlock !== baseBlock &&
+			localBlock !== baseBlock &&
+			serverBlock !== localBlock
+		) {
+			return {
+				base: baseBlock,
+				server: serverBlock,
+				local: localBlock,
+				blockIndex: index,
+			};
+		}
+	}
+
+	return {
+		base: baseContent,
+		server: serverContent,
+		local: localContent,
+		blockIndex: -1,
+	};
+}
+
+function getSerializedBlockChunks( content ) {
+	const matches = content.match(
+		/<!--\s+wp:[\s\S]*?-->(?:(?!<!--\s+\/wp:)[\s\S])*?<!--\s+\/wp:[\s\S]*?-->/g
+	);
+
+	return matches?.length ? matches : [ content ];
+}
+
+function getVisibleConflictText( content ) {
+	const withoutScripts = content
+		.replace( /<script\b[^>]*>[\s\S]*?<\/script\s*>/gi, ' ' )
+		.replace( /<style\b[^>]*>[\s\S]*?<\/style\s*>/gi, ' ' )
+		.replace( /<!--[\s\S]*?-->/g, ' ' )
+		.replace( /<[^>]*>/g, ' ' );
+	const decoded = decodeDistributedEditingHtmlEntities( withoutScripts )
+		.replace( /\s+/g, ' ' )
+		.trim();
+
+	return decoded || DISTRIBUTED_EDITING_EMPTY_CONFLICT_TEXT;
+}
+
+function decodeDistributedEditingHtmlEntities( value ) {
+	if ( globalThis?.document?.createElement ) {
+		const textarea = globalThis.document.createElement( 'textarea' );
+		textarea.innerHTML = value;
+		return textarea.value;
+	}
+
+	return value
+		.replace( /&nbsp;/g, ' ' )
+		.replace( /&amp;/g, '&' )
+		.replace( /&lt;/g, '<' )
+		.replace( /&gt;/g, '>' )
+		.replace( /&quot;/g, '"' )
+		.replace( /&#039;/g, "'" );
+}
+
+function getConflictComparisonRows( text ) {
+	return Math.min( 8, Math.max( 3, text.split( '\n' ).length ) );
+}
+
+function DistributedEditingSameBlockConflictComparison( {
+	comparison,
+	onAction,
+	onKeepEditing,
+} ) {
+	if ( ! comparison ) {
+		return null;
+	}
+
+	const actionItem = {
+		id: 'same-block-conflict-comparison',
+		localRebaseResultReason: comparison.reason,
+		nextStepAction: 'export_for_manual_conflict_review',
+	};
+
+	return (
+		<div
+			aria-label={ __( 'Distributed editing conflict comparison' ) }
+			className="editor-distributed-editing-status__conflict-comparison"
+			data-distributed-editing-conflict-comparison="same-block"
+			data-distributed-editing-conflict-comparison-block-index={
+				comparison.blockIndex
+			}
+			data-distributed-editing-conflict-comparison-calls-rest="false"
+			data-distributed-editing-conflict-comparison-calls-save="false"
+			data-distributed-editing-conflict-comparison-has-base={ formatDataBoolean(
+				comparison.hasBaseContent
+			) }
+			data-distributed-editing-conflict-comparison-has-local={ formatDataBoolean(
+				comparison.hasLocalContent
+			) }
+			data-distributed-editing-conflict-comparison-has-server={ formatDataBoolean(
+				comparison.hasServerContent
+			) }
+			data-distributed-editing-conflict-comparison-mutates-editor-content="false"
+			data-distributed-editing-conflict-comparison-read-only="true"
+			data-distributed-editing-conflict-comparison-reason={
+				comparison.reason
+			}
+			role="region"
+		>
+			<div className="editor-distributed-editing-status__conflict-comparison-header">
+				<strong>{ __( 'Review conflicting edits' ) }</strong>
+				<p>
+					{ __(
+						'WordPress and this editor changed the same block. Compare the text below before deciding how to continue.'
+					) }
+				</p>
+			</div>
+			<div className="editor-distributed-editing-status__conflict-comparison-grid">
+				{ comparison.rows.map( ( row ) => (
+					<div
+						className="editor-distributed-editing-status__conflict-comparison-row"
+						key={ row.id }
+					>
+						<span className="editor-distributed-editing-status__conflict-comparison-label">
+							{ row.label }
+						</span>
+						<textarea
+							aria-label={ row.label }
+							className="editor-distributed-editing-status__conflict-comparison-text"
+							readOnly
+							rows={ getConflictComparisonRows( row.text ) }
+							value={ row.text }
+						/>
+					</div>
+				) ) }
+			</div>
+			<div className="editor-distributed-editing-status__conflict-comparison-actions">
+				<Button
+					__next40pxDefaultSize
+					variant="secondary"
+					onClick={ onKeepEditing }
+				>
+					{ __( 'Keep editing locally' ) }
+				</Button>
+				<Button
+					__next40pxDefaultSize
+					variant="secondary"
+					onClick={ () =>
+						onAction?.(
+							DISTRIBUTED_EDITING_NOTICE_ACTIONS.EXPORT_LOCAL_UPDATES,
+							actionItem
+						)
+					}
+				>
+					{ __( 'Export for review' ) }
+				</Button>
+				<Button
+					__next40pxDefaultSize
+					variant="tertiary"
+					onClick={ () =>
+						onAction?.(
+							DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFETCH_SERVER_STATE,
+							actionItem
+						)
+					}
+				>
+					{ __( 'Get latest post' ) }
+				</Button>
+			</div>
+		</div>
+	);
+}
+
 /**
  * Renders the selector-backed DE-RTC status surface.
  *
@@ -1725,6 +1985,14 @@ export default function DistributedEditingStatus( {
 			sessionState,
 		]
 	);
+	const handleKeepEditingConflict = useCallback( () => {
+		setActionStatus( {
+			status: 'info',
+			message: __(
+				'Continuing locally. Save is still paused until this conflict is resolved or exported.'
+			),
+		} );
+	}, [] );
 
 	if (
 		! shouldRenderDistributedEditingStatus(
@@ -1735,14 +2003,26 @@ export default function DistributedEditingStatus( {
 		return null;
 	}
 
+	const conflictComparison = getDistributedEditingSameBlockConflictComparison(
+		sessionState,
+		editedPostContent
+	);
+
 	return (
-		<DistributedEditingStatusSurface
-			actionStatus={ actionStatus }
-			noticeDescriptors={ noticeDescriptors }
-			onAction={ handleAction }
-			placement={ placement }
-			unloadWarningState={ unloadWarningState }
-		/>
+		<>
+			<DistributedEditingStatusSurface
+				actionStatus={ actionStatus }
+				noticeDescriptors={ noticeDescriptors }
+				onAction={ handleAction }
+				placement={ placement }
+				unloadWarningState={ unloadWarningState }
+			/>
+			<DistributedEditingSameBlockConflictComparison
+				comparison={ conflictComparison }
+				onAction={ handleAction }
+				onKeepEditing={ handleKeepEditingConflict }
+			/>
+		</>
 	);
 }
 
