@@ -1578,6 +1578,18 @@ describe( 'DistributedEditingStatus', () => {
 			'data-distributed-editing-human-loop-action',
 			'edit'
 		);
+		expect( shell ).toHaveAttribute(
+			'data-distributed-editing-enabled-shell-scan-layout',
+			'compact-summary-row'
+		);
+		expect( shell ).toHaveAttribute(
+			'data-distributed-editing-enabled-shell-visible-labels',
+			'false'
+		);
+		expect( shell ).toHaveAttribute(
+			'data-distributed-editing-enabled-shell-save-guidance-visible',
+			'false'
+		);
 		expect( within( shell ).getByText( 'Editing together' ) ).toBeVisible();
 		expect(
 			screen.getByText( 'Other editors in this post appear below.' )
@@ -1592,6 +1604,15 @@ describe( 'DistributedEditingStatus', () => {
 			screen.queryByText( 'Save is available' )
 		).not.toBeInTheDocument();
 		expect( screen.queryByText( 'Current step' ) ).not.toBeInTheDocument();
+		expect( within( shell ).getByText( 'Mode' ) ).toHaveClass(
+			'screen-reader-text'
+		);
+		expect( within( shell ).getByText( 'Local protection' ) ).toHaveClass(
+			'screen-reader-text'
+		);
+		expect( within( shell ).getByText( 'Save' ) ).toHaveClass(
+			'screen-reader-text'
+		);
 		// eslint-disable-next-line testing-library/no-node-access
 		const humanLoop = shell.querySelector(
 			'[data-distributed-editing-human-loop-step-status]'
@@ -1648,14 +1669,42 @@ describe( 'DistributedEditingStatus', () => {
 			'data-distributed-editing-human-loop-claims-saved-without-evidence',
 			'false'
 		);
-		expect( screen.queryByText( 'Editing now' ) ).not.toBeInTheDocument();
+		expect( screen.queryByText( 'Active now' ) ).not.toBeInTheDocument();
 		expect( screen.getByText( 'No other editors shown.' ) ).toBeVisible();
+		expect( screen.getByText( 'No other editors shown.' ) ).toHaveAttribute(
+			'aria-label',
+			'Presence: No other editors shown.'
+		);
 		expect(
 			screen.queryByText( 'Editor activity has not been shown yet.' )
 		).not.toBeInTheDocument();
 		expect(
 			screen.queryByText( 'Use Refresh editing list to check again.' )
 		).not.toBeInTheDocument();
+		expect(
+			screen.getByRole( 'group', {
+				name: 'Distributed editing presence',
+			} )
+		).toHaveAttribute(
+			'data-distributed-editing-presence-summary-scan-layout',
+			'single-line-primary-cue'
+		);
+		expect(
+			screen.getByRole( 'group', {
+				name: 'Distributed editing presence',
+			} )
+		).toHaveAttribute(
+			'data-distributed-editing-presence-summary-live-region',
+			'polite'
+		);
+		expect(
+			screen.getByRole( 'group', {
+				name: 'Distributed editing presence',
+			} )
+		).toHaveAttribute(
+			'data-distributed-editing-presence-summary-has-accessible-name',
+			'true'
+		);
 		expect(
 			screen.getByRole( 'group', {
 				name: 'Distributed editing presence',
@@ -1933,6 +1982,12 @@ describe( 'DistributedEditingStatus', () => {
 			screen.getByText( '2 other editors are active now.' )
 		).toBeVisible();
 		expect(
+			screen.getByText( '2 other editors are active now.' )
+		).toHaveAttribute(
+			'aria-label',
+			'Presence: 2 other editors are active now.'
+		);
+		expect(
 			screen.queryByText( '2 editors are active now.' )
 		).not.toBeInTheDocument();
 		expect( presence ).toHaveAttribute(
@@ -2030,6 +2085,10 @@ describe( 'DistributedEditingStatus', () => {
 			'other_user'
 		);
 		expect( rows[ 0 ] ).toHaveAttribute(
+			'data-distributed-editing-presence-row-scan-treatment',
+			'avatar-name-status-chip'
+		);
+		expect( rows[ 0 ] ).toHaveAttribute(
 			'data-distributed-editing-presence-row-visual-treatment-color-only',
 			'false'
 		);
@@ -2045,13 +2104,10 @@ describe( 'DistributedEditingStatus', () => {
 			'data-distributed-editing-presence-row-exposes-private-fields',
 			'false'
 		);
-		expect( rows[ 0 ] ).toHaveAttribute(
-			'aria-label',
-			'Mira, Editing now'
-		);
+		expect( rows[ 0 ] ).toHaveAttribute( 'aria-label', 'Mira, Active now' );
 		expect( rows[ 1 ] ).toHaveAttribute(
 			'aria-label',
-			'Another editor, Editing now'
+			'Another editor, Active now'
 		);
 		expect( rows[ 1 ] ).toHaveAttribute(
 			'data-distributed-editing-presence-row-relationship',
@@ -2116,6 +2172,12 @@ describe( 'DistributedEditingStatus', () => {
 		expect(
 			screen.getByText( '1 other editor may be delayed.' )
 		).toBeVisible();
+		expect(
+			screen.getByText( '1 other editor may be delayed.' )
+		).toHaveAttribute(
+			'aria-label',
+			'Presence: 1 other editor may be delayed.'
+		);
 		expect( presence ).toHaveAttribute(
 			'data-distributed-editing-presence-other-editor-cue',
 			'1 other editor may be delayed.'
@@ -3277,7 +3339,7 @@ describe( 'DistributedEditingStatus', () => {
 		);
 		expect( rows[ 1 ] ).toHaveAttribute(
 			'aria-label',
-			'Another tab, Editing now'
+			'Another tab, Active now'
 		);
 		expect( rows[ 2 ] ).toHaveAttribute(
 			'data-distributed-editing-presence-row-current',
@@ -3287,10 +3349,7 @@ describe( 'DistributedEditingStatus', () => {
 			'data-distributed-editing-presence-row-relationship',
 			'other_user'
 		);
-		expect( rows[ 2 ] ).toHaveAttribute(
-			'aria-label',
-			'Mira, Editing now'
-		);
+		expect( rows[ 2 ] ).toHaveAttribute( 'aria-label', 'Mira, Active now' );
 		expect( rows[ 3 ] ).toHaveAttribute(
 			'data-distributed-editing-presence-row-current',
 			'false'
@@ -3424,7 +3483,7 @@ describe( 'DistributedEditingStatus', () => {
 		expect( rows ).toHaveLength( 6 );
 		expect( rows[ 0 ] ).toHaveAttribute(
 			'aria-label',
-			'This tab, Editing now'
+			'This tab, Active now'
 		);
 		expect( rows[ 0 ] ).toHaveAttribute(
 			'data-distributed-editing-presence-row-relationship',
@@ -3432,19 +3491,16 @@ describe( 'DistributedEditingStatus', () => {
 		);
 		expect( rows[ 1 ] ).toHaveAttribute(
 			'aria-label',
-			'Another tab, Editing now'
+			'Another tab, Active now'
 		);
 		expect( rows[ 1 ] ).toHaveAttribute(
 			'data-distributed-editing-presence-row-relationship',
 			'same_user_other_tab'
 		);
-		expect( rows[ 2 ] ).toHaveAttribute(
-			'aria-label',
-			'Mira, Editing now'
-		);
+		expect( rows[ 2 ] ).toHaveAttribute( 'aria-label', 'Mira, Active now' );
 		expect( rows[ 3 ] ).toHaveAttribute(
 			'aria-label',
-			'Another editor, Editing now'
+			'Another editor, Active now'
 		);
 		expect( rows[ 4 ] ).toHaveAttribute(
 			'aria-label',
@@ -3598,7 +3654,7 @@ describe( 'DistributedEditingStatus', () => {
 		expect( rows ).toHaveLength( 9 );
 		expect( rows[ 4 ] ).toHaveAttribute(
 			'aria-label',
-			'Another editor, Editing now'
+			'Another editor, Active now'
 		);
 		expect( rows[ 8 ] ).toHaveAttribute(
 			'aria-label',
@@ -3864,7 +3920,7 @@ describe( 'DistributedEditingStatus', () => {
 		);
 		expect(
 			screen.getByRole( 'listitem', {
-				name: 'This tab, Editing now',
+				name: 'This tab, Active now',
 			} )
 		).toBeVisible();
 

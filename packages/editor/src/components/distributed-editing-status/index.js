@@ -2800,6 +2800,11 @@ export function DistributedEditingEnabledShell( {
 		<div
 			aria-label={ __( 'Distributed editing enabled status' ) }
 			className="editor-distributed-editing-status__enabled-shell"
+			data-distributed-editing-enabled-shell-save-guidance-visible={ formatDataBoolean(
+				Boolean( saveLine )
+			) }
+			data-distributed-editing-enabled-shell-scan-layout="compact-summary-row"
+			data-distributed-editing-enabled-shell-visible-labels="false"
 			data-distributed-editing-authority-state={
 				shellState.authorityState
 			}
@@ -2833,41 +2838,83 @@ export function DistributedEditingEnabledShell( {
 				].join( ' ' ) }
 			>
 				<div className="editor-distributed-editing-status__enabled-shell-header">
-					<strong className="editor-distributed-editing-status__enabled-shell-title">
-						{ shellTitle }
-					</strong>
-					<span className="editor-distributed-editing-status__enabled-shell-protection">
-						{ protectionLine }
-					</span>
-				</div>
-				<div
-					className="editor-distributed-editing-status__enabled-shell-save-state"
-					data-distributed-editing-save-journey-calls-normal-save="false"
-					data-distributed-editing-save-journey-calls-rest="false"
-					data-distributed-editing-save-journey-calls-retry-save="false"
-					data-distributed-editing-save-journey-changes-post-lock="false"
-					data-distributed-editing-save-journey-authority-state={
-						shellState.authorityState
-					}
-					data-distributed-editing-save-journey-authority-summary={
-						shellState.authorityStatusText
-					}
-					data-distributed-editing-save-journey-claims-saved-without-evidence={ formatDataBoolean(
-						shellState.humanLoopStepState.claimsSavedWithoutEvidence
-					) }
-					data-distributed-editing-save-journey-descriptor-only="true"
-					data-distributed-editing-save-journey-exposes-proof-internals="false"
-					data-distributed-editing-save-journey-exposes-raw-content="false"
-					data-distributed-editing-save-journey-mutates-editor-content="false"
-					data-distributed-editing-save-journey-mutates-persisted-post-content="false"
-					data-distributed-editing-save-journey-status={
-						shellState.humanLoopStep
-					}
-					data-distributed-editing-save-journey-status-summary={
-						shellState.saveStateSummaryText
-					}
-				>
-					{ saveLine }
+					<dl
+						aria-label={ __( 'Distributed editing summary' ) }
+						className="editor-distributed-editing-status__enabled-shell-summary"
+					>
+						<div
+							className="editor-distributed-editing-status__enabled-shell-summary-item editor-distributed-editing-status__enabled-shell-summary-item--mode"
+							data-distributed-editing-enabled-shell-summary-item="mode"
+						>
+							<dt className="screen-reader-text">
+								{ __( 'Mode' ) }
+							</dt>
+							<dd className="editor-distributed-editing-status__enabled-shell-summary-value">
+								<strong className="editor-distributed-editing-status__enabled-shell-title">
+									{ shellTitle }
+								</strong>
+							</dd>
+						</div>
+						<div
+							className="editor-distributed-editing-status__enabled-shell-summary-item editor-distributed-editing-status__enabled-shell-summary-item--protection"
+							data-distributed-editing-enabled-shell-summary-item="protection"
+						>
+							<dt className="screen-reader-text">
+								{ __( 'Local protection' ) }
+							</dt>
+							<dd className="editor-distributed-editing-status__enabled-shell-summary-value editor-distributed-editing-status__enabled-shell-protection">
+								{ protectionLine }
+							</dd>
+						</div>
+						<div
+							className={ [
+								'editor-distributed-editing-status__enabled-shell-summary-item',
+								'editor-distributed-editing-status__enabled-shell-summary-item--save',
+								! saveLine &&
+									'editor-distributed-editing-status__enabled-shell-summary-item--hidden',
+							]
+								.filter( Boolean )
+								.join( ' ' ) }
+							data-distributed-editing-enabled-shell-summary-item="save"
+							data-distributed-editing-enabled-shell-summary-item-visible={ formatDataBoolean(
+								Boolean( saveLine )
+							) }
+						>
+							<dt className="screen-reader-text">
+								{ __( 'Save' ) }
+							</dt>
+							<dd
+								className="editor-distributed-editing-status__enabled-shell-summary-value editor-distributed-editing-status__enabled-shell-save-state"
+								data-distributed-editing-save-journey-calls-normal-save="false"
+								data-distributed-editing-save-journey-calls-rest="false"
+								data-distributed-editing-save-journey-calls-retry-save="false"
+								data-distributed-editing-save-journey-changes-post-lock="false"
+								data-distributed-editing-save-journey-authority-state={
+									shellState.authorityState
+								}
+								data-distributed-editing-save-journey-authority-summary={
+									shellState.authorityStatusText
+								}
+								data-distributed-editing-save-journey-claims-saved-without-evidence={ formatDataBoolean(
+									shellState.humanLoopStepState
+										.claimsSavedWithoutEvidence
+								) }
+								data-distributed-editing-save-journey-descriptor-only="true"
+								data-distributed-editing-save-journey-exposes-proof-internals="false"
+								data-distributed-editing-save-journey-exposes-raw-content="false"
+								data-distributed-editing-save-journey-mutates-editor-content="false"
+								data-distributed-editing-save-journey-mutates-persisted-post-content="false"
+								data-distributed-editing-save-journey-status={
+									shellState.humanLoopStep
+								}
+								data-distributed-editing-save-journey-status-summary={
+									shellState.saveStateSummaryText
+								}
+							>
+								{ saveLine }
+							</dd>
+						</div>
+					</dl>
 				</div>
 				<div
 					className="editor-distributed-editing-status__enabled-shell-authority-state"
@@ -3191,6 +3238,11 @@ function DistributedEditingPresenceRoster( {
 	]
 		.filter( Boolean )
 		.join( ' ' );
+	const presenceSummaryAccessibilityLabel = sprintf(
+		/* translators: %s: current Distributed Editing presence summary. */
+		__( 'Presence: %s' ),
+		presenceSummaryText
+	);
 
 	useEffect( () => {
 		if (
@@ -3879,6 +3931,9 @@ function DistributedEditingPresenceRoster( {
 			data-distributed-editing-presence-summary-hidden-count={
 				rosterState.hiddenCount
 			}
+			data-distributed-editing-presence-summary-has-accessible-name="true"
+			data-distributed-editing-presence-summary-live-region="polite"
+			data-distributed-editing-presence-summary-scan-layout="single-line-primary-cue"
 			data-distributed-editing-presence-refresh-hint={
 				rosterState.copy.refreshHint
 			}
@@ -3926,6 +3981,7 @@ function DistributedEditingPresenceRoster( {
 			role="group"
 		>
 			<div
+				aria-label={ presenceSummaryAccessibilityLabel }
 				aria-live="polite"
 				className={ presenceSummaryClassName }
 				data-distributed-editing-presence-other-editor-cue-copy={
@@ -4142,6 +4198,7 @@ function DistributedEditingPresenceRoster( {
 								data-distributed-editing-presence-row-relationship={ getPresenceRosterEntryRelationship(
 									entry
 								) }
+								data-distributed-editing-presence-row-scan-treatment="avatar-name-status-chip"
 								data-distributed-editing-presence-row-status-affordance="dot-and-label"
 								data-distributed-editing-presence-row-status-tone={
 									statusTone
@@ -4708,7 +4765,7 @@ function isPresenceRosterEntryCurrent( entry ) {
 
 function getPresenceRosterEntryStatusLabel( entry ) {
 	return isPresenceRosterEntryCurrent( entry )
-		? __( 'Editing now' )
+		? __( 'Active now' )
 		: __( 'Presence may be delayed' );
 }
 
