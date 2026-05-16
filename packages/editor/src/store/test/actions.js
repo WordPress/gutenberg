@@ -102,6 +102,17 @@ function createRegistryWithStores() {
 const getMethod = ( options ) =>
 	options.headers?.[ 'X-HTTP-Method-Override' ] || options.method || 'GET';
 
+function createDeferred() {
+	let resolve;
+	let reject;
+	const promise = new Promise( ( promiseResolve, promiseReject ) => {
+		resolve = promiseResolve;
+		reject = promiseReject;
+	} );
+
+	return { promise, reject, resolve };
+}
+
 describe( 'Post actions', () => {
 	describe( '__experimentalAppendDistributedEditingActionTranscriptEvent()', () => {
 		it( 'appends content-free lifecycle events without retaining unsafe entries', async () => {
@@ -437,6 +448,105 @@ describe( 'Post actions', () => {
 			expect( registry.select( editorStore ).isEditedPostDirty() ).toBe(
 				false
 			);
+		} );
+
+		it( 'merges late presence refresh responses into the latest protected local state', async () => {
+			const post = {
+				id: postId,
+				type: 'post',
+				title: 'Late presence refresh post',
+				content:
+					'<!-- wp:paragraph --><p>Late presence.</p><!-- /wp:paragraph -->',
+				status: 'draft',
+			};
+			const deferredPresence = createDeferred();
+			const registry = createRegistryWithStores();
+
+			apiFetch.setFetchHandler( ( options ) => {
+				expect( getMethod( options ) ).toBe( 'GET' );
+				expect( options.path ).toMatch(
+					new RegExp(
+						`^/wp/v2/posts/${ postId }/distributed-editing/presence`
+					)
+				);
+
+				return deferredPresence.promise;
+			} );
+
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', post );
+			registry.dispatch( editorStore ).setupEditor( post );
+
+			const refreshPromise = registry
+				.dispatch( editorStore )
+				.__experimentalRefreshDistributedEditingPresenceSnapshot();
+
+			registry
+				.dispatch( editorStore )
+				.setDistributedEditingSessionState( {
+					disposition:
+						DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+					reasonCode:
+						DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+					pendingChangeCount: 1,
+					hasPendingChanges: true,
+					canExportLocalUpdates: true,
+					localRebaseResultStatus:
+						DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.MANUAL_CONFLICT_REQUIRED,
+					localRebaseResultReason: 'same_block_changed',
+					requiresManualConflictResolution: true,
+				} );
+
+			deferredPresence.resolve( {
+				result: 'presence_roster_snapshot',
+				rest_route: 'post_presence_roster',
+				presence_roster: {
+					status: 'recent',
+					entries: [
+						{
+							key: 'presence-mira',
+							displayName: 'Mira',
+							identityVisibility: 'named',
+							relationship: 'other_user',
+							freshness: 'recent',
+						},
+					],
+				},
+				presence_read_contract: {
+					source: 'de_rtc_presence_read_snapshot',
+					cheap_host_polling_guidance: {
+						suggested_polling_interval_seconds: 30,
+					},
+				},
+			} );
+
+			await expect( refreshPromise ).resolves.toMatchObject( {
+				result: 'presence_roster_snapshot',
+			} );
+
+			expect(
+				registry
+					.select( editorStore )
+					.getDistributedEditingSessionState()
+			).toMatchObject( {
+				disposition:
+					DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+				reasonCode:
+					DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+				pendingChangeCount: 1,
+				hasPendingChanges: true,
+				canExportLocalUpdates: true,
+				localRebaseResultStatus:
+					DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.MANUAL_CONFLICT_REQUIRED,
+				requiresManualConflictResolution: true,
+				presenceRosterStatus:
+					DISTRIBUTED_EDITING_PRESENCE_ROSTER_STATUSES.RECENT,
+				presenceRosterRefreshStatus:
+					DISTRIBUTED_EDITING_PRESENCE_REFRESH_STATUSES.REFRESHED,
+				presenceRosterRefreshCallsSave: false,
+				presenceRosterRefreshClaimsSaved: false,
+			} );
 		} );
 	} );
 
@@ -1248,6 +1358,97 @@ describe( 'Post actions', () => {
 			expect( registry.select( editorStore ).isEditedPostDirty() ).toBe(
 				false
 			);
+		} );
+
+		it( 'merges late heartbeat responses into the latest protected local state', async () => {
+			const post = {
+				id: postId,
+				type: 'post',
+				title: 'Late heartbeat post',
+				content:
+					'<!-- wp:paragraph --><p>Late heartbeat.</p><!-- /wp:paragraph -->',
+				status: 'draft',
+			};
+			const deferredHeartbeat = createDeferred();
+			const registry = createRegistryWithStores();
+
+			apiFetch.setFetchHandler( ( options ) => {
+				expect( getMethod( options ) ).toBe( 'POST' );
+				expect( options.path ).toMatch(
+					new RegExp(
+						`/wp/v2/posts/${ postId }/distributed-editing/presence/heartbeat`
+					)
+				);
+
+				return deferredHeartbeat.promise;
+			} );
+
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', post );
+			registry.dispatch( editorStore ).setupEditor( post );
+			registry.dispatch( editorStore ).updateEditorSettings( {
+				distributedEditing: {
+					enabled: true,
+				},
+			} );
+
+			const heartbeatPromise = registry
+				.dispatch( editorStore )
+				.__experimentalSendDistributedEditingPresenceHeartbeat( {
+					sessionKey: 'late-heartbeat-session',
+				} );
+
+			registry
+				.dispatch( editorStore )
+				.setDistributedEditingSessionState( {
+					disposition:
+						DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+					reasonCode:
+						DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+					pendingChangeCount: 1,
+					hasPendingChanges: true,
+					canExportLocalUpdates: true,
+					localRebaseResultStatus:
+						DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.MANUAL_CONFLICT_REQUIRED,
+					localRebaseResultReason: 'same_block_changed',
+					requiresManualConflictResolution: true,
+				} );
+
+			deferredHeartbeat.resolve( {
+				result: 'presence_heartbeat_recorded',
+				rest_route: 'post_presence_heartbeat',
+				writes_presence: true,
+				records_presence_heartbeat: true,
+				heartbeat_interval_seconds: 30,
+			} );
+
+			await expect( heartbeatPromise ).resolves.toMatchObject( {
+				result: 'presence_heartbeat_recorded',
+			} );
+
+			expect(
+				registry
+					.select( editorStore )
+					.getDistributedEditingSessionState()
+			).toMatchObject( {
+				disposition:
+					DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+				reasonCode:
+					DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+				pendingChangeCount: 1,
+				hasPendingChanges: true,
+				canExportLocalUpdates: true,
+				localRebaseResultStatus:
+					DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.MANUAL_CONFLICT_REQUIRED,
+				requiresManualConflictResolution: true,
+				presenceHeartbeatStatus:
+					DISTRIBUTED_EDITING_PRESENCE_HEARTBEAT_STATUSES.SENT,
+				presenceHeartbeatRequested: true,
+				presenceHeartbeatCallsSave: false,
+				presenceHeartbeatClaimsSaved: false,
+				presenceRosterVisibleCount: 1,
+			} );
 		} );
 	} );
 

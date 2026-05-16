@@ -1274,20 +1274,27 @@ export const __experimentalRefreshDistributedEditingPresenceSnapshot =
 					options.sessionKey ||
 					getDistributedEditingPresenceSessionKey(),
 			} );
+			const latestSessionState =
+				select.getDistributedEditingSessionState?.() ||
+				currentSessionState;
 
 			dispatch.setDistributedEditingSessionState(
 				getDistributedEditingSessionStateForPresenceSnapshotRefreshResult(
 					response,
-					currentSessionState
+					latestSessionState
 				)
 			);
 
 			return response;
 		} catch ( error ) {
+			const latestSessionState =
+				select.getDistributedEditingSessionState?.() ||
+				currentSessionState;
+
 			dispatch.setDistributedEditingSessionState(
 				getDistributedEditingSessionStateForPresenceSnapshotRefreshResult(
 					error,
-					currentSessionState
+					latestSessionState
 				)
 			);
 
@@ -1327,20 +1334,27 @@ export const __experimentalRefreshDistributedEditingPresenceStorageReadiness =
 					postId,
 					restBase,
 				} );
+			const latestSessionState =
+				select.getDistributedEditingSessionState?.() ||
+				currentSessionState;
 
 			dispatch.setDistributedEditingSessionState(
 				getDistributedEditingSessionStateForPresenceStorageReadinessRecheckResult(
 					response,
-					currentSessionState
+					latestSessionState
 				)
 			);
 
 			return response;
 		} catch ( error ) {
+			const latestSessionState =
+				select.getDistributedEditingSessionState?.() ||
+				currentSessionState;
+
 			dispatch.setDistributedEditingSessionState(
 				getDistributedEditingSessionStateForPresenceStorageReadinessRecheckResult(
 					error,
-					currentSessionState
+					latestSessionState
 				)
 			);
 
@@ -1385,11 +1399,14 @@ export const __experimentalSendDistributedEditingPresenceHeartbeat =
 				result: 'presence_heartbeat_skipped',
 				calls_rest_endpoint: false,
 			};
+			const latestSessionState =
+				select.getDistributedEditingSessionState?.() ||
+				currentSessionState;
 
 			dispatch.setDistributedEditingSessionState(
 				getDistributedEditingSessionStateForPresenceHeartbeatResult(
 					response,
-					currentSessionState
+					latestSessionState
 				)
 			);
 
@@ -1404,20 +1421,27 @@ export const __experimentalSendDistributedEditingPresenceHeartbeat =
 					options.sessionKey ||
 					getDistributedEditingPresenceSessionKey(),
 			} );
+			const latestSessionState =
+				select.getDistributedEditingSessionState?.() ||
+				currentSessionState;
 
 			dispatch.setDistributedEditingSessionState(
 				getDistributedEditingSessionStateForPresenceHeartbeatResult(
 					response,
-					currentSessionState
+					latestSessionState
 				)
 			);
 
 			return response;
 		} catch ( error ) {
+			const latestSessionState =
+				select.getDistributedEditingSessionState?.() ||
+				currentSessionState;
+
 			dispatch.setDistributedEditingSessionState(
 				getDistributedEditingSessionStateForPresenceHeartbeatResult(
 					error,
-					currentSessionState
+					latestSessionState
 				)
 			);
 
