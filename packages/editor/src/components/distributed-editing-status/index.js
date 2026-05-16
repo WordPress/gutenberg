@@ -72,6 +72,12 @@ const DISTRIBUTED_EDITING_SAME_BLOCK_CONFLICT_REASONS = new Set( [
 	'same_block_changed',
 	'same_serialized_block_changed',
 ] );
+const DISTRIBUTED_EDITING_STRUCTURAL_CONFLICT_REASONS = new Set( [
+	'block_count_changed',
+	'block_deleted',
+	'block_inserted',
+	'block_reordered',
+] );
 const DISTRIBUTED_EDITING_EMPTY_CONFLICT_TEXT = __( 'No visible text.' );
 
 const DISTRIBUTED_EDITING_STATUS_CONTROL_STATE_DEFINITIONS = Object.freeze( {
@@ -1875,6 +1881,173 @@ function getConflictComparisonRows( text ) {
 	return Math.min( 8, Math.max( 3, text.split( '\n' ).length ) );
 }
 
+function getDistributedEditingStructuralConflictSummary(
+	sessionState,
+	editedPostContent
+) {
+	const normalized = normalizeDistributedEditingSessionState( sessionState );
+	const hasConfirmedRetrySave =
+		normalized.retrySaveStatus ===
+			DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVED &&
+		normalized.retrySaveAccepted &&
+		normalized.retrySaveClaimsSaved;
+	const isStructuralConflictReason =
+		DISTRIBUTED_EDITING_STRUCTURAL_CONFLICT_REASONS.has(
+			normalized.localRebaseResultReason
+		);
+	const isManualStructuralConflict =
+		normalized.disposition ===
+			DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION &&
+		normalized.localRebaseResultStatus ===
+			DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.MANUAL_CONFLICT_REQUIRED &&
+		isStructuralConflictReason;
+
+	if (
+		hasConfirmedRetrySave ||
+		! isManualStructuralConflict ||
+		typeof normalized.clientBaseContent !== 'string' ||
+		typeof normalized.refetchedServerContent !== 'string' ||
+		typeof editedPostContent !== 'string'
+	) {
+		return null;
+	}
+
+	const snapshots = [
+		getStructuralConflictSnapshot( {
+			content: normalized.clientBaseContent,
+			id: 'base',
+			label: __( 'Starting post' ),
+		} ),
+		getStructuralConflictSnapshot( {
+			content: normalized.refetchedServerContent,
+			id: 'server',
+			label: __( 'Latest from WordPress' ),
+		} ),
+		getStructuralConflictSnapshot( {
+			content: editedPostContent,
+			id: 'local',
+			label: __( 'Your local editor' ),
+		} ),
+	];
+	const baseBlockCount = snapshots[ 0 ].blockCount;
+	const serverBlockCount = snapshots[ 1 ].blockCount;
+	const localBlockCount = snapshots[ 2 ].blockCount;
+
+	if (
+		baseBlockCount === 0 &&
+		serverBlockCount === 0 &&
+		localBlockCount === 0
+	) {
+		return null;
+	}
+
+	return {
+		baseBlockCount,
+		localBlockCount,
+		localCountDelta: localBlockCount - baseBlockCount,
+		reason: normalized.localRebaseResultReason,
+		reasonLabel: getStructuralConflictReasonLabel(
+			normalized.localRebaseResultReason
+		),
+		serverBlockCount,
+		serverCountDelta: serverBlockCount - baseBlockCount,
+		snapshots,
+	};
+}
+
+function getStructuralConflictSnapshot( { content, id, label } ) {
+	const blockChunks = getSerializedBlockChunksForStructuralSummary( content );
+	const sampleTexts = blockChunks
+		.map( getVisibleConflictText )
+		.filter( ( text ) => text !== DISTRIBUTED_EDITING_EMPTY_CONFLICT_TEXT )
+		.slice( 0, 3 );
+
+	return {
+		blockCount: blockChunks.length,
+		id,
+		label,
+		overflowCount: Math.max( 0, blockChunks.length - sampleTexts.length ),
+		sampleTexts:
+			sampleTexts.length > 0
+				? sampleTexts
+				: [ DISTRIBUTED_EDITING_EMPTY_CONFLICT_TEXT ],
+	};
+}
+
+function getSerializedBlockChunksForStructuralSummary( content ) {
+	if ( typeof content !== 'string' || content.trim() === '' ) {
+		return [];
+	}
+
+	return getSerializedBlockChunks( content ).filter(
+		( block ) => block.trim() !== ''
+	);
+}
+
+function getStructuralConflictReasonLabel( reason ) {
+	switch ( reason ) {
+		case 'block_deleted':
+			return __( 'Blocks deleted' );
+		case 'block_inserted':
+			return __( 'Blocks inserted' );
+		case 'block_reordered':
+			return __( 'Blocks reordered' );
+	}
+
+	return __( 'Block structure changed' );
+}
+
+function getStructuralConflictMessage( summary ) {
+	switch ( summary.reason ) {
+		case 'block_deleted':
+			return __(
+				'Blocks were deleted in more than one place. Compare the starting post, latest WordPress version, and your local editor before choosing what to keep.'
+			);
+		case 'block_inserted':
+			return __(
+				'Blocks were inserted in more than one place. Compare the starting post, latest WordPress version, and your local editor before choosing what to keep.'
+			);
+		case 'block_reordered':
+			return __(
+				'Blocks were reordered while local changes were pending. Compare the starting post, latest WordPress version, and your local editor before choosing what to keep.'
+			);
+	}
+
+	return __(
+		'The block structure changed while local edits were pending. Compare the starting post, latest WordPress version, and your local editor before choosing what to keep.'
+	);
+}
+
+function getStructuralConflictBlockCountLabel( count ) {
+	return sprintf(
+		/* translators: %d: number of blocks. */
+		_n( '%d block', '%d blocks', count ),
+		count
+	);
+}
+
+function getStructuralConflictCountDeltaLabel( delta ) {
+	if ( delta > 0 ) {
+		return sprintf(
+			/* translators: %d: number of added blocks. */
+			_n( '+%d block', '+%d blocks', delta ),
+			delta
+		);
+	}
+
+	if ( delta < 0 ) {
+		const removedCount = Math.abs( delta );
+
+		return sprintf(
+			/* translators: %d: number of removed blocks. */
+			_n( '-%d block', '-%d blocks', removedCount ),
+			removedCount
+		);
+	}
+
+	return __( 'No count change' );
+}
+
 function getConflictComparisonGuide( comparison ) {
 	const isLocalChoice =
 		comparison.resolutionChoice ===
@@ -2405,6 +2578,152 @@ function DistributedEditingSameBlockConflictComparison( {
 	);
 }
 
+function DistributedEditingStructuralConflictSummary( { onAction, summary } ) {
+	if ( ! summary ) {
+		return null;
+	}
+
+	const actionItem = {
+		id: 'structural-conflict-summary',
+		localRebaseResultReason: summary.reason,
+		nextStepAction: 'manual_structural_review',
+	};
+
+	return (
+		<div
+			aria-label={ __( 'Distributed editing structural conflict summary' ) }
+			className="editor-distributed-editing-status__conflict-comparison editor-distributed-editing-status__structural-conflict"
+			data-distributed-editing-structural-conflict={ summary.reason }
+			data-distributed-editing-structural-conflict-base-block-count={
+				summary.baseBlockCount
+			}
+			data-distributed-editing-structural-conflict-calls-rest="false"
+			data-distributed-editing-structural-conflict-calls-save="false"
+			data-distributed-editing-structural-conflict-local-block-count={
+				summary.localBlockCount
+			}
+			data-distributed-editing-structural-conflict-local-count-delta={
+				summary.localCountDelta
+			}
+			data-distributed-editing-structural-conflict-mutates-editor-content="false"
+			data-distributed-editing-structural-conflict-read-only="true"
+			data-distributed-editing-structural-conflict-reason={
+				summary.reason
+			}
+			data-distributed-editing-structural-conflict-server-block-count={
+				summary.serverBlockCount
+			}
+			data-distributed-editing-structural-conflict-server-count-delta={
+				summary.serverCountDelta
+			}
+			role="region"
+		>
+			<div className="editor-distributed-editing-status__conflict-comparison-header">
+				<strong>{ __( 'Compare block structure' ) }</strong>
+				<p>{ getStructuralConflictMessage( summary ) }</p>
+			</div>
+			<div className="editor-distributed-editing-status__structural-conflict-grid">
+				{ summary.snapshots.map( ( snapshot ) => (
+					<div
+						className="editor-distributed-editing-status__structural-conflict-column"
+						data-distributed-editing-structural-conflict-row={
+							snapshot.id
+						}
+						data-distributed-editing-structural-conflict-row-block-count={
+							snapshot.blockCount
+						}
+						key={ snapshot.id }
+					>
+						<div className="editor-distributed-editing-status__structural-conflict-column-header">
+							<strong>{ snapshot.label }</strong>
+							<span>
+								{ getStructuralConflictBlockCountLabel(
+									snapshot.blockCount
+								) }
+							</span>
+						</div>
+						<ul className="editor-distributed-editing-status__structural-conflict-samples">
+							{ snapshot.sampleTexts.map( ( text, index ) => (
+								<li
+									data-distributed-editing-structural-conflict-sample={
+										snapshot.id
+									}
+									key={ `${ snapshot.id }-${ index }` }
+								>
+									{ text }
+								</li>
+							) ) }
+							{ snapshot.overflowCount > 0 && (
+								<li className="editor-distributed-editing-status__structural-conflict-overflow">
+									{ sprintf(
+										/* translators: %d: number of additional blocks not shown in the compact structural summary. */
+										_n(
+											'%d more block not shown',
+											'%d more blocks not shown',
+											snapshot.overflowCount
+										),
+										snapshot.overflowCount
+									) }
+								</li>
+							) }
+						</ul>
+					</div>
+				) ) }
+			</div>
+			<dl className="editor-distributed-editing-status__structural-conflict-counts">
+				<div>
+					<dt>{ __( 'Latest WordPress count change' ) }</dt>
+					<dd>
+						{ getStructuralConflictCountDeltaLabel(
+							summary.serverCountDelta
+						) }
+					</dd>
+				</div>
+				<div>
+					<dt>{ __( 'Local editor count change' ) }</dt>
+					<dd>
+						{ getStructuralConflictCountDeltaLabel(
+							summary.localCountDelta
+						) }
+					</dd>
+				</div>
+				<div>
+					<dt>{ __( 'Reason' ) }</dt>
+					<dd>{ summary.reasonLabel }</dd>
+				</div>
+			</dl>
+			<div className="editor-distributed-editing-status__conflict-comparison-actions editor-distributed-editing-status__conflict-comparison-actions--prepared">
+				<Button
+					__next40pxDefaultSize
+					data-distributed-editing-structural-conflict-support-action="export_for_review"
+					variant="secondary"
+					onClick={ () =>
+						onAction?.(
+							DISTRIBUTED_EDITING_NOTICE_ACTIONS.EXPORT_LOCAL_UPDATES,
+							actionItem
+						)
+					}
+				>
+					{ __( 'Export for review' ) }
+				</Button>
+				<Button
+					__next40pxDefaultSize
+					data-distributed-editing-structural-conflict-support-action="get_latest_post"
+					variant="tertiary"
+					onClick={ () =>
+						onAction?.(
+							DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFETCH_SERVER_STATE,
+							actionItem
+						)
+					}
+				>
+					{ __( 'Get latest post' ) }
+				</Button>
+			</div>
+		</div>
+	);
+}
+
 /**
  * Renders the selector-backed DE-RTC status surface.
  *
@@ -2715,6 +3034,11 @@ export default function DistributedEditingStatus( {
 		sessionState,
 		editedPostContent
 	);
+	const structuralConflictSummary =
+		getDistributedEditingStructuralConflictSummary(
+			sessionState,
+			editedPostContent
+		);
 
 	return (
 		<>
@@ -2744,6 +3068,10 @@ export default function DistributedEditingStatus( {
 					handleSelectLatestWordPressVersion
 				}
 				onSelectLocalVersion={ handleSelectLocalVersion }
+			/>
+			<DistributedEditingStructuralConflictSummary
+				onAction={ handleAction }
+				summary={ structuralConflictSummary }
 			/>
 		</>
 	);

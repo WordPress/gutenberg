@@ -1355,6 +1355,114 @@ describe( 'DistributedEditingStatus', () => {
 		).toBeVisible();
 	} );
 
+	it( 'renders a compact structural conflict summary for deleted blocks', () => {
+		setupDistributedEditingStatusDispatch();
+		setupDistributedEditingStatusSelect( {
+			editedPostContent:
+				'<!-- wp:paragraph --><p>Local keeps beta.</p><!-- /wp:paragraph -->',
+			sessionState: {
+				disposition:
+					DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+				reasonCode:
+					DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+				pendingChangeCount: 1,
+				remoteChangeCount: 1,
+				requiresServerStateRefetch: false,
+				refetchedServerState: true,
+				canExportLocalUpdates: true,
+				localRebasePlanStatus:
+					DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES.READY,
+				localRebaseResultStatus:
+					DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.MANUAL_CONFLICT_REQUIRED,
+				localRebaseResultReason: 'block_deleted',
+				requiresManualConflictResolution: true,
+				clientBaseContent:
+					'<!-- wp:paragraph --><p>Base alpha.</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Base beta.</p><!-- /wp:paragraph -->',
+				refetchedServerContent:
+					'<!-- wp:paragraph --><p>Base alpha.</p><!-- /wp:paragraph -->',
+			},
+		} );
+
+		render( <DistributedEditingStatus /> );
+
+		const summary = screen.getByRole( 'region', {
+			name: 'Distributed editing structural conflict summary',
+		} );
+
+		expect( summary ).toHaveAttribute(
+			'data-distributed-editing-structural-conflict',
+			'block_deleted'
+		);
+		expect( summary ).toHaveAttribute(
+			'data-distributed-editing-structural-conflict-base-block-count',
+			'2'
+		);
+		expect( summary ).toHaveAttribute(
+			'data-distributed-editing-structural-conflict-server-block-count',
+			'1'
+		);
+		expect( summary ).toHaveAttribute(
+			'data-distributed-editing-structural-conflict-local-block-count',
+			'1'
+		);
+		expect( summary ).toHaveAttribute(
+			'data-distributed-editing-structural-conflict-server-count-delta',
+			'-1'
+		);
+		expect( summary ).toHaveAttribute(
+			'data-distributed-editing-structural-conflict-local-count-delta',
+			'-1'
+		);
+		expect( summary ).toHaveAttribute(
+			'data-distributed-editing-structural-conflict-calls-save',
+			'false'
+		);
+		expect(
+			within( summary ).getByText( 'Compare block structure' )
+		).toBeVisible();
+		expect(
+			within( summary ).getByText(
+				'Blocks were deleted in more than one place. Compare the starting post, latest WordPress version, and your local editor before choosing what to keep.'
+			)
+		).toBeVisible();
+		expect( within( summary ).getByText( 'Starting post' ) ).toBeVisible();
+		expect(
+			within( summary ).getByText( 'Latest from WordPress' )
+		).toBeVisible();
+		expect(
+			within( summary ).getByText( 'Your local editor' )
+		).toBeVisible();
+		expect(
+			within( summary ).getAllByText( 'Base alpha.' )
+		).toHaveLength( 2 );
+		expect(
+			within( summary ).getByText( 'Base beta.' )
+		).toBeVisible();
+		expect(
+			within( summary ).getByText( 'Local keeps beta.' )
+		).toBeVisible();
+		expect( within( summary ).getByText( 'Blocks deleted' ) ).toBeVisible();
+		expect(
+			within( summary ).getAllByText( '-1 block' )
+		).toHaveLength( 2 );
+		expect(
+			within( summary ).getByRole( 'button', {
+				name: 'Export for review',
+			} )
+		).toBeVisible();
+		expect(
+			within( summary ).getByRole( 'button', {
+				name: 'Get latest post',
+			} )
+		).toBeVisible();
+		expect(
+			screen.queryByRole( 'region', {
+				name: 'Distributed editing conflict comparison',
+			} )
+		).not.toBeInTheDocument();
+		expect( screen.queryByText( /wp:paragraph/ ) ).not.toBeInTheDocument();
+	} );
+
 	it( 'requests fresh proof for a selected same-block conflict choice without saving', async () => {
 		const user = userEvent.setup();
 		const actions = setupDistributedEditingStatusDispatch();
