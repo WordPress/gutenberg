@@ -2838,28 +2838,39 @@ export const __experimentalSaveDistributedEditingRetryAfterProof =
 		try {
 			const response =
 				await requestDistributedEditingRetrySave( requestArgs );
-			const shouldApplyProposedPostContent =
-				response?.result === 'retry_save_applied' &&
-				typeof proposedPostContent === 'string' &&
-				select.getEditedPostContent?.() !== proposedPostContent;
+			const retrySaveAppliedResponse =
+				isDistributedEditingRetrySaveAppliedResponse( response );
+			const appliedPostContent =
+				getDistributedEditingRetrySaveAppliedPostContent( {
+					response,
+					proposedPostContent,
+				} );
 			const retrySaveResultSessionState =
 				getDistributedEditingSessionStateForRetrySaveResult(
 					response,
 					transcriptSavingSessionState
 				);
+			const retrySaveConfirmedResponse =
+				retrySaveAppliedResponse &&
+				hasDistributedEditingRetrySaveSavedStateEvidenceForSessionState(
+					retrySaveResultSessionState
+				);
+			const shouldApplyPostContent =
+				retrySaveConfirmedResponse &&
+				typeof appliedPostContent === 'string' &&
+				select.getEditedPostContent?.() !== appliedPostContent;
 			let nextSessionState =
 				getDistributedEditingSessionStateWithActionTranscriptEvent(
 					retrySaveResultSessionState,
 					{
-						eventType:
-							response?.result === 'retry_save_applied'
-								? DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.SAVE_CONFIRMED
-								: DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.SAVE_STATE_CHANGED,
+						eventType: retrySaveConfirmedResponse
+							? DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.SAVE_CONFIRMED
+							: DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.SAVE_STATE_CHANGED,
 						reasonCode: retrySaveResultSessionState.retrySaveReason,
 					}
 				);
 			const freshReviewRetrySaveConfirmed =
-				response?.result === 'retry_save_applied' &&
+				retrySaveConfirmedResponse &&
 				Boolean( acceptedFreshReviewConsumeValidation ) &&
 				( response?.fresh_review_decision_consumed === true ||
 					response?.fresh_review_decision_consumption_consumed ===
@@ -2882,13 +2893,13 @@ export const __experimentalSaveDistributedEditingRetryAfterProof =
 			}
 
 			dispatch.setDistributedEditingSessionState( nextSessionState );
-			if ( shouldApplyProposedPostContent ) {
+			if ( shouldApplyPostContent ) {
 				dispatch.editPost(
-					{ content: proposedPostContent },
+					{ content: appliedPostContent },
 					{ undoIgnore: true }
 				);
 			}
-			if ( response?.result === 'retry_save_applied' ) {
+			if ( retrySaveConfirmedResponse ) {
 				deleteDistributedEditingFreshReviewImportContentVaultEntry( {
 					postId,
 					postType,
@@ -2917,6 +2928,35 @@ export const __experimentalSaveDistributedEditingRetryAfterProof =
 			throw error;
 		}
 	};
+
+function isDistributedEditingRetrySaveAppliedResponse( response = {} ) {
+	const result = response?.result || response?.data?.result;
+
+	return (
+		result === 'retry_save_applied' || result === 'retry_save_server_merged'
+	);
+}
+
+function getDistributedEditingRetrySaveAppliedPostContent( {
+	response,
+	proposedPostContent,
+} ) {
+	const serverPostContent =
+		getDistributedEditingPostContentFromResponse( response );
+
+	if ( typeof serverPostContent === 'string' ) {
+		return serverPostContent;
+	}
+
+	if (
+		isDistributedEditingRetrySaveAppliedResponse( response ) &&
+		typeof proposedPostContent === 'string'
+	) {
+		return proposedPostContent;
+	}
+
+	return null;
+}
 
 /**
  * Browser-callable fresh-review retry-save handoff.

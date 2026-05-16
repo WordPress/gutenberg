@@ -1147,6 +1147,7 @@ export const DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE = Object.freeze( {
 	retrySaveClaimsSaved: false,
 	retrySaveRevisionCreated: false,
 	retrySaveCreatedRevisionIds: [],
+	retrySaveServerMerged: false,
 	retrySaveReviewStatus: null,
 	retrySaveReviewAction: null,
 	retrySaveReviewRequiredCapability: null,
@@ -1983,6 +1984,7 @@ export function normalizeDistributedEditingSessionState( sessionState = {} ) {
 		retrySaveCreatedRevisionIds: normalizeIdList(
 			sessionState.retrySaveCreatedRevisionIds
 		),
+		retrySaveServerMerged: Boolean( sessionState.retrySaveServerMerged ),
 		...normalizeRetrySaveReviewMetadataFields( sessionState ),
 		...normalizeRetrySaveReviewApprovalProofFields( {
 			...sessionState,
@@ -11975,6 +11977,12 @@ export function getDistributedEditingSessionStateForRetrySaveRequest(
 	} );
 }
 
+function isDistributedEditingRetrySaveAppliedResult( result ) {
+	return (
+		result === 'retry_save_applied' || result === 'retry_save_server_merged'
+	);
+}
+
 /**
  * Returns DE-RTC editor state for the guarded retry-save response.
  *
@@ -11997,6 +12005,8 @@ export function getDistributedEditingSessionStateForRetrySaveResult(
 	const result = normalizeNullableString(
 		responseOrError.result || responseData.result
 	);
+	const retrySaveAppliedResult =
+		isDistributedEditingRetrySaveAppliedResult( result );
 	const pendingChangeCount =
 		responseOrError.pendingChangeCount ??
 		responseOrError.pending_change_count ??
@@ -12054,6 +12064,13 @@ export function getDistributedEditingSessionStateForRetrySaveResult(
 			responseData.createdRevisionIds ||
 			responseData.created_revision_ids ||
 			[],
+		retrySaveServerMerged: Boolean(
+			responseOrError.serverMerged ||
+				responseOrError.server_merged ||
+				responseData.serverMerged ||
+				responseData.server_merged ||
+				result === 'retry_save_server_merged'
+		),
 	};
 	const retrySaveFreshReviewConsumeValidationFields =
 		getRetrySaveFreshReviewConsumeValidationFieldsFromResponseOrError(
@@ -12071,7 +12088,7 @@ export function getDistributedEditingSessionStateForRetrySaveResult(
 		( normalizedCurrent.hasPendingChanges ? 1 : 0 );
 
 	if (
-		result === 'retry_save_applied' &&
+		retrySaveAppliedResult &&
 		( responseOrError.retrySaveAccepted === true ||
 			responseOrError.retry_save_accepted === true ||
 			responseData.retrySaveAccepted === true ||
@@ -12136,16 +12153,15 @@ export function getDistributedEditingSessionStateForRetrySaveResult(
 		retrySaveFreshReviewConsumeValidationFields.retrySaveFreshReviewConsumeValidationAccepted ||
 			retrySaveFreshReviewConsumeValidationFields.retrySaveFreshReviewDecisionConsumptionValidated
 	);
-	const reasonCode =
-		result === 'retry_save_applied'
-			? DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_MALFORMED_SYNC_PAYLOAD
-			: normalizeNullableString(
-					responseOrError.code ||
-						responseOrError.reasonCode ||
-						responseOrError.reason_code ||
-						responseData.reasonCode ||
-						responseData.reason_code
-			  );
+	const reasonCode = retrySaveAppliedResult
+		? DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_MALFORMED_SYNC_PAYLOAD
+		: normalizeNullableString(
+				responseOrError.code ||
+					responseOrError.reasonCode ||
+					responseOrError.reason_code ||
+					responseData.reasonCode ||
+					responseData.reason_code
+		  );
 	const opaqueReviewApprovalProofTokenRejectionDetail =
 		getOpaqueReviewApprovalProofTokenRejectionDetail(
 			responseOrError,
@@ -12154,7 +12170,7 @@ export function getDistributedEditingSessionStateForRetrySaveResult(
 	const retrySaveReason =
 		opaqueReviewApprovalProofTokenRejectionDetail ||
 		reasonCode ||
-		( result === 'retry_save_applied'
+		( retrySaveAppliedResult
 			? DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.RETRY_SAVE_MISSING_SAVED_STATE_EVIDENCE
 			: result );
 	const retrySaveReviewMetadata =
@@ -12187,10 +12203,9 @@ export function getDistributedEditingSessionStateForRetrySaveResult(
 	return getDistributedEditingRejectedRetrySaveState( {
 		normalizedCurrent,
 		reasonCode,
-		result:
-			result === 'retry_save_applied'
-				? DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.RETRY_SAVE_MISSING_SAVED_STATE_EVIDENCE
-				: result,
+		result: retrySaveAppliedResult
+			? DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.RETRY_SAVE_MISSING_SAVED_STATE_EVIDENCE
+			: result,
 		retrySaveReason,
 		pendingChangeCount: rejectedPendingChangeCount,
 		serverVersion,
