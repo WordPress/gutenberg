@@ -55,17 +55,15 @@ function getWorkerAPI(): Remote< WorkerAPI > {
  * @param id             Item ID.
  * @param buffer         GIF file buffer.
  * @param outputMimeType Output MIME type ('video/mp4' or 'video/webm').
- * @param maxDimensions  Optional maximum dimensions for scaling.
  * @return Video file buffer.
  */
 export async function ffmpegConvertGifToVideo(
 	id: ItemId,
 	buffer: ArrayBuffer,
-	outputMimeType: string,
-	maxDimensions?: number
+	outputMimeType: string
 ): Promise< ArrayBuffer > {
 	const api = getWorkerAPI();
-	return api.convertGifToVideo( id, buffer, outputMimeType, maxDimensions );
+	return api.convertGifToVideo( id, buffer, outputMimeType );
 }
 
 /**

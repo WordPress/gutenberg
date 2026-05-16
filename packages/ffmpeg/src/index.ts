@@ -93,18 +93,6 @@ export async function cancelOperations( id: ItemId ) {
 }
 
 /**
- * Pads a dimension to the nearest even number.
- *
- * FFmpeg requires even dimensions for most codecs (H.264, VP9).
- *
- * @param value Dimension value.
- * @return Even dimension value.
- */
-function padToEven( value: number ): number {
-	return value % 2 === 0 ? value : value + 1;
-}
-
-/**
  * Serialization lock for FFmpeg operations.
  *
  * The FFmpeg core shares a single Emscripten module instance with shared
@@ -119,14 +107,12 @@ let operationLock: Promise< void > = Promise.resolve();
  * @param id             Item ID.
  * @param buffer         GIF file buffer.
  * @param outputMimeType Output MIME type ('video/mp4' or 'video/webm').
- * @param maxDimensions  Optional maximum dimensions for scaling.
  * @return Video file buffer.
  */
 export async function convertGifToVideo(
 	id: ItemId,
 	buffer: ArrayBuffer,
-	outputMimeType: string,
-	maxDimensions?: number
+	outputMimeType: string
 ): Promise< ArrayBuffer > {
 	inProgressOperations.add( id );
 
@@ -183,21 +169,9 @@ export async function convertGifToVideo(
 			// Use yuv420p for maximum compatibility.
 			args.push( '-pix_fmt', 'yuv420p' );
 
-			// Scale filter: pad to even dimensions (required by most codecs)
-			// and optionally scale down if exceeding maxDimensions.
-			if ( maxDimensions ) {
-				args.push(
-					'-vf',
-					`scale='min(${ padToEven(
-						maxDimensions
-					) },trunc(iw/2)*2)':'min(${ padToEven(
-						maxDimensions
-					) },trunc(ih/2)*2)':flags=lanczos`
-				);
-			} else {
-				// Just ensure even dimensions.
-				args.push( '-vf', "scale='trunc(iw/2)*2':'trunc(ih/2)*2'" );
-			}
+			// Scale filter: ensure even dimensions, required by most codecs
+			// (H.264, VP9).
+			args.push( '-vf', "scale='trunc(iw/2)*2':'trunc(ih/2)*2'" );
 
 			// MP4-specific: move metadata to the beginning for streaming.
 			if ( ! isWebm ) {
@@ -220,12 +194,13 @@ export async function convertGifToVideo(
 				throw new Error( 'FFmpeg produced empty output' );
 			}
 
-			// Slice the buffer to extract only the relevant bytes.
-			// Uint8Array.buffer may include data outside the view's range.
-			return output.buffer.slice(
-				output.byteOffset,
-				output.byteOffset + output.byteLength
-			) as ArrayBuffer;
+			// Copy into a fresh ArrayBuffer. core.FS.readFile() returns a
+			// Uint8Array that views a slice of MEMFS, and under
+			// crossOriginIsolated FFmpeg builds that backing buffer can be a
+			// SharedArrayBuffer. Slicing the typed array (rather than its
+			// .buffer) always allocates a standalone ArrayBuffer, which is
+			// safe to transfer across the worker boundary.
+			return new Uint8Array( output ).slice().buffer;
 		} finally {
 			// Always clean up MEMFS and reset core state so a failed run
 			// (e.g. empty output) doesn't leave stale files or state for

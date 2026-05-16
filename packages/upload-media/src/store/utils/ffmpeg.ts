@@ -48,22 +48,19 @@ function loadFFmpegModule(): Promise<
  * @param id             Queue item ID.
  * @param file           GIF file object.
  * @param outputMimeType Output MIME type ('video/mp4' or 'video/webm').
- * @param maxDimensions  Optional maximum dimensions for scaling.
  * @return Converted video file.
  */
 export async function ffmpegConvertGifToVideo(
 	id: QueueItemId,
 	file: File,
-	outputMimeType: string,
-	maxDimensions?: number
+	outputMimeType: string
 ) {
 	const { ffmpegConvertGifToVideo: convertGifToVideo } =
 		await loadFFmpegModule();
 	const buffer = await convertGifToVideo(
 		id,
 		await file.arrayBuffer(),
-		outputMimeType,
-		maxDimensions
+		outputMimeType
 	);
 
 	const ext = outputMimeType === 'video/webm' ? 'webm' : 'mp4';

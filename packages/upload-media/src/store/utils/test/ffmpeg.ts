@@ -68,7 +68,7 @@ describe( 'ffmpeg wrapper', () => {
 			expect( result.type ).toBe( 'video/webm' );
 		} );
 
-		it( 'forwards id, buffer, mime type, and max dimensions to the worker', async () => {
+		it( 'forwards id, buffer, and mime type to the worker', async () => {
 			mockedWorker.ffmpegConvertGifToVideo.mockResolvedValue(
 				new ArrayBuffer( 0 )
 			);
@@ -78,12 +78,7 @@ describe( 'ffmpeg wrapper', () => {
 				type: 'image/gif',
 			} );
 
-			await ffmpegConvertGifToVideo(
-				'queue-3',
-				input,
-				'video/mp4',
-				1024
-			);
+			await ffmpegConvertGifToVideo( 'queue-3', input, 'video/mp4' );
 
 			expect(
 				mockedWorker.ffmpegConvertGifToVideo
@@ -92,21 +87,7 @@ describe( 'ffmpeg wrapper', () => {
 			expect( call[ 0 ] ).toBe( 'queue-3' );
 			expect( new Uint8Array( call[ 1 ] ) ).toEqual( bytes );
 			expect( call[ 2 ] ).toBe( 'video/mp4' );
-			expect( call[ 3 ] ).toBe( 1024 );
-		} );
-
-		it( 'omits maxDimensions when not provided', async () => {
-			mockedWorker.ffmpegConvertGifToVideo.mockResolvedValue(
-				new ArrayBuffer( 0 )
-			);
-
-			const input = new File( [], 'source.gif', {
-				type: 'image/gif',
-			} );
-			await ffmpegConvertGifToVideo( 'queue-4', input, 'video/mp4' );
-
-			const args = mockedWorker.ffmpegConvertGifToVideo.mock.calls[ 0 ];
-			expect( args[ 3 ] ).toBeUndefined();
+			expect( call ).toHaveLength( 3 );
 		} );
 
 		it( 'handles files without an extension in the source name', async () => {
