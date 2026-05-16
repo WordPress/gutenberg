@@ -8,18 +8,27 @@ import { useState } from '@wordpress/element';
  * Internal dependencies
  */
 import * as Tooltip from '../../../packages/ui/src/tooltip';
+import * as Select from '../../../packages/ui/src/form/primitives/select';
+import { SelectControl } from '../../../packages/ui/src/form/select-control';
 import { WithWpCompatOverlaySlot } from './with-wp-compat-overlay-slot';
 
-// Cross-library stacking: a `@wordpress/ui` Tooltip inside a
-// `@wordpress/components` Modal / Popover should sit above the
-// components-side overlay via the compat overlay slot.
+const selectItems = [
+	{ value: 'option-1', label: 'Option 1' },
+	{ value: 'option-2', label: 'Option 2' },
+	{ value: 'option-3', label: 'Option 3' },
+];
+
+// Cross-library stacking: `@wordpress/ui` overlays (`Tooltip`, `Select`,
+// `SelectControl`) inside a `@wordpress/components` Modal / Popover
+// should sit above the components-side overlay via the compat overlay
+// slot.
 export default {
 	title: 'Playground/Debug fixtures/WP Compat Overlay Slot',
 	decorators: [ WithWpCompatOverlaySlot ],
 };
 
 export const InsideComponentsModal = {
-	name: 'Tooltip inside @wordpress/components Modal',
+	name: 'Overlays inside @wordpress/components Modal',
 	render: function Render() {
 		const [ isOpen, setIsOpen ] = useState( false );
 		return (
@@ -33,9 +42,9 @@ export const InsideComponentsModal = {
 						onRequestClose={ () => setIsOpen( false ) }
 					>
 						<p>
-							The Tooltip below is from `@wordpress/ui`. Hover its
-							trigger; the tooltip popup should render above this
-							modal, not behind it.
+							The overlays below are from `@wordpress/ui`. Their
+							popups should render above this modal, not behind
+							it.
 						</p>
 						<Tooltip.Provider delay={ 0 }>
 							<Tooltip.Root>
@@ -46,6 +55,29 @@ export const InsideComponentsModal = {
 								</Tooltip.Popup>
 							</Tooltip.Root>
 						</Tooltip.Provider>
+
+						<div style={ { marginTop: '1rem' } }>
+							<Select.Root items={ selectItems }>
+								<Select.Trigger aria-label="Select primitive" />
+								<Select.Popup>
+									{ selectItems.map( ( item ) => (
+										<Select.Item
+											key={ item.value }
+											value={ item }
+										>
+											{ item.label }
+										</Select.Item>
+									) ) }
+								</Select.Popup>
+							</Select.Root>
+						</div>
+
+						<div style={ { marginTop: '1rem' } }>
+							<SelectControl
+								label="SelectControl"
+								items={ selectItems }
+							/>
+						</div>
 					</Modal>
 				) }
 			</>
@@ -54,7 +86,7 @@ export const InsideComponentsModal = {
 };
 
 export const InsideComponentsPopover = {
-	name: 'Tooltip inside @wordpress/components Popover',
+	name: 'Overlays inside @wordpress/components Popover',
 	render: function Render() {
 		const [ anchor, setAnchor ] = useState( null );
 		const [ isOpen, setIsOpen ] = useState( false );
@@ -74,9 +106,8 @@ export const InsideComponentsPopover = {
 					>
 						<div style={ { padding: '1rem', maxWidth: '20rem' } }>
 							<p>
-								The Tooltip below is from `@wordpress/ui`. Hover
-								its trigger; the tooltip popup should render
-								above this popover.
+								The overlays below are from `@wordpress/ui`.
+								Their popups should render above this popover.
 							</p>
 							<Tooltip.Provider delay={ 0 }>
 								<Tooltip.Root>
@@ -87,6 +118,29 @@ export const InsideComponentsPopover = {
 									</Tooltip.Popup>
 								</Tooltip.Root>
 							</Tooltip.Provider>
+
+							<div style={ { marginTop: '1rem' } }>
+								<Select.Root items={ selectItems }>
+									<Select.Trigger aria-label="Select primitive" />
+									<Select.Popup>
+										{ selectItems.map( ( item ) => (
+											<Select.Item
+												key={ item.value }
+												value={ item }
+											>
+												{ item.label }
+											</Select.Item>
+										) ) }
+									</Select.Popup>
+								</Select.Root>
+							</div>
+
+							<div style={ { marginTop: '1rem' } }>
+								<SelectControl
+									label="SelectControl"
+									items={ selectItems }
+								/>
+							</div>
 						</div>
 					</Popover>
 				) }
