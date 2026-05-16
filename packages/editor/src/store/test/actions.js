@@ -5525,6 +5525,157 @@ describe( 'Post actions', () => {
 			} );
 		} );
 
+		it( 'hydrates same-block server-merge conflicts for comparison after retry-save rejection', async () => {
+			const basePostContent =
+				'<!-- wp:paragraph --><p>Original conflict base.</p><!-- /wp:paragraph -->';
+			const localPostContent =
+				'<!-- wp:paragraph --><p>Local conflict text.</p><!-- /wp:paragraph -->';
+			const localPostContentWithEditorSyncMeta = `${ localPostContent }<!-- wp:freeform --><p><script type="wp/post-sync-meta" data-sync-meta-format="diff-match-patch">{"version":"4"}</script></p><!-- /wp:freeform -->`;
+			const serverPostContent =
+				'<!-- wp:paragraph --><p>Server conflict text.</p><!-- /wp:paragraph -->';
+			const proposedPostContentHash =
+				'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc';
+			const post = {
+				id: postId,
+				type: 'post',
+				title: 'bar',
+				content: localPostContentWithEditorSyncMeta,
+				status: 'draft',
+			};
+			const error = {
+				code: DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_REBASE_FAILED,
+				message:
+					'Distributed Editing could not merge the retry save automatically.',
+				data: {
+					status: 409,
+					detail: 'retry_save_server_merge_same_serialized_block_changed',
+					server_merge_status: 'manual_conflict_required',
+					requires_manual_conflict_resolution: true,
+					can_export_local_updates: true,
+					client_base_version: '4',
+					accepted_proof_server_version: '4',
+					server_version: '5',
+					pending_change_count: 1,
+					saves_post: false,
+					mutates_post_content: false,
+					creates_revision: false,
+					claims_saved: false,
+				},
+			};
+			let retrySaveCalls = 0;
+			let serverStateRefetchCalls = 0;
+
+			apiFetch.setFetchHandler( async ( options ) => {
+				const { path, method, data } = options;
+
+				if (
+					method === 'GET' &&
+					path.startsWith( `/wp/v2/posts/${ postId }` ) &&
+					path.includes( 'context=edit' )
+				) {
+					serverStateRefetchCalls++;
+					return {
+						...post,
+						content: {
+							raw: `${ serverPostContent }<script type="wp/post-sync-meta" data-sync-meta-format="diff-match-patch">{"version":"5"}</script>`,
+						},
+						distributed_editing: {
+							server_version: '5',
+						},
+					};
+				}
+
+				expect( method ).toBe( 'POST' );
+				expect( path ).toMatch(
+					new RegExp(
+						`^/wp/v2/posts/${ postId }/distributed-editing/retry-save`
+					)
+				);
+				retrySaveCalls++;
+				expect( data.proposed_post_content ).toBe( localPostContent );
+				expect( data.proposed_post_content_hash ).toBe(
+					proposedPostContentHash
+				);
+				throw error;
+			} );
+
+			const registry = createRegistryWithStores();
+
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', post );
+			registry.dispatch( editorStore ).setupEditor( post, {
+				content: post.content,
+			} );
+			registry
+				.dispatch( editorStore )
+				.setDistributedEditingSessionState( {
+					clientBaseVersion: '4',
+					serverVersion: '4',
+					clientBaseContent: basePostContent,
+					pendingChangeCount: 1,
+					retrySubmitProofStatus:
+						DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.ACCEPTED_FOR_FUTURE_SAVE,
+					retrySubmitAccepted: true,
+					retrySubmitSavePathRequired: true,
+					retrySubmitSaveStatus:
+						DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.READY,
+					retrySubmitSaveReady: true,
+					canExportLocalUpdates: true,
+				} );
+
+			await expect(
+				registry
+					.dispatch( editorStore )
+					.__experimentalSaveDistributedEditingRetryAfterProof( {
+						proposedPostContentHash,
+					} )
+			).rejects.toBe( error );
+
+			expect( retrySaveCalls ).toBe( 1 );
+			expect( serverStateRefetchCalls ).toBe( 1 );
+			expect(
+				registry.select( editorStore ).getEditedPostContent()
+			).toBe( localPostContentWithEditorSyncMeta );
+			expect(
+				registry
+					.select( editorStore )
+					.getDistributedEditingSessionState()
+			).toMatchObject( {
+				disposition:
+					DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+				reasonCode:
+					DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_REBASE_FAILED,
+				serverVersion: '5',
+				pendingChangeCount: 1,
+				hasPendingChanges: true,
+				isAwaitingServerConfirmation: true,
+				requiresServerStateRefetch: false,
+				requiresManualConflictResolution: true,
+				refetchedServerState: true,
+				clientBaseContent: basePostContent,
+				refetchedServerContent: serverPostContent,
+				localRebasePlanStatus:
+					DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES.MANUAL_CONFLICT_REQUIRED,
+				localRebaseResultStatus:
+					DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.MANUAL_CONFLICT_REQUIRED,
+				localRebaseResultReason: 'same_block_changed',
+				canExportLocalUpdates: true,
+				retrySaveStatus:
+					DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.STALE_BASE_REJECTED,
+				retrySaveReason:
+					DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_REBASE_FAILED,
+				retrySaveAccepted: false,
+				retrySaveServerVersion: '5',
+				retrySaveSavesPost: false,
+				retrySaveMutatesPostContent: false,
+				retrySaveCreatesRevision: false,
+				retrySaveClaimsSaved: false,
+				actionTranscriptLatestEventType:
+					DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.SAVE_STATE_CHANGED,
+			} );
+		} );
+
 		it( 'passes accepted review approval proof into retry-save requests', async () => {
 			const proposedPostContent =
 				'<!-- wp:html --><script>approved</script><!-- /wp:html -->';

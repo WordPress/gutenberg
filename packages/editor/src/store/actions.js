@@ -72,6 +72,7 @@ import {
 	getDistributedEditingRetrySavePolicyForSessionState,
 	getDistributedEditingSessionStateWithActionTranscriptEvent,
 	DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES,
+	DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES,
 	DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES,
 	DISTRIBUTED_EDITING_LOCAL_UPDATES_REVIEW_REQUEST_STATUSES,
 	DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_STATUSES,
@@ -974,6 +975,41 @@ export const __experimentalMaybeHandleDistributedEditingSaveButtonClick =
 				savePolicy.reason ||
 				savePolicy.saveButtonReason ||
 				'distributed_editing_workflow_action_required';
+
+			if (
+				savePolicy.clickAction ===
+				DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.COMPARE_CONFLICTING_CHANGES
+			) {
+				const sessionState =
+					select.getDistributedEditingSessionState?.() || {};
+
+				return {
+					status: 'manual_conflict_comparison_required_before_save',
+					reason,
+					policy: savePolicy,
+					allowsNormalSaveFallback: false,
+					blocksNormalSavePost: true,
+					opensPrePublishReview: false,
+					requiresServerStateRefetch: false,
+					requiresManualConflictResolution: Boolean(
+						sessionState.requiresManualConflictResolution
+					),
+					canExportLocalUpdates: Boolean(
+						savePolicy.canExportLocalUpdates ||
+							sessionState.canExportLocalUpdates
+					),
+					preservesCompareState: true,
+					callsServerStateRefetchEndpoint: false,
+					callsRetrySubmitEndpoint: false,
+					callsNormalSavePost: false,
+					callsRetrySaveEndpoint: false,
+					dispatchesNotice: false,
+					mutatesEditorContent: false,
+					mutatesPersistedPostContent: false,
+					changesPostLock: false,
+					claimsSaved: false,
+				};
+			}
 
 			if (
 				savePolicy.clickAction ===
@@ -2780,7 +2816,7 @@ export const __experimentalSaveDistributedEditingRetryAfterProof =
 					reasonCode: savingSessionState.retrySaveReason,
 				}
 			);
-		const proposedPostContent =
+		const proposedPostContentCandidate =
 			options.proposedPostContent ??
 			getDistributedEditingFreshReviewImportedPostContentForRetrySave( {
 				postId,
@@ -2789,6 +2825,9 @@ export const __experimentalSaveDistributedEditingRetryAfterProof =
 				acceptedFreshReviewConsumeValidation,
 			} ) ??
 			select.getEditedPostContent?.();
+		const proposedPostContent = getDistributedEditingComparablePostContent(
+			proposedPostContentCandidate
+		);
 		const proposedPostContentHash =
 			options.proposedPostContentHash ??
 			getDistributedEditingRetrySaveProposedContentHashEvidence(
@@ -2939,11 +2978,76 @@ export const __experimentalSaveDistributedEditingRetryAfterProof =
 
 			return response;
 		} catch ( error ) {
-			const retrySaveResultSessionState =
+			let retrySaveResultSessionState =
 				getDistributedEditingSessionStateForRetrySaveResult(
 					error,
 					transcriptSavingSessionState
 				);
+			const shouldHydrateManualConflict =
+				retrySaveResultSessionState.requiresManualConflictResolution &&
+				retrySaveResultSessionState.localRebaseResultStatus ===
+					DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.MANUAL_CONFLICT_REQUIRED &&
+				retrySaveResultSessionState.localRebaseResultReason ===
+					'same_block_changed' &&
+				typeof retrySaveResultSessionState.refetchedServerContent !==
+					'string';
+
+			if ( shouldHydrateManualConflict ) {
+				try {
+					const refetchResponse =
+						await requestDistributedEditingServerStateRefetch( {
+							postId,
+							restBase,
+						} );
+					const refetchedPostContent =
+						getDistributedEditingPostContentFromResponse(
+							refetchResponse
+						);
+					const latestKnownPost = select.getCurrentPost?.() ?? {};
+					let currentPostContent = null;
+
+					if ( typeof latestKnownPost.content?.raw === 'string' ) {
+						currentPostContent = latestKnownPost.content.raw;
+					} else if ( typeof latestKnownPost.content === 'string' ) {
+						currentPostContent = latestKnownPost.content;
+					}
+
+					const clientBaseContent =
+						retrySaveResultSessionState.clientBaseContent ??
+						getDistributedEditingComparablePostContent(
+							currentPostContent
+						);
+					const refetchedServerContent =
+						getDistributedEditingComparablePostContent(
+							refetchedPostContent
+						);
+
+					if (
+						typeof clientBaseContent === 'string' &&
+						typeof refetchedServerContent === 'string'
+					) {
+						retrySaveResultSessionState = {
+							...retrySaveResultSessionState,
+							serverVersion:
+								getDistributedEditingServerVersionFromResponse(
+									refetchResponse
+								) || retrySaveResultSessionState.serverVersion,
+							clientBaseContent,
+							refetchedServerContent,
+							refetchedServerState: true,
+							requiresServerStateRefetch: false,
+							canAttemptLocalRebase: false,
+							localRebasePlanStatus:
+								DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES.MANUAL_CONFLICT_REQUIRED,
+							localRebaseResultStatus:
+								DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.MANUAL_CONFLICT_REQUIRED,
+							canExportLocalUpdates: true,
+						};
+					}
+				} catch {
+					// Keep the original protected retry-save rejection state when a follow-up refetch fails.
+				}
+			}
 
 			dispatch.setDistributedEditingSessionState(
 				getDistributedEditingSessionStateWithActionTranscriptEvent(

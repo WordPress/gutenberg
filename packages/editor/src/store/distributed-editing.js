@@ -17,6 +17,7 @@ export const DISTRIBUTED_EDITING_REASON_CODES = Object.freeze( {
 		'de_rtc_review_approval_requires_unfiltered_html',
 	DE_RTC_REVIEW_APPROVAL_HASH_MISMATCH:
 		'de_rtc_review_approval_hash_mismatch',
+	DE_RTC_REBASE_FAILED: 'de_rtc_rebase_failed',
 	DE_RTC_FEATURE_DISABLED: 'de_rtc_feature_disabled',
 	DE_RTC_PRESENCE_STORAGE_UNAVAILABLE: 'de_rtc_presence_storage_unavailable',
 	REST_CANNOT_EDIT: 'rest_cannot_edit',
@@ -388,6 +389,7 @@ export const DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS = Object.freeze( {
 	OPEN_PRE_PUBLISH_REVIEW: 'open_pre_publish_review',
 	CONTINUE_GUARDED_RETRY_SAVE: 'continue_guarded_retry_save',
 	REFETCH_SERVER_STATE: 'refetch_server_state',
+	COMPARE_CONFLICTING_CHANGES: 'compare_conflicting_changes',
 	APPLY_LOCAL_CHANGES: 'apply_local_changes',
 	PREPARE_CHANGES: 'prepare_changes',
 	CHECK_WITH_WORDPRESS: 'check_with_wordpress',
@@ -10424,10 +10426,14 @@ function getDistributedEditingSaveStateVocabulary( {
 function getDistributedEditingRequiredSaveWorkflowAction( normalized ) {
 	const hasLocalRebaseInputs =
 		hasDistributedEditingLocalRebaseInputs( normalized );
+	const requiresManualConflictReview = Boolean(
+		normalized.requiresManualConflictResolution
+	);
 	const canApplyLocalChanges =
 		( normalized.canAttemptLocalRebase ||
 			normalized.localRebasePlanStatus ===
 				DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES.READY ) &&
+		! requiresManualConflictReview &&
 		hasLocalRebaseInputs &&
 		normalized.localRebaseResultStatus !==
 			DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.REBASED;
@@ -10437,6 +10443,17 @@ function getDistributedEditingRequiredSaveWorkflowAction( normalized ) {
 		normalized.retrySubmitPrepared &&
 		normalized.retrySubmitProofStatus !==
 			DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.ACCEPTED_FOR_FUTURE_SAVE;
+
+	if ( requiresManualConflictReview ) {
+		return {
+			reason: 'manual_conflict_review_required_before_save',
+			label: 'Compare changes',
+			statusText:
+				'Compare conflicting changes before Save can update the post.',
+			clickAction:
+				DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.COMPARE_CONFLICTING_CHANGES,
+		};
+	}
 
 	if ( canApplyLocalChanges ) {
 		return {
@@ -10844,10 +10861,14 @@ export function getDistributedEditingHumanLoopStepStateForSessionState(
 	const hasLocalRebaseInputs =
 		normalized.clientBaseContent !== null &&
 		normalized.refetchedServerContent !== null;
+	const manualConflictNeedsReview = Boolean(
+		normalized.requiresManualConflictResolution
+	);
 	const localRebaseCanApply =
 		( normalized.canAttemptLocalRebase ||
 			normalized.localRebasePlanStatus ===
 				DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES.READY ) &&
+		! manualConflictNeedsReview &&
 		hasLocalRebaseInputs &&
 		normalized.localRebaseResultStatus !==
 			DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.REBASED;
@@ -10894,6 +10915,9 @@ export function getDistributedEditingHumanLoopStepStateForSessionState(
 			'accepted_retry_submit_proof_needs_save_preparation'
 				? 'prepare_save'
 				: 'save';
+	} else if ( manualConflictNeedsReview ) {
+		step = DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.LOCAL_CHANGES_PROTECTED;
+		action = 'compare_conflicting_changes';
 	} else if ( localRebaseCanApply ) {
 		step = DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.LOCAL_CHANGES_PROTECTED;
 		action = 'apply_local_changes';
@@ -10971,6 +10995,14 @@ function getDistributedEditingSaveJourneyCopyForStep( step, action ) {
 				};
 			}
 
+			if ( action === 'compare_conflicting_changes' ) {
+				return {
+					title: 'Save needs comparison',
+					summary:
+						'Compare protected local changes with the latest post before WordPress can check Save.',
+				};
+			}
+
 			return {
 				title: 'Save keeps changes protected',
 				summary:
@@ -11037,6 +11069,10 @@ function getDistributedEditingSaveJourneyActionHintForStep( step, action ) {
 				return 'Check with WordPress';
 			}
 
+			if ( action === 'compare_conflicting_changes' ) {
+				return 'Compare changes';
+			}
+
 			return null;
 		case DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.GET_LATEST_POST:
 			return 'Get latest first';
@@ -11070,6 +11106,7 @@ function getDistributedEditingSaveJourneyRequiresActionBeforeSaveForStep(
 			'apply_local_changes',
 			'prepare_changes',
 			'check_with_wordpress',
+			'compare_conflicting_changes',
 			'prepare_save',
 		].includes( action )
 	);
@@ -12309,6 +12346,11 @@ export function getDistributedEditingSessionStateForRetrySaveResult(
 			responseOrError,
 			responseData
 		);
+	const retrySaveServerMergeConflictFields =
+		getRetrySaveServerMergeConflictFieldsFromResponseOrError(
+			responseOrError,
+			responseData
+		);
 	const retrySaveReviewApprovalProofFields =
 		opaqueReviewApprovalProofTokenRejectionDetail ||
 		hasFreshReviewConsumeValidation
@@ -12346,6 +12388,7 @@ export function getDistributedEditingSessionStateForRetrySaveResult(
 		retrySaveReviewApprovalProofFields,
 		retrySaveFreshReviewConsumeValidationFields,
 		hasAcceptedReviewApprovalProof,
+		retrySaveServerMergeConflictFields,
 	} );
 }
 
@@ -13229,6 +13272,7 @@ function getDistributedEditingRejectedRetrySaveState( {
 	retrySaveReviewMetadata = {},
 	retrySaveReviewApprovalProofFields = {},
 	retrySaveFreshReviewConsumeValidationFields = {},
+	retrySaveServerMergeConflictFields = {},
 	hasAcceptedReviewApprovalProof = false,
 	retrySaveReason = null,
 } ) {
@@ -13302,6 +13346,19 @@ function getDistributedEditingRejectedRetrySaveState( {
 			requiresServerStateRefetch = true;
 			requiresManualConflictResolution = true;
 			break;
+
+		case DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_REBASE_FAILED:
+			if (
+				retrySaveServerMergeConflictFields.requiresManualConflictResolution
+			) {
+				disposition =
+					DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION;
+				retrySaveStatus =
+					DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.STALE_BASE_REJECTED;
+				requiresServerStateRefetch = false;
+				requiresManualConflictResolution = true;
+			}
+			break;
 	}
 
 	if ( result === 'stale_base_rejected' ) {
@@ -13369,11 +13426,59 @@ function getDistributedEditingRejectedRetrySaveState( {
 				DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_REVIEW_APPROVAL_REQUIRES_UNFILTERED_HTML ||
 			retrySaveReviewMetadata.retrySaveRequiresUnfilteredHtmlSaver,
 		requiresManualConflictResolution,
+		...( retrySaveServerMergeConflictFields.requiresManualConflictResolution
+			? {
+					localRebasePlanStatus:
+						DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES.MANUAL_CONFLICT_REQUIRED,
+					localRebaseResultStatus:
+						DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.MANUAL_CONFLICT_REQUIRED,
+					localRebaseResultReason:
+						retrySaveServerMergeConflictFields.localRebaseResultReason,
+					canAttemptLocalRebase: false,
+			  }
+			: {} ),
 		mustOfferLocalCopy: normalizeCount( pendingChangeCount ) > 0,
 		canExportLocalUpdates:
 			normalizedCurrent.canExportLocalUpdates ||
 			normalizeCount( pendingChangeCount ) > 0,
 	} );
+}
+
+function getRetrySaveServerMergeConflictFieldsFromResponseOrError(
+	responseOrError = {},
+	responseData = {}
+) {
+	const detail = normalizeNullableString(
+		responseOrError.detail ||
+			responseData.detail ||
+			responseOrError.errorDetail ||
+			responseData.errorDetail
+	);
+	const serverMergeStatus = normalizeNullableString(
+		responseOrError.serverMergeStatus ||
+			responseOrError.server_merge_status ||
+			responseData.serverMergeStatus ||
+			responseData.server_merge_status
+	);
+	const requiresManualConflictResolution = Boolean(
+		responseOrError.requiresManualConflictResolution ||
+			responseOrError.requires_manual_conflict_resolution ||
+			responseData.requiresManualConflictResolution ||
+			responseData.requires_manual_conflict_resolution ||
+			serverMergeStatus === 'manual_conflict_required'
+	);
+	let localRebaseResultReason = null;
+
+	if ( detail === 'retry_save_server_merge_same_serialized_block_changed' ) {
+		localRebaseResultReason = 'same_block_changed';
+	}
+
+	return {
+		requiresManualConflictResolution: Boolean(
+			requiresManualConflictResolution && localRebaseResultReason
+		),
+		localRebaseResultReason,
+	};
 }
 
 function normalizeRetrySaveReviewMetadataFields( sessionState = {} ) {
@@ -16226,6 +16331,20 @@ function parseDistributedEditingSyncMetaFromPostContent( postContent ) {
 		return null;
 	}
 
+	const freeformWrappedSyncMetaSource = `(?:<!--\\s*wp:freeform\\s*-->\\s*)?<p>\\s*${ DISTRIBUTED_EDITING_SYNC_META_SCRIPT_SOURCE }\\s*<\\/p>\\s*(?:<!--\\s*\\/wp:freeform\\s*-->\\s*)?`;
+	const wrappedPrefixPattern = new RegExp(
+		`^\\s*${ freeformWrappedSyncMetaSource }\\s*`,
+		'i'
+	);
+	const wrappedPrefixMatch = content.match( wrappedPrefixPattern );
+
+	if ( wrappedPrefixMatch ) {
+		return createDistributedEditingSyncMetaParseResult( {
+			postContent: content.slice( wrappedPrefixMatch[ 0 ].length ),
+			scriptContent: wrappedPrefixMatch[ 2 ],
+		} );
+	}
+
 	const prefixPattern = new RegExp(
 		`^\\s*${ DISTRIBUTED_EDITING_SYNC_META_SCRIPT_SOURCE }\\s*`,
 		'i'
@@ -16236,6 +16355,22 @@ function parseDistributedEditingSyncMetaFromPostContent( postContent ) {
 		return createDistributedEditingSyncMetaParseResult( {
 			postContent: content.slice( prefixMatch[ 0 ].length ),
 			scriptContent: prefixMatch[ 2 ],
+		} );
+	}
+
+	const wrappedTrailerPattern = new RegExp(
+		`\\s*${ freeformWrappedSyncMetaSource }\\s*$`,
+		'i'
+	);
+	const wrappedTrailerMatch = content.match( wrappedTrailerPattern );
+
+	if ( wrappedTrailerMatch ) {
+		return createDistributedEditingSyncMetaParseResult( {
+			postContent: content.slice(
+				0,
+				content.length - wrappedTrailerMatch[ 0 ].length
+			),
+			scriptContent: wrappedTrailerMatch[ 2 ],
 		} );
 	}
 

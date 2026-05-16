@@ -2620,7 +2620,7 @@ describe( 'distributed editing session state', () => {
 		const localContent =
 			'<!-- wp:paragraph --><p>Local alpha</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Beta</p><!-- /wp:paragraph -->';
 		const syncMeta =
-			'<script type="wp/post-sync-meta" data-sync-meta-format="diff-match-patch">{"version":"server-v7","previous_version":"server-v6"}</script>';
+			'<!-- wp:freeform --><p><script type="wp/post-sync-meta" data-sync-meta-format="diff-match-patch">{"version":"server-v7","previous_version":"server-v6"}</script></p><!-- /wp:freeform -->';
 		const refetchedState =
 			getDistributedEditingSessionStateForStaleBaseServerStateRefetchResult(
 				{
@@ -7378,6 +7378,30 @@ describe( 'distributed editing session state', () => {
 					canExportLocalUpdates: true,
 					localRebasePlanStatus:
 						DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES.READY,
+					localRebaseResultStatus:
+						DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.MANUAL_CONFLICT_REQUIRED,
+					localRebaseResultReason: 'same_block_changed',
+					requiresManualConflictResolution: true,
+					clientBaseContent:
+						'<!-- wp:paragraph --><p>Base</p><!-- /wp:paragraph -->',
+					refetchedServerContent:
+						'<!-- wp:paragraph --><p>Server</p><!-- /wp:paragraph -->',
+				},
+				reason: 'manual_conflict_review_required_before_save',
+				label: 'Compare changes',
+				statusText:
+					'Compare conflicting changes before Save can update the post.',
+				clickAction:
+					DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.COMPARE_CONFLICTING_CHANGES,
+				journeyAction: 'compare_conflicting_changes',
+			},
+			{
+				sessionState: {
+					pendingChangeCount: 1,
+					hasPendingChanges: true,
+					canExportLocalUpdates: true,
+					localRebasePlanStatus:
+						DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES.READY,
 					clientBaseContent:
 						'<!-- wp:paragraph --><p>Base</p><!-- /wp:paragraph -->',
 					refetchedServerContent:
@@ -7711,6 +7735,31 @@ describe( 'distributed editing session state', () => {
 				actionHint: null,
 				requiresActionBeforeSave: false,
 				saveButtonLabel: 'Update',
+			},
+			{
+				sessionState: {
+					pendingChangeCount: 1,
+					hasPendingChanges: true,
+					canExportLocalUpdates: true,
+					localRebasePlanStatus:
+						DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES.READY,
+					localRebaseResultStatus:
+						DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.MANUAL_CONFLICT_REQUIRED,
+					localRebaseResultReason: 'same_block_changed',
+					requiresManualConflictResolution: true,
+					clientBaseContent:
+						'<!-- wp:paragraph --><p>Base</p><!-- /wp:paragraph -->',
+					refetchedServerContent:
+						'<!-- wp:paragraph --><p>Server</p><!-- /wp:paragraph -->',
+				},
+				step: DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.LOCAL_CHANGES_PROTECTED,
+				action: 'compare_conflicting_changes',
+				title: 'Save needs comparison',
+				summary: 'Compare protected local changes',
+				actionHint: 'Compare changes',
+				requiresActionBeforeSave: true,
+				saveButtonLabel: 'Compare changes',
+				saveButtonBlocksNormalSavePost: true,
 			},
 			{
 				sessionState: {
