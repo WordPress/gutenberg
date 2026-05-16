@@ -311,6 +311,10 @@
 	grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
 }
 
+.editor-distributed-editing-status__conflict-comparison-grid--prepared {
+	grid-template-columns: minmax(0, 1fr);
+}
+
 .editor-distributed-editing-status__conflict-comparison-row {
 	display: grid;
 	gap: $grid-unit-05;
@@ -352,6 +356,10 @@
 	background: #f0f6fc;
 	border-color: #72aee6;
 	box-shadow: 0 0 0 1px #72aee6;
+}
+
+.editor-distributed-editing-status__conflict-comparison-grid--prepared .editor-distributed-editing-status__conflict-comparison-text {
+	min-height: 72px;
 }
 
 .editor-distributed-editing-status__conflict-comparison-actions {

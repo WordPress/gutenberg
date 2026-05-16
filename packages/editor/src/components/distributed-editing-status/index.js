@@ -1985,6 +1985,13 @@ function DistributedEditingSameBlockConflictComparison( {
 		selectedRowId = 'server';
 	}
 
+	const isPreparedComparisonCompact = Boolean(
+		comparison.saveReady && selectedRowId
+	);
+	const visibleRows = isPreparedComparisonCompact
+		? comparison.rows.filter( ( row ) => row.id === selectedRowId )
+		: comparison.rows;
+
 	return (
 		<div
 			aria-label={ __( 'Distributed editing conflict comparison' ) }
@@ -2004,10 +2011,19 @@ function DistributedEditingSameBlockConflictComparison( {
 			data-distributed-editing-conflict-comparison-has-server={ formatDataBoolean(
 				comparison.hasServerContent
 			) }
+			data-distributed-editing-conflict-comparison-prepared-compact={ formatDataBoolean(
+				isPreparedComparisonCompact
+			) }
+			data-distributed-editing-conflict-comparison-selected-row={
+				selectedRowId || undefined
+			}
 			data-distributed-editing-conflict-comparison-mutates-editor-content="false"
 			data-distributed-editing-conflict-comparison-read-only="true"
 			data-distributed-editing-conflict-comparison-reason={
 				comparison.reason
+			}
+			data-distributed-editing-conflict-comparison-visible-row-count={
+				visibleRows.length
 			}
 			data-distributed-editing-conflict-resolution-choice={
 				comparison.resolutionChoice || undefined
@@ -2097,8 +2113,14 @@ function DistributedEditingSameBlockConflictComparison( {
 					</div>
 				) }
 			</div>
-			<div className="editor-distributed-editing-status__conflict-comparison-grid">
-				{ comparison.rows.map( ( row ) => {
+			<div
+				className={
+					isPreparedComparisonCompact
+						? 'editor-distributed-editing-status__conflict-comparison-grid editor-distributed-editing-status__conflict-comparison-grid--prepared'
+						: 'editor-distributed-editing-status__conflict-comparison-grid'
+				}
+			>
+				{ visibleRows.map( ( row ) => {
 					const isSelectedRow = row.id === selectedRowId;
 
 					return (
