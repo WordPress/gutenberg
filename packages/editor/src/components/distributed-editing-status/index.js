@@ -2117,20 +2117,20 @@ function getStructuralConflictMessage( summary ) {
 	switch ( summary.reason ) {
 		case 'block_deleted':
 			return __(
-				'Blocks were deleted in more than one place. Compare the starting post, latest WordPress version, and your local editor before choosing what to keep.'
+				'Blocks were deleted in both versions. Choose which structure to keep.'
 			);
 		case 'block_inserted':
 			return __(
-				'Blocks were inserted in more than one place. Compare the starting post, latest WordPress version, and your local editor before choosing what to keep.'
+				'New blocks were added in both versions. Choose which structure to keep.'
 			);
 		case 'block_reordered':
 			return __(
-				'Blocks were reordered while local changes were pending. Compare the starting post, latest WordPress version, and your local editor before choosing what to keep.'
+				'Blocks moved while you were editing. Choose which structure to keep.'
 			);
 	}
 
 	return __(
-		'The block structure changed while local edits were pending. Compare the starting post, latest WordPress version, and your local editor before choosing what to keep.'
+		'The block structure changed while you were editing. Choose which structure to keep.'
 	);
 }
 
@@ -9444,15 +9444,15 @@ function getManualLocalRebaseConflictMessage( descriptor ) {
 	switch ( descriptor.localRebaseResultReason ) {
 		case 'block_inserted':
 			return __(
-				'The latest post is loaded, but blocks were inserted in more than one place. Compare local changes with the latest post before choosing what to keep.'
+				'New blocks were added in both versions. Choose which structure to keep before saving.'
 			);
 		case 'block_deleted':
 			return __(
-				'The latest post is loaded, but blocks were deleted in more than one place. Compare local changes with the latest post before choosing what to keep.'
+				'Blocks were deleted in both versions. Choose which structure to keep before saving.'
 			);
 		case 'block_reordered':
 			return __(
-				'The latest post is loaded, but blocks were reordered while local edits were pending. Compare local changes with the latest post before choosing what to keep.'
+				'Blocks moved while you were editing. Choose which structure to keep before saving.'
 			);
 		case 'same_block_changed':
 			return __(

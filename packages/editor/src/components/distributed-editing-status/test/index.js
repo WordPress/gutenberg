@@ -1423,7 +1423,7 @@ describe( 'DistributedEditingStatus', () => {
 		).toBeVisible();
 		expect(
 			within( summary ).getByText(
-				'Blocks were deleted in more than one place. Compare the starting post, latest WordPress version, and your local editor before choosing what to keep.'
+				'Blocks were deleted in both versions. Choose which structure to keep.'
 			)
 		).toBeVisible();
 		expect( summary ).toHaveAttribute(
@@ -1555,6 +1555,11 @@ describe( 'DistributedEditingStatus', () => {
 		expect(
 			within( insertedCueList ).getAllByText( 'Adds 1 block' )
 		).toHaveLength( 2 );
+		expect(
+			within( insertedSummary ).getByText(
+				'New blocks were added in both versions. Choose which structure to keep.'
+			)
+		).toBeVisible();
 
 		// eslint-disable-next-line testing-library/no-node-access
 		const insertedCues = insertedSummary.querySelectorAll(
@@ -1616,6 +1621,11 @@ describe( 'DistributedEditingStatus', () => {
 		expect(
 			within( reorderedCueList ).getAllByText( 'Reordered' )
 		).toHaveLength( 2 );
+		expect(
+			within( reorderedSummary ).getByText(
+				'Blocks moved while you were editing. Choose which structure to keep.'
+			)
+		).toBeVisible();
 
 		// eslint-disable-next-line testing-library/no-node-access
 		const reorderedCues = reorderedSummary.querySelectorAll(
@@ -9623,7 +9633,7 @@ describe( 'DistributedEditingStatusSurface', () => {
 		).toBeVisible();
 		expect(
 			screen.getByText(
-				'The latest post is loaded, but blocks were reordered while local edits were pending. Compare local changes with the latest post before choosing what to keep.'
+				'Blocks moved while you were editing. Choose which structure to keep before saving.'
 			)
 		).toBeVisible();
 		expect( screen.getByText( 'Next step:' ) ).toBeVisible();
