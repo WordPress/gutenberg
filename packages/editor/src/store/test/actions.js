@@ -6197,6 +6197,192 @@ describe( 'Post actions', () => {
 			} );
 		} );
 
+		it( 'blocks setting-enabled savePost after stale-again conflict proof without normal fallback', async () => {
+			const originalPostContent =
+				'<!-- wp:paragraph --><p>Original stale proof base.</p><!-- /wp:paragraph -->';
+			const chosenPostContent =
+				'<!-- wp:paragraph --><p>Chosen local stale proof text.</p><!-- /wp:paragraph -->';
+			const proposedPostContentHash =
+				'3434343434343434343434343434343434343434343434343434343434343434';
+			const post = {
+				id: postId,
+				type: 'post',
+				title: 'bar',
+				content: originalPostContent,
+				status: 'draft',
+			};
+			const staleProofError = {
+				code: DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+				message:
+					'Distributed Editing rejected the retry because the server advanced again.',
+				data: {
+					status: 409,
+					reason_code:
+						DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+					client_base_version: '7',
+					server_version: '8',
+					pending_change_count: 1,
+					remote_change_count: 1,
+				},
+			};
+			let retrySubmitCalls = 0;
+			let retrySaveCalls = 0;
+			let normalSaveCalls = 0;
+			let serverStateRefetchCalls = 0;
+
+			apiFetch.setFetchHandler( async ( options ) => {
+				const method = getMethod( options );
+				const { data } = options;
+				const path = options.path ?? '';
+
+				if (
+					method === 'POST' &&
+					path.startsWith(
+						`/wp/v2/posts/${ postId }/distributed-editing/retry-submit`
+					)
+				) {
+					retrySubmitCalls++;
+					expect( data ).toEqual( {
+						client_base_version: '7',
+						rebased_from_version: '4',
+						pending_change_count: 1,
+						proposed_post_content_hash: proposedPostContentHash,
+					} );
+
+					throw staleProofError;
+				}
+
+				if (
+					method === 'POST' &&
+					path.startsWith(
+						`/wp/v2/posts/${ postId }/distributed-editing/retry-save`
+					)
+				) {
+					retrySaveCalls++;
+				}
+
+				if (
+					method === 'GET' &&
+					path.startsWith( `/wp/v2/posts/${ postId }` ) &&
+					path.includes( 'context=edit' )
+				) {
+					serverStateRefetchCalls++;
+				}
+
+				if (
+					( method === 'POST' || method === 'PUT' ) &&
+					path.startsWith( `/wp/v2/posts/${ postId }` )
+				) {
+					normalSaveCalls++;
+				}
+
+				throw {
+					code: 'unexpected_path',
+					message: `Unexpected path: ${ method } ${ path }`,
+				};
+			} );
+
+			const registry = createRegistryWithStores();
+
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', post );
+			registry.dispatch( editorStore ).setupEditor( post, {
+				content: chosenPostContent,
+			} );
+			registry.dispatch( editorStore ).updateEditorSettings( {
+				distributedEditing: {
+					enabled: true,
+					retrySaveHandoff: true,
+				},
+			} );
+			registry
+				.dispatch( editorStore )
+				.setDistributedEditingSessionState( {
+					clientBaseVersion: '4',
+					serverVersion: '7',
+					pendingChangeCount: 1,
+					hasPendingChanges: true,
+					canExportLocalUpdates: true,
+					refetchedServerState: true,
+					staleBaseConflictResolutionStatus:
+						'local_version_selected',
+					staleBaseConflictResolutionChoice: 'local',
+					staleBaseConflictResolutionRequiresFreshProof: true,
+					retrySubmitHandoffStatus:
+						DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_STATUSES.PREPARED,
+					retrySubmitPrepared: true,
+				} );
+
+			await expect(
+				registry
+					.dispatch( editorStore )
+					.__experimentalRefreshDistributedEditingRetrySubmitProof( {
+						proposedPostContentHash,
+					} )
+			).rejects.toBe( staleProofError );
+
+			expect(
+				registry
+					.select( editorStore )
+					.getDistributedEditingSaveButtonState()
+			).toMatchObject( {
+				status: DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES.REFETCH_REQUIRED,
+				label: 'Refetch required',
+				clickAction:
+					DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.REFETCH_SERVER_STATE,
+				requiresServerStateRefetch: true,
+				blocksNormalSavePost: true,
+				shouldCallNormalSavePost: false,
+				shouldCallRetrySaveEndpoint: false,
+				claimsSaved: false,
+			} );
+
+			await expect(
+				registry.dispatch( editorStore ).savePost()
+			).resolves.toMatchObject( {
+				status: 'risky_block_review_refetch_required',
+				reason: DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.SERVER_STATE_REFETCH_REQUIRED,
+				allowsNormalSaveFallback: false,
+				blocksNormalSavePost: true,
+				requiresServerStateRefetch: true,
+				callsNormalSavePost: false,
+				callsRetrySaveEndpoint: false,
+				claimsSaved: false,
+			} );
+
+			expect( retrySubmitCalls ).toBe( 1 );
+			expect( retrySaveCalls ).toBe( 0 );
+			expect( normalSaveCalls ).toBe( 0 );
+			expect( serverStateRefetchCalls ).toBe( 0 );
+			expect( registry.select( editorStore ).isEditedPostDirty() ).toBe(
+				true
+			);
+			expect(
+				registry.select( editorStore ).getEditedPostContent()
+			).toBe( chosenPostContent );
+			expect(
+				registry
+					.select( editorStore )
+					.getDistributedEditingSessionState()
+			).toMatchObject( {
+				disposition:
+					DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+				reasonCode:
+					DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+				clientBaseVersion: '7',
+				serverVersion: '8',
+				pendingChangeCount: 1,
+				hasPendingChanges: true,
+				requiresServerStateRefetch: true,
+				retrySubmitProofStatus:
+					DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.STALE_BASE_REJECTED,
+				retrySubmitAccepted: false,
+				retrySubmitSavePathRequired: false,
+				canExportLocalUpdates: true,
+			} );
+		} );
+
 		it( 'routes setting-enabled savePost to risky-block review before normal save', async () => {
 			const originalPostContent =
 				'<!-- wp:paragraph --><p>Original.</p><!-- /wp:paragraph -->';
