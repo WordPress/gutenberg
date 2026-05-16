@@ -913,10 +913,41 @@ describe( 'DistributedEditingStatus', () => {
 
 		render( <DistributedEditingStatus /> );
 
+		const status = screen.getByRole( 'region', {
+			name: 'Distributed editing status',
+		} );
 		const comparison = screen.getByRole( 'region', {
 			name: 'Distributed editing conflict comparison',
 		} );
 
+		expect(
+			screen.getByText( 'Conflicting update not saved' )
+		).toBeVisible();
+		expect(
+			screen.getByText(
+				'WordPress did not save the conflicting update. Your local changes are protected in this editor; compare the versions below, export a copy, or get the latest post before deciding what to keep.'
+			)
+		).toBeVisible();
+		expect(
+			within( status ).getByRole( 'button', {
+				name: 'Get latest post',
+			} )
+		).toBeVisible();
+		expect(
+			within( status ).getByRole( 'button', {
+				name: 'Export local changes',
+			} )
+		).toBeVisible();
+		expect(
+			screen.queryByText( /Review changes tracks remote activity/ )
+		).not.toBeInTheDocument();
+		expect( screen.queryByText( /Save now:/ ) ).not.toBeInTheDocument();
+		expect(
+			screen.queryByText( 'Saved by WordPress' )
+		).not.toBeInTheDocument();
+		expect(
+			screen.queryByText( 'WordPress confirmed Save.' )
+		).not.toBeInTheDocument();
 		expect( comparison ).toHaveAttribute(
 			'data-distributed-editing-conflict-comparison',
 			'same-block'

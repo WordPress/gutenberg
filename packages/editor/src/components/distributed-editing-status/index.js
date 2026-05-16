@@ -6874,6 +6874,15 @@ function getNextStepDescriptor( nextStepAction ) {
 }
 
 function getStaleBaseStatusText( descriptor ) {
+	if ( isSameBlockManualLocalRebaseConflict( descriptor ) ) {
+		return {
+			title: __( 'Conflicting update not saved' ),
+			message: __(
+				'WordPress did not save the conflicting update. Your local changes are protected in this editor; compare the versions below, export a copy, or get the latest post before deciding what to keep.'
+			),
+		};
+	}
+
 	const remoteReviewContextMessage =
 		getRemoteReviewContextMessage( descriptor );
 	const saveNowContext = getSaveNowContext( descriptor );
@@ -7044,6 +7053,16 @@ function getRemoteReviewContextMessage( descriptor ) {
 
 	return __(
 		"Review changes tracks remote activity separately. Use this notice's next step to keep local changes protected before Save."
+	);
+}
+
+function isSameBlockManualLocalRebaseConflict( descriptor ) {
+	return (
+		descriptor?.localRebaseResultStatus ===
+			DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.MANUAL_CONFLICT_REQUIRED &&
+		DISTRIBUTED_EDITING_SAME_BLOCK_CONFLICT_REASONS.has(
+			descriptor?.localRebaseResultReason
+		)
 	);
 }
 
