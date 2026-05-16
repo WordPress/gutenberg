@@ -2244,6 +2244,303 @@ describe( 'Post actions', () => {
 			);
 		} );
 
+		it( 'carries a two-editor non-conflicting visible Save sequence through server-merged retry-save', async () => {
+			const basePostContent =
+				'<!-- wp:paragraph --><p>Base alpha.</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Base beta.</p><!-- /wp:paragraph -->';
+			const basePostContentWithSyncMeta = `${ basePostContent }<script type="wp/post-sync-meta" data-sync-meta-format="diff-match-patch">{"version":"4"}</script>`;
+			const localPostContent =
+				'<!-- wp:paragraph --><p>Editor B alpha.</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Base beta.</p><!-- /wp:paragraph -->';
+			const remotePostContent =
+				'<!-- wp:paragraph --><p>Base alpha.</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Editor A beta.</p><!-- /wp:paragraph -->';
+			const mergedPostContent =
+				'<!-- wp:paragraph --><p>Editor B alpha.</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Editor A beta.</p><!-- /wp:paragraph -->';
+			const post = {
+				id: postId,
+				type: 'post',
+				title: 'bar',
+				content: basePostContentWithSyncMeta,
+				status: 'draft',
+			};
+			let serverStateRefetchCalls = 0;
+			let retrySubmitCalls = 0;
+			let retrySaveCalls = 0;
+			let normalSaveCalls = 0;
+			let retrySubmitRequestData = null;
+			let retrySaveRequestData = null;
+
+			apiFetch.setFetchHandler( async ( options ) => {
+				const method = getMethod( options );
+				const { path, data } = options;
+
+				if (
+					method === 'GET' &&
+					path.startsWith( `/wp/v2/posts/${ postId }` ) &&
+					path.includes( 'context=edit' )
+				) {
+					serverStateRefetchCalls++;
+
+					if ( serverStateRefetchCalls === 1 ) {
+						return {
+							...post,
+							content: {
+								raw: `${ remotePostContent }<script type="wp/post-sync-meta" data-sync-meta-format="diff-match-patch">{"version":"7"}</script>`,
+							},
+							distributed_editing: {
+								server_version: '7',
+							},
+						};
+					}
+
+					return {
+						...post,
+						content: {
+							raw: `${ mergedPostContent }<script type="wp/post-sync-meta" data-sync-meta-format="diff-match-patch">{"version":"8"}</script>`,
+						},
+						distributed_editing: {
+							server_version: '8',
+						},
+					};
+				}
+
+				if (
+					method === 'POST' &&
+					path.startsWith(
+						`/wp/v2/posts/${ postId }/distributed-editing/retry-submit`
+					)
+				) {
+					retrySubmitCalls++;
+					retrySubmitRequestData = data;
+
+					return {
+						result: 'retry_submit_accepted_for_future_save',
+						retry_submit_accepted: true,
+						client_base_version: '7',
+						server_version: '7',
+						rebased_from_version: '4',
+						pending_change_count: 1,
+						save_path_required: true,
+						saves_post: false,
+						mutates_post_content: false,
+						creates_revision: false,
+						claims_saved: false,
+					};
+				}
+
+				if (
+					method === 'POST' &&
+					path.startsWith(
+						`/wp/v2/posts/${ postId }/distributed-editing/retry-save`
+					)
+				) {
+					retrySaveCalls++;
+					retrySaveRequestData = data;
+
+					return {
+						result: 'retry_save_server_merged',
+						retry_save_accepted: true,
+						previous_server_version: '7',
+						server_version: '8',
+						pending_change_count: 1,
+						saves_post: true,
+						mutates_post_content: true,
+						creates_revision: true,
+						claims_saved: true,
+						revision_created: true,
+						created_revision_ids: [ 8002 ],
+						server_merge_applied: true,
+						server_merge: {
+							merge_status: 'merged',
+							merge_strategy:
+								'top_level_serialized_block_three_way',
+							base_version: '4',
+							server_version: '7',
+							block_count: 2,
+							server_changed_indexes: [ 1 ],
+							local_changed_indexes: [ 0 ],
+							merged_stripped_content_hash:
+								'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb',
+						},
+					};
+				}
+
+				if (
+					method === 'PUT' &&
+					path.startsWith( `/wp/v2/posts/${ postId }` )
+				) {
+					normalSaveCalls++;
+				}
+
+				throw {
+					code: 'unexpected_path',
+					message: `Unexpected path: ${ method } ${ path }`,
+				};
+			} );
+
+			const registry = createRegistryWithStores();
+
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', post );
+			registry.dispatch( editorStore ).setupEditor( post, {
+				content: localPostContent,
+			} );
+			registry.dispatch( editorStore ).updateEditorSettings( {
+				distributedEditing: {
+					enabled: true,
+					retrySaveHandoff: true,
+					riskyBlockReview: true,
+				},
+			} );
+			registry
+				.dispatch( editorStore )
+				.setDistributedEditingSessionState( {
+					disposition:
+						DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+					reasonCode:
+						DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+					clientBaseVersion: '4',
+					serverVersion: '7',
+					clientBaseContent: basePostContent,
+					pendingChangeCount: 1,
+					remoteChangeCount: 1,
+					requiresServerStateRefetch: true,
+					hasPendingChanges: true,
+					canExportLocalUpdates: true,
+				} );
+
+			await expect(
+				registry
+					.dispatch( editorStore )
+					.__experimentalMaybeHandleDistributedEditingSaveButtonClick()
+			).resolves.toMatchObject( {
+				status: 'server_state_refetched_before_save',
+				callsServerStateRefetchEndpoint: true,
+				callsRetrySaveEndpoint: false,
+				claimsSaved: false,
+			} );
+
+			await expect(
+				registry
+					.dispatch( editorStore )
+					.__experimentalMaybeHandleDistributedEditingSaveButtonClick()
+			).resolves.toMatchObject( {
+				status: 'local_changes_applied_before_save',
+				mutatesEditorContent: true,
+				callsRetrySaveEndpoint: false,
+				claimsSaved: false,
+			} );
+			expect(
+				registry.select( editorStore ).getEditedPostContent()
+			).toBe( mergedPostContent );
+
+			await expect(
+				registry
+					.dispatch( editorStore )
+					.__experimentalMaybeHandleDistributedEditingSaveButtonClick()
+			).resolves.toMatchObject( {
+				status: 'retry_submit_prepared_before_save',
+				callsRetrySubmitEndpoint: false,
+				callsRetrySaveEndpoint: false,
+				claimsSaved: false,
+			} );
+
+			await expect(
+				registry
+					.dispatch( editorStore )
+					.__experimentalMaybeHandleDistributedEditingSaveButtonClick()
+			).resolves.toMatchObject( {
+				status: 'retry_submit_proof_refreshed_before_save',
+				callsRetrySubmitEndpoint: true,
+				callsRetrySaveEndpoint: false,
+				claimsSaved: false,
+			} );
+
+			await expect(
+				registry
+					.dispatch( editorStore )
+					.__experimentalMaybeHandleDistributedEditingSaveButtonClick()
+			).resolves.toMatchObject( {
+				status: 'retry_submit_save_prepared_before_save',
+				callsRetrySaveEndpoint: false,
+				retrySubmitSaveReady: true,
+				claimsSaved: false,
+			} );
+
+			const finalClickRouting = await registry
+				.dispatch( editorStore )
+				.__experimentalMaybeHandleDistributedEditingSaveButtonClick();
+
+			expect( finalClickRouting ).toMatchObject( {
+				status: 'guarded_retry_save_policy_deferred',
+				allowsNormalSaveFallback: true,
+				continuesToRetrySavePolicy: true,
+				blocksNormalSavePost: true,
+				callsRetrySaveEndpoint: false,
+				claimsSaved: false,
+			} );
+
+			await expect(
+				registry.dispatch( editorStore ).savePost()
+			).resolves.toMatchObject( {
+				status: 'retry_save_submitted',
+				callsRetrySaveAction: true,
+				callsNormalSavePost: false,
+				claimsSaved: true,
+			} );
+
+			expect( serverStateRefetchCalls ).toBe( 2 );
+			expect( retrySubmitCalls ).toBe( 1 );
+			expect( retrySaveCalls ).toBe( 1 );
+			expect( normalSaveCalls ).toBe( 0 );
+			expect( retrySubmitRequestData ).toMatchObject( {
+				client_base_version: '7',
+				rebased_from_version: '4',
+				pending_change_count: 1,
+			} );
+			expect( retrySubmitRequestData.content ).toBeUndefined();
+			expect(
+				retrySubmitRequestData.proposed_post_content
+			).toBeUndefined();
+			expect( retrySaveRequestData ).toMatchObject( {
+				client_base_version: '7',
+				accepted_proof_server_version: '7',
+				rebased_from_version: '4',
+				pending_change_count: 1,
+				proposed_post_content: mergedPostContent,
+				accepted_proof_saves_post: false,
+				accepted_proof_mutates_post_content: false,
+				accepted_proof_creates_revision: false,
+				accepted_proof_claims_saved: false,
+			} );
+			expect(
+				registry.select( editorStore ).getEditedPostContent()
+			).toBe( mergedPostContent );
+			expect(
+				registry
+					.select( editorStore )
+					.getDistributedEditingSessionState()
+			).toMatchObject( {
+				disposition: DISTRIBUTED_EDITING_DISPOSITIONS.IDLE,
+				pendingChangeCount: 0,
+				hasPendingChanges: false,
+				retrySaveStatus: DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVED,
+				retrySaveAccepted: true,
+				retrySaveServerVersion: '8',
+				retrySavePreviousServerVersion: '7',
+				retrySaveServerMerged: true,
+				retrySaveServerMergeApplied: true,
+				retrySaveServerMergeStatus: 'merged',
+				retrySaveServerMergeStrategy:
+					'top_level_serialized_block_three_way',
+				retrySaveServerMergeServerChangedIndexes: [ 1 ],
+				retrySaveServerMergeLocalChangedIndexes: [ 0 ],
+				canExportLocalUpdates: false,
+			} );
+			expect( registry.select( noticesStore ).getNotices() ).toEqual(
+				[]
+			);
+		} );
+
 		it( 'falls back to the ordinary Save click when Distributed Editing settings are disabled', async () => {
 			const registry = createRegistryWithStores();
 			let apiCalls = 0;
