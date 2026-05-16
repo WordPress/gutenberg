@@ -21,7 +21,6 @@ const meta: Meta< typeof DashboardLanes > = {
 	tags: [ 'status-experimental' ],
 	args: {
 		columns: 4,
-		spacing: 2,
 		flowTolerance: 16,
 		rowUnit: 4,
 		editMode: false,
@@ -36,10 +35,6 @@ const meta: Meta< typeof DashboardLanes > = {
 			control: { type: 'number', min: 80, max: 600, step: 8 },
 			description:
 				'Enables responsive mode. Per-lane lower bound in pixels.',
-		},
-		spacing: {
-			control: { type: 'number', min: 0, max: 16, step: 1 },
-			description: 'Gap multiplier (effective gap = spacing × 4px).',
 		},
 		flowTolerance: {
 			control: { type: 'number', min: 0, max: 64, step: 1 },
@@ -277,7 +272,6 @@ export const Spanning: Story = {
 export const EditMode: Story = {
 	args: {
 		columns: 4,
-		spacing: 2,
 		editMode: true,
 	},
 	render: function EditModeStory( args ) {
@@ -350,22 +344,16 @@ export const EditMode: Story = {
 
 /**
  * Example custom overlay supplied to `<DashboardLanes />` through the
- * `renderGridOverlay` prop. Receives `{ columns, gapPx, isActive }`
- * from the surface (no `rowHeight` because lane heights are
- * content-driven). The custom must honor `isActive` for the same
- * cross-fade behavior as the default; the surface always mounts the
- * overlay.
+ * `renderGridOverlay` prop. Receives `{ columns, isActive }` from the
+ * surface (no `rowHeight` because lane heights are content-driven).
+ * The custom must honor `isActive` for the same cross-fade behavior
+ * as the default; the surface always mounts the overlay.
  *
  * @param props          Render props supplied by the surface.
  * @param props.columns  Number of lane tracks to mirror.
- * @param props.gapPx    Gap between lanes in pixels.
  * @param props.isActive Whether the overlay should be visible.
  */
-function NumberedLanesOverlay( {
-	columns,
-	gapPx,
-	isActive,
-}: GridOverlayRenderProps ) {
+function NumberedLanesOverlay( { columns, isActive }: GridOverlayRenderProps ) {
 	return (
 		<div
 			aria-hidden
@@ -374,7 +362,7 @@ function NumberedLanesOverlay( {
 				inset: 0,
 				display: 'grid',
 				gridTemplateColumns: `repeat(${ columns }, minmax(0, 1fr))`,
-				gap: gapPx,
+				gap: 'var(--wpds-dimension-gap-md)',
 				pointerEvents: 'none',
 				opacity: isActive ? 1 : 0,
 				visibility: isActive ? 'visible' : 'hidden',
@@ -430,7 +418,6 @@ export const CustomGridOverlayStory: Story = {
 	name: 'Custom Grid Overlay',
 	args: {
 		columns: 4,
-		spacing: 2,
 		editMode: true,
 	},
 	render: function CustomGridOverlayRender( args ) {

@@ -1,5 +1,7 @@
 .grid {
 	width: 100%;
+	/* Drag placeholder outline radius: matches `.tile` and `@wordpress/ui` Card (`--wpds-border-radius-lg`). */
+	--wp-grid-placeholder-radius: var(--wpds-border-radius-lg);
 }
 
 .tile {

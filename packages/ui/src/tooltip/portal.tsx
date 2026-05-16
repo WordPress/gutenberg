@@ -5,7 +5,7 @@ import { getWpCompatOverlaySlot } from '../utils/wp-compat-overlay-slot';
 
 /**
  * Used to apply custom portal behavior to `Tooltip`'s floating content.
- * Defaults the `container` prop to the `@wordpress/ui` compat overlay slot.
+ * `container` defaults to the `@wordpress/ui` compat overlay slot.
  */
 const Portal = forwardRef< HTMLDivElement, PortalProps >(
 	function TooltipPortal( { container, ...restProps }, ref ) {

@@ -10,7 +10,7 @@ import { store as noticesStore } from '@wordpress/notices';
 /**
  * Internal dependencies
  */
-import { useDashboardLayout } from './hooks';
+import { useDashboardGridSettings, useDashboardLayout } from './hooks';
 import { WidgetDashboard } from './widget-dashboard';
 import type { DashboardWidget } from './widget-dashboard';
 import { useWidgetTypes } from './widget-types';
@@ -20,6 +20,8 @@ function Dashboard() {
 	const [ layout, setLayout, resetLayout ] = useDashboardLayout(
 		'gutenberg_dashboard'
 	);
+
+	const [ gridSettings, setGridSettings ] = useDashboardGridSettings();
 
 	const widgetTypes = useWidgetTypes();
 
@@ -40,6 +42,8 @@ function Dashboard() {
 			layout={ layout }
 			onLayoutChange={ handleLayoutChange }
 			onLayoutReset={ resetLayout }
+			gridSettings={ gridSettings }
+			onGridSettingsChange={ setGridSettings }
 			editMode={ editMode }
 			onEditChange={ setEditMode }
 		>
