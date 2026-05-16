@@ -1578,15 +1578,13 @@ describe( 'DistributedEditingStatus', () => {
 			'data-distributed-editing-human-loop-action',
 			'edit'
 		);
+		expect( within( shell ).getByText( 'Editing together' ) ).toBeVisible();
 		expect(
-			within( shell ).getByText( 'Distributed Editing: Ready' )
+			screen.getByText( 'Other editors in this post appear below.' )
 		).toBeVisible();
 		expect(
-			screen.getByText( 'Local work stays protected.' )
-		).toBeVisible();
-		expect(
-			screen.getByText( 'Save checks WordPress before updating.' )
-		).toBeVisible();
+			screen.queryByText( 'Save checks WordPress before updating.' )
+		).not.toBeInTheDocument();
 		expect(
 			screen.queryByText( 'Distributed Editing enabled' )
 		).not.toBeInTheDocument();
@@ -1784,9 +1782,7 @@ describe( 'DistributedEditingStatus', () => {
 			'data-distributed-editing-human-loop-action',
 			'none'
 		);
-		expect(
-			screen.getByText( 'Distributed Editing: Saved' )
-		).toBeVisible();
+		expect( screen.getByText( 'Saved' ) ).toBeVisible();
 		expect(
 			screen.queryByText(
 				'WordPress will protect local changes and show sync status here when review, refresh, or server confirmation is needed.'
@@ -5976,9 +5972,7 @@ describe( 'DistributedEditingStatus', () => {
 				'Updates may be delayed. Local changes remain protected and exportable.'
 			)
 		).not.toBeInTheDocument();
-		expect(
-			screen.getByText( 'Distributed Editing: Delayed' )
-		).toBeVisible();
+		expect( screen.getByText( 'Editing together delayed' ) ).toBeVisible();
 		expect( shell ).toHaveAttribute(
 			'data-distributed-editing-human-loop-step',
 			'local_changes_protected'

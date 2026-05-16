@@ -2712,30 +2712,30 @@ function getDistributedEditingHumanLoopSaveJourneyCopy( humanLoopStepState ) {
 
 function getDistributedEditingEnabledShellTitle( shellState ) {
 	if ( shellState.serverContact === 'degraded' ) {
-		return __( 'Distributed Editing: Delayed' );
+		return __( 'Editing together delayed' );
 	}
 
 	if ( shellState.humanLoopStepState.confirmedByWordPress ) {
-		return __( 'Distributed Editing: Saved' );
+		return __( 'Saved' );
 	}
 
 	if ( shellState.localProtection === 'protected' ) {
-		return __( 'Distributed Editing: Protecting changes' );
+		return __( 'Protected' );
 	}
 
-	return __( 'Distributed Editing: Ready' );
+	return __( 'Editing together' );
 }
 
 function getDistributedEditingEnabledShellProtectionLine( shellState ) {
 	if ( shellState.localProtection === 'protected' ) {
-		return __( 'Local changes are protected.' );
+		return __( 'Your changes are protected.' );
 	}
 
 	if ( shellState.humanLoopStepState.confirmedByWordPress ) {
-		return __( 'New edits will stay protected.' );
+		return __( 'WordPress confirmed the update.' );
 	}
 
-	return __( 'Local work stays protected.' );
+	return __( 'Other editors in this post appear below.' );
 }
 
 function getDistributedEditingEnabledShellSaveLine( shellState ) {
@@ -2754,7 +2754,7 @@ function getDistributedEditingEnabledShellSaveLine( shellState ) {
 			return __( 'Save checks WordPress before updating.' );
 	}
 
-	return __( 'Save checks WordPress before updating.' );
+	return '';
 }
 
 /**
