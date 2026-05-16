@@ -238,6 +238,26 @@ export const DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES = Object.freeze( {
 } );
 
 /**
+ * Stable no-save stale-base conflict resolution statuses. These describe the
+ * editor working-copy choice only; they do not authorize persistence.
+ */
+export const DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_STATUSES =
+	Object.freeze( {
+		NONE: 'none',
+		LOCAL_VERSION_SELECTED: 'local_version_selected',
+		LATEST_WORDPRESS_SELECTED: 'latest_wordpress_selected',
+	} );
+
+/**
+ * Stable no-save stale-base conflict resolution choices.
+ */
+export const DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_CHOICES =
+	Object.freeze( {
+		LOCAL: 'local',
+		LATEST_WORDPRESS: 'latest_wordpress',
+	} );
+
+/**
  * Stable retry-submit handoff statuses for staged local rebase results.
  */
 export const DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_STATUSES = Object.freeze(
@@ -786,6 +806,14 @@ const VALID_LOCAL_REBASE_RESULT_STATUSES = new Set(
 	Object.values( DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES )
 );
 
+const VALID_STALE_BASE_CONFLICT_RESOLUTION_STATUSES = new Set(
+	Object.values( DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_STATUSES )
+);
+
+const VALID_STALE_BASE_CONFLICT_RESOLUTION_CHOICES = new Set(
+	Object.values( DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_CHOICES )
+);
+
 const VALID_RETRY_SUBMIT_HANDOFF_STATUSES = new Set(
 	Object.values( DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_STATUSES )
 );
@@ -1069,6 +1097,17 @@ export const DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE = Object.freeze( {
 	localRebaseResultStatus:
 		DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.NONE,
 	localRebaseResultReason: null,
+	staleBaseConflictResolutionStatus:
+		DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_STATUSES.NONE,
+	staleBaseConflictResolutionChoice: null,
+	staleBaseConflictResolutionRequiresFreshProof: false,
+	staleBaseConflictResolutionCallsRest: false,
+	staleBaseConflictResolutionCallsSave: false,
+	staleBaseConflictResolutionMutatesEditorContent: false,
+	staleBaseConflictResolutionMutatesPersistedPostContent: false,
+	staleBaseConflictResolutionCreatesRevision: false,
+	staleBaseConflictResolutionChangesPostLock: false,
+	staleBaseConflictResolutionClaimsSaved: false,
 	readyToRetrySubmit: false,
 	retrySubmitHandoffStatus:
 		DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_STATUSES.NONE,
@@ -1627,6 +1666,18 @@ export function normalizeDistributedEditingSessionState( sessionState = {} ) {
 	const localRebaseResultReason = normalizeNullableString(
 		sessionState.localRebaseResultReason
 	);
+	const staleBaseConflictResolutionStatus =
+		VALID_STALE_BASE_CONFLICT_RESOLUTION_STATUSES.has(
+			sessionState.staleBaseConflictResolutionStatus
+		)
+			? sessionState.staleBaseConflictResolutionStatus
+			: DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE.staleBaseConflictResolutionStatus;
+	const staleBaseConflictResolutionChoice =
+		VALID_STALE_BASE_CONFLICT_RESOLUTION_CHOICES.has(
+			sessionState.staleBaseConflictResolutionChoice
+		)
+			? sessionState.staleBaseConflictResolutionChoice
+			: DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE.staleBaseConflictResolutionChoice;
 	const requestedRetrySubmitHandoffStatus =
 		VALID_RETRY_SUBMIT_HANDOFF_STATUSES.has(
 			sessionState.retrySubmitHandoffStatus
@@ -1846,6 +1897,32 @@ export function normalizeDistributedEditingSessionState( sessionState = {} ) {
 		localRebasePlanStatus,
 		localRebaseResultStatus,
 		localRebaseResultReason,
+		staleBaseConflictResolutionStatus,
+		staleBaseConflictResolutionChoice,
+		staleBaseConflictResolutionRequiresFreshProof: Boolean(
+			sessionState.staleBaseConflictResolutionRequiresFreshProof
+		),
+		staleBaseConflictResolutionCallsRest: Boolean(
+			sessionState.staleBaseConflictResolutionCallsRest
+		),
+		staleBaseConflictResolutionCallsSave: Boolean(
+			sessionState.staleBaseConflictResolutionCallsSave
+		),
+		staleBaseConflictResolutionMutatesEditorContent: Boolean(
+			sessionState.staleBaseConflictResolutionMutatesEditorContent
+		),
+		staleBaseConflictResolutionMutatesPersistedPostContent: Boolean(
+			sessionState.staleBaseConflictResolutionMutatesPersistedPostContent
+		),
+		staleBaseConflictResolutionCreatesRevision: Boolean(
+			sessionState.staleBaseConflictResolutionCreatesRevision
+		),
+		staleBaseConflictResolutionChangesPostLock: Boolean(
+			sessionState.staleBaseConflictResolutionChangesPostLock
+		),
+		staleBaseConflictResolutionClaimsSaved: Boolean(
+			sessionState.staleBaseConflictResolutionClaimsSaved
+		),
 		readyToRetrySubmit,
 		retrySubmitHandoffStatus,
 		retrySubmitHandoffReason: normalizeNullableString(

@@ -55,6 +55,8 @@ import {
 	DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_STATUSES,
 	DISTRIBUTED_EDITING_RETRY_SAVE_REVIEW_APPROVAL_PROOF_STATUSES,
 	DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES,
+	DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_CHOICES,
+	DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_STATUSES,
 	DISTRIBUTED_EDITING_UNLOAD_WARNING_REASONS,
 	DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE,
 	getDistributedEditingActionTranscriptStateForSessionState,
@@ -9965,6 +9967,54 @@ describe( 'distributed editing session state', () => {
 				requiresManualConflictResolution: true,
 				canExportLocalUpdates: true,
 			},
+		} );
+	} );
+
+	it( 'preserves no-save stale-base conflict resolution choices without enabling proof or save', () => {
+		const normalized = normalizeDistributedEditingSessionState( {
+			disposition:
+				DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+			reasonCode:
+				DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+			pendingChangeCount: 1,
+			localRebaseResultStatus:
+				DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.MANUAL_CONFLICT_REQUIRED,
+			localRebaseResultReason: 'same_block_changed',
+			requiresManualConflictResolution: true,
+			staleBaseConflictResolutionStatus:
+				DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_STATUSES.LATEST_WORDPRESS_SELECTED,
+			staleBaseConflictResolutionChoice:
+				DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_CHOICES.LATEST_WORDPRESS,
+			staleBaseConflictResolutionRequiresFreshProof: true,
+			staleBaseConflictResolutionCallsRest: false,
+			staleBaseConflictResolutionCallsSave: false,
+			staleBaseConflictResolutionMutatesEditorContent: true,
+			staleBaseConflictResolutionMutatesPersistedPostContent: false,
+			staleBaseConflictResolutionCreatesRevision: false,
+			staleBaseConflictResolutionChangesPostLock: false,
+			staleBaseConflictResolutionClaimsSaved: false,
+			readyToRetrySubmit: true,
+			retrySubmitHandoffStatus:
+				DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_STATUSES.READY,
+		} );
+
+		expect( normalized ).toMatchObject( {
+			staleBaseConflictResolutionStatus:
+				DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_STATUSES.LATEST_WORDPRESS_SELECTED,
+			staleBaseConflictResolutionChoice:
+				DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_CHOICES.LATEST_WORDPRESS,
+			staleBaseConflictResolutionRequiresFreshProof: true,
+			staleBaseConflictResolutionCallsRest: false,
+			staleBaseConflictResolutionCallsSave: false,
+			staleBaseConflictResolutionMutatesEditorContent: true,
+			staleBaseConflictResolutionMutatesPersistedPostContent: false,
+			staleBaseConflictResolutionCreatesRevision: false,
+			staleBaseConflictResolutionChangesPostLock: false,
+			staleBaseConflictResolutionClaimsSaved: false,
+			requiresManualConflictResolution: true,
+			readyToRetrySubmit: false,
+			retrySubmitHandoffStatus:
+				DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_STATUSES.NONE,
 		} );
 	} );
 

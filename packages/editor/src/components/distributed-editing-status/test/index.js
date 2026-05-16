@@ -61,6 +61,8 @@ import {
 	DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS,
 	DISTRIBUTED_EDITING_RETRY_SAVE_REVIEW_APPROVAL_PROOF_STATUSES,
 	DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES,
+	DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_CHOICES,
+	DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_STATUSES,
 	DISTRIBUTED_EDITING_UNLOAD_WARNING_REASONS,
 	getDistributedEditingLocalUpdatesExportPayload,
 	getDistributedEditingSessionStateForPresenceHeartbeatResult,
@@ -219,6 +221,7 @@ function setupDistributedEditingStatusDispatch() {
 			.mockResolvedValue( {
 				status: DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_STATUSES.IMPORTED_FOR_RETRY_SAVE,
 			} ),
+		editPost: jest.fn(),
 		resetDistributedEditingSessionState: jest.fn(),
 		setDistributedEditingSessionState: jest.fn(),
 	};
@@ -959,7 +962,12 @@ describe( 'DistributedEditingStatus', () => {
 		expect( comparison ).not.toHaveTextContent( '<!-- wp:paragraph' );
 		expect(
 			within( comparison ).getByRole( 'button', {
-				name: 'Keep editing locally',
+				name: 'Keep your local version',
+			} )
+		).toBeVisible();
+		expect(
+			within( comparison ).getByRole( 'button', {
+				name: 'Use latest from WordPress',
 			} )
 		).toBeVisible();
 		expect(
@@ -1019,15 +1027,41 @@ describe( 'DistributedEditingStatus', () => {
 
 		await user.click(
 			within( comparison ).getByRole( 'button', {
-				name: 'Keep editing locally',
+				name: 'Keep your local version',
 			} )
 		);
 
 		expect(
 			screen.getByText(
-				'Continuing locally. Save is still paused until this conflict is resolved or exported.'
+				'Keeping your local text in this editor. Save is still paused until WordPress checks this choice again.'
 			)
 		).toBeVisible();
+		expect( actions.editPost ).not.toHaveBeenCalled();
+		expect(
+			actions.setDistributedEditingSessionState
+		).toHaveBeenCalledWith(
+			expect.objectContaining( {
+				requiresManualConflictResolution: true,
+				readyToRetrySubmit: false,
+				retrySubmitHandoffStatus:
+					DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_STATUSES.NONE,
+				retrySubmitProofStatus:
+					DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.NONE,
+				retrySaveStatus: DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.NONE,
+				staleBaseConflictResolutionStatus:
+					DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_STATUSES.LOCAL_VERSION_SELECTED,
+				staleBaseConflictResolutionChoice:
+					DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_CHOICES.LOCAL,
+				staleBaseConflictResolutionRequiresFreshProof: true,
+				staleBaseConflictResolutionCallsRest: false,
+				staleBaseConflictResolutionCallsSave: false,
+				staleBaseConflictResolutionMutatesEditorContent: false,
+				staleBaseConflictResolutionMutatesPersistedPostContent: false,
+				staleBaseConflictResolutionCreatesRevision: false,
+				staleBaseConflictResolutionChangesPostLock: false,
+				staleBaseConflictResolutionClaimsSaved: false,
+			} )
+		);
 		expect( writeText ).not.toHaveBeenCalled();
 		expect(
 			actions.__experimentalRefreshDistributedEditingServerStateAfterStaleBase
@@ -1055,6 +1089,89 @@ describe( 'DistributedEditingStatus', () => {
 				actions.__experimentalRefreshDistributedEditingServerStateAfterStaleBase
 			).toHaveBeenCalledTimes( 1 )
 		);
+	} );
+
+	it( 'can choose the latest WordPress text for the local working copy without saving', async () => {
+		const user = userEvent.setup();
+		const actions = setupDistributedEditingStatusDispatch();
+		const latestWordPressContent =
+			'<!-- wp:paragraph --><p>Server same block choice.</p><!-- /wp:paragraph -->';
+
+		setupDistributedEditingStatusSelect( {
+			currentPost: { id: 42, type: 'post' },
+			editedPostContent:
+				'<!-- wp:paragraph --><p>Local same block choice.</p><!-- /wp:paragraph -->',
+			sessionState: {
+				disposition:
+					DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+				reasonCode:
+					DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+				pendingChangeCount: 1,
+				remoteChangeCount: 1,
+				requiresServerStateRefetch: false,
+				refetchedServerState: true,
+				canExportLocalUpdates: true,
+				localRebasePlanStatus:
+					DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES.READY,
+				localRebaseResultStatus:
+					DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.MANUAL_CONFLICT_REQUIRED,
+				localRebaseResultReason: 'same_block_changed',
+				requiresManualConflictResolution: true,
+				clientBaseContent:
+					'<!-- wp:paragraph --><p>Base same block choice.</p><!-- /wp:paragraph -->',
+				refetchedServerContent: latestWordPressContent,
+			},
+		} );
+
+		render( <DistributedEditingStatus /> );
+
+		const comparison = screen.getByRole( 'region', {
+			name: 'Distributed editing conflict comparison',
+		} );
+
+		await user.click(
+			within( comparison ).getByRole( 'button', {
+				name: 'Use latest from WordPress',
+			} )
+		);
+
+		expect( actions.editPost ).toHaveBeenCalledWith(
+			{ content: latestWordPressContent },
+			{ undoIgnore: true }
+		);
+		expect(
+			actions.setDistributedEditingSessionState
+		).toHaveBeenCalledWith(
+			expect.objectContaining( {
+				requiresManualConflictResolution: true,
+				readyToRetrySubmit: false,
+				retrySubmitHandoffStatus:
+					DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_STATUSES.NONE,
+				retrySubmitProofStatus:
+					DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.NONE,
+				retrySaveStatus: DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.NONE,
+				staleBaseConflictResolutionStatus:
+					DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_STATUSES.LATEST_WORDPRESS_SELECTED,
+				staleBaseConflictResolutionChoice:
+					DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_CHOICES.LATEST_WORDPRESS,
+				staleBaseConflictResolutionRequiresFreshProof: true,
+				staleBaseConflictResolutionCallsRest: false,
+				staleBaseConflictResolutionCallsSave: false,
+				staleBaseConflictResolutionMutatesEditorContent: true,
+				staleBaseConflictResolutionMutatesPersistedPostContent: false,
+				staleBaseConflictResolutionCreatesRevision: false,
+				staleBaseConflictResolutionChangesPostLock: false,
+				staleBaseConflictResolutionClaimsSaved: false,
+			} )
+		);
+		expect(
+			actions.__experimentalRefreshDistributedEditingServerStateAfterStaleBase
+		).not.toHaveBeenCalled();
+		expect(
+			screen.getByText(
+				'Using the latest WordPress text in this editor. Save is still paused until WordPress checks this choice again.'
+			)
+		).toBeVisible();
 	} );
 
 	it( 'mounts a content-free action transcript status entry', () => {

@@ -38,6 +38,8 @@ import {
 	DISTRIBUTED_EDITING_RETRY_SAVE_HANDOFF_STATUSES,
 	DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS,
 	DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES,
+	DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_CHOICES,
+	DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_STATUSES,
 	DISTRIBUTED_EDITING_UNLOAD_WARNING_REASONS,
 	getDistributedEditingFreshReviewDecisionStateForSessionState,
 	getDistributedEditingFreshReviewPreSaveStateForSessionState,
@@ -1603,6 +1605,10 @@ function getDistributedEditingSameBlockConflictComparison(
 		hasLocalContent:
 			rows[ 2 ].text !== DISTRIBUTED_EDITING_EMPTY_CONFLICT_TEXT,
 		reason: normalized.localRebaseResultReason,
+		resolutionChoice: normalized.staleBaseConflictResolutionChoice,
+		resolutionRequiresFreshProof:
+			normalized.staleBaseConflictResolutionRequiresFreshProof,
+		resolutionStatus: normalized.staleBaseConflictResolutionStatus,
 		rows,
 	};
 }
@@ -1695,7 +1701,8 @@ function getConflictComparisonRows( text ) {
 function DistributedEditingSameBlockConflictComparison( {
 	comparison,
 	onAction,
-	onKeepEditing,
+	onSelectLocalVersion,
+	onSelectLatestWordPressVersion,
 } ) {
 	if ( ! comparison ) {
 		return null;
@@ -1731,6 +1738,15 @@ function DistributedEditingSameBlockConflictComparison( {
 			data-distributed-editing-conflict-comparison-reason={
 				comparison.reason
 			}
+			data-distributed-editing-conflict-resolution-choice={
+				comparison.resolutionChoice || undefined
+			}
+			data-distributed-editing-conflict-resolution-requires-fresh-proof={ formatDataBoolean(
+				comparison.resolutionRequiresFreshProof
+			) }
+			data-distributed-editing-conflict-resolution-status={
+				comparison.resolutionStatus
+			}
 			role="region"
 		>
 			<div className="editor-distributed-editing-status__conflict-comparison-header">
@@ -1764,9 +1780,16 @@ function DistributedEditingSameBlockConflictComparison( {
 				<Button
 					__next40pxDefaultSize
 					variant="secondary"
-					onClick={ onKeepEditing }
+					onClick={ onSelectLocalVersion }
 				>
-					{ __( 'Keep editing locally' ) }
+					{ __( 'Keep your local version' ) }
+				</Button>
+				<Button
+					__next40pxDefaultSize
+					variant="secondary"
+					onClick={ onSelectLatestWordPressVersion }
+				>
+					{ __( 'Use latest from WordPress' ) }
 				</Button>
 				<Button
 					__next40pxDefaultSize
@@ -1842,6 +1865,8 @@ export default function DistributedEditingStatus( {
 		__experimentalRebaseDistributedEditingLocalUpdatesAfterStaleBase,
 		__experimentalRefreshDistributedEditingRetrySubmitProof,
 		__experimentalRefreshDistributedEditingServerStateAfterStaleBase,
+		editPost,
+		setDistributedEditingSessionState,
 	} = useDispatch( editorStore ) || {};
 	const handleAction = useCallback(
 		async ( actionKey, item ) => {
@@ -1985,14 +2010,107 @@ export default function DistributedEditingStatus( {
 			sessionState,
 		]
 	);
-	const handleKeepEditingConflict = useCallback( () => {
-		setActionStatus( {
-			status: 'info',
-			message: __(
-				'Continuing locally. Save is still paused until this conflict is resolved or exported.'
+	const handleSelectConflictVersion = useCallback(
+		( choice ) => {
+			const normalized =
+				normalizeDistributedEditingSessionState( sessionState );
+			const isLatestChoice =
+				choice ===
+				DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_CHOICES.LATEST_WORDPRESS;
+			const isLocalChoice =
+				choice ===
+				DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_CHOICES.LOCAL;
+
+			if (
+				! DISTRIBUTED_EDITING_SAME_BLOCK_CONFLICT_REASONS.has(
+					normalized.localRebaseResultReason
+				) ||
+				normalized.localRebaseResultStatus !==
+					DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.MANUAL_CONFLICT_REQUIRED ||
+				( isLatestChoice &&
+					typeof normalized.refetchedServerContent !== 'string' ) ||
+				( ! isLatestChoice && ! isLocalChoice )
+			) {
+				setActionStatus( {
+					status: 'warning',
+					message: __(
+						'This conflict choice is not available. Protected local changes remain exportable.'
+					),
+				} );
+				return null;
+			}
+
+			if ( isLatestChoice ) {
+				editPost?.(
+					{ content: normalized.refetchedServerContent },
+					{ undoIgnore: true }
+				);
+			}
+
+			const resolutionStatus = isLatestChoice
+				? DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_STATUSES.LATEST_WORDPRESS_SELECTED
+				: DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_STATUSES.LOCAL_VERSION_SELECTED;
+			const nextSessionState = normalizeDistributedEditingSessionState( {
+				...normalized,
+				canExportLocalUpdates: true,
+				requiresManualConflictResolution: true,
+				staleBaseConflictResolutionStatus: resolutionStatus,
+				staleBaseConflictResolutionChoice: choice,
+				staleBaseConflictResolutionRequiresFreshProof: true,
+				staleBaseConflictResolutionCallsRest: false,
+				staleBaseConflictResolutionCallsSave: false,
+				staleBaseConflictResolutionMutatesEditorContent: isLatestChoice,
+				staleBaseConflictResolutionMutatesPersistedPostContent: false,
+				staleBaseConflictResolutionCreatesRevision: false,
+				staleBaseConflictResolutionChangesPostLock: false,
+				staleBaseConflictResolutionClaimsSaved: false,
+				readyToRetrySubmit: false,
+				retrySubmitHandoffStatus:
+					DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_STATUSES.NONE,
+				retrySubmitPrepared: false,
+				retrySubmitProofStatus:
+					DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.NONE,
+				retrySubmitAccepted: false,
+				retrySubmitSavePathRequired: false,
+				retrySubmitSaveStatus:
+					DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.NONE,
+				retrySubmitSavePrepared: false,
+				retrySubmitSaveReady: false,
+				retrySaveStatus: DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.NONE,
+				retrySaveAccepted: false,
+				retrySaveClaimsSaved: false,
+			} );
+
+			setDistributedEditingSessionState?.( nextSessionState );
+			setActionStatus( {
+				status: 'info',
+				message: isLatestChoice
+					? __(
+							'Using the latest WordPress text in this editor. Save is still paused until WordPress checks this choice again.'
+					  )
+					: __(
+							'Keeping your local text in this editor. Save is still paused until WordPress checks this choice again.'
+					  ),
+			} );
+
+			return nextSessionState;
+		},
+		[ editPost, sessionState, setDistributedEditingSessionState ]
+	);
+	const handleSelectLocalVersion = useCallback(
+		() =>
+			handleSelectConflictVersion(
+				DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_CHOICES.LOCAL
 			),
-		} );
-	}, [] );
+		[ handleSelectConflictVersion ]
+	);
+	const handleSelectLatestWordPressVersion = useCallback(
+		() =>
+			handleSelectConflictVersion(
+				DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_CHOICES.LATEST_WORDPRESS
+			),
+		[ handleSelectConflictVersion ]
+	);
 
 	if (
 		! shouldRenderDistributedEditingStatus(
@@ -2020,7 +2138,10 @@ export default function DistributedEditingStatus( {
 			<DistributedEditingSameBlockConflictComparison
 				comparison={ conflictComparison }
 				onAction={ handleAction }
-				onKeepEditing={ handleKeepEditingConflict }
+				onSelectLatestWordPressVersion={
+					handleSelectLatestWordPressVersion
+				}
+				onSelectLocalVersion={ handleSelectLocalVersion }
 			/>
 		</>
 	);
