@@ -16,10 +16,9 @@ import { getWpCompatOverlaySlot } from '@wordpress/ui';
 import type { DraggableProps } from './types';
 import styles from './style.module.scss';
 
-// The hardcoded legacy class names are preserved alongside the
-// CSS-module hashed ones for backwards compatibility. `filter(Boolean)`
-// keeps Jest's CSS-module mock (which returns `undefined`) from leaking
-// a literal "undefined" class.
+// Legacy class names preserved alongside the CSS-module hashed ones for
+// backwards compatibility. `filter(Boolean)` strips `undefined` from Jest's
+// CSS-module mock.
 const dragImageClasses = [
 	styles[ 'invisible-drag-image' ],
 	'components-draggable__invisible-drag-image',
@@ -28,8 +27,7 @@ const cloneWrapperClasses = [
 	styles.clone,
 	'components-draggable__clone',
 ].filter( Boolean );
-// Body-level signal shared with external code (e.g. block-editor keyboard
-// drag), so it stays as a plain global class rather than module-scoped.
+// Global class — shared with external code (e.g. block-editor keyboard drag).
 const bodyClass = 'is-dragging-components-draggable';
 const clonePadding = 0;
 
@@ -114,8 +112,7 @@ export function Draggable( {
 	function start( event: DragEvent ) {
 		const { ownerDocument } = event.target as HTMLElement;
 		// Only use the slot when it lives in the same document as the
-		// dragged element, so the clone's viewport-relative coordinates
-		// resolve in one coordinate space.
+		// dragged element, so coordinate resolution stays in one space.
 		const slot = getWpCompatOverlaySlot();
 		const compatSlot = slot?.ownerDocument === ownerDocument ? slot : null;
 
@@ -136,8 +133,7 @@ export function Draggable( {
 		// IE, we need to check for its existence first.
 		if ( 'function' === typeof event.dataTransfer.setDragImage ) {
 			dragImage.classList.add( ...dragImageClasses );
-			// Stays at the document body — invisible, so the slot's stacking
-			// guarantees aren't needed here.
+			// Invisible — stays at the document body, no slot needed.
 			ownerDocument.body.appendChild( dragImage );
 			event.dataTransfer.setDragImage( dragImage, 0, 0 );
 		}

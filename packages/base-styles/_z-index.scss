@@ -125,15 +125,6 @@ $z-layers: (
 	// Appear under the topbar.
 	".customize-widgets__block-toolbar": 7,
 
-	// Ensure checkbox + actions don't overlap table header
-	".dataviews-view-table thead": 1,
-
-	// Ensure selection checkbox stays above the preview field.
-	".dataviews-view-grid__card .dataviews-selection-checkbox": 1,
-
-	// Ensure footer stays above the preview field.
-	".dataviews-footer": 2,
-
 	// Needs to be below media library (.media-model) that has a z-index of 160000.
 	".components-popover.components-dropdown__content.dataforms-layouts-panel__field-dropdown": 160000 - 10,
 );
