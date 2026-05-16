@@ -1703,7 +1703,7 @@ describe( 'DistributedEditingStatus', () => {
 
 		await user.click(
 			within( summary ).getByRole( 'button', {
-				name: 'Preview latest structure',
+				name: 'Preview latest',
 			} )
 		);
 
@@ -1731,7 +1731,7 @@ describe( 'DistributedEditingStatus', () => {
 
 		await user.click(
 			within( summary ).getByRole( 'button', {
-				name: 'Preview local structure',
+				name: 'Preview mine',
 			} )
 		);
 
@@ -1814,7 +1814,7 @@ describe( 'DistributedEditingStatus', () => {
 
 		await user.click(
 			within( summary ).getByRole( 'button', {
-				name: 'Use latest structure in editor',
+				name: 'Use latest',
 			} )
 		);
 
@@ -1877,13 +1877,13 @@ describe( 'DistributedEditingStatus', () => {
 		);
 		expect(
 			screen.getAllByText(
-				'Latest WordPress structure is now in this editor. Save is still paused until WordPress checks this choice.'
+				'Using latest structure. Save is still paused until WordPress checks this choice.'
 			).length
 		).toBeGreaterThan( 0 );
 
 		await user.click(
 			within( summary ).getByRole( 'button', {
-				name: 'Undo structure choice',
+				name: 'Undo choice',
 			} )
 		);
 
@@ -1993,7 +1993,7 @@ describe( 'DistributedEditingStatus', () => {
 
 		await user.click(
 			within( summary ).getByRole( 'button', {
-				name: 'Check structure with WordPress',
+				name: 'Check choice',
 			} )
 		);
 
@@ -2042,12 +2042,12 @@ describe( 'DistributedEditingStatus', () => {
 		);
 		expect(
 			screen.getByText(
-				'WordPress checked this structure. Prepare Save before updating the post.'
+				'WordPress checked this structure. Make Save available before updating the post.'
 			)
 		).toBeVisible();
 		expect(
 			within( summary ).queryByRole( 'button', {
-				name: 'Prepare Save',
+				name: 'Make Save available',
 			} )
 		).not.toBeInTheDocument();
 		expect(
@@ -2119,7 +2119,7 @@ describe( 'DistributedEditingStatus', () => {
 		);
 
 		const prepareButton = within( summary ).getByRole( 'button', {
-			name: 'Prepare structural Save',
+			name: 'Make Save available',
 		} );
 
 		expect( prepareButton ).toHaveAttribute(
@@ -2169,7 +2169,7 @@ describe( 'DistributedEditingStatus', () => {
 		);
 		expect(
 			screen.getByText(
-				'Structural Save prepared. WordPress has not updated the post.'
+				'Save is ready for this structure. WordPress has not updated the post.'
 			)
 		).toBeVisible();
 		expect(

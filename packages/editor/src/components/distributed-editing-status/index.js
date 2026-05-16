@@ -3028,7 +3028,7 @@ function DistributedEditingStructuralConflictSummary( {
 					}
 					onClick={ () => setPreviewSnapshotId( 'server' ) }
 				>
-					{ __( 'Preview latest structure' ) }
+					{ __( 'Preview latest' ) }
 				</Button>
 				<Button
 					__next40pxDefaultSize
@@ -3040,7 +3040,7 @@ function DistributedEditingStructuralConflictSummary( {
 					}
 					onClick={ () => setPreviewSnapshotId( 'local' ) }
 				>
-					{ __( 'Preview local structure' ) }
+					{ __( 'Preview mine' ) }
 				</Button>
 				{ previewSnapshot && (
 					<Button
@@ -3129,7 +3129,7 @@ function DistributedEditingStructuralConflictSummary( {
 						)
 					}
 				>
-					{ __( 'Use latest structure in editor' ) }
+					{ __( 'Use latest' ) }
 				</Button>
 				<Button
 					__next40pxDefaultSize
@@ -3151,7 +3151,7 @@ function DistributedEditingStructuralConflictSummary( {
 						)
 					}
 				>
-					{ __( 'Keep local structure' ) }
+					{ __( 'Keep mine' ) }
 				</Button>
 				{ structuralChoiceUndoAvailable && (
 					<Button
@@ -3164,7 +3164,7 @@ function DistributedEditingStructuralConflictSummary( {
 						variant="tertiary"
 						onClick={ undoStructuralChoice }
 					>
-						{ __( 'Undo structure choice' ) }
+						{ __( 'Undo choice' ) }
 					</Button>
 				) }
 				{ structuralChoiceRequiresFreshProof && (
@@ -3186,7 +3186,7 @@ function DistributedEditingStructuralConflictSummary( {
 							)
 						}
 					>
-						{ __( 'Check structure with WordPress' ) }
+						{ __( 'Check choice' ) }
 					</Button>
 				) }
 				{ structuralChoiceCanPrepareSave && (
@@ -3209,7 +3209,7 @@ function DistributedEditingStructuralConflictSummary( {
 							)
 						}
 					>
-						{ __( 'Prepare structural Save' ) }
+						{ __( 'Make Save available' ) }
 					</Button>
 				) }
 			</div>
@@ -3223,18 +3223,18 @@ function DistributedEditingStructuralConflictSummary( {
 				>
 					{ structuralChoiceSaveReady
 						? __(
-								'Structural Save is prepared. This checked structure is protected; WordPress has not updated the post.'
+								'Save is ready for this structure. WordPress has not updated the post.'
 						  )
 						: structuralChoiceProofAccepted
 						? __(
-								'WordPress checked this structure. Prepare Save before updating the post.'
+								'WordPress checked this structure. Make Save available before updating the post.'
 						  )
 						: selectedChoiceSnapshotId === 'server'
 						? __(
-								'Latest WordPress structure is now in this editor. Save is still paused until WordPress checks this choice.'
+								'Using latest structure. Save is still paused until WordPress checks this choice.'
 						  )
 						: __(
-								'Local structure is selected in this editor. Save is still paused until WordPress checks this choice.'
+								'Keeping local structure. Save is still paused until WordPress checks this choice.'
 						  ) }
 					{ structuralChoiceUndoAvailable && (
 						<span>
@@ -3440,7 +3440,7 @@ export default function DistributedEditingStatus( {
 							status: 'info',
 							message: isStructuralConflictPrepare
 								? __(
-										'Structural Save prepared. WordPress has not updated the post.'
+										'Save is ready for this structure. WordPress has not updated the post.'
 								  )
 								: __(
 										'Save prepared. Use Save to send these changes to WordPress.'
@@ -3509,7 +3509,7 @@ export default function DistributedEditingStatus( {
 							status: 'info',
 							message: isStructuralConflictProof
 								? __(
-										'WordPress checked this structure. Prepare Save before updating the post.'
+										'WordPress checked this structure. Make Save available before updating the post.'
 								  )
 								: item?.id === 'same-block-conflict-comparison'
 								? __(
@@ -3811,10 +3811,10 @@ export default function DistributedEditingStatus( {
 				status: 'info',
 				message: isLatestChoice
 					? __(
-							'Latest WordPress structure is now in this editor. Save is still paused until WordPress checks this choice.'
+							'Using latest structure. Save is still paused until WordPress checks this choice.'
 					  )
 					: __(
-							'Local structure is selected in this editor. Save is still paused until WordPress checks this choice.'
+							'Keeping local structure. Save is still paused until WordPress checks this choice.'
 					  ),
 			} );
 
@@ -3865,7 +3865,7 @@ export default function DistributedEditingStatus( {
 		setActionStatus( {
 			status: 'info',
 			message: __(
-				'Restored the local structure in this editor. Save is still paused until WordPress checks this choice.'
+				'Restored local structure. Save is still paused until WordPress checks this choice.'
 			),
 		} );
 
