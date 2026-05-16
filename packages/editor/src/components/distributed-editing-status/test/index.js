@@ -954,6 +954,31 @@ describe( 'DistributedEditingStatus', () => {
 		expect(
 			screen.queryByText( 'WordPress confirmed Save.' )
 		).not.toBeInTheDocument();
+		// eslint-disable-next-line testing-library/no-node-access
+		const actionGroups = comparison.querySelectorAll(
+			'.editor-distributed-editing-status__conflict-comparison-action-group'
+		);
+		expect( actionGroups ).toHaveLength( 2 );
+		expect(
+			within( actionGroups[ 0 ] ).getByRole( 'button', {
+				name: 'Keep your local version',
+			} )
+		).toBeVisible();
+		expect(
+			within( actionGroups[ 0 ] ).getByRole( 'button', {
+				name: 'Use latest from WordPress',
+			} )
+		).toBeVisible();
+		expect(
+			within( actionGroups[ 1 ] ).getByRole( 'button', {
+				name: 'Export for review',
+			} )
+		).toBeVisible();
+		expect(
+			within( actionGroups[ 1 ] ).getByRole( 'button', {
+				name: 'Get latest post',
+			} )
+		).toBeVisible();
 		expect( comparison ).toHaveAttribute(
 			'data-distributed-editing-conflict-comparison',
 			'same-block'

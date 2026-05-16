@@ -261,7 +261,7 @@
 .editor-distributed-editing-status__conflict-comparison-grid {
 	display: grid;
 	gap: $grid-unit-10;
-	grid-template-columns: repeat(3, minmax(0, 1fr));
+	grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
 }
 
 .editor-distributed-editing-status__conflict-comparison-row {
@@ -287,13 +287,17 @@
 }
 
 .editor-distributed-editing-status__conflict-comparison-actions {
+	display: grid;
+	gap: $grid-unit-05;
+}
+
+.editor-distributed-editing-status__conflict-comparison-action-group {
 	display: flex;
 	flex-wrap: wrap;
 	gap: $grid-unit-05;
 }
 
-@media ( max-width: 782px ) {
-	.editor-distributed-editing-status__conflict-comparison-grid {
-		grid-template-columns: 1fr;
-	}
+.editor-distributed-editing-status__conflict-comparison-action-group--choices .components-button {
+	flex: 1 1 12rem;
+	justify-content: center;
 }

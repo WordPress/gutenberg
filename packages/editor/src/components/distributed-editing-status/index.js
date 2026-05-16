@@ -1829,53 +1829,59 @@ function DistributedEditingSameBlockConflictComparison( {
 				) ) }
 			</div>
 			<div className="editor-distributed-editing-status__conflict-comparison-actions">
-				<Button
-					__next40pxDefaultSize
-					variant="secondary"
-					onClick={ onSelectLocalVersion }
-				>
-					{ __( 'Keep your local version' ) }
-				</Button>
-				<Button
-					__next40pxDefaultSize
-					variant="secondary"
-					onClick={ onSelectLatestWordPressVersion }
-				>
-					{ __( 'Use latest from WordPress' ) }
-				</Button>
-				{ comparison.canRequestFreshProof && (
+				<div className="editor-distributed-editing-status__conflict-comparison-action-group editor-distributed-editing-status__conflict-comparison-action-group--choices">
 					<Button
 						__next40pxDefaultSize
 						variant="secondary"
-						onClick={ () => onRequestFreshProof?.( actionItem ) }
+						onClick={ onSelectLocalVersion }
 					>
-						{ __( 'Check this choice' ) }
+						{ __( 'Keep your local version' ) }
 					</Button>
-				) }
-				<Button
-					__next40pxDefaultSize
-					variant="secondary"
-					onClick={ () =>
-						onAction?.(
-							DISTRIBUTED_EDITING_NOTICE_ACTIONS.EXPORT_LOCAL_UPDATES,
-							actionItem
-						)
-					}
-				>
-					{ __( 'Export for review' ) }
-				</Button>
-				<Button
-					__next40pxDefaultSize
-					variant="tertiary"
-					onClick={ () =>
-						onAction?.(
-							DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFETCH_SERVER_STATE,
-							actionItem
-						)
-					}
-				>
-					{ __( 'Get latest post' ) }
-				</Button>
+					<Button
+						__next40pxDefaultSize
+						variant="secondary"
+						onClick={ onSelectLatestWordPressVersion }
+					>
+						{ __( 'Use latest from WordPress' ) }
+					</Button>
+				</div>
+				<div className="editor-distributed-editing-status__conflict-comparison-action-group editor-distributed-editing-status__conflict-comparison-action-group--supporting">
+					{ comparison.canRequestFreshProof && (
+						<Button
+							__next40pxDefaultSize
+							variant="secondary"
+							onClick={ () =>
+								onRequestFreshProof?.( actionItem )
+							}
+						>
+							{ __( 'Check this choice' ) }
+						</Button>
+					) }
+					<Button
+						__next40pxDefaultSize
+						variant="secondary"
+						onClick={ () =>
+							onAction?.(
+								DISTRIBUTED_EDITING_NOTICE_ACTIONS.EXPORT_LOCAL_UPDATES,
+								actionItem
+							)
+						}
+					>
+						{ __( 'Export for review' ) }
+					</Button>
+					<Button
+						__next40pxDefaultSize
+						variant="tertiary"
+						onClick={ () =>
+							onAction?.(
+								DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFETCH_SERVER_STATE,
+								actionItem
+							)
+						}
+					>
+						{ __( 'Get latest post' ) }
+					</Button>
+				</div>
 			</div>
 		</div>
 	);
