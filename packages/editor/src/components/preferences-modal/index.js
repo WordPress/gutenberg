@@ -58,7 +58,7 @@ function PreferencesModalContents( { extraSections = {} } ) {
 	const { showBlockBreadcrumbsOption, showCollaborationOptions } = useSelect(
 		( select ) => {
 			const { getEditorSettings, isCollaborationEnabledForCurrentPost } =
-				select( editorStore );
+				unlock( select( editorStore ) );
 			const { get } = select( preferencesStore );
 			const isRichEditingEnabled = getEditorSettings().richEditingEnabled;
 			const isDistractionFreeEnabled = get( 'core', 'distractionFree' );

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 2.1.0 (2026-05-14)
+
 ### Bug Fixes
 
 -   `Page`: Fix nested landmark in header. [#78001](https://github.com/WordPress/gutenberg/pull/78001)

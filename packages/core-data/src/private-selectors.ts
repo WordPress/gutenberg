@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { createSelector, createRegistrySelector } from '@wordpress/data';
+import type { ConnectionStatus } from '@wordpress/sync';
 
 /**
  * Internal dependencies
@@ -346,4 +347,36 @@ export function getViewConfig(
 			form: undefined,
 		}
 	);
+}
+
+/**
+ * Returns the current sync connection status across all entities. Prioritizes
+ * disconnected states, then connecting, then connected.
+ *
+ * @param state Data state.
+ *
+ * @return The current sync connection state, prioritized by importance.
+ */
+export function getSyncConnectionStatus(
+	state: State
+): ConnectionStatus | undefined {
+	if ( ! state.syncConnectionStatuses ) {
+		return undefined;
+	}
+
+	const PRIORITIZED_STATUSES = [ 'disconnected', 'connecting', 'connected' ];
+
+	let coalesced: ConnectionStatus | undefined;
+
+	for ( const status of Object.values( state.syncConnectionStatuses ) ) {
+		if (
+			! coalesced ||
+			PRIORITIZED_STATUSES.indexOf( status.status ) <
+				PRIORITIZED_STATUSES.indexOf( coalesced.status )
+		) {
+			coalesced = status;
+		}
+	}
+
+	return coalesced;
 }

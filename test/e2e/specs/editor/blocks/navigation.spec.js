@@ -1144,6 +1144,77 @@ test.describe( 'Navigation block', () => {
 			await requestUtils.setupRest();
 		} );
 
+		test( 'can update a bound page link label from the inline Link UI', async ( {
+			editor,
+			admin,
+			navigation,
+			requestUtils,
+			pageUtils,
+		} ) => {
+			await admin.createNewPost();
+
+			const linkAttributes = JSON.stringify( {
+				id: testPage1.id,
+				label: 'Test Page 1',
+				kind: 'post-type',
+				type: 'page',
+				url: testPage1.link,
+				metadata: {
+					bindings: {
+						url: {
+							source: 'core/post-data',
+							args: {
+								field: 'link',
+							},
+						},
+					},
+				},
+			} );
+
+			const menu = await requestUtils.createNavigationMenu( {
+				title: 'Test Menu',
+				content: `<!-- wp:navigation-link ${ linkAttributes } /-->`,
+			} );
+
+			await editor.insertBlock( {
+				name: 'core/navigation',
+				attributes: {
+					ref: menu.id,
+				},
+			} );
+
+			const navLinkBlock = navigation
+				.getNavBlock()
+				.getByRole( 'document', {
+					name: 'Block: Page Link',
+				} )
+				.first();
+			await expect( navLinkBlock ).toBeVisible( { timeout: 10000 } );
+			await editor.selectBlocks( navLinkBlock );
+			await pageUtils.pressKeys( 'primary+k' );
+
+			const linkPopover = navigation.getLinkPopover();
+			await expect( linkPopover ).toBeVisible();
+			await expect(
+				linkPopover.getByRole( 'link', { name: /Test Page 1/ } )
+			).toBeVisible();
+			await linkPopover
+				.getByRole( 'button', { name: 'Edit link' } )
+				.click();
+
+			const textInput = linkPopover.getByRole( 'textbox', {
+				name: 'Text',
+			} );
+			await expect( textInput ).toHaveValue( 'Test Page 1' );
+
+			await textInput.fill( 'Updated Page Label' );
+			await linkPopover.getByRole( 'button', { name: 'Apply' } ).click();
+
+			await expect(
+				navigation.getNavBlock().getByText( 'Updated Page Label' )
+			).toBeVisible();
+		} );
+
 		test( 'can bind to a page', async ( {
 			editor,
 			page,

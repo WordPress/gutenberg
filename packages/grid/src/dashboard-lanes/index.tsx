@@ -42,6 +42,12 @@ import type { DashboardLanesLayoutItem, DashboardLanesProps } from './types';
 import type { ResizeDelta } from '../shared/types';
 import styles from './lanes.module.css';
 
+// Fallback gap in pixels for math that runs before the computed gap
+// can be read from the DOM. Matches the `'md'` step the surface
+// resolves to in CSS (`--wpds-dimension-gap-md`); the next layout
+// effect overwrites this with the actual computed value.
+const FALLBACK_GAP_PX = 12;
+
 const NO_SORT_STRATEGY = () => null;
 
 /**
@@ -89,7 +95,6 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 			children,
 			className,
 			style,
-			spacing = 2,
 			flowTolerance = 16,
 			rowUnit = 4,
 			minColumnWidth,
@@ -121,6 +126,7 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 			null
 		);
 		const [ containerWidth, setContainerWidth ] = useState( 0 );
+		const [ gapPx, setGapPx ] = useState( FALLBACK_GAP_PX );
 		const resizeObserverRef = useResizeObserver(
 			( [ { contentRect } ] ) => {
 				setContainerWidth( contentRect.width );
@@ -132,16 +138,24 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 			ref,
 		] );
 
+		// Measure synchronously before paint and snapshot the computed
+		// `column-gap` so the placement math tracks the design-system
+		// token under any density.
 		useLayoutEffect( () => {
-			if ( container ) {
-				const { width } = container.getBoundingClientRect();
-				if ( width > 0 ) {
-					setContainerWidth( width );
-				}
+			if ( ! container ) {
+				return;
+			}
+			const { width } = container.getBoundingClientRect();
+			if ( width > 0 ) {
+				setContainerWidth( width );
+			}
+			const parsed = Number.parseFloat(
+				window.getComputedStyle( container ).columnGap
+			);
+			if ( Number.isFinite( parsed ) && parsed > 0 ) {
+				setGapPx( parsed );
 			}
 		}, [ container ] );
-
-		const gapPx = spacing * 4;
 		const effectiveColumns = useMemo( () => {
 			if ( ! minColumnWidth ) {
 				return columns;
@@ -433,13 +447,9 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 		const Overlay = renderGridOverlay ?? GridOverlay;
 		const gridOverlay = useMemo(
 			() => (
-				<Overlay
-					columns={ effectiveColumns }
-					gapPx={ gapPx }
-					isActive={ editMode }
-				/>
+				<Overlay columns={ effectiveColumns } isActive={ editMode } />
 			),
-			[ Overlay, editMode, effectiveColumns, gapPx ]
+			[ Overlay, editMode, effectiveColumns ]
 		);
 
 		return (
@@ -463,15 +473,15 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 							{
 								...style,
 								gridTemplateColumns: `repeat(${ effectiveColumns }, minmax(0, 1fr))`,
-								// `column-gap` and `row-gap` resolve through
-								// the `--wp-grid-lane-gap` custom property in
-								// `lanes.module.css`, which uses `@supports`
-								// to zero `row-gap` in polyfill mode (the
-								// skyline already encodes vertical spacing
-								// in each tile's `top`). Driving the toggle
-								// from CSS keeps SSR and client output
-								// identical regardless of native support.
-								'--wp-grid-lane-gap': `${ gapPx }px`,
+								// `column-gap` and `row-gap` are set in
+								// `lanes.module.css` from the
+								// design-system gap token, with an
+								// `@supports` block that zeroes `row-gap`
+								// in polyfill mode (the skyline already
+								// encodes vertical spacing in each tile's
+								// `top`). Driving the toggle from CSS
+								// keeps SSR and client output identical
+								// regardless of native support.
 								'--wp-grid-lane-row-unit': `${ Math.max(
 									1,
 									rowUnit

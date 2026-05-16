@@ -10,9 +10,7 @@ const internalWindow = window as unknown as {
 	__wpUiCompatOverlaySlotEnabled?: boolean;
 };
 
-// The slot is identified by a data attribute (cross-tooling marker, not a
-// user-facing role/text), so direct DOM queries are appropriate here —
-// Testing Library's role/text accessors don't apply.
+// Slot is identified by a data attribute, not a user-facing role/text.
 /* eslint-disable testing-library/no-node-access */
 
 function findSlots(): HTMLElement[] {
@@ -36,12 +34,12 @@ describe( 'useEnableWpCompatOverlaySlot', () => {
 	} );
 
 	it( 'enables the slot once mounted, so getWpCompatOverlaySlot() returns the slot', () => {
-		expect( getWpCompatOverlaySlot() ).toBeNull();
+		expect( getWpCompatOverlaySlot() ).toBeUndefined();
 
 		render( <HookHost /> );
 
 		const slot = getWpCompatOverlaySlot();
-		expect( slot ).not.toBeNull();
+		expect( slot ).toBeDefined();
 		expect( slot?.parentElement ).toBe( document.body );
 		expect( findSlots() ).toHaveLength( 1 );
 	} );
@@ -55,24 +53,21 @@ describe( 'useEnableWpCompatOverlaySlot', () => {
 			</>
 		);
 
-		expect( getWpCompatOverlaySlot() ).not.toBeNull();
+		expect( getWpCompatOverlaySlot() ).toBeDefined();
 		expect( findSlots() ).toHaveLength( 1 );
 	} );
 
 	it( 'leaves the slot enabled after the hook caller unmounts (one-way opt-in)', () => {
-		// The slot is shared infrastructure across all `@wordpress/ui`
-		// consumers in the document; a single component shouldn't be
-		// able to disable it for everyone else once enabled. This test
-		// pins that one-way behavior — unmounting the hook caller does
-		// not flip the gate back off.
+		// Pins the one-way behavior — unmounting must not flip the gate
+		// back off; the slot is shared infrastructure.
 		const { unmount } = render( <HookHost /> );
 
-		expect( getWpCompatOverlaySlot() ).not.toBeNull();
+		expect( getWpCompatOverlaySlot() ).toBeDefined();
 
 		unmount();
 
 		expect( internalWindow.__wpUiCompatOverlaySlotEnabled ).toBe( true );
-		expect( getWpCompatOverlaySlot() ).not.toBeNull();
+		expect( getWpCompatOverlaySlot() ).toBeDefined();
 	} );
 } );
 

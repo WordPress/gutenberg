@@ -1,13 +1,11 @@
-import type { ComponentPropsWithoutRef, ReactElement, ReactNode } from 'react';
+import type { ReactElement, ReactNode } from 'react';
 import type { Tooltip as _Tooltip } from '@base-ui/react/tooltip';
 
 import type { ComponentProps } from '../utils/types';
 
-export type PortalProps = ComponentPropsWithoutRef< typeof _Tooltip.Portal >;
+export type PortalProps = ComponentProps< typeof _Tooltip.Portal >;
 
-export type PositionerProps = ComponentPropsWithoutRef<
-	typeof _Tooltip.Positioner
->;
+export type PositionerProps = ComponentProps< typeof _Tooltip.Positioner >;
 
 export type RootProps = Pick< _Tooltip.Root.Props, 'disabled' | 'children' >;
 

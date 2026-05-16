@@ -70,6 +70,15 @@ test.describe( 'Site Editor Performance', () => {
 			} );
 
 			draftId = page.id;
+
+			// Set preferences via REST so that welcomeGuide is reliably
+			// persisted before the timed iterations start.
+			await requestUtils.setPreferences( 'core/edit-site', {
+				welcomeGuide: false,
+				welcomeGuideStyles: false,
+				welcomeGuidePage: false,
+				welcomeGuideTemplate: false,
+			} );
 		} );
 
 		const samples = 10;
@@ -85,24 +94,26 @@ test.describe( 'Site Editor Performance', () => {
 				await metrics.startTracing();
 
 				// Go to the test draft.
-				await admin.visitSiteEditor( {
-					postId: draftId,
-					postType: 'page',
-					canvas: 'edit',
-				} );
+				await admin.page.goto(
+					'wp-admin/site-editor.php?postId=' +
+						draftId +
+						'&postType=page&canvas=edit'
+				);
 
 				// Wait for the first block.
 				const canvas = await perfUtils.getCanvas();
 				await canvas.locator( '.wp-block' ).first().waitFor();
+
+				// Capture timing metrics before `stopTracing()`, which
+				// blocks for the trace download/parse and would otherwise
+				// inflate `timeSinceResponseEnd` by seconds.
+				const loadingDurations = await metrics.getLoadingDurations();
 
 				// Stop tracing. Save just one representative sample.
 				await metrics.stopTracing(
 					i === Math.floor( iterations / 2 ) &&
 						'site-editor-first-block'
 				);
-
-				// Get the durations.
-				const loadingDurations = await metrics.getLoadingDurations();
 
 				// Save the results.
 				if ( i > throwaway ) {

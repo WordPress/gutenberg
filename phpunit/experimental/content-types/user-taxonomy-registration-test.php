@@ -92,6 +92,7 @@ class User_Taxonomy_Registration_Test extends WP_UnitTestCase {
 				'show_in_quick_edit' => false,
 				'show_admin_column'  => true,
 				'show_in_rest'       => false,
+				'sort'               => true,
 			),
 			'flagged_tax',
 			'Flagged'
@@ -111,8 +112,65 @@ class User_Taxonomy_Registration_Test extends WP_UnitTestCase {
 		$this->assertFalse( $tax->show_in_quick_edit );
 		$this->assertTrue( $tax->show_admin_column );
 		$this->assertFalse( $tax->show_in_rest );
+		$this->assertTrue( $tax->sort );
 
 		unregister_taxonomy( 'flagged_tax' );
+		wp_delete_post( $created['id'], true );
+	}
+
+	/**
+	 * `default_term` flows through as a `[ 'name' => ... ]` array on the
+	 * registered WP_Taxonomy.
+	 */
+	public function test_default_term_forwarded_to_register_taxonomy() {
+		$created = self::create_user_taxonomy(
+			array(
+				'labels'       => array( 'singular_name' => 'Topic' ),
+				'default_term' => array( 'name' => 'Uncategorized Topic' ),
+			),
+			'topic_tax',
+			'Topics'
+		);
+
+		gutenberg_register_user_defined_taxonomies();
+
+		$tax = get_taxonomy( 'topic_tax' );
+		$this->assertNotFalse( $tax );
+		$this->assertSame( 'Uncategorized Topic', $tax->default_term['name'] );
+
+		// WP core auto-creates the default term during register_taxonomy();
+		// clean up so the test doesn't leak rows.
+		$term_id = (int) get_option( 'default_term_topic_tax' );
+		if ( $term_id > 0 ) {
+			wp_delete_term( $term_id, 'topic_tax' );
+		}
+		delete_option( 'default_term_topic_tax' );
+		unregister_taxonomy( 'topic_tax' );
+		wp_delete_post( $created['id'], true );
+	}
+
+	/**
+	 * An empty `default_term.name` must not call `wp_insert_term()` (which
+	 * would error on an empty name) and must not set the option.
+	 */
+	public function test_default_term_with_empty_name_is_omitted() {
+		$created = self::create_user_taxonomy(
+			array(
+				'labels'       => array( 'singular_name' => 'Empty' ),
+				'default_term' => array( 'name' => '' ),
+			),
+			'empty_default_tax',
+			'Empties'
+		);
+
+		gutenberg_register_user_defined_taxonomies();
+
+		$tax = get_taxonomy( 'empty_default_tax' );
+		$this->assertNotFalse( $tax );
+		$this->assertEmpty( $tax->default_term );
+		$this->assertFalse( get_option( 'default_term_empty_default_tax' ) );
+
+		unregister_taxonomy( 'empty_default_tax' );
 		wp_delete_post( $created['id'], true );
 	}
 }

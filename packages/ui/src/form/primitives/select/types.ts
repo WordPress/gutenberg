@@ -1,10 +1,12 @@
 import type { Select as _Select } from '@base-ui/react/select';
-import type { ComponentPropsWithoutRef, ReactElement } from 'react';
+import type { ReactElement } from 'react';
 
 import type { ComponentProps } from '../../../utils/types';
 import type { InputLayoutProps } from '../input-layout/types';
 
-export type PortalProps = ComponentPropsWithoutRef< typeof _Select.Portal >;
+export type PortalProps = ComponentProps< typeof _Select.Portal >;
+
+export type PositionerProps = ComponentProps< typeof _Select.Positioner >;
 
 // The second type parameter is the `multiple` flag (currently disabled).
 export type SelectRootProps< Value = unknown > = Omit<
@@ -54,6 +56,14 @@ export type SelectPopupProps = ComponentProps< typeof _Select.Popup > & {
 	 * be ignored.
 	 */
 	portal?: ReactElement< Omit< PortalProps, 'children' > >;
+	/**
+	 * Optional positioner element, typically `<Select.Positioner />` with
+	 * custom positioning props (`side`, `align`, `sideOffset`, collision
+	 * settings, etc.). When omitted, `Select.Popup` uses `Select.Positioner`
+	 * with default props. Do not pass `children` on the positioner element;
+	 * they would be ignored.
+	 */
+	positioner?: ReactElement< Omit< PositionerProps, 'children' > >;
 };
 
 export type SelectItemProps = Omit<

@@ -100,11 +100,6 @@ export interface GridOverlayRenderProps {
 	columns: number;
 
 	/**
-	 * Gap between tracks in pixels (`spacing * 4`).
-	 */
-	gapPx: number;
-
-	/**
 	 * Row height in pixels for surfaces with uniform rows. Omitted on
 	 * surfaces with content-driven heights (lanes) or when row height
 	 * is `'auto'`; in those cases the overlay paints columns only.
