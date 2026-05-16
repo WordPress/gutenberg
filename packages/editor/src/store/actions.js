@@ -826,8 +826,9 @@ export const __experimentalMaybeHandleDistributedEditingSaveButtonClick =
 		if (
 			! shouldHandleDistributedEditingClick &&
 			shouldUseRetrySave &&
-			initialSessionState.hasPendingChanges &&
-			initialSessionState.canExportLocalUpdates
+			( select.isEditedPostDirty?.() ||
+				( initialSessionState.hasPendingChanges &&
+					initialSessionState.canExportLocalUpdates ) )
 		) {
 			const freshnessGuard =
 				await dispatch.__experimentalGuardDistributedEditingNormalSaveFreshness(

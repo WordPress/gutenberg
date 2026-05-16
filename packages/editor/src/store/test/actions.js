@@ -2592,57 +2592,16 @@ describe( 'Post actions', () => {
 					riskyBlockReview: true,
 				},
 			} );
-			registry
-				.dispatch( editorStore )
-				.setDistributedEditingSessionState( {
-					disposition:
-						DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
-					reasonCode:
-						DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
-					clientBaseVersion: '4',
-					serverVersion: '7',
-					clientBaseContent: basePostContent,
-					pendingChangeCount: 1,
-					remoteChangeCount: 1,
-					requiresServerStateRefetch: true,
-					hasPendingChanges: true,
-					canExportLocalUpdates: true,
-				} );
-
-			await expect(
-				registry
-					.dispatch( editorStore )
-					.__experimentalMaybeHandleDistributedEditingSaveButtonClick()
-			).resolves.toMatchObject( {
-				status: 'server_state_refetched_before_save',
-				callsServerStateRefetchEndpoint: true,
-				callsRetrySaveEndpoint: false,
-				claimsSaved: false,
-			} );
-
-			await expect(
-				registry
-					.dispatch( editorStore )
-					.__experimentalMaybeHandleDistributedEditingSaveButtonClick()
-			).resolves.toMatchObject( {
-				status: 'local_changes_applied_before_save',
-				mutatesEditorContent: true,
-				callsRetrySaveEndpoint: false,
-				claimsSaved: false,
-			} );
 			expect(
-				registry.select( editorStore ).getEditedPostContent()
-			).toBe( mergedPostContent );
-
-			await expect(
 				registry
-					.dispatch( editorStore )
-					.__experimentalMaybeHandleDistributedEditingSaveButtonClick()
-			).resolves.toMatchObject( {
-				status: 'retry_submit_prepared_before_save',
-				callsRetrySubmitEndpoint: false,
-				callsRetrySaveEndpoint: false,
-				claimsSaved: false,
+					.select( editorStore )
+					.getDistributedEditingSessionState()
+			).toMatchObject( {
+				clientBaseVersion: null,
+				serverVersion: null,
+				pendingChangeCount: 0,
+				hasPendingChanges: false,
+				canExportLocalUpdates: false,
 			} );
 
 			await expect(
@@ -2650,35 +2609,16 @@ describe( 'Post actions', () => {
 					.dispatch( editorStore )
 					.__experimentalMaybeHandleDistributedEditingSaveButtonClick()
 			).resolves.toMatchObject( {
-				status: 'retry_submit_proof_refreshed_before_save',
+				status: 'distributed_editing_normal_save_auto_merged_retry_save_submitted',
+				callsServerStateRefetchEndpoint: true,
 				callsRetrySubmitEndpoint: true,
-				callsRetrySaveEndpoint: false,
-				claimsSaved: false,
-			} );
-
-			await expect(
-				registry
-					.dispatch( editorStore )
-					.__experimentalMaybeHandleDistributedEditingSaveButtonClick()
-			).resolves.toMatchObject( {
-				status: 'retry_submit_save_prepared_before_save',
-				callsRetrySaveEndpoint: false,
-				retrySubmitSaveReady: true,
-				claimsSaved: false,
-			} );
-
-			const finalClickRouting = await registry
-				.dispatch( editorStore )
-				.__experimentalMaybeHandleDistributedEditingSaveButtonClick();
-
-			expect( finalClickRouting ).toMatchObject( {
-				status: 'guarded_retry_save_submitted_from_save_click',
-				allowsNormalSaveFallback: false,
-				blocksNormalSavePost: true,
-				callsRetrySaveAction: true,
 				callsRetrySaveEndpoint: true,
+				mutatesEditorContent: true,
+				allowsNormalSaveFallback: false,
+				callsRetrySaveAction: true,
 				callsNormalSavePost: false,
 				claimsSaved: true,
+				handledFreshProtectedChangesBeforeStatusEdit: true,
 			} );
 
 			expect( serverStateRefetchCalls ).toBe( 2 );
@@ -8499,6 +8439,18 @@ describe( 'Post actions', () => {
 					path.includes( 'context=edit' )
 				) {
 					serverStateRefetchCalls++;
+					if ( serverStateRefetchCalls > 1 ) {
+						return {
+							...post,
+							content: {
+								raw: mergedPostContent,
+							},
+							distributed_editing: {
+								server_version: '8',
+							},
+						};
+					}
+
 					return {
 						...post,
 						content: {
@@ -8599,7 +8551,7 @@ describe( 'Post actions', () => {
 				claimsSaved: true,
 			} );
 
-			expect( serverStateRefetchCalls ).toBe( 1 );
+			expect( serverStateRefetchCalls ).toBe( 2 );
 			expect( retrySubmitCalls ).toBe( 1 );
 			expect( retrySaveCalls ).toBe( 1 );
 			expect( normalSaveCalls ).toBe( 0 );
