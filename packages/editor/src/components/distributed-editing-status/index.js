@@ -1582,15 +1582,32 @@ function getDistributedEditingSameBlockConflictComparison(
 	editedPostContent
 ) {
 	const normalized = normalizeDistributedEditingSessionState( sessionState );
+	const isSameBlockConflictReason =
+		DISTRIBUTED_EDITING_SAME_BLOCK_CONFLICT_REASONS.has(
+			normalized.localRebaseResultReason
+		);
+	const hasConflictResolutionChoice = [
+		DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_CHOICES.LOCAL,
+		DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_CHOICES.LATEST_WORDPRESS,
+	].includes( normalized.staleBaseConflictResolutionChoice );
+	const isRetrySubmitProofAccepted =
+		normalized.retrySubmitProofStatus ===
+			DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.ACCEPTED_FOR_FUTURE_SAVE &&
+		normalized.retrySubmitAccepted &&
+		! normalized.staleBaseConflictResolutionRequiresFreshProof;
+	const isManualSameBlockConflict =
+		normalized.disposition ===
+			DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION &&
+		normalized.localRebaseResultStatus ===
+			DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.MANUAL_CONFLICT_REQUIRED &&
+		isSameBlockConflictReason;
+	const isCheckedSameBlockConflictChoice =
+		isSameBlockConflictReason &&
+		hasConflictResolutionChoice &&
+		isRetrySubmitProofAccepted;
 
 	if (
-		normalized.disposition !==
-			DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION ||
-		normalized.localRebaseResultStatus !==
-			DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.MANUAL_CONFLICT_REQUIRED ||
-		! DISTRIBUTED_EDITING_SAME_BLOCK_CONFLICT_REASONS.has(
-			normalized.localRebaseResultReason
-		) ||
+		( ! isManualSameBlockConflict && ! isCheckedSameBlockConflictChoice ) ||
 		typeof normalized.clientBaseContent !== 'string' ||
 		typeof normalized.refetchedServerContent !== 'string' ||
 		typeof editedPostContent !== 'string'
@@ -1628,6 +1645,9 @@ function getDistributedEditingSameBlockConflictComparison(
 			text: getVisibleConflictText( comparedBlocks.local ),
 		},
 	];
+	const savePrepared =
+		normalized.retrySubmitSaveStatus ===
+		DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.READY;
 
 	return {
 		blockIndex: comparedBlocks.blockIndex,
@@ -1648,6 +1668,12 @@ function getDistributedEditingSameBlockConflictComparison(
 			normalized.retrySubmitProofStatus !==
 				DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.ACCEPTED_FOR_FUTURE_SAVE,
 		retrySubmitProofStatus: normalized.retrySubmitProofStatus,
+		retrySubmitSaveStatus: normalized.retrySubmitSaveStatus,
+		canPrepareSave:
+			Boolean( normalized.staleBaseConflictResolutionChoice ) &&
+			isRetrySubmitProofAccepted &&
+			! savePrepared,
+		savePrepared,
 		rows,
 	};
 }
@@ -1748,13 +1774,24 @@ function getConflictComparisonGuide( comparison ) {
 		comparison.retrySubmitProofStatus ===
 		DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.ACCEPTED_FOR_FUTURE_SAVE;
 
+	if ( isProofAccepted && comparison.savePrepared ) {
+		return {
+			status: 'save_prepared',
+			currentStep: 'save',
+			title: __( 'Save is prepared' ),
+			message: __(
+				'Use the editor Save button to update WordPress. Local changes remain pending until WordPress confirms.'
+			),
+		};
+	}
+
 	if ( isProofAccepted ) {
 		return {
 			status: 'choice_checked',
-			currentStep: 'save',
+			currentStep: 'prepare',
 			title: __( 'WordPress checked this choice' ),
 			message: __(
-				'Use Save to send the guarded update. WordPress has not changed the post yet.'
+				'Prepare Save before using the editor Save button. WordPress has not changed the post yet.'
 			),
 		};
 	}
@@ -1797,8 +1834,13 @@ function getConflictComparisonGuideSteps( currentStep ) {
 			isCurrent: currentStep === 'check',
 		},
 		{
+			id: 'prepare',
+			label: __( 'Prepare Save' ),
+			isCurrent: currentStep === 'prepare',
+		},
+		{
 			id: 'save',
-			label: __( 'Save after check' ),
+			label: __( 'Use Save' ),
 			isCurrent: currentStep === 'save',
 		},
 	];
@@ -1810,6 +1852,7 @@ function DistributedEditingSameBlockConflictComparison( {
 	onSelectLocalVersion,
 	onSelectLatestWordPressVersion,
 	onRequestFreshProof,
+	onPrepareSave,
 } ) {
 	if ( ! comparison ) {
 		return null;
@@ -1819,7 +1862,9 @@ function DistributedEditingSameBlockConflictComparison( {
 		id: 'same-block-conflict-comparison',
 		conflictResolutionChoice: comparison.resolutionChoice,
 		localRebaseResultReason: comparison.reason,
-		nextStepAction: 'export_for_manual_conflict_review',
+		nextStepAction: comparison.canPrepareSave
+			? 'prepare_guarded_save'
+			: 'export_for_manual_conflict_review',
 	};
 	const guide = getConflictComparisonGuide( comparison );
 	const guideSteps = getConflictComparisonGuideSteps( guide.currentStep );
@@ -1873,6 +1918,15 @@ function DistributedEditingSameBlockConflictComparison( {
 			) }
 			data-distributed-editing-conflict-resolution-proof-status={
 				comparison.retrySubmitProofStatus
+			}
+			data-distributed-editing-conflict-resolution-prepare-save-ready={ formatDataBoolean(
+				comparison.canPrepareSave
+			) }
+			data-distributed-editing-conflict-resolution-save-prepared={ formatDataBoolean(
+				comparison.savePrepared
+			) }
+			data-distributed-editing-conflict-resolution-save-status={
+				comparison.retrySubmitSaveStatus
 			}
 			data-distributed-editing-conflict-resolution-guide-status={
 				guide.status
@@ -1967,6 +2021,15 @@ function DistributedEditingSameBlockConflictComparison( {
 							}
 						>
 							{ __( 'Check this choice' ) }
+						</Button>
+					) }
+					{ comparison.canPrepareSave && (
+						<Button
+							__next40pxDefaultSize
+							variant="primary"
+							onClick={ () => onPrepareSave?.( actionItem ) }
+						>
+							{ __( 'Prepare Save' ) }
 						</Button>
 					) }
 					<Button
@@ -2325,6 +2388,12 @@ export default function DistributedEditingStatus( {
 				onRequestFreshProof={ ( item ) =>
 					handleAction(
 						DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFRESH_RETRY_SUBMIT_PROOF,
+						item
+					)
+				}
+				onPrepareSave={ ( item ) =>
+					handleAction(
+						DISTRIBUTED_EDITING_NOTICE_ACTIONS.PREPARE_RETRY_SUBMIT_SAVE,
 						item
 					)
 				}

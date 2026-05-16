@@ -944,7 +944,8 @@ describe( 'DistributedEditingStatus', () => {
 		).toBeVisible();
 		expect( screen.getByText( 'Choose version' ) ).toBeVisible();
 		expect( screen.getByText( 'Check choice' ) ).toBeVisible();
-		expect( screen.getByText( 'Save after check' ) ).toBeVisible();
+		expect( screen.getByText( 'Prepare Save' ) ).toBeVisible();
+		expect( screen.getByText( 'Use Save' ) ).toBeVisible();
 		expect(
 			within( status ).getByRole( 'button', {
 				name: 'Get latest post',
@@ -1025,6 +1026,14 @@ describe( 'DistributedEditingStatus', () => {
 		expect( comparison ).toHaveAttribute(
 			'data-distributed-editing-conflict-resolution-guide-status',
 			'choose_version'
+		);
+		expect( comparison ).toHaveAttribute(
+			'data-distributed-editing-conflict-resolution-prepare-save-ready',
+			'false'
+		);
+		expect( comparison ).toHaveAttribute(
+			'data-distributed-editing-conflict-resolution-save-prepared',
+			'false'
 		);
 		expect( screen.getByLabelText( 'Base version' ) ).toHaveValue(
 			'Base paragraph edit & seed.'
@@ -1324,6 +1333,10 @@ describe( 'DistributedEditingStatus', () => {
 			)
 		).toBeVisible();
 		expect(
+			screen.getByText( 'Prepare Save' )
+		).toBeVisible();
+		expect( screen.getByText( 'Use Save' ) ).toBeVisible();
+		expect(
 			within( comparison ).getByRole( 'button', {
 				name: 'Keep your local version',
 			} )
@@ -1361,6 +1374,101 @@ describe( 'DistributedEditingStatus', () => {
 		expect(
 			await screen.findByText(
 				'WordPress checked this choice. Prepare Save before updating the post.'
+			)
+		).toBeVisible();
+	} );
+
+	it( 'prepares Save from a checked same-block conflict choice without saving', async () => {
+		const user = userEvent.setup();
+		const actions = setupDistributedEditingStatusDispatch();
+
+		setupDistributedEditingStatusSelect( {
+			currentPost: { id: 42, type: 'post' },
+			editedPostContent:
+				'<!-- wp:paragraph --><p>Local checked conflict choice.</p><!-- /wp:paragraph -->',
+			sessionState: {
+				disposition: DISTRIBUTED_EDITING_DISPOSITIONS.IDLE,
+				reasonCode: null,
+				pendingChangeCount: 1,
+				remoteChangeCount: 0,
+				requiresServerStateRefetch: false,
+				refetchedServerState: true,
+				canExportLocalUpdates: true,
+				localRebasePlanStatus:
+					DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES.READY,
+				localRebaseResultStatus:
+					DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.MANUAL_CONFLICT_REQUIRED,
+				localRebaseResultReason: 'same_block_changed',
+				requiresManualConflictResolution: false,
+				staleBaseConflictResolutionStatus:
+					DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_STATUSES.LOCAL_VERSION_SELECTED,
+				staleBaseConflictResolutionChoice:
+					DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_CHOICES.LOCAL,
+				staleBaseConflictResolutionRequiresFreshProof: false,
+				retrySubmitProofStatus:
+					DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.ACCEPTED_FOR_FUTURE_SAVE,
+				retrySubmitAccepted: true,
+				retrySubmitSavePathRequired: true,
+				clientBaseContent:
+					'<!-- wp:paragraph --><p>Base checked conflict choice.</p><!-- /wp:paragraph -->',
+				refetchedServerContent:
+					'<!-- wp:paragraph --><p>Server checked conflict choice.</p><!-- /wp:paragraph -->',
+			},
+		} );
+
+		render( <DistributedEditingStatus /> );
+
+		const comparison = screen.getByRole( 'region', {
+			name: 'Distributed editing conflict comparison',
+		} );
+
+		expect( comparison ).toHaveAttribute(
+			'data-distributed-editing-conflict-resolution-guide-status',
+			'choice_checked'
+		);
+		expect( comparison ).toHaveAttribute(
+			'data-distributed-editing-conflict-resolution-prepare-save-ready',
+			'true'
+		);
+		expect( comparison ).toHaveAttribute(
+			'data-distributed-editing-conflict-resolution-save-prepared',
+			'false'
+		);
+		expect(
+			screen.getByText( 'WordPress checked this choice' )
+		).toBeVisible();
+		expect(
+			screen.getByText(
+				'Prepare Save before using the editor Save button. WordPress has not changed the post yet.'
+			)
+		).toBeVisible();
+		expect(
+			within( comparison ).queryByRole( 'button', {
+				name: 'Check this choice',
+			} )
+		).not.toBeInTheDocument();
+
+		await user.click(
+			within( comparison ).getByRole( 'button', {
+				name: 'Prepare Save',
+			} )
+		);
+
+		expect(
+			actions.__experimentalPrepareDistributedEditingRetrySubmitSaveAfterProof
+		).toHaveBeenCalledTimes( 1 );
+		expect(
+			actions.__experimentalSaveDistributedEditingRetryAfterProof
+		).not.toHaveBeenCalled();
+		expect(
+			actions.__experimentalRefreshDistributedEditingRetrySubmitProof
+		).not.toHaveBeenCalled();
+		expect(
+			actions.__experimentalRefreshDistributedEditingServerStateAfterStaleBase
+		).not.toHaveBeenCalled();
+		expect(
+			await screen.findByText(
+				'Save prepared. Use Save to send these changes to WordPress.'
 			)
 		).toBeVisible();
 	} );
