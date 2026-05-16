@@ -10311,7 +10311,7 @@ function getDistributedEditingSaveStateVocabulary( {
 		DISTRIBUTED_EDITING_SAVE_REVIEW_CHECKPOINT_STATES.SERVER_REFRESH_REQUIRED
 	) {
 		summaryText =
-			'Protected local changes need a server refresh before the authoritative post can update.';
+			'Getting the latest post only refreshes server state; protected local changes stay in this editor until a later Save is confirmed.';
 	} else if (
 		reviewCheckpointState ===
 		DISTRIBUTED_EDITING_SAVE_REVIEW_CHECKPOINT_STATES.REVIEW_REQUIRED
@@ -10785,7 +10785,7 @@ function getDistributedEditingSaveJourneyCopyForStep( step ) {
 			return {
 				title: 'Save needs the latest post',
 				summary:
-					'Get the latest post before Save updates WordPress; local changes stay protected.',
+					'Getting the latest post refreshes server state before Save; local changes stay protected and WordPress is not updated yet.',
 			};
 		case DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.REVIEW_CHANGES:
 			return {

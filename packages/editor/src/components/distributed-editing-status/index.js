@@ -2592,7 +2592,7 @@ function getDistributedEditingHumanLoopStepCopy( humanLoopStepState ) {
 			return {
 				title: __( 'Get latest post' ),
 				summary: __(
-					'The server changed. Get the latest post before Save updates WordPress; local changes stay protected.'
+					'Getting the latest post only refreshes server state. Local changes stay protected and WordPress is not updated yet.'
 				),
 			};
 		case DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.REVIEW_CHANGES:
@@ -2646,7 +2646,7 @@ function getDistributedEditingHumanLoopSaveJourneyCopy( humanLoopStepState ) {
 			return {
 				title: __( 'Save needs the latest post' ),
 				summary: __(
-					'Get the latest post before Save updates WordPress; local changes stay protected.'
+					'Getting the latest post refreshes server state before Save; local changes stay protected and WordPress is not updated yet.'
 				),
 			};
 		case DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.REVIEW_CHANGES:
@@ -2718,7 +2718,7 @@ function getDistributedEditingEnabledShellProtectionLine( shellState ) {
 function getDistributedEditingEnabledShellSaveLine( shellState ) {
 	switch ( shellState.humanLoopStep ) {
 		case DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.GET_LATEST_POST:
-			return __( 'Get the latest post before Save.' );
+			return __( 'Getting the latest post only refreshes server state.' );
 		case DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.REVIEW_CHANGES:
 			return __( 'Review changes before Save.' );
 		case DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.READY_TO_SAVE:
@@ -7276,7 +7276,7 @@ function getRetrySaveHandoffBlockedText( descriptor ) {
 			return {
 				title: __( 'Save needs the latest post' ),
 				message: __(
-					'The latest post must be loaded before Save can continue. Protected local changes are still exportable; loading the latest post does not save over local changes.'
+					'Getting the latest post only refreshes server state; it does not discard protected local changes or save over other edits. Try Save again after it loads.'
 				),
 				...getNextStepDescriptor( 'get_latest_post' ),
 			};

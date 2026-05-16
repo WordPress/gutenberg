@@ -7287,7 +7287,7 @@ describe( 'distributed editing session state', () => {
 			reviewCheckpointState:
 				DISTRIBUTED_EDITING_SAVE_REVIEW_CHECKPOINT_STATES.SERVER_REFRESH_REQUIRED,
 			saveStateSummaryText:
-				'Protected local changes need a server refresh before the authoritative post can update.',
+				'Getting the latest post only refreshes server state; protected local changes stay in this editor until a later Save is confirmed.',
 			claimsSaved: false,
 		} );
 		expect( JSON.stringify( buttonStates ) ).not.toContain(
@@ -8327,7 +8327,7 @@ describe( 'distributed editing session state', () => {
 			authoritativePostState:
 				DISTRIBUTED_EDITING_SAVE_AUTHORITY_STATES.SERVER_REFRESH_REQUIRED_BEFORE_UPDATE,
 			saveStateSummaryText:
-				'Protected local changes need a server refresh before the authoritative post can update.',
+				'Getting the latest post only refreshes server state; protected local changes stay in this editor until a later Save is confirmed.',
 			actionKeys: [
 				DISTRIBUTED_EDITING_NOTICE_ACTIONS.EXPORT_LOCAL_UPDATES,
 				DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFETCH_SERVER_STATE,

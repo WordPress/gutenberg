@@ -433,7 +433,7 @@ describe( 'PostPublishButton', () => {
 					authoritativePostState:
 						'server_refresh_required_before_update',
 					saveStateSummaryText:
-						'Protected local changes need a server refresh before the authoritative post can update.',
+						'Getting the latest post only refreshes server state; protected local changes stay in this editor until a later Save is confirmed.',
 					authoritativePostUpdated: false,
 				} }
 				distributedEditingSaveJourneyState={ {
@@ -442,11 +442,11 @@ describe( 'PostPublishButton', () => {
 					action: 'get_latest_post',
 					title: 'Save needs the latest post',
 					summary:
-						'Get the latest post before Save updates WordPress; local changes stay protected.',
+						'Getting the latest post refreshes server state before Save; local changes stay protected and WordPress is not updated yet.',
 					actionHint: 'Get latest first',
 					requiresActionBeforeSave: true,
 					statusChromeSummary:
-						'Protected local changes need a server refresh before the authoritative post can update.',
+						'Getting the latest post only refreshes server state; protected local changes stay in this editor until a later Save is confirmed.',
 					statusChromeAuthorityState:
 						'server_refresh_required_before_update',
 					statusChromeAuthorityText:
@@ -461,7 +461,7 @@ describe( 'PostPublishButton', () => {
 		} );
 		expect( button ).toHaveAttribute(
 			'title',
-			'Get latest first. Get the latest post before Save updates WordPress; local changes stay protected. Protected local changes need a server refresh before the authoritative post can update.'
+			'Get latest first. Getting the latest post refreshes server state before Save; local changes stay protected and WordPress is not updated yet. Getting the latest post only refreshes server state; protected local changes stay in this editor until a later Save is confirmed.'
 		);
 		expect( button ).toHaveAttribute(
 			'data-distributed-editing-save-control-journey-step',
@@ -486,7 +486,7 @@ describe( 'PostPublishButton', () => {
 		const cueLabel = screen.getByText( 'Save needs the latest post' );
 		const cueActionHint = screen.getByText( 'Get latest first' );
 		const cue = screen.getByLabelText(
-			'Get latest first. Get the latest post before Save updates WordPress; local changes stay protected. Protected local changes need a server refresh before the authoritative post can update.'
+			'Get latest first. Getting the latest post refreshes server state before Save; local changes stay protected and WordPress is not updated yet. Getting the latest post only refreshes server state; protected local changes stay in this editor until a later Save is confirmed.'
 		);
 		expect( cueLabel ).toBeVisible();
 		expect( cueActionHint ).toBeVisible();
@@ -504,7 +504,7 @@ describe( 'PostPublishButton', () => {
 		);
 		expect( cue ).toHaveAttribute(
 			'data-distributed-editing-save-control-journey-status-summary',
-			'Protected local changes need a server refresh before the authoritative post can update.'
+			'Getting the latest post only refreshes server state; protected local changes stay in this editor until a later Save is confirmed.'
 		);
 		expect( cue ).toHaveAttribute(
 			'data-distributed-editing-save-control-journey-calls-normal-save',

@@ -9300,7 +9300,7 @@ describe( 'DistributedEditingStatusSurface', () => {
 				reason: DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.SERVER_STATE_REFETCH_REQUIRED,
 				title: 'Save needs the latest post',
 				message:
-					'The latest post must be loaded before Save can continue. Protected local changes are still exportable; loading the latest post does not save over local changes.',
+					'Getting the latest post only refreshes server state; it does not discard protected local changes or save over other edits. Try Save again after it loads.',
 				nextStep: 'Get the latest post before trying Save again.',
 				nextStepAction: 'get_latest_post',
 				refetch: true,
