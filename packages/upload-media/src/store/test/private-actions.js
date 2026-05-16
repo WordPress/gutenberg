@@ -502,6 +502,7 @@ describe( 'private actions', () => {
 			expect( error.file ).toBe( gifFile );
 			expect( error.cause ).toBeInstanceOf( Error );
 			expect( error.cause.message ).toBe( 'worker crashed' );
+			expect( console ).toHaveErrored();
 		} );
 
 		it( 'returns early when the queued item is missing', async () => {
