@@ -2028,6 +2028,9 @@ function DistributedEditingSameBlockConflictComparison( {
 							label: __( 'Change to latest from WordPress' ),
 							onClick: onSelectLatestWordPressVersion,
 							targetRow: 'server',
+							title: __(
+								'Change the selected version. This does not save until WordPress checks the choice and Save confirms.'
+							),
 							variant: 'tertiary',
 					  }
 					: {
@@ -2036,6 +2039,9 @@ function DistributedEditingSameBlockConflictComparison( {
 							label: __( 'Change to local version' ),
 							onClick: onSelectLocalVersion,
 							targetRow: 'local',
+							title: __(
+								'Change the selected version. This does not save until WordPress checks the choice and Save confirms.'
+							),
 							variant: 'tertiary',
 					  },
 		  ]
@@ -2046,6 +2052,9 @@ function DistributedEditingSameBlockConflictComparison( {
 					label: __( 'Keep your local version' ),
 					onClick: onSelectLocalVersion,
 					targetRow: 'local',
+					title: __(
+						'Select your local version. This does not save until WordPress checks the choice and Save confirms.'
+					),
 					variant: isLocalChoiceSelected ? 'primary' : 'secondary',
 				},
 				{
@@ -2054,6 +2063,9 @@ function DistributedEditingSameBlockConflictComparison( {
 					label: __( 'Use latest from WordPress' ),
 					onClick: onSelectLatestWordPressVersion,
 					targetRow: 'server',
+					title: __(
+						'Select the latest WordPress version. This does not save until WordPress checks the choice and Save confirms.'
+					),
 					variant: isLatestWordPressChoiceSelected
 						? 'primary'
 						: 'secondary',
@@ -2256,10 +2268,12 @@ function DistributedEditingSameBlockConflictComparison( {
 							data-distributed-editing-conflict-choice-selected={ formatDataBoolean(
 								choiceAction.isSelected
 							) }
+							data-distributed-editing-conflict-choice-selection-does-not-save="true"
 							data-distributed-editing-conflict-choice-target={
 								choiceAction.targetRow
 							}
 							key={ choiceAction.id }
+							title={ choiceAction.title }
 							variant={ choiceAction.variant }
 							onClick={ choiceAction.onClick }
 						>

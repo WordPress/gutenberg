@@ -969,16 +969,36 @@ describe( 'DistributedEditingStatus', () => {
 			'.editor-distributed-editing-status__conflict-comparison-action-group'
 		);
 		expect( actionGroups ).toHaveLength( 2 );
-		expect(
-			within( actionGroups[ 0 ] ).getByRole( 'button', {
+		const keepLocalButton = within( actionGroups[ 0 ] ).getByRole(
+			'button',
+			{
 				name: 'Keep your local version',
-			} )
-		).toBeVisible();
-		expect(
-			within( actionGroups[ 0 ] ).getByRole( 'button', {
+			}
+		);
+		const useLatestButton = within( actionGroups[ 0 ] ).getByRole(
+			'button',
+			{
 				name: 'Use latest from WordPress',
-			} )
-		).toBeVisible();
+			}
+		);
+		expect( keepLocalButton ).toBeVisible();
+		expect( keepLocalButton ).toHaveAttribute(
+			'data-distributed-editing-conflict-choice-selection-does-not-save',
+			'true'
+		);
+		expect( keepLocalButton ).toHaveAttribute(
+			'title',
+			'Select your local version. This does not save until WordPress checks the choice and Save confirms.'
+		);
+		expect( useLatestButton ).toBeVisible();
+		expect( useLatestButton ).toHaveAttribute(
+			'data-distributed-editing-conflict-choice-selection-does-not-save',
+			'true'
+		);
+		expect( useLatestButton ).toHaveAttribute(
+			'title',
+			'Select the latest WordPress version. This does not save until WordPress checks the choice and Save confirms.'
+		);
 		expect(
 			within( actionGroups[ 1 ] ).getByRole( 'button', {
 				name: 'Export for review',
@@ -1694,13 +1714,20 @@ describe( 'DistributedEditingStatus', () => {
 				name: 'Use latest from WordPress',
 			} )
 		).not.toBeInTheDocument();
-		expect(
-			within( comparison ).getByRole( 'button', {
-				name: 'Change to latest from WordPress',
-			} )
-		).toHaveAttribute(
+		const changeVersionButton = within( comparison ).getByRole( 'button', {
+			name: 'Change to latest from WordPress',
+		} );
+		expect( changeVersionButton ).toHaveAttribute(
 			'data-distributed-editing-conflict-choice-compact-change',
 			'true'
+		);
+		expect( changeVersionButton ).toHaveAttribute(
+			'data-distributed-editing-conflict-choice-selection-does-not-save',
+			'true'
+		);
+		expect( changeVersionButton ).toHaveAttribute(
+			'title',
+			'Change the selected version. This does not save until WordPress checks the choice and Save confirms.'
 		);
 		expect(
 			within( comparison )
