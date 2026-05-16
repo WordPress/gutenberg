@@ -8820,6 +8820,11 @@ describe( 'DistributedEditingStatusSurface', () => {
 				'Compare the local changes with the latest post before choosing what to keep.'
 			)
 		).toBeVisible();
+		expect(
+			screen.getByText(
+				'Save now: Compare changes before Save can update the post.'
+			)
+		).toBeVisible();
 		const reorderStatusItem = screen
 			.getByText( 'Compare conflicting changes' )
 			// eslint-disable-next-line testing-library/no-node-access
@@ -8827,6 +8832,10 @@ describe( 'DistributedEditingStatusSurface', () => {
 		expect( reorderStatusItem ).toHaveAttribute(
 			'data-distributed-editing-next-step',
 			'export_for_manual_conflict_review'
+		);
+		expect( reorderStatusItem ).toHaveAttribute(
+			'data-distributed-editing-save-now-action',
+			'compare_conflicting_changes'
 		);
 		expect( screen.queryByText( /wp:paragraph/ ) ).not.toBeInTheDocument();
 	} );

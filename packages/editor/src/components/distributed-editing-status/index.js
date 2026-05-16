@@ -7718,6 +7718,23 @@ function getStaleBaseStatusText( descriptor ) {
 }
 
 function getSaveNowContext( descriptor ) {
+	if (
+		descriptor?.requiresManualConflictResolution ||
+		descriptor?.localRebaseResultStatus ===
+			DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.MANUAL_CONFLICT_REQUIRED
+	) {
+		return {
+			saveNowContextAction: 'compare_conflicting_changes',
+			saveNowContextMessage: sprintf(
+				/* translators: %s: Distributed Editing action needed before Save can update the post, such as "Get latest first". */
+				__( 'Save now: %s before Save can update the post.' ),
+				__( 'Compare changes' )
+			),
+			saveNowContextStep:
+				DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.LOCAL_CHANGES_PROTECTED,
+		};
+	}
+
 	const saveJourneyState =
 		getDistributedEditingSaveJourneyStateForSessionState(
 			getSaveJourneyContextState( descriptor )
