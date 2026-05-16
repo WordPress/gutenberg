@@ -419,6 +419,17 @@
 	font-size: 12px;
 }
 
+.editor-distributed-editing-status__structural-conflict-change-cue {
+	background: $white;
+	border: 1px solid $gray-300;
+	border-radius: $radius-small;
+	color: $gray-700;
+	font-size: 12px;
+	font-weight: 500;
+	padding: 2px $grid-unit-05;
+	width: fit-content;
+}
+
 .editor-distributed-editing-status__structural-conflict-samples {
 	display: grid;
 	gap: $grid-unit-05;

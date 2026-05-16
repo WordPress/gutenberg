@@ -1442,6 +1442,12 @@ describe( 'DistributedEditingStatus', () => {
 		expect(
 			within( summary ).getByText( 'Local keeps beta.' )
 		).toBeVisible();
+		expect(
+			within( summary ).getByText( 'Original structure' )
+		).toBeVisible();
+		expect(
+			within( summary ).getAllByText( 'Deletes 1 block' )
+		).toHaveLength( 2 );
 		expect( within( summary ).getByText( 'Blocks deleted' ) ).toBeVisible();
 		expect(
 			within( summary ).getAllByText( '-1 block' )
@@ -1461,6 +1467,121 @@ describe( 'DistributedEditingStatus', () => {
 				name: 'Distributed editing conflict comparison',
 			} )
 		).not.toBeInTheDocument();
+		expect( screen.queryByText( /wp:paragraph/ ) ).not.toBeInTheDocument();
+	} );
+
+	it( 'renders compact structural change cues for inserted and reordered blocks', () => {
+		setupDistributedEditingStatusDispatch();
+		setupDistributedEditingStatusSelect( {
+			editedPostContent:
+				'<!-- wp:paragraph --><p>Base alpha.</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Local inserted.</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Base beta.</p><!-- /wp:paragraph -->',
+			sessionState: {
+				disposition:
+					DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+				reasonCode:
+					DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+				pendingChangeCount: 1,
+				remoteChangeCount: 1,
+				requiresServerStateRefetch: false,
+				refetchedServerState: true,
+				canExportLocalUpdates: true,
+				localRebasePlanStatus:
+					DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES.READY,
+				localRebaseResultStatus:
+					DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.MANUAL_CONFLICT_REQUIRED,
+				localRebaseResultReason: 'block_inserted',
+				requiresManualConflictResolution: true,
+				clientBaseContent:
+					'<!-- wp:paragraph --><p>Base alpha.</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Base beta.</p><!-- /wp:paragraph -->',
+				refetchedServerContent:
+					'<!-- wp:paragraph --><p>Base alpha.</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Server inserted.</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Base beta.</p><!-- /wp:paragraph -->',
+			},
+		} );
+
+		const view = render( <DistributedEditingStatus /> );
+		const insertedSummary = screen.getByRole( 'region', {
+			name: 'Distributed editing structural conflict summary',
+		} );
+
+		expect(
+			within( insertedSummary ).getAllByText( 'Adds 1 block' )
+		).toHaveLength( 2 );
+
+		// eslint-disable-next-line testing-library/no-node-access
+		const insertedColumns = insertedSummary.querySelectorAll(
+			'[data-distributed-editing-structural-conflict-row-change-kind]'
+		);
+		expect(
+			Array.from( insertedColumns ).map( ( column ) =>
+				column.getAttribute(
+					'data-distributed-editing-structural-conflict-row-change-kind'
+				)
+			)
+		).toEqual( [ 'base', 'blocks_added', 'blocks_added' ] );
+		expect(
+			Array.from( insertedColumns ).map( ( column ) =>
+				column.getAttribute(
+					'data-distributed-editing-structural-conflict-row-count-delta'
+				)
+			)
+		).toEqual( [ '0', '1', '1' ] );
+
+		view.unmount();
+		useSelect.mockReset();
+
+		setupDistributedEditingStatusSelect( {
+			editedPostContent:
+				'<!-- wp:paragraph --><p>Base alpha.</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Base gamma.</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Base beta.</p><!-- /wp:paragraph -->',
+			sessionState: {
+				disposition:
+					DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+				reasonCode:
+					DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+				pendingChangeCount: 1,
+				remoteChangeCount: 1,
+				requiresServerStateRefetch: false,
+				refetchedServerState: true,
+				canExportLocalUpdates: true,
+				localRebasePlanStatus:
+					DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES.READY,
+				localRebaseResultStatus:
+					DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.MANUAL_CONFLICT_REQUIRED,
+				localRebaseResultReason: 'block_reordered',
+				requiresManualConflictResolution: true,
+				clientBaseContent:
+					'<!-- wp:paragraph --><p>Base alpha.</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Base beta.</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Base gamma.</p><!-- /wp:paragraph -->',
+				refetchedServerContent:
+					'<!-- wp:paragraph --><p>Base beta.</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Base alpha.</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Base gamma.</p><!-- /wp:paragraph -->',
+			},
+		} );
+
+		render( <DistributedEditingStatus /> );
+		const reorderedSummary = screen.getByRole( 'region', {
+			name: 'Distributed editing structural conflict summary',
+		} );
+
+		expect(
+			within( reorderedSummary ).getAllByText( 'Reordered' )
+		).toHaveLength( 2 );
+
+		// eslint-disable-next-line testing-library/no-node-access
+		const reorderedColumns = reorderedSummary.querySelectorAll(
+			'[data-distributed-editing-structural-conflict-row-change-kind]'
+		);
+		expect(
+			Array.from( reorderedColumns ).map( ( column ) =>
+				column.getAttribute(
+					'data-distributed-editing-structural-conflict-row-change-kind'
+				)
+			)
+		).toEqual( [ 'base', 'blocks_reordered', 'blocks_reordered' ] );
+		expect(
+			Array.from( reorderedColumns ).map( ( column ) =>
+				column.getAttribute(
+					'data-distributed-editing-structural-conflict-row-count-delta'
+				)
+			)
+		).toEqual( [ '0', '0', '0' ] );
 		expect( screen.queryByText( /wp:paragraph/ ) ).not.toBeInTheDocument();
 	} );
 

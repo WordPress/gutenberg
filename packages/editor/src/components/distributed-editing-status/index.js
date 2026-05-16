@@ -1958,6 +1958,15 @@ function getDistributedEditingStructuralConflictSummary(
 		return null;
 	}
 
+	const baseSnapshot = snapshots[ 0 ];
+	const snapshotsWithChangeCues = snapshots.map( ( snapshot ) => ( {
+		...snapshot,
+		changeCue: getStructuralConflictSnapshotChangeCue(
+			snapshot,
+			baseSnapshot
+		),
+	} ) );
+
 	return {
 		baseBlockCount,
 		localBlockCount,
@@ -1967,8 +1976,7 @@ function getDistributedEditingStructuralConflictSummary(
 			normalized.localRebaseResultReason
 		),
 		retrySubmitProofStatus: normalized.retrySubmitProofStatus,
-		retrySubmitSavePathRequired:
-			normalized.retrySubmitSavePathRequired,
+		retrySubmitSavePathRequired: normalized.retrySubmitSavePathRequired,
 		retrySubmitSavePrepared: normalized.retrySubmitSavePrepared,
 		retrySubmitSaveReady: normalized.retrySubmitSaveReady,
 		retrySubmitSaveStatus: normalized.retrySubmitSaveStatus,
@@ -1978,7 +1986,7 @@ function getDistributedEditingStructuralConflictSummary(
 		resolutionRequiresFreshProof:
 			normalized.staleBaseConflictResolutionRequiresFreshProof,
 		resolutionStatus: normalized.staleBaseConflictResolutionStatus,
-		snapshots,
+		snapshots: snapshotsWithChangeCues,
 	};
 }
 
@@ -1992,6 +2000,7 @@ function getStructuralConflictSnapshot( { content, id, label } ) {
 
 	return {
 		blockCount: blockChunks.length,
+		comparisonTexts: visibleTexts,
 		id,
 		label,
 		overflowCount: Math.max( 0, blockChunks.length - sampleTexts.length ),
@@ -2008,6 +2017,71 @@ function getStructuralConflictSnapshot( { content, id, label } ) {
 				? previewTexts
 				: [ DISTRIBUTED_EDITING_EMPTY_CONFLICT_TEXT ],
 	};
+}
+
+function getStructuralConflictSnapshotChangeCue( snapshot, baseSnapshot ) {
+	if ( snapshot.id === 'base' ) {
+		return {
+			countDelta: 0,
+			kind: 'base',
+			label: __( 'Original structure' ),
+		};
+	}
+
+	const countDelta = snapshot.blockCount - baseSnapshot.blockCount;
+
+	if ( countDelta > 0 ) {
+		return {
+			countDelta,
+			kind: 'blocks_added',
+			label: sprintf(
+				/* translators: %d: number of added blocks. */
+				_n( 'Adds %d block', 'Adds %d blocks', countDelta ),
+				countDelta
+			),
+		};
+	}
+
+	if ( countDelta < 0 ) {
+		const removedCount = Math.abs( countDelta );
+
+		return {
+			countDelta,
+			kind: 'blocks_deleted',
+			label: sprintf(
+				/* translators: %d: number of deleted blocks. */
+				_n( 'Deletes %d block', 'Deletes %d blocks', removedCount ),
+				removedCount
+			),
+		};
+	}
+
+	if (
+		! areStructuralConflictTextSequencesEqual(
+			snapshot.comparisonTexts,
+			baseSnapshot.comparisonTexts
+		)
+	) {
+		return {
+			countDelta,
+			kind: 'blocks_reordered',
+			label: __( 'Reordered' ),
+		};
+	}
+
+	return {
+		countDelta,
+		kind: 'same_count',
+		label: __( 'Same block count' ),
+	};
+}
+
+function areStructuralConflictTextSequencesEqual( a = [], b = [] ) {
+	if ( a.length !== b.length ) {
+		return false;
+	}
+
+	return a.every( ( item, index ) => item === b[ index ] );
 }
 
 function getSerializedBlockChunksForStructuralSummary( content ) {
@@ -2799,6 +2873,12 @@ function DistributedEditingStructuralConflictSummary( {
 						data-distributed-editing-structural-conflict-row-block-count={
 							snapshot.blockCount
 						}
+						data-distributed-editing-structural-conflict-row-change-kind={
+							snapshot.changeCue.kind
+						}
+						data-distributed-editing-structural-conflict-row-count-delta={
+							snapshot.changeCue.countDelta
+						}
 						key={ snapshot.id }
 					>
 						<div className="editor-distributed-editing-status__structural-conflict-column-header">
@@ -2809,6 +2889,9 @@ function DistributedEditingStructuralConflictSummary( {
 								) }
 							</span>
 						</div>
+						<span className="editor-distributed-editing-status__structural-conflict-change-cue">
+							{ snapshot.changeCue.label }
+						</span>
 						<ul className="editor-distributed-editing-status__structural-conflict-samples">
 							{ snapshot.sampleTexts.map( ( text, index ) => (
 								<li
