@@ -345,6 +345,17 @@ export const DISTRIBUTED_EDITING_RETRY_SAVE_REVIEW_APPROVAL_PROOF_STATUSES =
 	} );
 
 /**
+ * Stable statuses for editor-side block identity request proof preparation.
+ * These are data descriptors only; they do not save or call REST.
+ */
+export const DISTRIBUTED_EDITING_BLOCK_IDENTITY_REQUEST_PROOF_STATUSES =
+	Object.freeze( {
+		NONE: 'none',
+		READY: 'ready',
+		BLOCKED: 'blocked',
+	} );
+
+/**
  * Stable KSES risky-block review statuses. These are editor data states for
  * future block annotation and pre-publish review UI; they do not save.
  */
@@ -7496,6 +7507,299 @@ export async function getDistributedEditingPostContentSha256Hash(
 	return Array.from( new Uint8Array( digest ) )
 		.map( ( byte ) => byte.toString( 16 ).padStart( 2, '0' ) )
 		.join( '' );
+}
+
+/**
+ * Prepares content-free block identity request proof from serialized editor
+ * content and accepted sync metadata.
+ *
+ * The descriptor is inert. It does not call REST, save, mutate editor content,
+ * persist post content, create revisions, change post locks, or claim saved
+ * state.
+ *
+ * @param {Object} args                         Request-proof inputs.
+ * @param {Object} args.acceptedSyncMeta        Accepted base sync metadata.
+ * @param {string} args.proposedPostContent     Serialized editor content.
+ * @param {string} [args.proposedPostContentHash] Optional SHA-256 evidence.
+ * @param {string|number} [args.clientBaseVersion] Optional base version.
+ *
+ * @return {Promise<Object>} Request-proof descriptor.
+ */
+export async function getDistributedEditingBlockIdentityRequestProofDescriptor( {
+	acceptedSyncMeta = null,
+	proposedPostContent = '',
+	proposedPostContentHash = null,
+	clientBaseVersion = null,
+} = {} ) {
+	const acceptedMeta =
+		normalizeDistributedEditingBlockIdentityAcceptedSyncMeta(
+			acceptedSyncMeta
+		);
+
+	if ( acceptedMeta.status !== 'valid' ) {
+		return createDistributedEditingBlockIdentityRequestProofBlockedDescriptor(
+			acceptedMeta.reason,
+			{
+				invalidDetail: acceptedMeta.detail,
+			}
+		);
+	}
+
+	const acceptedBlocks = acceptedMeta.syncMeta.blocks;
+	const acceptedBlocksByHash = new Map();
+
+	for ( const block of acceptedBlocks ) {
+		if ( acceptedBlocksByHash.has( block.serialized_hash ) ) {
+			return createDistributedEditingBlockIdentityRequestProofBlockedDescriptor(
+				'accepted_repeated_serialized_hash_ambiguous',
+				{
+					clientBaseVersion: String(
+						getFirstDefined(
+							clientBaseVersion,
+							acceptedMeta.syncMeta.version
+						)
+					),
+					acceptedBlockCount: acceptedBlocks.length,
+				}
+			);
+		}
+
+		acceptedBlocksByHash.set( block.serialized_hash, block );
+	}
+
+	const tokens = getSerializedBlockTokens( proposedPostContent );
+
+	if ( tokens.status !== 'safe' ) {
+		return createDistributedEditingBlockIdentityRequestProofBlockedDescriptor(
+			'unsafe_serialized_blocks',
+			{
+				clientBaseVersion: String(
+					getFirstDefined(
+						clientBaseVersion,
+						acceptedMeta.syncMeta.version
+					)
+				),
+				acceptedBlockCount: acceptedBlocks.length,
+				unsafeSerializedBlockReason: tokens.reason,
+			}
+		);
+	}
+
+	const normalizedProposedPostContentHash =
+		typeof proposedPostContentHash === 'string' &&
+		proposedPostContentHash.length > 0
+			? proposedPostContentHash
+			: await getDistributedEditingPostContentSha256Hash(
+					proposedPostContent
+			  );
+
+	if (
+		! isDistributedEditingBlockIdentitySha256Hash(
+			normalizedProposedPostContentHash
+		)
+	) {
+		return createDistributedEditingBlockIdentityRequestProofBlockedDescriptor(
+			'missing_hash_evidence',
+			{
+				clientBaseVersion: String(
+					getFirstDefined(
+						clientBaseVersion,
+						acceptedMeta.syncMeta.version
+					)
+				),
+				acceptedBlockCount: acceptedBlocks.length,
+				proposedBlockCount: tokens.blocks.length,
+			}
+		);
+	}
+
+	const proposedBlockHashCounts = new Map();
+	const proposedBlocks = [];
+
+	for ( const [ index, serializedBlock ] of tokens.blocks.entries() ) {
+		const serializedHash =
+			await getDistributedEditingPostContentSha256Hash( serializedBlock );
+
+		if ( ! isDistributedEditingBlockIdentitySha256Hash( serializedHash ) ) {
+			return createDistributedEditingBlockIdentityRequestProofBlockedDescriptor(
+				'missing_hash_evidence',
+				{
+					clientBaseVersion: String(
+						getFirstDefined(
+							clientBaseVersion,
+							acceptedMeta.syncMeta.version
+						)
+					),
+					acceptedBlockCount: acceptedBlocks.length,
+					proposedBlockCount: tokens.blocks.length,
+				}
+			);
+		}
+
+		const repeatedProposedHashCount =
+			proposedBlockHashCounts.get( serializedHash ) ?? 0;
+
+		if ( repeatedProposedHashCount > 0 ) {
+			return createDistributedEditingBlockIdentityRequestProofBlockedDescriptor(
+				'proposed_repeated_serialized_hash_ambiguous',
+				{
+					clientBaseVersion: String(
+						getFirstDefined(
+							clientBaseVersion,
+							acceptedMeta.syncMeta.version
+						)
+					),
+					proposedBlockCount: tokens.blocks.length,
+				}
+			);
+		}
+
+		proposedBlockHashCounts.set(
+			serializedHash,
+			repeatedProposedHashCount + 1
+		);
+
+		const blockName =
+			getDistributedEditingBlockIdentitySerializedBlockName(
+				serializedBlock
+			);
+
+		if ( ! blockName ) {
+			return createDistributedEditingBlockIdentityRequestProofBlockedDescriptor(
+				'unsafe_serialized_blocks',
+				{
+					clientBaseVersion: String(
+						getFirstDefined(
+							clientBaseVersion,
+							acceptedMeta.syncMeta.version
+						)
+					),
+					acceptedBlockCount: acceptedBlocks.length,
+					proposedBlockCount: tokens.blocks.length,
+					unsafeSerializedBlockReason: 'block_comment_invalid',
+				}
+			);
+		}
+
+		proposedBlocks.push( {
+			blockName,
+			ordinalPath: [ index ],
+			serializedHash,
+		} );
+	}
+
+	const retainedBlockUids = [];
+	const retainedBlockUidSet = new Set();
+	const insertedBlockNonces = [];
+	const proposedBlockMap = [];
+	const movedBlockUids = [];
+	const allAcceptedBlocksRetained = acceptedBlocks.every( ( block ) =>
+		proposedBlockHashCounts.has( block.serialized_hash )
+	);
+
+	for ( const [ index, proposedBlock ] of proposedBlocks.entries() ) {
+		const acceptedBlock = acceptedBlocksByHash.get(
+			proposedBlock.serializedHash
+		);
+
+		if (
+			acceptedBlock &&
+			! retainedBlockUidSet.has( acceptedBlock.block_uid )
+		) {
+			retainedBlockUids.push( acceptedBlock.block_uid );
+			retainedBlockUidSet.add( acceptedBlock.block_uid );
+			proposedBlockMap.push( {
+				block_uid: acceptedBlock.block_uid,
+				block_name: proposedBlock.blockName,
+				ordinal_path: proposedBlock.ordinalPath,
+				serialized_hash: proposedBlock.serializedHash,
+			} );
+
+			if (
+				JSON.stringify( acceptedBlock.ordinal_path ) !==
+				JSON.stringify( proposedBlock.ordinalPath )
+			) {
+				movedBlockUids.push( acceptedBlock.block_uid );
+			}
+
+			continue;
+		}
+
+		if (
+			proposedBlocks.length <= acceptedBlocks.length ||
+			! allAcceptedBlocksRetained
+		) {
+			return createDistributedEditingBlockIdentityRequestProofBlockedDescriptor(
+				'unmatched_without_insert_delta',
+				{
+					clientBaseVersion: String(
+						getFirstDefined(
+							clientBaseVersion,
+							acceptedMeta.syncMeta.version
+						)
+					),
+					acceptedBlockCount: acceptedBlocks.length,
+					proposedBlockCount: proposedBlocks.length,
+					retainedBlockCount: retainedBlockUidSet.size,
+				}
+			);
+		}
+
+		const insertedBlockNonce = `inserted-${ index }-${ proposedBlock.serializedHash.slice(
+			0,
+			16
+		) }`;
+		insertedBlockNonces.push( insertedBlockNonce );
+		proposedBlockMap.push( {
+			inserted_block_nonce: insertedBlockNonce,
+			block_name: proposedBlock.blockName,
+			ordinal_path: proposedBlock.ordinalPath,
+			serialized_hash: proposedBlock.serializedHash,
+		} );
+	}
+
+	const deletedBlockUids = acceptedBlocks
+		.filter( ( block ) => ! retainedBlockUidSet.has( block.block_uid ) )
+		.map( ( block ) => block.block_uid );
+
+	return {
+		status: DISTRIBUTED_EDITING_BLOCK_IDENTITY_REQUEST_PROOF_STATUSES.READY,
+		reason: null,
+		requestProof: {
+			client_base_version: String(
+				getFirstDefined(
+					clientBaseVersion,
+					acceptedMeta.syncMeta.version
+				)
+			),
+			proposed_post_content_hash: normalizedProposedPostContentHash,
+			proposed_block_map: proposedBlockMap,
+			retained_block_uids: retainedBlockUids,
+			inserted_block_nonces: insertedBlockNonces,
+			deleted_block_uids: deletedBlockUids,
+			moved_block_uids: movedBlockUids,
+		},
+		clientBaseVersion: String(
+			getFirstDefined( clientBaseVersion, acceptedMeta.syncMeta.version )
+		),
+		proposedPostContentHash: normalizedProposedPostContentHash,
+		acceptedBlockCount: acceptedBlocks.length,
+		proposedBlockCount: proposedBlocks.length,
+		retainedBlockCount: retainedBlockUids.length,
+		insertedBlockCount: insertedBlockNonces.length,
+		deletedBlockCount: deletedBlockUids.length,
+		movedBlockCount: movedBlockUids.length,
+		contentFree: true,
+		usesGutenbergClientId: false,
+		exposesRawContent: false,
+		callsRest: false,
+		callsSave: false,
+		mutatesEditorContent: false,
+		mutatesPersistedPostContent: false,
+		createsRevision: false,
+		changesPostLock: false,
+		claimsSaved: false,
+	};
 }
 
 /**
@@ -16526,13 +16830,12 @@ function getSerializedBlockLocalRebaseCandidate( {
 		};
 	}
 
-	const edgeInsertionCandidate = getSerializedBlockEdgeInsertionRebaseCandidate(
-		{
+	const edgeInsertionCandidate =
+		getSerializedBlockEdgeInsertionRebaseCandidate( {
 			baseBlocks,
 			serverBlocks,
 			localBlocks,
-		}
-	);
+		} );
 
 	if ( edgeInsertionCandidate ) {
 		return edgeInsertionCandidate;
@@ -16646,10 +16949,7 @@ function getSerializedBlockDeletionRebaseCandidate( {
 	}
 
 	if (
-		isPureSerializedBlockReorder(
-			baseBlocks.blocks,
-			stableBlocks.blocks
-		)
+		isPureSerializedBlockReorder( baseBlocks.blocks, stableBlocks.blocks )
 	) {
 		return {
 			status: 'manual_conflict_required',
@@ -16727,10 +17027,7 @@ function getSerializedBlockEdgeInsertionRebaseCandidate( {
 	}
 
 	if (
-		isPureSerializedBlockReorder(
-			baseBlocks.blocks,
-			stableBlocks.blocks
-		)
+		isPureSerializedBlockReorder( baseBlocks.blocks, stableBlocks.blocks )
 	) {
 		return {
 			status: 'manual_conflict_required',
@@ -16748,7 +17045,9 @@ function getSerializedBlockEdgeInsertionRebaseCandidate( {
 		const baseBlock = baseBlocks.blocks[ index ];
 		const stableBlock = stableBlocks.blocks[ index ];
 
-		mergedBlocks.push( stableBlock !== baseBlock ? stableBlock : baseBlock );
+		mergedBlocks.push(
+			stableBlock !== baseBlock ? stableBlock : baseBlock
+		);
 	}
 
 	if ( insertion.position === 'append' ) {
@@ -16815,7 +17114,8 @@ function getSerializedBlockDeletion( baseBlocks, candidateBlocks ) {
 
 	for (
 		let baseIndex = 0;
-		baseIndex < baseBlocks.length && candidateIndex < candidateBlocks.length;
+		baseIndex < baseBlocks.length &&
+		candidateIndex < candidateBlocks.length;
 		baseIndex++
 	) {
 		if ( baseBlocks[ baseIndex ] === candidateBlocks[ candidateIndex ] ) {
@@ -16953,6 +17253,305 @@ function haveSameSerializedBlockMultiset( firstBlocks, secondBlocks ) {
 	}
 
 	return counts.size === 0;
+}
+
+function createDistributedEditingBlockIdentityRequestProofBlockedDescriptor(
+	reason,
+	overrides = {}
+) {
+	return {
+		status: DISTRIBUTED_EDITING_BLOCK_IDENTITY_REQUEST_PROOF_STATUSES.BLOCKED,
+		reason,
+		requestProof: null,
+		clientBaseVersion: overrides.clientBaseVersion ?? null,
+		proposedPostContentHash: overrides.proposedPostContentHash ?? null,
+		invalidDetail: overrides.invalidDetail ?? null,
+		unsafeSerializedBlockReason:
+			overrides.unsafeSerializedBlockReason ?? null,
+		acceptedBlockCount: overrides.acceptedBlockCount ?? 0,
+		proposedBlockCount: overrides.proposedBlockCount ?? 0,
+		retainedBlockCount: overrides.retainedBlockCount ?? 0,
+		insertedBlockCount: 0,
+		deletedBlockCount: 0,
+		movedBlockCount: 0,
+		contentFree: true,
+		usesGutenbergClientId: false,
+		exposesRawContent: false,
+		callsRest: false,
+		callsSave: false,
+		mutatesEditorContent: false,
+		mutatesPersistedPostContent: false,
+		createsRevision: false,
+		changesPostLock: false,
+		claimsSaved: false,
+	};
+}
+
+function normalizeDistributedEditingBlockIdentityAcceptedSyncMeta( syncMeta ) {
+	if (
+		! syncMeta ||
+		typeof syncMeta !== 'object' ||
+		Array.isArray( syncMeta )
+	) {
+		return {
+			status: 'invalid',
+			reason: 'missing_accepted_sync_meta',
+			detail: 'block_identity_sync_meta_missing',
+			syncMeta: null,
+		};
+	}
+
+	if ( hasDistributedEditingBlockIdentityRawContentField( syncMeta ) ) {
+		return {
+			status: 'invalid',
+			reason: 'accepted_sync_meta_invalid',
+			detail: 'block_identity_raw_content_rejected',
+			syncMeta: null,
+		};
+	}
+
+	if ( hasDistributedEditingBlockIdentityClientIdField( syncMeta ) ) {
+		return {
+			status: 'invalid',
+			reason: 'accepted_sync_meta_invalid',
+			detail: 'block_identity_client_id_rejected',
+			syncMeta: null,
+		};
+	}
+
+	const requiredFields = [
+		'schema',
+		'document_uuid',
+		'version',
+		'content_hash',
+		'blocks',
+	];
+	const missingField = requiredFields.find(
+		( field ) => ! Object.prototype.hasOwnProperty.call( syncMeta, field )
+	);
+
+	if ( missingField ) {
+		return {
+			status: 'invalid',
+			reason: 'accepted_sync_meta_invalid',
+			detail: 'block_identity_sync_meta_missing_required_field',
+			missingField,
+			syncMeta: null,
+		};
+	}
+
+	if (
+		syncMeta.schema !== 'de-rtc-block-identity-v1' ||
+		typeof syncMeta.document_uuid !== 'string' ||
+		syncMeta.document_uuid.length === 0 ||
+		! (
+			typeof syncMeta.version === 'string' ||
+			typeof syncMeta.version === 'number'
+		) ||
+		String( syncMeta.version ).length === 0 ||
+		! isDistributedEditingBlockIdentitySha256Hash(
+			syncMeta.content_hash
+		) ||
+		! Array.isArray( syncMeta.blocks )
+	) {
+		return {
+			status: 'invalid',
+			reason: 'accepted_sync_meta_invalid',
+			detail: 'block_identity_sync_meta_invalid_required_field',
+			syncMeta: null,
+		};
+	}
+
+	const blockUids = new Set();
+
+	for ( const [ index, block ] of syncMeta.blocks.entries() ) {
+		const blockValidation =
+			validateDistributedEditingBlockIdentityAcceptedBlock( block );
+
+		if ( blockValidation.status !== 'valid' ) {
+			return {
+				status: 'invalid',
+				reason: 'accepted_sync_meta_invalid',
+				detail: blockValidation.detail,
+				blockIndex: index,
+				missingField: blockValidation.missingField ?? null,
+				syncMeta: null,
+			};
+		}
+
+		if ( blockUids.has( block.block_uid ) ) {
+			return {
+				status: 'invalid',
+				reason: 'accepted_sync_meta_invalid',
+				detail: 'block_identity_duplicate_block_uid',
+				blockIndex: index,
+				syncMeta: null,
+			};
+		}
+
+		blockUids.add( block.block_uid );
+	}
+
+	return {
+		status: 'valid',
+		reason: null,
+		detail: null,
+		syncMeta: {
+			...syncMeta,
+			version: String( syncMeta.version ),
+		},
+	};
+}
+
+function validateDistributedEditingBlockIdentityAcceptedBlock( block ) {
+	const requiredFields = [
+		'block_uid',
+		'parent_uid',
+		'block_name',
+		'ordinal_path',
+		'serialized_hash',
+	];
+
+	if ( ! block || typeof block !== 'object' || Array.isArray( block ) ) {
+		return {
+			status: 'invalid',
+			detail: 'block_identity_block_invalid',
+		};
+	}
+
+	const missingField = requiredFields.find(
+		( field ) => ! Object.prototype.hasOwnProperty.call( block, field )
+	);
+
+	if ( missingField ) {
+		return {
+			status: 'invalid',
+			detail: 'block_identity_block_missing_required_field',
+			missingField,
+		};
+	}
+
+	if (
+		typeof block.block_uid !== 'string' ||
+		block.block_uid.length === 0 ||
+		! (
+			typeof block.parent_uid === 'string' || block.parent_uid === null
+		) ||
+		typeof block.block_name !== 'string' ||
+		block.block_name.length === 0 ||
+		! isDistributedEditingBlockIdentityOrdinalPath( block.ordinal_path ) ||
+		! isDistributedEditingBlockIdentitySha256Hash( block.serialized_hash )
+	) {
+		return {
+			status: 'invalid',
+			detail: 'block_identity_block_invalid_required_field',
+		};
+	}
+
+	return {
+		status: 'valid',
+		detail: null,
+	};
+}
+
+function isDistributedEditingBlockIdentityOrdinalPath( value ) {
+	return (
+		Array.isArray( value ) &&
+		value.length > 0 &&
+		value.every(
+			( item ) =>
+				Number.isInteger( item ) &&
+				item >= 0 &&
+				Number.isSafeInteger( item )
+		)
+	);
+}
+
+function isDistributedEditingBlockIdentitySha256Hash( value ) {
+	return typeof value === 'string' && /^[a-f0-9]{64}$/.test( value );
+}
+
+function hasDistributedEditingBlockIdentityRawContentField( value ) {
+	if ( Array.isArray( value ) ) {
+		return value.some( hasDistributedEditingBlockIdentityRawContentField );
+	}
+
+	if ( ! value || typeof value !== 'object' ) {
+		return false;
+	}
+
+	for ( const [ key, nestedValue ] of Object.entries( value ) ) {
+		if (
+			/^(rawPostContent|postContent|proposedPostContent|sanitizedPostContent|content|html)$/i.test(
+				key
+			)
+		) {
+			return true;
+		}
+
+		if (
+			hasDistributedEditingBlockIdentityRawContentField( nestedValue )
+		) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
+function hasDistributedEditingBlockIdentityClientIdField( value ) {
+	if ( Array.isArray( value ) ) {
+		return value.some( hasDistributedEditingBlockIdentityClientIdField );
+	}
+
+	if ( ! value || typeof value !== 'object' ) {
+		return false;
+	}
+
+	for ( const [ key, nestedValue ] of Object.entries( value ) ) {
+		if (
+			[
+				'clientId',
+				'client_id',
+				'blockClientId',
+				'block_client_id',
+			].includes( key )
+		) {
+			return true;
+		}
+
+		if ( hasDistributedEditingBlockIdentityClientIdField( nestedValue ) ) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
+function getDistributedEditingBlockIdentitySerializedBlockName(
+	serializedBlock
+) {
+	if ( typeof serializedBlock !== 'string' ) {
+		return null;
+	}
+
+	const openingCommentEnd = serializedBlock.indexOf( '-->' );
+
+	if ( openingCommentEnd === -1 ) {
+		return null;
+	}
+
+	const openingComment = serializedBlock.slice( 0, openingCommentEnd + 3 );
+	const openingCommentData =
+		getSerializedBlockOpeningCommentData( openingComment );
+
+	if ( ! openingCommentData?.blockName ) {
+		return null;
+	}
+
+	return openingCommentData.blockName.includes( '/' )
+		? openingCommentData.blockName
+		: `core/${ openingCommentData.blockName }`;
 }
 
 function getSerializedBlockTokens( content ) {

@@ -1,6 +1,8 @@
 /**
  * External dependencies
  */
+import { webcrypto } from 'crypto';
+import { TextEncoder as NodeTextEncoder } from 'util';
 import deepFreeze from 'deep-freeze';
 
 /**
@@ -8,6 +10,7 @@ import deepFreeze from 'deep-freeze';
  */
 import {
 	DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES,
+	DISTRIBUTED_EDITING_BLOCK_IDENTITY_REQUEST_PROOF_STATUSES,
 	DISTRIBUTED_EDITING_DISPOSITIONS,
 	DISTRIBUTED_EDITING_FRESH_REVIEW_AUTHORITY_STATUSES,
 	DISTRIBUTED_EDITING_FRESH_REVIEW_DECISION_STATUSES,
@@ -76,8 +79,10 @@ import {
 	getDistributedEditingLocalUpdatesImportReviewRequestStateForSessionState,
 	getDistributedEditingAcceptedFreshReviewConsumeValidationForRetrySaveRequest,
 	getDistributedEditingAcceptedReviewApprovalProofForRetrySaveRequest,
+	getDistributedEditingBlockIdentityRequestProofDescriptor,
 	getDistributedEditingReviewedBlockItemsForRetrySaveReviewApprovalProof,
 	getDistributedEditingReviewedBlockItemsForFreshReviewDecision,
+	getDistributedEditingPostContentSha256Hash,
 	getDistributedEditingRetrySaveFlowStateForSessionState,
 	getDistributedEditingRetrySavePolicyForSessionState,
 	getDistributedEditingRiskyBlockReviewStateForSessionState,
@@ -11300,6 +11305,49 @@ describe( 'distributed editing session state', () => {
 	} );
 } );
 
+async function createAcceptedBlockIdentitySyncMeta( blocks ) {
+	ensureDistributedEditingTestCrypto();
+
+	const blockLetters = [ 'a', 'b', 'c', 'd' ];
+
+	return {
+		schema: 'de-rtc-block-identity-v1',
+		document_uuid: 'doc-turn-0366',
+		version: '41',
+		content_hash: await getDistributedEditingPostContentSha256Hash(
+			blocks.join( '\n\n' )
+		),
+		blocks: await Promise.all(
+			blocks.map( async ( serializedBlock, index ) => ( {
+				block_uid: `block-${ blockLetters[ index ] ?? index }`,
+				parent_uid: null,
+				block_name: 'core/paragraph',
+				ordinal_path: [ index ],
+				serialized_hash:
+					await getDistributedEditingPostContentSha256Hash(
+						serializedBlock
+					),
+			} ) )
+		),
+	};
+}
+
+function ensureDistributedEditingTestCrypto() {
+	if ( ! globalThis.crypto?.subtle ) {
+		Object.defineProperty( globalThis, 'crypto', {
+			configurable: true,
+			value: webcrypto,
+		} );
+	}
+
+	if ( typeof globalThis.TextEncoder !== 'function' ) {
+		Object.defineProperty( globalThis, 'TextEncoder', {
+			configurable: true,
+			value: NodeTextEncoder,
+		} );
+	}
+}
+
 describe( 'distributed editing store actions', () => {
 	it( 'creates a replacement session action', () => {
 		const sessionState = {
@@ -11990,6 +12038,164 @@ describe( 'distributed editing selectors', () => {
 		expect( JSON.stringify( decisionStateWithItems ) ).not.toMatch(
 			/proof_signature|reviewer_user_id|low_privileged_saver_user_id|reviewed_block_items|postContent|post_content|turn0147-accepted-request-hidden-proof|turn0147-accepted-request-raw-content-marker|turn0148-hidden-item-content/
 		);
+	} );
+
+	it( 'prepares content-free block identity request proof without Gutenberg clientId', async () => {
+		const baseBlocks = [
+			'<!-- wp:paragraph -->\n<p>Alpha</p>\n<!-- /wp:paragraph -->',
+			'<!-- wp:paragraph -->\n<p>Bravo</p>\n<!-- /wp:paragraph -->',
+		];
+		const insertedBlock =
+			'<!-- wp:paragraph -->\n<p>Inserted</p>\n<!-- /wp:paragraph -->';
+		const acceptedSyncMeta =
+			await createAcceptedBlockIdentitySyncMeta( baseBlocks );
+		const descriptor =
+			await getDistributedEditingBlockIdentityRequestProofDescriptor( {
+				acceptedSyncMeta,
+				proposedPostContent: [
+					baseBlocks[ 0 ],
+					insertedBlock,
+					baseBlocks[ 1 ],
+				].join( '\n\n' ),
+			} );
+		const insertedHash =
+			await getDistributedEditingPostContentSha256Hash( insertedBlock );
+
+		expect( descriptor ).toMatchObject( {
+			status: DISTRIBUTED_EDITING_BLOCK_IDENTITY_REQUEST_PROOF_STATUSES.READY,
+			reason: null,
+			contentFree: true,
+			usesGutenbergClientId: false,
+			exposesRawContent: false,
+			callsRest: false,
+			callsSave: false,
+			mutatesEditorContent: false,
+			mutatesPersistedPostContent: false,
+			createsRevision: false,
+			changesPostLock: false,
+			claimsSaved: false,
+			proposedBlockCount: 3,
+			retainedBlockCount: 2,
+			insertedBlockCount: 1,
+			deletedBlockCount: 0,
+			movedBlockCount: 1,
+		} );
+		expect( descriptor.requestProof ).toMatchObject( {
+			client_base_version: '41',
+			retained_block_uids: [ 'block-a', 'block-b' ],
+			inserted_block_nonces: [
+				`inserted-1-${ insertedHash.slice( 0, 16 ) }`,
+			],
+			deleted_block_uids: [],
+			moved_block_uids: [ 'block-b' ],
+		} );
+		expect( descriptor.requestProof.proposed_block_map ).toEqual( [
+			expect.objectContaining( {
+				block_uid: 'block-a',
+				block_name: 'core/paragraph',
+				ordinal_path: [ 0 ],
+			} ),
+			expect.objectContaining( {
+				inserted_block_nonce: `inserted-1-${ insertedHash.slice(
+					0,
+					16
+				) }`,
+				block_name: 'core/paragraph',
+				ordinal_path: [ 1 ],
+			} ),
+			expect.objectContaining( {
+				block_uid: 'block-b',
+				block_name: 'core/paragraph',
+				ordinal_path: [ 2 ],
+			} ),
+		] );
+		expect( JSON.stringify( descriptor.requestProof ) ).not.toMatch(
+			/Alpha|Bravo|Inserted|postContent|proposedPostContent|rawPostContent|clientId|client_id/
+		);
+	} );
+
+	it( 'blocks block identity request proof when accepted sync meta uses clientId', async () => {
+		const baseBlocks = [
+			'<!-- wp:paragraph -->\n<p>Alpha</p>\n<!-- /wp:paragraph -->',
+		];
+		const acceptedSyncMeta =
+			await createAcceptedBlockIdentitySyncMeta( baseBlocks );
+		acceptedSyncMeta.blocks[ 0 ].clientId = 'transient-editor-client-id';
+
+		const descriptor =
+			await getDistributedEditingBlockIdentityRequestProofDescriptor( {
+				acceptedSyncMeta,
+				proposedPostContent: baseBlocks.join( '\n\n' ),
+			} );
+
+		expect( descriptor ).toMatchObject( {
+			status: DISTRIBUTED_EDITING_BLOCK_IDENTITY_REQUEST_PROOF_STATUSES.BLOCKED,
+			reason: 'accepted_sync_meta_invalid',
+			invalidDetail: 'block_identity_client_id_rejected',
+			requestProof: null,
+			contentFree: true,
+			usesGutenbergClientId: false,
+			exposesRawContent: false,
+			callsSave: false,
+			mutatesPersistedPostContent: false,
+			claimsSaved: false,
+		} );
+	} );
+
+	it( 'blocks same-count block changes without durable block identity delta', async () => {
+		const baseBlocks = [
+			'<!-- wp:paragraph -->\n<p>Alpha</p>\n<!-- /wp:paragraph -->',
+		];
+		const acceptedSyncMeta =
+			await createAcceptedBlockIdentitySyncMeta( baseBlocks );
+		const descriptor =
+			await getDistributedEditingBlockIdentityRequestProofDescriptor( {
+				acceptedSyncMeta,
+				proposedPostContent:
+					'<!-- wp:paragraph -->\n<p>Changed</p>\n<!-- /wp:paragraph -->',
+			} );
+
+		expect( descriptor ).toMatchObject( {
+			status: DISTRIBUTED_EDITING_BLOCK_IDENTITY_REQUEST_PROOF_STATUSES.BLOCKED,
+			reason: 'unmatched_without_insert_delta',
+			requestProof: null,
+			proposedBlockCount: 1,
+			retainedBlockCount: 0,
+			callsRest: false,
+			callsSave: false,
+			mutatesEditorContent: false,
+			mutatesPersistedPostContent: false,
+			claimsSaved: false,
+		} );
+	} );
+
+	it( 'blocks ambiguous repeated accepted serialized block hashes', async () => {
+		const baseBlocks = [
+			'<!-- wp:paragraph -->\n<p>Alpha</p>\n<!-- /wp:paragraph -->',
+			'<!-- wp:paragraph -->\n<p>Bravo</p>\n<!-- /wp:paragraph -->',
+		];
+		const acceptedSyncMeta =
+			await createAcceptedBlockIdentitySyncMeta( baseBlocks );
+		acceptedSyncMeta.blocks[ 1 ].serialized_hash =
+			acceptedSyncMeta.blocks[ 0 ].serialized_hash;
+
+		const descriptor =
+			await getDistributedEditingBlockIdentityRequestProofDescriptor( {
+				acceptedSyncMeta,
+				proposedPostContent: baseBlocks.join( '\n\n' ),
+			} );
+
+		expect( descriptor ).toMatchObject( {
+			status: DISTRIBUTED_EDITING_BLOCK_IDENTITY_REQUEST_PROOF_STATUSES.BLOCKED,
+			reason: 'accepted_repeated_serialized_hash_ambiguous',
+			requestProof: null,
+			acceptedBlockCount: 2,
+			contentFree: true,
+			callsRest: false,
+			callsSave: false,
+			mutatesPersistedPostContent: false,
+			claimsSaved: false,
+		} );
 	} );
 
 	it( 'normalizes rejected fresh-review requests while preserving exportable local state', () => {
