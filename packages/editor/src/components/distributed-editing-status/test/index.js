@@ -2498,6 +2498,10 @@ describe( 'DistributedEditingStatus', () => {
 				'true'
 			);
 			expect( shell ).toHaveAttribute(
+				'data-distributed-editing-confirmed-save-merged-edits',
+				'false'
+			);
+			expect( shell ).toHaveAttribute(
 				'data-distributed-editing-confirmed-save-shell-quieted',
 				'false'
 			);
@@ -2584,6 +2588,10 @@ describe( 'DistributedEditingStatus', () => {
 				'true'
 			);
 			expect( shell ).toHaveAttribute(
+				'data-distributed-editing-confirmed-save-merged-edits',
+				'false'
+			);
+			expect( shell ).toHaveAttribute(
 				'data-distributed-editing-confirmed-save-shell-quieted',
 				'true'
 			);
@@ -2639,6 +2647,70 @@ describe( 'DistributedEditingStatus', () => {
 					originalConfirmedSaveShellHoldMs;
 			}
 		}
+	} );
+
+	it( 'distinguishes a server-merged Save in the enabled editor shell without adding receipt chatter', () => {
+		setupDistributedEditingStatusSelect( {
+			editorSettings: {
+				distributedEditing: {
+					enabled: true,
+				},
+			},
+			sessionState: {
+				retrySaveStatus: DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVED,
+				retrySaveAccepted: true,
+				retrySaveServerVersion: '233',
+				retrySavePreviousServerVersion: '232',
+				retrySaveSavesPost: true,
+				retrySaveMutatesPostContent: true,
+				retrySaveCreatesRevision: true,
+				retrySaveClaimsSaved: true,
+				retrySaveRevisionCreated: true,
+				retrySaveConfirmedMergedEdits: true,
+			},
+		} );
+
+		render( <DistributedEditingStatusChrome /> );
+
+		const shell = screen.getByRole( 'region', {
+			name: 'Distributed editing enabled status',
+		} );
+		expect( shell ).toHaveAttribute(
+			'data-distributed-editing-save-state',
+			'retry_save_confirmed'
+		);
+		expect( shell ).toHaveAttribute(
+			'data-distributed-editing-confirmed-save-evidence-retained',
+			'true'
+		);
+		expect( shell ).toHaveAttribute(
+			'data-distributed-editing-confirmed-save-merged-edits',
+			'true'
+		);
+		expect(
+			within( shell ).getByText( 'Merged by WordPress' )
+		).toBeVisible();
+		expect(
+			within( shell ).getByText( 'Ready for new edits.' )
+		).toBeVisible();
+		expect(
+			within( shell ).queryByText( 'Saved' )
+		).not.toBeInTheDocument();
+		expect(
+			within( shell ).queryByText( 'Save confirmed' )
+		).not.toBeInTheDocument();
+		expect(
+			within( shell ).queryByText( 'Show Save evidence' )
+		).not.toBeInTheDocument();
+		expect(
+			within(
+				screen.getByRole( 'region', {
+					name: 'Distributed editing status',
+				} )
+			).getByText(
+				/WordPress saved the merged edits, advanced the sync version from 232 to 233/
+			)
+		).toBeVisible();
 	} );
 
 	it( 'shows a latency-tolerant presence roster in the enabled editor shell', () => {

@@ -3061,6 +3061,7 @@ function getDistributedEditingEnabledShellState( sessionState ) {
 			humanLoopSummary: humanLoopStepCopy.summary,
 			saveJourneyTitle: saveJourneyCopy.title,
 			saveJourneySummary: saveJourneyCopy.summary,
+			confirmedSaveMergedEdits: false,
 			confirmedSaveEvidenceRetained: false,
 			confirmedSaveShellQuieted: false,
 			message: __(
@@ -3085,6 +3086,7 @@ function getDistributedEditingEnabledShellState( sessionState ) {
 			humanLoopSummary: humanLoopStepCopy.summary,
 			saveJourneyTitle: saveJourneyCopy.title,
 			saveJourneySummary: saveJourneyCopy.summary,
+			confirmedSaveMergedEdits: false,
 			confirmedSaveEvidenceRetained: false,
 			confirmedSaveShellQuieted: false,
 			message: __(
@@ -3109,6 +3111,9 @@ function getDistributedEditingEnabledShellState( sessionState ) {
 			humanLoopSummary: humanLoopStepCopy.summary,
 			saveJourneyTitle: saveJourneyCopy.title,
 			saveJourneySummary: saveJourneyCopy.summary,
+			confirmedSaveMergedEdits: Boolean(
+				normalized.retrySaveConfirmedMergedEdits
+			),
 			confirmedSaveEvidenceRetained: true,
 			confirmedSaveShellQuieted: false,
 			message: __(
@@ -3132,6 +3137,7 @@ function getDistributedEditingEnabledShellState( sessionState ) {
 		humanLoopSummary: humanLoopStepCopy.summary,
 		saveJourneyTitle: saveJourneyCopy.title,
 		saveJourneySummary: saveJourneyCopy.summary,
+		confirmedSaveMergedEdits: false,
 		confirmedSaveEvidenceRetained: false,
 		confirmedSaveShellQuieted: false,
 		message: __(
@@ -3342,6 +3348,10 @@ function getDistributedEditingEnabledShellTitle( shellState ) {
 	}
 
 	if ( shellState.humanLoopStepState.confirmedByWordPress ) {
+		if ( shellState.confirmedSaveMergedEdits ) {
+			return __( 'Merged by WordPress' );
+		}
+
 		return __( 'Saved' );
 	}
 
@@ -3469,6 +3479,9 @@ export function DistributedEditingEnabledShell( {
 			className="editor-distributed-editing-status__enabled-shell"
 			data-distributed-editing-confirmed-save-evidence-retained={ formatDataBoolean(
 				Boolean( shellState.confirmedSaveEvidenceRetained )
+			) }
+			data-distributed-editing-confirmed-save-merged-edits={ formatDataBoolean(
+				Boolean( shellState.confirmedSaveMergedEdits )
 			) }
 			data-distributed-editing-confirmed-save-shell-quieted={ formatDataBoolean(
 				Boolean( shellState.confirmedSaveShellQuieted )
