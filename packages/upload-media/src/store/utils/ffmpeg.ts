@@ -27,22 +27,28 @@ self.onmessage = function( e ) {
 			// Load FFmpeg core on first use.
 			if ( ! ffmpegModule ) {
 				importScripts( data.coreUrl );
-				// @ffmpeg/core 0.12.x ignores a user-supplied locateFile:
-				// during init it overwrites Module.locateFile with its own
-				// implementation that reads the WASM URL from a base64 JSON
-				// fragment on mainScriptUrlOrBlob. Hand the plugin-served
-				// WASM URL over via that fragment, otherwise the core falls
-				// back to fetching a bare 'ffmpeg-core.wasm' which fails in
-				// the Blob-URL worker (no base URL to resolve against).
-				var coreConfig = btoa( JSON.stringify( {
-					wasmURL: data.wasmUrl,
-					workerURL: '',
-				} ) );
-				ffmpegModule = await self.createFFmpegCore( {
-					mainScriptUrlOrBlob: data.coreUrl + '#' + coreConfig,
+				var moduleConfig = {
 					print: function() {},
 					printErr: function() {},
-				} );
+				};
+				// The wp-ffmpeg-wasm plugin ships a self-contained core
+				// with the WASM inlined as a data: URI in wasmBinaryFile;
+				// the core's isDataURI guard then loads it directly and
+				// never consults locateFile, so no URL config is needed.
+				// Only when the plugin serves a separate WASM binary
+				// (wasmUrl set) must we advertise it: @ffmpeg/core 0.12.x
+				// ignores a user-supplied locateFile and instead reads the
+				// WASM URL from a base64 JSON fragment on
+				// mainScriptUrlOrBlob, so hand it over that way.
+				if ( data.wasmUrl ) {
+					var coreConfig = btoa( JSON.stringify( {
+						wasmURL: data.wasmUrl,
+						workerURL: '',
+					} ) );
+					moduleConfig.mainScriptUrlOrBlob =
+						data.coreUrl + '#' + coreConfig;
+				}
+				ffmpegModule = await self.createFFmpegCore( moduleConfig );
 			}
 
 			var inputName = 'input.gif';
