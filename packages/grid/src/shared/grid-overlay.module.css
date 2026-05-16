@@ -2,6 +2,7 @@
 	position: absolute;
 	inset: 0;
 	display: grid;
+	gap: var(--wpds-dimension-gap-md);
 	pointer-events: none;
 	opacity: 0;
 	visibility: hidden;
