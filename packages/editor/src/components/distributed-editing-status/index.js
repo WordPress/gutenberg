@@ -1944,7 +1944,7 @@ export default function DistributedEditingStatus( {
 						setActionStatus( {
 							status: 'info',
 							message: __(
-								'Local changes staged. Check save safety before saving.'
+								'Local changes staged for a Save check. WordPress has not saved them yet.'
 							),
 						} );
 						return prepareResult;
@@ -6708,7 +6708,7 @@ function getNextStepDescriptor( nextStepAction ) {
 			return {
 				nextStepAction,
 				nextStepMessage: __(
-					'Export local changes, then compare them with the latest post before continuing.'
+					'Compare the local changes with the latest post before choosing what to keep.'
 				),
 			};
 		case 'export_for_html_review':
@@ -6802,9 +6802,9 @@ function getStaleBaseStatusText( descriptor ) {
 		DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_STATUSES.PREPARED
 	) {
 		return {
-			title: __( 'Local changes staged' ),
+			title: __( 'Ready for Save check' ),
 			message: __(
-				'Local changes are staged for the next Save check. WordPress has not saved them yet.'
+				'Local changes are staged against the latest post. Try Save again so WordPress can check freshness before updating the post.'
 			),
 		};
 	}
@@ -6812,14 +6812,14 @@ function getStaleBaseStatusText( descriptor ) {
 	switch ( descriptor.localRebaseResultStatus ) {
 		case DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.REBASED:
 			return {
-				title: __( 'Local changes ready' ),
+				title: __( 'Local changes applied' ),
 				message: __(
-					'Local changes were applied to the latest post and are ready for the next Save check.'
+					'The latest post is loaded and local changes were applied in this editor. Stage them for a Save check before WordPress updates the post.'
 				),
 			};
 		case DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.MANUAL_CONFLICT_REQUIRED:
 			return {
-				title: __( 'Local changes need review' ),
+				title: __( 'Compare conflicting changes' ),
 				message: getManualLocalRebaseConflictMessage( descriptor ),
 				...getNextStepDescriptor( 'export_for_manual_conflict_review' ),
 			};
@@ -6833,7 +6833,7 @@ function getStaleBaseStatusText( descriptor ) {
 			return {
 				title: __( 'Local changes not ready' ),
 				message: __(
-					'Get the latest post before applying local changes.'
+					'The latest post is not loaded yet. Get latest post before applying local changes.'
 				),
 			};
 	}
@@ -6846,7 +6846,7 @@ function getStaleBaseStatusText( descriptor ) {
 		return {
 			title: __( 'Latest post data missing' ),
 			message: __(
-				'Keep both the starting post and latest post available before applying local changes.'
+				'The editor needs both the starting post and latest post before it can apply local changes. Export local changes before reloading.'
 			),
 		};
 	}
@@ -6857,9 +6857,9 @@ function getStaleBaseStatusText( descriptor ) {
 		descriptor.hasLocalRebaseInputs
 	) {
 		return {
-			title: __( 'Ready to apply local changes' ),
+			title: __( 'Latest post loaded' ),
 			message: __(
-				'Local changes can be applied to the latest post before saving.'
+				'Apply local changes in this editor before trying Save again; WordPress is not updated yet.'
 			),
 		};
 	}
@@ -6867,7 +6867,7 @@ function getStaleBaseStatusText( descriptor ) {
 	return {
 		title: __( 'Post changed on the server' ),
 		message: __(
-			'Get the latest post before applying your local changes. Protected local changes remain in this editor session and can be exported before leaving.'
+			'Get latest post first. Then this editor will say whether local changes can be applied, need comparison, or are ready for another Save check.'
 		),
 	};
 }
@@ -7319,24 +7319,24 @@ function getManualLocalRebaseConflictMessage( descriptor ) {
 	switch ( descriptor.localRebaseResultReason ) {
 		case 'block_inserted':
 			return __(
-				'Blocks were inserted in more than one place. Review the local changes and the latest post before continuing.'
+				'The latest post is loaded, but blocks were inserted in more than one place. Compare local changes with the latest post before choosing what to keep.'
 			);
 		case 'block_deleted':
 			return __(
-				'Blocks were deleted in more than one place. Review the local changes and the latest post before continuing.'
+				'The latest post is loaded, but blocks were deleted in more than one place. Compare local changes with the latest post before choosing what to keep.'
 			);
 		case 'block_reordered':
 			return __(
-				'Blocks were reordered while local edits were pending. Review the local changes and the latest post before continuing.'
+				'The latest post is loaded, but blocks were reordered while local edits were pending. Compare local changes with the latest post before choosing what to keep.'
 			);
 		case 'same_block_changed':
 			return __(
-				'Local changes and the latest post touched the same block. Review both before continuing.'
+				'The latest post is loaded, but local changes and the latest post touched the same block. Compare both before choosing what to keep.'
 			);
 	}
 
 	return __(
-		'Local changes and the latest post could not be merged automatically.'
+		'The latest post is loaded, but local changes could not be merged automatically. Compare both before choosing what to keep.'
 	);
 }
 

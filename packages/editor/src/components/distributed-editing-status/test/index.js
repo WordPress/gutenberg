@@ -7205,7 +7205,7 @@ describe( 'DistributedEditingStatus', () => {
 		).not.toHaveBeenCalled();
 		expect(
 			await screen.findByText(
-				'Local changes staged. Check save safety before saving.'
+				'Local changes staged for a Save check. WordPress has not saved them yet.'
 			)
 		).toBeVisible();
 	} );
@@ -7597,12 +7597,10 @@ describe( 'DistributedEditingStatusSurface', () => {
 			/>
 		);
 
-		expect(
-			screen.getByText( 'Ready to apply local changes' )
-		).toBeVisible();
+		expect( screen.getByText( 'Latest post loaded' ) ).toBeVisible();
 		expect(
 			screen.getByText(
-				'Local changes can be applied to the latest post before saving.'
+				'Apply local changes in this editor before trying Save again; WordPress is not updated yet.'
 			)
 		).toBeVisible();
 
@@ -7657,7 +7655,7 @@ describe( 'DistributedEditingStatusSurface', () => {
 		expect( screen.getByText( 'Latest post data missing' ) ).toBeVisible();
 		expect(
 			screen.getByText(
-				'Keep both the starting post and latest post available before applying local changes.'
+				'The editor needs both the starting post and latest post before it can apply local changes. Export local changes before reloading.'
 			)
 		).toBeVisible();
 		expect(
@@ -7695,10 +7693,10 @@ describe( 'DistributedEditingStatusSurface', () => {
 			/>
 		);
 
-		expect( screen.getByText( 'Local changes ready' ) ).toBeVisible();
+		expect( screen.getByText( 'Local changes applied' ) ).toBeVisible();
 		expect(
 			screen.getByText(
-				'Local changes were applied to the latest post and are ready for the next Save check.'
+				'The latest post is loaded and local changes were applied in this editor. Stage them for a Save check before WordPress updates the post.'
 			)
 		).toBeVisible();
 		expect( screen.queryByText( /wp:paragraph/ ) ).not.toBeInTheDocument();
@@ -7733,20 +7731,22 @@ describe( 'DistributedEditingStatusSurface', () => {
 			/>
 		);
 
-		expect( screen.getByText( 'Local changes need review' ) ).toBeVisible();
+		expect(
+			screen.getByText( 'Compare conflicting changes' )
+		).toBeVisible();
 		expect(
 			screen.getByText(
-				'Blocks were reordered while local edits were pending. Review the local changes and the latest post before continuing.'
+				'The latest post is loaded, but blocks were reordered while local edits were pending. Compare local changes with the latest post before choosing what to keep.'
 			)
 		).toBeVisible();
 		expect( screen.getByText( 'Next step:' ) ).toBeVisible();
 		expect(
 			screen.getByText(
-				'Export local changes, then compare them with the latest post before continuing.'
+				'Compare the local changes with the latest post before choosing what to keep.'
 			)
 		).toBeVisible();
 		const reorderStatusItem = screen
-			.getByText( 'Local changes need review' )
+			.getByText( 'Compare conflicting changes' )
 			// eslint-disable-next-line testing-library/no-node-access
 			.closest( '[data-distributed-editing-next-step]' );
 		expect( reorderStatusItem ).toHaveAttribute(
@@ -7790,7 +7790,7 @@ describe( 'DistributedEditingStatusSurface', () => {
 		expect( screen.getByText( 'Next step:' ) ).toBeVisible();
 		expect(
 			screen.getByText(
-				'Export local changes, then compare them with the latest post before continuing.'
+				'Compare the local changes with the latest post before choosing what to keep.'
 			)
 		).toBeVisible();
 		const freeformStatusItem = screen
@@ -7831,10 +7831,10 @@ describe( 'DistributedEditingStatusSurface', () => {
 			/>
 		);
 
-		expect( screen.getByText( 'Local changes staged' ) ).toBeVisible();
+		expect( screen.getByText( 'Ready for Save check' ) ).toBeVisible();
 		expect(
 			screen.getByText(
-				'Local changes are staged for the next Save check. WordPress has not saved them yet.'
+				'Local changes are staged against the latest post. Try Save again so WordPress can check freshness before updating the post.'
 			)
 		).toBeVisible();
 	} );
