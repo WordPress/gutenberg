@@ -515,23 +515,23 @@ describe( 'PostPublishButton', () => {
 		const savePostStatus = jest.fn();
 		render(
 			<PostPublishButton
-				isDirty
 				isSaveable
 				isPublishable
 				savePostStatus={ savePostStatus }
 				distributedEditingSaveJourneyState={ {
 					shouldExposeInSaveControls: true,
-					step: 'ready_to_edit',
-					action: 'edit',
-					title: 'Save is available',
+					step: 'local_changes_protected',
+					action: 'dirty_save_preflight',
+					title: 'Save checks with WordPress',
 					summary:
-						'Use Save when you are ready for WordPress to update this post.',
+						'Save will check the latest post before WordPress updates it. Keep this tab open until WordPress confirms.',
 					statusChromeSummary:
-						'Save can update the authoritative WordPress post.',
+						'Local edits will be checked with WordPress before the post updates.',
 					statusChromeAuthorityState:
 						'ready_to_update_authoritative_post',
 					statusChromeAuthorityText:
-						'Save can update the authoritative WordPress post.',
+						'WordPress remains authoritative; Save checks for a newer version before updating the post.',
+					dirtyEditorPreflight: true,
 					claimsSavedWithoutEvidence: false,
 				} }
 			/>

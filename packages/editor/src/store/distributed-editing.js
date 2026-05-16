@@ -11117,12 +11117,15 @@ function getDistributedEditingSaveJourneyRequiresActionBeforeSaveForStep(
  * This is copy and state only; the descriptor does not perform the Save action
  * or change Save routing.
  *
- * @param {Object} sessionState DE-RTC session state.
+ * @param {Object}  sessionState    DE-RTC session state.
+ * @param {Object}  options         Save journey options.
+ * @param {boolean} options.isDirty Whether the editor has local edits.
  *
  * @return {Object} Save journey descriptor.
  */
 export function getDistributedEditingSaveJourneyStateForSessionState(
-	sessionState = {}
+	sessionState = {},
+	{ isDirty = false } = {}
 ) {
 	const humanLoopStep =
 		getDistributedEditingHumanLoopStepStateForSessionState( sessionState );
@@ -11134,8 +11137,7 @@ export function getDistributedEditingSaveJourneyStateForSessionState(
 		humanLoopStep.step,
 		humanLoopStep.action
 	);
-
-	return {
+	const saveJourneyState = {
 		step: humanLoopStep.step,
 		action: humanLoopStep.action,
 		title: copy.title,
@@ -11170,7 +11172,33 @@ export function getDistributedEditingSaveJourneyStateForSessionState(
 		exposesProofInternals: false,
 		exposesReviewerIds: false,
 		exposesSaverIds: false,
+		dirtyEditorPreflight: false,
 	};
+
+	if (
+		isDirty &&
+		saveJourneyState.step ===
+			DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.READY_TO_EDIT &&
+		saveJourneyState.action === 'edit'
+	) {
+		return {
+			...saveJourneyState,
+			step: DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.LOCAL_CHANGES_PROTECTED,
+			action: 'dirty_save_preflight',
+			title: 'Save checks with WordPress',
+			summary:
+				'Save will check the latest post before WordPress updates it. Keep this tab open until WordPress confirms.',
+			actionHint: null,
+			requiresActionBeforeSave: false,
+			dirtyEditorPreflight: true,
+			statusChromeSummary:
+				'Local edits will be checked with WordPress before the post updates.',
+			statusChromeAuthorityText:
+				'WordPress remains authoritative; Save checks for a newer version before updating the post.',
+		};
+	}
+
+	return saveJourneyState;
 }
 
 /**
@@ -16510,11 +16538,6 @@ function getSerializedBlockLocalRebaseCandidate( {
 	}
 
 	const mergedBlocks = [];
-	const mergedBlockSeparator = getSerializedBlockMergeSeparator(
-		baseBlocks,
-		serverBlocks,
-		localBlocks
-	);
 
 	for ( let index = 0; index < baseBlocks.blocks.length; index++ ) {
 		const baseBlock = baseBlocks.blocks[ index ];
@@ -16536,6 +16559,12 @@ function getSerializedBlockLocalRebaseCandidate( {
 			mergedBlocks.push( serverBlock );
 		}
 	}
+
+	const mergedBlockSeparator = getSerializedBlockMergeSeparator(
+		baseBlocks,
+		serverBlocks,
+		localBlocks
+	);
 
 	return {
 		status: 'rebased',

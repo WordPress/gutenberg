@@ -26,7 +26,6 @@ import { store as editorStore } from '../../store';
 import { ATTACHMENT_POST_TYPE } from '../../store/constants';
 import {
 	getDistributedEditingSaveJourneyDataAttributes,
-	getDistributedEditingSaveJourneyStateForDirtyEditor,
 	getDistributedEditingSaveJourneyTitle,
 } from '../distributed-editing-save-journey-cue';
 
@@ -77,9 +76,11 @@ export default function PostSavedState( { forceIsDirty } ) {
 				getDistributedEditingSaveJourneyState,
 			} = select( editorStore );
 			const { get } = select( preferencesStore );
+			const editorIsDirty = forceIsDirty || isEditedPostDirty();
+
 			return {
 				isAutosaving: isAutosavingPost(),
-				isDirty: forceIsDirty || isEditedPostDirty(),
+				isDirty: editorIsDirty,
 				isNew: isEditedPostNew(),
 				isPublished: isCurrentPostPublished(),
 				isSaving: isSavingPost(),
@@ -95,7 +96,7 @@ export default function PostSavedState( { forceIsDirty } ) {
 				distributedEditingSaveButtonState:
 					getDistributedEditingSaveButtonState?.(),
 				distributedEditingSaveJourneyState:
-					getDistributedEditingSaveJourneyState?.(),
+					getDistributedEditingSaveJourneyState?.( editorIsDirty ),
 			};
 		},
 		[ forceIsDirty ]
@@ -173,13 +174,8 @@ export default function PostSavedState( { forceIsDirty } ) {
 		hasDistributedEditingSaveButtonState &&
 			distributedEditingSaveButtonState.authoritativePostUpdated
 	);
-	const distributedEditingSaveJourneyStateForEditor =
-		getDistributedEditingSaveJourneyStateForDirtyEditor(
-			distributedEditingSaveJourneyState,
-			isDirty
-		);
 	const hasDistributedEditingSaveJourneyState = Boolean(
-		distributedEditingSaveJourneyStateForEditor?.shouldExposeInSaveControls
+		distributedEditingSaveJourneyState?.shouldExposeInSaveControls
 	);
 	const distributedEditingSaveButtonDataAttributes =
 		hasDistributedEditingSaveButtonState
@@ -214,7 +210,7 @@ export default function PostSavedState( { forceIsDirty } ) {
 			: {};
 	const distributedEditingSaveJourneyDataAttributes =
 		getDistributedEditingSaveJourneyDataAttributes(
-			distributedEditingSaveJourneyStateForEditor
+			distributedEditingSaveJourneyState
 		);
 	const isSaved = forceSavedMessage || ( ! isNew && ! isDirty );
 	const isSavedState = hasDistributedEditingSaveButtonState
@@ -227,7 +223,7 @@ export default function PostSavedState( { forceIsDirty } ) {
 	let buttonTitle;
 	if ( hasDistributedEditingSaveJourneyState ) {
 		buttonTitle = getDistributedEditingSaveJourneyTitle(
-			distributedEditingSaveJourneyStateForEditor
+			distributedEditingSaveJourneyState
 		);
 	} else if ( hasDistributedEditingSaveButtonState ) {
 		buttonTitle = distributedEditingSaveButtonState.statusText;

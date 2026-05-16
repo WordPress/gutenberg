@@ -7772,6 +7772,22 @@ describe( 'distributed editing session state', () => {
 				saveButtonLabel: 'Update',
 			},
 			{
+				sessionState: {},
+				options: { isDirty: true },
+				step: DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.LOCAL_CHANGES_PROTECTED,
+				action: 'dirty_save_preflight',
+				title: 'Save checks with WordPress',
+				summary: 'check the latest post',
+				actionHint: null,
+				requiresActionBeforeSave: false,
+				saveButtonLabel: 'Update',
+				dirtyEditorPreflight: true,
+				statusChromeSummary:
+					'Local edits will be checked with WordPress before the post updates.',
+				statusChromeAuthorityText:
+					'WordPress remains authoritative; Save checks for a newer version before updating the post.',
+			},
+			{
 				sessionState: {
 					pendingChangeCount: 1,
 					hasPendingChanges: true,
@@ -7966,7 +7982,8 @@ describe( 'distributed editing session state', () => {
 		for ( const currentCase of cases ) {
 			const journeyState =
 				getDistributedEditingSaveJourneyStateForSessionState(
-					currentCase.sessionState
+					currentCase.sessionState,
+					currentCase.options
 				);
 
 			expect( journeyState ).toMatchObject( {
@@ -7984,6 +8001,9 @@ describe( 'distributed editing session state', () => {
 				statusChromeAuthorityText: expect.any( String ),
 				saveButtonBlocksNormalSavePost: Boolean(
 					currentCase.saveButtonBlocksNormalSavePost
+				),
+				dirtyEditorPreflight: Boolean(
+					currentCase.dirtyEditorPreflight
 				),
 				confirmedByWordPress: Boolean(
 					currentCase.confirmedByWordPress
@@ -8031,6 +8051,37 @@ describe( 'distributed editing session state', () => {
 				DISTRIBUTED_EDITING_SAVE_AUTHORITY_STATES.REVIEW_REQUIRED_BEFORE_UPDATE,
 			statusChromeAuthorityText:
 				'The authoritative WordPress post cannot be updated until risky changes are approved or removed.',
+		} );
+
+		expect(
+			getDistributedEditingSaveJourneyState(
+				{
+					editorSettings: {
+						distributedEditing: {
+							enabled: true,
+						},
+					},
+					distributedEditingSession: {},
+				},
+				true
+			)
+		).toMatchObject( {
+			enabled: true,
+			shouldExposeInSaveControls: true,
+			step: DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.LOCAL_CHANGES_PROTECTED,
+			action: 'dirty_save_preflight',
+			title: 'Save checks with WordPress',
+			dirtyEditorPreflight: true,
+			statusChromeSummary:
+				'Local edits will be checked with WordPress before the post updates.',
+			statusChromeAuthorityText:
+				'WordPress remains authoritative; Save checks for a newer version before updating the post.',
+			callsNormalSavePost: false,
+			callsRetrySaveEndpoint: false,
+			mutatesEditorContent: false,
+			mutatesPersistedPostContent: false,
+			changesPostLock: false,
+			claimsSavedWithoutEvidence: false,
 		} );
 
 		expect(

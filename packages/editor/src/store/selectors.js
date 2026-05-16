@@ -690,15 +690,20 @@ export function getDistributedEditingSaveButtonState( state ) {
  * Returns the current DE-RTC Save journey descriptor for real editor Save
  * controls.
  *
- * @param {Object} state Editor state.
+ * @param {Object}  state   Editor state.
+ * @param {boolean} isDirty Whether the current editor has local edits.
  *
  * @return {Object} Save journey state.
  */
-export function getDistributedEditingSaveJourneyState( state ) {
+export function getDistributedEditingSaveJourneyState(
+	state,
+	isDirty = false
+) {
 	const distributedEditingSettings =
 		getEditorSettings( state ).distributedEditing || EMPTY_OBJECT;
 	const saveJourney = getDistributedEditingSaveJourneyStateForSessionState(
-		getDistributedEditingSessionState( state )
+		getDistributedEditingSessionState( state ),
+		{ isDirty }
 	);
 
 	return {
