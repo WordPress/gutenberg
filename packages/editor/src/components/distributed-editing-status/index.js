@@ -2002,6 +2002,15 @@ function DistributedEditingSameBlockConflictComparison( {
 				'This editor and WordPress changed the same block. Choose the local version or the latest WordPress version before trying Save again.'
 		  );
 	const visibleGuideSteps = isPreparedComparisonCompact ? [] : guideSteps;
+	const comparisonActionsLayout = isPreparedComparisonCompact
+		? 'prepared_recovery_inline'
+		: 'standard_grouped';
+	const supportActionsMode = isPreparedComparisonCompact
+		? 'quiet_recovery'
+		: 'standard_recovery';
+	const exportActionVariant = isPreparedComparisonCompact
+		? 'tertiary'
+		: 'secondary';
 	const conflictChoiceActions = isPreparedComparisonCompact
 		? [
 				isLocalChoiceSelected
@@ -2091,6 +2100,12 @@ function DistributedEditingSameBlockConflictComparison( {
 			}
 			data-distributed-editing-conflict-comparison-visible-choice-count={
 				conflictChoiceActions.length
+			}
+			data-distributed-editing-conflict-comparison-actions-layout={
+				comparisonActionsLayout
+			}
+			data-distributed-editing-conflict-support-actions-mode={
+				supportActionsMode
 			}
 			data-distributed-editing-conflict-resolution-choice={
 				comparison.resolutionChoice || undefined
@@ -2218,7 +2233,13 @@ function DistributedEditingSameBlockConflictComparison( {
 					);
 				} ) }
 			</div>
-			<div className="editor-distributed-editing-status__conflict-comparison-actions">
+			<div
+				className={
+					isPreparedComparisonCompact
+						? 'editor-distributed-editing-status__conflict-comparison-actions editor-distributed-editing-status__conflict-comparison-actions--prepared'
+						: 'editor-distributed-editing-status__conflict-comparison-actions'
+				}
+			>
 				<div
 					className={
 						isPreparedComparisonCompact
@@ -2247,7 +2268,13 @@ function DistributedEditingSameBlockConflictComparison( {
 						</Button>
 					) ) }
 				</div>
-				<div className="editor-distributed-editing-status__conflict-comparison-action-group editor-distributed-editing-status__conflict-comparison-action-group--supporting">
+				<div
+					className={
+						isPreparedComparisonCompact
+							? 'editor-distributed-editing-status__conflict-comparison-action-group editor-distributed-editing-status__conflict-comparison-action-group--supporting editor-distributed-editing-status__conflict-comparison-action-group--supporting-quiet'
+							: 'editor-distributed-editing-status__conflict-comparison-action-group editor-distributed-editing-status__conflict-comparison-action-group--supporting'
+					}
+				>
 					{ comparison.canRequestFreshProof && (
 						<Button
 							__next40pxDefaultSize
@@ -2270,7 +2297,11 @@ function DistributedEditingSameBlockConflictComparison( {
 					) }
 					<Button
 						__next40pxDefaultSize
-						variant="secondary"
+						data-distributed-editing-conflict-support-action="export_for_review"
+						data-distributed-editing-conflict-support-action-emphasis={
+							supportActionsMode
+						}
+						variant={ exportActionVariant }
 						onClick={ () =>
 							onAction?.(
 								DISTRIBUTED_EDITING_NOTICE_ACTIONS.EXPORT_LOCAL_UPDATES,
@@ -2282,6 +2313,10 @@ function DistributedEditingSameBlockConflictComparison( {
 					</Button>
 					<Button
 						__next40pxDefaultSize
+						data-distributed-editing-conflict-support-action="get_latest_post"
+						data-distributed-editing-conflict-support-action-emphasis={
+							supportActionsMode
+						}
 						variant="tertiary"
 						onClick={ () =>
 							onAction?.(

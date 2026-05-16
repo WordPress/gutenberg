@@ -1042,6 +1042,14 @@ describe( 'DistributedEditingStatus', () => {
 			'2'
 		);
 		expect( comparison ).toHaveAttribute(
+			'data-distributed-editing-conflict-comparison-actions-layout',
+			'standard_grouped'
+		);
+		expect( comparison ).toHaveAttribute(
+			'data-distributed-editing-conflict-support-actions-mode',
+			'standard_recovery'
+		);
+		expect( comparison ).toHaveAttribute(
 			'data-distributed-editing-conflict-comparison-visible-row-count',
 			'3'
 		);
@@ -1101,12 +1109,18 @@ describe( 'DistributedEditingStatus', () => {
 			within( comparison ).getByRole( 'button', {
 				name: 'Export for review',
 			} )
-		).toBeVisible();
+		).toHaveAttribute(
+			'data-distributed-editing-conflict-support-action-emphasis',
+			'standard_recovery'
+		);
 		expect(
 			within( comparison ).getByRole( 'button', {
 				name: 'Get latest post',
 			} )
-		).toBeVisible();
+		).toHaveAttribute(
+			'data-distributed-editing-conflict-support-action-emphasis',
+			'standard_recovery'
+		);
 	} );
 
 	it( 'keeps same-block conflict actions explicit without saving by default', async () => {
@@ -1602,6 +1616,14 @@ describe( 'DistributedEditingStatus', () => {
 			'1'
 		);
 		expect( comparison ).toHaveAttribute(
+			'data-distributed-editing-conflict-comparison-actions-layout',
+			'prepared_recovery_inline'
+		);
+		expect( comparison ).toHaveAttribute(
+			'data-distributed-editing-conflict-support-actions-mode',
+			'quiet_recovery'
+		);
+		expect( comparison ).toHaveAttribute(
 			'data-distributed-editing-conflict-comparison-visible-row-count',
 			'1'
 		);
@@ -1666,6 +1688,31 @@ describe( 'DistributedEditingStatus', () => {
 		).toHaveAttribute(
 			'data-distributed-editing-conflict-choice-compact-change',
 			'true'
+		);
+		expect(
+			within( comparison )
+				.getAllByRole( 'button' )
+				.map( ( button ) => button.textContent )
+		).toEqual( [
+			'Change to latest from WordPress',
+			'Export for review',
+			'Get latest post',
+		] );
+		expect(
+			within( comparison ).getByRole( 'button', {
+				name: 'Export for review',
+			} )
+		).toHaveAttribute(
+			'data-distributed-editing-conflict-support-action-emphasis',
+			'quiet_recovery'
+		);
+		expect(
+			within( comparison ).getByRole( 'button', {
+				name: 'Get latest post',
+			} )
+		).toHaveAttribute(
+			'data-distributed-editing-conflict-support-action-emphasis',
+			'quiet_recovery'
 		);
 		expect(
 			within( comparison ).getByLabelText( 'Your local version' )

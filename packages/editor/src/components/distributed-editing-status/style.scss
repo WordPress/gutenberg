@@ -367,6 +367,12 @@
 	gap: $grid-unit-05;
 }
 
+.editor-distributed-editing-status__conflict-comparison-actions--prepared {
+	align-items: center;
+	display: flex;
+	flex-wrap: wrap;
+}
+
 .editor-distributed-editing-status__conflict-comparison-action-group {
 	display: flex;
 	flex-wrap: wrap;
@@ -381,4 +387,8 @@
 .editor-distributed-editing-status__conflict-comparison-action-group--choices-prepared .components-button {
 	flex: 0 1 auto;
 	justify-content: flex-start;
+}
+
+.editor-distributed-editing-status__conflict-comparison-action-group--supporting-quiet .components-button {
+	color: $gray-700;
 }
