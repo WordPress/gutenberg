@@ -1503,6 +1503,9 @@ export function DistributedEditingStatusSurface( {
 						data-distributed-editing-next-step={
 							item.nextStepAction || undefined
 						}
+						data-distributed-editing-remote-review-context={ formatDataBoolean(
+							Boolean( item.remoteReviewContextMessage )
+						) }
 					>
 						<Notice
 							className="editor-distributed-editing-status__notice"
@@ -1516,6 +1519,11 @@ export function DistributedEditingStatusSurface( {
 								<div className="editor-distributed-editing-status__next-step">
 									<strong>{ __( 'Next step:' ) }</strong>{ ' ' }
 									{ nextStepMessage }
+								</div>
+							) }
+							{ item.remoteReviewContextMessage && (
+								<div className="editor-distributed-editing-status__remote-review-context">
+									{ item.remoteReviewContextMessage }
 								</div>
 							) }
 							{ actionTranscriptReportMessage && (
@@ -6773,6 +6781,9 @@ function getNextStepDescriptor( nextStepAction ) {
 }
 
 function getStaleBaseStatusText( descriptor ) {
+	const remoteReviewContextMessage =
+		getRemoteReviewContextMessage( descriptor );
+
 	if (
 		descriptor.retrySaveStatus ===
 		DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.STALE_BASE_REJECTED
@@ -6782,6 +6793,7 @@ function getStaleBaseStatusText( descriptor ) {
 			message: __(
 				'The post changed again before Save finished. Protected local changes are still exportable; get the latest post before trying again.'
 			),
+			remoteReviewContextMessage,
 		};
 	}
 
@@ -6794,6 +6806,7 @@ function getStaleBaseStatusText( descriptor ) {
 			message: __(
 				'The post changed after WordPress checked these changes. Protected local changes remain exportable; get the latest post before continuing.'
 			),
+			remoteReviewContextMessage,
 		};
 	}
 
@@ -6806,6 +6819,7 @@ function getStaleBaseStatusText( descriptor ) {
 			message: __(
 				'Local changes are prepared against the latest post. Check with WordPress before preparing Save; nothing has been saved yet.'
 			),
+			remoteReviewContextMessage,
 		};
 	}
 
@@ -6816,17 +6830,20 @@ function getStaleBaseStatusText( descriptor ) {
 				message: __(
 					'The latest post is loaded and local changes were applied in this editor. Prepare these changes for a WordPress check before updating the post.'
 				),
+				remoteReviewContextMessage,
 			};
 		case DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.MANUAL_CONFLICT_REQUIRED:
 			return {
 				title: __( 'Compare conflicting changes' ),
 				message: getManualLocalRebaseConflictMessage( descriptor ),
+				remoteReviewContextMessage,
 				...getNextStepDescriptor( 'export_for_manual_conflict_review' ),
 			};
 		case DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.UNSAFE_CONTENT_BOUNDARY:
 			return {
 				title: __( 'Local changes blocked' ),
 				message: getUnsafeLocalRebaseBoundaryMessage( descriptor ),
+				remoteReviewContextMessage,
 				...getNextStepDescriptor( 'export_for_manual_conflict_review' ),
 			};
 		case DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.BLOCKED_NEEDS_READY_PLAN:
@@ -6835,6 +6852,7 @@ function getStaleBaseStatusText( descriptor ) {
 				message: __(
 					'The latest post is not loaded yet. Get latest post before applying local changes.'
 				),
+				remoteReviewContextMessage,
 			};
 	}
 
@@ -6848,6 +6866,7 @@ function getStaleBaseStatusText( descriptor ) {
 			message: __(
 				'The editor needs both the starting post and latest post before it can apply local changes. Export local changes before reloading.'
 			),
+			remoteReviewContextMessage,
 		};
 	}
 
@@ -6861,6 +6880,7 @@ function getStaleBaseStatusText( descriptor ) {
 			message: __(
 				'Apply local changes in this editor before trying Save again; WordPress is not updated yet.'
 			),
+			remoteReviewContextMessage,
 		};
 	}
 
@@ -6869,7 +6889,18 @@ function getStaleBaseStatusText( descriptor ) {
 		message: __(
 			'Get latest post first. Then this editor will say whether local changes can be applied, need comparison, or are ready for WordPress to check.'
 		),
+		remoteReviewContextMessage,
 	};
+}
+
+function getRemoteReviewContextMessage( descriptor ) {
+	if ( normalizeCount( descriptor?.remoteChangeCount ) <= 0 ) {
+		return null;
+	}
+
+	return __(
+		"Review changes tracks remote activity separately. Use this notice's next step to keep local changes protected before Save."
+	);
 }
 
 function getRetrySaveStatusText( descriptor ) {

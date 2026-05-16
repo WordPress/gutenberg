@@ -7607,6 +7607,18 @@ describe( 'DistributedEditingStatusSurface', () => {
 			.getByText( 'Latest post loaded' )
 			// eslint-disable-next-line testing-library/no-node-access
 			.closest( '.editor-distributed-editing-status__notice' );
+		expect( staleBaseNotice ).toHaveTextContent(
+			"Review changes tracks remote activity separately. Use this notice's next step to keep local changes protected before Save."
+		);
+		expect(
+			screen
+				.getByText( 'Latest post loaded' )
+				// eslint-disable-next-line testing-library/no-node-access
+				.closest( '[data-distributed-editing-remote-review-context]' )
+		).toHaveAttribute(
+			'data-distributed-editing-remote-review-context',
+			'true'
+		);
 		expect(
 			within( staleBaseNotice )
 				.getAllByRole( 'button' )
@@ -7672,6 +7684,9 @@ describe( 'DistributedEditingStatusSurface', () => {
 			.getByText( 'Latest post data missing' )
 			// eslint-disable-next-line testing-library/no-node-access
 			.closest( '.editor-distributed-editing-status__notice' );
+		expect( staleBaseNotice ).toHaveTextContent(
+			"Review changes tracks remote activity separately. Use this notice's next step to keep local changes protected before Save."
+		);
 		expect(
 			within( staleBaseNotice )
 				.getAllByRole( 'button' )
@@ -7679,6 +7694,38 @@ describe( 'DistributedEditingStatusSurface', () => {
 					return button.textContent.trim();
 				} )
 		).toEqual( [ 'Get latest post', 'Export local changes' ] );
+	} );
+
+	it( 'does not render remote-review context when stale-base has no separate remote notice', () => {
+		const noticeDescriptors =
+			getDistributedEditingNoticeDescriptorsForSessionState( {
+				disposition:
+					DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+				reasonCode:
+					DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+				pendingChangeCount: 1,
+				canExportLocalUpdates: true,
+			} );
+
+		render(
+			<DistributedEditingStatusSurface
+				noticeDescriptors={ noticeDescriptors }
+				onAction={ jest.fn() }
+			/>
+		);
+
+		expect(
+			screen.queryByText( /tracks remote activity separately/ )
+		).not.toBeInTheDocument();
+		expect(
+			screen
+				.getByText( 'Post changed on the server' )
+				// eslint-disable-next-line testing-library/no-node-access
+				.closest( '[data-distributed-editing-remote-review-context]' )
+		).toHaveAttribute(
+			'data-distributed-editing-remote-review-context',
+			'false'
+		);
 	} );
 
 	it( 'renders stale-base rebase result status without leaking content', () => {
