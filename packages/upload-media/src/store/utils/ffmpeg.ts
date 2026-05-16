@@ -27,7 +27,19 @@ self.onmessage = function( e ) {
 			// Load FFmpeg core on first use.
 			if ( ! ffmpegModule ) {
 				importScripts( data.coreUrl );
+				// @ffmpeg/core 0.12.x ignores a user-supplied locateFile:
+				// during init it overwrites Module.locateFile with its own
+				// implementation that reads the WASM URL from a base64 JSON
+				// fragment on mainScriptUrlOrBlob. Hand the plugin-served
+				// WASM URL over via that fragment, otherwise the core falls
+				// back to fetching a bare 'ffmpeg-core.wasm' which fails in
+				// the Blob-URL worker (no base URL to resolve against).
+				var coreConfig = btoa( JSON.stringify( {
+					wasmURL: data.wasmUrl,
+					workerURL: '',
+				} ) );
 				ffmpegModule = await self.createFFmpegCore( {
+					mainScriptUrlOrBlob: data.coreUrl + '#' + coreConfig,
 					print: function() {},
 					printErr: function() {},
 				} );
@@ -41,69 +53,71 @@ self.onmessage = function( e ) {
 			// Write input file to Emscripten virtual filesystem.
 			ffmpegModule.FS.writeFile( inputName, new Uint8Array( data.inputBuffer ) );
 
-			// Build FFmpeg arguments.
-			var args = [ '-nostdin', '-y', '-i', inputName ];
-
-			// Video codec selection.
-			if ( isWebm ) {
-				args.push( '-c:v', 'libvpx-vp9' );
-				args.push( '-crf', '31', '-b:v', '0' );
-			} else {
-				args.push( '-c:v', 'libx264' );
-				args.push( '-preset', 'fast' );
-			}
-
-			// Common settings.
-			args.push( '-r', '24' );
-			args.push( '-pix_fmt', 'yuv420p' );
-
-			// Scale filter: ensure even dimensions (required by most codecs),
-			// and optionally scale down if exceeding maxDimensions.
-			if ( data.maxDimensions ) {
-				var max = data.maxDimensions + ( data.maxDimensions % 2 );
-				args.push(
-					'-vf',
-					"scale='min(" + max + ",trunc(iw/2)*2)':'min(" + max + ",trunc(ih/2)*2)':flags=lanczos"
-				);
-			} else {
-				args.push( '-vf', "scale='trunc(iw/2)*2':'trunc(ih/2)*2'" );
-			}
-
-			// MP4: move metadata to the beginning for streaming.
-			if ( ! isWebm ) {
-				args.push( '-movflags', '+faststart' );
-			}
-
-			// Remove audio (GIFs don't have audio).
-			args.push( '-an' );
-			args.push( outputName );
-
-			// Run FFmpeg.
-			ffmpegModule.setTimeout( -1 );
-			ffmpegModule.exec.apply( ffmpegModule, args );
-
-			// Read output file.
-			var output = ffmpegModule.FS.readFile( outputName );
-			if ( ! output || output.length === 0 ) {
-				throw new Error( 'FFmpeg produced empty output' );
-			}
-
-			// Extract only the relevant bytes.
-			var buffer = output.buffer.slice(
-				output.byteOffset,
-				output.byteOffset + output.byteLength
-			);
-
-			// Cleanup virtual filesystem and reset state.
 			try {
-				ffmpegModule.FS.unlink( inputName );
-				ffmpegModule.FS.unlink( outputName );
-			} catch ( _e ) {
-				// Ignore cleanup errors.
-			}
-			ffmpegModule.reset();
+				// Build FFmpeg arguments.
+				var args = [ '-nostdin', '-y', '-i', inputName ];
 
-			self.postMessage( { type: 'result', buffer: buffer }, [ buffer ] );
+				// Video codec selection.
+				if ( isWebm ) {
+					args.push( '-c:v', 'libvpx-vp9' );
+					args.push( '-crf', '31', '-b:v', '0' );
+				} else {
+					args.push( '-c:v', 'libx264' );
+					args.push( '-preset', 'fast' );
+				}
+
+				// Common settings.
+				args.push( '-r', '24' );
+				args.push( '-pix_fmt', 'yuv420p' );
+
+				// Scale filter: ensure even dimensions, required by most
+				// codecs (H.264, VP9).
+				args.push( '-vf', "scale='trunc(iw/2)*2':'trunc(ih/2)*2'" );
+
+				// MP4: move metadata to the beginning for streaming.
+				if ( ! isWebm ) {
+					args.push( '-movflags', '+faststart' );
+				}
+
+				// Remove audio (GIFs don't have audio).
+				args.push( '-an' );
+				args.push( outputName );
+
+				// Run FFmpeg.
+				ffmpegModule.setTimeout( -1 );
+				ffmpegModule.exec.apply( ffmpegModule, args );
+
+				// Read output file.
+				var output = ffmpegModule.FS.readFile( outputName );
+				if ( ! output || output.length === 0 ) {
+					throw new Error( 'FFmpeg produced empty output' );
+				}
+
+				// Copy into a fresh ArrayBuffer. FS.readFile() returns a
+				// Uint8Array viewing MEMFS, and under crossOriginIsolated
+				// FFmpeg builds that backing buffer can be a
+				// SharedArrayBuffer, which cannot be transferred via
+				// postMessage. Slicing the typed array always allocates a
+				// standalone, transferable ArrayBuffer.
+				var buffer = new Uint8Array( output ).slice().buffer;
+
+				self.postMessage( { type: 'result', buffer: buffer }, [ buffer ] );
+			} finally {
+				// Always clean up MEMFS and reset core state so a failed
+				// run doesn't leave stale files or state for the next
+				// message that reuses the cached module instance.
+				try {
+					ffmpegModule.FS.unlink( inputName );
+				} catch ( _e ) {
+					// Ignore cleanup errors.
+				}
+				try {
+					ffmpegModule.FS.unlink( outputName );
+				} catch ( _e2 ) {
+					// Ignore cleanup errors.
+				}
+				ffmpegModule.reset();
+			}
 		} catch ( err ) {
 			self.postMessage( { type: 'error', message: err.message || String( err ) } );
 		}
@@ -144,19 +158,17 @@ function getOrCreateWorker(): Worker {
  * assets URL. The conversion runs entirely in a worker to avoid
  * blocking the main thread.
  *
- * @param id            Queue item ID.
- * @param file          GIF file object.
- * @param config        WASM configuration from the wp-ffmpeg-wasm plugin.
- * @param outputFormat  Output format: 'mp4' or 'webm'.
- * @param maxDimensions Optional maximum dimensions for scaling.
+ * @param id           Queue item ID.
+ * @param file         GIF file object.
+ * @param config       WASM configuration from the wp-ffmpeg-wasm plugin.
+ * @param outputFormat Output format: 'mp4' or 'webm'.
  * @return Converted video file.
  */
 export async function ffmpegConvertGifToVideo(
 	id: QueueItemId,
 	file: File,
 	config: FFmpegConfig,
-	outputFormat: 'mp4' | 'webm' = 'mp4',
-	maxDimensions?: number
+	outputFormat: 'mp4' | 'webm' = 'mp4'
 ): Promise< File > {
 	const w = getOrCreateWorker();
 	const inputBuffer = await file.arrayBuffer();
@@ -190,9 +202,9 @@ export async function ffmpegConvertGifToVideo(
 			{
 				type: 'convert',
 				coreUrl: config.coreUrl,
+				wasmUrl: config.wasmUrl,
 				inputBuffer,
 				outputFormat,
-				maxDimensions,
 			},
 			[ inputBuffer ]
 		);
