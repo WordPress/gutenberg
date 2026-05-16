@@ -49,6 +49,7 @@ import {
 	getDistributedEditingPresenceRosterStateForSessionState,
 	getDistributedEditingPresenceStartupPolicyStateForSessionState,
 	getDistributedEditingSavePolicyStateForSessionState,
+	getDistributedEditingSaveJourneyStateForSessionState,
 	normalizeDistributedEditingSessionState,
 } from '../../store/distributed-editing';
 import PluginPrePublishPanel from '../plugin-pre-publish-panel';
@@ -1506,6 +1507,15 @@ export function DistributedEditingStatusSurface( {
 						data-distributed-editing-remote-review-context={ formatDataBoolean(
 							Boolean( item.remoteReviewContextMessage )
 						) }
+						data-distributed-editing-save-now-context={ formatDataBoolean(
+							Boolean( item.saveNowContextMessage )
+						) }
+						data-distributed-editing-save-now-action={
+							item.saveNowContextAction || undefined
+						}
+						data-distributed-editing-save-now-step={
+							item.saveNowContextStep || undefined
+						}
 					>
 						<Notice
 							className="editor-distributed-editing-status__notice"
@@ -1524,6 +1534,11 @@ export function DistributedEditingStatusSurface( {
 							{ item.remoteReviewContextMessage && (
 								<div className="editor-distributed-editing-status__remote-review-context">
 									{ item.remoteReviewContextMessage }
+								</div>
+							) }
+							{ item.saveNowContextMessage && (
+								<div className="editor-distributed-editing-status__save-now-context">
+									{ item.saveNowContextMessage }
 								</div>
 							) }
 							{ actionTranscriptReportMessage && (
@@ -6783,6 +6798,7 @@ function getNextStepDescriptor( nextStepAction ) {
 function getStaleBaseStatusText( descriptor ) {
 	const remoteReviewContextMessage =
 		getRemoteReviewContextMessage( descriptor );
+	const saveNowContext = getSaveNowContext( descriptor );
 
 	if (
 		descriptor.retrySaveStatus ===
@@ -6794,6 +6810,7 @@ function getStaleBaseStatusText( descriptor ) {
 				'The post changed again before Save finished. Protected local changes are still exportable; get the latest post before trying again.'
 			),
 			remoteReviewContextMessage,
+			...saveNowContext,
 		};
 	}
 
@@ -6807,6 +6824,7 @@ function getStaleBaseStatusText( descriptor ) {
 				'The post changed after WordPress checked these changes. Protected local changes remain exportable; get the latest post before continuing.'
 			),
 			remoteReviewContextMessage,
+			...saveNowContext,
 		};
 	}
 
@@ -6820,6 +6838,7 @@ function getStaleBaseStatusText( descriptor ) {
 				'Local changes are prepared against the latest post. Check with WordPress before preparing Save; nothing has been saved yet.'
 			),
 			remoteReviewContextMessage,
+			...saveNowContext,
 		};
 	}
 
@@ -6831,12 +6850,14 @@ function getStaleBaseStatusText( descriptor ) {
 					'The latest post is loaded and local changes were applied in this editor. Prepare these changes for a WordPress check before updating the post.'
 				),
 				remoteReviewContextMessage,
+				...saveNowContext,
 			};
 		case DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.MANUAL_CONFLICT_REQUIRED:
 			return {
 				title: __( 'Compare conflicting changes' ),
 				message: getManualLocalRebaseConflictMessage( descriptor ),
 				remoteReviewContextMessage,
+				...saveNowContext,
 				...getNextStepDescriptor( 'export_for_manual_conflict_review' ),
 			};
 		case DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.UNSAFE_CONTENT_BOUNDARY:
@@ -6844,6 +6865,7 @@ function getStaleBaseStatusText( descriptor ) {
 				title: __( 'Local changes blocked' ),
 				message: getUnsafeLocalRebaseBoundaryMessage( descriptor ),
 				remoteReviewContextMessage,
+				...saveNowContext,
 				...getNextStepDescriptor( 'export_for_manual_conflict_review' ),
 			};
 		case DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.BLOCKED_NEEDS_READY_PLAN:
@@ -6853,6 +6875,7 @@ function getStaleBaseStatusText( descriptor ) {
 					'The latest post is not loaded yet. Get latest post before applying local changes.'
 				),
 				remoteReviewContextMessage,
+				...saveNowContext,
 			};
 	}
 
@@ -6867,6 +6890,7 @@ function getStaleBaseStatusText( descriptor ) {
 				'The editor needs both the starting post and latest post before it can apply local changes. Export local changes before reloading.'
 			),
 			remoteReviewContextMessage,
+			...saveNowContext,
 		};
 	}
 
@@ -6881,6 +6905,7 @@ function getStaleBaseStatusText( descriptor ) {
 				'Apply local changes in this editor before trying Save again; WordPress is not updated yet.'
 			),
 			remoteReviewContextMessage,
+			...saveNowContext,
 		};
 	}
 
@@ -6890,6 +6915,47 @@ function getStaleBaseStatusText( descriptor ) {
 			'Get latest post first. Then this editor will say whether local changes can be applied, need comparison, or are ready for WordPress to check.'
 		),
 		remoteReviewContextMessage,
+		...saveNowContext,
+	};
+}
+
+function getSaveNowContext( descriptor ) {
+	const saveJourneyState =
+		getDistributedEditingSaveJourneyStateForSessionState(
+			getSaveJourneyContextState( descriptor )
+		);
+
+	if (
+		! saveJourneyState.requiresActionBeforeSave ||
+		! saveJourneyState.actionHint
+	) {
+		return {};
+	}
+
+	return {
+		saveNowContextAction: saveJourneyState.action,
+		saveNowContextMessage: sprintf(
+			/* translators: %s: Distributed Editing action needed before Save can update the post, such as "Get latest first". */
+			__( 'Save now: %s before Save can update the post.' ),
+			saveJourneyState.actionHint
+		),
+		saveNowContextStep: saveJourneyState.step,
+	};
+}
+
+function getSaveJourneyContextState( descriptor ) {
+	if ( descriptor?.hasLocalRebaseInputs !== true ) {
+		return descriptor;
+	}
+
+	// Preserve the redacted notice-descriptor boundary. The Save journey only
+	// needs content availability here, not the retained post content itself.
+	return {
+		...descriptor,
+		clientBaseContent: '',
+		refetchedServerState: true,
+		refetchedServerContent: '',
+		requiresServerStateRefetch: false,
 	};
 }
 

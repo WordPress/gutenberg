@@ -7610,6 +7610,9 @@ describe( 'DistributedEditingStatusSurface', () => {
 		expect( staleBaseNotice ).toHaveTextContent(
 			"Review changes tracks remote activity separately. Use this notice's next step to keep local changes protected before Save."
 		);
+		expect( staleBaseNotice ).toHaveTextContent(
+			'Save now: Apply local changes before Save can update the post.'
+		);
 		expect(
 			screen
 				.getByText( 'Latest post loaded' )
@@ -7618,6 +7621,22 @@ describe( 'DistributedEditingStatusSurface', () => {
 		).toHaveAttribute(
 			'data-distributed-editing-remote-review-context',
 			'true'
+		);
+		const staleBaseStatusItem = screen
+			.getByText( 'Latest post loaded' )
+			// eslint-disable-next-line testing-library/no-node-access
+			.closest( '[data-distributed-editing-save-now-context]' );
+		expect( staleBaseStatusItem ).toHaveAttribute(
+			'data-distributed-editing-save-now-context',
+			'true'
+		);
+		expect( staleBaseStatusItem ).toHaveAttribute(
+			'data-distributed-editing-save-now-action',
+			'apply_local_changes'
+		);
+		expect( staleBaseStatusItem ).toHaveAttribute(
+			'data-distributed-editing-save-now-step',
+			'local_changes_protected'
 		);
 		expect(
 			within( staleBaseNotice )
@@ -7687,6 +7706,18 @@ describe( 'DistributedEditingStatusSurface', () => {
 		expect( staleBaseNotice ).toHaveTextContent(
 			"Review changes tracks remote activity separately. Use this notice's next step to keep local changes protected before Save."
 		);
+		expect( staleBaseNotice ).toHaveTextContent(
+			'Save now: Get latest first before Save can update the post.'
+		);
+		expect(
+			screen
+				.getByText( 'Latest post data missing' )
+				// eslint-disable-next-line testing-library/no-node-access
+				.closest( '[data-distributed-editing-save-now-context]' )
+		).toHaveAttribute(
+			'data-distributed-editing-save-now-action',
+			'get_latest_post'
+		);
 		expect(
 			within( staleBaseNotice )
 				.getAllByRole( 'button' )
@@ -7718,6 +7749,11 @@ describe( 'DistributedEditingStatusSurface', () => {
 			screen.queryByText( /tracks remote activity separately/ )
 		).not.toBeInTheDocument();
 		expect(
+			screen.getByText(
+				'Save now: Get latest first before Save can update the post.'
+			)
+		).toBeVisible();
+		expect(
 			screen
 				.getByText( 'Post changed on the server' )
 				// eslint-disable-next-line testing-library/no-node-access
@@ -7725,6 +7761,15 @@ describe( 'DistributedEditingStatusSurface', () => {
 		).toHaveAttribute(
 			'data-distributed-editing-remote-review-context',
 			'false'
+		);
+		expect(
+			screen
+				.getByText( 'Post changed on the server' )
+				// eslint-disable-next-line testing-library/no-node-access
+				.closest( '[data-distributed-editing-save-now-context]' )
+		).toHaveAttribute(
+			'data-distributed-editing-save-now-context',
+			'true'
 		);
 	} );
 
