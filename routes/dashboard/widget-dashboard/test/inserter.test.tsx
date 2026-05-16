@@ -80,7 +80,9 @@ function Harness( {
 describe( 'WidgetDashboard.Inserter', () => {
 	it( 'is hidden until the "Add widgets" trigger is clicked', () => {
 		render( <Harness /> );
-		expect( screen.queryByRole( 'dialog' ) ).not.toBeInTheDocument();
+		expect(
+			screen.queryByRole( 'dialog', { name: 'Add widget' } )
+		).not.toBeInTheDocument();
 	} );
 
 	it( 'opens after clicking the "Add widgets" trigger', async () => {
@@ -91,7 +93,9 @@ describe( 'WidgetDashboard.Inserter', () => {
 			screen.getByRole( 'button', { name: 'Add widgets' } )
 		);
 
-		expect( await screen.findByRole( 'dialog' ) ).toBeInTheDocument();
+		expect(
+			await screen.findByRole( 'dialog', { name: 'Add widget' } )
+		).toBeInTheDocument();
 	} );
 
 	it( 'inserts the selected widget type into the layout on Done', async () => {
@@ -103,7 +107,9 @@ describe( 'WidgetDashboard.Inserter', () => {
 			screen.getByRole( 'button', { name: 'Add widgets' } )
 		);
 
-		const dialog = await screen.findByRole( 'dialog' );
+		const dialog = await screen.findByRole( 'dialog', {
+			name: 'Add widget',
+		} );
 		const options = within( dialog ).getAllByRole( 'option' );
 		expect( options ).toHaveLength( widgetTypes.length );
 
@@ -116,7 +122,9 @@ describe( 'WidgetDashboard.Inserter', () => {
 		expect( onLayoutChange ).not.toHaveBeenCalled();
 
 		await waitFor( () =>
-			expect( screen.queryByRole( 'dialog' ) ).not.toBeInTheDocument()
+			expect(
+				screen.queryByRole( 'dialog', { name: 'Add widget' } )
+			).not.toBeInTheDocument()
 		);
 
 		await user.click( screen.getByRole( 'button', { name: 'Done' } ) );
@@ -140,7 +148,9 @@ describe( 'WidgetDashboard.Inserter', () => {
 			screen.getByRole( 'button', { name: 'Add widgets' } )
 		);
 
-		const dialog = await screen.findByRole( 'dialog' );
+		const dialog = await screen.findByRole( 'dialog', {
+			name: 'Add widget',
+		} );
 		const options = within( dialog ).getAllByRole( 'option' );
 
 		await user.click( options[ 0 ] );
@@ -182,7 +192,9 @@ describe( 'WidgetDashboard.Inserter', () => {
 			screen.getByRole( 'button', { name: 'Add widgets' } )
 		);
 
-		const dialog = await screen.findByRole( 'dialog' );
+		const dialog = await screen.findByRole( 'dialog', {
+			name: 'Add widget',
+		} );
 		await user.click( within( dialog ).getAllByRole( 'option' )[ 1 ] );
 		await user.click(
 			within( dialog ).getByRole( 'button', { name: 'Select' } )

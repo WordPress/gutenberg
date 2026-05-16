@@ -145,17 +145,11 @@ interface BaseDashboardGridProps
 	/**
 	 * Inline styles applied to the grid root. Merged underneath the
 	 * grid's own layout styles, so the layout (`gridTemplateColumns`,
-	 * `gridAutoRows`, `gap`) always wins.
+	 * `gridAutoRows`) always wins. The gap between tiles is owned by
+	 * the design-system gap token and is not configurable per
+	 * instance; override it via a theme or density change.
 	 */
 	style?: React.CSSProperties;
-
-	/**
-	 * Grid gap multiplier size (e.g., a spacing of 2 results in a gap
-	 * of 8px, it's multiplied by 4).
-	 *
-	 * @default 2
-	 */
-	spacing?: number;
 
 	/**
 	 * Height of each row in pixels, or `'auto'` to let the tallest

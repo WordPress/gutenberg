@@ -12,8 +12,7 @@
 		}
 
 		&__suggestions_list {
-			margin-left: - $grid-unit-15;
-			margin-right: - $grid-unit-15;
+			margin-inline: - $grid-unit-15;
 			width: calc(100% + #{$grid-unit-15 * 2});
 		}
 	}
@@ -38,6 +37,7 @@
 		&__list-item {
 			display: block;
 			width: 100%;
+			// stylelint-disable-next-line plugin/use-logical-properties-and-values -- TODO: Please fix
 			text-align: left;
 			white-space: pre-wrap;
 			overflow-wrap: break-word;

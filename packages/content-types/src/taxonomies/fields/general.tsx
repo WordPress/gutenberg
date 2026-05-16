@@ -6,8 +6,9 @@ import { resolveSelect, useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import type { Field, Form } from '@wordpress/dataviews';
+import { addQueryArgs } from '@wordpress/url';
 // eslint-disable-next-line @wordpress/use-recommended-components -- Used here because it supports rendering as a `span` via the `render` prop to avoid invalid HTML.
-import { Notice, Stack } from '@wordpress/ui';
+import { Link, Notice, Stack } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -18,6 +19,7 @@ import {
 	createDescriptionField,
 	SlugEdit,
 } from '../../utils/fields';
+import { OverflowingBadges } from '../../utils/overflowing-badges';
 import { usePublicPostTypes } from '../utils';
 import type { TaxonomyFormData } from '../types';
 
@@ -143,11 +145,12 @@ export function useObjectTypeField(): Field< TaxonomyFormData > {
 					return <span aria-hidden="true">—</span>;
 				}
 				return (
-					<>
-						{ slugs
-							.map( ( s ) => labelMap[ s ] ?? s )
-							.join( ', ' ) }
-					</>
+					<OverflowingBadges
+						items={ slugs.map( ( s ) => ( {
+							key: s,
+							label: labelMap[ s ] ?? s,
+						} ) ) }
+					/>
 				);
 			},
 			isValid: { required: true },
@@ -155,6 +158,37 @@ export function useObjectTypeField(): Field< TaxonomyFormData > {
 		};
 	}, [ publicPostTypes ] );
 }
+
+export const countField: Field< TaxonomyFormData > = {
+	id: 'count',
+	label: __( 'Terms' ),
+	type: 'integer',
+	readOnly: true,
+	render: ( { item } ) => {
+		const count = item.count;
+		if ( item.status !== 'publish' || ! count ) {
+			return <span aria-hidden="true">—</span>;
+		}
+		const postType = item.config.object_type?.[ 0 ];
+		// `edit-tags.php` requires a `post_type` arg, so a taxonomy with no
+		// attached post types can't be linked even when it has terms.
+		if ( ! postType ) {
+			return count;
+		}
+		return (
+			<Link
+				href={ addQueryArgs( 'edit-tags.php', {
+					taxonomy: item.slug,
+					post_type: postType,
+				} ) }
+			>
+				{ count }
+			</Link>
+		);
+	},
+	enableSorting: false,
+	filterBy: false,
+};
 
 // The minimal form used by the quick-edit modal.
 export const defaultForm: Form = {

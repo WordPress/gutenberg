@@ -28,8 +28,6 @@
  * SOFTWARE.
  */
 
-/* eslint @eslint-community/eslint-comments/no-unlimited-disable: 0 */
-/* eslint-disable */
 /* pako 1.0.10 nodeca/pako */
 export default ( function () {
 	var define, module, exports;
@@ -4092,4 +4090,3 @@ export default ( function () {
 		[]
 	)( '/lib/inflate.js' );
 } )();
-/* eslint-enable */

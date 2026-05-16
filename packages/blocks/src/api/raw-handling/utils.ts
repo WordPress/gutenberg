@@ -61,11 +61,16 @@ export function getBlockContentSchemaFromTransforms(
 					return '*';
 				}
 
-				return { ...objValue, ...srcValue };
+				return mergeSchemas(
+					{ ...( objValue || {} ) },
+					srcValue || {}
+				);
 			}
 			case 'attributes':
 			case 'require': {
-				return [ ...( objValue || [] ), ...( srcValue || [] ) ];
+				return Array.from(
+					new Set( [ ...( objValue || [] ), ...( srcValue || [] ) ] )
+				);
 			}
 			case 'isMatch': {
 				// If one of the values being merge is undefined (matches everything),
@@ -79,27 +84,59 @@ export function getBlockContentSchemaFromTransforms(
 					return objValue( ...args ) || srcValue( ...args );
 				};
 			}
+			case 'classes': {
+				if (
+					( objValue || [] ).includes( '*' ) ||
+					( srcValue || [] ).includes( '*' )
+				) {
+					return [ '*' ];
+				}
+
+				return [ ...( objValue || [] ), ...( srcValue || [] ) ];
+			}
 		}
 	}
 
 	// A tagName schema is an object with children, attributes, require, and
 	// isMatch properties.
 	function mergeTagNameSchemas( a: any, b: any ) {
-		for ( const key in b ) {
-			a[ key ] = a[ key ]
-				? mergeTagNameSchemaProperties( a[ key ], b[ key ], key )
-				: { ...b[ key ] };
+		if ( a === b ) {
+			return a;
 		}
+
+		for ( const key in b ) {
+			if ( a[ key ] ) {
+				a[ key ] = mergeTagNameSchemaProperties(
+					a[ key ],
+					b[ key ],
+					key
+				);
+			} else if ( Array.isArray( b[ key ] ) ) {
+				a[ key ] = b[ key ].slice();
+			} else {
+				a[ key ] = { ...b[ key ] };
+			}
+		}
+
 		return a;
 	}
 
 	// A schema is an object with tagName schemas by tag name.
 	function mergeSchemas( a: any, b: any ) {
-		for ( const key in b ) {
-			a[ key ] = a[ key ]
-				? mergeTagNameSchemas( a[ key ], b[ key ] )
-				: { ...b[ key ] };
+		if ( a === b ) {
+			return a;
 		}
+
+		for ( const key in b ) {
+			if ( a[ key ] ) {
+				a[ key ] = mergeTagNameSchemas( a[ key ], b[ key ] );
+			} else if ( Array.isArray( b[ key ] ) ) {
+				a[ key ] = b[ key ].slice();
+			} else {
+				a[ key ] = { ...b[ key ] };
+			}
+		}
+
 		return a;
 	}
 
