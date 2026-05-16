@@ -1,17 +1,13 @@
 /**
  * WordPress dependencies
  */
-import { ToggleControl } from '@wordpress/components';
+import { __experimentalNumberControl as NumberControl } from '@wordpress/components';
+import { DataForm } from '@wordpress/dataviews';
+import type { DataFormControlProps, Field, Form } from '@wordpress/dataviews';
 import { useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 /* eslint-disable @wordpress/use-recommended-components */
-import {
-	Button,
-	Drawer,
-	InputControl,
-	SelectControl,
-	Stack,
-} from '@wordpress/ui';
+import { Button, Drawer } from '@wordpress/ui';
 /* eslint-enable @wordpress/use-recommended-components */
 
 /**
@@ -20,35 +16,180 @@ import {
 import { useDashboardInternalContext } from '../../context/dashboard-context';
 import { migrateLayout } from '../../utils/migrate-layout';
 import type {
+	WidgetGridLayoutSettings,
 	WidgetGridModel,
 	WidgetGridSettings,
-	WidgetMasonryLayoutSettings,
 } from '../../types';
 
-const MODEL_ITEMS = [
-	{ value: 'grid', label: __( 'Standard grid' ) },
-	{ value: 'masonry', label: __( 'Masonry' ) },
-] as const satisfies ReadonlyArray< { value: WidgetGridModel; label: string } >;
-
+const DEFAULT_FIXED_COLUMNS = 6;
+const DEFAULT_MIN_COLUMN_WIDTH = 350;
+const DEFAULT_ROW_HEIGHT = 200;
 const ROW_HEIGHT_AUTO = 'auto' as const;
 
-function getModelValue( settings: WidgetGridSettings ): WidgetGridModel {
-	return settings.model ?? 'grid';
+function getModel( item: WidgetGridSettings ): WidgetGridModel {
+	return item.model ?? 'grid';
 }
 
-function parsePositiveInt( raw: unknown ): number | undefined {
-	if ( typeof raw !== 'string' && typeof raw !== 'number' ) {
-		return undefined;
-	}
-	const parsed = typeof raw === 'number' ? raw : Number.parseInt( raw, 10 );
-	if ( ! Number.isFinite( parsed ) || parsed <= 0 ) {
-		return undefined;
-	}
-	return parsed;
+function isMasonry( item: WidgetGridSettings ): boolean {
+	return getModel( item ) === 'masonry';
 }
+
+function isFixedColumns( item: WidgetGridSettings ): boolean {
+	return item.columns !== undefined;
+}
+
+function getRowHeight(
+	item: WidgetGridSettings
+): WidgetGridLayoutSettings[ 'rowHeight' ] {
+	if ( isMasonry( item ) ) {
+		return undefined;
+	}
+	return ( item as WidgetGridLayoutSettings ).rowHeight;
+}
+
+function isAutoRowHeight( item: WidgetGridSettings ): boolean {
+	return getRowHeight( item ) === ROW_HEIGHT_AUTO;
+}
+
+function StepperIntegerEdit( {
+	data,
+	field,
+	onChange,
+}: DataFormControlProps< WidgetGridSettings > ) {
+	const { label, description, getValue, setValue, isValid } = field;
+	const value = getValue( { item: data } );
+	const disabled = field.isDisabled( { item: data, field } );
+	const min =
+		typeof isValid.min?.constraint === 'number'
+			? isValid.min.constraint
+			: undefined;
+	const max =
+		typeof isValid.max?.constraint === 'number'
+			? isValid.max.constraint
+			: undefined;
+
+	return (
+		<NumberControl
+			__next40pxDefaultSize
+			label={ label }
+			help={ description }
+			value={ value ?? '' }
+			min={ min }
+			max={ max }
+			step={ 1 }
+			spinControls="custom"
+			disabled={ disabled }
+			onChange={ ( next ) => {
+				const parsed =
+					next === '' || next === undefined
+						? undefined
+						: Number( next );
+				onChange( setValue( { item: data, value: parsed } ) );
+			} }
+		/>
+	);
+}
+
+const fields: Field< WidgetGridSettings >[] = [
+	{
+		id: 'model',
+		type: 'text',
+		Edit: 'select',
+		label: __( 'Layout model' ),
+		description: __(
+			'Standard grid uses explicit widths and heights. Masonry packs items by content height.'
+		),
+		elements: [
+			{ value: 'grid', label: __( 'Standard grid' ) },
+			{ value: 'masonry', label: __( 'Masonry' ) },
+		],
+		getValue: ( { item } ) => getModel( item ),
+	},
+	{
+		id: 'fixedColumns',
+		type: 'boolean',
+		Edit: 'toggle',
+		label: __( 'Fixed column count' ),
+		getValue: ( { item } ) => isFixedColumns( item ),
+		setValue: ( { item, value } ) =>
+			value
+				? {
+						columns: item.columns ?? DEFAULT_FIXED_COLUMNS,
+						minColumnWidth: undefined,
+				  }
+				: {
+						columns: undefined,
+						minColumnWidth:
+							item.minColumnWidth ?? DEFAULT_MIN_COLUMN_WIDTH,
+				  },
+	},
+	{
+		id: 'columns',
+		type: 'integer',
+		Edit: StepperIntegerEdit,
+		label: __( 'Columns' ),
+		isValid: { min: 1, max: 12 },
+		isVisible: ( item ) => isFixedColumns( item ),
+	},
+	{
+		id: 'minColumnWidth',
+		type: 'integer',
+		Edit: StepperIntegerEdit,
+		label: __( 'Min column width (px)' ),
+		description: __(
+			'Minimum width of each column. The number of columns adapts to the container width.'
+		),
+		isValid: { min: 48, max: 1024 },
+		isVisible: ( item ) => ! isFixedColumns( item ),
+	},
+	{
+		id: 'autoRowHeight',
+		type: 'boolean',
+		Edit: 'toggle',
+		label: __( 'Auto-fit row height to content' ),
+		getValue: ( { item } ) => isAutoRowHeight( item ),
+		setValue: ( { value } ) => ( {
+			rowHeight: value ? ROW_HEIGHT_AUTO : DEFAULT_ROW_HEIGHT,
+		} ),
+		isDisabled: ( { item } ) => isMasonry( item ),
+	},
+	{
+		id: 'rowHeight',
+		type: 'integer',
+		Edit: StepperIntegerEdit,
+		label: __( 'Row height (px)' ),
+		description: __( 'Height of each row in the standard grid.' ),
+		isValid: { min: 100 },
+		getValue: ( { item } ) => {
+			const rh = getRowHeight( item );
+			return typeof rh === 'number' ? rh : undefined;
+		},
+		isVisible: ( item ) => ! isMasonry( item ),
+		isDisabled: ( { item } ) => isAutoRowHeight( item ),
+	},
+];
+
+const form: Form = {
+	layout: { type: 'regular', labelPosition: 'top' },
+	fields: [
+		'model',
+		'fixedColumns',
+		'columns',
+		'minColumnWidth',
+		'autoRowHeight',
+		'rowHeight',
+	],
+};
 
 interface LayoutSettingsProps {
+	/**
+	 * Whether the drawer is visible.
+	 */
 	open: boolean;
+
+	/**
+	 * Callback to toggle the drawer.
+	 */
 	onOpenChange: ( open: boolean ) => void;
 }
 
@@ -75,9 +216,8 @@ interface LayoutSettingsProps {
  * commit never publishes layout edits that the user is in the
  * middle of staging through the toolbar.
  *
- * @param props
- * @param props.open         Whether the drawer is visible.
- * @param props.onOpenChange Toggle controller from the trigger.
+ * @param {LayoutSettingsProps} props Layout settings props.
+ * @return {React.ReactNode} The layout settings component.
  */
 export function LayoutSettings( {
 	open,
@@ -94,109 +234,27 @@ export function LayoutSettings( {
 		hasUncommittedChanges,
 	} = useDashboardInternalContext();
 
-	const currentModel = getModelValue( gridSettings );
-	const isMasonry = currentModel === 'masonry';
+	const handleChange = useCallback(
+		( edits: Record< string, unknown > ) => {
+			const nextModel = edits.model as WidgetGridModel | undefined;
+			const currentModel = getModel( gridSettings );
 
-	const handleModelChange = useCallback(
-		( nextModel: WidgetGridModel ) => {
-			if ( nextModel === currentModel ) {
-				return;
+			if ( nextModel && nextModel !== currentModel ) {
+				const migrated = migrateLayout(
+					layout,
+					currentModel,
+					nextModel,
+					{ columns: gridSettings.columns ?? DEFAULT_FIXED_COLUMNS }
+				);
+				onLayoutChange( migrated );
 			}
 
-			const migrated = migrateLayout( layout, currentModel, nextModel, {
-				columns: gridSettings.columns ?? 6,
-			} );
-
-			onLayoutChange( migrated );
 			onGridSettingsChange( {
 				...gridSettings,
-				model: nextModel,
+				...edits,
 			} as WidgetGridSettings );
 		},
-		[
-			currentModel,
-			gridSettings,
-			layout,
-			onGridSettingsChange,
-			onLayoutChange,
-		]
-	);
-
-	const handleMinColumnWidthChange = useCallback(
-		( raw: unknown ) => {
-			const next = parsePositiveInt( raw );
-			onGridSettingsChange( {
-				...gridSettings,
-				minColumnWidth: next,
-			} as WidgetGridSettings );
-		},
-		[ gridSettings, onGridSettingsChange ]
-	);
-
-	const handleColumnsChange = useCallback(
-		( raw: unknown ) => {
-			const next = parsePositiveInt( raw );
-			onGridSettingsChange( {
-				...gridSettings,
-				columns: next,
-			} as WidgetGridSettings );
-		},
-		[ gridSettings, onGridSettingsChange ]
-	);
-
-	const handleColumnsModeChange = useCallback(
-		( useFixedColumns: boolean ) => {
-			if ( useFixedColumns ) {
-				onGridSettingsChange( {
-					...gridSettings,
-					columns: gridSettings.columns ?? 6,
-					minColumnWidth: undefined,
-				} as WidgetGridSettings );
-			} else {
-				onGridSettingsChange( {
-					...gridSettings,
-					columns: undefined,
-					minColumnWidth: gridSettings.minColumnWidth ?? 350,
-				} as WidgetGridSettings );
-			}
-		},
-		[ gridSettings, onGridSettingsChange ]
-	);
-
-	const setRowHeight = useCallback(
-		( raw: unknown ) => {
-			const next = parsePositiveInt( raw );
-			onGridSettingsChange( {
-				...gridSettings,
-				rowHeight: next,
-			} as WidgetGridSettings );
-		},
-		[ gridSettings, onGridSettingsChange ]
-	);
-
-	const setRowHeightAuto = useCallback(
-		( checked: boolean ) => {
-			onGridSettingsChange( {
-				...gridSettings,
-				rowHeight: checked ? ROW_HEIGHT_AUTO : 200,
-			} as WidgetGridSettings );
-		},
-		[ gridSettings, onGridSettingsChange ]
-	);
-
-	const rowHeight = isMasonry
-		? undefined
-		: (
-				gridSettings as Exclude<
-					WidgetGridSettings,
-					WidgetMasonryLayoutSettings
-				>
-		   ).rowHeight;
-	const isRowHeightAuto = rowHeight === ROW_HEIGHT_AUTO;
-	const isFixedColumns = gridSettings.columns !== undefined;
-
-	const modelItem = MODEL_ITEMS.find(
-		( item ) => item.value === currentModel
+		[ gridSettings, layout, onGridSettingsChange, onLayoutChange ]
 	);
 
 	const handleCancel = useCallback( () => {
@@ -234,84 +292,12 @@ export function LayoutSettings( {
 				</Drawer.Header>
 
 				<Drawer.Content>
-					<Stack direction="column" gap="lg">
-						<SelectControl
-							label={ __( 'Layout model' ) }
-							description={ __(
-								'Standard grid uses explicit widths and heights. Masonry packs items by content height.'
-							) }
-							items={ [ ...MODEL_ITEMS ] }
-							value={ modelItem }
-							onValueChange={ ( item ) => {
-								if ( item ) {
-									handleModelChange(
-										item.value as WidgetGridModel
-									);
-								}
-							} }
-						/>
-
-						<Stack direction="column" gap="xs">
-							<ToggleControl
-								label={ __( 'Fixed column count' ) }
-								checked={ isFixedColumns }
-								onChange={ handleColumnsModeChange }
-							/>
-							{ isFixedColumns ? (
-								<InputControl
-									label={ __( 'Columns' ) }
-									type="number"
-									min={ 1 }
-									max={ 12 }
-									value={ gridSettings.columns ?? '' }
-									onValueChange={ handleColumnsChange }
-								/>
-							) : (
-								<InputControl
-									label={ __( 'Min column width (px)' ) }
-									description={ __(
-										'Minimum width of each column. The number of columns adapts to the container width.'
-									) }
-									type="number"
-									min={ 200 }
-									step={ 10 }
-									value={ gridSettings.minColumnWidth ?? '' }
-									onValueChange={ handleMinColumnWidthChange }
-								/>
-							) }
-						</Stack>
-
-						<Stack direction="column" gap="xs">
-							<ToggleControl
-								label={ __( 'Auto-fit row height to content' ) }
-								checked={ isRowHeightAuto }
-								disabled={ isMasonry }
-								onChange={ setRowHeightAuto }
-							/>
-							<InputControl
-								label={ __( 'Row height (px)' ) }
-								description={
-									isMasonry
-										? __(
-												'Row height is content-driven in masonry layouts.'
-										  )
-										: __(
-												'Height of each row in the standard grid.'
-										  )
-								}
-								type="number"
-								min={ 100 }
-								step={ 10 }
-								disabled={ isMasonry || isRowHeightAuto }
-								value={
-									typeof rowHeight === 'number'
-										? rowHeight
-										: ''
-								}
-								onValueChange={ setRowHeight }
-							/>
-						</Stack>
-					</Stack>
+					<DataForm
+						data={ gridSettings }
+						fields={ fields }
+						form={ form }
+						onChange={ handleChange }
+					/>
 				</Drawer.Content>
 
 				<Drawer.Footer>

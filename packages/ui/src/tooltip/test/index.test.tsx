@@ -154,26 +154,19 @@ describe( 'Tooltip', () => {
 		} );
 	} );
 
-	// The slot is identified by a data attribute (cross-tooling marker, no
-	// user-facing role/text), so direct DOM queries are appropriate here —
-	// Testing Library's role/text accessors don't apply.
+	// Slot is identified by a data attribute, not a user-facing role/text.
 	/* eslint-disable testing-library/no-node-access */
 	describe( 'wp compat overlay slot', () => {
 		const SLOT_SELECTOR = '[data-wp-compat-overlay-slot]';
 
-		// Wrapper that exercises the public opt-in path
-		// (`useEnableWpCompatOverlaySlot`), so the integration tests
-		// reflect how a real consumer would activate the slot rather
-		// than poking at the internal flag directly.
+		// Exercises the public opt-in path rather than poking the flag.
 		function WithSlotEnabled( { children }: { children: ReactNode } ) {
 			useEnableWpCompatOverlaySlot();
 			return <>{ children }</>;
 		}
 
 		afterEach( () => {
-			// Tear down anything the hook left behind so the next test
-			// starts from the dormant baseline. The hook is intentionally
-			// one-way at runtime; tests need to reset it explicitly.
+			// The hook is one-way at runtime; reset explicitly between tests.
 			delete ( window as { __wpUiCompatOverlaySlotEnabled?: boolean } )
 				.__wpUiCompatOverlaySlotEnabled;
 			document

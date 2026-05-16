@@ -142,7 +142,6 @@ await Promise.all(
 		);
 
 		try {
-			// eslint-disable-next-line no-console
 			console.log( `Writing docs to ${ outputFile }` );
 			return fs.writeFile( outputFile, docs );
 		} catch ( e ) {

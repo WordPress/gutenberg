@@ -1,13 +1,6 @@
-export interface ManifestComponent {
-	id: string;
-	name: string;
-	path: string;
-	description?: string;
-	stories?: Array< {
-		name: string;
-		snippet?: string;
-		description?: string;
-	} >;
+import type { ComponentManifest } from 'storybook/internal/types';
+
+export interface ManifestComponent extends ComponentManifest {
 	reactDocgen?: {
 		description?: string;
 		displayName?: string;
