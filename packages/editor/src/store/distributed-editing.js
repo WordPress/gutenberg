@@ -375,6 +375,7 @@ export const DISTRIBUTED_EDITING_SAVE_POLICY_STATUSES = Object.freeze( {
 	REVIEW_REQUIRED: 'review_required',
 	READY_FOR_REVIEWED_RETRY_SAVE: 'ready_for_reviewed_retry_save',
 	REFETCH_REQUIRED: 'refetch_required',
+	WORKFLOW_ACTION_REQUIRED: 'workflow_action_required',
 	IN_FLIGHT: 'in_flight',
 	RETRY_SAVE_CONFIRMED: 'retry_save_confirmed',
 } );
@@ -387,6 +388,9 @@ export const DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS = Object.freeze( {
 	OPEN_PRE_PUBLISH_REVIEW: 'open_pre_publish_review',
 	CONTINUE_GUARDED_RETRY_SAVE: 'continue_guarded_retry_save',
 	REFETCH_SERVER_STATE: 'refetch_server_state',
+	APPLY_LOCAL_CHANGES: 'apply_local_changes',
+	PREPARE_CHANGES: 'prepare_changes',
+	CHECK_WITH_WORDPRESS: 'check_with_wordpress',
 } );
 
 /**
@@ -402,6 +406,7 @@ export const DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES = Object.freeze( {
 	FRESH_REVIEW_VALIDATING: 'fresh_review_validating',
 	RETRY_SAVE_CONFIRMED: 'retry_save_confirmed',
 	REFETCH_REQUIRED: 'refetch_required',
+	WORKFLOW_ACTION_REQUIRED: 'workflow_action_required',
 } );
 
 /**
@@ -10287,12 +10292,17 @@ function getDistributedEditingSaveStateVocabulary( {
 			'Server state must be refreshed before review or Save can continue.';
 	} else if (
 		status === DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES.REVIEW_BLOCKED ||
+		status ===
+			DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES.WORKFLOW_ACTION_REQUIRED ||
 		pendingReviewItemCount > 0
 	) {
 		reviewCheckpointState =
 			DISTRIBUTED_EDITING_SAVE_REVIEW_CHECKPOINT_STATES.REVIEW_REQUIRED;
 		reviewCheckpointText =
-			'Review is required before the authoritative post can update.';
+			status ===
+			DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES.WORKFLOW_ACTION_REQUIRED
+				? 'A Distributed Editing recovery step is required before Save can continue.'
+				: 'Review is required before the authoritative post can update.';
 	} else if (
 		status ===
 			DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES.ACCEPTED_BUT_UNCONSUMED ||
@@ -10331,7 +10341,10 @@ function getDistributedEditingSaveStateVocabulary( {
 		DISTRIBUTED_EDITING_SAVE_REVIEW_CHECKPOINT_STATES.REVIEW_REQUIRED
 	) {
 		summaryText =
-			'Protected local changes need review before the authoritative post can update.';
+			status ===
+			DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES.WORKFLOW_ACTION_REQUIRED
+				? 'Protected local changes need the next Distributed Editing step before the authoritative post can update.'
+				: 'Protected local changes need review before the authoritative post can update.';
 	} else if (
 		reviewCheckpointState ===
 		DISTRIBUTED_EDITING_SAVE_REVIEW_CHECKPOINT_STATES.REVIEW_ACCEPTED
@@ -10358,6 +10371,58 @@ function getDistributedEditingSaveStateVocabulary( {
 		exposesReviewerIds: false,
 		exposesSaverIds: false,
 	};
+}
+
+function getDistributedEditingRequiredSaveWorkflowAction( normalized ) {
+	const hasLocalRebaseInputs =
+		hasDistributedEditingLocalRebaseInputs( normalized );
+	const canApplyLocalChanges =
+		( normalized.canAttemptLocalRebase ||
+			normalized.localRebasePlanStatus ===
+				DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES.READY ) &&
+		hasLocalRebaseInputs &&
+		normalized.localRebaseResultStatus !==
+			DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.REBASED;
+	const canPrepareChanges =
+		normalized.readyToRetrySubmit && ! normalized.retrySubmitPrepared;
+	const canCheckWithWordPress =
+		normalized.retrySubmitPrepared &&
+		normalized.retrySubmitProofStatus !==
+			DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.ACCEPTED_FOR_FUTURE_SAVE;
+
+	if ( canApplyLocalChanges ) {
+		return {
+			reason: 'local_changes_not_applied_before_save',
+			label: 'Apply local changes',
+			statusText:
+				'Apply protected local changes before Save can update the post.',
+			clickAction:
+				DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.APPLY_LOCAL_CHANGES,
+		};
+	}
+
+	if ( canPrepareChanges ) {
+		return {
+			reason: 'retry_submit_handoff_not_prepared_before_save',
+			label: 'Prepare changes',
+			statusText:
+				'Prepare protected changes before Save can check with WordPress.',
+			clickAction:
+				DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.PREPARE_CHANGES,
+		};
+	}
+
+	if ( canCheckWithWordPress ) {
+		return {
+			reason: 'retry_submit_proof_not_checked_before_save',
+			label: 'Check with WordPress',
+			statusText: 'Check with WordPress before Save can update the post.',
+			clickAction:
+				DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.CHECK_WITH_WORDPRESS,
+		};
+	}
+
+	return null;
 }
 
 /**
@@ -10430,6 +10495,8 @@ export function getDistributedEditingSaveButtonStateForSessionState(
 			hasAcceptedReviewApprovalProof ||
 			hasRiskyReviewReadyForProof ||
 			hasAcceptedRetrySubmitProof );
+	const workflowAction =
+		getDistributedEditingRequiredSaveWorkflowAction( normalized );
 	let status = DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES.UPDATE_READY;
 	let reason = null;
 	let source = 'default';
@@ -10594,6 +10661,18 @@ export function getDistributedEditingSaveButtonStateForSessionState(
 		authorityStatusText =
 			'The authoritative WordPress post has accepted the Distributed Editing Save.';
 		authoritativePostUpdated = true;
+	} else if ( workflowAction ) {
+		status =
+			DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES.WORKFLOW_ACTION_REQUIRED;
+		reason = workflowAction.reason;
+		source = 'stale_base_recovery';
+		label = workflowAction.label;
+		statusText = workflowAction.statusText;
+		clickAction = workflowAction.clickAction;
+		authorityState =
+			DISTRIBUTED_EDITING_SAVE_AUTHORITY_STATES.REVIEW_REQUIRED_BEFORE_UPDATE;
+		authorityStatusText =
+			'Finish the Distributed Editing recovery step before the authoritative WordPress post can be updated.';
 	}
 
 	const blocksNormalSavePost =
@@ -11068,6 +11147,16 @@ export function getDistributedEditingSavePolicyStateForSessionState(
 		saveButtonLabel = saveButton.label;
 		clickAction =
 			DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.CONTINUE_GUARDED_RETRY_SAVE;
+		blocksNormalSavePost = true;
+	} else if (
+		saveButton.status ===
+		DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES.WORKFLOW_ACTION_REQUIRED
+	) {
+		status =
+			DISTRIBUTED_EDITING_SAVE_POLICY_STATUSES.WORKFLOW_ACTION_REQUIRED;
+		reason = saveButton.reason;
+		saveButtonLabel = saveButton.label;
+		clickAction = saveButton.clickAction;
 		blocksNormalSavePost = true;
 	} else if (
 		saveButton.status ===

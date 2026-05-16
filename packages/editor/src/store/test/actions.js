@@ -1879,6 +1879,292 @@ describe( 'Post actions', () => {
 			} );
 		} );
 
+		it( 'applies local stale-base changes from a Save button click without ordinary save fallback', async () => {
+			const baseContent =
+				'<!-- wp:paragraph --><p>Base local</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Shared</p><!-- /wp:paragraph -->';
+			const serverContent =
+				'<!-- wp:paragraph --><p>Base local</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Remote</p><!-- /wp:paragraph -->';
+			const localContent =
+				'<!-- wp:paragraph --><p>Local</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Shared</p><!-- /wp:paragraph -->';
+			const expectedMergedContent =
+				'<!-- wp:paragraph --><p>Local</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Remote</p><!-- /wp:paragraph -->';
+			const post = {
+				id: postId,
+				type: 'post',
+				title: 'bar',
+				content: baseContent,
+				status: 'draft',
+			};
+			const registry = createRegistryWithStores();
+			let apiCalls = 0;
+
+			apiFetch.setFetchHandler( async () => {
+				apiCalls++;
+				throw new Error(
+					'Save button local rebase should not call REST.'
+				);
+			} );
+
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'root', 'postType', postTypeEntity );
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', post );
+			registry.dispatch( editorStore ).setupEditor( post, {
+				content: localContent,
+			} );
+			registry.dispatch( editorStore ).updateEditorSettings( {
+				distributedEditing: {
+					enabled: true,
+					retrySaveHandoff: true,
+					riskyBlockReview: true,
+				},
+			} );
+			registry
+				.dispatch( editorStore )
+				.setDistributedEditingSessionState( {
+					disposition:
+						DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+					reasonCode:
+						DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+					clientBaseVersion: '25',
+					serverVersion: '26',
+					pendingChangeCount: 1,
+					remoteChangeCount: 1,
+					refetchedServerState: true,
+					requiresServerStateRefetch: false,
+					hasPendingChanges: true,
+					canExportLocalUpdates: true,
+					localRebasePlanStatus:
+						DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES.READY,
+					canAttemptLocalRebase: true,
+					clientBaseContent: baseContent,
+					refetchedServerContent: serverContent,
+				} );
+
+			await expect(
+				registry
+					.dispatch( editorStore )
+					.__experimentalMaybeHandleDistributedEditingSaveButtonClick()
+			).resolves.toMatchObject( {
+				status: 'local_changes_applied_before_save',
+				reason: 'local_changes_not_applied_before_save',
+				allowsNormalSaveFallback: false,
+				blocksNormalSavePost: true,
+				callsServerStateRefetchEndpoint: false,
+				callsRetrySubmitEndpoint: false,
+				callsNormalSavePost: false,
+				callsRetrySaveEndpoint: false,
+				mutatesEditorContent: true,
+				mutatesPersistedPostContent: false,
+				changesPostLock: false,
+				claimsSaved: false,
+			} );
+
+			expect( apiCalls ).toBe( 0 );
+			expect(
+				registry.select( editorStore ).getEditedPostContent()
+			).toBe( expectedMergedContent );
+			expect(
+				registry
+					.select( editorStore )
+					.getDistributedEditingSessionState()
+			).toMatchObject( {
+				localRebaseResultStatus:
+					DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.REBASED,
+				readyToRetrySubmit: true,
+				canExportLocalUpdates: true,
+			} );
+			expect( registry.select( noticesStore ).getNotices() ).toEqual(
+				[]
+			);
+		} );
+
+		it( 'prepares retry submit from a Save button click without saving', async () => {
+			const registry = createRegistryWithStores();
+			let apiCalls = 0;
+
+			apiFetch.setFetchHandler( async () => {
+				apiCalls++;
+				throw new Error(
+					'Save button retry-submit preparation should not call REST.'
+				);
+			} );
+			registry.dispatch( editorStore ).updateEditorSettings( {
+				distributedEditing: {
+					enabled: true,
+					retrySaveHandoff: true,
+					riskyBlockReview: true,
+				},
+			} );
+			registry
+				.dispatch( editorStore )
+				.setDistributedEditingSessionState( {
+					disposition:
+						DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+					reasonCode:
+						DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+					clientBaseVersion: '25',
+					serverVersion: '26',
+					pendingChangeCount: 1,
+					refetchedServerState: true,
+					requiresServerStateRefetch: false,
+					hasPendingChanges: true,
+					canExportLocalUpdates: true,
+					localRebaseResultStatus:
+						DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.REBASED,
+					readyToRetrySubmit: true,
+				} );
+
+			await expect(
+				registry
+					.dispatch( editorStore )
+					.__experimentalMaybeHandleDistributedEditingSaveButtonClick()
+			).resolves.toMatchObject( {
+				status: 'retry_submit_prepared_before_save',
+				reason: 'retry_submit_handoff_not_prepared_before_save',
+				allowsNormalSaveFallback: false,
+				blocksNormalSavePost: true,
+				callsServerStateRefetchEndpoint: false,
+				callsRetrySubmitEndpoint: false,
+				callsNormalSavePost: false,
+				callsRetrySaveEndpoint: false,
+				mutatesEditorContent: false,
+				mutatesPersistedPostContent: false,
+				changesPostLock: false,
+				claimsSaved: false,
+			} );
+
+			expect( apiCalls ).toBe( 0 );
+			expect(
+				registry
+					.select( editorStore )
+					.getDistributedEditingSessionState()
+			).toMatchObject( {
+				retrySubmitPrepared: true,
+				retrySubmitHandoffStatus:
+					DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_STATUSES.PREPARED,
+				readyToRetrySubmit: false,
+				canExportLocalUpdates: true,
+			} );
+			expect( registry.select( noticesStore ).getNotices() ).toEqual(
+				[]
+			);
+		} );
+
+		it( 'checks retry-submit proof from a Save button click without retry-save or ordinary save', async () => {
+			const post = {
+				id: postId,
+				type: 'post',
+				title: 'bar',
+				content: 'bar',
+				status: 'draft',
+			};
+			const registry = createRegistryWithStores();
+			let retrySubmitCalls = 0;
+
+			apiFetch.setFetchHandler( async ( options ) => {
+				const { path, method, data } = options;
+
+				retrySubmitCalls++;
+				expect( method ).toBe( 'POST' );
+				expect( path ).toMatch(
+					new RegExp(
+						`^/wp/v2/posts/${ postId }/distributed-editing/retry-submit`
+					)
+				);
+				expect( data ).toMatchObject( {
+					client_base_version: '26',
+					rebased_from_version: '25',
+					pending_change_count: 1,
+				} );
+				expect( data ).not.toHaveProperty( 'content' );
+
+				return {
+					result: 'retry_submit_accepted_for_future_save',
+					retry_submit_accepted: true,
+					pending_change_count: 1,
+					saves_post: false,
+					mutates_post_content: false,
+					creates_revision: false,
+					claims_saved: false,
+				};
+			} );
+
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'root', 'postType', postTypeEntity );
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', post );
+			registry.dispatch( editorStore ).setupEditor( post, {
+				content: 'local bar',
+			} );
+			registry.dispatch( editorStore ).updateEditorSettings( {
+				distributedEditing: {
+					enabled: true,
+					retrySaveHandoff: true,
+					riskyBlockReview: true,
+				},
+			} );
+			registry
+				.dispatch( editorStore )
+				.setDistributedEditingSessionState( {
+					disposition:
+						DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+					reasonCode:
+						DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+					clientBaseVersion: '25',
+					serverVersion: '26',
+					pendingChangeCount: 1,
+					refetchedServerState: true,
+					requiresServerStateRefetch: false,
+					hasPendingChanges: true,
+					canExportLocalUpdates: true,
+					retrySubmitHandoffStatus:
+						DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_STATUSES.PREPARED,
+					retrySubmitPrepared: true,
+				} );
+
+			await expect(
+				registry
+					.dispatch( editorStore )
+					.__experimentalMaybeHandleDistributedEditingSaveButtonClick()
+			).resolves.toMatchObject( {
+				status: 'retry_submit_proof_refreshed_before_save',
+				reason: 'retry_submit_proof_not_checked_before_save',
+				allowsNormalSaveFallback: false,
+				blocksNormalSavePost: true,
+				callsServerStateRefetchEndpoint: false,
+				callsRetrySubmitEndpoint: true,
+				callsNormalSavePost: false,
+				callsRetrySaveEndpoint: false,
+				mutatesEditorContent: false,
+				mutatesPersistedPostContent: false,
+				changesPostLock: false,
+				claimsSaved: false,
+			} );
+
+			expect( retrySubmitCalls ).toBe( 1 );
+			expect(
+				registry.select( editorStore ).getEditedPostContent()
+			).toBe( 'local bar' );
+			expect(
+				registry
+					.select( editorStore )
+					.getDistributedEditingSessionState()
+			).toMatchObject( {
+				retrySubmitProofStatus:
+					DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.ACCEPTED_FOR_FUTURE_SAVE,
+				retrySubmitAccepted: true,
+				canExportLocalUpdates: true,
+			} );
+			expect( registry.select( noticesStore ).getNotices() ).toEqual(
+				[]
+			);
+		} );
+
 		it( 'falls back to the ordinary Save click when Distributed Editing settings are disabled', async () => {
 			const registry = createRegistryWithStores();
 			let apiCalls = 0;
@@ -6229,6 +6515,7 @@ describe( 'Post actions', () => {
 			let retrySaveCalls = 0;
 			let normalSaveCalls = 0;
 			let serverStateRefetchCalls = 0;
+			let retrySubmitRequestData = null;
 
 			apiFetch.setFetchHandler( async ( options ) => {
 				const method = getMethod( options );
@@ -6242,12 +6529,7 @@ describe( 'Post actions', () => {
 					)
 				) {
 					retrySubmitCalls++;
-					expect( data ).toEqual( {
-						client_base_version: '7',
-						rebased_from_version: '4',
-						pending_change_count: 1,
-						proposed_post_content_hash: proposedPostContentHash,
-					} );
+					retrySubmitRequestData = data;
 
 					throw staleProofError;
 				}
@@ -6305,8 +6587,7 @@ describe( 'Post actions', () => {
 					hasPendingChanges: true,
 					canExportLocalUpdates: true,
 					refetchedServerState: true,
-					staleBaseConflictResolutionStatus:
-						'local_version_selected',
+					staleBaseConflictResolutionStatus: 'local_version_selected',
 					staleBaseConflictResolutionChoice: 'local',
 					staleBaseConflictResolutionRequiresFreshProof: true,
 					retrySubmitHandoffStatus:
@@ -6352,6 +6633,12 @@ describe( 'Post actions', () => {
 			} );
 
 			expect( retrySubmitCalls ).toBe( 1 );
+			expect( retrySubmitRequestData ).toEqual( {
+				client_base_version: '7',
+				rebased_from_version: '4',
+				pending_change_count: 1,
+				proposed_post_content_hash: proposedPostContentHash,
+			} );
 			expect( retrySaveCalls ).toBe( 0 );
 			expect( normalSaveCalls ).toBe( 0 );
 			expect( serverStateRefetchCalls ).toBe( 0 );

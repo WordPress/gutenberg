@@ -78,6 +78,7 @@ import {
 	DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES,
 	DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS,
 	DISTRIBUTED_EDITING_SAVE_POLICY_STATUSES,
+	DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS,
 	DISTRIBUTED_EDITING_REASON_CODES,
 	getDistributedEditingStaleBaseLocalRebaseResult,
 	getDistributedEditingSessionStateForStaleBaseLocalRebasePlan,
@@ -795,9 +796,10 @@ export const __experimentalMaybeRouteSavePostToDistributedEditingRiskyBlockRevie
  * Handles explicit Distributed Editing Save button actions before the button
  * mutates publish status or falls through to the normal save flow.
  *
- * Refetch is the only transport call this action owns. Review handoff and
- * guarded retry-save readiness continue through the existing Save policy
- * actions, and protected states must still block ordinary post save fallback.
+ * Refetch and retry-submit proof checks are the only transport calls this
+ * action owns. Review handoff and guarded retry-save readiness continue through
+ * the existing Save policy actions, and protected states must still block
+ * ordinary post save fallback.
  *
  * @param {Object} [options] Save options.
  *
@@ -962,6 +964,153 @@ export const __experimentalMaybeHandleDistributedEditingSaveButtonClick =
 					claimsSaved: false,
 				};
 			}
+		}
+
+		if (
+			savePolicy.status ===
+			DISTRIBUTED_EDITING_SAVE_POLICY_STATUSES.WORKFLOW_ACTION_REQUIRED
+		) {
+			const reason =
+				savePolicy.reason ||
+				savePolicy.saveButtonReason ||
+				'distributed_editing_workflow_action_required';
+
+			if (
+				savePolicy.clickAction ===
+				DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.APPLY_LOCAL_CHANGES
+			) {
+				const result =
+					await dispatch.__experimentalRebaseDistributedEditingLocalUpdatesAfterStaleBase(
+						options
+					);
+
+				return {
+					status: 'local_changes_applied_before_save',
+					reason,
+					policy: savePolicy,
+					result,
+					allowsNormalSaveFallback: false,
+					blocksNormalSavePost: true,
+					opensPrePublishReview: false,
+					requiresServerStateRefetch: false,
+					callsServerStateRefetchEndpoint: false,
+					callsRetrySubmitEndpoint: false,
+					callsNormalSavePost: false,
+					callsRetrySaveEndpoint: false,
+					dispatchesNotice: false,
+					mutatesEditorContent: Boolean(
+						result?.hasCandidatePostContent
+					),
+					mutatesPersistedPostContent: false,
+					changesPostLock: false,
+					claimsSaved: false,
+				};
+			}
+
+			if (
+				savePolicy.clickAction ===
+				DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.PREPARE_CHANGES
+			) {
+				const result =
+					await dispatch.__experimentalPrepareDistributedEditingRetrySubmitAfterLocalRebase(
+						options
+					);
+
+				return {
+					status: 'retry_submit_prepared_before_save',
+					reason,
+					policy: savePolicy,
+					result,
+					allowsNormalSaveFallback: false,
+					blocksNormalSavePost: true,
+					opensPrePublishReview: false,
+					requiresServerStateRefetch: false,
+					callsServerStateRefetchEndpoint: false,
+					callsRetrySubmitEndpoint: false,
+					callsNormalSavePost: false,
+					callsRetrySaveEndpoint: false,
+					dispatchesNotice: false,
+					mutatesEditorContent: false,
+					mutatesPersistedPostContent: false,
+					changesPostLock: false,
+					claimsSaved: false,
+				};
+			}
+
+			if (
+				savePolicy.clickAction ===
+				DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.CHECK_WITH_WORDPRESS
+			) {
+				try {
+					const response =
+						await dispatch.__experimentalRefreshDistributedEditingRetrySubmitProof(
+							options
+						);
+
+					return {
+						status: 'retry_submit_proof_refreshed_before_save',
+						reason,
+						policy: savePolicy,
+						response,
+						allowsNormalSaveFallback: false,
+						blocksNormalSavePost: true,
+						opensPrePublishReview: false,
+						requiresServerStateRefetch: false,
+						callsServerStateRefetchEndpoint: false,
+						callsRetrySubmitEndpoint: true,
+						callsNormalSavePost: false,
+						callsRetrySaveEndpoint: false,
+						dispatchesNotice: false,
+						mutatesEditorContent: false,
+						mutatesPersistedPostContent: false,
+						changesPostLock: false,
+						claimsSaved: false,
+					};
+				} catch ( error ) {
+					return {
+						status: 'retry_submit_proof_refresh_failed_before_save',
+						reason:
+							error?.code ||
+							error?.message ||
+							reason ||
+							'retry_submit_proof_refresh_failed',
+						policy: savePolicy,
+						error,
+						allowsNormalSaveFallback: false,
+						blocksNormalSavePost: true,
+						opensPrePublishReview: false,
+						requiresServerStateRefetch: false,
+						callsServerStateRefetchEndpoint: false,
+						callsRetrySubmitEndpoint: true,
+						callsNormalSavePost: false,
+						callsRetrySaveEndpoint: false,
+						dispatchesNotice: false,
+						mutatesEditorContent: false,
+						mutatesPersistedPostContent: false,
+						changesPostLock: false,
+						claimsSaved: false,
+					};
+				}
+			}
+
+			return {
+				status: 'distributed_editing_save_button_blocked',
+				reason,
+				policy: savePolicy,
+				allowsNormalSaveFallback: false,
+				blocksNormalSavePost: true,
+				opensPrePublishReview: false,
+				requiresServerStateRefetch: false,
+				callsServerStateRefetchEndpoint: false,
+				callsRetrySubmitEndpoint: false,
+				callsNormalSavePost: false,
+				callsRetrySaveEndpoint: false,
+				dispatchesNotice: false,
+				mutatesEditorContent: false,
+				mutatesPersistedPostContent: false,
+				changesPostLock: false,
+				claimsSaved: false,
+			};
 		}
 
 		return dispatch.__experimentalMaybeRouteSavePostToDistributedEditingRiskyBlockReview(

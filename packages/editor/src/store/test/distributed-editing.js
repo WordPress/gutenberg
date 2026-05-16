@@ -7299,6 +7299,138 @@ describe( 'distributed editing session state', () => {
 		);
 	} );
 
+	it( 'routes mid-flow stale-base recovery through the real Save button semantics', () => {
+		const cases = [
+			{
+				sessionState: {
+					pendingChangeCount: 1,
+					hasPendingChanges: true,
+					canExportLocalUpdates: true,
+					localRebasePlanStatus:
+						DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES.READY,
+					clientBaseContent:
+						'<!-- wp:paragraph --><p>Base</p><!-- /wp:paragraph -->',
+					refetchedServerContent:
+						'<!-- wp:paragraph --><p>Server</p><!-- /wp:paragraph -->',
+				},
+				reason: 'local_changes_not_applied_before_save',
+				label: 'Apply local changes',
+				statusText:
+					'Apply protected local changes before Save can update the post.',
+				clickAction:
+					DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.APPLY_LOCAL_CHANGES,
+				journeyAction: 'apply_local_changes',
+			},
+			{
+				sessionState: {
+					pendingChangeCount: 1,
+					hasPendingChanges: true,
+					canExportLocalUpdates: true,
+					localRebaseResultStatus:
+						DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.REBASED,
+					readyToRetrySubmit: true,
+				},
+				reason: 'retry_submit_handoff_not_prepared_before_save',
+				label: 'Prepare changes',
+				statusText:
+					'Prepare protected changes before Save can check with WordPress.',
+				clickAction:
+					DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.PREPARE_CHANGES,
+				journeyAction: 'prepare_changes',
+			},
+			{
+				sessionState: {
+					pendingChangeCount: 1,
+					hasPendingChanges: true,
+					canExportLocalUpdates: true,
+					retrySubmitHandoffStatus:
+						DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_STATUSES.PREPARED,
+					retrySubmitPrepared: true,
+				},
+				reason: 'retry_submit_proof_not_checked_before_save',
+				label: 'Check with WordPress',
+				statusText:
+					'Check with WordPress before Save can update the post.',
+				clickAction:
+					DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.CHECK_WITH_WORDPRESS,
+				journeyAction: 'check_with_wordpress',
+			},
+		];
+
+		for ( const currentCase of cases ) {
+			const buttonState =
+				getDistributedEditingSaveButtonStateForSessionState(
+					currentCase.sessionState
+				);
+			const policyState =
+				getDistributedEditingSavePolicyStateForSessionState(
+					currentCase.sessionState
+				);
+			const journeyState =
+				getDistributedEditingSaveJourneyStateForSessionState(
+					currentCase.sessionState
+				);
+
+			expect( buttonState ).toMatchObject( {
+				status: DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES.WORKFLOW_ACTION_REQUIRED,
+				reason: currentCase.reason,
+				source: 'stale_base_recovery',
+				label: currentCase.label,
+				statusText: currentCase.statusText,
+				clickAction: currentCase.clickAction,
+				blocksNormalSavePost: true,
+				authorityState:
+					DISTRIBUTED_EDITING_SAVE_AUTHORITY_STATES.REVIEW_REQUIRED_BEFORE_UPDATE,
+				authorityStatusText:
+					'Finish the Distributed Editing recovery step before the authoritative WordPress post can be updated.',
+				localChangesState:
+					DISTRIBUTED_EDITING_SAVE_LOCAL_CHANGES_STATES.PROTECTED_CHANGES_EXPORTABLE,
+				reviewCheckpointState:
+					DISTRIBUTED_EDITING_SAVE_REVIEW_CHECKPOINT_STATES.REVIEW_REQUIRED,
+				saveStateSummaryText:
+					'Protected local changes need the next Distributed Editing step before the authoritative post can update.',
+				shouldCallNormalSavePost: false,
+				shouldCallRetrySaveEndpoint: false,
+				dispatchesNotice: false,
+				mutatesEditorContent: false,
+				mutatesPersistedPostContent: false,
+				changesPostLock: false,
+				claimsSaved: false,
+				rawContentIncluded: false,
+				exposesRawContent: false,
+			} );
+			expect( policyState ).toMatchObject( {
+				status: DISTRIBUTED_EDITING_SAVE_POLICY_STATUSES.WORKFLOW_ACTION_REQUIRED,
+				reason: currentCase.reason,
+				saveButtonLabel: currentCase.label,
+				clickAction: currentCase.clickAction,
+				blocksNormalSavePost: true,
+				opensPrePublishReview: false,
+				requiresServerStateRefetch: false,
+				shouldCallNormalSavePost: false,
+				shouldCallRetrySaveEndpoint: false,
+				dispatchesNotice: false,
+				mutatesEditorContent: false,
+				mutatesPersistedPostContent: false,
+				changesPostLock: false,
+				claimsSaved: false,
+			} );
+			expect( journeyState ).toMatchObject( {
+				step: DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.LOCAL_CHANGES_PROTECTED,
+				action: currentCase.journeyAction,
+				actionHint: currentCase.label,
+				requiresActionBeforeSave: true,
+				saveButtonLabel: currentCase.label,
+				saveButtonBlocksNormalSavePost: true,
+				callsNormalSavePost: false,
+				callsRetrySaveEndpoint: false,
+				claimsSavedWithoutEvidence: false,
+				exposesRawContent: false,
+				exposesProofInternals: false,
+			} );
+		}
+	} );
+
 	it( 'summarizes the M0 human loop step without side effects or private data', () => {
 		const confirmedState =
 			getDistributedEditingSessionStateForRetrySaveResult(
@@ -7528,7 +7660,8 @@ describe( 'distributed editing session state', () => {
 				summary: 'Apply protected local changes',
 				actionHint: 'Apply local changes',
 				requiresActionBeforeSave: true,
-				saveButtonLabel: 'Update',
+				saveButtonLabel: 'Apply local changes',
+				saveButtonBlocksNormalSavePost: true,
 			},
 			{
 				sessionState: {
@@ -7545,7 +7678,8 @@ describe( 'distributed editing session state', () => {
 				summary: 'Prepare these protected changes',
 				actionHint: 'Prepare changes',
 				requiresActionBeforeSave: true,
-				saveButtonLabel: 'Update',
+				saveButtonLabel: 'Prepare changes',
+				saveButtonBlocksNormalSavePost: true,
 			},
 			{
 				sessionState: {
@@ -7562,7 +7696,8 @@ describe( 'distributed editing session state', () => {
 				summary: 'Check with WordPress',
 				actionHint: 'Check with WordPress',
 				requiresActionBeforeSave: true,
-				saveButtonLabel: 'Update',
+				saveButtonLabel: 'Check with WordPress',
+				saveButtonBlocksNormalSavePost: true,
 			},
 			{
 				sessionState: {

@@ -348,6 +348,83 @@ describe( 'PostSavedState', () => {
 		expect( mockSavePost ).not.toHaveBeenCalled();
 	} );
 
+	it( 'should show mid-flow Distributed Editing recovery as the draft Save button action', async () => {
+		const user = userEvent.setup();
+		mockMaybeHandleDistributedEditingSaveButtonClick.mockResolvedValue( {
+			status: 'local_changes_applied_before_save',
+			allowsNormalSaveFallback: false,
+			blocksNormalSavePost: true,
+		} );
+		useSelect.mockImplementation( () => ( {
+			isDirty: true,
+			isNew: false,
+			isSaveable: true,
+			isSaving: false,
+			postStatus: 'draft',
+			distributedEditingSaveButtonState: {
+				status: 'workflow_action_required',
+				reason: 'local_changes_not_applied_before_save',
+				source: 'stale_base_recovery',
+				label: 'Apply local changes',
+				statusText:
+					'Apply protected local changes before Save can update the post.',
+				clickAction: 'apply_local_changes',
+				authorityState: 'review_required_before_update',
+				localChangesState: 'protected_local_changes_exportable',
+				reviewCheckpointState: 'review_required',
+				authoritativePostState: 'review_required_before_update',
+				saveStateSummaryText:
+					'Protected local changes need the next Distributed Editing step before the authoritative post can update.',
+				authoritativePostUpdated: false,
+			},
+			distributedEditingSaveJourneyState: {
+				shouldExposeInSaveControls: true,
+				step: 'local_changes_protected',
+				action: 'apply_local_changes',
+				title: 'Save needs local changes applied',
+				summary:
+					'Apply protected local changes in this editor before WordPress can check Save.',
+				actionHint: 'Apply local changes',
+				requiresActionBeforeSave: true,
+				statusChromeSummary:
+					'Protected local changes need the next Distributed Editing step before the authoritative post can update.',
+				statusChromeAuthorityState: 'review_required_before_update',
+				statusChromeAuthorityText:
+					'Finish the Distributed Editing recovery step before the authoritative WordPress post can be updated.',
+				claimsSavedWithoutEvidence: false,
+			},
+		} ) );
+
+		render( <PostSavedState /> );
+
+		const button = screen.getByRole( 'button', {
+			name: 'Apply local changes',
+		} );
+		expect( button ).toHaveAttribute(
+			'data-distributed-editing-save-button-status',
+			'workflow_action_required'
+		);
+		expect( button ).toHaveAttribute(
+			'data-distributed-editing-save-button-click-action',
+			'apply_local_changes'
+		);
+		expect( button ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-action',
+			'apply_local_changes'
+		);
+		expect( button ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-action-required',
+			'true'
+		);
+
+		await user.click( button );
+
+		expect(
+			mockMaybeHandleDistributedEditingSaveButtonClick
+		).toHaveBeenCalled();
+		expect( mockSavePost ).not.toHaveBeenCalled();
+	} );
+
 	it( 'should expose disabled and busy Distributed Editing save state without clicking through', async () => {
 		const user = userEvent.setup();
 		useSelect.mockImplementation( () => ( {
