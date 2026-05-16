@@ -2080,6 +2080,178 @@ describe( 'Post actions', () => {
 			} );
 		} );
 
+		it( 'requests risky-block review approval proof from a Save button click before guarded retry-save', async () => {
+			const proposedPostContentHash =
+				'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
+			const candidatePostContentHash =
+				'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb';
+			const approvedBlockHash =
+				'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc';
+			const filteredBlockHash =
+				'dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd';
+			const post = {
+				id: postId,
+				type: 'post',
+				title: 'bar',
+				content: 'bar',
+				status: 'draft',
+			};
+			let reviewApprovalCalls = 0;
+			let retrySaveCalls = 0;
+			let reviewApprovalMethod;
+			let reviewApprovalRequestData;
+
+			apiFetch.setFetchHandler( async ( options ) => {
+				const method = getMethod( options );
+				const { path, data } = options;
+
+				if (
+					path.startsWith(
+						`/wp/v2/posts/${ postId }/distributed-editing/review-approval`
+					)
+				) {
+					reviewApprovalCalls++;
+					reviewApprovalMethod = method;
+					reviewApprovalRequestData = data;
+
+					return {
+						result: 'review_approval_accepted_for_retry_save',
+						review_approval_accepted: true,
+						server_version: '12',
+						previous_server_version: '11',
+						client_base_version: '12',
+						accepted_proof_server_version: '12',
+						pending_change_count: 1,
+						reviewed_block_items: data.reviewed_block_items,
+						reviewed_block_item_count: 1,
+						block_review_status: 'approved_for_retry_save',
+						proposed_post_content_hash: proposedPostContentHash,
+						candidate_post_content_hash: candidatePostContentHash,
+						can_export_local_updates: true,
+						saves_post: false,
+						mutates_post_content: false,
+						creates_revision: false,
+						claims_saved: false,
+					};
+				}
+
+				if (
+					path.startsWith(
+						`/wp/v2/posts/${ postId }/distributed-editing/retry-save`
+					)
+				) {
+					retrySaveCalls++;
+				}
+
+				throw new Error( `Unexpected path: ${ method } ${ path }` );
+			} );
+
+			const registry = createRegistryWithStores();
+
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', post );
+			registry.dispatch( editorStore ).setupEditor( post, {} );
+			registry.dispatch( editorStore ).updateEditorSettings( {
+				distributedEditing: {
+					enabled: true,
+					retrySaveHandoff: true,
+					riskyBlockReview: true,
+				},
+			} );
+			registry
+				.dispatch( editorStore )
+				.setDistributedEditingSessionState( {
+					serverVersion: '12',
+					pendingChangeCount: 1,
+					hasPendingChanges: true,
+					canExportLocalUpdates: true,
+					retrySaveReviewProposedContentHash: proposedPostContentHash,
+					retrySaveReviewCandidateContentHash:
+						candidatePostContentHash,
+					riskyBlockReviewStatus:
+						DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_STATUSES.REVIEW_RESOLVED,
+					riskyBlockReviewItems: [
+						{
+							id: 'risk-html-approve',
+							blockClientId: 'block-risk-html-approve',
+							blockName: 'core/html',
+							blockLabel: 'Custom HTML approval',
+							proposedContentHash: approvedBlockHash,
+							ksesFilteredContentHash: filteredBlockHash,
+							reviewStatus:
+								DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES.APPROVED_FOR_RETRY_SAVE,
+							rawContent: '<script>unsafe</script>',
+						},
+					],
+					riskyBlockReviewItemCount: 1,
+					riskyBlockReviewPendingCount: 0,
+					riskyBlockReviewApprovedCount: 1,
+					riskyBlockReviewRejectedCount: 0,
+					riskyBlockReviewPrePublishPanelRequired: false,
+					riskyBlockReviewCanExportLocalUpdates: true,
+				} );
+
+			await expect(
+				registry
+					.dispatch( editorStore )
+					.__experimentalMaybeHandleDistributedEditingSaveButtonClick()
+			).resolves.toMatchObject( {
+				status: 'review_approval_proof_accepted',
+				allowsNormalSaveFallback: false,
+				blocksNormalSavePost: true,
+				callsReviewApprovalProofEndpoint: true,
+				reviewApprovalProofAccepted: true,
+				callsNormalSavePost: false,
+				callsRetrySaveEndpoint: false,
+				claimsSaved: false,
+			} );
+
+			expect( reviewApprovalCalls ).toBe( 1 );
+			expect( retrySaveCalls ).toBe( 0 );
+			expect( reviewApprovalMethod ).toBe( 'POST' );
+			expect( reviewApprovalRequestData ).toMatchObject( {
+				client_base_version: '12',
+				accepted_proof_server_version: '12',
+				pending_change_count: 1,
+				proposed_post_content_hash: proposedPostContentHash,
+				reviewed_proposed_content_hash: proposedPostContentHash,
+				candidate_post_content_hash: candidatePostContentHash,
+				reviewed_candidate_content_hash: candidatePostContentHash,
+				reviewed_block_items: [
+					{
+						id: 'risk-html-approve',
+						proposed_content_hash: approvedBlockHash,
+						reviewed_proposed_content_hash: approvedBlockHash,
+						kses_filtered_content_hash: filteredBlockHash,
+						review_status: 'approved_for_retry_save',
+						review_evidence_type: 'kses_block_hash_only_change',
+						content_review_policy: 'kses',
+					},
+				],
+			} );
+			expect(
+				reviewApprovalRequestData.reviewed_block_items
+			).toHaveLength( 1 );
+			expect(
+				reviewApprovalRequestData.reviewed_block_items[ 0 ].raw_content
+			).toBeUndefined();
+			expect(
+				registry
+					.select( editorStore )
+					.getDistributedEditingSessionState()
+			).toMatchObject( {
+				retrySaveReviewApprovalProofStatus:
+					DISTRIBUTED_EDITING_RETRY_SAVE_REVIEW_APPROVAL_PROOF_STATUSES.ACCEPTED_FOR_RETRY_SAVE,
+				retrySaveReviewApprovalAccepted: true,
+				retrySaveReviewApprovalReviewedBlockItemCount: 1,
+				canExportLocalUpdates: true,
+			} );
+			expect( registry.select( noticesStore ).getNotices() ).toEqual(
+				[]
+			);
+		} );
+
 		it( 'applies local stale-base changes from a Save button click without ordinary save fallback', async () => {
 			const baseContent =
 				'<!-- wp:paragraph --><p>Base local</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Shared</p><!-- /wp:paragraph -->';

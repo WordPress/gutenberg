@@ -1177,6 +1177,18 @@ export const __experimentalMaybeHandleDistributedEditingSaveButtonClick =
 			};
 		}
 
+		const riskyBlockReviewRouting =
+			await dispatch.__experimentalMaybeRouteSavePostToDistributedEditingRiskyBlockReview(
+				options
+			);
+
+		if (
+			riskyBlockReviewRouting.status !== 'normal_save_fallback' &&
+			! riskyBlockReviewRouting.continuesToRetrySavePolicy
+		) {
+			return riskyBlockReviewRouting;
+		}
+
 		if (
 			savePolicy.clickAction ===
 				DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.CONTINUE_GUARDED_RETRY_SAVE &&

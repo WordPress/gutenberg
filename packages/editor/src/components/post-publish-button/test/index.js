@@ -972,6 +972,7 @@ describe( 'PostPublishButton', () => {
 	it( 'should expose Distributed Editing save descriptor data on toggle buttons', () => {
 		render(
 			<PostPublishButton
+				hasPublishAction
 				isSaveable
 				isPublishable
 				isToggle
@@ -1033,6 +1034,71 @@ describe( 'PostPublishButton', () => {
 			'data-distributed-editing-save-button-authoritative-post-updated',
 			'true'
 		);
+	} );
+
+	it( 'should route actionable Distributed Editing toggle clicks through the save handler', async () => {
+		const user = userEvent.setup();
+		const onToggle = jest.fn();
+		const savePostStatus = jest.fn();
+		render(
+			<PostPublishButton
+				hasPublishAction
+				isSaveable
+				isPublishable
+				isToggle
+				onToggle={ onToggle }
+				savePostStatus={ savePostStatus }
+				distributedEditingSaveButtonState={ {
+					status: 'accepted_but_unconsumed',
+					source: 'review_approval',
+					label: 'Submit reviewed changes',
+					statusText:
+						'Accepted Distributed Editing proof is ready for WordPress Save.',
+					clickAction: 'continue_guarded_retry_save',
+					disabled: false,
+				} }
+			/>
+		);
+
+		await user.click(
+			screen.getByRole( 'button', {
+				name: 'Submit reviewed changes',
+			} )
+		);
+
+		expect( savePostStatus ).toHaveBeenCalledWith( 'publish' );
+		expect( onToggle ).not.toHaveBeenCalled();
+	} );
+
+	it( 'should keep Distributed Editing review-required toggle clicks on the review panel path', async () => {
+		const user = userEvent.setup();
+		const onToggle = jest.fn();
+		const savePostStatus = jest.fn();
+		render(
+			<PostPublishButton
+				isSaveable
+				isPublishable
+				isToggle
+				onToggle={ onToggle }
+				savePostStatus={ savePostStatus }
+				distributedEditingSaveButtonState={ {
+					status: 'review_blocked',
+					source: 'risky_block_review',
+					label: 'Review changes',
+					statusText:
+						'Save opens review before updating the authoritative post.',
+					clickAction: 'open_pre_publish_review',
+					disabled: false,
+				} }
+			/>
+		);
+
+		await user.click(
+			screen.getByRole( 'button', { name: 'Review changes' } )
+		);
+
+		expect( onToggle ).toHaveBeenCalledTimes( 1 );
+		expect( savePostStatus ).not.toHaveBeenCalled();
 	} );
 
 	it( 'should expose Distributed Editing in-flight save state without clicking through', async () => {

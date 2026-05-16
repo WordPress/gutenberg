@@ -17,6 +17,8 @@ import DistributedEditingSaveJourneyCue, {
 } from '../distributed-editing-save-journey-cue';
 
 const noop = () => {};
+const DISTRIBUTED_EDITING_OPEN_PRE_PUBLISH_REVIEW_ACTION =
+	'open_pre_publish_review';
 
 export class PostPublishButton extends Component {
 	constructor( props ) {
@@ -132,6 +134,12 @@ export class PostPublishButton extends Component {
 			distributedEditingSaveButtonState?.status &&
 				distributedEditingSaveButtonState.status !== 'update_ready'
 		);
+		const shouldRouteDistributedEditingToggleClick = Boolean(
+			hasDistributedEditingSaveButtonState &&
+				distributedEditingSaveButtonState.clickAction &&
+				distributedEditingSaveButtonState.clickAction !==
+					DISTRIBUTED_EDITING_OPEN_PRE_PUBLISH_REVIEW_ACTION
+		);
 		const distributedEditingSaveButtonDisabled = Boolean(
 			hasDistributedEditingSaveButtonState &&
 				distributedEditingSaveButtonState.disabled
@@ -231,6 +239,10 @@ export class PostPublishButton extends Component {
 		// Callback to open the publish panel.
 		const onClickToggle = () => {
 			if ( isToggleDisabled ) {
+				return;
+			}
+			if ( shouldRouteDistributedEditingToggleClick ) {
+				savePostStatus( publishStatus );
 				return;
 			}
 			onToggle();
