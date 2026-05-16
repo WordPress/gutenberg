@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { Stack } from '@wordpress/ui';
 import * as Card from '../index';
 
 /**
@@ -133,16 +134,18 @@ export const WithFullBleed: Story = {
 					<Card.Title>Featured image</Card.Title>
 				</Card.Header>
 				<Card.Content>
-					<Card.FullBleed>
-						<div
-							style={ {
-								height: 160,
-								background:
-									'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-							} }
-						/>
-					</Card.FullBleed>
-					<Text>Content below the full-bleed area.</Text>
+					<Stack direction="column" gap="lg">
+						<Card.FullBleed>
+							<div
+								style={ {
+									height: 160,
+									background:
+										'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+								} }
+							/>
+						</Card.FullBleed>
+						<Text>Content below the full-bleed area.</Text>
+					</Stack>
 				</Card.Content>
 			</>
 		),
