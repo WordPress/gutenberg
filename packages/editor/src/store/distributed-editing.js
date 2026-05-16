@@ -1148,6 +1148,15 @@ export const DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE = Object.freeze( {
 	retrySaveRevisionCreated: false,
 	retrySaveCreatedRevisionIds: [],
 	retrySaveServerMerged: false,
+	retrySaveServerMergeApplied: false,
+	retrySaveServerMergeStatus: null,
+	retrySaveServerMergeStrategy: null,
+	retrySaveServerMergeBaseVersion: null,
+	retrySaveServerMergeServerVersion: null,
+	retrySaveServerMergeBlockCount: 0,
+	retrySaveServerMergeServerChangedIndexes: [],
+	retrySaveServerMergeLocalChangedIndexes: [],
+	retrySaveServerMergeMergedStrippedContentHash: null,
 	retrySaveReviewStatus: null,
 	retrySaveReviewAction: null,
 	retrySaveReviewRequiredCapability: null,
@@ -1985,6 +1994,33 @@ export function normalizeDistributedEditingSessionState( sessionState = {} ) {
 			sessionState.retrySaveCreatedRevisionIds
 		),
 		retrySaveServerMerged: Boolean( sessionState.retrySaveServerMerged ),
+		retrySaveServerMergeApplied: Boolean(
+			sessionState.retrySaveServerMergeApplied
+		),
+		retrySaveServerMergeStatus: normalizeNullableString(
+			sessionState.retrySaveServerMergeStatus
+		),
+		retrySaveServerMergeStrategy: normalizeNullableString(
+			sessionState.retrySaveServerMergeStrategy
+		),
+		retrySaveServerMergeBaseVersion: normalizeNullableString(
+			sessionState.retrySaveServerMergeBaseVersion
+		),
+		retrySaveServerMergeServerVersion: normalizeNullableString(
+			sessionState.retrySaveServerMergeServerVersion
+		),
+		retrySaveServerMergeBlockCount: normalizeCount(
+			sessionState.retrySaveServerMergeBlockCount
+		),
+		retrySaveServerMergeServerChangedIndexes: normalizeBlockPath(
+			sessionState.retrySaveServerMergeServerChangedIndexes
+		),
+		retrySaveServerMergeLocalChangedIndexes: normalizeBlockPath(
+			sessionState.retrySaveServerMergeLocalChangedIndexes
+		),
+		retrySaveServerMergeMergedStrippedContentHash: normalizeSha256Hash(
+			sessionState.retrySaveServerMergeMergedStrippedContentHash
+		),
 		...normalizeRetrySaveReviewMetadataFields( sessionState ),
 		...normalizeRetrySaveReviewApprovalProofFields( {
 			...sessionState,
@@ -8968,6 +9004,16 @@ export function getDistributedEditingRetrySaveFlowStateForSessionState(
 			normalized.retrySavePreviousServerVersion,
 		retrySaveRevisionCreated: normalized.retrySaveRevisionCreated,
 		retrySaveCreatedRevisionIds: normalized.retrySaveCreatedRevisionIds,
+		retrySaveServerMerged: normalized.retrySaveServerMerged,
+		retrySaveServerMergeApplied: normalized.retrySaveServerMergeApplied,
+		retrySaveServerMergeStatus: normalized.retrySaveServerMergeStatus,
+		retrySaveServerMergeStrategy: normalized.retrySaveServerMergeStrategy,
+		retrySaveServerMergeBlockCount:
+			normalized.retrySaveServerMergeBlockCount,
+		retrySaveServerMergeServerChangedIndexes:
+			normalized.retrySaveServerMergeServerChangedIndexes,
+		retrySaveServerMergeLocalChangedIndexes:
+			normalized.retrySaveServerMergeLocalChangedIndexes,
 		...getDistributedEditingRetrySaveReviewMetadataFields( normalized ),
 		...getDistributedEditingRetrySaveReviewApprovalProofFields(
 			normalized
@@ -11581,6 +11627,28 @@ export function getDistributedEditingSessionStateForRetrySubmitProofResult(
 		responseData.pendingChangeCount ??
 		responseData.pending_change_count ??
 		normalizedCurrent.pendingChangeCount;
+	const acceptedClientBaseVersion =
+		normalizeNullableString(
+			responseOrError.rebasedFromVersion ||
+				responseOrError.rebased_from_version ||
+				responseData.rebasedFromVersion ||
+				responseData.rebased_from_version ||
+				responseOrError.clientBaseVersion ||
+				responseOrError.client_base_version ||
+				responseData.clientBaseVersion ||
+				responseData.client_base_version
+		) || normalizedCurrent.clientBaseVersion;
+	const acceptedServerVersion =
+		normalizeNullableString(
+			responseOrError.serverVersion ||
+				responseOrError.server_version ||
+				responseData.serverVersion ||
+				responseData.server_version ||
+				responseOrError.clientBaseVersion ||
+				responseOrError.client_base_version ||
+				responseData.clientBaseVersion ||
+				responseData.client_base_version
+		) || normalizedCurrent.serverVersion;
 	const remoteChangeCount =
 		responseOrError.remoteChangeCount ??
 		responseOrError.remote_change_count ??
@@ -11635,6 +11703,8 @@ export function getDistributedEditingSessionStateForRetrySubmitProofResult(
 			...normalizedCurrent,
 			disposition: DISTRIBUTED_EDITING_DISPOSITIONS.IDLE,
 			reasonCode: null,
+			clientBaseVersion: acceptedClientBaseVersion,
+			serverVersion: acceptedServerVersion,
 			pendingChangeCount,
 			remoteChangeCount: 0,
 			hasRemoteChanges: false,
@@ -11983,6 +12053,60 @@ function isDistributedEditingRetrySaveAppliedResult( result ) {
 	);
 }
 
+function getRetrySaveServerMergeEvidenceFields(
+	responseOrError = {},
+	responseData = {},
+	result = null
+) {
+	const serverMergeEvidence = normalizeObject(
+		responseOrError.serverMerge ||
+			responseOrError.server_merge ||
+			responseData.serverMerge ||
+			responseData.server_merge
+	);
+	const mergeStatus =
+		serverMergeEvidence.mergeStatus || serverMergeEvidence.merge_status;
+	const serverMergeApplied = Boolean(
+		responseOrError.serverMergeApplied ||
+			responseOrError.server_merge_applied ||
+			responseData.serverMergeApplied ||
+			responseData.server_merge_applied ||
+			result === 'retry_save_server_merged' ||
+			mergeStatus === 'merged'
+	);
+
+	return {
+		retrySaveServerMergeApplied: serverMergeApplied,
+		retrySaveServerMergeStatus: normalizeNullableString( mergeStatus ),
+		retrySaveServerMergeStrategy: normalizeNullableString(
+			serverMergeEvidence.mergeStrategy ||
+				serverMergeEvidence.merge_strategy
+		),
+		retrySaveServerMergeBaseVersion: normalizeNullableString(
+			serverMergeEvidence.baseVersion || serverMergeEvidence.base_version
+		),
+		retrySaveServerMergeServerVersion: normalizeNullableString(
+			serverMergeEvidence.serverVersion ||
+				serverMergeEvidence.server_version
+		),
+		retrySaveServerMergeBlockCount: normalizeCount(
+			serverMergeEvidence.blockCount || serverMergeEvidence.block_count
+		),
+		retrySaveServerMergeServerChangedIndexes: normalizeBlockPath(
+			serverMergeEvidence.serverChangedIndexes ||
+				serverMergeEvidence.server_changed_indexes
+		),
+		retrySaveServerMergeLocalChangedIndexes: normalizeBlockPath(
+			serverMergeEvidence.localChangedIndexes ||
+				serverMergeEvidence.local_changed_indexes
+		),
+		retrySaveServerMergeMergedStrippedContentHash: normalizeSha256Hash(
+			serverMergeEvidence.mergedStrippedContentHash ||
+				serverMergeEvidence.merged_stripped_content_hash
+		),
+	};
+}
+
 /**
  * Returns DE-RTC editor state for the guarded retry-save response.
  *
@@ -12027,6 +12151,11 @@ export function getDistributedEditingSessionStateForRetrySaveResult(
 				responseData.previousServerVersion ||
 				responseData.previous_server_version
 		) || normalizedCurrent.serverVersion;
+	const retrySaveServerMergeEvidence = getRetrySaveServerMergeEvidenceFields(
+		responseOrError,
+		responseData,
+		result
+	);
 	const retrySaveFlags = {
 		retrySaveSavesPost: Boolean(
 			responseOrError.savesPost ||
@@ -12069,8 +12198,10 @@ export function getDistributedEditingSessionStateForRetrySaveResult(
 				responseOrError.server_merged ||
 				responseData.serverMerged ||
 				responseData.server_merged ||
+				retrySaveServerMergeEvidence.retrySaveServerMergeApplied ||
 				result === 'retry_save_server_merged'
 		),
+		...retrySaveServerMergeEvidence,
 	};
 	const retrySaveFreshReviewConsumeValidationFields =
 		getRetrySaveFreshReviewConsumeValidationFieldsFromResponseOrError(

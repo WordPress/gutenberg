@@ -2980,6 +2980,9 @@ describe( 'distributed editing session state', () => {
 				{
 					result: 'retry_submit_accepted_for_future_save',
 					retry_submit_accepted: true,
+					client_base_version: '7',
+					server_version: '7',
+					rebased_from_version: '4',
 					save_path_required: true,
 					saves_post: false,
 					mutates_post_content: false,
@@ -3005,6 +3008,8 @@ describe( 'distributed editing session state', () => {
 		expect( normalized ).toMatchObject( {
 			disposition: DISTRIBUTED_EDITING_DISPOSITIONS.IDLE,
 			reasonCode: null,
+			clientBaseVersion: '4',
+			serverVersion: '7',
 			pendingChangeCount: 2,
 			hasPendingChanges: true,
 			isAwaitingServerConfirmation: true,
@@ -3334,6 +3339,71 @@ describe( 'distributed editing session state', () => {
 			retrySaveRevisionCreated: true,
 			retrySaveCreatedRevisionIds: [ 7002 ],
 			mustOfferLocalCopy: false,
+			canExportLocalUpdates: false,
+		} );
+	} );
+
+	it( 'normalizes confirmed server-merged retry-save evidence as saved and content-free', () => {
+		const normalized = getDistributedEditingSessionStateForRetrySaveResult(
+			{
+				result: 'retry_save_server_merged',
+				retry_save_accepted: true,
+				previous_server_version: '51',
+				server_version: '52',
+				pending_change_count: 1,
+				saves_post: true,
+				mutates_post_content: true,
+				creates_revision: true,
+				claims_saved: true,
+				revision_created: true,
+				created_revision_ids: [ 7003 ],
+				server_merge_applied: true,
+				server_merge: {
+					merge_status: 'merged',
+					merge_strategy: 'top_level_serialized_block_three_way',
+					base_version: '50',
+					server_version: '51',
+					block_count: 2,
+					server_changed_indexes: [ 1 ],
+					local_changed_indexes: [ 0 ],
+					merged_stripped_content_hash:
+						'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb',
+				},
+			},
+			{
+				serverVersion: '51',
+				pendingChangeCount: 1,
+				retrySubmitProofStatus:
+					DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.ACCEPTED_FOR_FUTURE_SAVE,
+				retrySubmitAccepted: true,
+				retrySubmitSavePathRequired: true,
+				retrySubmitSaveStatus:
+					DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.READY,
+				retrySubmitSaveReady: true,
+				canExportLocalUpdates: true,
+			}
+		);
+
+		expect( normalized ).toMatchObject( {
+			disposition: DISTRIBUTED_EDITING_DISPOSITIONS.IDLE,
+			pendingChangeCount: 0,
+			hasPendingChanges: false,
+			retrySaveStatus: DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVED,
+			retrySaveAccepted: true,
+			retrySaveServerVersion: '52',
+			retrySavePreviousServerVersion: '51',
+			retrySaveServerMerged: true,
+			retrySaveServerMergeApplied: true,
+			retrySaveServerMergeStatus: 'merged',
+			retrySaveServerMergeStrategy:
+				'top_level_serialized_block_three_way',
+			retrySaveServerMergeBaseVersion: '50',
+			retrySaveServerMergeServerVersion: '51',
+			retrySaveServerMergeBlockCount: 2,
+			retrySaveServerMergeServerChangedIndexes: [ 1 ],
+			retrySaveServerMergeLocalChangedIndexes: [ 0 ],
+			retrySaveServerMergeMergedStrippedContentHash:
+				'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb',
 			canExportLocalUpdates: false,
 		} );
 	} );

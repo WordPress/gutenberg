@@ -4684,6 +4684,9 @@ describe( 'Post actions', () => {
 				return {
 					result: 'retry_submit_accepted_for_future_save',
 					retry_submit_accepted: true,
+					client_base_version: '7',
+					server_version: '7',
+					rebased_from_version: '4',
 					save_path_required: true,
 					saves_post: false,
 					mutates_post_content: false,
@@ -4739,6 +4742,8 @@ describe( 'Post actions', () => {
 			).toMatchObject( {
 				disposition: DISTRIBUTED_EDITING_DISPOSITIONS.IDLE,
 				reasonCode: null,
+				clientBaseVersion: '4',
+				serverVersion: '7',
 				pendingChangeCount: 2,
 				hasPendingChanges: true,
 				isAwaitingServerConfirmation: true,
@@ -5077,7 +5082,7 @@ describe( 'Post actions', () => {
 			} );
 		} );
 
-		it( 'aligns confirmed server-merged retry-save writes to returned post content', async () => {
+		it( 'aligns confirmed server-merged retry-save writes to refetched post content', async () => {
 			const proposedPostContent =
 				'<!-- wp:paragraph --><p>Local paragraph.</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Base paragraph.</p><!-- /wp:paragraph -->';
 			const serverMergedPostContent =
@@ -5092,10 +5097,27 @@ describe( 'Post actions', () => {
 				status: 'draft',
 			};
 			let retrySaveRequestData;
+			let serverStateRefetchCalls = 0;
 
 			apiFetch.setFetchHandler( async ( options ) => {
 				const { path, method, data } = options;
-				retrySaveRequestData = data;
+
+				if (
+					method === 'GET' &&
+					path.startsWith( `/wp/v2/posts/${ postId }` ) &&
+					path.includes( 'context=edit' )
+				) {
+					serverStateRefetchCalls++;
+					return {
+						...post,
+						content: {
+							raw: `${ serverMergedPostContent }<script type="wp/post-sync-meta" data-sync-meta-format="diff-match-patch">{"version":"8"}</script>`,
+						},
+						distributed_editing: {
+							server_version: '8',
+						},
+					};
+				}
 
 				expect( method ).toBe( 'POST' );
 				expect( path ).toMatch(
@@ -5103,6 +5125,7 @@ describe( 'Post actions', () => {
 						`^/wp/v2/posts/${ postId }/distributed-editing/retry-save`
 					)
 				);
+				retrySaveRequestData = data;
 				expect( data.proposed_post_content ).toBe(
 					proposedPostContent
 				);
@@ -5110,7 +5133,6 @@ describe( 'Post actions', () => {
 				return {
 					result: 'retry_save_server_merged',
 					retry_save_accepted: true,
-					server_merged: true,
 					previous_server_version: '7',
 					server_version: '8',
 					pending_change_count: 2,
@@ -5120,8 +5142,17 @@ describe( 'Post actions', () => {
 					claims_saved: true,
 					revision_created: true,
 					created_revision_ids: [ 7002 ],
-					content: {
-						raw: `${ serverMergedPostContent }<script type="wp/post-sync-meta" data-sync-meta-format="diff-match-patch">{"version":"8"}</script>`,
+					server_merge_applied: true,
+					server_merge: {
+						merge_status: 'merged',
+						merge_strategy: 'top_level_serialized_block_three_way',
+						base_version: '4',
+						server_version: '7',
+						block_count: 2,
+						server_changed_indexes: [ 1 ],
+						local_changed_indexes: [ 0 ],
+						merged_stripped_content_hash:
+							'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb',
 					},
 				};
 			} );
@@ -5159,9 +5190,10 @@ describe( 'Post actions', () => {
 			).resolves.toMatchObject( {
 				result: 'retry_save_server_merged',
 				retry_save_accepted: true,
-				server_merged: true,
+				server_merge_applied: true,
 			} );
 
+			expect( serverStateRefetchCalls ).toBe( 1 );
 			expect( retrySaveRequestData ).toMatchObject( {
 				client_base_version: '7',
 				accepted_proof_server_version: '7',
@@ -5186,6 +5218,12 @@ describe( 'Post actions', () => {
 				retrySaveServerVersion: '8',
 				retrySavePreviousServerVersion: '7',
 				retrySaveServerMerged: true,
+				retrySaveServerMergeApplied: true,
+				retrySaveServerMergeStatus: 'merged',
+				retrySaveServerMergeStrategy:
+					'top_level_serialized_block_three_way',
+				retrySaveServerMergeServerChangedIndexes: [ 1 ],
+				retrySaveServerMergeLocalChangedIndexes: [ 0 ],
 				canExportLocalUpdates: false,
 			} );
 		} );

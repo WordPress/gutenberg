@@ -2840,7 +2840,11 @@ export const __experimentalSaveDistributedEditingRetryAfterProof =
 				await requestDistributedEditingRetrySave( requestArgs );
 			const retrySaveAppliedResponse =
 				isDistributedEditingRetrySaveAppliedResponse( response );
-			const appliedPostContent =
+			const retrySaveServerMergedResponse =
+				isDistributedEditingRetrySaveServerMergedResponse( response );
+			const retrySaveResponsePostContent =
+				getDistributedEditingPostContentFromResponse( response );
+			let appliedPostContent =
 				getDistributedEditingRetrySaveAppliedPostContent( {
 					response,
 					proposedPostContent,
@@ -2855,6 +2859,33 @@ export const __experimentalSaveDistributedEditingRetryAfterProof =
 				hasDistributedEditingRetrySaveSavedStateEvidenceForSessionState(
 					retrySaveResultSessionState
 				);
+			if (
+				retrySaveConfirmedResponse &&
+				retrySaveServerMergedResponse &&
+				typeof retrySaveResponsePostContent !== 'string'
+			) {
+				try {
+					const refetchResponse =
+						await requestDistributedEditingServerStateRefetch( {
+							postId,
+							restBase,
+						} );
+					const refetchedPostContent =
+						getDistributedEditingPostContentFromResponse(
+							refetchResponse
+						);
+
+					if ( typeof refetchedPostContent === 'string' ) {
+						appliedPostContent = refetchedPostContent;
+					}
+				} catch {
+					appliedPostContent =
+						getDistributedEditingRetrySaveAppliedPostContent( {
+							response,
+							proposedPostContent,
+						} );
+				}
+			}
 			const shouldApplyPostContent =
 				retrySaveConfirmedResponse &&
 				typeof appliedPostContent === 'string' &&
@@ -2934,6 +2965,23 @@ function isDistributedEditingRetrySaveAppliedResponse( response = {} ) {
 
 	return (
 		result === 'retry_save_applied' || result === 'retry_save_server_merged'
+	);
+}
+
+function isDistributedEditingRetrySaveServerMergedResponse( response = {} ) {
+	const responseData = response?.data ?? {};
+	const result = response?.result || responseData.result;
+
+	return Boolean(
+		result === 'retry_save_server_merged' ||
+			response.serverMerged ||
+			response.server_merged ||
+			response.serverMergeApplied ||
+			response.server_merge_applied ||
+			responseData.serverMerged ||
+			responseData.server_merged ||
+			responseData.serverMergeApplied ||
+			responseData.server_merge_applied
 	);
 }
 
