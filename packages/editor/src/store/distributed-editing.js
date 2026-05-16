@@ -1149,6 +1149,7 @@ export const DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE = Object.freeze( {
 	retrySaveClaimsSaved: false,
 	retrySaveRevisionCreated: false,
 	retrySaveCreatedRevisionIds: [],
+	retrySaveConfirmedMergedEdits: false,
 	retrySaveServerMerged: false,
 	retrySaveServerMergeApplied: false,
 	retrySaveServerMergeStatus: null,
@@ -1994,6 +1995,9 @@ export function normalizeDistributedEditingSessionState( sessionState = {} ) {
 		),
 		retrySaveCreatedRevisionIds: normalizeIdList(
 			sessionState.retrySaveCreatedRevisionIds
+		),
+		retrySaveConfirmedMergedEdits: Boolean(
+			sessionState.retrySaveConfirmedMergedEdits
 		),
 		retrySaveServerMerged: Boolean( sessionState.retrySaveServerMerged ),
 		retrySaveServerMergeApplied: Boolean(
@@ -9006,6 +9010,7 @@ export function getDistributedEditingRetrySaveFlowStateForSessionState(
 			normalized.retrySavePreviousServerVersion,
 		retrySaveRevisionCreated: normalized.retrySaveRevisionCreated,
 		retrySaveCreatedRevisionIds: normalized.retrySaveCreatedRevisionIds,
+		retrySaveConfirmedMergedEdits: normalized.retrySaveConfirmedMergedEdits,
 		retrySaveServerMerged: normalized.retrySaveServerMerged,
 		retrySaveServerMergeApplied: normalized.retrySaveServerMergeApplied,
 		retrySaveServerMergeStatus: normalized.retrySaveServerMergeStatus,
@@ -12271,6 +12276,12 @@ export function getDistributedEditingSessionStateForRetrySaveResult(
 		),
 		...retrySaveServerMergeEvidence,
 	};
+	const retrySaveConfirmedMergedEdits = Boolean(
+		retrySaveFlags.retrySaveServerMerged ||
+			retrySaveFlags.retrySaveServerMergeApplied ||
+			normalizedCurrent.localRebaseResultStatus ===
+				DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.REBASED
+	);
 	const retrySaveFreshReviewConsumeValidationFields =
 		getRetrySaveFreshReviewConsumeValidationFieldsFromResponseOrError(
 			responseOrError,
@@ -12337,6 +12348,7 @@ export function getDistributedEditingSessionStateForRetrySaveResult(
 			retrySaveAccepted: true,
 			retrySaveServerVersion: serverVersion,
 			retrySavePreviousServerVersion: previousServerVersion,
+			retrySaveConfirmedMergedEdits,
 			...retrySaveFlags,
 			...normalizeRetrySaveReviewMetadataFields(),
 			...normalizeRetrySaveReviewApprovalProofFields(),
@@ -13068,6 +13080,7 @@ function getDistributedEditingRetrySaveDescriptorFields( normalized ) {
 		retrySaveClaimsSaved: normalized.retrySaveClaimsSaved,
 		retrySaveRevisionCreated: normalized.retrySaveRevisionCreated,
 		retrySaveCreatedRevisionIds: normalized.retrySaveCreatedRevisionIds,
+		retrySaveConfirmedMergedEdits: normalized.retrySaveConfirmedMergedEdits,
 		retrySaveFreshReviewConsumed,
 		retrySaveFreshReviewRetrySaveAccepted,
 		retrySaveFreshReviewRetrySaveRejected,

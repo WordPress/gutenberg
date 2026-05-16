@@ -9948,6 +9948,13 @@ describe( 'DistributedEditingStatusSurface', () => {
 				retrySaveAccepted: true,
 				retrySaveClaimsSaved: true,
 			} );
+		const mergedSavedDescriptors =
+			getDistributedEditingNoticeDescriptorsForSessionState( {
+				retrySaveStatus: DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVED,
+				retrySaveAccepted: true,
+				retrySaveClaimsSaved: true,
+				retrySaveConfirmedMergedEdits: true,
+			} );
 
 		const { rerender } = render(
 			<DistributedEditingStatusSurface
@@ -9972,6 +9979,19 @@ describe( 'DistributedEditingStatusSurface', () => {
 		expect(
 			screen.getByText(
 				'WordPress saved the prepared changes. Protected local changes are no longer pending for this save.'
+			)
+		).toBeVisible();
+
+		rerender(
+			<DistributedEditingStatusSurface
+				noticeDescriptors={ mergedSavedDescriptors }
+			/>
+		);
+
+		expect( screen.getByText( 'Save confirmed' ) ).toBeVisible();
+		expect(
+			screen.getByText(
+				'WordPress saved the merged edits. Protected local changes are no longer pending for this save.'
 			)
 		).toBeVisible();
 	} );

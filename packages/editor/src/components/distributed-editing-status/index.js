@@ -1560,6 +1560,13 @@ export function DistributedEditingStatusSurface( {
 								  )
 								: undefined
 						}
+						data-distributed-editing-confirmed-save-merged-edits={
+							isConfirmedSaveStatus
+								? formatDataBoolean(
+										item.retrySaveConfirmedMergedEdits
+								  )
+								: undefined
+						}
 						data-distributed-editing-next-step={
 							item.nextStepAction || undefined
 						}
@@ -6355,6 +6362,12 @@ function getQuietedConfirmedSaveStatusMessage( item ) {
 		);
 	}
 
+	if ( item?.retrySaveConfirmedMergedEdits ) {
+		return __(
+			'WordPress confirmed the merged edits. Open details for version and revision evidence.'
+		);
+	}
+
 	return __(
 		'WordPress confirmed the update. Open details for version and revision evidence.'
 	);
@@ -7903,15 +7916,19 @@ function getRetrySaveConfirmedMessage( descriptor ) {
 		descriptor.retrySavePreviousServerVersion
 	);
 	const revisionCount = getRetrySaveRevisionCount( descriptor );
+	const savedChangeDescription = descriptor.retrySaveConfirmedMergedEdits
+		? __( 'merged edits' )
+		: __( 'prepared changes' );
 
 	if ( serverVersion && previousServerVersion && revisionCount > 0 ) {
 		return sprintf(
-			/* translators: 1: previous sync version, 2: saved sync version, 3: number of revisions. */
+			/* translators: 1: saved change description, such as "prepared changes" or "merged edits"; 2: previous sync version, 3: saved sync version, 4: number of revisions. */
 			_n(
-				'WordPress saved the prepared changes, advanced the sync version from %1$s to %2$s, and recorded %3$d revision. Protected local changes are no longer pending for this save.',
-				'WordPress saved the prepared changes, advanced the sync version from %1$s to %2$s, and recorded %3$d revisions. Protected local changes are no longer pending for this save.',
+				'WordPress saved the %1$s, advanced the sync version from %2$s to %3$s, and recorded %4$d revision. Protected local changes are no longer pending for this save.',
+				'WordPress saved the %1$s, advanced the sync version from %2$s to %3$s, and recorded %4$d revisions. Protected local changes are no longer pending for this save.',
 				revisionCount
 			),
+			savedChangeDescription,
 			previousServerVersion,
 			serverVersion,
 			revisionCount
@@ -7920,10 +7937,11 @@ function getRetrySaveConfirmedMessage( descriptor ) {
 
 	if ( serverVersion && previousServerVersion ) {
 		return sprintf(
-			/* translators: 1: previous sync version, 2: saved sync version. */
+			/* translators: 1: saved change description, such as "prepared changes" or "merged edits"; 2: previous sync version, 3: saved sync version. */
 			__(
-				'WordPress saved the prepared changes and advanced the sync version from %1$s to %2$s. Protected local changes are no longer pending for this save.'
+				'WordPress saved the %1$s and advanced the sync version from %2$s to %3$s. Protected local changes are no longer pending for this save.'
 			),
+			savedChangeDescription,
 			previousServerVersion,
 			serverVersion
 		);
@@ -7931,12 +7949,13 @@ function getRetrySaveConfirmedMessage( descriptor ) {
 
 	if ( serverVersion && revisionCount > 0 ) {
 		return sprintf(
-			/* translators: 1: saved sync version, 2: number of revisions. */
+			/* translators: 1: saved change description, such as "prepared changes" or "merged edits"; 2: saved sync version, 3: number of revisions. */
 			_n(
-				'WordPress saved the prepared changes at sync version %1$s and recorded %2$d revision. Protected local changes are no longer pending for this save.',
-				'WordPress saved the prepared changes at sync version %1$s and recorded %2$d revisions. Protected local changes are no longer pending for this save.',
+				'WordPress saved the %1$s at sync version %2$s and recorded %3$d revision. Protected local changes are no longer pending for this save.',
+				'WordPress saved the %1$s at sync version %2$s and recorded %3$d revisions. Protected local changes are no longer pending for this save.',
 				revisionCount
 			),
+			savedChangeDescription,
 			serverVersion,
 			revisionCount
 		);
@@ -7944,28 +7963,34 @@ function getRetrySaveConfirmedMessage( descriptor ) {
 
 	if ( serverVersion ) {
 		return sprintf(
-			/* translators: %s: saved sync version. */
+			/* translators: 1: saved change description, such as "prepared changes" or "merged edits"; 2: saved sync version. */
 			__(
-				'WordPress saved the prepared changes at sync version %s. Protected local changes are no longer pending for this save.'
+				'WordPress saved the %1$s at sync version %2$s. Protected local changes are no longer pending for this save.'
 			),
+			savedChangeDescription,
 			serverVersion
 		);
 	}
 
 	if ( revisionCount > 0 ) {
 		return sprintf(
-			/* translators: %d: number of revisions. */
+			/* translators: 1: saved change description, such as "prepared changes" or "merged edits"; 2: number of revisions. */
 			_n(
-				'WordPress saved the prepared changes and recorded %d revision. Protected local changes are no longer pending for this save.',
-				'WordPress saved the prepared changes and recorded %d revisions. Protected local changes are no longer pending for this save.',
+				'WordPress saved the %1$s and recorded %2$d revision. Protected local changes are no longer pending for this save.',
+				'WordPress saved the %1$s and recorded %2$d revisions. Protected local changes are no longer pending for this save.',
 				revisionCount
 			),
+			savedChangeDescription,
 			revisionCount
 		);
 	}
 
-	return __(
-		'WordPress saved the prepared changes. Protected local changes are no longer pending for this save.'
+	return sprintf(
+		/* translators: %s: saved change description, such as "prepared changes" or "merged edits". */
+		__(
+			'WordPress saved the %s. Protected local changes are no longer pending for this save.'
+		),
+		savedChangeDescription
 	);
 }
 

@@ -2832,6 +2832,7 @@ describe( 'Post actions', () => {
 				retrySaveAccepted: true,
 				retrySaveServerVersion: '8',
 				retrySavePreviousServerVersion: '7',
+				retrySaveConfirmedMergedEdits: true,
 				retrySaveServerMerged: true,
 				retrySaveServerMergeApplied: true,
 				retrySaveServerMergeStatus: 'merged',

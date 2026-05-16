@@ -3387,6 +3387,7 @@ describe( 'distributed editing session state', () => {
 			retrySaveClaimsSaved: true,
 			retrySaveRevisionCreated: true,
 			retrySaveCreatedRevisionIds: [ 7002 ],
+			retrySaveConfirmedMergedEdits: false,
 			mustOfferLocalCopy: false,
 			canExportLocalUpdates: false,
 		} );
@@ -3441,6 +3442,7 @@ describe( 'distributed editing session state', () => {
 			retrySaveAccepted: true,
 			retrySaveServerVersion: '52',
 			retrySavePreviousServerVersion: '51',
+			retrySaveConfirmedMergedEdits: true,
 			retrySaveServerMerged: true,
 			retrySaveServerMergeApplied: true,
 			retrySaveServerMergeStatus: 'merged',
