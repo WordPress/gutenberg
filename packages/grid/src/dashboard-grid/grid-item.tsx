@@ -7,13 +7,14 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { useState, useRef, useLayoutEffect } from '@wordpress/element';
+import { useState, useRef } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import ResizeHandle from '../shared/resize-handle';
+import type { ResizeSnapSize } from '../shared/resize-snap';
 import type { ResizeDelta } from '../shared/types';
 import type { GridItemProps } from './types';
 import styles from './grid-item.module.css';
@@ -43,35 +44,18 @@ export function GridItem( {
 	actionableArea = null,
 	onResize,
 	onResizeEnd,
+	resizeSnapPreview = null,
 	renderResizeHandle,
 }: GridItemProps ) {
-	const [ previewDelta, setPreviewDelta ] = useState< ResizeDelta | null >(
+	const [ resizeDelta, setResizeDelta ] = useState< ResizeDelta | null >(
 		null
 	);
-	const itemRef = useRef< HTMLDivElement >( null );
-	// Tile bounding rect at the first resize frame. The cursor `delta`
-	// from the handle is anchored to the gesture start, but the
-	// overlay needs to track the cursor against the *current* tile
-	// edge — which has shifted whenever the width/height stepped a
-	// column/row. Re-anchor locally by subtracting the tile growth.
-	const initialResizeRectRef = useRef< DOMRect | null >( null );
-	// Document scroll position at the start of a resize. The handle's
-	// `delta` is in document coordinates; `getBoundingClientRect` is
-	// in viewport coordinates. Auto-scroll near the viewport edge
-	// shifts both: the delta inflates by the scroll change, while the
-	// tile's viewport bottom drifts up by the same amount. Without a
-	// scroll reference, the preview overlay would carry that
-	// inflation forward and drift away from the tile's edge.
-	const initialResizeScrollRef = useRef< {
-		x: number;
-		y: number;
+	const [ initialContentSize, setInitialContentSize ] = useState< {
+		width: number;
+		height: number;
 	} | null >( null );
-	// Latest cursor delta from the resize handle. Reading this in a
-	// `useLayoutEffect` lets the overlay re-measure the tile rect
-	// *after* React commits a width step but before paint, so the
-	// frame that follows a column step never renders the overlay
-	// at the pre-step offset.
-	const lastResizeDeltaRef = useRef< ResizeDelta | null >( null );
+	const itemRef = useRef< HTMLDivElement >( null );
+	const contentRef = useRef< HTMLDivElement >( null );
 	const {
 		attributes,
 		listeners,
@@ -83,6 +67,7 @@ export function GridItem( {
 		disabled,
 	} );
 	const mergedRef = useMergeRefs( [ itemRef, setNodeRef ] );
+	const contentMergedRef = useMergeRefs( [ contentRef ] );
 	/*
 	 * With `<DragOverlay>` handling the cursor-following clone, the
 	 * sortable item stays put in its grid cell and acts as a
@@ -101,9 +86,11 @@ export function GridItem( {
 		gridRowEnd: `span ${ item.height || 1 }`,
 	};
 
+	const isResizing = resizeDelta !== null;
 	const itemClassName = clsx(
 		styles.item,
-		isDragging && styles[ 'is-dragging' ]
+		isDragging && styles[ 'is-dragging' ],
+		isResizing && styles[ 'is-resizing' ]
 	);
 
 	const handleResize = ( delta: ResizeDelta ) => {
@@ -111,95 +98,33 @@ export function GridItem( {
 			width: delta.width,
 			height: verticalResizable ? delta.height : 0,
 		};
-		const node = itemRef.current;
-		if ( node && ! initialResizeRectRef.current ) {
-			initialResizeRectRef.current = node.getBoundingClientRect();
-			const ownerWindow = node.ownerDocument.defaultView ?? window;
-			initialResizeScrollRef.current = {
-				x: ownerWindow.scrollX,
-				y: ownerWindow.scrollY,
-			};
+		const contentNode = contentRef.current;
+		if ( contentNode && ! initialContentSize ) {
+			const { width, height } = contentNode.getBoundingClientRect();
+			setInitialContentSize( { width, height } );
 		}
-		lastResizeDeltaRef.current = clamped;
+		setResizeDelta( clamped );
 		onResize( item.key, clamped );
-		// Provisional preview against the pre-commit rect; the
-		// `useLayoutEffect` below refines it once React commits the
-		// new tile size so a column step never paints with the
-		// stale offset. Subtract the scroll change so the overlay
-		// tracks the cursor's viewport-space position rather than
-		// drifting with the document scroll under it.
-		if (
-			node &&
-			initialResizeRectRef.current &&
-			initialResizeScrollRef.current
-		) {
-			const currentRect = node.getBoundingClientRect();
-			const ownerWindow = node.ownerDocument.defaultView ?? window;
-			const scrollDelta = {
-				x: ownerWindow.scrollX - initialResizeScrollRef.current.x,
-				y: ownerWindow.scrollY - initialResizeScrollRef.current.y,
-			};
-			const offsetX =
-				currentRect.right - initialResizeRectRef.current.right;
-			const offsetY =
-				currentRect.bottom - initialResizeRectRef.current.bottom;
-			setPreviewDelta( {
-				width: clamped.width - offsetX - scrollDelta.x,
-				height: verticalResizable
-					? clamped.height - offsetY - scrollDelta.y
-					: 0,
-			} );
-		}
 	};
 
-	useLayoutEffect( () => {
-		const lastDelta = lastResizeDeltaRef.current;
-		const initialRect = initialResizeRectRef.current;
-		const initialScroll = initialResizeScrollRef.current;
-		const node = itemRef.current;
-		if ( ! lastDelta || ! initialRect || ! initialScroll || ! node ) {
-			return;
-		}
-		const currentRect = node.getBoundingClientRect();
-		const ownerWindow = node.ownerDocument.defaultView ?? window;
-		const scrollDelta = {
-			x: ownerWindow.scrollX - initialScroll.x,
-			y: ownerWindow.scrollY - initialScroll.y,
-		};
-		const offsetX = currentRect.right - initialRect.right;
-		const offsetY = currentRect.bottom - initialRect.bottom;
-		const next = {
-			width: lastDelta.width - offsetX - scrollDelta.x,
-			height: verticalResizable
-				? lastDelta.height - offsetY - scrollDelta.y
-				: 0,
-		};
-		// Use the updater form so the effect doesn't need `previewDelta`
-		// in its deps. Returning `prev` when nothing changed lets React
-		// bail out without a re-render.
-		setPreviewDelta( ( prev ) =>
-			next.width === prev?.width && next.height === prev?.height
-				? prev
-				: next
-		);
-	}, [ item.width, item.height, verticalResizable ] );
-
 	const handleResizeEnd = () => {
-		setPreviewDelta( null );
-		initialResizeRectRef.current = null;
-		initialResizeScrollRef.current = null;
-		lastResizeDeltaRef.current = null;
+		setResizeDelta( null );
+		setInitialContentSize( null );
 		onResizeEnd();
 	};
 
-	const previewOverlay = previewDelta ? (
-		<div
-			className={ styles[ 'preview-overlay' ] }
-			style={ {
-				insetInlineEnd: -previewDelta.width,
-				bottom: -previewDelta.height,
-			} }
-		/>
+	const continuousContentStyle: React.CSSProperties | undefined =
+		resizeDelta && initialContentSize
+			? {
+					width: initialContentSize.width + resizeDelta.width,
+					height: verticalResizable
+						? initialContentSize.height + resizeDelta.height
+						: undefined,
+			  }
+			: undefined;
+
+	const previewOverlay = resizeSnapPreview ? (
+		<SnapPreviewOverlay snap={ resizeSnapPreview } />
 	) : null;
 
 	return (
@@ -219,20 +144,14 @@ export function GridItem( {
 				{ ...listeners }
 				style={ {
 					height: '100%',
-					// Keyboard activation needs `attributes` (tabIndex)
-					// and `listeners` (onKeyDown) on the same focused
-					// node; `setActivatorNodeRef` points dnd-kit's
-					// keyboard sensor here, the outer keeps `setNodeRef`
-					// for measurement.
-					//
-					// Cursor lives on this wrapper so `actionableArea`
-					// children (mounted outside it) keep their own;
-					// `undefined` during a gesture defers to the resize
-					// handle's document cursor lock.
 					cursor: getItemCursor( disabled, interacting ),
 				} }
 			>
-				<div className={ styles[ 'item-content' ] }>
+				<div
+					ref={ contentMergedRef }
+					className={ styles[ 'item-content' ] }
+					style={ continuousContentStyle }
+				>
 					{ children }
 					{ ! disabled && (
 						<ResizeHandle
@@ -247,5 +166,17 @@ export function GridItem( {
 				{ previewOverlay }
 			</div>
 		</div>
+	);
+}
+
+function SnapPreviewOverlay( { snap }: { snap: ResizeSnapSize } ) {
+	return (
+		<div
+			className={ styles[ 'preview-overlay' ] }
+			style={ {
+				width: snap.widthPx,
+				height: snap.heightPx ?? '100%',
+			} }
+		/>
 	);
 }

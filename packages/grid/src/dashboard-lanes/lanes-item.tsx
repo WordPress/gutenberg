@@ -7,7 +7,7 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { useState, useRef, useLayoutEffect } from '@wordpress/element';
+import { useState, useRef } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
 
 /**
@@ -15,6 +15,7 @@ import { useMergeRefs } from '@wordpress/compose';
  */
 import ResizeHandle from '../shared/resize-handle';
 import { LANES_DATA_KEY } from './use-lane-placement';
+import type { ResizeSnapSize } from '../shared/resize-snap';
 import type { ResizeDelta, ResizeHandleRenderProps } from '../shared/types';
 import styles from './lanes-item.module.css';
 
@@ -67,6 +68,11 @@ export type LanesItemProps = {
 
 	onResize: ( id: string, delta: ResizeDelta ) => void;
 
+	/**
+	 * Snapped column span in pixels for the resize-preview outline.
+	 */
+	resizeSnapPreview?: ResizeSnapSize | null;
+
 	onResizeEnd: () => void;
 
 	renderResizeHandle?: React.ComponentType< ResizeHandleRenderProps >;
@@ -81,22 +87,18 @@ export function LanesItem( {
 	actionableArea = null,
 	onResize,
 	onResizeEnd,
+	resizeSnapPreview = null,
 	renderResizeHandle,
 }: LanesItemProps ) {
-	const [ previewDelta, setPreviewDelta ] = useState< ResizeDelta | null >(
+	const [ resizeDelta, setResizeDelta ] = useState< ResizeDelta | null >(
 		null
 	);
-	const itemRef = useRef< HTMLDivElement >( null );
-	// See `grid-item.tsx` for the rationale behind these refs: the
-	// resize handle reports cursor delta against the gesture start, so
-	// the overlay must re-anchor to the live tile rect to track the
-	// cursor through column steps and auto-scroll.
-	const initialResizeRectRef = useRef< DOMRect | null >( null );
-	const initialResizeScrollRef = useRef< {
-		x: number;
-		y: number;
+	const [ initialContentSize, setInitialContentSize ] = useState< {
+		width: number;
+		height: number;
 	} | null >( null );
-	const lastResizeDeltaRef = useRef< ResizeDelta | null >( null );
+	const itemRef = useRef< HTMLDivElement >( null );
+	const contentRef = useRef< HTMLDivElement >( null );
 
 	const {
 		attributes,
@@ -109,99 +111,50 @@ export function LanesItem( {
 		disabled,
 	} );
 	const mergedRef = useMergeRefs( [ itemRef, setNodeRef ] );
+	const contentMergedRef = useMergeRefs( [ contentRef ] );
 
 	const style: React.CSSProperties = {
 		...placementStyle,
-		// Without this, the item is stretched to its grid track
-		// (4px when no row span has been computed yet) and
-		// `getBoundingClientRect` reports the track size, not the
-		// content size. The hook would then place every tile at row
-		// 1 and they would all overlap. `start` lets the item size
-		// to its content for measurement, and stays a no-op once
-		// the hook has applied an explicit `grid-row-end: span N`
-		// that already matches the content height.
 		alignSelf: 'start',
 	};
 
+	const isResizing = resizeDelta !== null;
 	const itemClassName = clsx(
 		styles.item,
-		isDragging && styles[ 'is-dragging' ]
+		isDragging && styles[ 'is-dragging' ],
+		isResizing && styles[ 'is-resizing' ]
 	);
 
 	const handleResize = ( delta: ResizeDelta ) => {
-		// Lanes are horizontal-only: height is driven by content.
 		const clamped = { width: delta.width, height: 0 };
-		const node = itemRef.current;
-		if ( node && ! initialResizeRectRef.current ) {
-			initialResizeRectRef.current = node.getBoundingClientRect();
-			const ownerWindow = node.ownerDocument.defaultView ?? window;
-			initialResizeScrollRef.current = {
-				x: ownerWindow.scrollX,
-				y: ownerWindow.scrollY,
-			};
+		const contentNode = contentRef.current;
+		if ( contentNode && ! initialContentSize ) {
+			const { width, height } = contentNode.getBoundingClientRect();
+			setInitialContentSize( { width, height } );
 		}
-		lastResizeDeltaRef.current = clamped;
+		setResizeDelta( clamped );
 		onResize( itemKey, clamped );
-		if (
-			node &&
-			initialResizeRectRef.current &&
-			initialResizeScrollRef.current
-		) {
-			const currentRect = node.getBoundingClientRect();
-			const ownerWindow = node.ownerDocument.defaultView ?? window;
-			const scrollDelta = {
-				x: ownerWindow.scrollX - initialResizeScrollRef.current.x,
-				y: ownerWindow.scrollY - initialResizeScrollRef.current.y,
-			};
-			const offsetX =
-				currentRect.right - initialResizeRectRef.current.right;
-			setPreviewDelta( {
-				width: clamped.width - offsetX - scrollDelta.x,
-				height: 0,
-			} );
-		}
 	};
 
-	useLayoutEffect( () => {
-		const lastDelta = lastResizeDeltaRef.current;
-		const initialRect = initialResizeRectRef.current;
-		const initialScroll = initialResizeScrollRef.current;
-		const node = itemRef.current;
-		if ( ! lastDelta || ! initialRect || ! initialScroll || ! node ) {
-			return;
-		}
-		const currentRect = node.getBoundingClientRect();
-		const ownerWindow = node.ownerDocument.defaultView ?? window;
-		const scrollDelta = {
-			x: ownerWindow.scrollX - initialScroll.x,
-			y: ownerWindow.scrollY - initialScroll.y,
-		};
-		const offsetX = currentRect.right - initialRect.right;
-		const next = {
-			width: lastDelta.width - offsetX - scrollDelta.x,
-			height: 0,
-		};
-		setPreviewDelta( ( prev ) =>
-			next.width === prev?.width && next.height === prev?.height
-				? prev
-				: next
-		);
-	}, [ placementStyle ] );
-
 	const handleResizeEnd = () => {
-		setPreviewDelta( null );
-		initialResizeRectRef.current = null;
-		initialResizeScrollRef.current = null;
-		lastResizeDeltaRef.current = null;
+		setResizeDelta( null );
+		setInitialContentSize( null );
 		onResizeEnd();
 	};
 
-	const previewOverlay = previewDelta ? (
+	const continuousContentStyle: React.CSSProperties | undefined =
+		resizeDelta && initialContentSize
+			? {
+					width: initialContentSize.width + resizeDelta.width,
+			  }
+			: undefined;
+
+	const previewOverlay = resizeSnapPreview ? (
 		<div
 			className={ styles[ 'preview-overlay' ] }
 			style={ {
-				insetInlineEnd: -previewDelta.width,
-				bottom: 0,
+				width: resizeSnapPreview.widthPx,
+				height: resizeSnapPreview.heightPx ?? '100%',
 			} }
 		/>
 	) : null;
@@ -228,20 +181,14 @@ export function LanesItem( {
 				{ ...listeners }
 				style={ {
 					height: '100%',
-					// Keyboard activation needs `attributes` (tabIndex)
-					// and `listeners` (onKeyDown) on the same focused
-					// node; `setActivatorNodeRef` points dnd-kit's
-					// keyboard sensor here, the outer keeps `setNodeRef`
-					// for measurement.
-					//
-					// Cursor lives on this wrapper so `actionableArea`
-					// children (mounted outside it) keep their own;
-					// `undefined` during a gesture defers to the resize
-					// handle's document cursor lock.
 					cursor: getItemCursor( disabled, interacting ),
 				} }
 			>
-				<div className={ styles[ 'item-content' ] }>
+				<div
+					ref={ contentMergedRef }
+					className={ styles[ 'item-content' ] }
+					style={ continuousContentStyle }
+				>
 					{ children }
 					{ ! disabled && (
 						<ResizeHandle
