@@ -296,6 +296,15 @@
 	font-weight: 600;
 }
 
+.editor-distributed-editing-status__conflict-comparison-save-cue {
+	background: #f0f6fc;
+	border-left: 3px solid #72aee6;
+	display: grid;
+	gap: $grid-unit-05;
+	margin-block-start: $grid-unit-05;
+	padding: $grid-unit-10;
+}
+
 .editor-distributed-editing-status__conflict-comparison-grid {
 	display: grid;
 	gap: $grid-unit-10;
