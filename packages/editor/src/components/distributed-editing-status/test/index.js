@@ -7603,29 +7603,34 @@ describe( 'DistributedEditingStatusSurface', () => {
 				'Apply local changes in this editor before trying Save again; WordPress is not updated yet.'
 			)
 		).toBeVisible();
+		const staleBaseNotice = screen
+			.getByText( 'Latest post loaded' )
+			// eslint-disable-next-line testing-library/no-node-access
+			.closest( '.editor-distributed-editing-status__notice' );
+		expect(
+			within( staleBaseNotice )
+				.getAllByRole( 'button' )
+				.map( ( button ) => {
+					return button.textContent.trim();
+				} )
+		).toEqual( [
+			'Apply local changes',
+			'Get latest post',
+			'Export local changes',
+		] );
 
 		await user.click(
 			screen.getByRole( 'button', {
-				name: 'Get latest post',
+				name: 'Apply local changes',
 			} )
 		);
 
 		expect( onAction ).toHaveBeenCalledWith(
-			DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFETCH_SERVER_STATE,
+			DISTRIBUTED_EDITING_NOTICE_ACTIONS.REBASE_LOCAL_UPDATES,
 			expect.objectContaining( {
 				kind: DISTRIBUTED_EDITING_NOTICE_KINDS.STALE_BASE_REJECTED,
 			} )
 		);
-		expect(
-			screen.getByRole( 'button', {
-				name: 'Apply local changes',
-			} )
-		).toBeVisible();
-		expect(
-			screen.getByRole( 'button', {
-				name: 'Export local changes',
-			} )
-		).toBeVisible();
 	} );
 
 	it( 'renders stale-base missing-input status without a rebase action', () => {
@@ -7663,6 +7668,17 @@ describe( 'DistributedEditingStatusSurface', () => {
 				name: 'Apply local changes',
 			} )
 		).not.toBeInTheDocument();
+		const staleBaseNotice = screen
+			.getByText( 'Latest post data missing' )
+			// eslint-disable-next-line testing-library/no-node-access
+			.closest( '.editor-distributed-editing-status__notice' );
+		expect(
+			within( staleBaseNotice )
+				.getAllByRole( 'button' )
+				.map( ( button ) => {
+					return button.textContent.trim();
+				} )
+		).toEqual( [ 'Get latest post', 'Export local changes' ] );
 	} );
 
 	it( 'renders stale-base rebase result status without leaking content', () => {

@@ -8433,33 +8433,10 @@ export function getDistributedEditingNoticeDescriptorsForSessionState(
 				kind: DISTRIBUTED_EDITING_NOTICE_KINDS.STALE_BASE_REJECTED,
 				status: 'warning',
 				priority: 'blocking',
-				actionKeys: [
-					...( normalized.canExportLocalUpdates
-						? [
-								DISTRIBUTED_EDITING_NOTICE_ACTIONS.EXPORT_LOCAL_UPDATES,
-						  ]
-						: [] ),
-					DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFETCH_SERVER_STATE,
-					...( normalized.canAttemptLocalRebase &&
-					hasDistributedEditingLocalRebaseInputs( normalized )
-						? [
-								DISTRIBUTED_EDITING_NOTICE_ACTIONS.REBASE_LOCAL_UPDATES,
-						  ]
-						: [] ),
-					...( normalized.readyToRetrySubmit &&
-					! normalized.retrySubmitPrepared
-						? [
-								DISTRIBUTED_EDITING_NOTICE_ACTIONS.PREPARE_RETRY_SUBMIT,
-						  ]
-						: [] ),
-					...( normalized.retrySubmitPrepared &&
-					normalized.retrySubmitProofStatus !==
-						DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.ACCEPTED_FOR_FUTURE_SAVE
-						? [
-								DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFRESH_RETRY_SUBMIT_PROOF,
-						  ]
-						: [] ),
-				],
+				actionKeys:
+					getDistributedEditingStaleBaseStatusActionKeys(
+						normalized
+					),
 				extra: getDistributedEditingLocalRebaseDescriptorFields(
 					normalized
 				),
@@ -8835,6 +8812,43 @@ export function getDistributedEditingNoticeDescriptorsForSessionState(
 	}
 
 	return descriptors;
+}
+
+function getDistributedEditingStaleBaseStatusActionKeys( normalized ) {
+	const actionKeys = [];
+	const canApplyLocalChanges =
+		normalized.canAttemptLocalRebase &&
+		hasDistributedEditingLocalRebaseInputs( normalized );
+	const canPrepareChanges =
+		normalized.readyToRetrySubmit && ! normalized.retrySubmitPrepared;
+	const canCheckWithWordPress =
+		normalized.retrySubmitPrepared &&
+		normalized.retrySubmitProofStatus !==
+			DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.ACCEPTED_FOR_FUTURE_SAVE;
+
+	if ( canApplyLocalChanges ) {
+		actionKeys.push(
+			DISTRIBUTED_EDITING_NOTICE_ACTIONS.REBASE_LOCAL_UPDATES
+		);
+	} else if ( canPrepareChanges ) {
+		actionKeys.push(
+			DISTRIBUTED_EDITING_NOTICE_ACTIONS.PREPARE_RETRY_SUBMIT
+		);
+	} else if ( canCheckWithWordPress ) {
+		actionKeys.push(
+			DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFRESH_RETRY_SUBMIT_PROOF
+		);
+	}
+
+	actionKeys.push( DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFETCH_SERVER_STATE );
+
+	if ( normalized.canExportLocalUpdates ) {
+		actionKeys.push(
+			DISTRIBUTED_EDITING_NOTICE_ACTIONS.EXPORT_LOCAL_UPDATES
+		);
+	}
+
+	return [ ...new Set( actionKeys ) ];
 }
 
 /**

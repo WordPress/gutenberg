@@ -10501,8 +10501,8 @@ describe( 'distributed editing session state', () => {
 				pendingChangeCount: 1,
 				remoteChangeCount: 1,
 				actionKeys: [
-					DISTRIBUTED_EDITING_NOTICE_ACTIONS.EXPORT_LOCAL_UPDATES,
 					DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFETCH_SERVER_STATE,
+					DISTRIBUTED_EDITING_NOTICE_ACTIONS.EXPORT_LOCAL_UPDATES,
 				],
 			} ),
 			expect.objectContaining( {
@@ -10550,13 +10550,44 @@ describe( 'distributed editing session state', () => {
 			hasRefetchedServerContent: true,
 			hasLocalRebaseInputs: true,
 			actionKeys: [
-				DISTRIBUTED_EDITING_NOTICE_ACTIONS.EXPORT_LOCAL_UPDATES,
-				DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFETCH_SERVER_STATE,
 				DISTRIBUTED_EDITING_NOTICE_ACTIONS.REBASE_LOCAL_UPDATES,
+				DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFETCH_SERVER_STATE,
+				DISTRIBUTED_EDITING_NOTICE_ACTIONS.EXPORT_LOCAL_UPDATES,
 			],
 		} );
 		expect( JSON.stringify( notices[ 0 ] ) ).not.toContain( baseContent );
 		expect( JSON.stringify( notices[ 0 ] ) ).not.toContain( serverContent );
+	} );
+
+	it( 'orders stale-base retry-submit preparation actions by the visible Save cue sequence', () => {
+		const notices = getDistributedEditingNoticeDescriptorsForSessionState( {
+			disposition:
+				DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+			reasonCode:
+				DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+			pendingChangeCount: 1,
+			remoteChangeCount: 1,
+			requiresServerStateRefetch: false,
+			refetchedServerState: true,
+			canExportLocalUpdates: true,
+			localRebasePlanStatus:
+				DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES.READY,
+			localRebaseResultStatus:
+				DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.REBASED,
+			readyToRetrySubmit: true,
+			clientBaseContent: '',
+			refetchedServerContent: '',
+		} );
+
+		expect( notices[ 0 ] ).toMatchObject( {
+			kind: DISTRIBUTED_EDITING_NOTICE_KINDS.STALE_BASE_REJECTED,
+			readyToRetrySubmit: true,
+			actionKeys: [
+				DISTRIBUTED_EDITING_NOTICE_ACTIONS.PREPARE_RETRY_SUBMIT,
+				DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFETCH_SERVER_STATE,
+				DISTRIBUTED_EDITING_NOTICE_ACTIONS.EXPORT_LOCAL_UPDATES,
+			],
+		} );
 	} );
 
 	it( 'withholds local rebase notice actions when remembered inputs are missing', () => {
@@ -10585,8 +10616,8 @@ describe( 'distributed editing session state', () => {
 			hasRefetchedServerContent: true,
 			hasLocalRebaseInputs: false,
 			actionKeys: [
-				DISTRIBUTED_EDITING_NOTICE_ACTIONS.EXPORT_LOCAL_UPDATES,
 				DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFETCH_SERVER_STATE,
+				DISTRIBUTED_EDITING_NOTICE_ACTIONS.EXPORT_LOCAL_UPDATES,
 			],
 		} );
 	} );
@@ -10619,9 +10650,9 @@ describe( 'distributed editing session state', () => {
 				DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_STATUSES.PREPARED,
 			retrySubmitPrepared: true,
 			actionKeys: [
-				DISTRIBUTED_EDITING_NOTICE_ACTIONS.EXPORT_LOCAL_UPDATES,
-				DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFETCH_SERVER_STATE,
 				DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFRESH_RETRY_SUBMIT_PROOF,
+				DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFETCH_SERVER_STATE,
+				DISTRIBUTED_EDITING_NOTICE_ACTIONS.EXPORT_LOCAL_UPDATES,
 			],
 		} );
 	} );
