@@ -7390,7 +7390,7 @@ describe( 'distributed editing session state', () => {
 				reason: 'manual_conflict_review_required_before_save',
 				label: 'Compare changes',
 				statusText:
-					'Compare conflicting changes before Save can update the post.',
+					'Compare the local and WordPress versions before Save can update the post.',
 				clickAction:
 					DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.COMPARE_CONFLICTING_CHANGES,
 				journeyAction: 'compare_conflicting_changes',
@@ -7755,7 +7755,7 @@ describe( 'distributed editing session state', () => {
 				step: DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.LOCAL_CHANGES_PROTECTED,
 				action: 'compare_conflicting_changes',
 				title: 'Save needs comparison',
-				summary: 'Compare protected local changes',
+				summary: 'Compare the local and WordPress versions',
 				actionHint: 'Compare changes',
 				requiresActionBeforeSave: true,
 				saveButtonLabel: 'Compare changes',

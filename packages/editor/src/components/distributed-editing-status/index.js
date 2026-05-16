@@ -1802,10 +1802,10 @@ function DistributedEditingSameBlockConflictComparison( {
 			role="region"
 		>
 			<div className="editor-distributed-editing-status__conflict-comparison-header">
-				<strong>{ __( 'Review conflicting edits' ) }</strong>
+				<strong>{ __( 'Compare changes' ) }</strong>
 				<p>
 					{ __(
-						'WordPress and this editor changed the same block. Compare the text below before deciding how to continue.'
+						'This editor and WordPress changed the same block. Choose the local version or the latest WordPress version before trying Save again.'
 					) }
 				</p>
 			</div>
@@ -6878,7 +6878,7 @@ function getStaleBaseStatusText( descriptor ) {
 		return {
 			title: __( 'Conflicting update not saved' ),
 			message: __(
-				'WordPress did not save the conflicting update. Your local changes are protected in this editor; compare the versions below, export a copy, or get the latest post before deciding what to keep.'
+				'WordPress did not save the conflicting update. Your local changes are protected in this editor. Compare the local and WordPress versions below, then choose which one to keep.'
 			),
 		};
 	}

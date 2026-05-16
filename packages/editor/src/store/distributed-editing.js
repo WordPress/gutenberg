@@ -10449,7 +10449,7 @@ function getDistributedEditingRequiredSaveWorkflowAction( normalized ) {
 			reason: 'manual_conflict_review_required_before_save',
 			label: 'Compare changes',
 			statusText:
-				'Compare conflicting changes before Save can update the post.',
+				'Compare the local and WordPress versions before Save can update the post.',
 			clickAction:
 				DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.COMPARE_CONFLICTING_CHANGES,
 		};
@@ -10999,7 +10999,7 @@ function getDistributedEditingSaveJourneyCopyForStep( step, action ) {
 				return {
 					title: 'Save needs comparison',
 					summary:
-						'Compare protected local changes with the latest post before WordPress can check Save.',
+						'Compare the local and WordPress versions before WordPress can check Save.',
 				};
 			}
 

@@ -925,7 +925,13 @@ describe( 'DistributedEditingStatus', () => {
 		).toBeVisible();
 		expect(
 			screen.getByText(
-				'WordPress did not save the conflicting update. Your local changes are protected in this editor; compare the versions below, export a copy, or get the latest post before deciding what to keep.'
+				'WordPress did not save the conflicting update. Your local changes are protected in this editor. Compare the local and WordPress versions below, then choose which one to keep.'
+			)
+		).toBeVisible();
+		expect( screen.getByText( 'Compare changes' ) ).toBeVisible();
+		expect(
+			screen.getByText(
+				'This editor and WordPress changed the same block. Choose the local version or the latest WordPress version before trying Save again.'
 			)
 		).toBeVisible();
 		expect(
