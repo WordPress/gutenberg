@@ -31,6 +31,10 @@ import {
 	DISTRIBUTED_EDITING_PRESENCE_STARTUP_POLICY_STATUSES,
 	DISTRIBUTED_EDITING_REASON_CODES,
 	DISTRIBUTED_EDITING_REVIEW_TOKEN_RECOVERY_STATUSES,
+	DISTRIBUTED_EDITING_SAVE_AUTHORITY_STATES,
+	DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES,
+	DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS,
+	DISTRIBUTED_EDITING_SAVE_POLICY_STATUSES,
 	DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_STATUSES,
 	DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES,
 	DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_REASONS,
@@ -62,6 +66,7 @@ const DISTRIBUTED_EDITING_OPAQUE_REVIEW_APPROVAL_PROOF_TOKEN_REJECTION_DETAILS =
 
 const distributedEditingStartupHeartbeatRuntimeKeys = new Set();
 const DISTRIBUTED_EDITING_STARTUP_SNAPSHOT_DELAY_MS = 1000;
+const DISTRIBUTED_EDITING_CONFIRMED_SAVE_SHELL_HOLD_MS = 4000;
 const DISTRIBUTED_EDITING_SAME_BLOCK_CONFLICT_REASONS = new Set( [
 	'same_block_changed',
 	'same_serialized_block_changed',
@@ -1670,10 +1675,10 @@ function getDistributedEditingSameBlockConflictComparison(
 	const nextStepAction = savePrepared
 		? 'save_guarded_update'
 		: canPrepareSave
-			? 'prepare_guarded_save'
-			: canRequestFreshProof
-				? 'check_conflict_choice'
-				: 'choose_conflict_version';
+		? 'prepare_guarded_save'
+		: canRequestFreshProof
+		? 'check_conflict_choice'
+		: 'choose_conflict_version';
 
 	return {
 		blockIndex: comparedBlocks.blockIndex,
@@ -2757,6 +2762,8 @@ function getDistributedEditingEnabledShellState( sessionState ) {
 			humanLoopSummary: humanLoopStepCopy.summary,
 			saveJourneyTitle: saveJourneyCopy.title,
 			saveJourneySummary: saveJourneyCopy.summary,
+			confirmedSaveEvidenceRetained: false,
+			confirmedSaveShellQuieted: false,
 			message: __(
 				'Updates may be delayed. Local changes remain protected and exportable.'
 			),
@@ -2779,6 +2786,8 @@ function getDistributedEditingEnabledShellState( sessionState ) {
 			humanLoopSummary: humanLoopStepCopy.summary,
 			saveJourneyTitle: saveJourneyCopy.title,
 			saveJourneySummary: saveJourneyCopy.summary,
+			confirmedSaveEvidenceRetained: false,
+			confirmedSaveShellQuieted: false,
 			message: __(
 				'Local changes are protected and remain exportable while WordPress waits for server confirmation.'
 			),
@@ -2801,6 +2810,8 @@ function getDistributedEditingEnabledShellState( sessionState ) {
 			humanLoopSummary: humanLoopStepCopy.summary,
 			saveJourneyTitle: saveJourneyCopy.title,
 			saveJourneySummary: saveJourneyCopy.summary,
+			confirmedSaveEvidenceRetained: true,
+			confirmedSaveShellQuieted: false,
 			message: __(
 				'WordPress accepted this Distributed Editing Save. You can keep editing; WordPress will protect any new local changes.'
 			),
@@ -2822,6 +2833,83 @@ function getDistributedEditingEnabledShellState( sessionState ) {
 		humanLoopSummary: humanLoopStepCopy.summary,
 		saveJourneyTitle: saveJourneyCopy.title,
 		saveJourneySummary: saveJourneyCopy.summary,
+		confirmedSaveEvidenceRetained: false,
+		confirmedSaveShellQuieted: false,
+		message: __(
+			'WordPress will protect local changes and show sync status here when review, refresh, or server confirmation is needed.'
+		),
+	};
+}
+
+function getDistributedEditingConfirmedSaveShellHoldMs() {
+	const holdMs =
+		globalThis.__experimentalDistributedEditingConfirmedSaveShellHoldMs;
+
+	if (
+		typeof holdMs === 'number' &&
+		Number.isFinite( holdMs ) &&
+		holdMs >= 0
+	) {
+		return holdMs;
+	}
+
+	return DISTRIBUTED_EDITING_CONFIRMED_SAVE_SHELL_HOLD_MS;
+}
+
+function getDistributedEditingQuietedConfirmedSaveShellState( shellState ) {
+	const humanLoopStepState = {
+		...shellState.humanLoopStepState,
+		step: DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.READY_TO_EDIT,
+		action: 'edit',
+		saveButtonStatus: DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES.UPDATE_READY,
+		saveButtonReason: null,
+		saveButtonLabel: __( 'Update' ),
+		saveButtonStatusText: __( 'Ready to update' ),
+		saveButtonDisabled: false,
+		saveButtonBusy: false,
+		saveButtonBlocksNormalSavePost: false,
+		saveButtonStateSummaryText: __(
+			'Save can update the authoritative WordPress post.'
+		),
+		saveButtonAuthorityStatusText: __(
+			'Save can update the authoritative WordPress post.'
+		),
+		saveAuthorityState:
+			DISTRIBUTED_EDITING_SAVE_AUTHORITY_STATES.READY_TO_UPDATE,
+		savePolicyAction: DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.CONTINUE_SAVE,
+		hasProtectedLocalChanges: false,
+		requiresServerStateRefetch: false,
+		requiresReview: false,
+		hasAcceptedButUnconsumed: false,
+		pendingServerConfirmation: false,
+		confirmedByWordPress: false,
+	};
+	const humanLoopStepCopy =
+		getDistributedEditingHumanLoopStepCopy( humanLoopStepState );
+	const saveJourneyCopy =
+		getDistributedEditingHumanLoopSaveJourneyCopy( humanLoopStepState );
+
+	return {
+		...shellState,
+		saveState: DISTRIBUTED_EDITING_SAVE_POLICY_STATUSES.UPDATE_READY,
+		saveAction: DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.CONTINUE_SAVE,
+		authorityState:
+			DISTRIBUTED_EDITING_SAVE_AUTHORITY_STATES.READY_TO_UPDATE,
+		saveStateSummaryText: __(
+			'Save can update the authoritative WordPress post.'
+		),
+		authorityStatusText: __(
+			'Save can update the authoritative WordPress post.'
+		),
+		humanLoopStepState,
+		humanLoopStep: humanLoopStepState.step,
+		humanLoopAction: humanLoopStepState.action,
+		humanLoopTitle: humanLoopStepCopy.title,
+		humanLoopSummary: humanLoopStepCopy.summary,
+		saveJourneyTitle: saveJourneyCopy.title,
+		saveJourneySummary: saveJourneyCopy.summary,
+		confirmedSaveEvidenceRetained: true,
+		confirmedSaveShellQuieted: true,
 		message: __(
 			'WordPress will protect local changes and show sync status here when review, refresh, or server confirmation is needed.'
 		),
@@ -3010,7 +3098,48 @@ export function DistributedEditingEnabledShell( {
 		return null;
 	}
 
-	const shellState = getDistributedEditingEnabledShellState( sessionState );
+	const rawShellState =
+		getDistributedEditingEnabledShellState( sessionState );
+	const isConfirmedSaveShell =
+		rawShellState.localProtection === 'idle' &&
+		rawShellState.humanLoopStepState.confirmedByWordPress;
+	const confirmedSaveShellKey = [
+		sessionState.retrySaveStatus || '',
+		sessionState.retrySaveServerVersion || '',
+		sessionState.retrySavePreviousServerVersion || '',
+		sessionState.retrySaveRevisionCreated ? 'revision' : 'no-revision',
+	].join( ':' );
+	const confirmedSaveShellHoldMs =
+		getDistributedEditingConfirmedSaveShellHoldMs();
+	const [ isConfirmedSaveShellQuieted, setIsConfirmedSaveShellQuieted ] =
+		useState( false );
+
+	useEffect( () => {
+		if ( ! isConfirmedSaveShell ) {
+			setIsConfirmedSaveShellQuieted( false );
+			return;
+		}
+
+		setIsConfirmedSaveShellQuieted( false );
+		const timeoutId = setTimeout( () => {
+			setIsConfirmedSaveShellQuieted( true );
+		}, confirmedSaveShellHoldMs );
+
+		return () => {
+			clearTimeout( timeoutId );
+		};
+	}, [
+		confirmedSaveShellHoldMs,
+		confirmedSaveShellKey,
+		isConfirmedSaveShell,
+	] );
+
+	const shellState =
+		isConfirmedSaveShell && isConfirmedSaveShellQuieted
+			? getDistributedEditingQuietedConfirmedSaveShellState(
+					rawShellState
+			  )
+			: rawShellState;
 	const shellTone =
 		shellState.serverContact === 'degraded'
 			? 'degraded'
@@ -3024,6 +3153,12 @@ export function DistributedEditingEnabledShell( {
 		<div
 			aria-label={ __( 'Distributed editing enabled status' ) }
 			className="editor-distributed-editing-status__enabled-shell"
+			data-distributed-editing-confirmed-save-evidence-retained={ formatDataBoolean(
+				Boolean( shellState.confirmedSaveEvidenceRetained )
+			) }
+			data-distributed-editing-confirmed-save-shell-quieted={ formatDataBoolean(
+				Boolean( shellState.confirmedSaveShellQuieted )
+			) }
 			data-distributed-editing-enabled-shell-save-guidance-visible={ formatDataBoolean(
 				Boolean( saveLine )
 			) }

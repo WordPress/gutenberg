@@ -934,9 +934,7 @@ describe( 'DistributedEditingStatus', () => {
 				'This editor and WordPress changed the same block. Choose the local version or the latest WordPress version before trying Save again.'
 			)
 		).toBeVisible();
-		expect(
-			screen.getByText( 'Choose a version to keep' )
-		).toBeVisible();
+		expect( screen.getByText( 'Choose a version to keep' ) ).toBeVisible();
 		expect(
 			screen.getByText(
 				'WordPress is waiting because this editor and the saved post changed the same block. Choosing here does not save yet.'
@@ -1340,9 +1338,7 @@ describe( 'DistributedEditingStatus', () => {
 				'Check this choice with WordPress before using Save. The WordPress post has not changed yet.'
 			)
 		).toBeVisible();
-		expect(
-			screen.getByText( 'Prepare Save' )
-		).toBeVisible();
+		expect( screen.getByText( 'Prepare Save' ) ).toBeVisible();
 		expect( screen.getByText( 'Use Save' ) ).toBeVisible();
 		expect(
 			within( comparison ).getByRole( 'button', {
@@ -1635,7 +1631,9 @@ describe( 'DistributedEditingStatus', () => {
 				name: 'Distributed editing conflict comparison',
 			} )
 		).not.toBeInTheDocument();
-		expect( screen.queryByText( 'Compare changes' ) ).not.toBeInTheDocument();
+		expect(
+			screen.queryByText( 'Compare changes' )
+		).not.toBeInTheDocument();
 		expect(
 			screen.queryByText( 'Editor Save is ready' )
 		).not.toBeInTheDocument();
@@ -2174,110 +2172,212 @@ describe( 'DistributedEditingStatus', () => {
 		).not.toBeInTheDocument();
 	} );
 
-	it( 'summarizes confirmed Save state in the enabled editor shell as ready for next edits', () => {
-		setupDistributedEditingStatusSelect( {
-			editorSettings: {
-				distributedEditing: {
-					enabled: true,
+	it( 'summarizes confirmed Save state in the enabled editor shell and then returns to quiet ready state', () => {
+		const originalConfirmedSaveShellHoldMs =
+			globalThis.__experimentalDistributedEditingConfirmedSaveShellHoldMs;
+		globalThis.__experimentalDistributedEditingConfirmedSaveShellHoldMs = 1000;
+		jest.useFakeTimers();
+
+		try {
+			setupDistributedEditingStatusSelect( {
+				editorSettings: {
+					distributedEditing: {
+						enabled: true,
+					},
 				},
-			},
-			sessionState: {
-				retrySaveStatus: DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVED,
-				retrySaveAccepted: true,
-				retrySaveServerVersion: '232',
-				retrySavePreviousServerVersion: '231',
-				retrySaveSavesPost: true,
-				retrySaveMutatesPostContent: true,
-				retrySaveCreatesRevision: true,
-				retrySaveClaimsSaved: true,
-				retrySaveRevisionCreated: true,
-			},
-		} );
+				sessionState: {
+					retrySaveStatus:
+						DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVED,
+					retrySaveAccepted: true,
+					retrySaveServerVersion: '232',
+					retrySavePreviousServerVersion: '231',
+					retrySaveSavesPost: true,
+					retrySaveMutatesPostContent: true,
+					retrySaveCreatesRevision: true,
+					retrySaveClaimsSaved: true,
+					retrySaveRevisionCreated: true,
+				},
+			} );
 
-		render( <DistributedEditingStatusChrome /> );
+			render( <DistributedEditingStatusChrome /> );
 
-		const shell = screen.getByRole( 'region', {
-			name: 'Distributed editing enabled status',
-		} );
-		expect( shell ).toHaveAttribute(
-			'data-distributed-editing-server-contact',
-			'nominal'
-		);
-		expect( shell ).toHaveAttribute(
-			'data-distributed-editing-local-protection',
-			'idle'
-		);
-		expect( shell ).toHaveAttribute(
-			'data-distributed-editing-save-state',
-			'retry_save_confirmed'
-		);
-		expect( shell ).toHaveAttribute(
-			'data-distributed-editing-save-action',
-			'none'
-		);
-		expect( shell ).toHaveAttribute(
-			'data-distributed-editing-authority-state',
-			'authoritative_update_confirmed'
-		);
-		expect( shell ).toHaveAttribute(
-			'data-distributed-editing-human-loop-step',
-			'save_confirmed'
-		);
-		expect( shell ).toHaveAttribute(
-			'data-distributed-editing-human-loop-action',
-			'none'
-		);
-		expect( screen.getByText( 'Saved' ) ).toBeVisible();
-		expect(
-			screen.queryByText(
-				'WordPress will protect local changes and show sync status here when review, refresh, or server confirmation is needed.'
-			)
-		).not.toBeInTheDocument();
-		expect(
-			screen.queryByText(
-				'WordPress accepted this Distributed Editing Save. You can keep editing; WordPress will protect any new local changes.'
-			)
-		).not.toBeInTheDocument();
-		expect( screen.getByText( 'Ready for new edits.' ) ).toBeVisible();
-		expect(
-			screen.queryByText( 'WordPress confirmed Save.' )
-		).not.toBeInTheDocument();
-		// eslint-disable-next-line testing-library/no-node-access
-		const saveJourney = shell.querySelector(
-			'[data-distributed-editing-save-journey-status]'
-		);
-		// eslint-disable-next-line testing-library/no-node-access
-		const saveSummaryItem = shell.querySelector(
-			'[data-distributed-editing-enabled-shell-summary-item="save"]'
-		);
-		// eslint-disable-next-line testing-library/no-node-access
-		const humanLoop = shell.querySelector(
-			'[data-distributed-editing-human-loop-step-status]'
-		);
-		expect( saveJourney ).toHaveAttribute(
-			'data-distributed-editing-save-journey-status',
-			'save_confirmed'
-		);
-		expect( saveSummaryItem ).toHaveAttribute(
-			'data-distributed-editing-enabled-shell-summary-item-visible',
-			'false'
-		);
-		expect( saveJourney ).toHaveAttribute(
-			'data-distributed-editing-save-journey-status-summary',
-			'Ready for new edits.'
-		);
-		expect( saveJourney ).toHaveAttribute(
-			'data-distributed-editing-save-journey-claims-saved-without-evidence',
-			'false'
-		);
-		expect( humanLoop ).toHaveAttribute(
-			'data-distributed-editing-human-loop-confirmed-by-wordpress',
-			'true'
-		);
-		expect( humanLoop ).toHaveAttribute(
-			'data-distributed-editing-human-loop-claims-saved-without-evidence',
-			'false'
-		);
+			const shell = screen.getByRole( 'region', {
+				name: 'Distributed editing enabled status',
+			} );
+			expect( shell ).toHaveAttribute(
+				'data-distributed-editing-server-contact',
+				'nominal'
+			);
+			expect( shell ).toHaveAttribute(
+				'data-distributed-editing-local-protection',
+				'idle'
+			);
+			expect( shell ).toHaveAttribute(
+				'data-distributed-editing-save-state',
+				'retry_save_confirmed'
+			);
+			expect( shell ).toHaveAttribute(
+				'data-distributed-editing-save-action',
+				'none'
+			);
+			expect( shell ).toHaveAttribute(
+				'data-distributed-editing-authority-state',
+				'authoritative_update_confirmed'
+			);
+			expect( shell ).toHaveAttribute(
+				'data-distributed-editing-human-loop-step',
+				'save_confirmed'
+			);
+			expect( shell ).toHaveAttribute(
+				'data-distributed-editing-human-loop-action',
+				'none'
+			);
+			expect( shell ).toHaveAttribute(
+				'data-distributed-editing-confirmed-save-evidence-retained',
+				'true'
+			);
+			expect( shell ).toHaveAttribute(
+				'data-distributed-editing-confirmed-save-shell-quieted',
+				'false'
+			);
+			expect( within( shell ).getByText( 'Saved' ) ).toBeVisible();
+			expect(
+				screen.queryByText(
+					'WordPress will protect local changes and show sync status here when review, refresh, or server confirmation is needed.'
+				)
+			).not.toBeInTheDocument();
+			expect(
+				screen.queryByText(
+					'WordPress accepted this Distributed Editing Save. You can keep editing; WordPress will protect any new local changes.'
+				)
+			).not.toBeInTheDocument();
+			expect(
+				within( shell ).getByText( 'Ready for new edits.' )
+			).toBeVisible();
+			expect(
+				screen.queryByText( 'WordPress confirmed Save.' )
+			).not.toBeInTheDocument();
+			// eslint-disable-next-line testing-library/no-node-access
+			let saveJourney = shell.querySelector(
+				'[data-distributed-editing-save-journey-status]'
+			);
+			// eslint-disable-next-line testing-library/no-node-access
+			const saveSummaryItem = shell.querySelector(
+				'[data-distributed-editing-enabled-shell-summary-item="save"]'
+			);
+			// eslint-disable-next-line testing-library/no-node-access
+			let humanLoop = shell.querySelector(
+				'[data-distributed-editing-human-loop-step-status]'
+			);
+			expect( saveJourney ).toHaveAttribute(
+				'data-distributed-editing-save-journey-status',
+				'save_confirmed'
+			);
+			expect( saveSummaryItem ).toHaveAttribute(
+				'data-distributed-editing-enabled-shell-summary-item-visible',
+				'false'
+			);
+			expect( saveJourney ).toHaveAttribute(
+				'data-distributed-editing-save-journey-status-summary',
+				'Ready for new edits.'
+			);
+			expect( saveJourney ).toHaveAttribute(
+				'data-distributed-editing-save-journey-claims-saved-without-evidence',
+				'false'
+			);
+			expect( humanLoop ).toHaveAttribute(
+				'data-distributed-editing-human-loop-confirmed-by-wordpress',
+				'true'
+			);
+			expect( humanLoop ).toHaveAttribute(
+				'data-distributed-editing-human-loop-claims-saved-without-evidence',
+				'false'
+			);
+
+			act( () => {
+				jest.advanceTimersByTime( 1000 );
+			} );
+
+			expect( shell ).toHaveAttribute(
+				'data-distributed-editing-save-state',
+				'update_ready'
+			);
+			expect( shell ).toHaveAttribute(
+				'data-distributed-editing-save-action',
+				'continue_save'
+			);
+			expect( shell ).toHaveAttribute(
+				'data-distributed-editing-authority-state',
+				'ready_to_update_authoritative_post'
+			);
+			expect( shell ).toHaveAttribute(
+				'data-distributed-editing-human-loop-step',
+				'ready_to_edit'
+			);
+			expect( shell ).toHaveAttribute(
+				'data-distributed-editing-human-loop-action',
+				'edit'
+			);
+			expect( shell ).toHaveAttribute(
+				'data-distributed-editing-confirmed-save-evidence-retained',
+				'true'
+			);
+			expect( shell ).toHaveAttribute(
+				'data-distributed-editing-confirmed-save-shell-quieted',
+				'true'
+			);
+			expect(
+				within( shell ).getByText( 'Editing together' )
+			).toBeVisible();
+			expect(
+				within( shell ).getByText(
+					'Other editors in this post appear below.'
+				)
+			).toBeVisible();
+			expect(
+				within( shell ).queryByText( 'Saved' )
+			).not.toBeInTheDocument();
+			expect(
+				within( shell ).queryByText( 'Ready for new edits.' )
+			).not.toBeInTheDocument();
+			// eslint-disable-next-line testing-library/no-node-access
+			saveJourney = shell.querySelector(
+				'[data-distributed-editing-save-journey-status]'
+			);
+			// eslint-disable-next-line testing-library/no-node-access
+			humanLoop = shell.querySelector(
+				'[data-distributed-editing-human-loop-step-status]'
+			);
+			expect( saveJourney ).toHaveAttribute(
+				'data-distributed-editing-save-journey-status',
+				'ready_to_edit'
+			);
+			expect( saveJourney ).toHaveAttribute(
+				'data-distributed-editing-save-journey-status-summary',
+				'Save can update the authoritative WordPress post.'
+			);
+			expect( saveJourney ).toHaveAttribute(
+				'data-distributed-editing-save-journey-claims-saved-without-evidence',
+				'false'
+			);
+			expect( humanLoop ).toHaveAttribute(
+				'data-distributed-editing-human-loop-confirmed-by-wordpress',
+				'false'
+			);
+			expect( humanLoop ).toHaveAttribute(
+				'data-distributed-editing-human-loop-claims-saved-without-evidence',
+				'false'
+			);
+		} finally {
+			jest.useRealTimers();
+
+			if ( originalConfirmedSaveShellHoldMs === undefined ) {
+				delete globalThis.__experimentalDistributedEditingConfirmedSaveShellHoldMs;
+			} else {
+				globalThis.__experimentalDistributedEditingConfirmedSaveShellHoldMs =
+					originalConfirmedSaveShellHoldMs;
+			}
+		}
 	} );
 
 	it( 'shows a latency-tolerant presence roster in the enabled editor shell', () => {
