@@ -2990,11 +2990,16 @@ export const __experimentalSaveDistributedEditingRetryAfterProof =
 				hasDistributedEditingRetrySaveSavedStateEvidenceForSessionState(
 					retrySaveResultSessionState
 				);
-			if (
+			const shouldRefetchConfirmedPostContent =
 				retrySaveConfirmedResponse &&
-				retrySaveServerMergedResponse &&
-				typeof retrySaveResponsePostContent !== 'string'
-			) {
+				typeof retrySaveResponsePostContent !== 'string' &&
+				( retrySaveServerMergedResponse ||
+					currentSessionState.localRebaseResultStatus ===
+						DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.REBASED ||
+					typeof currentSessionState.refetchedServerContent ===
+						'string' );
+
+			if ( shouldRefetchConfirmedPostContent ) {
 				try {
 					const refetchResponse =
 						await requestDistributedEditingServerStateRefetch( {
@@ -3017,10 +3022,6 @@ export const __experimentalSaveDistributedEditingRetryAfterProof =
 						} );
 				}
 			}
-			const shouldApplyPostContent =
-				retrySaveConfirmedResponse &&
-				typeof appliedPostContent === 'string' &&
-				select.getEditedPostContent?.() !== appliedPostContent;
 			let nextSessionState =
 				getDistributedEditingSessionStateWithActionTranscriptEvent(
 					retrySaveResultSessionState,
@@ -3055,11 +3056,15 @@ export const __experimentalSaveDistributedEditingRetryAfterProof =
 			}
 
 			dispatch.setDistributedEditingSessionState( nextSessionState );
-			if ( shouldApplyPostContent ) {
-				dispatch.editPost(
-					{ content: appliedPostContent },
-					{ undoIgnore: true }
-				);
+			if (
+				retrySaveConfirmedResponse &&
+				typeof appliedPostContent === 'string'
+			) {
+				applyDistributedEditingConfirmedPostContent( {
+					dispatch,
+					select,
+					postContent: appliedPostContent,
+				} );
 			}
 			if ( retrySaveConfirmedResponse ) {
 				deleteDistributedEditingFreshReviewImportContentVaultEntry( {
@@ -3155,6 +3160,34 @@ export const __experimentalSaveDistributedEditingRetryAfterProof =
 			throw error;
 		}
 	};
+
+function applyDistributedEditingConfirmedPostContent( {
+	dispatch,
+	select,
+	postContent,
+} ) {
+	const comparablePostContent =
+		getDistributedEditingComparablePostContent( postContent );
+	const applyPostContent = () => {
+		if ( select.getEditedPostContent?.() !== comparablePostContent ) {
+			const parsedBlocks = parse( comparablePostContent );
+
+			if ( parsedBlocks.length || ! comparablePostContent ) {
+				dispatch.resetEditorBlocks( parsedBlocks, {
+					__unstableShouldCreateUndoLevel: false,
+				} );
+			}
+			dispatch.editPost(
+				{ content: comparablePostContent },
+				{
+					undoIgnore: true,
+				}
+			);
+		}
+	};
+
+	applyPostContent();
+}
 
 function isDistributedEditingRetrySaveAppliedResponse( response = {} ) {
 	const result = response?.result || response?.data?.result;

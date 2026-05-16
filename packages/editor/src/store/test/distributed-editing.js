@@ -2784,6 +2784,55 @@ describe( 'distributed editing session state', () => {
 		);
 	} );
 
+	it( 'rebases stale-base local changes across formatted serialized block spacing', () => {
+		const serializeParagraph = ( text ) =>
+			`<!-- wp:paragraph -->\n<p>${ text }</p>\n<!-- /wp:paragraph -->`;
+		const serializeParagraphs = ( firstText, secondText ) =>
+			`${ serializeParagraph( firstText ) }\n\n${ serializeParagraph(
+				secondText
+			) }`;
+		const baseContent = serializeParagraphs( 'Alpha', 'Beta' );
+		const serverContent = serializeParagraphs( 'Alpha', 'Remote beta' );
+		const localContent = serializeParagraphs( 'Local alpha', 'Beta' );
+		const result = getDistributedEditingStaleBaseLocalRebaseResult( {
+			currentSessionState:
+				getDistributedEditingSessionStateForStaleBaseLocalRebasePlan(
+					getDistributedEditingSessionStateForStaleBaseServerStateRefetchResult(
+						{
+							distributed_editing: {
+								server_version: 'server-v7',
+							},
+						},
+						getDistributedEditingSessionStateForStaleBaseRejectionResult(
+							{
+								reason_code:
+									DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+								client_base_version: 'server-v4',
+								server_version: 'server-v6',
+								pending_change_count: 2,
+								remote_change_count: 1,
+							}
+						)
+					)
+				),
+			clientBaseContent: baseContent,
+			serverContent,
+			localContent,
+		} );
+
+		expect( result ).toMatchObject( {
+			status: DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.REBASED,
+			reason: null,
+			hasCandidatePostContent: true,
+			mergedBlockCount: 2,
+			readyToRetrySubmit: true,
+			requiresManualConflictResolution: false,
+		} );
+		expect( result.candidatePostContent ).toBe(
+			serializeParagraphs( 'Local alpha', 'Remote beta' )
+		);
+	} );
+
 	it( 'rebases one-sided insertion into an empty serialized post', () => {
 		const localContent =
 			'<!-- wp:paragraph --><p>Local draft</p><!-- /wp:paragraph -->';

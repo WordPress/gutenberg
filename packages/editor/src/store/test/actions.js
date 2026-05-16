@@ -5572,6 +5572,122 @@ describe( 'Post actions', () => {
 			} );
 		} );
 
+		it( 'refetches confirmed client-side auto-merged retry-save content after stale-base rebase', async () => {
+			const localPostContent =
+				'<!-- wp:paragraph --><p>Local alpha.</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Base beta.</p><!-- /wp:paragraph -->';
+			const proposedPostContent =
+				'<!-- wp:paragraph --><p>Local alpha.</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Remote beta.</p><!-- /wp:paragraph -->';
+			const proposedPostContentHash =
+				'1111111111111111111111111111111111111111111111111111111111111111';
+			const post = {
+				id: postId,
+				type: 'post',
+				title: 'bar',
+				content: localPostContent,
+				status: 'draft',
+			};
+			let serverStateRefetchCalls = 0;
+
+			apiFetch.setFetchHandler( async ( options ) => {
+				const { path, method, data } = options;
+
+				if (
+					method === 'GET' &&
+					path.startsWith( `/wp/v2/posts/${ postId }` ) &&
+					path.includes( 'context=edit' )
+				) {
+					serverStateRefetchCalls++;
+					return {
+						...post,
+						content: {
+							raw: `${ proposedPostContent }<script type="wp/post-sync-meta" data-sync-meta-format="diff-match-patch">{"version":"8"}</script>`,
+						},
+						distributed_editing: {
+							server_version: '8',
+						},
+					};
+				}
+
+				expect( method ).toBe( 'POST' );
+				expect( path ).toMatch(
+					new RegExp(
+						`^/wp/v2/posts/${ postId }/distributed-editing/retry-save`
+					)
+				);
+				expect( data.proposed_post_content ).toBe(
+					proposedPostContent
+				);
+
+				return {
+					result: 'retry_save_applied',
+					retry_save_accepted: true,
+					previous_server_version: '7',
+					server_version: '8',
+					pending_change_count: 1,
+					saves_post: true,
+					mutates_post_content: true,
+					creates_revision: true,
+					claims_saved: true,
+					revision_created: true,
+					created_revision_ids: [ 7002 ],
+				};
+			} );
+
+			const registry = createRegistryWithStores();
+
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', post );
+			registry.dispatch( editorStore ).setupEditor( post, {
+				content: post.content,
+			} );
+			registry
+				.dispatch( editorStore )
+				.setDistributedEditingSessionState( {
+					clientBaseVersion: '4',
+					serverVersion: '7',
+					pendingChangeCount: 1,
+					localRebaseResultStatus:
+						DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.REBASED,
+					refetchedServerContent:
+						'<!-- wp:paragraph --><p>Base alpha.</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Remote beta.</p><!-- /wp:paragraph -->',
+					retrySubmitProofStatus:
+						DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.ACCEPTED_FOR_FUTURE_SAVE,
+					retrySubmitAccepted: true,
+					retrySubmitSavePathRequired: true,
+					retrySubmitSaveStatus:
+						DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.READY,
+					retrySubmitSaveReady: true,
+					canExportLocalUpdates: true,
+				} );
+
+			await expect(
+				registry
+					.dispatch( editorStore )
+					.__experimentalSaveDistributedEditingRetryAfterProof( {
+						proposedPostContent,
+						proposedPostContentHash,
+					} )
+			).resolves.toMatchObject( {
+				result: 'retry_save_applied',
+				retry_save_accepted: true,
+			} );
+
+			expect( serverStateRefetchCalls ).toBe( 1 );
+			expect(
+				registry.select( editorStore ).getEditedPostContent()
+			).toBe( proposedPostContent );
+			expect(
+				registry
+					.select( editorStore )
+					.getDistributedEditingSessionState()
+			).toMatchObject( {
+				retrySaveStatus: DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVED,
+				retrySaveAccepted: true,
+				canExportLocalUpdates: false,
+			} );
+		} );
+
 		it( 'aligns confirmed server-merged retry-save writes to refetched post content', async () => {
 			const proposedPostContent =
 				'<!-- wp:paragraph --><p>Local paragraph.</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Base paragraph.</p><!-- /wp:paragraph -->';

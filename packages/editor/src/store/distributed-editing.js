@@ -16510,6 +16510,11 @@ function getSerializedBlockLocalRebaseCandidate( {
 	}
 
 	const mergedBlocks = [];
+	const mergedBlockSeparator = getSerializedBlockMergeSeparator(
+		baseBlocks,
+		serverBlocks,
+		localBlocks
+	);
 
 	for ( let index = 0; index < baseBlocks.blocks.length; index++ ) {
 		const baseBlock = baseBlocks.blocks[ index ];
@@ -16534,9 +16539,22 @@ function getSerializedBlockLocalRebaseCandidate( {
 
 	return {
 		status: 'rebased',
-		candidatePostContent: mergedBlocks.join( '' ),
+		candidatePostContent: mergedBlocks.join( mergedBlockSeparator ),
 		mergedBlockCount: mergedBlocks.length,
 	};
+}
+
+function getSerializedBlockMergeSeparator(
+	baseBlocks,
+	serverBlocks,
+	localBlocks
+) {
+	return (
+		localBlocks.interBlockSeparator ||
+		serverBlocks.interBlockSeparator ||
+		baseBlocks.interBlockSeparator ||
+		''
+	);
 }
 
 function getSerializedBlockStructureConflictReason(
@@ -16630,12 +16648,17 @@ function getSerializedBlockTokens( content ) {
 	}
 
 	const blocks = [];
+	const interBlockSeparators = [];
 	let offset = 0;
 
 	while ( offset < content.length ) {
 		const openingCommentStart = content.indexOf( '<!-- wp:', offset );
 
 		if ( openingCommentStart === -1 ) {
+			if ( content.slice( offset ).trim() === '' ) {
+				break;
+			}
+
 			return {
 				status: 'unsafe',
 				reason: 'freeform_html',
@@ -16643,10 +16666,20 @@ function getSerializedBlockTokens( content ) {
 		}
 
 		if ( openingCommentStart !== offset ) {
-			return {
-				status: 'unsafe',
-				reason: 'content_outside_serialized_blocks',
-			};
+			const leadingContent = content.slice( offset, openingCommentStart );
+
+			if ( leadingContent.trim() === '' ) {
+				if ( blocks.length > 0 ) {
+					interBlockSeparators.push( leadingContent );
+				}
+
+				offset = openingCommentStart;
+			} else {
+				return {
+					status: 'unsafe',
+					reason: 'content_outside_serialized_blocks',
+				};
+			}
 		}
 
 		const openingCommentEnd = content.indexOf( '-->', openingCommentStart );
@@ -16707,6 +16740,12 @@ function getSerializedBlockTokens( content ) {
 		status: 'safe',
 		content,
 		blocks,
+		interBlockSeparator:
+			interBlockSeparators.find( ( separator ) =>
+				separator.includes( '\n\n' )
+			) ??
+			interBlockSeparators[ 0 ] ??
+			'',
 	};
 }
 
