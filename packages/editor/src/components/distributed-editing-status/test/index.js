@@ -1022,8 +1022,16 @@ describe( 'DistributedEditingStatus', () => {
 			'true'
 		);
 		expect( comparison ).toHaveAttribute(
+			'data-distributed-editing-conflict-comparison-choice-control-mode',
+			'choose_between_versions'
+		);
+		expect( comparison ).toHaveAttribute(
 			'data-distributed-editing-conflict-comparison-prepared-compact',
 			'false'
+		);
+		expect( comparison ).toHaveAttribute(
+			'data-distributed-editing-conflict-comparison-visible-choice-count',
+			'2'
 		);
 		expect( comparison ).toHaveAttribute(
 			'data-distributed-editing-conflict-comparison-visible-row-count',
@@ -1571,8 +1579,16 @@ describe( 'DistributedEditingStatus', () => {
 			'true'
 		);
 		expect( comparison ).toHaveAttribute(
+			'data-distributed-editing-conflict-comparison-choice-control-mode',
+			'change_only'
+		);
+		expect( comparison ).toHaveAttribute(
 			'data-distributed-editing-conflict-comparison-selected-row',
 			'local'
+		);
+		expect( comparison ).toHaveAttribute(
+			'data-distributed-editing-conflict-comparison-visible-choice-count',
+			'1'
 		);
 		expect( comparison ).toHaveAttribute(
 			'data-distributed-editing-conflict-comparison-visible-row-count',
@@ -1599,6 +1615,24 @@ describe( 'DistributedEditingStatus', () => {
 				name: 'Prepare Save',
 			} )
 		).not.toBeInTheDocument();
+		expect(
+			within( comparison ).queryByRole( 'button', {
+				name: 'Keep your local version',
+			} )
+		).not.toBeInTheDocument();
+		expect(
+			within( comparison ).queryByRole( 'button', {
+				name: 'Use latest from WordPress',
+			} )
+		).not.toBeInTheDocument();
+		expect(
+			within( comparison ).getByRole( 'button', {
+				name: 'Change to latest from WordPress',
+			} )
+		).toHaveAttribute(
+			'data-distributed-editing-conflict-choice-compact-change',
+			'true'
+		);
 		expect(
 			within( comparison ).getByLabelText( 'Your local version' )
 		).toHaveValue( 'Local prepared conflict choice.' );

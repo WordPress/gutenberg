@@ -1991,6 +1991,46 @@ function DistributedEditingSameBlockConflictComparison( {
 	const visibleRows = isPreparedComparisonCompact
 		? comparison.rows.filter( ( row ) => row.id === selectedRowId )
 		: comparison.rows;
+	const conflictChoiceActions = isPreparedComparisonCompact
+		? [
+				isLocalChoiceSelected
+					? {
+							id: 'latest-wordpress',
+							isSelected: false,
+							label: __( 'Change to latest from WordPress' ),
+							onClick: onSelectLatestWordPressVersion,
+							targetRow: 'server',
+							variant: 'tertiary',
+					  }
+					: {
+							id: 'local',
+							isSelected: false,
+							label: __( 'Change to local version' ),
+							onClick: onSelectLocalVersion,
+							targetRow: 'local',
+							variant: 'tertiary',
+					  },
+		  ]
+		: [
+				{
+					id: 'local',
+					isSelected: isLocalChoiceSelected,
+					label: __( 'Keep your local version' ),
+					onClick: onSelectLocalVersion,
+					targetRow: 'local',
+					variant: isLocalChoiceSelected ? 'primary' : 'secondary',
+				},
+				{
+					id: 'latest-wordpress',
+					isSelected: isLatestWordPressChoiceSelected,
+					label: __( 'Use latest from WordPress' ),
+					onClick: onSelectLatestWordPressVersion,
+					targetRow: 'server',
+					variant: isLatestWordPressChoiceSelected
+						? 'primary'
+						: 'secondary',
+				},
+		  ];
 
 	return (
 		<div
@@ -2011,6 +2051,11 @@ function DistributedEditingSameBlockConflictComparison( {
 			data-distributed-editing-conflict-comparison-has-server={ formatDataBoolean(
 				comparison.hasServerContent
 			) }
+			data-distributed-editing-conflict-comparison-choice-control-mode={
+				isPreparedComparisonCompact
+					? 'change_only'
+					: 'choose_between_versions'
+			}
 			data-distributed-editing-conflict-comparison-prepared-compact={ formatDataBoolean(
 				isPreparedComparisonCompact
 			) }
@@ -2024,6 +2069,9 @@ function DistributedEditingSameBlockConflictComparison( {
 			}
 			data-distributed-editing-conflict-comparison-visible-row-count={
 				visibleRows.length
+			}
+			data-distributed-editing-conflict-comparison-visible-choice-count={
+				conflictChoiceActions.length
 			}
 			data-distributed-editing-conflict-resolution-choice={
 				comparison.resolutionChoice || undefined
@@ -2154,35 +2202,33 @@ function DistributedEditingSameBlockConflictComparison( {
 				} ) }
 			</div>
 			<div className="editor-distributed-editing-status__conflict-comparison-actions">
-				<div className="editor-distributed-editing-status__conflict-comparison-action-group editor-distributed-editing-status__conflict-comparison-action-group--choices">
-					<Button
-						__next40pxDefaultSize
-						aria-pressed={ isLocalChoiceSelected }
-						data-distributed-editing-conflict-choice-selected={ formatDataBoolean(
-							isLocalChoiceSelected
-						) }
-						variant={
-							isLocalChoiceSelected ? 'primary' : 'secondary'
-						}
-						onClick={ onSelectLocalVersion }
-					>
-						{ __( 'Keep your local version' ) }
-					</Button>
-					<Button
-						__next40pxDefaultSize
-						aria-pressed={ isLatestWordPressChoiceSelected }
-						data-distributed-editing-conflict-choice-selected={ formatDataBoolean(
-							isLatestWordPressChoiceSelected
-						) }
-						variant={
-							isLatestWordPressChoiceSelected
-								? 'primary'
-								: 'secondary'
-						}
-						onClick={ onSelectLatestWordPressVersion }
-					>
-						{ __( 'Use latest from WordPress' ) }
-					</Button>
+				<div
+					className={
+						isPreparedComparisonCompact
+							? 'editor-distributed-editing-status__conflict-comparison-action-group editor-distributed-editing-status__conflict-comparison-action-group--choices editor-distributed-editing-status__conflict-comparison-action-group--choices-prepared'
+							: 'editor-distributed-editing-status__conflict-comparison-action-group editor-distributed-editing-status__conflict-comparison-action-group--choices'
+					}
+				>
+					{ conflictChoiceActions.map( ( choiceAction ) => (
+						<Button
+							__next40pxDefaultSize
+							aria-pressed={ choiceAction.isSelected }
+							data-distributed-editing-conflict-choice-compact-change={ formatDataBoolean(
+								isPreparedComparisonCompact
+							) }
+							data-distributed-editing-conflict-choice-selected={ formatDataBoolean(
+								choiceAction.isSelected
+							) }
+							data-distributed-editing-conflict-choice-target={
+								choiceAction.targetRow
+							}
+							key={ choiceAction.id }
+							variant={ choiceAction.variant }
+							onClick={ choiceAction.onClick }
+						>
+							{ choiceAction.label }
+						</Button>
+					) ) }
 				</div>
 				<div className="editor-distributed-editing-status__conflict-comparison-action-group editor-distributed-editing-status__conflict-comparison-action-group--supporting">
 					{ comparison.canRequestFreshProof && (
