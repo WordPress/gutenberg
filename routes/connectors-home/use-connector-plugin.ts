@@ -61,9 +61,9 @@ interface WpUpdatesGlobal {
  * filesystem credentials modal), not an error. Genuine install
  * failures reject the promise instead.
  */
-type WpUpdatesInstallOutcome = 'installed' | 'canceled';
+export type WpUpdatesInstallOutcome = 'installed' | 'canceled';
 
-function installPluginViaWpUpdates(
+export function installPluginViaWpUpdates(
 	slug: string
 ): Promise< WpUpdatesInstallOutcome > {
 	return new Promise( ( resolve, reject ) => {
