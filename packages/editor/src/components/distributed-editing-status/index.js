@@ -1609,6 +1609,12 @@ function getDistributedEditingSameBlockConflictComparison(
 		resolutionRequiresFreshProof:
 			normalized.staleBaseConflictResolutionRequiresFreshProof,
 		resolutionStatus: normalized.staleBaseConflictResolutionStatus,
+		canRequestFreshProof:
+			Boolean( normalized.staleBaseConflictResolutionChoice ) &&
+			normalized.staleBaseConflictResolutionRequiresFreshProof &&
+			normalized.retrySubmitProofStatus !==
+				DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.ACCEPTED_FOR_FUTURE_SAVE,
+		retrySubmitProofStatus: normalized.retrySubmitProofStatus,
 		rows,
 	};
 }
@@ -1703,6 +1709,7 @@ function DistributedEditingSameBlockConflictComparison( {
 	onAction,
 	onSelectLocalVersion,
 	onSelectLatestWordPressVersion,
+	onRequestFreshProof,
 } ) {
 	if ( ! comparison ) {
 		return null;
@@ -1710,6 +1717,7 @@ function DistributedEditingSameBlockConflictComparison( {
 
 	const actionItem = {
 		id: 'same-block-conflict-comparison',
+		conflictResolutionChoice: comparison.resolutionChoice,
 		localRebaseResultReason: comparison.reason,
 		nextStepAction: 'export_for_manual_conflict_review',
 	};
@@ -1746,6 +1754,17 @@ function DistributedEditingSameBlockConflictComparison( {
 			) }
 			data-distributed-editing-conflict-resolution-status={
 				comparison.resolutionStatus
+			}
+			data-distributed-editing-conflict-resolution-proof-action={
+				comparison.canRequestFreshProof
+					? DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFRESH_RETRY_SUBMIT_PROOF
+					: undefined
+			}
+			data-distributed-editing-conflict-resolution-proof-ready={ formatDataBoolean(
+				comparison.canRequestFreshProof
+			) }
+			data-distributed-editing-conflict-resolution-proof-status={
+				comparison.retrySubmitProofStatus
 			}
 			role="region"
 		>
@@ -1791,6 +1810,15 @@ function DistributedEditingSameBlockConflictComparison( {
 				>
 					{ __( 'Use latest from WordPress' ) }
 				</Button>
+				{ comparison.canRequestFreshProof && (
+					<Button
+						__next40pxDefaultSize
+						variant="secondary"
+						onClick={ () => onRequestFreshProof?.( actionItem ) }
+					>
+						{ __( 'Check this choice' ) }
+					</Button>
+				) }
 				<Button
 					__next40pxDefaultSize
 					variant="secondary"
@@ -1927,9 +1955,14 @@ export default function DistributedEditingStatus( {
 							await __experimentalRefreshDistributedEditingRetrySubmitProof?.();
 						setActionStatus( {
 							status: 'info',
-							message: __(
-								'Save safety checked. Use Save to continue.'
-							),
+							message:
+								item?.id === 'same-block-conflict-comparison'
+									? __(
+											'WordPress checked this choice. Prepare Save before updating the post.'
+									  )
+									: __(
+											'Save safety checked. Use Save to continue.'
+									  ),
 						} );
 						return proofResult;
 					}
@@ -2138,6 +2171,12 @@ export default function DistributedEditingStatus( {
 			<DistributedEditingSameBlockConflictComparison
 				comparison={ conflictComparison }
 				onAction={ handleAction }
+				onRequestFreshProof={ ( item ) =>
+					handleAction(
+						DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFRESH_RETRY_SUBMIT_PROOF,
+						item
+					)
+				}
 				onSelectLatestWordPressVersion={
 					handleSelectLatestWordPressVersion
 				}

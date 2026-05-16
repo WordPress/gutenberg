@@ -1174,6 +1174,88 @@ describe( 'DistributedEditingStatus', () => {
 		).toBeVisible();
 	} );
 
+	it( 'requests fresh proof for a selected same-block conflict choice without saving', async () => {
+		const user = userEvent.setup();
+		const actions = setupDistributedEditingStatusDispatch();
+
+		setupDistributedEditingStatusSelect( {
+			currentPost: { id: 42, type: 'post' },
+			editedPostContent:
+				'<!-- wp:paragraph --><p>Local same block proof choice.</p><!-- /wp:paragraph -->',
+			sessionState: {
+				disposition:
+					DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+				reasonCode:
+					DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+				pendingChangeCount: 1,
+				remoteChangeCount: 1,
+				requiresServerStateRefetch: false,
+				refetchedServerState: true,
+				canExportLocalUpdates: true,
+				localRebasePlanStatus:
+					DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES.READY,
+				localRebaseResultStatus:
+					DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.MANUAL_CONFLICT_REQUIRED,
+				localRebaseResultReason: 'same_block_changed',
+				requiresManualConflictResolution: true,
+				staleBaseConflictResolutionStatus:
+					DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_STATUSES.LOCAL_VERSION_SELECTED,
+				staleBaseConflictResolutionChoice:
+					DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_CHOICES.LOCAL,
+				staleBaseConflictResolutionRequiresFreshProof: true,
+				clientBaseContent:
+					'<!-- wp:paragraph --><p>Base same block proof choice.</p><!-- /wp:paragraph -->',
+				refetchedServerContent:
+					'<!-- wp:paragraph --><p>Server same block proof choice.</p><!-- /wp:paragraph -->',
+			},
+		} );
+
+		render( <DistributedEditingStatus /> );
+
+		const comparison = screen.getByRole( 'region', {
+			name: 'Distributed editing conflict comparison',
+		} );
+
+		expect( comparison ).toHaveAttribute(
+			'data-distributed-editing-conflict-resolution-proof-action',
+			DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFRESH_RETRY_SUBMIT_PROOF
+		);
+		expect( comparison ).toHaveAttribute(
+			'data-distributed-editing-conflict-resolution-proof-ready',
+			'true'
+		);
+		expect(
+			within( comparison ).getByRole( 'button', {
+				name: 'Check this choice',
+			} )
+		).toBeVisible();
+
+		await user.click(
+			within( comparison ).getByRole( 'button', {
+				name: 'Check this choice',
+			} )
+		);
+
+		expect(
+			actions.__experimentalRefreshDistributedEditingRetrySubmitProof
+		).toHaveBeenCalledTimes( 1 );
+		expect( actions.editPost ).not.toHaveBeenCalled();
+		expect(
+			actions.__experimentalPrepareDistributedEditingRetrySubmitSaveAfterProof
+		).not.toHaveBeenCalled();
+		expect(
+			actions.__experimentalSaveDistributedEditingRetryAfterProof
+		).not.toHaveBeenCalled();
+		expect(
+			actions.__experimentalRefreshDistributedEditingServerStateAfterStaleBase
+		).not.toHaveBeenCalled();
+		expect(
+			await screen.findByText(
+				'WordPress checked this choice. Prepare Save before updating the post.'
+			)
+		).toBeVisible();
+	} );
+
 	it( 'mounts a content-free action transcript status entry', () => {
 		setupDistributedEditingStatusSelect( {
 			sessionState: {

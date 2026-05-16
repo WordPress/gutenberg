@@ -10018,6 +10018,95 @@ describe( 'distributed editing session state', () => {
 		} );
 	} );
 
+	it( 'accepts fresh proof for a chosen same-block conflict without preparing retry-save', () => {
+		const sessionState =
+			getDistributedEditingSessionStateForRetrySubmitProofResult(
+				{
+					result: 'retry_submit_accepted_for_future_save',
+					retry_submit_accepted: true,
+					pending_change_count: 1,
+					saves_post: false,
+					mutates_post_content: false,
+					creates_revision: false,
+					claims_saved: false,
+				},
+				{
+					disposition:
+						DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+					reasonCode:
+						DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+					clientBaseVersion: '7',
+					serverVersion: '8',
+					pendingChangeCount: 1,
+					hasPendingChanges: true,
+					requiresManualConflictResolution: true,
+					canExportLocalUpdates: true,
+					localRebaseResultStatus:
+						DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.MANUAL_CONFLICT_REQUIRED,
+					localRebaseResultReason: 'same_block_changed',
+					staleBaseConflictResolutionStatus:
+						DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_STATUSES.LOCAL_VERSION_SELECTED,
+					staleBaseConflictResolutionChoice:
+						DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_CHOICES.LOCAL,
+					staleBaseConflictResolutionRequiresFreshProof: true,
+				}
+			);
+		const savePolicy = getDistributedEditingRetrySavePolicyForSessionState(
+			sessionState,
+			{
+				postId: 44,
+				restBase: 'posts',
+				proposedPostContent:
+					'<!-- wp:paragraph --><p>Chosen local version.</p><!-- /wp:paragraph -->',
+			}
+		);
+		const editorSavePolicy =
+			getDistributedEditingSavePolicyStateForSessionState( sessionState );
+
+		expect( sessionState ).toMatchObject( {
+			disposition: DISTRIBUTED_EDITING_DISPOSITIONS.IDLE,
+			reasonCode: null,
+			requiresManualConflictResolution: false,
+			staleBaseConflictResolutionStatus:
+				DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_STATUSES.LOCAL_VERSION_SELECTED,
+			staleBaseConflictResolutionChoice:
+				DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_CHOICES.LOCAL,
+			staleBaseConflictResolutionRequiresFreshProof: false,
+			retrySubmitProofStatus:
+				DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.ACCEPTED_FOR_FUTURE_SAVE,
+			retrySubmitAccepted: true,
+			retrySubmitSavePathRequired: true,
+			retrySubmitSavesPost: false,
+			retrySubmitMutatesPostContent: false,
+			retrySubmitCreatesRevision: false,
+			retrySubmitClaimsSaved: false,
+			retrySubmitSaveStatus:
+				DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.NONE,
+			retrySubmitSaveReady: false,
+			canExportLocalUpdates: true,
+		} );
+		expect( savePolicy ).toMatchObject( {
+			status: DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_STATUSES.BLOCKED,
+			reason: DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.RETRY_SUBMIT_SAVE_NOT_READY,
+			hasAcceptedProof: true,
+			hasPreparedSavePath: false,
+			shouldCallRetrySaveEndpoint: false,
+			shouldCallNormalSavePost: false,
+			protectsLocalChanges: true,
+			canExportLocalUpdates: true,
+			claimsSaved: false,
+		} );
+		expect( editorSavePolicy ).toMatchObject( {
+			status: DISTRIBUTED_EDITING_SAVE_POLICY_STATUSES.READY_FOR_REVIEWED_RETRY_SAVE,
+			reason: 'accepted_retry_submit_proof_needs_save_preparation',
+			saveButtonLabel: 'Prepare Save',
+			blocksNormalSavePost: true,
+			shouldCallNormalSavePost: false,
+			shouldCallRetrySaveEndpoint: false,
+			claimsSaved: false,
+		} );
+	} );
+
 	it( 'rejects non-canonical serialized block content as unsafe', () => {
 		const baseContent =
 			'<!-- wp:paragraph --><p>Alpha</p><!-- /wp:paragraph -->';

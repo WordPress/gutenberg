@@ -10398,6 +10398,8 @@ export function getDistributedEditingSaveButtonStateForSessionState(
 		normalized.retrySubmitSaveStatus ===
 			DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.READY &&
 		normalized.retrySubmitSaveReady;
+	const hasAcceptedRetrySubmitProofAwaitingSavePreparation =
+		hasAcceptedRetrySubmitProof && ! hasRetrySavePreparation;
 	const hasRiskyReviewReadyForProof =
 		reviewState.status ===
 			DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_STATUSES.REVIEW_RESOLVED ||
@@ -10409,7 +10411,7 @@ export function getDistributedEditingSaveButtonStateForSessionState(
 				DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_STATUSES.READY_FOR_GUARDED_RETRY_SAVE ||
 			hasAcceptedReviewApprovalProof ||
 			hasRiskyReviewReadyForProof ||
-			( hasAcceptedRetrySubmitProof && hasRetrySavePreparation ) );
+			hasAcceptedRetrySubmitProof );
 	let status = DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES.UPDATE_READY;
 	let reason = null;
 	let source = 'default';
@@ -10540,13 +10542,19 @@ export function getDistributedEditingSaveButtonStateForSessionState(
 		} else if ( hasRiskyReviewReadyForProof ) {
 			reason = 'risky_block_review_ready_for_review_approval';
 			source = 'risky_block_review';
+		} else if ( hasAcceptedRetrySubmitProofAwaitingSavePreparation ) {
+			reason = 'accepted_retry_submit_proof_needs_save_preparation';
+			source = 'retry_submit';
 		} else {
 			reason = 'accepted_retry_submit_proof_unconsumed';
 			source = 'retry_submit';
 		}
-		label = 'Submit reviewed changes';
-		statusText =
-			'Accepted Distributed Editing proof is ready for WordPress Save.';
+		label = hasAcceptedRetrySubmitProofAwaitingSavePreparation
+			? 'Prepare Save'
+			: 'Submit reviewed changes';
+		statusText = hasAcceptedRetrySubmitProofAwaitingSavePreparation
+			? 'Accepted Distributed Editing proof needs Save preparation before WordPress can update the post.'
+			: 'Accepted Distributed Editing proof is ready for WordPress Save.';
 		clickAction =
 			DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.CONTINUE_GUARDED_RETRY_SAVE;
 		authorityState =
@@ -11404,6 +11412,16 @@ export function getDistributedEditingSessionStateForRetrySubmitProofResult(
 				responseData.claims_saved
 		),
 	};
+	const hasAcceptedConflictResolutionChoice =
+		normalizedCurrent.staleBaseConflictResolutionRequiresFreshProof &&
+		[
+			DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_CHOICES.LOCAL,
+			DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_CHOICES.LATEST_WORDPRESS,
+		].includes( normalizedCurrent.staleBaseConflictResolutionChoice ) &&
+		[
+			DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_STATUSES.LOCAL_VERSION_SELECTED,
+			DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_STATUSES.LATEST_WORDPRESS_SELECTED,
+		].includes( normalizedCurrent.staleBaseConflictResolutionStatus );
 
 	if (
 		result === 'retry_submit_accepted_for_future_save' ||
@@ -11422,6 +11440,14 @@ export function getDistributedEditingSessionStateForRetrySubmitProofResult(
 			requiresServerStateAcceptance: false,
 			requiresServerStateRefetch: false,
 			canAttemptLocalRebase: false,
+			requiresManualConflictResolution:
+				hasAcceptedConflictResolutionChoice
+					? false
+					: normalizedCurrent.requiresManualConflictResolution,
+			staleBaseConflictResolutionRequiresFreshProof:
+				hasAcceptedConflictResolutionChoice
+					? false
+					: normalizedCurrent.staleBaseConflictResolutionRequiresFreshProof,
 			readyToRetrySubmit: false,
 			retrySubmitProofStatus:
 				DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.ACCEPTED_FOR_FUTURE_SAVE,
