@@ -20,6 +20,9 @@ export function getDistributedEditingSaveJourneyDataAttributes(
 		'data-distributed-editing-save-control-journey-action-required': String(
 			Boolean( saveJourneyState.requiresActionBeforeSave )
 		),
+		'data-distributed-editing-save-control-journey-dirty-preflight': String(
+			Boolean( saveJourneyState.dirtyEditorPreflight )
+		),
 		'data-distributed-editing-save-control-journey-authority-state':
 			saveJourneyState.statusChromeAuthorityState,
 		'data-distributed-editing-save-control-journey-authority-summary':
@@ -74,6 +77,36 @@ export function getDistributedEditingSaveJourneyTitle( saveJourneyState ) {
 	}
 
 	return titleParts.join( ' ' ) || undefined;
+}
+
+export function getDistributedEditingSaveJourneyStateForDirtyEditor(
+	saveJourneyState,
+	isDirty
+) {
+	if (
+		! isDirty ||
+		! saveJourneyState?.shouldExposeInSaveControls ||
+		saveJourneyState.step !== 'ready_to_edit' ||
+		saveJourneyState.action !== 'edit'
+	) {
+		return saveJourneyState;
+	}
+
+	return {
+		...saveJourneyState,
+		step: 'local_changes_protected',
+		action: 'dirty_save_preflight',
+		title: 'Save checks with WordPress',
+		summary:
+			'Save will check the latest post before WordPress updates it. Keep this tab open until WordPress confirms.',
+		actionHint: null,
+		requiresActionBeforeSave: false,
+		dirtyEditorPreflight: true,
+		statusChromeSummary:
+			'Local edits will be checked with WordPress before the post updates.',
+		statusChromeAuthorityText:
+			'WordPress remains authoritative; Save checks for a newer version before updating the post.',
+	};
 }
 
 export default function DistributedEditingSaveJourneyCue( {

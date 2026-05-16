@@ -238,23 +238,27 @@ describe( 'PostSavedState', () => {
 		const button = screen.getByRole( 'button', { name: 'Save draft' } );
 		expect( button ).toHaveAttribute(
 			'title',
-			'Use Save when you are ready for WordPress to update this post. Save can update the authoritative WordPress post.'
+			'Save will check the latest post before WordPress updates it. Keep this tab open until WordPress confirms. Local edits will be checked with WordPress before the post updates.'
 		);
 		expect( button ).toHaveAttribute(
 			'data-distributed-editing-save-control-journey-step',
-			'ready_to_edit'
+			'local_changes_protected'
 		);
 		expect( button ).toHaveAttribute(
 			'data-distributed-editing-save-control-journey-action',
-			'edit'
+			'dirty_save_preflight'
 		);
 		expect( button ).toHaveAttribute(
 			'data-distributed-editing-save-control-journey-action-required',
 			'false'
 		);
 		expect( button ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-dirty-preflight',
+			'true'
+		);
+		expect( button ).toHaveAttribute(
 			'data-distributed-editing-save-control-journey-status-summary',
-			'Save can update the authoritative WordPress post.'
+			'Local edits will be checked with WordPress before the post updates.'
 		);
 		expect( button ).toHaveAttribute(
 			'data-distributed-editing-save-control-journey-authority-state',
@@ -262,7 +266,7 @@ describe( 'PostSavedState', () => {
 		);
 		expect( button ).toHaveAttribute(
 			'data-distributed-editing-save-control-journey-authority-summary',
-			'Save can update the authoritative WordPress post.'
+			'WordPress remains authoritative; Save checks for a newer version before updating the post.'
 		);
 		expect( button ).toHaveAttribute(
 			'data-distributed-editing-save-control-journey-descriptor-only',

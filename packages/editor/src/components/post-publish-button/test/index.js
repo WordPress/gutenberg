@@ -510,6 +510,73 @@ describe( 'PostPublishButton', () => {
 		expect( savePostStatus ).toHaveBeenCalledWith( 'pending' );
 	} );
 
+	it( 'should explain dirty Distributed Editing edits before visible Save checks with WordPress', async () => {
+		const user = userEvent.setup();
+		const savePostStatus = jest.fn();
+		render(
+			<PostPublishButton
+				isDirty
+				isSaveable
+				isPublishable
+				savePostStatus={ savePostStatus }
+				distributedEditingSaveJourneyState={ {
+					shouldExposeInSaveControls: true,
+					step: 'ready_to_edit',
+					action: 'edit',
+					title: 'Save is available',
+					summary:
+						'Use Save when you are ready for WordPress to update this post.',
+					statusChromeSummary:
+						'Save can update the authoritative WordPress post.',
+					statusChromeAuthorityState:
+						'ready_to_update_authoritative_post',
+					statusChromeAuthorityText:
+						'Save can update the authoritative WordPress post.',
+					claimsSavedWithoutEvidence: false,
+				} }
+			/>
+		);
+
+		const button = screen.getByRole( 'button', {
+			name: 'Submit for Review',
+		} );
+		expect( button ).toHaveAttribute(
+			'title',
+			'Save will check the latest post before WordPress updates it. Keep this tab open until WordPress confirms. Local edits will be checked with WordPress before the post updates.'
+		);
+		expect( button ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-step',
+			'local_changes_protected'
+		);
+		expect( button ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-action',
+			'dirty_save_preflight'
+		);
+		expect( button ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-action-required',
+			'false'
+		);
+		expect( button ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-dirty-preflight',
+			'true'
+		);
+		expect( button ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-status-summary',
+			'Local edits will be checked with WordPress before the post updates.'
+		);
+		expect( button ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-authority-summary',
+			'WordPress remains authoritative; Save checks for a newer version before updating the post.'
+		);
+		expect(
+			screen.getByText( 'Save checks with WordPress' )
+		).toBeVisible();
+
+		await user.click( button );
+
+		expect( savePostStatus ).toHaveBeenCalledWith( 'pending' );
+	} );
+
 	it( 'should show the refetch action hint on the Save journey cue without changing the click path', async () => {
 		const user = userEvent.setup();
 		const savePostStatus = jest.fn();

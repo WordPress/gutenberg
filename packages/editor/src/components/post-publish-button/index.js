@@ -13,6 +13,7 @@ import PublishButtonLabel from './label';
 import { store as editorStore } from '../../store';
 import DistributedEditingSaveJourneyCue, {
 	getDistributedEditingSaveJourneyDataAttributes,
+	getDistributedEditingSaveJourneyStateForDirtyEditor,
 	getDistributedEditingSaveJourneyTitle,
 } from '../distributed-editing-save-journey-cue';
 
@@ -118,6 +119,7 @@ export class PostPublishButton extends Component {
 			isPublished,
 			isSaveable,
 			isSaving,
+			isDirty,
 			isAutoSaving,
 			isToggle,
 			savePostStatus,
@@ -132,6 +134,11 @@ export class PostPublishButton extends Component {
 			distributedEditingSaveButtonState?.status &&
 				distributedEditingSaveButtonState.status !== 'update_ready'
 		);
+		const distributedEditingSaveJourneyStateForEditor =
+			getDistributedEditingSaveJourneyStateForDirtyEditor(
+				distributedEditingSaveJourneyState,
+				isDirty
+			);
 		const distributedEditingSaveButtonDisabled = Boolean(
 			hasDistributedEditingSaveButtonState &&
 				distributedEditingSaveButtonState.disabled
@@ -145,7 +152,7 @@ export class PostPublishButton extends Component {
 				? distributedEditingSaveButtonState.statusText
 				: undefined;
 		const hasDistributedEditingSaveJourneyState = Boolean(
-			distributedEditingSaveJourneyState?.shouldExposeInSaveControls
+			distributedEditingSaveJourneyStateForEditor?.shouldExposeInSaveControls
 		);
 		const distributedEditingSaveButtonDataAttributes =
 			hasDistributedEditingSaveButtonState
@@ -186,12 +193,12 @@ export class PostPublishButton extends Component {
 				: {};
 		const distributedEditingSaveJourneyDataAttributes =
 			getDistributedEditingSaveJourneyDataAttributes(
-				distributedEditingSaveJourneyState
+				distributedEditingSaveJourneyStateForEditor
 			);
 		const distributedEditingSaveControlTitle =
 			hasDistributedEditingSaveJourneyState
 				? getDistributedEditingSaveJourneyTitle(
-						distributedEditingSaveJourneyState
+						distributedEditingSaveJourneyStateForEditor
 				  )
 				: distributedEditingSaveButtonStatusText;
 
@@ -280,7 +287,9 @@ export class PostPublishButton extends Component {
 				</Button>
 				<DistributedEditingSaveJourneyCue
 					className="editor-post-publish-button__distributed-editing-save-journey-cue"
-					saveJourneyState={ distributedEditingSaveJourneyState }
+					saveJourneyState={
+						distributedEditingSaveJourneyStateForEditor
+					}
 				/>
 			</>
 		);
@@ -296,6 +305,7 @@ export default compose( [
 			isSavingPost,
 			isAutosavingPost,
 			isEditedPostBeingScheduled,
+			isEditedPostDirty,
 			getEditedPostVisibility,
 			isCurrentPostPublished,
 			isEditedPostSaveable,
@@ -315,6 +325,7 @@ export default compose( [
 			isSaving: isSavingPost(),
 			isAutoSaving: isAutosavingPost(),
 			isBeingScheduled: isEditedPostBeingScheduled(),
+			isDirty: isEditedPostDirty(),
 			visibility: getEditedPostVisibility(),
 			isSaveable: isEditedPostSaveable(),
 			isPostSavingLocked: isPostSavingLocked(),
