@@ -2165,6 +2165,85 @@ describe( 'Post actions', () => {
 			);
 		} );
 
+		it( 'prepares accepted retry-submit proof from a Save button click without saving', async () => {
+			const registry = createRegistryWithStores();
+			let apiCalls = 0;
+
+			apiFetch.setFetchHandler( async () => {
+				apiCalls++;
+				throw new Error(
+					'Prepare Save from the Save button should not call REST.'
+				);
+			} );
+			registry.dispatch( editorStore ).updateEditorSettings( {
+				distributedEditing: {
+					enabled: true,
+					retrySaveHandoff: true,
+					riskyBlockReview: true,
+				},
+			} );
+			registry
+				.dispatch( editorStore )
+				.setDistributedEditingSessionState( {
+					pendingChangeCount: 1,
+					hasPendingChanges: true,
+					isAwaitingServerConfirmation: true,
+					canExportLocalUpdates: true,
+					retrySubmitProofStatus:
+						DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.ACCEPTED_FOR_FUTURE_SAVE,
+					retrySubmitAccepted: true,
+					retrySubmitSavePathRequired: true,
+					retrySubmitSaveStatus:
+						DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.NONE,
+					retrySubmitSavesPost: false,
+					retrySubmitMutatesPostContent: false,
+					retrySubmitCreatesRevision: false,
+					retrySubmitClaimsSaved: false,
+				} );
+
+			await expect(
+				registry
+					.dispatch( editorStore )
+					.__experimentalMaybeHandleDistributedEditingSaveButtonClick()
+			).resolves.toMatchObject( {
+				status: 'retry_submit_save_prepared_before_save',
+				reason: 'accepted_retry_submit_proof_needs_save_preparation',
+				allowsNormalSaveFallback: false,
+				blocksNormalSavePost: true,
+				callsServerStateRefetchEndpoint: false,
+				callsRetrySubmitEndpoint: false,
+				callsNormalSavePost: false,
+				callsRetrySaveEndpoint: false,
+				mutatesEditorContent: false,
+				mutatesPersistedPostContent: false,
+				changesPostLock: false,
+				claimsSaved: false,
+				retrySubmitSaveStatus:
+					DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.READY,
+				retrySubmitSaveReady: true,
+			} );
+
+			expect( apiCalls ).toBe( 0 );
+			expect(
+				registry
+					.select( editorStore )
+					.getDistributedEditingSessionState()
+			).toMatchObject( {
+				retrySubmitSaveStatus:
+					DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.READY,
+				retrySubmitSavePrepared: true,
+				retrySubmitSaveReady: true,
+				actionTranscriptLatestEventType:
+					DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.SAVE_PREPARED,
+				actionTranscriptCallsSave: false,
+				actionTranscriptClaimsSaved: false,
+				canExportLocalUpdates: true,
+			} );
+			expect( registry.select( noticesStore ).getNotices() ).toEqual(
+				[]
+			);
+		} );
+
 		it( 'falls back to the ordinary Save click when Distributed Editing settings are disabled', async () => {
 			const registry = createRegistryWithStores();
 			let apiCalls = 0;

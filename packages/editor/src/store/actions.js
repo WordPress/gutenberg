@@ -1113,6 +1113,42 @@ export const __experimentalMaybeHandleDistributedEditingSaveButtonClick =
 			};
 		}
 
+		if (
+			savePolicy.clickAction ===
+				DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.CONTINUE_GUARDED_RETRY_SAVE &&
+			savePolicy.saveButtonReason ===
+				'accepted_retry_submit_proof_needs_save_preparation'
+		) {
+			const result =
+				await dispatch.__experimentalPrepareDistributedEditingRetrySubmitSaveAfterProof();
+			const sessionState =
+				select.getDistributedEditingSessionState?.() || {};
+
+			return {
+				status: 'retry_submit_save_prepared_before_save',
+				reason: savePolicy.saveButtonReason,
+				policy: savePolicy,
+				result,
+				allowsNormalSaveFallback: false,
+				blocksNormalSavePost: true,
+				opensPrePublishReview: false,
+				requiresServerStateRefetch: false,
+				callsServerStateRefetchEndpoint: false,
+				callsRetrySubmitEndpoint: false,
+				callsNormalSavePost: false,
+				callsRetrySaveEndpoint: false,
+				dispatchesNotice: false,
+				mutatesEditorContent: false,
+				mutatesPersistedPostContent: false,
+				changesPostLock: false,
+				claimsSaved: false,
+				retrySubmitSaveStatus: sessionState.retrySubmitSaveStatus,
+				retrySubmitSaveReady: Boolean(
+					sessionState.retrySubmitSaveReady
+				),
+			};
+		}
+
 		return dispatch.__experimentalMaybeRouteSavePostToDistributedEditingRiskyBlockReview(
 			options
 		);
