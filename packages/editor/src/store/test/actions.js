@@ -7978,11 +7978,9 @@ describe( 'Post actions', () => {
 			);
 		} );
 
-		it( 'checks server freshness before setting-enabled normal save fallback and allows unchanged content', async () => {
+		it( 'checks server freshness before setting-enabled normal save fallback and allows content-unchanged edits', async () => {
 			const originalPostContent =
 				'<!-- wp:paragraph --><p>Original freshness.</p><!-- /wp:paragraph -->';
-			const editedPostContent =
-				'<!-- wp:paragraph --><p>Local freshness.</p><!-- /wp:paragraph -->';
 			const post = {
 				id: postId,
 				type: 'post',
@@ -8041,7 +8039,8 @@ describe( 'Post actions', () => {
 				.dispatch( coreStore )
 				.receiveEntityRecords( 'postType', 'post', post );
 			registry.dispatch( editorStore ).setupEditor( post, {
-				content: editedPostContent,
+				content: originalPostContent,
+				title: 'bar changed',
 			} );
 			registry.dispatch( editorStore ).updateEditorSettings( {
 				distributedEditing: {
@@ -8179,6 +8178,172 @@ describe( 'Post actions', () => {
 				canExportLocalUpdates: true,
 				actionTranscriptLatestEventType:
 					DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.REMOTE_CHANGE_RECEIVED,
+				actionTranscriptCallsSave: false,
+				actionTranscriptClaimsSaved: false,
+			} );
+		} );
+
+		it( 'routes clean-base content edits through guarded retry-save instead of ordinary save', async () => {
+			const originalPostContent =
+				'<!-- wp:paragraph --><p>Clean base original.</p><!-- /wp:paragraph -->';
+			const originalPostContentWithSyncMeta = `${ originalPostContent }<script type="wp/post-sync-meta" data-sync-meta-format="diff-match-patch">{"version":"4"}</script>`;
+			const editedPostContent =
+				'<!-- wp:paragraph --><p>Clean base edited.</p><!-- /wp:paragraph -->';
+			const post = {
+				id: postId,
+				type: 'post',
+				title: 'bar',
+				content: originalPostContentWithSyncMeta,
+				status: 'draft',
+			};
+			let serverStateRefetchCalls = 0;
+			let retrySubmitCalls = 0;
+			let retrySaveCalls = 0;
+			let normalSaveCalls = 0;
+			let retrySubmitRequestData = null;
+			let retrySaveRequestData = null;
+
+			apiFetch.setFetchHandler( async ( options ) => {
+				const method = getMethod( options );
+				const { path, data } = options;
+
+				if (
+					method === 'GET' &&
+					path.startsWith( `/wp/v2/posts/${ postId }` ) &&
+					path.includes( 'context=edit' )
+				) {
+					serverStateRefetchCalls++;
+					return {
+						...post,
+						content: {
+							raw: originalPostContent,
+						},
+						distributed_editing: {
+							server_version: '4',
+						},
+					};
+				}
+
+				if (
+					method === 'POST' &&
+					path.startsWith(
+						`/wp/v2/posts/${ postId }/distributed-editing/retry-submit`
+					)
+				) {
+					retrySubmitCalls++;
+					retrySubmitRequestData = data;
+
+					return {
+						result: 'retry_submit_accepted_for_future_save',
+						retry_submit_accepted: true,
+						client_base_version: '4',
+						server_version: '4',
+						rebased_from_version: '4',
+						save_path_required: true,
+						saves_post: false,
+						mutates_post_content: false,
+						creates_revision: false,
+						claims_saved: false,
+					};
+				}
+
+				if (
+					method === 'POST' &&
+					path.startsWith(
+						`/wp/v2/posts/${ postId }/distributed-editing/retry-save`
+					)
+				) {
+					retrySaveCalls++;
+					retrySaveRequestData = data;
+
+					return {
+						result: 'retry_save_applied',
+						retry_save_accepted: true,
+						previous_server_version: '4',
+						server_version: '5',
+						pending_change_count: 1,
+						saves_post: true,
+						mutates_post_content: true,
+						creates_revision: true,
+						claims_saved: true,
+					};
+				}
+
+				if (
+					method === 'PUT' &&
+					path.startsWith( `/wp/v2/posts/${ postId }` )
+				) {
+					normalSaveCalls++;
+				}
+
+				throw {
+					code: 'unexpected_path',
+					message: `Unexpected path: ${ method } ${ path }`,
+				};
+			} );
+
+			const registry = createRegistryWithStores();
+
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', post );
+			registry.dispatch( editorStore ).setupEditor( post, {
+				content: editedPostContent,
+			} );
+			registry.dispatch( editorStore ).updateEditorSettings( {
+				distributedEditing: {
+					enabled: true,
+					retrySaveHandoff: true,
+				},
+			} );
+
+			await expect(
+				registry.dispatch( editorStore ).savePost()
+			).resolves.toMatchObject( {
+				status: 'distributed_editing_normal_save_guarded_retry_save_submitted',
+				allowsNormalSaveFallback: false,
+				callsServerStateRefetchEndpoint: true,
+				callsRetrySubmitEndpoint: true,
+				callsRetrySaveEndpoint: true,
+				callsNormalSavePost: false,
+				mutatesEditorContent: false,
+				changesPostLock: false,
+				claimsSaved: true,
+			} );
+
+			expect( serverStateRefetchCalls ).toBe( 1 );
+			expect( retrySubmitCalls ).toBe( 1 );
+			expect( retrySaveCalls ).toBe( 1 );
+			expect( normalSaveCalls ).toBe( 0 );
+			expect( retrySubmitRequestData ).toMatchObject( {
+				client_base_version: '4',
+				rebased_from_version: '4',
+				pending_change_count: 1,
+			} );
+			expect( retrySubmitRequestData.content ).toBeUndefined();
+			expect( retrySaveRequestData ).toMatchObject( {
+				client_base_version: '4',
+				accepted_proof_server_version: '4',
+				rebased_from_version: '4',
+				pending_change_count: 1,
+				proposed_post_content: editedPostContent,
+				accepted_proof_saves_post: false,
+				accepted_proof_mutates_post_content: false,
+				accepted_proof_creates_revision: false,
+				accepted_proof_claims_saved: false,
+			} );
+			expect(
+				registry
+					.select( editorStore )
+					.getDistributedEditingSessionState()
+			).toMatchObject( {
+				retrySaveStatus: DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVED,
+				retrySaveAccepted: true,
+				retrySaveServerVersion: '5',
+				retrySavePreviousServerVersion: '4',
+				canExportLocalUpdates: false,
+				actionTranscriptLatestEventType:
+					DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.SAVE_CONFIRMED,
 				actionTranscriptCallsSave: false,
 				actionTranscriptClaimsSaved: false,
 			} );

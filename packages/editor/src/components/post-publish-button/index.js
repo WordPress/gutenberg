@@ -81,11 +81,37 @@ export class PostPublishButton extends Component {
 		} );
 	}
 
+	getPublishStatus() {
+		const {
+			hasPublishAction,
+			isBeingScheduled,
+			visibility,
+			postStatus,
+			postStatusHasChanged,
+		} = this.props;
+
+		if ( postStatusHasChanged ) {
+			return postStatus;
+		}
+
+		if ( ! hasPublishAction ) {
+			return 'pending';
+		}
+
+		if ( visibility === 'private' ) {
+			return 'private';
+		}
+
+		if ( isBeingScheduled ) {
+			return 'future';
+		}
+
+		return 'publish';
+	}
+
 	render() {
 		const {
 			forceIsDirty,
-			hasPublishAction,
-			isBeingScheduled,
 			isOpen,
 			isPostSavingLocked,
 			isPublishable,
@@ -97,11 +123,8 @@ export class PostPublishButton extends Component {
 			savePostStatus,
 			onSubmit = noop,
 			onToggle,
-			visibility,
 			hasNonPostEntityChanges,
 			isSavingNonPostEntityChanges,
-			postStatus,
-			postStatusHasChanged,
 			distributedEditingSaveButtonState,
 			distributedEditingSaveJourneyState,
 		} = this.props;
@@ -195,16 +218,7 @@ export class PostPublishButton extends Component {
 		// other factors, like having a publish action, etc.. We need to preserve
 		// this because it affects when to show the pre and post publish panels.
 		// If it has changed though explicitly, we need to respect that.
-		let publishStatus = 'publish';
-		if ( postStatusHasChanged ) {
-			publishStatus = postStatus;
-		} else if ( ! hasPublishAction ) {
-			publishStatus = 'pending';
-		} else if ( visibility === 'private' ) {
-			publishStatus = 'private';
-		} else if ( isBeingScheduled ) {
-			publishStatus = 'future';
-		}
+		const publishStatus = this.getPublishStatus();
 
 		const onClickButton = () => {
 			if ( isButtonDisabled ) {

@@ -811,6 +811,8 @@ export const __experimentalMaybeHandleDistributedEditingSaveButtonClick =
 	async ( { select, dispatch } ) => {
 		const savePolicy =
 			select.getDistributedEditingSavePolicyState?.() || {};
+		const initialSessionState =
+			select.getDistributedEditingSessionState?.() || {};
 		const shouldUseRiskyBlockReview =
 			select.shouldUseDistributedEditingRiskyBlockReviewForSavePost?.(
 				options
@@ -820,6 +822,31 @@ export const __experimentalMaybeHandleDistributedEditingSaveButtonClick =
 		const shouldHandleDistributedEditingClick =
 			( shouldUseRiskyBlockReview || shouldUseRetrySave ) &&
 			Boolean( savePolicy.blocksNormalSavePost );
+
+		if (
+			! shouldHandleDistributedEditingClick &&
+			shouldUseRetrySave &&
+			initialSessionState.hasPendingChanges &&
+			initialSessionState.canExportLocalUpdates
+		) {
+			const freshnessGuard =
+				await dispatch.__experimentalGuardDistributedEditingNormalSaveFreshness(
+					options
+				);
+
+			if ( ! freshnessGuard.allowsNormalSaveFallback ) {
+				return {
+					...freshnessGuard,
+					status:
+						freshnessGuard.status ===
+						'distributed_editing_normal_save_guarded_retry_save_submitted'
+							? 'guarded_retry_save_submitted_from_save_click'
+							: freshnessGuard.status,
+					handledFreshProtectedChangesBeforeStatusEdit: true,
+					callsNormalSavePost: false,
+				};
+			}
+		}
 
 		if ( ! shouldHandleDistributedEditingClick ) {
 			return {
@@ -3541,10 +3568,7 @@ export const __experimentalGuardDistributedEditingNormalSaveFreshness =
 			const serverContent =
 				getDistributedEditingPostContentFromResponse( response );
 
-			if (
-				typeof serverContent !== 'string' ||
-				serverContent === clientBaseContent
-			) {
+			if ( typeof serverContent !== 'string' ) {
 				return getDistributedEditingNormalSaveFreshnessGuardAllowedResult(
 					{
 						callsServerStateRefetchEndpoint: true,
@@ -3562,13 +3586,133 @@ export const __experimentalGuardDistributedEditingNormalSaveFreshness =
 				currentSessionState.clientBaseVersion ||
 				currentSessionState.serverVersion ||
 				serverVersion;
+			const pendingChangeCount =
+				currentSessionState.pendingChangeCount || 1;
+
+			if ( serverContent === clientBaseContent ) {
+				const proposedPostContent =
+					getDistributedEditingComparablePostContent( localContent );
+
+				if (
+					typeof proposedPostContent !== 'string' ||
+					proposedPostContent === clientBaseContent
+				) {
+					return getDistributedEditingNormalSaveFreshnessGuardAllowedResult(
+						{
+							callsServerStateRefetchEndpoint: true,
+							reason: null,
+						}
+					);
+				}
+
+				const proposedPostContentHash =
+					await getDistributedEditingPostContentSha256Hash(
+						proposedPostContent
+					);
+				const proofReadySessionState = {
+					...currentSessionState,
+					clientBaseVersion: rebasedFromVersion,
+					serverVersion,
+					clientBaseContent,
+					pendingChangeCount,
+					hasPendingChanges: true,
+					mustOfferLocalCopy: true,
+					canExportLocalUpdates: true,
+				};
+
+				dispatch.setDistributedEditingSessionState(
+					getDistributedEditingSessionStateWithActionTranscriptEvent(
+						proofReadySessionState,
+						{
+							eventType:
+								DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.LOCAL_CHANGES_STAGED,
+						}
+					)
+				);
+
+				let didCallRetrySubmit = false;
+				let didCallRetrySave = false;
+
+				try {
+					didCallRetrySubmit = true;
+					await dispatch.__experimentalRefreshDistributedEditingRetrySubmitProof(
+						{
+							...options,
+							clientBaseVersion: serverVersion,
+							rebasedFromVersion,
+							pendingChangeCount,
+							proposedPostContentHash,
+						}
+					);
+					await dispatch.__experimentalPrepareDistributedEditingRetrySubmitSaveAfterProof();
+
+					didCallRetrySave = true;
+					const retrySaveResult =
+						await dispatch.__experimentalMaybeSavePostWithDistributedEditingRetryPolicy(
+							{
+								...options,
+								proposedPostContent,
+								proposedPostContentHash,
+								clientBaseVersion: serverVersion,
+								acceptedProofServerVersion: serverVersion,
+								rebasedFromVersion,
+								pendingChangeCount,
+							}
+						);
+
+					return {
+						...retrySaveResult,
+						status:
+							retrySaveResult.status === 'retry_save_submitted'
+								? 'distributed_editing_normal_save_guarded_retry_save_submitted'
+								: retrySaveResult.status,
+						allowsNormalSaveFallback: false,
+						callsServerStateRefetchEndpoint: true,
+						callsRetrySubmitEndpoint: true,
+						callsNormalSavePost: false,
+						callsRetrySaveEndpoint: Boolean(
+							retrySaveResult.callsRetrySaveAction
+						),
+						mutatesEditorContent: false,
+						changesPostLock: false,
+					};
+				} catch ( error ) {
+					const sessionState =
+						select.getDistributedEditingSessionState?.() || {};
+
+					return {
+						status: 'distributed_editing_normal_save_guarded_retry_save_blocked',
+						reason:
+							error?.code ||
+							sessionState.reasonCode ||
+							sessionState.retrySaveReason ||
+							sessionState.retrySubmitProofReason ||
+							DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+						error,
+						allowsNormalSaveFallback: false,
+						blocksNormalSavePost: true,
+						callsServerStateRefetchEndpoint: true,
+						callsRetrySubmitEndpoint: didCallRetrySubmit,
+						callsNormalSavePost: false,
+						callsRetrySaveEndpoint: didCallRetrySave,
+						mutatesEditorContent: false,
+						mutatesPersistedPostContent: false,
+						changesPostLock: false,
+						claimsSaved: false,
+						canExportLocalUpdates: true,
+						requiresServerStateRefetch: Boolean(
+							sessionState.requiresServerStateRefetch
+						),
+					};
+				}
+			}
+
 			const staleSessionState =
 				getDistributedEditingSessionStateForStaleBaseRejectionResult( {
 					clientBaseVersion: rebasedFromVersion,
 					serverVersion,
 					clientBaseContent,
-					pendingChangeCount:
-						currentSessionState.pendingChangeCount || 1,
+					pendingChangeCount,
 					remoteChangeCount:
 						currentSessionState.remoteChangeCount || 1,
 					canAttemptLocalRebase: true,
@@ -3620,8 +3764,7 @@ export const __experimentalGuardDistributedEditingNormalSaveFreshness =
 							...options,
 							clientBaseVersion: serverVersion,
 							rebasedFromVersion,
-							pendingChangeCount:
-								currentSessionState.pendingChangeCount || 1,
+							pendingChangeCount,
 							proposedPostContentHash,
 						}
 					);
@@ -3637,8 +3780,7 @@ export const __experimentalGuardDistributedEditingNormalSaveFreshness =
 								clientBaseVersion: serverVersion,
 								acceptedProofServerVersion: serverVersion,
 								rebasedFromVersion,
-								pendingChangeCount:
-									currentSessionState.pendingChangeCount || 1,
+								pendingChangeCount,
 							}
 						);
 
