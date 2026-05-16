@@ -442,6 +442,10 @@ class URLInput extends Component {
 					this.setState( {
 						selectedTab: tabName,
 					} );
+
+					if ( this.props.onTabSelect ) {
+						this.props.onTabSelect( tabName );
+					}
 				} }
 			>
 				{ () => null }

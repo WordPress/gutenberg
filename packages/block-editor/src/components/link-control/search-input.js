@@ -52,10 +52,15 @@ const LinkControlSearchInput = forwardRef(
 		},
 		ref
 	) => {
+		const [ selectedTab, setSelectedTab ] = useState( null );
+
+		const isCreateAllowed =
+			withCreateSuggestion && selectedTab !== 'attachment';
+
 		const genericSearchHandler = useSearchHandler(
 			suggestionsQuery,
 			allowDirectEntry,
-			withCreateSuggestion,
+			isCreateAllowed,
 			withURLSuggestion
 		);
 
@@ -80,7 +85,7 @@ const LinkControlSearchInput = forwardRef(
 		const handleRenderSuggestions = ( props ) =>
 			renderSuggestions( {
 				...props,
-				withCreateSuggestion,
+				withCreateSuggestion: isCreateAllowed,
 				createSuggestionButtonText,
 				suggestionsQuery,
 				handleSuggestionClick: ( suggestion ) => {
@@ -173,6 +178,7 @@ const LinkControlSearchInput = forwardRef(
 					showTabs={ showTabs }
 					tabClassName={ tabClassName }
 					tabs={ tabs }
+					onTabSelect={ setSelectedTab }
 					disabled={ isEntity }
 				/>
 				{ children }
