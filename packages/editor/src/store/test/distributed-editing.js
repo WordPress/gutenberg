@@ -7515,6 +7515,60 @@ describe( 'distributed editing session state', () => {
 					pendingChangeCount: 1,
 					hasPendingChanges: true,
 					canExportLocalUpdates: true,
+					localRebasePlanStatus:
+						DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES.READY,
+					clientBaseContent:
+						'<!-- wp:paragraph --><p>Base</p><!-- /wp:paragraph -->',
+					refetchedServerContent:
+						'<!-- wp:paragraph --><p>Server</p><!-- /wp:paragraph -->',
+				},
+				step: DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.LOCAL_CHANGES_PROTECTED,
+				action: 'apply_local_changes',
+				title: 'Save needs local changes applied',
+				summary: 'Apply protected local changes',
+				actionHint: 'Apply local changes',
+				requiresActionBeforeSave: true,
+				saveButtonLabel: 'Update',
+			},
+			{
+				sessionState: {
+					pendingChangeCount: 1,
+					hasPendingChanges: true,
+					canExportLocalUpdates: true,
+					localRebaseResultStatus:
+						DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.REBASED,
+					readyToRetrySubmit: true,
+				},
+				step: DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.LOCAL_CHANGES_PROTECTED,
+				action: 'prepare_changes',
+				title: 'Save needs prepared changes',
+				summary: 'Prepare these protected changes',
+				actionHint: 'Prepare changes',
+				requiresActionBeforeSave: true,
+				saveButtonLabel: 'Update',
+			},
+			{
+				sessionState: {
+					pendingChangeCount: 1,
+					hasPendingChanges: true,
+					canExportLocalUpdates: true,
+					retrySubmitHandoffStatus:
+						DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_STATUSES.PREPARED,
+					retrySubmitPrepared: true,
+				},
+				step: DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.LOCAL_CHANGES_PROTECTED,
+				action: 'check_with_wordpress',
+				title: 'Save needs WordPress check',
+				summary: 'Check with WordPress',
+				actionHint: 'Check with WordPress',
+				requiresActionBeforeSave: true,
+				saveButtonLabel: 'Update',
+			},
+			{
+				sessionState: {
+					pendingChangeCount: 1,
+					hasPendingChanges: true,
+					canExportLocalUpdates: true,
 					requiresServerStateRefetch: true,
 				},
 				step: DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.GET_LATEST_POST,
@@ -7535,6 +7589,25 @@ describe( 'distributed editing session state', () => {
 				actionHint: 'Review before update',
 				requiresActionBeforeSave: true,
 				saveButtonLabel: 'Review changes',
+				saveButtonBlocksNormalSavePost: true,
+			},
+			{
+				sessionState: {
+					pendingChangeCount: 1,
+					hasPendingChanges: true,
+					canExportLocalUpdates: true,
+					retrySubmitProofStatus:
+						DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.ACCEPTED_FOR_FUTURE_SAVE,
+					retrySubmitAccepted: true,
+					retrySubmitSavePathRequired: true,
+				},
+				step: DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.READY_TO_SAVE,
+				action: 'prepare_save',
+				title: 'Save needs preparation',
+				summary: 'Prepare Save before updating',
+				actionHint: 'Prepare Save',
+				requiresActionBeforeSave: true,
+				saveButtonLabel: 'Prepare Save',
 				saveButtonBlocksNormalSavePost: true,
 			},
 			{
@@ -8273,13 +8346,9 @@ describe( 'distributed editing session state', () => {
 			);
 		const state = { distributedEditingSession: handoffState };
 		const saveButton =
-			getDistributedEditingSaveButtonStateForSessionState(
-				handoffState
-			);
+			getDistributedEditingSaveButtonStateForSessionState( handoffState );
 		const editorSavePolicy =
-			getDistributedEditingSavePolicyStateForSessionState(
-				handoffState
-			);
+			getDistributedEditingSavePolicyStateForSessionState( handoffState );
 
 		expect( staleAgainState ).toMatchObject( {
 			disposition:

@@ -10700,6 +10700,23 @@ export function getDistributedEditingHumanLoopStepStateForSessionState(
 			DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES.RETRY_SAVE_CONFIRMED &&
 		saveButton.hasRetrySaveSavedStateEvidence &&
 		saveButton.authoritativePostUpdated;
+	const hasLocalRebaseInputs =
+		normalized.clientBaseContent !== null &&
+		normalized.refetchedServerContent !== null;
+	const localRebaseCanApply =
+		( normalized.canAttemptLocalRebase ||
+			normalized.localRebasePlanStatus ===
+				DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES.READY ) &&
+		hasLocalRebaseInputs &&
+		normalized.localRebaseResultStatus !==
+			DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.REBASED;
+	const retrySubmitCanPrepare = Boolean( normalized.readyToRetrySubmit );
+	const retrySubmitCanCheck =
+		normalized.retrySubmitHandoffStatus ===
+			DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_STATUSES.PREPARED &&
+		normalized.retrySubmitPrepared &&
+		normalized.retrySubmitProofStatus !==
+			DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.ACCEPTED_FOR_FUTURE_SAVE;
 	let step = DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.READY_TO_EDIT;
 	let action = 'edit';
 
@@ -10731,7 +10748,20 @@ export function getDistributedEditingHumanLoopStepStateForSessionState(
 		DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES.ACCEPTED_BUT_UNCONSUMED
 	) {
 		step = DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.READY_TO_SAVE;
-		action = 'save';
+		action =
+			saveButton.reason ===
+			'accepted_retry_submit_proof_needs_save_preparation'
+				? 'prepare_save'
+				: 'save';
+	} else if ( localRebaseCanApply ) {
+		step = DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.LOCAL_CHANGES_PROTECTED;
+		action = 'apply_local_changes';
+	} else if ( retrySubmitCanPrepare ) {
+		step = DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.LOCAL_CHANGES_PROTECTED;
+		action = 'prepare_changes';
+	} else if ( retrySubmitCanCheck ) {
+		step = DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.LOCAL_CHANGES_PROTECTED;
+		action = 'check_with_wordpress';
 	} else if ( hasProtectedLocalChanges ) {
 		step = DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.LOCAL_CHANGES_PROTECTED;
 		action = 'wait_or_export';
@@ -10773,9 +10803,33 @@ export function getDistributedEditingHumanLoopStepStateForSessionState(
 	};
 }
 
-function getDistributedEditingSaveJourneyCopyForStep( step ) {
+function getDistributedEditingSaveJourneyCopyForStep( step, action ) {
 	switch ( step ) {
 		case DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.LOCAL_CHANGES_PROTECTED:
+			if ( action === 'apply_local_changes' ) {
+				return {
+					title: 'Save needs local changes applied',
+					summary:
+						'Apply protected local changes in this editor before WordPress can check Save.',
+				};
+			}
+
+			if ( action === 'prepare_changes' ) {
+				return {
+					title: 'Save needs prepared changes',
+					summary:
+						'Prepare these protected changes for WordPress to check before Save can update the post.',
+				};
+			}
+
+			if ( action === 'check_with_wordpress' ) {
+				return {
+					title: 'Save needs WordPress check',
+					summary:
+						'Check with WordPress before preparing Save; the post is not updated yet.',
+				};
+			}
+
 			return {
 				title: 'Save keeps changes protected',
 				summary:
@@ -10794,6 +10848,14 @@ function getDistributedEditingSaveJourneyCopyForStep( step ) {
 					'Review highlighted changes before WordPress updates the post.',
 			};
 		case DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.READY_TO_SAVE:
+			if ( action === 'prepare_save' ) {
+				return {
+					title: 'Save needs preparation',
+					summary:
+						'WordPress checked these changes. Prepare Save before updating the post.',
+				};
+			}
+
 			return {
 				title: 'Save is ready',
 				summary:
@@ -10819,13 +10881,31 @@ function getDistributedEditingSaveJourneyCopyForStep( step ) {
 	};
 }
 
-function getDistributedEditingSaveJourneyActionHintForStep( step ) {
+function getDistributedEditingSaveJourneyActionHintForStep( step, action ) {
 	switch ( step ) {
+		case DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.LOCAL_CHANGES_PROTECTED:
+			if ( action === 'apply_local_changes' ) {
+				return 'Apply local changes';
+			}
+
+			if ( action === 'prepare_changes' ) {
+				return 'Prepare changes';
+			}
+
+			if ( action === 'check_with_wordpress' ) {
+				return 'Check with WordPress';
+			}
+
+			return null;
 		case DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.GET_LATEST_POST:
 			return 'Get latest first';
 		case DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.REVIEW_CHANGES:
 			return 'Review before update';
 		case DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.READY_TO_SAVE:
+			if ( action === 'prepare_save' ) {
+				return 'Prepare Save';
+			}
+
 			return 'Send guarded update';
 		case DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.WAITING_FOR_WORDPRESS:
 			return 'Keep tab open';
@@ -10837,12 +10917,21 @@ function getDistributedEditingSaveJourneyActionHintForStep( step ) {
 }
 
 function getDistributedEditingSaveJourneyRequiresActionBeforeSaveForStep(
-	step
+	step,
+	action
 ) {
-	return [
-		DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.GET_LATEST_POST,
-		DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.REVIEW_CHANGES,
-	].includes( step );
+	return (
+		[
+			DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.GET_LATEST_POST,
+			DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.REVIEW_CHANGES,
+		].includes( step ) ||
+		[
+			'apply_local_changes',
+			'prepare_changes',
+			'check_with_wordpress',
+			'prepare_save',
+		].includes( action )
+	);
 }
 
 /**
@@ -10860,10 +10949,12 @@ export function getDistributedEditingSaveJourneyStateForSessionState(
 	const humanLoopStep =
 		getDistributedEditingHumanLoopStepStateForSessionState( sessionState );
 	const copy = getDistributedEditingSaveJourneyCopyForStep(
-		humanLoopStep.step
+		humanLoopStep.step,
+		humanLoopStep.action
 	);
 	const actionHint = getDistributedEditingSaveJourneyActionHintForStep(
-		humanLoopStep.step
+		humanLoopStep.step,
+		humanLoopStep.action
 	);
 
 	return {
@@ -10874,7 +10965,8 @@ export function getDistributedEditingSaveJourneyStateForSessionState(
 		actionHint,
 		requiresActionBeforeSave:
 			getDistributedEditingSaveJourneyRequiresActionBeforeSaveForStep(
-				humanLoopStep.step
+				humanLoopStep.step,
+				humanLoopStep.action
 			),
 		saveButtonStatus: humanLoopStep.saveButtonStatus,
 		saveButtonReason: humanLoopStep.saveButtonReason,

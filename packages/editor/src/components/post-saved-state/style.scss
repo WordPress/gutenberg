@@ -7,7 +7,7 @@
 	display: flex;
 	align-items: center;
 	width: $button-size - $grid-unit-10;
-	padding: #{ $grid-unit-05 * 3 } $grid-unit-05;
+	padding: #{$grid-unit-05 * 3} $grid-unit-05;
 	color: $gray-700;
 	overflow: hidden;
 	white-space: nowrap;
@@ -30,7 +30,7 @@
 
 	@include break-small() {
 		width: auto;
-		padding: $grid-unit-10 #{ $grid-unit-05 * 3 };
+		padding: $grid-unit-10 #{$grid-unit-05 * 3};
 		text-indent: inherit;
 
 		svg {
@@ -70,12 +70,6 @@
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
-
-	&::before {
-		color: $gray-400;
-		content: "\00b7";
-		margin-right: $grid-unit-05;
-	}
 }
 
 .editor-distributed-editing-save-journey-cue__label {
@@ -84,12 +78,18 @@
 	white-space: nowrap;
 }
 
+.editor-distributed-editing-save-journey-cue__action-hint + .editor-distributed-editing-save-journey-cue__label::before {
+	color: $gray-400;
+	content: "\00b7";
+	margin-right: $grid-unit-05;
+}
+
 .editor-distributed-editing-save-journey-cue[data-distributed-editing-save-control-journey-step="ready_to_edit"] {
 	border-left-color: $gray-300;
 	color: $gray-600;
 }
 
-@media screen and (max-width: #{ ($break-small) }) {
+@media screen and (max-width: #{($break-small)}) {
 	.editor-distributed-editing-save-journey-cue {
 		border: $border-width solid var(--wp-admin-theme-color);
 		border-radius: $radius-small;

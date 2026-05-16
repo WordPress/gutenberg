@@ -104,12 +104,6 @@ export default function DistributedEditingSaveJourneyCue( {
 			}
 			title={ saveJourneyTitle }
 		>
-			<span
-				aria-hidden="true"
-				className="editor-distributed-editing-save-journey-cue__label"
-			>
-				{ saveJourneyState.title }
-			</span>
 			{ saveJourneyState.actionHint && (
 				<span
 					aria-hidden="true"
@@ -118,6 +112,12 @@ export default function DistributedEditingSaveJourneyCue( {
 					{ saveJourneyState.actionHint }
 				</span>
 			) }
+			<span
+				aria-hidden="true"
+				className="editor-distributed-editing-save-journey-cue__label"
+			>
+				{ saveJourneyState.title }
+			</span>
 		</span>
 	);
 }

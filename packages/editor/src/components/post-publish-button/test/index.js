@@ -490,6 +490,9 @@ describe( 'PostPublishButton', () => {
 		);
 		expect( cueLabel ).toBeVisible();
 		expect( cueActionHint ).toBeVisible();
+		expect( cue ).toHaveTextContent(
+			/^Get latest first.*Save needs the latest post/
+		);
 		expect( cue ).toHaveAttribute(
 			'data-distributed-editing-save-control-journey-visual-cue',
 			'true'
@@ -606,6 +609,9 @@ describe( 'PostPublishButton', () => {
 		);
 		expect( cueLabel ).toBeVisible();
 		expect( cueActionHint ).toBeVisible();
+		expect( cue ).toHaveTextContent(
+			/^Review before update.*Save opens review/
+		);
 		expect( cue ).toHaveAttribute(
 			'data-distributed-editing-save-control-journey-visual-cue',
 			'true'
@@ -733,6 +739,9 @@ describe( 'PostPublishButton', () => {
 		);
 		expect( cueLabel ).toBeVisible();
 		expect( cueActionHint ).toBeVisible();
+		expect( cue ).toHaveTextContent(
+			/^Send guarded update.*Save is ready/
+		);
 		expect( cue ).toHaveAttribute(
 			'data-distributed-editing-save-control-journey-visual-cue',
 			'true'
