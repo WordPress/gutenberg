@@ -1957,10 +1957,11 @@ function getDistributedEditingStructuralConflictSummary(
 
 function getStructuralConflictSnapshot( { content, id, label } ) {
 	const blockChunks = getSerializedBlockChunksForStructuralSummary( content );
-	const sampleTexts = blockChunks
+	const visibleTexts = blockChunks
 		.map( getVisibleConflictText )
-		.filter( ( text ) => text !== DISTRIBUTED_EDITING_EMPTY_CONFLICT_TEXT )
-		.slice( 0, 3 );
+		.filter( ( text ) => text !== DISTRIBUTED_EDITING_EMPTY_CONFLICT_TEXT );
+	const sampleTexts = visibleTexts.slice( 0, 3 );
+	const previewTexts = visibleTexts.slice( 0, 8 );
 
 	return {
 		blockCount: blockChunks.length,
@@ -1970,6 +1971,14 @@ function getStructuralConflictSnapshot( { content, id, label } ) {
 		sampleTexts:
 			sampleTexts.length > 0
 				? sampleTexts
+				: [ DISTRIBUTED_EDITING_EMPTY_CONFLICT_TEXT ],
+		previewOverflowCount: Math.max(
+			0,
+			blockChunks.length - previewTexts.length
+		),
+		previewTexts:
+			previewTexts.length > 0
+				? previewTexts
 				: [ DISTRIBUTED_EDITING_EMPTY_CONFLICT_TEXT ],
 	};
 }
@@ -2579,6 +2588,8 @@ function DistributedEditingSameBlockConflictComparison( {
 }
 
 function DistributedEditingStructuralConflictSummary( { onAction, summary } ) {
+	const [ previewSnapshotId, setPreviewSnapshotId ] = useState( null );
+
 	if ( ! summary ) {
 		return null;
 	}
@@ -2588,6 +2599,13 @@ function DistributedEditingStructuralConflictSummary( { onAction, summary } ) {
 		localRebaseResultReason: summary.reason,
 		nextStepAction: 'manual_structural_review',
 	};
+	const previewSnapshot =
+		summary.snapshots.find(
+			( snapshot ) => snapshot.id === previewSnapshotId
+		) ?? null;
+	const previewStatus = previewSnapshot
+		? `previewing_${ previewSnapshot.id }`
+		: 'inactive';
 
 	return (
 		<div
@@ -2615,6 +2633,19 @@ function DistributedEditingStructuralConflictSummary( { onAction, summary } ) {
 			}
 			data-distributed-editing-structural-conflict-server-count-delta={
 				summary.serverCountDelta
+			}
+			data-distributed-editing-structural-preview-calls-rest="false"
+			data-distributed-editing-structural-preview-calls-save="false"
+			data-distributed-editing-structural-preview-changes-post-lock="false"
+			data-distributed-editing-structural-preview-content-safe="true"
+			data-distributed-editing-structural-preview-creates-revision="false"
+			data-distributed-editing-structural-preview-mutates-editor-content="false"
+			data-distributed-editing-structural-preview-mutates-persisted-content="false"
+			data-distributed-editing-structural-preview-selected={
+				previewSnapshot?.id ?? 'none'
+			}
+			data-distributed-editing-structural-preview-status={
+				previewStatus
 			}
 			role="region"
 		>
@@ -2692,6 +2723,97 @@ function DistributedEditingStructuralConflictSummary( { onAction, summary } ) {
 					<dd>{ summary.reasonLabel }</dd>
 				</div>
 			</dl>
+			<div className="editor-distributed-editing-status__structural-conflict-preview-actions">
+				<Button
+					__next40pxDefaultSize
+					data-distributed-editing-structural-preview-action="preview_latest_wordpress"
+					variant={
+						previewSnapshotId === 'server'
+							? 'primary'
+							: 'secondary'
+					}
+					onClick={ () => setPreviewSnapshotId( 'server' ) }
+				>
+					{ __( 'Preview latest structure' ) }
+				</Button>
+				<Button
+					__next40pxDefaultSize
+					data-distributed-editing-structural-preview-action="preview_local_editor"
+					variant={
+						previewSnapshotId === 'local'
+							? 'primary'
+							: 'secondary'
+					}
+					onClick={ () => setPreviewSnapshotId( 'local' ) }
+				>
+					{ __( 'Preview local structure' ) }
+				</Button>
+				{ previewSnapshot && (
+					<Button
+						__next40pxDefaultSize
+						data-distributed-editing-structural-preview-action="close_preview"
+						variant="tertiary"
+						onClick={ () => setPreviewSnapshotId( null ) }
+					>
+						{ __( 'Close preview' ) }
+					</Button>
+				) }
+			</div>
+			{ previewSnapshot && (
+				<div
+					aria-label={ __(
+						'Distributed editing structural preview'
+					) }
+					className="editor-distributed-editing-status__structural-conflict-preview"
+					data-distributed-editing-structural-preview-panel={
+						previewSnapshot.id
+					}
+					data-distributed-editing-structural-preview-panel-block-count={
+						previewSnapshot.blockCount
+					}
+					role="region"
+				>
+					<div className="editor-distributed-editing-status__structural-conflict-preview-header">
+						<strong>
+							{ sprintf(
+								/* translators: %s: structural version label, such as Latest from WordPress or Your local editor. */
+								__( 'Previewing %s' ),
+								previewSnapshot.label
+							) }
+						</strong>
+						<span>
+							{ __(
+								'Preview only: no editor content changes, no Save, no request.'
+							) }
+						</span>
+					</div>
+					<ol className="editor-distributed-editing-status__structural-conflict-preview-list">
+						{ previewSnapshot.previewTexts.map( ( text, index ) => (
+							<li
+								data-distributed-editing-structural-preview-row={
+									previewSnapshot.id
+								}
+								key={ `${ previewSnapshot.id }-preview-${ index }` }
+							>
+								{ text }
+							</li>
+						) ) }
+						{ previewSnapshot.previewOverflowCount > 0 && (
+							<li className="editor-distributed-editing-status__structural-conflict-overflow">
+								{ sprintf(
+									/* translators: %d: number of additional blocks not shown in the structural preview. */
+									_n(
+										'%d more block not shown',
+										'%d more blocks not shown',
+										previewSnapshot.previewOverflowCount
+									),
+									previewSnapshot.previewOverflowCount
+								) }
+							</li>
+						) }
+					</ol>
+				</div>
+			) }
 			<div className="editor-distributed-editing-status__conflict-comparison-actions editor-distributed-editing-status__conflict-comparison-actions--prepared">
 				<Button
 					__next40pxDefaultSize

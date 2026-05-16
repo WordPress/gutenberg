@@ -465,3 +465,39 @@
 	font-weight: 600;
 	margin: 0;
 }
+
+.editor-distributed-editing-status__structural-conflict-preview-actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: $grid-unit-05;
+}
+
+.editor-distributed-editing-status__structural-conflict-preview {
+	background: $white;
+	border: 1px solid $gray-400;
+	border-radius: $radius-small;
+	display: grid;
+	gap: $grid-unit-05;
+	padding: $grid-unit-10;
+}
+
+.editor-distributed-editing-status__structural-conflict-preview-header {
+	display: grid;
+	gap: 2px;
+}
+
+.editor-distributed-editing-status__structural-conflict-preview-header span {
+	color: $gray-700;
+	font-size: 12px;
+}
+
+.editor-distributed-editing-status__structural-conflict-preview-list {
+	display: grid;
+	gap: $grid-unit-05;
+	margin: 0;
+	padding-left: $grid-unit-20;
+}
+
+.editor-distributed-editing-status__structural-conflict-preview-list li {
+	overflow-wrap: anywhere;
+}

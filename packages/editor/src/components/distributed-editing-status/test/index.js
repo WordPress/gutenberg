@@ -1463,6 +1463,132 @@ describe( 'DistributedEditingStatus', () => {
 		expect( screen.queryByText( /wp:paragraph/ ) ).not.toBeInTheDocument();
 	} );
 
+	it( 'previews structural conflict snapshots without saving or changing editor content', async () => {
+		const user = userEvent.setup();
+		const actions = setupDistributedEditingStatusDispatch();
+
+		setupDistributedEditingStatusSelect( {
+			editedPostContent:
+				'<!-- wp:paragraph --><p>Local keeps beta.</p><!-- /wp:paragraph -->',
+			sessionState: {
+				disposition:
+					DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+				reasonCode:
+					DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+				pendingChangeCount: 1,
+				remoteChangeCount: 1,
+				requiresServerStateRefetch: false,
+				refetchedServerState: true,
+				canExportLocalUpdates: true,
+				localRebasePlanStatus:
+					DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES.READY,
+				localRebaseResultStatus:
+					DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.MANUAL_CONFLICT_REQUIRED,
+				localRebaseResultReason: 'block_deleted',
+				requiresManualConflictResolution: true,
+				clientBaseContent:
+					'<!-- wp:paragraph --><p>Base alpha.</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Base beta.</p><!-- /wp:paragraph -->',
+				refetchedServerContent:
+					'<!-- wp:paragraph --><p>Base alpha.</p><!-- /wp:paragraph -->',
+			},
+		} );
+
+		render( <DistributedEditingStatus /> );
+
+		const summary = screen.getByRole( 'region', {
+			name: 'Distributed editing structural conflict summary',
+		} );
+
+		expect( summary ).toHaveAttribute(
+			'data-distributed-editing-structural-preview-status',
+			'inactive'
+		);
+		expect( summary ).toHaveAttribute(
+			'data-distributed-editing-structural-preview-mutates-editor-content',
+			'false'
+		);
+		expect( summary ).toHaveAttribute(
+			'data-distributed-editing-structural-preview-calls-save',
+			'false'
+		);
+		expect( summary ).toHaveAttribute(
+			'data-distributed-editing-structural-preview-calls-rest',
+			'false'
+		);
+
+		await user.click(
+			within( summary ).getByRole( 'button', {
+				name: 'Preview latest structure',
+			} )
+		);
+
+		expect( summary ).toHaveAttribute(
+			'data-distributed-editing-structural-preview-status',
+			'previewing_server'
+		);
+		expect( summary ).toHaveAttribute(
+			'data-distributed-editing-structural-preview-selected',
+			'server'
+		);
+
+		const preview = within( summary ).getByRole( 'region', {
+			name: 'Distributed editing structural preview',
+		} );
+		expect(
+			within( preview ).getByText( 'Previewing Latest from WordPress' )
+		).toBeVisible();
+		expect(
+			within( preview ).getByText(
+				'Preview only: no editor content changes, no Save, no request.'
+			)
+		).toBeVisible();
+		expect( within( preview ).getByText( 'Base alpha.' ) ).toBeVisible();
+
+		await user.click(
+			within( summary ).getByRole( 'button', {
+				name: 'Preview local structure',
+			} )
+		);
+
+		expect( summary ).toHaveAttribute(
+			'data-distributed-editing-structural-preview-status',
+			'previewing_local'
+		);
+		expect( summary ).toHaveAttribute(
+			'data-distributed-editing-structural-preview-selected',
+			'local'
+		);
+		expect(
+			within( preview ).getByText( 'Previewing Your local editor' )
+		).toBeVisible();
+		expect(
+			within( preview ).getByText( 'Local keeps beta.' )
+		).toBeVisible();
+
+		await user.click(
+			within( summary ).getByRole( 'button', {
+				name: 'Close preview',
+			} )
+		);
+
+		expect( summary ).toHaveAttribute(
+			'data-distributed-editing-structural-preview-status',
+			'inactive'
+		);
+		expect(
+			screen.queryByRole( 'region', {
+				name: 'Distributed editing structural preview',
+			} )
+		).not.toBeInTheDocument();
+		expect( actions.editPost ).not.toHaveBeenCalled();
+		expect(
+			actions.__experimentalRefreshDistributedEditingServerStateAfterStaleBase
+		).not.toHaveBeenCalled();
+		expect(
+			actions.__experimentalSaveDistributedEditingRetryAfterProof
+		).not.toHaveBeenCalled();
+	} );
+
 	it( 'requests fresh proof for a selected same-block conflict choice without saving', async () => {
 		const user = userEvent.setup();
 		const actions = setupDistributedEditingStatusDispatch();
