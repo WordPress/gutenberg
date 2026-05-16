@@ -797,10 +797,10 @@ export const __experimentalMaybeRouteSavePostToDistributedEditingRiskyBlockRevie
  * Handles explicit Distributed Editing Save button actions before the button
  * mutates publish status or falls through to the normal save flow.
  *
- * Refetch and retry-submit proof checks are the only transport calls this
- * action owns. Review handoff and guarded retry-save readiness continue through
- * the existing Save policy actions, and protected states must still block
- * ordinary post save fallback.
+ * Refetch, retry-submit proof checks, and a ready guarded retry-save are the
+ * only transport calls this action owns. Review handoff continues through the
+ * existing Save policy actions, and protected states must still block ordinary
+ * post save fallback.
  *
  * @param {Object} [options] Save options.
  *
@@ -1182,6 +1182,47 @@ export const __experimentalMaybeHandleDistributedEditingSaveButtonClick =
 				retrySubmitSaveReady: Boolean(
 					sessionState.retrySubmitSaveReady
 				),
+			};
+		}
+
+		if (
+			savePolicy.status ===
+				DISTRIBUTED_EDITING_SAVE_POLICY_STATUSES.READY_FOR_REVIEWED_RETRY_SAVE ||
+			savePolicy.clickAction ===
+				DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.CONTINUE_GUARDED_RETRY_SAVE
+		) {
+			const retrySaveResult =
+				await dispatch.__experimentalMaybeSavePostWithDistributedEditingRetryPolicy(
+					options
+				);
+			const allowsNormalSaveFallback = Boolean(
+				retrySaveResult.allowsNormalSaveFallback &&
+					! savePolicy.blocksNormalSavePost
+			);
+
+			return {
+				...retrySaveResult,
+				status:
+					retrySaveResult.status === 'retry_save_submitted'
+						? 'guarded_retry_save_submitted_from_save_click'
+						: retrySaveResult.status,
+				reason:
+					retrySaveResult.reason ||
+					savePolicy.reason ||
+					savePolicy.saveButtonReason ||
+					null,
+				saveButtonPolicy: savePolicy,
+				allowsNormalSaveFallback,
+				blocksNormalSavePost: ! allowsNormalSaveFallback,
+				opensPrePublishReview: false,
+				callsServerStateRefetchEndpoint: false,
+				callsRetrySubmitEndpoint: false,
+				callsNormalSavePost: false,
+				callsRetrySaveEndpoint: Boolean(
+					retrySaveResult.callsRetrySaveAction
+				),
+				dispatchesNotice: false,
+				changesPostLock: false,
 			};
 		}
 

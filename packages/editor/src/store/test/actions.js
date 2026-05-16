@@ -2672,19 +2672,11 @@ describe( 'Post actions', () => {
 				.__experimentalMaybeHandleDistributedEditingSaveButtonClick();
 
 			expect( finalClickRouting ).toMatchObject( {
-				status: 'guarded_retry_save_policy_deferred',
-				allowsNormalSaveFallback: true,
-				continuesToRetrySavePolicy: true,
+				status: 'guarded_retry_save_submitted_from_save_click',
+				allowsNormalSaveFallback: false,
 				blocksNormalSavePost: true,
-				callsRetrySaveEndpoint: false,
-				claimsSaved: false,
-			} );
-
-			await expect(
-				registry.dispatch( editorStore ).savePost()
-			).resolves.toMatchObject( {
-				status: 'retry_save_submitted',
 				callsRetrySaveAction: true,
+				callsRetrySaveEndpoint: true,
 				callsNormalSavePost: false,
 				claimsSaved: true,
 			} );
