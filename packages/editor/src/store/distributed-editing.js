@@ -16538,6 +16538,16 @@ function getSerializedBlockLocalRebaseCandidate( {
 		return edgeInsertionCandidate;
 	}
 
+	const deletionCandidate = getSerializedBlockDeletionRebaseCandidate( {
+		baseBlocks,
+		serverBlocks,
+		localBlocks,
+	} );
+
+	if ( deletionCandidate ) {
+		return deletionCandidate;
+	}
+
 	if (
 		baseBlocks.blocks.length !== serverBlocks.blocks.length ||
 		baseBlocks.blocks.length !== localBlocks.blocks.length
@@ -16586,6 +16596,87 @@ function getSerializedBlockLocalRebaseCandidate( {
 		} else {
 			mergedBlocks.push( serverBlock );
 		}
+	}
+
+	const mergedBlockSeparator = getSerializedBlockMergeSeparator(
+		baseBlocks,
+		serverBlocks,
+		localBlocks
+	);
+
+	return {
+		status: 'rebased',
+		candidatePostContent: mergedBlocks.join( mergedBlockSeparator ),
+		mergedBlockCount: mergedBlocks.length,
+	};
+}
+
+function getSerializedBlockDeletionRebaseCandidate( {
+	baseBlocks,
+	serverBlocks,
+	localBlocks,
+} ) {
+	const serverDeleted =
+		serverBlocks.blocks.length < baseBlocks.blocks.length &&
+		localBlocks.blocks.length === baseBlocks.blocks.length;
+	const localDeleted =
+		localBlocks.blocks.length < baseBlocks.blocks.length &&
+		serverBlocks.blocks.length === baseBlocks.blocks.length;
+
+	if ( ! serverDeleted && ! localDeleted ) {
+		return null;
+	}
+
+	const deletingBlocks = serverDeleted ? serverBlocks : localBlocks;
+	const stableBlocks = serverDeleted ? localBlocks : serverBlocks;
+	const deletion = getSerializedBlockDeletion(
+		baseBlocks.blocks,
+		deletingBlocks.blocks
+	);
+
+	if ( ! deletion ) {
+		return null;
+	}
+
+	if ( deletion.status === 'ambiguous' ) {
+		return {
+			status: 'manual_conflict_required',
+			reason: 'block_deleted',
+		};
+	}
+
+	if (
+		isPureSerializedBlockReorder(
+			baseBlocks.blocks,
+			stableBlocks.blocks
+		)
+	) {
+		return {
+			status: 'manual_conflict_required',
+			reason: 'block_reordered',
+		};
+	}
+
+	const mergedBlocks = [];
+	const deletedIndexes = new Set( deletion.deletedIndexes );
+
+	for ( let index = 0; index < baseBlocks.blocks.length; index++ ) {
+		const baseBlock = baseBlocks.blocks[ index ];
+		const stableBlock = stableBlocks.blocks[ index ];
+		const stableChanged = stableBlock !== baseBlock;
+
+		if ( deletedIndexes.has( index ) ) {
+			if ( stableChanged ) {
+				return {
+					status: 'manual_conflict_required',
+					reason: 'block_deleted',
+				};
+			}
+
+			continue;
+		}
+
+		mergedBlocks.push( stableChanged ? stableBlock : baseBlock );
 	}
 
 	const mergedBlockSeparator = getSerializedBlockMergeSeparator(
@@ -16712,6 +16803,70 @@ function getSerializedBlockEdgeInsertion( baseBlocks, candidateBlocks ) {
 	}
 
 	return null;
+}
+
+function getSerializedBlockDeletion( baseBlocks, candidateBlocks ) {
+	if ( candidateBlocks.length >= baseBlocks.length ) {
+		return null;
+	}
+
+	const leftmostIndexes = [];
+	let candidateIndex = 0;
+
+	for (
+		let baseIndex = 0;
+		baseIndex < baseBlocks.length && candidateIndex < candidateBlocks.length;
+		baseIndex++
+	) {
+		if ( baseBlocks[ baseIndex ] === candidateBlocks[ candidateIndex ] ) {
+			leftmostIndexes.push( baseIndex );
+			candidateIndex++;
+		}
+	}
+
+	if ( candidateIndex !== candidateBlocks.length ) {
+		return null;
+	}
+
+	const rightmostIndexes = new Array( candidateBlocks.length );
+	candidateIndex = candidateBlocks.length - 1;
+
+	for (
+		let baseIndex = baseBlocks.length - 1;
+		baseIndex >= 0 && candidateIndex >= 0;
+		baseIndex--
+	) {
+		if ( baseBlocks[ baseIndex ] === candidateBlocks[ candidateIndex ] ) {
+			rightmostIndexes[ candidateIndex ] = baseIndex;
+			candidateIndex--;
+		}
+	}
+
+	if (
+		candidateIndex !== -1 ||
+		leftmostIndexes.some(
+			( baseIndex, index ) => baseIndex !== rightmostIndexes[ index ]
+		)
+	) {
+		return {
+			status: 'ambiguous',
+			deletedIndexes: [],
+		};
+	}
+
+	const matchedIndexes = new Set( leftmostIndexes );
+	const deletedIndexes = [];
+
+	for ( let baseIndex = 0; baseIndex < baseBlocks.length; baseIndex++ ) {
+		if ( ! matchedIndexes.has( baseIndex ) ) {
+			deletedIndexes.push( baseIndex );
+		}
+	}
+
+	return {
+		status: 'deleted',
+		deletedIndexes,
+	};
 }
 
 function getSerializedBlockMergeSeparator(

@@ -3010,6 +3010,110 @@ describe( 'distributed editing session state', () => {
 		expect( result.candidatePostContent ).toBe( localContent );
 	} );
 
+	it( 'rebases a local serialized block deletion over a remote retained-block edit', () => {
+		const baseContent =
+			'<!-- wp:paragraph --><p>Alpha</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Beta</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Gamma</p><!-- /wp:paragraph -->';
+		const serverContent =
+			'<!-- wp:paragraph --><p>Remote alpha</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Beta</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Gamma</p><!-- /wp:paragraph -->';
+		const localContent =
+			'<!-- wp:paragraph --><p>Alpha</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Beta</p><!-- /wp:paragraph -->';
+		const result = getDistributedEditingStaleBaseLocalRebaseResult( {
+			currentSessionState: getReadyStaleBaseLocalRebaseSessionState(),
+			clientBaseContent: baseContent,
+			serverContent,
+			localContent,
+		} );
+
+		expect( result ).toMatchObject( {
+			status: DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.REBASED,
+			reason: null,
+			hasCandidatePostContent: true,
+			mergedBlockCount: 2,
+			readyToRetrySubmit: true,
+			requiresManualConflictResolution: false,
+		} );
+		expect( result.candidatePostContent ).toBe(
+			'<!-- wp:paragraph --><p>Remote alpha</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Beta</p><!-- /wp:paragraph -->'
+		);
+	} );
+
+	it( 'rebases a remote serialized block deletion around a local retained-block edit', () => {
+		const baseContent =
+			'<!-- wp:paragraph --><p>Alpha</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Beta</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Gamma</p><!-- /wp:paragraph -->';
+		const serverContent =
+			'<!-- wp:paragraph --><p>Alpha</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Beta</p><!-- /wp:paragraph -->';
+		const localContent =
+			'<!-- wp:paragraph --><p>Alpha</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Local beta</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Gamma</p><!-- /wp:paragraph -->';
+		const result = getDistributedEditingStaleBaseLocalRebaseResult( {
+			currentSessionState: getReadyStaleBaseLocalRebaseSessionState(),
+			clientBaseContent: baseContent,
+			serverContent,
+			localContent,
+		} );
+
+		expect( result ).toMatchObject( {
+			status: DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.REBASED,
+			reason: null,
+			hasCandidatePostContent: true,
+			mergedBlockCount: 2,
+			readyToRetrySubmit: true,
+			requiresManualConflictResolution: false,
+		} );
+		expect( result.candidatePostContent ).toBe(
+			'<!-- wp:paragraph --><p>Alpha</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Local beta</p><!-- /wp:paragraph -->'
+		);
+	} );
+
+	it( 'keeps ambiguous repeated-block deletions as manual conflicts', () => {
+		const repeatedBlock =
+			'<!-- wp:paragraph --><p>Repeated</p><!-- /wp:paragraph -->';
+		const baseContent = repeatedBlock + repeatedBlock;
+		const serverContent =
+			repeatedBlock +
+			'<!-- wp:paragraph --><p>Remote repeated edit</p><!-- /wp:paragraph -->';
+		const localContent = repeatedBlock;
+		const result = getDistributedEditingStaleBaseLocalRebaseResult( {
+			currentSessionState: getReadyStaleBaseLocalRebaseSessionState(),
+			clientBaseContent: baseContent,
+			serverContent,
+			localContent,
+		} );
+
+		expect( result ).toMatchObject( {
+			status: DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.MANUAL_CONFLICT_REQUIRED,
+			reason: 'block_deleted',
+			hasCandidatePostContent: false,
+			readyToRetrySubmit: false,
+			requiresManualConflictResolution: true,
+			sessionState: {
+				localRebaseResultReason: 'block_deleted',
+			},
+		} );
+	} );
+
+	it( 'keeps delete-versus-edit of the same serialized block as a manual conflict', () => {
+		const baseContent =
+			'<!-- wp:paragraph --><p>Alpha</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Beta</p><!-- /wp:paragraph -->';
+		const serverContent =
+			'<!-- wp:paragraph --><p>Alpha</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Remote beta</p><!-- /wp:paragraph -->';
+		const localContent =
+			'<!-- wp:paragraph --><p>Alpha</p><!-- /wp:paragraph -->';
+		const result = getDistributedEditingStaleBaseLocalRebaseResult( {
+			currentSessionState: getReadyStaleBaseLocalRebaseSessionState(),
+			clientBaseContent: baseContent,
+			serverContent,
+			localContent,
+		} );
+
+		expect( result ).toMatchObject( {
+			status: DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.MANUAL_CONFLICT_REQUIRED,
+			reason: 'block_deleted',
+			hasCandidatePostContent: false,
+			readyToRetrySubmit: false,
+			requiresManualConflictResolution: true,
+		} );
+	} );
+
 	it( 'requires manual conflict for concurrent serialized block insertions', () => {
 		const baseContent =
 			'<!-- wp:paragraph --><p>Alpha</p><!-- /wp:paragraph -->';
