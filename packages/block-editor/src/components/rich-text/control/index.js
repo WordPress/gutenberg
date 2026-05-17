@@ -55,6 +55,7 @@ const { useRichText } = unlock( richTextPrivateApis );
  * @param {boolean}  [props.preserveWhiteSpace]           Whether to preserve whitespace in the content.
  * @param {boolean}  [props.disableLineBreaks]            Whether to disable line breaks in the content.
  * @param {Array}    [props.autocompleters]               Optional list of autocompleters (e.g. `@`-mention completers).
+ * @param {boolean}  [props.focusOnMount]                 Whether to move focus to the field when it mounts. Off by default; opt in for standalone forms (e.g. a note form) where the old in-canvas `RichText` would have received focus via block-editor selection.
  *
  * @return {Element} The rendered RichTextControl component.
  */
@@ -73,6 +74,7 @@ export default function RichTextControl( {
 	preserveWhiteSpace,
 	disableLineBreaks,
 	autocompleters,
+	focusOnMount,
 } ) {
 	const [ selection, setSelection ] = useState( {
 		start: undefined,
@@ -136,6 +138,19 @@ export default function RichTextControl( {
 	function onFocus() {
 		anchorRef.current?.focus();
 	}
+
+	// Optionally move focus to the field when it mounts. `RichTextControl`
+	// drops the block-editor selection coupling that focuses the in-canvas
+	// `RichText`, so standalone consumers (e.g. a note form) have no other
+	// way to land the caret in the field on open.
+	const focusOnMountRef = useRefEffect(
+		( element ) => {
+			if ( focusOnMount ) {
+				element.focus();
+			}
+		},
+		[ focusOnMount ]
+	);
 
 	// Wire registered format keyboard shortcuts (e.g. Cmd+B, Cmd+I, Cmd+K)
 	// and InputEvent handlers (e.g. native formatBold) to the contenteditable.
@@ -250,6 +265,7 @@ export default function RichTextControl( {
 						anchorRef,
 						autocompleteProps.ref,
 						eventListenersRef,
+						focusOnMountRef,
 					] ) }
 					onFocus={ () => {
 						clearTimeout( blurDeselectTimeoutRef.current );

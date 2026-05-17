@@ -115,6 +115,27 @@ describe( 'RichTextControl', () => {
 		expect( textbox ).toHaveClass( 'my-custom-class' );
 	} );
 
+	it( 'does not take focus on mount by default', () => {
+		const { container } = render(
+			<RichTextControl label="Note" value="" onChange={ () => {} } />
+		);
+
+		expect( getTextbox( container ) ).not.toHaveFocus();
+	} );
+
+	it( 'takes focus on mount when `focusOnMount` is set', () => {
+		const { container } = render(
+			<RichTextControl
+				label="Note"
+				value=""
+				onChange={ () => {} }
+				focusOnMount
+			/>
+		);
+
+		expect( getTextbox( container ) ).toHaveFocus();
+	} );
+
 	describe( 'keyboard shortcuts', () => {
 		// Hold the latest `onUse` mock in a closure-captured ref so the
 		// format type can be registered once in `beforeAll` (avoiding store
