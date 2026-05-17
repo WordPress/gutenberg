@@ -3216,10 +3216,9 @@ export const __experimentalSaveDistributedEditingRetryAfterProof =
 		if (
 			blockIdentityRequestProof === undefined &&
 			options.prepareBlockIdentityRequestProof !== false &&
-			isDistributedEditingCurrentBaseRetrySaveRequest( {
+			isDistributedEditingBlockIdentityRetrySaveRequestEligible( {
 				clientBaseVersion: requestClientBaseVersion,
-				acceptedProofServerVersion:
-					requestAcceptedProofServerVersion,
+				acceptedProofServerVersion: requestAcceptedProofServerVersion,
 				sessionState: currentSessionState,
 			} )
 		) {
@@ -3594,6 +3593,25 @@ function getDistributedEditingRetrySaveAppliedPostContent( {
 	return null;
 }
 
+function isDistributedEditingBlockIdentityRetrySaveRequestEligible( {
+	clientBaseVersion,
+	acceptedProofServerVersion,
+	sessionState = {},
+} = {} ) {
+	return (
+		isDistributedEditingCurrentBaseRetrySaveRequest( {
+			clientBaseVersion,
+			acceptedProofServerVersion,
+			sessionState,
+		} ) ||
+		isDistributedEditingStaleUntouchedServerRetrySaveRequest( {
+			clientBaseVersion,
+			acceptedProofServerVersion,
+			sessionState,
+		} )
+	);
+}
+
 function isDistributedEditingCurrentBaseRetrySaveRequest( {
 	clientBaseVersion,
 	acceptedProofServerVersion,
@@ -3608,9 +3626,37 @@ function isDistributedEditingCurrentBaseRetrySaveRequest( {
 		acceptedProofServerVersion !== null &&
 		serverVersion !== undefined &&
 		serverVersion !== null &&
-		String( clientBaseVersion ) ===
-			String( acceptedProofServerVersion ) &&
+		String( clientBaseVersion ) === String( acceptedProofServerVersion ) &&
 		String( acceptedProofServerVersion ) === String( serverVersion )
+	);
+}
+
+function isDistributedEditingStaleUntouchedServerRetrySaveRequest( {
+	clientBaseVersion,
+	acceptedProofServerVersion,
+	sessionState = {},
+} = {} ) {
+	const serverVersion = sessionState.serverVersion;
+	const clientBaseContent = getDistributedEditingComparablePostContent(
+		sessionState.clientBaseContent
+	);
+	const refetchedServerContent = getDistributedEditingComparablePostContent(
+		sessionState.refetchedServerContent
+	);
+
+	return (
+		clientBaseVersion !== undefined &&
+		clientBaseVersion !== null &&
+		acceptedProofServerVersion !== undefined &&
+		acceptedProofServerVersion !== null &&
+		serverVersion !== undefined &&
+		serverVersion !== null &&
+		String( clientBaseVersion ) === String( acceptedProofServerVersion ) &&
+		String( acceptedProofServerVersion ) !== String( serverVersion ) &&
+		sessionState.refetchedServerState === true &&
+		typeof clientBaseContent === 'string' &&
+		typeof refetchedServerContent === 'string' &&
+		clientBaseContent === refetchedServerContent
 	);
 }
 
@@ -3718,12 +3764,9 @@ function updateDistributedEditingFreshReviewImportContentVault( {
 	postContentHash,
 } = {} ) {
 	const key = getDistributedEditingFreshReviewImportContentVaultKey( {
-		postId:
-			currentPost.id ??
-			result.sessionState?.localUpdatesImportPostId,
+		postId: currentPost.id ?? result.sessionState?.localUpdatesImportPostId,
 		postType:
-			currentPost.type ??
-			result.sessionState?.localUpdatesImportPostType,
+			currentPost.type ?? result.sessionState?.localUpdatesImportPostType,
 	} );
 
 	if ( ! key ) {

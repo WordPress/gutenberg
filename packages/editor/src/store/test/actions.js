@@ -5954,9 +5954,7 @@ describe( 'Post actions', () => {
 				insertedBlock,
 				baseBlocks[ 1 ],
 			].join( '\n\n' );
-			const proposedPostContentHash = hashContent(
-				proposedPostContent
-			);
+			const proposedPostContentHash = hashContent( proposedPostContent );
 			const insertedBlockHash = hashContent( insertedBlock );
 			const acceptedSyncMeta = {
 				schema: 'de-rtc-block-identity-v1',
@@ -6009,8 +6007,7 @@ describe( 'Post actions', () => {
 						proposed_post_content_hash: proposedPostContentHash,
 						block_identity_request_proof: {
 							client_base_version: '41',
-							proposed_post_content_hash:
-								proposedPostContentHash,
+							proposed_post_content_hash: proposedPostContentHash,
 							retained_block_uids: [ 'block-a', 'block-b' ],
 							inserted_block_nonces: [
 								`inserted-1-${ insertedBlockHash.slice(
@@ -6045,8 +6042,7 @@ describe( 'Post actions', () => {
 						} ),
 					] );
 					expect(
-						data.block_identity_request_proof
-							.proposed_post_content
+						data.block_identity_request_proof.proposed_post_content
 					).toBeUndefined();
 					expect(
 						data.block_identity_request_proof.raw_content
@@ -6055,9 +6051,7 @@ describe( 'Post actions', () => {
 						data.block_identity_request_proof.client_id
 					).toBeUndefined();
 					expect(
-						JSON.stringify(
-							data.block_identity_request_proof
-						)
+						JSON.stringify( data.block_identity_request_proof )
 					).not.toMatch(
 						/postContent|rawContent|raw_content|blockContent|block_content|clientId|client_id|Alpha|Bravo|Inserted/
 					);
@@ -6138,6 +6132,328 @@ describe( 'Post actions', () => {
 					delete globalThis.crypto;
 				}
 			}
+		} );
+
+		it( 'attaches stale-server block identity request proof when refetched server content still matches the accepted base', async () => {
+			const { createHash, webcrypto } = require( 'crypto' );
+			const { TextEncoder } = require( 'util' );
+			const originalCrypto = globalThis.crypto;
+			const originalTextEncoder = globalThis.TextEncoder;
+			const hashContent = ( content ) =>
+				createHash( 'sha256' ).update( content ).digest( 'hex' );
+			const baseBlocks = [
+				'<!-- wp:paragraph -->\n<p>Alpha</p>\n<!-- /wp:paragraph -->',
+				'<!-- wp:paragraph -->\n<p>Bravo</p>\n<!-- /wp:paragraph -->',
+			];
+			const basePostContent = baseBlocks.join( '\n\n' );
+			const insertedBlock =
+				'<!-- wp:paragraph -->\n<p>Inserted</p>\n<!-- /wp:paragraph -->';
+			const proposedPostContent = [
+				baseBlocks[ 0 ],
+				insertedBlock,
+				baseBlocks[ 1 ],
+			].join( '\n\n' );
+			const proposedPostContentHash = hashContent( proposedPostContent );
+			const insertedBlockHash = hashContent( insertedBlock );
+			const acceptedSyncMeta = {
+				schema: 'de-rtc-block-identity-v1',
+				document_uuid: 'doc-turn-0371',
+				version: '41',
+				content_hash: hashContent( basePostContent ),
+				blocks: baseBlocks.map( ( serializedBlock, index ) => ( {
+					block_uid: index === 0 ? 'block-a' : 'block-b',
+					parent_uid: null,
+					block_name: 'core/paragraph',
+					ordinal_path: [ index ],
+					serialized_hash: hashContent( serializedBlock ),
+				} ) ),
+			};
+			const post = {
+				id: postId,
+				type: 'post',
+				title: 'bar',
+				content: basePostContent,
+				status: 'draft',
+			};
+			let retrySaveRequestData;
+
+			Object.defineProperty( globalThis, 'TextEncoder', {
+				configurable: true,
+				value: originalTextEncoder || TextEncoder,
+			} );
+			Object.defineProperty( globalThis, 'crypto', {
+				configurable: true,
+				value: webcrypto,
+			} );
+
+			try {
+				apiFetch.setFetchHandler( async ( options ) => {
+					const { path, method, data } = options;
+
+					expect( method ).toBe( 'POST' );
+					expect( path ).toMatch(
+						new RegExp(
+							`^/wp/v2/posts/${ postId }/distributed-editing/retry-save`
+						)
+					);
+					retrySaveRequestData = data;
+					expect( data ).toMatchObject( {
+						client_base_version: '41',
+						accepted_proof_server_version: '41',
+						rebased_from_version: '37',
+						pending_change_count: 1,
+						proposed_post_content: proposedPostContent,
+						proposed_post_content_hash: proposedPostContentHash,
+						block_identity_request_proof: {
+							client_base_version: '41',
+							proposed_post_content_hash: proposedPostContentHash,
+							retained_block_uids: [ 'block-a', 'block-b' ],
+							inserted_block_nonces: [
+								`inserted-1-${ insertedBlockHash.slice(
+									0,
+									16
+								) }`,
+							],
+							deleted_block_uids: [],
+							moved_block_uids: [ 'block-b' ],
+						},
+					} );
+					expect(
+						data.block_identity_request_proof.proposed_block_map
+					).toEqual( [
+						expect.objectContaining( {
+							block_uid: 'block-a',
+							ordinal_path: [ 0 ],
+						} ),
+						expect.objectContaining( {
+							inserted_block_nonce: `inserted-1-${ insertedBlockHash.slice(
+								0,
+								16
+							) }`,
+							ordinal_path: [ 1 ],
+						} ),
+						expect.objectContaining( {
+							block_uid: 'block-b',
+							ordinal_path: [ 2 ],
+						} ),
+					] );
+					expect(
+						JSON.stringify( data.block_identity_request_proof )
+					).not.toMatch(
+						/postContent|rawContent|raw_content|blockContent|block_content|clientId|client_id|Alpha|Bravo|Inserted/
+					);
+
+					return {
+						result: 'retry_save_server_merged',
+						retry_save_accepted: true,
+						previous_server_version: '42',
+						server_version: '43',
+						pending_change_count: 1,
+						saves_post: true,
+						mutates_post_content: true,
+						creates_revision: true,
+						claims_saved: true,
+						revision_created: true,
+						created_revision_ids: [ 7043 ],
+						server_merge_applied: true,
+						server_merge: {
+							merge_status: 'merged',
+							merge_strategy:
+								'top_level_serialized_block_identity_map',
+							base_version: '41',
+							server_version: '42',
+							block_identity_base_current_match: true,
+						},
+					};
+				} );
+
+				const registry = createRegistryWithStores();
+
+				registry
+					.dispatch( coreStore )
+					.receiveEntityRecords( 'postType', 'post', post );
+				registry.dispatch( editorStore ).setupEditor( post, {
+					content: post.content,
+				} );
+				registry.dispatch( editorStore ).editPost( {
+					content: proposedPostContent,
+				} );
+				registry
+					.dispatch( editorStore )
+					.setDistributedEditingSessionState( {
+						clientBaseVersion: '37',
+						serverVersion: '42',
+						clientBaseContent: basePostContent,
+						refetchedServerState: true,
+						refetchedServerContent: basePostContent,
+						pendingChangeCount: 1,
+						retrySubmitProofStatus:
+							DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.ACCEPTED_FOR_FUTURE_SAVE,
+						retrySubmitAccepted: true,
+						retrySubmitSavePathRequired: true,
+						retrySubmitSaveStatus:
+							DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.READY,
+						retrySubmitSaveReady: true,
+						canExportLocalUpdates: true,
+					} );
+
+				await expect(
+					registry
+						.dispatch( editorStore )
+						.__experimentalSaveDistributedEditingRetryAfterProof( {
+							acceptedBlockIdentitySyncMeta: acceptedSyncMeta,
+							clientBaseVersion: '41',
+							acceptedProofServerVersion: '41',
+						} )
+				).resolves.toMatchObject( {
+					result: 'retry_save_server_merged',
+					retry_save_accepted: true,
+				} );
+
+				expect( retrySaveRequestData ).toBeTruthy();
+			} finally {
+				if ( originalTextEncoder ) {
+					Object.defineProperty( globalThis, 'TextEncoder', {
+						configurable: true,
+						value: originalTextEncoder,
+					} );
+				} else {
+					delete globalThis.TextEncoder;
+				}
+
+				if ( originalCrypto ) {
+					Object.defineProperty( globalThis, 'crypto', {
+						configurable: true,
+						value: originalCrypto,
+					} );
+				} else {
+					delete globalThis.crypto;
+				}
+			}
+		} );
+
+		it( 'omits stale-server block identity request proof when refetched server content drifted from the accepted base', async () => {
+			const { createHash } = require( 'crypto' );
+			const hashContent = ( content ) =>
+				createHash( 'sha256' ).update( content ).digest( 'hex' );
+			const baseBlocks = [
+				'<!-- wp:paragraph -->\n<p>Alpha</p>\n<!-- /wp:paragraph -->',
+				'<!-- wp:paragraph -->\n<p>Bravo</p>\n<!-- /wp:paragraph -->',
+			];
+			const basePostContent = baseBlocks.join( '\n\n' );
+			const refetchedServerContent = [
+				baseBlocks[ 0 ],
+				'<!-- wp:paragraph -->\n<p>Server drift</p>\n<!-- /wp:paragraph -->',
+			].join( '\n\n' );
+			const proposedPostContent = [
+				baseBlocks[ 0 ],
+				'<!-- wp:paragraph -->\n<p>Inserted</p>\n<!-- /wp:paragraph -->',
+				baseBlocks[ 1 ],
+			].join( '\n\n' );
+			const proposedPostContentHash =
+				'eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee';
+			const acceptedSyncMeta = {
+				schema: 'de-rtc-block-identity-v1',
+				document_uuid: 'doc-turn-0371',
+				version: '41',
+				content_hash: hashContent( basePostContent ),
+				blocks: baseBlocks.map( ( serializedBlock, index ) => ( {
+					block_uid: index === 0 ? 'block-a' : 'block-b',
+					parent_uid: null,
+					block_name: 'core/paragraph',
+					ordinal_path: [ index ],
+					serialized_hash: hashContent( serializedBlock ),
+				} ) ),
+			};
+			const post = {
+				id: postId,
+				type: 'post',
+				title: 'bar',
+				content: basePostContent,
+				status: 'draft',
+			};
+			let retrySaveRequestData;
+
+			apiFetch.setFetchHandler( async ( options ) => {
+				const { path, method, data } = options;
+
+				expect( method ).toBe( 'POST' );
+				expect( path ).toMatch(
+					new RegExp(
+						`^/wp/v2/posts/${ postId }/distributed-editing/retry-save`
+					)
+				);
+				retrySaveRequestData = data;
+				expect( data ).toMatchObject( {
+					client_base_version: '41',
+					accepted_proof_server_version: '41',
+					rebased_from_version: '37',
+					pending_change_count: 1,
+					proposed_post_content: proposedPostContent,
+					proposed_post_content_hash: proposedPostContentHash,
+				} );
+				expect( data.block_identity_request_proof ).toBeUndefined();
+
+				return {
+					result: 'retry_save_applied',
+					retry_save_accepted: true,
+					previous_server_version: '42',
+					server_version: '43',
+					pending_change_count: 1,
+					saves_post: true,
+					mutates_post_content: true,
+					creates_revision: true,
+					claims_saved: true,
+					revision_created: true,
+					created_revision_ids: [ 7044 ],
+				};
+			} );
+
+			const registry = createRegistryWithStores();
+
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', post );
+			registry.dispatch( editorStore ).setupEditor( post, {
+				content: post.content,
+			} );
+			registry.dispatch( editorStore ).editPost( {
+				content: proposedPostContent,
+			} );
+			registry
+				.dispatch( editorStore )
+				.setDistributedEditingSessionState( {
+					clientBaseVersion: '37',
+					serverVersion: '42',
+					clientBaseContent: basePostContent,
+					refetchedServerState: true,
+					refetchedServerContent,
+					pendingChangeCount: 1,
+					retrySubmitProofStatus:
+						DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.ACCEPTED_FOR_FUTURE_SAVE,
+					retrySubmitAccepted: true,
+					retrySubmitSavePathRequired: true,
+					retrySubmitSaveStatus:
+						DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.READY,
+					retrySubmitSaveReady: true,
+					canExportLocalUpdates: true,
+				} );
+
+			await expect(
+				registry
+					.dispatch( editorStore )
+					.__experimentalSaveDistributedEditingRetryAfterProof( {
+						acceptedBlockIdentitySyncMeta: acceptedSyncMeta,
+						clientBaseVersion: '41',
+						acceptedProofServerVersion: '41',
+						proposedPostContentHash,
+					} )
+			).resolves.toMatchObject( {
+				result: 'retry_save_applied',
+				retry_save_accepted: true,
+			} );
+
+			expect( retrySaveRequestData ).toBeTruthy();
 		} );
 
 		it( 'refetches confirmed client-side auto-merged retry-save content after stale-base rebase', async () => {
