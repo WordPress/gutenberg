@@ -547,6 +547,7 @@ export function __experimentalRequestDistributedEditingRetrySubmitProbe( {
  * @param {boolean} [args.acceptedProofClaimsSaved=false]        Whether accepted proof claimed saved state.
  * @param {Object}  [args.acceptedReviewApprovalProof]           Hash-only review approval proof.
  * @param {Object}  [args.acceptedFreshReviewConsumeValidation]  Hash-only fresh-review consume validation evidence.
+ * @param {Object}  [args.blockIdentityRequestProof]             Content-free block identity request proof.
  *
  * @return {Promise<Object>} REST response or error.
  */
@@ -565,6 +566,7 @@ export function __experimentalRequestDistributedEditingRetrySave( {
 	acceptedProofClaimsSaved = false,
 	acceptedReviewApprovalProof,
 	acceptedFreshReviewConsumeValidation,
+	blockIdentityRequestProof,
 } = {} ) {
 	const data = {
 		client_base_version: clientBaseVersion,
@@ -604,6 +606,16 @@ export function __experimentalRequestDistributedEditingRetrySave( {
 			normalizedFreshReviewConsumeValidation;
 	}
 
+	const normalizedBlockIdentityRequestProof =
+		normalizeBlockIdentityRequestProofForRetrySaveRequest(
+			blockIdentityRequestProof
+		);
+
+	if ( normalizedBlockIdentityRequestProof ) {
+		data.block_identity_request_proof =
+			normalizedBlockIdentityRequestProof;
+	}
+
 	return apiFetch( {
 		path: getDistributedEditingRetrySaveEndpointPath( {
 			postId,
@@ -612,6 +624,107 @@ export function __experimentalRequestDistributedEditingRetrySave( {
 		method: 'POST',
 		data,
 	} );
+}
+
+function normalizeBlockIdentityRequestProofForRetrySaveRequest( proof ) {
+	if (
+		! proof ||
+		typeof proof !== 'object' ||
+		Array.isArray( proof ) ||
+		containsRawContentEvidence( proof ) ||
+		containsClientIdEvidence( proof )
+	) {
+		return null;
+	}
+
+	const proposedBlockMap = Array.isArray(
+		proof.proposedBlockMap ?? proof.proposed_block_map
+	)
+		? ( proof.proposedBlockMap ?? proof.proposed_block_map )
+				.map( normalizeBlockIdentityRequestProofBlock )
+				.filter( Boolean )
+		: null;
+	const normalized = {
+		client_base_version: normalizeProofString(
+			proof.clientBaseVersion ?? proof.client_base_version
+		),
+		proposed_post_content_hash: normalizeProofString(
+			proof.proposedPostContentHash ??
+				proof.proposed_post_content_hash
+		),
+		proposed_block_map: proposedBlockMap,
+		retained_block_uids: normalizeProofStringList(
+			proof.retainedBlockUids ?? proof.retained_block_uids
+		),
+		inserted_block_nonces: normalizeProofStringList(
+			proof.insertedBlockNonces ?? proof.inserted_block_nonces
+		),
+		deleted_block_uids: normalizeProofStringList(
+			proof.deletedBlockUids ?? proof.deleted_block_uids
+		),
+		moved_block_uids: normalizeProofStringList(
+			proof.movedBlockUids ?? proof.moved_block_uids
+		),
+	};
+
+	if (
+		! normalized.client_base_version ||
+		! normalized.proposed_post_content_hash ||
+		! Array.isArray( normalized.proposed_block_map ) ||
+		normalized.proposed_block_map.length === 0 ||
+		! Array.isArray( normalized.retained_block_uids ) ||
+		! Array.isArray( normalized.inserted_block_nonces ) ||
+		! Array.isArray( normalized.deleted_block_uids ) ||
+		! Array.isArray( normalized.moved_block_uids )
+	) {
+		return null;
+	}
+
+	return normalized;
+}
+
+function normalizeBlockIdentityRequestProofBlock( block ) {
+	if (
+		! block ||
+		typeof block !== 'object' ||
+		Array.isArray( block ) ||
+		containsRawContentEvidence( block ) ||
+		containsClientIdEvidence( block )
+	) {
+		return null;
+	}
+
+	const blockUid = normalizeProofString( block.blockUid ?? block.block_uid );
+	const insertedBlockNonce = normalizeProofString(
+		block.insertedBlockNonce ?? block.inserted_block_nonce
+	);
+	const normalized = {
+		...( blockUid ? { block_uid: blockUid } : {} ),
+		...( insertedBlockNonce
+			? { inserted_block_nonce: insertedBlockNonce }
+			: {} ),
+		block_name: normalizeProofString(
+			block.blockName ?? block.block_name
+		),
+		ordinal_path: normalizeProofNonNegativeIntegerList(
+			block.ordinalPath ?? block.ordinal_path
+		),
+		serialized_hash: normalizeProofString(
+			block.serializedHash ?? block.serialized_hash
+		),
+	};
+
+	if (
+		( ! normalized.block_uid && ! normalized.inserted_block_nonce ) ||
+		! normalized.block_name ||
+		! normalized.ordinal_path ||
+		normalized.ordinal_path.length === 0 ||
+		! normalized.serialized_hash
+	) {
+		return null;
+	}
+
+	return normalized;
 }
 
 function normalizeAcceptedFreshReviewConsumeValidationForRetrySaveRequest(
@@ -1017,6 +1130,14 @@ function normalizeProofString( value ) {
 	return typeof value === 'string' && value.length > 0 ? value : undefined;
 }
 
+function normalizeProofStringList( value ) {
+	return Array.isArray( value )
+		? value
+				.map( normalizeProofString )
+				.filter( ( item ) => item !== undefined )
+		: undefined;
+}
+
 function containsRawContentEvidence( value ) {
 	if ( Array.isArray( value ) ) {
 		return value.some( containsRawContentEvidence );
@@ -1068,6 +1189,35 @@ function containsRawContentEvidence( value ) {
 	return false;
 }
 
+function containsClientIdEvidence( value ) {
+	if ( Array.isArray( value ) ) {
+		return value.some( containsClientIdEvidence );
+	}
+
+	if ( ! value || typeof value !== 'object' ) {
+		return false;
+	}
+
+	const forbiddenClientIdKeys = new Set( [
+		'clientId',
+		'client_id',
+		'blockClientId',
+		'block_client_id',
+	] );
+
+	for ( const [ key, nestedValue ] of Object.entries( value ) ) {
+		if ( forbiddenClientIdKeys.has( key ) ) {
+			return true;
+		}
+
+		if ( containsClientIdEvidence( nestedValue ) ) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
 function normalizeProofPositiveInteger( value ) {
 	const number = Number( value );
 
@@ -1086,6 +1236,15 @@ function normalizeProofNonNegativeInteger( value ) {
 	const number = Number( value );
 
 	return Number.isInteger( number ) && number >= 0 ? number : undefined;
+}
+
+function normalizeProofNonNegativeIntegerList( value ) {
+	return Array.isArray( value ) &&
+		value.every(
+			( item ) => normalizeProofNonNegativeInteger( item ) !== undefined
+		)
+		? value.map( normalizeProofNonNegativeInteger )
+		: undefined;
 }
 
 function getProofField( object, camelKey, snakeKey, fallback = undefined ) {

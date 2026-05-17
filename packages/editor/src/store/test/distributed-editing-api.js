@@ -585,6 +585,168 @@ describe( 'distributed editing REST helpers', () => {
 		} );
 	} );
 
+	it( 'requests retry-save with content-free block identity proof', async () => {
+		const proposedPostContent =
+			'<!-- wp:paragraph --><p>Retry-save inserted block.</p><!-- /wp:paragraph -->';
+		const proposedPostContentHash =
+			'0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef';
+		const insertedHash =
+			'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb';
+
+		apiFetch.setFetchHandler( async ( options ) => {
+			expect( options.path ).toMatch(
+				/^\/wp\/v2\/posts\/42\/distributed-editing\/retry-save/
+			);
+			expect( options.method ).toBe( 'POST' );
+			expect( options.data ).toMatchObject( {
+				client_base_version: '41',
+				accepted_proof_server_version: '41',
+				rebased_from_version: '41',
+				pending_change_count: 1,
+				proposed_post_content: proposedPostContent,
+				proposed_post_content_hash: proposedPostContentHash,
+				block_identity_request_proof: {
+					client_base_version: '41',
+					proposed_post_content_hash: proposedPostContentHash,
+					proposed_block_map: [
+						{
+							block_uid: 'block-a',
+							block_name: 'core/paragraph',
+							ordinal_path: [ 0 ],
+							serialized_hash:
+								'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+						},
+						{
+							inserted_block_nonce:
+								'inserted-1-bbbbbbbbbbbbbbbb',
+							block_name: 'core/paragraph',
+							ordinal_path: [ 1 ],
+							serialized_hash: insertedHash,
+						},
+					],
+					retained_block_uids: [ 'block-a' ],
+					inserted_block_nonces: [
+						'inserted-1-bbbbbbbbbbbbbbbb',
+					],
+					deleted_block_uids: [],
+					moved_block_uids: [],
+				},
+			} );
+			expect(
+				options.data.block_identity_request_proof.proposed_post_content
+			).toBeUndefined();
+			expect(
+				options.data.block_identity_request_proof.raw_content
+			).toBeUndefined();
+			expect(
+				options.data.block_identity_request_proof.client_id
+			).toBeUndefined();
+			expect(
+				JSON.stringify(
+					options.data.block_identity_request_proof
+				)
+			).not.toMatch(
+				/postContent|rawContent|raw_content|blockContent|block_content|clientId|client_id/
+			);
+
+			return {
+				result: 'retry_save_applied',
+				retry_save_accepted: true,
+			};
+		} );
+
+		await expect(
+			__experimentalRequestDistributedEditingRetrySave( {
+				postId: 42,
+				clientBaseVersion: '41',
+				acceptedProofServerVersion: '41',
+				rebasedFromVersion: '41',
+				pendingChangeCount: 1,
+				proposedPostContent,
+				proposedPostContentHash,
+				blockIdentityRequestProof: {
+					clientBaseVersion: '41',
+					proposedPostContentHash,
+					proposedBlockMap: [
+						{
+							blockUid: 'block-a',
+							blockName: 'core/paragraph',
+							ordinalPath: [ 0 ],
+							serializedHash:
+								'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+						},
+						{
+							insertedBlockNonce:
+								'inserted-1-bbbbbbbbbbbbbbbb',
+							blockName: 'core/paragraph',
+							ordinalPath: [ 1 ],
+							serializedHash: insertedHash,
+						},
+					],
+					retainedBlockUids: [ 'block-a' ],
+					insertedBlockNonces: [
+						'inserted-1-bbbbbbbbbbbbbbbb',
+					],
+					deletedBlockUids: [],
+					movedBlockUids: [],
+				},
+			} )
+		).resolves.toEqual( {
+			result: 'retry_save_applied',
+			retry_save_accepted: true,
+		} );
+	} );
+
+	it( 'omits retry-save block identity proof containing clientId evidence', async () => {
+		const proposedPostContent =
+			'<!-- wp:paragraph --><p>Retry-save inserted block.</p><!-- /wp:paragraph -->';
+
+		apiFetch.setFetchHandler( async ( options ) => {
+			expect( options.path ).toMatch(
+				/^\/wp\/v2\/posts\/42\/distributed-editing\/retry-save/
+			);
+			expect(
+				options.data.block_identity_request_proof
+			).toBeUndefined();
+
+			return {
+				result: 'retry_save_applied',
+				retry_save_accepted: true,
+			};
+		} );
+
+		await expect(
+			__experimentalRequestDistributedEditingRetrySave( {
+				postId: 42,
+				clientBaseVersion: '41',
+				acceptedProofServerVersion: '41',
+				proposedPostContent,
+				blockIdentityRequestProof: {
+					clientBaseVersion: '41',
+					proposedPostContentHash:
+						'0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef',
+					proposedBlockMap: [
+						{
+							blockUid: 'block-a',
+							blockName: 'core/paragraph',
+							ordinalPath: [ 0 ],
+							serializedHash:
+								'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+							clientId: 'transient-gutenberg-client-id',
+						},
+					],
+					retainedBlockUids: [ 'block-a' ],
+					insertedBlockNonces: [],
+					deletedBlockUids: [],
+					movedBlockUids: [],
+				},
+			} )
+		).resolves.toEqual( {
+			result: 'retry_save_applied',
+			retry_save_accepted: true,
+		} );
+	} );
+
 	it( 'requests retry-save with an opaque review approval proof token envelope', async () => {
 		const proposedPostContent =
 			'<!-- wp:paragraph --><p>Opaque token retry-save content.</p><!-- /wp:paragraph -->';

@@ -63,9 +63,11 @@ import {
 	getDistributedEditingComparablePostContent,
 	getDistributedEditingPostContentFromResponse,
 	getDistributedEditingPostContentSha256Hash,
+	getDistributedEditingBlockIdentityRequestProofDescriptor,
 	getDistributedEditingReviewedBlockItemsForFreshReviewDecision,
 	getDistributedEditingReviewedBlockItemsForRetrySaveReviewApprovalProof,
 	getDistributedEditingServerVersionFromResponse,
+	getDistributedEditingSyncMetaFromPostContent,
 	getDistributedEditingSessionStateForRetrySubmitHandoff,
 	getDistributedEditingSessionStateForRetrySubmitProofResult,
 	getDistributedEditingSessionStateForRetrySubmitSavePreparation,
@@ -73,6 +75,7 @@ import {
 	getDistributedEditingSessionStateWithActionTranscriptEvent,
 	normalizeDistributedEditingSessionState,
 	DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES,
+	DISTRIBUTED_EDITING_BLOCK_IDENTITY_REQUEST_PROOF_STATUSES,
 	DISTRIBUTED_EDITING_DISPOSITIONS,
 	DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES,
 	DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES,
@@ -3192,7 +3195,7 @@ export const __experimentalSaveDistributedEditingRetryAfterProof =
 		const proposedPostContent = getDistributedEditingComparablePostContent(
 			proposedPostContentCandidate
 		);
-		const proposedPostContentHash =
+		let proposedPostContentHash =
 			options.proposedPostContentHash ??
 			getDistributedEditingRetrySaveProposedContentHashEvidence(
 				currentSessionState,
@@ -3201,16 +3204,61 @@ export const __experimentalSaveDistributedEditingRetryAfterProof =
 					acceptedFreshReviewConsumeValidation,
 				}
 			);
+		const requestClientBaseVersion =
+			options.clientBaseVersion ??
+			currentSessionState.serverVersion ??
+			currentSessionState.clientBaseVersion;
+		const requestAcceptedProofServerVersion =
+			options.acceptedProofServerVersion ??
+			currentSessionState.serverVersion;
+		let blockIdentityRequestProof = options.blockIdentityRequestProof;
+
+		if (
+			blockIdentityRequestProof === undefined &&
+			options.prepareBlockIdentityRequestProof !== false &&
+			isDistributedEditingCurrentBaseRetrySaveRequest( {
+				clientBaseVersion: requestClientBaseVersion,
+				acceptedProofServerVersion:
+					requestAcceptedProofServerVersion,
+				sessionState: currentSessionState,
+			} )
+		) {
+			const acceptedSyncMeta =
+				getDistributedEditingAcceptedBlockIdentitySyncMetaForRetrySave(
+					{
+						currentPost,
+						options,
+					}
+				);
+
+			if ( acceptedSyncMeta ) {
+				const blockIdentityRequestProofDescriptor =
+					await getDistributedEditingBlockIdentityRequestProofDescriptor(
+						{
+							acceptedSyncMeta,
+							proposedPostContent,
+							proposedPostContentHash,
+							clientBaseVersion: requestClientBaseVersion,
+						}
+					);
+
+				if (
+					blockIdentityRequestProofDescriptor.status ===
+					DISTRIBUTED_EDITING_BLOCK_IDENTITY_REQUEST_PROOF_STATUSES.READY
+				) {
+					blockIdentityRequestProof =
+						blockIdentityRequestProofDescriptor.requestProof;
+					proposedPostContentHash =
+						proposedPostContentHash ||
+						blockIdentityRequestProofDescriptor.proposedPostContentHash;
+				}
+			}
+		}
 		const requestArgs = {
 			postId,
 			restBase,
-			clientBaseVersion:
-				options.clientBaseVersion ??
-				currentSessionState.serverVersion ??
-				currentSessionState.clientBaseVersion,
-			acceptedProofServerVersion:
-				options.acceptedProofServerVersion ??
-				currentSessionState.serverVersion,
+			clientBaseVersion: requestClientBaseVersion,
+			acceptedProofServerVersion: requestAcceptedProofServerVersion,
 			rebasedFromVersion:
 				options.rebasedFromVersion ??
 				currentSessionState.clientBaseVersion,
@@ -3232,6 +3280,7 @@ export const __experimentalSaveDistributedEditingRetryAfterProof =
 				currentSessionState.retrySubmitClaimsSaved,
 			acceptedReviewApprovalProof,
 			acceptedFreshReviewConsumeValidation,
+			blockIdentityRequestProof,
 		};
 
 		dispatch.setDistributedEditingSessionState(
@@ -3545,6 +3594,52 @@ function getDistributedEditingRetrySaveAppliedPostContent( {
 	return null;
 }
 
+function isDistributedEditingCurrentBaseRetrySaveRequest( {
+	clientBaseVersion,
+	acceptedProofServerVersion,
+	sessionState = {},
+} = {} ) {
+	const serverVersion = sessionState.serverVersion;
+
+	return (
+		clientBaseVersion !== undefined &&
+		clientBaseVersion !== null &&
+		acceptedProofServerVersion !== undefined &&
+		acceptedProofServerVersion !== null &&
+		serverVersion !== undefined &&
+		serverVersion !== null &&
+		String( clientBaseVersion ) ===
+			String( acceptedProofServerVersion ) &&
+		String( acceptedProofServerVersion ) === String( serverVersion )
+	);
+}
+
+function getDistributedEditingAcceptedBlockIdentitySyncMetaForRetrySave( {
+	currentPost = {},
+	options = {},
+} = {} ) {
+	const explicitSyncMeta =
+		options.acceptedBlockIdentitySyncMeta ?? options.acceptedSyncMeta;
+
+	if (
+		explicitSyncMeta &&
+		typeof explicitSyncMeta === 'object' &&
+		! Array.isArray( explicitSyncMeta )
+	) {
+		return explicitSyncMeta;
+	}
+
+	const postContent =
+		options.acceptedPostContentWithSyncMeta ??
+		options.currentPostContentWithSyncMeta ??
+		currentPost.content?.raw ??
+		( typeof currentPost.content === 'string'
+			? currentPost.content
+			: null );
+
+	return getDistributedEditingSyncMetaFromPostContent( postContent );
+}
+
 /**
  * Browser-callable fresh-review retry-save handoff.
  *
@@ -3623,8 +3718,12 @@ function updateDistributedEditingFreshReviewImportContentVault( {
 	postContentHash,
 } = {} ) {
 	const key = getDistributedEditingFreshReviewImportContentVaultKey( {
-		postId: currentPost.id,
-		postType: currentPost.type,
+		postId:
+			currentPost.id ??
+			result.sessionState?.localUpdatesImportPostId,
+		postType:
+			currentPost.type ??
+			result.sessionState?.localUpdatesImportPostType,
 	} );
 
 	if ( ! key ) {
@@ -3656,8 +3755,8 @@ function getDistributedEditingFreshReviewImportedPostContentForRetrySave( {
 	acceptedFreshReviewConsumeValidation = null,
 } = {} ) {
 	const key = getDistributedEditingFreshReviewImportContentVaultKey( {
-		postId,
-		postType,
+		postId: postId ?? sessionState.localUpdatesImportPostId,
+		postType: postType ?? sessionState.localUpdatesImportPostType,
 	} );
 
 	if ( ! key ) {
@@ -3712,11 +3811,11 @@ function getDistributedEditingFreshReviewImportContentVaultKey( {
 	postId,
 	postType,
 } = {} ) {
-	if ( postId === undefined || postId === null || ! postType ) {
+	if ( postId === undefined || postId === null ) {
 		return null;
 	}
 
-	return `${ postType }:${ postId }`;
+	return `${ postType || 'post' }:${ postId }`;
 }
 
 /**
@@ -3747,12 +3846,18 @@ export const __experimentalMaybeSavePostWithDistributedEditingRetryPolicy =
 			DISTRIBUTED_EDITING_RECOVERY_REST_BASE;
 		const currentSessionState =
 			select.getDistributedEditingSessionState?.() || {};
+		const acceptedFreshReviewConsumeValidation =
+			options.acceptedFreshReviewConsumeValidation ??
+			getDistributedEditingAcceptedFreshReviewConsumeValidationForRetrySaveRequest(
+				currentSessionState
+			);
 		const proposedPostContent =
 			options.proposedPostContent ??
 			getDistributedEditingFreshReviewImportedPostContentForRetrySave( {
 				postId,
 				postType,
 				sessionState: currentSessionState,
+				acceptedFreshReviewConsumeValidation,
 			} ) ??
 			select.getEditedPostContent?.();
 		const structuralNoopSaveCandidate =
@@ -3813,11 +3918,24 @@ export const __experimentalMaybeSavePostWithDistributedEditingRetryPolicy =
 			return handoff;
 		}
 
+		const retrySaveAcceptedFreshReviewConsumeValidation =
+			acceptedFreshReviewConsumeValidation ??
+			policy.request.acceptedFreshReviewConsumeValidation;
+		const retrySaveProposedPostContent =
+			options.proposedPostContent ??
+			getDistributedEditingFreshReviewImportedPostContentForRetrySave( {
+				postId,
+				postType,
+				sessionState: currentSessionState,
+				acceptedFreshReviewConsumeValidation:
+					retrySaveAcceptedFreshReviewConsumeValidation,
+			} ) ??
+			proposedPostContent;
 		const response =
 			await dispatch.__experimentalSaveDistributedEditingRetryAfterProof(
 				{
 					...policy.request,
-					proposedPostContent,
+					proposedPostContent: retrySaveProposedPostContent,
 					proposedPostContentHash: options.proposedPostContentHash,
 					acceptedProofSavesPost: options.acceptedProofSavesPost,
 					acceptedProofMutatesPostContent:
@@ -3829,8 +3947,7 @@ export const __experimentalMaybeSavePostWithDistributedEditingRetryPolicy =
 						options.acceptedReviewApprovalProof ??
 						policy.request.acceptedReviewApprovalProof,
 					acceptedFreshReviewConsumeValidation:
-						options.acceptedFreshReviewConsumeValidation ??
-						policy.request.acceptedFreshReviewConsumeValidation,
+						retrySaveAcceptedFreshReviewConsumeValidation,
 				}
 			);
 		const sessionState = select.getDistributedEditingSessionState?.() || {};
@@ -4365,11 +4482,31 @@ export const savePost =
 		if (
 			select.shouldUseDistributedEditingRetrySaveForSavePost( options )
 		) {
+			const currentPost = select.getCurrentPost?.() || {};
+			const currentSessionState =
+				select.getDistributedEditingSessionState?.() || {};
+			const acceptedFreshReviewConsumeValidation =
+				options.acceptedFreshReviewConsumeValidation ??
+				getDistributedEditingAcceptedFreshReviewConsumeValidationForRetrySaveRequest(
+					currentSessionState
+				);
+			const retrySaveProposedPostContent =
+				options.proposedPostContent ??
+				getDistributedEditingFreshReviewImportedPostContentForRetrySave(
+					{
+						postId: currentPost.id,
+						postType: currentPost.type,
+						sessionState: currentSessionState,
+						acceptedFreshReviewConsumeValidation,
+					}
+				) ??
+				content;
 			const retrySaveHandoff =
 				await dispatch.__experimentalMaybeSavePostWithDistributedEditingRetryPolicy(
 					{
 						...options,
-						proposedPostContent: content,
+						proposedPostContent: retrySaveProposedPostContent,
+						acceptedFreshReviewConsumeValidation,
 					}
 				);
 

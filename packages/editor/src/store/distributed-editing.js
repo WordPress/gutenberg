@@ -16667,7 +16667,7 @@ function stripDistributedEditingSyncMetaFromPostContent( postContent ) {
 	return parsed?.postContent ?? normalizeNullableContentString( postContent );
 }
 
-function getDistributedEditingSyncMetaFromPostContent( postContent ) {
+export function getDistributedEditingSyncMetaFromPostContent( postContent ) {
 	return parseDistributedEditingSyncMetaFromPostContent( postContent )
 		?.syncMeta;
 }
