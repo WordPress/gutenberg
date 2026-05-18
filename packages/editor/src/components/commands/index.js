@@ -54,6 +54,7 @@ const getEditorCommandLoader = () =>
 			isCodeEditingEnabled,
 			isRichEditingEnabled,
 			isPublishSidebarEnabled,
+			disableContentOnlyForUnsyncedPatterns,
 		} = useSelect( ( select ) => {
 			const { get } = select( preferencesStore );
 			const { isListViewOpened, getCurrentPostType, getEditorSettings } =
@@ -74,6 +75,9 @@ const getEditorCommandLoader = () =>
 				isRichEditingEnabled: getEditorSettings().richEditingEnabled,
 				isPublishSidebarEnabled:
 					select( editorStore ).isPublishSidebarEnabled(),
+				disableContentOnlyForUnsyncedPatterns:
+					!! getEditorSettings()
+						.disableContentOnlyForUnsyncedPatterns,
 			};
 		}, [] );
 		const { getActiveComplementaryArea } = useSelect( interfaceStore );
@@ -86,6 +90,7 @@ const getEditorCommandLoader = () =>
 			toggleDistractionFree,
 			toggleSpotlightMode,
 			toggleTopToolbar,
+			updateEditorSettings,
 		} = useDispatch( editorStore );
 		const { openModal, enableComplementaryArea, disableComplementaryArea } =
 			useDispatch( interfaceStore );
@@ -172,6 +177,22 @@ const getEditorCommandLoader = () =>
 			category: 'command',
 			callback: ( { close } ) => {
 				toggleTopToolbar();
+				close();
+			},
+		} );
+
+		commands.push( {
+			name: 'core/toggle-pattern-editing',
+			label: disableContentOnlyForUnsyncedPatterns
+				? __( 'Disable pattern editing' )
+				: __( 'Enable pattern editing' ),
+			icon: symbol,
+			category: 'command',
+			callback: ( { close } ) => {
+				updateEditorSettings( {
+					disableContentOnlyForUnsyncedPatterns:
+						! disableContentOnlyForUnsyncedPatterns,
+				} );
 				close();
 			},
 		} );
