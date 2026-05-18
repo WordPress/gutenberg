@@ -251,7 +251,8 @@ async function getRestPost(
 	postId: number
 ): Promise< RestPost > {
 	return requestUtils.rest< RestPost >( {
-		path: `/wp/v2/posts/${ postId }?context=edit`,
+		path: `/wp/v2/posts/${ postId }`,
+		params: { context: 'edit' },
 	} );
 }
 
@@ -262,7 +263,8 @@ async function getRevisionMarkerCount(
 ): Promise< number > {
 	const revisions = await requestUtils
 		.rest< RestRevision[] >( {
-			path: `/wp/v2/posts/${ postId }/revisions?context=edit&per_page=20`,
+			path: `/wp/v2/posts/${ postId }/revisions`,
+			params: { context: 'edit', per_page: 20 },
 		} )
 		.catch( () => [] );
 
