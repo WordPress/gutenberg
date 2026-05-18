@@ -26,44 +26,6 @@ import { Icon, check } from '@wordpress/icons';
 | ------ | --------- | ------- | ----------------------- |
 | `size` | `integer` | `24`    | Size of icon in pixels. |
 
-## PHP usage
-
-The same icon library is available in PHP via the `wp_icon()` function. It renders inline SVG, producing equivalent output to the React component.
-
-```php
-// Basic usage — renders an inline SVG with aria-hidden="true".
-echo wp_icon( 'plus' );
-
-// With options.
-echo wp_icon( 'plus', array(
-    'size'  => 18,
-    'class' => 'my-button-icon',
-    'label' => 'Add item',
-) );
-
-// Direct echo helper (mirrors the WordPress get_* / the_* convention).
-the_wp_icon( 'arrow-down' );
-```
-
-### Parameters
-
-| Name    | Type     | Default | Description                                                                                                                   |
-| ------- | -------- | ------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| `size`  | `int`    | `24`    | Width and height in pixels.                                                                                                   |
-| `class` | `string` | `''`    | Additional CSS class names, appended to the default `wp-icon` class.                                                          |
-| `label` | `string` | `''`    | Accessible label. When provided, the SVG gets `role="img"` and `aria-label`. When omitted, the SVG gets `aria-hidden="true"`. |
-
-### How it works
-
-The function checks the Icons Registry first (covers public and third-party registered icons), then falls back to reading the SVG file directly from `packages/icons/src/library/`. This means all icons in the library are accessible, not just those marked as public in the registry.
-
-### Running PHP tests
-
-```bash
-npm run wp-env start
-vendor/bin/phpunit phpunit/class-wp-icon-test.php
-```
-
 ## Docs & examples
 
 You can browse the icons docs and examples at [https://wordpress.github.io/gutenberg/?path=/docs/icons-icon--default](https://wordpress.github.io/gutenberg/?path=/docs/icons-icon--default)

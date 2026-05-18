@@ -87,7 +87,6 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require_once __DIR__ . '/class-wp-rest-edit-site-export-controller-gutenberg.php';
 	require_once __DIR__ . '/class-wp-icons-registry-gutenberg.php';
 	require_once __DIR__ . '/class-wp-rest-icons-controller-gutenberg.php';
-	require_once __DIR__ . '/icons.php';
 	require_once __DIR__ . '/rest-api.php';
 
 	// Experimental autosaves controller override for real-time collaboration.
@@ -133,6 +132,7 @@ if ( class_exists( '\WordPress\AiClient\AiClient' ) ) {
 require __DIR__ . '/compat/wordpress-7.1/media.php';
 require __DIR__ . '/compat/wordpress-7.1/preload.php';
 require __DIR__ . '/compat/wordpress-7.1/classic-block.php';
+require __DIR__ . '/compat/wordpress-7.1/icons.php';
 
 // Experimental features.
 require __DIR__ . '/experimental/omnibar/load.php';
