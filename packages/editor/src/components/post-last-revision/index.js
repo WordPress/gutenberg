@@ -88,10 +88,10 @@ export function PrivatePostLastRevision() {
 					className="editor-private-post-last-revision__button"
 					text={ revisionsCount }
 					aria-label={ sprintf(
-						/* translators: %s: number of revisions. */
+						/* translators: %d: number of revisions. */
 						_n(
-							'Open revisions screen: %s revision',
-							'Open revisions screen: %s revisions',
+							'Open revisions screen: %d revision',
+							'Open revisions screen: %d revisions',
 							revisionsCount
 						),
 						revisionsCount
