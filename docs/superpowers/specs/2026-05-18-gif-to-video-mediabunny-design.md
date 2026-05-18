@@ -12,17 +12,23 @@ GIFs to MP4/WebM on upload using FFmpeg compiled to WASM. That approach works bu
 has two material costs:
 
 1. **Bundle size:** ~14.1 MB of base64-inlined FFmpeg WASM.
-2. **Cross-origin isolation requirement:** FFmpeg's threaded WASM build needs
-   `SharedArrayBuffer`, so conversion only runs when the page is
-   `crossOriginIsolated`. On the many WordPress installs that are not, the
-   feature silently does nothing.
+2. **Performance:** software decoding/encoding in WASM is CPU- and
+   memory-heavy, with no hardware acceleration.
 
 [mediabunny](https://mediabunny.dev/) (MPL-2.0, v1.45.2) is a pure-TypeScript
 media toolkit that delegates encoding to the browser's native **WebCodecs**
-API. It is tree-shakable down to kB-scale shipped code and requires **no
-`SharedArrayBuffer` / cross-origin isolation**. This design uses mediabunny plus
-the browser's `ImageDecoder` to deliver the same feature at a fraction of the
-bundle cost and with broader runtime applicability.
+API (hardware-accelerated where available). It is tree-shakable down to
+kB-scale shipped code. This design uses mediabunny plus the browser's
+`ImageDecoder` to deliver the same feature at a fraction of the bundle cost
+and with faster, hardware-accelerated encoding.
+
+Note: client-side media as a whole already requires a Document Isolation
+Policy (cross-origin isolation), and FFmpeg's `SharedArrayBuffer` need is
+satisfied within that. So "avoiding `SharedArrayBuffer`" is **not** a
+differentiator here, and environments without cross-origin isolation (and
+browsers like Firefox where client-side media is not currently supported) are
+out of scope for both approaches. The win is strictly **bundle size and
+encode performance**.
 
 ## Goals
 
@@ -130,8 +136,10 @@ Ports only what PR #76946 added, kept independent of that branch:
 
 ### Feature detection & fallback
 
-Replace #76946's `self.crossOriginIsolated` gate with a WebCodecs capability
-check. Conversion is attempted only when:
+Client-side media already runs only under cross-origin isolation in supported
+browsers, so this is purely a defensive safety net (not a Firefox-support
+path). Keep #76946's existing client-side-media support gate, and additionally
+attempt conversion only when WebCodecs is present:
 
 - `'ImageDecoder' in self` (worker/global), and
 - `'VideoEncoder' in self`, and
@@ -144,9 +152,9 @@ the worker before encoding; if it fails there, the worker reports a sentinel and
 the action falls back to uploading the original GIF unchanged (treated as a
 non-error skip, not `GIF_TRANSCODING_ERROR`).
 
-When unsupported (notably Firefox, which lacks `ImageDecoder`), the original GIF
-uploads untouched — identical user-facing contract to #76946's
-non-`crossOriginIsolated` fallback.
+In supported client-side-media environments these checks are expected to pass;
+the fallback exists only so an unexpected missing/unsupported codec degrades to
+an untouched GIF upload rather than an error.
 
 ### Build / PHP wiring
 
@@ -203,19 +211,19 @@ Upload queued (image/gif)
   `prepareItem` enqueues `TranscodeGif` only for supported animated GIFs;
   concurrency limit; error path.
 - **E2E (Playwright):** upload a known animated GIF, assert the resulting
-  attachment is a video (MP4). Skipped in Firefox (no `ImageDecoder`).
+  attachment is a video (MP4). Runs in the same browser(s) the existing
+  client-side-media e2e suite uses.
 - **Manual verification:** animated GIF (converts), static GIF (untouched),
-  `gifConvert` disabled (untouched), WebM output format, Firefox (graceful
-  fallback), non-cross-origin-isolated page (still converts — the key
-  differentiator vs #76946).
+  `gifConvert` disabled (untouched), WebM output format, output size/quality
+  vs the FFmpeg PR on the same source GIFs.
 
 ## Risks & open questions
 
-- **WebCodecs availability:** `ImageDecoder` is not Baseline (absent in
-  Firefox). Mitigation: feature detection + graceful GIF passthrough. The net
-  reachable audience is plausibly *larger* than #76946's, since most installs
-  are not cross-origin isolated, but Firefox specifically regresses to no
-  conversion (it would also not convert under #76946 unless isolated).
+- **WebCodecs availability:** `ImageDecoder` is not Baseline, but client-side
+  media is already gated to browsers/environments where it is expected to be
+  present (Firefox is out of scope — client-side media is not supported there
+  today). Feature detection + graceful GIF passthrough remains as a defensive
+  safety net only.
 - **Encoder codec support varies by device** (e.g. hardware H.264). Mitigated by
   `VideoEncoder.isConfigSupported()` before encoding, with passthrough fallback.
 - **License:** mediabunny is MPL-2.0 (one-way compatible with GPLv2+). Flag for
