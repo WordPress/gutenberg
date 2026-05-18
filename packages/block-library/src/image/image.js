@@ -981,7 +981,7 @@ export default function Image( {
 									readOnly={ lockAltControls }
 									help={
 										lockAltControls ? (
-											lockAltControlsMessage
+											<>{ lockAltControlsMessage }</>
 										) : (
 											<ExternalLink
 												href={
