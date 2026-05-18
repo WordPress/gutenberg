@@ -46,9 +46,7 @@ type UseLayoutShiftAnimationResult = {
 
 function queryGridItems( container: HTMLElement ): HTMLElement[] {
 	return Array.from(
-		container.querySelectorAll< HTMLElement >(
-			`[${ GRID_ITEM_DATA_KEY }]`
-		)
+		container.querySelectorAll< HTMLElement >( `[${ GRID_ITEM_DATA_KEY }]` )
 	);
 }
 
@@ -109,8 +107,14 @@ function playLayoutShift(
 
 /**
  * Animates sibling tiles when grid layout reflows during drag or resize
- * using a FLIP transform. Respects `--wp-grid-layout-shift-*` tokens on
- * the container (see `layout-shift-animation.module.css`).
+ * using a FLIP transform (see `layout-shift-animation.module.css`).
+ *
+ * @param root0                   Hook options.
+ * @param root0.container         Surface root that contains grid tiles.
+ * @param root0.enabled           When false, snapshots are cleared and no transforms run.
+ * @param root0.layoutFingerprint Serialized layout/placement state.
+ * @param root0.excludeItemKey    Item key to skip (the tile being dragged or resized).
+ * @return Snapshot capture callback for use before layout updates.
  */
 export function useLayoutShiftAnimation( {
 	container,
@@ -118,12 +122,14 @@ export function useLayoutShiftAnimation( {
 	layoutFingerprint,
 	excludeItemKey = null,
 }: UseLayoutShiftAnimationOptions ): UseLayoutShiftAnimationResult {
-	const snapshotBeforeChangeRef = useRef<
-		Map< string, RectSnapshot > | null
-	>( null );
-	const lastRenderedPositionsRef = useRef<
-		Map< string, RectSnapshot > | null
-	>( null );
+	const snapshotBeforeChangeRef = useRef< Map<
+		string,
+		RectSnapshot
+	> | null >( null );
+	const lastRenderedPositionsRef = useRef< Map<
+		string,
+		RectSnapshot
+	> | null >( null );
 
 	const captureLayoutSnapshot = useCallback( () => {
 		if ( container ) {
@@ -144,8 +150,7 @@ export function useLayoutShiftAnimation( {
 		}
 
 		const previous =
-			snapshotBeforeChangeRef.current ??
-			lastRenderedPositionsRef.current;
+			snapshotBeforeChangeRef.current ?? lastRenderedPositionsRef.current;
 		snapshotBeforeChangeRef.current = null;
 
 		if ( previous ) {
@@ -175,6 +180,9 @@ export function useLayoutShiftAnimation( {
 /**
  * Stable fingerprint for {@link useLayoutShiftAnimation}. Width/height
  * values may be numbers or layout keywords (`'fill'`, `'full'`).
+ *
+ * @param layout Layout items to serialize.
+ * @return Fingerprint string.
  */
 export function getLayoutFingerprint(
 	layout: ReadonlyArray< {
@@ -197,6 +205,9 @@ export function getLayoutFingerprint(
 
 /**
  * Placement fingerprint for lanes polyfill / explicit grid positions.
+ *
+ * @param itemStyles Per-item inline placement styles.
+ * @return Fingerprint string.
  */
 export function getPlacementFingerprint(
 	itemStyles: Map< string, React.CSSProperties >
