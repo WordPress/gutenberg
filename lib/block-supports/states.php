@@ -1,9 +1,10 @@
 <?php
 /**
- * Block pseudo-state support for frontend CSS generation.
+ * Block state support for frontend CSS generation.
  *
- * Generates scoped CSS for per-instance pseudo-state styles (e.g., :hover, :focus)
- * declared in block attributes under `style[':hover']`, `style[':focus']`, etc.
+ * Generates scoped CSS for per-instance state styles declared in block attributes,
+ * including pseudo-states (e.g., `style[':hover']`) and responsive states
+ * (e.g., `style['mobile']` and `style['mobile'][':hover']`).
  *
  * @package WordPress
  */
@@ -87,12 +88,11 @@ function gutenberg_get_state_declarations_with_fallback_border_styles( $declarat
 }
 
 /**
- * Renders per-instance pseudo-state styles on the frontend for blocks with
- * configured pseudo-state support.
+ * Renders per-instance state styles on the frontend.
  *
  * @param string $block_content The block's rendered HTML.
  * @param array  $block         The block data including blockName and attrs.
- * @return string Modified block content with injected pseudo-state styles.
+ * @return string Modified block content with injected state styles.
  */
 function gutenberg_render_block_states_support( $block_content, $block ) {
 	if ( empty( $block['blockName'] ) || empty( $block_content ) ) {
@@ -105,15 +105,11 @@ function gutenberg_render_block_states_support( $block_content, $block ) {
 		return $block_content;
 	}
 
-	$supported_states = WP_Theme_JSON_Gutenberg::VALID_BLOCK_PSEUDO_SELECTORS[ $block_name ] ?? null;
-	if ( empty( $supported_states ) || ! is_array( $supported_states ) ) {
-		return $block_content;
-	}
+	$supported_pseudo_states = WP_Theme_JSON_Gutenberg::VALID_BLOCK_PSEUDO_SELECTORS[ $block_name ] ?? array();
+	$style                   = $block['attrs']['style'] ?? array();
+	$css_rules               = array();
 
-	$style     = $block['attrs']['style'] ?? array();
-	$css_rules = array();
-
-	foreach ( $supported_states as $state ) {
+	foreach ( $supported_pseudo_states as $state ) {
 		if ( empty( $style[ $state ] ) || ! is_array( $style[ $state ] ) ) {
 			continue;
 		}
@@ -123,9 +119,43 @@ function gutenberg_render_block_states_support( $block_content, $block ) {
 		);
 		if ( ! empty( $compiled['declarations'] ) ) {
 			$css_rules[] = array(
-				'state'        => $state,
-				'declarations' => $compiled['declarations'],
+				'selector_suffix' => $state,
+				'declarations'    => $compiled['declarations'],
 			);
+		}
+	}
+
+	foreach ( WP_Theme_JSON_Gutenberg::RESPONSIVE_BREAKPOINTS as $breakpoint => $media_query ) {
+		if ( empty( $style[ $breakpoint ] ) || ! is_array( $style[ $breakpoint ] ) ) {
+			continue;
+		}
+
+		$compiled = wp_style_engine_get_styles(
+			gutenberg_normalize_state_style_for_css_output( $style[ $breakpoint ] )
+		);
+		if ( ! empty( $compiled['declarations'] ) ) {
+			$css_rules[] = array(
+				'selector_suffix' => '',
+				'declarations'    => $compiled['declarations'],
+				'rules_group'     => $media_query,
+			);
+		}
+
+		foreach ( $supported_pseudo_states as $state ) {
+			if ( empty( $style[ $breakpoint ][ $state ] ) || ! is_array( $style[ $breakpoint ][ $state ] ) ) {
+				continue;
+			}
+
+			$compiled = wp_style_engine_get_styles(
+				gutenberg_normalize_state_style_for_css_output( $style[ $breakpoint ][ $state ] )
+			);
+			if ( ! empty( $compiled['declarations'] ) ) {
+				$css_rules[] = array(
+					'selector_suffix' => $state,
+					'declarations'    => $compiled['declarations'],
+					'rules_group'     => $media_query,
+				);
+			}
 		}
 	}
 
@@ -136,53 +166,32 @@ function gutenberg_render_block_states_support( $block_content, $block ) {
 	$unique_class = 'wp-states-' . substr( md5( wp_json_encode( $css_rules ) ), 0, 8 );
 
 	/*
-	 * Register each pseudo-state's CSS rules with the block-supports style engine store.
+	 * Register each state's CSS rules with the block-supports style engine store.
 	 * The store deduplicates rules by selector — two block instances with identical
-	 * pseudo-state styles share the same hash class and therefore the same selector,
+	 * state styles share the same hash class and therefore the same selector,
 	 * so only one CSS rule is emitted. The store is flushed to the page by
 	 * gutenberg_enqueue_stored_styles() rather than injected inline here.
 	 *
-	 * Some block support declarations need !important to apply reliably. Preset-backed
-	 * declarations need to override preset utility classes such as .has-accent-3-background-color,
-	 * while border declarations need to override base styles that can be serialized inline.
-	 * Properties that do not have either conflict do not need !important.
+	 * State declarations need !important to apply reliably over inline styles and
+	 * preset utility classes such as .has-accent-3-background-color.
 	 */
-	$important_properties = array(
-		'color',
-		'background-color',
-		'border-color',
-		'border-top-color',
-		'border-right-color',
-		'border-bottom-color',
-		'border-left-color',
-		'border-width',
-		'border-top-width',
-		'border-right-width',
-		'border-bottom-width',
-		'border-left-width',
-		'border-style',
-		'border-top-style',
-		'border-right-style',
-		'border-bottom-style',
-		'border-left-style',
-		'background',
-		'font-size',
-		'font-family',
-	);
-
 	$style_rules = array();
 	foreach ( $css_rules as $rule ) {
 		$declarations = array();
 		foreach ( $rule['declarations'] as $property => $value ) {
-			$declarations[ $property ] = in_array( $property, $important_properties, true )
-				? $value . ' !important'
-				: $value;
+			$declarations[ $property ] = is_string( $value ) && str_contains( $value, '!important' )
+				? $value
+				: $value . ' !important';
 		}
-		$declarations  = gutenberg_get_state_declarations_with_fallback_border_styles( $declarations );
-		$style_rules[] = array(
-			'selector'     => ".$unique_class{$rule['state']}",
+		$declarations = gutenberg_get_state_declarations_with_fallback_border_styles( $declarations );
+		$style_rule   = array(
+			'selector'     => ".$unique_class{$rule['selector_suffix']}",
 			'declarations' => $declarations,
 		);
+		if ( ! empty( $rule['rules_group'] ) ) {
+			$style_rule['rules_group'] = $rule['rules_group'];
+		}
+		$style_rules[] = $style_rule;
 	}
 
 	gutenberg_style_engine_get_stylesheet_from_css_rules(
@@ -193,8 +202,8 @@ function gutenberg_render_block_states_support( $block_content, $block ) {
 		)
 	);
 
-	// Add the unique class to the interactive element so that pseudo-state
-	// selectors like `.$unique_class:hover` match directly without needing a descendant.
+	// Add the unique class to the styled element so that state selectors like
+	// `.$unique_class:hover` match directly without needing a descendant.
 	// If the block declares selectors.root with a descendant (e.g. the button
 	// block's ".wp-block-button .wp-block-button__link"), we extract the last
 	// class and walk to that element. Otherwise we fall back to the wrapper.

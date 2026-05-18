@@ -42,12 +42,18 @@ import {
 } from './utils';
 import {
 	BlockStyleStateProvider,
+	DEFAULT_BLOCK_STYLE_STATE,
 	getStyleForState,
+	hasViewportBlockStyleState,
 	hasPseudoBlockStyleState,
 	isDefaultBlockStyleState,
 } from './block-style-state';
 import { BlockStateBadges, VALID_BLOCK_PSEUDO_STATES } from './states';
-import { buildStateSelector, buildCanvasStateSelector } from './state-utils';
+import {
+	buildStyleStateSelector,
+	buildStateSelector,
+	buildCanvasStateSelector,
+} from './state-utils';
 import { BlockInspectorPreTabsFill } from '../components/block-inspector/inspector-pre-tabs-slot-fill';
 import { scopeSelector } from '../components/global-styles/utils';
 import { useBlockEditingMode } from '../components/block-editing-mode';
@@ -238,7 +244,7 @@ export function getResponsiveStateCSSRules( style, name, baseSelector ) {
 			const viewportCSSRules = [];
 			const rootCSS = getStateStylesCSS(
 				getRootStateStyles( viewportStyles, nestedStateKeys ),
-				baseSelector
+				buildStyleStateSelector( baseSelector, name )
 			);
 			if ( rootCSS ) {
 				viewportCSSRules.push( rootCSS );
@@ -266,6 +272,38 @@ export function getResponsiveStateCSSRules( style, name, baseSelector ) {
 	);
 
 	return cssRules;
+}
+
+/**
+ * Returns the style value used to force-preview a selected state on canvas.
+ *
+ * Responsive pseudo states inherit from their default-viewport pseudo state.
+ * For example, selecting `mobile + :hover` should preview styles from
+ * `:hover`, with `mobile.:hover` values layered on top when present.
+ *
+ * @param {Object} style         Block style object.
+ * @param {Object} selectedState Selected block style state.
+ * @return {Object|undefined} Style value for the canvas preview.
+ */
+export function getCanvasStateStyleValue( style, selectedState ) {
+	const stateValue = getStyleForState( style, selectedState );
+	if ( ! hasViewportBlockStyleState( selectedState ) ) {
+		return stateValue;
+	}
+
+	const defaultViewportState = {
+		...selectedState,
+		viewport: DEFAULT_BLOCK_STYLE_STATE.viewport,
+	};
+	const defaultViewportStateValue = getStyleForState(
+		style,
+		defaultViewportState
+	);
+
+	if ( defaultViewportStateValue && stateValue ) {
+		return mergeGlobalStyles( defaultViewportStateValue, stateValue );
+	}
+	return stateValue || defaultViewportStateValue;
 }
 
 /**
@@ -551,11 +589,11 @@ function BlockStyleControls( {
 		[ clientId, name ]
 	);
 	const isPseudoSelectorState = hasPseudoBlockStyleState( selectedState );
-	const globalStateValue = getStyleForState(
+	const globalStateValue = getCanvasStateStyleValue(
 		globalBlockStyles,
 		selectedState
 	);
-	const instanceStateValue = getStyleForState( style, selectedState );
+	const instanceStateValue = getCanvasStateStyleValue( style, selectedState );
 
 	// Inject state styles onto the editor canvas so the selected state is
 	// visible while editing. Scoped to this block instance via data-block so

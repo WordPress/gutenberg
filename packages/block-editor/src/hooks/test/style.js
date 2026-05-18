@@ -1,7 +1,13 @@
 /**
+ * WordPress dependencies
+ */
+import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
+
+/**
  * Internal dependencies
  */
 import _style, {
+	getCanvasStateStyleValue,
 	getInlineStyles,
 	getResponsiveStateCSSRules,
 	getStateStylesCSS,
@@ -204,6 +210,24 @@ describe( 'getStateStylesCSS', () => {
 } );
 
 describe( 'getResponsiveStateCSSRules', () => {
+	beforeEach( () => {
+		registerBlockType( 'test/button', {
+			apiVersion: 3,
+			title: 'Button',
+			category: 'text',
+			attributes: {},
+			edit: () => null,
+			save: () => null,
+			selectors: {
+				root: '.wp-block-button .wp-block-button__link',
+			},
+		} );
+	} );
+
+	afterEach( () => {
+		unregisterBlockType( 'test/button' );
+	} );
+
 	it( 'generates media-query scoped root styles for viewport states', () => {
 		expect(
 			getResponsiveStateCSSRules(
@@ -217,6 +241,22 @@ describe( 'getResponsiveStateCSSRules', () => {
 			)
 		).toEqual( [
 			'@media (width <= 480px){.wp-elements-1 { color: red !important; }}',
+		] );
+	} );
+
+	it( 'generates media-query scoped root styles for descendant root selectors', () => {
+		expect(
+			getResponsiveStateCSSRules(
+				{
+					mobile: {
+						color: { text: 'red' },
+					},
+				},
+				'test/button',
+				'.wp-elements-1'
+			)
+		).toEqual( [
+			'@media (width <= 480px){.wp-elements-1 .wp-block-button__link { color: red !important; }}',
 		] );
 	} );
 
@@ -256,6 +296,58 @@ describe( 'getResponsiveStateCSSRules', () => {
 		).toEqual( [
 			'@media (width <= 480px){.wp-elements-1 a:where(:not(.wp-element-button)) { color: blue; }}',
 		] );
+	} );
+} );
+
+describe( 'getCanvasStateStyleValue', () => {
+	it( 'returns the selected pseudo state value without a viewport state', () => {
+		expect(
+			getCanvasStateStyleValue(
+				{
+					':hover': {
+						color: { text: 'red' },
+					},
+				},
+				{ viewport: 'default', pseudo: ':hover' }
+			)
+		).toEqual( {
+			color: { text: 'red' },
+		} );
+	} );
+
+	it( 'falls back to default viewport pseudo styles for responsive pseudo states', () => {
+		expect(
+			getCanvasStateStyleValue(
+				{
+					':hover': {
+						color: { text: 'red' },
+					},
+				},
+				{ viewport: 'mobile', pseudo: ':hover' }
+			)
+		).toEqual( {
+			color: { text: 'red' },
+		} );
+	} );
+
+	it( 'merges responsive pseudo styles over default viewport pseudo styles', () => {
+		expect(
+			getCanvasStateStyleValue(
+				{
+					':hover': {
+						color: { background: 'blue', text: 'red' },
+					},
+					mobile: {
+						':hover': {
+							color: { text: 'yellow' },
+						},
+					},
+				},
+				{ viewport: 'mobile', pseudo: ':hover' }
+			)
+		).toEqual( {
+			color: { background: 'blue', text: 'yellow' },
+		} );
 	} );
 } );
 

@@ -55,7 +55,7 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Mirrors the CSS-building logic in gutenberg_render_block_states_support()
+	 * Mirrors the pseudo-state CSS-building logic in gutenberg_render_block_states_support()
 	 * to produce the unique scoped class name for a given map of state => style arrays.
 	 * CSS is now registered with the style engine store rather than injected inline.
 	 *
@@ -70,8 +70,8 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 			);
 			if ( ! empty( $compiled['declarations'] ) ) {
 				$css_rules[] = array(
-					'state'        => $state,
-					'declarations' => $compiled['declarations'],
+					'selector_suffix' => $state,
+					'declarations'    => $compiled['declarations'],
 				);
 			}
 		}
@@ -650,6 +650,77 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 		$actual = gutenberg_render_block_states_support( $block_content, $block );
 
 		$this->assertSame( $block_content, $actual );
+	}
+
+	/**
+	 * Tests that a responsive root state generates media-query scoped CSS.
+	 *
+	 * @covers ::gutenberg_render_block_states_support
+	 */
+	public function test_responsive_root_state_generates_media_query_scoped_css() {
+		$this->ensure_block_registered( 'core/paragraph' );
+
+		$block_content = '<p class="wp-block-paragraph">Hello</p>';
+		$block         = array(
+			'blockName' => 'core/paragraph',
+			'attrs'     => array(
+				'style' => array(
+					'mobile' => array( 'color' => array( 'text' => '#ff0000' ) ),
+				),
+			),
+		);
+
+		$actual = gutenberg_render_block_states_support( $block_content, $block );
+
+		$this->assertMatchesRegularExpression(
+			'/^<p class="wp-block-paragraph (wp-states-[a-f0-9]{8})">Hello<\/p>$/',
+			$actual
+		);
+		preg_match( '/wp-states-[a-f0-9]{8}/', $actual, $matches );
+		$actual_stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) );
+
+		$this->assertStringContainsString(
+			'@media (width <= 480px){.' . $matches[0] . '{color:#ff0000 !important;}}',
+			$actual_stylesheet
+		);
+	}
+
+	/**
+	 * Tests that a responsive pseudo-state generates media-query scoped CSS.
+	 *
+	 * @covers ::gutenberg_render_block_states_support
+	 */
+	public function test_responsive_pseudo_state_generates_media_query_scoped_css() {
+		$this->ensure_block_registered(
+			'core/button',
+			array( 'root' => '.wp-block-button .wp-block-button__link' )
+		);
+
+		$block_content = '<div class="wp-block-button"><a class="wp-block-button__link">Click me</a></div>';
+		$block         = array(
+			'blockName' => 'core/button',
+			'attrs'     => array(
+				'style' => array(
+					'mobile' => array(
+						':hover' => array( 'color' => array( 'background' => '#ff00d0' ) ),
+					),
+				),
+			),
+		);
+
+		$actual = gutenberg_render_block_states_support( $block_content, $block );
+
+		$this->assertMatchesRegularExpression(
+			'/^<div class="wp-block-button"><a class="wp-block-button__link (wp-states-[a-f0-9]{8})">Click me<\/a><\/div>$/',
+			$actual
+		);
+		preg_match( '/wp-states-[a-f0-9]{8}/', $actual, $matches );
+		$actual_stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) );
+
+		$this->assertStringContainsString(
+			'@media (width <= 480px){.' . $matches[0] . ':hover{background-color:#ff00d0 !important;}}',
+			$actual_stylesheet
+		);
 	}
 
 	/**

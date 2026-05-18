@@ -6,7 +6,11 @@ import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
-import { getRelativeRootSelector, buildStateSelector } from '../state-utils';
+import {
+	getRelativeRootSelector,
+	buildStyleStateSelector,
+	buildStateSelector,
+} from '../state-utils';
 
 describe( 'getRelativeRootSelector', () => {
 	it( 'returns the descendant part of a space-combinator selector', () => {
@@ -32,7 +36,7 @@ describe( 'getRelativeRootSelector', () => {
 	} );
 } );
 
-describe( 'buildStateSelector', () => {
+describe( 'state selector builders', () => {
 	const BASE = '.wp-elements-abc123';
 
 	beforeEach( () => {
@@ -62,7 +66,17 @@ describe( 'buildStateSelector', () => {
 		unregisterBlockType( 'test/plain' );
 	} );
 
-	it( 'scopes state to the descendant element from selectors.root', () => {
+	it( 'scopes root state styles to the descendant element from selectors.root', () => {
+		expect( buildStyleStateSelector( BASE, 'test/button' ) ).toBe(
+			`${ BASE } .wp-block-button__link`
+		);
+	} );
+
+	it( 'falls back to the base selector when block has no selectors.root', () => {
+		expect( buildStyleStateSelector( BASE, 'test/plain' ) ).toBe( BASE );
+	} );
+
+	it( 'scopes pseudo states to the descendant element from selectors.root', () => {
 		expect( buildStateSelector( BASE, 'test/button', ':hover' ) ).toBe(
 			`${ BASE } .wp-block-button__link:hover`
 		);
