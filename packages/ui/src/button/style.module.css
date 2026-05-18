@@ -17,6 +17,7 @@
 		--wp-ui-button-foreground-color: var(--wpds-color-fg-interactive-brand-strong);
 		--wp-ui-button-foreground-color-active: var(--wpds-color-fg-interactive-brand-strong-active);
 		--wp-ui-button-foreground-color-disabled: var(--wpds-color-fg-interactive-neutral-strong-disabled);
+		--wp-ui-button-padding-block: var(--wpds-dimension-padding-xs);
 		--wp-ui-button-padding-inline: var(--wpds-dimension-padding-md);
 		--wp-ui-button-height: 40px;
 		--wp-ui-button-aspect-ratio: auto; /* Useful for overrides such as icon buttons */
@@ -40,7 +41,9 @@
 		gap: var(--wpds-dimension-gap-sm);
 		aspect-ratio: var(--wp-ui-button-aspect-ratio);
 		min-width: var(--wp-ui-button-min-width);
-		height: var(--wp-ui-button-height);
+		max-width: 100%;
+		min-height: var(--wp-ui-button-height);
+		padding-block: var(--wp-ui-button-padding-block);
 		padding-inline: var(--wp-ui-button-padding-inline);
 		border-style: solid;
 		border-width: 1px;
@@ -52,8 +55,10 @@
 		font-size: var(--wp-ui-button-font-size);
 		font-weight: var(--wp-ui-button-font-weight);
 		line-height: var(--wpds-typography-line-height-sm);
+		text-align: center;
 		text-decoration: none;
 		color: var(--wp-ui-button-foreground-color);
+		overflow-wrap: anywhere;
 		cursor: var(--wpds-cursor-control);
 
 		@media not ( prefers-reduced-motion ) {
@@ -129,6 +134,7 @@
 	}
 
 	.is-small {
+		--wp-ui-button-padding-block: 0;
 		--wp-ui-button-padding-inline: var(--wpds-dimension-padding-sm);
 		--wp-ui-button-height: 24px;
 	}

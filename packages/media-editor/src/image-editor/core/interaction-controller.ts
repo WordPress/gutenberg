@@ -62,7 +62,11 @@ export interface InteractionStatus {
 export interface CropperInteractionActions {
 	/** Set the image pan offset in normalized coordinates. */
 	setPan: ( pan: NormalizedPoint ) => void;
-	/** Set the zoom level. */
+	/**
+	 * Set the zoom level. Cursorless surfaces (slider, keyboard `+`/`-`)
+	 * rely on this anchoring at the crop center; pointer-driven zoom
+	 * paths use `setZoomAtPoint` with an explicit focal point instead.
+	 */
 	setZoom: ( zoom: number ) => void;
 	/** Set zoom and pan together for focal-point zoom. */
 	setZoomAtPoint: ( zoom: number, pan: NormalizedPoint ) => void;

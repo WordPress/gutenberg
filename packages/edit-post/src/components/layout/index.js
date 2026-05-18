@@ -38,9 +38,9 @@ import { addQueryArgs } from '@wordpress/url';
 import { decodeEntities } from '@wordpress/html-entities';
 import { store as coreStore } from '@wordpress/core-data';
 import {
-	Icon,
+	Icon as WCIcon,
 	SlotFillProvider,
-	Tooltip,
+	Tooltip as WCTooltip,
 	__unstableUseNavigateRegions as useNavigateRegions,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
@@ -321,14 +321,14 @@ function MetaBoxesMain( { isLegacy } ) {
 			{ ...( ! isShort && bindDragGesture( persistIsOpen ) ) }
 		>
 			{ paneLabel }
-			<Icon icon={ isOpen ? chevronUp : chevronDown } />
+			<WCIcon icon={ isOpen ? chevronUp : chevronDown } />
 		</button>
 	);
 
 	// The separator button that provides a11y for resizing.
 	const separator = ! isShort && (
 		<>
-			<Tooltip text={ __( 'Drag to resize' ) }>
+			<WCTooltip text={ __( 'Drag to resize' ) }>
 				<button
 					ref={ separatorRef }
 					role="separator" // eslint-disable-line jsx-a11y/no-interactive-element-to-noninteractive-role
@@ -337,7 +337,7 @@ function MetaBoxesMain( { isLegacy } ) {
 					aria-describedby={ separatorHelpId }
 					{ ...bindDragGesture() }
 				/>
-			</Tooltip>
+			</WCTooltip>
 			<VisuallyHidden id={ separatorHelpId }>
 				{ __(
 					'Use up and down arrow keys to resize the meta box pane.'

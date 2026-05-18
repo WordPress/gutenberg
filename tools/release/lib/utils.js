@@ -2,12 +2,12 @@
  * External dependencies
  */
 // @ts-ignore
-const { confirm } = require( '@inquirer/prompts' );
 const fs = require( 'fs' );
 const childProcess = require( 'child_process' );
 const { randomUUID } = require( 'crypto' );
 const path = require( 'path' );
 const os = require( 'os' );
+const { confirm } = require( '@inquirer/prompts' );
 
 /**
  * Internal dependencies
@@ -40,6 +40,7 @@ function runShellScript( script, cwd, env = {} ) {
 			function ( error, stdout, stderr ) {
 				if ( error ) {
 					console.log( stdout ); // Sometimes the error message is thrown via stdout.
+
 					console.log( stderr );
 					reject( error );
 				} else {
