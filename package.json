@@ -153,6 +153,8 @@
 		"postinstall": "patch-package && node ./patches/patch-xcode.js",
 		"prepare": "husky install",
 		"prepublishOnly": "npm run build",
+		"rtc:http": "node ./test/e2e/bin/rtc-dev.mjs --mode=http",
+		"rtc:ws": "node ./test/e2e/bin/rtc-dev.mjs --mode=websockets",
 		"start": "npm run dev",
 		"prestorybook:build": "npm run build -- --skip-types",
 		"storybook:build": "npm run --workspace @wordpress/storybook storybook:build",
