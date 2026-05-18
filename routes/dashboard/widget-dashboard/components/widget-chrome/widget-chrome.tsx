@@ -177,10 +177,12 @@ function HeaderActions( {
 								<MenuItem
 									key={ mode }
 									role="menuitemradio"
-									icon={
-										isSelected
-											? check
-											: WIDTH_MODE_ICON[ mode ]
+									icon={ WIDTH_MODE_ICON[ mode ] }
+									iconPosition="left"
+									suffix={
+										isSelected ? (
+											<Icon icon={ check } />
+										) : undefined
 									}
 									isSelected={ isSelected }
 									onClick={ () => {
