@@ -566,11 +566,9 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 		);
 
 		const layoutAnimating =
-			editMode &&
-			( isResizing || temporaryLayout !== undefined );
+			editMode && ( isResizing || temporaryLayout !== undefined );
 		const layoutFingerprint = useMemo(
-			() =>
-				getLayoutFingerprint( [ ...resolvedItemMap.values() ] ),
+			() => getLayoutFingerprint( [ ...resolvedItemMap.values() ] ),
 			[ resolvedItemMap ]
 		);
 		const excludeLayoutAnimationKey =
