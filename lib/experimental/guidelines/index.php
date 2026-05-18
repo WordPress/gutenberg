@@ -21,6 +21,24 @@ require_once __DIR__ . '/class-gutenberg-content-guidelines-rest-controller.php'
  */
 add_action( 'init', array( 'Gutenberg_Guidelines_Post_Type', 'register' ) );
 
+/*
+ * Ensure the post type is registered before any other `rest_api_init` callback
+ * runs. `init` normally fires before `rest_api_init`, but anything that calls
+ * `rest_get_server()` early (e.g. from `plugins_loaded`) fires `rest_api_init`
+ * before `init` priority 10. The callbacks below — both `register_post_meta`
+ * and the controller instantiations — dereference the post type object and
+ * would fatal (or trip `_doing_it_wrong`) without this guard.
+ */
+add_action(
+	'rest_api_init',
+	static function () {
+		if ( ! post_type_exists( Gutenberg_Guidelines_Post_Type::POST_TYPE ) ) {
+			Gutenberg_Guidelines_Post_Type::register();
+		}
+	},
+	1
+);
+
 // Register post meta once the REST API loads and the block registry is available.
 add_action( 'rest_api_init', array( 'Gutenberg_Guidelines_Post_Type', 'register_post_meta' ) );
 

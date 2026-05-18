@@ -73,17 +73,12 @@ interface BaseDashboardLanesProps
 
 	/**
 	 * Inline styles on the surface root. Merged underneath the
-	 * surface's own layout styles, so `display`, `gridTemplateColumns`,
-	 * and `gap` always win.
+	 * surface's own layout styles, so `display` and
+	 * `gridTemplateColumns` always win. The gap between tiles is
+	 * owned by the design-system gap token and is not configurable
+	 * per instance; override it via a theme or density change.
 	 */
 	style?: React.CSSProperties;
-
-	/**
-	 * Gap multiplier (effective gap = `spacing * 4px`).
-	 *
-	 * @default 2
-	 */
-	spacing?: number;
 
 	/**
 	 * `flow-tolerance` value in pixels. When two candidate lanes

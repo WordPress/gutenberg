@@ -12,7 +12,10 @@ import type { ComponentType, ReactNode } from 'react';
  */
 import type { IconType } from '@wordpress/components';
 import type { Field } from '@wordpress/dataviews';
-import type { DashboardGridLayoutItem } from '@wordpress/grid';
+import type {
+	DashboardGridLayoutItem,
+	DashboardLanesLayoutItem,
+} from '@wordpress/grid';
 
 /*
  * MIGRATION: `WidgetName`, `WidgetTypeMetadata`, and `WidgetType` below
@@ -142,23 +145,35 @@ export interface WidgetType extends WidgetTypeMetadata {
 }
 
 export type GridTilePlacement = Omit< DashboardGridLayoutItem, 'key' >;
+export type MasonryTilePlacement = Omit< DashboardLanesLayoutItem, 'key' >;
+
+/**
+ * Storage shape for a widget's placement.
+ *
+ * Structurally a union of every supported per-model shape, but the
+ * intended invariant is stronger than the type suggests: every
+ * placement in a given layout must match the shape of the currently
+ * active `gridSettings.model`. `migrateLayout` is the only correct
+ * way to transition placements across model changes; the render
+ * layer is allowed to trust the active model and treat each
+ * placement as the matching shape.
+ *
+ * The type system cannot enforce that invariant on its own (there is
+ * no discriminator on the placement itself), so consider this union a
+ * declaration of which shapes are *valid*, not which shape any given
+ * placement happens to be at runtime.
+ */
+export type DashboardTilePlacement = GridTilePlacement | MasonryTilePlacement;
 
 /**
  * A widget placed on the dashboard.
  *
- * A `WidgetType` describes the blueprint. A `DashboardWidget` is a concrete
- * placement of that type on a specific dashboard: its unique id, the type it
- * references, user-configured attributes, and its `placement` in the grid.
- *
- * The `Placement` generic defaults to the packed grid's item shape
- * (`DashboardGridLayoutItem` minus `key`, which the engine derives from
- * `uuid`). A different grid model — masonry, stack, absolute — would use a
- * different `Placement` shape; the widget identity stays unchanged.
+ * A `WidgetType` describes the blueprint. A `DashboardWidget` is a
+ * concrete placement of that type on a specific dashboard: its unique
+ * id, the type it references, user-configured attributes, and its
+ * `placement` in the grid.
  */
-export interface DashboardWidget<
-	Item = unknown,
-	Placement = GridTilePlacement,
-> {
+export interface DashboardWidget< Item = unknown > {
 	/**
 	 * Unique instance identifier.
 	 */
@@ -175,9 +190,12 @@ export interface DashboardWidget<
 	attributes?: Item;
 
 	/**
-	 * Grid-model-specific placement (column/row spans, ordering, etc.).
+	 * Grid-model-specific placement (column/row spans, ordering,
+	 * etc.). Must match the shape implied by the dashboard's active
+	 * `gridSettings.model`; see `DashboardTilePlacement` for the
+	 * invariant and `migrateLayout` for the transition mechanism.
 	 */
-	placement?: Placement;
+	placement?: DashboardTilePlacement;
 }
 
 /**
@@ -234,39 +252,81 @@ export type ResolveWidgetModule = (
 ) => Promise< WidgetModule >;
 
 /**
- * Grid-model configuration. Today maps to `@wordpress/grid`'s settings.
- * When alternative grid models (masonry, stack, ...) ship, this type
- * becomes a discriminated union keyed by the chosen model and per-model
- * settings are inferred from the model's own props.
+ * Identifier for the active grid model. Drives which `@wordpress/grid`
+ * surface the dashboard mounts and which per-model settings the
+ * `WidgetGridSettings` union admits.
  *
- * `columns` and `minColumnWidth` are mutually exclusive at runtime — set
- * either one or the other depending on whether you want a fixed or
- * responsive grid. The dashboard does not enforce the xor at the type
- * level so `react-docgen-typescript` (Storybook) can serialize the prop
- * cleanly; the underlying grid component handles the conflict.
+ * Model names describe user-facing concepts. The mapping to the
+ * underlying `@wordpress/grid` component is an implementation detail
+ * resolved in the render layer; `'masonry'` is rendered today through
+ * `DashboardLanes` (skyline placement) but could swap to a future
+ * native `display: grid-lanes` path without affecting the model name.
  */
-export interface WidgetGridSettings {
+export type WidgetGridModel = 'grid' | 'masonry';
+
+/**
+ * Settings common to every grid model. `columns` and `minColumnWidth`
+ * are mutually exclusive at runtime; the underlying grid component
+ * handles the conflict so the dashboard does not enforce the xor at
+ * the type level (keeps `react-docgen-typescript` serialization clean).
+ *
+ * `spacing` is intentionally absent: the gap between tiles is
+ * presentational and lives with the design-system theme/density, not
+ * with per-dashboard settings. The grid surface keeps the prop for
+ * programmatic overrides, but the dashboard does not propagate it.
+ */
+interface BaseWidgetGridSettings {
 	/**
 	 * Fixed column count. Mutually exclusive with `minColumnWidth`.
 	 */
 	columns?: number;
 
 	/**
-	 * Responsive minimum column width in pixels. Mutually exclusive with
-	 * `columns`.
+	 * Responsive minimum column width in pixels. Mutually exclusive
+	 * with `columns`.
 	 */
 	minColumnWidth?: number;
+}
+
+/**
+ * 2D packed grid settings. Items declare explicit width and height
+ * spans; rows can be uniform-sized or content-sized via `rowHeight`.
+ */
+export interface WidgetGridLayoutSettings extends BaseWidgetGridSettings {
+	model?: 'grid';
 
 	/**
-	 * Row height in pixels, or `'auto'`.
+	 * Row height in pixels, or `'auto'` to let the tallest item in
+	 * each row size it.
 	 */
 	rowHeight?: number | 'auto';
+}
+
+/**
+ * Masonry settings. Heights are content-driven; resize is
+ * horizontal-only. `flowTolerance` tunes how aggressively the placer
+ * preserves source order vs. minimizing empty regions.
+ */
+export interface WidgetMasonryLayoutSettings extends BaseWidgetGridSettings {
+	model: 'masonry';
 
 	/**
-	 * Grid gap multiplier (multiplied by 4px).
+	 * Pixel tolerance for source-order tiebreaking when two candidate
+	 * columns have similar baselines.
 	 */
-	spacing?: number;
+	flowTolerance?: number;
 }
+
+/**
+ * Discriminated union of supported grid-model configurations.
+ *
+ * When `model` is omitted the dashboard treats the settings as the
+ * 2D packed grid (`'grid'`) for backwards compatibility with the
+ * pre-union shape.
+ */
+export type WidgetGridSettings =
+	| WidgetGridLayoutSettings
+	| WidgetMasonryLayoutSettings;
 
 /**
  * Props for `WidgetDashboard`.
@@ -322,6 +382,15 @@ export interface WidgetDashboardProps {
 	 * Grid model configuration. See `WidgetGridSettings` for the shape.
 	 */
 	gridSettings?: WidgetGridSettings;
+
+	/**
+	 * Called when the user commits in-progress grid-settings edits via
+	 * the Done action. The dashboard maintains a staging copy of
+	 * settings internally; mutations stay local until commit. When
+	 * omitted, the `Layout settings` entry in the more-actions menu is
+	 * hidden, since there is nowhere to persist the change.
+	 */
+	onGridSettingsChange?: ( gridSettings: WidgetGridSettings ) => void;
 
 	children?: ReactNode;
 }
