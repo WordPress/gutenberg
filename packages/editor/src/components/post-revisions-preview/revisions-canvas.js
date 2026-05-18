@@ -66,6 +66,10 @@ const REVISION_DIFF_STYLES = `
 		text-decoration: line-through;
 		filter: url(#revision-removed-filter);
 	}
+	.is-revision-removed {
+		outline: 3px dashed #d63638;
+		outline-offset: 2px;
+	}
 	.is-revision-modified {
 		outline: 2px solid color-mix(in srgb, currentColor 30%, #dba617 70%) !important;
 		outline-offset: 2px;
