@@ -703,8 +703,15 @@ export function prepareItem( id: QueueItemId ) {
 			typeof ImageDecoder !== 'undefined' &&
 			typeof VideoEncoder !== 'undefined'
 		) {
-			const buffer = await file.arrayBuffer();
-			if ( isAnimatedGif( buffer ) ) {
+			let isAnimated = false;
+			try {
+				isAnimated = isAnimatedGif( await file.arrayBuffer() );
+			} catch {
+				// If the GIF cannot be read/inspected, fall through to the
+				// normal image pipeline rather than failing the upload.
+				isAnimated = false;
+			}
+			if ( isAnimated ) {
 				const outputFormat =
 					settings.videoOutputFormat === 'video/webm'
 						? 'webm'

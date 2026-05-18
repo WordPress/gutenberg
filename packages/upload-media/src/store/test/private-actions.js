@@ -475,5 +475,84 @@ describe( 'private actions', () => {
 				OperationType.TranscodeGif
 			);
 		} );
+
+		it( 'does not enqueue TranscodeGif for a static (single-frame) GIF', async () => {
+			// A static GIF has the "GIF89a" header but only one
+			// Graphic Control Extension block (0x00,0x21,0xf9), so
+			// isAnimatedGif() returns false.
+			const staticGifBytes = new Uint8Array( [
+				0x47, 0x49, 0x46, 0x38, 0x39, 0x61, 0x00, 0x21, 0xf9,
+			] );
+			const file = new File( [ staticGifBytes ], 'static.gif', {
+				type: 'image/gif',
+			} );
+			const item = {
+				id: 'gif-static-id',
+				file,
+				additionalData: {},
+			};
+
+			let dispatchedOperations;
+			const dispatch = ( action ) => {
+				if ( action?.type === 'ADD_OPERATIONS' ) {
+					dispatchedOperations = action.operations;
+				}
+			};
+			dispatch.cancelItem = jest.fn();
+			dispatch.finishOperation = jest.fn();
+
+			const select = {
+				getItem: () => item,
+				getSettings: () => ( {} ),
+			};
+
+			const thunk = prepareItem( 'gif-static-id' );
+			await thunk( { select, dispatch } );
+
+			// Static GIF falls through to the normal image pipeline (no TranscodeGif).
+			expect(
+				flattenOperations( dispatchedOperations || [] )
+			).not.toContain( OperationType.TranscodeGif );
+		} );
+
+		it( 'does not enqueue TranscodeGif when gifConvert is false', async () => {
+			// An animated GIF (two Graphic Control Extension blocks) with
+			// gifConvert:false in settings should skip the transcode path.
+			const animatedBytes = new Uint8Array( [
+				0x47, 0x49, 0x46, 0x38, 0x39, 0x61, 0x00, 0x21, 0xf9, 0x00,
+				0x21, 0xf9,
+			] );
+			const file = new File( [ animatedBytes ], 'animated.gif', {
+				type: 'image/gif',
+			} );
+			const item = {
+				id: 'gif-optout-id',
+				file,
+				additionalData: {},
+			};
+
+			let dispatchedOperations;
+			const dispatch = ( action ) => {
+				if ( action?.type === 'ADD_OPERATIONS' ) {
+					dispatchedOperations = action.operations;
+				}
+			};
+			dispatch.cancelItem = jest.fn();
+			dispatch.finishOperation = jest.fn();
+
+			const select = {
+				getItem: () => item,
+				// gifConvert:false opts out of the animated-GIF conversion path.
+				getSettings: () => ( { gifConvert: false } ),
+			};
+
+			const thunk = prepareItem( 'gif-optout-id' );
+			await thunk( { select, dispatch } );
+
+			// gifConvert:false bypasses the detection branch entirely.
+			expect(
+				flattenOperations( dispatchedOperations || [] )
+			).not.toContain( OperationType.TranscodeGif );
+		} );
 	} );
 } );
