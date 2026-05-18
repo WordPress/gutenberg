@@ -39,9 +39,8 @@ function runShellScript( script, cwd, env = {} ) {
 			},
 			function ( error, stdout, stderr ) {
 				if ( error ) {
-					// eslint-disable-next-line no-console
 					console.log( stdout ); // Sometimes the error message is thrown via stdout.
-					// eslint-disable-next-line no-console
+
 					console.log( stderr );
 					reject( error );
 				} else {
@@ -107,7 +106,6 @@ async function askForConfirmation(
 		} );
 	} catch ( error ) {
 		if ( error instanceof Error && error.name === 'ExitPromptError' ) {
-			// eslint-disable-next-line no-console
 			console.log( 'Cancelled.' );
 			process.exit( 1 );
 		}
@@ -138,7 +136,6 @@ function getRandomTemporaryPath() {
  */
 function getFilesFromDir( dir ) {
 	if ( ! fs.existsSync( dir ) ) {
-		// eslint-disable-next-line no-console
 		console.log( 'Directory does not exist: ', dir );
 		return [];
 	}

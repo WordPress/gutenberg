@@ -10,7 +10,6 @@ const catchException = ( command ) => {
 		try {
 			await command( ...args );
 		} catch ( error ) {
-			// eslint-disable-next-line no-console
 			console.error( error );
 			process.exitCode = 1;
 		}
