@@ -533,7 +533,7 @@ Content before this block will be shown in the excerpt on your archives page. ([
 
 ## Navigation
 
-A collection of blocks that allow visitors to get around your site. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/navigation))
+A collection of blocks that help visitors navigate through your site. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/navigation))
 
 -	**Name:** core/navigation
 -	**Category:** theme

@@ -18,7 +18,7 @@
 		"core/loginout",
 		"core/buttons"
 	],
-	"description": "A collection of blocks that allow visitors to get around your site.",
+	"description": "A collection of blocks that help visitors navigate through your site.",
 	"keywords": [ "menu", "navigation", "links" ],
 	"textdomain": "default",
 	"attributes": {
