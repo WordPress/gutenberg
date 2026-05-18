@@ -341,7 +341,7 @@ async function addPageContent( editor, page ) {
 		'role=listbox[name="Blocks"i] >> role=option[name="Group"i]'
 	);
 	await editor.canvas
-		.locator( 'role=button[name="Group: Gather blocks in a container."i]' )
+		.locator( 'role=button[name="Group: Gathers blocks in a container."i]' )
 		.click();
 	await editor.canvas.locator( 'role=button[name="Add block"i]' ).click();
 	await page.click(
@@ -355,7 +355,7 @@ async function addPageContent( editor, page ) {
 	).toBeVisible();
 	await page.keyboard.press( 'Enter' );
 	await editor.canvas
-		.locator( 'role=button[name="Group: Gather blocks in a container."i]' )
+		.locator( 'role=button[name="Group: Gathers blocks in a container."i]' )
 		.click();
 	await editor.canvas.locator( 'role=button[name="Add block"i]' ).click();
 	await page.click(
@@ -369,7 +369,7 @@ async function addPageContent( editor, page ) {
 	).toBeVisible();
 	await page.keyboard.press( 'Enter' );
 	await editor.canvas
-		.locator( 'role=button[name="Group: Gather blocks in a container."i]' )
+		.locator( 'role=button[name="Group: Gathers blocks in a container."i]' )
 		.click();
 	await editor.canvas.locator( 'role=button[name="Add block"i]' ).click();
 	await page.click(

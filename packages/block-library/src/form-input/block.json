@@ -6,7 +6,7 @@
 	"title": "Input Field",
 	"category": "widgets",
 	"ancestor": [ "core/form" ],
-	"description": "The basic building block for forms.",
+	"description": "Provides the basic building block for forms.",
 	"keywords": [ "input", "form" ],
 	"textdomain": "default",
 	"attributes": {

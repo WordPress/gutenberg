@@ -201,7 +201,7 @@ test.describe( 'Navigating the block hierarchy', () => {
 		await editor.insertBlock( { name: 'core/group' } );
 		await editor.canvas
 			.locator(
-				'role=button[name="Group: Gather blocks in a container."i]'
+				'role=button[name="Group: Gathers blocks in a container."i]'
 			)
 			.click();
 

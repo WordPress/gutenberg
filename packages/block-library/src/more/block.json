@@ -4,7 +4,7 @@
 	"name": "core/more",
 	"title": "More",
 	"category": "design",
-	"description": "Content before this block will be shown in the excerpt on your archives page.",
+	"description": "Displays content before this block in the excerpt on your archives page.",
 	"keywords": [ "read more" ],
 	"textdomain": "default",
 	"attributes": {

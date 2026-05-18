@@ -157,7 +157,7 @@ test.describe( 'Block variations', () => {
 		await expect(
 			page.locator( '.block-editor-block-card__description' )
 		).toHaveText(
-			'Give quoted text visual emphasis. "In quoting others, we cite ourselves." — Julio Cortázar'
+			'Gives quoted text visual emphasis. "In quoting others, we cite ourselves." — Julio Cortázar'
 		);
 	} );
 
@@ -235,6 +235,8 @@ test.describe( 'Block variations', () => {
 		// Warning Message variation is missing the `description`.
 		await expect(
 			page.locator( '.block-editor-block-card__description' )
-		).toHaveText( 'Start with the basic building block of all narrative.' );
+		).toHaveText(
+			'Starts with the basic building block of all narrative.'
+		);
 	} );
 } );

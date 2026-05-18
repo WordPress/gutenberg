@@ -96,7 +96,7 @@ test.describe( 'Order of block keyboard navigation', () => {
 		await editor.insertBlock( { name: 'core/group' } );
 		// Select the default, selected Group layout from the variation picker.
 		const groupButton = editor.canvas.locator(
-			'button[aria-label="Group: Gather blocks in a container."]'
+			'button[aria-label="Group: Gathers blocks in a container."]'
 		);
 
 		await groupButton.click();

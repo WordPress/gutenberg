@@ -6,7 +6,7 @@
 	"category": "media",
 	"usesContext": [ "galleryId" ],
 	"allowedBlocks": [ "core/image" ],
-	"description": "Display multiple images in a rich gallery.",
+	"description": "Displays multiple images in a rich gallery.",
 	"keywords": [ "images", "photos" ],
 	"textdomain": "default",
 	"attributes": {

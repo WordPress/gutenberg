@@ -90,11 +90,11 @@ Every block should include a description that clearly explains the block's funct
 
 You can add a description by using the description attribute in the [registerBlockType function](/docs/reference-guides/block-api/block-registration.md).
 
-Stick to a single imperative sentence with an action + subject format. Examples:
+Stick to a single third person sentence with an action + subject format. Examples:
 
--   Start with the basic building block of all narrative.
--   Introduce new sections and organize content to help visitors (and search engines) understand the structure of your content.
--   Create a bulleted or numbered list.
+-   Starts with the basic building block of all narrative.
+-   Introduces new sections and organize content to help visitors (and search engines) understand the structure of your content.
+-   Creates a bulleted or numbered list.
 
 ![A screenshot of a short block description](https://developer.wordpress.org/files/2022/01/block-descriptions-do.png)
 **Do:**

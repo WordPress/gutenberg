@@ -4,7 +4,7 @@
 	"name": "core/post-comments-form",
 	"title": "Comments Form",
 	"category": "theme",
-	"description": "Display a post's comments form.",
+	"description": "Displays a post's comments form.",
 	"textdomain": "default",
 	"usesContext": [ "postId", "postType" ],
 	"supports": {
