@@ -58,9 +58,21 @@
 		"useFirstImageFromPost": {
 			"type": "boolean",
 			"default": false
+		},
+		"caption": {
+			"type": "rich-text",
+			"source": "rich-text",
+			"selector": "figcaption",
+			"role": "content"
 		}
 	},
-	"usesContext": [ "postId", "postType", "queryId" ],
+	"usesContext": [
+		"postId",
+		"postType",
+		"queryId",
+		"imageCrop",
+		"allowResize"
+	],
 	"example": {
 		"viewportWidth": 350
 	},
