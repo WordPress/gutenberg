@@ -15,6 +15,7 @@ import { __ } from '@wordpress/i18n';
  */
 import DataViewsContext from '../dataviews-context';
 import { VIEW_LAYOUTS } from '../dataviews-layouts';
+import { getRegisteredLayout } from '../dataviews-layouts/registry';
 import { useDelayedLoading } from '../../hooks/use-delayed-loading';
 import type { ViewBaseProps } from '../../types';
 
@@ -65,9 +66,22 @@ export default function DataViewsLayout( { className }: DataViewsLayoutProps ) {
 		);
 	}
 
-	const ViewComponent = VIEW_LAYOUTS.find(
-		( v ) => v.type === view.type && defaultLayouts[ v.type ]
-	)?.component as ComponentType< ViewBaseProps< any > >;
+	// Built-ins keep their defaultLayouts gate (used by consumers to opt a
+	// specific DataViews instance into a subset of layouts). Layouts added
+	// via registerLayout() are global and skip the gate — requiring every
+	// consumer to enumerate custom types in defaultLayouts would defeat the
+	// point of a plugin API.
+	//
+	// The `v.type as keyof typeof defaultLayouts` cast restores the narrowing
+	// that ViewCustom's addition to the View union took away.
+	const ViewComponent = ( VIEW_LAYOUTS.find(
+		( v ) =>
+			v.type === view.type &&
+			defaultLayouts[ v.type as keyof typeof defaultLayouts ]
+	)?.component ??
+		getRegisteredLayout( view.type )?.component ) as ComponentType<
+		ViewBaseProps< any >
+	>;
 
 	return (
 		<div className="dataviews-layout__container" ref={ containerRef }>
