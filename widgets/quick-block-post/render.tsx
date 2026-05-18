@@ -7,12 +7,7 @@ import { DataForm } from '@wordpress/dataviews';
 import type { Field, Form } from '@wordpress/dataviews';
 import { useMemo, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { Stack, Text, Button } from '@wordpress/ui'; // eslint-disable-line @wordpress/use-recommended-components
-
-/**
- * Internal dependencies
- */
-import styles from './style.module.css';
+import { Stack, Button } from '@wordpress/ui'; // eslint-disable-line @wordpress/use-recommended-components
 
 type QuickBlockPostData = {
 	title: string;
@@ -42,6 +37,8 @@ export default function QuickBlockPost() {
 				type: 'text',
 				label: __( 'Title' ),
 				required: true,
+				hideLabelFromVision: true,
+				help: __( 'Enter a title for your post.' ),
 			},
 			{
 				id: 'content',
@@ -49,6 +46,7 @@ export default function QuickBlockPost() {
 				label: __( 'Content' ),
 				required: true,
 				Edit: { control: 'textarea', rows: 4 },
+				help: __( 'Enter the content for your post.' ),
 			},
 		],
 		[]
@@ -77,11 +75,6 @@ export default function QuickBlockPost() {
 
 	return (
 		<Stack direction="column" gap="md">
-			<Text variant="heading-md">{ __( 'Quick Block Post' ) }</Text>
-			<Text variant="body-sm">
-				{ __( 'Quickly publish a new block-based post.' ) }
-			</Text>
-
 			<DataForm< QuickBlockPostData >
 				data={ data }
 				fields={ fields }
@@ -90,7 +83,7 @@ export default function QuickBlockPost() {
 					setData( ( prev ) => ( { ...prev, ...edits } ) )
 				}
 			/>
-			<div className={ styles.actions }>
+			<Stack direction="row" gap="md" justify="flex-end">
 				<Button
 					variant="solid"
 					onClick={ handleSaveDraft }
@@ -99,7 +92,7 @@ export default function QuickBlockPost() {
 				>
 					{ __( 'Save as draft' ) }
 				</Button>
-			</div>
+			</Stack>
 		</Stack>
 	);
 }
