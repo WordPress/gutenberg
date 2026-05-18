@@ -262,7 +262,7 @@ export const AsyncItems: Story = {
 
 /**
  * For custom needs, a `Combobox.Trigger` can take a custom render function as its children,
- * while `Select.Item` can take arbitrary content as children.
+ * while `Combobox.Item` can take arbitrary content as children.
  *
  * In this example, some extra information is added to each list item as an ARIA description.
  */
@@ -360,7 +360,7 @@ export const WithCustomZIndex: Story = {
 					portal={
 						<Combobox.Portal
 							style={ {
-								'--wp-ui-combobox-z-index': '1000001',
+								'--wp-ui-combobox-z-index': '9999',
 							} }
 						/>
 					}
