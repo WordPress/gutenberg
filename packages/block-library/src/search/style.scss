@@ -141,3 +141,16 @@ $button-spacing-y: math.div($grid-unit-15, 2); // 6px
 		float: right;
 	}
 }
+
+.wp-block-search__live-result {
+	border: 1px solid rgb(148, 148, 148);
+	border-radius: 0.33rem;
+	display: none;
+	margin-left: 0;
+	margin-right: 0;
+	min-width: 3rem;
+	padding: 8px;
+	position: absolute;
+	background: rgb(255, 255, 255);
+	z-index: 999;
+}

@@ -128,6 +128,46 @@ function render_block_core_search( $attributes ) {
 				</svg>';
 		}
 
+		$results_container = new WP_HTML_Tag_Processor( '<div id="live-search-results" class="wp-block-search__live-result" data-wp-bind--hidden="!context.isSearchInputVisible" data-wp-bind--aria-hidden="!context.isSearchInputVisible" hidden></div>' );
+		// Inline JavaScript for live-search.
+		$inline_script = '<script>
+				const resultsContainer = document.getElementById( "live-search-results" );
+				const searchBox = document.getElementById( "' . esc_js( $input_id ) . '" );
+				searchBox.addEventListener( "input", fetchSearchResults );
+				let searchTimeout;
+				function fetchSearchResults() {
+					resultsContainer.style.width = parseFloat( getComputedStyle(searchBox).width ) - 2 * parseFloat( getComputedStyle(searchBox).padding ) - 2 * parseFloat( getComputedStyle(searchBox).border ) + "px";
+					clearTimeout( searchTimeout );
+					searchTimeout = setTimeout( () => {
+						const input = searchBox.value.trim();
+						if ( input.length < 2 ) {
+							resultsContainer.style.display = "none";
+							resultsContainer.innerHTML = "";
+							return;
+						}
+						resultsContainer.style.display = "block";
+						console.log(searchBox.offsetWidth);
+
+						fetch(
+							"' . esc_url( home_url( '/wp-json/wp/v2/search?search=' ) ) . '" +
+								encodeURIComponent( input )
+						)
+							.then( ( response ) => response.json() )
+							.then( ( data ) => {
+								console.log( data );
+								const resultsHTML = data.length
+									? data
+											.map(
+												( item ) =>
+													`<a href="${ item.url }">${ item.title }</a>`
+											)
+											.join( "<br>" )
+									: "<p>No results found</p>";
+								resultsContainer.innerHTML = resultsHTML;
+							} )
+							.catch( ( error ) => console.error( "Search error:", error ) );
+					}, 300 );
+				}';
 		// Include the button element class.
 		$button_classes[] = wp_theme_get_element_class_name( 'button' );
 		$button           = new WP_HTML_Tag_Processor( sprintf( '<button type="submit" %s>%s</button>', $inline_styles['button'], $button_internal_markup ) );
@@ -189,14 +229,23 @@ function render_block_core_search( $attributes ) {
 		 data-wp-on--keydown="actions.handleSearchKeydown"
 		 data-wp-on--focusout="actions.handleSearchFocusout"
 		';
+
+		$inline_script .= 'searchBox.addEventListener( "focusout", function () {
+			resultsContainer.innerHTML = "";
+			resultsContainer.style.display = "none";
+		} );';
 	}
 
+	$inline_script .= '</script>';
+
 	return sprintf(
-		'<form role="search" method="get" action="%1s" %2s %3s>%4s</form>',
+		'<form role="search" method="get" action="%1s" %2s %3s>%4s%5$s%6$s</form>',
 		esc_url( home_url( '/' ) ),
 		$wrapper_attributes,
 		$form_directives,
-		$label . $field_markup
+		$label . $field_markup,
+		$results_container,
+		$inline_script
 	);
 }
 
