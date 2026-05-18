@@ -14,6 +14,7 @@ const ALLOWLIST = {
 			'Collapsible',
 			'CollapsibleCard',
 			'EmptyState',
+			'Icon',
 			'Link',
 			'Stack',
 			'Text',

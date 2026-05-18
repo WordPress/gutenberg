@@ -8,7 +8,7 @@ import { View, Text, TouchableOpacity } from 'react-native';
  */
 import { __ } from '@wordpress/i18n';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
-import { Icon, Picker } from '@wordpress/components';
+import { Icon as WCIcon, Picker } from '@wordpress/components';
 import { BlockIcon } from '@wordpress/block-editor';
 import { useRef } from '@wordpress/element';
 
@@ -110,7 +110,7 @@ const EmbedPlaceholder = ( {
 			<View style={ containerStyle }>
 				{ cannotEmbed ? (
 					<>
-						<Icon
+						<WCIcon
 							icon={ noticeOutline }
 							fill={ embedIconErrorStyle.fill }
 							style={ embedIconErrorStyle }

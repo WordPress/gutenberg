@@ -207,7 +207,7 @@ add_action( 'admin_init', 'gutenberg_set_heic_upload_support_flag' );
 function gutenberg_delete_heic_companion_file( int $post_id ): void {
 	$metadata = wp_get_attachment_metadata( $post_id, true );
 
-	if ( empty( $metadata['original'] ) ) {
+	if ( empty( $metadata['original'] ) || ! is_string( $metadata['original'] ) ) {
 		return;
 	}
 

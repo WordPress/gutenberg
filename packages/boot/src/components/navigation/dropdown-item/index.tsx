@@ -12,7 +12,7 @@ import {
 	__experimentalItem as Item,
 	// @ts-ignore
 	__experimentalHStack as HStack,
-	Icon,
+	Icon as WCIcon,
 	__unstableMotion as motion,
 	__unstableAnimatePresence as AnimatePresence,
 } from '@wordpress/components';
@@ -96,7 +96,7 @@ export default function DropdownItem( {
 				>
 					{ wrapIcon( icon, false ) }
 					<FlexBlock>{ children }</FlexBlock>
-					<Icon
+					<WCIcon
 						icon={ chevronDownSmall }
 						className={ clsx( 'boot-dropdown-item__chevron', {
 							'is-up': isExpanded,

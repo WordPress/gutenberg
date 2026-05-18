@@ -12,6 +12,14 @@ export const MIN_ZOOM = 1;
 export const MAX_ZOOM = 10;
 
 /**
+ * Minimum crop rect dimension in source-image pixels, enforced per axis
+ * during resize. Prevents accidental sub-pixel crops while staying small
+ * enough to allow tight crops (favicons, icons). Adjust here to tune the
+ * floor globally.
+ */
+export const MIN_CROP_PIXELS = 24;
+
+/**
  * Wheel zoom sensitivity. A deltaY of 100 changes zoom by 0.25.
  * This could be made configurable as a prop to the Cropper component.
  */

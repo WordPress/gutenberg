@@ -15,10 +15,15 @@ test.describe( 'Post Content focus mode', () => {
 		await requestUtils.activateTheme( 'emptytheme' );
 	} );
 
+	test.beforeEach( async ( { requestUtils } ) => {
+		// "Show template" persists the rendering mode in user preferences.
+		// Reset before each test so it starts in post-only mode regardless
+		// of state leaked from previous tests or test files in the shard.
+		await requestUtils.resetPreferences();
+	} );
+
 	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'twentytwentyone' );
-		// Reset preferences so the persisted "Show template" rendering mode
-		// does not leak into subsequent test files.
 		await requestUtils.resetPreferences();
 	} );
 
@@ -113,12 +118,6 @@ test.describe( 'Post Content focus mode', () => {
 					'<!-- wp:template-part {"slug":"content-area","theme":"emptytheme"} /-->',
 				].join( '\n' ),
 			} );
-		} );
-
-		test.afterEach( async ( { requestUtils } ) => {
-			// "Show template" persists the rendering mode in user preferences.
-			// Reset between tests so each test starts in post-only mode.
-			await requestUtils.resetPreferences();
 		} );
 
 		test.afterAll( async ( { requestUtils } ) => {
