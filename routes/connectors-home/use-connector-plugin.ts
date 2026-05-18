@@ -38,7 +38,7 @@ interface WpUpdates {
 }
 
 type JQueryHandler = (
-	event: unknown,
+	event: JQuery.TriggeredEvent,
 	response:
 		| WpUpdatesInstallPluginResponse
 		| WpUpdatesInstallPluginErrorResponse
@@ -48,10 +48,7 @@ interface WpUpdatesGlobal {
 	wp?: {
 		updates?: WpUpdates;
 	};
-	jQuery?: ( target: Document ) => {
-		on: ( event: string, handler: JQueryHandler ) => unknown;
-		off: ( event: string, handler: JQueryHandler ) => unknown;
-	};
+	jQuery?: JQueryStatic;
 }
 
 /**
