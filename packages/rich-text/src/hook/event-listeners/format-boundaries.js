@@ -104,6 +104,7 @@ export default ( props ) => ( element ) => {
 	return subscribeSharedListener(
 		element.ownerDocument,
 		'keydown',
-		onKeyDown
+		onKeyDown,
+		true
 	);
 };
