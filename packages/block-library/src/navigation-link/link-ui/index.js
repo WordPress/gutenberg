@@ -82,8 +82,23 @@ const EXCLUDED = new Set( [
 	'core/navigation-submenu',
 ] );
 
+function getVariationBadgeLabel( variation ) {
+	if ( variation.attributes?.kind === 'post-type' ) {
+		/* translators: %s: Post type name (e.g. "Post", "Page", "CPT", "Taxonomy"). */
+		return sprintf( __( '%s link' ), variation.attributes?.type );
+	}
+	if ( variation.attributes?.kind === 'taxonomy' ) {
+		return __( 'taxonomy' );
+	}
+	return __( 'Link' );
+}
+const matchesQuery = ( query, title = '', keywords = [] ) =>
+	title.toLowerCase().includes( query ) ||
+	keywords.some( ( kw ) => kw.toLowerCase().includes( query ) );
+
 function UnforwardedLinkUI( props, ref ) {
 	const { label, url, opensInNewTab, type, kind, id } = props.link;
+	const { onBlockInsert, onClose } = props;
 
 	const { entityRecord, hasBinding, isEntityAvailable } = props.entity || {};
 
@@ -189,57 +204,106 @@ function UnforwardedLinkUI( props, ref ) {
 	}, [ shouldFocusPane ] );
 
 	const blockEditingMode = useBlockEditingMode();
-	const { rootClientId, insertionIndex, allBlockTypes, canInsertBlockType } =
-		useSelect(
-			( select ) => {
-				const {
-					getBlockRootClientId,
-					getBlockIndex,
-					canInsertBlockType: _canInsert,
-				} = select( blockEditorStore );
-				const root = getBlockRootClientId( props.clientId );
+	const {
+		rootClientId,
+		insertionIndex,
+		allBlockTypes,
+		canInsertBlockType,
+		navigationLinkVariations,
+	} = useSelect(
+		( select ) => {
+			const {
+				getBlockRootClientId,
+				getBlockIndex,
+				canInsertBlockType: _canInsert,
+			} = select( blockEditorStore );
+			const { getBlockVariations } = select( blocksStore );
+			const root = getBlockRootClientId( props.clientId );
 
-				return {
-					rootClientId: root,
-					insertionIndex: getBlockIndex( props.clientId ) + 1,
-					allBlockTypes: root
-						? select( blocksStore ).getBlockTypes()
-						: [],
-					canInsertBlockType: _canInsert,
-				};
-			},
-			[ props.clientId ]
-		);
+			return {
+				rootClientId: root,
+				insertionIndex: getBlockIndex( props.clientId ) + 1,
+				allBlockTypes: root
+					? select( blocksStore ).getBlockTypes()
+					: [],
+				canInsertBlockType: _canInsert,
+				navigationLinkVariations: root
+					? getBlockVariations( 'core/navigation-link', 'inserter' )
+					: [],
+			};
+		},
+		[ props.clientId ]
+	);
+
+	const { insertBlock } = useDispatch( blockEditorStore );
 
 	// Filter insertable blocks by both capabilities AND the live search input in one pass.
 	// Empty query > no results (avoids flooding the UI before the user types).
-	const matchingBlocks = useMemo( () => {
+	const matchingItems = useMemo( () => {
 		const query = searchInputValue.trim().toLowerCase();
 
-		if ( ! query || ! rootClientId ) {
+		if ( ! query || ! rootClientId || ( type && url ) ) {
 			return [];
 		}
 
-		return allBlockTypes.filter( ( blockType ) => {
-			if ( EXCLUDED.has( blockType.name ) ) {
-				return false;
-			}
-			if ( ! canInsertBlockType( blockType.name, rootClientId ) ) {
-				return false;
-			}
+		const variations = ( navigationLinkVariations ?? [] )
+			.filter(
+				( v ) =>
+					( v.title ?? '' ).toLowerCase() !== 'page link' &&
+					matchesQuery( query, v.title, v.keywords )
+			)
+			.map( ( v ) => ( {
+				key: `${ v.name }-${ v.title }`,
+				icon: v.icon ?? 'admin-links',
+				/* translators: %s: Variation title (e.g., "Category", "Posts") */
+				label: sprintf( __( 'Add %s' ), v.title ),
+				badge: getVariationBadgeLabel( v ),
+				onInsert() {
+					const block = createBlock(
+						'core/navigation-link',
+						v.attributes ?? {}
+					);
+					insertBlock( block, insertionIndex, rootClientId );
+					onBlockInsert?.( block );
+					onClose?.();
+				},
+			} ) );
 
-			const title = blockType.title.toLowerCase();
-			const keywords = ( blockType.keywords ?? [] ).map( ( k ) =>
-				k.toLowerCase()
-			);
-			return (
-				title.includes( query ) ||
-				keywords.some( ( kw ) => kw.includes( query ) )
-			);
-		} );
-	}, [ searchInputValue, allBlockTypes, canInsertBlockType, rootClientId ] );
+		const blocks = allBlockTypes
+			.filter(
+				( bt ) =>
+					! EXCLUDED.has( bt.name ) &&
+					canInsertBlockType( bt.name, rootClientId ) &&
+					matchesQuery( query, bt.title, bt.keywords )
+			)
+			.map( ( bt ) => ( {
+				key: bt.name,
+				icon: bt.icon,
+				/* translators: %s: Block title (e.g., "Site Logo") */
+				label: sprintf( __( 'Add %s Block' ), bt.title ),
+				badge: __( 'Block' ),
+				onInsert() {
+					const block = createBlock( bt.name );
+					insertBlock( block, insertionIndex, rootClientId );
+					onBlockInsert?.( block );
+					onClose?.();
+				},
+			} ) );
 
-	const { insertBlock } = useDispatch( blockEditorStore );
+		return [ ...variations, ...blocks ];
+	}, [
+		searchInputValue,
+		navigationLinkVariations,
+		allBlockTypes,
+		canInsertBlockType,
+		rootClientId,
+		insertionIndex,
+		insertBlock,
+		onBlockInsert,
+		onClose,
+		type,
+		url,
+	] );
 
 	return (
 		<Popover
@@ -309,21 +373,7 @@ function UnforwardedLinkUI( props, ref ) {
 									canAddBlock={
 										blockEditingMode === 'default'
 									}
-									matchingBlocks={ matchingBlocks }
-									onInsertBlock={ ( blockType ) => {
-										const newBlock = createBlock(
-											blockType.name
-										);
-										insertBlock(
-											newBlock,
-											insertionIndex,
-											rootClientId
-										);
-										if ( props.onBlockInsert ) {
-											props.onBlockInsert( newBlock );
-										}
-										props.onClose?.();
-									} }
+									matchingItems={ matchingItems }
 								/>
 							);
 						} }
@@ -373,34 +423,34 @@ const LinkUITools = ( {
 	setAddingPage,
 	canAddPage,
 	canAddBlock,
-	matchingBlocks = [],
-	onInsertBlock,
+	matchingItems = [],
 } ) => {
 	const blockInserterAriaRole = 'listbox';
 
 	// Don't render anything if neither button should be shown
-	if ( ! canAddPage && ! canAddBlock && matchingBlocks.length === 0 ) {
+	if ( ! canAddPage && ! canAddBlock && matchingItems.length === 0 ) {
 		return null;
 	}
 
 	return (
 		<VStack spacing={ 0 } className="link-ui-tools">
-			{ canAddBlock &&
-				matchingBlocks.map( ( blockType ) => (
+			{ canAddPage &&
+				canAddBlock &&
+				matchingItems.map( ( item ) => (
 					<Button
 						__next40pxDefaultSize
-						key={ blockType.name }
-						icon={ <BlockIcon icon={ blockType.icon } /> }
+						key={ item.key }
+						icon={ <BlockIcon icon={ item.icon } /> }
 						onClick={ ( e ) => {
 							e.preventDefault();
-							onInsertBlock( blockType );
+							item.onInsert();
 						} }
+						aria-haspopup={ blockInserterAriaRole }
 					>
-						{ sprintf(
-							/* translators: %s: Block title (e.g., "Site Logo") */
-							__( 'Add %s Block' ),
-							blockType.title
-						) }
+						{ item.label }
+						<span className="link-ui-suggestion-item__badge">
+							{ item.badge }
+						</span>
 					</Button>
 				) ) }
 			{ canAddPage && (
@@ -417,7 +467,7 @@ const LinkUITools = ( {
 					{ __( 'Create page' ) }
 				</Button>
 			) }
-			{ canAddBlock && (
+			{ canAddBlock && matchingItems.length === 0 && (
 				<Button
 					__next40pxDefaultSize
 					ref={ addBlockButtonRef }
