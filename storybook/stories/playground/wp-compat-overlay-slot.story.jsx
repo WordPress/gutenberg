@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { Modal, Popover, Button } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import {
@@ -11,9 +8,6 @@ import {
 	Tooltip,
 } from '@wordpress/ui';
 
-/**
- * Internal dependencies
- */
 import { WithWpCompatOverlaySlot } from './with-wp-compat-overlay-slot';
 
 const selectItems = [
