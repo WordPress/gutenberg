@@ -31,7 +31,7 @@ import ColorGradientControl from '../colors-gradients/control';
 import { useColorsPerOrigin, useGradientsPerOrigin } from './hooks';
 import { useToolsPanelDropdownMenuProps } from './utils';
 import { setImmutably } from '../../utils/object';
-import { extractColorSlug } from '../../utils/color-values';
+import { extractPresetSlug } from '../../utils/color-values';
 import { unlock } from '../../lock-unlock';
 
 export function useHasColorPanel( settings ) {
@@ -602,8 +602,9 @@ export default function ColorPanel( {
 					key: 'text',
 					label: __( 'Text' ),
 					inheritedValue: textColor,
-					inheritedSlug: extractColorSlug(
-						inheritedValue?.color?.text
+					inheritedSlug: extractPresetSlug(
+						inheritedValue?.color?.text,
+						'color'
 					),
 					setValue: setTextColor,
 					userValue: userTextColor,
@@ -625,8 +626,9 @@ export default function ColorPanel( {
 					key: 'background',
 					label: __( 'Color' ),
 					inheritedValue: backgroundColor,
-					inheritedSlug: extractColorSlug(
-						inheritedValue?.color?.background
+					inheritedSlug: extractPresetSlug(
+						inheritedValue?.color?.background,
+						'color'
 					),
 					setValue: setBackgroundColor,
 					userValue: userBackgroundColor,
@@ -653,8 +655,9 @@ export default function ColorPanel( {
 					key: 'link',
 					label: __( 'Default' ),
 					inheritedValue: linkColor,
-					inheritedSlug: extractColorSlug(
-						inheritedValue?.elements?.link?.color?.text
+					inheritedSlug: extractPresetSlug(
+						inheritedValue?.elements?.link?.color?.text,
+						'color'
 					),
 					setValue: setLinkColor,
 					userValue: userLinkColor,
@@ -663,9 +666,10 @@ export default function ColorPanel( {
 					key: 'hover',
 					label: __( 'Hover' ),
 					inheritedValue: hoverLinkColor,
-					inheritedSlug: extractColorSlug(
+					inheritedSlug: extractPresetSlug(
 						inheritedValue?.elements?.link?.[ ':hover' ]?.color
-							?.text
+							?.text,
+						'color'
 					),
 					setValue: setHoverLinkColor,
 					userValue: userHoverLinkColor,
@@ -777,8 +781,9 @@ export default function ColorPanel( {
 						key: 'text',
 						label: __( 'Text' ),
 						inheritedValue: elementTextColor,
-						inheritedSlug: extractColorSlug(
-							inheritedValue?.elements?.[ name ]?.color?.text
+						inheritedSlug: extractPresetSlug(
+							inheritedValue?.elements?.[ name ]?.color?.text,
+							'color'
 						),
 						setValue: setElementTextColor,
 						userValue: elementTextUserColor,
@@ -788,9 +793,10 @@ export default function ColorPanel( {
 						key: 'background',
 						label: __( 'Background' ),
 						inheritedValue: elementBackgroundColor,
-						inheritedSlug: extractColorSlug(
+						inheritedSlug: extractPresetSlug(
 							inheritedValue?.elements?.[ name ]?.color
-								?.background
+								?.background,
+							'color'
 						),
 						setValue: setElementBackgroundColor,
 						userValue: elementBackgroundUserColor,

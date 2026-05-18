@@ -31,7 +31,7 @@ import {
 	useHasColorPanel,
 	default as StylesColorPanel,
 } from '../components/global-styles/color-panel';
-import { extractColorSlug, extractPresetSlug } from '../utils/color-values';
+import { extractPresetSlug } from '../utils/color-values';
 import BlockColorContrastChecker from './contrast-checker';
 import { store as blockEditorStore } from '../store';
 import {
@@ -197,9 +197,12 @@ export function addSaveProps( props, blockNameOrType, attributes ) {
 
 function styleToAttributes( style ) {
 	const textColorValue = style?.color?.text;
-	const textColorSlug = extractColorSlug( textColorValue );
+	const textColorSlug = extractPresetSlug( textColorValue, 'color' );
 	const backgroundColorValue = style?.color?.background;
-	const backgroundColorSlug = extractColorSlug( backgroundColorValue );
+	const backgroundColorSlug = extractPresetSlug(
+		backgroundColorValue,
+		'color'
+	);
 	const gradientValue = style?.color?.gradient;
 	const gradientSlug = extractPresetSlug( gradientValue, 'gradient' );
 	const updatedStyle = { ...style };

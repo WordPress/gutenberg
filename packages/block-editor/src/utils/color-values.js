@@ -8,8 +8,8 @@
  * Returns `undefined` for plain values, non-strings, or any other
  * unrecognised format.
  *
- * @param {*}      rawValue Raw style value stored in the style object.
- * @param {string} type     Preset type, e.g. `'color'` or `'gradient'`.
+ * @param {*}                  rawValue Raw style value stored in the style object.
+ * @param {'color'|'gradient'} type     Preset type, e.g. `'color'` or `'gradient'`.
  * @return {string|undefined} The palette slug, or undefined.
  */
 export function extractPresetSlug( rawValue, type ) {
@@ -24,22 +24,5 @@ export function extractPresetSlug( rawValue, type ) {
 	const themeFormatMatch = rawValue.match(
 		new RegExp( `^var\\(${ cssVarPrefix }([^)]+)\\)$` )
 	);
-	return themeFormatMatch?.[ 1 ] ?? undefined;
-}
-
-/**
- * Extracts the palette slug from a color style value, supporting both the user
- * preset format and the theme CSS-variable format:
- *
- * - User format:  `var:preset|color|slug`
- * - Theme format: `var(--wp--preset--color--slug)`
- *
- * Returns `undefined` for plain hex values, non-strings, or any other
- * unrecognised format.
- *
- * @param {*} rawValue Raw style value stored in the style object.
- * @return {string|undefined} The palette slug, or undefined.
- */
-export function extractColorSlug( rawValue ) {
-	return extractPresetSlug( rawValue, 'color' );
+	return themeFormatMatch?.[ 1 ];
 }
