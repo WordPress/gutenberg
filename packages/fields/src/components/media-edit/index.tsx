@@ -16,7 +16,7 @@ import {
 	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
 	BaseControl,
-	Tooltip,
+	Tooltip as WCTooltip,
 } from '@wordpress/components';
 import { isBlobURL, getBlobTypeByURL } from '@wordpress/blob';
 import { store as coreStore, type Attachment } from '@wordpress/core-data';
@@ -193,9 +193,9 @@ function MediaPickerButton( {
 		return mediaPickerButton;
 	}
 	return (
-		<Tooltip text={ label } placement="top">
+		<WCTooltip text={ label } placement="top">
 			{ mediaPickerButton }
-		</Tooltip>
+		</WCTooltip>
 	);
 }
 

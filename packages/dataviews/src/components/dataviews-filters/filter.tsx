@@ -11,7 +11,7 @@ import {
 	Dropdown,
 	FlexItem,
 	SelectControl,
-	Tooltip,
+	Tooltip as WCTooltip,
 	Icon as WCIcon,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
@@ -267,7 +267,7 @@ export default function Filter( {
 			} }
 			renderToggle={ ( { isOpen, onToggle } ) => (
 				<div className="dataviews-filters__summary-chip-container">
-					<Tooltip
+					<WCTooltip
 						text={ sprintf(
 							/* translators: 1: Filter name. */
 							__( 'Filter by: %1$s' ),
@@ -311,9 +311,9 @@ export default function Filter( {
 								filter={ filter }
 							/>
 						</div>
-					</Tooltip>
+					</WCTooltip>
 					{ canResetOrRemove && (
-						<Tooltip
+						<WCTooltip
 							text={ isPrimary ? __( 'Reset' ) : __( 'Remove' ) }
 							placement="top"
 						>
@@ -343,7 +343,7 @@ export default function Filter( {
 							>
 								<WCIcon icon={ closeSmall } />
 							</button>
-						</Tooltip>
+						</WCTooltip>
 					) }
 				</div>
 			) }

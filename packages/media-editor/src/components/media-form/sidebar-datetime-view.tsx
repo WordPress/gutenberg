@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { dateI18n, getDate, getSettings } from '@wordpress/date';
-import { Tooltip } from '@wordpress/components';
+import { Tooltip as WCTooltip } from '@wordpress/components';
 import type { NormalizedField } from '@wordpress/dataviews';
 
 /**
@@ -28,8 +28,8 @@ export default function SidebarDatetimeView( {
 		getDate( value )
 	);
 	return (
-		<Tooltip text={ fullDatetime } placement="top">
+		<WCTooltip text={ fullDatetime } placement="top">
 			<time dateTime={ value }>{ dateOnly }</time>
-		</Tooltip>
+		</WCTooltip>
 	);
 }

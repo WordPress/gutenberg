@@ -266,6 +266,7 @@ export default dedupePlugins( [
 						Autocomplete: 'WCAutocomplete',
 						Badge: 'WCBadge',
 						Icon: 'WCIcon',
+						Tooltip: 'WCTooltip',
 					},
 				},
 			],
