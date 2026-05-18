@@ -8,7 +8,7 @@ import type { Field, Form } from '@wordpress/dataviews';
 import { useMemo, useState } from '@wordpress/element';
 import { check } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
-import { Button, Icon, Stack, Text } from '@wordpress/ui'; // eslint-disable-line @wordpress/use-recommended-components
+import { Button, Icon, Stack, Text, Link } from '@wordpress/ui'; // eslint-disable-line @wordpress/use-recommended-components
 import { addQueryArgs } from '@wordpress/url';
 
 type QuickBlockPostData = {
@@ -110,11 +110,11 @@ export default function QuickBlockPost() {
 				<Stack direction="row" gap="md" justify="center">
 					<Button
 						variant="solid"
-						// eslint-disable-next-line jsx-a11y/anchor-has-content
-						render={ <a href={ editUrl } /> }
+						render={ <Link href={ editUrl } openInNewTab /> }
 					>
 						{ __( 'Continue editing' ) }
 					</Button>
+
 					<Button variant="minimal" onClick={ writeAnother }>
 						{ __( 'Write another' ) }
 					</Button>
