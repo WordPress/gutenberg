@@ -8,7 +8,7 @@ import type { RefObject } from 'react';
 /**
  * Internal dependencies
  */
-import { clearSelection, copyToClipboard } from '../use-copy-to-clipboard';
+import { restoreFocus, copyToClipboard } from '../use-copy-to-clipboard';
 
 /**
  * Copies the text to the clipboard when the element is clicked.
@@ -73,7 +73,7 @@ export default function useCopyOnClick(
 				return;
 			}
 			if ( success ) {
-				clearSelection( trigger );
+				restoreFocus( trigger );
 				if ( timeout ) {
 					setHasCopied( true );
 					clearTimeout( timeoutId );
