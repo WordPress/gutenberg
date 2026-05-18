@@ -8,7 +8,7 @@
 
 ### Bug Fixes
 
--   `Popover`: Don't close when focus moves into the `@wordpress/ui` compat overlay slot, so nested `@wordpress/ui` overlays (e.g. `Select`) can be used inside a `Popover` without dismissing it.
+-   `Popover`: Don't close when focus moves into the `@wordpress/ui` compat overlay slot, so nested `@wordpress/ui` overlays (e.g. `Select`) can be used inside a `Popover` without dismissing it ([#78407](https://github.com/WordPress/gutenberg/pull/78407)).
 
 ## 33.1.0 (2026-05-14)
 
