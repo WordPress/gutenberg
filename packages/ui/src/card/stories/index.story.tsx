@@ -133,19 +133,17 @@ export const WithFullBleed: Story = {
 				<Card.Header>
 					<Card.Title>Featured image</Card.Title>
 				</Card.Header>
-				<Card.Content>
-					<Stack direction="column" gap="lg">
-						<Card.FullBleed>
-							<div
-								style={ {
-									height: 160,
-									background:
-										'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-								} }
-							/>
-						</Card.FullBleed>
-						<Text>Content below the full-bleed area.</Text>
-					</Stack>
+				<Card.Content render={ <Stack direction="column" gap="lg" /> }>
+					<Card.FullBleed>
+						<div
+							style={ {
+								height: 160,
+								background:
+									'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+							} }
+						/>
+					</Card.FullBleed>
+					<Text>Content below the full-bleed area.</Text>
 				</Card.Content>
 			</>
 		),
@@ -174,7 +172,7 @@ export const FullBleedInHeader: Story = {
 	args: {
 		children: (
 			<>
-				<Card.Header>
+				<Card.Header render={ <Stack direction="column" gap="lg" /> }>
 					<Card.FullBleed>
 						<div
 							style={ {

@@ -362,7 +362,9 @@ export const WithFullBleed: Story = {
 				<CollapsibleCard.Header>
 					<Card.Title>Featured image</Card.Title>
 				</CollapsibleCard.Header>
-				<CollapsibleCard.Content>
+				<CollapsibleCard.Content
+					render={ <Stack direction="column" gap="lg" /> }
+				>
 					<Card.FullBleed>
 						<div
 							style={ {
