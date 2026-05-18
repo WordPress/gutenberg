@@ -101,19 +101,16 @@ export class PostPublishButton extends Component {
 		} = this.props;
 
 		const isButtonDisabled =
-			isPostSavingLocked ||
-			( ( isSaving ||
-				! isSaveable ||
-				( ! isPublishable && ! forceIsDirty ) ) &&
-				( ! hasNonPostEntityChanges || isSavingNonPostEntityChanges ) );
+	isPostSavingLocked ||
+	isSaving ||
+	!isSaveable ||
+	( !isPublishable && !forceIsDirty );
 
 		const isToggleDisabled =
-			isPostSavingLocked ||
-			( ( isPublished ||
-				isSaving ||
-				! isSaveable ||
-				( ! isPublishable && ! forceIsDirty ) ) &&
-				( ! hasNonPostEntityChanges || isSavingNonPostEntityChanges ) );
+	isPostSavingLocked ||
+	isSaving ||
+	!isSaveable ||
+	( !isPublishable && !forceIsDirty );
 
 		// If the new status has not changed explicitly, we derive it from
 		// other factors, like having a publish action, etc.. We need to preserve
