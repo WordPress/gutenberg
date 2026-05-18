@@ -1,5 +1,0 @@
-.actions {
-	display: flex;
-	justify-content: flex-end;
-	gap: var(--wpds-dimension-gap-sm);
-}
