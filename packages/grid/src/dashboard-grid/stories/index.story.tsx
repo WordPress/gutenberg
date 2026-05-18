@@ -484,9 +484,7 @@ export const RowHeight: Story = {
  * tiles in each column when `rowHeight` is numeric. The overlay
  * disappears when `editMode` flips back to `false`.
  *
- * Theme the default look in place via CSS custom properties exposed
- * by the package (`--wp-grid-overlay-tile-bg`,
- * `--wp-grid-overlay-tile-border`),
+ * Theme the default look in place via `--wp-grid-overlay-tile-bg`,
  * or replace the visual wholesale by passing `renderGridOverlay`.
  * See the `Custom Grid Overlay` story for a full override example.
  *

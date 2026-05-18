@@ -292,8 +292,7 @@ export const Spanning: Story = {
  * columns only — there are no row markers because heights are
  * content-driven.
  *
- * Theme the default look in place via CSS custom properties
- * (`--wp-grid-overlay-tile-bg`, `--wp-grid-overlay-tile-border`),
+ * Theme the default look in place via `--wp-grid-overlay-tile-bg`,
  * or replace the visual wholesale
  * by passing `renderGridOverlay`. See the `Custom Grid Overlay`
  * story below for a full override example.
