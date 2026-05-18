@@ -7,6 +7,7 @@ import { LEFT, RIGHT } from '@wordpress/keycodes';
  * Internal dependencies
  */
 import { isCollapsed } from '../../is-collapsed';
+import { subscribeSharedListener } from './shared-listener';
 
 const EMPTY_ACTIVE_FORMATS = [];
 
@@ -25,6 +26,11 @@ export default ( props ) => ( element ) => {
 			return;
 		}
 
+		const { ownerDocument } = element;
+		if ( ! element.contains( ownerDocument.activeElement ) ) {
+			return;
+		}
+
 		const { record, applyRecord, forceRender } = props.current;
 		const {
 			text,
@@ -34,7 +40,6 @@ export default ( props ) => ( element ) => {
 			activeFormats: currentActiveFormats = [],
 		} = record.current;
 		const collapsed = isCollapsed( record.current );
-		const { ownerDocument } = element;
 		const { defaultView } = ownerDocument;
 		// To do: ideally, we should look at visual position instead.
 		const { direction } = defaultView.getComputedStyle( element );
@@ -96,8 +101,9 @@ export default ( props ) => ( element ) => {
 		forceRender();
 	}
 
-	element.addEventListener( 'keydown', onKeyDown );
-	return () => {
-		element.removeEventListener( 'keydown', onKeyDown );
-	};
+	return subscribeSharedListener(
+		element.ownerDocument,
+		'keydown',
+		onKeyDown
+	);
 };
