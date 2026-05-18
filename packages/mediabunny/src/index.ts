@@ -23,6 +23,12 @@ import type { ItemId } from './types';
 const inProgressOperations = new Set< ItemId >();
 
 /**
+ * Fallback per-frame duration when ImageDecoder reports none.
+ * GIF spec default 10fps = 100ms (in microseconds).
+ */
+const GIF_DEFAULT_FRAME_DURATION_US = 100_000;
+
+/**
  * Serializes encoder access. The upload-media concurrency limit already caps
  * this at 1, but the lock guards direct callers too.
  */
@@ -72,7 +78,7 @@ export async function convertGifToVideo(
 	inProgressOperations.add( id );
 
 	const previousLock = operationLock;
-	let releaseLock: () => void;
+	let releaseLock: () => void = () => {};
 	operationLock = new Promise< void >( ( resolve ) => {
 		releaseLock = resolve;
 	} );
@@ -106,95 +112,100 @@ export async function convertGifToVideo(
 			data: buffer,
 			type: 'image/gif',
 		} );
-		await decoder.completed;
 
-		if ( ! inProgressOperations.has( id ) ) {
-			decoder.close();
-			throw new Error( 'Operation cancelled' );
-		}
+		try {
+			await decoder.completed;
 
-		const track = decoder.tracks.selectedTrack;
-		const frameCount = track?.frameCount ?? 0;
-		if ( frameCount === 0 ) {
-			decoder.close();
-			throw new Error( 'GIF contains no decodable frames' );
-		}
-
-		const source = new VideoSampleSource( {
-			codec,
-			bitrate: QUALITY_HIGH,
-		} );
-		const target = new BufferTarget();
-		const output = new Output( {
-			format: isWebm ? new WebMOutputFormat() : new Mp4OutputFormat(),
-			target,
-		} );
-		output.addVideoTrack( source );
-		await output.start();
-
-		// ImageDecoder durations are MICROSECONDS; mediabunny VideoSample
-		// timestamps/durations are SECONDS. Accumulate in seconds.
-		let timestampSec = 0;
-		for ( let i = 0; i < frameCount; i++ ) {
 			if ( ! inProgressOperations.has( id ) ) {
-				decoder.close();
 				throw new Error( 'Operation cancelled' );
 			}
 
-			const { image } = await decoder.decode( { frameIndex: i } );
-			const durationUs = image.duration ?? 100000;
-			const durationSec = durationUs / 1_000_000;
-
-			let frameForEncode: VideoFrame = image;
-			if (
-				maxDimensions &&
-				( image.displayWidth > maxDimensions ||
-					image.displayHeight > maxDimensions )
-			) {
-				const scale = Math.min(
-					maxDimensions / image.displayWidth,
-					maxDimensions / image.displayHeight
-				);
-				const targetW = padToEven(
-					Math.round( image.displayWidth * scale )
-				);
-				const targetH = padToEven(
-					Math.round( image.displayHeight * scale )
-				);
-				const canvas = new OffscreenCanvas( targetW, targetH );
-				const ctx = canvas.getContext(
-					'2d'
-				) as OffscreenCanvasRenderingContext2D;
-				ctx.drawImage( image, 0, 0, targetW, targetH );
-				// VideoFrame timestamp is microseconds; mediabunny uses the
-				// SECONDS values from the VideoSample init below.
-				frameForEncode = new VideoFrame( canvas, {
-					timestamp: Math.round( timestampSec * 1_000_000 ),
-					duration: durationUs,
-				} );
-				image.close();
+			const track = decoder.tracks.selectedTrack;
+			const frameCount = track?.frameCount ?? 0;
+			if ( frameCount === 0 ) {
+				throw new Error( 'GIF contains no decodable frames' );
 			}
 
-			await source.add(
-				new VideoSample( frameForEncode, {
-					timestamp: timestampSec,
-					duration: durationSec,
-				} )
-			);
-			frameForEncode.close();
-			timestampSec += durationSec;
-		}
+			const source = new VideoSampleSource( {
+				codec,
+				bitrate: QUALITY_HIGH,
+			} );
+			const target = new BufferTarget();
+			const output = new Output( {
+				format: isWebm ? new WebMOutputFormat() : new Mp4OutputFormat(),
+				target,
+			} );
+			output.addVideoTrack( source );
+			await output.start();
 
-		decoder.close();
-		await output.finalize();
+			// ImageDecoder durations are MICROSECONDS; mediabunny VideoSample
+			// timestamps/durations are SECONDS. Accumulate in seconds.
+			let timestampSec = 0;
+			for ( let i = 0; i < frameCount; i++ ) {
+				if ( ! inProgressOperations.has( id ) ) {
+					throw new Error( 'Operation cancelled' );
+				}
 
-		const out = target.buffer;
-		if ( ! out || out.byteLength === 0 ) {
-			throw new Error( 'Encoder produced empty output' );
+				const { image } = await decoder.decode( { frameIndex: i } );
+				const durationUs =
+					image.duration ?? GIF_DEFAULT_FRAME_DURATION_US;
+				const durationSec = durationUs / 1_000_000;
+
+				let frameForEncode: VideoFrame = image;
+				if (
+					maxDimensions &&
+					( image.displayWidth > maxDimensions ||
+						image.displayHeight > maxDimensions )
+				) {
+					const scale = Math.min(
+						maxDimensions / image.displayWidth,
+						maxDimensions / image.displayHeight
+					);
+					const targetW = padToEven(
+						Math.round( image.displayWidth * scale )
+					);
+					const targetH = padToEven(
+						Math.round( image.displayHeight * scale )
+					);
+					const canvas = new OffscreenCanvas( targetW, targetH );
+					const ctx = canvas.getContext(
+						'2d'
+					) as OffscreenCanvasRenderingContext2D;
+					ctx.drawImage( image, 0, 0, targetW, targetH );
+					// This replacement VideoFrame's timestamp is in
+					// microseconds.
+					frameForEncode = new VideoFrame( canvas, {
+						timestamp: Math.round( timestampSec * 1_000_000 ),
+						duration: durationUs,
+					} );
+					image.close();
+				}
+
+				try {
+					await source.add(
+						new VideoSample( frameForEncode, {
+							timestamp: timestampSec,
+							duration: durationSec,
+						} )
+					);
+				} finally {
+					frameForEncode.close();
+				}
+				timestampSec += durationSec;
+			}
+
+			await output.finalize();
+
+			const out = target.buffer;
+			if ( ! out || out.byteLength === 0 ) {
+				throw new Error( 'Encoder produced empty output' );
+			}
+			return out;
+		} finally {
+			decoder.close();
 		}
-		return out;
 	} finally {
 		inProgressOperations.delete( id );
-		releaseLock!();
+		releaseLock();
 	}
 }

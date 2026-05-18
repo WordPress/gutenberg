@@ -14,9 +14,15 @@ class FakeVideoFrame {
 	}
 }
 
+// Frames decoded by FakeImageDecoder, exposed so tests can assert on
+// resource cleanup (e.g. that close() was called on error paths).
+let mockDecodedFrames: FakeVideoFrame[] = [];
+// Configurable frame count for the active FakeImageDecoder instance.
+let mockFrameCount = 3;
+
 class FakeImageDecoder {
 	completed = Promise.resolve();
-	tracks = { selectedTrack: { frameCount: 3 } };
+	tracks = { selectedTrack: { frameCount: mockFrameCount } };
 	init: { data: ArrayBuffer; type: string };
 	constructor( init: { data: ArrayBuffer; type: string } ) {
 		this.init = init;
@@ -24,6 +30,7 @@ class FakeImageDecoder {
 	async decode( { frameIndex }: { frameIndex: number } ) {
 		const image = new FakeVideoFrame();
 		image.timestamp = frameIndex * 100000;
+		mockDecodedFrames.push( image );
 		return { image };
 	}
 	close() {}
@@ -33,6 +40,13 @@ const mockAddedSamples: Array< {
 	init: { timestamp: number; duration: number };
 } > = [];
 const mockCanEncodeVideo = jest.fn().mockResolvedValue( true );
+// Default VideoSampleSource.add implementation; tests can override it,
+// e.g. to make it reject and exercise frame-cleanup error paths.
+const mockSourceAdd = jest.fn(
+	async ( sample: { init: { timestamp: number; duration: number } } ) => {
+		mockAddedSamples.push( sample );
+	}
+);
 // A controllable gate so the cancellation test has a deterministic async
 // boundary: convertGifToVideo awaits canEncodeVideo; we cancel while it is
 // pending, then resolve it.
@@ -56,8 +70,8 @@ jest.mock( 'mediabunny', () => ( {
 	Mp4OutputFormat: class {},
 	WebMOutputFormat: class {},
 	VideoSampleSource: class {
-		async add( sample: { init: { timestamp: number; duration: number } } ) {
-			mockAddedSamples.push( sample );
+		add( sample: { init: { timestamp: number; duration: number } } ) {
+			return mockSourceAdd( sample );
 		}
 	},
 	VideoSample: class {
@@ -77,8 +91,14 @@ jest.mock( 'mediabunny', () => ( {
 
 beforeEach( () => {
 	mockAddedSamples.length = 0;
+	mockDecodedFrames = [];
+	mockFrameCount = 3;
 	encodeGateResolve = undefined;
 	mockCanEncodeVideo.mockResolvedValue( true );
+	mockSourceAdd.mockReset();
+	mockSourceAdd.mockImplementation( async ( sample ) => {
+		mockAddedSamples.push( sample );
+	} );
 	( globalThis as Record< string, unknown > ).ImageDecoder = FakeImageDecoder;
 	( globalThis as Record< string, unknown > ).VideoEncoder = class {};
 } );
@@ -125,5 +145,26 @@ describe( 'convertGifToVideo', () => {
 		await expect(
 			convertGifToVideo( 'item-3', GIF_BUFFER, 'video/mp4' )
 		).rejects.toThrow( 'Unsupported' );
+	} );
+
+	it( 'rejects when the GIF has zero decodable frames', async () => {
+		mockFrameCount = 0;
+		await expect(
+			convertGifToVideo( 'item-zero', GIF_BUFFER, 'video/mp4' )
+		).rejects.toThrow( /no decodable frames/i );
+	} );
+
+	it( 'closes the decoded frame even when source.add() throws', async () => {
+		mockSourceAdd.mockReset();
+		mockSourceAdd.mockRejectedValue( new Error( 'add failed' ) );
+
+		await expect(
+			convertGifToVideo( 'item-add-throw', GIF_BUFFER, 'video/mp4' )
+		).rejects.toThrow( 'add failed' );
+
+		// The first frame was decoded; it must have been closed despite the
+		// add() rejection (Issue 1: frame leak on source.add() throw).
+		expect( mockDecodedFrames ).toHaveLength( 1 );
+		expect( mockDecodedFrames[ 0 ].closed ).toBe( true );
 	} );
 } );
