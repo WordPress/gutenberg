@@ -68,7 +68,7 @@ describe( 'useCopyToClipboard', () => {
 		expect( onSuccess ).not.toHaveBeenCalled();
 	} );
 
-	it( 'should not call onSuccess after unmount', async () => {
+	it( 'should call onSuccess even when the node unmounts before the copy resolves', async () => {
 		let resolvePromise: () => void;
 		const delayedPromise = new Promise< void >( ( resolve ) => {
 			resolvePromise = resolve;
@@ -91,7 +91,7 @@ describe( 'useCopyToClipboard', () => {
 			await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
 		} );
 
-		expect( onSuccess ).not.toHaveBeenCalled();
+		expect( onSuccess ).toHaveBeenCalledTimes( 1 );
 	} );
 } );
 

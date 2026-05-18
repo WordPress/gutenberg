@@ -93,7 +93,7 @@ export default function useCopyToClipboard< T extends HTMLElement >(
 	const textRef = useUpdatedRef( text );
 	const onSuccessRef = useUpdatedRef( onSuccess );
 	return useRefEffect( ( node ) => {
-		// Flag to prevent callbacks after unmount when the Promise resolves.
+		// Tracks whether the node is still mounted when the Promise resolves.
 		let isActive = true;
 		const handleClick = async () => {
 			const textToCopy =
@@ -101,11 +101,12 @@ export default function useCopyToClipboard< T extends HTMLElement >(
 					? textRef.current()
 					: textRef.current || '';
 			const success = await copyToClipboard( textToCopy, node );
-			if ( ! isActive ) {
-				return;
-			}
 			if ( success ) {
-				clearSelection( node );
+				// Restoring focus only matters while the node is mounted.
+				if ( isActive ) {
+					clearSelection( node );
+				}
+				// Always run, even after unmount, to allow updating other UI.
 				if ( onSuccessRef.current ) {
 					onSuccessRef.current();
 				}

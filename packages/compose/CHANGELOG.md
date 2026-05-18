@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `useCopyToClipboard`: Call the `onSuccess` callback even when the trigger node unmounts before the copy resolves (e.g. a menu item that closes the menu on click).
+
 ## 7.46.0 (2026-05-14)
 
 ## 7.45.0 (2026-04-29)
