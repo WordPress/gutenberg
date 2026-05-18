@@ -7,6 +7,17 @@
 	height: 100%;
 }
 
+.is-resizing {
+	overflow: visible;
+	z-index: 1;
+}
+
+.is-resizing .item-content {
+	position: relative;
+	z-index: 2;
+	overflow: visible;
+}
+
 /*
  * During drag, the original item acts as a placeholder in its grid
  * cell while `<DragOverlay>` renders a clone that follows the cursor.
@@ -34,8 +45,9 @@
 	position: absolute;
 	top: 0;
 	inset-inline-start: 0;
+	box-sizing: border-box;
 	pointer-events: none;
-	z-index: 1;
+	z-index: 0;
 	border:
 		var(--wpds-border-width-sm)
 		var(--wp-grid-resize-preview-outline-style, solid)

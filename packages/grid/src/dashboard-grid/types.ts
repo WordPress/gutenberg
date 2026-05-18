@@ -7,6 +7,7 @@ import type {
 	ResizeDelta,
 	ResizeHandleRenderProps,
 } from '../shared/types';
+import type { ResizeSnapSize } from '../shared/resize-snap';
 
 /**
  * Dashboard grid layout item definition.
@@ -98,9 +99,17 @@ export type GridItemProps = {
 	/**
 	 * Callback fired while the item is being resized. Receives the
 	 * item's `key` plus the cursor offset from the gesture start in
-	 * pixels; the grid converts the offset to column/row spans.
+	 * pixels. The grid derives snapped spans from the delta and passes
+	 * them back through `resizeSnapPreview`.
 	 */
 	onResize: ( id: string, delta: ResizeDelta ) => void;
+
+	/**
+	 * Snapped grid size in pixels for the resize-preview outline. The
+	 * tile content resizes continuously with the cursor; this outline
+	 * shows the span the layout will commit to on release.
+	 */
+	resizeSnapPreview?: ResizeSnapSize | null;
 
 	/**
 	 * Callback fired when the resize gesture ends.
