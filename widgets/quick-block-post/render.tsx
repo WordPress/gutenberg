@@ -3,7 +3,7 @@
  */
 import { store as coreDataStore } from '@wordpress/core-data';
 import { useDispatch } from '@wordpress/data';
-import { DataForm } from '@wordpress/dataviews';
+import { DataForm, useFormValidity } from '@wordpress/dataviews';
 import type { Field, Form } from '@wordpress/dataviews';
 import { useMemo, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -52,7 +52,9 @@ export default function QuickBlockPost() {
 		[]
 	);
 
-	const canSave = data.title.trim().length > 0 && ! isSaving;
+	const { validity, isValid } = useFormValidity( data, fields, FORM );
+
+	const canSave = isValid && ! isSaving;
 
 	const handleSaveDraft = async () => {
 		if ( ! canSave ) {
@@ -79,6 +81,7 @@ export default function QuickBlockPost() {
 				data={ data }
 				fields={ fields }
 				form={ FORM }
+				validity={ validity }
 				onChange={ ( edits ) =>
 					setData( ( prev ) => ( { ...prev, ...edits } ) )
 				}
