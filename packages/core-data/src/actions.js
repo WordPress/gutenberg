@@ -462,7 +462,7 @@ export const editEntityRecord =
 				objectId,
 				editsWithMerges,
 				origin,
-				{ isNewUndoLevel }
+				{ baseRecord: editedRecord, isNewUndoLevel }
 			);
 		}
 		if ( ! options.undoIgnore ) {
@@ -585,16 +585,22 @@ export const __unstableCreateUndoLevel =
 /**
  * Action triggered to save an entity record.
  *
- * @param {string}   kind                         Kind of the received entity.
- * @param {string}   name                         Name of the received entity.
- * @param {Object}   record                       Record to be saved.
- * @param {Object}   options                      Saving options.
- * @param {boolean}  [options.isAutosave=false]   Whether this is an autosave.
- * @param {Function} [options.__unstableFetch]    Internal use only. Function to
- *                                                call instead of `apiFetch()`.
- *                                                Must return a promise.
- * @param {boolean}  [options.throwOnError=false] If false, this action suppresses all
- *                                                the exceptions. Defaults to false.
+ * @param {string}   kind                                     Kind of the received entity.
+ * @param {string}   name                                     Name of the received entity.
+ * @param {Object}   record                                   Record to be saved.
+ * @param {Object}   options                                  Saving options.
+ * @param {boolean}  [options.isAutosave=false]               Whether this is an autosave.
+ * @param {Function} [options.__unstableFetch]                Internal use only. Function to
+ *                                                            call instead of `apiFetch()`.
+ *                                                            Must return a promise.
+ * @param {boolean}  [options.__unstableSkipSyncUpdate=false] Whether to mark
+ *                                                            synced entities
+ *                                                            as saved without
+ *                                                            applying the
+ *                                                            server response to
+ *                                                            the CRDT.
+ * @param {boolean}  [options.throwOnError=false]             If false, this action suppresses all
+ *                                                            the exceptions. Defaults to false.
  */
 export const saveEntityRecord =
 	( kind, name, record, options = {} ) =>

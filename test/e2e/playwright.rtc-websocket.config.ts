@@ -38,6 +38,13 @@ if ( Array.isArray( baseConfig.testIgnore ) ) {
 } else if ( baseConfig.testIgnore ) {
 	baseTestIgnore.push( baseConfig.testIgnore );
 }
+const rtcTestIgnore = baseTestIgnore.filter(
+	( pattern ) =>
+		! (
+			typeof pattern === 'string' &&
+			pattern === '**/specs/editor/collaboration/websocket-only/**'
+		)
+);
 
 const config = defineConfig( {
 	...baseConfig,
@@ -49,7 +56,7 @@ const config = defineConfig( {
 	// `http-only/` and are excluded here.
 	testMatch: '**/specs/editor/collaboration/**/collaboration-*.spec.ts',
 	testIgnore: [
-		...baseTestIgnore,
+		...rtcTestIgnore,
 		'**/specs/editor/collaboration/http-only/**',
 	],
 	webServer: [
