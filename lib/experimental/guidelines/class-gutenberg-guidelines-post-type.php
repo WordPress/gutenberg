@@ -90,7 +90,7 @@ class Gutenberg_Guidelines_Post_Type {
 		register_post_type(
 			self::POST_TYPE,
 			array(
-				'labels'             => array(
+				'labels'                => array(
 					'name'                     => _x( 'Guidelines', 'post type general name', 'gutenberg' ),
 					'singular_name'            => _x( 'Guideline', 'post type singular name', 'gutenberg' ),
 					'add_new'                  => __( 'Add Guideline', 'gutenberg' ),
@@ -112,15 +112,18 @@ class Gutenberg_Guidelines_Post_Type {
 					'view_item'                => __( 'View Guideline', 'gutenberg' ),
 					'view_items'               => __( 'View Guidelines', 'gutenberg' ),
 				),
-				'public'             => false,
-				'publicly_queryable' => false,
-				'show_ui'            => true,
-				'show_in_menu'       => false,
-				'show_in_rest'       => true,
-				'rest_base'          => 'guidelines',
-				'capability_type'    => 'guideline',
-				'map_meta_cap'       => true,
-				'capabilities'       => array(
+				'public'                => false,
+				'publicly_queryable'    => false,
+				'show_ui'               => true,
+				'show_in_menu'          => false,
+				'show_in_rest'          => true,
+				'rest_base'             => 'guidelines',
+
+				'rest_controller_class' => Gutenberg_Guidelines_REST_Controller::class,
+
+				'capability_type'       => 'guideline',
+				'map_meta_cap'          => true,
+				'capabilities'          => array(
 					'read'                   => 'edit_posts',
 					'create_posts'           => 'publish_posts',
 					'edit_posts'             => 'edit_posts',
@@ -134,12 +137,12 @@ class Gutenberg_Guidelines_Post_Type {
 					'edit_others_posts'      => 'edit_others_posts',
 					'delete_others_posts'    => 'delete_others_posts',
 				),
-				'supports'           => array( 'title', 'editor', 'excerpt', 'author', 'revisions' ),
-				'hierarchical'       => false,
-				'has_archive'        => false,
-				'rewrite'            => false,
-				'query_var'          => false,
-				'can_export'         => true,
+				'supports'              => array( 'title', 'editor', 'excerpt', 'author', 'revisions' ),
+				'hierarchical'          => false,
+				'has_archive'           => false,
+				'rewrite'               => false,
+				'query_var'             => false,
+				'can_export'            => true,
 			)
 		);
 

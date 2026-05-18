@@ -26,7 +26,12 @@ import { store as editorStore } from '../../store';
 import { FLOATING_NOTES_SIDEBAR } from './constants';
 import { unlock } from '../../lock-unlock';
 import { createBoardStore } from './board-store';
-import { calculateNotePositions } from './utils';
+import {
+	calculateNotePositions,
+	getNoteIdsFromMetadata,
+	addNoteIdToMetadata,
+	removeNoteIdFromMetadata,
+} from './utils';
 
 const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
 
@@ -59,15 +64,19 @@ export function useNoteThreads( postId ) {
 			return { notes: [], unresolvedNotes: [] };
 		}
 
-		// Single pass over clientIds: build clientId->noteId map AND reverse lookup.
+		// Single pass over clientIds builds the forward map and reverse lookup
+		// together. getNoteIdsFromMetadata returns numeric ids, matching the
+		// types returned by the comments REST endpoint.
 		const blocksWithNotes = {};
 		const clientIdByNoteId = new Map();
 		for ( const clientId of clientIds ) {
-			const noteId = getBlockAttributes( clientId )?.metadata?.noteId;
-			if ( noteId ) {
-				const key = String( noteId );
-				blocksWithNotes[ clientId ] = key;
-				clientIdByNoteId.set( key, clientId );
+			const metadata = getBlockAttributes( clientId )?.metadata;
+			const noteIds = getNoteIdsFromMetadata( metadata );
+			if ( noteIds.length > 0 ) {
+				blocksWithNotes[ clientId ] = noteIds;
+				for ( const noteId of noteIds ) {
+					clientIdByNoteId.set( noteId, clientId );
+				}
 			}
 		}
 
@@ -81,7 +90,7 @@ export function useNoteThreads( postId ) {
 				reply: [],
 				blockClientId:
 					item.parent === 0
-						? clientIdByNoteId.get( String( item.id ) ) ?? null
+						? clientIdByNoteId.get( item.id ) ?? null
 						: null,
 			};
 			threadsById.set( item.id, thread );
@@ -101,20 +110,21 @@ export function useNoteThreads( postId ) {
 			return { notes: [], unresolvedNotes: [] };
 		}
 
-		// Single partition over notes-in-block-order.
+		// Single partition over notes-in-block-order. Each block can have
+		// multiple note IDs, so iterate the flattened list.
 		const unresolved = [];
 		const resolved = [];
-		for ( const noteId of Object.values( blocksWithNotes ) ) {
-			const thread =
-				threadsById.get( Number( noteId ) ) ??
-				threadsById.get( noteId );
-			if ( ! thread ) {
-				continue;
-			}
-			if ( thread.status === 'hold' ) {
-				unresolved.push( thread );
-			} else if ( thread.status === 'approved' ) {
-				resolved.push( thread );
+		for ( const noteIds of Object.values( blocksWithNotes ) ) {
+			for ( const noteId of noteIds ) {
+				const thread = threadsById.get( noteId );
+				if ( ! thread ) {
+					continue;
+				}
+				if ( thread.status === 'hold' ) {
+					unresolved.push( thread );
+				} else if ( thread.status === 'approved' ) {
+					resolved.push( thread );
+				}
 			}
 		}
 
@@ -170,14 +180,22 @@ export function useNoteActions() {
 			);
 
 			// If it's a top-level note, update the block attributes with the note id.
+			// Read-modify-write on metadata is racy under concurrent edits:
+			// two near-simultaneous adds against the same base will each write
+			// a 2-element array and the later write wins, dropping the other
+			// id. Tracking issue: https://github.com/WordPress/gutenberg/issues/74751.
 			if ( ! parent && savedRecord?.id ) {
 				const clientId = getSelectedBlockClientId();
+				if ( ! clientId ) {
+					return savedRecord;
+				}
 				const metadata = getBlockAttributes( clientId )?.metadata;
+				const updatedMetadata = addNoteIdToMetadata(
+					metadata,
+					savedRecord.id
+				);
 				updateBlockAttributes( clientId, {
-					metadata: {
-						...metadata,
-						noteId: savedRecord.id,
-					},
+					metadata: cleanEmptyObject( updatedMetadata ),
 				} );
 			}
 
@@ -267,13 +285,19 @@ export function useNoteActions() {
 			} );
 
 			if ( ! note.parent ) {
-				const clientId = getSelectedBlockClientId();
+				// Use blockClientId if available, otherwise fall back to selected block.
+				const clientId =
+					note.blockClientId || getSelectedBlockClientId();
+				if ( ! clientId ) {
+					return;
+				}
 				const metadata = getBlockAttributes( clientId )?.metadata;
+				const updatedMetadata = removeNoteIdFromMetadata(
+					metadata,
+					note.id
+				);
 				updateBlockAttributes( clientId, {
-					metadata: cleanEmptyObject( {
-						...metadata,
-						noteId: undefined,
-					} ),
+					metadata: cleanEmptyObject( updatedMetadata ),
 				} );
 			}
 

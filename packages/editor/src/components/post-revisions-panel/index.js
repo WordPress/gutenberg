@@ -145,6 +145,14 @@ function PostRevisionsPanelContent() {
 }
 
 export default function PostRevisionsPanel() {
+	const disableVisualRevisions = useSelect(
+		( select ) =>
+			!! select( editorStore ).getEditorSettings().disableVisualRevisions,
+		[]
+	);
+	if ( disableVisualRevisions ) {
+		return null;
+	}
 	return (
 		<PostLastRevisionCheck>
 			<PostRevisionsPanelContent />
