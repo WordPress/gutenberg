@@ -10,8 +10,8 @@
  * in lib/client-assets.php. The worker module is only fetched when
  * GIF-to-video conversion is actually triggered.
  *
- * @see packages/upload-media/src/store/utils/mediabunny.ts — the consumer
- * @see packages/vips/src/loader.ts — the reference pattern
+ * @see packages/upload-media/src/store/utils/mediabunny.ts (the consumer)
+ * @see packages/vips/src/loader.ts (the reference pattern)
  */
 export default function loader() {
 	return import( '@wordpress/mediabunny/worker' );
