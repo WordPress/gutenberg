@@ -88,6 +88,7 @@ describe( 'useCopyToClipboard', () => {
 
 		await user.click( button );
 		unmount();
+		// Discard focus calls from the initial click; we only care about post-unmount calls.
 		focusSpy.mockClear();
 
 		await act( async () => {
