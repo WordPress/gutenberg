@@ -74,15 +74,19 @@ function padToEven( value: number ): number {
  * Decodes GIF frames via the browser ImageDecoder (honoring per-frame
  * delays) and re-encodes them with mediabunny / WebCodecs.
  *
+ * Accepts the GIF as a Blob so the bytes are read once, here in the worker,
+ * instead of being materialized on the main thread and transferred. An
+ * ArrayBuffer is still accepted for direct callers and tests.
+ *
  * @param id             Item ID.
- * @param buffer         GIF file buffer.
+ * @param gifSource      GIF file as a Blob/File or ArrayBuffer.
  * @param outputMimeType Output MIME type ('video/mp4' or 'video/webm').
  * @param maxDimensions  Optional maximum dimension for downscaling.
  * @return Encoded video buffer.
  */
 export async function convertGifToVideo(
 	id: ItemId,
-	buffer: ArrayBuffer,
+	gifSource: ArrayBuffer | Blob,
 	outputMimeType: string,
 	maxDimensions?: number
 ): Promise< ArrayBuffer > {
@@ -123,8 +127,18 @@ export async function convertGifToVideo(
 			throw new Error( 'Operation cancelled' );
 		}
 
+		// Read the bytes here (worker thread) rather than on the main thread.
+		const data =
+			gifSource instanceof ArrayBuffer
+				? gifSource
+				: await gifSource.arrayBuffer();
+
+		if ( ! inProgressOperations.has( id ) ) {
+			throw new Error( 'Operation cancelled' );
+		}
+
 		const decoder = new ImageDecoder( {
-			data: buffer,
+			data,
 			type: 'image/gif',
 		} );
 

@@ -85,12 +85,9 @@ export async function mediabunnyConvertGifToVideo(
 ) {
 	const { mediabunnyConvertGifToVideo: convert } =
 		await loadMediabunnyModule();
-	const buffer = await convert(
-		id,
-		await file.arrayBuffer(),
-		outputMimeType,
-		maxDimensions
-	);
+	// Pass the File straight through: the worker reads its bytes once, off
+	// the main thread, instead of materializing an ArrayBuffer here.
+	const buffer = await convert( id, file, outputMimeType, maxDimensions );
 
 	const ext = outputMimeType === 'video/webm' ? 'webm' : 'mp4';
 	const fileName = `${ getFileBasename( file.name ) }.${ ext }`;

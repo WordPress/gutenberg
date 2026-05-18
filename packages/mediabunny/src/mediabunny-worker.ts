@@ -53,19 +53,24 @@ function getWorkerAPI(): Remote< WorkerAPI > {
  * Converts an animated GIF to a video file using mediabunny in a worker.
  *
  * @param id             Item ID.
- * @param buffer         GIF file buffer.
+ * @param gifSource      GIF file as a Blob/File or ArrayBuffer.
  * @param outputMimeType Output MIME type ('video/mp4' or 'video/webm').
  * @param maxDimensions  Optional maximum dimension for downscaling.
  * @return Video file buffer.
  */
 export async function mediabunnyConvertGifToVideo(
 	id: ItemId,
-	buffer: ArrayBuffer,
+	gifSource: ArrayBuffer | Blob,
 	outputMimeType: string,
 	maxDimensions?: number
 ): Promise< ArrayBuffer > {
 	const api = getWorkerAPI();
-	return api.convertGifToVideo( id, buffer, outputMimeType, maxDimensions );
+	return api.convertGifToVideo(
+		id,
+		gifSource,
+		outputMimeType,
+		maxDimensions
+	);
 }
 
 /**
