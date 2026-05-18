@@ -9,6 +9,7 @@ import type { ReactNode } from 'react';
  */
 import {
 	Dropdown,
+	Icon as WCIcon,
 	MenuGroup,
 	MenuItem,
 	Spinner,
@@ -120,7 +121,7 @@ function Header( { titleId, widgetType }: HeaderProps ) {
 							className={ styles.widgetChromeHeaderIcon }
 							aria-hidden="true"
 						>
-							<Icon icon={ widgetType.icon } />
+							<WCIcon icon={ widgetType.icon } />
 						</span>
 					) }
 					<Card.Title id={ titleId } render={ <h3 /> }>
