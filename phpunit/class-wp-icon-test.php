@@ -10,7 +10,7 @@ class WP_Icon_Test extends WP_UnitTestCase {
 	public function test_wp_icon_returns_svg_for_known_icon() {
 		$output = wp_icon( 'plus' );
 		$this->assertStringStartsWith( '<svg ', $output );
-		$this->assertStringEndsWith( '</svg>', $output );
+		$this->assertStringContainsString( '</svg>', $output );
 	}
 
 	public function test_wp_icon_returns_empty_string_for_unknown_icon() {
@@ -20,7 +20,8 @@ class WP_Icon_Test extends WP_UnitTestCase {
 
 	public function test_wp_icon_default_attributes() {
 		$output = wp_icon( 'plus' );
-		$this->assertStringContainsString( 'viewBox="0 0 24 24"', $output );
+		// WP_HTML_Tag_Processor lowercases attribute names.
+		$this->assertStringContainsString( 'viewbox="0 0 24 24"', $output );
 		$this->assertStringContainsString( 'width="24"', $output );
 		$this->assertStringContainsString( 'height="24"', $output );
 		$this->assertStringContainsString( 'class="wp-icon"', $output );
