@@ -11,6 +11,7 @@ import {
 	finalizeItem,
 	transcodeGifItem,
 	prepareItem,
+	generateThumbnails,
 } from '../private-actions';
 import { OperationType, Type } from '../types';
 import { vipsHasTransparency } from '../utils';
@@ -521,7 +522,7 @@ describe( 'private actions', () => {
 		} );
 	} );
 
-	describe( 'prepareItem (animated GIF → image + companion video)', () => {
+	describe( 'prepareItem (animated GIF → image; video sideloaded later)', () => {
 		const originalCrossOriginIsolated = Reflect.getOwnPropertyDescriptor(
 			globalThis,
 			'crossOriginIsolated'
@@ -561,7 +562,7 @@ describe( 'private actions', () => {
 		function runPrepare( { item, settings, id = 'q' } ) {
 			const dispatchFn = jest.fn();
 			dispatchFn.finishOperation = jest.fn();
-			dispatchFn.addItem = jest.fn();
+			dispatchFn.addSideloadItem = jest.fn();
 			const select = {
 				getItem: () => item,
 				getSettings: () => settings,
@@ -578,7 +579,13 @@ describe( 'private actions', () => {
 			return args.dispatch;
 		}
 
-		it( 'uploads the GIF as an image and queues a companion video item (mp4 by default)', async () => {
+		function gifFinishCall( dispatchFn ) {
+			return dispatchFn.finishOperation.mock.calls.find(
+				( [ , payload ] ) => payload?.animatedGifFile !== undefined
+			);
+		}
+
+		it( 'uploads an animated GIF as an image and stashes it for sideload', async () => {
 			isAnimatedGif.mockReturnValue( true );
 			const item = makeGifItem( 'q-anim' );
 
@@ -588,8 +595,8 @@ describe( 'private actions', () => {
 				id: 'q-anim',
 			} );
 
-			// The GIF item itself flows through the normal image pipeline
-			// so the block stays a valid core/image.
+			// The GIF flows through the normal image pipeline so the
+			// block stays a valid core/image.
 			const addOpsCall = dispatchFn.mock.calls.find(
 				( [ action ] ) => action?.type === Type.AddOperations
 			);
@@ -602,51 +609,16 @@ describe( 'private actions', () => {
 				OperationType.Finalize,
 			] );
 
-			// A companion item is queued that transcodes the same GIF to
-			// a video and uploads it as a separate attachment.
-			expect( dispatchFn.addItem ).toHaveBeenCalledTimes( 1 );
-			const companion = dispatchFn.addItem.mock.calls[ 0 ][ 0 ];
-			expect( companion.file ).toBe( item.file );
-			expect( companion.operations ).toEqual( [
-				[ OperationType.TranscodeGif, { outputFormat: 'mp4' } ],
-				OperationType.Upload,
-			] );
-			expect( companion.additionalData.generate_sub_sizes ).toBe( true );
-			expect( companion.additionalData.convert_format ).toBe( true );
-
-			// The pair token links the two attachments server-side and
-			// must match on both halves.
-			const token = companion.additionalData.animated_gif_pair_token;
-			expect( typeof token ).toBe( 'string' );
-			expect( token ).not.toBe( '' );
+			// The original GIF is stashed so generateThumbnails can
+			// transcode + sideload it as a companion file. No separate
+			// attachment/queue item is created.
 			expect( dispatchFn.finishOperation ).toHaveBeenCalledWith(
 				'q-anim',
-				{
-					additionalData: {
-						animated_gif_pair_token: token,
-					},
-				}
+				{ animatedGifFile: item.file }
 			);
 		} );
 
-		it( 'queues webm output when videoOutputFormat is video/webm', async () => {
-			isAnimatedGif.mockReturnValue( true );
-			const item = makeGifItem( 'q-webm' );
-
-			const dispatchFn = await runPrepare( {
-				item,
-				settings: { videoOutputFormat: 'video/webm' },
-				id: 'q-webm',
-			} );
-
-			const companion = dispatchFn.addItem.mock.calls[ 0 ][ 0 ];
-			expect( companion.operations[ 0 ] ).toEqual( [
-				OperationType.TranscodeGif,
-				{ outputFormat: 'webm' },
-			] );
-		} );
-
-		it( 'preserves any existing additionalData from the queue item', async () => {
+		it( 'does not alter the queue item additionalData', async () => {
 			isAnimatedGif.mockReturnValue( true );
 			const item = makeGifItem( 'q-additional', {
 				post_id: 7,
@@ -659,19 +631,9 @@ describe( 'private actions', () => {
 				id: 'q-additional',
 			} );
 
-			const token =
-				dispatchFn.addItem.mock.calls[ 0 ][ 0 ].additionalData
-					.animated_gif_pair_token;
-			expect( dispatchFn.finishOperation ).toHaveBeenCalledWith(
-				'q-additional',
-				{
-					additionalData: {
-						post_id: 7,
-						custom: 'keep-me',
-						animated_gif_pair_token: token,
-					},
-				}
-			);
+			const call = gifFinishCall( dispatchFn );
+			expect( call ).toBeDefined();
+			expect( call[ 1 ] ).toEqual( { animatedGifFile: item.file } );
 		} );
 
 		it( 'skips the GIF branch when settings.gifConvert is false', async () => {
@@ -684,7 +646,7 @@ describe( 'private actions', () => {
 				id: 'q-off',
 			} );
 
-			expect( dispatchFn.addItem ).not.toHaveBeenCalled();
+			expect( gifFinishCall( dispatchFn ) ).toBeUndefined();
 		} );
 
 		it( 'skips the GIF branch when crossOriginIsolated is false', async () => {
@@ -701,7 +663,7 @@ describe( 'private actions', () => {
 			// isAnimatedGif should never be consulted because the isolation
 			// check short-circuits first.
 			expect( isAnimatedGif ).not.toHaveBeenCalled();
-			expect( dispatchFn.addItem ).not.toHaveBeenCalled();
+			expect( gifFinishCall( dispatchFn ) ).toBeUndefined();
 		} );
 
 		it( 'falls through when the GIF is not animated', async () => {
@@ -714,9 +676,107 @@ describe( 'private actions', () => {
 				id: 'q-static',
 			} );
 
-			// A static GIF takes the normal image path: no companion
-			// video item is queued.
-			expect( dispatchFn.addItem ).not.toHaveBeenCalled();
+			// A static GIF takes the normal image path: it is not stashed
+			// for video sideload.
+			expect( gifFinishCall( dispatchFn ) ).toBeUndefined();
+		} );
+	} );
+
+	describe( 'generateThumbnails (animated GIF video sideload)', () => {
+		beforeEach( () => {
+			jest.clearAllMocks();
+		} );
+
+		function runGenerate( { item, settings } ) {
+			const dispatchFn = jest.fn();
+			dispatchFn.finishOperation = jest.fn();
+			dispatchFn.addSideloadItem = jest.fn();
+			const select = {
+				getItem: () => item,
+				getSettings: () => settings,
+			};
+			const thunk = generateThumbnails( item.id );
+			return thunk( { select, dispatch: dispatchFn } ).then(
+				() => dispatchFn
+			);
+		}
+
+		function makeGif( name = 'animated.gif' ) {
+			return new File(
+				[ new Uint8Array( [ 0x47, 0x49, 0x46, 0x38 ] ) ],
+				name,
+				{ type: 'image/gif' }
+			);
+		}
+
+		it( 'sideloads the converted video as an animated-video companion', async () => {
+			const gif = makeGif();
+			const item = {
+				id: 'g',
+				sourceFile: gif,
+				file: gif,
+				animatedGifFile: gif,
+				attachment: { id: 42 },
+			};
+
+			const dispatchFn = await runGenerate( {
+				item,
+				settings: { videoOutputFormat: 'video/mp4' },
+			} );
+
+			expect( dispatchFn.addSideloadItem ).toHaveBeenCalledTimes( 1 );
+			const sideload = dispatchFn.addSideloadItem.mock.calls[ 0 ][ 0 ];
+			expect( sideload.file ).toBe( gif );
+			expect( sideload.parentId ).toBe( 'g' );
+			expect( sideload.additionalData ).toEqual(
+				expect.objectContaining( {
+					post: 42,
+					image_size: 'animated-video',
+					convert_format: false,
+				} )
+			);
+			expect( sideload.operations ).toEqual( [
+				[ OperationType.TranscodeGif, { outputFormat: 'mp4' } ],
+				OperationType.Upload,
+			] );
+		} );
+
+		it( 'uses webm when videoOutputFormat is video/webm', async () => {
+			const gif = makeGif();
+			const item = {
+				id: 'g2',
+				sourceFile: gif,
+				file: gif,
+				animatedGifFile: gif,
+				attachment: { id: 7 },
+			};
+
+			const dispatchFn = await runGenerate( {
+				item,
+				settings: { videoOutputFormat: 'video/webm' },
+			} );
+
+			const sideload = dispatchFn.addSideloadItem.mock.calls[ 0 ][ 0 ];
+			expect( sideload.operations[ 0 ] ).toEqual( [
+				OperationType.TranscodeGif,
+				{ outputFormat: 'webm' },
+			] );
+		} );
+
+		it( 'does not sideload a video for non-GIF uploads', async () => {
+			const jpeg = new File( [ 'x' ], 'photo.jpg', {
+				type: 'image/jpeg',
+			} );
+			const item = {
+				id: 'g3',
+				sourceFile: jpeg,
+				file: jpeg,
+				attachment: { id: 9 },
+			};
+
+			const dispatchFn = await runGenerate( { item, settings: {} } );
+
+			expect( dispatchFn.addSideloadItem ).not.toHaveBeenCalled();
 		} );
 	} );
 } );

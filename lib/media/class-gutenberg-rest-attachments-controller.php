@@ -51,6 +51,7 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 								$valid_sizes   = array_keys( wp_get_registered_image_subsizes() );
 								$valid_sizes[] = 'original';
 								$valid_sizes[] = 'original-heic';
+								$valid_sizes[] = 'animated-video';
 								$valid_sizes[] = 'scaled';
 								$valid_sizes[] = 'full';
 
@@ -197,20 +198,15 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 		$args = rest_get_endpoint_args_for_schema( $this->get_item_schema(), $method );
 
 		if ( WP_REST_Server::CREATABLE === $method ) {
-			$args['generate_sub_sizes']      = array(
+			$args['generate_sub_sizes'] = array(
 				'type'        => 'boolean',
 				'default'     => true,
 				'description' => __( 'Whether to generate image sub sizes.', 'gutenberg' ),
 			);
-			$args['convert_format']          = array(
+			$args['convert_format']     = array(
 				'type'        => 'boolean',
 				'default'     => true,
 				'description' => __( 'Whether to convert image formats.', 'gutenberg' ),
-			);
-			$args['animated_gif_pair_token'] = array(
-				'type'              => 'string',
-				'description'       => __( 'Correlation token linking an animated GIF image attachment to its companion video attachment.', 'gutenberg' ),
-				'sanitize_callback' => 'sanitize_key',
 			);
 		}
 
@@ -496,6 +492,12 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 				// web-viewable JPEG derivative. Cleanup on attachment delete
 				// is handled by a delete_attachment hook that reads this key.
 				$metadata['original'] = $sub_size['file'];
+			} elseif ( 'animated-video' === $image_size ) {
+				// Converted video companion of an animated GIF. Stored
+				// under its own key; the GIF stays the attachment. The
+				// render-time swap and secure cleanup live in
+				// lib/media/animated-gif-to-video.php.
+				$metadata['animated_video'] = $sub_size['file'];
 			} elseif ( 'scaled' === $image_size ) {
 				if ( ! empty( $sub_size['original_image'] ) ) {
 					$metadata['original_image'] = $sub_size['original_image'];
@@ -718,6 +720,12 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 			// $metadata['original'] (separate from 'original_image', which the
 			// scaled-sideload flow owns). Cleanup on attachment delete is
 			// handled by a delete_attachment hook that reads this key.
+			$sub_size_data['file'] = wp_basename( $path );
+		} elseif ( 'animated-video' === $image_size ) {
+			// Converted animated-GIF video companion. finalize_item()
+			// writes the filename to $metadata['animated_video']; it is
+			// swapped in for the GIF at render time and deleted by a
+			// delete_attachment hook. See lib/media/animated-gif-to-video.php.
 			$sub_size_data['file'] = wp_basename( $path );
 		} elseif ( 'scaled' === $image_size ) {
 			// Record the current attached file as the original.

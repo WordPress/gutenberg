@@ -705,45 +705,13 @@ export function prepareItem( id: QueueItemId ) {
 		) {
 			const buffer = await file.arrayBuffer();
 			if ( isAnimatedGif( buffer ) ) {
-				const outputFormat =
-					settings.videoOutputFormat === 'video/webm'
-						? 'webm'
-						: 'mp4';
-
-				// Links the GIF image attachment to its companion video
-				// attachment so the two can be swapped at render time
-				// (see lib/media/load.php). Generated client-side so the
-				// server can establish the link regardless of which of
-				// the two uploads finishes first.
-				const pairToken = uuidv4();
-
-				// Companion item: transcode this same GIF to a video and
-				// upload it as a separate attachment. It carries no
-				// onChange/onSuccess because no editor block is bound to
-				// it — the originating block stays a core/image pointing
-				// at the GIF.
-				dispatch.addItem( {
-					file: item.file,
-					additionalData: {
-						generate_sub_sizes: true,
-						convert_format: true,
-						animated_gif_pair_token: pairToken,
-					},
-					operations: [
-						[
-							OperationType.TranscodeGif,
-							{
-								outputFormat,
-							} as OperationArgs[ OperationType.TranscodeGif ],
-						],
-						OperationType.Upload,
-					],
-				} );
-
-				// The GIF itself uploads through the normal image
-				// pipeline so the block remains a valid core/image.
-				// wp_filter_content_tags() swaps in the companion video
-				// at render time when one is linked.
+				// The GIF uploads through the normal image pipeline so the
+				// block remains a valid core/image. The converted video is
+				// sideloaded as a companion file of this same attachment
+				// after upload (see generateThumbnails) — like the HEIC
+				// original — not as a separate media library attachment.
+				// It is recorded in attachment metadata and swapped in at
+				// render time (see lib/media/animated-gif-to-video.php).
 				operations.push(
 					OperationType.Upload,
 					OperationType.ThumbnailGeneration,
@@ -756,11 +724,10 @@ export function prepareItem( id: QueueItemId ) {
 					operations,
 				} );
 
+				// Keep the original GIF so generateThumbnails can
+				// transcode and sideload it once the attachment exists.
 				dispatch.finishOperation( id, {
-					additionalData: {
-						...item.additionalData,
-						animated_gif_pair_token: pairToken,
-					},
+					animatedGifFile: item.file,
 				} );
 				return;
 			}
@@ -1251,6 +1218,37 @@ export function generateThumbnails( id: QueueItemId ) {
 					convert_format: false,
 				},
 				operations: [ OperationType.Upload ],
+			} );
+		}
+
+		// Animated GIF: transcode the original to a video and sideload it
+		// as a companion file of this attachment (recorded in metadata as
+		// `animated_video`), mirroring the HEIC original flow. The
+		// TranscodeGif step keeps the FFmpeg WASM concurrency limit;
+		// parentId routes the result to the sideload endpoint, so no
+		// separate attachment is created.
+		if ( item.animatedGifFile && attachment.id ) {
+			const outputFormat =
+				settings.videoOutputFormat === 'video/webm' ? 'webm' : 'mp4';
+
+			dispatch.addSideloadItem( {
+				file: item.animatedGifFile,
+				batchId: uuidv4(),
+				parentId: item.id,
+				additionalData: {
+					post: attachment.id,
+					image_size: 'animated-video',
+					convert_format: false,
+				},
+				operations: [
+					[
+						OperationType.TranscodeGif,
+						{
+							outputFormat,
+						} as OperationArgs[ OperationType.TranscodeGif ],
+					],
+					OperationType.Upload,
+				],
 			} );
 		}
 

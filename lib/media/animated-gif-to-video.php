@@ -1,18 +1,16 @@
 <?php
 /**
- * Animated GIF → video: link companion attachments and swap at render time.
+ * Animated GIF → video: swap the GIF for its companion video at render time.
  *
  * When client-side media processing is enabled, an uploaded animated GIF is
- * uploaded normally as an image attachment *and* a companion video attachment
- * (MP4/WebM) is generated from it (see `@wordpress/upload-media`). Both
- * uploads carry a shared `animated_gif_pair_token` so the two attachments can
- * be linked server-side:
- *
- * - `_animated_video_id`      on the GIF image  → companion video attachment ID
- * - `_animated_gif_image_id`  on the video      → originating GIF attachment ID
+ * stored as a normal image attachment (it stays a single media library item).
+ * The GIF is also transcoded to a video (MP4/WebM) which is sideloaded as a
+ * *companion file* of that same attachment — like the HEIC original — and
+ * recorded in the attachment metadata under the `animated_video` key. It is
+ * never a separate attachment.
  *
  * The editor keeps showing the GIF as a normal `core/image` block. On the
- * front end, every `<img>` that resolves to a GIF with a linked video is
+ * front end, every `<img>` that resolves to a GIF with a companion video is
  * swapped for a GIF-behaving `<video>` (muted, looping, autoplaying, inline,
  * no controls) via the `wp_content_img_tag` filter — which runs inside
  * `wp_filter_content_tags()` and therefore covers post content, block widgets
@@ -22,63 +20,41 @@
  */
 
 /**
- * Links an animated GIF image attachment to its companion video attachment.
+ * Returns the absolute path to an attachment's companion video, if any.
  *
- * Runs after a REST attachment insert. The two halves of a pair can arrive in
- * either order (the video is transcoded client-side and usually finishes
- * later), so linking happens whenever the *second* half appears.
+ * The path is rebuilt from the attachment's own (trusted) directory plus the
+ * recorded basename, so the stored metadata cannot point anywhere else.
  *
- * @param WP_Post         $attachment The inserted attachment post.
- * @param WP_REST_Request $request    The request used to insert the attachment.
+ * @param int $attachment_id Attachment ID.
+ * @return string|null Absolute file path, or null when there is no companion.
  */
-function gutenberg_link_animated_gif_video( $attachment, $request ): void {
-	$token = $request['animated_gif_pair_token'];
+function gutenberg_get_animated_gif_video_path( int $attachment_id ): ?string {
+	$metadata = wp_get_attachment_metadata( $attachment_id, true );
 
-	if ( ! is_string( $token ) || '' === $token ) {
-		return;
+	if ( empty( $metadata['animated_video'] ) || ! is_string( $metadata['animated_video'] ) ) {
+		return null;
 	}
 
-	$new_id = (int) $attachment->ID;
+	// Only ever trust the basename of the recorded value; strip any path
+	// components so the metadata can't reference another directory.
+	$name = wp_basename( $metadata['animated_video'] );
 
-	update_post_meta( $new_id, '_animated_gif_pair_token', $token );
-
-	$partners = get_posts(
-		array(
-			'post_type'        => 'attachment',
-			'post_status'      => 'inherit',
-			'posts_per_page'   => 1,
-			'fields'           => 'ids',
-			'post__not_in'     => array( $new_id ),
-			'meta_key'         => '_animated_gif_pair_token', // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
-			'meta_value'       => $token, // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value
-			'no_found_rows'    => true,
-			'suppress_filters' => false,
-		)
-	);
-
-	if ( empty( $partners ) ) {
-		return;
+	if ( '' === $name ) {
+		return null;
 	}
 
-	$partner_id = (int) $partners[0];
+	$attached_file = get_attached_file( $attachment_id, true );
 
-	if ( wp_attachment_is( 'video', $new_id ) ) {
-		$video_id = $new_id;
-		$image_id = $partner_id;
-	} else {
-		$image_id = $new_id;
-		$video_id = $partner_id;
+	if ( ! $attached_file ) {
+		return null;
 	}
 
-	update_post_meta( $image_id, '_animated_video_id', $video_id );
-	update_post_meta( $video_id, '_animated_gif_image_id', $image_id );
+	return path_join( dirname( $attached_file ), $name );
 }
-
-add_action( 'rest_after_insert_attachment', 'gutenberg_link_animated_gif_video', 10, 2 );
 
 /**
  * Swaps a GIF `<img>` for a GIF-behaving `<video>` when a companion video
- * attachment is linked.
+ * has been generated for the attachment.
  *
  * @param string $filtered_image The `<img>` tag HTML.
  * @param string $context        Context (e.g. 'the_content').
@@ -90,15 +66,29 @@ function gutenberg_swap_animated_gif_for_video( string $filtered_image, string $
 		return $filtered_image;
 	}
 
-	$video_id = (int) get_post_meta( $attachment_id, '_animated_video_id', true );
+	$video_path = gutenberg_get_animated_gif_video_path( $attachment_id );
 
-	if ( ! $video_id || ! wp_attachment_is( 'video', $video_id ) ) {
+	if ( ! $video_path || ! file_exists( $video_path ) ) {
+		return $filtered_image;
+	}
+
+	$attachment_url = wp_get_attachment_url( $attachment_id );
+
+	if ( ! $attachment_url ) {
+		return $filtered_image;
+	}
+
+	$video_name = wp_basename( $video_path );
+	$video_url  = trailingslashit( dirname( $attachment_url ) ) . $video_name;
+	$video_mime = wp_check_filetype( $video_name )['type'];
+
+	if ( ! $video_mime ) {
 		return $filtered_image;
 	}
 
 	/**
-	 * Filters whether a linked animated GIF should be swapped for its
-	 * companion video at render time.
+	 * Filters whether a GIF should be swapped for its companion video at
+	 * render time.
 	 *
 	 * Returning false leaves the original `<img>` untouched, allowing
 	 * developers to keep specific GIFs as GIFs on a per-image basis
@@ -109,24 +99,18 @@ function gutenberg_swap_animated_gif_for_video( string $filtered_image, string $
 	 *
 	 * @param bool   $swap          Whether to perform the swap. Default true.
 	 * @param int    $attachment_id The GIF image attachment ID.
-	 * @param int    $video_id      The linked companion video attachment ID.
+	 * @param string $video_url     URL of the companion video.
 	 * @param string $context       Context the image is rendered in (e.g. 'the_content').
 	 */
 	$swap = apply_filters(
 		'gutenberg_swap_animated_gif_for_video',
 		true,
 		$attachment_id,
-		$video_id,
+		$video_url,
 		$context
 	);
 
 	if ( ! $swap ) {
-		return $filtered_image;
-	}
-
-	$video_url = wp_get_attachment_url( $video_id );
-
-	if ( ! $video_url ) {
 		return $filtered_image;
 	}
 
@@ -171,48 +155,52 @@ function gutenberg_swap_animated_gif_for_video( string $filtered_image, string $
 		'<video %1$s><source src="%2$s" type="%3$s" /></video>',
 		$attributes,
 		esc_url( $video_url ),
-		esc_attr( get_post_mime_type( $video_id ) )
+		esc_attr( $video_mime )
 	);
 }
 
 add_filter( 'wp_content_img_tag', 'gutenberg_swap_animated_gif_for_video', 10, 3 );
 
 /**
- * Keeps the GIF ↔ video link consistent when either attachment is deleted.
+ * Deletes the companion video file when its GIF attachment is deleted.
  *
- * - Deleting the GIF image also deletes its auto-generated companion video
- *   (the video is not independently managed by the user).
- * - Deleting the video clears the dangling `_animated_video_id` on the GIF so
- *   it falls back to rendering as a normal image.
+ * The video is sideloaded next to the GIF and recorded in
+ * $metadata['animated_video']. WordPress core's wp_delete_attachment_files()
+ * does not know about it, so without this hook the video would linger on
+ * disk after the attachment is deleted.
+ *
+ * The path is rebuilt from the attachment's own directory plus the recorded
+ * basename, then confirmed to resolve inside the uploads directory and to be
+ * a regular file, so this can only ever delete the sideloaded companion.
  *
  * @param int $post_id Attachment ID being deleted.
  */
-function gutenberg_cleanup_animated_gif_video( int $post_id ): void {
-	static $deleting = array();
+function gutenberg_delete_animated_gif_video( int $post_id ): void {
+	$video_path = gutenberg_get_animated_gif_video_path( $post_id );
 
-	if ( isset( $deleting[ $post_id ] ) ) {
+	if ( ! $video_path || ! file_exists( $video_path ) ) {
 		return;
 	}
 
-	$video_id = (int) get_post_meta( $post_id, '_animated_video_id', true );
+	$real_path = realpath( $video_path );
 
-	if ( $video_id ) {
-		$deleting[ $post_id ] = true;
-		delete_post_meta( $post_id, '_animated_video_id' );
-
-		if ( ! isset( $deleting[ $video_id ] ) && get_post( $video_id ) ) {
-			$deleting[ $video_id ] = true;
-			wp_delete_attachment( $video_id, true );
-		}
-
+	if ( ! $real_path || ! is_file( $real_path ) ) {
 		return;
 	}
 
-	$image_id = (int) get_post_meta( $post_id, '_animated_gif_image_id', true );
+	$uploads  = wp_get_upload_dir();
+	$base_dir = empty( $uploads['error'] ) ? realpath( $uploads['basedir'] ) : false;
 
-	if ( $image_id && ! isset( $deleting[ $image_id ] ) ) {
-		delete_post_meta( $image_id, '_animated_video_id' );
+	if ( ! $base_dir ) {
+		return;
 	}
+
+	// Must resolve to a regular file strictly inside the uploads directory.
+	if ( ! str_starts_with( $real_path, $base_dir . DIRECTORY_SEPARATOR ) ) {
+		return;
+	}
+
+	wp_delete_file( $real_path );
 }
 
-add_action( 'delete_attachment', 'gutenberg_cleanup_animated_gif_video' );
+add_action( 'delete_attachment', 'gutenberg_delete_animated_gif_video' );
