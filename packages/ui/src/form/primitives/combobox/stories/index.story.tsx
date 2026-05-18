@@ -56,10 +56,10 @@ export const Default: Story = {
 							<Combobox.Collection>
 								{ ( item: FixtureItem ) => (
 									<Combobox.Item
-										key={ item.id }
+										key={ item.value }
 										value={ item }
 									>
-										{ item.value }
+										{ item.label }
 									</Combobox.Item>
 								) }
 							</Combobox.Collection>
@@ -88,11 +88,11 @@ export const Compact: Story = {
 							<Combobox.Collection>
 								{ ( item: FixtureItem ) => (
 									<Combobox.Item
-										key={ item.id }
+										key={ item.value }
 										value={ item }
 										size="compact"
 									>
-										{ item.value }
+										{ item.label }
 									</Combobox.Item>
 								) }
 							</Combobox.Collection>
@@ -131,8 +131,11 @@ export const DetachedInline: Story = {
 					<Combobox.List>
 						<Combobox.Collection>
 							{ ( item: FixtureItem ) => (
-								<Combobox.Item key={ item.id } value={ item }>
-									{ item.value }
+								<Combobox.Item
+									key={ item.value }
+									value={ item }
+								>
+									{ item.label }
 								</Combobox.Item>
 							) }
 						</Combobox.Collection>
@@ -149,10 +152,10 @@ export const Creatable: Story = {
 		const [ value, setValue ] = useState( ITEMS[ 0 ] );
 		const hasNoExactMatch =
 			inputValue.length > 0 &&
-			! ITEMS.some( ( item ) => item.value === inputValue.trim() );
+			! ITEMS.some( ( item ) => item.label === inputValue.trim() );
 		const creatableItem = {
-			id: 'create',
-			value:
+			value: 'create',
+			label:
 				'Create new item' + ( inputValue ? `: ${ inputValue }` : '' ),
 		};
 
@@ -164,7 +167,7 @@ export const Creatable: Story = {
 				value={ value }
 				onValueChange={ ( newValue, event ) => {
 					const typedValue = newValue as FixtureItem;
-					if ( typedValue.id === 'create' ) {
+					if ( typedValue.value === 'create' ) {
 						// eslint-disable-next-line no-alert
 						alert( 'Show dialog to create new item!' );
 					} else {
@@ -188,12 +191,12 @@ export const Creatable: Story = {
 						<Combobox.ListBody>
 							<Combobox.Collection>
 								{ ( item: FixtureItem ) =>
-									item.id !== creatableItem.id && (
+									item.value !== creatableItem.value && (
 										<Combobox.Item
-											key={ item.id }
+											key={ item.value }
 											value={ item }
 										>
-											{ item.value }
+											{ item.label }
 										</Combobox.Item>
 									)
 								}
@@ -203,9 +206,9 @@ export const Creatable: Story = {
 							<Combobox.Item
 								variant="creatable"
 								value={ creatableItem }
-								key={ creatableItem.id }
+								key={ creatableItem.value }
 							>
-								{ creatableItem.value }
+								{ creatableItem.label }
 							</Combobox.Item>
 						</Combobox.ListFooter>
 					</Combobox.List>
@@ -218,8 +221,8 @@ export const Creatable: Story = {
 export const AsyncItems: Story = {
 	render: function Template( args ) {
 		const LOADING_ITEM = {
-			id: 'loading',
-			value: 'Loading...',
+			value: 'loading',
+			label: 'Loading...',
 		};
 		const [ items, setItems ] = useState( [ LOADING_ITEM ] );
 		const [ value, setValue ] = useState< unknown >( LOADING_ITEM );
@@ -251,11 +254,11 @@ export const AsyncItems: Story = {
 							<Combobox.Collection>
 								{ ( item: FixtureItem ) => (
 									<Combobox.Item
-										key={ item.id }
+										key={ item.value }
 										value={ item }
-										disabled={ item.id === 'loading' }
+										disabled={ item.value === 'loading' }
 									>
-										{ item.value }
+										{ item.label }
 									</Combobox.Item>
 								) }
 							</Combobox.Collection>
@@ -289,14 +292,14 @@ export const WithCustomTriggerAndItem: Story = {
 							} }
 						>
 							<img
-								src={ `https://gravatar.com/avatar/?d=initials&name=${ item.id }` }
+								src={ `https://gravatar.com/avatar/?d=initials&name=${ item.value }` }
 								alt=""
 								width="20"
 								style={ {
 									borderRadius: '50%',
 								} }
 							/>
-							{ item.value }
+							{ item.label }
 						</span>
 					) }
 				</Combobox.Trigger>
@@ -309,9 +312,9 @@ export const WithCustomTriggerAndItem: Story = {
 							<Combobox.Collection>
 								{ ( item: FixtureItem ) => (
 									<Combobox.Item
-										key={ item.id }
+										key={ item.value }
 										value={ item }
-										aria-describedby={ `description-${ item.id }` }
+										aria-describedby={ `description-${ item.value }` }
 									>
 										<div
 											style={ {
@@ -321,9 +324,9 @@ export const WithCustomTriggerAndItem: Story = {
 												flexGrow: 1,
 											} }
 										>
-											<span>{ item.value }</span>
+											<span>{ item.label }</span>
 											<span
-												id={ `description-${ item.id }` }
+												id={ `description-${ item.value }` }
 												aria-hidden="true"
 											>
 												99 in stock
@@ -376,10 +379,10 @@ export const WithCustomZIndex: Story = {
 							<Combobox.Collection>
 								{ ( item: FixtureItem ) => (
 									<Combobox.Item
-										key={ item.id }
+										key={ item.value }
 										value={ item }
 									>
-										{ item.value }
+										{ item.label }
 									</Combobox.Item>
 								) }
 							</Combobox.Collection>
