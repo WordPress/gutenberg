@@ -26,6 +26,14 @@
 			"type": "string",
 			"default": "excerpt",
 			"enum": [ "none", "excerpt", "full" ]
+		},
+		"showPingbacks": {
+			"type": "boolean",
+			"default": true
+		},
+		"showTrackbacks": {
+			"type": "boolean",
+			"default": true
 		}
 	},
 	"supports": {

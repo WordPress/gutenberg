@@ -454,7 +454,7 @@ Display a list of your most recent comments. ([Source](https://github.com/WordPr
 -	**Name:** core/latest-comments
 -	**Category:** widgets
 -	**Supports:** align, anchor, color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** commentsToShow, displayAvatar, displayContent, displayDate
+-	**Attributes:** commentsToShow, displayAvatar, displayContent, displayDate, showPingbacks, showTrackbacks
 
 ## Latest Posts
 

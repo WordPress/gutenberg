@@ -34,8 +34,14 @@ const MIN_COMMENTS = 1;
 const MAX_COMMENTS = 100;
 
 export default function LatestComments( { attributes, setAttributes, name } ) {
-	const { commentsToShow, displayAvatar, displayDate, displayContent } =
-		attributes;
+	const {
+		commentsToShow,
+		displayAvatar,
+		displayDate,
+		displayContent,
+		showPingbacks,
+		showTrackbacks,
+	} = attributes;
 
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
@@ -65,6 +71,8 @@ export default function LatestComments( { attributes, setAttributes, name } ) {
 							displayAvatar: true,
 							displayDate: true,
 							displayContent: 'excerpt',
+							showPingbacks: true,
+							showTrackbacks: true,
 						} );
 					} }
 					dropdownMenuProps={ dropdownMenuProps }
@@ -148,6 +156,44 @@ export default function LatestComments( { attributes, setAttributes, name } ) {
 							min={ MIN_COMMENTS }
 							max={ MAX_COMMENTS }
 							required
+						/>
+					</ToolsPanelItem>
+
+					<ToolsPanelItem
+						hasValue={ () => ! showPingbacks }
+						label={ __( 'Show pingbacks' ) }
+						onDeselect={ () =>
+							setAttributes( { showPingbacks: true } )
+						}
+						isShownByDefault
+					>
+						<ToggleControl
+							label={ __( 'Show pingbacks' ) }
+							checked={ showPingbacks }
+							onChange={ () =>
+								setAttributes( {
+									showPingbacks: ! showPingbacks,
+								} )
+							}
+						/>
+					</ToolsPanelItem>
+
+					<ToolsPanelItem
+						hasValue={ () => ! showTrackbacks }
+						label={ __( 'Show trackbacks' ) }
+						onDeselect={ () =>
+							setAttributes( { showTrackbacks: true } )
+						}
+						isShownByDefault
+					>
+						<ToggleControl
+							label={ __( 'Show trackbacks' ) }
+							checked={ showTrackbacks }
+							onChange={ () =>
+								setAttributes( {
+									showTrackbacks: ! showTrackbacks,
+								} )
+							}
 						/>
 					</ToolsPanelItem>
 				</ToolsPanel>
