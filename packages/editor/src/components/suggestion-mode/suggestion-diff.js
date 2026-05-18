@@ -1,10 +1,13 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _n, sprintf } from '@wordpress/i18n';
 import { __experimentalText as WCText } from '@wordpress/components';
 import { Stack, VisuallyHidden } from '@wordpress/ui';
 import { useMemo } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
+import { store as blockEditorStore } from '@wordpress/block-editor';
+import { getBlockType } from '@wordpress/blocks';
 
 /**
  * Upper bound for word-level LCS input length (characters). Beyond this,
@@ -300,37 +303,110 @@ function BlockInsertDiff( { operation } ) {
 }
 
 /**
- * Render a `block-move` op as a from→to descriptor. The op carries
- * the from + to anchors (clientId of the previous sibling at each
- * position, or null for "first child"); the diff renders them in a
- * compact "Moved from … to …" sentence so reviewers can verify the
- * proposed motion without the canvas open. Block content stays where
- * it was — just its position is suggested.
+ * Build a human-readable move descriptor. Pure and exported for unit
+ * testing.
+ *
+ * @param {Object}  args              Args.
+ * @param {number}  args.fromIndex    Old index within the old parent.
+ * @param {number}  args.currentIndex Current index within the new parent.
+ * @param {boolean} args.sameParent   Old and new parent are the same.
+ * @param {boolean} args.movedToRoot  Moved out of a container to the root.
+ * @param {string}  args.parentTitle  Title of the new parent block (when the
+ *                                    block moved into a different container).
+ * @return {string} Descriptor sentence.
+ */
+export function describeMove( {
+	fromIndex,
+	currentIndex,
+	sameParent,
+	movedToRoot,
+	parentTitle,
+} ) {
+	if ( sameParent ) {
+		const delta = currentIndex - fromIndex;
+		if ( delta < 0 ) {
+			const n = Math.abs( delta );
+			return sprintf(
+				/* translators: %d: number of positions moved. */
+				_n( 'Moved up %d block', 'Moved up %d blocks', n ),
+				n
+			);
+		}
+		if ( delta > 0 ) {
+			return sprintf(
+				/* translators: %d: number of positions moved. */
+				_n( 'Moved down %d block', 'Moved down %d blocks', delta ),
+				delta
+			);
+		}
+		return __( 'Moved' );
+	}
+	if ( movedToRoot ) {
+		return __( 'Moved to top level' );
+	}
+	return sprintf(
+		/* translators: %s: parent block type title. */
+		__( 'Moved into %s' ),
+		parentTitle
+	);
+}
+
+/**
+ * Render a `block-move` op as a meaningful directional descriptor. The op
+ * carries the captured `fromIndex` / `fromParentClientId`; the live index
+ * and parent come from the store so the sentence reflects the proposed
+ * motion ("Moved up 3 blocks", "Moved into Group", "Moved to top level")
+ * without needing the canvas open. Block content stays where it was — only
+ * its position is suggested.
  *
  * @param {{ operation: {
+ *   clientId: string,
  *   blockName?: string,
- *   fromAnchorClientId?: string|null,
- *   toAnchorClientId?: string|null,
+ *   fromIndex?: number,
+ *   fromParentClientId?: string,
  * } }} props
  */
 function BlockMoveDiff( { operation } ) {
-	const blockName = operation.blockName ?? '';
-	const friendly = blockName || __( 'block' );
-	const fromLabel = operation.fromAnchorClientId
-		? __( 'after a previous block' )
-		: __( 'the start' );
-	const toLabel = operation.toAnchorClientId
-		? __( 'after a different block' )
-		: __( 'the start' );
+	const friendly = operation.blockName || __( 'block' );
+	const { currentIndex, sameParent, movedToRoot, parentTitle } = useSelect(
+		( select ) => {
+			const be = select( blockEditorStore );
+			const idx = be.getBlockIndex( operation.clientId );
+			const rootId = be.getBlockRootClientId( operation.clientId ) || '';
+			const fromParent = operation.fromParentClientId ?? '';
+			const same = fromParent === rootId;
+			const toRoot = ! same && rootId === '';
+			let title = '';
+			if ( ! same && ! toRoot ) {
+				const parentName = be.getBlockName( rootId );
+				title = getBlockType( parentName )?.title ?? parentName ?? '';
+			}
+			return {
+				currentIndex: idx,
+				sameParent: same,
+				movedToRoot: toRoot,
+				parentTitle: title,
+			};
+		},
+		[ operation.clientId, operation.fromParentClientId ]
+	);
+
+	const sentence = describeMove( {
+		fromIndex: operation.fromIndex ?? 0,
+		currentIndex,
+		sameParent,
+		movedToRoot,
+		parentTitle,
+	} );
+
 	return (
 		<WCText size="13px" variant="muted">
-			{
-				/* translators: %1$s: block name; %2$s: from-position; %3$s: to-position. */
-				__( 'Moved %1$s from %2$s to %3$s.' )
-					.replace( '%1$s', friendly )
-					.replace( '%2$s', fromLabel )
-					.replace( '%3$s', toLabel )
-			}
+			{ sprintf(
+				/* translators: %1$s: block name; %2$s: move description. */
+				__( '%1$s — %2$s' ),
+				friendly,
+				sentence
+			) }
 		</WCText>
 	);
 }
