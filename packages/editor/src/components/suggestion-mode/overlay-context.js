@@ -50,6 +50,7 @@ const BLOCK_EDITOR_STORE_NAME = 'core/block-editor';
 /**
  * Internal dependencies
  */
+import { buildMoveGhostIndex } from './move-ghost-index';
 
 /**
  * @typedef {Object} OverlayEntry
@@ -72,12 +73,21 @@ const BLOCK_EDITOR_STORE_NAME = 'core/block-editor';
  * @property {Function}                     clearOverlay         Remove the entry.
  * @property {Function}                     hasOverlay           Check if an entry has any
  *                                                               overlay attributes.
+ * @property {{after:Map,before:Map}}       moveGhosts           Anchor → ghost
+ *                                                               index for pending
+ *                                                               moves.
  */
 
 const EMPTY_ENTRIES = Object.freeze( {} );
 
+const EMPTY_GHOSTS = Object.freeze( {
+	after: new Map(),
+	before: new Map(),
+} );
+
 const OverlayContext = createContext( {
 	entries: EMPTY_ENTRIES,
+	moveGhosts: EMPTY_GHOSTS,
 	captureBaseline: () => {},
 	setOverlayAttributes: () => {},
 	clearOverlay: () => {},
@@ -338,9 +348,78 @@ export function SuggestionOverlayProvider( { children } ) {
 		}
 	}, [ hasEntries, blockCount, entries, registry ] );
 
+	// Single O(n) scan for pending-move markers, shared by every block via
+	// context — avoids an O(n^2) per-block scan in the rendering HOC.
+	//
+	// `useSelect` must return a referentially stable value when state is
+	// unchanged (otherwise `@wordpress/data` warns about wasted re-renders),
+	// so it returns a primitive signature string that fully determines ghost
+	// placement (clientId, old index/anchor/parent, whether the anchor still
+	// exists, and the old parent's current first non-self sibling). The
+	// index itself is rebuilt only when that signature changes.
+	const moveSignature = useSelect( ( select ) => {
+		const blockEditor = select( BLOCK_EDITOR_STORE_NAME );
+		const ids = blockEditor?.getClientIdsWithDescendants?.() ?? [];
+		let signature = '';
+		for ( const clientId of ids ) {
+			const marker =
+				blockEditor.getBlockAttributes( clientId )?.metadata
+					?.suggestion;
+			if ( marker?.type !== 'pending-move' ) {
+				continue;
+			}
+			const fromParent = marker.fromParentClientId ?? '';
+			const fromAnchor = marker.fromAnchorClientId ?? '';
+			const anchorExists =
+				fromAnchor && blockEditor.getBlockName( fromAnchor ) ? 1 : 0;
+			const firstSibling =
+				blockEditor
+					.getBlockOrder( fromParent )
+					.find( ( id ) => id !== clientId ) ?? '';
+			signature += `${ clientId }:${
+				marker.fromIndex ?? 0
+			}:${ fromAnchor }:${ fromParent }:${ anchorExists }:${ firstSibling }|`;
+		}
+		return signature;
+	}, [] );
+
+	const moveGhosts = useMemo( () => {
+		if ( ! moveSignature ) {
+			return EMPTY_GHOSTS;
+		}
+		const blockEditor = registry.select( BLOCK_EDITOR_STORE_NAME );
+		if ( ! blockEditor?.getClientIdsWithDescendants ) {
+			return EMPTY_GHOSTS;
+		}
+		const moved = [];
+		for ( const clientId of blockEditor.getClientIdsWithDescendants() ) {
+			const marker =
+				blockEditor.getBlockAttributes( clientId )?.metadata
+					?.suggestion;
+			if ( marker?.type === 'pending-move' ) {
+				moved.push( {
+					clientId,
+					name: blockEditor.getBlockName( clientId ),
+					authorId: marker.authorId ?? null,
+					fromAnchorClientId: marker.fromAnchorClientId ?? null,
+					fromParentClientId: marker.fromParentClientId ?? '',
+					fromIndex: marker.fromIndex ?? 0,
+				} );
+			}
+		}
+		if ( moved.length === 0 ) {
+			return EMPTY_GHOSTS;
+		}
+		return buildMoveGhostIndex( moved, {
+			blockExists: ( id ) => !! blockEditor.getBlockName( id ),
+			getSiblings: ( parentId ) => blockEditor.getBlockOrder( parentId ),
+		} );
+	}, [ moveSignature, registry ] );
+
 	const value = useMemo(
 		() => ( {
 			entries,
+			moveGhosts,
 			captureBaseline,
 			setOverlayAttributes,
 			clearOverlay,
@@ -353,6 +432,7 @@ export function SuggestionOverlayProvider( { children } ) {
 		} ),
 		[
 			entries,
+			moveGhosts,
 			captureBaseline,
 			setOverlayAttributes,
 			clearOverlay,
