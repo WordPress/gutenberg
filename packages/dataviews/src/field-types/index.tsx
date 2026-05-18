@@ -11,8 +11,10 @@ import type { FieldType } from '../types/private';
 import { getControl } from '../components/dataform-controls';
 import getFilterBy from './utils/get-filter-by';
 import getValueFromId from './utils/get-value-from-id';
+import getValueFromMap from './utils/get-value-from-map';
 import hasElements from './utils/has-elements';
 import setValueFromId from './utils/set-value-from-id';
+import setValueFromMap from './utils/set-value-from-map';
 import { default as email } from './email';
 import { default as integer } from './integer';
 import { default as number } from './number';
@@ -75,7 +77,24 @@ export default function normalizeFields< Item >(
 	return fields.map( ( field ) => {
 		const fieldType = getFieldTypeByName< Item >( field.type );
 
-		const getValue = field.getValue || getValueFromId( field.id );
+		let getValue;
+		if ( typeof field.getValue === 'function' ) {
+			getValue = field.getValue;
+		} else if ( typeof field.getValue === 'object' ) {
+			getValue = getValueFromMap( field.getValue );
+		} else {
+			getValue = getValueFromId( field.id );
+		}
+
+		let setValue;
+		if ( typeof field.setValue === 'function' ) {
+			setValue = field.setValue;
+		} else if ( typeof field.setValue === 'object' ) {
+			setValue = setValueFromMap( field.setValue );
+		} else {
+			setValue = setValueFromId( field.id );
+		}
+
 		const sort = function ( a: any, b: any, direction: SortDirection ) {
 			const aValue = getValue( { item: a } );
 			const bValue = getValue( { item: b } );
@@ -91,7 +110,7 @@ export default function normalizeFields< Item >(
 			description: field.description,
 			placeholder: field.placeholder,
 			getValue,
-			setValue: field.setValue || setValueFromId( field.id ),
+			setValue,
 			elements: field.elements,
 			getElements: field.getElements,
 			hasElements: hasElements( field ),

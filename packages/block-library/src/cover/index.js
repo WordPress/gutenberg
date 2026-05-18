@@ -74,20 +74,20 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
 				multiple: false,
 				useFeaturedImage: true,
 			},
-			getValue: ( { item } ) => ( {
-				id: item.id,
-				url: item.url,
-				alt: item.alt,
-				mediaType: item.backgroundType,
-				featuredImage: item.useFeaturedImage,
-			} ),
-			setValue: ( { value } ) => ( {
-				id: value.id,
-				url: value.url,
-				alt: value.alt,
-				mediaType: value.backgroundType,
-				useFeaturedImage: value.featuredImage,
-			} ),
+			getValue: {
+				id: 'id',
+				url: 'url',
+				alt: 'alt',
+				mediaType: 'backgroundType',
+				featuredImage: 'useFeaturedImage',
+			},
+			setValue: {
+				id: 'id',
+				url: 'url',
+				alt: 'alt',
+				backgroundType: 'mediaType',
+				useFeaturedImage: 'featuredImage',
+			},
 		},
 	];
 	settings[ formKey ] = {

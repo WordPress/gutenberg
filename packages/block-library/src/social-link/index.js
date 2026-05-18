@@ -33,14 +33,8 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
 			label: __( 'Link' ),
 			type: 'url',
 			Edit: 'link', // TODO: replace with custom component
-			getValue: ( { item } ) => ( {
-				url: item.url,
-				rel: item.rel,
-			} ),
-			setValue: ( { value } ) => ( {
-				url: value.url,
-				rel: value.rel,
-			} ),
+			getValue: { url: 'url', rel: 'rel' },
+			setValue: { url: 'url', rel: 'rel' },
 		},
 		{
 			id: 'label',

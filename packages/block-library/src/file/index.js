@@ -47,14 +47,8 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
 				allowedTypes: [],
 				multiple: false,
 			},
-			getValue: ( { item } ) => ( {
-				id: item.id,
-				url: item.href,
-			} ),
-			setValue: ( { value } ) => ( {
-				id: value.id,
-				href: value.url,
-			} ),
+			getValue: { id: 'id', url: 'href' },
+			setValue: { id: 'id', href: 'url' },
 		},
 		{
 			id: 'fileName',

@@ -4,6 +4,11 @@
 import filesizeField from '../index';
 import type { MediaItem } from '../../types';
 
+// Type assertion for getValue since it's defined as a function in this field
+const getValue = filesizeField.getValue as
+	| ( ( args: { item: MediaItem } ) => string )
+	| undefined;
+
 describe( 'filesizeField', () => {
 	it( 'has correct field configuration', () => {
 		expect( filesizeField ).toMatchObject( {
@@ -25,7 +30,7 @@ describe( 'filesizeField', () => {
 				},
 			} as MediaItem;
 
-			const result = filesizeField.getValue?.( {
+			const result = getValue?.( {
 				item,
 			} );
 
@@ -54,7 +59,7 @@ describe( 'filesizeField', () => {
 					},
 				} as MediaItem;
 
-				const result = filesizeField.getValue?.( {
+				const result = getValue?.( {
 					item,
 				} );
 
@@ -76,7 +81,7 @@ describe( 'filesizeField', () => {
 			[ { media_details: { sizes: {} } }, 'when filesize is missing' ],
 			[ {}, 'when media_details is missing' ],
 		] )( 'returns empty string %s', ( item, description ) => {
-			const result = filesizeField.getValue?.( {
+			const result = getValue?.( {
 				item: item as MediaItem,
 			} );
 
