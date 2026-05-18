@@ -57,6 +57,7 @@ describe( 'Combobox', () => {
 		const user = userEvent.setup();
 		const triggerRef = createRef< HTMLButtonElement >();
 		const popupRef = createRef< HTMLDivElement >();
+		const positionerRef = createRef< HTMLDivElement >();
 		const inputRef = createRef< HTMLInputElement >();
 		const listRef = createRef< HTMLDivElement >();
 		const listBodyRef = createRef< HTMLDivElement >();
@@ -70,7 +71,10 @@ describe( 'Combobox', () => {
 		render(
 			<Combobox.Root items={ ITEMS } defaultValue={ ITEMS[ 0 ] }>
 				<Combobox.Trigger ref={ triggerRef } />
-				<Combobox.Popup ref={ popupRef }>
+				<Combobox.Popup
+					ref={ popupRef }
+					positioner={ <Combobox.Positioner ref={ positionerRef } /> }
+				>
 					<Combobox.Input ref={ inputRef } placeholder="Search" />
 					<Combobox.Value>
 						<Combobox.Chips ref={ chipsRef }>
@@ -117,6 +121,7 @@ describe( 'Combobox', () => {
 		await waitFor( () => {
 			expect( popupRef.current ).toBeInstanceOf( HTMLDivElement );
 		} );
+		expect( positionerRef.current ).toBeInstanceOf( HTMLDivElement );
 		expect( inputRef.current ).toBeInstanceOf( HTMLInputElement );
 		expect( listRef.current ).toBeInstanceOf( HTMLDivElement );
 		expect( listBodyRef.current ).toBeInstanceOf( HTMLDivElement );
@@ -126,6 +131,45 @@ describe( 'Combobox', () => {
 		expect( chipWithRemoveRef.current ).toBeInstanceOf( HTMLDivElement );
 		expect( clearRef.current ).toBeInstanceOf( HTMLButtonElement );
 		expect( emptyRef.current ).toBeInstanceOf( HTMLDivElement );
+	} );
+
+	it( 'uses a custom positioner', async () => {
+		const user = userEvent.setup();
+
+		render(
+			<Combobox.Root items={ ITEMS }>
+				<Combobox.Trigger />
+				<Combobox.Popup
+					positioner={
+						<Combobox.Positioner data-testid="custom-positioner" />
+					}
+				>
+					<Combobox.List>
+						<Combobox.ListBody>
+							<Combobox.Collection>
+								{ ( item ) => (
+									<Combobox.Item
+										key={ item.id }
+										value={ item }
+									>
+										{ item.value }
+									</Combobox.Item>
+								) }
+							</Combobox.Collection>
+						</Combobox.ListBody>
+					</Combobox.List>
+				</Combobox.Popup>
+			</Combobox.Root>
+		);
+
+		await user.click( screen.getByRole( 'combobox' ) );
+
+		const item = await screen.findByRole( 'option', {
+			name: 'Item 1',
+		} );
+		expect( screen.getByTestId( 'custom-positioner' ) ).toContainElement(
+			item
+		);
 	} );
 
 	it( 'uses a custom accessible label for chip remove buttons', () => {

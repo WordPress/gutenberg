@@ -75,6 +75,8 @@ export type ComboboxListFooterProps = ComponentProps< 'div' > & {
 
 export type PortalProps = ComponentPropsWithoutRef< typeof _Combobox.Portal >;
 
+export type PositionerProps = ComponentProps< typeof _Combobox.Positioner >;
+
 export type ComboboxPopupProps = ComponentProps< typeof _Combobox.Popup > & {
 	children?: React.ReactNode;
 	/**
@@ -84,6 +86,14 @@ export type ComboboxPopupProps = ComponentProps< typeof _Combobox.Popup > & {
 	 * ignored.
 	 */
 	portal?: ReactElement< Omit< PortalProps, 'children' > >;
+	/**
+	 * Optional positioner element, typically `<Combobox.Positioner />` with
+	 * custom positioning props (`side`, `align`, `sideOffset`, collision
+	 * settings, etc.). When omitted, `Combobox.Popup` uses
+	 * `Combobox.Positioner` with default props. Do not pass `children` on the
+	 * positioner element; they would be ignored.
+	 */
+	positioner?: ReactElement< Omit< PositionerProps, 'children' > >;
 };
 
 export type ComboboxRootProps<

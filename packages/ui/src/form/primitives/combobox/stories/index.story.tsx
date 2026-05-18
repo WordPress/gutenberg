@@ -9,6 +9,7 @@ const meta: Meta< typeof Combobox.Root > = {
 	subcomponents: {
 		Trigger: Combobox.Trigger,
 		Portal: Combobox.Portal,
+		Positioner: Combobox.Positioner,
 		Popup: Combobox.Popup,
 		Input: Combobox.Input,
 		List: Combobox.List,
@@ -342,9 +343,8 @@ export const WithCustomTriggerAndItem: Story = {
  *
  * - **Globally**, by setting the variable on `:root` or `body` (raises every
  *   `Combobox` popup in the page), or
- * - **Per instance**, by passing a `Combobox.Portal` with a `style` (or
- *   `className`) to `Combobox.Popup`'s `portal` prop. The variable cascades
- *   from the portal wrapper to everything rendered inside it.
+ * - **Per instance**, by passing a `Combobox.Positioner` with a `style` (or
+ *   `className`) to `Combobox.Popup`'s `positioner` prop.
  *
  * This story demonstrates the per-instance approach.
  */
@@ -357,8 +357,8 @@ export const WithCustomZIndex: Story = {
 			<>
 				<Combobox.Trigger />
 				<Combobox.Popup
-					portal={
-						<Combobox.Portal
+					positioner={
+						<Combobox.Positioner
 							style={ {
 								'--wp-ui-combobox-z-index': '9999',
 							} }

@@ -9,6 +9,7 @@ export { List } from './list';
 export { ListBody } from './list-body';
 export { ListFooter } from './list-footer';
 export { Portal } from './portal';
+export { Positioner } from './positioner';
 export { Popup } from './popup';
 export { Root } from './root';
 export { Trigger } from './trigger';
