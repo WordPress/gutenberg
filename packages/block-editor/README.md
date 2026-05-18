@@ -671,6 +671,25 @@ _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/inspector-controls/README.md>
 
+### isURLLike
+
+Determines whether a given value could be a URL or valid href value (like relative paths or hash links). Note this does not guarantee the value is a URL only that it looks like something that should be treated as direct entry rather than a search term. For example, just because a string has `www.` in it doesn't make it a URL, but it does make it highly likely that it will be so in the context of creating a link it makes sense to treat it like one.
+
+Examples of "URL-like" values:
+
+-   URLs with protocols: `https://wordpress.org`, `mailto:test@example.com`
+-   Domain-like strings: `www.wordpress.org`, `wordpress.org`
+-   Relative paths: `/handbook`, `./page`, `../parent`
+-   Hash links: `#section`
+
+_Parameters_
+
+-   _val_ `string`: the candidate for being URL-like (or not).
+
+_Returns_
+
+-   `boolean`: whether or not the value is potentially a URL.
+
 ### isValueSpacingPreset
 
 Checks is given value is a spacing preset.

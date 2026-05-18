@@ -71,17 +71,21 @@ function getEntityTypeName( type, kind ) {
  * This component provides the inspector controls (ToolsPanel) that are identical
  * between both navigation blocks.
  *
- * @param {Object}   props                - Component props
- * @param {Object}   props.attributes     - Block attributes
- * @param {Function} props.setAttributes  - Function to update block attributes
- * @param {string}   props.clientId       - Block client ID
- * @param {boolean}  props.isLinkEditable - Whether link editing should be allowed
+ * @param {Object}   props                         - Component props
+ * @param {Object}   props.attributes              - Block attributes
+ * @param {Function} props.setAttributes           - Function to update block attributes
+ * @param {string}   props.clientId                - Block client ID
+ * @param {boolean}  props.isLinkEditable          - Whether link editing should be allowed
+ * @param {boolean}  props.isSelected
+ * @param {boolean}  props.isParentOfSelectedBlock
  */
 export function Controls( {
 	attributes,
 	setAttributes,
 	clientId,
 	isLinkEditable = true,
+	isSelected = false,
+	isParentOfSelectedBlock = false,
 } ) {
 	const { label, url, description, rel, opensInNewTab } = attributes;
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
@@ -93,11 +97,15 @@ export function Controls( {
 			attributes,
 		} );
 
+	const isEditingContext = isSelected || isParentOfSelectedBlock;
+
 	const [ isInvalid, isDraft ] = useIsInvalidLink(
 		attributes.kind,
 		attributes.type,
 		entityRecord?.id,
-		hasUrlBinding
+		hasUrlBinding,
+		url,
+		isEditingContext
 	);
 
 	let helpText = '';
