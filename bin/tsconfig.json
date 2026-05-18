@@ -30,7 +30,6 @@
 		"api-docs/gen-theme-reference.mjs",
 		"build.mjs",
 		"cherry-pick.mjs",
-		"commander.js",
 		"dev.mjs",
 		"generate-php-sync-issue.mjs",
 		"log-performance-results.js",
