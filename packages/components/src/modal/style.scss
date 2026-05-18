@@ -200,7 +200,8 @@
 	align-items: center;
 	height: $header-height + $grid-unit-10; // 72px
 	width: 100%;
-	z-index: z-index(".components-modal__header");
+	// Stack above modal content that may overlap the header.
+	z-index: 10;
 	position: absolute;
 	top: 0;
 	left: 0;

@@ -3,7 +3,7 @@
  */
 import {
 	Button,
-	Icon,
+	Icon as WCIcon,
 	__unstableMotion as motion,
 } from '@wordpress/components';
 import { arrowUpLeft } from '@wordpress/icons';
@@ -79,7 +79,7 @@ export default function BootBackButton( { length }: { length: number } ) {
 				className="boot-canvas-back-button__icon"
 				variants={ toggleHomeIconVariants }
 			>
-				<Icon icon={ arrowUpLeft } />
+				<WCIcon icon={ arrowUpLeft } />
 			</motion.div>
 		</motion.div>
 	);

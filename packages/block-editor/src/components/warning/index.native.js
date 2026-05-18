@@ -6,7 +6,7 @@ import { View, Text } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { Icon } from '@wordpress/components';
+import { Icon as WCIcon } from '@wordpress/components';
 import { withPreferredColorScheme } from '@wordpress/compose';
 import { normalizeIconObject } from '@wordpress/blocks';
 
@@ -48,7 +48,7 @@ function Warning( {
 		<View style={ containerStyle } { ...viewProps }>
 			{ icon && (
 				<View style={ styles.icon }>
-					<Icon
+					<WCIcon
 						className={ iconClass || internalIconClass }
 						icon={ icon && icon.src ? icon.src : icon }
 					/>

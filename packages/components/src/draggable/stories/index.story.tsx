@@ -34,9 +34,9 @@ const meta: Meta< typeof Draggable > = {
 		controls: { expanded: true },
 		docs: {
 			source: { code: '' },
-			// Render each story in its own iframe — Storybook's docs-page
-			// wrappers create transform-based containing blocks that break
-			// the drag clone's `position: fixed` resolution.
+			// Render in its own iframe — Storybook's docs-page wrappers
+			// create transform-based containing blocks that break the
+			// clone's `position: fixed` resolution.
 			story: { inline: false, height: '250px' },
 		},
 		componentStatus: {

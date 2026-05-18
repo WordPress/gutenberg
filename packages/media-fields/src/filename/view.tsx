@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import {
-	Tooltip,
+	Tooltip as WCTooltip,
 	__experimentalTruncate as Truncate,
 } from '@wordpress/components';
 import { useMemo } from '@wordpress/element';
@@ -30,11 +30,11 @@ export default function FileNameView( {
 	}
 
 	return fileName.length > TRUNCATE_LENGTH ? (
-		<Tooltip text={ fileName }>
+		<WCTooltip text={ fileName }>
 			<Truncate limit={ TRUNCATE_LENGTH } ellipsizeMode="tail">
 				{ fileName }
 			</Truncate>
-		</Tooltip>
+		</WCTooltip>
 	) : (
 		<>{ fileName }</>
 	);

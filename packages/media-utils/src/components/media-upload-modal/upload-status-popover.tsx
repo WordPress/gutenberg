@@ -3,7 +3,13 @@
  */
 import { useState, useEffect, useCallback, useRef } from '@wordpress/element';
 import { __, sprintf, _n } from '@wordpress/i18n';
-import { Button, Icon, Notice, Popover, Spinner } from '@wordpress/components';
+import {
+	Button,
+	Icon as WCIcon,
+	Notice,
+	Popover,
+	Spinner,
+} from '@wordpress/components';
 import { check, chevronDown } from '@wordpress/icons';
 
 export interface UploadingFile {
@@ -123,7 +129,7 @@ export function UploadStatusPopover( {
 							>
 								{ file.status === 'uploading' && <Spinner /> }
 								{ file.status === 'uploaded' && (
-									<Icon icon={ check } size={ 16 } />
+									<WCIcon icon={ check } size={ 16 } />
 								) }
 								{ ( file.status === 'uploading' ||
 									file.status === 'uploaded' ) && (
