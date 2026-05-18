@@ -94,7 +94,7 @@
 		"webpack-dev-server": "^4.15.1"
 	},
 	"peerDependencies": {
-		"@playwright/test": "^1.59.1",
+		"@playwright/test": "^1.60.0",
 		"@wordpress/env": ">=10.0.0",
 		"react": "^18.0.0",
 		"react-dom": "^18.0.0"
