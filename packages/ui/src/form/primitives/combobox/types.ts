@@ -115,7 +115,7 @@ export type ComboboxTriggerProps = ComponentProps<
 	size?: ComboboxSize;
 };
 
-export type ComboboxValueProps = {
+export type ComboboxValueProps = ComponentProps< typeof _Combobox.Value > & {
 	/**
 	 * Can be used to override the current value of the combobox.
 	 */

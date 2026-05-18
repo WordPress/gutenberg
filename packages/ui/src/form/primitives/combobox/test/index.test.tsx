@@ -203,6 +203,16 @@ describe( 'Combobox', () => {
 		).toBeVisible();
 	} );
 
+	it( 'supports a value placeholder', () => {
+		render(
+			<Combobox.Root items={ ITEMS }>
+				<Combobox.Value placeholder="No item selected" />
+			</Combobox.Root>
+		);
+
+		expect( screen.getByText( 'No item selected' ) ).toBeVisible();
+	} );
+
 	// The actual bug is a CSS grid overlap: both Empty and List target
 	// `grid-area: main`, so Empty rendered later in DOM stacks on top and
 	// blocks clicks. JSDOM doesn't compute CSS layout, so this test only
