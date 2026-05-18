@@ -6,6 +6,10 @@
 
 -   `Draggable`: Render the drag clone inside the `@wordpress/ui` compat overlay slot so it shares stacking with `@wordpress/ui` overlays opened mid-drag. Auto-enabled in WordPress environments; other hosts can opt in via `useEnableWpCompatOverlaySlot()` ([#78183](https://github.com/WordPress/gutenberg/pull/78183), [#78354](https://github.com/WordPress/gutenberg/pull/78354)).
 
+### Bug Fixes
+
+-   `Popover`: Don't close when focus moves into the `@wordpress/ui` compat overlay slot, so nested `@wordpress/ui` overlays (e.g. `Select`) can be used inside a `Popover` without dismissing it.
+
 ## 33.1.0 (2026-05-14)
 
 ### Enhancements

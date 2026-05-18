@@ -663,4 +663,58 @@ describe( 'Popover', () => {
 			} );
 		} );
 	} );
+
+	describe( 'wp compat overlay slot', () => {
+		it( 'should not call onFocusOutside when focus moves into the wp compat overlay slot', async () => {
+			const user = userEvent.setup();
+			const onFocusOutside = jest.fn();
+
+			// Simulate a body-level overlay slot rendered as a sibling of the
+			// Popover. `@wordpress/ui` overlays such as `Select` portal their
+			// popup into a slot tagged with `[data-wp-compat-overlay-slot]`
+			// and move DOM focus into it; the Popover should stay open in
+			// that case.
+			const slot = document.createElement( 'div' );
+			slot.setAttribute( 'data-wp-compat-overlay-slot', '' );
+			const slotButton = document.createElement( 'button' );
+			slotButton.textContent = 'Slotted item';
+			slot.appendChild( slotButton );
+			document.body.appendChild( slot );
+
+			render(
+				<Popover onFocusOutside={ onFocusOutside }>
+					<button>Inside popover</button>
+				</Popover>
+			);
+
+			await user.click( screen.getByText( 'Inside popover' ) );
+			await user.click( slotButton );
+
+			await new Promise( ( resolve ) => setTimeout( resolve, 50 ) );
+			expect( onFocusOutside ).not.toHaveBeenCalled();
+
+			document.body.removeChild( slot );
+		} );
+
+		it( 'should still call onFocusOutside when focus moves to a sibling outside the slot', async () => {
+			const user = userEvent.setup();
+			const onFocusOutside = jest.fn();
+
+			render(
+				<>
+					<Popover onFocusOutside={ onFocusOutside }>
+						<button>Inside popover</button>
+					</Popover>
+					<button>Outside</button>
+				</>
+			);
+
+			await user.click( screen.getByText( 'Inside popover' ) );
+			await user.click( screen.getByText( 'Outside' ) );
+
+			await waitFor( () => {
+				expect( onFocusOutside ).toHaveBeenCalledTimes( 1 );
+			} );
+		} );
+	} );
 } );

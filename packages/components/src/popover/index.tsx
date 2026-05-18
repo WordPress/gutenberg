@@ -279,6 +279,20 @@ const UnforwardedPopover = (
 				) {
 					return;
 				}
+				// Ignore blur events where focus moves into the `@wordpress/ui`
+				// compat overlay slot. Some `@wordpress/ui` overlays (e.g. `Select`)
+				// portal their popup to a body-level slot and move DOM focus into
+				// it, which would otherwise be perceived as focus leaving the
+				// popover and close it prematurely.
+				// See https://github.com/WordPress/gutenberg/issues/78406.
+				const relatedTarget =
+					'relatedTarget' in event ? event.relatedTarget : null;
+				if (
+					relatedTarget instanceof Element &&
+					relatedTarget.closest( '[data-wp-compat-overlay-slot]' )
+				) {
+					return;
+				}
 				// Call onFocusOutside if defined or call onClose.
 				if ( onFocusOutside ) {
 					onFocusOutside( event );
