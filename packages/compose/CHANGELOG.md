@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
--   `useCopyToClipboard`: Call the `onSuccess` callback even when the trigger node unmounts before the copy resolves (e.g. a menu item that closes the menu on click).
+-   `useCopyToClipboard`: Call the `onSuccess` callback even when the trigger node unmounts before the copy resolves ([#78387](https://github.com/WordPress/gutenberg/pull/78387)).
 
 ## 7.46.0 (2026-05-14)
 
