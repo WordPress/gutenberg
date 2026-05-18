@@ -23,7 +23,7 @@ const OVERLAP_MARGIN = 20;
  */
 const AVATAR_BORDER_COLORS = [
 	'#C36EFF', // Purple
-	'#FF51A8', // Pink
+	'#D94145', // Red
 	'#E4780A', // Orange
 	'#FF35EE', // Magenta
 	'#879F11', // Olive
@@ -88,6 +88,75 @@ export function getNoteExcerpt( text, excerptLength = 10 ) {
 
 	const isTrimmed = trimmedExcerpt !== rawText;
 	return isTrimmed ? trimmedExcerpt + '…' : trimmedExcerpt;
+}
+
+/**
+ * Normalizes noteId metadata to always return an array of unique numeric ids,
+ * preserving insertion order. Handles both scalar (legacy, possibly
+ * string-typed) and array (new) values.
+ *
+ * @param {Object} metadata Block metadata object
+ * @return {number[]} Array of note IDs (may be empty)
+ */
+export function getNoteIdsFromMetadata( metadata ) {
+	const noteId = metadata?.noteId;
+	const raw = Array.isArray( noteId ) ? noteId : [ noteId ];
+	const ids = new Set();
+	for ( const value of raw ) {
+		const id = Number( value );
+		if ( Number.isFinite( id ) && id > 0 ) {
+			ids.add( id );
+		}
+	}
+	return [ ...ids ];
+}
+
+/**
+ * Adds a note ID to the metadata.
+ * Converts scalar to array if needed, otherwise appends.
+ *
+ * @param {Object} metadata Existing block metadata
+ * @param {number} noteId   Note ID to add
+ * @return {Object} Updated metadata object
+ */
+export function addNoteIdToMetadata( metadata, noteId ) {
+	const ids = new Set( getNoteIdsFromMetadata( metadata ) );
+	const id = Number( noteId );
+	if ( ids.has( id ) ) {
+		return metadata;
+	}
+	ids.add( id );
+	return { ...metadata, noteId: [ ...ids ] };
+}
+
+/**
+ * Picks the most relevant thread from a list: first unresolved, else first.
+ *
+ * @param {Array} threads Ordered list of thread objects.
+ * @return {Object|null} Selected thread or null when the list is empty.
+ */
+export function pickPrimaryNote( threads ) {
+	return (
+		threads.find( ( thread ) => thread.status === 'hold' ) ??
+		threads[ 0 ] ??
+		null
+	);
+}
+
+/**
+ * Removes a note ID from the metadata.
+ *
+ * @param {Object} metadata Existing block metadata
+ * @param {number} noteId   Note ID to remove
+ * @return {Object} Updated metadata object
+ */
+export function removeNoteIdFromMetadata( metadata, noteId ) {
+	const ids = new Set( getNoteIdsFromMetadata( metadata ) );
+	ids.delete( Number( noteId ) );
+	return {
+		...metadata,
+		noteId: ids.size > 0 ? [ ...ids ] : undefined,
+	};
 }
 
 /**
@@ -198,18 +267,17 @@ export function calculateNotePositions( {
 }
 
 /**
- * Shift focus to the note thread associated with a particular note ID.
- * If an additional selector is provided, the focus will be shifted to the element matching the selector.
+ * Resolve the DOM element for a note thread once it's mounted,
+ * or `null` if not found within 3 seconds.
  *
- * @typedef {import('@wordpress/element').RefObject} RefObject
- *
- * @param {string}       noteId             The ID of the note thread to focus.
- * @param {?HTMLElement} container          The container element to search within.
- * @param {string}       additionalSelector The additional selector to focus on.
+ * @param {string}       noteId             Note thread ID.
+ * @param {?HTMLElement} container          Container to search within.
+ * @param {string}       additionalSelector Optional descendant selector.
+ * @return {Promise<HTMLElement|null>} Resolved element, or `null` on timeout.
  */
-export function focusNoteThread( noteId, container, additionalSelector ) {
+function findNoteThread( noteId, container, additionalSelector ) {
 	if ( ! container ) {
-		return;
+		return Promise.resolve( null );
 	}
 
 	// A thread without a noteId is a new note thread.
@@ -236,15 +304,43 @@ export function focusNoteThread( noteId, container, additionalSelector ) {
 			}
 		} );
 
-		observer.observe( container, {
-			childList: true,
-			subtree: true,
-		} );
+		observer.observe( container, { childList: true, subtree: true } );
 
 		// Stop trying after 3 seconds.
 		timer = setTimeout( () => {
 			observer.disconnect();
 			resolve( null );
 		}, 3000 );
-	} ).then( ( element ) => element?.focus() );
+	} );
+}
+
+/**
+ * Focus a note thread (or a descendant) and scroll it into view.
+ *
+ * @param {string}       noteId             Note thread ID.
+ * @param {?HTMLElement} container          Container to search within.
+ * @param {string}       additionalSelector Optional descendant selector.
+ */
+export function focusNoteThread( noteId, container, additionalSelector ) {
+	return findNoteThread( noteId, container, additionalSelector ).then(
+		( element ) => {
+			if ( ! element ) {
+				return;
+			}
+			element.focus();
+			element.scrollIntoView( { block: 'nearest' } );
+		}
+	);
+}
+
+/**
+ * Scroll a note thread into view without changing focus.
+ *
+ * @param {string}       noteId    Note thread ID.
+ * @param {?HTMLElement} container Container to search within.
+ */
+export function scrollNoteThreadIntoView( noteId, container ) {
+	return findNoteThread( noteId, container ).then( ( element ) => {
+		element?.scrollIntoView( { block: 'nearest' } );
+	} );
 }

@@ -24,6 +24,9 @@
 		outline:
 			var(--wpds-border-width-focus) solid
 			var(--wpds-color-stroke-focus-brand);
+		// Override style from wp-admin common.css.
+		box-shadow: none;
+		border-radius: 0;
 	}
 }
 
@@ -34,6 +37,7 @@
 }
 
 .components-external-link__icon {
+	line-height: 1;
 	display: inline-block;
 	margin-inline-start: var(--wpds-dimension-padding-xs);
 	font-weight: var(--wpds-typography-font-weight-regular);

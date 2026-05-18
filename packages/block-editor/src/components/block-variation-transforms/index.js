@@ -144,7 +144,7 @@ function VariationsToggleGroupControl( {
 	);
 }
 
-function __experimentalBlockVariationTransforms( { blockClientId } ) {
+function BlockVariationTransforms( { blockClientId } ) {
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 	const {
 		activeBlockVariation,
@@ -235,4 +235,4 @@ function __experimentalBlockVariationTransforms( { blockClientId } ) {
 	);
 }
 
-export default __experimentalBlockVariationTransforms;
+export default BlockVariationTransforms;

@@ -7,7 +7,7 @@ import {
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
 	__experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
-	__experimentalVStack as VStack,
+	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import {
@@ -27,7 +27,7 @@ import { useSettings } from '../components/use-settings';
 import { appendSelectors, getBlockGapCSS, getAlignmentsInfo } from './utils';
 import { getGapCSSValue } from '../hooks/gap';
 import { BlockControls, JustifyContentControl } from '../components';
-import { shouldSkipSerialization } from '../hooks/utils';
+import { cleanEmptyObject, shouldSkipSerialization } from '../hooks/utils';
 import { LAYOUT_DEFINITIONS } from './definitions';
 
 export default {
@@ -37,6 +37,8 @@ export default {
 		layout,
 		onChange,
 		layoutBlockSupport = {},
+		resetLayout = {},
+		clientId,
 	} ) {
 		const { wideSize, contentSize, justifyContent = 'center' } = layout;
 		const {
@@ -70,92 +72,143 @@ export default {
 		const units = useCustomUnits( {
 			availableUnits: availableUnits || [ '%', 'px', 'em', 'rem', 'vw' ],
 		} );
+		const hasLayoutValue = ( key, defaultValue ) =>
+			( layout?.[ key ] ?? defaultValue ) !==
+			( resetLayout?.[ key ] ?? defaultValue );
+		const resetContentSize = () =>
+			onChange(
+				cleanEmptyObject( {
+					...layout,
+					contentSize: resetLayout?.contentSize,
+				} )
+			);
+		const resetWideSize = () =>
+			onChange(
+				cleanEmptyObject( {
+					...layout,
+					wideSize: resetLayout?.wideSize,
+				} )
+			);
+		const resetJustification = () =>
+			onChange(
+				cleanEmptyObject( {
+					...layout,
+					justifyContent: resetLayout?.justifyContent,
+				} )
+			);
+		const hasContentSizeValue = () => hasLayoutValue( 'contentSize' );
+		const hasWideSizeValue = () => hasLayoutValue( 'wideSize' );
+		const hasJustificationValue = () =>
+			hasLayoutValue( 'justifyContent', 'center' );
+
 		return (
-			<VStack
-				spacing={ 4 }
-				className="block-editor-hooks__layout-constrained"
-			>
+			<>
 				{ allowCustomContentAndWideSize && (
 					<>
-						<UnitControl
-							__next40pxDefaultSize
+						<ToolsPanelItem
 							label={ __( 'Content width' ) }
-							labelPosition="top"
-							value={ contentSize || wideSize || '' }
-							onChange={ ( nextWidth ) => {
-								nextWidth =
-									0 > parseFloat( nextWidth )
-										? '0'
-										: nextWidth;
-								onChange( {
-									...layout,
-									contentSize:
-										nextWidth !== ''
-											? nextWidth
-											: undefined,
-								} );
-							} }
-							units={ units }
-							prefix={
-								<InputControlPrefixWrapper variant="icon">
-									<Icon icon={ alignNone } />
-								</InputControlPrefixWrapper>
-							}
-						/>
-						<UnitControl
-							__next40pxDefaultSize
+							hasValue={ hasContentSizeValue }
+							onDeselect={ resetContentSize }
+							panelId={ clientId }
+						>
+							<UnitControl
+								__next40pxDefaultSize
+								label={ __( 'Content width' ) }
+								labelPosition="top"
+								value={ contentSize || wideSize || '' }
+								onChange={ ( nextWidth ) => {
+									nextWidth =
+										0 > parseFloat( nextWidth )
+											? '0'
+											: nextWidth;
+									onChange(
+										cleanEmptyObject( {
+											...layout,
+											contentSize:
+												nextWidth !== ''
+													? nextWidth
+													: undefined,
+										} )
+									);
+								} }
+								units={ units }
+								prefix={
+									<InputControlPrefixWrapper variant="icon">
+										<Icon icon={ alignNone } />
+									</InputControlPrefixWrapper>
+								}
+							/>
+						</ToolsPanelItem>
+						<ToolsPanelItem
 							label={ __( 'Wide width' ) }
-							labelPosition="top"
-							value={ wideSize || contentSize || '' }
-							onChange={ ( nextWidth ) => {
-								nextWidth =
-									0 > parseFloat( nextWidth )
-										? '0'
-										: nextWidth;
-								onChange( {
-									...layout,
-									wideSize:
-										nextWidth !== ''
-											? nextWidth
-											: undefined,
-								} );
-							} }
-							units={ units }
-							prefix={
-								<InputControlPrefixWrapper variant="icon">
-									<Icon icon={ stretchWide } />
-								</InputControlPrefixWrapper>
-							}
-						/>
-						<p className="block-editor-hooks__layout-constrained-helptext">
-							{ __(
-								'Customize the width for all elements that are assigned to the center or wide columns.'
-							) }
-						</p>
+							hasValue={ hasWideSizeValue }
+							onDeselect={ resetWideSize }
+							panelId={ clientId }
+						>
+							<UnitControl
+								__next40pxDefaultSize
+								label={ __( 'Wide width' ) }
+								labelPosition="top"
+								value={ wideSize || contentSize || '' }
+								onChange={ ( nextWidth ) => {
+									nextWidth =
+										0 > parseFloat( nextWidth )
+											? '0'
+											: nextWidth;
+									onChange(
+										cleanEmptyObject( {
+											...layout,
+											wideSize:
+												nextWidth !== ''
+													? nextWidth
+													: undefined,
+										} )
+									);
+								} }
+								units={ units }
+								prefix={
+									<InputControlPrefixWrapper variant="icon">
+										<Icon icon={ stretchWide } />
+									</InputControlPrefixWrapper>
+								}
+							/>
+							<p className="block-editor-hooks__layout-constrained-helptext">
+								{ __(
+									'Customize the width for all elements that are assigned to the center or wide columns.'
+								) }
+							</p>
+						</ToolsPanelItem>
 					</>
 				) }
 				{ allowJustification && (
-					<ToggleGroupControl
-						__next40pxDefaultSize
+					<ToolsPanelItem
 						label={ __( 'Justification' ) }
-						value={ justifyContent }
-						onChange={ onJustificationChange }
+						hasValue={ hasJustificationValue }
+						onDeselect={ resetJustification }
+						panelId={ clientId }
 					>
-						{ justificationOptions.map(
-							( { value, icon, label } ) => {
-								return (
-									<ToggleGroupControlOptionIcon
-										key={ value }
-										value={ value }
-										icon={ icon }
-										label={ label }
-									/>
-								);
-							}
-						) }
-					</ToggleGroupControl>
+						<ToggleGroupControl
+							__next40pxDefaultSize
+							label={ __( 'Justification' ) }
+							value={ justifyContent }
+							onChange={ onJustificationChange }
+						>
+							{ justificationOptions.map(
+								( { value, icon, label } ) => {
+									return (
+										<ToggleGroupControlOptionIcon
+											key={ value }
+											value={ value }
+											icon={ icon }
+											label={ label }
+										/>
+									);
+								}
+							) }
+						</ToggleGroupControl>
+					</ToolsPanelItem>
 				) }
-			</VStack>
+			</>
 		);
 	},
 	toolBarControls: function DefaultLayoutToolbarControls( {
