@@ -73,6 +73,14 @@ function gutenberg_should_add_elements_class_name( $block, $options ) {
 				array( 'h6', 'color', 'gradient' ),
 			),
 		),
+		'caption' => array(
+			'skip'  => $options['caption']['skip'] ?? false,
+			'paths' => array(
+				array( 'caption', 'color', 'text' ),
+				array( 'caption', 'color', 'background' ),
+				array( 'caption', 'color', 'gradient' ),
+			),
+		),
 	);
 
 	$elements_style_attributes = $block['attrs']['style']['elements'];
@@ -134,9 +142,11 @@ function gutenberg_render_elements_support_styles( $parsed_block ) {
 	$skip_link_color_serialization         = wp_should_skip_block_supports_serialization( $block_type, 'color', 'link' );
 	$skip_heading_color_serialization      = wp_should_skip_block_supports_serialization( $block_type, 'color', 'heading' );
 	$skip_button_color_serialization       = wp_should_skip_block_supports_serialization( $block_type, 'color', 'button' );
+	$skip_caption_color_serialization      = wp_should_skip_block_supports_serialization( $block_type, 'color', 'caption' );
 	$skips_all_element_color_serialization = $skip_link_color_serialization &&
 		$skip_heading_color_serialization &&
-		$skip_button_color_serialization;
+		$skip_button_color_serialization &&
+		$skip_caption_color_serialization;
 
 	if ( $skips_all_element_color_serialization ) {
 		return $parsed_block;
@@ -146,6 +156,7 @@ function gutenberg_render_elements_support_styles( $parsed_block ) {
 		'button'  => array( 'skip' => $skip_button_color_serialization ),
 		'link'    => array( 'skip' => $skip_link_color_serialization ),
 		'heading' => array( 'skip' => $skip_heading_color_serialization ),
+		'caption' => array( 'skip' => $skip_caption_color_serialization ),
 	);
 
 	if ( ! gutenberg_should_add_elements_class_name( $parsed_block, $options ) ) {
@@ -173,6 +184,10 @@ function gutenberg_render_elements_support_styles( $parsed_block ) {
 			'selector' => ".$class_name h1, .$class_name h2, .$class_name h3, .$class_name h4, .$class_name h5, .$class_name h6",
 			'skip'     => $skip_heading_color_serialization,
 			'elements' => array( 'h1', 'h2', 'h3', 'h4', 'h5', 'h6' ),
+		),
+		'caption' => array(
+			'selector' => ".$class_name .wp-element-caption, .$class_name figcaption",
+			'skip'     => $skip_caption_color_serialization,
 		),
 	);
 
