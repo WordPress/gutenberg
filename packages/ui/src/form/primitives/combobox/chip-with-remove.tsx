@@ -10,9 +10,6 @@ import styles from './style.module.css';
 /**
  * A utility component that combines a chip and a remove button,
  * with standard styling.
- *
- * For custom designs, use the `Combobox.Chip` and `Combobox.ChipRemove`
- * components directly.
  */
 export const ChipWithRemove = forwardRef<
 	HTMLDivElement,
