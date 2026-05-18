@@ -236,7 +236,7 @@ function ColumnEditWrapper( props ) {
 	);
 }
 
-export default compose( [
+const ColumnEditWrapperComposed = compose( [
 	withSelect( ( select, { clientId } ) => {
 		const {
 			getBlockCount,
@@ -271,3 +271,11 @@ export default compose( [
 	} ),
 	withPreferredColorScheme,
 ] )( ColumnEditWrapper );
+
+// Determines if the block can be removed from the block hierarchy
+// in order to flatten deeply nested inner blocks. If true and the following conditions are met, its inner blocks will be rendered in the parent block.
+// - The block is being rendered as an inner block.
+// - The block is not selected.
+ColumnEditWrapperComposed.canFlattenInnerBlocks = () => true;
+
+export default ColumnEditWrapperComposed;
