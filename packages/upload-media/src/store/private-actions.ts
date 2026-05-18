@@ -586,12 +586,14 @@ function isValidImageFormat( format: string ): format is ImageFormat {
  * @param file           The image file.
  * @param outputMimeType The target output MIME type.
  * @param interlaced     Whether to use interlaced encoding.
+ * @param quality        Re-encode quality (0-1). Defaults to DEFAULT_OUTPUT_QUALITY.
  * @return The transcode operation tuple if transcoding is needed, null otherwise.
  */
 export async function getTranscodeImageOperation(
 	file: File,
 	outputMimeType: string,
-	interlaced: boolean = false
+	interlaced: boolean = false,
+	quality: number = DEFAULT_OUTPUT_QUALITY
 ): Promise<
 	| [
 			OperationType.TranscodeImage,
@@ -627,7 +629,7 @@ export async function getTranscodeImageOperation(
 		OperationType.TranscodeImage,
 		{
 			outputFormat: formatPart,
-			outputQuality: DEFAULT_OUTPUT_QUALITY,
+			outputQuality: quality,
 			interlaced,
 		},
 	];
@@ -875,7 +877,8 @@ export function resizeCropItem( id: QueueItemId, args?: ResizeCropItemArgs ) {
 				false, // smartCrop
 				addSuffix,
 				item.abortController?.signal,
-				scaledSuffix
+				scaledSuffix,
+				args.quality
 			);
 
 			const blobUrl = createBlobURL( file );
@@ -1148,6 +1151,26 @@ export function generateThumbnails( id: QueueItemId ) {
 			const outputMimeType = attachment.image_output_format;
 			const interlaced = attachment.image_save_progressive ?? false;
 
+			// Resolve the size-aware encode quality from the
+			// wp_editor_set_quality filter, carried in the upload response.
+			// Quality is reported as 1-100 (WordPress scale); the vips worker
+			// expects 0-1. Fall back to the generic setting, then the
+			// hardcoded default, when the response predates this field.
+			const imageQuality = attachment.image_quality;
+			const fallbackQuality =
+				settings.imageQuality ?? DEFAULT_OUTPUT_QUALITY;
+			const defaultQuality =
+				typeof imageQuality?.default === 'number'
+					? imageQuality.default / 100
+					: fallbackQuality;
+			const qualityForSize = ( sizeName: string ): number => {
+				const sized = imageQuality?.sizes?.[ sizeName ];
+				if ( typeof sized === 'number' ) {
+					return sized / 100;
+				}
+				return defaultQuality;
+			};
+
 			// Check if thumbnails should be transcoded to a different format.
 			// Uses the same transparency-aware logic as the main image
 			// to avoid converting transparent PNGs to JPEG.
@@ -1162,7 +1185,8 @@ export function generateThumbnails( id: QueueItemId ) {
 				thumbnailTranscodeOperation = await getTranscodeImageOperation(
 					thumbnailSource,
 					outputMimeType,
-					interlaced
+					interlaced,
+					defaultQuality
 				);
 			}
 
@@ -1192,15 +1216,30 @@ export function generateThumbnails( id: QueueItemId ) {
 			for ( const [ , names ] of dimensionGroups ) {
 				const imageSize = allImageSizes[ names[ 0 ] ];
 
+				// Sizes grouped here share dimensions, so wp_editor_set_quality
+				// (which is dimension-aware) resolves to the same value for
+				// every name in the group.
+				const sizeQuality = qualityForSize( names[ 0 ] );
+
 				// Build operations list for this thumbnail.
 				const thumbnailOperations: Operation[] = [
-					[ OperationType.ResizeCrop, { resize: imageSize } ],
+					[
+						OperationType.ResizeCrop,
+						{ resize: imageSize, quality: sizeQuality },
+					],
 				];
 
 				// Add transcoding if format conversion is configured and
-				// the transparency check passed.
+				// the transparency check passed. Override the template's
+				// quality with this size's resolved value.
 				if ( thumbnailTranscodeOperation ) {
-					thumbnailOperations.push( thumbnailTranscodeOperation );
+					thumbnailOperations.push( [
+						thumbnailTranscodeOperation[ 0 ],
+						{
+							...thumbnailTranscodeOperation[ 1 ],
+							outputQuality: sizeQuality,
+						},
+					] );
 				}
 
 				thumbnailOperations.push( OperationType.Upload );
@@ -1253,6 +1292,7 @@ export function generateThumbnails( id: QueueItemId ) {
 										height: bigImageSizeThreshold,
 									},
 									isThresholdResize: true,
+									quality: defaultQuality,
 								},
 							],
 						];
