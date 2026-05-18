@@ -58,6 +58,8 @@ const REVISION_REMOVED_FILTER_SVG = `
 const REVISION_DIFF_STYLES = `
 	.is-revision-added {
 		box-shadow: inset 0 0 0 9999px color-mix(in srgb, currentColor 5%, #00a32a 15%), 0 0 0 4px color-mix(in srgb, currentColor 5%, #00a32a 15%);
+		outline: 3px solid #00a32a;
+		outline-offset: 2px;
 	}
 	.is-revision-removed,
 	.revision-diff-removed {
