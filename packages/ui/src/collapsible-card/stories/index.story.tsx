@@ -321,7 +321,7 @@ export const ComparedToCard: Story = {
  * header sits above it, the media bumps against the card&apos;s side and
  * bottom edges while the header retains its normal padding. (Unlike a plain
  * `Card`, a header is always required here for the collapse trigger — see
- * `Card` stories for a body-only `FullBleedOnly` example.)
+ * `Card` stories for a body-only `FullBleedCoverOnly` example.)
  */
 export const FullBleedCoverWithHeader: Story = {
 	argTypes: { open: { control: false } },
