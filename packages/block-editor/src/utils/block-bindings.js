@@ -1,5 +1,6 @@
 const DEFAULT_ATTRIBUTE = '__default';
 const PATTERN_OVERRIDES_SOURCE = 'core/pattern-overrides';
+const SYNCED_STYLES_SOURCE = 'core/synced-styles';
 
 /**
  * Checks if the block has the `__default` binding for pattern overrides.
@@ -28,19 +29,25 @@ export function replacePatternOverridesDefaultBinding(
 	bindings,
 	supportedAttributes
 ) {
-	// The `__default` binding currently only works for pattern overrides.
-	if ( hasPatternOverridesDefaultBinding( bindings ) ) {
-		const bindingsWithDefaults = {};
-		for ( const attributeName of supportedAttributes ) {
-			// If the block has mixed binding sources, retain any non pattern override bindings.
-			const bindingSource = bindings[ attributeName ]
-				? bindings[ attributeName ]
-				: { source: PATTERN_OVERRIDES_SOURCE };
-			bindingsWithDefaults[ attributeName ] = bindingSource;
-		}
+	const defaultBinding = bindings?.[ DEFAULT_ATTRIBUTE ];
+	const source = defaultBinding?.source;
 
-		return bindingsWithDefaults;
+	// The `__default` binding works for pattern overrides and synced styles.
+	if (
+		source !== PATTERN_OVERRIDES_SOURCE &&
+		source !== SYNCED_STYLES_SOURCE
+	) {
+		return bindings;
 	}
 
-	return bindings;
+	const bindingsWithDefaults = {};
+	for ( const attributeName of supportedAttributes ) {
+		// If the block has mixed binding sources, retain any non-default bindings.
+		// Spread defaultBinding to preserve args (e.g. context key for synced styles).
+		bindingsWithDefaults[ attributeName ] = bindings[ attributeName ]
+			? bindings[ attributeName ]
+			: { ...defaultBinding };
+	}
+
+	return bindingsWithDefaults;
 }

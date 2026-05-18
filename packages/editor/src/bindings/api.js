@@ -9,6 +9,7 @@ import { registerBlockBindingsSource } from '@wordpress/blocks';
 import patternOverrides from './pattern-overrides';
 import postData from './post-data';
 import postMeta from './post-meta';
+import syncedStyles from './synced-styles';
 import termData from './term-data';
 
 /**
@@ -25,5 +26,6 @@ export function registerCoreBlockBindingsSources() {
 	registerBlockBindingsSource( patternOverrides );
 	registerBlockBindingsSource( postData );
 	registerBlockBindingsSource( postMeta );
+	registerBlockBindingsSource( syncedStyles );
 	registerBlockBindingsSource( termData );
 }
