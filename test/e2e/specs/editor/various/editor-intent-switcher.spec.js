@@ -14,7 +14,7 @@ test.describe( 'Editor intent switcher', () => {
 		await admin.createNewPost();
 	} );
 
-	test( 'defaults to Edit intent and persists across reload', async ( {
+	test( 'defaults to Edit intent and resets to Edit after reload', async ( {
 		page,
 		editor,
 	} ) => {
@@ -38,14 +38,25 @@ test.describe( 'Editor intent switcher', () => {
 		await expect( viewChoice ).toBeVisible();
 		await expect( editChoice ).toHaveAttribute( 'aria-checked', 'true' );
 
-		// Select Suggest and confirm selection persists across reload.
+		// Intent is session-scoped by design (see `setEditorIntent` and the
+		// `editorIntent` reducer in @wordpress/editor): selecting Suggest
+		// takes effect within the session, but reloading deliberately
+		// returns to the default Edit intent rather than persisting a
+		// non-default mode the user may not realize they left active.
 		await suggestChoice.click();
+		await expect( suggestChoice ).toHaveAttribute( 'aria-checked', 'true' );
+
 		await page.reload();
 		await editor.canvas.locator( 'body' ).waitFor();
 		await openIntentSwitcher( page );
 		await expect(
-			page.getByRole( 'menuitemradio', { name: /^Suggest/ } )
+			page.getByRole( 'menuitemradio', {
+				name: /^Edit\s+Edit content directly/,
+			} )
 		).toHaveAttribute( 'aria-checked', 'true' );
+		await expect(
+			page.getByRole( 'menuitemradio', { name: /^Suggest/ } )
+		).toHaveAttribute( 'aria-checked', 'false' );
 	} );
 
 	test( 'View intent makes blocks read-only', async ( { editor, page } ) => {

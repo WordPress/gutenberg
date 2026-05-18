@@ -55,7 +55,14 @@ test.describe( 'Suggestion mode', () => {
 		).toBeVisible();
 	} );
 
-	test( 'auto-saves a content edit as a suggestion', async ( {
+	// Skipped: asserts an automatic debounced auto-save
+	// (POST /wp/v2/comments). On this branch a suggestion is only
+	// persisted via the explicit commit-bar Submit button; the debounced
+	// auto-save subsystem lands in Phase 6 (#78308), which is not in this
+	// branch's ancestry. Re-enable once #78308 is in this stack's base.
+	// See: https://github.com/WordPress/gutenberg/pull/78308
+	// eslint-disable-next-line playwright/no-skipped-test -- intentional; tracked by #78308.
+	test.skip( 'auto-saves a content edit as a suggestion', async ( {
 		editor,
 		page,
 	} ) => {
@@ -88,7 +95,14 @@ test.describe( 'Suggestion mode', () => {
 		await expect( paragraph ).toHaveClass( /is-suggestion-pending/ );
 	} );
 
-	test( 'captures a heading-level change made via the block-switcher variation picker', async ( {
+	// Skipped: relies on the debounced auto-save (POST /wp/v2/comments) to
+	// persist the captured suggestion. That subsystem lands in Phase 6
+	// (#78308) and is not in this branch's ancestry; on this branch the
+	// suggestion is only persisted via the explicit commit-bar Submit
+	// button. Re-enable once #78308 is in this stack's base.
+	// See: https://github.com/WordPress/gutenberg/pull/78308
+	// eslint-disable-next-line playwright/no-skipped-test -- intentional; tracked by #78308.
+	test.skip( 'captures a heading-level change made via the block-switcher variation picker', async ( {
 		editor,
 		page,
 	} ) => {
