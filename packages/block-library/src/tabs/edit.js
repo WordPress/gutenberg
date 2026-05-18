@@ -8,7 +8,7 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
-import { useMemo, useEffect } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -34,16 +34,6 @@ const TABS_TEMPLATE = [ [ 'core/tab-list' ], [ 'core/tab-panels' ] ];
 
 function Edit( { clientId, attributes, setAttributes } ) {
 	const { anchor, activeTabIndex, editorActiveTabIndex } = attributes;
-
-	/**
-	 * Initialize editorActiveTabIndex to activeTabIndex on mount.
-	 * This ensures the ephemeral editor state starts at the persisted default.
-	 */
-	useEffect( () => {
-		if ( editorActiveTabIndex === undefined ) {
-			setAttributes( { editorActiveTabIndex: activeTabIndex } );
-		}
-	}, [] ); // eslint-disable-line react-hooks/exhaustive-deps
 
 	const { tabPanels, tabPanelsClientId, tabs, tabListClientId } = useSelect(
 		( select ) => {

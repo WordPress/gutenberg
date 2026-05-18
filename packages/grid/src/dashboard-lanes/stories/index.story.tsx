@@ -220,6 +220,36 @@ export const Responsive: Story = {
 };
 
 /**
+ * Layered configuration: `columns` caps the lane count and
+ * `minColumnWidth` enforces a per-tile width floor. The surface
+ * renders up to `columns` lanes on wide containers and reduces the
+ * count on narrow ones whenever fitting all of them would push
+ * tiles below `minColumnWidth`.
+ */
+export const Layered: Story = {
+	args: {
+		columns: 4,
+		minColumnWidth: 200,
+		layout: [
+			{ key: 'a' },
+			{ key: 'b' },
+			{ key: 'c' },
+			{ key: 'd' },
+			{ key: 'e' },
+			{ key: 'f' },
+		],
+		children: [
+			<Tile key="a" tone="brand" height={ 120 } index={ 1 } />,
+			<Tile key="b" tone="info" height={ 200 } index={ 2 } />,
+			<Tile key="c" tone="success" height={ 80 } index={ 3 } />,
+			<Tile key="d" tone="warning" height={ 160 } index={ 4 } />,
+			<Tile key="e" tone="error" height={ 100 } index={ 5 } />,
+			<Tile key="f" tone="neutral" height={ 240 } index={ 6 } />,
+		],
+	},
+};
+
+/**
  * Items with `width: 2` span two lanes. The skyline picks a span
  * position that minimizes the resulting baseline across spanned
  * lanes.

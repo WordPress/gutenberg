@@ -29,6 +29,13 @@ import type {
 	WidgetName,
 } from '../../types';
 
+// Floor applied as `minColumnWidth` on every surface render. Acts as a
+// safety net for stored settings that predate the layered model (where
+// `minColumnWidth` was XOR with `columns` and could be persisted as
+// `undefined`), and keeps tiles legible on narrow viewports without
+// requiring the consumer to wire the floor up themselves.
+const DASHBOARD_MIN_COLUMN_WIDTH = 350;
+
 function toGridLayout( widgets: DashboardWidget[] ): DashboardGridLayoutItem[] {
 	return widgets.map( ( w ) => ( {
 		key: w.uuid,
@@ -149,54 +156,32 @@ export const Widgets = forwardRef< HTMLDivElement, WidgetsProps >(
 				WidgetResizeHandle as React.ComponentType< ResizeHandleRenderProps >,
 		};
 
-		let surface: React.ReactNode;
-		if ( isMasonry ) {
-			surface =
-				gridSettings.columns !== undefined ? (
-					<DashboardLanes
-						layout={ gridLayout as DashboardLanesLayoutItem[] }
-						columns={ gridSettings.columns }
-						flowTolerance={ gridSettings.flowTolerance }
-						onChangeLayout={ handleMasonryChange }
-						{ ...sharedRenderProps }
-					>
-						{ children }
-					</DashboardLanes>
-				) : (
-					<DashboardLanes
-						layout={ gridLayout as DashboardLanesLayoutItem[] }
-						minColumnWidth={ gridSettings.minColumnWidth }
-						flowTolerance={ gridSettings.flowTolerance }
-						onChangeLayout={ handleMasonryChange }
-						{ ...sharedRenderProps }
-					>
-						{ children }
-					</DashboardLanes>
-				);
-		} else {
-			surface =
-				gridSettings.columns !== undefined ? (
-					<DashboardGrid
-						layout={ gridLayout as DashboardGridLayoutItem[] }
-						columns={ gridSettings.columns }
-						rowHeight={ gridSettings.rowHeight }
-						onChangeLayout={ handleGridChange }
-						{ ...sharedRenderProps }
-					>
-						{ children }
-					</DashboardGrid>
-				) : (
-					<DashboardGrid
-						layout={ gridLayout as DashboardGridLayoutItem[] }
-						minColumnWidth={ gridSettings.minColumnWidth }
-						rowHeight={ gridSettings.rowHeight }
-						onChangeLayout={ handleGridChange }
-						{ ...sharedRenderProps }
-					>
-						{ children }
-					</DashboardGrid>
-				);
-		}
+		const minColumnWidth =
+			gridSettings.minColumnWidth ?? DASHBOARD_MIN_COLUMN_WIDTH;
+
+		const surface: React.ReactNode = isMasonry ? (
+			<DashboardLanes
+				layout={ gridLayout as DashboardLanesLayoutItem[] }
+				columns={ gridSettings.columns }
+				minColumnWidth={ minColumnWidth }
+				flowTolerance={ gridSettings.flowTolerance }
+				onChangeLayout={ handleMasonryChange }
+				{ ...sharedRenderProps }
+			>
+				{ children }
+			</DashboardLanes>
+		) : (
+			<DashboardGrid
+				layout={ gridLayout as DashboardGridLayoutItem[] }
+				columns={ gridSettings.columns }
+				minColumnWidth={ minColumnWidth }
+				rowHeight={ gridSettings.rowHeight }
+				onChangeLayout={ handleGridChange }
+				{ ...sharedRenderProps }
+			>
+				{ children }
+			</DashboardGrid>
+		);
 
 		return (
 			<div ref={ ref } className={ clsx( styles.grid, className ) }>

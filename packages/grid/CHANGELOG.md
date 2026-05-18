@@ -4,6 +4,10 @@
 
 ### Enhancements
 
+-   Add `--wp-grid-placeholder-outline-style` and
+    `--wp-grid-resize-preview-outline-style` CSS custom properties for
+    the drag-placeholder outline (default `dashed`) and resize-preview
+    border (default `solid`).
 -   Set `data-wp-dashboard-grid-resizing` on the `DashboardGrid` root
     element while any tile resize gesture is active, so consumers can
     adjust styles when the pointer may still hover tiles ([#78234](https://github.com/WordPress/gutenberg/pull/78234)).

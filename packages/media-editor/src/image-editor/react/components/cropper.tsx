@@ -30,8 +30,9 @@ import type {
 	NormalizedRect,
 } from '../../core/types';
 import type { UseCropperStateReturn } from '../hooks/use-cropper-state';
-import { getImageFit } from '../../core/camera';
+import { getImageFit, getRotatedBBox } from '../../core/camera';
 import { getImageCropBounds } from '../../core/containment';
+import { MIN_CROP_PIXELS } from '../../core/constants';
 import { useInteraction } from '../hooks/use-interaction';
 import { useTransformStyle } from '../hooks/use-transform-style';
 import { useAriaAnnouncer } from '../hooks/use-aria-announcer';
@@ -289,6 +290,32 @@ function CropperInner(
 			),
 		[ canvasSize, naturalWidth, naturalHeight, state.rotation ]
 	);
+
+	// Per-axis minimum crop size in normalized space, expressing a
+	// pixel floor on the captured source region. cropRect is normalized
+	// in the viewport's snap-rotation bbox; the captured source-pixel
+	// width is `cropRect.width * bbox.width / zoom`, so the normalized
+	// floor scales with `zoom` to keep the source-pixel floor constant.
+	// Without this, SETTLE_CROP zooms in proportional to the shrink and
+	// successive drags can crop arbitrarily small.
+	const minCropSize: Size | undefined = useMemo( () => {
+		if ( naturalWidth <= 0 || naturalHeight <= 0 ) {
+			return undefined;
+		}
+		const snapRotation = Math.round( state.rotation / 90 ) * 90;
+		const bbox = getRotatedBBox(
+			naturalWidth,
+			naturalHeight,
+			snapRotation
+		);
+		return {
+			width: Math.min( 1, ( MIN_CROP_PIXELS * state.zoom ) / bbox.width ),
+			height: Math.min(
+				1,
+				( MIN_CROP_PIXELS * state.zoom ) / bbox.height
+			),
+		};
+	}, [ naturalWidth, naturalHeight, state.rotation, state.zoom ] );
 
 	// In fixed-crop mode, auto-size the crop rect only when a fixed aspect
 	// ratio is selected. With "Free" selected, turning freeform handles off
@@ -740,6 +767,7 @@ function CropperInner(
 						freeformCrop={ freeformCrop }
 						stencilTransition={ settleStencilTransition }
 						cropBounds={ cropBounds }
+						minCropSize={ minCropSize }
 					/>
 
 					{ /* Rule-of-thirds grid */ }
