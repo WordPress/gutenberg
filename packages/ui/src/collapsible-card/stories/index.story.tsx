@@ -323,7 +323,7 @@ export const ComparedToCard: Story = {
  * `Card`, a header is always required here for the collapse trigger — see
  * `Card` stories for a body-only `FullBleedOnly` example.)
  */
-export const FullBleedContentWithHeader: Story = {
+export const FullBleedCoverWithHeader: Story = {
 	argTypes: { open: { control: false } },
 	args: {
 		defaultOpen: true,

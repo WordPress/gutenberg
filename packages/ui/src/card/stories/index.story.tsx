@@ -76,7 +76,7 @@ export const Default: Story = {
  * `Card.FullBleed` as the sole child of `Card.Content` spans edge-to-edge
  * with no padding around it.
  */
-export const FullBleedOnly: Story = {
+export const FullBleedCoverOnly: Story = {
 	args: {
 		children: (
 			<Card.Content>
@@ -99,7 +99,7 @@ export const FullBleedOnly: Story = {
  * `Card.Header` sits above it, the image bumps against the card's side and
  * bottom edges while the header retains its normal padding.
  */
-export const FullBleedContentWithHeader: Story = {
+export const FullBleedCoverWithHeader: Story = {
 	args: {
 		children: (
 			<>
@@ -168,7 +168,7 @@ export const HeaderOnly: Story = {
  * flush to the card's top and side edges — ideal for hero images. Content
  * that follows inside the header is padded normally.
  */
-export const FullBleedInHeader: Story = {
+export const FullBleedHeroWithTitle: Story = {
 	args: {
 		children: (
 			<>
