@@ -1,0 +1,6 @@
+{
+	"name": "gutenberg/quick-block-post",
+	"title": "Quick Block Post",
+	"description": "Quickly publish a new block-based post.",
+	"category": "dashboard"
+}
