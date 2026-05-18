@@ -478,9 +478,9 @@ async function publishPackagesToNpm( {
 					throw err;
 				}
 				log(
-					`>> Push failed (attempt ${ attempt }/${ maxPushAttempts }): ${ err.message }, retrying in ${
-						attempt * 5
-					}s…`
+					`>> Push failed (attempt ${ attempt }/${ maxPushAttempts }): ${
+						err.message
+					}, retrying in ${ attempt * 5 }s…`
 				);
 				await new Promise( ( resolve ) =>
 					setTimeout( resolve, attempt * 5000 )
