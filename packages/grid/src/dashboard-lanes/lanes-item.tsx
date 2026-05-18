@@ -38,7 +38,7 @@ function getItemCursor(
 export type LanesItemProps = {
 	/**
 	 * Item key. Forwarded to dnd-kit and emitted as the
-	 * `data-lanes-key` attribute the hook reads to map measured DOM
+	 * `data-wp-grid-item-key` attribute the hook reads to map measured DOM
 	 * nodes back to logical items.
 	 */
 	itemKey: string;

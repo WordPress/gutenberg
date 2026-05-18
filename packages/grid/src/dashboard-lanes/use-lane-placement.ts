@@ -9,15 +9,6 @@ import { useState, useLayoutEffect, useMemo } from '@wordpress/element';
 import { computeLanePlacements } from './lane-placement';
 import { GRID_ITEM_DATA_KEY } from '../shared/grid-item-key';
 
-/**
- * Data attribute children must declare to participate in lane placement.
- * The renderer adds it; the hook reads it to map measured DOM nodes
- * back to logical item keys.
- *
- * @deprecated Use {@link GRID_ITEM_DATA_KEY} from `../shared/grid-item-key`.
- */
-export const LANES_DATA_KEY = GRID_ITEM_DATA_KEY;
-
 const DEFAULT_ROW_UNIT = 4;
 
 function supportsGridLanes(): boolean {
@@ -36,7 +27,7 @@ function clampSpan( span: number | undefined ): number {
 
 /**
  * Logical item passed to the hook. The renderer is responsible for
- * mounting a DOM node with `data-lanes-key={ item.key }` for each
+ * mounting a DOM node with `data-wp-grid-item-key={ item.key }` for each
  * entry; the hook will measure that node and produce inline styles.
  */
 export type LaneItemInput = {
@@ -96,7 +87,7 @@ export type UseLanePlacementResult = {
  *         { items.map( ( item ) => (
  *             <div
  *                 key={ item.key }
- *                 data-lanes-key={ item.key }
+ *                 data-wp-grid-item-key={ item.key }
  *                 style={ itemStyles.get( item.key ) }
  *             >
  *                 { ... }
@@ -219,7 +210,7 @@ export function useLanePlacement(
 			let changed = false;
 			for ( const entry of entries ) {
 				const key = ( entry.target as HTMLElement ).getAttribute(
-					LANES_DATA_KEY
+					GRID_ITEM_DATA_KEY
 				);
 				if ( ! key ) {
 					continue;
@@ -237,13 +228,13 @@ export function useLanePlacement(
 
 		const refreshObserved = () => {
 			const current = container.querySelectorAll(
-				`[${ LANES_DATA_KEY }]`
+				`[${ GRID_ITEM_DATA_KEY }]`
 			);
 			for ( const element of current ) {
 				if ( ! observed.has( element ) ) {
 					observed.add( element );
 					resizeObserver.observe( element );
-					const key = element.getAttribute( LANES_DATA_KEY );
+					const key = element.getAttribute( GRID_ITEM_DATA_KEY );
 					if ( key ) {
 						const rect = (
 							element as HTMLElement
@@ -260,7 +251,7 @@ export function useLanePlacement(
 			}
 		};
 
-		// Children may mount, unmount, or change `data-lanes-key`
+		// Children may mount, unmount, or change `data-wp-grid-item-key`
 		// after the container exists (drag reorders, additions). The
 		// mutation observer keeps the observed set in sync.
 		const mutationObserver =
@@ -275,7 +266,7 @@ export function useLanePlacement(
 				childList: true,
 				subtree: true,
 				attributes: true,
-				attributeFilter: [ LANES_DATA_KEY ],
+				attributeFilter: [ GRID_ITEM_DATA_KEY ],
 			} );
 		}
 
