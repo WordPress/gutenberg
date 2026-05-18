@@ -266,9 +266,9 @@ export type WidgetGridModel = 'grid' | 'masonry';
 
 /**
  * Settings common to every grid model. `columns` and `minColumnWidth`
- * are mutually exclusive at runtime; the underlying grid component
- * handles the conflict so the dashboard does not enforce the xor at
- * the type level (keeps `react-docgen-typescript` serialization clean).
+ * compose as a layered model at runtime: `columns` caps the count and
+ * `minColumnWidth` enforces a per-tile width floor that can reduce the
+ * count on narrow containers. See `@wordpress/grid` for the resolution.
  *
  * `spacing` is intentionally absent: the gap between tiles is
  * presentational and lives with the design-system theme/density, not
@@ -277,13 +277,15 @@ export type WidgetGridModel = 'grid' | 'masonry';
  */
 interface BaseWidgetGridSettings {
 	/**
-	 * Fixed column count. Mutually exclusive with `minColumnWidth`.
+	 * Target column count (cap). When omitted alongside
+	 * `minColumnWidth`, the grid renders six columns.
 	 */
 	columns?: number;
 
 	/**
-	 * Responsive minimum column width in pixels. Mutually exclusive
-	 * with `columns`.
+	 * Per-tile minimum width in pixels. Acts as a floor that can
+	 * reduce the effective column count below `columns` on narrow
+	 * containers.
 	 */
 	minColumnWidth?: number;
 }

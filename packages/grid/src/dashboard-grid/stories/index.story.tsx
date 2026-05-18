@@ -332,6 +332,50 @@ export const Responsive: Story = {
 };
 
 /**
+ * Layered configuration: `columns` caps the count and
+ * `minColumnWidth` enforces a per-tile width floor. The grid renders
+ * up to `columns` columns on wide containers and reduces the count
+ * on narrow ones whenever fitting all of them would push tiles
+ * below `minColumnWidth`. Resize the preview to see the cap apply
+ * on wide widths and the floor reduce the count on narrow widths.
+ */
+export const Layered: Story = {
+	args: {
+		layout: [
+			{ key: 'a', width: 1, order: 1 },
+			{ key: 'b', width: 2, order: 2 },
+			{ key: 'c', width: 2, order: 3 },
+			{ key: 'd', width: 1, order: 4 },
+			{ key: 'e', width: 2, order: 5 },
+			{ key: 'f', width: 2, order: 6 },
+		],
+		rowHeight: 96,
+		columns: 6,
+		minColumnWidth: 240,
+		children: [
+			<Tile key="a" tone="brand">
+				width: 1
+			</Tile>,
+			<Tile key="b" tone="info">
+				width: 2
+			</Tile>,
+			<Tile key="c" tone="success">
+				width: 2
+			</Tile>,
+			<Tile key="d" tone="warning">
+				width: 1
+			</Tile>,
+			<Tile key="e" tone="error">
+				width: 2
+			</Tile>,
+			<Tile key="f" tone="neutral">
+				width: 2
+			</Tile>,
+		],
+	},
+};
+
+/**
  * A `width: 'fill'` item expands to cover the remaining columns in
  * its row. Mix it with fixed-width items on either side to build
  * sidebar-like layouts that adapt to the column count.
