@@ -37,8 +37,10 @@ import {
  */
 import { GridItem } from './grid-item';
 import { GridOverlay } from '../shared/grid-overlay';
+import { gridSpanToPixelSize } from '../shared/resize-snap';
 import { resolveFillWidths } from './resolve-fill-widths';
 import type { DashboardGridLayoutItem, DashboardGridProps } from './types';
+import type { ResizeSnapSize } from '../shared/resize-snap';
 import type { ResizeDelta } from '../shared/types';
 import styles from './grid.module.css';
 
@@ -47,6 +49,12 @@ import styles from './grid.module.css';
 // resolves to in CSS (`--wpds-dimension-gap-md`); the next layout
 // effect overwrites this with the actual computed value.
 const FALLBACK_GAP_PX = 12;
+
+// Default column cap when no explicit `columns` or `minColumnWidth` is
+// supplied. Layered semantics: `columns` acts as a cap and
+// `minColumnWidth` as a per-tile floor; if neither is set we still
+// need a finite count to render against.
+const DEFAULT_COLUMNS = 6;
 
 // Reorder is driven by `temporaryLayout` + CSS Grid, not by dnd-kit
 // transforms. Hoist the no-op strategy outside the component so its
@@ -91,7 +99,7 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 	function DashboardGrid( props, ref ) {
 		const {
 			layout,
-			columns = 6,
+			columns,
 			children,
 			className,
 			style,
@@ -115,6 +123,13 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 		// it drives the grid-wide `inert` flag on actionable areas so
 		// hovering over another tile's buttons can't steal the gesture.
 		const [ isResizing, setIsResizing ] = useState( false );
+		// Snapped span in pixels for the resize-preview outline on the
+		// active tile. The tile content follows the cursor continuously;
+		// this preview shows the grid size that will commit on release.
+		const [ resizeSnapPreview, setResizeSnapPreview ] = useState< {
+			id: string;
+			snap: ResizeSnapSize;
+		} | null >( null );
 		// Mirror of `temporaryLayout` read synchronously on drag end —
 		// the state update from `handleDragMove` may still be batched.
 		const latestLayoutRef = useRef<
@@ -172,14 +187,15 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 		}, [] );
 		const effectiveColumns = useMemo( () => {
 			if ( ! minColumnWidth ) {
-				return columns;
+				return columns ?? DEFAULT_COLUMNS;
 			}
 
 			const totalWidthPerColumn = minColumnWidth + gapPx;
-			const maxColumns = Math.floor(
-				( containerWidth + gapPx ) / totalWidthPerColumn
+			const maxFit = Math.max(
+				1,
+				Math.floor( ( containerWidth + gapPx ) / totalWidthPerColumn )
 			);
-			return Math.max( 1, maxColumns );
+			return columns !== undefined ? Math.min( columns, maxFit ) : maxFit;
 		}, [ minColumnWidth, gapPx, containerWidth, columns ] );
 		const columnWidth =
 			( containerWidth - ( effectiveColumns - 1 ) * gapPx ) /
@@ -303,6 +319,7 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 			lastReorderCursorRef.current = null;
 			resizeBaselineRef.current = null;
 			setIsResizing( false );
+			setResizeSnapPreview( null );
 			setTemporaryLayout( undefined );
 		} );
 
@@ -373,8 +390,10 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 			latestLayoutRef.current = undefined;
 			resizeBaselineRef.current = null;
 			setIsResizing( false );
+			setResizeSnapPreview( null );
 
 			if ( ! onChangeLayout || ! latest ) {
+				setTemporaryLayout( undefined );
 				return;
 			}
 
@@ -439,16 +458,29 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 				1,
 				baseline.height + relativeDelta.height
 			);
+			const rowHeightPx =
+				typeof rowHeight === 'number' ? rowHeight : null;
 
-			// Bail when the resulting size matches the current preview.
-			// Covers both the zero-delta start frame and the case where
-			// the cursor returns through the zero-delta zone after a
-			// step. A symbolic width (`'fill'`/`'full'`) on the live
-			// item never matches a numeric `newWidth`, so the first
-			// step still converts it to a numeric span.
-			const currentItem = activeLayout.find(
+			setResizeSnapPreview( {
+				id,
+				snap: gridSpanToPixelSize(
+					newWidth,
+					newHeight,
+					columnWidth,
+					gapPx,
+					rowHeightPx
+				),
+			} );
+
+			// Bail when the snapped size matches the layout already
+			// staged for commit. The tile still tracks the cursor
+			// continuously; only the preview outline and pending commit
+			// need updating when the snap target changes.
+			const pendingItem = latestLayoutRef.current?.find(
 				( item ) => item.key === id
 			);
+			const currentItem =
+				pendingItem ?? activeLayout.find( ( item ) => item.key === id );
 			if (
 				currentItem &&
 				currentItem.width === newWidth &&
@@ -464,7 +496,6 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 			);
 
 			latestLayoutRef.current = updatedLayout;
-			setTemporaryLayout( updatedLayout );
 			onPreviewLayout?.( updatedLayout );
 		} );
 
@@ -556,6 +587,11 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 								interacting={ activeId !== null || isResizing }
 								onResize={ handleResize }
 								onResizeEnd={ persistTemporaryLayout }
+								resizeSnapPreview={
+									resizeSnapPreview?.id === id
+										? resizeSnapPreview.snap
+										: null
+								}
 								actionableArea={ actionableAreaMap.get( id ) }
 								renderResizeHandle={ renderResizeHandle }
 							>
