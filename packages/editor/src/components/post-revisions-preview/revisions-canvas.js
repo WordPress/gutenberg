@@ -71,7 +71,7 @@ const REVISION_DIFF_STYLES = `
 		outline-offset: 2px;
 	}
 	.is-revision-modified {
-		outline: 2px solid color-mix(in srgb, currentColor 30%, #dba617 70%) !important;
+		outline: 3px dotted #9a7000 !important;
 		outline-offset: 2px;
 	}
 	.revision-diff-added {
