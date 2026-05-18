@@ -9,16 +9,21 @@ import type { FullBleedProps } from './types';
  *
  * Additional edge-bumping behavior based on placement:
  *
+ * - As the **first child** of `Card.Header`, it extends flush to the card's
+ *   top edge — ideal for hero images.
  * - As the **only child** of `Card.Content`, it extends flush to the card's
  *   top edge when `Content` is the first card section, and to the bottom edge
  *   when it is the last.
  *
- *   Note: inside `CollapsibleCard`, the panel that holds `Content` is a
- *   separate wrapper, so the top-edge bump does not apply — the gap between
- *   the trigger and the panel is preserved by design.
+ * Inter-sibling spacing inside `Card.Header` / `Card.Content` is consumer-
+ * managed. To add space between a hero `FullBleed` and the following
+ * siblings, compose the parent with `Stack` via the `render` prop:
+ * `<Card.Header render={ <Stack direction="column" gap="lg" /> }>`. This
+ * keeps `FullBleed` a direct child of `Card.Header` so the edge-bump still
+ * fires, while `Stack` provides the gap.
  *
- * With `CollapsibleCard`, place full-bleed media in `CollapsibleCard.Content`,
- * not the header.
+ * Inside `CollapsibleCard`, place full-bleed media in `CollapsibleCard.Content`
+ * (not the header). The trigger/panel gap is preserved by design.
  *
  * Must be used as a direct child of `Card.Content` or `Card.Header`.
  */
