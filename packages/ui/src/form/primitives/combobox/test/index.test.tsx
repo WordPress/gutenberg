@@ -128,6 +128,37 @@ describe( 'Combobox', () => {
 		expect( emptyRef.current ).toBeInstanceOf( HTMLDivElement );
 	} );
 
+	it( 'uses a custom accessible label for chip remove buttons', () => {
+		render(
+			<Combobox.Root< Item, true >
+				items={ ITEMS }
+				multiple
+				defaultValue={ [ ITEMS[ 0 ] ] }
+			>
+				<Combobox.Chips>
+					<Combobox.Value>
+						{ ( value: Item[] ) => (
+							<>
+								{ value.map( ( item ) => (
+									<Combobox.ChipWithRemove
+										key={ item.id }
+										removeLabel={ `Remove ${ item.value }` }
+									>
+										{ item.value }
+									</Combobox.ChipWithRemove>
+								) ) }
+							</>
+						) }
+					</Combobox.Value>
+				</Combobox.Chips>
+			</Combobox.Root>
+		);
+
+		expect(
+			screen.getByRole( 'button', { name: 'Remove Item 1' } )
+		).toBeVisible();
+	} );
+
 	// The actual bug is a CSS grid overlap: both Empty and List target
 	// `grid-area: main`, so Empty rendered later in DOM stacks on top and
 	// blocks clicks. JSDOM doesn't compute CSS layout, so this test only

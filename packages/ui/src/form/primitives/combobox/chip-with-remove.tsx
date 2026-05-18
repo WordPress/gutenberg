@@ -15,7 +15,7 @@ export const ChipWithRemove = forwardRef<
 	HTMLDivElement,
 	ComboboxChipWithRemoveProps
 >( function ChipWithRemove(
-	{ className, children, prefix, ...restProps },
+	{ className, children, prefix, removeLabel = __( 'Remove' ), ...restProps },
 	ref
 ) {
 	return (
@@ -34,7 +34,7 @@ export const ChipWithRemove = forwardRef<
 				render={ ( props, { disabled } ) => (
 					<IconButton
 						icon={ closeSmall }
-						label={ __( 'Remove' ) }
+						label={ removeLabel }
 						size="small"
 						variant="minimal"
 						tone="neutral"

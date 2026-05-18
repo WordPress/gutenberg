@@ -19,6 +19,12 @@ export type ComboboxChipWithRemoveProps = Omit<
 	 * Circular element to render before the chip content.
 	 */
 	prefix?: React.ReactNode;
+	/**
+	 * Accessible label for the remove button.
+	 *
+	 * @default __( 'Remove' )
+	 */
+	removeLabel?: string;
 };
 
 export type ComboboxClearProps = ComponentProps< typeof _Combobox.Clear > & {
