@@ -264,8 +264,7 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 		} );
 
 		const layoutAnimating =
-			editMode &&
-			( isResizing || temporaryLayout !== undefined );
+			editMode && ( isResizing || temporaryLayout !== undefined );
 		const layoutFingerprint = useMemo( () => {
 			const layoutSig = getLayoutFingerprint( activeLayout );
 			const placementSig = getPlacementFingerprint( itemStyles );
