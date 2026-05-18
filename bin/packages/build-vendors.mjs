@@ -2,6 +2,7 @@
 
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { readFile, writeFile, mkdir } from 'fs/promises';
 import esbuild from 'esbuild';
 
 const __dirname = path.dirname( fileURLToPath( import.meta.url ) );
@@ -14,31 +15,85 @@ const VENDOR_SCRIPTS = [
 		name: 'react',
 		global: 'React',
 		handle: 'react',
+		dependencies: [ 'wp-polyfill' ],
 	},
 	{
 		name: 'react-dom',
 		global: 'ReactDOM',
 		handle: 'react-dom',
+		dependencies: [ 'react' ],
+		contents: [
+			'module.exports = {',
+			'  ...require("react-dom"),',
+			'  ...require("react-dom/client"),',
+			'};',
+		].join( '\n' ),
 	},
 	{
 		name: 'react/jsx-runtime',
 		global: 'ReactJSXRuntime',
 		handle: 'react-jsx-runtime',
+		dependencies: [ 'react' ],
 	},
 ];
+
+/**
+ * Read the version from a package's package.json in node_modules.
+ *
+ * @param {string} packageName npm package name (e.g., 'react', 'react-dom').
+ * @return {Promise<string>} The package version string.
+ */
+async function getPackageVersion( packageName ) {
+	const packageJsonPath = path.join(
+		ROOT_DIR,
+		'node_modules',
+		packageName,
+		'package.json'
+	);
+	const packageJson = JSON.parse(
+		await readFile( packageJsonPath, 'utf-8' )
+	);
+	return packageJson.version;
+}
+
+/**
+ * Generate a .asset.php file for a vendor script.
+ *
+ * @param {Object}   config              Vendor script configuration.
+ * @param {string}   config.handle       WordPress script handle.
+ * @param {string}   config.name         Package name (e.g., 'react', 'react/jsx-runtime').
+ * @param {string[]} config.dependencies WordPress script dependencies.
+ */
+async function generateAssetFile( config ) {
+	const { handle, name, dependencies } = config;
+
+	// The npm package name is the first segment of the name (e.g., 'react/jsx-runtime' -> 'react').
+	const packageName = name.split( '/' )[ 0 ];
+	const version = await getPackageVersion( packageName );
+
+	const dependenciesString = dependencies
+		.map( ( dep ) => `'${ dep }'` )
+		.join( ', ' );
+	const assetContent = `<?php return array('dependencies' => array(${ dependenciesString }), 'version' => '${ version }');`;
+
+	const assetFilePath = path.join( VENDORS_DIR, `${ handle }.min.asset.php` );
+	await mkdir( path.dirname( assetFilePath ), { recursive: true } );
+	await writeFile( assetFilePath, assetContent );
+}
 
 /**
  * Bundle a vendor script from node_modules into an IIFE script.
  * This is used to build packages like React that don't ship UMD builds.
  *
- * @param {Object} config        Vendor script configuration.
- * @param {string} config.name   Package name (e.g., 'react', 'react-dom', 'react/jsx-runtime').
- * @param {string} config.global Global variable name (e.g., 'React', 'ReactDOM').
- * @param {string} config.handle WordPress script handle (e.g., 'react', 'react-dom').
+ * @param {Object}   config              Vendor script configuration.
+ * @param {string}   config.name         Package name (e.g., 'react', 'react-dom', 'react/jsx-runtime').
+ * @param {string}   config.global       Global variable name (e.g., 'React', 'ReactDOM').
+ * @param {string}   config.handle       WordPress script handle (e.g., 'react', 'react-dom').
+ * @param {string[]} config.dependencies WordPress script dependencies.
  * @return {Promise<void>} Promise that resolves when all builds are finished.
  */
 async function bundleVendorScript( config ) {
-	const { name, global, handle } = config;
+	const { name, global, handle, contents } = config;
 
 	// Plugin that externalizes the `react` package.
 	const reactExternalPlugin = {
@@ -64,23 +119,38 @@ async function bundleVendorScript( config ) {
 		},
 	};
 
-	// Build both minified and non-minified versions
-	await Promise.all(
-		[ false, true ].map( ( production ) => {
-			const outputFile = handle + ( production ? '.min.js' : '.js' );
-			return esbuild.build( {
-				entryPoints: [ name ],
-				outfile: path.join( VENDORS_DIR, outputFile ),
-				bundle: true,
-				format: 'iife',
-				globalName: global,
-				minify: production,
-				target: 'esnext', // Don't transpile, just bundle.
-				platform: 'browser',
-				plugins: [ reactExternalPlugin ],
-			} );
-		} )
-	);
+	const esbuildOptions = {
+		bundle: true,
+		format: 'iife',
+		globalName: global,
+		target: 'esnext',
+		platform: 'browser',
+		plugins: [ reactExternalPlugin ],
+	};
+
+	if ( contents ) {
+		esbuildOptions.stdin = {
+			contents,
+			resolveDir: ROOT_DIR,
+			loader: 'js',
+		};
+	} else {
+		esbuildOptions.entryPoints = [ name ];
+	}
+
+	await Promise.all( [
+		esbuild.build( {
+			...esbuildOptions,
+			outfile: path.join( VENDORS_DIR, handle + '.js' ),
+			minify: false,
+		} ),
+		esbuild.build( {
+			...esbuildOptions,
+			outfile: path.join( VENDORS_DIR, handle + '.min.js' ),
+			minify: true,
+		} ),
+		generateAssetFile( config ),
+	] );
 }
 
 /**
@@ -95,11 +165,11 @@ async function buildVendors() {
 			await bundleVendorScript( vendorConfig );
 			const buildTime = Date.now() - startTime;
 			console.log(
-				`   ✔ Bundled vendor ${ vendorConfig.name } (${ buildTime }ms)`
+				`   ✔ Bundled vendor ${ vendorConfig.handle } (${ buildTime }ms)`
 			);
 		} catch ( error ) {
 			console.error(
-				`   ✘ Failed to bundle vendor ${ vendorConfig.name }: ${ error.message }`
+				`   ✘ Failed to bundle vendor ${ vendorConfig.handle }: ${ error.message }`
 			);
 		}
 	}

@@ -18,6 +18,7 @@ import { unlock } from '../lock-unlock';
 
 const MAX_RECENTLY_SAVED = 30;
 const MAX_RECENTLY_DISPLAYED = 5;
+const EMPTY_ARRAY = [];
 const EMPTY_SET = new Set();
 
 export function recordUsage( name ) {
@@ -61,7 +62,7 @@ export function useRecentCommands() {
 		staticCommands,
 		contextualLoaders,
 		staticLoaders,
-		recentlyUsedNames,
+		recentlyUsedNames = EMPTY_ARRAY,
 	} = useSelect( ( select ) => {
 		const { getCommands, getCommandLoaders } = select( commandsStore );
 		return {
@@ -69,11 +70,10 @@ export function useRecentCommands() {
 			staticCommands: getCommands( false ),
 			contextualLoaders: getCommandLoaders( true ),
 			staticLoaders: getCommandLoaders( false ),
-			recentlyUsedNames:
-				select( preferencesStore ).get(
-					'core/commands',
-					'recentlyUsed'
-				) ?? [],
+			recentlyUsedNames: select( preferencesStore ).get(
+				'core/commands',
+				'recentlyUsed'
+			),
 		};
 	}, [] );
 

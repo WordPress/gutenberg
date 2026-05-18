@@ -13,12 +13,13 @@ import {
 	notAllowed,
 } from '@wordpress/icons';
 import { useViewConfig } from '@wordpress/views';
+import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
-import DataViewItem from './dataview-item';
+import SidebarNavigationItem from '../sidebar-navigation-item';
 
 const { useLocation } = unlock( routerPrivateApis );
 
@@ -31,12 +32,19 @@ const SLUG_TO_ICON = {
 	private: notAllowed,
 	trash,
 };
+const defaultResolveIcon = ( view ) => {
+	return SLUG_TO_ICON[ view.slug ];
+};
 
-export default function DataViewsSidebarContent( { postType } ) {
+export default function DataViewsSidebarContent( {
+	postType,
+	resolveIcon = defaultResolveIcon,
+} ) {
 	const {
+		path,
 		query: { activeView = 'all' },
 	} = useLocation();
-	const { default_view: defaultView, view_list: viewList } = useViewConfig( {
+	const { view_list: viewList } = useViewConfig( {
 		kind: 'postType',
 		name: postType,
 	} );
@@ -48,15 +56,20 @@ export default function DataViewsSidebarContent( { postType } ) {
 		<>
 			<ItemGroup className="edit-site-sidebar-dataviews">
 				{ viewList?.map( ( view ) => {
+					const isActive = view.slug === activeView;
+					const slug = view.slug === 'all' ? undefined : view.slug;
+					const icon = resolveIcon( view );
 					return (
-						<DataViewItem
+						<SidebarNavigationItem
 							key={ view.slug }
-							slug={ view.slug }
-							title={ view.title }
-							icon={ SLUG_TO_ICON[ view.slug ] }
-							type={ view.view?.type ?? defaultView.type }
-							isActive={ view.slug === activeView }
-						/>
+							icon={ icon }
+							to={ addQueryArgs( path, {
+								activeView: slug,
+							} ) }
+							aria-current={ isActive ? 'true' : undefined }
+						>
+							{ view.title }
+						</SidebarNavigationItem>
 					);
 				} ) }
 			</ItemGroup>

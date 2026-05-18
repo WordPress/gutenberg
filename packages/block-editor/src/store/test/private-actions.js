@@ -11,6 +11,7 @@ import {
 	stopDragging,
 	showViewportModal,
 	hideViewportModal,
+	setSelectedBlockStyleState,
 } from '../private-actions';
 
 describe( 'private actions', () => {
@@ -138,6 +139,18 @@ describe( 'private actions', () => {
 		it( 'should return the HIDE_VIEWPORT_MODAL action', () => {
 			expect( hideViewportModal() ).toEqual( {
 				type: 'HIDE_VIEWPORT_MODAL',
+			} );
+		} );
+	} );
+
+	describe( 'setSelectedBlockStyleState', () => {
+		it( 'returns the SET_SELECTED_BLOCK_STYLE_STATE action', () => {
+			expect(
+				setSelectedBlockStyleState( 'client-1', ':hover' )
+			).toEqual( {
+				type: 'SET_SELECTED_BLOCK_STYLE_STATE',
+				clientId: 'client-1',
+				value: ':hover',
 			} );
 		} );
 	} );

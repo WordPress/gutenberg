@@ -1,6 +1,11 @@
 @use "@wordpress/base-styles/variables" as *;
 @use "@wordpress/base-styles/colors" as *;
 
+.wp-block[data-align="center"] > .wp-block-icon {
+	display: flex;
+	justify-content: center;
+}
+
 // Style for the icon library modal.
 .wp-block-icon__inserter {
 	padding: 0 $grid-unit-30;

@@ -82,8 +82,8 @@ export type Rules< Item > = {
 	pattern?: string;
 	minLength?: number;
 	maxLength?: number;
-	min?: number;
-	max?: number;
+	min?: number | string;
+	max?: number | string;
 	custom?:
 		| ( ( item: Item, field: NormalizedField< Item > ) => null | string )
 		| ( (
@@ -125,8 +125,8 @@ export type NormalizedRules< Item > = {
 	pattern?: NormalizedRule< Item, string >;
 	minLength?: NormalizedRule< Item, number >;
 	maxLength?: NormalizedRule< Item, number >;
-	min?: NormalizedRule< Item, number >;
-	max?: NormalizedRule< Item, number >;
+	min?: NormalizedRule< Item, number > | NormalizedRule< Item, string >;
+	max?: NormalizedRule< Item, number > | NormalizedRule< Item, string >;
 	custom?: CustomValidator< Item >;
 };
 
@@ -157,10 +157,21 @@ export type EditConfigText = {
 };
 
 /**
- * Edit configuration for other control types (excluding 'text' and 'textarea').
+ * Edit configuration for datetime controls.
+ */
+export type EditConfigDatetime = {
+	control: 'datetime';
+	/**
+	 * Whether to render a compact version without the calendar widget.
+	 */
+	compact?: boolean;
+};
+
+/**
+ * Edit configuration for other control types (excluding 'text', 'textarea', and 'datetime').
  */
 export type EditConfigGeneric = {
-	control: Exclude< FieldTypeName, 'text' | 'textarea' >;
+	control: Exclude< FieldTypeName, 'text' | 'textarea' | 'datetime' >;
 };
 
 /**
@@ -170,14 +181,12 @@ export type EditConfigGeneric = {
 export type EditConfig =
 	| EditConfigTextarea
 	| EditConfigText
+	| EditConfigDatetime
 	| EditConfigGeneric;
 
-/**
- * A dataview field for a specific property of a data type.
- */
 export type Field< Item > = {
 	/**
-	 * Type of the fields.
+	 * Type of the field.
 	 */
 	type?: FieldTypeName;
 
@@ -200,7 +209,7 @@ export type Field< Item > = {
 	/**
 	 * A description of the field.
 	 */
-	description?: string;
+	description?: string | ReactElement;
 
 	/**
 	 * Placeholder for the field.
@@ -223,7 +232,12 @@ export type Field< Item > = {
 	sort?: ( a: Item, b: Item, direction: SortDirection ) => number;
 
 	/**
-	 * Callback used to validate the field.
+	 * Validation config for the field.
+	 *
+	 * Range rules are normalized according to `type`:
+	 * - `'integer' | 'number'`: `min`/`max` accept `number`
+	 * - `'date' | 'datetime'`: `min`/`max` accept `string`
+	 * - all other field types ignore `min`/`max`
 	 */
 	isValid?: Rules< Item >;
 
@@ -231,6 +245,18 @@ export type Field< Item > = {
 	 * Callback used to decide if a field should be displayed.
 	 */
 	isVisible?: ( item: Item ) => boolean;
+
+	/**
+	 * Whether a field should be disabled.
+	 * Can be a boolean or a callback receiving the current item and field.
+	 * Defaults to false.
+	 */
+	isDisabled?:
+		| boolean
+		| ( ( args: {
+				item: Item;
+				field: NormalizedField< Item >;
+		  } ) => boolean );
 
 	/**
 	 * Whether the field is sortable.
@@ -368,6 +394,10 @@ export type NormalizedField< Item > = Omit<
 	filterBy: Required< FilterByConfig > | false;
 	filter: FilterOperatorMap< Item >;
 	readOnly: boolean;
+	isDisabled: ( args: {
+		item: Item;
+		field: NormalizedField< Item >;
+	} ) => boolean;
 	format:
 		| {}
 		| Required< FormatDate >
@@ -449,6 +479,7 @@ export type DataFormControlProps< Item > = {
 		prefix?: React.ComponentType;
 		suffix?: React.ComponentType;
 		rows?: number;
+		compact?: boolean;
 	};
 };
 

@@ -91,6 +91,7 @@
 		"babel-plugin-react-native-platform-specific-extensions": "1.1.1",
 		"babel-plugin-transform-remove-console": "6.9.4",
 		"css-to-react-native-transform": "^2.1.0",
+		"globals": "14.0.0",
 		"jest-environment-jsdom": "^30.2.0",
 		"sass": "^1.54.0",
 		"webdriverio": "8.16.20"

@@ -4,7 +4,7 @@
 const path = require( 'path' );
 const fs = require( 'fs/promises' );
 const os = require( 'os' );
-const { v4: uuid } = require( 'uuid' );
+const { randomUUID } = require( 'crypto' );
 
 /**
  * WordPress dependencies
@@ -24,10 +24,7 @@ test.describe( 'Gallery', () => {
 		await requestUtils.deleteAllMedia();
 
 		uploadedMedia = await requestUtils.uploadMedia(
-			path.resolve(
-				process.cwd(),
-				'test/e2e/assets/10x10_e2e_test_image_z9T8jK.png'
-			)
+			'./assets/10x10_e2e_test_image_z9T8jK.png'
 		);
 	} );
 
@@ -291,21 +288,14 @@ class GalleryBlockUtils {
 	constructor( { page } ) {
 		this.page = page;
 
-		this.TEST_IMAGE_FILE_PATH = path.join(
-			__dirname,
-			'..',
-			'..',
-			'..',
-			'assets',
-			'10x10_e2e_test_image_z9T8jK.png'
-		);
+		this.TEST_IMAGE_FILE_PATH = './assets/10x10_e2e_test_image_z9T8jK.png';
 	}
 
 	async upload( inputElement ) {
 		const tmpDirectory = await fs.mkdtemp(
 			path.join( os.tmpdir(), 'gutenberg-test-image-' )
 		);
-		const fileName = uuid();
+		const fileName = randomUUID();
 		const tmpFileName = path.join( tmpDirectory, fileName + '.png' );
 		await fs.copyFile( this.TEST_IMAGE_FILE_PATH, tmpFileName );
 

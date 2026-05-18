@@ -8,7 +8,18 @@
  */
 const ALLOWLIST = {
 	'@wordpress/ui': {
-		allowed: [ 'Badge', 'Stack' ],
+		allowed: [
+			'Badge',
+			'Card',
+			'Collapsible',
+			'CollapsibleCard',
+			'EmptyState',
+			'Icon',
+			'Link',
+			'Stack',
+			'Text',
+			'VisuallyHidden',
+		],
 		message:
 			'`{{ name }}` from `{{ source }}` is not yet recommended for use in a WordPress environment.',
 	},
@@ -24,8 +35,22 @@ const ALLOWLIST = {
  */
 const DENYLIST = {
 	'@wordpress/components': {
+		ExternalLink:
+			'Use `Link` from `@wordpress/ui` with the `openInNewTab` prop instead.',
+		__experimentalHeading: 'Use `Text` from `@wordpress/ui` instead.',
+		__experimentalHStack: 'Use `Stack` from `@wordpress/ui` instead.',
+		__experimentalText: 'Use `Text` from `@wordpress/ui` instead.',
+		__experimentalVStack: 'Use `Stack` from `@wordpress/ui` instead.',
 		__experimentalZStack:
 			'{{ name }} is planned for deprecation. Write your own CSS instead.',
+		Card: 'Use `Card.Root` from `@wordpress/ui` instead.',
+		CardBody: 'Use `Card.Content` from `@wordpress/ui` instead.',
+		CardDivider: 'A divider is no longer a standard pattern for cards.',
+		CardFooter: 'A footer is no longer a standard pattern for cards.',
+		CardHeader:
+			'Use `Card.Header` (and optionally `Card.Title`) from `@wordpress/ui` instead.',
+		CardMedia: 'Use `Card.FullBleed` from `@wordpress/ui` instead.',
+		VisuallyHidden: 'Use `{{ name }}` from `@wordpress/ui` instead.',
 	},
 };
 

@@ -2,6 +2,22 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `useCopyToClipboard`: Call the `onSuccess` callback even when the trigger node unmounts before the copy resolves ([#78387](https://github.com/WordPress/gutenberg/pull/78387)).
+
+## 7.46.0 (2026-05-14)
+
+## 7.45.0 (2026-04-29)
+
+## 7.44.0 (2026-04-15)
+
+## 7.43.0 (2026-04-01)
+
+### Bug Fixes
+
+-   `useDialog`: Add `event.stopPropagation()` to the Escape key handler to prevent the event from bubbling to parent overlays ([#76861](https://github.com/WordPress/gutenberg/pull/76861)).
+
 ## 7.42.0 (2026-03-18)
 
 ### New Features

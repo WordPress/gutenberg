@@ -785,7 +785,7 @@ For class components, there is no recommendation for documenting the props of th
 ## PHP
 
 We use
-[`phpcs` (PHP_CodeSniffer)](https://github.com/squizlabs/PHP_CodeSniffer) with the [WordPress Coding Standards ruleset](https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards) to run a lot of automated checks against all PHP code in this project. This ensures that we are consistent with WordPress PHP coding standards.
+[`phpcs` (PHP_CodeSniffer)](https://github.com/PHPCSStandards/PHP_CodeSniffer) with the [WordPress Coding Standards ruleset](https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards) to run a lot of automated checks against all PHP code in this project. This ensures that we are consistent with WordPress PHP coding standards.
 
 The easiest way to use PHPCS is [local environment](/docs/contributors/code/getting-started-with-code-contribution.md#local-environment). Once that's installed, you can check your PHP by running `npm run lint:php`.
 

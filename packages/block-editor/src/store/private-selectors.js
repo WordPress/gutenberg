@@ -147,7 +147,7 @@ export const getEnabledClientIdsTree = createRegistrySelector( () =>
 	createSelector( getEnabledClientIdsTreeUnmemoized, ( state ) => [
 		state.blocks.order,
 		state.derivedBlockEditingModes,
-		state.blockEditingModes,
+		state.blocks.blockEditingModes,
 	] )
 );
 
@@ -170,7 +170,7 @@ export const getEnabledBlockParents = createSelector(
 	},
 	( state ) => [
 		state.blocks.parents,
-		state.blockEditingModes,
+		state.blocks.blockEditingModes,
 		state.settings.templateLock,
 		state.blockListSettings,
 	]
@@ -1051,4 +1051,20 @@ export function getViewportModalClientIds( state ) {
  */
 export function getRequestedInspectorTab( state ) {
 	return state.requestedInspectorTab;
+}
+
+/**
+ * Returns the selected pseudo-state for a block's style controls.
+ *
+ * @param {Object} state    Global application state.
+ * @param {string} clientId The block client ID.
+ *
+ * @return {string} The selected block style state.
+ */
+export function getSelectedBlockStyleState( state, clientId ) {
+	if ( state.selectedBlockStyleState?.clientId !== clientId ) {
+		return 'default';
+	}
+
+	return state.selectedBlockStyleState.value ?? 'default';
 }

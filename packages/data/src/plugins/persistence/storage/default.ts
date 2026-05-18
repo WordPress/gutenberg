@@ -13,7 +13,7 @@ try {
 	storage = window.localStorage;
 	storage.setItem( '__wpDataTestLocalStorage', '' );
 	storage.removeItem!( '__wpDataTestLocalStorage' );
-} catch ( error ) {
+} catch {
 	storage = objectStorage;
 }
 

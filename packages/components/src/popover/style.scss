@@ -73,10 +73,6 @@ $shadow-popover-border-top-only-alternate: 0 #{-$border-width} 0 $gray-900;
 	width: 100%;
 }
 
-.components-popover__close.components-button {
-	z-index: z-index(".components-popover__close");
-}
-
 .components-popover__arrow {
 	position: absolute;
 	width: $arrow-triangle-base-size;

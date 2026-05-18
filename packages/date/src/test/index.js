@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import momentLib from 'moment';
+
+/**
  * Internal dependencies
  */
 import {
@@ -681,5 +686,68 @@ describe( 'Moment.js Localization', () => {
 
 			expect( humanTimeDiff( twoDaysLater ) ).toBe( 'in 2 days' );
 		} );
+	} );
+} );
+
+describe( 'WP timezone zone recovery', () => {
+	// Simulate what happens when a third-party plugin (e.g. WooCommerce)
+	// loads its own copy of moment-timezone, which reinitializes the
+	// internal zone storage and destroys the custom 'WP' zone.
+	function destroyWPZone() {
+		// moment-timezone stores zones in an internal object.
+		// Removing 'wp' simulates a third-party moment-timezone reload.
+		const zones = momentLib.tz._zones;
+		delete zones.wp;
+	}
+
+	it( 'getDate should recover after WP zone is lost', () => {
+		const settings = getSettings();
+		setSettings( {
+			...settings,
+			timezone: { offset: 4, string: '' },
+		} );
+
+		destroyWPZone();
+
+		// Should not throw and should return a valid date.
+		const result = getDate( '2024-01-15T10:00:00' );
+		expect( result ).toBeInstanceOf( Date );
+		expect( result.getTime() ).not.toBeNaN();
+
+		setSettings( settings );
+	} );
+
+	it( 'isInTheFuture should recover after WP zone is lost', () => {
+		const settings = getSettings();
+		setSettings( {
+			...settings,
+			timezone: { offset: 4, string: '' },
+		} );
+
+		destroyWPZone();
+
+		// Create a date far in the future.
+		const futureDate = new Date( Date.now() + 1000 * 60 * 60 * 24 * 365 );
+		expect( isInTheFuture( futureDate ) ).toBe( true );
+
+		setSettings( settings );
+	} );
+
+	it( 'humanTimeDiff should recover after WP zone is lost', () => {
+		const settings = getSettings();
+		setSettings( {
+			...settings,
+			timezone: { offset: 4, string: '' },
+		} );
+
+		destroyWPZone();
+
+		const result = humanTimeDiff(
+			'2023-04-28T11:00:00.000Z',
+			'2023-04-28T12:00:00.000Z'
+		);
+		expect( result ).toBe( 'an hour ago' );
+
+		setSettings( settings );
 	} );
 } );

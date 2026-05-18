@@ -155,24 +155,37 @@ Do not edit directly.
 | `--wpds-elevation-md` | For components that offer additional actions. Example: Menus, Command Palette                                                     |
 | `--wpds-elevation-lg` | For components that confirm decisions or handle necessary interruptions. Example: Modals.                                         |
 
+### Motion
+
+| Variable name                     | Description                                                                                         |
+| --------------------------------- | --------------------------------------------------------------------------------------------------- |
+| `--wpds-motion-duration-xs`       | Micro-delays and transition offsets                                                                 |
+| `--wpds-motion-duration-sm`       | Micro-interactions like focus rings and state changes                                               |
+| `--wpds-motion-duration-md`       | Standard transitions like menus and popovers                                                        |
+| `--wpds-motion-duration-lg`       | Deliberate animations like slides and reveals                                                       |
+| `--wpds-motion-duration-xl`       | Extended animations like complex or multi-step transitions                                          |
+| `--wpds-motion-easing-subtle`     | Nearly imperceptible easing for hover, color, and background transitions                            |
+| `--wpds-motion-easing-balanced`   | General-purpose easing for on-screen movement like resizing, morphing, and layout shifts            |
+| `--wpds-motion-easing-expressive` | Noticeable easing for enter/exit and spatial transitions like menus, popovers, dialogs, and drawers |
+
 ### Typography
 
-| Variable name                 | Description                                  |
-| ----------------------------- | -------------------------------------------- |
-| `--wpds-font-family-heading`  | Headings font family                         |
-| `--wpds-font-family-body`     | Body font family                             |
-| `--wpds-font-family-mono`     | Monospace font family                        |
-| `--wpds-font-size-xs`         | Extra small font size                        |
-| `--wpds-font-size-sm`         | Small font size                              |
-| `--wpds-font-size-md`         | Medium font size                             |
-| `--wpds-font-size-lg`         | Large font size                              |
-| `--wpds-font-size-xl`         | Extra large font size                        |
-| `--wpds-font-size-2xl`        | 2X large font size                           |
-| `--wpds-font-line-height-xs`  | Extra small line height                      |
-| `--wpds-font-line-height-sm`  | Small line height                            |
-| `--wpds-font-line-height-md`  | Medium line height                           |
-| `--wpds-font-line-height-lg`  | Large line height                            |
-| `--wpds-font-line-height-xl`  | Extra large line height                      |
-| `--wpds-font-line-height-2xl` | 2X large line height                         |
-| `--wpds-font-weight-regular`  | Regular font weight for body text            |
-| `--wpds-font-weight-medium`   | Medium font weight for emphasis and headings |
+| Variable name                           | Description                                  |
+| --------------------------------------- | -------------------------------------------- |
+| `--wpds-typography-font-family-heading` | Headings font family                         |
+| `--wpds-typography-font-family-body`    | Body font family                             |
+| `--wpds-typography-font-family-mono`    | Monospace font family                        |
+| `--wpds-typography-font-size-xs`        | Extra small font size                        |
+| `--wpds-typography-font-size-sm`        | Small font size                              |
+| `--wpds-typography-font-size-md`        | Medium font size                             |
+| `--wpds-typography-font-size-lg`        | Large font size                              |
+| `--wpds-typography-font-size-xl`        | Extra large font size                        |
+| `--wpds-typography-font-size-2xl`       | 2X large font size                           |
+| `--wpds-typography-line-height-xs`      | Extra small line height                      |
+| `--wpds-typography-line-height-sm`      | Small line height                            |
+| `--wpds-typography-line-height-md`      | Medium line height                           |
+| `--wpds-typography-line-height-lg`      | Large line height                            |
+| `--wpds-typography-line-height-xl`      | Extra large line height                      |
+| `--wpds-typography-line-height-2xl`     | 2X large line height                         |
+| `--wpds-typography-font-weight-regular` | Regular font weight for body text            |
+| `--wpds-typography-font-weight-medium`  | Medium font weight for emphasis and headings |

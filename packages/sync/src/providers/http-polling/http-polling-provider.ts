@@ -111,17 +111,28 @@ class HttpPollingProvider extends ObservableV2< HttpPollingEvents > {
 	/**
 	 * Log debug messages if debugging is enabled.
 	 *
-	 * @param message The debug message
-	 * @param debug   Additional debug information
+	 * @param message    The debug message
+	 * @param debug      Additional debug information
+	 * @param errorLevel The console method to use for logging
+	 * @param force      Whether to force logging regardless of debug setting
 	 */
-	protected log = ( message: string, debug: object = {} ): void => {
-		if ( this.options.debug ) {
-			// eslint-disable-next-line no-console
-			console.log( `[${ this.constructor.name }]: ${ message }`, {
-				room: this.options.room,
-				...debug,
-			} );
+	protected log = (
+		message: string,
+		debug: object = {},
+		errorLevel: 'log' | 'warn' | 'error' = 'log',
+		force = false
+	): void => {
+		if ( ! this.options.debug && ! force ) {
+			return;
 		}
+
+		// eslint-disable-next-line no-console
+		const logFn = console[ errorLevel ] || console.log;
+
+		logFn( `[${ this.constructor.name }]: ${ message }`, {
+			room: this.options.room,
+			...debug,
+		} );
 	};
 
 	/**

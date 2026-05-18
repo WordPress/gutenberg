@@ -3,7 +3,6 @@
  */
 // @ts-expect-error: Not typed yet.
 import { BlockPreview } from '@wordpress/block-editor';
-// @ts-expect-error: Not typed yet.
 import { getBlockType, getBlockFromExample } from '@wordpress/blocks';
 import { __experimentalSpacer as Spacer } from '@wordpress/components';
 import { useMemo } from '@wordpress/element';
