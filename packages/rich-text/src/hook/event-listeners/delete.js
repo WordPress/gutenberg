@@ -7,11 +7,11 @@ import { BACKSPACE, DELETE } from '@wordpress/keycodes';
  * Internal dependencies
  */
 import { remove } from '../../remove';
+import { subscribeSharedListener } from './shared-listener';
 
 export default ( props ) => ( element ) => {
 	function onKeyDown( event ) {
 		const { keyCode } = event;
-		const { createRecord, handleChange } = props.current;
 
 		if ( event.defaultPrevented ) {
 			return;
@@ -21,6 +21,12 @@ export default ( props ) => ( element ) => {
 			return;
 		}
 
+		const { ownerDocument } = element;
+		if ( ! element.contains( ownerDocument.activeElement ) ) {
+			return;
+		}
+
+		const { createRecord, handleChange } = props.current;
 		const currentValue = createRecord();
 		const { start, end, text } = currentValue;
 
@@ -31,8 +37,9 @@ export default ( props ) => ( element ) => {
 		}
 	}
 
-	element.addEventListener( 'keydown', onKeyDown );
-	return () => {
-		element.removeEventListener( 'keydown', onKeyDown );
-	};
+	return subscribeSharedListener(
+		element.ownerDocument,
+		'keydown',
+		onKeyDown
+	);
 };
