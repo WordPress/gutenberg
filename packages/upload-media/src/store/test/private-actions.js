@@ -6,7 +6,11 @@ import { createBlobURL, revokeBlobURL } from '@wordpress/blob';
 /**
  * Internal dependencies
  */
-import { getTranscodeImageOperation, finalizeItem } from '../private-actions';
+import {
+	getTranscodeImageOperation,
+	finalizeItem,
+	prepareItem,
+} from '../private-actions';
 import { OperationType } from '../types';
 import { vipsHasTransparency } from '../utils';
 
@@ -16,9 +20,24 @@ jest.mock( '@wordpress/blob', () => ( {
 	revokeBlobURL: jest.fn(),
 } ) );
 
-// Mock vips utilities
-jest.mock( '../utils', () => ( {
-	vipsHasTransparency: jest.fn(),
+// Mock vips utilities. The real isAnimatedGif() is needed by prepareItem
+// so it is required from the actual module rather than stubbed out.
+jest.mock( '../utils', () => {
+	const actual = jest.requireActual( '../utils' );
+	return {
+		vipsHasTransparency: jest.fn(),
+		isAnimatedGif: actual.isAnimatedGif,
+		cloneFile: actual.cloneFile,
+		convertBlobToFile: actual.convertBlobToFile,
+		renameFile: actual.renameFile,
+	};
+} );
+
+// Mock the mediabunny wrapper so the dynamic worker import is never executed.
+jest.mock( '../utils/mediabunny', () => ( {
+	mediabunnyConvertGifToVideo: jest.fn(),
+	mediabunnyCancelOperations: jest.fn(),
+	terminateMediabunnyWorker: jest.fn(),
 } ) );
 
 describe( 'private actions', () => {
@@ -377,6 +396,84 @@ describe( 'private actions', () => {
 			await thunk( { select, dispatch } );
 
 			expect( finishOperation ).not.toHaveBeenCalled();
+		} );
+	} );
+
+	describe( 'prepareItem GIF to video', () => {
+		// Animated GIF bytes: "GIF89a" magic followed by two Graphic
+		// Control Extension headers (0x00 0x21 0xF9) so isAnimatedGif()
+		// reports more than one frame.
+		const animatedGifBytes = new Uint8Array( [
+			0x47, 0x49, 0x46, 0x38, 0x39, 0x61, 0x00, 0x21, 0xf9, 0x00, 0x21,
+			0xf9,
+		] );
+
+		function createGifFile() {
+			return new File( [ animatedGifBytes ], 'animated.gif', {
+				type: 'image/gif',
+			} );
+		}
+
+		function flattenOperations( operations ) {
+			return operations.map( ( op ) =>
+				Array.isArray( op ) ? op[ 0 ] : op
+			);
+		}
+
+		async function runPrepareItem() {
+			const file = createGifFile();
+			const item = {
+				id: 'gif-id',
+				file,
+				additionalData: {},
+			};
+
+			let dispatchedOperations;
+			const dispatch = ( action ) => {
+				if ( action?.type === 'ADD_OPERATIONS' ) {
+					dispatchedOperations = action.operations;
+				}
+			};
+			dispatch.cancelItem = jest.fn();
+			dispatch.finishOperation = jest.fn();
+
+			const select = {
+				getItem: () => item,
+				getSettings: () => ( {} ),
+			};
+
+			const thunk = prepareItem( 'gif-id' );
+			await thunk( { select, dispatch } );
+
+			return dispatchedOperations;
+		}
+
+		beforeEach( () => {
+			global.ImageDecoder = function () {};
+			global.VideoEncoder = function () {};
+		} );
+
+		afterEach( () => {
+			delete global.ImageDecoder;
+			delete global.VideoEncoder;
+		} );
+
+		it( 'enqueues a TranscodeGif operation when WebCodecs is available', async () => {
+			const operations = await runPrepareItem();
+
+			expect( flattenOperations( operations ) ).toContain(
+				OperationType.TranscodeGif
+			);
+		} );
+
+		it( 'does not enqueue TranscodeGif when WebCodecs is unavailable', async () => {
+			delete global.ImageDecoder;
+
+			const operations = await runPrepareItem();
+
+			expect( flattenOperations( operations ) ).not.toContain(
+				OperationType.TranscodeGif
+			);
 		} );
 	} );
 } );

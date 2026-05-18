@@ -13,7 +13,12 @@ type WPDataRegistry = ReturnType< typeof createRegistry >;
 /**
  * Internal dependencies
  */
-import { cloneFile, convertBlobToFile, renameFile } from '../utils';
+import {
+	cloneFile,
+	convertBlobToFile,
+	isAnimatedGif,
+	renameFile,
+} from '../utils';
 import { canvasConvertToJpeg } from '../canvas-utils';
 import { isClientSideMediaSupported } from '../feature-detection';
 import { CLIENT_SIDE_SUPPORTED_MIME_TYPES, HEIC_MIME_TYPES } from './constants';
@@ -26,6 +31,7 @@ import {
 	vipsHasTransparency,
 	terminateVipsWorker,
 } from './utils';
+import { mediabunnyConvertGifToVideo } from './utils/mediabunny';
 import type {
 	AccumulateSubSizeAction,
 	AddAction,
@@ -74,6 +80,7 @@ type ActionCreators = {
 	resizeCropItem: typeof resizeCropItem;
 	rotateItem: typeof rotateItem;
 	transcodeImageItem: typeof transcodeImageItem;
+	transcodeGifItem: typeof transcodeGifItem;
 	generateThumbnails: typeof generateThumbnails;
 	finalizeItem: typeof finalizeItem;
 	updateItemProgress: typeof updateItemProgress;
@@ -311,6 +318,17 @@ export function processItem( id: QueueItemId ) {
 			}
 		}
 
+		/*
+		 * GIF-to-video conversion is memory-intensive (WebCodecs encode).
+		 * Limit to 1 concurrent transcoding operation.
+		 */
+		if ( operation === OperationType.TranscodeGif ) {
+			const activeCount = select.getActiveVideoProcessingCount();
+			if ( activeCount >= 1 ) {
+				return;
+			}
+		}
+
 		if ( attachment ) {
 			// Don't update the block with a HEIC URL — the browser can't
 			// display it.  The scaled JPEG sideload will call onChange
@@ -421,6 +439,13 @@ export function processItem( id: QueueItemId ) {
 				dispatch.transcodeImageItem(
 					item.id,
 					operationArgs as OperationArgs[ OperationType.TranscodeImage ]
+				);
+				break;
+
+			case OperationType.TranscodeGif:
+				dispatch.transcodeGifItem(
+					item.id,
+					operationArgs as OperationArgs[ OperationType.TranscodeGif ]
 				);
 				break;
 
@@ -562,6 +587,17 @@ export function finishOperation(
 				dispatch.processItem( pendingItem.id );
 			}
 		}
+
+		/*
+		 * If a video processing operation just finished, there may be items
+		 * waiting due to the video processing concurrency limit.
+		 */
+		if ( previousOperation === OperationType.TranscodeGif ) {
+			const pendingItems = select.getPendingVideoProcessing();
+			for ( const pendingItem of pendingItems ) {
+				dispatch.processItem( pendingItem.id );
+			}
+		}
 	};
 }
 
@@ -657,6 +693,51 @@ export function prepareItem( id: QueueItemId ) {
 
 		const operations: Operation[] = [];
 		const settings = select.getSettings();
+
+		// Animated GIF to video conversion. WebCodecs is required; client-side
+		// media already runs only under cross-origin isolation, so this is a
+		// capability check, not a browser-support fallback path.
+		if (
+			file.type === 'image/gif' &&
+			settings.gifConvert !== false &&
+			typeof ImageDecoder !== 'undefined' &&
+			typeof VideoEncoder !== 'undefined'
+		) {
+			const buffer = await file.arrayBuffer();
+			if ( isAnimatedGif( buffer ) ) {
+				const outputFormat =
+					settings.videoOutputFormat === 'video/webm'
+						? 'webm'
+						: 'mp4';
+
+				operations.push(
+					[
+						OperationType.TranscodeGif,
+						{
+							outputFormat,
+						} as OperationArgs[ OperationType.TranscodeGif ],
+					],
+					OperationType.Upload
+				);
+
+				dispatch< AddOperationsAction >( {
+					type: Type.AddOperations,
+					id,
+					operations,
+				} );
+
+				// Tell the server to handle sub-sizes since this is a video.
+				dispatch.finishOperation( id, {
+					additionalData: {
+						...item.additionalData,
+						generate_sub_sizes: true,
+						convert_format: true,
+					},
+				} );
+				return;
+			}
+		}
+
 		let heicJpeg: File | null = null;
 
 		const isImage = file.type.startsWith( 'image/' );
@@ -1034,6 +1115,81 @@ export function transcodeImageItem(
 					code: 'MEDIA_TRANSCODING_ERROR',
 					message:
 						'Image could not be transcoded to the target format',
+					file: item.file,
+					cause: error instanceof Error ? error : undefined,
+				} )
+			);
+		}
+	};
+}
+
+type TranscodeGifItemArgs = OperationArgs[ OperationType.TranscodeGif ];
+
+/**
+ * Converts an animated GIF to a video file (MP4 or WebM).
+ *
+ * Uses mediabunny + WebCodecs in a web worker for fully client-side
+ * conversion. The resulting video replaces the original GIF in the queue.
+ *
+ * @param id     Item ID.
+ * @param [args] Transcode arguments including output format.
+ */
+export function transcodeGifItem(
+	id: QueueItemId,
+	args?: TranscodeGifItemArgs
+) {
+	return async ( { select, dispatch }: ThunkArgs ) => {
+		const item = select.getItem( id );
+		if ( ! item ) {
+			return;
+		}
+
+		const outputFormat = args?.outputFormat ?? 'mp4';
+		const outputMimeType = `video/${ outputFormat }`;
+
+		try {
+			const file = await mediabunnyConvertGifToVideo(
+				item.id,
+				item.file,
+				outputMimeType
+			);
+
+			const blobUrl = createBlobURL( file );
+			dispatch< CacheBlobUrlAction >( {
+				type: Type.CacheBlobUrl,
+				id,
+				blobUrl,
+			} );
+
+			dispatch.finishOperation( id, {
+				file,
+				attachment: {
+					url: blobUrl,
+				},
+			} );
+		} catch ( error ) {
+			// An "Unsupported" outcome is a graceful skip, not a failure:
+			// finish the operation untouched so the original GIF uploads
+			// (matches the spec's non-error fallback contract).
+			if (
+				error instanceof Error &&
+				error.message.startsWith( 'Unsupported' )
+			) {
+				dispatch.finishOperation( id, {} );
+				return;
+			}
+			// Surface the real cause to the console; the user-facing
+			// notification is intentionally generic.
+			// eslint-disable-next-line no-console
+			console.error(
+				'[mediabunny] GIF to video conversion failed:',
+				error
+			);
+			dispatch.cancelItem(
+				id,
+				new UploadError( {
+					code: 'GIF_TRANSCODING_ERROR',
+					message: 'Animated GIF could not be converted to video',
 					file: item.file,
 					cause: error instanceof Error ? error : undefined,
 				} )
