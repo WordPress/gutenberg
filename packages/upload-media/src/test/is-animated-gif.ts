@@ -39,4 +39,19 @@ describe( 'isAnimatedGif', () => {
 	it( 'returns true for a multi-frame (animated) GIF', () => {
 		expect( isAnimatedGif( buildGif( 2 ) ) ).toBe( true );
 	} );
+
+	// Characterization test for a documented heuristic limitation: the marker
+	// byte sequence can occur coincidentally inside image data, so a
+	// single-frame GIF can be misreported as animated. This is non-destructive
+	// (the worker's ImageDecoder frame count is authoritative) — see the
+	// isAnimatedGif docblock.
+	it( 'misreports a single-frame GIF when image data contains the marker bytes (known limitation)', () => {
+		// Header + one real Graphic Control Extension, then a coincidental
+		// 0x00 0x21 0xF9 sequence embedded in "image data".
+		const bytes = [
+			0x47, 0x49, 0x46, 0x38, 0x39, 0x61, 0x00, 0x21, 0xf9, 0x42, 0x07,
+			0x00, 0x21, 0xf9,
+		];
+		expect( isAnimatedGif( new Uint8Array( bytes ).buffer ) ).toBe( true );
+	} );
 } );

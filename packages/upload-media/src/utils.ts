@@ -116,6 +116,22 @@ export function getFileNameFromUrl( url: string ) {
  *    (Block Terminator 0x00 + Extension Introducer 0x21 + Graphic Control Label 0xF9)
  * 3. Returns true if more than 1 frame is found
  *
+ * This is a deliberately cheap heuristic, not a full GIF parser. It scans
+ * the raw bytes for the Graphic Control Extension marker rather than walking
+ * the block structure, which has two known limitations:
+ *
+ * - False positives: the 0x00 0x21 0xF9 byte sequence can occur coincidentally
+ *   inside LZW-compressed image data, so a single-frame GIF may be reported as
+ *   animated.
+ * - False negatives: Graphic Control Extension blocks are optional per the GIF
+ *   spec, so an animated GIF that omits them is reported as static.
+ *
+ * Both outcomes are non-destructive: the worker's ImageDecoder frame count is
+ * the authoritative source, so a misdetected static GIF still encodes to an
+ * accurate (1-frame) video, and a misdetected animated GIF simply falls back
+ * to the normal image upload pipeline. A full structural parse is intentionally
+ * avoided here to keep this off the hot path of every GIF upload.
+ *
  * Based on the GIF specification:
  *
  * @see http://www.matthewflickinger.com/lab/whatsinagif/
