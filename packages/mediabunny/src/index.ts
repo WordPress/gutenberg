@@ -1,2 +1,200 @@
-// Public API will be added in subsequent tasks.
-// See ./types.ts for shared type definitions.
+/**
+ * External dependencies
+ */
+import {
+	Output,
+	BufferTarget,
+	Mp4OutputFormat,
+	WebMOutputFormat,
+	VideoSampleSource,
+	VideoSample,
+	QUALITY_HIGH,
+	canEncodeVideo,
+} from 'mediabunny';
+
+/**
+ * Internal dependencies
+ */
+import type { ItemId } from './types';
+
+/**
+ * Tracks in-progress operations so they can be cancelled at async boundaries.
+ */
+const inProgressOperations = new Set< ItemId >();
+
+/**
+ * Serializes encoder access. The upload-media concurrency limit already caps
+ * this at 1, but the lock guards direct callers too.
+ */
+let operationLock: Promise< void > = Promise.resolve();
+
+/**
+ * Cancels all ongoing operations for a given item ID.
+ *
+ * Cancellation takes effect at async boundaries (waiting for the lock,
+ * encoder-support check, decoder completion, between frames).
+ *
+ * @param id Item ID.
+ * @return Whether an operation was cancelled.
+ */
+export async function cancelOperations( id: ItemId ): Promise< boolean > {
+	return inProgressOperations.delete( id );
+}
+
+/**
+ * Pads a dimension up to the nearest even number (encoder requirement).
+ *
+ * @param value Dimension value.
+ * @return Even dimension value.
+ */
+function padToEven( value: number ): number {
+	return value % 2 === 0 ? value : value + 1;
+}
+
+/**
+ * Converts an animated GIF to a video file (MP4 or WebM).
+ *
+ * Decodes GIF frames via the browser ImageDecoder (honoring per-frame
+ * delays) and re-encodes them with mediabunny / WebCodecs.
+ *
+ * @param id             Item ID.
+ * @param buffer         GIF file buffer.
+ * @param outputMimeType Output MIME type ('video/mp4' or 'video/webm').
+ * @param maxDimensions  Optional maximum dimension for downscaling.
+ * @return Encoded video buffer.
+ */
+export async function convertGifToVideo(
+	id: ItemId,
+	buffer: ArrayBuffer,
+	outputMimeType: string,
+	maxDimensions?: number
+): Promise< ArrayBuffer > {
+	inProgressOperations.add( id );
+
+	const previousLock = operationLock;
+	let releaseLock: () => void;
+	operationLock = new Promise< void >( ( resolve ) => {
+		releaseLock = resolve;
+	} );
+
+	try {
+		await previousLock;
+
+		if ( ! inProgressOperations.has( id ) ) {
+			throw new Error( 'Operation cancelled' );
+		}
+
+		if (
+			typeof ImageDecoder === 'undefined' ||
+			typeof VideoEncoder === 'undefined'
+		) {
+			throw new Error( 'Unsupported: WebCodecs unavailable' );
+		}
+
+		const isWebm = outputMimeType === 'video/webm';
+		const codec = isWebm ? 'vp9' : 'avc';
+
+		if ( ! ( await canEncodeVideo( codec ) ) ) {
+			throw new Error( 'Unsupported: encoder codec not supported' );
+		}
+
+		if ( ! inProgressOperations.has( id ) ) {
+			throw new Error( 'Operation cancelled' );
+		}
+
+		const decoder = new ImageDecoder( {
+			data: buffer,
+			type: 'image/gif',
+		} );
+		await decoder.completed;
+
+		if ( ! inProgressOperations.has( id ) ) {
+			decoder.close();
+			throw new Error( 'Operation cancelled' );
+		}
+
+		const track = decoder.tracks.selectedTrack;
+		const frameCount = track?.frameCount ?? 0;
+		if ( frameCount === 0 ) {
+			decoder.close();
+			throw new Error( 'GIF contains no decodable frames' );
+		}
+
+		const source = new VideoSampleSource( {
+			codec,
+			bitrate: QUALITY_HIGH,
+		} );
+		const target = new BufferTarget();
+		const output = new Output( {
+			format: isWebm ? new WebMOutputFormat() : new Mp4OutputFormat(),
+			target,
+		} );
+		output.addVideoTrack( source );
+		await output.start();
+
+		// ImageDecoder durations are MICROSECONDS; mediabunny VideoSample
+		// timestamps/durations are SECONDS. Accumulate in seconds.
+		let timestampSec = 0;
+		for ( let i = 0; i < frameCount; i++ ) {
+			if ( ! inProgressOperations.has( id ) ) {
+				decoder.close();
+				throw new Error( 'Operation cancelled' );
+			}
+
+			const { image } = await decoder.decode( { frameIndex: i } );
+			const durationUs = image.duration ?? 100000;
+			const durationSec = durationUs / 1_000_000;
+
+			let frameForEncode: VideoFrame = image;
+			if (
+				maxDimensions &&
+				( image.displayWidth > maxDimensions ||
+					image.displayHeight > maxDimensions )
+			) {
+				const scale = Math.min(
+					maxDimensions / image.displayWidth,
+					maxDimensions / image.displayHeight
+				);
+				const targetW = padToEven(
+					Math.round( image.displayWidth * scale )
+				);
+				const targetH = padToEven(
+					Math.round( image.displayHeight * scale )
+				);
+				const canvas = new OffscreenCanvas( targetW, targetH );
+				const ctx = canvas.getContext(
+					'2d'
+				) as OffscreenCanvasRenderingContext2D;
+				ctx.drawImage( image, 0, 0, targetW, targetH );
+				// VideoFrame timestamp is microseconds; mediabunny uses the
+				// SECONDS values from the VideoSample init below.
+				frameForEncode = new VideoFrame( canvas, {
+					timestamp: Math.round( timestampSec * 1_000_000 ),
+					duration: durationUs,
+				} );
+				image.close();
+			}
+
+			await source.add(
+				new VideoSample( frameForEncode, {
+					timestamp: timestampSec,
+					duration: durationSec,
+				} )
+			);
+			frameForEncode.close();
+			timestampSec += durationSec;
+		}
+
+		decoder.close();
+		await output.finalize();
+
+		const out = target.buffer;
+		if ( ! out || out.byteLength === 0 ) {
+			throw new Error( 'Encoder produced empty output' );
+		}
+		return out;
+	} finally {
+		inProgressOperations.delete( id );
+		releaseLock!();
+	}
+}
