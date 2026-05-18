@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, within } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 
 /**
  * WordPress dependencies
@@ -50,7 +50,7 @@ describe( 'InlineNotices', () => {
 		);
 	} );
 
-	it( 'should only render the pinned list when there are pinned notices', () => {
+	it( 'renders pinned notices without a close button', () => {
 		const registry = createRegistry();
 		registry.register( noticesStore );
 		registry
@@ -65,32 +65,85 @@ describe( 'InlineNotices', () => {
 			</RegistryProvider>
 		);
 
-		const wrapper = getInlineNoticesWrapper( container );
 		expect(
-			within( wrapper ).getByText( 'Pinned notice', {
-				selector: '.components-notice__content',
-			} )
+			within( getInlineNoticesWrapper( container ) ).getByText(
+				'Pinned notice'
+			)
 		).toBeInTheDocument();
 		expect(
-			within( wrapper ).queryByText( 'Pinned notice', {
-				selector: '.components-notices__dismissible *',
-			} )
+			screen.queryByRole( 'button', { name: 'Close' } )
 		).not.toBeInTheDocument();
 	} );
 
-	it( 'should render the dismissible list when children are provided', () => {
-		const { container } = renderInlineNotices( {
-			children: <div>Extra notice</div>,
-		} );
+	it( 'renders dismissible notices with a close button', () => {
+		const registry = createRegistry();
+		registry.register( noticesStore );
+		registry
+			.dispatch( noticesStore )
+			.createNotice( 'warning', 'Dismissible notice' );
 
-		const wrapper = getInlineNoticesWrapper( container );
+		render(
+			<RegistryProvider value={ registry }>
+				<InlineNotices />
+			</RegistryProvider>
+		);
+
 		expect(
-			within( wrapper ).getByText( 'Extra notice' )
+			screen.getByRole( 'button', { name: 'Close' } )
+		).toBeInTheDocument();
+	} );
+
+	it( 'partitions pinned and dismissible notices into separate lists', () => {
+		const registry = createRegistry();
+		registry.register( noticesStore );
+		registry
+			.dispatch( noticesStore )
+			.createNotice( 'warning', 'Pinned notice', {
+				isDismissible: false,
+			} );
+		registry
+			.dispatch( noticesStore )
+			.createNotice( 'success', 'Dismissible notice' );
+
+		const { container } = render(
+			<RegistryProvider value={ registry }>
+				<InlineNotices
+					pinnedNoticesClassName="test-pinned"
+					dismissibleNoticesClassName="test-dismissible"
+				/>
+			</RegistryProvider>
+		);
+
+		// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access -- partition via public className props.
+		const pinned = container.querySelector( '.test-pinned' )!;
+		// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access -- partition via public className props.
+		const dismissible = container.querySelector( '.test-dismissible' )!;
+
+		expect(
+			within( pinned ).getByText( 'Pinned notice' )
 		).toBeInTheDocument();
 		expect(
-			within( wrapper ).queryByText( 'Extra notice', {
-				selector: '.components-notices__pinned *',
-			} )
+			within( pinned ).queryByText( 'Dismissible notice' )
 		).not.toBeInTheDocument();
+		expect(
+			within( dismissible ).getByText( 'Dismissible notice' )
+		).toBeInTheDocument();
+		expect(
+			within( dismissible ).queryByText( 'Pinned notice' )
+		).not.toBeInTheDocument();
+	} );
+
+	it( 'renders children in the dismissible list', () => {
+		const { container } = renderInlineNotices( {
+			children: <div>Extra notice</div>,
+			dismissibleNoticesClassName: 'test-dismissible',
+		} );
+
+		// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access -- partition via public className props.
+		const dismissible = container.querySelector( '.test-dismissible' )!;
+
+		expect(
+			within( dismissible ).getByText( 'Extra notice' )
+		).toBeInTheDocument();
 	} );
 } );
