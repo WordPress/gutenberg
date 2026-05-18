@@ -55,13 +55,12 @@ the_wp_icon( 'arrow-down' );
 
 ### How it works
 
-At build time, `npm run build` in the icons package generates `packages/icons/build-php/icons-data.php` — a PHP array mapping every icon slug to its viewBox and inner SVG content. The `wp_icon()` function loads this file once (static-cached) and composes an inline `<svg>` string on each call. No filesystem I/O per call, no parsing, no DOM mutation.
+The function checks the Icons Registry first (covers public and third-party registered icons), then falls back to reading the SVG file directly from `packages/icons/src/library/`. This means all icons in the library are accessible, not just those marked as public in the registry.
 
 ### Running PHP tests
 
 ```bash
 npm run wp-env start
-npm run build -- --include=icons
 vendor/bin/phpunit phpunit/class-wp-icon-test.php
 ```
 

@@ -7,9 +7,13 @@
 
 if ( ! function_exists( 'wp_icon' ) ) {
 	/**
-	 * Returns the SVG markup for a registered icon.
+	 * Returns the SVG markup for an icon.
 	 *
-	 * @param string $name The icon slug (e.g. 'plus', 'arrow-down').
+	 * Checks the Icons Registry first (covers public and third-party icons),
+	 * then falls back to reading the SVG file from the icons package.
+	 *
+	 * @param string $name The icon slug (e.g. 'plus', 'arrow-down') or a
+	 *                     namespaced icon name (e.g. 'my-plugin/custom-icon').
 	 * @param array  $args {
 	 *     Optional. Arguments for the icon.
 	 *
@@ -22,63 +26,67 @@ if ( ! function_exists( 'wp_icon' ) ) {
 	 * @return string SVG markup for the icon, or empty string if not found.
 	 */
 	function wp_icon( $name, $args = array() ) {
-		static $icons_data = null;
+		$svg = '';
 
-		if ( null === $icons_data ) {
-			$data_path = gutenberg_dir_path() . 'packages/icons/build-php/icons-data.php';
-			if ( is_readable( $data_path ) ) {
-				$icons_data = include $data_path;
-			}
-			if ( ! is_array( $icons_data ) ) {
-				$icons_data = array();
+		// Determine the registry name: bare slugs get the core/ prefix.
+		$registry_name = str_contains( $name, '/' ) ? $name : 'core/' . $name;
+
+		// Try the Icons Registry first (public + third-party icons).
+		$icon = WP_Icons_Registry::get_instance()->get_registered_icon( $registry_name );
+		if ( ! is_null( $icon ) ) {
+			$svg = $icon['content'];
+		} else {
+			// Fall back to reading the SVG file for non-public core icons.
+			$svg_path = gutenberg_dir_path() . 'packages/icons/src/library/' . $name . '.svg';
+			if ( is_readable( $svg_path ) ) {
+				$svg = file_get_contents( $svg_path );
 			}
 		}
 
-		if ( ! isset( $icons_data[ $name ] ) ) {
+		if ( empty( $svg ) ) {
 			return '';
 		}
 
-		$icon = $icons_data[ $name ];
-
-		$defaults = array(
-			'size'  => 24,
-			'class' => '',
-			'label' => '',
+		$args = wp_parse_args(
+			$args,
+			array(
+				'size'  => 24,
+				'class' => '',
+				'label' => '',
+			)
 		);
 
-		$args = wp_parse_args( $args, $defaults );
-
-		$size    = absint( $args['size'] );
-		$viewbox = isset( $icon['viewBox'] ) ? $icon['viewBox'] : '0 0 24 24';
-
-		$classes = 'wp-icon';
-		if ( ! empty( $args['class'] ) ) {
-			$classes .= ' ' . $args['class'];
+		$processor = new WP_HTML_Tag_Processor( $svg );
+		if ( ! $processor->next_tag( 'svg' ) ) {
+			return '';
 		}
 
-		$attrs = sprintf(
-			'xmlns="http://www.w3.org/2000/svg" viewBox="%s" width="%d" height="%d" class="%s" fill="currentColor"',
-			esc_attr( $viewbox ),
-			$size,
-			$size,
-			esc_attr( $classes )
-		);
+		$processor->set_attribute( 'width', (string) $args['size'] );
+		$processor->set_attribute( 'height', (string) $args['size'] );
+		$processor->set_attribute( 'fill', 'currentColor' );
+		$processor->add_class( 'wp-icon' );
+
+		if ( ! empty( $args['class'] ) ) {
+			$processor->add_class( $args['class'] );
+		}
 
 		if ( ! empty( $args['label'] ) ) {
-			$attrs .= sprintf( ' role="img" aria-label="%s"', esc_attr( $args['label'] ) );
+			$processor->set_attribute( 'role', 'img' );
+			$processor->set_attribute( 'aria-label', $args['label'] );
 		} else {
-			$attrs .= ' aria-hidden="true"';
+			$processor->set_attribute( 'aria-hidden', 'true' );
 		}
 
-		return sprintf( '<svg %s>%s</svg>', $attrs, $icon['content'] );
+		return $processor->get_updated_html();
 	}
 }
 
 if ( ! function_exists( 'the_wp_icon' ) ) {
 	/**
-	 * Echoes the SVG markup for a registered icon.
+	 * Echoes the SVG markup for an icon.
 	 *
-	 * @param string $name The icon slug (e.g. 'plus', 'arrow-down').
+	 * @param string $name The icon slug (e.g. 'plus', 'arrow-down') or a
+	 *                     namespaced icon name (e.g. 'my-plugin/custom-icon').
 	 * @param array  $args Optional. Arguments for the icon. See wp_icon() for details.
 	 */
 	function the_wp_icon( $name, $args = array() ) {

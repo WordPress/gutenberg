@@ -63,6 +63,14 @@ class WP_Icon_Test extends WP_UnitTestCase {
 		$this->assertStringNotContainsString( '<script>', $output );
 	}
 
+	public function test_wp_icon_non_public_icon_loads_from_file() {
+		// 'accordion' is not marked public in manifest.json, so it is not
+		// in the registry. It should still be accessible via file fallback.
+		$output = wp_icon( 'accordion' );
+		$this->assertStringStartsWith( '<svg ', $output );
+		$this->assertStringContainsString( '<path ', $output );
+	}
+
 	public function test_the_wp_icon_echoes_output() {
 		ob_start();
 		the_wp_icon( 'plus' );
