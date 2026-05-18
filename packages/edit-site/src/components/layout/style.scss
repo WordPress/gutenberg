@@ -5,14 +5,14 @@
 
 .edit-site-layout {
 	height: 100%;
-	background: $gray-900;
-	color: $gray-400;
+	background: var(--wpds-color-bg-surface-neutral);
+	color: var(--wpds-color-fg-content-neutral);
 	display: flex;
 	flex-direction: column;
 
 	// Show a dark background in "frame" mode to avoid edge artifacts.
 	&:not(.is-full-canvas) .editor-visual-editor {
-		background: $gray-900;
+		background: var(--wpds-color-bg-surface-neutral);
 	}
 }
 
@@ -79,6 +79,13 @@
 	.edit-site-sidebar-navigation-screen__main {
 		padding: 0 $grid-unit-15;
 	}
+}
+
+.edit-site-layout__mobile-content {
+	display: flex;
+	flex-direction: column;
+	flex-grow: 1;
+	background: var(--wpds-color-bg-surface-neutral);
 }
 
 .edit-site-layout__canvas-container {
@@ -173,7 +180,7 @@ html.canvas-mode-edit-transition::view-transition-group(toggle) {
 	view-transition-name: toggle;
 	/* stylelint-enable  */
 	position: relative;
-	color: $white;
+	color: var(--wpds-color-fg-content-neutral);
 	height: $header-height;
 	width: $header-height;
 	overflow: hidden;
@@ -181,12 +188,12 @@ html.canvas-mode-edit-transition::view-transition-group(toggle) {
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	background: $gray-900;
+	background: var(--wpds-color-bg-surface-neutral);
 	border-radius: 0;
 
 	&:hover,
 	&:active {
-		color: $white;
+		color: var(--wpds-color-fg-content-neutral);
 	}
 
 	&:focus-visible,

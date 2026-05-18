@@ -24,19 +24,19 @@
 	}
 
 	.block-editor-list-view-block-select-button {
-		color: $gray-600;
+		color: var(--wpds-color-fg-content-neutral-weak);
 		&:hover,
 		&:focus,
 		&[aria-current] {
-			color: $white;
+			color: var(--wpds-color-fg-content-neutral);
 		}
 	}
 
 	.block-editor-list-view-block__menu {
-		color: $gray-600;
+		color: var(--wpds-color-fg-content-neutral-weak);
 		&:hover,
 		&:focus {
-			color: $white;
+			color: var(--wpds-color-fg-content-neutral);
 		}
 	}
 }

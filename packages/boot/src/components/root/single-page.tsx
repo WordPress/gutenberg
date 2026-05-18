@@ -9,6 +9,7 @@ import clsx from 'clsx';
 import { privateApis as routePrivateApis } from '@wordpress/route';
 import { SnackbarNotices } from '@wordpress/notices';
 import { SlotFillProvider } from '@wordpress/components';
+import { privateApis as themePrivateApis } from '@wordpress/theme';
 
 /**
  * Internal dependencies
@@ -19,9 +20,9 @@ import { unlock } from '../../lock-unlock';
 import type { CanvasData } from '../../store/types';
 import './style.scss';
 import useRouteTitle from '../app/use-route-title';
-import { UserThemeProvider } from '../user-theme-provider';
 
 const { useMatches, Outlet } = unlock( routePrivateApis );
+const { UserThemeProvider } = unlock( themePrivateApis );
 
 /**
  * Root component for single page mode (no sidebar).
@@ -43,7 +44,7 @@ export default function RootSinglePage() {
 	return (
 		<SlotFillProvider>
 			<UserThemeProvider isRoot color={ { bg: '#f8f8f8' } }>
-				<UserThemeProvider color={ { bg: '#1d2327' } }>
+				<UserThemeProvider>
 					<div
 						className={ clsx(
 							'boot-layout boot-layout--single-page',

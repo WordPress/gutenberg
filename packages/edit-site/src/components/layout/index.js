@@ -27,6 +27,7 @@ import {
 	privateApis as editorPrivateApis,
 } from '@wordpress/editor';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
+import { privateApis as themePrivateApis } from '@wordpress/theme';
 import { PluginArea } from '@wordpress/plugins';
 import { SnackbarNotices, store as noticesStore } from '@wordpress/notices';
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -49,6 +50,7 @@ import SavePanel from '../save-panel';
 
 const { useLocation } = unlock( routerPrivateApis );
 const { useStyle } = unlock( editorPrivateApis );
+const { UserThemeProvider } = unlock( themePrivateApis );
 
 const ANIMATION_DURATION = 0.3;
 
@@ -179,9 +181,21 @@ function Layout() {
 											/>
 										) }
 										<SidebarContent routeKey={ routeKey }>
-											<ErrorBoundary>
-												{ areas.mobile }
-											</ErrorBoundary>
+											{ areas.content ? (
+												<UserThemeProvider
+													color={ { bg: '#ffffff' } }
+												>
+													<div className="edit-site-layout__mobile-content">
+														<ErrorBoundary>
+															{ areas.mobile }
+														</ErrorBoundary>
+													</div>
+												</UserThemeProvider>
+											) : (
+												<ErrorBoundary>
+													{ areas.mobile }
+												</ErrorBoundary>
+											) }
 										</SidebarContent>
 										<SaveHub />
 										<SavePanel />
@@ -204,7 +218,11 @@ function Layout() {
 									maxWidth: widths?.content,
 								} }
 							>
-								<ErrorBoundary>{ areas.content }</ErrorBoundary>
+								<UserThemeProvider color={ { bg: '#ffffff' } }>
+									<ErrorBoundary>
+										{ areas.content }
+									</ErrorBoundary>
+								</UserThemeProvider>
 							</div>
 						) }
 
@@ -215,7 +233,9 @@ function Layout() {
 								maxWidth: widths?.edit,
 							} }
 						>
-							<ErrorBoundary>{ areas.edit }</ErrorBoundary>
+							<UserThemeProvider color={ { bg: '#ffffff' } }>
+								<ErrorBoundary>{ areas.edit }</ErrorBoundary>
+							</UserThemeProvider>
 						</div>
 					) }
 
@@ -287,7 +307,9 @@ export default function LayoutWithGlobalStylesProvider( props ) {
 			<Tooltip.Provider>
 				{ /** This needs to be within the SlotFillProvider */ }
 				<PluginArea onError={ onPluginAreaError } />
-				<Layout { ...props } />
+				<UserThemeProvider isRoot>
+					<Layout { ...props } />
+				</UserThemeProvider>
 			</Tooltip.Provider>
 		</SlotFillProvider>
 	);

@@ -17,7 +17,7 @@
 	margin-top: $grid-unit-20;
 
 	p {
-		color: $gray-600;
+		color: var(--wpds-color-fg-content-neutral-weak);
 	}
 
 	h2 {
@@ -28,6 +28,6 @@
 }
 
 .edit-site-sidebar-navigation-screen-patterns__divider {
-	border-top: 1px solid $gray-800;
+	border-top: 1px solid var(--wpds-color-stroke-surface-neutral);
 	margin: $grid-unit-20 0;
 }
