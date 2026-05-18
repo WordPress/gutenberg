@@ -696,6 +696,37 @@ describe( 'Popover', () => {
 			document.body.removeChild( slot );
 		} );
 
+		it( 'should not call onFocusOutside when focus returns from the slot to a popover descendant', async () => {
+			const user = userEvent.setup();
+			const onFocusOutside = jest.fn();
+
+			const slot = document.createElement( 'div' );
+			slot.setAttribute( 'data-wp-compat-overlay-slot', '' );
+			const slotButton = document.createElement( 'button' );
+			slotButton.textContent = 'Slotted item';
+			slot.appendChild( slotButton );
+			document.body.appendChild( slot );
+
+			render(
+				<Popover onFocusOutside={ onFocusOutside }>
+					<button>Trigger</button>
+				</Popover>
+			);
+
+			const trigger = screen.getByText( 'Trigger' );
+			// Move focus into the slot, then back to the popover (simulating
+			// a portaled overlay closing and restoring focus to its trigger
+			// inside the host popover).
+			slotButton.focus();
+			await user.click( slotButton );
+			trigger.focus();
+
+			await new Promise( ( resolve ) => setTimeout( resolve, 50 ) );
+			expect( onFocusOutside ).not.toHaveBeenCalled();
+
+			document.body.removeChild( slot );
+		} );
+
 		it( 'should still call onFocusOutside when focus moves to a sibling outside the slot', async () => {
 			const user = userEvent.setup();
 			const onFocusOutside = jest.fn();

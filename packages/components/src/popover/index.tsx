@@ -279,19 +279,33 @@ const UnforwardedPopover = (
 				) {
 					return;
 				}
-				// Ignore blur events where focus moves into the `@wordpress/ui`
-				// compat overlay slot. Some `@wordpress/ui` overlays (e.g. `Select`)
-				// portal their popup to a body-level slot and move DOM focus into
-				// it, which would otherwise be perceived as focus leaving the
-				// popover and close it prematurely.
+				// Ignore blur events whose `relatedTarget` is logically inside
+				// this popover. This covers two cases caused by portaled
+				// descendants:
+				// 1. Focus moves into the `@wordpress/ui` compat overlay slot:
+				//    some `@wordpress/ui` overlays (e.g. `Select`) portal their
+				//    popup to a body-level slot and move DOM focus into it.
+				// 2. Focus moves back from a portaled descendant into the
+				//    popover (e.g. base-ui's `FloatingFocusManager` restoring
+				//    focus to its trigger when the popup closes).
+				// Both look like "focus leaving the popover" via DOM
+				// containment alone, but are logically internal.
 				// See https://github.com/WordPress/gutenberg/issues/78406.
 				const relatedTarget =
 					'relatedTarget' in event ? event.relatedTarget : null;
-				if (
-					relatedTarget instanceof Element &&
-					relatedTarget.closest( '[data-wp-compat-overlay-slot]' )
-				) {
-					return;
+				if ( relatedTarget instanceof Element ) {
+					if (
+						relatedTarget.closest( '[data-wp-compat-overlay-slot]' )
+					) {
+						return;
+					}
+					// Note: only the floating element is checked; the
+					// reference element falls back to the popover's parent
+					// when no `anchor` is provided, which would also include
+					// arbitrary siblings.
+					if ( floatingElement?.contains( relatedTarget ) ) {
+						return;
+					}
 				}
 				// Call onFocusOutside if defined or call onClose.
 				if ( onFocusOutside ) {
