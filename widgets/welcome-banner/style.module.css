@@ -25,3 +25,9 @@
 	text-decoration: underline;
 	text-underline-offset: 0.2em;
 }
+
+.columns {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: var(--wpds-dimension-gap-2xl);
+}
