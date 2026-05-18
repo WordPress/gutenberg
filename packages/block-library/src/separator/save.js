@@ -13,9 +13,16 @@ import {
 } from '@wordpress/block-editor';
 
 export default function separatorSave( { attributes } ) {
-	const { backgroundColor, style, opacity, tagName: Tag } = attributes;
+	const {
+		backgroundColor,
+		style,
+		opacity,
+		tagName: Tag,
+		orientation,
+	} = attributes;
 	const customColor = style?.color?.background;
 	const colorProps = getColorClassesAndStyles( attributes );
+	const isVertical = orientation === 'vertical';
 	// The hr support changing color using border-color, since border-color
 	// is not yet supported in the color palette, we use background-color.
 
@@ -29,6 +36,7 @@ export default function separatorSave( { attributes } ) {
 			[ colorClass ]: colorClass,
 			'has-css-opacity': opacity === 'css',
 			'has-alpha-channel-opacity': opacity === 'alpha-channel',
+			'is-vertical': isVertical,
 		},
 		colorProps.className
 	);

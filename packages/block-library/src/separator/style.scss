@@ -35,3 +35,31 @@
 	// Important required to ensure dots does not get a border.
 	border: none !important;
 }
+
+// Vertical separator variation
+.wp-block-separator.is-vertical {
+	// Switch from horizontal border to vertical border
+	border-top: none;
+	border-left: 2px solid currentColor;
+
+	// Width collapses to 0 since its a line
+	width: 0;
+
+	// Height should stretch to fill the parent (Row/Columns block)
+	height: auto;
+	align-self: stretch;
+
+	// HR has auto horizontal margins by default which would misalign it
+	margin-top: 0;
+	margin-bottom: 0;
+
+	// Fallback height if not inside a flex/grid container
+	min-height: 1em;
+}
+
+// Disable dots style in vertical.
+.wp-block-separator.is-vertical.is-style-dots {
+	&::before {
+		content: none;
+	}
+}
