@@ -25,6 +25,7 @@ import {
 	isSectionBlock,
 	getParentSectionBlock,
 	getSelectedBlockStyleState,
+	isSelectedBlockStyleStateShownOnCanvas,
 } from '../private-selectors';
 import { getBlockEditingMode } from '../selectors';
 import { deviceTypeKey } from '../private-keys';
@@ -122,6 +123,42 @@ describe( 'private selectors', () => {
 				viewport: 'default',
 				pseudo: 'default',
 			} );
+		} );
+	} );
+
+	describe( 'isSelectedBlockStyleStateShownOnCanvas', () => {
+		it( 'returns true when the block has no canvas preview state', () => {
+			const state = {};
+
+			expect(
+				isSelectedBlockStyleStateShownOnCanvas( state, 'client-1' )
+			).toBe( true );
+		} );
+
+		it( 'returns the canvas preview state for the block', () => {
+			const state = {
+				selectedBlockStyleState: {
+					clientId: 'client-1',
+					showStateOnCanvas: false,
+				},
+			};
+
+			expect(
+				isSelectedBlockStyleStateShownOnCanvas( state, 'client-1' )
+			).toBe( false );
+		} );
+
+		it( 'returns true when another block has canvas preview state', () => {
+			const state = {
+				selectedBlockStyleState: {
+					clientId: 'client-2',
+					showStateOnCanvas: false,
+				},
+			};
+
+			expect(
+				isSelectedBlockStyleStateShownOnCanvas( state, 'client-1' )
+			).toBe( true );
 		} );
 	} );
 

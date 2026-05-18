@@ -1,12 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useEffect, useMemo, useRef, useState } from '@wordpress/element';
-import {
-	ToggleControl,
-	__experimentalSpacer as Spacer,
-} from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { useMemo } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 import { useSelect } from '@wordpress/data';
 import { mergeGlobalStyles } from '@wordpress/global-styles-engine';
@@ -46,23 +41,17 @@ import {
 	getStyleForState,
 	hasViewportBlockStyleState,
 	hasPseudoBlockStyleState,
-	isDefaultBlockStyleState,
 } from './block-style-state';
-import { BlockStateBadges, VALID_BLOCK_PSEUDO_STATES } from './states';
+import { VALID_BLOCK_PSEUDO_STATES } from './states';
 import {
 	buildRootStyleStateSelector,
 	buildPseudoStyleStateSelector,
 	buildCanvasStateSelector,
 } from './state-utils';
-import { BlockInspectorPreTabsFill } from '../components/block-inspector/inspector-pre-tabs-slot-fill';
 import { scopeSelector } from '../components/global-styles/utils';
 import { useBlockEditingMode } from '../components/block-editing-mode';
 import { store as blockEditorStore } from '../store';
-import {
-	deviceTypeKey,
-	globalStylesDataKey,
-	setPreviewDeviceTypeKey,
-} from '../store/private-keys';
+import { globalStylesDataKey } from '../store/private-keys';
 import { unlock } from '../lock-unlock';
 
 const BORDER_SIDES = [ 'Top', 'Right', 'Bottom', 'Left' ];
@@ -73,35 +62,6 @@ const RESPONSIVE_BREAKPOINTS = {
 	mobile: '@media (width <= 480px)',
 	tablet: '@media (480px < width <= 782px)',
 };
-
-const PREVIEW_DEVICE_TYPE_BY_VIEWPORT = {
-	mobile: 'Mobile',
-	tablet: 'Tablet',
-};
-
-/**
- * Returns the editor preview device type for a selected block style state.
- *
- * State preview can be disabled independently from state selection. When
- * disabled, return to Desktop so the editor no longer presents a forced state
- * preview canvas.
- *
- * @param {Object}  selectedState     Selected block style state.
- * @param {boolean} showStateOnCanvas Whether pseudo-state preview is enabled.
- * @return {string} Editor preview device type.
- */
-export function getPreviewDeviceTypeForState(
-	selectedState,
-	showStateOnCanvas
-) {
-	if ( ! showStateOnCanvas ) {
-		return 'Desktop';
-	}
-
-	return (
-		PREVIEW_DEVICE_TYPE_BY_VIEWPORT[ selectedState.viewport ] ?? 'Desktop'
-	);
-}
 
 const styleSupportKeys = [
 	...TYPOGRAPHY_SUPPORT_KEYS,
@@ -609,50 +569,24 @@ function BlockStyleControls( {
 } ) {
 	const settings = useBlockSettings( name, __unstableParentLayout );
 	const blockEditingMode = useBlockEditingMode();
-	const [ showStateOnCanvas, setShowStateOnCanvas ] = useState( true );
-	const {
-		currentDeviceType,
-		globalBlockStyles,
-		selectedState,
-		setPreviewDeviceType,
-	} = useSelect(
+	const { globalBlockStyles, selectedState, showStateOnCanvas } = useSelect(
 		( select ) => {
 			const blockEditorSelect = select( blockEditorStore );
+			const {
+				getSelectedBlockStyleState,
+				isSelectedBlockStyleStateShownOnCanvas,
+			} = unlock( blockEditorSelect );
 			const editorSettings = blockEditorSelect.getSettings();
 			return {
-				currentDeviceType: editorSettings?.[ deviceTypeKey ],
 				globalBlockStyles:
 					editorSettings?.[ globalStylesDataKey ]?.blocks?.[ name ],
-				selectedState:
-					unlock( blockEditorSelect ).getSelectedBlockStyleState(
-						clientId
-					),
-				setPreviewDeviceType:
-					editorSettings?.[ setPreviewDeviceTypeKey ],
+				selectedState: getSelectedBlockStyleState( clientId ),
+				showStateOnCanvas:
+					isSelectedBlockStyleStateShownOnCanvas( clientId ),
 			};
 		},
 		[ clientId, name ]
 	);
-	const previewDeviceType = getPreviewDeviceTypeForState(
-		selectedState,
-		showStateOnCanvas
-	);
-	const syncedPreviewDeviceTypeRef = useRef();
-	useEffect( () => {
-		if (
-			! setPreviewDeviceType ||
-			syncedPreviewDeviceTypeRef.current === previewDeviceType
-		) {
-			return;
-		}
-
-		syncedPreviewDeviceTypeRef.current = previewDeviceType;
-		if ( currentDeviceType !== previewDeviceType ) {
-			setPreviewDeviceType( previewDeviceType );
-		}
-	}, [ currentDeviceType, previewDeviceType, setPreviewDeviceType ] );
-	const isBlockStyleStateSelected =
-		! isDefaultBlockStyleState( selectedState );
 	const isPseudoSelectorState = hasPseudoBlockStyleState( selectedState );
 
 	// Inject state styles onto the editor canvas so the selected state is
@@ -722,30 +656,13 @@ function BlockStyleControls( {
 	};
 
 	return (
-		<>
-			{ isBlockStyleStateSelected && (
-				<BlockInspectorPreTabsFill>
-					<Spacer paddingX={ 4 } paddingY={ 2 }>
-						<ToggleControl
-							label={ __( 'Show state on canvas' ) }
-							checked={ showStateOnCanvas }
-							onChange={ setShowStateOnCanvas }
-						/>
-						<BlockStateBadges
-							name={ name }
-							value={ selectedState }
-						/>
-					</Spacer>
-				</BlockInspectorPreTabsFill>
-			) }
-			<BlockStyleStateProvider value={ selectedState }>
-				<ColorEdit { ...passedProps } />
-				<BackgroundImagePanel { ...passedProps } />
-				<TypographyPanel { ...passedProps } />
-				<BorderPanel { ...passedProps } />
-				<DimensionsPanel { ...passedProps } />
-			</BlockStyleStateProvider>
-		</>
+		<BlockStyleStateProvider value={ selectedState }>
+			<ColorEdit { ...passedProps } />
+			<BackgroundImagePanel { ...passedProps } />
+			<TypographyPanel { ...passedProps } />
+			<BorderPanel { ...passedProps } />
+			<DimensionsPanel { ...passedProps } />
+		</BlockStyleStateProvider>
 	);
 }
 

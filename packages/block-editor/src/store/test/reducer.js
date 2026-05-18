@@ -5832,6 +5832,7 @@ describe( 'state', () => {
 
 			expect( state ).toEqual( {
 				clientId: 'client-1',
+				showStateOnCanvas: true,
 				value: {
 					viewport: 'mobile',
 					pseudo: 'default',
@@ -5848,6 +5849,7 @@ describe( 'state', () => {
 
 			expect( state ).toEqual( {
 				clientId: 'client-1',
+				showStateOnCanvas: true,
 				value: {
 					viewport: 'default',
 					pseudo: ':hover',
@@ -5870,6 +5872,7 @@ describe( 'state', () => {
 
 			expect( state ).toEqual( {
 				clientId: 'client-1',
+				showStateOnCanvas: true,
 				value: {
 					viewport: 'mobile',
 					pseudo: ':hover',
@@ -5892,6 +5895,7 @@ describe( 'state', () => {
 
 			expect( state ).toEqual( {
 				clientId: 'client-2',
+				showStateOnCanvas: true,
 				value: {
 					viewport: 'default',
 					pseudo: ':focus',
@@ -5914,6 +5918,7 @@ describe( 'state', () => {
 
 			expect( state ).toEqual( {
 				clientId: 'client-1',
+				showStateOnCanvas: true,
 				value: {
 					viewport: 'default',
 					pseudo: 'default',
@@ -6129,6 +6134,47 @@ describe( 'state', () => {
 			} );
 
 			expect( state ).toBe( originalState );
+		} );
+
+		it( 'stores whether canvas preview is enabled for the selected state', () => {
+			const state = selectedBlockStyleState(
+				{
+					clientId: 'client-1',
+					value: { viewport: 'mobile', pseudo: ':hover' },
+				},
+				{
+					type: 'SET_SELECTED_BLOCK_STYLE_STATE_CANVAS_PREVIEW',
+					clientId: 'client-1',
+					value: false,
+				}
+			);
+
+			expect( state ).toEqual( {
+				clientId: 'client-1',
+				showStateOnCanvas: false,
+				value: { viewport: 'mobile', pseudo: ':hover' },
+			} );
+		} );
+
+		it( 'keeps canvas preview when updating the selected state for the same block', () => {
+			const state = selectedBlockStyleState(
+				{
+					clientId: 'client-1',
+					showStateOnCanvas: false,
+					value: { viewport: 'mobile', pseudo: 'default' },
+				},
+				{
+					type: 'SET_SELECTED_BLOCK_STYLE_STATE',
+					clientId: 'client-1',
+					value: { pseudo: ':hover' },
+				}
+			);
+
+			expect( state ).toEqual( {
+				clientId: 'client-1',
+				showStateOnCanvas: false,
+				value: { viewport: 'mobile', pseudo: ':hover' },
+			} );
 		} );
 	} );
 

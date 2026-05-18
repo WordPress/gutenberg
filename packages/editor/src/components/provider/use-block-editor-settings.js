@@ -107,7 +107,7 @@ const {
 	getMediaSelectKey,
 	isIsolatedEditorKey,
 	deviceTypeKey,
-	setPreviewDeviceTypeKey,
+	onViewportStateChangeKey,
 	isNavigationOverlayContextKey,
 	isNavigationPostEditorKey,
 	mediaUploadOnSuccessKey,
@@ -271,19 +271,13 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		[ settingsBlockPatternCategories, restBlockPatternCategories ]
 	);
 
-	const { undo, setDeviceType, setIsInserterOpened } =
-		useDispatch( editorStore );
+	const { undo, setIsInserterOpened } = useDispatch( editorStore );
+	const { updateDeviceTypeForViewportState } = unlock(
+		useDispatch( editorStore )
+	);
 	const { editMediaEntity } = unlock( useDispatch( coreStore ) );
-	const { resetZoomLevel } = unlock( useDispatch( blockEditorStore ) );
 	const { saveEntityRecord } = useDispatch( coreStore );
 	const { openMediaEditorModal } = useDispatch( mediaEditorStore );
-	const setPreviewDeviceType = useCallback(
-		( newDeviceType ) => {
-			setDeviceType( newDeviceType );
-			resetZoomLevel();
-		},
-		[ resetZoomLevel, setDeviceType ]
-	);
 
 	/**
 	 * Creates a Post entity.
@@ -419,7 +413,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			disableContentOnlyForTemplateParts:
 				renderingMode === 'template-locked',
 			...( deviceType ? { [ deviceTypeKey ]: deviceType } : {} ),
-			[ setPreviewDeviceTypeKey ]: setPreviewDeviceType,
+			[ onViewportStateChangeKey ]: updateDeviceTypeForViewportState,
 			[ isNavigationOverlayContextKey ]: isNavigationOverlayContext,
 		};
 
@@ -456,7 +450,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		renderingMode,
 		editMediaEntity,
 		openMediaEditorModal,
-		setPreviewDeviceType,
+		updateDeviceTypeForViewportState,
 		deviceType,
 		allImageSizes,
 		bigImageSizeThreshold,
