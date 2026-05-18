@@ -1,5 +1,5 @@
 import type { CropperState, Size } from '../types';
-import { DEFAULT_STATE } from '../constants';
+import { DEFAULT_STATE, MAX_ZOOM } from '../constants';
 import { cropperReducer, enforceContainment, isStateDirty } from '../state';
 import {
 	createCamera,
@@ -265,6 +265,28 @@ describe( 'cropperReducer — SETTLE_CROP', () => {
 		const settled = cropperReducer( state, { type: 'SETTLE_CROP' } );
 
 		expect( settled.zoom ).toBeGreaterThan( 0 );
+		expectSameVisibleRegion( state, settled );
+	} );
+
+	it( 'caps zoom at MAX_ZOOM for tight crops and keeps the visible region', () => {
+		// A 5% crop at zoom=1 would otherwise settle to zoom=20 (1/0.05),
+		// pushing state past the user-facing zoom cap and breaking wheel
+		// and slider interactions that clamp to MAX_ZOOM. With the cap,
+		// the post-settle crop is smaller than the viewport but the
+		// content the user framed is preserved.
+		const state = makeState( {
+			cropRect: { x: 0.4, y: 0.4, width: 0.05, height: 0.05 },
+			zoom: 1,
+			pan: { x: 0, y: 0 },
+		} );
+		const settled = cropperReducer( state, { type: 'SETTLE_CROP' } );
+
+		expect( settled.zoom ).toBeCloseTo( MAX_ZOOM, 5 );
+		// The scale was capped at MAX_ZOOM/zoom (=10), not at the uncapped
+		// fit scale of 20 — so the new crop is 5% × 10 = 50% of the viewport,
+		// not 100%.
+		expect( settled.cropRect.width ).toBeCloseTo( 0.5, 5 );
+		expect( settled.cropRect.height ).toBeCloseTo( 0.5, 5 );
 		expectSameVisibleRegion( state, settled );
 	} );
 
