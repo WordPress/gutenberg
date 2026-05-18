@@ -59,6 +59,7 @@
 		{ "path": "packages/media-editor" },
 		{ "path": "packages/media-fields" },
 		{ "path": "packages/media-utils" },
+		{ "path": "packages/mediabunny" },
 		{ "path": "packages/notices" },
 		{ "path": "packages/plugins" },
 		{ "path": "packages/preferences" },

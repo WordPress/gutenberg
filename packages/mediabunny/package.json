@@ -1,0 +1,62 @@
+{
+	"name": "@wordpress/mediabunny",
+	"version": "0.1.0",
+	"description": "WebCodecs-based media wrapper for client-side video processing.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"media",
+		"mediabunny",
+		"video"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/mediabunny/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/mediabunny"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"engines": {
+		"node": ">=18.12.0",
+		"npm": ">=8.19.2"
+	},
+	"files": [
+		"src",
+		"build-module",
+		"build-types",
+		"*.md"
+	],
+	"type": "module",
+	"module": "build-module/index.mjs",
+	"exports": {
+		".": {
+			"types": "./build-types/index.d.ts",
+			"import": "./build-module/index.mjs"
+		},
+		"./worker": {
+			"types": "./build-types/mediabunny-worker.d.ts",
+			"import": "./build-module/mediabunny-worker.mjs"
+		},
+		"./package.json": "./package.json"
+	},
+	"wpWorkers": {
+		"./worker": {
+			"entry": "./src/worker.ts"
+		}
+	},
+	"wpScriptModuleExports": {
+		"./worker": "./build-module/mediabunny-worker.mjs",
+		"./loader": "./build-module/loader.mjs"
+	},
+	"types": "build-types",
+	"dependencies": {
+		"@wordpress/worker-threads": "file:../worker-threads",
+		"mediabunny": "^1.45.2"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}
