@@ -44,7 +44,7 @@ export function Inserter() {
 	return (
 		<Dialog.Root open={ inserterOpen } onOpenChange={ setInserterOpen }>
 			<Dialog.Popup
-				size="large"
+				size="full"
 				portal={
 					<Dialog.Portal
 						style={

@@ -4,6 +4,11 @@
 
 ### Enhancements
 
+-   Rework the default edit-mode `GridOverlay` to paint per-row marker
+    tiles (with `border-radius` md) inside each column instead of
+    column backgrounds, outlines, and repeating row dividers. Theme via
+    `--wp-grid-overlay-tile-bg`.
+    `GridOverlayRenderProps` now includes `rows` for uniform-row grids.
 -   Add `--wp-grid-placeholder-outline-style` and
     `--wp-grid-resize-preview-outline-style` CSS custom properties for
     the drag-placeholder outline (default `dashed`) and resize-preview
