@@ -4,6 +4,7 @@
 import { getActiveFormats } from '../../get-active-formats';
 import { isCollapsed } from '../../is-collapsed';
 import { updateFormats } from '../../update-formats';
+import { subscribeSharedListener } from './shared-listener';
 
 /**
  * All inserting input types that would insert HTML into the DOM.
@@ -58,6 +59,14 @@ export default ( props ) => ( element ) => {
 	let isComposing = false;
 
 	function onInput( event ) {
+		// Document-scoped listener: bail when the event isn't for our
+		// editable. `event` is optional — `onCompositionEnd` calls
+		// `onInput({ inputType: 'insertText' })` synthetically, in which
+		// case we trust the caller.
+		if ( event && event.target && ! element.contains( event.target ) ) {
+			return;
+		}
+
 		// Do not trigger a change if characters are being composed. Browsers
 		// will usually emit a final `input` event when the characters are
 		// composed. As of December 2019, Safari doesn't support
@@ -185,7 +194,10 @@ export default ( props ) => ( element ) => {
 		onSelectionChange( start, end );
 	}
 
-	function onCompositionStart() {
+	function onCompositionStart( event ) {
+		if ( ! element.contains( event.target ) ) {
+			return;
+		}
 		isComposing = true;
 		// Do not update the selection when characters are being composed as
 		// this rerenders the component and might destroy internal browser
@@ -201,7 +213,10 @@ export default ( props ) => ( element ) => {
 		element.querySelector( `[${ PLACEHOLDER_ATTR_NAME }]` )?.remove();
 	}
 
-	function onCompositionEnd() {
+	function onCompositionEnd( event ) {
+		if ( ! element.contains( event.target ) ) {
+			return;
+		}
 		isComposing = false;
 		// Ensure the value is up-to-date for browsers that don't emit a final
 		// input event after composition.
@@ -213,7 +228,13 @@ export default ( props ) => ( element ) => {
 		);
 	}
 
-	function onFocus() {
+	function onFocus( event ) {
+		// Document-scoped `focusin` listener: bail when focus didn't land
+		// on our editable.
+		if ( event.target !== element ) {
+			return;
+		}
+
 		const { record, isSelected, onSelectionChange, applyRecord } =
 			props.current;
 
@@ -252,15 +273,31 @@ export default ( props ) => ( element ) => {
 		);
 	}
 
-	element.addEventListener( 'input', onInput );
-	element.addEventListener( 'compositionstart', onCompositionStart );
-	element.addEventListener( 'compositionend', onCompositionEnd );
-	element.addEventListener( 'focus', onFocus );
+	const unsubscribeInput = subscribeSharedListener(
+		ownerDocument,
+		'input',
+		onInput
+	);
+	const unsubscribeCompositionStart = subscribeSharedListener(
+		ownerDocument,
+		'compositionstart',
+		onCompositionStart
+	);
+	const unsubscribeCompositionEnd = subscribeSharedListener(
+		ownerDocument,
+		'compositionend',
+		onCompositionEnd
+	);
+	const unsubscribeFocus = subscribeSharedListener(
+		ownerDocument,
+		'focusin',
+		onFocus
+	);
 
 	return () => {
-		element.removeEventListener( 'input', onInput );
-		element.removeEventListener( 'compositionstart', onCompositionStart );
-		element.removeEventListener( 'compositionend', onCompositionEnd );
-		element.removeEventListener( 'focus', onFocus );
+		unsubscribeInput();
+		unsubscribeCompositionStart();
+		unsubscribeCompositionEnd();
+		unsubscribeFocus();
 	};
 };
