@@ -42,6 +42,6 @@ export async function createNewPost(
 
 	await this.editor.setPreferences( 'core/edit-post', {
 		welcomeGuide: options.showWelcomeGuide ?? false,
-		fullscreenMode: options.fullscreenMode ?? false,
+		fullscreenMode: options.fullscreenMode ?? true,
 	} );
 }

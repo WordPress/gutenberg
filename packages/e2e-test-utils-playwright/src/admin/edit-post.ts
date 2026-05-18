@@ -19,6 +19,6 @@ export async function editPost( this: Admin, postId: string | number ) {
 
 	await this.editor.setPreferences( 'core/edit-post', {
 		welcomeGuide: false,
-		fullscreenMode: false,
+		fullscreenMode: true,
 	} );
 }
