@@ -52,15 +52,6 @@ export interface ResizeHandleRenderProps {
 	isResizing: boolean;
 
 	/**
-	 * False while another tile is being dragged or resized, so this
-	 * handle can fade out with the surface chrome. The tile that owns
-	 * the active resize gesture stays `true`.
-	 *
-	 * @default true
-	 */
-	visible?: boolean;
-
-	/**
 	 * Owning item's `key`. Available so consumers can render per-tile
 	 * content if needed.
 	 */
@@ -170,12 +161,4 @@ export interface ResizeHandleProps {
 	 * responsible for the visual.
 	 */
 	renderResizeHandle?: React.ComponentType< ResizeHandleRenderProps >;
-
-	/**
-	 * When false, the handle animates out (e.g. while a tile drag or
-	 * another tile's resize is in progress).
-	 *
-	 * @default true
-	 */
-	visible?: boolean;
 }

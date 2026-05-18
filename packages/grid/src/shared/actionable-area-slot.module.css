@@ -10,7 +10,7 @@
 	}
 }
 
-.actionable-area-slot--hidden {
+:global([data-wp-grid-resizing]) .actionable-area-slot {
 	opacity: 0;
 	pointer-events: none;
 }

@@ -59,26 +59,18 @@ export type LanesItemProps = {
 
 	/**
 	 * Whether any tile in the surface is currently being dragged or
-	 * resized. Drives the drag activator cursor and, while the
-	 * `actionableArea` is visible, mutes it with `inert`.
+	 * resized. Drives the drag activator cursor.
 	 */
 	interacting?: boolean;
 
 	/**
-	 * When false, the tile's `actionableArea` fades out (e.g. while
-	 * any tile in the surface is being resized).
+	 * Whether a tile drag is in progress. Mutes each tile's
+	 * `actionableArea` with `inert` so hovers on other tiles' controls
+	 * do not steal the gesture.
 	 *
-	 * @default true
+	 * @default false
 	 */
-	actionableAreaVisible?: boolean;
-
-	/**
-	 * When false, the tile's resize handle fades out (e.g. while a
-	 * tile drag or another tile's resize is active).
-	 *
-	 * @default true
-	 */
-	resizeHandleVisible?: boolean;
+	dragging?: boolean;
 
 	children: React.ReactNode;
 
@@ -107,8 +99,7 @@ export function LanesItem( {
 	onResizeEnd,
 	resizeSnapPreview = null,
 	renderResizeHandle,
-	resizeHandleVisible = true,
-	actionableAreaVisible = true,
+	dragging = false,
 }: LanesItemProps ) {
 	const [ resizeDelta, setResizeDelta ] = useState< ResizeDelta | null >(
 		null
@@ -185,22 +176,15 @@ export function LanesItem( {
 			className={ itemClassName }
 			style={ style }
 			{ ...{ [ GRID_ITEM_DATA_KEY ]: itemKey } }
+			data-wp-grid-item-resizing={ isResizing || undefined }
 		>
 			{ actionableArea ? (
 				<div
-					className={ clsx(
-						actionableAreaStyles[ 'actionable-area-slot' ],
-						! actionableAreaVisible &&
-							actionableAreaStyles[
-								'actionable-area-slot--hidden'
-							]
-					) }
+					className={ actionableAreaStyles[ 'actionable-area-slot' ] }
 				>
 					<div
 						style={ { display: 'contents' } }
-						{ ...( interacting && actionableAreaVisible
-							? { inert: '' }
-							: {} ) }
+						{ ...( dragging ? { inert: '' } : {} ) }
 					>
 						{ actionableArea }
 					</div>
@@ -226,7 +210,6 @@ export function LanesItem( {
 						<ResizeHandle
 							itemId={ itemKey }
 							verticalResizable={ false }
-							visible={ resizeHandleVisible }
 							onResize={ handleResize }
 							onResizeEnd={ handleResizeEnd }
 							renderResizeHandle={ renderResizeHandle }

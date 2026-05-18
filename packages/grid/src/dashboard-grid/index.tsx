@@ -135,9 +135,6 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 			id: string;
 			snap: ResizeSnapSize;
 		} | null >( null );
-		const [ resizingItemId, setResizingItemId ] = useState< string | null >(
-			null
-		);
 		// Mirror of `temporaryLayout` read synchronously on drag end —
 		// the state update from `handleDragMove` may still be batched.
 		const latestLayoutRef = useRef<
@@ -325,7 +322,6 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 			resizeBaselineRef.current = null;
 			setIsResizing( false );
 			setResizeSnapPreview( null );
-			setResizingItemId( null );
 			setTemporaryLayout( undefined );
 		} );
 
@@ -398,8 +394,6 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 			resizeBaselineRef.current = null;
 			setIsResizing( false );
 			setResizeSnapPreview( null );
-			setResizingItemId( null );
-
 			if ( ! onChangeLayout || ! latest ) {
 				setTemporaryLayout( undefined );
 				return;
@@ -416,7 +410,6 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 
 			if ( ! isResizing ) {
 				setIsResizing( true );
-				setResizingItemId( id );
 			}
 
 			const relativeDelta = {
@@ -540,16 +533,6 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 		// edit-mode toggles; `isActive` drives the opacity transition
 		// inside the overlay. Memoized so drag/resize re-renders skip
 		// reconciliation while inputs are stable.
-		const resizeHandleVisibleForItem = ( itemId: string ) => {
-			if ( activeId !== null ) {
-				return false;
-			}
-			if ( isResizing ) {
-				return resizingItemId === itemId;
-			}
-			return true;
-		};
-
 		const Overlay = renderGridOverlay ?? GridOverlay;
 		const overlayRowHeight =
 			typeof rowHeight === 'number' ? rowHeight : undefined;
@@ -623,9 +606,8 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 								layoutAnimationStyles[ 'layout-animating' ],
 							className
 						) }
-						data-wp-dashboard-grid-resizing={
-							isResizing || undefined
-						}
+						data-wp-grid-dragging={ activeId || undefined }
+						data-wp-grid-resizing={ isResizing || undefined }
 						style={ {
 							...style,
 							gridTemplateColumns: `repeat(${ effectiveColumns }, minmax(0, 1fr))`,
@@ -645,10 +627,7 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 								disabled={ ! editMode }
 								verticalResizable={ rowHeight !== 'auto' }
 								interacting={ activeId !== null || isResizing }
-								actionableAreaVisible={ ! isResizing }
-								resizeHandleVisible={ resizeHandleVisibleForItem(
-									id
-								) }
+								dragging={ activeId !== null }
 								onResize={ handleResize }
 								onResizeEnd={ persistTemporaryLayout }
 								resizeSnapPreview={

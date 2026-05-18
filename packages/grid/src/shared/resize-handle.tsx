@@ -44,7 +44,6 @@ function ResizeHandle( {
 	itemId,
 	verticalResizable = true,
 	renderResizeHandle,
-	visible = true,
 }: ResizeHandleProps ) {
 	const { attributes, listeners, setNodeRef, isDragging } = useDraggable( {
 		id: 'draggable',
@@ -83,7 +82,6 @@ function ResizeHandle( {
 				attributes={ attributes }
 				verticalResizable={ verticalResizable }
 				isResizing={ isDragging }
-				visible={ visible }
 				itemId={ itemId }
 			/>
 		);
@@ -120,11 +118,10 @@ function ResizeHandle( {
  * @param props Component props.
  */
 export default function ResizeHandleWrapper( props: ResizeHandleProps ) {
-	const { visible = true, ...resizeHandleProps } = props;
 	const throttleDelay = 16;
 	const throttledResize = useThrottle( ( delta: ResizeDelta ) => {
-		if ( resizeHandleProps.onResize ) {
-			resizeHandleProps.onResize( delta );
+		if ( props.onResize ) {
+			props.onResize( delta );
 		}
 	}, throttleDelay );
 
@@ -144,8 +141,8 @@ export default function ResizeHandleWrapper( props: ResizeHandleProps ) {
 	};
 
 	const handleDragEnd = () => {
-		if ( resizeHandleProps.onResizeEnd ) {
-			resizeHandleProps.onResizeEnd();
+		if ( props.onResizeEnd ) {
+			props.onResizeEnd();
 		}
 	};
 
@@ -158,13 +155,8 @@ export default function ResizeHandleWrapper( props: ResizeHandleProps ) {
 			onDragMove={ handleDragMove }
 			onDragEnd={ handleDragEnd }
 		>
-			<div
-				className={ clsx(
-					styles[ 'resize-handle-slot' ],
-					! visible && styles[ 'resize-handle-slot--hidden' ]
-				) }
-			>
-				<ResizeHandle { ...resizeHandleProps } visible={ visible } />
+			<div className={ styles[ 'resize-handle-slot' ] }>
+				<ResizeHandle { ...props } />
 			</div>
 		</DndContext>
 	);

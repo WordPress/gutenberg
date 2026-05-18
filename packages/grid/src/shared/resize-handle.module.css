@@ -18,9 +18,22 @@
 	}
 }
 
-.resize-handle-slot--hidden {
+/*
+ * Grid-level interaction hooks (`data-wp-grid-dragging`,
+ * `data-wp-grid-resizing`, `data-wp-grid-item-resizing`) drive
+ * handle visibility so surfaces do not prop-drill per tile.
+ */
+:global([data-wp-grid-dragging]) .resize-handle-slot,
+:global([data-wp-grid-resizing]) .resize-handle-slot {
 	opacity: 0;
 	pointer-events: none;
+}
+
+:global([data-wp-grid-resizing])
+	:global([data-wp-grid-item-resizing])
+	.resize-handle-slot {
+	opacity: 1;
+	pointer-events: auto;
 }
 
 .resize-handle {

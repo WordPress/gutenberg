@@ -42,14 +42,13 @@ export function GridItem( {
 	disabled = false,
 	verticalResizable = true,
 	interacting = false,
+	dragging = false,
 	children,
 	actionableArea = null,
 	onResize,
 	onResizeEnd,
 	resizeSnapPreview = null,
 	renderResizeHandle,
-	resizeHandleVisible = true,
-	actionableAreaVisible = true,
 }: GridItemProps ) {
 	const [ resizeDelta, setResizeDelta ] = useState< ResizeDelta | null >(
 		null
@@ -137,22 +136,15 @@ export function GridItem( {
 			className={ itemClassName }
 			style={ style }
 			{ ...{ [ GRID_ITEM_DATA_KEY ]: item.key } }
+			data-wp-grid-item-resizing={ isResizing || undefined }
 		>
 			{ actionableArea ? (
 				<div
-					className={ clsx(
-						actionableAreaStyles[ 'actionable-area-slot' ],
-						! actionableAreaVisible &&
-							actionableAreaStyles[
-								'actionable-area-slot--hidden'
-							]
-					) }
+					className={ actionableAreaStyles[ 'actionable-area-slot' ] }
 				>
 					<div
 						style={ { display: 'contents' } }
-						{ ...( interacting && actionableAreaVisible
-							? { inert: '' }
-							: {} ) }
+						{ ...( dragging ? { inert: '' } : {} ) }
 					>
 						{ actionableArea }
 					</div>
@@ -178,7 +170,6 @@ export function GridItem( {
 						<ResizeHandle
 							itemId={ item.key }
 							verticalResizable={ verticalResizable }
-							visible={ resizeHandleVisible }
 							onResize={ handleResize }
 							onResizeEnd={ handleResizeEnd }
 							renderResizeHandle={ renderResizeHandle }
