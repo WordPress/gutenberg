@@ -6,8 +6,10 @@ import { useDispatch } from '@wordpress/data';
 import { DataForm, useFormValidity } from '@wordpress/dataviews';
 import type { Field, Form } from '@wordpress/dataviews';
 import { useMemo, useState } from '@wordpress/element';
+import { check } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
-import { Stack, Button } from '@wordpress/ui'; // eslint-disable-line @wordpress/use-recommended-components
+import { Button, Icon, Stack, Text } from '@wordpress/ui'; // eslint-disable-line @wordpress/use-recommended-components
+import { addQueryArgs } from '@wordpress/url';
 
 type QuickBlockPostData = {
 	title: string;
@@ -27,6 +29,9 @@ const INITIAL_DATA: QuickBlockPostData = {
 export default function QuickBlockPost() {
 	const [ data, setData ] = useState< QuickBlockPostData >( INITIAL_DATA );
 	const [ isSaving, setIsSaving ] = useState( false );
+	const [ createdPostId, setCreatedPostId ] = useState< number | null >(
+		null
+	);
 
 	const { saveEntityRecord } = useDispatch( coreDataStore );
 
@@ -64,16 +69,59 @@ export default function QuickBlockPost() {
 		setIsSaving( true );
 
 		try {
-			await saveEntityRecord( 'postType', 'post', {
+			const saved = await saveEntityRecord( 'postType', 'post', {
 				title: data.title,
 				content: data.content,
 				status: 'draft',
 			} );
+			const newId = ( saved as { id?: number } | null )?.id;
+			if ( typeof newId === 'number' ) {
+				setCreatedPostId( newId );
+			}
 			setData( INITIAL_DATA );
 		} finally {
 			setIsSaving( false );
 		}
 	};
+
+	const writeAnother = () => {
+		setCreatedPostId( null );
+	};
+
+	if ( createdPostId !== null ) {
+		const editUrl = addQueryArgs( 'post.php', {
+			post: createdPostId,
+			action: 'edit',
+		} );
+
+		return (
+			<Stack direction="column" gap="md" align="center" justify="center">
+				<Icon
+					icon={ check }
+					size={ 48 }
+					style={ {
+						color: 'var(--wpds-color-fg-content-success)',
+					} }
+				/>
+				<Text variant="heading-md">{ __( 'Draft saved' ) }</Text>
+				<Text variant="body-md">
+					{ __( 'Your post is ready to keep editing.' ) }
+				</Text>
+				<Stack direction="row" gap="md" justify="center">
+					<Button
+						variant="solid"
+						// eslint-disable-next-line jsx-a11y/anchor-has-content
+						render={ <a href={ editUrl } /> }
+					>
+						{ __( 'Continue editing' ) }
+					</Button>
+					<Button variant="minimal" onClick={ writeAnother }>
+						{ __( 'Write another' ) }
+					</Button>
+				</Stack>
+			</Stack>
+		);
+	}
 
 	return (
 		<Stack direction="column" gap="md" justify="space-between">
