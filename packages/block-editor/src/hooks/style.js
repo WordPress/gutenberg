@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useEffect, useMemo, useState } from '@wordpress/element';
+import { useEffect, useMemo, useRef, useState } from '@wordpress/element';
 import {
 	ToggleControl,
 	__experimentalSpacer as Spacer,
@@ -637,8 +637,17 @@ function BlockStyleControls( {
 		selectedState,
 		showStateOnCanvas
 	);
+	const syncedPreviewDeviceTypeRef = useRef();
 	useEffect( () => {
-		if ( currentDeviceType !== previewDeviceType && setPreviewDeviceType ) {
+		if (
+			! setPreviewDeviceType ||
+			syncedPreviewDeviceTypeRef.current === previewDeviceType
+		) {
+			return;
+		}
+
+		syncedPreviewDeviceTypeRef.current = previewDeviceType;
+		if ( currentDeviceType !== previewDeviceType ) {
 			setPreviewDeviceType( previewDeviceType );
 		}
 	}, [ currentDeviceType, previewDeviceType, setPreviewDeviceType ] );
