@@ -54,9 +54,4 @@
 		margin-block-end: calc(-1 * var(--wp-ui-card-padding));
 	}
 
-	/* Add a vertical gap between the hero and the next sibling so they don't crash into each other. */
-	.header > .fullbleed:first-child:not(:last-child) {
-		margin-block-end: var(--wp-ui-card-padding);
-	}
-
 }
