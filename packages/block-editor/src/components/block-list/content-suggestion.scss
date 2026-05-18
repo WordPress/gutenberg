@@ -110,3 +110,39 @@ $suggestion-author-color: var(--suggestion-author-color, #{$suggestion-color});
 		z-index: 1;
 	}
 }
+
+// Move ghost: a non-interactive placeholder rendered at a moved block's
+// original position (by the editor-package suggestion HOC) so a reviewer
+// can see where the block came from. Dimmed + struck-through, tinted with
+// the suggester's color (shared with the decorated block at the destination
+// via `--suggestion-author-color`), with a small "Moved from here" label so
+// the ghost reads as one half of a move pair.
+.is-suggestion-move-ghost {
+	display: block;
+	position: relative;
+	margin: $grid-unit-15 0;
+	padding: $grid-unit-15;
+	opacity: 0.6;
+	color: $suggestion-author-color;
+	border: 1px dotted $suggestion-author-color;
+	border-radius: $radius-small;
+	text-decoration: line-through;
+	text-decoration-color: $suggestion-author-color;
+	pointer-events: none;
+	user-select: none;
+
+	.is-suggestion-move-ghost__label {
+		display: inline-flex;
+		align-items: center;
+		gap: $grid-unit-05;
+		font-size: 11px;
+		font-weight: 500;
+		text-decoration: none;
+	}
+
+	.is-suggestion-move-ghost__excerpt {
+		display: block;
+		margin-top: $grid-unit-05;
+		font-size: 13px;
+	}
+}
