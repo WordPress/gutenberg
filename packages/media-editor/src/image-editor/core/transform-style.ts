@@ -3,7 +3,10 @@
  */
 import type { CropperState, Size } from './types';
 import { degreesToRadians } from './math/rotation';
-import { sanitizeCropperState } from './math/sanitize';
+import { isValidSize, sanitizeCropperState } from './math/sanitize';
+
+/** Identity CSS transform — applied when inputs aren't safe to compose. */
+const IDENTITY_MATRIX_STYLE = 'matrix(1, 0, 0, 1, 0, 0)';
 
 /**
  * Computes a CSS matrix() transform string from the cropper state.
@@ -26,6 +29,13 @@ export function computeTransformStyle(
 	state: CropperState,
 	imageSize: Size
 ): string {
+	// Match the identity short-circuit used by `createCamera` and
+	// `getSourceRegion` so the preview path stays consistent with the math
+	// path when `imageSize` itself is hostile (state sanitization below
+	// only guards the state fields, not these size arguments).
+	if ( ! isValidSize( imageSize ) ) {
+		return IDENTITY_MATRIX_STYLE;
+	}
 	// Sanitize so hostile state can't produce `matrix(NaN, NaN, ...)` here
 	// while the parallel `createCamera` path returns a finite matrix. Both
 	// paths must agree under defense-in-depth conditions.

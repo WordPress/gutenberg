@@ -784,6 +784,24 @@ describe( 'computeTransformStyle — non-finite input regression', () => {
 		expect( out ).not.toMatch( /NaN/ );
 		expect( out ).not.toMatch( /Infinity/ );
 	} );
+
+	it( 'returns the identity matrix when imageSize is hostile', () => {
+		// State sanitization only covers state fields; imageSize NaN/Infinity
+		// would still emit `matrix(..., NaN, NaN)` in the translate components
+		// without this explicit guard.
+		expect(
+			computeTransformStyle( makeState(), {
+				width: Number.NaN,
+				height: 900,
+			} )
+		).toBe( 'matrix(1, 0, 0, 1, 0, 0)' );
+		expect(
+			computeTransformStyle( makeState(), {
+				width: Infinity,
+				height: Infinity,
+			} )
+		).toBe( 'matrix(1, 0, 0, 1, 0, 0)' );
+	} );
 } );
 
 describe( 'getImageCropBounds — non-finite input regression', () => {
