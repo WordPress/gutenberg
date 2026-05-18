@@ -168,8 +168,6 @@ export function useScaleCanvas( {
 	const isZoomedOut = scale !== 1;
 	const prefersReducedMotion = useReducedMotion();
 	const isAutoScaled = scale === 'auto-scaled';
-	// Track if the animation should start when the useEffect runs.
-	const startAnimationRef = useRef( false );
 	// Track the animation so we know if we have an animation running,
 	// and can cancel it, reverse it, call a finish event, etc.
 	const animationRef = useRef( null );
@@ -271,7 +269,6 @@ export function useScaleCanvas( {
 	 * - Sets the transitionFrom to the transitionTo state to be ready for the next animation.
 	 */
 	const finishZoomOutAnimation = useCallback( () => {
-		startAnimationRef.current = false;
 		animationRef.current = null;
 
 		// Add our final scale and frame size now that the animation is done.
@@ -306,39 +303,14 @@ export function useScaleCanvas( {
 	const previousIsZoomedOut = useRef( false );
 
 	/**
-	 * Runs when zoom out mode is toggled, and sets the startAnimation flag
-	 * so the animation will start when the next useEffect runs. We _only_
-	 * want to animate when the zoom out mode is toggled, not when the scale
-	 * changes due to the container resizing.
-	 */
-	useEffect( () => {
-		const trigger =
-			iframeDocument && previousIsZoomedOut.current !== isZoomedOut;
-
-		previousIsZoomedOut.current = isZoomedOut;
-
-		if ( ! trigger ) {
-			return;
-		}
-
-		startAnimationRef.current = true;
-
-		if ( ! isZoomedOut ) {
-			return;
-		}
-
-		iframeDocument.documentElement.classList.add( 'is-zoomed-out' );
-		return () => {
-			iframeDocument.documentElement.classList.remove( 'is-zoomed-out' );
-		};
-	}, [ iframeDocument, isZoomedOut ] );
-
-	/**
 	 * This handles:
 	 * 1. Setting the correct scale and vars of the canvas when zoomed out
 	 * 2. If zoom out mode has been toggled, runs the animation of zooming in/out
 	 */
 	useEffect( () => {
+		const startAnimation = previousIsZoomedOut.current !== isZoomedOut;
+		previousIsZoomedOut.current = isZoomedOut;
+
 		if ( ! iframeDocument ) {
 			return;
 		}
@@ -356,12 +328,12 @@ export function useScaleCanvas( {
 			} );
 		}
 
-		if ( scaleValue < 1 ) {
+		if ( isZoomedOut ) {
 			// If we are not going to animate the transition, set the scale and frame size directly.
 			// If we are animating, these values will be set when the animation is finished.
 			// Example: Opening sidebars that reduce the scale of the canvas, but we don't want to
 			// animate the transition.
-			if ( ! startAnimationRef.current ) {
+			if ( ! startAnimation ) {
 				iframeDocument.documentElement.style.setProperty(
 					'--wp-block-editor-iframe-zoom-out-scale',
 					scaleValue
@@ -371,6 +343,8 @@ export function useScaleCanvas( {
 					`${ frameSize }px`
 				);
 			}
+
+			iframeDocument.documentElement.classList.add( 'is-zoomed-out' );
 
 			iframeDocument.documentElement.style.setProperty(
 				'--wp-block-editor-iframe-zoom-out-content-height',
@@ -403,10 +377,7 @@ export function useScaleCanvas( {
 		 * - After the animation is complete, remove the fixed positioning
 		 *   and set the scroll position that keeps everything centered.
 		 */
-		if ( startAnimationRef.current ) {
-			// Don't allow a new transition to start again unless it was started by the zoom out mode changing.
-			startAnimationRef.current = false;
-
+		if ( startAnimation ) {
 			/**
 			 * If we already have an animation running, reverse it.
 			 */
@@ -462,6 +433,10 @@ export function useScaleCanvas( {
 				}
 			}
 		}
+
+		return () => {
+			iframeDocument.documentElement.classList.remove( 'is-zoomed-out' );
+		};
 	}, [
 		startZoomOutAnimation,
 		finishZoomOutAnimation,
@@ -475,6 +450,7 @@ export function useScaleCanvas( {
 		containerHeight,
 		maxContainerWidth,
 		scaleContainerWidth,
+		isZoomedOut,
 	] );
 
 	return {
