@@ -359,4 +359,49 @@ describe( 'apiFetch', () => {
 
 		await apiFetch( expectedOptions );
 	} );
+
+	it( 'should allow DELETE, PUT, and PATCH methods after removing httpV1Middleware', async () => {
+		jest.resetModules();
+		const isolatedApiFetch = ( await import( '../' ) ).default;
+
+		globalThis.fetch.mockResolvedValue( {
+			ok: true,
+			status: 200,
+			json: () => Promise.resolve( {} ),
+		} );
+
+		isolatedApiFetch.removeHttpV1Middleware();
+
+		const methodTests = [
+			{ method: 'DELETE', path: '/wp/v2/posts/1' },
+			{
+				method: 'PUT',
+				path: '/wp/v2/posts/1',
+				data: { title: 'Updated Post' },
+			},
+			{
+				method: 'PATCH',
+				path: '/wp/v2/posts/1',
+				data: { status: 'draft' },
+			},
+		];
+
+		for ( const { method, path, data } of methodTests ) {
+			globalThis.fetch.mockClear();
+
+			await isolatedApiFetch( {
+				path,
+				method,
+				...( data ? { data } : {} ),
+			} );
+
+			expect( globalThis.fetch ).toHaveBeenCalledWith(
+				`${ path }?_locale=user`,
+				expect.objectContaining( {
+					method,
+					...( data ? { body: JSON.stringify( data ) } : {} ),
+				} )
+			);
+		}
+	} );
 } );
