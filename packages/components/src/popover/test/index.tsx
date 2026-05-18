@@ -671,21 +671,20 @@ describe( 'Popover', () => {
 	} );
 
 	describe( 'wp compat overlay slot', () => {
-		it( 'should not call onFocusOutside when focus moves into the wp compat overlay slot', async () => {
-			const user = userEvent.setup();
-			const onFocusOutside = jest.fn();
-
-			// Simulate a body-level overlay slot rendered as a sibling of the
-			// Popover. `@wordpress/ui` overlays such as `Select` portal their
-			// popup into a slot tagged with `[data-wp-compat-overlay-slot]`
-			// and move DOM focus into it; the Popover should stay open in
-			// that case.
+		function createOverlaySlot() {
 			const slot = document.createElement( 'div' );
 			slot.setAttribute( 'data-wp-compat-overlay-slot', '' );
 			const slotButton = document.createElement( 'button' );
 			slotButton.textContent = 'Slotted item';
 			slot.appendChild( slotButton );
 			document.body.appendChild( slot );
+			return { slot, slotButton };
+		}
+
+		it( 'should not call onFocusOutside when focus moves into the wp compat overlay slot', async () => {
+			const user = userEvent.setup();
+			const onFocusOutside = jest.fn();
+			const { slot, slotButton } = createOverlaySlot();
 
 			render(
 				<Popover onFocusOutside={ onFocusOutside }>
@@ -705,13 +704,7 @@ describe( 'Popover', () => {
 		it( 'should not call onFocusOutside when focus returns from the slot to a popover descendant', async () => {
 			const user = userEvent.setup();
 			const onFocusOutside = jest.fn();
-
-			const slot = document.createElement( 'div' );
-			slot.setAttribute( 'data-wp-compat-overlay-slot', '' );
-			const slotButton = document.createElement( 'button' );
-			slotButton.textContent = 'Slotted item';
-			slot.appendChild( slotButton );
-			document.body.appendChild( slot );
+			const { slot, slotButton } = createOverlaySlot();
 
 			render(
 				<Popover onFocusOutside={ onFocusOutside }>
@@ -720,9 +713,6 @@ describe( 'Popover', () => {
 			);
 
 			const trigger = screen.getByText( 'Trigger' );
-			// Move focus into the slot, then back to the popover (simulating
-			// a portaled overlay closing and restoring focus to its trigger
-			// inside the host popover).
 			slotButton.focus();
 			await user.click( slotButton );
 			trigger.focus();
@@ -734,18 +724,12 @@ describe( 'Popover', () => {
 		} );
 
 		it( 'should not call onFocusOutside when focus is restored to a popover descendant by the time the blur check runs', async () => {
-			// Simulates the base-ui Select backdrop dismissal path: the
-			// currently-focused element (in the body-level slot) drops
-			// focus to `body` when the backdrop is clicked, then focus is
-			// restored to the popover trigger after the popup unmounts.
+			// Mimics the base-ui `Select` backdrop dismissal: focus drops
+			// to `body` (so the captured `relatedTarget` is `null`), then
+			// is synchronously restored to the popover before the blur
+			// check runs.
 			const onFocusOutside = jest.fn();
-
-			const slot = document.createElement( 'div' );
-			slot.setAttribute( 'data-wp-compat-overlay-slot', '' );
-			const slotButton = document.createElement( 'button' );
-			slotButton.textContent = 'Slotted item';
-			slot.appendChild( slotButton );
-			document.body.appendChild( slot );
+			const { slot, slotButton } = createOverlaySlot();
 
 			render(
 				<Popover
@@ -761,20 +745,13 @@ describe( 'Popover', () => {
 
 			await act( async () => {
 				slotButton.focus();
-				// Native blur fires when focus leaves an element to `body`
-				// (no related target). The blur is dispatched here against
-				// the floating popover content (event.target = floating
-				// element, which is the wrapper bound to useFocusOutside).
 				floating.dispatchEvent(
 					new FocusEvent( 'blur', {
 						bubbles: true,
 						relatedTarget: null,
 					} )
 				);
-				// Restore focus to the popover descendant synchronously,
-				// before the blur-check timeout runs.
 				trigger.focus();
-				// Let the blur-check timeout (setTimeout(0)) run.
 				await new Promise( ( resolve ) => setTimeout( resolve, 50 ) );
 			} );
 
