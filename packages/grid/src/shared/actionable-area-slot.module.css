@@ -1,0 +1,16 @@
+.actionable-area-slot {
+	opacity: 1;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+	.actionable-area-slot {
+		transition:
+			opacity var(--wpds-motion-duration-md)
+			var(--wpds-motion-easing-subtle);
+	}
+}
+
+.actionable-area-slot--hidden {
+	opacity: 0;
+	pointer-events: none;
+}

@@ -645,6 +645,7 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 								disabled={ ! editMode }
 								verticalResizable={ rowHeight !== 'auto' }
 								interacting={ activeId !== null || isResizing }
+								actionableAreaVisible={ ! isResizing }
 								resizeHandleVisible={ resizeHandleVisibleForItem(
 									id
 								) }

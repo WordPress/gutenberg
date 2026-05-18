@@ -13,6 +13,7 @@ import { useMergeRefs } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
+import actionableAreaStyles from '../shared/actionable-area-slot.module.css';
 import { GRID_ITEM_DATA_KEY } from '../shared/grid-item-key';
 import ResizeHandle from '../shared/resize-handle';
 import type { ResizeSnapSize } from '../shared/resize-snap';
@@ -48,6 +49,7 @@ export function GridItem( {
 	resizeSnapPreview = null,
 	renderResizeHandle,
 	resizeHandleVisible = true,
+	actionableAreaVisible = true,
 }: GridItemProps ) {
 	const [ resizeDelta, setResizeDelta ] = useState< ResizeDelta | null >(
 		null
@@ -138,10 +140,22 @@ export function GridItem( {
 		>
 			{ actionableArea ? (
 				<div
-					style={ { display: 'contents' } }
-					{ ...( interacting ? { inert: '' } : {} ) }
+					className={ clsx(
+						actionableAreaStyles[ 'actionable-area-slot' ],
+						! actionableAreaVisible &&
+							actionableAreaStyles[
+								'actionable-area-slot--hidden'
+							]
+					) }
 				>
-					{ actionableArea }
+					<div
+						style={ { display: 'contents' } }
+						{ ...( interacting && actionableAreaVisible
+							? { inert: '' }
+							: {} ) }
+					>
+						{ actionableArea }
+					</div>
 				</div>
 			) : null }
 

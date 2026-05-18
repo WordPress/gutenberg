@@ -560,6 +560,7 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 									}
 									disabled={ ! editMode }
 									interacting={ interacting }
+									actionableAreaVisible={ ! isResizing }
 									resizeHandleVisible={ resizeHandleVisibleForItem(
 										id
 									) }

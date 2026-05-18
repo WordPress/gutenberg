@@ -13,6 +13,7 @@ import { useMergeRefs } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
+import actionableAreaStyles from '../shared/actionable-area-slot.module.css';
 import ResizeHandle from '../shared/resize-handle';
 import { GRID_ITEM_DATA_KEY } from '../shared/grid-item-key';
 import type { ResizeSnapSize } from '../shared/resize-snap';
@@ -58,9 +59,18 @@ export type LanesItemProps = {
 
 	/**
 	 * Whether any tile in the surface is currently being dragged or
-	 * resized. Used to mute `actionableArea` content with `inert`.
+	 * resized. Drives the drag activator cursor and, while the
+	 * `actionableArea` is visible, mutes it with `inert`.
 	 */
 	interacting?: boolean;
+
+	/**
+	 * When false, the tile's `actionableArea` fades out (e.g. while
+	 * any tile in the surface is being resized).
+	 *
+	 * @default true
+	 */
+	actionableAreaVisible?: boolean;
 
 	/**
 	 * When false, the tile's resize handle fades out (e.g. while a
@@ -98,6 +108,7 @@ export function LanesItem( {
 	resizeSnapPreview = null,
 	renderResizeHandle,
 	resizeHandleVisible = true,
+	actionableAreaVisible = true,
 }: LanesItemProps ) {
 	const [ resizeDelta, setResizeDelta ] = useState< ResizeDelta | null >(
 		null
@@ -177,10 +188,22 @@ export function LanesItem( {
 		>
 			{ actionableArea ? (
 				<div
-					style={ { display: 'contents' } }
-					{ ...( interacting ? { inert: '' } : {} ) }
+					className={ clsx(
+						actionableAreaStyles[ 'actionable-area-slot' ],
+						! actionableAreaVisible &&
+							actionableAreaStyles[
+								'actionable-area-slot--hidden'
+							]
+					) }
 				>
-					{ actionableArea }
+					<div
+						style={ { display: 'contents' } }
+						{ ...( interacting && actionableAreaVisible
+							? { inert: '' }
+							: {} ) }
+					>
+						{ actionableArea }
+					</div>
 				</div>
 			) : null }
 

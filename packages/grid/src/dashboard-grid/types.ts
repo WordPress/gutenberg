@@ -75,13 +75,21 @@ export type GridItemProps = {
 
 	/**
 	 * Whether any tile in the grid is currently being dragged or
-	 * resized. When true, the item mutes its `actionableArea` with
-	 * `inert` so pointer hovers over buttons in other tiles do not
-	 * steal the in-progress gesture.
+	 * resized. Drives the drag activator cursor and, while the
+	 * `actionableArea` is visible, mutes it with `inert` so hovers on
+	 * other tiles' controls do not steal the gesture.
 	 *
 	 * @default false
 	 */
 	interacting?: boolean;
+
+	/**
+	 * When false, the tile's `actionableArea` fades out (e.g. while
+	 * any tile in the surface is being resized).
+	 *
+	 * @default true
+	 */
+	actionableAreaVisible?: boolean;
 
 	/**
 	 * When false, the tile's resize handle fades out (e.g. while a
