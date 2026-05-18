@@ -87,9 +87,4 @@
 		--wp-grid-overlay-tile-bg,
 		var(--wpds-color-bg-surface-neutral-weak)
 	);
-	border: var(--wpds-border-width-xs) solid
-		var(
-			--wp-grid-overlay-tile-border,
-			var(--wpds-color-stroke-surface-neutral-weak)
-		);
 }
