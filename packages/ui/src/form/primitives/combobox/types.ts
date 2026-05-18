@@ -108,6 +108,13 @@ export type ComboboxTriggerProps = ComponentProps<
 > & {
 	children?: _Combobox.Value.Props[ 'children' ];
 	/**
+	 * Text to show when no value is selected.
+	 * This is overridden by `children` if specified, or by a null item's label in `items`.
+	 *
+	 * @default __( 'Select' )
+	 */
+	placeholder?: _Combobox.Value.Props[ 'placeholder' ];
+	/**
 	 * The size of the trigger.
 	 *
 	 * @default 'default'

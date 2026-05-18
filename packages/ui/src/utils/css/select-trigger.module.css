@@ -51,7 +51,7 @@
 		text-overflow: ellipsis;
 		white-space: nowrap;
 
-		&[data-placeholder] {
+		.trigger[data-placeholder] & {
 			color: var(--wpds-color-fg-interactive-neutral-disabled);
 		}
 	}

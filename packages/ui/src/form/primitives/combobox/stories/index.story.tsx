@@ -42,7 +42,6 @@ const inputWrapperStyle = {
 
 export const Default: Story = {
 	args: {
-		defaultValue: ITEMS[ 0 ],
 		items: ITEMS,
 		children: (
 			<>

@@ -213,6 +213,32 @@ describe( 'Combobox', () => {
 		expect( screen.getByText( 'No item selected' ) ).toBeVisible();
 	} );
 
+	it( 'renders a default trigger placeholder when no value is selected', () => {
+		render(
+			<Combobox.Root items={ ITEMS }>
+				<Combobox.Trigger />
+			</Combobox.Root>
+		);
+
+		const trigger = screen.getByRole( 'combobox' );
+
+		expect( trigger ).toHaveTextContent( 'Select' );
+		expect( trigger ).toHaveAttribute( 'data-placeholder' );
+	} );
+
+	it( 'supports custom trigger placeholder text', () => {
+		render(
+			<Combobox.Root items={ ITEMS }>
+				<Combobox.Trigger placeholder="Choose an item" />
+			</Combobox.Root>
+		);
+
+		const trigger = screen.getByRole( 'combobox' );
+
+		expect( trigger ).toHaveTextContent( 'Choose an item' );
+		expect( trigger ).toHaveAttribute( 'data-placeholder' );
+	} );
+
 	// The actual bug is a CSS grid overlap: both Empty and List target
 	// `grid-area: main`, so Empty rendered later in DOM stacks on top and
 	// blocks clicks. JSDOM doesn't compute CSS layout, so this test only

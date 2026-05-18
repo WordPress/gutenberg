@@ -1,6 +1,7 @@
 import { Combobox as _Combobox } from '@base-ui/react/combobox';
 import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 import { chevronDown } from '@wordpress/icons';
 import { Icon } from '../../../icon';
 import focusStyles from '../../../utils/css/focus.module.css';
@@ -10,7 +11,13 @@ import type { ComboboxTriggerProps } from './types';
 
 export const Trigger = forwardRef< HTMLButtonElement, ComboboxTriggerProps >(
 	function Trigger(
-		{ className, children, size = 'default', ...restProps },
+		{
+			className,
+			children,
+			size = 'default',
+			placeholder = __( 'Select' ),
+			...restProps
+		},
 		ref
 	) {
 		return (
@@ -29,7 +36,9 @@ export const Trigger = forwardRef< HTMLButtonElement, ComboboxTriggerProps >(
 					ref={ ref }
 				>
 					<div className={ selectTriggerStyles[ 'trigger-value' ] }>
-						<_Combobox.Value>{ children }</_Combobox.Value>
+						<_Combobox.Value placeholder={ placeholder }>
+							{ children }
+						</_Combobox.Value>
 					</div>
 					<Icon
 						className={ selectTriggerStyles[ 'trigger-caret' ] }
