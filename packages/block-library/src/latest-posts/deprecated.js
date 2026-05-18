@@ -26,10 +26,10 @@ const migrateCategories = ( oldAttributes ) => {
 };
 
 const migratePostLayout = ( oldAttributes ) => {
-	const { postLayout, columns, layout, ...attributesWithoutLegacyLayout } =
+	const { postLayout, columns, ...attributesWithoutLegacyLayout } =
 		oldAttributes;
 
-	if ( layout || ! postLayout ) {
+	if ( ! postLayout ) {
 		return oldAttributes;
 	}
 
@@ -57,7 +57,7 @@ export default [
 		},
 		migrate: ( oldAttributes ) =>
 			migratePostLayout( migrateCategories( oldAttributes ) ),
-		isEligible: ( { layout, postLayout } ) => ! layout && postLayout,
+		isEligible: ( { postLayout } ) => postLayout,
 		save: () => null,
 	},
 	{
