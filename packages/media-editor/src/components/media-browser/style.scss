@@ -2,7 +2,7 @@
 @use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/base-styles/mixins" as *;
 
-.media-upload-modal {
+.media-modal-browser {
 	.components-modal__header {
 		padding-bottom: $grid-unit-10;
 	}
@@ -19,7 +19,7 @@
 		padding-top: $grid-unit-10;
 	}
 
-	.media-upload-modal__footer {
+	.media-modal-browser__footer {
 		position: sticky;
 		bottom: 0;
 		background-color: inherit;
@@ -37,7 +37,7 @@
 		}
 	}
 
-	.media-upload-modal__upload-status {
+	.media-modal-browser__upload-status {
 		position: absolute;
 		display: flex;
 		align-items: center;
@@ -55,30 +55,40 @@
 			margin: 0;
 		}
 	}
+
+	.media-modal-browser__sidebar-empty {
+		padding: $grid-unit-20;
+		color: $gray-700;
+		font-style: italic;
+	}
+
+	.media-modal-browser__edit-image {
+		justify-content: space-between;
+		width: 100%;
+	}
 }
 
-.media-upload-modal__snackbar {
+.media-modal-browser__snackbar {
 	@include snackbar-container();
 	z-index: 200000;
 
-	// Override the transform and transform-origin applied by the Snackbar component
-	// to prevent the snackbar from shifting position when its content changes while
-	// the media upload modal is open. This is an edge case particular to the media
-	// upload modal when instantiated from a popover, such as the Replace control in
-	// the Image Block. In that case, the Framer Motion transform appears to get
-	// confused by the Snackbars being a child of the popover.
+	// Override the transform and transform-origin applied by the Snackbar
+	// component to prevent the snackbar from shifting position when its
+	// content changes while the modal is open. This is an edge case
+	// particular to the modal when instantiated from a popover, such as the
+	// Replace control in the Image Block.
 	> div {
 		transform: none !important;
 		transform-origin: 0 !important;
 	}
 }
 
-.media-upload-modal__upload-status__popover {
+.media-modal-browser__upload-status__popover {
 	.components-popover__content {
 		width: 320px;
 	}
 
-	.media-upload-modal__upload-status__header {
+	.media-modal-browser__upload-status__header {
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
@@ -90,7 +100,7 @@
 		}
 	}
 
-	.media-upload-modal__upload-status__list {
+	.media-modal-browser__upload-status__list {
 		max-height: 200px;
 		overflow-y: auto;
 		margin: 0;
@@ -98,7 +108,7 @@
 		list-style: none;
 	}
 
-	.media-upload-modal__upload-status__item {
+	.media-modal-browser__upload-status__item {
 		display: flex;
 		align-items: flex-start;
 		margin-bottom: 0;
@@ -114,7 +124,7 @@
 		}
 	}
 
-	.media-upload-modal__upload-status__filename {
+	.media-modal-browser__upload-status__filename {
 		overflow: hidden;
 		text-overflow: ellipsis;
 		white-space: nowrap;

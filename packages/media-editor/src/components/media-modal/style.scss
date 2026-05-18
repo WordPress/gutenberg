@@ -1,0 +1,4 @@
+// The unified media modal currently owns no styles of its own — the
+// browse and edit views each style their own Modal wrapper. This file
+// exists so the entry stylesheet can `@use` the modal directory if/when
+// shell-level styles are needed.

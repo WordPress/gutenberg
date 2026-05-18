@@ -15,12 +15,11 @@
  */
 import { useState, useCallback } from '@wordpress/element';
 import { isBlobURL } from '@wordpress/blob';
+import type { Attachment } from '@wordpress/media-utils';
 
 /**
  * Internal dependencies
  */
-import type { Attachment } from '../../utils/types';
-import { UploadError } from '../../utils/upload-error';
 import type { UploadingFile } from './upload-status-popover';
 
 let idCounter = 0;
@@ -49,6 +48,19 @@ interface UseUploadStatusReturn {
 	clearCompleted: () => void;
 	/** True when tracked entries exist but none are still uploading. */
 	allComplete: boolean;
+}
+
+/**
+ * Duck-type detection for `UploadError` from `@wordpress/media-utils`
+ * without taking a runtime dependency on the class itself.
+ * @param error
+ */
+function getErroredFileName( error: Error ): string | undefined {
+	const maybeFile = ( error as unknown as { file?: { name?: unknown } } )
+		.file;
+	return maybeFile && typeof maybeFile.name === 'string'
+		? maybeFile.name
+		: undefined;
 }
 
 export function useUploadStatus( {
@@ -144,14 +156,13 @@ export function useUploadStatus( {
 			};
 
 			const onError = ( error: Error ) => {
-				// uploadMedia always wraps errors in UploadError, which
-				// carries the originating File so we can match it back to
-				// the correct item. A custom onUpload prop could pass a
-				// plain Error instead — in that case fileName is undefined
-				// and no entry will be visually marked as errored, but the
-				// batch will still complete correctly via errorCount.
-				const fileName =
-					error instanceof UploadError ? error.file.name : undefined;
+				// uploadMedia always wraps errors with the originating File
+				// attached, so we can match it back to the correct item.
+				// A custom onUpload prop could pass a plain Error instead —
+				// in that case fileName is undefined and no entry will be
+				// visually marked as errored, but the batch will still
+				// complete correctly via errorCount.
+				const fileName = getErroredFileName( error );
 
 				// Find the first still-uploading entry in this batch whose
 				// name matches the failed file and mark it as errored.

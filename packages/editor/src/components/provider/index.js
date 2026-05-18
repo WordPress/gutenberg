@@ -466,7 +466,8 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 									<StartTemplateOptions />
 									<PatternRenameModal />
 									<PatternDuplicateModal />
-									{ window?.__experimentalMediaEditorModal && (
+									{ ( window?.__experimentalMediaEditorModal ||
+										window?.__experimentalUnifiedMediaModal ) && (
 										<MediaEditorModalMount />
 									) }
 								</>

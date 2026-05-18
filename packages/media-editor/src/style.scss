@@ -1,3 +1,7 @@
+// Bring in the media-fields-built stylesheet (consumed by the browse-mode
+// Details sidebar and the DataViews picker's field rendering).
+@use "@wordpress/media-fields/build-style/style.css" as *;
+
 // Import component styles
 @use "./components/media-preview/style.scss" as *;
 @use "./image-editor/style.scss" as *;
@@ -6,4 +10,6 @@
 @use "./components/media-editor-canvas/style.scss" as *;
 @use "./components/media-editor-toolbar/style.scss" as *;
 @use "./components/media-editor-keyboard-shortcuts-modal/style.scss" as *;
+@use "./components/media-modal/style.scss" as *;
+@use "./components/media-browser/style.scss" as *;
 @use "./components/rotation-ruler/style.scss" as *;

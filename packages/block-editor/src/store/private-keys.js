@@ -13,3 +13,4 @@ export const isNavigationOverlayContextKey = Symbol(
 export const isNavigationPostEditorKey = Symbol( 'isNavigationPostEditor' );
 export const mediaUploadOnSuccessKey = Symbol( 'mediaUploadOnSuccess' );
 export const openMediaEditorModalKey = Symbol( 'openMediaEditorModal' );
+export const openMediaUploadModalKey = Symbol( 'openMediaUploadModal' );

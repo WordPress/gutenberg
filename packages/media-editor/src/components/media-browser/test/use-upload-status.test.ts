@@ -11,7 +11,6 @@ import { renderHook, act } from '@testing-library/react';
  * Internal dependencies
  */
 import { useUploadStatus } from '../use-upload-status';
-import { UploadError } from '../../../utils/upload-error';
 
 function createFile( name: string ): File {
 	return new File( [ 'content' ], name, { type: 'image/png' } );
@@ -25,12 +24,17 @@ function createBlobAttachment( name: string ) {
 	return { url: `blob:https://example.com/${ name }` };
 }
 
-function createUploadError( name: string, message = 'Upload failed' ) {
-	return new UploadError( {
-		code: 'GENERAL',
-		message,
-		file: createFile( name ),
-	} );
+/**
+ * The hook duck-types `error.file.name` to associate an upload failure with
+ * its file. A plain Error with a `file` property is enough — no dependency
+ * on `UploadError` from `@wordpress/media-utils`.
+ * @param name
+ * @param message
+ */
+function createUploadError( name: string, message = 'Upload failed' ): Error {
+	const err = new Error( message );
+	( err as unknown as { file: File } ).file = createFile( name );
+	return err;
 }
 
 function statuses( result: ReturnType< typeof useUploadStatus > ): string[] {
@@ -363,7 +367,6 @@ describe( 'useUploadStatus', () => {
 				] ) );
 			} );
 
-			// Blob URL calls and partial completions (all ignored).
 			act( () => {
 				onFileChange( [
 					createBlobAttachment( 'a' ),
@@ -383,7 +386,6 @@ describe( 'useUploadStatus', () => {
 			} );
 			expect( onBatchComplete ).not.toHaveBeenCalled();
 
-			// c.png fails — onFileChange with only successful attachments.
 			act( () =>
 				onFileChange( [
 					createAttachment( 1, 'a.png' ),
@@ -392,7 +394,6 @@ describe( 'useUploadStatus', () => {
 			);
 			expect( onBatchComplete ).not.toHaveBeenCalled();
 
-			// onError fires for c.png — batch now complete.
 			act( () => onError( createUploadError( 'c.png' ) ) );
 
 			expect( onBatchComplete ).toHaveBeenCalledTimes( 1 );

@@ -1,150 +1,45 @@
 /**
- * External dependencies
- */
-import clsx from 'clsx';
-
-/**
  * WordPress dependencies
  */
-import {
-	createPortal,
-	useState,
-	useCallback,
-	useMemo,
-	useRef,
-	useEffect,
-} from '@wordpress/element';
-import { __, sprintf, _n } from '@wordpress/i18n';
-import {
-	privateApis as coreDataPrivateApis,
-	store as coreStore,
-} from '@wordpress/core-data';
-import { resolveSelect, useDispatch } from '@wordpress/data';
-import { Modal, DropZone, FormFileUpload, Button } from '@wordpress/components';
-import { upload as uploadIcon } from '@wordpress/icons';
-import { DataViewsPicker } from '@wordpress/dataviews';
-import type {
-	Field,
-	ActionButton,
-	SupportedLayouts,
-	View,
-} from '@wordpress/dataviews';
-import { useView } from '@wordpress/views';
-import { Stack } from '@wordpress/ui';
-import {
-	altTextField,
-	attachedToField,
-	authorField,
-	captionField,
-	dateAddedField,
-	dateModifiedField,
-	descriptionField,
-	filenameField,
-	filesizeField,
-	mediaDimensionsField,
-	mediaThumbnailField,
-	mimeTypeField,
-} from '@wordpress/media-fields';
-import { store as noticesStore, SnackbarNotices } from '@wordpress/notices';
+import { useEffect, useRef } from '@wordpress/element';
+import { dispatch, useSelect } from '@wordpress/data';
+// `@wordpress/block-editor` does not currently emit type declarations for its
+// runtime exports (its tsconfig limits the TS project to a couple of files),
+// so the import below is type-suppressed. Runtime resolution works via the
+// package's CJS/ESM entries.
+// prettier-ignore
+// @ts-expect-error
+import { privateApis as blockEditorPrivateApis, store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
-import type { Attachment, RestAttachment } from '../../utils/types';
-import { transformAttachment } from '../../utils/transform-attachment';
-import { uploadMedia } from '../../utils/upload-media';
+import type { Attachment } from '../../utils/types';
 import { unlock } from '../../lock-unlock';
-import { UploadStatusPopover } from './upload-status-popover';
-import { useInvalidateAttachmentResolutions } from './use-invalidate-attachment-resolutions';
-import { useUploadStatus } from './use-upload-status';
 
-const { useEntityRecordsWithPermissions } = unlock( coreDataPrivateApis );
-
-// Layout constants - matching the picker layout types
-const LAYOUT_PICKER_GRID = 'pickerGrid';
-const LAYOUT_PICKER_TABLE = 'pickerTable';
-
-// Custom notices context for the media modal
-const NOTICES_CONTEXT = 'media-modal';
-
-// Notice ID - reused for all upload-related notices to prevent flooding
-const NOTICE_ID_UPLOAD_PROGRESS = 'media-modal-upload-progress';
-
-type ViewQueryParams = Pick< View, 'page' | 'search' >;
-
-const defaultQueryParams: ViewQueryParams = {
-	page: 1,
-	search: '',
-};
-
-const defaultView: View = {
-	type: LAYOUT_PICKER_GRID,
-	fields: [],
-	showTitle: false,
-	titleField: 'title',
-	mediaField: 'media_thumbnail',
-	perPage: 50,
-	filters: [],
-	layout: {
-		previewSize: 170,
-		density: 'compact',
-	},
-};
-
-const defaultLayouts: SupportedLayouts = {
-	[ LAYOUT_PICKER_GRID ]: {
-		fields: [],
-		showTitle: false,
-		layout: {
-			previewSize: 170,
-			density: 'compact',
-		},
-	},
-	[ LAYOUT_PICKER_TABLE ]: {
-		fields: [
-			'filename',
-			'filesize',
-			'media_dimensions',
-			'author',
-			'date',
-		],
-		showTitle: true,
-	},
-};
+const { openMediaUploadModalKey } = unlock( blockEditorPrivateApis );
 
 interface MediaUploadModalProps {
-	/**
-	 * Array of allowed media types.
-	 */
+	/** Array of allowed media types. */
 	allowedTypes?: string[];
 
 	/**
 	 * Whether multiple files can be selected.
+	 *
 	 * @default false
 	 */
 	multiple?: boolean;
 
-	/**
-	 * The currently selected media item(s).
-	 * Can be a single ID number or array of IDs for multiple selection.
-	 */
+	/** The currently selected media item(s). */
 	value?: number | number[];
 
-	/**
-	 * Function called when media is selected.
-	 * Receives single attachment object or array of attachments.
-	 */
+	/** Function called when media is selected. */
 	onSelect: ( media: Attachment | Attachment[] ) => void;
 
-	/**
-	 * Function called when the modal is closed without selection.
-	 */
+	/** Function called when the modal is closed without selection. */
 	onClose?: () => void;
 
-	/**
-	 * Function to handle media uploads.
-	 * If not provided, drag and drop will be disabled.
-	 */
+	/** Function to handle media uploads. Defaults to `uploadMedia`. */
 	onUpload?: ( args: {
 		allowedTypes?: string[];
 		filesList: File[];
@@ -155,518 +50,182 @@ interface MediaUploadModalProps {
 
 	/**
 	 * Title for the modal.
+	 *
 	 * @default 'Select Media'
 	 */
 	title?: string;
 
-	/**
-	 * Whether the modal is open.
-	 */
+	/** Whether the modal is open. */
 	isOpen: boolean;
 
 	/**
 	 * Whether the modal can be closed by clicking outside or pressing escape.
+	 *
 	 * @default true
 	 */
 	isDismissible?: boolean;
 
-	/**
-	 * Additional CSS class for the modal.
-	 */
+	/** Additional CSS class for the modal. */
 	modalClass?: string;
 
 	/**
 	 * Whether to show a search input.
+	 *
 	 * @default true
 	 */
 	search?: boolean;
 
-	/**
-	 * Label for the search input.
-	 */
+	/** Label for the search input. */
 	searchLabel?: string;
 }
 
 /**
- * MediaUploadModal component that uses Modal and DataViewsPicker for media selection.
+ * Back-compat shim for the experimental `MediaUploadModal`.
  *
- * This is a modern functional component alternative to the legacy MediaUpload class component.
- * It provides a cleaner API and better integration with the WordPress block editor.
+ * The actual UI now lives in `@wordpress/media-editor` and is mounted exactly
+ * once at the editor root. This component preserves the previous prop API but
+ * no longer renders its own `<Modal>` — instead, when `isOpen` flips to true
+ * it dispatches an open action via the `openMediaUploadModalKey` settings
+ * symbol (parallel to how the Image-block "Crop" entry opens the editor
+ * modal). The dispatcher returns a session symbol so the shim can later
+ * dispatch a guarded close that only acts on its own session.
  *
- * @param props               Component props
- * @param props.allowedTypes  Array of allowed media types
- * @param props.multiple      Whether multiple files can be selected
- * @param props.value         Currently selected media item(s)
- * @param props.onSelect      Function called when media is selected
- * @param props.onClose       Function called when modal is closed
- * @param props.onUpload      Function to handle media uploads
- * @param props.title         Title for the modal
- * @param props.isOpen        Whether the modal is open
- * @param props.isDismissible Whether modal can be dismissed
- * @param props.modalClass    Additional CSS class for modal
- * @param props.search        Whether to show search input
- * @param props.searchLabel   Label for search input
- * @return JSX element or null
+ * Outside a block-editor context the open function is undefined and the
+ * shim silently no-ops. A dev-only warning is emitted on the first attempt
+ * to make this visible to plugin authors during the prototype.
+ * @param props
  */
-export function MediaUploadModal( {
-	allowedTypes,
-	multiple = false,
-	value,
-	onSelect,
-	onClose,
-	onUpload,
-	title = __( 'Select Media' ),
-	isOpen,
-	isDismissible = true,
-	modalClass,
-	search = true,
-	searchLabel = __( 'Search media' ),
-}: MediaUploadModalProps ) {
-	const [ selection, setSelection ] = useState< string[] >( () => {
-		if ( ! value ) {
-			return [];
-		}
-		return Array.isArray( value )
-			? value.map( String )
-			: [ String( value ) ];
-	} );
-
-	const { createSuccessNotice, removeAllNotices } =
-		useDispatch( noticesStore );
-	const invalidateAttachmentResolutions =
-		useInvalidateAttachmentResolutions();
-	const [ queryParams, setQueryParams ] = useState< ViewQueryParams >(
-		() => defaultQueryParams
-	);
-
-	// Persist view configuration across sessions via the preferences store.
-	const { view, updateView, isModified, resetToDefault } = useView( {
-		kind: 'postType',
-		name: 'attachment',
-		slug: 'media-modal',
-		defaultView,
-		queryParams,
-		onChangeQueryParams: setQueryParams,
-	} );
-
-	// Normalize undefined transient DataViews values so they do not persist as modified modal preferences.
-	const handleChangeView = useCallback(
-		( nextView: View ) => {
-			const normalizedView = { ...nextView };
-			if ( normalizedView.startPosition === undefined ) {
-				delete normalizedView.startPosition;
-			}
-			updateView( normalizedView );
-		},
-		[ updateView ]
-	);
-
-	// Build query args based on view properties, similar to PostList
-	const queryArgs = useMemo( () => {
-		const filters: Record< string, any > = {};
-
-		view.filters?.forEach( ( filter ) => {
-			// Handle media type filters
-			if ( filter.field === 'media_type' ) {
-				filters.media_type = filter.value;
-			}
-			// Handle author filters
-			if ( filter.field === 'author' ) {
-				if ( filter.operator === 'isAny' ) {
-					filters.author = filter.value;
-				} else if ( filter.operator === 'isNone' ) {
-					filters.author_exclude = filter.value;
-				}
-			}
-			// Handle date filters
-			if ( filter.field === 'date' || filter.field === 'modified' ) {
-				if ( filter.operator === 'before' ) {
-					filters.before = filter.value;
-				} else if ( filter.operator === 'after' ) {
-					filters.after = filter.value;
-				}
-			}
-			// Handle mime type filters
-			if ( filter.field === 'mime_type' ) {
-				filters.mime_type = filter.value;
-			}
-		} );
-
-		// Base media and mime type on allowedTypes if no filter is set
-		if (
-			! filters.media_type &&
-			! filters.mime_type &&
-			allowedTypes &&
-			! allowedTypes.includes( '*' )
-		) {
-			const { mediaTypes, mimeTypes } = allowedTypes.reduce(
-				( acc, type ) => {
-					if ( type.endsWith( '/*' ) ) {
-						acc.mediaTypes.push( type.replace( '/*', '' ) );
-					} else if ( type.includes( '/' ) ) {
-						acc.mimeTypes.push( type );
-					} else {
-						acc.mediaTypes.push( type );
-					}
-
-					return acc;
-				},
-				{ mediaTypes: [] as string[], mimeTypes: [] as string[] }
-			);
-
-			if ( mediaTypes.length ) {
-				filters.media_type = mediaTypes;
-			}
-			if ( mimeTypes.length ) {
-				filters.mime_type = mimeTypes;
-			}
-		}
-
-		return {
-			per_page: view.perPage || 20,
-			page: view.page || 1,
-			status: 'inherit',
-			order: view.sort?.direction,
-			orderby: view.sort?.field,
-			search: view.search,
-			_embed: 'author,wp:attached-to',
-			...filters,
-		};
-	}, [ view, allowedTypes ] );
-
-	// Per-batch completion handler: auto-select uploaded items and refresh the grid.
-	const handleBatchComplete = useCallback(
-		( attachments: Partial< Attachment >[] ) => {
-			const uploadedIds = attachments
-				.map( ( attachment ) => String( attachment.id ) )
-				.filter( Boolean );
-
-			if ( multiple ) {
-				setSelection( ( prev ) => {
-					const existing = new Set( prev );
-					const newIds = uploadedIds.filter(
-						( id ) => ! existing.has( id )
-					);
-					return [ ...prev, ...newIds ];
-				} );
-			} else {
-				setSelection( uploadedIds.slice( 0, 1 ) );
-			}
-
-			// Invalidate all cached attachment queries so every page of
-			// results refreshes — not just the page the user is viewing.
-			invalidateAttachmentResolutions();
-		},
-		[ multiple, invalidateAttachmentResolutions ]
-	);
-
+export function MediaUploadModal( props: MediaUploadModalProps ) {
 	const {
-		uploadingFiles,
-		registerBatch,
-		dismissError,
-		clearCompleted,
-		allComplete,
-	} = useUploadStatus( { onBatchComplete: handleBatchComplete } );
+		isOpen,
+		onSelect,
+		onClose,
+		onUpload,
+		allowedTypes,
+		multiple,
+		value,
+		title,
+		isDismissible,
+		modalClass,
+		search,
+		searchLabel,
+	} = props;
 
-	const isPopoverOpenRef = useRef( false );
-	const handlePopoverOpenChange = useCallback(
-		( open: boolean ) => {
-			isPopoverOpenRef.current = open;
-			if ( ! open ) {
-				clearCompleted();
-			}
-		},
-		[ clearCompleted ]
-	);
+	// Latest-callback refs so prop identity changes don't churn the dispatch
+	// and the store never holds a stale closure.
+	const onSelectRef = useRef( onSelect );
+	const onCloseRef = useRef( onClose );
+	const onUploadRef = useRef( onUpload );
+	useEffect( () => {
+		onSelectRef.current = onSelect;
+	}, [ onSelect ] );
+	useEffect( () => {
+		onCloseRef.current = onClose;
+	}, [ onClose ] );
+	useEffect( () => {
+		onUploadRef.current = onUpload;
+	}, [ onUpload ] );
 
-	// Fetch all media attachments using WordPress core data with permissions
-	const {
-		records: mediaRecords,
-		isResolving: isLoading,
-		totalItems,
-		totalPages,
-	} = useEntityRecordsWithPermissions( 'postType', 'attachment', queryArgs );
-
-	const fields: Field< RestAttachment >[] = useMemo(
-		() => [
-			// Media field definitions from @wordpress/media-fields
-			// Cast is safe because RestAttachment has the same properties as Attachment
-			{
-				...( mediaThumbnailField as Field< RestAttachment > ),
-				enableHiding: false, // Within the modal, the thumbnail should always be shown.
-			},
-			{
-				id: 'title',
-				type: 'text' as const,
-				label: __( 'Title' ),
-				getValue: ( { item }: { item: RestAttachment } ) => {
-					const titleValue = item.title.raw || item.title.rendered;
-					return titleValue || __( '(no title)' );
-				},
-			},
-			altTextField as Field< RestAttachment >,
-			captionField as Field< RestAttachment >,
-			descriptionField as Field< RestAttachment >,
-			dateAddedField as Field< RestAttachment >,
-			dateModifiedField as Field< RestAttachment >,
-			authorField as Field< RestAttachment >,
-			filenameField as Field< RestAttachment >,
-			filesizeField as Field< RestAttachment >,
-			mediaDimensionsField as Field< RestAttachment >,
-			mimeTypeField as Field< RestAttachment >,
-			attachedToField as Field< RestAttachment >,
-		],
+	const openMediaUploadModal = useSelect(
+		( select ) =>
+			select( blockEditorStore ).getSettings()[
+				openMediaUploadModalKey as unknown as string
+			] as
+				| ( ( args: Record< string, unknown > ) => symbol | undefined )
+				| undefined,
 		[]
 	);
 
-	const actions: ActionButton< RestAttachment >[] = useMemo(
-		() => [
-			{
-				id: 'select',
-				label: __( 'Select' ),
-				isPrimary: true,
-				supportsBulk: multiple,
-				async callback() {
-					if ( selection.length === 0 ) {
-						return;
-					}
+	// Track the session this shim instance owns. The store guards
+	// `closeMediaUploadModal({ session })` so that an unmount cleanup from a
+	// superseded shim cannot close the active modal.
+	const sessionRef = useRef< symbol | null >( null );
+	const wasOpenRef = useRef( false );
 
-					const selectedPostsQuery = {
-						include: selection,
-						per_page: -1,
-					};
-
-					const selectedPosts = await resolveSelect(
-						coreStore
-					).getEntityRecords< RestAttachment >(
-						'postType',
-						'attachment',
-						selectedPostsQuery
+	// React to isOpen transitions (including initial mount with isOpen=true).
+	useEffect( () => {
+		if ( isOpen && ! wasOpenRef.current ) {
+			if ( ! openMediaUploadModal ) {
+				if (
+					process.env.NODE_ENV !== 'production' &&
+					typeof window !== 'undefined'
+				) {
+					// eslint-disable-next-line no-console
+					console.warn(
+						'`MediaUploadModal` rendered with `isOpen` but no block-editor settings host is present, ' +
+							'or `window.__experimentalUnifiedMediaModal` is not enabled. The modal will not open.'
 					);
-
-					// Transform the selected posts to the expected Attachment format
-					const transformedPosts = ( selectedPosts ?? [] )
-						.map( transformAttachment )
-						.filter( Boolean );
-
-					const selectedItems = multiple
-						? transformedPosts
-						: transformedPosts?.[ 0 ];
-
-					removeAllNotices( 'snackbar', NOTICES_CONTEXT );
-					onSelect( selectedItems );
-				},
-			},
-		],
-		[ multiple, onSelect, selection, removeAllNotices ]
-	);
-
-	const handleModalClose = useCallback( () => {
-		removeAllNotices( 'snackbar', NOTICES_CONTEXT );
-		onClose?.();
-	}, [ removeAllNotices, onClose ] );
-
-	useEffect( () => {
-		if ( ! isOpen ) {
-			setQueryParams( defaultQueryParams );
-		}
-	}, [ isOpen ] );
-
-	// Use onUpload if provided, otherwise fall back to uploadMedia
-	const handleUpload = onUpload || uploadMedia;
-
-	// Show success notice and auto-clear completed entries when all batches finish.
-	const prevAllCompleteRef = useRef( false );
-	useEffect( () => {
-		if ( allComplete && ! prevAllCompleteRef.current ) {
-			const completeCount = uploadingFiles.filter(
-				( file ) => file.status === 'uploaded'
-			).length;
-			if ( completeCount > 0 ) {
-				createSuccessNotice(
-					sprintf(
-						// translators: %s: number of files
-						_n(
-							'Uploaded %s file',
-							'Uploaded %s files',
-							completeCount
-						),
-						completeCount.toLocaleString()
-					),
-					{
-						type: 'snackbar',
-						context: NOTICES_CONTEXT,
-						id: NOTICE_ID_UPLOAD_PROGRESS,
-					}
-				);
+				}
+				return;
 			}
-
-			// Auto-clear completed entries, unless the popover is
-			// open — in that case, they'll be cleared on close.
-			if ( ! isPopoverOpenRef.current ) {
-				clearCompleted();
-			}
-		}
-		prevAllCompleteRef.current = allComplete;
-	}, [ allComplete, uploadingFiles, createSuccessNotice, clearCompleted ] );
-
-	const handleFileSelect = useCallback(
-		( event: React.ChangeEvent< HTMLInputElement > ) => {
-			const files = event.target.files;
-			if ( files && files.length > 0 ) {
-				const filesArray = Array.from( files );
-				const { onFileChange, onError } = registerBatch( filesArray );
-
-				handleUpload( {
+			sessionRef.current =
+				openMediaUploadModal( {
 					allowedTypes,
-					filesList: filesArray,
-					onFileChange,
-					onError,
-				} );
-			}
-		},
-		[ allowedTypes, handleUpload, registerBatch ]
-	);
-
-	const paginationInfo = useMemo(
-		() => ( {
-			totalItems,
-			totalPages,
-		} ),
-		[ totalItems, totalPages ]
-	);
-
-	// Build accept attribute from allowedTypes
-	const acceptTypes = useMemo( () => {
-		if ( allowedTypes?.includes( '*' ) ) {
-			return undefined;
+					multiple,
+					value,
+					title,
+					isDismissible,
+					modalClass,
+					search,
+					searchLabel,
+					onSelect: ( media: Attachment | Attachment[] ) =>
+						onSelectRef.current?.( media ),
+					onClose: () => onCloseRef.current?.(),
+					onUpload: onUploadRef.current
+						? (
+								args: Parameters<
+									NonNullable< typeof onUpload >
+								>[ 0 ]
+						  ) => onUploadRef.current!( args )
+						: undefined,
+				} ) ?? null;
+		} else if ( ! isOpen && wasOpenRef.current ) {
+			closeBySession( sessionRef.current );
+			sessionRef.current = null;
 		}
-		return allowedTypes?.join( ',' );
-	}, [ allowedTypes ] );
+		wasOpenRef.current = isOpen;
+		// We deliberately depend only on `isOpen` and the open function — the
+		// other props are captured on open and updated via refs while open.
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [ isOpen, openMediaUploadModal ] );
 
-	if ( ! isOpen ) {
-		return null;
-	}
-
-	return (
-		<Modal
-			title={ title }
-			onRequestClose={ handleModalClose }
-			isDismissible={ isDismissible }
-			className={ modalClass }
-			overlayClassName="media-upload-modal"
-			size="fill"
-			headerActions={
-				<FormFileUpload
-					accept={ acceptTypes }
-					multiple
-					onChange={ handleFileSelect }
-					__next40pxDefaultSize
-					render={ ( { openFileDialog } ) => (
-						<Button
-							onClick={ openFileDialog }
-							icon={ uploadIcon }
-							__next40pxDefaultSize
-						>
-							{ __( 'Upload media' ) }
-						</Button>
-					) }
-				/>
+	// Unmount cleanup: if the shim unmounts while the singleton is still
+	// active for this session, dispatch a close. (Guarded by session in the
+	// store, so this is a no-op if another shim has taken over.)
+	useEffect( () => {
+		return () => {
+			if ( wasOpenRef.current ) {
+				closeBySession( sessionRef.current );
 			}
-		>
-			<DropZone
-				onFilesDrop={ ( files ) => {
-					let filteredFiles = files;
-					// Filter files by allowed types if specified
-					if ( allowedTypes && ! allowedTypes.includes( '*' ) ) {
-						filteredFiles = files.filter( ( file ) =>
-							allowedTypes.some( ( allowedType ) => {
-								// Check if the file type matches the allowed MIME type
-								return (
-									file.type === allowedType ||
-									file.type.startsWith(
-										allowedType.replace( '*', '' )
-									)
-								);
-							} )
-						);
-					}
-					if ( filteredFiles.length > 0 ) {
-						const { onFileChange, onError } =
-							registerBatch( filteredFiles );
+		};
+	}, [] );
 
-						handleUpload( {
-							allowedTypes,
-							filesList: filteredFiles,
-							onFileChange,
-							onError,
-						} );
-					}
-				} }
-				label={ __( 'Drop files to upload' ) }
-			/>
-			<DataViewsPicker
-				data={ mediaRecords || [] }
-				fields={ fields }
-				view={ view }
-				onChangeView={ handleChangeView }
-				actions={ actions }
-				selection={ selection }
-				onChangeSelection={ setSelection }
-				isLoading={ isLoading }
-				paginationInfo={ paginationInfo }
-				defaultLayouts={ defaultLayouts }
-				getItemId={ ( item: RestAttachment ) => String( item.id ) }
-				itemListLabel={ __( 'Media items' ) }
-				onReset={ isModified ? resetToDefault : false }
-			>
-				<Stack
-					direction="row"
-					align="top"
-					justify="space-between"
-					className="dataviews__view-actions"
-					gap="xs"
-				>
-					<Stack
-						direction="row"
-						gap="sm"
-						justify="start"
-						className="dataviews__search"
-					>
-						{ search && (
-							<DataViewsPicker.Search label={ searchLabel } />
-						) }
-						<DataViewsPicker.FiltersToggle />
-					</Stack>
-					<Stack direction="row" gap="xs" style={ { flexShrink: 0 } }>
-						<DataViewsPicker.LayoutSwitcher />
-						<DataViewsPicker.ViewConfig />
-					</Stack>
-				</Stack>
-				<DataViewsPicker.FiltersToggled className="dataviews-filters__container" />
-				<DataViewsPicker.Layout />
-				<div
-					className={ clsx( 'media-upload-modal__footer', {
-						'is-uploading': uploadingFiles.length > 0,
-					} ) }
-				>
-					<UploadStatusPopover
-						uploadingFiles={ uploadingFiles }
-						onDismissError={ dismissError }
-						onOpenChange={ handlePopoverOpenChange }
-					/>
-					<DataViewsPicker.BulkActionToolbar />
-				</div>
-			</DataViewsPicker>
-			{ createPortal(
-				<SnackbarNotices
-					className="media-upload-modal__snackbar"
-					context={ NOTICES_CONTEXT }
-				/>,
-				document.body
-			) }
-		</Modal>
-	);
+	return null;
+}
+
+/**
+ * Closes the singleton media upload modal by dispatching against the
+ * `core/media-editor` store by name. The string lookup avoids a static dep
+ * on `@wordpress/media-editor` from `@wordpress/media-utils` — keeping the
+ * layering "media-editor → media-utils" intact rather than circular. The
+ * store is registered when the editor mounts the unified modal, so the
+ * dispatch is a no-op if the modal isn't currently active.
+ * @param session
+ */
+function closeBySession( session: symbol | null ) {
+	if ( ! session ) {
+		return;
+	}
+	// String-literal store lookup is intentional: importing the store
+	// descriptor from `@wordpress/media-editor` would invert the package
+	// layering (media-editor already depends on media-utils), so the close
+	// is dispatched by name. The store is registered when the editor mounts
+	// the unified modal; otherwise the dispatch is a harmless no-op.
+	// eslint-disable-next-line @wordpress/data-no-store-string-literals
+	const actions = dispatch( 'core/media-editor' ) as
+		| { closeMediaUploadModal?: ( args: { session: symbol } ) => void }
+		| undefined;
+	actions?.closeMediaUploadModal?.( { session } );
 }
 
 export default MediaUploadModal;
