@@ -17,6 +17,8 @@
  * @return string Returns the filtered post title for the current post wrapped inside "h1" tags.
  */
 function render_block_core_post_title( $attributes, $content, $block ) {
+	// While postId is not used in this function, we should keep this guard to
+	// make sure the block is rendered in the correct context.
 	if ( ! isset( $block->context['postId'] ) ) {
 		return '';
 	}
@@ -38,7 +40,7 @@ function render_block_core_post_title( $attributes, $content, $block ) {
 
 	if ( isset( $attributes['isLink'] ) && $attributes['isLink'] ) {
 		$rel   = ! empty( $attributes['rel'] ) ? 'rel="' . esc_attr( $attributes['rel'] ) . '"' : '';
-		$title = sprintf( '<a href="%1$s" target="%2$s" %3$s>%4$s</a>', esc_url( get_the_permalink( $block->context['postId'] ) ), esc_attr( $attributes['linkTarget'] ), $rel, $title );
+		$title = sprintf( '<a href="%1$s" target="%2$s" %3$s>%4$s</a>', esc_url( get_the_permalink() ), esc_attr( $attributes['linkTarget'] ), $rel, $title );
 	}
 
 	$classes = array();
