@@ -874,7 +874,9 @@ function poll(): void {
 				// gracefully instead of retrying indefinitely. This can happen if
 				// the client is running an outdated version of the code that is
 				// incompatible with the server.
-				roomStates.forEach( ( state ) => {
+				const affectedRooms = [ ...roomStates.entries() ];
+
+				for ( const [ , state ] of affectedRooms ) {
 					state.onStatusChange( {
 						status: 'disconnected',
 						error: new ConnectionError(
@@ -882,8 +884,15 @@ function poll(): void {
 							'Protocol mismatch between client and server'
 						),
 					} );
-					state.unregister();
-				} );
+				}
+
+				// Skip the server-side disconnect signal: by definition the
+				// server can't speak our protocol, so sending one is pointless.
+				for ( const [ room ] of affectedRooms ) {
+					unregisterRoom( room, { sendDisconnectSignal: false } );
+				}
+
+				isPolling = false;
 				return;
 			} else {
 				// Use the explicit retry delay schedule for backoff.

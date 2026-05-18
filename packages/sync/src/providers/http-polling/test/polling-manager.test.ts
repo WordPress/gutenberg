@@ -931,6 +931,72 @@ describe( 'polling-manager', () => {
 			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 2 );
 		} );
 
+		it( 'does not send a disconnect beacon for a protocol mismatch (server cannot speak our protocol)', async () => {
+			mockPostSyncUpdate.mockResolvedValueOnce( syncResponse );
+
+			pollingManager.registerRoom( {
+				room: 'test-room',
+				doc: createMockDoc( 1 ),
+				awareness: createMockAwareness(),
+				log: jest.fn(),
+				onStatusChange: jest.fn(),
+				onSync: jest.fn(),
+			} );
+
+			await jest.advanceTimersByTimeAsync( 0 );
+			mockPostSyncUpdateNonBlocking.mockClear();
+
+			mockPostSyncUpdate.mockRejectedValueOnce( {
+				code: 'rest_sync_protocol_mismatch',
+			} );
+
+			await jest.advanceTimersByTimeAsync( 4000 );
+
+			expect( mockPostSyncUpdateNonBlocking ).not.toHaveBeenCalled();
+		} );
+
+		it( 'fully tears down state so a later registerRoom starts a fresh poll cycle', async () => {
+			mockPostSyncUpdate.mockResolvedValueOnce( syncResponse );
+
+			pollingManager.registerRoom( {
+				room: 'test-room',
+				doc: createMockDoc( 1 ),
+				awareness: createMockAwareness(),
+				log: jest.fn(),
+				onStatusChange: jest.fn(),
+				onSync: jest.fn(),
+			} );
+
+			await jest.advanceTimersByTimeAsync( 0 );
+
+			mockPostSyncUpdate.mockRejectedValueOnce( {
+				code: 'rest_sync_protocol_mismatch',
+			} );
+
+			await jest.advanceTimersByTimeAsync( 4000 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 2 );
+
+			// Register a new room. If isPolling weren't reset, this would
+			// not kick off a poll; if roomStates weren't cleared, the old
+			// room would still be in the next payload.
+			mockPostSyncUpdate.mockResolvedValueOnce( syncResponse );
+			pollingManager.registerRoom( {
+				room: 'new-room',
+				doc: createMockDoc( 3 ),
+				awareness: createMockAwareness(),
+				log: jest.fn(),
+				onStatusChange: jest.fn(),
+				onSync: jest.fn(),
+			} );
+
+			await jest.advanceTimersByTimeAsync( 0 );
+
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 3 );
+			const lastPayload = mockPostSyncUpdate.mock.calls[ 2 ][ 0 ];
+			expect( lastPayload.rooms ).toHaveLength( 1 );
+			expect( lastPayload.rooms[ 0 ].room ).toBe( 'new-room' );
+		} );
+
 		it( 'does not apply exponential backoff for protocol mismatch errors', async () => {
 			// First poll succeeds.
 			mockPostSyncUpdate.mockResolvedValueOnce( syncResponse );
