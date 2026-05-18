@@ -125,7 +125,17 @@ export function SyncConnectionErrorModal() {
 		}
 	}, [ connectionStatus, canRetry ] );
 
-	if ( ! isCollaborationEnabled || ! hasInitialized || ! showModal ) {
+	// Unrecoverable disconnections (e.g. protocol mismatch, connection limit
+	// exceeded) bypass the initial-load debounce. There is no in-flight
+	// connection attempt to wait on, so delaying the modal serves no purpose.
+	const isUnrecoverableDisconnection =
+		connectionStatus?.status === 'disconnected' && ! canRetry;
+
+	if (
+		! isCollaborationEnabled ||
+		( ! hasInitialized && ! isUnrecoverableDisconnection ) ||
+		! showModal
+	) {
 		return null;
 	}
 
