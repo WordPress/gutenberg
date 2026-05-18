@@ -52,15 +52,14 @@ export async function copyToClipboard(
 }
 
 /**
- * Clears the current selection and restores focus to the trigger element.
+ * Restores focus to the trigger element.
  *
  * @param trigger The element that triggered the copy.
  */
-export function clearSelection( trigger: Element ): void {
+export function restoreFocus( trigger: Element ): void {
 	if ( 'focus' in trigger && typeof trigger.focus === 'function' ) {
 		trigger.focus();
 	}
-	trigger.ownerDocument?.defaultView?.getSelection()?.removeAllRanges();
 }
 
 /**
@@ -104,7 +103,7 @@ export default function useCopyToClipboard< T extends HTMLElement >(
 			if ( success ) {
 				// Restoring focus only matters while the node is mounted.
 				if ( isActive ) {
-					clearSelection( node );
+					restoreFocus( node );
 				}
 				// Always run, even after unmount, to allow updating other UI.
 				if ( onSuccessRef.current ) {

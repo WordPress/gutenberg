@@ -7,7 +7,7 @@ import userEvent from '@testing-library/user-event';
 /**
  * Internal dependencies
  */
-import useCopyToClipboard, { copyToClipboard, clearSelection } from '../';
+import useCopyToClipboard, { copyToClipboard, restoreFocus } from '../';
 
 interface TestComponentProps {
 	text: string | ( () => string );
@@ -157,13 +157,13 @@ describe( 'copyToClipboard', () => {
 	} );
 } );
 
-describe( 'clearSelection', () => {
+describe( 'restoreFocus', () => {
 	it( 'should focus the trigger element', () => {
 		const trigger = document.createElement( 'button' );
 		document.body.appendChild( trigger );
 		const focusMock = jest.spyOn( trigger, 'focus' );
 
-		clearSelection( trigger );
+		restoreFocus( trigger );
 
 		expect( focusMock ).toHaveBeenCalledTimes( 1 );
 
