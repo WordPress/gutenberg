@@ -31,7 +31,7 @@ export default function Notice( { children, onRemove, actions = [] } ) {
 			) }
 			<Button
 				className="components-notice__dismiss"
-				icon={ check }
+				icon={ closeSmall }
 				label={ __( 'Dismiss this notice' ) }
 				onClick={ onRemove }
 			/>
