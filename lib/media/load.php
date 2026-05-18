@@ -24,6 +24,11 @@ if ( ! gutenberg_is_client_side_media_processing_enabled() ) {
 	return;
 }
 
+// Animated GIF → video: link companion attachments and swap at render
+// time. Loaded unconditionally — the render-time swap runs on the front
+// end and does not depend on browser WASM support.
+require_once __DIR__ . '/animated-gif-to-video.php';
+
 // ── Tier 1: HEIC infrastructure (always loaded) ─────────────────────
 
 /**

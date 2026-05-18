@@ -197,15 +197,20 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 		$args = rest_get_endpoint_args_for_schema( $this->get_item_schema(), $method );
 
 		if ( WP_REST_Server::CREATABLE === $method ) {
-			$args['generate_sub_sizes'] = array(
+			$args['generate_sub_sizes']      = array(
 				'type'        => 'boolean',
 				'default'     => true,
 				'description' => __( 'Whether to generate image sub sizes.', 'gutenberg' ),
 			);
-			$args['convert_format']     = array(
+			$args['convert_format']          = array(
 				'type'        => 'boolean',
 				'default'     => true,
 				'description' => __( 'Whether to convert image formats.', 'gutenberg' ),
+			);
+			$args['animated_gif_pair_token'] = array(
+				'type'              => 'string',
+				'description'       => __( 'Correlation token linking an animated GIF image attachment to its companion video attachment.', 'gutenberg' ),
+				'sanitize_callback' => 'sanitize_key',
 			);
 		}
 

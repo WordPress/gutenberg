@@ -710,14 +710,44 @@ export function prepareItem( id: QueueItemId ) {
 						? 'webm'
 						: 'mp4';
 
-				operations.push(
-					[
-						OperationType.TranscodeGif,
-						{
-							outputFormat,
-						} as OperationArgs[ OperationType.TranscodeGif ],
+				// Links the GIF image attachment to its companion video
+				// attachment so the two can be swapped at render time
+				// (see lib/media/load.php). Generated client-side so the
+				// server can establish the link regardless of which of
+				// the two uploads finishes first.
+				const pairToken = uuidv4();
+
+				// Companion item: transcode this same GIF to a video and
+				// upload it as a separate attachment. It carries no
+				// onChange/onSuccess because no editor block is bound to
+				// it — the originating block stays a core/image pointing
+				// at the GIF.
+				dispatch.addItem( {
+					file: item.file,
+					additionalData: {
+						generate_sub_sizes: true,
+						convert_format: true,
+						animated_gif_pair_token: pairToken,
+					},
+					operations: [
+						[
+							OperationType.TranscodeGif,
+							{
+								outputFormat,
+							} as OperationArgs[ OperationType.TranscodeGif ],
+						],
+						OperationType.Upload,
 					],
-					OperationType.Upload
+				} );
+
+				// The GIF itself uploads through the normal image
+				// pipeline so the block remains a valid core/image.
+				// wp_filter_content_tags() swaps in the companion video
+				// at render time when one is linked.
+				operations.push(
+					OperationType.Upload,
+					OperationType.ThumbnailGeneration,
+					OperationType.Finalize
 				);
 
 				dispatch< AddOperationsAction >( {
@@ -726,12 +756,10 @@ export function prepareItem( id: QueueItemId ) {
 					operations,
 				} );
 
-				// Tell the server to handle sub-sizes since this will be a video.
 				dispatch.finishOperation( id, {
 					additionalData: {
 						...item.additionalData,
-						generate_sub_sizes: true,
-						convert_format: true,
+						animated_gif_pair_token: pairToken,
 					},
 				} );
 				return;

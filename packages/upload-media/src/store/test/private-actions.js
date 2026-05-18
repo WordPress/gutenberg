@@ -521,7 +521,7 @@ describe( 'private actions', () => {
 		} );
 	} );
 
-	describe( 'prepareItem (animated GIF → video branch)', () => {
+	describe( 'prepareItem (animated GIF → image + companion video)', () => {
 		const originalCrossOriginIsolated = Reflect.getOwnPropertyDescriptor(
 			globalThis,
 			'crossOriginIsolated'
@@ -561,6 +561,7 @@ describe( 'private actions', () => {
 		function runPrepare( { item, settings, id = 'q' } ) {
 			const dispatchFn = jest.fn();
 			dispatchFn.finishOperation = jest.fn();
+			dispatchFn.addItem = jest.fn();
 			const select = {
 				getItem: () => item,
 				getSettings: () => settings,
@@ -577,7 +578,7 @@ describe( 'private actions', () => {
 			return args.dispatch;
 		}
 
-		it( 'queues TranscodeGif + Upload for an animated GIF (mp4 by default)', async () => {
+		it( 'uploads the GIF as an image and queues a companion video item (mp4 by default)', async () => {
 			isAnimatedGif.mockReturnValue( true );
 			const item = makeGifItem( 'q-anim' );
 
@@ -587,7 +588,8 @@ describe( 'private actions', () => {
 				id: 'q-anim',
 			} );
 
-			// Find AddOperations dispatch.
+			// The GIF item itself flows through the normal image pipeline
+			// so the block stays a valid core/image.
 			const addOpsCall = dispatchFn.mock.calls.find(
 				( [ action ] ) => action?.type === Type.AddOperations
 			);
@@ -595,16 +597,35 @@ describe( 'private actions', () => {
 			const [ action ] = addOpsCall;
 			expect( action.id ).toBe( 'q-anim' );
 			expect( action.operations ).toEqual( [
+				OperationType.Upload,
+				OperationType.ThumbnailGeneration,
+				OperationType.Finalize,
+			] );
+
+			// A companion item is queued that transcodes the same GIF to
+			// a video and uploads it as a separate attachment.
+			expect( dispatchFn.addItem ).toHaveBeenCalledTimes( 1 );
+			const companion = dispatchFn.addItem.mock.calls[ 0 ][ 0 ];
+			expect( companion.file ).toBe( item.file );
+			expect( companion.operations ).toEqual( [
 				[ OperationType.TranscodeGif, { outputFormat: 'mp4' } ],
 				OperationType.Upload,
 			] );
+			expect( companion.additionalData.generate_sub_sizes ).toBe(
+				true
+			);
+			expect( companion.additionalData.convert_format ).toBe( true );
 
+			// The pair token links the two attachments server-side and
+			// must match on both halves.
+			const token = companion.additionalData.animated_gif_pair_token;
+			expect( typeof token ).toBe( 'string' );
+			expect( token ).not.toBe( '' );
 			expect( dispatchFn.finishOperation ).toHaveBeenCalledWith(
 				'q-anim',
 				{
 					additionalData: {
-						generate_sub_sizes: true,
-						convert_format: true,
+						animated_gif_pair_token: token,
 					},
 				}
 			);
@@ -620,10 +641,8 @@ describe( 'private actions', () => {
 				id: 'q-webm',
 			} );
 
-			const addOpsCall = dispatchFn.mock.calls.find(
-				( [ action ] ) => action?.type === Type.AddOperations
-			);
-			expect( addOpsCall[ 0 ].operations[ 0 ] ).toEqual( [
+			const companion = dispatchFn.addItem.mock.calls[ 0 ][ 0 ];
+			expect( companion.operations[ 0 ] ).toEqual( [
 				OperationType.TranscodeGif,
 				{ outputFormat: 'webm' },
 			] );
@@ -642,31 +661,20 @@ describe( 'private actions', () => {
 				id: 'q-additional',
 			} );
 
+			const token =
+				dispatchFn.addItem.mock.calls[ 0 ][ 0 ].additionalData
+					.animated_gif_pair_token;
 			expect( dispatchFn.finishOperation ).toHaveBeenCalledWith(
 				'q-additional',
 				{
 					additionalData: {
 						post_id: 7,
 						custom: 'keep-me',
-						generate_sub_sizes: true,
-						convert_format: true,
+						animated_gif_pair_token: token,
 					},
 				}
 			);
 		} );
-
-		function hasTranscodeGifOperation( dispatchFn ) {
-			return dispatchFn.mock.calls.some( ( [ action ] ) => {
-				if ( action?.type !== Type.AddOperations ) {
-					return false;
-				}
-				return action.operations.some(
-					( op ) =>
-						Array.isArray( op ) &&
-						op[ 0 ] === OperationType.TranscodeGif
-				);
-			} );
-		}
 
 		it( 'skips the GIF branch when settings.gifConvert is false', async () => {
 			isAnimatedGif.mockReturnValue( true );
@@ -678,7 +686,7 @@ describe( 'private actions', () => {
 				id: 'q-off',
 			} );
 
-			expect( hasTranscodeGifOperation( dispatchFn ) ).toBe( false );
+			expect( dispatchFn.addItem ).not.toHaveBeenCalled();
 		} );
 
 		it( 'skips the GIF branch when crossOriginIsolated is false', async () => {
@@ -695,7 +703,7 @@ describe( 'private actions', () => {
 			// isAnimatedGif should never be consulted because the isolation
 			// check short-circuits first.
 			expect( isAnimatedGif ).not.toHaveBeenCalled();
-			expect( hasTranscodeGifOperation( dispatchFn ) ).toBe( false );
+			expect( dispatchFn.addItem ).not.toHaveBeenCalled();
 		} );
 
 		it( 'falls through when the GIF is not animated', async () => {
@@ -708,13 +716,9 @@ describe( 'private actions', () => {
 				id: 'q-static',
 			} );
 
-			// finishOperation is called at the end of prepareItem for every
-			// item, but never with the GIF-specific generate_sub_sizes flag.
-			const gifFinishCall = dispatchFn.finishOperation.mock.calls.find(
-				( [ , payload ] ) =>
-					payload?.additionalData?.convert_format === true
-			);
-			expect( gifFinishCall ).toBeUndefined();
+			// A static GIF takes the normal image path: no companion
+			// video item is queued.
+			expect( dispatchFn.addItem ).not.toHaveBeenCalled();
 		} );
 	} );
 } );
