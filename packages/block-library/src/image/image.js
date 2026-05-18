@@ -262,26 +262,6 @@ function ContentOnlyControls( {
 	);
 }
 
-function getAltHelp( { lockAltControls, lockAltControlsMessage } ) {
-	if ( lockAltControls ) {
-		return <>{ lockAltControlsMessage }</>;
-	}
-	return (
-		<>
-			<ExternalLink
-				href={
-					// translators: Localized tutorial, if one exists. W3C Web Accessibility Initiative link has list of existing translations.
-					__(
-						'https://www.w3.org/WAI/tutorials/images/decision-tree/'
-					)
-				}
-			>
-				{ __( 'Describe the purpose of the image.' ) }
-			</ExternalLink>
-		</>
-	);
-}
-
 export default function Image( {
 	temporaryURL,
 	isSideloading,
@@ -999,10 +979,24 @@ export default function Image( {
 									value={ alt || '' }
 									onChange={ updateAlt }
 									readOnly={ lockAltControls }
-									help={ getAltHelp( {
-										lockAltControls,
-										lockAltControlsMessage,
-									} ) }
+									help={
+										lockAltControls ? (
+											lockAltControlsMessage
+										) : (
+											<ExternalLink
+												href={
+													// translators: Localized tutorial, if one exists. W3C Web Accessibility Initiative link has list of existing translations.
+													__(
+														'https://www.w3.org/WAI/tutorials/images/decision-tree/'
+													)
+												}
+											>
+												{ __(
+													'Describe the purpose of the image.'
+												) }
+											</ExternalLink>
+										)
+									}
 								/>
 							</ToolsPanelItem>
 						) }
