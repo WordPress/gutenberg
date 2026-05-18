@@ -110,7 +110,16 @@ export default function QuickBlockPost() {
 				<Stack direction="row" gap="md" justify="center">
 					<Button
 						variant="solid"
-						render={ <Link href={ editUrl } openInNewTab /> }
+						nativeButton={ false }
+						render={
+							<Link
+								href={ editUrl }
+								openInNewTab
+								style={ {
+									color: 'var(--wpds-color-fg-interactive-brand-strong)',
+								} }
+							/>
+						}
 					>
 						{ __( 'Continue editing' ) }
 					</Button>
