@@ -19,8 +19,9 @@ import type {
 	NormalizedRect,
 	Flip,
 } from '../../core/types';
-import { DEFAULT_STATE } from '../../core/constants';
+import { DEFAULT_STATE, MIN_ZOOM, MAX_ZOOM } from '../../core/constants';
 import { exportCroppedImage } from '../../core/export/canvas-renderer';
+import { restrictPanZoom } from '../../core/containment';
 import {
 	cropperReducer,
 	enforceContainment,
@@ -46,7 +47,18 @@ export interface UseCropperStateReturn {
 	 * `setCropRect` for the crop rectangle.
 	 */
 	setPan: ( pan: NormalizedPoint ) => void;
-	/** Set the zoom level. Clamped to [1, 10]. */
+	/**
+	 * Set the zoom level (clamped to [1, 10]), anchored at the crop
+	 * center.
+	 *
+	 * Pointer-driven zoom (wheel, pinch, double-tap) anchors at the
+	 * cursor via `setZoomAtPoint`. Cursorless surfaces — the slider, the
+	 * `+`/`-` keys, programmatic toolbar buttons — have no natural
+	 * focal point, so they default to the crop center. Otherwise
+	 * `enforceContainment` would translate the image whichever way is
+	 * shortest, which snaps the framed content toward the nearest
+	 * viewport corner when zooming out from an off-center position.
+	 */
 	setZoom: ( zoom: number ) => void;
 	/** Set zoom and pan together so focal-point zoom remains atomic. */
 	setZoomAtPoint: ( zoom: number, pan: NormalizedPoint ) => void;
@@ -54,6 +66,8 @@ export interface UseCropperStateReturn {
 	setRotation: ( rotation: number ) => void;
 	/** Set the flip state. */
 	setFlip: ( flip: Flip ) => void;
+	/** Toggle flip on the given axis. */
+	toggleFlip: ( direction: 'horizontal' | 'vertical' ) => void;
 	/** Snap rotate 90° preserving the image selection (Google Photos style). */
 	snapRotate90: ( direction: 1 | -1 ) => void;
 	/** Set the crop rectangle in normalized coordinates. */
@@ -307,7 +321,43 @@ export function useCropperState(
 
 	const setZoom = useCallback(
 		( zoom: number ) => {
-			dispatch( { type: 'SET_ZOOM', payload: zoom } );
+			const s = stateRef.current;
+			const clampedZoom = Math.min(
+				MAX_ZOOM,
+				Math.max( MIN_ZOOM, zoom )
+			);
+			if ( clampedZoom === s.zoom ) {
+				return;
+			}
+			// Crop center expressed in the same coord system as `state.pan`:
+			// container-center-relative, normalized by image rendered size.
+			// `cropRect` is image-top-left-origin (0–1), so subtract 0.5
+			// to recenter.
+			const { cropRect } = s;
+			const focalNormX = cropRect.x + cropRect.width / 2 - 0.5;
+			const focalNormY = cropRect.y + cropRect.height / 2 - 0.5;
+			const zoomRatio = 1 - clampedZoom / s.zoom;
+			const newPanX = s.pan.x + ( focalNormX - s.pan.x ) * zoomRatio;
+			const newPanY = s.pan.y + ( focalNormY - s.pan.y ) * zoomRatio;
+			const imageSize = s.image
+				? {
+						width: s.image.naturalWidth,
+						height: s.image.naturalHeight,
+				  }
+				: { width: 1, height: 1 };
+			const { pan: clampedPan } = restrictPanZoom(
+				{
+					...s,
+					zoom: clampedZoom,
+					pan: { x: newPanX, y: newPanY },
+				},
+				imageSize,
+				s.cropRect
+			);
+			dispatch( {
+				type: 'SET_ZOOM_AT_POINT',
+				payload: { zoom: clampedZoom, pan: clampedPan },
+			} );
 		},
 		[ dispatch ]
 	);
@@ -337,6 +387,16 @@ export function useCropperState(
 			dispatch( { type: 'SET_FLIP', payload: flip } );
 		},
 		[ dispatch, pushToHistory, commitHistory ]
+	);
+
+	const toggleFlip = useCallback(
+		( direction: 'horizontal' | 'vertical' ) => {
+			setFlip( {
+				...stateRef.current.flip,
+				[ direction ]: ! stateRef.current.flip[ direction ],
+			} );
+		},
+		[ setFlip ]
 	);
 
 	const snapRotate90 = useCallback(
@@ -427,6 +487,7 @@ export function useCropperState(
 		setZoomAtPoint,
 		setRotation,
 		setFlip,
+		toggleFlip,
 		snapRotate90,
 		setCropRect,
 		settleCrop,

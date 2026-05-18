@@ -3,7 +3,10 @@
  */
 import { __ } from '@wordpress/i18n';
 import { LEFT, RIGHT } from '@wordpress/keycodes';
-import { Tooltip, __unstableMotion as motion } from '@wordpress/components';
+import {
+	Tooltip as WCTooltip,
+	__unstableMotion as motion,
+} from '@wordpress/components';
 import { VisuallyHidden } from '@wordpress/ui';
 
 const DELTA_DISTANCE = 20; // The distance to resize per keydown in pixels.
@@ -41,7 +44,7 @@ export default function ResizeHandle( { direction, resizeWidthBy } ) {
 
 	return (
 		<>
-			<Tooltip text={ __( 'Drag to resize' ) }>
+			<WCTooltip text={ __( 'Drag to resize' ) }>
 				<motion.button
 					className={ `editor-resizable-editor__resize-handle is-${ direction }` }
 					aria-label={ __( 'Drag to resize' ) }
@@ -55,7 +58,7 @@ export default function ResizeHandle( { direction, resizeWidthBy } ) {
 					role="separator"
 					aria-orientation="vertical"
 				/>
-			</Tooltip>
+			</WCTooltip>
 			<VisuallyHidden id={ resizableHandleHelpId }>
 				{ __( 'Use left and right arrow keys to resize the canvas.' ) }
 			</VisuallyHidden>

@@ -12,10 +12,24 @@ export const MIN_ZOOM = 1;
 export const MAX_ZOOM = 10;
 
 /**
+ * Minimum crop rect dimension in source-image pixels, enforced per axis
+ * during resize. Prevents accidental sub-pixel crops while staying small
+ * enough to allow tight crops (favicons, icons). Adjust here to tune the
+ * floor globally.
+ */
+export const MIN_CROP_PIXELS = 24;
+
+/**
  * Wheel zoom sensitivity. A deltaY of 100 changes zoom by 0.25.
  * This could be made configurable as a prop to the Cropper component.
  */
 export const DEFAULT_WHEEL_ZOOM_SPEED = 0.0025;
+
+/** Fine step for keyboard-driven cropper movement, in normalized coordinates. */
+export const DEFAULT_KEYBOARD_STEP = 0.01;
+
+/** Coarse keyboard movement multiplier when Shift is held. */
+export const KEYBOARD_SHIFT_STEP_MULTIPLIER = 10;
 
 /**
  * Maximum free-rotation offset in degrees from the nearest 90° step.

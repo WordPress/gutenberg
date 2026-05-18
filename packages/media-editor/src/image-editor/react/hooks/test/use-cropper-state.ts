@@ -54,6 +54,65 @@ describe( 'useCropperState', () => {
 		expect( result.current.state.zoom ).toBe( 3 );
 	} );
 
+	it( 'leaves pan at zero on setZoom when the cropRect is centered', () => {
+		// Sanity: the default cropRect spans the full image, so its
+		// center coincides with the image center and the crop-center
+		// focal-point correction degenerates to "no pan change."
+		// Guards against regressions where setZoom accidentally pans.
+		const { result } = renderHook( () => useCropperState() );
+
+		act( () => {
+			result.current.setZoom( 4 );
+		} );
+
+		expect( result.current.state.zoom ).toBe( 4 );
+		expect( result.current.state.pan ).toEqual( { x: 0, y: 0 } );
+
+		act( () => {
+			result.current.setZoom( 2 );
+		} );
+
+		expect( result.current.state.zoom ).toBe( 2 );
+		expect( result.current.state.pan ).toEqual( { x: 0, y: 0 } );
+	} );
+
+	it( 'anchors setZoom at the crop-rect center', () => {
+		// With an off-center crop, setZoom must shift pan toward the
+		// crop center as zoom decreases — otherwise `enforceContainment`
+		// would translate the image toward the nearest viewport corner
+		// (the original bug this method fixes).
+		const { result } = renderHook( () => useCropperState() );
+
+		act( () => {
+			result.current.setZoom( 4 );
+		} );
+		// Place the crop in the bottom-right quadrant — center
+		// at ( 0.7, 0.7 ), i.e. ( +0.2, +0.2 ) in pan coords.
+		act( () => {
+			result.current.setCropRect( {
+				x: 0.6,
+				y: 0.6,
+				width: 0.2,
+				height: 0.2,
+			} );
+		} );
+		act( () => {
+			result.current.setPan( { x: 0, y: 0 } );
+		} );
+
+		expect( result.current.state.pan ).toEqual( { x: 0, y: 0 } );
+
+		// Zoom out — pan should move toward the focal point in +x, +y,
+		// not stay at the origin (which would corner-snap on containment).
+		act( () => {
+			result.current.setZoom( 2 );
+		} );
+
+		expect( result.current.state.zoom ).toBe( 2 );
+		expect( result.current.state.pan.x ).toBeGreaterThan( 0 );
+		expect( result.current.state.pan.y ).toBeGreaterThan( 0 );
+	} );
+
 	it( 'should dispatch SET_ZOOM_AT_POINT via setZoomAtPoint', () => {
 		const { result } = renderHook( () => useCropperState() );
 
@@ -120,6 +179,41 @@ describe( 'useCropperState', () => {
 		expect( result.current.state.flip ).toEqual( {
 			horizontal: true,
 			vertical: false,
+		} );
+	} );
+
+	it( 'toggleFlip should toggle horizontal flip', () => {
+		const { result } = renderHook( () => useCropperState() );
+
+		act( () => {
+			result.current.toggleFlip( 'horizontal' );
+		} );
+
+		expect( result.current.state.flip ).toEqual( {
+			horizontal: true,
+			vertical: false,
+		} );
+
+		act( () => {
+			result.current.toggleFlip( 'horizontal' );
+		} );
+
+		expect( result.current.state.flip ).toEqual( {
+			horizontal: false,
+			vertical: false,
+		} );
+	} );
+
+	it( 'toggleFlip should toggle vertical flip independently', () => {
+		const { result } = renderHook( () => useCropperState() );
+
+		act( () => {
+			result.current.toggleFlip( 'vertical' );
+		} );
+
+		expect( result.current.state.flip ).toEqual( {
+			horizontal: false,
+			vertical: true,
 		} );
 	} );
 
@@ -887,6 +981,14 @@ describe( 'useCropperState', () => {
 		} );
 
 		// --- discrete actions ---
+
+		it( 'toggleFlip creates a history entry immediately', () => {
+			const { result } = renderHook( () => useCropperState() );
+			act( () => {
+				result.current.toggleFlip( 'horizontal' );
+			} );
+			expect( result.current.hasUndo ).toBe( true );
+		} );
 
 		it( 'setFlip creates a history entry immediately', () => {
 			const { result } = renderHook( () => useCropperState() );

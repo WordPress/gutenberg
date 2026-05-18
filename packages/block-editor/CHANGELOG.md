@@ -2,9 +2,19 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `ColorPanel`: Theme CSS custom-property gradients are now decoded to their preset slug and persisted as a `gradient` block attribute rather than as a raw `style.color.gradient` value ([#78328](https://github.com/WordPress/gutenberg/pull/78328)).
+
+## 15.19.0 (2026-05-14)
+
 ### Enhancements
 
 -   `BlockManager`: Add stacking context isolation to category list ([#77759](https://github.com/WordPress/gutenberg/pull/77759)).
+
+### Bug Fixes
+
+-   `ColorPanel`: Fix incorrect color selection and text↔link sync with duplicate-value palette entries. Slug-based selection is now threaded through the color panel so that two palette entries sharing the same hex value but different slugs are treated as distinct choices. The text↔link sync condition now compares raw stored references instead of decoded hex values; the previous decoded comparison incorrectly conflated entries that shared a hex value ([#78048](https://github.com/WordPress/gutenberg/pull/78048)).
 
 ## 15.18.0 (2026-04-29)
 

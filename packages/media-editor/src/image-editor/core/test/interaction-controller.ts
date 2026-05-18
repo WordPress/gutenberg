@@ -237,6 +237,7 @@ describe( 'InteractionController', () => {
 			setZoom: jest.fn(),
 			setZoomAtPoint: jest.fn(),
 			snapRotate90: jest.fn(),
+			toggleFlip: jest.fn(),
 		};
 	} );
 
@@ -611,7 +612,18 @@ describe( 'InteractionController', () => {
 			expect( actionMocks.snapRotate90 ).toHaveBeenCalledWith( 1 );
 		} );
 
-		it.each( [ 'metaKey', 'ctrlKey', 'altKey', 'shiftKey' ] )(
+		it( 'calls snapRotate90 counter-clockwise on shift+r', () => {
+			const state = makeState( { rotation: 0 } );
+			const { controller } = createController( state );
+
+			controller.handleKeyDown(
+				createKeyboardEvent( 'r', { shiftKey: true } )
+			);
+
+			expect( actionMocks.snapRotate90 ).toHaveBeenCalledWith( -1 );
+		} );
+
+		it.each( [ 'metaKey', 'ctrlKey', 'altKey' ] )(
 			'does not rotate when %s is held with r',
 			( modifier ) => {
 				const state = makeState( { rotation: 0 } );
@@ -625,6 +637,74 @@ describe( 'InteractionController', () => {
 				expect( actionMocks.setZoom ).not.toHaveBeenCalled();
 				expect( actionMocks.setZoomAtPoint ).not.toHaveBeenCalled();
 				expect( actionMocks.snapRotate90 ).not.toHaveBeenCalled();
+			}
+		);
+
+		it( 'calls flip horizontal on h key', () => {
+			const state = makeState();
+			const { controller } = createController( state );
+
+			controller.handleKeyDown( createKeyboardEvent( 'h' ) );
+
+			expect( actionMocks.toggleFlip ).toHaveBeenCalledWith(
+				'horizontal'
+			);
+		} );
+
+		it( 'calls flip horizontal on H key', () => {
+			const state = makeState();
+			const { controller } = createController( state );
+
+			controller.handleKeyDown( createKeyboardEvent( 'H' ) );
+
+			expect( actionMocks.toggleFlip ).toHaveBeenCalledWith(
+				'horizontal'
+			);
+		} );
+
+		it( 'calls flip vertical on v key', () => {
+			const state = makeState();
+			const { controller } = createController( state );
+
+			controller.handleKeyDown( createKeyboardEvent( 'v' ) );
+
+			expect( actionMocks.toggleFlip ).toHaveBeenCalledWith( 'vertical' );
+		} );
+
+		it( 'calls flip vertical on V key', () => {
+			const state = makeState();
+			const { controller } = createController( state );
+
+			controller.handleKeyDown( createKeyboardEvent( 'V' ) );
+
+			expect( actionMocks.toggleFlip ).toHaveBeenCalledWith( 'vertical' );
+		} );
+
+		it.each( [ 'metaKey', 'ctrlKey', 'altKey', 'shiftKey' ] )(
+			'does not flip when %s is held with h',
+			( modifier ) => {
+				const state = makeState();
+				const { controller } = createController( state );
+
+				controller.handleKeyDown(
+					createKeyboardEvent( 'h', { [ modifier ]: true } )
+				);
+
+				expect( actionMocks.toggleFlip ).not.toHaveBeenCalled();
+			}
+		);
+
+		it.each( [ 'metaKey', 'ctrlKey', 'altKey', 'shiftKey' ] )(
+			'does not flip when %s is held with v',
+			( modifier ) => {
+				const state = makeState();
+				const { controller } = createController( state );
+
+				controller.handleKeyDown(
+					createKeyboardEvent( 'v', { [ modifier ]: true } )
+				);
+
+				expect( actionMocks.toggleFlip ).not.toHaveBeenCalled();
 			}
 		);
 
@@ -645,6 +725,42 @@ describe( 'InteractionController', () => {
 			expect( call![ 0 ].x ).toBeCloseTo( -0.1 );
 		} );
 
+		it( 'uses fine keyboardStep by default for arrow key panning', () => {
+			const state = makeState( { zoom: 2 } );
+			const { controller } = createController( state );
+
+			controller.handleKeyDown( createKeyboardEvent( 'ArrowRight' ) );
+
+			const call = actionMocks.setPan.mock.calls[ 0 ];
+			expect( call![ 0 ].x ).toBeCloseTo( -0.01 );
+		} );
+
+		it( 'uses a 10x larger keyboardStep when Shift is held while panning', () => {
+			const state = makeState( { zoom: 2 } );
+			const { controller } = createController( state );
+
+			controller.handleKeyDown(
+				createKeyboardEvent( 'ArrowRight', { shiftKey: true } )
+			);
+
+			const call = actionMocks.setPan.mock.calls[ 0 ];
+			expect( call![ 0 ].x ).toBeCloseTo( -0.1 );
+		} );
+
+		it( 'applies the Shift multiplier to custom keyboardStep while panning', () => {
+			const state = makeState( { zoom: 2 } );
+			const { controller } = createController( state, {
+				keyboardStep: 0.02,
+			} );
+
+			controller.handleKeyDown(
+				createKeyboardEvent( 'ArrowRight', { shiftKey: true } )
+			);
+
+			const call = actionMocks.setPan.mock.calls[ 0 ];
+			expect( call![ 0 ].x ).toBeCloseTo( -0.2 );
+		} );
+
 		it( 'does not dispatch on unhandled keys', () => {
 			const state = makeState();
 			const { controller } = createController( state );
@@ -655,6 +771,7 @@ describe( 'InteractionController', () => {
 			expect( actionMocks.setZoom ).not.toHaveBeenCalled();
 			expect( actionMocks.setZoomAtPoint ).not.toHaveBeenCalled();
 			expect( actionMocks.snapRotate90 ).not.toHaveBeenCalled();
+			expect( actionMocks.toggleFlip ).not.toHaveBeenCalled();
 		} );
 	} );
 
