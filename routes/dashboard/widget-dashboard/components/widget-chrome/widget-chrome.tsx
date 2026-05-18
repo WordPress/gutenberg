@@ -153,8 +153,9 @@ function HeaderActions( {
 	onWidthChange,
 }: HeaderActionsProps ) {
 	return (
-		<Stack direction="row" align="center" gap="xs">
+		<Stack direction="row" align="center" gap="sm">
 			<Dropdown
+				style={ { height: '24px', width: '24px' } }
 				popoverProps={ { placement: 'bottom-end' } }
 				renderToggle={ ( { isOpen, onToggle } ) => (
 					<IconButton
