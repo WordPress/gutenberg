@@ -31,7 +31,10 @@ import {
 	vipsHasTransparency,
 	terminateVipsWorker,
 } from './utils';
-import { mediabunnyConvertGifToVideo } from './utils/mediabunny';
+import {
+	mediabunnyConvertGifToVideo,
+	isUnsupportedConversionError,
+} from './utils/mediabunny';
 import type {
 	AccumulateSubSizeAction,
 	AddAction,
@@ -1178,10 +1181,7 @@ export function transcodeGifItem(
 			// An "Unsupported" outcome is a graceful skip, not a failure:
 			// finish the operation untouched so the original GIF uploads
 			// (matches the spec's non-error fallback contract).
-			if (
-				error instanceof Error &&
-				error.message.startsWith( 'Unsupported' )
-			) {
+			if ( isUnsupportedConversionError( error ) ) {
 				dispatch.finishOperation( id, {} );
 				return;
 			}

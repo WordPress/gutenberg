@@ -5,6 +5,36 @@ import { getFileBasename } from '../../utils';
 import type { QueueItemId } from '../types';
 
 /**
+ * Message prefix used by @wordpress/mediabunny to flag an
+ * unsupported-but-graceful conversion outcome (no WebCodecs, unsupported
+ * codec). This MUST mirror the package's exported `UNSUPPORTED_ERROR_PREFIX`.
+ *
+ * It is duplicated here rather than imported because the only path that
+ * carries the constant (`@wordpress/mediabunny`) statically pulls the heavy
+ * mediabunny library into the main bundle, defeating the lazy worker load.
+ * The worker RPC layer (comctx) also serializes a thrown error to its
+ * `message` string only, so the cross-boundary contract is inherently a
+ * message prefix. `isUnsupportedConversionError` is unit-tested against the
+ * exact strings the worker throws to catch any drift.
+ */
+const UNSUPPORTED_ERROR_PREFIX = 'Unsupported';
+
+/**
+ * Whether an error from GIF-to-video conversion represents an
+ * unsupported-but-graceful outcome (caller should fall back to uploading the
+ * original GIF) rather than a hard failure.
+ *
+ * @param error Error thrown by `mediabunnyConvertGifToVideo`.
+ * @return Whether the error is a graceful "unsupported" outcome.
+ */
+export function isUnsupportedConversionError( error: unknown ): boolean {
+	return (
+		error instanceof Error &&
+		error.message.startsWith( UNSUPPORTED_ERROR_PREFIX )
+	);
+}
+
+/**
  * Cached dynamic import promise for @wordpress/mediabunny/worker.
  *
  * Using a dynamic import keeps the worker module out of the main bundle; it

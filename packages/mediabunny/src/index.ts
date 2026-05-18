@@ -29,6 +29,17 @@ const inProgressOperations = new Set< ItemId >();
 const GIF_DEFAULT_FRAME_DURATION_US = 100_000;
 
 /**
+ * Message prefix for "unsupported but graceful" outcomes (no WebCodecs,
+ * unsupported codec). Consumers detect this prefix and fall back to uploading
+ * the original GIF instead of surfacing a hard error.
+ *
+ * The contract is the message *prefix*, not the Error type: the worker RPC
+ * layer (comctx) serializes a thrown error to its `message` string only — the
+ * Error subclass, `name`, and `stack` do not survive the worker boundary.
+ */
+export const UNSUPPORTED_ERROR_PREFIX = 'Unsupported';
+
+/**
  * Serializes encoder access. The upload-media concurrency limit already caps
  * this at 1, but the lock guards direct callers too.
  */
@@ -94,14 +105,18 @@ export async function convertGifToVideo(
 			typeof ImageDecoder === 'undefined' ||
 			typeof VideoEncoder === 'undefined'
 		) {
-			throw new Error( 'Unsupported: WebCodecs unavailable' );
+			throw new Error(
+				`${ UNSUPPORTED_ERROR_PREFIX }: WebCodecs unavailable`
+			);
 		}
 
 		const isWebm = outputMimeType === 'video/webm';
 		const codec = isWebm ? 'vp9' : 'avc';
 
 		if ( ! ( await canEncodeVideo( codec ) ) ) {
-			throw new Error( 'Unsupported: encoder codec not supported' );
+			throw new Error(
+				`${ UNSUPPORTED_ERROR_PREFIX }: encoder codec not supported`
+			);
 		}
 
 		if ( ! inProgressOperations.has( id ) ) {

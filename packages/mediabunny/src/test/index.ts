@@ -1,7 +1,11 @@
 /**
  * Internal dependencies
  */
-import { convertGifToVideo, cancelOperations } from '../index';
+import {
+	convertGifToVideo,
+	cancelOperations,
+	UNSUPPORTED_ERROR_PREFIX,
+} from '../index';
 
 class FakeVideoFrame {
 	duration = 100000; // microseconds
@@ -145,6 +149,24 @@ describe( 'convertGifToVideo', () => {
 		await expect(
 			convertGifToVideo( 'item-3', GIF_BUFFER, 'video/mp4' )
 		).rejects.toThrow( 'Unsupported' );
+	} );
+
+	it( 'prefixes graceful "unsupported" errors with UNSUPPORTED_ERROR_PREFIX (consumer contract)', async () => {
+		// Pins the producer side of the cross-worker contract: consumers
+		// detect a graceful fallback by this message prefix only (comctx
+		// serializes errors to their message string). See
+		// isUnsupportedConversionError in @wordpress/upload-media.
+		( globalThis as Record< string, unknown > ).ImageDecoder = undefined;
+		await expect(
+			convertGifToVideo( 'item-prefix', GIF_BUFFER, 'video/mp4' )
+		).rejects.toThrow( new RegExp( `^${ UNSUPPORTED_ERROR_PREFIX }:` ) );
+
+		( globalThis as Record< string, unknown > ).ImageDecoder =
+			FakeImageDecoder;
+		mockCanEncodeVideo.mockResolvedValue( false );
+		await expect(
+			convertGifToVideo( 'item-prefix-2', GIF_BUFFER, 'video/mp4' )
+		).rejects.toThrow( new RegExp( `^${ UNSUPPORTED_ERROR_PREFIX }:` ) );
 	} );
 
 	it( 'rejects when the GIF has zero decodable frames', async () => {
