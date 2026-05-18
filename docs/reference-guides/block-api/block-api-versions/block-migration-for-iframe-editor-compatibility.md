@@ -24,8 +24,8 @@ The iframed post editor will make life easier for block and theme authors by red
 
 While most editors, including the template editor, already work as iframes, for backward compatibility, the current post editor only works as an iframe when the following conditions are met (determined by [the useShouldIframe hook](https://github.com/WordPress/gutenberg/blob/cd4fae71551e0ebf27472da1d7bbdfce91a131ec/packages/edit-post/src/components/layout/use-should-iframe.js#L16)):
 
-- **If the Gutenberg plugin is enabled:**: The active theme is a block-based theme OR all registered blocks have `apiVersion` 3 or higher
-- **If the Gutenberg plugin is not enabled:**: All blocks present in the post content have `apiVersion` 3 or higher
+- **If the Gutenberg plugin is enabled:** The active theme is a block-based theme OR all registered blocks have `apiVersion` 3 or higher
+- **If the Gutenberg plugin is not enabled:** All blocks present in the post content have `apiVersion` 3 or higher
 
 In summary, if you haven't been able to fully test your blocks in the iframe editor yet, by maintaining `apiVersion` 2, you can prevent the post editor from working as an iframe in most cases. Once you've confirmed that your blocks work in the iframe editor, you can then migrate to `apiVersion` 3.
 
