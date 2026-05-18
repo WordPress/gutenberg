@@ -7,6 +7,7 @@ import { __, sprintf } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
+import { HeaderBackground } from './components';
 import styles from './style.module.css';
 
 const DISPLAY_VERSION = '7.1';
@@ -14,6 +15,8 @@ const DISPLAY_VERSION = '7.1';
 export default function WelcomeBanner() {
 	return (
 		<Stack className={ styles.banner } direction="column" justify="center">
+			<HeaderBackground />
+
 			<Stack
 				className={ styles.bannerContent }
 				gap="sm"
