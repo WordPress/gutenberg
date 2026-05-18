@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/release-tools",
-	"version": "1.0.0",
+	"version": "0.0.0",
 	"description": "CLI tools for Gutenberg plugin release management, changelog generation, and npm publishing.",
 	"private": true,
 	"author": "The WordPress Contributors",
@@ -20,21 +20,20 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"bin": {
-		"release-tools": "./cli.js"
+		"release-cli": "./cli.js"
 	},
 	"dependencies": {
-		"@inquirer/prompts": "7.2.0",
-		"@octokit/rest": "16.26.0",
-		"chalk": "4.1.1",
-		"commander": "9.2.0",
-		"execa": "4.0.2",
+		"@inquirer/prompts": "^7.2.0",
+		"@octokit/rest": "^16.26.0",
+		"chalk": "^4.1.1",
+		"commander": "^9.2.0",
+		"execa": "^4.0.2",
 		"fast-glob": "^3.2.7",
-		"node-fetch": "2.7.0",
-		"rimraf": "5.0.10",
-		"semver": "7.5.4",
-		"simple-git": "3.24.0",
-		"sprintf-js": "1.1.1",
-		"uuid": "9.0.1"
+		"node-fetch": "^2.7.0",
+		"rimraf": "^5.0.10",
+		"semver": "^7.5.4",
+		"simple-git": "^3.24.0",
+		"sprintf-js": "^1.1.1"
 	},
 	"publishConfig": {
 		"access": "public"
