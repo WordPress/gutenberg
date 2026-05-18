@@ -168,9 +168,10 @@ export async function convertGifToVideo(
 						Math.round( image.displayHeight * scale )
 					);
 					const canvas = new OffscreenCanvas( targetW, targetH );
-					const ctx = canvas.getContext(
-						'2d'
-					) as OffscreenCanvasRenderingContext2D;
+					const ctx = canvas.getContext( '2d' );
+					if ( ! ctx ) {
+						throw new Error( 'Failed to create 2D canvas context' );
+					}
 					ctx.drawImage( image, 0, 0, targetW, targetH );
 					// This replacement VideoFrame's timestamp is in
 					// microseconds.
