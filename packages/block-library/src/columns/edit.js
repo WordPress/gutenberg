@@ -47,11 +47,14 @@ const DEFAULT_BLOCK = {
 	name: 'core/column',
 };
 
-function ColumnInspectorControls( {
-	clientId,
-	setAttributes,
-	isStackedOnMobile,
-} ) {
+/**
+ * Creates a custom hook to use columns block data in multiple components.
+ *
+ * @param {string} clientId The blocks client id.
+ *
+ * @return {Object} The columns block data.
+ */
+function useColumnsBlockData( clientId ) {
 	const { count, canInsertColumnBlock, minCount } = useSelect(
 		( select ) => {
 			const { canInsertBlockType, canRemoveBlock, getBlockOrder } =
@@ -81,6 +84,17 @@ function ColumnInspectorControls( {
 		},
 		[ clientId ]
 	);
+
+	return { count, canInsertColumnBlock, minCount };
+}
+
+function ColumnInspectorControls( {
+	clientId,
+	setAttributes,
+	isStackedOnMobile,
+} ) {
+	const { count, canInsertColumnBlock, minCount } =
+		useColumnsBlockData( clientId );
 	const { getBlocks } = useSelect( blockEditorStore );
 	const { replaceInnerBlocks } = useDispatch( blockEditorStore );
 
@@ -207,13 +221,18 @@ function ColumnInspectorControls( {
 function ColumnsEditContainer( { attributes, setAttributes, clientId } ) {
 	const { isStackedOnMobile, verticalAlignment, templateLock } = attributes;
 	const registry = useRegistry();
+	const { count } = useColumnsBlockData( clientId );
 	const { getBlockOrder } = useSelect( blockEditorStore );
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
 	const classes = clsx( {
 		[ `are-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
 		[ `is-not-stacked-on-mobile` ]: ! isStackedOnMobile,
+		[ `wp-block-columns-${ count }` ]: true,
 	} );
+
+	// Update the columns count attribute to columns count we get.
+	setAttributes( { columnsCount: count } );
 
 	const blockProps = useBlockProps( {
 		className: classes,
