@@ -364,8 +364,17 @@ function entity( entityConfig ) {
  */
 export function entitiesConfig( state = rootEntitiesConfig, action ) {
 	switch ( action.type ) {
-		case 'ADD_ENTITIES':
-			return [ ...state, ...action.entities ];
+		case 'ADD_ENTITIES': {
+			const filteredState = state.filter(
+				( currentEntity ) =>
+					! action.entities.some(
+						( newEntity ) =>
+							currentEntity.kind === newEntity.kind &&
+							currentEntity.name === newEntity.name
+					)
+			);
+			return [ ...filteredState, ...action.entities ];
+		}
 	}
 
 	return state;
