@@ -4,8 +4,9 @@
 
 ### Breaking Changes
 
--   `Notice`: Remove the `is-dismissible` root class. Use `.components-notice:has(.components-notice__dismiss)` (or select `.components-notice__dismiss`) for styles that should only apply when the dismiss control is present ([#78231](https://github.com/WordPress/gutenberg/pull/78231)).
--   `Notice`: Render `.components-notice__actions` as a sibling of `.components-notice__content` (not nested inside it). Update any custom CSS that targeted actions with a descendant selector under `__content` (for example `.components-notice__content .components-notice__actions`) to use `.components-notice__actions` or `.components-notice .components-notice__actions` instead ([#78231](https://github.com/WordPress/gutenberg/pull/78231)).
+-   `Notice`: Rework internal DOM structure and class names ([#78231](https://github.com/WordPress/gutenberg/pull/78231)). Consumers relying on those implementation details should update their projects accordingly:
+    -   Removed the `is-dismissible` class name on the root wrapper.
+    -   Moved the `.components-notice__actions` wrapper as a sibling of `.components-notice__content` (it was previously nested inside it).
 
 ### Enhancements
 
