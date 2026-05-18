@@ -11,6 +11,7 @@ import {
 	__unstableGetAnimateClassName as getAnimateClassName,
 	ResizableBox,
 	ToolbarButton,
+	Placeholder,
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
@@ -24,7 +25,7 @@ import {
 	__experimentalGetElementClassName,
 } from '@wordpress/block-editor';
 import { useEffect, useState } from '@wordpress/element';
-import { useCopyToClipboard } from '@wordpress/compose';
+import { useCopyToClipboard, useResizeObserver } from '@wordpress/compose';
 import { __, _x } from '@wordpress/i18n';
 import { file as icon } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
@@ -207,6 +208,11 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 
 	const displayPreviewInEditor = browserSupportsPdfs() && displayPreview;
 
+	const [ placeholderResizeListener, { width: placeholderWidth } ] =
+		useResizeObserver();
+
+	const isSmallContainer = placeholderWidth && placeholderWidth < 160;
+
 	if ( ! href && ! temporaryURL ) {
 		return (
 			<div { ...blockProps }>
@@ -221,6 +227,22 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 					onSelect={ onSelectFile }
 					onError={ onUploadError }
 					accept="*"
+					placeholder={ ( content ) => (
+						<Placeholder
+							className="block-editor-media-placeholder"
+							icon={ icon }
+							withIllustration={
+								! isSelected || isSmallContainer
+							}
+							label={ ! isSmallContainer && __( 'File' ) }
+							instructions={ __(
+								'Drag and drop a file here, upload, or choose from your library.'
+							) }
+						>
+							{ content }
+							{ placeholderResizeListener }
+						</Placeholder>
+					) }
 				/>
 			</div>
 		);
