@@ -9,7 +9,7 @@ import clsx from 'clsx';
 import { privateApis as routePrivateApis } from '@wordpress/route';
 import { SnackbarNotices } from '@wordpress/notices';
 import { SlotFillProvider } from '@wordpress/components';
-import { privateApis as themePrivateApis } from '@wordpress/theme';
+import { privateApis as adminUiPrivateApis } from '@wordpress/admin-ui';
 
 /**
  * Internal dependencies
@@ -22,7 +22,7 @@ import './style.scss';
 import useRouteTitle from '../app/use-route-title';
 
 const { useMatches, Outlet } = unlock( routePrivateApis );
-const { UserThemeProvider } = unlock( themePrivateApis );
+const { UserThemeProvider } = unlock( adminUiPrivateApis );
 
 /**
  * Root component for single page mode (no sidebar).

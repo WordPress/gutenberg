@@ -41,7 +41,6 @@
 		{ "path": "../rich-text" },
 		{ "path": "../router" },
 		{ "path": "../style-engine" },
-		{ "path": "../theme" },
 		{ "path": "../ui" },
 		{ "path": "../url" },
 		{ "path": "../viewport" },

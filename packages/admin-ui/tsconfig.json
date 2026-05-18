@@ -11,6 +11,7 @@
 		{ "path": "../private-apis" },
 		{ "path": "../route" },
 		{ "path": "../style-runtime" },
+		{ "path": "../theme" },
 		{ "path": "../ui" }
 	]
 }

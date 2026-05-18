@@ -18,10 +18,9 @@ import {
 import { menu } from '@wordpress/icons';
 import { useState, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { Page } from '@wordpress/admin-ui';
+import { Page, privateApis as adminUiPrivateApis } from '@wordpress/admin-ui';
 // eslint-disable-next-line @wordpress/use-recommended-components -- `Tooltip` is not yet on the recommended `@wordpress/ui` allow-list; landing as a migration step ahead of the wider rollout.
 import { Tooltip } from '@wordpress/ui';
-import { privateApis as themePrivateApis } from '@wordpress/theme';
 
 /**
  * Internal dependencies
@@ -35,7 +34,7 @@ import type { CanvasData } from '../../store/types';
 import './style.scss';
 
 const { useLocation, useMatches, Outlet } = unlock( routePrivateApis );
-const { UserThemeProvider } = unlock( themePrivateApis );
+const { UserThemeProvider } = unlock( adminUiPrivateApis );
 
 export default function Root() {
 	const matches = useMatches();

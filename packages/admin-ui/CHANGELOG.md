@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   Add private `UserThemeProvider`, a `ThemeProvider` pre-seeded from the active WordPress admin color scheme ([#78397](https://github.com/WordPress/gutenberg/pull/78397)).
+
 ## 2.2.0 (2026-05-27)
 
 ## 2.1.0 (2026-05-14)

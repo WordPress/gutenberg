@@ -6,7 +6,10 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { NavigableRegion } from '@wordpress/admin-ui';
+import {
+	NavigableRegion,
+	privateApis as adminUiPrivateApis,
+} from '@wordpress/admin-ui';
 import {
 	__unstableMotion as motion,
 	__unstableAnimatePresence as AnimatePresence,
@@ -27,7 +30,6 @@ import {
 	privateApis as editorPrivateApis,
 } from '@wordpress/editor';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
-import { privateApis as themePrivateApis } from '@wordpress/theme';
 import { PluginArea } from '@wordpress/plugins';
 import { SnackbarNotices, store as noticesStore } from '@wordpress/notices';
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -50,7 +52,7 @@ import SavePanel from '../save-panel';
 
 const { useLocation } = unlock( routerPrivateApis );
 const { useStyle } = unlock( editorPrivateApis );
-const { UserThemeProvider } = unlock( themePrivateApis );
+const { UserThemeProvider } = unlock( adminUiPrivateApis );
 
 const ANIMATION_DURATION = 0.3;
 
