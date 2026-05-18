@@ -10,9 +10,11 @@ import {
 	getTranscodeImageOperation,
 	finalizeItem,
 	prepareItem,
+	transcodeGifItem,
 } from '../private-actions';
-import { OperationType } from '../types';
+import { OperationType, Type } from '../types';
 import { vipsHasTransparency } from '../utils';
+import { mediabunnyConvertGifToVideo } from '../utils/mediabunny';
 
 // Mock @wordpress/blob
 jest.mock( '@wordpress/blob', () => ( {
@@ -34,11 +36,17 @@ jest.mock( '../utils', () => {
 } );
 
 // Mock the mediabunny wrapper so the dynamic worker import is never executed.
-jest.mock( '../utils/mediabunny', () => ( {
-	mediabunnyConvertGifToVideo: jest.fn(),
-	mediabunnyCancelOperations: jest.fn(),
-	terminateMediabunnyWorker: jest.fn(),
-} ) );
+// isUnsupportedConversionError is kept real so transcodeGifItem's
+// graceful-skip vs. hard-failure branching is genuinely exercised.
+jest.mock( '../utils/mediabunny', () => {
+	const actual = jest.requireActual( '../utils/mediabunny' );
+	return {
+		mediabunnyConvertGifToVideo: jest.fn(),
+		mediabunnyCancelOperations: jest.fn(),
+		terminateMediabunnyWorker: jest.fn(),
+		isUnsupportedConversionError: actual.isUnsupportedConversionError,
+	};
+} );
 
 describe( 'private actions', () => {
 	describe( 'getTranscodeImageOperation', () => {
@@ -591,6 +599,128 @@ describe( 'private actions', () => {
 			expect(
 				flattenOperations( dispatchedOperations || [] )
 			).not.toContain( OperationType.TranscodeGif );
+		} );
+	} );
+
+	describe( 'transcodeGifItem', () => {
+		const gifFile = new File( [ 'gif' ], 'animation.gif', {
+			type: 'image/gif',
+		} );
+
+		function buildArgs() {
+			const dispatch = Object.assign( jest.fn(), {
+				finishOperation: jest.fn(),
+				cancelItem: jest.fn(),
+			} );
+			const select = {
+				getItem: jest.fn( () => ( {
+					id: 'gif-1',
+					file: gifFile,
+				} ) ),
+			};
+			return { select, dispatch };
+		}
+
+		let consoleError;
+
+		beforeEach( () => {
+			mediabunnyConvertGifToVideo.mockReset();
+			createBlobURL.mockClear();
+			consoleError = jest
+				.spyOn( console, 'error' )
+				.mockImplementation( () => {} );
+		} );
+
+		afterEach( () => {
+			consoleError.mockRestore();
+		} );
+
+		it( 'replaces the GIF with the converted video on success', async () => {
+			const videoFile = new File( [ 'mp4' ], 'animation.mp4', {
+				type: 'video/mp4',
+			} );
+			mediabunnyConvertGifToVideo.mockResolvedValue( videoFile );
+			const { select, dispatch } = buildArgs();
+
+			await transcodeGifItem( 'gif-1', { outputFormat: 'mp4' } )( {
+				select,
+				dispatch,
+			} );
+
+			expect( mediabunnyConvertGifToVideo ).toHaveBeenCalledWith(
+				'gif-1',
+				gifFile,
+				'video/mp4'
+			);
+			expect( dispatch ).toHaveBeenCalledWith( {
+				type: Type.CacheBlobUrl,
+				id: 'gif-1',
+				blobUrl: 'blob:mock-url',
+			} );
+			expect( dispatch.finishOperation ).toHaveBeenCalledWith( 'gif-1', {
+				file: videoFile,
+				attachment: { url: 'blob:mock-url' },
+			} );
+			expect( dispatch.cancelItem ).not.toHaveBeenCalled();
+		} );
+
+		it( 'defaults to mp4 when no output format is given', async () => {
+			mediabunnyConvertGifToVideo.mockResolvedValue(
+				new File( [ 'mp4' ], 'animation.mp4', { type: 'video/mp4' } )
+			);
+			const { select, dispatch } = buildArgs();
+
+			await transcodeGifItem( 'gif-1' )( { select, dispatch } );
+
+			expect( mediabunnyConvertGifToVideo ).toHaveBeenCalledWith(
+				'gif-1',
+				gifFile,
+				'video/mp4'
+			);
+		} );
+
+		it( 'skips gracefully (uploads original GIF) on an Unsupported error', async () => {
+			mediabunnyConvertGifToVideo.mockRejectedValue(
+				new Error( 'Unsupported: WebCodecs unavailable' )
+			);
+			const { select, dispatch } = buildArgs();
+
+			await transcodeGifItem( 'gif-1' )( { select, dispatch } );
+
+			// Operation finishes untouched; the original GIF proceeds to upload.
+			expect( dispatch.finishOperation ).toHaveBeenCalledWith(
+				'gif-1',
+				{}
+			);
+			expect( dispatch.cancelItem ).not.toHaveBeenCalled();
+			expect( consoleError ).not.toHaveBeenCalled();
+		} );
+
+		it( 'cancels the item with an UploadError on a hard failure', async () => {
+			const cause = new Error( 'Encoder produced empty output' );
+			mediabunnyConvertGifToVideo.mockRejectedValue( cause );
+			const { select, dispatch } = buildArgs();
+
+			await transcodeGifItem( 'gif-1' )( { select, dispatch } );
+
+			expect( dispatch.finishOperation ).not.toHaveBeenCalled();
+			expect( dispatch.cancelItem ).toHaveBeenCalledTimes( 1 );
+			const [ cancelledId, error ] = dispatch.cancelItem.mock.calls[ 0 ];
+			expect( cancelledId ).toBe( 'gif-1' );
+			expect( error.code ).toBe( 'GIF_TRANSCODING_ERROR' );
+			expect( error.cause ).toBe( cause );
+			expect( consoleError ).toHaveBeenCalled();
+		} );
+
+		it( 'does nothing when the item is not in the queue', async () => {
+			const { dispatch } = buildArgs();
+			const select = { getItem: jest.fn( () => undefined ) };
+
+			await transcodeGifItem( 'missing' )( { select, dispatch } );
+
+			expect( mediabunnyConvertGifToVideo ).not.toHaveBeenCalled();
+			expect( dispatch.finishOperation ).not.toHaveBeenCalled();
+			expect( dispatch.cancelItem ).not.toHaveBeenCalled();
 		} );
 	} );
 } );
