@@ -114,7 +114,7 @@ function gutenberg_render_block_states_support( $block_content, $block ) {
 			continue;
 		}
 
-		$compiled = wp_style_engine_get_styles(
+		$compiled = gutenberg_style_engine_get_styles(
 			gutenberg_normalize_state_style_for_css_output( $style[ $pseudo_state ] )
 		);
 		if ( ! empty( $compiled['declarations'] ) ) {
@@ -130,7 +130,7 @@ function gutenberg_render_block_states_support( $block_content, $block ) {
 			continue;
 		}
 
-		$compiled = wp_style_engine_get_styles(
+		$compiled = gutenberg_style_engine_get_styles(
 			gutenberg_normalize_state_style_for_css_output( $style[ $breakpoint ] )
 		);
 		if ( ! empty( $compiled['declarations'] ) ) {
@@ -146,7 +146,7 @@ function gutenberg_render_block_states_support( $block_content, $block ) {
 				continue;
 			}
 
-			$compiled = wp_style_engine_get_styles(
+			$compiled = gutenberg_style_engine_get_styles(
 				gutenberg_normalize_state_style_for_css_output( $style[ $breakpoint ][ $pseudo_state ] )
 			);
 			if ( ! empty( $compiled['declarations'] ) ) {

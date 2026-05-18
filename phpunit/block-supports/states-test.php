@@ -65,7 +65,7 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 	private function build_expected_state_output( $state_styles ) {
 		$css_rules = array();
 		foreach ( $state_styles as $pseudo_state => $style ) {
-			$compiled = wp_style_engine_get_styles(
+			$compiled = gutenberg_style_engine_get_styles(
 				gutenberg_normalize_state_style_for_css_output( $style )
 			);
 			if ( ! empty( $compiled['declarations'] ) ) {
