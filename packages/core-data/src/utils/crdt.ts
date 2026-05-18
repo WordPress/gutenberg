@@ -6,7 +6,10 @@ import fastDeepEqual from 'fast-deep-equal/es6/index.js';
 /**
  * WordPress dependencies
  */
-import { __unstableSerializeAndClean } from '@wordpress/blocks';
+import {
+	__unstableSerializeAndClean,
+	type Block as WPBlock,
+} from '@wordpress/blocks';
 import {
 	type CRDTDoc,
 	type ObjectData,
@@ -443,7 +446,7 @@ export function getPostChangesFromCRDTDoc(
 		changes.content = ( {
 			blocks: blocksForSerialization = [],
 		}: {
-			blocks: Block[];
+			blocks: WPBlock[];
 		} ) => __unstableSerializeAndClean( blocksForSerialization );
 	}
 
