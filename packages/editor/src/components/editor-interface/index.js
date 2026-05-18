@@ -49,6 +49,7 @@ const interfaceLabels = {
 
 const Notices = () => (
 	<InlineNotices
+		className="editor-notices"
 		pinnedNoticesClassName="editor-notices__pinned"
 		dismissibleNoticesClassName="editor-notices__dismissible"
 	>

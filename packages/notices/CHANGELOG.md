@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `InlineNotices`: Wrap pinned and dismissible lists in a `components-inline-notices` container with spacing between lists. Add optional `className` prop for the wrapper.
+
 ### Internal
 
 -   `InlineNotices`: Remove package-level `Notice` style overrides; `Notice` from `@wordpress/components` owns layout and chrome ([#78231](https://github.com/WordPress/gutenberg/pull/78231)).

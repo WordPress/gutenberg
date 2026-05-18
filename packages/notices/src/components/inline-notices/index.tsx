@@ -17,6 +17,7 @@ import { store as noticesStore } from '../../store';
 
 type InlineNoticesProps = {
 	children?: ReactNode;
+	className?: string;
 	pinnedNoticesClassName?: string;
 	dismissibleNoticesClassName?: string;
 	context?: string;
@@ -24,6 +25,7 @@ type InlineNoticesProps = {
 
 export default function InlineNotices( {
 	children,
+	className,
 	pinnedNoticesClassName,
 	dismissibleNoticesClassName,
 	context,
@@ -40,25 +42,36 @@ export default function InlineNotices( {
 		( { isDismissible, type } ) => ! isDismissible && type === 'default'
 	);
 
+	const hasPinnedNotices = nonDismissibleNotices.length > 0;
+	const hasDismissibleNotices = dismissibleNotices.length > 0 || !! children;
+
+	if ( ! hasPinnedNotices && ! hasDismissibleNotices ) {
+		return null;
+	}
+
 	return (
-		<>
-			<NoticeList
-				notices={ nonDismissibleNotices }
-				className={ clsx(
-					'components-notices__pinned',
-					pinnedNoticesClassName
-				) }
-			/>
-			<NoticeList
-				notices={ dismissibleNotices }
-				className={ clsx(
-					'components-notices__dismissible',
-					dismissibleNoticesClassName
-				) }
-				onRemove={ ( id ) => removeNotice( id, context ) }
-			>
-				{ children }
-			</NoticeList>
-		</>
+		<div className={ clsx( 'components-inline-notices', className ) }>
+			{ hasPinnedNotices && (
+				<NoticeList
+					notices={ nonDismissibleNotices }
+					className={ clsx(
+						'components-notices__pinned',
+						pinnedNoticesClassName
+					) }
+				/>
+			) }
+			{ hasDismissibleNotices && (
+				<NoticeList
+					notices={ dismissibleNotices }
+					className={ clsx(
+						'components-notices__dismissible',
+						dismissibleNoticesClassName
+					) }
+					onRemove={ ( id ) => removeNotice( id, context ) }
+				>
+					{ children }
+				</NoticeList>
+			) }
+		</div>
 	);
 }
