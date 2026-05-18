@@ -22,16 +22,11 @@
 	.overlay.is-active:not(.has-rows) .column {
 		opacity: 0;
 		transform: scale(0.94);
-		animation: grid-overlay-tile-in
+		animation:
+			grid-overlay-tile-in
 			var(--wpds-motion-duration-md) var(--wpds-motion-easing-expressive)
 			both;
-		animation-delay: calc(
-			var(--wp-grid-overlay-wave-delay-step, 28ms) *
-				(
-					var(--wp-grid-overlay-column-index, 0) +
-						var(--wp-grid-overlay-row-index, 0)
-				)
-		);
+		animation-delay: calc(var(--wp-grid-overlay-wave-delay-step, 28ms) * (var(--wp-grid-overlay-column-index, 0) + var(--wp-grid-overlay-row-index, 0)));
 	}
 
 	@keyframes grid-overlay-tile-in {
@@ -44,7 +39,7 @@
 	.overlay:not(.is-active) {
 		transition:
 			opacity var(--wpds-motion-duration-sm)
-				var(--wpds-motion-easing-subtle),
+			var(--wpds-motion-easing-subtle),
 			visibility 0s linear var(--wpds-motion-duration-sm);
 	}
 
@@ -59,14 +54,14 @@
 	.overlay {
 		transition:
 			opacity var(--wpds-motion-duration-sm)
-				var(--wpds-motion-easing-subtle),
+			var(--wpds-motion-easing-subtle),
 			visibility 0s linear var(--wpds-motion-duration-sm);
 	}
 
 	.overlay.is-active {
 		transition:
 			opacity var(--wpds-motion-duration-sm)
-				var(--wpds-motion-easing-subtle),
+			var(--wpds-motion-easing-subtle),
 			visibility 0s linear 0s;
 	}
 }
@@ -83,8 +78,5 @@
 	height: var(--wp-grid-overlay-row-height);
 	box-sizing: border-box;
 	border-radius: var(--wpds-border-radius-md);
-	background-color: var(
-		--wp-grid-overlay-tile-bg,
-		var(--wpds-color-bg-surface-neutral-weak)
-	);
+	background-color: var(--wp-grid-overlay-tile-bg, var(--wpds-color-bg-surface-neutral-weak));
 }
