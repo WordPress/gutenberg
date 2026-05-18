@@ -459,6 +459,60 @@ describe( 'withSuggestionBlockClassName', () => {
 		const node = setup( { intent: 'edit' } );
 		expect( node.className ).not.toMatch( /is-suggestion-pending/ );
 	} );
+
+	function setupMove( { withMove = true } = {} ) {
+		const registry = createRegistry();
+		registry.register( noticesStore );
+		registry.register( preferencesStore );
+		registry.register( blockEditorStore );
+		registry.register( editorStore );
+		registry.dispatch( editorStore ).setEditorIntent( 'edit' );
+
+		const anchor = createBlock( TEST_BLOCK_NAME, { content: 'Anchor' } );
+		const moved = createBlock( TEST_BLOCK_NAME, {
+			content: 'I moved away',
+			...( withMove && {
+				metadata: {
+					suggestion: {
+						type: 'pending-move',
+						authorId: null,
+						fromAnchorClientId: anchor.clientId,
+						fromParentClientId: '',
+						fromIndex: 1,
+					},
+				},
+			} ),
+		} );
+		registry.dispatch( blockEditorStore ).resetBlocks( [ anchor, moved ] );
+
+		const wrapper = ( { children } ) => (
+			<RegistryProvider value={ registry }>
+				<SuggestionOverlayProvider>
+					{ children }
+				</SuggestionOverlayProvider>
+			</RegistryProvider>
+		);
+
+		// Render the wrapped *anchor* block — the ghost is a sibling of the
+		// block that did not move, placed after it.
+		render( <WrappedBlockListBlock clientId={ anchor.clientId } />, {
+			wrapper,
+		} );
+	}
+
+	it( 'renders a ghost after a block that is a pending-move anchor', () => {
+		setupMove( { withMove: true } );
+		expect(
+			screen.getByTestId( 'suggestion-move-ghost' )
+		).toBeInTheDocument();
+	} );
+
+	it( 'renders no ghost when there is no pending move anchored here', () => {
+		setupMove( { withMove: false } );
+		expect(
+			screen.queryByTestId( 'suggestion-move-ghost' )
+		).not.toBeInTheDocument();
+	} );
 } );
 
 describe( 'applyDiffMarks', () => {

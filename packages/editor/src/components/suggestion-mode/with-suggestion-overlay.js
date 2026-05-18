@@ -44,6 +44,7 @@ import { useSuggestionOverlay } from './overlay-context';
 import { EDITOR_STORE_NAME, SUGGEST_INTENT } from './constants';
 import { markContentDiff, stripSuggestionMarks } from './inline-formats';
 import { getAvatarBorderColor } from '../collab-sidebar/utils';
+import SuggestionMoveGhost from './suggestion-move-ghost';
 
 const BLOCK_EDITOR_STORE_NAME = 'core/block-editor';
 
@@ -401,7 +402,12 @@ const withSuggestionBlockClassName = createHigherOrderComponent(
 	( BlockListBlock ) =>
 		function BlockListBlockWithSuggestionClass( props ) {
 			const { clientId } = props;
-			const { entries } = useSuggestionOverlay();
+			const { entries, moveGhosts } = useSuggestionOverlay();
+			const ghostsAfter = moveGhosts?.after?.get( clientId );
+			const ghostsBefore = moveGhosts?.before?.get( clientId );
+			const hasGhosts =
+				( ghostsAfter && ghostsAfter.length > 0 ) ||
+				( ghostsBefore && ghostsBefore.length > 0 );
 			const { isSuggestMode, structuralClass, authorId } = useSelect(
 				( select ) => {
 					const editor = select( EDITOR_STORE_NAME );
@@ -424,9 +430,17 @@ const withSuggestionBlockClassName = createHigherOrderComponent(
 				Object.keys( entry.overlayAttributes ?? {} ).length > 0;
 			const showOverlayBracket = isSuggestMode && hasPendingOverlay;
 
-			if ( ! showOverlayBracket && ! structuralClass ) {
+			if ( ! showOverlayBracket && ! structuralClass && ! hasGhosts ) {
 				return <BlockListBlock { ...props } />;
 			}
+
+			const renderGhosts = ( list, keyPrefix ) =>
+				list?.map( ( moved ) => (
+					<SuggestionMoveGhost
+						key={ `${ keyPrefix }-${ moved.clientId }` }
+						moved={ moved }
+					/>
+				) );
 
 			// Apply the suggester's avatar color via a CSS custom property
 			// so the canvas treatment (outline / strikethrough / label tab)
@@ -441,19 +455,28 @@ const withSuggestionBlockClassName = createHigherOrderComponent(
 					  }
 					: props.wrapperProps?.style;
 
+			const blockClassName =
+				showOverlayBracket || structuralClass
+					? clsx(
+							props.className,
+							showOverlayBracket && 'is-suggestion-pending',
+							structuralClass
+					  )
+					: props.className;
+
 			return (
-				<BlockListBlock
-					{ ...props }
-					className={ clsx(
-						props.className,
-						showOverlayBracket && 'is-suggestion-pending',
-						structuralClass
-					) }
-					wrapperProps={ {
-						...props.wrapperProps,
-						style: wrapperStyle,
-					} }
-				/>
+				<>
+					{ renderGhosts( ghostsBefore, 'gb' ) }
+					<BlockListBlock
+						{ ...props }
+						className={ blockClassName }
+						wrapperProps={ {
+							...props.wrapperProps,
+							style: wrapperStyle,
+						} }
+					/>
+					{ renderGhosts( ghostsAfter, 'ga' ) }
+				</>
 			);
 		},
 	'withSuggestionBlockClassName'
