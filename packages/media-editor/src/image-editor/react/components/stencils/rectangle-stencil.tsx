@@ -103,6 +103,7 @@ type RectangleStencilProps = StencilProps;
  * @param props.stencilTransition CSS transition string for settle animation.
  * @param props.cropBounds        Maximum crop rect bounds from camera (zoom/rotation-aware).
  * @param props.onEscape          Called when Escape is pressed on a resize handle.
+ * @param props.minCropSize       Minimum crop rect dimension in normalized space, per axis.
  * @return The rectangle stencil element.
  */
 export function RectangleStencil( {
@@ -117,6 +118,7 @@ export function RectangleStencil( {
 	stencilTransition,
 	cropBounds,
 	onEscape,
+	minCropSize,
 }: RectangleStencilProps ) {
 	// Use cropBounds from the camera if available, otherwise default to [0,1].
 	const boundsMinX = cropBounds?.minX ?? 0;
@@ -308,8 +310,15 @@ export function RectangleStencil( {
 			clientX: number,
 			clientY: number
 		): NormalizedRect =>
-			computeFreeResizeRect( drag, clientX, clientY, imageSize, bounds ),
-		[ imageSize, bounds ]
+			computeFreeResizeRect(
+				drag,
+				clientX,
+				clientY,
+				imageSize,
+				bounds,
+				minCropSize
+			),
+		[ imageSize, bounds, minCropSize ]
 	);
 
 	/**
@@ -328,9 +337,10 @@ export function RectangleStencil( {
 				clientY,
 				imageSize,
 				bounds,
-				normalizedRatio
+				normalizedRatio,
+				minCropSize
 			),
-		[ imageSize, bounds, normalizedRatio ]
+		[ imageSize, bounds, normalizedRatio, minCropSize ]
 	);
 
 	/**
@@ -348,9 +358,10 @@ export function RectangleStencil( {
 				clientX,
 				clientY,
 				imageSize,
-				bounds
+				bounds,
+				minCropSize
 			),
-		[ imageSize, bounds ]
+		[ imageSize, bounds, minCropSize ]
 	);
 
 	latestHandlersRef.current = {

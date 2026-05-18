@@ -29,10 +29,7 @@
 }
 
 .column {
-	outline:
-		1px dashed
-		var(--wp-grid-overlay-track-color, var(--wpds-color-stroke-surface-neutral));
-	background-color: var(--wp-grid-overlay-column-fill, color-mix(in srgb, var(--wpds-color-bg-surface-info) 10%, transparent));
+	background-color: var(--wp-grid-overlay-column-fill, color-mix(in srgb, var(--wpds-color-bg-surface-info) 20%, transparent));
 	position: relative;
 }
 
