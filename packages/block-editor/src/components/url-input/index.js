@@ -45,7 +45,35 @@ function isFunction( maybeFunc ) {
 	return typeof maybeFunc === 'function';
 }
 
+/**
+ * URLInput Component
+ *
+ * A React component for handling URL input with suggestions, autocomplete, and keyboard navigation.
+ * It provides functionality for fetching and displaying link suggestions based on user input.
+ *
+ * @augments {Component}
+ */
 class URLInput extends Component {
+	/**
+	 * Constructor to initialize state and bind methods.
+	 *
+	 * @param {Object}   props                                      The component props.
+	 * @param {Function} props.onChange                             Callback to handle input changes.
+	 * @param {Function} props.onSubmit                             Callback to handle form submission.
+	 * @param {Function} props.__experimentalFetchLinkSuggestions   Function to fetch link suggestions.
+	 * @param {Function} props.__experimentalHandleURLSuggestions   Function to handle URL-specific suggestions.
+	 * @param {boolean}  props.disableSuggestions                   Whether to disable suggestions.
+	 * @param {boolean}  props.__experimentalShowInitialSuggestions Whether to show suggestions initially.
+	 * @param {string}   props.value                                The current input value.
+	 * @param {string}   props.placeholder                          Placeholder for the input field.
+	 * @param {Function} props.debouncedSpeak                       Function for accessibility messages.
+	 * @param {Function} props.speak                                Function for accessibility announcements.
+	 * @param {Function} props.__experimentalRenderControl          Custom render function for the control.
+	 * @param {Function} props.__experimentalRenderSuggestions      Custom render function for suggestions.
+	 * @param {Function} props.autocompleteRef                      Reference for the autocomplete input.
+	 * @param {Function} props.onKeyDown                            Optional handler for custom keydown logic.
+	 * @param {Function} props.suffix                               Optional content to render as a suffix in the input field.
+	 */
 	constructor( props ) {
 		super( props );
 
