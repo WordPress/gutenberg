@@ -18,9 +18,9 @@
 	border: none;
 	box-shadow: none;
 	cursor: var(--wpds-cursor-control);
-	padding: 3px $grid-unit-20; // Use padding to offset the is-active border, this benefits Windows High Contrast mode
+	padding: 3px var(--wpds-dimension-padding-lg); // Use padding to offset the is-active border, this benefits Windows High Contrast mode
 	margin-left: 0;
-	font-weight: $font-weight-regular;
+	font-weight: var(--wpds-typography-font-weight-regular);
 	color: var(--wpds-color-fg-interactive-neutral);
 
 	&:disabled,
@@ -71,15 +71,12 @@
 	&::before {
 		content: "";
 		position: absolute;
-		top: $grid-unit-15;
-		right: $grid-unit-15;
-		bottom: $grid-unit-15;
-		left: $grid-unit-15;
+		inset: var(--wpds-dimension-padding-md);
 		pointer-events: none;
 
 		// Draw the indicator.
 		box-shadow: 0 0 0 0 transparent;
-		border-radius: $radius-small;
+		border-radius: var(--wpds-border-radius-sm);
 
 		// Animation
 		@media not (prefers-reduced-motion) {
@@ -97,7 +94,7 @@
 	}
 
 	.components-tab-panel__tabs[aria-orientation="vertical"] & {
-		border-radius: $radius-small;
+		border-radius: var(--wpds-border-radius-sm);
 
 		&::after {
 			display: none;
