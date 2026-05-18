@@ -112,6 +112,17 @@ export type GridItemProps = {
 	resizeSnapPreview?: ResizeSnapSize | null;
 
 	/**
+	 * Minimum tile width while resizing, in pixels (one column track).
+	 */
+	minResizeWidthPx: number;
+
+	/**
+	 * Minimum tile height while resizing, in pixels (one row track).
+	 * Omitted when vertical resize is disabled.
+	 */
+	minResizeHeightPx?: number;
+
+	/**
 	 * Callback fired when the resize gesture ends.
 	 */
 	onResizeEnd: () => void;

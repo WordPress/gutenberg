@@ -4,6 +4,9 @@
 
 ### Enhancements
 
+-   Clamp tile resize so width cannot shrink below a single column
+    track (and height below a single row on `DashboardGrid` when
+    vertical resize is enabled).
 -   Add `--wp-grid-placeholder-outline-style` and
     `--wp-grid-resize-preview-outline-style` CSS custom properties for
     the drag-placeholder outline (default `dashed`) and resize-preview

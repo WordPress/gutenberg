@@ -14,7 +14,7 @@ import { useMergeRefs } from '@wordpress/compose';
  * Internal dependencies
  */
 import ResizeHandle from '../shared/resize-handle';
-import type { ResizeSnapSize } from '../shared/resize-snap';
+import { clampResizeDelta, type ResizeSnapSize } from '../shared/resize-snap';
 import type { ResizeDelta } from '../shared/types';
 import type { GridItemProps } from './types';
 import styles from './grid-item.module.css';
@@ -45,6 +45,8 @@ export function GridItem( {
 	onResize,
 	onResizeEnd,
 	resizeSnapPreview = null,
+	minResizeWidthPx,
+	minResizeHeightPx,
 	renderResizeHandle,
 }: GridItemProps ) {
 	const [ resizeDelta, setResizeDelta ] = useState< ResizeDelta | null >(
@@ -94,14 +96,22 @@ export function GridItem( {
 	);
 
 	const handleResize = ( delta: ResizeDelta ) => {
-		const clamped = {
+		const contentNode = contentRef.current;
+		let baselineSize = initialContentSize;
+		if ( contentNode && ! baselineSize ) {
+			const { width, height } = contentNode.getBoundingClientRect();
+			baselineSize = { width, height };
+			setInitialContentSize( baselineSize );
+		}
+		let clamped: ResizeDelta = {
 			width: delta.width,
 			height: verticalResizable ? delta.height : 0,
 		};
-		const contentNode = contentRef.current;
-		if ( contentNode && ! initialContentSize ) {
-			const { width, height } = contentNode.getBoundingClientRect();
-			setInitialContentSize( { width, height } );
+		if ( baselineSize ) {
+			clamped = clampResizeDelta( clamped, baselineSize, {
+				width: minResizeWidthPx,
+				height: verticalResizable ? minResizeHeightPx : undefined,
+			} );
 		}
 		setResizeDelta( clamped );
 		onResize( item.key, clamped );
