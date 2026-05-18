@@ -56,7 +56,7 @@ export default function QuickBlockPost() {
 
 	const canSave = isValid && ! isSaving;
 
-	const handleSaveDraft = async () => {
+	const saveDraftPost = async () => {
 		if ( ! canSave ) {
 			return;
 		}
@@ -76,7 +76,7 @@ export default function QuickBlockPost() {
 	};
 
 	return (
-		<Stack direction="column" gap="md">
+		<Stack direction="column" gap="md" justify="space-between">
 			<DataForm< QuickBlockPostData >
 				data={ data }
 				fields={ fields }
@@ -86,10 +86,11 @@ export default function QuickBlockPost() {
 					setData( ( prev ) => ( { ...prev, ...edits } ) )
 				}
 			/>
+
 			<Stack direction="row" gap="md" justify="flex-end">
 				<Button
 					variant="solid"
-					onClick={ handleSaveDraft }
+					onClick={ saveDraftPost }
 					loading={ isSaving }
 					disabled={ ! canSave }
 				>
