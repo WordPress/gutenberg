@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useMemo, useState } from '@wordpress/element';
+import { useEffect, useMemo, useState } from '@wordpress/element';
 import {
 	ToggleControl,
 	__experimentalSpacer as Spacer,
@@ -58,7 +58,11 @@ import { BlockInspectorPreTabsFill } from '../components/block-inspector/inspect
 import { scopeSelector } from '../components/global-styles/utils';
 import { useBlockEditingMode } from '../components/block-editing-mode';
 import { store as blockEditorStore } from '../store';
-import { globalStylesDataKey } from '../store/private-keys';
+import {
+	deviceTypeKey,
+	globalStylesDataKey,
+	setPreviewDeviceTypeKey,
+} from '../store/private-keys';
 import { unlock } from '../lock-unlock';
 
 const BORDER_SIDES = [ 'Top', 'Right', 'Bottom', 'Left' ];
@@ -69,6 +73,35 @@ const RESPONSIVE_BREAKPOINTS = {
 	mobile: '@media (width <= 480px)',
 	tablet: '@media (480px < width <= 782px)',
 };
+
+const PREVIEW_DEVICE_TYPE_BY_VIEWPORT = {
+	mobile: 'Mobile',
+	tablet: 'Tablet',
+};
+
+/**
+ * Returns the editor preview device type for a selected block style state.
+ *
+ * State preview can be disabled independently from state selection. When
+ * disabled, return to Desktop so the editor no longer presents a forced state
+ * preview canvas.
+ *
+ * @param {Object}  selectedState     Selected block style state.
+ * @param {boolean} showStateOnCanvas Whether pseudo-state preview is enabled.
+ * @return {string} Editor preview device type.
+ */
+export function getPreviewDeviceTypeForState(
+	selectedState,
+	showStateOnCanvas
+) {
+	if ( ! showStateOnCanvas ) {
+		return 'Desktop';
+	}
+
+	return (
+		PREVIEW_DEVICE_TYPE_BY_VIEWPORT[ selectedState.viewport ] ?? 'Desktop'
+	);
+}
 
 const styleSupportKeys = [
 	...TYPOGRAPHY_SUPPORT_KEYS,
@@ -573,21 +606,40 @@ function BlockStyleControls( {
 	const settings = useBlockSettings( name, __unstableParentLayout );
 	const blockEditingMode = useBlockEditingMode();
 	const [ showStateOnCanvas, setShowStateOnCanvas ] = useState( true );
-	const { globalBlockStyles, selectedState } = useSelect(
+	const {
+		currentDeviceType,
+		globalBlockStyles,
+		selectedState,
+		setPreviewDeviceType,
+	} = useSelect(
 		( select ) => {
 			const blockEditorSelect = select( blockEditorStore );
+			const editorSettings = blockEditorSelect.getSettings();
 			return {
+				currentDeviceType: editorSettings?.[ deviceTypeKey ],
 				globalBlockStyles:
-					blockEditorSelect.getSettings()[ globalStylesDataKey ]
-						?.blocks?.[ name ],
+					editorSettings?.[ globalStylesDataKey ]?.blocks?.[ name ],
 				selectedState:
 					unlock( blockEditorSelect ).getSelectedBlockStyleState(
 						clientId
 					),
+				setPreviewDeviceType:
+					editorSettings?.[ setPreviewDeviceTypeKey ],
 			};
 		},
 		[ clientId, name ]
 	);
+	const previewDeviceType = getPreviewDeviceTypeForState(
+		selectedState,
+		showStateOnCanvas
+	);
+	useEffect( () => {
+		if ( currentDeviceType !== previewDeviceType && setPreviewDeviceType ) {
+			setPreviewDeviceType( previewDeviceType );
+		}
+	}, [ currentDeviceType, previewDeviceType, setPreviewDeviceType ] );
+	const isBlockStyleStateSelected =
+		! isDefaultBlockStyleState( selectedState );
 	const isPseudoSelectorState = hasPseudoBlockStyleState( selectedState );
 	const globalStateValue = getCanvasStateStyleValue(
 		globalBlockStyles,
@@ -653,16 +705,14 @@ function BlockStyleControls( {
 
 	return (
 		<>
-			{ ! isDefaultBlockStyleState( selectedState ) && (
+			{ isBlockStyleStateSelected && (
 				<BlockInspectorPreTabsFill>
 					<Spacer paddingX={ 4 } paddingY={ 2 }>
-						{ isPseudoSelectorState && (
-							<ToggleControl
-								label={ __( 'Show state on canvas' ) }
-								checked={ showStateOnCanvas }
-								onChange={ setShowStateOnCanvas }
-							/>
-						) }
+						<ToggleControl
+							label={ __( 'Show state on canvas' ) }
+							checked={ showStateOnCanvas }
+							onChange={ setShowStateOnCanvas }
+						/>
 						<BlockStateBadges
 							name={ name }
 							value={ selectedState }

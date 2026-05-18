@@ -9,6 +9,7 @@ import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
 import _style, {
 	getCanvasStateStyleValue,
 	getInlineStyles,
+	getPreviewDeviceTypeForState,
 	getResponsiveStateCSSRules,
 	getStateStylesCSS,
 	omitStyle,
@@ -348,6 +349,53 @@ describe( 'getCanvasStateStyleValue', () => {
 		).toEqual( {
 			color: { background: 'blue', text: 'yellow' },
 		} );
+	} );
+} );
+
+describe( 'getPreviewDeviceTypeForState', () => {
+	it( 'returns Desktop for the default viewport state', () => {
+		expect(
+			getPreviewDeviceTypeForState(
+				{ viewport: 'default', pseudo: 'default' },
+				true
+			)
+		).toBe( 'Desktop' );
+	} );
+
+	it( 'returns Tablet for the tablet viewport state', () => {
+		expect(
+			getPreviewDeviceTypeForState(
+				{ viewport: 'tablet', pseudo: 'default' },
+				true
+			)
+		).toBe( 'Tablet' );
+	} );
+
+	it( 'returns Mobile for the mobile viewport state', () => {
+		expect(
+			getPreviewDeviceTypeForState(
+				{ viewport: 'mobile', pseudo: 'default' },
+				true
+			)
+		).toBe( 'Mobile' );
+	} );
+
+	it( 'returns Desktop when canvas preview is disabled for a responsive state', () => {
+		expect(
+			getPreviewDeviceTypeForState(
+				{ viewport: 'mobile', pseudo: 'default' },
+				false
+			)
+		).toBe( 'Desktop' );
+	} );
+
+	it( 'returns Desktop when canvas preview is disabled for a responsive pseudo state', () => {
+		expect(
+			getPreviewDeviceTypeForState(
+				{ viewport: 'mobile', pseudo: ':hover' },
+				false
+			)
+		).toBe( 'Desktop' );
 	} );
 } );
 
