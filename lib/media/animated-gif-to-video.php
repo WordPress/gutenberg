@@ -96,6 +96,34 @@ function gutenberg_swap_animated_gif_for_video( string $filtered_image, string $
 		return $filtered_image;
 	}
 
+	/**
+	 * Filters whether a linked animated GIF should be swapped for its
+	 * companion video at render time.
+	 *
+	 * Returning false leaves the original `<img>` untouched, allowing
+	 * developers to keep specific GIFs as GIFs on a per-image basis
+	 * (e.g. based on the attachment, the rendering context, or where the
+	 * image appears on the site).
+	 *
+	 * @since 23.3.0
+	 *
+	 * @param bool   $swap          Whether to perform the swap. Default true.
+	 * @param int    $attachment_id The GIF image attachment ID.
+	 * @param int    $video_id      The linked companion video attachment ID.
+	 * @param string $context       Context the image is rendered in (e.g. 'the_content').
+	 */
+	$swap = apply_filters(
+		'gutenberg_swap_animated_gif_for_video',
+		true,
+		$attachment_id,
+		$video_id,
+		$context
+	);
+
+	if ( ! $swap ) {
+		return $filtered_image;
+	}
+
 	$video_url = wp_get_attachment_url( $video_id );
 
 	if ( ! $video_url ) {
