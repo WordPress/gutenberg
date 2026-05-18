@@ -252,7 +252,7 @@ export default {
 			}
 		} else {
 			rules.push(
-				`grid-template-columns: repeat(auto-fill, minmax(min(${
+				`grid-template-columns: repeat(auto-fit, minmax(min(${
 					minimumColumnWidth || '12rem'
 				}, 100%), 1fr))`,
 				'container-type: inline-size'
