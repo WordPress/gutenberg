@@ -21,10 +21,10 @@
 	.overlay.is-active .row,
 	.overlay.is-active:not(.has-rows) .column {
 		opacity: 0;
-		transform: scale(0.94);
+		transform: scale(0.64);
 		animation:
 			grid-overlay-tile-in
-			var(--wpds-motion-duration-md) var(--wpds-motion-easing-expressive)
+			var(--wpds-motion-duration-md) var(--wpds-motion-easing-subtle)
 			both;
 		animation-delay: calc(var(--wp-grid-overlay-wave-delay-step, 28ms) * (var(--wp-grid-overlay-column-index, 0) + var(--wp-grid-overlay-row-index, 0)));
 	}
