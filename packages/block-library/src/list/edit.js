@@ -118,6 +118,30 @@ function IndentUI( { clientId } ) {
 	);
 }
 
+function usePropagateOrderedToDescendants( clientId ) {
+	const registry = useRegistry();
+	const { updateBlockAttributes } = useDispatch( blockEditorStore );
+	const { getClientIdsOfDescendants, getBlockName } =
+		useSelect( blockEditorStore );
+
+	return useCallback(
+		( nextOrdered ) => {
+			registry.batch( () => {
+				const ids = [
+					clientId,
+					...getClientIdsOfDescendants( clientId ),
+				];
+				for ( const id of ids ) {
+					if ( getBlockName( id ) === 'core/list' ) {
+						updateBlockAttributes( id, { ordered: nextOrdered } );
+					}
+				}
+			} );
+		},
+		[ clientId, getClientIdsOfDescendants, getBlockName ]
+	);
+}
+
 export default function Edit( { attributes, setAttributes, clientId, style } ) {
 	const { ordered, type, reversed, start } = attributes;
 	const blockProps = useBlockProps( {
@@ -141,6 +165,8 @@ export default function Edit( { attributes, setAttributes, clientId, style } ) {
 		__experimentalCaptureToolbars: true,
 	} );
 	useMigrateOnLoad( attributes, clientId );
+	const propagateOrderedToDescendants =
+		usePropagateOrderedToDescendants( clientId );
 
 	const controls = (
 		<BlockControls group="block">
@@ -150,7 +176,7 @@ export default function Edit( { attributes, setAttributes, clientId, style } ) {
 				description={ __( 'Convert to unordered list' ) }
 				isActive={ ordered === false }
 				onClick={ () => {
-					setAttributes( { ordered: false } );
+					propagateOrderedToDescendants( false );
 				} }
 			/>
 			<ToolbarButton
@@ -159,7 +185,7 @@ export default function Edit( { attributes, setAttributes, clientId, style } ) {
 				description={ __( 'Convert to ordered list' ) }
 				isActive={ ordered === true }
 				onClick={ () => {
-					setAttributes( { ordered: true } );
+					propagateOrderedToDescendants( true );
 				} }
 			/>
 			<IndentUI clientId={ clientId } />
