@@ -40,6 +40,7 @@ function runShellScript( script, cwd, env = {} ) {
 			function ( error, stdout, stderr ) {
 				if ( error ) {
 					console.log( stdout ); // Sometimes the error message is thrown via stdout.
+
 					console.log( stderr );
 					reject( error );
 				} else {

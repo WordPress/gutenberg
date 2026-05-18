@@ -31,8 +31,13 @@ import type {
  * `gridSettings` entirely; if `gridSettings` is provided, the consumer's
  * shape passes through untouched and missing fields fall back to whatever
  * defaults the grid model itself supplies.
+ *
+ * `widgets.tsx` also applies a hard-coded floor when `minColumnWidth`
+ * resolves to `undefined`, to keep legibility intact for stored settings
+ * that predate the layered model.
  */
 const DEFAULT_GRID: WidgetGridSettings = {
+	columns: 6,
 	minColumnWidth: 350,
 	rowHeight: 200,
 };
