@@ -22,6 +22,7 @@ import {
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
+	check,
 	contents,
 	stretchFullWidth,
 	stretchWide,
@@ -170,19 +171,27 @@ function HeaderActions( {
 				) }
 				renderContent={ ( { onClose } ) => (
 					<MenuGroup>
-						{ WIDTH_MODES.map( ( mode ) => (
-							<MenuItem
-								key={ mode }
-								icon={ WIDTH_MODE_ICON[ mode ] }
-								isSelected={ selectedWidthMode === mode }
-								onClick={ () => {
-									onWidthChange( mode );
-									onClose();
-								} }
-							>
-								{ WIDTH_MODE_LABEL[ mode ] }
-							</MenuItem>
-						) ) }
+						{ WIDTH_MODES.map( ( mode ) => {
+							const isSelected = selectedWidthMode === mode;
+							return (
+								<MenuItem
+									key={ mode }
+									role="menuitemradio"
+									icon={
+										isSelected
+											? check
+											: WIDTH_MODE_ICON[ mode ]
+									}
+									isSelected={ isSelected }
+									onClick={ () => {
+										onWidthChange( mode );
+										onClose();
+									} }
+								>
+									{ WIDTH_MODE_LABEL[ mode ] }
+								</MenuItem>
+							);
+						} ) }
 					</MenuGroup>
 				) }
 			/>
