@@ -83,6 +83,11 @@ class GifToVideoUtils {
 	 * @param {import('@playwright/test').TestInfo} testInstance The test object.
 	 */
 	async skipIfGifConversionInactive( testInstance ) {
+		// This guard is intentionally conservative: it skips the test when any
+		// required capability is absent. The crossOriginIsolated check is not a
+		// runtime capability differentiator - client-side media already requires
+		// Document Isolation Policy globally - but it confirms the test
+		// environment is set up correctly before asserting conversion results.
 		const isActive = await this.page.evaluate( () => {
 			if ( ! window.__clientSideMediaProcessing ) {
 				return false;
