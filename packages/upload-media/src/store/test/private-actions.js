@@ -611,9 +611,7 @@ describe( 'private actions', () => {
 				[ OperationType.TranscodeGif, { outputFormat: 'mp4' } ],
 				OperationType.Upload,
 			] );
-			expect( companion.additionalData.generate_sub_sizes ).toBe(
-				true
-			);
+			expect( companion.additionalData.generate_sub_sizes ).toBe( true );
 			expect( companion.additionalData.convert_format ).toBe( true );
 
 			// The pair token links the two attachments server-side and
