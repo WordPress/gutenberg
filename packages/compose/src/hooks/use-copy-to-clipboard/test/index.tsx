@@ -68,7 +68,7 @@ describe( 'useCopyToClipboard', () => {
 		expect( onSuccess ).not.toHaveBeenCalled();
 	} );
 
-	it( 'should call onSuccess even when the node unmounts before the copy resolves', async () => {
+	it( 'should call onSuccess but skip focus restoration when the node unmounts before the copy resolves', async () => {
 		let resolvePromise: () => void;
 		const delayedPromise = new Promise< void >( ( resolve ) => {
 			resolvePromise = resolve;
@@ -83,8 +83,12 @@ describe( 'useCopyToClipboard', () => {
 			<TestComponent text="test" onSuccess={ onSuccess } />
 		);
 
-		await user.click( screen.getByRole( 'button' ) );
+		const button = screen.getByRole( 'button' );
+		const focusSpy = jest.spyOn( button, 'focus' );
+
+		await user.click( button );
 		unmount();
+		focusSpy.mockClear();
 
 		await act( async () => {
 			resolvePromise();
@@ -92,6 +96,7 @@ describe( 'useCopyToClipboard', () => {
 		} );
 
 		expect( onSuccess ).toHaveBeenCalledTimes( 1 );
+		expect( focusSpy ).not.toHaveBeenCalled();
 	} );
 } );
 
