@@ -163,7 +163,7 @@ function MetaBoxesMain( { isLegacy } ) {
 			return;
 		}
 		const noticeContainer = container.querySelector(
-			':scope > .components-inline-notices'
+			':scope > .notices-inline-notices-wrapper'
 		);
 		const resizeHandle = container.querySelector(
 			'.edit-post-meta-boxes-main__presenter'

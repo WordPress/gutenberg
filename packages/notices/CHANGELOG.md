@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   `InlineNotices`: Wrap pinned and dismissible lists in a `components-inline-notices` container with spacing between lists. Add optional `className` prop for the wrapper.
+-   `InlineNotices`: Wrap pinned and dismissible lists in a `notices-inline-notices-wrapper` container with spacing between lists. Add optional `className` prop for the wrapper.
 
 ### Internal
 

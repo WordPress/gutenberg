@@ -50,7 +50,7 @@ export default function InlineNotices( {
 	}
 
 	return (
-		<div className={ clsx( 'components-inline-notices', className ) }>
+		<div className={ clsx( 'notices-inline-notices-wrapper', className ) }>
 			{ hasPinnedNotices && (
 				<NoticeList
 					notices={ nonDismissibleNotices }

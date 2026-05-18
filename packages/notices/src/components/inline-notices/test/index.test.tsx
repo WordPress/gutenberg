@@ -45,7 +45,7 @@ describe( 'InlineNotices', () => {
 		} );
 
 		expect( getInlineNoticesWrapper( container ) ).toHaveClass(
-			'components-inline-notices',
+			'notices-inline-notices-wrapper',
 			'my-inline-notices'
 		);
 	} );
