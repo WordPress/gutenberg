@@ -1,7 +1,13 @@
 /**
  * External dependencies
  */
-import { render, screen, waitFor, getByText } from '@testing-library/react';
+import {
+	act,
+	render,
+	screen,
+	waitFor,
+	getByText,
+} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { CSSProperties } from 'react';
 
@@ -722,6 +728,56 @@ describe( 'Popover', () => {
 			trigger.focus();
 
 			await new Promise( ( resolve ) => setTimeout( resolve, 50 ) );
+			expect( onFocusOutside ).not.toHaveBeenCalled();
+
+			document.body.removeChild( slot );
+		} );
+
+		it( 'should not call onFocusOutside when focus is restored to a popover descendant by the time the blur check runs', async () => {
+			// Simulates the base-ui Select backdrop dismissal path: the
+			// currently-focused element (in the body-level slot) drops
+			// focus to `body` when the backdrop is clicked, then focus is
+			// restored to the popover trigger after the popup unmounts.
+			const onFocusOutside = jest.fn();
+
+			const slot = document.createElement( 'div' );
+			slot.setAttribute( 'data-wp-compat-overlay-slot', '' );
+			const slotButton = document.createElement( 'button' );
+			slotButton.textContent = 'Slotted item';
+			slot.appendChild( slotButton );
+			document.body.appendChild( slot );
+
+			render(
+				<Popover
+					data-testid="popover"
+					onFocusOutside={ onFocusOutside }
+				>
+					<button>Trigger</button>
+				</Popover>
+			);
+
+			const trigger = screen.getByText( 'Trigger' );
+			const floating = screen.getByTestId( 'popover' );
+
+			await act( async () => {
+				slotButton.focus();
+				// Native blur fires when focus leaves an element to `body`
+				// (no related target). The blur is dispatched here against
+				// the floating popover content (event.target = floating
+				// element, which is the wrapper bound to useFocusOutside).
+				floating.dispatchEvent(
+					new FocusEvent( 'blur', {
+						bubbles: true,
+						relatedTarget: null,
+					} )
+				);
+				// Restore focus to the popover descendant synchronously,
+				// before the blur-check timeout runs.
+				trigger.focus();
+				// Let the blur-check timeout (setTimeout(0)) run.
+				await new Promise( ( resolve ) => setTimeout( resolve, 50 ) );
+			} );
+
 			expect( onFocusOutside ).not.toHaveBeenCalled();
 
 			document.body.removeChild( slot );

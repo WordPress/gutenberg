@@ -279,33 +279,45 @@ const UnforwardedPopover = (
 				) {
 					return;
 				}
-				// Ignore blur events whose `relatedTarget` is logically inside
-				// this popover. This covers two cases caused by portaled
-				// descendants:
-				// 1. Focus moves into the `@wordpress/ui` compat overlay slot:
-				//    some `@wordpress/ui` overlays (e.g. `Select`) portal their
-				//    popup to a body-level slot and move DOM focus into it.
+				// Ignore blur events caused by portaled descendants, which
+				// look like "focus leaving the popover" via DOM containment
+				// alone but are logically internal. Covers three cases:
+				// 1. Focus moves into the `@wordpress/ui` compat overlay
+				//    slot — some `@wordpress/ui` overlays (e.g. `Select`)
+				//    portal their popup to a body-level slot and move DOM
+				//    focus into it.
 				// 2. Focus moves back from a portaled descendant into the
-				//    popover (e.g. base-ui's `FloatingFocusManager` restoring
-				//    focus to its trigger when the popup closes).
-				// Both look like "focus leaving the popover" via DOM
-				// containment alone, but are logically internal.
+				//    popover (e.g. base-ui's `FloatingFocusManager`
+				//    restoring focus to its trigger when the popup closes
+				//    via Esc / item selection).
+				// 3. A portaled descendant briefly dropped focus on `body`
+				//    while closing, then focus was restored to the popover
+				//    (e.g. base-ui's `Select` `modal: true` backdrop click,
+				//    where the backdrop blurs the trigger to `body` before
+				//    the popup unmounts and restores focus).
 				// See https://github.com/WordPress/gutenberg/issues/78406.
 				const relatedTarget =
 					'relatedTarget' in event ? event.relatedTarget : null;
-				if ( relatedTarget instanceof Element ) {
-					if (
-						relatedTarget.closest( '[data-wp-compat-overlay-slot]' )
-					) {
-						return;
-					}
-					// Note: only the floating element is checked; the
-					// reference element falls back to the popover's parent
-					// when no `anchor` is provided, which would also include
-					// arbitrary siblings.
-					if ( floatingElement?.contains( relatedTarget ) ) {
-						return;
-					}
+				if (
+					relatedTarget instanceof Element &&
+					relatedTarget.closest( '[data-wp-compat-overlay-slot]' )
+				) {
+					return;
+				}
+				// Note: only the floating element is checked; the reference
+				// element falls back to the popover's parent when no
+				// `anchor` is provided, which would also include arbitrary
+				// siblings.
+				if (
+					floatingElement &&
+					( ( relatedTarget instanceof Element &&
+						floatingElement.contains( relatedTarget ) ) ||
+						( ownerDocument?.activeElement instanceof Element &&
+							floatingElement.contains(
+								ownerDocument.activeElement
+							) ) )
+				) {
+					return;
 				}
 				// Call onFocusOutside if defined or call onClose.
 				if ( onFocusOutside ) {
