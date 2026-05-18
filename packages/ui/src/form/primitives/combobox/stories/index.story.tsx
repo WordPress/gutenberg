@@ -374,6 +374,9 @@ export const WithCustomZIndex: Story = {
 						/>
 					}
 				>
+					<div style={ inputWrapperStyle }>
+						<Combobox.Input placeholder="Search" />
+					</div>
 					<Combobox.List>
 						<Combobox.ListBody>
 							<Combobox.Collection>
