@@ -8,8 +8,8 @@ import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
  */
 import {
 	getRelativeRootSelector,
-	buildStyleStateSelector,
-	buildStateSelector,
+	buildRootStyleStateSelector,
+	buildPseudoStyleStateSelector,
 } from '../state-utils';
 
 describe( 'getRelativeRootSelector', () => {
@@ -67,39 +67,41 @@ describe( 'state selector builders', () => {
 	} );
 
 	it( 'scopes root state styles to the descendant element from selectors.root', () => {
-		expect( buildStyleStateSelector( BASE, 'test/button' ) ).toBe(
+		expect( buildRootStyleStateSelector( BASE, 'test/button' ) ).toBe(
 			`${ BASE } .wp-block-button__link`
 		);
 	} );
 
 	it( 'falls back to the base selector when block has no selectors.root', () => {
-		expect( buildStyleStateSelector( BASE, 'test/plain' ) ).toBe( BASE );
+		expect( buildRootStyleStateSelector( BASE, 'test/plain' ) ).toBe(
+			BASE
+		);
 	} );
 
 	it( 'scopes pseudo states to the descendant element from selectors.root', () => {
-		expect( buildStateSelector( BASE, 'test/button', ':hover' ) ).toBe(
-			`${ BASE } .wp-block-button__link:hover`
-		);
+		expect(
+			buildPseudoStyleStateSelector( BASE, 'test/button', ':hover' )
+		).toBe( `${ BASE } .wp-block-button__link:hover` );
 	} );
 
 	it( 'works for :focus and :active states', () => {
-		expect( buildStateSelector( BASE, 'test/button', ':focus' ) ).toBe(
-			`${ BASE } .wp-block-button__link:focus`
-		);
-		expect( buildStateSelector( BASE, 'test/button', ':active' ) ).toBe(
-			`${ BASE } .wp-block-button__link:active`
-		);
+		expect(
+			buildPseudoStyleStateSelector( BASE, 'test/button', ':focus' )
+		).toBe( `${ BASE } .wp-block-button__link:focus` );
+		expect(
+			buildPseudoStyleStateSelector( BASE, 'test/button', ':active' )
+		).toBe( `${ BASE } .wp-block-button__link:active` );
 	} );
 
 	it( 'falls back to appending state to the base selector when block has no selectors.root', () => {
-		expect( buildStateSelector( BASE, 'test/plain', ':hover' ) ).toBe(
-			`${ BASE }:hover`
-		);
+		expect(
+			buildPseudoStyleStateSelector( BASE, 'test/plain', ':hover' )
+		).toBe( `${ BASE }:hover` );
 	} );
 
 	it( 'falls back to appending state to the base selector for an unknown block name', () => {
-		expect( buildStateSelector( BASE, 'test/unknown', ':hover' ) ).toBe(
-			`${ BASE }:hover`
-		);
+		expect(
+			buildPseudoStyleStateSelector( BASE, 'test/unknown', ':hover' )
+		).toBe( `${ BASE }:hover` );
 	} );
 } );

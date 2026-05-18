@@ -50,8 +50,8 @@ import {
 } from './block-style-state';
 import { BlockStateBadges, VALID_BLOCK_PSEUDO_STATES } from './states';
 import {
-	buildStyleStateSelector,
-	buildStateSelector,
+	buildRootStyleStateSelector,
+	buildPseudoStyleStateSelector,
 	buildCanvasStateSelector,
 } from './state-utils';
 import { BlockInspectorPreTabsFill } from '../components/block-inspector/inspector-pre-tabs-slot-fill';
@@ -240,7 +240,7 @@ function getPseudoStateCSSRules( style, name, baseSelector ) {
 	validPseudoStates.forEach( ( pseudoState ) => {
 		const stateStyles = style?.[ pseudoState ];
 		if ( stateStyles ) {
-			const selector = buildStateSelector(
+			const selector = buildPseudoStyleStateSelector(
 				baseSelector,
 				name,
 				pseudoState
@@ -281,7 +281,7 @@ export function getResponsiveStateCSSRules( style, name, baseSelector ) {
 			const viewportCSSRules = [];
 			const rootCSS = getStateStylesCSS(
 				getRootStateStyles( viewportStyles, nestedStateKeys ),
-				buildStyleStateSelector( baseSelector, name )
+				buildRootStyleStateSelector( baseSelector, name )
 			);
 			if ( rootCSS ) {
 				viewportCSSRules.push( rootCSS );

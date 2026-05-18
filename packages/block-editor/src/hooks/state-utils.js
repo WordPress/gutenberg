@@ -48,7 +48,7 @@ export function getRelativeRootSelector( rootSelector ) {
  * @param {string} name         The block name, used to look up selectors.
  * @return {string} The fully-scoped CSS selector for root state styles.
  */
-export function buildStyleStateSelector( baseSelector, name ) {
+export function buildRootStyleStateSelector( baseSelector, name ) {
 	const rootSelector = getBlockType( name )?.selectors?.root;
 	if ( rootSelector ) {
 		const relativeSelector = getRelativeRootSelector( rootSelector );
@@ -73,8 +73,8 @@ export function buildStyleStateSelector( baseSelector, name ) {
  * @param {string} state        The pseudo-class string, e.g. ":hover".
  * @return {string} The fully-scoped CSS selector for this state.
  */
-export function buildStateSelector( baseSelector, name, state ) {
-	return `${ buildStyleStateSelector( baseSelector, name ) }${ state }`;
+export function buildPseudoStyleStateSelector( baseSelector, name, state ) {
+	return `${ buildRootStyleStateSelector( baseSelector, name ) }${ state }`;
 }
 
 /**
