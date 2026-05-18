@@ -116,7 +116,15 @@ describe( 'prePersistPostType', () => {
 				.mockReturnValue( mockSerializedDoc ),
 		} );
 
-		const record = { id: 123, status: 'publish' };
+		const basePersistedCRDTDoc = 'base-crdt-doc-data';
+		const record = {
+			id: 123,
+			status: 'publish',
+			meta: {
+				[ POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE ]:
+					basePersistedCRDTDoc,
+			},
+		};
 		const edits = {};
 		const result = await prePersistPostType( record, edits, 'post', false );
 
@@ -127,7 +135,8 @@ describe( 'prePersistPostType', () => {
 		expect( getSyncManager ).toHaveBeenCalled();
 		expect( getSyncManager().createPersistedCRDTDoc ).toHaveBeenCalledWith(
 			'postType/post',
-			123
+			123,
+			{ basePersistedCRDTDoc }
 		);
 
 		getSyncManager.mockReset();

@@ -21,6 +21,7 @@ import {
 import { getProviderCreators } from './providers';
 import type {
 	CollectionHandlers,
+	CreatePersistedCRDTDocOptions,
 	CRDTDoc,
 	EntityID,
 	ObjectID,
@@ -37,6 +38,7 @@ import { createUndoManager } from './undo-manager';
 import {
 	createYjsDoc,
 	deserializeCrdtDoc,
+	getPersistedCrdtDocVersion,
 	initializeYjsDoc,
 	markEntityAsSaved,
 	serializeCrdtDoc,
@@ -58,6 +60,10 @@ interface EntityState {
 	syncConfig: SyncConfig;
 	unload: () => void;
 	ydoc: CRDTDoc;
+}
+
+interface ApplyPersistedCrdtDocOptions {
+	shouldPersist?: boolean;
 }
 
 /**
@@ -451,12 +457,15 @@ export function createSyncManager( debug = false ): SyncManager {
 	 * @param {ObjectType} objectType Object type.
 	 * @param {ObjectID}   objectId   Object ID.
 	 * @param {ObjectData} record     Entity record representing this object type.
+	 * @param {Object}     options    Options for applying the persisted CRDT document.
 	 */
 	function _applyPersistedCrdtDoc(
 		objectType: ObjectType,
 		objectId: ObjectID,
-		record: ObjectData
+		record: ObjectData,
+		options: ApplyPersistedCrdtDocOptions = {}
 	): void {
+		const { shouldPersist = true } = options;
 		const entityId = getEntityId( objectType, objectId );
 		const entityState = entityStates.get( entityId );
 
@@ -486,7 +495,9 @@ export function createSyncManager( debug = false ): SyncManager {
 			// calling `syncManager.createPersistedCRDTDoc`.
 			targetDoc.transact( () => {
 				applyChangesToCRDTDoc( targetDoc, record );
-				handlers.persistCRDTDoc();
+				if ( shouldPersist ) {
+					handlers.persistCRDTDoc();
+				}
 			}, LOCAL_SYNC_MANAGER_ORIGIN );
 			return;
 		}
@@ -543,8 +554,29 @@ export function createSyncManager( debug = false ): SyncManager {
 		// `syncManager.createPersistedCRDTDoc`.
 		targetDoc.transact( () => {
 			applyChangesToCRDTDoc( targetDoc, changes );
-			handlers.persistCRDTDoc();
+			if ( shouldPersist ) {
+				handlers.persistCRDTDoc();
+			}
 		}, LOCAL_SYNC_MANAGER_ORIGIN );
+	}
+
+	/**
+	 * Apply a persisted CRDT document and flush resulting changes into the local
+	 * entity record.
+	 *
+	 * @param {ObjectType} objectType Object type.
+	 * @param {ObjectID}   objectId   Object ID.
+	 * @param {ObjectData} record     Entity record representing this object type.
+	 */
+	async function applyPersistedCRDTDoc(
+		objectType: ObjectType,
+		objectId: ObjectID,
+		record: ObjectData
+	): Promise< void > {
+		internal.applyPersistedCrdtDoc( objectType, objectId, record, {
+			shouldPersist: false,
+		} );
+		await internal.updateEntityRecord( objectType, objectId );
 	}
 
 	/**
@@ -649,7 +681,8 @@ export function createSyncManager( debug = false ): SyncManager {
 	 */
 	async function createPersistedCRDTDoc(
 		objectType: ObjectType,
-		objectId: ObjectID
+		objectId: ObjectID,
+		options: CreatePersistedCRDTDocOptions = {}
 	): Promise< string | null > {
 		const entityId = getEntityId( objectType, objectId );
 		const entityState = entityStates.get( entityId );
@@ -663,7 +696,11 @@ export function createSyncManager( debug = false ): SyncManager {
 		// before we serialize the document.
 		await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
 
-		return serializeCrdtDoc( entityState.ydoc );
+		return serializeCrdtDoc( entityState.ydoc, {
+			baseVersion: getPersistedCrdtDocVersion(
+				options.basePersistedCRDTDoc
+			),
+		} );
 	}
 
 	// Collect internal functions so that they can be wrapped before calling.
@@ -674,6 +711,7 @@ export function createSyncManager( debug = false ): SyncManager {
 
 	// Wrap and return the public API.
 	return {
+		applyPersistedCRDTDoc: debugWrap( applyPersistedCRDTDoc ),
 		createPersistedCRDTDoc: debugWrap( createPersistedCRDTDoc ),
 		getAwareness,
 		load: debugWrap( loadEntity ),

@@ -312,7 +312,13 @@ export const prePersistPostType = async (
 		const objectId = persistedRecord.id;
 		const serializedDoc = await getSyncManager()?.createPersistedCRDTDoc(
 			objectType,
-			objectId
+			objectId,
+			{
+				basePersistedCRDTDoc:
+					persistedRecord?.meta?.[
+						POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE
+					] || null,
+			}
 		);
 
 		if ( serializedDoc ) {

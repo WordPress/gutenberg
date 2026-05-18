@@ -742,6 +742,7 @@ describe( 'saveEntityRecord', () => {
 
 	beforeEach( async () => {
 		apiFetch.mockReset();
+		getSyncManager.mockReset();
 		dispatch = Object.assign( jest.fn(), {
 			receiveEntityRecords: jest.fn(),
 			__unstableAcquireStoreLock: jest.fn(),
@@ -1045,6 +1046,121 @@ describe( 'saveEntityRecord', () => {
 		);
 
 		expect( result ).toBe( postType );
+	} );
+
+	it( 'refetches, merges, and retries when persisted CRDT document meta is stale', async () => {
+		const staleError = {
+			code: 'rest_crdt_document_stale',
+			data: { status: 409 },
+		};
+		const post = { id: 10, title: 'local title', meta: {} };
+		const latestRecord = {
+			id: 10,
+			title: 'server title',
+			meta: { _crdt_document: 'server-crdt-doc' },
+		};
+		const mergedRecord = {
+			id: 10,
+			title: 'merged title',
+			meta: {},
+		};
+		const updatedRecord = {
+			id: 10,
+			title: 'merged title',
+			meta: { _crdt_document: 'fresh-crdt-doc' },
+		};
+		const prePersist = jest
+			.fn()
+			.mockResolvedValueOnce( {
+				meta: { _crdt_document: 'stale-crdt-doc' },
+			} )
+			.mockResolvedValueOnce( {
+				meta: { _crdt_document: 'fresh-crdt-doc' },
+			} );
+		const configs = [
+			{
+				name: 'post',
+				kind: 'postType',
+				baseURL: '/wp/v2/posts',
+				baseURLParams: { context: 'edit' },
+				syncConfig: {},
+				__unstablePrePersist: prePersist,
+			},
+		];
+		const select = {
+			getRawEntityRecord: jest.fn( () => post ),
+			getEditedEntityRecord: jest.fn( () => mergedRecord ),
+		};
+		const resolveSelect = { getEntitiesConfig: jest.fn( () => configs ) };
+		const syncManager = {
+			applyPersistedCRDTDoc: jest.fn(),
+			update: jest.fn(),
+		};
+		getSyncManager.mockReturnValue( syncManager );
+		apiFetch
+			.mockRejectedValueOnce( staleError )
+			.mockResolvedValueOnce( latestRecord )
+			.mockResolvedValueOnce( updatedRecord );
+
+		const result = await saveEntityRecord(
+			'postType',
+			'post',
+			post
+		)( { select, dispatch, resolveSelect } );
+
+		expect( apiFetch ).toHaveBeenCalledTimes( 3 );
+		expect( apiFetch ).toHaveBeenNthCalledWith( 1, {
+			path: '/wp/v2/posts/10',
+			method: 'PUT',
+			data: {
+				...post,
+				meta: { _crdt_document: 'stale-crdt-doc' },
+			},
+		} );
+		expect( apiFetch ).toHaveBeenNthCalledWith( 2, {
+			path: '/wp/v2/posts/10?context=edit',
+		} );
+		expect( apiFetch ).toHaveBeenNthCalledWith( 3, {
+			path: '/wp/v2/posts/10',
+			method: 'PUT',
+			data: {
+				...mergedRecord,
+				meta: { _crdt_document: 'fresh-crdt-doc' },
+			},
+		} );
+		expect( dispatch.receiveEntityRecords ).toHaveBeenNthCalledWith(
+			1,
+			'postType',
+			'post',
+			latestRecord,
+			undefined,
+			true
+		);
+		expect( syncManager.applyPersistedCRDTDoc ).toHaveBeenCalledWith(
+			'postType/post',
+			10,
+			latestRecord
+		);
+		expect( dispatch.receiveEntityRecords ).toHaveBeenNthCalledWith(
+			2,
+			'postType',
+			'post',
+			updatedRecord,
+			undefined,
+			true,
+			{
+				...mergedRecord,
+				meta: { _crdt_document: 'fresh-crdt-doc' },
+			}
+		);
+		expect( syncManager.update ).toHaveBeenCalledWith(
+			'postType/post',
+			10,
+			updatedRecord,
+			undefined,
+			{ isSave: true }
+		);
+		expect( result ).toBe( updatedRecord );
 	} );
 } );
 
