@@ -51,25 +51,40 @@ test.describe( 'Collaboration with large documents', () => {
 		// code path ran: onDocUpdate detected the oversized update,
 		// emitted the status, and unregistered the room.
 		await page.waitForFunction(
-			() =>
-				window?.wp?.data
-					?.select( 'core/editor' )
-					?.isCollaborationEnabledForCurrentPost?.() === false,
-			undefined,
+			( consent ) => {
+				const privateApis = ( window as any ).wp.privateApis;
+				const { unlock } =
+					privateApis.__dangerousOptInToUnstableAPIsOnlyForCoreModules(
+						consent,
+						'@wordpress/core-data'
+					);
+				return (
+					unlock(
+						window.wp.data.select( 'core/editor' )
+					).isCollaborationEnabledForCurrentPost() === false
+				);
+			},
+			'I acknowledge private features are not for use in themes or plugins and doing so will break in the next version of WordPress.',
 			{ timeout: 15000 }
 		);
 
 		// Verify the sync connection status is 'disconnected' with
 		// a 'document-size-limit-exceeded' error code.
-		const syncStatus = await page.evaluate( () => {
-			const status = window.wp.data
-				.select( 'core' )
-				.getSyncConnectionStatus();
+		const syncStatus = await page.evaluate( ( consent ) => {
+			const privateApis = ( window as any ).wp.privateApis;
+			const { unlock } =
+				privateApis.__dangerousOptInToUnstableAPIsOnlyForCoreModules(
+					consent,
+					'@wordpress/core-data'
+				);
+			const status = unlock(
+				window.wp.data.select( 'core' )
+			).getSyncConnectionStatus();
 			return {
 				status: status?.status,
 				errorCode: status?.error?.code,
 			};
-		} );
+		}, 'I acknowledge private features are not for use in themes or plugins and doing so will break in the next version of WordPress.' );
 		expect( syncStatus ).toEqual( {
 			status: 'disconnected',
 			errorCode: 'document-size-limit-exceeded',

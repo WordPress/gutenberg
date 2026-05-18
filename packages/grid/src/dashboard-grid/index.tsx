@@ -36,10 +36,17 @@ import {
  * Internal dependencies
  */
 import { GridItem } from './grid-item';
+import { GridOverlay } from '../shared/grid-overlay';
 import { resolveFillWidths } from './resolve-fill-widths';
 import type { DashboardGridLayoutItem, DashboardGridProps } from './types';
 import type { ResizeDelta } from '../shared/types';
 import styles from './grid.module.css';
+
+// Fallback gap in pixels for math that runs before the computed gap
+// can be read from the DOM. Matches the `'md'` step the surface
+// resolves to in CSS (`--wpds-dimension-gap-md`); the next layout
+// effect overwrites this with the actual computed value.
+const FALLBACK_GAP_PX = 12;
 
 // Reorder is driven by `temporaryLayout` + CSS Grid, not by dnd-kit
 // transforms. Hoist the no-op strategy outside the component so its
@@ -88,7 +95,6 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 			children,
 			className,
 			style,
-			spacing = 2,
 			rowHeight = 'auto',
 			minColumnWidth,
 			editMode = false,
@@ -96,6 +102,7 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 			onPreviewLayout,
 			renderResizeHandle,
 			renderDragPreview,
+			renderGridOverlay,
 			...divProps
 		} = props;
 		// Preview layout applied during drag/resize before committing.
@@ -132,6 +139,7 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 
 		const rootRef = useRef< HTMLDivElement >( null );
 		const [ containerWidth, setContainerWidth ] = useState( 0 );
+		const [ gapPx, setGapPx ] = useState( FALLBACK_GAP_PX );
 		const resizeObserverRef = useResizeObserver(
 			( [ { contentRect } ] ) => {
 				setContainerWidth( contentRect.width );
@@ -144,16 +152,24 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 		] );
 
 		// Measure before paint to avoid a single-column flash in
-		// responsive mode; `useResizeObserver` delivers async.
+		// responsive mode; `useResizeObserver` delivers async. The
+		// computed `column-gap` is read from the resolved CSS so the
+		// math tracks the design-system token under any density.
 		useLayoutEffect( () => {
-			if ( rootRef.current ) {
-				const { width } = rootRef.current.getBoundingClientRect();
-				if ( width > 0 ) {
-					setContainerWidth( width );
-				}
+			if ( ! rootRef.current ) {
+				return;
+			}
+			const { width } = rootRef.current.getBoundingClientRect();
+			if ( width > 0 ) {
+				setContainerWidth( width );
+			}
+			const parsed = Number.parseFloat(
+				window.getComputedStyle( rootRef.current ).columnGap
+			);
+			if ( Number.isFinite( parsed ) && parsed > 0 ) {
+				setGapPx( parsed );
 			}
 		}, [] );
-		const gapPx = spacing * 4;
 		const effectiveColumns = useMemo( () => {
 			if ( ! minColumnWidth ) {
 				return columns;
@@ -473,6 +489,30 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 				</div>
 			) : null;
 
+		// Edit-mode background visual. Default paints diagonal stripes
+		// and dashed track guides; a consumer can replace it via
+		// `renderGridOverlay` while reusing the resolved column count,
+		// gap, and row height. `'auto'` collapses to `undefined` for
+		// the overlay so it falls back to columns-only (row dividers
+		// have no anchor when the row height is content-driven).
+		// Rendered unconditionally so the overlay can cross-fade on
+		// edit-mode toggles; `isActive` drives the opacity transition
+		// inside the overlay. Memoized so drag/resize re-renders skip
+		// reconciliation while inputs are stable.
+		const Overlay = renderGridOverlay ?? GridOverlay;
+		const overlayRowHeight =
+			typeof rowHeight === 'number' ? rowHeight : undefined;
+		const gridOverlay = useMemo(
+			() => (
+				<Overlay
+					columns={ effectiveColumns }
+					rowHeight={ overlayRowHeight }
+					isActive={ editMode }
+				/>
+			),
+			[ Overlay, editMode, effectiveColumns, overlayRowHeight ]
+		);
+
 		return (
 			<DndContext
 				sensors={ sensors }
@@ -492,13 +532,16 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 						{ ...divProps }
 						ref={ mergedGridRef }
 						className={ clsx( styles.grid, className ) }
+						data-wp-dashboard-grid-resizing={
+							isResizing || undefined
+						}
 						style={ {
 							...style,
 							gridTemplateColumns: `repeat(${ effectiveColumns }, minmax(0, 1fr))`,
 							gridAutoRows: rowHeight,
-							gap: gapPx,
 						} }
 					>
+						{ gridOverlay }
 						{ items.map( ( id ) => (
 							<GridItem
 								key={ id }

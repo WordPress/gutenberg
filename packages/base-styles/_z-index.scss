@@ -6,12 +6,8 @@
 
 $z-layers: (
 	".block-editor-block-list__block.is-selected": 20,
-	".editor-text-editor__toolbar": 1,
 
 	".components-modal__header": 10,
-	".edit-post-meta-boxes-area.is-loading::before": 1,
-	".edit-post-meta-boxes-area .spinner": 5,
-	".components-popover__close": 5,
 	".edit-post-layout__footer": 30,
 	".interface-interface-skeleton__header": 30,
 	".interface-interface-skeleton__content": 20,
@@ -128,15 +124,6 @@ $z-layers: (
 
 	// Appear under the topbar.
 	".customize-widgets__block-toolbar": 7,
-
-	// Ensure checkbox + actions don't overlap table header
-	".dataviews-view-table thead": 1,
-
-	// Ensure selection checkbox stays above the preview field.
-	".dataviews-view-grid__card .dataviews-selection-checkbox": 1,
-
-	// Ensure footer stays above the preview field.
-	".dataviews-footer": 2,
 
 	// Needs to be below media library (.media-model) that has a z-index of 160000.
 	".components-popover.components-dropdown__content.dataforms-layouts-panel__field-dropdown": 160000 - 10,

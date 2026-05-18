@@ -194,9 +194,6 @@ jobs:
             matrix:
                 IS_GUTENBERG_PLUGIN: [true, false]
 
-        outputs:
-            job_status: ${{ job.status }}
-
         steps:
             - name: Checkout code
               uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -261,9 +258,16 @@ jobs:
             packages: write
         if: |
             always() &&
-            needs.build.outputs.job_status == 'success' &&
+            needs.build.result == 'success' &&
             github.repository == 'WordPress/gutenberg' &&
-            github.event_name == 'push'
+            (
+              github.event_name == 'push' ||
+              github.event_name == 'workflow_dispatch' ||
+              (
+                github.event_name == 'pull_request' &&
+                github.event.pull_request.head.repo.full_name == github.repository
+              )
+            )
 
         steps:
             - name: Download build artifact
@@ -275,8 +279,12 @@ jobs:
               run: unzip gutenberg.zip && rm gutenberg.zip
 
             # Noting the hash helps keep track of the commit the zip was built from.
+            # For pull_request events, github.sha is the ephemeral merge commit; use the PR head SHA instead
+            # so the recorded value points to a real, branch-reachable commit.
             - name: Add a file for tracking the SHA value used.
-              run: echo "${{ github.sha }}" > .gutenberg-hash
+              env:
+                  SOURCE_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
+              run: echo "$SOURCE_SHA" > .gutenberg-hash
 
             - name: Recompress as a .gz file
               run: tar -czf ${{ runner.temp }}/gutenberg.tar.gz . && mv ${{ runner.temp }}/gutenberg.tar.gz .
@@ -297,12 +305,41 @@ jobs:
             # Container Registry. The organization name is WordPress, so ${{ github.repository }} causes an error.
             # See https://github.com/orgs/community/discussions/27086 for more info.
             - name: Push built plugin .tar.gz file to GitHub Container Registry
+              env:
+                  SOURCE_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
               run: |
-                  oras push "ghcr.io/wordpress/gutenberg/gutenberg-wp-develop-build:${{ github.sha }}" \
+                  oras push "ghcr.io/wordpress/gutenberg/gutenberg-wp-develop-build:${SOURCE_SHA}" \
                   "gutenberg.tar.gz:application/gzip" \
-                  --annotation "org.opencontainers.image.description=Gutenberg plugin build for commit ${{ github.sha }}" \
+                  --annotation "org.opencontainers.image.description=Gutenberg plugin build for commit ${SOURCE_SHA}" \
                   --annotation "org.opencontainers.image.source=https://github.com/${{ github.repository }}" \
-                  --annotation "org.opencontainers.image.revision=${{ github.sha }}"
+                  --annotation "org.opencontainers.image.revision=${SOURCE_SHA}"
+
+            # Compute the mutable tag from the event. GitHub Actions expressions can't do string replacement,
+            # so the branch-name-to-tag conversion (release/19.5 -> release-19.5) must happen in bash.
+            - name: Determine mutable tag
+              id: mutable_tag
+              env:
+                  EVENT_NAME: ${{ github.event_name }}
+                  GITHUB_REF: ${{ github.ref }}
+                  PR_NUMBER: ${{ github.event.pull_request.number }}
+              run: |
+                  if [[ "$EVENT_NAME" == "pull_request" ]]; then
+                      TAG="pr-${PR_NUMBER}"
+                  else
+                      BRANCH="${GITHUB_REF#refs/heads/}"
+                      TAG="${BRANCH//\//-}"
+                  fi
+                  TAG="$(echo "$TAG" | tr '[:upper:]' '[:lower:]')"
+                  echo "value=${TAG}" >> "$GITHUB_OUTPUT"
+
+            # Add a mutable tag alongside the SHA tag so developers can pull "the latest build for this stream"
+            # (e.g. :trunk, :pr-12345, :release-19.5) without needing to update a pinned SHA.
+            - name: Add mutable tag for the built plugin
+              env:
+                  SOURCE_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
+                  MUTABLE_TAG: ${{ steps.mutable_tag.outputs.value }}
+              run: |
+                  oras tag "ghcr.io/wordpress/gutenberg/gutenberg-wp-develop-build:${SOURCE_SHA}" "${MUTABLE_TAG}"
 
     revert-version-bump:
         name: Revert version bump if build failed
@@ -312,7 +349,7 @@ jobs:
             contents: write
         if: |
             always() &&
-            ( needs.build.outputs.job_status == 'failure' ) &&
+            needs.build.result == 'failure' &&
             needs.bump-version.outputs.release_branch_commit
 
         steps:

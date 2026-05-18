@@ -11,6 +11,7 @@ export type {
 } from './dashboard-lanes/types';
 export type {
 	DragPreviewRenderProps,
+	GridOverlayRenderProps,
 	ResizeDelta,
 	ResizeHandleRenderProps,
 } from './shared/types';

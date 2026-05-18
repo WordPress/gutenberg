@@ -1,5 +1,7 @@
 .grid {
 	width: 100%;
+	/* Drag placeholder outline radius: matches `.tile` and `@wordpress/ui` Card (`--wpds-border-radius-lg`). */
+	--wp-grid-placeholder-radius: var(--wpds-border-radius-lg);
 }
 
 .tile {
@@ -14,6 +16,17 @@
 .tileEditMode:hover,
 .tileEditMode:focus-visible {
 	box-shadow: var(--wpds-elevation-md);
+}
+
+/*
+ * While a resize is in progress, the pointer often sits over the tile;
+ * keep resting elevation so the hover lift does not flicker or fight the
+ * gesture. `data-wp-dashboard-grid-resizing` is set on `@wordpress/grid`
+ * `DashboardGrid` root for the duration of the resize.
+ */
+:global([data-wp-dashboard-grid-resizing]) .tileEditMode:hover,
+:global([data-wp-dashboard-grid-resizing]) .tileEditMode:focus-visible {
+	box-shadow: var(--wpds-elevation-xs);
 }
 
 .tileEditMode:focus-visible {
@@ -39,6 +52,6 @@
 
 @media not ( prefers-reduced-motion ) {
 	.tile {
-		transition: box-shadow 180ms ease;
+		transition: box-shadow var(--wpds-motion-duration-md) var(--wpds-motion-easing-subtle);
 	}
 }

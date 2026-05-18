@@ -74,7 +74,6 @@ function Dashboard() {
 		<DashboardGrid
 			layout={ current }
 			columns={ 6 }
-			spacing={ 2 }
 			editMode
 			onChangeLayout={ setCurrent }
 		>
@@ -119,7 +118,6 @@ interface DashboardGridLayoutItem {
 | `children` | `ReactNode` | — | Required. Each child needs a `key` matching a layout entry. |
 | `columns` | `number` | `6` | Total columns (fixed mode). |
 | `minColumnWidth` | `number` | — | If set, enables responsive mode: columns derived from container width. Mutually exclusive with `columns`. |
-| `spacing` | `number` | `2` | Gap multiplier. Effective gap = `spacing * 4px`. |
 | `rowHeight` | `number \| 'auto'` | `'auto'` | Row height in pixels, or `'auto'` to let content size rows. |
 | `editMode` | `boolean` | `false` | Enables drag-to-reorder and resize handles. |
 | `onChangeLayout` | `( layout ) => void` | — | Fired when the user commits a drag or resize. |
@@ -131,8 +129,11 @@ interface DashboardGridLayoutItem {
 `DashboardGrid` forwards refs to its root `<div>`, and standard
 `<div>` attributes (`id`, `aria-*`, `data-*`, event handlers,
 `style`, etc.) flow through. The grid's own layout styles
-(`gridTemplateColumns`, `gridAutoRows`, `gap`) override any
-user-supplied `style` for those properties.
+(`gridTemplateColumns`, `gridAutoRows`) override any user-supplied
+`style` for those properties. The gap between tiles is owned by the
+design-system gap token (`--wpds-dimension-gap-md` by default) and
+is not configurable per instance; theme it through a `ThemeProvider`
+density change or token override.
 
 #### Child-level props
 
@@ -177,7 +178,7 @@ When `editMode` is true:
   stays in place as a dashed placeholder while a clone follows the
   cursor through `<DragOverlay>`.
 - A resize handle appears on the bottom-right of each item. A
-  dashed outline previews the target size as the cursor moves.
+  solid outline previews the target size as the cursor moves.
 - While any tile is dragging or resizing, `actionableArea` content
   on every tile is set `inert` so hovers on other tiles can't steal
   the gesture.
@@ -224,7 +225,6 @@ function Pinboard() {
 		<DashboardLanes
 			layout={ current }
 			columns={ 4 }
-			spacing={ 2 }
 			editMode
 			onChangeLayout={ setCurrent }
 		>
@@ -275,7 +275,6 @@ items flow around them; out-of-range values (negative, or beyond
 | `children` | `ReactNode` | — | Required. Each child needs a `key` matching a layout entry. |
 | `columns` | `number` | `6` | Total lanes (fixed mode). |
 | `minColumnWidth` | `number` | — | If set, enables responsive mode: lane count derived from container width. Mutually exclusive with `columns`. |
-| `spacing` | `number` | `2` | Gap multiplier. Effective gap = `spacing * 4px`. |
 | `flowTolerance` | `number` | `16` | Pixel tolerance for source-order tiebreaking when two candidate lanes have similar baselines. Larger values keep tiles closer to reading order at the cost of bigger empty regions. |
 | `rowUnit` | `number` | `4` | Snap unit for the polyfill's `grid-row-start` math. Smaller values produce sharper placement at the cost of a larger implicit row count. Ignored on browsers with native `display: grid-lanes` support. |
 | `editMode` | `boolean` | `false` | Enables drag-to-reorder and horizontal resize. |
@@ -475,8 +474,10 @@ root itself via `style`). All values fall back to sensible defaults.
 |----------|---------|------------|
 | `--wp-grid-drag-preview-scale` | `1.05` | Lift scale of the drag-preview functional frame. Set to `1` to disable the lift. |
 | `--wp-grid-placeholder-opacity` | `0.4` | Opacity of the placeholder tile (the original item while a drag is in flight). |
-| `--wp-grid-placeholder-outline-color` | `var(--wpds-color-stroke-interactive-brand)` | Dashed outline color of the placeholder and of the resize-preview overlay. |
-| `--wp-grid-placeholder-radius` | `0` | Border radius of the placeholder, used to match the consumer's tile shape so the dashed outline traces the right silhouette. |
+| `--wp-grid-placeholder-outline-style` | `dashed` | Outline style of the drag placeholder (for example `solid` or `dotted`). |
+| `--wp-grid-resize-preview-outline-style` | `solid` | Border style of the resize-preview overlay (for example `dashed` or `dotted`). |
+| `--wp-grid-placeholder-outline-color` | `var(--wpds-color-stroke-interactive-brand)` | Outline color of the placeholder and of the resize-preview overlay. |
+| `--wp-grid-placeholder-radius` | `0` | Border radius of the placeholder, used to match the consumer's tile shape so the outline traces the right silhouette. |
 
 ---
 

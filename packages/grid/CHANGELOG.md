@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Add `--wp-grid-placeholder-outline-style` and
+    `--wp-grid-resize-preview-outline-style` CSS custom properties for
+    the drag-placeholder outline (default `dashed`) and resize-preview
+    border (default `solid`).
+-   Set `data-wp-dashboard-grid-resizing` on the `DashboardGrid` root
+    element while any tile resize gesture is active, so consumers can
+    adjust styles when the pointer may still hover tiles ([#78234](https://github.com/WordPress/gutenberg/pull/78234)).
+
 ### New Features
 
 -   Initial release. Ships two layout components:
@@ -26,6 +36,15 @@
     `--wp-grid-placeholder-opacity`,
     `--wp-grid-placeholder-outline-color`,
     `--wp-grid-placeholder-radius`).
+
+### Breaking changes
+
+-   Remove the `spacing` prop from `DashboardGrid` and `DashboardLanes`.
+    The gap between tiles is now owned by the design-system gap token
+    (`--wpds-dimension-gap-md`) applied in CSS; override via theme or
+    density rather than per instance. `GridOverlayRenderProps` no
+    longer exposes `spacing` or `gapPx`; the overlay inherits the same
+    gap token. The `DashboardGridSpacing` type export is removed.
 
 ### Internal
 

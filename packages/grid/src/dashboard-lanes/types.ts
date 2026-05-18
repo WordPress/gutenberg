@@ -3,6 +3,7 @@
  */
 import type {
 	DragPreviewRenderProps,
+	GridOverlayRenderProps,
 	ResizeHandleRenderProps,
 } from '../shared/types';
 
@@ -72,17 +73,12 @@ interface BaseDashboardLanesProps
 
 	/**
 	 * Inline styles on the surface root. Merged underneath the
-	 * surface's own layout styles, so `display`, `gridTemplateColumns`,
-	 * and `gap` always win.
+	 * surface's own layout styles, so `display` and
+	 * `gridTemplateColumns` always win. The gap between tiles is
+	 * owned by the design-system gap token and is not configurable
+	 * per instance; override it via a theme or density change.
 	 */
 	style?: React.CSSProperties;
-
-	/**
-	 * Gap multiplier (effective gap = `spacing * 4px`).
-	 *
-	 * @default 2
-	 */
-	spacing?: number;
 
 	/**
 	 * `flow-tolerance` value in pixels. When two candidate lanes
@@ -145,6 +141,17 @@ interface BaseDashboardLanesProps
 	 * properties documented in the README.
 	 */
 	renderDragPreview?: React.ComponentType< DragPreviewRenderProps >;
+
+	/**
+	 * Override the default edit-mode overlay (diagonal stripes plus
+	 * dashed column track guides) with a custom component. Lanes are
+	 * content-driven vertically, so no `rowHeight` is supplied and the
+	 * default visual paints columns only.
+	 *
+	 * The overlay only renders when `editMode` is true. When omitted,
+	 * the package's default visual is used.
+	 */
+	renderGridOverlay?: React.ComponentType< GridOverlayRenderProps >;
 }
 
 interface FixedDashboardLanesProps extends BaseDashboardLanesProps {

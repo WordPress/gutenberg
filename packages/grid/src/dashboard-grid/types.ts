@@ -3,6 +3,7 @@
  */
 import type {
 	DragPreviewRenderProps,
+	GridOverlayRenderProps,
 	ResizeDelta,
 	ResizeHandleRenderProps,
 } from '../shared/types';
@@ -144,17 +145,11 @@ interface BaseDashboardGridProps
 	/**
 	 * Inline styles applied to the grid root. Merged underneath the
 	 * grid's own layout styles, so the layout (`gridTemplateColumns`,
-	 * `gridAutoRows`, `gap`) always wins.
+	 * `gridAutoRows`) always wins. The gap between tiles is owned by
+	 * the design-system gap token and is not configurable per
+	 * instance; override it via a theme or density change.
 	 */
 	style?: React.CSSProperties;
-
-	/**
-	 * Grid gap multiplier size (e.g., a spacing of 2 results in a gap
-	 * of 8px, it's multiplied by 4).
-	 *
-	 * @default 2
-	 */
-	spacing?: number;
 
 	/**
 	 * Height of each row in pixels, or `'auto'` to let the tallest
@@ -209,6 +204,17 @@ interface BaseDashboardGridProps
 	 * properties documented in the README.
 	 */
 	renderDragPreview?: React.ComponentType< DragPreviewRenderProps >;
+
+	/**
+	 * Override the default edit-mode overlay (diagonal stripes plus
+	 * dashed column and row tracks) with a custom component. The grid
+	 * supplies the resolved column count, gap, and row height; the
+	 * consumer is responsible for the visual.
+	 *
+	 * The overlay only renders when `editMode` is true. When omitted,
+	 * the package's default visual is used.
+	 */
+	renderGridOverlay?: React.ComponentType< GridOverlayRenderProps >;
 }
 
 interface FixedDashboardGridProps extends BaseDashboardGridProps {

@@ -3,9 +3,7 @@ import { forwardRef } from '@wordpress/element';
 import type { PortalProps } from './types';
 
 /**
- * Root element that portals `Autocomplete` popup content. Pass to
- * `Autocomplete.Popup`'s `portal` prop. When `portal` is omitted,
- * `Autocomplete.Popup` uses this component with default props.
+ * Used to apply custom portal behavior to `Autocomplete`'s popup content.
  */
 const Portal = forwardRef< HTMLDivElement, PortalProps >(
 	function AutocompletePortal( props, ref ) {

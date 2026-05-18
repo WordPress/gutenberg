@@ -159,6 +159,13 @@ export type ViewportAction =
 	| { type: 'RESET_VIEWPORT' };
 
 /**
+ * Direction of a crop resize handle. Eight compass positions: four
+ * corners and four edge midpoints. Used by stencil callbacks and any
+ * overlay that needs to know which handle the user is dragging.
+ */
+export type HandlePosition = 'n' | 's' | 'e' | 'w' | 'nw' | 'ne' | 'sw' | 'se';
+
+/**
  * The contract for a pluggable stencil component.
  * Stencils render the crop area overlay and handle resize interactions.
  */
@@ -171,8 +178,14 @@ export interface StencilProps {
 	imageSize: Size;
 	/** Callback when the crop rectangle changes (during drag). */
 	onCropChange: ( rect: NormalizedRect ) => void;
-	/** Callback when a resize drag starts (pointerdown on handle). */
-	onResizeStart?: () => void;
+	/**
+	 * Callback when a resize interaction starts — pointerdown on a handle
+	 * or the first arrow-key press on a focused handle. The handle direction
+	 * is passed so downstream overlays can anchor to it. The argument is
+	 * optional to keep custom stencils that don't track a direction
+	 * backward-compatible.
+	 */
+	onResizeStart?: ( handle?: HandlePosition ) => void;
 	/** Callback when a resize drag ends (mouseup after handle drag). */
 	onResizeEnd?: () => void;
 	/** Optional fixed aspect ratio (width / height) in pixel space. */
@@ -190,4 +203,10 @@ export interface StencilProps {
 	};
 	/** Called when Escape is pressed on a resize handle. */
 	onEscape?: () => void;
+	/**
+	 * Minimum crop rect dimension in normalized space, per axis. Derived
+	 * by the host from a pixel-based floor (see `MIN_CROP_PIXELS`) and
+	 * the source image dimensions. Omit to use the stencil's default.
+	 */
+	minCropSize?: Size;
 }

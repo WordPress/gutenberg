@@ -253,6 +253,22 @@
 	/* For components that confirm decisions or handle necessary interruptions. Example: Modals. */
 	--wpds-elevation-lg: 0 5px 15px 0 #00000014, 0 15px 27px 0 #00000012,
 		0 30px 36px 0 #0000000a, 0 50px 43px 0 #00000005;
+	/* Micro-delays and transition offsets */
+	--wpds-motion-duration-xs: 50ms;
+	/* Micro-interactions like focus rings and state changes */
+	--wpds-motion-duration-sm: 100ms;
+	/* Standard transitions like menus and popovers */
+	--wpds-motion-duration-md: 200ms;
+	/* Deliberate animations like slides and reveals */
+	--wpds-motion-duration-lg: 300ms;
+	/* Extended animations like complex or multi-step transitions */
+	--wpds-motion-duration-xl: 400ms;
+	/* Nearly imperceptible easing for hover, color, and background transitions */
+	--wpds-motion-easing-subtle: cubic-bezier( 0.15, 0, 0.15, 1 );
+	/* General-purpose easing for on-screen movement like resizing, morphing, and layout shifts */
+	--wpds-motion-easing-balanced: cubic-bezier( 0.4, 0, 0.2, 1 );
+	/* Noticeable easing for enter/exit and spatial transitions like menus, popovers, dialogs, and drawers */
+	--wpds-motion-easing-expressive: cubic-bezier( 0.25, 0, 0, 1 );
 	/* Headings font family */
 	--wpds-typography-font-family-heading: -apple-system, system-ui, 'Segoe UI',
 		'Roboto', 'Oxygen-Sans', 'Ubuntu', 'Cantarell', 'Helvetica Neue',
