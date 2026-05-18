@@ -237,10 +237,14 @@ function getPseudoStateCSSRules( style, name, baseSelector ) {
 	}
 
 	const cssRules = [];
-	validPseudoStates.forEach( ( state ) => {
-		const stateStyles = style?.[ state ];
+	validPseudoStates.forEach( ( pseudoState ) => {
+		const stateStyles = style?.[ pseudoState ];
 		if ( stateStyles ) {
-			const selector = buildStateSelector( baseSelector, name, state );
+			const selector = buildStateSelector(
+				baseSelector,
+				name,
+				pseudoState
+			);
 			const css = getStateStylesCSS( stateStyles, selector );
 			if ( css ) {
 				cssRules.push( css );

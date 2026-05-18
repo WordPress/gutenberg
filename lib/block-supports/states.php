@@ -109,17 +109,17 @@ function gutenberg_render_block_states_support( $block_content, $block ) {
 	$style                   = $block['attrs']['style'] ?? array();
 	$css_rules               = array();
 
-	foreach ( $supported_pseudo_states as $state ) {
-		if ( empty( $style[ $state ] ) || ! is_array( $style[ $state ] ) ) {
+	foreach ( $supported_pseudo_states as $pseudo_state ) {
+		if ( empty( $style[ $pseudo_state ] ) || ! is_array( $style[ $pseudo_state ] ) ) {
 			continue;
 		}
 
 		$compiled = wp_style_engine_get_styles(
-			gutenberg_normalize_state_style_for_css_output( $style[ $state ] )
+			gutenberg_normalize_state_style_for_css_output( $style[ $pseudo_state ] )
 		);
 		if ( ! empty( $compiled['declarations'] ) ) {
 			$css_rules[] = array(
-				'selector_suffix' => $state,
+				'selector_suffix' => $pseudo_state,
 				'declarations'    => $compiled['declarations'],
 			);
 		}
@@ -141,17 +141,17 @@ function gutenberg_render_block_states_support( $block_content, $block ) {
 			);
 		}
 
-		foreach ( $supported_pseudo_states as $state ) {
-			if ( empty( $style[ $breakpoint ][ $state ] ) || ! is_array( $style[ $breakpoint ][ $state ] ) ) {
+		foreach ( $supported_pseudo_states as $pseudo_state ) {
+			if ( empty( $style[ $breakpoint ][ $pseudo_state ] ) || ! is_array( $style[ $breakpoint ][ $pseudo_state ] ) ) {
 				continue;
 			}
 
 			$compiled = wp_style_engine_get_styles(
-				gutenberg_normalize_state_style_for_css_output( $style[ $breakpoint ][ $state ] )
+				gutenberg_normalize_state_style_for_css_output( $style[ $breakpoint ][ $pseudo_state ] )
 			);
 			if ( ! empty( $compiled['declarations'] ) ) {
 				$css_rules[] = array(
-					'selector_suffix' => $state,
+					'selector_suffix' => $pseudo_state,
 					'declarations'    => $compiled['declarations'],
 					'rules_group'     => $media_query,
 				);
