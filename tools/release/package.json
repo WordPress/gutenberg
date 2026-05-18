@@ -37,8 +37,5 @@
 	},
 	"publishConfig": {
 		"access": "public"
-	},
-	"scripts": {
-		"changelog": "node ./cli.js changelog"
 	}
 }
