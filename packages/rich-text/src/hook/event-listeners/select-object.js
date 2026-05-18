@@ -1,6 +1,14 @@
+import { subscribeSharedListener } from './shared-listener';
+
 export default () => ( element ) => {
 	function onClick( event ) {
 		const { target } = event;
+
+		// Document-scoped listener: bail when the click isn't inside our
+		// editable.
+		if ( ! element.contains( target ) ) {
+			return;
+		}
 
 		// If the child element has no text content, it must be an object.
 		if (
@@ -45,10 +53,18 @@ export default () => ( element ) => {
 		}
 	}
 
-	element.addEventListener( 'click', onClick );
-	element.addEventListener( 'focusin', onFocusIn );
+	const unsubscribeClick = subscribeSharedListener(
+		element.ownerDocument,
+		'click',
+		onClick
+	);
+	const unsubscribeFocusIn = subscribeSharedListener(
+		element.ownerDocument,
+		'focusin',
+		onFocusIn
+	);
 	return () => {
-		element.removeEventListener( 'click', onClick );
-		element.removeEventListener( 'focusin', onFocusIn );
+		unsubscribeClick();
+		unsubscribeFocusIn();
 	};
 };
