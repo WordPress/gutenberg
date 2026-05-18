@@ -11,8 +11,8 @@ import { Button, __experimentalHStack as HStack } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
-import { memo, forwardRef, useContext } from '@wordpress/element';
-import { search } from '@wordpress/icons';
+import { memo, forwardRef } from '@wordpress/element';
+import { menu } from '@wordpress/icons';
 import { store as commandsStore } from '@wordpress/commands';
 import { displayShortcut } from '@wordpress/keycodes';
 import { VisuallyHidden } from '@wordpress/ui';
@@ -223,7 +223,7 @@ export const SiteHubMobile = memo(
 							<Button
 								__next40pxDefaultSize
 								className="edit-site-site-hub_toggle-command-center"
-								icon={ search }
+								icon={ menu }
 								onClick={ () => openCommandCenter() }
 								label={ __( 'Open command palette' ) }
 								shortcut={ displayShortcut.primary( 'k' ) }
