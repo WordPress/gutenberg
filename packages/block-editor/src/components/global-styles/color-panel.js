@@ -476,6 +476,9 @@ export default function ColorPanel( {
 
 	// Text Color
 	const showTextPanel = useHasTextPanel( settings );
+	const showCaptionPanel = useHasCaptionPanel( settings );
+	const showButtonPanel = useHasButtonPanel( settings );
+	const showHeadingPanel = useHasHeadingPanel( settings );
 	const textColor = decodeValue( inheritedValue?.color?.text );
 	const userTextColor = decodeValue( value?.color?.text );
 	const hasTextColor = () => !! userTextColor;
@@ -519,47 +522,47 @@ export default function ColorPanel( {
 		{
 			name: 'caption',
 			label: __( 'Captions' ),
-			showPanel: useHasCaptionPanel( settings ),
+			showPanel: showCaptionPanel,
 		},
 		{
 			name: 'button',
 			label: __( 'Button' ),
-			showPanel: useHasButtonPanel( settings ),
+			showPanel: showButtonPanel,
 		},
 		{
 			name: 'heading',
 			label: __( 'Heading' ),
-			showPanel: useHasHeadingPanel( settings ),
+			showPanel: showHeadingPanel,
 		},
 		{
 			name: 'h1',
 			label: __( 'H1' ),
-			showPanel: useHasHeadingPanel( settings ),
+			showPanel: showHeadingPanel,
 		},
 		{
 			name: 'h2',
 			label: __( 'H2' ),
-			showPanel: useHasHeadingPanel( settings ),
+			showPanel: showHeadingPanel,
 		},
 		{
 			name: 'h3',
 			label: __( 'H3' ),
-			showPanel: useHasHeadingPanel( settings ),
+			showPanel: showHeadingPanel,
 		},
 		{
 			name: 'h4',
 			label: __( 'H4' ),
-			showPanel: useHasHeadingPanel( settings ),
+			showPanel: showHeadingPanel,
 		},
 		{
 			name: 'h5',
 			label: __( 'H5' ),
-			showPanel: useHasHeadingPanel( settings ),
+			showPanel: showHeadingPanel,
 		},
 		{
 			name: 'h6',
 			label: __( 'H6' ),
-			showPanel: useHasHeadingPanel( settings ),
+			showPanel: showHeadingPanel,
 		},
 	];
 

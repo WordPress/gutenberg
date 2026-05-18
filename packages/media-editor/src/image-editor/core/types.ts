@@ -203,4 +203,10 @@ export interface StencilProps {
 	};
 	/** Called when Escape is pressed on a resize handle. */
 	onEscape?: () => void;
+	/**
+	 * Minimum crop rect dimension in normalized space, per axis. Derived
+	 * by the host from a pixel-based floor (see `MIN_CROP_PIXELS`) and
+	 * the source image dimensions. Omit to use the stencil's default.
+	 */
+	minCropSize?: Size;
 }

@@ -592,12 +592,129 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 		$matches = array();
 		if ( preg_match( '/(.*)(-\d+x\d+|-scaled)-' . $number . '$/', $name, $matches ) ) {
 			$filename_without_suffix = $matches[1] . $matches[2] . ".$ext";
-			if ( $matches[1] === $orig_name && ! file_exists( "$dir/$filename_without_suffix" ) ) {
+			if ( $matches[1] === $orig_name ) {
 				return $filename_without_suffix;
 			}
 		}
 
 		return $filename;
+	}
+
+	/**
+	 * Validates that uploaded image dimensions are appropriate for the specified image size.
+	 *
+	 * @param int          $width         Uploaded image width.
+	 * @param int          $height        Uploaded image height.
+	 * @param string|array $image_size    The target image size name, or an array
+	 *                                    of names that share the same dimensions.
+	 * @param int          $attachment_id The attachment ID.
+	 * @return true|WP_Error True if valid, WP_Error if invalid.
+	 */
+	private function validate_image_dimensions( int $width, int $height, $image_size, int $attachment_id ) {
+		// Dimensions must be positive for all sizes.
+		if ( $width <= 0 || $height <= 0 ) {
+			return new WP_Error(
+				'rest_upload_invalid_dimensions',
+				__( 'Uploaded image must have positive dimensions.', 'gutenberg' ),
+				array( 'status' => 400 )
+			);
+		}
+
+		// Arrays only contain regular sub-size names that share dimensions.
+		// Validate each one against its registered constraints.
+		if ( is_array( $image_size ) ) {
+			foreach ( $image_size as $name ) {
+				$result = $this->validate_image_dimensions( $width, $height, $name, $attachment_id );
+				if ( is_wp_error( $result ) ) {
+					return $result;
+				}
+			}
+			return true;
+		}
+
+		// 'original-heic' companion file: no dimension constraint.
+		if ( 'original-heic' === $image_size ) {
+			return true;
+		}
+
+		// 'original' size: should match original attachment dimensions.
+		if ( 'original' === $image_size ) {
+			$metadata = wp_get_attachment_metadata( $attachment_id, true );
+			if ( is_array( $metadata ) && isset( $metadata['width'], $metadata['height'] ) ) {
+				$expected_width  = (int) $metadata['width'];
+				$expected_height = (int) $metadata['height'];
+
+				if ( $width !== $expected_width || $height !== $expected_height ) {
+					return new WP_Error(
+						'rest_upload_dimension_mismatch',
+						sprintf(
+							/* translators: 1: actual width, 2: actual height, 3: expected width, 4: expected height */
+							__( 'Uploaded image dimensions (%1$dx%2$d) do not match original image dimensions (%3$dx%4$d).', 'gutenberg' ),
+							$width,
+							$height,
+							$expected_width,
+							$expected_height
+						),
+						array( 'status' => 400 )
+					);
+				}
+			}
+			return true;
+		}
+
+		// 'full' size (PDF thumbnails) and 'scaled': no further constraints.
+		if ( 'full' === $image_size || 'scaled' === $image_size ) {
+			return true;
+		}
+
+		// Regular image sizes: validate against registered size constraints.
+		$registered_sizes = wp_get_registered_image_subsizes();
+
+		if ( ! isset( $registered_sizes[ $image_size ] ) ) {
+			return new WP_Error(
+				'rest_upload_unknown_size',
+				__( 'Unknown image size.', 'gutenberg' ),
+				array( 'status' => 400 )
+			);
+		}
+
+		$size_data  = $registered_sizes[ $image_size ];
+		$max_width  = (int) $size_data['width'];
+		$max_height = (int) $size_data['height'];
+
+		// Validate dimensions don't exceed the registered size maximums.
+		// Allow 1px tolerance for rounding differences.
+		$tolerance = 1;
+
+		if ( $max_width > 0 && $width > $max_width + $tolerance ) {
+			return new WP_Error(
+				'rest_upload_dimension_mismatch',
+				sprintf(
+					/* translators: 1: image size name, 2: max width, 3: actual width */
+					__( 'Uploaded image width (%3$d) exceeds maximum for "%1$s" size (%2$d).', 'gutenberg' ),
+					$image_size,
+					$max_width,
+					$width
+				),
+				array( 'status' => 400 )
+			);
+		}
+
+		if ( $max_height > 0 && $height > $max_height + $tolerance ) {
+			return new WP_Error(
+				'rest_upload_dimension_mismatch',
+				sprintf(
+					/* translators: 1: image size name, 2: max height, 3: actual height */
+					__( 'Uploaded image height (%3$d) exceeds maximum for "%1$s" size (%2$d).', 'gutenberg' ),
+					$image_size,
+					$max_height,
+					$height
+				),
+				array( 'status' => 400 )
+			);
+		}
+
+		return true;
 	}
 
 	/**
@@ -688,6 +805,29 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 
 		$image_size = $request['image_size'];
 
+		// Read dimensions once up-front. Needed both for early-error handling
+		// (corrupted/unsupported files) and for populating the sub-size payload
+		// below. Scalar 'original' is a byte-only passthrough and does not need
+		// dimensions, but reading them here is harmless.
+		$size = wp_getimagesize( $path );
+
+		if ( ! $size ) {
+			// Could not determine dimensions (corrupted file, unsupported format).
+			wp_delete_file( $path );
+			return new WP_Error(
+				'rest_upload_invalid_image',
+				__( 'Could not read image dimensions. The file may be corrupted or an unsupported format.', 'gutenberg' ),
+				array( 'status' => 400 )
+			);
+		}
+
+		$validation = $this->validate_image_dimensions( $size[0], $size[1], $image_size, $attachment_id );
+		if ( is_wp_error( $validation ) ) {
+			// Clean up the uploaded file.
+			wp_delete_file( $path );
+			return $validation;
+		}
+
 		// Build sub-size data to return to the client.
 		// The client accumulates these and sends them all to the finalize endpoint.
 		// `image_size` may be a single string or an array of names that share the
@@ -699,10 +839,8 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 		);
 
 		if ( is_array( $image_size ) ) {
-			$size = wp_getimagesize( $path );
-
-			$sub_size_data['width']     = $size ? $size[0] : 0;
-			$sub_size_data['height']    = $size ? $size[1] : 0;
+			$sub_size_data['width']     = $size[0];
+			$sub_size_data['height']    = $size[1];
 			$sub_size_data['file']      = wp_basename( $path );
 			$sub_size_data['mime_type'] = $type;
 			$sub_size_data['filesize']  = wp_filesize( $path );
@@ -723,17 +861,13 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 			// This writes to _wp_attached_file meta, not _wp_attachment_metadata.
 			update_attached_file( $attachment_id, $path );
 
-			$size = wp_getimagesize( $path );
-
-			$sub_size_data['width']    = $size ? $size[0] : 0;
-			$sub_size_data['height']   = $size ? $size[1] : 0;
+			$sub_size_data['width']    = $size[0];
+			$sub_size_data['height']   = $size[1];
 			$sub_size_data['filesize'] = wp_filesize( $path );
 			$sub_size_data['file']     = _wp_relative_upload_path( $path );
 		} else {
-			$size = wp_getimagesize( $path );
-
-			$sub_size_data['width']     = $size ? $size[0] : 0;
-			$sub_size_data['height']    = $size ? $size[1] : 0;
+			$sub_size_data['width']     = $size[0];
+			$sub_size_data['height']    = $size[1];
 			$sub_size_data['file']      = wp_basename( $path );
 			$sub_size_data['mime_type'] = $type;
 			$sub_size_data['filesize']  = wp_filesize( $path );

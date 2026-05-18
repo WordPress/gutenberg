@@ -10,11 +10,9 @@ import { useState } from '@wordpress/element';
 import * as Tooltip from '../../../packages/ui/src/tooltip';
 import { WithWpCompatOverlaySlot } from './with-wp-compat-overlay-slot';
 
-/**
- * Cross-library stacking: a `@wordpress/ui` `Tooltip` rendered inside a
- * `@wordpress/components` `Modal` (or `Popover`) reliably sits above the
- * components-side overlay, via the `@wordpress/ui` compat overlay slot.
- */
+// Cross-library stacking: a `@wordpress/ui` Tooltip inside a
+// `@wordpress/components` Modal / Popover should sit above the
+// components-side overlay via the compat overlay slot.
 export default {
 	title: 'Playground/Debug fixtures/WP Compat Overlay Slot',
 	decorators: [ WithWpCompatOverlaySlot ],
