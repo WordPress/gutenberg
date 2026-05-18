@@ -237,10 +237,7 @@ export function WidgetChromeActionableArea( {
  * or is still resolving.
  */
 export const WidgetChrome = forwardRef< HTMLDivElement, WidgetChromeProps >(
-	function WidgetChrome(
-		{ widget, index, className, tabIndex },
-		ref
-	) {
+	function WidgetChrome( { widget, index, className, tabIndex }, ref ) {
 		const { widgetTypes, editMode } = useDashboardInternalContext();
 		const widgetType = widgetTypes.find( ( t ) => t.name === widget.type );
 		const titleId = useId();

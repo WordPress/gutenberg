@@ -32,7 +32,7 @@
 .widgetChromeActionableArea {
 	position: absolute;
 	top: var(--wpds-dimension-padding-xs);
-	right: var(--wpds-dimension-padding-xs);
+	inset-inline-end: var(--wpds-dimension-padding-xs);
 	z-index: 1;
 }
 
