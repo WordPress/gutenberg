@@ -130,6 +130,9 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 			id: string;
 			snap: ResizeSnapSize;
 		} | null >( null );
+		const [ resizingItemId, setResizingItemId ] = useState< string | null >(
+			null
+		);
 		const latestLayoutRef = useRef<
 			DashboardLanesLayoutItem[] | undefined
 		>();
@@ -298,6 +301,7 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 			resizeBaselineRef.current = null;
 			setIsResizing( false );
 			setResizeSnapPreview( null );
+			setResizingItemId( null );
 			setTemporaryLayout( undefined );
 		} );
 
@@ -367,6 +371,7 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 			resizeBaselineRef.current = null;
 			setIsResizing( false );
 			setResizeSnapPreview( null );
+			setResizingItemId( null );
 
 			if ( ! onChangeLayout || ! latest ) {
 				setTemporaryLayout( undefined );
@@ -383,6 +388,7 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 			}
 			if ( ! isResizing ) {
 				setIsResizing( true );
+				setResizingItemId( id );
 			}
 
 			const relativeDelta = Math.round(
@@ -431,6 +437,16 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 		} );
 
 		const interacting = activeId !== null || isResizing;
+
+		const resizeHandleVisibleForItem = ( itemId: string ) => {
+			if ( activeId !== null ) {
+				return false;
+			}
+			if ( isResizing ) {
+				return resizingItemId === itemId;
+			}
+			return true;
+		};
 
 		// Drag-overlay clone composition: the surface always wraps with a
 		// thin functional frame (lift, cursor, pointer pass-through). When
@@ -544,6 +560,9 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 									}
 									disabled={ ! editMode }
 									interacting={ interacting }
+									resizeHandleVisible={ resizeHandleVisibleForItem(
+										id
+									) }
 									onResize={ handleResize }
 									onResizeEnd={ persistTemporaryLayout }
 									resizeSnapPreview={

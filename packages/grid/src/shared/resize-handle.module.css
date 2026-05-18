@@ -1,3 +1,28 @@
+/*
+ * Fade with opacity only: `visibility` is not interpolatable and pairing
+ * it with delayed transitions breaks fade-in (handles stay unpainted
+ * until the delay elapses) or cancels fade-out if flipped to hidden
+ * in the same frame as opacity hits 0. `pointer-events: none` covers
+ * hit-testing while faded out. Transition is omitted when the user
+ * requests reduced motion.
+ */
+.resize-handle-slot {
+	opacity: 1;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+	.resize-handle-slot {
+		transition:
+			opacity var(--wpds-motion-duration-md)
+			var(--wpds-motion-easing-subtle);
+	}
+}
+
+.resize-handle-slot--hidden {
+	opacity: 0;
+	pointer-events: none;
+}
+
 .resize-handle {
 	position: absolute;
 	bottom: 0;

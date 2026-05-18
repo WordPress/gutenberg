@@ -47,6 +47,7 @@ export function GridItem( {
 	onResizeEnd,
 	resizeSnapPreview = null,
 	renderResizeHandle,
+	resizeHandleVisible = true,
 }: GridItemProps ) {
 	const [ resizeDelta, setResizeDelta ] = useState< ResizeDelta | null >(
 		null
@@ -163,6 +164,7 @@ export function GridItem( {
 						<ResizeHandle
 							itemId={ item.key }
 							verticalResizable={ verticalResizable }
+							visible={ resizeHandleVisible }
 							onResize={ handleResize }
 							onResizeEnd={ handleResizeEnd }
 							renderResizeHandle={ renderResizeHandle }

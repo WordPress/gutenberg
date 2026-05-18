@@ -62,6 +62,14 @@ export type LanesItemProps = {
 	 */
 	interacting?: boolean;
 
+	/**
+	 * When false, the tile's resize handle fades out (e.g. while a
+	 * tile drag or another tile's resize is active).
+	 *
+	 * @default true
+	 */
+	resizeHandleVisible?: boolean;
+
 	children: React.ReactNode;
 
 	actionableArea?: React.ReactNode;
@@ -89,6 +97,7 @@ export function LanesItem( {
 	onResizeEnd,
 	resizeSnapPreview = null,
 	renderResizeHandle,
+	resizeHandleVisible = true,
 }: LanesItemProps ) {
 	const [ resizeDelta, setResizeDelta ] = useState< ResizeDelta | null >(
 		null
@@ -194,6 +203,7 @@ export function LanesItem( {
 						<ResizeHandle
 							itemId={ itemKey }
 							verticalResizable={ false }
+							visible={ resizeHandleVisible }
 							onResize={ handleResize }
 							onResizeEnd={ handleResizeEnd }
 							renderResizeHandle={ renderResizeHandle }
