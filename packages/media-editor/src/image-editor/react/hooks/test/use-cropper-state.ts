@@ -54,6 +54,76 @@ describe( 'useCropperState', () => {
 		expect( result.current.state.zoom ).toBe( 3 );
 	} );
 
+	it( 'leaves pan at zero on setZoom when the cropRect is centered', () => {
+		// Sanity: the default cropRect spans the full image, so its
+		// center coincides with the image center and the crop-center
+		// focal-point correction degenerates to "no pan change."
+		// Guards against regressions where setZoom accidentally pans.
+		const { result } = renderHook( () => useCropperState() );
+
+		act( () => {
+			result.current.setZoom( 4 );
+		} );
+
+		expect( result.current.state.zoom ).toBe( 4 );
+		expect( result.current.state.pan ).toEqual( { x: 0, y: 0 } );
+
+		act( () => {
+			result.current.setZoom( 2 );
+		} );
+
+		expect( result.current.state.zoom ).toBe( 2 );
+		expect( result.current.state.pan ).toEqual( { x: 0, y: 0 } );
+	} );
+
+	it( 'anchors setZoom at the crop-rect center', () => {
+		// With an off-center crop, setZoom must shift pan toward the
+		// crop center as zoom decreases — otherwise `enforceContainment`
+		// would translate the image toward the nearest viewport corner
+		// (the original bug this method fixes).
+		const { result } = renderHook( () => useCropperState() );
+
+		act( () => {
+			result.current.setZoom( 4 );
+		} );
+		// Place the crop in the bottom-right quadrant — center
+		// at ( 0.7, 0.7 ), i.e. ( +0.2, +0.2 ) in pan coords.
+		act( () => {
+			result.current.setCropRect( {
+				x: 0.6,
+				y: 0.6,
+				width: 0.2,
+				height: 0.2,
+			} );
+		} );
+		act( () => {
+			result.current.setPan( { x: 0, y: 0 } );
+		} );
+
+		expect( result.current.state.pan ).toEqual( { x: 0, y: 0 } );
+
+		// Zoom out — pan should move toward the focal point in +x, +y,
+		// not stay at the origin (which would corner-snap on containment).
+		act( () => {
+			result.current.setZoom( 2 );
+		} );
+
+		expect( result.current.state.zoom ).toBe( 2 );
+		expect( result.current.state.pan.x ).toBeGreaterThan( 0 );
+		expect( result.current.state.pan.y ).toBeGreaterThan( 0 );
+	} );
+
+	it( 'should dispatch SET_ZOOM_AT_POINT via setZoomAtPoint', () => {
+		const { result } = renderHook( () => useCropperState() );
+
+		act( () => {
+			result.current.setZoomAtPoint( 3, { x: 0.2, y: 0.1 } );
+		} );
+
+		expect( result.current.state.zoom ).toBe( 3 );
+		expect( result.current.state.pan ).toEqual( { x: 0.2, y: 0.1 } );
+	} );
+
 	it( 'should clamp zoom to valid range via SET_ZOOM', () => {
 		const { result } = renderHook( () => useCropperState() );
 
@@ -109,6 +179,41 @@ describe( 'useCropperState', () => {
 		expect( result.current.state.flip ).toEqual( {
 			horizontal: true,
 			vertical: false,
+		} );
+	} );
+
+	it( 'toggleFlip should toggle horizontal flip', () => {
+		const { result } = renderHook( () => useCropperState() );
+
+		act( () => {
+			result.current.toggleFlip( 'horizontal' );
+		} );
+
+		expect( result.current.state.flip ).toEqual( {
+			horizontal: true,
+			vertical: false,
+		} );
+
+		act( () => {
+			result.current.toggleFlip( 'horizontal' );
+		} );
+
+		expect( result.current.state.flip ).toEqual( {
+			horizontal: false,
+			vertical: false,
+		} );
+	} );
+
+	it( 'toggleFlip should toggle vertical flip independently', () => {
+		const { result } = renderHook( () => useCropperState() );
+
+		act( () => {
+			result.current.toggleFlip( 'vertical' );
+		} );
+
+		expect( result.current.state.flip ).toEqual( {
+			horizontal: false,
+			vertical: true,
 		} );
 	} );
 
@@ -380,13 +485,10 @@ describe( 'useCropperState', () => {
 		function setupWithImage() {
 			const view = renderHook( () => useCropperState() );
 			act( () => {
-				view.result.current.__dispatch( {
-					type: 'SET_IMAGE',
-					payload: {
-						src: 'test.jpg',
-						naturalWidth: 1000,
-						naturalHeight: 500,
-					},
+				view.result.current.setImage( {
+					src: 'test.jpg',
+					naturalWidth: 1000,
+					naturalHeight: 500,
 				} );
 			} );
 			return view;
@@ -626,13 +728,10 @@ describe( 'useCropperState', () => {
 		function setupWithImage() {
 			const view = renderHook( () => useCropperState() );
 			act( () => {
-				view.result.current.__dispatch( {
-					type: 'SET_IMAGE',
-					payload: {
-						src: 'test.jpg',
-						naturalWidth: 1000,
-						naturalHeight: 500,
-					},
+				view.result.current.setImage( {
+					src: 'test.jpg',
+					naturalWidth: 1000,
+					naturalHeight: 500,
 				} );
 			} );
 			return view;
@@ -652,7 +751,7 @@ describe( 'useCropperState', () => {
 			} );
 
 			act( () => {
-				result.current.__dispatch( { type: 'SETTLE_CROP' } );
+				result.current.settleCrop();
 			} );
 
 			const { cropRect } = result.current.state;
@@ -691,7 +790,7 @@ describe( 'useCropperState', () => {
 			const preZoom = result.current.state.zoom;
 
 			act( () => {
-				result.current.__dispatch( { type: 'SETTLE_CROP' } );
+				result.current.settleCrop();
 			} );
 
 			const postCropRect = result.current.state.cropRect;
@@ -715,7 +814,7 @@ describe( 'useCropperState', () => {
 			const stateBefore = result.current.state;
 
 			act( () => {
-				result.current.__dispatch( { type: 'SETTLE_CROP' } );
+				result.current.settleCrop();
 			} );
 
 			const stateAfter = result.current.state;
@@ -730,13 +829,10 @@ describe( 'useCropperState', () => {
 		function setupWithImage() {
 			const view = renderHook( () => useCropperState() );
 			act( () => {
-				view.result.current.__dispatch( {
-					type: 'SET_IMAGE',
-					payload: {
-						src: 'test.jpg',
-						naturalWidth: 1000,
-						naturalHeight: 500,
-					},
+				view.result.current.setImage( {
+					src: 'test.jpg',
+					naturalWidth: 1000,
+					naturalHeight: 500,
 				} );
 			} );
 			return view;
@@ -825,24 +921,262 @@ describe( 'useCropperState', () => {
 		} );
 	} );
 
-	describe( 'direct dispatch', () => {
-		it( 'should handle SET_IMAGE via dispatch', () => {
+	describe( 'undo/redo history', () => {
+		const DEBOUNCE_MS = 300;
+
+		beforeEach( () => jest.useFakeTimers() );
+		afterEach( () => jest.useRealTimers() );
+
+		// --- debounce batching ---
+
+		it( 'does not create a history entry before the debounce fires', () => {
 			const { result } = renderHook( () => useCropperState() );
-
-			const imageData = {
-				src: 'test.jpg',
-				naturalWidth: 800,
-				naturalHeight: 600,
-			};
-
 			act( () => {
-				result.current.__dispatch( {
-					type: 'SET_IMAGE',
-					payload: imageData,
+				result.current.setZoom( 3 );
+			} );
+			expect( result.current.hasUndo ).toBe( false );
+		} );
+
+		it( 'creates one history entry after the debounce settles', () => {
+			const { result } = renderHook( () => useCropperState() );
+			act( () => {
+				result.current.setZoom( 2 );
+				result.current.setZoom( 3 );
+				result.current.setZoom( 4 );
+			} );
+			act( () => jest.advanceTimersByTime( DEBOUNCE_MS ) );
+			expect( result.current.hasUndo ).toBe( true );
+			act( () => result.current.undo() );
+			expect( result.current.state.zoom ).toBe( 1 );
+			expect( result.current.hasUndo ).toBe( false );
+		} );
+
+		it( 'does not create a history entry for a no-op round trip', () => {
+			const { result } = renderHook( () => useCropperState() );
+			act( () => result.current.setZoom( 2 ) );
+			act( () => result.current.setZoom( 1 ) );
+			act( () => jest.advanceTimersByTime( DEBOUNCE_MS ) );
+			expect( result.current.hasUndo ).toBe( false );
+		} );
+
+		// --- commitHistory flush ---
+
+		it( 'commitHistory flushes the pending entry immediately', () => {
+			const { result } = renderHook( () => useCropperState() );
+			// Separate act() calls are required: setZoom dispatches a reducer
+			// action that React processes when act() flushes. If commitHistory
+			// runs in the same act(), stateRef.current hasn't updated yet and
+			// the flush sees no change.
+			act( () => result.current.setZoom( 3 ) );
+			act( () => result.current.commitHistory() );
+			expect( result.current.hasUndo ).toBe( true );
+		} );
+
+		it( 'commitHistory is a no-op when state has not changed', () => {
+			const { result } = renderHook( () => useCropperState() );
+			act( () => {
+				result.current.commitHistory();
+			} );
+			expect( result.current.hasUndo ).toBe( false );
+		} );
+
+		// --- discrete actions ---
+
+		it( 'toggleFlip creates a history entry immediately', () => {
+			const { result } = renderHook( () => useCropperState() );
+			act( () => {
+				result.current.toggleFlip( 'horizontal' );
+			} );
+			expect( result.current.hasUndo ).toBe( true );
+		} );
+
+		it( 'setFlip creates a history entry immediately', () => {
+			const { result } = renderHook( () => useCropperState() );
+			act( () => {
+				result.current.setFlip( { horizontal: true, vertical: false } );
+			} );
+			expect( result.current.hasUndo ).toBe( true );
+		} );
+
+		it( 'snapRotate90 creates a history entry immediately', () => {
+			const { result } = renderHook( () => useCropperState() );
+			act( () => {
+				result.current.snapRotate90( 1 );
+			} );
+			expect( result.current.hasUndo ).toBe( true );
+		} );
+
+		it( 'applyOperation creates a history entry immediately', () => {
+			const { result } = renderHook( () => useCropperState() );
+			act( () => {
+				result.current.applyOperation( { type: 'zoom', factor: 3 } );
+			} );
+			expect( result.current.hasUndo ).toBe( true );
+		} );
+
+		// --- undo / redo round-trip ---
+
+		it( 'undo restores the previous state and enables redo', () => {
+			const { result } = renderHook( () => useCropperState() );
+			act( () => result.current.setZoom( 3 ) );
+			act( () => result.current.commitHistory() );
+			act( () => result.current.undo() );
+			expect( result.current.state.zoom ).toBe( 1 );
+			expect( result.current.hasUndo ).toBe( false );
+			expect( result.current.hasRedo ).toBe( true );
+		} );
+
+		it( 'redo re-applies the undone state', () => {
+			const { result } = renderHook( () => useCropperState() );
+			act( () => result.current.setZoom( 3 ) );
+			act( () => result.current.commitHistory() );
+			act( () => result.current.undo() );
+			act( () => result.current.redo() );
+			expect( result.current.state.zoom ).toBe( 3 );
+			expect( result.current.hasRedo ).toBe( false );
+		} );
+
+		it( 'undo after redo returns to a clean initial state', () => {
+			const { result } = renderHook( () => useCropperState() );
+			act( () => {
+				result.current.setImage( {
+					src: 'test.jpg',
+					naturalWidth: 1000,
+					naturalHeight: 500,
 				} );
 			} );
+			act( () => result.current.snapRotate90( 1 ) );
+			expect( result.current.isDirty ).toBe( true );
 
-			expect( result.current.state.image ).toEqual( imageData );
+			act( () => result.current.undo() );
+			expect( result.current.isDirty ).toBe( false );
+
+			act( () => result.current.redo() );
+			expect( result.current.isDirty ).toBe( true );
+
+			act( () => result.current.undo() );
+			expect( result.current.state.rotation ).toBe( 0 );
+			expect( result.current.isDirty ).toBe( false );
+		} );
+
+		// --- undo/redo with a pending gesture ---
+
+		it( 'undo flushes a pending gesture before undoing', () => {
+			const { result } = renderHook( () => useCropperState() );
+			// Commit one step, then start a second change without committing.
+			act( () => result.current.setZoom( 3 ) );
+			act( () => result.current.commitHistory() );
+			act( () => result.current.setZoom( 5 ) );
+			// Undo should flush zoom=5 first, then undo back to zoom=3.
+			act( () => result.current.undo() );
+			expect( result.current.state.zoom ).toBe( 3 );
+			expect( result.current.hasRedo ).toBe( true );
+		} );
+
+		it( 'undo with no prior history flushes and undoes the pending gesture', () => {
+			const { result } = renderHook( () => useCropperState() );
+			act( () => {
+				result.current.setZoom( 3 );
+			} );
+			// Undo before the debounce fires — flush saves the change, then
+			// immediately undoes it.
+			act( () => result.current.undo() );
+			expect( result.current.state.zoom ).toBe( 1 );
+		} );
+
+		// --- setImage and reset do not pollute history ---
+
+		it( 'setImage does not create a history entry', () => {
+			const { result } = renderHook( () => useCropperState() );
+			act( () => {
+				result.current.setImage( {
+					src: 'test.jpg',
+					naturalWidth: 100,
+					naturalHeight: 100,
+				} );
+			} );
+			act( () => jest.advanceTimersByTime( DEBOUNCE_MS ) );
+			expect( result.current.hasUndo ).toBe( false );
+		} );
+
+		it( 'reset is undoable and restores a clean current state', () => {
+			const { result } = renderHook( () => useCropperState() );
+			act( () => result.current.setZoom( 3 ) );
+			act( () => result.current.commitHistory() );
+			expect( result.current.hasUndo ).toBe( true );
+			act( () => result.current.reset() );
+			expect( result.current.state.zoom ).toBe( 1 );
+			expect( result.current.isDirty ).toBe( false );
+			expect( result.current.hasUndo ).toBe( true );
+			act( () => result.current.undo() );
+			expect( result.current.state.zoom ).toBe( 3 );
+		} );
+
+		it( 'reset does not create a history entry when already clean', () => {
+			const { result } = renderHook( () => useCropperState() );
+			act( () => result.current.reset() );
+			expect( result.current.hasUndo ).toBe( false );
+		} );
+
+		// --- discrete action flushes a concurrent continuous gesture ---
+
+		it( 'discrete action saves the pending gesture as a separate undo step', () => {
+			const { result } = renderHook( () => useCropperState() );
+			act( () => {
+				result.current.setZoom( 3 );
+			} );
+			act( () => {
+				result.current.setFlip( { horizontal: true, vertical: false } );
+			} );
+			// First undo removes the flip.
+			act( () => result.current.undo() );
+			expect( result.current.state.flip.horizontal ).toBe( false );
+			expect( result.current.state.zoom ).toBe( 3 );
+			// Second undo removes the zoom gesture.
+			act( () => result.current.undo() );
+			expect( result.current.state.zoom ).toBe( 1 );
+		} );
+
+		it( 'settleCrop is grouped into the resize undo step', () => {
+			const { result } = renderHook( () => useCropperState() );
+			act( () => {
+				result.current.setImage( {
+					src: 'test.jpg',
+					naturalWidth: 1000,
+					naturalHeight: 500,
+				} );
+			} );
+			const initialCropRect = result.current.state.cropRect;
+
+			act( () => {
+				result.current.setCropRect( {
+					x: 0.25,
+					y: 0.25,
+					width: 0.5,
+					height: 0.5,
+				} );
+			} );
+			act( () => result.current.settleCrop() );
+			const settledState = result.current.state;
+
+			expect( result.current.hasUndo ).toBe( true );
+			act( () => result.current.undo() );
+			expect( result.current.state.cropRect ).toEqual( initialCropRect );
+			expect( result.current.hasUndo ).toBe( false );
+
+			act( () => result.current.redo() );
+			expect( result.current.state.cropRect ).toEqual(
+				settledState.cropRect
+			);
+			expect( result.current.state.zoom ).toBe( settledState.zoom );
+		} );
+	} );
+
+	describe( 'public controller contract', () => {
+		it( 'does not expose the raw reducer dispatch', () => {
+			const { result } = renderHook( () => useCropperState() );
+
+			expect( '__dispatch' in result.current ).toBe( false );
 		} );
 	} );
 

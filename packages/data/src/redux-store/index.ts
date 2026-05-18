@@ -458,6 +458,7 @@ export default function createReduxStore< State, Actions, Selectors >(
 			// a promise that resolves when the resolution is finished.
 			const bindResolveSelector = mapResolveSelector(
 				store,
+				resolvers,
 				boundMetadataSelectors
 			);
 
@@ -633,12 +634,14 @@ function instantiateReduxStore(
  * Maps selectors to functions that return a resolution promise for them.
  *
  * @param store                  The redux store the selectors are bound to.
+ * @param resolvers              The normalized resolvers for the store.
  * @param boundMetadataSelectors The bound metadata selectors.
  *
  * @return Function that maps selectors to resolvers.
  */
 function mapResolveSelector(
 	store: ReduxStore,
+	resolvers: Record< string, NormalizedResolver >,
 	boundMetadataSelectors: Record< string, SelectorLike >
 ) {
 	return ( selector: SelectorLike, selectorName: string ) => {
@@ -650,10 +653,15 @@ function mapResolveSelector(
 
 		return ( ...args: unknown[] ) =>
 			new Promise( ( resolve, reject ) => {
+				const resolver = resolvers[ selectorName ];
 				const hasFinished = () => {
-					return boundMetadataSelectors.hasFinishedResolution(
-						selectorName,
-						args
+					return (
+						boundMetadataSelectors.hasFinishedResolution(
+							selectorName,
+							args
+						) ||
+						( typeof resolver.isFulfilled === 'function' &&
+							resolver.isFulfilled( store.getState(), ...args ) )
 					);
 				};
 				const finalize = ( result: unknown ) => {
@@ -789,7 +797,9 @@ function mapSelectorWithResolver(
 	function fulfillSelector( args: unknown[] ): void {
 		if (
 			resolversCache.isRunning( selectorName, args ) ||
-			boundMetadataSelectors.hasStartedResolution( selectorName, args )
+			boundMetadataSelectors.hasStartedResolution( selectorName, args ) ||
+			( typeof resolver.isFulfilled === 'function' &&
+				resolver.isFulfilled( store.getState(), ...args ) )
 		) {
 			return;
 		}
@@ -802,14 +812,9 @@ function mapSelectorWithResolver(
 				metadataActions.startResolution( selectorName, args )
 			);
 			try {
-				const isFulfilled =
-					typeof resolver.isFulfilled === 'function' &&
-					resolver.isFulfilled( store.getState(), ...args );
-				if ( ! isFulfilled ) {
-					const action = resolver.fulfill( ...args );
-					if ( action ) {
-						await store.dispatch( action );
-					}
+				const action = resolver.fulfill( ...args );
+				if ( action ) {
+					await store.dispatch( action );
 				}
 				store.dispatch(
 					metadataActions.finishResolution( selectorName, args )

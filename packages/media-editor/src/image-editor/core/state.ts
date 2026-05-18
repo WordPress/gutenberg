@@ -1,10 +1,17 @@
 /**
  * Internal dependencies
  */
-import type { CropperState, CropperAction, TransformOperation } from './types';
+import type { CropperAction, CropperState, TransformOperation } from './types';
 import { DEFAULT_STATE, MAX_ZOOM } from './constants';
 import { normalizeRotation, degreesToRadians } from './math/rotation';
 import { restrictPanZoom, restrictCropRect } from './containment';
+
+/** Small tolerance for cropper floating-point comparisons. */
+const STATE_EPSILON = 1e-6;
+
+function nearlyEqual( a: number, b: number ): boolean {
+	return Math.abs( a - b ) < STATE_EPSILON;
+}
 
 /**
  * Translate a pipeline transform operation into the equivalent
@@ -338,24 +345,27 @@ export function cropperReducer(
 				return state;
 			}
 
-			// New crop: fill height (or width), maintain aspect ratio, center.
-			const normalizedRatio = rect.width / rect.height;
-			let newH = 1;
-			let newW = normalizedRatio;
-			if ( newW > 1 ) {
-				newW = 1;
-				newH = 1 / normalizedRatio;
-			}
+			// Scale factor: how much the crop grows. fitScale fills the
+			// larger axis to 1 (viewport-filling settle). Cap so the
+			// resulting zoom stays at or below MAX_ZOOM — tight crops
+			// would otherwise push state.zoom past the user-facing cap
+			// and break wheel/slider interactions, which clamp to
+			// MAX_ZOOM and snap state.zoom down on the first input.
+			const fitScale = 1 / Math.max( rect.width, rect.height );
+			const zoomCap = state.zoom > 0 ? MAX_ZOOM / state.zoom : fitScale;
+			const s = Math.min( fitScale, zoomCap );
 
-			// Scale factor: how much the crop grew.
-			const s = newH / rect.height;
+			const newW = rect.width * s;
+			const newH = rect.height * s;
 
 			// The old crop center in normalized visual space.
 			const oldCx = rect.x + rect.width / 2;
 			const oldCy = rect.y + rect.height / 2;
 
-			// Zoom scales by s so the same image region fills the
-			// larger crop at the same relative size.
+			// Zoom scales by s so the same image region fills the new
+			// crop at the same relative size. When s is capped, the new
+			// crop is smaller than the viewport but the visible content
+			// inside it remains the source region the user framed.
 			// Pan: the visible content center was at
 			//   (cropCx - crop.x, cropCy - crop.y)
 			// in visual-normalized space. After centering the crop to
@@ -414,15 +424,15 @@ export function isStateDirty(
 	initial: CropperState
 ): boolean {
 	return (
-		current.pan.x !== initial.pan.x ||
-		current.pan.y !== initial.pan.y ||
-		current.zoom !== initial.zoom ||
-		current.rotation !== initial.rotation ||
+		! nearlyEqual( current.pan.x, initial.pan.x ) ||
+		! nearlyEqual( current.pan.y, initial.pan.y ) ||
+		! nearlyEqual( current.zoom, initial.zoom ) ||
+		! nearlyEqual( current.rotation, initial.rotation ) ||
 		current.flip.horizontal !== initial.flip.horizontal ||
 		current.flip.vertical !== initial.flip.vertical ||
-		current.cropRect.x !== initial.cropRect.x ||
-		current.cropRect.y !== initial.cropRect.y ||
-		current.cropRect.width !== initial.cropRect.width ||
-		current.cropRect.height !== initial.cropRect.height
+		! nearlyEqual( current.cropRect.x, initial.cropRect.x ) ||
+		! nearlyEqual( current.cropRect.y, initial.cropRect.y ) ||
+		! nearlyEqual( current.cropRect.width, initial.cropRect.width ) ||
+		! nearlyEqual( current.cropRect.height, initial.cropRect.height )
 	);
 }

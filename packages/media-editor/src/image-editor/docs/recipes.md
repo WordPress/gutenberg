@@ -40,7 +40,7 @@ The cropper fills its parent container. Wrap it in a sized element:
 const controller = useCropperState();
 const {
   state,
-  setZoom, setRotation, setFlip, snapRotate90, setCropRect,
+  setZoom, setZoomAtPoint, setRotation, setFlip, snapRotate90, setCropRect,
   applyOperation, reset, isDirty, getCroppedImage,
 } = controller;
 
@@ -88,7 +88,7 @@ useCropperState()          -- State management (reducer + convenience setters)
 <Cropper>                  -- Orchestrates rendering and interaction
     |
     +-- stencil prop       -- Pluggable crop area UI (StencilProps interface)
-    +-- useInteraction()   -- Mouse/touch/keyboard → reducer actions
+    +-- useInteraction()   -- Mouse/touch/keyboard → named controller actions
     +-- useTransformStyle()-- State → CSS matrix
     |
     v
@@ -647,10 +647,10 @@ function ImageEditorWithUndo( { src }: { src: string } ) {
 The cropper is keyboard-accessible and screen-reader friendly:
 
 **Keyboard controls:**
-- **Arrow keys** on the container: pan the image
+- **Arrow keys** on the container: pan the image (Shift for larger jumps)
 - **+/-** on the container: zoom in/out
 - **R** on the container: snap rotate 90°
-- **Tab** to crop handles, then **arrow keys** to resize (0.02 step per keypress)
+- **Tab** to crop handles, then **arrow keys** to resize (Shift for larger jumps)
 - Aspect ratio lock is respected during keyboard resize
 
 **Screen reader support:**
@@ -718,4 +718,3 @@ npx playwright test test/storybook-playwright/specs/image-editor.spec.ts --updat
 2. **New containment invariant cases**: Add rotation/zoom combinations to the parametric test in `core/test/camera.ts`.
 
 3. **New visual regression stories**: Add a new test case in `test/storybook-playwright/specs/image-editor.spec.ts` using `gotoStoryId` with the Storybook story ID (format: `mediaeditor-imagecropper--story-name`).
-

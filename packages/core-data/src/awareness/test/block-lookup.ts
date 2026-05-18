@@ -9,6 +9,7 @@ import { select } from '@wordpress/data';
  */
 import {
 	getBlockPathInYdoc,
+	getContainingBlockYMap,
 	resolveBlockClientIdByPath,
 } from '../block-lookup';
 
@@ -239,6 +240,75 @@ describe( 'getBlockPathInYdoc', () => {
 		] );
 
 		expect( getBlockPathInYdoc( grandchild ) ).toEqual( [ 2, 7, 1 ] );
+	} );
+} );
+
+describe( 'getContainingBlockYMap', () => {
+	it( 'should find the containing block for direct rich text content', () => {
+		const block = createTestYBlock( 'block' );
+		const attributes = new Y.Map< any >();
+		const text = new Y.Text( 'Direct text' );
+		attributes.set( 'content', text );
+		block.set( 'attributes', attributes );
+
+		const ydoc = new Y.Doc();
+		const rootMap = ydoc.getMap( 'test' );
+		const blocks = new Y.Array< Y.Map< any > >();
+		rootMap.set( 'blocks', blocks );
+		blocks.push( [ block ] );
+
+		expect( getContainingBlockYMap( text ) ).toBe( block );
+	} );
+
+	it( 'should find the containing block for deeply nested rich text attributes', () => {
+		const block = createTestYBlock( 'block' );
+		const attributes = new Y.Map< any >();
+		const cards = new Y.Array< Y.Map< any > >();
+		const card = new Y.Map< any >();
+		const meta = new Y.Map< any >();
+		const caption = new Y.Text( 'Nested caption' );
+
+		meta.set( 'caption', caption );
+		card.set( 'meta', meta );
+		cards.push( [ card ] );
+		attributes.set( 'cards', cards );
+		block.set( 'attributes', attributes );
+
+		const ydoc = new Y.Doc();
+		const rootMap = ydoc.getMap( 'test' );
+		const blocks = new Y.Array< Y.Map< any > >();
+		rootMap.set( 'blocks', blocks );
+		blocks.push( [ block ] );
+
+		expect( getContainingBlockYMap( caption ) ).toBe( block );
+	} );
+
+	it( 'should return null when no block ancestor exists', () => {
+		const orphanAttributes = new Y.Map< any >();
+		const text = new Y.Text( 'Orphan text' );
+		orphanAttributes.set( 'content', text );
+
+		expect( getContainingBlockYMap( text ) ).toBeNull();
+	} );
+
+	it( 'should skip nested attribute maps that look like blocks', () => {
+		const block = createTestYBlock( 'block' );
+		const attributes = new Y.Map< any >();
+		const blockLikeAttribute = new Y.Map< any >();
+		const text = new Y.Text( 'Nested text' );
+		blockLikeAttribute.set( 'clientId', 'attribute-client-id' );
+		blockLikeAttribute.set( 'innerBlocks', new Y.Array() );
+		blockLikeAttribute.set( 'content', text );
+		attributes.set( 'nested', blockLikeAttribute );
+		block.set( 'attributes', attributes );
+
+		const ydoc = new Y.Doc();
+		const rootMap = ydoc.getMap( 'test' );
+		const blocks = new Y.Array< Y.Map< any > >();
+		rootMap.set( 'blocks', blocks );
+		blocks.push( [ block ] );
+
+		expect( getContainingBlockYMap( text ) ).toBe( block );
 	} );
 } );
 

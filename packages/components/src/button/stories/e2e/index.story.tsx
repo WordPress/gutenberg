@@ -147,6 +147,17 @@ Icon.args = {
 	icon: wordpress,
 };
 
+export const TextOverflow: StoryFn< typeof Button > = ( props ) => {
+	return <Button __next40pxDefaultSize { ...props } />;
+};
+TextOverflow.args = {
+	children:
+		'This is an extremely long label thatshoulddemonstratetextoverflow behavior',
+};
+TextOverflow.parameters = {
+	textOverflowContainers: true,
+};
+
 export const Dashicons: StoryFn< typeof Button > = ( props ) => {
 	return (
 		<div style={ { display: 'flex', gap: 8 } }>
