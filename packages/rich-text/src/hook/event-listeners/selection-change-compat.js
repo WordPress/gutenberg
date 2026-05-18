@@ -2,6 +2,7 @@
  * Internal dependencies
  */
 import { isRangeEqual } from '../../is-range-equal';
+import { subscribeSharedListener } from './shared-listener';
 
 /**
  * Sometimes some browsers are not firing a `selectionchange` event when
@@ -21,6 +22,10 @@ export default () => ( element ) => {
 	}
 
 	function onDown( event ) {
+		if ( ! element.contains( event.target ) ) {
+			return;
+		}
+
 		const type = event.type === 'keydown' ? 'keyup' : 'pointerup';
 
 		function onCancel() {
@@ -44,10 +49,18 @@ export default () => ( element ) => {
 		range = getRange();
 	}
 
-	element.addEventListener( 'pointerdown', onDown );
-	element.addEventListener( 'keydown', onDown );
+	const unsubscribePointerDown = subscribeSharedListener(
+		ownerDocument,
+		'pointerdown',
+		onDown
+	);
+	const unsubscribeKeyDown = subscribeSharedListener(
+		ownerDocument,
+		'keydown',
+		onDown
+	);
 	return () => {
-		element.removeEventListener( 'pointerdown', onDown );
-		element.removeEventListener( 'keydown', onDown );
+		unsubscribePointerDown();
+		unsubscribeKeyDown();
 	};
 };
