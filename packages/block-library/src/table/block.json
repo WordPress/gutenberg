@@ -160,11 +160,12 @@
 		"anchor": true,
 		"align": true,
 		"color": {
-			"__experimentalSkipSerialization": true,
 			"gradients": true,
+			"link": true,
 			"__experimentalDefaultControls": {
 				"background": true,
-				"text": true
+				"text": true,
+				"link": true
 			}
 		},
 		"spacing": {
