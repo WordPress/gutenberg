@@ -1,0 +1,27 @@
+.banner {
+	--banner-bg: var(--wpds-color-fg-content-neutral);
+	--banner-fg: var(--wpds-color-bg-surface-neutral-strong);
+	--banner-line-brand: var(--wpds-color-bg-interactive-brand-strong);
+	--banner-line-caution: var(--wpds-color-bg-surface-caution-weak);
+	--banner-line-success: var(--wpds-color-bg-surface-success);
+	--banner-line-error: color-mix(in srgb, var(--wpds-color-fg-interactive-error) 30%, var(--wpds-color-bg-surface-neutral-strong));
+	--banner-line-info: color-mix(in srgb, var(--wpds-color-bg-interactive-brand-strong) 60%, var(--wpds-color-bg-surface-neutral-strong));
+
+	position: relative;
+	overflow: hidden;
+	min-block-size: 240px;
+	padding: var(--wpds-dimension-padding-3xl);
+	background-color: var(--banner-bg);
+	color: var(--banner-fg);
+}
+
+.bannerContent {
+	position: relative;
+	z-index: 1;
+}
+
+.bannerLink {
+	color: inherit;
+	text-decoration: underline;
+	text-underline-offset: 0.2em;
+}
