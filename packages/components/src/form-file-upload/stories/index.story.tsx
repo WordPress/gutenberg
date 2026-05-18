@@ -14,6 +14,7 @@ import { upload as uploadIcon } from '@wordpress/icons';
 import FormFileUpload from '..';
 
 const meta: Meta< typeof FormFileUpload > = {
+	tags: [ 'manifest' ],
 	title: 'Components/Selection & Input/File Upload/FormFileUpload',
 	id: 'components-formfileupload',
 	component: FormFileUpload,
@@ -26,7 +27,7 @@ const meta: Meta< typeof FormFileUpload > = {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
 		componentStatus: {
-			status: 'stable',
+			status: 'recommended',
 			whereUsed: 'global',
 		},
 	},

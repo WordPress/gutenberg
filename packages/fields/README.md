@@ -107,7 +107,7 @@ _Parameters_
 -   _props.data_ `Item`: - The item being edited.
 -   _props.field_ `Object`: - The field configuration with getValue and setValue methods.
 -   _props.onChange_ `Function`: - Callback function when the media selection changes.
--   _props.allowedTypes_ `[string[]]`: - Array of allowed media types. Default `['image']`.
+-   _props.allowedTypes_ `[string[]]`: - Array of allowed media types. Use `['*']` to allow all file types. Default `['image']`.
 -   _props.multiple_ `[boolean]`: - Whether to allow multiple media selections. Default `false`.
 -   _props.hideLabelFromVision_ `[boolean]`: - Whether the label should be hidden from vision.
 -   _props.isExpanded_ `[boolean]`: - Whether to render in an expanded form. Default `false`.

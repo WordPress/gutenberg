@@ -2,13 +2,29 @@
  * WordPress dependencies
  */
 import { Page } from '@wordpress/admin-ui';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { DataForm } from '@wordpress/dataviews';
 import { MediaEdit } from '@wordpress/fields';
 
 const fields = [
+	{
+		id: 'title',
+		type: 'text',
+		label: __( 'Site Title' ),
+		description: __(
+			"Displays in your site's layout via the Site Title block."
+		),
+	},
+	{
+		id: 'description',
+		type: 'text',
+		label: __( 'Site Tagline' ),
+		description: __(
+			"In a few words, explain what this site is about. Displays in your site's layout via the Site Tagline block."
+		),
+	},
 	{
 		id: 'site_logo',
 		type: 'media',
@@ -42,7 +58,7 @@ const form = {
 		type: 'regular',
 		labelPosition: 'top',
 	},
-	fields: [ 'site_logo', 'site_icon' ],
+	fields: [ 'title', 'description', 'site_logo', 'site_icon' ],
 };
 
 export default function SidebarIdentity() {
@@ -58,7 +74,11 @@ export default function SidebarIdentity() {
 	};
 
 	return (
-		<Page title={ __( 'Identity' ) } hasPadding>
+		<Page
+			title={ _x( 'Identity', 'site identity' ) }
+			headingLevel={ 2 }
+			hasPadding
+		>
 			<DataForm
 				data={ data }
 				fields={ fields }

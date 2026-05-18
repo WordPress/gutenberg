@@ -59,6 +59,7 @@ export default function RelativeDateControl< Item >( {
 		];
 
 	const { id, label, description, getValue, setValue } = field;
+	const disabled = field.isDisabled( { item: data, field } );
 	const fieldValue = getValue( { item: data } );
 	const { value: relValue = '', unit = options[ 0 ].value } =
 		fieldValue && typeof fieldValue === 'object' ? fieldValue : {};
@@ -102,6 +103,7 @@ export default function RelativeDateControl< Item >( {
 					step={ 1 }
 					value={ relValue }
 					onChange={ onChangeValue }
+					disabled={ disabled }
 				/>
 				<SelectControl
 					className="dataviews-controls__relative-date-unit"
@@ -111,6 +113,7 @@ export default function RelativeDateControl< Item >( {
 					options={ options }
 					onChange={ onChangeUnit }
 					hideLabelFromVision
+					disabled={ disabled }
 				/>
 			</Stack>
 		</BaseControl>

@@ -65,18 +65,43 @@ export default function save( { attributes } ) {
 			src={ url }
 			alt={ alt }
 			className={ imageClasses || undefined }
-			style={ {
-				...borderProps.style,
-				...shadowProps.style,
-				aspectRatio,
-				objectFit: scale,
-				objectPosition:
-					focalPoint && scale
-						? mediaPosition( focalPoint )
-						: undefined,
-				width,
-				height,
-			} }
+			style={ ( () => {
+				const style = {
+					...borderProps.style,
+					...shadowProps.style,
+					aspectRatio,
+					objectFit: scale,
+					objectPosition:
+						focalPoint && scale
+							? mediaPosition( focalPoint )
+							: undefined,
+				};
+				// Only apply dimension styles when a width or height is provided.
+				if ( width !== undefined || height !== undefined ) {
+					// Only apply width when explicitly provided.
+					if ( width === 'auto' ) {
+						style.width = 'auto';
+					} else if ( width !== undefined && width !== null ) {
+						style.width =
+							typeof width === 'number' ? `${ width }px` : width;
+					}
+					// Force height to auto when unspecified to prevent
+					// theme CSS from squishing the image.
+					if (
+						height === 'auto' ||
+						height === undefined ||
+						height === null
+					) {
+						style.height = 'auto';
+					} else {
+						style.height =
+							typeof height === 'number'
+								? `${ height }px`
+								: height;
+					}
+				}
+				return style;
+			} )() }
 			title={ title }
 		/>
 	);

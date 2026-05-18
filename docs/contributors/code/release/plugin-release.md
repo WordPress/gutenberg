@@ -122,7 +122,7 @@ All PRs should have a label prefixed by `[Type]` as well as labels for sub-categ
 Update the labels on each PR as needed. You can continue generating the changelog until you are comfortable proceeding. Now you are ready to start the release candidate workflow.
 
 <div class="callout callout-tip">
-You can see how the changelog is generated from the PR labels in the <a href="https://github.com/WordPress/gutenberg/blob/trunk/bin/plugin/commands/changelog.js">changelog.js</a> file.
+You can see how the changelog is generated from the PR labels in the <a href="https://github.com/WordPress/gutenberg/blob/trunk/tools/release/commands/changelog.js">changelog.js</a> file.
 </div>
 
 ### Running the release workflow

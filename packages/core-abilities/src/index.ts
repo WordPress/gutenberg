@@ -133,14 +133,21 @@ async function initializeAbilities(): Promise< void > {
 	}
 }
 
-/**
- * Initialize WordPress abilities integration.
- */
-async function initialize(): Promise< void > {
-	// Fetch and register categories, then abilities
-	await initializeCategories();
-	await initializeAbilities();
-}
+let initializePromise: Promise< void > | null = null;
 
-// Auto-initialize on import
-initialize();
+/**
+ * Fetches and registers core abilities and their categories.
+ *
+ * Memoized: repeated calls return the same in-flight or resolved promise, so
+ * callers can invoke it from multiple entry points without triggering duplicate
+ * REST requests.
+ */
+export function initialize(): Promise< void > {
+	if ( ! initializePromise ) {
+		initializePromise = ( async () => {
+			await initializeCategories();
+			await initializeAbilities();
+		} )();
+	}
+	return initializePromise;
+}

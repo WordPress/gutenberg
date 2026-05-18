@@ -1,5 +1,5 @@
 /* eslint-disable jest/no-conditional-expect */
-import { render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { DirectionProvider } from '@base-ui/react/direction-provider';
 import { useEffect, useState, createRef } from '@wordpress/element';
@@ -2344,7 +2344,9 @@ describe( 'Tabs', () => {
 			await waitForComponentToBeInitializedWithSelectedTab( 'One' );
 
 			// Wait a bit to ensure validation has run
-			await new Promise( ( resolve ) => setTimeout( resolve, 50 ) );
+			await act(
+				() => new Promise( ( resolve ) => setTimeout( resolve, 50 ) )
+			);
 
 			expect( errors ).toHaveLength( 0 );
 
@@ -2391,7 +2393,9 @@ describe( 'Tabs', () => {
 			await waitForComponentToBeInitializedWithSelectedTab( 'One' );
 
 			// Wait for validation
-			await new Promise( ( resolve ) => setTimeout( resolve, 50 ) );
+			await act(
+				() => new Promise( ( resolve ) => setTimeout( resolve, 50 ) )
+			);
 
 			// No errors since counts match
 			expect( errors ).toHaveLength( 0 );

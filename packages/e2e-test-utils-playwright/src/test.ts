@@ -1,3 +1,5 @@
+// Playwright fixtures use `use()` which is not a React hook.
+
 /**
  * External dependencies
  */

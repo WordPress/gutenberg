@@ -130,7 +130,7 @@ export const LayoutCustomComponent = ( {
 			view={ view }
 			fields={ fields }
 			onChangeView={ setView }
-			defaultLayouts={ { table: {} } }
+			defaultLayouts={ { table: true } }
 		>
 			<div style={ { padding: '2px', height: containerHeight } }>
 				<DataViews.Search />

@@ -93,6 +93,13 @@ export const LayoutRegular = {
 			description: 'Chooses the label position.',
 			options: [ 'default', 'top', 'side', 'none' ],
 		},
+		disabled: {
+			control: { type: 'boolean' },
+			description: 'Disable all fields in the form.',
+		},
+	},
+	args: {
+		disabled: false,
 	},
 };
 

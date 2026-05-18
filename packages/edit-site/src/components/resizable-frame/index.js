@@ -9,7 +9,7 @@ import clsx from 'clsx';
 import { useState, useRef } from '@wordpress/element';
 import {
 	ResizableBox,
-	Tooltip,
+	Tooltip as WCTooltip,
 	__unstableMotion as motion,
 } from '@wordpress/components';
 import { useInstanceId, useReducedMotion } from '@wordpress/compose';
@@ -17,12 +17,12 @@ import { __, isRTL } from '@wordpress/i18n';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
+import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
-import { addQueryArgs } from '@wordpress/url';
 
 const { useLocation, useHistory } = unlock( routerPrivateApis );
 
@@ -294,7 +294,7 @@ function ResizableFrame( {
 			handleComponent={ {
 				[ isRTL() ? 'right' : 'left' ]: canvas === 'view' && (
 					<>
-						<Tooltip text={ __( 'Drag to resize' ) }>
+						<WCTooltip text={ __( 'Drag to resize' ) }>
 							{ /* Disable reason: role="separator" does in fact support aria-valuenow */ }
 							{ /* eslint-disable-next-line jsx-a11y/role-supports-aria-props */ }
 							<motion.button
@@ -321,7 +321,7 @@ function ResizableFrame( {
 								whileFocus="active"
 								whileHover="active"
 							/>
-						</Tooltip>
+						</WCTooltip>
 						<div hidden id={ resizableHandleHelpId }>
 							{ __(
 								'Use left and right arrow keys to resize the canvas. Hold shift to resize in larger increments.'

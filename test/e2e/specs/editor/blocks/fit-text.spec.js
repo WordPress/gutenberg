@@ -426,6 +426,7 @@ test.describe( 'Fit Text', () => {
 					const el = document.querySelector( 'h2.has-fit-text' );
 					return el && el.style.fontSize && el.style.fontSize !== '';
 				},
+				undefined,
 				{ timeout: 5000 }
 			);
 
@@ -502,6 +503,7 @@ test.describe( 'Fit Text', () => {
 					const el = document.querySelector( 'p.has-fit-text' );
 					return el && el.style.fontSize && el.style.fontSize !== '';
 				},
+				undefined,
 				{ timeout: 5000 }
 			);
 
