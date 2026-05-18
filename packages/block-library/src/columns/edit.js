@@ -218,6 +218,7 @@ function ColumnsEditContainer( { attributes, setAttributes, clientId } ) {
 	const blockProps = useBlockProps( {
 		className: classes,
 	} );
+
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		defaultBlock: DEFAULT_BLOCK,
 		directInsert: true,
