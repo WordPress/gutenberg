@@ -326,8 +326,51 @@
 			height: var(--wp--lightbox-image-height);
 		}
 
-		figcaption {
+		// Hide any legacy inline figcaption inside the overlay, but keep our
+		// explicit `.wp-lightbox-caption` element visible so it can fade in.
+		figcaption:not(.wp-lightbox-caption) {
 			display: none;
+		}
+	}
+
+	// Caption inside the lightbox overlay. Uses the explicit
+	// `wp-lightbox-caption` class so the rules apply regardless of the figure's
+	// runtime class (which is bound dynamically via the Interactivity API).
+	// Visibility is driven by `:empty` rather than a hidden attribute so the
+	// fade transition is not interrupted by `display: none`.
+	.wp-lightbox-caption {
+		position: absolute;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		z-index: 3000001;
+		margin: 0;
+		padding: 3em 1em 1em;
+		color: #fff;
+		text-align: center;
+		font-size: 0.875rem;
+		line-height: 1.4;
+		background: linear-gradient(to top, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0));
+		pointer-events: none;
+		opacity: 0;
+		transition: opacity 120ms ease-in;
+
+		@media (prefers-reduced-motion: reduce) {
+			transition: none;
+		}
+	}
+
+	// Fade the caption in only after the zoom animation has had a chance to
+	// settle. `.active` is toggled on the overlay wrapper itself. The
+	// `has-caption` class is bound via the Interactivity API when the current
+	// image has a non-empty caption, which keeps the empty caption element
+	// visually hidden for images without a caption.
+	&.active .wp-lightbox-caption.has-caption {
+		opacity: 1;
+		transition: opacity 200ms ease-out 200ms;
+
+		@media (prefers-reduced-motion: reduce) {
+			transition: none;
 		}
 	}
 

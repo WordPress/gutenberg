@@ -113,13 +113,23 @@
 		"aspectRatio": {
 			"type": "string",
 			"default": "auto"
+		},
+		"showCaptionInGallery": {
+			"type": "boolean",
+			"default": true
+		},
+		"showCaptionInLightbox": {
+			"type": "boolean",
+			"default": true
 		}
 	},
 	"providesContext": {
 		"allowResize": "allowResize",
 		"imageCrop": "imageCrop",
 		"fixedHeight": "fixedHeight",
-		"navigationButtonType": "navigationButtonType"
+		"navigationButtonType": "navigationButtonType",
+		"showCaptionInGallery": "showCaptionInGallery",
+		"showCaptionInLightbox": "showCaptionInLightbox"
 	},
 	"supports": {
 		"anchor": true,

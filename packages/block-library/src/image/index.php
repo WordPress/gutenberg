@@ -230,6 +230,16 @@ function block_core_image_render_lightbox( $block_content, $block, $block_instan
 	$figure_class_names = $processor->get_attribute( 'class' );
 	$figure_styles      = $processor->get_attribute( 'style' );
 
+	// Caption. The caption is rendered as plain text via the Interactivity API's
+	// `data-wp-text` directive, so strip any markup preserved in the inline caption.
+	// When the image lives inside a Gallery block that opted out of lightbox
+	// captions, skip extraction so the overlay stays empty for those images.
+	$caption                  = '';
+	$show_caption_in_lightbox = $block_instance->context['showCaptionInLightbox'] ?? true;
+	if ( $show_caption_in_lightbox && preg_match( '/<figcaption[^>]*>(.*?)<\/figcaption>/is', $block_content, $caption_match ) ) {
+		$caption = trim( wp_strip_all_tags( $caption_match[1] ) );
+	}
+
 	// Create unique id and set the image metadata in the state.
 	$unique_image_id = uniqid();
 	wp_interactivity_state(
@@ -247,6 +257,7 @@ function block_core_image_render_lightbox( $block_content, $block, $block_instan
 					'targetHeight'           => $img_height,
 					'scaleAttr'              => $block['attrs']['scale'] ?? false,
 					'alt'                    => $alt,
+					'caption'                => $caption,
 					'galleryId'              => $block_instance->context['galleryId'] ?? null,
 					'customAriaLabel'        => $custom_aria_label ?? null,
 					'navigationButtonType'   => $block_instance->context['navigationButtonType'] ?? 'icon',
@@ -318,6 +329,29 @@ function block_core_image_render_lightbox( $block_content, $block, $block_instan
 }
 
 /**
+ * Removes the figcaption from the rendered Image block when the parent Gallery
+ * block opted out of showing captions inline (while still keeping them
+ * available in the lightbox overlay). The Gallery block exposes
+ * `showCaptionInGallery` via its provided context; when it is explicitly
+ * `false`, the figcaption is stripped from the block output.
+ *
+ * @since 23.0.0
+ *
+ * @param string   $block_content Rendered block content.
+ * @param array    $block         Block attributes and metadata.
+ * @param WP_Block $block_instance The block instance.
+ * @return string Filtered block content.
+ */
+function block_core_image_apply_gallery_caption_visibility( $block_content, $block, $block_instance ) {
+	$show_in_gallery = $block_instance->context['showCaptionInGallery'] ?? true;
+	if ( false !== $show_in_gallery ) {
+		return $block_content;
+	}
+	return preg_replace( '/<figcaption\b[^>]*>.*?<\/figcaption>/is', '', $block_content );
+}
+add_filter( 'render_block_core/image', 'block_core_image_apply_gallery_caption_visibility', 20, 3 );
+
+/**
  * @since 6.5.0
  */
 function block_core_image_print_lightbox_overlay() {
@@ -380,6 +414,7 @@ function block_core_image_print_lightbox_overlay() {
 				<div class="lightbox-image-container">
 					<figure data-wp-bind--class="state.selectedImage.figureClassNames" data-wp-bind--style="state.figureStyles">
 						<img data-wp-bind--alt="state.selectedImage.alt" data-wp-bind--class="state.selectedImage.imgClassNames" data-wp-bind--style="state.imgStyles" data-wp-bind--src="state.selectedImage.currentSrc">
+						<figcaption class="wp-lightbox-caption" data-wp-class--has-caption="!!state.selectedImage.caption" data-wp-text="state.selectedImage.caption"></figcaption>
 					</figure>
 				</div>
 				<div class="lightbox-image-container">
@@ -393,6 +428,7 @@ function block_core_image_print_lightbox_overlay() {
 							data-wp-bind--srcset="state.enlargedSrcset"
 							sizes="100vw"
 						>
+						<figcaption class="wp-lightbox-caption" data-wp-class--has-caption="!!state.selectedImage.caption" data-wp-text="state.selectedImage.caption"></figcaption>
 					</figure>
 				</div>
 				<button type="button" style="fill:{$close_button_color}" class="wp-lightbox-navigation-button wp-lightbox-navigation-button-next" data-wp-bind--hidden="!state.hasNavigation" data-wp-on--click="actions.showNextImage" data-wp-bind--aria-label="state.nextButtonAriaLabel">
