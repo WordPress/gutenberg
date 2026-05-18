@@ -39,6 +39,12 @@ import { LanesItem } from './lanes-item';
 import { useLanePlacement } from './use-lane-placement';
 import { GridOverlay } from '../shared/grid-overlay';
 import { gridSpanToPixelSize } from '../shared/resize-snap';
+import layoutAnimationStyles from '../shared/layout-shift-animation.module.css';
+import {
+	getLayoutFingerprint,
+	getPlacementFingerprint,
+	useLayoutShiftAnimation,
+} from '../shared/use-layout-shift-animation';
 import type { DashboardLanesLayoutItem, DashboardLanesProps } from './types';
 import type { ResizeSnapSize } from '../shared/resize-snap';
 import type { ResizeDelta } from '../shared/types';
@@ -257,6 +263,25 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 			rowUnit,
 		} );
 
+		const layoutAnimating =
+			editMode &&
+			( isResizing || temporaryLayout !== undefined );
+		const layoutFingerprint = useMemo( () => {
+			const layoutSig = getLayoutFingerprint( activeLayout );
+			const placementSig = getPlacementFingerprint( itemStyles );
+			return `${ layoutSig }\0${ placementSig }`;
+		}, [ activeLayout, itemStyles ] );
+		const excludeLayoutAnimationKey =
+			activeId ?? ( isResizing ? resizeSnapPreview?.id : null );
+		const captureLayoutSnapshotRef = useRef< () => void >( () => {} );
+		const { captureLayoutSnapshot } = useLayoutShiftAnimation( {
+			container,
+			enabled: layoutAnimating,
+			layoutFingerprint,
+			excludeItemKey: excludeLayoutAnimationKey,
+		} );
+		captureLayoutSnapshotRef.current = captureLayoutSnapshot;
+
 		const [ childrenMap, actionableAreaMap, remaining ] = useMemo( () => {
 			const childMap = new Map< string, React.ReactElement >();
 			const actionableMap = new Map< string, React.ReactNode >();
@@ -371,6 +396,7 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 				y: activeCenterY,
 			};
 			latestLayoutRef.current = updatedLayout;
+			captureLayoutSnapshotRef.current();
 			setTemporaryLayout( updatedLayout );
 			onPreviewLayout?.( updatedLayout );
 		} );
@@ -439,6 +465,8 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 			);
 
 			latestLayoutRef.current = updatedLayout;
+			captureLayoutSnapshotRef.current();
+			setTemporaryLayout( updatedLayout );
 			onPreviewLayout?.( updatedLayout );
 		} );
 
@@ -496,7 +524,12 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 					<div
 						{ ...divProps }
 						ref={ mergedRootRef }
-						className={ clsx( styles.lanes, className ) }
+						className={ clsx(
+							styles.lanes,
+							layoutAnimating &&
+								layoutAnimationStyles[ 'layout-animating' ],
+							className
+						) }
 						style={
 							{
 								...style,

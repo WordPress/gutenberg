@@ -7,13 +7,16 @@ import { useState, useLayoutEffect, useMemo } from '@wordpress/element';
  * Internal dependencies
  */
 import { computeLanePlacements } from './lane-placement';
+import { GRID_ITEM_DATA_KEY } from '../shared/grid-item-key';
 
 /**
  * Data attribute children must declare to participate in lane placement.
  * The renderer adds it; the hook reads it to map measured DOM nodes
  * back to logical item keys.
+ *
+ * @deprecated Use {@link GRID_ITEM_DATA_KEY} from `../shared/grid-item-key`.
  */
-export const LANES_DATA_KEY = 'data-lanes-key';
+export const LANES_DATA_KEY = GRID_ITEM_DATA_KEY;
 
 const DEFAULT_ROW_UNIT = 4;
 

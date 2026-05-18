@@ -1,0 +1,30 @@
+/*
+ * Motion tokens for sibling tiles reflowing during drag/resize. Applied
+ * on the surface root while a gesture is in progress.
+ */
+.layout-animating {
+	--wp-grid-layout-shift-duration: var(--wpds-motion-duration-md, 200ms);
+	--wp-grid-layout-shift-easing: var(
+		--wpds-motion-easing-balanced,
+		cubic-bezier(0.4, 0, 0.2, 1)
+	);
+}
+
+/*
+ * Transition lives on tiles so the browser can interpolate `transform`
+ * reliably (inline `transition` + FLIP in the same frame is skipped).
+ */
+.layout-animating :global( [data-wp-grid-item-key] ) {
+	transition: transform var(--wp-grid-layout-shift-duration)
+		var(--wp-grid-layout-shift-easing);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.layout-animating {
+		--wp-grid-layout-shift-duration: 0ms;
+	}
+
+	.layout-animating :global( [data-wp-grid-item-key] ) {
+		transition: none;
+	}
+}
