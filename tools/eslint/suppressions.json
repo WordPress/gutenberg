@@ -1463,16 +1463,6 @@
 			"count": 1
 		}
 	},
-	"packages/grid/src/dashboard-grid/index.tsx": {
-		"react-hooks/refs": {
-			"count": 13
-		}
-	},
-	"packages/grid/src/dashboard-lanes/index.tsx": {
-		"react-hooks/refs": {
-			"count": 13
-		}
-	},
 	"packages/grid/src/shared/resize-handle.tsx": {
 		"react-hooks/immutability": {
 			"count": 1
