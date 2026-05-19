@@ -138,6 +138,12 @@ function Header( { titleId, widgetType }: HeaderProps ) {
 export interface WidgetChromeProps {
 	widget: DashboardWidget< unknown >;
 	index: number;
+	/**
+	 * Lifted by the surrounding `@wordpress/grid` surface into a sibling
+	 * slot of the grid item; not rendered by `WidgetChrome` itself.
+	 * Living outside `Card.Root` is what keeps these controls interactive
+	 * while edit mode applies `inert` to the chrome.
+	 */
 	actionableArea?: ReactNode;
 	className?: string;
 	tabIndex?: number;
