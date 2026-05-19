@@ -7,6 +7,7 @@ import { createBlobURL, revokeBlobURL } from '@wordpress/blob';
  * Internal dependencies
  */
 import {
+	generateThumbnails,
 	getTranscodeImageOperation,
 	finalizeItem,
 	prepareItem,
@@ -491,7 +492,7 @@ describe( 'private actions', () => {
 			const thunk = prepareItem( 'gif-id' );
 			await thunk( { select, dispatch } );
 
-			return dispatchedOperations;
+			return { operations: dispatchedOperations, dispatch, item };
 		}
 
 		beforeEach( () => {
@@ -504,21 +505,41 @@ describe( 'private actions', () => {
 			delete global.VideoEncoder;
 		} );
 
-		it( 'enqueues a TranscodeGif operation when WebCodecs is available', async () => {
-			const operations = await runPrepareItem();
+		it( 'schedules a normal image upload and stashes animatedGifFile', async () => {
+			// In the companion-file flow the GIF uploads as an ordinary
+			// image attachment (so the editor block stays core/image),
+			// and generateThumbnails sideloads the transcoded video.
+			// prepareItem itself never enqueues TranscodeGif as the
+			// first op — that happens inside the sideload's own
+			// operations list.
+			const { operations, dispatch, item } = await runPrepareItem();
 
-			expect( flattenOperations( operations ) ).toContain(
-				OperationType.TranscodeGif
-			);
-		} );
-
-		it( 'does not enqueue TranscodeGif when WebCodecs is unavailable', async () => {
-			delete global.ImageDecoder;
-
-			const operations = await runPrepareItem();
-
+			expect( flattenOperations( operations ) ).toEqual( [
+				OperationType.Upload,
+				OperationType.ThumbnailGeneration,
+				OperationType.Finalize,
+			] );
 			expect( flattenOperations( operations ) ).not.toContain(
 				OperationType.TranscodeGif
+			);
+			expect( dispatch.finishOperation ).toHaveBeenCalledWith( 'gif-id', {
+				animatedGifFile: item.file,
+			} );
+		} );
+
+		it( 'does not stash animatedGifFile when WebCodecs is unavailable', async () => {
+			delete global.ImageDecoder;
+
+			const { operations, dispatch } = await runPrepareItem();
+
+			expect( flattenOperations( operations || [] ) ).not.toContain(
+				OperationType.TranscodeGif
+			);
+			expect( dispatch.finishOperation ).not.toHaveBeenCalledWith(
+				'gif-id',
+				expect.objectContaining( {
+					animatedGifFile: expect.anything(),
+				} )
 			);
 		} );
 
@@ -635,7 +656,7 @@ describe( 'private actions', () => {
 			consoleError.mockRestore();
 		} );
 
-		it( 'replaces the GIF with the converted video on success', async () => {
+		it( 'hands the transcoded video to the next Upload via finishOperation', async () => {
 			const videoFile = new File( [ 'mp4' ], 'animation.mp4', {
 				type: 'video/mp4',
 			} );
@@ -652,14 +673,14 @@ describe( 'private actions', () => {
 				gifFile,
 				'video/mp4'
 			);
-			expect( dispatch ).toHaveBeenCalledWith( {
-				type: Type.CacheBlobUrl,
-				id: 'gif-1',
-				blobUrl: 'blob:mock-url',
-			} );
+			// Sideload context: no CacheBlobUrl, no attachment URL update -
+			// the parent GIF attachment already owns the block's URL.
+			expect( createBlobURL ).not.toHaveBeenCalled();
+			expect( dispatch ).not.toHaveBeenCalledWith(
+				expect.objectContaining( { type: Type.CacheBlobUrl } )
+			);
 			expect( dispatch.finishOperation ).toHaveBeenCalledWith( 'gif-1', {
 				file: videoFile,
-				attachment: { url: 'blob:mock-url' },
 			} );
 			expect( dispatch.cancelItem ).not.toHaveBeenCalled();
 		} );
@@ -679,7 +700,11 @@ describe( 'private actions', () => {
 			);
 		} );
 
-		it( 'skips gracefully (uploads original GIF) on an Unsupported error', async () => {
+		it( 'silently cancels the sideload on an Unsupported error', async () => {
+			// The parent GIF attachment is already uploaded; falling back
+			// to "upload the original GIF" here would write a meaningless
+			// animated_video meta entry pointing at the GIF itself. Just
+			// cancel the sideload — silently — and let the GIF stand alone.
 			mediabunnyConvertGifToVideo.mockRejectedValue(
 				new Error( 'Unsupported: WebCodecs unavailable' )
 			);
@@ -687,16 +712,19 @@ describe( 'private actions', () => {
 
 			await transcodeGifItem( 'gif-1' )( { select, dispatch } );
 
-			// Operation finishes untouched; the original GIF proceeds to upload.
-			expect( dispatch.finishOperation ).toHaveBeenCalledWith(
-				'gif-1',
-				{}
-			);
-			expect( dispatch.cancelItem ).not.toHaveBeenCalled();
+			expect( dispatch.finishOperation ).not.toHaveBeenCalled();
+			expect( dispatch.cancelItem ).toHaveBeenCalledTimes( 1 );
+			const [ cancelledId, , silent ] =
+				dispatch.cancelItem.mock.calls[ 0 ];
+			expect( cancelledId ).toBe( 'gif-1' );
+			expect( silent ).toBe( true );
 			expect( consoleError ).not.toHaveBeenCalled();
 		} );
 
-		it( 'cancels the item with an UploadError on a hard failure', async () => {
+		it( 'silently cancels the sideload on a hard transcoding failure', async () => {
+			// A real engine failure is also not user-actionable on what the
+			// user thinks of as an image upload: log the cause, cancel
+			// the sideload silently, leave the GIF attachment untouched.
 			const cause = new Error( 'Encoder produced empty output' );
 			mediabunnyConvertGifToVideo.mockRejectedValue( cause );
 			const { select, dispatch } = buildArgs();
@@ -705,10 +733,12 @@ describe( 'private actions', () => {
 
 			expect( dispatch.finishOperation ).not.toHaveBeenCalled();
 			expect( dispatch.cancelItem ).toHaveBeenCalledTimes( 1 );
-			const [ cancelledId, error ] = dispatch.cancelItem.mock.calls[ 0 ];
+			const [ cancelledId, error, silent ] =
+				dispatch.cancelItem.mock.calls[ 0 ];
 			expect( cancelledId ).toBe( 'gif-1' );
 			expect( error.code ).toBe( 'GIF_TRANSCODING_ERROR' );
 			expect( error.cause ).toBe( cause );
+			expect( silent ).toBe( true );
 			expect( consoleError ).toHaveBeenCalled();
 		} );
 
@@ -721,6 +751,100 @@ describe( 'private actions', () => {
 			expect( mediabunnyConvertGifToVideo ).not.toHaveBeenCalled();
 			expect( dispatch.finishOperation ).not.toHaveBeenCalled();
 			expect( dispatch.cancelItem ).not.toHaveBeenCalled();
+		} );
+	} );
+
+	describe( 'generateThumbnails (animated GIF video sideload)', () => {
+		function runGenerate( { item, settings } ) {
+			const dispatchFn = jest.fn();
+			dispatchFn.finishOperation = jest.fn();
+			dispatchFn.addSideloadItem = jest.fn();
+			const select = {
+				getItem: () => item,
+				getSettings: () => settings,
+			};
+			const thunk = generateThumbnails( item.id );
+			return thunk( { select, dispatch: dispatchFn } ).then(
+				() => dispatchFn
+			);
+		}
+
+		function makeGif( name = 'animated.gif' ) {
+			return new File(
+				[ new Uint8Array( [ 0x47, 0x49, 0x46, 0x38 ] ) ],
+				name,
+				{ type: 'image/gif' }
+			);
+		}
+
+		it( 'sideloads the converted video as an animated-video companion', async () => {
+			const gif = makeGif();
+			const item = {
+				id: 'g',
+				sourceFile: gif,
+				file: gif,
+				animatedGifFile: gif,
+				attachment: { id: 42 },
+			};
+
+			const dispatchFn = await runGenerate( {
+				item,
+				settings: { videoOutputFormat: 'video/mp4' },
+			} );
+
+			expect( dispatchFn.addSideloadItem ).toHaveBeenCalledTimes( 1 );
+			const sideload = dispatchFn.addSideloadItem.mock.calls[ 0 ][ 0 ];
+			expect( sideload.file ).toBe( gif );
+			expect( sideload.parentId ).toBe( 'g' );
+			expect( sideload.additionalData ).toEqual(
+				expect.objectContaining( {
+					post: 42,
+					image_size: 'animated-video',
+					convert_format: false,
+				} )
+			);
+			expect( sideload.operations ).toEqual( [
+				[ OperationType.TranscodeGif, { outputFormat: 'mp4' } ],
+				OperationType.Upload,
+			] );
+		} );
+
+		it( 'uses webm when videoOutputFormat is video/webm', async () => {
+			const gif = makeGif();
+			const item = {
+				id: 'g2',
+				sourceFile: gif,
+				file: gif,
+				animatedGifFile: gif,
+				attachment: { id: 7 },
+			};
+
+			const dispatchFn = await runGenerate( {
+				item,
+				settings: { videoOutputFormat: 'video/webm' },
+			} );
+
+			const sideload = dispatchFn.addSideloadItem.mock.calls[ 0 ][ 0 ];
+			expect( sideload.operations[ 0 ] ).toEqual( [
+				OperationType.TranscodeGif,
+				{ outputFormat: 'webm' },
+			] );
+		} );
+
+		it( 'does not sideload a video for non-GIF uploads', async () => {
+			const jpeg = new File( [ 'x' ], 'photo.jpg', {
+				type: 'image/jpeg',
+			} );
+			const item = {
+				id: 'g3',
+				sourceFile: jpeg,
+				file: jpeg,
+				attachment: { id: 9 },
+			};
+
+			const dispatchFn = await runGenerate( { item, settings: {} } );
+
+			expect( dispatchFn.addSideloadItem ).not.toHaveBeenCalled();
 		} );
 	} );
 } );

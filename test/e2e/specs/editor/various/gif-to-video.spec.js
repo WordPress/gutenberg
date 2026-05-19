@@ -127,13 +127,16 @@ test.describe( 'Mediabunny: animated GIF to video conversion', () => {
 		await requestUtils.deleteAllMedia();
 	} );
 
-	test( 'converts an animated GIF to a video on upload', async ( {
+	test( 'keeps the GIF as core/image and sideloads a companion video', async ( {
 		editor,
 		gifToVideoUtils,
 		requestUtils,
 	} ) => {
-		// Insert an image block; the upload pipeline will intercept the GIF
-		// and replace it with a video via mediabunny + WebCodecs.
+		// The companion-file design uploads the GIF as a normal image
+		// attachment (block stays a valid core/image) and sideloads the
+		// transcoded video as that attachment's `animated_video` meta.
+		// The render-time PHP filter swaps the GIF <img> for a
+		// GIF-behaving <video> on the front end.
 		await editor.insertBlock( { name: 'core/image' } );
 
 		const imageBlock = editor.canvas.locator(
@@ -146,22 +149,31 @@ test.describe( 'Mediabunny: animated GIF to video conversion', () => {
 			ANIMATED_GIF_FIXTURE
 		);
 
-		// After conversion the block should display the transcoded video.
-		// The blob URL is set on the attachment during transcoding; wait for
-		// the final server-side URL (http/https) to confirm a successful upload.
+		// Editor still shows the GIF in an <img>: the block was not
+		// transformed, and the <img>'s final src is the server URL.
 		const image = imageBlock.getByRole( 'img', {
 			name: 'This image has an empty alt attribute',
 		} );
 		await expect( image ).toBeVisible( { timeout: 30_000 } );
-		await expect( image ).toHaveAttribute( 'src', /^https?:\/\//, {
-			timeout: 30_000,
-		} );
+		await expect( image ).toHaveAttribute(
+			'src',
+			/^https?:\/\/.*\.gif(\?.*)?$/i,
+			{ timeout: 30_000 }
+		);
 
-		// Drain the queue before inspecting the REST API response.
-		await gifToVideoUtils.waitForUploadQueueEmpty( 30_000 );
+		// Drain the full queue (parent GIF upload + companion video
+		// sideload + TranscodeGif) before inspecting REST.
+		await gifToVideoUtils.waitForUploadQueueEmpty( 60_000 );
 
-		// Retrieve the attachment ID from the block and confirm via REST API
-		// that the uploaded file is a video (MP4 or WebM).
+		// Block must remain core/image.
+		const selectedBlockName = await gifToVideoUtils.page.evaluate(
+			() =>
+				window.wp.data.select( 'core/block-editor' ).getSelectedBlock()
+					?.name
+		);
+		expect( selectedBlockName ).toBe( 'core/image' );
+
+		// Attachment must be an image (GIF), not a video.
 		const attachmentId = await gifToVideoUtils.page.evaluate(
 			() =>
 				window.wp.data.select( 'core/block-editor' ).getSelectedBlock()
@@ -174,7 +186,14 @@ test.describe( 'Mediabunny: animated GIF to video conversion', () => {
 			path: `/wp/v2/media/${ attachmentId }`,
 		} );
 
-		// The critical assertion: the GIF was transcoded to a video format.
-		expect( [ 'video/mp4', 'video/webm' ] ).toContain( media.mime_type );
+		expect( media.mime_type ).toBe( 'image/gif' );
+
+		// Companion video filename should be recorded in attachment
+		// metadata under the animated_video key (basename only).
+		expect( media.media_details ).toBeDefined();
+		expect( typeof media.media_details.animated_video ).toBe( 'string' );
+		expect( media.media_details.animated_video ).toMatch(
+			/\.(mp4|webm)$/i
+		);
 	} );
 } );
