@@ -106,8 +106,9 @@ export const Widgets = forwardRef< HTMLDivElement, WidgetsProps >(
 	function Widgets( { className }, ref ) {
 		const { layout, onLayoutChange, editMode, gridSettings } =
 			useDashboardInternalContext();
-
 		const isMasonry = gridSettings.model === 'masonry';
+		const minColumnWidth =
+			gridSettings.minColumnWidth ?? DASHBOARD_MIN_COLUMN_WIDTH;
 
 		const gridLayout = useMemo(
 			() =>
@@ -160,9 +161,6 @@ export const Widgets = forwardRef< HTMLDivElement, WidgetsProps >(
 			renderResizeHandle:
 				WidgetResizeHandle as React.ComponentType< ResizeHandleRenderProps >,
 		};
-
-		const minColumnWidth =
-			gridSettings.minColumnWidth ?? DASHBOARD_MIN_COLUMN_WIDTH;
 
 		const surface: React.ReactNode = isMasonry ? (
 			<DashboardLanes
