@@ -51,6 +51,7 @@
 		text-overflow: ellipsis;
 		white-space: nowrap;
 
+		/* Supports placeholder styling for both Select and Combobox triggers. */
 		.trigger[data-placeholder] & {
 			color: var(--wpds-color-fg-interactive-neutral-disabled);
 		}
