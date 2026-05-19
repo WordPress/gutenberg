@@ -3204,6 +3204,7 @@ class WP_Theme_JSON_Gutenberg {
 				if ( $include_variations && isset( $node['variations'] ) ) {
 					foreach ( $node['variations'] as $variation => $node ) {
 						$variation_selectors[] = array(
+							'name'     => $variation,
 							'path'     => array( 'styles', 'blocks', $name, 'variations', $variation ),
 							'selector' => $selectors[ $name ]['styleVariations'][ $variation ],
 						);
@@ -5464,7 +5465,7 @@ class WP_Theme_JSON_Gutenberg {
 	 */
 	protected static function get_block_style_variation_feature_selector( $style_variation, $feature_selector ) {
 		$variation_path = $style_variation['path'] ?? array();
-		$variation_name = is_array( $variation_path ) ? end( $variation_path ) : null;
+		$variation_name = $style_variation['name'] ?? ( is_array( $variation_path ) ? end( $variation_path ) : null );
 
 		if ( ! $variation_name ) {
 			return $style_variation['selector'] ?? $feature_selector;
