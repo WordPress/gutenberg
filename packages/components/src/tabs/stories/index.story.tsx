@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
 import { fn } from 'storybook/test';
-
-/**
- * WordPress dependencies
- */
 import { wordpress, more, link } from '@wordpress/icons';
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { Tabs } from '..';
 import { Slot, Fill, Provider as SlotFillProvider } from '../../slot-fill';
 import Button from '../../button';
