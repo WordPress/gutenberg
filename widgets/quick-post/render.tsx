@@ -11,10 +11,6 @@ import { useMemo, useState } from '@wordpress/element';
 import { escapeHTML } from '@wordpress/escape-html';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
-<<<<<<< HEAD
-=======
-import { store as noticesStore } from '@wordpress/notices';
->>>>>>> 9f6c172283de0a340ea422aaaaff1d99b4b5f9f8
 import { Button, Stack } from '@wordpress/ui'; // eslint-disable-line @wordpress/use-recommended-components
 
 /**
@@ -86,10 +82,6 @@ export default function QuickPost() {
 	const [ hasDismissedPrompt, setHasDismissedPrompt ] = useState( false );
 
 	const { saveEntityRecord } = useDispatch( coreDataStore );
-<<<<<<< HEAD
-=======
-	const { createSuccessNotice } = useDispatch( noticesStore );
->>>>>>> 9f6c172283de0a340ea422aaaaff1d99b4b5f9f8
 
 	const { existingDraft, isLoadingDrafts } = useSelect( ( select ) => {
 		const { getCurrentUser, getEntityRecords, hasFinishedResolution } =
@@ -169,12 +161,6 @@ export default function QuickPost() {
 			// The newly saved draft would re-trigger the prompt on the next
 			// render; skip it for the rest of this session.
 			setHasDismissedPrompt( true );
-<<<<<<< HEAD
-=======
-			void createSuccessNotice( __( 'Draft saved.' ), {
-				type: 'snackbar',
-			} );
->>>>>>> 9f6c172283de0a340ea422aaaaff1d99b4b5f9f8
 		} finally {
 			setIsSaving( false );
 		}
