@@ -186,7 +186,9 @@ function Layout() {
 											/>
 										) }
 										<SidebarContent routeKey={ routeKey }>
-											{ areas.content ? (
+											{ areas.content &&
+											areas.mobile?.type !==
+												areas.sidebar?.type ? (
 												<ThemeProvider
 													color={ {
 														...themeColors,
