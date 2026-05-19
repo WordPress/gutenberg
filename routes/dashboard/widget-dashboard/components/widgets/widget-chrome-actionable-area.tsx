@@ -12,10 +12,7 @@ import { IconButton, Stack } from '@wordpress/ui';
  * Internal dependencies
  */
 import { unlock } from '../../../lock-unlock';
-import {
-	DEFAULT_GRID,
-	useDashboardInternalContext,
-} from '../../context/dashboard-context';
+import { useDashboardInternalContext } from '../../context/dashboard-context';
 import styles from './widget-chrome-actionable-area.module.css';
 import type { DashboardWidget, GridTilePlacement } from '../../types';
 
@@ -157,7 +154,7 @@ export function WidgetChromeActionableArea( {
 }: WidgetChromeActionableAreaProps ) {
 	const { layout, onLayoutChange, gridSettings } =
 		useDashboardInternalContext();
-	const gridColumns = gridSettings.columns ?? DEFAULT_GRID.columns;
+	const gridColumns = gridSettings.columns;
 	const width = widget.placement?.width;
 
 	const updateWidth = ( nextWidth: GridTilePlacement[ 'width' ] ) => {
