@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import {
-	Icon,
+	Icon as WCIcon,
 	BaseControl,
 	TextControl,
 	Button,
@@ -231,7 +231,7 @@ export function CreateTemplatePartModalContents( {
 												instanceId
 											) }
 										/>
-										<Icon
+										<WCIcon
 											icon={ icon }
 											className="fields-create-template-part-modal__area-radio-icon"
 										/>
@@ -244,7 +244,7 @@ export function CreateTemplatePartModalContents( {
 										>
 											{ item.label }
 										</label>
-										<Icon
+										<WCIcon
 											icon={ check }
 											className="fields-create-template-part-modal__area-radio-checkmark"
 										/>

@@ -1,3 +1,14 @@
-export { store } from './store';
-export { bootstrapWidgetTypes } from './bootstrap';
-export type { WidgetName, WidgetTypeMetadata, WidgetType } from './types';
+/**
+ * Hooks
+ */
+export { useWidgetTypes } from './hooks';
+
+/**
+ * Types
+ */
+export type {
+	WidgetName,
+	WidgetTypeMetadata,
+	WidgetType,
+	WidgetRenderProps,
+} from './types';

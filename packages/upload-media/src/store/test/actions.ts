@@ -1085,5 +1085,137 @@ describe( 'actions', () => {
 			// Exactly at threshold means no scaling (condition is > not >=).
 			expect( scaledItems ).toHaveLength( 0 );
 		} );
+
+		// Sub-size and scaled-sideload naming uses attachment.filename
+		// verbatim. The cases below cover both the everyday filename and
+		// edge cases that previously broke with a client-side strip:
+		//   - a legitimate `-scaled` suffix in the user's filename
+		//   - the literal basename `scaled.jpg`
+		//   - `-scaled` appearing mid-name
+		//   - the server's numeric conflict-resolution suffix
+		//   - mixed case and multi-dot filenames
+		it.each( [
+			'IMG_2300.jpg',
+			'foo-scaled.jpg',
+			'scaled.jpg',
+			'my-scaled-image.jpg',
+			'IMG_2300-1.jpg',
+			'IMG-scaled-2.jpg',
+			'image.with.dots.jpg',
+			'FOO-SCALED.JPG',
+			'photo.jpeg',
+		] )( 'uses %s verbatim for thumbnail sideloads', async ( filename ) => {
+			mockCreateImageBitmap( 800, 600 );
+
+			unlock( registry.dispatch( uploadStore ) ).updateSettings( {
+				bigImageSizeThreshold: 2560,
+				allImageSizes: {
+					thumbnail: { width: 150, height: 150 },
+					medium: { width: 300, height: 300 },
+				},
+			} );
+
+			const item = await setupItemForThumbnailGeneration( {
+				attachment: { filename },
+			} );
+			await unlock( registry.dispatch( uploadStore ) ).generateThumbnails(
+				item.id
+			);
+
+			const thumbnailItems = unlock( registry.select( uploadStore ) )
+				.getAllItems()
+				.filter(
+					( i ) =>
+						i.additionalData?.image_size === 'thumbnail' ||
+						i.additionalData?.image_size === 'medium'
+				);
+			expect( thumbnailItems ).toHaveLength( 2 );
+			for ( const sideload of thumbnailItems ) {
+				expect( sideload.file.name ).toBe( filename );
+			}
+		} );
+
+		it.each( [
+			'IMG_2300.jpg',
+			'foo-scaled.jpg',
+			'scaled.jpg',
+			'IMG_2300-1.jpg',
+			'image.with.dots.jpg',
+		] )(
+			'uses %s verbatim for the scaled sideload when above threshold',
+			async ( filename ) => {
+				// Image above threshold triggers the scaled sideload path.
+				mockCreateImageBitmap( 4000, 3000 );
+
+				unlock( registry.dispatch( uploadStore ) ).updateSettings( {
+					bigImageSizeThreshold: 2560,
+					allImageSizes: {
+						thumbnail: { width: 150, height: 150 },
+					},
+				} );
+
+				const item = await setupItemForThumbnailGeneration( {
+					attachment: {
+						filename,
+						missing_image_sizes: [ 'thumbnail' ],
+					},
+				} );
+				await unlock(
+					registry.dispatch( uploadStore )
+				).generateThumbnails( item.id );
+
+				const scaledItems = unlock( registry.select( uploadStore ) )
+					.getAllItems()
+					.filter(
+						( i ) => i.additionalData?.image_size === 'scaled'
+					);
+				expect( scaledItems ).toHaveLength( 1 );
+				// vipsResizeImage adds the `-scaled` suffix during the
+				// ResizeCrop op; the sideload enters the queue under the
+				// server's filename so the resulting file matches WP core's
+				// naming (e.g. foo-scaled.jpg → foo-scaled-scaled.jpg, which
+				// is correct because the user really did have `-scaled` in
+				// their original name and the file was just scaled again).
+				expect( scaledItems[ 0 ].file.name ).toBe( filename );
+			}
+		);
+	} );
+
+	describe( 'prepareItem big image threshold', () => {
+		it( 'should not pre-scale the main upload when bigImageSizeThreshold is set', async () => {
+			// Pre-scaling the main upload would cause the server-returned
+			// attachment.filename to carry `-scaled`, which would then leak
+			// into every sub-size name. Threshold scaling must happen as a
+			// sideload so the original is uploaded with its un-suffixed
+			// basename.
+			unlock( registry.dispatch( uploadStore ) ).updateSettings( {
+				bigImageSizeThreshold: 2560,
+			} );
+			unlock( registry.dispatch( uploadStore ) ).addItem( {
+				file: jpegFile,
+			} );
+
+			const item = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			await unlock( registry.dispatch( uploadStore ) ).prepareItem(
+				item.id
+			);
+
+			const updatedItem = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			expect( updatedItem.operations ).not.toEqual(
+				expect.arrayContaining( [ OperationType.ResizeCrop ] )
+			);
+			expect( updatedItem.operations ).toEqual(
+				expect.arrayContaining( [
+					OperationType.Upload,
+					OperationType.ThumbnailGeneration,
+				] )
+			);
+		} );
 	} );
 } );

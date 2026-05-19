@@ -11,7 +11,7 @@ import { BlockPreview } from '@wordpress/block-editor';
 import {
 	PanelBody,
 	Button,
-	Tooltip,
+	Tooltip as WCTooltip,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
@@ -117,7 +117,7 @@ export default function TemplateActionsPanelContent() {
 		if ( hasSwapTargets ) {
 			const tooltipText = __( 'Change template' );
 			return (
-				<Tooltip text={ tooltipText }>
+				<WCTooltip text={ tooltipText }>
 					<div
 						className="editor-template-actions-panel__preview"
 						role="button"
@@ -128,7 +128,7 @@ export default function TemplateActionsPanelContent() {
 					>
 						{ previewContent }
 					</div>
-				</Tooltip>
+				</WCTooltip>
 			);
 		}
 

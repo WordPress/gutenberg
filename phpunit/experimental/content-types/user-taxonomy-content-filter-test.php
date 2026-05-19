@@ -21,6 +21,13 @@ class User_Taxonomy_Content_Filter_Test extends WP_UnitTestCase {
 
 	public static function wpSetUpBeforeClass( WP_UnitTest_Factory $factory ) {
 		self::$admin_id = $factory->user->create( array( 'role' => 'administrator' ) );
+		// On multisite, `unfiltered_html` belongs to super admins only; the
+		// single-site administrator role doesn't carry it. Promote so the
+		// kses pre-filter is bypassed in both environments and the test
+		// exercises our sanitizer as the sole line of defense.
+		if ( is_multisite() ) {
+			grant_super_admin( self::$admin_id );
+		}
 	}
 
 	public static function wpTearDownAfterClass() {

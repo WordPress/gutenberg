@@ -168,6 +168,7 @@ describe( 'global styles renderer', () => {
 						},
 					},
 					selector: ELEMENTS.link,
+					elementName: 'link',
 					skipSelectorWrapper: true,
 				},
 				{
@@ -187,6 +188,7 @@ describe( 'global styles renderer', () => {
 						},
 					},
 					selector: '.my-heading1 h1, .my-heading2 h1',
+					elementName: 'h1',
 				},
 				{
 					styles: {
@@ -195,6 +197,7 @@ describe( 'global styles renderer', () => {
 						},
 					},
 					selector: '.my-heading1 h2, .my-heading2 h2',
+					elementName: 'h2',
 				},
 				{
 					styles: {
@@ -213,6 +216,7 @@ describe( 'global styles renderer', () => {
 					},
 					selector:
 						'.my-heading1 a:where(:not(.wp-element-button)), .my-heading2 a:where(:not(.wp-element-button))',
+					elementName: 'link',
 				},
 				{
 					styles: {
@@ -392,6 +396,15 @@ describe( 'global styles renderer', () => {
 	} );
 
 	describe( 'transformToStyles', () => {
+		const minimalStyleOptions = {
+			blockGap: false,
+			blockStyles: true,
+			layoutStyles: false,
+			marginReset: false,
+			presets: false,
+			rootPadding: false,
+		};
+
 		it( 'should return a ruleset', () => {
 			const tree = {
 				settings: {
@@ -652,6 +665,72 @@ describe( 'global styles renderer', () => {
 			);
 		} );
 
+		it( 'handles variation inner block states', () => {
+			const tree = {
+				styles: {
+					blocks: {
+						'core/group': {
+							variations: {
+								foo: {
+									blocks: {
+										'core/button': {
+											color: {
+												text: 'red',
+											},
+											':hover': {
+												color: {
+													text: 'blue',
+												},
+											},
+											mobile: {
+												color: {
+													text: 'green',
+												},
+												':hover': {
+													color: {
+														text: 'yellow',
+													},
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			} as unknown as GlobalStylesConfig;
+
+			const blockSelectors = {
+				'core/group': {
+					selector: '.wp-block-group',
+					styleVariationSelectors: {
+						foo: '.is-style-foo.wp-block-group',
+					},
+				},
+				'core/button': {
+					selector: '.wp-block-button',
+				},
+			};
+
+			const result = transformToStyles(
+				Object.freeze( tree ),
+				blockSelectors,
+				false,
+				false,
+				true,
+				true,
+				{
+					...minimalStyleOptions,
+					variationStyles: true,
+				}
+			);
+
+			expect( result ).toEqual(
+				':root :where(.is-style-foo.wp-block-group .wp-block-button){color: red;}@media (width <= 480px){:root :where(.is-style-foo.wp-block-group .wp-block-button){color: green;}}:root :where(.is-style-foo.wp-block-group .wp-block-button:hover){color: blue;}@media (width <= 480px){:root :where(.is-style-foo.wp-block-group .wp-block-button:hover){color: yellow;}}'
+			);
+		} );
+
 		it( 'should handle block pseudo selectors', () => {
 			const tree = {
 				styles: {
@@ -696,6 +775,87 @@ describe( 'global styles renderer', () => {
 			expect( result ).toEqual(
 				':root :where(.wp-block-button){color: red;}:root :where(.wp-block-button:hover){color: blue;}'
 			);
+		} );
+
+		it( 'outputs default pseudo styles after responsive base styles', () => {
+			const tree = {
+				styles: {
+					blocks: {
+						'core/button': {
+							color: {
+								text: 'black',
+							},
+							':hover': {
+								color: {
+									text: 'blue',
+								},
+							},
+							mobile: {
+								color: {
+									text: 'red',
+								},
+							},
+						},
+					},
+				},
+			} as unknown as GlobalStylesConfig;
+
+			const blockSelectors = {
+				'core/button': {
+					selector: '.wp-block-button',
+				},
+			};
+
+			const result = transformToStyles(
+				Object.freeze( tree ),
+				blockSelectors,
+				false,
+				false,
+				true,
+				true,
+				minimalStyleOptions
+			);
+
+			expect( result ).toEqual(
+				':root :where(.wp-block-button){color: black;}@media (width <= 480px){:root :where(.wp-block-button){color: red;}}:root :where(.wp-block-button:hover){color: blue;}'
+			);
+		} );
+
+		it( 'ignores root-level state styles', () => {
+			const tree = {
+				styles: {
+					color: {
+						text: 'red',
+					},
+					':hover': {
+						color: {
+							text: 'blue',
+						},
+					},
+					mobile: {
+						color: {
+							text: 'green',
+						},
+						':hover': {
+							color: {
+								text: 'yellow',
+							},
+						},
+					},
+				},
+			} as unknown as GlobalStylesConfig;
+
+			const result = transformToStyles(
+				Object.freeze( tree ),
+				{},
+				false,
+				false,
+				true,
+				true,
+				minimalStyleOptions
+			);
+
+			expect( result ).toEqual( 'body{color: red;}' );
 		} );
 
 		it( 'should handle style variation pseudo selectors', () => {
@@ -749,6 +909,283 @@ describe( 'global styles renderer', () => {
 
 			expect( result ).toEqual(
 				':root :where(.is-style-foo.wp-block-button){color: green;}:root :where(.is-style-foo.wp-block-button:hover){color: yellow;}'
+			);
+		} );
+
+		it( 'outputs variation pseudo styles after variation responsive base styles', () => {
+			const tree = {
+				styles: {
+					blocks: {
+						'core/button': {
+							variations: {
+								foo: {
+									color: {
+										text: 'green',
+									},
+									':hover': {
+										color: {
+											text: 'blue',
+										},
+									},
+									mobile: {
+										color: {
+											text: 'red',
+										},
+										':hover': {
+											color: {
+												text: 'orange',
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			} as unknown as GlobalStylesConfig;
+
+			const blockSelectors = {
+				'core/button': {
+					selector: '.wp-block-button',
+					styleVariationSelectors: {
+						foo: '.is-style-foo.wp-block-button',
+					},
+				},
+			};
+
+			const result = transformToStyles(
+				Object.freeze( tree ),
+				blockSelectors,
+				false,
+				false,
+				true,
+				true,
+				{
+					...minimalStyleOptions,
+					variationStyles: true,
+				}
+			);
+
+			expect( result ).toEqual(
+				':root :where(.is-style-foo.wp-block-button){color: green;}@media (width <= 480px){:root :where(.is-style-foo.wp-block-button){color: red;}}:root :where(.is-style-foo.wp-block-button:hover){color: blue;}@media (width <= 480px){:root :where(.is-style-foo.wp-block-button:hover){color: orange;}}'
+			);
+		} );
+
+		it( 'handles responsive block styles', () => {
+			const tree = {
+				styles: {
+					blocks: {
+						'core/button': {
+							color: {
+								text: 'red',
+							},
+							mobile: {
+								color: {
+									text: 'blue',
+								},
+							},
+						},
+					},
+				},
+			} as unknown as GlobalStylesConfig;
+
+			const blockSelectors = {
+				'core/button': {
+					selector: '.wp-block-button',
+				},
+			};
+
+			const result = transformToStyles(
+				Object.freeze( tree ),
+				blockSelectors,
+				false,
+				false,
+				true,
+				true,
+				minimalStyleOptions
+			);
+
+			expect( result ).toEqual(
+				':root :where(.wp-block-button){color: red;}@media (width <= 480px){:root :where(.wp-block-button){color: blue;}}'
+			);
+		} );
+
+		it( 'handles responsive pseudo selector styles', () => {
+			const tree = {
+				styles: {
+					blocks: {
+						'core/button': {
+							':hover': {
+								color: {
+									text: 'blue',
+								},
+							},
+							mobile: {
+								color: {
+									text: 'red',
+								},
+								':hover': {
+									color: {
+										text: 'orange',
+									},
+								},
+							},
+						},
+					},
+				},
+			} as unknown as GlobalStylesConfig;
+
+			const blockSelectors = {
+				'core/button': {
+					selector: '.wp-block-button',
+				},
+			};
+
+			const result = transformToStyles(
+				Object.freeze( tree ),
+				blockSelectors,
+				false,
+				false,
+				true,
+				true,
+				minimalStyleOptions
+			);
+
+			expect( result ).toEqual(
+				'@media (width <= 480px){:root :where(.wp-block-button){color: red;}}:root :where(.wp-block-button:hover){color: blue;}@media (width <= 480px){:root :where(.wp-block-button:hover){color: orange;}}'
+			);
+		} );
+
+		it( 'handles responsive feature selector styles', () => {
+			const tree = {
+				settings: {},
+				styles: {
+					blocks: {
+						'core/button': {
+							dimensions: {
+								width: '25%',
+							},
+							mobile: {
+								dimensions: {
+									width: '50%',
+								},
+							},
+						},
+					},
+				},
+			} as unknown as GlobalStylesConfig;
+
+			const blockSelectors = {
+				'core/button': {
+					selector: '.wp-block-button .wp-block-button__link',
+					featureSelectors: {
+						dimensions: {
+							root: '.wp-block-button',
+							width: '.wp-block-button',
+						},
+					},
+				},
+			};
+
+			const result = transformToStyles(
+				Object.freeze( tree ),
+				blockSelectors,
+				false,
+				false,
+				true,
+				true,
+				minimalStyleOptions
+			);
+
+			expect( result ).toEqual(
+				':root :where(.wp-block-button){width: calc(25 * 1% - (var(--wp--style--block-gap, 0.5em) * (1 - 25 / 100)));}@media (width <= 480px){:root :where(.wp-block-button){width: calc(50 * 1% - (var(--wp--style--block-gap, 0.5em) * (1 - 50 / 100)));}}'
+			);
+		} );
+
+		it( 'handles responsive element styles', () => {
+			const tree = {
+				styles: {
+					elements: {
+						link: {
+							color: {
+								text: 'blue',
+							},
+							mobile: {
+								color: {
+									text: 'red',
+								},
+								':hover': {
+									color: {
+										text: 'orange',
+									},
+								},
+							},
+						},
+					},
+				},
+			} as unknown as GlobalStylesConfig;
+
+			const result = transformToStyles(
+				Object.freeze( tree ),
+				{},
+				false,
+				false,
+				true,
+				true,
+				minimalStyleOptions
+			);
+
+			expect( result ).toEqual(
+				'a:where(:not(.wp-element-button)){color: blue;}@media (width <= 480px){:root :where(a:where(:not(.wp-element-button))){color: red;}}@media (width <= 480px){:root :where(a:where(:not(.wp-element-button)):hover){color: orange;}}'
+			);
+		} );
+
+		it( 'handles responsive style variation styles', () => {
+			const tree = {
+				styles: {
+					blocks: {
+						'core/button': {
+							variations: {
+								foo: {
+									color: {
+										text: 'green',
+									},
+									mobile: {
+										color: {
+											text: 'yellow',
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			} as unknown as GlobalStylesConfig;
+
+			const blockSelectors = {
+				'core/button': {
+					selector: '.wp-block-button',
+					styleVariationSelectors: {
+						foo: '.is-style-foo.wp-block-button',
+					},
+				},
+			};
+
+			const result = transformToStyles(
+				Object.freeze( tree ),
+				blockSelectors,
+				false,
+				false,
+				true,
+				true,
+				{
+					...minimalStyleOptions,
+					variationStyles: true,
+				}
+			);
+
+			expect( result ).toEqual(
+				':root :where(.is-style-foo.wp-block-button){color: green;}@media (width <= 480px){:root :where(.is-style-foo.wp-block-button){color: yellow;}}'
 			);
 		} );
 
