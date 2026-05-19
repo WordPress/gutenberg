@@ -7,7 +7,10 @@ import type { ReactNode } from 'react';
 /**
  * WordPress dependencies
  */
-import { Dropdown, MenuGroup, MenuItem, Spinner } from '@wordpress/components';
+import {
+	privateApis as componentsPrivateApis,
+	Spinner,
+} from '@wordpress/components';
 import {
 	Component,
 	Suspense,
@@ -17,7 +20,6 @@ import {
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
-	check,
 	contents,
 	stretchFullWidth,
 	stretchWide,
@@ -37,11 +39,14 @@ import {
 /**
  * Internal dependencies
  */
+import { unlock } from '../../../lock-unlock';
 import { useDashboardInternalContext } from '../../context/dashboard-context';
 import { WidgetContextProvider } from '../../context/widget-context';
 import { WidgetRender } from '../widget-render';
 import styles from './widget-chrome.module.css';
 import type { DashboardWidget, WidgetType } from '../../types';
+
+const { Menu } = unlock( componentsPrivateApis );
 
 interface ErrorBoundaryProps {
 	children: ReactNode;
@@ -150,48 +155,40 @@ function HeaderActions( {
 }: HeaderActionsProps ) {
 	return (
 		<Stack direction="row" align="center" gap="sm">
-			<Dropdown
-				style={ { height: '24px', width: '24px' } }
-				popoverProps={ { placement: 'bottom-end' } }
-				renderToggle={ ( { isOpen, onToggle } ) => (
-					<IconButton
-						icon={ WIDTH_MODE_ICON[ selectedWidthMode ] }
-						label={ __( 'Widget width' ) }
-						size="small"
-						variant="minimal"
-						tone="neutral"
-						aria-expanded={ isOpen }
-						onClick={ onToggle }
-					/>
-				) }
-				renderContent={ ( { onClose } ) => (
-					<MenuGroup>
-						{ WIDTH_MODES.map( ( mode ) => {
-							const isSelected = selectedWidthMode === mode;
-							return (
-								<MenuItem
-									key={ mode }
-									role="menuitemradio"
-									icon={ WIDTH_MODE_ICON[ mode ] }
-									iconPosition="left"
-									suffix={
-										isSelected ? (
-											<Icon icon={ check } />
-										) : undefined
-									}
-									isSelected={ isSelected }
-									onClick={ () => {
-										onWidthChange( mode );
-										onClose();
-									} }
-								>
+			<Menu>
+				<Menu.TriggerButton
+					render={
+						<IconButton
+							icon={ WIDTH_MODE_ICON[ selectedWidthMode ] }
+							label={ __( 'Widget width' ) }
+							size="small"
+							variant="minimal"
+							tone="neutral"
+						/>
+					}
+				/>
+				<Menu.Popover>
+					<Menu.Group>
+						{ WIDTH_MODES.map( ( mode ) => (
+							<Menu.RadioItem
+								key={ mode }
+								name="widget-width"
+								value={ mode }
+								checked={ selectedWidthMode === mode }
+								hideOnClick
+								onChange={ () => onWidthChange( mode ) }
+								suffix={
+									<Icon icon={ WIDTH_MODE_ICON[ mode ] } />
+								}
+							>
+								<Menu.ItemLabel>
 									{ WIDTH_MODE_LABEL[ mode ] }
-								</MenuItem>
-							);
-						} ) }
-					</MenuGroup>
-				) }
-			/>
+								</Menu.ItemLabel>
+							</Menu.RadioItem>
+						) ) }
+					</Menu.Group>
+				</Menu.Popover>
+			</Menu>
 			<IconButton
 				icon={ trash }
 				label={ __( 'Remove' ) }
