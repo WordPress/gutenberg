@@ -1,19 +1,3 @@
-/**
- * WordPress dependencies
- */
-import {
-	type ThemeProvider as ThemeProviderType,
-	privateApis as themePrivateApis,
-} from '@wordpress/theme';
-
-/**
- * Internal dependencies
- */
-import { unlock } from '../lock-unlock';
-
-const ThemeProvider: typeof ThemeProviderType =
-	unlock( themePrivateApis ).ThemeProvider;
-
 const ADMIN_THEME_PRIMARY_COLORS = new Map< string, string >( [
 	[ 'light', '#0085ba' ],
 	[ 'modern', '#3858e9' ],
@@ -37,6 +21,14 @@ const ADMIN_THEME_BACKGROUND_COLORS = new Map< string, string >( [
 	[ 'light', '#e5e5e5' ],
 ] );
 
+/**
+ * Reads the active WordPress admin color scheme from the `admin-color-*` body
+ * class and returns its primary and background colors. Intended to seed a
+ * `ThemeProvider` (`color` prop) so the design system matches the user's chosen
+ * admin color scheme.
+ *
+ * @return The primary and background colors for the active admin color scheme.
+ */
 export function getAdminThemeColors() {
 	const scheme =
 		document.body.className.match( /admin-color-([\w-]+)/ )?.[ 1 ];
@@ -47,15 +39,4 @@ export function getAdminThemeColors() {
 			( scheme && ADMIN_THEME_BACKGROUND_COLORS.get( scheme ) ) ||
 			ADMIN_THEME_BACKGROUND_COLORS.get( 'fresh' ),
 	};
-}
-
-export function UserThemeProvider( {
-	color,
-	...restProps
-}: React.ComponentProps< typeof ThemeProvider > ) {
-	const { primary, bg } = getAdminThemeColors();
-
-	return (
-		<ThemeProvider { ...restProps } color={ { primary, bg, ...color } } />
-	);
 }

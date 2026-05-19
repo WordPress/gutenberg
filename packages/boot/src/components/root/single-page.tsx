@@ -10,6 +10,7 @@ import { privateApis as routePrivateApis } from '@wordpress/route';
 import { SnackbarNotices } from '@wordpress/notices';
 import { SlotFillProvider } from '@wordpress/components';
 import { privateApis as adminUiPrivateApis } from '@wordpress/admin-ui';
+import { privateApis as themePrivateApis } from '@wordpress/theme';
 
 /**
  * Internal dependencies
@@ -22,7 +23,8 @@ import './style.scss';
 import useRouteTitle from '../app/use-route-title';
 
 const { useMatches, Outlet } = unlock( routePrivateApis );
-const { UserThemeProvider } = unlock( adminUiPrivateApis );
+const { getAdminThemeColors } = unlock( adminUiPrivateApis );
+const { ThemeProvider } = unlock( themePrivateApis );
 
 /**
  * Root component for single page mode (no sidebar).
@@ -41,10 +43,12 @@ export default function RootSinglePage() {
 
 	useRouteTitle();
 
+	const themeColors = getAdminThemeColors();
+
 	return (
 		<SlotFillProvider>
-			<UserThemeProvider isRoot color={ { bg: '#f8f8f8' } }>
-				<UserThemeProvider>
+			<ThemeProvider isRoot color={ { ...themeColors, bg: '#f8f8f8' } }>
+				<ThemeProvider color={ themeColors }>
 					<div
 						className={ clsx(
 							'boot-layout boot-layout--single-page',
@@ -57,7 +61,9 @@ export default function RootSinglePage() {
 						<SavePanel />
 						<SnackbarNotices className="boot-notices__snackbar" />
 						<div className="boot-layout__surfaces">
-							<UserThemeProvider color={ { bg: '#ffffff' } }>
+							<ThemeProvider
+								color={ { ...themeColors, bg: '#ffffff' } }
+							>
 								<Outlet />
 								{ /* Render Canvas in Root to prevent remounting on route changes */ }
 								{ ( canvas || canvas === null ) && (
@@ -70,11 +76,11 @@ export default function RootSinglePage() {
 										/>
 									</div>
 								) }
-							</UserThemeProvider>
+							</ThemeProvider>
 						</div>
 					</div>
-				</UserThemeProvider>
-			</UserThemeProvider>
+				</ThemeProvider>
+			</ThemeProvider>
 		</SlotFillProvider>
 	);
 }

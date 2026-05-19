@@ -30,6 +30,7 @@ import {
 	privateApis as editorPrivateApis,
 } from '@wordpress/editor';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
+import { privateApis as themePrivateApis } from '@wordpress/theme';
 import { PluginArea } from '@wordpress/plugins';
 import { SnackbarNotices, store as noticesStore } from '@wordpress/notices';
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -52,11 +53,13 @@ import SavePanel from '../save-panel';
 
 const { useLocation } = unlock( routerPrivateApis );
 const { useStyle } = unlock( editorPrivateApis );
-const { UserThemeProvider } = unlock( adminUiPrivateApis );
+const { getAdminThemeColors } = unlock( adminUiPrivateApis );
+const { ThemeProvider } = unlock( themePrivateApis );
 
 const ANIMATION_DURATION = 0.3;
 
 function Layout() {
+	const themeColors = getAdminThemeColors();
 	const { query, name: routeKey, areas, widths } = useLocation();
 	// Force canvas to 'view' on notfound route to show the error message and allow navigation.
 	const canvas = routeKey === 'notfound' ? 'view' : query?.canvas ?? 'view';
@@ -184,15 +187,18 @@ function Layout() {
 										) }
 										<SidebarContent routeKey={ routeKey }>
 											{ areas.content ? (
-												<UserThemeProvider
-													color={ { bg: '#ffffff' } }
+												<ThemeProvider
+													color={ {
+														...themeColors,
+														bg: '#ffffff',
+													} }
 												>
 													<div className="edit-site-layout__mobile-content">
 														<ErrorBoundary>
 															{ areas.mobile }
 														</ErrorBoundary>
 													</div>
-												</UserThemeProvider>
+												</ThemeProvider>
 											) : (
 												<ErrorBoundary>
 													{ areas.mobile }
@@ -220,11 +226,16 @@ function Layout() {
 									maxWidth: widths?.content,
 								} }
 							>
-								<UserThemeProvider color={ { bg: '#ffffff' } }>
+								<ThemeProvider
+									color={ {
+										...themeColors,
+										bg: '#ffffff',
+									} }
+								>
 									<ErrorBoundary>
 										{ areas.content }
 									</ErrorBoundary>
-								</UserThemeProvider>
+								</ThemeProvider>
 							</div>
 						) }
 
@@ -235,9 +246,14 @@ function Layout() {
 								maxWidth: widths?.edit,
 							} }
 						>
-							<UserThemeProvider color={ { bg: '#ffffff' } }>
+							<ThemeProvider
+								color={ {
+									...themeColors,
+									bg: '#ffffff',
+								} }
+							>
 								<ErrorBoundary>{ areas.edit }</ErrorBoundary>
-							</UserThemeProvider>
+							</ThemeProvider>
 						</div>
 					) }
 
@@ -277,11 +293,14 @@ function Layout() {
 													backgroundColor,
 											} }
 										>
-											<UserThemeProvider
-												color={ { bg: '#ffffff' } }
+											<ThemeProvider
+												color={ {
+													...themeColors,
+													bg: '#ffffff',
+												} }
 											>
 												{ areas.preview }
-											</UserThemeProvider>
+											</ThemeProvider>
 										</ResizableFrame>
 									</ErrorBoundary>
 								</div>
@@ -295,6 +314,7 @@ function Layout() {
 }
 
 export default function LayoutWithGlobalStylesProvider( props ) {
+	const themeColors = getAdminThemeColors();
 	const { createErrorNotice } = useDispatch( noticesStore );
 	function onPluginAreaError( name ) {
 		createErrorNotice(
@@ -313,9 +333,9 @@ export default function LayoutWithGlobalStylesProvider( props ) {
 			<Tooltip.Provider>
 				{ /** This needs to be within the SlotFillProvider */ }
 				<PluginArea onError={ onPluginAreaError } />
-				<UserThemeProvider>
+				<ThemeProvider color={ themeColors }>
 					<Layout { ...props } />
-				</UserThemeProvider>
+				</ThemeProvider>
 			</Tooltip.Provider>
 		</SlotFillProvider>
 	);
