@@ -36,7 +36,7 @@ import type {
  * resolves to `undefined`, to keep legibility intact for stored settings
  * that predate the layered model.
  */
-const DEFAULT_GRID: WidgetGridSettings = {
+export const DEFAULT_GRID: WidgetGridSettings = {
 	columns: 6,
 	minColumnWidth: 350,
 	rowHeight: 200,

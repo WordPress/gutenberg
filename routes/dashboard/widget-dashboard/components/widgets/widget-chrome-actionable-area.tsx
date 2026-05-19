@@ -12,7 +12,10 @@ import { IconButton, Stack } from '@wordpress/ui';
  * Internal dependencies
  */
 import { unlock } from '../../../lock-unlock';
-import { useDashboardInternalContext } from '../../context/dashboard-context';
+import {
+	DEFAULT_GRID,
+	useDashboardInternalContext,
+} from '../../context/dashboard-context';
 import styles from './widget-chrome-actionable-area.module.css';
 import type { DashboardWidget, GridTilePlacement } from '../../types';
 
@@ -20,9 +23,6 @@ const { Menu } = unlock( componentsPrivateApis );
 
 const COLUMN_SPAN_RADIO_NAME = 'widget-column-span';
 const NAMED_WIDTH_RADIO_NAME = 'widget-named-width';
-
-/** Matches `DEFAULT_GRID.columns` in the dashboard provider. */
-const DEFAULT_GRID_COLUMNS = 6;
 
 type NamedGridWidth = Exclude<
 	NonNullable< GridTilePlacement[ 'width' ] >,
@@ -157,7 +157,7 @@ export function WidgetChromeActionableArea( {
 }: WidgetChromeActionableAreaProps ) {
 	const { layout, onLayoutChange, gridSettings } =
 		useDashboardInternalContext();
-	const gridColumns = gridSettings.columns ?? DEFAULT_GRID_COLUMNS;
+	const gridColumns = gridSettings.columns ?? DEFAULT_GRID.columns;
 	const width = widget.placement?.width;
 
 	const updateWidth = ( nextWidth: GridTilePlacement[ 'width' ] ) => {
