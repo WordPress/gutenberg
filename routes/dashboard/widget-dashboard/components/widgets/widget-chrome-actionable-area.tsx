@@ -3,12 +3,7 @@
  */
 import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import {
-	resizeCornerNE,
-	stretchFullWidth,
-	stretchWide,
-	trash,
-} from '@wordpress/icons';
+import { trash } from '@wordpress/icons';
 // Dashboard is still experimental.
 // eslint-disable-next-line @wordpress/use-recommended-components
 import { Icon, IconButton, Stack } from '@wordpress/ui';
@@ -18,6 +13,7 @@ import { Icon, IconButton, Stack } from '@wordpress/ui';
  */
 import { unlock } from '../../../lock-unlock';
 import { useDashboardInternalContext } from '../../context/dashboard-context';
+import { widthCustom, widthFill, widthFull } from './width-mode-icons';
 import styles from './widget-chrome-actionable-area.module.css';
 import type { DashboardWidget, GridTilePlacement } from '../../types';
 
@@ -31,9 +27,9 @@ type WidthMode = 'custom' | NamedGridWidth;
 
 const WIDTH_MODES: WidthMode[] = [ 'custom', 'fill', 'full' ];
 const WIDTH_MODE_ICON = {
-	custom: resizeCornerNE,
-	fill: stretchWide,
-	full: stretchFullWidth,
+	custom: widthCustom,
+	fill: widthFill,
+	full: widthFull,
 } as const;
 
 interface WidgetChromeActionsProps {
