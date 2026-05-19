@@ -17,8 +17,16 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 const ASSETS_DIR = path.join( __dirname, '..', '..', '..', 'assets' );
 
-/** Animated GIF fixture used for conversion tests. */
-const ANIMATED_GIF_FIXTURE = '100x80_e2e_test_image_animated.gif';
+/**
+ * Animated GIF fixture used for conversion tests.
+ *
+ * Deliberately uses odd width AND height (599x441): the avc/vp9 encoders
+ * reject odd dimensions, so this fixture regression-guards the even-dimension
+ * padding. Its size also makes the ImageDecoder track-ready race
+ * (`completed` resolving before `tracks.ready`) reproducible, which an
+ * even, tiny fixture did not catch.
+ */
+const ANIMATED_GIF_FIXTURE = '599x441_e2e_test_image_animated.gif';
 
 test.use( {
 	gifToVideoUtils: async ( { page }, use ) => {
