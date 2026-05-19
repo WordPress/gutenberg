@@ -8,7 +8,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import { displayShortcut, rawShortcut } from '@wordpress/keycodes';
 import { check } from '@wordpress/icons';
 import { EntitiesSavedStates } from '@wordpress/editor';
-import { Button, Modal, Tooltip } from '@wordpress/components';
+import { Button, Modal, Tooltip as WCTooltip } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -85,7 +85,7 @@ export default function SaveButton() {
 
 	return (
 		<>
-			<Tooltip
+			<WCTooltip
 				text={ hasChanges ? label : undefined }
 				shortcut={ displayShortcut.primary( 's' ) }
 			>
@@ -103,7 +103,7 @@ export default function SaveButton() {
 				>
 					{ label }
 				</Button>
-			</Tooltip>
+			</WCTooltip>
 			{ isSaveViewOpen && (
 				<Modal
 					title={ __( 'Review changes' ) }

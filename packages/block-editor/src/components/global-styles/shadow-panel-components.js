@@ -11,7 +11,7 @@ import {
 	FlexItem,
 	Dropdown,
 	Composite,
-	Tooltip,
+	Tooltip as WCTooltip,
 } from '@wordpress/components';
 import { useMemo, useRef } from '@wordpress/element';
 import { shadow as shadowIcon, Icon, check, reset } from '@wordpress/icons';
@@ -82,7 +82,7 @@ export function ShadowPresets( { presets, activeShadow, onSelect } ) {
 
 export function ShadowIndicator( { type, label, isActive, onSelect, shadow } ) {
 	return (
-		<Tooltip text={ label }>
+		<WCTooltip text={ label }>
 			<Composite.Item
 				role="option"
 				aria-label={ label }
@@ -106,7 +106,7 @@ export function ShadowIndicator( { type, label, isActive, onSelect, shadow } ) {
 					</button>
 				}
 			/>
-		</Tooltip>
+		</WCTooltip>
 	);
 }
 

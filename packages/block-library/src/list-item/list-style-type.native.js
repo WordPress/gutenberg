@@ -6,7 +6,7 @@ import { View, Text } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { Icon } from '@wordpress/components';
+import { Icon as WCIcon } from '@wordpress/components';
 import { Platform } from '@wordpress/element';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 
@@ -85,7 +85,7 @@ function IconList( { fontSize, color, defaultFontSize, indentationLevel } ) {
 
 	return (
 		<View style={ listStyles }>
-			<Icon icon={ listIcon } size={ iconSize } />
+			<WCIcon icon={ listIcon } size={ iconSize } />
 		</View>
 	);
 }

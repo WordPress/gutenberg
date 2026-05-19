@@ -340,6 +340,44 @@ class WP_Block_Supports_Custom_CSS_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Tests that custom CSS class surrounded by ASCII whitespace (other than space) is extracted.
+	 *
+	 * @covers ::gutenberg_render_custom_css_class_name
+	 */
+	public function test_render_custom_css_class_name_extracts_class_between_whitespace() {
+		$block_content = '<div class="wp-block-paragraph">Test content</div>';
+		$block         = array(
+			'blockName' => 'core/paragraph',
+			'attrs'     => array(
+				'className' => "\twp-custom-css-123abc\t",
+			),
+		);
+
+		$result = gutenberg_render_custom_css_class_name( $block_content, $block );
+
+		$this->assertStringContainsString( 'wp-custom-css-123abc', $result, 'Custom CSS class should be extracted from between whitespace.' );
+	}
+
+	/**
+	 * Tests that a class merely prefixed with wp-custom-css- (e.g. via a hyphen) is not treated as the custom CSS class.
+	 *
+	 * @covers ::gutenberg_render_custom_css_class_name
+	 */
+	public function test_render_custom_css_class_name_returns_unchanged_for_prefixed_class() {
+		$block_content = '<div class="wp-block-paragraph">Test content</div>';
+		$block         = array(
+			'blockName' => 'core/paragraph',
+			'attrs'     => array(
+				'className' => 'my-wp-custom-css-456def',
+			),
+		);
+
+		$result = gutenberg_render_custom_css_class_name( $block_content, $block );
+
+		$this->assertSame( $block_content, $result, 'Block content should remain unchanged when wp-custom-css- only appears as a substring of another class.' );
+	}
+
+	/**
 	 * Tests that custom CSS support is enabled by default.
 	 *
 	 * @covers ::gutenberg_render_custom_css_support_styles

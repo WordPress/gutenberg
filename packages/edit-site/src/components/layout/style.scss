@@ -23,7 +23,7 @@
 }
 
 .edit-site-layout__sidebar-region {
-	z-index: z-index(".edit-site-layout__sidebar");
+	z-index: 1;
 	width: 100vw;
 	flex-shrink: 0;
 
@@ -60,7 +60,7 @@
 .edit-site-layout__mobile {
 	position: relative;
 	width: 100%;
-	z-index: z-index(".edit-site-layout__canvas-container");
+	z-index: 2;
 	display: flex;
 	flex-direction: column;
 
@@ -84,21 +84,9 @@
 .edit-site-layout__canvas-container {
 	position: relative;
 	flex-grow: 1;
-	z-index: z-index(".edit-site-layout__canvas-container");
+	z-index: 2;
 	// When animating the frame size can exceed its container size.
 	overflow: visible;
-
-	&.is-resizing::after {
-		// This covers the whole content which ensures mouse up triggers
-		// even if the content is "inert".
-		position: absolute;
-		top: 0;
-		left: 0;
-		right: 0;
-		bottom: 0;
-		content: "";
-		z-index: z-index(".edit-site-layout__canvas-container.is-resizing::after");
-	}
 }
 
 .edit-site-layout__canvas {

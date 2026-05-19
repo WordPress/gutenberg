@@ -191,3 +191,32 @@ export function receiveViewConfig( kind, name, config ) {
 		config,
 	};
 }
+
+/**
+ * Returns an action object used to set the sync connection status for an entity or collection.
+ *
+ * @param {string}             kind   Kind of the entity.
+ * @param {string}             name   Name of the entity.
+ * @param {number|string|null} key    The entity key, or null for collections.
+ * @param {Object|null}        status The connection state object or null on unload.
+ *
+ * @return {Object} Action object.
+ */
+export function setSyncConnectionStatus( kind, name, key, status ) {
+	if ( ! status ) {
+		return {
+			type: 'CLEAR_SYNC_CONNECTION_STATUS',
+			kind,
+			name,
+			key,
+		};
+	}
+
+	return {
+		type: 'SET_SYNC_CONNECTION_STATUS',
+		kind,
+		name,
+		key,
+		status,
+	};
+}

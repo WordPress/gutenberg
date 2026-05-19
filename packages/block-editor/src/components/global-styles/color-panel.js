@@ -19,7 +19,7 @@ import {
 	Button,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
-import { useCallback, useRef } from '@wordpress/element';
+import { useMemo, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { getValueFromVariable } from '@wordpress/global-styles-engine';
 import { reset as resetIcon } from '@wordpress/icons';
@@ -31,6 +31,7 @@ import ColorGradientControl from '../colors-gradients/control';
 import { useColorsPerOrigin, useGradientsPerOrigin } from './hooks';
 import { useToolsPanelDropdownMenuProps } from './utils';
 import { setImmutably } from '../../utils/object';
+import { extractPresetSlug } from '../../utils/color-values';
 import { unlock } from '../../lock-unlock';
 
 export function useHasColorPanel( settings ) {
@@ -144,6 +145,29 @@ export function ColorToolsPanel( {
 	);
 }
 
+/**
+ * Encodes a color value for storage in the style object.
+ *
+ * When a `slug` is provided it is used directly (slug-based selection path).
+ * Otherwise the function falls back to looking up the hex value in the
+ * palette; if found it encodes the slug, otherwise it stores the raw hex.
+ *
+ * Extracted to module scope so it is not re-created on every render.
+ * Callers pass the flattened palette (`allColors`), computed once in `ColorPanel` from the per-origin `colors` array.
+ *
+ * @param {Array}       allColors  Flat array of `{ color, slug }` objects.
+ * @param {string|void} colorValue Hex or CSS color string.
+ * @param {string|void} slug       Optional palette slug from slug-aware selection.
+ * @return {string|void} Encoded value suitable for the style object.
+ */
+function encodeColorValueWithPalette( allColors, colorValue, slug ) {
+	if ( slug ) {
+		return 'var:preset|color|' + slug;
+	}
+	const colorObject = allColors.find( ( { color } ) => color === colorValue );
+	return colorObject ? 'var:preset|color|' + colorObject.slug : colorValue;
+}
+
 const DEFAULT_CONTROLS = {
 	text: true,
 	background: true,
@@ -179,6 +203,7 @@ const LabeledColorIndicators = ( { indicators, label } ) => (
 function ColorPanelTab( {
 	isGradient,
 	inheritedValue,
+	inheritedSlug,
 	userValue,
 	setValue,
 	colorGradientControlSettings,
@@ -190,6 +215,7 @@ function ColorPanelTab( {
 			enableAlpha
 			__experimentalIsRenderedInSidebar
 			colorValue={ isGradient ? undefined : inheritedValue }
+			colorSlug={ isGradient ? undefined : inheritedSlug }
 			gradientValue={ isGradient ? inheritedValue : undefined }
 			onColorChange={ isGradient ? undefined : setValue }
 			onGradientChange={ isGradient ? setValue : undefined }
@@ -341,19 +367,15 @@ export default function ColorPanel( {
 	const hasBackgroundGradientSupport = !! settings?.background?.gradient;
 	const showGradientColors =
 		hasGradientColors && ! hasBackgroundGradientSupport;
+
 	const decodeValue = ( rawValue ) =>
 		getValueFromVariable( { settings }, '', rawValue );
-	const encodeColorValue = ( colorValue ) => {
-		const allColors = colors.flatMap(
-			( { colors: originColors } ) => originColors
-		);
-		const colorObject = allColors.find(
-			( { color } ) => color === colorValue
-		);
-		return colorObject
-			? 'var:preset|color|' + colorObject.slug
-			: colorValue;
-	};
+
+	const allColors = useMemo(
+		() => colors.flatMap( ( { colors: originColors } ) => originColors ),
+		[ colors ]
+	);
+
 	const encodeGradientValue = ( gradientValue ) => {
 		const allGradients = gradients.flatMap(
 			( { gradients: originGradients } ) => originGradients
@@ -375,11 +397,11 @@ export default function ColorPanel( {
 	const hasBackground = () =>
 		!! userBackgroundColor ||
 		( ! hasBackgroundGradientSupport && !! userGradient );
-	const setBackgroundColor = ( newColor ) => {
+	const setBackgroundColor = ( newColor, newSlug ) => {
 		const newValue = setImmutably(
 			value,
 			[ 'color', 'background' ],
-			encodeColorValue( newColor )
+			encodeColorValueWithPalette( allColors, newColor, newSlug )
 		);
 		if ( ! hasBackgroundGradientSupport ) {
 			newValue.color.gradient = undefined;
@@ -413,12 +435,12 @@ export default function ColorPanel( {
 		inheritedValue?.elements?.link?.color?.text
 	);
 	const userLinkColor = decodeValue( value?.elements?.link?.color?.text );
-	const setLinkColor = ( newColor ) => {
+	const setLinkColor = ( newColor, newSlug ) => {
 		onChange(
 			setImmutably(
 				value,
 				[ 'elements', 'link', 'color', 'text' ],
-				encodeColorValue( newColor )
+				encodeColorValueWithPalette( allColors, newColor, newSlug )
 			)
 		);
 	};
@@ -428,12 +450,12 @@ export default function ColorPanel( {
 	const userHoverLinkColor = decodeValue(
 		value?.elements?.link?.[ ':hover' ]?.color?.text
 	);
-	const setHoverLinkColor = ( newColor ) => {
+	const setHoverLinkColor = ( newColor, newSlug ) => {
 		onChange(
 			setImmutably(
 				value,
 				[ 'elements', 'link', ':hover', 'color', 'text' ],
-				encodeColorValue( newColor )
+				encodeColorValueWithPalette( allColors, newColor, newSlug )
 			)
 		);
 	};
@@ -454,20 +476,40 @@ export default function ColorPanel( {
 
 	// Text Color
 	const showTextPanel = useHasTextPanel( settings );
+	const showCaptionPanel = useHasCaptionPanel( settings );
+	const showButtonPanel = useHasButtonPanel( settings );
+	const showHeadingPanel = useHasHeadingPanel( settings );
 	const textColor = decodeValue( inheritedValue?.color?.text );
 	const userTextColor = decodeValue( value?.color?.text );
 	const hasTextColor = () => !! userTextColor;
-	const setTextColor = ( newColor ) => {
+	const setTextColor = ( newColor, newSlug ) => {
 		let changedObject = setImmutably(
 			value,
 			[ 'color', 'text' ],
-			encodeColorValue( newColor )
+			encodeColorValueWithPalette( allColors, newColor, newSlug )
 		);
-		if ( textColor === linkColor ) {
+		// Compare raw encoded references (e.g. `var:preset|color|slug`), not
+		// decoded hex values. Two palette entries can share the same hex but
+		// carry different slugs (e.g. `var:preset|color|dark-background` and
+		// `var:preset|color|dark-text` both resolving to `#000`); comparing decoded
+		// values would conflate them and incorrectly force the link color to
+		// follow the text color even when the user deliberately chose a
+		// different palette slot.
+		//
+		// Note: this is stricter than the previous decoded comparison.
+		// If text and link were stored in different formats that resolved to
+		// the same hex (e.g. one as `var:preset|color|x` and the other as
+		// `var(--wp--preset--color--x)`), the old check would sync them
+		// and this one will not. In practice this should not arise because
+		// both values are written through the same encoding path.
+		if (
+			inheritedValue?.color?.text ===
+			inheritedValue?.elements?.link?.color?.text
+		) {
 			changedObject = setImmutably(
 				changedObject,
 				[ 'elements', 'link', 'color', 'text' ],
-				encodeColorValue( newColor )
+				encodeColorValueWithPalette( allColors, newColor, newSlug )
 			);
 		}
 
@@ -480,78 +522,75 @@ export default function ColorPanel( {
 		{
 			name: 'caption',
 			label: __( 'Captions' ),
-			showPanel: useHasCaptionPanel( settings ),
+			showPanel: showCaptionPanel,
 		},
 		{
 			name: 'button',
 			label: __( 'Button' ),
-			showPanel: useHasButtonPanel( settings ),
+			showPanel: showButtonPanel,
 		},
 		{
 			name: 'heading',
 			label: __( 'Heading' ),
-			showPanel: useHasHeadingPanel( settings ),
+			showPanel: showHeadingPanel,
 		},
 		{
 			name: 'h1',
 			label: __( 'H1' ),
-			showPanel: useHasHeadingPanel( settings ),
+			showPanel: showHeadingPanel,
 		},
 		{
 			name: 'h2',
 			label: __( 'H2' ),
-			showPanel: useHasHeadingPanel( settings ),
+			showPanel: showHeadingPanel,
 		},
 		{
 			name: 'h3',
 			label: __( 'H3' ),
-			showPanel: useHasHeadingPanel( settings ),
+			showPanel: showHeadingPanel,
 		},
 		{
 			name: 'h4',
 			label: __( 'H4' ),
-			showPanel: useHasHeadingPanel( settings ),
+			showPanel: showHeadingPanel,
 		},
 		{
 			name: 'h5',
 			label: __( 'H5' ),
-			showPanel: useHasHeadingPanel( settings ),
+			showPanel: showHeadingPanel,
 		},
 		{
 			name: 'h6',
 			label: __( 'H6' ),
-			showPanel: useHasHeadingPanel( settings ),
+			showPanel: showHeadingPanel,
 		},
 	];
 
-	const resetAllFilter = useCallback(
-		( previousValue ) => {
-			return {
-				...previousValue,
-				color: undefined,
-				elements: {
-					...previousValue?.elements,
-					link: {
-						...previousValue?.elements?.link,
+	const resetAllFilter = ( previousValue ) => {
+		return {
+			...previousValue,
+			color: undefined,
+			elements: {
+				...previousValue?.elements,
+				link: {
+					...previousValue?.elements?.link,
+					color: undefined,
+					':hover': {
 						color: undefined,
-						':hover': {
+					},
+				},
+				...elements.reduce( ( acc, element ) => {
+					return {
+						...acc,
+						[ element.name ]: {
+							...previousValue?.elements?.[ element.name ],
 							color: undefined,
 						},
-					},
-					...elements.reduce( ( acc, element ) => {
-						return {
-							...acc,
-							[ element.name ]: {
-								...previousValue?.elements?.[ element.name ],
-								color: undefined,
-							},
-						};
-					}, {} ),
-				},
-			};
-		},
-		[ elements ]
-	);
+					};
+				}, {} ),
+			},
+		};
+	};
 
 	const items = [
 		showTextPanel && {
@@ -566,6 +605,10 @@ export default function ColorPanel( {
 					key: 'text',
 					label: __( 'Text' ),
 					inheritedValue: textColor,
+					inheritedSlug: extractPresetSlug(
+						inheritedValue?.color?.text,
+						'color'
+					),
 					setValue: setTextColor,
 					userValue: userTextColor,
 				},
@@ -586,6 +629,10 @@ export default function ColorPanel( {
 					key: 'background',
 					label: __( 'Color' ),
 					inheritedValue: backgroundColor,
+					inheritedSlug: extractPresetSlug(
+						inheritedValue?.color?.background,
+						'color'
+					),
 					setValue: setBackgroundColor,
 					userValue: userBackgroundColor,
 				},
@@ -611,6 +658,10 @@ export default function ColorPanel( {
 					key: 'link',
 					label: __( 'Default' ),
 					inheritedValue: linkColor,
+					inheritedSlug: extractPresetSlug(
+						inheritedValue?.elements?.link?.color?.text,
+						'color'
+					),
 					setValue: setLinkColor,
 					userValue: userLinkColor,
 				},
@@ -618,6 +669,11 @@ export default function ColorPanel( {
 					key: 'hover',
 					label: __( 'Hover' ),
 					inheritedValue: hoverLinkColor,
+					inheritedSlug: extractPresetSlug(
+						inheritedValue?.elements?.link?.[ ':hover' ]?.color
+							?.text,
+						'color'
+					),
 					setValue: setHoverLinkColor,
 					userValue: userHoverLinkColor,
 				},
@@ -665,20 +721,28 @@ export default function ColorPanel( {
 			onChange( newValue );
 		};
 
-		const setElementTextColor = ( newTextColor ) => {
+		const setElementTextColor = ( newTextColor, newSlug ) => {
 			onChange(
 				setImmutably(
 					value,
 					[ 'elements', name, 'color', 'text' ],
-					encodeColorValue( newTextColor )
+					encodeColorValueWithPalette(
+						allColors,
+						newTextColor,
+						newSlug
+					)
 				)
 			);
 		};
-		const setElementBackgroundColor = ( newBackgroundColor ) => {
+		const setElementBackgroundColor = ( newBackgroundColor, newSlug ) => {
 			const newValue = setImmutably(
 				value,
 				[ 'elements', name, 'color', 'background' ],
-				encodeColorValue( newBackgroundColor )
+				encodeColorValueWithPalette(
+					allColors,
+					newBackgroundColor,
+					newSlug
+				)
 			);
 			newValue.elements[ name ].color.gradient = undefined;
 			onChange( newValue );
@@ -720,6 +784,10 @@ export default function ColorPanel( {
 						key: 'text',
 						label: __( 'Text' ),
 						inheritedValue: elementTextColor,
+						inheritedSlug: extractPresetSlug(
+							inheritedValue?.elements?.[ name ]?.color?.text,
+							'color'
+						),
 						setValue: setElementTextColor,
 						userValue: elementTextUserColor,
 					},
@@ -728,6 +796,11 @@ export default function ColorPanel( {
 						key: 'background',
 						label: __( 'Background' ),
 						inheritedValue: elementBackgroundColor,
+						inheritedSlug: extractPresetSlug(
+							inheritedValue?.elements?.[ name ]?.color
+								?.background,
+							'color'
+						),
 						setValue: setElementBackgroundColor,
 						userValue: elementBackgroundUserColor,
 					},
