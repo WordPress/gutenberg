@@ -7,13 +7,7 @@ import type { ReactNode } from 'react';
 /**
  * WordPress dependencies
  */
-import {
-	Dropdown,
-	Icon as WCIcon,
-	MenuGroup,
-	MenuItem,
-	Spinner,
-} from '@wordpress/components';
+import { Dropdown, MenuGroup, MenuItem, Spinner } from '@wordpress/components';
 import {
 	Component,
 	Suspense,
@@ -112,22 +106,22 @@ function Header( { titleId, widgetType }: HeaderProps ) {
 	if ( ! widgetType.title ) {
 		return null;
 	}
+
 	return (
 		<Card.Header>
-			<Stack direction="row" align="center" justify="space-between">
-				<Stack direction="row" align="center" gap="sm">
-					{ widgetType.icon && (
-						<span
-							className={ styles.widgetChromeHeaderIcon }
-							aria-hidden="true"
-						>
-							<WCIcon icon={ widgetType.icon } />
-						</span>
-					) }
-					<Card.Title id={ titleId } render={ <h3 /> }>
-						{ widgetType.title }
-					</Card.Title>
-				</Stack>
+			<Stack direction="row" align="center" gap="sm">
+				{ widgetType.icon && (
+					<span
+						className={ styles.widgetChromeHeaderIcon }
+						aria-hidden="true"
+					>
+						<Icon icon={ widgetType.icon } />
+					</span>
+				) }
+
+				<Card.Title id={ titleId } render={ <h3 /> }>
+					{ widgetType.title }
+				</Card.Title>
 			</Stack>
 		</Card.Header>
 	);
