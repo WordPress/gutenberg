@@ -143,6 +143,7 @@ class URLInput extends Component {
 		const {
 			__experimentalFetchLinkSuggestions: fetchLinkSuggestions,
 			__experimentalHandleURLSuggestions: handleURLSuggestions,
+			showTabs,
 		} = this.props;
 
 		if ( ! fetchLinkSuggestions ) {
@@ -186,7 +187,7 @@ class URLInput extends Component {
 
 		const request = fetchLinkSuggestions( value, {
 			isInitialSuggestions,
-			type: selectedTab || 'post',
+			...( showTabs && selectedTab ? { type: selectedTab } : {} ),
 		} );
 
 		request
