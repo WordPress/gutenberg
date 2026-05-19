@@ -7,6 +7,6 @@
 }
 
 .wp-block-math__popover-content {
-	padding: 16px;
+	padding: var(--wpds-dimension-padding-lg);
 	min-width: 300px;
 }
