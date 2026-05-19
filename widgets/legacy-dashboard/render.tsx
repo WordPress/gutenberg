@@ -1,10 +1,11 @@
 /**
  * WordPress dependencies
  */
+import { Spinner } from '@wordpress/components';
 import { useRefEffect } from '@wordpress/compose';
-import { Placeholder, Spinner } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { Stack, Text } from '@wordpress/ui';
 import { addQueryArgs } from '@wordpress/url';
 
 /**
@@ -89,9 +90,15 @@ export default function LegacyDashboardWidgetRender( {
 
 	if ( ! legacyId ) {
 		return (
-			<Placeholder>
-				{ __( 'Legacy dashboard widget is missing an id.' ) }
-			</Placeholder>
+			<Stack
+				align="center"
+				justify="center"
+				className={ styles.legacyDashboardWidget }
+			>
+				<Text>
+					{ __( 'Legacy dashboard widget is missing an id.' ) }
+				</Text>
+			</Stack>
 		);
 	}
 
@@ -100,9 +107,13 @@ export default function LegacyDashboardWidgetRender( {
 	return (
 		<>
 			{ ! isLoaded && (
-				<Placeholder>
+				<Stack
+					align="center"
+					justify="center"
+					className={ styles.loading }
+				>
 					<Spinner />
-				</Placeholder>
+				</Stack>
 			) }
 			<div
 				className={

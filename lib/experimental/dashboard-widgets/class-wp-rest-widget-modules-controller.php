@@ -135,6 +135,10 @@ if ( ! class_exists( 'WP_REST_Widget_Modules_Controller' ) ) {
 		 * @return WP_REST_Response Response object on success.
 		 */
 		public function get_items( $request ) {
+			if ( function_exists( 'gutenberg_register_legacy_dashboard_widget_types' ) ) {
+				gutenberg_register_legacy_dashboard_widget_types();
+			}
+
 			$registered = WP_Widget_Type_Registry::get_instance()->get_all_registered();
 			$data       = array();
 
@@ -154,6 +158,10 @@ if ( ! class_exists( 'WP_REST_Widget_Modules_Controller' ) ) {
 		 *                                   WP_Error on failure.
 		 */
 		public function get_item( $request ) {
+			if ( function_exists( 'gutenberg_register_legacy_dashboard_widget_types' ) ) {
+				gutenberg_register_legacy_dashboard_widget_types();
+			}
+
 			$widget_type = WP_Widget_Type_Registry::get_instance()->get_registered( $request['id'] );
 			if ( null === $widget_type ) {
 				return new WP_Error(

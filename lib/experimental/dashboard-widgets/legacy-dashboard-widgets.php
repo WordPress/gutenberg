@@ -35,6 +35,103 @@ function gutenberg_legacy_dashboard_widget_type_name( $widget_id ) {
 }
 
 /**
+ * Loads the minimum wp-admin includes needed for dashboard widget discovery.
+ *
+ * REST requests and early hooks do not bootstrap wp-admin by default, so
+ * `WP_Screen` and `add_meta_box()` are unavailable until these files load.
+ */
+function gutenberg_load_dashboard_admin_dependencies() {
+	if ( ! class_exists( 'WP_Screen' ) ) {
+		require_once ABSPATH . 'wp-admin/includes/class-wp-screen.php';
+	}
+
+	if ( ! function_exists( 'get_current_screen' ) ) {
+		require_once ABSPATH . 'wp-admin/includes/screen.php';
+	}
+
+	if ( ! function_exists( 'add_meta_box' ) ) {
+		require_once ABSPATH . 'wp-admin/includes/template.php';
+	}
+}
+
+/**
+ * Registers dashboard meta boxes for discovery without running `wp_dashboard_setup()`.
+ *
+ * The full setup routine pulls in browser/PHP nag checks and other admin-only
+ * dependencies that are not loaded during REST requests. This mirrors the
+ * widget-registration portion of core only.
+ */
+function gutenberg_register_dashboard_meta_boxes_for_discovery() {
+	if ( did_action( 'wp_dashboard_setup' ) ) {
+		return;
+	}
+
+	global $wp_dashboard_control_callbacks, $wp_registered_widgets, $wp_registered_widget_controls;
+
+	$wp_dashboard_control_callbacks = array();
+	$dashboard_widgets              = array();
+
+	if ( is_network_admin() ) {
+		wp_add_dashboard_widget( 'network_dashboard_right_now', __( 'Right Now' ), 'wp_network_dashboard_right_now' );
+
+		/** This action is documented in wp-admin/includes/dashboard.php */
+		do_action( 'wp_network_dashboard_setup' );
+
+		/** This filter is documented in wp-admin/includes/dashboard.php */
+		$dashboard_widgets = apply_filters( 'wp_network_dashboard_widgets', array() );
+	} elseif ( is_user_admin() ) {
+		/** This action is documented in wp-admin/includes/dashboard.php */
+		do_action( 'wp_user_dashboard_setup' );
+
+		/** This filter is documented in wp-admin/includes/dashboard.php */
+		$dashboard_widgets = apply_filters( 'wp_user_dashboard_widgets', array() );
+	} else {
+		$post_type = get_post_type_object( 'post' );
+
+		if ( $post_type && current_user_can( $post_type->cap->create_posts ) ) {
+			$quick_draft_title = sprintf(
+				'<span class="hide-if-no-js">%1$s</span> <span class="hide-if-js">%2$s</span>',
+				__( 'Quick Draft' ),
+				__( 'Your Recent Drafts' )
+			);
+			wp_add_dashboard_widget( 'dashboard_quick_press', $quick_draft_title, 'wp_dashboard_quick_press' );
+		}
+
+		wp_add_dashboard_widget( 'dashboard_primary', __( 'WordPress Events and News' ), 'wp_dashboard_events_news' );
+
+		/** This action is documented in wp-admin/includes/dashboard.php */
+		do_action( 'wp_dashboard_setup' );
+
+		/** This filter is documented in wp-admin/includes/dashboard.php */
+		$dashboard_widgets = apply_filters( 'wp_dashboard_widgets', array() );
+	}
+
+	if (
+		! empty( $dashboard_widgets ) &&
+		isset( $wp_registered_widgets, $wp_registered_widget_controls )
+	) {
+		foreach ( $dashboard_widgets as $widget_id ) {
+			if ( ! isset( $wp_registered_widgets[ $widget_id ]['callback'] ) ) {
+				continue;
+			}
+
+			$name = empty( $wp_registered_widgets[ $widget_id ]['all_link'] )
+				? $wp_registered_widgets[ $widget_id ]['name']
+				: $wp_registered_widgets[ $widget_id ]['name'] . " <a href='{$wp_registered_widgets[$widget_id]['all_link']}' class='edit-box open-box'>" . __( 'View all' ) . '</a>';
+
+			$control_callback = $wp_registered_widget_controls[ $widget_id ]['callback'] ?? null;
+
+			wp_add_dashboard_widget(
+				$widget_id,
+				$name,
+				$wp_registered_widgets[ $widget_id ]['callback'],
+				$control_callback
+			);
+		}
+	}
+}
+
+/**
  * Ensures classic dashboard meta boxes are registered for the `dashboard` screen.
  *
  * Plugins register widgets on `wp_dashboard_setup`, which only runs when the
@@ -48,28 +145,30 @@ function gutenberg_ensure_legacy_dashboard_widgets_loaded() {
 		return;
 	}
 
-	$loaded = true;
-
 	$should_load = is_admin() || ( defined( 'REST_REQUEST' ) && REST_REQUEST );
 
 	if ( ! $should_load ) {
 		return;
 	}
 
-	require_once ABSPATH . 'wp-admin/includes/dashboard.php';
+	$loaded = true;
 
-	if ( ! function_exists( 'get_current_screen' ) ) {
-		require_once ABSPATH . 'wp-admin/includes/screen.php';
-	}
+	gutenberg_load_dashboard_admin_dependencies();
+
+	require_once ABSPATH . 'wp-admin/includes/dashboard.php';
 
 	$screen = get_current_screen();
 	if ( ! $screen || 'dashboard' !== $screen->id ) {
 		set_current_screen( 'dashboard' );
 	}
 
-	if ( ! did_action( 'wp_dashboard_setup' ) ) {
-		wp_dashboard_setup();
+	// Plugins such as Jetpack defer `wp_dashboard_setup` to `load-index.php`.
+	if ( ! did_action( 'load-index.php' ) ) {
+		/** This action is documented in wp-admin/admin.php */
+		do_action( 'load-index.php' );
 	}
+
+	gutenberg_register_dashboard_meta_boxes_for_discovery();
 }
 
 /**
@@ -129,8 +228,9 @@ function gutenberg_register_legacy_dashboard_widget_types() {
 		return;
 	}
 
-	$registry      = WP_Widget_Type_Registry::get_instance();
-	$render_module = gutenberg_get_legacy_dashboard_render_module();
+	$registry       = WP_Widget_Type_Registry::get_instance();
+	$render_module  = gutenberg_get_legacy_dashboard_render_module();
+	$metadata_module = 'wp/widgets/legacy-dashboard/widget';
 
 	foreach ( gutenberg_get_legacy_dashboard_meta_boxes() as $meta_box ) {
 		$name = gutenberg_legacy_dashboard_widget_type_name( $meta_box['id'] );
@@ -143,7 +243,7 @@ function gutenberg_register_legacy_dashboard_widget_types() {
 			$name,
 			array(
 				'render_module' => $render_module,
-				'widget_module' => null,
+				'widget_module' => $metadata_module,
 				'legacy_id'     => $meta_box['id'],
 				'title'         => $meta_box['title'],
 				'presentation'  => 'framed',
@@ -153,15 +253,39 @@ function gutenberg_register_legacy_dashboard_widget_types() {
 }
 
 /**
+ * Whether legacy dashboard widgets should be discovered in this request.
+ *
+ * Avoids running discovery on every wp-admin screen (which would fire
+ * `wp_dashboard_setup` before `index.php` and double-register widgets).
+ *
+ * @return bool
+ */
+function gutenberg_should_discover_legacy_dashboard_widgets() {
+	if ( defined( 'REST_REQUEST' ) && REST_REQUEST ) {
+		return true;
+	}
+
+	if ( ! is_admin() ) {
+		return false;
+	}
+
+	if ( ! empty( $_GET['dashboard-legacy-widget-preview'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		return true;
+	}
+
+	global $pagenow;
+
+	return isset( $pagenow ) && 'admin.php' === $pagenow && isset( $_GET['page'] ) && 'dashboard-wp-admin' === $_GET['page']; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+}
+
+/**
  * Appends legacy widget type registration after manifest-driven types load.
  *
- * Runs on `admin_init` (not `init`) because `get_current_screen()` and the
- * dashboard meta box APIs are only available once the admin bootstrap has
- * loaded `wp-admin/includes/screen.php`. Mirrors the legacy-widget block
- * preview handler timing.
+ * Legacy types requested over REST are also registered lazily from
+ * `WP_REST_Widget_Modules_Controller::get_items()`.
  */
 function gutenberg_register_legacy_dashboard_widget_types_after_manifest() {
-	if ( ! is_admin() && ! ( defined( 'REST_REQUEST' ) && REST_REQUEST ) ) {
+	if ( ! gutenberg_should_discover_legacy_dashboard_widgets() ) {
 		return;
 	}
 
@@ -169,7 +293,6 @@ function gutenberg_register_legacy_dashboard_widget_types_after_manifest() {
 }
 
 add_action( 'admin_init', 'gutenberg_register_legacy_dashboard_widget_types_after_manifest', 20 );
-add_action( 'rest_api_init', 'gutenberg_register_legacy_dashboard_widget_types_after_manifest', 20 );
 
 /**
  * Renders a single legacy dashboard widget by id.
