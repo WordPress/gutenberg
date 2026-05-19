@@ -100,6 +100,10 @@ function getBlockSettingsFromMetadata( {
 	return settings;
 }
 
+/**
+ * This acts as an intermediate type to explicitly note that the "name" property
+ * will be ignored if passed into the settings argument
+ */
 type SettingsBlockConfiguration<
 	Attributes extends Record< string, unknown > = Record< string, unknown >,
 > = Omit< BlockConfiguration< Attributes >, 'name' > & { name?: unknown };
