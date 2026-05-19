@@ -50,7 +50,7 @@ function getTodayStartISO() {
 	return `${ year }-${ month }-${ day }T00:00:00`;
 }
 
-type QuickBlockPostData = {
+type QuickPostData = {
 	title: string;
 	content: string;
 };
@@ -60,19 +60,19 @@ const FORM: Form = {
 	fields: [ 'title', 'content' ],
 };
 
-const INITIAL_DATA: QuickBlockPostData = {
+const INITIAL_DATA: QuickPostData = {
 	title: '',
 	content: '',
 };
 
 /**
- * Quick Block Post widget. Lets the user draft a post (title + content)
- * without leaving the dashboard. Branches between a loading spinner, a prompt
- * when a draft already exists from today, a confirmation after saving, and
- * the form itself.
+ * Quick Post widget. Lets the user draft a post (title + content) without
+ * leaving the dashboard. Branches between a loading spinner, a prompt when a
+ * draft already exists from today, a confirmation after saving, and the form
+ * itself.
  */
-export default function QuickBlockPost() {
-	const [ data, setData ] = useState< QuickBlockPostData >( INITIAL_DATA );
+export default function QuickPost() {
+	const [ data, setData ] = useState< QuickPostData >( INITIAL_DATA );
 	const [ isSaving, setIsSaving ] = useState( false );
 	const [ createdPost, setCreatedPost ] = useState< {
 		id: number;
@@ -113,7 +113,7 @@ export default function QuickBlockPost() {
 		};
 	}, [] );
 
-	const fields = useMemo< Field< QuickBlockPostData >[] >(
+	const fields = useMemo< Field< QuickPostData >[] >(
 		() => [
 			{
 				id: 'title',
@@ -210,7 +210,7 @@ export default function QuickBlockPost() {
 			className={ styles.body }
 		>
 			<Stack className={ styles.formContainer }>
-				<DataForm< QuickBlockPostData >
+				<DataForm< QuickPostData >
 					data={ data }
 					fields={ fields }
 					form={ FORM }
