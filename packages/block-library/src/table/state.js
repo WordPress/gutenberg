@@ -1,6 +1,25 @@
 const INHERITED_COLUMN_ATTRIBUTES = [ 'align' ];
 
 /**
+ * Expands a row's cells into one entry per logical column, respecting colspan.
+ * A cell with colspan=N occupies N consecutive logical column slots, each
+ * pointing back to the same cell object so attribute inheritance stays correct.
+ *
+ * @param {Object|undefined} row A table row object.
+ * @return {Array} Array whose length equals the row's effective column count.
+ */
+function expandRowCells( row ) {
+	const result = [];
+	for ( const cell of row?.cells ?? [] ) {
+		const span = parseInt( cell.colspan, 10 ) || 1;
+		for ( let i = 0; i < span; i++ ) {
+			result.push( cell );
+		}
+	}
+	return result;
+}
+
+/**
  * Creates a table state.
  *
  * @param {Object} options
@@ -160,8 +179,9 @@ export function isCellSelected( cellLocation, selection ) {
  */
 export function insertRow( state, { sectionName, rowIndex, columnCount } ) {
 	const firstRow = getFirstRow( state );
+	const expandedCells = expandRowCells( firstRow );
 	const cellCount =
-		columnCount === undefined ? firstRow?.cells?.length : columnCount;
+		columnCount === undefined ? expandedCells.length : columnCount;
 
 	// Bail early if the function cannot determine how many cells to add.
 	if ( ! cellCount ) {
@@ -174,8 +194,7 @@ export function insertRow( state, { sectionName, rowIndex, columnCount } ) {
 			{
 				cells: Array.from( { length: cellCount } ).map(
 					( _, index ) => {
-						const firstCellInColumn =
-							firstRow?.cells?.[ index ] ?? {};
+						const firstCellInColumn = expandedCells[ index ] ?? {};
 
 						const inheritedAttributes = Object.fromEntries(
 							Object.entries( firstCellInColumn ).filter(
@@ -317,8 +336,8 @@ export function toggleSection( state, sectionName ) {
 		return { [ sectionName ]: [] };
 	}
 
-	// Get the length of the first row of the body to use when creating the header.
-	const columnCount = state.body?.[ 0 ]?.cells?.length ?? 1;
+	// Get the effective column count of the first body row to use when creating the header.
+	const columnCount = expandRowCells( state.body?.[ 0 ] ).length || 1;
 
 	// Section doesn't exist, insert an empty row to create the section.
 	return insertRow( state, { sectionName, rowIndex: 0, columnCount } );
