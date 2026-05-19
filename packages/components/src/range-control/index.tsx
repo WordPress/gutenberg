@@ -10,6 +10,7 @@ import type { ChangeEvent, FocusEvent, ForwardedRef } from 'react';
 import { __, isRTL } from '@wordpress/i18n';
 import { useRef, useState, forwardRef } from '@wordpress/element';
 import { useInstanceId, useMergeRefs } from '@wordpress/compose';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -76,6 +77,7 @@ function UnforwardedRangeControl(
 		disabled = false,
 		help,
 		hideLabelFromVision = false,
+		icon,
 		initialPosition,
 		isShiftStepEnabled = true,
 		label,
@@ -100,6 +102,13 @@ function UnforwardedRangeControl(
 		__shouldNotWarnDeprecated36pxSize,
 		...otherProps
 	} = props;
+
+	if ( icon !== undefined ) {
+		deprecated( '`icon` prop in wp.components.RangeControl', {
+			since: '7.1',
+			alternative: '`beforeIcon` or `afterIcon`',
+		} );
+	}
 
 	const [ value, setValue ] = useControlledRangeValue( {
 		min,

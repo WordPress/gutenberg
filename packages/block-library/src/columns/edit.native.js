@@ -36,7 +36,6 @@ import {
 } from '@wordpress/element';
 import { useResizeObserver } from '@wordpress/compose';
 import { createBlock } from '@wordpress/blocks';
-import { columns } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
@@ -229,7 +228,6 @@ function ColumnsEditContainer( {
 						<PanelBody title={ __( 'Columns Settings' ) }>
 							<RangeControl
 								label={ __( 'Number of columns' ) }
-								icon={ columns }
 								value={ columnCount }
 								onChange={ onChangeColumnsNum }
 								min={ MIN_COLUMNS_NUM }

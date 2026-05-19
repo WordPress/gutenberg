@@ -11,6 +11,10 @@
 
 -   `Popover`: Don't close when focus moves into the `@wordpress/ui` compat overlay slot, or is restored to the popover from any portaled descendant. This unblocks nested overlays such as `@wordpress/ui` `Select`, which previously dismissed the host `Popover` on hover and on overlay dismissal ([#78407](https://github.com/WordPress/gutenberg/pull/78407)).
 
+### Deprecations
+
+-   `RangeControl`: Deprecate the `icon` prop, which has no effect. Use `beforeIcon` or `afterIcon` instead ([#78444](https://github.com/WordPress/gutenberg/pull/78444)).
+
 ## 33.1.0 (2026-05-14)
 
 ### Enhancements
