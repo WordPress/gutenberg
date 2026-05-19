@@ -37,7 +37,7 @@ export function useOnEnter( props ) {
 				return;
 			}
 
-			if ( ! element.contains( event.target ) ) {
+			if ( event.target !== element ) {
 				return;
 			}
 

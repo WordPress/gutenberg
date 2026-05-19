@@ -398,7 +398,7 @@ export function useAutocompleteProps( options: UseAutocompleteProps ) {
 			function _onKeyDown( event: Event ) {
 				// Document-scoped listener: bail when the keydown isn't
 				// for our element.
-				if ( ! element.contains( event.target as Node | null ) ) {
+				if ( event.target !== element ) {
 					return;
 				}
 				onKeyDownRef.current?.( event as KeyboardEvent );

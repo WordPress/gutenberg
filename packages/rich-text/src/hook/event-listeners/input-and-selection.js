@@ -67,7 +67,7 @@ export default ( props ) => ( element ) => {
 		// editable. `event` is optional — `onCompositionEnd` calls
 		// `onInput({ inputType: 'insertText' })` synthetically, in which
 		// case we trust the caller.
-		if ( event && event.target && ! element.contains( event.target ) ) {
+		if ( event && event.target && event.target !== element ) {
 			return;
 		}
 
@@ -199,7 +199,7 @@ export default ( props ) => ( element ) => {
 	}
 
 	function onCompositionStart( event ) {
-		if ( ! element.contains( event.target ) ) {
+		if ( event.target !== element ) {
 			return;
 		}
 		isComposing = true;
@@ -218,7 +218,7 @@ export default ( props ) => ( element ) => {
 	}
 
 	function onCompositionEnd( event ) {
-		if ( ! element.contains( event.target ) ) {
+		if ( event.target !== element ) {
 			return;
 		}
 		isComposing = false;

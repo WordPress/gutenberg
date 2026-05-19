@@ -73,7 +73,7 @@ function useEnter( props ) {
 			if ( event.defaultPrevented || event.keyCode !== ENTER ) {
 				return;
 			}
-			if ( ! element.contains( event.target ) ) {
+			if ( event.target !== element ) {
 				return;
 			}
 			const { content, clientId } = propsRef.current;

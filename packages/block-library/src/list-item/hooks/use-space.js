@@ -34,7 +34,7 @@ export default function useSpace( clientId ) {
 					return;
 				}
 
-				if ( ! element.contains( event.target ) ) {
+				if ( event.target !== element ) {
 					return;
 				}
 

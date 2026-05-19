@@ -26,8 +26,7 @@ export default ( props ) => ( element ) => {
 			return;
 		}
 
-		const { ownerDocument } = element;
-		if ( ! element.contains( ownerDocument.activeElement ) ) {
+		if ( event.target !== element ) {
 			return;
 		}
 
@@ -40,7 +39,7 @@ export default ( props ) => ( element ) => {
 			activeFormats: currentActiveFormats = [],
 		} = record.current;
 		const collapsed = isCollapsed( record.current );
-		const { defaultView } = ownerDocument;
+		const { defaultView } = element.ownerDocument;
 		// To do: ideally, we should look at visual position instead.
 		const { direction } = defaultView.getComputedStyle( element );
 		const reverseKey = direction === 'rtl' ? RIGHT : LEFT;

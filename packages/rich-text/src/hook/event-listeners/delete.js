@@ -21,8 +21,7 @@ export default ( props ) => ( element ) => {
 			return;
 		}
 
-		const { ownerDocument } = element;
-		if ( ! element.contains( ownerDocument.activeElement ) ) {
+		if ( event.target !== element ) {
 			return;
 		}
 
