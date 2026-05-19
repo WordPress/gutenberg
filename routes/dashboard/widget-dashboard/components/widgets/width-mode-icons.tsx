@@ -4,38 +4,46 @@
 import { Path, SVG } from '@wordpress/primitives';
 
 /*
- * 3x3 grid of cells. The widget occupies a continuous rectangle in the
- * top row; the remaining cells render as 2x2 dots to convey grid context
- * without competing with the widget mark. Cells are 6x6 at (2,2),
- * (9,2), (16,2) and the rows below, with a 1-unit gap.
+ * Width-mode glyphs over a 3-column row metaphor. The shared row spans
+ * x=2 to x=22 at y=8 to y=16 (20x8). `custom` shows the widget as a
+ * single occupied cell among siblings; `fill` and `full` merge the
+ * widget's cells into one contiguous rectangle to convey continuity.
  */
 
 /**
- * Top-left cell occupied. Custom width: the widget takes a specific
- * portion of the row.
+ * One occupied cell among two siblings. Custom width: the widget takes
+ * a specific portion of the row.
  */
 export const widthCustom = (
 	<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-		<Path d="M2 2h6v6h-6ZM11 4h2v2h-2ZM18 4h2v2h-2ZM4 11h2v2h-2ZM11 11h2v2h-2ZM18 11h2v2h-2ZM4 18h2v2h-2ZM11 18h2v2h-2ZM18 18h2v2h-2Z" />
+		<Path
+			fillRule="evenodd"
+			clipRule="evenodd"
+			d="M2 8h6v8h-6ZM9 8h6v8h-6ZM10 9h4v6h-4ZM16 8h6v8h-6ZM17 9h4v6h-4Z"
+		/>
 	</SVG>
 );
 
 /**
- * Trailing two-thirds of the top row occupied as a single rectangle.
- * Fill width: the widget grows over the remaining row after a sibling.
+ * Trailing rectangle spanning two columns next to a sibling frame.
+ * Fill width: the widget grows over the remaining row.
  */
 export const widthFill = (
 	<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-		<Path d="M9 2h13v6h-13ZM4 4h2v2h-2ZM4 11h2v2h-2ZM11 11h2v2h-2ZM18 11h2v2h-2ZM4 18h2v2h-2ZM11 18h2v2h-2ZM18 18h2v2h-2Z" />
+		<Path
+			fillRule="evenodd"
+			clipRule="evenodd"
+			d="M2 8h6v8h-6ZM3 9h4v6h-4ZM9 8h13v8H9Z"
+		/>
 	</SVG>
 );
 
 /**
- * Entire top row occupied as a single rectangle. Full width: the widget
- * spans the row edge to edge.
+ * Single rectangle spanning all three columns. Full width: the widget
+ * spans the entire row.
  */
 export const widthFull = (
 	<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-		<Path d="M2 2h20v6h-20ZM4 11h2v2h-2ZM11 11h2v2h-2ZM18 11h2v2h-2ZM4 18h2v2h-2ZM11 18h2v2h-2ZM18 18h2v2h-2Z" />
+		<Path d="M2 8h20v8H2Z" />
 	</SVG>
 );
