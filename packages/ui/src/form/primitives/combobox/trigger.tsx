@@ -35,6 +35,11 @@ export const Trigger = forwardRef< HTMLButtonElement, ComboboxTriggerProps >(
 					data-can-disable-input-layout
 					ref={ ref }
 				>
+					{
+						// Combobox.Value does not currently render an element, so this
+						// wrapper lets it share the same trigger text styles as Select.
+						// See https://github.com/mui/base-ui/issues/4864
+					 }
 					<div className={ selectTriggerStyles[ 'trigger-value' ] }>
 						<_Combobox.Value placeholder={ placeholder }>
 							{ children }
