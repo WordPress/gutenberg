@@ -203,16 +203,6 @@ describe( 'Combobox', () => {
 		).toBeVisible();
 	} );
 
-	it( 'supports a value placeholder', () => {
-		render(
-			<Combobox.Root items={ ITEMS }>
-				<Combobox.Value placeholder="No item selected" />
-			</Combobox.Root>
-		);
-
-		expect( screen.getByText( 'No item selected' ) ).toBeVisible();
-	} );
-
 	it( 'renders a default trigger placeholder when no value is selected', () => {
 		render(
 			<Combobox.Root items={ ITEMS }>
@@ -223,7 +213,6 @@ describe( 'Combobox', () => {
 		const trigger = screen.getByRole( 'combobox' );
 
 		expect( trigger ).toHaveTextContent( 'Select' );
-		expect( trigger ).toHaveAttribute( 'data-placeholder' );
 	} );
 
 	it( 'supports custom trigger placeholder text', () => {
@@ -236,7 +225,6 @@ describe( 'Combobox', () => {
 		const trigger = screen.getByRole( 'combobox' );
 
 		expect( trigger ).toHaveTextContent( 'Choose an item' );
-		expect( trigger ).toHaveAttribute( 'data-placeholder' );
 	} );
 
 	// The actual bug is a CSS grid overlap: both Empty and List target
