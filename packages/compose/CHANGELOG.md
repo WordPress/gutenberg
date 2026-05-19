@@ -5,7 +5,7 @@
 ### Bug Fixes
 
 -   `useCopyToClipboard`: Call the `onSuccess` callback even when the trigger node unmounts before the copy resolves ([#78387](https://github.com/WordPress/gutenberg/pull/78387)).
--   `useDialog`: Handle the Escape key via a React `onKeyDown` prop instead of a native listener, so portaled descendants that handle Escape and call `event.stopPropagation()` can correctly prevent the dialog from closing.
+-   `useDialog`: Handle the Escape key via a React `onKeyDown` prop instead of a native listener, so portaled descendants that handle Escape and call `event.stopPropagation()` can correctly prevent the dialog from closing ([#78433](https://github.com/WordPress/gutenberg/pull/78433)).
 
 ## 7.46.0 (2026-05-14)
 
