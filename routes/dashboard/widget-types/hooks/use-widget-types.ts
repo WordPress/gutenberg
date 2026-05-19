@@ -40,7 +40,7 @@ interface WidgetModuleRecord {
 	render_module?: string | null;
 	widget_module?: string | null;
 	presentation?: WidgetTypeMetadata[ 'presentation' ] | null;
-	legacy_id?: string | null;
+	classic_id?: string | null;
 	title?: string | null;
 }
 
@@ -108,21 +108,21 @@ export function useWidgetTypes(): WidgetType[] {
 
 		Promise.all(
 			records.map( async ( record ) => {
-				const legacyId = getRecordString(
+				const classicId = getRecordString(
 					record,
-					'legacy_id',
-					'legacyId'
+					'classic_id',
+					'classicId'
 				);
 
-				// Build artifact for the shared legacy render module; not insertable.
+				// Build artifact for the shared classic render module; not insertable.
 				if (
-					'wp-legacy/legacy-dashboard' === record.name &&
-					! legacyId
+					'wp-classic/classic-dashboard' === record.name &&
+					! classicId
 				) {
 					return null;
 				}
 
-				if ( legacyId ) {
+				if ( classicId ) {
 					const renderModule = getRecordString(
 						record,
 						'render_module',
@@ -152,14 +152,14 @@ export function useWidgetTypes(): WidgetType[] {
 					return {
 						apiVersion: 1,
 						name: record.name as WidgetName,
-						title: title ?? legacyId,
+						title: title ?? classicId,
 						renderModule: renderModule ?? '',
-						category: 'legacy',
+						category: 'classic',
 						...( presentation ? { presentation } : {} ),
 						...( icon ? { icon } : {} ),
 						example: {
 							attributes: {
-								legacyId,
+								classicId,
 							},
 						},
 					} as WidgetType;

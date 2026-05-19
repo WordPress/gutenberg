@@ -13,20 +13,20 @@ import { addQueryArgs } from '@wordpress/url';
  */
 import styles from './render.module.css';
 
-export interface LegacyDashboardWidgetAttributes {
-	legacyId: string;
+export interface ClassicDashboardWidgetAttributes {
+	classicId: string;
 }
 
-interface LegacyDashboardWidgetRenderProps {
-	attributes: LegacyDashboardWidgetAttributes;
+interface ClassicDashboardWidgetRenderProps {
+	attributes: ClassicDashboardWidgetAttributes;
 	setAttributes?: (
-		next: Partial< LegacyDashboardWidgetAttributes >
+		next: Partial< ClassicDashboardWidgetAttributes >
 	) => void;
 }
 
-function getPreviewUrl( legacyId: string ): string {
+function getPreviewUrl( classicId: string ): string {
 	return addQueryArgs( window.location.pathname, {
-		'dashboard-legacy-widget-preview': legacyId,
+		'dashboard-classic-widget-preview': classicId,
 	} );
 }
 
@@ -34,14 +34,14 @@ function getPreviewUrl( legacyId: string ): string {
  * Renders a classic `wp_add_dashboard_widget()` registration via an admin
  * iframe so plugin scripts and styles can load normally.
  *
- * @param {LegacyDashboardWidgetRenderProps} root0            Component props.
- * @param {LegacyDashboardWidgetAttributes}  root0.attributes Dashboard widget instance attributes.
+ * @param {ClassicDashboardWidgetRenderProps} root0            Component props.
+ * @param {ClassicDashboardWidgetAttributes}  root0.attributes Dashboard widget instance attributes.
  * @return Rendered iframe preview.
  */
-export default function LegacyDashboardWidgetRender( {
+export default function ClassicDashboardWidgetRender( {
 	attributes,
-}: LegacyDashboardWidgetRenderProps ) {
-	const legacyId = attributes?.legacyId;
+}: ClassicDashboardWidgetRenderProps ) {
+	const classicId = attributes?.classicId;
 	const [ isLoaded, setIsLoaded ] = useState( false );
 
 	const resizeRef = useRefEffect(
@@ -85,21 +85,21 @@ export default function LegacyDashboardWidgetRender( {
 		[ isLoaded ]
 	);
 
-	if ( ! legacyId ) {
+	if ( ! classicId ) {
 		return (
 			<Stack
 				align="center"
 				justify="center"
-				className={ styles.legacyDashboardWidget }
+				className={ styles.classicDashboardWidget }
 			>
 				<Text>
-					{ __( 'Legacy dashboard widget is missing an id.' ) }
+					{ __( 'Classic dashboard widget is missing an id.' ) }
 				</Text>
 			</Stack>
 		);
 	}
 
-	const previewUrl = getPreviewUrl( legacyId );
+	const previewUrl = getPreviewUrl( classicId );
 
 	return (
 		<>
@@ -115,14 +115,14 @@ export default function LegacyDashboardWidgetRender( {
 			<div
 				className={
 					isLoaded
-						? styles.legacyDashboardWidget
-						: `${ styles.legacyDashboardWidget } ${ styles.isOffscreen }`
+						? styles.classicDashboardWidget
+						: `${ styles.classicDashboardWidget } ${ styles.isOffscreen }`
 				}
 			>
 				<iframe
 					ref={ resizeRef }
-					className={ styles.legacyDashboardWidgetIframe }
-					title={ __( 'Legacy dashboard widget preview' ) }
+					className={ styles.classicDashboardWidgetIframe }
+					title={ __( 'Classic dashboard widget preview' ) }
 					src={ previewUrl }
 					tabIndex={ -1 }
 					onLoad={ ( event ) => {

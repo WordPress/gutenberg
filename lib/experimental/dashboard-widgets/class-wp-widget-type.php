@@ -70,14 +70,14 @@ if ( ! class_exists( 'WP_Widget_Type' ) ) {
 		/**
 		 * Classic dashboard widget id from `wp_add_dashboard_widget()`.
 		 *
-		 * Set for legacy bridge types; null for script-module widgets.
+		 * Set for classic bridge types; null for script-module widgets.
 		 *
 		 * @var string|null
 		 */
-		public $legacy_id = null;
+		public $classic_id = null;
 
 		/**
-		 * Display title for legacy widget types without a metadata module.
+		 * Display title for classic widget types without a metadata module.
 		 *
 		 * @var string|null
 		 */

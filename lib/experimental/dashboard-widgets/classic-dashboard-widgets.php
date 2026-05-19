@@ -1,27 +1,27 @@
 <?php
 /**
- * Legacy Dashboard Widgets: bridges `wp_add_dashboard_widget()` registrations
+ * Classic Dashboard Widgets: bridges `wp_add_dashboard_widget()` registrations
  * into the experimental widget type registry and iframe preview endpoint.
  *
  * @package gutenberg
  */
 
 /**
- * Returns the script-module handle shared by all legacy dashboard widget types.
+ * Returns the script-module handle shared by all classic dashboard widget types.
  *
  * @return string
  */
-function gutenberg_get_legacy_dashboard_render_module() {
-	return 'wp/widgets/legacy-dashboard/render';
+function gutenberg_get_classic_dashboard_render_module() {
+	return 'wp/widgets/classic-dashboard/render';
 }
 
 /**
  * Converts a classic dashboard widget id into a namespaced widget type name.
  *
  * @param string $widget_id Dashboard widget id passed to `wp_add_dashboard_widget()`.
- * @return string Widget type name in `wp-legacy/{slug}` form.
+ * @return string Widget type name in `wp-classic/{slug}` form.
  */
-function gutenberg_legacy_dashboard_widget_type_name( $widget_id ) {
+function gutenberg_classic_dashboard_widget_type_name( $widget_id ) {
 	$slug = strtolower( (string) $widget_id );
 	$slug = str_replace( '_', '-', $slug );
 	$slug = preg_replace( '/[^a-z0-9-]+/', '-', $slug );
@@ -31,7 +31,7 @@ function gutenberg_legacy_dashboard_widget_type_name( $widget_id ) {
 		$slug = 'widget';
 	}
 
-	return 'wp-legacy/' . $slug;
+	return 'wp-classic/' . $slug;
 }
 
 /**
@@ -138,7 +138,7 @@ function gutenberg_register_dashboard_meta_boxes_for_discovery() {
  * classic dashboard loads. The new dashboard surface calls this helper so those
  * registrations are available for discovery and iframe previews.
  */
-function gutenberg_ensure_legacy_dashboard_widgets_loaded() {
+function gutenberg_ensure_classic_dashboard_widgets_loaded() {
 	static $loaded = false;
 
 	if ( $loaded ) {
@@ -176,8 +176,8 @@ function gutenberg_ensure_legacy_dashboard_widgets_loaded() {
  *
  * @return array<int, array{id: string, title: string, callback: callable, args: mixed}>
  */
-function gutenberg_get_legacy_dashboard_meta_boxes() {
-	gutenberg_ensure_legacy_dashboard_widgets_loaded();
+function gutenberg_get_classic_dashboard_meta_boxes() {
+	gutenberg_ensure_classic_dashboard_widgets_loaded();
 
 	global $wp_meta_boxes;
 
@@ -213,27 +213,27 @@ function gutenberg_get_legacy_dashboard_meta_boxes() {
 	}
 
 	/**
-	 * Filters the legacy dashboard widgets exposed to the new dashboard.
+	 * Filters the classic dashboard widgets exposed to the new dashboard.
 	 *
 	 * @param array<int, array{id: string, title: string, callback: callable, args: mixed}> $meta_boxes
 	 */
-	return apply_filters( 'gutenberg_legacy_dashboard_meta_boxes', $meta_boxes );
+	return apply_filters( 'gutenberg_classic_dashboard_meta_boxes', $meta_boxes );
 }
 
 /**
- * Registers legacy dashboard widgets in `WP_Widget_Type_Registry`.
+ * Registers classic dashboard widgets in `WP_Widget_Type_Registry`.
  */
-function gutenberg_register_legacy_dashboard_widget_types() {
+function gutenberg_register_classic_dashboard_widget_types() {
 	if ( ! class_exists( 'WP_Widget_Type_Registry', false ) ) {
 		return;
 	}
 
 	$registry       = WP_Widget_Type_Registry::get_instance();
-	$render_module  = gutenberg_get_legacy_dashboard_render_module();
-	$metadata_module = 'wp/widgets/legacy-dashboard/widget';
+	$render_module  = gutenberg_get_classic_dashboard_render_module();
+	$metadata_module = 'wp/widgets/classic-dashboard/widget';
 
-	foreach ( gutenberg_get_legacy_dashboard_meta_boxes() as $meta_box ) {
-		$name = gutenberg_legacy_dashboard_widget_type_name( $meta_box['id'] );
+	foreach ( gutenberg_get_classic_dashboard_meta_boxes() as $meta_box ) {
+		$name = gutenberg_classic_dashboard_widget_type_name( $meta_box['id'] );
 
 		if ( $registry->is_registered( $name ) ) {
 			continue;
@@ -244,7 +244,7 @@ function gutenberg_register_legacy_dashboard_widget_types() {
 			array(
 				'render_module' => $render_module,
 				'widget_module' => $metadata_module,
-				'legacy_id'     => $meta_box['id'],
+				'classic_id'     => $meta_box['id'],
 				'title'         => $meta_box['title'],
 				'presentation'  => 'framed',
 			)
@@ -253,14 +253,14 @@ function gutenberg_register_legacy_dashboard_widget_types() {
 }
 
 /**
- * Whether legacy dashboard widgets should be discovered in this request.
+ * Whether classic dashboard widgets should be discovered in this request.
  *
  * Avoids running discovery on every wp-admin screen (which would fire
  * `wp_dashboard_setup` before `index.php` and double-register widgets).
  *
  * @return bool
  */
-function gutenberg_should_discover_legacy_dashboard_widgets() {
+function gutenberg_should_discover_classic_dashboard_widgets() {
 	if ( defined( 'REST_REQUEST' ) && REST_REQUEST ) {
 		return true;
 	}
@@ -269,7 +269,7 @@ function gutenberg_should_discover_legacy_dashboard_widgets() {
 		return false;
 	}
 
-	if ( ! empty( $_GET['dashboard-legacy-widget-preview'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	if ( ! empty( $_GET['dashboard-classic-widget-preview'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		return true;
 	}
 
@@ -279,30 +279,30 @@ function gutenberg_should_discover_legacy_dashboard_widgets() {
 }
 
 /**
- * Appends legacy widget type registration after manifest-driven types load.
+ * Appends classic widget type registration after manifest-driven types load.
  *
- * Legacy types requested over REST are also registered lazily from
+ * Classic types requested over REST are also registered lazily from
  * `WP_REST_Widget_Modules_Controller::get_items()`.
  */
-function gutenberg_register_legacy_dashboard_widget_types_after_manifest() {
-	if ( ! gutenberg_should_discover_legacy_dashboard_widgets() ) {
+function gutenberg_register_classic_dashboard_widget_types_after_manifest() {
+	if ( ! gutenberg_should_discover_classic_dashboard_widgets() ) {
 		return;
 	}
 
-	gutenberg_register_legacy_dashboard_widget_types();
+	gutenberg_register_classic_dashboard_widget_types();
 }
 
-add_action( 'admin_init', 'gutenberg_register_legacy_dashboard_widget_types_after_manifest', 20 );
+add_action( 'admin_init', 'gutenberg_register_classic_dashboard_widget_types_after_manifest', 20 );
 
 /**
- * Renders a single legacy dashboard widget by id.
+ * Renders a single classic dashboard widget by id.
  *
  * @param string $widget_id Dashboard widget id.
  */
-function gutenberg_render_legacy_dashboard_widget( $widget_id ) {
-	gutenberg_ensure_legacy_dashboard_widgets_loaded();
+function gutenberg_render_classic_dashboard_widget( $widget_id ) {
+	gutenberg_ensure_classic_dashboard_widgets_loaded();
 
-	foreach ( gutenberg_get_legacy_dashboard_meta_boxes() as $meta_box ) {
+	foreach ( gutenberg_get_classic_dashboard_meta_boxes() as $meta_box ) {
 		if ( $meta_box['id'] !== $widget_id ) {
 			continue;
 		}
@@ -323,34 +323,100 @@ function gutenberg_render_legacy_dashboard_widget( $widget_id ) {
 }
 
 /**
- * Serves an isolated admin iframe preview for a legacy dashboard widget.
+ * Sets admin globals so classic dashboard widget callbacks enqueue assets for index.php.
  */
-function gutenberg_handle_legacy_dashboard_widget_preview_iframe() {
-	if ( empty( $_GET['dashboard-legacy-widget-preview'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		return;
+function gutenberg_prepare_classic_dashboard_widget_preview_admin_context() {
+	global $pagenow, $hook_suffix;
+
+	// phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
+	$pagenow = 'index.php';
+
+	// phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
+	$hook_suffix = 'index.php';
+
+	gutenberg_ensure_classic_dashboard_widgets_loaded();
+}
+
+/**
+ * Enqueues admin scripts and styles for the classic dashboard widget preview iframe.
+ *
+ * Call after rendering the widget so callbacks can register assets first.
+ */
+function gutenberg_enqueue_classic_dashboard_widget_preview_assets() {
+	global $hook_suffix;
+
+	if ( empty( $hook_suffix ) ) {
+		// phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
+		$hook_suffix = 'index.php';
 	}
 
-	if ( ! current_user_can( 'read' ) ) {
-		return;
+	wp_enqueue_style( 'common' );
+	wp_enqueue_style( 'forms' );
+	wp_enqueue_style( 'dashboard' );
+	wp_enqueue_script( 'jquery' );
+
+	if ( wp_script_is( 'dashboard', 'registered' ) ) {
+		wp_enqueue_script( 'dashboard' );
 	}
 
-	$widget_id = sanitize_key( wp_unslash( $_GET['dashboard-legacy-widget-preview'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	/**
+	 * Fires when enqueuing assets for a classic dashboard widget preview iframe.
+	 *
+	 * @param string $hook_suffix Admin screen suffix (`index.php`).
+	 */
+	do_action( 'gutenberg_classic_dashboard_widget_preview_enqueue', $hook_suffix );
 
-	define( 'IFRAME_REQUEST', true );
+	do_action( 'admin_enqueue_scripts', $hook_suffix ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+}
 
-	?>
-	<!doctype html>
-	<html <?php language_attributes(); ?>>
-	<head>
-		<meta charset="<?php bloginfo( 'charset' ); ?>" />
-		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<?php wp_enqueue_style( 'common' ); ?>
-		<?php wp_enqueue_style( 'forms' ); ?>
-		<?php wp_enqueue_style( 'dashboard' ); ?>
-		<?php wp_admin_css( 'dashboard', true ); ?>
-		<?php wp_admin_css(); ?>
-		<?php wp_head(); ?>
-		<style>
+/**
+ * Prints enqueued admin styles and head scripts for the preview iframe.
+ */
+function gutenberg_print_classic_dashboard_widget_preview_head_assets() {
+	global $hook_suffix;
+
+	if ( empty( $hook_suffix ) ) {
+		// phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
+		$hook_suffix = 'index.php';
+	}
+
+	wp_admin_css( 'dashboard', true );
+	wp_admin_css();
+
+	do_action( "admin_print_styles-{$hook_suffix}" ); // phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores, WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+	do_action( 'admin_print_styles' ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+
+	do_action( "admin_print_scripts-{$hook_suffix}" ); // phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores, WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+	do_action( 'admin_print_scripts' ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+
+	do_action( "admin_head-{$hook_suffix}" ); // phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores, WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+	do_action( 'admin_head' ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+}
+
+/**
+ * Prints enqueued admin footer scripts for the preview iframe.
+ */
+function gutenberg_print_classic_dashboard_widget_preview_footer_assets() {
+	global $hook_suffix;
+
+	if ( empty( $hook_suffix ) ) {
+		// phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
+		$hook_suffix = 'index.php';
+	}
+
+	do_action( 'admin_footer', '' ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+
+	do_action( "admin_print_footer_scripts-{$hook_suffix}" ); // phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores, WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+	do_action( 'admin_print_footer_scripts' ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+}
+
+/**
+ * Returns inline CSS that isolates the widget postbox inside the preview iframe.
+ *
+ * @return string
+ */
+function gutenberg_get_classic_dashboard_widget_preview_isolation_styles() {
+	return '
 			html, body, #page, #content {
 				padding: 0 !important;
 				margin: 0 !important;
@@ -390,15 +456,50 @@ function gutenberg_handle_legacy_dashboard_widget_preview_iframe() {
 			.postbox .handle-order-lower {
 				display: none !important;
 			}
-		</style>
+		';
+}
+
+/**
+ * Serves an isolated admin iframe preview for a classic dashboard widget.
+ */
+function gutenberg_handle_classic_dashboard_widget_preview_iframe() {
+	if ( empty( $_GET['dashboard-classic-widget-preview'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		return;
+	}
+
+	if ( ! current_user_can( 'read' ) ) {
+		return;
+	}
+
+	$widget_id = sanitize_key( wp_unslash( $_GET['dashboard-classic-widget-preview'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+
+	define( 'IFRAME_REQUEST', true );
+
+	gutenberg_prepare_classic_dashboard_widget_preview_admin_context();
+
+	// Render the widget before printing assets so callbacks can enqueue styles/scripts.
+	ob_start();
+	gutenberg_render_classic_dashboard_widget( $widget_id );
+	$widget_content = ob_get_clean();
+
+	gutenberg_enqueue_classic_dashboard_widget_preview_assets();
+
+	?>
+	<!doctype html>
+	<html <?php language_attributes(); ?>>
+	<head>
+		<meta charset="<?php bloginfo( 'charset' ); ?>" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<?php gutenberg_print_classic_dashboard_widget_preview_head_assets(); ?>
+		<style><?php echo gutenberg_get_classic_dashboard_widget_preview_isolation_styles(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></style>
 	</head>
 	<body <?php body_class(); ?>>
 		<div id="page" class="site">
 			<div id="content" class="site-content">
-				<?php gutenberg_render_legacy_dashboard_widget( $widget_id ); ?>
+				<?php echo $widget_content; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 			</div>
 		</div>
-		<?php wp_footer(); ?>
+		<?php gutenberg_print_classic_dashboard_widget_preview_footer_assets(); ?>
 	</body>
 	</html>
 	<?php
@@ -406,4 +507,4 @@ function gutenberg_handle_legacy_dashboard_widget_preview_iframe() {
 	exit;
 }
 
-add_action( 'admin_init', 'gutenberg_handle_legacy_dashboard_widget_preview_iframe', 20 );
+add_action( 'admin_init', 'gutenberg_handle_classic_dashboard_widget_preview_iframe', 20 );
