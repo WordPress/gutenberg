@@ -13,11 +13,11 @@ const ADMIN_THEME_BACKGROUND_COLORS = new Map< string, string >( [
 	[ 'fresh', '#1d2327' ],
 	[ 'modern', '#1e1e1e' ],
 	[ 'midnight', '#363b3f' ],
-	[ 'coffee', '#59524c' ],
-	[ 'ocean', '#738e96' ],
-	[ 'blue', '#52accc' ],
-	[ 'ectoplasm', '#523f6d' ],
-	[ 'sunrise', '#cf4944' ],
+	[ 'coffee', '#7c726c' ],
+	[ 'ocean', '#5f787f' ],
+	[ 'blue', '#0e7da4' ],
+	[ 'ectoplasm', '#8468ab' ],
+	[ 'sunrise', '#cc4541' ],
 	[ 'light', '#e5e5e5' ],
 ] );
 

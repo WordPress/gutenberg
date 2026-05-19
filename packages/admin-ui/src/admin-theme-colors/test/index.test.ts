@@ -9,7 +9,7 @@ describe( 'getAdminThemeColors', () => {
 
 		expect( getAdminThemeColors() ).toEqual( {
 			primary: '#46403c',
-			bg: '#59524c',
+			bg: '#7c726c',
 		} );
 	} );
 } );
