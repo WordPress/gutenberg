@@ -25,12 +25,9 @@ interface LegacyDashboardWidgetRenderProps {
 }
 
 function getPreviewUrl( legacyId: string ): string {
-	return addQueryArgs(
-		{
-			'dashboard-legacy-widget-preview': legacyId,
-		},
-		window.location.pathname
-	);
+	return addQueryArgs( window.location.pathname, {
+		'dashboard-legacy-widget-preview': legacyId,
+	} );
 }
 
 /**
