@@ -7,6 +7,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { DataForm, useFormValidity } from '@wordpress/dataviews';
 import type { Field, Form } from '@wordpress/dataviews';
 import { useMemo, useState } from '@wordpress/element';
+import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
 import { Button, Stack } from '@wordpress/ui'; // eslint-disable-line @wordpress/use-recommended-components
 
@@ -15,7 +16,7 @@ import { Button, Stack } from '@wordpress/ui'; // eslint-disable-line @wordpress
  */
 import { ExistingDraftPrompt, SavedPost } from './components';
 import { QuickPostContentField } from './fields';
-import styles from './render.module.css';
+import styles from './styles.module.css';
 
 function getTodayStartISO() {
 	const now = new Date();
@@ -43,33 +44,42 @@ const INITIAL_DATA: QuickBlockPostData = {
 export default function QuickBlockPost() {
 	const [ data, setData ] = useState< QuickBlockPostData >( INITIAL_DATA );
 	const [ isSaving, setIsSaving ] = useState( false );
-	const [ createdPostId, setCreatedPostId ] = useState< number | null >(
-		null
-	);
+	const [ createdPost, setCreatedPost ] = useState< {
+		id: number;
+		title: string;
+	} | null >( null );
 	const [ hasDismissedPrompt, setHasDismissedPrompt ] = useState( false );
 
 	const { saveEntityRecord } = useDispatch( coreDataStore );
 
 	const { existingDraft, isLoadingDrafts } = useSelect( ( select ) => {
-		const { getCurrentUser, getEntityRecords } = select( coreDataStore );
+		const { getCurrentUser, getEntityRecords, hasFinishedResolution } =
+			select( coreDataStore );
 		const currentUser = getCurrentUser();
 
 		if ( ! currentUser?.id ) {
 			return { existingDraft: null, isLoadingDrafts: true };
 		}
 
-		const records = getEntityRecords( 'postType', 'post', {
+		const query = {
 			status: 'draft',
 			author: currentUser.id,
 			after: getTodayStartISO(),
 			orderby: 'date',
 			order: 'desc',
 			per_page: 1,
-		} ) as Array< { id: number } > | undefined;
+		};
+		const records = getEntityRecords( 'postType', 'post', query ) as
+			| Array< { id: number; title: { rendered: string } } >
+			| undefined;
 
 		return {
 			existingDraft: records?.[ 0 ] ?? null,
-			isLoadingDrafts: records === undefined,
+			isLoadingDrafts: ! hasFinishedResolution( 'getEntityRecords', [
+				'postType',
+				'post',
+				query,
+			] ),
 		};
 	}, [] );
 
@@ -114,7 +124,7 @@ export default function QuickBlockPost() {
 			} );
 			const newId = ( saved as { id?: number } | null )?.id;
 			if ( typeof newId === 'number' ) {
-				setCreatedPostId( newId );
+				setCreatedPost( { id: newId, title: data.title } );
 			}
 			setData( INITIAL_DATA );
 			setHasDismissedPrompt( true );
@@ -124,7 +134,7 @@ export default function QuickBlockPost() {
 	};
 
 	const writeAnother = () => {
-		setCreatedPostId( null );
+		setCreatedPost( null );
 	};
 
 	if ( isLoadingDrafts ) {
@@ -140,20 +150,22 @@ export default function QuickBlockPost() {
 		);
 	}
 
-	if ( createdPostId !== null ) {
-		return (
-			<SavedPost
-				postId={ createdPostId }
-				onWriteAnother={ writeAnother }
-			/>
-		);
-	}
-
 	if ( existingDraft && ! hasDismissedPrompt ) {
 		return (
 			<ExistingDraftPrompt
 				postId={ existingDraft.id }
+				postTitle={ decodeEntities( existingDraft.title.rendered ) }
 				onWriteAnother={ () => setHasDismissedPrompt( true ) }
+			/>
+		);
+	}
+
+	if ( createdPost !== null ) {
+		return (
+			<SavedPost
+				postId={ createdPost.id }
+				postTitle={ createdPost.title }
+				onWriteAnother={ writeAnother }
 			/>
 		);
 	}
@@ -165,7 +177,7 @@ export default function QuickBlockPost() {
 			justify="space-between"
 			className={ styles.body }
 		>
-			<div className={ styles.formContainer }>
+			<Stack className={ styles.formContainer }>
 				<DataForm< QuickBlockPostData >
 					data={ data }
 					fields={ fields }
@@ -175,7 +187,7 @@ export default function QuickBlockPost() {
 						setData( ( prev ) => ( { ...prev, ...edits } ) )
 					}
 				/>
-			</div>
+			</Stack>
 
 			<Stack direction="row" gap="md" justify="flex-end">
 				<Button
