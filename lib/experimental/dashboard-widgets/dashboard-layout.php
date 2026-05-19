@@ -70,7 +70,7 @@ function gutenberg_inject_dashboard_default_layout( $value, $user_id, $meta_key 
 		: array();
 
 	if ( ! empty( $committed ) ) {
-		return $value;
+		return $committed;
 	}
 
 	/**
