@@ -138,9 +138,7 @@ export const WidgetChrome = forwardRef< HTMLDivElement, WidgetChromeProps >(
 		}
 
 		const isFullBleed = widgetType.presentation === 'full-bleed';
-		const header = (
-			<Header titleId={ titleId } widgetType={ widgetType } />
-		);
+		const header = <Header titleId={ titleId } widgetType={ widgetType } />;
 		const body = (
 			<WidgetErrorBoundary>
 				<Suspense fallback={ <LoadingOverlay /> }>
