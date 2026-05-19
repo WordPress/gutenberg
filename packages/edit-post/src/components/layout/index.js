@@ -82,8 +82,6 @@ const DESIGN_POST_TYPES = [
 	'wp_navigation',
 ];
 
-const INLINE_NOTICES_CLASS_NAME = 'edit-post-layout__inline-notices';
-
 function useEditorStyles( settings ) {
 	const { hasThemeStyleSupport } = useSelect( ( select ) => {
 		return {
@@ -165,7 +163,7 @@ function MetaBoxesMain( { isLegacy } ) {
 			return;
 		}
 		const noticeContainer = container.querySelector(
-			`:scope > .${ INLINE_NOTICES_CLASS_NAME }`
+			':scope > .notices-inline-notices-wrapper'
 		);
 		const resizeHandle = container.querySelector(
 			'.edit-post-meta-boxes-main__presenter'
@@ -584,7 +582,6 @@ function Layout( {
 						postId={ currentPostId }
 						templateId={ templateId }
 						className={ className }
-						inlineNoticesClassName={ INLINE_NOTICES_CLASS_NAME }
 						forceIsDirty={ hasActiveMetaboxes }
 						disableIframe={ ! shouldIframe }
 						// We should auto-focus the canvas (title) on load.

@@ -47,17 +47,15 @@ const interfaceLabels = {
 	footer: __( 'Editor footer' ),
 };
 
-function Notices( { inlineNoticesClassName } ) {
-	return (
-		<InlineNotices
-			className={ clsx( 'editor-notices', inlineNoticesClassName ) }
-			pinnedNoticesClassName="editor-notices__pinned"
-			dismissibleNoticesClassName="editor-notices__dismissible"
-		>
-			<TemplateValidationNotice />
-		</InlineNotices>
-	);
-}
+const Notices = () => (
+	<InlineNotices
+		className="editor-notices"
+		pinnedNoticesClassName="editor-notices__pinned"
+		dismissibleNoticesClassName="editor-notices__dismissible"
+	>
+		<TemplateValidationNotice />
+	</InlineNotices>
+);
 
 export default function EditorInterface( {
 	className,
@@ -70,7 +68,6 @@ export default function EditorInterface( {
 	customSavePanel,
 	forceDisableBlockTools,
 	iframeProps,
-	inlineNoticesClassName,
 } ) {
 	const {
 		mode,
@@ -202,9 +199,7 @@ export default function EditorInterface( {
 					/>
 				)
 			}
-			editorNotices={
-				<Notices inlineNoticesClassName={ inlineNoticesClassName } />
-			}
+			editorNotices={ <Notices /> }
 			secondarySidebar={
 				! isAttachment &&
 				! isPreviewMode &&
@@ -218,11 +213,7 @@ export default function EditorInterface( {
 			}
 			content={
 				<>
-					{ ! isDistractionFree && ! isPreviewMode && (
-						<Notices
-							inlineNoticesClassName={ inlineNoticesClassName }
-						/>
-					) }
+					{ ! isDistractionFree && ! isPreviewMode && <Notices /> }
 					{ shouldShowMediaEditor && (
 						<MediaPreview { ...iframeProps } />
 					) }
