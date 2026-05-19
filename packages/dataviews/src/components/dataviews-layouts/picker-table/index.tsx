@@ -143,14 +143,16 @@ function TableRow< Item >( {
 			aria-posinset={ posinset }
 			role={ infiniteScrollEnabled ? 'article' : 'option' }
 			onMouseDown={ ( event ) => {
-				if ( event.button !== 0 ) {
-					return;
+				// Prevent the browser from moving focus to the row on click.
+				// Without this, Ariakit's first focus into the Composite calls
+				// `baseElement.focus()` without `preventScroll`, which both
+				// swallows the click and scrolls the active row under the
+				// sticky table header.
+				if ( event.button === 0 ) {
+					event.preventDefault();
 				}
-				// Prevent the browser from moving focus to the row. Without
-				// this, Ariakit's first focus into the Composite calls
-				// `baseElement.focus()` without `preventScroll`, which
-				// scrolls the active row under the sticky table header.
-				event.preventDefault();
+			} }
+			onClick={ () => {
 				if ( isSelected ) {
 					onChangeSelection(
 						selection.filter( ( itemId ) => id !== itemId )
