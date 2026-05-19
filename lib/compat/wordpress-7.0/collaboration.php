@@ -98,6 +98,22 @@ if ( ! function_exists( 'wp_collaboration_register_meta' ) ) {
 	add_action( 'init', 'gutenberg_rest_api_crdt_post_meta' );
 }
 
+if ( ! function_exists( 'wp_collaboration_register_non_cacheable_meta' ) ) {
+	/**
+	 * Registers RTC meta keys as non-cache-invalidating.
+	 *
+	 * These keys are written at high frequency during collaborative editing
+	 * and should not bump the `last_changed` timestamp in the posts cache group.
+	 *
+	 * @since 20.3.0
+	 */
+	function gutenberg_collaboration_register_non_cacheable_meta() {
+		gutenberg_register_non_cacheable_post_meta( 'wp_sync_awareness' );
+		gutenberg_register_non_cacheable_post_meta( 'wp_sync_update' );
+	}
+	add_action( 'init', 'gutenberg_collaboration_register_non_cacheable_meta' );
+}
+
 if ( ! function_exists( 'wp_collaboration_inject_setting' ) ) {
 	/**
 	 * Registers the real-time collaboration setting.
