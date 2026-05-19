@@ -153,15 +153,15 @@ interface WidgetChromeActionableAreaProps {
 	widget: DashboardWidget< unknown >;
 }
 
-interface HeaderActionsProps {
+interface WidgetChromeActionsProps {
 	selectedWidthMode: WidthMode;
 	onWidthChange: ( width: WidthMode ) => void;
 }
 
-function HeaderActions( {
+function WidgetChromeActions( {
 	selectedWidthMode,
 	onWidthChange,
-}: HeaderActionsProps ) {
+}: WidgetChromeActionsProps ) {
 	const widthModeLabel: Record< WidthMode, string > = {
 		custom: __( 'Custom width' ),
 		fill: __( 'Fill width' ),
@@ -238,7 +238,7 @@ export function WidgetChromeActionableArea( {
 
 	return (
 		<div className={ styles.widgetChromeActionableArea }>
-			<HeaderActions
+			<WidgetChromeActions
 				selectedWidthMode={ selectedWidthMode }
 				onWidthChange={ onWidthChange }
 			/>
