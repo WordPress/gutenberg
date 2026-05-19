@@ -38,6 +38,11 @@ import {
 import { GridItem } from './grid-item';
 import { GridOverlay } from '../shared/grid-overlay';
 import { gridSpanToPixelSize } from '../shared/resize-snap';
+import layoutAnimationStyles from '../shared/layout-shift-animation.module.css';
+import {
+	getLayoutFingerprint,
+	useLayoutShiftAnimation,
+} from '../shared/use-layout-shift-animation';
 import { resolveFillWidths } from './resolve-fill-widths';
 import type { DashboardGridLayoutItem, DashboardGridProps } from './types';
 import type { ResizeSnapSize } from '../shared/resize-snap';
@@ -150,9 +155,12 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 			width: number;
 			height: number;
 		} | null >( null );
+		const captureLayoutSnapshotRef = useRef< () => void >( () => {} );
 		const activeLayout = temporaryLayout ?? layout;
 
-		const rootRef = useRef< HTMLDivElement >( null );
+		const [ gridRoot, setGridRoot ] = useState< HTMLDivElement | null >(
+			null
+		);
 		const [ containerWidth, setContainerWidth ] = useState( 0 );
 		const [ containerHeight, setContainerHeight ] = useState( 0 );
 		const [ gapPx, setGapPx ] = useState( FALLBACK_GAP_PX );
@@ -163,7 +171,7 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 			}
 		);
 		const mergedGridRef = useMergeRefs( [
-			rootRef,
+			setGridRoot,
 			resizeObserverRef,
 			ref,
 		] );
@@ -173,10 +181,10 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 		// computed `column-gap` is read from the resolved CSS so the
 		// math tracks the design-system token under any density.
 		useLayoutEffect( () => {
-			if ( ! rootRef.current ) {
+			if ( ! gridRoot ) {
 				return;
 			}
-			const { width, height } = rootRef.current.getBoundingClientRect();
+			const { width, height } = gridRoot.getBoundingClientRect();
 			if ( width > 0 ) {
 				setContainerWidth( width );
 			}
@@ -184,12 +192,12 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 				setContainerHeight( height );
 			}
 			const parsed = Number.parseFloat(
-				window.getComputedStyle( rootRef.current ).columnGap
+				window.getComputedStyle( gridRoot ).columnGap
 			);
 			if ( Number.isFinite( parsed ) && parsed > 0 ) {
 				setGapPx( parsed );
 			}
-		}, [] );
+		}, [ gridRoot ] );
 		const effectiveColumns = useMemo( () => {
 			if ( ! minColumnWidth ) {
 				return columns ?? DEFAULT_COLUMNS;
@@ -218,39 +226,28 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 		// is derived inline from state). Without this, downstream memos
 		// would invalidate on every parent re-render and the children
 		// walk skip during gestures wouldn't hold.
-		const layoutKeysSig = layout.map( ( item ) => item.key ).join( '\0' );
-		const layoutKeysRef = useRef< {
-			sig: string;
-			set: Set< string >;
-		} | null >( null );
-		if ( layoutKeysRef.current?.sig !== layoutKeysSig ) {
-			layoutKeysRef.current = {
-				sig: layoutKeysSig,
-				set: new Set( layout.map( ( item ) => item.key ) ),
-			};
-		}
-		const layoutKeys = layoutKeysRef.current.set;
+		const layoutKeys = useMemo(
+			() => new Set( layout.map( ( item ) => item.key ) ),
+			[ layout ]
+		);
 
 		// Sorted item keys, identity-stable when the resulting sequence is
 		// unchanged. Avoids producing a fresh `items` array on every parent
 		// re-render so `<SortableContext>` doesn't update its context value
 		// and notify every `useSortable` subscriber unnecessarily.
-		const sortedItems = activeLayout
-			.map( ( item, index ) => ( { item, index } ) )
-			.sort(
-				( a, b ) =>
-					( a.item.order ?? a.index ) - ( b.item.order ?? b.index )
-			)
-			.map( ( { item } ) => item.key );
-		const itemsSig = sortedItems.join( '\0' );
-		const itemsRef = useRef< {
-			sig: string;
-			arr: string[];
-		} | null >( null );
-		if ( itemsRef.current?.sig !== itemsSig ) {
-			itemsRef.current = { sig: itemsSig, arr: sortedItems };
-		}
-		const items = itemsRef.current.arr;
+		const sortedItems = useMemo(
+			() =>
+				activeLayout
+					.map( ( item, index ) => ( { item, index } ) )
+					.sort(
+						( a, b ) =>
+							( a.item.order ?? a.index ) -
+							( b.item.order ?? b.index )
+					)
+					.map( ( { item } ) => item.key ),
+			[ activeLayout ]
+		);
+		const items = sortedItems;
 
 		// Resolve `width: 'fill'` items to concrete column spans.
 		const resolvedItemMap = useMemo( () => {
@@ -384,6 +381,7 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 				y: activeCenterY,
 			};
 			latestLayoutRef.current = updatedLayout;
+			captureLayoutSnapshotRef.current();
 			setTemporaryLayout( updatedLayout );
 			onPreviewLayout?.( updatedLayout );
 		} );
@@ -501,6 +499,8 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 			);
 
 			latestLayoutRef.current = updatedLayout;
+			captureLayoutSnapshotRef.current();
+			setTemporaryLayout( updatedLayout );
 			onPreviewLayout?.( updatedLayout );
 		} );
 
@@ -565,6 +565,24 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 			]
 		);
 
+		const layoutAnimating =
+			editMode && ( isResizing || temporaryLayout !== undefined );
+		const layoutFingerprint = useMemo(
+			() => getLayoutFingerprint( [ ...resolvedItemMap.values() ] ),
+			[ resolvedItemMap ]
+		);
+		const excludeLayoutAnimationKey =
+			activeId ?? ( isResizing ? resizeSnapPreview?.id : null );
+		const { captureLayoutSnapshot } = useLayoutShiftAnimation( {
+			container: gridRoot,
+			enabled: layoutAnimating,
+			layoutFingerprint,
+			excludeItemKey: excludeLayoutAnimationKey,
+		} );
+		useLayoutEffect( () => {
+			captureLayoutSnapshotRef.current = captureLayoutSnapshot;
+		}, [ captureLayoutSnapshot ] );
+
 		return (
 			<DndContext
 				sensors={ sensors }
@@ -583,7 +601,12 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 					<div
 						{ ...divProps }
 						ref={ mergedGridRef }
-						className={ clsx( styles.grid, className ) }
+						className={ clsx(
+							styles.grid,
+							layoutAnimating &&
+								layoutAnimationStyles[ 'layout-animating' ],
+							className
+						) }
 						data-wp-dashboard-grid-resizing={
 							isResizing || undefined
 						}

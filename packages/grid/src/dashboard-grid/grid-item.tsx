@@ -13,6 +13,7 @@ import { useMergeRefs } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
+import { GRID_ITEM_DATA_KEY } from '../shared/grid-item-key';
 import ResizeHandle from '../shared/resize-handle';
 import type { ResizeSnapSize } from '../shared/resize-snap';
 import type { ResizeDelta } from '../shared/types';
@@ -128,7 +129,12 @@ export function GridItem( {
 	) : null;
 
 	return (
-		<div ref={ mergedRef } className={ itemClassName } style={ style }>
+		<div
+			ref={ mergedRef }
+			className={ itemClassName }
+			style={ style }
+			{ ...{ [ GRID_ITEM_DATA_KEY ]: item.key } }
+		>
 			{ actionableArea ? (
 				<div
 					style={ { display: 'contents' } }
