@@ -10,7 +10,7 @@ import type { ComponentProps, ReactElement, HTMLAttributes } from 'react';
 import {
 	Flex,
 	FlexItem,
-	Tooltip,
+	Tooltip as WCTooltip,
 	Composite,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
@@ -304,11 +304,11 @@ const GridItem = forwardRef< HTMLDivElement, GridItemProps< any > >(
 										direction="row"
 									>
 										<>
-											<Tooltip text={ field.label }>
+											<WCTooltip text={ field.label }>
 												<FlexItem className="dataviews-view-grid__field-name">
 													{ field.header }
 												</FlexItem>
-											</Tooltip>
+											</WCTooltip>
 											<FlexItem
 												className="dataviews-view-grid__field-value"
 												style={ { maxHeight: 'none' } }

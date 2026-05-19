@@ -39,6 +39,12 @@ import { LanesItem } from './lanes-item';
 import { useLanePlacement } from './use-lane-placement';
 import { GridOverlay } from '../shared/grid-overlay';
 import { gridSpanToPixelSize } from '../shared/resize-snap';
+import layoutAnimationStyles from '../shared/layout-shift-animation.module.css';
+import {
+	getLayoutFingerprint,
+	getPlacementFingerprint,
+	useLayoutShiftAnimation,
+} from '../shared/use-layout-shift-animation';
 import type { DashboardLanesLayoutItem, DashboardLanesProps } from './types';
 import type { ResizeSnapSize } from '../shared/resize-snap';
 import type { ResizeDelta } from '../shared/types';
@@ -132,6 +138,7 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 			y: number;
 		} | null >( null );
 		const resizeBaselineRef = useRef< number | null >( null );
+		const captureLayoutSnapshotRef = useRef< () => void >( () => {} );
 		const activeLayout = temporaryLayout ?? layout;
 
 		const [ container, setContainer ] = useState< HTMLDivElement | null >(
@@ -190,21 +197,10 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 		}, [ activeLayout ] );
 
 		// Stable-identity key set for the children walk (see grid.tsx).
-		const layoutKeysSig = useMemo(
-			() => layout.map( ( item ) => item.key ).join( '\0' ),
+		const layoutKeys = useMemo(
+			() => new Set( layout.map( ( item ) => item.key ) ),
 			[ layout ]
 		);
-		const layoutKeysRef = useRef< {
-			sig: string;
-			set: Set< string >;
-		} | null >( null );
-		if ( layoutKeysRef.current?.sig !== layoutKeysSig ) {
-			layoutKeysRef.current = {
-				sig: layoutKeysSig,
-				set: new Set( layout.map( ( item ) => item.key ) ),
-			};
-		}
-		const layoutKeys = layoutKeysRef.current.set;
 
 		// Sorted item keys, identity-stable when the resulting sequence
 		// is unchanged (avoids invalidating SortableContext).
@@ -220,18 +216,7 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 					.map( ( { item } ) => item.key ),
 			[ activeLayout ]
 		);
-		const itemsSig = useMemo(
-			() => sortedItems.join( '\0' ),
-			[ sortedItems ]
-		);
-		const itemsRef = useRef< {
-			sig: string;
-			arr: string[];
-		} | null >( null );
-		if ( itemsRef.current?.sig !== itemsSig ) {
-			itemsRef.current = { sig: itemsSig, arr: sortedItems };
-		}
-		const items = itemsRef.current.arr;
+		const items = sortedItems;
 
 		// Placement input for the hook: each item with its clamped span
 		// in source (sorted) order. `lane` forwards the optional explicit
@@ -371,6 +356,7 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 				y: activeCenterY,
 			};
 			latestLayoutRef.current = updatedLayout;
+			captureLayoutSnapshotRef.current();
 			setTemporaryLayout( updatedLayout );
 			onPreviewLayout?.( updatedLayout );
 		} );
@@ -439,6 +425,8 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 			);
 
 			latestLayoutRef.current = updatedLayout;
+			captureLayoutSnapshotRef.current();
+			setTemporaryLayout( updatedLayout );
 			onPreviewLayout?.( updatedLayout );
 		} );
 
@@ -480,6 +468,25 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 			[ Overlay, editMode, effectiveColumns ]
 		);
 
+		const layoutAnimating =
+			editMode && ( isResizing || temporaryLayout !== undefined );
+		const layoutFingerprint = useMemo( () => {
+			const layoutSig = getLayoutFingerprint( activeLayout );
+			const placementSig = getPlacementFingerprint( itemStyles );
+			return `${ layoutSig }\0${ placementSig }`;
+		}, [ activeLayout, itemStyles ] );
+		const excludeLayoutAnimationKey =
+			activeId ?? ( isResizing ? resizeSnapPreview?.id : null );
+		const { captureLayoutSnapshot } = useLayoutShiftAnimation( {
+			container,
+			enabled: layoutAnimating,
+			layoutFingerprint,
+			excludeItemKey: excludeLayoutAnimationKey,
+		} );
+		useLayoutEffect( () => {
+			captureLayoutSnapshotRef.current = captureLayoutSnapshot;
+		}, [ captureLayoutSnapshot ] );
+
 		return (
 			<DndContext
 				sensors={ sensors }
@@ -496,7 +503,12 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 					<div
 						{ ...divProps }
 						ref={ mergedRootRef }
-						className={ clsx( styles.lanes, className ) }
+						className={ clsx(
+							styles.lanes,
+							layoutAnimating &&
+								layoutAnimationStyles[ 'layout-animating' ],
+							className
+						) }
 						style={
 							{
 								...style,

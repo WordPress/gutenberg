@@ -14,7 +14,7 @@ import { useMergeRefs } from '@wordpress/compose';
  * Internal dependencies
  */
 import ResizeHandle from '../shared/resize-handle';
-import { LANES_DATA_KEY } from './use-lane-placement';
+import { GRID_ITEM_DATA_KEY } from '../shared/grid-item-key';
 import type { ResizeSnapSize } from '../shared/resize-snap';
 import type { ResizeDelta, ResizeHandleRenderProps } from '../shared/types';
 import styles from './lanes-item.module.css';
@@ -38,7 +38,7 @@ function getItemCursor(
 export type LanesItemProps = {
 	/**
 	 * Item key. Forwarded to dnd-kit and emitted as the
-	 * `data-lanes-key` attribute the hook reads to map measured DOM
+	 * `data-wp-grid-item-key` attribute the hook reads to map measured DOM
 	 * nodes back to logical items.
 	 */
 	itemKey: string;
@@ -164,7 +164,7 @@ export function LanesItem( {
 			ref={ mergedRef }
 			className={ itemClassName }
 			style={ style }
-			{ ...{ [ LANES_DATA_KEY ]: itemKey } }
+			{ ...{ [ GRID_ITEM_DATA_KEY ]: itemKey } }
 		>
 			{ actionableArea ? (
 				<div

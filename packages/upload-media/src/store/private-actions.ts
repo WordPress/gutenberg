@@ -1304,11 +1304,24 @@ export function finalizeItem( id: QueueItemId ) {
 
 		const attachment = item.attachment;
 		const { mediaFinalize } = select.getSettings();
+		const updates: Partial< QueueItem > = {};
 
 		// Only finalize if we have an attachment ID and a mediaFinalize callback.
 		if ( attachment?.id && mediaFinalize ) {
 			try {
-				await mediaFinalize( attachment.id, item.subSizes || [] );
+				// Pass the post-finalize attachment through so the reducer
+				// merges the updated URL (now pointing at the `-scaled` file)
+				// into item.attachment. The next processItem pass fires
+				// onChange with that URL, which is what the block stores —
+				// and what `wp_calculate_image_srcset()` needs in order to
+				// match a known size and emit srcset on the front end.
+				const updatedAttachment = await mediaFinalize(
+					attachment.id,
+					item.subSizes || []
+				);
+				if ( updatedAttachment ) {
+					updates.attachment = updatedAttachment;
+				}
 			} catch ( error ) {
 				// Log but don't fail the upload if finalization fails.
 				// eslint-disable-next-line no-console
@@ -1316,7 +1329,7 @@ export function finalizeItem( id: QueueItemId ) {
 			}
 		}
 
-		dispatch.finishOperation( id, {} );
+		dispatch.finishOperation( id, updates );
 	};
 }
 

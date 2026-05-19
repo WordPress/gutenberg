@@ -2,7 +2,12 @@
  * Internal dependencies
  */
 import type { CropperAction, CropperState, TransformOperation } from './types';
-import { DEFAULT_STATE, MAX_ZOOM } from './constants';
+import {
+	ABSOLUTE_MIN_ZOOM,
+	DEFAULT_STATE,
+	MAX_ZOOM,
+	MIN_ZOOM,
+} from './constants';
 import { normalizeRotation, degreesToRadians } from './math/rotation';
 import { restrictPanZoom, restrictCropRect } from './containment';
 
@@ -11,6 +16,16 @@ const STATE_EPSILON = 1e-6;
 
 function nearlyEqual( a: number, b: number ): boolean {
 	return Math.abs( a - b ) < STATE_EPSILON;
+}
+
+function clampRequestedZoom( state: CropperState, zoom: number ): number {
+	// With an image, enforceContainment raises zoom to the coverage-aware
+	// floor below. Without an image, no enforcement runs, so MIN_ZOOM stays
+	// the conservative resting default.
+	if ( state.image ) {
+		return Math.min( MAX_ZOOM, Math.max( ABSOLUTE_MIN_ZOOM, zoom ) );
+	}
+	return Math.min( MAX_ZOOM, Math.max( MIN_ZOOM, zoom ) );
 }
 
 /**
@@ -192,7 +207,7 @@ export function cropperReducer(
 			);
 
 		case 'SET_ZOOM': {
-			const z = Math.min( MAX_ZOOM, Math.max( 1, action.payload ) );
+			const z = clampRequestedZoom( state, action.payload );
 			return commitBase(
 				enforceContainment( {
 					...state,
@@ -202,7 +217,7 @@ export function cropperReducer(
 		}
 
 		case 'SET_ZOOM_AT_POINT': {
-			const z = Math.min( MAX_ZOOM, Math.max( 1, action.payload.zoom ) );
+			const z = clampRequestedZoom( state, action.payload.zoom );
 			return commitBase(
 				enforceContainment( {
 					...state,

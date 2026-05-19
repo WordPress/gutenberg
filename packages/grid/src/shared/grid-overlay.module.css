@@ -6,48 +6,77 @@
 	pointer-events: none;
 	opacity: 0;
 	visibility: hidden;
-	transition:
-		opacity 200ms ease,
-		visibility 0s linear 200ms;
-	background-image:
-		repeating-linear-gradient(135deg, var(--wp-grid-overlay-stripe-color, color-mix(in srgb, var(--wpds-color-bg-surface-info) 15%, transparent))
-		0 6px, transparent 6px 12px);
 }
 
 .overlay.is-active {
 	opacity: 1;
 	visibility: visible;
-	transition:
-		opacity 200ms ease,
-		visibility 0s linear 0s;
+}
+
+/*
+ * Alpha wave: row-marker tiles (or column tracks on lanes) reveal in a
+ * diagonal sweep from the top-left using staggered delays.
+ */
+@media not (prefers-reduced-motion) {
+	.overlay.is-active .row,
+	.overlay.is-active:not(.has-rows) .column {
+		opacity: 0;
+		transform: scale(0.64);
+		animation:
+			grid-overlay-tile-in
+			var(--wpds-motion-duration-md) var(--wpds-motion-easing-subtle)
+			both;
+		animation-delay: calc(var(--wp-grid-overlay-wave-delay-step, 28ms) * (var(--wp-grid-overlay-column-index, 0) + var(--wp-grid-overlay-row-index, 0)));
+	}
+
+	@keyframes grid-overlay-tile-in {
+		to {
+			opacity: 1;
+			transform: scale(1);
+		}
+	}
+
+	.overlay:not(.is-active) {
+		transition:
+			opacity var(--wpds-motion-duration-sm)
+			var(--wpds-motion-easing-subtle),
+			visibility 0s linear var(--wpds-motion-duration-sm);
+	}
+
+	.overlay:not(.is-active) .row,
+	.overlay:not(.is-active) .column {
+		animation: none;
+		transform: none;
+	}
 }
 
 @media (prefers-reduced-motion: reduce) {
 	.overlay {
-		transition: none;
+		transition:
+			opacity var(--wpds-motion-duration-sm)
+			var(--wpds-motion-easing-subtle),
+			visibility 0s linear var(--wpds-motion-duration-sm);
+	}
+
+	.overlay.is-active {
+		transition:
+			opacity var(--wpds-motion-duration-sm)
+			var(--wpds-motion-easing-subtle),
+			visibility 0s linear 0s;
 	}
 }
 
 .column {
-	background-color: var(--wp-grid-overlay-column-fill, color-mix(in srgb, var(--wpds-color-bg-surface-info) 20%, transparent));
-	position: relative;
+	display: flex;
+	flex-direction: column;
+	gap: var(--wpds-dimension-gap-md);
+	min-width: 0;
 }
 
-/*
- * Dashed row dividers framing every row. A `::after` pseudo-element
- * tiles two 1px strokes per row (top of the row area and bottom of
- * the row area, leaving the gap clear between them) and is masked
- * with a horizontal dash pattern so the strokes render dashed instead
- * of solid.
- */
-.has-rows .column::after {
-	content: "";
-	position: absolute;
-	inset: 0;
-	pointer-events: none;
-	background-image: linear-gradient(to bottom, var(--wp-grid-overlay-track-color, var(--wpds-color-stroke-surface-neutral)) 0, var(--wp-grid-overlay-track-color, var(--wpds-color-stroke-surface-neutral)) 1px, transparent 1px, transparent calc(var(--wp-grid-overlay-row-height) - 1px), var(--wp-grid-overlay-track-color, var(--wpds-color-stroke-surface-neutral)) calc(var(--wp-grid-overlay-row-height) - 1px), var(--wp-grid-overlay-track-color, var(--wpds-color-stroke-surface-neutral)) var(--wp-grid-overlay-row-height), transparent var(--wp-grid-overlay-row-height), transparent var(--wp-grid-overlay-row-tile));
-	background-size: 100% var(--wp-grid-overlay-row-tile);
-	background-repeat: repeat;
-	mask-image: repeating-linear-gradient(to right, #000 0 4px, transparent 4px 8px);
-	-webkit-mask-image: repeating-linear-gradient(to right, #000 0 4px, transparent 4px 8px);
+.row {
+	flex: 0 0 var(--wp-grid-overlay-row-height);
+	height: var(--wp-grid-overlay-row-height);
+	box-sizing: border-box;
+	border-radius: var(--wpds-border-radius-lg);
+	background-color: var(--wp-grid-overlay-tile-bg, var(--wpds-color-bg-surface-neutral-weak));
 }

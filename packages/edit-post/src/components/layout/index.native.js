@@ -19,7 +19,7 @@ import {
 	HTMLTextInput,
 	KeyboardAvoidingView,
 	NoticeList,
-	Tooltip,
+	Tooltip as WCTooltip,
 	__unstableAutocompletionItemsSlot as AutocompletionItemsSlot,
 } from '@wordpress/components';
 import {
@@ -145,7 +145,7 @@ class Layout extends Component {
 		];
 
 		return (
-			<Tooltip.Slot>
+			<WCTooltip.Slot>
 				<SafeAreaView
 					style={ containerStyles }
 					onLayout={ this.onRootViewLayout }
@@ -184,7 +184,7 @@ class Layout extends Component {
 					) }
 					{ Platform.OS === 'android' && <AutocompletionItemsSlot /> }
 				</SafeAreaView>
-			</Tooltip.Slot>
+			</WCTooltip.Slot>
 		);
 	}
 }
