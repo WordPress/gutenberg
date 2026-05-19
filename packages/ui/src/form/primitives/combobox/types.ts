@@ -99,9 +99,7 @@ export type ComboboxPopupProps = ComponentProps< typeof _Combobox.Popup > & {
 export type ComboboxRootProps<
 	Value,
 	Multiple extends boolean | undefined = false,
-> = ComponentProps< typeof _Combobox.Root< Value, Multiple > > & {
-	children?: React.ReactNode;
-};
+> = _Combobox.Root.Props< Value, Multiple >;
 
 export type ComboboxTriggerProps = ComponentProps<
 	typeof _Combobox.Trigger
@@ -122,9 +120,4 @@ export type ComboboxTriggerProps = ComponentProps<
 	size?: ComboboxSize;
 };
 
-export type ComboboxValueProps = ComponentProps< typeof _Combobox.Value > & {
-	/**
-	 * Can be used to override the current value of the combobox.
-	 */
-	children?: _Combobox.Value.Props[ 'children' ];
-};
+export type ComboboxValueProps = _Combobox.Value.Props;
