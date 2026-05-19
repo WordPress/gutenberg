@@ -186,6 +186,8 @@ When `editMode` is true:
 - `onPreviewLayout` fires continuously during the interaction for
   live feedback; the committed layout is still emitted via
   `onChangeLayout`.
+- Sibling tiles animate into their new positions when the layout
+  reflows.
 
 ---
 
@@ -308,6 +310,9 @@ Drag-to-reorder works the same as in `DashboardGrid`. Resize is
 **horizontal-only**: tile heights are content-driven, so there is
 no vertical resize gesture. The default handle is a vertical bar
 centered on the trailing edge; the cursor is `ew-resize`.
+
+Sibling tiles animate into their new positions when the layout
+reflows.
 
 ---
 
