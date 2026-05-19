@@ -1,4 +1,7 @@
-import { addQueryArgs } from '@wordpress/url';
+/**
+ * WordPress dependencies
+ */
+import { addQueryArgs, getPath } from '@wordpress/url';
 import { __, sprintf } from '@wordpress/i18n';
 import type { Action } from '@wordpress/dataviews';
 import type { Post } from '../types';
@@ -27,9 +30,18 @@ const viewPostRevisions: Action< Post > = {
 	},
 	callback( posts, { onActionPerformed } ) {
 		const post = posts[ 0 ];
-		const href = addQueryArgs( 'revision.php', {
-			revision: post?._links?.[ 'predecessor-version' ]?.[ 0 ]?.id,
-		} );
+		const isSiteEditor = getPath( window.location.href )?.includes(
+			'site-editor.php'
+		);
+		const href = isSiteEditor
+			? addQueryArgs( 'site-editor.php', {
+					p: `/${ post.type }/${ post.id }`,
+					canvas: 'edit',
+			  } )
+			: addQueryArgs( 'revision.php', {
+					revision:
+						post?._links?.[ 'predecessor-version' ]?.[ 0 ]?.id,
+			  } );
 		document.location.href = href;
 		if ( onActionPerformed ) {
 			onActionPerformed( posts );
