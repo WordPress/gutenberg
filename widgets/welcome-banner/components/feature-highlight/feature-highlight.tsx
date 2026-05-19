@@ -1,23 +1,23 @@
 /**
  * External dependencies
  */
-import type { ReactElement, ReactNode } from 'react';
+import type { ReactNode } from 'react';
 
 /**
  * WordPress dependencies
  */
-import { Icon } from '@wordpress/components';
-// Dashboard is still experimental.
-// eslint-disable-next-line @wordpress/use-recommended-components
-import { Link, Stack, Text } from '@wordpress/ui';
+import { Icon, Link, Stack, Text } from '@wordpress/ui'; // eslint-disable-line @wordpress/use-recommended-components
 
 /**
  * Internal dependencies
  */
 import styles from './feature-highlight.module.css';
 
+// Infer the icon type from the Icon component
+type IconType = React.ComponentProps< typeof Icon >[ 'icon' ];
+
 interface FeatureHighlightProps {
-	icon: ReactElement;
+	icon: IconType;
 	title: ReactNode;
 	description: ReactNode;
 	ctaUrl: string;
@@ -41,6 +41,7 @@ export function FeatureHighlight( {
 			>
 				<Icon icon={ icon } />
 			</Stack>
+
 			<Stack direction="column" gap="sm">
 				<Text variant="heading-md" render={ <h3 /> }>
 					{ title }
