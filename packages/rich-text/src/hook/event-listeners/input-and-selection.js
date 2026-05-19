@@ -273,10 +273,16 @@ export default ( props ) => ( element ) => {
 		);
 	}
 
+	// `input` and `compositionend` must run before block-editor's
+	// `input-rules.js` element-level listeners, which call `getValue()`
+	// reading `record.current` updated by our `onInput`. Use capture phase
+	// so the shared document listener fires before any element-level
+	// bubble handlers up the chain.
 	const unsubscribeInput = subscribeSharedListener(
 		ownerDocument,
 		'input',
-		onInput
+		onInput,
+		true
 	);
 	const unsubscribeCompositionStart = subscribeSharedListener(
 		ownerDocument,
@@ -286,7 +292,8 @@ export default ( props ) => ( element ) => {
 	const unsubscribeCompositionEnd = subscribeSharedListener(
 		ownerDocument,
 		'compositionend',
-		onCompositionEnd
+		onCompositionEnd,
+		true
 	);
 	const unsubscribeFocus = subscribeSharedListener(
 		ownerDocument,
