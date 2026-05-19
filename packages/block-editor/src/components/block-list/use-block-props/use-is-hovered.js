@@ -2,18 +2,14 @@
  * WordPress dependencies
  */
 import { useRefEffect } from '@wordpress/compose';
+import { privateApis as richTextPrivateApis } from '@wordpress/rich-text';
 
-function listener( event ) {
-	if ( event.defaultPrevented ) {
-		return;
-	}
+/**
+ * Internal dependencies
+ */
+import { unlock } from '../../../lock-unlock';
 
-	event.preventDefault();
-	event.currentTarget.classList.toggle(
-		'is-hovered',
-		event.type === 'mouseover'
-	);
-}
+const { subscribeSharedListener } = unlock( richTextPrivateApis );
 
 /**
  * Adds `is-hovered` class when the block is hovered and in navigation or
@@ -31,12 +27,34 @@ export function useIsHovered( { isEnabled = true } = {} ) {
 				return;
 			}
 
-			node.addEventListener( 'mouseout', listener );
-			node.addEventListener( 'mouseover', listener );
+			function listener( event ) {
+				if ( event.defaultPrevented ) {
+					return;
+				}
+				if ( ! node.contains( event.target ) ) {
+					return;
+				}
+				event.preventDefault();
+				node.classList.toggle(
+					'is-hovered',
+					event.type === 'mouseover'
+				);
+			}
+
+			const unsubscribeOut = subscribeSharedListener(
+				node.ownerDocument,
+				'mouseout',
+				listener
+			);
+			const unsubscribeOver = subscribeSharedListener(
+				node.ownerDocument,
+				'mouseover',
+				listener
+			);
 
 			return () => {
-				node.removeEventListener( 'mouseout', listener );
-				node.removeEventListener( 'mouseover', listener );
+				unsubscribeOut();
+				unsubscribeOver();
 
 				// Remove class in case it lingers.
 				node.classList.remove( 'is-hovered' );
