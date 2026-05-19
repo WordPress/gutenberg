@@ -773,6 +773,30 @@ describe( 'crdt', () => {
 			} );
 		} );
 
+		it( 'excludes orphaned meta keys not present on the edited record', () => {
+			// If post meta is registered, saved (landing in a CRDT doc),
+			// then unregistered, it can permanently mark the record dirty.
+			// Orphaned values should not show up as a change.
+			const metaMap = createYMap();
+			metaMap.set( 'registered_meta', 'value' );
+			metaMap.set( 'orphaned_meta', 'stale value' );
+			map.set( 'meta', metaMap );
+
+			const editedRecord = {
+				meta: {
+					registered_meta: 'value',
+				},
+			} as unknown as Post;
+
+			const changes = getPostChangesFromCRDTDoc(
+				doc,
+				editedRecord,
+				defaultSyncedProperties
+			);
+
+			expect( changes ).not.toHaveProperty( 'meta' );
+		} );
+
 		it( 'excludes disallowed meta keys in changes', () => {
 			const metaMap = createYMap();
 			metaMap.set( 'public_meta', 'new value' );

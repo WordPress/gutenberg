@@ -16,6 +16,7 @@ import { dateI18n, getSettings as getDateSettings } from '@wordpress/date';
  * Internal dependencies
  */
 import isTemplateRevertable from './utils/is-template-revertable';
+import { buildRevisionsPageQuery } from './private-selectors';
 export * from '../dataviews/store/private-actions';
 
 /**
@@ -588,6 +589,39 @@ export function setCurrentRevisionId( revisionId ) {
 		revisionId,
 	};
 }
+
+/**
+ * Set the current revisions page number and select the newest
+ * revision on that page once it loads.
+ *
+ * @param {number} page The page number.
+ */
+export const setRevisionPage =
+	( page ) =>
+	async ( { dispatch, select, registry } ) => {
+		const postType = select.getCurrentPostType();
+		const postId = select.getCurrentPostId();
+		const entityConfig = registry
+			.select( coreStore )
+			.getEntityConfig( 'postType', postType );
+		const revisionKey = entityConfig?.revisionKey || 'id';
+
+		const revisions = await registry
+			.resolveSelect( coreStore )
+			.getRevisions(
+				'postType',
+				postType,
+				postId,
+				buildRevisionsPageQuery( revisionKey, page )
+			);
+
+		registry.batch( () => {
+			dispatch( { type: 'SET_REVISION_PAGE', page } );
+			if ( revisions?.length ) {
+				dispatch.setCurrentRevisionId( revisions[ 0 ][ revisionKey ] );
+			}
+		} );
+	};
 
 /**
  * Set whether the revision diff highlighting is shown.

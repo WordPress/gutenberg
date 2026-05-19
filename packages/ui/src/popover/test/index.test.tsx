@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createRef, useState } from '@wordpress/element';
 import * as Popover from '../index';
@@ -389,6 +389,35 @@ describe( 'Popover', () => {
 				);
 			} );
 		} );
+
+		it( 'merges user `className` on Popover.Title with the internal one', async () => {
+			// Regression test for the shared `useRender` class-name merge
+			// that also covers Popover.Description and its Dialog/Drawer
+			// counterparts.
+			const user = userEvent.setup();
+
+			render(
+				<Popover.Root>
+					<Popover.Trigger>Open</Popover.Trigger>
+					<Popover.Popup>
+						<Popover.Title className="custom-title">
+							Title
+						</Popover.Title>
+					</Popover.Popup>
+				</Popover.Root>
+			);
+
+			await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
+
+			const heading = await screen.findByRole( 'heading', {
+				name: 'Title',
+			} );
+			// The regression this guards against: `useRender` must still
+			// forward the user-supplied className to the underlying DOM node.
+			// CSS module classes are stubbed in the Jest environment, so we
+			// can only assert the user class end-to-end.
+			expect( heading ).toHaveClass( 'custom-title' );
+		} );
 	} );
 
 	describe( 'variant', () => {
@@ -499,6 +528,35 @@ describe( 'Popover', () => {
 		} );
 	} );
 
+	describe( 'positioner', () => {
+		it( 'should render the custom positioner element wrapping the popup content', async () => {
+			const user = userEvent.setup();
+
+			render(
+				<Popover.Root>
+					<Popover.Trigger>Open</Popover.Trigger>
+					<Popover.Popup
+						positioner={
+							<Popover.Positioner data-testid="custom-positioner" />
+						}
+					>
+						<Popover.Title>Title</Popover.Title>
+						Positioner slot content
+					</Popover.Popup>
+				</Popover.Root>
+			);
+
+			await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
+
+			const content = await screen.findByText(
+				'Positioner slot content'
+			);
+			const positioner = screen.getByTestId( 'custom-positioner' );
+
+			expect( positioner ).toContainElement( content );
+		} );
+	} );
+
 	describe( 'anchor', () => {
 		it( 'should render the popup when an anchor element is provided without a trigger', async () => {
 			function AnchorTest() {
@@ -510,7 +568,13 @@ describe( 'Popover', () => {
 							Anchor element
 						</div>
 						<Popover.Root defaultOpen>
-							<Popover.Popup anchor={ anchorEl ?? undefined }>
+							<Popover.Popup
+								positioner={
+									<Popover.Positioner
+										anchor={ anchorEl ?? undefined }
+									/>
+								}
+							>
 								<Popover.Title>Title</Popover.Title>
 								Anchored content
 							</Popover.Popup>
@@ -719,7 +783,9 @@ describe( 'Popover', () => {
 				expect( screen.getByText( 'Valid Title' ) ).toBeVisible();
 			} );
 
-			await new Promise( ( resolve ) => setTimeout( resolve, 50 ) );
+			await act(
+				() => new Promise( ( resolve ) => setTimeout( resolve, 50 ) )
+			);
 			expect( errors ).toHaveLength( 0 );
 
 			cleanup();
@@ -746,7 +812,9 @@ describe( 'Popover', () => {
 			} );
 
 			// Let initial validation settle — no errors expected.
-			await new Promise( ( resolve ) => setTimeout( resolve, 50 ) );
+			await act(
+				() => new Promise( ( resolve ) => setTimeout( resolve, 50 ) )
+			);
 			expect( errors ).toHaveLength( 0 );
 
 			// Remove the title via rerender.
@@ -796,7 +864,9 @@ describe( 'Popover', () => {
 			rerender( ui( true ) );
 
 			// Wait for deferred validation to settle.
-			await new Promise( ( resolve ) => setTimeout( resolve, 50 ) );
+			await act(
+				() => new Promise( ( resolve ) => setTimeout( resolve, 50 ) )
+			);
 
 			// No new errors should have been thrown.
 			expect( errors ).toHaveLength( errorCountAfterInitial );

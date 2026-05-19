@@ -137,6 +137,12 @@ function Header( {
 			}
 			settings={
 				<>
+					{ ! hasCenter && ! isTooNarrowForDocumentBar && (
+						<CollaboratorsPresence
+							postType={ postType }
+							postId={ postId }
+						/>
+					) }
 					{ ! customSaveButton && ! isPublishSidebarOpened && (
 						/*
 						 * This button isn't completely hidden by the publish sidebar.

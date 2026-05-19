@@ -36,7 +36,7 @@ Wraps the heading and panel in one unit. ([Source](https://github.com/WordPress/
 -	**Category:** design
 -	**Parent:** core/accordion
 -	**Allowed Blocks:** core/accordion-heading, core/accordion-panel
--	**Supports:** color (background, gradients, text), contentRole, interactivity, layout (~~allowEditing~~), shadow, spacing (blockGap, margin), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** color (background, gradients, text), contentRole, interactivity, layout (~~allowEditing~~), shadow, spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** openByDefault
 
 ## Accordion Panel
@@ -337,7 +337,7 @@ A form. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/blo
 
 -	**Name:** core/form
 -	**Experimental:** true
--	**Category:** common
+-	**Category:** widgets
 -	**Allowed Blocks:** core/paragraph, core/heading, core/form-input, core/form-submit-button, core/form-submission-notification, core/group, core/columns
 -	**Supports:** anchor, color (background, gradients, link, text), spacing (margin, padding), typography (fontSize, lineHeight)
 -	**Attributes:** action, email, method, submissionMethod
@@ -348,7 +348,7 @@ The basic building block for forms. ([Source](https://github.com/WordPress/guten
 
 -	**Name:** core/form-input
 -	**Experimental:** true
--	**Category:** common
+-	**Category:** widgets
 -	**Ancestor:** core/form
 -	**Supports:** anchor, spacing (margin), ~~reusable~~
 -	**Attributes:** inlineLabel, label, name, placeholder, required, type, value, visibilityPermissions
@@ -359,7 +359,7 @@ Provide a notification message after the form has been submitted. ([Source](http
 
 -	**Name:** core/form-submission-notification
 -	**Experimental:** true
--	**Category:** common
+-	**Category:** widgets
 -	**Ancestor:** core/form
 -	**Attributes:** type
 
@@ -369,7 +369,7 @@ A submission button for forms. ([Source](https://github.com/WordPress/gutenberg/
 
 -	**Name:** core/form-submit-button
 -	**Experimental:** true
--	**Category:** common
+-	**Category:** widgets
 -	**Ancestor:** core/form
 -	**Allowed Blocks:** core/buttons, core/button
 
@@ -418,7 +418,7 @@ Create a link that always points to the homepage of the site. Usually not necess
 -	**Category:** design
 -	**Parent:** core/navigation
 -	**Supports:** anchor, interactivity (clientNavigation), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
--	**Attributes:** label
+-	**Attributes:** description, label, opensInNewTab
 
 ## Custom HTML
 
@@ -445,7 +445,7 @@ Insert an image to make a visual statement. ([Source](https://github.com/WordPre
 -	**Name:** core/image
 -	**Category:** media
 -	**Supports:** align (center, full, left, right, wide), anchor, color (~~background~~, ~~text~~), filter (duotone), interactivity, shadow, spacing (margin)
--	**Attributes:** alt, aspectRatio, blob, caption, focalPoint, height, href, id, lightbox, linkClass, linkDestination, linkTarget, rel, scale, sizeSlug, title, url, width
+-	**Attributes:** alt, aspectRatio, blob, caption, focalPoint, height, href, id, isDecorative, lightbox, linkClass, linkDestination, linkTarget, rel, scale, sizeSlug, title, url, width
 
 ## Latest Comments
 
@@ -990,24 +990,45 @@ Add white space between blocks and customize its height. ([Source](https://githu
 
 ## Tab
 
-Content for a tab in a tabbed interface. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/tab))
+A single tab button in the tab list. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/tab))
 
 -	**Name:** core/tab
 -	**Experimental:** true
 -	**Category:** design
--	**Parent:** core/tab-panel
--	**Supports:** anchor, color (background, text), layout, renaming, spacing (blockGap, padding, ~~margin~~), typography (fontSize), ~~html~~, ~~reusable~~, ~~visibility~~
--	**Attributes:** label
+-	**Parent:** core/tab-list
+-	**Supports:** color (background, text), spacing (padding), typography (fontSize, textAlign), ~~html~~, ~~lock~~, ~~reusable~~, ~~visibility~~
 
-## Tab Panel
+## Tab List
 
-Container for tab panel content in a tabbed interface. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/tab-panel))
+Display the tab buttons for a tabbed interface. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/tab-list))
 
--	**Name:** core/tab-panel
+-	**Name:** core/tab-list
 -	**Experimental:** true
 -	**Category:** design
 -	**Parent:** core/tabs
 -	**Allowed Blocks:** core/tab
+-	**Supports:** color (background, text), dimensions (~~aspectRatio~~, ~~height~~, ~~minHeight~~, ~~width~~), layout (allowJustification, allowOrientation, allowVerticalAlignment, default, ~~allowSwitching~~), spacing (blockGap, margin, padding), typography (fontSize), ~~html~~, ~~lock~~, ~~reusable~~, ~~visibility~~
+
+## Tab Panel
+
+Content for a tab in a tabbed interface. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/tab-panel))
+
+-	**Name:** core/tab-panel
+-	**Experimental:** true
+-	**Category:** design
+-	**Parent:** core/tab-panels
+-	**Supports:** anchor, color (background, text), layout, renaming, spacing (blockGap, padding, ~~margin~~), typography (fontSize), ~~html~~, ~~reusable~~, ~~visibility~~
+-	**Attributes:** label
+
+## Tab Panels
+
+Container for tab panel content in a tabbed interface. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/tab-panels))
+
+-	**Name:** core/tab-panels
+-	**Experimental:** true
+-	**Category:** design
+-	**Parent:** core/tabs
+-	**Allowed Blocks:** core/tab-panel
 -	**Supports:** color (background, heading, link, text), dimensions (~~aspectRatio~~, ~~height~~, ~~minHeight~~, ~~width~~), layout (allowJustification, default, ~~allowOrientation~~, ~~allowSizingOnChildren~~, ~~allowSwitching~~, ~~allowVerticalAlignment~~), spacing (margin, padding, ~~blockGap~~), typography (fontSize), ~~anchor~~, ~~html~~, ~~lock~~, ~~reusable~~, ~~visibility~~
 
 ## Table
@@ -1036,30 +1057,9 @@ Display content in a tabbed interface to help users navigate detailed content wi
 -	**Name:** core/tabs
 -	**Experimental:** true
 -	**Category:** design
--	**Allowed Blocks:** core/tabs-menu, core/tab-panel
+-	**Allowed Blocks:** core/tab-list, core/tab-panels
 -	**Supports:** align, anchor, color (background, text), interactivity, layout (allowJustification, allowOrientation, allowSizingOnChildren, allowVerticalAlignment, default, ~~allowSwitching~~), renaming, spacing (blockGap, margin, padding), typography (fontSize), ~~html~~
 -	**Attributes:** activeTabIndex, editorActiveTabIndex
-
-## Tabs Menu
-
-Display the tab buttons for a tabbed interface. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/tabs-menu))
-
--	**Name:** core/tabs-menu
--	**Experimental:** true
--	**Category:** design
--	**Parent:** core/tabs
--	**Allowed Blocks:** core/tabs-menu-item
--	**Supports:** color (background, text), dimensions (~~aspectRatio~~, ~~height~~, ~~minHeight~~, ~~width~~), layout (allowJustification, allowOrientation, allowVerticalAlignment, default, ~~allowSwitching~~), spacing (blockGap, margin, padding), typography (fontSize), ~~html~~, ~~lock~~, ~~reusable~~, ~~visibility~~
-
-## Tab Menu Item
-
-A single tab button in the tabs menu. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/tabs-menu-item))
-
--	**Name:** core/tabs-menu-item
--	**Experimental:** true
--	**Category:** design
--	**Parent:** core/tabs-menu
--	**Supports:** color (background, text), spacing (padding), typography (fontSize, textAlign), ~~html~~, ~~lock~~, ~~reusable~~, ~~visibility~~
 
 ## Tag Cloud
 

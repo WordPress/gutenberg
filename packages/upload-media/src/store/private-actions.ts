@@ -171,7 +171,6 @@ export function addItem( {
 					url: blobUrl,
 				},
 				additionalData: {
-					convert_format: false,
 					generate_sub_sizes: false,
 					...additionalData,
 				},
@@ -579,29 +578,6 @@ function isValidImageFormat( format: string ): format is ImageFormat {
 }
 
 /**
- * Gets the appropriate interlace setting for the given output format.
- *
- * @param outputMimeType The output mime type.
- * @param settings       The upload settings.
- * @return Whether to use interlaced encoding.
- */
-function getInterlacedSetting(
-	outputMimeType: string,
-	settings: Settings
-): boolean {
-	switch ( outputMimeType ) {
-		case 'image/jpeg':
-			return settings.jpegInterlaced ?? false;
-		case 'image/png':
-			return settings.pngInterlaced ?? false;
-		case 'image/gif':
-			return settings.gifInterlaced ?? false;
-		default:
-			return false;
-	}
-}
-
-/**
  * Determines if an image should be transcoded to a different format.
  *
  * Handles PNG to JPEG conversion carefully by checking for transparency
@@ -609,13 +585,13 @@ function getInterlacedSetting(
  *
  * @param file           The image file.
  * @param outputMimeType The target output MIME type.
- * @param settings       Media settings.
+ * @param interlaced     Whether to use interlaced encoding.
  * @return The transcode operation tuple if transcoding is needed, null otherwise.
  */
 export async function getTranscodeImageOperation(
 	file: File,
 	outputMimeType: string,
-	settings: Settings
+	interlaced: boolean = false
 ): Promise<
 	| [
 			OperationType.TranscodeImage,
@@ -652,7 +628,7 @@ export async function getTranscodeImageOperation(
 		{
 			outputFormat: formatPart,
 			outputQuality: DEFAULT_OUTPUT_QUALITY,
-			interlaced: getInterlacedSetting( outputMimeType, settings ),
+			interlaced,
 		},
 	];
 }
@@ -689,24 +665,21 @@ export function prepareItem( id: QueueItemId ) {
 		);
 		const isHeic = HEIC_MIME_TYPES.includes( file.type );
 
-		// For images that can be processed by vips, check if we need to scale down based on threshold.
+		// For images that can be processed by vips, upload the original and
+		// let generateThumbnails() handle threshold scaling as a sideload.
+		//
+		// Uploading the original (rather than a pre-scaled copy) preserves
+		// the un-suffixed basename in attachment.filename, so sub-size
+		// names are derived from the original — matching WordPress core's
+		// wp_create_image_subsizes() naming convention where only the
+		// scaled-down full-size copy carries the `-scaled` suffix and the
+		// original is kept alongside it as `original_image`.
+		//
+		// Main-file format conversion is handled server-side via the
+		// image_editor_output_format filter during create_item.
+		// The response carries image_output_format so generateThumbnails
+		// can transcode sub-sizes to the same target format.
 		if ( isImage && isVipsSupported ) {
-			const { imageOutputFormats } = settings;
-
-			// Check if we need to transcode to a different format.
-			// Uses WordPress image_editor_output_format filter settings.
-			const outputMimeType = imageOutputFormats?.[ file.type ];
-			if ( outputMimeType && outputMimeType !== file.type ) {
-				const transcodeOperation = await getTranscodeImageOperation(
-					file,
-					outputMimeType,
-					settings
-				);
-				if ( transcodeOperation ) {
-					operations.push( transcodeOperation );
-				}
-			}
-
 			operations.push(
 				OperationType.Upload,
 				OperationType.ThumbnailGeneration,
@@ -1171,14 +1144,13 @@ export function generateThumbnails( id: QueueItemId ) {
 				: thumbnailSource;
 			const batchId = uuidv4();
 
-			const { imageOutputFormats } = settings;
+			// Read per-file format conversion data from the attachment response.
+			const outputMimeType = attachment.image_output_format;
+			const interlaced = attachment.image_save_progressive ?? false;
 
 			// Check if thumbnails should be transcoded to a different format.
 			// Uses the same transparency-aware logic as the main image
 			// to avoid converting transparent PNGs to JPEG.
-			const sourceType = thumbnailSource.type;
-			const outputMimeType = imageOutputFormats?.[ sourceType ];
-
 			let thumbnailTranscodeOperation:
 				| [
 						OperationType.TranscodeImage,
@@ -1186,11 +1158,11 @@ export function generateThumbnails( id: QueueItemId ) {
 				  ]
 				| null = null;
 
-			if ( outputMimeType && outputMimeType !== sourceType ) {
+			if ( outputMimeType ) {
 				thumbnailTranscodeOperation = await getTranscodeImageOperation(
 					thumbnailSource,
 					outputMimeType,
-					settings
+					interlaced
 				);
 			}
 
@@ -1332,11 +1304,24 @@ export function finalizeItem( id: QueueItemId ) {
 
 		const attachment = item.attachment;
 		const { mediaFinalize } = select.getSettings();
+		const updates: Partial< QueueItem > = {};
 
 		// Only finalize if we have an attachment ID and a mediaFinalize callback.
 		if ( attachment?.id && mediaFinalize ) {
 			try {
-				await mediaFinalize( attachment.id, item.subSizes || [] );
+				// Pass the post-finalize attachment through so the reducer
+				// merges the updated URL (now pointing at the `-scaled` file)
+				// into item.attachment. The next processItem pass fires
+				// onChange with that URL, which is what the block stores —
+				// and what `wp_calculate_image_srcset()` needs in order to
+				// match a known size and emit srcset on the front end.
+				const updatedAttachment = await mediaFinalize(
+					attachment.id,
+					item.subSizes || []
+				);
+				if ( updatedAttachment ) {
+					updates.attachment = updatedAttachment;
+				}
 			} catch ( error ) {
 				// Log but don't fail the upload if finalization fails.
 				// eslint-disable-next-line no-console
@@ -1344,7 +1329,7 @@ export function finalizeItem( id: QueueItemId ) {
 			}
 		}
 
-		dispatch.finishOperation( id, {} );
+		dispatch.finishOperation( id, updates );
 	};
 }
 

@@ -23,12 +23,6 @@ jest.mock( '../utils', () => ( {
 
 describe( 'private actions', () => {
 	describe( 'getTranscodeImageOperation', () => {
-		const mockSettings = {
-			jpegInterlaced: false,
-			pngInterlaced: false,
-			gifInterlaced: false,
-		};
-
 		beforeEach( () => {
 			jest.clearAllMocks();
 		} );
@@ -41,7 +35,7 @@ describe( 'private actions', () => {
 			const result = await getTranscodeImageOperation(
 				file,
 				'image/webp',
-				mockSettings
+				false
 			);
 
 			expect( result ).toEqual( [
@@ -62,7 +56,7 @@ describe( 'private actions', () => {
 			const result = await getTranscodeImageOperation(
 				file,
 				'image/unknown',
-				mockSettings
+				false
 			);
 
 			expect( result ).toBeNull();
@@ -78,7 +72,7 @@ describe( 'private actions', () => {
 			const result = await getTranscodeImageOperation(
 				file,
 				'image/jpeg',
-				mockSettings
+				false
 			);
 
 			expect( result ).toBeNull();
@@ -96,7 +90,7 @@ describe( 'private actions', () => {
 			const result = await getTranscodeImageOperation(
 				file,
 				'image/jpeg',
-				mockSettings
+				false
 			);
 
 			expect( result ).toEqual( [
@@ -123,7 +117,7 @@ describe( 'private actions', () => {
 			const result = await getTranscodeImageOperation(
 				file,
 				'image/jpeg',
-				mockSettings
+				false
 			);
 
 			expect( result ).toBeNull();
@@ -138,7 +132,7 @@ describe( 'private actions', () => {
 			const result = await getTranscodeImageOperation(
 				file,
 				'image/webp',
-				mockSettings
+				false
 			);
 
 			expect( result ).toEqual( [
@@ -161,7 +155,7 @@ describe( 'private actions', () => {
 			const result = await getTranscodeImageOperation(
 				file,
 				'image/jpeg',
-				{ ...mockSettings, jpegInterlaced: true }
+				true
 			);
 
 			expect( result ).toEqual( [
@@ -182,7 +176,7 @@ describe( 'private actions', () => {
 			const result = await getTranscodeImageOperation(
 				file,
 				'image/png',
-				{ ...mockSettings, pngInterlaced: true }
+				true
 			);
 
 			expect( result ).toEqual( [
@@ -203,7 +197,7 @@ describe( 'private actions', () => {
 			const result = await getTranscodeImageOperation(
 				file,
 				'image/gif',
-				{ ...mockSettings, gifInterlaced: true }
+				true
 			);
 
 			expect( result ).toEqual( [
@@ -224,7 +218,7 @@ describe( 'private actions', () => {
 			const result = await getTranscodeImageOperation(
 				file,
 				'image/avif',
-				mockSettings
+				false
 			);
 
 			expect( result ).toEqual( [
@@ -245,7 +239,7 @@ describe( 'private actions', () => {
 			const result = await getTranscodeImageOperation(
 				file,
 				'image/',
-				mockSettings
+				false
 			);
 
 			expect( result ).toBeNull();
@@ -341,6 +335,44 @@ describe( 'private actions', () => {
 
 			expect( mediaFinalize ).not.toHaveBeenCalled();
 			expect( finishOperation ).toHaveBeenCalledWith( 'test-id', {} );
+		} );
+
+		it( 'should forward the finalized attachment to finishOperation', async () => {
+			// Regression: after PR #78038, CSM uploads the original file rather
+			// than a pre-scaled copy, so the upload response carries the URL of
+			// the un-scaled original. The scaled-sideload step later updates
+			// _wp_attached_file server-side, and finalize returns the
+			// up-to-date attachment. The queue's stored attachment must be
+			// merged with that response so onChange propagates the scaled URL
+			// to the block — otherwise wp_calculate_image_srcset() cannot
+			// match the src to a known size and no srcset is rendered.
+			const updatedAttachment = {
+				id: 42,
+				url: 'https://example.com/wp-content/uploads/image-scaled.jpg',
+			};
+			const mediaFinalize = jest
+				.fn()
+				.mockResolvedValue( updatedAttachment );
+			const finishOperation = jest.fn();
+			const select = {
+				getItem: () => ( {
+					attachment: {
+						id: 42,
+						url: 'https://example.com/wp-content/uploads/image.jpg',
+					},
+					subSizes: mockSubSizes,
+				} ),
+				getSettings: () => ( { mediaFinalize } ),
+			};
+			const dispatch = { finishOperation };
+
+			const thunk = finalizeItem( 'test-id' );
+			await thunk( { select, dispatch } );
+
+			expect( mediaFinalize ).toHaveBeenCalledWith( 42, mockSubSizes );
+			expect( finishOperation ).toHaveBeenCalledWith( 'test-id', {
+				attachment: updatedAttachment,
+			} );
 		} );
 
 		it( 'should handle mediaFinalize errors gracefully', async () => {
