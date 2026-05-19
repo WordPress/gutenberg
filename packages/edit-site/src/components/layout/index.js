@@ -6,10 +6,7 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import {
-	NavigableRegion,
-	privateApis as adminUiPrivateApis,
-} from '@wordpress/admin-ui';
+import { NavigableRegion, getAdminThemeColors } from '@wordpress/admin-ui';
 import {
 	__unstableMotion as motion,
 	__unstableAnimatePresence as AnimatePresence,
@@ -53,7 +50,6 @@ import SavePanel from '../save-panel';
 
 const { useLocation } = unlock( routerPrivateApis );
 const { useStyle } = unlock( editorPrivateApis );
-const { getAdminThemeColors } = unlock( adminUiPrivateApis );
 const { ThemeProvider } = unlock( themePrivateApis );
 
 const ANIMATION_DURATION = 0.3;

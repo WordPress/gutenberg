@@ -9,7 +9,7 @@ import clsx from 'clsx';
 import { privateApis as routePrivateApis } from '@wordpress/route';
 import { SnackbarNotices } from '@wordpress/notices';
 import { SlotFillProvider } from '@wordpress/components';
-import { privateApis as adminUiPrivateApis } from '@wordpress/admin-ui';
+import { getAdminThemeColors } from '@wordpress/admin-ui';
 import { privateApis as themePrivateApis } from '@wordpress/theme';
 
 /**
@@ -23,7 +23,6 @@ import './style.scss';
 import useRouteTitle from '../app/use-route-title';
 
 const { useMatches, Outlet } = unlock( routePrivateApis );
-const { getAdminThemeColors } = unlock( adminUiPrivateApis );
 const { ThemeProvider } = unlock( themePrivateApis );
 
 /**
