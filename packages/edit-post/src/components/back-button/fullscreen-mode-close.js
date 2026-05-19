@@ -9,7 +9,7 @@ import clsx from 'clsx';
 import { useSelect } from '@wordpress/data';
 import {
 	Button,
-	Icon,
+	Icon as WCIcon,
 	__unstableMotion as motion,
 } from '@wordpress/components';
 import { __, isRTL } from '@wordpress/i18n';
@@ -96,7 +96,7 @@ function FullscreenModeClose( { showTooltip, icon, href, initialPost } ) {
 		);
 	} else {
 		siteIconContent = (
-			<Icon
+			<WCIcon
 				className="edit-post-fullscreen-mode-close-site-icon__icon"
 				icon={ wordpress }
 				size={ 48 }
@@ -106,7 +106,7 @@ function FullscreenModeClose( { showTooltip, icon, href, initialPost } ) {
 
 	// Override default icon if custom icon is provided via props.
 	const buttonIcon = icon ? (
-		<Icon size="36px" icon={ icon } />
+		<WCIcon size="36px" icon={ icon } />
 	) : (
 		<div className="edit-post-fullscreen-mode-close-site-icon">
 			{ siteIconContent }
@@ -156,7 +156,7 @@ function FullscreenModeClose( { showTooltip, icon, href, initialPost } ) {
 			</Button>
 			{ hasAdminBarInEditor ? (
 				<div className="edit-post-fullscreen-mode-close__back-icon">
-					<Icon icon={ isRTL() ? chevronRight : chevronLeft } />
+					<WCIcon icon={ isRTL() ? chevronRight : chevronLeft } />
 				</div>
 			) : (
 				<motion.div
@@ -168,7 +168,7 @@ function FullscreenModeClose( { showTooltip, icon, href, initialPost } ) {
 					) }
 					variants={ ! disableMotion && toggleHomeIconVariants }
 				>
-					<Icon icon={ isRTL() ? arrowUpRight : arrowUpLeft } />
+					<WCIcon icon={ isRTL() ? arrowUpRight : arrowUpLeft } />
 				</motion.div>
 			) }
 		</motion.div>

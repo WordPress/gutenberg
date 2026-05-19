@@ -9,7 +9,7 @@ import {
 	store as blocksStore,
 } from '@wordpress/blocks';
 import { __unstableMotion as motion } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { useRef } from '@wordpress/element';
 
 /**
@@ -25,6 +25,7 @@ import { store as blockEditorStore } from '../../store';
 import BlockStyles from '../block-styles';
 import { ListViewContentPopover } from '../inspector-controls/list-view-content-popover';
 import InspectorControls from '../inspector-controls';
+import { BlockInspectorPreTabsSlot } from './inspector-pre-tabs-slot-fill';
 import { default as InspectorControlsTabs } from '../inspector-controls-tabs';
 import useInspectorControlsTabs from '../inspector-controls-tabs/use-inspector-controls-tabs';
 import InspectorControlsLastItem from '../inspector-controls/last-item';
@@ -32,6 +33,7 @@ import AdvancedControls from '../inspector-controls-tabs/advanced-controls-panel
 import PositionControls from '../inspector-controls-tabs/position-controls-panel';
 import useBlockInspectorAnimationSettings from './useBlockInspectorAnimationSettings';
 import { useBorderPanelLabel } from '../../hooks/border';
+import { BlockStatesControl } from '../../hooks/states';
 import ContentTab from '../inspector-controls-tabs/content-tab';
 import ViewportVisibilityInfo from '../block-visibility/viewport-visibility-info';
 import { unlock } from '../../lock-unlock';
@@ -60,13 +62,14 @@ function StyleInspectorSlots( {
 				group="typography"
 				label={ __( 'Typography' ) }
 			/>
+			<InspectorControls.Slot group="layout" label={ __( 'Layout' ) } />
 			<InspectorControls.Slot
 				group="dimensions"
 				label={ __( 'Dimensions' ) }
 			/>
 			<InspectorControls.Slot group="border" label={ borderPanelLabel } />
-			<InspectorControls.Slot group="styles" />
 			{ showPositionControls && <PositionControls /> }
+			<InspectorControls.Slot group="styles" />
 			{ showBindingsControls && (
 				<InspectorControls.Slot group="bindings" />
 			) }
@@ -75,6 +78,33 @@ function StyleInspectorSlots( {
 					<AdvancedControls />
 				</div>
 			) }
+		</>
+	);
+}
+
+function StyleStateInspectorSlots( { blockName } ) {
+	const borderPanelLabel = useBorderPanelLabel( { blockName } );
+	return (
+		<>
+			<InspectorControls.Slot
+				group="color"
+				label={ __( 'Color' ) }
+				className="color-block-support-panel__inner-wrapper"
+			/>
+			<InspectorControls.Slot
+				group="background"
+				label={ __( 'Background image' ) }
+				className="background-block-support-panel__inner-wrapper"
+			/>
+			<InspectorControls.Slot
+				group="typography"
+				label={ __( 'Typography' ) }
+			/>
+			<InspectorControls.Slot
+				group="dimensions"
+				label={ __( 'Dimensions' ) }
+			/>
+			<InspectorControls.Slot group="border" label={ borderPanelLabel } />
 		</>
 	);
 }
@@ -89,6 +119,8 @@ function BlockInspector() {
 		isSectionBlockInSelection,
 		hasBlockStyles,
 		editedContentOnlySection,
+		blockEditingMode,
+		selectedBlockStyleState,
 	} = useSelect( ( select ) => {
 		const {
 			getSelectedBlockClientId,
@@ -99,6 +131,8 @@ function BlockInspector() {
 			isSectionBlock: _isSectionBlock,
 			getEditedContentOnlySection,
 			isWithinEditedContentOnlySection,
+			getBlockEditingMode,
+			getSelectedBlockStyleState,
 		} = unlock( select( blockEditorStore ) );
 		const { getBlockStyles } = select( blocksStore );
 		const _selectedBlockClientId = getSelectedBlockClientId();
@@ -130,6 +164,10 @@ function BlockInspector() {
 			isSectionBlock: _isSectionBlock( _renderedBlockClientId ),
 			hasBlockStyles: _hasBlockStyles,
 			editedContentOnlySection: getEditedContentOnlySection(),
+			blockEditingMode: getBlockEditingMode( _renderedBlockClientId ),
+			selectedBlockStyleState: getSelectedBlockStyleState(
+				_renderedBlockClientId
+			),
 		};
 	}, [] );
 
@@ -198,6 +236,7 @@ function BlockInspector() {
 		useBlockInspectorAnimationSettings( blockType );
 
 	const hasSelectedBlocks = selectedBlockCount > 1;
+	const isBlockStyleStateSelected = selectedBlockStyleState !== 'default';
 
 	if ( hasSelectedBlocks && ! isSectionBlockInSelection ) {
 		return (
@@ -265,6 +304,9 @@ function BlockInspector() {
 				contentClientIds={ contentClientIds }
 				hasBlockStyles={ hasBlockStyles }
 				editedContentOnlySection={ editedContentOnlySection }
+				blockEditingMode={ blockEditingMode }
+				selectedBlockStyleState={ selectedBlockStyleState }
+				isBlockStyleStateSelected={ isBlockStyleStateSelected }
 			/>
 		</BlockInspectorSingleBlockWrapper>
 	);
@@ -316,6 +358,9 @@ const BlockInspectorSingleBlock = ( {
 	contentClientIds,
 	hasBlockStyles,
 	editedContentOnlySection,
+	blockEditingMode,
+	selectedBlockStyleState,
+	isBlockStyleStateSelected,
 } ) => {
 	const listViewRef = useRef( null );
 	const hasMultipleTabs = availableTabs?.length > 1;
@@ -329,6 +374,9 @@ const BlockInspectorSingleBlock = ( {
 		renderedBlockClientId
 	);
 	const isBlockSynced = blockInformation.isSynced;
+	const { setSelectedBlockStyleState } = unlock(
+		useDispatch( blockEditorStore )
+	);
 
 	return (
 		<div className="block-editor-block-inspector">
@@ -347,11 +395,29 @@ const BlockInspectorSingleBlock = ( {
 				className={ isBlockSynced && 'is-synced' }
 				isChild={ hasParentChildBlockCards }
 				clientId={ renderedBlockClientId }
+				controls={
+					blockEditingMode === 'default' && (
+						<BlockStatesControl
+							name={ blockName }
+							value={ selectedBlockStyleState }
+							onChange={ ( value ) =>
+								setSelectedBlockStyleState(
+									renderedBlockClientId,
+									value
+								)
+							}
+						/>
+					)
+				}
 			/>
 			<ViewportVisibilityInfo clientId={ renderedBlockClientId } />
 			<EditContents clientId={ renderedBlockClientId } />
 			<BlockVariationTransforms blockClientId={ renderedBlockClientId } />
-			{ hasMultipleTabs && (
+			<BlockInspectorPreTabsSlot />
+			{ isBlockStyleStateSelected && ! isSectionBlock && (
+				<StyleStateInspectorSlots blockName={ blockName } />
+			) }
+			{ ! isBlockStyleStateSelected && hasMultipleTabs && (
 				<>
 					<InspectorControlsTabs
 						hasBlockStyles={ hasBlockStyles }
@@ -363,7 +429,7 @@ const BlockInspectorSingleBlock = ( {
 					/>
 				</>
 			) }
-			{ ! hasMultipleTabs && (
+			{ ! isBlockStyleStateSelected && ! hasMultipleTabs && (
 				<>
 					{ hasBlockStyles && (
 						<BlockStyles clientId={ renderedBlockClientId } />
@@ -377,7 +443,9 @@ const BlockInspectorSingleBlock = ( {
 					) }
 				</>
 			) }
-			<InspectorControlsLastItem.Slot />
+			{ ! isBlockStyleStateSelected && (
+				<InspectorControlsLastItem.Slot />
+			) }
 			<SkipToSelectedBlock key="back" />
 		</div>
 	);

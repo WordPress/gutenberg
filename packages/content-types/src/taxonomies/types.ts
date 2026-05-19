@@ -5,7 +5,10 @@ export interface TaxonomyRecord {
 	status: 'publish' | 'draft';
 	title: { raw: string; rendered: string };
 	config: StoredConfig;
+	// WP core's `register_taxonomy()` accepts `array|string`, but the
+	// `wp_user_taxonomy` REST controller normalizes to `string[]`.
 	object_type: string[];
+	count: number;
 }
 
 export interface StoredLabels {
@@ -41,7 +44,11 @@ export interface StoredConfig {
 	show_in_quick_edit: boolean;
 	show_admin_column: boolean;
 	show_in_rest: boolean;
+	sort?: boolean;
+	default_term?: { name: string };
 }
+
+import type { ContentType } from '../types';
 
 /**
  * Normalized in-memory shape used by the Add/Edit forms and the DataViews
@@ -50,18 +57,11 @@ export interface StoredConfig {
  * `config` here even though the wire format keeps it at the top level —
  * keeps the form components free of split state.
  */
-export interface TaxonomyFormData {
-	id?: number;
-	slug: string;
-	status: 'publish' | 'draft';
-	title: { raw: string };
-	config: {
+export interface TaxonomyFormData extends ContentType {
+	config: ContentType[ 'config' ] & {
 		labels: Required< Pick< StoredLabels, 'singular_name' > > &
 			StoredLabels;
 		object_type: string[];
-		description: string;
-		public: boolean;
-		hierarchical: boolean;
 		publicly_queryable: boolean;
 		show_ui: boolean;
 		show_in_menu: boolean;
@@ -69,8 +69,11 @@ export interface TaxonomyFormData {
 		show_tagcloud: boolean;
 		show_in_quick_edit: boolean;
 		show_admin_column: boolean;
-		show_in_rest: boolean;
+		sort: boolean;
+		// Form-only — controls whether `default_term` is sent on save.
+		// Not part of `StoredConfig`; stripped by `serializeForSave`.
+		default_term_enabled: boolean;
+		default_term: { name: string };
 	};
+	count?: number;
 }
-
-export type CoreDataError = { message?: string; code?: string };

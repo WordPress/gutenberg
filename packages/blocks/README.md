@@ -504,10 +504,18 @@ Undocumented declaration.
 
 Converts an HTML string to known blocks.
 
+_Usage_
+
+```js
+import { rawHandler } from '@wordpress/blocks';
+
+const blocks = rawHandler( { HTML: '<p>Hello</p><p>World</p>' } );
+```
+
 _Parameters_
 
--   _$1_ `{ HTML?: string; }`:
--   _$1.HTML_ `string`: The HTML to convert.
+-   _options_ `{ HTML?: string; }`: Options.
+-   _options.HTML_ `string`: The HTML to convert.
 
 _Returns_
 
@@ -627,7 +635,7 @@ registerBlockType( 'namespace/block-name', {
 _Parameters_
 
 -   _blockNameOrMetadata_ `string | BlockConfiguration< Attributes >`: Block type name or its metadata.
--   _settings_ `Partial< BlockConfiguration< Attributes > >`: Block settings.
+-   _settings_ `Partial< SettingsBlockConfiguration< Attributes > >`: Block settings.
 
 _Returns_
 

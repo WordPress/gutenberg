@@ -9,6 +9,7 @@ import { __, sprintf } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
+import { pickStoredLabels, serializeLabels } from '../utils/form-data';
 import type { StoredLabels, TaxonomyFormData, TaxonomyRecord } from './types';
 
 export const BLANK_RECORD: TaxonomyFormData = {
@@ -29,6 +30,9 @@ export const BLANK_RECORD: TaxonomyFormData = {
 		show_in_quick_edit: true,
 		show_admin_column: false,
 		show_in_rest: true,
+		sort: false,
+		default_term_enabled: false,
+		default_term: { name: '' },
 	},
 };
 
@@ -139,13 +143,11 @@ export function deriveLabels(
 
 export function toFormData( row: TaxonomyRecord ): TaxonomyFormData {
 	const config = row.config ?? {};
-	const labels: StoredLabels = {};
-	for ( const key of STRING_LABEL_KEYS ) {
-		const value = config.labels?.[ key ];
-		if ( typeof value === 'string' ) {
-			labels[ key ] = value;
-		}
-	}
+	const labels = pickStoredLabels< StoredLabels >(
+		config.labels,
+		STRING_LABEL_KEYS
+	);
+	const defaultTermName = config.default_term?.name ?? '';
 	const formConfig: TaxonomyFormData[ 'config' ] = {
 		labels: { singular_name: '', ...labels },
 		object_type: Array.isArray( row.object_type ) ? row.object_type : [],
@@ -160,6 +162,9 @@ export function toFormData( row: TaxonomyRecord ): TaxonomyFormData {
 		show_in_quick_edit: config.show_in_quick_edit,
 		show_admin_column: config.show_admin_column,
 		show_in_rest: config.show_in_rest,
+		sort: !! config.sort,
+		default_term_enabled: defaultTermName !== '',
+		default_term: { name: defaultTermName },
 	};
 	return {
 		id: row.id,
@@ -167,24 +172,24 @@ export function toFormData( row: TaxonomyRecord ): TaxonomyFormData {
 		status: row.status,
 		title: { raw: row.title.raw },
 		config: formConfig,
+		count: row.count,
 	};
 }
 
 export function serializeForSave( data: TaxonomyFormData ) {
 	const { config } = data;
 
-	const labels: StoredLabels = {};
-	for ( const key of STRING_LABEL_KEYS ) {
-		const value = config.labels[ key ];
-		if ( typeof value === 'string' && value.trim() !== '' ) {
-			labels[ key ] = value.trim();
-		}
-	}
-	// singular_name is required; keep the raw (possibly-empty) value so save
-	// errors point at the right field rather than silently dropping it.
-	labels.singular_name = config.labels.singular_name;
+	const labels = serializeLabels< TaxonomyFormData[ 'config' ][ 'labels' ] >(
+		config.labels,
+		STRING_LABEL_KEYS as ReadonlyArray<
+			keyof TaxonomyFormData[ 'config' ][ 'labels' ]
+		>
+	);
 
 	const description = config.description.trim();
+	const defaultTermName = config.default_term.name.trim();
+	const includeDefaultTerm =
+		config.default_term_enabled && defaultTermName !== '';
 	return {
 		...( data.id !== undefined ? { id: data.id } : {} ),
 		slug: data.slug,
@@ -203,7 +208,11 @@ export function serializeForSave( data: TaxonomyFormData ) {
 			show_in_quick_edit: config.show_in_quick_edit,
 			show_admin_column: config.show_admin_column,
 			show_in_rest: config.show_in_rest,
+			sort: config.sort,
 			...( description !== '' ? { description } : {} ),
+			...( includeDefaultTerm
+				? { default_term: { name: defaultTermName } }
+				: {} ),
 		},
 	};
 }

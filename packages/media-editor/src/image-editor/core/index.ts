@@ -7,6 +7,7 @@ export type {
 	Size,
 	Flip,
 	StencilProps,
+	HandlePosition,
 } from './types';
 // Note: `CropperAction` is intentionally not exported. The reducer's
 // action shape is an internal detail; consumers drive state through

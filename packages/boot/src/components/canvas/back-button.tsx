@@ -3,7 +3,7 @@
  */
 import {
 	Button,
-	Icon,
+	Icon as WCIcon,
 	__unstableMotion as motion,
 } from '@wordpress/components';
 import { arrowUpLeft, arrowUpRight } from '@wordpress/icons';
@@ -85,7 +85,7 @@ export default function BootBackButton( { length }: { length: number } ) {
 
 			{ hasAdminBarInEditor ? (
 				<div className="boot-canvas-back-button__icon">
-					<Icon icon={ arrowIcon } />
+					<WCIcon icon={ arrowIcon } />
 				</div>
 			) : (
 				/* Overlay arrow that appears on hover */
@@ -93,7 +93,7 @@ export default function BootBackButton( { length }: { length: number } ) {
 					className="boot-canvas-back-button__icon"
 					variants={ toggleHomeIconVariants }
 				>
-					<Icon icon={ arrowIcon } />
+					<WCIcon icon={ arrowIcon } />
 				</motion.div>
 			) }
 		</motion.div>

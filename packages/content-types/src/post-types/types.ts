@@ -5,6 +5,7 @@ export interface PostTypeRecord {
 	status: 'publish' | 'draft';
 	title: { raw: string; rendered: string };
 	config: StoredConfig;
+	count: number;
 }
 
 export interface StoredLabels {
@@ -70,27 +71,20 @@ export interface StoredConfig {
 	show_in_rest?: boolean;
 }
 
+import type { ContentType } from '../types';
+
 /**
  * Normalized in-memory shape used by the Add/Edit forms and the DataViews
  * table. REST rows are converted to this shape via `toFormData`, and back to
  * the save payload via `serializeForSave`.
  */
-export interface PostTypeFormData {
-	id?: number;
-	slug: string;
-	status: 'publish' | 'draft';
-	title: { raw: string };
-	config: {
+export interface PostTypeFormData extends ContentType {
+	config: ContentType[ 'config' ] & {
 		labels: Required< Pick< StoredLabels, 'singular_name' > > &
 			StoredLabels;
 		taxonomies: string[];
 		supports: SupportFeature[];
-		description: string;
-		public: boolean;
-		hierarchical: boolean;
 		has_archive: boolean;
-		show_in_rest: boolean;
 	};
+	count?: number;
 }
-
-export type CoreDataError = { message?: string; code?: string };

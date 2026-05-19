@@ -12,6 +12,13 @@ const meta: Meta< typeof Tabs.Root > = {
 		'Tabs.Tab': Tabs.Tab,
 		'Tabs.Panel': Tabs.Panel,
 	},
+	parameters: {
+		componentStatus: {
+			status: 'use-with-caution',
+			whereUsed: 'global',
+			notes: 'Not yet recommended for use alongside components from `@wordpress/components`, pending review of color consistency with `@wordpress/components`. See [WordPress/gutenberg#76135](https://github.com/WordPress/gutenberg/issues/76135).',
+		},
+	},
 };
 export default meta;
 
@@ -281,7 +288,14 @@ export const WithTabIconsAndTooltips: StoryObj< typeof Tabs.Root > = {
 										} }
 									/>
 								</Tooltip.Trigger>
-								<Tooltip.Popup align="center" side="top">
+								<Tooltip.Popup
+									positioner={
+										<Tooltip.Positioner
+											align="center"
+											side="top"
+										/>
+									}
+								>
 									{ label }
 								</Tooltip.Popup>
 							</Tooltip.Root>
