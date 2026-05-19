@@ -8,6 +8,7 @@ import type { ReactNode } from 'react';
  * WordPress dependencies
  */
 import {
+	Icon as WCIcon,
 	privateApis as componentsPrivateApis,
 	Spinner,
 } from '@wordpress/components';
@@ -122,7 +123,7 @@ function Header( { titleId, widgetType }: HeaderProps ) {
 						className={ styles.widgetChromeHeaderIcon }
 						aria-hidden="true"
 					>
-						<Icon icon={ widgetType.icon } />
+						<WCIcon icon={ widgetType.icon } />
 					</span>
 				) }
 

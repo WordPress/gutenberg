@@ -13,11 +13,8 @@
 /**
  * External dependencies
  */
-import type { ComponentProps } from 'react';
+import type { IconType } from '@wordpress/components';
 import type { Field } from '@wordpress/dataviews';
-import type { Icon } from '@wordpress/ui';
-
-type IconProps = ComponentProps< typeof Icon >;
 
 /**
  * Widget type identifier, structured as `<widget-namespace>/<widget-name>`.
@@ -61,9 +58,9 @@ export interface WidgetTypeMetadata< Item = unknown > {
 	description?: string;
 
 	/**
-	 * Visual identifier shown in the widget header.
+	 * Visual identifier shown in the widget header; dashicon string, React node, or SVG component.
 	 */
-	icon?: IconProps[ 'icon' ];
+	icon?: IconType;
 
 	/**
 	 * Grouping category. Core provides `dashboard`; plugins and themes may
