@@ -195,6 +195,14 @@ if ( ! class_exists( 'WP_REST_Widget_Modules_Controller' ) ) {
 				$data['presentation'] = $widget_type->presentation;
 			}
 
+			if ( rest_is_field_included( 'legacy_id', $fields ) ) {
+				$data['legacy_id'] = $widget_type->legacy_id;
+			}
+
+			if ( rest_is_field_included( 'title', $fields ) ) {
+				$data['title'] = $widget_type->title;
+			}
+
 			$context = ! empty( $request['context'] ) ? $request['context'] : 'view';
 			$data    = $this->add_additional_fields_to_object( $data, $request );
 			$data    = $this->filter_response_by_context( $data, $context );
@@ -242,6 +250,20 @@ if ( ! class_exists( 'WP_REST_Widget_Modules_Controller' ) ) {
 						'description' => __( 'Authoring intent about how the widget wants to render.', 'gutenberg' ),
 						'type'        => array( 'string', 'null' ),
 						'enum'        => array_merge( WP_Widget_Type::PRESENTATION_VALUES, array( null ) ),
+						'context'     => array( 'view', 'edit', 'embed' ),
+						'readonly'    => true,
+					),
+
+					'legacy_id'     => array(
+						'description' => __( 'Classic dashboard widget id when this type bridges `wp_add_dashboard_widget()`.', 'gutenberg' ),
+						'type'        => array( 'string', 'null' ),
+						'context'     => array( 'view', 'edit', 'embed' ),
+						'readonly'    => true,
+					),
+
+					'title'         => array(
+						'description' => __( 'Display title for legacy widget types without a metadata module.', 'gutenberg' ),
+						'type'        => array( 'string', 'null' ),
 						'context'     => array( 'view', 'edit', 'embed' ),
 						'readonly'    => true,
 					),

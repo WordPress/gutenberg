@@ -1,0 +1,16 @@
+.legacyDashboardWidget {
+	height: 100%;
+	min-height: 100px;
+}
+
+.legacyDashboardWidget.isOffscreen {
+	position: absolute;
+	left: -9999px;
+	width: 100%;
+}
+
+.legacyDashboardWidgetIframe {
+	display: block;
+	width: 100%;
+	border: 0;
+}

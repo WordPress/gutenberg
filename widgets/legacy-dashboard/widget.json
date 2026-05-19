@@ -1,0 +1,7 @@
+{
+	"name": "wp-legacy/legacy-dashboard",
+	"title": "Legacy Dashboard Widget",
+	"description": "Renders a classic wp-admin dashboard widget inside an iframe.",
+	"category": "legacy",
+	"presentation": "framed"
+}

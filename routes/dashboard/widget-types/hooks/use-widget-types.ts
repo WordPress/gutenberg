@@ -40,6 +40,8 @@ interface WidgetModuleRecord {
 	render_module?: string | null;
 	widget_module?: string | null;
 	presentation?: WidgetTypeMetadata[ 'presentation' ] | null;
+	legacy_id?: string | null;
+	title?: string | null;
 }
 
 /**
@@ -76,6 +78,46 @@ export function useWidgetTypes(): WidgetType[] {
 
 		Promise.all(
 			records.map( async ( record ) => {
+				// Build artifact for the shared legacy render module; not insertable.
+				if (
+					'wp-legacy/legacy-dashboard' === record.name &&
+					! record.legacy_id
+				) {
+					return null;
+				}
+
+				if ( record.legacy_id ) {
+					let icon: WidgetType[ 'icon' ];
+					if ( record.widget_module ) {
+						try {
+							const module = await import(
+								/* webpackIgnore: true */ record.widget_module
+							);
+							icon = ( module.default as Partial< WidgetType > )
+								?.icon;
+						} catch {
+							// Fall through without a custom icon.
+						}
+					}
+
+					return {
+						apiVersion: 1,
+						name: record.name as WidgetName,
+						title: record.title ?? record.legacy_id,
+						renderModule: record.render_module ?? '',
+						category: 'legacy',
+						...( record.presentation
+							? { presentation: record.presentation }
+							: {} ),
+						...( icon ? { icon } : {} ),
+						example: {
+							attributes: {
+								legacyId: record.legacy_id,
+							},
+						},
+					} as WidgetType;
+				}
+
 				if ( ! record.widget_module ) {
 					return null;
 				}
