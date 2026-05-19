@@ -15,9 +15,8 @@ const meta: Meta< typeof Tabs.Root > = {
 	},
 	parameters: {
 		componentStatus: {
-			status: 'use-with-caution',
+			status: 'recommended',
 			whereUsed: 'global',
-			notes: 'Not yet recommended for use alongside components from `@wordpress/components`, pending review of color consistency with `@wordpress/components`. See [WordPress/gutenberg#76135](https://github.com/WordPress/gutenberg/issues/76135).',
 		},
 	},
 };
