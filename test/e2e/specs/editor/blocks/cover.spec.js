@@ -276,8 +276,7 @@ test.describe( 'Cover', () => {
 		const handleCenterX =
 			coverBlockResizeHandleBox.x + coverBlockResizeHandleBox.width / 2;
 		const handleCenterY =
-			coverBlockResizeHandleBox.y +
-			coverBlockResizeHandleBox.height / 2;
+			coverBlockResizeHandleBox.y + coverBlockResizeHandleBox.height / 2;
 		await page.mouse.move( handleCenterX, handleCenterY );
 		await page.mouse.down();
 		await page.mouse.move( handleCenterX, handleCenterY + 100 );
