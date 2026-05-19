@@ -27,7 +27,21 @@ ruleTester.run( 'use-recommended-components', rule, {
 		"import { Badge, Icon, Link, Stack, Tabs, Text } from '@wordpress/ui';",
 
 		// Unlocked private APIs are only checked for denied names.
-		"import { privateApis } from '@wordpress/components'; const { SomethingElse } = unlock( privateApis );",
+		"import { privateApis } from '@wordpress/components'; import { unlock } from '../../lock-unlock'; const { SomethingElse } = unlock( privateApis );",
+		`
+			import { privateApis } from '@wordpress/components';
+			import { unlock } from '../../lock-unlock';
+
+			function test() {
+				function unlock( value ) {
+					return value;
+				}
+
+				const { Tabs } = unlock( privateApis );
+
+				return Tabs;
+			}
+		`,
 	],
 
 	invalid: [
@@ -85,7 +99,7 @@ ruleTester.run( 'use-recommended-components', rule, {
 			],
 		},
 		{
-			code: "import { privateApis } from '@wordpress/components'; const { Tabs } = unlock( privateApis );",
+			code: "import { privateApis } from '@wordpress/components'; import { unlock } from '../../lock-unlock'; const { Tabs } = unlock( privateApis );",
 			errors: [
 				{
 					message: 'Use `Tabs` from `@wordpress/ui` instead.',
@@ -93,7 +107,15 @@ ruleTester.run( 'use-recommended-components', rule, {
 			],
 		},
 		{
-			code: "import { privateApis as componentsPrivateApis } from '@wordpress/components'; const { Tabs: WCTabs } = unlock( componentsPrivateApis );",
+			code: "import { privateApis as componentsPrivateApis } from '@wordpress/components'; import { unlock } from '../../lock-unlock'; const { Tabs: WCTabs } = unlock( componentsPrivateApis );",
+			errors: [
+				{
+					message: 'Use `Tabs` from `@wordpress/ui` instead.',
+				},
+			],
+		},
+		{
+			code: "import { privateApis } from '@wordpress/components'; import { unlock as open } from '../../lock-unlock'; const { Tabs } = open( privateApis );",
 			errors: [
 				{
 					message: 'Use `Tabs` from `@wordpress/ui` instead.',

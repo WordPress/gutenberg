@@ -70,6 +70,7 @@ const rule = {
 	},
 	create( context ) {
 		const privateApisSources = new Map();
+		const trackedUnlockImports = new Set();
 
 		return {
 			/** @param {import('estree').ImportDeclaration} node */
@@ -83,16 +84,19 @@ const rule = {
 				const allowlistEntry = ALLOWLIST[ source ];
 				const denylistEntry = DENYLIST[ source ];
 
-				if ( ! allowlistEntry && ! denylistEntry ) {
-					return;
-				}
-
 				node.specifiers.forEach( ( specifier ) => {
 					if ( specifier.type !== 'ImportSpecifier' ) {
 						return;
 					}
 
 					const name = getImportedName( specifier );
+					if ( name === 'unlock' ) {
+						trackedUnlockImports.add( specifier.local.name );
+					}
+
+					if ( ! allowlistEntry && ! denylistEntry ) {
+						return;
+					}
 
 					if ( denylistEntry && name === 'privateApis' ) {
 						privateApisSources.set( specifier.local.name, source );
@@ -130,7 +134,11 @@ const rule = {
 					node.parent.type !== 'VariableDeclaration' ||
 					node.parent.kind !== 'const' ||
 					node.id.type !== 'ObjectPattern' ||
-					! isUnlockCall( node.init )
+					! isUnlockCall(
+						node.init,
+						context.sourceCode,
+						trackedUnlockImports
+					)
 				) {
 					return;
 				}
@@ -169,7 +177,7 @@ const rule = {
 					}
 
 					context.report( {
-						node: getReportNode( property.value ),
+						node: property.key,
 						message: resolveMessage(
 							denylistEntry[ name ],
 							name,
@@ -209,16 +217,34 @@ function getImportedName( specifier ) {
 
 /**
  * @param {import('estree').CallExpression|import('estree').Expression|null} node
+ * @param {import('eslint').SourceCode}                                      sourceCode
+ * @param {ReadonlySet<string>}                                              trackedUnlockImports
  * @return {node is import('estree').CallExpression} Whether this is an `unlock()` call with one argument.
  */
-function isUnlockCall( node ) {
-	return !! (
+function isUnlockCall( node, sourceCode, trackedUnlockImports ) {
+	if (
 		node &&
 		node.type === 'CallExpression' &&
 		node.callee.type === 'Identifier' &&
-		node.callee.name === 'unlock' &&
 		node.arguments.length === 1
-	);
+	) {
+		if ( ! trackedUnlockImports.has( node.callee.name ) ) {
+			return false;
+		}
+
+		let scope = sourceCode.getScope( node.callee );
+		while ( scope ) {
+			const variable = scope.set.get( node.callee.name );
+			if ( variable ) {
+				return variable.defs.some(
+					( definition ) => definition.type === 'ImportBinding'
+				);
+			}
+			scope = scope.upper;
+		}
+	}
+
+	return false;
 }
 
 /**
@@ -235,21 +261,6 @@ function getPropertyName( key ) {
 	}
 
 	return null;
-}
-
-/**
- * @param {import('estree').Pattern} value
- * @return {import('estree').Node} Node to report on.
- */
-function getReportNode( value ) {
-	if (
-		value.type === 'AssignmentPattern' &&
-		value.left.type === 'Identifier'
-	) {
-		return value.left;
-	}
-
-	return value;
 }
 
 module.exports = rule;
