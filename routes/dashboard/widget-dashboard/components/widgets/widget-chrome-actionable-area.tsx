@@ -43,7 +43,7 @@ function WidgetChromeActions( {
 }: WidgetChromeActionsProps ) {
 	const widthModeLabel: Record< WidthMode, string > = {
 		custom: __( 'Custom width' ),
-		fill: __( 'Fill width' ),
+		fill: __( 'Fill available width' ),
 		full: __( 'Full width' ),
 	};
 

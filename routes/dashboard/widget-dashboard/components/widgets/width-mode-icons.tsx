@@ -26,7 +26,7 @@ export const widthCustom = (
 
 /**
  * Trailing rectangle spanning two columns next to a sibling frame.
- * Fill width: the widget grows over the remaining row.
+ * Fill available width: the widget grows over the remaining row.
  */
 export const widthFill = (
 	<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
