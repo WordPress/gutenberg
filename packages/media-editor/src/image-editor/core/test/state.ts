@@ -355,15 +355,14 @@ describe( 'cropperReducer — SETTLE_CROP', () => {
 	} );
 
 	it( 'preserves image selection across 50 random crop/zoom/pan combos', () => {
-		let passCount = 0;
-		let skippedCappedCount = 0;
 		for ( let i = 0; i < 50; i++ ) {
-			// Generate deterministic-ish crop rects.
-			const cropW = 0.15 + ( ( i * 7 ) % 8 ) / 10;
-			const cropH = 0.15 + ( ( i * 11 ) % 8 ) / 10;
+			// Generate deterministic-ish crop rects in the preservation
+			// regime. Capped zoom behavior is covered by a dedicated test.
+			const cropW = 0.4 + ( ( i * 7 ) % 6 ) / 10;
+			const cropH = 0.4 + ( ( i * 11 ) % 6 ) / 10;
 			const cropX = Math.min( ( ( i * 3 ) % 10 ) / 10, 1 - cropW );
 			const cropY = Math.min( ( ( i * 5 ) % 10 ) / 10, 1 - cropH );
-			const zoom = 1 + ( ( i * 13 ) % 30 ) / 10;
+			const zoom = 1 + ( ( i * 13 ) % 12 ) / 10;
 			const panX = ( ( ( i * 17 ) % 20 ) - 10 ) / 100;
 			const panY = ( ( ( i * 19 ) % 20 ) - 10 ) / 100;
 
@@ -384,20 +383,10 @@ describe( 'cropperReducer — SETTLE_CROP', () => {
 				type: 'SETTLE_CROP',
 			} );
 
-			const normalizedRatio =
-				state.cropRect.width / state.cropRect.height;
-			let newH = 1;
-			let newW = normalizedRatio;
-			if ( newW > 1 ) {
-				newW = 1;
-				newH = 1 / normalizedRatio;
-			}
 			const expectedUncappedZoom =
-				state.zoom * ( newH / state.cropRect.height );
-			if ( expectedUncappedZoom > MAX_ZOOM ) {
-				skippedCappedCount++;
-				continue;
-			}
+				state.zoom /
+				Math.max( state.cropRect.width, state.cropRect.height );
+			expect( expectedUncappedZoom ).toBeLessThanOrEqual( MAX_ZOOM );
 
 			const regionBefore = getCropWorldRegion( state, IMAGE, CONTAINER );
 			const regionAfter = getCropWorldRegion( settled, IMAGE, CONTAINER );
@@ -422,10 +411,7 @@ describe( 'cropperReducer — SETTLE_CROP', () => {
 			expect( dy ).toBeLessThanOrEqual( tol );
 			expect( dw ).toBeLessThanOrEqual( tol );
 			expect( dh ).toBeLessThanOrEqual( tol );
-			passCount++;
 		}
-		expect( passCount + skippedCappedCount ).toBe( 50 );
-		expect( passCount ).toBeGreaterThan( 0 );
 	} );
 
 	it( 'diagonal corner drag: small crop settles accurately', () => {
