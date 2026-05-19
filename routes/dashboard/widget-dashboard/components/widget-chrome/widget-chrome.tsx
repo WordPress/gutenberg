@@ -170,21 +170,17 @@ function HeaderActions( {
 				<Menu.Popover>
 					<Menu.Group>
 						{ WIDTH_MODES.map( ( mode ) => (
-							<Menu.RadioItem
+							<Menu.Item
 								key={ mode }
-								name="widget-width"
-								value={ mode }
-								checked={ selectedWidthMode === mode }
-								hideOnClick
-								onChange={ () => onWidthChange( mode ) }
-								suffix={
+								prefix={
 									<Icon icon={ WIDTH_MODE_ICON[ mode ] } />
 								}
+								onClick={ () => onWidthChange( mode ) }
 							>
 								<Menu.ItemLabel>
 									{ WIDTH_MODE_LABEL[ mode ] }
 								</Menu.ItemLabel>
-							</Menu.RadioItem>
+							</Menu.Item>
 						) ) }
 					</Menu.Group>
 				</Menu.Popover>
