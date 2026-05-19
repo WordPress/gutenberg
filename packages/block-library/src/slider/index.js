@@ -28,32 +28,54 @@ export const settings = {
 				name: 'core/slider-pagination',
 			},
 			{
-				name: 'core/slider-track',
+				name: 'core/slide',
 				innerBlocks: [
 					{
-						name: 'core/slide',
+						name: 'core/cover',
+						attributes: {
+							dimRatio: 100,
+							overlayColor: 'black',
+							minHeight: 300,
+							minHeightUnit: 'px',
+						},
 						innerBlocks: [
 							{
-								name: 'core/cover',
+								name: 'core/paragraph',
 								attributes: {
-									dimRatio: 100,
-									overlayColor: 'black',
-									minHeight: 300,
-									minHeightUnit: 'px',
-								},
-								innerBlocks: [
-									{
-										name: 'core/paragraph',
-										attributes: {
-											content: __( 'Slide 1' ),
-											style: {
-												typography: {
-													textAlign: 'center',
-												},
-											},
+									content: __( 'Slide 1' ),
+									style: {
+										typography: {
+											textAlign: 'center',
 										},
 									},
-								],
+								},
+							},
+						],
+					},
+				],
+			},
+			{
+				name: 'core/slide',
+				innerBlocks: [
+					{
+						name: 'core/cover',
+						attributes: {
+							dimRatio: 100,
+							overlayColor: 'black',
+							minHeight: 300,
+							minHeightUnit: 'px',
+						},
+						innerBlocks: [
+							{
+								name: 'core/paragraph',
+								attributes: {
+									content: __( 'Slide 2' ),
+									style: {
+										typography: {
+											textAlign: 'center',
+										},
+									},
+								},
 							},
 						],
 					},

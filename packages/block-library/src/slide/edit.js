@@ -15,51 +15,22 @@ import {
 import { useSelect } from '@wordpress/data';
 
 function SlideEdit( { clientId, isSelected } ) {
-	const { blockIndex, hasInnerBlocksSelected, trackHasSelectedInnerBlock } =
-		useSelect(
-			( select ) => {
-				const {
-					getBlockRootClientId,
-					getBlockIndex,
-					hasSelectedInnerBlock,
-				} = select( blockEditorStore );
+	const hasInnerBlocksSelected = useSelect(
+		( select ) =>
+			select( blockEditorStore ).hasSelectedInnerBlock( clientId, true ),
+		[ clientId ]
+	);
 
-				// Get the slider-track parent.
-				const trackClientId = getBlockRootClientId( clientId );
-
-				return {
-					blockIndex: getBlockIndex( clientId ),
-					hasInnerBlocksSelected: hasSelectedInnerBlock(
-						clientId,
-						true
-					),
-					// Check if any slide in the track is selected (not controls).
-					trackHasSelectedInnerBlock: hasSelectedInnerBlock(
-						trackClientId,
-						true
-					),
-				};
-			},
-			[ clientId ]
-		);
-
-	// Show this slide if it is selected, has selected inner blocks,
-	// or is the first slide and nothing else in the track is selected.
-	const isSelectedSlide =
-		isSelected ||
-		hasInnerBlocksSelected ||
-		( blockIndex === 0 && ! trackHasSelectedInnerBlock );
+	const isActiveSlide = isSelected || hasInnerBlocksSelected;
 
 	const blockProps = useBlockProps( {
 		className: clsx( 'wp-block-slide', {
-			'is-selected-slide': isSelectedSlide,
+			'is-selected-slide': isActiveSlide,
 		} ),
 	} );
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		renderAppender: isSelectedSlide
-			? InnerBlocks.ButtonBlockAppender
-			: false,
+		renderAppender: isActiveSlide ? InnerBlocks.ButtonBlockAppender : false,
 	} );
 
 	return <div { ...innerBlocksProps } />;

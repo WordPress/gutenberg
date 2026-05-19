@@ -92,7 +92,9 @@ function updateSlideInert( slides, currentIndex, slidesToShow ) {
 
 function getSliderElements( ref ) {
 	const slider = ref.closest( '.wp-block-slider' );
-	const track = slider?.querySelector( '.wp-block-slider-track' ) ?? null;
+	const explicitTrack =
+		slider?.querySelector( '.wp-block-slider-track' ) ?? null;
+	const track = explicitTrack ?? slider ?? null;
 
 	if ( ! slider || ! track ) {
 		return {

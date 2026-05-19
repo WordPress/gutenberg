@@ -7,7 +7,7 @@
 	"description": "Display content in a scrolling slider.",
 	"category": "design",
 	"textdomain": "default",
-	"allowedBlocks": [ "core/slider-pagination" ],
+	"allowedBlocks": [ "core/slider-pagination", "core/slide" ],
 	"attributes": {
 		"slidesToShow": {
 			"type": "integer",
@@ -42,5 +42,6 @@
 		}
 	},
 	"editorScript": "file:./index.js",
+	"style": "wp-block-slider",
 	"viewScriptModule": "@wordpress/block-library/slider/view"
 }

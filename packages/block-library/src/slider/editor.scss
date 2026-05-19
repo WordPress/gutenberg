@@ -1,0 +1,45 @@
+/*
+ * Editor-only layout for the slider track.
+ *
+ * On the frontend the track is a horizontal flex container (slider/style.scss).
+ * In the editor we use the parent slider block as the inner-blocks wrapper.
+ * display:block / inline-block ensures that:
+ *   - core/slider-pagination renders as a full-width block row above the slides.
+ *   - core/slide elements render as inline-block items side-by-side.
+ *   - overflow-x scrolling lets the editor scroll to the selected slide,
+ *     matching the behaviour of the removed slider-track block.
+ *
+ * The `block-editor-block-list__layout` class is always added by useInnerBlocksProps;
+ * include it in the selector so our display value wins over any editor default.
+ */
+.wp-block-slider {
+	&,
+	&.block-editor-block-list__layout {
+		display: block;
+		overflow-x: auto;
+		overflow-y: hidden;
+		white-space: nowrap;
+		// Keep the scrollbar hidden (matching the frontend)
+		scrollbar-width: none;
+		-ms-overflow-style: none;
+
+		&::-webkit-scrollbar {
+			display: none;
+		}
+	}
+
+	> .wp-block-slider-pagination {
+		position: sticky;
+		inset-inline-start: 0;
+		z-index: 1;
+		white-space: normal;
+	}
+
+	// Slides: inline-block so they sit side-by-side in the same "line".
+	// Width comes from slide/style.scss using --wp--slider-slides-to-show.
+	> .wp-block-slide {
+		display: inline-block;
+		vertical-align: top;
+		white-space: normal;
+	}
+}

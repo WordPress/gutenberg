@@ -7,7 +7,7 @@
 	"description": "A single slide within a slider.",
 	"category": "design",
 	"textdomain": "default",
-	"parent": [ "core/slider-track" ],
+	"parent": [ "core/slider" ],
 	"supports": {
 		"anchor": true,
 		"html": false,

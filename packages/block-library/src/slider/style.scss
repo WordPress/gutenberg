@@ -1,3 +1,9 @@
+/*
+ * Frontend layout for the slider track belongs to the slider block.
+ *
+ * The slider-track block was removed, but the rendered frontend markup still
+ * uses the .wp-block-slider-track wrapper class inside core/slider.
+ */
 .wp-block-slider-track {
 	display: flex;
 	min-height: 0;

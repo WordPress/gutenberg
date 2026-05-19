@@ -966,7 +966,7 @@ A single slide within a slider. ([Source](https://github.com/WordPress/gutenberg
 -	**Name:** core/slide
 -	**Experimental:** true
 -	**Category:** design
--	**Parent:** core/slider-track
+-	**Parent:** core/slider
 -	**Supports:** anchor, color (background, gradients, text), shadow, spacing (padding, ~~margin~~), ~~html~~, ~~reusable~~
 
 ## Slider
@@ -976,7 +976,7 @@ Display content in a scrolling slider. ([Source](https://github.com/WordPress/gu
 -	**Name:** core/slider
 -	**Experimental:** true
 -	**Category:** design
--	**Allowed Blocks:** core/slider-pagination
+-	**Allowed Blocks:** core/slider-pagination, core/slide
 -	**Supports:** align, ariaLabel, color (background, gradients, ~~text~~), interactivity, layout (allowOrientation, default, ~~allowJustification~~), spacing (margin, padding), ~~html~~
 -	**Attributes:** loop, slidesToShow
 
@@ -1012,16 +1012,6 @@ Dot indicators showing the current slide position. ([Source](https://github.com/
 -	**Category:** design
 -	**Ancestor:** core/slider-pagination
 -	**Supports:** color (text, ~~background~~), spacing (margin), ~~anchor~~, ~~html~~, ~~reusable~~
-
-## Slides
-
-Container for slides in a slider. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/slider-track))
-
--	**Name:** core/slider-track
--	**Experimental:** true
--	**Category:** design
--	**Allowed Blocks:** core/slide
--	**Supports:** listView, ~~anchor~~, ~~html~~, ~~inserter~~, ~~lock~~, ~~reusable~~, ~~visibility~~
 
 ## Social Icon
 

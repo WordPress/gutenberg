@@ -8,27 +8,84 @@
 /**
  * Renders the `core/slider` block on the server.
  *
- * @param array  $attributes Block attributes.
- * @param string $content    Block default content.
+ * @param array    $attributes Block attributes.
+ * @param string   $content    Block default content.
+ * @param WP_Block $block      Block instance.
  *
  * @return string Returns the block markup.
  */
-function render_block_core_slider( $attributes, $content ) {
-	/*
-	 * Count slides from the rendered markup. Empty slides return ''
-	 * from their render callback, so only non-empty slides are present
-	 * in $content.
-	 */
-	$slide_count = 0;
-	$p           = new WP_HTML_Tag_Processor( $content );
-	while ( $p->next_tag( array( 'class_name' => 'wp-block-slide' ) ) ) {
-		++$slide_count;
+function render_block_core_slider( $attributes, $content, $block ) {
+	$pagination_content = '';
+	$slides_content     = '';
+	$other_content      = '';
+	$slide_count        = 0;
+
+	if ( $block instanceof WP_Block && ! empty( $block->inner_blocks ) ) {
+		foreach ( $block->inner_blocks as $inner_block ) {
+			$rendered_inner_block = $inner_block->render();
+
+			if ( '' === $rendered_inner_block ) {
+				continue;
+			}
+
+			if ( 'core/slider-pagination' === $inner_block->name ) {
+				$pagination_content .= $rendered_inner_block;
+				continue;
+			}
+
+			if ( 'core/slide' === $inner_block->name ) {
+				$slides_content .= $rendered_inner_block;
+				++$slide_count;
+				continue;
+			}
+
+			$other_content .= $rendered_inner_block;
+		}
+	} else {
+		$p = new WP_HTML_Tag_Processor( $content );
+		while ( $p->next_tag( array( 'class_name' => 'wp-block-slide' ) ) ) {
+			++$slide_count;
+		}
+
+		$slides_content = $content;
 	}
 
 	// If there are no slides, do not render the slider block.
 	if ( 0 === $slide_count ) {
 		return '';
 	}
+
+	$p           = new WP_HTML_Tag_Processor( $slides_content );
+	$slide_index = 0;
+
+	while ( $p->next_tag( array( 'class_name' => 'wp-block-slide' ) ) ) {
+		++$slide_index;
+		$p->set_attribute( 'role', 'group' );
+		$p->set_attribute( 'aria-roledescription', 'slide' );
+		$p->set_attribute(
+			'aria-label',
+			sprintf(
+				/* translators: 1: Slide number, 2: Total number of slides. */
+				__( 'Slide %1$d of %2$d' ),
+				$slide_index,
+				$slide_count
+			)
+		);
+
+		if ( 1 === $slide_index ) {
+			$p->remove_attribute( 'inert' );
+		} else {
+			$p->set_attribute( 'inert', '' );
+		}
+	}
+
+	$track_markup = sprintf(
+		'<div class="wp-block-slider-track" data-wp-on--scroll="actions.handleScroll" data-wp-init="callbacks.initTrack" tabindex="0" aria-label="%1$s">%2$s</div>',
+		esc_attr__( 'Slides' ),
+		$p->get_updated_html()
+	);
+
+	$rendered_content = $pagination_content . $track_markup . $other_content;
 
 	$slides_to_show = isset( $attributes['slidesToShow'] ) ? (int) $attributes['slidesToShow'] : 1;
 	$slides_to_show = max( 1, min( $slides_to_show, $slide_count ) );
@@ -70,7 +127,7 @@ function render_block_core_slider( $attributes, $content ) {
 	return sprintf(
 		'<div %1$s>%2$s%3$s</div>',
 		$wrapper_attributes,
-		$content,
+		$rendered_content,
 		$live_region
 	);
 }
