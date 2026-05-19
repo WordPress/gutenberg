@@ -153,6 +153,7 @@ function TableRow< Item >( {
 				}
 			} }
 			onClick={ () => {
+				// Toggle in/out of selection array
 				if ( isSelected ) {
 					onChangeSelection(
 						selection.filter( ( itemId ) => id !== itemId )
