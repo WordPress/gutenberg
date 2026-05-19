@@ -142,8 +142,15 @@ function TableRow< Item >( {
 			aria-setsize={ paginationInfo.totalItems || undefined }
 			aria-posinset={ posinset }
 			role={ infiniteScrollEnabled ? 'article' : 'option' }
-			onClick={ () => {
-				// Toggle in/out of selection array
+			onMouseDown={ ( event ) => {
+				if ( event.button !== 0 ) {
+					return;
+				}
+				// Prevent the browser from moving focus to the row. Without
+				// this, Ariakit's first focus into the Composite calls
+				// `baseElement.focus()` without `preventScroll`, which
+				// scrolls the active row under the sticky table header.
+				event.preventDefault();
 				if ( isSelected ) {
 					onChangeSelection(
 						selection.filter( ( itemId ) => id !== itemId )
