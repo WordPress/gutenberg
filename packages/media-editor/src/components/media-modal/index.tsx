@@ -36,8 +36,9 @@ export interface MediaModalProps {
 /**
  * Top-level singleton media modal. Routes between the browse picker and the
  * editor based on the current `mode` in `core/media-editor`. The editor mounts
- * exactly one instance at the editor root, gated by
- * `window.__experimentalUnifiedMediaModal`.
+ * exactly one instance at the editor root when either
+ * `window.__experimentalDataViewsMediaModal` (browse) or
+ * `window.__experimentalMediaEditorModal` (edit/crop) is enabled.
  * @param root0
  * @param root0.fields
  * @param root0.aspectRatioPresets

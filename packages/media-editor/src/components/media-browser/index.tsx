@@ -28,7 +28,11 @@ import {
 	Modal,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
-import { arrowRight, upload as uploadIcon } from '@wordpress/icons';
+import {
+	arrowRight,
+	drawerRight,
+	upload as uploadIcon,
+} from '@wordpress/icons';
 import { DataViewsPicker } from '@wordpress/dataviews';
 import type {
 	ActionButton,
@@ -56,6 +60,7 @@ import { store as noticesStore, SnackbarNotices } from '@wordpress/notices';
 import {
 	ComplementaryArea,
 	InterfaceSkeleton,
+	PinnedItems,
 	// No type declarations available for @wordpress/interface.
 	// @ts-expect-error
 } from '@wordpress/interface';
@@ -158,6 +163,7 @@ function BrowserSidebar( {
 			scope="media-browser"
 			identifier="media-browser/details"
 			title={ __( 'Details' ) }
+			icon={ drawerRight }
 			isActiveByDefault
 			className="media-editor__sidebar media-modal-browser__sidebar"
 			panelClassName="media-editor__sidebar-panel"
@@ -661,21 +667,29 @@ function MediaBrowserContent( {
 			overlayClassName="media-modal-browser__overlay"
 			size="fill"
 			headerActions={
-				<FormFileUpload
-					accept={ acceptTypes }
-					multiple
-					onChange={ handleFileSelect }
-					__next40pxDefaultSize
-					render={ ( { openFileDialog } ) => (
-						<Button
-							onClick={ openFileDialog }
-							icon={ uploadIcon }
-							__next40pxDefaultSize
-						>
-							{ __( 'Upload media' ) }
-						</Button>
-					) }
-				/>
+				<Stack
+					direction="row"
+					align="center"
+					gap="xs"
+					className="media-modal-browser__header-actions"
+				>
+					<FormFileUpload
+						accept={ acceptTypes }
+						multiple
+						onChange={ handleFileSelect }
+						__next40pxDefaultSize
+						render={ ( { openFileDialog } ) => (
+							<Button
+								onClick={ openFileDialog }
+								icon={ uploadIcon }
+								__next40pxDefaultSize
+							>
+								{ __( 'Upload media' ) }
+							</Button>
+						) }
+					/>
+					<PinnedItems.Slot scope="media-browser" />
+				</Stack>
 			}
 		>
 			<MediaEditorProvider

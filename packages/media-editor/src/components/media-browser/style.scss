@@ -2,21 +2,82 @@
 @use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/base-styles/mixins" as *;
 
+// `className` on `<Modal>` is applied to `.components-modal__frame`, so this
+// bumps specificity over the shipped full-screen modal content rule and lets
+// the `InterfaceSkeleton` run edge-to-edge inside the modal. Mirrors the
+// `.media-editor-modal` rules.
+.media-modal-browser.components-modal__frame .components-modal__content {
+	padding: 0;
+	margin-bottom: 0;
+	display: flex;
+	flex-direction: column;
+	min-height: 0;
+}
+
+.media-modal-browser.components-modal__frame .components-modal__children-container {
+	display: flex;
+	flex: 1;
+	flex-direction: column;
+	min-height: 0;
+}
+
 .media-modal-browser {
+	display: flex;
+	flex-direction: column;
+
 	.components-modal__header {
 		padding-bottom: $grid-unit-10;
 	}
 
-	.components-modal__frame.is-full-screen .components-modal__content {
-		margin-bottom: 0;
+	// `.interface-interface-skeleton` defaults to `position: fixed; top: 0` under
+	// `.is-fullscreen-mode` (the post editor sets that body class), which would
+	// hoist the skeleton to the top of the viewport and overlap the modal's
+	// title bar. Re-anchor it to its modal container, matching the override
+	// `.media-editor` applies for the edit-mode wrapper.
+	.interface-interface-skeleton {
+		position: relative;
+		top: auto;
+		right: auto;
+		bottom: auto;
+		left: auto;
+		height: 100%;
+		max-height: none;
+		flex: 1;
+		flex-direction: column;
 	}
 
-	.components-modal__content {
-		padding: 0;
+	.interface-interface-skeleton__editor {
+		min-width: 0;
+		flex: 1;
 	}
 
 	.dataviews-picker-wrapper > .dataviews__view-actions {
 		padding-top: $grid-unit-10;
+	}
+
+	// Sidebar/panel styling mirrors `.media-editor` so the browse-mode Details
+	// sidebar matches the edit-mode one: reset the sidebar surface, give the
+	// details panel breathing room, and trim the tab header so the active-tab
+	// underline aligns with the label.
+	.media-editor__sidebar {
+		@include reset;
+	}
+
+	.media-editor__panel {
+		padding: $grid-unit-20;
+	}
+
+	.components-panel__header.media-editor__sidebar-header {
+		padding-left: 0;
+		padding-right: $grid-unit-10;
+
+		.components-button.has-icon {
+			padding: 0;
+
+			@include break-medium() {
+				display: flex;
+			}
+		}
 	}
 
 	.media-modal-browser__footer {

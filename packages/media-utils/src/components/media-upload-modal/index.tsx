@@ -153,7 +153,7 @@ export function MediaUploadModal( props: MediaUploadModalProps ) {
 					// eslint-disable-next-line no-console
 					console.warn(
 						'`MediaUploadModal` rendered with `isOpen` but no block-editor settings host is present, ' +
-							'or `window.__experimentalUnifiedMediaModal` is not enabled. The modal will not open.'
+							'or `window.__experimentalDataViewsMediaModal` is not enabled. The modal will not open.'
 					);
 				}
 				return;
