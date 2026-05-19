@@ -9,10 +9,9 @@ import {
 	store as coreDataStore,
 	privateApis as coreDataPrivateApis,
 } from '@wordpress/core-data';
-import {
-	privateApis,
-	store as blockEditorStore,
-} from '@wordpress/block-editor';
+// @ts-expect-error - No type declarations available for @wordpress/block-editor
+// prettier-ignore
+import { privateApis, store as blockEditorStore } from '@wordpress/block-editor';
 import {
 	Button,
 	Modal,
