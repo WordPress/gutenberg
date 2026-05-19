@@ -395,13 +395,13 @@ export function useAutocompleteProps( options: UseAutocompleteProps ) {
 	const mergedRefs = useMergeRefs( [
 		ref,
 		useRefEffect( ( element: HTMLElement ) => {
-			function _onKeyDown( event: KeyboardEvent ) {
+			function _onKeyDown( event: Event ) {
 				// Document-scoped listener: bail when the keydown isn't
 				// for our element.
 				if ( ! element.contains( event.target as Node | null ) ) {
 					return;
 				}
-				onKeyDownRef.current?.( event );
+				onKeyDownRef.current?.( event as KeyboardEvent );
 			}
 			return subscribeSharedListener(
 				element.ownerDocument,
