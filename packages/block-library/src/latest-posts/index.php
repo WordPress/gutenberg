@@ -203,7 +203,6 @@ function render_block_core_latest_posts( $attributes ) {
 				}
 			}
 
-			$post_content = str_replace( ']]>', ']]&gt;', $post_content );
 			$post_content       = str_replace( ']]>', ']]&gt;', $post_content );
 			$list_items_markup .= sprintf(
 				'<div class="wp-block-latest-posts__post-full-content">%1$s</div>',
