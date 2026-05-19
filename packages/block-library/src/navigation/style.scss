@@ -559,13 +559,14 @@ button.wp-block-navigation-item__content {
 	}
 
 	// Morphed state: two horizontal lines become an X.
-	// Each line translates to the SVG center (y=12) and rotates.
+	// Each line translates to the SVG center (y=12), rotates, and scales
+	// to match the close icon's longer diagonal arms (~21px vs 16px).
 	&.is-morphed .wp-block-navigation__hamburger-line:first-child {
-		transform: translateY(3.75px) rotate(45deg);
+		transform: translateY(3.75px) rotate(45deg) scaleX(1.24);
 	}
 
 	&.is-morphed .wp-block-navigation__hamburger-line:last-child {
-		transform: translateY(-3.75px) rotate(-45deg);
+		transform: translateY(-3.75px) rotate(-45deg) scaleX(1.24);
 	}
 }
 

@@ -352,12 +352,16 @@ const { state, actions } = store(
 				const { ref } = getElement();
 
 				// Check if the reverse morph animation should play.
-				// Only applies when clicking the Navigation Overlay Close block.
+				// Applies to both the default close button and the custom
+				// Navigation Overlay Close block.
 				if (
 					ctx.morphStartRect &&
-					ref.classList.contains(
+					( ref.classList.contains(
 						'wp-block-navigation-overlay-close'
-					)
+					) ||
+						ref.classList.contains(
+							'wp-block-navigation__responsive-container-close'
+						) )
 				) {
 					const nav = ref.closest( '.wp-block-navigation' );
 					const hamburgerBtn = nav?.querySelector(
@@ -511,10 +515,29 @@ const { state, actions } = store(
 							'.wp-block-navigation__responsive-container-open'
 						);
 						const closeBtn = ref.querySelector(
-							'.wp-block-navigation-overlay-close'
+							'.wp-block-navigation-overlay-close, .wp-block-navigation__responsive-container-close'
 						);
 
 						if ( nav && hamburgerBtn && closeBtn ) {
+							// Suppress the overlay's translateY fade-in
+							// animation. Any transform on an ancestor makes
+							// it the containing block for position: fixed
+							// descendants, which would otherwise drag the
+							// close button as the transform animates away
+							// and cause a snap at the end of the morph.
+							ref.style.animation = 'none';
+							ref.style.transform = 'none';
+
+							// Anchor the close button to the hamburger's
+							// exact viewport position so the morph ends
+							// where it started.
+							closeBtn.style.position = 'fixed';
+							closeBtn.style.top =
+								ctx.morphStartRect.top + 'px';
+							closeBtn.style.left =
+								ctx.morphStartRect.left + 'px';
+							closeBtn.style.right = 'auto';
+
 							runOpenMorphAnimation(
 								nav,
 								hamburgerBtn,
