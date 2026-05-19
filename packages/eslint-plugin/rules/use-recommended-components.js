@@ -232,16 +232,14 @@ function isUnlockCall( node, sourceCode, trackedUnlockImports ) {
 			return false;
 		}
 
-		let scope = sourceCode.getScope( node.callee );
-		while ( scope ) {
-			const variable = scope.set.get( node.callee.name );
-			if ( variable ) {
-				return variable.defs.some(
-					( definition ) => definition.type === 'ImportBinding'
-				);
-			}
-			scope = scope.upper;
-		}
+		const { references } = sourceCode.getScope( node.callee );
+		const reference = references.find(
+			( currentReference ) => currentReference.identifier === node.callee
+		);
+
+		return !! reference?.resolved?.defs.some(
+			( definition ) => definition.type === 'ImportBinding'
+		);
 	}
 
 	return false;
