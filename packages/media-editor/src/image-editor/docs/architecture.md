@@ -31,6 +31,7 @@ graph TD
     subgraph Containment["containment.ts — restriction source of truth"]
         restrictPanZoom["restrictPanZoom()\nbuilds camera → inverse → clamp"]
         restrictCropRect["restrictCropRect()"]
+        getMinZoom["getMinZoom()"]
         getMinZoomForCover["getMinZoomForCover()"]
         getImageCropBounds["getImageCropBounds()"]
     end

@@ -4,7 +4,9 @@
 import { Modal } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
+import { ShortcutProvider } from '@wordpress/keyboard-shortcuts';
 import type { Field } from '@wordpress/dataviews';
+import type { KeyboardEvent as ReactKeyboardEvent } from 'react';
 
 /**
  * Internal dependencies
@@ -52,6 +54,16 @@ export function MediaEditorModal( {
 	const portalElement =
 		typeof document === 'undefined' ? null : document.body;
 
+	// React synthetic events bubble through the React tree, not the DOM tree,
+	// so a host `ShortcutProvider` higher up still receives keydown events
+	// from inside this portaled modal. Stop propagation at the modal boundary
+	// so host shortcuts (undo/redo, save, etc.) don't fire from within.
+	const stopKeyDownPropagation = (
+		event: ReactKeyboardEvent< HTMLDivElement >
+	) => {
+		event.stopPropagation();
+	};
+
 	return (
 		<MediaEditor
 			id={ id }
@@ -79,18 +91,23 @@ export function MediaEditorModal( {
 				onKeyDown,
 				shouldCloseOnClickOutside,
 			} ) => (
-				<Modal
-					className="media-editor-modal"
-					title={ __( 'Edit media' ) }
-					size="fill"
-					isDismissible={ false }
-					shouldCloseOnClickOutside={ shouldCloseOnClickOutside }
-					onKeyDown={ onKeyDown }
-					onRequestClose={ onRequestClose }
-					headerActions={ headerActions }
+				<ShortcutProvider
+					className="media-editor-modal__shortcut-scope"
+					onKeyDown={ stopKeyDownPropagation }
 				>
-					{ children }
-				</Modal>
+					<Modal
+						className="media-editor-modal"
+						title={ __( 'Edit media' ) }
+						size="fill"
+						isDismissible={ false }
+						shouldCloseOnClickOutside={ shouldCloseOnClickOutside }
+						onKeyDown={ onKeyDown }
+						onRequestClose={ onRequestClose }
+						headerActions={ headerActions }
+					>
+						{ children }
+					</Modal>
+				</ShortcutProvider>
 			) }
 		/>
 	);

@@ -1,6 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useId, useRef, useState } from '@wordpress/element';
-import { SlotFillProvider, Slot } from '@wordpress/components';
 import { close, info } from '@wordpress/icons';
 import * as Popover from '../';
 import { VisuallyHidden } from '../../visually-hidden';
@@ -14,6 +13,7 @@ const meta: Meta< typeof Popover.Root > = {
 	subcomponents: {
 		'Popover.Trigger': Popover.Trigger,
 		'Popover.Portal': Popover.Portal,
+		'Popover.Positioner': Popover.Positioner,
 		'Popover.Popup': Popover.Popup,
 		'Popover.Arrow': Popover.Arrow,
 		'Popover.Title': Popover.Title,
@@ -22,6 +22,13 @@ const meta: Meta< typeof Popover.Root > = {
 	},
 	argTypes: {
 		children: { control: false },
+	},
+	parameters: {
+		componentStatus: {
+			status: 'use-with-caution',
+			whereUsed: 'global',
+			notes: 'Not yet recommended for use alongside components from `@wordpress/components`, pending review of overlays compatibility. See [WordPress/gutenberg#76135](https://github.com/WordPress/gutenberg/issues/76135).',
+		},
 	},
 };
 export default meta;
@@ -81,7 +88,7 @@ export const NoArrow: Story = {
 };
 
 /**
- * All combinations of `side` and `align` props on `Popover.Popup`.
+ * All combinations of `side` and `align` props on `Popover.Positioner`.
  *
  * Each row shows a side (`top`, `right`, `bottom`, `left`), and each column
  * shows an alignment (`start`, `center`, `end`).
@@ -109,12 +116,16 @@ export const Positioning: Story = {
 								{ side } / { align }
 							</Popover.Trigger>
 							<Popover.Popup
-								side={ side }
-								align={ align }
-								collisionAvoidance={ {
-									side: 'none',
-									align: 'none',
-								} }
+								positioner={
+									<Popover.Positioner
+										side={ side }
+										align={ align }
+										collisionAvoidance={ {
+											side: 'none',
+											align: 'none',
+										} }
+									/>
+								}
 							>
 								<VisuallyHidden render={ <Popover.Title /> }>
 									{ side } / { align }
@@ -409,16 +420,21 @@ export const OverlayPlacement: Story = {
 					</Popover.Trigger>
 					<Popover.Popup
 						ref={ popupRef }
-						side="bottom"
-						align="center"
-						sideOffset={
-							-1 *
-							( popupSize.height / 2 + triggerSize.height / 2 )
+						positioner={
+							<Popover.Positioner
+								side="bottom"
+								align="center"
+								sideOffset={
+									-1 *
+									( popupSize.height / 2 +
+										triggerSize.height / 2 )
+								}
+								collisionAvoidance={ {
+									side: 'none',
+									align: 'none',
+								} }
+							/>
 						}
-						collisionAvoidance={ {
-							side: 'none',
-							align: 'none',
-						} }
 					>
 						<Popover.Title
 							style={ {
@@ -531,8 +547,12 @@ export const CollisionAvoidance: Story = {
 					<Popover.Root defaultOpen>
 						<Popover.Trigger>Flip (default)</Popover.Trigger>
 						<Popover.Popup
-							side="top"
-							collisionBoundary={ boundary ?? undefined }
+							positioner={
+								<Popover.Positioner
+									side="top"
+									collisionBoundary={ boundary ?? undefined }
+								/>
+							}
 						>
 							<Popover.Title
 								style={ {
@@ -551,12 +571,16 @@ export const CollisionAvoidance: Story = {
 					<Popover.Root defaultOpen>
 						<Popover.Trigger>No collision</Popover.Trigger>
 						<Popover.Popup
-							side="top"
-							collisionBoundary={ boundary ?? undefined }
-							collisionAvoidance={ {
-								side: 'none',
-								align: 'none',
-							} }
+							positioner={
+								<Popover.Positioner
+									side="top"
+									collisionBoundary={ boundary ?? undefined }
+									collisionAvoidance={ {
+										side: 'none',
+										align: 'none',
+									} }
+								/>
+							}
 						>
 							<Popover.Title
 								style={ {
@@ -639,8 +663,12 @@ export const CrossIframe: Story = {
 											}
 										/>
 									}
-									collisionBoundary={
-										iframeBoundary ?? undefined
+									positioner={
+										<Popover.Positioner
+											collisionBoundary={
+												iframeBoundary ?? undefined
+											}
+										/>
 									}
 								>
 									<Popover.Arrow />
@@ -664,98 +692,6 @@ export const CrossIframe: Story = {
 					</div>
 				</GenericIframe>
 			</div>
-		);
-	},
-};
-
-/**
- * Same cross-iframe scenario, but using `SlotFillProvider` and `Slot` from
- * `@wordpress/components` as the render target.
- *
- * The `Slot` renders a `div` in the parent document, and its forwarded ref
- * is passed to `Popover.Portal`'s `container` prop (via `Popover.Popup`'s
- * `portal` prop) so the popup portals into the slot element. This mirrors the
- * legacy Popover's `WithSlotOutsideIframe` pattern.
- */
-export const CrossIframeWithSlotFill: Story = {
-	name: 'Cross-Iframe (SlotFill)',
-	args: { defaultOpen: true },
-	argTypes: { defaultOpen: { control: false } },
-	render: function Render( { children: _children, ...args } ) {
-		const slotRef = useRef< HTMLDivElement >( null );
-		const [ iframeBoundary, setIframeBoundary ] =
-			useState< HTMLIFrameElement | null >( null );
-
-		return (
-			<SlotFillProvider>
-				<Slot
-					name="popover-container"
-					bubblesVirtually
-					ref={ slotRef }
-				/>
-				<GenericIframe
-					ref={ setIframeBoundary }
-					style={ {
-						width: '100%',
-						height: 400,
-						border: 0,
-						outline: '1px solid purple',
-					} }
-				>
-					<div
-						style={ {
-							height: '200vh',
-							paddingTop: '10vh',
-						} }
-					>
-						<div
-							style={ {
-								maxWidth: 200,
-								marginTop: 100,
-								marginInline: 'auto',
-							} }
-						>
-							<Popover.Root { ...args }>
-								<Popover.Trigger
-									style={ {
-										padding: 8,
-										background: 'salmon',
-									} }
-								>
-									Popover&apos;s anchor (inside iframe)
-								</Popover.Trigger>
-								<Popover.Popup
-									portal={
-										<Popover.Portal
-											container={
-												slotRef as React.RefObject< HTMLElement >
-											}
-										/>
-									}
-									collisionBoundary={
-										iframeBoundary ?? undefined
-									}
-								>
-									<Popover.Arrow />
-									<Popover.Title
-										style={ {
-											marginBottom:
-												'var(--wpds-dimension-gap-xs)',
-										} }
-									>
-										Cross-Iframe (SlotFill)
-									</Popover.Title>
-									<Popover.Description>
-										This popup renders in the parent
-										document via a `Slot` from
-										`@wordpress/components`.
-									</Popover.Description>
-								</Popover.Popup>
-							</Popover.Root>
-						</div>
-					</div>
-				</GenericIframe>
-			</SlotFillProvider>
 		);
 	},
 };
@@ -809,9 +745,9 @@ export const WithCustomZIndex: Story = {
 };
 
 /**
- * Use the `anchor` prop on `Popover.Popup` to position the popover against an
- * arbitrary element instead of the built-in trigger. Base UI accepts four
- * anchor types:
+ * Pass an `anchor` to `Popover.Positioner` (via `Popover.Popup`'s `positioner`
+ * slot) to position the popover against an arbitrary element instead of the
+ * built-in trigger. `anchor` accepts four types:
  *
  * 1. **Element** — a direct DOM element reference.
  * 2. **VirtualElement** — an object with a `getBoundingClientRect()` method.
@@ -845,7 +781,7 @@ export const Anchor: Story = {
 			textAlign: 'center' as const,
 		};
 
-		const popupProps = {
+		const sharedPositionerProps = {
 			collisionAvoidance: {
 				side: 'none' as const,
 				align: 'none' as const,
@@ -868,8 +804,12 @@ export const Anchor: Story = {
 					</div>
 					<Popover.Root open>
 						<Popover.Popup
-							anchor={ elementAnchor ?? undefined }
-							{ ...popupProps }
+							positioner={
+								<Popover.Positioner
+									anchor={ elementAnchor ?? undefined }
+									{ ...sharedPositionerProps }
+								/>
+							}
 						>
 							<VisuallyHidden render={ <Popover.Title /> }>
 								Element anchor
@@ -889,8 +829,12 @@ export const Anchor: Story = {
 					</div>
 					<Popover.Root open>
 						<Popover.Popup
-							anchor={ virtualAnchor }
-							{ ...popupProps }
+							positioner={
+								<Popover.Positioner
+									anchor={ virtualAnchor }
+									{ ...sharedPositionerProps }
+								/>
+							}
 						>
 							<VisuallyHidden render={ <Popover.Title /> }>
 								Virtual anchor
@@ -909,7 +853,14 @@ export const Anchor: Story = {
 						RefObject anchor
 					</div>
 					<Popover.Root open>
-						<Popover.Popup anchor={ refAnchor } { ...popupProps }>
+						<Popover.Popup
+							positioner={
+								<Popover.Positioner
+									anchor={ refAnchor }
+									{ ...sharedPositionerProps }
+								/>
+							}
+						>
 							<VisuallyHidden render={ <Popover.Title /> }>
 								Ref anchor
 							</VisuallyHidden>
@@ -928,8 +879,12 @@ export const Anchor: Story = {
 					</div>
 					<Popover.Root open>
 						<Popover.Popup
-							anchor={ () => callbackTarget.current }
-							{ ...popupProps }
+							positioner={
+								<Popover.Positioner
+									anchor={ () => callbackTarget.current }
+									{ ...sharedPositionerProps }
+								/>
+							}
 						>
 							<VisuallyHidden render={ <Popover.Title /> }>
 								Callback anchor
@@ -984,13 +939,12 @@ export const ToolbarVariant: Story = {
 };
 
 /**
- * Base UI's Positioner exposes `--available-height` and
- * `--available-width` CSS variables representing the space
- * between the anchor and the viewport edge. Apply them as `max-height` /
- * `max-width` via the `style` prop (which targets the positioner) to
- * constrain the popup size. Then add `overflow: auto` on an inner wrapper
- * so scrolling happens inside the popup content area — this replaces the
- * legacy Popover's `resize` prop.
+ * `Popover.Positioner` exposes `--available-height` and `--available-width`
+ * CSS variables representing the space between the anchor and the viewport
+ * edge. These cascade down to `Popover.Popup`, where applying them as
+ * `max-height` / `max-width` via the `style` prop constrains the popup size.
+ * Then add `overflow: auto` on an inner wrapper so scrolling happens inside
+ * the popup content area — this replaces the legacy Popover's `resize` prop.
  *
  * Open the popover and resize or scroll the container to see the popup shrink
  * to fit.
@@ -1012,7 +966,7 @@ export const ViewportConstrainedSize: Story = {
 				<Popover.Root { ...args }>
 					<Popover.Trigger>Show Content</Popover.Trigger>
 					<Popover.Popup
-						side="bottom"
+						positioner={ <Popover.Positioner side="bottom" /> }
 						style={ {
 							maxHeight: 'var(--available-height, 300px)',
 							maxWidth: 'var(--available-width, 300px)',

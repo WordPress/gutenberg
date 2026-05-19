@@ -9,7 +9,7 @@ import {
 import { unlock } from '../lock-unlock';
 import { useDeprioritizedInitialFocus } from '../utils/use-deprioritized-initial-focus';
 import { SCROLL_CONTAINER_ATTR } from '../utils/use-overlay-scroll-state-attributes';
-import { renderPortalWithChildren } from '../utils/render-portal-with-children';
+import { renderSlotWithChildren } from '../utils/render-slot-with-children';
 import { DialogValidationProvider, useDialogModal } from './context';
 import { Portal } from './portal';
 import styles from './style.module.css';
@@ -24,8 +24,7 @@ const CLOSE_ICON_ATTR = 'data-wp-ui-dialog-close-icon';
  * Renders the dialog popup element that contains the dialog content.
  * Uses a portal to render outside the DOM hierarchy.
  *
- * When `portal` is omitted, defaults to `Dialog.Portal`. Portal merging is
- * handled by `renderPortalWithChildren` (shared with other overlay `Popup`s).
+ * When `portal` is omitted, defaults to `Dialog.Portal`.
  */
 const Popup = forwardRef< HTMLDivElement, PopupProps >( function DialogPopup(
 	{
@@ -80,7 +79,7 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function DialogPopup(
 		</>
 	);
 
-	return renderPortalWithChildren( portal, <Portal />, portalChildren );
+	return renderSlotWithChildren( portal, <Portal />, portalChildren );
 } );
 
 export { Popup };

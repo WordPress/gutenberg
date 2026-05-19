@@ -2,6 +2,7 @@
  * Internal dependencies
  */
 import {
+	computeFreeResizeRect,
 	computeLockedResizeRect,
 	computeShiftLockedResizeRect,
 	type CropBounds,
@@ -316,6 +317,198 @@ describe( 'computeShiftLockedResizeRect', () => {
 			const newPixelRatio =
 				( rect.width * IMAGE.width ) / ( rect.height * IMAGE.height );
 			expect( newPixelRatio ).toBeCloseTo( startPixelRatio, 5 );
+		} );
+	} );
+} );
+
+describe( 'per-axis minCropSize', () => {
+	// Cover the explicit per-axis floor introduced for the source-pixel
+	// minimum. The defaults (0.05, 0.05) are already covered by the
+	// suites above; these tests pass `minCropSize` explicitly to lock in
+	// the math the cropper relies on.
+	const IMAGE_NON_SQUARE: Size = { width: 1000, height: 500 };
+
+	describe( 'computeFreeResizeRect', () => {
+		it( 'clamps the dragged edge to the per-axis floor (width)', () => {
+			// SE handle from a wide start rect; drag left far enough that
+			// width would collapse without the floor.
+			const startRect = { x: 0.1, y: 0.1, width: 0.6, height: 0.6 };
+			const drag: ResizeDragState = {
+				handle: 'e',
+				startX: 700,
+				startY: 350,
+				startRect,
+			};
+			const minCropSize: Size = { width: 0.2, height: 0.05 };
+			const rect = computeFreeResizeRect(
+				drag,
+				0,
+				350,
+				IMAGE_NON_SQUARE,
+				FULL_BOUNDS,
+				minCropSize
+			);
+			expect( rect.width ).toBeCloseTo( minCropSize.width, 5 );
+			// Left edge anchored at start; right edge pulled in to the floor.
+			expect( rect.x ).toBeCloseTo( startRect.x, 5 );
+		} );
+
+		it( 'clamps the dragged edge to the per-axis floor (height)', () => {
+			const startRect = { x: 0.1, y: 0.1, width: 0.6, height: 0.6 };
+			const drag: ResizeDragState = {
+				handle: 's',
+				startX: 500,
+				startY: 350,
+				startRect,
+			};
+			const minCropSize: Size = { width: 0.05, height: 0.3 };
+			const rect = computeFreeResizeRect(
+				drag,
+				500,
+				0,
+				IMAGE_NON_SQUARE,
+				FULL_BOUNDS,
+				minCropSize
+			);
+			expect( rect.height ).toBeCloseTo( minCropSize.height, 5 );
+			expect( rect.y ).toBeCloseTo( startRect.y, 5 );
+		} );
+
+		it( 'uses width vs height independently — different floors per axis', () => {
+			// Drag NW corner inward far past both floors. The per-axis
+			// floors clamp x-collapse and y-collapse independently.
+			const startRect = { x: 0.1, y: 0.1, width: 0.8, height: 0.8 };
+			const drag: ResizeDragState = {
+				handle: 'nw',
+				startX: 100,
+				startY: 50,
+				startRect,
+			};
+			const minCropSize: Size = { width: 0.4, height: 0.1 };
+			const rect = computeFreeResizeRect(
+				drag,
+				1000,
+				500,
+				IMAGE_NON_SQUARE,
+				FULL_BOUNDS,
+				minCropSize
+			);
+			// Both floors hit at the same time on different axes.
+			expect( rect.width ).toBeCloseTo( minCropSize.width, 5 );
+			expect( rect.height ).toBeCloseTo( minCropSize.height, 5 );
+		} );
+	} );
+
+	describe( 'computeLockedResizeRect — per-axis floor projects through the ratio', () => {
+		// Wide image, square aspect ratio. The per-axis floor projection
+		// in `minDistW = max(minCropSize.width, minCropSize.height * normalizedRatio)`
+		// is the load-bearing piece for non-equal per-axis floors.
+		const imageSize: Size = { width: 2000, height: 1000 };
+		const aspectRatio = 1; // pixel-square
+		const normalizedRatio =
+			( aspectRatio * imageSize.height ) / imageSize.width; // 0.5
+		const startRect = { x: 0, y: 0, width: 0, height: 0 };
+
+		it( 'lifts width to satisfy the height floor when the height floor is the binding axis', () => {
+			// Drag SE inward to zero — both axes try to collapse. With
+			// minCropSize = { 0.01, 0.05 } and normalizedRatio 0.5,
+			// minDistW = max(0.01, 0.05 * 0.5) = 0.025, minDistH = 0.05.
+			// Driver: pixel motion equal → height drives → distW = distH/2.
+			const drag: ResizeDragState = {
+				handle: 'se',
+				startX: 0,
+				startY: 0,
+				startRect,
+			};
+			const minCropSize: Size = { width: 0.01, height: 0.05 };
+			const rect = computeLockedResizeRect(
+				drag,
+				1,
+				1,
+				imageSize,
+				FULL_BOUNDS,
+				normalizedRatio,
+				minCropSize
+			);
+			// Height floor binds: width is `height * normalizedRatio`.
+			expect( rect.height ).toBeCloseTo( minCropSize.height, 5 );
+			expect( rect.width ).toBeCloseTo(
+				minCropSize.height * normalizedRatio,
+				5
+			);
+		} );
+
+		it( 'lifts height to satisfy the width floor when the width floor binds', () => {
+			// minDistW = max(0.2, 0.05 * 0.5) = 0.2, minDistH = 0.4.
+			const drag: ResizeDragState = {
+				handle: 'se',
+				startX: 0,
+				startY: 0,
+				startRect,
+			};
+			const minCropSize: Size = { width: 0.2, height: 0.05 };
+			const rect = computeLockedResizeRect(
+				drag,
+				1,
+				1,
+				imageSize,
+				FULL_BOUNDS,
+				normalizedRatio,
+				minCropSize
+			);
+			expect( rect.width ).toBeCloseTo( 0.2, 5 );
+			expect( rect.height ).toBeCloseTo( 0.4, 5 );
+		} );
+	} );
+
+	describe( 'computeShiftLockedResizeRect — edge handles', () => {
+		// Shift-locked edge resize must enforce the floor on the driver
+		// axis and on the perpendicular axis after projecting through
+		// the start rect's normalized ratio.
+		const imageSize: Size = { width: 1000, height: 500 };
+		// Wide start rect — normalizedRatio = 0.4/0.4 = 1.
+		const startRect = { x: 0.3, y: 0.3, width: 0.4, height: 0.4 };
+
+		it( 'east edge: width-driver respects width floor and projects to height', () => {
+			const drag: ResizeDragState = {
+				handle: 'e',
+				startX: 700,
+				startY: 400,
+				startRect,
+			};
+			// Drag well past the floor toward the start anchor.
+			const minCropSize: Size = { width: 0.2, height: 0.05 };
+			const rect = computeShiftLockedResizeRect(
+				drag,
+				300,
+				400,
+				imageSize,
+				FULL_BOUNDS,
+				minCropSize
+			);
+			// Width clamped at the per-axis floor; height follows ratio (1:1).
+			expect( rect.width ).toBeCloseTo( minCropSize.width, 5 );
+			expect( rect.height ).toBeCloseTo( minCropSize.width, 5 );
+		} );
+
+		it( 'north edge: height-driver respects height floor and projects to width', () => {
+			const drag: ResizeDragState = {
+				handle: 'n',
+				startX: 500,
+				startY: 300,
+				startRect,
+			};
+			const minCropSize: Size = { width: 0.05, height: 0.2 };
+			const rect = computeShiftLockedResizeRect(
+				drag,
+				500,
+				700,
+				imageSize,
+				FULL_BOUNDS,
+				minCropSize
+			);
+			expect( rect.height ).toBeCloseTo( minCropSize.height, 5 );
+			expect( rect.width ).toBeCloseTo( minCropSize.height, 5 );
 		} );
 	} );
 } );

@@ -6,6 +6,7 @@ import type { Form, Field } from '@wordpress/dataviews';
 import { Spinner, __experimentalVStack as VStack } from '@wordpress/components';
 import { VisuallyHidden } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
+import { useMemo } from '@wordpress/element';
 import type { ReactNode } from 'react';
 
 /**
@@ -13,6 +14,7 @@ import type { ReactNode } from 'react';
  */
 import { useMediaEditorContext } from '../media-editor-provider';
 import type { Media } from '../media-editor-provider';
+import SidebarDatetimeView from './sidebar-datetime-view';
 
 /**
  * Props for MediaForm component.
@@ -38,6 +40,18 @@ export default function MediaForm( {
 	header,
 }: MediaFormProps ) {
 	const { media, fields, onChange } = useMediaEditorContext();
+
+	// Render readonly datetime fields compactly in the sidebar: date only,
+	// with the full datetime exposed on hover via Tooltip and `title`.
+	const formFields = useMemo(
+		() =>
+			fields.map( ( field: Field< Media > ) =>
+				field.type === 'datetime' && field.readOnly
+					? { ...field, render: SidebarDatetimeView }
+					: field
+			),
+		[ fields ]
+	);
 
 	if ( ! media || ! onChange ) {
 		return (
@@ -82,7 +96,7 @@ export default function MediaForm( {
 				{ header }
 				<DataForm
 					data={ media }
-					fields={ fields }
+					fields={ formFields }
 					form={ form }
 					onChange={ onChange }
 				/>

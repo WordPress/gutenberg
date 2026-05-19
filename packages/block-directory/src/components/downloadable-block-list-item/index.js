@@ -7,7 +7,11 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { __, _n, sprintf } from '@wordpress/i18n';
-import { Tooltip, Spinner, Composite } from '@wordpress/components';
+import {
+	Tooltip as WCTooltip,
+	Spinner,
+	Composite,
+} from '@wordpress/components';
 import { createInterpolateElement } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { getBlockType } from '@wordpress/blocks';
@@ -97,7 +101,7 @@ function DownloadableBlockListItem( { item, onClick } ) {
 	} );
 
 	return (
-		<Tooltip placement="top" text={ itemLabel }>
+		<WCTooltip placement="top" text={ itemLabel }>
 			<Composite.Item
 				className={ clsx(
 					'block-directory-downloadable-block-list-item',
@@ -158,7 +162,7 @@ function DownloadableBlockListItem( { item, onClick } ) {
 					) }
 				</span>
 			</Composite.Item>
-		</Tooltip>
+		</WCTooltip>
 	);
 }
 

@@ -7,21 +7,48 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { forwardRef, useCallback, useMemo } from '@wordpress/element';
-import { DashboardGrid } from '@wordpress/grid';
-import type { DashboardGridLayoutItem } from '@wordpress/grid';
+import { DashboardGrid, DashboardLanes } from '@wordpress/grid';
+import type {
+	DashboardGridLayoutItem,
+	DashboardLanesLayoutItem,
+	DragPreviewRenderProps,
+	ResizeHandleRenderProps,
+} from '@wordpress/grid';
 
 /**
  * Internal dependencies
  */
 import { useDashboardInternalContext } from '../../context/dashboard-context';
 import { WidgetChrome } from '../widget-chrome';
+import { WidgetResizeHandle } from './widget-resize-handle';
 import styles from './widgets.module.css';
-import type { DashboardWidget, WidgetName } from '../../types';
+import type {
+	DashboardWidget,
+	GridTilePlacement,
+	MasonryTilePlacement,
+	WidgetName,
+} from '../../types';
+
+// Floor applied as `minColumnWidth` on every surface render. Acts as a
+// safety net for stored settings that predate the layered model (where
+// `minColumnWidth` was XOR with `columns` and could be persisted as
+// `undefined`), and keeps tiles legible on narrow viewports without
+// requiring the consumer to wire the floor up themselves.
+const DASHBOARD_MIN_COLUMN_WIDTH = 350;
 
 function toGridLayout( widgets: DashboardWidget[] ): DashboardGridLayoutItem[] {
 	return widgets.map( ( w ) => ( {
 		key: w.uuid,
-		...w.placement,
+		...( w.placement as GridTilePlacement | undefined ),
+	} ) );
+}
+
+function toMasonryLayout(
+	widgets: DashboardWidget[]
+): DashboardLanesLayoutItem[] {
+	return widgets.map( ( w ) => ( {
+		key: w.uuid,
+		...( w.placement as MasonryTilePlacement | undefined ),
 	} ) );
 }
 
@@ -45,61 +72,120 @@ function applyGridChange(
 	} );
 }
 
+function applyMasonryChange(
+	widgets: DashboardWidget[],
+	masonryLayout: DashboardLanesLayoutItem[]
+): DashboardWidget[] {
+	return masonryLayout.map( ( { key, ...placement } ) => {
+		const existing = widgets.find( ( w ) => w.uuid === key );
+		if ( ! existing ) {
+			return {
+				uuid: key,
+				type: '' as WidgetName,
+				placement,
+			};
+		}
+		return {
+			...existing,
+			placement,
+		};
+	} );
+}
+
 export interface WidgetsProps {
 	className?: string;
 }
 
 /**
  * Iterates `layout`, delegates each entry to `WidgetDashboard.WidgetChrome`, and
- * feeds the resulting tree into `@wordpress/grid`.
+ * feeds the resulting tree into the active `@wordpress/grid` surface (2D grid
+ * or masonry, picked from `gridSettings.model`).
  */
 export const Widgets = forwardRef< HTMLDivElement, WidgetsProps >(
 	function Widgets( { className }, ref ) {
 		const { layout, onLayoutChange, editMode, gridSettings } =
 			useDashboardInternalContext();
 
-		const gridLayout = useMemo( () => toGridLayout( layout ), [ layout ] );
+		const isMasonry = gridSettings.model === 'masonry';
 
-		const handleLayoutChange = useCallback(
+		const gridLayout = useMemo(
+			() =>
+				isMasonry ? toMasonryLayout( layout ) : toGridLayout( layout ),
+			[ layout, isMasonry ]
+		);
+
+		const handleGridChange = useCallback(
 			( newGridLayout: DashboardGridLayoutItem[] ) => {
 				onLayoutChange( applyGridChange( layout, newGridLayout ) );
 			},
 			[ layout, onLayoutChange ]
 		);
 
+		const handleMasonryChange = useCallback(
+			( newMasonryLayout: DashboardLanesLayoutItem[] ) => {
+				onLayoutChange(
+					applyMasonryChange( layout, newMasonryLayout )
+				);
+			},
+			[ layout, onLayoutChange ]
+		);
+
 		const children = layout.map( ( widget, index ) => (
-			<WidgetChrome
+			<div
 				key={ widget.uuid }
-				widget={ widget }
-				index={ index }
-			/>
+				className={ clsx( styles.tile, {
+					[ styles.tileEditMode ]: editMode,
+				} ) }
+				tabIndex={ editMode ? 0 : undefined }
+			>
+				<WidgetChrome widget={ widget } index={ index } />
+			</div>
 		) );
 
-		const sharedProps = {
-			layout: gridLayout,
-			spacing: gridSettings.spacing,
-			rowHeight: gridSettings.rowHeight,
+		const renderDragPreview = useCallback(
+			( { children: clone }: DragPreviewRenderProps ) => (
+				<div className={ styles.dragPreview }>{ clone }</div>
+			),
+			[]
+		);
+
+		const sharedRenderProps = {
 			editMode,
-			onChangeLayout: handleLayoutChange,
+			renderDragPreview,
+			renderResizeHandle:
+				WidgetResizeHandle as React.ComponentType< ResizeHandleRenderProps >,
 		};
+
+		const minColumnWidth =
+			gridSettings.minColumnWidth ?? DASHBOARD_MIN_COLUMN_WIDTH;
+
+		const surface: React.ReactNode = isMasonry ? (
+			<DashboardLanes
+				layout={ gridLayout as DashboardLanesLayoutItem[] }
+				columns={ gridSettings.columns }
+				minColumnWidth={ minColumnWidth }
+				flowTolerance={ gridSettings.flowTolerance }
+				onChangeLayout={ handleMasonryChange }
+				{ ...sharedRenderProps }
+			>
+				{ children }
+			</DashboardLanes>
+		) : (
+			<DashboardGrid
+				layout={ gridLayout as DashboardGridLayoutItem[] }
+				columns={ gridSettings.columns }
+				minColumnWidth={ minColumnWidth }
+				rowHeight={ gridSettings.rowHeight }
+				onChangeLayout={ handleGridChange }
+				{ ...sharedRenderProps }
+			>
+				{ children }
+			</DashboardGrid>
+		);
 
 		return (
 			<div ref={ ref } className={ clsx( styles.grid, className ) }>
-				{ gridSettings.columns !== undefined ? (
-					<DashboardGrid
-						{ ...sharedProps }
-						columns={ gridSettings.columns }
-					>
-						{ children }
-					</DashboardGrid>
-				) : (
-					<DashboardGrid
-						{ ...sharedProps }
-						minColumnWidth={ gridSettings.minColumnWidth }
-					>
-						{ children }
-					</DashboardGrid>
-				) }
+				{ surface }
 			</div>
 		);
 	}

@@ -6,7 +6,7 @@ import { Text, View } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { Icon } from '@wordpress/components';
+import { Icon as WCIcon } from '@wordpress/components';
 import { useGlobalStyles } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { withPreferredColorScheme } from '@wordpress/compose';
@@ -41,7 +41,7 @@ function EditTitle( { getStylesFromColorScheme, title } ) {
 	return (
 		<View style={ styles.titleContainer }>
 			<View style={ styles.lockIconContainer }>
-				<Icon
+				<WCIcon
 					label={ __( 'Lock icon' ) }
 					icon={ lock }
 					size={ 16 }
@@ -52,7 +52,7 @@ function EditTitle( { getStylesFromColorScheme, title } ) {
 				{ title }
 			</Text>
 			<View style={ styles.helpIconContainer }>
-				<Icon
+				<WCIcon
 					label={ __( 'Help icon' ) }
 					icon={ help }
 					size={ 20 }
