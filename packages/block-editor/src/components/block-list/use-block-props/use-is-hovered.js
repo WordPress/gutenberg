@@ -1,15 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useRefEffect } from '@wordpress/compose';
-import { privateApis as richTextPrivateApis } from '@wordpress/rich-text';
-
-/**
- * Internal dependencies
- */
-import { unlock } from '../../../lock-unlock';
-
-const { subscribeSharedListener } = unlock( richTextPrivateApis );
+import { useRefEffect, subscribeSharedListener } from '@wordpress/compose';
 
 /**
  * Adds `is-hovered` class when the block is hovered and in navigation or

@@ -2,18 +2,8 @@
  * WordPress dependencies
  */
 import { ENTER } from '@wordpress/keycodes';
-import {
-	insert,
-	remove,
-	privateApis as richTextPrivateApis,
-} from '@wordpress/rich-text';
-
-/**
- * Internal dependencies
- */
-import { unlock } from '../../../lock-unlock';
-
-const { subscribeSharedListener } = unlock( richTextPrivateApis );
+import { insert, remove } from '@wordpress/rich-text';
+import { subscribeSharedListener } from '@wordpress/compose';
 
 export default ( props ) => ( element ) => {
 	function onKeyDownDeprecated( event ) {

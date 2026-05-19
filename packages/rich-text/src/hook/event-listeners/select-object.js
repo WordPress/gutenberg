@@ -1,4 +1,7 @@
-import { subscribeSharedListener } from './shared-listener';
+/**
+ * WordPress dependencies
+ */
+import { subscribeSharedListener } from '@wordpress/compose';
 
 export default () => ( element ) => {
 	function onClick( event ) {

@@ -1,11 +1,15 @@
 /**
+ * WordPress dependencies
+ */
+import { subscribeSharedListener } from '@wordpress/compose';
+
+/**
  * Internal dependencies
  */
 import { toHTMLString } from '../../to-html-string';
 import { isCollapsed } from '../../is-collapsed';
 import { slice } from '../../slice';
 import { getTextContent } from '../../get-text-content';
-import { subscribeSharedListener } from './shared-listener';
 
 export default ( props ) => ( element ) => {
 	function onCopy( event ) {

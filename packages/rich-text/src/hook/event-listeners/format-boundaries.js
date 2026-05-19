@@ -2,12 +2,12 @@
  * WordPress dependencies
  */
 import { LEFT, RIGHT } from '@wordpress/keycodes';
+import { subscribeSharedListener } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import { isCollapsed } from '../../is-collapsed';
-import { subscribeSharedListener } from './shared-listener';
 
 const EMPTY_ACTIVE_FORMATS = [];
 

@@ -1,10 +1,14 @@
 /**
+ * WordPress dependencies
+ */
+import { subscribeSharedListener } from '@wordpress/compose';
+
+/**
  * Internal dependencies
  */
 import { getActiveFormats } from '../../get-active-formats';
 import { isCollapsed } from '../../is-collapsed';
 import { updateFormats } from '../../update-formats';
-import { subscribeSharedListener } from './shared-listener';
 
 /**
  * All inserting input types that would insert HTML into the DOM.

@@ -1,8 +1,12 @@
 /**
+ * WordPress dependencies
+ */
+import { subscribeSharedListener } from '@wordpress/compose';
+
+/**
  * Internal dependencies
  */
 import { isRangeEqual } from '../../is-range-equal';
-import { subscribeSharedListener } from './shared-listener';
 
 /**
  * Sometimes some browsers are not firing a `selectionchange` event when

@@ -2,13 +2,9 @@
  * WordPress dependencies
  */
 import { pasteHandler } from '@wordpress/blocks';
-import {
-	isEmpty,
-	insert,
-	create,
-	privateApis as richTextPrivateApis,
-} from '@wordpress/rich-text';
+import { isEmpty, insert, create } from '@wordpress/rich-text';
 import { isURL } from '@wordpress/url';
+import { subscribeSharedListener } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -16,9 +12,6 @@ import { isURL } from '@wordpress/url';
 import { store as blockEditorStore } from '../../../store';
 import { addActiveFormats } from '../utils';
 import { getPasteEventData } from '../../../utils/pasting';
-import { unlock } from '../../../lock-unlock';
-
-const { subscribeSharedListener } = unlock( richTextPrivateApis );
 
 /** @typedef {import('@wordpress/rich-text').RichTextValue} RichTextValue */
 

@@ -1,7 +1,7 @@
 /**
- * Internal dependencies
+ * WordPress dependencies
  */
-import { subscribeSharedListener } from './shared-listener';
+import { subscribeSharedListener } from '@wordpress/compose';
 
 /**
  * Prevents focus from being captured by the element when clicking _outside_

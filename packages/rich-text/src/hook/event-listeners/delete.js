@@ -2,12 +2,12 @@
  * WordPress dependencies
  */
 import { BACKSPACE, DELETE } from '@wordpress/keycodes';
+import { subscribeSharedListener } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import { remove } from '../../remove';
-import { subscribeSharedListener } from './shared-listener';
 
 export default ( props ) => ( element ) => {
 	function onKeyDown( event ) {

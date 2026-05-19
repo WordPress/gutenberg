@@ -153,6 +153,10 @@ _Related_
 
 Given a component returns the enhanced component augmented with a component only re-rendering when its props/state change
 
+### subscribeSharedListener
+
+Undocumented declaration.
+
 ### throttle
 
 A simplified and properly typed version of lodash's `throttle`, that always uses timers instead of sometimes using rAF.
