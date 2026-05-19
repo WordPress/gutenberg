@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { privateApis as componentsPrivateApis } from '@wordpress/components';
-import { __, _n, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { moreVertical, trash } from '@wordpress/icons';
 // Dashboard is still experimental.
 // eslint-disable-next-line @wordpress/use-recommended-components
@@ -18,48 +18,22 @@ import type { DashboardWidget, GridTilePlacement } from '../../types';
 
 const { Menu } = unlock( componentsPrivateApis );
 
-const COLUMN_SPAN_RADIO_NAME = 'widget-column-span';
-const NAMED_WIDTH_RADIO_NAME = 'widget-named-width';
-
 type NamedGridWidth = Exclude<
 	NonNullable< GridTilePlacement[ 'width' ] >,
 	number
 >;
 
-function getColumnSpanLabel( span: number, gridColumns: number ): string {
-	return sprintf(
-		/* translators: 1: column span, 2: total columns in the grid layout. */
-		_n( '%1$d/%2$d column', '%1$d/%2$d columns', gridColumns ),
-		span,
-		gridColumns
-	);
-}
-
 interface WidgetChromeActionsProps {
 	width: GridTilePlacement[ 'width' ];
-	gridColumns: number;
-	onColumnSpanChange: ( span: number ) => void;
 	onNamedWidthChange: ( width: NamedGridWidth ) => void;
 	onRemove: () => void;
 }
 
 function WidgetChromeActions( {
 	width,
-	gridColumns,
-	onColumnSpanChange,
 	onNamedWidthChange,
 	onRemove,
 }: WidgetChromeActionsProps ) {
-	const selectedColumnSpan =
-		typeof width === 'number'
-			? Math.max( 1, Math.min( width, gridColumns ) )
-			: null;
-
-	const columnSpans = Array.from(
-		{ length: gridColumns },
-		( _, index ) => index + 1
-	);
-
 	return (
 		<Stack direction="row" align="center" gap="sm">
 			<Menu>
@@ -75,62 +49,25 @@ function WidgetChromeActions( {
 					}
 				/>
 				<Menu.Popover>
-					<Menu>
-						<Menu.SubmenuTriggerItem
-							suffix={
-								selectedColumnSpan !== null
-									? getColumnSpanLabel(
-											selectedColumnSpan,
-											gridColumns
-									  )
-									: undefined
-							}
+					<Menu.Group>
+						<Menu.GroupLabel>{ __( 'Width' ) }</Menu.GroupLabel>
+						<Menu.Item
+							disabled={ width === 'fill' }
+							onClick={ () => onNamedWidthChange( 'fill' ) }
 						>
 							<Menu.ItemLabel>
-								{ __( 'Fixed width' ) }
+								{ __( 'Use available width' ) }
 							</Menu.ItemLabel>
-						</Menu.SubmenuTriggerItem>
-						<Menu.Popover>
-							<Menu.Group>
-								{ columnSpans.map( ( span ) => (
-									<Menu.RadioItem
-										key={ span }
-										name={ COLUMN_SPAN_RADIO_NAME }
-										value={ String( span ) }
-										checked={ selectedColumnSpan === span }
-										onChange={ () =>
-											onColumnSpanChange( span )
-										}
-									>
-										<Menu.ItemLabel>
-											{ getColumnSpanLabel(
-												span,
-												gridColumns
-											) }
-										</Menu.ItemLabel>
-									</Menu.RadioItem>
-								) ) }
-							</Menu.Group>
-						</Menu.Popover>
-					</Menu>
-					<Menu.RadioItem
-						name={ NAMED_WIDTH_RADIO_NAME }
-						value="fill"
-						checked={ width === 'fill' }
-						onChange={ () => onNamedWidthChange( 'fill' ) }
-					>
-						<Menu.ItemLabel>
-							{ __( 'Fill available width' ) }
-						</Menu.ItemLabel>
-					</Menu.RadioItem>
-					<Menu.RadioItem
-						name={ NAMED_WIDTH_RADIO_NAME }
-						value="full"
-						checked={ width === 'full' }
-						onChange={ () => onNamedWidthChange( 'full' ) }
-					>
-						<Menu.ItemLabel>{ __( 'Full width' ) }</Menu.ItemLabel>
-					</Menu.RadioItem>
+						</Menu.Item>
+						<Menu.Item
+							disabled={ width === 'full' }
+							onClick={ () => onNamedWidthChange( 'full' ) }
+						>
+							<Menu.ItemLabel>
+								{ __( 'Make full width' ) }
+							</Menu.ItemLabel>
+						</Menu.Item>
+					</Menu.Group>
 				</Menu.Popover>
 			</Menu>
 			<IconButton
@@ -152,9 +89,7 @@ interface WidgetChromeActionableAreaProps {
 export function WidgetChromeActionableArea( {
 	widget,
 }: WidgetChromeActionableAreaProps ) {
-	const { layout, onLayoutChange, gridSettings } =
-		useDashboardInternalContext();
-	const gridColumns = gridSettings.columns;
+	const { layout, onLayoutChange } = useDashboardInternalContext();
 	const width = widget.placement?.width;
 
 	const updateWidth = ( nextWidth: GridTilePlacement[ 'width' ] ) => {
@@ -170,10 +105,6 @@ export function WidgetChromeActionableArea( {
 				: currentWidget
 		);
 		onLayoutChange( nextLayout );
-	};
-
-	const onColumnSpanChange = ( span: number ) => {
-		updateWidth( span );
 	};
 
 	const onNamedWidthChange = ( nextWidth: NamedGridWidth ) => {
@@ -192,8 +123,6 @@ export function WidgetChromeActionableArea( {
 		<div className={ styles.widgetChromeActionableArea }>
 			<WidgetChromeActions
 				width={ width }
-				gridColumns={ gridColumns }
-				onColumnSpanChange={ onColumnSpanChange }
 				onNamedWidthChange={ onNamedWidthChange }
 				onRemove={ onRemove }
 			/>
