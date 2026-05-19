@@ -587,6 +587,7 @@ Rule of thumb: anything expressible as plain JSON goes in `widget.json`. Anythin
 Exports a default object that describes the widget's runtime contract: typed attributes, translated labels, example data. The build system injects the `render_module` handle at registration time, so authors don't need to declare it.
 
 ```ts
+import { wordpress } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 
 type HelloWorldAttributes = {
@@ -597,6 +598,7 @@ type HelloWorldAttributes = {
 const widget = {
 	name: 'my-plugin/hello-world',
 	title: __( 'Hello World', 'my-plugin' ),
+	icon: wordpress,
 	attributes: [
 		{
 			id: 'greeting',
