@@ -7,6 +7,7 @@ import { mat2d, vec2 } from 'gl-matrix';
  * Internal dependencies
  */
 import type { CropperState, NormalizedRect, Size } from './types';
+import { ABSOLUTE_MIN_ZOOM, MAX_ZOOM, MIN_ZOOM } from './constants';
 import { degreesToRadians } from './math/rotation';
 import {
 	isValidSize,
@@ -44,18 +45,19 @@ function getVisualDimensions(
 }
 
 /**
- * Calculates the minimum zoom factor needed for the rotated image to fully cover
- * the crop rectangle, using normalized coordinates and imageAspectRatio.
- *
- * Works in pixel-proportional space where the unrotated image is a×1.
- * The crop rect is in visual-normalized space and must be scaled by the
+ * The geometric minimum zoom required for the rotated image to fully cover the
+ * crop rectangle. Works in pixel-proportional space where the unrotated image
+ * is a×1; the crop rect lives in visual-normalized space and is scaled by the
  * rotation-dependent visual dimensions before projecting into the image-local
  * frame.
+ *
+ * Returns 0 for a degenerate (zero-area) crop — callers compose the result
+ * with their own floor (typically the current zoom or `MIN_ZOOM`).
  *
  * @param rotation         Rotation angle in degrees.
  * @param imageAspectRatio Image width / height ratio.
  * @param cropRect         The crop rectangle in normalized coordinates.
- * @return The minimum zoom factor (always >= 1).
+ * @return The minimum zoom factor needed for coverage.
  */
 function getMinZoomForCover(
 	rotation: number,
@@ -88,7 +90,39 @@ function getMinZoomForCover(
 	const zoomFromAlpha = ( 2 * spanAlpha ) / aspectRatio;
 	const zoomFromBeta = 2 * spanBeta;
 
-	return Math.max( 1, zoomFromAlpha, zoomFromBeta );
+	return Math.max( zoomFromAlpha, zoomFromBeta );
+}
+
+/**
+ * Resolves the effective minimum zoom for the current state — the coverage-
+ * aware floor when an image is loaded, falling back to `MIN_ZOOM` otherwise.
+ * Used by both the cropper's interaction layer and the zoom slider so the
+ * floor stays consistent across surfaces.
+ *
+ * @param state The current cropper state.
+ * @return The minimum zoom factor.
+ */
+export function getMinZoom( state: CropperState ): number {
+	if ( ! state.image ) {
+		return MIN_ZOOM;
+	}
+	const imageSize = {
+		width: state.image.naturalWidth,
+		height: state.image.naturalHeight,
+	};
+	if ( ! isValidSize( imageSize ) ) {
+		return MIN_ZOOM;
+	}
+	const safeState = sanitizeCropperState( state );
+	const aspectRatio = imageSize.width / imageSize.height;
+	return Math.max(
+		ABSOLUTE_MIN_ZOOM,
+		getMinZoomForCover(
+			safeState.rotation,
+			aspectRatio,
+			safeState.cropRect
+		)
+	);
 }
 
 /**
@@ -300,12 +334,11 @@ export function restrictPanZoom(
 	const aspectRatio = isValidSize( imageSize )
 		? imageSize.width / imageSize.height
 		: 1;
-	const minZoom = getMinZoomForCover(
-		safeState.rotation,
-		aspectRatio,
-		safeCropRect
+	const minZoom = Math.max(
+		ABSOLUTE_MIN_ZOOM,
+		getMinZoomForCover( safeState.rotation, aspectRatio, safeCropRect )
 	);
-	const zoom = Math.max( safeState.zoom, minZoom );
+	const zoom = Math.min( MAX_ZOOM, Math.max( safeState.zoom, minZoom ) );
 
 	// Step 2: build camera with candidate pan and corrected zoom.
 	const candidateState = { ...safeState, zoom };

@@ -96,7 +96,7 @@ jobs:
               run: |
                   cd cli
                   npm ci
-                  ./bin/plugin/cli.js npm-next --ci --repository-path ../publish
+                  npm exec --no release-cli -- npm-next --ci --repository-path ../publish
               env:
                   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
@@ -105,7 +105,7 @@ jobs:
               run: |
                   cd cli
                   npm ci
-                  ./bin/plugin/cli.js npm-latest --semver minor --ci --repository-path ../publish
+                  npm exec --no release-cli -- npm-latest --semver minor --ci --repository-path ../publish
               env:
                   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
@@ -114,7 +114,7 @@ jobs:
               run: |
                   cd cli
                   npm ci
-                  ./bin/plugin/cli.js npm-bugfix --ci --repository-path ../publish
+                  npm exec --no release-cli -- npm-bugfix --ci --repository-path ../publish
               env:
                   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 

@@ -288,14 +288,12 @@ export const Spanning: Story = {
  * new layout via `onChangeLayout`.
  *
  * While `editMode` is on, `<DashboardLanes />` paints its default
- * overlay behind the tiles to mark the lane tracks: diagonal stripes
- * plus a dashed outline and subtle fill on each column. Lanes paint
- * columns only — there are no row dividers because heights are
+ * overlay behind the tiles to mark the lane tracks. Lanes paint
+ * columns only — there are no row markers because heights are
  * content-driven.
  *
- * Theme the default look in place via CSS custom properties
- * (`--wp-grid-overlay-stripe-color`, `--wp-grid-overlay-track-color`,
- * `--wp-grid-overlay-column-fill`), or replace the visual wholesale
+ * Theme the default look in place via `--wp-grid-overlay-tile-bg`,
+ * or replace the visual wholesale
  * by passing `renderGridOverlay`. See the `Custom Grid Overlay`
  * story below for a full override example.
  */
@@ -392,7 +390,7 @@ function NumberedLanesOverlay( { columns, isActive }: GridOverlayRenderProps ) {
 				inset: 0,
 				display: 'grid',
 				gridTemplateColumns: `repeat(${ columns }, minmax(0, 1fr))`,
-				gap: 'var(--wpds-dimension-gap-md)',
+				gap: 'var(--wpds-dimension-gap-xl)',
 				pointerEvents: 'none',
 				opacity: isActive ? 1 : 0,
 				visibility: isActive ? 'visible' : 'hidden',

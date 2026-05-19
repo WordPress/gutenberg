@@ -11,14 +11,16 @@ import {
 	restrictPanZoom,
 	restrictCropRect,
 	getImageCropBounds,
+	getMinZoom,
 } from '../containment';
 import { getSourceRegion, getSourceRegionPercent } from '../source-region';
 import { computeTransformStyle } from '../transform-style';
-import { DEFAULT_STATE } from '../constants';
+import { DEFAULT_STATE, MAX_ZOOM, MIN_ZOOM } from '../constants';
 import type { CropperState, Size } from '../types';
 
 const CONTAINER: Size = { width: 800, height: 600 };
 const IMAGE: Size = { width: 1600, height: 900 };
+const PORTRAIT_IMAGE: Size = { width: 900, height: 1600 };
 
 function makeState( overrides: Partial< CropperState > = {} ): CropperState {
 	return {
@@ -30,6 +32,47 @@ function makeState( overrides: Partial< CropperState > = {} ): CropperState {
 		},
 		...overrides,
 	};
+}
+
+function expectImageCoversCrop( state: CropperState, imageSize: Size ): void {
+	const container: Size = { width: 1000, height: 1000 };
+	const camera = createCamera( state, container, imageSize );
+	const snapRotation = Math.round( state.rotation / 90 ) * 90;
+	const baseCamera = createCamera(
+		{
+			...state,
+			pan: { x: 0, y: 0 },
+			zoom: 1,
+			rotation: snapRotation,
+		},
+		container,
+		imageSize
+	);
+	const vb = getVisibleBounds( baseCamera );
+	const cr = state.cropRect;
+	const stencilCorners: [ number, number ][] = [
+		[ vb.left + cr.x * vb.width, vb.top + cr.y * vb.height ],
+		[ vb.left + ( cr.x + cr.width ) * vb.width, vb.top + cr.y * vb.height ],
+		[
+			vb.left + ( cr.x + cr.width ) * vb.width,
+			vb.top + ( cr.y + cr.height ) * vb.height,
+		],
+		[
+			vb.left + cr.x * vb.width,
+			vb.top + ( cr.y + cr.height ) * vb.height,
+		],
+	];
+
+	for ( const corner of stencilCorners ) {
+		const w = screenToWorld( camera, {
+			x: corner[ 0 ],
+			y: corner[ 1 ],
+		} );
+		expect( w.x ).toBeGreaterThanOrEqual( -0.001 );
+		expect( w.x ).toBeLessThanOrEqual( 1.001 );
+		expect( w.y ).toBeGreaterThanOrEqual( -0.001 );
+		expect( w.y ).toBeLessThanOrEqual( 1.001 );
+	}
 }
 
 describe( 'createCamera', () => {
@@ -122,6 +165,35 @@ describe( 'restrictPanZoom', () => {
 		const result = restrictPanZoom( state, IMAGE, state.cropRect );
 		expect( result.zoom ).toBeGreaterThanOrEqual( 1 );
 	} );
+	it( 'caps zoom at MAX_ZOOM', () => {
+		const state = makeState( { zoom: MAX_ZOOM * 2 } );
+		const result = restrictPanZoom( state, IMAGE, state.cropRect );
+		expect( result.zoom ).toBe( MAX_ZOOM );
+	} );
+	it( 'allows zoom below 1 when a fine-rotated portrait crop remains covered', () => {
+		const cropRect = { x: 0.46, y: 0, width: 0.08, height: 1 };
+		const state = makeState( {
+			image: {
+				src: 'portrait.jpg',
+				naturalWidth: PORTRAIT_IMAGE.width,
+				naturalHeight: PORTRAIT_IMAGE.height,
+			},
+			rotation: 19,
+			zoom: 0.9,
+			cropRect,
+		} );
+		const result = restrictPanZoom( state, PORTRAIT_IMAGE, cropRect );
+
+		expect( result.zoom ).toBeGreaterThan( 0.9 );
+		expect( result.zoom ).toBeLessThan( 1 );
+
+		const restrictedState = makeState( {
+			...state,
+			pan: result.pan,
+			zoom: result.zoom,
+		} );
+		expectImageCoversCrop( restrictedState, PORTRAIT_IMAGE );
+	} );
 	it( 'at 90° with zoom=1, allows zero pan on landscape image', () => {
 		// At zoom=1, 90° rotation, the image exactly covers the visual area.
 		// No pan should be possible in either direction.
@@ -172,6 +244,36 @@ describe( 'restrictPanZoom', () => {
 		const result = restrictPanZoom( state, IMAGE, state.cropRect );
 		expect( result.pan.x ).toBeCloseTo( 0, 5 );
 		expect( result.pan.y ).toBeCloseTo( 0, 5 );
+	} );
+} );
+
+describe( 'getMinZoom', () => {
+	it( 'falls back to MIN_ZOOM for invalid image dimensions', () => {
+		const state = makeState( {
+			image: {
+				src: 'invalid.jpg',
+				naturalWidth: 1000,
+				naturalHeight: 0,
+			},
+		} );
+
+		expect( getMinZoom( state ) ).toBe( MIN_ZOOM );
+	} );
+
+	it( 'returns a finite value for non-finite rotation and crop fields', () => {
+		const state = makeState( {
+			rotation: Number.NaN,
+			cropRect: {
+				x: 0,
+				y: 0,
+				width: Number.NaN,
+				height: 1,
+			},
+		} );
+
+		const minZoom = getMinZoom( state );
+		expect( Number.isFinite( minZoom ) ).toBe( true );
+		expect( minZoom ).toBeGreaterThan( 0 );
 	} );
 } );
 

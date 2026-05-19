@@ -19,9 +19,9 @@ import type {
 	NormalizedRect,
 	Flip,
 } from '../../core/types';
-import { DEFAULT_STATE, MIN_ZOOM, MAX_ZOOM } from '../../core/constants';
+import { DEFAULT_STATE, MAX_ZOOM } from '../../core/constants';
 import { exportCroppedImage } from '../../core/export/canvas-renderer';
-import { restrictPanZoom } from '../../core/containment';
+import { getMinZoom, restrictPanZoom } from '../../core/containment';
 import {
 	cropperReducer,
 	enforceContainment,
@@ -48,8 +48,8 @@ export interface UseCropperStateReturn {
 	 */
 	setPan: ( pan: NormalizedPoint ) => void;
 	/**
-	 * Set the zoom level (clamped to [1, 10]), anchored at the crop
-	 * center.
+	 * Set the zoom level, anchored at the crop center. Clamped to the
+	 * coverage-aware minimum and maximum zoom.
 	 *
 	 * Pointer-driven zoom (wheel, pinch, double-tap) anchors at the
 	 * cursor via `setZoomAtPoint`. Cursorless surfaces — the slider, the
@@ -324,7 +324,7 @@ export function useCropperState(
 			const s = stateRef.current;
 			const clampedZoom = Math.min(
 				MAX_ZOOM,
-				Math.max( MIN_ZOOM, zoom )
+				Math.max( getMinZoom( s ), zoom )
 			);
 			if ( clampedZoom === s.zoom ) {
 				return;

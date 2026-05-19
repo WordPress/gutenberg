@@ -31,7 +31,7 @@ import type {
 } from '../../core/types';
 import type { UseCropperStateReturn } from '../hooks/use-cropper-state';
 import { getImageFit, getRotatedBBox } from '../../core/camera';
-import { getImageCropBounds } from '../../core/containment';
+import { getImageCropBounds, getMinZoom } from '../../core/containment';
 import { MIN_CROP_PIXELS } from '../../core/constants';
 import { useInteraction } from '../hooks/use-interaction';
 import { useTransformStyle } from '../hooks/use-transform-style';
@@ -96,7 +96,7 @@ export interface CropperProps {
 	showDimming?: boolean;
 	/** Show the live output dimensions tooltip during a resize. */
 	showDimensions?: boolean;
-	/** Minimum zoom level. */
+	/** Minimum zoom level override. Defaults to the coverage-aware minimum. */
 	minZoom?: number;
 	/** Maximum zoom level. */
 	maxZoom?: number;
@@ -149,7 +149,7 @@ export interface CropperProps {
  * @param root0.isPlacementActive Keep grid visible during external placement activity.
  * @param root0.showDimming       Show dimming overlay outside crop.
  * @param root0.showDimensions    Show live dimensions tooltip during resize.
- * @param root0.minZoom           Minimum zoom level.
+ * @param root0.minZoom           Minimum zoom level override.
  * @param root0.maxZoom           Maximum zoom level.
  * @param root0.aspectRatio       Fixed aspect ratio (width/height).
  * @param root0.freeformCrop      Enable resize handles.
@@ -375,6 +375,8 @@ function CropperInner(
 		}
 		return getImageCropBounds( state, elementSize, visualSize );
 	}, [ state, elementSize, visualSize ] );
+	const effectiveMinZoom =
+		minZoom !== undefined ? minZoom : getMinZoom( state );
 	const [ isResizing, setIsResizing ] = useState( false );
 	const isResizingRef = useRef( false );
 	const isSettlingRef = useRef( false );
@@ -393,7 +395,7 @@ function CropperInner(
 		isZooming,
 		isPlacementActive: isInteractionPlacementActive,
 	} = useInteraction( state, controller, canvasSize, visualSize, {
-		minZoom,
+		minZoom: effectiveMinZoom,
 		maxZoom,
 		onGestureStart,
 		onGestureEnd,

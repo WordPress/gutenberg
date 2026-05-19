@@ -279,6 +279,28 @@ const UnforwardedPopover = (
 				) {
 					return;
 				}
+				// Treat focus moves involving portaled descendants as
+				// internal: either the next focus target is in the
+				// `@wordpress/ui` compat overlay slot, or focus is back
+				// inside this popover by the time we evaluate (e.g. when
+				// a portaled overlay is dismissed and synchronously
+				// restores focus to its trigger).
+				// See https://github.com/WordPress/gutenberg/issues/78406.
+				const relatedTarget =
+					'relatedTarget' in event ? event.relatedTarget : null;
+				if (
+					relatedTarget instanceof Element &&
+					relatedTarget.closest( '[data-wp-compat-overlay-slot]' )
+				) {
+					return;
+				}
+				if (
+					floatingElement &&
+					ownerDocument?.activeElement instanceof Element &&
+					floatingElement.contains( ownerDocument.activeElement )
+				) {
+					return;
+				}
 				// Call onFocusOutside if defined or call onClose.
 				if ( onFocusOutside ) {
 					onFocusOutside( event );
