@@ -292,6 +292,8 @@ function CropperInner(
 		setCropperCanvasSize( canvasSize );
 	}, [ canvasSize, setCropperCanvasSize ] );
 
+	// The Provider can outlive this canvas if the cropper is hidden
+	// conditionally; clear the measurement so consumers become unready.
 	useEffect( () => {
 		return () => {
 			setCropperCanvasSize( { width: 0, height: 0 } );
