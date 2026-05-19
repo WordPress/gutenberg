@@ -244,7 +244,13 @@ By default, files located in `build`, `node_modules`, and `vendor` folders are i
 
 #### Advanced information
 
-It uses [eslint](https://eslint.org/) with the set of recommended rules defined in [@wordpress/eslint-plugin](https://www.npmjs.com/package/@wordpress/eslint-plugin) npm package. You can override default rules with your own as described in [eslint docs](https://eslint.org/docs/rules/). Learn more in the [Advanced Usage](#advanced-usage) section.
+It uses [ESLint](https://eslint.org/) with the set of recommended rules defined in [@wordpress/eslint-plugin](https://www.npmjs.com/package/@wordpress/eslint-plugin) npm package. It detects flat config files (`eslint.config.*`) first, falling back to legacy `.eslintrc.*` files if present. You can override default rules with your own as described in the [ESLint configuration docs](https://eslint.org/docs/latest/use/configure/). Learn more in the [Advanced Usage](#advanced-usage) section.
+
+**Breaking changes in ESLint v10:**
+
+-   The default config path has changed from `config/.eslintrc.js` to `config/eslint.config.cjs`. If you were extending the default config, update your import path.
+-   The `--ignore-path` CLI flag was removed along with the eslintrc system. Use `ignores` arrays in your flat config instead.
+-   Legacy `.eslintrc.*` fallback detection is deprecated and will be removed in a future version. Migrate to `eslint.config.*` files.
 
 ### `lint-pkg-json`
 
@@ -811,6 +817,6 @@ If you follow this approach, please, be aware that:
 
 This is an individual package that’s part of the Gutenberg project. The project is organized as a monorepo. It’s made up of multiple self-contained software packages, each with a specific purpose. The packages in this monorepo are published to [npm](https://www.npmjs.com/) and used by [WordPress](https://make.wordpress.org/core/) as well as other software projects.
 
-To find out more about contributing to this package or Gutenberg as a whole, please read the project’s main [contributor guide](/CONTRIBUTING.md).
+To find out more about contributing to this package or Gutenberg as a whole, please read the project’s main [contributor guide](https://github.com/WordPress/gutenberg/tree/HEAD/CONTRIBUTING.md).
 
 <br /><br /><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>

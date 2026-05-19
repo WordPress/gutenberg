@@ -27,7 +27,7 @@ import type { SnackbarProps } from './types';
 import type { NoticeAction } from '../notice/types';
 import type { WordPressComponentProps } from '../context';
 
-const NOTICE_TIMEOUT = 10000;
+const NOTICE_TIMEOUT = 6000;
 
 /**
  * Custom hook which announces the message with the given politeness, if a
@@ -206,5 +206,6 @@ function UnforwardedSnackbar(
  * ```
  */
 export const Snackbar = forwardRef( UnforwardedSnackbar );
+Snackbar.displayName = 'Snackbar';
 
 export default Snackbar;

@@ -6,29 +6,61 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { Icon, __experimentalHStack as HStack } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import {
+	Icon as WCIcon,
+	__experimentalHStack as HStack,
+	privateApis as componentsPrivateApis,
+} from '@wordpress/components';
+import { __, _x } from '@wordpress/i18n';
 import { useState, useMemo } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { parse } from '@wordpress/blocks';
+import { BlockPreview } from '@wordpress/block-editor';
 import {
-	BlockPreview,
-	privateApis as blockEditorPrivateApis,
-} from '@wordpress/block-editor';
-import { EditorProvider } from '@wordpress/editor';
+	EditorProvider,
+	privateApis as editorPrivateApis,
+} from '@wordpress/editor';
+import {
+	privateApis as corePrivateApis,
+	store as coreStore,
+} from '@wordpress/core-data';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import { useAddedBy } from './hooks';
+import { useDefaultTemplateTypes } from '../add-new-template/utils';
 import usePatternSettings from '../page-patterns/use-pattern-settings';
 import { unlock } from '../../lock-unlock';
 
-const { useGlobalStyle } = unlock( blockEditorPrivateApis );
+const { Badge: WCBadge } = unlock( componentsPrivateApis );
+const { useEntityRecordsWithPermissions } = unlock( corePrivateApis );
+const { useStyle } = unlock( editorPrivateApis );
+
+function useAllDefaultTemplateTypes() {
+	const defaultTemplateTypes = useDefaultTemplateTypes();
+	const { records: staticRecords } = useEntityRecordsWithPermissions(
+		'root',
+		'registeredTemplate'
+	);
+	return [
+		...defaultTemplateTypes,
+		...staticRecords
+			?.filter( ( record ) => ! record.is_custom )
+			.map( ( record ) => {
+				return {
+					slug: record.slug,
+					title: record.title.rendered,
+					description: record.description,
+				};
+			} ),
+	];
+}
 
 function PreviewField( { item } ) {
 	const settings = usePatternSettings();
-	const [ backgroundColor = 'white' ] = useGlobalStyle( 'color.background' );
+	const backgroundColor = useStyle( 'color.background' ) ?? 'white';
 	const blocks = useMemo( () => {
 		return parse( item.content.raw );
 	}, [ item.content.raw ] );
@@ -68,9 +100,19 @@ export const previewField = {
 export const descriptionField = {
 	label: __( 'Description' ),
 	id: 'description',
-	render: ( { item } ) => {
-		return item.description && decodeEntities( item.description );
-	},
+	render: window?.__experimentalTemplateActivate
+		? function RenderDescription( { item } ) {
+				const defaultTemplateTypes = useAllDefaultTemplateTypes();
+				const defaultTemplateType = defaultTemplateTypes.find(
+					( type ) => type.slug === item.slug
+				);
+				return item.description
+					? decodeEntities( item.description )
+					: defaultTemplateType?.description;
+		  }
+		: ( { item } ) => {
+				return item.description && decodeEntities( item.description );
+		  },
 	enableSorting: false,
 	enableGlobalSearch: true,
 };
@@ -83,7 +125,7 @@ function AuthorField( { item } ) {
 		<HStack alignment="left" spacing={ 0 }>
 			{ imageUrl && (
 				<div
-					className={ clsx( 'page-templates-author-field__avatar', {
+					className={ clsx( 'fields-controls__author-avatar', {
 						'is-loaded': isImageLoaded,
 					} ) }
 				>
@@ -95,11 +137,11 @@ function AuthorField( { item } ) {
 				</div>
 			) }
 			{ ! imageUrl && (
-				<div className="page-templates-author-field__icon">
-					<Icon icon={ icon } />
+				<div className="fields-controls__author-icon">
+					<WCIcon icon={ icon } />
 				</div>
 			) }
-			<span className="page-templates-author-field__name">{ text }</span>
+			<span className="fields-controls__author-name">{ text }</span>
 		</HStack>
 	);
 }
@@ -107,6 +149,58 @@ function AuthorField( { item } ) {
 export const authorField = {
 	label: __( 'Author' ),
 	id: 'author',
-	getValue: ( { item } ) => item.author_text,
+	getValue: ( { item } ) => item.author_text ?? item.author,
 	render: AuthorField,
+};
+
+export const activeField = {
+	label: __( 'Status' ),
+	id: 'active',
+	type: 'boolean',
+	getValue: ( { item } ) => item._isActive,
+	render: function Render( { item } ) {
+		const activeLabel = item._isCustom
+			? _x( 'Active when used', 'template' )
+			: _x( 'Active', 'template' );
+		const activeIntent = item._isCustom ? 'info' : 'success';
+		const isActive = item._isActive;
+		return (
+			<WCBadge intent={ isActive ? activeIntent : 'default' }>
+				{ isActive ? activeLabel : _x( 'Inactive', 'template' ) }
+			</WCBadge>
+		);
+	},
+};
+
+export const useThemeField = () => {
+	const activeTheme = useSelect( ( select ) =>
+		select( coreStore ).getCurrentTheme()
+	);
+	return useMemo(
+		() => ( {
+			label: __( 'Compatible Theme' ),
+			id: 'theme',
+			getValue: ( { item } ) => item.theme,
+			render: function Render( { item } ) {
+				if ( item.theme === activeTheme.stylesheet ) {
+					return <WCBadge intent="success">{ item.theme }</WCBadge>;
+				}
+				return <WCBadge intent="error">{ item.theme }</WCBadge>;
+			},
+		} ),
+		[ activeTheme ]
+	);
+};
+
+export const slugField = {
+	label: __( 'Template Type' ),
+	id: 'slug',
+	getValue: ( { item } ) => item.slug,
+	render: function Render( { item } ) {
+		const defaultTemplateTypes = useAllDefaultTemplateTypes();
+		const defaultTemplateType = defaultTemplateTypes.find(
+			( type ) => type.slug === item.slug
+		);
+		return defaultTemplateType?.title || _x( 'Custom', 'template type' );
+	},
 };

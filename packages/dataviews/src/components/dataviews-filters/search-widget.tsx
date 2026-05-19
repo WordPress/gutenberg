@@ -12,14 +12,16 @@ import clsx from 'clsx';
 import { useInstanceId } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
 import { useState, useMemo, useDeferredValue } from '@wordpress/element';
-import { VisuallyHidden, Icon, Composite } from '@wordpress/components';
+import { Icon as WCIcon, Composite, Spinner } from '@wordpress/components';
 import { search, check } from '@wordpress/icons';
+import { VisuallyHidden } from '@wordpress/ui';
 
 /**
  * Internal dependencies
  */
 import { getCurrentValue } from './utils';
 import type { Filter, NormalizedFilter, View, Option } from '../../types';
+import useElements from '../../hooks/use-elements';
 
 interface SearchWidgetProps {
 	view: View;
@@ -66,7 +68,7 @@ const MultiSelectionOption = ( { selected }: { selected: boolean } ) => {
 				{ 'is-selected': selected }
 			) }
 		>
-			{ selected && <Icon icon={ check } /> }
+			{ selected && <WCIcon icon={ check } /> }
 		</span>
 	);
 };
@@ -200,7 +202,12 @@ function ListBox( { view, filter, onChangeView }: SearchWidgetProps ) {
 							selected={ currentValue.includes( element.value ) }
 						/>
 					) }
-					<span>{ element.label }</span>
+					<span
+						className="dataviews-filters__search-widget-listitem-value"
+						title={ element.label }
+					>
+						{ element.label }
+					</span>
 				</Composite.Hover>
 			) ) }
 		</Composite>
@@ -256,22 +263,16 @@ function ComboboxList( { view, filter, onChangeView }: SearchWidgetProps ) {
 			setValue={ setSearchValue }
 		>
 			<div className="dataviews-filters__search-widget-filter-combobox__wrapper">
-				<Ariakit.ComboboxLabel
-					render={
-						<VisuallyHidden>
-							{ __( 'Search items' ) }
-						</VisuallyHidden>
-					}
-				>
+				<VisuallyHidden render={ <Ariakit.ComboboxLabel /> }>
 					{ __( 'Search items' ) }
-				</Ariakit.ComboboxLabel>
+				</VisuallyHidden>
 				<Ariakit.Combobox
 					autoSelect="always"
 					placeholder={ __( 'Search' ) }
 					className="dataviews-filters__search-widget-filter-combobox__input"
 				/>
 				<div className="dataviews-filters__search-widget-filter-combobox__icon">
-					<Icon icon={ search } />
+					<WCIcon icon={ search } />
 				</div>
 			</div>
 			<Ariakit.ComboboxList
@@ -301,7 +302,10 @@ function ComboboxList( { view, filter, onChangeView }: SearchWidgetProps ) {
 									) }
 								/>
 							) }
-							<span>
+							<span
+								className="dataviews-filters__search-widget-listitem-value"
+								title={ element.label }
+							>
 								<Ariakit.ComboboxItemValue
 									className="dataviews-filters__search-widget-filter-combobox-item-value"
 									value={ element.label }
@@ -322,6 +326,27 @@ function ComboboxList( { view, filter, onChangeView }: SearchWidgetProps ) {
 }
 
 export default function SearchWidget( props: SearchWidgetProps ) {
-	const Widget = props.filter.elements.length > 10 ? ComboboxList : ListBox;
-	return <Widget { ...props } />;
+	const { elements, isLoading } = useElements( {
+		elements: props.filter.elements,
+		getElements: props.filter.getElements,
+	} );
+
+	if ( isLoading ) {
+		return (
+			<div className="dataviews-filters__search-widget-no-elements">
+				<Spinner />
+			</div>
+		);
+	}
+
+	if ( elements.length === 0 ) {
+		return (
+			<div className="dataviews-filters__search-widget-no-elements">
+				{ __( 'No elements found' ) }
+			</div>
+		);
+	}
+
+	const Widget = elements.length > 10 ? ComboboxList : ListBox;
+	return <Widget { ...props } filter={ { ...props.filter, elements } } />;
 }

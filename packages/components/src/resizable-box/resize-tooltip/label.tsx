@@ -35,7 +35,7 @@ type LabelProps = React.DetailedHTMLProps<
 function Label(
 	{ label, position = POSITIONS.corner, zIndex = 1000, ...props }: LabelProps,
 	ref: ForwardedRef< HTMLDivElement >
-): JSX.Element | null {
+) {
 	const showLabel = !! label;
 
 	const isBottom = position === POSITIONS.bottom;

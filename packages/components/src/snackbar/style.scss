@@ -1,3 +1,9 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/z-index" as *;
+@use "../utils/theme-variables" as *;
+
 .components-snackbar {
 	font-family: $default-font;
 	font-size: $default-font-size;
@@ -8,9 +14,9 @@
 	color: $white;
 	padding: $grid-unit-15 ($grid-unit-05 * 5);
 	width: 100%;
-	max-width: 600px;
+	max-width: var(--wpds-dimension-surface-width-lg);
 	box-sizing: border-box;
-	cursor: pointer;
+	cursor: var(--wpds-cursor-control);
 
 	// Re-enable pointer events, which are disabled by the
 	// .components-snackbar-list styles.
@@ -41,7 +47,7 @@
 
 	.components-snackbar__dismiss-button {
 		margin-left: $grid-unit-30;
-		cursor: pointer;
+		cursor: var(--wpds-cursor-control);
 	}
 }
 

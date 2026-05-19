@@ -33,12 +33,19 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
+                event: ['${{ github.event_name }}']
                 node: ['20', '22', '24']
                 shard: ['1/4', '2/4', '3/4', '4/4']
+                exclude:
+                    # On PRs: Only test Node 20
+                    - event: 'pull_request'
+                      node: '22'
+                    - event: 'pull_request'
+                      node: '24'
 
         steps:
             - name: Checkout repository
-              uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+              uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
                   persist-credentials: false
@@ -78,11 +85,18 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
+                event: ['${{ github.event_name }}']
                 node: ['20', '22', '24']
+                exclude:
+                    # On PRs: Only test Node 20
+                    - event: 'pull_request'
+                      node: '22'
+                    - event: 'pull_request'
+                      node: '24'
 
         steps:
             - name: Checkout repository
-              uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+              uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
                   persist-credentials: false
@@ -140,7 +154,7 @@ jobs:
         permissions:
             contents: read
         steps:
-            - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+            - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
                   persist-credentials: false
@@ -149,15 +163,14 @@ jobs:
               uses: ./.github/setup-node
 
             - name: Run build scripts
-              run: npm run build
+              run: npm run build -- --skip-types
 
             - name: Upload built JavaScript assets
-              uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.3.3
+              uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
               with:
                   name: build-assets
                   path: |
                       ./build/
-                      ./build-module/
 
     test-php:
         name: PHP ${{ matrix.php }}${{ matrix.multisite && ' multisite' || '' }}${{ matrix.wordpress != '' && format( ' (WP {0}) ', matrix.wordpress ) || '' }} on Linux
@@ -170,23 +183,28 @@ jobs:
         strategy:
             fail-fast: true
             matrix:
-                php:
-                    - '7.2'
-                    - '7.3'
-                    - '7.4'
-                    - '8.0'
-                    - '8.1'
-                    - '8.2'
-                    - '8.3'
+                event: ['${{ github.event_name }}']
+                php: ['7.4', '8.0', '8.1', '8.2', '8.3']
                 multisite: [false, true]
-                wordpress: [''] # Latest WordPress version.
-                include:
-                    # Test with the previous WP version.
-                    - php: '7.2'
+                wordpress: ['', 'previous major version']
+                exclude:
+                    # On PRs: Only test PHP 7.4 and 8.3, single-site, latest WP
+                    - event: 'pull_request'
+                      php: '8.0'
+                    - event: 'pull_request'
+                      php: '8.1'
+                    - event: 'pull_request'
+                      php: '8.2'
+                    - event: 'pull_request'
+                      multisite: true
+                    - event: 'pull_request'
                       wordpress: 'previous major version'
-                    - php: '7.4'
+                    # On trunk/releases: Only test previous WP version with specific PHP versions
+                    - php: '8.0'
                       wordpress: 'previous major version'
-                    - php: '8.3'
+                    - php: '8.1'
+                      wordpress: 'previous major version'
+                    - php: '8.2'
                       wordpress: 'previous major version'
 
         env:
@@ -195,7 +213,7 @@ jobs:
 
         steps:
             - name: Checkout repository
-              uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+              uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
                   persist-credentials: false
@@ -211,29 +229,24 @@ jobs:
             # dependency versions are installed and cached.
             ##
             - name: Set up PHP
-              uses: shivammathur/setup-php@ec406be512d7077f68eed36e63f4d91bc006edc4 # v2.35.4
+              uses: shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f # v2.37.0
               with:
                   php-version: '${{ matrix.php }}'
                   ini-file: development
                   coverage: none
 
-            # Ensure that Composer installs the correct versions of packages.
-            - name: Override PHP version in composer.json
-              env:
-                  VERSION: ${{ matrix.php }}
-              run: composer config platform.php "$VERSION"
-
             # Since Composer dependencies are installed using `composer update` and no lock file is in version control,
             # passing a custom cache suffix ensures that the cache is flushed at least once per week.
             - name: Install Composer dependencies
-              uses: ramsey/composer-install@3cf229dc2919194e9e36783941438d17239e8520 # v3.1.1
+              uses: ramsey/composer-install@65e4f84970763564f46a70b8a54b90d033b3bdda # v4.0.0
               with:
                   custom-cache-suffix: $(/bin/date -u --date='last Mon' "+%F")
 
             - name: Download built JavaScript assets
-              uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
+              uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
               with:
                   name: build-assets
+                  path: build
 
             - name: Docker debug information
               run: |
@@ -248,20 +261,20 @@ jobs:
                   locale -a
 
             - name: Start Docker environment
-              run: npm run wp-env start
+              run: npm run wp-env-test start
 
             - name: Log running Docker containers
               run: docker ps -a
 
             - name: Docker container debug information
               run: |
-                  npm run wp-env run tests-mysql mysql -- --version
-                  npm run wp-env run tests-wordpress php -- --version
-                  npm run wp-env run tests-wordpress php -m
-                  npm run wp-env run tests-wordpress php -i
-                  npm run wp-env run tests-wordpress /var/www/html/wp-content/plugins/gutenberg/vendor/bin/phpunit -- --version
-                  npm run wp-env run tests-wordpress locale -a
-                  npm run wp-env run tests-cli wp core version
+                  npm run wp-env-test -- run mysql mariadb -- --version
+                  npm run wp-env-test -- run wordpress php -- --version
+                  npm run wp-env-test -- run wordpress php -m
+                  npm run wp-env-test -- run wordpress php -i
+                  npm run wp-env-test -- run wordpress /var/www/html/wp-content/plugins/gutenberg/vendor/bin/phpunit -- --version
+                  npm run wp-env-test -- run wordpress locale -a
+                  npm run wp-env-test -- run cli wp core version
 
             - name: Running single site unit tests
               if: ${{ ! matrix.multisite }}
@@ -305,13 +318,13 @@ jobs:
 
         steps:
             - name: Checkout repository
-              uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+              uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
                   persist-credentials: false
 
             - name: Set up PHP
-              uses: shivammathur/setup-php@ec406be512d7077f68eed36e63f4d91bc006edc4 # v2.35.4
+              uses: shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f # v2.37.0
               with:
                   php-version: '7.4'
                   coverage: none
@@ -324,7 +337,7 @@ jobs:
               run: echo "date=$(/bin/date -u --date='last Mon' "+%F")" >> "$GITHUB_OUTPUT"
 
             - name: Cache PHPCS scan cache
-              uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
+              uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
               with:
                   path: .cache/phpcs.json
                   key: ${{ runner.os }}-date-${{ steps.get-date.outputs.date }}-phpcs-cache-${{ hashFiles('**/composer.json', 'phpcs.xml.dist') }}
@@ -332,7 +345,7 @@ jobs:
             # Since Composer dependencies are installed using `composer update` and no lock file is in version control,
             # passing a custom cache suffix ensures that the cache is flushed at least once per week.
             - name: Install Composer dependencies
-              uses: ramsey/composer-install@3cf229dc2919194e9e36783941438d17239e8520 # v3.1.1
+              uses: ramsey/composer-install@65e4f84970763564f46a70b8a54b90d033b3bdda # v4.0.0
               with:
                   custom-cache-suffix: ${{ steps.get-date.outputs.date }}
 
@@ -369,38 +382,3 @@ jobs:
             - name: Mark the job as passed if all the checks pass
               if: ${{ needs.test-php.result == 'success' && needs.phpcs.result == 'success' }}
               run: exit 0
-
-    mobile-unit-js:
-        name: Mobile
-        runs-on: 'ubuntu-24.04'
-        permissions:
-            contents: read
-        # React 19 breaks these tests, and upgrading React Native to a compatible version is paused.
-        # See: https://github.com/WordPress/gutenberg/issues/71336
-        if: false
-        #if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
-
-        steps:
-            - name: Checkout repository
-              uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
-              with:
-                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
-                  persist-credentials: false
-
-            - name: Determine the number of CPU cores
-              uses: SimenB/github-actions-cpu-cores@97ba232459a8e02ff6121db9362b09661c875ab8 # v2.0.0
-              id: cpu-cores
-
-            - name: Setup Node.js and install dependencies
-              uses: ./.github/setup-node
-
-            - name: Run build scripts
-              # It's not necessary to run the full build, since Jest can interpret
-              # source files with `babel-jest`. Some packages have their own custom
-              # build tasks, however. These must be run.
-              run: npx lerna run build
-
-            - name: Running the tests
-              env:
-                  MAXWORKERS: ${{ steps.cpu-cores.outputs.count }}
-              run: npm run test:native -- --ci --maxWorkers="$MAXWORKERS" --cacheDirectory="$HOME/.jest-cache"

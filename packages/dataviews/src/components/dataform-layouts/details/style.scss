@@ -1,0 +1,8 @@
+.dataforms-layouts-details__summary-content {
+	display: inline-flex;
+	min-height: calc(var(--wpds-dimension-base) * 6); // TODO: use size token when available
+}
+
+.dataforms-layouts-details__content {
+	padding-top: var(--wpds-dimension-padding-md);
+}

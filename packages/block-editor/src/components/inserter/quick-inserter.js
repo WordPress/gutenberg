@@ -89,7 +89,6 @@ export default function QuickInserter( {
 		>
 			{ showSearch && (
 				<SearchControl
-					__nextHasNoMarginBottom
 					className="block-editor-inserter__search"
 					value={ filterValue }
 					onChange={ ( value ) => {

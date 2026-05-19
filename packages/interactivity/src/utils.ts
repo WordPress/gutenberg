@@ -9,7 +9,7 @@ import {
 	type EffectCallback,
 	type Inputs,
 } from 'preact/hooks';
-import { effect } from '@preact/signals';
+import { effect, signal } from '@preact/signals';
 
 /**
  * Internal dependencies
@@ -24,13 +24,17 @@ interface Flusher {
 
 declare global {
 	interface Window {
-		scheduler?: {
-			readonly yield?: () => Promise< void >;
+		scheduler: {
+			postTask: (
+				callback: () => unknown,
+				options?: object
+			) => Promise< unknown >;
+			yield: () => Promise< void >;
 		};
 	}
 }
 
-interface SyncAwareFunction extends Function {
+export interface SyncAwareFunction extends Function {
 	sync?: boolean;
 }
 
@@ -68,6 +72,27 @@ export const splitTask =
 					setTimeout( resolve, 0 );
 				} );
 		  };
+/**
+ * Executes the passed callback on `DOMContentLoaded`, or immediately if that
+ * event has already been triggered.
+ *
+ * This function depends on `PerformanceNavigationTiming` (see
+ * https://developer.mozilla.org/en-US/docs/Web/API/PerformanceNavigationTiming) to
+ * detect whether the event has been dispatched.
+ *
+ * @param callback Function to execute on `DOMContentLoaded`.
+ */
+export const onDOMReady = ( callback: () => void ) => {
+	const [ navigation ] = performance.getEntriesByType( 'navigation' );
+	if (
+		( navigation as PerformanceNavigationTiming )
+			.domContentLoadedEventStart > 0
+	) {
+		callback();
+	} else {
+		document.addEventListener( 'DOMContentLoaded', callback );
+	}
+};
 
 /**
  * Creates a Flusher object that can be used to flush computed values and notify listeners.
@@ -333,6 +358,9 @@ export const createRootFragment = (
 		removeChild( c: Node ) {
 			parent.removeChild( c );
 		},
+		contains( c: Node ) {
+			parent.contains( c );
+		},
 	} );
 };
 
@@ -373,7 +401,7 @@ export const warn = ( message: string ): void => {
 		// A consumer can use 'pause on caught exceptions'
 		try {
 			throw Error( message );
-		} catch ( e ) {
+		} catch {
 			// Do nothing.
 		}
 		logged.add( message );
@@ -406,4 +434,109 @@ export function withSyncEvent( callback: Function ): SyncAwareFunction {
 	const syncAware = callback as SyncAwareFunction;
 	syncAware.sync = true;
 	return syncAware;
+}
+
+export type DeepReadonly< T > = T extends ( ...args: any[] ) => any
+	? T
+	: T extends object
+	? { readonly [ K in keyof T ]: DeepReadonly< T[ K ] > }
+	: T;
+
+// WeakMap cache to reuse proxies for the same read-only objects.
+const readOnlyMap = new WeakMap< object, object >();
+
+/**
+ * Creates a proxy handler that prevents any modifications to the target object.
+ *
+ * @param errorMessage Custom error message to display when modification is attempted.
+ * @return Proxy handler for read-only behavior.
+ */
+const createDeepReadOnlyHandlers = (
+	errorMessage: string
+): ProxyHandler< object > => {
+	const handleError = () => {
+		if ( globalThis.SCRIPT_DEBUG ) {
+			warn( errorMessage );
+		}
+		return false;
+	};
+
+	return {
+		get( target, prop ) {
+			const value = target[ prop ];
+			if ( value && typeof value === 'object' ) {
+				return deepReadOnly( value, { errorMessage } );
+			}
+			return value;
+		},
+		set: handleError,
+		deleteProperty: handleError,
+		defineProperty: handleError,
+	};
+};
+
+/**
+ * Creates a deeply read-only proxy of an object.
+ *
+ * This function recursively wraps an object and all its nested objects in
+ * proxies that prevent any modifications. All mutation operations (`set`,
+ * `deleteProperty`, and `defineProperty`) will silently fail in production and
+ * emit warnings in development (when `globalThis.SCRIPT_DEBUG` is true).
+ *
+ * The wrapping is lazy: nested objects are only wrapped when accessed, making
+ * this efficient for large or deeply nested structures.
+ *
+ * Proxies are cached using a WeakMap, so calling this function multiple times
+ * with the same object will return the same proxy instance.
+ *
+ * @param obj                  The object to make read-only.
+ * @param options              Optional configuration.
+ * @param options.errorMessage Custom error message to display when modification is attempted.
+ * @return A read-only proxy of the object.
+ */
+export function deepReadOnly< T extends object >(
+	obj: T,
+	options?: { errorMessage?: string }
+): T {
+	const errorMessage =
+		options?.errorMessage ?? 'Cannot modify read-only object';
+
+	if ( ! readOnlyMap.has( obj ) ) {
+		const handlers = createDeepReadOnlyHandlers( errorMessage );
+		readOnlyMap.set( obj, new Proxy( obj, handlers ) );
+	}
+
+	return readOnlyMap.get( obj ) as T;
+}
+
+export const navigationSignal = signal( 0 );
+
+/**
+ * Unique identifier for the current browser session of the interactivity
+ * runtime. Generated once when the module is first evaluated. Used by the
+ * router to tag history entries so that, after a full page reload, popstate
+ * events for entries created in a previous session trigger a full reload
+ * instead of a client-side navigation that would leave stale content.
+ */
+export const sessionId = Math.random().toString( 36 ).slice( 2 );
+
+/**
+ * Recursively clones the passed object.
+ *
+ * @param source Source object.
+ * @return Cloned object.
+ */
+export function deepClone< T >( source: T ): T {
+	if ( isPlainObject( source ) ) {
+		return Object.fromEntries(
+			Object.entries( source as object ).map( ( [ key, value ] ) => [
+				key,
+				deepClone( value ),
+			] )
+		) as T;
+	}
+	if ( Array.isArray( source ) ) {
+		return source.map( ( i ) => deepClone( i ) ) as T;
+	}
+	return source;
 }

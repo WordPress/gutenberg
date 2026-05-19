@@ -1,3 +1,5 @@
+@use "@wordpress/base-styles/mixins" as *;
+
 ul.wp-block-rss { // The ul is needed for specificity to override the reset styles in the editor.
 
 	&.alignleft {

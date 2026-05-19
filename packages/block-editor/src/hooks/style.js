@@ -1,8 +1,15 @@
 /**
  * WordPress dependencies
  */
-import { useMemo } from '@wordpress/element';
+import { useMemo, useState } from '@wordpress/element';
+import {
+	ToggleControl,
+	__experimentalSpacer as Spacer,
+} from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 import { addFilter } from '@wordpress/hooks';
+import { useSelect } from '@wordpress/data';
+import { mergeGlobalStyles } from '@wordpress/global-styles-engine';
 import {
 	getBlockSupport,
 	hasBlockSupport,
@@ -28,12 +35,22 @@ import {
 	DimensionsPanel,
 } from './dimensions';
 import {
+	cleanEmptyObject,
 	shouldSkipSerialization,
 	useStyleOverride,
 	useBlockSettings,
 } from './utils';
+import { BlockStyleStateProvider } from './block-style-state';
+import { BlockStateBadges, VALID_BLOCK_PSEUDO_STATES } from './states';
+import { buildStateSelector, buildCanvasStateSelector } from './state-utils';
+import { BlockInspectorPreTabsFill } from '../components/block-inspector/inspector-pre-tabs-slot-fill';
 import { scopeSelector } from '../components/global-styles/utils';
 import { useBlockEditingMode } from '../components/block-editing-mode';
+import { store as blockEditorStore } from '../store';
+import { globalStylesDataKey } from '../store/private-keys';
+import { unlock } from '../lock-unlock';
+
+const BORDER_SIDES = [ 'Top', 'Right', 'Bottom', 'Left' ];
 
 const styleSupportKeys = [
 	...TYPOGRAPHY_SUPPORT_KEYS,
@@ -67,6 +84,71 @@ export function getInlineStyles( styles = {} ) {
 }
 
 /**
+ * Returns fallback border styles for visible state border styles.
+ *
+ * State styles are emitted as stylesheet rules rather than inline styles, so
+ * they cannot rely on the block-library inline-style attribute fallback rules.
+ *
+ * @param {Object} stateStyles State style object.
+ * @return {Object|undefined} Style object containing fallback border styles.
+ */
+function getStateFallbackBorderStyles( stateStyles ) {
+	const border = stateStyles?.border;
+	if ( ! border ) {
+		return undefined;
+	}
+
+	const hasBorderStyle = !! border.style;
+	const hasBorderColor = !! border.color;
+	const hasBorderWidth = !! border.width;
+	const fallbackBorder = {};
+
+	if ( ! hasBorderStyle && ( hasBorderColor || hasBorderWidth ) ) {
+		fallbackBorder.style = 'solid';
+	}
+
+	BORDER_SIDES.forEach( ( side ) => {
+		const sideKey = side.toLowerCase();
+		const sideBorder = border[ sideKey ];
+		const hasSideStyle = !! sideBorder?.style;
+		const hasSideColor = !! sideBorder?.color;
+		const hasSideWidth = !! sideBorder?.width;
+
+		if (
+			! hasBorderStyle &&
+			! hasSideStyle &&
+			( hasSideColor || hasSideWidth )
+		) {
+			fallbackBorder[ sideKey ] = { style: 'solid' };
+		}
+	} );
+
+	return cleanEmptyObject( { border: cleanEmptyObject( fallbackBorder ) } );
+}
+
+/**
+ * Generates CSS for a block instance state style object.
+ *
+ * State declarations need to win over preset utility classes, but fallback
+ * border styles should not become important because they must not override
+ * explicitly authored default border styles.
+ *
+ * @param {Object} stateStyles State style object.
+ * @param {string} selector    CSS selector for the generated style.
+ * @return {string} Generated stylesheet.
+ */
+export function getStateStylesCSS( stateStyles, selector ) {
+	const css = compileCSS( stateStyles, { selector } );
+	const importantCSS = css ? css.replace( /;/g, ' !important;' ) : undefined;
+	const fallbackBorderStyles = getStateFallbackBorderStyles( stateStyles );
+	const fallbackCSS = fallbackBorderStyles
+		? compileCSS( fallbackBorderStyles, { selector } )
+		: undefined;
+
+	return [ importantCSS, fallbackCSS ].filter( Boolean ).join( '\n' );
+}
+
+/**
  * Filters registered block settings, extending attributes to include `style` attribute.
  *
  * @param {Object} settings Original block settings.
@@ -74,7 +156,10 @@ export function getInlineStyles( styles = {} ) {
  * @return {Object} Filtered block settings.
  */
 function addAttribute( settings ) {
-	if ( ! hasStyleSupport( settings ) ) {
+	if (
+		! hasStyleSupport( settings ) &&
+		! hasBlockSupport( settings, 'customCSS', true )
+	) {
 		return settings;
 	}
 
@@ -324,34 +409,110 @@ function BlockStyleControls( {
 	clientId,
 	name,
 	setAttributes,
+	style,
 	__unstableParentLayout,
 } ) {
 	const settings = useBlockSettings( name, __unstableParentLayout );
 	const blockEditingMode = useBlockEditingMode();
+	const [ showStateOnCanvas, setShowStateOnCanvas ] = useState( true );
+	const { globalBlockStyles, selectedState } = useSelect(
+		( select ) => {
+			const blockEditorSelect = select( blockEditorStore );
+			return {
+				globalBlockStyles:
+					blockEditorSelect.getSettings()[ globalStylesDataKey ]
+						?.blocks?.[ name ],
+				selectedState:
+					unlock( blockEditorSelect ).getSelectedBlockStyleState(
+						clientId
+					),
+			};
+		},
+		[ clientId, name ]
+	);
+	const globalStateValue = globalBlockStyles?.[ selectedState ];
+	const instanceStateValue = style?.[ selectedState ];
+
+	// Inject state styles onto the editor canvas so the selected state is
+	// visible while editing. Scoped to this block instance via data-block so
+	// other blocks of the same type are not affected. Must be called before
+	// any early returns because it is a hook.
+	const canvasStateCSS = useMemo( () => {
+		if ( ! showStateOnCanvas || selectedState === 'default' ) {
+			return undefined;
+		}
+		let stateValue;
+
+		if ( globalStateValue && instanceStateValue ) {
+			stateValue = mergeGlobalStyles(
+				globalStateValue,
+				instanceStateValue
+			);
+		} else if ( instanceStateValue ) {
+			stateValue = instanceStateValue;
+		} else if ( globalStateValue ) {
+			stateValue = globalStateValue;
+		} else {
+			return undefined;
+		}
+
+		const selector = buildCanvasStateSelector( clientId, name );
+		return getStateStylesCSS( stateValue, selector );
+	}, [
+		showStateOnCanvas,
+		selectedState,
+		globalStateValue,
+		instanceStateValue,
+		clientId,
+		name,
+	] );
+	useStyleOverride( { css: canvasStateCSS } );
+
+	if ( blockEditingMode !== 'default' ) {
+		return null;
+	}
+
+	const panelSettings = {
+		...settings,
+		typography: {
+			...settings.typography,
+			// The text alignment UI for individual blocks is rendered in
+			// the block toolbar, so disable it here.
+			textAlign: false,
+		},
+	};
+
 	const passedProps = {
 		clientId,
 		name,
 		setAttributes,
-		settings: {
-			...settings,
-			typography: {
-				...settings.typography,
-				// The text alignment UI for individual blocks is rendered in
-				// the block toolbar, so disable it here.
-				textAlign: false,
-			},
-		},
+		settings: panelSettings,
 	};
-	if ( blockEditingMode !== 'default' ) {
-		return null;
-	}
+
 	return (
 		<>
-			<ColorEdit { ...passedProps } />
-			<BackgroundImagePanel { ...passedProps } />
-			<TypographyPanel { ...passedProps } />
-			<BorderPanel { ...passedProps } />
-			<DimensionsPanel { ...passedProps } />
+			{ selectedState !== 'default' && (
+				<BlockInspectorPreTabsFill>
+					<Spacer paddingX={ 4 } paddingY={ 2 }>
+						<ToggleControl
+							label={ __( 'Show state on canvas' ) }
+							checked={ showStateOnCanvas }
+							onChange={ setShowStateOnCanvas }
+						/>
+						<BlockStateBadges
+							name={ name }
+							value={ selectedState }
+						/>
+					</Spacer>
+				</BlockInspectorPreTabsFill>
+			) }
+			<BlockStyleStateProvider value={ selectedState }>
+				<ColorEdit { ...passedProps } />
+				<BackgroundImagePanel { ...passedProps } />
+				<TypographyPanel { ...passedProps } />
+				<BorderPanel { ...passedProps } />
+				<DimensionsPanel { ...passedProps } />
+			</BlockStyleStateProvider>
 		</>
 	);
 }
@@ -379,6 +540,84 @@ const elementTypes = [
 // Used for generating the instance ID
 const STYLE_BLOCK_PROPS_REFERENCE = {};
 
+/**
+ * Generates CSS rules for block element styles (buttons, links, headings, etc.).
+ *
+ * Iterates over supported element types and compiles their styles, including
+ * pseudo-selectors (e.g. :hover) and related sub-elements (e.g. h1-h6 for headings),
+ * into scoped CSS rule strings.
+ *
+ * @param {Object} blockElementStyles The block's `style.elements` object.
+ * @param {string} blockName          The block name, used for skip-serialization checks.
+ * @param {string} baseSelector       The base CSS selector to scope rules under.
+ * @return {string|undefined} Concatenated CSS rules string, or undefined if none.
+ */
+function getElementCSSRules( blockElementStyles, blockName, baseSelector ) {
+	if ( ! blockElementStyles ) {
+		return;
+	}
+
+	const rules = [];
+
+	elementTypes.forEach( ( { elementType, pseudo, elements } ) => {
+		const skipSerialization = shouldSkipSerialization(
+			blockName,
+			COLOR_SUPPORT_KEY,
+			elementType
+		);
+
+		if ( skipSerialization ) {
+			return;
+		}
+
+		const elementStyles = blockElementStyles?.[ elementType ];
+
+		// Process primary element type styles.
+		if ( elementStyles ) {
+			const selector = scopeSelector(
+				baseSelector,
+				ELEMENTS[ elementType ]
+			);
+
+			rules.push( compileCSS( elementStyles, { selector } ) );
+
+			// Process any interactive states for the element type.
+			if ( pseudo ) {
+				pseudo.forEach( ( pseudoSelector ) => {
+					if ( elementStyles[ pseudoSelector ] ) {
+						rules.push(
+							compileCSS( elementStyles[ pseudoSelector ], {
+								selector: scopeSelector(
+									baseSelector,
+									`${ ELEMENTS[ elementType ] }${ pseudoSelector }`
+								),
+							} )
+						);
+					}
+				} );
+			}
+		}
+
+		// Process related elements e.g. h1-h6 for headings
+		if ( elements ) {
+			elements.forEach( ( element ) => {
+				if ( blockElementStyles[ element ] ) {
+					rules.push(
+						compileCSS( blockElementStyles[ element ], {
+							selector: scopeSelector(
+								baseSelector,
+								ELEMENTS[ element ]
+							),
+						} )
+					);
+				}
+			} );
+		}
+	} );
+
+	return rules.length > 0 ? rules.join( '' ) : undefined;
+}
+
 function useBlockProps( { name, style } ) {
 	const blockElementsContainerIdentifier = useInstanceId(
 		STYLE_BLOCK_PROPS_REFERENCE,
@@ -389,74 +628,38 @@ function useBlockProps( { name, style } ) {
 	const blockElementStyles = style?.elements;
 
 	const styles = useMemo( () => {
-		if ( ! blockElementStyles ) {
-			return;
+		const cssRules = [];
+
+		const elementCSS = getElementCSSRules(
+			blockElementStyles,
+			name,
+			baseElementSelector
+		);
+		if ( elementCSS ) {
+			cssRules.push( elementCSS );
 		}
 
-		const elementCSSRules = [];
-
-		elementTypes.forEach( ( { elementType, pseudo, elements } ) => {
-			const skipSerialization = shouldSkipSerialization(
-				name,
-				COLOR_SUPPORT_KEY,
-				elementType
-			);
-
-			if ( skipSerialization ) {
-				return;
-			}
-
-			const elementStyles = blockElementStyles?.[ elementType ];
-
-			// Process primary element type styles.
-			if ( elementStyles ) {
-				const selector = scopeSelector(
-					baseElementSelector,
-					ELEMENTS[ elementType ]
-				);
-
-				elementCSSRules.push(
-					compileCSS( elementStyles, { selector } )
-				);
-
-				// Process any interactive states for the element type.
-				if ( pseudo ) {
-					pseudo.forEach( ( pseudoSelector ) => {
-						if ( elementStyles[ pseudoSelector ] ) {
-							elementCSSRules.push(
-								compileCSS( elementStyles[ pseudoSelector ], {
-									selector: scopeSelector(
-										baseElementSelector,
-										`${ ELEMENTS[ elementType ] }${ pseudoSelector }`
-									),
-								} )
-							);
-						}
-					} );
-				}
-			}
-
-			// Process related elements e.g. h1-h6 for headings
-			if ( elements ) {
-				elements.forEach( ( element ) => {
-					if ( blockElementStyles[ element ] ) {
-						elementCSSRules.push(
-							compileCSS( blockElementStyles[ element ], {
-								selector: scopeSelector(
-									baseElementSelector,
-									ELEMENTS[ element ]
-								),
-							} )
-						);
+		// Generate per-instance pseudo-state CSS (e.g., :hover, :focus).
+		const validStates = VALID_BLOCK_PSEUDO_STATES[ name ];
+		if ( validStates ) {
+			validStates.forEach( ( state ) => {
+				const stateStyles = style?.[ state ];
+				if ( stateStyles ) {
+					const selector = buildStateSelector(
+						baseElementSelector,
+						name,
+						state
+					);
+					const css = getStateStylesCSS( stateStyles, selector );
+					if ( css ) {
+						cssRules.push( css );
 					}
-				} );
-			}
-		} );
+				}
+			} );
+		}
 
-		return elementCSSRules.length > 0
-			? elementCSSRules.join( '' )
-			: undefined;
-	}, [ baseElementSelector, blockElementStyles, name ] );
+		return cssRules.length > 0 ? cssRules.join( '' ) : undefined;
+	}, [ baseElementSelector, blockElementStyles, name, style ] );
 
 	useStyleOverride( { css: styles } );
 

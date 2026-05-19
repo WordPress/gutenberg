@@ -3,6 +3,10 @@
 /** @type {import('stylelint').Config} */
 module.exports = {
 	extends: [ 'stylelint-config-recommended' ].map( require.resolve ),
+	plugins: [
+		'@wordpress/theme/stylelint-plugins/no-unknown-ds-tokens',
+		'@wordpress/theme/stylelint-plugins/no-setting-wpds-custom-properties',
+	],
 	rules: {
 		'at-rule-empty-line-before': [
 			'always',
@@ -68,6 +72,8 @@ module.exports = {
 		'selector-pseudo-element-colon-notation': 'double',
 		'selector-type-case': 'lower',
 		'value-keyword-case': 'lower',
+		'plugin-wpds/no-setting-wpds-custom-properties': true,
+		'plugin-wpds/no-unknown-ds-tokens': true,
 
 		/* Disable new rules from stylelint-config-recommended 7 > 14 */
 		'function-no-unknown': null,

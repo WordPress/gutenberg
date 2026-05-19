@@ -56,7 +56,6 @@ const AvatarInspectorControls = ( {
 					onDeselect={ () => setAttributes( { size: 96 } ) }
 				>
 					<RangeControl
-						__nextHasNoMarginBottom
 						__next40pxDefaultSize
 						label={ __( 'Image size' ) }
 						onChange={ ( newSize ) =>
@@ -77,7 +76,6 @@ const AvatarInspectorControls = ( {
 					onDeselect={ () => setAttributes( { isLink: false } ) }
 				>
 					<ToggleControl
-						__nextHasNoMarginBottom
 						label={ __( 'Link to user profile' ) }
 						onChange={ () =>
 							setAttributes( { isLink: ! attributes.isLink } )
@@ -95,7 +93,6 @@ const AvatarInspectorControls = ( {
 						}
 					>
 						<ToggleControl
-							__nextHasNoMarginBottom
 							label={ __( 'Open in new tab' ) }
 							onChange={ ( value ) =>
 								setAttributes( {
@@ -130,6 +127,19 @@ const AvatarInspectorControls = ( {
 	);
 };
 
+const AvatarLinkWrapper = ( { children, isLink } ) =>
+	isLink ? (
+		<a
+			href="#avatar-pseudo-link"
+			className="wp-block-avatar__link"
+			onClick={ ( event ) => event.preventDefault() }
+		>
+			{ children }
+		</a>
+	) : (
+		children
+	);
+
 const ResizableAvatar = ( {
 	setAttributes,
 	attributes,
@@ -146,43 +156,46 @@ const ResizableAvatar = ( {
 	);
 	return (
 		<div { ...blockProps }>
-			<ResizableBox
-				size={ {
-					width: attributes.size,
-					height: attributes.size,
-				} }
-				showHandle={ isSelected }
-				onResizeStop={ ( event, direction, elt, delta ) => {
-					setAttributes( {
-						size: parseInt(
-							attributes.size + ( delta.height || delta.width ),
-							10
-						),
-					} );
-				} }
-				lockAspectRatio
-				enable={ {
-					top: false,
-					right: ! isRTL(),
-					bottom: true,
-					left: isRTL(),
-				} }
-				minWidth={ avatar.minSize }
-				maxWidth={ avatar.maxSize }
-			>
-				<img
-					src={ doubledSizedSrc }
-					alt={ avatar.alt }
-					className={ clsx(
-						'avatar',
-						'avatar-' + attributes.size,
-						'photo',
-						'wp-block-avatar__image',
-						borderProps.className
-					) }
-					style={ borderProps.style }
-				/>
-			</ResizableBox>
+			<AvatarLinkWrapper isLink={ attributes.isLink }>
+				<ResizableBox
+					size={ {
+						width: attributes.size,
+						height: attributes.size,
+					} }
+					showHandle={ isSelected }
+					onResizeStop={ ( event, direction, elt, delta ) => {
+						setAttributes( {
+							size: parseInt(
+								attributes.size +
+									( delta.height || delta.width ),
+								10
+							),
+						} );
+					} }
+					lockAspectRatio
+					enable={ {
+						top: false,
+						right: ! isRTL(),
+						bottom: true,
+						left: isRTL(),
+					} }
+					minWidth={ avatar.minSize }
+					maxWidth={ avatar.maxSize }
+				>
+					<img
+						src={ doubledSizedSrc }
+						alt={ avatar.alt }
+						className={ clsx(
+							'avatar',
+							'avatar-' + attributes.size,
+							'photo',
+							'wp-block-avatar__image',
+							borderProps.className
+						) }
+						style={ borderProps.style }
+					/>
+				</ResizableBox>
+			</AvatarLinkWrapper>
 		</div>
 	);
 };
@@ -198,29 +211,13 @@ const CommentEdit = ( { attributes, context, setAttributes, isSelected } ) => {
 				attributes={ attributes }
 				selectUser={ false }
 			/>
-			{ attributes.isLink ? (
-				<a
-					href="#avatar-pseudo-link"
-					className="wp-block-avatar__link"
-					onClick={ ( event ) => event.preventDefault() }
-				>
-					<ResizableAvatar
-						attributes={ attributes }
-						avatar={ avatar }
-						blockProps={ blockProps }
-						isSelected={ isSelected }
-						setAttributes={ setAttributes }
-					/>
-				</a>
-			) : (
-				<ResizableAvatar
-					attributes={ attributes }
-					avatar={ avatar }
-					blockProps={ blockProps }
-					isSelected={ isSelected }
-					setAttributes={ setAttributes }
-				/>
-			) }
+			<ResizableAvatar
+				attributes={ attributes }
+				avatar={ avatar }
+				blockProps={ blockProps }
+				isSelected={ isSelected }
+				setAttributes={ setAttributes }
+			/>
 		</>
 	);
 };
@@ -241,29 +238,14 @@ const UserEdit = ( { attributes, context, setAttributes, isSelected } ) => {
 				avatar={ avatar }
 				setAttributes={ setAttributes }
 			/>
-			{ attributes.isLink ? (
-				<a
-					href="#avatar-pseudo-link"
-					className="wp-block-avatar__link"
-					onClick={ ( event ) => event.preventDefault() }
-				>
-					<ResizableAvatar
-						attributes={ attributes }
-						avatar={ avatar }
-						blockProps={ blockProps }
-						isSelected={ isSelected }
-						setAttributes={ setAttributes }
-					/>
-				</a>
-			) : (
-				<ResizableAvatar
-					attributes={ attributes }
-					avatar={ avatar }
-					blockProps={ blockProps }
-					isSelected={ isSelected }
-					setAttributes={ setAttributes }
-				/>
-			) }
+
+			<ResizableAvatar
+				attributes={ attributes }
+				avatar={ avatar }
+				blockProps={ blockProps }
+				isSelected={ isSelected }
+				setAttributes={ setAttributes }
+			/>
 		</>
 	);
 };

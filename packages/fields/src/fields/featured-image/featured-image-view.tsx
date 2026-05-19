@@ -1,30 +1,18 @@
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
-import { store as coreStore } from '@wordpress/core-data';
 import type { DataViewRenderFieldProps } from '@wordpress/dataviews';
 
 /**
  * Internal dependencies
  */
-import type { BasePost } from '../../types';
+import type { BasePostWithEmbeddedFeaturedMedia } from '../../types';
 
 export const FeaturedImageView = ( {
 	item,
 	config,
-}: DataViewRenderFieldProps< BasePost > ) => {
-	const mediaId = item.featured_media;
-
-	const media = useSelect(
-		( select ) => {
-			const { getEntityRecord } = select( coreStore );
-			return mediaId
-				? getEntityRecord( 'postType', 'attachment', mediaId )
-				: null;
-		},
-		[ mediaId ]
-	);
+}: DataViewRenderFieldProps< BasePostWithEmbeddedFeaturedMedia > ) => {
+	const media = item?._embedded?.[ 'wp:featuredmedia' ]?.[ 0 ];
 	const url = media?.source_url;
 
 	if ( url ) {

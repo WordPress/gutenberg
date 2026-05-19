@@ -24,10 +24,7 @@ import { Context } from './context';
 export const Popover = forwardRef<
 	HTMLDivElement,
 	WordPressComponentProps< PopoverProps, 'div', false >
->( function Popover(
-	{ gutter, children, shift, modal = true, ...otherProps },
-	ref
-) {
+>( function Popover( { gutter, shift, modal = true, ...otherProps }, ref ) {
 	const menuContext = useContext( Context );
 
 	// Extract the side from the applied placement — useful for animations.
@@ -70,8 +67,20 @@ export const Popover = forwardRef<
 		);
 	}
 
+	const renderMenu = useCallback(
+		( htmlProps: React.ComponentPropsWithRef< 'div' > ) => (
+			<Styled.MenuMotionRoot>
+				<Styled.MenuSurface
+					{ ...htmlProps }
+					variant={ menuContext.variant }
+				/>
+			</Styled.MenuMotionRoot>
+		),
+		[ menuContext.variant ]
+	);
+
 	return (
-		<Ariakit.Menu
+		<Styled.Menu
 			{ ...otherProps }
 			ref={ ref }
 			modal={ modal }
@@ -84,20 +93,11 @@ export const Popover = forwardRef<
 			shift={ shift ?? ( menuContext.store.parent ? -4 : 0 ) }
 			hideOnHoverOutside={ false }
 			data-side={ appliedPlacementSide }
+			data-submenu={ !! menuContext.store.parent || undefined }
 			wrapperProps={ wrapperProps }
 			hideOnEscape={ hideOnEscape }
 			unmountOnHide
-			render={ ( renderProps ) => (
-				// Two wrappers are needed for the entry animation, where the menu
-				// container scales with a different factor than its contents.
-				// The {...renderProps} are passed to the inner wrapper, so that the
-				// menu element is the direct parent of the menu item elements.
-				<Styled.PopoverOuterWrapper variant={ menuContext.variant }>
-					<Styled.PopoverInnerWrapper { ...renderProps } />
-				</Styled.PopoverOuterWrapper>
-			) }
-		>
-			{ children }
-		</Ariakit.Menu>
+			render={ renderMenu }
+		/>
 	);
 } );

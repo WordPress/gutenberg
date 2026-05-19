@@ -3,8 +3,12 @@ name: Compressed Size
 on:
     pull_request:
         paths:
-            # Any change to a CSS, Sass, or JavaScript file should run checks.
+            # Any change to a CSS, Sass, or JavaScript/TypeScript file should run checks.
             - '**.js'
+            - '**.ts'
+            - '**.tsx'
+            - '**.cjs'
+            - '**.mjs'
             - '**.css'
             - '**.scss'
             # Changes to any NPM related files could affect the outcome.
@@ -23,6 +27,7 @@ on:
             - 'webpack.config.js'
             # Changes to this workflow file should always verify the changes are successful.
             - '.github/workflows/bundle-size.yml'
+            - bin/packages
 
 # Cancels all previous workflow runs for pull requests that have not completed.
 concurrency:
@@ -44,21 +49,21 @@ jobs:
             pull-requests: write
 
         steps:
-            - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+            - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
               with:
                   fetch-depth: 1
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
                   persist-credentials: false
 
             - name: Use desired version of Node.js
-              uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+              uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
               with:
                   node-version-file: '.nvmrc'
                   check-latest: true
                   cache: npm
 
-            - uses: preactjs/compressed-size-action@946a292cd35bd1088e0d7eb92b69d1a8d5b5d76a # v2.8.0
+            - uses: preactjs/compressed-size-action@66325aad6443cb7cf89c4bfcd414aea2367cda94 # v2.9.1
               with:
                   repo-token: '${{ secrets.GITHUB_TOKEN }}'
-                  pattern: '{build/**/*.min.js,build/**/*.css,build-module/**/*.min.js}'
+                  pattern: '{build/scripts/**/*.min.js,build/styles/**/*.css,build/modules/**/*.min.js}'
                   clean-script: 'distclean'

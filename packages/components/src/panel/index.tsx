@@ -44,5 +44,6 @@ function UnforwardedPanel(
  * ```
  */
 export const Panel = forwardRef( UnforwardedPanel );
+Panel.displayName = 'Panel';
 
 export default Panel;

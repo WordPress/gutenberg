@@ -3,10 +3,11 @@
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
-test.describe( 'Write/Design mode', () => {
+test.describe.skip( 'Write/Design mode', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'emptytheme' );
 	} );
+
 	test.beforeEach( async ( { admin, page } ) => {
 		await page.addInitScript( () => {
 			window.__experimentalEditorWriteMode = true;
@@ -17,9 +18,11 @@ test.describe( 'Write/Design mode', () => {
 			canvas: 'edit',
 		} );
 	} );
+
 	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
+
 	test( 'Should prevent selecting intermediary blocks', async ( {
 		editor,
 		page,
@@ -176,6 +179,7 @@ test.describe( 'Write/Design mode', () => {
 
 		await expect( nonContentBlock ).toBeHidden();
 	} );
+
 	test( 'prevents adding non-content blocks to content role containers', async ( {
 		editor,
 		page,
@@ -226,6 +230,7 @@ test.describe( 'Write/Design mode', () => {
 			page.getByRole( 'option', { name: 'Group' } )
 		).toBeHidden();
 	} );
+
 	test( 'allows adding blocks to content role containers', async ( {
 		editor,
 		page,

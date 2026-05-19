@@ -1,11 +1,17 @@
-// eslint-disable-next-line eslint-comments/disable-enable-pair
+// eslint-disable-next-line @eslint-community/eslint-comments/disable-enable-pair
 /* eslint-disable react-hooks/exhaustive-deps */
 
 /**
  * External dependencies
  */
-import { h as createElement, type VNode, type RefObject } from 'preact';
-import { useContext, useMemo, useRef } from 'preact/hooks';
+import {
+	h as createElement,
+	cloneElement,
+	type VNode,
+	type RefObject,
+} from 'preact';
+import { useContext, useLayoutEffect, useMemo, useRef } from 'preact/hooks';
+import { signal, type Signal } from '@preact/signals';
 
 /**
  * Internal dependencies
@@ -17,6 +23,7 @@ import {
 	warn,
 	splitTask,
 	isPlainObject,
+	deepClone,
 } from './utils';
 import {
 	directive,
@@ -26,29 +33,41 @@ import {
 	type DirectiveCallback,
 	type DirectiveEntry,
 } from './hooks';
-import { getScope } from './scopes';
+import { getScope, navigationContextSignal } from './scopes';
 import { proxifyState, proxifyContext, deepMerge } from './proxies';
+import { PENDING_GETTER } from './proxies/state';
 
-/**
- * Recursively clones the passed object.
- *
- * @param source Source object.
- * @return Cloned object.
- */
-function deepClone< T >( source: T ): T {
-	if ( isPlainObject( source ) ) {
-		return Object.fromEntries(
-			Object.entries( source as object ).map( ( [ key, value ] ) => [
-				key,
-				deepClone( value ),
-			] )
-		) as T;
+const warnUniqueIdWithTwoHyphens = (
+	prefix: string,
+	suffix: string,
+	uniqueId?: string
+) => {
+	if ( globalThis.SCRIPT_DEBUG ) {
+		warn(
+			`The usage of data-wp-${ prefix }--${ suffix }${
+				uniqueId ? `--${ uniqueId }` : ''
+			} (two hyphens for unique ID) is deprecated and will stop working in WordPress 7.1. Please use data-wp-${ prefix }${
+				uniqueId ? `--${ suffix }---${ uniqueId }` : `---${ suffix }`
+			} (three hyphens for unique ID) from now on.`
+		);
 	}
-	if ( Array.isArray( source ) ) {
-		return source.map( ( i ) => deepClone( i ) ) as T;
+};
+
+const warnUniqueIdNotSupported = ( prefix: string, uniqueId: string ) => {
+	if ( globalThis.SCRIPT_DEBUG ) {
+		warn(
+			`Unique IDs are not supported for the data-wp-${ prefix } directive. Ignoring the directive with unique ID "${ uniqueId }".`
+		);
 	}
-	return source;
-}
+};
+
+const warnWithSyncEvent = ( wrongPrefix: string, rightPrefix: string ) => {
+	if ( globalThis.SCRIPT_DEBUG ) {
+		warn(
+			`The usage of data-wp-${ wrongPrefix } is deprecated and will stop working in WordPress 7.0. Please, use data-wp-${ rightPrefix } with the withSyncEvent() helper from now on.`
+		);
+	}
+};
 
 /**
  * Wraps event object to warn about access of synchronous properties and methods.
@@ -71,16 +90,20 @@ function wrapEventAsync( event: Event ) {
 			const value = target[ prop ];
 			switch ( prop ) {
 				case 'currentTarget':
-					warn(
-						`Accessing the synchronous event.${ prop } property in a store action without wrapping it in withSyncEvent() is deprecated and will stop working in WordPress 6.9. Please wrap the store action in withSyncEvent().`
-					);
+					if ( globalThis.SCRIPT_DEBUG ) {
+						warn(
+							`Accessing the synchronous event.${ prop } property in a store action without wrapping it in withSyncEvent() is deprecated and will stop working in WordPress 7.0. Please wrap the store action in withSyncEvent().`
+						);
+					}
 					break;
 				case 'preventDefault':
 				case 'stopImmediatePropagation':
 				case 'stopPropagation':
-					warn(
-						`Using the synchronous event.${ prop }() function in a store action without wrapping it in withSyncEvent() is deprecated and will stop working in WordPress 6.9. Please wrap the store action in withSyncEvent().`
-					);
+					if ( globalThis.SCRIPT_DEBUG ) {
+						warn(
+							`Using the synchronous event.${ prop }() function in a store action without wrapping it in withSyncEvent() is deprecated and will stop working in WordPress 7.0. Please wrap the store action in withSyncEvent().`
+						);
+					}
 					break;
 			}
 			if ( value instanceof Function ) {
@@ -148,7 +171,17 @@ const getGlobalEventDirective = (
 		directives[ `on-${ type }` ]
 			.filter( isNonDefaultDirectiveSuffix )
 			.forEach( ( entry ) => {
-				const eventName = entry.suffix.split( '--', 1 )[ 0 ];
+				const suffixParts = entry.suffix.split( '--', 2 );
+				const eventName = suffixParts[ 0 ];
+				if ( globalThis.SCRIPT_DEBUG ) {
+					if ( suffixParts[ 1 ] ) {
+						warnUniqueIdWithTwoHyphens(
+							`on-${ type }`,
+							suffixParts[ 0 ],
+							suffixParts[ 1 ]
+						);
+					}
+				}
 				useInit( () => {
 					const cb = ( event: Event ) => {
 						const result = evaluate( entry );
@@ -168,6 +201,98 @@ const getGlobalEventDirective = (
 };
 
 /**
+ * Obtains the given item key based on the passed `eachKey` entry. Used by the
+ * `wp-each` directive.
+ *
+ * The item key is computed using `getEvaluate` with a mocked scope simulating
+ * the specific context that inner directives will inherit, i.e., including the
+ * item under the corresponding item prop.
+ *
+ * @param inheritedValue Inherited context value.
+ * @param namespace      Namespace for the `wp-each` directive.
+ * @param item           Item from the list of items pointed by `wp-each`.
+ * @param itemProp       Prop in which the item is accessible from the context.
+ * @param eachKey        Directive entry pointing to the item's key.
+ * @return The evaluated key for the passed item.
+ */
+const evaluateItemKey = (
+	inheritedValue: any,
+	namespace: string,
+	item: unknown,
+	itemProp: string,
+	eachKey?: DirectiveEntry
+) => {
+	// Construct a client context with the item. Note that accessing the item
+	// prop is not reactive, as this simulated context is not proxified.
+	const clientContextWithItem = {
+		...inheritedValue.client,
+		[ namespace ]: {
+			...inheritedValue.client[ namespace ],
+			[ itemProp ]: item,
+		},
+	};
+
+	// Scope must contain the client and the server contexts.
+	const scope = {
+		...getScope(),
+		context: clientContextWithItem,
+		serverContext: inheritedValue.server,
+	};
+
+	// If passed, evaluate `eachKey` entry with the simulated scope. Return
+	// `item` otherwhise.
+	return eachKey ? getEvaluate( { scope } )( eachKey ) : item;
+};
+
+/**
+ * Generates an `Iterable` from the passed items that returns, for each item, a
+ * tuple with the item, its context and its evaluated key. Used by the `wp-each`
+ * directive.
+ *
+ * @param inheritedValue Inherited context value.
+ * @param namespace      Namespace for the `wp-each` directive.
+ * @param items          List of items pointed by `wp-each`.
+ * @param itemProp       Prop in which items are accessible from the context.
+ * @param eachKey        Directive entry pointing to the item's key.
+ * @return Generator that yields items along with their context and key.
+ */
+const useItemContexts = function* (
+	inheritedValue: any,
+	namespace: string,
+	items: Iterable< unknown >,
+	itemProp: string,
+	eachKey?: DirectiveEntry
+): Generator< [ item: unknown, context: any, key: any ] > {
+	const { current: itemContexts } = useRef< Map< any, any > >( new Map() );
+
+	for ( const item of items ) {
+		const key = evaluateItemKey(
+			inheritedValue,
+			namespace,
+			item,
+			itemProp,
+			eachKey
+		);
+
+		if ( ! itemContexts.has( key ) ) {
+			itemContexts.set(
+				key,
+				proxifyContext(
+					proxifyState( namespace, {
+						// Inits the item prop in the context to shadow it in case
+						// it was inherited from the parent context. The actual
+						// value is set in the `wp-each` directive later on.
+						[ itemProp ]: undefined,
+					} ),
+					inheritedValue.client[ namespace ]
+				)
+			);
+		}
+		yield [ item, itemContexts.get( key ), key ];
+	}
+};
+
+/**
  * Creates a directive that adds an async event listener to the global window or
  * document object.
  *
@@ -180,6 +305,9 @@ const getGlobalAsyncEventDirective = (
 		directives[ `on-async-${ type }` ]
 			.filter( isNonDefaultDirectiveSuffix )
 			.forEach( ( entry ) => {
+				if ( globalThis.SCRIPT_DEBUG ) {
+					warnWithSyncEvent( `on-async-${ type }`, `on-${ type }` );
+				}
 				const eventName = entry.suffix.split( '--', 1 )[ 0 ];
 				useInit( () => {
 					const cb = async ( event: Event ) => {
@@ -199,8 +327,22 @@ const getGlobalAsyncEventDirective = (
 	};
 };
 
+/**
+ * Relates each router region with its current vDOM content. Used by the
+ * `router-region` directive.
+ *
+ * Keys are router region IDs, and values are signals with the corresponding
+ * VNode rendered inside. If the value is `null`, that means the regions should
+ * not be rendered. If the value is `undefined`, the region is already contained
+ * inside another router region and does not need to change its children.
+ */
+export const routerRegions = new Map<
+	string,
+	Signal< VNode | null | undefined >
+>();
+
 export default () => {
-	// data-wp-context
+	// data-wp-context---[unique-id]
 	directive(
 		'context',
 		( {
@@ -208,60 +350,94 @@ export default () => {
 			props: { children },
 			context: inheritedContext,
 		} ) => {
-			const { Provider } = inheritedContext;
-			const defaultEntry = context.find( isDefaultDirectiveSuffix );
-			const { client: inheritedClient, server: inheritedServer } =
-				useContext( inheritedContext );
+			const entries = context
+				.filter( isDefaultDirectiveSuffix )
+				// Reverses entries to make the ones with unique IDs override the default one.
+				.reverse();
 
-			const ns = defaultEntry!.namespace;
-			const client = useRef( proxifyState( ns, {} ) );
-			const server = useRef( proxifyState( ns, {}, { readOnly: true } ) );
-
-			// No change should be made if `defaultEntry` does not exist.
-			const contextStack = useMemo( () => {
-				const result = {
-					client: { ...inheritedClient },
-					server: { ...inheritedServer },
-				};
-				if ( defaultEntry ) {
-					const { namespace, value } = defaultEntry;
-					// Check that the value is a JSON object. Send a console warning if not.
-					if ( ! isPlainObject( value ) ) {
-						warn(
-							`The value of data-wp-context in "${ namespace }" store must be a valid stringified JSON object.`
-						);
-					}
-					deepMerge(
-						client.current,
-						deepClone( value ) as object,
-						false
-					);
-					deepMerge( server.current, deepClone( value ) as object );
-					result.client[ namespace ] = proxifyContext(
-						client.current,
-						inheritedClient[ namespace ]
-					);
-					result.server[ namespace ] = proxifyContext(
-						server.current,
-						inheritedServer[ namespace ]
+			// Doesn't do anything if there are no default entries.
+			if ( ! entries.length ) {
+				if ( globalThis.SCRIPT_DEBUG ) {
+					warn(
+						'The usage of data-wp-context--unique-id (two hyphens) is not supported. To add a unique ID to the directive, please use data-wp-context---unique-id (three hyphens) instead.'
 					);
 				}
-				return result;
-			}, [ defaultEntry, inheritedClient, inheritedServer ] );
+				return;
+			}
 
-			return createElement( Provider, { value: contextStack }, children );
+			const { Provider } = inheritedContext;
+			const { client: inheritedClient, server: inheritedServer } =
+				useContext( inheritedContext );
+			const client = useRef( {} );
+			const server = {};
+			const result = {
+				client: { ...inheritedClient },
+				server: { ...inheritedServer },
+			};
+			const namespaces = new Set< string >();
+
+			entries.forEach( ( { value, namespace, uniqueId } ) => {
+				// Checks that the value is a JSON object. Sends a console warning if not.
+				if ( ! isPlainObject( value ) ) {
+					if ( globalThis.SCRIPT_DEBUG ) {
+						warn(
+							`The value of data-wp-context${
+								uniqueId ? `---${ uniqueId }` : ''
+							} on the ${ namespace } namespace must be a valid stringified JSON object.`
+						);
+					}
+					return;
+				}
+
+				// If the namespace doesn't exist yet, initalizes an empty
+				// proxified state for that namespace's client context.
+				if ( ! client.current[ namespace ] ) {
+					client.current[ namespace ] = proxifyState( namespace, {} );
+				}
+
+				// Merges the new client value with whatever was there before.
+				deepMerge(
+					client.current[ namespace ],
+					deepClone( value ),
+					false
+				);
+
+				// Replaces the server context for that namespace with the
+				// current value.
+				server[ namespace ] = value;
+
+				// Registers the namespace.
+				namespaces.add( namespace );
+			} );
+
+			namespaces.forEach( ( namespace ) => {
+				result.client[ namespace ] = proxifyContext(
+					client.current[ namespace ],
+					inheritedClient[ namespace ]
+				);
+				result.server[ namespace ] = proxifyContext(
+					server[ namespace ],
+					inheritedServer[ namespace ]
+				);
+			} );
+
+			return createElement( Provider, { value: result }, children );
 		},
 		{ priority: 5 }
 	);
 
-	// data-wp-watch--[name]
+	// data-wp-watch---[unique-id]
 	directive( 'watch', ( { directives: { watch }, evaluate } ) => {
 		watch.forEach( ( entry ) => {
+			if ( globalThis.SCRIPT_DEBUG ) {
+				if ( entry.suffix ) {
+					warnUniqueIdWithTwoHyphens( 'watch', entry.suffix );
+				}
+			}
 			useWatch( () => {
 				let start;
 				if ( globalThis.IS_GUTENBERG_PLUGIN ) {
 					if ( globalThis.SCRIPT_DEBUG ) {
-						// eslint-disable-next-line no-unused-vars
 						start = performance.now();
 					}
 				}
@@ -290,9 +466,14 @@ export default () => {
 		} );
 	} );
 
-	// data-wp-init--[name]
+	// data-wp-init---[unique-id]
 	directive( 'init', ( { directives: { init }, evaluate } ) => {
 		init.forEach( ( entry ) => {
+			if ( globalThis.SCRIPT_DEBUG ) {
+				if ( entry.suffix ) {
+					warnUniqueIdWithTwoHyphens( 'init', entry.suffix );
+				}
+			}
 			// TODO: Replace with useEffect to prevent unneeded scopes.
 			useInit( () => {
 				let start;
@@ -310,7 +491,6 @@ export default () => {
 						performance.measure(
 							`interactivity api init ${ entry.namespace }`,
 							{
-								// eslint-disable-next-line no-undef
 								start,
 								end: performance.now(),
 								detail: {
@@ -327,24 +507,33 @@ export default () => {
 		} );
 	} );
 
-	// data-wp-on--[event]
+	// data-wp-on--[event]---[unique-id]
 	directive( 'on', ( { directives: { on }, element, evaluate } ) => {
 		const events = new Map< string, Set< DirectiveEntry > >();
 		on.filter( isNonDefaultDirectiveSuffix ).forEach( ( entry ) => {
-			const event = entry.suffix.split( '--' )[ 0 ];
-			if ( ! events.has( event ) ) {
-				events.set( event, new Set< DirectiveEntry >() );
+			const suffixParts = entry.suffix.split( '--', 2 );
+			if ( globalThis.SCRIPT_DEBUG ) {
+				if ( suffixParts[ 1 ] ) {
+					warnUniqueIdWithTwoHyphens(
+						'on',
+						suffixParts[ 0 ],
+						suffixParts[ 1 ]
+					);
+				}
 			}
-			events.get( event )!.add( entry );
+			if ( ! events.has( suffixParts[ 0 ] ) ) {
+				events.set( suffixParts[ 0 ], new Set< DirectiveEntry >() );
+			}
+			events.get( suffixParts[ 0 ] )!.add( entry );
 		} );
 
 		events.forEach( ( entries, eventType ) => {
 			const existingHandler = element.props[ `on${ eventType }` ];
 			element.props[ `on${ eventType }` ] = ( event: Event ) => {
+				if ( existingHandler ) {
+					existingHandler( event );
+				}
 				entries.forEach( ( entry ) => {
-					if ( existingHandler ) {
-						existingHandler( event );
-					}
 					let start;
 					if ( globalThis.IS_GUTENBERG_PLUGIN ) {
 						if ( globalThis.SCRIPT_DEBUG ) {
@@ -363,7 +552,6 @@ export default () => {
 							performance.measure(
 								`interactivity api on ${ entry.namespace }`,
 								{
-									// eslint-disable-next-line no-undef
 									start,
 									end: performance.now(),
 									detail: {
@@ -380,15 +568,18 @@ export default () => {
 		} );
 	} );
 
-	// data-wp-on-async--[event]
+	// data-wp-on-async--[event] (deprecated)
 	directive(
 		'on-async',
 		( { directives: { 'on-async': onAsync }, element, evaluate } ) => {
+			if ( globalThis.SCRIPT_DEBUG ) {
+				warnWithSyncEvent( 'on-async', 'on' );
+			}
 			const events = new Map< string, Set< DirectiveEntry > >();
 			onAsync
 				.filter( isNonDefaultDirectiveSuffix )
 				.forEach( ( entry ) => {
-					const event = entry.suffix.split( '--' )[ 0 ];
+					const event = entry.suffix.split( '--', 1 )[ 0 ];
 					if ( ! events.has( event ) ) {
 						events.set( event, new Set< DirectiveEntry >() );
 					}
@@ -413,14 +604,14 @@ export default () => {
 		}
 	);
 
-	// data-wp-on-window--[event]
+	// data-wp-on-window--[event]---[unique-id]
 	directive( 'on-window', getGlobalEventDirective( 'window' ) );
-	// data-wp-on-document--[event]
+	// data-wp-on-document--[event]---[unique-id]
 	directive( 'on-document', getGlobalEventDirective( 'document' ) );
 
-	// data-wp-on-async-window--[event]
+	// data-wp-on-async-window--[event] (deprecated)
 	directive( 'on-async-window', getGlobalAsyncEventDirective( 'window' ) );
-	// data-wp-on-async-document--[event]
+	// data-wp-on-async-document--[event] (deprecated)
 	directive(
 		'on-async-document',
 		getGlobalAsyncEventDirective( 'document' )
@@ -433,8 +624,13 @@ export default () => {
 			classNames
 				.filter( isNonDefaultDirectiveSuffix )
 				.forEach( ( entry ) => {
-					const className = entry.suffix;
+					const className = entry.uniqueId
+						? `${ entry.suffix }---${ entry.uniqueId }`
+						: entry.suffix;
 					let result = evaluate( entry );
+					if ( result === PENDING_GETTER ) {
+						return;
+					}
 					if ( typeof result === 'function' ) {
 						result = result();
 					}
@@ -476,8 +672,17 @@ export default () => {
 	// data-wp-style--[style-prop]
 	directive( 'style', ( { directives: { style }, element, evaluate } ) => {
 		style.filter( isNonDefaultDirectiveSuffix ).forEach( ( entry ) => {
+			if ( entry.uniqueId ) {
+				if ( globalThis.SCRIPT_DEBUG ) {
+					warnUniqueIdNotSupported( 'style', entry.uniqueId );
+				}
+				return;
+			}
 			const styleProp = entry.suffix;
 			let result = evaluate( entry );
+			if ( result === PENDING_GETTER ) {
+				return;
+			}
 			if ( typeof result === 'function' ) {
 				result = result();
 			}
@@ -502,9 +707,9 @@ export default () => {
 						element.ref as RefObject< HTMLElement >
 					 ).current!.style.removeProperty( styleProp );
 				} else {
-					( element.ref as RefObject< HTMLElement > ).current!.style[
-						styleProp
-					] = result;
+					(
+						element.ref as RefObject< HTMLElement >
+					 ).current!.style.setProperty( styleProp, result );
 				}
 			} );
 		} );
@@ -513,8 +718,17 @@ export default () => {
 	// data-wp-bind--[attribute]
 	directive( 'bind', ( { directives: { bind }, element, evaluate } ) => {
 		bind.filter( isNonDefaultDirectiveSuffix ).forEach( ( entry ) => {
+			if ( entry.uniqueId ) {
+				if ( globalThis.SCRIPT_DEBUG ) {
+					warnUniqueIdNotSupported( 'bind', entry.uniqueId );
+				}
+				return;
+			}
 			const attribute = entry.suffix;
 			let result = evaluate( entry );
+			if ( result === PENDING_GETTER ) {
+				return;
+			}
 			if ( typeof result === 'function' ) {
 				result = result();
 			}
@@ -531,7 +745,7 @@ export default () => {
 				/*
 				 * We set the value directly to the corresponding HTMLElement instance
 				 * property excluding the following special cases. We follow Preact's
-				 * logic: https://github.com/preactjs/preact/blob/ea49f7a0f9d1ff2c98c0bdd66aa0cbc583055246/src/diff/props.js#L110-L129
+				 * logic: https://github.com/preactjs/preact/blob/10.29.1/src/diff/props.js#L115-L129
 				 */
 				if ( attribute === 'style' ) {
 					if ( typeof result === 'string' ) {
@@ -560,6 +774,7 @@ export default () => {
 					attribute !== 'rowSpan' &&
 					attribute !== 'colSpan' &&
 					attribute !== 'role' &&
+					attribute !== 'popover' &&
 					attribute in el
 				) {
 					try {
@@ -568,20 +783,23 @@ export default () => {
 								? ''
 								: result;
 						return;
-					} catch ( err ) {}
+					} catch {}
 				}
 				/*
 				 * aria- and data- attributes have no boolean representation.
 				 * A `false` value is different from the attribute not being
 				 * present, so we can't remove it.
-				 * We follow Preact's logic: https://github.com/preactjs/preact/blob/ea49f7a0f9d1ff2c98c0bdd66aa0cbc583055246/src/diff/props.js#L131C24-L136
+				 * We follow Preact's logic: https://github.com/preactjs/preact/blob/10.29.1/src/diff/props.js#L138-L150
 				 */
 				if (
 					result !== null &&
 					result !== undefined &&
 					( result !== false || attribute[ 4 ] === '-' )
 				) {
-					el.setAttribute( attribute, result );
+					el.setAttribute(
+						attribute,
+						attribute === 'popover' && result === true ? '' : result
+					);
 				} else {
 					el.removeAttribute( attribute );
 				}
@@ -589,7 +807,7 @@ export default () => {
 		} );
 	} );
 
-	// data-wp-ignore
+	// data-wp-ignore (deprecated)
 	directive(
 		'ignore',
 		( {
@@ -600,10 +818,11 @@ export default () => {
 		}: {
 			element: any;
 		} ) => {
-			// Shown deprecation warning
-			warn(
-				'The "data-wp-ignore" directive of the Interactivity API is deprecated since version 6.9 and will be removed in version 7.0.'
-			);
+			if ( globalThis.SCRIPT_DEBUG ) {
+				warn(
+					'The data-wp-ignore directive is deprecated and will be removed in version 7.0.'
+				);
+			}
 
 			// Preserve the initial inner HTML
 			const cached = useMemo( () => innerHTML, [] );
@@ -616,27 +835,47 @@ export default () => {
 
 	// data-wp-text
 	directive( 'text', ( { directives: { text }, element, evaluate } ) => {
-		const entry = text.find( isDefaultDirectiveSuffix );
-		if ( ! entry ) {
-			element.props.children = null;
+		const entries = text.filter( isDefaultDirectiveSuffix );
+		// Doesn't do anything if there are no default entries.
+		if ( ! entries.length ) {
+			if ( globalThis.SCRIPT_DEBUG ) {
+				warn(
+					'The usage of data-wp-text--suffix is not supported. Please use data-wp-text instead.'
+				);
+			}
 			return;
 		}
-
-		try {
-			let result = evaluate( entry );
-			if ( typeof result === 'function' ) {
-				result = result();
+		entries.forEach( ( entry ) => {
+			if ( entry.uniqueId ) {
+				if ( globalThis.SCRIPT_DEBUG ) {
+					warnUniqueIdNotSupported( 'text', entry.uniqueId );
+				}
+				return;
 			}
-			element.props.children =
-				typeof result === 'object' ? null : result.toString();
-		} catch ( e ) {
-			element.props.children = null;
-		}
+			try {
+				let result = evaluate( entry );
+				if ( result === PENDING_GETTER ) {
+					return;
+				}
+				if ( typeof result === 'function' ) {
+					result = result();
+				}
+				element.props.children =
+					typeof result === 'object' ? null : result.toString();
+			} catch {
+				element.props.children = null;
+			}
+		} );
 	} );
 
-	// data-wp-run
+	// data-wp-run---[unique-id]
 	directive( 'run', ( { directives: { run }, evaluate } ) => {
 		run.forEach( ( entry ) => {
+			if ( globalThis.SCRIPT_DEBUG ) {
+				if ( entry.suffix ) {
+					warnUniqueIdWithTwoHyphens( 'run', entry.suffix );
+				}
+			}
 			let result = evaluate( entry );
 			if ( typeof result === 'function' ) {
 				result = result();
@@ -655,6 +894,11 @@ export default () => {
 			evaluate,
 		} ) => {
 			if ( element.type !== 'template' ) {
+				if ( globalThis.SCRIPT_DEBUG ) {
+					warn(
+						'The data-wp-each directive can only be used on <template> elements.'
+					);
+				}
 				return;
 			}
 
@@ -662,9 +906,28 @@ export default () => {
 			const inheritedValue = useContext( inheritedContext );
 
 			const [ entry ] = each;
-			const { namespace } = entry;
+			const { namespace, suffix, uniqueId } = entry;
+
+			if ( each.length > 1 ) {
+				if ( globalThis.SCRIPT_DEBUG ) {
+					warn(
+						'The usage of multiple data-wp-each directives on the same element is not supported. Please pick only one.'
+					);
+				}
+				return;
+			}
+
+			if ( uniqueId ) {
+				if ( globalThis.SCRIPT_DEBUG ) {
+					warnUniqueIdNotSupported( 'each', uniqueId );
+				}
+				return;
+			}
 
 			let iterable = evaluate( entry );
+			if ( iterable === PENDING_GETTER ) {
+				return;
+			}
 			if ( typeof iterable === 'function' ) {
 				iterable = iterable();
 			}
@@ -673,17 +936,19 @@ export default () => {
 				return;
 			}
 
-			const itemProp = isNonDefaultDirectiveSuffix( entry )
-				? kebabToCamelCase( entry.suffix )
-				: 'item';
+			const itemProp = suffix ? kebabToCamelCase( suffix ) : 'item';
 
 			const result: VNode< any >[] = [];
 
-			for ( const item of iterable ) {
-				const itemContext = proxifyContext(
-					proxifyState( namespace, {} ),
-					inheritedValue.client[ namespace ]
-				);
+			const itemContexts = useItemContexts(
+				inheritedValue,
+				namespace,
+				iterable,
+				itemProp,
+				eachKey?.[ 0 ]
+			);
+
+			for ( const [ item, itemContext, key ] of itemContexts ) {
 				const mergedContext = {
 					client: {
 						...inheritedValue.client,
@@ -692,17 +957,8 @@ export default () => {
 					server: { ...inheritedValue.server },
 				};
 
-				// Set the item after proxifying the context.
+				// Sets the item after proxifying the context.
 				mergedContext.client[ namespace ][ itemProp ] = item;
-
-				const scope = {
-					...getScope(),
-					context: mergedContext.client,
-					serverContext: mergedContext.server,
-				};
-				const key = eachKey
-					? getEvaluate( { scope } )( eachKey[ 0 ] )
-					: item;
 
 				result.push(
 					createElement(
@@ -717,5 +973,75 @@ export default () => {
 		{ priority: 20 }
 	);
 
-	directive( 'each-child', () => null, { priority: 1 } );
+	// data-wp-each-child (internal use only)
+	directive(
+		'each-child',
+		( { directives: { 'each-child': eachChild }, element, evaluate } ) => {
+			const entry = eachChild.find( isDefaultDirectiveSuffix );
+
+			if ( ! entry ) {
+				return;
+			}
+
+			const iterable = evaluate( entry );
+			return iterable === PENDING_GETTER ? element : null;
+		},
+		{ priority: 1 }
+	);
+
+	// data-wp-router-region
+	directive(
+		'router-region',
+		( { directives: { 'router-region': routerRegion } } ) => {
+			const entry = routerRegion.find( isDefaultDirectiveSuffix );
+			if ( ! entry ) {
+				return;
+			}
+
+			if ( entry.suffix ) {
+				if ( globalThis.SCRIPT_DEBUG ) {
+					warn(
+						`Suffixes for the data-wp-router-region directive are not supported. Ignoring the directive with suffix "${ entry.suffix }".`
+					);
+				}
+				return;
+			}
+
+			if ( entry.uniqueId ) {
+				if ( globalThis.SCRIPT_DEBUG ) {
+					warnUniqueIdNotSupported( 'router-region', entry.uniqueId );
+				}
+				return;
+			}
+
+			const regionId =
+				typeof entry.value === 'string'
+					? entry.value
+					: ( entry.value as any ).id;
+
+			if ( ! routerRegions.has( regionId ) ) {
+				routerRegions.set( regionId, signal() );
+			}
+
+			// Get the content of this router region.
+			const vdom = routerRegions.get( regionId )!.value;
+
+			// Triggers an invalidation after the directive data-wp-context has
+			// been evaluated and the value of the server context has changed.
+			useLayoutEffect( () => {
+				if ( vdom && typeof vdom.type !== 'string' ) {
+					navigationContextSignal.value =
+						navigationContextSignal.peek() + 1;
+				}
+			}, [ vdom ] );
+
+			if ( vdom && typeof vdom.type !== 'string' ) {
+				// The scope needs to be injected.
+				const previousScope = getScope();
+				return cloneElement( vdom, { previousScope } );
+			}
+			return vdom;
+		},
+		{ priority: 1 }
+	);
 };

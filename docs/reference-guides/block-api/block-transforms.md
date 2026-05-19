@@ -188,7 +188,7 @@ transforms: {
 
 ### Raw
 
-This type of transformations support the _from_ direction, allowing blocks to be created from raw HTML nodes. They're applied when the user executes the "Convert to Blocks" action from within the block setting UI menu, as well as when some content is pasted or dropped into the editor.
+This type of transformation supports the _from_ direction, allowing blocks to be created from raw HTML nodes. They're applied when the user executes the "Convert to Blocks" action from within the block setting UI menu, as well as when some content is pasted or dropped into the editor.
 
 A transformation of type `raw` is an object that takes the following parameters:
 
@@ -336,6 +336,33 @@ transforms: {
     ]
 },
 ```
+
+**Example: shortcode with wrapped content to block with InnerBlocks**
+
+Shortcodes that wrap inner content (e.g. `[example]<p>Inner.</p>[/example]`) can be transformed into a block with InnerBlocks by passing `match.shortcode.content` through [`rawHandler`](/packages/blocks/README.md#rawHandler) inside `transform`.
+
+```js
+transforms: {
+    from: [
+        {
+            type: 'shortcode',
+            tag: 'example',
+            transform( attrs, match ) {
+                const innerBlocks = rawHandler( {
+                    HTML: match.shortcode.content || '',
+                } );
+                return createBlock(
+                    'myplugin/example',
+                    { att1: attrs.named.att1 || '' },
+                    innerBlocks
+                );
+            },
+        },
+    ],
+},
+```
+
+`rawHandler` recurses into the content, so nested shortcodes and HTML are converted to blocks the same way pasted content is.
 
 ## `ungroup` blocks
 

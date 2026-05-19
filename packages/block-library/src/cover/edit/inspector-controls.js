@@ -3,7 +3,6 @@
  */
 import { useMemo } from '@wordpress/element';
 import {
-	ExternalLink,
 	FocalPointPicker,
 	RangeControl,
 	TextareaControl,
@@ -27,6 +26,7 @@ import {
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
+import { Link } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -178,9 +178,7 @@ export default function CoverInspectorControls( {
 		} );
 	};
 
-	const showFocalPointPicker =
-		isVideoBackground ||
-		( isImageBackground && ( ! hasParallax || isRepeated ) );
+	const showFocalPointPicker = isVideoBackground || isImageBackground;
 
 	const imperativeFocalPointPreview = ( value ) => {
 		const [ styleOfRef, property ] = mediaElement.current
@@ -195,8 +193,8 @@ export default function CoverInspectorControls( {
 
 	return (
 		<>
-			<InspectorControls>
-				{ !! url && (
+			{ ( !! url || useFeaturedImage ) && (
+				<InspectorControls>
 					<ToolsPanel
 						label={ __( 'Settings' ) }
 						resetAll={ () => {
@@ -225,7 +223,6 @@ export default function CoverInspectorControls( {
 									}
 								>
 									<ToggleControl
-										__nextHasNoMarginBottom
 										label={ __( 'Fixed background' ) }
 										checked={ !! hasParallax }
 										onChange={ toggleParallax }
@@ -243,7 +240,6 @@ export default function CoverInspectorControls( {
 									}
 								>
 									<ToggleControl
-										__nextHasNoMarginBottom
 										label={ __( 'Repeated background' ) }
 										checked={ isRepeated }
 										onChange={ toggleIsRepeated }
@@ -263,7 +259,6 @@ export default function CoverInspectorControls( {
 								}
 							>
 								<FocalPointPicker
-									__nextHasNoMarginBottom
 									label={ __( 'Focal point' ) }
 									url={ url }
 									value={ focalPoint }
@@ -297,7 +292,6 @@ export default function CoverInspectorControls( {
 								}
 							>
 								<TextareaControl
-									__nextHasNoMarginBottom
 									label={ __( 'Alternative text' ) }
 									value={ alt }
 									onChange={ ( newAlt ) =>
@@ -305,7 +299,8 @@ export default function CoverInspectorControls( {
 									}
 									help={
 										<>
-											<ExternalLink
+											<Link
+												openInNewTab
 												href={
 													// translators: Localized tutorial, if one exists. W3C Web Accessibility Initiative link has list of existing translations.
 													__(
@@ -316,7 +311,7 @@ export default function CoverInspectorControls( {
 												{ __(
 													'Describe the purpose of the image.'
 												) }
-											</ExternalLink>
+											</Link>
 											<br />
 											{ __(
 												'Leave empty if decorative.'
@@ -335,8 +330,8 @@ export default function CoverInspectorControls( {
 							/>
 						) }
 					</ToolsPanel>
-				) }
-			</InspectorControls>
+				</InspectorControls>
+			) }
 			{ colorGradientSettings.hasColorsOrGradients && (
 				<InspectorControls group="color">
 					<ColorGradientSettingsDropdown
@@ -378,7 +373,6 @@ export default function CoverInspectorControls( {
 						panelId={ clientId }
 					>
 						<RangeControl
-							__nextHasNoMarginBottom
 							label={ __( 'Overlay opacity' ) }
 							value={ dimRatio }
 							onChange={ ( newDimRatio ) =>

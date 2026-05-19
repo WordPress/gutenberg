@@ -1,3 +1,5 @@
+@use "@wordpress/base-styles/colors" as *;
+
 .edit-site-sidebar-button {
 	color: $gray-200;
 	flex-shrink: 0;

@@ -1,0 +1,16 @@
+.editor-post-revisions-panel {
+	.editor-post-revisions-panel__view-all {
+		justify-content: center;
+	}
+
+	.editor-post-revisions-panel__revision-date {
+		text-transform: uppercase;
+		font-weight: 600;
+		font-size: 12px;
+	}
+}
+
+.editor-post-revisions-panel__revisions-count {
+	margin-top: -4.5px;
+	margin-bottom: -4.5px;
+}

@@ -1,3 +1,5 @@
+@use "@wordpress/base-styles/colors" as *;
+
 // Allow these default styles to be overridden by global styles.
 :where(.wp-block-post-comments-form textarea),
 :where(.wp-block-post-comments-form input:not([type="submit"])) {

@@ -42,25 +42,10 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		await expect( activeElementLocator ).toBeFocused();
 		await expect( activeElementLocator ).toHaveText( '2nd col' );
 
-		// Arrow up in inner blocks should navigate through (1) column wrapper,
-		// (2) text fields.
-		await page.keyboard.press( 'ArrowUp' );
-		await expect
-			.poll( writingFlowUtils.getActiveBlockName )
-			.toBe( 'core/column' );
-		await page.keyboard.press( 'ArrowUp' );
-		const activeElementBlockType = await editor.canvas
-			.locator( ':root' )
-			.evaluate( () =>
-				document.activeElement.getAttribute( 'data-type' )
-			);
-		expect( activeElementBlockType ).toBe( 'core/columns' );
-		await expect
-			.poll( writingFlowUtils.getActiveBlockName )
-			.toBe( 'core/columns' );
-
-		// Arrow up from focused (columns) block wrapper exits nested context
-		// to prior text input.
+		// Arrow up skips non-empty blocks and column/columns wrappers,
+		// navigating directly to the prior text input. Since columns
+		// are side by side, "1st col" and "2nd col" are on the same
+		// visual line, so ArrowUp goes to "First paragraph".
 		await page.keyboard.press( 'ArrowUp' );
 		await expect
 			.poll( writingFlowUtils.getActiveBlockName )
@@ -104,6 +89,35 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 				attributes: { content: 'Second paragraph' },
 			},
 		] );
+	} );
+
+	test( 'should not select list wrapper when pressing arrow up from list', async ( {
+		editor,
+		page,
+		writingFlowUtils,
+	} ) => {
+		// Insert a paragraph block first.
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'First paragraph' },
+		} );
+
+		// Insert a list block.
+		await editor.insertBlock( { name: 'core/list' } );
+		await page.keyboard.type( 'List item' );
+
+		// The caret is now inside the list item.
+		// Press ArrowUp - should skip the list wrapper and go to the paragraph.
+		await page.keyboard.press( 'ArrowUp' );
+
+		// Verify we're in the paragraph, NOT the list wrapper.
+		await expect
+			.poll( writingFlowUtils.getActiveBlockName )
+			.toBe( 'core/paragraph' );
+
+		// Verify the focused element has the paragraph content.
+		const activeElementLocator = editor.canvas.locator( ':focus' );
+		await expect( activeElementLocator ).toHaveText( 'First paragraph' );
 	} );
 
 	test( 'should navigate around inline boundaries', async ( {
@@ -525,6 +539,31 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		] );
 	} );
 
+	// Regression test for https://github.com/WordPress/gutenberg/issues/72053.
+	test( 'should navigate contenteditable with border radius', async ( {
+		editor,
+		page,
+	} ) => {
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'Enter' );
+		await editor.canvas.locator( ':root' ).evaluate( () => {
+			document.activeElement.style.borderRadius = '50px';
+		} );
+		await page.keyboard.press( 'ArrowUp' );
+		await page.keyboard.type( '1' );
+
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: '1' },
+			},
+			{
+				name: 'core/paragraph',
+				attributes: { content: '' },
+			},
+		] );
+	} );
+
 	test( 'should not prematurely multi-select', async ( {
 		editor,
 		page,
@@ -838,6 +877,9 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		await page.keyboard.type( '1' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '/image' );
+		await expect(
+			page.getByRole( 'option', { name: 'Image', selected: true } )
+		).toBeVisible();
 		await page.keyboard.press( 'Enter' );
 		await editor.clickBlockToolbarButton( 'Align' );
 
@@ -915,6 +957,9 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 	} ) => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '/table' );
+		await expect(
+			page.getByRole( 'option', { name: 'Table', selected: true } )
+		).toBeVisible();
 		await page.keyboard.press( 'Enter' );
 		// Tab to the "Create table" button.
 		await pageUtils.pressKeys( 'Tab' );
@@ -1126,6 +1171,102 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		await expect(
 			editor.canvas.locator( '[data-type="core/block"]' )
 		).toBeFocused();
+	} );
+
+	test( 'should select non-contenteditable block via click after partial selection', async ( {
+		editor,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( { name: 'core/paragraph' } );
+		await editor.insertBlock( { name: 'core/spacer' } );
+		await editor.canvas
+			.getByRole( 'document', { name: 'Empty block' } )
+			.fill( 'A partial selection' );
+		await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
+
+		const spacer = editor.canvas.getByRole( 'document', {
+			name: 'Block: Spacer',
+		} );
+		await spacer.click();
+
+		await expect( spacer ).toBeFocused();
+		await expect(
+			editor.canvas.getByRole( 'document', { name: 'Block: Paragraph' } )
+		).not.toBeFocused();
+	} );
+
+	test( 'should show format toolbar when selecting text from the left edge of a block', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Hello world' },
+		} );
+
+		// Deselect the block.
+		await page.evaluate( () =>
+			window.wp.data.dispatch( 'core/block-editor' ).clearSelectedBlock()
+		);
+
+		const paragraphBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Paragraph',
+		} );
+		const box = await paragraphBlock.boundingBox();
+
+		// Start the drag from just before the left edge of the paragraph
+		// (on the block wrapper padding) and drag into the text.
+		const startX = box.x - 5;
+		const startY = box.y + box.height / 2;
+		const endX = box.x + box.width / 2;
+		const endY = startY;
+
+		await page.mouse.move( startX, startY );
+		await page.mouse.down();
+		await page.mouse.move( endX, endY, { steps: 10 } );
+		await page.mouse.up();
+
+		// The Bold button should be visible in the inline block toolbar.
+		await expect(
+			page
+				.getByRole( 'toolbar', { name: 'Block tools' } )
+				.getByRole( 'button', { name: 'Bold' } )
+		).toBeVisible();
+	} );
+
+	// Regression test: ArrowDown should not skip over a paragraph that contains
+	// a link. See https://github.com/WordPress/gutenberg/issues/77473.
+	test( 'should not skip paragraph with link when navigating down with ArrowDown', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'a' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: '<a href="#">a</a>' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'a' },
+		} );
+
+		// Position cursor at the start of the first paragraph.
+		await editor.canvas
+			.locator( 'role=document[name="Block: Paragraph"i]' )
+			.first()
+			.click();
+		await page.keyboard.press( 'Home' );
+
+		// ArrowDown should move to the second paragraph (with the link),
+		// not skip over it to the third.
+		await page.keyboard.press( 'ArrowDown' );
+
+		// The focused element should be the second paragraph, which contains a link.
+		const focusedElement = editor.canvas.locator( ':focus' );
+		await expect( focusedElement.locator( 'a[href="#"]' ) ).toBeVisible();
 	} );
 } );
 

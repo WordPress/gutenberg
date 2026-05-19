@@ -1,0 +1,40 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+
+.editor-styles-canvas {
+	height: 100%;
+	padding: $grid-unit-20;
+
+	// This is the gray background color that's applied behind "isolation mode".
+	// The color normally comes from .editor-visual-editor, but that class is missing here.
+	background-color: var(--wp-editor-canvas-background);
+
+	// Controls height of editor and styles canvas (style book, global styles revisions previews etc.)
+	iframe {
+		display: block;
+		width: 100%;
+		height: 100%;
+	}
+}
+
+.editor-styles-canvas__section {
+	background: $white; // Fallback color, overridden by JavaScript.
+	border-radius: $radius-large;
+	bottom: 0;
+	left: 0;
+	overflow: hidden;
+	position: absolute;
+	right: 0;
+	top: 0;
+	@media not (prefers-reduced-motion) {
+		transition: all 0.3s; // Match .block-editor-iframe__body transition.
+	}
+}
+
+.editor-styles-canvas__close-button {
+	position: absolute;
+	right: $grid-unit-10;
+	top: $grid-unit-10;
+	z-index: 2;
+	background: $white;
+}
