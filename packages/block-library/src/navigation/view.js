@@ -45,6 +45,218 @@ function getFocusableElements( ref ) {
 // capture the clicks, instead of relying on the focusout event.
 document.addEventListener( 'click', () => {} );
 
+/**
+ * Hamburger-to-close morph animation.
+ *
+ * When a Navigation block has a custom overlay with a Navigation Overlay Close
+ * block, the hamburger icon flies to the close button's position while its two
+ * horizontal lines morph into an X. The reverse plays on close.
+ */
+const MORPH_DURATION = 350;
+const MORPH_EASING = 'cubic-bezier(0.4, 0, 0.2, 1)';
+
+// Track active morph animations per navigation block element.
+const activeMorphAnimations = new WeakMap();
+
+/**
+ * Whether morph animation should play (respects reduced motion preference).
+ *
+ * @return {boolean} True if animation should play.
+ */
+function shouldAnimateMorph() {
+	return ! window.matchMedia( '(prefers-reduced-motion: reduce)' ).matches;
+}
+
+/**
+ * Cancel and clean up any in-progress morph animation for a navigation block.
+ *
+ * @param {HTMLElement} nav - The navigation block element.
+ */
+function cleanupMorphAnimation( nav ) {
+	const morph = activeMorphAnimations.get( nav );
+	if ( morph ) {
+		morph.animation?.cancel();
+		morph.phantom?.remove();
+		if ( morph.closeBtn ) {
+			morph.closeBtn.style.visibility = '';
+		}
+		activeMorphAnimations.delete( nav );
+	}
+}
+
+/**
+ * Create a phantom element (clone of the hamburger button) for the flight
+ * animation. The phantom is positioned fixed above the overlay and is inert
+ * (no click handlers, not focusable, hidden from screen readers).
+ *
+ * @param {HTMLElement} hamburgerBtn - The hamburger button to clone.
+ * @param {boolean}     isMorphed   - Whether to start in the morphed (X) state.
+ * @return {HTMLElement} The phantom element, already appended to document.body.
+ */
+function createMorphPhantom( hamburgerBtn, isMorphed ) {
+	const phantom = hamburgerBtn.cloneNode( true );
+	// Remove Interactivity API directives so the clone is inert.
+	phantom.removeAttribute( 'data-wp-on--click' );
+	phantom.removeAttribute( 'data-wp-on--keydown' );
+	phantom.setAttribute( 'aria-hidden', 'true' );
+	phantom.setAttribute( 'tabindex', '-1' );
+	phantom.classList.add( 'wp-block-navigation__morph-phantom' );
+	phantom.style.position = 'fixed';
+	phantom.style.zIndex = '100001';
+	phantom.style.pointerEvents = 'none';
+	phantom.style.margin = '0';
+	// Inherit the computed color so the phantom matches the hamburger's theme.
+	phantom.style.color = window.getComputedStyle( hamburgerBtn ).color;
+	if ( isMorphed ) {
+		phantom.classList.add( 'is-morphed' );
+	}
+	document.body.appendChild( phantom );
+	return phantom;
+}
+
+/**
+ * Run the open morph animation: hamburger flies to close button, lines → X.
+ *
+ * @param {HTMLElement} nav          - The navigation block element.
+ * @param {HTMLElement} hamburgerBtn - The hamburger button element.
+ * @param {HTMLElement} closeBtn     - The overlay close button element.
+ * @param {DOMRect}     startRect   - The hamburger's bounding rect (captured before overlay opened).
+ */
+function runOpenMorphAnimation( nav, hamburgerBtn, closeBtn, startRect ) {
+	cleanupMorphAnimation( nav );
+
+	if ( ! shouldAnimateMorph() ) {
+		return;
+	}
+
+	requestAnimationFrame( () => {
+		const endRect = closeBtn.getBoundingClientRect();
+
+		// Hide the real close button during the animation.
+		closeBtn.style.visibility = 'hidden';
+
+		// Create phantom at the hamburger's captured position (un-morphed).
+		const phantom = createMorphPhantom( hamburgerBtn, false );
+		phantom.style.top = startRect.top + 'px';
+		phantom.style.left = startRect.left + 'px';
+
+		// Calculate the translation to fly from hamburger to close button,
+		// centering on the close button's position.
+		const dx =
+			endRect.left +
+			( endRect.width - startRect.width ) / 2 -
+			startRect.left;
+		const dy =
+			endRect.top +
+			( endRect.height - startRect.height ) / 2 -
+			startRect.top;
+
+		// Use a second rAF so the browser paints the phantom at start position
+		// before the transition begins.
+		requestAnimationFrame( () => {
+			// Trigger the CSS morph transition (horizontal lines → X).
+			phantom.classList.add( 'is-morphed' );
+
+			// Fly the phantom from hamburger to close button position.
+			const animation = phantom.animate(
+				[
+					{ transform: 'translate(0, 0)' },
+					{
+						transform: `translate(${ dx }px, ${ dy }px)`,
+					},
+				],
+				{
+					duration: MORPH_DURATION,
+					easing: MORPH_EASING,
+					fill: 'forwards',
+				}
+			);
+
+			activeMorphAnimations.set( nav, {
+				animation,
+				phantom,
+				closeBtn,
+			} );
+
+			animation.onfinish = () => {
+				phantom.remove();
+				closeBtn.style.visibility = '';
+				activeMorphAnimations.delete( nav );
+			};
+		} );
+	} );
+}
+
+/**
+ * Run the close morph animation: X flies back to hamburger, lines restore.
+ *
+ * @param {HTMLElement} nav           - The navigation block element.
+ * @param {HTMLElement} hamburgerBtn  - The hamburger button element.
+ * @param {HTMLElement} closeBtn      - The overlay close button element.
+ * @param {DOMRect}     hamburgerRect - The hamburger's original bounding rect.
+ * @param {Function}    onComplete    - Callback to run after animation finishes.
+ */
+function runCloseMorphAnimation(
+	nav,
+	hamburgerBtn,
+	closeBtn,
+	hamburgerRect,
+	onComplete
+) {
+	cleanupMorphAnimation( nav );
+
+	if ( ! shouldAnimateMorph() ) {
+		onComplete();
+		return;
+	}
+
+	const closeRect = closeBtn.getBoundingClientRect();
+
+	// Hide the real close button.
+	closeBtn.style.visibility = 'hidden';
+
+	// Create phantom at close button's position (morphed as X).
+	const phantom = createMorphPhantom( hamburgerBtn, true );
+	phantom.style.top = closeRect.top + 'px';
+	phantom.style.left = closeRect.left + 'px';
+
+	// Calculate translation back to hamburger position.
+	const dx =
+		hamburgerRect.left +
+		( hamburgerRect.width - closeRect.width ) / 2 -
+		closeRect.left;
+	const dy =
+		hamburgerRect.top +
+		( hamburgerRect.height - closeRect.height ) / 2 -
+		closeRect.top;
+
+	requestAnimationFrame( () => {
+		// Trigger the CSS morph transition (X → horizontal lines).
+		phantom.classList.remove( 'is-morphed' );
+
+		// Fly the phantom from close button to hamburger position.
+		const animation = phantom.animate(
+			[
+				{ transform: 'translate(0, 0)' },
+				{ transform: `translate(${ dx }px, ${ dy }px)` },
+			],
+			{
+				duration: MORPH_DURATION,
+				easing: MORPH_EASING,
+				fill: 'forwards',
+			}
+		);
+
+		activeMorphAnimations.set( nav, { animation, phantom, closeBtn } );
+
+		animation.onfinish = () => {
+			phantom.remove();
+			activeMorphAnimations.delete( nav );
+			onComplete();
+		};
+	} );
+}
+
 const { state, actions } = store(
 	'core/navigation',
 	{
@@ -116,9 +328,63 @@ const { state, actions } = store(
 				const ctx = getContext();
 				const { ref } = getElement();
 				ctx.previousFocus = ref;
+
+				// Capture hamburger position before the overlay covers it.
+				// Only for the "handle" icon variant (has rect-based SVG lines).
+				if (
+					ref.querySelector(
+						'.wp-block-navigation__hamburger-line'
+					)
+				) {
+					const rect = ref.getBoundingClientRect();
+					ctx.morphStartRect = {
+						top: rect.top,
+						left: rect.left,
+						width: rect.width,
+						height: rect.height,
+					};
+				}
+
 				actions.openMenu( 'click' );
 			},
 			closeMenuOnClick() {
+				const ctx = getContext();
+				const { ref } = getElement();
+
+				// Check if the reverse morph animation should play.
+				// Only applies when clicking the Navigation Overlay Close block.
+				if (
+					ctx.morphStartRect &&
+					ref.classList.contains(
+						'wp-block-navigation-overlay-close'
+					)
+				) {
+					const nav = ref.closest( '.wp-block-navigation' );
+					const hamburgerBtn = nav?.querySelector(
+						'.wp-block-navigation__responsive-container-open'
+					);
+
+					if (
+						nav &&
+						hamburgerBtn &&
+						hamburgerBtn.querySelector(
+							'.wp-block-navigation__hamburger-line'
+						)
+					) {
+						runCloseMorphAnimation(
+							nav,
+							hamburgerBtn,
+							ref,
+							ctx.morphStartRect,
+							() => {
+								actions.closeMenu( 'click' );
+								actions.closeMenu( 'focus' );
+							}
+						);
+						return;
+					}
+				}
+
 				actions.closeMenu( 'click' );
 				actions.closeMenu( 'focus' );
 			},
@@ -237,6 +503,33 @@ const { state, actions } = store(
 					ctx.firstFocusableElement = focusableElements[ 0 ];
 					ctx.lastFocusableElement =
 						focusableElements[ focusableElements.length - 1 ];
+
+					// Trigger the open morph animation if applicable.
+					if ( ctx.morphStartRect ) {
+						const nav = ref.closest( '.wp-block-navigation' );
+						const hamburgerBtn = nav?.querySelector(
+							'.wp-block-navigation__responsive-container-open'
+						);
+						const closeBtn = ref.querySelector(
+							'.wp-block-navigation-overlay-close'
+						);
+
+						if ( nav && hamburgerBtn && closeBtn ) {
+							runOpenMorphAnimation(
+								nav,
+								hamburgerBtn,
+								closeBtn,
+								ctx.morphStartRect
+							);
+						}
+					}
+				} else if ( ctx.type === 'overlay' ) {
+					// Menu closed — clean up any in-progress morph animation
+					// (e.g. if Escape was pressed during a close animation).
+					const nav = ref.closest( '.wp-block-navigation' );
+					if ( nav ) {
+						cleanupMorphAnimation( nav );
+					}
 				}
 			},
 			focusFirstElement() {
