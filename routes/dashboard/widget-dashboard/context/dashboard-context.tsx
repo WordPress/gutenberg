@@ -19,8 +19,10 @@ import {
 /**
  * Internal dependencies
  */
+import { computeGridModelChange } from '../utils/grid-model-change';
 import type {
 	ResolveWidgetModule,
+	WidgetGridModel,
 	WidgetGridSettings,
 	DashboardWidget,
 	WidgetType,
@@ -110,6 +112,13 @@ interface InternalDashboardContextValue {
 	 * rollback if a callback throws.
 	 */
 	commit: () => void;
+
+	/**
+	 * Switches the layout model, updates staging, and publishes
+	 * immediately — equivalent to changing the model in layout
+	 * settings and clicking Save.
+	 */
+	commitGridModelChange: ( targetModel: WidgetGridModel ) => void;
 
 	/** Reverts both staging slices and exits edit mode. */
 	cancel: () => void;
@@ -284,6 +293,33 @@ export function WidgetDashboardProvider( {
 		onEditChange?.( false );
 	}, [ committedLayout, committedGridSettings, onEditChange ] );
 
+	const commitGridModelChange = useCallback(
+		( targetModel: WidgetGridModel ) => {
+			const next = computeGridModelChange( {
+				layout: stagingLayout,
+				gridSettings: stagingGridSettings,
+				targetModel,
+			} );
+
+			if ( ! next ) {
+				return;
+			}
+
+			setStagingLayout( next.layout );
+			setStagingGridSettings( next.gridSettings );
+			onLayoutChange( canonicalize( next.layout ) );
+			onGridSettingsChange?.( next.gridSettings );
+			onEditChange?.( false );
+		},
+		[
+			stagingLayout,
+			stagingGridSettings,
+			onLayoutChange,
+			onGridSettingsChange,
+			onEditChange,
+		]
+	);
+
 	const resetGridSettings = useCallback( () => {
 		setStagingGridSettings( DEFAULT_GRID );
 	}, [] );
@@ -312,6 +348,7 @@ export function WidgetDashboardProvider( {
 			canEditGridSettings,
 			resetGridSettings,
 			commit,
+			commitGridModelChange,
 			cancel,
 			hasUncommittedChanges,
 			editMode,
@@ -326,6 +363,7 @@ export function WidgetDashboardProvider( {
 			canEditGridSettings,
 			resetGridSettings,
 			commit,
+			commitGridModelChange,
 			cancel,
 			hasUncommittedChanges,
 			editMode,

@@ -7,7 +7,7 @@ import { render, screen } from '@testing-library/react';
 /**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
+import { useMemo, useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as commandsStore } from '@wordpress/commands';
 
@@ -24,28 +24,60 @@ const layout: DashboardWidget[] = [
 	{ uuid: 'a', type: 'core/test', placement: { width: 1, height: 1 } },
 ];
 
-function CommandsProbe() {
-	const { context, customizeCommand } = useSelect( ( select ) => {
-		const { getContext, getCommands } = select( commandsStore );
-		const contextualCommands = getCommands( true );
-		return {
-			context: getContext(),
-			customizeCommand: contextualCommands.find(
-				( command ) => command.name === 'core/dashboard/customize'
+function CommandsProbe( { names }: { names: string[] } ) {
+	const context = useSelect(
+		( select ) => select( commandsStore ).getContext(),
+		[]
+	);
+	const contextualCommands = useSelect(
+		( select ) => select( commandsStore ).getCommands( true ),
+		[]
+	);
+
+	const registered = useMemo(
+		() =>
+			Object.fromEntries(
+				names.map( ( name ) => [
+					name,
+					contextualCommands.some(
+						( command ) => command.name === name
+					),
+				] )
 			),
-		};
-	}, [] );
+		[ names, contextualCommands ]
+	);
 
 	return (
 		<div
 			data-testid="commands-probe"
 			data-context={ context }
-			data-has-customize={ customizeCommand ? 'yes' : 'no' }
+			data-registered={ JSON.stringify( registered ) }
 		/>
 	);
 }
 
-function Harness( { initialEditMode = false }: { initialEditMode?: boolean } ) {
+const COMMAND_NAMES = [
+	'core/dashboard/customize',
+	'core/dashboard/add-widgets',
+	'core/dashboard/switch-to-masonry-layout',
+	'core/dashboard/switch-to-grid-layout',
+	'core/dashboard/layout-settings',
+	'core/dashboard/reset-to-default',
+];
+
+interface HarnessProps {
+	initialEditMode?: boolean;
+	withGridSettings?: boolean;
+	withLayoutReset?: boolean;
+	gridModel?: 'grid' | 'masonry';
+}
+
+function Harness( {
+	initialEditMode = false,
+	withGridSettings = false,
+	withLayoutReset = false,
+	gridModel = 'grid',
+}: HarnessProps ) {
 	const [ editMode, setEditMode ] = useState( initialEditMode );
 
 	return (
@@ -55,30 +87,93 @@ function Harness( { initialEditMode = false }: { initialEditMode?: boolean } ) {
 			widgetTypes={ widgetTypes }
 			editMode={ editMode }
 			onEditChange={ setEditMode }
+			onLayoutReset={ withLayoutReset ? async () => {} : undefined }
+			gridSettings={
+				withGridSettings
+					? { model: gridModel, columns: 6, minColumnWidth: 350 }
+					: undefined
+			}
+			onGridSettingsChange={ withGridSettings ? () => {} : undefined }
 		>
-			<CommandsProbe />
+			<CommandsProbe names={ COMMAND_NAMES } />
 		</WidgetDashboard>
 	);
 }
 
+function getRegistered( probe: HTMLElement ): Record< string, boolean > {
+	return JSON.parse( probe.getAttribute( 'data-registered' ) ?? '{}' );
+}
+
 describe( 'WidgetDashboard.DashboardCommands', () => {
-	it( 'sets the dashboard command context and registers Customize', () => {
-		render( <Harness /> );
+	it( 'sets the dashboard command context and registers core commands', () => {
+		render( <Harness withGridSettings withLayoutReset /> );
 		const probe = screen.getByTestId( 'commands-probe' );
+		const registered = getRegistered( probe );
 
 		expect( probe ).toHaveAttribute(
 			'data-context',
 			DASHBOARD_COMMAND_CONTEXT
 		);
-		expect( probe ).toHaveAttribute( 'data-has-customize', 'yes' );
+		expect( registered[ 'core/dashboard/customize' ] ).toBe( true );
+		expect( registered[ 'core/dashboard/add-widgets' ] ).toBe( true );
+		expect( registered[ 'core/dashboard/reset-to-default' ] ).toBe( true );
 	} );
 
 	it( 'unregisters Customize while edit mode is active', () => {
-		render( <Harness initialEditMode /> );
-
-		expect( screen.getByTestId( 'commands-probe' ) ).toHaveAttribute(
-			'data-has-customize',
-			'no'
+		render( <Harness initialEditMode withGridSettings withLayoutReset /> );
+		const registered = getRegistered(
+			screen.getByTestId( 'commands-probe' )
 		);
+
+		expect( registered[ 'core/dashboard/customize' ] ).toBe( false );
+		expect( registered[ 'core/dashboard/add-widgets' ] ).toBe( true );
+	} );
+
+	it( 'disables layout commands while edit mode is active', () => {
+		render(
+			<Harness
+				initialEditMode
+				withGridSettings
+				withLayoutReset
+				gridModel="grid"
+			/>
+		);
+		const registered = getRegistered(
+			screen.getByTestId( 'commands-probe' )
+		);
+
+		expect( registered[ 'core/dashboard/switch-to-masonry-layout' ] ).toBe(
+			false
+		);
+		expect( registered[ 'core/dashboard/switch-to-grid-layout' ] ).toBe(
+			false
+		);
+		expect( registered[ 'core/dashboard/layout-settings' ] ).toBe( false );
+	} );
+
+	it( 'only registers the active layout-model switch command', () => {
+		render( <Harness withGridSettings withLayoutReset gridModel="grid" /> );
+		const registered = getRegistered(
+			screen.getByTestId( 'commands-probe' )
+		);
+
+		expect( registered[ 'core/dashboard/switch-to-masonry-layout' ] ).toBe(
+			true
+		);
+		expect( registered[ 'core/dashboard/switch-to-grid-layout' ] ).toBe(
+			false
+		);
+	} );
+
+	it( 'omits grid-settings commands when grid settings are not editable', () => {
+		render( <Harness withLayoutReset /> );
+		const registered = getRegistered(
+			screen.getByTestId( 'commands-probe' )
+		);
+
+		expect( registered[ 'core/dashboard/switch-to-masonry-layout' ] ).toBe(
+			false
+		);
+		expect( registered[ 'core/dashboard/layout-settings' ] ).toBe( false );
 	} );
 } );
