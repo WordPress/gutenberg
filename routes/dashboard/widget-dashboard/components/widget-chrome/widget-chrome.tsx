@@ -110,7 +110,6 @@ export interface WidgetChromeProps {
 	 */
 	actionableArea?: ReactNode;
 	className?: string;
-	tabIndex?: number;
 }
 
 /**
@@ -120,7 +119,7 @@ export interface WidgetChromeProps {
  * or is still resolving.
  */
 export const WidgetChrome = forwardRef< HTMLDivElement, WidgetChromeProps >(
-	function WidgetChrome( { widget, index, className, tabIndex }, ref ) {
+	function WidgetChrome( { widget, index, className }, ref ) {
 		const { widgetTypes, editMode } = useDashboardInternalContext();
 		const widgetType = widgetTypes.find( ( t ) => t.name === widget.type );
 		const titleId = useId();
@@ -156,7 +155,6 @@ export const WidgetChrome = forwardRef< HTMLDivElement, WidgetChromeProps >(
 					render={ <section /> }
 					ref={ ref }
 					className={ clsx( styles.widgetChrome, className ) }
-					tabIndex={ tabIndex }
 					aria-labelledby={ widgetType.title ? titleId : undefined }
 					{ ...( editMode ? { inert: '' } : {} ) }
 				>

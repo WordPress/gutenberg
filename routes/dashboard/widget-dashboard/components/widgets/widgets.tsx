@@ -139,7 +139,6 @@ export const Widgets = forwardRef< HTMLDivElement, WidgetsProps >(
 				className={ clsx( styles.tile, {
 					[ styles.tileEditMode ]: editMode,
 				} ) }
-				tabIndex={ editMode ? 0 : undefined }
 				actionableArea={
 					editMode ? (
 						<WidgetChromeActionableArea widget={ widget } />
