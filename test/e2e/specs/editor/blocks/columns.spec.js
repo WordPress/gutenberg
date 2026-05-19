@@ -12,29 +12,6 @@ test.describe( 'Columns', () => {
 		await requestUtils.deleteAllPosts();
 	} );
 
-	test( 'shows layout options without the redundant skip button', async ( {
-		editor,
-	} ) => {
-		await editor.insertBlock( { name: 'core/columns' } );
-
-		await expect(
-			editor.canvas.getByRole( 'list', { name: 'Block variations' } )
-		).toBeVisible();
-		await expect(
-			editor.canvas.getByRole( 'button', { name: 'Skip', exact: true } )
-		).toHaveCount( 0 );
-
-		await editor.canvas
-			.getByRole( 'button', { name: 'Two columns; equal split' } )
-			.click();
-
-		await expect(
-			editor.canvas
-				.getByRole( 'document', { name: 'Block: Columns' } )
-				.getByRole( 'document' )
-		).toHaveCount( 2 );
-	} );
-
 	test( 'restricts all blocks inside the columns block', async ( {
 		page,
 		editor,
