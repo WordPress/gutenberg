@@ -13,6 +13,8 @@ import { Button, Stack } from '@wordpress/ui'; // eslint-disable-line @wordpress
  * Internal dependencies
  */
 import { SavedPost } from './components';
+import { QuickPostContentField } from './fields';
+import styles from './render.module.css';
 
 type QuickBlockPostData = {
 	title: string;
@@ -53,7 +55,7 @@ export default function QuickBlockPost() {
 				type: 'text',
 				label: __( 'Content' ),
 				isValid: { required: true, minLength: 10 },
-				Edit: { control: 'textarea', rows: 4 },
+				Edit: QuickPostContentField,
 				help: __( 'Enter the content for your post.' ),
 			},
 		],
@@ -101,16 +103,23 @@ export default function QuickBlockPost() {
 	}
 
 	return (
-		<Stack direction="column" gap="md" justify="space-between">
-			<DataForm< QuickBlockPostData >
-				data={ data }
-				fields={ fields }
-				form={ FORM }
-				validity={ validity }
-				onChange={ ( edits ) =>
-					setData( ( prev ) => ( { ...prev, ...edits } ) )
-				}
-			/>
+		<Stack
+			direction="column"
+			gap="md"
+			justify="space-between"
+			className={ styles.body }
+		>
+			<div className={ styles.formContainer }>
+				<DataForm< QuickBlockPostData >
+					data={ data }
+					fields={ fields }
+					form={ FORM }
+					validity={ validity }
+					onChange={ ( edits ) =>
+						setData( ( prev ) => ( { ...prev, ...edits } ) )
+					}
+				/>
+			</div>
 
 			<Stack direction="row" gap="md" justify="flex-end">
 				<Button
