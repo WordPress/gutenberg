@@ -4,7 +4,7 @@
 import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import {
-	contents,
+	resizeCornerNE,
 	stretchFullWidth,
 	stretchWide,
 	trash,
@@ -31,7 +31,7 @@ type WidthMode = 'custom' | NamedGridWidth;
 
 const WIDTH_MODES: WidthMode[] = [ 'custom', 'fill', 'full' ];
 const WIDTH_MODE_ICON = {
-	custom: contents,
+	custom: resizeCornerNE,
 	fill: stretchWide,
 	full: stretchFullWidth,
 } as const;
