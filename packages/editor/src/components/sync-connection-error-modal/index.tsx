@@ -9,9 +9,10 @@ import {
 	store as coreDataStore,
 	privateApis as coreDataPrivateApis,
 } from '@wordpress/core-data';
-// @ts-expect-error - No type declarations available for @wordpress/block-editor
-// prettier-ignore
-import { privateApis, store as blockEditorStore } from '@wordpress/block-editor';
+import {
+	privateApis,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 import {
 	Button,
 	Modal,
@@ -25,7 +26,10 @@ import { __, sprintf, _n } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { getSyncErrorMessages } from '../../utils/sync-error-messages';
+import {
+	getSyncErrorMessages,
+	PROTOCOL_MISMATCH,
+} from '../../utils/sync-error-messages';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import { useRetryCountdown } from './use-retry-countdown';
@@ -125,15 +129,16 @@ export function SyncConnectionErrorModal() {
 		}
 	}, [ connectionStatus, canRetry ] );
 
-	// Unrecoverable disconnections (e.g. protocol mismatch, connection limit
-	// exceeded) bypass the initial-load debounce. There is no in-flight
-	// connection attempt to wait on, so delaying the modal serves no purpose.
-	const isUnrecoverableDisconnection =
-		connectionStatus?.status === 'disconnected' && ! canRetry;
+	// Protocol mismatch is unrecoverable and has no in-flight connection
+	// attempt to wait on, so delaying the modal serves no purpose.
+	const isProtocolMismatch =
+		connectionStatus?.status === 'disconnected' &&
+		'error' in connectionStatus &&
+		connectionStatus.error?.code === PROTOCOL_MISMATCH;
 
 	if (
 		! isCollaborationEnabled ||
-		( ! hasInitialized && ! isUnrecoverableDisconnection ) ||
+		( ! hasInitialized && ! isProtocolMismatch ) ||
 		! showModal
 	) {
 		return null;
