@@ -21,9 +21,9 @@ import {
 	areSelectionsStatesEqual,
 	getSelectionState,
 	SelectionType,
+	SelectionDirection,
 } from '../utils/crdt-user-selections';
 
-import { SelectionDirection } from '../types';
 import type { SelectionState, WPBlockSelection } from '../types';
 import type { YBlocks } from '../utils/crdt-blocks';
 import type {
