@@ -18,6 +18,10 @@ import { ExistingDraftPrompt, SavedPost } from './components';
 import { QuickPostContentField } from './fields';
 import styles from './styles.module.css';
 
+/**
+ * Start of today in the user's local time, formatted without a timezone offset
+ * so the WP REST `after` filter compares against site-local `post_date`.
+ */
 function getTodayStartISO() {
 	const now = new Date();
 	const year = now.getFullYear();
@@ -41,6 +45,12 @@ const INITIAL_DATA: QuickBlockPostData = {
 	content: '',
 };
 
+/**
+ * Quick Block Post widget. Lets the user draft a post (title + content)
+ * without leaving the dashboard. Branches between a loading spinner, a prompt
+ * when a draft already exists from today, a confirmation after saving, and
+ * the form itself.
+ */
 export default function QuickBlockPost() {
 	const [ data, setData ] = useState< QuickBlockPostData >( INITIAL_DATA );
 	const [ isSaving, setIsSaving ] = useState( false );
@@ -127,6 +137,8 @@ export default function QuickBlockPost() {
 				setCreatedPost( { id: newId, title: data.title } );
 			}
 			setData( INITIAL_DATA );
+			// The newly saved draft would re-trigger the prompt on the next
+			// render; skip it for the rest of this session.
 			setHasDismissedPrompt( true );
 		} finally {
 			setIsSaving( false );

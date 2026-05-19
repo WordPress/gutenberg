@@ -10,6 +10,10 @@ import type { DataFormControlProps, FieldValidity } from '@wordpress/dataviews';
  */
 import styles from './quick-post-content-field.module.css';
 
+/*
+ * Returns the first failing validity rule's message. Order matches the visual
+ * reading order (required, then length, then format, then custom).
+ */
 function getErrorMessage( validity: FieldValidity | undefined ) {
 	if ( ! validity ) {
 		return undefined;
@@ -25,6 +29,11 @@ function getErrorMessage( validity: FieldValidity | undefined ) {
 	return invalid?.message;
 }
 
+/*
+ * Custom DataForm `Edit` that renders a `<textarea>` filling its container
+ * vertically, so the field grows with the widget tile. See the module CSS for
+ * the API-gap workarounds that complete the flex chain end-to-end.
+ */
 export default function QuickPostContentField< Item >( {
 	data,
 	field,
