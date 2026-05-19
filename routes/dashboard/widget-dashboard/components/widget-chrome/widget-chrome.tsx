@@ -25,7 +25,6 @@ import {
 	stretchWide,
 	trash,
 } from '@wordpress/icons';
-// Dashboard is still experimental.
 // eslint-disable-next-line @wordpress/use-recommended-components
 import {
 	Card,
@@ -44,7 +43,11 @@ import { useDashboardInternalContext } from '../../context/dashboard-context';
 import { WidgetContextProvider } from '../../context/widget-context';
 import { WidgetRender } from '../widget-render';
 import styles from './widget-chrome.module.css';
-import type { DashboardWidget, WidgetType } from '../../types';
+import type {
+	DashboardWidget,
+	GridTilePlacement,
+	WidgetType,
+} from '../../types';
 
 const { Menu } = unlock( componentsPrivateApis );
 
@@ -93,7 +96,11 @@ interface HeaderProps {
 	widgetType: WidgetType;
 }
 
-type WidthMode = 'custom' | 'fill' | 'full';
+type NamedGridWidth = Exclude<
+	NonNullable< GridTilePlacement[ 'width' ] >,
+	number
+>;
+type WidthMode = 'custom' | NamedGridWidth;
 
 const WIDTH_MODES: WidthMode[] = [ 'custom', 'fill', 'full' ];
 const WIDTH_MODE_ICON = {
