@@ -143,14 +143,21 @@ function TableRow< Item >( {
 			aria-posinset={ posinset }
 			role={ infiniteScrollEnabled ? 'article' : 'option' }
 			onMouseDown={ ( event ) => {
-				// Prevent the browser from moving focus to the row on click.
-				// Without this, Ariakit's first focus into the Composite calls
+				if ( event.button !== 0 ) {
+					return;
+				}
+				// Prevent the browser from moving focus to the row. Without
+				// this, Ariakit's first focus into the Composite calls
 				// `baseElement.focus()` without `preventScroll`, which both
 				// swallows the click and scrolls the active row under the
 				// sticky table header.
-				if ( event.button === 0 ) {
-					event.preventDefault();
-				}
+				event.preventDefault();
+				// Still put focus on the Composite container (the parent
+				// `tbody`) so keyboard navigation is available after click.
+				// `preventScroll` avoids the scroll the browser would
+				// otherwise apply when focus moves.
+				const composite = event.currentTarget.parentElement;
+				composite?.focus( { preventScroll: true } );
 			} }
 			onClick={ () => {
 				// Toggle in/out of selection array
