@@ -1,0 +1,9 @@
+.body {
+	height: 100%;
+}
+
+.icon {
+	color: var(--wpds-color-fg-content-success);
+	border-color: var(--wpds-color-stroke-surface-success);
+	background-color: var(--wpds-color-bg-surface-success-weak);
+}
