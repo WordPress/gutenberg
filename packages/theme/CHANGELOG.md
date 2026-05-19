@@ -2,15 +2,15 @@
 
 ## Unreleased
 
+### Documentation
+
+-   Add "How to pick a token" and "Naming pattern" guidance to [the design system tokens reference documentation](https://github.com/WordPress/gutenberg/blob/trunk/packages/theme/docs/tokens.md) ([#78438](https://github.com/WordPress/gutenberg/pull/78438)).
+
 ## 0.13.0 (2026-05-14)
 
 ### New Features
 
 -   Add `--wpds-motion-duration-*` and `--wpds-motion-easing-*` design tokens for standardizing animation timing across components. Easing tokens use intent-based names: `subtle`, `balanced`, and `expressive` ([#76097](https://github.com/WordPress/gutenberg/pull/76097)).
-
-### Documentation
-
--   Add "How to pick a token" and "Naming pattern" guidance to [the design system tokens reference documentation](https://github.com/WordPress/gutenberg/blob/trunk/packages/theme/docs/tokens.md) ([#78438](https://github.com/WordPress/gutenberg/pull/78438)).
 
 ## 0.12.0 (2026-04-29)
 
