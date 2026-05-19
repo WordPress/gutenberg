@@ -8,7 +8,7 @@ import clsx from 'clsx';
  */
 import {
 	Button,
-	Icon,
+	Icon as WCIcon,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { Text, Stack } from '@wordpress/ui';
@@ -179,7 +179,7 @@ function BlockCard( {
 						) }
 						{ isChild && (
 							<span className="block-editor-block-card__child-indicator-icon">
-								<Icon
+								<WCIcon
 									icon={ isRTL() ? arrowLeft : arrowRight }
 								/>
 							</span>

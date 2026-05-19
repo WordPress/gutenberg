@@ -4,7 +4,8 @@
 
 ### Breaking Changes
 
--   Remove the following entries from the `z-index()` helper ([#78315](https://github.com/WordPress/gutenberg/pull/78315)):
+-   Remove the following entries from the `z-index()` helper ([#78315](https://github.com/WordPress/gutenberg/pull/78315), [#78362](https://github.com/WordPress/gutenberg/pull/78362)):
+    -   `.components-modal__header`
     -   `.dataviews-footer`
     -   `.dataviews-view-grid__card .dataviews-selection-checkbox`
     -   `.dataviews-view-table thead`
