@@ -91,6 +91,9 @@ export function MediaEditorModal( {
 					savedId !== previous.id &&
 					onUpdate
 				) {
+					// Intentionally unscoped: the modal is closing, so the
+					// snackbar surfaces in the host editor (not the media
+					// editor's `MEDIA_EDITOR_NOTICES_CONTEXT` region).
 					createSuccessNotice( __( 'Image edited.' ), {
 						type: 'snackbar',
 						actions: [

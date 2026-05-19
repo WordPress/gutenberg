@@ -22,7 +22,6 @@ let mockSaveResult = {
 	previous: {
 		id: 10,
 		url: 'original.jpg',
-		media: { id: 10, source_url: 'original.jpg' },
 	},
 };
 const mockOnUpdate = jest.fn();
@@ -76,7 +75,6 @@ describe( 'MediaEditorModal', () => {
 			previous: {
 				id: 10,
 				url: 'original.jpg',
-				media: { id: 10, source_url: 'original.jpg' },
 			},
 		};
 

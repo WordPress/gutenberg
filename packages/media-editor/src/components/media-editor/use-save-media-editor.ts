@@ -41,7 +41,6 @@ export interface MediaEditorSaveResult {
 	previous?: {
 		id: number;
 		url?: string;
-		media: Media;
 	};
 }
 
@@ -116,7 +115,6 @@ export function useSaveMediaEditor( {
 					? {
 							id,
 							url: media.source_url,
-							media,
 					  }
 					: undefined;
 

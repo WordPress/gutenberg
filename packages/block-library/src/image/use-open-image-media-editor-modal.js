@@ -297,10 +297,6 @@ export function useOpenImageMediaEditorModal( { attributes, setAttributes } ) {
 
 				if ( Object.keys( resolvedMetadataAttributes ).length ) {
 					Object.assign( nextAttributes, resolvedMetadataAttributes );
-					blockAttributesRef.current = {
-						...blockAttributesRef.current,
-						...resolvedMetadataAttributes,
-					};
 				}
 			}
 
