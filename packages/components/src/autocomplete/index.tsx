@@ -8,7 +8,12 @@ import {
 	useReducer,
 	useRef,
 } from '@wordpress/element';
-import { useInstanceId, useMergeRefs, useRefEffect } from '@wordpress/compose';
+import {
+	useInstanceId,
+	useMergeRefs,
+	useRefEffect,
+	subscribeSharedListener,
+} from '@wordpress/compose';
 import {
 	create,
 	slice,
@@ -391,12 +396,27 @@ export function useAutocompleteProps( options: UseAutocompleteProps ) {
 		ref,
 		useRefEffect( ( element: HTMLElement ) => {
 			function _onKeyDown( event: KeyboardEvent ) {
+				// Document-scoped listener: bail when the keydown isn't
+				// for our element.
+				if ( ! element.contains( event.target as Node | null ) ) {
+					return;
+				}
 				onKeyDownRef.current?.( event );
 			}
-			element.addEventListener( 'keydown', _onKeyDown );
-			return () => {
-				element.removeEventListener( 'keydown', _onKeyDown );
-			};
+			return subscribeSharedListener(
+				element.ownerDocument,
+				'keydown',
+				_onKeyDown,
+				// Capture phase. When the autocomplete popover is open,
+				// Up/Down/Enter/Escape must navigate the completion list
+				// — they shouldn't be consumed by ancestor handlers
+				// (e.g. block-editor's writing-flow) for block navigation,
+				// block splitting, or "move out of parent" actions.
+				// Those handlers fire at bubble phase and gate on
+				// `event.defaultPrevented`, so firing in capture lets us
+				// preventDefault first when the popover is active.
+				true
+			);
 		}, [] ),
 	] );
 
