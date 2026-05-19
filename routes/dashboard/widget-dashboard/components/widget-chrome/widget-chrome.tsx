@@ -6,7 +6,7 @@ import type { ReactNode } from 'react';
 /**
  * WordPress dependencies
  */
-import { Icon as WCIcon, Spinner } from '@wordpress/components';
+import { Spinner } from '@wordpress/components';
 import {
 	Component,
 	Suspense,
@@ -17,7 +17,7 @@ import {
 import { __ } from '@wordpress/i18n';
 // Dashboard is still experimental.
 // eslint-disable-next-line @wordpress/use-recommended-components
-import { Card, Stack, Notice, VisuallyHidden } from '@wordpress/ui';
+import { Card, Icon, Stack, Notice, VisuallyHidden } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -85,7 +85,7 @@ function Header( { titleId, widgetType }: HeaderProps ) {
 						className={ styles.widgetChromeHeaderIcon }
 						aria-hidden="true"
 					>
-						<WCIcon icon={ widgetType.icon } />
+						<Icon icon={ widgetType.icon } />
 					</span>
 				) }
 				<Card.Title id={ titleId } render={ <h3 /> }>
