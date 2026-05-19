@@ -5,6 +5,5 @@
 	z-index: 1;
 	padding: var(--wpds-dimension-padding-xs);
 	background: var(--wpds-color-bg-surface-neutral-strong);
-	border: 1px solid var(--wpds-color-stroke-surface-neutral-weak);
 	border-radius: var(--wpds-border-radius-md);
 }
