@@ -48,13 +48,7 @@ type DialogOptions = {
 	constrainTabbing?: boolean;
 	onClose?: () => void;
 	/**
-	 * Optional consumer-provided `onKeyDown` handler. It runs before the
-	 * built-in close-on-Escape behavior so the consumer can call
-	 * `event.preventDefault()` to opt out of closing for a given key event.
-	 *
-	 * Provided as an option (rather than letting consumers attach their own
-	 * `onKeyDown` to the dialog wrapper) so consumers don't have to manually
-	 * merge their handler with the one returned by `useDialog`.
+	 * Optional `onKeyDown` handler, merged with the built-in one.
 	 */
 	onKeyDown?: KeyboardEventHandler< HTMLElement >;
 	/**
