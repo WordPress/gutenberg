@@ -7,6 +7,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { DataForm, useFormValidity } from '@wordpress/dataviews';
 import type { Field, Form } from '@wordpress/dataviews';
 import { useMemo, useState } from '@wordpress/element';
+import { escapeHTML } from '@wordpress/escape-html';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
 import { Button, Stack } from '@wordpress/ui'; // eslint-disable-line @wordpress/use-recommended-components
@@ -17,6 +18,25 @@ import { Button, Stack } from '@wordpress/ui'; // eslint-disable-line @wordpress
 import { ExistingDraftPrompt, SavedPost } from './components';
 import { QuickPostContentField } from './fields';
 import styles from './styles.module.css';
+
+/*
+ * Serializes plain text into one or more `core/paragraph` blocks. Splits on
+ * blank lines for paragraph breaks and converts single newlines to `<br>`,
+ * so the saved draft opens in the editor as proper blocks instead of a
+ * Classic block fallback. Builds the comment-delimited HTML by hand so it
+ * does not depend on `@wordpress/block-library` being loaded at runtime.
+ */
+function textToParagraphBlocks( text: string ): string {
+	return text
+		.split( /\n\n+/ )
+		.map( ( paragraph ) => paragraph.trim() )
+		.filter( Boolean )
+		.map( ( paragraph ) => {
+			const content = escapeHTML( paragraph ).replace( /\n/g, '<br>' );
+			return `<!-- wp:paragraph -->\n<p>${ content }</p>\n<!-- /wp:paragraph -->`;
+		} )
+		.join( '\n\n' );
+}
 
 /**
  * Start of today in the user's local time, formatted without a timezone offset
@@ -129,7 +149,7 @@ export default function QuickBlockPost() {
 		try {
 			const saved = await saveEntityRecord( 'postType', 'post', {
 				title: data.title,
-				content: data.content,
+				content: textToParagraphBlocks( data.content ),
 				status: 'draft',
 			} );
 			const newId = ( saved as { id?: number } | null )?.id;
