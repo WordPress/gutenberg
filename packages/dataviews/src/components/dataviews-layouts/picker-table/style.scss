@@ -10,6 +10,14 @@
 		width: calc(var(--wpds-dimension-base) * 12);
 	}
 
+	// When focus enters the tbody (e.g. tabbing into the table), the
+	// browser scrolls it into view by default. Without margin, the sticky
+	// `thead` would obscure the first row. The value is a generous
+	// approximation of the header height.
+	tbody {
+		scroll-margin-top: calc(var(--wpds-dimension-base) * 10);
+	}
+
 	tbody:focus-visible {
 		// Only show one focus outline at a time. When focus is on a child element,
 		// hide the table's own focus outline.
