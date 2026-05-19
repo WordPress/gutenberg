@@ -103,10 +103,9 @@ export function WidgetChromeActionableArea( {
 	widget,
 }: WidgetChromeActionableAreaProps ) {
 	const { layout, onLayoutChange } = useDashboardInternalContext();
+	const width = widget.placement?.width;
 	const selectedWidthMode: WidthMode =
-		typeof widget.placement?.width === 'number'
-			? 'custom'
-			: widget.placement?.width ?? 'full';
+		typeof width === 'string' ? width : 'custom';
 
 	const onWidthChange = ( nextWidth: WidthMode ) => {
 		const nextLayout = layout.map( ( currentWidget ) =>
