@@ -1483,10 +1483,7 @@ export const transformToStyles = (
 					) };}`;
 				}
 				if ( styles?.css ) {
-					ruleset += processCSSNesting(
-						styles.css,
-						`:root :where(${ selector })`
-					);
+					ruleset += processCustomBlockCSS( styles.css, selector );
 				}
 
 				if ( options.variationStyles && styleVariationSelectors ) {
@@ -1553,9 +1550,9 @@ export const transformToStyles = (
 									) };}`;
 								}
 								if ( styleVariations?.css ) {
-									ruleset += processCSSNesting(
+									ruleset += processCustomBlockCSS(
 										styleVariations.css,
-										`:root :where(${ styleVariationSelector })`
+										styleVariationSelector as string
 									);
 								}
 								// Generate layout styles for the variation if it supports layout and has blockGap defined.
@@ -1813,6 +1810,133 @@ function updateConfigWithSeparator(
 	return config;
 }
 
+/**
+ * Splits a raw CSS string into top-level segments: conditional at rules with
+ * blocks (@media, @supports, @layer) and ordinary rule sets.
+ *
+ * Each item is one of:
+ *   { type: 'at-rule', header: string, inner: string }
+ *   { type: 'rule',    raw:    string }
+ * @param css
+ */
+function splitCSSTopLevelSegments(
+	css: string
+): Array<
+	| { type: 'at-rule'; header: string; inner: string }
+	| { type: 'rule'; raw: string }
+> {
+	const segments: ReturnType< typeof splitCSSTopLevelSegments > = [];
+	let i = 0;
+
+	while ( i < css.length ) {
+		// Skip whitespace between rules.
+		while ( i < css.length && css[ i ].trim() === '' ) {
+			i++;
+		}
+		if ( i >= css.length ) {
+			break;
+		}
+
+		if ( css[ i ] === '@' ) {
+			let j = i;
+			while ( j < css.length && css[ j ] !== '{' && css[ j ] !== ';' ) {
+				j++;
+			}
+
+			if ( j < css.length && css[ j ] === '{' ) {
+				const header = css.slice( i, j ).trim();
+				j++;
+				let depth = 1;
+				const innerStart = j;
+				while ( j < css.length && depth > 0 ) {
+					if ( css[ j ] === '{' ) {
+						depth++;
+					} else if ( css[ j ] === '}' ) {
+						depth--;
+					}
+					j++;
+				}
+				segments.push( {
+					type: 'at-rule',
+					header,
+					inner: css.slice( innerStart, j - 1 ),
+				} );
+				i = j;
+			} else if ( j < css.length && css[ j ] === ';' ) {
+				segments.push( { type: 'rule', raw: css.slice( i, j + 1 ) } );
+				i = j + 1;
+			} else {
+				i = j;
+			}
+			continue;
+		}
+
+		let j = i;
+		let depth = 0;
+		let foundBrace = false;
+		let end = -1;
+		while ( j < css.length ) {
+			if ( css[ j ] === '{' ) {
+				depth++;
+				foundBrace = true;
+			} else if ( css[ j ] === '}' ) {
+				depth--;
+				if ( depth === 0 && foundBrace ) {
+					end = j;
+					break;
+				}
+			}
+			j++;
+		}
+		if ( end === -1 ) {
+			break;
+		}
+
+		segments.push( { type: 'rule', raw: css.slice( i, end + 1 ) } );
+		i = end + 1;
+	}
+
+	return segments;
+}
+
+/**
+ * Like processCSSNesting but preserves top level at rules (@media, @supports, @layer)
+ * by extracting their inner content, processing it recursively, then
+ * re-wrapping with the original at rule header.
+ *
+ * @param css
+ * @param blockSelector
+ */
+export function processCustomBlockCSS(
+	css: string,
+	blockSelector: string
+): string {
+	if ( ! css ) {
+		return '';
+	}
+
+	const output: string[] = [];
+
+	for ( const segment of splitCSSTopLevelSegments( css ) ) {
+		if ( segment.type === 'at-rule' ) {
+			const processedInner = processCustomBlockCSS(
+				segment.inner,
+				blockSelector
+			);
+			if ( processedInner.trim() ) {
+				output.push( `${ segment.header } {\n${ processedInner }\n}` );
+			}
+		} else {
+			const processed = processCSSNesting( segment.raw, blockSelector );
+			if ( processed.trim() ) {
+				output.push( processed );
+			}
+		}
+	}
+
+	return output.join( '\n' );
+}
+
 export function processCSSNesting( css: string, blockSelector: string ) {
 	let processedCSS = '';
 
@@ -1971,7 +2095,7 @@ export function generateGlobalStyles(
 				resolvedCssSelector ??
 				blockSelectors[ blockType.name ].selector;
 			styles.push( {
-				css: processCSSNesting( blockStyles.css, selector ),
+				css: processCustomBlockCSS( blockStyles.css, selector ),
 				isGlobalStyles: true,
 			} );
 		}

@@ -1522,6 +1522,146 @@ class WP_Theme_JSON_Gutenberg {
 	}
 
 	/**
+	 * Splits CSS into top level segments and processes each one so that
+	 * conditional at rules (@media, @supports, @layer) are preserved while
+	 * `&` nesting inside them is still resolved correctly.
+	 *
+	 * @since 23.0.0
+	 *
+	 * @param string $css      Raw CSS entered by the user.
+	 * @param string $selector The block's unique CSS class selector.
+	 * @return string Processed, browser-ready CSS.
+	 */
+	public static function process_blocks_custom_css_with_at_rules( $css, $selector ) {
+		if ( empty( trim( $css ) ) ) {
+			return '';
+		}
+
+		$output   = array();
+		$segments = static::split_css_top_level_segments( $css );
+
+		foreach ( $segments as $segment ) {
+			if ( 'at-rule' === $segment['type'] ) {
+				$processed_inner = static::process_blocks_custom_css_with_at_rules(
+					$segment['inner'],
+					$selector
+				);
+
+				if ( ! empty( trim( $processed_inner ) ) ) {
+					$output[] = $segment['header'] . " {\n" . $processed_inner . "\n}";
+				}
+			} else {
+				$processed = static::process_blocks_custom_css( $segment['raw'], $selector );
+
+				if ( ! empty( trim( $processed ) ) ) {
+					$output[] = $processed;
+				}
+			}
+		}
+
+		return implode( "\n", $output );
+	}
+
+	/**
+	 * Splits a raw CSS string into top level segments: at rules with blocks
+	 * (@media, @supports, @layer) and ordinary rule sets.
+	 *
+	 * Each item is one of:
+	 *   [ 'type' => 'at-rule', 'header' => string, 'inner' => string ]
+	 *   [ 'type' => 'rule',    'raw'    => string ]
+	 *
+	 * @since 23.0.0
+	 *
+	 * @param string $css Raw CSS string.
+	 * @return array Parsed top-level segments.
+	 */
+	private static function split_css_top_level_segments( $css ) {
+		$segments = array();
+		$len      = strlen( $css );
+		$i        = 0;
+
+		while ( $i < $len ) {
+			// Skip whitespace between rules.
+			while ( $i < $len && ctype_space( $css[ $i ] ) ) {
+				++$i;
+			}
+			if ( $i >= $len ) {
+				break;
+			}
+
+			if ( '@' === $css[ $i ] ) {
+				$j = $i;
+				while ( $j < $len && '{' !== $css[ $j ] && ';' !== $css[ $j ] ) {
+					++$j;
+				}
+
+				if ( $j < $len && '{' === $css[ $j ] ) {
+					$header = trim( substr( $css, $i, $j - $i ) );
+					++$j;
+
+					$depth       = 1;
+					$inner_start = $j;
+					while ( $j < $len && $depth > 0 ) {
+						if ( '{' === $css[ $j ] ) {
+							++$depth;
+						} elseif ( '}' === $css[ $j ] ) {
+							--$depth;
+						}
+						++$j;
+					}
+
+					$segments[] = array(
+						'type'   => 'at-rule',
+						'header' => $header,
+						'inner'  => substr( $css, $inner_start, $j - $inner_start - 1 ),
+					);
+					$i          = $j;
+				} elseif ( $j < $len && ';' === $css[ $j ] ) {
+					$segments[] = array(
+						'type' => 'rule',
+						'raw'  => substr( $css, $i, $j - $i + 1 ),
+					);
+					$i          = $j + 1;
+				} else {
+					$i = $j;
+				}
+				continue;
+			}
+
+			$j           = $i;
+			$found_brace = false;
+			$depth       = 0;
+			$end         = -1;
+
+			while ( $j < $len ) {
+				if ( '{' === $css[ $j ] ) {
+					++$depth;
+					$found_brace = true;
+				} elseif ( '}' === $css[ $j ] ) {
+					--$depth;
+					if ( 0 === $depth && $found_brace ) {
+						$end = $j;
+						break;
+					}
+				}
+				++$j;
+			}
+
+			if ( -1 === $end ) {
+				break;
+			}
+
+			$segments[] = array(
+				'type' => 'rule',
+				'raw'  => substr( $css, $i, $end - $i + 1 ),
+			);
+			$i          = $end + 1;
+		}
+
+		return $segments;
+	}
+
+	/**
 	 * Processes the CSS, to apply nesting.
 	 *
 	 * @since 6.2.0
@@ -3277,7 +3417,7 @@ class WP_Theme_JSON_Gutenberg {
 
 				// Store custom CSS for the style variation.
 				if ( isset( $style_variation_node['css'] ) ) {
-					$style_variation_custom_css[ $style_variation['selector'] ] = $this->process_blocks_custom_css( $style_variation_node['css'], $style_variation['selector'] );
+					$style_variation_custom_css[ $style_variation['selector'] ] = static::process_blocks_custom_css_with_at_rules( $style_variation_node['css'], $style_variation['selector'] );
 				}
 
 				// Store variation metadata and node for layout styles generation.
@@ -3466,7 +3606,7 @@ class WP_Theme_JSON_Gutenberg {
 				$css_feature_selector = $css_feature_selector['root'] ?? null;
 			}
 			$css_selector = is_string( $css_feature_selector ) ? $css_feature_selector : $selector;
-			$block_rules .= $this->process_blocks_custom_css( $node['css'], $css_selector );
+			$block_rules .= static::process_blocks_custom_css_with_at_rules( $node['css'], $css_selector );
 		}
 
 		return $block_rules;
