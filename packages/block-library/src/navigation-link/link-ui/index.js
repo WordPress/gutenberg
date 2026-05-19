@@ -248,11 +248,12 @@ function UnforwardedLinkUI( props, ref ) {
 										setAddingPage( true );
 									} }
 									canAddPage={
+										blockEditingMode !== 'disabled' &&
 										permissions?.canCreate &&
 										type === 'page'
 									}
 									canAddBlock={
-										blockEditingMode === 'default'
+										blockEditingMode !== 'disabled'
 									}
 								/>
 							);
