@@ -1274,7 +1274,7 @@ class WP_Theme_JSON_Gutenberg {
 			return $selector . $to_append;
 		}
 		$new_selectors = array();
-		$selectors     = explode( ',', $selector );
+		$selectors     = static::split_selector_list( $selector );
 		foreach ( $selectors as $sel ) {
 			$new_selectors[] = $sel . $to_append;
 		}
@@ -1299,11 +1299,48 @@ class WP_Theme_JSON_Gutenberg {
 			return $to_prepend . $selector;
 		}
 		$new_selectors = array();
-		$selectors     = explode( ',', $selector );
+		$selectors     = static::split_selector_list( $selector );
 		foreach ( $selectors as $sel ) {
 			$new_selectors[] = $to_prepend . $sel;
 		}
 		return implode( ',', $new_selectors );
+	}
+
+	/**
+	 * Splits a selector list by top-level commas.
+	 *
+	 * @param string $selector CSS selector list.
+	 * @return string[] Selectors.
+	 */
+	protected static function split_selector_list( $selector ) {
+		if ( ! str_contains( $selector, ',' ) ) {
+			return array( $selector );
+		}
+
+		$selectors         = array();
+		$current_selector  = '';
+		$parentheses_depth = 0;
+		$selector_length   = strlen( $selector );
+
+		for ( $i = 0; $i < $selector_length; $i++ ) {
+			$char = $selector[ $i ];
+
+			if ( '(' === $char ) {
+				++$parentheses_depth;
+			} elseif ( ')' === $char && $parentheses_depth > 0 ) {
+				--$parentheses_depth;
+			} elseif ( ',' === $char && 0 === $parentheses_depth ) {
+				$selectors[]      = $current_selector;
+				$current_selector = '';
+				continue;
+			}
+
+			$current_selector .= $char;
+		}
+
+		$selectors[] = $current_selector;
+
+		return $selectors;
 	}
 
 	/**
@@ -2283,8 +2320,8 @@ class WP_Theme_JSON_Gutenberg {
 			return $selector;
 		}
 
-		$scopes    = explode( ',', $scope );
-		$selectors = explode( ',', $selector );
+		$scopes    = static::split_selector_list( $scope );
+		$selectors = static::split_selector_list( $selector );
 
 		$selectors_scoped = array();
 		foreach ( $scopes as $outer ) {
@@ -5394,7 +5431,7 @@ class WP_Theme_JSON_Gutenberg {
 		}
 
 		$limit          = 1;
-		$selector_parts = explode( ',', $block_selector );
+		$selector_parts = static::split_selector_list( $block_selector );
 		$result         = array();
 
 		foreach ( $selector_parts as $part ) {
@@ -5434,7 +5471,7 @@ class WP_Theme_JSON_Gutenberg {
 		}
 
 		$variation_class = ".is-style-$variation_name";
-		$selector_parts  = explode( ',', $feature_selector );
+		$selector_parts  = static::split_selector_list( $feature_selector );
 		$selector_parts  = array_map(
 			static function ( $selector ) use ( $variation_class ) {
 				$selector = trim( $selector );

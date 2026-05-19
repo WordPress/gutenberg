@@ -19,6 +19,34 @@ import { getValueFromObjectPath } from './object';
 export const ROOT_BLOCK_SELECTOR = 'body';
 export const ROOT_CSS_PROPERTIES_SELECTOR = ':root';
 
+function splitSelectorList( selector: string ) {
+	if ( ! selector.includes( ',' ) ) {
+		return [ selector ];
+	}
+
+	const selectors: string[] = [];
+	let currentSelector = '';
+	let parenthesesDepth = 0;
+
+	for ( const char of selector ) {
+		if ( char === '(' ) {
+			parenthesesDepth++;
+		} else if ( char === ')' && parenthesesDepth > 0 ) {
+			parenthesesDepth--;
+		} else if ( char === ',' && parenthesesDepth === 0 ) {
+			selectors.push( currentSelector );
+			currentSelector = '';
+			continue;
+		}
+
+		currentSelector += char;
+	}
+
+	selectors.push( currentSelector );
+
+	return selectors;
+}
+
 export const PRESET_METADATA = [
 	{
 		path: [ 'color', 'palette' ],
@@ -170,8 +198,8 @@ export function scopeSelector( scope: string | undefined, selector: string ) {
 		return selector;
 	}
 
-	const scopes = scope.split( ',' );
-	const selectors = selector.split( ',' );
+	const scopes = splitSelectorList( scope );
+	const selectors = splitSelectorList( selector );
 
 	const selectorsScoped: string[] = [];
 	scopes.forEach( ( outer ) => {
@@ -257,7 +285,7 @@ export function appendToSelector( selector: string, toAppend: string ) {
 	if ( ! selector.includes( ',' ) ) {
 		return selector + toAppend;
 	}
-	const selectors = selector.split( ',' );
+	const selectors = splitSelectorList( selector );
 	const newSelectors = selectors.map( ( sel ) => sel + toAppend );
 	return newSelectors.join( ',' );
 }
@@ -298,9 +326,9 @@ export function getBlockStyleVariationSelector(
 		return group1 + group2 + variationClass;
 	};
 
-	const result = blockSelector
-		.split( ',' )
-		.map( ( part ) => part.replace( ancestorRegex, addVariationClass ) );
+	const result = splitSelectorList( blockSelector ).map( ( part ) =>
+		part.replace( ancestorRegex, addVariationClass )
+	);
 
 	return result.join( ',' );
 }
@@ -322,16 +350,18 @@ export function getBlockStyleVariationFeatureSelector(
 	featureSelector: string
 ) {
 	const variationClass = `.is-style-${ variation }`;
-	const selectorParts = featureSelector.split( ',' ).map( ( selector ) => {
-		const trimmedSelector = selector.trim();
-		const prefix = `${ variationClass } `;
+	const selectorParts = splitSelectorList( featureSelector ).map(
+		( selector ) => {
+			const trimmedSelector = selector.trim();
+			const prefix = `${ variationClass } `;
 
-		if ( trimmedSelector.startsWith( prefix ) ) {
-			return trimmedSelector.slice( prefix.length );
+			if ( trimmedSelector.startsWith( prefix ) ) {
+				return trimmedSelector.slice( prefix.length );
+			}
+
+			return trimmedSelector;
 		}
-
-		return trimmedSelector;
-	} );
+	);
 
 	return getBlockStyleVariationSelector(
 		variation,

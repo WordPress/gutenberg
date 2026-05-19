@@ -304,6 +304,13 @@ describe( 'editor utils', () => {
 					'.wp-block.is-style-custom:is(.outer .inner:first-child)',
 			},
 			{
+				type: ':is with selector list',
+				selector:
+					'.wp-block:is(.outer, .inner:first-child) .content, .wp-block-alternative',
+				expected:
+					'.wp-block.is-style-custom:is(.outer, .inner:first-child) .content, .wp-block-alternative.is-style-custom',
+			},
+			{
 				type: ':not',
 				selector: '.wp-block:not(.outer .inner:first-child)',
 				expected:
@@ -360,6 +367,17 @@ describe( 'editor utils', () => {
 					'.is-style-outline--3 .wp-block-button'
 				)
 			).toBe( '.wp-block-button.is-style-outline--3' );
+		} );
+
+		it( 'preserves selector-list commas inside pseudo-class functions', () => {
+			expect(
+				getBlockStyleVariationFeatureSelector(
+					'outline--3',
+					'.is-style-outline--3 .wp-block-button:is(.primary, .secondary), .is-style-outline--3 .wp-block-button .inner'
+				)
+			).toBe(
+				'.wp-block-button.is-style-outline--3:is(.primary, .secondary),.wp-block-button.is-style-outline--3 .inner'
+			);
 		} );
 	} );
 
