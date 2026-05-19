@@ -697,9 +697,16 @@ export function prepareItem( id: QueueItemId ) {
 		const operations: Operation[] = [];
 		const settings = select.getSettings();
 
-		// Animated GIF to video conversion. WebCodecs is required; client-side
-		// media already runs only under cross-origin isolation, so this is a
+		// Animated GIF → video. WebCodecs is required; client-side media
+		// already runs only under cross-origin isolation, so this is a
 		// capability check, not a browser-support fallback path.
+		//
+		// The GIF uploads through the normal image pipeline so the block
+		// remains a valid core/image. The converted video is sideloaded as
+		// a companion file of this same attachment after upload (see
+		// generateThumbnails) — like the HEIC original — not as a separate
+		// media library attachment. It is recorded in attachment metadata
+		// and swapped in at render time (see lib/media/animated-gif-to-video.php).
 		if (
 			file.type === 'image/gif' &&
 			settings.gifConvert !== false &&
@@ -715,19 +722,10 @@ export function prepareItem( id: QueueItemId ) {
 				isAnimated = false;
 			}
 			if ( isAnimated ) {
-				const outputFormat =
-					settings.videoOutputFormat === 'video/webm'
-						? 'webm'
-						: 'mp4';
-
 				operations.push(
-					[
-						OperationType.TranscodeGif,
-						{
-							outputFormat,
-						} as OperationArgs[ OperationType.TranscodeGif ],
-					],
-					OperationType.Upload
+					OperationType.Upload,
+					OperationType.ThumbnailGeneration,
+					OperationType.Finalize
 				);
 
 				dispatch< AddOperationsAction >( {
@@ -736,13 +734,10 @@ export function prepareItem( id: QueueItemId ) {
 					operations,
 				} );
 
-				// Tell the server to handle sub-sizes since this is a video.
+				// Keep the original GIF so generateThumbnails can
+				// transcode and sideload it once the attachment exists.
 				dispatch.finishOperation( id, {
-					additionalData: {
-						...item.additionalData,
-						generate_sub_sizes: true,
-						convert_format: true,
-					},
+					animatedGifFile: item.file,
 				} );
 				return;
 			}
@@ -1138,8 +1133,11 @@ type TranscodeGifItemArgs = OperationArgs[ OperationType.TranscodeGif ];
 /**
  * Converts an animated GIF to a video file (MP4 or WebM).
  *
- * Uses mediabunny + WebCodecs in a web worker for fully client-side
- * conversion. The resulting video replaces the original GIF in the queue.
+ * Runs inside a sideload item whose parent is the GIF's image attachment
+ * (see generateThumbnails). The next Upload op then sideloads the
+ * transcoded video as a companion of that attachment under the
+ * `animated-video` image size; the GIF stays the primary attachment and
+ * the editor block stays `core/image`.
  *
  * @param id     Item ID.
  * @param [args] Transcode arguments including output format.
@@ -1164,29 +1162,30 @@ export function transcodeGifItem(
 				outputMimeType
 			);
 
-			const blobUrl = createBlobURL( file );
-			dispatch< CacheBlobUrlAction >( {
-				type: Type.CacheBlobUrl,
-				id,
-				blobUrl,
-			} );
-
-			dispatch.finishOperation( id, {
-				file,
-				attachment: {
-					url: blobUrl,
-				},
-			} );
+			// Hand the transcoded video to the next Upload op as the
+			// sideload's payload. The parent attachment (the GIF) is
+			// already uploaded; no blob URL is needed for any block.
+			dispatch.finishOperation( id, { file } );
 		} catch ( error ) {
 			// An "Unsupported" outcome is a graceful skip, not a failure:
-			// finish the operation untouched so the original GIF uploads
-			// (matches the spec's non-error fallback contract).
+			// the parent GIF attachment already exists and stays as-is, so
+			// we silently cancel this sideload (no companion video, no
+			// user-facing error). Uploading the original GIF here would
+			// create an `animated_video` meta entry pointing at the GIF
+			// itself — meaningless.
 			if ( isUnsupportedConversionError( error ) ) {
-				dispatch.finishOperation( id, {} );
+				dispatch.cancelItem(
+					id,
+					new Error( 'Animated GIF conversion unsupported' ),
+					true
+				);
 				return;
 			}
-			// Surface the real cause to the console; the user-facing
-			// notification is intentionally generic.
+			// Real engine failure. The parent GIF attachment is fine —
+			// the user just won't get a companion video. Log the cause
+			// for debuggability and silently cancel the sideload; we do
+			// not surface a "could not be converted to video" toast on
+			// what the user thinks of as an image upload.
 			// eslint-disable-next-line no-console
 			console.error(
 				'[mediabunny] GIF to video conversion failed:',
@@ -1199,7 +1198,8 @@ export function transcodeGifItem(
 					message: 'Animated GIF could not be converted to video',
 					file: item.file,
 					cause: error instanceof Error ? error : undefined,
-				} )
+				} ),
+				true
 			);
 		}
 	};
@@ -1244,6 +1244,37 @@ export function generateThumbnails( id: QueueItemId ) {
 					convert_format: false,
 				},
 				operations: [ OperationType.Upload ],
+			} );
+		}
+
+		// Animated GIF: transcode the original to a video and sideload it
+		// as a companion file of this attachment (recorded in metadata as
+		// `animated_video`), mirroring the HEIC original flow. The
+		// TranscodeGif step keeps the WebCodecs concurrency limit;
+		// parentId routes the result to the sideload endpoint, so no
+		// separate attachment is created.
+		if ( item.animatedGifFile && attachment.id ) {
+			const outputFormat =
+				settings.videoOutputFormat === 'video/webm' ? 'webm' : 'mp4';
+
+			dispatch.addSideloadItem( {
+				file: item.animatedGifFile,
+				batchId: uuidv4(),
+				parentId: item.id,
+				additionalData: {
+					post: attachment.id,
+					image_size: 'animated-video',
+					convert_format: false,
+				},
+				operations: [
+					[
+						OperationType.TranscodeGif,
+						{
+							outputFormat,
+						} as OperationArgs[ OperationType.TranscodeGif ],
+					],
+					OperationType.Upload,
+				],
 			} );
 		}
 

@@ -32,6 +32,11 @@ export interface QueueItem {
 	// as the attachment's "original_image" after the converted JPEG is
 	// uploaded. Not set for non-HEIC items.
 	originalHeicFile?: File;
+	// Original animated GIF, kept separately so it can be transcoded to a
+	// video and sideloaded as a companion file of the GIF image attachment
+	// (recorded in attachment metadata as `animated_video`). Not set for
+	// non-animated-GIF items.
+	animatedGifFile?: File;
 	poster?: File;
 	attachment?: Partial< Attachment >;
 	status: ItemStatus;
