@@ -4,7 +4,7 @@
 import type { CropperState, NormalizedRect, Size } from './types';
 import { getRotatedBBox } from './camera';
 import { getSourceRegion, type SourceRegion } from './source-region';
-import { MIN_CROP_SIZE, type CropBounds } from './stencil-math';
+import { DEFAULT_MIN_CROP_SIZE, type CropBounds } from './stencil-math';
 
 const EPSILON = 1e-9;
 
@@ -318,11 +318,11 @@ function cropBoundsToPixelRectBounds(
 	const maxWidth = Math.max( 0, maxRight - minLeft );
 	const maxHeight = Math.max( 0, maxBottom - minTop );
 	const minWidth = Math.min(
-		normalizedWidthToPixel( MIN_CROP_SIZE, state, snap ),
+		normalizedWidthToPixel( DEFAULT_MIN_CROP_SIZE.width, state, snap ),
 		maxWidth
 	);
 	const minHeight = Math.min(
-		normalizedHeightToPixel( MIN_CROP_SIZE, state, snap ),
+		normalizedHeightToPixel( DEFAULT_MIN_CROP_SIZE.height, state, snap ),
 		maxHeight
 	);
 
