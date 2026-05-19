@@ -39,7 +39,11 @@ import {
 	getDefaultBlockName,
 	getBlockBindingsSource,
 } from '@wordpress/blocks';
-import { useMergeRefs, useRefEffect } from '@wordpress/compose';
+import {
+	useMergeRefs,
+	useRefEffect,
+	subscribeSharedListener,
+} from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { NEW_TAB_TARGET, NOFOLLOW_REL } from './constants';
 import { getUpdatedLinkAttributes } from './get-updated-link-attributes';
@@ -67,6 +71,9 @@ function useEnter( props ) {
 	return useRefEffect( ( element ) => {
 		function onKeyDown( event ) {
 			if ( event.defaultPrevented || event.keyCode !== ENTER ) {
+				return;
+			}
+			if ( ! element.contains( event.target ) ) {
 				return;
 			}
 			const { content, clientId } = propsRef.current;
@@ -107,10 +114,14 @@ function useEnter( props ) {
 			selectionChange( middle.clientId );
 		}
 
-		element.addEventListener( 'keydown', onKeyDown );
-		return () => {
-			element.removeEventListener( 'keydown', onKeyDown );
-		};
+		// Capture phase so we run before writing-flow's ancestor-bubble
+		// keydown handlers that gate on `event.defaultPrevented`.
+		return subscribeSharedListener(
+			element.ownerDocument,
+			'keydown',
+			onKeyDown,
+			true
+		);
 	}, [] );
 }
 

@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useRef } from '@wordpress/element';
-import { useRefEffect } from '@wordpress/compose';
+import { useRefEffect, subscribeSharedListener } from '@wordpress/compose';
 import { ENTER } from '@wordpress/keycodes';
 import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
@@ -34,6 +34,10 @@ export function useOnEnter( props ) {
 			}
 
 			if ( event.keyCode !== ENTER ) {
+				return;
+			}
+
+			if ( ! element.contains( event.target ) ) {
 				return;
 			}
 
@@ -119,9 +123,15 @@ export function useOnEnter( props ) {
 			} );
 		}
 
-		element.addEventListener( 'keydown', onKeyDown );
-		return () => {
-			element.removeEventListener( 'keydown', onKeyDown );
-		};
+		// Capture phase so we run before writing-flow's element-level
+		// keydown handlers on ancestor block-list nodes
+		// (`use-input.js`, `use-arrow-nav.js`) that gate on
+		// `event.defaultPrevented`.
+		return subscribeSharedListener(
+			element.ownerDocument,
+			'keydown',
+			onKeyDown,
+			true
+		);
 	}, [] );
 }

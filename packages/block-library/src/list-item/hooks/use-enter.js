@@ -7,7 +7,7 @@ import {
 	cloneBlock,
 } from '@wordpress/blocks';
 import { useRef } from '@wordpress/element';
-import { useRefEffect } from '@wordpress/compose';
+import { useRefEffect, subscribeSharedListener } from '@wordpress/compose';
 import { ENTER } from '@wordpress/keycodes';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
@@ -27,6 +27,9 @@ export default function useEnter( props ) {
 	return useRefEffect( ( element ) => {
 		function onKeyDown( event ) {
 			if ( event.defaultPrevented || event.keyCode !== ENTER ) {
+				return;
+			}
+			if ( ! element.contains( event.target ) ) {
 				return;
 			}
 			const { content, clientId } = propsRef.current;
@@ -82,9 +85,13 @@ export default function useEnter( props ) {
 			selectionChange( middle.clientId );
 		}
 
-		element.addEventListener( 'keydown', onKeyDown );
-		return () => {
-			element.removeEventListener( 'keydown', onKeyDown );
-		};
+		// Capture phase so we run before writing-flow's ancestor-bubble
+		// keydown handlers that gate on `event.defaultPrevented`.
+		return subscribeSharedListener(
+			element.ownerDocument,
+			'keydown',
+			onKeyDown,
+			true
+		);
 	}, [] );
 }
