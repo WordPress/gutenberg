@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { RuleTester } from 'eslint';
-
-/**
- * Internal dependencies
- */
 import rule, { ALLOWLIST, DENYLIST } from '../use-recommended-components';
 
 const ruleTester = new RuleTester( {
@@ -14,11 +7,6 @@ const ruleTester = new RuleTester( {
 		ecmaVersion: 6,
 	},
 } );
-
-const TEST_BADGE_MESSAGE =
-	'Badge is planned for deprecation. Write your own CSS instead.';
-
-DENYLIST[ '@wordpress/components' ].Badge = TEST_BADGE_MESSAGE;
 
 ruleTester.run( 'use-recommended-components', rule, {
 	valid: [
@@ -97,18 +85,18 @@ ruleTester.run( 'use-recommended-components', rule, {
 			],
 		},
 		{
-			code: "import { privateApis } from '@wordpress/components'; const { Badge } = unlock( privateApis );",
+			code: "import { privateApis } from '@wordpress/components'; const { Tabs } = unlock( privateApis );",
 			errors: [
 				{
-					message: TEST_BADGE_MESSAGE,
+					message: 'Use `Tabs` from `@wordpress/ui` instead.',
 				},
 			],
 		},
 		{
-			code: "import { privateApis as componentsPrivateApis } from '@wordpress/components'; const { Badge: WCBadge } = unlock( componentsPrivateApis );",
+			code: "import { privateApis as componentsPrivateApis } from '@wordpress/components'; const { Tabs: WCTabs } = unlock( componentsPrivateApis );",
 			errors: [
 				{
-					message: TEST_BADGE_MESSAGE,
+					message: 'Use `Tabs` from `@wordpress/ui` instead.',
 				},
 			],
 		},
