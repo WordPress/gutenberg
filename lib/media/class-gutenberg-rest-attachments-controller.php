@@ -51,6 +51,7 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 								$valid_sizes   = array_keys( wp_get_registered_image_subsizes() );
 								$valid_sizes[] = 'original';
 								$valid_sizes[] = 'original-heic';
+								$valid_sizes[] = 'animated-video';
 								$valid_sizes[] = 'scaled';
 								$valid_sizes[] = 'full';
 
@@ -491,6 +492,12 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 				// web-viewable JPEG derivative. Cleanup on attachment delete
 				// is handled by a delete_attachment hook that reads this key.
 				$metadata['original'] = $sub_size['file'];
+			} elseif ( 'animated-video' === $image_size ) {
+				// Converted video companion of an animated GIF. Stored
+				// under its own key; the GIF stays the attachment. The
+				// render-time swap and secure cleanup live in
+				// lib/media/animated-gif-to-video.php.
+				$metadata['animated_video'] = $sub_size['file'];
 			} elseif ( 'scaled' === $image_size ) {
 				if ( ! empty( $sub_size['original_image'] ) ) {
 					$metadata['original_image'] = $sub_size['original_image'];
@@ -611,6 +618,13 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 	 * @return true|WP_Error True if valid, WP_Error if invalid.
 	 */
 	private function validate_image_dimensions( int $width, int $height, $image_size, int $attachment_id ) {
+		// 'animated-video' companion file: video, not an image. Skip *all*
+		// dimension checks (the caller passes (0, 0) for this case so the
+		// positive-dimension assertion below would otherwise fire).
+		if ( 'animated-video' === $image_size ) {
+			return true;
+		}
+
 		// Dimensions must be positive for all sizes.
 		if ( $width <= 0 || $height <= 0 ) {
 			return new WP_Error(
@@ -809,7 +823,12 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 		// (corrupted/unsupported files) and for populating the sub-size payload
 		// below. Scalar 'original' is a byte-only passthrough and does not need
 		// dimensions, but reading them here is harmless.
-		$size = wp_getimagesize( $path );
+		//
+		// 'animated-video' companions are video files (MP4/WebM); the image
+		// helpers can't read their dimensions and would falsely report the
+		// upload as "corrupted or unsupported". Skip the read for this case;
+		// validate_image_dimensions() also short-circuits it below.
+		$size = 'animated-video' === $image_size ? array( 0, 0 ) : wp_getimagesize( $path );
 
 		if ( ! $size ) {
 			// Could not determine dimensions (corrupted file, unsupported format).
@@ -851,6 +870,12 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 			// $metadata['original'] (separate from 'original_image', which the
 			// scaled-sideload flow owns). Cleanup on attachment delete is
 			// handled by a delete_attachment hook that reads this key.
+			$sub_size_data['file'] = wp_basename( $path );
+		} elseif ( 'animated-video' === $image_size ) {
+			// Converted animated-GIF video companion. finalize_item()
+			// writes the filename to $metadata['animated_video']; it is
+			// swapped in for the GIF at render time and deleted by a
+			// delete_attachment hook. See lib/media/animated-gif-to-video.php.
 			$sub_size_data['file'] = wp_basename( $path );
 		} elseif ( 'scaled' === $image_size ) {
 			// Record the current attached file as the original.
