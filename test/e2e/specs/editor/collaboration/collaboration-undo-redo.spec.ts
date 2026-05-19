@@ -224,33 +224,11 @@ test.describe( 'Collaboration - Undo/Redo', () => {
 				},
 			] );
 
-		// Wait for the CRDT content field to be synced on User B.
-		await expect
-			.poll(
-				() =>
-					page2.evaluate( () => {
-						const postId = ( window as any ).wp.data
-							.select( 'core/editor' )
-							.getCurrentPostId();
-						const record = ( window as any ).wp.data
-							.select( 'core' )
-							.getEditedEntityRecord(
-								'postType',
-								'post',
-								postId
-							);
-						return typeof record?.content === 'string'
-							? record.content
-							: record?.content?.raw ?? '';
-					} ),
-				{ timeout: 5000 }
-			)
-			.toContain( 'Important work' );
-
 		// Clear blocks on User B via editEntityRecord, simulating what
 		// the Code Editor does (post-text-editor sets blocks: undefined
-		// when the user edits HTML directly). Blocks must be re-parsed
-		// from the CRDT content field.
+		// when the user edits HTML directly). The receiver-injected
+		// content closure captured the synced blocks, so getEditedPostContent
+		// should still return the right HTML even with blocks cleared.
 		await page2.evaluate( () => {
 			const postId = ( window as any ).wp.data
 				.select( 'core/editor' )
@@ -262,9 +240,6 @@ test.describe( 'Collaboration - Undo/Redo', () => {
 				} );
 		} );
 
-		// After blocks are cleared and re-parsed from content, User B
-		// should still see the content. If the CRDT content field was
-		// never synced (stale/empty), the blocks would be lost.
 		await expect
 			.poll(
 				() =>

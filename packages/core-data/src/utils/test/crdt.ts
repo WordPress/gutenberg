@@ -10,6 +10,9 @@ import { describe, expect, it, jest, beforeEach } from '@jest/globals';
 
 /**
  * Mock getBlockTypes so CRDT merging can identify rich-text attributes.
+ * Also stub __unstableSerializeAndClean so we can assert how it's invoked
+ * (the real implementation returns "" without registered block types, which
+ * isn't useful for asserting closure-capture behavior).
  */
 jest.mock( '@wordpress/blocks', () => {
 	const actual = jest.requireActual( '@wordpress/blocks' ) as Record<
@@ -43,6 +46,9 @@ jest.mock( '@wordpress/blocks', () => {
 				},
 			},
 		],
+		__unstableSerializeAndClean: jest.fn(
+			( blocks: unknown[] ) => `serialized:${ blocks?.length ?? 0 }`
+		),
 	};
 } );
 
@@ -979,7 +985,7 @@ describe( 'crdt', () => {
 			} );
 		} );
 
-		it( 'injects a content function when blocks changed but content did not', () => {
+		it( 'injects a closure-based content function when blocks changed but content did not', () => {
 			addBlockToDoc( map, 'block-1', 'Hello world' );
 
 			const editedRecord = {
@@ -1000,7 +1006,40 @@ describe( 'crdt', () => {
 			expect( typeof changes.content ).toBe( 'function' );
 		} );
 
-		it( 'does not inject a content function when content also changed', () => {
+		it( 'injected content function captures the synced blocks and ignores its caller-supplied argument', () => {
+			addBlockToDoc( map, 'block-1', 'Hello world' );
+
+			const editedRecord = {
+				title: 'CRDT Title',
+				status: 'draft',
+				content: { raw: 'Same content', rendered: 'Same content' },
+				blocks: [],
+			} as unknown as Post;
+
+			const changes = getPostChangesFromCRDTDoc(
+				doc,
+				editedRecord,
+				defaultSyncedProperties
+			);
+
+			// The injected function takes no parameters and serializes the
+			// captured (synced) blocks. This is what makes getEditedPostContent
+			// keep working after the Code Editor clears `record.blocks` to force
+			// a re-parse: the closure already has the right blocks on hand.
+			//
+			// The mocked __unstableSerializeAndClean returns "serialized:<n>"
+			// where n is the length of the blocks it was called with. The
+			// captured blocks have one entry, so both calls below should yield
+			// "serialized:1" (proving the closure ignores its argument and
+			// uses the captured blocks instead).
+			const contentFn = changes.content as ( args?: {
+				blocks: Block[];
+			} ) => string;
+			expect( contentFn() ).toBe( 'serialized:1' );
+			expect( contentFn( { blocks: [] } ) ).toBe( 'serialized:1' );
+		} );
+
+		it( 'does not inject a content function when content also changed in the doc', () => {
 			addBlockToDoc( map, 'block-1', 'Hello world' );
 			map.set( 'content', new Y.Text( 'New content' ) );
 
@@ -1020,6 +1059,7 @@ describe( 'crdt', () => {
 			// Content changed directly, so it should be a string, not a function.
 			expect( changes.blocks ).toBeDefined();
 			expect( typeof changes.content ).toBe( 'string' );
+			expect( changes.content ).toBe( 'New content' );
 		} );
 
 		it( 'does not inject a content function when blocks did not change', () => {
