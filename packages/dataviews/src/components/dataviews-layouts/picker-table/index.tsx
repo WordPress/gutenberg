@@ -146,18 +146,16 @@ function TableRow< Item >( {
 				if ( event.button !== 0 ) {
 					return;
 				}
-				// Prevent the browser from moving focus to the row. Without
-				// this, Ariakit's first focus into the Composite calls
-				// `baseElement.focus()` without `preventScroll`, which both
-				// swallows the click and scrolls the active row under the
-				// sticky table header.
-				event.preventDefault();
-				// Still put focus on the Composite container (the parent
-				// `tbody`) so keyboard navigation is available after click.
-				// `preventScroll` avoids the scroll the browser would
-				// otherwise apply when focus moves.
-				const composite = event.currentTarget.parentElement;
-				composite?.focus( { preventScroll: true } );
+				// Pre-focus the Composite container (parent `tbody`) so that
+				// when the row is focused on click, Ariakit sees the focus
+				// coming from within the Composite and uses `focusSilently`
+				// (which passes `preventScroll: true`). Without this, the
+				// first focus into the Composite scrolls the active row
+				// under the sticky table header, which also causes the click
+				// to land on a different element than the original target.
+				event.currentTarget.parentElement?.focus( {
+					preventScroll: true,
+				} );
 			} }
 			onClick={ () => {
 				// Toggle in/out of selection array
