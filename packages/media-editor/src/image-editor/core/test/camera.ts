@@ -11,10 +11,11 @@ import {
 	restrictPanZoom,
 	restrictCropRect,
 	getImageCropBounds,
+	getMinZoom,
 } from '../containment';
 import { getSourceRegion, getSourceRegionPercent } from '../source-region';
 import { computeTransformStyle } from '../transform-style';
-import { DEFAULT_STATE, MAX_ZOOM } from '../constants';
+import { DEFAULT_STATE, MAX_ZOOM, MIN_ZOOM } from '../constants';
 import type { CropperState, Size } from '../types';
 
 const CONTAINER: Size = { width: 800, height: 600 };
@@ -243,6 +244,36 @@ describe( 'restrictPanZoom', () => {
 		const result = restrictPanZoom( state, IMAGE, state.cropRect );
 		expect( result.pan.x ).toBeCloseTo( 0, 5 );
 		expect( result.pan.y ).toBeCloseTo( 0, 5 );
+	} );
+} );
+
+describe( 'getMinZoom', () => {
+	it( 'falls back to MIN_ZOOM for invalid image dimensions', () => {
+		const state = makeState( {
+			image: {
+				src: 'invalid.jpg',
+				naturalWidth: 1000,
+				naturalHeight: 0,
+			},
+		} );
+
+		expect( getMinZoom( state ) ).toBe( MIN_ZOOM );
+	} );
+
+	it( 'returns a finite value for non-finite rotation and crop fields', () => {
+		const state = makeState( {
+			rotation: Number.NaN,
+			cropRect: {
+				x: 0,
+				y: 0,
+				width: Number.NaN,
+				height: 1,
+			},
+		} );
+
+		const minZoom = getMinZoom( state );
+		expect( Number.isFinite( minZoom ) ).toBe( true );
+		expect( minZoom ).toBeGreaterThan( 0 );
 	} );
 } );
 

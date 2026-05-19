@@ -106,10 +106,22 @@ export function getMinZoom( state: CropperState ): number {
 	if ( ! state.image ) {
 		return MIN_ZOOM;
 	}
-	const aspectRatio = state.image.naturalWidth / state.image.naturalHeight;
+	const imageSize = {
+		width: state.image.naturalWidth,
+		height: state.image.naturalHeight,
+	};
+	if ( ! isValidSize( imageSize ) ) {
+		return MIN_ZOOM;
+	}
+	const safeState = sanitizeCropperState( state );
+	const aspectRatio = imageSize.width / imageSize.height;
 	return Math.max(
 		ABSOLUTE_MIN_ZOOM,
-		getMinZoomForCover( state.rotation, aspectRatio, state.cropRect )
+		getMinZoomForCover(
+			safeState.rotation,
+			aspectRatio,
+			safeState.cropRect
+		)
 	);
 }
 

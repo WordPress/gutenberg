@@ -49,7 +49,7 @@ export interface UseCropperStateReturn {
 	setPan: ( pan: NormalizedPoint ) => void;
 	/**
 	 * Set the zoom level, anchored at the crop center. Clamped to the
-	 * coverage-aware range — see `getMinZoom` and `MAX_ZOOM`.
+	 * coverage-aware minimum and maximum zoom.
 	 *
 	 * Pointer-driven zoom (wheel, pinch, double-tap) anchors at the
 	 * cursor via `setZoomAtPoint`. Cursorless surfaces — the slider, the

@@ -14,6 +14,11 @@ import type { NormalizedRect, Flip, CropperState } from './types';
  * floor for those comes from `getMinZoom`.
  */
 export const MIN_ZOOM = 1;
+/**
+ * Safety floor for coverage-aware zoom. Degenerate crops can have a geometric
+ * coverage minimum of 0, but camera and inverse-matrix math need a stable,
+ * positive scale.
+ */
 export const ABSOLUTE_MIN_ZOOM = 0.1;
 export const MAX_ZOOM = 10;
 
