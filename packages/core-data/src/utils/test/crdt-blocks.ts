@@ -362,6 +362,378 @@ describe( 'crdt-blocks', () => {
 			expect( content1.toString() ).toBe( 'First' );
 		} );
 
+		it( 'preserves concurrent list item moves by client ID', () => {
+			const createListBlock = ( itemOrder: string[] ): Block[] => [
+				{
+					name: 'core/list',
+					attributes: {},
+					innerBlocks: itemOrder.map( ( item ) => ( {
+						name: 'core/list-item',
+						attributes: { content: `Item ${ item }` },
+						innerBlocks: [],
+						clientId: `item-${ item.toLowerCase() }`,
+					} ) ),
+					clientId: 'list-block',
+				},
+			];
+			const getListItems = ( checkBlocks: YBlocks ): string[] =>
+				( checkBlocks.get( 0 ).get( 'innerBlocks' ) as YBlocks )
+					.toArray()
+					.map( ( item ) =>
+						(
+							(
+								item.get( 'attributes' ) as YBlockAttributes
+							 ).get( 'content' ) as Y.Text
+						 ).toString()
+					);
+			const initialOrder = [
+				'Alpha',
+				'Beta',
+				'Gamma',
+				'Delta',
+				'Epsilon',
+				'Zeta',
+			];
+
+			mergeCrdtBlocks( yblocks, createListBlock( initialOrder ), null );
+
+			const doc2 = new Y.Doc();
+			const yblocks2 = doc2.getArray< YBlock >();
+			Y.applyUpdate( doc2, Y.encodeStateAsUpdate( doc ) );
+
+			mergeCrdtBlocks(
+				yblocks,
+				createListBlock( [
+					'Alpha',
+					'Gamma',
+					'Beta',
+					'Delta',
+					'Epsilon',
+					'Zeta',
+				] ),
+				null
+			);
+			mergeCrdtBlocks(
+				yblocks2,
+				createListBlock( [
+					'Alpha',
+					'Beta',
+					'Gamma',
+					'Epsilon',
+					'Delta',
+					'Zeta',
+				] ),
+				null
+			);
+
+			const updateA = Y.encodeStateAsUpdate( doc );
+			const updateB = Y.encodeStateAsUpdate( doc2 );
+			Y.applyUpdate( doc2, updateA );
+			Y.applyUpdate( doc, updateB );
+
+			for ( const checkBlocks of [ yblocks, yblocks2 ] ) {
+				expect( getListItems( checkBlocks ) ).toEqual( [
+					'Item Alpha',
+					'Item Gamma',
+					'Item Beta',
+					'Item Epsilon',
+					'Item Delta',
+					'Item Zeta',
+				] );
+			}
+
+			doc2.destroy();
+		} );
+
+		it( 'preserves concurrent list item moves by client ID with base records', () => {
+			const createListBlock = ( itemOrder: string[] ): Block[] => [
+				{
+					name: 'core/list',
+					attributes: {},
+					innerBlocks: itemOrder.map( ( item ) => ( {
+						name: 'core/list-item',
+						attributes: { content: `Item ${ item }` },
+						innerBlocks: [],
+						clientId: `item-${ item.toLowerCase() }`,
+					} ) ),
+					clientId: 'list-block',
+				},
+			];
+			const getListItems = ( checkBlocks: YBlocks ): string[] =>
+				( checkBlocks.get( 0 ).get( 'innerBlocks' ) as YBlocks )
+					.toArray()
+					.map( ( item ) =>
+						(
+							(
+								item.get( 'attributes' ) as YBlockAttributes
+							 ).get( 'content' ) as Y.Text
+						 ).toString()
+					);
+			const initialBlocks = createListBlock( [
+				'Alpha',
+				'Beta',
+				'Gamma',
+				'Delta',
+				'Epsilon',
+				'Zeta',
+			] );
+
+			mergeCrdtBlocks( yblocks, initialBlocks, null );
+
+			const doc2 = new Y.Doc();
+			const yblocks2 = doc2.getArray< YBlock >();
+			Y.applyUpdate( doc2, Y.encodeStateAsUpdate( doc ) );
+
+			mergeCrdtBlocks(
+				yblocks,
+				createListBlock( [
+					'Alpha',
+					'Gamma',
+					'Beta',
+					'Delta',
+					'Epsilon',
+					'Zeta',
+				] ),
+				null,
+				initialBlocks
+			);
+			mergeCrdtBlocks(
+				yblocks2,
+				createListBlock( [
+					'Alpha',
+					'Beta',
+					'Gamma',
+					'Epsilon',
+					'Delta',
+					'Zeta',
+				] ),
+				null,
+				initialBlocks
+			);
+
+			const updateA = Y.encodeStateAsUpdate( doc );
+			const updateB = Y.encodeStateAsUpdate( doc2 );
+			Y.applyUpdate( doc2, updateA );
+			Y.applyUpdate( doc, updateB );
+
+			for ( const checkBlocks of [ yblocks, yblocks2 ] ) {
+				expect( getListItems( checkBlocks ) ).toEqual( [
+					'Item Alpha',
+					'Item Gamma',
+					'Item Beta',
+					'Item Epsilon',
+					'Item Delta',
+					'Item Zeta',
+				] );
+			}
+
+			doc2.destroy();
+		} );
+
+		it( 'rebases a delayed list item move over a remote list item move', () => {
+			const createListBlock = ( itemOrder: string[] ): Block[] => [
+				{
+					name: 'core/list',
+					attributes: {},
+					innerBlocks: itemOrder.map( ( item ) => ( {
+						name: 'core/list-item',
+						attributes: { content: `Item ${ item }` },
+						innerBlocks: [],
+						clientId: `item-${ item.toLowerCase() }`,
+					} ) ),
+					clientId: 'list-block',
+				},
+			];
+			const getListItems = ( checkBlocks: YBlocks ): string[] =>
+				( checkBlocks.get( 0 ).get( 'innerBlocks' ) as YBlocks )
+					.toArray()
+					.map( ( item ) =>
+						(
+							(
+								item.get( 'attributes' ) as YBlockAttributes
+							 ).get( 'content' ) as Y.Text
+						 ).toString()
+					);
+			const initialBlocks = createListBlock( [
+				'Alpha',
+				'Beta',
+				'Gamma',
+				'Delta',
+				'Epsilon',
+				'Zeta',
+			] );
+
+			mergeCrdtBlocks( yblocks, initialBlocks, null );
+			mergeCrdtBlocks(
+				yblocks,
+				createListBlock( [
+					'Alpha',
+					'Beta',
+					'Gamma',
+					'Epsilon',
+					'Delta',
+					'Zeta',
+				] ),
+				null,
+				initialBlocks
+			);
+			mergeCrdtBlocks(
+				yblocks,
+				createListBlock( [
+					'Alpha',
+					'Gamma',
+					'Beta',
+					'Delta',
+					'Epsilon',
+					'Zeta',
+				] ),
+				null,
+				initialBlocks
+			);
+
+			expect( getListItems( yblocks ) ).toEqual( [
+				'Item Alpha',
+				'Item Gamma',
+				'Item Beta',
+				'Item Epsilon',
+				'Item Delta',
+				'Item Zeta',
+			] );
+		} );
+
+		it( 'rebases a delayed list item move when equivalent blocks have different client IDs', () => {
+			const createListBlock = (
+				itemOrder: string[],
+				clientIdPrefix: string
+			): Block[] => [
+				{
+					name: 'core/list',
+					attributes: {},
+					innerBlocks: itemOrder.map( ( item ) => ( {
+						name: 'core/list-item',
+						attributes: { content: `Item ${ item }` },
+						innerBlocks: [],
+						clientId: `${ clientIdPrefix }-${ item.toLowerCase() }`,
+					} ) ),
+					clientId: `${ clientIdPrefix }-list-block`,
+				},
+			];
+			const getListItems = ( checkBlocks: YBlocks ): string[] =>
+				( checkBlocks.get( 0 ).get( 'innerBlocks' ) as YBlocks )
+					.toArray()
+					.map( ( item ) =>
+						(
+							(
+								item.get( 'attributes' ) as YBlockAttributes
+							 ).get( 'content' ) as Y.Text
+						 ).toString()
+					);
+			const initialBlocks = createListBlock(
+				[ 'Alpha', 'Beta', 'Gamma', 'Delta', 'Epsilon', 'Zeta' ],
+				'local'
+			);
+
+			mergeCrdtBlocks( yblocks, initialBlocks, null );
+			mergeCrdtBlocks(
+				yblocks,
+				createListBlock(
+					[ 'Alpha', 'Gamma', 'Beta', 'Delta', 'Epsilon', 'Zeta' ],
+					'remote'
+				),
+				null
+			);
+			mergeCrdtBlocks(
+				yblocks,
+				createListBlock(
+					[ 'Alpha', 'Beta', 'Gamma', 'Epsilon', 'Delta', 'Zeta' ],
+					'local'
+				),
+				null,
+				initialBlocks
+			);
+
+			expect( getListItems( yblocks ) ).toEqual( [
+				'Item Alpha',
+				'Item Gamma',
+				'Item Beta',
+				'Item Epsilon',
+				'Item Delta',
+				'Item Zeta',
+			] );
+		} );
+
+		it( 'does not overwrite remote list item content while rebasing a delayed move', () => {
+			const createListBlock = (
+				itemOrder: string[],
+				contentByItem: Record< string, string > = {}
+			): Block[] => [
+				{
+					name: 'core/list',
+					attributes: {},
+					innerBlocks: itemOrder.map( ( item ) => ( {
+						name: 'core/list-item',
+						attributes: {
+							content: contentByItem[ item ] ?? `Item ${ item }`,
+						},
+						innerBlocks: [],
+						clientId: `item-${ item.toLowerCase() }`,
+					} ) ),
+					clientId: 'list-block',
+				},
+			];
+			const getListItems = ( checkBlocks: YBlocks ): string[] =>
+				( checkBlocks.get( 0 ).get( 'innerBlocks' ) as YBlocks )
+					.toArray()
+					.map( ( item ) =>
+						(
+							(
+								item.get( 'attributes' ) as YBlockAttributes
+							 ).get( 'content' ) as Y.Text
+						 ).toString()
+					);
+			const initialBlocks = createListBlock( [
+				'Alpha',
+				'Beta',
+				'Gamma',
+				'Delta',
+				'Epsilon',
+				'Zeta',
+			] );
+
+			mergeCrdtBlocks( yblocks, initialBlocks, null );
+			mergeCrdtBlocks(
+				yblocks,
+				createListBlock(
+					[ 'Alpha', 'Beta', 'Gamma', 'Epsilon', 'Delta', 'Zeta' ],
+					{ Epsilon: 'Item Epsilon remote edit' }
+				),
+				null,
+				initialBlocks
+			);
+			mergeCrdtBlocks(
+				yblocks,
+				createListBlock( [
+					'Alpha',
+					'Gamma',
+					'Beta',
+					'Delta',
+					'Epsilon',
+					'Zeta',
+				] ),
+				null,
+				initialBlocks
+			);
+
+			expect( getListItems( yblocks ) ).toEqual( [
+				'Item Alpha',
+				'Item Gamma',
+				'Item Beta',
+				'Item Epsilon remote edit',
+				'Item Delta',
+				'Item Zeta',
+			] );
+		} );
+
 		it( 'creates Y.Text for rich-text attributes', () => {
 			const blocks: Block[] = [
 				{

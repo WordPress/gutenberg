@@ -13,11 +13,7 @@ import {
 	CRDT_STATE_MAP_SAVED_AT_KEY as SAVED_AT_KEY,
 	LOCAL_SYNC_MANAGER_ORIGIN,
 } from './config';
-import {
-	logPerformanceTiming,
-	passThru,
-	yieldToEventLoop,
-} from './performance';
+import { logPerformanceTiming, passThru } from './performance';
 import { getProviderCreators } from './providers';
 import type {
 	CollectionHandlers,
@@ -55,6 +51,8 @@ interface EntityState {
 	handlers: RecordHandlers;
 	objectId: ObjectID;
 	objectType: ObjectType;
+	remoteKeyVersions: Map< string, number >;
+	reconcilingRemoteKeys: Set< string >;
 	syncConfig: SyncConfig;
 	unload: () => void;
 	ydoc: CRDTDoc;
@@ -71,6 +69,45 @@ function getEntityId(
 	objectId: ObjectID | null
 ): EntityID {
 	return `${ objectType }_${ objectId }`;
+}
+
+function getTopLevelRecordKeysFromEvents(
+	events: Y.YEvent< any >[]
+): string[] {
+	const keys = new Set< string >();
+
+	for ( const event of events ) {
+		const [ key ] = event.path;
+		if ( 'string' === typeof key ) {
+			keys.add( key );
+			continue;
+		}
+
+		if ( event instanceof Y.YMapEvent ) {
+			event.keysChanged.forEach( ( changedKey ) =>
+				keys.add( changedKey )
+			);
+		}
+	}
+
+	return [ ...keys ];
+}
+
+function getScheduledRemoteKeyVersions(
+	entityState: EntityState | undefined,
+	changes: Partial< ObjectData >
+): Map< string, number > {
+	const versions = new Map< string, number >();
+
+	if ( ! entityState ) {
+		return versions;
+	}
+
+	Object.keys( changes ).forEach( ( key ) => {
+		versions.set( key, entityState.remoteKeyVersions.get( key ) ?? 0 );
+	} );
+
+	return versions;
 }
 
 /**
@@ -209,7 +246,7 @@ export function createSyncManager( debug = false ): SyncManager {
 		// When the CRDT document is updated by an UndoManager or a connection (not
 		// a local origin), update the local store.
 		const onRecordUpdate = (
-			_events: Y.YEvent< any >[],
+			events: Y.YEvent< any >[],
 			transaction: Y.Transaction
 		): void => {
 			if (
@@ -219,7 +256,27 @@ export function createSyncManager( debug = false ): SyncManager {
 				return;
 			}
 
-			void internal.updateEntityRecord( objectType, objectId );
+			const remoteChangedKeys = transaction.local
+				? []
+				: getTopLevelRecordKeysFromEvents( events );
+
+			const currentEntityState = entityStates.get( entityId );
+			if ( currentEntityState ) {
+				remoteChangedKeys.forEach( ( key ) => {
+					currentEntityState.remoteKeyVersions.set(
+						key,
+						( currentEntityState.remoteKeyVersions.get( key ) ??
+							0 ) + 1
+					);
+					currentEntityState.reconcilingRemoteKeys.add( key );
+				} );
+			}
+
+			void internal.updateEntityRecord(
+				objectType,
+				objectId,
+				remoteChangedKeys
+			);
 		};
 
 		const onStateMapUpdate = (
@@ -261,6 +318,8 @@ export function createSyncManager( debug = false ): SyncManager {
 			handlers,
 			objectId,
 			objectType,
+			remoteKeyVersions: new Map(),
+			reconcilingRemoteKeys: new Set(),
 			syncConfig,
 			unload,
 			ydoc,
@@ -550,28 +609,58 @@ export function createSyncManager( debug = false ): SyncManager {
 	/**
 	 * Update CRDT document with changes from the local store.
 	 *
-	 * @param {ObjectType}               objectType             Object type.
-	 * @param {ObjectID}                 objectId               Object ID.
-	 * @param {Partial< ObjectData >}    changes                Updates to make.
-	 * @param {string}                   origin                 The source of change.
-	 * @param {SyncManagerUpdateOptions} options                Optional flags for the update.
-	 * @param {boolean}                  options.isSave         Whether this update is part of a save operation. Defaults to false.
-	 * @param {boolean}                  options.isNewUndoLevel Whether to create a new undo level for this change. Defaults to false.
+	 * @param {ObjectType}               objectType                 Object type.
+	 * @param {ObjectID}                 objectId                   Object ID.
+	 * @param {Partial< ObjectData >}    changes                    Updates to make.
+	 * @param {string}                   origin                     The source of change.
+	 * @param {SyncManagerUpdateOptions} options                    Optional flags for the update.
+	 * @param {boolean}                  options.isSave             Whether this update is part of a save operation. Defaults to false.
+	 * @param {boolean}                  options.isNewUndoLevel     Whether to create a new undo level for this change. Defaults to false.
+	 * @param {Map< string, number >}    scheduledRemoteKeyVersions Remote key versions captured when the local update was scheduled.
 	 */
 	function updateCRDTDoc(
 		objectType: ObjectType,
 		objectId: ObjectID | null,
 		changes: Partial< ObjectData >,
 		origin: string,
-		options: SyncManagerUpdateOptions = {}
+		options: SyncManagerUpdateOptions = {},
+		scheduledRemoteKeyVersions: Map< string, number > = new Map()
 	): void {
 		const { isSave = false, isNewUndoLevel = false } = options;
 		const entityId = getEntityId( objectType, objectId );
 		const entityState = entityStates.get( entityId );
-		const collectionState = collectionStates.get( objectType );
 
 		if ( entityState ) {
 			const { syncConfig, ydoc } = entityState;
+			let changesToApply = changes;
+
+			if (
+				! isSave &&
+				! options.baseRecord &&
+				entityState.reconcilingRemoteKeys.size > 0
+			) {
+				changesToApply = Object.fromEntries(
+					Object.entries( changes ).filter( ( [ key ] ) => {
+						if ( key === 'blocks' ) {
+							return true;
+						}
+
+						if ( ! entityState.reconcilingRemoteKeys.has( key ) ) {
+							return true;
+						}
+
+						return (
+							( entityState.remoteKeyVersions.get( key ) ??
+								0 ) ===
+							( scheduledRemoteKeyVersions.get( key ) ?? 0 )
+						);
+					} )
+				);
+
+				if ( 0 === Object.keys( changesToApply ).length ) {
+					return;
+				}
+			}
 
 			// If this is change should create a new undo level, tell the undo
 			// manager to stop capturing and create a new undo group.
@@ -584,9 +673,15 @@ export function createSyncManager( debug = false ): SyncManager {
 
 			ydoc.transact( () => {
 				log( 'updateCRDTDoc', 'applying changes', entityId, {
-					changedKeys: Object.keys( changes ),
+					changedKeys: Object.keys( changesToApply ),
 				} );
-				syncConfig.applyChangesToCRDTDoc( ydoc, changes );
+				if ( options.baseRecord ) {
+					syncConfig.applyChangesToCRDTDoc( ydoc, changesToApply, {
+						baseRecord: options.baseRecord,
+					} );
+				} else {
+					syncConfig.applyChangesToCRDTDoc( ydoc, changesToApply );
+				}
 
 				if ( isSave ) {
 					markEntityAsSaved( ydoc );
@@ -594,6 +689,7 @@ export function createSyncManager( debug = false ): SyncManager {
 			}, origin );
 		}
 
+		const collectionState = collectionStates.get( objectType );
 		if ( collectionState && isSave ) {
 			collectionState.ydoc.transact( () => {
 				markEntityAsSaved( collectionState.ydoc );
@@ -605,12 +701,14 @@ export function createSyncManager( debug = false ): SyncManager {
 	 * Update the entity record in the local store with changes from the CRDT
 	 * document.
 	 *
-	 * @param {ObjectType} objectType Object type of record to update.
-	 * @param {ObjectID}   objectId   Object ID of record to update.
+	 * @param {ObjectType} objectType        Object type of record to update.
+	 * @param {ObjectID}   objectId          Object ID of record to update.
+	 * @param {string[]}   preReconciledKeys Keys being reconciled before this update.
 	 */
 	async function _updateEntityRecord(
 		objectType: ObjectType,
-		objectId: ObjectID
+		objectId: ObjectID,
+		preReconciledKeys: string[] = []
 	): Promise< void > {
 		const entityId = getEntityId( objectType, objectId );
 		const entityState = entityStates.get( entityId );
@@ -632,13 +730,55 @@ export function createSyncManager( debug = false ): SyncManager {
 		const changedKeys = Object.keys( changes );
 
 		if ( 0 === changedKeys.length ) {
+			preReconciledKeys.forEach( ( key ) =>
+				entityState.reconcilingRemoteKeys.delete( key )
+			);
 			return;
 		}
 
 		log( 'updateEntityRecord', 'changes', entityId, {
 			changedKeys,
 		} );
+		const keysToReconcile = [
+			...new Set( [ ...preReconciledKeys, ...changedKeys ] ),
+		];
+		keysToReconcile.forEach( ( key ) =>
+			entityState.reconcilingRemoteKeys.add( key )
+		);
 		handlers.editRecord( changes );
+		void clearReconciledRemoteKeys( entityState, keysToReconcile );
+	}
+
+	async function clearReconciledRemoteKeys(
+		entityState: EntityState,
+		keys: string[],
+		attempt = 0
+	): Promise< void > {
+		await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
+
+		const changes = entityState.syncConfig.getChangesFromCRDTDoc(
+			entityState.ydoc,
+			await entityState.handlers.getEditedRecord()
+		);
+
+		for ( const key of keys ) {
+			if ( ! Object.prototype.hasOwnProperty.call( changes, key ) ) {
+				entityState.reconcilingRemoteKeys.delete( key );
+			}
+		}
+
+		if (
+			keys.some( ( key ) =>
+				entityState.reconcilingRemoteKeys.has( key )
+			) &&
+			attempt < 5
+		) {
+			return clearReconciledRemoteKeys( entityState, keys, attempt + 1 );
+		}
+
+		keys.forEach( ( key ) =>
+			entityState.reconcilingRemoteKeys.delete( key )
+		);
 	}
 
 	/**
@@ -666,6 +806,30 @@ export function createSyncManager( debug = false ): SyncManager {
 		return serializeCrdtDoc( entityState.ydoc );
 	}
 
+	function scheduleUpdateCRDTDoc(
+		objectType: ObjectType,
+		objectId: ObjectID | null,
+		changes: Partial< ObjectData >,
+		origin: string,
+		options: SyncManagerUpdateOptions = {}
+	): void {
+		const scheduledRemoteKeyVersions = getScheduledRemoteKeyVersions(
+			entityStates.get( getEntityId( objectType, objectId ) ),
+			changes
+		);
+
+		setTimeout( () => {
+			updateCRDTDoc(
+				objectType,
+				objectId,
+				changes,
+				origin,
+				options,
+				scheduledRemoteKeyVersions
+			);
+		}, 0 );
+	}
+
 	// Collect internal functions so that they can be wrapped before calling.
 	const internal = {
 		applyPersistedCrdtDoc: debugWrap( _applyPersistedCrdtDoc ),
@@ -683,6 +847,6 @@ export function createSyncManager( debug = false ): SyncManager {
 			return undoManager;
 		},
 		unload: debugWrap( unloadEntity ),
-		update: debugWrap( yieldToEventLoop( updateCRDTDoc ) ),
+		update: debugWrap( scheduleUpdateCRDTDoc ),
 	};
 }
