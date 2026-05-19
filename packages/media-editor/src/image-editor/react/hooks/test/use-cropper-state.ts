@@ -140,6 +140,30 @@ describe( 'useCropperState', () => {
 		expect( result.current.state.zoom ).toBe( 1 );
 	} );
 
+	it( 'allows setZoom below 1 when the coverage minimum permits', () => {
+		// Thin, fine-rotated crop on a portrait image: the coverage
+		// minimum drops below 1, so `setZoom` (slider / keyboard path)
+		// must honour values below 1 rather than clamping at MIN_ZOOM.
+		const { result } = renderHook( () =>
+			useCropperState( {
+				image: {
+					src: 'portrait.jpg',
+					naturalWidth: 900,
+					naturalHeight: 1600,
+				},
+				rotation: 19,
+				cropRect: { x: 0.48, y: 0, width: 0.04, height: 1 },
+			} )
+		);
+
+		act( () => {
+			result.current.setZoom( 0.9 );
+		} );
+
+		expect( result.current.state.zoom ).toBeLessThan( 1 );
+		expect( result.current.state.zoom ).toBeGreaterThanOrEqual( 0.9 );
+	} );
+
 	it( 'should dispatch SET_ROTATION via setRotation', () => {
 		const { result } = renderHook( () => useCropperState() );
 

@@ -69,6 +69,17 @@ export interface WidgetTypeMetadata< Item = unknown > {
 	category?: string;
 
 	/**
+	 * Authoring intent about how the widget wants to render. Static
+	 * and declarative; not a user-editable attribute.
+	 *
+	 * - `'framed'` (default when absent): the widget renders its
+	 *   content only.
+	 * - `'full-bleed'`: the widget renders edge-to-edge with no
+	 *   surrounding chrome.
+	 */
+	presentation?: 'framed' | 'full-bleed';
+
+	/**
 	 * Search aliases used to surface the widget from the inserter.
 	 */
 	keywords?: string[];
@@ -77,6 +88,11 @@ export interface WidgetTypeMetadata< Item = unknown > {
 	 * Widget version, used for asset cache invalidation.
 	 */
 	version?: string;
+
+	/**
+	 * Gettext text domain for translations.
+	 */
+	textdomain?: string;
 
 	/**
 	 * Experiment gate; boolean `true`, or a specific experiment name.

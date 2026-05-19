@@ -9,6 +9,24 @@
 
 .widgetChromeContent {
 	flex: 1;
+	height: 100%;
+
+	/*
+	 * Probably remove the following padding
+	 * once #77856 lands.
+	 * @see https://github.com/WordPress/gutenberg/pull/77856
+	 */
+	padding-top: 0;
+	padding-bottom: 0;
+}
+
+/**
+ * Full-bleed widgets are rendered in a full-bleed container.
+ * Probably remove the following CSS once #77586 lands.
+ * @see https://github.com/WordPress/gutenberg/pull/77586
+ */
+.widgetChromeContentFullBleed {
+	height: 100%;
 }
 
 .loading {

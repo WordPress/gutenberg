@@ -1,5 +1,5 @@
 import type { CropperState, Size } from '../types';
-import { DEFAULT_STATE, MAX_ZOOM } from '../constants';
+import { ABSOLUTE_MIN_ZOOM, DEFAULT_STATE, MAX_ZOOM } from '../constants';
 import { cropperReducer, enforceContainment, isStateDirty } from '../state';
 import {
 	createCamera,
@@ -9,6 +9,7 @@ import {
 } from '../camera';
 
 const IMAGE: Size = { width: 1600, height: 900 };
+const PORTRAIT_IMAGE: Size = { width: 900, height: 1600 };
 const CONTAINER: Size = { width: 800, height: 600 };
 
 function makeState( overrides: Partial< CropperState > = {} ): CropperState {
@@ -103,6 +104,19 @@ describe( 'enforceContainment', () => {
 		expect( result.pan.y ).toBeCloseTo( 0, 5 );
 		expect( result.zoom ).toBeCloseTo( 1, 5 );
 		expect( result.cropRect ).toEqual( state.cropRect );
+	} );
+
+	it( 'keeps zoom at the absolute minimum for a degenerate crop rect', () => {
+		// A degenerate crop has coverage minimum 0; the floor must come
+		// from ABSOLUTE_MIN_ZOOM. Use a sub-floor (but >EPSILON) zoom so
+		// sanitization doesn't bump it to 1 before restrictPanZoom runs.
+		const state = makeState( {
+			cropRect: { x: 0.5, y: 0.5, width: 0, height: 0 },
+			zoom: ABSOLUTE_MIN_ZOOM / 2,
+		} );
+		const result = enforceContainment( state );
+
+		expect( result.zoom ).toBe( ABSOLUTE_MIN_ZOOM );
 	} );
 
 	it( 'bumps zoom before shrinking crop for small rotation', () => {
@@ -290,6 +304,40 @@ describe( 'cropperReducer — SETTLE_CROP', () => {
 		expectSameVisibleRegion( state, settled );
 	} );
 
+	it( 'allows a fine-rotated tall portrait crop to settle below 1x zoom', () => {
+		const state = makeState( {
+			image: {
+				src: 'portrait.jpg',
+				naturalWidth: PORTRAIT_IMAGE.width,
+				naturalHeight: PORTRAIT_IMAGE.height,
+			},
+			cropRect: { x: 0.46, y: -0.02, width: 0.08, height: 1.04 },
+			rotation: 19,
+			zoom: 1,
+			pan: { x: 0, y: 0 },
+		} );
+		const settled = cropperReducer( state, { type: 'SETTLE_CROP' } );
+
+		expect( settled.cropRect.height ).toBeCloseTo( 1, 5 );
+		expect( settled.zoom ).toBeLessThan( 1 );
+		expect( settled.zoom ).toBeGreaterThan( 0.95 );
+
+		const regionBefore = getCropWorldRegion(
+			state,
+			PORTRAIT_IMAGE,
+			CONTAINER
+		);
+		const regionAfter = getCropWorldRegion(
+			settled,
+			PORTRAIT_IMAGE,
+			CONTAINER
+		);
+		expect( regionAfter.minX ).toBeCloseTo( regionBefore.minX, 1 );
+		expect( regionAfter.minY ).toBeCloseTo( regionBefore.minY, 1 );
+		expect( regionAfter.maxX ).toBeCloseTo( regionBefore.maxX, 1 );
+		expect( regionAfter.maxY ).toBeCloseTo( regionBefore.maxY, 1 );
+	} );
+
 	it( 'is a no-op when crop is already full-sized and centered', () => {
 		const state = makeState( {
 			cropRect: { x: 0, y: 0, width: 1, height: 1 },
@@ -307,14 +355,14 @@ describe( 'cropperReducer — SETTLE_CROP', () => {
 	} );
 
 	it( 'preserves image selection across 50 random crop/zoom/pan combos', () => {
-		let passCount = 0;
 		for ( let i = 0; i < 50; i++ ) {
-			// Generate deterministic-ish crop rects.
-			const cropW = 0.15 + ( ( i * 7 ) % 8 ) / 10;
-			const cropH = 0.15 + ( ( i * 11 ) % 8 ) / 10;
+			// Generate deterministic-ish crop rects in the preservation
+			// regime. Capped zoom behavior is covered by a dedicated test.
+			const cropW = 0.4 + ( ( i * 7 ) % 6 ) / 10;
+			const cropH = 0.4 + ( ( i * 11 ) % 6 ) / 10;
 			const cropX = Math.min( ( ( i * 3 ) % 10 ) / 10, 1 - cropW );
 			const cropY = Math.min( ( ( i * 5 ) % 10 ) / 10, 1 - cropH );
-			const zoom = 1 + ( ( i * 13 ) % 30 ) / 10;
+			const zoom = 1 + ( ( i * 13 ) % 12 ) / 10;
 			const panX = ( ( ( i * 17 ) % 20 ) - 10 ) / 100;
 			const panY = ( ( ( i * 19 ) % 20 ) - 10 ) / 100;
 
@@ -334,6 +382,11 @@ describe( 'cropperReducer — SETTLE_CROP', () => {
 			const settled = cropperReducer( state, {
 				type: 'SETTLE_CROP',
 			} );
+
+			const expectedUncappedZoom =
+				state.zoom /
+				Math.max( state.cropRect.width, state.cropRect.height );
+			expect( expectedUncappedZoom ).toBeLessThanOrEqual( MAX_ZOOM );
 
 			const regionBefore = getCropWorldRegion( state, IMAGE, CONTAINER );
 			const regionAfter = getCropWorldRegion( settled, IMAGE, CONTAINER );
@@ -358,9 +411,7 @@ describe( 'cropperReducer — SETTLE_CROP', () => {
 			expect( dy ).toBeLessThanOrEqual( tol );
 			expect( dw ).toBeLessThanOrEqual( tol );
 			expect( dh ).toBeLessThanOrEqual( tol );
-			passCount++;
 		}
-		expect( passCount ).toBe( 50 );
 	} );
 
 	it( 'diagonal corner drag: small crop settles accurately', () => {
@@ -445,6 +496,26 @@ describe( 'cropperReducer — SETTLE_CROP', () => {
 		const wBefore = regionBefore.maxX - regionBefore.minX;
 		const wAfter = regionAfter.maxX - regionAfter.minX;
 		expect( wAfter ).toBeCloseTo( wBefore, 1 );
+	} );
+
+	it( 'caps settle zoom for crops smaller than the maximum zoom can preserve', () => {
+		const afterDrag = enforceContainment(
+			makeState( {
+				cropRect: { x: 0.475, y: 0.475, width: 0.05, height: 0.05 },
+				zoom: 1,
+				pan: { x: 0, y: 0 },
+			} )
+		);
+
+		const settled = cropperReducer( afterDrag, { type: 'SETTLE_CROP' } );
+
+		expect( settled.zoom ).toBe( MAX_ZOOM );
+
+		const regionAfter = getCropWorldRegion( settled, IMAGE, CONTAINER );
+		expect( regionAfter.minX ).toBeGreaterThanOrEqual( -0.001 );
+		expect( regionAfter.minY ).toBeGreaterThanOrEqual( -0.001 );
+		expect( regionAfter.maxX ).toBeLessThanOrEqual( 1.001 );
+		expect( regionAfter.maxY ).toBeLessThanOrEqual( 1.001 );
 	} );
 } );
 

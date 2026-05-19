@@ -10,6 +10,7 @@ import { useState } from '@wordpress/element';
 import * as Tooltip from '../../../packages/ui/src/tooltip';
 import * as Select from '../../../packages/ui/src/form/primitives/select';
 import { SelectControl } from '../../../packages/ui/src/form/select-control';
+import * as Autocomplete from '../../../packages/ui/src/form/primitives/autocomplete';
 import { WithWpCompatOverlaySlot } from './with-wp-compat-overlay-slot';
 
 const selectItems = [
@@ -18,10 +19,16 @@ const selectItems = [
 	{ value: 'option-3', label: 'Option 3' },
 ];
 
+const autocompleteItems = [
+	{ id: '1', value: 'Item 1' },
+	{ id: '2', value: 'Item 2' },
+	{ id: '3', value: 'Item 3' },
+];
+
 // Cross-library stacking: `@wordpress/ui` overlays (`Tooltip`, `Select`,
-// `SelectControl`) inside a `@wordpress/components` Modal / Popover
-// should sit above the components-side overlay via the compat overlay
-// slot.
+// `SelectControl`, `Autocomplete`) inside a `@wordpress/components`
+// Modal / Popover should sit above the components-side overlay via the
+// compat overlay slot.
 export default {
 	title: 'Playground/Debug fixtures/WP Compat Overlay Slot',
 	decorators: [ WithWpCompatOverlaySlot ],
@@ -77,6 +84,34 @@ export const InsideComponentsModal = {
 								label="SelectControl"
 								items={ selectItems }
 							/>
+						</div>
+
+						<div style={ { marginTop: '1rem' } }>
+							<Autocomplete.Root items={ autocompleteItems }>
+								<Autocomplete.Input
+									placeholder="Search items"
+									aria-label="Autocomplete primitive"
+								/>
+								<Autocomplete.Popup>
+									<Autocomplete.Empty>
+										No matching items.
+									</Autocomplete.Empty>
+									<Autocomplete.List>
+										<Autocomplete.ListBody>
+											<Autocomplete.Collection>
+												{ ( item ) => (
+													<Autocomplete.Item
+														key={ item.id }
+														value={ item }
+													>
+														{ item.value }
+													</Autocomplete.Item>
+												) }
+											</Autocomplete.Collection>
+										</Autocomplete.ListBody>
+									</Autocomplete.List>
+								</Autocomplete.Popup>
+							</Autocomplete.Root>
 						</div>
 					</Modal>
 				) }
@@ -140,6 +175,34 @@ export const InsideComponentsPopover = {
 									label="SelectControl"
 									items={ selectItems }
 								/>
+							</div>
+
+							<div style={ { marginTop: '1rem' } }>
+								<Autocomplete.Root items={ autocompleteItems }>
+									<Autocomplete.Input
+										placeholder="Search items"
+										aria-label="Autocomplete primitive"
+									/>
+									<Autocomplete.Popup>
+										<Autocomplete.Empty>
+											No matching items.
+										</Autocomplete.Empty>
+										<Autocomplete.List>
+											<Autocomplete.ListBody>
+												<Autocomplete.Collection>
+													{ ( item ) => (
+														<Autocomplete.Item
+															key={ item.id }
+															value={ item }
+														>
+															{ item.value }
+														</Autocomplete.Item>
+													) }
+												</Autocomplete.Collection>
+											</Autocomplete.ListBody>
+										</Autocomplete.List>
+									</Autocomplete.Popup>
+								</Autocomplete.Root>
 							</div>
 						</div>
 					</Popover>

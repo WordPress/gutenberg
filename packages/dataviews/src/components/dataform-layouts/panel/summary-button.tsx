@@ -6,7 +6,11 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { Button, Icon as WCIcon, Tooltip } from '@wordpress/components';
+import {
+	Button,
+	Icon as WCIcon,
+	Tooltip as WCTooltip,
+} from '@wordpress/components';
 import { sprintf, _x } from '@wordpress/i18n';
 import { error as errorIcon, pencil } from '@wordpress/icons';
 import { useInstanceId } from '@wordpress/compose';
@@ -111,11 +115,11 @@ export default function SummaryButton< Item >( {
 				<span className={ labelClassName }>{ labelContent }</span>
 			) }
 			{ labelPosition === 'none' && showError && (
-				<Tooltip text={ errorMessage } placement="top">
+				<WCTooltip text={ errorMessage } placement="top">
 					<span className="dataforms-layouts-panel__field-label-error-content">
 						<WCIcon icon={ errorIcon } size={ 16 } />
 					</span>
-				</Tooltip>
+				</WCTooltip>
 			) }
 			<span
 				id={ `${ controlId }` }
