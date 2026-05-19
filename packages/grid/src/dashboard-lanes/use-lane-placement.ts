@@ -140,7 +140,13 @@ export function useLanePlacement(
 			.join( '\0' );
 	}, [ input.items ] );
 
-	const { items, lanes, gap, flowTolerance, rowUnit } = input;
+	// Stable array identity while placement-relevant fields match
+	// `itemsSignature`, so the layout effect is not torn down on every
+	// parent re-render that passes a fresh `items` reference.
+	// eslint-disable-next-line react-hooks/exhaustive-deps -- `itemsSignature` encodes keys/spans/lanes; `input.items` reference often changes without placement changes.
+	const itemsForPlacement = useMemo( () => input.items, [ itemsSignature ] );
+
+	const { lanes, gap, flowTolerance, rowUnit } = input;
 
 	useLayoutEffect( () => {
 		if ( ! isPolyfilled || ! container ) {
@@ -166,7 +172,7 @@ export function useLanePlacement(
 				if ( cancelled ) {
 					return;
 				}
-				const itemsWithHeight = items.map( ( item ) => ( {
+				const itemsWithHeight = itemsForPlacement.map( ( item ) => ( {
 					key: item.key,
 					span: clampSpan( item.span ),
 					lane: item.lane,
@@ -183,7 +189,7 @@ export function useLanePlacement(
 					rowUnit ?? DEFAULT_ROW_UNIT
 				);
 				const next = new Map< string, React.CSSProperties >();
-				for ( const item of items ) {
+				for ( const item of itemsForPlacement ) {
 					const placement = result.placements.get( item.key );
 					if ( ! placement ) {
 						continue;
@@ -288,12 +294,7 @@ export function useLanePlacement(
 		gap,
 		flowTolerance,
 		rowUnit,
-		// `items` is intentionally not a dep: the rAF closure reads
-		// from it, but the only fields that affect placement (keys,
-		// spans, explicit lanes) are captured by `itemsSignature`.
-		// Including the array identity would tear the effect down on
-		// every fresh reference from the parent and defeat the signature.
-		itemsSignature,
+		itemsForPlacement,
 	] );
 
 	if ( ! isPolyfilled ) {
