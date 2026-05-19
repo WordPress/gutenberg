@@ -2,11 +2,11 @@
 
 .sidebar-navigation__more-menu {
 	.components-button {
-		color: var(--wpds-color-fg-content-neutral);
+		color: var(--wpds-color-fg-interactive-neutral);
 		&:hover,
 		&:focus,
 		&[aria-current] {
-			color: var(--wpds-color-fg-content-neutral);
+			color: var(--wpds-color-fg-interactive-neutral);
 		}
 	}
 }

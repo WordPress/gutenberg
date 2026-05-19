@@ -5,14 +5,14 @@
 
 .edit-site-layout {
 	height: 100%;
-	background: var(--wpds-color-bg-surface-neutral);
+	background: var(--wpds-color-bg-surface-neutral-weak);
 	color: var(--wpds-color-fg-content-neutral);
 	display: flex;
 	flex-direction: column;
 
 	// Show a dark background in "frame" mode to avoid edge artifacts.
 	&:not(.is-full-canvas) .editor-visual-editor {
-		background: var(--wpds-color-bg-surface-neutral);
+		background: var(--wpds-color-bg-surface-neutral-weak);
 	}
 }
 
@@ -180,7 +180,7 @@ html.canvas-mode-edit-transition::view-transition-group(toggle) {
 	view-transition-name: toggle;
 	/* stylelint-enable  */
 	position: relative;
-	color: var(--wpds-color-fg-content-neutral);
+	color: var(--wpds-color-fg-interactive-neutral);
 	height: $header-height;
 	width: $header-height;
 	overflow: hidden;
@@ -188,12 +188,12 @@ html.canvas-mode-edit-transition::view-transition-group(toggle) {
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	background: var(--wpds-color-bg-surface-neutral);
+	background: var(--wpds-color-bg-surface-neutral-weak);
 	border-radius: 0;
 
 	&:hover,
 	&:active {
-		color: var(--wpds-color-fg-content-neutral);
+		color: var(--wpds-color-fg-interactive-neutral-active);
 	}
 
 	&:focus-visible,

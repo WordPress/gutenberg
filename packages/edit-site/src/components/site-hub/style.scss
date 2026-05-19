@@ -25,7 +25,7 @@
 }
 
 .edit-site-site-hub__title .components-button {
-	color: var(--wpds-color-fg-content-neutral);
+	color: var(--wpds-color-fg-interactive-neutral);
 	display: block;
 	flex-grow: 1;
 	font-size: 15px;
@@ -44,7 +44,7 @@
 	&:hover,
 	&:focus,
 	&:active {
-		color: var(--wpds-color-fg-content-neutral);
+		color: var(--wpds-color-fg-interactive-neutral);
 	}
 
 	&:focus {
@@ -55,7 +55,7 @@
 
 	&:focus-visible {
 		// Push the shadow away from the title.
-		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wpds-color-bg-surface-neutral), 0 0 0 calc(2 * var(--wp-admin-border-width-focus)) var(--wp-admin-theme-color);
+		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wpds-color-bg-surface-neutral-weak), 0 0 0 calc(2 * var(--wp-admin-border-width-focus)) var(--wp-admin-theme-color);
 
 		// Windows High Contrast mode will show this outline, but not the box-shadow.
 		outline: 2px solid transparent;
@@ -82,12 +82,12 @@
 }
 
 .edit-site-site-hub_toggle-command-center {
-	color: var(--wpds-color-fg-content-neutral);
+	color: var(--wpds-color-fg-interactive-neutral);
 
 	&:hover,
 	&:active {
 		svg {
-			fill: var(--wpds-color-fg-content-neutral);
+			fill: var(--wpds-color-fg-interactive-neutral-active);
 		}
 	}
 }
