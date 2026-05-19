@@ -19,6 +19,7 @@ import { useMemo, Platform } from '@wordpress/element';
 import { useSettings } from '../components/use-settings';
 import InspectorControls from '../components/inspector-controls';
 import useBlockDisplayInformation from '../components/use-block-display-information';
+import { useGlobalStyle } from '../components/global-styles/hooks';
 import { cleanEmptyObject, useStyleOverride } from './utils';
 import { store as blockEditorStore } from '../store';
 
@@ -268,7 +269,10 @@ export function PositionPanelPure( {
 		web:
 			options.length > 1 ? (
 				<InspectorControls group="position">
-					<BaseControl help={ stickyHelpText }>
+					<BaseControl
+						__nextHasNoMarginBottom
+						help={ stickyHelpText }
+					>
 						<CustomSelectControl
 							__next40pxDefaultSize
 							label={ __( 'Position' ) }
@@ -301,7 +305,7 @@ export default {
 		return <PositionPanelPure { ...props } />;
 	},
 	useBlockProps,
-	attributeKeys: [ 'style' ],
+	attributeKeys: [ 'style', 'backgroundColor', 'gradient' ],
 	hasSupport( name ) {
 		return hasBlockSupport( name, POSITION_SUPPORT_KEY );
 	},
@@ -310,7 +314,7 @@ export default {
 // Used for generating the instance ID
 const POSITION_BLOCK_PROPS_REFERENCE = {};
 
-function useBlockProps( { name, style } ) {
+function useBlockProps( { name, style, backgroundColor, gradient } ) {
 	const hasPositionBlockSupport = hasBlockSupport(
 		name,
 		POSITION_SUPPORT_KEY
@@ -319,6 +323,9 @@ function useBlockProps( { name, style } ) {
 	const allowPositionStyles = hasPositionBlockSupport && ! isPositionDisabled;
 
 	const id = useInstanceId( POSITION_BLOCK_PROPS_REFERENCE );
+
+	// Always call hook to satisfy rules of hooks.
+	const [ globalBackgroundColor ] = useGlobalStyle( 'color.background' );
 
 	// Higher specificity to override defaults in editor UI.
 	const positionSelector = `.wp-container-${ id }.wp-container-${ id }`;
@@ -331,6 +338,28 @@ function useBlockProps( { name, style } ) {
 				selector: positionSelector,
 				style,
 			} ) || '';
+
+		/*
+		 * If the block has a sticky or fixed position but no background set,
+		 * apply the site's global background color so the block content does not
+		 * appear to float without a visible background.
+		 */
+		const positionType = style?.position?.type;
+		const hasBackground =
+			!! style?.color?.background ||
+			!! style?.color?.gradient ||
+			!! style?.background?.backgroundImage ||
+			!! backgroundColor ||
+			!! gradient;
+
+		if (
+			css &&
+			( positionType === 'sticky' || positionType === 'fixed' ) &&
+			! hasBackground &&
+			globalBackgroundColor
+		) {
+			css += `${ positionSelector }{background-color:${ globalBackgroundColor };}`;
+		}
 	}
 
 	// Attach a `wp-container-` id-based class name.
