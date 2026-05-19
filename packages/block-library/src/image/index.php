@@ -250,7 +250,8 @@ function block_core_image_render_lightbox( $block_content, $block, $block_instan
 					'galleryId'              => $block_instance->context['galleryId'] ?? null,
 					'customAriaLabel'        => $custom_aria_label ?? null,
 					'navigationButtonType'   => $block_instance->context['navigationButtonType'] ?? 'icon',
-					'triggerButtonAriaLabel' => null,
+					/* translators: %s: Image alt text. */
+					'triggerButtonAriaLabel' => $alt ? sprintf( __( 'Enlarge image: %s' ), $alt ) : __( 'Enlarge image' ),
 				),
 			),
 		)
