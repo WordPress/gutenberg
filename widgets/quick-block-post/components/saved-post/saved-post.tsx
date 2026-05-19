@@ -1,8 +1,9 @@
 /**
  * WordPress dependencies
  */
+import { createInterpolateElement } from '@wordpress/element';
 import { check } from '@wordpress/icons';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { addQueryArgs } from '@wordpress/url';
 import { Button, EmptyState, Link, Stack } from '@wordpress/ui'; // eslint-disable-line @wordpress/use-recommended-components
 
@@ -13,10 +14,15 @@ import styles from './saved-post.module.css';
 
 type SavedPostProps = {
 	postId: number;
+	postTitle: string;
 	onWriteAnother: () => void;
 };
 
-export function SavedPost( { postId, onWriteAnother }: SavedPostProps ) {
+export function SavedPost( {
+	postId,
+	postTitle,
+	onWriteAnother,
+}: SavedPostProps ) {
 	const editUrl = addQueryArgs( 'post.php', {
 		post: postId,
 		action: 'edit',
@@ -33,7 +39,18 @@ export function SavedPost( { postId, onWriteAnother }: SavedPostProps ) {
 				<EmptyState.Icon icon={ check } className={ styles.icon } />
 				<EmptyState.Title>{ __( 'Draft saved' ) }</EmptyState.Title>
 				<EmptyState.Description>
-					{ __( 'Your post is ready to keep editing.' ) }
+					{ createInterpolateElement(
+						sprintf(
+							/* translators: %s: post title */
+							__(
+								'<strong>"%s"</strong> is ready to keep editing.'
+							),
+							postTitle
+						),
+						{
+							strong: <strong />,
+						}
+					) }
 				</EmptyState.Description>
 				<EmptyState.Actions>
 					<Button
