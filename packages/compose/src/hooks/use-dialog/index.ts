@@ -1,7 +1,12 @@
 /**
  * External dependencies
  */
-import type { KeyboardEvent, RefCallback, SyntheticEvent } from 'react';
+import type {
+	KeyboardEvent,
+	KeyboardEventHandler,
+	RefCallback,
+	SyntheticEvent,
+} from 'react';
 
 /**
  * WordPress dependencies
@@ -42,6 +47,16 @@ type DialogOptions = {
 	 */
 	constrainTabbing?: boolean;
 	onClose?: () => void;
+	/**
+	 * Optional consumer-provided `onKeyDown` handler. It runs before the
+	 * built-in close-on-Escape behavior so the consumer can call
+	 * `event.preventDefault()` to opt out of closing for a given key event.
+	 *
+	 * Provided as an option (rather than letting consumers attach their own
+	 * `onKeyDown` to the dialog wrapper) so consumers don't have to manually
+	 * merge their handler with the one returned by `useDialog`.
+	 */
+	onKeyDown?: KeyboardEventHandler< HTMLElement >;
 	/**
 	 * Use the `onClose` prop instead.
 	 *
@@ -92,6 +107,9 @@ function useDialog( options: DialogOptions ): useDialogReturn {
 	// `event.stopPropagation()` correctly prevent the dialog from closing.
 	// See https://github.com/WordPress/gutenberg/issues/78432.
 	const onKeyDown = useCallback( ( event: KeyboardEvent< HTMLElement > ) => {
+		// Let the consumer-provided handler (if any) run first so it can
+		// call `preventDefault()` to opt out of close-on-Escape.
+		currentOptions.current?.onKeyDown?.( event );
 		if (
 			event.key === 'Escape' &&
 			! event.defaultPrevented &&

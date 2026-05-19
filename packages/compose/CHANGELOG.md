@@ -2,10 +2,15 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `useDialog`: Accept an optional `onKeyDown` option. Provided handlers run before the built-in close-on-Escape behavior, and can call `event.preventDefault()` to opt out ([#78433](https://github.com/WordPress/gutenberg/pull/78433)).
+
 ### Bug Fixes
 
 -   `useCopyToClipboard`: Call the `onSuccess` callback even when the trigger node unmounts before the copy resolves ([#78387](https://github.com/WordPress/gutenberg/pull/78387)).
 -   `useDialog`: Handle the Escape key via a React `onKeyDown` prop instead of a native listener, so portaled descendants that handle Escape and call `event.stopPropagation()` can correctly prevent the dialog from closing ([#78433](https://github.com/WordPress/gutenberg/pull/78433)).
+    -   Potential breaking change: the returned `props` object now exposes an `onKeyDown` handler. Consumers that spread it onto a wrapper that also receives an `onKeyDown` from elsewhere should either pass that handler to `useDialog` (via the new `onKeyDown` option, which merges it with close-on-Escape) or merge the two themselves.
 
 ## 7.46.0 (2026-05-14)
 

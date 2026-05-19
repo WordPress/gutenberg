@@ -201,6 +201,65 @@ describe( 'useDialog', () => {
 		expect( outerOnClose ).not.toHaveBeenCalled();
 	} );
 
+	it( 'should call the consumer-provided onKeyDown alongside close-on-Escape', async () => {
+		const user = userEvent.setup();
+		const onClose = jest.fn();
+		const consumerOnKeyDown = jest.fn();
+
+		function DialogWithConsumerOnKeyDown() {
+			const [ ref, props ] = useDialog( {
+				onClose,
+				onKeyDown: consumerOnKeyDown,
+				focusOnMount: false,
+			} );
+			return (
+				<div
+					ref={ ref }
+					{ ...props }
+					role="dialog"
+					aria-label="Test dialog"
+				/>
+			);
+		}
+
+		render( <DialogWithConsumerOnKeyDown /> );
+
+		screen.getByRole( 'dialog' ).focus();
+		await user.keyboard( '[Escape]' );
+
+		expect( consumerOnKeyDown ).toHaveBeenCalledTimes( 1 );
+		expect( consumerOnKeyDown.mock.calls[ 0 ][ 0 ].key ).toBe( 'Escape' );
+		expect( onClose ).toHaveBeenCalledTimes( 1 );
+	} );
+
+	it( 'should let the consumer-provided onKeyDown opt out of close-on-Escape via preventDefault', async () => {
+		const user = userEvent.setup();
+		const onClose = jest.fn();
+
+		function DialogOptingOut() {
+			const [ ref, props ] = useDialog( {
+				onClose,
+				onKeyDown: ( event ) => event.preventDefault(),
+				focusOnMount: false,
+			} );
+			return (
+				<div
+					ref={ ref }
+					{ ...props }
+					role="dialog"
+					aria-label="Test dialog"
+				/>
+			);
+		}
+
+		render( <DialogOptingOut /> );
+
+		screen.getByRole( 'dialog' ).focus();
+		await user.keyboard( '[Escape]' );
+
+		expect( onClose ).not.toHaveBeenCalled();
+	} );
+
 	it( 'should not call onClose for non-Escape keys', async () => {
 		const user = userEvent.setup();
 		const onClose = jest.fn();
