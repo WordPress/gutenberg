@@ -69,6 +69,7 @@ The design system follows the [Design Tokens Community Group (DTCG)](https://des
 | `typography.json` | Font family stacks, font sizes, and line heights                                                                                 |
 | `border.json`     | Border radius and width values                                                                                                   |
 | `elevation.json`  | Shadow definitions for creating depth and layering                                                                               |
+| `motion.json`     | Animation durations and easing curves                                                                                            |
 
 Each JSON file contains both primitive and semantic token definitions in a hierarchical structure. These files are the source of truth for the design system and are processed during the build step to generate CSS custom properties and other output formats in `/src/prebuilt`.
 
@@ -88,6 +89,7 @@ Semantic tokens follow a consistent naming pattern:
 | `dimension`  | Spacing, sizing, and other measurable lengths (e.g., padding, margins, widths) |
 | `border`     | Border properties like radius and width                                        |
 | `elevation`  | Shadow definitions for layering and depth                                      |
+| `motion`     | Animation durations and easing curves                                          |
 | `typography` | Typography properties like font family, font size, and line-height             |
 
 **Property** is the specific design property being defined.
@@ -101,6 +103,8 @@ Semantic tokens follow a consistent naming pattern:
 | `gap`         | Spacing between elements           |
 | `radius`      | Border radius for rounded corners  |
 | `width`       | Border width                       |
+| `duration`    | Animation duration                 |
+| `easing`      | Animation easing curve             |
 | `font-size`   | Font size                          |
 | `font-family` | Font family                        |
 | `font-weight` | Font weight                        |

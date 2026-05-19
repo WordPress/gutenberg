@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import {
-	Icon,
+	Icon as WCIcon,
 	Button,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
@@ -130,7 +130,10 @@ export default function PostCardPanel( {
 				className="editor-post-card-panel__header"
 				alignment="flex-start"
 			>
-				<Icon className="editor-post-card-panel__icon" icon={ icon } />
+				<WCIcon
+					className="editor-post-card-panel__icon"
+					icon={ icon }
+				/>
 				<WCText
 					numberOfLines={ 2 }
 					truncate

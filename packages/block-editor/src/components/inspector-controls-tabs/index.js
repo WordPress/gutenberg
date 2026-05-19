@@ -2,8 +2,8 @@
  * WordPress dependencies
  */
 import {
-	Icon,
-	Tooltip,
+	Icon as WCIcon,
+	Tooltip as WCTooltip,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { useEffect, useState, useRef } from '@wordpress/element';
@@ -175,14 +175,14 @@ export default function InspectorControlsTabs( {
 								{ tab.title }
 							</Tabs.Tab>
 						) : (
-							<Tooltip text={ tab.title } key={ tab.name }>
+							<WCTooltip text={ tab.title } key={ tab.name }>
 								<Tabs.Tab
 									tabId={ tab.name }
 									aria-label={ tab.title }
 								>
-									<Icon icon={ tab.icon } />
+									<WCIcon icon={ tab.icon } />
 								</Tabs.Tab>
-							</Tooltip>
+							</WCTooltip>
 						)
 					) }
 				</Tabs.TabList>

@@ -204,7 +204,12 @@ export interface Settings {
 	// Default is 0.82 if not set.
 	imageQuality?: number;
 	// Function for finalizing an upload after all client-side processing is complete.
-	mediaFinalize?: ( id: number, subSizes: SubSizeData[] ) => Promise< void >;
+	// May return the up-to-date attachment so the queue and block markup can pick
+	// up the post-finalize URL (the scaled file), which is required for `srcset`.
+	mediaFinalize?: (
+		id: number,
+		subSizes: SubSizeData[]
+	) => Promise< Partial< Attachment > | void >;
 }
 
 // Matches the Attachment type from the media-utils package.

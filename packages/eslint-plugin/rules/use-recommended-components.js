@@ -13,6 +13,9 @@ const ALLOWLIST = {
 			'Card',
 			'Collapsible',
 			'CollapsibleCard',
+			'EmptyState',
+			'Icon',
+			'Link',
 			'Stack',
 			'Text',
 			'VisuallyHidden',
@@ -32,6 +35,8 @@ const ALLOWLIST = {
  */
 const DENYLIST = {
 	'@wordpress/components': {
+		ExternalLink:
+			'Use `Link` from `@wordpress/ui` with the `openInNewTab` prop instead.',
 		__experimentalHeading: 'Use `Text` from `@wordpress/ui` instead.',
 		__experimentalHStack: 'Use `Stack` from `@wordpress/ui` instead.',
 		__experimentalText: 'Use `Text` from `@wordpress/ui` instead.',
