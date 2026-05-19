@@ -1743,7 +1743,8 @@ describe( 'Tabs', () => {
 
 					expect( screen.getAllByRole( 'tab' ) ).toHaveLength( 2 );
 
-					// Falls back to the first tab.
+					// Falls back to the first tab and fires `onValueChange`
+					// for the automatic selection.
 					expect(
 						screen.getByRole( 'tab', {
 							name: 'Alpha',
@@ -1756,7 +1757,11 @@ describe( 'Tabs', () => {
 						} )
 					).toBeVisible();
 
-					expect( mockOnValueChange ).toHaveBeenCalledTimes( 1 );
+					expect( mockOnValueChange ).toHaveBeenCalledTimes( 2 );
+					expect( mockOnValueChange ).toHaveBeenLastCalledWith(
+						'alpha',
+						expect.anything()
+					);
 				} );
 			} );
 
@@ -1858,7 +1863,22 @@ describe( 'Tabs', () => {
 							).toBeVisible();
 						}
 
-						expect( mockOnValueChange ).not.toHaveBeenCalled();
+						if ( mode === 'Uncontrolled' ) {
+							// `onValueChange` fires once for the automatic
+							// fallback from gamma → alpha.
+							expect( mockOnValueChange ).toHaveBeenCalledTimes(
+								1
+							);
+							expect( mockOnValueChange ).toHaveBeenNthCalledWith(
+								1,
+								'alpha',
+								expect.anything()
+							);
+						}
+
+						if ( mode === 'Controlled' ) {
+							expect( mockOnValueChange ).not.toHaveBeenCalled();
+						}
 					} );
 
 					it( `should not fall back to the tab matching the \`${ propName }\` prop when a different selected tab is removed`, async () => {
@@ -1979,7 +1999,26 @@ describe( 'Tabs', () => {
 							).toBeVisible();
 						}
 
-						expect( mockOnValueChange ).toHaveBeenCalledTimes( 1 );
+						if ( mode === 'Uncontrolled' ) {
+							// One call for the user click on alpha, plus one
+							// for the automatic fallback from alpha → beta.
+							expect( mockOnValueChange ).toHaveBeenCalledTimes(
+								2
+							);
+							expect(
+								mockOnValueChange
+							).toHaveBeenLastCalledWith(
+								'beta',
+								expect.anything()
+							);
+						}
+
+						if ( mode === 'Controlled' ) {
+							// Only the user click on alpha is observed.
+							expect( mockOnValueChange ).toHaveBeenCalledTimes(
+								1
+							);
+						}
 					} );
 				}
 			);
@@ -2020,7 +2059,22 @@ describe( 'Tabs', () => {
 							);
 						}
 
-						expect( mockOnValueChange ).not.toHaveBeenCalled();
+						if ( mode === 'Uncontrolled' ) {
+							// `onValueChange` fires once for the automatic
+							// fallback from delta → alpha.
+							expect( mockOnValueChange ).toHaveBeenCalledTimes(
+								1
+							);
+							expect( mockOnValueChange ).toHaveBeenNthCalledWith(
+								1,
+								'alpha',
+								expect.anything()
+							);
+						}
+
+						if ( mode === 'Controlled' ) {
+							expect( mockOnValueChange ).not.toHaveBeenCalled();
+						}
 
 						// Re-render with delta added.
 						rerender(
@@ -2060,7 +2114,18 @@ describe( 'Tabs', () => {
 							).toBeVisible();
 						}
 
-						expect( mockOnValueChange ).not.toHaveBeenCalled();
+						if ( mode === 'Uncontrolled' ) {
+							// Still only the one call from the initial fallback —
+							// adding delta does not change the active uncontrolled
+							// selection.
+							expect( mockOnValueChange ).toHaveBeenCalledTimes(
+								1
+							);
+						}
+
+						if ( mode === 'Controlled' ) {
+							expect( mockOnValueChange ).not.toHaveBeenCalled();
+						}
 					} );
 				}
 			);
@@ -2072,7 +2137,7 @@ describe( 'Tabs', () => {
 			] )(
 				'when using the `%s` prop [%s]',
 				( propName, mode, Component ) => {
-					it( `should keep the initial tab matching the \`${ propName }\` prop as selected even if it becomes disabled`, async () => {
+					it( `should handle the initial tab matching the \`${ propName }\` prop becoming disabled`, async () => {
 						const mockOnValueChange = jest.fn();
 
 						const initialComponentProps = {
@@ -2100,36 +2165,85 @@ describe( 'Tabs', () => {
 							/>
 						);
 
-						// Beta continues to be selected and focused, even if it is disabled.
-						expect(
-							screen.getByRole( 'tab', {
-								selected: true,
-								name: 'Beta',
-							} )
-						).toBeVisible();
-						expect(
-							screen.getByRole( 'tabpanel', {
-								name: 'Beta',
-							} )
-						).toBeVisible();
+						if ( mode === 'Uncontrolled' ) {
+							// Selection falls back to alpha (the first
+							// enabled tab) and `onValueChange` fires for the
+							// automatic selection.
+							expect(
+								screen.getByRole( 'tab', {
+									selected: true,
+									name: 'Alpha',
+								} )
+							).toBeVisible();
+							expect(
+								screen.getByRole( 'tabpanel', {
+									name: 'Alpha',
+								} )
+							).toBeVisible();
+							expect( mockOnValueChange ).toHaveBeenCalledTimes(
+								1
+							);
+							expect( mockOnValueChange ).toHaveBeenNthCalledWith(
+								1,
+								'alpha',
+								expect.anything()
+							);
+						}
+
+						if ( mode === 'Controlled' ) {
+							// Beta continues to be selected and focused,
+							// even if it is disabled.
+							expect(
+								screen.getByRole( 'tab', {
+									selected: true,
+									name: 'Beta',
+								} )
+							).toBeVisible();
+							expect(
+								screen.getByRole( 'tabpanel', {
+									name: 'Beta',
+								} )
+							).toBeVisible();
+							expect( mockOnValueChange ).not.toHaveBeenCalled();
+						}
 
 						// Re-enable beta.
 						rerender( <Component { ...initialComponentProps } /> );
 
-						// Beta continues to be selected and focused.
-						expect(
-							screen.getByRole( 'tab', {
-								selected: true,
-								name: 'Beta',
-							} )
-						).toBeVisible();
-						expect(
-							screen.getByRole( 'tabpanel', {
-								name: 'Beta',
-							} )
-						).toBeVisible();
+						if ( mode === 'Uncontrolled' ) {
+							// Alpha stays selected — re-enabling beta does
+							// not re-select it.
+							expect(
+								screen.getByRole( 'tab', {
+									selected: true,
+									name: 'Alpha',
+								} )
+							).toBeVisible();
+							expect(
+								screen.getByRole( 'tabpanel', {
+									name: 'Alpha',
+								} )
+							).toBeVisible();
+							expect( mockOnValueChange ).toHaveBeenCalledTimes(
+								1
+							);
+						}
 
-						expect( mockOnValueChange ).not.toHaveBeenCalled();
+						if ( mode === 'Controlled' ) {
+							// Beta continues to be selected and focused.
+							expect(
+								screen.getByRole( 'tab', {
+									selected: true,
+									name: 'Beta',
+								} )
+							).toBeVisible();
+							expect(
+								screen.getByRole( 'tabpanel', {
+									name: 'Beta',
+								} )
+							).toBeVisible();
+							expect( mockOnValueChange ).not.toHaveBeenCalled();
+						}
 					} );
 
 					it( 'should handle the user-selected tab becoming disabled', async () => {
@@ -2250,7 +2364,26 @@ describe( 'Tabs', () => {
 							).toBeVisible();
 						}
 
-						expect( mockOnValueChange ).toHaveBeenCalledTimes( 1 );
+						if ( mode === 'Uncontrolled' ) {
+							// One call for the user click on beta, plus one
+							// for the automatic fallback to alpha when beta
+							// was disabled.
+							expect( mockOnValueChange ).toHaveBeenCalledTimes(
+								2
+							);
+							expect(
+								mockOnValueChange
+							).toHaveBeenLastCalledWith(
+								'alpha',
+								expect.anything()
+							);
+						}
+
+						if ( mode === 'Controlled' ) {
+							expect( mockOnValueChange ).toHaveBeenCalledTimes(
+								1
+							);
+						}
 					} );
 				}
 			);
