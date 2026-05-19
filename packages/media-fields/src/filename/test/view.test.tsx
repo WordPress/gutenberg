@@ -17,7 +17,7 @@ import type { MediaItem } from '../../types';
 
 describe( 'FileNameView', () => {
 	describe( 'filename rendering', () => {
-		it( 'renders short filename (15 characters or less)', () => {
+		it( 'renders short filename without a title attribute', () => {
 			const item: Partial< MediaItem > = {
 				source_url: 'https://example.com/uploads/12345678901.jpg', // exactly 15 chars
 			};
@@ -29,11 +29,12 @@ describe( 'FileNameView', () => {
 				/>
 			);
 
-			// Verify the filename is visible to users
-			expect( screen.getByText( '12345678901.jpg' ) ).toBeInTheDocument();
+			const rendered = screen.getByText( '12345678901.jpg' );
+			expect( rendered ).toHaveClass( 'dataviews-media-field__filename' );
+			expect( rendered ).not.toHaveAttribute( 'title' );
 		} );
 
-		it( 'renders long filename (more than 15 characters)', () => {
+		it( 'renders long filename with full name as title attribute', () => {
 			const longFilename =
 				'very-long-filename-that-exceeds-fifteen-characters.jpg';
 			const item: Partial< MediaItem > = {
@@ -47,11 +48,31 @@ describe( 'FileNameView', () => {
 				/>
 			);
 
-			// Verify the full filename text is accessible to users
-			// (the component handles truncation via Truncate/Tooltip, but the text is still present)
-			expect(
-				screen.getByText( longFilename.slice( 0, 15 ) + '…' )
-			).toBeInTheDocument();
+			// CSS handles the visual ellipsis; the DOM text remains the full
+			// filename so assistive technology reading the row gets the
+			// complete name, and the title attribute exposes it on hover.
+			const rendered = screen.getByText( longFilename );
+			expect( rendered ).toHaveClass( 'dataviews-media-field__filename' );
+			expect( rendered ).toHaveAttribute( 'title', longFilename );
+		} );
+
+		it( 'does not add a tab stop for truncated filenames', () => {
+			const longFilename =
+				'very-long-filename-that-exceeds-fifteen-characters.jpg';
+			const item: Partial< MediaItem > = {
+				source_url: `https://example.com/uploads/${ longFilename }`,
+			};
+
+			render(
+				<FileNameView
+					item={ item as MediaItem }
+					field={ filenameField as NormalizedField< MediaItem > }
+				/>
+			);
+
+			expect( screen.getByTitle( longFilename ) ).not.toHaveAttribute(
+				'tabindex'
+			);
 		} );
 	} );
 

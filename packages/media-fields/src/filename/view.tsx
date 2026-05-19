@@ -1,10 +1,6 @@
 /**
  * WordPress dependencies
  */
-import {
-	Tooltip as WCTooltip,
-	__experimentalTruncate as Truncate,
-} from '@wordpress/components';
 import { useMemo } from '@wordpress/element';
 import { getFilename } from '@wordpress/url';
 import type { DataViewRenderFieldProps } from '@wordpress/dataviews';
@@ -13,8 +9,9 @@ import type { DataViewRenderFieldProps } from '@wordpress/dataviews';
  */
 import type { MediaItem } from '../types';
 
-// Hard-coded truncate length to match the available area in the media sidebar.
-// Longer file names will be truncated and wrapped in a tooltip showing the full name.
+// Proxy threshold for "long enough that the cell will visually truncate" —
+// used to decide whether to expose the full filename via the native `title`
+// attribute. Visual truncation itself is handled in CSS.
 const TRUNCATE_LENGTH = 15;
 
 export default function FileNameView( {
@@ -29,13 +26,14 @@ export default function FileNameView( {
 		return '';
 	}
 
-	return fileName.length > TRUNCATE_LENGTH ? (
-		<WCTooltip text={ fileName }>
-			<Truncate limit={ TRUNCATE_LENGTH } ellipsizeMode="tail">
-				{ fileName }
-			</Truncate>
-		</WCTooltip>
-	) : (
-		<>{ fileName }</>
+	const isTruncated = fileName.length > TRUNCATE_LENGTH;
+
+	return (
+		<span
+			className="dataviews-media-field__filename"
+			title={ isTruncated ? fileName : undefined }
+		>
+			{ fileName }
+		</span>
 	);
 }
