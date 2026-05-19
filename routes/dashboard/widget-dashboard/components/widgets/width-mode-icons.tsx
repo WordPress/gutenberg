@@ -3,40 +3,46 @@
  */
 import { Path, SVG } from '@wordpress/primitives';
 
+/*
+ * 3-cell row indicating the widget's footprint within a grid row.
+ * Empty cells render as 1-unit frames; occupied cells as solid 6x6
+ * squares. Geometry shared across the three variants: cells at
+ * (2,9), (9,9), (16,9), each 6x6, with a 1-unit gap.
+ */
+
 /**
- * Row container with a small filled cell inside. Represents a widget
- * occupying a custom (numeric) portion of a grid row.
+ * One occupied cell (left). Custom width: the widget takes a specific
+ * portion of the row.
  */
 export const widthCustom = (
 	<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
 		<Path
 			fillRule="evenodd"
 			clipRule="evenodd"
-			d="M3 8h18v8H3ZM4 9h16v6H4ZM5 10h4v4H5Z"
+			d="M2 9h6v6H2ZM9 9h6v6H9ZM10 10h4v4h-4ZM16 9h6v6h-6ZM17 10h4v4h-4Z"
 		/>
 	</SVG>
 );
 
 /**
- * Row container with a wide filled cell anchored to the trailing edge.
- * Represents a widget filling the remaining space in a grid row.
+ * Two trailing cells occupied. Fill width: the widget grows over the
+ * remaining row after a sibling.
  */
 export const widthFill = (
 	<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
 		<Path
 			fillRule="evenodd"
 			clipRule="evenodd"
-			d="M3 8h18v8H3ZM4 9h16v6H4ZM10 10h10v4H10Z"
+			d="M2 9h6v6H2ZM3 10h4v4H3ZM9 9h6v6H9ZM16 9h6v6h-6Z"
 		/>
 	</SVG>
 );
 
 /**
- * Solid bar spanning the full icon width. Represents a widget that
- * spans the entire grid row.
+ * All three cells occupied. Full width: the widget spans the entire row.
  */
 export const widthFull = (
 	<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-		<Path d="M3 10h18v4H3Z" />
+		<Path d="M2 9h6v6H2ZM9 9h6v6H9ZM16 9h6v6h-6Z" />
 	</SVG>
 );
