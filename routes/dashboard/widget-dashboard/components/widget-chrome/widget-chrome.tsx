@@ -108,11 +108,6 @@ const WIDTH_MODE_ICON = {
 	fill: stretchWide,
 	full: stretchFullWidth,
 } as const;
-const WIDTH_MODE_LABEL = {
-	custom: __( 'Custom width' ),
-	fill: __( 'Fill width' ),
-	full: __( 'Full width' ),
-} as const;
 
 function Header( { titleId, widgetType }: HeaderProps ) {
 	if ( ! widgetType.title ) {
@@ -160,6 +155,12 @@ function HeaderActions( {
 	selectedWidthMode,
 	onWidthChange,
 }: HeaderActionsProps ) {
+	const widthModeLabel: Record< WidthMode, string > = {
+		custom: __( 'Custom width' ),
+		fill: __( 'Fill width' ),
+		full: __( 'Full width' ),
+	};
+
 	return (
 		<Stack direction="row" align="center" gap="sm">
 			<Menu>
@@ -186,7 +187,7 @@ function HeaderActions( {
 								onClick={ () => onWidthChange( mode ) }
 							>
 								<Menu.ItemLabel>
-									{ WIDTH_MODE_LABEL[ mode ] }
+									{ widthModeLabel[ mode ] }
 								</Menu.ItemLabel>
 							</Menu.Item>
 						) ) }
