@@ -17,24 +17,25 @@
  * native listener per (target, type, phase) is cheaper than churning the
  * registry.
  *
- * @param {EventTarget} target          Window or Document to listen on.
- * @param {string}      eventType       DOM event name.
- * @param {Function}    callback        Listener to be invoked with the event.
- * @param {boolean}     [capture=false] Use the capture phase. Required when
- *                                      ancestor listeners gate on
- *                                      `event.defaultPrevented`, since a
- *                                      bubble-phase document listener fires
- *                                      after them.
- * @return {Function} Unsubscribe function.
+ * @param target    Window or Document to listen on.
+ * @param eventType DOM event name.
+ * @param callback  Listener to be invoked with the event.
+ * @param capture   Use the capture phase. Required when ancestor
+ *                  listeners gate on `event.defaultPrevented`, since a
+ *                  bubble-phase document listener fires after them.
+ *                  Defaults to `false`.
+ * @return Unsubscribe function.
  */
-const registries = new WeakMap();
+type Listener = ( event: Event ) => void;
+
+const registries = new WeakMap< EventTarget, Map< string, Set< Listener > > >();
 
 export default function subscribeSharedListener(
-	target,
-	eventType,
-	callback,
-	capture = false
-) {
+	target: EventTarget,
+	eventType: string,
+	callback: Listener,
+	capture: boolean = false
+): () => void {
 	let perTarget = registries.get( target );
 	if ( ! perTarget ) {
 		perTarget = new Map();
@@ -45,10 +46,11 @@ export default function subscribeSharedListener(
 	if ( ! listeners ) {
 		listeners = new Set();
 		perTarget.set( key, listeners );
+		const fanOut = listeners;
 		target.addEventListener(
 			eventType,
 			( event ) => {
-				for ( const cb of listeners ) {
+				for ( const cb of fanOut ) {
 					cb( event );
 				}
 			},
@@ -57,6 +59,6 @@ export default function subscribeSharedListener(
 	}
 	listeners.add( callback );
 	return () => {
-		listeners.delete( callback );
+		listeners?.delete( callback );
 	};
 }
