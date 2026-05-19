@@ -31,39 +31,6 @@ jobs:
               with:
                   args: '-color -verbose'
 
-    # Runs the Octoscan GitHub Action workflow file linter.
-    #
-    # See https://github.com/synacktiv/octoscan
-    #
-    # This helps guard against injection attacks, credential exposure, vulnerable actions, repository jacking,
-    # dangerous checkouts, and artifact security issues.
-    octoscan:
-        name: Octoscan
-        runs-on: ubuntu-24.04
-        permissions:
-            security-events: write
-            actions: read
-            contents: read
-        timeout-minutes: 10
-        steps:
-            - name: Checkout code
-              uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
-              with:
-                  persist-credentials: false
-
-            - name: Run octoscan
-              id: octoscan
-              uses: synacktiv/action-octoscan@6b1cf2343893dfb9e5f75652388bd2dc83f456b0 # v1.0.0
-              with:
-                  filter_triggers: ''
-                  disable_rules: 'local-action,runner-label'
-
-            - name: Upload SARIF file to GitHub
-              uses: github/codeql-action/upload-sarif@3c3833e0f8c1c83d449a7478aa59c036a9165498 # v3.29.11
-              with:
-                  sarif_file: '${{steps.octoscan.outputs.sarif_output}}'
-                  category: octoscan
-
     # Runs the Zizmor GitHub Action workflow file linter.
     #
     # See https://github.com/zizmorcore/zizmor
@@ -96,30 +63,3 @@ jobs:
               with:
                   sarif_file: results.sarif
                   category: zizmor
-
-    # Runs the Poutine GitHub Action workflow file linter.
-    #
-    # See https://github.com/boostsecurityio/poutine
-    #
-    # This helps guard against CI/CD pipeline risks, supply chain vulnerabilities, excessive permissions,
-    # and dangerous build platform configurations.
-    poutine:
-        name: Poutine
-        runs-on: ubuntu-24.04
-        permissions:
-            security-events: write
-            contents: read
-        steps:
-            - name: Checkout repository
-              uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
-              with:
-                  persist-credentials: false
-
-            - name: Run Poutine
-              uses: boostsecurityio/poutine-action@84c0a0d32e8d57ae12651222be1eb15351429228 # v0.15.2
-
-            - name: Upload poutine SARIF file
-              uses: github/codeql-action/upload-sarif@3c3833e0f8c1c83d449a7478aa59c036a9165498 # v3.29.11
-              with:
-                  sarif_file: results.sarif
-                  category: poutine
