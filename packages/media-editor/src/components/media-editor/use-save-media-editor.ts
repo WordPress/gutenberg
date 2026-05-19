@@ -37,6 +37,12 @@ export interface MediaEditorSaveResult {
 	id: number;
 	url?: string;
 	media: Media;
+	imageEdited?: boolean;
+	previous?: {
+		id: number;
+		url?: string;
+		media: Media;
+	};
 }
 
 interface UseSaveMediaEditorArgs {
@@ -104,6 +110,15 @@ export function useSaveMediaEditor( {
 		try {
 			let saved: Media | null | undefined;
 			const modifiers = getCropModifiers( cropper );
+			const imageEdited = modifiers.length > 0;
+			const previous =
+				imageEdited && media
+					? {
+							id,
+							url: media.source_url,
+							media,
+					  }
+					: undefined;
 
 			if ( modifiers.length > 0 ) {
 				const pendingEdits = registry
@@ -156,6 +171,8 @@ export function useSaveMediaEditor( {
 					id: next.id,
 					url: next.source_url,
 					media: next,
+					imageEdited,
+					previous,
 				} );
 			}
 		} catch ( error ) {
