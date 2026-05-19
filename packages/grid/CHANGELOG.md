@@ -20,7 +20,9 @@
     adjust styles when the pointer may still hover tiles ([#78234](https://github.com/WordPress/gutenberg/pull/78234)).
 -   Add `--wp-grid-gap` so consumers can set tile spacing per surface
     without remapping design-system tokens (defaults to
-    `--wpds-dimension-gap-md`).
+    `--wpds-dimension-gap-xl`).
+-   Increase the default tile gap from `--wpds-dimension-gap-md` to
+    `--wpds-dimension-gap-xl`.
 
 ### New Features
 
