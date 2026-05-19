@@ -69,6 +69,8 @@ const rule = {
 		schema: [],
 	},
 	create( context ) {
+		const privateApisSources = new Map();
+
 		return {
 			/** @param {import('estree').ImportDeclaration} node */
 			ImportDeclaration( node ) {
@@ -90,7 +92,11 @@ const rule = {
 						return;
 					}
 
-					const name = specifier.imported.name;
+					const name = getImportedName( specifier );
+
+					if ( denylistEntry && name === 'privateApis' ) {
+						privateApisSources.set( specifier.local.name, source );
+					}
 
 					if (
 						allowlistEntry &&
@@ -118,6 +124,60 @@ const rule = {
 					}
 				} );
 			},
+			/** @param {import('estree').VariableDeclarator} node */
+			VariableDeclarator( node ) {
+				if (
+					node.parent.type !== 'VariableDeclaration' ||
+					node.parent.kind !== 'const' ||
+					node.id.type !== 'ObjectPattern' ||
+					! isUnlockCall( node.init )
+				) {
+					return;
+				}
+
+				const privateApisIdentifier = node.init.arguments[ 0 ];
+				if ( privateApisIdentifier.type !== 'Identifier' ) {
+					return;
+				}
+
+				const source = privateApisSources.get(
+					privateApisIdentifier.name
+				);
+				if ( ! source ) {
+					return;
+				}
+
+				const denylistEntry = DENYLIST[ source ];
+				if ( ! denylistEntry ) {
+					return;
+				}
+
+				node.id.properties.forEach( ( property ) => {
+					if ( property.type !== 'Property' || property.computed ) {
+						return;
+					}
+
+					const name = getPropertyName( property.key );
+					if (
+						! name ||
+						! Object.prototype.hasOwnProperty.call(
+							denylistEntry,
+							name
+						)
+					) {
+						return;
+					}
+
+					context.report( {
+						node: getReportNode( property.value ),
+						message: resolveMessage(
+							denylistEntry[ name ],
+							name,
+							source
+						),
+					} );
+				} );
+			},
 		};
 	},
 };
@@ -135,6 +195,61 @@ function resolveMessage( template, name, source ) {
 	return template
 		.replace( /\{\{\s*name\s*\}\}/g, name )
 		.replace( /\{\{\s*source\s*\}\}/g, source );
+}
+
+/**
+ * @param {import('estree').ImportSpecifier} specifier
+ * @return {string} Imported name.
+ */
+function getImportedName( specifier ) {
+	return specifier.imported.type === 'Identifier'
+		? specifier.imported.name
+		: String( specifier.imported.value );
+}
+
+/**
+ * @param {import('estree').CallExpression|import('estree').Expression|null} node
+ * @return {node is import('estree').CallExpression} Whether this is an `unlock()` call with one argument.
+ */
+function isUnlockCall( node ) {
+	return !! (
+		node &&
+		node.type === 'CallExpression' &&
+		node.callee.type === 'Identifier' &&
+		node.callee.name === 'unlock' &&
+		node.arguments.length === 1
+	);
+}
+
+/**
+ * @param {import('estree').Expression|import('estree').PrivateIdentifier} key
+ * @return {string|null} Property name.
+ */
+function getPropertyName( key ) {
+	if ( key.type === 'Identifier' ) {
+		return key.name;
+	}
+
+	if ( key.type === 'Literal' ) {
+		return String( key.value );
+	}
+
+	return null;
+}
+
+/**
+ * @param {import('estree').Pattern} value
+ * @return {import('estree').Node} Node to report on.
+ */
+function getReportNode( value ) {
+	if (
+		value.type === 'AssignmentPattern' &&
+		value.left.type === 'Identifier'
+	) {
+		return value.left;
+	}
+
+	return value;
 }
 
 module.exports = rule;

@@ -15,6 +15,11 @@ const ruleTester = new RuleTester( {
 	},
 } );
 
+const TEST_BADGE_MESSAGE =
+	'Badge is planned for deprecation. Write your own CSS instead.';
+
+DENYLIST[ '@wordpress/components' ].Badge = TEST_BADGE_MESSAGE;
+
 ruleTester.run( 'use-recommended-components', rule, {
 	valid: [
 		// Unrelated packages are not affected.
@@ -32,6 +37,9 @@ ruleTester.run( 'use-recommended-components', rule, {
 		"import { Stack } from '@wordpress/ui';",
 		"import { Text } from '@wordpress/ui';",
 		"import { Badge, Icon, Link, Stack, Tabs, Text } from '@wordpress/ui';",
+
+		// Unlocked private APIs are only checked for denied names.
+		"import { privateApis } from '@wordpress/components'; const { SomethingElse } = unlock( privateApis );",
 	],
 
 	invalid: [
@@ -85,6 +93,22 @@ ruleTester.run( 'use-recommended-components', rule, {
 				},
 				{
 					message: 'Use `Tabs` from `@wordpress/ui` instead.',
+				},
+			],
+		},
+		{
+			code: "import { privateApis } from '@wordpress/components'; const { Badge } = unlock( privateApis );",
+			errors: [
+				{
+					message: TEST_BADGE_MESSAGE,
+				},
+			],
+		},
+		{
+			code: "import { privateApis as componentsPrivateApis } from '@wordpress/components'; const { Badge: WCBadge } = unlock( componentsPrivateApis );",
+			errors: [
+				{
+					message: TEST_BADGE_MESSAGE,
 				},
 			],
 		},
