@@ -19,7 +19,8 @@ import type {
  * Internal dependencies
  */
 import { useDashboardInternalContext } from '../../context/dashboard-context';
-import { WidgetChrome, WidgetChromeActionableArea } from '../widget-chrome';
+import { WidgetChrome } from '../widget-chrome';
+import { WidgetChromeActionableArea } from './widget-chrome-actionable-area';
 import { WidgetResizeHandle } from './widget-resize-handle';
 import styles from './widgets.module.css';
 import type {

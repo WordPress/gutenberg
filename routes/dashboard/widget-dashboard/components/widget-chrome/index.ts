@@ -1,1 +1,1 @@
-export { WidgetChrome, WidgetChromeActionableArea } from './widget-chrome';
+export { WidgetChrome } from './widget-chrome';

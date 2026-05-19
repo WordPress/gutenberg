@@ -7,11 +7,7 @@ import type { ReactNode } from 'react';
 /**
  * WordPress dependencies
  */
-import {
-	Icon as WCIcon,
-	privateApis as componentsPrivateApis,
-	Spinner,
-} from '@wordpress/components';
+import { Icon as WCIcon, Spinner } from '@wordpress/components';
 import {
 	Component,
 	Suspense,
@@ -20,37 +16,18 @@ import {
 	useMemo,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import {
-	contents,
-	stretchFullWidth,
-	stretchWide,
-	trash,
-} from '@wordpress/icons';
+// Dashboard is still experimental.
 // eslint-disable-next-line @wordpress/use-recommended-components
-import {
-	Card,
-	Icon,
-	IconButton,
-	Stack,
-	Notice,
-	VisuallyHidden,
-} from '@wordpress/ui';
+import { Card, Stack, Notice, VisuallyHidden } from '@wordpress/ui';
 
 /**
  * Internal dependencies
  */
-import { unlock } from '../../../lock-unlock';
 import { useDashboardInternalContext } from '../../context/dashboard-context';
 import { WidgetContextProvider } from '../../context/widget-context';
 import { WidgetRender } from '../widget-render';
 import styles from './widget-chrome.module.css';
-import type {
-	DashboardWidget,
-	GridTilePlacement,
-	WidgetType,
-} from '../../types';
-
-const { Menu } = unlock( componentsPrivateApis );
+import type { DashboardWidget, WidgetType } from '../../types';
 
 interface ErrorBoundaryProps {
 	children: ReactNode;
@@ -97,19 +74,6 @@ interface HeaderProps {
 	widgetType: WidgetType;
 }
 
-type NamedGridWidth = Exclude<
-	NonNullable< GridTilePlacement[ 'width' ] >,
-	number
->;
-type WidthMode = 'custom' | NamedGridWidth;
-
-const WIDTH_MODES: WidthMode[] = [ 'custom', 'fill', 'full' ];
-const WIDTH_MODE_ICON = {
-	custom: contents,
-	fill: stretchWide,
-	full: stretchFullWidth,
-} as const;
-
 function Header( { titleId, widgetType }: HeaderProps ) {
 	if ( ! widgetType.title ) {
 		return null;
@@ -147,103 +111,6 @@ export interface WidgetChromeProps {
 	actionableArea?: ReactNode;
 	className?: string;
 	tabIndex?: number;
-}
-
-interface WidgetChromeActionableAreaProps {
-	widget: DashboardWidget< unknown >;
-}
-
-interface WidgetChromeActionsProps {
-	selectedWidthMode: WidthMode;
-	onWidthChange: ( width: WidthMode ) => void;
-}
-
-function WidgetChromeActions( {
-	selectedWidthMode,
-	onWidthChange,
-}: WidgetChromeActionsProps ) {
-	const widthModeLabel: Record< WidthMode, string > = {
-		custom: __( 'Custom width' ),
-		fill: __( 'Fill width' ),
-		full: __( 'Full width' ),
-	};
-
-	return (
-		<Stack direction="row" align="center" gap="sm">
-			<Menu>
-				<Menu.TriggerButton
-					render={
-						<IconButton
-							icon={ WIDTH_MODE_ICON[ selectedWidthMode ] }
-							label={ __( 'Widget width' ) }
-							size="small"
-							variant="minimal"
-							tone="neutral"
-						/>
-					}
-				/>
-				<Menu.Popover>
-					<Menu.Group>
-						{ WIDTH_MODES.map( ( mode ) => (
-							<Menu.Item
-								key={ mode }
-								prefix={
-									<Icon icon={ WIDTH_MODE_ICON[ mode ] } />
-								}
-								disabled={ selectedWidthMode === mode }
-								onClick={ () => onWidthChange( mode ) }
-							>
-								<Menu.ItemLabel>
-									{ widthModeLabel[ mode ] }
-								</Menu.ItemLabel>
-							</Menu.Item>
-						) ) }
-					</Menu.Group>
-				</Menu.Popover>
-			</Menu>
-			<IconButton
-				icon={ trash }
-				label={ __( 'Remove' ) }
-				size="small"
-				variant="minimal"
-				tone="neutral"
-			/>
-		</Stack>
-	);
-}
-
-export function WidgetChromeActionableArea( {
-	widget,
-}: WidgetChromeActionableAreaProps ) {
-	const { layout, onLayoutChange } = useDashboardInternalContext();
-	const selectedWidthMode: WidthMode =
-		typeof widget.placement?.width === 'number'
-			? 'custom'
-			: widget.placement?.width ?? 'full';
-
-	const onWidthChange = ( nextWidth: WidthMode ) => {
-		const nextLayout = layout.map( ( currentWidget ) =>
-			currentWidget.uuid === widget.uuid
-				? {
-						...currentWidget,
-						placement: {
-							...currentWidget.placement,
-							width: nextWidth === 'custom' ? 1 : nextWidth,
-						},
-				  }
-				: currentWidget
-		);
-		onLayoutChange( nextLayout );
-	};
-
-	return (
-		<div className={ styles.widgetChromeActionableArea }>
-			<WidgetChromeActions
-				selectedWidthMode={ selectedWidthMode }
-				onWidthChange={ onWidthChange }
-			/>
-		</div>
-	);
 }
 
 /**

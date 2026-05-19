@@ -29,13 +29,6 @@
 	height: 100%;
 }
 
-.widgetChromeActionableArea {
-	position: absolute;
-	top: var(--wpds-dimension-padding-md);
-	inset-inline-end: var(--wpds-dimension-padding-md);
-	z-index: 1;
-}
-
 .loading {
 	height: 100%;
 }
