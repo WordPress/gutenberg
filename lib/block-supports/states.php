@@ -88,6 +88,213 @@ function gutenberg_get_state_declarations_with_fallback_border_styles( $declarat
 }
 
 /**
+ * Adds a style fragment to a selector-keyed state style group.
+ *
+ * @param array       $groups   Selector-keyed style groups.
+ * @param string|null $selector Block or feature selector.
+ * @param array       $style    Style fragment.
+ */
+function gutenberg_add_state_style_group( &$groups, $selector, $style ) {
+	$key = is_string( $selector ) ? $selector : '';
+
+	if ( ! isset( $groups[ $key ] ) ) {
+		$groups[ $key ] = array(
+			'selector' => $selector,
+			'style'    => array(),
+		);
+	}
+
+	$groups[ $key ]['style'] = array_replace_recursive( $groups[ $key ]['style'], $style );
+}
+
+/**
+ * Splits a state style object into groups based on block feature selectors.
+ *
+ * @param array $state_style     State style object.
+ * @param array $block_selectors Block selectors metadata.
+ * @return array[] Selector/style groups.
+ */
+function gutenberg_get_state_style_groups( $state_style, $block_selectors ) {
+	$groups = array();
+
+	foreach ( $state_style as $feature => $feature_styles ) {
+		$feature_selectors = $block_selectors[ $feature ] ?? null;
+
+		if ( is_string( $feature_selectors ) ) {
+			gutenberg_add_state_style_group(
+				$groups,
+				$feature_selectors,
+				array( $feature => $feature_styles )
+			);
+			continue;
+		}
+
+		if ( is_array( $feature_selectors ) && is_array( $feature_styles ) ) {
+			$remaining_styles = $feature_styles;
+
+			foreach ( $feature_selectors as $subfeature => $subfeature_selector ) {
+				if (
+					'root' === $subfeature ||
+					! is_string( $subfeature_selector ) ||
+					! array_key_exists( $subfeature, $feature_styles )
+				) {
+					continue;
+				}
+
+				gutenberg_add_state_style_group(
+					$groups,
+					$subfeature_selector,
+					array(
+						$feature => array(
+							$subfeature => $feature_styles[ $subfeature ],
+						),
+					)
+				);
+				unset( $remaining_styles[ $subfeature ] );
+			}
+
+			if ( array() !== $remaining_styles ) {
+				gutenberg_add_state_style_group(
+					$groups,
+					$feature_selectors['root'] ?? ( $block_selectors['root'] ?? null ),
+					array( $feature => $remaining_styles )
+				);
+			}
+			continue;
+		}
+
+		gutenberg_add_state_style_group(
+			$groups,
+			$block_selectors['root'] ?? null,
+			array( $feature => $feature_styles )
+		);
+	}
+
+	return array_values( $groups );
+}
+
+/**
+ * Builds compiled state style rules, preserving the selector each rule targets.
+ *
+ * @param array         $state_styles Map of state to style array.
+ * @param WP_Block_Type $block_type   Block type.
+ * @param string|null   $rules_group  Optional style engine rules group, e.g. a media query.
+ * @return array[] State style rules.
+ */
+function gutenberg_get_block_state_style_rules( $state_styles, $block_type, $rules_group = null ) {
+	$css_rules       = array();
+	$block_selectors = isset( $block_type->selectors ) && is_array( $block_type->selectors )
+		? $block_type->selectors
+		: array();
+
+	foreach ( $state_styles as $state => $state_style ) {
+		if ( empty( $state_style ) || ! is_array( $state_style ) ) {
+			continue;
+		}
+
+		foreach ( gutenberg_get_state_style_groups( $state_style, $block_selectors ) as $group ) {
+			$compiled = gutenberg_style_engine_get_styles(
+				gutenberg_normalize_state_style_for_css_output( $group['style'] )
+			);
+
+			if ( ! empty( $compiled['declarations'] ) ) {
+				$css_rule = array(
+					'state'        => $state,
+					'selector'     => $group['selector'],
+					'declarations' => $compiled['declarations'],
+				);
+				if ( null !== $rules_group ) {
+					$css_rule['rules_group'] = $rules_group;
+				}
+				$css_rules[] = $css_rule;
+			}
+		}
+	}
+
+	return $css_rules;
+}
+
+/**
+ * Returns a unique class for a set of state style rules.
+ *
+ * @param string $block_name Block name.
+ * @param array  $css_rules  State style rules.
+ * @return string Unique class name.
+ */
+function gutenberg_get_block_state_unique_class( $block_name, $css_rules ) {
+	return 'wp-states-' . substr(
+		md5(
+			wp_json_encode(
+				array(
+					'blockName' => $block_name,
+					'rules'     => $css_rules,
+				)
+			)
+		),
+		0,
+		8
+	);
+}
+
+/**
+ * Builds a scoped selector from a block selector and optional pseudo-state.
+ *
+ * @param string      $base_selector  Block-instance scoping selector.
+ * @param string|null $block_selector Block or feature selector from metadata.
+ * @param string      $state          Pseudo-state selector.
+ * @return string Scoped selector.
+ */
+function gutenberg_build_state_selector( $base_selector, $block_selector, $state ) {
+	if ( ! is_string( $block_selector ) || '' === trim( $block_selector ) ) {
+		return $base_selector . $state;
+	}
+
+	$selectors        = explode( ',', $block_selector );
+	$scoped_selectors = array();
+
+	foreach ( $selectors as $selector ) {
+		$selector = trim( $selector );
+		if ( '' === $selector ) {
+			continue;
+		}
+
+		if ( preg_match( '/^[^ >+~]+[ >+~](.*)$/', $selector, $matches ) ) {
+			$scoped_selectors[] = $base_selector . ' ' . trim( $matches[1] ) . $state;
+			continue;
+		}
+
+		$scoped_selectors[] = $base_selector . $state;
+	}
+
+	return empty( $scoped_selectors )
+		? $base_selector . $state
+		: implode( ', ', $scoped_selectors );
+}
+
+/**
+ * Returns a style object with nested state/element keys removed.
+ *
+ * Responsive state objects can contain root declarations alongside nested
+ * `elements` and pseudo-state styles. Only root declarations should be passed
+ * to the style engine for the viewport root selector.
+ *
+ * @param array $state_style State style object.
+ * @param array $nested_keys Keys to remove from the root style object.
+ * @return array Root-only style object.
+ */
+function gutenberg_get_root_state_styles( $state_style, $nested_keys ) {
+	if ( ! is_array( $state_style ) ) {
+		return array();
+	}
+
+	$root_styles = $state_style;
+	foreach ( $nested_keys as $nested_key ) {
+		unset( $root_styles[ $nested_key ] );
+	}
+	return $root_styles;
+}
+
+/**
  * Renders per-instance state styles on the frontend.
  *
  * @param string $block_content The block's rendered HTML.
@@ -109,61 +316,60 @@ function gutenberg_render_block_states_support( $block_content, $block ) {
 	$style                   = $block['attrs']['style'] ?? array();
 	$css_rules               = array();
 
+	$state_styles = array();
 	foreach ( $supported_pseudo_states as $pseudo_state ) {
 		if ( empty( $style[ $pseudo_state ] ) || ! is_array( $style[ $pseudo_state ] ) ) {
 			continue;
 		}
 
-		$compiled = gutenberg_style_engine_get_styles(
-			gutenberg_normalize_state_style_for_css_output( $style[ $pseudo_state ] )
-		);
-		if ( ! empty( $compiled['declarations'] ) ) {
-			$css_rules[] = array(
-				'selector_suffix' => $pseudo_state,
-				'declarations'    => $compiled['declarations'],
-			);
-		}
+		$state_styles[ $pseudo_state ] = $style[ $pseudo_state ];
 	}
+	$css_rules = array_merge(
+		$css_rules,
+		gutenberg_get_block_state_style_rules( $state_styles, $block_type )
+	);
+
+	$nested_state_keys = array_merge( array( 'elements' ), $supported_pseudo_states );
 
 	foreach ( WP_Theme_JSON_Gutenberg::RESPONSIVE_BREAKPOINTS as $breakpoint => $media_query ) {
 		if ( empty( $style[ $breakpoint ] ) || ! is_array( $style[ $breakpoint ] ) ) {
 			continue;
 		}
 
-		$compiled = gutenberg_style_engine_get_styles(
-			gutenberg_normalize_state_style_for_css_output( $style[ $breakpoint ] )
+		$viewport_styles = $style[ $breakpoint ];
+		$root_styles     = gutenberg_get_root_state_styles( $viewport_styles, $nested_state_keys );
+		$css_rules       = array_merge(
+			$css_rules,
+			gutenberg_get_block_state_style_rules(
+				array( '' => $root_styles ),
+				$block_type,
+				$media_query
+			)
 		);
-		if ( ! empty( $compiled['declarations'] ) ) {
-			$css_rules[] = array(
-				'selector_suffix' => '',
-				'declarations'    => $compiled['declarations'],
-				'rules_group'     => $media_query,
-			);
-		}
 
+		$responsive_state_styles = array();
 		foreach ( $supported_pseudo_states as $pseudo_state ) {
-			if ( empty( $style[ $breakpoint ][ $pseudo_state ] ) || ! is_array( $style[ $breakpoint ][ $pseudo_state ] ) ) {
+			if ( empty( $viewport_styles[ $pseudo_state ] ) || ! is_array( $viewport_styles[ $pseudo_state ] ) ) {
 				continue;
 			}
 
-			$compiled = gutenberg_style_engine_get_styles(
-				gutenberg_normalize_state_style_for_css_output( $style[ $breakpoint ][ $pseudo_state ] )
-			);
-			if ( ! empty( $compiled['declarations'] ) ) {
-				$css_rules[] = array(
-					'selector_suffix' => $pseudo_state,
-					'declarations'    => $compiled['declarations'],
-					'rules_group'     => $media_query,
-				);
-			}
+			$responsive_state_styles[ $pseudo_state ] = $viewport_styles[ $pseudo_state ];
 		}
+		$css_rules = array_merge(
+			$css_rules,
+			gutenberg_get_block_state_style_rules(
+				$responsive_state_styles,
+				$block_type,
+				$media_query
+			)
+		);
 	}
 
 	if ( empty( $css_rules ) ) {
 		return $block_content;
 	}
 
-	$unique_class = 'wp-states-' . substr( md5( wp_json_encode( $css_rules ) ), 0, 8 );
+	$unique_class = gutenberg_get_block_state_unique_class( $block_name, $css_rules );
 
 	/*
 	 * Register each state's CSS rules with the block-supports style engine store.
@@ -185,7 +391,11 @@ function gutenberg_render_block_states_support( $block_content, $block ) {
 		}
 		$declarations = gutenberg_get_state_declarations_with_fallback_border_styles( $declarations );
 		$style_rule   = array(
-			'selector'     => ".$unique_class{$rule['selector_suffix']}",
+			'selector'     => gutenberg_build_state_selector(
+				".$unique_class",
+				$rule['selector'],
+				$rule['state']
+			),
 			'declarations' => $declarations,
 		);
 		if ( ! empty( $rule['rules_group'] ) ) {
@@ -202,26 +412,10 @@ function gutenberg_render_block_states_support( $block_content, $block ) {
 		)
 	);
 
-	// Add the unique class to the styled element so that state selectors like
-	// `.$unique_class:hover` match directly without needing a descendant.
-	// If the block declares selectors.root with a descendant (e.g. the button
-	// block's ".wp-block-button .wp-block-button__link"), we extract the last
-	// class and walk to that element. Otherwise we fall back to the wrapper.
-	$root_selector = $block_type->selectors['root'] ?? null;
-	$target_class  = null;
-	if ( $root_selector && preg_match( '/\.([a-zA-Z0-9_-]+)\s*$/', $root_selector, $matches ) ) {
-		$target_class = $matches[1];
-	}
-
+	// Add the unique class to the wrapper so generated selectors can scope
+	// root and feature selectors under the block instance.
 	$processor = new WP_HTML_Tag_Processor( $block_content );
-	if ( $target_class ) {
-		while ( $processor->next_tag() ) {
-			if ( $processor->has_class( $target_class ) ) {
-				$processor->add_class( $unique_class );
-				break;
-			}
-		}
-	} elseif ( $processor->next_tag() ) {
+	if ( $processor->next_tag() ) {
 		$processor->add_class( $unique_class );
 	}
 	return $processor->get_updated_html();

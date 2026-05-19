@@ -1,15 +1,9 @@
 /**
- * WordPress dependencies
- */
-import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
-
-/**
  * Internal dependencies
  */
 import {
 	getRelativeRootSelector,
-	buildRootStyleStateSelector,
-	buildPseudoStyleStateSelector,
+	buildScopedBlockSelector,
 } from '../state-utils';
 
 describe( 'getRelativeRootSelector', () => {
@@ -36,72 +30,45 @@ describe( 'getRelativeRootSelector', () => {
 	} );
 } );
 
-describe( 'state selector builders', () => {
+describe( 'buildScopedBlockSelector', () => {
 	const BASE = '.wp-elements-abc123';
 
-	beforeEach( () => {
-		registerBlockType( 'test/button', {
-			apiVersion: 3,
-			title: 'Button',
-			category: 'text',
-			attributes: {},
-			edit: () => null,
-			save: () => null,
-			selectors: {
-				root: '.wp-block-button .wp-block-button__link',
-			},
-		} );
-		registerBlockType( 'test/plain', {
-			apiVersion: 3,
-			title: 'Plain',
-			category: 'text',
-			attributes: {},
-			edit: () => null,
-			save: () => null,
-		} );
-	} );
-
-	afterEach( () => {
-		unregisterBlockType( 'test/button' );
-		unregisterBlockType( 'test/plain' );
-	} );
-
-	it( 'scopes root state styles to the descendant element from selectors.root', () => {
-		expect( buildRootStyleStateSelector( BASE, 'test/button' ) ).toBe(
-			`${ BASE } .wp-block-button__link`
-		);
-	} );
-
-	it( 'falls back to the base selector when block has no selectors.root', () => {
-		expect( buildRootStyleStateSelector( BASE, 'test/plain' ) ).toBe(
-			BASE
-		);
-	} );
-
-	it( 'scopes pseudo states to the descendant element from selectors.root', () => {
+	it( 'scopes a suffix to the descendant element from a block selector', () => {
 		expect(
-			buildPseudoStyleStateSelector( BASE, 'test/button', ':hover' )
+			buildScopedBlockSelector(
+				BASE,
+				'.wp-block-button .wp-block-button__link',
+				':hover'
+			)
 		).toBe( `${ BASE } .wp-block-button__link:hover` );
 	} );
 
 	it( 'works for :focus and :active states', () => {
 		expect(
-			buildPseudoStyleStateSelector( BASE, 'test/button', ':focus' )
+			buildScopedBlockSelector(
+				BASE,
+				'.wp-block-button .wp-block-button__link',
+				':focus'
+			)
 		).toBe( `${ BASE } .wp-block-button__link:focus` );
 		expect(
-			buildPseudoStyleStateSelector( BASE, 'test/button', ':active' )
+			buildScopedBlockSelector(
+				BASE,
+				'.wp-block-button .wp-block-button__link',
+				':active'
+			)
 		).toBe( `${ BASE } .wp-block-button__link:active` );
 	} );
 
-	it( 'falls back to appending state to the base selector when block has no selectors.root', () => {
+	it( 'falls back to appending the suffix to the base selector when there is no descendant', () => {
 		expect(
-			buildPseudoStyleStateSelector( BASE, 'test/plain', ':hover' )
+			buildScopedBlockSelector( BASE, '.wp-block-button', ':hover' )
 		).toBe( `${ BASE }:hover` );
 	} );
 
-	it( 'falls back to appending state to the base selector for an unknown block name', () => {
-		expect(
-			buildPseudoStyleStateSelector( BASE, 'test/unknown', ':hover' )
-		).toBe( `${ BASE }:hover` );
+	it( 'falls back to appending the suffix to the base selector when the block selector is missing', () => {
+		expect( buildScopedBlockSelector( BASE, undefined, ':hover' ) ).toBe(
+			`${ BASE }:hover`
+		);
 	} );
 } );
