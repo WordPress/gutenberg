@@ -175,6 +175,7 @@ function HeaderActions( {
 								prefix={
 									<Icon icon={ WIDTH_MODE_ICON[ mode ] } />
 								}
+								disabled={ selectedWidthMode === mode }
 								onClick={ () => onWidthChange( mode ) }
 							>
 								<Menu.ItemLabel>
