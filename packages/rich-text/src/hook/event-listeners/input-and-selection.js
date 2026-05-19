@@ -235,6 +235,16 @@ export default ( props ) => ( element ) => {
 			return;
 		}
 
+		// `contentEditable` can be false even on a tabindex'd element
+		// (e.g. a paragraph with a locked block binding). When that's the
+		// case the rich text isn't actually being edited and shouldn't
+		// claim selection — block-editor's `use-focus-handler.js` will
+		// dispatch `selectionChange(clientId)` to keep `attributeKey`
+		// unset for the wrapper-level focus.
+		if ( element.contentEditable !== 'true' ) {
+			return;
+		}
+
 		const { record, isSelected, onSelectionChange, applyRecord } =
 			props.current;
 
