@@ -1,5 +1,5 @@
 .root {
-	container-type: inline-size;
+	container-type: size;
 }
 
 .banner {
@@ -42,5 +42,12 @@
 	.banner {
 		min-block-size: 180px;
 		padding: var(--wpds-dimension-padding-xl);
+	}
+}
+
+@container (max-height: 320px) {
+	.banner {
+		min-block-size: 140px;
+		padding: var(--wpds-dimension-padding-lg);
 	}
 }
