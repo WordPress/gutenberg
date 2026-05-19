@@ -37,8 +37,7 @@
 		&__list-item {
 			display: block;
 			width: 100%;
-			// stylelint-disable-next-line plugin/use-logical-properties-and-values -- TODO: Please fix
-			text-align: left;
+			text-align: start;
 			white-space: pre-wrap;
 			overflow-wrap: break-word;
 			height: auto;
