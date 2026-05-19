@@ -4,19 +4,14 @@
 import {
 	useBlockProps,
 	useInnerBlocksProps,
-	BlockControls,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { ToolbarGroup, ToolbarButton } from '@wordpress/components';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { useLayoutEffect, useRef } from '@wordpress/element';
-import { createBlock } from '@wordpress/blocks';
-import { __ } from '@wordpress/i18n';
 
 const SLIDE_TEMPLATE = [ [ 'core/slide' ] ];
 
 function SliderTrackEdit( { clientId } ) {
-	const { insertBlock } = useDispatch( blockEditorStore );
 	const trackRef = useRef();
 	const { selectedSlideClientId } = useSelect(
 		( select ) => {
@@ -97,11 +92,6 @@ function SliderTrackEdit( { clientId } ) {
 		};
 	}, [ selectedSlideClientId ] );
 
-	const addSlide = () => {
-		const newSlideBlock = createBlock( 'core/slide' );
-		insertBlock( newSlideBlock, undefined, clientId );
-	};
-
 	const blockProps = useBlockProps( {
 		ref: trackRef,
 		className: 'wp-block-slider-track',
@@ -112,20 +102,7 @@ function SliderTrackEdit( { clientId } ) {
 		renderAppender: false,
 	} );
 
-	return (
-		<>
-			<BlockControls group="block">
-				<ToolbarGroup>
-					<ToolbarButton
-						className="components-toolbar__control"
-						onClick={ addSlide }
-						text={ __( 'Add Slide' ) }
-					/>
-				</ToolbarGroup>
-			</BlockControls>
-			<div { ...innerBlocksProps }>{ innerBlocksProps.children }</div>
-		</>
-	);
+	return <div { ...innerBlocksProps }>{ innerBlocksProps.children }</div>;
 }
 
 export default SliderTrackEdit;

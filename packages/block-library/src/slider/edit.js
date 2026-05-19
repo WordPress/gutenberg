@@ -5,11 +5,19 @@ import {
 	useBlockProps,
 	useInnerBlocksProps,
 	InspectorControls,
+	BlockControls,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { useSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-import { PanelBody, ToggleControl, RangeControl } from '@wordpress/components';
+import {
+	PanelBody,
+	ToggleControl,
+	RangeControl,
+	ToolbarGroup,
+	ToolbarButton,
+} from '@wordpress/components';
+import { createBlock } from '@wordpress/blocks';
 
 const SLIDER_TEMPLATE = [
 	[ 'core/slider-pagination' ],
@@ -84,6 +92,7 @@ function normalizeSlidesToShow( slidesToShow, maxSlidesToShow = Infinity ) {
 }
 
 function SliderEdit( { attributes, setAttributes, clientId } ) {
+	const { insertBlock } = useDispatch( blockEditorStore );
 	const totalSlides = useSelect(
 		( select ) => {
 			const { getBlocks } = select( blockEditorStore );
@@ -108,6 +117,23 @@ function SliderEdit( { attributes, setAttributes, clientId } ) {
 		slidesToShow,
 		maxSlidesToShow
 	);
+	const trackClientId = useSelect(
+		( select ) => {
+			const { getBlocks } = select( blockEditorStore );
+			return getBlocks( clientId ).find(
+				( childBlock ) => childBlock.name === 'core/slider-track'
+			)?.clientId;
+		},
+		[ clientId ]
+	);
+
+	const addSlide = () => {
+		if ( ! trackClientId ) {
+			return;
+		}
+
+		insertBlock( createBlock( 'core/slide' ), undefined, trackClientId );
+	};
 
 	const blockProps = useBlockProps( {
 		style: {
@@ -121,6 +147,15 @@ function SliderEdit( { attributes, setAttributes, clientId } ) {
 
 	return (
 		<>
+			<BlockControls group="block">
+				<ToolbarGroup>
+					<ToolbarButton
+						className="components-toolbar__control"
+						onClick={ addSlide }
+						text={ __( 'Add Slide' ) }
+					/>
+				</ToolbarGroup>
+			</BlockControls>
 			<InspectorControls>
 				<PanelBody title={ __( 'Slider settings' ) }>
 					<RangeControl
