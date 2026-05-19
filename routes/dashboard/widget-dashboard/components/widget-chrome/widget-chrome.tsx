@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import clsx from 'clsx';
 import type { ReactNode } from 'react';
 
 /**
@@ -151,7 +152,12 @@ export const WidgetChrome = forwardRef< HTMLDivElement, WidgetChromeProps >(
 						header
 					) }
 
-					<Card.Content className={ styles.widgetChromeContent }>
+					<Card.Content
+						className={ clsx(
+							styles.widgetChromeContent,
+							isFullBleed && styles.widgetChromeContentFullBleed
+						) }
+					>
 						{ isFullBleed ? (
 							<Card.FullBleed
 								className={
