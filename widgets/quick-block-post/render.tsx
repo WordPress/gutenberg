@@ -1,8 +1,9 @@
 /**
  * WordPress dependencies
  */
+import { Spinner } from '@wordpress/components';
 import { store as coreDataStore } from '@wordpress/core-data';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { DataForm, useFormValidity } from '@wordpress/dataviews';
 import type { Field, Form } from '@wordpress/dataviews';
 import { useMemo, useState } from '@wordpress/element';
@@ -12,9 +13,17 @@ import { Button, Stack } from '@wordpress/ui'; // eslint-disable-line @wordpress
 /**
  * Internal dependencies
  */
-import { SavedPost } from './components';
+import { ExistingDraftPrompt, SavedPost } from './components';
 import { QuickPostContentField } from './fields';
 import styles from './render.module.css';
+
+function getTodayStartISO() {
+	const now = new Date();
+	const year = now.getFullYear();
+	const month = String( now.getMonth() + 1 ).padStart( 2, '0' );
+	const day = String( now.getDate() ).padStart( 2, '0' );
+	return `${ year }-${ month }-${ day }T00:00:00`;
+}
 
 type QuickBlockPostData = {
 	title: string;
@@ -37,8 +46,32 @@ export default function QuickBlockPost() {
 	const [ createdPostId, setCreatedPostId ] = useState< number | null >(
 		null
 	);
+	const [ hasDismissedPrompt, setHasDismissedPrompt ] = useState( false );
 
 	const { saveEntityRecord } = useDispatch( coreDataStore );
+
+	const { existingDraft, isLoadingDrafts } = useSelect( ( select ) => {
+		const { getCurrentUser, getEntityRecords } = select( coreDataStore );
+		const currentUser = getCurrentUser();
+
+		if ( ! currentUser?.id ) {
+			return { existingDraft: null, isLoadingDrafts: true };
+		}
+
+		const records = getEntityRecords( 'postType', 'post', {
+			status: 'draft',
+			author: currentUser.id,
+			after: getTodayStartISO(),
+			orderby: 'date',
+			order: 'desc',
+			per_page: 1,
+		} ) as Array< { id: number } > | undefined;
+
+		return {
+			existingDraft: records?.[ 0 ] ?? null,
+			isLoadingDrafts: records === undefined,
+		};
+	}, [] );
 
 	const fields = useMemo< Field< QuickBlockPostData >[] >(
 		() => [
@@ -84,6 +117,7 @@ export default function QuickBlockPost() {
 				setCreatedPostId( newId );
 			}
 			setData( INITIAL_DATA );
+			setHasDismissedPrompt( true );
 		} finally {
 			setIsSaving( false );
 		}
@@ -93,11 +127,33 @@ export default function QuickBlockPost() {
 		setCreatedPostId( null );
 	};
 
+	if ( isLoadingDrafts ) {
+		return (
+			<Stack
+				direction="column"
+				align="center"
+				justify="center"
+				className={ styles.body }
+			>
+				<Spinner />
+			</Stack>
+		);
+	}
+
 	if ( createdPostId !== null ) {
 		return (
 			<SavedPost
 				postId={ createdPostId }
 				onWriteAnother={ writeAnother }
+			/>
+		);
+	}
+
+	if ( existingDraft && ! hasDismissedPrompt ) {
+		return (
+			<ExistingDraftPrompt
+				postId={ existingDraft.id }
+				onWriteAnother={ () => setHasDismissedPrompt( true ) }
 			/>
 		);
 	}
