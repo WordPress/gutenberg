@@ -237,6 +237,35 @@
 			height: 1em;
 			width: 1em;
 		}
+
+		&:has(.wp-lightbox-close-text[hidden]) {
+			&::after {
+				position: absolute;
+				top: calc(100% + 8px);
+				right: 0;
+				padding: 4px 8px;
+				border-radius: 2px;
+				background: rgb(0 0 0 / 85%);
+				color: #fff;
+				content: attr(aria-label);
+				font-size: 12px;
+				line-height: 1.2;
+				white-space: nowrap;
+				opacity: 0;
+				pointer-events: none;
+				transition: opacity 120ms ease-in-out;
+			}
+
+			@media (hover: hover) {
+				&:hover::after {
+					opacity: 1;
+				}
+			}
+
+			&:focus-visible::after {
+				opacity: 1;
+			}
+		}
 	}
 
 	.wp-lightbox-close-icon svg {
@@ -281,14 +310,50 @@
 			height: 1.5em;
 			display: block;
 		}
+
+		&:has(.wp-lightbox-navigation-text[hidden]) {
+			&::after {
+				position: absolute;
+				bottom: calc(100% + 8px);
+				padding: 4px 8px;
+				border-radius: 2px;
+				background: rgb(0 0 0 / 85%);
+				color: #fff;
+				content: attr(aria-label);
+				font-size: 12px;
+				line-height: 1.2;
+				white-space: nowrap;
+				opacity: 0;
+				pointer-events: none;
+				transition: opacity 120ms ease-in-out;
+			}
+
+			@media (hover: hover) {
+				&:hover::after {
+					opacity: 1;
+				}
+			}
+
+			&:focus-visible::after {
+				opacity: 1;
+			}
+		}
 	}
 
 	.wp-lightbox-navigation-button-prev {
 		left: calc(env(safe-area-inset-left) + 16px);
+
+		&:has(.wp-lightbox-navigation-text[hidden])::after {
+			left: 0;
+		}
 	}
 
 	.wp-lightbox-navigation-button-next {
 		right: calc(env(safe-area-inset-right) + 16px);
+
+		&:has(.wp-lightbox-navigation-text[hidden])::after {
+			right: 0;
+		}
 	}
 
 	.wp-lightbox-navigation-icon svg {

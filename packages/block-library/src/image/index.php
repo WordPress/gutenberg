@@ -249,7 +249,7 @@ function block_core_image_render_lightbox( $block_content, $block, $block_instan
 					'alt'                    => $alt,
 					'galleryId'              => $block_instance->context['galleryId'] ?? null,
 					'customAriaLabel'        => $custom_aria_label ?? null,
-					'navigationButtonType'   => $block_instance->context['navigationButtonType'] ?? 'icon',
+					'navigationButtonType'   => $block_instance->context['navigationButtonType'] ?? 'both',
 					'triggerButtonAriaLabel' => null,
 				),
 			),

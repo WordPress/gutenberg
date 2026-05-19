@@ -5,7 +5,7 @@
 		"attributes": {
 			"images": [],
 			"ids": [],
-			"navigationButtonType": "icon",
+			"navigationButtonType": "both",
 			"shortCodeTransforms": [],
 			"columns": 1,
 			"caption": "",

@@ -68,15 +68,17 @@ test.describe( 'Gallery', () => {
 <!-- /wp:image --></figure>
 <!-- /wp:gallery -->` );
 
-		await page.click(
-			'role=region[name="Editor top bar"i] >> role=button[name="Undo"i]'
-		);
+		await page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'Undo' } )
+			.click();
 
 		await expect.poll( editor.getEditedPostContent ).toBe( '' );
 
-		await page.click(
-			'role=region[name="Editor top bar"i] >> role=button[name="Redo"i]'
-		);
+		await page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'Redo' } )
+			.click();
 
 		await expect
 			.poll( editor.getEditedPostContent )
@@ -281,6 +283,84 @@ test.describe( 'Gallery', () => {
 			imgs.map( ( img ) => parseInt( img.alt, 10 ) )
 		);
 		expect( numbers ).not.toEqual( imageAltTexts );
+	} );
+
+	test( 'uses both navigation labels by default in lightbox', async ( {
+		admin,
+		editor,
+		page,
+	} ) => {
+		await admin.createNewPost();
+		await editor.insertBlock( {
+			name: 'core/gallery',
+			innerBlocks: Array.from( { length: 2 }, () => ( {
+				name: 'core/image',
+				attributes: {
+					id: uploadedMedia.id,
+					url: uploadedMedia.source_url,
+					lightbox: { enabled: true },
+				},
+			} ) ),
+		} );
+
+		const postId = await editor.publishPost();
+		await page.goto( `/?p=${ postId }` );
+
+		await page.locator( '.wp-block-gallery img' ).first().click();
+
+		await expect( page.locator( '.wp-lightbox-close-text' ) ).toBeVisible();
+		await expect(
+			page.locator(
+				'.wp-lightbox-navigation-button-next .wp-lightbox-navigation-text'
+			)
+		).toBeVisible();
+	} );
+
+	test( 'shows icon-only tooltip labels on keyboard focus', async ( {
+		admin,
+		editor,
+		page,
+	} ) => {
+		await admin.createNewPost();
+		await editor.insertBlock( {
+			name: 'core/gallery',
+			attributes: {
+				navigationButtonType: 'icon',
+			},
+			innerBlocks: Array.from( { length: 2 }, () => ( {
+				name: 'core/image',
+				attributes: {
+					id: uploadedMedia.id,
+					url: uploadedMedia.source_url,
+					lightbox: { enabled: true },
+				},
+			} ) ),
+		} );
+
+		const postId = await editor.publishPost();
+		await page.goto( `/?p=${ postId }` );
+
+		await page.locator( '.wp-block-gallery img' ).first().click();
+		await expect( page.locator( '.wp-lightbox-close-text' ) ).toBeHidden();
+
+		await page.keyboard.press( 'Tab' );
+
+		await expect
+			.poll( async () => {
+				return page
+					.locator( '.wp-lightbox-close-button' )
+					.evaluate( ( button ) => {
+						const style = window.getComputedStyle(
+							button,
+							'::after'
+						);
+						return {
+							content: style.content,
+							opacity: style.opacity,
+						};
+					} );
+			} )
+			.toEqual( { content: '"Close"', opacity: '1' } );
 	} );
 } );
 
