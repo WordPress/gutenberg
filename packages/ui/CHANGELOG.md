@@ -49,11 +49,12 @@
 
 ### Bug Fixes
 
--   `Tabs`: When uncontrolled, `onValueChange` now fires for automatic tab selection (e.g. when the currently selected tab is removed or becomes disabled, the selection now updates to the first available tab and is reported through the callback) — inherited from [`@base-ui/react@1.5.0`](https://github.com/mui/base-ui/releases/tag/v1.5.0).
+-   `Tabs`: `onValueChange` now fires for automatic tab selection — when `Tabs` itself picks a tab without a consumer-supplied value (initial uncontrolled mount with no `defaultValue`, fallback to the first enabled tab when the first tab is disabled, or fallback when the currently selected tab is removed or becomes disabled) — inherited from [`@base-ui/react@1.5.0`](https://github.com/mui/base-ui/releases/tag/v1.5.0).
 
 ### Internal
 
 -   Update `@base-ui/react` from `1.4.1` to [`1.5.0`](https://github.com/mui/base-ui/releases/tag/v1.5.0).
+-   `Tabs`: Re-enable previously skipped test assertions that depended on the `onValueChange` fix from upstream issue [mui/base-ui#2097](https://github.com/mui/base-ui/issues/2097).
 
 ## 0.13.0 (2026-05-14)
 

@@ -465,13 +465,28 @@ describe( 'Tabs', () => {
 		describe( 'when a selected tab id is not specified', () => {
 			describe( 'when left `undefined` [Uncontrolled]', () => {
 				it( 'should choose the first tab as selected', async () => {
+					const mockOnValueChange = jest.fn();
+
 					const user = userEvent.setup();
 
-					render( <UncontrolledTabs tabs={ TABS } /> );
+					render(
+						<UncontrolledTabs
+							tabs={ TABS }
+							onValueChange={ mockOnValueChange }
+						/>
+					);
 
-					// Alpha is automatically selected as the selected tab.
+					// Alpha is automatically selected as the selected tab,
+					// and `onValueChange` fires for the automatic selection.
 					await waitForComponentToBeInitializedWithSelectedTab(
 						'Alpha'
+					);
+
+					expect( mockOnValueChange ).toHaveBeenCalledTimes( 1 );
+					expect( mockOnValueChange ).toHaveBeenNthCalledWith(
+						1,
+						'alpha',
+						expect.anything()
 					);
 
 					// Press tab. The selected tab (alpha) received focus.
@@ -482,22 +497,32 @@ describe( 'Tabs', () => {
 							name: 'Alpha',
 						} )
 					).toHaveFocus();
-
-					// TODO: check that `onValueChange` fired
-					// once https://github.com/mui/base-ui/issues/2097 is fixed
 				} );
 
 				it( 'should choose the first non-disabled tab if the first tab is disabled', async () => {
+					const mockOnValueChange = jest.fn();
+
 					const user = userEvent.setup();
 
 					render(
-						<UncontrolledTabs tabs={ TABS_WITH_ALPHA_DISABLED } />
+						<UncontrolledTabs
+							tabs={ TABS_WITH_ALPHA_DISABLED }
+							onValueChange={ mockOnValueChange }
+						/>
 					);
 
-					// Beta is automatically selected as the selected tab, since alpha is
-					// disabled.
+					// Beta is automatically selected as the selected tab,
+					// since alpha is disabled, and `onValueChange` fires for
+					// the automatic selection.
 					await waitForComponentToBeInitializedWithSelectedTab(
 						'Beta'
+					);
+
+					expect( mockOnValueChange ).toHaveBeenCalledTimes( 1 );
+					expect( mockOnValueChange ).toHaveBeenNthCalledWith(
+						1,
+						'beta',
+						expect.anything()
 					);
 
 					// Press tab. The selected tab (beta) received focus. The corresponding
@@ -509,9 +534,6 @@ describe( 'Tabs', () => {
 							name: 'Beta',
 						} )
 					).toHaveFocus();
-
-					// TODO: check that `onValueChange` fired
-					// once https://github.com/mui/base-ui/issues/2097 is fixed
 				} );
 			} );
 			describe( 'when `null` [Controlled]', () => {
@@ -982,12 +1004,12 @@ describe( 'Tabs', () => {
 					/>
 				);
 
-				// Alpha is automatically selected as the selected tab.
+				// Alpha is selected from the consumer-provided initial value;
+				// `onValueChange` does not fire for consumer-provided initial
+				// selection (only for automatic fallback selection).
 				await waitForComponentToBeInitializedWithSelectedTab( 'Alpha' );
 
-				// TODO: re-enable once https://github.com/mui/base-ui/issues/2097 is fixed
-				// expect( mockOnValueChange ).toHaveBeenCalledTimes( 1 );
-				// expect( mockOnValueChange ).toHaveBeenLastCalledWith( 'alpha' );
+				expect( mockOnValueChange ).not.toHaveBeenCalled();
 
 				// Focus the tablist (and the selected tab, alpha)
 				// Tab should initially focus the first tab in the tablist, which
@@ -1082,12 +1104,12 @@ describe( 'Tabs', () => {
 					/>
 				);
 
-				// Alpha is automatically selected as the selected tab.
+				// Alpha is selected from the consumer-provided initial value;
+				// `onValueChange` does not fire for consumer-provided initial
+				// selection.
 				await waitForComponentToBeInitializedWithSelectedTab( 'Alpha' );
 
-				// TODO: re-enable once https://github.com/mui/base-ui/issues/2097 is fixed
-				// expect( mockOnValueChange ).toHaveBeenCalledTimes( 1 );
-				// expect( mockOnValueChange ).toHaveBeenLastCalledWith( 'alpha' );
+				expect( mockOnValueChange ).not.toHaveBeenCalled();
 
 				// Focus the tablist (and the selected tab, alpha)
 				// Tab should initially focus the first tab in the tablist, which
@@ -1168,12 +1190,12 @@ describe( 'Tabs', () => {
 					/>
 				);
 
-				// Alpha is automatically selected as the selected tab.
+				// Alpha is selected from the consumer-provided initial value;
+				// `onValueChange` does not fire for consumer-provided initial
+				// selection.
 				await waitForComponentToBeInitializedWithSelectedTab( 'Alpha' );
 
-				// TODO: re-enable once https://github.com/mui/base-ui/issues/2097 is fixed
-				// expect( mockOnValueChange ).toHaveBeenCalledTimes( 1 );
-				// expect( mockOnValueChange ).toHaveBeenLastCalledWith( 'alpha' );
+				expect( mockOnValueChange ).not.toHaveBeenCalled();
 
 				// Focus the tablist (and the selected tab, alpha)
 				// Tab should initially focus the first tab in the tablist, which
@@ -1293,12 +1315,12 @@ describe( 'Tabs', () => {
 					/>
 				);
 
-				// Alpha is automatically selected as the selected tab.
+				// Alpha is selected from the consumer-provided initial value;
+				// `onValueChange` does not fire for consumer-provided initial
+				// selection.
 				await waitForComponentToBeInitializedWithSelectedTab( 'Alpha' );
 
-				// TODO: re-enable once https://github.com/mui/base-ui/issues/2097 is fixed
-				// expect( mockOnValueChange ).toHaveBeenCalledTimes( 1 );
-				// expect( mockOnValueChange ).toHaveBeenLastCalledWith( 'alpha' );
+				expect( mockOnValueChange ).not.toHaveBeenCalled();
 
 				// Focus the tablist (and the selected tab, alpha)
 				// Tab should initially focus the first tab in the tablist, which
@@ -1376,12 +1398,12 @@ describe( 'Tabs', () => {
 					</DirectionProvider>
 				);
 
-				// Alpha is automatically selected as the selected tab.
+				// Alpha is selected from the consumer-provided initial value;
+				// `onValueChange` does not fire for consumer-provided initial
+				// selection.
 				await waitForComponentToBeInitializedWithSelectedTab( 'Alpha' );
 
-				// TODO: re-enable once https://github.com/mui/base-ui/issues/2097 is fixed
-				// expect( mockOnValueChange ).toHaveBeenCalledTimes( 1 );
-				// expect( mockOnValueChange ).toHaveBeenLastCalledWith( 'alpha' );
+				expect( mockOnValueChange ).not.toHaveBeenCalled();
 
 				// Focus the tablist (and the selected tab, alpha)
 				// Tab should initially focus the first tab in the tablist, which
@@ -1479,12 +1501,12 @@ describe( 'Tabs', () => {
 					/>
 				);
 
-				// Alpha is automatically selected as the selected tab.
+				// Alpha is selected from the consumer-provided initial value;
+				// `onValueChange` does not fire for consumer-provided initial
+				// selection.
 				await waitForComponentToBeInitializedWithSelectedTab( 'Alpha' );
 
-				// TODO: re-enable once https://github.com/mui/base-ui/issues/2097 is fixed
-				// expect( mockOnValueChange ).toHaveBeenCalledTimes( 1 );
-				// expect( mockOnValueChange ).toHaveBeenLastCalledWith( 'alpha' );
+				expect( mockOnValueChange ).not.toHaveBeenCalled();
 
 				// Focus the tablist (and the selected tab, alpha)
 				// Tab should initially focus the first tab in the tablist, which
@@ -1700,14 +1722,14 @@ describe( 'Tabs', () => {
 						/>
 					);
 
-					// Alpha is automatically selected as the selected tab.
+					// Alpha is selected from the consumer-provided
+					// `defaultValue`; `onValueChange` does not fire for
+					// consumer-provided initial selection.
 					await waitForComponentToBeInitializedWithSelectedTab(
 						'Alpha'
 					);
 
-					// TODO: re-enable once https://github.com/mui/base-ui/issues/2097 is fixed
-					// expect( mockOnValueChange ).toHaveBeenCalledTimes( 1 );
-					// expect( mockOnValueChange ).toHaveBeenLastCalledWith( 'alpha' );
+					expect( mockOnValueChange ).not.toHaveBeenCalled();
 
 					// Select gamma
 					await user.click(
@@ -2261,14 +2283,14 @@ describe( 'Tabs', () => {
 							<Component { ...initialComponentProps } />
 						);
 
-						// Alpha is automatically selected as the selected tab.
+						// Alpha is selected from the consumer-provided
+						// initial value; `onValueChange` does not fire for
+						// consumer-provided initial selection.
 						await waitForComponentToBeInitializedWithSelectedTab(
 							'Alpha'
 						);
 
-						// TODO: re-enable once https://github.com/mui/base-ui/issues/2097 is fixed
-						// expect( mockOnValueChange ).toHaveBeenCalledTimes( 1 );
-						// expect( mockOnValueChange ).toHaveBeenLastCalledWith( 'alpha' );
+						expect( mockOnValueChange ).not.toHaveBeenCalled();
 
 						// Click on beta tab, beta becomes selected.
 						await user.click(
