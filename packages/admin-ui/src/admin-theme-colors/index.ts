@@ -4,7 +4,7 @@ type AdminThemeColors = {
 };
 
 const ADMIN_THEME_COLORS = new Map< string, AdminThemeColors >( [
-	[ 'fresh', { primary: '#3858e9', bg: '#1d2327' } ],
+	[ 'fresh', { primary: '#3858e9', bg: '#1e1e1e' } ],
 	[ 'modern', { primary: '#3858e9', bg: '#1e1e1e' } ],
 	[ 'midnight', { primary: '#e14d43', bg: '#363b3f' } ],
 	[ 'coffee', { primary: '#46403c', bg: '#7c726c' } ],
