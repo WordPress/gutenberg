@@ -1,10 +1,6 @@
 /*
  * Fade with opacity only: `visibility` is not interpolatable and pairing
- * it with delayed transitions breaks fade-in (handles stay unpainted
- * until the delay elapses) or cancels fade-out if flipped to hidden
- * in the same frame as opacity hits 0. `pointer-events: none` covers
- * hit-testing while faded out. Transition is omitted when the user
- * requests reduced motion.
+ * it with delayed transitions breaks fade-in.
  */
 .resize-handle-slot {
 	opacity: 1;
@@ -21,7 +17,7 @@
 /*
  * Grid-level interaction hooks (`data-wp-grid-dragging`,
  * `data-wp-grid-resizing`, `data-wp-grid-item-resizing`) drive
- * handle visibility so surfaces do not prop-drill per tile.
+ * handle visibility.
  */
 :global([data-wp-grid-dragging]) .resize-handle-slot,
 :global([data-wp-grid-resizing]) .resize-handle-slot {
@@ -30,8 +26,8 @@
 }
 
 :global([data-wp-grid-resizing])
-	:global([data-wp-grid-item-resizing])
-	.resize-handle-slot {
+:global([data-wp-grid-item-resizing])
+.resize-handle-slot {
 	opacity: 1;
 	pointer-events: auto;
 }
