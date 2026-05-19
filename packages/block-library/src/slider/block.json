@@ -42,6 +42,5 @@
 		}
 	},
 	"editorScript": "file:./index.js",
-	"editorStyle": "wp-block-slider-editor",
 	"viewScriptModule": "@wordpress/block-library/slider/view"
 }
