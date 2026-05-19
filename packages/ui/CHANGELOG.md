@@ -2,9 +2,21 @@
 
 ## Unreleased
 
+### New Features
+
+-   `Card`: `Card.FullBleed` now supports edge-bumping in additional positions ([#77856](https://github.com/WordPress/gutenberg/pull/77856)):
+    -   As the **first child of `Card.Header`**, it extends flush to the card's top and side edges — ideal for hero images. Inter-sibling spacing is consumer-managed: compose `Card.Header` with `Stack` via the `render` prop to add a gap between the hero and following siblings (e.g. `Card.Title`).
+    -   As the **sole child of `Card.Content`**, it extends flush to the card's side edges and additionally to the top edge when `Content` is the first card child, or the bottom edge when it is the last. This enables full-bleed content panels with or without a header above them.
+
 ### Enhancements
 
 -   Export `getWpCompatOverlaySlot()` so consumers can route their own portals into the compat overlay slot ([#78183](https://github.com/WordPress/gutenberg/pull/78183)).
+-   `Select`, `SelectControl`: Default the popup's portal container to the `@wordpress/ui` compat overlay slot when present, so select popups stack reliably above other overlays in mixed-library compositions. A caller-supplied `Select.Portal` `container` prop continues to take precedence ([#78372](https://github.com/WordPress/gutenberg/pull/78372)).
+-   `Autocomplete`: Default the popup's portal container to the `@wordpress/ui` compat overlay slot when present, so autocomplete popups stack reliably above other overlays in mixed-library compositions. A caller-supplied `Autocomplete.Portal` `container` prop continues to take precedence ([#78375](https://github.com/WordPress/gutenberg/pull/78375)).
+
+### Bug Fixes
+
+-   Apply shared item popup typography to inline lists and empty states ([#78403](https://github.com/WordPress/gutenberg/pull/78403)).
 
 ## 0.13.0 (2026-05-14)
 
@@ -37,6 +49,7 @@
 
 ### Enhancements
 
+-   `Button`: Allow long labels to wrap within constrained containers ([#78300](https://github.com/WordPress/gutenberg/pull/78300)).
 -   `Select`: Add a `placeholder` prop to `Select.Trigger`, and support `null` item values for clearable placeholder options ([#78076](https://github.com/WordPress/gutenberg/pull/78076)).
 -   `Drawer`: Fade the popup elevation shadow alongside the slide ([#77800](https://github.com/WordPress/gutenberg/pull/77800)).
 -   `Drawer`: Allow mouse-drag swipe-dismiss in the popup-edge padding gutter ([#77800](https://github.com/WordPress/gutenberg/pull/77800)).

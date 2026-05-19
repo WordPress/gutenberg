@@ -22,7 +22,7 @@ import {
 	setFeaturedImage,
 } from '@wordpress/react-native-bridge';
 import {
-	Icon,
+	Icon as WCIcon,
 	PanelBody,
 	ToolbarButton,
 	ToolbarGroup,
@@ -514,7 +514,7 @@ export class ImageEdit extends Component {
 
 	getPlaceholderIcon() {
 		return (
-			<Icon
+			<WCIcon
 				icon={ placeholderIcon }
 				{ ...this.props.getStylesFromColorScheme(
 					styles.iconPlaceholder,

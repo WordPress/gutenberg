@@ -223,10 +223,10 @@ export interface DashboardGridProps
 	renderDragPreview?: React.ComponentType< DragPreviewRenderProps >;
 
 	/**
-	 * Override the default edit-mode overlay (diagonal stripes plus
-	 * dashed column and row tracks) with a custom component. The grid
-	 * supplies the resolved column count, gap, and row height; the
-	 * consumer is responsible for the visual.
+	 * Override the default edit-mode overlay (row-marker tiles per
+	 * column) with a custom component. The grid supplies the resolved
+	 * column count, row height, and row count; the consumer is
+	 * responsible for the visual.
 	 *
 	 * The overlay only renders when `editMode` is true. When omitted,
 	 * the package's default visual is used.

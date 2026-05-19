@@ -116,7 +116,7 @@ export type CropperAction =
 	| { type: 'SET_IMAGE'; payload: CropperState[ 'image' ] }
 	/** Sets the image pan offset. (Crop rectangle is SET_CROP_RECT.) */
 	| { type: 'SET_PAN'; payload: NormalizedPoint }
-	/** Sets the zoom level, clamped to [1, MAX_ZOOM]. */
+	/** Sets the zoom level, clamped to [coverage-aware min, MAX_ZOOM]. */
 	| { type: 'SET_ZOOM'; payload: number }
 	/**
 	 * Sets zoom and pan together atomically. Used by focal-point

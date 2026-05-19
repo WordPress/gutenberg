@@ -480,15 +480,11 @@ export const RowHeight: Story = {
 /**
  * Edit mode with drag, resize, and all width modes. While `editMode`
  * is on, `<DashboardGrid />` paints its default overlay behind the
- * tiles to visualize the underlying template: diagonal stripes, a
- * dashed outline on each column track, a subtle column fill that
- * marks the drop zones against the gaps, and a 1px row divider when
- * `rowHeight` is numeric. The overlay disappears when `editMode`
- * flips back to `false`.
+ * tiles to visualize the underlying template: rounded row-marker
+ * tiles in each column when `rowHeight` is numeric. The overlay
+ * disappears when `editMode` flips back to `false`.
  *
- * Theme the default look in place via CSS custom properties exposed
- * by the package (`--wp-grid-overlay-stripe-color`,
- * `--wp-grid-overlay-track-color`, `--wp-grid-overlay-column-fill`),
+ * Theme the default look in place via `--wp-grid-overlay-tile-bg`,
  * or replace the visual wholesale by passing `renderGridOverlay`.
  * See the `Custom Grid Overlay` story for a full override example.
  *
