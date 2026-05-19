@@ -1,5 +1,6 @@
 .root {
 	container-type: size;
+	height: 100%;
 }
 
 .banner {
@@ -12,11 +13,14 @@
 	--banner-line-info: color-mix(in srgb, var(--wpds-color-bg-interactive-brand-strong) 60%, var(--banner-bg));
 
 	position: relative;
-	overflow: hidden;
-	min-block-size: 240px;
+	/* overflow: hidden; */
+	/* min-block-size: 240px; */
 	padding: var(--wpds-dimension-padding-3xl);
 	background-color: var(--banner-bg);
 	color: var(--banner-fg);
+	flex-grow: 1;
+	min-height: 120px;
+	max-height: 300px;
 }
 
 .bannerContent {
@@ -38,10 +42,15 @@
 	margin: 0 var(--wpds-dimension-padding-2xl) var(--wpds-dimension-padding-2xl);
 }
 
-@container (max-width: 480px) {
+@container (max-width: 420px) {
 	.banner {
 		min-block-size: 180px;
-		padding: var(--wpds-dimension-padding-xl);
+		padding: var(--wpds-dimension-padding-lg);
+	}
+
+	.columns {
+		padding: var(--wpds-dimension-padding-lg);
+		margin: 0;
 	}
 }
 
@@ -49,5 +58,10 @@
 	.banner {
 		min-block-size: 140px;
 		padding: var(--wpds-dimension-padding-lg);
+	}
+
+	.columns {
+		padding: var(--wpds-dimension-padding-lg);
+		margin: 0;
 	}
 }
