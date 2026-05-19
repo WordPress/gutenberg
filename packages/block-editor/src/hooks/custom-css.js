@@ -20,6 +20,147 @@ const CUSTOM_CSS_INSTANCE_REFERENCE = {};
 const EMPTY_STYLE = {};
 
 /**
+ * Splits a raw CSS string into top level segments, conditional at rules with
+ * blocks (@media, @supports, @layer …) and ordinary rule sets.
+ *
+ * Each returned item is one of:
+ *   { type: 'at-rule', header: string, inner: string }
+ *   { type: 'rule',    raw: string }
+ *
+ * @param {string} css Raw CSS string.
+ * @return {Array<Object>} Parsed top-level segments.
+ */
+function splitCSSTopLevelSegments( css ) {
+	const segments = [];
+	let i = 0;
+
+	while ( i < css.length ) {
+		// Skip whitespace between rules.
+		while ( i < css.length && css[ i ].trim() === '' ) {
+			i++;
+		}
+		if ( i >= css.length ) {
+			break;
+		}
+
+		if ( css[ i ] === '@' ) {
+			// Advance to the first '{' or ';'.
+			let j = i;
+			while ( j < css.length && css[ j ] !== '{' && css[ j ] !== ';' ) {
+				j++;
+			}
+
+			if ( j < css.length && css[ j ] === '{' ) {
+				const header = css.slice( i, j ).trim();
+				j++;
+
+				// Walk to the matching closing brace, respecting nesting.
+				let depth = 1;
+				const innerStart = j;
+				while ( j < css.length && depth > 0 ) {
+					if ( css[ j ] === '{' ) {
+						depth++;
+					} else if ( css[ j ] === '}' ) {
+						depth--;
+					}
+					j++;
+				}
+
+				segments.push( {
+					type: 'at-rule',
+					header,
+					inner: css.slice( innerStart, j - 1 ),
+				} );
+				i = j;
+			} else if ( j < css.length && css[ j ] === ';' ) {
+				segments.push( { type: 'rule', raw: css.slice( i, j + 1 ) } );
+				i = j + 1;
+			} else {
+				i = j;
+			}
+			continue;
+		}
+
+		let j = i;
+		let depth = 0;
+		let foundBrace = false;
+		let end = -1;
+
+		while ( j < css.length ) {
+			if ( css[ j ] === '{' ) {
+				depth++;
+				foundBrace = true;
+			} else if ( css[ j ] === '}' ) {
+				depth--;
+				if ( depth === 0 && foundBrace ) {
+					end = j;
+					break;
+				}
+			}
+			j++;
+		}
+
+		if ( end === -1 ) {
+			break;
+		}
+
+		segments.push( { type: 'rule', raw: css.slice( i, end + 1 ) } );
+		i = end + 1;
+	}
+
+	return segments;
+}
+
+/**
+ * This function splits the raw CSS into top level segments first.  For each
+ * conditional at rule it delegates only the inner content to processCSSNesting
+ * (so `&` resolution still works as expected), then re-wraps the processed
+ * result with the original at rule header.  Plain rule sets are passed through
+ * unchanged.
+ *
+ * @param {string} css      Raw CSS entered by the user.
+ * @param {string} selector The block's unique CSS class selector, e.g. `.wp-custom-css-abc`.
+ * @return {string} Processed, browser-ready CSS.
+ */
+export function processCustomBlockCSS( css, selector ) {
+	if ( ! css ) {
+		return '';
+	}
+
+	const output = [];
+	const segments = splitCSSTopLevelSegments( css );
+
+	for ( const segment of segments ) {
+		if ( segment.type === 'at-rule' ) {
+			/*
+			 * Recursively process the inner content so that:
+			 *
+			 *   @supports (display: grid) {
+			 *     @media (min-width: 768px) { & { … } }
+			 *   }
+			 *
+			 * is handled correctly at every nesting depth.
+			 */
+			const processedInner = processCustomBlockCSS(
+				segment.inner,
+				selector
+			);
+
+			if ( processedInner.trim() ) {
+				output.push( `${ segment.header } {\n${ processedInner }\n}` );
+			}
+		} else {
+			const processed = processCSSNesting( segment.raw, selector );
+			if ( processed.trim() ) {
+				output.push( processed );
+			}
+		}
+	}
+
+	return output.join( '\n' );
+}
+
+/**
  * Inspector control for custom CSS.
  *
  * @param {Object}   props               Component props.
@@ -141,13 +282,13 @@ function useBlockProps( { style } ) {
 
 	const customCSSSelector = `.${ customCSSIdentifier }`;
 
-	// Transform the custom CSS using the same logic as global styles.
+	// Process the custom CSS with full at rule support (@media, @supports …).
 	// Only process if CSS is valid (doesn't contain HTML markup).
 	const transformedCSS = useMemo( () => {
 		if ( ! isValidCSS ) {
 			return undefined;
 		}
-		return processCSSNesting( customCSS, customCSSSelector );
+		return processCustomBlockCSS( customCSS, customCSSSelector );
 	}, [ customCSS, customCSSSelector, isValidCSS ] );
 
 	// Inject the CSS via style override.

@@ -6,6 +6,161 @@
  */
 
 /**
+ * Splits a raw CSS string into top level segments, at rules with blocks
+ * (e.g. @media, @supports, @layer) and ordinary rule sets.
+ *
+ * Each returned item is an associative array with:
+ *   - 'type'    => 'at-rule' | 'rule'
+ *   - 'header'  => string  (for at-rules: e.g. "@media (min-width: 1024px)")
+ *   - 'inner'   => string  (content between the outermost braces)
+ *   - 'raw'     => string  (full original text, for plain rules)
+ *
+ * @since 23.0.0
+ *
+ * @param string $css Raw CSS string.
+ * @return array<int, array<string, string>> Parsed segments.
+ */
+function gutenberg_split_css_top_level_segments( $css ) {
+	$segments = array();
+	$len      = strlen( $css );
+	$i        = 0;
+
+	while ( $i < $len ) {
+		// Skip whitespace between rules.
+		while ( $i < $len && ctype_space( $css[ $i ] ) ) {
+			++$i;
+		}
+		if ( $i >= $len ) {
+			break;
+		}
+
+		if ( '@' === $css[ $i ] ) {
+			// Collect up to the first '{' or ';'.
+			$j = $i;
+			while ( $j < $len && '{' !== $css[ $j ] && ';' !== $css[ $j ] ) {
+				++$j;
+			}
+
+			if ( $j < $len && '{' === $css[ $j ] ) {
+				$header = trim( substr( $css, $i, $j - $i ) );
+				++$j;
+
+				$depth       = 1;
+				$inner_start = $j;
+				while ( $j < $len && $depth > 0 ) {
+					if ( '{' === $css[ $j ] ) {
+						++$depth;
+					} elseif ( '}' === $css[ $j ] ) {
+						--$depth;
+					}
+					++$j;
+				}
+
+				$inner      = substr( $css, $inner_start, $j - $inner_start - 1 );
+				$segments[] = array(
+					'type'   => 'at-rule',
+					'header' => $header,
+					'inner'  => $inner,
+				);
+				$i          = $j;
+			} elseif ( $j < $len && ';' === $css[ $j ] ) {
+				$segments[] = array(
+					'type' => 'rule',
+					'raw'  => substr( $css, $i, $j - $i + 1 ),
+				);
+				$i          = $j + 1;
+			} else {
+				$i = $j;
+			}
+			continue;
+		}
+
+		$j           = $i;
+		$found_brace = false;
+		$depth       = 0;
+		$end         = -1;
+
+		while ( $j < $len ) {
+			if ( '{' === $css[ $j ] ) {
+				++$depth;
+				$found_brace = true;
+			} elseif ( '}' === $css[ $j ] ) {
+				--$depth;
+				if ( 0 === $depth && $found_brace ) {
+					$end = $j;
+					break;
+				}
+			}
+			++$j;
+		}
+
+		if ( -1 === $end ) {
+			break;
+		}
+
+		$segments[] = array(
+			'type' => 'rule',
+			'raw'  => substr( $css, $i, $end - $i + 1 ),
+		);
+		$i          = $end + 1;
+	}
+
+	return $segments;
+}
+
+/**
+ * This wrapper splits the CSS into top-level segments first.  For each
+ * conditional at rule it delegates only the inner content to the core
+ * processor (so `&` resolution still works), then re wraps the result with
+ * the original at rule header.  Plain rule sets are passed through unchanged.
+ *
+ * @since 23.0.0
+ *
+ * @param string $css      Raw CSS entered by the user.
+ * @param string $selector The block's unique CSS class selector, e.g. '.wp-custom-css-abc123'.
+ * @return string Processed, browser-ready CSS.
+ */
+function gutenberg_process_block_custom_css_with_at_rules( $css, $selector ) {
+	if ( empty( trim( $css ) ) ) {
+		return '';
+	}
+
+	$output   = array();
+	$segments = gutenberg_split_css_top_level_segments( $css );
+
+	foreach ( $segments as $segment ) {
+		if ( 'at-rule' === $segment['type'] ) {
+			/*
+			 * Recursively process the inner content so that:
+			 *   @supports (display: grid) {
+			 *     @media (min-width: 768px) { & { … } }
+			 *   }
+			 * is handled correctly at every nesting depth.
+			 */
+			$processed_inner = gutenberg_process_block_custom_css_with_at_rules(
+				$segment['inner'],
+				$selector
+			);
+
+			if ( ! empty( trim( $processed_inner ) ) ) {
+				$output[] = $segment['header'] . " {\n" . $processed_inner . "\n}";
+			}
+		} else {
+			$processed = WP_Theme_JSON_Gutenberg::process_blocks_custom_css(
+				$segment['raw'],
+				$selector
+			);
+
+			if ( ! empty( trim( $processed ) ) ) {
+				$output[] = $processed;
+			}
+		}
+	}
+
+	return implode( "\n", $output );
+}
+
+/**
  * Render the custom CSS stylesheet and add class name to block as required.
  *
  * @param array $parsed_block The parsed block.
@@ -49,9 +204,9 @@ function gutenberg_render_custom_css_support_styles( $parsed_block ) {
 
 	_wp_array_set( $parsed_block, array( 'attrs', 'className' ), $updated_class_name );
 
-	// Process the custom CSS using the same method as global styles.
+	// Process the custom CSS with full at rule support (@media, @supports …).
 	$selector      = '.' . $class_name;
-	$processed_css = WP_Theme_JSON_Gutenberg::process_blocks_custom_css( $custom_css, $selector );
+	$processed_css = gutenberg_process_block_custom_css_with_at_rules( $custom_css, $selector );
 
 	if ( ! empty( $processed_css ) ) {
 		/*
