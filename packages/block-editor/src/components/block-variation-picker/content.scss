@@ -2,6 +2,7 @@
 @use "@wordpress/base-styles/colors" as *;
 
 .block-editor-block-variation-picker__variations,
+.block-editor-block-variation-picker__skip,
 .wp-block-group-placeholder__variations {
 	list-style: none;
 	display: flex;
@@ -38,4 +39,3 @@
 		gap: $grid-unit-05;
 	}
 }
-

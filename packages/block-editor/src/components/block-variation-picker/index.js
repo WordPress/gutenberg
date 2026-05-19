@@ -16,6 +16,7 @@ function BlockVariationPicker( {
 	instructions = __( 'Select a variation to start with:' ),
 	variations,
 	onSelect,
+	allowSkip,
 } ) {
 	const classes = clsx( 'block-editor-block-variation-picker', {
 		'has-many-variations': variations.length > 4,
@@ -60,6 +61,17 @@ function BlockVariationPicker( {
 				) ) }
 			</ul>
 			{ /* eslint-enable jsx-a11y/no-redundant-roles */ }
+			{ allowSkip && (
+				<div className="block-editor-block-variation-picker__skip">
+					<Button
+						__next40pxDefaultSize
+						variant="link"
+						onClick={ () => onSelect() }
+					>
+						{ __( 'Skip' ) }
+					</Button>
+				</div>
+			) }
 		</Placeholder>
 	);
 }
