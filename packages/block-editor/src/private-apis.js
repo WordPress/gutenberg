@@ -51,6 +51,7 @@ import {
 	isNavigationPostEditorKey,
 	mediaUploadOnSuccessKey,
 	openMediaEditorModalKey,
+	openMediaUploadModalKey,
 } from './store/private-keys';
 import { requiresWrapperOnCopy } from './components/writing-flow/utils';
 import { PrivateRichText } from './components/rich-text/';
@@ -135,6 +136,7 @@ lock( privateApis, {
 	isNavigationPostEditorKey,
 	mediaUploadOnSuccessKey,
 	openMediaEditorModalKey,
+	openMediaUploadModalKey,
 	useBlockElement,
 	useBlockElementRef,
 	LinkPicker,

@@ -111,6 +111,7 @@ const {
 	isNavigationPostEditorKey,
 	mediaUploadOnSuccessKey,
 	openMediaEditorModalKey,
+	openMediaUploadModalKey,
 } = unlock( privateApis );
 
 /**
@@ -273,7 +274,8 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 	const { undo, setIsInserterOpened } = useDispatch( editorStore );
 	const { editMediaEntity } = unlock( useDispatch( coreStore ) );
 	const { saveEntityRecord } = useDispatch( coreStore );
-	const { openMediaEditorModal } = useDispatch( mediaEditorStore );
+	const { openMediaEditorModal, openMediaUploadModal } =
+		useDispatch( mediaEditorStore );
 
 	/**
 	 * Creates a Post entity.
@@ -348,6 +350,16 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 				? ( { id, onUpdate } ) =>
 						openMediaEditorModal( { id, onUpdate } )
 				: undefined,
+			[ openMediaUploadModalKey ]:
+				window?.__experimentalDataViewsMediaModal
+					? ( args ) => {
+							// The dispatched action seeds the store and returns the
+							// allocated session symbol via the action object; the
+							// caller (shim) reads it back for close-by-session.
+							const action = openMediaUploadModal( args ?? {} );
+							return action?.browse?.session;
+					  }
+					: undefined,
 			mediaUpload: hasUploadPermissions ? mediaUpload : undefined,
 			[ mediaUploadOnSuccessKey ]: hasUploadPermissions
 				? mediaUploadOnSuccess
@@ -445,6 +457,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		renderingMode,
 		editMediaEntity,
 		openMediaEditorModal,
+		openMediaUploadModal,
 		settings.onNavigateToEntityRecord,
 		deviceType,
 		allImageSizes,

@@ -1,2 +1,4 @@
 @use "@wordpress/media-fields/build-style/style.css" as *;
-@use "./components/media-upload-modal/style.scss" as *;
+// The media upload modal styles moved to `@wordpress/media-editor` alongside
+// the modal implementation. The export in this package is now a shim that
+// renders no DOM of its own.

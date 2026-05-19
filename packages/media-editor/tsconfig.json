@@ -7,6 +7,7 @@
 	},
 	"references": [
 		{ "path": "../api-fetch" },
+		{ "path": "../blob" },
 		{ "path": "../components" },
 		{ "path": "../core-data" },
 		{ "path": "../data" },
@@ -17,8 +18,11 @@
 		{ "path": "../icons" },
 		{ "path": "../keyboard-shortcuts" },
 		{ "path": "../keycodes" },
+		{ "path": "../media-fields" },
+		{ "path": "../media-utils" },
 		{ "path": "../notices" },
 		{ "path": "../private-apis" },
-		{ "path": "../ui" }
+		{ "path": "../ui" },
+		{ "path": "../views" }
 	]
 }

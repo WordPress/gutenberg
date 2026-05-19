@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useState, useEffect, useCallback, useRef } from '@wordpress/element';
+import { useState, useEffect, useCallback } from '@wordpress/element';
 import { __, sprintf, _n } from '@wordpress/i18n';
 import {
 	Button,
@@ -33,7 +33,12 @@ export function UploadStatusPopover( {
 }: UploadStatusPopoverProps ) {
 	const [ isOpen, setIsOpen ] = useState( false );
 	const [ prevHadErrors, setPrevHadErrors ] = useState( false );
-	const triggerRef = useRef< HTMLButtonElement >( null );
+	// `Popover` needs an anchor element it can read at render time. Storing
+	// the trigger button via a callback ref + state — rather than `useRef`
+	// — keeps us out of the "Cannot access refs during render" rule and
+	// re-renders the Popover when the anchor mounts.
+	const [ triggerElement, setTriggerElement ] =
+		useState< HTMLButtonElement | null >( null );
 
 	const updateIsOpen = useCallback(
 		( open: boolean ) => {
@@ -85,32 +90,32 @@ export function UploadStatusPopover( {
 	}
 
 	return (
-		<div className="media-upload-modal__upload-status">
+		<div className="media-modal-browser__upload-status">
 			{ isUploading && <Spinner /> }
 			<Button
-				className="media-upload-modal__upload-status__trigger"
+				className="media-modal-browser__upload-status__trigger"
 				size="compact"
 				icon={ chevronDown }
 				iconPosition="right"
 				onClick={ () => updateIsOpen( ! isOpen ) }
 				aria-expanded={ isOpen }
-				ref={ triggerRef }
+				ref={ setTriggerElement }
 			>
 				{ buttonLabel }
 			</Button>
 			{ isOpen && (
 				<Popover
-					className="media-upload-modal__upload-status__popover"
+					className="media-modal-browser__upload-status__popover"
 					placement="top-start"
 					offset={ 8 }
-					anchor={ triggerRef.current }
+					anchor={ triggerElement }
 					focusOnMount
 					onClose={ () => {
 						// Let the button's onClick handle toggling when
 						// the close was triggered by clicking the trigger.
 						if (
-							triggerRef.current?.contains(
-								triggerRef.current.ownerDocument.activeElement
+							triggerElement?.contains(
+								triggerElement.ownerDocument.activeElement
 							)
 						) {
 							return;
@@ -118,14 +123,14 @@ export function UploadStatusPopover( {
 						updateIsOpen( false );
 					} }
 				>
-					<div className="media-upload-modal__upload-status__header">
+					<div className="media-modal-browser__upload-status__header">
 						<h3>{ popoverHeading }</h3>
 					</div>
-					<ul className="media-upload-modal__upload-status__list">
+					<ul className="media-modal-browser__upload-status__list">
 						{ uploadingFiles.map( ( file ) => (
 							<li
 								key={ file.id }
-								className="media-upload-modal__upload-status__item"
+								className="media-modal-browser__upload-status__item"
 							>
 								{ file.status === 'uploading' && <Spinner /> }
 								{ file.status === 'uploaded' && (
@@ -134,7 +139,7 @@ export function UploadStatusPopover( {
 								{ ( file.status === 'uploading' ||
 									file.status === 'uploaded' ) && (
 									<span
-										className="media-upload-modal__upload-status__filename"
+										className="media-modal-browser__upload-status__filename"
 										title={ file.name }
 									>
 										{ file.name }
