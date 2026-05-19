@@ -65,3 +65,15 @@
 		margin: 0;
 	}
 }
+
+.wide .banner {
+	flex: 0 0 35%;
+	min-height: 0;
+	max-height: none;
+}
+
+.wide .columns {
+	flex: 1;
+	padding: var(--wpds-dimension-padding-2xl);
+	margin: 0;
+}

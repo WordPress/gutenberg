@@ -1,6 +1,8 @@
 /**
  * WordPress dependencies
  */
+import { useResizeObserver } from '@wordpress/compose';
+import { useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { layout, pencil, styles as stylesIcon } from '@wordpress/icons';
 // Dashboard is still experimental.
@@ -14,10 +16,24 @@ import { FeatureHighlight, HeaderBackground } from './components';
 import styles from './style.module.css';
 
 const DISPLAY_VERSION = '7.1';
+const WIDE_LAYOUT_BREAKPOINT = 900;
 
 export default function WelcomeBanner() {
+	const [ isWide, setIsWide ] = useState( false );
+
+	const setRef = useResizeObserver< HTMLDivElement >( ( [ entry ] ) => {
+		setIsWide( entry.contentRect.width >= WIDE_LAYOUT_BREAKPOINT );
+	} );
+
 	return (
-		<Stack className={ styles.root } direction="column" gap="lg">
+		<Stack
+			ref={ setRef }
+			className={ `${ styles.root }${
+				isWide ? ` ${ styles.wide }` : ''
+			}` }
+			direction={ isWide ? 'row' : 'column' }
+			gap="lg"
+		>
 			<Stack
 				className={ styles.banner }
 				direction="column"
