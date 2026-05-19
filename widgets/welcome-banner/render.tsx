@@ -17,7 +17,7 @@ const DISPLAY_VERSION = '7.1';
 
 export default function WelcomeBanner() {
 	return (
-		<>
+		<Stack className={ styles.root } direction="column" gap="lg">
 			<Stack
 				className={ styles.banner }
 				direction="column"
@@ -62,6 +62,7 @@ export default function WelcomeBanner() {
 					ctaUrl="/wp-admin/post-new.php?post_type=page"
 					ctaLabel={ __( 'Add a new page' ) }
 				/>
+
 				<FeatureHighlight
 					icon={ layout }
 					title={ __(
@@ -73,6 +74,7 @@ export default function WelcomeBanner() {
 					ctaUrl="/wp-admin/site-editor.php"
 					ctaLabel={ __( 'Open site editor' ) }
 				/>
+
 				<FeatureHighlight
 					icon={ stylesIcon }
 					title={ __(
@@ -85,6 +87,6 @@ export default function WelcomeBanner() {
 					ctaLabel={ __( 'Edit styles' ) }
 				/>
 			</Stack>
-		</>
+		</Stack>
 	);
 }
