@@ -143,7 +143,13 @@ export async function convertGifToVideo(
 		} );
 
 		try {
-			await decoder.completed;
+			// Wait for the track list to be populated, not decoder.completed.
+			// For a fully-buffered ArrayBuffer source, `completed` resolves as
+			// soon as the bytes are received, which can be *before* the GIF is
+			// parsed - leaving `tracks` empty and `frameCount` at 0 (decoded as
+			// "GIF contains no decodable frames"). `tracks.ready` is the
+			// promise that resolves once track metadata is available.
+			await decoder.tracks.ready;
 
 			if ( ! inProgressOperations.has( id ) ) {
 				throw new Error( 'Operation cancelled' );
@@ -180,22 +186,31 @@ export async function convertGifToVideo(
 					image.duration ?? GIF_DEFAULT_FRAME_DURATION_US;
 				const durationSec = durationUs / 1_000_000;
 
-				let frameForEncode: VideoFrame = image;
+				const srcW = image.displayWidth;
+				const srcH = image.displayHeight;
+
+				// Optionally downscale, then force even dimensions: the avc/vp9
+				// encoders reject odd width/height (e.g. a 600x385 GIF). This
+				// runs even when no downscaling is requested, so odd-sized GIFs
+				// are not rejected outright.
+				let targetW = srcW;
+				let targetH = srcH;
 				if (
 					maxDimensions &&
-					( image.displayWidth > maxDimensions ||
-						image.displayHeight > maxDimensions )
+					( srcW > maxDimensions || srcH > maxDimensions )
 				) {
 					const scale = Math.min(
-						maxDimensions / image.displayWidth,
-						maxDimensions / image.displayHeight
+						maxDimensions / srcW,
+						maxDimensions / srcH
 					);
-					const targetW = padToEven(
-						Math.round( image.displayWidth * scale )
-					);
-					const targetH = padToEven(
-						Math.round( image.displayHeight * scale )
-					);
+					targetW = Math.round( srcW * scale );
+					targetH = Math.round( srcH * scale );
+				}
+				targetW = padToEven( targetW );
+				targetH = padToEven( targetH );
+
+				let frameForEncode: VideoFrame = image;
+				if ( targetW !== srcW || targetH !== srcH ) {
 					const canvas = new OffscreenCanvas( targetW, targetH );
 					const ctx = canvas.getContext( '2d' );
 					if ( ! ctx ) {
@@ -211,14 +226,16 @@ export async function convertGifToVideo(
 					image.close();
 				}
 
+				const sample = new VideoSample( frameForEncode, {
+					timestamp: timestampSec,
+					duration: durationSec,
+				} );
 				try {
-					await source.add(
-						new VideoSample( frameForEncode, {
-							timestamp: timestampSec,
-							duration: durationSec,
-						} )
-					);
+					await source.add( sample );
 				} finally {
+					// Close both the sample wrapper and the underlying frame;
+					// leaking either pressures memory across a long GIF.
+					sample.close();
 					frameForEncode.close();
 				}
 				timestampSec += durationSec;
