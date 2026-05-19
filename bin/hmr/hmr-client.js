@@ -361,17 +361,17 @@
 						onAllLoaded();
 					}
 				},
-					function ( failedPath ) {
-						if ( ! hasError ) {
-							hasError = true;
-							console.error(
-								'[HMR] Script load error: ' +
-									failedPath +
-									', full reload'
-							);
-							reloadPage( 'script load error: ' + failedPath );
-						}
+				function ( failedPath ) {
+					if ( ! hasError ) {
+						hasError = true;
+						console.error(
+							'[HMR] Script load error: ' +
+								failedPath +
+								', full reload'
+						);
+						reloadPage( 'script load error: ' + failedPath );
 					}
+				}
 			);
 		}
 	}
