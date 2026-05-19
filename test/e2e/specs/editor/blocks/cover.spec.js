@@ -257,6 +257,10 @@ test.describe( 'Cover', () => {
 			'.components-resizable-box__handle-bottom'
 		);
 
+		// Ensure the resize handle is in view before measuring its bounding box,
+		// so the cached coordinates match the actual position during the drag.
+		await coverBlockResizeHandle.scrollIntoViewIfNeeded();
+
 		// Establish the existing bounding boxes for the Cover block
 		// and the Cover block's resizing handle.
 		const coverBlockBox = await coverBlock.boundingBox();
