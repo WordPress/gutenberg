@@ -708,14 +708,14 @@ describe( 'Popover', () => {
 
 			render(
 				<Popover onFocusOutside={ onFocusOutside }>
-					<button>Trigger</button>
+					<button>Inside popover</button>
 				</Popover>
 			);
 
-			const trigger = screen.getByText( 'Trigger' );
-			slotButton.focus();
+			const insideButton = screen.getByText( 'Inside popover' );
+			await user.click( insideButton );
 			await user.click( slotButton );
-			trigger.focus();
+			insideButton.focus();
 
 			await new Promise( ( resolve ) => setTimeout( resolve, 50 ) );
 			expect( onFocusOutside ).not.toHaveBeenCalled();
