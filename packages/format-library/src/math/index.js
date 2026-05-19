@@ -9,9 +9,9 @@ import {
 	Popover,
 	TextControl,
 	__experimentalVStack as VStack,
-	ExternalLink,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
+import { Link } from '@wordpress/ui';
 import { math as icon } from '@wordpress/icons';
 import { speak } from '@wordpress/a11y';
 
@@ -119,9 +119,13 @@ function InlineUI( {
 							<style children=".wp-block-math__error .components-badge__content{white-space:normal}" />
 						</>
 					) }
-					<ExternalLink href="https://wordpress.org/documentation/article/math-block/">
+					<Link
+						href={ __(
+							'https://wordpress.org/documentation/article/math-block/'
+						) }
+					>
 						{ __( 'Learn more about LaTeX syntax' ) }
-					</ExternalLink>
+					</Link>
 				</VStack>
 			</div>
 		</Popover>

@@ -10,9 +10,9 @@ import {
 	TextareaControl,
 	Popover,
 	__experimentalVStack as VStack,
-	ExternalLink,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
+import { Link } from '@wordpress/ui';
 import { useState, useEffect, useRef } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import { speak } from '@wordpress/a11y';
@@ -134,9 +134,13 @@ export default function MathEdit( { attributes, setAttributes, isSelected } ) {
 									<style children=".wp-block-math__error .components-badge__content{white-space:normal}" />
 								</>
 							) }
-							<ExternalLink href="https://wordpress.org/documentation/article/math-block/">
+							<Link
+								href={ __(
+									'https://wordpress.org/documentation/article/math-block/'
+								) }
+							>
 								{ __( 'Learn more about LaTeX syntax' ) }
-							</ExternalLink>
+							</Link>
 						</VStack>
 					</div>
 				</Popover>
