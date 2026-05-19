@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { autop } from '@wordpress/autop';
 import { Spinner } from '@wordpress/components';
 import { store as coreDataStore } from '@wordpress/core-data';
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -20,22 +21,22 @@ import { QuickPostContentField } from './fields';
 import styles from './styles.module.css';
 
 /*
- * Serializes plain text into one or more `core/paragraph` blocks. Splits on
- * blank lines for paragraph breaks and converts single newlines to `<br>`,
- * so the saved draft opens in the editor as proper blocks instead of a
- * Classic block fallback. Builds the comment-delimited HTML by hand so it
- * does not depend on `@wordpress/block-library` being loaded at runtime.
+ * Serializes plain text into one or more `core/paragraph` blocks so the saved
+ * draft opens in the editor as proper blocks instead of a Classic-block
+ * fallback. `autop` handles paragraph splitting and `<br>` conversion (same
+ * algorithm as PHP's `wpautop`); we wrap each `<p>` in block delimiters
+ * because `rawHandler` from `@wordpress/blocks` would need
+ * `@wordpress/block-library` registered at runtime, which the dashboard
+ * surface does not load.
  */
 function textToParagraphBlocks( text: string ): string {
-	return text
-		.split( /\n\n+/ )
-		.map( ( paragraph ) => paragraph.trim() )
-		.filter( Boolean )
-		.map( ( paragraph ) => {
-			const content = escapeHTML( paragraph ).replace( /\n/g, '<br>' );
-			return `<!-- wp:paragraph -->\n<p>${ content }</p>\n<!-- /wp:paragraph -->`;
-		} )
-		.join( '\n\n' );
+	if ( ! text.trim() ) {
+		return '';
+	}
+	return autop( escapeHTML( text ) ).replace(
+		/<p>([\s\S]*?)<\/p>/g,
+		'<!-- wp:paragraph -->\n<p>$1</p>\n<!-- /wp:paragraph -->'
+	);
 }
 
 /**
