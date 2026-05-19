@@ -4,6 +4,7 @@
 import { WidgetDashboardProvider } from './context/dashboard-context';
 import { WidgetDashboardUIProvider } from './context/ui-context';
 import { Actions } from './components/actions';
+import { DashboardCommands } from './components/dashboard-commands';
 import { Inserter } from './components/inserter';
 import { WidgetChrome } from './components/widget-chrome';
 import { Widgets } from './components/widgets';
@@ -71,6 +72,7 @@ export const WidgetDashboard = Object.assign(
 						</>
 					) }
 
+					<DashboardCommands />
 					<Inserter />
 				</WidgetDashboardUIProvider>
 			</WidgetDashboardProvider>
