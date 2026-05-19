@@ -3,12 +3,16 @@
  */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
+import { privateApis as richTextPrivateApis } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
  */
 import { isInsideRootBlock } from '../../../utils/dom';
 import { store as blockEditorStore } from '../../../store';
+import { unlock } from '../../../lock-unlock';
+
+const { subscribeSharedListener } = unlock( richTextPrivateApis );
 
 /**
  * Selects the block if it receives focus.
@@ -30,6 +34,12 @@ export function useFocusHandler( clientId ) {
 			 * @param {FocusEvent} event Focus event.
 			 */
 			function onFocus( event ) {
+				// Document-scoped listener: bail when focus didn't land
+				// inside this block's wrapper.
+				if ( ! node.contains( event.target ) ) {
+					return;
+				}
+
 				// When the whole editor is editable, let writing flow handle
 				// selection.
 				if (
@@ -57,11 +67,11 @@ export function useFocusHandler( clientId ) {
 				selectBlock( clientId );
 			}
 
-			node.addEventListener( 'focusin', onFocus );
-
-			return () => {
-				node.removeEventListener( 'focusin', onFocus );
-			};
+			return subscribeSharedListener(
+				node.ownerDocument,
+				'focusin',
+				onFocus
+			);
 		},
 		[ isBlockSelected, selectBlock ]
 	);
