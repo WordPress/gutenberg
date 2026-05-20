@@ -1,3 +1,11 @@
+const {
+	createPrivateApisState,
+	trackPrivateApisImport,
+	trackUnlockImport,
+	getPropertyName,
+	getUnlockDestructuring,
+} = require( '../utils/private-apis' );
+
 /**
  * Allowlist: only the listed components are permitted from these packages.
  * Any other named import will be flagged with the package's message.
@@ -69,8 +77,7 @@ const rule = {
 		schema: [],
 	},
 	create( context ) {
-		const privateApisSources = new Map();
-		const trackedUnlockImports = new Set();
+		const privateApisState = createPrivateApisState();
 
 		return {
 			/** @param {import('estree').ImportDeclaration} node */
@@ -90,16 +97,18 @@ const rule = {
 					}
 
 					const name = specifier.imported.name;
-					if ( name === 'unlock' ) {
-						trackedUnlockImports.add( specifier.local.name );
-					}
+					trackUnlockImport( privateApisState, specifier );
 
 					if ( ! allowlistEntry && ! denylistEntry ) {
 						return;
 					}
 
 					if ( denylistEntry && name === 'privateApis' ) {
-						privateApisSources.set( specifier.local.name, source );
+						trackPrivateApisImport(
+							privateApisState,
+							specifier,
+							source
+						);
 					}
 
 					if (
@@ -130,40 +139,22 @@ const rule = {
 			},
 			/** @param {import('estree').VariableDeclarator} node */
 			VariableDeclarator( node ) {
-				if (
-					node.parent.type !== 'VariableDeclaration' ||
-					node.id.type !== 'ObjectPattern' ||
-					! isUnlockCall(
-						node.init,
-						context.sourceCode,
-						trackedUnlockImports
-					)
-				) {
-					return;
-				}
-
-				const privateApisIdentifier = node.init.arguments[ 0 ];
-				if ( privateApisIdentifier.type !== 'Identifier' ) {
-					return;
-				}
-
-				const source = privateApisSources.get(
-					privateApisIdentifier.name
+				const unlockDestructuring = getUnlockDestructuring(
+					node,
+					context.sourceCode,
+					privateApisState
 				);
-				if ( ! source ) {
+				if ( ! unlockDestructuring ) {
 					return;
 				}
 
+				const { source, properties } = unlockDestructuring;
 				const denylistEntry = DENYLIST[ source ];
 				if ( ! denylistEntry ) {
 					return;
 				}
 
-				node.id.properties.forEach( ( property ) => {
-					if ( property.type !== 'Property' || property.computed ) {
-						return;
-					}
-
+				properties.forEach( ( property ) => {
 					const name = getPropertyName( property.key );
 					if ( ! name || ! denylistEntry.hasOwnProperty( name ) ) {
 						return;
@@ -196,52 +187,6 @@ function resolveMessage( template, name, source ) {
 	return template
 		.replace( /\{\{\s*name\s*\}\}/g, name )
 		.replace( /\{\{\s*source\s*\}\}/g, source );
-}
-
-/**
- * @param {import('estree').CallExpression|import('estree').Expression|null} node
- * @param {import('eslint').SourceCode}                                      sourceCode
- * @param {ReadonlySet<string>}                                              trackedUnlockImports
- * @return {node is import('estree').CallExpression} Whether this is an `unlock()` call with one argument.
- */
-function isUnlockCall( node, sourceCode, trackedUnlockImports ) {
-	if (
-		node &&
-		node.type === 'CallExpression' &&
-		node.callee.type === 'Identifier' &&
-		node.arguments.length === 1
-	) {
-		if ( ! trackedUnlockImports.has( node.callee.name ) ) {
-			return false;
-		}
-
-		const { references } = sourceCode.getScope( node.callee );
-		const reference = references.find(
-			( currentReference ) => currentReference.identifier === node.callee
-		);
-
-		return !! reference?.resolved?.defs.some(
-			( definition ) => definition.type === 'ImportBinding'
-		);
-	}
-
-	return false;
-}
-
-/**
- * @param {import('estree').Expression|import('estree').PrivateIdentifier} key
- * @return {string|null} Property name.
- */
-function getPropertyName( key ) {
-	if ( key.type === 'Identifier' ) {
-		return key.name;
-	}
-
-	if ( key.type === 'Literal' ) {
-		return String( key.value );
-	}
-
-	return null;
 }
 
 module.exports = rule;
