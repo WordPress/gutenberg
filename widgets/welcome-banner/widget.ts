@@ -5,7 +5,7 @@ import { __ } from '@wordpress/i18n';
 
 const widget = {
 	apiVersion: 1,
-	name: 'gutenberg/welcome-banner',
+	name: 'core/welcome',
 	title: __( 'Welcome' ),
 	description: __( 'A short widget description.' ),
 	icon: 'wordpress',
