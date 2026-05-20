@@ -132,7 +132,6 @@ const rule = {
 			VariableDeclarator( node ) {
 				if (
 					node.parent.type !== 'VariableDeclaration' ||
-					node.parent.kind !== 'const' ||
 					node.id.type !== 'ObjectPattern' ||
 					! isUnlockCall(
 						node.init,
