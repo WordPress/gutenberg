@@ -222,7 +222,6 @@ export default function QuickPost() {
 				/>
 			</Stack>
 
-
 			<Stack direction="row" gap="md" justify="flex-start">
 				<Button
 					variant="solid"
