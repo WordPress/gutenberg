@@ -8,7 +8,7 @@ import { privateApis as composePrivateApis } from '@wordpress/compose';
  */
 import { unlock } from '../../lock-unlock';
 
-const { subscribeSharedListener } = unlock( composePrivateApis );
+const { subscribeDelegatedListener } = unlock( composePrivateApis );
 
 /**
  * Prevents focus from being captured by the element when clicking _outside_
@@ -46,12 +46,12 @@ export function preventFocusCapture() {
 			}
 		}
 
-		const unsubscribePointerDown = subscribeSharedListener(
+		const unsubscribePointerDown = subscribeDelegatedListener(
 			defaultView,
 			'pointerdown',
 			onPointerDown
 		);
-		const unsubscribePointerUp = subscribeSharedListener(
+		const unsubscribePointerUp = subscribeDelegatedListener(
 			defaultView,
 			'pointerup',
 			onPointerUp

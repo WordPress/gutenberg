@@ -8,7 +8,7 @@ import { privateApis as composePrivateApis } from '@wordpress/compose';
  */
 import { unlock } from '../../lock-unlock';
 
-const { subscribeSharedListener } = unlock( composePrivateApis );
+const { subscribeDelegatedListener } = unlock( composePrivateApis );
 
 export default () => ( element ) => {
 	function onClick( event ) {
@@ -57,12 +57,12 @@ export default () => ( element ) => {
 		}
 	}
 
-	const unsubscribeClick = subscribeSharedListener(
+	const unsubscribeClick = subscribeDelegatedListener(
 		element,
 		'click',
 		onClick
 	);
-	const unsubscribeFocusIn = subscribeSharedListener(
+	const unsubscribeFocusIn = subscribeDelegatedListener(
 		element,
 		'focusin',
 		onFocusIn

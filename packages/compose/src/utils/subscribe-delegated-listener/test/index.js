@@ -1,9 +1,9 @@
 /**
  * Internal dependencies
  */
-import subscribeSharedListener from '..';
+import subscribeDelegatedListener from '..';
 
-describe( 'subscribeSharedListener', () => {
+describe( 'subscribeDelegatedListener', () => {
 	let root;
 	let target;
 
@@ -31,7 +31,7 @@ describe( 'subscribeSharedListener', () => {
 
 	test( 'invokes element subscriber when event fires on that element', () => {
 		const cb = jest.fn();
-		subscribeSharedListener( target, 'click', cb );
+		subscribeDelegatedListener( target, 'click', cb );
 		fire( target );
 		expect( cb ).toHaveBeenCalledTimes( 1 );
 	} );
@@ -40,7 +40,7 @@ describe( 'subscribeSharedListener', () => {
 		const cb = jest.fn();
 		const child = document.createElement( 'b' );
 		target.appendChild( child );
-		subscribeSharedListener( target, 'click', cb );
+		subscribeDelegatedListener( target, 'click', cb );
 		fire( child );
 		expect( cb ).toHaveBeenCalledTimes( 1 );
 	} );
@@ -49,7 +49,7 @@ describe( 'subscribeSharedListener', () => {
 		const cb = jest.fn();
 		const sibling = document.createElement( 'div' );
 		document.body.appendChild( sibling );
-		subscribeSharedListener( target, 'click', cb );
+		subscribeDelegatedListener( target, 'click', cb );
 		fire( sibling );
 		expect( cb ).not.toHaveBeenCalled();
 		document.body.removeChild( sibling );
@@ -57,21 +57,25 @@ describe( 'subscribeSharedListener', () => {
 
 	test( 'bubble phase: nested subscribers fire inner-to-outer', () => {
 		const order = [];
-		subscribeSharedListener( root, 'click', () => order.push( 'outer' ) );
-		subscribeSharedListener( target, 'click', () => order.push( 'leaf' ) );
+		subscribeDelegatedListener( root, 'click', () =>
+			order.push( 'outer' )
+		);
+		subscribeDelegatedListener( target, 'click', () =>
+			order.push( 'leaf' )
+		);
 		fire( target );
 		expect( order ).toEqual( [ 'leaf', 'outer' ] );
 	} );
 
 	test( 'capture phase: nested subscribers fire outer-to-inner', () => {
 		const order = [];
-		subscribeSharedListener(
+		subscribeDelegatedListener(
 			root,
 			'click',
 			() => order.push( 'outer' ),
 			true
 		);
-		subscribeSharedListener(
+		subscribeDelegatedListener(
 			target,
 			'click',
 			() => order.push( 'leaf' ),
@@ -84,8 +88,8 @@ describe( 'subscribeSharedListener', () => {
 	test( 'capture and bubble registries are independent', () => {
 		const captureCb = jest.fn();
 		const bubbleCb = jest.fn();
-		subscribeSharedListener( target, 'click', captureCb, true );
-		subscribeSharedListener( target, 'click', bubbleCb, false );
+		subscribeDelegatedListener( target, 'click', captureCb, true );
+		subscribeDelegatedListener( target, 'click', bubbleCb, false );
 		fire( target );
 		expect( captureCb ).toHaveBeenCalledTimes( 1 );
 		expect( bubbleCb ).toHaveBeenCalledTimes( 1 );
@@ -93,7 +97,7 @@ describe( 'subscribeSharedListener', () => {
 
 	test( 'document subscriber always fires for events in the document', () => {
 		const cb = jest.fn();
-		subscribeSharedListener( document, 'click', cb );
+		subscribeDelegatedListener( document, 'click', cb );
 		fire( target );
 		expect( cb ).toHaveBeenCalledTimes( 1 );
 	} );
@@ -101,8 +105,8 @@ describe( 'subscribeSharedListener', () => {
 	test( 'window subscriber fans out independently of element subscribers', () => {
 		const winCb = jest.fn();
 		const elCb = jest.fn();
-		subscribeSharedListener( window, 'resize', winCb );
-		subscribeSharedListener( target, 'resize', elCb );
+		subscribeDelegatedListener( window, 'resize', winCb );
+		subscribeDelegatedListener( target, 'resize', elCb );
 		window.dispatchEvent( new Event( 'resize' ) );
 		expect( winCb ).toHaveBeenCalledTimes( 1 );
 		// Element subscriber doesn't see a resize on window.
@@ -112,8 +116,8 @@ describe( 'subscribeSharedListener', () => {
 	test( 'multiple callbacks for the same element all fire', () => {
 		const a = jest.fn();
 		const b = jest.fn();
-		subscribeSharedListener( target, 'click', a );
-		subscribeSharedListener( target, 'click', b );
+		subscribeDelegatedListener( target, 'click', a );
+		subscribeDelegatedListener( target, 'click', b );
 		fire( target );
 		expect( a ).toHaveBeenCalledTimes( 1 );
 		expect( b ).toHaveBeenCalledTimes( 1 );
@@ -121,7 +125,7 @@ describe( 'subscribeSharedListener', () => {
 
 	test( 'unsubscribe stops further dispatch', () => {
 		const cb = jest.fn();
-		const unsub = subscribeSharedListener( target, 'click', cb );
+		const unsub = subscribeDelegatedListener( target, 'click', cb );
 		fire( target );
 		expect( cb ).toHaveBeenCalledTimes( 1 );
 		unsub();
@@ -133,9 +137,9 @@ describe( 'subscribeSharedListener', () => {
 		const spy = jest.spyOn( document, 'addEventListener' );
 		// First subscribe attaches the native listener; subsequent ones
 		// for the same key share it.
-		subscribeSharedListener( target, 'mousemove', jest.fn() );
-		subscribeSharedListener( root, 'mousemove', jest.fn() );
-		subscribeSharedListener( document, 'mousemove', jest.fn() );
+		subscribeDelegatedListener( target, 'mousemove', jest.fn() );
+		subscribeDelegatedListener( root, 'mousemove', jest.fn() );
+		subscribeDelegatedListener( document, 'mousemove', jest.fn() );
 		const nativeMousemoves = spy.mock.calls.filter(
 			( [ type, , opts ] ) => type === 'mousemove' && ! opts // bubble-phase only
 		).length;
@@ -155,7 +159,7 @@ describe( 'subscribeSharedListener', () => {
 
 		const cb = jest.fn();
 		expect( () =>
-			subscribeSharedListener( iframeTarget, 'click', cb )
+			subscribeDelegatedListener( iframeTarget, 'click', cb )
 		).not.toThrow();
 		iframeTarget.dispatchEvent(
 			new iframe.contentWindow.Event( 'click', { bubbles: true } )

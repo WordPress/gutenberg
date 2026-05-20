@@ -53,7 +53,7 @@ import useDeprecatedTextAlign from '../utils/deprecated-text-align-attributes';
 import { getWidthClasses, isPercentageWidth } from './utils';
 
 const { HTMLElementControl } = unlock( blockEditorPrivateApis );
-const { subscribeSharedListener } = unlock( composePrivateApis );
+const { subscribeDelegatedListener } = unlock( composePrivateApis );
 
 const LINK_SETTINGS = [
 	...LinkControl.DEFAULT_LINK_SETTINGS,
@@ -114,7 +114,12 @@ function useEnter( props ) {
 
 		// Capture phase so we run before writing-flow's ancestor-bubble
 		// keydown handlers that gate on `event.defaultPrevented`.
-		return subscribeSharedListener( element, 'keydown', onKeyDown, true );
+		return subscribeDelegatedListener(
+			element,
+			'keydown',
+			onKeyDown,
+			true
+		);
 	}, [] );
 }
 

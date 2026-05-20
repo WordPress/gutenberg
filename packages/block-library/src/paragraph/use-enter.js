@@ -21,7 +21,7 @@ import {
  */
 import { unlock } from '../lock-unlock';
 
-const { subscribeSharedListener } = unlock( composePrivateApis );
+const { subscribeDelegatedListener } = unlock( composePrivateApis );
 
 export function useOnEnter( props ) {
 	const { batch } = useRegistry();
@@ -131,6 +131,11 @@ export function useOnEnter( props ) {
 
 		// Capture phase so we run before writing-flow's ancestor-bubble
 		// keydown handlers that gate on `event.defaultPrevented`.
-		return subscribeSharedListener( element, 'keydown', onKeyDown, true );
+		return subscribeDelegatedListener(
+			element,
+			'keydown',
+			onKeyDown,
+			true
+		);
 	}, [] );
 }

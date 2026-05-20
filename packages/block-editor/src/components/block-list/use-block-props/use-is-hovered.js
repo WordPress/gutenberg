@@ -11,7 +11,7 @@ import {
  */
 import { unlock } from '../../../lock-unlock';
 
-const { subscribeSharedListener } = unlock( composePrivateApis );
+const { subscribeDelegatedListener } = unlock( composePrivateApis );
 
 /**
  * Adds `is-hovered` class when the block is hovered and in navigation or
@@ -40,12 +40,12 @@ export function useIsHovered( { isEnabled = true } = {} ) {
 				);
 			}
 
-			const unsubscribeOut = subscribeSharedListener(
+			const unsubscribeOut = subscribeDelegatedListener(
 				node,
 				'mouseout',
 				listener
 			);
-			const unsubscribeOver = subscribeSharedListener(
+			const unsubscribeOver = subscribeDelegatedListener(
 				node,
 				'mouseover',
 				listener

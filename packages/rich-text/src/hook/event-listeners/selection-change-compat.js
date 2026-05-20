@@ -9,7 +9,7 @@ import { privateApis as composePrivateApis } from '@wordpress/compose';
 import { isRangeEqual } from '../../is-range-equal';
 import { unlock } from '../../lock-unlock';
 
-const { subscribeSharedListener } = unlock( composePrivateApis );
+const { subscribeDelegatedListener } = unlock( composePrivateApis );
 
 /**
  * Sometimes some browsers are not firing a `selectionchange` event when
@@ -52,12 +52,12 @@ export default () => ( element ) => {
 		range = getRange();
 	}
 
-	const unsubscribePointerDown = subscribeSharedListener(
+	const unsubscribePointerDown = subscribeDelegatedListener(
 		element,
 		'pointerdown',
 		onDown
 	);
-	const unsubscribeKeyDown = subscribeSharedListener(
+	const unsubscribeKeyDown = subscribeDelegatedListener(
 		element,
 		'keydown',
 		onDown

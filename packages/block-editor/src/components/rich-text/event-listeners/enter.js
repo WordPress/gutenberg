@@ -10,7 +10,7 @@ import { privateApis as composePrivateApis } from '@wordpress/compose';
  */
 import { unlock } from '../../../lock-unlock';
 
-const { subscribeSharedListener } = unlock( composePrivateApis );
+const { subscribeDelegatedListener } = unlock( composePrivateApis );
 
 export default ( props ) => ( element ) => {
 	function onKeyDownDeprecated( event ) {
@@ -83,7 +83,7 @@ export default ( props ) => ( element ) => {
 
 	// Attach the listener to the window so parent elements have the chance to
 	// prevent the default behavior.
-	const unsubscribeKeyDown = subscribeSharedListener(
+	const unsubscribeKeyDown = subscribeDelegatedListener(
 		defaultView,
 		'keydown',
 		onKeyDown

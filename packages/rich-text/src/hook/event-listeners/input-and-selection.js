@@ -11,7 +11,7 @@ import { isCollapsed } from '../../is-collapsed';
 import { updateFormats } from '../../update-formats';
 import { unlock } from '../../lock-unlock';
 
-const { subscribeSharedListener } = unlock( composePrivateApis );
+const { subscribeDelegatedListener } = unlock( composePrivateApis );
 
 /**
  * All inserting input types that would insert HTML into the DOM.
@@ -280,24 +280,24 @@ export default ( props ) => ( element ) => {
 	// `input-rules.js` element-level listeners, which call `getValue()`
 	// reading `record.current` updated by our `onInput`. Use capture phase
 	// so we fire before any ancestor bubble handlers.
-	const unsubscribeInput = subscribeSharedListener(
+	const unsubscribeInput = subscribeDelegatedListener(
 		element,
 		'input',
 		onInput,
 		true
 	);
-	const unsubscribeCompositionStart = subscribeSharedListener(
+	const unsubscribeCompositionStart = subscribeDelegatedListener(
 		element,
 		'compositionstart',
 		onCompositionStart
 	);
-	const unsubscribeCompositionEnd = subscribeSharedListener(
+	const unsubscribeCompositionEnd = subscribeDelegatedListener(
 		element,
 		'compositionend',
 		onCompositionEnd,
 		true
 	);
-	const unsubscribeFocus = subscribeSharedListener(
+	const unsubscribeFocus = subscribeDelegatedListener(
 		element,
 		'focusin',
 		onFocus

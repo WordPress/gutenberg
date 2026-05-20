@@ -10,7 +10,7 @@ import { privateApis as composePrivateApis } from '@wordpress/compose';
 import { remove } from '../../remove';
 import { unlock } from '../../lock-unlock';
 
-const { subscribeSharedListener } = unlock( composePrivateApis );
+const { subscribeDelegatedListener } = unlock( composePrivateApis );
 
 export default ( props ) => ( element ) => {
 	function onKeyDown( event ) {
@@ -35,5 +35,5 @@ export default ( props ) => ( element ) => {
 		}
 	}
 
-	return subscribeSharedListener( element, 'keydown', onKeyDown );
+	return subscribeDelegatedListener( element, 'keydown', onKeyDown );
 };

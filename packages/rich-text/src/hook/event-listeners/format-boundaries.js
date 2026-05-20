@@ -10,7 +10,7 @@ import { privateApis as composePrivateApis } from '@wordpress/compose';
 import { isCollapsed } from '../../is-collapsed';
 import { unlock } from '../../lock-unlock';
 
-const { subscribeSharedListener } = unlock( composePrivateApis );
+const { subscribeDelegatedListener } = unlock( composePrivateApis );
 
 const EMPTY_ACTIVE_FORMATS = [];
 
@@ -99,5 +99,5 @@ export default ( props ) => ( element ) => {
 		forceRender();
 	}
 
-	return subscribeSharedListener( element, 'keydown', onKeyDown, true );
+	return subscribeDelegatedListener( element, 'keydown', onKeyDown, true );
 };

@@ -43,7 +43,7 @@ import type {
 import getNodeText from '../utils/get-node-text';
 import { unlock } from '../lock-unlock';
 
-const { subscribeSharedListener } = unlock( composePrivateApis );
+const { subscribeDelegatedListener } = unlock( composePrivateApis );
 
 const EMPTY_FILTERED_OPTIONS: KeyedOption[] = [];
 
@@ -409,7 +409,7 @@ export function useAutocompleteProps( options: UseAutocompleteProps ) {
 			// fire at bubble phase and gate on `event.defaultPrevented`,
 			// so firing in capture lets us preventDefault first when the
 			// popover is active.
-			return subscribeSharedListener(
+			return subscribeDelegatedListener(
 				element,
 				'keydown',
 				_onKeyDown,

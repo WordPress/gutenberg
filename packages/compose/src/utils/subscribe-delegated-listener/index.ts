@@ -48,7 +48,7 @@ function getRoot( target: EventTarget ): EventTarget {
 	return ( target as Node ).ownerDocument as Document;
 }
 
-export default function subscribeSharedListener(
+export default function subscribeDelegatedListener(
 	target: EventTarget,
 	eventType: string,
 	callback: EventListener,

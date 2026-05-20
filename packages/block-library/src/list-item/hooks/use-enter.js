@@ -21,7 +21,7 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 import useOutdentListItem from './use-outdent-list-item';
 import { unlock } from '../../lock-unlock';
 
-const { subscribeSharedListener } = unlock( composePrivateApis );
+const { subscribeDelegatedListener } = unlock( composePrivateApis );
 
 export default function useEnter( props ) {
 	const { replaceBlocks, selectionChange } = useDispatch( blockEditorStore );
@@ -90,6 +90,11 @@ export default function useEnter( props ) {
 
 		// Capture phase so we run before writing-flow's ancestor-bubble
 		// keydown handlers that gate on `event.defaultPrevented`.
-		return subscribeSharedListener( element, 'keydown', onKeyDown, true );
+		return subscribeDelegatedListener(
+			element,
+			'keydown',
+			onKeyDown,
+			true
+		);
 	}, [] );
 }

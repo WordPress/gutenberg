@@ -14,7 +14,7 @@ import { isInsideRootBlock } from '../../../utils/dom';
 import { store as blockEditorStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
 
-const { subscribeSharedListener } = unlock( composePrivateApis );
+const { subscribeDelegatedListener } = unlock( composePrivateApis );
 
 /**
  * Selects the block if it receives focus.
@@ -63,7 +63,7 @@ export function useFocusHandler( clientId ) {
 				selectBlock( clientId );
 			}
 
-			return subscribeSharedListener( node, 'focusin', onFocus );
+			return subscribeDelegatedListener( node, 'focusin', onFocus );
 		},
 		[ isBlockSelected, selectBlock ]
 	);

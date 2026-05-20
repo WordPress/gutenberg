@@ -12,7 +12,7 @@ import { slice } from '../../slice';
 import { getTextContent } from '../../get-text-content';
 import { unlock } from '../../lock-unlock';
 
-const { subscribeSharedListener } = unlock( composePrivateApis );
+const { subscribeDelegatedListener } = unlock( composePrivateApis );
 
 export default ( props ) => ( element ) => {
 	function onCopy( event ) {
@@ -39,12 +39,12 @@ export default ( props ) => ( element ) => {
 	}
 
 	const { defaultView } = element.ownerDocument;
-	const unsubscribeCopy = subscribeSharedListener(
+	const unsubscribeCopy = subscribeDelegatedListener(
 		defaultView,
 		'copy',
 		onCopy
 	);
-	const unsubscribeCut = subscribeSharedListener(
+	const unsubscribeCut = subscribeDelegatedListener(
 		defaultView,
 		'cut',
 		onCopy

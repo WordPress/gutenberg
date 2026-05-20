@@ -14,7 +14,7 @@ import { addActiveFormats } from '../utils';
 import { getPasteEventData } from '../../../utils/pasting';
 import { unlock } from '../../../lock-unlock';
 
-const { subscribeSharedListener } = unlock( composePrivateApis );
+const { subscribeDelegatedListener } = unlock( composePrivateApis );
 
 /** @typedef {import('@wordpress/rich-text').RichTextValue} RichTextValue */
 
@@ -145,5 +145,5 @@ export default ( props ) => ( element ) => {
 
 	// Attach the listener to the window so parent elements have the chance to
 	// prevent the default behavior.
-	return subscribeSharedListener( defaultView, 'paste', _onPaste );
+	return subscribeDelegatedListener( defaultView, 'paste', _onPaste );
 };

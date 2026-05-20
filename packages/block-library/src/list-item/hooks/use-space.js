@@ -16,7 +16,7 @@ import useIndentListItem from './use-indent-list-item';
 import useOutdentListItem from './use-outdent-list-item';
 import { unlock } from '../../lock-unlock';
 
-const { subscribeSharedListener } = unlock( composePrivateApis );
+const { subscribeDelegatedListener } = unlock( composePrivateApis );
 
 export default function useSpace( clientId ) {
 	const { getSelectionStart, getSelectionEnd, getBlockIndex } =
@@ -63,7 +63,7 @@ export default function useSpace( clientId ) {
 
 			// Capture phase so we run before writing-flow's ancestor-bubble
 			// keydown handlers that gate on `event.defaultPrevented`.
-			return subscribeSharedListener(
+			return subscribeDelegatedListener(
 				element,
 				'keydown',
 				onKeyDown,
