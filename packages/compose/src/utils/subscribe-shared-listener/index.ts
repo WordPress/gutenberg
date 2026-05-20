@@ -32,10 +32,13 @@ const registries = new WeakMap<
 >();
 
 function getRoot( target: EventTarget ): EventTarget {
-	if ( typeof Document !== 'undefined' && target instanceof Document ) {
+	// Detect Document / Window via duck typing (works across realms —
+	// the iframe's `Document` constructor is distinct from the parent
+	// window's, so `instanceof` is unreliable).
+	if ( ( target as Document ).nodeType === 9 /* DOCUMENT_NODE */ ) {
 		return target;
 	}
-	if ( typeof Window !== 'undefined' && target instanceof Window ) {
+	if ( ( target as Window ).window === target ) {
 		return target;
 	}
 	// Assume Element/Node.
@@ -49,7 +52,8 @@ export default function subscribeSharedListener(
 	capture: boolean = false
 ): () => void {
 	const root = getRoot( target );
-	const isWindow = typeof Window !== 'undefined' && root instanceof Window;
+	// Duck-type detection (cross-realm safe).
+	const isWindow = ( root as Window ).window === root;
 
 	let perRoot = registries.get( root );
 	if ( ! perRoot ) {
@@ -76,18 +80,19 @@ export default function subscribeSharedListener(
 					return;
 				}
 				// Walk the target → root ancestry, dispatching callbacks
-				// for any node in the path. For capture phase, dispatch
-				// outermost-first; for bubble, innermost-first.
-				const path: Array< Node | Document > = [];
-				let current: Node | null = event.target as Node | null;
-				while ( current ) {
-					path.push( current );
-					if ( current === root ) {
-						break;
-					}
-					current = current.parentNode;
-				}
+				// for any node in the path. Bubble order matches the walk
+				// direction, so dispatch inline (no path array). Capture
+				// has to materialise the path to iterate in reverse.
 				if ( capture ) {
+					const path: Array< Node | Document > = [];
+					let current: Node | null = event.target as Node | null;
+					while ( current ) {
+						path.push( current );
+						if ( current === root ) {
+							break;
+						}
+						current = current.parentNode;
+					}
 					for ( let i = path.length - 1; i >= 0; i-- ) {
 						const set = subscribers.get( path[ i ] );
 						if ( set ) {
@@ -97,13 +102,18 @@ export default function subscribeSharedListener(
 						}
 					}
 				} else {
-					for ( const node of path ) {
-						const set = subscribers.get( node );
+					let current: Node | null = event.target as Node | null;
+					while ( current ) {
+						const set = subscribers.get( current );
 						if ( set ) {
 							for ( const cb of set ) {
 								cb( event );
 							}
 						}
+						if ( current === root ) {
+							break;
+						}
+						current = current.parentNode;
 					}
 				}
 			},
