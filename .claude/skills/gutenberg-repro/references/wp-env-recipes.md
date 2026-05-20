@@ -1,14 +1,16 @@
 # wp-env recipes
 
-Copy-paste WP-CLI invocations for applying common preconditions before opening the browser. All examples assume the current working directory is the Gutenberg checkout and that `npm run wp-env start -- --runtime=playground` has already completed.
+Copy-paste WP-CLI invocations for applying common preconditions before opening the browser. All examples assume the current working directory is the Gutenberg checkout and that wp-env has been started on a session-specific port (see SKILL.md Step 5).
 
 The general shape:
 
 ```bash
-npm run wp-env run cli wp <wp-cli-command>
+WP_ENV_PORT=<port> WP_ENV_TESTS_PORT=<tests-port> npm run wp-env run cli wp <wp-cli-command>
 ```
 
-> **Runtime note.** The `npm run wp-env run cli wp …` commands below require the Docker runtime. Under the Playground runtime (`npm run wp-env start -- --runtime=playground`) the `run` subcommand is unsupported — `wp-env` will print `✖ The 'run' command is not supported in the Playground runtime at the moment.` See "Playground fallbacks" at the bottom of this file.
+Replace `<port>` / `<tests-port>` with the values allocated in SKILL.md Step 5. The env-var prefix is required on **every** wp-env call because each Bash invocation is a fresh shell.
+
+> **Runtime note.** The `wp-env run cli wp …` commands below require the Docker runtime. Under the Playground runtime (`npm run wp-env start -- --runtime=playground`) the `run` subcommand is unsupported — `wp-env` will print `✖ The 'run' command is not supported in the Playground runtime at the moment.` See "Playground fallbacks" at the bottom of this file.
 
 Log every command executed in the report's "Preconditions applied" section, along with an excerpt of its output.
 
@@ -16,15 +18,15 @@ Log every command executed in the report's "Preconditions applied" section, alon
 
 - Admin user: `admin`
 - Admin password: `password`
-- Site URL: `http://localhost:8888`
-- Admin URL: `http://localhost:8888/wp-admin/`
+- Site URL: `http://localhost:<port>` (the port allocated in SKILL.md Step 5, not 8888)
+- Admin URL: `http://localhost:<port>/wp-admin/`
 
 ## Posts and content
 
 ### Create a draft post with raw HTML/block content
 
 ```bash
-npm run wp-env run cli wp post create \
+WP_ENV_PORT=<port> WP_ENV_TESTS_PORT=<tests-port> npm run wp-env run cli wp post create \
   --post_type=post \
   --post_status=draft \
   --post_title='Repro: <issue-number>' \
@@ -35,18 +37,18 @@ npm run wp-env run cli wp post create \
 The `--porcelain` flag prints just the new post ID. Capture it and use it to build the editor URL:
 
 ```
-http://localhost:8888/wp-admin/post.php?post=<ID>&action=edit
+http://localhost:<port>/wp-admin/post.php?post=<ID>&action=edit
 ```
 
 ### Create a post containing a specific block
 
 ```bash
-npm run wp-env run cli wp post create \
+WP_ENV_PORT=<port> WP_ENV_TESTS_PORT=<tests-port> npm run wp-env run cli wp post create \
   --post_type=post \
   --post_status=draft \
   --post_title='Repro' \
-  --post_content='<!-- wp:cover {"url":"http://localhost:8888/wp-content/uploads/2024/01/sample.jpg"} -->
-<div class="wp-block-cover"><img class="wp-block-cover__image-background" alt="" src="http://localhost:8888/wp-content/uploads/2024/01/sample.jpg" data-object-fit="cover"/><div class="wp-block-cover__inner-container"><!-- wp:paragraph --><p>Cover text</p><!-- /wp:paragraph --></div></div>
+  --post_content='<!-- wp:cover {"url":"http://localhost:<port>/wp-content/uploads/2024/01/sample.jpg"} -->
+<div class="wp-block-cover"><img class="wp-block-cover__image-background" alt="" src="http://localhost:<port>/wp-content/uploads/2024/01/sample.jpg" data-object-fit="cover"/><div class="wp-block-cover__inner-container"><!-- wp:paragraph --><p>Cover text</p><!-- /wp:paragraph --></div></div>
 <!-- /wp:cover -->' \
   --porcelain
 ```
@@ -57,7 +59,7 @@ Do **not** run this unless the user has explicitly confirmed — it is destructi
 
 ```bash
 # DO NOT run without user consent
-npm run wp-env run cli wp post delete $(npm run wp-env run cli wp post list --post_type=post --format=ids) --force
+WP_ENV_PORT=<port> WP_ENV_TESTS_PORT=<tests-port> npm run wp-env run cli wp post delete $(WP_ENV_PORT=<port> WP_ENV_TESTS_PORT=<tests-port> npm run wp-env run cli wp post list --post_type=post --format=ids) --force
 ```
 
 ## Themes
@@ -65,19 +67,19 @@ npm run wp-env run cli wp post delete $(npm run wp-env run cli wp post list --po
 ### List installed themes
 
 ```bash
-npm run wp-env run cli wp theme list
+WP_ENV_PORT=<port> WP_ENV_TESTS_PORT=<tests-port> npm run wp-env run cli wp theme list
 ```
 
 ### Switch active theme
 
 ```bash
-npm run wp-env run cli wp theme activate twentytwentyfive
+WP_ENV_PORT=<port> WP_ENV_TESTS_PORT=<tests-port> npm run wp-env run cli wp theme activate twentytwentyfive
 ```
 
 If the requested theme isn't installed:
 
 ```bash
-npm run wp-env run cli wp theme install twentytwentyfive --activate
+WP_ENV_PORT=<port> WP_ENV_TESTS_PORT=<tests-port> npm run wp-env run cli wp theme install twentytwentyfive --activate
 ```
 
 ## Plugins
@@ -85,14 +87,14 @@ npm run wp-env run cli wp theme install twentytwentyfive --activate
 ### List active plugins
 
 ```bash
-npm run wp-env run cli wp plugin list --status=active
+WP_ENV_PORT=<port> WP_ENV_TESTS_PORT=<tests-port> npm run wp-env run cli wp plugin list --status=active
 ```
 
 ### Activate / deactivate a plugin
 
 ```bash
-npm run wp-env run cli wp plugin activate gutenberg
-npm run wp-env run cli wp plugin deactivate gutenberg
+WP_ENV_PORT=<port> WP_ENV_TESTS_PORT=<tests-port> npm run wp-env run cli wp plugin activate gutenberg
+WP_ENV_PORT=<port> WP_ENV_TESTS_PORT=<tests-port> npm run wp-env run cli wp plugin deactivate gutenberg
 ```
 
 The Gutenberg plugin is normally already active in the dev wp-env. The skill should not deactivate it unless the issue explicitly tests classic-editor behavior.
@@ -102,7 +104,7 @@ The Gutenberg plugin is normally already active in the dev wp-env. The skill sho
 ### Create a user with a specific role
 
 ```bash
-npm run wp-env run cli wp user create author1 author1@example.com \
+WP_ENV_PORT=<port> WP_ENV_TESTS_PORT=<tests-port> npm run wp-env run cli wp user create author1 author1@example.com \
   --role=author \
   --user_pass=password \
   --porcelain
@@ -111,7 +113,7 @@ npm run wp-env run cli wp user create author1 author1@example.com \
 ### Change role of existing user
 
 ```bash
-npm run wp-env run cli wp user set-role <login> editor
+WP_ENV_PORT=<port> WP_ENV_TESTS_PORT=<tests-port> npm run wp-env run cli wp user set-role <login> editor
 ```
 
 To log in as a non-admin user, the Playwright login step needs the matching credentials — pass them through the plan, do not hardcode `admin`/`password` for non-admin scenarios.
@@ -121,7 +123,7 @@ To log in as a non-admin user, the Playwright login step needs the matching cred
 ### Set a single option
 
 ```bash
-npm run wp-env run cli wp option update <option_name> '<value>'
+WP_ENV_PORT=<port> WP_ENV_TESTS_PORT=<tests-port> npm run wp-env run cli wp option update <option_name> '<value>'
 ```
 
 ### Toggle a Gutenberg experiment
@@ -129,8 +131,8 @@ npm run wp-env run cli wp option update <option_name> '<value>'
 Experiments are stored in the `gutenberg-experiments` option:
 
 ```bash
-npm run wp-env run cli wp option get gutenberg-experiments --format=json
-npm run wp-env run cli wp option update gutenberg-experiments '{"gutenberg-block-bindings-ui":true}' --format=json
+WP_ENV_PORT=<port> WP_ENV_TESTS_PORT=<tests-port> npm run wp-env run cli wp option get gutenberg-experiments --format=json
+WP_ENV_PORT=<port> WP_ENV_TESTS_PORT=<tests-port> npm run wp-env run cli wp option update gutenberg-experiments '{"gutenberg-block-bindings-ui":true}' --format=json
 ```
 
 Toggling experiments can change the editor UI substantially. Always note the experiment state in the report.
@@ -142,7 +144,7 @@ Toggling experiments can change the editor UI substantially. Always note the exp
 The simplest path is creating a post with the pattern's serialized block markup (see "Create a post with a specific block" above). For complex patterns, consider attaching the markup to a file and:
 
 ```bash
-npm run wp-env run cli wp post create --post_type=post --post_content="$(cat /tmp/pattern.html)" --porcelain
+WP_ENV_PORT=<port> WP_ENV_TESTS_PORT=<tests-port> npm run wp-env run cli wp post create --post_type=post --post_content="$(cat /tmp/pattern.html)" --porcelain
 ```
 
 ## REST endpoints
@@ -153,12 +155,12 @@ For backend reproductions where the bug is in the REST API itself, `curl` the en
 
 ```bash
 # Health check
-npm run wp-env run cli wp core version
-npm run wp-env run cli wp plugin list
-npm run wp-env run cli wp theme list
+WP_ENV_PORT=<port> WP_ENV_TESTS_PORT=<tests-port> npm run wp-env run cli wp core version
+WP_ENV_PORT=<port> WP_ENV_TESTS_PORT=<tests-port> npm run wp-env run cli wp plugin list
+WP_ENV_PORT=<port> WP_ENV_TESTS_PORT=<tests-port> npm run wp-env run cli wp theme list
 
 # Look at recent error log entries (debug.log)
-npm run wp-env run cli wp config get WP_DEBUG_LOG
+WP_ENV_PORT=<port> WP_ENV_TESTS_PORT=<tests-port> npm run wp-env run cli wp config get WP_DEBUG_LOG
 ```
 
 Run these at the end of preconditions setup to confirm the env is in the expected shape; capture relevant output in the execution log.
@@ -171,7 +173,7 @@ Under the Playground runtime, apply preconditions via wp-admin UI instead of WP-
 
 *Requires user consent — see SKILL.md Step 6.*
 
-1. Navigate to `http://localhost:8888/wp-admin/plugin-install.php?tab=upload`.
+1. Navigate to `http://localhost:<port>/wp-admin/plugin-install.php?tab=upload`.
 2. Click the "Plugin zip file" button (opens the OS file chooser via Playwright).
 3. Call `browser_file_upload` with a path. Playwright MCP only accepts paths inside the project root or `.playwright-mcp/`; it rejects `/tmp/...`. Because staging files inside the checkout requires user consent, surface this trade-off to the user before proceeding.
 4. Click "Install Now".

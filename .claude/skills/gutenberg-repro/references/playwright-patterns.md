@@ -21,10 +21,10 @@ The relevant Playwright MCP tools:
 
 ## Login flow
 
-Always log in through the UI form. Do not inject cookies, mint nonces, or use application passwords.
+Always log in through the UI form. Do not inject cookies, mint nonces, or use application passwords. `<port>` is the session-specific port allocated in SKILL.md Step 5 — wp-env is not running on 8888 in this session.
 
 ```
-1. browser_navigate("http://localhost:8888/wp-login.php")
+1. browser_navigate("http://localhost:<port>/wp-login.php")
 2. browser_snapshot()  — locate the user_login and user_pass inputs
 3. browser_fill_form([
      {name: "Username", ref: "<user_login ref>", value: "admin"},
@@ -55,13 +55,13 @@ Use `browser_take_screenshot()` only at the moments the SKILL prescribes:
 
 | Goal                          | URL                                                            |
 | ----------------------------- | -------------------------------------------------------------- |
-| New post (post editor)        | `http://localhost:8888/wp-admin/post-new.php`                  |
-| Edit existing post by ID      | `http://localhost:8888/wp-admin/post.php?post=<ID>&action=edit` |
-| New page                      | `http://localhost:8888/wp-admin/post-new.php?post_type=page`   |
-| Site editor                   | `http://localhost:8888/wp-admin/site-editor.php`               |
-| Widgets screen                | `http://localhost:8888/wp-admin/widgets.php`                   |
-| Navigation editor             | `http://localhost:8888/wp-admin/site-editor.php?path=/navigation` |
-| Pattern editor                | `http://localhost:8888/wp-admin/site-editor.php?path=/patterns` |
+| New post (post editor)        | `http://localhost:<port>/wp-admin/post-new.php`                  |
+| Edit existing post by ID      | `http://localhost:<port>/wp-admin/post.php?post=<ID>&action=edit` |
+| New page                      | `http://localhost:<port>/wp-admin/post-new.php?post_type=page`   |
+| Site editor                   | `http://localhost:<port>/wp-admin/site-editor.php`               |
+| Widgets screen                | `http://localhost:<port>/wp-admin/widgets.php`                   |
+| Navigation editor             | `http://localhost:<port>/wp-admin/site-editor.php?path=/navigation` |
+| Pattern editor                | `http://localhost:<port>/wp-admin/site-editor.php?path=/patterns` |
 
 ## Editor stability waits
 

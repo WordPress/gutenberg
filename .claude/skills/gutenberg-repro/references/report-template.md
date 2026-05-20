@@ -41,7 +41,8 @@ The first non-blank line under the title must be the `**Verdict:**` line so the 
 - `git pull --ff-only origin trunk` → up to date at `<sha>`
 - `npm install` → <n> packages, <duration>
 - `npm run build` → ok in <duration>
-- `npm run wp-env start -- --runtime=playground` → <ok | already running>
+- Allocated ports: site `<port>`, tests `<tests-port>` (random free ports; site reachable at `http://localhost:<port>`)
+- `WP_ENV_PORT=<port> WP_ENV_TESTS_PORT=<tests-port> npm run wp-env start -- --runtime=playground` → <ok | already running>
 
 ### Preconditions applied
 - `npm run wp-env run cli wp <…>` → <output excerpt>

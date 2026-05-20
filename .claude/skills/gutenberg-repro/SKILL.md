@@ -85,10 +85,32 @@ git pull --ff-only origin trunk
 npm install
 # Run composer install only if composer.lock changed in the pull
 npm run build
-npm run wp-env status
-# If not running:
-npm run wp-env start -- --runtime=playground
 ```
+
+**Allocate a random free port** before starting wp-env to avoid conflicts with any other wp-env instance the user may have running on the default 8888/8889. Pick a port in 20000–60000:
+
+```bash
+# Pick a free port (and a separate tests port wp-env demands even when unused).
+python3 -c 'import socket
+def f():
+    s = socket.socket(); s.bind(("", 0)); p = s.getsockname()[1]; s.close(); return p
+print(f(), f())'
+```
+
+Capture both numbers. Throughout the rest of this session:
+
+- `<port>` is the site port; `<tests-port>` is the tests port.
+- **Every** wp-env command must be prefixed `WP_ENV_PORT=<port> WP_ENV_TESTS_PORT=<tests-port>` because each `Bash` invocation is a fresh shell — env vars do not persist between calls.
+- **Every** browser URL must use `http://localhost:<port>`. The site is not reachable on 8888 in this session.
+- Record `<port>` and `<tests-port>` in the report's "Setup" log so the user can inspect the env afterward.
+
+Start wp-env with the allocated ports:
+
+```bash
+WP_ENV_PORT=<port> WP_ENV_TESTS_PORT=<tests-port> npm run wp-env start -- --runtime=playground
+```
+
+Skip the pre-start `wp-env status` check — with a freshly allocated port nothing can be running on it, so the call adds noise without information.
 
 Never run `wp-env destroy`, `wp-env clean`, `git reset --hard`, branch switches, or any other destructive operation without explicit user consent.
 
@@ -109,9 +131,9 @@ Run up to 3 attempts. Stop the loop as soon as one attempt reproduces the bug.
 For each attempt:
 
 1. Open a fresh browser context via Playwright MCP.
-2. Log in through the UI: navigate to `http://localhost:8888/wp-login.php`, fill `admin` / `password`, submit. Hide this in the execution log unless it fails.
+2. Log in through the UI: navigate to `http://localhost:<port>/wp-login.php`, fill `admin` / `password`, submit. Hide this in the execution log unless it fails.
 3. Subscribe to console messages and network errors. Filter to entries that mention `wp-`, `gutenberg`, `@wordpress/`, or files under `/wp-content/` or `/wp-includes/`. Discard the rest.
-4. Navigate to the start URL implied by the plan (often `http://localhost:8888/wp-admin/post-new.php`).
+4. Navigate to the start URL implied by the plan (often `http://localhost:<port>/wp-admin/post-new.php`).
 5. Execute the plan's steps. Apply a 10-second timeout per step and a 90-second total cap per attempt.
 6. After the final step, observe the resulting state and compare against `expected` and `actual` from the plan.
 7. Record per-attempt outcome: `reproduced`, `not reproduced`, `timeout`, or `error (<message>)`.
