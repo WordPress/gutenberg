@@ -1,5 +1,5 @@
 import type { Combobox as _Combobox } from '@base-ui/react/combobox';
-import type { ComponentPropsWithoutRef, ReactElement } from 'react';
+import type { ReactElement } from 'react';
 
 import type { ComponentProps } from '../../../utils/types';
 import type { InputLayoutProps } from '../input-layout/types';
@@ -74,7 +74,7 @@ export type ComboboxListFooterProps = ComponentProps< 'div' > & {
 	children?: React.ReactNode;
 };
 
-export type PortalProps = ComponentPropsWithoutRef< typeof _Combobox.Portal >;
+export type PortalProps = ComponentProps< typeof _Combobox.Portal >;
 
 export type PositionerProps = ComponentProps< typeof _Combobox.Positioner >;
 
