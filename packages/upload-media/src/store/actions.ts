@@ -182,12 +182,7 @@ export function cancelItem( id: QueueItemId, error: Error, silent = false ) {
 		// the whole attachment or keep the partially-uploaded sub-sizes.
 		// Items whose primary upload already finished (attachment exists)
 		// are also excluded — the cancellation is cleanup, not a retry.
-		if (
-			! silent &&
-			error &&
-			! item.parentId &&
-			! item.attachment?.id
-		) {
+		if ( ! silent && error && ! item.parentId && ! item.attachment?.id ) {
 			const settings = select.getSettings();
 			const retrySettings = settings.retry;
 
