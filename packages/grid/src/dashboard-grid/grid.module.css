@@ -1,6 +1,6 @@
 .grid {
 	display: grid;
-	gap: var(--wpds-dimension-gap-md);
+	gap: var(--wp-grid-gap, var(--wpds-dimension-gap-xl));
 	position: relative;
 }
 

@@ -6,9 +6,7 @@ import { DataForm } from '@wordpress/dataviews';
 import type { DataFormControlProps, Field, Form } from '@wordpress/dataviews';
 import { useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-/* eslint-disable @wordpress/use-recommended-components */
-import { Button, Drawer } from '@wordpress/ui';
-/* eslint-enable @wordpress/use-recommended-components */
+import { Button, Drawer } from '@wordpress/ui'; // eslint-disable-line @wordpress/use-recommended-components
 
 /**
  * Internal dependencies
@@ -20,6 +18,7 @@ import type {
 	WidgetGridModel,
 	WidgetGridSettings,
 } from '../../types';
+import { LayoutModelEditField } from './layout-model-edit-field';
 
 const DEFAULT_FIXED_COLUMNS = 6;
 const DEFAULT_MIN_COLUMN_WIDTH = 350;
@@ -32,10 +31,6 @@ function getModel( item: WidgetGridSettings ): WidgetGridModel {
 
 function isMasonry( item: WidgetGridSettings ): boolean {
 	return getModel( item ) === 'masonry';
-}
-
-function isFixedColumns( item: WidgetGridSettings ): boolean {
-	return item.columns !== undefined;
 }
 
 function getRowHeight(
@@ -94,10 +89,10 @@ const fields: Field< WidgetGridSettings >[] = [
 	{
 		id: 'model',
 		type: 'text',
-		Edit: 'select',
+		Edit: LayoutModelEditField,
 		label: __( 'Layout model' ),
 		description: __(
-			'Standard grid uses explicit widths and heights. Masonry packs items by content height.'
+			'Grid keeps every tile the same height. Masonry lets tiles flow at their own height.'
 		),
 		elements: [
 			{ value: 'grid', label: __( 'Standard grid' ) },
@@ -106,41 +101,47 @@ const fields: Field< WidgetGridSettings >[] = [
 		getValue: ( { item } ) => getModel( item ),
 	},
 	{
-		id: 'fixedColumns',
-		type: 'boolean',
-		Edit: 'toggle',
-		label: __( 'Fixed column count' ),
-		getValue: ( { item } ) => isFixedColumns( item ),
-		setValue: ( { item, value } ) =>
-			value
-				? {
-						columns: item.columns ?? DEFAULT_FIXED_COLUMNS,
-						minColumnWidth: undefined,
-				  }
-				: {
-						columns: undefined,
-						minColumnWidth:
-							item.minColumnWidth ?? DEFAULT_MIN_COLUMN_WIDTH,
-				  },
-	},
-	{
 		id: 'columns',
 		type: 'integer',
 		Edit: StepperIntegerEdit,
 		label: __( 'Columns' ),
+		description: __(
+			'How many columns to show when the dashboard has enough space.'
+		),
 		isValid: { min: 1, max: 12 },
-		isVisible: ( item ) => isFixedColumns( item ),
+	},
+	{
+		id: 'adaptiveColumns',
+		type: 'boolean',
+		Edit: 'toggle',
+		label: __( 'Adjust on narrow screens' ),
+		description: __(
+			'Show fewer columns when the dashboard gets too narrow to keep tiles readable.'
+		),
+		getValue: ( { item } ) => item.minColumnWidth !== 0,
+		setValue: ( { item, value } ) => {
+			if ( ! value ) {
+				return { minColumnWidth: 0 };
+			}
+			const previous = item.minColumnWidth;
+			return {
+				minColumnWidth:
+					previous && previous > 0
+						? previous
+						: DEFAULT_MIN_COLUMN_WIDTH,
+			};
+		},
 	},
 	{
 		id: 'minColumnWidth',
 		type: 'integer',
 		Edit: StepperIntegerEdit,
-		label: __( 'Min column width (px)' ),
+		label: __( 'Minimum tile width' ),
 		description: __(
-			'Minimum width of each column. The number of columns adapts to the container width.'
+			'The smallest tile width before a column is removed.'
 		),
-		isValid: { min: 48, max: 1024 },
-		isVisible: ( item ) => ! isFixedColumns( item ),
+		isValid: { min: 48, max: 600 },
+		isVisible: ( item ) => item.minColumnWidth !== 0,
 	},
 	{
 		id: 'autoRowHeight',
@@ -151,7 +152,7 @@ const fields: Field< WidgetGridSettings >[] = [
 		setValue: ( { value } ) => ( {
 			rowHeight: value ? ROW_HEIGHT_AUTO : DEFAULT_ROW_HEIGHT,
 		} ),
-		isDisabled: ( { item } ) => isMasonry( item ),
+		isVisible: ( item ) => ! isMasonry( item ),
 	},
 	{
 		id: 'rowHeight',
@@ -173,8 +174,8 @@ const form: Form = {
 	layout: { type: 'regular', labelPosition: 'top' },
 	fields: [
 		'model',
-		'fixedColumns',
 		'columns',
+		'adaptiveColumns',
 		'minColumnWidth',
 		'autoRowHeight',
 		'rowHeight',

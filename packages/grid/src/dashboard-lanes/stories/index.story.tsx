@@ -220,6 +220,36 @@ export const Responsive: Story = {
 };
 
 /**
+ * Layered configuration: `columns` caps the lane count and
+ * `minColumnWidth` enforces a per-tile width floor. The surface
+ * renders up to `columns` lanes on wide containers and reduces the
+ * count on narrow ones whenever fitting all of them would push
+ * tiles below `minColumnWidth`.
+ */
+export const Layered: Story = {
+	args: {
+		columns: 4,
+		minColumnWidth: 200,
+		layout: [
+			{ key: 'a' },
+			{ key: 'b' },
+			{ key: 'c' },
+			{ key: 'd' },
+			{ key: 'e' },
+			{ key: 'f' },
+		],
+		children: [
+			<Tile key="a" tone="brand" height={ 120 } index={ 1 } />,
+			<Tile key="b" tone="info" height={ 200 } index={ 2 } />,
+			<Tile key="c" tone="success" height={ 80 } index={ 3 } />,
+			<Tile key="d" tone="warning" height={ 160 } index={ 4 } />,
+			<Tile key="e" tone="error" height={ 100 } index={ 5 } />,
+			<Tile key="f" tone="neutral" height={ 240 } index={ 6 } />,
+		],
+	},
+};
+
+/**
  * Items with `width: 2` span two lanes. The skyline picks a span
  * position that minimizes the resulting baseline across spanned
  * lanes.
@@ -258,14 +288,12 @@ export const Spanning: Story = {
  * new layout via `onChangeLayout`.
  *
  * While `editMode` is on, `<DashboardLanes />` paints its default
- * overlay behind the tiles to mark the lane tracks: diagonal stripes
- * plus a dashed outline and subtle fill on each column. Lanes paint
- * columns only — there are no row dividers because heights are
+ * overlay behind the tiles to mark the lane tracks. Lanes paint
+ * columns only — there are no row markers because heights are
  * content-driven.
  *
- * Theme the default look in place via CSS custom properties
- * (`--wp-grid-overlay-stripe-color`, `--wp-grid-overlay-track-color`,
- * `--wp-grid-overlay-column-fill`), or replace the visual wholesale
+ * Theme the default look in place via `--wp-grid-overlay-tile-bg`,
+ * or replace the visual wholesale
  * by passing `renderGridOverlay`. See the `Custom Grid Overlay`
  * story below for a full override example.
  */
@@ -362,7 +390,7 @@ function NumberedLanesOverlay( { columns, isActive }: GridOverlayRenderProps ) {
 				inset: 0,
 				display: 'grid',
 				gridTemplateColumns: `repeat(${ columns }, minmax(0, 1fr))`,
-				gap: 'var(--wpds-dimension-gap-md)',
+				gap: 'var(--wpds-dimension-gap-xl)',
 				pointerEvents: 'none',
 				opacity: isActive ? 1 : 0,
 				visibility: isActive ? 'visible' : 'hidden',

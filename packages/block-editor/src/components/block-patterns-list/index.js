@@ -10,7 +10,7 @@ import { cloneBlock } from '@wordpress/blocks';
 import { useEffect, useState, forwardRef, useMemo } from '@wordpress/element';
 import {
 	Composite,
-	Tooltip,
+	Tooltip as WCTooltip,
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
 import { VisuallyHidden, Text } from '@wordpress/ui';
@@ -28,7 +28,7 @@ import { INSERTER_PATTERN_TYPES } from '../inserter/block-patterns-tab/utils';
 
 const WithToolTip = ( { showTooltip, title, children } ) => {
 	if ( showTooltip ) {
-		return <Tooltip text={ title }>{ children }</Tooltip>;
+		return <WCTooltip text={ title }>{ children }</WCTooltip>;
 	}
 	return <>{ children }</>;
 };

@@ -222,14 +222,14 @@ export interface BlockType<
 	 *
 	 * @see https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#editor-script
 	 */
-	editorScript?: string;
+	editorScript?: string | string[];
 	/**
 	 * Block type editor style definition.
 	 * It will only be enqueued in the context of the editor.
 	 *
 	 * @see https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#editor-style
 	 */
-	editorStyle?: string;
+	editorStyle?: string | string[];
 	/**
 	 * Example provides structured data for the block preview.
 	 * When not defined then no preview is shown.
@@ -295,7 +295,7 @@ export interface BlockType<
 	 *
 	 * @see https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#script
 	 */
-	script?: string;
+	script?: string | string[];
 	/**
 	 * Block type frontend style definition.
 	 * It will be enqueued both in the editor and when viewing
@@ -303,7 +303,7 @@ export interface BlockType<
 	 *
 	 * @see https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#style
 	 */
-	style?: string;
+	style?: string | string[];
 	/**
 	 * Block type frontend script definition.
 	 * It will only be enqueued when viewing the content on
@@ -311,7 +311,7 @@ export interface BlockType<
 	 *
 	 * @see https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#view-script
 	 */
-	viewScript?: string;
+	viewScript?: string | string[];
 	/**
 	 * Block type frontend module script definition.
 	 * It will only be enqueued when viewing the content on
@@ -319,7 +319,7 @@ export interface BlockType<
 	 *
 	 * @see https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#view-script-module
 	 */
-	viewScriptModule?: string;
+	viewScriptModule?: string | string[];
 	/**
 	 * Block type view style definition.
 	 * It will only be enqueued when viewing the content on
@@ -327,7 +327,7 @@ export interface BlockType<
 	 *
 	 * @see https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#view-style
 	 */
-	viewStyle?: string;
+	viewStyle?: string | string[];
 	/**
 	 * PHP file to use when rendering the block type on the server
 	 * to show on the front end.
@@ -1205,8 +1205,11 @@ export interface BlockEditProps<
  */
 export type BlockConfiguration<
 	Attributes extends Record< string, unknown > = Record< string, unknown >,
-> = Partial< Omit< BlockType< Attributes >, 'icon' > > &
-	Pick< BlockType< Attributes >, 'attributes' | 'category' | 'title' > & {
+> = Partial< Omit< BlockType< Attributes >, 'icon' | 'name' > > &
+	Pick<
+		BlockType< Attributes >,
+		'attributes' | 'category' | 'title' | 'name'
+	> & {
 		icon?: BlockTypeIcon;
 	};
 
