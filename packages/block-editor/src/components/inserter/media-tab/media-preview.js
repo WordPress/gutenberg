@@ -7,7 +7,7 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import {
-	Tooltip,
+	Tooltip as WCTooltip,
 	DropdownMenu,
 	MenuGroup,
 	MenuItem,
@@ -261,7 +261,7 @@ export function MediaPreview( { media, onClick, category } ) {
 							onMouseEnter={ onMouseEnter }
 							onMouseLeave={ onMouseLeave }
 						>
-							<Tooltip text={ title }>
+							<WCTooltip text={ title }>
 								<Composite.Item
 									render={
 										<div
@@ -281,7 +281,7 @@ export function MediaPreview( { media, onClick, category } ) {
 										) }
 									</div>
 								</Composite.Item>
-							</Tooltip>
+							</WCTooltip>
 							{ ! isInserting && (
 								<MediaPreviewOptions
 									category={ category }

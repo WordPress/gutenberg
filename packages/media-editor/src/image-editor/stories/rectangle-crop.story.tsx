@@ -31,12 +31,12 @@ import {
 import { Cropper } from '../react/components/cropper';
 import { useCropperState } from '../react/hooks/use-cropper-state';
 import {
-	MIN_ZOOM,
 	MAX_ZOOM,
 	MAX_ROTATION_OFFSET,
 	DEFAULT_ASPECT_RATIOS,
 	ORIGINAL_ASPECT_RATIO,
 } from '../core/constants';
+import { getMinZoom, restrictPanZoom } from '../core/containment';
 import {
 	loadImage,
 	renderToCanvas,
@@ -50,7 +50,6 @@ import {
 	getImageFit,
 	getVisibleBounds,
 } from '../core/camera';
-import { restrictPanZoom } from '../core/containment';
 import { getSourceRegion } from '../core/source-region';
 import './style.css';
 
@@ -467,7 +466,7 @@ const WithControlsComponent = () => {
 						__next40pxDefaultSize
 						__nextHasNoMarginBottom
 						label="Zoom"
-						min={ MIN_ZOOM }
+						min={ getMinZoom( state ) }
 						max={ MAX_ZOOM }
 						step={ 0.1 }
 						value={ state.zoom }
@@ -887,7 +886,7 @@ const DebugComponent = () => {
 						__next40pxDefaultSize
 						__nextHasNoMarginBottom
 						label="Zoom"
-						min={ MIN_ZOOM }
+						min={ getMinZoom( state ) }
 						max={ MAX_ZOOM }
 						step={ 0.1 }
 						value={ state.zoom }

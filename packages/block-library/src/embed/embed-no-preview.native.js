@@ -14,7 +14,11 @@ import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 import { requestPreview } from '@wordpress/react-native-bridge';
 import { useSelect } from '@wordpress/data';
 import { store as editorStore } from '@wordpress/editor';
-import { BottomSheet, Icon, TextControl } from '@wordpress/components';
+import {
+	BottomSheet,
+	Icon as WCIcon,
+	TextControl,
+} from '@wordpress/components';
 import { help } from '@wordpress/icons';
 import { BlockIcon } from '@wordpress/block-editor';
 
@@ -150,7 +154,7 @@ const EmbedNoPreview = ( {
 						onPress={ onPressHelp }
 						style={ helpIconStyle }
 					>
-						<Icon
+						<WCIcon
 							icon={ help }
 							fill={ helpIconStyle.fill }
 							size={ helpIconStyle.width }
@@ -167,7 +171,7 @@ const EmbedNoPreview = ( {
 			>
 				<View style={ styles[ 'embed-no-preview__container' ] }>
 					<View style={ sheetIconStyle }>
-						<Icon
+						<WCIcon
 							icon={ help }
 							fill={ sheetIconStyle.fill }
 							size={ sheetIconStyle.width }
