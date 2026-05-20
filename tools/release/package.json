@@ -19,9 +19,6 @@
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
-	"scripts": {
-		"generate-php-sync-issue": "node ./generate-php-sync-issue.mjs"
-	},
 	"bin": {
 		"release-cli": "./cli.js"
 	},
@@ -40,5 +37,8 @@
 	},
 	"publishConfig": {
 		"access": "public"
+	},
+	"scripts": {
+		"generate-php-sync-issue": "node ./generate-php-sync-issue.mjs"
 	}
 }
