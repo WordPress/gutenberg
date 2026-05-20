@@ -12,6 +12,7 @@ export type ComboboxChipsProps = ComponentProps< typeof _Combobox.Chips > & {
 
 export type ComboboxChipWithRemoveProps = Omit<
 	ComponentProps< typeof _Combobox.Chip >,
+	// Replace the native HTML `prefix` attribute.
 	'prefix'
 > & {
 	children?: React.ReactNode;
