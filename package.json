@@ -235,6 +235,7 @@
 	"workspaces": [
 		"packages/*",
 		"routes/*",
+		"widgets/*",
 		"storybook",
 		"test/e2e",
 		"test/integration",

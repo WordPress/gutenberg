@@ -545,6 +545,7 @@ Widgets provide a file-based discovery system for building self-contained UI com
 ```
 widgets/
   hello-world/
+    package.json    # Optional npm dependencies manifest
     widget.json     # Static discovery metadata (required)
     widget.ts       # Runtime schema entry point (optional)
     render.tsx      # UI component entry point (optional)
