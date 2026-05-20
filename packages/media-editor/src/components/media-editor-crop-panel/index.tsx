@@ -12,8 +12,11 @@ import { __, sprintf } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { useCropper } from '../../image-editor';
-import { useCropGestureHandlers } from '../../hooks/use-crop-gesture-handlers';
+import { useMediaEditor } from '../../state';
+import {
+	useCropGestureHandlers,
+	CROP_CONTROL_ATTR,
+} from '../../hooks/use-crop-gesture-handlers';
 import { MAX_ZOOM } from '../../image-editor/core/constants';
 import { getMinZoom } from '../../image-editor/core/containment';
 import type { AspectRatioPreset } from '../../image-editor/core/constants';
@@ -57,12 +60,19 @@ export default function MediaEditorCropPanel( {
 	onPlacementControlInteraction,
 	aspectRatioOptions,
 }: MediaEditorCropPanelProps ) {
-	const { state, setZoom } = useCropper();
+	const { state, setZoom } = useMediaEditor();
 	const zoomGestureHandlers = useCropGestureHandlers();
 	const minZoom = getMinZoom( state );
 
 	return (
-		<Stack direction="column" gap="md">
+		// Tag the whole panel as a crop-control region so the modal's
+		// Cmd+Z handler doesn't mistake the SelectControl / ToggleControl
+		// inputs for metadata fields (which would suppress undo).
+		<Stack
+			direction="column"
+			gap="md"
+			{ ...{ [ CROP_CONTROL_ATTR ]: true } }
+		>
 			<VisuallyHidden render={ <h2 /> }>
 				{ __( 'Crop options' ) }
 			</VisuallyHidden>

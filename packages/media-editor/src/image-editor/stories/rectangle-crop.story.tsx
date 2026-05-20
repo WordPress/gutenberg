@@ -29,7 +29,7 @@ import {
  * Internal dependencies
  */
 import { Cropper } from '../react/components/cropper';
-import { useCropperState } from '../react/hooks/use-cropper-state';
+import { useCropperReducer } from '../react/hooks/use-cropper-reducer';
 import {
 	MAX_ZOOM,
 	MAX_ROTATION_OFFSET,
@@ -142,7 +142,7 @@ type Story = StoryObj< typeof Cropper >;
  * Default story. Basic cropper with a sample image, no controls.
  */
 const DefaultComponent = () => {
-	const controller = useCropperState();
+	const controller = useCropperReducer();
 
 	return (
 		<div>
@@ -166,7 +166,7 @@ export const Default: Story = {
  * Full interactive demo with controls.
  */
 const WithControlsComponent = () => {
-	const controller = useCropperState();
+	const controller = useCropperReducer();
 	const {
 		state,
 		setRotation,
@@ -539,7 +539,7 @@ export const WithControls: Story = {
  * or verify the camera and render paths agree.
  */
 const DebugComponent = () => {
-	const controller = useCropperState();
+	const controller = useCropperReducer();
 	const {
 		state,
 		setRotation,

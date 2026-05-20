@@ -1,2 +1,2 @@
-export { useCropperState } from './use-cropper-state';
-export type { UseCropperStateReturn } from './use-cropper-state';
+export { useCropperReducer } from './use-cropper-reducer';
+export type { CropperController } from './use-cropper-reducer';

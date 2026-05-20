@@ -6,19 +6,19 @@ import { renderHook, act } from '@testing-library/react';
 /**
  * Internal dependencies
  */
-import { useCropperState } from '../use-cropper-state';
+import { useCropperReducer } from '../use-cropper-reducer';
 import { DEFAULT_STATE } from '../../../core/constants';
 
-describe( 'useCropperState', () => {
+describe( 'useCropperReducer', () => {
 	it( 'should initialize with DEFAULT_STATE', () => {
-		const { result } = renderHook( () => useCropperState() );
+		const { result } = renderHook( () => useCropperReducer() );
 
 		expect( result.current.state ).toEqual( DEFAULT_STATE );
 	} );
 
 	it( 'should initialize with merged partial state', () => {
 		const { result } = renderHook( () =>
-			useCropperState( { zoom: 2, rotation: 45 } )
+			useCropperReducer( { zoom: 2, rotation: 45 } )
 		);
 
 		expect( result.current.state.zoom ).toBe( 2 );
@@ -28,7 +28,7 @@ describe( 'useCropperState', () => {
 	} );
 
 	it( 'should dispatch SET_CROP via setCrop', () => {
-		const { result } = renderHook( () => useCropperState() );
+		const { result } = renderHook( () => useCropperReducer() );
 
 		// At zoom=1, crop is clamped to (0,0) — no panning possible.
 		// Zoom in first to allow panning.
@@ -45,7 +45,7 @@ describe( 'useCropperState', () => {
 	} );
 
 	it( 'should dispatch SET_ZOOM via setZoom', () => {
-		const { result } = renderHook( () => useCropperState() );
+		const { result } = renderHook( () => useCropperReducer() );
 
 		act( () => {
 			result.current.setZoom( 3 );
@@ -59,7 +59,7 @@ describe( 'useCropperState', () => {
 		// center coincides with the image center and the crop-center
 		// focal-point correction degenerates to "no pan change."
 		// Guards against regressions where setZoom accidentally pans.
-		const { result } = renderHook( () => useCropperState() );
+		const { result } = renderHook( () => useCropperReducer() );
 
 		act( () => {
 			result.current.setZoom( 4 );
@@ -81,7 +81,7 @@ describe( 'useCropperState', () => {
 		// crop center as zoom decreases — otherwise `enforceContainment`
 		// would translate the image toward the nearest viewport corner
 		// (the original bug this method fixes).
-		const { result } = renderHook( () => useCropperState() );
+		const { result } = renderHook( () => useCropperReducer() );
 
 		act( () => {
 			result.current.setZoom( 4 );
@@ -114,7 +114,7 @@ describe( 'useCropperState', () => {
 	} );
 
 	it( 'should dispatch SET_ZOOM_AT_POINT via setZoomAtPoint', () => {
-		const { result } = renderHook( () => useCropperState() );
+		const { result } = renderHook( () => useCropperReducer() );
 
 		act( () => {
 			result.current.setZoomAtPoint( 3, { x: 0.2, y: 0.1 } );
@@ -125,7 +125,7 @@ describe( 'useCropperState', () => {
 	} );
 
 	it( 'should clamp zoom to valid range via SET_ZOOM', () => {
-		const { result } = renderHook( () => useCropperState() );
+		const { result } = renderHook( () => useCropperReducer() );
 
 		act( () => {
 			result.current.setZoom( 15 );
@@ -145,7 +145,7 @@ describe( 'useCropperState', () => {
 		// minimum drops below 1, so `setZoom` (slider / keyboard path)
 		// must honour values below 1 rather than clamping at MIN_ZOOM.
 		const { result } = renderHook( () =>
-			useCropperState( {
+			useCropperReducer( {
 				image: {
 					src: 'portrait.jpg',
 					naturalWidth: 900,
@@ -165,7 +165,7 @@ describe( 'useCropperState', () => {
 	} );
 
 	it( 'should dispatch SET_ROTATION via setRotation', () => {
-		const { result } = renderHook( () => useCropperState() );
+		const { result } = renderHook( () => useCropperReducer() );
 
 		act( () => {
 			result.current.setRotation( 90 );
@@ -175,7 +175,7 @@ describe( 'useCropperState', () => {
 	} );
 
 	it( 'should normalize rotation via SET_ROTATION', () => {
-		const { result } = renderHook( () => useCropperState() );
+		const { result } = renderHook( () => useCropperReducer() );
 
 		act( () => {
 			result.current.setRotation( -90 );
@@ -191,7 +191,7 @@ describe( 'useCropperState', () => {
 	} );
 
 	it( 'should dispatch SET_FLIP via setFlip', () => {
-		const { result } = renderHook( () => useCropperState() );
+		const { result } = renderHook( () => useCropperReducer() );
 
 		act( () => {
 			result.current.setFlip( {
@@ -207,7 +207,7 @@ describe( 'useCropperState', () => {
 	} );
 
 	it( 'toggleFlip should toggle horizontal flip', () => {
-		const { result } = renderHook( () => useCropperState() );
+		const { result } = renderHook( () => useCropperReducer() );
 
 		act( () => {
 			result.current.toggleFlip( 'horizontal' );
@@ -229,7 +229,7 @@ describe( 'useCropperState', () => {
 	} );
 
 	it( 'toggleFlip should toggle vertical flip independently', () => {
-		const { result } = renderHook( () => useCropperState() );
+		const { result } = renderHook( () => useCropperReducer() );
 
 		act( () => {
 			result.current.toggleFlip( 'vertical' );
@@ -242,7 +242,7 @@ describe( 'useCropperState', () => {
 	} );
 
 	it( 'should dispatch SET_CROP_RECT via setCropRect', () => {
-		const { result } = renderHook( () => useCropperState() );
+		const { result } = renderHook( () => useCropperReducer() );
 
 		const rect = { x: 0.1, y: 0.2, width: 0.5, height: 0.6 };
 		act( () => {
@@ -253,7 +253,7 @@ describe( 'useCropperState', () => {
 	} );
 
 	it( 'should dispatch APPLY_OPERATION via applyOperation', () => {
-		const { result } = renderHook( () => useCropperState() );
+		const { result } = renderHook( () => useCropperReducer() );
 
 		act( () => {
 			result.current.applyOperation( {
@@ -266,7 +266,7 @@ describe( 'useCropperState', () => {
 	} );
 
 	it( 'should handle APPLY_OPERATION for flip', () => {
-		const { result } = renderHook( () => useCropperState() );
+		const { result } = renderHook( () => useCropperReducer() );
 
 		act( () => {
 			result.current.applyOperation( {
@@ -280,7 +280,7 @@ describe( 'useCropperState', () => {
 	} );
 
 	it( 'should accumulate rotation via APPLY_OPERATION', () => {
-		const { result } = renderHook( () => useCropperState() );
+		const { result } = renderHook( () => useCropperReducer() );
 
 		act( () => {
 			result.current.applyOperation( {
@@ -300,7 +300,7 @@ describe( 'useCropperState', () => {
 	} );
 
 	it( 'should handle APPLY_OPERATION for crop', () => {
-		const { result } = renderHook( () => useCropperState() );
+		const { result } = renderHook( () => useCropperReducer() );
 
 		const rect = { x: 0.1, y: 0.2, width: 0.5, height: 0.6 };
 		act( () => {
@@ -314,7 +314,7 @@ describe( 'useCropperState', () => {
 	} );
 
 	it( 'should handle APPLY_OPERATION for zoom', () => {
-		const { result } = renderHook( () => useCropperState() );
+		const { result } = renderHook( () => useCropperReducer() );
 
 		act( () => {
 			result.current.applyOperation( {
@@ -327,7 +327,7 @@ describe( 'useCropperState', () => {
 	} );
 
 	it( 'should reset to DEFAULT_STATE', () => {
-		const { result } = renderHook( () => useCropperState() );
+		const { result } = renderHook( () => useCropperReducer() );
 
 		act( () => {
 			result.current.setZoom( 5 );
@@ -344,7 +344,7 @@ describe( 'useCropperState', () => {
 	} );
 
 	it( 'should reset to a custom state', () => {
-		const { result } = renderHook( () => useCropperState() );
+		const { result } = renderHook( () => useCropperReducer() );
 
 		act( () => {
 			result.current.setZoom( 5 );
@@ -360,13 +360,13 @@ describe( 'useCropperState', () => {
 
 	describe( 'isDirty', () => {
 		it( 'should be false initially', () => {
-			const { result } = renderHook( () => useCropperState() );
+			const { result } = renderHook( () => useCropperReducer() );
 
 			expect( result.current.isDirty ).toBe( false );
 		} );
 
 		it( 'should be true after changing crop', () => {
-			const { result } = renderHook( () => useCropperState() );
+			const { result } = renderHook( () => useCropperReducer() );
 
 			// Zoom in first so crop change isn't clamped to (0,0).
 			act( () => {
@@ -381,7 +381,7 @@ describe( 'useCropperState', () => {
 		} );
 
 		it( 'should be true after changing zoom', () => {
-			const { result } = renderHook( () => useCropperState() );
+			const { result } = renderHook( () => useCropperReducer() );
 
 			act( () => {
 				result.current.setZoom( 2 );
@@ -391,7 +391,7 @@ describe( 'useCropperState', () => {
 		} );
 
 		it( 'should be true after changing rotation', () => {
-			const { result } = renderHook( () => useCropperState() );
+			const { result } = renderHook( () => useCropperReducer() );
 
 			act( () => {
 				result.current.setRotation( 45 );
@@ -401,7 +401,7 @@ describe( 'useCropperState', () => {
 		} );
 
 		it( 'should be true after changing flip', () => {
-			const { result } = renderHook( () => useCropperState() );
+			const { result } = renderHook( () => useCropperReducer() );
 
 			act( () => {
 				result.current.setFlip( {
@@ -414,7 +414,7 @@ describe( 'useCropperState', () => {
 		} );
 
 		it( 'should be false after reset', () => {
-			const { result } = renderHook( () => useCropperState() );
+			const { result } = renderHook( () => useCropperReducer() );
 
 			act( () => {
 				result.current.setZoom( 5 );
@@ -430,7 +430,7 @@ describe( 'useCropperState', () => {
 		} );
 
 		it( 'should be false after manually resetting fields to initial values', () => {
-			const { result } = renderHook( () => useCropperState() );
+			const { result } = renderHook( () => useCropperReducer() );
 
 			// Zoom in and pan.
 			act( () => {
@@ -460,7 +460,7 @@ describe( 'useCropperState', () => {
 		// non-square images. The initial snapshot must be refreshed so
 		// isDirty still reports false at a "clean" post-load state.
 		it( 'should be false after setImage on a non-square image', () => {
-			const { result } = renderHook( () => useCropperState() );
+			const { result } = renderHook( () => useCropperReducer() );
 
 			act( () => {
 				result.current.setImage( {
@@ -473,12 +473,36 @@ describe( 'useCropperState', () => {
 			expect( result.current.isDirty ).toBe( false );
 		} );
 
+		it( 'does not reset the clean baseline when the same image is reported again', () => {
+			const image = {
+				src: 'test.jpg',
+				naturalWidth: 1600,
+				naturalHeight: 900,
+			};
+			const { result } = renderHook( () => useCropperReducer() );
+
+			act( () => {
+				result.current.setImage( image );
+			} );
+			act( () => {
+				result.current.setRotation( 45 );
+			} );
+			expect( result.current.isDirty ).toBe( true );
+
+			act( () => {
+				result.current.setImage( image );
+			} );
+
+			expect( result.current.isDirty ).toBe( true );
+			expect( result.current.state.rotation ).toBe( 45 );
+		} );
+
 		// Regression: reset() on a loaded image must produce a "clean"
 		// snapshot that matches what the reducer actually stored
 		// (preserving the image, re-enforcing containment). Otherwise
 		// isDirty reports true right after reset.
 		it( 'should be false after reset on a loaded image', () => {
-			const { result } = renderHook( () => useCropperState() );
+			const { result } = renderHook( () => useCropperReducer() );
 
 			act( () => {
 				result.current.setImage( {
@@ -507,7 +531,7 @@ describe( 'useCropperState', () => {
 		// For these tests, we need a loaded image so the reducer can
 		// compute minZoomForCover and restrict position.
 		function setupWithImage() {
-			const view = renderHook( () => useCropperState() );
+			const view = renderHook( () => useCropperReducer() );
 			act( () => {
 				view.result.current.setImage( {
 					src: 'test.jpg',
@@ -750,7 +774,7 @@ describe( 'useCropperState', () => {
 
 	describe( 'SETTLE_CROP', () => {
 		function setupWithImage() {
-			const view = renderHook( () => useCropperState() );
+			const view = renderHook( () => useCropperReducer() );
 			act( () => {
 				view.result.current.setImage( {
 					src: 'test.jpg',
@@ -851,7 +875,7 @@ describe( 'useCropperState', () => {
 
 	describe( 'SNAP_ROTATE_90', () => {
 		function setupWithImage() {
-			const view = renderHook( () => useCropperState() );
+			const view = renderHook( () => useCropperReducer() );
 			act( () => {
 				view.result.current.setImage( {
 					src: 'test.jpg',
@@ -945,260 +969,9 @@ describe( 'useCropperState', () => {
 		} );
 	} );
 
-	describe( 'undo/redo history', () => {
-		const DEBOUNCE_MS = 300;
-
-		beforeEach( () => jest.useFakeTimers() );
-		afterEach( () => jest.useRealTimers() );
-
-		// --- debounce batching ---
-
-		it( 'does not create a history entry before the debounce fires', () => {
-			const { result } = renderHook( () => useCropperState() );
-			act( () => {
-				result.current.setZoom( 3 );
-			} );
-			expect( result.current.hasUndo ).toBe( false );
-		} );
-
-		it( 'creates one history entry after the debounce settles', () => {
-			const { result } = renderHook( () => useCropperState() );
-			act( () => {
-				result.current.setZoom( 2 );
-				result.current.setZoom( 3 );
-				result.current.setZoom( 4 );
-			} );
-			act( () => jest.advanceTimersByTime( DEBOUNCE_MS ) );
-			expect( result.current.hasUndo ).toBe( true );
-			act( () => result.current.undo() );
-			expect( result.current.state.zoom ).toBe( 1 );
-			expect( result.current.hasUndo ).toBe( false );
-		} );
-
-		it( 'does not create a history entry for a no-op round trip', () => {
-			const { result } = renderHook( () => useCropperState() );
-			act( () => result.current.setZoom( 2 ) );
-			act( () => result.current.setZoom( 1 ) );
-			act( () => jest.advanceTimersByTime( DEBOUNCE_MS ) );
-			expect( result.current.hasUndo ).toBe( false );
-		} );
-
-		// --- commitHistory flush ---
-
-		it( 'commitHistory flushes the pending entry immediately', () => {
-			const { result } = renderHook( () => useCropperState() );
-			// Separate act() calls are required: setZoom dispatches a reducer
-			// action that React processes when act() flushes. If commitHistory
-			// runs in the same act(), stateRef.current hasn't updated yet and
-			// the flush sees no change.
-			act( () => result.current.setZoom( 3 ) );
-			act( () => result.current.commitHistory() );
-			expect( result.current.hasUndo ).toBe( true );
-		} );
-
-		it( 'commitHistory is a no-op when state has not changed', () => {
-			const { result } = renderHook( () => useCropperState() );
-			act( () => {
-				result.current.commitHistory();
-			} );
-			expect( result.current.hasUndo ).toBe( false );
-		} );
-
-		// --- discrete actions ---
-
-		it( 'toggleFlip creates a history entry immediately', () => {
-			const { result } = renderHook( () => useCropperState() );
-			act( () => {
-				result.current.toggleFlip( 'horizontal' );
-			} );
-			expect( result.current.hasUndo ).toBe( true );
-		} );
-
-		it( 'setFlip creates a history entry immediately', () => {
-			const { result } = renderHook( () => useCropperState() );
-			act( () => {
-				result.current.setFlip( { horizontal: true, vertical: false } );
-			} );
-			expect( result.current.hasUndo ).toBe( true );
-		} );
-
-		it( 'snapRotate90 creates a history entry immediately', () => {
-			const { result } = renderHook( () => useCropperState() );
-			act( () => {
-				result.current.snapRotate90( 1 );
-			} );
-			expect( result.current.hasUndo ).toBe( true );
-		} );
-
-		it( 'applyOperation creates a history entry immediately', () => {
-			const { result } = renderHook( () => useCropperState() );
-			act( () => {
-				result.current.applyOperation( { type: 'zoom', factor: 3 } );
-			} );
-			expect( result.current.hasUndo ).toBe( true );
-		} );
-
-		// --- undo / redo round-trip ---
-
-		it( 'undo restores the previous state and enables redo', () => {
-			const { result } = renderHook( () => useCropperState() );
-			act( () => result.current.setZoom( 3 ) );
-			act( () => result.current.commitHistory() );
-			act( () => result.current.undo() );
-			expect( result.current.state.zoom ).toBe( 1 );
-			expect( result.current.hasUndo ).toBe( false );
-			expect( result.current.hasRedo ).toBe( true );
-		} );
-
-		it( 'redo re-applies the undone state', () => {
-			const { result } = renderHook( () => useCropperState() );
-			act( () => result.current.setZoom( 3 ) );
-			act( () => result.current.commitHistory() );
-			act( () => result.current.undo() );
-			act( () => result.current.redo() );
-			expect( result.current.state.zoom ).toBe( 3 );
-			expect( result.current.hasRedo ).toBe( false );
-		} );
-
-		it( 'undo after redo returns to a clean initial state', () => {
-			const { result } = renderHook( () => useCropperState() );
-			act( () => {
-				result.current.setImage( {
-					src: 'test.jpg',
-					naturalWidth: 1000,
-					naturalHeight: 500,
-				} );
-			} );
-			act( () => result.current.snapRotate90( 1 ) );
-			expect( result.current.isDirty ).toBe( true );
-
-			act( () => result.current.undo() );
-			expect( result.current.isDirty ).toBe( false );
-
-			act( () => result.current.redo() );
-			expect( result.current.isDirty ).toBe( true );
-
-			act( () => result.current.undo() );
-			expect( result.current.state.rotation ).toBe( 0 );
-			expect( result.current.isDirty ).toBe( false );
-		} );
-
-		// --- undo/redo with a pending gesture ---
-
-		it( 'undo flushes a pending gesture before undoing', () => {
-			const { result } = renderHook( () => useCropperState() );
-			// Commit one step, then start a second change without committing.
-			act( () => result.current.setZoom( 3 ) );
-			act( () => result.current.commitHistory() );
-			act( () => result.current.setZoom( 5 ) );
-			// Undo should flush zoom=5 first, then undo back to zoom=3.
-			act( () => result.current.undo() );
-			expect( result.current.state.zoom ).toBe( 3 );
-			expect( result.current.hasRedo ).toBe( true );
-		} );
-
-		it( 'undo with no prior history flushes and undoes the pending gesture', () => {
-			const { result } = renderHook( () => useCropperState() );
-			act( () => {
-				result.current.setZoom( 3 );
-			} );
-			// Undo before the debounce fires — flush saves the change, then
-			// immediately undoes it.
-			act( () => result.current.undo() );
-			expect( result.current.state.zoom ).toBe( 1 );
-		} );
-
-		// --- setImage and reset do not pollute history ---
-
-		it( 'setImage does not create a history entry', () => {
-			const { result } = renderHook( () => useCropperState() );
-			act( () => {
-				result.current.setImage( {
-					src: 'test.jpg',
-					naturalWidth: 100,
-					naturalHeight: 100,
-				} );
-			} );
-			act( () => jest.advanceTimersByTime( DEBOUNCE_MS ) );
-			expect( result.current.hasUndo ).toBe( false );
-		} );
-
-		it( 'reset is undoable and restores a clean current state', () => {
-			const { result } = renderHook( () => useCropperState() );
-			act( () => result.current.setZoom( 3 ) );
-			act( () => result.current.commitHistory() );
-			expect( result.current.hasUndo ).toBe( true );
-			act( () => result.current.reset() );
-			expect( result.current.state.zoom ).toBe( 1 );
-			expect( result.current.isDirty ).toBe( false );
-			expect( result.current.hasUndo ).toBe( true );
-			act( () => result.current.undo() );
-			expect( result.current.state.zoom ).toBe( 3 );
-		} );
-
-		it( 'reset does not create a history entry when already clean', () => {
-			const { result } = renderHook( () => useCropperState() );
-			act( () => result.current.reset() );
-			expect( result.current.hasUndo ).toBe( false );
-		} );
-
-		// --- discrete action flushes a concurrent continuous gesture ---
-
-		it( 'discrete action saves the pending gesture as a separate undo step', () => {
-			const { result } = renderHook( () => useCropperState() );
-			act( () => {
-				result.current.setZoom( 3 );
-			} );
-			act( () => {
-				result.current.setFlip( { horizontal: true, vertical: false } );
-			} );
-			// First undo removes the flip.
-			act( () => result.current.undo() );
-			expect( result.current.state.flip.horizontal ).toBe( false );
-			expect( result.current.state.zoom ).toBe( 3 );
-			// Second undo removes the zoom gesture.
-			act( () => result.current.undo() );
-			expect( result.current.state.zoom ).toBe( 1 );
-		} );
-
-		it( 'settleCrop is grouped into the resize undo step', () => {
-			const { result } = renderHook( () => useCropperState() );
-			act( () => {
-				result.current.setImage( {
-					src: 'test.jpg',
-					naturalWidth: 1000,
-					naturalHeight: 500,
-				} );
-			} );
-			const initialCropRect = result.current.state.cropRect;
-
-			act( () => {
-				result.current.setCropRect( {
-					x: 0.25,
-					y: 0.25,
-					width: 0.5,
-					height: 0.5,
-				} );
-			} );
-			act( () => result.current.settleCrop() );
-			const settledState = result.current.state;
-
-			expect( result.current.hasUndo ).toBe( true );
-			act( () => result.current.undo() );
-			expect( result.current.state.cropRect ).toEqual( initialCropRect );
-			expect( result.current.hasUndo ).toBe( false );
-
-			act( () => result.current.redo() );
-			expect( result.current.state.cropRect ).toEqual(
-				settledState.cropRect
-			);
-			expect( result.current.state.zoom ).toBe( settledState.zoom );
-		} );
-	} );
-
 	describe( 'public controller contract', () => {
 		it( 'does not expose the raw reducer dispatch', () => {
-			const { result } = renderHook( () => useCropperState() );
+			const { result } = renderHook( () => useCropperReducer() );
 
 			expect( '__dispatch' in result.current ).toBe( false );
 		} );
@@ -1207,7 +980,7 @@ describe( 'useCropperState', () => {
 	describe( 'isStateDirty coverage guard', () => {
 		// This test ensures that isStateDirty checks ALL fields in CropperState.
 		// If you add a field to CropperState/DEFAULT_STATE and this test fails,
-		// you MUST also update isStateDirty() in use-cropper-state.ts.
+		// you MUST also update isStateDirty() in use-cropper-reducer.ts.
 		it( 'should track all CropperState fields', () => {
 			// Flatten DEFAULT_STATE keys into dot-notation paths.
 			// e.g., { pan: { x: 0, y: 0 } } → ['crop.x', 'crop.y']
