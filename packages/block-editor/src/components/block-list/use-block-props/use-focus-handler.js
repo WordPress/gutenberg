@@ -30,12 +30,6 @@ export function useFocusHandler( clientId ) {
 			 * @param {FocusEvent} event Focus event.
 			 */
 			function onFocus( event ) {
-				// Document-scoped listener: bail when focus didn't land
-				// inside this block's wrapper.
-				if ( ! node.contains( event.target ) ) {
-					return;
-				}
-
 				// When the whole editor is editable, let writing flow handle
 				// selection.
 				if (
@@ -63,11 +57,7 @@ export function useFocusHandler( clientId ) {
 				selectBlock( clientId );
 			}
 
-			return subscribeSharedListener(
-				node.ownerDocument,
-				'focusin',
-				onFocus
-			);
+			return subscribeSharedListener( node, 'focusin', onFocus );
 		},
 		[ isBlockSelected, selectBlock ]
 	);

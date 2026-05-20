@@ -1,34 +1,46 @@
 /**
- * Adds a callback to a shared `addEventListener` on the given target (a
- * `Window` or `Document`). Only one underlying native listener is attached
- * per (target, event type, phase); subsequent subscribers join an in-JS
- * `Set` that fans out the event.
+ * Adds a callback to a shared `addEventListener`. Only one underlying
+ * native listener is attached per (root, event type, phase); subscribers
+ * join an in-JS registry that dispatches events along the DOM ancestry
+ * of `event.target`.
  *
- * Many editor surfaces attach the same DOM listener once per component
- * instance (`copy`, `cut`, `pointerdown`, `pointerup`, `selectionchange`,
- * `focusin`, `mouseover`, etc.). Each instance previously called
- * `addEventListener` and short-circuited inside the handler when not the
- * active one. With many mounted instances that's redundant JS↔C++
- * boundary crossings on every event. Sharing collapses them.
+ * The model mirrors React's synthetic event system: a single root
+ * listener handles every event of a given type, and callbacks bound to
+ * an `Element` only fire when that element is on the target's path.
+ * Callbacks bound to a `Document` always fire (document is the root of
+ * every event in that document); callbacks bound to a `Window` always
+ * fire as a flat fan-out, since `window` isn't on the DOM tree.
  *
- * The native listener is registered lazily on the first subscribe and is
- * not removed when the last subscriber unsubscribes — `window` /
- * `document` outlive the component instances, and keeping one stable
- * native listener per (target, type, phase) is cheaper than churning the
- * registry.
- *
- * @param target    Window or Document to listen on.
+ * @param target    `Element`, `Document`, or `Window` to bind the
+ *                  callback to. For `Element`, the callback only fires
+ *                  when the event happens on the element or a
+ *                  descendant.
  * @param eventType DOM event name.
  * @param callback  Listener to be invoked with the event.
  * @param capture   Use the capture phase. Required when ancestor
  *                  listeners gate on `event.defaultPrevented`, since a
- *                  bubble-phase document listener fires after them.
- *                  Defaults to `false`.
+ *                  bubble-phase root listener fires after them. Defaults
+ *                  to `false`.
  * @return Unsubscribe function.
  */
 type Listener = ( event: Event ) => void;
 
-const registries = new WeakMap< EventTarget, Map< string, Set< Listener > > >();
+// root -> eventTypeKey -> subscribedTarget -> Set<callback>
+const registries = new WeakMap<
+	EventTarget,
+	Map< string, Map< EventTarget, Set< Listener > > >
+>();
+
+function getRoot( target: EventTarget ): EventTarget {
+	if ( typeof Document !== 'undefined' && target instanceof Document ) {
+		return target;
+	}
+	if ( typeof Window !== 'undefined' && target instanceof Window ) {
+		return target;
+	}
+	// Assume Element/Node.
+	return ( target as Node ).ownerDocument as Document;
+}
 
 export default function subscribeSharedListener(
 	target: EventTarget,
@@ -36,29 +48,75 @@ export default function subscribeSharedListener(
 	callback: Listener,
 	capture: boolean = false
 ): () => void {
-	let perTarget = registries.get( target );
-	if ( ! perTarget ) {
-		perTarget = new Map();
-		registries.set( target, perTarget );
+	const root = getRoot( target );
+	const isWindow = typeof Window !== 'undefined' && root instanceof Window;
+
+	let perRoot = registries.get( root );
+	if ( ! perRoot ) {
+		perRoot = new Map();
+		registries.set( root, perRoot );
 	}
 	const key = capture ? `${ eventType }:capture` : eventType;
-	let listeners = perTarget.get( key );
-	if ( ! listeners ) {
-		listeners = new Set();
-		perTarget.set( key, listeners );
-		const fanOut = listeners;
-		target.addEventListener(
+	let perEvent = perRoot.get( key );
+	if ( ! perEvent ) {
+		perEvent = new Map< EventTarget, Set< Listener > >();
+		perRoot.set( key, perEvent );
+		const subscribers = perEvent;
+		root.addEventListener(
 			eventType,
 			( event ) => {
-				for ( const cb of fanOut ) {
-					cb( event );
+				if ( isWindow ) {
+					// Window has no DOM ancestry — fan out to all
+					// window-bound callbacks.
+					for ( const set of subscribers.values() ) {
+						for ( const cb of set ) {
+							cb( event );
+						}
+					}
+					return;
+				}
+				// Walk the target → root ancestry, dispatching callbacks
+				// for any node in the path. For capture phase, dispatch
+				// outermost-first; for bubble, innermost-first.
+				const path: Array< Node | Document > = [];
+				let current: Node | null = event.target as Node | null;
+				while ( current ) {
+					path.push( current );
+					if ( current === root ) {
+						break;
+					}
+					current = current.parentNode;
+				}
+				if ( capture ) {
+					for ( let i = path.length - 1; i >= 0; i-- ) {
+						const set = subscribers.get( path[ i ] );
+						if ( set ) {
+							for ( const cb of set ) {
+								cb( event );
+							}
+						}
+					}
+				} else {
+					for ( const node of path ) {
+						const set = subscribers.get( node );
+						if ( set ) {
+							for ( const cb of set ) {
+								cb( event );
+							}
+						}
+					}
 				}
 			},
 			capture
 		);
 	}
-	listeners.add( callback );
+	let set = perEvent.get( target );
+	if ( ! set ) {
+		set = new Set();
+		perEvent.set( target, set );
+	}
+	set.add( callback );
 	return () => {
-		listeners?.delete( callback );
+		set?.delete( callback );
 	};
 }

@@ -34,10 +34,6 @@ export default function useSpace( clientId ) {
 					return;
 				}
 
-				if ( event.target !== element ) {
-					return;
-				}
-
 				const selectionStart = getSelectionStart();
 				const selectionEnd = getSelectionEnd();
 				if (
@@ -62,7 +58,7 @@ export default function useSpace( clientId ) {
 			// Capture phase so we run before writing-flow's ancestor-bubble
 			// keydown handlers that gate on `event.defaultPrevented`.
 			return subscribeSharedListener(
-				element.ownerDocument,
+				element,
 				'keydown',
 				onKeyDown,
 				true

@@ -396,15 +396,10 @@ export function useAutocompleteProps( options: UseAutocompleteProps ) {
 		ref,
 		useRefEffect( ( element: HTMLElement ) => {
 			function _onKeyDown( event: Event ) {
-				// Document-scoped listener: bail when the keydown isn't
-				// for our element.
-				if ( event.target !== element ) {
-					return;
-				}
 				onKeyDownRef.current?.( event as KeyboardEvent );
 			}
 			return subscribeSharedListener(
-				element.ownerDocument,
+				element,
 				'keydown',
 				_onKeyDown,
 				// Capture phase. When the autocomplete popover is open,

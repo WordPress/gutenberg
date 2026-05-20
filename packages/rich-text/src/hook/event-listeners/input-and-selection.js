@@ -63,14 +63,6 @@ export default ( props ) => ( element ) => {
 	let isComposing = false;
 
 	function onInput( event ) {
-		// Document-scoped listener: bail when the event isn't for our
-		// editable. `event` is optional — `onCompositionEnd` calls
-		// `onInput({ inputType: 'insertText' })` synthetically, in which
-		// case we trust the caller.
-		if ( event && event.target && event.target !== element ) {
-			return;
-		}
-
 		// Do not trigger a change if characters are being composed. Browsers
 		// will usually emit a final `input` event when the characters are
 		// composed. As of December 2019, Safari doesn't support
@@ -198,10 +190,7 @@ export default ( props ) => ( element ) => {
 		onSelectionChange( start, end );
 	}
 
-	function onCompositionStart( event ) {
-		if ( event.target !== element ) {
-			return;
-		}
+	function onCompositionStart() {
 		isComposing = true;
 		// Do not update the selection when characters are being composed as
 		// this rerenders the component and might destroy internal browser
@@ -217,10 +206,7 @@ export default ( props ) => ( element ) => {
 		element.querySelector( `[${ PLACEHOLDER_ATTR_NAME }]` )?.remove();
 	}
 
-	function onCompositionEnd( event ) {
-		if ( event.target !== element ) {
-			return;
-		}
+	function onCompositionEnd() {
 		isComposing = false;
 		// Ensure the value is up-to-date for browsers that don't emit a final
 		// input event after composition.
@@ -233,8 +219,8 @@ export default ( props ) => ( element ) => {
 	}
 
 	function onFocus( event ) {
-		// Document-scoped `focusin` listener: bail when focus didn't land
-		// on our editable.
+		// `focusin` bubbles from focusable descendants too — only act
+		// when focus lands on the editable itself.
 		if ( event.target !== element ) {
 			return;
 		}
@@ -290,27 +276,26 @@ export default ( props ) => ( element ) => {
 	// `input` and `compositionend` must run before block-editor's
 	// `input-rules.js` element-level listeners, which call `getValue()`
 	// reading `record.current` updated by our `onInput`. Use capture phase
-	// so the shared document listener fires before any element-level
-	// bubble handlers up the chain.
+	// so we fire before any ancestor bubble handlers.
 	const unsubscribeInput = subscribeSharedListener(
-		ownerDocument,
+		element,
 		'input',
 		onInput,
 		true
 	);
 	const unsubscribeCompositionStart = subscribeSharedListener(
-		ownerDocument,
+		element,
 		'compositionstart',
 		onCompositionStart
 	);
 	const unsubscribeCompositionEnd = subscribeSharedListener(
-		ownerDocument,
+		element,
 		'compositionend',
 		onCompositionEnd,
 		true
 	);
 	const unsubscribeFocus = subscribeSharedListener(
-		ownerDocument,
+		element,
 		'focusin',
 		onFocus
 	);

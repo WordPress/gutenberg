@@ -23,9 +23,6 @@ export function useIsHovered( { isEnabled = true } = {} ) {
 				if ( event.defaultPrevented ) {
 					return;
 				}
-				if ( ! node.contains( event.target ) ) {
-					return;
-				}
 				event.preventDefault();
 				node.classList.toggle(
 					'is-hovered',
@@ -34,12 +31,12 @@ export function useIsHovered( { isEnabled = true } = {} ) {
 			}
 
 			const unsubscribeOut = subscribeSharedListener(
-				node.ownerDocument,
+				node,
 				'mouseout',
 				listener
 			);
 			const unsubscribeOver = subscribeSharedListener(
-				node.ownerDocument,
+				node,
 				'mouseover',
 				listener
 			);

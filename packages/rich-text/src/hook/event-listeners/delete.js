@@ -21,10 +21,6 @@ export default ( props ) => ( element ) => {
 			return;
 		}
 
-		if ( event.target !== element ) {
-			return;
-		}
-
 		const { createRecord, handleChange } = props.current;
 		const currentValue = createRecord();
 		const { start, end, text } = currentValue;
@@ -36,9 +32,5 @@ export default ( props ) => ( element ) => {
 		}
 	}
 
-	return subscribeSharedListener(
-		element.ownerDocument,
-		'keydown',
-		onKeyDown
-	);
+	return subscribeSharedListener( element, 'keydown', onKeyDown );
 };

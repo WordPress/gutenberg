@@ -37,10 +37,6 @@ export function useOnEnter( props ) {
 				return;
 			}
 
-			if ( event.target !== element ) {
-				return;
-			}
-
 			const { content, clientId } = propsRef.current;
 
 			// The paragraph should be empty.
@@ -123,15 +119,8 @@ export function useOnEnter( props ) {
 			} );
 		}
 
-		// Capture phase so we run before writing-flow's element-level
-		// keydown handlers on ancestor block-list nodes
-		// (`use-input.js`, `use-arrow-nav.js`) that gate on
-		// `event.defaultPrevented`.
-		return subscribeSharedListener(
-			element.ownerDocument,
-			'keydown',
-			onKeyDown,
-			true
-		);
+		// Capture phase so we run before writing-flow's ancestor-bubble
+		// keydown handlers that gate on `event.defaultPrevented`.
+		return subscribeSharedListener( element, 'keydown', onKeyDown, true );
 	}, [] );
 }

@@ -26,10 +26,6 @@ export default ( props ) => ( element ) => {
 			return;
 		}
 
-		if ( event.target !== element ) {
-			return;
-		}
-
 		const { record, applyRecord, forceRender } = props.current;
 		const {
 			text,
@@ -100,10 +96,5 @@ export default ( props ) => ( element ) => {
 		forceRender();
 	}
 
-	return subscribeSharedListener(
-		element.ownerDocument,
-		'keydown',
-		onKeyDown,
-		true
-	);
+	return subscribeSharedListener( element, 'keydown', onKeyDown, true );
 };

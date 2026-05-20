@@ -29,9 +29,6 @@ export default function useEnter( props ) {
 			if ( event.defaultPrevented || event.keyCode !== ENTER ) {
 				return;
 			}
-			if ( event.target !== element ) {
-				return;
-			}
 			const { content, clientId } = propsRef.current;
 			if ( content.length ) {
 				return;
@@ -87,11 +84,6 @@ export default function useEnter( props ) {
 
 		// Capture phase so we run before writing-flow's ancestor-bubble
 		// keydown handlers that gate on `event.defaultPrevented`.
-		return subscribeSharedListener(
-			element.ownerDocument,
-			'keydown',
-			onKeyDown,
-			true
-		);
+		return subscribeSharedListener( element, 'keydown', onKeyDown, true );
 	}, [] );
 }

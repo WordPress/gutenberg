@@ -7,12 +7,6 @@ export default () => ( element ) => {
 	function onClick( event ) {
 		const { target } = event;
 
-		// Document-scoped listener: bail when the click isn't inside our
-		// editable.
-		if ( ! element.contains( target ) ) {
-			return;
-		}
-
 		// If the child element has no text content, it must be an object.
 		if (
 			target === element ||
@@ -57,12 +51,12 @@ export default () => ( element ) => {
 	}
 
 	const unsubscribeClick = subscribeSharedListener(
-		element.ownerDocument,
+		element,
 		'click',
 		onClick
 	);
 	const unsubscribeFocusIn = subscribeSharedListener(
-		element.ownerDocument,
+		element,
 		'focusin',
 		onFocusIn
 	);

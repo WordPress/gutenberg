@@ -26,10 +26,6 @@ export default () => ( element ) => {
 	}
 
 	function onDown( event ) {
-		if ( ! element.contains( event.target ) ) {
-			return;
-		}
-
 		const type = event.type === 'keydown' ? 'keyup' : 'pointerup';
 
 		function onCancel() {
@@ -54,12 +50,12 @@ export default () => ( element ) => {
 	}
 
 	const unsubscribePointerDown = subscribeSharedListener(
-		ownerDocument,
+		element,
 		'pointerdown',
 		onDown
 	);
 	const unsubscribeKeyDown = subscribeSharedListener(
-		ownerDocument,
+		element,
 		'keydown',
 		onDown
 	);
